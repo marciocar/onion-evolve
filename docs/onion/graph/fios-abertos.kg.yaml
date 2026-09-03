@@ -122,6 +122,15 @@ nodes:
     label: 'A bancada vendorizada (lint-selftest.sh) NAO PODE passar no adotante: medido em 2026-09-02 no 1o adotante greenfield do pin 8e2517724c0a — SELFTEST_RC=1, 19 casos ✗ (18 em r16-count-drift, 1 em r22-evolution-links) e a suite aborta antes da soma sob set -e. Causa estrutural: inventory_scope_excluded() exclui fixtures e, em repo derivado, tudo fora de docs/onion/ e CLAUDE.onion.md (posto de proposito em 2026-08-06 para o adotante nao nascer vermelho) — o que torna as assercoes dessas familias insatisfaziveis la. Opcoes: (a) marcar as familias core-only e pular quando o stamp diz role: adopted; (b) fixtures proprias do adotante; (c) nao vendorizar a bancada. GATILHO: proximo /meta:adopt --update de um adotante (medir la) OU o maestro selar (a).'
     trace: 'docs/evolution/inbox/_processed/2026-09-02-sinal-research-lens-rule-nasce-hard-no-adotante.md'
 
+  - id: D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    label: 'DECISAO PROPOSTA (sinal upstream do 1o adotante greenfield, 2026-09-03; maestro verbatim: "fundir da melhor forma para aproveitamento do Onion, o core deveria mandar pronto e resolvido"): hoje o /meta:adopt, ao achar CLAUDE.md pre-existente, deixa CLAUDE.onion.md ao lado (never-clobber) e um item "fundir ou nao — decisao do maestro" — resultado: quem abre o repo pelo CLAUDE.md (o arquivo que o harness carrega) NAO ve o Onion (papel, contextos, warm-up, gate). Opcoes: (1) FUNDIR na adocao quando o CLAUDE.md existente e reconhecivel como boilerplate de template (Astro/Next/Vite: so comandos e links, sem regras de projeto) — o conteudo vira secao "Desenvolvimento" do esqueleto Onion-first; never-clobber segue para CLAUDE.md com regras reais; (2) sempre fundir, original preservado integralmente em secao nomeada, diff visivel no commit da adocao; (3) manter e so avisar mais alto. Recomendacao do adotante: (1). Implementacao de referencia: o CLAUDE.md fundido da sacola-de-ideias. GATILHO: proxima adocao greenfield OU selo do maestro.'
+    trace: 'docs/evolution/inbox/_processed/2026-09-03-sinal-adocao-deveria-entregar-claude-md-fundido.md'
+
 edges:
   - from: I_JWKS_ATTEMPTED_AT
     to: W8_REAIS_EXECUTAVEIS
@@ -142,5 +151,8 @@ edges:
     to: W8_REAIS_EXECUTAVEIS
     edge_type: SUPPORTS
   - from: Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE
+    to: W8_REAIS_EXECUTAVEIS
+    edge_type: DEPENDS_ON
+  - from: D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO
     to: W8_REAIS_EXECUTAVEIS
     edge_type: DEPENDS_ON

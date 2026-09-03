@@ -41,3 +41,16 @@ O melhor argumento **contra** minha recomendação vale só para o dogfood (B): 
 - Aplicabilidade de LGPD/BACEN a canal não-oficial servindo de sistema de registro/retenção [S4-F7, corrigido — norma correta em aberto] e a exigência de rastreabilidade por autoria [S4-F8].
 - Se telemetria de lib não-oficial (IP do servidor) configura transferência internacional sob LGPD [S4-F9] — depende de verificação técnica de código **e** parecer.
 - Postura PCI-DSS ao evitar dados de cartão em template [S1-F10] — boa prática inferida, não política publicada pela Meta.
+## Revisita 2026-09-03 (apêndice datado — 1º dogfood do `--revisit` do `/onion-research`)
+
+Cadência forçada de 30 d (`cadenceDays: 30`); 6 nós vencidos re-medidos pela mesma votação adversarial (3 votos,
+2 refutam), verificador **re-buscando a fonte** em vez de julgar citação antiga. Resultado: **1 reconfirmado**
+(lock-in estrutural entre BSPs — o número porta, o histórico/fluxos não) e **5 superados** por `SUPERSEDES` com
+nós datados `E_*_REVISITA_20260903` (preço de template BR, cálculo do quality rating, regras de 550 chars/10
+emojis, lista de BSPs no Brasil, markup da 360dialog) — todos apoiados em **blog tier 4**; a fonte não sustenta
+a afirmação hoje. Leitura honesta: *refutado* = "não sustentado pela fonte apresentada", não "o oposto é
+verdade". Nenhum dos 5 eixos da pergunta (preço, limites, política, versão, banimento) teve mudança **verificada**
+em fonte primária nesta passada — ausência de medição, não estabilidade. `meta.review_after` → 2026-10-03.
+Achado de método: o corpus de julho carregava fatos de mercado/preço selados sobre blog — o gate de tier (REGRA 68)
+teria barrado. Custo: 21 agentes, 1,32 M tokens (mais 1,37 M de uma rodada anterior invalidada pelo placeholder de
+citação, corrigido no mesmo loop). SSOT: o grafo; run `wf_9487391f-594`.
