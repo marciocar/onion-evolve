@@ -1,7 +1,6 @@
 ---
 name: help
 description: Ajuda contextual da vertical de engenharia do Onion — o ciclo faseado plan→pr + GitFlow + especialistas.
-model: sonnet
 allowed-tools: Read Bash(git *)
 category: engineer
 tags: [help, engineering, gitflow, pull-request, documentation]

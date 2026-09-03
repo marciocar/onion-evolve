@@ -3,7 +3,6 @@ name: convert-to-tasks
 description: |
   Converte documentos consolidados em tasks organizadas hierarquicamente.
   Delega para comandos existentes do Sistema Onion para criação de tasks.
-model: sonnet
 allowed-tools: Read Bash(find *) Bash(ls *)
 
 parameters:

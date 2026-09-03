@@ -1,7 +1,6 @@
 ---
 name: task-check
 description: Verificar se task do Task Manager foi implementada no código.
-model: sonnet
 allowed-tools: Read Grep Glob Bash(cat .env*) Bash(git *) Bash(find *)
 category: product
 tags: [verification, implementation, audit]

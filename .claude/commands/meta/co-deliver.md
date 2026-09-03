@@ -1,7 +1,6 @@
 ---
 name: co-deliver
 description: 'Carteiro-LOCAL do doc-bridge (downstream) — entrega um anúncio da staging do core (federation/outbox/<id>/) direto no inbound/ de um adotante que vive na MESMA máquina, para o hook "you have mail" sinalizar 📥 sem o maestro copiar à mão. ENTREGA-SEM-COMMIT (o core nunca commita no repo alheio — invariante I3); o commit + processamento é da sessão do adotante. É o "Carteiro-local mínimo" NÃO-gated do ADR onion-adr-ledger-format-location. Par producer = /meta:co-announce (gera o rascunho).'
-model: sonnet
 category: meta
 tags: [co-evolution, downstream, transport, carteiro, inbound, delivery, bridge]
 version: "1.0.0"

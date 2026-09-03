@@ -1,7 +1,6 @@
 ---
 name: build-compliance-docs
 description: Gerar arquitetura de compliance em `docs/compliance-context/`.
-model: sonnet
 
 parameters:
   - name: frameworks

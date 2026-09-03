@@ -1,7 +1,6 @@
 ---
 name: pre-pr
 description: Validação completa antes do PR. Verifica padrões e qualidade.
-model: sonnet
 allowed-tools: Read Bash(cat .env*) Bash(git *)
 category: engineer
 tags: [validation, pr, quality]

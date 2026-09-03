@@ -1,7 +1,6 @@
 ---
 name: federation-status
 description: 'Monitor read-only da Onion Federation (Fase 3). Lê o ledger (members.yaml + CHANGELOG + contracts/) e reporta saúde cross-repo: contract-drift (contrato alterado sem publish, via script determinístico) + status de CI por membro (via forge adapter). Não muta nada — dá ao maestro a visão "está tudo são?" antes/depois de coordenar uma mudança.'
-model: sonnet
 category: meta
 tags: [federation, status, monitor, drift, ci, ledger, forge, sdaal]
 version: "1.0.0"

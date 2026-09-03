@@ -3,7 +3,6 @@ name: pair-testing
 description: |
   Organiza sessão de pair testing multi-perspectiva para validação colaborativa de features.
   Use para estruturar sessões de teste em par (Dev+Dev, Dev+QA, QA+QA) com foco em White-box, Grey-box ou Black-box.
-model: sonnet
 allowed-tools: Read Glob Write
 
 parameters:

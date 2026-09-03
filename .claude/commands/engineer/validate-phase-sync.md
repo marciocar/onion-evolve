@@ -1,7 +1,6 @@
 ---
 name: validate-phase-sync
 description: Validar sincronização entre fases do plan.md e subtasks do Task Manager.
-model: sonnet
 allowed-tools: Read Grep Edit Bash(find .claude/sessions*) Bash(cat .env*)
 category: engineer
 tags: [validation, sync, task-manager]

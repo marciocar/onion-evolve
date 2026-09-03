@@ -4,7 +4,6 @@ description: |
   Análise estruturada de problemas complexos com template oficial.
   Use para análises críticas, migrações, arquitetura ou performance.
   Diferença vs /quick:analysis: este é o caminho COMPLETO (tipado, com gate/template oficial); use /quick:analysis para análise rápida sem cerimônia.
-model: opus
 allowed-tools: Read Grep Glob Write
 
 parameters:

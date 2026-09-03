@@ -1,7 +1,6 @@
 ---
 name: init
 description: Inicializar repositório com GitFlow e convenções padrão.
-model: sonnet
 allowed-tools: Grep Bash(git *)
 category: git
 tags: [init, gitflow, setup]

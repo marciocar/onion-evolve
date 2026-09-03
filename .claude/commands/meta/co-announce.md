@@ -1,7 +1,6 @@
 ---
 name: co-announce
 description: Gera um anúncio downstream pronto-para-transportar a partir de uma entrada do CHANGELOG de co-evolução, endereçado ao(s) adotante(s) do campo `alvo:` (resolvidos via members.yaml), escrevendo na staging do core (federation/outbox/<id>/). É o lado producer do doc-bridge leve (≠ /meta:federation-publish, que é o ledger de contratos). Human-in-the-loop — o maestro revisa e transporta para o inbound/ do adotante (a sessão do core nunca pusha repo alheio).
-model: sonnet
 category: meta
 tags: [co-evolution, downstream, announce, inbound, outbox, bridge, federation]
 version: "1.1.0"

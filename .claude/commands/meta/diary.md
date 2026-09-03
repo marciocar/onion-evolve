@@ -7,7 +7,6 @@ description: |
   sub-comando review é o gatilho invariável de reflexão (⏰ migalha vencida → re-testar, nunca re-carimbar).
   O diário é autobiografia viva: não registra o passado, orienta o futuro. Relacionado: /meta:co-relay,
   /meta:personality-sync (Fase 2, gated), RFC-0003.
-model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(bash *) Bash(ls *) Bash(cat *) Bash(mkdir *) Bash(touch *) Bash(date *) Bash(find *) Bash(awk *) Bash(grep *) Bash(sort *)
 argument-hint: "create | list [--classification <c>] [--type <t>] [--sharable] | export-sharable [--dry-run] | index | review"
 category: meta

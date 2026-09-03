@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**68 regras** no total — **59 HARD**, **18 SOFT**.
+**70 regras** no total — **61 HARD**, **18 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -40,7 +40,7 @@ Campos obrigatórios, válidos e bem-formados no frontmatter de agentes e comand
 | 3 | Campo model: restrito à allowlist sonnet\|opus\|haiku\|fable | HARD | model fora da allowlist embarcado num artefato |
 | 12 | Nomes de tool de agente válidos no Claude Code | HARD | agente declara uma tool inexistente no Claude Code |
 | 17 | Frontmatter: valor escalar com ': ' não-aspado | HARD | YAML de frontmatter quebrado por escalar com ': ' não-aspado |
-| 23 | Frontmatter: model: em comandos e category: em agentes | HARD | comando sem model: ou agente sem category: |
+| 23 | Frontmatter: category: em agentes (a metade 'model: em comandos' foi REVOGADA pela REGRA 71) | HARD | agente sem category: — o roteamento/inventário dependem dele. Até 2026-09-03 esta regra também EXIGIA |
 | 51 | Agentes branch-* documentam a distinção vs o par geral | SOFT | par de agentes com overlap invisível — dispatcher que roteia por description não escolhe |
 
 ## Higiene de artefato
@@ -57,6 +57,7 @@ Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.
 | 22 | Links relativos quebrados em docs/evolution/ e docs/knowledge-base/ | HARD | link relativo quebrado em docs/evolution ou docs/knowledge-base |
 | 48 | Referência de caminho `.claude/…` em backtick (prosa) que não resolve | HARD | referência .claude/ em backtick na prosa apontando p/ arquivo inexistente (ponteiro morto silencioso) |
 | 60 | Identificador de código em INGLÊS | HARD | identificador em pt-BR entrando no código sem que nenhuma guarda mecânica o veja. |
+| 71 | Comando não declara model: no frontmatter — segue a escada da sessão | HARD | o Claude Code 2.1.259 passou a HONRAR model: de comando em sessão interativa (radar E3 rodada 2, l.17): |
 
 ## Fronteiras & contratos de arquitetura
 
@@ -98,6 +99,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 59 | Modo que a produção consome é exercitado pela bancada | HARD | guarda que roda no gate por um caminho que nenhum teste percorreu — o modo consumido |
 | 62 | Projeção GERADA em sincronia com a fonte (docs/backlog.md) | HARD | projeção gerada que envelhece calada — o item existe no grafo e some da superfície que as sessões leem |
 | 63 | Colheita de grafo emite os ids colhidos no resíduo de revisão | HARD + SOFT | nó removido de um .kg.yaml sem registro consultável de que existiu — a promessa "a história fica no artefato de revisão" cumprida só na letra |
+| 70 | fallbackModel do settings.json é PROJEÇÃO da escada de modelos (eixo E6) | HARD | a escada (session_models + session_floor em docs/onion/radar-baselines.yaml) e o fallback nativo do |
 
 ## KG & proveniência
 

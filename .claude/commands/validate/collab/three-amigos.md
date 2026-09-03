@@ -3,7 +3,6 @@ name: three-amigos
 description: |
   Facilita sessão Three Amigos (PO + Developer + QA) para refinement de stories.
   Gera agenda estruturada, template de ata e checklist de outputs.
-model: sonnet
 allowed-tools: Read Write Bash(cat .env*)
 
 parameters:

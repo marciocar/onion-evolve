@@ -8,7 +8,6 @@ description: |
   O worker NUNCA escreve: propõe. O maestro sela. Irmão de /meta:kb-freshness e
   /meta:context-freshness, com uma diferença declarada — aqueles não têm onde escrever,
   o KG tem.
-model: opus
 category: meta
 tags: [kg, freshness, orchestration, validation, ssot]
 version: "1.0.0"

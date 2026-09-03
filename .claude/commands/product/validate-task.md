@@ -1,7 +1,6 @@
 ---
 name: validate-task
 description: Validar e analisar task existente do Task Manager.
-model: sonnet
 allowed-tools: Read Bash(cat .env*)
 category: product
 tags: [validation, task-manager, analysis]

@@ -3,7 +3,6 @@ name: presentation
 description: |
   Criação de apresentações profissionais via Gamma.app.
   Use para gerar apresentações a partir de temas, tasks ou documentos.
-model: sonnet
 allowed-tools: Read Glob Grep
 
 parameters:

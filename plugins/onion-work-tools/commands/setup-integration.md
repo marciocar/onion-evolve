@@ -3,7 +3,6 @@ name: setup-integration
 description: |
   Configura integrações do Sistema Onion (Task Managers, Gamma, etc).
   Guia o usuário na configuração segura de variáveis de ambiente para MCPs e APIs.
-model: sonnet
 allowed-tools: Read Bash(test -f *) Bash(grep *) Bash(git ls-files*)
 parameters:
   - name: integration

@@ -14,7 +14,6 @@ name: nome-do-comando
 description: |
   Descrição clara em 1-2 linhas do propósito do comando.
   Use para [caso de uso principal].
-model: sonnet                    # sonnet | opus | haiku | fable
 
 # ═══════════════════════════════════════════════════════════════════════════════
 # PARÂMETROS (opcional)
@@ -226,7 +225,6 @@ name: example-command
 description: |
   Comando exemplo demonstrando estrutura padrão v3.0.
   Use como referência para criar novos comandos.
-model: sonnet
 
 parameters:
   - name: target

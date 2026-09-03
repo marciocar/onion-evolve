@@ -3,7 +3,6 @@ name: setup-code-review
 description: |
   Setup, validação e otimização de code review automático no CI (GitHub Actions).
   Use para configurar o workflow de review de PRs do projeto.
-model: sonnet
 allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Bash(cat .env*)
 
 parameters:

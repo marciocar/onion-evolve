@@ -5,7 +5,6 @@ description: |
   paralela) → converge (gate WCAG determinístico filtra + juiz ranqueia) → vencedora
   alimenta o DEVELOP do /design:identity. A IA gera; o gate decide. Orquestra os workers
   via onion-orchestration/Workflow (generate-and-filter). Delega a @brand-generator (workers).
-model: opus
 allowed-tools: Read Write Edit Glob Grep Workflow Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/design-source/*) Bash(mktemp -d -t onion-design-*) Bash(rm -rf /tmp/onion-design-*)
 category: design
 tags: [design, tokens, generative, orchestration, wcag, branding]

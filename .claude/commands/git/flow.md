@@ -3,7 +3,6 @@ name: flow
 description: |
   Dispatcher único do ciclo de vida GitFlow: feature/release/hotfix × start/publish/finish.
   Orquestrador fino sobre o motor GitFlow (KB) + adapters forge e task-manager.
-model: sonnet
 allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Bash(cat .env*)
 category: git
 tags: [gitflow, feature, release, hotfix, dispatcher]

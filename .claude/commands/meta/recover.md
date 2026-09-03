@@ -6,7 +6,6 @@ description: |
   customizações locais (never-clobber). Use quando Claude Code abre "cego" ao Onion mesmo
   com .claude/ instalado. Para repos sem .claude/ algum, usar docs/applying/rescue-prompt.md.
   Relacionado: /meta:adopt --update, docs/applying/rescue-prompt.md.
-model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(ls *) Bash(cat *) Bash(mkdir *) Bash(touch *) Bash(date *)
 argument-hint: "[--dry-run]"
 category: meta

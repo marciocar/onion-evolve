@@ -3,7 +3,6 @@ name: e2e
 description: |
   Gera e executa testes end-to-end automaticamente com detecção de framework.
   Use para criar testes E2E seguindo padrões do projeto e executá-los com gravação.
-model: sonnet
 allowed-tools: Read Glob Write Bash(npx *)
 
 parameters:

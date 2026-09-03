@@ -3,7 +3,6 @@ name: start
 description: |
   Iniciar desenvolvimento de feature. Cria sessão e analisa tasks.
   Suporta múltiplos gerenciadores via TASK_MANAGER_PROVIDER.
-model: sonnet
 allowed-tools: Bash(git *) Bash(cat .env*) Bash(ls .claude/*) Read Write Edit Grep Glob
 category: engineer
 tags: [development, workflow, session]

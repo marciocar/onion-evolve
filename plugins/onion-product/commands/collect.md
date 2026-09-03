@@ -1,7 +1,6 @@
 ---
 name: collect
 description: Coletar novas ideias de features ou bugs para o projeto.
-model: sonnet
 allowed-tools: Read Bash(cat .env*)
 category: product
 tags: [ideation, features, bugs]

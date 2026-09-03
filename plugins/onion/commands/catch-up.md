@@ -3,7 +3,6 @@ name: catch-up
 description: |
   Briefing de retomada — reconstrói "onde paramos" de sinais duráveis
   (git recente, sessão ACTIVE, memória, inbox) após queda/saída de sessão.
-model: sonnet
 allowed-tools: Read Grep Glob Bash(git *) Bash(ls *) Bash(find .claude/sessions*) Bash(find docs/evolution*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh*)
 category: general
 tags: [resume, briefing, session, recovery, cold-resume, kg-first]

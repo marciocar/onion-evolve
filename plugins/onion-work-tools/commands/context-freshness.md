@@ -7,7 +7,6 @@ description: |
   CURRENT/STALE/HISTORICAL + trechos desatualizados + direção de refresh; o fan-in
   consolida, detecta contradição cross-domínio e marca candidatos a remoção.
   É a fase *Manage* executável do ciclo de vida (ADR onion-adr-domain-context-lifecycle).
-model: opus
 category: meta
 tags: [context, freshness, orchestration, validation, lifecycle]
 version: "1.0.0"

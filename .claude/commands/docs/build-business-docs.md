@@ -1,7 +1,6 @@
 ---
 name: build-business-docs
 description: Gerar arquitetura de contexto de negócio em `docs/business-context/`.
-model: sonnet
 allowed-tools: Read Write WebSearch Bash(find *)
 
 parameters:

@@ -1,7 +1,6 @@
 ---
 name: personality-sync
 description: 'Gera a personalidade EMERGENTE de uma instância Onion — .claude/identity/personality.md, 5 seções — a partir da EVIDÊNCIA DE USO (diário, .onion-version, primeiros 30 commits), nunca declarada à mão. Materializa a RFC-0003 §2.4 (Fase 2). Cada sync REGENERA (a personalidade acompanha o uso). O arquivo é PROJEÇÃO one-way (compatível A2A Agent Card), não fonte da verdade. Produz também a linha `personality_summary` do members.yaml para a própria instância. É o declarado≠verificado aplicado à identidade: mata os seeds manuais pré-F2.'
-model: sonnet
 category: meta
 tags: [federation, identity, personality, emergent, rfc-0003, declared-vs-verified, a2a-card]
 version: "1.0.0"

@@ -4,7 +4,6 @@ description: |
   Orquestrador para criar, validar, otimizar e migrar Agent Skills via
   @agent-skills-specialist. Padrão Onion: skills em .claude/skills/ (Claude Code-nativo).
   Suporta também .agents/skills/ para distribuição cross-client.
-model: sonnet
 allowed-tools: Read Write Bash(ls *) Bash(grep *) Bash(bash .claude/validation/inventory.sh*)
 
 parameters:

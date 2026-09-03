@@ -3129,8 +3129,10 @@ check_vendored_surface_clean() {
 }
 
 # ===========================================================================
-# REGRA 23 — Frontmatter: model: em comandos e category: em agentes [HARD]
-# previne: comando sem model: ou agente sem category:
+# REGRA 23 — Frontmatter: category: em agentes (a metade 'model: em comandos' foi REVOGADA pela REGRA 71) [HARD]
+# previne: agente sem category: — o roteamento/inventário dependem dele. Até 2026-09-03 esta regra também EXIGIA
+#   model: em comandos; a REGRA 71 inverteu (comando segue a escada da sessão; tiering é dos agentes) — Aufhebung:
+#   o número fica, a metade de comando sai, e a fixture r23 bad-command-no-model virou caso BOM.
 #   Origem: Q_LINT_FRONTMATTER do KG (achados D8-20/D8-21 da auditoria
 #   2026-07-04 — o gap deixou 7 artefatos divergirem em silêncio; a regra
 #   impede o 8º). Escopo DELIBERADAMENTE determinístico: granularidade de
@@ -3139,16 +3141,6 @@ check_vendored_surface_clean() {
 #   Mesmo molde/exclusões da R1 (agentes) e R2 (comandos: sem common/, sem README).
 # ===========================================================================
 check_frontmatter_model_category() {
-  while IFS= read -r -d '' cmd; do
-    if ! grep -q "^model:" "${cmd}"; then
-      violation "HARD" "${cmd}" "frontmatter de comando sem model: — todo comando invocável declara o tier (achado D8-20, auditoria 2026-07-04) — adicione 'model: sonnet|opus|haiku|fable' ao frontmatter"
-    fi
-  done < <(
-    _find "${CLAUDE_DIR}/commands" -name "*.md" \
-      ! -path "*/common/*"   \
-      ! -name "README.md"    \
-      -print0 2>/dev/null
-  )
   while IFS= read -r -d '' agent; do
     if ! grep -q "^category:" "${agent}"; then
       violation "HARD" "${agent}" "frontmatter de agente sem category: — exigido pelo inventário/roteamento (achado D8-21, auditoria 2026-07-04) — adicione 'category: <categoria>' ao frontmatter (ex.: o nome do subdiretório em .claude/agents/)"
@@ -3761,6 +3753,50 @@ check_radar_sources_freshness() {
 }
 
 check_radar_sources_freshness
+
+# REGRA 70 — fallbackModel do settings.json é PROJEÇÃO da escada de modelos (eixo E6) [HARD]
+# previne: a escada (session_models + session_floor em docs/onion/radar-baselines.yaml) e o fallback nativo do
+# Claude Code (settings.json:fallbackModel, lista ordenada, dispara em sobrecarga) divergirem — a plataforma cairia
+# num modelo que a guarda PreModelSwitch veta, ou fora do piso selado. A fonte é a escada; o settings é derivado
+# (mesma doutrina da REGRA 62). Baseline sem escada = silêncio (adotante não nasce vermelho).
+check_fallback_model_parity() {
+  local bl="${ONION_RADAR_BASELINES:-${REPO_ROOT}/docs/onion/radar-baselines.yaml}"
+  local st="${ONION_SETTINGS_JSON:-${REPO_ROOT}/.claude/settings.json}"
+  [ -f "${bl}" ] && [ -f "${st}" ] || return 0
+  command -v python3 >/dev/null 2>&1 || return 0
+  if [ -n "${ONLY_PATH}" ]; then case "${ONLY_PATH}" in "${bl}"|"${st}") : ;; *) return 0 ;; esac; fi
+  local expected actual
+  expected="$(awk '
+    /^[[:space:]]*session_models:[[:space:]]*(#.*)?$/ {f=1; next}
+    f && /^[[:space:]]*-[[:space:]]*/ { sub(/^[[:space:]]*-[[:space:]]*/,""); sub(/[[:space:]]*#.*$/,""); gsub(/"/,""); if ($0!="") print; next }
+    f { f=0 }
+    /^[[:space:]]*session_floor:[[:space:]]*/ { sub(/^[[:space:]]*session_floor:[[:space:]]*/,""); sub(/[[:space:]]*#.*$/,""); gsub(/"/,""); if ($0!="") print }' "${bl}" 2>/dev/null | tail -n +2 | paste -sd, -)"
+  [ -n "${expected}" ] || return 0
+  actual="$(python3 -c 'import json,sys
+d=json.load(open(sys.argv[1])); v=d.get("fallbackModel")
+print(",".join(v) if isinstance(v,list) else (v or ""))' "${st}" 2>/dev/null || echo "?")"
+  if [ "${expected}" != "${actual}" ]; then
+    violation "HARD" "${st}" "REGRA 70: settings.json:fallbackModel [${actual:-<ausente>}] diverge da escada do eixo E6 [${expected}] — o fallback nativo cairia fora da guarda; projete: fallbackModel = session_models[1:] + session_floor"
+  fi
+}
+check_fallback_model_parity
+
+# REGRA 71 — Comando não declara model: no frontmatter — segue a escada da sessão [HARD]
+# previne: o Claude Code 2.1.259 passou a HONRAR model: de comando em sessão interativa (radar E3 rodada 2, l.17):
+# 96 comandos com `sonnet` viravam pedido de downgrade a cada invocação, vetado pela guarda. Tiering é dos AGENTES
+# (worker), não do comando: o comando roda no modelo da sessão, que segue a escada do eixo E6. Opção A selada
+# pelo maestro em 2026-09-03 (D_COMANDOS_SEM_MODEL_OU_NO_LINEUP).
+check_commands_without_model() {
+  local dir="${REPO_ROOT}/.claude/commands" f
+  [ -d "${dir}" ] || return 0
+  while IFS= read -r f; do
+    if [ -n "${ONLY_PATH}" ] && [ "${ONLY_PATH}" != "${f}" ]; then continue; fi
+    if awk 'NR==1&&$0!="---"{exit 1} /^---$/{c++; if(c==2)exit 1; next} c==1&&/^model:[[:space:]]/{found=1; exit 0} END{exit (found?0:1)}' "${f}" 2>/dev/null; then
+      violation "HARD" "${f}" "REGRA 71: comando declara model: no frontmatter — comandos seguem a escada da sessão (E6); tiering é dos agentes. Remova a linha"
+    fi
+  done < <(find "${dir}" -name '*.md' -not -path '*/common/templates/*' 2>/dev/null | sort)
+}
+check_commands_without_model
 check_research_kg_review_after
 check_kg_source_tier_confidence
 check_session_models_baseline

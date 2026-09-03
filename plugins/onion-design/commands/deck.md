@@ -7,7 +7,6 @@ description: |
   modo projetor. Distinto do /product:presentation (Gamma.app, SaaS online): aqui o
   deliverable é um único .html soberano, sem rede. Nasceu de dogfood de campo (decks de um
   treino real, 2026-07 — validados em uso).
-model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/*)
 category: design
 tags: [design, deck, onboarding, training, self-contained, offline, progressive-disclosure]

@@ -30,8 +30,14 @@ axes:
     # selada pelo maestro 2026-09-02: veta downgrade, loga sempre). Diretriz: sempre o latest/maximo do
     # lineup (agent-orchestration.md "Disponibilidade de modelos" e a fonte doutrinaria; ISTO e o dado).
     # Sufixo de contexto ([1m]) e ignorado no match. Muda so por rodada E6 — nunca por /model.
+    # ESCADA (D_COMANDOS_SEM_MODEL_OU_NO_LINEUP, selo do maestro 2026-09-03): ordem = degradacao. session_models
+    # e o lineup de troca livre (primario -> fallback); session_floor e o PISO: so alcancavel por fallback
+    # (source != picker), nunca pelo /model — e a degradacao fica VISIVEL (log ladder=degraded + aviso a cada
+    # prompt). settings.json:fallbackModel e PROJECAO desta escada (REGRA 70); comandos NAO declaram model:
+    # (REGRA 71) — seguem a escada. Reorganizacao = rodada E6 (REGRA 65) + ops/model-lineup-probe.sh.
     session_models:
-      - claude-fable-5-1
-      - claude-opus-5
+      - claude-fable-5-1      # primario: sempre o maximo (doutrina)
+      - claude-opus-5         # fallback: sobrecarga/cota do primario
+    session_floor: claude-sonnet-5   # piso: so por fallback; degradacao visivel
     descartes: "4/25 estratégias reprovadas pelo juiz Elenxo (itens 1, 3, 18, 25) + 3 contagens corrigidas; preço do Fable 5.1 = catálogo, não medido"
     kg: docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml

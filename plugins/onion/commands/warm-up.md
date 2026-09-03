@@ -3,7 +3,6 @@ name: warm-up
 description: |
   Preparação geral do projeto - contexto completo do Sistema Onion.
   Revisa README, estrutura de documentação e meta especificações.
-model: sonnet
 allowed-tools: Read Bash(ls *) Bash(find docs*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh*)
 category: general
 tags: [warmup, context, preparation, overview, kg-first]

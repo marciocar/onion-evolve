@@ -5,7 +5,6 @@ description: |
   e instala o framework (modelo durável) ou opera in-place (efêmero), faseado e
   retomável. Greenfield-first. NÃO é CLI — roda dentro do Claude Code.
   Relacionado: /docs:reverse-consolidate, /meta:setup-integration, /docs:build-tech-docs.
-model: sonnet
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(rm -rf "$TMP") Bash(mktemp *) Bash(cat > *) Bash(mkdir *) Bash(printf *)
 argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--role adopted|hub] [--integration-branch <nome>] [--in-place] [--update] [--promote-hub] [--dry-run]"
 category: meta

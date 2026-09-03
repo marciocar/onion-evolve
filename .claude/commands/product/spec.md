@@ -1,7 +1,6 @@
 ---
 name: spec
 description: Criar especificação de produto a partir de requisitos iniciais.
-model: sonnet
 allowed-tools: Read Edit
 category: product
 tags: [specification, requirements, product]

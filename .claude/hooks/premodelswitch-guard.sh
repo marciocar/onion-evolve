@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # PreModelSwitch + PostModelSwitch — guarda do modelo da SESSÃO (Onion, selada pelo maestro 2026-09-02:
-# "1 + 3": VETA downgrade, LOGA sempre).
+# "1 + 3": VETA downgrade, LOGA sempre). 2026-09-03: escada com PISO (session_floor) — piso so por fallback; campo ladder no log.
 #
 # ── O QUE MEDE (não o que declara) ────────────────────────────────────────────────────────────
 # O evento existe e dispara (E_PREMODELSWITCH_DISPARO_MEDIDO_0902, Claude Code >= 2.1.251): payload
@@ -40,8 +40,8 @@ bl="${ONION_RADAR_BASELINES:-${root}/docs/onion/radar-baselines.yaml}"
 log="${ONION_MODEL_SWITCH_LOG:-${root}/.claude/sessions/model-switch.jsonl}"
 _log() {  # <decision>
   mkdir -p "$(dirname "${log}")" 2>/dev/null || return 0
-  printf '{"ts":"%s","event":"%s","from":"%s","to":"%s","requested":"%s","source":"%s","context_tokens":"%s","cache_write_usd":"%s","decision":"%s","session":"%s"}\n' \
-    "$(date -Is 2>/dev/null || date)" "${ev}" "${from}" "${to}" "${req}" "${src}" "${ctx}" "${usd}" "$1" "${CLAUDE_CODE_SESSION_ID:-}" >> "${log}" 2>/dev/null || true
+  printf '{"ts":"%s","event":"%s","from":"%s","to":"%s","requested":"%s","source":"%s","context_tokens":"%s","cache_write_usd":"%s","decision":"%s","ladder":"%s","session":"%s"}\n' \
+    "$(date -Is 2>/dev/null || date)" "${ev}" "${from}" "${to}" "${req}" "${src}" "${ctx}" "${usd}" "$1" "${ladder:-}" "${CLAUDE_CODE_SESSION_ID:-}" >> "${log}" 2>/dev/null || true
 }
 if [ "${ev}" = "PostModelSwitch" ]; then _log applied; exit 0; fi
 [ "${ev}" = "PreModelSwitch" ] || exit 0
@@ -57,6 +57,23 @@ if [ -z "${allowed}" ]; then
   exit 2
 fi
 to_base="${to%%\[*}"      # claude-fable-5-1[1m] → claude-fable-5-1
+from_base="${from%%\[*}"
+# PISO (2026-09-03): session_floor e alcancavel so por fallback (source != picker) — nunca pelo /model.
+floor="$(awk '/^[[:space:]]*session_floor:[[:space:]]*/ { sub(/^[[:space:]]*session_floor:[[:space:]]*/,""); sub(/[[:space:]]*#.*$/,""); gsub(/"/,""); print; exit }' "${bl}" 2>/dev/null)"
+# posicao na escada (0 = primario … n = piso): sobe = restored, desce = degraded, igual = same
+_pos() { local i=0 m; while IFS= read -r m; do [ "$m" = "$1" ] && { echo "$i"; return; }; i=$((i+1)); done < <(printf '%s\n' "${allowed}"; [ -n "${floor}" ] && printf '%s\n' "${floor}"); echo "-1"; }
+pf="$(_pos "${from_base}")"; pt="$(_pos "${to_base}")"
+ladder=same; [ "${pt}" -gt "${pf}" ] && [ "${pf}" -ge 0 ] && ladder=degraded; [ "${pt}" -lt "${pf}" ] && [ "${pt}" -ge 0 ] && ladder=restored
+if [ -n "${floor}" ] && [ "${to_base}" = "${floor}" ]; then
+  if [ "${src}" = "picker" ]; then
+    _log block
+    echo "GUARDA-PREMODELSWITCH: troca ${from} → ${to} NEGADA — '${floor}' é o PISO da escada (session_floor): só por fallback automático (sobrecarga/cota), nunca pelo /model. Para trabalhar abaixo do lineup de propósito, edite session_floor/session_models na rodada E6." >&2
+    exit 2
+  fi
+  _log allow
+  echo "GUARDA-PREMODELSWITCH: sessão DEGRADADA ao piso '${floor}' por fallback (${src}). Volte ao primário com /model assim que houver capacidade; o aviso repete a cada prompt." >&2
+  exit 0
+fi
 if printf '%s\n' "${allowed}" | grep -qxF "${to_base}"; then _log allow; exit 0; fi
 _log block
 echo "GUARDA-PREMODELSWITCH: troca ${from} → ${to} NEGADA — '${to_base}' não está em session_models do eixo E6 de docs/onion/radar-baselines.yaml ($(printf '%s' "${allowed}" | tr '\n' ' ')). Diretriz da casa: sempre o latest/máximo do lineup; downgrade só por rodada do radar (/meta:radar E6-fronteira-modelos) que atualize o baseline — nunca por /model." >&2

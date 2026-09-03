@@ -1,7 +1,6 @@
 ---
 name: kg-inbox
 description: Processa a fila de propostas de escrita no grafo (docs/evolution/kg-inbox/) — a perna de SELAGEM do write-leg (F4b). Lista as propostas pendentes, roda o radar advisory em cada uma, e para cada decide SELAR (integrar no grafo vivo + git mv → _sealed/) ou REJEITAR (git mv → _rejected/ com motivo). É o mecanismo que impede a fila de acumular sem controle. Human-in-the-loop na TRIAGEM (o que mora no core é juízo), mecânico no resto.
-model: sonnet
 category: meta
 tags: [kg, kg-inbox, write-leg, sealing, i3, self-evolution, sdaal]
 version: "1.0.0"

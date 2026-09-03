@@ -3,7 +3,6 @@ name: extract-meeting
 description: |
   Extração estruturada de conhecimento de transcrições de reuniões usando Framework EXTRACT.
   Use para transformar arquivos de contexto bruto em artefatos de alto valor para humanos, sistemas e IA.
-model: sonnet
 allowed-tools: Read Write Bash(find *) Bash(test -e *) Bash(mkdir -p *) Bash(basename *)
 
 parameters:

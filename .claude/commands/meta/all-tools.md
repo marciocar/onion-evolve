@@ -1,7 +1,6 @@
 ---
 name: all-tools
 description: Apresenta, sob demanda, as ferramentas disponíveis no contexto atual (nativas do Claude Code + MCP) e defere ao inventário canônico para comandos/agentes/skills do Onion. Não gera arquivos.
-model: sonnet
 allowed-tools: Read
 category: meta
 tags: [tools, reference, discovery, on-demand]

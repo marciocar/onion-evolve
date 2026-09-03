@@ -1,7 +1,6 @@
 ---
 description: Conduz um plano-grafo até o fim com rigor Onion — censo→avança→Elenxo→dogfood→realign→checkpoint (degrau AUDIT)
 allowed-tools: Bash, Read, Edit, Write, Task
-model: opus
 ---
 
 # 🚗 /meta:drive — conduzir um plano-grafo até o fim
