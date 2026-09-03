@@ -124,11 +124,13 @@ nodes:
 
   - id: D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO
     node_type: decision
-    plane: DEV
+    plane: PROD
     impact: 4
-    confidence: 0.8
-    status: open
-    label: 'DECISAO PROPOSTA (sinal upstream do 1o adotante greenfield, 2026-09-03; maestro verbatim: "fundir da melhor forma para aproveitamento do Onion, o core deveria mandar pronto e resolvido"): hoje o /meta:adopt, ao achar CLAUDE.md pre-existente, deixa CLAUDE.onion.md ao lado (never-clobber) e um item "fundir ou nao — decisao do maestro" — resultado: quem abre o repo pelo CLAUDE.md (o arquivo que o harness carrega) NAO ve o Onion (papel, contextos, warm-up, gate). Opcoes: (1) FUNDIR na adocao quando o CLAUDE.md existente e reconhecivel como boilerplate de template (Astro/Next/Vite: so comandos e links, sem regras de projeto) — o conteudo vira secao "Desenvolvimento" do esqueleto Onion-first; never-clobber segue para CLAUDE.md com regras reais; (2) sempre fundir, original preservado integralmente em secao nomeada, diff visivel no commit da adocao; (3) manter e so avisar mais alto. Recomendacao do adotante: (1). Implementacao de referencia: o CLAUDE.md fundido da sacola-de-ideias. GATILHO: proxima adocao greenfield OU selo do maestro.'
+    confidence: 0.9
+    status: done
+    label: 'DECISAO PROPOSTA (sinal upstream do 1o adotante greenfield, 2026-09-03; maestro verbatim: "fundir da melhor forma para aproveitamento do Onion, o core deveria mandar pronto e resolvido"): hoje o /meta:adopt, ao achar CLAUDE.md pre-existente, deixa CLAUDE.onion.md ao lado (never-clobber) e um item "fundir ou nao — decisao do maestro" — resultado: quem abre o repo pelo CLAUDE.md (o arquivo que o harness carrega) NAO ve o Onion (papel, contextos, warm-up, gate). Opcoes: (1) FUNDIR na adocao quando o CLAUDE.md existente e reconhecivel como boilerplate de template (Astro/Next/Vite: so comandos e links, sem regras de projeto) — o conteudo vira secao "Desenvolvimento" do esqueleto Onion-first; never-clobber segue para CLAUDE.md com regras reais; (2) sempre fundir, original preservado integralmente em secao nomeada, diff visivel no commit da adocao; (3) manter e so avisar mais alto. Recomendacao do adotante: (1). Implementacao de referencia: o CLAUDE.md fundido da sacola-de-ideias. GATILHO: proxima adocao greenfield OU selo do maestro.' # SELADA 2026-09-03 (opcao 1): helper .claude/utils/adopt/claude-md-fuse.sh (--classify boilerplate|rules, --fuse; recusa exit 3 em regras) + familia claude_md_fuse (5 casos) + Fase 3 do /meta:adopt chama o helper; dogfood REAL da adocao = proxima greenfield
+    verified_at: '2026-09-03'
+    verified_against: 'bancada: run_claude_md_fuse_selftests 5/5 (boilerplate Astro funde; marcador NUNCA e prosa >=25 palavras recusam); adopt.md Fase 3'
     trace: 'docs/evolution/inbox/_processed/2026-09-03-sinal-adocao-deveria-entregar-claude-md-fundido.md'
   - id: D_BANCADA_FAIXAS_E_MAPA
     node_type: decision
@@ -156,7 +158,7 @@ nodes:
     impact: 3
     confidence: 0.5
     status: open
-    label: 'PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-verified_at) falhou 1 vez em 4 runs paralelos de 8 workers (HARD 9->9) e nunca em serie? O lint mostrou-se deterministico sob carga (E_BANCADA_FAIXAS_MEDIDA), nao ha timeout no caminho do lint, o sandbox e privado. Suspeitos: leitura do repo vivo pelo lint do sandbox (git sem origin, provenance), parse do contador (sed|tail -1) sob saida truncada. Gatilho: proxima ocorrencia — o caso agora imprime as HARD so-do-mutante na mensagem de falha; dai abre-se a causa.'
+    label: 'PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-verified_at) falhou 1 vez em 4 runs paralelos de 8 workers (HARD 9->9) e nunca em serie? O lint mostrou-se deterministico sob carga (E_BANCADA_FAIXAS_MEDIDA), nao ha timeout no caminho do lint, o sandbox e privado. Suspeitos: leitura do repo vivo pelo lint do sandbox (git sem origin, provenance), parse do contador (sed|tail -1) sob saida truncada. Gatilho: proxima ocorrencia — o caso agora imprime as HARD so-do-mutante na mensagem de falha; dai abre-se a causa. 2a OCORRENCIA 2026-09-03 (gate do adopt, 1/1 run paralelo; serie passa): a mensagem nova mostrou HARD so-no-mutante = [] — o lint do mutante NAO viu no novo. Causa candidata achada no codigo: _fixture_done_nu fazia cat >> no FIM do arquivo, e fios-abertos termina em edges: — o no-fixture caia sob edges, nao sob nodes (o parser tolerava as vezes). Curado: o no entra antes de edges:. Se recorrer com a cura, a causa e outra.'
     verified_against: 'f-par.log (1 falha), par8.log/par8q.log/f-par2.log (0 falhas), 2026-09-03'
 
 edges:

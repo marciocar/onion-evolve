@@ -323,6 +323,7 @@ SANDBOX="$(mktemp -d)"
 #    `_bench_abort_guard` é chamado PRIMEIRO e sua 1ª instrução é `local rc=$?`, então o exit status
 #    real chega intacto; a limpeza vem depois e nunca mascara o veredito.
 _bench_on_exit() { _bench_abort_guard; rm -rf "${SANDBOX:-}"; }
+  rm -f "${_FIXTURE_NODE:-}" 2>/dev/null || true   # nó-fixture do (e) de kg-backlog (mktemp no top-level)
 trap _bench_on_exit EXIT
 cp -a "${REPO_ROOT}/.claude"   "${SANDBOX}/.claude"
 cp -a "${REPO_ROOT}/docs"      "${SANDBOX}/docs"
@@ -6827,8 +6828,19 @@ run_consumed_modes_selftests() {
 # cap e trocar a acusação, fazendo o caso reprovar pela razão errada.
 _fixture_done_nu() {
   local _src="$1" _dst="$2"
-  sed -E 's/(#.*TETO:[[:space:]]*)[0-9]+/\1999/' "${_src}" > "${_dst}"
-  cat >> "${_dst}" <<'FIXTURE_DONE_NU'
+  # (2026-09-03) o nó-fixture entra na seção NODES (antes de `edges:`), não no fim do arquivo: um grafo que termina em
+  # edges: recebia o nó sob edges — o parser tolerava às vezes, e o (e) ficou intermitente (2/11 runs paralelos, HARD 10→10
+  # com "só-no-mutante: []"). Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO.
+  sed -E 's/(#.*TETO:[[:space:]]*)[0-9]+/\1999/' "${_src}" > "${_dst}.tmp"
+  if grep -qE '^edges:' "${_dst}.tmp"; then
+    awk 'BEGIN{done=0} /^edges:/ && !done { while ((getline line < ENVIRON["_FIXTURE_NODE"]) > 0) print line; done=1 } {print}' "${_dst}.tmp" > "${_dst}"
+  else
+    cp "${_dst}.tmp" "${_dst}"; cat "${_FIXTURE_NODE}" >> "${_dst}"
+  fi
+  rm -f "${_dst}.tmp"
+}
+_FIXTURE_NODE="$(mktemp)"; export _FIXTURE_NODE
+cat > "${_FIXTURE_NODE}" <<'FIXTURE_DONE_NU'
 
   - id: I_FIXTURE_DONE_SEM_CARIMBO
     node_type: decision
@@ -6838,7 +6850,6 @@ _fixture_done_nu() {
     confidence: 1.0
     label: "Fixture da bancada: declara done sem verified_at. Nao existe no backlog real."
 FIXTURE_DONE_NU
-}
 
 # Modo vps-exposure — a guarda que vigia as duas condicoes que armam risco na VPS. Ela checa ESTADO
 # VIVO (docker), nao codigo, e por isso CALA fora da VPS. O par que importa aqui e (a)/(b): sem ele,
@@ -10833,6 +10844,39 @@ PYI
   rm -rf "${d}"
 }
 _family run_selftest_lanes_selftests
+
+# Modo claude-md-fuse — D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO (sinal upstream do 1º adotante greenfield, 2026-09-03): na adoção, um
+# CLAUDE.md pré-existente que é BOILERPLATE de template (só comandos/estrutura/links) é FUNDIDO no esqueleto Onion-first,
+# original preservado em seção nomeada; CLAUDE.md com regras reais segue never-clobber (helper recusa com exit 3).
+run_claude_md_fuse_selftests() {
+  local h="${REPO_ROOT}/.claude/utils/adopt/claude-md-fuse.sh"
+  if [ ! -f "${h}" ]; then record_fail "claude-md-fuse" "helper ausente: ${h}"; return; fi
+  local d out rc; d="$(mktemp -d)"
+  printf '# Astro Starter Kit: Basics\n\n## 🚀 Project Structure\n\nInside of your Astro project, you will see the following folders and files:\n\n| Command | Action |\n| :--- | :--- |\n| `npm run dev` | Starts local dev server at `localhost:4321` |\n\n## 🧞 Commands\n\n- `npm run build`\n- [Astro docs](https://docs.astro.build)\n' > "${d}/astro.md"
+  printf '# Projeto X\n\n## Regras\n- NUNCA commitar direto na main.\n' > "${d}/rules-marker.md"
+  printf '# Projeto Y\n\nToda migration precisa de rollback testado antes do merge, e o time de dados revisa qualquer mudança de schema que afete relatórios regulatórios do trimestre.\n' > "${d}/rules-prose.md"
+  printf '# 🧅 Alvo — regras do projeto\n\n## 🚪 Entrada\n- /onion · /warm-up\n' > "${d}/skel.md"
+  out="$(bash "${h}" --classify "${d}/astro.md" 2>&1 || true)"
+  if [ "${out}" = "boilerplate" ]; then record_pass "claude-md-fuse: (a) template Astro (tabela+comandos+links) ⇒ boilerplate"
+  else record_fail "claude-md-fuse: (a)" "esperava boilerplate, veio: ${out}"; fi
+  out="$(bash "${h}" --classify "${d}/rules-marker.md" 2>&1 || true)"
+  if [ "${out}" = "rules" ]; then record_pass "claude-md-fuse: (b) marcador de regra (NUNCA) ⇒ rules"
+  else record_fail "claude-md-fuse: (b)" "esperava rules, veio: ${out}"; fi
+  out="$(bash "${h}" --classify "${d}/rules-prose.md" 2>&1 || true)"
+  if [ "${out}" = "rules" ]; then record_pass "claude-md-fuse: (c) parágrafo de prosa ≥ 25 palavras ⇒ rules (recusa no incerto)"
+  else record_fail "claude-md-fuse: (c)" "esperava rules, veio: ${out}"; fi
+  rc=0; bash "${h}" --fuse "${d}/astro.md" "${d}/skel.md" "${d}/fused.md" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && [ "$(head -1 "${d}/fused.md")" = "# 🧅 Alvo — regras do projeto" ] \
+     && grep -q '^## 🛠️ Desenvolvimento — conteúdo original do template (Astro Starter Kit: Basics)' "${d}/fused.md" \
+     && grep -qF '`npm run dev`' "${d}/fused.md" && ! grep -q '^# Astro Starter Kit' "${d}/fused.md"; then
+    record_pass "claude-md-fuse: (d) fusão = esqueleto Onion primeiro + original preservado em seção nomeada (título vira nome da seção)"
+  else record_fail "claude-md-fuse: (d) fusão" "rc=${rc}; $(head -3 "${d}/fused.md" 2>/dev/null | tr '\n' '|')"; fi
+  rc=0; bash "${h}" --fuse "${d}/rules-marker.md" "${d}/skel.md" "${d}/fused2.md" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 3 ] && [ ! -s "${d}/fused2.md" ]; then record_pass "claude-md-fuse: (e) CLAUDE.md com regras ⇒ recusa (exit 3), nada escrito — never-clobber preservado"
+  else record_fail "claude-md-fuse: (e) recusa" "rc=${rc} (esperado 3); fused2 tem $(wc -c < "${d}/fused2.md" 2>/dev/null || echo 0) bytes"; fi
+  rm -rf "${d}"
+}
+_family run_claude_md_fuse_selftests
 
 # ---------------------------------------------------------------------------
 # O harness testando a SI MESMO — os três desfechos não podem colapsar em dois
