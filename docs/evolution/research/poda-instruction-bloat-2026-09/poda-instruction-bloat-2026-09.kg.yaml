@@ -1,0 +1,374 @@
+meta:
+  id: poda-instruction-bloat-2026-09
+  schema_version: "1"
+  baseline: 2026-09-03
+  review_after: 2026-10-03   # cadência FERRAMENTA/PREÇO = 30d. Justificativa do tipo dominante: o objeto
+                             # desta decisão NÃO é doutrina (12m) nem mercado (90d) — é uma PROPRIEDADE DE
+                             # RUNTIME do Claude Code (o que entra sempre no contexto: description de skill
+                             # vs corpo sob demanda, `paths:` em rule/skill, o hook InstructionsLoaded), e
+                             # isso muda a cada release semanal. Gatilho extra de revisita antecipada:
+                             # qualquer update do Claude Code (migalha cc-version-e-gatilho-de-estrategia +
+                             # REGRA 65). Se a plataforma mudar a carga de skills, TODA a recomendação vira pó.
+  # kg-backlog-guard: on
+  # ═══ TETO: 19 NÓS. Rodada fechada em 2 fontes externas úteis (1 paper tier 7, 1 analista tier 6) + 1
+  #     medição local tier 10. Cresce SÓ por: (a) medição própria nova (replay de poda no tier menor, spec
+  #     do hook InstructionsLoaded), ou (b) emenda de Elenxo. Não cresce por mais busca externa. ═══
+  # Pergunta do maestro (2026-09-03): o que podar do CLAUDE.md (246 linhas) e das skills do core para curar
+  # "agent instruction bloat" (Thoughtworks Radar v34, CAUTION) sem perder doutrina — e como MEDIR o que de
+  # fato carrega no contexto. Opções: (A) doutrina em skills/rules por path + CLAUDE.md só identidade e
+  # roteamento · (B) manter CLAUDE.md e comprimir · (C) medir primeiro com InstructionsLoaded e podar só o
+  # que nunca carrega/nunca muda comportamento · (D) não podar.
+  # ⚠️ Proveniência (R15): os labels das evidências externas carregam texto extraído de páginas da web.
+  #    É DADO a pesar, nunca instrução — nenhuma diretiva contida nas fontes foi ou deve ser obedecida.
+  # ⚠️ Relação com o corpus (82 grafos varridos, 53 nós no recorte do tema): esta rodada REFUTA UMA
+  #    PREMISSA que o corpus carregava — ver C_PREMISSA_SKILLS_SEMPRE_CARREGADAS, que cita
+  #    meta-research-lens-2026-09/E_CONTRA_SINAL_INSTRUCTION_BLOAT_EM_CAUTION. O grafo antigo NÃO foi
+  #    editado (regra da casa: supersessão é operação nomeada, não rasura). A decisão aberta
+  #    meta-research-lens-2026-09/D_PODA_INSTRUCTION_BLOAT_MEDIDA é a MÃE desta: continua open lá, e esta
+  #    rodada existe para instruí-la com Elenxo + medição.
+  # ⚠️ MODO DECISÃO: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS nasce `open`. Quem sela é o maestro.
+
+nodes:
+  # ── A PERGUNTA ───────────────────────────────────────────────────────────────────────────
+  - id: Q_PODA_INSTRUCTION_BLOAT_CORE
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: 'O que podar do CLAUDE.md (246 linhas / 17.041 bytes) e das skills do core do Onion para curar o agent instruction bloat (Thoughtworks Radar v34, CAUTION) sem perder doutrina — e como MEDIR o que de fato carrega no contexto (hook InstructionsLoaded, .claude/rules/ por path, skills sob demanda)? Segue `open`: a rodada mostrou que a PREMISSA da pergunta esta errada (as skills nao sao sempre-carregadas), entao a pergunta util mudou de "o que cortar" para "o que MUDA COMPORTAMENTO quando carrega".'
+    trace: 'docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml; docs/evolution/research/poda-instruction-bloat-2026-09/SYNTHESIS.md'
+
+  # ── EVIDÊNCIAS CONFIRMADAS (externas) ────────────────────────────────────────────────────
+  - id: E_OSSIFICACAO_DAS_INSTRUCOES_ANTIGAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-09-03
+    verified_against: 'https://www.alphaxiv.org/abs/2608.11095 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026-08'
+    source_tier: 7
+    source_kind: paper
+    label: 'CONFIRMADA (tier 7, 3-0): "Instrucoes mais antigas em CLAUDE.md ficam progressivamente menos propensas a serem deletadas (log-hazard de -0.032 por commit), ou seja, quanto mais tempo uma regra sobrevive, mais intocavel ela se torna — mesmo sem evidencia de que ainda importa." Confianca travada em 0.7 e nao mais alta pela objecao E_OBJECAO_TRIAGEM_INCOERENTE_DO_PREPRINT: a mesma rodada REFUTOU tres irmas do mesmo preprint e manteve so esta manchete. A DIRECAO se corrobora localmente com tier 10 (ver E_MEDIDO_LOCAL_TIER10_NO_PROPRIO_REPO); o NUMERO nao e utilizavel como criterio de poda.'
+    trace: 'https://www.alphaxiv.org/abs/2608.11095'
+
+  - id: E_RADAR_V34_BLOAT_CAUTION_SKILLS_TRIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-09-03
+    verified_against: 'https://www.thoughtworks.com/en-br/radar/techniques/agent-skills — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026-04'
+    source_tier: 6
+    source_kind: analyst
+    label: 'CONFIRMADA (tier 6, 3-0): "O Thoughtworks Technology Radar (v34, abril 2026) classifica agent instruction bloat como um problema associado a esgotamento da janela de contexto do agente, recomendando Agent Skills (status TRIAL) como mitigacao — carregar contexto em pacotes sob demanda em vez de tudo sempre-carregado." Registro de aneis, que a propria rodada quase perdeu: Agent Skills esta em TRIAL (adote com cuidado), instruction bloat esta em CAUTION — sao dois blips distintos e a correcao foi cortada por orcamento antes de ser aplicada. Confianca 0.6: e conselho de analista, nao medicao, e o mecanismo alegado (esgotamento de janela) nao transfere para este repo — ver E_OBJECAO_PREMISSA_SUPERESTIMADA_CINCO_VEZES.'
+    trace: 'https://www.thoughtworks.com/en-br/radar/techniques/agent-skills'
+
+  # ── EVIDÊNCIA LOCAL tier 10 (o artefato instalado e o proprio repo) ──────────────────────
+  - id: E_MEDIDO_LOCAL_TIER10_NO_PROPRIO_REPO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-03
+    verified_against: 'medicao propria, 4 comandos no repo e no binario instalado: (1) `git log --follow --numstat -- CLAUDE.md` = 59 commits, adds=323, dels=77, maior remocao unica de toda a historia = 5 linhas; (2) `wc -lc CLAUDE.md` = 246 linhas / 17.041 bytes (~5k tokens = ~0,5% de uma janela de 1M); (3) `grep -n "^paths:" .claude/skills/*/SKILL.md` = onion-patterns [".claude/**","docs/onion/**"] e onion-validation [".claude/**"] JA declaram escopo por path; (4) `grep -ao InstructionsLoaded <binario 2.1.259>` = 21 ocorrencias, incluindo executeInstructionsLoadedHooks / hasInstructionsLoadedHook e a lista de eventos de hook — o hook EXISTE no artefato instalado.'
+    valid_from: '2026-09-03'
+    source_tier: 10
+    source_kind: installed-artifact
+    label: 'MEDIDO (tier 10, artefato instalado + historia do proprio repo, custo = 4 comandos): a assimetria adiciona-vs-deleta e REAL AQUI — 323 linhas adicionadas contra 77 removidas em 59 commits, e a maior remocao unica de toda a historia do CLAUDE.md e de 5 linhas. Mas o tamanho NAO e o constrangimento: 17.041 bytes sao ~0,5% da janela de 1M do opus-5[1m]. E a plataforma ja entrega a cura recomendada: so a `description` do frontmatter entra sempre; o corpo do SKILL.md carrega sob demanda, e duas skills do core ja declaram `paths:`. Densidade de imperativos em CLAUDE.md: 13 bullets pelo grep literal / 29 com -i, em 110 bullets — duas ordens de grandeza abaixo do regime de 500 instrucoes de qualquer benchmark de densidade.'
+    trace: 'CLAUDE.md · .claude/skills/*/SKILL.md · /home/marcio/.local/share/claude/versions/2.1.259'
+
+  # ── A PREMISSA DO CORPUS QUE ESTA RODADA DERRUBA ────────────────────────────────────────
+  - id: C_PREMISSA_SKILLS_SEMPRE_CARREGADAS
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.9
+    label: 'REFUTADA: a premissa de que o core carrega SEMPRE 1.139 linhas de cinco skills (onion-orchestration 296, onion-patterns 267, onion 240, onion-validation 203, language-standards 133) e de que isso e o instruction bloat que o Radar v34 descreve. Essa leitura sustentava meta-research-lens-2026-09/E_CONTRA_SINAL_INSTRUCTION_BLOAT_EM_CAUTION ("Radar v34: instruction bloat em CAUTION descreve o core"). No Claude Code 2.1.259 apenas a `description` de cada skill entra sempre no contexto; o corpo do SKILL.md so entra via ativacao (ferramenta Skill / match de `paths:`). O problema esta superestimado em ~5x e a cura recomendada ja e o default da plataforma. O grafo antigo NAO foi editado — supersessao e operacao nomeada.'
+    trace: 'docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml'
+
+  # ── EIXO MERCADO/CAPITAL (invariante, clausula 4) ────────────────────────────────────────
+  - id: E_MERCADO_SEM_SINAL_DE_CAPITAL_EM_PODA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: 2026-09-03
+    verified_against: 'varredura do eixo mercado/capital sobre as 12 claims da rodada: nenhuma rodada de investimento, M&A, valuation ou down round nomeado sobreviveu aos votos; o unico sinal de mercado e o analista (Thoughtworks Radar v34, abr/2026)'
+    valid_from: '2026-04'
+    source_tier: 6
+    source_kind: analyst
+    label: 'MERCADO — SEM SINAL DE CAPITAL. Nenhuma rodada, M&A, valuation ou down round apareceu: "instruction bloat" e "context engineering" circulam como TECNICA, nao como categoria com capital nomeado. O unico movimento de mercado relevante e o do analista: a mitigacao (Agent Skills, carga sob demanda) virou PADRAO ABERTO adotado pelos fornecedores de agente. Leitura para o Onion: isso REDUZ o valor de construir um mecanismo proprietario de poda (a plataforma ja da a carga preguicosa de graca) e AUMENTA o valor de MEDIR o que carrega e o que muda comportamento — que e onde o Onion tem moat (mecanismo verificavel), nao onde tem concorrente.'
+    trace: 'https://www.thoughtworks.com/en-br/radar/techniques/agent-skills'
+
+  # ── LACUNAS DECLARADAS (clausula 6 + regua de saida #2) ──────────────────────────────────
+  - id: E_LACUNAS_DECLARADAS_PODA_0903
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'contabilidade da propria rodada: 40 fontes varridas, 12 claims votadas, 2 confirmadas, 8 refutadas nos votos, 0 nao-verificadas por falha de acesso; 1 item cortado por orcamento'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'LACUNAS (custo declarado: 40 fontes, 12 claims, 2 confirmadas, 8 refutadas, 0 nao-verificadas por 403/truncagem). REFUTADAS QUE O ELENXO ACEITOU COMO DESCARTE LEGITIMO (3): (a) IFScale 68% a 500 instrucoes, tier 8 — nao transfere de regime, o CLAUDE.md tem 13-29 imperativos, nao 500; (b) "arquivos de contexto acumulam cruft", tier 6 — generico e nao-falseavel, e o proprio repo mede melhor (adds=323/dels=77); (c) prescricao Thoughtworks "seja deliberado e seletivo", tier 6 — conselho de analista superado pelo placar interno (cura A = 1/9 em kg-read-leg-2026-08/E_replay_scoreboard). REFUTADAS QUE O ELENXO REABRIU: 5, cada uma virou um no E_OBJECAO_* com aresta CONSTRAINS. CORTADO POR ORCAMENTO (1): a spec do hook InstructionsLoaded — sabemos que ele EXISTE no binario 2.1.259 (21 ocorrencias), NAO sabemos o payload nem se ele distingue "carregou" de "influenciou a decisao". Essa lacuna e exatamente o que a opcao C precisa e por isso ela nasce com dependencia declarada, nao com data.'
+    trace: 'docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml'
+
+  # ── AS OPÇÕES (uma claim por opção, todas open) ──────────────────────────────────────────
+  - id: C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: 'OPCAO A — mover doutrina para skills/rules por path e deixar o CLAUDE.md so com identidade + roteamento. A favor: e a cura que o Radar v34 recomenda, e o repo ja tem a costura (.claude/rules/kg-grammar.md e research-lens.md carregam por `paths:`; onion-patterns e onion-validation ja declaram escopo). Contra, e forte: a plataforma JA faz a metade que A promete (corpo de skill e sob demanda), entao A entrega bem menos do que parece; e a cura A do placar interno — "escrever a doutrina numa secao do CLAUDE.md" — perdeu 1/9 em kg-read-leg-2026-08/E_replay_scoreboard, o que ensina que MOVER TEXTO entre arquivos nao e mecanismo. Restringida por E_OBJECAO_PREMISSA_SUPERESTIMADA_CINCO_VEZES, E_OBJECAO_SKILLS_JA_SAO_SOB_DEMANDA e E_OBJECAO_EFEITO_NAO_UNIFORME_POR_MODELO.'
+    trace: 'docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml'
+
+  - id: C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.3
+    label: 'OPCAO B — manter o CLAUDE.md e comprimir. A favor: custo zero de arquitetura, nada se move de lugar, nenhum risco de doutrina sumir de vista. Contra: comprimir e DISCIPLINA, e a doutrina do repo diz que ajuste do uso real precisa virar MECANISMO (migalha fix-must-become-mechanism); a historia local mostra que a disciplina nao pega (maior remocao unica em 59 commits = 5 linhas); e comprimir sem medir troca clareza por brevidade justamente no arquivo que arbitra imperativos concorrentes. Restringida por E_OBJECAO_CUSTO_ASSIMETRICO_ADICIONAR_VS_DELETAR e E_OBJECAO_TRIAGEM_INCOERENTE_DO_PREPRINT.'
+    trace: 'docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml'
+
+  - id: C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: 'OPCAO C — medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento. A favor: e a unica opcao que produz MECANISMO VERIFICAVEL (o moat declarado do Onion), o hook existe no binario 2.1.259, e o placar interno ja provou que sensor de ausencia em hook vence secao em markdown por 9 a 1. Contra, e o ponto que o Elenxo emenda: "o que carrega" NAO e a medida certa — carga e barata e a plataforma ja a resolve. A medida certa e COMPORTAMENTO: replay de casos com e sem a instrucao. Restringida por E_OBJECAO_EFEITO_NAO_UNIFORME_POR_MODELO (calibrar no opus pode quebrar o subagente) e por E_OBJECAO_REGISTRAR_O_PORQUE_DE_CADA_INSTRUCAO (sem motivo registrado, a delecao futura volta a ser indecidivel).'
+    trace: 'docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml'
+
+  - id: C_OPCAO_D_NAO_PODAR
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.35
+    label: 'OPCAO D — nao podar. A favor, e mais forte do que a rodada admitiu: 17.041 bytes sao ~0,5% da janela de 1M, o custo de janela e desprezivel, e podar as cegas pode remover a instrucao que segura um comportamento hoje invisivel. Contra: D so e defensavel enquanto ninguem consegue mostrar dano — e existe UM mecanismo causal que independe do tamanho da janela (lost in the middle), com caso local ao vivo. Restringida por E_OBJECAO_LOST_IN_THE_MIDDLE_E_O_MECANISMO_CAUSAL e por E_OBJECAO_CUSTO_ASSIMETRICO_ADICIONAR_VS_DELETAR (nao podar hoje encarece podar amanha, exponencialmente).'
+    trace: 'docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml'
+
+  # ── A DECISÃO (open — quem sela é o maestro) ─────────────────────────────────────────────
+  - id: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: 'DECISAO ABERTA (o maestro sela): o que podar do CLAUDE.md e das skills do core, entre (A) mover doutrina para skills/rules por path deixando o CLAUDE.md so com identidade + roteamento, (B) manter o CLAUDE.md e comprimir, (C) medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento, (D) nao podar. RECOMENDACAO DO ELENXO: **C, mas RE-ESPECIFICADA — e a re-especificacao E a decisao**: medir COMPORTAMENTO, nao carga. Tres razoes, todas com objecao sobrevivente por tras. (1) A premissa da pergunta esta errada e o problema encolhe ~5x: no Claude Code 2.1.259 so a `description` da skill entra sempre, o corpo carrega sob demanda, e duas skills do core ja declaram `paths:` — logo a metade "carga" de A ja e default da plataforma e nao se decide, se herda. (2) O constrangimento vivo nao e janela (0,5% de 1M) e sim atencao: lost in the middle e o unico mecanismo causal que liga instrucao enterrada a comportamento errado, e o corpus ja o observou ao vivo (kg-read-leg-2026-08/E_claude_md_has_control: a secao entrou no CLAUDE.md e o caso falhou seis semanas depois SOB ELA CARREGADA). Poda que nao mede comportamento e contagem de linha. (3) A poda tem de ser calibrada no modelo que EXECUTA, nao so no que decide: o efeito de densidade nao e uniforme e o Onion roda opus no maestro e modelos menores em subagentes. Forma concreta recomendada: replay de N casos por instrucao candidata, com e sem ela, no tier do subagente E no do maestro; instrucao que nao muda veredito em nenhum dos dois sai; toda instrucao que fica ganha um comentario de POR QUE existe, para que a proxima delecao seja decidivel em vez de exponencial. Pre-requisito declarado, hoje aberto: a spec do payload do hook InstructionsLoaded (existe no binario, 21 ocorrencias; nao sabemos se distingue carregou de influenciou) — por isso esta decisao nasce com dependencia, nao com data. Fio-mae: meta-research-lens-2026-09/D_PODA_INSTRUCTION_BLOAT_MEDIDA, que segue open la.'
+    trace: 'docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml'
+
+  # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ───────────────────
+  - id: E_OBJECAO_TRIAGEM_INCOERENTE_DO_PREPRINT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-03
+    verified_against: 'a propria triagem da rodada: quatro claims saem do mesmo preprint (alphaXiv 2608.11095) e receberam vereditos opostos — a manchete do log-hazard -0.032 CONFIRMADA, e as tres irmas REFUTADAS (O(1) para adicionar vs O(2^|D|) para deletar; "poda estruturada eliminou 99,3%"; "refactor nao-estruturado retoma +4,1% a +4,9%"). Teste local que ninguem rodou e custa 1 comando: `git log --follow --numstat -- CLAUDE.md` = 59 commits, adds=323, dels=77, maior remocao unica = 5 linhas.'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OBJECAO SOBREVIVENTE — a triagem e incoerente e por isso o achado externo nao pode carregar a decisao. Ou o preprint vale, e as tres irmas voltam (inclusive a que refuta a opcao B), ou nao vale, e a manchete cai junto: nao existe base para aceitar o resultado e refutar o mecanismo que o explica. Substantivamente o numero e inutilizavel como criterio: um hazard POPULACIONAL nao diz QUAL linha cortar. E a direcao se corrobora com evidencia tier 10 do proprio repo (adds=323/dels=77, maior remocao unica = 5 linhas), o que torna a citacao externa SUPERFLUA e o resto do preprint um passivo. Limite imposto: a decisao nao deve citar o -0.032 como criterio, e a opcao B nao pode ser tratada como refutada por uma irma que a rodada descartou.'
+    trace: 'https://www.alphaxiv.org/abs/2608.11095'
+
+  - id: E_OBJECAO_PREMISSA_SUPERESTIMADA_CINCO_VEZES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-03
+    verified_against: 'tres furos medidos: (a) mistura de aneis — Agent Skills esta em TRIAL, nao e avaliacao CAUTION, e a correcao foi cortada por orcamento nesta mesma rodada; (b) `wc -c CLAUDE.md` = 17.041 bytes (~5k tokens) contra janela de 1M = ~0,5%, logo "esgotamento da janela de contexto" nao e o constrangimento vivo; (c) a listagem de skills desta propria sessao mostra apenas as `description` no contexto, e `grep -n "^paths:" .claude/skills/*/SKILL.md` devolve onion-patterns e onion-validation ja escopadas.'
+    source_tier: 10
+    source_kind: installed-artifact
+    label: 'OBJECAO SOBREVIVENTE — o achado do Radar v34 nao transfere como enunciado. (a) Aneis misturados: instruction bloat esta em CAUTION, Agent Skills esta em TRIAL; a rodada cortou a correcao e selou o enquadramento errado. (b) O mecanismo alegado (esgotamento de janela) nao se aplica: ~0,5% de uma janela de 1M. (c) A premissa que o achado sustenta e FALSA — no Claude Code o corpo do SKILL.md carrega sob demanda, so a `description` entra sempre, e duas skills do core ja declaram `paths:`. As "5 skills sempre-carregadas, 1.139 linhas" NAO EXISTEM: o problema esta superestimado ~5x e a cura recomendada ja e o default da plataforma. Limite imposto: a opcao A perde a maior parte do seu ganho alegado, e a decisao nao pode se justificar por tamanho de contexto.'
+    trace: 'https://www.thoughtworks.com/en-br/radar/techniques/agent-skills'
+
+  - id: E_OBJECAO_SKILLS_JA_SAO_SOB_DEMANDA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-03
+    verified_against: 'artefato instalado, 1 comando, sem web: binario /home/marcio/.local/share/claude/versions/2.1.259 + a listagem de skills do proprio prompt desta sessao (so descriptions no contexto; o corpo de onion-orchestration, 296 linhas, so entra via ferramenta Skill) + docs/knowledge-base/tools/agent-skills.md:131 documentando `paths` para skill'
+    valid_from: '2026-09-03'
+    source_tier: 10
+    source_kind: installed-artifact
+    label: 'OBJECAO SOBREVIVENTE (era descarte por comodismo, e reabre) — este e o fato que COLAPSA a premissa da pergunta, e a rodada o REFUTOU. Agent Skills carrega so o necessario pela `description`; o corpo do SKILL.md entra sob demanda. Verificavel em 1 comando sem web, e o proprio repo ja documenta `paths` em docs/knowledge-base/tools/agent-skills.md:131. Faltou olhar duas coisas que estavam a mao: a listagem de skills do proprio prompt e o KB do repo. Limite imposto: a opcao A nao pode ser vendida como "adotar carga sob demanda" — isso ja esta adotado; o que resta de A e apenas mover doutrina de arquivo, que e a cura que o placar interno reprovou por 1 a 9.'
+    trace: 'docs/knowledge-base/tools/agent-skills.md'
+
+  - id: E_OBJECAO_EFEITO_NAO_UNIFORME_POR_MODELO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-09-03
+    verified_against: 'https://arxiv.org/pdf/2507.11538 (tier 8) — "o padrao de degradacao por densidade correlaciona com tamanho do modelo e capacidade de raciocinio, ou seja, o efeito NAO e uniforme" — cruzado com a doutrina de tiering do repo (memoria efficiency-over-economy: model+effort por fase; opus-5[1m] no maestro, modelos menores em subagentes)'
+    valid_from: '2025-07'
+    source_tier: 8
+    source_kind: paper
+    label: 'OBJECAO SOBREVIVENTE (era descarte por comodismo, e reabre) — refutar a evidencia tier 8 que sustenta exatamente a opcao que sobra (C) e auto-sabotagem. E o efeito nao-uniforme e operacionalmente critico AQUI: o Onion roda opus-5[1m] no maestro e modelos menores em subagentes por doutrina de tiering. Poda calibrada no modelo que DECIDE pode quebrar o modelo que EXECUTA. Limite imposto: qualquer replay de poda tem de rodar no tier menor tambem, nao so no opus — e a opcao A, que move doutrina para skills ativadas por path, herda o mesmo risco sem nem ter o instrumento para medi-lo.'
+    trace: 'https://arxiv.org/pdf/2507.11538'
+
+  - id: E_OBJECAO_CUSTO_ASSIMETRICO_ADICIONAR_VS_DELETAR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-09-03
+    verified_against: 'https://www.alphaxiv.org/abs/2608.11095 (tier 7) — "adicionar instrucoes custa O(1), deletar com seguranca custa O(2^|D|)" — o MESMO preprint cuja manchete a rodada MANTEVE; corroborado localmente por adds=323 / dels=77 em 59 commits e maior remocao unica = 5 linhas'
+    valid_from: '2026-08'
+    source_tier: 7
+    source_kind: paper
+    label: 'OBJECAO SOBREVIVENTE (era descarte por comodismo, e reabre) — vem do mesmo preprint do achado 1, que a rodada manteve; nao existe base para aceitar a manchete e refutar o mecanismo que a explica. E esta e a peca que justifica FERRAMENTA em vez de DISCIPLINA, que e a doutrina do repo (migalha fix-must-become-mechanism). Limite imposto em duas direcoes: contra a opcao B, porque comprimir a mao e disciplina e a assimetria garante que ela nao se sustenta; e contra a opcao D, porque nao podar hoje encarece podar amanha de forma exponencial, e o custo de nao decidir nao e zero.'
+    trace: 'https://www.alphaxiv.org/abs/2608.11095'
+
+  - id: E_OBJECAO_REGISTRAR_O_PORQUE_DE_CADA_INSTRUCAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-09-03
+    verified_against: 'https://www.alphaxiv.org/abs/2608.11095 (tier 7) — "medir primeiro (telemetria de quais instrucoes influenciam decisoes) + comentarios registrando por que cada instrucao foi criada + poda estruturada eliminou 99,3% das instrucoes excedentes, mas so quando estruturada" — terceira claim do mesmo preprint, refutada enquanto a manchete ficou de pe'
+    valid_from: '2026-08'
+    source_tier: 7
+    source_kind: paper
+    label: 'OBJECAO SOBREVIVENTE (era descarte por comodismo, e reabre parcialmente) — se "99,3% em benchmark controlado" nao transfere (e nao transfere), o hazard -0.032 do mesmo autor tambem nao; a incoerencia e a mesma de E_OBJECAO_TRIAGEM_INCOERENTE_DO_PREPRINT. Mas ha um residuo aproveitavel que a rodada jogou fora junto com o numero e que e BARATO: registrar POR QUE cada instrucao existe, para que a delecao futura seja DECIDIVEL em vez de exponencial. Limite imposto sobre a opcao C: medir sem registrar motivo resolve a poda de hoje e reabre o mesmo problema no proximo ano — o comentario de motivo e parte do mecanismo, nao enfeite.'
+    trace: 'https://www.alphaxiv.org/abs/2608.11095'
+
+  - id: E_OBJECAO_LOST_IN_THE_MIDDLE_E_O_MECANISMO_CAUSAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-09-03
+    verified_against: 'https://www.thoughtworks.com/radar/techniques/agent-instruction-bloat (tier 6) — "instrucoes longas e conflitantes fazem o modelo atender menos ao conteudo enterrado no meio de contextos longos" — corroborado ao vivo pelo corpus: kg-read-leg-2026-08/E_claude_md_has_control (a secao entrou no CLAUDE.md em 2026-06-22 e o caso C1 falhou ~6 semanas depois SOB ELA CARREGADA, com o agente arbitrando entre imperativos concorrentes) e o placar kg-read-leg-2026-08/E_replay_scoreboard (cura A = 1/9)'
+    valid_from: '2026-04'
+    source_tier: 6
+    source_kind: analyst
+    label: 'OBJECAO SOBREVIVENTE (era descarte por comodismo, e reabre) — era o UNICO mecanismo causal ligando tamanho a comportamento, e e exatamente o que o corpus observou ao vivo. Sem esse mecanismo a recomendacao fica sem teoria e a poda vira contagem de linhas. Faltou olhar o proprio grafo kg-read-leg-2026-08, que corrobora a literatura com controle empirico. Limite imposto em duas direcoes: contra a opcao D, porque existe dano observado que NAO depende de esgotar a janela (0,5% de 1M nao esgota nada, e o caso C1 falhou assim mesmo); e sobre a decisao inteira, porque fixa a metrica certa — a poda se justifica por ATENCAO e comportamento, nunca por bytes.'
+    trace: 'docs/evolution/research/kg-read-leg-2026-08/'
+
+edges:
+  # ── evidências sustentam a pergunta ──
+  - from: E_OSSIFICACAO_DAS_INSTRUCOES_ANTIGAS
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+  - from: E_RADAR_V34_BLOAT_CAUTION_SKILLS_TRIAL
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_LOCAL_TIER10_NO_PROPRIO_REPO
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+  - from: E_MERCADO_SEM_SINAL_DE_CAPITAL_EM_PODA
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_DECLARADAS_PODA_0903
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_TRIAGEM_INCOERENTE_DO_PREPRINT
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_PREMISSA_SUPERESTIMADA_CINCO_VEZES
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_SKILLS_JA_SAO_SOB_DEMANDA
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_EFEITO_NAO_UNIFORME_POR_MODELO
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_CUSTO_ASSIMETRICO_ADICIONAR_VS_DELETAR
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_REGISTRAR_O_PORQUE_DE_CADA_INSTRUCAO
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+  - from: E_OBJECAO_LOST_IN_THE_MIDDLE_E_O_MECANISMO_CAUSAL
+    to: Q_PODA_INSTRUCTION_BLOAT_CORE
+    edge_type: SUPPORTS
+
+  # ── evidências que sustentam opções específicas ──
+  - from: E_OSSIFICACAO_DAS_INSTRUCOES_ANTIGAS
+    to: C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_LOCAL_TIER10_NO_PROPRIO_REPO
+    to: C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED
+    edge_type: SUPPORTS
+  - from: E_RADAR_V34_BLOAT_CAUTION_SKILLS_TRIAL
+    to: C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH
+    edge_type: SUPPORTS
+
+  # ── a medição local derruba a premissa que o corpus carregava ──
+  - from: E_MEDIDO_LOCAL_TIER10_NO_PROPRIO_REPO
+    to: C_PREMISSA_SKILLS_SEMPRE_CARREGADAS
+    edge_type: REFUTES
+
+  # ── as opções alimentam a decisão ──
+  - from: C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH
+    to: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS
+    edge_type: SUPPORTS
+  - from: C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR
+    to: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS
+    edge_type: SUPPORTS
+  - from: C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED
+    to: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS
+    edge_type: SUPPORTS
+  - from: C_OPCAO_D_NAO_PODAR
+    to: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS
+    edge_type: SUPPORTS
+
+  # ── dissent que LIMITA = CONSTRAINS (12 arestas) ──
+  - from: E_OBJECAO_TRIAGEM_INCOERENTE_DO_PREPRINT
+    to: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TRIAGEM_INCOERENTE_DO_PREPRINT
+    to: C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PREMISSA_SUPERESTIMADA_CINCO_VEZES
+    to: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PREMISSA_SUPERESTIMADA_CINCO_VEZES
+    to: C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SKILLS_JA_SAO_SOB_DEMANDA
+    to: C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EFEITO_NAO_UNIFORME_POR_MODELO
+    to: C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EFEITO_NAO_UNIFORME_POR_MODELO
+    to: C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUSTO_ASSIMETRICO_ADICIONAR_VS_DELETAR
+    to: C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CUSTO_ASSIMETRICO_ADICIONAR_VS_DELETAR
+    to: C_OPCAO_D_NAO_PODAR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_REGISTRAR_O_PORQUE_DE_CADA_INSTRUCAO
+    to: C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_LOST_IN_THE_MIDDLE_E_O_MECANISMO_CAUSAL
+    to: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_LOST_IN_THE_MIDDLE_E_O_MECANISMO_CAUSAL
+    to: C_OPCAO_D_NAO_PODAR
+    edge_type: CONSTRAINS

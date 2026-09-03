@@ -3756,6 +3756,13 @@ run_research_workflow_selftests() {
   if awk '/^---$/{c++; next} c==1' "${sk}" | grep -q "^description:"; then record_pass "research-workflow: (c) SKILL.md tem description (auto-ativação)"
   else record_fail "research-workflow: (c)" "SKILL.md sem description no frontmatter"; fi
   grep -q "argument-hint" "${sk}" && record_fail "research-workflow: (d)" "argument-hint não é aceito em SKILL.md (2.1.258)" || record_pass "research-workflow: (d) SKILL.md sem chave proibida argument-hint"
+  grep -q "MODE === 'decision'" "${wf}" && grep -q "const ELENXO_SCHEMA" "${wf}" && grep -q "kind: { enum: \['finding', 'discarded-by-evidence', 'discarded-by-comodismo'\] }" "${wf}" \
+    && record_pass "research-workflow: (f) modo decisão: fase Elenxo com objeções finding/discarded-by-evidence/discarded-by-comodismo" \
+    || record_fail "research-workflow: (f)" "modo decisão ausente/incompleto no workflow (F3)"
+  # (g) o contrato de decisão é EXIGIDO pelo schema do write(KG) (1º dogfood: o agente nunca recebeu o bloco — 5 nós, 0 D_)
+  grep -q "const KG_SCHEMA_DECISION" "${wf}" && grep -q "pattern: '^D_'" "${wf}" && grep -q "constrainsEdges: { type: 'integer', minimum: 1 }" "${wf}" && grep -q "MODO DECISÃO — LEIA PRIMEIRO" "${wf}" \
+    && record_pass "research-workflow: (g) write(KG) em modo decisão exige D_ + CONSTRAINS pelo schema (fail-loud no JS)" \
+    || record_fail "research-workflow: (g)" "contrato de decisão não exigido pelo schema do write(KG)"
   local n; n=$(grep -cE '^  - id: ' "${rs}")
   [ "${n}" -ge 5 ] && grep -q "vendor-on-competitor" "${rs}" && record_pass "research-workflow: (e) radar-sources.yaml com ${n} eixos e tier vendor-on-competitor declarado" \
     || record_fail "research-workflow: (e)" "roster com ${n} eixos ou sem vendor-on-competitor"

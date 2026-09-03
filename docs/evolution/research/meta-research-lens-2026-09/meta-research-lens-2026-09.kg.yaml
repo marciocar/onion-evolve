@@ -251,10 +251,12 @@ nodes:
 
   - id: D_F3_MODO_DECISAO_COM_ELENXO
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
     impact: 4
-    confidence: 0.7
+    confidence: 0.85
+    verified_at: 2026-09-03
+    verified_against: 'DOGFOOD ao vivo: Workflow wf_ab17f8d6-773 em mode=decision sobre "o que podar do CLAUDE.md" (52 agentes, 3,4M tokens, 27 min): fase Elenxo derrubou os 2 achados web e reabriu 12 descartes por comodismo (inclusive a premissa da MINHA pergunta: skills nao sao sempre-carregadas, problema ~5x menor); 1a escrita do grafo saiu SEM no D_ (patch mirou ancora inexistente — o agente nunca recebeu o bloco) → contrato de decisao passou a ser EXIGIDO pelo schema (decisionNodeId/optionNodeIds/constrainsEdges>=1) + fail-loud; relancado do cache (99k) → poda-instruction-bloat-2026-09: 19 nos, 4 opcoes, 7 objecoes, 12 CONSTRAINS, 1 REFUTES, D_ open para o maestro, radar exit 0. Bancada run_research_workflow_selftests 7/7.'
     label: 'F3 (1 PR, decisao): sem comando novo — a skill ganha modo "para decidir": corpus -> lacunas -> pesquisa SO nas lacunas -> Elenxo (refutador com mandato REPROVAR, e o passo novo: refutar tambem o que EU descartei — "por evidencia ou comodismo?") -> no decision `open` com opcoes, evidencias e CONSTRAINS -> o maestro sela (tabela de selagem do /meta:drive, KIND decision). Dogfood: a propria decisao "instruction bloat: o que podar do CLAUDE.md" (E_CONTRA_SINAL). Custo ~500k. DEPENDS_ON F2.'
     trace: 'docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md'
 
