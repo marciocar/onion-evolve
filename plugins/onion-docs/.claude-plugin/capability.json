@@ -1,6 +1,6 @@
 {
   "name": "onion-docs",
-  "version": "0.1.0",
+  "version": "0.1.23",
   "conformance": "silver",
   "provides": ["business-technical-context","c4-model-mermaid","docs-health-validacao","engenharia-reversa"],
   "requires": ["agent:c4-architecture-specialist","agent:c4-documentation-specialist","agent:mermaid-specialist","agent:docs-reverse-engineer"],

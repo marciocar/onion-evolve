@@ -11018,6 +11018,36 @@ run_model_ladder_selftests() {
   rm -rf "${d}"
 }
 _family run_model_ladder_selftests
+# Modo plugin-version-derived — a versão do plugin ANDA com o conteúdo (sinal de campo 2026-09-03: `claude plugin update`
+# compara só a versão; manifesto parado em 0.1.0 = updater no-op com o cache 89 arquivos atrás). Sandbox git próprio.
+run_plugin_version_derived_selftests() {
+  local asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
+  [ -f "${asm}" ] || { record_fail "plugin-version-derived" "assembler ausente"; return; }
+  local d v1 v2 v3 v4; d="$(mktemp -d)"
+  mkdir -p "${d}/src/.claude/commands/quick" "${d}/src/.claude/utils/marketplace/verticals"
+  printf -- '---\nname: ping\ndescription: x\ncategory: quick\ntags: [a, b, c]\nversion: "1.0.0"\nupdated: "2026-09-03"\n---\n# ping\n' > "${d}/src/.claude/commands/quick/ping.md"
+  printf 'PLUGIN_NAME="probe"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="probe"\nKEYWORDS=(probe)\nCOMMANDS=(.claude/commands/quick/ping.md)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\n' > "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh"
+  ( cd "${d}/src" && git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm seed ) >/dev/null 2>&1
+  _ver() { bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out" >/dev/null 2>&1; grep -oE '"version": *"[^"]+"' "${d}/out/.claude-plugin/plugin.json" | grep -oE '[0-9.]+'; }
+  v1="$(_ver)"; v2="$(_ver)"
+  if [ "${v1}" = "${v2}" ] && [ "${v1}" = "0.1.1" ]; then record_pass "plugin-version-derived: (a) versão = 0.1.<commits das fontes> (${v1}); mesma fonte ⇒ mesma versão"
+  else record_fail "plugin-version-derived: (a)" "v1=${v1} v2=${v2} (esperado 0.1.1 e igual)"; fi
+  printf '# ping v2\n' >> "${d}/src/.claude/commands/quick/ping.md"; ( cd "${d}/src" && git add -A ) >/dev/null 2>&1
+  v3="$(_ver)"
+  ( cd "${d}/src" && git -c user.email=t@t -c user.name=t commit -qm change ) >/dev/null 2>&1
+  v4="$(_ver)"
+  if [ "${v3}" = "0.1.2" ] && [ "${v4}" = "0.1.2" ]; then record_pass "plugin-version-derived: (b) fonte alterada no índice ⇒ 0.1.2 antes E depois do commit (pre-commit = CI)"
+  else record_fail "plugin-version-derived: (b)" "índice sujo=${v3} pós-commit=${v4} (esperado 0.1.2/0.1.2)"; fi
+  printf '# outro\n' > "${d}/src/README.md"; ( cd "${d}/src" && git add -A && git -c user.email=t@t -c user.name=t commit -qm unrelated ) >/dev/null 2>&1
+  v1="$(_ver)"
+  if [ "${v1}" = "0.1.2" ]; then record_pass "plugin-version-derived: (c) commit que NÃO toca as fontes não anda a versão"
+  else record_fail "plugin-version-derived: (c)" "esperava 0.1.2 após commit alheio, veio ${v1}"; fi
+  v1="$(ONION_PLUGIN_VERSION_DERIVED=0 bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out2" >/dev/null 2>&1; grep -oE '"version": *"[^"]+"' "${d}/out2/.claude-plugin/plugin.json" | grep -oE '[0-9.]+')"
+  if [ "${v1}" = "0.1.0" ]; then record_pass "plugin-version-derived: (d) ONION_PLUGIN_VERSION_DERIVED=0 ⇒ versão do manifesto (legado)"
+  else record_fail "plugin-version-derived: (d)" "esperava 0.1.0, veio ${v1}"; fi
+  rm -rf "${d}"
+}
+_family run_plugin_version_derived_selftests
 
 # ---------------------------------------------------------------------------
 # O harness testando a SI MESMO — os três desfechos não podem colapsar em dois

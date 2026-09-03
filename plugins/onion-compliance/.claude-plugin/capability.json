@@ -1,6 +1,6 @@
 {
   "name": "onion-compliance",
-  "version": "0.1.0",
+  "version": "0.1.19",
   "conformance": "gold",
   "provides": ["iso-27001-isms","iso-22301-bcms","soc2-tsc","pmbok-governance","build-compliance-docs","ssot-context-resolver"],
   "requires": ["agent:security-information-master","agent:iso-27001-specialist","agent:iso-22301-specialist","agent:soc2-specialist","agent:pmbok-specialist","command:build-compliance-docs","skill:onion-compliance-context","template:compliance-context-template.md","template:compliance_iso27001_template.md","template:compliance_iso22301_template.md","template:compliance_soc2_template.md","template:compliance_pmbok_template.md"],

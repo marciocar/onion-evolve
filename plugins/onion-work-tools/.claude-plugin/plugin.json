@@ -1,6 +1,6 @@
 {
   "name": "onion-work-tools",
-  "version": "0.1.0",
+  "version": "0.1.146",
   "description": "Ferramentas de trabalho cross-cutting do Onion (nao meta-fabrica): knowledge-graph (kg + radar soberano), diario de aprendizado, orquestracao, validacao de metaspec, freshness de KB/contexto, constelacao de estudos, recover, setup de integracoes, e co-evolucao upstream (co-evolve/co-relay). Distribuido a source/hub/standalone.",
   "author": { "name": "Onion - Marcio Carvalho" },
   "homepage": "https://github.com/marciocar/onion-evolve",

@@ -1,6 +1,6 @@
 {
   "name": "onion-engineering",
-  "version": "0.1.0",
+  "version": "0.1.86",
   "description": "Vertical de engenharia do Onion: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow + sessoes persistentes) + especialistas de codigo (Node/React/Postgres/NX/Docker) e gates pre-PR. Camada 1; task-manager e forge do consumidor via SDAAL.",
   "author": { "name": "Onion - Marcio Carvalho" },
   "homepage": "https://github.com/marciocar/onion-evolve",

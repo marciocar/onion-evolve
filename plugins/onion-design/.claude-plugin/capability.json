@@ -1,6 +1,6 @@
 {
   "name": "onion-design",
-  "version": "0.1.0",
+  "version": "0.1.22",
   "conformance": "gold",
   "provides": ["design-tokens-w3c-dtcg","wcag-contrast-gate","materializacao-css-tailwind-shadcn"],
   "requires": ["agent:design-system-specialist","agent:brand-generator","agent:branding-positioning-specialist","validation:lint-design-tokens.sh","util:design-source","util:design-sink"],

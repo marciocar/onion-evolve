@@ -12,6 +12,7 @@ Gerado em: 2026-09-03
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-09-03 | learning | public 📤 | versao-de-plugin-que-nao-anda-e-declaracao-o-updater-so-le-a-string | — | 2026-12-02 | static |
 | 2026-09-03 | learning | public 📤 | regra-n-titulo-o-numero-e-chave-o-titulo-e-significado | — | 2026-12-02 | static |
 | 2026-09-03 | learning | public 📤 | onda-da-lente-de-pesquisa-fechada-dogfood-derrubou-8 | Em 24 h a diretriz de pesquisa que o maestro redigia a cada rodada virou spec carregada + workflow salvo com três modos, e o próprio workflow achou 7 defeitos meus em dogfood — o mecanismo julgou o mecanismo. | 2026-12-02 | static |
 | 2026-09-03 | decision | public 📤 | escada-de-modelos-com-piso-visivel-sempre-o-maximo-e-direcao-nao-bloqueio | — | 2026-12-02 | static |
