@@ -1004,7 +1004,7 @@ run_moat_boundary_selftests() {
   local mf="${vdir}/__mbguard__.manifest.sh" out rc
   trap 'rm -f "'"${mf}"'"' RETURN
   # grep pela violação da PRÓPRIA fixture (a guarda varre TODOS os manifestos — evita contaminação)
-  local sig='__mbguard__.manifest.sh: manifesto de plugin PUBLIC'
+  local sig='manifesto de plugin PUBLIC'   # (2026-09-03) a linha VIOLATION passou a trazer 'REGRA N (Título): ' entre o arquivo e a mensagem
   # (a) RED abrangente — todo tipo de moat que o revisor apontou (C1): auto-evolução, federação
   #     downstream+ledger, absorb-skill (fábrica), grafo FORA de docs/onion/graph (o life-KG privado).
   cat > "${mf}" <<'RED'
@@ -1021,7 +1021,7 @@ REQUIRES=()
 LOADS=()
 RED
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
-  if _emit "${out}" | grep -qF "${sig}"; then
+  if _emit "${out}" | grep -qF "${sig}" && _emit "${out}" | grep -qF "__mbguard__.manifest.sh: REGRA"; then
     record_pass "moat-boundary: (a) evolve/federação/absorb-skill/life-KG → HARD (C1 do revisor)"
   else record_fail "moat-boundary: (a)" "vazamento C1 não pego: rc=${rc}"; fi
   # (b) RED por DIRETÓRIO-PAI (C2): declarar commands/meta (dir) arrasta a fábrica; a guarda checa a
@@ -1038,7 +1038,7 @@ REQUIRES=()
 LOADS=()
 RED
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
-  if _emit "${out}" | grep -qF "${sig}"; then
+  if _emit "${out}" | grep -qF "${sig}" && _emit "${out}" | grep -qF "__mbguard__.manifest.sh: REGRA"; then
     record_pass "moat-boundary: (b) declaração por DIRETÓRIO-PAI → HARD pela expansão (C2 do revisor)"
   else record_fail "moat-boundary: (b)" "bypass por dir-pai não pego: rc=${rc}"; fi
   # (c) GREEN — capacidade + upstream (co-evolve/co-relay) + produto (create-task-structure) + dir de
@@ -4012,16 +4012,16 @@ run_research_lens_selftests() {
   printf 'meta:\n  id: g4\n  schema_version: "1"\n  baseline: 2026-01-01\nnodes:\n  - id: C_Z\n    node_type: claim\n    plane: DEV\n    status: superseded\n    impact: 2\n    confidence: 0.5\n    label: "z premodelswitch antigo"\nedges:\n' > "${d}/g4/g4.kg.yaml"
   local rc=0 out
   out="$(ONION_RESEARCH_KG_DIR="${d}" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if _emit "${out}" | grep -q "REGRA 67: grafo de pesquisa NOVO (baseline 2026-09-02) sem meta.review_after" && _emit "${out}" | grep -q "g1/g1.kg.yaml"; then
+  if _emit "${out}" | grep -q "REGRA 67 (" && _emit "${out}" | grep -qF "grafo de pesquisa NOVO (baseline 2026-09-02) sem meta.review_after" && _emit "${out}" | grep -q "g1/g1.kg.yaml"; then
     record_pass "research-lens: (a) grafo NOVO sem review_after ⇒ SOFT 67 (catraca sem retro-ruído)"
   else record_fail "research-lens: (a)" "esperava SOFT 67 em g1 (rc=${rc}): ${out:0:300}"; fi
-  if _emit "${out}" | grep -q "REGRA 67: revisita VENCIDA (review_after ${past}"; then
+  if _emit "${out}" | grep -q "REGRA 67 (" && _emit "${out}" | grep -qF "revisita VENCIDA (review_after ${past}"; then
     record_pass "research-lens: (b) review_after vencido ⇒ SOFT 67"
   else record_fail "research-lens: (b)" "esperava VENCIDA em g2: ${out:0:300}"; fi
   if ! _emit "${out}" | grep -q "g3/g3.kg.yaml" && ! _emit "${out}" | grep -q "g4/g4.kg.yaml"; then
     record_pass "research-lens: (c) review_after futuro e grafo antigo sem chave ⇒ silêncio"
   else record_fail "research-lens: (c)" "falso positivo em g3/g4: ${out:0:300}"; fi
-  if _emit "${out}" | grep -q "REGRA 68: nó E_BLOG_CONCORRENTE tem confidence 0.9 com fonte fraca (source_tier 2, source_kind vendor-on-competitor)"; then
+  if _emit "${out}" | grep -q "REGRA 68 (" && _emit "${out}" | grep -qF "nó E_BLOG_CONCORRENTE tem confidence 0.9 com fonte fraca (source_tier 2, source_kind vendor-on-competitor)"; then
     record_pass "research-lens: (d) confiança 0.9 + tier 2 vendor-on-competitor ⇒ SOFT 68"
   else record_fail "research-lens: (d)" "esperava SOFT 68 em E_BLOG_CONCORRENTE: ${out:0:300}"; fi
   if ! _emit "${out}" | grep -q "E_DOC_OFICIAL"; then
@@ -4043,7 +4043,7 @@ run_research_lens_selftests() {
   # REGRA 69 — roster de fontes: last_checked vencido pela cadência ⇒ SOFT; fresco/sem last_checked ⇒ silêncio
   printf 'axes:\n  - id: ax1\n    cadence: weekly\n    sources:\n      - { url: "https://a.example/x", kind: primary, tier: 9, last_checked: "2026-01-01" }\n      - { url: "https://b.example/y", kind: primary, tier: 9, last_checked: "%s" }\n      - { url: "https://c.example/z", kind: forum, tier: 4 }\n' "$(date +%F)" > "${d}/roster.yaml"
   rc=0; out="$(ONION_RADAR_SOURCES="${d}/roster.yaml" ONION_RESEARCH_KG_DIR="${d}/nao-existe" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if _emit "${out}" | grep -q "REGRA 69: fonte do roster VENCIDA — eixo ax1, https://a.example/x (cadência weekly" && ! _emit "${out}" | grep -q "b.example" && ! _emit "${out}" | grep -q "c.example"; then
+  if _emit "${out}" | grep -q "REGRA 69 (" && _emit "${out}" | grep -qF "fonte do roster VENCIDA — eixo ax1, https://a.example/x (cadência weekly" && ! _emit "${out}" | grep -q "b.example" && ! _emit "${out}" | grep -q "c.example"; then
     record_pass "research-lens: (i) REGRA 69: fonte com last_checked vencido ⇒ SOFT; fresca e sem carimbo ⇒ silêncio"
   else record_fail "research-lens: (i)" "REGRA 69 errada (rc=${rc}): ${out:0:300}"; fi
   rm -rf "${d}"
@@ -11264,7 +11264,7 @@ PY
   ( cd "${sbo}" && git init -q -b solta && git add -A \
     && git -c user.email=t@t -c user.name=t commit -qm unica ) >/dev/null 2>&1 || true
   out="$(cd "${sbo}" && bash .claude/validation/lint-artifacts.sh --only="${sbo}/CLAUDE.md" 2>&1 || true)"
-  if _emit "${out}" | grep -q 'REGRA 63 nao pode julgar'; then
+  if _emit "${out}" | grep -q 'REGRA 63 (' && _emit "${out}" | grep -q 'nao pode julgar'; then
     record_pass "harvest-residue: sem base resolvível → SOFT que DECLARA (não silêncio)"
   else record_fail "harvest-residue: sem base" "a guarda ficou MUDA sem base — é o fail-open que a matava no CI: ${out}"; fi
   rm -rf "${sbo}" "${sb}"
@@ -11365,7 +11365,7 @@ run_members_registry_selftests() {
   local d; d="$(mktemp -d)"
   printf '# Registro de membros da co-evolução Onion (fixture)\nmembers:\n  - id: quebrado\n' > "$d/bad.yaml"
   rc=0; out="$(ONION_MEMBERS_FILE="$d/bad.yaml" bash "${lint}" --only=docs/evolution/federation/members.yaml 2>&1)" || rc=$?
-  if _emit "${out}" | grep -q 'REGRA 66: registro da federação INVÁLIDO' && [ "${rc}" -ne 0 ]; then
+  if _emit "${out}" | grep -q 'REGRA 66 (' && _emit "${out}" | grep -qF 'registro da federação INVÁLIDO' && [ "${rc}" -ne 0 ]; then
     record_pass "members-registry: (b) registro inválido é HARD com rc do validador"
   else record_fail "members-registry: (b)" "inválido não reprovou (rc=${rc}): ${out}"; fi
 
@@ -11394,7 +11394,7 @@ run_radar_staleness_selftests() {
 
   printf 'axes:\n  - id: EB\n    last_run: 2026-01-01\n' > "$d/velho.yaml"
   rc=0; out="$(ONION_RADAR_BASELINES="$d/velho.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if _emit "${out}" | grep -q "REGRA 65: eixo 'EB' do radar de mundo está VELHO"; then
+  if _emit "${out}" | grep -q "REGRA 65 (" && _emit "${out}" | grep -qF "eixo 'EB' do radar de mundo está VELHO"; then
     record_pass "radar-staleness: (b) eixo velho vira SOFT nomeando o eixo e a idade"
   else record_fail "radar-staleness: (b)" "eixo velho não acusado: ${out}"; fi
 
