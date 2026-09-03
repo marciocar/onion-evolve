@@ -1,6 +1,6 @@
 {
   "name": "onion-work-tools",
-  "version": "0.1.0",
+  "version": "0.1.146",
   "conformance": "silver",
   "provides": ["knowledge-graph-sdaal","learning-diary","orchestration","metaspec-validation","freshness-audits","constellation-map","co-evolution-upstream","guided-conduction","guided-onboarding","retro-feedback"],
   "requires": ["agent:metaspec-gate-keeper","skill:onion-orchestration"],

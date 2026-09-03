@@ -1,6 +1,6 @@
 {
   "name": "onion-testing",
-  "version": "0.1.0",
+  "version": "0.1.18",
   "conformance": "silver",
   "provides": ["geracao-testes-unit-integration-e2e","estrategia-de-teste","qa-story-points"],
   "requires": ["agent:test-agent","agent:test-engineer","agent:test-planner"],

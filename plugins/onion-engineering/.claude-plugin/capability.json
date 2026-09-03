@@ -1,6 +1,6 @@
 {
   "name": "onion-engineering",
-  "version": "0.1.0",
+  "version": "0.1.86",
   "conformance": "silver",
   "provides": ["gitflow-faseado","pull-request-lifecycle","code-review-pre-pr","code-specialists-node-react-postgres-nx-docker","ssot-context-resolver"],
   "requires": ["agent:gitflow-specialist","agent:branch-code-reviewer","agent:code-reviewer","agent:nodejs-specialist","agent:react-developer","agent:postgres-specialist","agent:docker-specialist","skill:onion-engineering-context"],

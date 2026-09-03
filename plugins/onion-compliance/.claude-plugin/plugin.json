@@ -1,6 +1,6 @@
 {
   "name": "onion-compliance",
-  "version": "0.1.0",
+  "version": "0.1.19",
   "description": "Vertical de compliance do Onion: documentacao de conformidade como spec-as-code (ISO 27001/22301, SOC2, PMBOK) via agentes especialistas + build-compliance-docs. Auto-adapta ao compliance-context do consumidor (SDAAL).",
   "author": { "name": "Onion - Marcio Carvalho" },
   "homepage": "https://github.com/marciocar/onion-evolve",

@@ -262,6 +262,20 @@ cat > "${DEST}/.claude-plugin/provenance.json" <<EOF
 EOF
 
 # KEYWORDS bash array → JSON array (sem jq).
+# VERSÃO DERIVADA DO CONTEÚDO (sinal de campo 2026-09-03: `claude plugin update` compara só a string de versão —
+# "already at the latest version (0.1.0)" com o cache 89 arquivos atrás do repo). Uma versão que não anda é
+# declaração (behavior-over-declaration). Aqui: PLUGIN_VERSION = <major.minor do manifesto>.<N>, N = commits que
+# tocaram as fontes canônicas deste plugin (+1 se o índice tem mudança pendente nelas — assim o pre-commit e o CI
+# concordam). Monotônica, semver-válida, muda exatamente quando o conteúdo muda; regenerada pela REGRA 19.
+# Sem git (alvo sem histórico) mantém a versão do manifesto. ONION_PLUGIN_VERSION_DERIVED=0 desliga (bancada/legado).
+if [ "${ONION_PLUGIN_VERSION_DERIVED:-1}" = "1" ] && git -C "${SRC}" rev-parse --verify HEAD >/dev/null 2>&1; then
+  _vsrc=(); for p in "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" "${SKILLS[@]}" "${HOOKS[@]}" "${DOCS[@]}"; do _vsrc+=("${p}"); done
+  _mrel="${MANIFEST#${SRC}/}"; [ -f "${SRC}/${_mrel}" ] && _vsrc+=("${_mrel}")
+  _n="$(git -C "${SRC}" rev-list --count HEAD -- "${_vsrc[@]}" 2>/dev/null || echo 0)"
+  git -C "${SRC}" diff --cached --quiet -- "${_vsrc[@]}" 2>/dev/null || _n=$(( _n + 1 ))
+  PLUGIN_VERSION="${PLUGIN_VERSION%.*}.${_n}"
+fi
+
 kw_json=""; for k in "${KEYWORDS[@]}"; do kw_json="${kw_json}\"${k}\","; done; kw_json="[${kw_json%,}]"
 
 # plugin.json — EXATAMENTE os 8 campos permitidos (additionalProperties REJEITADO).

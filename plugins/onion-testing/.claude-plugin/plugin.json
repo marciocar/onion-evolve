@@ -1,6 +1,6 @@
 {
   "name": "onion-testing",
-  "version": "0.1.0",
+  "version": "0.1.18",
   "description": "Vertical de testes/QA do Onion: geracao e execucao de testes (unit/integration/e2e) com deteccao de framework + validacao de workflow. Perspectivas White/Grey/Black-box e QA story points. Camada 1.",
   "author": { "name": "Onion - Marcio Carvalho" },
   "homepage": "https://github.com/marciocar/onion-evolve",
