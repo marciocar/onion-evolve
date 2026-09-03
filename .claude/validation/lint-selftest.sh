@@ -413,6 +413,11 @@ _prove_mutation() { # $1=nome $2=arq_intacto $3=arq_mutante $4=rc_caso_no_intact
 # máquina saudável. Sinal de campo 2026-07-25 (adotante): o mesmo defeito custou um deploy.
 # Em STRICT (CI) um skip é FALHA — ver bloco do sumário. [[fix-must-become-mechanism]]
 record_skip() { SKIP=$((SKIP + 1)); SKIPPED_CASES+=("${1}"); echo "  ⊘ ${1}"; }
+# _emit — emissor IMUNE a EPIPE para `… | grep -q` / `| head` (leitor que fecha cedo). Com saída > 64 KB (triplas,
+# radar) o leitor fecha antes do printf terminar; sob pipefail o status do pipeline vira o EPIPE do printf e o `if`
+# vê falha — falso ✗ que só aparece com timing de CI (2 cores) e só com --jobs>1 mudou a agenda. 337 sítios
+# (2026-09-03, PR #780: `graph: members ingest` e `rules-registry (f)` foram os dois que dispararam).
+_emit() { printf '%s\n' "$1" 2>/dev/null || true; }
 
 # ---------------------------------------------------------------------------
 # Modo lint — injeta a fixture no sandbox e assere por path
@@ -456,7 +461,7 @@ run_lint_fixture() {
     bad)
       if [ -z "${cited}" ]; then
         record_fail "${fixture}" "esperava violação citando a fixture, nenhuma apareceu (guarda quebrada?)"
-      elif [ -n "${keyword}" ] && ! printf '%s\n' "${cited}" | grep -qF "${keyword}"; then
+      elif [ -n "${keyword}" ] && ! _emit "${cited}" | grep -qF "${keyword}"; then
         record_fail "${fixture}" "violação apareceu sem o keyword '${keyword}' (regra errada disparou?)"
       else
         record_pass "${fixture}"
@@ -703,8 +708,8 @@ run_kg_freshness_selftests() {
   sed -i 's/ && ntype\[id\] == "claim"//' "${mut}/mutado.sh"
   if ! grep -q 'verifiedAgainst\[id\] == "" && ntype\[id\] == "claim"' "${mut}/mutado.sh"; then
     local mout; mout="$(bash "${mut}/mutado.sh" "${fxu}" --freshness 2>&1 || true)"
-    if printf '%s' "${mout}" | grep -q 'UNANCHORED: E_MEDIU' \
-       && ! printf '%s' "${mout}" | grep -q 'ℹ '; then
+    if _emit "${mout}" | grep -q 'UNANCHORED: E_MEDIU' \
+       && ! _emit "${mout}" | grep -q 'ℹ '; then
       record_pass "kg-freshness: (k) (MUT) sem o filtro o evidence volta a ser cobrado — a guarda é load-bearing"
     else record_fail "kg-freshness: (k) (MUT)" "mutação não mudou o veredito — o filtro é vacuidade? out=${mout}"; fi
   else
@@ -820,8 +825,8 @@ run_kg_freshness_selftests() {
   sed -i 's/if (plane\[id\] == "PROD" \&\& verifiedAgainst\[id\] ~/if (ntype[id] == "claim" \&\& plane[id] == "PROD" \&\& verifiedAgainst[id] ~/' "${mut}/mut-mis.sh"
   if grep -q 'ntype\[id\] == "claim" && plane\[id\] == "PROD"' "${mut}/mut-mis.sh"; then
     local mmis; mmis="$(bash "${mut}/mut-mis.sh" "${fxm}" --freshness 2>&1 || true)"
-    if ! printf '%s' "${mmis}" | grep -q 'MISPLANED: E_PROD_MAS_LEU_COMMIT' \
-       && printf '%s' "${mmis}" | grep -q 'MISPLANED: C_PROD_MAS_LEU_BRANCH'; then
+    if ! _emit "${mmis}" | grep -q 'MISPLANED: E_PROD_MAS_LEU_COMMIT' \
+       && _emit "${mmis}" | grep -q 'MISPLANED: C_PROD_MAS_LEU_BRANCH'; then
       record_pass "kg-freshness: (t) (MUT) restrito a claim, o evidence escapa — reproduz o modo-de-falha do sinal"
     else record_fail "kg-freshness: (t) (MUT)" "a restrição por tipo não mudou o veredito; out=${mmis}"; fi
   else
@@ -875,7 +880,7 @@ run_shell_pipefail_robustness_selftests() {
     record_pass "shell-pipefail: nenhum pipeline sort→fechador-precoce frágil nos scripts strict-mode (drene com sed -n '1p')"
   else
     record_fail "shell-pipefail: pipeline sort→fechador-precoce frágil sob pipefail" \
-      "drene com sed em vez de fechar cedo (sem EPIPE): $(printf '%s' "${hits}" | sed -n '1,3p' | tr '\n' ';')"
+      "drene com sed em vez de fechar cedo (sem EPIPE): $(_emit "${hits}" | sed -n '1,3p' | tr '\n' ';')"
   fi
 }
 
@@ -925,7 +930,7 @@ run_projection_name_selftests() {
   f="$(mktemp)"
   printf 'members:\n  - id: poc-x\n    name: Nome Comercial Alheio (rotulo — CONFIDENCIAL Acme)\n' > "${f}"
   out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)" || true   # sob set -e, exit != 0 do helper abortaria a suíte
-  if printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
+  if _emit "${out}" | grep -q 'NOME-PROJETADO'; then
     record_pass "projection-name: (a) nome de terceiro no trecho projetado → HARD"
   else record_fail "projection-name: (a)" "nome de terceiro no trecho publicado NÃO foi pego"; fi
   rm -f "${f}"
@@ -936,7 +941,7 @@ run_projection_name_selftests() {
   f="$(mktemp)"
   printf 'members:\n  - id: poc-x\n    name: Nome Comercial Alheio (rotulo — CONFIDENCIAL Acme)\n    projection_name_exempt: true\n' > "${f}"
   out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)" || true   # sob set -e, exit != 0 do helper abortaria a suíte
-  if ! printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
+  if ! _emit "${out}" | grep -q 'NOME-PROJETADO'; then
     record_pass "projection-name: (b) projection_name_exempt no dado é honrado"
   else record_fail "projection-name: (b)" "isenção declarada no membro foi ignorada"; fi
   rm -f "${f}"
@@ -945,7 +950,7 @@ run_projection_name_selftests() {
   f="$(mktemp)"
   printf 'members:\n  - id: acme-slug\n    name: AcmeSlug (rotulo — CONFIDENCIAL Acme)\n' > "${f}"
   out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)" || true   # sob set -e, exit != 0 do helper abortaria a suíte
-  if ! printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
+  if ! _emit "${out}" | grep -q 'NOME-PROJETADO'; then
     record_pass "projection-name: (c) variação de caixa do slug passa sem isenção"
   else record_fail "projection-name: (c)" "falso-positivo em variação de caixa do próprio slug"; fi
   rm -f "${f}"
@@ -957,7 +962,7 @@ run_projection_name_selftests() {
   f="$(mktemp)"
   printf 'members:\n  - id: acme-slug\n    name: acme-slug          # anotacao interna qualquer\n' > "${f}"
   out="$(bash "${helper}" --members "${f}" --format tsv "${surf}" 2>&1)" || true   # sob set -e, exit != 0 do helper abortaria a suíte
-  if ! printf '%s' "${out}" | grep -q 'NOME-PROJETADO'; then
+  if ! _emit "${out}" | grep -q 'NOME-PROJETADO'; then
     record_pass "projection-name: (d) (MUT) comentário de fim de linha não é projeção"
   else record_fail "projection-name: (d)" "comentário YAML tratado como nome projetado"; fi
   rm -f "${f}"
@@ -976,13 +981,13 @@ run_vendor_scrub_selftests() {
   # (a) nome comercial real numa raiz vendorizada → HARD
   printf 'exemplo citando %s como cliente\n' "${term}" > "${tf}"
   out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'vendor-scrub'; then
+  if _emit "${out}" | grep -q 'vendor-scrub'; then
     record_pass "vendor-scrub: (a) nome comercial na superfície vendorizada → HARD"
   else record_fail "vendor-scrub: (a)" "nome de cliente vendorizado não pego: rc=${rc}"; fi
   # (b) sem nome comercial → limpo (e grep-sem-match não aborta)
   printf 'texto generico sem nome de cliente\n' > "${tf}"
   rc=0; out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
-  if ! printf '%s' "${out}" | grep -q 'vendor-scrub'; then
+  if ! _emit "${out}" | grep -q 'vendor-scrub'; then
     record_pass "vendor-scrub: (b) superfície limpa → sem HARD"
   else record_fail "vendor-scrub: (b)" "falso-positivo em texto limpo"; fi
   rm -f "${tf}"
@@ -1016,7 +1021,7 @@ REQUIRES=()
 LOADS=()
 RED
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -qF "${sig}"; then
+  if _emit "${out}" | grep -qF "${sig}"; then
     record_pass "moat-boundary: (a) evolve/federação/absorb-skill/life-KG → HARD (C1 do revisor)"
   else record_fail "moat-boundary: (a)" "vazamento C1 não pego: rc=${rc}"; fi
   # (b) RED por DIRETÓRIO-PAI (C2): declarar commands/meta (dir) arrasta a fábrica; a guarda checa a
@@ -1033,7 +1038,7 @@ REQUIRES=()
 LOADS=()
 RED
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -qF "${sig}"; then
+  if _emit "${out}" | grep -qF "${sig}"; then
     record_pass "moat-boundary: (b) declaração por DIRETÓRIO-PAI → HARD pela expansão (C2 do revisor)"
   else record_fail "moat-boundary: (b)" "bypass por dir-pai não pego: rc=${rc}"; fi
   # (c) GREEN — capacidade + upstream (co-evolve/co-relay) + produto (create-task-structure) + dir de
@@ -1052,7 +1057,7 @@ REQUIRES=()
 LOADS=()
 GREEN
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
-  if ! printf '%s' "${out}" | grep -qF "${sig}"; then
+  if ! _emit "${out}" | grep -qF "${sig}"; then
     record_pass "moat-boundary: (c) capacidade+upstream+produto+dir limpos → sem HARD"
   else record_fail "moat-boundary: (c)" "falso-positivo em manifesto de capacidade limpo"; fi
   rm -f "${mf}"
@@ -1130,8 +1135,8 @@ run_backtick_ref_selftests() {
   # (A) reage: ref kebab p/ arquivo .claude/ ausente → HARD com o token
   printf '# fixture\nCite `.claude/utils/__absent-xyz-fixture__.md` na prosa.\n' > "${tf}"
   out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'referência de caminho em backtick' \
-     && printf '%s' "${out}" | grep -q '__absent-xyz-fixture__'; then
+  if _emit "${out}" | grep -q 'referência de caminho em backtick' \
+     && _emit "${out}" | grep -q '__absent-xyz-fixture__'; then
     record_pass "backtick-ref: (A) ref .claude/ kebab p/ arquivo ausente → HARD (ponteiro morto pego)"
   else record_fail "backtick-ref: (A)" "ref morta não virou HARD: rc=${rc}"; fi
   # (B) NÃO superreage: válida(existe) + exemplo(não-kebab) + em fence + allowlist(ausente) → 0 flag
@@ -1143,7 +1148,7 @@ run_backtick_ref_selftests() {
     printf '```\n`.claude/utils/__fenced-absent__.md`\n```\n'
   } > "${tf}"
   rc=0; out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
-  if ! printf '%s' "${out}" | grep -q 'referência de caminho em backtick'; then
+  if ! _emit "${out}" | grep -q 'referência de caminho em backtick'; then
     record_pass "backtick-ref: (B) válida/exemplo-não-kebab/fence/allowlist → 0 flag (os 4 filtros de FP)"
   else record_fail "backtick-ref: (B)" "falso-positivo: $(printf '%s' "${out}" | grep 'referência de caminho em backtick' | head -2)"; fi
   rm -f "${tf}"
@@ -1161,13 +1166,13 @@ run_site_deeplink_selftests() {
   # (a) deep-link p/ repo PRIVADO → HARD
   printf '<a href="https://github.com/marciocar/onion-evolve/pull/222">PR #222</a>\n' > "${tf}"
   out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q '404-privado'; then
+  if _emit "${out}" | grep -q '404-privado'; then
     record_pass "site-deeplink: (a) deep-link p/ repo privado em site/ → HARD"
   else record_fail "site-deeplink: (a)" "link 404 não foi pego: rc=${rc} out=${out}"; fi
   # (b) home do repo (sem /pull) + link interno → limpo (e grep-sem-match NÃO aborta o lint)
   printf '<a href="https://github.com/marciocar/onion-evolve">repo</a> <a href="/historia/migalhas/provas/">prova</a>\n' > "${tf}"
   rc=0; out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
-  if ! printf '%s' "${out}" | grep -q '404-privado'; then
+  if ! _emit "${out}" | grep -q '404-privado'; then
     record_pass "site-deeplink: (b) home do repo + link interno → limpo (grep-sem-match não aborta)"
   else record_fail "site-deeplink: (b)" "falso-positivo em link permitido"; fi
   rm -f "${tf}"
@@ -1232,7 +1237,7 @@ run_rules_registry_selftests() {
   # (2026-09-03) era `bash lint | grep -q 'OK ✓'`: o grep -q fecha o pipe no 1º match, o lint leva SIGPIPE e,
   # sob pipefail, o `if` vê falha — corrida que só aparecia com a bancada em paralelo (2 runs de 8 workers, 2×).
   local f_out; f_out="$(bash "${lint}" --only="${doc}" 2>&1 || true)"
-  if printf '%s\n' "${f_out}" | grep -q 'OK ✓'; then
+  if _emit "${f_out}" | grep -q 'OK ✓'; then
     record_pass "rules-registry: (f) REGRA 39 verde no estado real (--only lint-rules.md)"
   else record_fail "rules-registry: (f)" "REGRA 39 acusou o estado real (deveria estar em paridade)"; fi
 }
@@ -1255,35 +1260,35 @@ run_onion_version_tracked_selftests() {
   local out
   # (a) role: adopted + stamp UNTRACKED → HARD
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
+  if _emit "${out}" | grep -q 'onion-version NÃO trackeado'; then
     record_pass "onion-version-tracked: (a) adotante com stamp UNTRACKED → HARD"
   else record_fail "onion-version-tracked: (a)" "stamp untracked não pego — o clone perderia o role"; fi
   # (b) força-add → TRACKED → sem violação
   git -C "${sb}" add -f .claude/.onion-version >/dev/null 2>&1
   git -C "${sb}" -c user.name=t -c user.email=t@t commit -q -m s >/dev/null 2>&1
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if ! printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
+  if ! _emit "${out}" | grep -q 'onion-version NÃO trackeado'; then
     record_pass "onion-version-tracked: (b) stamp TRACKED → sem violação"
   else record_fail "onion-version-tracked: (b)" "falso-positivo com stamp trackeado"; fi
   # (c) role: source + UNTRACKED → guarda PULA (é o gate de papel, não o de tracked)
   git -C "${sb}" rm --cached .claude/.onion-version >/dev/null 2>&1
   printf 'framework: onion-evolve\nrole: source\n' > "${sb}/.claude/.onion-version"
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if ! printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
+  if ! _emit "${out}" | grep -q 'onion-version NÃO trackeado'; then
     record_pass "onion-version-tracked: (c) role: source + untracked → guarda pula (gate de papel)"
   else record_fail "onion-version-tracked: (c)" "disparou em role: source (não-adotante)"; fi
 
   # (d) role: hub + UNTRACKED → HARD (o hub também é stamp de adoção que o clone precisa trackear)
   printf 'framework: acme-adopter\nrole: hub\n' > "${sb}/.claude/.onion-version"
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
+  if _emit "${out}" | grep -q 'onion-version NÃO trackeado'; then
     record_pass "onion-version-tracked: (d) role: hub + untracked → HARD (hub trackeia o stamp)"
   else record_fail "onion-version-tracked: (d)" "não pegou hub untracked (o clone do hub perderia o papel)"; fi
   # (e) FONTE-DESACOPLADA (role: source + decoupled_from) + UNTRACKED → HARD (também carrega stamp derivado).
   # O stamp já está untracked (a case c fez rm --cached e a d só reescreveu o conteúdo) — só sobrescrevo.
   printf 'framework: x\nrole: source\ndecoupled_from: https://github.com/marciocar/onion-evolve.git\n' > "${sb}/.claude/.onion-version"
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'onion-version NÃO trackeado'; then
+  if _emit "${out}" | grep -q 'onion-version NÃO trackeado'; then
     record_pass "onion-version-tracked: (e) fonte-desacoplada + untracked → HARD (o stamp derivado precisa viajar)"
   else record_fail "onion-version-tracked: (e)" "não pegou decoupled untracked"; fi
 }
@@ -1390,19 +1395,19 @@ K
   # (a) SSOT válido + gated com trace morto IGNORADO → sem violação de topologia
   _gen_topo
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${KG}" 2>&1 || true)"
-  if ! printf '%s' "${out}" | grep -q 'topologia/'; then
+  if ! _emit "${out}" | grep -q 'topologia/'; then
     record_pass "family-topology: (a) transição ativa resolve + papel em roles.yaml + gated ignorado → limpo"
   else record_fail "family-topology: (a)" "acusou um SSOT válido (ou não ignorou o gated)"; fi
   # (b) transição ATIVA com trace morto → HARD (o SSOT mentiria p/ o wizard)
   _gen_topo; sed -i 's#lint-artifacts.sh, status: confirmed#NAO-EXISTE.sh, status: confirmed#' "${KG}"
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${KG}" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'topologia/TRACE-MORTO'; then
+  if _emit "${out}" | grep -q 'topologia/TRACE-MORTO'; then
     record_pass "family-topology: (b) transição ativa com trace morto → HARD (anti-dessincronização)"
   else record_fail "family-topology: (b)" "não pegou trace morto numa transição ativa"; fi
   # (c) papel ATIVO fora de roles.yaml → HARD
   _gen_topo; sed -i 's/id: ROLE_hub/id: ROLE_banana/' "${KG}"
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${KG}" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'topologia/PAPEL-ORFAO'; then
+  if _emit "${out}" | grep -q 'topologia/PAPEL-ORFAO'; then
     record_pass "family-topology: (c) papel ativo fora de roles.yaml → HARD"
   else record_fail "family-topology: (c)" "não pegou papel órfão vs roles.yaml"; fi
 }
@@ -1480,7 +1485,7 @@ run_kg_status_factor_selftests() {
     # que o consumidor REALMENTE tem fecha as duas fugas.
     case "${g}" in kg-view) local mode="--json" ;; *) local mode="--integrity" ;; esac
     rc=0; out="$(bash "$d/${g}.sh" "$d/t.kg.yaml" "${mode}" 2>&1)" || rc=$?
-    { [ "${rc}" -eq 2 ] && printf '%s' "${out}" | grep -q 'AUSENTE' && printf '%s' "${out}" | grep -q 'status-factor.awk'; } \
+    { [ "${rc}" -eq 2 ] && _emit "${out}" | grep -q 'AUSENTE' && _emit "${out}" | grep -q 'status-factor.awk'; } \
       || broken="${broken} ${g}(rc=${rc})"
   done
   rm -rf "$d"
@@ -1566,7 +1571,7 @@ run_kg_status_factor_selftests() {
   cp "${REPO_ROOT}/docs/onion/graph/fios-abertos.kg.yaml" "$d/g.kg.yaml" 2>/dev/null \
     || printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n  - id: A\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 1.0\n    label: "a"\n  - id: B\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 1.0\n    label: "b"\nedges:\n  - from: A\n    to: B\n    edge_type: SUPPORTS\n' > "$d/g.kg.yaml"
   rc=0; out="$(bash "$d/kg-view.sh" "$d/g.kg.yaml" --assert-parity 2>&1)" || rc=$?
-  if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -qiE 'motor nao emitiu|AUSENTE'; then
+  if [ "${rc}" -ne 0 ] && _emit "${out}" | grep -qiE 'motor nao emitiu|AUSENTE'; then
     record_pass "status-factor: (g) lib VAZIA reprova culpando o INSTRUMENTO, nao o grafo"
   else record_fail "status-factor: (g)" "lib corrompida passou ou culpou o grafo (rc=${rc}): ${out}"; fi
   rm -rf "$d"
@@ -1744,9 +1749,9 @@ run_kg_scope_selftests() {
   # algum dia passar a sair != 0 neste caminho. Latente, corrigido de passagem.
   rc=0; out="$(bash "${repo}/.claude/validation/kg-provenance-coverage.sh" "${repo}" --scope docs/outro-corpus 2>&1)" || rc=$?
   if [ "${rc}" -eq 0 ] \
-     && printf '%s' "${out}" | grep -q 'EXPLORATÓRIA' \
-     && printf '%s' "${out}" | grep -q 'docs/outro-corpus/alheio.md' \
-     && ! printf '%s' "${out}" | grep -q 'docs/analysis/novo.md'; then
+     && _emit "${out}" | grep -q 'EXPLORATÓRIA' \
+     && _emit "${out}" | grep -q 'docs/outro-corpus/alheio.md' \
+     && ! _emit "${out}" | grep -q 'docs/analysis/novo.md'; then
     record_pass "kg-scope: (S1) --scope mede a raiz alheia e NÃO arrasta o escopo canônico"
   else record_fail "kg-scope: (S1)" "rc=${rc} out=${out}"; fi
 
@@ -1754,9 +1759,9 @@ run_kg_scope_selftests() {
   #      nenhuma entrada do baseline pode virar ÓRFÃ/OBSOLETA por causa do escopo.
   _prov_run "${repo}" --scope docs/outro-corpus
   if [ "${_PROV_RC}" -eq 0 ] \
-     && ! printf '%s' "${_PROV_OUT}" | grep -q 'BASELINE-ORFA' \
-     && ! printf '%s' "${_PROV_OUT}" | grep -q 'BASELINE-OBSOLETA' \
-     && ! printf '%s' "${_PROV_OUT}" | grep -q 'HARD'; then
+     && ! _emit "${_PROV_OUT}" | grep -q 'BASELINE-ORFA' \
+     && ! _emit "${_PROV_OUT}" | grep -q 'BASELINE-OBSOLETA' \
+     && ! _emit "${_PROV_OUT}" | grep -q 'HARD'; then
     record_pass "kg-scope: (S2) exploratório não produz órfã/obsoleta/HARD contra o baseline canônico"
   else record_fail "kg-scope: (S2)" "escopo alheio contaminou a catraca canônica: rc=${_PROV_RC} out=${_PROV_OUT}"; fi
 
@@ -1765,8 +1770,8 @@ run_kg_scope_selftests() {
   #      porta dos fundos permanente).
   printf '# baseline do outro corpus\n' > "${repo}/.claude/validation/outro-baseline.txt"
   _prov_run "${repo}" --scope docs/outro-corpus --baseline .claude/validation/outro-baseline.txt
-  if printf '%s' "${_PROV_OUT}" | grep -q 'docs/outro-corpus/alheio.md' \
-     && printf '%s' "${_PROV_OUT}" | grep -qE '^HARD'; then
+  if _emit "${_PROV_OUT}" | grep -q 'docs/outro-corpus/alheio.md' \
+     && _emit "${_PROV_OUT}" | grep -qE '^HARD'; then
     record_pass "kg-scope: (S3) --scope + --baseline explícito ARMA a catraca no escopo novo"
   else record_fail "kg-scope: (S3)" "esperava HARD para doc novo sob baseline explícito: out=${_PROV_OUT}"; fi
 
@@ -1776,7 +1781,7 @@ run_kg_scope_selftests() {
   sed 's/^  EXPLORATORY=1$/  EXPLORATORY=0/' \
       "${repo}/.claude/validation/kg-provenance-coverage.sh" > "${repo}/.claude/validation/mutated.sh"
   out="$(bash "${repo}/.claude/validation/mutated.sh" "${repo}" --scope docs/outro-corpus --format tsv 2>/dev/null || true)"
-  if printf '%s' "${out}" | grep -qE 'BASELINE-ORFA|BASELINE-OBSOLETA|^HARD'; then
+  if _emit "${out}" | grep -qE 'BASELINE-ORFA|BASELINE-OBSOLETA|^HARD'; then
     record_pass "kg-scope: (S4) MUTATION — sem o modo exploratório o escopo alheio CONTAMINA a catraca; a proteção é load-bearing"
   else record_fail "kg-scope: (S4)" "com a proteção desfeita nada mudou — (S2) não prova nada: out=${out}"; fi
 }
@@ -2016,7 +2021,7 @@ run_kg_open_queue_selftests() {
   #     e a fila cross-grafo (que e o consumidor) fica inutil.
   if printf '%s' "${out}" | awk -F'\t' -v F="${fx}" '$1!=F{bad=1} END{exit (bad||NR==0)?1:0}'; then
     record_pass "kg-fila: (c) 1a coluna e o arquivo de origem (a fila do corpus e o laco de quem chama)"
-  else record_fail "kg-fila: (c)" "coluna de arquivo ausente ou errada: $(printf '%s' "${out}" | head -1 | cut -f1)"; fi
+  else record_fail "kg-fila: (c)" "coluna de arquivo ausente ou errada: $(_emit "${out}" | head -1 | cut -f1)"; fi
 
   # ⚠️ A FIXTURE DE (d)-(f) PRECISA SER GRANDE, e isso e calibragem medida, nao estetica: o `--state`
   # EXCLUI o top-10 do radar por construcao. Na 1a escrita deste bloco usei 7 e 10 nos — o radar
@@ -2051,7 +2056,7 @@ run_kg_open_queue_selftests() {
   # (e) A CURA DA ALLOWLIST no `--state`: `drifted`/`unverifiable` sao trabalho e tem de APARECER.
   #     Medido no corpus real antes de escrever: o no de MAIOR attention pendente do grafo da VPS
   #     (`unverifiable`, 8.0) nao aparecia — a fila de abertos era cega para reconciliacao devida.
-  if printf '%s' "${st}" | grep -q 'N_DRIFTED' && printf '%s' "${st}" | grep -q 'N_UNVERIFIABLE'; then
+  if _emit "${st}" | grep -q 'N_DRIFTED' && _emit "${st}" | grep -q 'N_UNVERIFIABLE'; then
     record_pass "kg-fila: (e) o --state mostra drifted/unverifiable (a allowlist os perdia em silencio)"
   else record_fail "kg-fila: (e)" "a fila de abertos segue cega para reconciliacao devida: ${st}"; fi
 
@@ -2070,7 +2075,7 @@ run_kg_open_queue_selftests() {
   if printf '%s' "${out}" | awk -F'\t' '
         $2=="X_TYPO" {viu=1; att=$8+0; ver=$11}
         END{exit !(viu && att>0 && ver=="STATUS-DESCONHECIDO")}' \
-     && printf '%s' "${out}" | head -1 | cut -f2 | grep -qx 'X_TYPO'; then
+     && _emit "${out}" | head -1 | cut -f2 | grep -qx 'X_TYPO'; then
     record_pass "kg-fila: (g) status FORA do enum entra, SOBE (nao afunda) e traz veredito STATUS-DESCONHECIDO"
   else record_fail "kg-fila: (g)" "status desconhecido tratado errado: $(printf '%s' "${out}" | cut -f2,5,8,11 | tr '\n' ' ')"; fi
 
@@ -2095,8 +2100,8 @@ run_kg_open_queue_selftests() {
   sed '/mode == "--state"/,/^  }$/ s/if (!trabalhoPendente(nstatus\[id\])) continue.*/if (nstatus[id] != "open") continue/' "${radar}" > "${mut}"
   out_int="$(bash "${radar}" "$d/g.kg.yaml" --state 2>/dev/null || true)"
   out_mut="$(bash "${mut}"   "$d/g.kg.yaml" --state 2>/dev/null || true)"
-  if printf '%s' "${out_int}" | grep -q 'N_DRIFTED'; then rc_intact=0; else rc_intact=1; fi
-  if printf '%s' "${out_mut}" | grep -q 'N_DRIFTED'; then rc_mutant=0; else rc_mutant=1; fi
+  if _emit "${out_int}" | grep -q 'N_DRIFTED'; then rc_intact=0; else rc_intact=1; fi
+  if _emit "${out_mut}" | grep -q 'N_DRIFTED'; then rc_mutant=0; else rc_mutant=1; fi
   _prove_mutation "kg-fila: (f) (MUT) com a allowlist de volta o --state perde o drifted — a denylist e load-bearing" \
                   "${radar}" "${mut}" "${rc_intact}" "${rc_mutant}"
   rm -rf "$d"
@@ -2127,7 +2132,7 @@ run_kg_state_selftests() {
   # (b) SÓ `open` — nenhum nó com outro status entra na fila. A fixture tem confirmed, superseded
   # e done de propósito, então o lado negativo é real e não vacuidade.
   local st2; st2=$(bash "${radar}" "${sx}/supersedes-mixed.kg.yaml" --state 2>&1)
-  if ! printf '%s' "${st2}" | grep -qE 'D_JA_RECONCILIADO|Q_JA_FECHADA|D_PESO_'; then
+  if ! _emit "${st2}" | grep -qE 'D_JA_RECONCILIADO|Q_JA_FECHADA|D_PESO_'; then
     record_pass "kg-state: (b) só nós open entram — confirmed/superseded/done ficam fora"
   else record_fail "kg-state: (b) só open" "state=${st2}"; fi
 
@@ -2161,7 +2166,7 @@ edges:
     edge_type: SUPPORTS
 KGEOF
   rc=0; out=$(bash "${radar}" "${tmp}/sem-aberto.kg.yaml" --state 2>&1) || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'nada em aberto'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q 'nada em aberto'; then
     record_pass "kg-state: (c) grafo sem aberto DIZ que não há — não imprime cabeçalho mudo"
   else record_fail "kg-state: (c) sem aberto" "rc=${rc} out=${out}"; fi
 
@@ -2220,7 +2225,7 @@ run_kg_trace_resolve_selftests() {
   out="$(bash "${helper}" "${d}" --format tsv 2>/dev/null || true)"
 
   # (a) ACUSA os dois mortos — um por raiz, um por relativo-ao-grafo.
-  if printf '%s' "${out}" | grep -q 'C_MORTO_RAIZ' && printf '%s' "${out}" | grep -q 'C_MORTO_REL'; then
+  if _emit "${out}" | grep -q 'C_MORTO_RAIZ' && _emit "${out}" | grep -q 'C_MORTO_REL'; then
     record_pass "kg-trace: (a) acusa ponteiro morto por raiz E por relativo-ao-grafo"
   else record_fail "kg-trace: (a) acusa mortos" "out=${out}"; fi
 
@@ -2229,7 +2234,7 @@ run_kg_trace_resolve_selftests() {
   #     com um motivo só passaria por acidente se um único filtro estivesse fazendo todo o trabalho.
   local ruido=0 n
   for n in C_VIVO_RAIZ C_VIVO_RELATIVO C_VIVO_PAI C_ABSOLUTO C_RAIZ_EXTERNA C_COMANDO C_DOMINIO C_NOME_SOLTO; do
-    if printf '%s' "${out}" | grep -q "${n}"; then ruido=$((ruido + 1)); fi
+    if _emit "${out}" | grep -q "${n}"; then ruido=$((ruido + 1)); fi
   done
   if [ "${ruido}" -eq 0 ]; then
     record_pass "kg-trace: (b) cala nos 8 sãos — 8 motivos distintos (3 raízes + 5 exclusões), nenhum filtro carregando o resto"
@@ -2267,8 +2272,8 @@ run_kg_trace_resolve_selftests() {
     local rct=0 outt
     outt="$(bash "${mut}/m.sh" "${d}" --format tsv 2>&1)" || rct=$?
     rc=0; out="$(bash "${mut}/m.sh" "${d}" 2>&1)" || rc=$?
-    if [ "${rct}" -eq 1 ] && printf '%s' "${outt}" | grep -q 'VACUIDADE' \
-       && [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'VACUIDADE'; then
+    if [ "${rct}" -eq 1 ] && _emit "${outt}" | grep -q 'VACUIDADE' \
+       && [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'VACUIDADE'; then
       record_pass "kg-trace: (e) (MUT) parser cego → VACUIDADE + exit 1 nos DOIS modos (tsv é o que o lint usa)"
     else record_fail "kg-trace: (e) (MUT) vacuidade" "tsv: rc=${rct} out=${outt} · humano: rc=${rc} out=${out}"; fi
 
@@ -2281,7 +2286,7 @@ run_kg_trace_resolve_selftests() {
       > "${d3}/docs/onion/graph/so-nao-julgavel.kg.yaml"
     ( cd "${d3}" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
     rc=0; out="$(bash "${helper}" "${d3}" 2>&1)" || rc=$?
-    if [ "${rc}" -eq 0 ] && ! printf '%s' "${out}" | grep -q 'VACUIDADE'; then
+    if [ "${rc}" -eq 0 ] && ! _emit "${out}" | grep -q 'VACUIDADE'; then
       record_pass "kg-trace: (f) tudo não-julgável ≠ parser morto (não acusa vacuidade falsa)"
     else record_fail "kg-trace: (f) vacuidade falsa" "rc=${rc} out=${out}"; fi
     rm -rf "${d3}"
@@ -2499,8 +2504,8 @@ run_aside_router_hook_selftests() {
   local elsewhere; elsewhere="$(mktemp -d)"
   rc=0
   out="$(cd "${elsewhere}" && CLAUDE_PROJECT_DIR="${d}" bash "${d}/.claude/hooks/aside-router-hook.sh" <<<"${payload_marker}")" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"hookEventName":"UserPromptSubmit"' \
-     && printf '%s' "${out}" | grep -q 'APARTE dúvida'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q '"hookEventName":"UserPromptSubmit"' \
+     && _emit "${out}" | grep -q 'APARTE dúvida'; then
     record_pass "aside-router-hook: marcador tipado + cwd neutro → resolve via CLAUDE_PROJECT_DIR, rota certa"
   else record_fail "aside-router-hook: marcador (CLAUDE_PROJECT_DIR)" "esperava JSON com APARTE dúvida; out='${out}' rc=${rc}"; fi
   rm -rf "${elsewhere}"
@@ -2552,8 +2557,8 @@ run_aside_router_hook_selftests() {
     else
       rc=0
       out="$(cd "${d}" && CLAUDE_PROJECT_DIR="${d}" PATH="${nojq_bin}" bash .claude/hooks/aside-router-hook.sh <<<"${payload_marker}")" || rc=$?
-      if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"hookEventName":"UserPromptSubmit"' \
-         && printf '%s' "${out}" | grep -q 'APARTE dúvida'; then
+      if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q '"hookEventName":"UserPromptSubmit"' \
+         && _emit "${out}" | grep -q 'APARTE dúvida'; then
         record_pass "aside-router-hook: fallback SEM jq produz o mesmo contrato (rota certa, JSON válido)"
       else record_fail "aside-router-hook: fallback sem jq" "esperava JSON com APARTE dúvida; out='${out}' rc=${rc}"; fi
 
@@ -2872,14 +2877,14 @@ run_kg_reconcile_selftests() {
   # que estão certos. Sem o lado negativo, "consertar" seria alargar a guarda e chamar de fix.
   rc=0; out=$(bash "${radar}" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1) || rc=$?
   if [ "${rc}" -eq 0 ] \
-     && printf '%s' "${out}" | grep -q '⚠ D_ALVO_VIVO: recebe SUPERSEDES' \
-     && printf '%s' "${out}" | grep -q '⚠ Q_RESPONDIDA: pergunta RESPONDIDA' \
-     && printf '%s' "${out}" | grep -q '⚠ C_ALVO_DE_DRIFTED' \
-     && printf '%s' "${out}" | grep -q '⚠ D_ALVO_DRIFTED' \
-     && ! printf '%s' "${out}" | grep -q '⚠ D_JA_RECONCILIADO' \
-     && ! printf '%s' "${out}" | grep -q '⚠ Q_JA_FECHADA' \
-     && ! printf '%s' "${out}" | grep -q '⚠ C_SUPERSEDER_ABERTO' \
-     && ! printf '%s' "${out}" | grep -q '⚠ C_SO_REFUTES' \
+     && _emit "${out}" | grep -q '⚠ D_ALVO_VIVO: recebe SUPERSEDES' \
+     && _emit "${out}" | grep -q '⚠ Q_RESPONDIDA: pergunta RESPONDIDA' \
+     && _emit "${out}" | grep -q '⚠ C_ALVO_DE_DRIFTED' \
+     && _emit "${out}" | grep -q '⚠ D_ALVO_DRIFTED' \
+     && ! _emit "${out}" | grep -q '⚠ D_JA_RECONCILIADO' \
+     && ! _emit "${out}" | grep -q '⚠ Q_JA_FECHADA' \
+     && ! _emit "${out}" | grep -q '⚠ C_SUPERSEDER_ABERTO' \
+     && ! _emit "${out}" | grep -q '⚠ C_SO_REFUTES' \
      && [ "$(printf '%s' "${out}" | grep -c '⚠ ')" -eq 4 ]; then
     record_pass "kg-reconcile: (a) acusa EXATAMENTE 4 (alvo-vivo, pergunta-respondida e os dois de drifted); cala em reconciliado/fechado/superseder-aberto/REFUTES"
   else record_fail "kg-reconcile: (a) dois lados" "rc=${rc} out=${out}"; fi
@@ -2887,8 +2892,8 @@ run_kg_reconcile_selftests() {
   # (b) MENSAGEM PRÓPRIA POR TIPO — `question` recebe "fechar como done", não "reconciliar".
   # A distinção não é cosmética: pergunta respondida NÃO é história superada, e mandar virar
   # `superseded` produziria dado errado (4 dos 15 casos reais eram exatamente isto).
-  if printf '%s' "${out}" | grep -q 'Q_RESPONDIDA.*fechar como .done.' \
-     && printf '%s' "${out}" | grep -q 'D_ALVO_VIVO.*CONSTRAINS.*REFINA'; then
+  if _emit "${out}" | grep -q 'Q_RESPONDIDA.*fechar como .done.' \
+     && _emit "${out}" | grep -q 'D_ALVO_VIVO.*CONSTRAINS.*REFINA'; then
     record_pass "kg-reconcile: (b) mensagem por tipo — question→done, decisão→menu de 3 remédios"
   else record_fail "kg-reconcile: (b) mensagem por tipo" "out=${out}"; fi
 
@@ -2898,7 +2903,7 @@ run_kg_reconcile_selftests() {
   # reprovação é EXATAMENTE essa e nenhuma outra.
   rc=0; out=$(bash "${radar}" "${rx}/supersedes-mixed.kg.yaml" --integrity 2>&1) || rc=$?
   if [ "${rc}" -eq 1 ] \
-     && printf '%s' "${out}" | grep -q 'CONTRADIÇÃO: C_SO_REFUTES' \
+     && _emit "${out}" | grep -q 'CONTRADIÇÃO: C_SO_REFUTES' \
      && [ "$(printf '%s' "${out}" | grep -c '✗ ')" -eq 1 ]; then
     record_pass "kg-reconcile: (c) fixture íntegra — a única reprovação é o REFUTES declarado"
   else record_fail "kg-reconcile: (c) integridade da fixture" "rc=${rc} out=${out}"; fi
@@ -2912,7 +2917,7 @@ run_kg_reconcile_selftests() {
   sed -i 's/ \&\& supersederConta(nstatus\[efrom\[i\]\])//' "${mut}/mutado.sh"
   if ! grep -q 'etype\[i\] == "SUPERSEDES" && supersederConta' "${mut}/mutado.sh"; then
     local mout; mout="$(bash "${mut}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
-    if printf '%s' "${mout}" | grep -q '⚠ C_SUPERSEDER_ABERTO'; then
+    if _emit "${mout}" | grep -q '⚠ C_SUPERSEDER_ABERTO'; then
       record_pass "kg-reconcile: (d) (MUT) sem o filtro o superseder-aberto volta a acusar — o filtro é load-bearing"
     else record_fail "kg-reconcile: (d) (MUT)" "mutação não mudou o veredito — o filtro é vacuidade? out=${mout}"; fi
   else
@@ -2926,7 +2931,7 @@ run_kg_reconcile_selftests() {
   sed -i '/supersededByLive\[id\] > 0/,+6d' "${mut2}/mutado.sh"
   if ! grep -q 'supersededByLive\[id\] > 0' "${mut2}/mutado.sh"; then
     local mout2; mout2="$(bash "${mut2}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
-    if ! printf '%s' "${mout2}" | grep -q '⚠ '; then
+    if ! _emit "${mout2}" | grep -q '⚠ '; then
       record_pass "kg-reconcile: (e) (MUT) sem a guarda o ⚠ some — a guarda é quem produz o veredito"
     else record_fail "kg-reconcile: (e) (MUT)" "⚠ sobreviveu à remoção da guarda: out=${mout2}"; fi
   else
@@ -2948,10 +2953,10 @@ run_kg_reconcile_selftests() {
   if grep -q 'supersederConta(s) { return (s == "confirmed") }' "${mut3}/mutado.sh" \
      && grep -q 'pendingTarget(s, t) { return (s == "confirmed" || s == "open") }' "${mut3}/mutado.sh"; then
     local mout3; mout3="$(bash "${mut3}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
-    if ! printf '%s' "${mout3}" | grep -q '⚠ C_ALVO_DE_DRIFTED' \
-       && ! printf '%s' "${mout3}" | grep -q '⚠ D_ALVO_DRIFTED' \
-       && printf '%s' "${mout3}" | grep -q '⚠ D_ALVO_VIVO' \
-       && printf '%s' "${mout3}" | grep -q '⚠ Q_RESPONDIDA'; then
+    if ! _emit "${mout3}" | grep -q '⚠ C_ALVO_DE_DRIFTED' \
+       && ! _emit "${mout3}" | grep -q '⚠ D_ALVO_DRIFTED' \
+       && _emit "${mout3}" | grep -q '⚠ D_ALVO_VIVO' \
+       && _emit "${mout3}" | grep -q '⚠ Q_RESPONDIDA'; then
       record_pass "kg-reconcile: (f) (MUT) sob a allowlist antiga os DOIS casos de drifted somem e os antigos ficam — a denylist é load-bearing"
     else record_fail "kg-reconcile: (f) (MUT) denylist" "a allowlist antiga não mudou o veredito dos drifted: out=${mout3}"; fi
   else
@@ -2965,10 +2970,10 @@ run_kg_reconcile_selftests() {
   # a que ninguém podia mexer com segurança. Fixture SEPARADA porque (c) assere contagem na outra.
   rc=0; out=$(bash "${radar}" "${rx}/refutes-drifted.kg.yaml" --integrity 2>&1) || rc=$?
   if [ "${rc}" -eq 1 ] \
-     && printf '%s' "${out}" | grep -q 'CONTRADIÇÃO: C_ALVO_DRIFTED_REFUTADO' \
-     && printf '%s' "${out}" | grep -q 'CONTRADIÇÃO: C_ALVO_UNVER_REFUTADO' \
-     && ! printf '%s' "${out}" | grep -q 'C_ALVO_JA_REFUTADO' \
-     && ! printf '%s' "${out}" | grep -q 'Q_FECHADA_REFUTADA' \
+     && _emit "${out}" | grep -q 'CONTRADIÇÃO: C_ALVO_DRIFTED_REFUTADO' \
+     && _emit "${out}" | grep -q 'CONTRADIÇÃO: C_ALVO_UNVER_REFUTADO' \
+     && ! _emit "${out}" | grep -q 'C_ALVO_JA_REFUTADO' \
+     && ! _emit "${out}" | grep -q 'Q_FECHADA_REFUTADA' \
      && [ "$(printf '%s' "${out}" | grep -c '✗ ')" -eq 2 ]; then
     record_pass "kg-reconcile: (g) REFUTES em alvo drifted/unverifiable REPROVA (exatamente 2 ✗); cala em já-refutado e question-done"
   else record_fail "kg-reconcile: (g) lado HARD" "rc=${rc} out=${out}"; fi
@@ -3001,7 +3006,7 @@ run_kg_reconcile_selftests() {
     printf '  - from: C_VIVO\n    to: Q_Q_DONE\n    edge_type: SUPERSEDES\n'
   } > "${dz}/tipado.kg.yaml"
   out="$(bash "${radar}" "${dz}/tipado.kg.yaml" --reconcile 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q '⚠ D_DEC_DONE' && ! printf '%s' "${out}" | grep -q '⚠ Q_Q_DONE'; then
+  if _emit "${out}" | grep -q '⚠ D_DEC_DONE' && ! _emit "${out}" | grep -q '⚠ Q_Q_DONE'; then
     record_pass "kg-reconcile: (h) done fica fora SÓ para question — decisão fechada e superada ACUSA (era fail-open com a assinatura do defeito que o arquivo cura)"
   else record_fail "kg-reconcile: (h) exclusão tipada" "out=${out}"; fi
   rm -rf "${dz}"
@@ -3017,18 +3022,18 @@ run_kg_provenance_selftests() {
   # (senão "consertar" seria matar a guarda). exit 0 (aviso, não reprova).
   rc=0; out=$(bash "${radar}" "${px}/provenance-mixed.kg.yaml" --provenance 2>&1) || rc=$?
   if [ "${rc}" -eq 0 ] \
-     && printf '%s' "${out}" | grep -q 'decisão-sem-proveniência: D_ORPHAN' \
-     && ! printf '%s' "${out}" | grep -q 'D_TRACED' \
-     && ! printf '%s' "${out}" | grep -q 'D_INLINE' \
-     && ! printf '%s' "${out}" | grep -q 'D_DEAD' \
-     && ! printf '%s' "${out}" | grep -q 'C_CLAIM'; then
+     && _emit "${out}" | grep -q 'decisão-sem-proveniência: D_ORPHAN' \
+     && ! _emit "${out}" | grep -q 'D_TRACED' \
+     && ! _emit "${out}" | grep -q 'D_INLINE' \
+     && ! _emit "${out}" | grep -q 'D_DEAD' \
+     && ! _emit "${out}" | grep -q 'C_CLAIM'; then
     record_pass "kg-provenance: decisão viva sem chão avisada; ancorada/superseded/claim NÃO (aviso, exit 0)"
   else record_fail "kg-provenance: mixed" "rc=${rc} out=${out}"; fi
 
   # (b) mixed --integrity: a fixture é um KG estruturalmente válido → exit 0 (senão o veredito
   # de (a) seria sobre um grafo quebrado — a guarda tem que rodar sobre um KG legível).
   rc=0; out=$(bash "${radar}" "${px}/provenance-mixed.kg.yaml" --integrity 2>&1) || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'sem contradições estruturais'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q 'sem contradições estruturais'; then
     record_pass "kg-provenance: fixture mixed é KG válido (integridade verde)"
   else record_fail "kg-provenance: mixed integrity" "esperava exit 0 + integridade verde; rc=${rc} out=${out}"; fi
 
@@ -3036,8 +3041,8 @@ run_kg_provenance_selftests() {
   # falso-positivar o que tem chão — o par "good" que prova que a guarda fica quieta).
   rc=0; out=$(bash "${radar}" "${px}/provenance-clean.kg.yaml" --provenance 2>&1) || rc=$?
   if [ "${rc}" -eq 0 ] \
-     && ! printf '%s' "${out}" | grep -q 'decisão-sem-proveniência' \
-     && printf '%s' "${out}" | grep -q '✅ 2 decisão'; then
+     && ! _emit "${out}" | grep -q 'decisão-sem-proveniência' \
+     && _emit "${out}" | grep -q '✅ 2 decisão'; then
     record_pass "kg-provenance: toda decisão viva ancorada → ✅, sem falso-positivo"
   else record_fail "kg-provenance: clean" "esperava ✅ sem ⚠; rc=${rc} out=${out}"; fi
 }
@@ -3118,8 +3123,8 @@ KGEOF
   # (a) integridade: label citando "layer:"/"node_type:"/"plane:"/"status:" NÃO vira configuração
   rc=0; out=$(bash "${radar}" "${tmp}/label-collision.kg.yaml" --integrity 2>&1) || rc=$?
   if [ "${rc}" -eq 0 ] \
-     && printf '%s' "${out}" | grep -q 'sem contradições estruturais' \
-     && ! printf '%s' "${out}" | grep -q 'inválido'; then
+     && _emit "${out}" | grep -q 'sem contradições estruturais' \
+     && ! _emit "${out}" | grep -q 'inválido'; then
     record_pass "kg-label-collision: label citando token de campo → integridade verde (conteúdo ≠ configuração)"
   else record_fail "kg-label-collision: label não confunde" "esperava exit 0 sem 'inválido'; rc=${rc} out=${out}"; fi
 
@@ -3127,14 +3132,14 @@ KGEOF
   # peso de C_TRAP = impact 3 × confidence 0.9 × status confirmed (1.0) × grau 2 = 5.4, plano DEV.
   rc=0; out=$(bash "${radar}" "${tmp}/label-collision.kg.yaml" --radar 2>&1) || rc=$?
   if [ "${rc}" -eq 0 ] \
-     && printf '%s' "${out}" | grep -q '5.4  C_TRAP' \
-     && printf '%s' "${out}" | grep -q 'claim(DEV/confirmed)'; then
+     && _emit "${out}" | grep -q '5.4  C_TRAP' \
+     && _emit "${out}" | grep -q 'claim(DEV/confirmed)'; then
     record_pass "kg-label-collision: campos reais ainda lidos (peso 5.4, claim(DEV/confirmed))"
   else record_fail "kg-label-collision: campos reais" "esperava 5.4 C_TRAP claim(DEV/confirmed); rc=${rc} out=${out}"; fi
 
   # (c) guarda viva: enum inválido em POSIÇÃO DE CAMPO continua reprovando com exit 1
   rc=0; out=$(bash "${radar}" "${tmp}/enum-real.kg.yaml" --integrity 2>&1) || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'C_BAD: layer inválido'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'C_BAD: layer inválido'; then
     record_pass "kg-label-collision: enum inválido em posição de campo AINDA reprova (guarda viva)"
   else record_fail "kg-label-collision: guarda viva" "esperava exit 1 + 'C_BAD: layer inválido'; rc=${rc} out=${out}"; fi
 
@@ -3167,8 +3172,8 @@ edges:
 KGEOF
   rc=0; out=$(bash "${radar}" "${tmp}/edge-collision.kg.yaml" --integrity 2>&1) || rc=$?
   if [ "${rc}" -eq 0 ] \
-     && printf '%s' "${out}" | grep -q 'sem contradições estruturais' \
-     && ! printf '%s' "${out}" | grep -q 'inexistente'; then
+     && _emit "${out}" | grep -q 'sem contradições estruturais' \
+     && ! _emit "${out}" | grep -q 'inexistente'; then
     record_pass "kg-label-collision: aresta com id contendo ':' e campo livre citando 'on:' → integridade verde"
   else record_fail "kg-label-collision: arestas/meta ancoradas" "esperava exit 0 sem 'inexistente'; rc=${rc} out=${out}"; fi
 }
@@ -3447,7 +3452,7 @@ run_resolve_production_selftests() {
   git -C "${d}" update-ref refs/remotes/origin/main "${new_sha}"
   _rp_run "${d}" --integration develop
   rm -rf "${d}"
-  if [ "${RP_OUT}" = "main" ] && printf '%s' "${RP_ERR}" | grep -qi "AMBIGUIDADE"; then
+  if [ "${RP_OUT}" = "main" ] && _emit "${RP_ERR}" | grep -qi "AMBIGUIDADE"; then
     record_pass "resolve-production: pós-rename → main (mais recente) + avisa ambiguidade"
   else
     record_fail "resolve-production: pós-rename" "esperava out='main' + aviso AMBIGUIDADE, veio out='${RP_OUT}' err='${RP_ERR}'"
@@ -3477,7 +3482,7 @@ run_resolve_production_selftests() {
   git -C "${d}" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/develop
   _rp_run "${d}" --integration develop
   rm -rf "${d}"
-  if [ -z "${RP_OUT}" ] && printf '%s' "${RP_ERR}" | grep -qi "não identificada"; then
+  if [ -z "${RP_OUT}" ] && _emit "${RP_ERR}" | grep -qi "não identificada"; then
     record_pass "resolve-production: não identificável → vazio + aviso (nunca chuta main)"
   else
     record_fail "resolve-production: não identificável" "esperava out='' + aviso 'não identificada', veio out='${RP_OUT}' err='${RP_ERR}'"
@@ -3762,8 +3767,8 @@ run_vendor_branch_selftests() {
   local dirty; dirty="$(git -C "$t5" status --porcelain | wc -l)"
   local uconf; uconf="$(git -C "$t5" diff --name-only --diff-filter=U 2>/dev/null | wc -l)"
   if [ "$rcx" -eq 11 ] \
-     && printf '%s' "$outx" | grep -q 'BASE CRUZADA' \
-     && printf '%s' "$outx" | grep -q 'src/app.js' \
+     && _emit "$outx" | grep -q 'BASE CRUZADA' \
+     && _emit "$outx" | grep -q 'src/app.js' \
      && [ "$dirty" = "0" ] && [ "$uconf" = "0" ]; then
     record_pass "vendor-branch: (g) base cruzada → exit 11 ANTES do merge, nomeia o arquivo alheio, integração INTACTA"
   else record_fail "vendor-branch: (g) base cruzada" "exit=$rcx dirty=$dirty conflitos=$uconf out=${outx}"; fi
@@ -4007,29 +4012,29 @@ run_research_lens_selftests() {
   printf 'meta:\n  id: g4\n  schema_version: "1"\n  baseline: 2026-01-01\nnodes:\n  - id: C_Z\n    node_type: claim\n    plane: DEV\n    status: superseded\n    impact: 2\n    confidence: 0.5\n    label: "z premodelswitch antigo"\nedges:\n' > "${d}/g4/g4.kg.yaml"
   local rc=0 out
   out="$(ONION_RESEARCH_KG_DIR="${d}" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q "REGRA 67: grafo de pesquisa NOVO (baseline 2026-09-02) sem meta.review_after" && printf '%s' "${out}" | grep -q "g1/g1.kg.yaml"; then
+  if _emit "${out}" | grep -q "REGRA 67: grafo de pesquisa NOVO (baseline 2026-09-02) sem meta.review_after" && _emit "${out}" | grep -q "g1/g1.kg.yaml"; then
     record_pass "research-lens: (a) grafo NOVO sem review_after ⇒ SOFT 67 (catraca sem retro-ruído)"
   else record_fail "research-lens: (a)" "esperava SOFT 67 em g1 (rc=${rc}): ${out:0:300}"; fi
-  if printf '%s' "${out}" | grep -q "REGRA 67: revisita VENCIDA (review_after ${past}"; then
+  if _emit "${out}" | grep -q "REGRA 67: revisita VENCIDA (review_after ${past}"; then
     record_pass "research-lens: (b) review_after vencido ⇒ SOFT 67"
   else record_fail "research-lens: (b)" "esperava VENCIDA em g2: ${out:0:300}"; fi
-  if ! printf '%s' "${out}" | grep -q "g3/g3.kg.yaml" && ! printf '%s' "${out}" | grep -q "g4/g4.kg.yaml"; then
+  if ! _emit "${out}" | grep -q "g3/g3.kg.yaml" && ! _emit "${out}" | grep -q "g4/g4.kg.yaml"; then
     record_pass "research-lens: (c) review_after futuro e grafo antigo sem chave ⇒ silêncio"
   else record_fail "research-lens: (c)" "falso positivo em g3/g4: ${out:0:300}"; fi
-  if printf '%s' "${out}" | grep -q "REGRA 68: nó E_BLOG_CONCORRENTE tem confidence 0.9 com fonte fraca (source_tier 2, source_kind vendor-on-competitor)"; then
+  if _emit "${out}" | grep -q "REGRA 68: nó E_BLOG_CONCORRENTE tem confidence 0.9 com fonte fraca (source_tier 2, source_kind vendor-on-competitor)"; then
     record_pass "research-lens: (d) confiança 0.9 + tier 2 vendor-on-competitor ⇒ SOFT 68"
   else record_fail "research-lens: (d)" "esperava SOFT 68 em E_BLOG_CONCORRENTE: ${out:0:300}"; fi
-  if ! printf '%s' "${out}" | grep -q "E_DOC_OFICIAL"; then
+  if ! _emit "${out}" | grep -q "E_DOC_OFICIAL"; then
     record_pass "research-lens: (e) confiança 0.9 + tier 9 primary ⇒ silêncio"
   else record_fail "research-lens: (e)" "falso positivo em E_DOC_OFICIAL: ${out:0:300}"; fi
   # corpus-grep: acha por termo no label, esconde superseded por default, mostra com --all-status, fail-loud sem corpus
   local files; files="$(printf '%s\n' "${d}/g1/g1.kg.yaml" "${d}/g4/g4.kg.yaml")"
   out="$(ONION_KG_CORPUS_FILES="${files}" bash "${cg}" concorrente 2>&1)"; rc=$?
-  if [ "${rc}" = 0 ] && printf '%s' "${out}" | grep -q "E_BLOG_CONCORRENTE" && printf '%s' "${out}" | grep -q "^# corpus: 2 grafos"; then
+  if [ "${rc}" = 0 ] && _emit "${out}" | grep -q "E_BLOG_CONCORRENTE" && _emit "${out}" | grep -q "^# corpus: 2 grafos"; then
     record_pass "research-lens: (f) kg-corpus-grep acha por termo no label e conta o corpus"
   else record_fail "research-lens: (f)" "rc=${rc}: ${out:0:200}"; fi
   out="$(ONION_KG_CORPUS_FILES="${files}" bash "${cg}" premodelswitch 2>&1)"
-  if ! printf '%s' "${out}" | grep -q "C_Z" && ONION_KG_CORPUS_FILES="${files}" bash "${cg}" premodelswitch --all-status 2>&1 | grep -q "C_Z"; then
+  if ! _emit "${out}" | grep -q "C_Z" && ONION_KG_CORPUS_FILES="${files}" bash "${cg}" premodelswitch --all-status 2>&1 | grep -q "C_Z"; then
     record_pass "research-lens: (g) superseded escondido por default, visível com --all-status"
   else record_fail "research-lens: (g)" "filtro de status errado: ${out:0:200}"; fi
   rc=0; ONION_KG_CORPUS_FILES= ONION_KG_CORPUS_ROOT="${d}/vazio" bash "${cg}" x >/dev/null 2>&1 || rc=$?
@@ -4038,7 +4043,7 @@ run_research_lens_selftests() {
   # REGRA 69 — roster de fontes: last_checked vencido pela cadência ⇒ SOFT; fresco/sem last_checked ⇒ silêncio
   printf 'axes:\n  - id: ax1\n    cadence: weekly\n    sources:\n      - { url: "https://a.example/x", kind: primary, tier: 9, last_checked: "2026-01-01" }\n      - { url: "https://b.example/y", kind: primary, tier: 9, last_checked: "%s" }\n      - { url: "https://c.example/z", kind: forum, tier: 4 }\n' "$(date +%F)" > "${d}/roster.yaml"
   rc=0; out="$(ONION_RADAR_SOURCES="${d}/roster.yaml" ONION_RESEARCH_KG_DIR="${d}/nao-existe" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q "REGRA 69: fonte do roster VENCIDA — eixo ax1, https://a.example/x (cadência weekly" && ! printf '%s' "${out}" | grep -q "b.example" && ! printf '%s' "${out}" | grep -q "c.example"; then
+  if _emit "${out}" | grep -q "REGRA 69: fonte do roster VENCIDA — eixo ax1, https://a.example/x (cadência weekly" && ! _emit "${out}" | grep -q "b.example" && ! _emit "${out}" | grep -q "c.example"; then
     record_pass "research-lens: (i) REGRA 69: fonte com last_checked vencido ⇒ SOFT; fresca e sem carimbo ⇒ silêncio"
   else record_fail "research-lens: (i)" "REGRA 69 errada (rc=${rc}): ${out:0:300}"; fi
   rm -rf "${d}"
@@ -4234,7 +4239,7 @@ run_reconcile_inputs_selftests() {
   # --outbox é barato (sem python); --entries chama resolve-target → captura UMA vez e reusa.
   local outbox entries
   outbox="$(bash "${helper}" --outbox 2>/dev/null)"
-  if [ "$(printf '%s\n' "${outbox}" | head -1)" = "[OUTBOX]" ]; then
+  if [ "$(_emit "${outbox}" | head -1)" = "[OUTBOX]" ]; then
     record_pass "reconcile-inputs: --outbox emite cabeçalho [OUTBOX]"
   else record_fail "reconcile-inputs: --outbox" "cabeçalho [OUTBOX] ausente"; fi
   local bad_state
@@ -4248,14 +4253,14 @@ run_reconcile_inputs_selftests() {
   if ! (command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1); then
     record_skip "reconcile-inputs: conteúdo de entries pulado (sem python+yaml — gracioso)"; return; fi
   entries="$(bash "${helper}" --entries 2>/dev/null)"   # 1× (memoizado no helper)
-  if [ "$(printf '%s\n' "${entries}" | head -1)" = "[ENTRIES]" ]; then
+  if [ "$(_emit "${entries}" | head -1)" = "[ENTRIES]" ]; then
     record_pass "reconcile-inputs: --entries emite cabeçalho [ENTRIES]"
   else record_fail "reconcile-inputs: --entries" "cabeçalho [ENTRIES] ausente"; fi
   local bad_entry
   bad_entry="$(printf '%s\n' "${entries}" | tail -n +2 | awk -F'\t' 'NF<4 || $2==""' | head -1)"
   if [ -z "${bad_entry}" ]; then record_pass "reconcile-inputs: toda entry tem ≥4 campos + destinatários"
   else record_fail "reconcile-inputs: entry malformada" "linha: ${bad_entry}"; fi
-  if printf '%s\n' "${entries}" | grep -q '2026-07-10	.*a2a-live'; then
+  if _emit "${entries}" | grep -q '2026-07-10	.*a2a-live'; then
     record_pass "reconcile-inputs: entrada a2a-live 07-10 presente com destinatários"
   else record_fail "reconcile-inputs: a2a-live" "entrada 07-10 a2a-live ausente da conciliação"; fi
 }
@@ -4271,10 +4276,10 @@ run_federation_radar_selftests() {
   out="$(bash "${helper}" 2>/dev/null)" || rc=$?
   if [ "${rc}" -eq 0 ]; then record_pass "federation-radar: advisory (exit 0)"
   else record_fail "federation-radar: exit" "esperava 0 (advisory), veio ${rc}"; fi
-  if printf '%s\n' "${out}" | grep -q 'FEDERATION RADAR'; then record_pass "federation-radar: emite cabeçalho"
+  if _emit "${out}" | grep -q 'FEDERATION RADAR'; then record_pass "federation-radar: emite cabeçalho"
   else record_fail "federation-radar: cabeçalho" "sem 'FEDERATION RADAR'"; fi
   # os 3 checks numerados presentes
-  if printf '%s\n' "${out}" | grep -q '①' && printf '%s\n' "${out}" | grep -q '②' && printf '%s\n' "${out}" | grep -q '③'; then
+  if _emit "${out}" | grep -q '①' && _emit "${out}" | grep -q '②' && _emit "${out}" | grep -q '③'; then
     record_pass "federation-radar: 3 checks presentes (pin/staging/hub)"
   else record_fail "federation-radar: checks" "faltam checks numerados"; fi
   if [ "$(bash "${helper}" 2>/dev/null | sha256sum)" = "$(bash "${helper}" 2>/dev/null | sha256sum)" ]; then
@@ -4295,12 +4300,12 @@ run_federation_console_selftests() {
     else record_skip "federation-console: pulado (sem python+yaml)"; fi
     return; fi
   local H; H="$(bash "${helper}" 2>/dev/null)"
-  if printf '%s' "${H}" | grep -q '<!doctype html>' && printf '%s' "${H}" | grep -q '</html>' \
-     && ! printf '%s' "${H}" | grep -q '__DATA__' \
-     && printf '%s' "${H}" | grep -q '"timeline"' && printf '%s' "${H}" | grep -q '"members"'; then
+  if _emit "${H}" | grep -q '<!doctype html>' && _emit "${H}" | grep -q '</html>' \
+     && ! _emit "${H}" | grep -q '__DATA__' \
+     && _emit "${H}" | grep -q '"timeline"' && _emit "${H}" | grep -q '"members"'; then
     record_pass "federation-console: HTML self-contained (members+timeline, sem placeholder)"
   else record_fail "federation-console: html" "HTML inválido/incompleto"; fi
-  if printf '%s' "${H}" | grep -qiE 'src=.?https?://|<script src|href=.?https?://[^"]*\.(js|css)|fetch\('; then
+  if _emit "${H}" | grep -qiE 'src=.?https?://|<script src|href=.?https?://[^"]*\.(js|css)|fetch\('; then
     record_fail "federation-console: self-contained" "tem dependência externa (CDN/fetch)"
   else record_pass "federation-console: self-contained (sem CDN/fetch externo)"; fi
   local H2; H2="$(bash "${helper}" 2>/dev/null)"
@@ -4340,8 +4345,8 @@ run_site_inventory_selftests() {
   printf '<p>%s comandos invocáveis</p>\n<b data-n="%s">0</b><span>knowledge bases</span>\n' \
     "$((cmds - 1))" "$((kbs - 1))" > "${sb}/site/index.html"
   local out; out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q "site afirma $((cmds - 1)) comandos" \
-     && printf '%s' "${out}" | grep -q "afirma $((kbs - 1)) knowledge bases"; then
+  if _emit "${out}" | grep -q "site afirma $((cmds - 1)) comandos" \
+     && _emit "${out}" | grep -q "afirma $((kbs - 1)) knowledge bases"; then
     record_pass "site-inventory: drift no pitch (prosa + contador data-n) → HARD"
   else record_fail "site-inventory: drift" "gate não pegou o drift: ${out}"; fi
 
@@ -4351,7 +4356,7 @@ run_site_inventory_selftests() {
   printf '<span>/meta:kg nasce (comando nº 95)</span>\n<p>96 comandos</p>\n' \
     > "${sb}/site/historia/index.html"
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if printf '%s' "${out}" | grep -qE 'site afirma|contador data-n'; then
+  if _emit "${out}" | grep -qE 'site afirma|contador data-n'; then
     record_fail "site-inventory: alinhado" "falso-positivo OU gateou a timeline histórica: ${out}"
   else
     record_pass "site-inventory: pitch alinhado passa; timeline histórica não é gateada"
@@ -4376,7 +4381,7 @@ run_adopted_role_selftests() {
   printf 'framework: onion-evolve\nrole: adopted\n' > "${asb}/.claude/.onion-version"
   local out
   out="$(cd "${asb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if printf '%s' "${out}" | grep -qE 'plugin ausente|não registrado no marketplace'; then
+  if _emit "${out}" | grep -qE 'plugin ausente|não registrado no marketplace'; then
     record_fail "adopted-role: marketplace-skip" "consumidor sem plugins/ ainda viola marketplace (guarda por papel regrediu)"
   else
     record_pass "adopted-role: role adopted sem plugins/ → 0 violações de marketplace (guarda por papel)"
@@ -4392,11 +4397,11 @@ run_adopted_role_selftests() {
     > "${asb}/docs/knowledge-base/test-link-guard.md"
   local out2 broken; out2="$(cd "${asb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
   broken="$(printf '%s\n' "${out2}" | grep 'link relativo quebrado' || true)"
-  if printf '%s' "${broken}" | grep -q 'concepts/nao-existe-xyz.md' \
-     && ! printf '%s' "${broken}" | grep -q 'analysis/foo.md'; then
+  if _emit "${broken}" | grep -q 'concepts/nao-existe-xyz.md' \
+     && ! _emit "${broken}" | grep -q 'analysis/foo.md'; then
     record_pass "adopted-role: link-guard — broken-link pula core-only e pega KB-interno (REGRA 45 trata core-privado à parte)"
   else
-    record_fail "adopted-role: link-guard" "broken-link impreciso: core-only virou 'quebrado' OU kb-interno não-pego — $(printf '%s' "${broken}" | head -3)"
+    record_fail "adopted-role: link-guard" "broken-link impreciso: core-only virou 'quebrado' OU kb-interno não-pego — $(_emit "${broken}" | head -3)"
   fi
   rm -rf "${asb}"
 }
@@ -4453,9 +4458,9 @@ run_write_stamp_selftests() {
   printf 'pin 0123456789ab citado na SSOT viva\n' > "${wsb}/p/docs/tech/index.md"
   printf 'sinal histórico cita 0123456789ab\n' > "${wsb}/p/docs/evolution/inbox/2026-08-01-sinal.md"
   local pin_err; pin_err="$(bash "${helper}" "${wsb}/p" --framework onion-evolve --commit fedcba987654 --commit-date 2026-09-01 2>&1 >/dev/null || true)"
-  if printf '%s' "${pin_err}" | grep -q '^AVISO: 1 referência' \
-     && printf '%s' "${pin_err}" | grep -q 'docs/tech/index.md' \
-     && ! printf '%s' "${pin_err}" | grep -q 'inbox'; then
+  if _emit "${pin_err}" | grep -q '^AVISO: 1 referência' \
+     && _emit "${pin_err}" | grep -q 'docs/tech/index.md' \
+     && ! _emit "${pin_err}" | grep -q 'inbox'; then
     record_pass "write-stamp: (D_GREP_OLD_PIN) update avisa 1 citação viva do pin antigo; história (inbox) excluída"
   else record_fail "write-stamp: grep-old-pin" "${pin_err}"; fi
   # 5. --role inválido → exit 2 (só adopted|hub)
@@ -4636,7 +4641,7 @@ run_mail_receiver_selftests() {
   else record_fail "mail-receiver: 0-mail" "esperava vazio+0 (got '${out}'/${rc})"; fi
   printf 'x' > "$t/docs/evolution/inbox/a.md"
   out="$(bash "${helper}" --repo "$t" 2>&1)"
-  if printf '%s' "${out}" | grep -q 'co-evolve' && [ -f "$t/.claude/sessions/.mail-receiver.state" ]; then
+  if _emit "${out}" | grep -q 'co-evolve' && [ -f "$t/.claude/sessions/.mail-receiver.state" ]; then
     record_pass "mail-receiver: mail novo → acorda + salva assinatura"
   else record_fail "mail-receiver: wake" "não acordou / sem estado"; fi
   if [ -z "$(bash "${helper}" --repo "$t" 2>&1)" ]; then record_pass "mail-receiver: dedup (mesmo conjunto → silencioso)"
@@ -4647,7 +4652,7 @@ run_mail_receiver_selftests() {
   else record_fail "mail-receiver: novo" "não reacordou no conjunto novo"; fi
   rm -f "$t/.claude/sessions/.mail-receiver.state"
   local o2; o2="$(bash "${helper}" --repo "$t" --dry-run 2>&1)"
-  if printf '%s' "${o2}" | grep -q 'co-evolve' && [ ! -f "$t/.claude/sessions/.mail-receiver.state" ]; then
+  if _emit "${o2}" | grep -q 'co-evolve' && [ ! -f "$t/.claude/sessions/.mail-receiver.state" ]; then
     record_pass "mail-receiver: --dry-run imprime sem tocar estado"
   else record_fail "mail-receiver: dry-run" "tocou estado ou não imprimiu"; fi
   rm -rf "$t"
@@ -4697,36 +4702,36 @@ YML
   _ssrf() { rc=0; out="$(A2A_MEMBERS_FILE="${mf}" bash "${helper}" "$1" 2>/dev/null)" || rc=$?; }
 
   _ssrf "http://127.0.0.1:8787/h"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'loopback'; then record_pass "a2a-ssrf: 127.0.0.1 → deny loopback"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'loopback'; then record_pass "a2a-ssrf: 127.0.0.1 → deny loopback"
   else record_fail "a2a-ssrf: loopback" "out='${out}' rc=${rc}"; fi
 
   _ssrf "http://169.254.169.254/latest/meta-data/"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'link-local-metadata'; then record_pass "a2a-ssrf: 169.254.169.254 (metadata cloud) → deny"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'link-local-metadata'; then record_pass "a2a-ssrf: 169.254.169.254 (metadata cloud) → deny"
   else record_fail "a2a-ssrf: metadata" "out='${out}' rc=${rc}"; fi
 
   _ssrf "https://10.1.2.3/h"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'rfc1918'; then record_pass "a2a-ssrf: 10.x → deny rfc1918"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'rfc1918'; then record_pass "a2a-ssrf: 10.x → deny rfc1918"
   else record_fail "a2a-ssrf: rfc1918-10" "out='${out}' rc=${rc}"; fi
 
   _ssrf "https://192.168.1.1/h"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'rfc1918'; then record_pass "a2a-ssrf: 192.168.x → deny rfc1918"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'rfc1918'; then record_pass "a2a-ssrf: 192.168.x → deny rfc1918"
   else record_fail "a2a-ssrf: rfc1918-192" "out='${out}' rc=${rc}"; fi
 
   _ssrf "ftp://gitlab.example.org/x"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'scheme'; then record_pass "a2a-ssrf: esquema não-http → deny"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'scheme'; then record_pass "a2a-ssrf: esquema não-http → deny"
   else record_fail "a2a-ssrf: scheme" "out='${out}' rc=${rc}"; fi
 
   _ssrf "https://gitlab.example.org/webhook"
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '^allow'; then record_pass "a2a-ssrf: host ∈ members.remote → allow"
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q '^allow'; then record_pass "a2a-ssrf: host ∈ members.remote → allow"
   else record_fail "a2a-ssrf: allow" "out='${out}' rc=${rc}"; fi
 
   _ssrf "https://evil.example.net/hook"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'not-in-allowlist'; then record_pass "a2a-ssrf: host público fora da allowlist → deny"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'not-in-allowlist'; then record_pass "a2a-ssrf: host público fora da allowlist → deny"
   else record_fail "a2a-ssrf: allowlist" "out='${out}' rc=${rc}"; fi
 
   # fail-safe: SSOT ausente → deny (nunca allow por ausência)
   rc=0; out="$(A2A_MEMBERS_FILE=/nao/existe/members.yaml bash "${helper}" "https://gitlab.example.org/x" 2>/dev/null)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'members-absent'; then record_pass "a2a-ssrf: SSOT ausente → deny (fail-safe)"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'members-absent'; then record_pass "a2a-ssrf: SSOT ausente → deny (fail-safe)"
   else record_fail "a2a-ssrf: ssot-absent" "out='${out}' rc=${rc}"; fi
 
   rm -f "${mf}"
@@ -4778,51 +4783,51 @@ YML
   _verify() { rc=0; out="$(A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver "$1" --repo "${sb}" --dry-run --envelope - <<<"$2" 2>/dev/null)" || rc=$?; }
 
   _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-h)" acme onion-evolve "")"
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"verified":true'; then record_pass "a2a-verify: envelope assinado válido → verified"
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q '"verified":true'; then record_pass "a2a-verify: envelope assinado válido → verified"
   else record_fail "a2a-verify: happy" "out='${out}' rc=${rc}"; fi
-  if printf '%s' "${out}" | grep -q '"gated":true'; then record_pass "a2a-verify: gated:true sempre (verified pende gate humano)"
+  if _emit "${out}" | grep -q '"gated":true'; then record_pass "a2a-verify: gated:true sempre (verified pende gate humano)"
   else record_fail "a2a-verify: gated-verified" "out='${out}'"; fi
-  if printf '%s' "${out}" | grep -q '"committed":false'; then record_pass "a2a-verify: committed:false sempre (I3)"
+  if _emit "${out}" | grep -q '"committed":false'; then record_pass "a2a-verify: committed:false sempre (I3)"
   else record_fail "a2a-verify: committed" "out='${out}'"; fi
 
   _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-h)" acme onion-evolve "")"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q '"reason":"replay"'; then record_pass "a2a-verify: jti reusado → veto replay"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q '"reason":"replay"'; then record_pass "a2a-verify: jti reusado → veto replay"
   else record_fail "a2a-verify: replay" "out='${out}' rc=${rc}"; fi
 
   _verify onion-evolve "$(_env "$(_jws acme onion-evolve "$((NOW-7200))" "$((NOW-3600))" jti-e)" acme onion-evolve "")"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'expired'; then record_pass "a2a-verify: exp no passado → veto expired"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'expired'; then record_pass "a2a-verify: exp no passado → veto expired"
   else record_fail "a2a-verify: expired" "out='${out}' rc=${rc}"; fi
 
   _verify onion-evolve "$(_env "$(_jws acme onion-evolve "$((NOW+99999))" "$((NOW+999999))" jti-f)" acme onion-evolve "")"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'future'; then record_pass "a2a-verify: iat muito à frente → veto future"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'future'; then record_pass "a2a-verify: iat muito à frente → veto future"
   else record_fail "a2a-verify: future" "out='${out}' rc=${rc}"; fi
 
   _verify onion-evolve "$(_env "$(_jws ghost onion-evolve "${NOW}" "$((NOW+3600))" jti-g)" ghost onion-evolve "")"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'trust-denied'; then record_pass "a2a-verify: from fora da policy → veto trust-denied"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'trust-denied'; then record_pass "a2a-verify: from fora da policy → veto trust-denied"
   else record_fail "a2a-verify: trust" "out='${out}' rc=${rc}"; fi
-  if printf '%s' "${out}" | grep -q '"gated":true'; then record_pass "a2a-verify: gated:true sempre (mesmo em veto)"
+  if _emit "${out}" | grep -q '"gated":true'; then record_pass "a2a-verify: gated:true sempre (mesmo em veto)"
   else record_fail "a2a-verify: gated-veto" "out='${out}'"; fi
 
   _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-s)" acme onion-evolve ',"pushNotificationConfig":{"url":"http://169.254.169.254/"}')"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q '"reason":"ssrf"'; then record_pass "a2a-verify: webhook p/ metadata → veto ssrf"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q '"reason":"ssrf"'; then record_pass "a2a-verify: webhook p/ metadata → veto ssrf"
   else record_fail "a2a-verify: ssrf" "out='${out}' rc=${rc}"; fi
 
   local jbad; jbad="$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-b)"; jbad="${jbad%.*}.AAAABBBBCCCCDDDD"
   _verify onion-evolve "$(_env "${jbad}" acme onion-evolve "")"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'bad-signature'; then record_pass "a2a-verify: assinatura adulterada → veto bad-signature"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'bad-signature'; then record_pass "a2a-verify: assinatura adulterada → veto bad-signature"
   else record_fail "a2a-verify: bad-sig" "out='${out}' rc=${rc}"; fi
 
   _verify onion-evolve "$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-k kZ)" acme onion-evolve "")"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'unknown-kid'; then record_pass "a2a-verify: kid sem pubkey no JWKS → veto unknown-kid"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'unknown-kid'; then record_pass "a2a-verify: kid sem pubkey no JWKS → veto unknown-kid"
   else record_fail "a2a-verify: kid" "out='${out}' rc=${rc}"; fi
 
   _verify fin "$(_env "$(_jws onion-evolve fin "${NOW}" "$((NOW+3600))" jti-r)" onion-evolve fin "")"
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"apply_mode":"propose-only"'; then record_pass "a2a-verify: receptor regulado → apply_mode:propose-only (never-live-pull)"
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q '"apply_mode":"propose-only"'; then record_pass "a2a-verify: receptor regulado → apply_mode:propose-only (never-live-pull)"
   else record_fail "a2a-verify: regulated" "out='${out}' rc=${rc}"; fi
 
   # kid-binding: from=fin (sem k1 nas suas a2a.keys) assina com k1 → veto (anti-impersonação, hardening de um adotante multi-linhagem)
   _verify onion-evolve "$(_env "$(_jws fin onion-evolve "${NOW}" "$((NOW+3600))" jti-imp)" fin onion-evolve "")"
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'kid-not-owned-by-from'; then record_pass "a2a-verify: kid de outro dono (impersonação) → veto kid-not-owned-by-from"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'kid-not-owned-by-from'; then record_pass "a2a-verify: kid de outro dono (impersonação) → veto kid-not-owned-by-from"
   else record_fail "a2a-verify: kid-binding" "out='${out}' rc=${rc}"; fi
 
   # FAIL-SAFE: openssl fora do PATH → veto tooling-absent (degrade→VETO, nunca skip/allow)
@@ -4832,7 +4837,7 @@ YML
   done
   local se; se="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-safe)" acme onion-evolve "")"
   rc=0; out="$(PATH="${bin}" A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"${se}" 2>/dev/null)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'tooling-absent'; then record_pass "a2a-verify: FAIL-SAFE — tooling ausente → veto (nunca skip/allow)"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'tooling-absent'; then record_pass "a2a-verify: FAIL-SAFE — tooling ausente → veto (nunca skip/allow)"
   else record_fail "a2a-verify: fail-safe" "out='${out}' rc=${rc}"; fi
 
   # CLOCK-TRUST (carimbo de tempo só vale com fonte verificada): PATH stubado com TODAS as
@@ -4844,12 +4849,12 @@ YML
   printf '#!/usr/bin/env bash\necho no\n' > "${clkbin}/timedatectl"; chmod +x "${clkbin}/timedatectl"
   local ce; ce="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-clk1)" acme onion-evolve "")"
   rc=0; out="$(PATH="${clkbin}" A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"${ce}" 2>/dev/null)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'clock-untrusted'; then record_pass "a2a-verify: relógio sem prova de sync → veto clock-untrusted (fail-safe)"
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'clock-untrusted'; then record_pass "a2a-verify: relógio sem prova de sync → veto clock-untrusted (fail-safe)"
   else record_fail "a2a-verify: clock-untrusted" "out='${out}' rc=${rc}"; fi
   # mesmo host dessincronizado + atestado explícito do operador → camada passa (verified)
   ce="$(_env "$(_jws acme onion-evolve "${NOW}" "$((NOW+3600))" jti-clk2)" acme onion-evolve "")"
   rc=0; out="$(PATH="${clkbin}" A2A_CLOCK_TRUST=attested A2A_JWKS_DIR="${sb}/jwks" bash "${helper}" --receiver onion-evolve --repo "${sb}" --dry-run --envelope - <<<"${ce}" 2>/dev/null)" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '"verified":true'; then record_pass "a2a-verify: A2A_CLOCK_TRUST=attested → atestado explícito destrava a camada"
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q '"verified":true'; then record_pass "a2a-verify: A2A_CLOCK_TRUST=attested → atestado explícito destrava a camada"
   else record_fail "a2a-verify: clock-attested" "out='${out}' rc=${rc}"; fi
   rm -rf "${bin}" "${clkbin}" "${sb}"
 }
@@ -4883,16 +4888,16 @@ YML
     record_pass "agent-card: JSON válido"
   else record_fail "agent-card: json" "rc=${rc} out='${out:0:80}'"; fi
 
-  if printf '%s' "${out}" | grep -q 'onion-evolve' && ! printf '%s' "${out}" | grep -q 'acme-secret'; then
+  if _emit "${out}" | grep -q 'onion-evolve' && ! _emit "${out}" | grep -q 'acme-secret'; then
     record_pass "agent-card: CONFIDENCIALIDADE — só o core, adotante não vaza"
   else record_fail "agent-card: confidencialidade" "vazou adotante OU sem core"; fi
 
   n="$(printf '%s' "${out}" | python3 -c 'import sys,json;print(len(json.load(sys.stdin).get("skills",[])))' 2>/dev/null)"
-  if [ "${n}" = "1" ] && printf '%s' "${out}" | grep -q 'signals-only'; then
+  if [ "${n}" = "1" ] && _emit "${out}" | grep -q 'signals-only'; then
     record_pass "agent-card: signals-only (1 skill gated, sem conversa autônoma)"
   else record_fail "agent-card: signals-only" "n_skills='${n}'"; fi
 
-  if printf '%s' "${out}" | grep -q '"oauth2"' && printf '%s' "${out}" | grep -q '"mtls"'; then
+  if _emit "${out}" | grep -q '"oauth2"' && _emit "${out}" | grep -q '"mtls"'; then
     record_pass "agent-card: securitySchemes oauth2 + mtls"
   else record_fail "agent-card: schemes" "faltou oauth2/mtls"; fi
 
@@ -4932,7 +4937,7 @@ JSON
   else record_fail "a2a-accept: fields" "campos ausentes no doc"; fi
 
   rc=0; out="$(bash "${helper}" "${rec}" --inbox "${ib}" 2>&1)" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'já aceito'; then record_pass "a2a-accept: idempotente (não sobrescreve)"
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q 'já aceito'; then record_pass "a2a-accept: idempotente (não sobrescreve)"
   else record_fail "a2a-accept: idem" "rc=${rc} out='${out}'"; fi
 
   local recu="${d}/unverified.json"
@@ -5001,12 +5006,12 @@ run_show_scope_selftests() {
   S="$(bash "${helper}" --show-scope --role adopted --form docs-only \
         framework="$d/fw.json" empresa="$d/org.json" time="$d/team.json" pessoa="$d/person.json" 2>/dev/null)" || rc=$?
   if [ "$rc" -eq 0 ] \
-     && printf '%s\n' "$S" | grep -qxF "# layers: framework empresa time pessoa · role: adopted · form: docs-only" \
-     && printf '%s\n' "$S" | grep -qxF "pessoa${TAB}theme=\"light\"${TAB}# sobrepõe: framework" \
-     && printf '%s\n' "$S" | grep -qxF "time${TAB}model=\"opus\"" \
-     && printf '%s\n' "$S" | grep -qxF "empresa${TAB}env.ORG=\"acme\"" \
-     && printf '%s\n' "$S" | grep -qxF "framework${TAB}permissions.allow[0]=\"Bash(git *)\"" \
-     && printf '%s\n' "$S" | grep -qxF "time${TAB}permissions.allow[1]=\"Bash(nx *)\"${TAB}# merged"; then
+     && _emit "$S" | grep -qxF "# layers: framework empresa time pessoa · role: adopted · form: docs-only" \
+     && _emit "$S" | grep -qxF "pessoa${TAB}theme=\"light\"${TAB}# sobrepõe: framework" \
+     && _emit "$S" | grep -qxF "time${TAB}model=\"opus\"" \
+     && _emit "$S" | grep -qxF "empresa${TAB}env.ORG=\"acme\"" \
+     && _emit "$S" | grep -qxF "framework${TAB}permissions.allow[0]=\"Bash(git *)\"" \
+     && _emit "$S" | grep -qxF "time${TAB}permissions.allow[1]=\"Bash(nx *)\"${TAB}# merged"; then
     record_pass "show-scope: texto (vencedor + sobrepõe + set-once + chave profunda + array merged)"
   else record_fail "show-scope: texto" "saída não bate com o esperado (rc=$rc)"; fi
 
@@ -5032,8 +5037,8 @@ run_show_scope_selftests() {
   # (d) conflito de tipo: objeto sombreado por escalar → folha vence, sub-chave NÃO vaza
   printf '%s' '{"x":{"a":1,"b":2}}' > "$d/t1.json"; printf '%s' '{"x":"flat"}' > "$d/t2.json"
   local T; T="$(bash "${helper}" --show-scope base="$d/t1.json" top="$d/t2.json" 2>/dev/null)"
-  if printf '%s\n' "$T" | grep -qxF "top${TAB}x=\"flat\"${TAB}# sobrepõe: base" \
-     && ! printf '%s\n' "$T" | grep -qF "x.a"; then
+  if _emit "$T" | grep -qxF "top${TAB}x=\"flat\"${TAB}# sobrepõe: base" \
+     && ! _emit "$T" | grep -qF "x.a"; then
     record_pass "show-scope: conflito de tipo (folha vence; sub-chave não vaza)"
   else record_fail "show-scope: conflito de tipo" "sub-chave vazou ou vencedor errado"; fi
 
@@ -5062,8 +5067,8 @@ run_show_scope_selftests() {
     printf 'framework: onion-evolve\nsource_commit: abc\nsource_commit_date: 2026-07-01\nrole: adopted\nform: docs-only\n' > "$t/.claude/.onion-version"
     us="$(mktemp)"; printf '%s' '{"theme":"light"}' > "$us"
     R="$(bash "${resolver}" "$t/apps/dev" --user "$us" --show-scope 2>/dev/null)"
-    if printf '%s\n' "$R" | grep -qxF "# layers: empresa time pessoa · role: adopted · form: docs-only" \
-       && printf '%s\n' "$R" | grep -qxF "pessoa${TAB}theme=\"light\"${TAB}# sobrepõe: empresa"; then
+    if _emit "$R" | grep -qxF "# layers: empresa time pessoa · role: adopted · form: docs-only" \
+       && _emit "$R" | grep -qxF "pessoa${TAB}theme=\"light\"${TAB}# sobrepõe: empresa"; then
       record_pass "show-scope: resolve-scope-layers repassa (labels canônicos + role/form do stamp)"
     else record_fail "show-scope: resolve" "passthrough sem labels/role/form esperados"; fi
     rm -rf "$t" "$us"
@@ -5218,29 +5223,29 @@ run_post_review_comment_selftests() {
 
   # (a) STICKY, 1ª vez — sem comentário existente → POST
   out="$(bash "${helper}" --pr 42 --body-file "${b}" --sticky '<!-- m -->' --repo o/r --dry-run 2>&1)"
-  if printf '%s' "${out}" | grep -q '^POST'; then
+  if _emit "${out}" | grep -q '^POST'; then
     record_pass "forge-post: (a) sticky sem comentário prévio → POST"
   else record_fail "forge-post: (a) primeiro post" "out=${out}"; fi
 
   # (b) STICKY, 2ª vez — comentário existe → PATCH, NÃO um segundo POST. É a lição medida no PR
   #     #529: o workflow roda em `synchronize`, 2 pushes viravam 2 comentários e 2 e-mails.
   out="$(DRY_EXISTENTE=777 bash "${helper}" --pr 42 --body-file "${b}" --sticky '<!-- m -->' --repo o/r --dry-run 2>&1)"
-  if printf '%s' "${out}" | grep -q '^PATCH.*777'; then
+  if _emit "${out}" | grep -q '^PATCH.*777'; then
     record_pass "forge-post: (b) sticky com comentário prévio → PATCH no mesmo id (editar não gera e-mail novo)"
   else record_fail "forge-post: (b) sticky edita" "out=${out}"; fi
 
   # (c) SEM --sticky → comportamento da SPEC: sempre cria. O sticky é EXTENSÃO declarada, e o
   #     modo espec-fiel tem de continuar existindo.
   out="$(DRY_EXISTENTE=777 bash "${helper}" --pr 42 --body-file "${b}" --repo o/r --dry-run 2>&1)"
-  if printf '%s' "${out}" | grep -q '^POST'; then
+  if _emit "${out}" | grep -q '^POST'; then
     record_pass "forge-post: (c) sem --sticky sempre CRIA (fidelidade à spec: addReviewComment não tem sticky)"
   else record_fail "forge-post: (c) modo spec" "out=${out}"; fi
 
   # (d) CORPO VAZIO não posta. Comentário em branco é pior que nenhum: parece que houve parecer.
   local empty; empty="$(mktemp)"; : > "${empty}"
   rc=0; out="$(bash "${helper}" --pr 42 --body-file "${empty}" --repo o/r --dry-run 2>&1)" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'corpo VAZIO' \
-     && ! printf '%s' "${out}" | grep -qE '^(POST|PATCH)'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q 'corpo VAZIO' \
+     && ! _emit "${out}" | grep -qE '^(POST|PATCH)'; then
     record_pass "forge-post: (d) corpo vazio → avisa e NÃO posta, com exit 0 (posting não reprova PR)"
   else record_fail "forge-post: (d) corpo vazio" "rc=${rc} out=${out}"; fi
   rm -f "${empty}"
@@ -5261,7 +5266,7 @@ run_post_review_comment_selftests() {
   # passava mesmo com sed no-op. Elenxo 2026-08-07. Comparar arquivos nao tem como ser vacuo.
   if ! cmp -s "${helper}" "${mut}/m.sh"; then
     out="$(DRY_EXISTENTE=777 bash "${mut}/m.sh" --pr 42 --body-file "${b}" --sticky '<!-- m -->' --repo o/r --dry-run 2>&1)"
-    if printf '%s' "${out}" | grep -q '^POST'; then
+    if _emit "${out}" | grep -q '^POST'; then
       record_pass "forge-post: (f) (MUT) sem a busca pela marca o sticky duplica — a busca é load-bearing"
     else record_fail "forge-post: (f) (MUT)" "mutante ainda deu PATCH: out=${out}"; fi
   else record_fail "forge-post: (f) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
@@ -5353,7 +5358,7 @@ run_kg_seal_check_selftests() {
   # (b) CONFIRMED com carimbo VELHO → HARD. É o caso do #552: mediu e o carimbo não registra.
   _mk_seal_repo "$(_cat "$(_no C_CONF claim confirmed 1.0 2026-07-31)" "$(_no D_DRIFT decision confirmed 1.0 2026-08-06)" "$(_no C_ANTIGA claim superseded 0.0 '')")" "${EDGES_OK}" "${LED_OK}" 3 1
   rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'SELO-FALTANDO' && printf '%s' "${out}" | grep -q 'C_CONF'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'SELO-FALTANDO' && _emit "${out}" | grep -q 'C_CONF'; then
     record_pass "kg-selo: (b) CONFIRMED com verified_at de outro dia → HARD SELO-FALTANDO"
   else record_fail "kg-selo: (b) confirmed sem carimbo" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5361,7 +5366,7 @@ run_kg_seal_check_selftests() {
   # (c) DRIFTED sem reconciliação alguma → HARD. É o caso que sobrou do #555.
   _mk_seal_repo "$(_cat "$(_no C_CONF claim confirmed 1.0 2026-08-06)" "$(_no D_DRIFT decision confirmed 1.0 2026-08-06)")" '' "${LED_OK}" 2 0
   rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'DRIFT-NAO-RECONCILIADO'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'DRIFT-NAO-RECONCILIADO'; then
     record_pass "kg-selo: (c) DRIFTED sem SUPERSEDES nem status drifted → HARD"
   else record_fail "kg-selo: (c) drift nao reconciliado" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5379,7 +5384,7 @@ run_kg_seal_check_selftests() {
   #     carimba. É o único veredito cuja violação é ESCREVER demais, não de menos.
   _mk_seal_repo "$(_no C_UNV claim confirmed 0.5 2026-08-06)" '' '# id\tveredito\nC_UNV\tUNVERIFIABLE\t1\n' 1 0
   rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'UNVER-CARIMBADO'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'UNVER-CARIMBADO'; then
     record_pass "kg-selo: (e) UNVERIFIABLE com verified_at do run → HARD (o contrato proíbe carimbar o que não se mediu)"
   else record_fail "kg-selo: (e) unver carimbado" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5389,7 +5394,7 @@ run_kg_seal_check_selftests() {
   #     NADA no radar. Foi o defeito real do #555, medido: atenção 12.00 antes e 12.00 depois.
   _mk_seal_repo "$(_no C_UNV claim unverifiable 1.0 2026-07-31)" '' '# id\tveredito\nC_UNV\tUNVERIFIABLE\t1\n' 1 0
   rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'UNVER-INERTE'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'UNVER-INERTE'; then
     record_pass "kg-selo: (f) UNVERIFIABLE sem rebaixar confidence nem abrir question → HARD (selo mecanicamente inerte)"
   else record_fail "kg-selo: (f) unver inerte" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5411,8 +5416,8 @@ run_kg_seal_check_selftests() {
     && git -c user.email=t@t -c user.name=t commit -qm base ) 2>/dev/null
   rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
   local outh; outh="$(bash "${helper}" "${d}" 2>&1)" || true
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'ISENCAO' \
-     && printf '%s' "${outh}" | grep -q 'fora de escopo'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q 'ISENCAO' \
+     && _emit "${outh}" | grep -q 'fora de escopo'; then
     record_pass "kg-selo: (h) repo sem run declarando ledger → ISENÇÃO CONTADA nos dois modos (tsv e humano), nunca silêncio"
   else record_fail "kg-selo: (h) isencao por escopo" "rc=${rc} tsv=${out} humano=${outh}"; fi
   rm -rf "${d}"
@@ -5421,7 +5426,7 @@ run_kg_seal_check_selftests() {
   #     está tudo certo. Sem isto, um ledger só de comentários passaria verde.
   _mk_seal_repo "${NODES_OK}" "${EDGES_OK}" '# so comentario\n# nenhum dado\n' 3 1
   rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'VACUIDADE'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'VACUIDADE'; then
     record_pass "kg-selo: (i) ledger sem linha de dado → VACUIDADE (ler zero e dizer que está tudo certo é fail-open)"
   else record_fail "kg-selo: (i) vacuidade" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5466,7 +5471,7 @@ run_kg_seal_check_selftests() {
   #     (verified_at de 1999). Fail-open dentro da cura do fail-open.
   _mk_seal_repo "$(_no C_X claim confirmed 1.0 1999-01-01)" '' '# id\tveredito\nC_X\tconfirmed\t1\n' 1 0
   rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'VOCABULARIO-DESCONHECIDO'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'VOCABULARIO-DESCONHECIDO'; then
     record_pass "kg-selo: (n) veredito fora do vocabulário fechado → HARD NOMEADO (minúscula não passa calada)"
   else record_fail "kg-selo: (n) vocabulário" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5476,7 +5481,7 @@ run_kg_seal_check_selftests() {
   #     passava verde porque a aresta ja existia. Era o modo de falha original pela porta da frente.
   _mk_seal_repo "$(_cat "$(_no D_X decision confirmed 1.0 2026-07-10)" "$(_no C_VELHA claim superseded 0.0 2026-07-10)")" '  - from: D_X\n    to: C_VELHA\n    edge_type: SUPERSEDES\n' '# id\tveredito\nD_X\tDRIFTED\t1\n' 2 1
   rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'DRIFT-NAO-RECONCILIADO'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'DRIFT-NAO-RECONCILIADO'; then
     record_pass "kg-selo: (o) aresta ANTERIOR ao run não sela veredito novo → HARD"
   else record_fail "kg-selo: (o) amarra ao run" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5486,7 +5491,7 @@ run_kg_seal_check_selftests() {
   #     HARD seria poder emprestado da evidencia dos outros ramos.
   _mk_seal_repo "$(_no C_R claim confirmed 1.0 2026-08-06)" '' '# id\tveredito\nC_R\tREFUTED\t1\n' 1 0
   rc=0; out="$(bash "${helper}" "${d}" --format=tsv 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q '^SOFT.*REFUTACAO-NAO-SELADA'; then
+  if _emit "${out}" | grep -q '^SOFT.*REFUTACAO-NAO-SELADA'; then
     record_pass "kg-selo: (p) REFUTED sai SOFT — severidade proporcional à evidência (2 de 6 cláusulas, 0 casos reais)"
   else record_fail "kg-selo: (p) REFUTED SOFT" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5600,7 +5605,7 @@ run_review_artifact_selftests() {
   # seria auto-proteção que MASCARA a falha do mecanismo: passaria em silêncio com o unset
   # quebrado. Nu, ele reprova alto no CI — que é exatamente como o defeito apareceu.
   rc=0; out="$( cd "${d}" && bash "${helper}" "${d}" 2>&1 )" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'fora de escopo'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q 'fora de escopo'; then
     record_pass "review-artifact: (a) sem PR aberto → CALA (trabalho em curso não é trabalho proposto)"
   else record_fail "review-artifact: (a) sem PR" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5608,7 +5613,7 @@ run_review_artifact_selftests() {
   # (b) COM PR e SEM artefato → HARD. É o caso que aconteceu de verdade (#546/#548).
   _mk_pr_repo
   rc=0; out="$(_run "${d}")" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'ARTEFATO-AUSENTE'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'ARTEFATO-AUSENTE'; then
     record_pass "review-artifact: (b) PR sem resíduo de revisão → HARD"
   else record_fail "review-artifact: (b) PR sem artefato" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5622,7 +5627,7 @@ run_review_artifact_selftests() {
   # revisão adversarial). O modo humano é usado só aqui, para ler a frase; o veredito é o do TSV.
   rc=0; out="$(_run "${d}")" || rc=$?
   local outh; outh="$(_run_humano "${d}")" || true
-  if [ "${rc}" -eq 0 ] && printf '%s' "${outh}" | grep -q 'revisão registrada'; then
+  if [ "${rc}" -eq 0 ] && _emit "${outh}" | grep -q 'revisão registrada'; then
     record_pass "review-artifact: (c) artefato casando → passa PELO CAMINHO CERTO (não por fora de escopo)"
   else record_fail "review-artifact: (c) artefato válido" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5634,7 +5639,7 @@ run_review_artifact_selftests() {
   ( cd "${d}" && printf 'v3 mudou DEPOIS da revisao\n' > .claude/validation/alvo.sh \
     && git add -A && git -c user.email=t@t -c user.name=t commit -qm depois ) 2>/dev/null
   rc=0; out="$(_run "${d}")" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'ARTEFATO-CADUCO'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'ARTEFATO-CADUCO'; then
     record_pass "review-artifact: (d) código mudou DEPOIS de revisado → HARD (o hash amarra revisão↔diff)"
   else record_fail "review-artifact: (d) caduco" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5644,7 +5649,7 @@ run_review_artifact_selftests() {
   _mk_pr_repo
   _art "${d}" "$(_sha_of "${d}")" 0
   rc=0; out="$(_run "${d}")" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'CAMPO-DE-REAVALIACAO-AUSENTE'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'CAMPO-DE-REAVALIACAO-AUSENTE'; then
     record_pass "review-artifact: (e) sem os campos de N=10 → HARD (cadência não julgável = mecanismo cego)"
   else record_fail "review-artifact: (e) campos de reavaliação" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5663,7 +5668,7 @@ run_review_artifact_selftests() {
     printf 'on: pull_request\n' > .github/workflows/onion-review.yml
     git add -A && git -c user.email=t@t -c user.name=t commit -qm revisor ) 2>/dev/null
   rc=0; out="$(_run_humano "${d}")" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'ovo-galinha'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q 'ovo-galinha'; then
     record_pass "review-artifact: (f) PR que edita o próprio revisor → isento, e a isenção é CONTADA"
   else record_fail "review-artifact: (f) isenção ovo-galinha" "rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5679,7 +5684,7 @@ run_review_artifact_selftests() {
   rc=0
   out="$( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
           bash "${helper}" "${d}" --format=tsv 2>&1 )" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'ARTEFATO-AUSENTE'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'ARTEFATO-AUSENTE'; then
     record_pass "review-artifact: (h) HEAD destacado + GITHUB_HEAD_REF (a forma do CI) → JULGA (não sai por fora de escopo)"
   else record_fail "review-artifact: (h) forma do CI" "a regra não roda no CI: rc=${rc} out=${out}"; fi
   rm -rf "${d}"
@@ -5691,7 +5696,7 @@ run_review_artifact_selftests() {
   _mk_pr_repo
   # 🐤 segundo canário, no modo TSV (o que o lint consome): nu pela mesma razão que (a).
   rc=0; out="$( cd "${d}" && bash "${helper}" "${d}" --format=tsv 2>&1 )" || rc=$?
-  if printf '%s' "${out}" | grep -q 'ISENCAO'; then
+  if _emit "${out}" | grep -q 'ISENCAO'; then
     record_pass "review-artifact: (i) isenção aparece no modo TSV (o que o lint consome), não só no humano"
   else record_fail "review-artifact: (i) isenção em TSV" "isenção invisível no modo consumido: out=${out}"; fi
   rm -rf "${d}"
@@ -5788,7 +5793,7 @@ run_empty_result_guard_selftests() {
 
   # (a) REAGE: descoberta nua com saída vazia (o falso "o workflow não sobreviveu")
   out="$(_erg '"ls -d /home/x/projects/y/subagents"' '""' || true)"
-  if printf '%s' "${out}" | grep -q 'VAZIO'; then
+  if _emit "${out}" | grep -q 'VAZIO'; then
     record_pass "empty-result-guard: (a) descoberta vazia → avisa que vazio != ausência"
   else record_fail "empty-result-guard: (a)" "não reagiu a ls com saída vazia: ${out}"; fi
 
@@ -5796,7 +5801,7 @@ run_empty_result_guard_selftests() {
   # NB: $? vai LITERAL no JSON (as aspas simples do shell protegem). Um \$ aqui seria escape JSON
   #     INVALIDO — o jq recusaria o parse, o hook sairia cedo e o teste passaria vazio: falso-verde.
   out="$(_erg '"tail -4 /tmp/x | sed s/a/b/; echo EXIT=$?"' '"x"' || true)"
-  if printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+  if _emit "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
     record_pass "empty-result-guard: (b) \$? pós-pipe → avisa que o exit é do último elemento"
   else record_fail "empty-result-guard: (b)" "não reagiu a \$? após pipe: ${out}"; fi
 
@@ -5805,7 +5810,7 @@ run_empty_result_guard_selftests() {
   #      ERRA: ele espera para sempre, e esperar parece trabalhar (shell preso 1h06 enquanto o
   #      comando aguardado já tinha terminado).
   out="$(_erg '"until ! pgrep -f (git commit -F) >/dev/null; do sleep 30; done"' '""' || true)"
-  if printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
+  if _emit "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
     record_pass "empty-result-guard: (b2) \`until ! pgrep -f\` → avisa que o laço espera por SI MESMO"
   else record_fail "empty-result-guard: (b2)" "não reagiu ao pgrep -f auto-casante: ${out}"; fi
 
@@ -5818,7 +5823,7 @@ run_empty_result_guard_selftests() {
                 '"until ! pgrep -a -f (git commit -F); do sleep 30; done"' \
                 '"pgrep -u root -f (deploy.sh)"'; do
     out="$(_erg "${_cvcmd}" '""' || true)"
-    printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA' || _cov_fail=$((_cov_fail + 1))
+    _emit "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA' || _cov_fail=$((_cov_fail + 1))
   done
   if [ "${_cov_fail}" -eq 0 ]; then
     record_pass "empty-result-guard: (b2b) cobre \`-9 -f\`, \`-a -f\`, \`-u root -f\` e \`--full\` — não só o dialeto"
@@ -5833,7 +5838,7 @@ run_empty_result_guard_selftests() {
                 '"LOG=/tmp/d.$$X; until ! pgrep -f (alvo); do sleep 5; done"' \
                 '"pkill -x nginx; until ! pgrep -f (deploy.sh); do sleep 5; done"'; do
     out="$(_erg "${_cvcmd}" '""' || true)"
-    printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA' || _esc_fail=$((_esc_fail + 1))
+    _emit "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA' || _esc_fail=$((_esc_fail + 1))
   done
   if [ "${_esc_fail}" -eq 0 ]; then
     record_pass "empty-result-guard: (b2c) isenção vale por INVOCAÇÃO — \`[\` em redirect, \`\$\$\` e \`-x\` irmão não desarmam"
@@ -5848,7 +5853,7 @@ run_empty_result_guard_selftests() {
   #    ocorre no lançamento. O caso reprovava sobre uma regra CORRETA: o artifício de escape do teste
   #    virou parte do dado medido. É a mesma família de `bancada-espelha-o-runner`.
   out="$(_erg '"bash marcador-x.sh & until ! pgrep -f [m]arcador-x.sh; do sleep 5; done"' '""' || true)"
-  if printf '%s' "${out}" | grep -q 'COLCHETE-FURADO'; then
+  if _emit "${out}" | grep -q 'COLCHETE-FURADO'; then
     record_pass "empty-result-guard: (b2d) colchete com a forma NUA co-ocorrendo → acusa FURADO, não certifica"
   else record_fail "empty-result-guard: (b2d)" "certificou como curado um colchete que não protege: ${out}"; fi
 
@@ -5856,7 +5861,7 @@ run_empty_result_guard_selftests() {
   #       próprio shell — é a cura de VERDADE. Na 2ª versão ela passava por ACIDENTE, caindo no buraco
   #       de cobertura; guarda que cala por acidente volta a acusar assim que o buraco é tapado.
   out="$(_erg '"until ! pgrep -A -f (git commit -F); do sleep 30; done"' '""' || true)"
-  if printf '%s' "${out}" | grep -qE 'PGREP-QUE-SE-ENCONTRA|COLCHETE-FURADO'; then
+  if _emit "${out}" | grep -qE 'PGREP-QUE-SE-ENCONTRA|COLCHETE-FURADO'; then
     record_fail "empty-result-guard: (b2e)" "acusou \`pgrep -A -f\`, que é a cura recomendada: ${out}"
   else record_pass "empty-result-guard: (b2e) cala em \`pgrep -A -f\` — reconhece a cura, não tropeça nela"; fi
 
@@ -5907,7 +5912,7 @@ run_empty_result_guard_selftests() {
                   'echo git checkout -b fix/teste-de-vivo|silencio'; do
     _br_cmd="${_br_case%%|*}"; _br_want="${_br_case##*|}"
     out="$(_erg "\"${_br_cmd}\"" '""' || true)"
-    if printf '%s' "${out}" | grep -q 'BRANCH-EM-PT-BR'; then
+    if _emit "${out}" | grep -q 'BRANCH-EM-PT-BR'; then
       [ "${_br_want}" = "ACUSA" ] || _br_fail=$((_br_fail + 1))
     else
       [ "${_br_want}" = "silencio" ] || _br_fail=$((_br_fail + 1))
@@ -5954,11 +5959,11 @@ run_empty_result_guard_selftests() {
       _neg="$(_erg_wl "${_wl_dir}/vazia.txt"   'git checkout -b fix/catraca-duas-portas' || true)"
       _pos="$(_erg_wl "${_wl_dir}/forjada.txt" 'git checkout -b feat/zzmarcador-probe'   || true)"
       _iso="$(_erg_wl "${_wl_dir}/forjada.txt" 'git checkout -b fix/catraca-duas-portas' || true)"
-      if printf '%s' "${_neg}" | grep -q 'BRANCH-EM-PT-BR'; then
+      if _emit "${_neg}" | grep -q 'BRANCH-EM-PT-BR'; then
         record_fail "empty-result-guard: (b5b)" "lista VAZIA e a regra ainda acusou — ela não depende do arquivo"
-      elif ! printf '%s' "${_pos}" | grep -q 'BRANCH-EM-PT-BR'; then
+      elif ! _emit "${_pos}" | grep -q 'BRANCH-EM-PT-BR'; then
         record_fail "empty-result-guard: (b5b)" "lista FORJADA com \`zzmarcador\` e a regra NÃO acusou — ela não LÊ o arquivo (uma lista hardcoded produz exatamente isto)"
-      elif printf '%s' "${_iso}" | grep -q 'BRANCH-EM-PT-BR'; then
+      elif _emit "${_iso}" | grep -q 'BRANCH-EM-PT-BR'; then
         record_fail "empty-result-guard: (b5b)" "com a lista forjada a regra ainda pegou palavra da lista REAL — há vocabulário embutido além do arquivo"
       else
         record_pass "empty-result-guard: (b5b) MUTATION — vazia CALA · forjada ACUSA · e SÓ o que está no arquivo conta (lista hardcoded reprova por construção)"
@@ -5979,7 +5984,7 @@ run_empty_result_guard_selftests() {
   #      vir pgrep", que empurraria quem obedece para o bypass (a lição da REGRA 56, que puniu
   #      quem obedecia 23 vezes). A guarda tem de reconhecer a forma correta, não só a errada.
   out="$(_erg '"pgrep -f ([l]int-selftest)"' '"123"' || true)"
-  if printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
+  if _emit "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
     record_fail "empty-result-guard: (b3)" "acusou o idioma do COLCHETE, que é a cura: ${out}"
   else record_pass "empty-result-guard: (b3) cala no \`pgrep -f '[l]…'\` — reconhece a forma correta"; fi
 
@@ -5997,7 +6002,7 @@ run_empty_result_guard_selftests() {
     'pkill -x sleep ; pgrep -f meu-alvo|-x numa invocacao IRMA' \
     'pgrep -f a[b]c ; pkill -f meu-alvo-real|colchete no 1o, culpado no 2o'; do
     out="$(_erg "\"${_b4_desc%%|*}\"" '"x"' || true)"
-    if ! printf '%s' "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
+    if ! _emit "${out}" | grep -q 'PGREP-QUE-SE-ENCONTRA'; then
       _b4_fail=1
       record_fail "empty-result-guard: (b4c)" "FAIL-OPEN reaberto — ${_b4_desc##*|}: ${out}"
     fi
@@ -6006,7 +6011,7 @@ run_empty_result_guard_selftests() {
 
   # (c) REAGE: glob sob sudo + erro engolido virando número (os 7 .env.bak que viraram 0)
   out="$(_erg '"sudo -n ls -1 /home/onion/.env.bak-* 2>/dev/null | wc -l"' '"0"' || true)"
-  if printf '%s' "${out}" | grep -q 'GLOB-SOB-SUDO' && printf '%s' "${out}" | grep -q 'ERRO-ENGOLIDO'; then
+  if _emit "${out}" | grep -q 'GLOB-SOB-SUDO' && _emit "${out}" | grep -q 'ERRO-ENGOLIDO'; then
     record_pass "empty-result-guard: (c) glob sob sudo + erro engolido em contagem → avisa os dois"
   else record_fail "empty-result-guard: (c)" "não reagiu ao glob/erro engolido: ${out}"; fi
 
@@ -6015,7 +6020,7 @@ run_empty_result_guard_selftests() {
   for c in '"git status --short"' '"grep -q foo /etc/hostname && echo sim"' \
            '"ls /tmp/x 2>/dev/null || echo nenhum"' '"set -o pipefail; a | tail -1; echo \$?"'; do
     out="$(_erg "${c}" '"saida"' || true)"
-    if printf '%s' "${out}" | grep -q 'pode MENTIR'; then noisy=1; fi
+    if _emit "${out}" | grep -q 'pode MENTIR'; then noisy=1; fi
   done
   if [ "${noisy}" -eq 0 ]; then
     record_pass "empty-result-guard: (d) comando saudável / com ramo-vazio tratado → SILENCIOSO"
@@ -6031,7 +6036,7 @@ run_empty_result_guard_selftests() {
   local mg_ok=1 v
   for v in '"gh pr merge 551 --squash --delete-branch"' '"gh pr create --base main --head x"'; do
     out="$(_erg "${v}" '"ok"' || true)"
-    printf '%s' "${out}" | grep -qE 'MERGE-SEM-FONTE-LIDA|PR-SEM-PASSADA-ADVERSARIAL' || mg_ok=0
+    _emit "${out}" | grep -qE 'MERGE-SEM-FONTE-LIDA|PR-SEM-PASSADA-ADVERSARIAL' || mg_ok=0
   done
   if [ "${mg_ok}" -eq 1 ]; then
     record_pass "empty-result-guard: (j) gh pr merge/create → aponta a FONTE do veredito (o verde do revisor e soft-pass)"
@@ -6045,7 +6050,7 @@ run_empty_result_guard_selftests() {
   for v in '"grep -rn \"gh pr merge\" .claude/hooks/"' '"echo proximo-passo-gh-pr-create-fill"' \
            '"gh pr checks 551"' '"gh pr view 551 --json state"' '"gh pr list --state open"'; do
     out="$(_erg "${v}" '"saida"' || true)"
-    if printf '%s' "${out}" | grep -qE 'MERGE-SEM-FONTE-LIDA|PR-SEM-PASSADA-ADVERSARIAL'; then mg_noisy=1; fi
+    if _emit "${out}" | grep -qE 'MERGE-SEM-FONTE-LIDA|PR-SEM-PASSADA-ADVERSARIAL'; then mg_noisy=1; fi
   done
   if [ "${mg_noisy}" -eq 0 ]; then
     record_pass "empty-result-guard: (k) MENÇÃO ao comando (grep/echo) e verbos de leitura → SILENCIOSO"
@@ -6066,13 +6071,13 @@ run_empty_result_guard_selftests() {
   local hd_quiet hd_loud
   hd_quiet='{"tool_input":{"command":"git commit -F - <<'"'"'EOF'"'"'\nfeat: descreve os detectores\n  tail f | sed x; echo $?\n  sudo -n ls /home/onion/.env.bak-*\n  cmd 2>/dev/null | wc -l\nEOF"},"tool_response":{"stdout":"ok"}}'
   out="$(printf '%s' "${hd_quiet}" | bash "${hook}" 2>&1 || true)"
-  if ! printf '%s' "${out}" | grep -q 'pode MENTIR'; then
+  if ! _emit "${out}" | grep -q 'pode MENTIR'; then
     record_pass "empty-result-guard: (f) padroes dentro de CORPO de heredoc (texto) → SILENCIOSO"
   else record_fail "empty-result-guard: (f)" "falso-positivo em prosa de heredoc: ${out}"; fi
 
   hd_loud='{"tool_input":{"command":"sudo -n ls /home/onion/x/.env.bak-* 2>/dev/null | wc -l\ngit commit -F - <<'"'"'EOF'"'"'\ntexto inocente\nEOF"},"tool_response":{"stdout":"0"}}'
   out="$(printf '%s' "${hd_loud}" | bash "${hook}" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'GLOB-SOB-SUDO' && printf '%s' "${out}" | grep -q 'ERRO-ENGOLIDO'; then
+  if _emit "${out}" | grep -q 'GLOB-SOB-SUDO' && _emit "${out}" | grep -q 'ERRO-ENGOLIDO'; then
     record_pass "empty-result-guard: (g) MESMO comando, padrao FORA do heredoc → AINDA DISPARA (o filtro nao cegou)"
   else record_fail "empty-result-guard: (g)" "o filtro de heredoc CEGOU a guarda — silenciou comando real: ${out}"; fi
 
@@ -6083,12 +6088,12 @@ run_empty_result_guard_selftests() {
   # baixo — continua sendo pega. Sem (i), "proximidade" poderia ter virado "so mesma linha" e o
   # caso que originou a guarda escaparia.
   out="$(_erg '"find x | sed s/a/b/\n\n\nbash script.sh > /tmp/o 2>&1\necho exit=$?"' '"x"' || true)"
-  if ! printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+  if ! _emit "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
     record_pass "empty-result-guard: (h) \$? longe do pipe (instrucoes distintas) → SILENCIOSO"
   else record_fail "empty-result-guard: (h)" "falso-positivo cross-statement: ${out}"; fi
 
   out="$(_erg '"bash radar.sh f 2>&1 | tail -22\necho EXIT=$?"' '"x"' || true)"
-  if printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+  if _emit "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
     record_pass "empty-result-guard: (i) pipe numa linha + \$? na SEGUINTE → AINDA DISPARA (o caso real)"
   else record_fail "empty-result-guard: (i)" "a proximidade cegou o caso multi-linha que originou a guarda: ${out}"; fi
 
@@ -6098,26 +6103,26 @@ run_empty_result_guard_selftests() {
   # (l) prova que o ruido morreu; (m)(n)(o) provam que o filtro NAO CEGOU a guarda — cada uma
   # cobre uma das TRES formas em que "entre aspas e texto" e FALSO, e todas foram regressoes reais.
   out="$(_erg '"bash algo.sh > arq 2>&1\necho \"rc=$?\"; grep -E '"'"'Passaram|Falharam'"'"' arq"' '"x"' || true)"
-  if ! printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+  if ! _emit "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
     record_pass "empty-result-guard: (l) \$? de REDIRECT + | no PADRAO do grep → SILENCIOSO"
   else record_fail "empty-result-guard: (l)" "o falso-positivo que disparou 5x numa sessao voltou: ${out}"; fi
 
   # (m) o modo-de-falha nº2 que FUNDOU a guarda. A 1a cura o cegou — e o proprio diff que a
   # introduziu continha tres linhas desta forma.
   out="$(_erg '"n=\"$(ls /tmp | wc -l)\"\necho $?"' '"x"' || true)"
-  if printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+  if _emit "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
     record_pass "empty-result-guard: (m) pipe dentro de \$( ) → AINDA DISPARA (aspas com SUBSTITUICAO nao sao texto)"
   else record_fail "empty-result-guard: (m)" "o filtro de aspas cegou o modo-de-falha FUNDADOR da guarda: ${out}"; fi
 
   out="$(_erg '"bash -c '"'"'ls /tmp | tail -1'"'"'\necho $?"' '"x"' || true)"
-  if printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+  if _emit "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
     record_pass "empty-result-guard: (n) pipe em string de \`sh -c\` → AINDA DISPARA (ali as aspas contem SHELL)"
   else record_fail "empty-result-guard: (n)" "o filtro de aspas cegou pipe real entregue a um shell: ${out}"; fi
 
   # (o) aspa DENTRO de aspa e literal — par-de-regex nao sabe disso e apagava o miolo inteiro,
   # pipe real junto. Por isso a varredura passou a ser por ESTADO, caractere a caractere.
   out="$(_erg '"echo \"it'"'"'s\"; ls | wc -l; echo \"don'"'"'t\"; echo $?"' '"x"' || true)"
-  if printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+  if _emit "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
     record_pass "empty-result-guard: (o) apostrofo DENTRO de aspas duplas → AINDA DISPARA (aspa em aspa e literal)"
   else record_fail "empty-result-guard: (o)" "o gsub desemparelhado apagou o pipe real do meio do comando: ${out}"; fi
 
@@ -6126,12 +6131,12 @@ run_empty_result_guard_selftests() {
   # DEPOIS dele. (q) prova que o ruido morreu; (r) prova que o filtro NAO CEGOU: pipe ANTES do `$?`
   # na mesma linha continua sendo o caso que funda o detector.
   out="$(_erg '"bash algo.sh > f 2>&1\necho \"rc=$?\"; grep -E x f | head -4"' '"x"' || true)"
-  if ! printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+  if ! _emit "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
     record_pass "empty-result-guard: (q) \$? ANTES do pipe na mesma linha → SILENCIOSO"
   else record_fail "empty-result-guard: (q)" "falso-positivo de ORDEM: o \$? e da linha anterior e o pipe vem depois: ${out}"; fi
 
   out="$(_erg '"ls | wc -l; echo $?"' '"x"' || true)"
-  if printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+  if _emit "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
     record_pass "empty-result-guard: (r) pipe ANTES do \$? na mesma linha → AINDA DISPARA (o caso fundador)"
   else record_fail "empty-result-guard: (r)" "o filtro de ORDEM cegou o caso que funda o detector: ${out}"; fi
 
@@ -6140,7 +6145,7 @@ run_empty_result_guard_selftests() {
   # (antes do pipe), concluia "ordem ok" e CALAVA — enquanto o SEGUNDO le o exit do `wc`.
   # Um filtro que resolve um falso-positivo e abre um falso-NEGATIVO troca ruido por mentira.
   out="$(_erg '"echo $?; ls | wc -l; echo $?"' '"x"' || true)"
-  if printf '%s' "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+  if _emit "${out}" | grep -q 'EXIT-CODE-DE-PIPE'; then
     record_pass "empty-result-guard: (s) multiplos \$? — o ULTIMO apos pipe real AINDA DISPARA"
   else record_fail "empty-result-guard: (s)" "o filtro de ORDEM olhou o PRIMEIRO \$? e cegou o segundo: ${out}"; fi
 
@@ -6161,7 +6166,7 @@ run_empty_result_guard_selftests() {
     #    Aqui o `|` entre aspas vem ANTES do `$?`: a ordem NAO salva, so `unquoted` salva.
     m_l="$(printf '%s' '{"tool_input":{"command":"grep -E '"'"'Passaram|Falharam'"'"' arq; echo $?"},"tool_response":{"stdout":"x"}}' | bash "${gd}/m.sh" 2>&1 || true)"
     m_m="$(printf '%s' '{"tool_input":{"command":"n=\"$(ls /tmp | wc -l)\"\necho $?"},"tool_response":{"stdout":"x"}}' | bash "${gd}/m.sh" 2>&1 || true)"
-    if printf '%s' "${m_l}" | grep -q 'EXIT-CODE-DE-PIPE' && printf '%s' "${m_m}" | grep -q 'EXIT-CODE-DE-PIPE'; then
+    if _emit "${m_l}" | grep -q 'EXIT-CODE-DE-PIPE' && _emit "${m_m}" | grep -q 'EXIT-CODE-DE-PIPE'; then
       record_pass "empty-result-guard: (p) mutation — sem \`unquoted\` o caso (l) REPROVA (o filtro e load-bearing)"
     else record_fail "empty-result-guard: (p) mutation" "o mutante SEM o filtro ainda satisfaz (l) — o caso (l) passa por vacuo"; fi
   fi
@@ -6194,7 +6199,7 @@ run_scan_sanity_selftests() {
   # (a) de dentro do worktree, a varredura TEM de enxergar a propria arvore
   local out
   out="$(bash "${wt}/.claude/validation/lint-artifacts.sh" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'varredura-sa'; then
+  if _emit "${out}" | grep -q 'varredura-sa'; then
     record_fail "varredura-sa: (a) lint rodando DE DENTRO de worktree enxerga a própria árvore" \
                 "a varredura se declarou cega no proprio worktree — a poda voltou a se comer"
   else
@@ -6212,7 +6217,7 @@ s = s.replace('find "${roots[@]}" -path "${CLAUDE_DIR}/worktrees/*" -prune -o "$
 open(p, "w").write(s)
 PY
   out="$(bash "${wt}/.claude/validation/lint-artifacts.sh" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'varredura-sa'; then
+  if _emit "${out}" | grep -q 'varredura-sa'; then
     record_pass "varredura-sa: (b) MUTATION — poda por sufixo volta a cegar e a REGRA 54 REPROVA"
   else
     record_fail "varredura-sa: (b) MUTATION" \
@@ -6240,15 +6245,15 @@ run_generator_failure_selftests() {
   # (a) gerador que FALHA (exit != 0) → violação diz QUEBRA, com o stderr
   printf '#!/usr/bin/env bash\necho "boom" >&2\nexit 3\n' > "${d}/.claude/validation/a2a-agent-card.sh"
   out="$(bash "${d}/.claude/validation/lint-artifacts.sh" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'o GERADOR falhou (exit 3)'; then
+  if _emit "${out}" | grep -q 'o GERADOR falhou (exit 3)'; then
     record_pass "gerador-quebrado: (a) exit!=0 do gerador vira QUEBRA, não 'desatualizado'"
   else record_fail "gerador-quebrado: (a)" "exit!=0 do gerador nao produziu a violacao de QUEBRA"; fi
 
   # (b) gerador que devolve VAZIO com exit 0 (o caso real do GIT_DIR) → QUEBRA, e SEM "regenere"
   printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/.claude/validation/a2a-agent-card.sh"
   out="$(bash "${d}/.claude/validation/lint-artifacts.sh" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'saída VAZIA' &&
-     ! printf '%s' "${out}" | grep -q 'agent card desatualizado'; then
+  if _emit "${out}" | grep -q 'saída VAZIA' &&
+     ! _emit "${out}" | grep -q 'agent card desatualizado'; then
     record_pass "gerador-quebrado: (b) saída vazia vira QUEBRA e NUNCA o conselho que zera o arquivo"
   else record_fail "gerador-quebrado: (b)" "saida vazia ainda vira 'desatualizado — regenere' (conselho destrutivo)"; fi
   rm -rf "${d}"
@@ -6309,7 +6314,7 @@ run_safe_count_selftests() {
   # (d) MUT do contrato de stdout: a saída tem de ser SÓ o número, consumível por $( ).
   #     Se vazar mensagem para stdout, todo `n=$(count_files ...)` a jusante quebra.
   out="$(count_files "${d}" '*.md')"
-  if printf '%s' "${out}" | grep -qE '^[0-9]+$'; then
+  if _emit "${out}" | grep -qE '^[0-9]+$'; then
     record_pass "safe-count: (d) stdout é SÓ o número (contrato de \$( ) preservado)"
   else record_fail "safe-count: (d)" "stdout poluído: '${out}'"; fi
 
@@ -6351,13 +6356,13 @@ run_line_limits_selftests() {
   # (a) comando ACIMA do teto hard (800) → HARD
   d="$(_sandbox)"; _mkbig "$d/.claude/commands/meta" "probe-grande.md" 810
   out="$(bash "$d/.claude/validation/lint-artifacts.sh" --only="$d/.claude/commands/meta/probe-grande.md" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'limite: 800'; then
+  if _emit "${out}" | grep -q 'limite: 800'; then
     record_pass "line-limits: (a) comando com 810+ linhas → HARD (limite 800)"
   else record_fail "line-limits: (a)" "não reprovou comando acima do teto: ${out}"; fi
   # (a2) a mensagem TERMINA EM AÇÃO — cita a prescrição de fragmentação (commands.md §5).
   #      Sem esta asserção a cura pode cair na próxima edição e a guarda volta a só ACUSAR,
   #      que é o defeito que a revisão de 2026-08-03 mediu em 17 mensagens.
-  if printf '%s' "${out}" | grep -q 'commands.md §5'; then
+  if _emit "${out}" | grep -q 'commands.md §5'; then
     record_pass "line-limits: (a2) mensagem cita a cura (commands.md §5), não só acusa"
   else record_fail "line-limits: (a2)" "mensagem sem prescrição de fragmentação: ${out}"; fi
   rm -rf "$d"
@@ -6367,7 +6372,7 @@ run_line_limits_selftests() {
   #     não só a existência da guarda.
   d="$(_sandbox)"; _mkbig "$d/.claude/commands/meta" "probe-limite.md" 790
   out="$(bash "$d/.claude/validation/lint-artifacts.sh" --only="$d/.claude/commands/meta/probe-limite.md" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'limite: 800'; then
+  if _emit "${out}" | grep -q 'limite: 800'; then
     record_fail "line-limits: (b)" "falso-positivo logo abaixo do teto: ${out}"
   else record_pass "line-limits: (b) comando logo abaixo do teto → silêncio (a fronteira é o que importa)"; fi
   rm -rf "$d"
@@ -6380,7 +6385,7 @@ run_line_limits_selftests() {
     i=1; while [ "$i" -le 810 ]; do printf 'Linha de corpo %s do agente sintetico.\n' "$i"; i=$((i+1)); done
   } > "$d/.claude/agents/development/probe-agente.md"
   out="$(bash "$d/.claude/validation/lint-artifacts.sh" --only="$d/.claude/agents/development/probe-agente.md" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -qE 'limite: (800|1500)'; then
+  if _emit "${out}" | grep -qE 'limite: (800|1500)'; then
     record_fail "line-limits: (c)" "810 linhas não deveria reprovar como AGENTE (teto 1500): ${out}"
   else record_pass "line-limits: (c) 810 linhas reprova como COMANDO mas passa como AGENTE — o teto é por TIPO"; fi
   rm -rf "$d"
@@ -6394,10 +6399,10 @@ run_line_limits_selftests() {
     i=1; while [ "$i" -le 1510 ]; do printf 'Linha de corpo %s do agente sintetico.\n' "$i"; i=$((i+1)); done
   } > "$d/.claude/agents/development/probe-agente-grande.md"
   out="$(bash "$d/.claude/validation/lint-artifacts.sh" --only="$d/.claude/agents/development/probe-agente-grande.md" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'limite: 1500'; then
+  if _emit "${out}" | grep -q 'limite: 1500'; then
     record_pass "line-limits: (d) agente com 1510 linhas → HARD (limite 1500)"
   else record_fail "line-limits: (d)" "não reprovou agente acima do teto: ${out}"; fi
-  if printf '%s' "${out}" | grep -q 'agents.md §4'; then
+  if _emit "${out}" | grep -q 'agents.md §4'; then
     record_pass "line-limits: (d2) mensagem cita a cura (agents.md §4), não só acusa"
   else record_fail "line-limits: (d2)" "mensagem sem prescrição de fragmentação: ${out}"; fi
   rm -rf "$d"
@@ -6445,7 +6450,7 @@ run_kg_radar_integrity_selftests() {
   # (a) grafo com CONTRADIÇÃO (recebe REFUTES e segue confirmed) → HARD
   d="$(mktemp -d)"; _mki "$d" contraditorio
   out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
-  if printf '%s' "${out}" | grep -q '^HARD.*CONTRADICAO'; then
+  if _emit "${out}" | grep -q '^HARD.*CONTRADICAO'; then
     record_pass "kg-integridade: (a) grafo com REFUTES sobre nó confirmed → HARD"
   else record_fail "kg-integridade: (a)" "não reprovou grafo contraditório: ${out}"; fi
   rm -rf "$d"
@@ -6503,14 +6508,14 @@ run_kg_verification_selftests() {
   d="$(mktemp -d)"; _mk "$d" C_NOVO PROD 5 confirmed ""
   mkdir -p "$d/.claude/validation"; printf '# vazio\n' > "$d/.claude/validation/kg-verification-baseline.txt"
   out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
-  if printf '%s' "${out}" | grep -q '^HARD.*NOVO'; then
+  if _emit "${out}" | grep -q '^HARD.*NOVO'; then
     record_pass "kg-verificacao: (a) no novo PROD/impact>=4 sem verified_at → HARD"
   else record_fail "kg-verificacao: (a)" "nao reprovou no novo sem carimbo: ${out}"; fi
 
   # (b) o MESMO no, agora no baseline -> SOFT PASSIVO (tolerado), sem HARD
   bash "${helper}" "$d" --emit-baseline > "$d/.claude/validation/kg-verification-baseline.txt" 2>/dev/null
   out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
-  if printf '%s' "${out}" | grep -q '^SOFT.*PASSIVO' && ! printf '%s' "${out}" | grep -q '^HARD'; then
+  if _emit "${out}" | grep -q '^SOFT.*PASSIVO' && ! _emit "${out}" | grep -q '^HARD'; then
     record_pass "kg-verificacao: (b) mesmo no no baseline → SOFT PASSIVO, sem HARD (catraca tolera)"
   else record_fail "kg-verificacao: (b)" "baseline nao tolerou o passivo: ${out}"; fi
 
@@ -6529,7 +6534,7 @@ run_kg_verification_selftests() {
     d="$(mktemp -d)"; _mk "$d" "$1" "$2" "$3" "$4" ""
     mkdir -p "$d/.claude/validation"; printf '# vazio\n' > "$d/.claude/validation/kg-verification-baseline.txt"
     out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
-    printf '%s' "${out}" | grep -q '^HARD' && noisy=1
+    _emit "${out}" | grep -q '^HARD' && noisy=1
   done
   if [ "${noisy}" -eq 0 ]; then
     record_pass "kg-verificacao: (d) impact<4, plane DEV e superseded → FORA do escopo (sem falso-positivo)"
@@ -6538,14 +6543,14 @@ run_kg_verification_selftests() {
   # (e) FAIL-CLOSED: baseline AUSENTE nao libera tudo
   d="$(mktemp -d)"; _mk "$d" C_X PROD 5 confirmed ""
   out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
-  if printf '%s' "${out}" | grep -q 'NO-BASELINE'; then
+  if _emit "${out}" | grep -q 'NO-BASELINE'; then
     record_pass "kg-verificacao: (e) baseline ausente → HARD NO-BASELINE (fail-closed, nao libera tudo)"
   else record_fail "kg-verificacao: (e)" "sem baseline o gate ficou mudo: ${out}"; fi
 
   # (f) o baseline NAO pode conter id de no cru (viaja vendorizado — REGRA 36 pegou isto de verdade)
   d="$(mktemp -d)"; _mk "$d" E_NOME_DE_CLIENTE PROD 5 confirmed ""
   out="$(bash "${helper}" "$d" --emit-baseline 2>/dev/null || true)"
-  if ! printf '%s' "${out}" | grep -q 'E_NOME_DE_CLIENTE'; then
+  if ! _emit "${out}" | grep -q 'E_NOME_DE_CLIENTE'; then
     record_pass "kg-verificacao: (f) baseline guarda hash, NAO o id cru (id carrega nome de adotante)"
   else record_fail "kg-verificacao: (f)" "VAZAMENTO: o id cru foi para o baseline versionado"; fi
 
@@ -6563,8 +6568,8 @@ run_kg_verification_selftests() {
   local out_intact out_mutant
   out_intact="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
   out_mutant="$(bash "${mut}"    "$d" --format tsv 2>/dev/null || true)"
-  if printf '%s' "${out_intact}" | grep -q '^HARD.*NOVO'; then rc_intact=0; else rc_intact=1; fi
-  if printf '%s' "${out_mutant}" | grep -q '^HARD.*NOVO'; then rc_mutant=0; else rc_mutant=1; fi
+  if _emit "${out_intact}" | grep -q '^HARD.*NOVO'; then rc_intact=0; else rc_intact=1; fi
+  if _emit "${out_mutant}" | grep -q '^HARD.*NOVO'; then rc_mutant=0; else rc_mutant=1; fi
   _prove_mutation "kg-verificacao: (g) (MUT) sem a condicao central (ver == \"\") o caso (a) para de reprovar" \
                  "${helper}" "${mut}" "${rc_intact}" "${rc_mutant}"
 }
@@ -6601,7 +6606,7 @@ run_identifier_language_selftests() {
   rc=0; out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>&1)" || rc=$?
   if [ "${rc}" -eq 0 ]; then
     record_pass "idioma: (a) o repo vivo PASSA (os residuais estao no baseline, o novo e que e HARD)"
-  else record_fail "idioma: (a)" "o repo real ja reprova (rc=${rc}): $(printf '%s' "${out}" | head -c 200)"; fi
+  else record_fail "idioma: (a)" "o repo real ja reprova (rc=${rc}): $(_emit "${out}" | head -c 200)"; fi
 
   _lang_repo() { # $1=dir  $2=conteudo do script novo
     mkdir -p "$1/.claude/validation/lib"
@@ -6618,9 +6623,9 @@ run_identifier_language_selftests() {
   d="$(mktemp -d)"; _lang_repo "$d" "#!/usr/bin/env bash
 local $(printf 'contagem')_de_erros=0"
   rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'IDIOMA-DE-IDENTIFICADOR' && printf '%s' "${out}" | grep -q 'contagem'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'IDIOMA-DE-IDENTIFICADOR' && _emit "${out}" | grep -q 'contagem'; then
     record_pass "idioma: (b) identificador NOVO em pt-BR e HARD, nomeando o segmento culpado"
-  else record_fail "idioma: (b)" "nao acusou ou nao nomeou o segmento (rc=${rc}): $(printf '%s' "${out}" | head -c 200)"; fi
+  else record_fail "idioma: (b)" "nao acusou ou nao nomeou o segmento (rc=${rc}): $(_emit "${out}" | head -c 200)"; fi
   rm -rf "$d"
 
   # (c) CAMELCASE — o par de (b). Casando so por `_`, `semAspas` escaparia; e era EXATAMENTE a forma
@@ -6629,9 +6634,9 @@ local $(printf 'contagem')_de_erros=0"
   d="$(mktemp -d)"; _lang_repo "$d" "#!/usr/bin/env bash
 function sem$(printf 'Aspas')() { :; }"
   rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'aspas'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'aspas'; then
     record_pass "idioma: (c) camelCase e quebrado — \`semAspas\` acusa por \`aspas\` (a forma dos achados reais)"
-  else record_fail "idioma: (c) camelCase" "o split nao quebrou camelCase (rc=${rc}): $(printf '%s' "${out}" | head -c 200)"; fi
+  else record_fail "idioma: (c) camelCase" "o split nao quebrou camelCase (rc=${rc}): $(_emit "${out}" | head -c 200)"; fi
   rm -rf "$d"
 
   # (d) INGLES NAO ACUSA — o falso-positivo e o que mata a guarda. Os quatro nomes aqui sao os
@@ -6641,7 +6646,7 @@ local unquoted=1 _lib_beside=2 _missing_deps=3 dirty_before=4 total=5 base=6 fin
   rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
   if [ "${rc}" -eq 0 ]; then
     record_pass "idioma: (d) identificador em ingles NAO acusa — inclui homografo (total/base/final)"
-  else record_fail "idioma: (d) falso-positivo" "acusou ingles (rc=${rc}): $(printf '%s' "${out}" | head -c 250)"; fi
+  else record_fail "idioma: (d) falso-positivo" "acusou ingles (rc=${rc}): $(_emit "${out}" | head -c 250)"; fi
   rm -rf "$d"
 
   # (e) COMENTARIO E PROSA, e prosa e pt-BR POR DOUTRINA. Uma varredura minha a mao ja errou assim
@@ -6656,7 +6661,7 @@ local ok=1"
   rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
   if [ "${rc}" -eq 0 ]; then
     record_pass "idioma: (e) COMENTARIO em pt-BR nao acusa — a doutrina e codigo em ingles, PROSA em pt-BR"
-  else record_fail "idioma: (e) acusou comentario" "a guarda cobrou o oposto do padrao (rc=${rc}): $(printf '%s' "${out}" | head -c 250)"; fi
+  else record_fail "idioma: (e) acusou comentario" "a guarda cobrou o oposto do padrao (rc=${rc}): $(_emit "${out}" | head -c 250)"; fi
   rm -rf "$d"
 
   # (f) FAIL-LOUD: lista ausente e exit 2, nunca "nenhuma violacao". Fonte ausente jamais vira
@@ -6666,9 +6671,9 @@ local ok=1"
 local $(printf 'contagem')=1"
   rm -f "$d/.claude/validation/lib/pt-br-words.txt"
   rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" 2>&1)" || rc=$?
-  if [ "${rc}" -eq 2 ] && printf '%s' "${out}" | grep -q 'AUSENTE'; then
+  if [ "${rc}" -eq 2 ] && _emit "${out}" | grep -q 'AUSENTE'; then
     record_pass "idioma: (f) lista ausente -> exit 2 NOMEANDO o arquivo (fail-loud, nunca aprovacao)"
-  else record_fail "idioma: (f)" "lista ausente nao deu exit 2 (rc=${rc}): $(printf '%s' "${out}" | head -c 200)"; fi
+  else record_fail "idioma: (f)" "lista ausente nao deu exit 2 (rc=${rc}): $(_emit "${out}" | head -c 200)"; fi
   rm -rf "$d"
 
   # (g) A LISTA NAO PODE CONTER HOMOGRAFO. Guarda-da-guarda: se alguem acrescentar `base`, `total`,
@@ -6699,14 +6704,14 @@ run_consumed_modes_selftests() {
     # contar para quem nao le. O caso agora exige LINHAS TABULADAS ou vazio, nunca prosa, e proibe
     # HARD no verde. Teste que afirma "vazio" contra um contrato que passou a falar vira falso-alarme
     # — e falso-alarme em bancada e o que faz alguem afrouxar o caso em vez de ler o codigo.
-    if { [ "${rc}" -eq 0 ] && { [ -z "${out}" ] || { printf '%s' "${out}" | grep -qP '^SOFT\t' && ! printf '%s' "${out}" | grep -qP '^HARD\t'; }; }; } \
-       || { [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -qP '^HARD\t(MODO-SEM-TESTE|PISO-DE-COBERTURA)\t'; }; then
+    if { [ "${rc}" -eq 0 ] && { [ -z "${out}" ] || { _emit "${out}" | grep -qP '^SOFT\t' && ! _emit "${out}" | grep -qP '^HARD\t'; }; }; } \
+       || { [ "${rc}" -eq 1 ] && _emit "${out}" | grep -qP '^HARD\t(MODO-SEM-TESTE|PISO-DE-COBERTURA)\t'; }; then
       record_pass "modos: (0) o proprio detector no modo --format tsv que a REGRA 59 consome"
-    else record_fail "modos: (0) detector em tsv" "rc=${rc} com saida inesperada: $(printf '%s' "${out}" | head -c 200)"; fi
+    else record_fail "modos: (0) detector em tsv" "rc=${rc} com saida inesperada: $(_emit "${out}" | head -c 200)"; fi
     rc=0; out="$(bash "${cmc}" --selftest 2>&1)" || rc=$?
-    if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '4 passaram, 0 falharam'; then
+    if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q '4 passaram, 0 falharam'; then
       record_pass "modos: (0b) o detector se prova (4/4) — guarda que nunca se provou nao sobe ao gate"
-    else record_fail "modos: (0b) --selftest" "rc=${rc}: $(printf '%s' "${out}" | head -c 200)"; fi
+    else record_fail "modos: (0b) --selftest" "rc=${rc}: $(_emit "${out}" | head -c 200)"; fi
   fi
 
   # (0e) PISO DE COBERTURA — a guarda de vacuidade so disparava em ZERO EXATO, e passada adversarial
@@ -6723,18 +6728,18 @@ run_consumed_modes_selftests() {
     printf '#!/usr/bin/env bash\nbash "${SCRIPT_DIR}/alvo.sh" --modo\n' > "$d/.claude/validation/lint-artifacts.sh"
     printf '#!/usr/bin/env bash\nbash "${SCRIPT_DIR}/alvo.sh" --modo\n' > "$d/.claude/validation/lint-selftest.sh"
     rc=0; out="$(bash "${SCRIPT_DIR}/consumed-mode-check.sh" "$d" --format tsv 2>&1)" || rc=$?
-    if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q 'PISO-DE-COBERTURA'; then
+    if [ "${rc}" -ne 0 ] && _emit "${out}" | grep -q 'PISO-DE-COBERTURA'; then
       record_pass "modos: (0e) extrator que perde visao da producao REPROVA pelo PISO (cobertura, nao so ausencia)"
-    else record_fail "modos: (0e) piso" "1 par contra piso 30 nao acusou (rc=${rc}): $(printf '%s' "${out}" | head -c 180)"; fi
+    else record_fail "modos: (0e) piso" "1 par contra piso 30 nao acusou (rc=${rc}): $(_emit "${out}" | head -c 180)"; fi
     rm -rf "$d"
     # o piso NAO pode julgar repo sintetico — falso-positivo em regra HARD ensina a ignorar o gate
     rc=0; out="$(bash "${SCRIPT_DIR}/consumed-mode-check.sh" --selftest 2>&1)" || rc=$?
     if [ "${rc}" -eq 0 ]; then
       record_pass "modos: (0e2) o piso NAO acusa as fixtures do proprio --selftest (1 par, de proposito)"
-    else record_fail "modos: (0e2) piso em fixture" "o piso acusou o proprio teste (rc=${rc}): $(printf '%s' "${out}" | head -c 180)"; fi
+    else record_fail "modos: (0e2) piso em fixture" "o piso acusou o proprio teste (rc=${rc}): $(_emit "${out}" | head -c 180)"; fi
     # (0f) a supressao E VISIVEL no modo tsv
     rc=0; out="$(bash "${SCRIPT_DIR}/consumed-mode-check.sh" "${REPO_ROOT}" --format tsv 2>&1)" || rc=$?
-    if printf '%s' "${out}" | grep -qP '^SOFT\tSUPRESSAO\t'; then
+    if _emit "${out}" | grep -qP '^SOFT\tSUPRESSAO\t'; then
       record_pass "modos: (0f) a supressao aparece no --format tsv (o modo que o gate le), com o NUMERO"
     else record_fail "modos: (0f) supressao invisivel" "o tsv nao emitiu a linha de SUPRESSAO — 'contada, nunca silenciosa' seria falso no modo do gate"; fi
   fi
@@ -6753,7 +6758,7 @@ run_consumed_modes_selftests() {
       || : > "$d/.claude/validation/automation-ladder-registry.txt"
     printf 'forjada|AUTO|-\n' >> "$d/.claude/validation/automation-ladder-registry.txt"
     rc=0; out="$(bash "${SCRIPT_DIR}/ladder-integrity-check.sh" "$d" --format tsv 2>&1)" || rc=$?
-    if [ "${rc}" -ne 0 ] && [ -n "${out}" ] && printf '%s' "${out}" | grep -q 'forjada'; then
+    if [ "${rc}" -ne 0 ] && [ -n "${out}" ] && _emit "${out}" | grep -q 'forjada'; then
       record_pass "modos: (0c) ladder --format tsv EMITE (classe forjada acusada, tabulada) — o ramo tsv nao e mudo"
     else record_fail "modos: (0c) ladder tsv" "o ramo tsv nao acusou a classe forjada (rc=${rc}, ${#out} bytes) — foi essa mutacao que a delegacao escondia"; fi
     rm -rf "$d"
@@ -6765,18 +6770,18 @@ run_consumed_modes_selftests() {
     # parte do contrato, e a alternativa (ensinar o extrator a resolver variavel) e outro ciclo.
     rc=0; out="$(bash "${SCRIPT_DIR}/kb-vendored-link-check.sh" "${REPO_ROOT}" --format tsv 2>&1)" || rc=$?
     # o contrato do modo tsv: silencio no verde, linhas TABULADAS no vermelho — nunca prosa
-    if [ "${rc}" -le 1 ] && { [ -z "${out}" ] || printf '%s' "${out}" | grep -qP '\t'; }; then
+    if [ "${rc}" -le 1 ] && { [ -z "${out}" ] || _emit "${out}" | grep -qP '\t'; }; then
       record_pass "modos: (0d) kb-vendored-link --format tsv respeita o contrato (vazio ou TABULADO, nunca prosa)"
-    else record_fail "modos: (0d) kbv tsv" "rc=${rc} com saida nao-tabulada: $(printf '%s' "${out}" | head -c 200)"; fi
+    else record_fail "modos: (0d) kbv tsv" "rc=${rc} com saida nao-tabulada: $(_emit "${out}" | head -c 200)"; fi
   fi
 
   # (a) inventory.sh --markdown: a producao compara ESTA saida com docs/onion/inventory.md.
   local inv="${SCRIPT_DIR}/inventory.sh"
   if [ ! -f "${inv}" ]; then record_skip "modos: (a) inventory.sh ausente"; else
     rc=0; out="$(bash "${inv}" --markdown 2>&1)" || rc=$?
-    if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '|' && printf '%s' "${out}" | grep -qiE 'coman|agent'; then
+    if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q '|' && _emit "${out}" | grep -qiE 'coman|agent'; then
       record_pass "modos: (a) inventory.sh --markdown emite TABELA (o formato que a REGRA de SSOT compara)"
-    else record_fail "modos: (a) inventory.sh --markdown" "rc=${rc}, saida sem tabela: $(printf '%s' "${out}" | head -c 200)"; fi
+    else record_fail "modos: (a) inventory.sh --markdown" "rc=${rc}, saida sem tabela: $(_emit "${out}" | head -c 200)"; fi
   fi
 
   # (b) kg-backlog-check.sh --format tsv: o modo que o LINT consome. Diferenca que importa: em tsv a
@@ -6789,9 +6794,9 @@ run_consumed_modes_selftests() {
     else record_fail "modos: (b) tsv no verde" "esperava saida VAZIA e rc=0; veio rc=${rc} out='${out}'"; fi
     d="$(mktemp -d)"; _fixture_done_nu "${bg}" "$d/m.yaml"
     rc=0; out="$(bash "${kbc}" "$d/m.yaml" --format tsv 2>&1)" || rc=$?
-    if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -qP '^HARD\tDONE-NU\t'; then
+    if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -qP '^HARD\tDONE-NU\t'; then
       record_pass "modos: (b2) e no vermelho emite TSV tabulado (HARD<TAB>DONE-NU<TAB>...)"
-    else record_fail "modos: (b2) tsv no vermelho" "rc=${rc}, formato inesperado: $(printf '%s' "${out}" | head -c 200)"; fi
+    else record_fail "modos: (b2) tsv no vermelho" "rc=${rc}, formato inesperado: $(_emit "${out}" | head -c 200)"; fi
     rm -rf "$d"
   fi
 
@@ -6854,7 +6859,7 @@ run_vps_exposure_selftests() {
   _emptydir="$(mktemp -d)"
   if out="$(PATH="${_emptydir}" /bin/bash "${g}" 2>&1)"; then rc=0; else rc=$?; fi
   rm -rf "${_emptydir}"
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'fora do escopo'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q 'fora do escopo'; then
     record_pass "vps-exposure: (a) sem docker a guarda CALA declarando fora-de-escopo, nunca aprova"
   else record_fail "vps-exposure: (a)" "sem docker deveria sair 0 declarando escopo (rc=${rc}): ${out}"; fi
 
@@ -6872,13 +6877,13 @@ run_vps_exposure_selftests() {
   local _bd; _bd="$(mktemp -d)"
   : > "${_bd}/dump-em-claro.sql"
   rc=0; out="$(BACKUP_DIRS_OVERRIDE="${_bd}" bash "${g}" 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'BACKUP-EM-CLARO'; then
+  if _emit "${out}" | grep -q 'BACKUP-EM-CLARO'; then
     record_pass "vps-exposure: (d) arquivo sem .gpg em diretorio de backup e ACUSADO"
   else record_fail "vps-exposure: (d)" "backup em claro nao foi acusado (rc=${rc}): ${out}"; fi
   # (d2) e CALA quando tudo esta cifrado — sem este par a regra poderia acusar sempre
   rm -f "${_bd}/dump-em-claro.sql"; : > "${_bd}/dump.sql.gpg"
   rc=0; out="$(BACKUP_DIRS_OVERRIDE="${_bd}" bash "${g}" 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'BACKUP-EM-CLARO'; then
+  if _emit "${out}" | grep -q 'BACKUP-EM-CLARO'; then
     record_fail "vps-exposure: (d2)" "acusou um diretorio 100% cifrado: ${out}"
   else record_pass "vps-exposure: (d2) cala quando todo artefato tem .gpg"; fi
   rm -rf "${_bd}"
@@ -6922,7 +6927,7 @@ run_kg_backlog_selftests() {
   _prove_mutation "kg-backlog: (b) item \`done\` SEM carimbo REPROVA — quem nao carimba nao declara feito" \
                   "${bg}" "$d/done.yaml" "${rc_int}" "${rc_mut}"
   # a mensagem faz parte do contrato: quem le tem de saber QUAL item e o QUE falta
-  if printf '%s' "${out}" | grep -q 'DONE-NU' && printf '%s' "${out}" | grep -q 'verified_at=AUSENTE'; then
+  if _emit "${out}" | grep -q 'DONE-NU' && _emit "${out}" | grep -q 'verified_at=AUSENTE'; then
     record_pass "kg-backlog: (b2) a acusacao NOMEIA o item e o campo que falta"
   else record_fail "kg-backlog: (b2)" "acusacao sem diagnostico acionavel: ${out}"; fi
 
@@ -6939,7 +6944,7 @@ run_kg_backlog_selftests() {
   else
     _fixture_done_nu "$d/sem-abertos.yaml" "$d/sem-abertos-mutado.yaml"
     rc=0; out="$(bash "${helper}" "$d/sem-abertos-mutado.yaml" 2>&1)" || rc=$?
-    if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q 'DONE-NU'; then
+    if [ "${rc}" -ne 0 ] && _emit "${out}" | grep -q 'DONE-NU'; then
       record_pass "kg-backlog: (b3) a fixture funciona com o backlog ZERADO — nao depende do conteudo do vivo"
     else record_fail "kg-backlog: (b3)" "sem nenhum \`open\` na fonte a fixture nao produziu DONE-NU (rc=${rc}): ${out}"; fi
   fi
@@ -6956,7 +6961,7 @@ run_kg_backlog_selftests() {
   awk -v n="${_fillers_needed}" '/^edges:/ && !done { for (k=0;k<n;k++) printf "    - id: N_ENCHENDO_%d\n      node_type: question\n      plane: DEV\n      status: open\n      impact: 1\n      confidence: 1.0\n      label: \"enchendo %d\"\n\n", k, k; done=1 } {print}' \
     "${bg}" > "$d/teto.yaml"
   rc=0; out="$(bash "${helper}" "$d/teto.yaml" 2>&1)" || rc=$?
-  if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q 'TETO' && printf '%s' "${out}" | grep -q 'teto declarado 20'; then
+  if [ "${rc}" -ne 0 ] && _emit "${out}" | grep -q 'TETO' && _emit "${out}" | grep -q 'teto declarado 20'; then
     record_pass "kg-backlog: (c) passar do TETO reprova, citando o numero que esta no \`meta:\`"
   else record_fail "kg-backlog: (c)" "teto nao mordeu ou nao citou o numero do arquivo (rc=${rc}): ${out}"; fi
 
@@ -6965,7 +6970,7 @@ run_kg_backlog_selftests() {
   #     "teto zero" para quem so olha o exit code.
   grep -v 'TETO: 20' "${bg}" > "$d/semteto.yaml"
   rc=0; out="$(bash "${helper}" "$d/semteto.yaml" 2>&1)" || rc=$?
-  if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q 'SEM-TETO'; then
+  if [ "${rc}" -ne 0 ] && _emit "${out}" | grep -q 'SEM-TETO'; then
     record_pass "kg-backlog: (d) \`meta:\` sem TETO e HARD SEM-TETO (fail-loud, nunca conformidade por ausencia)"
   else record_fail "kg-backlog: (d)" "sem o teto declarado a guarda ficou calada (rc=${rc}): ${out}"; fi
 
@@ -6999,14 +7004,14 @@ run_kg_backlog_selftests() {
       #    para produzir HARD.
       local e_ctrl_out e_mut_out
       e_ctrl_out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-      h_ctrl="$(printf '%s' "${e_ctrl_out}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
+      h_ctrl="$(_emit "${e_ctrl_out}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
       # mesma razão de (b): mutar um `open` existente depende do CONTEÚDO do arquivo vivo, e o
       # backlog zerado torna o `sed` um no-op. Aqui não há `_prove_mutation` para avisar — o caso
       # apenas compararia dois lints idênticos e passaria a medir o nada.
       _fixture_done_nu "${sb}/docs/onion/graph/fios-abertos.kg.yaml" "${sb}/.done-nu.tmp"
       mv "${sb}/.done-nu.tmp" "${sb}/docs/onion/graph/fios-abertos.kg.yaml"
       e_mut_out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-      h_mut="$(printf '%s' "${e_mut_out}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
+      h_mut="$(_emit "${e_mut_out}" | sed -n 's/.*Violações HARD *: *\([0-9]*\).*/\1/p' | tail -1)"
       if [ -z "${h_ctrl}" ] || [ -z "${h_mut}" ]; then
         record_fail "kg-backlog: (e) atravessa o gate" "nao consegui ler o contador HARD do lint (ctrl='${h_ctrl}' mut='${h_mut}') — o caso mediria o nada"
       elif [ "${h_mut}" -gt "${h_ctrl}" ]; then
@@ -7079,7 +7084,7 @@ run_kg_ratchet_direction_selftests() {
     d="$(mktemp -d)"; _graph49 "$d" "${st}" 5 PROD "" ""; _commit49 "$d"
     mkdir -p "$d/.claude/validation"; printf '# vazio\n' > "$d/.claude/validation/kg-verification-baseline.txt"
     out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
-    printf '%s' "${out}" | grep -q '^HARD.*NOVO' || outside="${outside} ${st}"
+    _emit "${out}" | grep -q '^HARD.*NOVO' || outside="${outside} ${st}"
   done
   if [ -z "${outside}" ]; then
     record_pass "kg-catraca: (h) drifted/unverifiable/done/open/confirmed DENTRO do escopo (denylist nao quebra quando o enum cresce)"
@@ -7397,14 +7402,14 @@ run_task_manager_hook_selftests() {
 
   # (a) ambiente setado → anuncia o provider do ambiente (alinhado ao adapter)
   out="$(TASK_MANAGER_PROVIDER=jira bash "${hook}" 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q 'ativo = jira'; then
+  if _emit "${out}" | grep -q 'ativo = jira'; then
     record_pass "task-manager-hook: (a) ambiente setado → anuncia do ambiente (fonte do adapter)"
   else record_fail "task-manager-hook: (a)" "não leu o ambiente: ${out}"; fi
 
   # (b) ambiente vazio + .env com provider → avisa HONESTO (adapter cego), não anuncia cosmético
   d="$(mktemp -d)"; printf 'TASK_MANAGER_PROVIDER=linear\n' > "${d}/.env"
   out="$(cd "${d}" && env -u TASK_MANAGER_PROVIDER CLAUDE_PROJECT_DIR="${d}" bash "${hook}" 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q 'declarado no .env' && printf '%s' "${out}" | grep -q 'cego'; then
+  if _emit "${out}" | grep -q 'declarado no .env' && _emit "${out}" | grep -q 'cego'; then
     record_pass "task-manager-hook: (b) só no .env → aviso honesto (adapter cego), não cosmético"
   else record_fail "task-manager-hook: (b)" "não avisou sobre .env não-carregado: ${out}"; fi
   rm -rf "${d}"
@@ -7412,7 +7417,7 @@ run_task_manager_hook_selftests() {
   # (c) ambiente vazio + sem .env → none
   d="$(mktemp -d)"
   out="$(cd "${d}" && env -u TASK_MANAGER_PROVIDER CLAUDE_PROJECT_DIR="${d}" bash "${hook}" 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q 'ativo = none'; then
+  if _emit "${out}" | grep -q 'ativo = none'; then
     record_pass "task-manager-hook: (c) sem ambiente e sem .env → none"
   else record_fail "task-manager-hook: (c)" "esperava none: ${out}"; fi
   rm -rf "${d}"
@@ -7440,7 +7445,7 @@ run_regen_baselines_selftests() {
   # ⚠️ `cmd; rc=$?` sob `set -e` MATA a suíte (a bancada tem guarda que acusa isso, e ela me
   #    pegou aqui em 2026-08-17): o helper sai 2/3 DE PROPÓSITO. Idioma da casa: `|| rc=$?`.
   rc=0; out="$(bash "${helper}" "${REPO_ROOT}" 2>&1)" || rc=$?
-  if [ "${rc}" -eq 2 ] && printf '%s' "${out}" | grep -q 'CORE'; then
+  if [ "${rc}" -eq 2 ] && _emit "${out}" | grep -q 'CORE'; then
     record_pass "regen-baselines: recusa no core (role: source computado pela autoridade)"
   else record_fail "regen-baselines: guarda do core" "rc=${rc} (esperado 2) — regeneraria o ledger do core"; fi
 
@@ -7627,7 +7632,7 @@ run_seed_adoption_graph_selftests() {
   d="$(_seed_fixture)"
   bash "${helper}" "${d}" --gate-unproven >/dev/null 2>&1 || true
   out="$(awk '/id: DETERMINISTIC_GATE/,/label:/' "${d}/docs/onion/graph/onion-adoption.kg.yaml" 2>/dev/null || true)"
-  if printf '%s' "${out}" | grep -qE '^[[:space:]]*status:[[:space:]]*open'; then
+  if _emit "${out}" | grep -qE '^[[:space:]]*status:[[:space:]]*open'; then
     record_pass "seed-graph: (c) gate não provado → nó \`open\`, não afirma prova inexistente"
   else record_fail "seed-graph: (c)" "gate sem prova ficou como confirmed — o grafo mentiria de saída"; fi
   rm -rf "${d}"
@@ -7680,7 +7685,7 @@ run_githook_selftests() {
   # (c) core.hooksPath já setado (husky/custom) → NÃO sobrescreve + avisa
   d="$(mktemp -d)"; git -C "${d}" init -q; git -C "${d}" config core.hooksPath .husky/_
   local err; err="$(bash "${helper}" "${d}" 2>&1 >/dev/null)"
-  if [ "$(git -C "${d}" config --local --get core.hooksPath)" = ".husky/_" ] && printf '%s' "${err}" | grep -q 'NÃO sobrescrito'; then
+  if [ "$(git -C "${d}" config --local --get core.hooksPath)" = ".husky/_" ] && _emit "${err}" | grep -q 'NÃO sobrescrito'; then
     record_pass "githook: hooksPath pré-setado não é sobrescrito"
   else record_fail "githook: hooksPath never-clobber" "sobrescreveu o hooksPath do adotante"; fi
   rm -rf "${d}"
@@ -7871,9 +7876,9 @@ run_marketplace_generate_selftests() {
 
   # (a) deriva campos dos dois plugins (name/source/version)
   out="$(bash "${helper}" "${d}" 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '"name": "zeta"' \
-     && printf '%s' "${out}" | grep -q '"source": "./plugins/alpha"' \
-     && printf '%s' "${out}" | grep -q '"version": "1.2.3"'; then
+  if _emit "${out}" | grep -q '"name": "zeta"' \
+     && _emit "${out}" | grep -q '"source": "./plugins/alpha"' \
+     && _emit "${out}" | grep -q '"version": "1.2.3"'; then
     record_pass "generate-marketplace: deriva campos dos plugins"
   else record_fail "generate-marketplace: deriva campos" "name/source/version ausentes na saída"; fi
 
@@ -7892,14 +7897,14 @@ run_marketplace_generate_selftests() {
   mkdir -p "${d}/.claude-plugin"
   printf '{\n  "name": "meu-repo",\n  "owner": { "name": "Dono" },\n  "metadata": { "description": "d", "version": "9.9", "pluginRoot": "./plugins" },\n  "plugins": []\n}\n' > "${d}/.claude-plugin/marketplace.json"
   out="$(bash "${helper}" "${d}" 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '"name": "meu-repo"' && printf '%s' "${out}" | grep -q '"version": "9.9"'; then
+  if _emit "${out}" | grep -q '"name": "meu-repo"' && _emit "${out}" | grep -q '"version": "9.9"'; then
     record_pass "generate-marketplace: top-level preservado"
   else record_fail "generate-marketplace: top-level preservado" "top-level não preservado"; fi
   rm -rf "${d}"
 
   # (e) sem plugins → JSON com plugins array (vazio) válido
   d="$(mktemp -d)"; out="$(bash "${helper}" "${d}" 2>/dev/null)"; rm -rf "${d}"
-  if printf '%s' "${out}" | grep -q '"plugins": \['; then record_pass "generate-marketplace: sem plugins → array válido"
+  if _emit "${out}" | grep -q '"plugins": \['; then record_pass "generate-marketplace: sem plugins → array válido"
   else record_fail "generate-marketplace: sem plugins" "não emitiu plugins array"; fi
 }
 
@@ -7926,7 +7931,7 @@ run_bootstrap_vertical_selftests() {
 
   # (b) never-clobber: 2ª rodada não sobrescreve
   out="$(bash "${helper}" meuproj --dir "${d}" 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q "never-clobber"; then record_pass "bootstrap-vertical: never-clobber"
+  if _emit "${out}" | grep -q "never-clobber"; then record_pass "bootstrap-vertical: never-clobber"
   else record_fail "bootstrap-vertical: never-clobber" "não pulou artefato existente"; fi
   rm -rf "${d}"
 
@@ -7960,7 +7965,7 @@ run_scaffold_book_selftests() {
   else record_fail "scaffold-book: gera+substitui" "arquivo/substituição incorretos"; fi
 
   out="$(bash "${helper}" livroteste --dir "${d}" 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q "never-clobber"; then record_pass "scaffold-book: never-clobber"
+  if _emit "${out}" | grep -q "never-clobber"; then record_pass "scaffold-book: never-clobber"
   else record_fail "scaffold-book: never-clobber" "não pulou existente"; fi
   rm -rf "${d}"
 
@@ -8032,7 +8037,7 @@ run_scaffold_diagnose_selftests() {
 
   # (d) never-clobber: re-rodar não sobrescreve
   out="$(DIAGNOSE_SCAFFOLD_DATE=2026-07-30 bash "${helper}" cliente-x --dir "${d}" 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q 'never-clobber'; then record_pass "scaffold-diagnose: (d) never-clobber (não sobrescreve o store existente)"
+  if _emit "${out}" | grep -q 'never-clobber'; then record_pass "scaffold-diagnose: (d) never-clobber (não sobrescreve o store existente)"
   else record_fail "scaffold-diagnose: (d)" "não pulou artefatos existentes"; fi
   rm -rf "${d}"
 
@@ -8319,8 +8324,8 @@ run_graph_selftests() {
     record_pass "graph: triplas determinísticas"
   else record_fail "graph: determinismo" "triplas variam entre execuções"; fi
 
-  if printf '%s\n' "${T}" | grep -q "^maestro	gates	assistant" \
-     && printf '%s\n' "${T}" | grep -q "^onion	serves	maestro"; then
+  if _emit "${T}" | grep -q "^maestro	gates	assistant" \
+     && _emit "${T}" | grep -q "^onion	serves	maestro"; then
     record_pass "graph: atores+comunicação presentes (maestro/assistant/onion)"
   else record_fail "graph: atores" "arestas de ator/comunicação ausentes"; fi
 
@@ -8331,8 +8336,8 @@ run_graph_selftests() {
   # --closure: fecho transitivo direto (auto-escopo de bundle) alcança require direto E,
   # via ponte de prefixo (agent:X → X), o nó basename que carrega related_*.
   local clo; clo="$(bash "${gen}" --closure onion-engineering 2>/dev/null)"
-  if printf '%s\n' "${clo}" | grep -qE '^  agent:gitflow-specialist$' \
-     && printf '%s\n' "${clo}" | grep -qE '^  gitflow-specialist$'; then
+  if _emit "${clo}" | grep -qE '^  agent:gitflow-specialist$' \
+     && _emit "${clo}" | grep -qE '^  gitflow-specialist$'; then
     record_pass "graph: --closure alcança require direto + ponte de prefixo (agent:X→X)"
   else record_fail "graph: --closure" "fecho transitivo não achou require/basename conhecido"; fi
   # --closure sem semente → uso + exit 2 (|| captura: sob set -e, exit 2 abortaria o harness)
@@ -8343,14 +8348,14 @@ run_graph_selftests() {
   # F1.1 — ingestão de members.yaml (fonte 5) + mapa Mermaid derivado. Pula gracioso sem python+yaml.
   if command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' >/dev/null 2>&1 \
      && [ -f "${REPO_ROOT}/docs/evolution/federation/members.yaml" ]; then
-    if printf '%s\n' "${T}" | grep -qE '	adopts	onion-evolve	' \
-       && printf '%s\n' "${T}" | grep -qE '	tier	(source|hub|standalone)	'; then
+    if _emit "${T}" | grep -qE '	adopts	onion-evolve	' \
+       && _emit "${T}" | grep -qE '	tier	(source|hub|standalone)	'; then
       record_pass "graph: members.yaml ingerido (adopts/tier na federação)"
     else record_fail "graph: members ingest" "triplas sem arestas de membro (adopts/tier)"; fi
     local M; M="$(bash "${gen}" --map 2>/dev/null)"
-    if printf '%s\n' "${M}" | grep -q 'flowchart TD' \
-       && printf '%s\n' "${M}" | grep -q -- '-->|adopts|' \
-       && printf '%s\n' "${M}" | grep -q 'classDef source'; then
+    if _emit "${M}" | grep -q 'flowchart TD' \
+       && _emit "${M}" | grep -q -- '-->|adopts|' \
+       && _emit "${M}" | grep -q 'classDef source'; then
       record_pass "graph: --map emite Mermaid derivado (flowchart + adopts + classDef)"
     else record_fail "graph: --map" "mapa Mermaid inválido (falta flowchart/adopts/classDef)"; fi
     # determinismo do --map (compara dois valores capturados — ambos sem newline final)
@@ -8618,10 +8623,10 @@ run_de_identification_selftests() {
 
   # (a) PII conhecida é redigida — placeholders presentes, originais ausentes
   map="$(mktemp)"; red="$(printf '%s' "${sample}" | bash "${s}" --redact --map "${map}")"
-  if printf '%s' "${red}" | grep -q '\[\[EMAIL_1\]\]' \
-     && printf '%s' "${red}" | grep -q '\[\[CPF_1\]\]' \
-     && printf '%s' "${red}" | grep -q '\[\[CARD_1\]\]' \
-     && ! printf '%s' "${red}" | grep -q '123\.456\.789-09'; then
+  if _emit "${red}" | grep -q '\[\[EMAIL_1\]\]' \
+     && _emit "${red}" | grep -q '\[\[CPF_1\]\]' \
+     && _emit "${red}" | grep -q '\[\[CARD_1\]\]' \
+     && ! _emit "${red}" | grep -q '123\.456\.789-09'; then
     record_pass "de-id: PII de formato fixo é redigida (email/CPF/CNPJ/tel/cartão/IP)"
   else record_fail "de-id: redação" "PII não redigida ou original vazou no texto"; fi
 
@@ -8861,23 +8866,23 @@ run_kg_coverage_selftests() {
     && record_pass "kg-provenance: documento do baseline → SOFT (tolerado, não reprova)" \
     || record_fail "kg-provenance: passivo" "não tolerou o documento do baseline como SOFT"
 
-  printf '%s\n' "${out}" | grep -q "docs/analysis/coberto\.md" \
+  _emit "${out}" | grep -q "docs/analysis/coberto\.md" \
     && record_fail "kg-provenance: coberto" "falso-positivo — acusou documento CITADO em trace: (com sufixo :42)" \
     || record_pass "kg-provenance: coberto por trace: (sufixo :NNN normalizado) → silêncio"
 
-  printf '%s\n' "${out}" | grep -q "research/tema-x/SYNTHESIS\.md" \
+  _emit "${out}" | grep -q "research/tema-x/SYNTHESIS\.md" \
     && record_fail "kg-provenance: evidence lista" "não reconheceu cobertura via evidence: em LISTA (com ./ à frente)" \
     || record_pass "kg-provenance: coberto por evidence: em lista → silêncio"
 
-  printf '%s\n' "${out}" | grep -q "onion-adr-excluido\.md" \
+  _emit "${out}" | grep -q "onion-adr-excluido\.md" \
     && record_fail "kg-provenance: exclusão ADR" "ADR entrou no escopo (deve ser NORMA, não achado)" \
     || record_pass "kg-provenance: ADR por nome → fora do escopo"
 
-  printf '%s\n' "${out}" | grep -q "decisao-sem-prefixo\.md" \
+  _emit "${out}" | grep -q "decisao-sem-prefixo\.md" \
     && record_fail "kg-provenance: exclusão ADR-frontmatter" "ADR declarado por 'type: adr' entrou no escopo" \
     || record_pass "kg-provenance: ADR por frontmatter (type: adr) → fora do escopo"
 
-  printf '%s\n' "${out}" | grep -q "docs/analysis/README\.md" \
+  _emit "${out}" | grep -q "docs/analysis/README\.md" \
     && record_fail "kg-provenance: exclusão README" "README (navegação, não achado) entrou no escopo" \
     || record_pass "kg-provenance: README → fora do escopo"
 
@@ -8896,7 +8901,7 @@ run_kg_coverage_selftests() {
     trace: "docs/analysis/novo.md"
 KGEOF
   _prov_run "${d}"; out="${_PROV_OUT}"
-  if printf '%s\n' "${out}" | grep -q "	NEW	"; then
+  if _emit "${out}" | grep -q "	NEW	"; then
     record_fail "kg-provenance: repo-only" "modelar o doc no .kg.yaml do PRÓPRIO repo não removeu o HARD"
   else
     record_pass "kg-provenance: (P2) decisão tomada só com o repo — modelar no grafo do repo zera o HARD; rc=${_PROV_RC}"
@@ -8918,7 +8923,7 @@ KGEOF
 
   # B2 — baseline ENCOLHEU (antes 2 entradas, agora 1) ⇒ nenhuma HARD de catraca.
   _prov_run "${b}" --previous-baseline "${prev_maior}"; out="${_PROV_OUT}"
-  printf '%s\n' "${out}" | grep -q "	CATRACA	" \
+  _emit "${out}" | grep -q "	CATRACA	" \
     && record_fail "kg-provenance: catraca-encolhe" "baseline que ENCOLHEU foi tratado como regressão" \
     || record_pass "kg-provenance: (P3) baseline que ENCOLHE → sem HARD de catraca"
 
@@ -8927,10 +8932,10 @@ KGEOF
   printf '# baseline\ndocs/analysis/passivo.md\ndocs/analysis/coberto.md\ndocs/analysis/sumiu.md\n' \
     > "${b}/.claude/validation/kg-coverage-baseline.txt"
   _prov_run "${b}" --previous-baseline "${b}/.claude/validation/kg-coverage-baseline.txt"; out="${_PROV_OUT}"
-  printf '%s\n' "${out}" | grep -q "	BASELINE-OBSOLETA	" \
+  _emit "${out}" | grep -q "	BASELINE-OBSOLETA	" \
     && record_pass "kg-provenance: (P3) entrada obsoleta (doc já coberto) → SOFT 'remova do baseline'" \
     || record_fail "kg-provenance: baseline-obsoleta" "não cobrou a remoção de entrada já coberta pelo grafo"
-  printf '%s\n' "${out}" | grep -q "	BASELINE-ORFA	" \
+  _emit "${out}" | grep -q "	BASELINE-ORFA	" \
     && record_pass "kg-provenance: (P3) entrada órfã (doc inexistente) → SOFT 'remova do baseline'" \
     || record_fail "kg-provenance: baseline-orfa" "não cobrou a remoção de entrada que não existe mais"
 
@@ -8940,7 +8945,7 @@ KGEOF
   #       leria "sem violações"). Modo-de-falha, não happy-path.
   printf '# baseline (vazio de propósito)\n' > "${b}/.claude/validation/kg-coverage-baseline.txt"
   _prov_run "${b}"; out="${_PROV_OUT}"
-  if [ -n "${out}" ] && printf '%s\n' "${out}" | grep -q "	NEW	docs/analysis/passivo.md	"; then
+  if [ -n "${out}" ] && _emit "${out}" | grep -q "	NEW	docs/analysis/passivo.md	"; then
     record_pass "kg-provenance: (P3) baseline VAZIO → gate segue avaliando (não aborta em silêncio)"
   else
     record_fail "kg-provenance: baseline-vazio" "baseline sem entradas produziu saída vazia/sem HARD — o gate abortou em silêncio"
@@ -8959,7 +8964,7 @@ KGEOF
   else
     record_fail "kg-provenance: baseline-ausente" "esperava exatamente 1 HARD (NO-BASELINE) e rc=1; veio HARD=${n_hard} NO-BASELINE=${n_nobase} rc=${_PROV_RC}"
   fi
-  printf '%s\n' "${out}" | grep -q "	NO-BASELINE-UNCOVERED	docs/analysis/novo.md	" \
+  _emit "${out}" | grep -q "	NO-BASELINE-UNCOVERED	docs/analysis/novo.md	" \
     && record_pass "kg-provenance: (P3) sem baseline, o passivo continua VISÍVEL (SOFT) — silenciar seria liberar tudo" \
     || record_fail "kg-provenance: baseline-ausente-visibilidade" "sem baseline o gate ficou cego aos documentos sem nó"
 
@@ -8978,7 +8983,7 @@ KGEOF
     set +e
     mout="$(bash "${mut}" "${m}" --format tsv 2>/dev/null)"; mrc=$?
     set -e
-    if printf '%s\n' "${mout}" | grep -q "	NEW	docs/analysis/novo.md	"; then
+    if _emit "${mout}" | grep -q "	NEW	docs/analysis/novo.md	"; then
       record_fail "kg-provenance: (P4) mutation" "com a condição central DESFEITA o caso ainda passou verde — o teste não é load-bearing"
     else
       record_pass "kg-provenance: (P4) MUTATION TEST — condição central desfeita ⇒ o caso 'novo → HARD' FALHA (rc ${_PROV_RC}→${mrc}); o teste é load-bearing"
@@ -9014,7 +9019,7 @@ KGEOF
     printf '# sonda nova\n' > "${sb}/${probe_novo}"
     o1="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe_novo}" 2>&1 || true)"
     h1="$(printf '%s' "${o1}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
-    if [ "${h1}" = "$((h0 + 1))" ] && printf '%s' "${o1}" | grep -qF "${probe_novo}"; then
+    if [ "${h1}" = "$((h0 + 1))" ] && _emit "${o1}" | grep -qF "${probe_novo}"; then
       record_pass "kg-provenance: (P1) SEVERIDADE por DELTA — documento novo sem nó soma HARD (${h0}→${h1})"
     else
       record_fail "kg-provenance: (P1) delta HARD" "esperava HARD ${h0}→$((h0 + 1)) citando ${probe_novo}; veio ${h1}"
@@ -9059,8 +9064,8 @@ KGEOF
   # (E1) baseline versionado só no HEAD, INALTERADO → catraca resolve pelo git,
   #      mas HEAD é ref LOCAL: tem de AVISAR (fraca), não sair verde em silêncio.
   rc=0; og="$(cd "${g}" && bash .claude/validation/kg-provenance-coverage.sh 2>&1)" || rc=$?
-  if printf '%s' "${og}" | grep -q 'CATRACA-FRACA' \
-     && ! printf '%s' "${og}" | grep -q 'CATRACA-INDISPONIVEL'; then
+  if _emit "${og}" | grep -q 'CATRACA-FRACA' \
+     && ! _emit "${og}" | grep -q 'CATRACA-INDISPONIVEL'; then
     record_pass "kg-provenance: (E1) caminho git — baseline no HEAD resolve a catraca e AVISA ref fraca"
   else
     record_fail "kg-provenance: (E1) ref fraca" "esperava CATRACA-FRACA sem CATRACA-INDISPONIVEL; veio: ${og}"
@@ -9071,7 +9076,7 @@ KGEOF
   #      compara o baseline consigo mesmo, que era o no-op silencioso do defeito 3).
   printf '%s\n' 'docs/analysis/inventado.md' >> "${g}/.claude/validation/kg-coverage-baseline.txt"
   rc=0; og="$(cd "${g}" && bash .claude/validation/kg-provenance-coverage.sh 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${og}" | grep -qi 'catraca'; then
+  if [ "${rc}" -eq 1 ] && _emit "${og}" | grep -qi 'catraca'; then
     record_pass "kg-provenance: (E2) caminho git — baseline que CRESCE vs o ref ⇒ HARD (rc=1)"
   else
     record_fail "kg-provenance: (E2) crescimento via git" "esperava rc=1 + violação de catraca; rc=${rc} out=${og}"
@@ -9088,7 +9093,7 @@ KGEOF
   git -C "${g}" update-ref "refs/remotes/origin/${_gb}" HEAD 2>/dev/null
   git -C "${g}" symbolic-ref "refs/remotes/origin/HEAD" "refs/remotes/origin/${_gb}" 2>/dev/null
   rc=0; og="$(cd "${g}" && bash .claude/validation/kg-provenance-coverage.sh 2>&1)" || rc=$?
-  if ! printf '%s' "${og}" | grep -q 'CATRACA-FRACA'; then
+  if ! _emit "${og}" | grep -q 'CATRACA-FRACA'; then
     record_pass "kg-provenance: (E3) caminho git — origin/<branch> é ref FORTE (sem aviso de fraqueza)"
   else
     record_fail "kg-provenance: (E3) ref forte" "origin/<branch> presente e ainda avisou fraqueza: ${og}"
@@ -9168,7 +9173,7 @@ run_doctrine_freshness_selftests() {
   local d out; d="$(_df_make_repo)"
   _df_run "${d}"; out="${_DF_OUT}"
 
-  printf '%s\n' "${out}" | grep -q 'concepts/fresh\.md' \
+  _emit "${out}" | grep -q 'concepts/fresh\.md' \
     && record_fail "doctrine: fresh" "doc carimbado e dentro do TTL foi flagado (falso-positivo)" \
     || record_pass "doctrine: (NÍVEL A) doc fresco (verified_at hoje + source) → silêncio"
 
@@ -9225,7 +9230,7 @@ run_doctrine_freshness_selftests() {
     || record_fail "doctrine: catraca-cresce" "acrescentar path ao baseline não foi HARD"
 
   _df_run "${b}" --previous-baseline "${prev_maior}"; out="${_DF_OUT}"
-  printf '%s\n' "${out}" | grep -qE $'\tCATRACA\t' \
+  _emit "${out}" | grep -qE $'\tCATRACA\t' \
     && record_fail "doctrine: catraca-encolhe" "baseline que ENCOLHEU foi tratado como regressão" \
     || record_pass "doctrine: (P3) baseline que ENCOLHE → sem HARD de catraca"
 
@@ -9233,10 +9238,10 @@ run_doctrine_freshness_selftests() {
   printf '# baseline\ndocs/knowledge-base/concepts/passivo.md\ndocs/knowledge-base/concepts/fresh.md\ndocs/knowledge-base/concepts/ghost.md\n' \
     > "${b}/.claude/validation/doctrine-freshness-baseline.txt"
   _df_run "${b}" --previous-baseline "${b}/.claude/validation/doctrine-freshness-baseline.txt"; out="${_DF_OUT}"
-  printf '%s\n' "${out}" | grep -qE $'\tBASELINE-OBSOLETA\t' \
+  _emit "${out}" | grep -qE $'\tBASELINE-OBSOLETA\t' \
     && record_pass "doctrine: (P3) entrada obsoleta (doc já carimbado) → SOFT 'remova do baseline'" \
     || record_fail "doctrine: baseline-obsoleta" "não cobrou a remoção de entrada já carimbada"
-  printf '%s\n' "${out}" | grep -qE $'\tBASELINE-ORFA\t' \
+  _emit "${out}" | grep -qE $'\tBASELINE-ORFA\t' \
     && record_pass "doctrine: (P3) entrada órfã (fora da lista) → SOFT 'remova do baseline'" \
     || record_fail "doctrine: baseline-orfa" "não cobrou a remoção de entrada fora da lista"
 
@@ -9290,7 +9295,7 @@ run_doctrine_freshness_selftests() {
     && record_pass "doctrine: (P4-TTL) TTL default 90 → doc de 2020 é STALE; doc de hoje NÃO" \
     || record_fail "doctrine: ttl-default" "com TTL 90 o doc de 2020 não ficou STALE"
   _DF_TTL=100000 _df_run "${dt}"; out="${_DF_OUT}"
-  printf '%s\n' "${out}" | grep -q $'\tSTALE\tdocs/knowledge-base/concepts/stale\.md' \
+  _emit "${out}" | grep -q $'\tSTALE\tdocs/knowledge-base/concepts/stale\.md' \
     && record_fail "doctrine: ttl-env" "TTL alargado por env NÃO rejuvenesceu o doc (a fixture não fixa o TTL)" \
     || record_pass "doctrine: (P4-TTL) TTL alargado por env (100000d) → o MESMO doc deixa de ser STALE (fixture fixa o TTL)"
 
@@ -9302,7 +9307,7 @@ run_doctrine_freshness_selftests() {
   _df_has "${out}" SOFT STALE-CLOCK-UNTRUSTED 'docs/knowledge-base/concepts/stale\.md' \
     && record_pass "doctrine: (P4-RELÓGIO) relógio não-confiável → STALE degrada a SOFT (não reprova por relógio)" \
     || record_fail "doctrine: clock-stale" "com relógio não-confiável a idade não degradou a SOFT STALE-CLOCK-UNTRUSTED"
-  printf '%s\n' "${out}" | grep -qE $'\tHARD\tFUTURE\t' \
+  _emit "${out}" | grep -qE $'\tHARD\tFUTURE\t' \
     && record_fail "doctrine: clock-future" "relógio não-confiável ainda emitiu HARD FUTURE (a comparação com 'agora' não degradou)" \
     || record_pass "doctrine: (P4-RELÓGIO) relógio não-confiável → FUTURE também degrada (não HARD espúrio)"
   _df_has "${out}" HARD MALFORMED 'docs/knowledge-base/concepts/malformed\.md' \
@@ -9329,13 +9334,13 @@ run_doctrine_freshness_selftests() {
   # (G1) baseline versionado só no HEAD, INALTERADO → resolve pela ref, mas HEAD é
   #      ref LOCAL: AVISA fraca (não sai verde em silêncio).
   rc=0; og="$(cd "${g}" && DOCTRINE_CLOCK_TRUST=attested bash .claude/validation/doctrine-freshness.sh --list-file .claude/validation/df-list.txt 2>&1)" || rc=$?
-  printf '%s' "${og}" | grep -q 'CATRACA-FRACA' && ! printf '%s' "${og}" | grep -q 'CATRACA-INDISPONIVEL' \
+  _emit "${og}" | grep -q 'CATRACA-FRACA' && ! _emit "${og}" | grep -q 'CATRACA-INDISPONIVEL' \
     && record_pass "doctrine: (G1) caminho git — baseline no HEAD resolve a catraca e AVISA ref fraca" \
     || record_fail "doctrine: (G1) ref fraca" "esperava CATRACA-FRACA sem CATRACA-INDISPONIVEL; veio: ${og}"
   # (G2) baseline CRESCEU vs o ref git ⇒ HARD (prova que compara de verdade, não consigo mesmo)
   printf 'docs/knowledge-base/concepts/inventado.md\n' >> "${g}/.claude/validation/doctrine-freshness-baseline.txt"
   rc=0; og="$(cd "${g}" && DOCTRINE_CLOCK_TRUST=attested bash .claude/validation/doctrine-freshness.sh --list-file .claude/validation/df-list.txt 2>&1)" || rc=$?
-  [ "${rc}" -eq 1 ] && printf '%s' "${og}" | grep -qi 'catraca' \
+  [ "${rc}" -eq 1 ] && _emit "${og}" | grep -qi 'catraca' \
     && record_pass "doctrine: (G2) caminho git — baseline que CRESCE vs o ref ⇒ HARD (rc=1)" \
     || record_fail "doctrine: (G2) crescimento via git" "esperava rc=1 + violação de catraca; rc=${rc}"
 
@@ -9421,28 +9426,28 @@ run_kg_born_marker_selftests() {
   _born_run "${d}"; out="${_BORN_OUT}"
 
   # (i) kg: → grafo VÁLIDO → passa (nenhuma linha para i-valid.md).
-  printf '%s\n' "${out}" | grep -q 'i-valid\.md' \
+  _emit "${out}" | grep -q 'i-valid\.md' \
     && record_fail "kg-born-marker: (i) válido" "falso-positivo — grafo VÁLIDO (radar exit 0) foi reprovado" \
     || record_pass "kg-born-marker: (i) kg: → .kg.yaml VÁLIDO (radar --integrity E --schema exit 0) → silêncio"
 
   # (ii) kg: PENDURADO → HARD/MISSING-PATH.
-  printf '%s\n' "${out}" | grep -qE '^HARD	MISSING-PATH	.claude/diary/ii-dangling\.md	' \
+  _emit "${out}" | grep -qE '^HARD	MISSING-PATH	.claude/diary/ii-dangling\.md	' \
     && record_pass "kg-born-marker: (ii) kg: pendurado (path inexistente) → HARD" \
     || record_fail "kg-born-marker: (ii) pendurado" "não emitiu HARD/MISSING-PATH para ii-dangling.md"
 
   # (iii) kg: → .md que não é grafo → HARD/NOT-KG.
-  printf '%s\n' "${out}" | grep -qE '^HARD	NOT-KG	.claude/diary/iii-notkg\.md	' \
+  _emit "${out}" | grep -qE '^HARD	NOT-KG	.claude/diary/iii-notkg\.md	' \
     && record_pass "kg-born-marker: (iii) kg: aponta .md não-grafo → HARD" \
     || record_fail "kg-born-marker: (iii) não-grafo" "não emitiu HARD/NOT-KG para iii-notkg.md"
 
   # (iv) kg: → .kg.yaml que o radar REPROVA → HARD/RADAR-FAIL.
-  printf '%s\n' "${out}" | grep -qE '^HARD	RADAR-FAIL	.claude/diary/iv-radarfail\.md	' \
+  _emit "${out}" | grep -qE '^HARD	RADAR-FAIL	.claude/diary/iv-radarfail\.md	' \
     && record_pass "kg-born-marker: (iv) kg: aponta .kg.yaml que o radar REPROVA → HARD" \
     || record_fail "kg-born-marker: (iv) radar-reprova" "não emitiu HARD/RADAR-FAIL para iv-radarfail.md"
 
   # (v) migalha SEM kg: → passa. É a RAZÃO DE EXISTIR do gate (missing != violation —
   #     o oposto da catraca da 29; retro-reprovar as ~72 migalhas seria o erro da catraca).
-  printf '%s\n' "${out}" | grep -q 'v-nomarker\.md' \
+  _emit "${out}" | grep -q 'v-nomarker\.md' \
     && record_fail "kg-born-marker: (v) sem kg:" "retro-reprovou uma migalha SEM kg: — o erro da catraca que este gate NÃO comete" \
     || record_pass "kg-born-marker: (v) migalha SEM kg: → passa (missing != violation; não retro-reprova)"
 
@@ -9467,7 +9472,7 @@ run_kg_born_marker_selftests() {
     set +e
     mout="$(bash "${mut}" "${m}" --format tsv 2>/dev/null)"; mrc=$?
     set -e
-    if printf '%s\n' "${mout}" | grep -qE '^HARD	MISSING-PATH	.claude/diary/ii-dangling\.md	'; then
+    if _emit "${mout}" | grep -qE '^HARD	MISSING-PATH	.claude/diary/ii-dangling\.md	'; then
       record_fail "kg-born-marker: (MUT) mutation" "com a severidade rebaixada a SOFT o caso (ii) ainda saiu HARD — o teste não é load-bearing"
     else
       record_pass "kg-born-marker: (MUT) MUTATION TEST — severidade HARD→SOFT em (ii) QUEBRA a asserção de HARD (rc ${_BORN_RC}→${mrc}); a severidade é load-bearing, não declarada"
@@ -9504,7 +9509,7 @@ run_kg_born_marker_selftests() {
       printf '%s\n' '---' 'type: decision' 'kg: docs/analysis/nao-existe-selftest.kg.yaml' '---' '# sonda' > "${sb}/${probe}"
       o1="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe}" 2>&1 || true)"
       h1="$(printf '%s' "${o1}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
-      if [ "${h1}" = "$((h0 + 1))" ] && printf '%s' "${o1}" | grep -qF "${probe}"; then
+      if [ "${h1}" = "$((h0 + 1))" ] && _emit "${o1}" | grep -qF "${probe}"; then
         record_pass "kg-born-marker: SEVERIDADE por DELTA — migalha com kg: pendurado soma HARD no lint real (${h0}→${h1})"
       else
         record_fail "kg-born-marker: delta HARD" "esperava HARD ${h0}→$((h0 + 1)) citando ${probe}; veio ${h1}"
@@ -9580,32 +9585,32 @@ run_outbox_channel_selftests() {
   hard_com="$(printf '%s' "${out}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
   soft_com="$(printf '%s' "${out}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
 
-  printf '%s' "${out}" | grep -qF "selftest-com-canal" \
+  _emit "${out}" | grep -qF "selftest-com-canal" \
     && record_fail "outbox-channel: com canal" "falso-positivo — acusou membro que TEM inbound/" \
     || record_pass "outbox-channel: vendorizado COM canal → sem violação"
 
-  printf '%s' "${out}" | grep -qF "o clone local existe" \
+  _emit "${out}" | grep -qF "o clone local existe" \
     && record_pass "outbox-channel: vendorizado SEM canal → SOFT (classe local)" \
     || record_fail "outbox-channel: sem canal" "não emitiu a violação de clone-sem-inbound"
 
-  printf '%s' "${out}" | grep -qF "selftest-vazio" \
+  _emit "${out}" | grep -qF "selftest-vazio" \
     && record_fail "outbox-channel: sem anúncio" "acusou membro sem nenhum anúncio em staging" \
     || record_pass "outbox-channel: SEM anúncio em staging → sem violação"
 
-  printf '%s' "${out}" | grep -qF "selftest-nao-vendoriza', que adota o MÉTODO" \
+  _emit "${out}" | grep -qF "selftest-nao-vendoriza', que adota o MÉTODO" \
     && record_pass "outbox-channel: membro onion_version n/a → SOFT (classe decidível no CI)" \
     || record_fail "outbox-channel: n/a" "não acusou membro que não vendoriza (a classe que roda no CI)"
 
-  printf '%s' "${out}" | grep -qF "selftest-orfao-xyz', que NÃO é id de membro" \
+  _emit "${out}" | grep -qF "selftest-orfao-xyz', que NÃO é id de membro" \
     && record_fail "outbox-channel: órfão" "REGRA 28 ainda emite p/ dir órfão — amputação de double-firing (R28×R46) não se sustentou" \
     || record_pass "outbox-channel: dir órfão → REGRA 28 silenciosa (classe amputada 2026-08, dona é a 46)"
 
-  printf '%s' "${out}" | grep -qF "outbox-órfã] diretório sem membro correspondente em members.yaml" \
-    && printf '%s' "${out}" | grep -qF "selftest-orfao-xyz" \
+  _emit "${out}" | grep -qF "outbox-órfã] diretório sem membro correspondente em members.yaml" \
+    && _emit "${out}" | grep -qF "selftest-orfao-xyz" \
     && record_pass "outbox-channel: dir órfão → SOFT único, via REGRA 46 (dona da classe)" \
     || record_fail "outbox-channel: órfão-R46" "REGRA 46 não acusou dir de staging que não resolve a membro"
 
-  printf '%s' "${out}" | grep -qF "selftest-so-processed" \
+  _emit "${out}" | grep -qF "selftest-so-processed" \
     && record_fail "outbox-channel: só _processed" "varreu _processed/ (já entregue) — deve ser 1º nível apenas" \
     || record_pass "outbox-channel: só _processed/ → sem violação (1º nível apenas)"
 
@@ -9632,7 +9637,7 @@ run_outbox_channel_selftests() {
   # rodando o lint DENTRO da cópia limpa de um adotante (o core é o pior oráculo do que viaja).
   rm -f "${sb}/docs/evolution/federation/members.yaml"
   local out3; out3="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if printf '%s' "${out3}" | grep -q 'Viola..es HARD'; then
+  if _emit "${out3}" | grep -q 'Viola..es HARD'; then
     record_pass "outbox-channel: (GREENFIELD) sem members.yaml → lint COMPLETA (REGRA 36 não aborta com terms vazio)"
   else record_fail "outbox-channel: greenfield" "lint abortou num adotante sem members.yaml (terms vazio + set -e na REGRA 36)"; fi
 
@@ -9677,7 +9682,7 @@ run_diary_crumbs_selftests() {
   printf -- '---\ndate: 2026-01-05\ntype: learning\nclassification: public\nreview_after: 2099-01-01\nconflict_class: volatile\n---\n## Signal\nx\n' \
     > "${d}/.claude/diary/2026-01-05-bad-class.md"
   rc=0; out="$(bash "${di}" "${d}" 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q "conflict_class 'volatile' inválida"; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q "conflict_class 'volatile' inválida"; then
     record_pass "diary-crumbs: classe fora do vocabulário → exit 1 com erro nomeado"
   else record_fail "diary-crumbs: classe inválida" "esperava exit 1 + erro; out='${out}' rc=${rc}"; fi
   rm -f "${d}/.claude/diary/2026-01-05-bad-class.md"
@@ -9686,7 +9691,7 @@ run_diary_crumbs_selftests() {
   printf -- '---\ndate: 2026-01-06\ntype: learning\nclassification: public\nreview_after: 2099-01-01\nconflict_class: conditional\n---\n## Signal\nx\n' \
     > "${d}/.claude/diary/2026-01-06-cond-sem-when.md"
   rc=0; out="$(bash "${di}" "${d}" 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q "exige valid_when"; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q "exige valid_when"; then
     record_pass "diary-crumbs: conditional sem valid_when → exit 1 (guarda do enabler)"
   else record_fail "diary-crumbs: cond sem when" "esperava exit 1 + erro; out='${out}' rc=${rc}"; fi
   rm -f "${d}/.claude/diary/2026-01-06-cond-sem-when.md"
@@ -9696,7 +9701,7 @@ run_diary_crumbs_selftests() {
   printf -- '---\ndate: 2026-01-07\ntype: musing\nclassification: public\nreview_after: 2099-01-01\nconflict_class: static\n---\n## Signal\nx\n' \
     > "${d}/.claude/diary/2026-01-07-bad-type.md"
   rc=0; out="$(bash "${di}" "${d}" 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q "type 'musing' inválido"; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q "type 'musing' inválido"; then
     record_pass "diary-crumbs: type fora do enum → exit 1 com erro nomeado"
   else record_fail "diary-crumbs: type inválido" "esperava exit 1 + erro; out='${out}' rc=${rc}"; fi
   rm -f "${d}/.claude/diary/2026-01-07-bad-type.md"
@@ -9731,9 +9736,9 @@ run_diary_crumbs_selftests() {
   printf -- '---\ndate: 2026-01-10\ntype: learning\nclassification: collective 📤\nreview_after: 2099-01-01\nconflict_class: static\n---\n## Signal\nx\n' \
     > "${d}/.claude/diary/2026-01-10-marker-in-source.md"
   rc=0; out="$(bash "${di}" "${d}" 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q "pertence ao ÍNDICE"; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q "pertence ao ÍNDICE"; then
     record_pass "diary-crumbs: (h) marcador 📤 no frontmatter → exit 1 (projeção não entra na fonte)"
-  else record_fail "diary-crumbs: (h) marcador na fonte" "esperava exit 1 + erro nomeado; rc=${rc} out='$(printf '%s' "${out}" | head -2)'"; fi
+  else record_fail "diary-crumbs: (h) marcador na fonte" "esperava exit 1 + erro nomeado; rc=${rc} out='$(_emit "${out}" | head -2)'"; fi
 
   rm -rf "${d}"
 }
@@ -9771,7 +9776,7 @@ run_session_beacon_selftests() {
 
   # (b) check com farol VIVO alheio → exit 1 e lista 🕯️ (regressão colisão W1×W2)
   rc=0; out="$(bash "${sb}" check "${d}")" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q '🕯️ DECLARADA (dono NÃO verificado): sess-alpha'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q '🕯️ DECLARADA (dono NÃO verificado): sess-alpha'; then
     record_pass "session-beacon: farol sem dono medido → DECLARADA + exit 1 (conservador; regressão W1×W2)"
   else record_fail "session-beacon: check vivo" "esperava exit 1 + DECLARADA; out='${out}' rc=${rc}"; fi
 
@@ -9783,7 +9788,7 @@ run_session_beacon_selftests() {
   # (d) farol STALE (refreshed_at antigo) → listado como stale, exit 0 (sinal, não trava)
   sed -i 's/^refreshed_at:.*/refreshed_at: 1000000/' "${d}/.claude/beacons/sess-alpha.beacon"
   rc=0; out="$(bash "${sb}" check "${d}")" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '(stale) sess-alpha'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q '(stale) sess-alpha'; then
     record_pass "session-beacon: stale não bloqueia (sessão morta não trava o repo)"
   else record_fail "session-beacon: stale" "esperava exit 0 + stale; out='${out}' rc=${rc}"; fi
 
@@ -9801,7 +9806,7 @@ run_session_beacon_selftests() {
     bash "${sb}" up "${d}" "sess-other"
     rc=0; out="$(cd "${d}" && printf '{"session_id":"sess-self"}' | bash .claude/hooks/session-beacon-hook.sh up)" || rc=$?
     if [ "${rc}" -eq 0 ] && [ -f "${d}/.claude/beacons/sess-self.beacon" ] \
-       && printf '%s' "${out}" | grep -q 'farol aceso neste repo'; then
+       && _emit "${out}" | grep -q 'farol aceso neste repo'; then
       record_pass "session-beacon: hook acende farol + avisa colisão no boot (exit 0)"
     else record_fail "session-beacon: hook" "esperava farol+aviso+0; out='${out}' rc=${rc}"; fi
 
@@ -9809,8 +9814,8 @@ run_session_beacon_selftests() {
     # AFIRMAR sessão alheia viva — tem de se declarar não-verificado E mandar verificar
     # quem é e o que faz. Sem este teste, a próxima reescrita do texto silenciosamente
     # volta a afirmar, e a sessão que lê volta a invocar I3 contra fantasma.
-    if printf '%s' "${out}" | grep -q 'INFORMADO, NÃO VERIFICADO' \
-       && printf '%s' "${out}" | grep -q 'VERIFIQUE QUEM É E O QUE FAZ'; then
+    if _emit "${out}" | grep -q 'INFORMADO, NÃO VERIFICADO' \
+       && _emit "${out}" | grep -q 'VERIFIQUE QUEM É E O QUE FAZ'; then
       record_pass "session-beacon: aviso se declara NÃO-VERIFICADO e manda verificar quem/o quê"
     else record_fail "session-beacon: aviso informado≠verificado" "o aviso voltou a AFIRMAR sessão viva sem mandar verificar; out='${out}'"; fi
 
@@ -9861,7 +9866,7 @@ run_session_beacon_selftests() {
     out="$(bash "${sb}" verdict "${ddon}/.claude/beacons/sess-dono.beacon")"
     rc=0; out2="$(bash "${sb}" check "${ddon}")" || rc=$?
     if [ "${out}" = "live" ] && [ "${rc}" -eq 1 ] \
-       && printf '%s' "${out2}" | grep -q '🕯️ VIVA (dono verificado): sess-dono'; then
+       && _emit "${out2}" | grep -q '🕯️ VIVA (dono verificado): sess-dono'; then
       record_pass "session-beacon: dono vivo medido → live + rótulo VIVA + BLOQUEIA sozinho (I3)"
     else record_fail "session-beacon: dono vivo" "esperava live+exit1+rótulo; veredito='${out}' rc=${rc} out='${out2}'"; fi
 
@@ -9903,7 +9908,7 @@ run_session_beacon_selftests() {
     # (k5) carimbo corrompido não pode derrubar a listagem inteira (set -u)
     sed -i 's/^refreshed_at:.*/refreshed_at: abc/' "${ddon}/.claude/beacons/sess-outrohost.beacon"
     rc=0; out2="$(bash "${sb}" check "${ddon}")" || rc=$?
-    if printf '%s' "${out2}" | grep -q 'sess-dono'; then
+    if _emit "${out2}" | grep -q 'sess-dono'; then
       record_pass "session-beacon: refreshed_at corrompido não engole a listagem (o vivo segue impresso)"
     else record_fail "session-beacon: carimbo corrompido" "listagem perdida; out='${out2}' rc=${rc}"; fi
   else
@@ -9992,7 +9997,7 @@ run_session_beacon_selftests() {
     rc=0; out2="$(bash "${sb}" check "${dorf}")" || rc=$?
     bash "${sb}" sweep "${dorf}"
     if [ "${out}" = "orphan" ] && [ "${rc}" -eq 0 ] \
-       && printf '%s' "${out2}" | grep -q '(órfã) sess-orfa' \
+       && _emit "${out2}" | grep -q '(órfã) sess-orfa' \
        && [ ! -f "${dorf}/.claude/beacons/sess-orfa.beacon" ]; then
       record_pass "session-beacon: dono morto → órfã não bloqueia + rótulo impresso + sweep remove"
     else record_fail "session-beacon: órfã" "esperava orphan+exit0+rótulo+removido; veredito='${out}' rc=${rc} out='${out2}'"; fi
@@ -10142,8 +10147,8 @@ EOF
   rc=0; out="$(bash "${map}" --dir "${dd}" 2>&1)" || rc=$?
 
   # (a) lista N=4 (o _template é ignorado) + phase + estrela
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q '4 estrela' \
-     && printf '%s' "${out}" | grep -q 'alpha' && printf '%s' "${out}" | grep -q 'EXPLORE'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q '4 estrela' \
+     && _emit "${out}" | grep -q 'alpha' && _emit "${out}" | grep -q 'EXPLORE'; then
     record_pass "constellation-map: lista N estrelas (ignora _template) + phase"
   else record_fail "constellation-map: painel" "rc=${rc} out=${out}"; fi
 
@@ -10160,7 +10165,7 @@ EOF
   else record_fail "constellation-map: convergência" "não achou a convergência NS1; out=${out}"; fi
 
   # (d) sem falso-positivo: glob/tag únicos (gamma) NÃO aparecem em colisão/convergência
-  if ! printf '%s' "${out}" | grep -q 'docs/unique/' && ! printf '%s' "${out}" | grep -qE 'solo →'; then
+  if ! _emit "${out}" | grep -q 'docs/unique/' && ! _emit "${out}" | grep -qE 'solo →'; then
     record_pass "constellation-map: sem falso-positivo (glob/tag únicos de gamma fora das seções)"
   else record_fail "constellation-map: falso-positivo" "gamma vazou p/ colisão/convergência; out=${out}"; fi
 
@@ -10178,7 +10183,7 @@ EOF
   # Prova que o mapa lê SÓ o frontmatter (fronteira estrutural), nunca o corpo da discussão.
   local outj; outj="$(bash "${map}" --dir "${dd}" --json 2>&1; bash "${map}" --dir "${dd}" 2>&1)"
   # SECRETTAG (campo ausente do frontmatter) é o discriminante do LIMITE; SECRET reforça.
-  if ! printf '%s' "${outj}" | grep -qE 'SECRET'; then
+  if ! _emit "${outj}" | grep -qE 'SECRET'; then
     record_pass "constellation-map: corpo NUNCA lido (decoy SECRETTAG/SECRET ausentes do painel e do json)"
   else record_fail "constellation-map: só-metadados" "VAZOU o corpo (SECRET* apareceu) — leu além do frontmatter!"; fi
   rm -rf "${dd}"
@@ -10265,35 +10270,35 @@ run_pin_integrity_selftests() {
   printf 'framework: onion\nsource_commit: %s\nrole: adopted\n' "${pin1}" > "${tgt}/.claude/.onion-version"
   printf '#!/bin/sh\necho v1\n' > "${tgt}/.claude/validation/lint-artifacts.sh"
   rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q "^pin-ok ${pin1}"; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q "^pin-ok ${pin1}"; then
     record_pass "pin-integrity: pin real + canário íntegro → pin-ok"
   else record_fail "pin-integrity: pin-ok" "esperava exit 0 'pin-ok ${pin1}'; out='${out}' rc=${rc}"; fi
 
   # (b) CASO DE CAMPO — pin real mas canário divergente (vendor mais velho/novo que o stamp) → untrusted
   printf '#!/bin/sh\necho v2\n' > "${tgt}/.claude/validation/lint-artifacts.sh"
   rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'canario-divergente'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'canario-divergente'; then
     record_pass "pin-integrity: canário divergente → untrusted (regressão do incidente de campo 06-30)"
   else record_fail "pin-integrity: canário" "esperava exit 1 canario-divergente; out='${out}' rc=${rc}"; fi
 
   # (c) pin unknown (recover honesto) → untrusted, sem quebrar
   printf 'framework: onion\nsource_commit: unknown\nrole: adopted\n' > "${tgt}/.claude/.onion-version"
   rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'unknown'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'unknown'; then
     record_pass "pin-integrity: pin unknown → untrusted (recover honesto resolvível)"
   else record_fail "pin-integrity: unknown" "esperava exit 1 unknown; out='${out}' rc=${rc}"; fi
 
   # (d) pin inexistente na história da fonte → untrusted
   printf 'framework: onion\nsource_commit: deadbeefcafe\nrole: adopted\n' > "${tgt}/.claude/.onion-version"
   rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'inexistente-na-historia'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'inexistente-na-historia'; then
     record_pass "pin-integrity: pin fora da história → untrusted"
   else record_fail "pin-integrity: história" "esperava exit 1 inexistente; out='${out}' rc=${rc}"; fi
 
   # (e) stamp ausente → untrusted (nunca crash)
   rm -f "${tgt}/.claude/.onion-version"
   rc=0; out="$(bash "${pic}" "${src}" "${tgt}")" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'stamp-ausente'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'stamp-ausente'; then
     record_pass "pin-integrity: stamp ausente → untrusted"
   else record_fail "pin-integrity: stamp" "esperava exit 1 stamp-ausente; out='${out}' rc=${rc}"; fi
 
@@ -10325,7 +10330,7 @@ run_mail_hook_selftests() {
   printf '# p\n' > "${d}/docs/evolution/inbox/_processed/2025-12-01-velho.md"
   printf '# a\n' > "${d}/docs/evolution/inbound/2026-01-02-anuncio.md"
   out="$(cd "${d}" && bash "${hook}")"
-  if printf '%s' "${out}" | grep -q '📬.*1 mensagem' && printf '%s' "${out}" | grep -q '📥.*1 entrega'; then
+  if _emit "${out}" | grep -q '📬.*1 mensagem' && _emit "${out}" | grep -q '📥.*1 entrega'; then
     record_pass "mail-hook: 📬+📥 contam só 1º nível (README/_processed fora)"
   else record_fail "mail-hook: canais" "contagem errada: ${out}"; fi
 
@@ -10334,7 +10339,7 @@ run_mail_hook_selftests() {
   printf -- '---\nreview_after: 2099-01-01\n---\n' > "${d}/.claude/diary/2099-01-01-fresca.md"
   printf '# idx\n' > "${d}/.claude/diary/index.md"
   out="$(cd "${d}" && bash "${hook}")"
-  if printf '%s' "${out}" | grep -q '⏰.*1 migalha'; then
+  if _emit "${out}" | grep -q '⏰.*1 migalha'; then
     record_pass "mail-hook: ⏰ conta só review_after vencido (regressão RFC-0003 §2.3)"
   else record_fail "mail-hook: reflexão" "⏰ errado: ${out}"; fi
 
@@ -10366,7 +10371,7 @@ run_guardrails_selftests() {
     if [ ! -f "${gdir}/${t}.sh" ]; then record_fail "guardrails: ${t}" "harness ausente: ${gdir}/${t}.sh"; continue; fi
     rc=0; out="$(bash "${gdir}/${t}.sh" 2>&1)" || rc=$?
     if [ "${rc}" -eq 0 ]; then
-      record_pass "guardrails: ${t}.sh dogfood adversarial ($(printf '%s' "${out}" | sed -n 's/.*== resultado: \([0-9]* passaram.*\) ==/\1/p' | tail -1))"
+      record_pass "guardrails: ${t}.sh dogfood adversarial ($(_emit "${out}" | sed -n 's/.*== resultado: \([0-9]* passaram.*\) ==/\1/p' | tail -1))"
     else
       record_fail "guardrails: ${t}.sh" "dogfood reprovou (exit ${rc}) — $(printf '%s' "${out}" | grep '❌' | head -1)"
     fi
@@ -10532,11 +10537,11 @@ run_cycle_completion_selftests() {
   printf '## NEXT\n(sem campo de status)\n'          > "${d}/s-nosignal/STATE.md"
   touch -d '60 days ago' "${d}/s-stale/STATE.md" 2>/dev/null || true
   out="$(ONION_SESSIONS_DIR="${d}" bash "${helper}" --summary-json --stale-days 21 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '"total":4' \
-     && printf '%s' "${out}" | grep -q '"done":1' \
-     && printf '%s' "${out}" | grep -q '"open_abandoned":1' \
-     && printf '%s' "${out}" | grep -q '"no_signal":1' \
-     && printf '%s' "${out}" | grep -q '"with_signal":3'; then
+  if _emit "${out}" | grep -q '"total":4' \
+     && _emit "${out}" | grep -q '"done":1' \
+     && _emit "${out}" | grep -q '"open_abandoned":1' \
+     && _emit "${out}" | grep -q '"no_signal":1' \
+     && _emit "${out}" | grep -q '"with_signal":3'; then
     record_pass "cycle-completion: classifica done/open-stale/no-signal + denominador exclui no-signal"
   else record_fail "cycle-completion: classificação" "esperado total4/done1/aband1/nosignal1/with3, veio: ${out}"; fi
   rm -rf "${d}"
@@ -10544,7 +10549,7 @@ run_cycle_completion_selftests() {
   d="$(mktemp -d)"; mkdir -p "${d}/s"
   printf '## NEXT\nphase: DONE (F0-F6)\nphase_title: x\n' > "${d}/s/STATE.md"
   out="$(ONION_SESSIONS_DIR="${d}" bash "${helper}" --summary-json 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '"done":1'; then
+  if _emit "${out}" | grep -q '"done":1'; then
     record_pass "cycle-completion: phase:DONE sem status: → conta como concluída"
   else record_fail "cycle-completion: phase:DONE" "não contou phase:DONE como done: ${out}"; fi
   rm -rf "${d}"
@@ -10563,10 +10568,10 @@ run_federation_engagement_selftests() {
   : > "${d}/outbox/m-active/_processed/${today}-x.md"
   : > "${d}/outbox/m-dormant/_processed/${old}-y.md"
   out="$(ONION_FED_DIR="${d}" bash "${helper}" --summary-json --dormant-days 30 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '"members":3' \
-     && printf '%s' "${out}" | grep -q '"active":1' \
-     && printf '%s' "${out}" | grep -q '"dormant":1' \
-     && printf '%s' "${out}" | grep -q '"never":1'; then
+  if _emit "${out}" | grep -q '"members":3' \
+     && _emit "${out}" | grep -q '"active":1' \
+     && _emit "${out}" | grep -q '"dormant":1' \
+     && _emit "${out}" | grep -q '"never":1'; then
     record_pass "federation-engagement: active/dormant/never + exclui o core"
   else record_fail "federation-engagement" "esperado members3/active1/dormant1/never1, veio: ${out}"; fi
   rm -rf "${d}"
@@ -10585,10 +10590,10 @@ run_context_freshness_metric_selftests() {
   printf '# doc velho\n\n**Última Atualização:** %s\n' "${old}" > "${d}/tc/b.md"
   printf '# doc sem carimbo\n(nada)\n' > "${d}/cc/c.md"
   out="$(ONION_CONTEXT_DIRS="${d}/bc ${d}/tc ${d}/cc" bash "${helper}" --summary-json --months 18 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '"docs":3' \
-     && printf '%s' "${out}" | grep -q '"current":1' \
-     && printf '%s' "${out}" | grep -q '"stale":1' \
-     && printf '%s' "${out}" | grep -q '"no_stamp":1'; then
+  if _emit "${out}" | grep -q '"docs":3' \
+     && _emit "${out}" | grep -q '"current":1' \
+     && _emit "${out}" | grep -q '"stale":1' \
+     && _emit "${out}" | grep -q '"no_stamp":1'; then
     record_pass "context-freshness-metric: current/stale/no-stamp + denominador exclui no-stamp"
   else record_fail "context-freshness-metric" "esperado docs3/current1/stale1/nostamp1, veio: ${out}"; fi
   rm -rf "${d}"
@@ -10628,7 +10633,7 @@ run_session_velocity_selftests() {
   led="$(mktemp)"
   printf '{"duration_s":3600}\n{"duration_s":7200}\n{"duration_s":1800}\n' > "${led}"
   out="$(ONION_LIFECYCLE_LEDGER="${led}" bash "${vel}" --summary-json 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '"sessions":3' && printf '%s' "${out}" | grep -q '"median_seconds":"3600"'; then
+  if _emit "${out}" | grep -q '"sessions":3' && _emit "${out}" | grep -q '"median_seconds":"3600"'; then
     record_pass "session-velocity: lê ledger → mediana correta"
   else record_fail "session-velocity: mediana" "esperado sessions3/median3600, veio: ${out}"; fi
   rm -f "${led}"
@@ -10742,8 +10747,8 @@ run_selftest_lanes_selftests() {
   # (a) --list: só nomes, ≥100, inclui fixtures e vendor_pin
   out="$(bash "${sut}" --list 2>/dev/null || true)"
   n="$(printf '%s\n' "${out}" | grep -c .)"
-  if [ "${n}" -ge 100 ] && ! printf '%s\n' "${out}" | grep -qvE '^[a-z0-9_]+$' \
-     && printf '%s\n' "${out}" | grep -qx fixtures && printf '%s\n' "${out}" | grep -qx vendor_pin; then
+  if [ "${n}" -ge 100 ] && ! _emit "${out}" | grep -qvE '^[a-z0-9_]+$' \
+     && _emit "${out}" | grep -qx fixtures && _emit "${out}" | grep -qx vendor_pin; then
     record_pass "selftest-lanes: (a) --list = ${n} nomes puros, com fixtures e vendor_pin"
   else record_fail "selftest-lanes: (a) --list" "n=${n}; linhas não-nome: $(printf '%s\n' "${out}" | grep -vE '^[a-z0-9_]+$' | head -2 | tr '\n' '|')"; fi
   # (b) GUARDA DA FANTASMA: toda família definida é invocada no top-level (definições == --list)
@@ -10754,7 +10759,7 @@ run_selftest_lanes_selftests() {
   # (c) --families roda SÓ a família pedida (ladder_integrity = 1 caso)
   out="$(bash "${sut}" --families ladder_integrity 2>&1 || true)"
   n="$(printf '%s\n' "${out}" | grep -c '^  ✓' || true)"
-  if [ "${n}" -eq 1 ] && printf '%s\n' "${out}" | grep -q '^OK ✓'; then
+  if [ "${n}" -eq 1 ] && _emit "${out}" | grep -q '^OK ✓'; then
     record_pass "selftest-lanes: (c) --families ladder_integrity ⇒ 1 ✓ e OK"
   else record_fail "selftest-lanes: (c) --families" "✓=${n}; $(printf '%s\n' "${out}" | tail -1)"; fi
   # (d) --map cobre toda família listada
@@ -10764,17 +10769,17 @@ run_selftest_lanes_selftests() {
   else record_fail "selftest-lanes: (d) --map" "sem entrada: ${missing:-<mapa vazio>}"; fi
   # (e) --affected por helper conhecido seleciona a família dele e NÃO as outras
   out="$(bash "${sut}" --affected .claude/validation/ladder-integrity-check.sh --dry-run 2>&1 || true)"
-  if printf '%s\n' "${out}" | grep -q '^dry-run: famílias=.*ladder_integrity' && ! printf '%s\n' "${out}" | grep -q 'vendor_pin'; then
+  if _emit "${out}" | grep -q '^dry-run: famílias=.*ladder_integrity' && ! _emit "${out}" | grep -q 'vendor_pin'; then
     record_pass "selftest-lanes: (e) --affected helper ⇒ seleciona ladder_integrity, não vendor_pin"
   else record_fail "selftest-lanes: (e) --affected" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
   # (f) failsafe: infraestrutura da bancada ⇒ TUDO
   out="$(bash "${sut}" --affected .claude/validation/lint-artifacts.sh --dry-run 2>&1 || true)"
-  if printf '%s\n' "${out}" | grep -q 'famílias=<todas>' && printf '%s\n' "${out}" | grep -q 'failsafe'; then
+  if _emit "${out}" | grep -q 'famílias=<todas>' && _emit "${out}" | grep -q 'failsafe'; then
     record_pass "selftest-lanes: (f) failsafe: lint-artifacts.sh ⇒ todas"
   else record_fail "selftest-lanes: (f) failsafe infra" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
   # (g) failsafe: arquivo do domínio citado por ninguém ⇒ TUDO (recusa no incerto)
   out="$(bash "${sut}" --affected .claude/validation/zz-nao-existe.sh --dry-run 2>&1 || true)"
-  if printf '%s\n' "${out}" | grep -q 'famílias=<todas>' && printf '%s\n' "${out}" | grep -q 'nenhuma família'; then
+  if _emit "${out}" | grep -q 'famílias=<todas>' && _emit "${out}" | grep -q 'nenhuma família'; then
     record_pass "selftest-lanes: (g) failsafe: arquivo desconhecido no domínio ⇒ todas"
   else record_fail "selftest-lanes: (g) failsafe desconhecido" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
   # (h)(i)(j) cópia hermética com famílias sintéticas (REPO_ROOT da cópia = sandbox)
@@ -10792,25 +10797,25 @@ s=s[:k]+syn+s[k:]; open(p,"w").write(s)
 PYI
   local copy="${d}/.claude/validation/lint-selftest.sh"
   out="$(bash "${copy}" --families zz_ok,zz_ok2 --jobs 2 2>&1)" && rc=0 || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s\n' "${out}" | grep -q 'Passaram : 2' && printf '%s\n' "${out}" | grep -q 'faixa paralela: 2 famílias / 2 workers'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q 'Passaram : 2' && _emit "${out}" | grep -q 'faixa paralela: 2 famílias / 2 workers'; then
     record_pass "selftest-lanes: (h) --jobs 2 agrega 2 workers ⇒ Passaram 2, exit 0"
   else record_fail "selftest-lanes: (h) --jobs agrega" "rc=${rc}; $(printf '%s\n' "${out}" | grep -E 'Passaram|faixa' | tr '\n' '|' | cut -c1-140)"; fi
   out="$(bash "${copy}" --families zz_ok,zz_abort --jobs 2 2>&1)" && rc=0 || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s\n' "${out}" | grep -q 'ABORTOU sem somar' && printf '%s\n' "${out}" | grep -q 'zz_abort reivindicada e NÃO concluída' && ! printf '%s\n' "${out}" | grep -q '^OK ✓'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'ABORTOU sem somar' && _emit "${out}" | grep -q 'zz_abort reivindicada e NÃO concluída' && ! _emit "${out}" | grep -q '^OK ✓'; then
     record_pass "selftest-lanes: (i) worker que aborta ⇒ FALHA no pai (exit 1): sem trailer + família reivindicada-e-não-concluída nomeada"
   else record_fail "selftest-lanes: (i) worker abortado" "rc=${rc}; $(printf '%s\n' "${out}" | grep -E 'ABORTOU|Passaram|^OK|FALHOU' | tr '\n' '|' | cut -c1-160)"; fi
   out="$(bash "${copy}" --families zz_ok --child 2>&1 || true)"
-  if printf '%s\n' "${out}" | grep -qx '#ONION_SELFTEST_COUNTS 1 0 0'; then
+  if _emit "${out}" | grep -qx '#ONION_SELFTEST_COUNTS 1 0 0'; then
     record_pass "selftest-lanes: (j) --child imprime o trailer de soma (1 0 0)"
   else record_fail "selftest-lanes: (j) trailer" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
   # (k) default = serial, tudo (comportamento antigo preservado)
   out="$(bash "${copy}" --dry-run 2>&1 || true)"
-  if printf '%s\n' "${out}" | grep -qx 'dry-run: famílias=<todas> jobs=1'; then
+  if _emit "${out}" | grep -qx 'dry-run: famílias=<todas> jobs=1'; then
     record_pass "selftest-lanes: (k) sem argumento = serial e todas as famílias (compat)"
   else record_fail "selftest-lanes: (k) default" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
   # (l) VACUIDADE: seleção que não exerce guarda nenhuma NÃO é verde
   out="$(bash "${copy}" --families zz_nao_existe 2>&1)" && rc=0 || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s\n' "${out}" | grep -q 'NENHUMA guarda foi exercida'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'NENHUMA guarda foi exercida'; then
     record_pass "selftest-lanes: (l) --families inexistente ⇒ FALHOU por vacuidade (0 guardas ≠ verde)"
   else record_fail "selftest-lanes: (l) vacuidade" "rc=${rc}; $(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
   # (m) SHARD do manifest: 4 fixtures reais no manifest da cópia; 2 workers ⇒ cada linha exatamente uma vez
@@ -10818,11 +10823,11 @@ PYI
   { grep -E '^kind' "${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv"; grep -E '^lint' "${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv" | sed -n '1,4p'; } > "${mf}"   # sed drena: `| head` dava EPIPE ao grep (exit 2) e matou o worker 0 no CI (2 cores)
   out="$(bash "${copy}" --families fixtures --jobs 2 2>&1)" && rc=0 || rc=$?
   n="$(printf '%s\n' "${out}" | grep -c '^  ✓' || true)"
-  if [ "${rc}" -eq 0 ] && [ "${n}" -eq 4 ] && printf '%s\n' "${out}" | grep -q 'Passaram : 4'; then
+  if [ "${rc}" -eq 0 ] && [ "${n}" -eq 4 ] && _emit "${out}" | grep -q 'Passaram : 4'; then
     record_pass "selftest-lanes: (m) fixtures fatiada em 2 workers ⇒ 4 casos, cada linha do manifest uma vez"
   else record_fail "selftest-lanes: (m) shard" "rc=${rc} ✓=${n}; $(printf '%s\n' "${out}" | grep -E 'Passaram|ABORTOU' | tr '\n' '|' | cut -c1-120)"; fi
   out="$(ONION_SELFTEST_SHARD=1/2 bash "${copy}" --families fixtures --child 2>&1 || true)"
-  if printf '%s\n' "${out}" | grep -qx '#ONION_SELFTEST_COUNTS 2 0 0'; then
+  if _emit "${out}" | grep -qx '#ONION_SELFTEST_COUNTS 2 0 0'; then
     record_pass "selftest-lanes: (n) ONION_SELFTEST_SHARD=1/2 ⇒ metade do manifest (2 de 4)"
   else record_fail "selftest-lanes: (n) shard child" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
   rm -rf "${d}"
@@ -10872,15 +10877,15 @@ printf "%s/%s" "${PASS}" "${SKIP}"' 2>/dev/null || true)"
   # (d) STRICT=1 + skip ⇒ exit 1 (asserção de capacidade — o modo do CI).
   rc=0; out="$(bash -c 'PASS=3; FAIL=0; SKIP=2; FAILED_CASES=(); SKIPPED_CASES=(x y); STRICT=1
 '"${block}"'' 2>&1)" || rc=$?
-  if [ "${rc}" -eq 1 ] && printf '%s' "${out}" | grep -q 'FALHOU (STRICT)'; then
+  if [ "${rc}" -eq 1 ] && _emit "${out}" | grep -q 'FALHOU (STRICT)'; then
     record_pass "selftest-outcomes: (d) STRICT=1 + skip ⇒ exit 1 (CI não aceita 'não verifiquei')"
   else record_fail "selftest-outcomes: (d) strict" "esperava exit 1 + 'FALHOU (STRICT)'; rc=${rc} out=${out}"; fi
 
   # (e) sem STRICT ⇒ exit 0, MAS os pulados aparecem: gracioso não pode ser silencioso.
   rc=0; out="$(bash -c 'PASS=3; FAIL=0; SKIP=2; FAILED_CASES=(); SKIPPED_CASES=(x y); STRICT=0
 '"${block}"'' 2>&1)" || rc=$?
-  if [ "${rc}" -eq 0 ] && printf '%s' "${out}" | grep -q 'NÃO VERIFICADOS' \
-     && printf '%s' "${out}" | grep -q 'Pularam  : 2'; then
+  if [ "${rc}" -eq 0 ] && _emit "${out}" | grep -q 'NÃO VERIFICADOS' \
+     && _emit "${out}" | grep -q 'Pularam  : 2'; then
     record_pass "selftest-outcomes: (e) sem STRICT ⇒ exit 0 com os ⊘ VISÍVEIS (gracioso ≠ silencioso)"
   else record_fail "selftest-outcomes: (e) visibilidade" "esperava exit 0 + contagem/lista de pulados; rc=${rc} out=${out}"; fi
 
@@ -10921,7 +10926,7 @@ run_kg_reverify_schema_selftests() {
   #     string livre nunca conferida; um 7º caso deixaria a bancada anunciando número morto).
   local st_out
   st_out="$(bash "${chk}" --selftest 2>&1)" || true
-  if printf '%s\n' "${st_out}" | grep -qE '^[0-9]+/[0-9]+ ' && ! printf '%s\n' "${st_out}" | grep -q '✗'; then
+  if _emit "${st_out}" | grep -qE '^[0-9]+/[0-9]+ ' && ! _emit "${st_out}" | grep -q '✗'; then
     record_pass "kg-reverify-schema: selftest embutido verde ($(printf '%s' "${st_out}" | grep -oE '^[0-9]+/[0-9]+' | tail -1))"
   else
     # (2026-09-03) 3ª reprovação desta guarda no gate com o helper passando isolado (24/24 sob 8× concorrência):
@@ -10946,7 +10951,7 @@ run_kg_reverify_schema_selftests() {
   local m_out m_rc=0
   m_out="$(bash "${mroot}/.claude/validation/kg-reverify-schema-check.sh" 2>&1)" || m_rc=$?
   rm -rf "${mroot}"
-  if [ "${m_rc}" -eq 1 ] && printf '%s\n' "${m_out}" | grep -q "REQUIRED-DUPLICADO"; then
+  if [ "${m_rc}" -eq 1 ] && _emit "${m_out}" | grep -q "REQUIRED-DUPLICADO"; then
     record_pass "kg-reverify-schema: MUTANTE (required duplicado) é ACUSADO no caminho de produção"
   else
     record_fail "kg-reverify-schema: mutante" "required duplicado NÃO foi acusado (rc=${m_rc}) — a guarda absolve sem medir"
@@ -10974,7 +10979,7 @@ run_hook_autofix_selftests() {
   ( cd "${hc}/repo" && printf '\n<!-- catraca-dir -->\n' >> .claude/commands/engineer/plan.md \
     && git add .claude/commands/engineer/plan.md ) >/dev/null 2>&1
   out="$(cd "${hc}/repo" && bash "${blk}" 2>&1)" || true
-  if printf '%s\n' "${out}" | grep -q "onion-engineering" && printf '%s\n' "${out}" | grep -q "BLOCO_FIM"; then
+  if _emit "${out}" | grep -q "onion-engineering" && _emit "${out}" | grep -q "BLOCO_FIM"; then
     record_pass "hook-autofix: (a) fonte em entrada-DIRETÓRIO dispara a regeneração (a cegueira da v1 não volta)"
   else
     record_fail "hook-autofix: (a) entrada-dir" "não regenerou — o matcher regrediu para grep textual?"
@@ -10983,7 +10988,7 @@ run_hook_autofix_selftests() {
   # (b) GIT_INDEX_FILE temporário PULA com aviso (o revert-fantasma do commit-por-pathspec não volta)
   ( cd "${hc}/repo" && printf '\n<!-- x -->\n' >> .claude/commands/meta/kg.md && git add .claude/commands/meta/kg.md ) >/dev/null 2>&1
   out="$(cd "${hc}/repo" && GIT_INDEX_FILE=".git/next-index-999.lock" bash "${blk}" 2>&1)" || true
-  if printf '%s\n' "${out}" | grep -q "PULADO" && ! printf '%s\n' "${out}" | grep -q "🔁"; then
+  if _emit "${out}" | grep -q "PULADO" && ! _emit "${out}" | grep -q "🔁"; then
     record_pass "hook-autofix: (b) índice temporário pula com aviso (sem revert fantasma)"
   else
     record_fail "hook-autofix: (b) índice temporário" "não pulou — o gate por GIT_INDEX_FILE sumiu?"
@@ -10994,7 +10999,7 @@ run_hook_autofix_selftests() {
     && git add .claude/commands/meta/kg.md && printf '\n<!-- unstaged -->\n' >> .claude/commands/meta/kg.md ) >/dev/null 2>&1
   local rc_c=0
   out="$(cd "${hc}/repo" && bash "${blk}" 2>&1)" || rc_c=$?
-  if [ "${rc_c}" -ne 0 ] && printf '%s\n' "${out}" | grep -q "ABORTADO"; then
+  if [ "${rc_c}" -ne 0 ] && _emit "${out}" | grep -q "ABORTADO"; then
     record_pass "hook-autofix: (c) staging parcial aborta com instrução (WIP não vaza para o plugin)"
   else
     record_fail "hook-autofix: (c) staging parcial" "não abortou (rc=${rc_c}) — o assemble publicaria WIP não-staged"
@@ -11002,7 +11007,7 @@ run_hook_autofix_selftests() {
   # (d) R19 alterada: assemble FALHO acusa E SOMA (era morte rc=2 sem sumário)
   ( cd "${hc}/repo" && rm -rf .claude/skills/onion-orchestration ) >/dev/null 2>&1
   out="$(cd "${hc}/repo" && bash .claude/validation/lint-artifacts.sh --only="${hc}/repo/.claude/utils/marketplace/verticals/onion-work-tools.manifest.sh" 2>&1)" || true
-  if printf '%s\n' "${out}" | grep -q "assemble FALHOU" && printf '%s\n' "${out}" | grep -q "Sumário"; then
+  if _emit "${out}" | grep -q "assemble FALHOU" && _emit "${out}" | grep -q "Sumário"; then
     record_pass "hook-autofix: (d) assemble falho vira violation E o lint soma (morte silenciosa não volta)"
   else
     record_fail "hook-autofix: (d) assemble falho" "não acusou ou não somou — a R19 regrediu para morte rc=2?"
@@ -11070,7 +11075,7 @@ run_realign_selftests() {
     if [ "${rc}" != "${wantrc}" ]; then
       record_fail "realign: ${name} (rc)" "esperava rc=${wantrc}, veio rc=${rc}: ${out}"; continue
     fi
-    if printf '%s' "${out}" | grep -qF "${want}"; then
+    if _emit "${out}" | grep -qF "${want}"; then
       record_pass "realign: ${name} classifica e sela (rc=${rc})"
     else
       record_fail "realign: ${name} (classificação)" "esperava '${want}' em: ${out}"
@@ -11127,19 +11132,19 @@ FIX
   if [ "${n_port}" -eq 1 ] && [ "${n_fall}" -eq 1 ]; then
     record_pass "compose-exposure: acusa porta sem bind E fallback de segredo (1+1); o 127.0.0.1 cala"
   else
-    record_fail "compose-exposure: acusação" "esperava 1+1; veio porta=${n_port} fallback=${n_fall}: $(printf '%s' "${out}" | head -2)"
+    record_fail "compose-exposure: acusação" "esperava 1+1; veio porta=${n_port} fallback=${n_fall}: $(_emit "${out}" | head -2)"
   fi
   sed -i 's|- 5435:5432|- 127.0.0.1:5435:5432|; s|${DB_PASSWORD:-postgres123}|${DB_PASSWORD:?defina}|' "$d/docker-compose.yml"
   ( cd "$d" && git add -A )
   out="$(cd "$d" && REPO_ROOT="$d" bash -c 'violation(){ echo "V[$1] $2 :: $3"; }; source f.sh; check_compose_exposure' 2>&1)" || true
-  if printf '%s\n' "${out}" | grep -q 'REGRA 64'; then
+  if _emit "${out}" | grep -q 'REGRA 64'; then
     record_fail "compose-exposure: falso-positivo" "compose curado ainda acusa"
   else
     record_pass "compose-exposure: compose curado passa limpo"
   fi
   printf 'services:\n  x:\n    ports:\n      - 9999:9999\n' > "$d/docker-compose.dev.yml"
   out="$(cd "$d" && REPO_ROOT="$d" bash -c 'violation(){ echo "V[$1] $2 :: $3"; }; source f.sh; check_compose_exposure' 2>&1)" || true
-  if printf '%s\n' "${out}" | grep -q '9999'; then
+  if _emit "${out}" | grep -q '9999'; then
     record_fail "compose-exposure: escopo" "UNTRACKED foi acusado — escopo declarado é git ls-files"
   else
     record_pass "compose-exposure: untracked fica fora (rascunho não é artefato)"
@@ -11151,12 +11156,12 @@ FIX
   ( cd "$d" && REPO_ROOT="$d" bash "${REPO_ROOT}/.claude/validation/compose-exposure-check.sh" --emit-baseline > .claude-baseline.txt 2>/dev/null ) || true
   mkdir -p "$d/.claude/validation" && mv "$d/.claude-baseline.txt" "$d/.claude/validation/compose-exposure-baseline.txt"
   out="$(cd "$d" && REPO_ROOT="$d" bash -c 'violation(){ echo "V[$1] $2 :: $3"; }; source f.sh; check_compose_exposure' 2>&1)" || true
-  if printf '%s\n' "${out}" | grep -q 'V\[HARD\]'; then
+  if _emit "${out}" | grep -q 'V\[HARD\]'; then
     record_fail "compose-exposure: catraca" "dívida emitida pelo emissor AINDA sai HARD — receita de chave divergiu entre emissor e lint"
-  elif printf '%s\n' "${out}" | grep -q 'toleradas pelo baseline'; then
+  elif _emit "${out}" | grep -q 'toleradas pelo baseline'; then
     record_pass "compose-exposure: catraca — dívida legada tolerada (SOFT agregado), paridade emissor↔lint provada"
   else
-    record_fail "compose-exposure: catraca" "nem HARD nem SOFT agregado — a guarda calou: $(printf '%s' "${out}" | head -1)"
+    record_fail "compose-exposure: catraca" "nem HARD nem SOFT agregado — a guarda calou: $(_emit "${out}" | head -1)"
   fi
   printf '    ports:\n      - 7777:7777\n' >> "$d/docker-compose.yml"
   ( cd "$d" && git add -A )
@@ -11165,10 +11170,10 @@ FIX
   # exatamente 1 HARD (a linha nova) com a dívida antiga ainda tolerada (SOFT agregado presente).
   local n_hard
   n_hard="$(printf '%s\n' "${out}" | grep -c 'V\[HARD\]' || true)"
-  if [ "${n_hard}" -eq 1 ] && printf '%s\n' "${out}" | grep -q 'toleradas pelo baseline'; then
+  if [ "${n_hard}" -eq 1 ] && _emit "${out}" | grep -q 'toleradas pelo baseline'; then
     record_pass "compose-exposure: linha NOVA fora do baseline segue HARD (1 exata) com o legado ainda tolerado"
   else
-    record_fail "compose-exposure: crescimento" "esperava 1 HARD + SOFT agregado; veio hard=${n_hard}: $(printf '%s' "${out}" | head -2)"
+    record_fail "compose-exposure: crescimento" "esperava 1 HARD + SOFT agregado; veio hard=${n_hard}: $(_emit "${out}" | head -2)"
   fi
   rm -rf "$d"
 }
@@ -11231,7 +11236,7 @@ PY
 
   # (a) SEM resíduo → HARD
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'não há resíduo de revisão'; then
+  if _emit "${out}" | grep -q 'não há resíduo de revisão'; then
     record_pass "harvest-residue: colheita SEM resíduo → HARD"
   else record_fail "harvest-residue: sem resíduo" "a guarda não pegou colheita sem resíduo: ${out}"; fi
 
@@ -11239,8 +11244,8 @@ PY
   printf -- '---\ntitle: x\n---\nColhi N_PRIMEIRO.\n' > "${sb}/docs/evolution/review/test-harvest-case.md"
   ( cd "${sb}" && git add -A && git -c user.email=t@t -c user.name=t commit -qam parcial ) >/dev/null 2>&1 || true
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'colheita sem registro' && printf '%s' "${out}" | grep -q 'N_SEGUNDO' \
-     && ! printf '%s' "${out}" | grep -q -- '— N_PRIMEIRO'; then
+  if _emit "${out}" | grep -q 'colheita sem registro' && _emit "${out}" | grep -q 'N_SEGUNDO' \
+     && ! _emit "${out}" | grep -q -- '— N_PRIMEIRO'; then
     record_pass "harvest-residue: resíduo PARCIAL → HARD só sobre o id não-nomeado"
   else record_fail "harvest-residue: parcial" "esperava HARD citando N_SEGUNDO e não N_PRIMEIRO: ${out}"; fi
 
@@ -11248,7 +11253,7 @@ PY
   printf -- '---\ntitle: x\n---\nColhi N_PRIMEIRO e N_SEGUNDO.\n' > "${sb}/docs/evolution/review/test-harvest-case.md"
   ( cd "${sb}" && git add -A && git -c user.email=t@t -c user.name=t commit -qam completo ) >/dev/null 2>&1 || true
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
-  if ! printf '%s' "${out}" | grep -q 'colheita sem registro'; then
+  if ! _emit "${out}" | grep -q 'colheita sem registro'; then
     record_pass "harvest-residue: resíduo COMPLETO → guarda cala (sem falso-positivo)"
   else record_fail "harvest-residue: completo" "falso-positivo com resíduo completo: ${out}"; fi
 
@@ -11259,7 +11264,7 @@ PY
   ( cd "${sbo}" && git init -q -b solta && git add -A \
     && git -c user.email=t@t -c user.name=t commit -qm unica ) >/dev/null 2>&1 || true
   out="$(cd "${sbo}" && bash .claude/validation/lint-artifacts.sh --only="${sbo}/CLAUDE.md" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'REGRA 63 nao pode julgar'; then
+  if _emit "${out}" | grep -q 'REGRA 63 nao pode julgar'; then
     record_pass "harvest-residue: sem base resolvível → SOFT que DECLARA (não silêncio)"
   else record_fail "harvest-residue: sem base" "a guarda ficou MUDA sem base — é o fail-open que a matava no CI: ${out}"; fi
   rm -rf "${sbo}" "${sb}"
@@ -11285,10 +11290,10 @@ run_sdaal_workflows_selftests() {
     source <(sed -n "/^check_no_direct_provider_calls()/,/^}$/p" "'"${SCRIPT_DIR}"'/lint-artifacts.sh")
     check_no_direct_provider_calls
   ' 2>&1)"
-  if printf '%s' "${out}" | grep -q 'provider em WORKFLOW' && printf '%s' "${out}" | grep -q 'bad.yml'; then
+  if _emit "${out}" | grep -q 'provider em WORKFLOW' && _emit "${out}" | grep -q 'bad.yml'; then
     record_pass "sdaal-workflows: (a) provider direto em .github/workflows é HARD"
   else record_fail "sdaal-workflows: (a)" "não mordeu: ${out}"; fi
-  if printf '%s' "${out}" | grep -q 'good.yml'; then
+  if _emit "${out}" | grep -q 'good.yml'; then
     record_fail "sdaal-workflows: (b)" "workflow limpo acusado: ${out}"
   else record_pass "sdaal-workflows: (b) workflow limpo fica em silêncio"; fi
   rm -rf "$d"
@@ -11303,26 +11308,26 @@ run_census_extract_selftests() {
   printf '**2 itens abertos**\n| 9.0 | `N_FRESCO` | fx | a |\n| 3.0 | `N_VELHO` | fx | b |\n' > "$d/backlog.md"
   # (a) partição correta FRESCO/A-MEDIR
   out="$(cd "$d" && ONION_CENSUS_ROOT="$d" ONION_CENSUS_BACKLOG="$d/backlog.md" bash "${ex}" --format summary 2>&1)"; rc=$?
-  if [ $rc -eq 0 ] && printf '%s' "$out" | grep -q '1 A-MEDIR' && printf '%s' "$out" | grep -q '1 FRESCOS'; then
+  if [ $rc -eq 0 ] && _emit "$out" | grep -q '1 A-MEDIR' && _emit "$out" | grep -q '1 FRESCOS'; then
     record_pass "census-extract: (a) partição FRESCO/A-MEDIR correta na fixture sintética"
   else record_fail "census-extract: (a)" "partição errada (rc=$rc): $out"; fi
   # (b) descompasso contagem ⇒ exit 2 fail-loud
   printf '**5 itens abertos**\n| 9.0 | `N_FRESCO` | fx | a |\n' > "$d/backlog.md"
   rc=0; out="$(cd "$d" && ONION_CENSUS_ROOT="$d" ONION_CENSUS_BACKLOG="$d/backlog.md" bash "${ex}" 2>&1)" || rc=$?
-  if [ $rc -eq 2 ] && printf '%s' "$out" | grep -q 'FAIL-LOUD'; then
+  if [ $rc -eq 2 ] && _emit "$out" | grep -q 'FAIL-LOUD'; then
     record_pass "census-extract: (b) contagem divergente é exit 2 fail-loud (população errada não se mede)"
   else record_fail "census-extract: (b)" "descompasso não reprovou (rc=$rc): $out"; fi
   # (c) --floor corta e DECLARA
   printf '**2 itens abertos**\n| 9.0 | `N_FRESCO` | fx | a |\n| 3.0 | `N_VELHO` | fx | b |\n' > "$d/backlog.md"
   out="$(cd "$d" && ONION_CENSUS_ROOT="$d" ONION_CENSUS_BACKLOG="$d/backlog.md" bash "${ex}" --floor 5 --format summary 2>&1)"; rc=$?
-  if [ $rc -eq 0 ] && printf '%s' "$out" | grep -q '1 cortados pelo piso 5.0 (corte DECLARADO)'; then
+  if [ $rc -eq 0 ] && _emit "$out" | grep -q '1 cortados pelo piso 5.0 (corte DECLARADO)'; then
     record_pass "census-extract: (c) --floor corta e o corte é DECLARADO (nunca silêncio)"
   else record_fail "census-extract: (c)" "piso sem declaração (rc=$rc): $out"; fi
   # (d) TESTEMUNHO sai NOMEADO, nunca para a fila de workers (medir relato é circular e custa 74k/nó)
   printf 'meta:\n  id: fx\nnodes:\n  - id: N_VELHO\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: 2026-01-01\n    label: "b"\n  - id: N_RELATO\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: 2026-01-01\n    verified_against: relato-x\n    evidence_class: testimony\n    label: "c"\n' > "$d/docs/onion/graph/fx.kg.yaml"
   printf '**2 itens abertos**\n| 9.0 | `N_VELHO` | fx | b |\n| 3.0 | `N_RELATO` | fx | c |\n' > "$d/backlog.md"
   out="$(cd "$d" && ONION_CENSUS_ROOT="$d" ONION_CENSUS_BACKLOG="$d/backlog.md" bash "${ex}" --format summary 2>&1)"; rc=$?
-  if [ $rc -eq 0 ] && printf '%s' "$out" | grep -q '1 A-MEDIR' && printf '%s' "$out" | grep -q '1 TESTEMUNHO'; then
+  if [ $rc -eq 0 ] && _emit "$out" | grep -q '1 A-MEDIR' && _emit "$out" | grep -q '1 TESTEMUNHO'; then
     record_pass "census-extract: (d) testimony sai da fila A-MEDIR, NOMEADO como TESTEMUNHO"
   else record_fail "census-extract: (d)" "testemunho não particionado (rc=$rc): $out"; fi
   rm -rf "$d"
@@ -11352,7 +11357,7 @@ run_members_registry_selftests() {
   # REGRA 66 — sem depender do estado do vivo além do caso (a), que é o canário da fixture
   local rc out
   rc=0; out="$(bash "${lint}" --only=docs/evolution/federation/members.yaml 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'REGRA 66'; then
+  if _emit "${out}" | grep -q 'REGRA 66'; then
     record_fail "members-registry: (a)" "o registro VIVO reprova no gate: ${out}"
   else record_pass "members-registry: (a) o members.yaml vivo passa no gate"; fi
 
@@ -11360,7 +11365,7 @@ run_members_registry_selftests() {
   local d; d="$(mktemp -d)"
   printf '# Registro de membros da co-evolução Onion (fixture)\nmembers:\n  - id: quebrado\n' > "$d/bad.yaml"
   rc=0; out="$(ONION_MEMBERS_FILE="$d/bad.yaml" bash "${lint}" --only=docs/evolution/federation/members.yaml 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'REGRA 66: registro da federação INVÁLIDO' && [ "${rc}" -ne 0 ]; then
+  if _emit "${out}" | grep -q 'REGRA 66: registro da federação INVÁLIDO' && [ "${rc}" -ne 0 ]; then
     record_pass "members-registry: (b) registro inválido é HARD com rc do validador"
   else record_fail "members-registry: (b)" "inválido não reprovou (rc=${rc}): ${out}"; fi
 
@@ -11383,25 +11388,25 @@ run_radar_staleness_selftests() {
 
   printf 'axes:\n  - id: EA\n    last_run: %s\n' "${fresh_date}" > "$d/fresco.yaml"
   rc=0; out="$(ONION_RADAR_BASELINES="$d/fresco.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'REGRA 65'; then
+  if _emit "${out}" | grep -q 'REGRA 65'; then
     record_fail "radar-staleness: (a)" "eixo fresco gerou violação: ${out}"
   else record_pass "radar-staleness: (a) eixo com rodada de hoje fica em silêncio"; fi
 
   printf 'axes:\n  - id: EB\n    last_run: 2026-01-01\n' > "$d/velho.yaml"
   rc=0; out="$(ONION_RADAR_BASELINES="$d/velho.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q "REGRA 65: eixo 'EB' do radar de mundo está VELHO"; then
+  if _emit "${out}" | grep -q "REGRA 65: eixo 'EB' do radar de mundo está VELHO"; then
     record_pass "radar-staleness: (b) eixo velho vira SOFT nomeando o eixo e a idade"
   else record_fail "radar-staleness: (b)" "eixo velho não acusado: ${out}"; fi
 
   printf 'axes:\n  - id: EC\n    last_run: ontem\n' > "$d/ruim.yaml"
   rc=0; out="$(ONION_RADAR_BASELINES="$d/ruim.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q "last_run ilegível" && [ "${rc}" -ne 0 ]; then
+  if _emit "${out}" | grep -q "last_run ilegível" && [ "${rc}" -ne 0 ]; then
     record_pass "radar-staleness: (c) data ilegível é HARD fail-loud (rc!=0)"
   else record_fail "radar-staleness: (c)" "data ilegível não reprovou (rc=${rc}): ${out}"; fi
 
   printf '# vazio\n' > "$d/vazio.yaml"
   rc=0; out="$(ONION_RADAR_BASELINES="$d/vazio.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'SEM eixos legíveis' && [ "${rc}" -ne 0 ]; then
+  if _emit "${out}" | grep -q 'SEM eixos legíveis' && [ "${rc}" -ne 0 ]; then
     record_pass "radar-staleness: (d) arquivo presente sem eixos é HARD (nunca conformidade por ausência)"
   else record_fail "radar-staleness: (d)" "baseline vazia passou (rc=${rc}): ${out}"; fi
 
@@ -11412,7 +11417,7 @@ run_radar_staleness_selftests() {
   chmod +x "$d/bin/date"
   printf 'axes:\n  - id: EE\n    last_run: 2026-01-01\n' > "$d/semd.yaml"
   rc=0; out="$(PATH="$d/bin:$PATH" ONION_RADAR_BASELINES="$d/semd.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'NÃO MEDIDA neste ambiente' && ! printf '%s' "${out}" | grep -q "eixo 'EE' com data não-computável"; then
+  if _emit "${out}" | grep -q 'NÃO MEDIDA neste ambiente' && ! _emit "${out}" | grep -q "eixo 'EE' com data não-computável"; then
     record_pass "radar-staleness: (e) ambiente sem date -d degrada SOFT declarando 'não medida' (nunca HARD no artefato)"
   else record_fail "radar-staleness: (e)" "degradação de ambiente errada (rc=${rc}): ${out}"; fi
 
@@ -11423,14 +11428,14 @@ run_radar_staleness_selftests() {
   # ONION_CC_EXECPATH= (definido-vazio) isola a bancada do CLAUDE_CODE_EXECPATH da sessão que a roda —
   # sem isso o caso muda de resultado conforme roda no CI (sem sessão) ou no pre-commit (dentro de uma).
   rc=0; out="$(ONION_CC_EXECPATH= ONION_CC_BIN="$d/bin/claude-stub" ONION_RADAR_BASELINES="$d/ccver.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'mudou de versão desde a última rodada de estratégia (rodada=1.0.0, instalado=9.9.9)'; then
+  if _emit "${out}" | grep -q 'mudou de versão desde a última rodada de estratégia (rodada=1.0.0, instalado=9.9.9)'; then
     record_pass "radar-staleness: (f) troca de versão do Claude Code dispara SOFT de re-medição de estratégia"
   else record_fail "radar-staleness: (f)" "gatilho de versão não disparou (rc=${rc}): ${out}"; fi
 
   # (g) PROCESSO > DISCO (2026-09-02): dentro de uma sessão a versão que importa é a do processo
   # (CLAUDE_CODE_EXECPATH); processo ≠ disco é um 2º SOFT próprio (cura = reiniciar, não radar).
   rc=0; out="$(ONION_CC_EXECPATH=/x/versions/2.1.247 ONION_CC_BIN="$d/bin/claude-stub" ONION_RADAR_BASELINES="$d/ccver.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'rodada=1.0.0, processo=2.1.247)' && printf '%s' "${out}" | grep -q 'roda o Claude Code 2.1.247 mas o disco já tem 9.9.9'; then
+  if _emit "${out}" | grep -q 'rodada=1.0.0, processo=2.1.247)' && _emit "${out}" | grep -q 'roda o Claude Code 2.1.247 mas o disco já tem 9.9.9'; then
     record_pass "radar-staleness: (g) sessão em binário velho: SOFT nomeia processo=2.1.247 + 2º SOFT processo≠disco (reinicie)"
   else record_fail "radar-staleness: (g)" "processo/disco não distinguidos (rc=${rc}): ${out}"; fi
 
@@ -11438,11 +11443,11 @@ run_radar_staleness_selftests() {
   printf 'axes:\n  - id: E6-fronteira-modelos\n    last_run: %s\n' "${fresh_date}" > "$d/sm-sem.yaml"
   printf 'axes:\n  - id: E6-fronteira-modelos\n    last_run: %s\n    session_models:\n      - claude-fable-5-1\n' "${fresh_date}" > "$d/sm-com.yaml"
   rc=0; out="$(ONION_SESSION_MODELS_FILE="$d/sm-sem.yaml" ONION_RADAR_BASELINES="$d/sm-com.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if [ "${rc}" -ne 0 ] && printf '%s' "${out}" | grep -q "SEM 'session_models:' legível"; then
+  if [ "${rc}" -ne 0 ] && _emit "${out}" | grep -q "SEM 'session_models:' legível"; then
     record_pass "radar-staleness: (h) baseline sem session_models ⇒ HARD (guarda de modelo não desarma por omissão)"
   else record_fail "radar-staleness: (h)" "esperava HARD nomeando session_models (rc=${rc}): ${out}"; fi
   rc=0; out="$(ONION_SESSION_MODELS_FILE="$d/sm-com.yaml" ONION_RADAR_BASELINES="$d/sm-com.yaml" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
-  if ! printf '%s' "${out}" | grep -q "session_models"; then
+  if ! _emit "${out}" | grep -q "session_models"; then
     record_pass "radar-staleness: (i) baseline com session_models ⇒ silêncio"
   else record_fail "radar-staleness: (i)" "falso positivo (rc=${rc}): ${out}"; fi
 
@@ -11473,14 +11478,14 @@ run_backlog_projection_selftests() {
   # (a) EM DIA → a regra cala. Roda ANTES do drift: se já viesse sujo, o caso (b) passaria
   #     por motivo errado e nunca saberíamos.
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'projeção desatualizada'; then
+  if _emit "${out}" | grep -q 'projeção desatualizada'; then
     record_fail "backlog-projection: em-dia" "acusou drift num sandbox pristino (falso-positivo): ${out}"
   else record_pass "backlog-projection: projeção em dia → regra cala"; fi
 
   # (b) DRIFT → HARD. O modo de falha que a guarda existe para pegar.
   printf '\nLINHA-INTRUSA-DO-SELFTEST\n' >> "${sb}/docs/backlog.md"
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'projeção desatualizada vs a fonte'; then
+  if _emit "${out}" | grep -q 'projeção desatualizada vs a fonte'; then
     record_pass "backlog-projection: drift → HARD (projeção que envelhece calada)"
   else record_fail "backlog-projection: drift" "a guarda NÃO pegou o drift: ${out}"; fi
 
@@ -11602,7 +11607,7 @@ run_drive_selftests() {
     if [ "${rc}" != "${wantrc}" ]; then
       record_fail "drive: ${name} (rc)" "esperava rc=${wantrc}, veio rc=${rc}: ${out}"; continue
     fi
-    if printf '%s' "${out}" | grep -qF "${want}"; then
+    if _emit "${out}" | grep -qF "${want}"; then
       record_pass "drive: ${name} censo/fila-pronta (rc=${rc})"
     else
       record_fail "drive: ${name} (censo)" "esperava '${want}' em: ${out}"
@@ -11623,12 +11628,12 @@ run_site_derivation_selftests() {
   printf 'x' > "${sb2}/site/dist/leak.html"
   ( cd "${sb2}" && git init -q . && git add site/dist ) >/dev/null 2>&1
   rc=0; out="$(bash "${sb2}/.claude/validation/lint-artifacts.sh" --only="${sb2}/CLAUDE.md" 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'DERIVACAO-COMMITADA'; then
+  if _emit "${out}" | grep -q 'DERIVACAO-COMMITADA'; then
     record_pass "site-derivation: (a) dist TRACKED em repo git → HARD"
   else record_fail "site-derivation: (a)" "dist tracked não acusou (rc=${rc})"; fi
   ( cd "${sb2}" && git rm -rq --cached site/dist ) >/dev/null 2>&1
   rc=0; out="$(bash "${sb2}/.claude/validation/lint-artifacts.sh" --only="${sb2}/CLAUDE.md" 2>&1)" || rc=$?
-  if ! printf '%s' "${out}" | grep -q 'DERIVACAO-COMMITADA'; then
+  if ! _emit "${out}" | grep -q 'DERIVACAO-COMMITADA'; then
     record_pass "site-derivation: (b) dist untracked → limpo"
   else record_fail "site-derivation: (b)" "falso-positivo com dist fora do índice"; fi
   # (c) VOLUME acima do buffer do pipe (~64KB de ls-files): a asserção que importa não é
@@ -11638,7 +11643,7 @@ run_site_derivation_selftests() {
   for i in $(seq 1 1500); do printf 'x' > "${sb2}/site/dist/f-longo-nome-para-encher-o-buffer-${i}.html"; done
   ( cd "${sb2}" && git add site/dist ) >/dev/null 2>&1
   rc=0; out="$(bash "${sb2}/.claude/validation/lint-artifacts.sh" --only="${sb2}/CLAUDE.md" 2>&1)" || rc=$?
-  if printf '%s' "${out}" | grep -q 'DERIVACAO-COMMITADA' && printf '%s' "${out}" | grep -q 'Sumário'; then
+  if _emit "${out}" | grep -q 'DERIVACAO-COMMITADA' && _emit "${out}" | grep -q 'Sumário'; then
     record_pass "site-derivation: (c) 1500 arquivos tracked → acusa E o lint chega ao sumário (rc=${rc}, não 141)"
   else record_fail "site-derivation: (c)" "sob volume: rc=${rc}; acusou=$(printf '%s' "${out}" | grep -c 'DERIVACAO-COMMITADA'); sumário=$(printf '%s' "${out}" | grep -c 'Sumário')"; fi
   rm -rf "${sb2}"
