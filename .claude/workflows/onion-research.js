@@ -33,6 +33,7 @@ if (!/^\d{4}-\d{2}-\d{2}$/.test(TODAY)) return { error: "args.today (AAAA-MM-DD)
 const SLUG = String(A.slug || 'research').replace(/[^a-z0-9-]/gi, '-').toLowerCase()
 const KG_PATH = String(A.kgPath || ('docs/evolution/research/' + SLUG + '-' + TODAY.slice(0, 7) + '/' + SLUG + '-' + TODAY.slice(0, 7) + '.kg.yaml'))
 const CORPUS = String(A.corpus || '')
+const MODE = String(A.mode || 'research')   // research | decision (F3): decision = Elenxo + nó D_ open para o maestro selar
 const MAX_FETCH = Number((A.budget && A.budget.maxFetch) || 15)
 const MAX_VERIFY_CLAIMS = Number((A.budget && A.budget.maxVerify) || 25)
 const VOTES_PER_CLAIM = 3
@@ -59,8 +60,17 @@ const REPORT_SCHEMA = { type: 'object', required: ['summary', 'findings', 'cavea
   findings: { type: 'array', items: { type: 'object', required: ['claim', 'confidence', 'sources', 'evidence'], properties: {
     claim: { type: 'string' }, confidence: { enum: ['high', 'medium', 'low'] }, sources: { type: 'array', items: { type: 'string' } }, evidence: { type: 'string' }, vote: { type: 'string' } } } },
   market: { type: 'string' }, caveats: { type: 'string' }, unverifiedList: { type: 'array', items: { type: 'string' } }, openQuestions: { type: 'array', items: { type: 'string' } } } }
+const ELENXO_SCHEMA = { type: 'object', required: ['objections', 'recommendation'], properties: {
+  objections: { type: 'array', items: { type: 'object', required: ['target', 'kind', 'survives', 'evidence'], properties: {
+    target: { type: 'string' }, kind: { enum: ['finding', 'discarded-by-evidence', 'discarded-by-comodismo'] }, survives: { type: 'boolean' }, evidence: { type: 'string' } } } },
+  recommendation: { type: 'string' }, options: { type: 'array', items: { type: 'string' } } } }
 const KG_SCHEMA = { type: 'object', required: ['kgPath', 'radarExit', 'nodes', 'edges', 'summary'], properties: {
-  kgPath: { type: 'string' }, radarExit: { type: 'integer' }, nodes: { type: 'integer' }, edges: { type: 'integer' }, summary: { type: 'string' } } }
+  kgPath: { type: 'string' }, radarExit: { type: 'integer' }, nodes: { type: 'integer' }, edges: { type: 'integer' }, summary: { type: 'string' },
+  decisionNodeId: { type: 'string' }, optionNodeIds: { type: 'array', items: { type: 'string' } }, constrainsEdges: { type: 'integer' } } }
+// modo decisão: o schema EXIGE o nó D_ e as arestas CONSTRAINS — a camada de tool força o agente a produzi-los.
+// (1º dogfood do F3: o patch mirou uma âncora inexistente e o agente NUNCA recebeu o bloco de decisão — 5 nós, 0 D_)
+const KG_SCHEMA_DECISION = { ...KG_SCHEMA, required: [...KG_SCHEMA.required, 'decisionNodeId', 'optionNodeIds', 'constrainsEdges'],
+  properties: { ...KG_SCHEMA.properties, decisionNodeId: { type: 'string', pattern: '^D_' }, optionNodeIds: { type: 'array', minItems: 2, items: { type: 'string' } }, constrainsEdges: { type: 'integer', minimum: 1 } } }
 
 // ─── Phase 0: Corpus (0 tokens — vem pronto da skill via kg-corpus-grep) ───
 phase('Corpus')
@@ -200,19 +210,39 @@ const report = confirmed.length === 0 ? null : await agent(
   '\n\n## Tarefa\nEscreva: summary (2-4 frases, resposta primeiro); findings (só das confirmadas, com sources e evidence; confidence pelo tier+votos); market (OBRIGATÓRIO: o que o eixo mercado/capital/analistas disse — rodadas, M&A, analistas — ou "sem sinal encontrado" explicitamente); caveats (o que a pesquisa não cobre; igual→transfere / diferente→desenha frente ao corpus); unverifiedList (as não verificadas + as refutadas por fonte fraca que mereceriam fonte primária); openQuestions.\n\nSomente saída estruturada.',
   { label: 'synthesize', phase: 'Synthesize', schema: REPORT_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
 
+// ─── Elenxo (só MODE=decision): refuta os achados E interroga o que foi descartado ───
+// Doutrina (onion-elenxo-doctrine.md): mandato REFUTAR, default REPROVADO na dúvida; a objeção
+// sobrevivente vira nó preservado (CONSTRAINS), nunca descartada. O passo NOVO desta casa: para cada claim
+// refutada/cortada e cada opção descartada, responder "por evidência ou por comodismo/hype?" — o que foi
+// por comodismo VOLTA como objeção sobrevivente. (C_NAO_REINVENTAR_NAO_ABANDONAR_TEM_REGUA)
+let elenxo = null
+if (MODE === 'decision') {
+  phase('Elenxo')
+  elenxo = await agent(
+    '## Refutador (Elenxo) — mandato: REPROVAR. Default na dúvida: a objeção SOBREVIVE.\n\nPergunta/decisão: "' + QUESTION + '"\nOpções e lacunas (do Scope): ' + webText(scope.summary) +
+    '\n\n## Achados confirmados (tente derrubar cada um)\n' + confirmed.map((c, i) => (i + 1) + '. ' + WEB_NOTE + '"' + webText(c.claim) + '" — ' + webText(c.sourceUrl) + ' (tier=' + c.sourceTier + ', votos ' + (c.verdicts.length - c.refutedVotes) + '-' + c.refutedVotes + ')').join('\n') +
+    '\n\n## Descartados nesta rodada (para cada um: foi por EVIDÊNCIA ou por COMODISMO/hype/orçamento?)\n' + killed.map(c => '- refutada: ' + webText(c.claim) + ' (tier ' + c.sourceTier + ')').join('\n') + '\n' + notVerifiedByBudget.slice(0, 15).map(c => '- cortada por orçamento: ' + webText(c.claim)).join('\n') + '\n' + budgetDropped.slice(0, 10).map(b => '- fonte não lida: ' + webText(b.url) + ' (' + webText(b.angle) + ')').join('\n') +
+    '\n\n## O que o corpus já sabia\n' + (CORPUS || '(vazio)') +
+    '\n\n## Tarefa\n1. Para cada achado: uma objeção concreta (kind=finding) com evidência; survives=true se a objeção fica de pé.\n2. Para cada descartado: kind=discarded-by-evidence (descarte legítimo, survives=false) OU kind=discarded-by-comodismo (descartado por preguiça/hype/orçamento sem evidência — survives=true, e diga o que faltou olhar).\n3. recommendation: qual opção você recomendaria ao maestro e sob quais CONSTRAINS (as objeções sobreviventes). options: as opções nomeadas.\n\nSomente saída estruturada. Evidência específica.',
+    { label: 'elenxo', phase: 'Elenxo', schema: ELENXO_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
+  if (elenxo) log('Elenxo: ' + elenxo.objections.length + ' objeções, ' + elenxo.objections.filter(o => o.survives).length + ' sobreviventes (' + elenxo.objections.filter(o => o.kind === 'discarded-by-comodismo' && o.survives).length + ' descartes por comodismo reabertos)')
+}
+
 // ─── write(KG): um agente ESCREVE o grafo, roda o radar, devolve o exit ───
 phase('write(KG)')
 const kg = await agent(
   '## write(KG) — escreva o grafo da pesquisa e prove que o radar o lê\n\nPergunta: "' + QUESTION + '"\nData de hoje (verified_at): ' + TODAY + '\nCaminho do grafo: ' + KG_PATH + '\n\n' +
   'Leia ANTES: .claude/rules/kg-grammar.md e .claude/commands/common/prompts/research-doctrine.md (cláusulas 7-8). Formato estrito: uma chave por linha; arestas em bloco (- from:/to:/edge_type:); id em inglês, label em pt-BR; meta com id, schema_version "1", baseline ' + TODAY + ', review_after (cadência: ferramenta/preço 30d · modelos 45d · mercado 90d · benchmark 120d · doutrina 12m — escolha pelo tipo dominante e justifique em comentário), `# kg-backlog-guard: on` e `# ═══ TETO: N NÓS ═══`.\n\n' +
+  (MODE === 'decision' && elenxo ? '## MODO DECISÃO — LEIA PRIMEIRO. Este grafo é de DECISÃO. OBRIGATÓRIO (o schema de retorno exige; sem isto o run falha): (1) 1 nó decision `D_…` com status OPEN (o maestro sela — você NUNCA sela), label = a decisão + as opções nomeadas + a recomendação do Elenxo; (2) 1 nó claim por OPÇÃO (`C_OPCAO_…`, status open) — opções: ' + JSON.stringify(elenxo.options || []) + '; (3) para cada objeção SOBREVIVENTE do Elenxo, 1 nó evidence `E_OBJECAO_…` (plane DEV, confirmed, verified_at hoje, verified_against = a evidência da objeção) com aresta CONSTRAINS para a opção/decisão que ela limita (dissent que LIMITA é CONSTRAINS; REFUTES só para opção morta por evidência, e aí o status da opção vira refuted); (4) devolva decisionNodeId, optionNodeIds e constrainsEdges (contagem REAL das arestas escritas). Objeções do Elenxo: ' + JSON.stringify(elenxo.objections).slice(0, 6000) + ' Recomendação: ' + webText(elenxo.recommendation).slice(0, 1500) + '\n\n' : '') +
   '## Conteúdo\n- 1 nó question (Q_…, status open ou done se respondida) para a pergunta.\n- 1 nó evidence por claim CONFIRMADA (E_…, plane DEV, status confirmed, impact 2-5 pelo peso, confidence pelo tier+votos (tier ≤3 nunca acima de 0.7), verified_at ' + TODAY + ', verified_against = URL + votos, valid_from quando houver, source_tier, source_kind, label = a claim em pt-BR, trace = URL).\n- 1 nó evidence E_MERCADO_… com o eixo mercado/capital (mesmo que "sem sinal").\n- 1 nó evidence E_LACUNAS_… listando refutadas por fonte fraca, não verificadas (' + unverified.length + ') e cortadas por orçamento (' + budgetDropped.length + ' fontes, ' + notVerifiedByBudget.length + ' claims).\n- Se o corpus já tinha nós sobre o tema e a pesquisa os CONTRADIZ, modele SUPERSEDES/REFUTES citando o id e o grafo (não edite o grafo antigo).\n- Arestas SUPPORTS de cada evidência para a question.\n\n' +
   '## Dados\n### Confirmadas\n' + confirmed.map(c => '- ' + WEB_NOTE + '"' + webText(c.claim) + '" | ' + webText(c.sourceUrl) + ' | kind=' + webText(c.sourceKind) + ' tier=' + c.sourceTier + ' validFrom=' + webText(c.validFrom || '') + ' votos=' + (c.verdicts.length - c.refutedVotes) + '-' + c.refutedVotes).join('\n') +
   '\n### Mercado (do sintetizador)\n' + (report ? webText(report.market) : '(sem síntese: 0 confirmadas)') +
   '\n### Não verificadas / refutadas\n' + unverified.map(c => '- ? ' + webText(c.claim) + ' | ' + webText(c.sourceUrl)).join('\n') + '\n' + killed.map(c => '- ✗ ' + webText(c.claim) + ' | ' + webText(c.sourceUrl) + ' tier=' + c.sourceTier).join('\n') +
   '\n### Corpus prévio\n' + (CORPUS || '(vazio)') +
   '\n\n## Passos\n1. Write do arquivo em ' + KG_PATH + ' (crie o diretório).\n2. Rode: bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema — capture o exit code. Se ≠ 0, CORRIJA e rode de novo (máx 3 tentativas).\n3. Devolva kgPath, radarExit (o último), nodes, edges, summary (1 frase).\n\nSomente saída estruturada.',
-  { label: 'write-kg', phase: 'write(KG)', schema: KG_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
+  { label: 'write-kg', phase: 'write(KG)', schema: (MODE === 'decision' && elenxo) ? KG_SCHEMA_DECISION : KG_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
 if (!kg) return { error: 'write(KG) não devolveu resultado — o grafo não foi escrito. Nada selado.', question: QUESTION, findings: report ? report.findings : [] }
+if (MODE === 'decision' && elenxo && (!kg.decisionNodeId || !(kg.constrainsEdges >= 1))) return { error: 'modo decisão sem nó D_/CONSTRAINS no grafo — o write(KG) não cumpriu o contrato de decisão; nada selado.', question: QUESTION, kgPath: kg.kgPath, radarExit: kg.radarExit }
 if (kg.radarExit !== 0) return { error: 'radar exit ' + kg.radarExit + ' em ' + kg.kgPath + ' — grafo escrito mas ILEGÍVEL pelo motor; não conte a pesquisa como feita.', question: QUESTION, kgPath: kg.kgPath, radarExit: kg.radarExit }
 log('write(KG): ' + kg.kgPath + ' — ' + kg.nodes + ' nós / ' + kg.edges + ' arestas, radar exit ' + kg.radarExit)
 
@@ -224,5 +254,6 @@ return {
   caveats: report ? report.caveats : '', openQuestions: report ? report.openQuestions || [] : [],
   refuted: killed.map(toRefuted), unverified: unverified.map(toUnverified),
   notVerifiedByBudget, budgetDropped,
+  decision: elenxo ? { options: elenxo.options || [], objections: elenxo.objections, recommendation: elenxo.recommendation, sealedBy: 'maestro (nó D_ open no grafo; tabela de selagem do /meta:drive)' } : null,
   stats: { anglesTopic: scope.angles.length, anglesFixed: FIXED_AXES.length, sources: allSources.length, claims: allClaims.length, verified: rankedClaims.length, confirmed: confirmed.length, refuted: killed.length, unverified: unverified.length, dupes: dupes.length, maxFetch: MAX_FETCH, maxVerify: MAX_VERIFY_CLAIMS },
 }

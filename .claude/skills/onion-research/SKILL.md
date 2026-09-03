@@ -49,8 +49,13 @@ A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 c
    (do retorno: `unverified`, `refuted` por fonte fraca, `notVerifiedByBudget`, `budgetDropped`) e
    **valeu-a-pena** (tokens ÷ nós); `meta.review_after` pela cadência do tipo dominante (REGRA 67);
    `docs/backlog.md` regenerado se houver nó open; resíduo REGRA 56; PR pelo fluxo normal.
-6. **Se a pergunta é para DECIDIR** (F3, quando existir): o resultado vira nó `decision` open com as opções e
-   `CONSTRAINS`; o maestro sela — você nunca sela sozinho.
+6. **Se a pergunta é para DECIDIR** ("devo", "vale a pena", "qual escolher", "o que podar"): passe `mode: 'decision'`
+   nos `args`. O workflow ganha a fase **Elenxo** (refutador opus/high, default REPROVADO): refuta cada achado **e**
+   interroga cada descarte — *"por evidência ou por comodismo/hype/orçamento?"*; o descarte por comodismo volta
+   como objeção sobrevivente. O `write(KG)` escreve **1 nó `decision` OPEN** (opções nomeadas + recomendação)
+   com `CONSTRAINS` das objeções sobreviventes. **Você nunca sela**: informe ao maestro o id do nó `D_` e a
+   tabela de selagem do `/meta:drive` (KIND decision). O retorno traz `decision: {options, objections,
+   recommendation}`.
 
 ## Fronteiras declaradas
 
