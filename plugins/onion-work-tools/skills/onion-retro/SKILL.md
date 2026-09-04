@@ -61,7 +61,7 @@ canal). O condutor **verifica contra o vivo** (o arquivo foi commitado/empurrado
 #### 5. Agregar + emitir
 Com as respostas: montar a **síntese** (NPS, tabela CSAT por fase, os 4 eixos condensados,
 Start/Stop/Continue) e **emitir**:
-- **migalha de diário** (`/meta:diary`) do que o ciclo ensinou; e/ou
+- **migalha de diário** (`/onion-work-tools:diary`) do que o ciclo ensinou; e/ou
 - **sinal upstream** (`docs/evolution/inbox/`) se há aprendizado para o core — **passando pelo gate
   client-safe** (grep=0) e respeitando o boundary de autorização (quem relaya).
 - Se a retro produziu **achados estruturados** (decisões, produtos deriváveis), o destino é um
@@ -102,8 +102,8 @@ Posso usar (parte d)este depoimento como case/material? **sim/não** — e condi
 ### Notas
 
 - **Por que skill e não comando:** a retro é um **workflow reusável** que se ativa por reconhecimento
-  ("fechar o ciclo"), não um passo fixo de pipeline. Compõe com `/meta:diary` (migalha) e
-  `/meta:co-evolve` (relay do sinal), sem substituí-los.
+  ("fechar o ciclo"), não um passo fixo de pipeline. Compõe com `/onion-work-tools:diary` (migalha) e
+  `/onion-work-tools:co-evolve` (relay do sinal), sem substituí-los.
 - **Soberania/federação:** o que viaja é o **método + o template**, não o conteúdo de nenhuma retro
   específica (que é do respondente/da instância). Cada adotante roda a própria.
 - **Fronteira de dados:** a retro é client-safe **por construção** quando cruza fronteira; o gate

@@ -6,7 +6,7 @@ description: |
   e, na camada `layer: domain`, o SSOT de domínio (entity/state/event/rule/policy) que o audit TRACES_TO.
   Roda o radar determinístico (kg-radar.sh) para atenção, reconciliação, integridade e radar-de-domínio.
   Modo `map <área>`: PFR de mapeamento completo (inventário → atom-map/fatias → .kg.yaml → radar).
-  Nascido do 1º dogfood do core (auditoria /meta:evolve 2026-07-04) — F2 da vertical onion-investigation.
+  Nascido do 1º dogfood do core (auditoria meta:evolve 2026-07-04) — F2 da vertical onion-investigation.
 category: meta
 tags: [kg, knowledge-graph, investigation, sdaal, radar, reconciliation, domain-layer]
 version: "1.4.0"
@@ -14,15 +14,15 @@ updated: "2026-07-21"
 allowed-tools: Read Write Edit Grep Glob Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-provenance-coverage.sh*) Bash(ls docs/*)
 argument-hint: "[<arquivo.kg.yaml> | novo <slug> | map <área> | diagnose <slug> | backfill [<escopo>]]  (vazio = localizar .kg.yaml existente e rodar radar)"
 related_commands:
-  - /meta:evolve
-  - /meta:graph
-  - /meta:co-evolve
+  - meta:evolve
+  - meta:graph
+  - /onion-work-tools:co-evolve
 related_agents:
   - research-agent
   - onion
 ---
 
-# /meta:kg — Investigação como Knowledge Graph SDAAL
+# /onion-work-tools:kg — Investigação como Knowledge Graph SDAAL
 
 Investigações longas degradam para **log cronológico**: auto-correções ficam enterradas em prosa,
 verdade×verdade não se confronta, conclusões de branch se misturam com o artefato vivo. Este
@@ -36,7 +36,7 @@ impressão do modelo.
 
 ## 🟢 Quando usar
 
-- Auditoria/investigação com **muitos achados que se relacionam** (ex.: rodada de `/meta:evolve`,
+- Auditoria/investigação com **muitos achados que se relacionam** (ex.: rodada de `meta:evolve`,
   auditoria de produção, reconciliação entre linhagens/branches).
 - Quando houver **refutações**: achados plausíveis que caíram sob verificação merecem aresta
   `REFUTES` explícita, não deleção (história reconcilia, não apaga).
@@ -46,7 +46,7 @@ impressão do modelo.
   redesenhar/refatorar — o contrato primeiro, o pixel/refactor depois (ver Modo map abaixo).
 
 **NÃO** usar para: lista simples de tarefas (use o task manager) · estrutura do próprio framework
-(use `/meta:graph`, que é outra lente — derivada da spec-as-code, sem store).
+(use `meta:graph`, que é outra lente — derivada da spec-as-code, sem store).
 
 ## 📁 Store (eixo SDAAL)
 
@@ -79,7 +79,7 @@ nodes:
     impact: 4                # 1-5
     confidence: 0.9          # 0-1
     status: open             # open | confirmed | drifted | unverifiable | refuted | superseded | done
-                             # drifted/unverifiable: saída de re-verificação (/meta:kg-freshness)
+                             # drifted/unverifiable: saída de re-verificação (/onion:kg-freshness)
     verified_against: branch # nomeia o ALVO verificado (branch|commit|deploy|config|dump:) — rastreia por frescor mesmo em DEV; obrigatório junto de verified_at EM node_type: claim (ausente = ⚠ UNANCHORED); nos demais tipos a âncora é trace:/TRACES_TO
     verified_at: AAAA-MM-DD  # quando a claim foi cruzada com o vivo (nó PROD ou com verified_against; ausente = ⚠ STALE-MISSING)
     valid_from: AAAA-MM-DD   # opcional (evidence): quando o FATO passou a valer — bi-temporal: ≠ verified_at (quando VOCÊ verificou)
@@ -393,10 +393,10 @@ máquina de estados por identidade"** (a jornada do cliente/processo como `state
 sources/  (transcrições, docs, deck do cliente → proxy textual .md; binário pesado no .gitignore)
    │  F0 inventário / descoberta
    ▼
-extracts/  ← /product:extract-meeting (EXTRACT: decisões, gaps, contradições, deps, stakeholders, timeline)
+extracts/  ← /onion-product:extract-meeting (EXTRACT: decisões, gaps, contradições, deps, stakeholders, timeline)
    │  extração (um .md por fonte)
    ▼
-consolidated/  ← /product:consolidate-meetings (bloco de proveniência F1..Fn + Convergências/Divergências)
+consolidated/  ← /onion-product:consolidate-meetings (bloco de proveniência F1..Fn + Convergências/Divergências)
    │  fusão multi-fonte — DIVERGÊNCIA entre fontes = claim a reconciliar
    ▼
 docs/<área>/graph/<slug>.kg.yaml  ← ESTE modo: modela o consolidado como KG de 2 camadas
@@ -438,14 +438,14 @@ bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh docs/<área>/graph/<slug>.kg.y
 
 O que dá pra automatizar sem virar caixa-preta: **o fan-out mecânico**, preservando a **PAUSA** como
 gate humano duro. É `generate-and-filter` com selo humano — o pipeline gera candidatos, o radar filtra
-por atenção, o **humano sela**. O precedente no core: o eixo `interactive` do `/product:transform-consolidated`
+por atenção, o **humano sela**. O precedente no core: o eixo `interactive` do `/onion-product:transform-consolidated`
 (a análise roda sozinha; a validação por bloco só com o humano) e o dry-run-como-gate do `onion-wizard`.
 
 - **F0 — store (auto):** `bash ${CLAUDE_PLUGIN_ROOT}/utils/diagnose/scaffold-diagnose-store.sh <slug> [--area <área>]`
   cria o store inteiro (skeleton `.kg.yaml` de 2 camadas + `STATE.md` com `NEXT` retomável + `notes.md`
   append-only + `sources/ extracts/ consolidated/`). Never-clobber, `--dry-run`, idempotente. Fecha o
   "skeleton à mão". → **PAUSA:** preencha `sources/` e confirme o escopo antes de extrair.
-- **Extração/consolidação (auto):** `/product:extract-meeting` por fonte → `/product:consolidate-meetings`.
+- **Extração/consolidação (auto):** `/onion-product:extract-meeting` por fonte → `/onion-product:consolidate-meetings`.
   Rodam ponta-a-ponta (nenhum tem gate). Produzem o consolidado com Convergências/**Divergências**.
 - **Candidatos (auto):** as **Divergências** viram nós `question`/`claim` **candidatos** no `.kg.yaml`; o
   radar ranqueia por atenção. É o fan-out mecânico — não o diagnóstico.
@@ -473,18 +473,18 @@ Antes de qualquer projeção cruzar fronteira (material pro cliente, sinal pro c
 ## 💡 Exemplos
 
 ```bash
-/meta:kg novo auditoria-seguranca          # cria docs/onion/graph/auditoria-seguranca.kg.yaml
-/meta:kg docs/onion/graph/onion-evolution-2026-07.kg.yaml   # modela/atualiza e roda radar
-/meta:kg                                    # localiza o mais recente e roda o radar
-/meta:kg map command-center                 # PFR F0-F4: inventário → atom-map → .kg.yaml → radar (software)
-/meta:kg diagnose cliente-acme-2026-07       # engajamento como KG 2-camadas; radar = diagnóstico (atenção/gargalo/reconciliação)
-/meta:kg narrate m2-bridge-logto-2026-07     # autora a narração pré-cozida (tour + resumos) p/ o console
+/onion-work-tools:kg novo auditoria-seguranca          # cria docs/onion/graph/auditoria-seguranca.kg.yaml
+/onion-work-tools:kg docs/onion/graph/onion-evolution-2026-07.kg.yaml   # modela/atualiza e roda radar
+/onion-work-tools:kg                                    # localiza o mais recente e roda o radar
+/onion-work-tools:kg map command-center                 # PFR F0-F4: inventário → atom-map → .kg.yaml → radar (software)
+/onion-work-tools:kg diagnose cliente-acme-2026-07       # engajamento como KG 2-camadas; radar = diagnóstico (atenção/gargalo/reconciliação)
+/onion-work-tools:kg narrate m2-bridge-logto-2026-07     # autora a narração pré-cozida (tour + resumos) p/ o console
 ```
 
 ## ⚠️ Notas
 
-- **Grafo primeiro, relatório depois** (contrato para os consumidores): `/meta:evolve`,
-  `/meta:kb-freshness` e `/meta:context-freshness` — e qualquer comando que produza achados
+- **Grafo primeiro, relatório depois** (contrato para os consumidores): `meta:evolve`,
+  `/onion-work-tools:kb-freshness` e `/onion-work-tools:context-freshness` — e qualquer comando que produza achados
   estruturados — materializam aqui **antes** de renderizar seu relatório final; o markdown é
   **projeção** do `.kg.yaml`, nunca fonte paralela. Senão o grafo vira predecessor da avaliação em
   vez de destino dela (sinal de campo de um adotante regulado, 2026-07-20: uma avaliação de 70 agentes com 60
@@ -511,4 +511,4 @@ Antes de qualquer projeção cruzar fronteira (material pro cliente, sinal pro c
 - Doutrina: [knowledge-graph-sdaal.md](${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md)
 - Motor: `${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh` (soberano; awk determinístico)
 - Vertical: [onion-adr-verticals-investigation-cartography-2026-07.md](../../../docs/analysis/onion-adr-verticals-investigation-cartography-2026-07.md)
-- Lente irmã (estrutura do framework): `/meta:graph`
+- Lente irmã (estrutura do framework): `meta:graph`

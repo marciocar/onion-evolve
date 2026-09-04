@@ -3,7 +3,7 @@ name: generate
 description: |
   Camada generativa da vertical de design: diverge (N identidades por IA, em orquestração
   paralela) → converge (gate WCAG determinístico filtra + juiz ranqueia) → vencedora
-  alimenta o DEVELOP do /design:identity. A IA gera; o gate decide. Orquestra os workers
+  alimenta o DEVELOP do /onion-design:identity. A IA gera; o gate decide. Orquestra os workers
   via onion-orchestration/Workflow (generate-and-filter). Delega a @brand-generator (workers).
 allowed-tools: Read Write Edit Glob Grep Workflow Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/design-source/*) Bash(mktemp -d -t onion-design-*) Bash(rm -rf /tmp/onion-design-*)
 category: design
@@ -15,12 +15,12 @@ related_agents:
   - design-system-specialist
   - branding-positioning-specialist
 related_commands:
-  - /design:identity
-  - /product:branding
-  - /meta:orchestrate
+  - /onion-design:identity
+  - /onion-product:branding
+  - /onion-work-tools:orchestrate
 ---
 
-# /design:generate — Identidade generativa (diverge → converge)
+# /onion-design:generate — Identidade generativa (diverge → converge)
 
 ## Objetivo
 
@@ -36,9 +36,9 @@ passou no contraste calculado** e melhor atende o brief.
 
 ## Fronteiras
 
-- **Alimenta**, não substitui, o `/design:identity`: a candidata vencedora vira input do **DEVELOP**
+- **Alimenta**, não substitui, o `/onion-design:identity`: a candidata vencedora vira input do **DEVELOP**
   (Fase 2) do identity, que a materializa via `design-sink`. Aqui só se **gera e escolhe**.
-- **NÃO** decide posicionamento → o brief vem de `/product:branding` / `business-context`.
+- **NÃO** decide posicionamento → o brief vem de `/onion-product:branding` / `business-context`.
 - **NÃO** commita candidatas na SSOT automaticamente: vivem em staging (`/tmp` ou
   `docs/design-context/_candidates/`) até o **maestro** escolher e promover. Promover uma 2ª marca
   na cascata pende do gatilho do [ADR de peer](../../../docs/design-context/decisions/onion-adr-design-peer-promotion.md).
@@ -91,7 +91,7 @@ um único resultado com a **vencedora** + runners-up + o porquê.
 
 ### 5. ENTREGA ao maestro
 Apresentar a vencedora (tokens + rationale) e **parar**: o maestro decide promover. Se sim → vira
-input do `/design:identity` DEVELOP (escopo `core` ou `brands/<brand>` para multi-brand).
+input do `/onion-design:identity` DEVELOP (escopo `core` ou `brands/<brand>` para multi-brand).
 
 ## Dogfood (padrão master)
 
@@ -104,19 +104,19 @@ contraste deve ser **descartado** pelo gate, não vencer. Prova que "o gate deci
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-/design:generate — <scope> — orquestração generate-and-filter
+/onion-design:generate — <scope> — orquestração generate-and-filter
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ◆ Ângulos     : <N> (conservadora, ousada, …)  · workers: <N> sonnet
 ◆ Geradas     : <N>  → Gate WCAG: <P> aprovadas / <R> descartadas (SKIP)
 ◆ Vencedora   : <ângulo> — <rationale 1 linha> — contraste min <ratio>
 ◆ Runners-up  : <ângulo>, <ângulo>
-▶ Próximo     : maestro promove? → /design:identity DEVELOP <scope>
+▶ Próximo     : maestro promove? → /onion-design:identity DEVELOP <scope>
 ```
 
 ## Referências
 
 - Workers: `@brand-generator` · Materializa o vencedor: `@design-system-specialist`
 - Gate: `${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh` · Ingestão: `${CLAUDE_PLUGIN_ROOT}/utils/design-source/`
-- Orquestração: skill `onion-orchestration` · `/meta:orchestrate` · KB `agent-orchestration`
-- Consome o vencedor: `/design:identity` (Fase 2 DEVELOP) · Brief: `/product:branding`
+- Orquestração: skill `onion-orchestration` · `/onion-work-tools:orchestrate` · KB `agent-orchestration`
+- Consome o vencedor: `/onion-design:identity` (Fase 2 DEVELOP) · Brief: `/onion-product:branding`
 - Peer provisório: `docs/design-context/decisions/onion-adr-design-peer-promotion.md`

@@ -135,7 +135,7 @@ Declarado no frontmatter `tools:` com naming canônico `mcp__code-understanding_
 - `mcp__code-understanding__get_repo_documentation` - Extrai docs existentes
 
 #### **Orquestração de subagentes (nativa)**
-Para orquestração paralela de múltiplos especialistas, use a ferramenta **Workflow** nativa do Claude Code (fan-out/fan-in) — ver a skill `onion-orchestration` e o comando `/meta:orchestrate`. Não há MCP de orquestração.
+Para orquestração paralela de múltiplos especialistas, use a ferramenta **Workflow** nativa do Claude Code (fan-out/fan-in) — ver a skill `onion-orchestration` e o comando `/onion-work-tools:orchestrate`. Não há MCP de orquestração.
 
 ## 📋 Protocolo de Operação
 

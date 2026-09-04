@@ -205,8 +205,8 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 > ⚠️ **Listagem parcial e sujeita a drift — a SSOT é outra.** Alguns comandos abaixo não existem
 > mais ou nunca existiram (ex.: `/engineer/deploy`, `/git/rebase`, `/validate/architecture`).
 > **A SSOT viva é [docs/onion/inventory.md](../../../docs/onion/inventory.md)** (gerada do filesystem
-> por `/meta:inventory`) + os arquivos em `.claude/commands/`. Em caso de divergência, a SSOT vence.
-> O atuador do refresh é **`/meta:inventory`**, não `/meta:evolve` — o evolve é read-only e *propõe*;
+> por `meta:inventory`) + os arquivos em `.claude/commands/`. Em caso de divergência, a SSOT vence.
+> O atuador do refresh é **`meta:inventory`**, não `meta:evolve` — o evolve é read-only e *propõe*;
 > apontar o conserto para um sensor era ação falsa, o beco que a revisão de guardas de 2026-08-03
 > vetou nas mensagens de guarda.
 
@@ -235,12 +235,12 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 #### **🌿 Git (15 comandos)**
 - `/git/init` - Inicializa GitFlow
-- `/git:flow feature start` - Inicia feature branch
-- `/git:flow feature finish` - Finaliza feature
-- `/git:flow hotfix start` - Inicia hotfix
-- `/git:flow hotfix finish` - Finaliza hotfix
-- `/git:flow release start` - Inicia release
-- `/git:flow release finish` - Finaliza release
+- `/onion-engineering:flow feature start` - Inicia feature branch
+- `/onion-engineering:flow feature finish` - Finaliza feature
+- `/onion-engineering:flow hotfix start` - Inicia hotfix
+- `/onion-engineering:flow hotfix finish` - Finaliza hotfix
+- `/onion-engineering:flow release start` - Inicia release
+- `/onion-engineering:flow release finish` - Finaliza release
 - `/git/sync` - Sincroniza branches
 - `/git/status` - Status do repositório
 - `/git/log` - Log de commits
@@ -290,7 +290,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 #### **2. Hotfix Flow (Urgente)**
 ```
-/engineer/hotfix → /engineer/work → /engineer/pr → /git:flow hotfix finish
+/engineer/hotfix → /engineer/work → /engineer/pr → /onion-engineering:flow hotfix finish
 ```
 
 #### **3. Documentation Flow**
@@ -305,7 +305,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 #### **5. Release Flow**
 ```
-/git:flow release start → /engineer/test → /validate/tests → /git:flow release finish
+/onion-engineering:flow release start → /engineer/test → /validate/tests → /onion-engineering:flow release finish
 ```
 
 ## 📋 Protocolo de Operação
@@ -345,7 +345,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 | **Criar diagrama** | Delegue `@mermaid-specialist` ou `@c4-architecture-specialist` | "Preciso de um diagrama" |
 | **Review de código** | Delegue `@code-reviewer` | "Revise este código" |
 | **Testes** | Delegue `@test-engineer` | "Preciso de testes" |
-| **Tarefa paralelizável (auditoria, migração, review amplo)** | Oriente `/meta:orchestrate` (fan-out via Workflow nativa) | "Audite todos os agentes contra as meta-specs" |
+| **Tarefa paralelizável (auditoria, migração, review amplo)** | Oriente `/onion-work-tools:orchestrate` (fan-out via Workflow nativa) | "Audite todos os agentes contra as meta-specs" |
 
 ### Fase 2: Execução Inteligente
 
@@ -379,7 +379,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 ```markdown
 1. Identifique a sequência de comandos/agentes
 2. Explique o fluxo completo
-3. Execute passo a passo; para subtarefas independentes, faça fan-out paralelo via a ferramenta nativa Workflow (ver `/meta:orchestrate`)
+3. Execute passo a passo; para subtarefas independentes, faça fan-out paralelo via a ferramenta nativa Workflow (ver `/onion-work-tools:orchestrate`)
 4. Atualize o Task Manager configurado conforme progresso
 5. Documente decisões importantes
 ```

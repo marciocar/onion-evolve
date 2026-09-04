@@ -59,7 +59,7 @@ Invocação: `/onion-docs:<comando>` (namespace do plugin).
 ## Requisitos
 
 - Claude Code ≥ 2.1.239 (marketplace com `pluginRoot`); `bash`, `git`, `awk`; `python3` (motores KG e censos); `jq` opcional.
-- Este plugin instala **capacidade** (read-only, atualizável pelo gerenciador). Não é adoção: para vendorizar o Onion num repo, o canal é `/meta:adopt` no repositório-fonte.
+- Este plugin instala **capacidade** (read-only, atualizável pelo gerenciador). Não é adoção: para vendorizar o Onion num repo, o canal é `meta:adopt` (comando do core, não distribuído por plugin) no repositório-fonte.
 
 ## Proveniência
 
@@ -71,6 +71,10 @@ Invocação: `/onion-docs:<comando>` (namespace do plugin).
 Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 
 Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT em `.claude/` do source. Não edite à mão: a próxima montagem sobrescreve.
+
+## Comandos do core citados (não distribuídos neste plugin)
+
+Estes comandos aparecem no texto sem a barra inicial porque pertencem ao core do Onion (meta-fábrica ou outra superfície) e **não** são instalados por este plugin: `meta:create-knowledge-base`. Estão disponíveis num repo que adotou o Onion por vendorização (`.claude/` completo).
 
 ## Licença
 

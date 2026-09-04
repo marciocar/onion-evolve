@@ -467,7 +467,7 @@ Após todos specialists concluírem, consolidar em 2 arquivos principais:
 
 ---
 
-> **Nota:** os caminhos abaixo são a **estrutura de saída gerada** no projeto-alvo (relativos a `docs/compliance-context/`, produzidos por `/docs:build-compliance-docs`). São paths de *output*, **não** links navegáveis do framework — por isso aparecem como código, não como links.
+> **Nota:** os caminhos abaixo são a **estrutura de saída gerada** no projeto-alvo (relativos a `docs/compliance-context/`, produzidos por `/onion-compliance:build-compliance-docs`). São paths de *output*, **não** links navegáveis do framework — por isso aparecem como código, não como links.
 
 ## 🔒 ISO 27001:2022 - Segurança da Informação
 [Se gerado]

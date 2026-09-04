@@ -16,7 +16,7 @@
 #
 # Consumido por: CI (.github/workflows/onion-validate.yml — bloqueia em HARD
 #                quando muda .claude/**, docs/meta-specs/** ou docs/design-context/**),
-#                /design (fase converge), /meta:context-freshness.
+#                /design (fase converge), /onion-work-tools:context-freshness.
 # Exercitado por: lint-selftest.sh (run_design_tokens_selftests).
 # =============================================================================
 set -uo pipefail

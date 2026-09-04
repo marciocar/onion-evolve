@@ -4,7 +4,7 @@ description: |
   Criação de tasks com decomposição hierárquica inteligente.
   Use para criar tasks estruturadas com subtasks e action items.
   Suporta: Jira, ClickUp, Asana, Linear (via TASK_MANAGER_PROVIDER).
-  Diferença vs /product:create-task-structure: este PERSISTE no task manager ativo; o create-task-structure é decomposição LOCAL read-only (saída textual, não grava).
+  Diferença vs /onion-product:create-task-structure: este PERSISTE no task manager ativo; o create-task-structure é decomposição LOCAL read-only (saída textual, não grava).
 allowed-tools: Bash(cat .env*) Read Write Grep Glob
 parameters:
   - name: description

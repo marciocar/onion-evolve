@@ -8,7 +8,7 @@ version: "4.0.0"
 updated: "2026-06-21"
 ---
 
-# /meta:all-tools — Catálogo de Ferramentas (sob demanda)
+# /onion-work-tools:all-tools — Catálogo de Ferramentas (sob demanda)
 
 ## 🎯 Objetivo
 
@@ -21,7 +21,7 @@ snapshots em `.claude/docs/tools/` que **drifavam** da realidade; isso viola o p
 
 - **Inventário do próprio Onion** (comandos, agentes, skills, contagens) → **NÃO re-documentar
   aqui**. É derivado da SSOT; aponte para o canônico:
-  - Contagens: `docs/onion/inventory.md` (SSOT gerada por `/meta:inventory`)
+  - Contagens: `docs/onion/inventory.md` (SSOT gerada por `meta:inventory`)
   - Comandos: `docs/onion/commands-guide.md`
   - Agentes: `docs/onion/agents-reference.md`
 - **Ferramentas nativas do Claude Code + MCP disponíveis** → **este é o valor único**: não
@@ -51,4 +51,4 @@ snapshots em `.claude/docs/tools/` que **drifavam** da realidade; isso viola o p
 - **Efêmero por natureza**: a disponibilidade de ferramentas/MCP é de runtime. Materializá-la
   num arquivo versionado reintroduz drift — por isso este comando só apresenta.
 - **Sem contagens hardcoded**: se precisar citar totais do Onion, leia `docs/onion/inventory.md`.
-- **Relacionados**: `/meta:inventory` (SSOT de comandos/agentes/skills/KBs do Onion).
+- **Relacionados**: `meta:inventory` (SSOT de comandos/agentes/skills/KBs do Onion).

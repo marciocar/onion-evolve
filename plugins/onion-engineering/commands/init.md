@@ -79,7 +79,7 @@ Após execução bem-sucedida:
 
 Após inicialização, o sistema recomendará:
 
-- **Primeira feature**: `/git:flow feature start "nome-da-funcionalidade"`
+- **Primeira feature**: `/onion-engineering:flow feature start "nome-da-funcionalidade"`
 - **Sincronização**: `/git/sync` se houver repositório remoto
 - **Ajuda contextual**: `/git/help` para entender os workflows disponíveis
 

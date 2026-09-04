@@ -45,7 +45,7 @@ Siga estes passos para criar o PR:
    A base do PR é a **branch de integração** do repo — resolvida de forma determinística e portável
    (SSOT versionado `.onion-version` → `git config gitflow.branch.develop` → default detectado), **não**
    hardcoded. Isto faz um repo adotado com branch de integração própria (ex. `<projeto>-evolve`, carimbada
-   pelo `/meta:adopt --integration-branch`) ser respeitada em qualquer máquina:
+   pelo `meta:adopt --integration-branch`) ser respeitada em qualquer máquina:
    ```bash
    BASE="$(bash ${CLAUDE_PLUGIN_ROOT}/validation/resolve-integration-branch.sh)"   # ver helper p/ a cadeia
    ```

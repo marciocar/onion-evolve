@@ -21,9 +21,9 @@ updated: "2026-05-15"
 output_path: docs/technical-context/
 
 related_commands:
-  - /docs:build-business-docs
-  - /meta:create-knowledge-base
-  - /docs:build-index
+  - /onion-docs:build-business-docs
+  - meta:create-knowledge-base
+  - /onion-docs:build-index
 
 related_agents:
   - c4-architecture-specialist
@@ -200,8 +200,8 @@ docs/technical-context/
 
 🚀 PRÓXIMOS PASSOS:
    ∟ Revisar com time técnico
-   ∟ /docs:build-business-docs (contexto de negócio)
-   ∟ /docs:build-index (atualizar índice mestre)
+   ∟ /onion-docs:build-business-docs (contexto de negócio)
+   ∟ /onion-docs:build-index (atualizar índice mestre)
 
 ━━━━━━━━━━━━━━
 
@@ -238,7 +238,7 @@ docs/technical-context/
 
 - **Template-base**: `.claude/commands/common/templates/technical-context-template.md`
 - **Pasta-alvo**: `docs/technical-context/`
-- **Comando complementar**: `/docs:build-business-docs`
+- **Comando complementar**: `/onion-docs:build-business-docs`
 - **Knowledge base**: `docs/knowledge-base/`
 
 ---

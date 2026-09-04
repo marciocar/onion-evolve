@@ -64,7 +64,7 @@ Estrutura definida pela **SSOT** — não redefina aqui: [gitflow-patterns.md §
 ### Comandos
 - Arquivo: `nome-comando.md` em kebab-case
 - Caminho de invocação: `/categoria/nome-comando` ou `/categoria:subcategoria:nome`
-- Ex: `/engineer/start`, `/product/task`, `/git:flow feature start`, `/meta:create-skill`
+- Ex: `/engineer/start`, `/product/task`, `/onion-engineering:flow feature start`, `meta:create-skill`
 
 ### Agentes
 - Arquivo: `nome-especialista.md` em kebab-case
@@ -162,15 +162,15 @@ Para Jira (`TASK_MANAGER_PROVIDER=jira`), usar **ADF** (JSON estruturado) — n�
 
 ### Hotfix
 ```
-/engineer/hotfix → /engineer/work → /engineer/pr → /git:flow hotfix finish
+/engineer/hotfix → /engineer/work → /engineer/pr → /onion-engineering:flow hotfix finish
 ```
 
 ### Criação de componentes Onion
 ```
-/meta:create-agent      # novo agente especializado
-/meta:create-skill      # nova skill
-/meta:create-command    # novo comando
-/meta:create-knowledge-base  # nova KB em docs/knowledge-base/
+meta:create-agent      # novo agente especializado
+meta:create-skill      # nova skill
+meta:create-command    # novo comando
+meta:create-knowledge-base  # nova KB em docs/knowledge-base/
 ```
 
 ## Playbooks (recognition-primed — catálogo, blip #9)
@@ -195,7 +195,7 @@ Situação: feature definida a implementar com rastreabilidade.
 ### assumir um repo  ("adota não impõe")
 Situação: instalar/operar o Onion num projeto novo ou legado — **detectar o padrão do projeto, não impor**.
 ```
-/meta:adopt (detect → defer/extend/introduce, never-clobber) → /docs/reverse-consolidate → /docs/build-tech-docs
+meta:adopt (detect → defer/extend/introduce, never-clobber) → /docs/reverse-consolidate → /docs/build-tech-docs
 ```
 
 ### agir em ambiente compartilhado / prod-durante-dev  (guarda — sinal de campo)

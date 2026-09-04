@@ -19,7 +19,7 @@ if [ -z "$ENTRIES" ]; then
   cat > "$INDEX" <<EOF
 # Diário — $(basename "$REPO")
 
-> Nenhuma entrada ainda. Use \`/meta:diary create\` para criar a primeira migalha.
+> Nenhuma entrada ainda. Use \`/onion-work-tools:diary create\` para criar a primeira migalha.
 
 Gerado em: ${TODAY}
 EOF
@@ -53,7 +53,7 @@ while IFS= read -r f; do
   # quando presentes são validados — classe fora do vocabulário ou `conditional` sem `valid_when`
   # é migalha DESONESTA (promete um re-teste dirigido que não pode cumprir) → erro, exit 1.
   # `type` fora do vocabulário é desonesto pelo mesmo critério: o índice promete ao Transformer um
-  # tipo que o /meta:diary não sabe processar. Enum: RFC-0003 §2.3 + /meta:diary (`reflection`
+  # tipo que o /onion-work-tools:diary não sabe processar. Enum: RFC-0003 §2.3 + /onion-work-tools:diary (`reflection`
   # promovido em 2026-07-17 — o campo o inventou antes do vocabulário ter casa p/ síntese
   # retrospectiva). Diferente de conflict_class, `type` NÃO é opcional (sempre existiu no schema).
   case "$TYPE" in
@@ -159,8 +159,8 @@ Gerado em: ${TODAY}
 ${TABLE_ROWS}
 ---
 
-*Gerenciado por \`/meta:diary\`. Para criar uma entrada: \`/meta:diary create\`.*
-*Para exportar compartilháveis: \`/meta:diary export-sharable\`.*
+*Gerenciado por \`/onion-work-tools:diary\`. Para criar uma entrada: \`/onion-work-tools:diary create\`.*
+*Para exportar compartilháveis: \`/onion-work-tools:diary export-sharable\`.*
 *Para regenerar este índice: \`bash ${CLAUDE_PLUGIN_ROOT}/validation/diary-index.sh\`.*
 EOF
 

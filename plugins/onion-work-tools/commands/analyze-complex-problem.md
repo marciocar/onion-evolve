@@ -3,7 +3,7 @@ name: analyze-complex-problem
 description: |
   Análise estruturada de problemas complexos com template oficial.
   Use para análises críticas, migrações, arquitetura ou performance.
-  Diferença vs /quick:analysis: este é o caminho COMPLETO (tipado, com gate/template oficial); use /quick:analysis para análise rápida sem cerimônia.
+  Diferença vs /onion-work-tools:analysis: este é o caminho COMPLETO (tipado, com gate/template oficial); use /onion-work-tools:analysis para análise rápida sem cerimônia.
 allowed-tools: Read Grep Glob Write
 
 parameters:

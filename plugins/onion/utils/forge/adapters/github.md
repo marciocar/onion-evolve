@@ -572,7 +572,7 @@ function isGhInstalled(): boolean {
    ```
 2. **Autenticar**: `gh auth login` (ou exportar `GH_TOKEN`).
 3. **Testar**: `gh auth status` deve retornar autenticado.
-4. **Usar nos comandos Onion**: `/git:flow feature publish`, `/engineer/pr` (rotam PR/CI pelo adapter).
+4. **Usar nos comandos Onion**: `/onion-engineering:flow feature publish`, `/engineer/pr` (rotam PR/CI pelo adapter).
 
 ---
 

@@ -81,7 +81,7 @@ Estabelecer contexto completo do projeto incluindo:
 ### 5. Co-evolução (se `docs/evolution/` existir)
 - ✅ Reconhecer o papel do repo: `source` (core) · `adopted` (consumidor) — via `.claude/.onion-version` ou `${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh`
 - ✅ Conferir os canais de co-evolução: `docs/evolution/inbox/` (upstream, sinal/feedback) e, em consumidores, `docs/evolution/inbound/` (downstream, relatório de update/anúncio do core). O hook SessionStart "you have mail" já avisa a **contagem** no boot (📬 inbox / 📥 inbound); o warm-up apenas **orienta** — não re-conta.
-- ✅ Havendo mensagens, rodar `/meta:co-evolve` para ler/gerenciar. O protocolo canônico (3 fluxos) vive em `docs/evolution/README.md`.
+- ✅ Havendo mensagens, rodar `/onion-work-tools:co-evolve` para ler/gerenciar. O protocolo canônico (3 fluxos) vive em `docs/evolution/README.md`.
 
 ## 🔍 Contexto a Manter
 
@@ -112,7 +112,7 @@ Estabelecer contexto completo do projeto incluindo:
 Após este warm-up geral, use warm-ups específicos:
 - `/product/warm-up` - Para trabalho de produto
 - `/engineer/warm-up` - Para trabalho de engenharia
-- `/meta:co-evolve` - Se o hook "you have mail" (📬 inbox / 📥 inbound) sinalizou mensagens nos canais de co-evolução
+- `/onion-work-tools:co-evolve` - Se o hook "you have mail" (📬 inbox / 📥 inbound) sinalizou mensagens nos canais de co-evolução
 
 ## ⚠️ Notas
 

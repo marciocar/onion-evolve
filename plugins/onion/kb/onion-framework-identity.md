@@ -49,7 +49,7 @@ O Sistema Onion é um **framework de orquestração de desenvolvimento** que viv
 
 A identidade do Onion foi consolidada em **2026-05-18**, quando o framework abandonou formalmente as direções de CLI standalone, suporte multi-IDE e estrutura agnóstica `.onion/` — a aposta passou a ser **profundidade de integração com Claude Code**, não portabilidade entre IDEs. O resultado é uma arquitetura em **5 camadas** (detalhada na seção 3): comandos (workflows), agentes (especialistas), skills (orquestração de alto nível), abstrações SDAAL (task manager + forge) e documentação constitucional (meta-specs + knowledge bases + spec-as-code).
 
-O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — Produto, Engenharia e Compliance são **peers**, não hierarquizados. Um time pode entrar pelo `@product-agent`, pelo `/engineer:plan`, ou diretamente em `/validate:collab/three-amigos` — o framework não privilegia nenhuma dimensão, e cada uma pode evoluir e ser adotada independentemente.
+O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — Produto, Engenharia e Compliance são **peers**, não hierarquizados. Um time pode entrar pelo `@product-agent`, pelo `/onion-engineering:plan`, ou diretamente em `validate:collab/three-amigos` — o framework não privilegia nenhuma dimensão, e cada uma pode evoluir e ser adotada independentemente.
 
 *(Fontes: `CLAUDE.md` §Identidade canônica; `onion-review-2026-05.md` §2 (interno do core))*
 
@@ -71,7 +71,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | **Abstraction Doctrine** | **quando** algo vira SDAAL (Teste do Eixo + Teste do Gatilho) | [`onion-abstraction-doctrine.md`](../concepts/onion-abstraction-doctrine.md) | ✅ ativa (2026-07-17) |
 | **Economy of Motors** | 3 motores (Transformer · SLM-ferramenta · Shell); use o mais barato capaz | [`onion-engine-economy.md`](../concepts/onion-engine-economy.md) | ✅ ativa |
 | **SDAAL** *(Specification-Driven AI Abstraction Layer)* | uma interface, N providers; o spec é o artefato e o LLM o runtime | [KB](../concepts/specification-driven-ai-abstraction-layer.md) · [whitepaper](../../sdaal/sdaal.md) | ✅ ativa |
-| **KG SDAAL** | investigação/domínio como grafo tipado; verdades **reconciliadas** (`REFUTES`/`SUPERSEDES`), radar determinístico | [`knowledge-graph-sdaal.md`](../concepts/knowledge-graph-sdaal.md) | ✅ ativa — **é infraestrutura**: 51 grafos, `kg-radar`, `kg-console`, `/meta:kg`, `/meta:kg-freshness`, REGRAS 43/47/49/52 e regra path-scoped nativa |
+| **KG SDAAL** | investigação/domínio como grafo tipado; verdades **reconciliadas** (`REFUTES`/`SUPERSEDES`), radar determinístico | [`knowledge-graph-sdaal.md`](../concepts/knowledge-graph-sdaal.md) | ✅ ativa — **é infraestrutura**: 51 grafos, `kg-radar`, `kg-console`, `/onion-work-tools:kg`, `/onion:kg-freshness`, REGRAS 43/47/49/52 e regra path-scoped nativa |
 | **SSOT-as-runtime** | a SSOT é o **programa que se executa**: `read→verify→act→write`; KG-first + drive-to-verify | [KG SDAAL §SSOT-as-runtime](../concepts/knowledge-graph-sdaal.md#ssot-as-runtime--o-kg-é-o-primeiro-ato-mecanismo-não-conselho) | ✅ ativa (cabeada nos 3 loops) |
 | **`gated-until-trigger`** | o artefato nasce do **uso que o prove**, nunca de simetria/plano | [modernization §🚦](../concepts/onion-modernization-doctrine.md) | ✅ ativa |
 | **`declarado ≠ verificado`** | carimbo/doc/branch é DEV; só o artefato vivo é PROD | [verify-read-path-first](../agentic-patterns/ai-strategies/verify-read-path-first.md) (tabela da família) | ✅ ativa |
@@ -79,7 +79,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | **PFR** *(Padrão Faseado Retomável)* | sessão durável + `STATE.md` + retomada fria; fases nunca fundidas | `onion-adr-phased-resumable-pattern-2026-06.md` (ADR interno do core — nomeia o PFR, padrão já invariante L0; provisório, PR à meta-spec diferido até gatilho) + [método §2a](../concepts/onion-working-method.md) | 🟡 ADR provisório (a cravar em `commands.md §3`) |
 | **Capability Contract** | o que um repo adotado pode esperar: Bronze/Silver/Gold — contrato **verificável** | `onion-adr-capability-contract-2026-06.md` (ADR interno do core — auto-descrição `provides/requires/loads/conformance`, tiers Bronze/Silver/Gold, validada pelo lint REGRA 20; visão-de-fora composta dos contratos, não registry à mão) + **7** `plugins/*/.claude-plugin/capability.json` | ✅ ativa — ADR **+ mecanismo** (REGRA 20 [HARD]) |
 | **Co-Evolution Protocol** *(doc-bridge)* | sinal bidirecional core↔adotante por arquivo commitado; sem runtime acoplado | `docs/evolution/README.md` (interno do core — fonte canônica do protocolo doc-bridge; maestro humano orquestra, execução do que chega é gate humano) + `/meta:co-*` | ✅ ativa |
-| **Breadcrumbs / migalhas** | sinal explícito **no artefato** que força **absorção** em vez de acomodação | [`breadcrumb-patterns.md`](../agentic-patterns/ai-strategies/breadcrumb-patterns.md) + `/meta:diary` | ✅ ativa — 92 entradas, TTL + `conflict_class` por entrada, e o `personality-sync` F2 fez a **identidade emergir de 74 migalhas** |
+| **Breadcrumbs / migalhas** | sinal explícito **no artefato** que força **absorção** em vez de acomodação | [`breadcrumb-patterns.md`](../agentic-patterns/ai-strategies/breadcrumb-patterns.md) + `/onion-work-tools:diary` | ✅ ativa — 92 entradas, TTL + `conflict_class` por entrada, e o `personality-sync` F2 fez a **identidade emergir de 74 migalhas** |
 | **Object-led discovery** | o maestro dirige com o objeto; o Transformer executa com as peças certas | [KB](../agentic-patterns/ai-strategies/object-led-discovery.md) + `onion-adr-object-led-discovery-2026-07.md` (ADR interno do core — playbook espelhar→descobrir(object-led)→vestir(capability-fitting)→materializar→realimentar; "quem sabe sobre o objeto é o próprio objeto", Information Expert) | ✅ ativa |
 | **Autobiographical Marketing** | o framework conta a própria história; os commits **são** a autobiografia | `onion-adoption-manual.md` (persona 1ª pessoa) + **onionevolve.com reformado** (2026-08-25, PR #672): /historia/ com a curva dos commits gerada do git, diário com 62 migalhas, /doutrinas/ com as cicatrizes datadas | ✅ ativa (2026-08-25 — deixou de ser só prosa de manual: virou site vivo com números derivados da SSOT em build) |
 | **Maestro's Aside** *(Aparte do Maestro)* | protocolo de entrada lateral tipada: marcador pt-BR no início da mensagem (`dúvida:`/`corrige:`/`paralelo:`…) → hook `UserPromptSubmit` injeta a rota canônica (recall, **não** gate); dispatcher p/ diário/memória/STATE/orquestração que já existem | [`maestro-aside.md`](../agentic-patterns/harness/maestro-aside.md) + hook+motor | ✅ ativa (2026-08-04) |
@@ -92,13 +92,13 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 
 | # | Problema | Sem Onion | Com Onion |
 |---|----------|-----------|-----------|
-| 1 | Orquestração manual da IA | Prompts ad-hoc por tarefa, sem memória de workflow nem tiering de agentes | 109 comandos = workflows codificados (`/engineer:plan` já sabe delegar a `@task-specialist`) |
+| 1 | Orquestração manual da IA | Prompts ad-hoc por tarefa, sem memória de workflow nem tiering de agentes | 109 comandos = workflows codificados (`/onion-engineering:plan` já sabe delegar a `@task-specialist`) |
 | 2 | Cada integração de task manager é caso especial | Reescrever prompts/formatos por provider (Jira exige ADF, ClickUp Unicode, Asana HTML) | SDAAL Task Manager Abstraction — `TASK_MANAGER_PROVIDER` no `.env` roteia ao adapter certo, formatação tipada |
 | 3 | Trabalho interrompido = contexto perdido | Reexplicar contexto do zero a cada retomada de sessão | Workflows faseados retomáveis + `STATE.md` (ponteiro Tier-0 ~1KB) em `.claude/sessions/` |
-| 4 | Compliance é silo separado do dev | Documentação ISO/SOC2 criada depois, manualmente, desconectada da entrega | 5 agentes de compliance integrados ao mesmo ciclo; `/docs:build-compliance-docs` gera a partir do estado real |
+| 4 | Compliance é silo separado do dev | Documentação ISO/SOC2 criada depois, manualmente, desconectada da entrega | 5 agentes de compliance integrados ao mesmo ciclo; `/onion-compliance:build-compliance-docs` gera a partir do estado real |
 | 5 | Orquestrações de IA são caras e trabalhosas | Escrever scripts de orquestração manuais, schemas, tiering, tratamento de falha | Skill `onion-orchestration` autora `Workflow` com tiering automático (haiku/sonnet/opus), barrier+fan-in, verificação adversarial |
 | 6 | Multi-repo sem coordenação quebra integrações | Coordenação por Slack/docs manuais, sem garantia de validação prévia | Federation v2 — topologia peer + ledger git (`publish` → `check` → `status` → `rollback`) |
-| 7 | Framework envelhece silenciosamente | Documentação e agentes ficam obsoletos sem que ninguém audite | `/meta:evolve` — auto-auditoria em 10 dimensões via orquestração, backlog priorizado com evidência citada |
+| 7 | Framework envelhece silenciosamente | Documentação e agentes ficam obsoletos sem que ninguém audite | `meta:evolve` — auto-auditoria em 10 dimensões via orquestração, backlog priorizado com evidência citada |
 | 8 | Sem padrão paralelo vs sequencial | O time não sabe quando usar fan-out, sessões ou Agent Teams | KB `agent-orchestration` — tabela de decisão dos 3 substratos + fallback gracioso |
 
 *(Detalhamento "antes/depois" com prosa completa e fontes por item: material bruto §2)*
@@ -146,17 +146,17 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 ### Fluxo de uma feature típica
 
 ```
-/product:collect → /product:refine → /product:spec → /product:task
+/onion-product:collect → /onion-product:refine → /onion-product:spec → /onion-product:task
    ↓
-/engineer:start (cria worklog STATE.md)
+/onion-engineering:start (cria worklog STATE.md)
    ↓
-/engineer:work (retomável — lê STATE.md, continua fase [ACTIVE])
+/onion-engineering:work (retomável — lê STATE.md, continua fase [ACTIVE])
    ↓
-/engineer:pre-pr (@branch-metaspec-checker + testes)
+/onion-engineering:pre-pr (@branch-metaspec-checker + testes)
    ↓
-/engineer:pr (forge adapter → PR com link da task)
+/onion-engineering:pr (forge adapter → PR com link da task)
    ↓
-/git:sync (cleanup + archive de sessão)
+/onion-engineering:sync (cleanup + archive de sessão)
 ```
 
 `product/collect→task` e `engineer/plan→pr-update` são **workflows faseados retomáveis** — invariantes do framework. Nunca são fundidos numa fase única.
@@ -164,7 +164,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 ### Padrão SDAAL (Specification-Driven AI Abstraction Layer)
 
 - **Task Manager**: `TASK_MANAGER_PROVIDER` no `.env` define o adapter ativo. O consumidor chama `taskManager.create()`; o adapter resolve para `POST /rest/api/3/issue` (Jira) ou a chamada equivalente (ClickUp/Asana/Linear).
-- **Forge**: `FORGE_PROVIDER` define o host remoto. `/engineer:pr` chama `forge.createPR()`; o adapter usa `gh pr create` (default) ou REST (fallback).
+- **Forge**: `FORGE_PROVIDER` define o host remoto. `/onion-engineering:pr` chama `forge.createPR()`; o adapter usa `gh pr create` (default) ou REST (fallback).
 
 **Por que importa:** o mesmo comando funciona em projetos com stacks de ferramentas diferentes, sem reescrita — e troca de provider é mudança de `.env`, não de código.
 
@@ -178,24 +178,24 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 
 | Capacidade | Comando | Exemplo concreto |
 |------------|---------|------------------|
-| Coletar requisitos | `/product:collect` | Entrevistar usuário, estruturar em história |
-| Refinar especificação | `/product:refine` | Gap analysis, critérios de aceite |
-| Especificação completa | `/product:spec` | Gerar spec pronta para `/engineer:plan` |
-| Transcrição de reunião | `/product:whisper` | Áudio → ata estruturada |
-| Extração de ata | `/product:extract-meeting` | Ata bruta → decisions/actions |
-| Análise de dor do cliente | `/product:analyze-pain-price` | JTBD + precificação |
-| Converter em tasks | `/product:convert-to-tasks` | Spec → hierarquia no task manager ativo |
+| Coletar requisitos | `/onion-product:collect` | Entrevistar usuário, estruturar em história |
+| Refinar especificação | `/onion-product:refine` | Gap analysis, critérios de aceite |
+| Especificação completa | `/onion-product:spec` | Gerar spec pronta para `/onion-engineering:plan` |
+| Transcrição de reunião | `/onion-product:whisper` | Áudio → ata estruturada |
+| Extração de ata | `/onion-product:extract-meeting` | Ata bruta → decisions/actions |
+| Análise de dor do cliente | `/onion-product:analyze-pain-price` | JTBD + precificação |
+| Converter em tasks | `/onion-product:convert-to-tasks` | Spec → hierarquia no task manager ativo |
 
 ### Engenharia & GitFlow
 
 | Capacidade | Comando | Exemplo concreto |
 |------------|---------|------------------|
-| Planejar feature | `/engineer:plan` | Fases retomáveis, `STATE.md` |
-| Iniciar dev | `/engineer:start` | Cria worklog, branch GitFlow |
-| Retomar dev | `/engineer:work` | Lê `STATE.md`, continua fase `[ACTIVE]` |
-| Gate pré-PR | `/engineer:pre-pr` | Lint, testes, `@branch-metaspec-checker` |
-| Abrir PR | `/engineer:pr` | Forge adapter → PR com link da task |
-| Hotfix urgente | `/engineer:hotfix` | Branch hotfix, PR fast-track |
+| Planejar feature | `/onion-engineering:plan` | Fases retomáveis, `STATE.md` |
+| Iniciar dev | `/onion-engineering:start` | Cria worklog, branch GitFlow |
+| Retomar dev | `/onion-engineering:work` | Lê `STATE.md`, continua fase `[ACTIVE]` |
+| Gate pré-PR | `/onion-engineering:pre-pr` | Lint, testes, `@branch-metaspec-checker` |
+| Abrir PR | `/onion-engineering:pr` | Forge adapter → PR com link da task |
+| Hotfix urgente | `/onion-engineering:hotfix` | Branch hotfix, PR fast-track |
 
 ### Qualidade & Compliance
 
@@ -203,7 +203,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 |------------|----------------|------------------|
 | Code review | `@code-reviewer` | Bugs, patterns, manutenibilidade |
 | Review de branch | `@branch-code-reviewer` | Diff-scoped, pré-PR |
-| Testes unitários | `/test:unit` | Gerar + executar suíte |
+| Testes unitários | `/onion-testing:unit` | Gerar + executar suíte |
 | ISO 27001 | `@iso-27001-specialist` | Política SGSI, risk assessment |
 | SOC2 Type II | `@soc2-specialist` | Controles + coleta de evidências |
 | Validação arquitetural | `@metaspec-gate-keeper` | Conformidade L0/L1+ |
@@ -221,12 +221,12 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 
 | Capacidade | Comando |
 |------------|---------|
-| Auto-auditoria | `/meta:evolve` — 10 dimensões, orquestração, backlog priorizado |
-| Frescor de KBs | `/meta:kb-freshness` — veredito CURRENT/STALE/HISTORICAL |
-| Criar novo agente | `/meta:create-agent` — contextualizado no ecossistema |
-| Criar novo comando | `/meta:create-command` |
-| Validar conformidade | `/meta:metaspec-validate` |
-| Inventário automático | `/meta:inventory` — SSOT gerada do filesystem |
+| Auto-auditoria | `meta:evolve` — 10 dimensões, orquestração, backlog priorizado |
+| Frescor de KBs | `/onion-work-tools:kb-freshness` — veredito CURRENT/STALE/HISTORICAL |
+| Criar novo agente | `meta:create-agent` — contextualizado no ecossistema |
+| Criar novo comando | `meta:create-command` |
+| Validar conformidade | `/onion-work-tools:metaspec-validate` |
+| Inventário automático | `meta:inventory` — SSOT gerada do filesystem |
 
 ---
 
@@ -235,16 +235,16 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 ### Caso 1 — Federation v2: "Coordenação Multi-Repo Sem Quebrar Nada"
 
 **Situação:** time com múltiplos repositórios integrados (API + frontend + infra); qualquer mudança de contrato podia quebrar os demais, coordenada manualmente via Slack.
-**O que o Onion fez:** topologia peer + ledger git, implementada em fases (register → publish+check → status+rollback); cada repo valida localmente via `/meta:federation-check`.
+**O que o Onion fez:** topologia peer + ledger git, implementada em fases (register → publish+check → status+rollback); cada repo valida localmente via `meta:federation-check`.
 **Resultado:** ciclo `register→publish→check→status→rollback` completo em produção; mudança incompatível é bloqueada com mensagem acionável, rollback coordenado restaura o estado.
 **Citação:** *"Cada Onion defende seus interesses — o repo dono valida localmente as mudanças que o afetam (conhecimento de 1ª mão)."* — `onion-federation-design-v2-2026-06.md` §2 (interno do core: design da Federation na **topologia peer + ledger git** — cada repo mantém seu Onion soberano e valida em casa as mudanças de contrato que o afetam; documenta o pivô do hub v1, que repousava num spike não-verificado)
 
-### Caso 2 — `/meta:evolve`: "O Framework se Auto-Auditando"
+### Caso 2 — `meta:evolve`: "O Framework se Auto-Auditando"
 
 **Situação:** após um ciclo grande de mudanças (migração Cursor→native, federation, novos comandos), o framework não tinha auditoria formal recente.
-**O que o Onion fez:** `/meta:evolve` disparou 28 agentes em 8 dimensões (peso, redundância, duplicação, KBs stale, conformidade, legado, links, frontmatter); juiz adversarial (opus) refutou 11 de 41 achados brutos.
+**O que o Onion fez:** `meta:evolve` disparou 28 agentes em 8 dimensões (peso, redundância, duplicação, KBs stale, conformidade, legado, links, frontmatter); juiz adversarial (opus) refutou 11 de 41 achados brutos.
 **Resultado:** 30 achados sobreviventes → backlog priorizado → 100% executado (8 PRs do ciclo de auto-auditoria #54-#61: sweep MCP-first, índices reconciliados, 51 comandos com `allowed-tools`, calibração de régua de frescor).
-**Citação:** *"28 agentes (8 auditores + ~19 juízes + critic) · 1.27M tokens · 635 tool-uses · ~26 min."* — `onion-evolution-2026-06-15.md` §0 (backlog de auto-auditoria do `/meta:evolve`, interno do core: run real que gerou 41 achados brutos → **30 sobreviventes** após o juiz adversarial refutar 11)
+**Citação:** *"28 agentes (8 auditores + ~19 juízes + critic) · 1.27M tokens · 635 tool-uses · ~26 min."* — `onion-evolution-2026-06-15.md` §0 (backlog de auto-auditoria do `meta:evolve`, interno do core: run real que gerou 41 achados brutos → **30 sobreviventes** após o juiz adversarial refutar 11)
 
 ### Caso 3 — Agent Teams: "Decidindo Não Adotar (Com Evidência)"
 
@@ -280,10 +280,10 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | Knowledge Bases | 93 | `docs/onion/inventory.md` (SSOT gerada) |
 | Task Manager providers suportados | 4 (Jira, ClickUp, Asana, Linear) | `CLAUDE.md` §Task Manager |
 | PRs na jornada completa de auto-evolução (Agent Teams + Federation + Evolve) | 22 | ⚠️ **não-verificável** — a fonte (`.claude/sessions/INDEX.md`) é **gitignored**; número congelado-no-tempo, sem como re-medir |
-| Workers no `/meta:evolve` | 28 agentes | onion-evolution-2026-06-15.md §0 |
-| Tokens no `/meta:evolve` | 1.27M | onion-evolution-2026-06-15.md §0 |
-| Tool-uses no `/meta:evolve` | 635 | onion-evolution-2026-06-15.md §0 |
-| Duração do `/meta:evolve` | ~26 min | onion-evolution-2026-06-15.md §0 |
+| Workers no `meta:evolve` | 28 agentes | onion-evolution-2026-06-15.md §0 |
+| Tokens no `meta:evolve` | 1.27M | onion-evolution-2026-06-15.md §0 |
+| Tool-uses no `meta:evolve` | 635 | onion-evolution-2026-06-15.md §0 |
+| Duração do `meta:evolve` | ~26 min | onion-evolution-2026-06-15.md §0 |
 | Achados D1 (peso/tamanho) | 0 outliers | onion-evolution-2026-06-15.md §2 — "framework dentro dos limites" |
 | Agentes migrados Cursor→native | 49/49 (100%) | sessions archives jun/2026 |
 | Comandos com `allowed-tools` após D8 | 82/82 (100%) | PR #60 |
@@ -299,7 +299,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 > **Manutenção (anti-redrift):** as contagens de inventário **presentes** (comandos/agentes/skills/KBs/dimensões)
 > são derivadas da SSOT gerada `docs/onion/inventory.md` (interna do core — contagens de comandos/agentes/skills/KBs computadas do filesystem por `${CLAUDE_PLUGIN_ROOT}/validation/inventory.sh`, validadas no CI, nunca digitadas à mão)
 > — ao resync, leia a SSOT, nunca reescreva de memória. Os números **dentro dos Casos de Uso (§5)** e das
-> métricas de run específico (tokens/agentes/duração do `/meta:evolve` de 2026-06-15) são **congelados-no-tempo**:
+> métricas de run específico (tokens/agentes/duração do `meta:evolve` de 2026-06-15) são **congelados-no-tempo**:
 > descrevem um evento histórico e **não** se atualizam com o inventário. Family [`declarado ≠ verificado`](#15-invenções-nomeadas--o-catálogo-canônico).
 
 ---
@@ -356,7 +356,7 @@ grafo: `docs/onion/graph/onion-identity-2026-07.kg.yaml` → `C_CORE_NAO_E_FAMIL
 | Compliance | Não existe | ISO 27001, SOC2, PMBOK, ISO 22301 integrados |
 | Orquestração | Manual, caso a caso | 109 workflows + 51 agentes + 13 skills |
 | Multi-repo | Não existe | Federation v2 com topologia peer |
-| Auto-evolução | Não existe | `/meta:evolve` audita 10 dimensões |
+| Auto-evolução | Não existe | `meta:evolve` audita 10 dimensões |
 | Sessions retomáveis | Não existe | `STATE.md` + worklog persistente |
 | Abstração de integração | Não existe | SDAAL (Task Manager + Forge) |
 
@@ -380,13 +380,13 @@ Não. O Onion vive inteiramente em `.claude/` — código, linguagem, framework 
 Sim, para Jira, ClickUp, Asana ou Linear — basta definir `TASK_MANAGER_PROVIDER` no `.env`. Sem provider, o modo `none` permite uso offline com decomposição local.
 
 **Precisa de plano Claude Code pago?**
-O Onion usa o Claude Code como plataforma. Orquestrações pesadas (ex.: `/meta:evolve` ≈ 1.27M tokens numa auditoria completa) favorecem planos com mais headroom; uso moderado funciona em planos menores.
+O Onion usa o Claude Code como plataforma. Orquestrações pesadas (ex.: `meta:evolve` ≈ 1.27M tokens numa auditoria completa) favorecem planos com mais headroom; uso moderado funciona em planos menores.
 
 **O Onion substitui o GitFlow?**
 Não — complementa. `/engineer:*` e `/git:*` são orientados pelo motor GitFlow (`gitflow-patterns.md`); o Onion adiciona sessões retomáveis, gates de qualidade e integração com task manager por cima.
 
 **O que acontece se o Claude Code lançar uma feature incompatível?**
-O framework tem meta-specs L0 e `/meta:evolve` para auto-auditoria — mudanças de plataforma geram achados D6 (legado/modernização) que o mantenedor executa. A migração Cursor→native em 49 agentes é um exemplo real.
+O framework tem meta-specs L0 e `meta:evolve` para auto-auditoria — mudanças de plataforma geram achados D6 (legado/modernização) que o mantenedor executa. A migração Cursor→native em 49 agentes é um exemplo real.
 
 **Funciona em projetos legados sem testes?**
 Sim — projetado para "qualquer projeto (novo, legado ou regulado)". Os agentes `/test:*` e `@branch-test-planner` ajudam a estabelecer cobertura onde não existe.
@@ -403,7 +403,7 @@ Não. São complementares: `Workflow` = orquestração determinística de forma 
 **O Onion funciona com monorepo?**
 Sim — `@nx-monorepo-specialist` e `@nx-migration-specialist` são especializados em NX, validados em repositórios NX reais.
 
-**O que é o `/meta:evolve` e por que é relevante?**
+**O que é o `meta:evolve` e por que é relevante?**
 A auto-auditoria do framework: dispara uma orquestração em 10 dimensões (peso, redundância, duplicação, KBs stale, conformidade, legado, links, frontmatter, frescor de contexto, frescor de memória) e produz backlog priorizado com evidência `arquivo:linha`. O framework se diagnostica periodicamente sem revisão manual artefato-a-artefato.
 
 **Como funciona a integração de compliance?**
@@ -505,4 +505,4 @@ comandos e a tabela §6 dizia 99); §3, §6 e §7 passaram a derivar da mesma SS
 
 Casos históricos §5 seguem **intactos** como congelados-no-tempo. SSOT da doutrina:
 `docs/onion/graph/onion-identity-2026-07.kg.yaml`.
-**Mantido por**: Sistema Onion (síntese — gerada via `/meta:create-knowledge-base`, Fase 3 do plano de materiais externos)
+**Mantido por**: Sistema Onion (síntese — gerada via `meta:create-knowledge-base`, Fase 3 do plano de materiais externos)

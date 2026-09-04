@@ -3,7 +3,7 @@ name: docs-health
 description: |
   Health check completo da documentação do projeto.
   Use para diagnóstico de qualidade, gaps e recomendações.
-  Diferença vs /docs:validate-docs: este é DIAGNÓSTICO read-only (saúde/gaps/recomendações); o validate-docs valida estrutura/links/padrões e pode CORRIGIR (--fix).
+  Diferença vs /onion-docs:validate-docs: este é DIAGNÓSTICO read-only (saúde/gaps/recomendações); o validate-docs valida estrutura/links/padrões e pode CORRIGIR (--fix).
 allowed-tools: Read Bash(find *) Bash(ls *) Bash(wc *)
 
 parameters:

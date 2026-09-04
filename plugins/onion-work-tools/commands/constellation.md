@@ -9,7 +9,7 @@ version: "1.0.0"
 updated: "2026-07-19"
 ---
 
-# /meta:constellation — o 🗺️ Mapa da Constelação de Estudos
+# /onion-work-tools:constellation — o 🗺️ Mapa da Constelação de Estudos
 
 O **catch-up das N frentes**: o "Tier-0 dos Tier-0". Enquanto o `/catch-up` reorienta **uma**
 estrela, este comando reorienta a **constelação** — o painel macro de todos os estudos

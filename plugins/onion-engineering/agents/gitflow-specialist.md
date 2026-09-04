@@ -58,12 +58,12 @@ O Sistema Onion agora oferece **comandos Gitflow automatizados** que executam os
 #### **Para EXECUÇÃO rápida e automatizada:**
 - `/git/help` - Sistema de ajuda e referência
 - `/git/init` - Setup automático Gitflow  
-- `/git:flow feature start` - Criar feature backlog ClickUp
-- `/git:flow feature finish` - Merge + cleanup automático
-- `/git:flow release start` - Release + versionamento semântico
-- `/git:flow release finish` - Deploy production + tags
-- `/git:flow hotfix start` - Emergency setup < 2h SLA
-- `/git:flow hotfix finish` - Deploy crítico emergencial  
+- `/onion-engineering:flow feature start` - Criar feature backlog ClickUp
+- `/onion-engineering:flow feature finish` - Merge + cleanup automático
+- `/onion-engineering:flow release start` - Release + versionamento semântico
+- `/onion-engineering:flow release finish` - Deploy production + tags
+- `/onion-engineering:flow hotfix start` - Emergency setup < 2h SLA
+- `/onion-engineering:flow hotfix finish` - Deploy crítico emergencial  
 - `/engineer/hotfix` - Workflow híbrido completo
 - `/git/sync` - Pós-merge synchronization
 

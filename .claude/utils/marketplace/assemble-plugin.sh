@@ -210,6 +210,21 @@ while IFS= read -r f; do
 done < <(find "${DEST}" -type f ! -path "*/.claude-plugin/*" 2>/dev/null)
 
 # ---------------------------------------------------------------------------
+# NAMESPACE-PORTABILITY — comandos de plugin são `/<plugin>:<cmd>`, nunca `/<ns-do-core>:<cmd>`.
+# Medido 2026-09-04: 531 refs no namespace do core em plugins/ (208 cross, 194 mesmo-plugin, 129 dangling),
+# ZERO na forma do plugin — o lint só varria .claude/ + docs/, onde `/engineer:pr` resolve. A cura é do
+# helper da REGRA 72 (um só lugar para regex + mapa): mapeado → forma do plugin (mapa derivado de TODOS os
+# manifestos, não só deste); dangling (meta-fábrica, não distribuída) → sem a barra. O helper vive no
+# core (dirname deste script), não no SRC — a bancada monta SRCs mínimos sem .claude/validation/.
+# ---------------------------------------------------------------------------
+NS_HELPER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../../validation/plugin-namespace-check.sh"
+if [ -f "${NS_HELPER}" ]; then
+  bash "${NS_HELPER}" "${SRC}" --rewrite "${DEST}" || printf 'assemble-plugin: NAMESPACE-PORTABILITY falhou (rc=%s) — REGRA 72 vai acusar\n' "$?" >&2
+else
+  printf 'assemble-plugin: helper de namespace ausente (%s) — refs ao namespace do core ficam intactas\n' "${NS_HELPER}" >&2
+fi
+
+# ---------------------------------------------------------------------------
 # IRMÃ-NÃO-EMBARCADA → PLAIN-TEXT (cura POR CONSTRUÇÃO — medido em 2026-08-18).
 # Uma KB embarcada em kb/ cita as irmãs por link relativo (`[X](irma.md)`). Quando a irmã NÃO está
 # no manifesto, o link resolve dentro do plugin para um arquivo que não existe: MORTO. Medição que
