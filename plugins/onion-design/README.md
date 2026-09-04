@@ -57,9 +57,9 @@ Invocação: `/onion-design:<comando>` (namespace do plugin).
 | Campo | Valor |
 |---|---|
 | Fonte | `marciocar/onion-evolve` |
-| Ref | `2658f41eb06c` |
-| tree_sha (conteúdo) | `56e2fddc1720` |
-| Data do commit | 2026-09-03T22:34:24-03:00 |
+| tree_sha (hash do conteúdo das fontes) | `56e2fddc1720` |
+
+Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 
 Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT em `.claude/` do source. Não edite à mão: a próxima montagem sobrescreve.
 

@@ -91,7 +91,8 @@ if hooks:
     out += [f"| `{esc(e)}` | `{esc(s)}` |" for e,s in hooks]; out.append("")
     out.append("Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é a capacidade que só existe no Claude Code. Nenhum envia dados para fora; todos rodam local.\n")
 out.append("## Requisitos\n\n- Claude Code ≥ 2.1.239 (marketplace com `pluginRoot`); `bash`, `git`, `awk`; `python3` (motores KG e censos); `jq` opcional.\n- Este plugin instala **capacidade** (read-only, atualizável pelo gerenciador). Não é adoção: para vendorizar o Onion num repo, o canal é `/meta:adopt` no repositório-fonte.\n")
-out.append("## Proveniência\n\n| Campo | Valor |\n|---|---|\n| Fonte | `%s` |\n| Ref | `%s` |\n| tree_sha (conteúdo) | `%s` |\n| Data do commit | %s |\n" % (prov.get("repository","?"), str(prov.get("ref","?"))[:12], str(prov.get("tree_sha","?"))[:12], prov.get("commit_date","?")))
+# Só campos CONTENT-STABLE aqui: ref/commit_date mudam a cada commit e fariam o README driftar (REGRA 19 acusou no CI, 2026-09-04).
+out.append("## Proveniência\n\n| Campo | Valor |\n|---|---|\n| Fonte | `%s` |\n| tree_sha (hash do conteúdo das fontes) | `%s` |\n\nRef e data do commit de origem estão em `.claude-plugin/provenance.json`.\n" % (prov.get("repository","?"), str(prov.get("tree_sha","?"))[:12]))
 out.append("Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT em `.claude/` do source. Não edite à mão: a próxima montagem sobrescreve.\n")
 out.append("## Licença\n\n%s — © Onion · Marcio Carvalho. Site: https://onionevolve.com · Fonte: https://github.com/%s\n" % (pj.get("license","MIT"), prov.get("repository","marciocar/onion-evolve")))
 open(os.path.join(dest,"README.md"),"w",encoding="utf-8").write("\n".join(out))

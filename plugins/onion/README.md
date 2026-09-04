@@ -75,9 +75,9 @@ Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é 
 | Campo | Valor |
 |---|---|
 | Fonte | `marciocar/onion-evolve` |
-| Ref | `2658f41eb06c` |
-| tree_sha (conteúdo) | `40c73b85f485` |
-| Data do commit | 2026-09-03T22:34:24-03:00 |
+| tree_sha (hash do conteúdo das fontes) | `40c73b85f485` |
+
+Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 
 Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT em `.claude/` do source. Não edite à mão: a próxima montagem sobrescreve.
 

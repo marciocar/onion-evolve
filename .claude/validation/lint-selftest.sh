@@ -11110,6 +11110,13 @@ run_marketplace_readmes_selftests() {
   bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out" >/dev/null 2>&1 || true
   if ! grep -q 'edicao manual' "${d}/out/README.md"; then record_pass "marketplace-readmes: (c) re-montagem sobrescreve edição manual (artefato gerado)"
   else record_fail "marketplace-readmes: (c) gerado" "edição manual sobreviveu à re-montagem"; fi
+  # (d) README é CONTENT-STABLE: um commit novo que NÃO toca as fontes (outro HEAD, outra data) gera README idêntico.
+  #     Foi o drift que a REGRA 19 acusou no CI em 2026-09-04: ref/commit_date no README mudavam a cada commit.
+  cp "${d}/out/README.md" "${d}/readme-head1.md"
+  ( cd "${d}/src" && printf 'x\n' > unrelated.txt && git add unrelated.txt && GIT_COMMITTER_DATE="2030-01-01T00:00:00Z" git -c user.email=t@t -c user.name=t commit -qm other --date="2030-01-01T00:00:00Z" ) >/dev/null 2>&1
+  bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out2" >/dev/null 2>&1 || true
+  if [ -f "${d}/out2/README.md" ] && cmp -s "${d}/readme-head1.md" "${d}/out2/README.md"; then record_pass "marketplace-readmes: (d) README content-stable entre HEADs (sem ref/data volátil)"
+  else record_fail "marketplace-readmes: (d) content-stable" "README difere entre dois HEADs com as mesmas fontes: $(diff "${d}/readme-head1.md" "${d}/out2/README.md" 2>&1 | head -4 | tr '\n' ' ')"; fi
   rm -rf "${d}"
 }
 _family run_marketplace_readmes_selftests
