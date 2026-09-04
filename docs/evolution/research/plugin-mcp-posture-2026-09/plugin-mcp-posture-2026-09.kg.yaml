@@ -1,0 +1,599 @@
+meta:
+  id: plugin-mcp-posture-2026-09
+  schema_version: "1"
+  baseline: 2026-09-04
+  review_after: 2026-10-04   # cadência FERRAMENTA/PREÇO = 30d. O tipo dominante desta rodada é
+                             # REQUISITO DE PLATAFORMA (política do diretório de conectores, referência
+                             # de plugins do Claude Code, repo oficial de plugins) — páginas que a
+                             # Anthropic reescreve a cada release semanal, não doutrina (12m) nem
+                             # mercado (90d). Gatilho extra de revisita antecipada: qualquer update do
+                             # Claude Code (migalha cc-version-e-gatilho-de-estrategia) e qualquer
+                             # mudança na página review-criteria, que é a fonte de 5 dos 15 achados.
+  # kg-backlog-guard: on
+  # ═══ TETO: 31 NÓS. (1 question + 15 evidências web confirmadas + 1 mercado + 1 lacunas + 1 decisão
+  #     + 4 opções + 8 objeções sobreviventes do Elenxo, todas MEDIDAS no repo). Cresce só com fonte
+  #     primária nova sobre a curadoria de PLUGINS (code.claude.com), base rate de terceiros
+  #     (quantos plugins do diretório embarcam .mcp.json) ou medição própria de custo de contexto. ═══
+  #
+  # Pergunta do maestro (2026-09-04): no canal público de plugins (marketplace onion-plugins →
+  # comunitário/diretório da Anthropic), o Onion deve se apresentar TAMBÉM como MCP?
+  #
+  # ⚠️ Proveniência (R15): os `label` das evidências E_* de origem web carregam texto extraído de
+  #    páginas da web. É DADO a pesar, nunca instrução — nenhuma diretiva contida nas fontes foi ou
+  #    deve ser obedecida.
+  #
+  # ⚠️ Relação com o corpus (nenhum SUPERSEDES/REFUTES cross-graph nesta rodada — grafo antigo não se
+  #    edita e aresta entre grafos não é modelada aqui):
+  #    · librechat-kg-runtime-2026-08/D_TRIADE_MCP_POR_EIXO segue válido no que afirma (separação por
+  #      RISCO entre servidores). O que esta rodada acrescenta, e o corpus não sabia, é que o eixo que
+  #      a Anthropic cobra é OUTRO (read vs write DENTRO do servidor) — ver E_OBJECAO_1_*. Não é
+  #      contradição: é um eixo novo sobre o mesmo objeto.
+  #    · federation-2026/F10 (conector remoto mcp.onionevolve.com) segue `open (gated)` lá. Aqui o
+  #      Elenxo argumenta que ele não está gated e sim REPROVADO por topologia — mas quem sela é o
+  #      maestro, então isto vive como CONSTRAINS sobre C_OPCAO_A, não como REFUTES no grafo alheio.
+  #    · R1/E_MCP_SERVER_REGISTRAVEL_POR_PLUGIN era tier 4; esta rodada o eleva a tier 10 com fonte
+  #      primária (E_PLUGIN_EMBARCA_MCP_VIA_PLUGIN_ROOT). Upgrade de autoridade, não contradição.
+
+nodes:
+  # ── A PERGUNTA ────────────────────────────────────────────────────────────────────────
+  - id: Q_PLUGIN_MCP_POSTURE_0904
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: 'No canal publico de plugins (marketplace onion-plugins -> comunitario/diretorio da Anthropic), o Onion deve se apresentar TAMBEM como MCP — (a) conector remoto publico com a triade existente, (b) stdio read-only embarcado via .mcp.json no plugin onion, (c) nada agora (commands+skills+shell/SDAAL ja servem)? Segue `open`: a rodada levantou os REQUISITOS mas nao a ADOCAO — a base rate de terceiros (quantos plugins do diretorio embarcam .mcp.json) e o custo absoluto de conformidade de (b) foram cortados por orcamento, e sem eles a pergunta nao e decidivel.'
+    trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+
+  # ── EVIDÊNCIAS CONFIRMADAS (fontes web) ──────────────────────────────────────────────
+  - id: E_ANTHROPIC_READ_WRITE_SEPARADOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026'
+    source_tier: 10
+    source_kind: primary
+    label: 'CONFIRMADA (tier 10, 3-0): "Anthropic exige tools de leitura e escrita separados em servidores MCP — um tool unico que aceita metodos seguros e inseguros (ex.: catch-all api_request com parametro method) e rejeitado na triagem." ATENCAO ao endereco da fonte: esta pagina governa o Connector Directory (MCP remoto do claude.ai), nao a curadoria de PLUGINS do Claude Code — ver E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA.'
+    trace: 'https://claude.com/docs/connectors/building/review-criteria'
+
+  - id: E_TOOL_ANNOTATIONS_OBRIGATORIAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026'
+    source_tier: 10
+    source_kind: primary
+    label: 'CONFIRMADA (tier 10, 3-0): "Todo tool MCP submetido ao diretorio deve ter anotacoes title e readOnlyHint/destructiveHint, que determinam se roda sem confirmacao por chamada (read-only) ou sempre pede confirmacao (destrutivo) no Claude."'
+    trace: 'https://claude.com/docs/connectors/building/review-criteria'
+
+  - id: E_PLUGIN_EMBARCA_MCP_VIA_PLUGIN_ROOT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'https://code.claude.com/docs/en/plugins-reference — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026'
+    source_tier: 10
+    source_kind: primary
+    label: 'CONFIRMADA (tier 10, 3-0): "Plugins Claude Code podem empacotar servidores MCP declarando um bloco mcpServers em .mcp.json (ou plugin.json), com comando/args resolvidos via ${CLAUDE_PLUGIN_ROOT}." Eleva a tier 10 o que o corpus R1 tinha em tier 4 (plugin-directory-landscape-2026-09/E_MCP_SERVER_REGISTRAVEL_POR_PLUGIN). CAPACIDADE confirmada; o ENCAIXE e outra coisa — ver E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA.'
+    trace: 'https://code.claude.com/docs/en/plugins-reference'
+
+  - id: E_TOOLS_NAMESPACED_POR_PLUGIN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'https://code.claude.com/docs/en/plugins-reference — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026'
+    source_tier: 10
+    source_kind: primary
+    label: 'CONFIRMADA (tier 10, 3-0): "Tools expostas por um MCP server embarcado num plugin sao namespaced automaticamente como mcp__plugin_<plugin-name>_<server-name>__<tool>, isolando-as de outros plugins/servers." Isola NOMES; nao isola confianca nem custo de contexto — ver E_OBJECAO_4_NAMESPACE_NAO_ISOLA_CUSTO_NEM_MENTIRA.'
+    trace: 'https://code.claude.com/docs/en/plugins-reference'
+
+  - id: E_MCP_REMOTO_EXIGE_OAUTH_CA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-09-04
+    verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)'
+    valid_from: '2026'
+    source_tier: 10
+    source_kind: primary
+    label: 'CONFIRMADA (tier 10, 2-1): "MCP remotos que exigem autenticacao devem usar OAuth 2.0 seguro com certificados de autoridades reconhecidas" — a opcao (a) tem exigencia formal explicita na politica do diretorio, elevando o custo de curadoria dessa rota. Confianca 0.8 (nao 0.9) pelo voto dissidente. O corpus mostra que OAuth e CONSTRUIVEL aqui (JWKS/IdP ja deployado, onion-bridge); o que bloqueia (a) e outra coisa — ver E_OBJECAO_5_TOPOLOGIA_PRIVADA_BLOQUEIA_A.'
+    trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+
+  - id: E_POLITICA_REMOTO_VS_LOCAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-09-04
+    verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)'
+    source_tier: 10
+    source_kind: primary
+    label: 'CONFIRMADA (tier 10, 2-1): "A politica distingue e impoe requisitos DIFERENTES (mais rigorosos) para servidores MCP remotos vs. locais/embarcados — a opcao (b) tem barra de conformidade mais baixa que a (a), sem exigencia de OAuth." Claim COMPARATIVO: diz que (b) < (a), nao diz quanto e o absoluto de (b) — ver E_OBJECAO_6_COMPARATIVO_USADO_COMO_LUZ_VERDE.'
+    trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+
+  - id: E_PLUGIN_JSON_CAMPO_MCPSERVERS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'https://code.claude.com/docs/en/plugin-marketplaces — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026'
+    source_tier: 9
+    source_kind: primary
+    label: 'CONFIRMADA (tier 9, 3-0): "O plugin.json do Claude Code suporta um campo mcpServers que permite ao plugin embarcar servidores MCP como parte de sua distribuicao."'
+    trace: 'https://code.claude.com/docs/en/plugin-marketplaces'
+
+  - id: E_MARKETPLACE_JSON_MCPSERVERS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'https://code.claude.com/docs/en/plugin-marketplaces — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    source_tier: 9
+    source_kind: primary
+    label: 'CONFIRMADA (tier 9, 3-0): "Entradas de plugin no marketplace.json tambem suportam o campo mcpServers (string ou objeto) para configuracao de servidor MCP." E o MESMO fato de E_PLUGIN_JSON_CAMPO_MCPSERVERS, na MESMA pagina, visto do outro lado do manifesto — contado aqui por fidelidade a rodada, mas com impact rebaixado a 2 para nao inflar a contagem de evidencia (ver E_OBJECAO_8_DUPLICATA_INFLA_CONTAGEM).'
+    trace: 'https://code.claude.com/docs/en/plugin-marketplaces'
+
+  - id: E_MCP_JSON_OPCIONAL_NO_OFICIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'https://github.com/anthropics/claude-plugins-official — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026-09'
+    source_tier: 9
+    source_kind: primary
+    label: 'CONFIRMADA (tier 9, 3-0): "No .claude-plugin/plugin.json de um plugin, o arquivo .mcp.json (configuracao de servidor MCP) e explicitamente opcional, nao obrigatorio." E a evidencia mais direta a favor de (c): o canal publico NAO cobra MCP para aceitar um plugin — logo nao ha forca externa empurrando o Onion para (b).'
+    trace: 'https://github.com/anthropics/claude-plugins-official'
+
+  - id: E_POSTMARK_MCP_MALICIOSO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: 2026-09-04
+    verified_against: 'https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)'
+    valid_from: '2025-09'
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'CONFIRMADA (tier 4, 2-1) — texto original: "A malicious version of the postmark-mcp npm package was found to have been modified to secretly BCC email contents to an external attacker-controlled domain, compromising any agentic pipeline that had installed it." Confianca travada em 0.5: vendor-on-competitor e sempre suspeito (clausula 7) — a Snyk vende justamente a deteccao desse risco. Ainda assim e o caso concreto que sustenta a preocupacao de superficie na triagem do comunitario (opcoes a/b).'
+    trace: 'https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/'
+
+  - id: E_MCP_ALTO_TRUST_AMPLA_PERMISSAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: 2026-09-04
+    verified_against: 'https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'CONFIRMADA (tier 4, 3-0) — texto original: "MCP servers operate with high trust and broad permissions inside agent toolchains, so any data they handle can be exposed if the server is compromised." Confianca 0.5 pelo tier e pelo conflito de interesse do emissor. Le-se junto com a doutrina do core: o que o Onion serviria por MCP embarcado e conteudo PRIVADO do adotante (KG, diario, KBs).'
+    trace: 'https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/'
+
+  - id: E_KG_MCP_TERCEIRO_MULTI_HOST_STDIO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-09-04
+    verified_against: 'https://github.com/hilyfux/knowledge-graph — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026'
+    source_tier: 3
+    source_kind: aggregator
+    label: 'CONFIRMADA (tier 3, 3-0): "Um servidor MCP de knowledge graph de projeto de terceiros declara explicitamente suportar multiplos hosts nao-Claude-Code (Codex, Cursor, Windsurf, Claude Desktop) via stdio, nao remoto/OAuth." E o unico sinal desta rodada sobre a metade "ha demanda de hosts nao-Claude-Code?" da pergunta — e e sinal de OFERTA (alguem construiu), nao de DEMANDA (alguem usa). Confianca travada em 0.6 pela clausula 7 (tier <= 3 nunca acima de 0.7).'
+    trace: 'https://github.com/hilyfux/knowledge-graph'
+
+  - id: E_MCP_DEVE_CHAMAR_API_PRIMEIRA_PARTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026'
+    source_tier: 10
+    source_kind: primary
+    label: 'CONFIRMADA (tier 10, 3-0): "O servidor MCP deve chamar APIs de primeira parte do proprio publicador (ou que ele legitimamente faz proxy); o dominio do servidor MCP deve corresponder ao servico." Para (a) isto e favoravel — mcp.onionevolve.com serviria o proprio Onion e o dominio corresponde. Nao e este o criterio que derruba (a).'
+    trace: 'https://claude.com/docs/connectors/building/review-criteria'
+
+  - id: E_PLUGIN_EXIGE_REPO_PUBLICO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026'
+    source_tier: 10
+    source_kind: primary
+    label: 'CONFIRMADA (tier 10, 3-0): "Plugins submetidos ao diretorio precisam vincular um repositorio publico no GitHub — codigo fechado nao e aceito." Cruzada com a topologia real do Onion (core PRIVADO; migalha family-repo-topology-door-core-collapse), esta e a evidencia de maior consequencia da rodada: o repo que TEM o KG nao pode ser submetido, e o repo que PODE ser submetido (onion-plugins) nao tem o KG.'
+    trace: 'https://claude.com/docs/connectors/building/review-criteria'
+
+  - id: E_EXIGE_DOC_PUBLICA_E_CREDENCIAIS_TESTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026'
+    source_tier: 10
+    source_kind: primary
+    label: 'CONFIRMADA (tier 10, 3-0): "Documentacao publica (post de blog ou artigo de central de ajuda) e exigida ate a data de publicacao, e credenciais de teste com conta totalmente populada sao obrigatorias na submissao." Custo operacional continuo que a opcao (a) herda inteiro: alguem precisa manter conta de teste populada com um KG de demonstracao — que nao pode ser o KG real do core, por ser privado.'
+    trace: 'https://claude.com/docs/connectors/building/review-criteria'
+
+  # ── EIXO MERCADO/CAPITAL (invariante, clausula 4) ────────────────────────────────────
+  - id: E_MERCADO_PLUGIN_MCP_0904
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-09-04
+    verified_against: 'fan-out desta rodada (36 fontes): nenhum angulo devolveu rodada, M&A ou valuation ligado ao canal de plugins do Claude Code; confirma E_MERCADO_PLUGIN_DIRECTORY_0904 do corpus R1, medido na mesma data'
+    source_tier: 3
+    source_kind: synthesis
+    label: 'EIXO MERCADO — SEM SINAL DE CAPITAL para o canal de plugins nesta rodada (registro explicito: o eixo e invariante mesmo vazio). Nenhuma rodada, M&A ou valuation associado ao Claude Code plugin directory apareceu nas fontes colhidas. O unico sinal de mercado e TRACAO DE USO, nao de capital: os dois plugins de topo do diretorio passam de 1M de instalacoes (corpus R1) — a curadoria distribui volume real mas ainda nao atraiu capital rastreavel. O eixo de analistas veio VAZIO POR REFUTACAO: a leitura de que o Thoughtworks Technology Radar classifica MCP em "Trial" nao sobreviveu a verificacao (ver E_LACUNAS_*). Consequencia para a decisao: nao ha follow-the-money empurrando MCP embarcado como diferencial competitivo — a tese "embarcar MCP capta distribuicao" nao tem lastro de capital nesta rodada.'
+    trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+
+  # ── LACUNAS DECLARADAS (regra de saida #2) ───────────────────────────────────────────
+  - id: E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-09-04
+    verified_against: 'contabilidade da propria rodada: 36 fontes consultadas, 18 claims levantadas, 15 confirmadas, 10 refutadas por fonte fraca, 0 nao-verificadas por falha de acesso, 3 parcelas de custo cortadas por orcamento'
+    source_tier: 10
+    source_kind: measurement
+    label: 'LACUNAS DECLARADAS (36 fontes, 18 claims). (1) REFUTADAS POR FONTE FRACA — 10: ausencia de exigencia de SBOM/assinatura/pin para plugins com MCP (tier 9, ausencia nao provada); repo oficial nao certifica MCP de terceiros (tier 9); respostas de tool MCP nao sao sanitizadas antes do contexto (OWASP tier 8); descricoes de tool revisadas so na 1a conexao (OWASP tier 8); Thoughtworks Radar classifica MCP em "Trial" (tier 7) e o alerta de lacunas arquiteturais/MCP-Scan (tier 7) — as duas derrubam o eixo de analistas desta rodada; parceria Stytch+Cloudflare para Remote MCP Authorization (tier 5); deployment do KG MCP de terceiro ser stdio auto-registrado (tier 3); 52% dos 1.847 servidores MCP auditados abandonados (tier 3); so 17% prontos-para-producao (tier 3). (2) NAO VERIFICADAS POR FALHA DE ACESSO: ZERO — nenhum 403, nenhuma doc truncada. (3) CORTADAS POR ORCAMENTO, e sao exatamente as que decidiriam (b): (i) o requisito de "dependencias razoavelmente atuais, incl. node_modules" para servidores locais; (ii) se ha revisao CONTINUA da Anthropic para permanecer listado; (iii) se a curadoria do diretorio de PLUGINS (code.claude.com) cita MCP/SBOM/pin — hoje so temos a pagina de CONECTORES. (4) NUNCA PERGUNTADA: a base rate de terceiros — quantos dos plugins do diretorio publico embarcam .mcp.json. Sem ela, "o ecossistema faz isso" e opiniao.'
+    trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+
+  # ── A DECISÃO (o maestro sela — esta sessão NUNCA sela) ──────────────────────────────
+  - id: D_PLUGIN_MCP_POSTURE_0904
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: 'DECISAO ABERTA (o maestro sela): o Onion deve se apresentar TAMBEM como MCP no canal publico de plugins? Opcoes — (a) expor a triade existente (onion-kg read-only 6 tools, onion-exec 4 tools com write-como-proposta, onion-framework 5 tools) como conector remoto publico em mcp.onionevolve.com com OAuth 2.1/PKCE, o F10 gated da federacao; (b) embarcar um servidor stdio read-only (adapter do onion-kg: kg_list, kg_radar, kb_search, kb_get, diary_index, inventory) via .mcp.json no plugin onion; (c) nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; (d) skill-bundle via git-subdir (cortada por orcamento nesta rodada, nao considerada). RECOMENDACAO DO ELENXO: **(c) — nada agora — mas com a ressalva que E o veredito principal: a decisao como posta ainda nao e decidivel, e (c) hoje e a escolha certa pelo motivo ERRADO.** O motivo errado seria "MCP aumenta superficie na triagem"; o motivo certo e que os dois caminhos alternativos foram medidos e nenhum esta pronto. (1) A opcao (a) esta REPROVADA, nao gated — tres bloqueios independentes, cada um suficiente: repo publico obrigatorio contra core PRIVADO (E_PLUGIN_EXIGE_REPO_PUBLICO + E_OBJECAO_5), separacao read/write que a triade JA viola no onion-exec (E_OBJECAO_1), e ZERO annotations nos tres servidores, o que faz de "expor" uma reescrita e nao uma exposicao (E_OBJECAO_2). (2) A opcao (b) nao e um adapter: e reescrita com um problema de resolucao de raiz NAO RESOLVIDO — ${CLAUDE_PLUGIN_ROOT} aponta para a raiz errada e o servidor serviria os arquivos do proprio plugin, jamais o KG do adotante (E_OBJECAO_3); e seu custo absoluto de conformidade e justamente o que a rodada cortou por orcamento (E_OBJECAO_6). (3) O peso a favor de "o ecossistema faz isso" esta inflado por contagem duplicada de um fato de sintaxe (E_OBJECAO_7 e E_OBJECAO_8) e a base rate de terceiros nunca foi medida. CONDICAO DE REABERTURA NOMEADA (nao data): reabre quando (i) a base rate de plugins do diretorio com .mcp.json for medida, E (ii) existir um caminho provado de resolucao da raiz do projeto do adotante a partir de um plugin instalado. Ate la, (c) — e as duas curas internas que a rodada revelou (o count-drift "91 KBs" contra 94 reais no onion-kg, e a mistura read/write no onion-exec) valem por si, independentemente da decisao.'
+    trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml · projeção: docs/evolution/research/plugin-mcp-posture-2026-09/SYNTHESIS.md'
+
+  # ── AS OPÇÕES (uma claim por opção; quem sela é o maestro) ───────────────────────────
+  - id: C_OPCAO_A_CONECTOR_REMOTO_PUBLICO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.3
+    label: 'OPCAO (a): expor a triade existente (onion-kg read-only 6 tools, onion-exec 4 tools com write-como-proposta, onion-framework 5 tools) como conector remoto publico em mcp.onionevolve.com com OAuth 2.1/PKCE — o F10 gated da federacao. Confianca 0.3: o Elenxo grada esta opcao como REPROVADA (nao gated) por tres bloqueios independentes e suficientes, mas ela permanece `open` porque quem sela e o maestro — nenhuma sessao converte a recomendacao do refutador em veredito. O que a rodada estabeleceu: o verbo "expor" e falso (a triade nao tem annotations e mistura read/write, logo seria reescrita), OAuth e o menor dos problemas (o corpus ja tem JWKS/IdP deployado) e o bloqueio real e de TOPOLOGIA (repo publico obrigatorio contra core privado).'
+    trace: 'docs/evolution/research/federation-2026'
+
+  - id: C_OPCAO_B_STDIO_EMBARCADO_READONLY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.4
+    label: 'OPCAO (b): embarcar um servidor stdio read-only (adapter do onion-kg: kg_list, kg_radar, kb_search, kb_get, diary_index, inventory) via .mcp.json no plugin onion, para o KG do adotante virar tool no Claude Code e em outros hosts MCP. Confianca 0.4: a CAPACIDADE esta confirmada em tier 10 (E_PLUGIN_EMBARCA_MCP_VIA_PLUGIN_ROOT) e a barra e comparativamente mais baixa que (a) (E_POLITICA_REMOTO_VS_LOCAL), mas o ENCAIXE esta quebrado na raiz (E_OBJECAO_3) e o custo ABSOLUTO de conformidade foi cortado por orcamento (E_OBJECAO_6). Nao e reprovada: e nao-decidivel hoje. O que falta e nomeado na condicao de reabertura da decisao.'
+    trace: 'https://code.claude.com/docs/en/plugins-reference'
+
+  - id: C_OPCAO_C_NADA_AGORA_SDAAL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: 'OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem do comunitario. Confianca 0.7: e a recomendacao do Elenxo, sustentada por evidencia externa (E_MCP_JSON_OPCIONAL_NO_OFICIAL: o canal publico NAO cobra MCP) e por precedente interno (2026-08-07, o maestro recusou MCP para o revisor inline em favor de shell/SDAAL — testavel e portavel em CI; e a postura de acoplamento do CLAUDE.md: acople so quando a capacidade nao existe fora). Ressalva do Elenxo que impede confianca maior: (c) hoje seria escolhida pelo motivo errado (superficie) quando o motivo certo e que (a) esta reprovada e (b) nao esta pronta — e "nada agora" nao pode virar arquivamento silencioso das duas curas internas que a rodada revelou.'
+    trace: 'docs/knowledge-base/concepts/task-manager-abstraction.md'
+
+  - id: C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.2
+    label: 'OPCAO (d) — NAO CONSIDERADA NA DECISAO, CORTADA POR ORCAMENTO NESTA RODADA: skill-bundle — skills locais via git-subdir (strict:false), capacidade sem servidor, sem processo e sem triagem. Confianca 0.2 nao mede merito e sim AUSENCIA DE EVIDENCIA: nenhuma fonte foi colhida sobre ela, nenhum voto adversarial foi emitido, nenhum custo foi medido. Fica registrada como no explicito para que a proxima rodada nao a redescubra como novidade — e para que o corte por orcamento seja um fato citavel, nao um esquecimento (clausula 6: ideia descartada responde se foi por evidencia ou por comodismo; aqui a resposta e "por orcamento", que e a terceira opcao e precisa estar escrita).'
+    trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+
+  # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ───────────────
+  - id: E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'E_ANTHROPIC_READ_WRITE_SEPARADOS (https://claude.com/docs/connectors/building/review-criteria) cruzada com medicao no repo: ops/mcp-onion-exec/server.py — dict TOOLS l.92-95 com run_lint, run_inventory, kg_freshness (leitura) e propose_kg_write (escrita, `open(fpath, "w")` em docs/evolution/kg-inbox/) NO MESMO SERVIDOR'
+    source_tier: 10
+    source_kind: measurement
+    label: 'OBJECAO SOBREVIVENTE 1 — dupla. (i) FONTE MAL ENDERECADA: review-criteria governa o Connector Directory (MCP remoto do claude.ai), nao o marketplace/diretorio de PLUGINS do Claude Code, cujos requisitos vem de code.claude.com. Cinco dos quinze achados saem dessa pagina e sao aplicados a opcao (b) sem que nada estabeleca que a submissao de plugin herda o criterio de conector. (ii) E ONDE O CRITERIO SE APLICA, A TRIADE JA FALHA: medido — ops/mcp-onion-exec/server.py mistura tres tools de leitura com uma de escrita no mesmo servidor. O corpus celebra librechat-kg-runtime-2026-08/D_TRIADE_MCP_POR_EIXO como "separada por risco", mas a separacao e entre SERVIDORES, nao entre READ e WRITE — que e exatamente o eixo que o criterio cobra. O achado foi lido como custo externo quando e defeito interno ja presente.'
+    trace: 'ops/mcp-onion-exec/server.py'
+
+  - id: E_OBJECAO_2_ZERO_ANNOTATIONS_EXPOR_E_REESCREVER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'grep -c "readOnlyHint|destructiveHint|annotations" em ops/mcp-onion-kg/server.py, ops/mcp-onion-exec/server.py, ops/mcp-onion-framework/server.py -> 0, 0, 0 (executado 2026-09-04); a unica string "title" e a de serverInfo, nao por-tool'
+    source_tier: 10
+    source_kind: measurement
+    label: 'OBJECAO SOBREVIVENTE 2: os tres servidores da triade tem ZERO annotations. O dicionario de FERRAMENTAS e montado so com name/description/inputSchema. Consequencia direta sobre o enunciado da decisao: a opcao (a) NAO e "expor a triade existente" — e REESCREVER a superficie de tools dos tres servidores para atender E_TOOL_ANNOTATIONS_OBRIGATORIAS. O verbo "expor" embute um custo zero que a medicao refuta.'
+    trace: 'ops/mcp-onion-kg/server.py'
+
+  - id: E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'ops/mcp-onion-kg/server.py l.21 `REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))` e todo `_run` com cwd=REPO; caminhos hardcoded do CORE (docs/knowledge-base/, .claude/validation/kg-radar.sh, .claude/diary/index.md, docs/onion/inventory.md) contra o layout medido do plugin materializado: plugins/onion/kb (4 arquivos) e plugins/onion/validation/kg-radar.sh'
+    source_tier: 10
+    source_kind: measurement
+    label: 'OBJECAO SOBREVIVENTE 3: capacidade nao e encaixe, e aqui o encaixe esta QUEBRADO NA RAIZ. Sob ${CLAUDE_PLUGIN_ROOT}, o REPO calculado por tres dirname sobre __file__ resolve para o diretorio do PLUGIN INSTALADO, nao para o projeto do adotante. E os caminhos sao caminhos do CORE; no plugin materializado o layout e OUTRO (medido: plugins/onion/kb com 4 arquivos, plugins/onion/validation/kg-radar.sh). Logo o servidor embarcado serviria os arquivos DO PROPRIO PLUGIN, ou nada — jamais "o KG do adotante". A opcao (b) nao e um adapter: e reescrita com um problema de resolucao de raiz nao resolvido, e ${CLAUDE_PLUGIN_ROOT}, o unico mecanismo que a doc oferece, aponta justamente para a raiz ERRADA.'
+    trace: 'ops/mcp-onion-kg/server.py'
+
+  - id: E_OBJECAO_4_NAMESPACE_NAO_ISOLA_CUSTO_NEM_MENTIRA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'ops/mcp-onion-kg/server.py l.85 declara "Busca um termo nas 91 KBs (docs/knowledge-base)" contra `find docs/knowledge-base -name "*.md" | wc -l` = 94 (executado 2026-09-04)'
+    source_tier: 10
+    source_kind: measurement
+    label: 'OBJECAO SOBREVIVENTE 4: o namespacing (mcp__plugin_<plugin>_<server>__<tool>) isola NOMES; nao isola confianca nem custo de contexto. Cada tool entra em TODO request com name + description + inputSchema. E a descricao ja mente hoje: o kb_search declara "91 KBs" enquanto a contagem real e 94 — a familia count-drift do proprio core, embarcada num artefato que o adotante nao regenera. Seis tools com prosa estatica = imposto permanente de contexto em toda sessao do adotante, inclusive as que nunca tocam o KG, para uma capacidade que commands+skills ja servem (precedente 2026-08-07).'
+    trace: 'ops/mcp-onion-kg/server.py'
+
+  - id: E_OBJECAO_5_TOPOLOGIA_PRIVADA_BLOQUEIA_A
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'E_PLUGIN_EXIGE_REPO_PUBLICO (review-criteria, tier 10, 3-0) cruzada com a topologia real: onion-claude equivale a onion-evolve e e PRIVATE (migalha family-repo-topology-door-core-collapse); as tools da triade servem docs/knowledge-base/, .claude/diary/ e os .kg.yaml, que so existem no repo privado'
+    source_tier: 10
+    source_kind: measurement
+    label: 'OBJECAO SOBREVIVENTE 5: o achado do OAuth subestima o bloqueio de (a) ao apresenta-lo como "custo de curadoria". OAuth e CONSTRUIVEL — o corpus tem JWKS/IdP deployado (onion-bridge-update-state). O que NAO e construivel e a exigencia de repositorio publico combinada com a topologia: o core e PRIVADO e as tools servem exatamente o conteudo privado dele (diario, grafos, KBs, inventario). A opcao (a) nao esta "gated em OAuth"; esta bloqueada por um fato de topologia que a rodada nao havia cruzado.'
+    trace: 'https://claude.com/docs/connectors/building/review-criteria'
+
+  - id: E_OBJECAO_6_COMPARATIVO_USADO_COMO_LUZ_VERDE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'E_POLITICA_REMOTO_VS_LOCAL (tier 10, 2-1) confrontada com a lista de cortes por orcamento desta rodada, registrada em E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904 itens (i), (ii) e (iii)'
+    source_tier: 10
+    source_kind: measurement
+    label: 'OBJECAO SOBREVIVENTE 6: claim COMPARATIVO usado como luz verde ABSOLUTA. "Barra mais baixa que (a)" nao diz qual e a barra. E as tres parcelas do custo absoluto de (b) sao justamente as CORTADAS POR ORCAMENTO nesta mesma rodada: (i) o requisito de dependencias razoavelmente atuais, incl. node_modules, para servidores locais; (ii) a existencia de revisao inicial E CONTINUA da Anthropic para permanecer listado; (iii) se a curadoria do diretorio de PLUGINS cita MCP/SBOM/pin. A conclusao "barra mais baixa logo escolha (b)" repousa sobre evidencia que a propria rodada decidiu nao coletar.'
+    trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+
+  - id: E_OBJECAO_7_SINTAXE_TRES_VEZES_ADOCAO_NENHUMA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'find . -name .mcp.json (fora de .git) -> ZERO ocorrencias; .claude-plugin/marketplace.json com 8 plugins e `grep -c mcpServers` -> 0 (executado 2026-09-04)'
+    source_tier: 10
+    source_kind: measurement
+    label: 'OBJECAO SOBREVIVENTE 7: os achados 7 e 8 sao o MESMO fato da MESMA pagina (code.claude.com/docs/en/plugin-marketplaces) contados duas vezes, e o achado 3 e o mesmo mecanismo por uma terceira pagina. Tres votos 3-0 sobre um fato de SINTAXE inflam o peso de "o ecossistema faz isso" sem tocar na pergunta de ADOCAO. Medi o nosso lado: `find . -name .mcp.json` devolve ZERO, e nenhum dos 8 plugins do marketplace.json declara mcpServers. Mas isso e o Onion medindo a si mesmo (corpus R1/E_ONION_MEDIDO_LOCAL_0904) — auto-medicao nao e evidencia de mercado, e a base rate de terceiros continua desconhecida.'
+    trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+
+  - id: E_OBJECAO_8_DUPLICATA_INFLA_CONTAGEM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'E_PLUGIN_JSON_CAMPO_MCPSERVERS e E_MARKETPLACE_JSON_MCPSERVERS compartilham URL, pagina e mecanismo (https://code.claude.com/docs/en/plugin-marketplaces); ambas registradas com votos 3-0'
+    source_tier: 10
+    source_kind: measurement
+    label: 'OBJECAO SOBREVIVENTE 8: o achado 8 e duplicata do 7 — mesma URL, mesma pagina, mesmo mecanismo visto do outro lado do manifesto. Contado como achado independente com votos 3-0, distorce a contagem de evidencia a favor de (b) e faz a rodada parecer mais convergente do que e. Cura aplicada neste grafo: E_MARKETPLACE_JSON_MCPSERVERS entrou com impact rebaixado a 2 e a duplicidade declarada no proprio label, para que a contagem de nos nao seja lida como contagem de fatos independentes.'
+    trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+
+edges:
+  # ── evidência web -> pergunta ────────────────────────────────────────────────────────
+  - from: E_ANTHROPIC_READ_WRITE_SEPARADOS
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_TOOL_ANNOTATIONS_OBRIGATORIAS
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_PLUGIN_EMBARCA_MCP_VIA_PLUGIN_ROOT
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_TOOLS_NAMESPACED_POR_PLUGIN
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_MCP_REMOTO_EXIGE_OAUTH_CA
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_POLITICA_REMOTO_VS_LOCAL
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_PLUGIN_JSON_CAMPO_MCPSERVERS
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_MARKETPLACE_JSON_MCPSERVERS
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_MCP_JSON_OPCIONAL_NO_OFICIAL
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_POSTMARK_MCP_MALICIOSO
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_MCP_ALTO_TRUST_AMPLA_PERMISSAO
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_KG_MCP_TERCEIRO_MULTI_HOST_STDIO
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_MCP_DEVE_CHAMAR_API_PRIMEIRA_PARTE
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_PLUGIN_EXIGE_REPO_PUBLICO
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_EXIGE_DOC_PUBLICA_E_CREDENCIAIS_TESTE
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_MERCADO_PLUGIN_MCP_0904
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  # ── objeções do Elenxo -> pergunta (também são evidência medida) ─────────────────────
+  - from: E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_2_ZERO_ANNOTATIONS_EXPOR_E_REESCREVER
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_4_NAMESPACE_NAO_ISOLA_CUSTO_NEM_MENTIRA
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_5_TOPOLOGIA_PRIVADA_BLOQUEIA_A
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_6_COMPARATIVO_USADO_COMO_LUZ_VERDE
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_7_SINTAXE_TRES_VEZES_ADOCAO_NENHUMA
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_8_DUPLICATA_INFLA_CONTAGEM
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  # ── a decisão e suas opções ──────────────────────────────────────────────────────────
+  - from: D_PLUGIN_MCP_POSTURE_0904
+    to: Q_PLUGIN_MCP_POSTURE_0904
+    edge_type: SUPPORTS
+
+  - from: D_PLUGIN_MCP_POSTURE_0904
+    to: C_OPCAO_A_CONECTOR_REMOTO_PUBLICO
+    edge_type: DEPENDS_ON
+
+  - from: D_PLUGIN_MCP_POSTURE_0904
+    to: C_OPCAO_B_STDIO_EMBARCADO_READONLY
+    edge_type: DEPENDS_ON
+
+  - from: D_PLUGIN_MCP_POSTURE_0904
+    to: C_OPCAO_C_NADA_AGORA_SDAAL
+    edge_type: DEPENDS_ON
+
+  - from: D_PLUGIN_MCP_POSTURE_0904
+    to: C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA
+    edge_type: DEPENDS_ON
+
+  # ── objeções sobreviventes LIMITAM (CONSTRAINS), não matam ───────────────────────────
+  - from: E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA
+    to: C_OPCAO_A_CONECTOR_REMOTO_PUBLICO
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA
+    to: D_PLUGIN_MCP_POSTURE_0904
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_2_ZERO_ANNOTATIONS_EXPOR_E_REESCREVER
+    to: C_OPCAO_A_CONECTOR_REMOTO_PUBLICO
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA
+    to: C_OPCAO_B_STDIO_EMBARCADO_READONLY
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_4_NAMESPACE_NAO_ISOLA_CUSTO_NEM_MENTIRA
+    to: C_OPCAO_B_STDIO_EMBARCADO_READONLY
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_5_TOPOLOGIA_PRIVADA_BLOQUEIA_A
+    to: C_OPCAO_A_CONECTOR_REMOTO_PUBLICO
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_6_COMPARATIVO_USADO_COMO_LUZ_VERDE
+    to: C_OPCAO_B_STDIO_EMBARCADO_READONLY
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_7_SINTAXE_TRES_VEZES_ADOCAO_NENHUMA
+    to: D_PLUGIN_MCP_POSTURE_0904
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_8_DUPLICATA_INFLA_CONTAGEM
+    to: D_PLUGIN_MCP_POSTURE_0904
+    edge_type: CONSTRAINS
+
+  - from: E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904
+    to: C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA
+    edge_type: CONSTRAINS
