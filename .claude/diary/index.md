@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 124 entradas · **Stale:** 0 · **Compartilháveis:** 112 · **Com significância:** 51
+**Total:** 125 entradas · **Stale:** 0 · **Compartilháveis:** 113 · **Com significância:** 51
 
 Gerado em: 2026-09-04
 
@@ -12,6 +12,7 @@ Gerado em: 2026-09-04
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-09-04 | learning | public 📤 | tres-bugs-de-campo-do-primeiro-adotante-greenfield-e-a-guarda-que-casava-o-comentario | — | 2026-12-03 | static |
 | 2026-09-04 | error | public 📤 | regra-n-sem-titulo-na-prosa-reincidi-duas-vezes-e-a-cura-e-um-hook-stop | — | 2026-12-03 | static |
 | 2026-09-04 | learning | public 📤 | readme-de-plugin-e-catalogo-gerado-nao-prosa-e-version-duplicada-esconde-update | — | 2026-12-03 | static |
 | 2026-09-04 | decision | public 📤 | oito-plugins-viram-cinco-o-canal-premia-bundle-vertical-e-work-tools-era-saco-de-ferramentas | — | 2026-12-03 | static |

@@ -27,7 +27,9 @@ VENDOR="onion/vendor"
 
 # Superfície L1+L2 (mesma do adopt.md; filtrada pelo que existe no core em HEAD).
 _manifest() {  # $1=SOURCE_ROOT → imprime pathspecs existentes, um por linha
-  local want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules \
+  # .claude/workflows: a skill onion-research instrui Workflow({scriptPath:'.claude/workflows/onion-research.js'}) —
+  # sem o dir o comando NASCE MORTO no adotante (sinal de campo portal-gamificacao, 2026-09-04).
+  local want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows \
               docs/meta-specs docs/knowledge-base docs/sdaal) p
   for p in "${want[@]}"; do git -C "$1" ls-tree HEAD -- "$p" | grep -q . && printf '%s\n' "$p"; done
 }

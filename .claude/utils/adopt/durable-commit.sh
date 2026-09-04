@@ -10,7 +10,7 @@
 # bloqueia tracked sujo; quem destrói é o descarte.) Este helper commita a superfície Onion numa
 # branch dedicada → a instalação vira objeto git durável, imune a qualquer descarte.
 #
-# Uso     : durable-commit.sh <DEST> <OP> <PIN> [BR]
+# Uso     : durable-commit.sh <DEST> <OP> <PIN> [BR]      (env SUBJECT=... sobrepõe o assunto)
 #   DEST  = repo alvo · OP = adopt|update · PIN = source_commit curto
 #   BR    = branch do commit (default: chore/onion-<OP>-<PIN>; a adoção passa onion/adopt,
 #           branch que a Fase 2 já cria; o --update dedica chore/onion-update-<pin>)
@@ -52,6 +52,16 @@ if git -C "${DEST}" diff --cached --quiet 2>/dev/null; then
   exit 0
 fi
 
-git -C "${DEST}" commit --no-verify -m "chore(onion): ${OP} to pin ${PIN}" >/dev/null 2>&1 \
+# ASSUNTO EM pt-BR (sinal de campo portal-gamificacao, 2026-09-04): o prefixo Conventional é contrato de
+# máquina (inglês), o ASSUNTO é narrativa (pt-BR) — code-standards.md §3.4, ratificado em 2026-08-03. O
+# helper emitia "adopt to pin <x>" e a revisão adversarial do adotante pegou o desvio. `SUBJECT=` permite
+# ao alvo com outra política passar o seu; sem ele, o default segue a política da casa.
+case "${OP}" in
+  adopt)  _subj="adotar o Onion no pin ${PIN}" ;;
+  update) _subj="atualizar o Onion para o pin ${PIN}" ;;
+  *)      _subj="${OP} no pin ${PIN}" ;;
+esac
+[ -n "${SUBJECT:-}" ] && _subj="${SUBJECT}"
+git -C "${DEST}" commit --no-verify -m "chore(onion): ${_subj}" >/dev/null 2>&1 \
   && { echo "Onion: instalação commitada em ${BR} (durável — imune a descarte de working-tree)."; exit 0; } \
   || { echo "⚠️  commit durável falhou em ${DEST} (${BR})." >&2; exit 1; }

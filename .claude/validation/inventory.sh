@@ -28,29 +28,39 @@ KB_DIR="${REPO_ROOT}/docs/knowledge-base"
 DOCS_DIR="${REPO_ROOT}/docs"
 
 # ---------------------------------------------------------------------------
+# ENUMERAÇÃO RASTREADA (sinal de campo portal-gamificacao, 2026-09-04): contar por `find` no filesystem
+# inclui arquivo GITIGNORADO — o inventário local ficava verde e o CI, num checkout limpo, reprovava a
+# REGRA 8. `git ls-files` vê o MESMO conjunto que o CI. Fallback para `find` quando não há git (adotante
+# pré-init, tarball): declarado, nunca silencioso.
+# ---------------------------------------------------------------------------
+_tracked_or_find() {   # $1=dir → lista arquivos RASTREADOS sob o dir (ou todos, sem git)
+  local dir="$1"
+  if git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
+    git -C "${REPO_ROOT}" ls-files -- "${dir#${REPO_ROOT}/}" 2>/dev/null | sed "s|^|${REPO_ROOT}/|"
+  else
+    find "${dir}" -type f -print 2>/dev/null
+  fi
+}
+
+# ---------------------------------------------------------------------------
 # Contagem de comandos invocáveis por categoria (exclui common/ e READMEs)
 # ---------------------------------------------------------------------------
 count_commands_in() {
   # $1 = diretório de categoria
-  find "$1" -maxdepth 10 -name "*.md" \
-    ! -iname "readme.md" \
-    -print 2>/dev/null | wc -l | tr -d ' '
+  _tracked_or_find "$1" | grep -E '\.md$' | grep -viE '/readme\.md$' | grep -c . || true
 }
 
 # Total invocável (categorias + root onion/warm-up/catch-up), exclui common/ e READMEs
 count_commands_total() {
-  find "${CLAUDE_DIR}/commands" -name "*.md" \
-    ! -path "*/common/*" \
-    ! -iname "readme.md" \
-    -print 2>/dev/null | wc -l | tr -d ' '
+  _tracked_or_find "${CLAUDE_DIR}/commands" | grep -E '\.md$' | grep -v '/common/' | grep -viE '/readme\.md$' | grep -c . || true
 }
 
 count_agents_in() {
-  find "$1" -name "*.md" ! -iname "readme.md" -print 2>/dev/null | wc -l | tr -d ' '
+  _tracked_or_find "$1" | grep -E '\.md$' | grep -viE '/readme\.md$' | grep -c . || true
 }
 
 count_agents_total() {
-  find "${CLAUDE_DIR}/agents" -name "*.md" ! -iname "readme.md" -print 2>/dev/null | wc -l | tr -d ' '
+  _tracked_or_find "${CLAUDE_DIR}/agents" | grep -E '\.md$' | grep -viE '/readme\.md$' | grep -c . || true
 }
 
 count_skills() {

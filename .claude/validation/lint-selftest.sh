@@ -11351,6 +11351,79 @@ run_plugin_deps_contract_selftests() {
 }
 _family run_plugin_deps_contract_selftests
 
+# Três curas de sinal upstream (portal-gamificacao, 2026-09-04): enumeração rastreada no inventário,
+# .claude/workflows na superfície de adoção, e assunto de commit em pt-BR no durable-commit.
+run_upstream_portal_fixes_selftests() {
+  local inv="${SCRIPT_DIR}/inventory.sh" dc="${SCRIPT_DIR}/../utils/adopt/durable-commit.sh"
+  local vb="${SCRIPT_DIR}/../utils/adopt/vendor-branch.sh" adopt="${SCRIPT_DIR}/../commands/meta/adopt.md"
+  command -v git >/dev/null 2>&1 || { record_skip "upstream-portal: git ausente"; return; }
+
+  # ── (a) INVENTÁRIO conta só o RASTREADO: arquivo gitignorado não infla a contagem (lint local = CI) ──
+  if [ ! -f "${inv}" ]; then record_skip "upstream-portal: (a) inventory.sh ausente"; else
+    local sb; sb="$(mktemp -d)"; sb="$(cd "${sb}" && pwd -P)"
+    mkdir -p "${sb}/.claude/validation" "${sb}/.claude/agents/development" "${sb}/.claude/commands/meta" \
+             "${sb}/.claude/skills/foo" "${sb}/docs/onion" "${sb}/docs/knowledge-base/concepts"
+    cp "${SCRIPT_DIR}"/*.sh "${sb}/.claude/validation/" 2>/dev/null
+    printf -- '---\nname: foo\ndescription: x\n---\n# s\n' > "${sb}/.claude/skills/foo/SKILL.md"
+    printf '# kb\n' > "${sb}/docs/knowledge-base/concepts/k.md"
+    printf -- '---\ndescription: x\n---\n# c\n' > "${sb}/.claude/commands/meta/c.md"
+    printf -- '---\nname: visivel\ndescription: x\nmodel: sonnet\ncategory: development\n---\nrole\n' > "${sb}/.claude/agents/development/visivel.md"
+    printf -- '---\nname: ignorado\ndescription: x\nmodel: sonnet\ncategory: development\n---\nrole\n' > "${sb}/.claude/agents/development/ignorado.md"
+    printf '.claude/agents/development/ignorado.md\n' > "${sb}/.gitignore"
+    git -C "${sb}" init -q; git -C "${sb}" add -A >/dev/null 2>&1
+    git -C "${sb}" -c user.name=t -c user.email=t@t commit -q -m seed >/dev/null 2>&1
+    local out n_ag
+    out="$(cd "${sb}" && bash .claude/validation/inventory.sh --markdown 2>/dev/null || true)"
+    # o inventário imprime a linha `| Agentes | **N** |` (formato real, conferido em docs/onion/inventory.md)
+    n_ag="$(grep -oE '^\| Agentes \| \*\*[0-9]+\*\*' <<< "${out}" 2>/dev/null | grep -oE '[0-9]+' | head -1 || true)"
+    if [ "${n_ag:-x}" = "1" ]; then
+      record_pass "upstream-portal: (a) inventário conta só o RASTREADO — arquivo gitignorado fora (lint local = CI)"
+    else
+      record_fail "upstream-portal: (a) enumeração rastreada" "esperava 1 agente (o gitignorado fora), leu '${n_ag:-vazio}'; find veria $(find "${sb}/.claude/agents" -name '*.md' | grep -c . || true)"
+    fi
+    rm -rf "${sb}"
+  fi
+
+  # ── (b) .claude/workflows viaja na adoção: sem ele a skill onion-research aponta p/ script ausente ──
+  local miss="" _nw
+  # Exige a string DENTRO do `want=` e IGNORA comentário: o mutante desta bancada passou verde porque o
+  # comentário explicativo (que também cita .claude/workflows) satisfazia um grep solto — guarda que casa
+  # prosa não é guarda (medido no próprio dogfood, 2026-09-04).
+  if ! grep -qE '^[^#]*want=\(.*\.claude/workflows' "${vb}" 2>/dev/null; then miss="${miss} vendor-branch.sh(want=)"; fi
+  _nw="$(grep -cE '^[^#]*want=\(.*\.claude/workflows' "${adopt}" 2>/dev/null || true)"; [ -n "${_nw}" ] || _nw=0
+  if [ "${_nw}" -lt 2 ]; then miss="${miss} adopt.md(want= x2, achou ${_nw})"; fi
+  if [ -z "${miss}" ]; then
+    record_pass "upstream-portal: (b) .claude/workflows na superfície de adoção (a skill onion-research resolve no adotante)"
+  else
+    record_fail "upstream-portal: (b) workflows não viaja" "ausente em:${miss} — a skill instrui scriptPath '.claude/workflows/onion-research.js' e o comando nasce morto no adotante"
+  fi
+
+  # ── (c) durable-commit: assunto em pt-BR por default, SUBJECT= sobrepõe (prefixo Conventional intacto) ──
+  if [ ! -f "${dc}" ]; then record_skip "upstream-portal: (c) durable-commit.sh ausente"; else
+    local t; t="$(mktemp -d)"; t="$(cd "${t}" && pwd -P)"
+    git -C "${t}" init -q; mkdir -p "${t}/.claude"; printf 'x\n' > "${t}/.claude/marca.txt"
+    git -C "${t}" -c user.name=t -c user.email=t@t commit -q --allow-empty -m base >/dev/null 2>&1
+    bash "${dc}" "${t}" adopt abc1234 main >/dev/null 2>&1
+    local subj; subj="$(git -C "${t}" log -1 --pretty=%s 2>/dev/null || true)"
+    if [ "${subj}" = "chore(onion): adotar o Onion no pin abc1234" ]; then
+      record_pass "upstream-portal: (c) durable-commit emite assunto em pt-BR (prefixo Conventional em inglês, assunto narrativo)"
+    else
+      record_fail "upstream-portal: (c) idioma do assunto" "esperava 'chore(onion): adotar o Onion no pin abc1234', veio '${subj}'"
+    fi
+    printf 'y\n' > "${t}/.claude/marca2.txt"
+    SUBJECT="assunto do alvo" bash "${dc}" "${t}" adopt abc1234 main >/dev/null 2>&1
+    subj="$(git -C "${t}" log -1 --pretty=%s 2>/dev/null || true)"
+    if [ "${subj}" = "chore(onion): assunto do alvo" ]; then
+      record_pass "upstream-portal: (c2) SUBJECT= sobrepõe (alvo com política própria)"
+    else
+      record_fail "upstream-portal: (c2) SUBJECT=" "esperava 'chore(onion): assunto do alvo', veio '${subj}'"
+    fi
+    rm -rf "${t}"
+  fi
+}
+_family run_upstream_portal_fixes_selftests
+
+
 
 
 

@@ -109,7 +109,7 @@ DEST="<INSTALL_DIR — ver Fase 2>"
 
 # (a) MANIFESTO filtrado: só pathspecs que EXISTEM em HEAD — git archive aborta (exit 128) se um
 #     pathspec não casa nada. Filtrar evita o erro críptico de tar.
-want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules
+want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows
       docs/meta-specs docs/knowledge-base docs/sdaal)
 #     ⚠️ Novo path docs/ vendorizado aqui → refletir em .claude/utils/adopt/prettierignore-onion.tpl
 #       (proteção de formatador, passo (5) do Procedimento pós-cópia). .claude/* já coberto por `.claude/`.
@@ -725,7 +725,7 @@ fi
 [ -n "$PIN_OK" ] && [ "$ADOPTED_COMMIT" = "$NOW" ] && { echo "Já atualizado ($NOW)."; exit 0; }
 
 # DELTA do framework desde a adoção (manifesto filtrado, como no Procedimento):
-want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules
+want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows
       docs/meta-specs docs/knowledge-base docs/sdaal .env.example)
 # ⚠️ Novo path docs/ vendorizado aqui → refletir em .claude/utils/adopt/prettierignore-onion.tpl (passo (5)).
 manifest=(); for p in "${want[@]}"; do git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p" | grep -q . && manifest+=("$p"); done
