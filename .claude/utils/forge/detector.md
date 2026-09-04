@@ -166,8 +166,11 @@ function isGhAuthenticated(): boolean {
  * @returns { owner, repo } ou null se não parseável
  */
 function parseRepoIdentity(remoteUrl: string): { owner: string; repo: string } | null {
-  // git@github.com:owner/repo.git  |  https://github.com/owner/repo(.git)
-  const m = remoteUrl.match(/[:/]([^/:]+)\/([^/]+?)(?:\.git)?$/);
+  // git@github.com:owner/repo.git  |  https://github.com/owner/repo(.git)  |  https://gitlab.com/group/sub/project.git
+  // owner = TODO o namespace entre o host e o último segmento (GitLab aninha subgrupos; GitHub tem 1 nível).
+  // (2026-09-04, radar E3 rodada 3: a versão anterior devolvia owner = último segmento — gitlab.com/group/subgroup/project
+  //  virava owner=subgroup — o mesmo defeito que o Claude Code 2.1.260 corrigiu em l.39/l.40 do changelog.)
+  const m = remoteUrl.match(/^(?:[a-z][a-z0-9+.-]*:\/\/)?(?:[^@\/]+@)?[^\/:]+[:\/](.+?)\/([^\/]+?)(?:\.git)?\/?$/);
   if (!m) return null;
   return { owner: m[1], repo: m[2] };
 }
@@ -181,6 +184,7 @@ function parseRepoIdentity(remoteUrl: string): { owner: string; repo: string } |
 |---|---|
 | `git@github.com:owner/repo.git` | `github` |
 | `https://github.com/owner/repo` | `github` |
+| `https://gitlab.com/group/subgroup/project.git` | `gitlab` (owner = `group/subgroup` — namespace inteiro) |
 | `git@gitlab.com:owner/repo.git` | `gitlab` |
 | `https://gitlab.empresa.com/...` | `gitlab` |
 | `https://bitbucket.org/owner/repo` | `bitbucket` |

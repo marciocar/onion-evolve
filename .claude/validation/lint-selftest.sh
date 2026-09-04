@@ -11049,6 +11049,28 @@ run_plugin_version_derived_selftests() {
 }
 _family run_plugin_version_derived_selftests
 
+# Modo forge-detector — parseRepoIdentity do spec do forge (I_FORGE_PARSE_GITLAB_SUBGRUPOS, radar E3 rodada 3): a regex é
+# EXTRAÍDA do próprio detector.md (não copiada) e exercitada em node; GitLab aninhado dá o namespace inteiro, GitHub 1 nível.
+run_forge_detector_selftests() {
+  local doc="${REPO_ROOT}/.claude/utils/forge/detector.md"
+  [ -f "${doc}" ] || { record_fail "forge-detector" "detector.md ausente"; return; }
+  command -v node >/dev/null 2>&1 || { record_skip "forge-detector: node ausente"; return; }
+  local re; re="$(grep -oE 'remoteUrl\.match\(/.*/\);' "${doc}" | head -1 | sed -E 's/^remoteUrl\.match\(//; s/\);$//')"
+  [ -n "${re}" ] || { record_fail "forge-detector: regex" "não achei remoteUrl.match(/…/) no detector.md"; return; }
+  local out; out="$(RE="${re}" node -e '
+const re = eval(process.env.RE);
+for (const u of ["git@github.com:owner/repo.git","https://github.com/owner/repo","https://gitlab.com/group/project.git","https://gitlab.com/group/subgroup/project.git","git@gitlab.com:group/sub1/sub2/project.git"]) {
+  const m = u.match(re); console.log(u + "\t" + (m ? m[1] + "\t" + m[2] : "null"));
+}' 2>&1 || true)"
+  if _emit "${out}" | grep -qE $'^git@github.com:owner/repo.git\towner\trepo$' && _emit "${out}" | grep -qE $'^https://github.com/owner/repo\towner\trepo$'; then
+    record_pass "forge-detector: (a) GitHub ssh/https ⇒ owner/repo (1 nível, inalterado)"
+  else record_fail "forge-detector: (a) github" "$(_emit "${out}" | head -2 | tr '\n' '|')"; fi
+  if _emit "${out}" | grep -qE $'^https://gitlab.com/group/subgroup/project.git\tgroup/subgroup\tproject$' && _emit "${out}" | grep -qE $'^git@gitlab.com:group/sub1/sub2/project.git\tgroup/sub1/sub2\tproject$'; then
+    record_pass "forge-detector: (b) GitLab aninhado ⇒ owner = namespace inteiro (group/subgroup; group/sub1/sub2)"
+  else record_fail "forge-detector: (b) gitlab aninhado" "$(_emit "${out}" | tail -3 | tr '\n' '|')"; fi
+}
+_family run_forge_detector_selftests
+
 # ---------------------------------------------------------------------------
 # O harness testando a SI MESMO — os três desfechos não podem colapsar em dois
 #
