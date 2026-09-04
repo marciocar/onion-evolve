@@ -1,0 +1,235 @@
+meta:
+  id: radar-E3-2026-09-04
+  schema_version: "1"
+  baseline: 2026-09-04
+  review_after: 2026-10-19   # revisita: versao do Claude Code, 45d (= REGRA 65) — REGRA 67
+  # kg-backlog-guard: on
+  # ═══ TETO: 20 NÓS. Rodada fechada: cresce só se uma re-medição do mesmo delta emendar um achado. ═══
+  # Rodada 3 do /meta:radar, eixo E3 (claude-code-delta): delta 2.1.259 (baseline 2026-09-03,
+  # radar-E3-2026-09-03.kg.yaml) -> 2.1.260 (disco instalado 2026-09-04 00:29Z; o processo desta sessao ja e 2.1.260).
+  # Gatilho: REGRA 65 SOFT. Fonte primaria: CHANGELOG.md oficial (data/changelog-2.1.260.md; l.N por `grep -n`).
+  # Juiz adversarial opus/high, mandato REFUTAR, re-executou as medicoes: 13 achados -> 3 APROVADOS, 9 EMENDADOS,
+  # 1 REPROVADO (F8), 8 OMISSOES. PRIMEIRA rodada sem erro de citacao (cura de ontem: l.N so por grep -n).
+  # Nenhum comportamento de 2.1.260 foi OBSERVADO — tudo e leitura de changelog; o que exige observacao esta em E_LACUNAS.
+  # O radar so enxerga arestas dentro de um arquivo: o vinculo com a baseline vai por trace:.
+nodes:
+  - id: Q_E3_DELTA_2_1_260
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: 'O que mudou no Claude Code entre 2.1.259 e 2.1.260 que altera a ADEQUACAO da estrategia do Onion (escada de modelos, hooks/guardas, permissoes, orquestracao Workflow/subagentes, forge SDAAL, plugins/marketplace, sessoes headless na VPS)? Rodada 3 do E3. ABERTA no que exige observacao em processo 2.1.260 (E_LACUNAS_E3_0904) e no fio local que a rodada abriu (I_FORGE_PARSE_GITLAB_SUBGRUPOS em fios-abertos).'
+    verified_against: 'CHANGELOG 2.1.260 (data/), juiz opus/high 2026-09-04; baseline anterior: docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml'
+    trace: 'docs/evolution/research/radar-E3-2026-09-04/data/f1-findings-pre-juiz.md'
+  - id: E_R3_F1_REVERT_DENY_READ_BASH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG 2.1.260 l.42; juiz EMENDOU: supera SO a metade "cobertura por deny rule e opcao a adotar" do E_F5 da rodada 2; o ALLOW Bash(grep * .env) em settings.json:12 segue vivo (4 camadas de settings: zero deny, zero ask)'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F1 EMENDADO. l.42 REVERTE a mudanca de 2.1.259 que aplicava deny rules Read() a argumentos do Bash (negava `npm run build` sob Read(./**/build/**) e fazia `cd … && grep` perguntar ate em auto mode). Supera PELA METADE o E_F5_DENY_READ_COBERTURA_E_O_ALLOW_DO_ENV da rodada 2 (radar-E3-2026-09-03): a claim "cobertura por deny rule e opcao a adotar" cai; a claim do ALLOW `Bash(grep * .env)` (settings.json:12) continua aberta e intocada pelo revert. A doutrina da casa (segredo fora do repo + pass) nunca dependeu da deny rule. O no antigo fica confirmed com esta ressalva (superacao parcial nao flipa status).'
+    trace: 'docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml'
+  - id: E_R3_F2_TROCA_DE_MODELO_RECHECA_E_NOMEIA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.20, l.21; juiz EMENDOU: l.20 e falha de carga de hook de PLUGIN — a guarda do core e hook de settings.json (PreModelSwitch entre 9 eventos/15 hooks), nao de plugin'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F2 EMENDADO. l.20: a troca de modelo deixava de ficar BLOQUEADA pelo resto da sessao apos falha de carga de um hook de PLUGIN; l.21: idem quando um marketplace gerenciado nao carregava. Agora cada troca re-checa e a recusa NOMEIA a causa. Relevancia restrita ao Onion INSTALADO COMO PLUGIN (onion-plugins), onde a guarda PreModelSwitch viaja como hook de plugin; no core e no adotante vendorizado ela e hook de settings.json e l.20 nao se aplica. Converge com o desenho "recusa sempre nomeia" da escada (#786).'
+    trace: '.claude/hooks/premodelswitch-guard.sh'
+  - id: E_R3_F3_PICKER_MOSTRA_FABLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.18; juiz EMENDOU: source=picker JA foi medido em 2026-09-02 18:28Z (unico registro de model-switch.jsonl, decision=block); ladder=restored so sai vindo de degrau abaixo — Fable→Fable da `same`'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F3 EMENDADO. l.18: o picker /model passa a MOSTRAR o Fable 5.1 para organizacoes que podem usa-lo (antes so aceito digitado). O que e novo para a escada e a direcao PARA CIMA: restaurar ao primario por pick antes era impossivel pelo picker. Nao abre lacuna nova de fonte (source=picker ja medido em 09-02); o caso mensuravel e: de Opus ou do piso, pick de Fable no picker ⇒ allow + ladder=restored e o aviso de degradacao cala.'
+    trace: 'docs/onion/radar-baselines.yaml'
+  - id: E_R3_F4_AGENTES_FABLE_1M
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.95
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.17; juiz APROVOU e re-mediu: frontmatter entre os dois --- = 43 sonnet + 8 opus + 0 fable = 51 agentes (9 arquivos sem model: sao READMEs); grep fable em .claude/agents = 0; pin ANTHROPIC_DEFAULT_FABLE_MODEL ausente'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F4 APROVADO. l.17: agentes `model: fable` ignoravam o tag [1m] num pin ANTHROPIC_DEFAULT_FABLE_MODEL e rodavam com 200K de contexto em silencio. O core nao tem agente em Fable (0/51) nem usa o pin. Nota para quem tierar agentes em Fable: o [1m] agora e respeitado.'
+    trace: 'docs/knowledge-base/concepts/agent-orchestration.md'
+  - id: E_R3_F5_CACHE_FABLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.19, l.51, l.4; juiz APROVOU'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F5 APROVADO. Cache de prompt no Fable 5.1: o contexto anexado apos tool results era re-enviado sem cache a cada turno de tool-call (l.19); mudar /effort no meio da sessao invalidava o cache (l.51). O custo do "sempre o maximo" cai justamente em sessoes longas de ferramenta — o caso desta casa. l.4: /cost e a statusline passam a nomear a causa provavel de cache miss. Sem acao; medir no /cost.'
+    trace: 'docs/evolution/research/radar-E3-2026-09-04/SYNTHESIS.md'
+  - id: E_R3_F6_AUTOCOMPACT_1M
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.49; juiz EMENDOU: o "~800k desta sessao" nao era verificavel — o unico contexto medido e context_tokens=457573 (registro de 09-02); numero retirado'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F6 EMENDADO. l.49: auto-compact em modelos de 1M (Opus e Fable) compacta pouco antes do limite e a compactacao de recuperacao em contextos muito grandes deixa de estourar 10 min. Relevante a doutrina de sessoes longas do core. Nota.'
+    trace: 'docs/onion/radar-baselines.yaml'
+  - id: E_R3_F7_WORKFLOW_SCHEMA_E_STALL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.43, l.34; juiz EMENDOU substancialmente: allOf = 0 ocorrencias em onion-research.js; KG_SCHEMA_DECISION e spread + properties estreitadas, todo required existe em properties — nenhum schema do workflow e insatisfazivel'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F7 EMENDADO. l.43: Workflow agent({schema}) rejeita de saida um JSON Schema INSATISFAZIVEL, e erros de teto de retry passam a incluir a ultima falha de validacao; l.34: subagentes de Workflow nao sao mais reiniciados como "stalled" durante compactacao longa. A metade que MORDE no /onion-research e a segunda de l.43: `pattern ^D_`, `minItems 2`, `minimum 1` reprovam de verdade e agora o erro de teto diz qual — a primeira metade nao se aplica (nenhum schema da casa e insatisfazivel). Positivo; sem acao.'
+    trace: '.claude/workflows/onion-research.js'
+  - id: E_R3_F8_PLATAFORMA_SUBAGENTES_E_BACKGROUND
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.29, l.31, l.61; juiz REPROVOU a ancora local (o bg-spare e desta sessao, 04-09, e /exit soltando so a visao do cliente e a semantica correta de job destacado — nao a duplicacao de l.31) e reduziu l.61 a nota (o teto de 1 h valia so para comandos de background de SUBAGENTES; a bancada roda do pre-commit e da sessao principal)'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F8+F9 REPROVADOS como achados, mantidos como NOTA de plataforma: l.29 subagente que retomava outro via SendMessage passa a ser acordado pela conclusao; l.31 sessao movida para background deixava de aparecer 2x em ListAgents (gemea "interativa" fantasma recebendo SendMessage); l.61 removido o limite de 1 h em comandos de background iniciados por SUBAGENTES. Nenhuma duplicacao foi medida nesta casa; o bg-spare de 2026-09-04 e um job destacado funcionando como documentado. Sem ancora local, sem acao.'
+    trace: 'docs/knowledge-base/concepts/agent-orchestration.md'
+  - id: E_R3_F10_RELOAD_PLUGINS_HEADLESS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.5, l.35; juiz EMENDOU: "fecha o ciclo sem reiniciar" NAO foi medido e contraria evidencia da casa (hooks novos exigiram reinicio, 09-02); o plugin do Onion embarca hooks'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F10 EMENDADO. l.5: /reload-plugins em sessoes headless; l.35: instalacao de plugin de marketplace por URL deixa de falhar quando o host guarda a entrada como diretorio. Com a versao derivada (#787) o plugin update volta a andar; se /reload-plugins dispensa reinicio para plugin COM hooks e PENDENTE DE MEDICAO (a casa ja viu hook novo exigir reinicio).'
+    trace: '.claude/skills/onion-publish/SKILL.md'
+  - id: E_R3_F11_REGRAS_DE_PERMISSAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.9, l.10, l.11, l.54; juiz APROVOU e reforcou: as 4 camadas de settings sao allow-only (13, 97, 3, 24 entradas), zero deny, zero ask'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F11 APROVADO. Regras de permissao: caminho com parenteses era descartado e deixava pasta "read-only" gravavel (l.9); padrao incompilavel quebrava toda edicao (l.10); zsh escondendo substituicao em REPORTTIME etc. era auto-aprovado (l.11); texto apos o parentese passa a ser invalido em vez de ignorado (l.54). O core e allow-only nas 4 camadas: nada disso morde hoje; nota para adotante com deny rules. Regra de lint "settings bem-formados" adiada (nao ha deny para validar).'
+    trace: '.claude/settings.json'
+  - id: E_R3_F12_GITLAB_SUBGRUPOS_TAMBEM_NO_FORGE_DO_CORE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.39, l.40; juiz EMENDOU com medicao: a regex do parseRepoIdentity do spec do forge (detector.md) devolve owner=subgroup para gitlab.com/group/subgroup/project.git e owner=sub2 para group/sub1/sub2/project.git — o namespace e descartado; costura confere (detector.md:133, factory.md:75 case gitlab, sem adapter)'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F12 EMENDADO — HA ACAO LOCAL. l.39: deteccao de repositorio GitLab em subgrupos aninhados corrigida na plataforma; l.40: refs owner/repo#123 passam a apontar para gitlab.com em repo GitLab. O forge SDAAL do core tem o MESMO defeito no parseRepoIdentity (owner = ultimo segmento; para o GitLab a identidade e o caminho inteiro do namespace). Fio aberto: I_FORGE_PARSE_GITLAB_SUBGRUPOS (fios-abertos). O adapter gitlab segue "costura pronta, nao implementado".'
+    trace: '.claude/utils/forge/detector.md'
+  - id: E_R3_F13_BASH_MODE_FORA_DO_SANDBOX
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.59; juiz EMENDOU: o core nao tem configuracao de sandbox em nenhuma camada — l.59 e no-op hoje'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'F13 EMENDADO. l.59: comandos digitados no prompt `!` (bash-mode) rodam FORA do sandbox mesmo em modo estrito. O core nao tem sandbox configurado em camada nenhuma: hoje nao morde. Sinal prospectivo para a doutrina de sessoes compartilhadas na VPS — se um adotante ligar sandbox estrito, `!` e escape declarado.'
+    trace: 'docs/analysis/onion-vps-network-exposure-2026-08.md'
+  - id: E_R3_OMISSOES_JUIZ_0904
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'CHANGELOG l.16, l.55, l.8, l.13, l.28, l.44, l.60, l.4, l.22, l.46; juiz opus/high'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: '8 OMISSOES do rascunho, apontadas pelo juiz: (1) l.16 deny de Skill(name) nao cobria a forma aninhada <dir>:name — o core tem 13 skills e o plugin as expoe aninhadas (a mais grave). (2) l.55 claudeMd gerenciado deixa de pedir aprovacao de seguranca; hooks, sandbox e env inseguro seguem pedindo — toca o exit 2 (a capacidade que compra o acoplamento) e a fusao de CLAUDE.md na adocao. (3) l.8 userPluginMarketplacesEnabled/userPluginUploadsEnabled: uma organizacao pode desligar marketplaces de usuario, barrando o canal da Fase 5 (onion-plugins). (4) l.13/l.28/l.44 trio de worktree: leitura bloqueada escondendo o checkout do subagente isolado; -p --resume falhando sem metadados git; exclusao de sessao nomeando branch e commits nao enviados. (5) l.60 --kill-session-after-min libera sessao pausada em vez de mata-la (headless na VPS). (6) l.4 /cost e prompt_cache nomeando a causa do miss — o instrumento que F5 manda usar. (7) l.22 servidores MCP do SDK faltando no 1o turno (MCP = transporte opcional). (8) l.46 CPU ocioso de sessoes -p/SDK (host compartilhado).'
+    trace: 'docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md'
+  - id: E_LACUNAS_E3_0904
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'juiz opus/high 2026-09-04; model-switch.jsonl (1 registro, anterior ao campo ladder); instructions-loaded.jsonl (2 cargas de CLAUDE.md por session_start)'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'LACUNAS DECLARADAS: (1) NENHUM comportamento de 2.1.260 foi observado — 13 achados sao leitura de changelog; o processo desta sessao ja e 2.1.260, mas as observacoes ficam para uso real. (2) ladder=restored nunca foi observado (o unico registro do log de switches e anterior ao campo); com l.18, o caso mensuravel e: de Opus/piso, pick de Fable ⇒ restored + aviso cala. (3) /reload-plugins com hooks embarcados: dispensa reinicio? medir antes de afirmar. (4) cota do Fable no Max (fallback nativo emite PreModelSwitch? source?) — segue da rodada 2. (5) O censo L1 da poda ja registra (2 cargas de CLAUDE.md por session_start); regras com paths: so aparecem quando um arquivo casar.'
+    trace: '.claude/hooks/premodelswitch-guard.sh'
+edges:
+  - from: E_R3_F1_REVERT_DENY_READ_BASH
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_F2_TROCA_DE_MODELO_RECHECA_E_NOMEIA
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_F3_PICKER_MOSTRA_FABLE
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_F4_AGENTES_FABLE_1M
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_F5_CACHE_FABLE
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_F6_AUTOCOMPACT_1M
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_F7_WORKFLOW_SCHEMA_E_STALL
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_F8_PLATAFORMA_SUBAGENTES_E_BACKGROUND
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_F10_RELOAD_PLUGINS_HEADLESS
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_F11_REGRAS_DE_PERMISSAO
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_F12_GITLAB_SUBGRUPOS_TAMBEM_NO_FORGE_DO_CORE
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_F13_BASH_MODE_FORA_DO_SANDBOX
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_R3_OMISSOES_JUIZ_0904
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_E3_0904
+    to: Q_E3_DELTA_2_1_260
+    edge_type: SUPPORTS

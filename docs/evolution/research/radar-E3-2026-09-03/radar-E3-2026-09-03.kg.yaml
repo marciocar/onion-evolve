@@ -84,6 +84,9 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F5 REPROVADO e substituido. l.9 amplia a cobertura de deny rules Read() do Bash (valores de opcao como -f.env/@file, operandos de git diff/grep, compostos cd DIR && cat FILE; grep -r/cp -r sobre dir com arquivo negado passa a perguntar). Medido: o core NAO tem deny rule nenhuma; a linha 12 do settings.json e um ALLOW de `Bash(grep * .env)` — sentido contrario. Antes de adotar deny estilo Read(./.env) e preciso rever esse allow. A doutrina da casa (segredo nunca em claro no repo + pass) nao depende de deny rule; a cobertura nova e OPCAO, nao lacuna.'
     trace: '.claude/settings.json'
+    # 2026-09-04 (rodada 3, l.42): a plataforma REVERTEU a cobertura de deny rules Read() em args do Bash — a metade
+    # "cobertura e opcao a adotar" deste no esta superada (E_R3_F1_REVERT_DENY_READ_BASH em radar-E3-2026-09-04);
+    # a metade do ALLOW Bash(grep * .env) segue viva. Superacao parcial: status fica confirmed.
   - id: E_F6_PLUGIN_VALIDATE_JSON
     node_type: evidence
     plane: DEV

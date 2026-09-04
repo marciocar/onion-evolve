@@ -172,6 +172,14 @@ nodes:
     trace: 'docs/evolution/review/fix-bench-adopter-core-only.md'
     verified_at: '2026-09-03'
     verified_against: 'adopter-map2.tsv (134 familias em serie) + adopter-bench4.log (--jobs 4) na copia $CLAUDE_JOB_DIR/tmp/adopter-copy'
+  - id: I_FORGE_PARSE_GITLAB_SUBGRUPOS
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+    label: 'ITEM (radar E3 rodada 3, 2026-09-04, medido pelo juiz): o parseRepoIdentity do spec do forge SDAAL (.claude/utils/forge/detector.md) devolve owner = ULTIMO segmento — para gitlab.com/group/subgroup/project.git da owner=subgroup, para group/sub1/sub2/project.git da owner=sub2; o namespace e descartado. Para o GitLab a identidade e o caminho inteiro. A plataforma corrigiu o mesmo defeito em 2.1.260 (l.39/l.40). Cura: owner = tudo entre o host e o ultimo segmento (GitHub continua 1 nivel); caso de bancada com os 3 exemplos. Gatilho: proximo PR que toque o forge OU adotante GitLab.'
+    trace: '.claude/utils/forge/detector.md'
 
 edges:
   - from: I_JWKS_ATTEMPTED_AT
@@ -210,3 +218,6 @@ edges:
   - from: E_BANCADA_NO_ADOTANTE_MEDIDA_0903
     to: Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE
     edge_type: SUPPORTS
+  - from: I_FORGE_PARSE_GITLAB_SUBGRUPOS
+    to: W8_REAIS_EXECUTAVEIS
+    edge_type: DEPENDS_ON
