@@ -9669,13 +9669,31 @@ run_outbox_channel_selftests() {
   # testada, não declarada em comentário. Sem este caso, trocar violation SOFT->HARD passava verde
   # (mutation test da verificação adversarial 2026-07-20). Compara o delta COM e SEM as fixtures:
   # elas podem acrescentar SOFT, jamais HARD — senão os 6 anúncios pré-existentes bloqueariam o CI.
-  rm -rf "${ob}/selftest-com-canal" "${ob}/selftest-sem-canal" "${ob}/selftest-nao-vendoriza" \
-         "${ob}/selftest-orfao-xyz" "${ob}/selftest-so-processed"
+  #
+  # ⚠️ SANDBOX IRMÃO, não mutação sequencial (medido no CI do #805, 2026-09-04): a 1ª versão media o
+  # MESMO sandbox em dois instantes (com fixtures → rm -rf → sem fixtures). Os totais do lint dependem de
+  # estado EXTERNO ao sandbox — a REGRA 65 (Radar de mundo com baseline DATADA por eixo) lê a versão do
+  # binário `claude` instalado, e o Claude Code atualizou de 2.1.260 para 2.1.261 ENTRE as duas medições:
+  # HARD 32→33 e o caso reprovou sem defeito nenhum na regra. Agora as duas medições saem de UMA cópia
+  # feita no mesmo instante (irmãos), e ambas rodam sob o MESMO ambiente congelado (`env -i` com PATH
+  # mínimo) — o que muda no mundo entre elas deixa de virar veredito.
+  local sb_sem; sb_sem="$(mktemp -d)"
+  (cd "${sb}" && tar -cf - .) | (cd "${sb_sem}" && tar -xf -)
+  rm -rf "${sb_sem}/docs/evolution/federation/outbox/selftest-com-canal" \
+         "${sb_sem}/docs/evolution/federation/outbox/selftest-sem-canal" \
+         "${sb_sem}/docs/evolution/federation/outbox/selftest-nao-vendoriza" \
+         "${sb_sem}/docs/evolution/federation/outbox/selftest-orfao-xyz" \
+         "${sb_sem}/docs/evolution/federation/outbox/selftest-so-processed"
   local out2 hard_sem soft_sem
-  out2="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  # re-mede o COM no mesmo ambiente congelado do SEM (o `out` de cima serviu aos casos 1-6, não à severidade)
+  out="$(cd "${sb}" && env -i PATH="/usr/bin:/bin" HOME="${sb}" bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  hard_com="$(printf '%s' "${out}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
+  soft_com="$(printf '%s' "${out}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
+  out2="$(cd "${sb_sem}" && env -i PATH="/usr/bin:/bin" HOME="${sb_sem}" bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
   hard_sem="$(printf '%s' "${out2}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
   soft_sem="$(printf '%s' "${out2}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
 
+  rm -rf "${sb_sem}"
   if [ "${hard_com}" = "${hard_sem}" ] && [ "${soft_com}" -gt "${soft_sem}" ]; then
     record_pass "outbox-channel: SEVERIDADE provada — fixtures somam SOFT (${soft_sem}→${soft_com}) e ZERO HARD (${hard_sem})"
   else
@@ -11401,9 +11419,13 @@ run_upstream_portal_fixes_selftests() {
   # ── (c) durable-commit: assunto em pt-BR por default, SUBJECT= sobrepõe (prefixo Conventional intacto) ──
   if [ ! -f "${dc}" ]; then record_skip "upstream-portal: (c) durable-commit.sh ausente"; else
     local t; t="$(mktemp -d)"; t="$(cd "${t}" && pwd -P)"
+    # IDENTIDADE GIT POR ENV: o durable-commit faz o PRÓPRIO `git commit` e o runner do CI não tem
+    # user.email global — sem isto o helper sai 1 e, sob `set -e`, MATA a suíte (medido no CI do #805,
+    # 6ª ocorrência da classe "a bancada espelha o runner"; local passava por ter identidade global).
+    export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
     git -C "${t}" init -q; mkdir -p "${t}/.claude"; printf 'x\n' > "${t}/.claude/marca.txt"
-    git -C "${t}" -c user.name=t -c user.email=t@t commit -q --allow-empty -m base >/dev/null 2>&1
-    bash "${dc}" "${t}" adopt abc1234 main >/dev/null 2>&1
+    git -C "${t}" commit -q --allow-empty -m base >/dev/null 2>&1 || true
+    bash "${dc}" "${t}" adopt abc1234 main >/dev/null 2>&1 || true
     local subj; subj="$(git -C "${t}" log -1 --pretty=%s 2>/dev/null || true)"
     if [ "${subj}" = "chore(onion): adotar o Onion no pin abc1234" ]; then
       record_pass "upstream-portal: (c) durable-commit emite assunto em pt-BR (prefixo Conventional em inglês, assunto narrativo)"
@@ -11411,13 +11433,14 @@ run_upstream_portal_fixes_selftests() {
       record_fail "upstream-portal: (c) idioma do assunto" "esperava 'chore(onion): adotar o Onion no pin abc1234', veio '${subj}'"
     fi
     printf 'y\n' > "${t}/.claude/marca2.txt"
-    SUBJECT="assunto do alvo" bash "${dc}" "${t}" adopt abc1234 main >/dev/null 2>&1
+    SUBJECT="assunto do alvo" bash "${dc}" "${t}" adopt abc1234 main >/dev/null 2>&1 || true
     subj="$(git -C "${t}" log -1 --pretty=%s 2>/dev/null || true)"
     if [ "${subj}" = "chore(onion): assunto do alvo" ]; then
       record_pass "upstream-portal: (c2) SUBJECT= sobrepõe (alvo com política própria)"
     else
       record_fail "upstream-portal: (c2) SUBJECT=" "esperava 'chore(onion): assunto do alvo', veio '${subj}'"
     fi
+    unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
     rm -rf "${t}"
   fi
 }
