@@ -29,13 +29,13 @@ route() {  # $1 = key
   case "$1" in
     QUESTION)   printf 'APARTE dúvida — pergunta lateral do maestro. Responda BREVE sem parar a tarefa; se exigir ferramenta, sugira /btw (fork "f"). Retome o fluxo em seguida. %s' "$SUFFIX" ;;
     CORRECTION) printf 'APARTE corrige — dica/correção/orientação sobre o curso. Se é p/ AGORA, reoriente o passo atual (o maestro pode ter dado Esc); se é p/ o próximo, aplique na próxima fronteira de passo. Não descarte o trabalho já feito. %s' "$SUFFIX" ;;
-    PRAISE)     printf 'APARTE reforço — reforço positivo. Absorva o PORQUÊ; se revela identidade/preferência durável, registre via /onion-work-tools:diary (significance). %s' "$SUFFIX" ;;
+    PRAISE)     printf 'APARTE reforço — reforço positivo. Absorva o PORQUÊ; se revela identidade/preferência durável, registre via /onion:diary (significance). %s' "$SUFFIX" ;;
     NOTE)       printf 'APARTE nota — lembrete/aviso SÓ desta sessão. Anote no scratchpad/notes.md (parking-lot); NÃO é memória durável nem exige ação agora. %s' "$SUFFIX" ;;
-    REMEMBER)   printf 'APARTE guarda — memória DURÁVEL. Escolha o tier: fato pessoal/de-ambiente ou estado-de-trabalho → memória do harness (auto-memory); aprendizado/decisão de rede → /onion-work-tools:diary (conflict_class + review_after). Repo é fonte, memória é cache. %s' "$SUFFIX" ;;
+    REMEMBER)   printf 'APARTE guarda — memória DURÁVEL. Escolha o tier: fato pessoal/de-ambiente ou estado-de-trabalho → memória do harness (auto-memory); aprendizado/decisão de rede → /onion:diary (conflict_class + review_after). Repo é fonte, memória é cache. %s' "$SUFFIX" ;;
     ADD_STEP)   printf 'APARTE +etapa — adicionar etapa ao plano. Insira no STATE.md (bloco NEXT)/plan; se altera escopo já commitado, PROPONHA antes. %s' "$SUFFIX" ;;
     DROP_STEP)  printf 'APARTE -etapa — remover/pular etapa. %s Não descarte trabalho sem OK. %s' "$GATE" "$SUFFIX" ;;
     PARALLEL)   printf 'APARTE paralelo — atividade/pesquisa em paralelo sem parar o fluxo. Dispare assíncrono (Ctrl+B/background) ou fan-out via onion-orchestration/Workflow; sintetize no retorno. Se escrever, respeite I3 (um escritor/repo). %s' "$SUFFIX" ;;
-    GUARDRAIL)  printf 'APARTE guarda-regra — instalar guardrail durável de comportamento. %s Prefira forcing-function (hook / .claude/rules path-scoped), não prosa "never do X"; registre a decisão no /onion-work-tools:diary. %s' "$GATE" "$SUFFIX" ;;
+    GUARDRAIL)  printf 'APARTE guarda-regra — instalar guardrail durável de comportamento. %s Prefira forcing-function (hook / .claude/rules path-scoped), não prosa "never do X"; registre a decisão no /onion:diary. %s' "$GATE" "$SUFFIX" ;;
     *) return 0 ;;
   esac
   printf '\n'

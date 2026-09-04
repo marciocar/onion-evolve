@@ -79,17 +79,17 @@ Branch atual:
 ### Documentação
 | Intenção | Comando / Agente |
 |----------|-----------------|
-| Documentação técnica | `/onion-docs:build-tech-docs` |
-| Documentação de negócio | `/onion-docs:build-business-docs` |
-| Atualizar índice de docs | `/onion-docs:build-index` |
-| Engenharia reversa de projeto | `/onion-docs:reverse-consolidate` |
-| Validar documentação | `/onion-docs:validate-docs` |
+| Documentação técnica | `/onion-product:build-tech-docs` |
+| Documentação de negócio | `/onion-product:build-business-docs` |
+| Atualizar índice de docs | `/onion-product:build-index` |
+| Engenharia reversa de projeto | `/onion-product:reverse-consolidate` |
+| Validar documentação | `/onion-product:validate-docs` |
 | Diagrama de arquitetura C4 | `@c4-architecture-specialist` |
 | Diagrama Mermaid | `@mermaid-specialist` |
 
 **Sequência de documentação:**
 ```
-/onion-docs:build-tech-docs → /onion-docs:build-business-docs → /onion-docs:build-index
+/onion-product:build-tech-docs → /onion-product:build-business-docs → /onion-product:build-index
 ```
 
 ---
@@ -101,9 +101,9 @@ Branch atual:
 | Novo skill | `meta:create-skill` |
 | Novo comando | `meta:create-command` |
 | Nova knowledge base | `meta:create-knowledge-base` |
-| Configurar integração (task manager, APIs) | `/onion-work-tools:setup-integration` |
-| Análise de problema complexo | `/onion-work-tools:analyze-complex-problem` |
-| Orquestrar subagentes (fan-out paralelo) | `/onion-work-tools:orchestrate` (skill `onion-orchestration`) |
+| Configurar integração (task manager, APIs) | `/onion:setup-integration` |
+| Análise de problema complexo | `/onion:analyze-complex-problem` |
+| Orquestrar subagentes (fan-out paralelo) | `/onion:orchestrate` (skill `onion-orchestration`) |
 
 **Régua de decisão — em qual CAIXA vai um procedimento recorrente?** (a tabela acima dá o comando *se você já sabe a caixa*; isto decide a caixa — antes de criar)
 1. **P0 — Já existe?** `grep`/`find` no namespace. Se algo cobre, ou é extensão natural (flag, parâmetro, seção a um SKILL.md) → **EXTEND/FIX, não crie** (anti-proliferação de átomos).
@@ -118,7 +118,7 @@ Branch atual:
 ### Orquestração (paralelo)
 | Intenção | Comando / Skill |
 |----------|-----------------|
-| Auditoria/migração/review amplos em paralelo | `/onion-work-tools:orchestrate` |
+| Auditoria/migração/review amplos em paralelo | `/onion:orchestrate` |
 | Decompor → delegar → sintetizar/verificar | skill `onion-orchestration` (autora `Workflow`) |
 | Doutrina e padrões canônicos | KB `agent-orchestration` |
 
@@ -129,7 +129,7 @@ Branch atual:
 |----------|--------------|
 | "Auditar o Onion", "como melhoro o framework?", "está desatualizado/pesado?" | `meta:evolve` (orquestração, read-only → backlog priorizado) |
 | Qual padrão de refatoração aplicar (consolidar/adapter/KB/skill/fan-out) | KB `onion-modernization-doctrine` |
-| Frescor de KBs · conformidade meta-spec | `/onion-work-tools:kb-freshness` · `/onion-work-tools:metaspec-validate` (compostos pelo `meta:evolve`) |
+| Frescor de KBs · conformidade meta-spec | `/onion:kb-freshness` · `/onion:metaspec-validate` (compostos pelo `meta:evolve`) |
 
 ---
 
@@ -138,12 +138,12 @@ Branch atual:
 |----------|-----------------|
 | Code review | `@code-reviewer` |
 | Review de branch completa | `@branch-code-reviewer` |
-| Testes unitários | `/onion-testing:unit` |
-| Testes de integração | `/onion-testing:integration` |
-| Testes E2E | `/onion-testing:e2e` |
+| Testes unitários | `/onion-engineering:unit` |
+| Testes de integração | `/onion-engineering:integration` |
+| Testes E2E | `/onion-engineering:e2e` |
 | Planejamento de testes | `@test-planner` |
 | Validar conformidade arquitetural | `@metaspec-gate-keeper` |
-| Validar workflow do Onion | `/onion-testing:workflow` |
+| Validar workflow do Onion | `/onion-engineering:workflow` |
 
 ---
 
@@ -177,7 +177,7 @@ Branch atual:
 | Warm-up de engenharia | `/engineer/warm-up` |
 | Warm-up de produto | `/product/warm-up` |
 | Visão geral do sistema | `/onion` |
-| Listar todas as ferramentas | `/onion-work-tools:all-tools` |
+| Listar todas as ferramentas | `/onion:all-tools` |
 
 ---
 
@@ -200,7 +200,7 @@ Branch atual:
 ## Gotchas Críticos
 
 **Task Manager Provider obrigatório**
-Antes de qualquer operação com tasks: ler `TASK_MANAGER_PROVIDER` no `.env`. Providers válidos: `clickup`, `jira`, `asana`, `linear`, `none`. Se ausente ou inválido: avisar o usuário e sugerir `/onion-work-tools:setup-integration`. Nunca inventar valores nem assumir outro provider.
+Antes de qualquer operação com tasks: ler `TASK_MANAGER_PROVIDER` no `.env`. Providers válidos: `clickup`, `jira`, `asana`, `linear`, `none`. Se ausente ou inválido: avisar o usuário e sugerir `/onion:setup-integration`. Nunca inventar valores nem assumir outro provider.
 
 **Feature slug: sempre kebab-case**
 Correto: `user-authentication`. Errado: `user_authentication`, `UserAuth`, `userAuth`. O slug é usado tanto no nome da branch Git quanto na pasta de sessão `.claude/sessions/<feature-slug>/`.

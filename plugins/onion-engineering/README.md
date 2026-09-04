@@ -1,8 +1,8 @@
 # Onion · Engineering — plugin `onion-engineering` do Sistema Onion 🧅
 
-Vertical de engenharia do Onion: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow + sessoes persistentes) + especialistas de codigo (Node/React/Postgres/NX/Docker) e gates pre-PR. Camada 1; task-manager e forge do consumidor via SDAAL.
+Vertical de engenharia do Onion: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow + sessões persistentes), gates pré-PR, especialistas de código (Node, React, Postgres, NX, Docker, segurança) e testes (unit/integration/e2e, estratégia de teste, QA story points).
 
-**Versão** `0.1.86` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
+**Versão** `0.1.91` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
 
 ## Instalar
 
@@ -22,12 +22,12 @@ claude plugin marketplace add marciocar/onion-plugins && claude plugin install o
 
 | Componente | Quantidade |
 |---|---|
-| Comandos | 17 |
-| Agentes | 16 |
+| Comandos | 21 |
+| Agentes | 19 |
 | Skills | 1 |
 | Hooks | 0 |
 
-**Capacidades (Capability Contract):** provê `gitflow-faseado`, `pull-request-lifecycle`, `code-review-pre-pr`, `code-specialists-node-react-postgres-nx-docker`, `ssot-context-resolver`; requer `agent:gitflow-specialist`, `agent:branch-code-reviewer`, `agent:code-reviewer`, `agent:nodejs-specialist`, `agent:react-developer`, `agent:postgres-specialist`, `agent:docker-specialist`, `skill:onion-engineering-context`.
+**Capacidades (Capability Contract):** provê `gitflow-faseado`, `pull-request-lifecycle`, `code-review-pre-pr`, `code-specialists-node-react-postgres-nx-docker`, `ssot-context-resolver`, `geracao-testes-unit-integration-e2e`, `estrategia-de-teste`, `qa-story-points`; requer `agent:gitflow-specialist`, `agent:branch-code-reviewer`, `agent:code-reviewer`, `agent:nodejs-specialist`, `agent:react-developer`, `agent:postgres-specialist`, `agent:docker-specialist`, `skill:onion-engineering-context`, `agent:test-agent`, `agent:test-engineer`, `agent:test-planner`.
 
 ## Comandos
 
@@ -36,22 +36,26 @@ Invocação: `/onion-engineering:<comando>` (namespace do plugin).
 | Comando | O que faz |
 |---|---|
 | `/onion-engineering:bump` | Bump de versão seguindo semver. |
-| `/onion-engineering:code-review` | [Alias] Redireciona para /onion-work-tools:setup-code-review (setup de code review no CI). |
+| `/onion-engineering:code-review` | [Alias] Redireciona para /onion:setup-code-review (setup de code review no CI). |
 | `/onion-engineering:docs` | Invocar agente de documentação para branch atual. |
+| `/onion-engineering:e2e` | Gera e executa testes end-to-end automaticamente com detecção de framework. |
 | `/onion-engineering:fast-commit` | Adiciona todas as mudanças e faz commit rápido. |
 | `/onion-engineering:flow` | Dispatcher único do ciclo de vida GitFlow: feature/release/hotfix × start/publish/finish. |
 | `/onion-engineering:help` | Ajuda contextual da vertical de engenharia do Onion — o ciclo faseado plan→pr + GitFlow + especialistas. |
 | `/onion-engineering:hotfix` | Emergency workflow completo: task no Task Manager + branch hotfix + desenvolvimento. |
 | `/onion-engineering:init` | Inicializar repositório com GitFlow e convenções padrão. |
+| `/onion-engineering:integration` | Gera e executa testes de integração automaticamente com detecção de framework. |
 | `/onion-engineering:plan` | Planejamento de feature. |
 | `/onion-engineering:pr-update` | Atualizar PR existente com mudanças adicionais. |
 | `/onion-engineering:pr` | Criar Pull Request com integração GitFlow e sync automático. |
 | `/onion-engineering:pre-pr` | Validação completa antes do PR. |
 | `/onion-engineering:start` | Iniciar desenvolvimento de feature. |
 | `/onion-engineering:sync` | Sincronização automática de branches com GitFlow e proteção de branches críticas. |
+| `/onion-engineering:unit` | Gera e executa testes unitários automaticamente com detecção de framework. |
 | `/onion-engineering:validate-phase-sync` | Validar sincronização entre fases do plan.md e subtasks do Task Manager. |
 | `/onion-engineering:warm-up` | Preparação de contexto técnico e de engenharia. |
 | `/onion-engineering:work` | Continuar trabalho em feature ativa. |
+| `/onion-engineering:workflow` | Validar completude de workflows do Sistema Onion. |
 
 ## Agentes
 
@@ -72,6 +76,9 @@ Invocação: `/onion-engineering:<comando>` (namespace do plugin).
 | `@postgres-specialist` | Especialista em PostgreSQL 17 para triggers, functions, schema e performance. |
 | `@react-developer` | Especialista em React moderno com shadcn/ui, TypeScript e arquitetura component-first. |
 | `@runflow-specialist` | Especialista em Runflow SDK e plataforma para desenvolvimento de agentes IA, workflows e integrações. |
+| `@test-agent` | Especialista completo em estratégias de teste baseado no Framework Completo de Testes e QA. |
+| `@test-engineer` | Especialista em testes unitários práticos que verifica comportamento real. |
+| `@test-planner` | Especialista em planejamento e cobertura de testes para análise sistemática. |
 | `@zen-engine-specialist` | Especialista em ZEN Engine e JDM (JSON Decision Model) para criação, validação e otimização de regras de negócios. |
 
 ## Skills
@@ -90,7 +97,7 @@ Invocação: `/onion-engineering:<comando>` (namespace do plugin).
 | Campo | Valor |
 |---|---|
 | Fonte | `marciocar/onion-evolve` |
-| tree_sha (hash do conteúdo das fontes) | `1b7e7c0e008a` |
+| tree_sha (hash do conteúdo das fontes) | `68251c3f7306` |
 
 Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 

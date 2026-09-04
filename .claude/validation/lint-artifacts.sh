@@ -1338,7 +1338,7 @@ PY
   # --- WORK_TOOLS (eixo cross-cutting, 2026-07-19) — drift-guard próprio ---
   #   (1) todo `work_tools:` de papel referencia um set válido (ou none/tbd);
   #   (2) todo tool nomeado em work_tool_sets resolve a um comando real .claude/commands/meta/<tool>.md;
-  #   (3) o conjunto `full` está coberto pelo manifesto onion-work-tools (roles.yaml <-> manifesto).
+  #   (3) o conjunto `full` está coberto pelo manifesto onion — o núcleo absorveu onion-work-tools em 2026-09-04 (roles.yaml <-> manifesto).
   local wt_out kind a b
   wt_out="$(python3 - "${roles}" <<'PY'
 import sys, yaml
@@ -1360,10 +1360,10 @@ PY
       TOOL) [ -f "${REPO_ROOT}/.claude/commands/meta/${a}.md" ] || violation "HARD" "utils/marketplace/roles.yaml" "work_tool '${a}' sem comando em .claude/commands/meta/${a}.md — crie com /meta:create-command ${a} (ou corrija o nome em work_tool_sets se foi digitado errado)" ;;
     esac
   done <<< "${wt_out}"
-  local wtman="${vdir}/onion-work-tools.manifest.sh" ft
+  local wtman="${vdir}/onion.manifest.sh" ft   # 2026-09-04: onion absorveu onion-work-tools (F2)
   if [ -f "${wtman}" ]; then
     for ft in $(python3 -c "import yaml; d=yaml.safe_load(open('${roles}')) or {}; print(' '.join((d.get('work_tool_sets') or {}).get('full') or []))" 2>/dev/null); do
-      grep -q "commands/meta/${ft}.md" "${wtman}" || violation "HARD" "utils/marketplace/verticals/onion-work-tools.manifest.sh" "work_tool 'full:${ft}' (roles.yaml) ausente do manifesto onion-work-tools — adicione 'commands/meta/${ft}.md' ao manifesto onion-work-tools.manifest.sh"
+      grep -q "commands/meta/${ft}.md" "${wtman}" || violation "HARD" "utils/marketplace/verticals/onion.manifest.sh" "work_tool 'full:${ft}' (roles.yaml) ausente do manifesto onion (núcleo) — adicione 'commands/meta/${ft}.md' ao manifesto onion.manifest.sh"
     done
   fi
 }

@@ -278,7 +278,7 @@ END {
       print "          - id: <ID>"
       print "            node_type: <tipo>          # (não `type:`)"
       print "    e arestas como \"- from:\" INDENTADO + \"edge_type:\". Regenere na gramática canônica"
-      print "    (ver /onion-work-tools:kg) ou corrija o gerador."
+      print "    (ver /onion:kg) ou corrija o gerador."
     } else {
       print "  ✗ nenhum nó encontrado: seção nodes: ausente ou vazia — isto não é um .kg.yaml legível."
     }

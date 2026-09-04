@@ -81,9 +81,12 @@ if not os.path.isfile(baseline):
     cur = set()
 else:
     cur = set(l.strip() for l in open(baseline, encoding="utf-8") if l.strip() and not l.startswith("#"))
-    grew = cur - prev if prev else set()
-    if grew:
-        rows.append(("HARD", "CATRACA-VIOLADA", baseline_rel, f"baseline CRESCEU em {len(grew)} entrada(s) vs origin/main — o passivo só encolhe: " + ", ".join(sorted(grew)[:3])))
+    # CATRACA POR CONTAGEM (2026-09-04, consolidação 8→5): a chave é <rel>|<ref> e um RENAME de plugin
+    # (plugins/onion-work-tools/… → plugins/onion/…) reescreve todas as chaves sem mudar o passivo — a
+    # diferença de conjuntos acusaria "cresceu" com 0 refs novas. O que "só encolhe" é o NÚMERO.
+    if prev and len(cur) > len(prev):
+        grew = cur - prev
+        rows.append(("HARD", "CATRACA-VIOLADA", baseline_rel, f"baseline CRESCEU: {len(prev)} → {len(cur)} entrada(s) vs origin/main — o passivo só encolhe; novas: " + ", ".join(sorted(grew)[:3])))
 passivo = 0
 for rel, ref, at, i in found:
     key = f"{rel}|{ref}"

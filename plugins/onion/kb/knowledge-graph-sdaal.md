@@ -7,9 +7,9 @@
 > generalizado**; a implementação de referência vive em um adotante (`scripts/kg/radar.js` +
 > `docs/<adopter>/graph/audit.kg.yaml`).
 >
-> **Gate (comando `/onion-work-tools:kg`): ✅ CUMPRIDO em 2026-07-04** — o core dogfoodou o método na rodada
+> **Gate (comando `/onion:kg`): ✅ CUMPRIDO em 2026-07-04** — o core dogfoodou o método na rodada
 > de `meta:evolve` (`onion-evolution-2026-07.kg.yaml` — grafo interno do core; a auditoria `meta:evolve`
-> de 2026-07-04 modelada como KG, 37 nós/33 arestas, 7 refutações como arestas REFUTES) e o comando **`/onion-work-tools:kg`** nasceu dessa
+> de 2026-07-04 modelada como KG, 37 nós/33 arestas, 7 refutações como arestas REFUTES) e o comando **`/onion:kg`** nasceu dessa
 > vivência, junto com o motor soberano `${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh`. A doutrina
 > gated-until-trigger foi respeitada: o comando veio DEPOIS do dogfood, não antes.
 >
@@ -20,12 +20,12 @@
 > cartografia de contextos de domínio — sob a doutrina gated-until-trigger (registra desenho e gatilhos,
 > não autoriza construir) e soberania (cada instância implementa seu motor, não se porta o radar do adotante).
 > **F1 disparou em 2026-07-04** (1º dogfood na federação, sessão de um adotante — ver nota de doutrina abaixo)
-> e **F2 executou no mesmo dia** (dogfood do core via `meta:evolve` → `/onion-work-tools:kg` + `kg-radar.sh`).
+> e **F2 executou no mesmo dia** (dogfood do core via `meta:evolve` → `/onion:kg` + `kg-radar.sh`).
 > Resta F3 (plugin `onion-investigation`), gated por maturidade de uso.
 >
 > **Camada de DOMÍNIO promovida em 2026-07-10** — 2º dogfood de campo (sinal
 > `2026-07-08-kg-dogfood-completo-promover.md`, sinal upstream interno do core — o grafo de auditoria,
-> 111 nós/170 arestas e 4 fatias de domínio, evoluiu para SSOT de domínio e pediu des-gate do `/onion-work-tools:kg`
+> 111 nós/170 arestas e 4 fatias de domínio, evoluiu para SSOT de domínio e pediu des-gate do `/onion:kg`
 > + promoção do **schema + método, não do código**) elevou o padrão a **duas camadas**
 > (`layer: audit|domain`), com radar-de-domínio e a materialização design/atom-map — ver seções abaixo.
 
@@ -118,14 +118,14 @@ camadas** (campo `layer`, default `audit` — retrocompatível):
     vivo AGORA e alguém precisa reconciliar"* — não *"um run devolveu veredito DRIFTED"*. Se o
     label já foi atualizado com a verdade medida, o nó **não** é `drifted`: ele é `confirmed`, e o
     veredito do run vira a **aresta** `SUPERSEDES` + o nó da posição superada. Confundir os dois é
-    erro medido (Elenxo 2026-08-07): produz nó `drifted` que não diverge de nada, ocupa o topo do
+    erro medido ([Elenxo](onion-elenxo-doctrine.md) 2026-08-07): produz nó `drifted` que não diverge de nada, ocupa o topo do
     radar e — porque a guarda de reconciliação só conta superseder `confirmed` — deixa a aresta
     recém-criada **invisível**, um fail-open.
 - **migalha unificada**: aresta `TRACES_TO` → `{file:line | task | commit | env | reason | snapshot}`
 
 O grafo é **append-mostly**: auto-correções viram arestas `REFUTES` explícitas — a história não se
 apaga, se **reconcilia** (mesmo parentesco do protocolo de re-teste do diário: `superseded: true`,
-nunca deletar — `/onion-work-tools:diary review`).
+nunca deletar — `/onion:diary review`).
 
 > **Normativo: `id` em INGLÊS, `label` em pt-BR.** Segue a skill `language-standards`/
 > `code-standards` — `id` é identificador (código: inglês),
@@ -412,7 +412,7 @@ regresso), quando o radar então reconstruiu a escada inteira + a tese-núcleo p
 lint ocasional — e estava **sub-usado**. A correção é **em camadas, honesta**: (1) uma **FASE `write(KG)`
 canônica** no template da classe FINDINGS da orquestração (default-path, caminho de menor resistência —
 materializa o `.kg.yaml` + roda o radar **antes** de retornar); (2) este **gate de integridade do
-marcador**; (3) a **pergunta guiada** no `/onion-work-tools:diary create` (*"nasceu no grafo? path do `.kg.yaml`,
+marcador**; (3) a **pergunta guiada** no `/onion:diary create` (*"nasceu no grafo? path do `.kg.yaml`,
 ou prosa-só + porquê"*); (4) o **limite honesto** declarado abaixo.
 
 **O marcador `kg:`** é um campo de frontmatter — em migalha epistêmica (`type` decision/error/learning/
@@ -603,7 +603,7 @@ SVG estático para um grafo Cytoscape com **encoding epistêmico** (tamanho ∝ 
 confiança, borda por status, halo âmbar = stale, aresta por SUPPORTS/REFUTES⊣/SUPERSEDES⇢) e um
 **tour narrado** que conduz o leitor por atenção — a narrativa é o que torna o grafo grande legível
 (vence o teto de ~50 nós). A narração é um artefato `<slug>.narration.json` **autorado por agente**
-(modo `/onion-work-tools:kg narrate`) e **embutido** pelo console, tocado **offline** (não live-chat, que quebraria
+(modo `/onion:kg narrate`) e **embutido** pelo console, tocado **offline** (não live-chat, que quebraria
 o CSP): o `kg-console.sh` continua **LLM-free** — o único ponto com IA é a autoria. Ela é **projeção
 dos 4 vereditos do radar** (atenção→ordem; REFUTES/SUPERSEDES→Aufhebung; STALE→"o que re-verificar"),
 nunca fonte paralela — e **cita só ids que existem**, garantido por mecanismo (`kg-narrate-validate.sh`,
@@ -611,7 +611,7 @@ nunca fonte paralela — e **cita só ids que existem**, garantido por mecanismo
 (`kg-view.sh --json`) + o método de encoding + o arco de narração — **nunca o JS do renderer** (o
 Cytoscape é *uma* implementação). Ver ≠ distribuir, uma camada acima.
 
-## Mapeamento completo — o playbook (`/onion-work-tools:kg map <área>`)
+## Mapeamento completo — o playbook (`/onion:kg map <área>`)
 
 > **Situação (recognition-primed):** vai redesenhar/refatorar/assumir uma área e o conhecimento dela
 > vive espalhado (telas, endpoints, regras implícitas). **Playbook:** mapear a área como SSOT de
@@ -619,7 +619,7 @@ Cytoscape é *uma* implementação). Ver ≠ distribuir, uma camada acima.
 > de um adotante e se repete a cada adotante que assume uma área.
 
 O PFR completo (F0 inventário → F1 contrato → F2 `.kg.yaml` → F3 radar → F4 adaptador) vive no
-comando `/onion-work-tools:kg` §Modo map. O essencial doutrinário:
+comando `/onion:kg` §Modo map. O essencial doutrinário:
 
 - **F1 tem 3 variantes — todas por identidade, não analogia** (o mesmo motor, o mesmo radar):
   1. **UI → atom-map** (contrato de átomos): 1 átomo = 1 fonte + 1 dono-de-exibição + 1
@@ -639,7 +639,7 @@ comando `/onion-work-tools:kg` §Modo map. O essencial doutrinário:
 - **Invariante grep-verificável no repo do adotante**: cada endpoint-dono aparece como fonte de
   exibição em 1 componente ("cara-crachá" — `verify-read-path-first` aplicado ao front).
 
-### A 3ª aplicação — o mesmo motor como DIAGNÓSTICO de engajamento (`/onion-work-tools:kg diagnose`)
+### A 3ª aplicação — o mesmo motor como DIAGNÓSTICO de engajamento (`/onion:kg diagnose`)
 
 O `map` mapeia **software**; a mesma máquina — 2 camadas + radar — mapeia um **engajamento de
 consultoria** (descoberta de negócio). É a **tese-núcleo aplicada ao diagnóstico**: o grafo é
@@ -671,7 +671,7 @@ instância implementa com seu stack; o core permanece determinístico até a esc
 
 - **≠ `meta:graph`**: aquele é a lente sócio-técnica da *spec-as-code* (estrutura do framework);
   este é o grafo do *conhecimento de uma investigação* (claims/decisões/evidência). Complementares.
-- **Parentesco**: protocolo de re-teste do diário (`/onion-work-tools:diary review`); doutrina de dogfood
+- **Parentesco**: protocolo de re-teste do diário (`/onion:diary review`); doutrina de dogfood
   ([onion-dogfooding-doctrine](onion-dogfooding-doctrine.md)) — "invoque o artefato e observe" é a
   regra PROD-plane em outra roupa.
 - **Origem e crédito**: uma instância adotante, auditoria de produção (evidência: radar priorizou cura de

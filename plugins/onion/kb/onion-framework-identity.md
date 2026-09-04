@@ -71,7 +71,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | **Abstraction Doctrine** | **quando** algo vira SDAAL (Teste do Eixo + Teste do Gatilho) | `onion-abstraction-doctrine.md` | ✅ ativa (2026-07-17) |
 | **Economy of Motors** | 3 motores (Transformer · SLM-ferramenta · Shell); use o mais barato capaz | `onion-engine-economy.md` | ✅ ativa |
 | **SDAAL** *(Specification-Driven AI Abstraction Layer)* | uma interface, N providers; o spec é o artefato e o LLM o runtime | KB · whitepaper | ✅ ativa |
-| **KG SDAAL** | investigação/domínio como grafo tipado; verdades **reconciliadas** (`REFUTES`/`SUPERSEDES`), radar determinístico | `knowledge-graph-sdaal.md` | ✅ ativa — **é infraestrutura**: 51 grafos, `kg-radar`, `kg-console`, `/onion-work-tools:kg`, `/onion:kg-freshness`, REGRAS 43/47/49/52 e regra path-scoped nativa |
+| **KG SDAAL** | investigação/domínio como grafo tipado; verdades **reconciliadas** (`REFUTES`/`SUPERSEDES`), radar determinístico | `knowledge-graph-sdaal.md` | ✅ ativa — **é infraestrutura**: 51 grafos, `kg-radar`, `kg-console`, `/onion:kg`, `/onion:kg-freshness`, REGRAS 43/47/49/52 e regra path-scoped nativa |
 | **SSOT-as-runtime** | a SSOT é o **programa que se executa**: `read→verify→act→write`; KG-first + drive-to-verify | KG SDAAL §SSOT-as-runtime | ✅ ativa (cabeada nos 3 loops) |
 | **`gated-until-trigger`** | o artefato nasce do **uso que o prove**, nunca de simetria/plano | modernization §🚦 | ✅ ativa |
 | **`declarado ≠ verificado`** | carimbo/doc/branch é DEV; só o artefato vivo é PROD | verify-read-path-first (tabela da família) | ✅ ativa |
@@ -79,7 +79,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | **PFR** *(Padrão Faseado Retomável)* | sessão durável + `STATE.md` + retomada fria; fases nunca fundidas | `onion-adr-phased-resumable-pattern-2026-06.md` (ADR interno do core — nomeia o PFR, padrão já invariante L0; provisório, PR à meta-spec diferido até gatilho) + método §2a | 🟡 ADR provisório (a cravar em `commands.md §3`) |
 | **Capability Contract** | o que um repo adotado pode esperar: Bronze/Silver/Gold — contrato **verificável** | `onion-adr-capability-contract-2026-06.md` (ADR interno do core — auto-descrição `provides/requires/loads/conformance`, tiers Bronze/Silver/Gold, validada pelo lint REGRA 20; visão-de-fora composta dos contratos, não registry à mão) + **7** `plugins/*/.claude-plugin/capability.json` | ✅ ativa — ADR **+ mecanismo** (REGRA 20 [HARD]) |
 | **Co-Evolution Protocol** *(doc-bridge)* | sinal bidirecional core↔adotante por arquivo commitado; sem runtime acoplado | `docs/evolution/README.md` (interno do core — fonte canônica do protocolo doc-bridge; maestro humano orquestra, execução do que chega é gate humano) + `/meta:co-*` | ✅ ativa |
-| **Breadcrumbs / migalhas** | sinal explícito **no artefato** que força **absorção** em vez de acomodação | `breadcrumb-patterns.md` + `/onion-work-tools:diary` | ✅ ativa — 92 entradas, TTL + `conflict_class` por entrada, e o `personality-sync` F2 fez a **identidade emergir de 74 migalhas** |
+| **Breadcrumbs / migalhas** | sinal explícito **no artefato** que força **absorção** em vez de acomodação | `breadcrumb-patterns.md` + `/onion:diary` | ✅ ativa — 92 entradas, TTL + `conflict_class` por entrada, e o `personality-sync` F2 fez a **identidade emergir de 74 migalhas** |
 | **Object-led discovery** | o maestro dirige com o objeto; o Transformer executa com as peças certas | KB + `onion-adr-object-led-discovery-2026-07.md` (ADR interno do core — playbook espelhar→descobrir(object-led)→vestir(capability-fitting)→materializar→realimentar; "quem sabe sobre o objeto é o próprio objeto", Information Expert) | ✅ ativa |
 | **Autobiographical Marketing** | o framework conta a própria história; os commits **são** a autobiografia | `onion-adoption-manual.md` (persona 1ª pessoa) + **onionevolve.com reformado** (2026-08-25, PR #672): /historia/ com a curva dos commits gerada do git, diário com 62 migalhas, /doutrinas/ com as cicatrizes datadas | ✅ ativa (2026-08-25 — deixou de ser só prosa de manual: virou site vivo com números derivados da SSOT em build) |
 | **Maestro's Aside** *(Aparte do Maestro)* | protocolo de entrada lateral tipada: marcador pt-BR no início da mensagem (`dúvida:`/`corrige:`/`paralelo:`…) → hook `UserPromptSubmit` injeta a rota canônica (recall, **não** gate); dispatcher p/ diário/memória/STATE/orquestração que já existem | `maestro-aside.md` + hook+motor | ✅ ativa (2026-08-04) |
@@ -203,7 +203,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 |------------|----------------|------------------|
 | Code review | `@code-reviewer` | Bugs, patterns, manutenibilidade |
 | Review de branch | `@branch-code-reviewer` | Diff-scoped, pré-PR |
-| Testes unitários | `/onion-testing:unit` | Gerar + executar suíte |
+| Testes unitários | `/onion-engineering:unit` | Gerar + executar suíte |
 | ISO 27001 | `@iso-27001-specialist` | Política SGSI, risk assessment |
 | SOC2 Type II | `@soc2-specialist` | Controles + coleta de evidências |
 | Validação arquitetural | `@metaspec-gate-keeper` | Conformidade L0/L1+ |
@@ -222,10 +222,10 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | Capacidade | Comando |
 |------------|---------|
 | Auto-auditoria | `meta:evolve` — 10 dimensões, orquestração, backlog priorizado |
-| Frescor de KBs | `/onion-work-tools:kb-freshness` — veredito CURRENT/STALE/HISTORICAL |
+| Frescor de KBs | `/onion:kb-freshness` — veredito CURRENT/STALE/HISTORICAL |
 | Criar novo agente | `meta:create-agent` — contextualizado no ecossistema |
 | Criar novo comando | `meta:create-command` |
-| Validar conformidade | `/onion-work-tools:metaspec-validate` |
+| Validar conformidade | `/onion:metaspec-validate` |
 | Inventário automático | `meta:inventory` — SSOT gerada do filesystem |
 
 ---

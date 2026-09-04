@@ -15,13 +15,13 @@
 #     não o autora). ADOPT = Camada 2 (source + hub — a empresa adota os PRÓPRIOS projetos; ver adopt.md PASSO 0).
 #     DOWNSTREAM (co-deliver/announce) = Camada 3, gated (federação cross-empresa; autoridade do core por ora).
 #
-# SSOT: verticais = verticals/*.manifest.sh; work_tools = verticals/onion-work-tools.manifest.sh; ambos em marketplace.json.
+# SSOT: verticais = verticals/*.manifest.sh; work_tools = verticals/onion.manifest.sh (o núcleo absorveu onion-work-tools em 2026-09-04); ambos em marketplace.json.
 # Drift-guard: lint check_role_bundle_sync (todo vertical/tool nomeado resolve a artefato real).
 # Resolver: resolve-role-bundle.sh <role> [--with-optional] [--tools].
 version: 1
 
 # Conjuntos de work_tools nomeados (referenciados por papel abaixo). NÃO são verticais de domínio,
-# NÃO são meta-fábrica. O manifesto onion-work-tools.manifest.sh materializa comandos + motores + agente.
+# NÃO são meta-fábrica. O manifesto onion.manifest.sh (núcleo) materializa comandos + motores + agente — onion-work-tools foi absorvido em 2026-09-04.
 work_tool_sets:
   # FULL — source/hub/standalone: a ferramenta de trabalho COMPLETA (o reframe: std=solo-completo).
   full:
@@ -48,14 +48,14 @@ work_tool_sets:
 
 roles:
   source:        # TIER 0 — o core (onion-evolve). Instala TUDO: autor + autoridade emissora.
-    base: [onion-engineering, onion-product, onion-testing, onion-docs, onion-design, onion-compliance]
+    base: [onion-engineering, onion-product, onion-design, onion-compliance]
     optional: []
     work_tools: full
     downstream: true
     note: "Alem dos verticais e dos work_tools, a meta-factory (create-*/adopt/federation-*/evolve/graph/inventory) e core-only e NAO e vertical/tool — nunca sai do core."
 
   hub:           # TIER 1 — adocao de EMPRESA; a empresa como autoridade sobre os PROPRIOS projetos.
-    base: [onion-engineering, onion-product, onion-testing, onion-docs]
+    base: [onion-engineering, onion-product]
     optional: [onion-design, onion-compliance]
     work_tools: full
     # 3 CAMADAS de capacidade (2026-07-23, sinal de campo de um adotante — o "multi" chegou):
@@ -67,14 +67,14 @@ roles:
     downstream: gated    # Camada 3 — co-deliver/announce cross-empresa so quando a seam abrir; hoje a autoria e do core
 
   standalone:    # TIER 3 — dev solo com ferramenta COMPLETA, SEM federacao. Pode evoluir p/ hub ou consumer.
-    base: [onion-engineering, onion-product, onion-testing, onion-docs]
+    base: [onion-engineering, onion-product]
     optional: [onion-design, onion-compliance]
     work_tools: full
     downstream: false   # exposes_downstream sempre vazio — sem sub-adotados
 
   consumer:      # TIER 2 — minimo (adota um hub, nao o core).
-    base: [onion-engineering, onion-docs]
-    optional: [onion-product, onion-testing]
+    base: [onion-engineering, onion-product]
+    optional: []
     work_tools: tbd     # A DEFINIR quando nascer um consumer real (subconjunto de full)
     downstream: false
 

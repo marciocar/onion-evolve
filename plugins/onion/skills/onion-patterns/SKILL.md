@@ -220,7 +220,7 @@ catálogo/SDAAL antes de introduzir dependência nova) → **materializar** (gat
 
 ### validação de doutrina — o **ELENXO** (superação de alto risco)
 
-> 📖 **SSOT: `docs/knowledge-base/concepts/onion-elenxo-doctrine.md`**
+> 📖 **SSOT: [`${CLAUDE_PLUGIN_ROOT}/kb/onion-elenxo-doctrine.md`](${CLAUDE_PLUGIN_ROOT}/kb/onion-elenxo-doctrine.md)**
 > — a doutrina inteira (as 5 etapas com o que cada uma reprova, a medição da etapa 5, por que não há
 > gate mecânico, o Bulbo e a porosidade). Esta seção é **derivação**; divergiu, a KB ganha.
 >

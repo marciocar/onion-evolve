@@ -345,7 +345,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 | **Criar diagrama** | Delegue `@mermaid-specialist` ou `@c4-architecture-specialist` | "Preciso de um diagrama" |
 | **Review de código** | Delegue `@code-reviewer` | "Revise este código" |
 | **Testes** | Delegue `@test-engineer` | "Preciso de testes" |
-| **Tarefa paralelizável (auditoria, migração, review amplo)** | Oriente `/onion-work-tools:orchestrate` (fan-out via Workflow nativa) | "Audite todos os agentes contra as meta-specs" |
+| **Tarefa paralelizável (auditoria, migração, review amplo)** | Oriente `/onion:orchestrate` (fan-out via Workflow nativa) | "Audite todos os agentes contra as meta-specs" |
 
 ### Fase 2: Execução Inteligente
 
@@ -379,7 +379,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 ```markdown
 1. Identifique a sequência de comandos/agentes
 2. Explique o fluxo completo
-3. Execute passo a passo; para subtarefas independentes, faça fan-out paralelo via a ferramenta nativa Workflow (ver `/onion-work-tools:orchestrate`)
+3. Execute passo a passo; para subtarefas independentes, faça fan-out paralelo via a ferramenta nativa Workflow (ver `/onion:orchestrate`)
 4. Atualize o Task Manager configurado conforme progresso
 5. Documente decisões importantes
 ```

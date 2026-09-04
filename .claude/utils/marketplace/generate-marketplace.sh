@@ -72,7 +72,7 @@ if [ -d "${PLUGINS_DIR}" ]; then
     author="$(awk '/"author"/{sub(/.*"name"[[:space:]]*:[[:space:]]*"/,"");sub(/".*/,"");print;exit}' "${pj}")"
     lic="$(field "${pj}" license)"; home="$(field "${pj}" homepage)"; repo="$(field "${pj}" repository)"
     # displayName / category (padrão de referência do marketplace do Claude Code: displayName, category, tags, license)
-    case "${name}" in onion) disp="Onion"; cat="core" ;; onion-work-tools) disp="Onion · Work Tools"; cat="tools" ;; *) disp="Onion · $(printf '%s' "${name#onion-}" | sed 's/-/ /g; s/\b\(.\)/\u\1/g')"; cat="vertical" ;; esac
+    case "${name}" in onion) disp="Onion"; cat="core" ;; *) disp="Onion · $(printf '%s' "${name#onion-}" | sed 's/-/ /g; s/\b\(.\)/\u\1/g')"; cat="vertical" ;; esac
     tags="$(awk '/"keywords"/{sub(/.*"keywords"[[:space:]]*:[[:space:]]*\[/,"");sub(/\].*/,"");print;exit}' "${pj}" | tr -d ' ')"
     [ "${first}" -eq 1 ] && first=0 || printf ','
     printf '\n    {\n'

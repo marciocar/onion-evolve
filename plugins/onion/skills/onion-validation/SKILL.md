@@ -192,7 +192,7 @@ Se validação falhar:
 ```bash
 if [ -z "$TASK_MANAGER_PROVIDER" ]; then
   echo "⚠️ TASK_MANAGER_PROVIDER não configurado"
-  echo "Execute /onion-work-tools:setup-integration"
+  echo "Execute /onion:setup-integration"
 fi
 ```
 

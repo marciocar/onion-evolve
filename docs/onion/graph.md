@@ -88,12 +88,26 @@
 - **onion** --loads--> embed:kb/behavior-over-declaration.md
 - **onion** --loads--> embed:kb/knowledge-graph-sdaal.md
 - **onion** --loads--> embed:kb/onion-dogfooding-doctrine.md
+- **onion** --loads--> embed:kb/onion-elenxo-doctrine.md
+- **onion** --loads--> when:diary -> run:validation/diary-index.sh
+- **onion** --loads--> when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)
+- **onion** --loads--> when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)
 - **onion** --loads--> when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)
+- **onion** --provides--> co-evolution-upstream
+- **onion** --provides--> constellation-map
 - **onion** --provides--> dogfood-doctrine
+- **onion** --provides--> freshness-audits
+- **onion** --provides--> guided-conduction
+- **onion** --provides--> guided-onboarding
 - **onion** --provides--> kg-freshness-reverify
 - **onion** --provides--> knowledge-graph-runtime
+- **onion** --provides--> knowledge-graph-sdaal
 - **onion** --provides--> language-standards
+- **onion** --provides--> learning-diary
 - **onion** --provides--> master-orchestration
+- **onion** --provides--> metaspec-validation
+- **onion** --provides--> orchestration
+- **onion** --provides--> retro-feedback
 - **onion** --provides--> sdaal-forge
 - **onion** --provides--> sdaal-task-manager
 - **onion** --provides--> session-runtime
@@ -109,6 +123,7 @@
 - **onion** --related--> product-agent
 - **onion** --related--> task-specialist
 - **onion** --related--> test-engineer
+- **onion** --requires--> agent:metaspec-gate-keeper
 - **onion** --requires--> skill:onion-orchestration
 - **onion** --serves--> maestro
 
@@ -117,15 +132,30 @@
 - onion **loads** embed:kb/behavior-over-declaration.md
 - onion **loads** embed:kb/knowledge-graph-sdaal.md
 - onion **loads** embed:kb/onion-dogfooding-doctrine.md
+- onion **loads** embed:kb/onion-elenxo-doctrine.md
+- onion **loads** when:diary -> run:validation/diary-index.sh
+- onion **loads** when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)
+- onion **loads** when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)
 - onion **loads** when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)
+- onion **provides** co-evolution-upstream
+- onion **provides** constellation-map
 - onion **provides** dogfood-doctrine
+- onion **provides** freshness-audits
+- onion **provides** guided-conduction
+- onion **provides** guided-onboarding
 - onion **provides** kg-freshness-reverify
 - onion **provides** knowledge-graph-runtime
+- onion **provides** knowledge-graph-sdaal
 - onion **provides** language-standards
+- onion **provides** learning-diary
 - onion **provides** master-orchestration
+- onion **provides** metaspec-validation
+- onion **provides** orchestration
+- onion **provides** retro-feedback
 - onion **provides** sdaal-forge
 - onion **provides** sdaal-task-manager
 - onion **provides** session-runtime
+- onion **requires** agent:metaspec-gate-keeper
 - onion **requires** skill:onion-orchestration
 - onion-compliance **loads** when:build -> resolve:compliance-context (skill onion-compliance-context)
 - onion-compliance **loads** when:framework=iso27001 -> template:compliance_iso27001_template.md
@@ -159,21 +189,16 @@
 - onion-design **requires** util:design-sink
 - onion-design **requires** util:design-source
 - onion-design **requires** validation:lint-design-tokens.sh
-- onion-docs **provides** business-technical-context
-- onion-docs **provides** c4-model-mermaid
-- onion-docs **provides** docs-health-validacao
-- onion-docs **provides** engenharia-reversa
-- onion-docs **requires** agent:c4-architecture-specialist
-- onion-docs **requires** agent:c4-documentation-specialist
-- onion-docs **requires** agent:docs-reverse-engineer
-- onion-docs **requires** agent:mermaid-specialist
 - onion-engineering **loads** embed:kb/gitflow-patterns.md
 - onion-engineering **loads** embed:kb/worklog-protocol.md
 - onion-engineering **loads** when:work -> resolve:technical-context (skill onion-engineering-context)
 - onion-engineering **provides** code-review-pre-pr
 - onion-engineering **provides** code-specialists-node-react-postgres-nx-docker
+- onion-engineering **provides** estrategia-de-teste
+- onion-engineering **provides** geracao-testes-unit-integration-e2e
 - onion-engineering **provides** gitflow-faseado
 - onion-engineering **provides** pull-request-lifecycle
+- onion-engineering **provides** qa-story-points
 - onion-engineering **provides** ssot-context-resolver
 - onion-engineering **requires** agent:branch-code-reviewer
 - onion-engineering **requires** agent:code-reviewer
@@ -182,45 +207,33 @@
 - onion-engineering **requires** agent:nodejs-specialist
 - onion-engineering **requires** agent:postgres-specialist
 - onion-engineering **requires** agent:react-developer
+- onion-engineering **requires** agent:test-agent
+- onion-engineering **requires** agent:test-engineer
+- onion-engineering **requires** agent:test-planner
 - onion-engineering **requires** skill:onion-engineering-context
 - onion-product **loads** embed:kb/framework-story-points.md
 - onion-product **loads** embed:kb/identificar-precificar-dor-cliente.md
 - onion-product **loads** when:spec -> resolve:business-context (skill onion-product-context)
 - onion-product **provides** apresentacoes
+- onion-product **provides** business-technical-context
+- onion-product **provides** c4-model-mermaid
 - onion-product **provides** decomposicao-de-tasks
 - onion-product **provides** descoberta-a-backlog
+- onion-product **provides** docs-health-validacao
+- onion-product **provides** engenharia-reversa
 - onion-product **provides** estimativa-story-points
 - onion-product **provides** extracao-de-reunioes
 - onion-product **provides** ssot-context-resolver
+- onion-product **requires** agent:c4-architecture-specialist
+- onion-product **requires** agent:c4-documentation-specialist
+- onion-product **requires** agent:docs-reverse-engineer
 - onion-product **requires** agent:extract-meeting-specialist
+- onion-product **requires** agent:mermaid-specialist
 - onion-product **requires** agent:pain-price-specialist
 - onion-product **requires** agent:product-agent
 - onion-product **requires** agent:story-points-framework-specialist
 - onion-product **requires** agent:task-specialist
 - onion-product **requires** skill:onion-product-context
-- onion-testing **provides** estrategia-de-teste
-- onion-testing **provides** geracao-testes-unit-integration-e2e
-- onion-testing **provides** qa-story-points
-- onion-testing **requires** agent:test-agent
-- onion-testing **requires** agent:test-engineer
-- onion-testing **requires** agent:test-planner
-- onion-work-tools **loads** embed:kb/knowledge-graph-sdaal.md
-- onion-work-tools **loads** embed:kb/onion-elenxo-doctrine.md
-- onion-work-tools **loads** when:diary -> run:validation/diary-index.sh
-- onion-work-tools **loads** when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)
-- onion-work-tools **loads** when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)
-- onion-work-tools **provides** co-evolution-upstream
-- onion-work-tools **provides** constellation-map
-- onion-work-tools **provides** freshness-audits
-- onion-work-tools **provides** guided-conduction
-- onion-work-tools **provides** guided-onboarding
-- onion-work-tools **provides** knowledge-graph-sdaal
-- onion-work-tools **provides** learning-diary
-- onion-work-tools **provides** metaspec-validation
-- onion-work-tools **provides** orchestration
-- onion-work-tools **provides** retro-feedback
-- onion-work-tools **requires** agent:metaspec-gate-keeper
-- onion-work-tools **requires** skill:onion-orchestration
 
 ## Triplas (cruas — para consumo determinístico)
 
@@ -461,12 +474,26 @@ onion	has-member	zen-engine-specialist
 onion	loads	embed:kb/behavior-over-declaration.md	
 onion	loads	embed:kb/knowledge-graph-sdaal.md	
 onion	loads	embed:kb/onion-dogfooding-doctrine.md	
+onion	loads	embed:kb/onion-elenxo-doctrine.md	
+onion	loads	when:diary -> run:validation/diary-index.sh	
+onion	loads	when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)	
+onion	loads	when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)	
 onion	loads	when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)	
+onion	provides	co-evolution-upstream	
+onion	provides	constellation-map	
 onion	provides	dogfood-doctrine	
+onion	provides	freshness-audits	
+onion	provides	guided-conduction	
+onion	provides	guided-onboarding	
 onion	provides	kg-freshness-reverify	
 onion	provides	knowledge-graph-runtime	
+onion	provides	knowledge-graph-sdaal	
 onion	provides	language-standards	
+onion	provides	learning-diary	
 onion	provides	master-orchestration	
+onion	provides	metaspec-validation	
+onion	provides	orchestration	
+onion	provides	retro-feedback	
 onion	provides	sdaal-forge	
 onion	provides	sdaal-task-manager	
 onion	provides	session-runtime	
@@ -482,6 +509,7 @@ onion	related	jira-specialist
 onion	related	product-agent	
 onion	related	task-specialist	
 onion	related	test-engineer	
+onion	requires	agent:metaspec-gate-keeper	
 onion	requires	skill:onion-orchestration	
 onion	serves	maestro	
 onion-arthur	adopts	onion-evolve	
@@ -534,21 +562,16 @@ onion-dist	specialization	kg-sdaal-method
 onion-dist	specialization	research-arm	
 onion-dist	tier	standalone	
 onion-dist	trust-advises	onion-evolve	
-onion-docs	provides	business-technical-context	
-onion-docs	provides	c4-model-mermaid	
-onion-docs	provides	docs-health-validacao	
-onion-docs	provides	engenharia-reversa	
-onion-docs	requires	agent:c4-architecture-specialist	
-onion-docs	requires	agent:c4-documentation-specialist	
-onion-docs	requires	agent:docs-reverse-engineer	
-onion-docs	requires	agent:mermaid-specialist	
 onion-engineering	loads	embed:kb/gitflow-patterns.md	
 onion-engineering	loads	embed:kb/worklog-protocol.md	
 onion-engineering	loads	when:work -> resolve:technical-context (skill onion-engineering-context)	
 onion-engineering	provides	code-review-pre-pr	
 onion-engineering	provides	code-specialists-node-react-postgres-nx-docker	
+onion-engineering	provides	estrategia-de-teste	
+onion-engineering	provides	geracao-testes-unit-integration-e2e	
 onion-engineering	provides	gitflow-faseado	
 onion-engineering	provides	pull-request-lifecycle	
+onion-engineering	provides	qa-story-points	
 onion-engineering	provides	ssot-context-resolver	
 onion-engineering	requires	agent:branch-code-reviewer	
 onion-engineering	requires	agent:code-reviewer	
@@ -557,6 +580,9 @@ onion-engineering	requires	agent:gitflow-specialist
 onion-engineering	requires	agent:nodejs-specialist	
 onion-engineering	requires	agent:postgres-specialist	
 onion-engineering	requires	agent:react-developer	
+onion-engineering	requires	agent:test-agent	
+onion-engineering	requires	agent:test-engineer	
+onion-engineering	requires	agent:test-planner	
 onion-engineering	requires	skill:onion-engineering-context	
 onion-evolve	lineage	product	
 onion-evolve	lineage	vps-bridge	
@@ -589,12 +615,20 @@ onion-product	loads	embed:kb/framework-story-points.md
 onion-product	loads	embed:kb/identificar-precificar-dor-cliente.md	
 onion-product	loads	when:spec -> resolve:business-context (skill onion-product-context)	
 onion-product	provides	apresentacoes	
+onion-product	provides	business-technical-context	
+onion-product	provides	c4-model-mermaid	
 onion-product	provides	decomposicao-de-tasks	
 onion-product	provides	descoberta-a-backlog	
+onion-product	provides	docs-health-validacao	
+onion-product	provides	engenharia-reversa	
 onion-product	provides	estimativa-story-points	
 onion-product	provides	extracao-de-reunioes	
 onion-product	provides	ssot-context-resolver	
+onion-product	requires	agent:c4-architecture-specialist	
+onion-product	requires	agent:c4-documentation-specialist	
+onion-product	requires	agent:docs-reverse-engineer	
 onion-product	requires	agent:extract-meeting-specialist	
+onion-product	requires	agent:mermaid-specialist	
 onion-product	requires	agent:pain-price-specialist	
 onion-product	requires	agent:product-agent	
 onion-product	requires	agent:story-points-framework-specialist	
@@ -609,29 +643,6 @@ onion-standalone	specialization	public-distribution
 onion-standalone	specialization	role-scoped-adopt	
 onion-standalone	tier	standalone	
 onion-standalone	trust-advises	onion-evolve	
-onion-testing	provides	estrategia-de-teste	
-onion-testing	provides	geracao-testes-unit-integration-e2e	
-onion-testing	provides	qa-story-points	
-onion-testing	requires	agent:test-agent	
-onion-testing	requires	agent:test-engineer	
-onion-testing	requires	agent:test-planner	
-onion-work-tools	loads	embed:kb/knowledge-graph-sdaal.md	
-onion-work-tools	loads	embed:kb/onion-elenxo-doctrine.md	
-onion-work-tools	loads	when:diary -> run:validation/diary-index.sh	
-onion-work-tools	loads	when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)	
-onion-work-tools	loads	when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)	
-onion-work-tools	provides	co-evolution-upstream	
-onion-work-tools	provides	constellation-map	
-onion-work-tools	provides	freshness-audits	
-onion-work-tools	provides	guided-conduction	
-onion-work-tools	provides	guided-onboarding	
-onion-work-tools	provides	knowledge-graph-sdaal	
-onion-work-tools	provides	learning-diary	
-onion-work-tools	provides	metaspec-validation	
-onion-work-tools	provides	orchestration	
-onion-work-tools	provides	retro-feedback	
-onion-work-tools	requires	agent:metaspec-gate-keeper	
-onion-work-tools	requires	skill:onion-orchestration	
 pain-price-specialist	related	product-agent	
 pain-price-specialist	related	research-agent	
 pmbok-specialist	related	/docs/build-compliance-docs	

@@ -17,7 +17,7 @@ related_agents:
 related_commands:
   - /onion-design:identity
   - /onion-product:branding
-  - /onion-work-tools:orchestrate
+  - /onion:orchestrate
 ---
 
 # /onion-design:generate — Identidade generativa (diverge → converge)
@@ -117,6 +117,6 @@ contraste deve ser **descartado** pelo gate, não vencer. Prova que "o gate deci
 
 - Workers: `@brand-generator` · Materializa o vencedor: `@design-system-specialist`
 - Gate: `${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh` · Ingestão: `${CLAUDE_PLUGIN_ROOT}/utils/design-source/`
-- Orquestração: skill `onion-orchestration` · `/onion-work-tools:orchestrate` · KB `agent-orchestration`
+- Orquestração: skill `onion-orchestration` · `/onion:orchestrate` · KB `agent-orchestration`
 - Consome o vencedor: `/onion-design:identity` (Fase 2 DEVELOP) · Brief: `/onion-product:branding`
 - Peer provisório: `docs/design-context/decisions/onion-adr-design-peer-promotion.md`

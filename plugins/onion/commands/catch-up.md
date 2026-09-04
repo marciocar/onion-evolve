@@ -91,7 +91,7 @@ Sintetize em **um bloco curto** (não despeje os comandos crus):
 ```
 
 Termine oferecendo a retomada: se há worklog → `/onion-engineering:work <slug>`; se há diff
-não-commitado → revisar/concluir; se há inbox → `/onion-work-tools:co-evolve`. **Não execute**
+não-commitado → revisar/concluir; se há inbox → `/onion:co-evolve`. **Não execute**
 nada automaticamente — o briefing orienta, o maestro decide.
 
 ## 💡 Quando Usar
