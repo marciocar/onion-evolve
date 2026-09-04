@@ -107,6 +107,10 @@ Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT e
 
 Estes comandos aparecem no texto sem a barra inicial porque pertencem ao core do Onion (meta-fábrica ou outra superfície) e **não** são instalados por este plugin: `git:feature:finish`, `git:feature:publish`, `git:feature:start`, `git:hotfix:finish`, `git:hotfix:start`, `git:release:finish`, `git:release:start`, `meta:adopt`, `test:watch`. Estão disponíveis num repo que adotou o Onion por vendorização (`.claude/` completo).
 
+## Funciona melhor com
+
+Comandos deste plugin citam: `onion`. Não é dependência — sem eles, essas menções apontam para comandos não instalados.
+
 ## Licença
 
 MIT (texto integral em `LICENSE`, na raiz do plugin) — © Onion · Marcio Carvalho. Site: https://onionevolve.com · Fonte: https://github.com/marciocar/onion-evolve

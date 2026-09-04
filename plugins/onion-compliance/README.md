@@ -69,6 +69,10 @@ Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 
 Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT em `.claude/` do source. Não edite à mão: a próxima montagem sobrescreve.
 
+## Funciona melhor com
+
+Comandos deste plugin citam: `onion`, `onion-product`. Não é dependência — sem eles, essas menções apontam para comandos não instalados.
+
 ## Licença
 
 MIT (texto integral em `LICENSE`, na raiz do plugin) — © Onion · Marcio Carvalho. Site: https://onionevolve.com · Fonte: https://github.com/marciocar/onion-evolve

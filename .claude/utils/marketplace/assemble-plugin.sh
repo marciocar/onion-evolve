@@ -309,6 +309,10 @@ cat > "${DEST}/.claude-plugin/plugin.json" <<EOF
 EOF
 
 # capability.json — Capability Contract materializado (auto-descrição content-stable; sem campos voláteis).
+# REQUIRES_PLUGINS (opcional, REGRA 77): dependência de OUTRO PLUGIN do marketplace (uma skill/util que só ele
+# embarca) vira `plugin:<nome>` em requires — contrato declarado, não menção. Menção de comando cruzado NÃO é
+# dependência (é informativa; o README lista em "Funciona melhor com").
+declare -a _REQ_PLUGINS=(); for _rp in "${REQUIRES_PLUGINS[@]:-}"; do [ -n "${_rp}" ] && _REQ_PLUGINS+=("plugin:${_rp}"); done
 json_arr() { local out="" x; for x in "$@"; do out="${out}\"${x}\","; done; printf '[%s]' "${out%,}"; }
 cat > "${DEST}/.claude-plugin/capability.json" <<EOF
 {
@@ -316,7 +320,7 @@ cat > "${DEST}/.claude-plugin/capability.json" <<EOF
   "version": "${PLUGIN_VERSION}",
   "conformance": "${CONFORMANCE}",
   "provides": $(json_arr "${PROVIDES[@]}"),
-  "requires": $(json_arr "${REQUIRES[@]}"),
+  "requires": $(json_arr "${REQUIRES[@]}" "${_REQ_PLUGINS[@]}"),
   "loads": $(json_arr "${LOADS[@]}")
 }
 EOF

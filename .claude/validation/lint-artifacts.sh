@@ -3939,6 +3939,40 @@ check_marketplace_root_sync() {
     violation "HARD" "${REPO_ROOT}/${path}" "[marketplace-raiz/${cls}] ${msg}"
   done <<< "${out}"
 }
+
+# ===========================================================================
+# REGRA 77 — Contrato de dependência entre plugins [HARD + SOFT]
+# previne: dois plugins embarcando a mesma skill/KB (cópias divergem) ou um plugin usando skill que só outro embarca sem declarar
+#   Medido 2026-09-04: onion e onion-work-tools embarcavam a mesma skill, o mesmo motor (3 md5) e a mesma
+#   KB; nenhum capability.json declarava outro PLUGIN. A consolidação 8→5 sumiu com a duplicação; esta
+#   regra impede que volte: (HARD) conhecimento duplicado (skills/, kb/), skill de outro plugin sem
+#   REQUIRES_PLUGINS, REQUIRES_PLUGINS sem reflexo em capability.json/README; (SOFT, 1 linha agregada)
+#   menções cruzadas de comando — informativas, o README lista em "Funciona melhor com". Motores em
+#   validation/utils viajam com quem os chama (um plugin só alcança a própria raiz) e não são duplicata.
+#   Lógica em plugin-deps-check.sh.
+# ===========================================================================
+check_plugin_deps_contract() {
+  local helper="${SCRIPT_DIR}/plugin-deps-check.sh"
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  [ -f "${helper}" ] || return 0
+  [ -d "${REPO_ROOT}/plugins" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/plugins/*|*/verticals/*.manifest.sh|*/assemble-plugin.sh|*/plugin-deps-check.sh|*/plugin-readme.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out sev cls path msg soft=0
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev cls path msg; do
+    [ -n "${sev}" ] || continue
+    if [ "${sev}" = "SOFT" ]; then soft=$((soft+1)); continue; fi
+    violation "HARD" "${REPO_ROOT}/${path}" "[plugin-deps/${cls}] ${msg}"
+  done <<< "${out}"
+  [ "${soft}" -gt 0 ] && violation "SOFT" "${REPO_ROOT}/plugins" "[plugin-deps/MENCAO-CRUZADA] ${soft} par(es) de plugins com menção cruzada de comando — informativo (o README lista em 'Funciona melhor com'; detalhe: bash .claude/validation/plugin-deps-check.sh)"
+  return 0
+}
 check_commands_without_model
 check_research_kg_review_after
 check_kg_source_tier_confidence
@@ -4007,6 +4041,7 @@ check_plugin_hooks_resolvable
 check_plugin_bare_paths
 check_plugin_dead_links
 check_marketplace_root_sync
+check_plugin_deps_contract
 
 # ===========================================================================
 # SUMÁRIO FINAL
