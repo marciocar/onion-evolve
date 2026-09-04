@@ -112,7 +112,7 @@ const scope = REVISIT ? { question: QUESTION, summary: 'revisita de ' + REVISIT,
   '\n\n## O que os grafos do Onion JÁ sabem (não repita; procure o que FALTA ou o que pode ter MUDADO)\n' + (CORPUS || '(corpus vazio)') +
   '\n\n## Tarefa\nGere 3-5 queries de busca distintas para o TEMA (o mercado, o Claude Code atual, repositórios por trajetória, analistas e comunidade JÁ são eixos fixos — não os repita). ' +
   'Ângulos típicos: estado da arte · benchmarks · limitações · adoção · custo/tradeoffs · contrarian. Queries específicas o bastante para achar sinal. ' +
-  'Devolva a pergunta (normalizada), a estratégia em 1-2 frases e os ângulos.\n\nSomente saída estruturada.',
+  'Devolva a pergunta (normalizada), a estratégia em 1-2 frases e os ângulos.\n\n## Formato (StructuredOutput, campos JSON de topo — NUNCA tags XML nem texto dentro de um único campo)\n- question: string (a pergunta normalizada)\n- summary: string (a estratégia, 1-2 frases)\n- angles: array de 3-5 objetos { label, query, rationale }\n\nMedido 2026-09-04: sem esta lista o coletor devolveu <question>…</question><summary>… tudo dentro de `question` 5x seguidas e o run morreu na primeira fase.',
   { label: 'scope', phase: 'Scope', schema: SCOPE_SCHEMA, model: TIER.collect.model, effort: TIER.collect.effort })
 if (!scope) return { error: 'Scope não devolveu resultado — não dá para decompor a pergunta.' }
 const year = TODAY.slice(0, 4)
