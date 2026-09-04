@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**110 itens abertos** em 32 grafo(s) com aberto (de 54 no escopo) · 32 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**112 itens abertos** em 33 grafo(s) com aberto (de 55 no escopo) · 33 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## m3-federation-admin-2026-07 — 12 item(ns)
 
@@ -34,6 +34,12 @@
 | 12.0 | `C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH` | poda-instruction-bloat-2026-09 | OPCAO A — mover doutrina para skills/rules por path e deixar o CLAUDE.md so com identidade + roteamento. A favor: e a cura que o |
 | 2.8 | `C_OPCAO_D_NAO_PODAR` | poda-instruction-bloat-2026-09 | OPCAO D — nao podar. A favor, e mais forte do que a rodada admitiu: 17.041 bytes sao ~0,5% da janela de 1M, o custo de janela e  |
 | 2.4 | `C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR` | poda-instruction-bloat-2026-09 | OPCAO B — manter o CLAUDE.md e comprimir. A favor: custo zero de arquitetura, nada se move de lugar, nenhum risco de doutrina su |
+
+## radar-E3-2026-09-04 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 36.0 | `Q_E3_DELTA_2_1_260` | radar-E3-2026-09-04 | O que mudou no Claude Code entre 2.1.259 e 2.1.260 que altera a ADEQUACAO da estrategia do Onion (escada de modelos, hooks/guardas |
 
 ## d5-pricing-2026-07 — 6 item(ns)
 
@@ -223,6 +229,13 @@
 |--:|---|---|---|
 | 5.4 | `Q_MUDEZ_DA_GUARDA_NAO_SE_IDENTIFICA` | elenxo-mecanismos-lint-2026-08-13 | O TETO DA GUARDA DIRTY-TREE GANHA DONO NO GRAFO (8o Elenxo, fechamento do Q_PARECER): no caminho benigno a guarda NAO emite nada  |
 
+## fios-abertos — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.4 | `I_FORGE_PARSE_GITLAB_SUBGRUPOS` | fios-abertos | ITEM (radar E3 rodada 3, 2026-09-04, medido pelo juiz): o parseRepoIdentity do spec do forge SDAAL (.claude/utils/forge/detector.m |
+| 3.0 | `Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO` | fios-abertos | PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-ver |
+
 ## granaai-doctrine-absorption-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -240,12 +253,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
-
-## fios-abertos — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 3.0 | `Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO` | fios-abertos | PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-ver |
 
 ## catraca-regra49-2026-08 — 1 item(ns)
 
