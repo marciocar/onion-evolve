@@ -5,14 +5,13 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**124 itens abertos** em 36 grafo(s) com aberto (de 58 no escopo) · 36 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**122 itens abertos** em 36 grafo(s) com aberto (de 58 no escopo) · 36 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
-## plugin-mcp-posture-2026-09 — 6 item(ns)
+## plugin-mcp-posture-2026-09 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 94.5 | `Q_PLUGIN_MCP_POSTURE_0904` | plugin-mcp-posture-2026-09 | No canal publico de plugins (marketplace onion-plugins -> comunitario/diretorio da Anthropic), o Onion deve se apresentar TAMBEM c |
-| 31.5 | `D_PLUGIN_MCP_POSTURE_0904` | plugin-mcp-posture-2026-09 | DECISAO ABERTA (o maestro sela): o Onion deve se apresentar TAMBEM como MCP no canal publico de plugins? Opcoes — (a) expor a tr |
 | 10.0 | `C_OPCAO_B_STDIO_EMBARCADO_READONLY` | plugin-mcp-posture-2026-09 | OPCAO (b): embarcar um servidor stdio read-only (adapter do onion-kg: kg_list, kg_radar, kb_search, kb_get, diary_index, inventory |
 | 7.5 | `C_OPCAO_A_CONECTOR_REMOTO_PUBLICO` | plugin-mcp-posture-2026-09 | OPCAO (a): expor a triade existente (onion-kg read-only 6 tools, onion-exec 4 tools com write-como-proposta, onion-framework 5 too |
 | 5.6 | `C_OPCAO_C_NADA_AGORA_SDAAL` | plugin-mcp-posture-2026-09 | OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem |
@@ -34,17 +33,6 @@
 | 5.2 | `C_p4_audit_trail` | m3-federation-admin-2026-07 | REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivad |
 | 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
-
-## plugin-language-policy-2026-09 — 6 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 45.5 | `D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO` | plugin-language-policy-2026-09 | DECISAO ABERTA (o maestro sela): qual politica de idioma adotar no canal publico de plugins do Onion, entre (i) superficies gerada |
-| 35.8 | `Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO` | plugin-language-policy-2026-09 | Qual politica de idioma o canal publico de plugins do Onion (onion-plugins -> marketplace comunitario / diretorio da Anthropic) de |
-| 16.2 | `C_OPCAO_I_LINHA_SUPERFICIE_EMITIDA_DEFINIDA_MECANICAMENTE` | plugin-language-policy-2026-09 | OPCAO (i-linha) CORRIGIDA PELO ELENXO — ingles em TODA superficie que os geradores EMITEM, com a fronteira definida MECANICAMENT |
-| 12.6 | `C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR` | plugin-language-policy-2026-09 | OPCAO (i) — superficies GERADAS em ingles (description do plugin.json, README do plugin e do marketplace, argument-hint, marketp |
-| 6.3 | `C_OPCAO_II_BILINGUE_POR_CAMPOS` | plugin-language-policy-2026-09 | OPCAO (ii) — bilingue por campos: `description` + `description_en` no plugin.json, README com EN em cima e pt-BR abaixo, ambos c |
-| 3.8 | `C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS` | plugin-language-policy-2026-09 | OPCAO (iii) — ingles integral nas superficies e corpos traduzidos progressivamente. A favor: e a unica que casa 100% com o norte |
 
 ## plugin-directory-landscape-2026-09 — 1 item(ns)
 
@@ -79,6 +67,16 @@
 | 7.5 | `Q_d2_l1l6_activation` | d5-pricing-2026-07 | GATE D2: a assinatura SOTA vende o mecanismo L1-L6 (classificação-por-inferência + gate-por-propósito + ε-ledger) que segue G |
 | 6.6 | `Q_p4_interviews` | d5-pricing-2026-07 | Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entre |
 | 4.9 | `Q_train_cert_chaining` | d5-pricing-2026-07 | Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento  |
+
+## plugin-language-policy-2026-09 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 35.8 | `Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO` | plugin-language-policy-2026-09 | Qual politica de idioma o canal publico de plugins do Onion (onion-plugins -> marketplace comunitario / diretorio da Anthropic) de |
+| 16.2 | `C_OPCAO_I_LINHA_SUPERFICIE_EMITIDA_DEFINIDA_MECANICAMENTE` | plugin-language-policy-2026-09 | OPCAO (i-linha) CORRIGIDA PELO ELENXO — ingles em TODA superficie que os geradores EMITEM, com a fronteira definida MECANICAMENT |
+| 12.6 | `C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR` | plugin-language-policy-2026-09 | OPCAO (i) — superficies GERADAS em ingles (description do plugin.json, README do plugin e do marketplace, argument-hint, marketp |
+| 6.3 | `C_OPCAO_II_BILINGUE_POR_CAMPOS` | plugin-language-policy-2026-09 | OPCAO (ii) — bilingue por campos: `description` + `description_en` no plugin.json, README com EN em cima e pt-BR abaixo, ambos c |
+| 3.8 | `C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS` | plugin-language-policy-2026-09 | OPCAO (iii) — ingles integral nas superficies e corpos traduzidos progressivamente. A favor: e a unica que casa 100% com o norte |
 
 ## radar-E3-2026-09-03 — 1 item(ns)
 
