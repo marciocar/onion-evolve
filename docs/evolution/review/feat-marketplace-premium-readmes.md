@@ -3,7 +3,7 @@ title: "Revisão — READMEs gerados no padrão de referência de plugins do Cla
 date: 2026-09-04
 branch: feat/marketplace-premium-readmes
 reviewer: "condutor com dogfood EXECUTADO: 8 plugins regenerados e materializados num alvo de scratch (tabela + 8 READMEs lidos); família marketplace_readmes 3/3; padrão de referência lido na doc oficial e no diretório oficial"
-reviewed_diff_sha256: baaa1489f2cf3229c6ba4ad480ab492efd6a9bb16d56624640f80dc0316a446a
+reviewed_diff_sha256: 3fec8ef094a99fd8dab655eabc7d8dd100a990a63126d2e4ed54e41e2868f2a8
 findings_total: 4
 findings_real: 4
 verdict: APROVADO
@@ -28,3 +28,7 @@ e pelo materializador; `generate-marketplace.sh` com entradas ricas e sem `versi
 4. **A regeneração dos plugins no core traz os 8 READMEs para `plugins/`** (REGRA 19 os mantém em sincronia); a re-montagem sobrescreve
    edição manual (caso (c)). Limite declarado: o README do marketplace só nasce na materialização (o clone `~/onion-plugins` recebe na
    próxima `materialize` + push do maestro).
+
+### Achado 5 — CI, REGRA 19 (Plugins de vertical sincronizados com as fontes) reprovou os 8 plugins
+
+O README gerado embutia `ref` (sha do HEAD no momento da montagem) e `commit_date`. O hook monta os plugins ANTES do commit existir, então o `ref` gravado é o do commit anterior; o CI re-monta com o HEAD do PR e o README diverge. O drift-guard ignora esses campos no `provenance.json`, mas no README eles contavam. **Cura:** o README só carrega campos content-stable (`repository`, `tree_sha`); ref/data ficam no `provenance.json`. **Bancada:** caso (d) — dois HEADs com as mesmas fontes ⇒ README `cmp` idêntico; mutante (gerador antigo) reprova, corrigido passa.
