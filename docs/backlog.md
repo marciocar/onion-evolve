@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**122 itens abertos** em 36 grafo(s) com aberto (de 58 no escopo) · 36 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**132 itens abertos** em 37 grafo(s) com aberto (de 59 no escopo) · 37 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -16,6 +16,21 @@
 | 7.5 | `C_OPCAO_A_CONECTOR_REMOTO_PUBLICO` | plugin-mcp-posture-2026-09 | OPCAO (a): expor a triade existente (onion-kg read-only 6 tools, onion-exec 4 tools com write-como-proposta, onion-framework 5 too |
 | 5.6 | `C_OPCAO_C_NADA_AGORA_SDAAL` | plugin-mcp-posture-2026-09 | OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem |
 | 1.8 | `C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA` | plugin-mcp-posture-2026-09 | OPCAO (d) — NAO CONSIDERADA NA DECISAO, CORTADA POR ORCAMENTO NESTA RODADA: skill-bundle — skills locais via git-subdir (stric |
+
+## kg-multi-graph-view-2026-09 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 84.0 | `Q_KG_MULTI_GRAPH_VIEW_0904` | kg-multi-graph-view-2026-09 | Qual e o mecanismo certo para "N grafos .kg.yaml PEER, 1 visao" no Knowledge Graph SDAAL do Onion, quando um adotante tem 4 vertic |
+| 52.5 | `D_KG_MULTI_GRAPH_VIEW_0904` | kg-multi-graph-view-2026-09 | DECISAO ABERTA (o maestro sela): qual o mecanismo para "N grafos peer, 1 visao" no KG SDAAL do Onion? OPCOES — O1 kg-radar.sh ga |
+| 15.0 | `C_OPCAO_O5_PONTEIRO_XREF_COM_RESOLVER` | kg-multi-graph-view-2026-09 | OPCAO O5: referencia cross-arquivo como PONTEIRO tipado (proxy-node / campo `xref:` no padrao do `trace:`) + resolver-irmao HARD q |
+| 12.0 | `C_OPCAO_O2_CONSUMIDOR_IRMAO_LACO` | kg-multi-graph-view-2026-09 | OPCAO O2: o radar permanece de ARQUIVO UNICO e awk-puro; a agregacao vive num CONSUMIDOR-IRMAO que faz o laco por grafo — padrao |
+| 9.6 | `C_OPCAO_O7_BACKLOG_PARAMETRIZA_RAIZ` | kg-multi-graph-view-2026-09 | OPCAO O7: kg-backlog-project.sh parametriza a RAIZ canonica (hoje `docs/onion/graph` hardcoded em l.55/l.89/l.155/l.160) alem do m |
+| 6.2 | `C_OPCAO_O1_RADAR_CORPUS_GLOB` | kg-multi-graph-view-2026-09 | OPCAO O1: kg-radar.sh ganha modo multi-arquivo (--corpus <glob>) agregando atencao/estado/reconciliacao de N grafos numa unica inv |
+| 3.6 | `C_OPCAO_O3_SEM_VISAO_AGREGADA` | kg-multi-graph-view-2026-09 | OPCAO O3: nenhuma visao agregada — cada grafo julgado sozinho por desenho, agregar e anti-padrao. Confianca 0.3: o Elenxo NAO re |
+| 2.4 | `C_OPCAO_O4_ARESTA_CROSS_ARQUIVO_PRIMEIRA_CLASSE` | kg-multi-graph-view-2026-09 | OPCAO O4: referencia cross-arquivo vira ARESTA de 1a classe no schema (edge com file:id, resolvida pelo motor). Confianca 0.2: o E |
+| 1.8 | `C_OPCAO_O8_CONSOLE_MULTI_GRAFO` | kg-multi-graph-view-2026-09 | OPCAO O8: kg-console.sh/kg-view.sh aceitam N arquivos e renderizam painel comparativo multi-grafo. Confianca 0.2: o Elenxo REPROVA |
+| 1.4 | `C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS` | kg-multi-graph-view-2026-09 | OPCAO O6: grafo de nivel 0 que IMPORTA nos de outros arquivos (owl:imports), formando um grafo composto. Confianca 0.15 (a mais ba |
 
 ## m3-federation-admin-2026-07 — 12 item(ns)
 
