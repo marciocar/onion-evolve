@@ -4,7 +4,7 @@
 W3C/DTCG) para o formato que cada alvo consome. **Anti-lock-in:** a SSOT é W3C/DTCG — neutra por formato;
 quem quiser outro alvo escreve outro conversor lendo a mesma SSOT.
 
-> **Por que script e não SDAAL** ([abstraction-doctrine](../../../docs/knowledge-base/concepts/onion-abstraction-doctrine.md)):
+> **Por que script e não SDAAL** (abstraction-doctrine):
 > há **1 conversor real** (`css-vars`) e os demais são costura. Teste do Eixo (a) reprova — abstração de
 > provider único é overhead sem ganho (whitepaper §13); e é transformação **determinística sem LLM**, que
 > a régua P0-P3 manda para script (P1). **Gatilho de graduação a SDAAL:** o **2º conversor real** nascer.
@@ -15,8 +15,8 @@ quem quiser outro alvo escreve outro conversor lendo a mesma SSOT.
 | Provider | Saída | Status |
 |----------|-------|--------|
 | **`css-vars`** | `:root { --color-... }` (CSS custom properties) | ✅ implementado (`tokens-to-css-vars.sh`) — universal, zero dependência |
-| `tailwind` | `@theme { --color-...: ... }` (Tailwind v4) | 🟡 **output de referência validado** em [`docs/materials/theme.tailwind.css`](../../../docs/materials/theme.tailwind.css) (materializado via `@design-system-specialist`, gate verde) · **adapter reutilizável 🔜** |
-| `shadcn` | `:root { --background/--primary/--ring/… }` (19 vars shadcn/ui, hex v4) | 🟡 **output de referência validado** em [`docs/materials/theme.shadcn.css`](../../../docs/materials/theme.shadcn.css) (gate verde, contrastes calculados) · **adapter reutilizável 🔜** |
+| `tailwind` | `@theme { --color-...: ... }` (Tailwind v4) | 🟡 **output de referência validado** em `docs/materials/theme.tailwind.css` (materializado via `@design-system-specialist`, gate verde) · **adapter reutilizável 🔜** |
+| `shadcn` | `:root { --background/--primary/--ring/… }` (19 vars shadcn/ui, hex v4) | 🟡 **output de referência validado** em `docs/materials/theme.shadcn.css` (gate verde, contrastes calculados) · **adapter reutilizável 🔜** |
 | `style-dictionary` | build multi-plataforma (CSS/TS/Swift/Kotlin) | 🔜 adapter (dependência node, opcional) |
 | `artifact-design` | preview/dogfood visual via skill nativa | 🔜 |
 | `none` | no-op (fallback gracioso) | ✅ |

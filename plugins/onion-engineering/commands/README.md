@@ -21,7 +21,7 @@ O fluxo principal é uma cadeia retomável com sessões persistentes em `.claude
 | [`/onion-engineering:warm-up`](warm-up.md) | Preparação de contexto técnico/de engenharia (arquitetura, padrões, estrutura, frameworks). |
 
 ## 🔗 Referências
-- Agente delegado: [`@gitflow-specialist`](../../agents/git/gitflow-specialist.md) — motor GitFlow para `pr` e `hotfix`.
+- Agente delegado: `@gitflow-specialist` — motor GitFlow para `pr` e `hotfix`.
 - KB do motor: [`gitflow-patterns.md`](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md) — branch/merge/tag locais.
-- Adapters de integração: [`utils/forge/`](../../utils/forge/) (PR/CI/Release) e [`utils/task-manager/`](../../utils/task-manager/) (tasks/sprints).
-- Comandos irmãos: [`git/`](../git/README.md) (ciclo GitFlow), [`product/`](../product/README.md) (descoberta a backlog), [`test/`](../test/) e [`validate/`](../validate/) (qualidade pré-entrega).
+- Adapters de integração: `utils/forge/` (PR/CI/Release) e `utils/task-manager/` (tasks/sprints).
+- Comandos irmãos: `git/` (ciclo GitFlow), `product/` (descoberta a backlog), `test/` e `validate/` (qualidade pré-entrega).

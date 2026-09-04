@@ -50,7 +50,7 @@ ideias, dados e informações brutas em **apresentações Gamma.app de alta qual
 3. **`@gamma-api-specialist`** — geração via API Gamma.app
 
 > **📚 Base de conhecimento canônica:**
-> [presentation-orchestration.md](../../../docs/knowledge-base/patterns/presentation-orchestration.md)
+> presentation-orchestration.md
 > — contratos de delegação completos, templates de prompt por fase, matriz de erros, casos de uso
 > e templates de saída. **Consulte-a antes de delegar**; este agente é o grafo executável, a KB é
 > o conhecimento.
@@ -119,7 +119,7 @@ Validar coerência/quantidade e salvar em `.tmp/presentation-narrative-[timestam
    `.tmp/gamma-input-[timestamp].txt`.
 2. Montar payload (tema, formato, idioma, textOptions/imageOptions/cardOptions — payload de
    referência na **KB §2**; spec completa na
-   [KB da API](../../../docs/knowledge-base/platforms/gamma-app-api.md)) →
+   KB da API) →
    `.tmp/gamma-config-[timestamp].json`.
 
 ### FASE 5 — Geração 🚀 → `@gamma-api-specialist`
@@ -161,8 +161,8 @@ não fazer (renderizar) · ignorar erros · misturar contextos entre gerações 
 
 ## 📚 Referências
 
-- **KB canônica (contratos/templates/erros/casos):** [presentation-orchestration.md](../../../docs/knowledge-base/patterns/presentation-orchestration.md)
-- **Spec técnica Gamma (payload/temas/limites):** [gamma-app-api.md](../../../docs/knowledge-base/platforms/gamma-app-api.md)
+- **KB canônica (contratos/templates/erros/casos):** presentation-orchestration.md
+- **Spec técnica Gamma (payload/temas/limites):** gamma-app-api.md
 - Task manager via adapter: `taskManager.getTask|searchTasks|addComment` — avançado delega ao
   especialista do provider ativo (clickup→@clickup-specialist · jira→@jira-specialist · demais→@task-specialist).
 - Ativação: `@presentation-orchestrator crie apresentação sobre [tema] para [audiência]` ·

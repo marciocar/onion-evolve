@@ -6,7 +6,7 @@ W3C/DTCG como SSOT em `docs/design-context/`; CSS/componentes/material como saí
 > **Categoria de comando ≠ dimensão peer.** Esta categoria organiza os comandos de design; ela **não**
 > afirma uma 4ª dimensão de domínio (como `meta/`, `validate/`, `test/` também não são dimensões). A
 > promoção de `design-context` a 4º peer é decisão separada e provisória — ver
-> [`docs/design-context/decisions/onion-adr-design-peer-promotion.md`](../../../docs/design-context/decisions/onion-adr-design-peer-promotion.md).
+> `docs/design-context/decisions/onion-adr-design-peer-promotion.md`.
 
 ## Comandos
 
@@ -20,7 +20,7 @@ W3C/DTCG como SSOT em `docs/design-context/`; CSS/componentes/material como saí
 - `design:evolve`: faceta de `meta:evolve` — audita drift visual e produz backlog priorizado.
   **Gated até:** existir ≥1 identidade de projeto com tokens materializados **que drifte** dos
   tokens da SSOT. Sem esse gatilho não há o que auditar — construir antes seria catedral à frente
-  do uso ([modernization §🚦](../../../docs/knowledge-base/concepts/onion-modernization-doctrine.md)).
+  do uso (modernization §🚦).
 
 ## Princípios
 

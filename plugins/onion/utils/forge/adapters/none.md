@@ -40,7 +40,7 @@ Isso evita espalhar `if (forge == null)` pelos comandos — eles chamam o adapte
 
 - [Factory](../factory.md) — implementação `NoForgeAdapter`
 - [Interface IForge](../interface.md) — contrato + fronteira local-vs-remoto
-- [SDAAL — Null Object](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+- SDAAL — Null Object
 
 ---
 

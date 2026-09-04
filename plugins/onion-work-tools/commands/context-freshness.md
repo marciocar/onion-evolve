@@ -35,7 +35,7 @@ fase **Manage** do ciclo de vida CRUD+ — a operação **Validar** (rastreabili
 frescor + contradição cross-domínio) que decide se o contexto ainda merece
 confiança, e sinaliza a operação **Remover** (stale engana ativamente).
 
-A premissa, da KB [domain-context-lifecycle.md](../../../docs/knowledge-base/concepts/domain-context-lifecycle.md):
+A premissa, da KB domain-context-lifecycle.md:
 **uma doc de contexto desatualizada é pior que ausente** — a IA age com confiança
 sobre uma realidade que já não existe. Este comando **nunca muta** os contextos;
 apenas audita e relata (para aplicar refreshes, use os `/docs:build-*-docs`).
@@ -53,7 +53,7 @@ ao alvo `docs/*-context/`.
 - Após mudança grande no produto/código/regulação (pivot, refactor, novo
   framework de compliance) — para flagar o contexto que ficou para trás.
 - Antes de confiar num contexto para uma decisão importante (gate de confiança).
-- Composto pelo [`meta:evolve`](evolve.md) (dimensão D9) numa auditoria ampla.
+- Composto pelo `meta:evolve` (dimensão D9) numa auditoria ampla.
 
 ---
 
@@ -218,8 +218,8 @@ CONTEXT FRESHNESS REPORT — AAAA-MM-DD
 
 ## Referências
 
-- Doutrina do ciclo de vida: [domain-context-lifecycle.md](../../../docs/knowledge-base/concepts/domain-context-lifecycle.md)
-- ADR: [onion-adr-domain-context-lifecycle-2026-06.md](../../../docs/analysis/onion-adr-domain-context-lifecycle-2026-06.md) (§Gatilho — este comando é o Tijolo 2)
+- Doutrina do ciclo de vida: domain-context-lifecycle.md
+- ADR: onion-adr-domain-context-lifecycle-2026-06.md (§Gatilho — este comando é o Tijolo 2)
 - Molde reusado: [`/onion-work-tools:kb-freshness`](kb-freshness.md)
 - Geradores (primeiro tick): `/onion-docs:build-business-docs` · `/onion-docs:build-tech-docs` · `/onion-compliance:build-compliance-docs`
-- Doutrina de orquestração: [agent-orchestration.md](../../../docs/knowledge-base/concepts/agent-orchestration.md) · Skill: `onion-orchestration`
+- Doutrina de orquestração: agent-orchestration.md · Skill: `onion-orchestration`

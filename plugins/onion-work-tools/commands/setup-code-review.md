@@ -67,11 +67,11 @@ Se `{{mode}}` fornecido → usar o modo especificado; senão → detecção auto
 
 ### Passo 3: Reportar no PR (opcional)
 
-Para postar o resultado da validação como comentário no PR, usar o **adapter forge** (`forge.addReviewComment(...)` em [.claude/utils/forge/](../../utils/forge/interface.md)) — **não** chamar `gh`/API direto (integrations.md §9).
+Para postar o resultado da validação como comentário no PR, usar o **adapter forge** (`forge.addReviewComment(...)` em .claude/utils/forge/) — **não** chamar `gh`/API direto (integrations.md §9).
 
 ### Passo 4: Task Manager (opcional)
 
-Se houver task associada e `TASK_MANAGER_PROVIDER` != `none`, registrar o resultado via o adapter ([utils/task-manager/factory.md](../../utils/task-manager/factory.md)). Roteamento por provider é do adapter — **não reimplementar aqui**.
+Se houver task associada e `TASK_MANAGER_PROVIDER` != `none`, registrar o resultado via o adapter (utils/task-manager/factory.md). Roteamento por provider é do adapter — **não reimplementar aqui**.
 
 ## 📤 Output Esperado
 
@@ -88,8 +88,8 @@ Se houver task associada e `TASK_MANAGER_PROVIDER` != `none`, registrar o result
 ## 🔗 Referências
 
 - Checklist: `common/prompts/code-review-checklist.md`
-- Forge (comentário no PR): [utils/forge/interface.md](../../utils/forge/interface.md)
-- Integração / secrets: [.env.example](../../../.env.example) · `/onion-work-tools:setup-integration`
+- Forge (comentário no PR): utils/forge/interface.md
+- Integração / secrets: .env.example · `/onion-work-tools:setup-integration`
 - Review manual: `@code-reviewer`
 
 ## ⚠️ Notas

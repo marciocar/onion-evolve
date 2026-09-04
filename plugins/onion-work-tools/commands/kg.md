@@ -32,7 +32,7 @@ impressão do modelo.
 
 > Doutrina: [knowledge-graph-sdaal.md](${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md)
 > (inclui a nota *"git merge não reconcilia verdades"*, confirmada em campo).
-> Rampa da vertical: [ADR verticals](../../../docs/analysis/onion-adr-verticals-investigation-cartography-2026-07.md).
+> Rampa da vertical: ADR verticals.
 
 ## 🟢 Quando usar
 
@@ -113,7 +113,7 @@ eventos, regras). O audit **`TRACES_TO`** o domain — mesma convenção de um a
 - Vazio → `ls docs/onion/graph/*.kg.yaml` e propor o existente mais recente.
 
 ### Passo 2 — Modelar (o juízo é seu; a estrutura é do schema)
-- **Pesquisa?** Antes de modelar, a lente: [`research-doctrine.md`](../common/prompts/research-doctrine.md) (corpus primeiro via `kg-corpus-grep.sh`, mercado invariante, tier de fonte, bi-temporal, revisita).
+- **Pesquisa?** Antes de modelar, a lente: `research-doctrine.md` (corpus primeiro via `kg-corpus-grep.sh`, mercado invariante, tier de fonte, bi-temporal, revisita).
 - Cada **achado** vira `claim` com `plane` honesto (conclusão tirada de branch = DEV; medição do
   artefato vivo = PROD) e `trace` para a fonte.
 - Cada **verificação** vira `evidence` + aresta `SUPPORTS` ou `REFUTES`. Refutou? O claim **fica**
@@ -124,7 +124,7 @@ eventos, regras). O audit **`TRACES_TO`** o domain — mesma convenção de um a
   incentivo impresso no próprio texto). O que a fonte concede **contra o próprio interesse** é a parte
   de **maior** confiança; o que ela afirma **a favor** do próprio interesse pede desconto — mas
   interesse **qualifica, não anula** (achado distinto e de lógica de negócio não se relativiza).
-  Doutrina: [evidence-source-interest.md](../../../docs/knowledge-base/concepts/evidence-source-interest.md).
+  Doutrina: evidence-source-interest.md.
 - Correção que substitui verdade anterior = novo nó + `SUPERSEDES` (nunca editar o antigo além do status).
 - Perguntas em aberto viram `question`; decisões tomadas viram `decision` com `TRACES_TO` ao que as gerou.
 - **Todo nó precisa de pelo menos 1 aresta** — nó que não se liga a nada não pertence ao grafo
@@ -499,16 +499,16 @@ Antes de qualquer projeção cruzar fronteira (material pro cliente, sinal pro c
   vivo — é o que aposenta o ⚠ STALE-MISSING e deixa o próximo leitor (humano ou IA) confiar sem re-checar.
 - **Átomos de UI** (design) são nós `layer: domain`: átomo `READS` sua fonte (1 só — fonte-única),
   `TRACES_TO` o componente dono; o `SourceTag` do adotante é a aresta *renderizada*, não motor do core.
-  Doutrina: [ADR design-extends-kg](../../../docs/analysis/onion-adr-design-extends-kg-2026-07.md).
+  Doutrina: ADR design-extends-kg.
 - **Fase-2 semântica** (método, não código do core): embeddings + cosseno para flag de redundância
   entre nós — cada instância implementa com seu stack (soberania); o core fica no determinístico.
 - 1º dogfood real (56 nós/81 arestas em um adotante; 37 nós/33 arestas no core): ver
-  [onion-evolution-2026-07-04.md](../../../docs/analysis/onion-evolution-2026-07-04.md) e o sinal
-  [2026-07-04-kg-primeiro-dogfood-federacao.md](../../../docs/evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md).
+  onion-evolution-2026-07-04.md e o sinal
+  2026-07-04-kg-primeiro-dogfood-federacao.md.
 
 ## 🔗 Referências
 
 - Doutrina: [knowledge-graph-sdaal.md](${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md)
 - Motor: `${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh` (soberano; awk determinístico)
-- Vertical: [onion-adr-verticals-investigation-cartography-2026-07.md](../../../docs/analysis/onion-adr-verticals-investigation-cartography-2026-07.md)
+- Vertical: onion-adr-verticals-investigation-cartography-2026-07.md
 - Lente irmã (estrutura do framework): `meta:graph`

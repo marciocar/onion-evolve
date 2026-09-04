@@ -8,7 +8,7 @@ Define o contrato que todos os adapters de **forge** (host de código remoto) de
 
 ## 🧭 Fronteira local-vs-remoto (a regra que sustenta esta camada)
 
-**IForge cobre EXCLUSIVAMENTE operações no host remoto (forge).** Operações Git locais **NÃO** pertencem ao IForge — permanecem como chamadas `git` diretas nos comandos, orientadas pelo motor GitFlow ([gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md)). O adapter é a **fronteira de rede**; o Git local é determinístico e portátil, e não precisa de abstração de provider.
+**IForge cobre EXCLUSIVAMENTE operações no host remoto (forge).** Operações Git locais **NÃO** pertencem ao IForge — permanecem como chamadas `git` diretas nos comandos, orientadas pelo motor GitFlow (gitflow-patterns.md). O adapter é a **fronteira de rede**; o Git local é determinístico e portátil, e não precisa de abstração de provider.
 
 | Operação | Camada | Onde vive |
 |---|---|---|
@@ -239,8 +239,8 @@ await forge.addReviewComment({ number: pr.number }, { body: '🔍 Pronto para re
 - [Detector](./detector.md) — resolve provider + transporte efetivo
 - [Factory](./factory.md)
 - [Adapters](./adapters/)
-- [Motor GitFlow (git local)](../../../docs/knowledge-base/frameworks/gitflow-patterns.md)
-- [SDAAL — padrão-pai](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+- Motor GitFlow (git local)
+- SDAAL — padrão-pai
 
 ---
 

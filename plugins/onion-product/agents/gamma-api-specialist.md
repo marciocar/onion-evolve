@@ -54,7 +54,7 @@ conteúdo com IA**: transforma texto em apresentações, documentos e conteúdo 
 robustas, otimizadas e escaláveis.
 
 > **📚 Base de conhecimento canônica:**
-> [gamma-app-api.md](../../../docs/knowledge-base/platforms/gamma-app-api.md) — especificação
+> gamma-app-api.md — especificação
 > completa da API (payload, endpoints, temas, idiomas, constraints), padrões de integração
 > (rate-limit manager, matriz de erros, best practices), casos de uso com código e implementações
 > de referência (SDK/CLI). **Consulte-a antes de montar qualquer request**; este agente é o
@@ -122,9 +122,9 @@ Limitações beta (sem OAuth/webhooks/streaming/batch) e workarounds: **KB §7**
 
 ## 📚 Referências
 
-- **KB canônica:** [gamma-app-api.md](../../../docs/knowledge-base/platforms/gamma-app-api.md)
+- **KB canônica:** gamma-app-api.md
 - Docs oficiais: <https://developers.gamma.app/> · Status: <https://status.gamma.app/>
-- Orquestrador consumidor: [presentation-orchestration.md](../../../docs/knowledge-base/patterns/presentation-orchestration.md)
+- Orquestrador consumidor: presentation-orchestration.md
 
 ---
 

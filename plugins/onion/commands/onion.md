@@ -67,7 +67,7 @@ git branch --show-current
 git status --short
 ```
 
-> Para reportar status de um worklog, o agente lê **só o `STATE.md`** (índice Tier-0 ~1KB, ponteiro `NEXT`) — não a pasta inteira. Worklog ≠ transcript nativo (`claude --resume`). Ver [worklog-protocol.md](../../docs/knowledge-base/concepts/worklog-protocol.md).
+> Para reportar status de um worklog, o agente lê **só o `STATE.md`** (índice Tier-0 ~1KB, ponteiro `NEXT`) — não a pasta inteira. Worklog ≠ transcript nativo (`claude --resume`). Ver worklog-protocol.md.
 
 ### Passo 3: Invocar @onion
 

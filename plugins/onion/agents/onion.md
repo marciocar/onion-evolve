@@ -204,7 +204,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 > ⚠️ **Listagem parcial e sujeita a drift — a SSOT é outra.** Alguns comandos abaixo não existem
 > mais ou nunca existiram (ex.: `/engineer/deploy`, `/git/rebase`, `/validate/architecture`).
-> **A SSOT viva é [docs/onion/inventory.md](../../../docs/onion/inventory.md)** (gerada do filesystem
+> **A SSOT viva é docs/onion/inventory.md** (gerada do filesystem
 > por `meta:inventory`) + os arquivos em `.claude/commands/`. Em caso de divergência, a SSOT vence.
 > O atuador do refresh é **`meta:inventory`**, não `meta:evolve` — o evolve é read-only e *propõe*;
 > apontar o conserto para um sensor era ação falsa, o beco que a revisão de guardas de 2026-08-03
@@ -508,7 +508,7 @@ do Sistema Onion. Foque em [aspectos específicos]."
 ├── plan.md             # Plano por fases ([DONE]/[ACTIVE]/[TODO])
 └── notes.md            # Notas e decisões (append-only)
 ```
-> Estrutura canônica na [SSOT §Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento); resume/leitura em [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md). Worklog ≠ transcript nativo (`claude --resume`). Para reportar status, leia só o `STATE.md`.
+> Estrutura canônica na SSOT §Contrato de Sessão; resume/leitura em worklog-protocol.md. Worklog ≠ transcript nativo (`claude --resume`). Para reportar status, leia só o `STATE.md`.
 
 ## 💡 Exemplos de Uso
 

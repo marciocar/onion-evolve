@@ -25,7 +25,7 @@ Esta é a **irmã, um nível acima do código, de `declarado ≠ verificado`**. 
 manda desconfiar do que um agente ou um store *afirma* sobre um dado. Esta manda desconfiar do
 que o *próprio artefato* afirma sobre a sua *função* — cobertura, autoridade, atualidade. O
 artefato mente sobre si; o comportamento não sabe mentir. Ver os irmãos
-[`verify-read-path-first.md`](./verify-read-path-first.md) (onde-o-dado-vive é hipótese até
+`verify-read-path-first.md` (onde-o-dado-vive é hipótese até
 rastrear o read-path) e a doutrina `verify-external-for-current` (algo atual/emergente se
 verifica contra a fonte externa viva, nunca do cutoff).
 
@@ -165,7 +165,7 @@ verifica contra a fonte externa viva, nunca do cutoff).
   morre em segundos: o farol viraria `orphan` **com a sessão viva**, o erro na direção proibida.
   **Substring de path não é identidade**; a cura casa por `comm`. E o mesmo dogfood expôs um
   `exit 1` espúrio do `up` (cadeia `&&` como última instrução sob `set -e`) que o `|| true` do
-  hook mascarava — [exit code não é a verificação](../../concepts/onion-dogfooding-doctrine.md).
+  hook mascarava — exit code não é a verificação.
 - **Corolário da cópia:** o mapa da constelação carregava uma **segunda** implementação da regra
   de "vivo" por TTL. Cura no motor não alcança cópia — a regra passou a morar num lugar só
   (`session-beacon.sh verdict`). **Regra copiada envelhece separada.**
@@ -209,7 +209,7 @@ o escopo que *diz* proteger, não o que *deveria*.
 Membro de "estado declarado ≠ fato verificado", um nível acima do código (o artefato mente
 sobre a própria função, não sobre um dado):
 
-- [`verify-read-path-first.md`](./verify-read-path-first.md) — onde-o-dado-vive é hipótese até
+- `verify-read-path-first.md` — onde-o-dado-vive é hipótese até
   rastrear o read-path real.
 - `verify-external-for-current` (memória durável) — o atual/emergente se verifica contra a
   fonte externa viva, nunca do cutoff.

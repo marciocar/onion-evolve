@@ -24,7 +24,7 @@ fonte. Cobre dois sintomas:
 - `CLAUDE.md` sem skeleton Onion → nenhum roteamento de task manager, idioma ou branches
 
 > **Pré-requisito:** `.claude/` com agents/commands/skills deve existir. Se não existe, o repo está
-> totalmente orphaned — use [`docs/applying/rescue-prompt.md`](../../../docs/applying/rescue-prompt.md)
+> totalmente orphaned — use `docs/applying/rescue-prompt.md`
 > (funciona sem Onion instalado).
 
 ---
@@ -382,5 +382,5 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 | `.claude/` intacto, stamp/CLAUDE.md quebrados | **Este comando** (`/onion-work-tools:recover`) |
 | `.claude/` desatualizado (nova versão do core) | `meta:adopt --update <path>` (da sessão do core) |
 | `.claude/` parcialmente ausente (utils/, hooks/) | `meta:adopt --update <path>` (da sessão do core) |
-| Sem `.claude/` algum | [`docs/applying/rescue-prompt.md`](../../../docs/applying/rescue-prompt.md) |
+| Sem `.claude/` algum | `docs/applying/rescue-prompt.md` |
 | Quer adoção inicial | `meta:adopt <path>` (da sessão do core) |

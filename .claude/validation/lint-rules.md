@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**73 regras** no total — **64 HARD**, **19 SOFT**.
+**75 regras** no total — **66 HARD**, **19 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -61,6 +61,7 @@ Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.
 | 72 | Namespace de comando em plugin é /<plugin>:<cmd>, nunca o do core | HARD | comando empacotado citando `/engineer:pr` — ponteiro que não resolve no consumidor |
 | 73 | Hook empacotado resolve no plugin instalado | HARD | hook morto e silencioso no plugin (script ausente, motor não embarcado, caminho $REPO/${CLAUDE_PLUGIN_ROOT}, matcher perdido) |
 | 74 | Caminho .claude/ NU dentro de plugin só resolve no core, com catraca | HARD + SOFT | comando/agente empacotado apontando .claude/{utils,commands,templates,…} que não viajou — ponteiro morto no consumidor |
+| 75 | Link markdown relativo dentro de plugin resolve no plugin | HARD | `[irmã](../kb/x.md)` num plugin apontando para arquivo que não viajou — 404 no consumidor |
 
 ## Fronteiras & contratos de arquitetura
 
@@ -103,6 +104,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 62 | Projeção GERADA em sincronia com a fonte (docs/backlog.md) | HARD | projeção gerada que envelhece calada — o item existe no grafo e some da superfície que as sessões leem |
 | 63 | Colheita de grafo emite os ids colhidos no resíduo de revisão | HARD + SOFT | nó removido de um .kg.yaml sem registro consultável de que existiu — a promessa "a história fica no artefato de revisão" cumprida só na letra |
 | 70 | fallbackModel do settings.json é PROJEÇÃO da escada de modelos (eixo E6) | HARD | a escada (session_models + session_floor em docs/onion/radar-baselines.yaml) e o fallback nativo do |
+| 76 | marketplace.json da raiz é projeção do gerador | HARD | .claude-plugin/marketplace.json envelhecendo calado (o core também é marketplace instalável) |
 
 ## KG & proveniência
 

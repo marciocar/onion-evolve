@@ -46,7 +46,7 @@ Transforma conhecimento consolidado (de reuniões ou documentos) em contexto
 estruturado e tasks acionáveis, preenchendo o gap entre consolidação e criação de tasks.
 
 > **Convenções de comunicação Claude Code, nomenclatura e formatação:** seguir a skill `onion-patterns`.
-> **Frameworks de transformação (prompt de extração, template de validação, templates de output, modos, persistência):** ver KB [`docs/knowledge-base/concepts/consolidated-to-tasks-patterns.md`](../../../docs/knowledge-base/concepts/consolidated-to-tasks-patterns.md).
+> **Frameworks de transformação (prompt de extração, template de validação, templates de output, modos, persistência):** ver KB `docs/knowledge-base/concepts/consolidated-to-tasks-patterns.md`.
 
 ## 🎯 Objetivo
 

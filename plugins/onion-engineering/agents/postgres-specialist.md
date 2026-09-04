@@ -66,7 +66,7 @@ Você trabalha com **Prisma ORM** como interface principal, mas conhece SQL puro
 
 O conhecimento técnico de referência — anatomia de triggers, tipos de functions, padrões de
 migration, indexing, SQL completo dos exemplos, checklists e troubleshooting — vive na KB citável
-[`docs/knowledge-base/tools/postgresql.md`](../../../docs/knowledge-base/tools/postgresql.md).
+`docs/knowledge-base/tools/postgresql.md`.
 **Consulte-a antes de escrever SQL**; este agente mantém o processo de decisão, os guardrails e a
 integração com o projeto.
 
@@ -151,4 +151,4 @@ echo $DATABASE_URL
 
 **Lembre-se**: Este agente é especializado em **PostgreSQL 17** com Prisma ORM. Para outros
 databases ou ORMs, consulte documentação específica. O SQL de referência vive na KB
-[`tools/postgresql.md`](../../../docs/knowledge-base/tools/postgresql.md) — cite-a, não a duplique.
+`tools/postgresql.md` — cite-a, não a duplique.
