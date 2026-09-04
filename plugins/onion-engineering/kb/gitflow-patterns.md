@@ -97,16 +97,16 @@
 `git config gitflow.branch.develop` é **local da máquina** — não viaja no clone. Para que a base dos PRs
 de evolução seja a mesma em qualquer máquina, o Onion resolve a **branch de integração** por uma cadeia
 determinística, exposta pelo helper `${CLAUDE_PLUGIN_ROOT}/validation/resolve-integration-branch.sh` e consumida pelo
-`/engineer:pr` (a base do PR **não** é hardcoded):
+`/onion-engineering:pr` (a base do PR **não** é hardcoded):
 
 1. **`.claude/.onion-version` campo `integration_branch`** — SSOT **versionado** (viaja no clone). Carimbado
-   pelo `/meta:adopt --integration-branch <nome>` (ex. `<projeto>-evolve`). Vence a cadeia.
+   pelo `meta:adopt --integration-branch <nome>` (ex. `<projeto>-evolve`). Vence a cadeia.
 2. **`git config --get gitflow.branch.develop`** — conveniência local (p/ quem usa `git flow` cru).
 3. **Default detectado** — `develop` se a branch existir; senão a branch principal
    (`gitflow.branch.master` → `origin/HEAD` → `main`).
 
 > Assim um repo adotado com branch de integração própria é respeitado sem depender de config local; o
-> `git config` que o `/meta:adopt` seta é só atalho para o `git flow` nativo. Schema do stamp:
+> `git config` que o `meta:adopt` seta é só atalho para o `git flow` nativo. Schema do stamp:
 > [`architecture.md §6.1`](../../meta-specs/architecture.md).
 
 ---

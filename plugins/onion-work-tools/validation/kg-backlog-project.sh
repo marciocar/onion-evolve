@@ -205,7 +205,7 @@ if [ "$MODE" = "markdown" ]; then
 fi
 
 if [ "$MODE" = "check" ]; then
-  if [ "$(cat "$OUT" 2>/dev/null || true)" = "$(render)" ]; then echo "backlog.md: em dia ($n_open abertos)"; else echo "backlog.md: DRIFT (advisory) — rode /meta:backlog"; fi
+  if [ "$(cat "$OUT" 2>/dev/null || true)" = "$(render)" ]; then echo "backlog.md: em dia ($n_open abertos)"; else echo "backlog.md: DRIFT (advisory) — rode /onion-work-tools:backlog"; fi
   exit 0
 fi
 render > "$OUT"

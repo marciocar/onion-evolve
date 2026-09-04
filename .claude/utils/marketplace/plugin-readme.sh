@@ -90,10 +90,26 @@ if hooks:
     out.append("## Hooks\n\n| Evento | Script |\n|---|---|")
     out += [f"| `{esc(e)}` | `{esc(s)}` |" for e,s in hooks]; out.append("")
     out.append("Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é a capacidade que só existe no Claude Code. Nenhum envia dados para fora; todos rodam local.\n")
-out.append("## Requisitos\n\n- Claude Code ≥ 2.1.239 (marketplace com `pluginRoot`); `bash`, `git`, `awk`; `python3` (motores KG e censos); `jq` opcional.\n- Este plugin instala **capacidade** (read-only, atualizável pelo gerenciador). Não é adoção: para vendorizar o Onion num repo, o canal é `/meta:adopt` no repositório-fonte.\n")
+out.append("## Requisitos\n\n- Claude Code ≥ 2.1.239 (marketplace com `pluginRoot`); `bash`, `git`, `awk`; `python3` (motores KG e censos); `jq` opcional.\n- Este plugin instala **capacidade** (read-only, atualizável pelo gerenciador). Não é adoção: para vendorizar o Onion num repo, o canal é `meta:adopt` (comando do core, não distribuído por plugin) no repositório-fonte.\n")
 # Só campos CONTENT-STABLE aqui: ref/commit_date mudam a cada commit e fariam o README driftar (REGRA 19 acusou no CI, 2026-09-04).
 out.append("## Proveniência\n\n| Campo | Valor |\n|---|---|\n| Fonte | `%s` |\n| tree_sha (hash do conteúdo das fontes) | `%s` |\n\nRef e data do commit de origem estão em `.claude-plugin/provenance.json`.\n" % (prov.get("repository","?"), str(prov.get("tree_sha","?"))[:12]))
 out.append("Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT em `.claude/` do source. Não edite à mão: a próxima montagem sobrescreve.\n")
+# Comandos do CORE citados e NÃO distribuídos neste plugin (o assembler tirou a barra deles: `meta:adopt`).
+# Derivado do próprio artefato — content-stable. Sem esta seção o leitor vê `meta:adopt` e não sabe por quê.
+import re as _re
+_CORE_NS = ("meta","engineer","product","git","docs","validate","test","design","development","quick")
+_pat = _re.compile(r"(?<![A-Za-z0-9_/.:\-])(?:" + "|".join(_CORE_NS) + r"):[a-z0-9-]*[a-z0-9](?::[a-z0-9-]*[a-z0-9])*(?![A-Za-z0-9*-])")
+_seen = set()
+for _dp, _dn, _fn in os.walk(dest):
+    if "/.claude-plugin" in _dp: continue
+    for _f in _fn:
+        if _f == "README.md" and _dp == dest: continue
+        if not (_f.endswith(".md") or _f.endswith(".sh")): continue
+        try: _t = open(os.path.join(_dp, _f), encoding="utf-8", errors="surrogateescape").read()
+        except Exception: continue
+        for _m in _pat.finditer(_t): _seen.add(_m.group(0))
+if _seen:
+    out.append("## Comandos do core citados (não distribuídos neste plugin)\n\nEstes comandos aparecem no texto sem a barra inicial porque pertencem ao core do Onion (meta-fábrica ou outra superfície) e **não** são instalados por este plugin: " + ", ".join("`" + x + "`" for x in sorted(_seen)) + ". Estão disponíveis num repo que adotou o Onion por vendorização (`.claude/` completo).\n")
 out.append("## Licença\n\n%s (texto integral em `LICENSE`, na raiz do plugin) — © Onion · Marcio Carvalho. Site: https://onionevolve.com · Fonte: https://github.com/%s\n" % (pj.get("license","MIT"), prov.get("repository","marciocar/onion-evolve")))
 open(os.path.join(dest,"README.md"),"w",encoding="utf-8").write("\n".join(out))
 print(f"plugin-readme: {name}: {len(cmds)} comandos, {len(agents)} agentes, {len(skills)} skills, {len(hooks)} hooks")

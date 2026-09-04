@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**70 regras** no total — **61 HARD**, **18 SOFT**.
+**71 regras** no total — **62 HARD**, **18 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -58,6 +58,7 @@ Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.
 | 48 | Referência de caminho `.claude/…` em backtick (prosa) que não resolve | HARD | referência .claude/ em backtick na prosa apontando p/ arquivo inexistente (ponteiro morto silencioso) |
 | 60 | Identificador de código em INGLÊS | HARD | identificador em pt-BR entrando no código sem que nenhuma guarda mecânica o veja. |
 | 71 | Comando não declara model: no frontmatter — segue a escada da sessão | HARD | o Claude Code 2.1.259 passou a HONRAR model: de comando em sessão interativa (radar E3 rodada 2, l.17): |
+| 72 | Namespace de comando em plugin é /<plugin>:<cmd>, nunca o do core | HARD | comando empacotado citando `/engineer:pr` — ponteiro que não resolve no consumidor |
 
 ## Fronteiras & contratos de arquitetura
 

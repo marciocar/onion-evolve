@@ -16,12 +16,12 @@ related_agents:
   - branding-positioning-specialist
   - presentation-orchestrator
 related_commands:
-  - /product:branding
-  - /product:presentation
-  - /meta:context-freshness
+  - /onion-product:branding
+  - /onion-product:presentation
+  - /onion-work-tools:context-freshness
 ---
 
-# /design:identity — Identidade visual como spec-as-code
+# /onion-design:identity — Identidade visual como spec-as-code
 
 ## Objetivo
 
@@ -37,10 +37,10 @@ material são saída gerada e regenerável.
 
 ## Fronteiras
 
-- **NÃO** decide posicionamento/estratégia de marca → use `/product:branding` antes (alimenta o brief).
+- **NÃO** decide posicionamento/estratégia de marca → use `/onion-product:branding` antes (alimenta o brief).
 - **NÃO** é gerador-de-IA-de-design: usa **fonte manual** (você/o especialista edita tokens) ou
   **ingestão** (`design-source/`). A geração divergente (N identidades por IA) + convergência
-  (gate + juiz) vive no comando irmão **[`/design:generate`](generate.md)** — cuja candidata
+  (gate + juiz) vive no comando irmão **[`/onion-design:generate`](generate.md)** — cuja candidata
   vencedora alimenta o **DEVELOP** (Fase 2) daqui.
 - **NÃO** crava o 4º peer: `docs/design-context/` é provisório (ver seu ADR de promoção).
 
@@ -81,7 +81,7 @@ ou `<brand>`/`<product>` para multi-brand. Cada fase atualiza o ponteiro `NEXT`.
 ### Fase 3 — MATERIAL (opcional, reuso)
 
 Gerar material de comunicação **on-brand** a partir dos tokens resolvidos por escopo — **reusa**
-`/product:presentation` (Gamma) e o MCP Canva. NÃO cria gerador novo: o material lê a identidade
+`/onion-product:presentation` (Gamma) e o MCP Canva. NÃO cria gerador novo: o material lê a identidade
 materializada. Ex.: deck, brand-book, social. Retomável.
 
 ## Auto-update / Task Manager
@@ -100,7 +100,7 @@ fora da escala, contraste insuficiente, alias órfão) — o gate deve barrar. F
 
 ```
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-/design:identity — <scope> — Fase <n>
+/onion-design:identity — <scope> — Fase <n>
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ◆ Brief        : <intenção declarada / fonte business-context>
 ◆ Tokens       : <N foundations · M semantic · escopos>
@@ -113,5 +113,5 @@ fora da escala, contraste insuficiente, alias órfão) — o gate deve barrar. F
 
 - SSOT + gate: `docs/design-context/` · `${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh`
 - Sink: `${CLAUDE_PLUGIN_ROOT}/utils/design-sink/` · Especialista: `@design-system-specialist`
-- Brief upstream: `/product:branding` (estratégia) · Material: `/product:presentation`
+- Brief upstream: `/onion-product:branding` (estratégia) · Material: `/onion-product:presentation`
 - Decisão de peer: `docs/design-context/decisions/onion-adr-design-peer-promotion.md` (provisório)

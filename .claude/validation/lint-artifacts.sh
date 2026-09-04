@@ -3796,6 +3796,37 @@ check_commands_without_model() {
     fi
   done < <(find "${dir}" -name '*.md' -not -path '*/common/templates/*' 2>/dev/null | sort)
 }
+
+# ===========================================================================
+# REGRA 72 — Namespace de comando em plugin é /<plugin>:<cmd>, nunca o do core [HARD]
+# previne: comando empacotado citando `/engineer:pr` — ponteiro que não resolve no consumidor
+#   Um comando instalado por plugin é `/<plugin>:<cmd>`. Medido 2026-09-04: 531 referências ao
+#   namespace do core dentro de plugins/ (208 cross-plugin, 194 mesmo-plugin, 129 dangling p/ a
+#   meta-fábrica) e ZERO na forma do plugin — o lint era cego porque só varria .claude/ + docs/,
+#   onde `/engineer:pr` resolve. A CURA é determinística e vive no gerador (assemble-plugin.sh →
+#   NAMESPACE-PORTABILITY via plugin-namespace-check.sh --rewrite), por isso HARD sem baseline:
+#   catraca só faz sentido quando a cura é manual. Toda a lógica (mapa derivado de TODOS os
+#   manifestos, regex, classes) vive em plugin-namespace-check.sh — um só lugar.
+# ===========================================================================
+check_plugin_namespace() {
+  local helper="${SCRIPT_DIR}/plugin-namespace-check.sh"
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  [ -f "${helper}" ] || return 0
+  [ -d "${REPO_ROOT}/plugins" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/plugins/*|*/verticals/*.manifest.sh|*/assemble-plugin.sh|*/plugin-namespace-check.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out sev cls path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev cls path msg; do
+    [ -n "${sev}" ] || continue
+    violation "HARD" "${REPO_ROOT}/${path}" "[plugin-namespace/${cls}] ${msg} — regenere: bash .claude/utils/marketplace/assemble-plugin.sh <manifesto>"
+  done <<< "${out}"
+}
 check_commands_without_model
 check_research_kg_review_after
 check_kg_source_tier_confidence
@@ -3859,6 +3890,7 @@ check_family_topology_sync
 check_federation_outbox_membership
 check_kg_narration_valid
 check_backtick_path_refs
+check_plugin_namespace
 
 # ===========================================================================
 # SUMÁRIO FINAL

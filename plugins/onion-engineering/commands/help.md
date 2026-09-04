@@ -54,7 +54,7 @@ Ajuda contextual da **dimensão de engenharia** do Onion: o ciclo faseado e reto
 | `bump` | Bump de versão seguindo semver (major/minor/patch). |
 | `docs` | Invoca o agente de documentação para a branch atual. |
 | `warm-up` | Preparação de contexto técnico/de engenharia (arquitetura, padrões, frameworks). |
-| `code-review` | Alias → setup de code review no CI (`/meta:setup-code-review`). |
+| `code-review` | Alias → setup de code review no CI (`/onion-work-tools:setup-code-review`). |
 
 ## 📚 Fontes canônicas
 

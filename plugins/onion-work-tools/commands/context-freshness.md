@@ -14,17 +14,17 @@ updated: "2026-06-17"
 allowed-tools: Read Grep Glob
 argument-hint: "[caminho/glob de contexto específico | vazio = os 3 contextos]"
 related_commands:
-  - /meta:kb-freshness
-  - /meta:evolve
-  - /docs:build-business-docs
-  - /docs:build-tech-docs
-  - /docs:build-compliance-docs
+  - /onion-work-tools:kb-freshness
+  - meta:evolve
+  - /onion-docs:build-business-docs
+  - /onion-docs:build-tech-docs
+  - /onion-compliance:build-compliance-docs
 related_agents:
   - onion
   - metaspec-gate-keeper
 ---
 
-# /meta:context-freshness — Auditoria de Frescor de Contexto de Domínio
+# /onion-work-tools:context-freshness — Auditoria de Frescor de Contexto de Domínio
 
 ## Objetivo
 
@@ -40,7 +40,7 @@ A premissa, da KB [domain-context-lifecycle.md](../../../docs/knowledge-base/con
 sobre uma realidade que já não existe. Este comando **nunca muta** os contextos;
 apenas audita e relata (para aplicar refreshes, use os `/docs:build-*-docs`).
 
-Reusa o **molde** do [`/meta:kb-freshness`](kb-freshness.md) (fan-out-and-synthesize,
+Reusa o **molde** do [`/onion-work-tools:kb-freshness`](kb-freshness.md) (fan-out-and-synthesize,
 veredito CURRENT/STALE/HISTORICAL, threshold ≤18 meses, schema, tiering) — adaptado
 ao alvo `docs/*-context/`.
 
@@ -53,7 +53,7 @@ ao alvo `docs/*-context/`.
 - Após mudança grande no produto/código/regulação (pivot, refactor, novo
   framework de compliance) — para flagar o contexto que ficou para trás.
 - Antes de confiar num contexto para uma decisão importante (gate de confiança).
-- Composto pelo [`/meta:evolve`](evolve.md) (dimensão D9) numa auditoria ampla.
+- Composto pelo [`meta:evolve`](evolve.md) (dimensão D9) numa auditoria ampla.
 
 ---
 
@@ -139,7 +139,7 @@ No contexto principal (0 tokens de modelo):
 4. **Verificação adversarial** (opus) acionada quando: >30% STALE/HISTORICAL, ou
    contradição cross-domínio detectada. O juiz tenta refutar antes de consolidar.
 5. **Grafo primeiro**: contradição cross-domínio e candidatos `HISTORICAL` são achados estruturados
-   — materialize via `/meta:kg` (nó `claim`, `layer: audit`, `trace` ao arquivo) **antes** de
+   — materialize via `/onion-work-tools:kg` (nó `claim`, `layer: audit`, `trace` ao arquivo) **antes** de
    fechar a saída abaixo. O relatório é **vista** do grafo, não destino do achado (senão o grafo
    fica predecessor da avaliação em vez de destino dela — sinal de campo de um adotante regulado, 2026-07-20).
 > ⚠️ **Alcance honesto:** este comando **não escreve arquivo** (a saída é bloco de console), logo
@@ -173,7 +173,7 @@ CONTEXT FRESHNESS REPORT — AAAA-MM-DD
 ─── STALE (refresh) ───────────────────────────
 ⚠  business-context/01-customer/personas.md
    Falhou: #1 (sem Última Atualização)
-   Ação  : /docs:build-business-docs (re-tick) + carimbar data
+   Ação  : /onion-docs:build-business-docs (re-tick) + carimbar data
 
 ─── CURRENT ───────────────────────────────────
 ✅ compliance-context/iso27001/controls.md
@@ -185,7 +185,7 @@ CONTEXT FRESHNESS REPORT — AAAA-MM-DD
 1. Arquivar HISTORICAL (operação Remover)
 2. Refresh STALE via /docs:build-*-docs + carimbar data
 3. Reconciliar contradição cross-domínio
-4. Re-executar /meta:context-freshness para confirmar
+4. Re-executar /onion-work-tools:context-freshness para confirmar
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -194,9 +194,9 @@ CONTEXT FRESHNESS REPORT — AAAA-MM-DD
 ## Exemplos
 
 ```bash
-/meta:context-freshness                                   # os 3 contextos
-/meta:context-freshness docs/business-context/            # só negócio
-/meta:context-freshness docs/technical-context/03-domain/ # um subdiretório
+/onion-work-tools:context-freshness                                   # os 3 contextos
+/onion-work-tools:context-freshness docs/business-context/            # só negócio
+/onion-work-tools:context-freshness docs/technical-context/03-domain/ # um subdiretório
 ```
 
 ---
@@ -209,9 +209,9 @@ CONTEXT FRESHNESS REPORT — AAAA-MM-DD
 - **Orquestração opt-in**: alvo único → executa direto com `Agent` (sem overhead de Workflow).
 - Orquestre **sempre no nível principal** — nunca dentro de subagente; **não crie** um
   agente "context-freshness-worker".
-- **Contrato de composição (D9 do `/meta:evolve`)**: quando invocado por `/meta:evolve`,
+- **Contrato de composição (D9 do `meta:evolve`)**: quando invocado por `meta:evolve`,
   retorne o **array `FreshnessSchema[]` cru** (não só o relatório Unicode), para o
-  `evolve` mesclar no backlog. `/meta:evolve` chama no **fluxo principal** e ingere o
+  `evolve` mesclar no backlog. `meta:evolve` chama no **fluxo principal** e ingere o
   array — nunca aninha esta orquestração dentro da dele (mesma regra do D4/`kb-freshness`).
 
 ---
@@ -220,6 +220,6 @@ CONTEXT FRESHNESS REPORT — AAAA-MM-DD
 
 - Doutrina do ciclo de vida: [domain-context-lifecycle.md](../../../docs/knowledge-base/concepts/domain-context-lifecycle.md)
 - ADR: [onion-adr-domain-context-lifecycle-2026-06.md](../../../docs/analysis/onion-adr-domain-context-lifecycle-2026-06.md) (§Gatilho — este comando é o Tijolo 2)
-- Molde reusado: [`/meta:kb-freshness`](kb-freshness.md)
-- Geradores (primeiro tick): `/docs:build-business-docs` · `/docs:build-tech-docs` · `/docs:build-compliance-docs`
+- Molde reusado: [`/onion-work-tools:kb-freshness`](kb-freshness.md)
+- Geradores (primeiro tick): `/onion-docs:build-business-docs` · `/onion-docs:build-tech-docs` · `/onion-compliance:build-compliance-docs`
 - Doutrina de orquestração: [agent-orchestration.md](../../../docs/knowledge-base/concepts/agent-orchestration.md) · Skill: `onion-orchestration`

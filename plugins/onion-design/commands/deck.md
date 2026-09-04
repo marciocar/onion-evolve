@@ -4,7 +4,7 @@ description: |
   Gerador de deck de treino/onboarding AUTO-GUIADO como HTML self-contained: uma spec
   (roteiro de slides) vira um deck que abre em qualquer navegador, OFFLINE (fonte embutida
   data-URI, zero CDN), com progressive-disclosure, botões "Copiar", exemplos preenchidos e
-  modo projetor. Distinto do /product:presentation (Gamma.app, SaaS online): aqui o
+  modo projetor. Distinto do /onion-product:presentation (Gamma.app, SaaS online): aqui o
   deliverable é um único .html soberano, sem rede. Nasceu de dogfood de campo (decks de um
   treino real, 2026-07 — validados em uso).
 allowed-tools: Read Write Edit Glob Grep Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/*)
@@ -23,11 +23,11 @@ parameters:
     default: onboarding
 ---
 
-## /design:deck — o deck que se explica sozinho, offline
+## /onion-design:deck — o deck que se explica sozinho, offline
 
 Um deck de treino que depende de rede, de um SaaS ou de um facilitador lendo os slides é frágil.
 Este comando gera um **HTML self-contained** — um arquivo só, que abre em `file://`, com a fonte
-embutida e zero CDN. É a **face de didática** irmã da vertical: o `/meta:create-vertical` scaffolda
+embutida e zero CDN. É a **face de didática** irmã da vertical: o `meta:create-vertical` scaffolda
 `book + hub + helpers`; este ensina a **usá-los**.
 
 > **Regra que não se negocia:** o deck **abre offline** (fonte data-URI, sem `<script src>` externo,
@@ -80,10 +80,10 @@ Um `.html` self-contained (o path declarado), pronto pra abrir offline. No relat
 `mode`, e o veredito do gate offline (o `grep` de rede = 0).
 
 ### Notas
-- **Distinto do `/product:presentation`** (Gamma.app): aquele é SaaS online, pitch/report; este é
+- **Distinto do `/onion-product:presentation`** (Gamma.app): aquele é SaaS online, pitch/report; este é
   **deck de treino/onboarding soberano offline**. Escolha por destino: sala de treino sem rede
   garantida → `deck`; apresentação corporativa rica online → `presentation`.
 - **Federação:** viaja o **chassi + o método**, nunca o conteúdo de nenhum deck (soberania — cada
   adotante gera o próprio, do próprio book).
-- **Composição:** par natural do `/meta:create-vertical` (scaffolda a vertical) → `/design:deck`
-  (ensina a usá-la). E do `/design:identity` (a identidade visual que o chassi pode herdar).
+- **Composição:** par natural do `meta:create-vertical` (scaffolda a vertical) → `/onion-design:deck`
+  (ensina a usá-la). E do `/onion-design:identity` (a identidade visual que o chassi pode herdar).

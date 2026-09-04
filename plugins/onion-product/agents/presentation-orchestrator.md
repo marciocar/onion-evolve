@@ -63,7 +63,7 @@ ideias, dados e informações brutas em **apresentações Gamma.app de alta qual
 
 > **Orquestração paralela (orchestrator-worker):** quando há etapas *independentes* (vários
 > diagramas, variações de narrativa, pesquisa de fontes), use a camada de orquestração do Onion —
-> skill `onion-orchestration` / `/meta:orchestrate` (fan-out via ferramenta nativa **Workflow**),
+> skill `onion-orchestration` / `/onion-work-tools:orchestrate` (fan-out via ferramenta nativa **Workflow**),
 > sempre no **nível principal**, nunca dentro deste agente. Aqui o fluxo é sequencial por design
 > (cada fase depende da anterior). Ver `docs/knowledge-base/concepts/agent-orchestration.md`.
 

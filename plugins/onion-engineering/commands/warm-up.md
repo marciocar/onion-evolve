@@ -93,7 +93,7 @@ Estabelecer contexto focado em:
 
 ### 9. Git e Versionamento
 - ✅ Revisar comandos Git disponíveis:
-  - `/git:flow feature start` - Criar branch de feature
+  - `/onion-engineering:flow feature start` - Criar branch de feature
   - `/git/sync` - Sincronizar após merge
 - ✅ Entender workflow Git do projeto
 - ✅ Conhecer convenções de branching
@@ -125,7 +125,7 @@ Estabelecer contexto focado em:
 - ✅ Distinguir **worklog** (estado em arquivo) do **transcript** nativo (`claude --resume`)
 
 ### Co-evolução do framework (se `docs/evolution/` existir)
-- ✅ Sinais core↔derivados passam por dois canais: `docs/evolution/inbox/` (upstream: bug/pedido/field-signal consumidor→core) e, em consumidores, `docs/evolution/inbound/` (downstream: relatório de update/anúncio core→consumidor). O hook "you have mail" (📬 inbox / 📥 inbound) avisa a contagem no boot; rode `/meta:co-evolve` para ler/gerenciar. Protocolo (3 fluxos): [docs/evolution/README.md](../../../docs/evolution/README.md)
+- ✅ Sinais core↔derivados passam por dois canais: `docs/evolution/inbox/` (upstream: bug/pedido/field-signal consumidor→core) e, em consumidores, `docs/evolution/inbound/` (downstream: relatório de update/anúncio core→consumidor). O hook "you have mail" (📬 inbox / 📥 inbound) avisa a contagem no boot; rode `/onion-work-tools:co-evolve` para ler/gerenciar. Protocolo (3 fluxos): [docs/evolution/README.md](../../../docs/evolution/README.md)
 
 ## 💡 Quando Usar Este Warm-up
 

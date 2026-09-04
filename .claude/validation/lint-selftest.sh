@@ -11126,6 +11126,54 @@ run_marketplace_readmes_selftests() {
 }
 _family run_marketplace_readmes_selftests
 
+# REGRA 72 — namespace de comando em plugin é /<plugin>:<cmd>. Helper plugin-namespace-check.sh
+# (scan + cura --rewrite) e o wire-in no assembler (NAMESPACE-PORTABILITY). A bancada exercita o
+# modo que a produção consome (`--format tsv`, REGRA 59) e o mutante (plugin editado à mão).
+run_plugin_namespace_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/plugin-namespace-check.sh" asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
+  [ -f "${h}" ] && [ -f "${asm}" ] || { record_fail "plugin-namespace" "helper ou assembler ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "plugin-namespace: python3 ausente"; return; }
+  local d out; d="$(mktemp -d)"
+  export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
+  mkdir -p "${d}/src/.claude/commands/alpha" "${d}/src/.claude/commands/beta" "${d}/src/.claude/utils/marketplace/verticals"
+  printf -- '---\nname: one\ndescription: Um. Rode /alpha:two, depois /beta:three e por fim /meta:adopt.\n---\n# one\nVeja `/alpha:two` (mesmo plugin), `/beta:three` (cross) e `/meta:adopt` (dangling). URL https://x/meta:nao fica.\n' > "${d}/src/.claude/commands/alpha/one.md"
+  printf -- '---\nname: two\ndescription: Dois.\n---\n# two\n' > "${d}/src/.claude/commands/alpha/two.md"
+  printf -- '---\nname: three\ndescription: Tres.\n---\n# three\n' > "${d}/src/.claude/commands/beta/three.md"
+  printf 'PLUGIN_NAME="probe-a"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="Sonda A"\nKEYWORDS=(a)\nCOMMANDS=(.claude/commands/alpha)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\n' > "${d}/src/.claude/utils/marketplace/verticals/probe-a.manifest.sh"
+  printf 'PLUGIN_NAME="probe-b"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="Sonda B"\nKEYWORDS=(b)\nCOMMANDS=(.claude/commands/beta/three.md)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\n' > "${d}/src/.claude/utils/marketplace/verticals/probe-b.manifest.sh"
+  ( cd "${d}/src" && git init -q && git add -A && git commit -qm seed ) >/dev/null 2>&1
+  # (a) o assembler CURA: mesmo-plugin e cross viram /<plugin>:<cmd>; dangling perde a barra; URL intacta
+  bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe-a.manifest.sh" "${d}/src" "${d}/src/plugins/probe-a" >/dev/null 2>&1 || true
+  out="$(cat "${d}/src/plugins/probe-a/commands/one.md" 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q '`/probe-a:two`' && printf '%s' "${out}" | grep -q '`/probe-b:three`' && printf '%s' "${out}" | grep -q '`meta:adopt`' && printf '%s' "${out}" | grep -q 'https://x/meta:nao' && ! printf '%s' "${out}" | grep -q '/alpha:two'; then
+    record_pass "plugin-namespace: (a) assembler reescreve mesmo-plugin+cross para /<plugin>:<cmd>, dangling sem barra, URL intacta"
+  else record_fail "plugin-namespace: (a) cura" "$(printf '%s' "${out}" | grep -n 'alpha:two\|beta:three\|meta:adopt' | head -3 | tr '\n' ' ')"; fi
+  # (b) README lista os comandos do core citados e não distribuídos
+  if grep -q '^## Comandos do core citados' "${d}/src/plugins/probe-a/README.md" 2>/dev/null && grep -q '`meta:adopt`' "${d}/src/plugins/probe-a/README.md"; then
+    record_pass "plugin-namespace: (b) README lista meta:adopt como comando do core não distribuído"
+  else record_fail "plugin-namespace: (b) README" "seção ausente ou sem meta:adopt"; fi
+  # (c) o modo consumido pelo lint: --format tsv fica VAZIO no plugin curado
+  out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
+  if [ -z "${out}" ]; then record_pass "plugin-namespace: (c) --format tsv vazio no plugin curado"
+  else record_fail "plugin-namespace: (c) tsv" "$(printf '%s' "${out}" | head -2 | tr '\n' ' ')"; fi
+  # (d) MUTANTE: plugin editado à mão volta ao namespace do core → 3 classes, HARD
+  printf 'Rode /alpha:two, /beta:three e /meta:adopt.\n' >> "${d}/src/plugins/probe-a/commands/one.md"
+  out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
+  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 3 ] && printf '%s' "${out}" | grep -q 'mesmo-plugin' && printf '%s' "${out}" | grep -q 'cross-plugin' && printf '%s' "${out}" | grep -q 'dangling'; then
+    record_pass "plugin-namespace: (d) mutante à mão → 3 HARD (mesmo-plugin, cross-plugin, dangling)"
+  else record_fail "plugin-namespace: (d) mutante" "esperava 3 HARD: $(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  # (e) idempotência: re-montar produz o mesmo arquivo (a cura não acumula)
+  bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe-a.manifest.sh" "${d}/src" "${d}/src/plugins/probe-a" >/dev/null 2>&1 || true
+  cp "${d}/src/plugins/probe-a/commands/one.md" "${d}/one-1.md"
+  bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe-a.manifest.sh" "${d}/src" "${d}/src/plugins/probe-a" >/dev/null 2>&1 || true
+  if cmp -s "${d}/one-1.md" "${d}/src/plugins/probe-a/commands/one.md"; then record_pass "plugin-namespace: (e) re-montagem idempotente"
+  else record_fail "plugin-namespace: (e) idempotência" "$(diff "${d}/one-1.md" "${d}/src/plugins/probe-a/commands/one.md" | head -3 | tr '\n' ' ')"; fi
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+  rm -rf "${d}"
+}
+_family run_plugin_namespace_selftests
+
+
 # ---------------------------------------------------------------------------
 # O harness testando a SI MESMO — os três desfechos não podem colapsar em dois
 #

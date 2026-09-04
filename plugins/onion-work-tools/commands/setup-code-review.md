@@ -30,7 +30,7 @@ related_agents:
 
 # 🤖 Setup de Code Review no CI
 
-Gerencia o workflow de **code review automático** no CI (GitHub Actions) do projeto. É uma tarefa de **configuração de integração** (não de GitFlow) — por isso vive em `meta/`, ao lado de `/meta:setup-integration`.
+Gerencia o workflow de **code review automático** no CI (GitHub Actions) do projeto. É uma tarefa de **configuração de integração** (não de GitFlow) — por isso vive em `meta/`, ao lado de `/onion-work-tools:setup-integration`.
 
 > ℹ️ **Compatibilidade com a porta Claude Code do Onion**: o CI canônico deste repositório é o **`.github/workflows/onion-review.yml`** (revisor baseado em Claude). Este comando reconhece e valida esse workflow; opcionalmente, também sabe scaffoldar um review de terceiros. _Conteúdo herdado de uma versão que citava a action `anc95/ChatGPT-CodeReview` — refresh completo desse template está marcado para iteração 2._
 
@@ -89,7 +89,7 @@ Se houver task associada e `TASK_MANAGER_PROVIDER` != `none`, registrar o result
 
 - Checklist: `common/prompts/code-review-checklist.md`
 - Forge (comentário no PR): [utils/forge/interface.md](../../utils/forge/interface.md)
-- Integração / secrets: [.env.example](../../../.env.example) · `/meta:setup-integration`
+- Integração / secrets: [.env.example](../../../.env.example) · `/onion-work-tools:setup-integration`
 - Review manual: `@code-reviewer`
 
 ## ⚠️ Notas

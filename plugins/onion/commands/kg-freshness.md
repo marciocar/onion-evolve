@@ -5,8 +5,8 @@ description: |
   Consome a fila determinística do `kg-radar.sh --freshness-tsv` (ordenada por atenção,
   NÃO pelo que o radar flagou) e roda um worker por nó, que MEDE e devolve
   CONFIRMED/DRIFTED/REFUTED/UNVERIFIABLE + o comando executado + o observado verbatim.
-  O worker NUNCA escreve: propõe. O maestro sela. Irmão de /meta:kb-freshness e
-  /meta:context-freshness, com uma diferença declarada — aqueles não têm onde escrever,
+  O worker NUNCA escreve: propõe. O maestro sela. Irmão de /onion-work-tools:kb-freshness e
+  /onion-work-tools:context-freshness, com uma diferença declarada — aqueles não têm onde escrever,
   o KG tem.
 category: meta
 tags: [kg, freshness, orchestration, validation, ssot]
@@ -15,15 +15,15 @@ updated: "2026-07-27"
 allowed-tools: Read Write Edit Grep Glob Bash
 argument-hint: "[<arquivo.kg.yaml>] [--top N] [--node <id>]  (vazio = grafo mais recente, top 16 por atenção)"
 related_commands:
-  - /meta:kg
-  - /meta:kb-freshness
-  - /meta:context-freshness
-  - /meta:diary
+  - /onion-work-tools:kg
+  - /onion-work-tools:kb-freshness
+  - /onion-work-tools:context-freshness
+  - /onion-work-tools:diary
 related_agents:
   - research-agent
 ---
 
-# /meta:kg-freshness — re-verificar a SSOT contra o vivo
+# /onion:kg-freshness — re-verificar a SSOT contra o vivo
 
 ## Objetivo
 
@@ -58,8 +58,8 @@ Não medi ⇒ não carimbo — `UNVERIFIABLE` é desfecho de primeira classe, n�
 - ✅ Depois de uma janela de mudanças no vivo (deploy, flip, hardening) que possa ter
   envelhecido claims `plane: PROD`
 - ✅ Quando o `--freshness` acusar STALE/UNANCHORED em nó de alta atenção
-- ❌ Não use para *criar* grafo (isso é `/meta:kg novo`) nem para pagar passivo de
-  proveniência (isso é `/meta:kg backfill`)
+- ❌ Não use para *criar* grafo (isso é `/onion-work-tools:kg novo`) nem para pagar passivo de
+  proveniência (isso é `/onion-work-tools:kg backfill`)
 
 ## Etapas de Execução
 
@@ -317,8 +317,8 @@ Bloco `KG REVERIFY REPORT` no formato dos irmãos, mais:
 
 ## Notas
 
-- Composição: invocado por `/meta:evolve`, devolva o array `KgReverifySchema[]` cru —
-  espelha o contrato de `/meta:kb-freshness` (D4) e `/meta:context-freshness` (D9).
+- Composição: invocado por `meta:evolve`, devolva o array `KgReverifySchema[]` cru —
+  espelha o contrato de `/onion-work-tools:kb-freshness` (D4) e `/onion-work-tools:context-freshness` (D9).
 - `Bash` largo no `allowed-tools` é **por desenho**: medir o vivo é o ponto. O lint já registra
   que granularidade de `allowed-tools` ficou fora por gerar falso-positivo.
 - Diferença declarada vs os irmãos: `kb-freshness` e `context-freshness` **nunca mutam** — mas

@@ -62,7 +62,7 @@
 #     · KBs (docs/knowledge-base/**) — conhecimento DESTILADO e estável, feito
 #       para ser CITADO. Forçá-las ao grafo transformaria toda KB em nó e diluiria
 #       o sinal até o gate virar ruído.
-#     · Diário (docs/onion/diary/**, /meta:diary) — autobiografia com forcing
+#     · Diário (docs/onion/diary/**, /onion-work-tools:diary) — autobiografia com forcing
 #       function PRÓPRIA (o sub-comando review re-testa migalha vencida). Duas
 #       catracas sobre o mesmo artefato competem.
 #     · docs/onion/** — GERADO (inventory.md, graph.md, federation-map.md,
@@ -91,7 +91,7 @@
 # ---------------------------------------------------------------------------
 #   O escopo default acima é o do GATE (CI, baseline, catraca). `--scope <dir>`
 #   serve a outra pergunta, EXPLORATÓRIA: "quanto deste corpus está no grafo?" —
-#   é o que alimenta o modo `/meta:kg backfill`.
+#   é o que alimenta o modo `/onion-work-tools:kg backfill`.
 #
 #   Por que --scope NÃO arma catraca (e isso é estrutural, não conselho):
 #   um escopo alheio avaliado contra o baseline CANÔNICO faria toda entrada do
@@ -314,7 +314,7 @@ if [ "${EMIT_BASELINE}" -eq 1 ]; then
 fi
 
 # --- Modo EXPLORATÓRIO (--scope sem --baseline): MEDE, não cobra --------------
-# Sai SEMPRE 0: é diagnóstico, não gate. Quem consome isto é o /meta:kg backfill,
+# Sai SEMPRE 0: é diagnóstico, não gate. Quem consome isto é o /onion-work-tools:kg backfill,
 # que usa a lista de descobertos como pauta de trabalho.
 if [ "${EXPLORATORY}" -eq 1 ]; then
   n_scope=$(wc -l < "${TMP}/scope" | tr -d ' ')
@@ -334,7 +334,7 @@ if [ "${EXPLORATORY}" -eq 1 ]; then
   printf '  Descobertos          : %s\n' "${n_unc}"
   printf '  Catraca              : NÃO armada (modo exploratório — use --baseline para armar)\n'
   if [ "${n_unc}" -gt 0 ]; then
-    printf '\n  Pauta para /meta:kg backfill:\n'
+    printf '\n  Pauta para /onion-work-tools:kg backfill:\n'
     while IFS= read -r p; do [ -n "${p}" ] && printf '    · %s\n' "${p}"; done < "${TMP}/uncovered"
   fi
   exit 0
@@ -383,7 +383,7 @@ else
   comm -23 "${TMP}/uncovered" "${TMP}/baseline" > "${TMP}/novos"
   while IFS= read -r p; do
     [ -n "${p}" ] || continue
-    say "HARD" "NEW" "${p}" "documento de análise NOVO sem nó no grafo — nenhum .kg.yaml o cita em trace:/evidence:. Achado estruturado nasce no grafo; o markdown é vista. Modele com /meta:kg e valide: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <grafo>.kg.yaml"
+    say "HARD" "NEW" "${p}" "documento de análise NOVO sem nó no grafo — nenhum .kg.yaml o cita em trace:/evidence:. Achado estruturado nasce no grafo; o markdown é vista. Modele com /onion-work-tools:kg e valide: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <grafo>.kg.yaml"
   done < "${TMP}/novos"
 
   # (3b) Passivo tolerado => SOFT. É o que torna o gate adotável no 1º dia.

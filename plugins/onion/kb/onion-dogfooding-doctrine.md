@@ -16,9 +16,9 @@
 | **Data de Criação** | 2026-06-22 |
 | **Última Atualização** | 2026-07-17 |
 | **Categoria** | Conceitos |
-| **Comando relacionado** | `/meta:evolve` (sensor) · gate mecânico em `${CLAUDE_PLUGIN_ROOT}/validation/` |
+| **Comando relacionado** | `meta:evolve` (sensor) · gate mecânico em `${CLAUDE_PLUGIN_ROOT}/validation/` |
 | **Padrão-irmão** | Doutrina de Modernização |
-| **Padrão-parente** | [Knowledge Graph SDAAL](knowledge-graph-sdaal.md) — o KG é o SSOT que o loop lê antes e escreve depois (§♻️ e §Onde se encaixa) · [`/meta:diary`](../../../.claude/commands/meta/diary.md) — o re-teste de migalha é o "re-" em outra roupa |
+| **Padrão-parente** | [Knowledge Graph SDAAL](knowledge-graph-sdaal.md) — o KG é o SSOT que o loop lê antes e escreve depois (§♻️ e §Onde se encaixa) · [`/onion-work-tools:diary`](../../../.claude/commands/meta/diary.md) — o re-teste de migalha é o "re-" em outra roupa |
 
 ---
 
@@ -67,7 +67,7 @@ O dogfood do Onion tem duas camadas que se complementam:
 
 Regra prática: se mudou um **artefato runnable** (comando/skill/script/adapter), o gate mecânico
 **não basta** — rode o artefato. Se mudou uma **guarda** (lint/fixtures), o selftest é parte do
-dogfood. Se a mudança altera **contagens** (comandos/agentes/skills/KBs), `/meta:inventory`
+dogfood. Se a mudança altera **contagens** (comandos/agentes/skills/KBs), `meta:inventory`
 (que roda `lint-artifacts.sh --fix`) é o dogfood que propaga a SSOT.
 
 ---
@@ -85,7 +85,7 @@ de vendor) prova-se **rodando UMA VEZ dentro de um clone de adotante**, não só
 
 - **Onde:** o clone de um adotante real (`~/<adotante>`), onde os arquivos que só o core tem **não
   existem**.
-- **Quando:** o gatilho natural é `/meta:adopt --update` — toda vez que o framework viaja é a janela
+- **Quando:** o gatilho natural é `meta:adopt --update` — toda vez que o framework viaja é a janela
   para rodar o gate no destino. É barato (o clone já existe) e é exatamente quando os bugs de
   "funciona no core, quebra fora" se revelam.
 - **Checklist mínimo ao escrever a guarda:** ela depende de algum arquivo que **só o core tem**? Se
@@ -104,11 +104,11 @@ Casos reais onde o dogfood pegou o que o happy-path escondia:
 
 | Mudança | O que o dogfood fez | O que pegou |
 |---|---|---|
-| **Self-heal de inventário** (PR #126) | Dogfood do fluxo: adicionar **e remover** um recurso real e rodar `/meta:inventory` | Bug real: o `CLAUDE.md` vive **fora** dos scan-roots do lint (`.claude/`+`docs/`); o `--fix` global não o alcançava. O happy-path (CLAUDE.md já correto) escondia — só a mudança real de contagem expôs. |
-| **`/meta:all-tools`** (PR #128) | Rodar o comando reescrito e produzir o catálogo real da sessão | Lacunas: faltava marcar **status de conexão MCP** (conectado vs exige-auth) e tratar **tools deferidas por nome** (sem inventar descrição — o pecado do dialeto-Cursor em outra roupagem). |
+| **Self-heal de inventário** (PR #126) | Dogfood do fluxo: adicionar **e remover** um recurso real e rodar `meta:inventory` | Bug real: o `CLAUDE.md` vive **fora** dos scan-roots do lint (`.claude/`+`docs/`); o `--fix` global não o alcançava. O happy-path (CLAUDE.md já correto) escondia — só a mudança real de contagem expôs. |
+| **`/onion-work-tools:all-tools`** (PR #128) | Rodar o comando reescrito e produzir o catálogo real da sessão | Lacunas: faltava marcar **status de conexão MCP** (conectado vs exige-auth) e tratar **tools deferidas por nome** (sem inventar descrição — o pecado do dialeto-Cursor em outra roupagem). |
 | **Limpeza `.claude/docs/`** (PR #127) | Verificação **adversarial** do veredito do explorer | O veredito "deletar os c4" teria **quebrado** os agentes c4 (que os referenciam); a verificação reverteu para "mover" (e o move **reparou** refs já penduradas). |
 | **`.env.example`** (fix #89) | Dogfooding do Onion **no adotante** (um adotante, ao vivo) | Bug de campo que virou fix never-clobber no core, via upstream do inbox (`docs/evolution/README.md`, interno do core). |
-| **Update de campo** (2026-07-21, um adotante de campo) | **Dogfood de fronteira**: rodar `/meta:adopt --update` num adotante real e rodar o lint DENTRO do clone dele | **Dois** bugs verdes no core: a Segurança de Projeção (REGRA 30) exigia `members.yaml`, que só o core tem → HARD em todo adotante; um índice de KB vendorizado linkava alvos fora do manifesto → link pendurado no adotante. O lint do core **nunca veria** — lá os alvos existem. |
+| **Update de campo** (2026-07-21, um adotante de campo) | **Dogfood de fronteira**: rodar `meta:adopt --update` num adotante real e rodar o lint DENTRO do clone dele | **Dois** bugs verdes no core: a Segurança de Projeção (REGRA 30) exigia `members.yaml`, que só o core tem → HARD em todo adotante; um índice de KB vendorizado linkava alvos fora do manifesto → link pendurado no adotante. O lint do core **nunca veria** — lá os alvos existem. |
 | **Validação de pin** (2026-07-21, vendor-branch) | Auditar os 3 adotantes reais com `--audit-vendor` | 2 de 3 tinham **pin inválido carimbado** (`vnextpin`; uma data). O drift silencioso que o grafo só refutava em abstrato ganhou mecanismo. E: 5 fixtures usavam **pins fictícios** — praticavam o hábito que deixou o lixo real passar. |
 
 A lição comum: **o erro só apareceu ao executar** — e, para o que viaja, só ao executar **fora do
@@ -123,7 +123,7 @@ O dogfooding é o **fechamento empírico** do loop que a Doutrina de Modernizaç
 ```
 KG-first (se houver .kg.yaml)→ read(KG): o grafo é o SSOT de estado, ACIMA do git/memória
         ↓ drive-to-verify: claim PROD de alto impacto → cruzar contra o vivo antes de agir
-/meta:evolve (sensor)        → audita, propõe backlog (read-only)
+meta:evolve (sensor)        → audita, propõe backlog (read-only)
         ↓ cada item cita uma regra de DECISÃO (modernization-doctrine)
 /meta:create-* (atuadores)   → geram/enxugam o artefato
         ↓
@@ -133,7 +133,7 @@ DOGFOOD (esta doutrina)      → roda de verdade → aprende → resolve no mesm
    ├─ gate mecânico: lint + selftest + inventory (determinístico)
    └─ gate de uso: invoca o artefato; testa modo-de-falha; verificação adversarial
         ↓ write(KG): o que o dogfood descobriu volta como nó/aresta (REFUTES/SUPERSEDES)
-        ↺ fix → re-dogfood até passar; findings de campo (upstream) realimentam /meta:evolve
+        ↺ fix → re-dogfood até passar; findings de campo (upstream) realimentam meta:evolve
 ```
 
 **O KG fecha o loop nas duas pontas** ([knowledge-graph-sdaal §SSOT-as-runtime](knowledge-graph-sdaal.md#ssot-as-runtime--o-kg-é-o-primeiro-ato-mecanismo-não-conselho)):
@@ -159,7 +159,7 @@ Nenhum dos três é opcional, e nenhum é novo — o que faltava era dizer que s
 | Instância | Onde vive (SSOT) | TTL | Sinal de vencimento | Reconciliação |
 |---|---|---|---|---|
 | **re-dogfood** do fix | esta doutrina (§🚦 item 3) | — | o fix existe | re-exercitar até passar |
-| **re-teste** de migalha | [`/meta:diary review`](../../../.claude/commands/meta/diary.md) | `review_after` (90d) | ⏰ no boot (hook) | `superseded: true` (nunca apagar) |
+| **re-teste** de migalha | [`/onion-work-tools:diary review`](../../../.claude/commands/meta/diary.md) | `review_after` (90d) | ⏰ no boot (hook) | `superseded: true` (nunca apagar) |
 | **re-verificação** do KG | [knowledge-graph-sdaal §Frescor](knowledge-graph-sdaal.md#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou) | `verified_at` × `meta.baseline` | ⚠ STALE (radar `--freshness`) | `REFUTES`/`SUPERSEDES` (append-mostly) |
 
 O parentesco é **declarado, não analogia**: o gate de frescor do KG é filho do `review_after` do diário
@@ -190,4 +190,4 @@ hipótese**"* — **é esta doutrina**, em outra roupa.
 - Governança: [@metaspec-gate-keeper](../../../.claude/agents/meta/metaspec-gate-keeper.md) (Regra Zero — evidência ou abstenção)
 - Co-evolução (upstream = dogfooding de campo): `docs/evolution/README.md` (interno do core) — *dimensão:* fonte canônica do protocolo doc-bridge core↔adotante, sinal bidirecional por markdown commitado (`inbox/` upstream, `inbound/` downstream); maestro humano orquestra e transporta, execução do que chega é gate humano
 - Reforço aplicado: `CONTRIBUTING.md` (fluxo de PR) · `${CLAUDE_PLUGIN_ROOT}/skills/onion-validation/SKILL.md` (regra de gerador) · `CLAUDE.md` (recall por sessão no core)
-- Evidência (PRs): self-heal de inventário (#126), limpeza `.claude/docs/` (#127), `/meta:all-tools` (#128)
+- Evidência (PRs): self-heal de inventário (#126), limpeza `.claude/docs/` (#127), `/onion-work-tools:all-tools` (#128)

@@ -5,7 +5,7 @@ description: |
   regenera .onion-version ausente/incompleto e o skeleton do CLAUDE.md. Nunca sobrescreve
   customizações locais (never-clobber). Use quando Claude Code abre "cego" ao Onion mesmo
   com .claude/ instalado. Para repos sem .claude/ algum, usar docs/applying/rescue-prompt.md.
-  Relacionado: /meta:adopt --update, docs/applying/rescue-prompt.md.
+  Relacionado: meta:adopt --update, docs/applying/rescue-prompt.md.
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(ls *) Bash(cat *) Bash(mkdir *) Bash(touch *) Bash(date *)
 argument-hint: "[--dry-run]"
 category: meta
@@ -13,7 +13,7 @@ version: "1.2.0"
 updated: "2026-07-03"
 ---
 
-# 🧅 /meta:recover — Recuperação de Identidade Onion
+# 🧅 /onion-work-tools:recover — Recuperação de Identidade Onion
 
 ## Objetivo
 
@@ -213,7 +213,7 @@ OLD_INTBRANCH="$(awk '/^integration_branch:/{print $2}' "$STAMP" 2>/dev/null)"
 # Usar valor coletado ou preservar o antigo ou usar fallback
 # ⚠️ NUNCA "adivinhar" o pin com o HEAD atual do core (incidente 2026-06-30/um adotante: um restore manual
 #    carimbou o HEAD da fonte sem copiar os arquivos correspondentes → o anúncio downstream "você já
-#    tem o fix" saiu falso). `unknown` é honesto e resolvível: o /meta:adopt --update tem guard
+#    tem o fix" saiu falso). `unknown` é honesto e resolvível: o meta:adopt --update tem guard
 #    pin-integrity que detecta pin não confiável e re-sincroniza via cópia segura completa.
 SOURCE_COMMIT="${OLD_SOURCE_COMMIT:-unknown}"
 SOURCE_DATE="${OLD_SOURCE_DATE:-$TODAY}"
@@ -289,7 +289,7 @@ Adapter: `.claude/utils/task-manager/adapters/<provider>.md`.
 
 Canal upstream (sinal→core): `docs/evolution/inbox/`
 Canal downstream (update/anúncio do core): `docs/evolution/inbound/`
-Rode `/meta:co-evolve` para ler/gerenciar.
+Rode `/onion-work-tools:co-evolve` para ler/gerenciar.
 
 ---
 
@@ -309,7 +309,7 @@ if [ ! -f "$REPO/docs/evolution/README.md" ]; then
 # Co-evolução (consumidor)
 
 Este repo é **CONSUMIDOR** do Onion. Canais: `inbox/` para sinalizar o core (upstream) e `inbound/`
-para receber relatórios de update/anúncios do core (downstream). Rode `/meta:co-evolve` para ler/gerenciar.
+para receber relatórios de update/anúncios do core (downstream). Rode `/onion-work-tools:co-evolve` para ler/gerenciar.
 PTR
 fi
 ```
@@ -364,7 +364,7 @@ git commit --no-verify -m "chore(onion): recover Onion identity
 
 Regenerated .onion-version stamp and CLAUDE.md Onion skeleton after
 context loss. .claude/ framework files were intact; only identity
-metadata was missing. Ran /meta:recover to restore.
+metadata was missing. Ran /onion-work-tools:recover to restore.
 
 Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 ```
@@ -379,8 +379,8 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 
 | Situação | Caminho certo |
 |---|---|
-| `.claude/` intacto, stamp/CLAUDE.md quebrados | **Este comando** (`/meta:recover`) |
-| `.claude/` desatualizado (nova versão do core) | `/meta:adopt --update <path>` (da sessão do core) |
-| `.claude/` parcialmente ausente (utils/, hooks/) | `/meta:adopt --update <path>` (da sessão do core) |
+| `.claude/` intacto, stamp/CLAUDE.md quebrados | **Este comando** (`/onion-work-tools:recover`) |
+| `.claude/` desatualizado (nova versão do core) | `meta:adopt --update <path>` (da sessão do core) |
+| `.claude/` parcialmente ausente (utils/, hooks/) | `meta:adopt --update <path>` (da sessão do core) |
 | Sem `.claude/` algum | [`docs/applying/rescue-prompt.md`](../../../docs/applying/rescue-prompt.md) |
-| Quer adoção inicial | `/meta:adopt <path>` (da sessão do core) |
+| Quer adoção inicial | `meta:adopt <path>` (da sessão do core) |

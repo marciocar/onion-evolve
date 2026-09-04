@@ -9,7 +9,7 @@ allowed-tools: Read Grep Glob Bash(ls docs/evolution/*) Bash(git mv docs/evoluti
 argument-hint: "(sem argumentos — lê o estado de co-evolução deste repo)"
 ---
 
-# 🔄 /meta:co-evolve — Orientação de co-evolução (core ↔ derivados)
+# 🔄 /onion-work-tools:co-evolve — Orientação de co-evolução (core ↔ derivados)
 
 Mostra a posição **deste repo** no modelo de co-evolução do Onion, lê o `inbox` e orienta o que fazer.
 **Read-only por padrão** — só move mensagens para `_processed/` quando você confirmar.
@@ -53,7 +53,7 @@ Mapear: **`role: source` → CORE** (`onion-evolve`, dono do framework + protoco
 > # saída não-vazia = anúncios que o core marcou transportado mas NÃO chegaram → re-entregar com --target certo
 > ```
 > Lição de campo 2026-07-21 (um adotante multi-máquina): 7 anúncios caíram no checkout de uma máquina
-> enquanto o trabalho vivia em outra — só o `comm -13` achou. **Entregue sempre com `/meta:co-deliver
+> enquanto o trabalho vivia em outra — só o `comm -13` achou. **Entregue sempre com `meta:co-deliver
 > --target` = o checkout que trabalha** (resolva pelo `local_path` do `members.yaml`).
 
 Listar de 1º nível (excluir `_processed/` e `README.md`) **os dois canais** do doc-bridge:
@@ -73,18 +73,18 @@ Para cada, resumir `title`/`date`/`type` do frontmatter. Canal vazio/ausente →
 **Se CONSUMIDOR (projeto):**
 - **Pedir ajuda / reportar bug / dar feedback ao core (upstream):** escrever um markdown datado
   (`AAAA-MM-DD-<assunto>.md`) no **próprio** `inbox/` (`docs/evolution/inbox/` — é o que "a relayar ao core")
-  e **transportar com [`/meta:co-relay`](co-relay.md)** (`/meta:co-relay <sinal> --target <path-do-core>`):
+  e **transportar com [`/onion-work-tools:co-relay`](co-relay.md)** (`/onion-work-tools:co-relay <sinal> --target <path-do-core>`):
   Ato-1 determinístico, **entrega-sem-commit** (untracked no `inbox/` do core; a sessão do core commita +
   tria). Se o core **não** vive na mesma máquina → entregar ao maestro transportar. Sem comunicação viva —
   assíncrono via git.
 - **Receber releases do framework (downstream):** ler o `inbound/` (relatório de update auto-emitido pelo core,
-  com arquivos aplicados + novidades + próximos passos) e o `CHANGELOG` do core; atualizar com `/meta:adopt --update`.
+  com arquivos aplicados + novidades + próximos passos) e o `CHANGELOG` do core; atualizar com `meta:adopt --update`.
 - O protocolo é **canônico no core** — este repo **referencia**, não redefine.
 
 **Se CORE (`onion-evolve`):**
 - **Ler o inbox** = sinal de campo dos projetos; triar (vira fix/feature/backlog).
 - **Anunciar** mudança relevante aos projetos no `docs/evolution/federation/CHANGELOG.md` (downstream) e
-  **gerar o anúncio pronto-para-transportar** com [`/meta:co-announce`](co-announce.md) (produtor do
+  **gerar o anúncio pronto-para-transportar** com [`meta:co-announce`](co-announce.md) (produtor do
   doc-bridge: escreve na staging `federation/outbox/<id>/`; o maestro transporta ao `inbound/` do adotante).
 - **Registro** de quem adota: `docs/evolution/federation/members.yaml`.
 
@@ -96,11 +96,11 @@ atos 1-2 automáticos; o ato 3 vira *propor→confirmar*):
 
 - **CORE com 📬:** redigir o **rascunho de triagem** (veredito: fix/feature/backlog/informativo + resposta
   sugerida) e, se couber anúncio, o **esboço de entrada de CHANGELOG** — apresentar e **parar**. Só após o
-  maestro confirmar: registrar/anunciar (`/meta:co-announce`) e mover a mensagem (Passo 5).
+  maestro confirmar: registrar/anunciar (`meta:co-announce`) e mover a mensagem (Passo 5).
 - **CONSUMIDOR com 📥:** redigir o **rascunho de processamento** (o que o anúncio pede, o que muda aqui,
   ação proposta) e, se gerar sinal de volta, o **esboço de mensagem upstream** no próprio `inbox/` —
-  apresentar e **parar**. Só após confirmação: commitar/relayar (`/meta:co-relay`) e mover.
-- **⏰ (qualquer papel):** propor a sessão de **re-teste** das migalhas vencidas via `/meta:diary review`
+  apresentar e **parar**. Só após confirmação: commitar/relayar (`/onion-work-tools:co-relay`) e mover.
+- **⏰ (qualquer papel):** propor a sessão de **re-teste** das migalhas vencidas via `/onion-work-tools:diary review`
   (nunca re-carimbar sem re-testar — risco de reflexão falsa persistida).
 
 O rascunho nasce **no repo desta sessão** (ou como entrega-sem-commit) — I3 intacto.

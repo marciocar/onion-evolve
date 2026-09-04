@@ -75,7 +75,7 @@ function detectForgeProvider(): ForgeConfig {
         requiredEnvVars: [],   // CLI autenticada dispensa env; API exige token
         optionalEnvVars: ['GH_TOKEN', 'GITHUB_TOKEN', 'FORGE_TRANSPORT'],
         errorMessage: !isConfigured
-          ? `❌ GitHub não configurado. Faltando: ${missing.join(', ')}. Execute /meta:setup-integration`
+          ? `❌ GitHub não configurado. Faltando: ${missing.join(', ')}. Execute /onion-work-tools:setup-integration`
           : undefined
       };
     })(),

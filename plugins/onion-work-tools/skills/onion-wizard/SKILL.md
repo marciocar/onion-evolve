@@ -47,12 +47,12 @@ Never-clobber é a doutrina; o preview é a confirmação.
 
 ### 5. Executar (rotear ao procedimento — o SCAFFOLD)
 Após confirmação explícita, **execute o `trace` da transição**, não uma cópia dele:
-- `trace` = `.claude/commands/meta/adopt.md` → invoque `/meta:adopt` (via Skill) com os args colhidos
+- `trace` = `.claude/commands/meta/adopt.md` → invoque `meta:adopt` (via Skill) com os args colhidos
   (create/adopt/update), ou o bloco `--promote-hub` para a promoção.
 - O comando faz as fases (cópia/config/stamp/commit durável). Você é o intake guiado, ele é o motor.
 
 ## Resumível (STATE.md)
-Movimentos longos (adopt faseado) são retomáveis — o próprio `/meta:adopt` já checkpointa em
+Movimentos longos (adopt faseado) são retomáveis — o próprio `meta:adopt` já checkpointa em
 `.claude/sessions/adopt-<slug>/STATE.md`. Não duplique: delegue e deixe o comando retomar.
 
 ## Elenxo — auto-refutável e poroso

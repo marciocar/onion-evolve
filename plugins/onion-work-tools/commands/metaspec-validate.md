@@ -110,10 +110,10 @@ grep -nE '^(description|allowed-tools):' <alvo>         # frontmatter de comando
 **Critérios**: [X]/[Total] conformes
 ```
 
-## 📦 Addendum estruturado (contrato de composição — D5 do `/meta:evolve`)
+## 📦 Addendum estruturado (contrato de composição — D5 do `meta:evolve`)
 
 Além do relatório em prosa (saída primária para humanos), quando invocado por
-`/meta:evolve`, emita também um bloco **machine-mergeable** para que o `evolve`
+`meta:evolve`, emita também um bloco **machine-mergeable** para que o `evolve`
 agregue os vereditos no backlog preservando a severidade:
 
 ```json
@@ -122,7 +122,7 @@ agregue os vereditos no backlog preservando a severidade:
 ]
 ```
 
-`/meta:evolve` chama este comando no **fluxo principal** (por artefato de alto
+`meta:evolve` chama este comando no **fluxo principal** (por artefato de alto
 risco) e ingere este array — a prosa continua primária.
 
 ## 🚫 Regras

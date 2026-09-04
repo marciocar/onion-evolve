@@ -15,14 +15,14 @@ argument-hint: "[seção opcional: knowledge-base | business-context | technical
 
 Gerar/atualizar os índices de `docs/` (o hub `docs/INDEX.md` e os `index.md` de seção) **a partir da estrutura real** do repositório. Mantém a navegação organizada, os links válidos e as contagens corretas.
 
-> **Princípio evergreen (obrigatório):** **NUNCA** escreva contagens, listas ou métricas hardcoded de memória — elas estagnam (foi o que aconteceu com versões anteriores deste comando). **Sempre escaneie** o filesystem na hora da execução e derive os números de lá. Relacionado: skill `language-standards` e a premissa de frescor em `/meta:kb-freshness`.
+> **Princípio evergreen (obrigatório):** **NUNCA** escreva contagens, listas ou métricas hardcoded de memória — elas estagnam (foi o que aconteceu com versões anteriores deste comando). **Sempre escaneie** o filesystem na hora da execução e derive os números de lá. Relacionado: skill `language-standards` e a premissa de frescor em `/onion-work-tools:kb-freshness`.
 
 ## Quando usar
 
 - Após adicionar/remover/renomear docs ou KBs.
 - Após mudanças estruturais (novas categorias, dedup, renomeações).
 - Para corrigir links mortos ou contagens desatualizadas num índice.
-- Junto com `/meta:kb-freshness` (frescor de conteúdo) e `/docs:validate-docs`.
+- Junto com `/onion-work-tools:kb-freshness` (frescor de conteúdo) e `/onion-docs:validate-docs`.
 
 ## Estrutura real de `docs/` (descobrir dinamicamente)
 
@@ -34,23 +34,23 @@ Não assuma esta lista — confirme com `find docs -maxdepth 1 -type d`. Tipicam
 | `knowledge-base/` | KBs por categoria (`concepts/`, `frameworks/`, `tools/`, `platforms/`, `patterns/`, `architectures/`, `meta/`) | tem `index.md` próprio |
 | `meta-specs/` | constituição L0 (agents, commands, architecture, code-standards, integrations) | tem `index.md` |
 | `onion/` | documentação operacional (guias, referências) | tem `index.md` |
-| `business-context/` | contexto de negócio (spec-as-code) | **template** no framework (só `README.md`); **populado no projeto-alvo** por `/docs:build-business-docs` |
-| `technical-context/` | contexto técnico (C4/ADR, spec-as-code) | **template** no framework; populado no alvo por `/docs:build-tech-docs` |
-| `compliance-context/` | contexto de compliance (ISO/SOC2/PMBOK) | **template** no framework; populado no alvo por `/docs:build-compliance-docs` |
+| `business-context/` | contexto de negócio (spec-as-code) | **template** no framework (só `README.md`); **populado no projeto-alvo** por `/onion-docs:build-business-docs` |
+| `technical-context/` | contexto técnico (C4/ADR, spec-as-code) | **template** no framework; populado no alvo por `/onion-docs:build-tech-docs` |
+| `compliance-context/` | contexto de compliance (ISO/SOC2/PMBOK) | **template** no framework; populado no alvo por `/onion-compliance:build-compliance-docs` |
 | `analysis/`, `plans/`, `applying/`, `sdaal/` | análises datadas, planos, guias, KB SDAAL | indexados a partir do `INDEX.md` |
 
 ## Etapas
 
 **Argumento recebido**: `$ARGUMENTS` — vazio reconstrói o hub; uma seção reconstrói só o `index.md` dela.
 
-### `/docs:build-index` (sem argumento) — reconstrói o hub `docs/INDEX.md`
+### `/onion-docs:build-index` (sem argumento) — reconstrói o hub `docs/INDEX.md`
 
 1. **Escanear** `docs/` (`find docs -maxdepth 1 -type d`) e `.claude/` (comandos, agentes, skills) para **contar recursos na hora** (`find ... | wc -l`).
 2. **Ler** o `index.md`/`README.md` de cada seção para extrair título e descrição.
 3. **Gerar** `docs/INDEX.md` com: visão geral, estatísticas (contadas), estrutura, navegação por perfil e links de seção.
 4. **Validar links**: cada caminho referenciado deve existir (`test -f`); remover/corrigir links mortos.
 
-### `/docs:build-index <seção>` — reconstrói o `index.md` daquela seção
+### `/onion-docs:build-index <seção>` — reconstrói o `index.md` daquela seção
 
 1. Resolver a pasta (`docs/<seção>/`); abortar com aviso se não existir.
 2. Percorrer arquivos e subpastas reais; **contar dinamicamente**.
@@ -65,22 +65,22 @@ Não assuma esta lista — confirme com `find docs -maxdepth 1 -type d`. Tipicam
 ## Exemplos
 
 ```bash
-/docs:build-index                      # reconstrói o hub docs/INDEX.md
-/docs:build-index knowledge-base       # reconstrói docs/knowledge-base/index.md
-/docs:build-index business-context     # indexa o contexto de negócio (template ou populado)
-/docs:build-index technical-context    # indexa o contexto técnico
-/docs:build-index compliance-context   # indexa o contexto de compliance
+/onion-docs:build-index                      # reconstrói o hub docs/INDEX.md
+/onion-docs:build-index knowledge-base       # reconstrói docs/knowledge-base/index.md
+/onion-docs:build-index business-context     # indexa o contexto de negócio (template ou populado)
+/onion-docs:build-index technical-context    # indexa o contexto técnico
+/onion-docs:build-index compliance-context   # indexa o contexto de compliance
 ```
 
 ## Notas
 
 - **Contagens vêm do scan**, nunca de memória — releia a estrutura a cada execução.
 - Os 3 contextos são **spec-as-code** (`architecture.md §1.3`): vazios/template no framework, populados no projeto-alvo.
-- Este comando **não cria conteúdo** de contexto — para isso use `/docs:build-business-docs`, `/docs:build-tech-docs`, `/docs:build-compliance-docs`.
+- Este comando **não cria conteúdo** de contexto — para isso use `/onion-docs:build-business-docs`, `/onion-docs:build-tech-docs`, `/onion-compliance:build-compliance-docs`.
 
 ## Referências
 
 - Hub: `docs/INDEX.md`
-- Geração de contexto: `/docs:build-business-docs`, `/docs:build-tech-docs`, `/docs:build-compliance-docs`
-- Frescor de conteúdo: `/meta:kb-freshness`
-- Validação: `/docs:validate-docs`
+- Geração de contexto: `/onion-docs:build-business-docs`, `/onion-docs:build-tech-docs`, `/onion-compliance:build-compliance-docs`
+- Frescor de conteúdo: `/onion-work-tools:kb-freshness`
+- Validação: `/onion-docs:validate-docs`

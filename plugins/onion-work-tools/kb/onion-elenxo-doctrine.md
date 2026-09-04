@@ -165,7 +165,7 @@ do passado, é convite futuro para verificar se ainda é verdade.
 
 O ciclo é de **Zimmerman (2002)** — previsão → execução → **autorreflexão** —, e a autorreflexão ali
 não é "pensar sobre o passado": é o passo que **redefine a previsão seguinte**. É literalmente o que
-`/meta:diary review` faz ao encontrar migalha vencida: **não re-carimba, re-testa**.
+`/onion-work-tools:diary review` faz ao encontrar migalha vencida: **não re-carimba, re-testa**.
 
 > *(Não é Pintrich. Essa atribuição foi corrigida quando encontrada errada — e a correção fica à
 > mostra, porque citar mal a ciência numa página que se diz científica destrói exatamente a

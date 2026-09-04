@@ -129,7 +129,7 @@ $FEATURE_NAME
 ### **Para Iniciar Desenvolvimento:**
 \`\`\`bash
 # Após planejamento, iniciar desenvolvimento GitFlow:
-/git:flow feature start \"$FEATURE_SLUG\"
+/onion-engineering:flow feature start \"$FEATURE_SLUG\"
 
 # Ou usar sessão de desenvolvimento:
 /engineer/start $FEATURE_SLUG
@@ -137,7 +137,7 @@ $FEATURE_NAME
 
 ### **Workflow Sequencial Recomendado:**
 1. **🎯 Planejamento**: Task criada (atual) + detalhamento
-2. **🌿 Desenvolvimento**: /git:flow feature start $FEATURE_SLUG  
+2. **🌿 Desenvolvimento**: /onion-engineering:flow feature start $FEATURE_SLUG  
 3. **🛠️ Iteração**: /engineer/work
 4. **🔄 Finalização**: /git/sync
 5. **🚀 Deploy**: /engineer/pr
@@ -256,7 +256,7 @@ if [ "$TASK_ID" != "" ] && [ "$TASK_ID" != "null" ]; then
     echo "🎯 NEXT STEPS:"
     echo "   ∟ Add details: Open $TASK_URL"
     echo "   ∟ Set priority: Adjust based on roadmap"  
-    echo "   ∟ Start development: /git:flow feature start \"$FEATURE_SLUG\""
+    echo "   ∟ Start development: /onion-engineering:flow feature start \"$FEATURE_SLUG\""
     echo ""
     echo "💡 WORKFLOW SEQUENCIAL:"
     echo "   1. 🎯 Planning (current) → 2. 🌿 GitFlow Start → 3. 🛠️ Development → 4. ✅ Done"
@@ -283,7 +283,7 @@ if [ "$TASK_ID" != "" ] && [ "$TASK_ID" != "null" ]; then
    ▶ Priorizar no roadmap
 
 🚀 PARA DESENVOLVIMENTO:
-   ▶ Após planejamento: /git:flow feature start \"$FEATURE_SLUG\"
+   ▶ Após planejamento: /onion-engineering:flow feature start \"$FEATURE_SLUG\"
    ▶ Para sessão: /engineer/start $FEATURE_SLUG
 
 📋 WORKFLOW:
@@ -327,7 +327,7 @@ fi
 
 ### **Separação Clara de Responsabilidades:**
 - **`/product/feature`**: Cria task backlog para **planejamento**
-- **`/git:flow feature start`**: Inicia desenvolvimento **GitFlow** (branch + session)
+- **`/onion-engineering:flow feature start`**: Inicia desenvolvimento **GitFlow** (branch + session)
 - **`/git/sync`**: Finaliza desenvolvimento (pós-merge + cleanup)
 
 ### **Workflow Sequencial Integrado:**
@@ -335,7 +335,7 @@ fi
 1. /product/feature "nova-funcionalidade"      # ← PLANEJAMENTO
    # ... tempo de planejamento, detalhamento, priorização ...
    
-2. /git:flow feature start "nova-funcionalidade"   # ← DESENVOLVIMENTO GitFlow
+2. /onion-engineering:flow feature start "nova-funcionalidade"   # ← DESENVOLVIMENTO GitFlow
    # ... desenvolvimento usando sessões ...
    
 3. /git/sync                                  # ← FINALIZAÇÃO
@@ -348,7 +348,7 @@ fi
 - ✅ **Setup inicial** de projetos com múltiplas features
 
 ### **Quando NÃO usar:**
-- ❌ Desenvolvimento imediato (use `/git:flow feature start`)
+- ❌ Desenvolvimento imediato (use `/onion-engineering:flow feature start`)
 - ❌ Hotfixes urgentes (use `/engineer/hotfix`)  
 - ❌ Tasks já existem (use `/engineer/start <feature-slug>`)
 
@@ -405,4 +405,4 @@ fi
 
 ---
 
-**🎯 Criação rápida de features para backlog e planejamento! Para iniciar desenvolvimento GitFlow, use `/git:flow feature start [feature-name]`.**
+**🎯 Criação rápida de features para backlog e planejamento! Para iniciar desenvolvimento GitFlow, use `/onion-engineering:flow feature start [feature-name]`.**

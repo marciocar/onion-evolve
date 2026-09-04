@@ -169,7 +169,7 @@ done
 2. **Testar o modo de falha** (input ausente, recurso já existe, retomada, colisão), não só o
    happy-path.
 3. **Fechar o loop**: todo fix é **re-dogfoodado** (o fix pode regredir).
-4. Gate mecânico: `lint-artifacts.sh` + `lint-selftest.sh`; se mudou contagens, `/meta:inventory`.
+4. Gate mecânico: `lint-artifacts.sh` + `lint-selftest.sh`; se mudou contagens, `meta:inventory`.
 5. Doutrina: `${CLAUDE_PLUGIN_ROOT}/kb/onion-dogfooding-doctrine.md`.
 
 ## Fallback para falhas de validação
@@ -192,7 +192,7 @@ Se validação falhar:
 ```bash
 if [ -z "$TASK_MANAGER_PROVIDER" ]; then
   echo "⚠️ TASK_MANAGER_PROVIDER não configurado"
-  echo "Execute /meta:setup-integration"
+  echo "Execute /onion-work-tools:setup-integration"
 fi
 ```
 

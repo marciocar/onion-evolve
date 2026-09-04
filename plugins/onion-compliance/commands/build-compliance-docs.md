@@ -21,8 +21,8 @@ version: "4.0.0"
 updated: "2026-06-16"
 
 related_commands:
-  - /docs:build-tech-docs
-  - /docs:build-business-docs
+  - /onion-docs:build-tech-docs
+  - /onion-docs:build-business-docs
 
 related_agents:
   - security-information-master
@@ -103,7 +103,7 @@ propagar a contradição para a documentação gerada.
 
 Os 4 especialistas são **independentes entre si** — sem dependência de ordem. Despachá-los em **paralelo** via orquestração (pattern `fan-out-and-synthesize`).
 
-Use `/meta:orchestrate` ou a skill `onion-orchestration` para despachar em paralelo:
+Use `/onion-work-tools:orchestrate` ou a skill `onion-orchestration` para despachar em paralelo:
 
 ```
 PARALELO (todos ao mesmo tempo, sem esperar o anterior):
@@ -175,7 +175,7 @@ docs/compliance-context/
 
 - **Template-base**: `${CLAUDE_PLUGIN_ROOT}/templates/compliance-context-template.md`
 - **Pasta-alvo**: `docs/compliance-context/`
-- **Comandos complementares**: `/docs:build-tech-docs` · `/docs:build-business-docs`
+- **Comandos complementares**: `/onion-docs:build-tech-docs` · `/onion-docs:build-business-docs`
 - **Ciclo de vida (SSOT viva)**: [domain-context-lifecycle.md](../../../docs/knowledge-base/concepts/domain-context-lifecycle.md)
 - Orquestrador: @security-information-master · ISO 27001: @iso-27001-specialist · SOC2: @soc2-specialist
 

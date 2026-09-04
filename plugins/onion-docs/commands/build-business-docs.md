@@ -21,9 +21,9 @@ updated: "2026-05-15"
 output_path: docs/business-context/
 
 related_commands:
-  - /docs:build-tech-docs
-  - /meta:create-knowledge-base
-  - /docs:build-index
+  - /onion-docs:build-tech-docs
+  - meta:create-knowledge-base
+  - /onion-docs:build-index
 
 related_agents:
   - product-agent
@@ -188,8 +188,8 @@ docs/business-context/
 
 🚀 PRÓXIMOS PASSOS:
    ∟ Revisar com stakeholders
-   ∟ /docs:build-tech-docs (contexto técnico)
-   ∟ /docs:build-index (atualizar índice mestre)
+   ∟ /onion-docs:build-tech-docs (contexto técnico)
+   ∟ /onion-docs:build-index (atualizar índice mestre)
 
 ━━━━━━━━━━━━━━
 
@@ -223,7 +223,7 @@ docs/business-context/
 
 - **Template-base**: `.claude/commands/common/templates/business-context-template.md`
 - **Pasta-alvo**: `docs/business-context/`
-- **Comando complementar**: `/docs:build-tech-docs`
+- **Comando complementar**: `/onion-docs:build-tech-docs`
 - **Knowledge base**: `docs/knowledge-base/`
 
 ---

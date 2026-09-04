@@ -72,7 +72,7 @@ Nativas" (fonte única).
    colete `DiffSchema`, **detecte colisão de paths em JS**; partição limpa → aplique
    tudo numa **branch de consolidação**; colisão → **gate humano** (ou judge-panel
    p/ abordagens concorrentes). A branch consolidada entra no fluxo normal
-   (`/git:flow feature finish` / `/engineer:pr` via forge) — nunca N branches
+   (`/onion-engineering:flow feature finish` / `/onion-engineering:pr` via forge) — nunca N branches
    soltas. (Playbook: KB de orquestração §7.)
 5. **Verificação adversarial / judge-panel quando alto risco.** Mudanças amplas,
    irreversíveis ou de compliance ganham uma etapa de verificação por um agente
@@ -90,7 +90,7 @@ Nativas" (fonte única).
    grafo virou predecessor da avaliação em vez de destino dela). **Persista** a síntese
    no repo (`docs/**/research/*.md` ou local durável) — **nunca**
    a deixe só no `/tmp/.../tasks/*.output` **efêmero** do harness — **e materialize/atualize** o
-   `.kg.yaml` via `/meta:kg` + `bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh` (exit 0). Fecha o ciclo
+   `.kg.yaml` via `/onion-work-tools:kg` + `bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh` (exit 0). Fecha o ciclo
    `read(KG)→verify→act→write(KG)` ([knowledge-graph-sdaal.md](${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md)
    §SSOT-as-runtime) — é o **bookend simétrico** do read(KG) (passo 0 de `warm-up`/`catch-up`/`engineer:work`).
    **Mecanismo, não conselho:** skills do harness como `deep-research` despejam em `/tmp` efêmero — a
@@ -153,7 +153,7 @@ const results = (await parallel(
 const paths = results.flatMap(r => r.files.map(f => f.path));
 const collided = paths.filter((p, i) => paths.indexOf(p) !== i);
 if (collided.length) return gateHumano(collided, results);  // partição falhou
-// sem colisão → consolida numa branch → /git:flow feature finish | /engineer:pr
+// sem colisão → consolida numa branch → /onion-engineering:flow feature finish | /onion-engineering:pr
 ```
 
 ### `write(KG)` — template canônico de fase (classe FINDINGS)
@@ -170,7 +170,7 @@ const synthesisPath = `docs/analysis/${slug}-${today}.md`;
 await write(synthesisPath, synthesisToMarkdown(synthesis));       // persiste no repo — nunca só /tmp efêmero
 
 const kgPath = `docs/onion/graph/${slug}-${today}.kg.yaml`;
-await agent(                                                      // ou: /meta:kg <slug> (mesmo efeito)
+await agent(                                                      // ou: /onion-work-tools:kg <slug> (mesmo efeito)
   `Modele a síntese consolidada como Knowledge Graph SDAAL (.kg.yaml): claims/evidência/decisões
    tipados, arestas SUPPORTS/REFUTES/SUPERSEDES. Escreva em ${kgPath}.\n\n${JSON.stringify(synthesis)}`,
   { schema: KgWriteSchema, model: "sonnet", effort: "medium" }
@@ -257,7 +257,7 @@ força), e a doutrina desta casa é que `fix-must-become-mechanism` vale **quand
   **dispensa worktree** (worktree custa ~200-500ms + disco/agente). Use
   `isolation:'worktree'` **só** quando há sobreposição real ou branches
   independentes a fundir. Consolide numa **única branch** → fluxo normal
-  (`/git:flow` / `/engineer:pr`). Playbook completo: KB de orquestração §7.
+  (`/onion-engineering:flow` / `/onion-engineering:pr`). Playbook completo: KB de orquestração §7.
 - **Orquestração é OPT-IN, nunca default.** Fan-out é decisão explícita. Trabalho
   serial e os workflows faseados canônicos (`engineer/*`, `product/*`)
   permanecem sequenciais — a orquestração paraleliza *dentro* de uma fase, não funde
@@ -290,7 +290,7 @@ força), e a doutrina desta casa é que `fix-must-become-mechanism` vale **quand
 ## Referências
 
 - KB de doutrina e mapeamento de padrões: `docs/knowledge-base/concepts/agent-orchestration.md`
-- Comando faceta: `/meta:orchestrate`
+- Comando faceta: `/onion-work-tools:orchestrate`
 - Meta-spec de comandos (§10 Orquestração): `docs/meta-specs/commands.md`
 - Meta-spec de arquitetura (§4.2 dependências): `docs/meta-specs/architecture.md`
 - Skill relacionada: `onion-patterns` (estrutura e nomenclatura)

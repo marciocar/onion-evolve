@@ -149,7 +149,7 @@ function pendingTarget(s, t) { return (s != "superseded" && s != "refuted" && !(
 #
 # ⚠️ DENYLIST, e a forma importa mais que a lista. O `--state` nasceu com ALLOWLIST
 # (`nstatus[id] != "open"`), e em 2026-08-06 o enum cresceu POR BAIXO dela: `drifted` e
-# `unverifiable` são a saída do `/meta:kg-freshness` e significam **reconciliação DEVIDA** — o
+# `unverifiable` são a saída do `/onion:kg-freshness` e significam **reconciliação DEVIDA** — o
 # trabalho mais urgente que existe. A allowlist os descartava em silêncio, e a fila de abertos ficava
 # cega justamente para o que acabou de provar que o mundo andou. Era o 4º sítio da mesma classe
 # (C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE, elenxos-2026-08-07); os outros três já foram curados.
@@ -278,7 +278,7 @@ END {
       print "          - id: <ID>"
       print "            node_type: <tipo>          # (não `type:`)"
       print "    e arestas como \"- from:\" INDENTADO + \"edge_type:\". Regenere na gramática canônica"
-      print "    (ver /meta:kg) ou corrija o gerador."
+      print "    (ver /onion-work-tools:kg) ou corrija o gerador."
     } else {
       print "  ✗ nenhum nó encontrado: seção nodes: ausente ou vazia — isto não é um .kg.yaml legível."
     }

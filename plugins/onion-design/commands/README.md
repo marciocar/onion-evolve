@@ -12,12 +12,12 @@ W3C/DTCG como SSOT em `docs/design-context/`; CSS/componentes/material como saí
 
 | Comando | Faz |
 |---------|-----|
-| [`/design:identity`](identity.md) | Ciclo brief → develop (tokens + gate WCAG + materializa) → material. Faseado, retomável. Delega a `@design-system-specialist`. |
-| [`/design:generate`](generate.md) | Camada generativa: diverge (N identidades por IA, em orquestração) → converge (gate WCAG + juiz) → vencedora alimenta o DEVELOP do identity. Delega a `@brand-generator`. |
+| [`/onion-design:identity`](identity.md) | Ciclo brief → develop (tokens + gate WCAG + materializa) → material. Faseado, retomável. Delega a `@design-system-specialist`. |
+| [`/onion-design:generate`](generate.md) | Camada generativa: diverge (N identidades por IA, em orquestração) → converge (gate WCAG + juiz) → vencedora alimenta o DEVELOP do identity. Delega a `@brand-generator`. |
 
 ## Próximos (roadmap — plano `transient-cooking-pebble`)
 
-- `/design:evolve`: faceta de `/meta:evolve` — audita drift visual e produz backlog priorizado.
+- `design:evolve`: faceta de `meta:evolve` — audita drift visual e produz backlog priorizado.
   **Gated até:** existir ≥1 identidade de projeto com tokens materializados **que drifte** dos
   tokens da SSOT. Sem esse gatilho não há o que auditar — construir antes seria catedral à frente
   do uso ([modernization §🚦](../../../docs/knowledge-base/concepts/onion-modernization-doctrine.md)).

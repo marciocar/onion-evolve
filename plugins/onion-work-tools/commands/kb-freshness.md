@@ -14,14 +14,14 @@ updated: "2026-06-13"
 allowed-tools: Read Grep Glob
 argument-hint: "[caminho de KB específica | vazio = todas]"
 related_commands:
-  - /meta:orchestrate
-  - /meta:create-knowledge-base
+  - /onion-work-tools:orchestrate
+  - meta:create-knowledge-base
 related_agents:
   - onion
   - metaspec-gate-keeper
 ---
 
-# /meta:kb-freshness — Auditoria de Frescor de Knowledge Bases
+# /onion-work-tools:kb-freshness — Auditoria de Frescor de Knowledge Bases
 
 ## Objetivo
 
@@ -36,7 +36,7 @@ A premissa de frescor é simples: **uma KB que ensina o que não existe mais ou
 omite o que existe hoje é pior que nenhuma KB** — ela induz agentes e humanos ao
 erro. A obrigação de manter KBs vivas está documentada em
 `docs/knowledge-base/concepts/agent-orchestration.md` e no comando
-`/meta:create-knowledge-base` (seção "Manter viva: revisar quando o tema
+`meta:create-knowledge-base` (seção "Manter viva: revisar quando o tema
 evolui").
 
 ---
@@ -47,7 +47,7 @@ evolui").
   deprecado, mudança de provider).
 - Quando o Claude Code lança novas primitivas (ex.: a ferramenta Workflow em
   mai/2026) que podem tornar seções de KBs obsoletas.
-- Em auditorias periódicas de saúde documental (ex.: junto com `/docs:docs-health`).
+- Em auditorias periódicas de saúde documental (ex.: junto com `/onion-docs:docs-health`).
 - Antes de criar uma nova KB — para saber se já existe uma desatualizada sobre o
   tema que vale atualizar em vez de duplicar.
 - Sempre que uma KB específica for citada num PR e houver dúvida sobre sua
@@ -176,7 +176,7 @@ No contexto principal (custo 0 tokens de modelo), consolide `findings`:
 4. Se houver 3+ KBs com o mesmo `failed_item`, adicione um **alerta transversal**
    no relatório (indica problema sistêmico, não pontual).
 5. **Grafo primeiro**: achados `HISTORICAL` e alertas transversais são achados estruturados —
-   materialize via `/meta:kg` (nó `claim`, `layer: audit`, `trace` à KB) **antes** de fechar o
+   materialize via `/onion-work-tools:kg` (nó `claim`, `layer: audit`, `trace` à KB) **antes** de fechar o
    relatório abaixo. O relatório é **vista** do grafo, não destino do achado (senão o grafo fica
    predecessor da avaliação em vez de destino dela — sinal de campo de um adotante regulado, 2026-07-20).
 > ⚠️ **Alcance honesto:** este comando **não escreve arquivo** (a saída é bloco de console), logo
@@ -243,13 +243,13 @@ KB FRESHNESS REPORT — 2026-06-13
 
 ─── ALERTAS TRANSVERSAIS ──────────────────────
 ⚠  Item #1 (lineup de modelos) falhou em 4 KBs — revisão em lote recomendada.
-   Sugestão: /meta:orchestrate substituir referências a modelos obsoletos em lote
+   Sugestão: /onion-work-tools:orchestrate substituir referências a modelos obsoletos em lote
 
 ─── PRÓXIMOS PASSOS ───────────────────────────
 1. Arquivar/reescrever KBs HISTORICAL (2 arquivos)
-2. Atualizar KBs STALE em lote via /meta:orchestrate
-3. Rodar /docs:build-index após os refreshes
-4. Re-executar /meta:kb-freshness para confirmar frescor
+2. Atualizar KBs STALE em lote via /onion-work-tools:orchestrate
+3. Rodar /onion-docs:build-index após os refreshes
+4. Re-executar /onion-work-tools:kb-freshness para confirmar frescor
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
@@ -260,16 +260,16 @@ KB FRESHNESS REPORT — 2026-06-13
 
 ```bash
 # Auditar todas as KBs (modo completo)
-/meta:kb-freshness
+/onion-work-tools:kb-freshness
 
 # Auditar uma KB específica
-/meta:kb-freshness docs/knowledge-base/concepts/ai-agent-design-patterns.md
+/onion-work-tools:kb-freshness docs/knowledge-base/concepts/ai-agent-design-patterns.md
 
 # Auditar um diretório inteiro
-/meta:kb-freshness docs/knowledge-base/frameworks/
+/onion-work-tools:kb-freshness docs/knowledge-base/frameworks/
 
 # Auditar usando glob pattern
-/meta:kb-freshness docs/knowledge-base/concepts/*.md
+/onion-work-tools:kb-freshness docs/knowledge-base/concepts/*.md
 ```
 
 ---
@@ -277,8 +277,8 @@ KB FRESHNESS REPORT — 2026-06-13
 ## Notas
 
 - Este comando **nunca cria nem modifica KBs** — apenas audita e relata. Para
-  aplicar os refreshes, use `/meta:create-knowledge-base` (atualizar KB
-  existente) ou `/meta:orchestrate` (atualização em lote de muitas KBs de uma vez).
+  aplicar os refreshes, use `meta:create-knowledge-base` (atualizar KB
+  existente) ou `/onion-work-tools:orchestrate` (atualização em lote de muitas KBs de uma vez).
 - A doutrina de orquestração (fan-out-and-synthesize, model tiering, teto de 16
   workers, verificação adversarial) vem de
   `docs/knowledge-base/concepts/agent-orchestration.md` — consulte-a se
@@ -287,10 +287,10 @@ KB FRESHNESS REPORT — 2026-06-13
   executa diretamente com `Agent` (sem overhead de Workflow).
 - Orquestre **sempre no nível principal** — nunca dentro de um subagente e
   **não crie** um agente "kb-freshness-worker".
-- **Contrato de composição (D4 do `/meta:evolve`)**: quando invocado por
-  `/meta:evolve`, retorne o **array `FreshnessSchema[]` cru** (não apenas o
+- **Contrato de composição (D4 do `meta:evolve`)**: quando invocado por
+  `meta:evolve`, retorne o **array `FreshnessSchema[]` cru** (não apenas o
   relatório Unicode), para que o `evolve` mescle os vereditos direto no backlog
-  sem reparsear. O schema (acima) é o contrato. `/meta:evolve` chama este comando
+  sem reparsear. O schema (acima) é o contrato. `meta:evolve` chama este comando
   no **fluxo principal** e ingere o array — nunca aninha esta orquestração dentro da dele.
 
 ---
@@ -299,7 +299,7 @@ KB FRESHNESS REPORT — 2026-06-13
 
 - KB de doutrina de orquestração: `docs/knowledge-base/concepts/agent-orchestration.md`
 - Skill operacional do fan-out: `onion-orchestration`
-- Comando de geração de KB: `/meta:create-knowledge-base`
-- Saúde documental ampla: `/docs:docs-health`
-- Atualização em lote: `/meta:orchestrate`
-- Índice mestre: `docs/knowledge-base/index.md` (atualizar via `/docs:build-index`)
+- Comando de geração de KB: `meta:create-knowledge-base`
+- Saúde documental ampla: `/onion-docs:docs-health`
+- Atualização em lote: `/onion-work-tools:orchestrate`
+- Índice mestre: `docs/knowledge-base/index.md` (atualizar via `/onion-docs:build-index`)

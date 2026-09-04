@@ -44,7 +44,7 @@ related_agents:
 
 Comando para consolidar múltiplos documentos relacionados, identificando padrões, divergências, convergências e insights estratégicos.
 
-> **Diferença vs `/product:consolidate-meetings`:** este consolida **documentos** gerais (business-context, tech-docs, etc.); o de meetings consolida **transcrições de reunião** (via `@meeting-consolidator`).
+> **Diferença vs `/onion-product:consolidate-meetings`:** este consolida **documentos** gerais (business-context, tech-docs, etc.); o de meetings consolida **transcrições de reunião** (via `@meeting-consolidator`).
 
 ## 🎯 Objetivo
 

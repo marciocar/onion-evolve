@@ -24,7 +24,7 @@ duráveis** — sem depender do transcript da conversa anterior. É o **resume f
 worklog formal: a sequência de commits soltos, a análise em andamento, o ajuste
 que ficou pela metade.
 
-> **Fronteira vs `/engineer:work`:** se há um worklog formal ACTIVE
+> **Fronteira vs `/onion-engineering:work`:** se há um worklog formal ACTIVE
 > (`.claude/sessions/<slug>/STATE.md`), aquele é o ponteiro **autoritativo** de
 > retomada — o catch-up o **detecta e aponta**, não o substitui. O catch-up
 > brilha quando **não** existe worklog.
@@ -60,7 +60,7 @@ fonte da verdade de estado, acima do git. É o **primeiro ato**, não um passo o
 ### 2. Sessão formal ACTIVE (se houver)
 - `find .claude/sessions -maxdepth 2 -name STATE.md -not -path '*/archived/*'` → worklogs vivos
 - Para o mais recente (`mtime`), leia **só o `STATE.md`** (Tier 0, ~300 tokens): o bloco `## NEXT` é o próximo passo autoritativo
-- Se existir → no briefing, **aponte** `/engineer:work <slug>` como retomada canônica
+- Se existir → no briefing, **aponte** `/onion-engineering:work <slug>` como retomada canônica
 
 ### 3. Memória recente
 - Leia `MEMORY.md` (índice) e os arquivos de memória **mais recentes** (`mtime`) em `~/.claude/projects/<repo>/memory/` — capturam decisões/`project`/`feedback` em curso que o git não mostra
@@ -90,8 +90,8 @@ Sintetize em **um bloco curto** (não despeje os comandos crus):
 ▶️  Próximo passo provável: <inferência acionável, dirigida pelo KG quando houver>
 ```
 
-Termine oferecendo a retomada: se há worklog → `/engineer:work <slug>`; se há diff
-não-commitado → revisar/concluir; se há inbox → `/meta:co-evolve`. **Não execute**
+Termine oferecendo a retomada: se há worklog → `/onion-engineering:work <slug>`; se há diff
+não-commitado → revisar/concluir; se há inbox → `/onion-work-tools:co-evolve`. **Não execute**
 nada automaticamente — o briefing orienta, o maestro decide.
 
 ## 💡 Quando Usar
@@ -105,5 +105,5 @@ nada automaticamente — o briefing orienta, o maestro decide.
 
 - **Read-only / orientação**: reconstrói e propõe; não muta estado nem executa workflows
 - Para contexto **do projeto** (não "onde parei"), use `/warm-up`
-- Para retomar um worklog formal específico, `/engineer:work <slug>` é o caminho direto
+- Para retomar um worklog formal específico, `/onion-engineering:work <slug>` é o caminho direto
 - Mecânica de resume frio vs quente: `docs/knowledge-base/concepts/worklog-protocol.md §2`

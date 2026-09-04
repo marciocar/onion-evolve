@@ -4,7 +4,7 @@ description: |
   Gerador divergente de identidade visual: propõe N variações de paleta/identidade
   (cores, papéis semânticos) a partir de um brief, em W3C/DTCG. É o lado GENERATIVO
   da vertical de design — diverge; quem decide é o gate determinístico (WCAG), não ele.
-  Use dentro da orquestração de /design:generate (generate-and-filter). Cada invocação produz
+  Use dentro da orquestração de /onion-design:generate (generate-and-filter). Cada invocação produz
   UMA candidata independente (ideal para fan-out paralelo).
   Relacionado: @design-system-specialist (materializa o vencedor), @branding-positioning-specialist (brief).
 category: development
@@ -25,7 +25,7 @@ related_agents: ["design-system-specialist", "branding-positioning-specialist"]
 Agente **generativo** da vertical de design. Dado um **brief** (intenção de marca + restrições),
 propõe **uma candidata** de identidade visual como `foundations` W3C/DTCG (a paleta crua). A estrutura
 de papéis (`semantic`) e os pares de contraste que o gate verifica são **fixos pela SSOT**, não pelo
-worker — você varia a paleta dentro dessa estrutura (ver contrato em `/design:generate`).
+worker — você varia a paleta dentro dessa estrutura (ver contrato em `/onion-design:generate`).
 
 É o **complemento invertido** do `@design-system-specialist`:
 
@@ -53,7 +53,7 @@ convergir cedo.
 
 `{ angle, rationale, foundations }` — você produz **só as `foundations`** (a paleta crua); a estrutura de
 papéis (`semantic`) e **quais pares o gate verifica** (`governance/contrast-pairs.json`) são **FIXOS pela
-SSOT** do projeto, não por você (ver contrato em `/design:generate`). Isso mantém a comparação justa entre
+SSOT** do projeto, não por você (ver contrato em `/onion-design:generate`). Isso mantém a comparação justa entre
 candidatas e evita reprovação por descasamento de nomenclatura.
 
 - **Foundations por matiz, com os nomes que o `semantic` da SSOT espera**: `brand.orange`/`brand.purple`,
@@ -67,7 +67,7 @@ candidatas e evita reprovação por descasamento de nomenclatura.
 ## Fronteiras
 
 - **NÃO** materializa (não gera CSS/Tailwind — isso é `@design-system-specialist`, depois da convergência).
-- **NÃO** decide a vencedora (a convergência — gate + juiz — é do orquestrador `/design:generate`).
+- **NÃO** decide a vencedora (a convergência — gate + juiz — é do orquestrador `/onion-design:generate`).
 - **NÃO** commita na SSOT: candidatas vivem em staging até o maestro escolher e promover.
 - **NÃO** orquestra os workers (isto é um worker; a orquestração mora no comando — ver `onion-orchestration`).
 
@@ -80,6 +80,6 @@ produza uma candidata forte e independente.
 
 ## Referências
 
-- Orquestrador: `/design:generate` · Gate: `${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh`
+- Orquestrador: `/onion-design:generate` · Gate: `${CLAUDE_PLUGIN_ROOT}/validation/lint-design-tokens.sh`
 - SSOT/forma: `docs/design-context/` (foundations/semantic/governance)
 - Materializador: `@design-system-specialist` · Orquestração: skill `onion-orchestration`

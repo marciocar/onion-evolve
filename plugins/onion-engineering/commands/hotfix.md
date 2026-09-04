@@ -91,7 +91,7 @@ Criar `.claude/sessions/<slug>/` conforme o [Contrato de Sessão](${CLAUDE_PLUGI
 ∟ Task: <ID/URL no provider ativo, ou "local">
 ∟ Branch: hotfix/X.Y.Z-description   ∟ Base: main
 ∟ Sessão: .claude/sessions/<slug>/
-⚡ Próximos: implementar → /engineer/pre-pr → /git:flow hotfix finish
+⚡ Próximos: implementar → /engineer/pre-pr → /onion-engineering:flow hotfix finish
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -104,5 +104,5 @@ Criar `.claude/sessions/<slug>/` conforme o [Contrato de Sessão](${CLAUDE_PLUGI
 
 ## ⚠️ Notas
 
-- Sempre parte de `main`/`master`; merge dual (main + develop) no `/git:flow hotfix finish`.
+- Sempre parte de `main`/`master`; merge dual (main + develop) no `/onion-engineering:flow hotfix finish`.
 - Task criada com prioridade `urgent` (mapeada pelo adapter ao vocabulário do provider).

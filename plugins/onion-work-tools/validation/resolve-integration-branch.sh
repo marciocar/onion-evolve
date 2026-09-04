@@ -2,7 +2,7 @@
 # =============================================================================
 # resolve-integration-branch.sh — Resolve a BRANCH DE INTEGRAÇÃO de um repo Onion
 #
-# Propósito : Dar ao fluxo de PR (/engineer:pr) e ao /meta:adopt uma resposta
+# Propósito : Dar ao fluxo de PR (/onion-engineering:pr) e ao meta:adopt uma resposta
 #             determinística e PORTÁVEL para "qual branch os PRs de evolução
 #             devem mirar?". Resolve o gap do sinal de campo
 #             docs/evolution/inbox/_processed/2026-06-18-adopt-gitflow-develop-branch-config.md:
@@ -25,7 +25,7 @@
 # Uso       : resolve-integration-branch.sh [REPO_DIR]   (default: .)
 #             Emite o nome da branch em STDOUT. Exit 0 sempre (sempre há default).
 #
-# Determinístico, sem LLM. Consumido por /engineer:pr e /meta:adopt; coberto
+# Determinístico, sem LLM. Consumido por /onion-engineering:pr e meta:adopt; coberto
 # pelo lint-selftest.sh (modo resolve). Viaja para repos adotados via manifesto.
 # =============================================================================
 set -euo pipefail
@@ -55,7 +55,7 @@ master="$(git -C "${REPO_DIR}" config --get gitflow.branch.master 2>/dev/null ||
 # agora na origem por resolve-production-branch.sh). Foi REVERTIDA por verificação adversarial:
 # (a) regride um caso real — clone fresco onde develop só existe em refs/remotes/origin/develop e
 #     gitflow.branch.master=develop era o ÚNICO sinal correto da integração; a guarda o descartava
-#     e a cadeia caía no palpite cego "main" (base errada de PR no /engineer:pr);
+#     e a cadeia caía no palpite cego "main" (base errada de PR no /onion-engineering:pr);
 # (b) o ganho é quase inalcançável — o adopt.md sempre grava gitflow.branch.develop, então o passo
 #     (2) retorna antes de chegar aqui. Cura-se o veneno na ORIGEM (helper de produção + --unset no
 #     passo (3) do adopt), não neste consumidor.
@@ -72,7 +72,7 @@ if [ -z "${master:-}" ]; then
     printf '⚠️  resolve-integration-branch: SEM sinal de branch de integração — usando o palpite cego "main".\n'
     printf '    (sem integration_branch no .onion-version, sem gitflow.branch.develop, sem branch develop, sem origin/HEAD).\n'
     printf '    Se a branch de integração NÃO for "main", grave o campo no SSOT versionado:\n'
-    printf '      integration_branch: <sua-branch>   # em .claude/.onion-version   (ou passe --integration-branch no /meta:adopt)\n'
+    printf '      integration_branch: <sua-branch>   # em .claude/.onion-version   (ou passe --integration-branch no meta:adopt)\n'
   } >&2
 fi
 printf '%s\n' "${master:-main}"

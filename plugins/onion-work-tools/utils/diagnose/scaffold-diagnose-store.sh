@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # =============================================================================
 # scaffold-diagnose-store.sh — Scaffolda o STORE de um diagnóstico de engajamento
-# (/meta:kg diagnose). Cria, para um <slug>:
+# (/onion-work-tools:kg diagnose). Cria, para um <slug>:
 #   docs/<área>/graph/<slug>.kg.yaml            — skeleton KG de 2 camadas (audit/domain)
 #   docs/<área>/diagnose/<slug>/sources/        — material bruto (transcrições, docs)
 #   docs/<área>/diagnose/<slug>/extracts/       — EXTRACT por fonte

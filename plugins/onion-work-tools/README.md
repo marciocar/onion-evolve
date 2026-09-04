@@ -40,7 +40,7 @@ Invocação: `/onion-work-tools:<comando>` (namespace do plugin).
 | `/onion-work-tools:analyze-complex-problem` | Análise estruturada de problemas complexos com template oficial. |
 | `/onion-work-tools:backlog` | Regenerar docs/backlog.md — a projeção humana do trabalho ABERTO do core, a partir dos nós abertos (status open) da camada canônica (docs/onion/graph) + grafos… |
 | `/onion-work-tools:co-evolve` | Orienta a sessão na co-evolução Onion core↔derivados — detecta o papel do repo (core/consumidor via .claude/.onion-version), lê o inbox de mensagens pendentes,… |
-| `/onion-work-tools:co-relay` | Carteiro-LOCAL do doc-bridge (UPSTREAM) — espelho do /meta:co-deliver. |
+| `/onion-work-tools:co-relay` | Carteiro-LOCAL do doc-bridge (UPSTREAM) — espelho do meta:co-deliver. |
 | `/onion-work-tools:constellation` | 🗺️ O MAPA da Constelação de Estudos — visão macro das N estrelas (estudos discuss/*) lendo SÓ os metadados (frontmatter+Tier-0) de cada SEED. |
 | `/onion-work-tools:context-freshness` | Audita o frescor dos contextos de domínio (docs/business-context/, docs/technical-context/, docs/compliance-context/) tratando-os como SSOT viva, não snapshot. |
 | `/onion-work-tools:diary` | Gerencia o diário de aprendizado da instância Onion — sistema de breadcrumbs para o Transformer. |
@@ -70,7 +70,7 @@ Invocação: `/onion-work-tools:<comando>` (namespace do plugin).
 ## Requisitos
 
 - Claude Code ≥ 2.1.239 (marketplace com `pluginRoot`); `bash`, `git`, `awk`; `python3` (motores KG e censos); `jq` opcional.
-- Este plugin instala **capacidade** (read-only, atualizável pelo gerenciador). Não é adoção: para vendorizar o Onion num repo, o canal é `/meta:adopt` no repositório-fonte.
+- Este plugin instala **capacidade** (read-only, atualizável pelo gerenciador). Não é adoção: para vendorizar o Onion num repo, o canal é `meta:adopt` (comando do core, não distribuído por plugin) no repositório-fonte.
 
 ## Proveniência
 
@@ -82,6 +82,10 @@ Invocação: `/onion-work-tools:<comando>` (namespace do plugin).
 Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 
 Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT em `.claude/` do source. Não edite à mão: a próxima montagem sobrescreve.
+
+## Comandos do core citados (não distribuídos neste plugin)
+
+Estes comandos aparecem no texto sem a barra inicial porque pertencem ao core do Onion (meta-fábrica ou outra superfície) e **não** são instalados por este plugin: `engineer:work`, `meta:adopt`, `meta:co-announce`, `meta:co-deliver`, `meta:create-agent`, `meta:create-knowledge-base`, `meta:evolve`, `meta:graph`, `meta:inventory`, `meta:personality-sync`. Estão disponíveis num repo que adotou o Onion por vendorização (`.claude/` completo).
 
 ## Licença
 

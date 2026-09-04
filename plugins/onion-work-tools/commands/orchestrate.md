@@ -11,8 +11,8 @@ updated: "2026-07-18"
 allowed-tools: Read Write Grep Glob Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh*)
 argument-hint: "<tarefa a paralelizar>"
 related_commands:
-  - /meta:create-agent
-  - /meta:metaspec-validate
+  - meta:create-agent
+  - /onion-work-tools:metaspec-validate
 related_agents:
   - onion
   - metaspec-gate-keeper
@@ -69,7 +69,7 @@ Capture `$ARGUMENTS` como a descrição da tarefa a paralelizar. Se vier vazia,
 peça ao usuário o que paralelizar antes de prosseguir (não invente escopo).
 
 ```
-/meta:orchestrate <tarefa a paralelizar>
+/onion-work-tools:orchestrate <tarefa a paralelizar>
 ```
 
 Levante o conjunto de itens (arquivos, módulos, PRs, fontes) com `Glob`/`Grep`
@@ -166,7 +166,7 @@ const collided = paths.filter((p, i) => paths.indexOf(p) !== i);
 if (collided.length) return gateHumano(collided, results);                  // partição falhou → humano decide
 
 // partição limpa → 1 branch de consolidação → entra no fluxo faseado normal:
-//   /git:flow feature finish   ou   /engineer:pr  (via forge adapter)
+//   /onion-engineering:flow feature finish   ou   /onion-engineering:pr  (via forge adapter)
 return { branch: "orchestration/add-version-field", changed: paths.length };
 
 // Variante worktree (só quando há sobreposição): trocar a chamada acima por
@@ -194,7 +194,7 @@ uma mutação de código que já termina em branch/PR — o resultado consolidad
 1. **Persista a síntese no repo** — `docs/**/research/*.md` (ou local durável apropriado). **Nunca**
    deixe o resultado só no `/tmp/.../tasks/*.output` **efêmero** do harness: ele **drifta** e o SSOT
    nunca o vê.
-2. **Materialize/atualize o `.kg.yaml`** dos achados/decisões via `/meta:kg` e valide com
+2. **Materialize/atualize o `.kg.yaml`** dos achados/decisões via `/onion-work-tools:kg` e valide com
    `bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo>` (**exit 0**).
 
 Fecha o ciclo `read(KG)→verify→act→write(KG)`
@@ -251,13 +251,13 @@ ferramenta `Agent`:
 
 ```bash
 # Auditoria de conformidade ampla (fan-out-and-synthesize + verificação adversarial)
-/meta:orchestrate auditar conformidade de todos os agentes contra as meta-specs
+/onion-work-tools:orchestrate auditar conformidade de todos os agentes contra as meta-specs
 
 # Migração mecânica multi-arquivo (mutação partição-primeiro → 1 branch; ver script no Passo 3)
-/meta:orchestrate adicionar o campo `version` ao frontmatter de todos os comandos sem versão
+/onion-work-tools:orchestrate adicionar o campo `version` ao frontmatter de todos os comandos sem versão
 
 # Pesquisa fan-out citada (fan-out-and-synthesize)
-/meta:orchestrate pesquisar e comparar 5 fontes sobre padrões de orquestração de agentes em 2026
+/onion-work-tools:orchestrate pesquisar e comparar 5 fontes sobre padrões de orquestração de agentes em 2026
 ```
 
 ## 🔗 Referências

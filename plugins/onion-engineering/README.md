@@ -36,7 +36,7 @@ Invocação: `/onion-engineering:<comando>` (namespace do plugin).
 | Comando | O que faz |
 |---|---|
 | `/onion-engineering:bump` | Bump de versão seguindo semver. |
-| `/onion-engineering:code-review` | [Alias] Redireciona para /meta:setup-code-review (setup de code review no CI). |
+| `/onion-engineering:code-review` | [Alias] Redireciona para /onion-work-tools:setup-code-review (setup de code review no CI). |
 | `/onion-engineering:docs` | Invocar agente de documentação para branch atual. |
 | `/onion-engineering:fast-commit` | Adiciona todas as mudanças e faz commit rápido. |
 | `/onion-engineering:flow` | Dispatcher único do ciclo de vida GitFlow: feature/release/hotfix × start/publish/finish. |
@@ -83,7 +83,7 @@ Invocação: `/onion-engineering:<comando>` (namespace do plugin).
 ## Requisitos
 
 - Claude Code ≥ 2.1.239 (marketplace com `pluginRoot`); `bash`, `git`, `awk`; `python3` (motores KG e censos); `jq` opcional.
-- Este plugin instala **capacidade** (read-only, atualizável pelo gerenciador). Não é adoção: para vendorizar o Onion num repo, o canal é `/meta:adopt` no repositório-fonte.
+- Este plugin instala **capacidade** (read-only, atualizável pelo gerenciador). Não é adoção: para vendorizar o Onion num repo, o canal é `meta:adopt` (comando do core, não distribuído por plugin) no repositório-fonte.
 
 ## Proveniência
 
@@ -95,6 +95,10 @@ Invocação: `/onion-engineering:<comando>` (namespace do plugin).
 Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 
 Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT em `.claude/` do source. Não edite à mão: a próxima montagem sobrescreve.
+
+## Comandos do core citados (não distribuídos neste plugin)
+
+Estes comandos aparecem no texto sem a barra inicial porque pertencem ao core do Onion (meta-fábrica ou outra superfície) e **não** são instalados por este plugin: `git:feature:finish`, `git:feature:publish`, `git:feature:start`, `git:hotfix:finish`, `git:hotfix:start`, `git:release:finish`, `git:release:start`, `meta:adopt`, `test:watch`. Estão disponíveis num repo que adotou o Onion por vendorização (`.claude/` completo).
 
 ## Licença
 

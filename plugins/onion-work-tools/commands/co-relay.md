@@ -1,6 +1,6 @@
 ---
 name: co-relay
-description: 'Carteiro-LOCAL do doc-bridge (UPSTREAM) — espelho do /meta:co-deliver. Relaya um sinal do adotante (docs/evolution/inbox/) direto no inbox/ do CORE que vive na MESMA máquina, para o hook "you have mail" sinalizar 📬 sem o maestro copiar à mão. ENTREGA-SEM-COMMIT (o adotante nunca commita no repo alheio — invariante I3); o commit + triagem é da sessão do core. Dissolve o incidente "commit cross-repo na branch errada" (sinal S2): sem commit, não há pergunta de branch/push. Roda só no ADOTANTE.'
+description: 'Carteiro-LOCAL do doc-bridge (UPSTREAM) — espelho do meta:co-deliver. Relaya um sinal do adotante (docs/evolution/inbox/) direto no inbox/ do CORE que vive na MESMA máquina, para o hook "you have mail" sinalizar 📬 sem o maestro copiar à mão. ENTREGA-SEM-COMMIT (o adotante nunca commita no repo alheio — invariante I3); o commit + triagem é da sessão do core. Dissolve o incidente "commit cross-repo na branch errada" (sinal S2): sem commit, não há pergunta de branch/push. Roda só no ADOTANTE.'
 category: meta
 tags: [co-evolution, upstream, transport, carteiro, inbox, relay, bridge]
 version: "1.1.0"
@@ -9,10 +9,10 @@ allowed-tools: Read Bash(bash .claude/utils/co-evolution/co-relay.sh*) Bash(ls d
 argument-hint: "[<signal-file>] --target <path-local-do-core> [--from <dir>] [--dry-run]"
 ---
 
-# 📨 /meta:co-relay — Carteiro-local (upstream, relay de sinal ao core)
+# 📨 /onion-work-tools:co-relay — Carteiro-local (upstream, relay de sinal ao core)
 
 Transporta um **sinal** que o adotante escreveu (`docs/evolution/inbox/`) para o `inbox/` do **core na mesma
-máquina** — automatizando o `cp` que o maestro fazia à mão. É o **espelho UPSTREAM** do [`/meta:co-deliver`]
+máquina** — automatizando o `cp` que o maestro fazia à mão. É o **espelho UPSTREAM** do [`meta:co-deliver`]
 (co-deliver.md) (que é downstream, core→adotante). Materializa o sub-protocolo do regime manual fixado no
 [ADR de relay manual](../../../docs/analysis/onion-adr-manual-relay-subprotocol-2026-06.md).
 
@@ -35,7 +35,7 @@ S2 ("commit cross-repo na branch errada") é **estruturalmente impossível**.
 `role: source` por ser a identidade da FONTE; cópia byte-idêntica no adotante mentiria 'source').
 - `role: adopted` → **ADOTANTE** → segue.
 - `role: source` / stamp ausente → **CORE/pré-adoção** → **parar**: o core não relaya upstream; ele anuncia
-  downstream via [`/meta:co-announce`](co-announce.md). (O helper aplica a mesma guarda e sai com exit 2.)
+  downstream via [`meta:co-announce`](co-announce.md). (O helper aplica a mesma guarda e sai com exit 2.)
 
 ## Passo 2 — Resolver alvo (o core) e sinal(is)
 
@@ -76,7 +76,7 @@ Saída sugerida (ORIENTE o próximo passo — não pergunte se deve commitar):
 📨 Carteiro-local upstream — relayado ao core (<N> arquivo(s)) em <core>/docs/evolution/inbox/
    ◆ entrega-sem-commit (I3 respeitado) — a sessão do core commita + tria o sinal
    ▶ aqui (adotante): git mv inbox/<sinal> inbox/_processed/ + commit (junto da linha Onion, separado de outras frentes)
-   ▶ no core: abrir sessão → 📬 you-have-mail → /meta:co-evolve (triar)
+   ▶ no core: abrir sessão → 📬 you-have-mail → /onion-work-tools:co-evolve (triar)
 ```
 
 ## ⚠️ Notas
@@ -86,12 +86,12 @@ Saída sugerida (ORIENTE o próximo passo — não pergunte se deve commitar):
   (determinístico) — **não escalar** (é untracked/branch-agnóstico). Só a execução no core é Ato-3.
 - **Untracked é entrega, não durabilidade.** Um `git clean -fd` no core apagaria o sinal **antes** de
   processado — por isso a sessão do core deve ler/triar logo (mover p/ `_processed/` torna durável lá).
-- **Distribuição:** este comando só existe no adotante após `/meta:adopt --update` (vendorização do delta).
+- **Distribuição:** este comando só existe no adotante após `meta:adopt --update` (vendorização do delta).
 - **Verbo solto em `meta/`**; não funde nem dispara workflows faseados.
 
 ## 🔗 Referências
 
-- Espelho downstream: [`/meta:co-deliver`](co-deliver.md)
-- Orientação/gestão: [`/meta:co-evolve`](co-evolve.md) · Protocolo: [docs/evolution/README.md](../../../docs/evolution/README.md)
+- Espelho downstream: [`meta:co-deliver`](co-deliver.md)
+- Orientação/gestão: [`/onion-work-tools:co-evolve`](co-evolve.md) · Protocolo: [docs/evolution/README.md](../../../docs/evolution/README.md)
 - Sub-protocolo (decisão): [ADR de relay manual](../../../docs/analysis/onion-adr-manual-relay-subprotocol-2026-06.md) · Eixo dos 3 atos: [ADR transporte vs execução](../../../docs/analysis/onion-adr-comms-transport-vs-execution-2026-06.md)
 - Hook: `.claude/hooks/co-evolution-inbox-check.sh` · Registro: [members.yaml](../../../docs/evolution/federation/members.yaml)
