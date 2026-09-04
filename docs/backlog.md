@@ -244,12 +244,6 @@
 |--:|---|---|---|
 | 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETE |
 
-## fios-abertos — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 6.0 | `Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO` | fios-abertos | PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-ver |
-
 ## graduated-automation-elenxo-2026-07 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -281,6 +275,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.8 | `C_S4` | granaai-doctrine-absorption-2026-07 | FEATURE: /meta:kg map projeto (canonicalizacao de monorepo) — hoje map area existe, projeto/monorepo aberto |
+
+## fios-abertos — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.5 | `Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE` | fios-abertos | PERGUNTA (classe B, estreitada em 2026-09-04 pelo /meta:drive): por que o caso (e) da familia kg_backlog — que monta um sandbox  |
 
 ## vps-shared-tools-2026-07 — 1 item(ns)
 

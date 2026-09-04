@@ -159,9 +159,10 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 0.5
-    status: open
+    status: superseded
     label: 'PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-verified_at) falhou 1 vez em 4 runs paralelos de 8 workers (HARD 9->9) e nunca em serie? O lint mostrou-se deterministico sob carga (E_BANCADA_FAIXAS_MEDIDA), nao ha timeout no caminho do lint, o sandbox e privado. Suspeitos: leitura do repo vivo pelo lint do sandbox (git sem origin, provenance), parse do contador (sed|tail -1) sob saida truncada. Gatilho: proxima ocorrencia — o caso agora imprime as HARD so-do-mutante na mensagem de falha; dai abre-se a causa. 2a OCORRENCIA 2026-09-03 (gate do adopt, 1/1 run paralelo; serie passa): a mensagem nova mostrou HARD so-no-mutante = [] — o lint do mutante NAO viu no novo. Causa candidata achada no codigo: _fixture_done_nu fazia cat >> no FIM do arquivo, e fios-abertos termina em edges: — o no-fixture caia sob edges, nao sob nodes (o parser tolerava as vezes). Curado: o no entra antes de edges:. Se recorrer com a cura, a causa e outra.'
-    verified_against: 'f-par.log (1 falha), par8.log/par8q.log/f-par2.log (0 falhas), 2026-09-03'
+    verified_at: '2026-09-04'
+    verified_against: 'f-par.log (1 falha), par8.log/par8q.log/f-par2.log (0 falhas), 2026-09-03; SUPERSEDIDO em 2026-09-04 pelo /meta:drive: a pergunta abrangia UMA classe e a medicao a partiu em DUAS (A curada: veredito por _emit|grep -q sob leitor multi-thread; B aberta: o contador de HARD nao sobe no mutante do caso (e), que NAO decide por grep -q). Reproducao pos-cura do (e): 0 falha(s) em 20 tentativas sob 4 concorrentes'
   - id: E_BANCADA_NO_ADOTANTE_MEDIDA_0903
     node_type: evidence
     plane: PROD
@@ -203,6 +204,15 @@ nodes:
     trace: 'docs/evolution/review/fix-bench-emit-pipe-race.md'
     verified_at: '2026-09-04'
     verified_against: 'lint-selftest.sh: 429 here-strings, 0 vereditos em pipe; bench1.log (1035/0/0, 777s)'
+
+  - id: Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.5
+    status: open
+    label: 'PERGUNTA (classe B, estreitada em 2026-09-04 pelo /meta:drive): por que o caso (e) da familia kg_backlog — que monta um sandbox `git archive HEAD`, roda o lint INTEIRO duas vezes (controle e mutante com um no `done` sem verified_at) e exige `h_mut > h_ctrl` — ja falhou 2 vezes em paralelo com o CONTADOR IGUAL (HARD 9->9), e nunca em serie? O que esta pergunta NAO e: a classe A (veredito por `_emit|grep -q`, que devolve falso sob leitor multi-thread) foi medida e curada em 2026-09-04 (here-string em 496 sitios + guarda de reintroducao) — e o (e) NAO decide por grep -q: ele extrai dois contadores com `_emit | sed -n | tail -1`, sem fechador precoce. Duas curas anteriores foram aplicadas e a classe recorreu: (1) a fixture caia sob `edges:` em vez de `nodes:` (curada, e recorreu no gate do adopt); (2) a cura do ESCRITOR (`_emit` imune a EPIPE) nao toca este caminho. Suspeitos vivos: subshell/escopo do contador no dispatcher do lint sob concorrencia; arquivo mutado fora do escopo da varredura no sandbox. GATILHO: proxima ocorrencia — a mensagem de falha JA imprime as HARD so-do-mutante (diff controle x mutante), que e o dado que abre a causa; sem ela, nao ha o que medir. Reproducao deliberada pos-cura: 0 falha(s) em 20 tentativas sob 4 concorrentes (nao reproduziu no volume testado — logo a classe B e RARA, nao inexistente: ela ja apareceu 2x em gate real).'
+    verified_against: 'reproducao 2026-09-04: 20 tentativas do caso (e) sob 4 concorrentes, 0 falha(s); ocorrencias reais: f-par.log (2026-09-03) e gate do /meta:adopt (2026-09-03)'
 
 edges:
   - from: I_JWKS_ATTEMPTED_AT
@@ -250,3 +260,9 @@ edges:
   - from: E_CURA_HERE_STRING_MEDIDA_0904
     to: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
     edge_type: SUPPORTS
+  - from: Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE
+    to: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
+    edge_type: SUPERSEDES
+  - from: E_CURA_HERE_STRING_MEDIDA_0904
+    to: Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE
+    edge_type: CONSTRAINS

@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 123 entradas · **Stale:** 0 · **Compartilháveis:** 111 · **Com significância:** 51
+**Total:** 124 entradas · **Stale:** 0 · **Compartilháveis:** 112 · **Com significância:** 51
 
 Gerado em: 2026-09-04
 
@@ -15,6 +15,7 @@ Gerado em: 2026-09-04
 | 2026-09-04 | error | public 📤 | regra-n-sem-titulo-na-prosa-reincidi-duas-vezes-e-a-cura-e-um-hook-stop | — | 2026-12-03 | static |
 | 2026-09-04 | learning | public 📤 | readme-de-plugin-e-catalogo-gerado-nao-prosa-e-version-duplicada-esconde-update | — | 2026-12-03 | static |
 | 2026-09-04 | decision | public 📤 | oito-plugins-viram-cinco-o-canal-premia-bundle-vertical-e-work-tools-era-saco-de-ferramentas | — | 2026-12-03 | static |
+| 2026-09-04 | error | public 📤 | n-escolhido-por-conveniencia-nao-decide-nada-24-tentativas-para-uma-taxa-de-1-em-100 | — | 2026-12-03 | static |
 | 2026-09-04 | learning | public 📤 | link-vivo-no-core-morto-no-plugin-e-o-marketplace-json-que-envelheceu-calado | — | 2026-12-03 | static |
 | 2026-09-04 | decision | public 📤 | license-por-plugin-o-diretorio-oficial-exige-o-arquivo-nao-so-o-campo | — | 2026-12-03 | static |
 | 2026-09-04 | error | public 📤 | hook-morto-e-silencioso-no-plugin-o-motor-nao-viajou-e-o-exit-0-escondeu | — | 2026-12-03 | static |
