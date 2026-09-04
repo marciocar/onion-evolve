@@ -105,46 +105,9 @@ bash "${GEN}" "${TARGET}" > "${TARGET}/.claude-plugin/marketplace.json.new" 2>/d
   && mv "${TARGET}/.claude-plugin/marketplace.json.new" "${TARGET}/.claude-plugin/marketplace.json" \
   || { echo "ERRO: generate-marketplace falhou." >&2; exit 2; }
 
-# README com instruções de instalação (canal PLUGIN — não adopt).
-cat > "${TARGET}/README.md" <<README
-# ${MKT_NAME} — Marketplace público do Sistema Onion 🧅
-
-Instale o Onion (ou verticais) como **plugin do Claude Code** — capacidade read-only, atualizável
-pelo gerenciador de plugins. **Não** é adoção/vendorização (esse é outro canal, \`/meta:adopt\`).
-
-## Instalar
-
-\`\`\`
-/plugin marketplace add marciocar/${MKT_NAME}
-/plugin install onion@${MKT_NAME}
-\`\`\`
-
-\`onion\` é o núcleo operacional (orquestrador + skills core + runtime + motores KG-SSOT + SDAAL +
-doutrina) — é ele que traz a ENTRADA: \`/onion:warm-up\`, \`/onion:catch-up\`, \`/onion:onion\`. Verticais de
-domínio (engineering, product, compliance, design, docs, testing) e o \`onion-work-tools\` são plugins
-adicionais no mesmo marketplace.
-
-**Instalado ≠ habilitado.** Se \`/onion:warm-up\` ou \`/onion:catch-up\` não aparecerem na sessão:
-\`claude plugin enable onion@${MKT_NAME}\` e reinicie o Claude Code (hooks só carregam em sessão nova).
-
-**Atualizar:** \`claude plugin marketplace update ${MKT_NAME} && claude plugin update onion@${MKT_NAME}\` —
-a versão de cada plugin é derivada do conteúdo (anda quando o conteúdo anda).
-
-## Atualizar
-
-\`\`\`
-/plugin marketplace update ${MKT_NAME}
-\`\`\`
-
-## O que NÃO vem aqui (por desenho — moat)
-
-A meta-fábrica (gerar novos comandos/verticais/adotantes) e os grafos privados do core ficam no
-repositório-fonte. Aqui está a **capacidade operacional**; o seu grafo de conhecimento é **seu**
-(KG-SSOT-First: o plugin traz o motor, você constrói o SSOT).
-
----
-🧅 Gerado do source por \`materialize-marketplace-repo.sh\` (Sistema Onion).
-README
+# README do marketplace (padrão de referência do Claude Code) — GERADO do próprio alvo pelo marketplace-readme.sh
+# (quick start slash+CLI, tabela de plugins com o que cada um traz, manter em dia, requisitos, política de versão, moat).
+bash "${HERE}/marketplace-readme.sh" "${TARGET}" "${MKT_NAME}" >&2 || { echo "ERRO: marketplace-readme.sh falhou" >&2; exit 2; }
 
 echo "Onion: marketplace '${MKT_NAME}' materializado em ${TARGET} (${count} plugins)."
 

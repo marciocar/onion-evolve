@@ -12,7 +12,8 @@
 #
 # Derivação:
 #   - plugins[]  : DERIVADO — varre plugins/*/.claude-plugin/plugin.json (ordem
-#                  ALFABÉTICA determinística), extrai name/version/description/author.
+#                  ALFABÉTICA determinística), extrai name/displayName/description/category/tags/license/homepage/author
+#                  (SEM version por entrada — plugin.json é a autoridade; 2026-09-04, padrão oficial do marketplace).
 #   - top-level  : CURADO — name/owner/metadata preservados verbatim do marketplace.json
 #                  existente (é metadado humano); se ausente, emite default do repo.
 #
@@ -67,15 +68,24 @@ if [ -d "${PLUGINS_DIR}" ]; then
     [ -f "${pj}" ] || continue
     pdir="$(dirname "$(dirname "${pj}")")"; pname="$(basename "${pdir}")"
     name="$(field "${pj}" name)";       [ -n "${name}" ] || name="${pname}"
-    ver="$(field "${pj}" version)";     [ -n "${ver}" ] || ver="0.1.0"
     desc="$(field "${pj}" description)"
     author="$(awk '/"author"/{sub(/.*"name"[[:space:]]*:[[:space:]]*"/,"");sub(/".*/,"");print;exit}' "${pj}")"
+    lic="$(field "${pj}" license)"; home="$(field "${pj}" homepage)"; repo="$(field "${pj}" repository)"
+    # displayName / category (padrão de referência do marketplace do Claude Code: displayName, category, tags, license)
+    case "${name}" in onion) disp="Onion"; cat="core" ;; onion-work-tools) disp="Onion · Work Tools"; cat="tools" ;; *) disp="Onion · $(printf '%s' "${name#onion-}" | sed 's/-/ /g; s/\b\(.\)/\u\1/g')"; cat="vertical" ;; esac
+    tags="$(awk '/"keywords"/{sub(/.*"keywords"[[:space:]]*:[[:space:]]*\[/,"");sub(/\].*/,"");print;exit}' "${pj}" | tr -d ' ')"
     [ "${first}" -eq 1 ] && first=0 || printf ','
     printf '\n    {\n'
     printf '      "name": "%s",\n' "$(json_escape "${name}")"
+    printf '      "displayName": "%s",\n' "$(json_escape "${disp}")"
     printf '      "source": "./plugins/%s",\n' "$(json_escape "${pname}")"
     printf '      "description": "%s",\n' "$(json_escape "${desc}")"
-    printf '      "version": "%s",\n' "$(json_escape "${ver}")"
+    printf '      "category": "%s",\n' "${cat}"
+    [ -n "${tags}" ] && printf '      "tags": [%s],\n' "${tags}"
+    [ -n "${lic}" ] && printf '      "license": "%s",\n' "$(json_escape "${lic}")"
+    [ -n "${home}" ] && printf '      "homepage": "%s",\n' "$(json_escape "${home}")"
+    [ -n "${repo}" ] && printf '      "repository": "%s",\n' "$(json_escape "${repo}")"
+    # SEM "version" na entrada: docs oficiais — plugin.json é a autoridade e uma version duplicada/estagnada ESCONDE updates.
     printf '      "author": { "name": "%s" }\n' "$(json_escape "${author:-${top_owner_name}}")"
     printf '    }'
   done < <(find "${PLUGINS_DIR}" -mindepth 2 -maxdepth 3 -name plugin.json -path '*/.claude-plugin/*' 2>/dev/null | sort)

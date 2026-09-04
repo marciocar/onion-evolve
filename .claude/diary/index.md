@@ -4,14 +4,15 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 114 entradas · **Stale:** 0 · **Compartilháveis:** 102 · **Com significância:** 51
+**Total:** 116 entradas · **Stale:** 0 · **Compartilháveis:** 104 · **Com significância:** 51
 
-Gerado em: 2026-09-03
+Gerado em: 2026-09-04
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-09-04 | learning | public 📤 | readme-de-plugin-e-catalogo-gerado-nao-prosa-e-version-duplicada-esconde-update | — | 2026-12-03 | static |
 | 2026-09-03 | learning | public 📤 | versao-de-plugin-que-nao-anda-e-declaracao-o-updater-so-le-a-string | — | 2026-12-02 | static |
 | 2026-09-03 | learning | public 📤 | regra-n-titulo-o-numero-e-chave-o-titulo-e-significado | — | 2026-12-02 | static |
 | 2026-09-03 | learning | public 📤 | onda-da-lente-de-pesquisa-fechada-dogfood-derrubou-8 | Em 24 h a diretriz de pesquisa que o maestro redigia a cada rodada virou spec carregada + workflow salvo com três modos, e o próprio workflow achou 7 defeitos meus em dogfood — o mecanismo julgou o mecanismo. | 2026-12-02 | static |

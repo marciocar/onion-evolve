@@ -305,5 +305,8 @@ cat > "${DEST}/.claude-plugin/capability.json" <<EOF
 }
 EOF
 
+# README do plugin (padrão de referência de plugins do Claude Code) — gerado do próprio plugin montado.
+bash "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/plugin-readme.sh" "${DEST}" "${ONION_MARKETPLACE_NAME:-onion-plugins}" >&2 || true
+
 echo "Onion: plugin '${PLUGIN_NAME}' montado em ${DEST} (tree_sha=${tree_sha:0:12}; conformance=${CONFORMANCE})." >&2
 exit 0

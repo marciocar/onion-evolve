@@ -31,7 +31,8 @@ reimplementa o que o helper faz. É o par de `onion-wizard` para o movimento "pu
   "A publicação do marketplace é ato da FONTE (o core). Aqui o papel é `<role>`."
 - Diga o que vai acontecer: materializar TODOS os plugins publicáveis (os `verticals/*.manifest.sh`) num
   repo-alvo self-contained, gerar o `marketplace.json` (name `onion-plugins`, sources relative-path) +
-  README, e **parar antes do push**.
+  README do marketplace e um README por plugin — ambos GERADOS (marketplace-readme.sh / plugin-readme.sh, padrão de referência
+  do Claude Code: quick start, catálogo, manter em dia, proveniência) — e **parar antes do push**.
 
 ### 2. Confirmar a fronteira de MOAT (em voz alta)
 Diga o que **NÃO** vai no repo público (por desenho): a meta-fábrica (create-*/adopt/marketplace/
