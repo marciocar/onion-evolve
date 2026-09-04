@@ -1,0 +1,496 @@
+meta:
+  id: plugin-language-policy-2026-09
+  schema_version: "1"
+  baseline: 2026-09-04
+  review_after: 2026-10-04   # cadência FERRAMENTA/PREÇO = 30d. Justificativa do tipo dominante: o objeto
+                             # desta decisão NÃO é doutrina (12m) nem mercado (90d) — é a POLÍTICA VIVA de
+                             # um diretório recém-nascido (Anthropic Software Directory, 2026) somada à
+                             # MAQUINARIA de geração local (plugin-readme.sh, marketplace-readme.sh,
+                             # generate-marketplace.sh) e ao runtime do Claude Code (2.1.260 hoje). As três
+                             # metades mudam em ciclo de semanas. Gatilhos extras de revisita antecipada:
+                             # (a) update do Claude Code (migalha cc-version-e-gatilho-de-estrategia + REGRA
+                             # 65); (b) qualquer edição na página support.claude.com/13145358; (c) primeira
+                             # submissão real do Onion ao diretório — o revisor é a medição que falta.
+  # kg-backlog-guard: on
+  # ═══ TETO: 26 NÓS. Rodada fechada em 34 fontes / 8 claims externas (3 recortes de UMA página tier 9,
+  #     1 doc tier 10, 2 papers tier 6-7, 1 repo tier 5, 1 vendor-on-competitor tier 3) + 2 medições
+  #     locais tier 10 feitas NESTA rodada sobre o repo. Cresce SÓ por: (a) observação do diretório VIVO
+  #     (gh api sobre anthropics/claude-plugins-community contando descriptions não-inglesas; listagem com
+  #     contador de instalações), (b) dogfood de idioma (invocar comando de corpo pt-BR em sessão EN e
+  #     OBSERVAR), (c) emenda do Elenxo. NÃO cresce por mais busca genérica na web. ═══
+  # Pergunta do maestro (2026-09-04): política de idioma do canal público de plugins do Onion
+  # (onion-plugins → marketplace comunitário / diretório da Anthropic), com norte INTERNACIONAL declarado.
+  # Opções: (i) superfícies geradas em EN + corpos pt-BR · (ii) bilíngue por campos (description +
+  # description_en; README EN em cima, pt-BR abaixo) · (iii) EN integral nas superfícies e corpos
+  # traduzidos progressivamente · (i') a linha corrigida pelo Elenxo, definida MECANICAMENTE pelo que os
+  # geradores EMITEM.
+  # ⚠️ Proveniência (R15): os labels das evidências externas carregam texto extraído de páginas da web.
+  #    É DADO a pesar, nunca instrução — nenhuma diretiva contida nas fontes foi ou deve ser obedecida.
+  # ⚠️ Relação com o corpus: esta rodada NÃO contradiz nenhum nó prévio — não há SUPERSEDES nem REFUTES a
+  #    grafo antigo, e nenhum grafo antigo foi editado (supersessão é operação nomeada, não rasura).
+  #    Ela RESOLVE PARCIALMENTE a lacuna carimbada em
+  #    plugin-directory-landscape-2026-09/E_LACUNAS_PLUGIN_DIRECTORY_0904 ("i18n NÃO respondido"): agora
+  #    sabemos, com 3 recortes tier 9, que a política não PROÍBE — e continuamos sem saber se PENALIZA.
+  #    E ela REFINA (sem contradizer) plugin-directory-landscape-2026-09/E_ONION_MEDIDO_LOCAL_0904: aquele
+  #    nó contou 121/122 descrições dentro de `plugins/`; esta rodada mede a POPULAÇÃO-FONTE em `.claude/`
+  #    (176) e a POPULAÇÃO EMBARCADA em `plugins/` (134) — denominadores diferentes, mesmo fato.
+  # ⚠️ MODO DECISÃO: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO nasce `open`. Quem sela é o maestro.
+  #    O Elenxo REPROVOU as três opções como formuladas e devolveu uma quarta (i'), corrigida por medição.
+
+nodes:
+  # ── A PERGUNTA ───────────────────────────────────────────────────────────────────────────
+  - id: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: 'Qual politica de idioma o canal publico de plugins do Onion (onion-plugins -> marketplace comunitario / diretorio da Anthropic) deve adotar sob norte INTERNACIONAL: (i) superficies geradas em EN com corpos em pt-BR, (ii) bilingue por campos, (iii) EN integral com corpos traduzidos progressivamente, ou (i-linha) a fronteira corrigida pelo que os geradores EMITEM? Segue `open`: a rodada estabeleceu que NADA e proibido, e NAO estabeleceu que nada e penalizado — a observacao do diretorio vivo e o dogfood de idioma nao foram feitos.'
+    trace: 'docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml'
+
+  # ── EVIDÊNCIAS CONFIRMADAS DA RODADA ─────────────────────────────────────────────────────
+  - id: E_POLITICA_SEM_REQUISITO_DE_IDIOMA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026'
+    source_tier: 9
+    source_kind: primary
+    label: 'CONFIRMADA (tier 9, 3-0): "A Anthropic Software Directory Policy exige que a descricao do plugin corresponda precisamente a funcionalidade real, mas nao declara nenhum requisito de idioma ou campo de locale para as superficies do plugin (description, README, plugin.json)." Sustenta EXATAMENTE uma proposicao — nada e PROIBIDO. Nao sustenta que nada e PENALIZADO (ver E_OBJECAO_SILENCIO_CORTA_PARA_OS_DOIS_LADOS).'
+    trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+
+  - id: E_POLITICA_PRIVACIDADE_E_DOC_SEM_LOCALE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 3-0'
+    valid_from: '2026'
+    source_tier: 9
+    source_kind: primary
+    label: 'CONFIRMADA (tier 9, 3-0): "A politica exige politica de privacidade acessivel explicando coleta/uso/retencao de dados, documentacao de como o software funciona, proposito pretendido e troubleshooting, mas nao menciona idioma nem campo de locale em plugin.json ou SKILL.md." O ponto operacional: "documentacao de como o software funciona + troubleshooting" e justamente a superficie que o Onion GERA — logo o requisito TOCA o item em disputa, e a rodada nao perguntou em que idioma o revisor a le.'
+    trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+
+  - id: E_POLITICA_TRES_EXEMPLOS_SEM_IDIOMA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 3-0'
+    source_tier: 9
+    source_kind: primary
+    label: 'CONFIRMADA (tier 9, 3-0): "A politica exige ao menos tres exemplos de prompt funcionais para o plugin, sem especificar o idioma desses exemplos." Os exemplos de prompt sao a UNICA superficie que alguem COPIA E EXECUTA — inclusive o revisor que testa se a descricao corresponde precisamente a funcionalidade.'
+    trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+
+  - id: E_TRADUCAO_MANUAL_PARA_MEDIANA_ZERO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-09-04
+    verified_against: 'https://arxiv.org/html/2508.02497v1 — verificacao adversarial 3-0'
+    valid_from: 2025-08
+    source_tier: 6
+    source_kind: paper
+    label: 'CONFIRMADA (tier 6, 3-0): "Traducoes mescladas em repositorios grandes nao recebem atualizacoes continuas: a versao traduzida teve mediana de 0 commits em 6 meses, enquanto a versao em ingles teve mediana de 8,5 commits no mesmo periodo." E a evidencia mais forte contra bilinguismo MANTIDO A MAO. Transferencia LIMITADA: o paper mede traducao manual, e a metade GERADA do onion-plugins e travada byte-a-byte pela REGRA 19 [HARD] (lint-artifacts.sh:1161) — la o modo de falha medido e mecanicamente impossivel.'
+    trace: 'https://arxiv.org/html/2508.02497v1'
+
+  - id: E_MIRROR_COMUNITARIO_SEM_POLITICA_DE_IDIOMA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-09-04
+    verified_against: 'https://github.com/anthropics/claude-plugins-community — verificacao adversarial 3-0'
+    valid_from: 2026-09
+    source_tier: 5
+    source_kind: aggregator
+    label: 'CONFIRMADA (tier 5, 3-0): "O repositorio oficial (mirror) de submissao de plugins da comunidade Anthropic nao declara politica de idioma nem campo de locale nos requisitos de submissao." O que foi lido foi o README do mirror; o portao real (template de PR, bot de revisao, listagem viva com contador de instalacoes) NAO foi inspecionado. Confianca travada em 0.6: agregador, e ausencia-de-linha sem exemplo observado nao decide nada.'
+    trace: 'https://github.com/anthropics/claude-plugins-community'
+
+  - id: E_ANTHROPIC_RECOMENDA_IDIOMA_EXPLICITO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-04
+    verified_against: 'https://docs.claude.com/en/docs/build-with-claude/multilingual-support — verificacao adversarial 3-0'
+    valid_from: '2026'
+    source_tier: 10
+    source_kind: primary
+    label: 'CONFIRMADA (tier 10, 3-0): "Quando a aplicacao permite ao usuario escolher idioma em tempo real, a recomendacao da Anthropic e interpolar essa escolha no system prompt em vez de depender da inferencia automatica do Claude a partir da mensagem do usuario." Este e o unico achado tier 10 de RUNTIME da rodada e ele DERRUBA a premissa confortavel de (i) e (iii) — se o modo confiavel e instrucao explicita, nenhuma opcao esta completa enquanto nao disser ONDE mora a instrucao de idioma num plugin distribuido.'
+    trace: 'https://docs.claude.com/en/docs/build-with-claude/multilingual-support'
+
+  - id: E_JETBRAINS_DECLARADO_IRRELEVANTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: 2026-09-04
+    verified_against: 'https://plugins.jetbrains.com/docs/intellij/providing-translations.html — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)'
+    source_tier: 3
+    source_kind: vendor-on-competitor
+    label: 'CONFIRMADA COM RESSALVA (tier 3, 2-1 — maioria apertada): "O documento oficial do JetBrains Plugin SDK sobre traducao nao aborda politica de idioma para descricoes/metadados de marketplace, nao compara plugins nao-anglofonos e nao trata do comportamento de resposta de LLMs por idioma." Achado NEGATIVO. Confianca travada em 0.5 pela clausula 7 (tier <= 3 nunca acima de 0.7) e pelo voto dissidente — que o Elenxo reabriu em E_OBJECAO_JETBRAINS_TEM_LOCALE_EXPLICITO.'
+    trace: 'https://plugins.jetbrains.com/docs/intellij/providing-translations.html'
+
+  # ── MEDIÇÃO LOCAL DESTA RODADA (dogfood tier 10 no proprio repo) ─────────────────────────
+  - id: E_MEDIDO_LOCAL_SUPERFICIE_GERADA_VEM_DO_CORPO_0904
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.98
+    verified_at: 2026-09-04
+    verified_against: 'medicao no repo em 2026-09-04 (Claude Code 2.1.260): `ls plugins/` = 8; as 8 `description` de plugins/*/.claude-plugin/plugin.json estao em pt-BR e sao ESCRITAS A MAO; `generate-marketplace.sh` so as COPIA (`desc="$(field "${pj}" description)"`); `plugin-readme.sh` tem 24 blocos `out.append` de prosa pt-BR hardcoded e monta as tabelas "O que faz" / "Especialidade" / "Quando ativa" a partir do `description:` de frontmatter; populacao-fonte em .claude/ = 112 comandos + 51 agentes + 13 skills = 176 descricoes e 29 `argument-hint`; populacao EMBARCADA em plugins/ = 76 + 46 + 12 = 134 descricoes e 13 `argument-hint`'
+    valid_from: 2026-09-04
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'MEDIDO NO ARTEFATO (behavior-over-declaration): a premissa comum as tres opcoes da pergunta — "superficie e gerada, corpo e escrito" — e FALSA neste repo. (a) As 8 descriptions de plugin.json sao MANUAIS: o gerador do marketplace apenas as copia, entao "superficie gerada em EN" nao chega nelas de graca. (b) O CORPO ALIMENTA A SUPERFICIE: os READMEs gerados imprimem tabelas cujo texto sai do `description:` de frontmatter de 134 artefatos embarcados (176 na fonte) mais os argument-hint em prosa; traduzir a superficie SEM tocar os corpos e impossivel por construcao. (c) O proprio gerador carrega 24 blocos de prosa pt-BR. Conclusao: a fronteira idioma-superficie / idioma-corpo NAO coincide com a fronteira gerado / escrito, e so uma definicao MECANICA (o que o gerador EMITE) e implementavel.'
+    trace: '.claude/utils/marketplace/plugin-readme.sh; .claude/utils/marketplace/generate-marketplace.sh; plugins/*/.claude-plugin/plugin.json'
+
+  - id: E_MEDIDO_LOCAL_ZERO_EXEMPLOS_DE_PROMPT_0904
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.98
+    verified_at: 2026-09-04
+    verified_against: 'medicao no repo em 2026-09-04: `grep -rc "Exemplo" plugins/*/README.md` devolve 0 nos 8 READMEs; os headings gerados sao Instalar / O que traz / Comandos / Agentes / Skills / Hooks / Requisitos / Proveniencia / Comandos do core citados / Licenca — nenhuma secao de exemplos de prompt'
+    valid_from: 2026-09-04
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'MEDIDO NO ARTEFATO: os 8 READMEs de plugin gerados hoje tem ZERO exemplos de prompt. A politica do diretorio EXIGE >= 3 (E_POLITICA_TRES_EXEMPLOS_SEM_IDIOMA). Ou seja: o artefato que a politica cobra em idioma nao-especificado NAO EXISTE ainda, e nenhuma das tres opcoes da pergunta o menciona. A decisao de idioma dos exemplos precisa ser tomada JUNTO com a decisao de CRIA-LOS — e como sao copiados-e-executados, sao a superficie onde o idioma tem consequencia operacional, nao estetica.'
+    trace: 'plugins/*/README.md; .claude/utils/marketplace/plugin-readme.sh'
+
+  # ── EIXO MERCADO/CAPITAL (invariante — clausula 4) ───────────────────────────────────────
+  - id: E_MERCADO_SEM_SINAL_DE_CAPITAL_EM_I18N_DE_CATALOGO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: 2026-09-04
+    verified_against: 'varredura de mercado/capital da propria rodada (34 fontes): zero rodadas, zero M&A, zero nota de analista sobre marketplaces de plugins de agente ou i18n de catalogo'
+    source_tier: 5
+    source_kind: synthesis
+    label: 'MERCADO/CAPITAL — SEM SINAL ENCONTRADO para capital: nenhuma rodada, M&A ou nota de analista sobre marketplaces de plugins de agente / i18n de catalogo nesta rodada. O que existe e sinal de DEMANDA E DISTRIBUICAO, e ele e negativo para a tese de que traducao compra posicao: (a) o mirror oficial da comunidade e o canal de submissao e NAO cobra idioma — o gargalo competitivo do canal nao e traducao; (b) do corpus R1, a curadoria e de DUAS camadas (revisao automatica a cada push + selo Anthropic Verified opcional), e os top-2 instalados passam de 1M de instalacoes com bundle vertical coeso, nao com catalogo poliglota. Leitura honesta: o dinheiro nao esta premiando i18n de catalogo hoje, e tambem nao ha evidencia de que o penalize. Ausencia de sinal de capital nao e argumento a favor de nenhuma das opcoes — e razao para nao gastar orcamento de engenharia comprando um beneficio que ninguem mediu.'
+    trace: 'docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml'
+
+  # ── LACUNAS DE 1a CLASSE (regua de saida, item 2) ────────────────────────────────────────
+  - id: E_LACUNAS_DECLARADAS_PLUGIN_LANGUAGE_0904
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'contabilidade da propria rodada: 34 fontes varridas, 8 claims externas confirmadas (1 delas 2-1), 18 claims refutadas por fonte fraca ou descartadas, 0 claims nao-verificadas por 403/truncagem, 2 medicoes locais tier 10 acrescentadas nesta rodada'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'NAO-VERIFICADOS DE 1a CLASSE (custo: 34 fontes, 8 claims externas). (a) CONCENTRACAO DE FONTE: 3 das 8 claims confirmadas sao TRES RECORTES DA MESMA PAGINA (support.claude.com/13145358). A base real e 1 pagina tier 9 + 1 doc tier 10 + 2 papers tier 6-7 + 1 repo tier 5 + 1 vendor-on-competitor tier 3 — contar 3-0 em cada recorte INFLACIONA a confianca. (b) NAO MEDIDO, e era 1 comando: quantos plugin.json do mirror oficial tem description nao-inglesa (`gh api` sobre anthropics/claude-plugins-community); a propria rodada registra que "o fetch nao encontrou exemplos de plugins nao-anglofonos". (c) NAO MEDIDO: o dogfood de idioma — invocar um comando de corpo pt-BR numa sessao em ingles e OBSERVAR idioma da resposta e ativacao da skill. (d) CORTADO POR ORCAMENTO: o eixo JetBrains, cujo material decisivo (language packs com `locale="zh-CN"` no plugin.xml e bundled translations por /localization/$LANGUAGE_CODE$/) e o precedente mais proximo da opcao (ii) e ficou fora. (e) REFUTADAS POR FONTE FRACA que o Elenxo aceitou como descarte: as leituras de padrao em repos tier 4 (daymade/claude-code-skills, xiaomoBoy/claude-writing-skills) — amostra de conveniencia, sem denominador. (f) REFUTADAS QUE O ELENXO REABRIU: 2, cada uma virou no E_OBJECAO_* com aresta CONSTRAINS. O gargalo desta rodada foi OBSERVACAO DO VIVO, nao teto de execucao.'
+    trace: 'docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml'
+
+  # ── AS OPÇÕES (uma claim por opção, todas open) ──────────────────────────────────────────
+  - id: C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.45
+    label: 'OPCAO (i) — superficies GERADAS em ingles (description do plugin.json, README do plugin e do marketplace, argument-hint, marketplace.json) com corpos dos comandos/agentes/skills em pt-BR. A favor: e a leitura mais proxima da regra da casa (prosa pt-BR / codigo EN) empurrada um degrau — trata a vitrine como interface de maquina e o corpo como prosa; e a superficie e pequena (8 descriptions + 9 READMEs). Contra, MEDIDO: a lista de superficies da opcao esta errada por construcao — as 8 descriptions sao MANUAIS (o gerador so copia) e os READMEs "gerados" imprimem 134 descricoes de frontmatter dos CORPOS, entao "superficie EN, corpo pt-BR" e inexecutavel sem tocar os corpos (E_MEDIDO_LOCAL_SUPERFICIE_GERADA_VEM_DO_CORPO_0904). Contra tambem: assume que o corpo pt-BR nao trava o idioma da resposta — premissa nao verificada, e a Anthropic recomenda o oposto (instrucao explicita). Restringida por E_OBJECAO_SILENCIO_CORTA_PARA_OS_DOIS_LADOS, E_OBJECAO_IDIOMA_EXIGE_INSTRUCAO_EXPLICITA, E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS, E_OBJECAO_DOGFOOD_DE_IDIOMA_NAO_FOI_FEITO e E_OBJECAO_PENALIDADE_DE_DESCOBERTA_DESCARTADA.'
+    trace: 'docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml'
+
+  - id: C_OPCAO_II_BILINGUE_POR_CAMPOS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: 'OPCAO (ii) — bilingue por campos: `description` + `description_en` no plugin.json, README com EN em cima e pt-BR abaixo, ambos consumidos pelos geradores. A favor: e o unico desenho que nao PERDE nada — o adotante lusofono continua lendo em pt-BR e o revisor internacional le em EN; e tem precedente vivo no repo (site/src/pages/en/ mantem gemeas traduzidas a mao de 2 paginas-chave, com mecanismo compartilhado). E tem precedente de plataforma que a rodada CORTOU POR ORCAMENTO: o JetBrains SDK expoe locale explicito no manifesto. Contra, e forte: a metade MANUAL (8 descriptions + 134 frontmatter) e exatamente o regime que o paper mede parar — mediana 0 commits em 6 meses contra 8,5. Contra tambem: `description_en` e campo INVENTADO — nenhum consumidor da Anthropic o le, entao ele custa manutencao e nao compra descoberta. Restringida por E_OBJECAO_SILENCIO_CORTA_PARA_OS_DOIS_LADOS, E_OBJECAO_PAPER_SO_TRANSFERE_PARA_A_PARTE_MANUAL, E_OBJECAO_JETBRAINS_TEM_LOCALE_EXPLICITO, E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS e E_OBJECAO_PENALIDADE_DE_DESCOBERTA_DESCARTADA.'
+    trace: 'docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml'
+
+  - id: C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.25
+    label: 'OPCAO (iii) — ingles integral nas superficies e corpos traduzidos progressivamente. A favor: e a unica que casa 100% com o norte internacional declarado pelo maestro, elimina a fronteira ambigua de vez, e responde a unica evidencia quantitativa de descoberta que a rodada tinha (repos dominados por ingles com mediana de estrelas muito maior). Contra: "progressivamente" e a palavra que o paper mata — traducao mantida a mao para. Contra, e mais grave para a casa: viola frontalmente a regra de linguagem do Onion (prosa pt-BR) na maior massa do repo, e a decisao de 2026-05-18 diz que o fosso do Onion esta justamente nos 52.655 linhas de markdown que ACONSELHAM; traduzir isso e reescrever o fosso, nao publica-lo. Restringida por E_OBJECAO_PAPER_SO_TRANSFERE_PARA_A_PARTE_MANUAL, E_OBJECAO_IDIOMA_EXIGE_INSTRUCAO_EXPLICITA e E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS.'
+    trace: 'docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml'
+
+  - id: C_OPCAO_I_LINHA_SUPERFICIE_EMITIDA_DEFINIDA_MECANICAMENTE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.65
+    label: 'OPCAO (i-linha) CORRIGIDA PELO ELENXO — ingles em TODA superficie que os geradores EMITEM, com a fronteira definida MECANICAMENTE (nao por intuicao "vitrine vs corpo"): (a) as 8 `description` de plugin.json, o `marketplace.json`, os 24 blocos de prosa do plugin-readme.sh, os blocos do marketplace-readme.sh, os `argument-hint` e o `description:` de frontmatter dos 134 artefatos EMBARCADOS — porque TODOS eles saem impressos no README publico; (b) pt-BR sobrevive intacto ABAIXO do frontmatter, no corpo instrucional que so o Claude le; (c) o leitor lusofono nao e abandonado: um README pt-BR SEPARADO, tambem GERADO pelo mesmo gerador a partir do mesmo dado, entra sob a catraca da REGRA 19 [HARD] e portanto NAO pode divergir — a duplicacao vira MECANISMO, nao disciplina, e o modo de falha do paper (traducao que para) fica mecanicamente barrado. A favor: e a unica opcao implementavel como esta, porque e a unica cuja fronteira coincide com o que o codigo faz. Contra, declarado: exige reescrever 134 `description:` de frontmatter (obra real, nao ajuste), e nao resolve sozinha o idioma dos >= 3 exemplos de prompt que ainda nao existem, nem onde vive a instrucao explicita de idioma. Restringida por E_OBJECAO_IDIOMA_EXIGE_INSTRUCAO_EXPLICITA, E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS e E_OBJECAO_DOGFOOD_DE_IDIOMA_NAO_FOI_FEITO.'
+    trace: 'docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml'
+
+  # ── A DECISÃO (open — quem sela é o maestro) ─────────────────────────────────────────────
+  - id: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.65
+    label: 'DECISAO ABERTA (o maestro sela): qual politica de idioma adotar no canal publico de plugins do Onion, entre (i) superficies geradas em EN + corpos pt-BR, (ii) bilingue por campos (description + description_en; README EN em cima, pt-BR abaixo), (iii) EN integral nas superficies e corpos traduzidos progressivamente, e (i-linha) EN em toda superficie que os geradores EMITEM, definida mecanicamente, com pt-BR abaixo do frontmatter e um README pt-BR separado tambem gerado. RECOMENDACAO DO ELENXO: **REPROVO (i), (ii) e (iii) COMO FORMULADAS e recomendo (i-linha)** — a re-especificacao E a decisao. Tres razoes, cada uma com objecao sobrevivente por tras. (1) A PREMISSA COMUM AS TRES E FALSA, e isso foi MEDIDO agora, nao inferido: "superficie e gerada, corpo e escrito" nao descreve este repo — as 8 descriptions de plugin.json sao escritas A MAO (generate-marketplace.sh so copia) e os READMEs gerados imprimem tabelas montadas a partir do `description:` de frontmatter de 134 artefatos embarcados (176 na fonte) mais os argument-hint; o gerador ainda carrega 24 blocos de prosa pt-BR. Logo a fronteira so e implementavel se for definida pelo que o GERADOR EMITE. (2) A METADE PERMISSIVA DA DECISAO E DECLARADA, NAO VERIFICADA: os tres achados que "liberam" pt-BR sao TRES RECORTES DA MESMA PAGINA, e silencio de politica corta para os dois lados — a mesma ausencia que nao PROIBE tambem nao prova que nao PENALIZA sob revisao automatica a cada push + selo Verified. Alem disso o unico achado tier 10 de runtime diz que o modo confiavel de fixar idioma e INSTRUCAO EXPLICITA, o que derruba o conforto de (i) e (iii) de que "o corpo nao importa". (3) O ARTEFATO QUE A POLITICA EXIGE NAO EXISTE: medi hoje `grep -rc "Exemplo" plugins/*/README.md` = 0 nos oito READMEs, contra o requisito de >= 3 exemplos de prompt. Nenhuma das opcoes nomeadas menciona os exemplos, e eles sao a UNICA superficie copiada-e-executada — inclusive pelo revisor que testa se a descricao corresponde a funcionalidade. FORMA CONCRETA RECOMENDADA: (a) adotar (i-linha) e travar a fronteira no proprio gerador, nao em prosa; (b) gerar os >= 3 exemplos de prompt POR PLUGIN em ingles, no mesmo gerador, sob a catraca da REGRA 19; (c) gerar o README pt-BR como arquivo irmao, tambem sob catraca, para que "bilingue" nunca seja disciplina; (d) declarar explicitamente no corpo dos comandos a instrucao de idioma de saida, em vez de confiar na inferencia. PRE-REQUISITOS DECLARADOS, HOJE ABERTOS (por isso esta decisao nasce com dependencia, nao com data): (I) observar o diretorio VIVO — contar por `gh api` quantos plugin.json do mirror tem description nao-inglesa; era um comando e nao foi rodado; (II) o dogfood de idioma — invocar um comando de corpo pt-BR em sessao EN e OBSERVAR. Enquanto (I) e (II) nao rodarem, QUALQUER selo aqui e decisao por ausencia de dado.'
+    trace: 'docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml · projeção: docs/evolution/research/plugin-language-policy-2026-09/SYNTHESIS.md'
+
+  # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ───────────────────
+  - id: E_OBJECAO_SILENCIO_CORTA_PARA_OS_DOIS_LADOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'a propria E_POLITICA_SEM_REQUISITO_DE_IDIOMA (tier 9) lida com rigor logico, cruzada com plugin-directory-landscape-2026-09/E_CURADORIA_DUAS_CAMADAS (revisao automatica a cada push + selo Anthropic Verified) e com E_LACUNAS_PLUGIN_DIRECTORY_0904 ("i18n NAO respondido")'
+    source_tier: 9
+    source_kind: primary
+    label: 'OBJECAO SOBREVIVENTE (achado 1) — inferencia do silencio corta para os DOIS lados. A mesma ausencia que "libera" pt-BR nao autoriza concluir neutralidade na PRATICA: a curadoria e de duas camadas (revisao automatica a cada push + selo Verified), e o corpus ja carimbou que i18n NAO foi respondido. Este achado sustenta exatamente "nada e PROIBIDO"; nunca "nada e PENALIZADO". Usa-lo como base de escolha e decidir por ausencia de dado — e nenhuma observacao do diretorio VIVO foi feita nesta rodada.'
+    trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+
+  - id: E_OBJECAO_TRES_ACHADOS_SAO_UMA_SO_PAGINA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'contagem de URLs distintas entre as claims confirmadas: achados 1, 2 e 7 apontam todos para https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OBJECAO SOBREVIVENTE (achado 2) — inflacao de confianca por recorte. Tres dos sete achados confirmados sao a MESMA pagina; a base real da rodada e 1 fonte tier 9 + 1 doc tier 10 + 2 papers + 1 repo tier 5 + 1 vendor-on-competitor tier 3. Contar 3-0 em cada recorte multiplica a aparencia de consenso sem multiplicar a evidencia. Alem disso o requisito "documentacao de como o software funciona + troubleshooting" TOCA o item em disputa (e a superficie que o Onion gera) e a rodada nao perguntou em que idioma o revisor a le.'
+    trace: 'docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml'
+
+  - id: E_OBJECAO_PAPER_SO_TRANSFERE_PARA_A_PARTE_MANUAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'https://arxiv.org/html/2508.02497v1 (regime medido: traducao MANTIDA A MAO) cruzado com a medicao local — READMEs de plugin e do marketplace sao GERADOS por .claude/utils/marketplace/plugin-readme.sh e marketplace-readme.sh e travados byte-a-byte pela REGRA 19 [HARD] em .claude/validation/lint-artifacts.sh:1161'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OBJECAO SOBREVIVENTE (achado 3) — o paper mata a parte MANUAL, nao o bilinguismo inteiro. Na metade GERADA e travada por catraca [HARD], o modo de falha medido (traducao que para de receber commits) e mecanicamente impossivel. O achado transfere, e transfere com forca, para o que e ESCRITO A MAO: as 8 descriptions de plugin.json, os 29 argument-hint da fonte (13 embarcados) e as 176 descriptions de frontmatter (134 embarcadas). Usa-lo para matar (ii) INTEIRO e sobre-generalizacao; usa-lo para matar a metade manual de (ii) e legitimo — e e exatamente por isso que a saida recomendada e GERAR o segundo idioma, nao mante-lo.'
+    trace: 'https://arxiv.org/html/2508.02497v1'
+
+  - id: E_OBJECAO_MIRROR_NAO_FOI_MEDIDO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-09-04
+    verified_against: 'https://github.com/anthropics/claude-plugins-community — o que foi lido foi o README do mirror; o template de PR, o bot de revisao e a listagem viva com contador de instalacoes nao foram inspecionados, e a propria rodada registra em "descartados" que o fetch nao encontrou exemplos de plugins nao-anglofonos'
+    source_tier: 5
+    source_kind: aggregator
+    label: 'OBJECAO SOBREVIVENTE (achado 4) — ausencia de linha de politica SOMADA a ausencia de exemplo observado e ZERO evidencia em qualquer direcao. O portao real nao foi inspecionado. E era medivel em um comando (`gh api` sobre o repo do mirror, contando quantos plugin.json tem description nao-inglesa) e nao foi medido. Enquanto isso nao rodar, tanto "pt-BR passa" quanto "pt-BR nao passa" sao especulacao.'
+    trace: 'https://github.com/anthropics/claude-plugins-community'
+
+  - id: E_OBJECAO_JETBRAINS_TEM_LOCALE_EXPLICITO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-09-04
+    verified_against: 'material do JetBrains SDK citado pelo Elenxo e cortado por orcamento na rodada: language packs com atributo de locale explicito (locale="zh-CN" no plugin.xml) e bundled translations por diretorio (/localization/$LANGUAGE_CODE$/) — nao re-buscado nesta rodada, por isso confianca 0.6'
+    source_tier: 3
+    source_kind: vendor-on-competitor
+    label: 'OBJECAO SOBREVIVENTE (achado 5) — o eixo declarado irrelevante e o precedente mais proximo da opcao (ii). O achado 5 e NEGATIVO, passou por maioria apertada (2-1), e o material que o refuta foi cortado por ORCAMENTO: o JetBrains SDK tem exatamente o "campo de locale em manifesto" que a pergunta procura. Declarar irrelevante o eixo cujas evidencias decisivas ficaram fora do orcamento e fechar a pergunta pelo lado do CUSTO, nao da evidencia. Ressalva propria: tier 3 vendor-on-competitor, e o Claude Code nao le plugin.xml — o precedente ensina DESENHO (locale explicito, bundles separados por idioma), nao autoriza copiar o campo.'
+    trace: 'https://plugins.jetbrains.com/docs/intellij/providing-translations.html'
+
+  - id: E_OBJECAO_IDIOMA_EXIGE_INSTRUCAO_EXPLICITA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-04
+    verified_against: 'https://docs.claude.com/en/docs/build-with-claude/multilingual-support (tier 10, 3-0) somado ao tier 6 descartado de que prompt em ingles produz resposta ~52% mais longa (https://arxiv.org/html/2608.26186)'
+    source_tier: 10
+    source_kind: primary
+    label: 'OBJECAO SOBREVIVENTE (achado 6) — nenhuma das opcoes diz ONDE mora a instrucao de idioma. Se o modo confiavel e interpolar a escolha no system prompt em vez de confiar na inferencia, entao (i), (ii), (iii) e (i-linha) estao todas incompletas: nenhuma nomeia se a instrucao vive no system prompt do usuario, no corpo do comando ou num campo do plugin.json que ninguem consome. Agrava: o idioma do PROMPT mexe em caracteristica de saida (resposta ~52% mais longa em ingles, tier 6), logo o idioma do corpo nao e neutro — e ninguem mediu isso invocando um comando do Onion.'
+    trace: 'https://docs.claude.com/en/docs/build-with-claude/multilingual-support'
+
+  - id: E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-04
+    verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy (>= 3 exemplos de prompt exigidos) cruzado com a medicao local de 2026-09-04: `grep -rc "Exemplo" plugins/*/README.md` = 0 nos oito READMEs; nenhum heading de exemplos entre os 10 gerados'
+    valid_from: 2026-09-04
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OBJECAO SOBREVIVENTE (achado 7) — as opcoes estao subespecificadas exatamente no artefato que a politica EXIGE. Os exemplos de prompt sao a UNICA superficie copiada-e-executada, inclusive pelo revisor que testa se a descricao corresponde precisamente a funcionalidade; e o silencio da politica sobre idioma tem, ai, consequencia operacional e nao estetica. Nenhuma das opcoes nomeadas os menciona: (i) fala de description/README/argument-hint/marketplace.json, (ii) de campos, (iii) de superficies e corpos. Agravante medido hoje: eles nao existem — zero nos oito READMEs — logo a decisao de idioma tem de ser tomada JUNTO com a decisao de cria-los, e isso e trabalho, nao ajuste de politica.'
+    trace: 'plugins/*/README.md; https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+
+  - id: E_OBJECAO_DOGFOOD_DE_IDIOMA_NAO_FOI_FEITO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'https://docs.claude.com/en/docs/build-with-claude/multilingual-support (tier 10) — claim descartada pela rodada apesar de responder LITERALMENTE a uma das perguntas do escopo; nenhuma invocacao de comando de corpo pt-BR em sessao EN foi executada nesta rodada'
+    source_tier: 10
+    source_kind: primary
+    label: 'OBJECAO SOBREVIVENTE (descarte por comodismo) — a claim tier 10 "Claude infere o idioma da conversa, nao do corpo; travar exige instrucao explicita" responde LITERALMENTE a uma das perguntas do escopo e foi DESCARTADA, enquanto o achado 6 — que diz o mesmo pelo outro lado — foi mantido. Faltou o dogfood que a casa exige (doutrina de dogfooding: invoque o artefato e observe): rodar um comando de corpo pt-BR numa sessao em ingles e OBSERVAR idioma da resposta e ativacao da skill. Sem isso, a metade permissiva da decisao — "corpo pt-BR nao trava nada" — fica DECLARADA e nao verificada, que e o defeito-raiz que o repo mais persegue.'
+    trace: 'https://docs.claude.com/en/docs/build-with-claude/multilingual-support'
+
+  - id: E_OBJECAO_PENALIDADE_DE_DESCOBERTA_DESCARTADA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-09-04
+    verified_against: 'https://arxiv.org/html/2602.19446 (tier 7) — claim descartada pela rodada sem contra-evidencia nomeada: repos dominados por ingles com mediana de 36 estrelas contra 12 (mistos) e 2 (nao-ingles)'
+    source_tier: 7
+    source_kind: paper
+    label: 'OBJECAO SOBREVIVENTE (descarte por comodismo) — a UNICA evidencia quantitativa a favor do norte internacional sumiu sem contra-evidencia escrita. Se a objecao era "correlacao, nao causa", ela precisava estar no grafo. Ressalva propria, e ela e seria: o venue real NAO e o GitHub por estrelas — e um diretorio CURADO com contador de instalacoes, onde o mecanismo de descoberta e outro. Ou seja, a claim nao pode ser usada como prova da penalidade no diretorio; ela pode e deve ser usada como RAZAO PARA MEDIR o diretorio vivo antes de selar. E a mesma medicao que E_OBJECAO_MIRROR_NAO_FOI_MEDIDO pede.'
+    trace: 'https://arxiv.org/html/2602.19446'
+
+edges:
+  # ── evidências sustentam a pergunta (11) ──
+  - from: E_POLITICA_SEM_REQUISITO_DE_IDIOMA
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: E_POLITICA_PRIVACIDADE_E_DOC_SEM_LOCALE
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: E_POLITICA_TRES_EXEMPLOS_SEM_IDIOMA
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: E_TRADUCAO_MANUAL_PARA_MEDIANA_ZERO
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: E_MIRROR_COMUNITARIO_SEM_POLITICA_DE_IDIOMA
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: E_ANTHROPIC_RECOMENDA_IDIOMA_EXPLICITO
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: E_JETBRAINS_DECLARADO_IRRELEVANTE
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_LOCAL_SUPERFICIE_GERADA_VEM_DO_CORPO_0904
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_LOCAL_ZERO_EXEMPLOS_DE_PROMPT_0904
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: E_MERCADO_SEM_SINAL_DE_CAPITAL_EM_I18N_DE_CATALOGO
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_DECLARADAS_PLUGIN_LANGUAGE_0904
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+
+  # ── as opções sustentam a decisão (4) + a decisão responde a pergunta (1) ──
+  - from: C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_II_BILINGUE_POR_CAMPOS
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_I_LINHA_SUPERFICIE_EMITIDA_DEFINIDA_MECANICAMENTE
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+  - from: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    to: Q_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
+
+  # ── dissent que LIMITA = CONSTRAINS (24 arestas) ──
+  - from: E_OBJECAO_SILENCIO_CORTA_PARA_OS_DOIS_LADOS
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SILENCIO_CORTA_PARA_OS_DOIS_LADOS
+    to: C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SILENCIO_CORTA_PARA_OS_DOIS_LADOS
+    to: C_OPCAO_II_BILINGUE_POR_CAMPOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TRES_ACHADOS_SAO_UMA_SO_PAGINA
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PAPER_SO_TRANSFERE_PARA_A_PARTE_MANUAL
+    to: C_OPCAO_II_BILINGUE_POR_CAMPOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PAPER_SO_TRANSFERE_PARA_A_PARTE_MANUAL
+    to: C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MIRROR_NAO_FOI_MEDIDO
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_JETBRAINS_TEM_LOCALE_EXPLICITO
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_JETBRAINS_TEM_LOCALE_EXPLICITO
+    to: C_OPCAO_II_BILINGUE_POR_CAMPOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_IDIOMA_EXIGE_INSTRUCAO_EXPLICITA
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_IDIOMA_EXIGE_INSTRUCAO_EXPLICITA
+    to: C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_IDIOMA_EXIGE_INSTRUCAO_EXPLICITA
+    to: C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_IDIOMA_EXIGE_INSTRUCAO_EXPLICITA
+    to: C_OPCAO_I_LINHA_SUPERFICIE_EMITIDA_DEFINIDA_MECANICAMENTE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS
+    to: C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS
+    to: C_OPCAO_II_BILINGUE_POR_CAMPOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS
+    to: C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS
+    to: C_OPCAO_I_LINHA_SUPERFICIE_EMITIDA_DEFINIDA_MECANICAMENTE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DOGFOOD_DE_IDIOMA_NAO_FOI_FEITO
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DOGFOOD_DE_IDIOMA_NAO_FOI_FEITO
+    to: C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DOGFOOD_DE_IDIOMA_NAO_FOI_FEITO
+    to: C_OPCAO_I_LINHA_SUPERFICIE_EMITIDA_DEFINIDA_MECANICAMENTE
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PENALIDADE_DE_DESCOBERTA_DESCARTADA
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PENALIDADE_DE_DESCOBERTA_DESCARTADA
+    to: C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PENALIDADE_DE_DESCOBERTA_DESCARTADA
+    to: C_OPCAO_II_BILINGUE_POR_CAMPOS
+    edge_type: CONSTRAINS
