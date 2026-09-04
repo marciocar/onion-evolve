@@ -183,6 +183,27 @@ nodes:
     verified_against: 'run_forge_detector_selftests 2/2 (regex extraida do detector.md, node); regex velha reprova o caso aninhado (modo de falha provado)'
     trace: '.claude/utils/forge/detector.md'
 
+  - id: E_CAUSA_ABERTA_LEITOR_MULTITHREAD_0904
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    label: 'CAUSA ABERTA E MEDIDA (2026-09-04, /meta:drive sobre Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO): a classe "falha so em paralelo, passa em serie" NAO era do fixture nem de carga — e do LEITOR. `_emit "$saida" | grep -q PADRAO` em posicao de VEREDITO devolve FALSO com o padrao PRESENTE sob concorrencia. Medicao: 12 processos x 40 tentativas com 145.378 bytes de saida sintetica → 4 a 18 falhas POR PROCESSO (10-45%); em serie, 0 em 40. O `grep` desta maquina e ugrep 7.8.4 (multi-thread, /usr/bin/grep), e `-q` sai no 1o match fechando o stdin. A cura de 2026-09-03 (`_emit` imune a EPIPE, 489 sitios) tratava o ESCRITOR e por isso nao curou: o falso nasce no leitor. Assinatura unica que explica as 4 ocorrencias: kg-backlog (e), gate do adopt, graph atores e line-limits (d2).'
+    trace: 'docs/evolution/review/fix-bench-emit-pipe-race.md'
+    verified_at: '2026-09-04'
+    verified_against: 'probe.sh (12 processos x 40, serial vs concorrente) e cure.sh (4 formas x 480 tentativas) em /tmp/tmp/drive; bancada completa 1035/0 em 145 familias/8 workers/777s pos-cura'
+  - id: E_CURA_HERE_STRING_MEDIDA_0904
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    label: 'CURA MEDIDA E APLICADA (2026-09-04): das quatro formas testadas sob a MESMA concorrencia (12 processos x 40), o pipe falhou 9 vezes em 480 e as tres alternativas ZERO em 480 cada — here-string (`grep -q PAD <<< "$var"`), comparacao em bash (`case`) e arquivo temporario. Aplicada a here-string em 496 sitios de VEREDITO da bancada (preservando flags -q/-qE/-qF/-qx/-qi/-qP e negacoes; os 40 sitios que so compoem MENSAGEM ficam com pipe — ali truncar nao vira veredito falso). Guarda de reintroducao na familia shell_pipefail_robustness (2a classe), provada com mutante: reprova com `_emit|grep -q` em posicao de teste, verde sem. Bancada completa pos-cura: 1035 passaram, 0 falharam.'
+    trace: 'docs/evolution/review/fix-bench-emit-pipe-race.md'
+    verified_at: '2026-09-04'
+    verified_against: 'lint-selftest.sh: 429 here-strings, 0 vereditos em pipe; bench1.log (1035/0/0, 777s)'
+
 edges:
   - from: I_JWKS_ATTEMPTED_AT
     to: W8_REAIS_EXECUTAVEIS
@@ -223,3 +244,9 @@ edges:
   - from: I_FORGE_PARSE_GITLAB_SUBGRUPOS
     to: W8_REAIS_EXECUTAVEIS
     edge_type: DEPENDS_ON
+  - from: E_CAUSA_ABERTA_LEITOR_MULTITHREAD_0904
+    to: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
+    edge_type: SUPPORTS
+  - from: E_CURA_HERE_STRING_MEDIDA_0904
+    to: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
+    edge_type: SUPPORTS

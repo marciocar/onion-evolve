@@ -244,6 +244,12 @@
 |--:|---|---|---|
 | 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETE |
 
+## fios-abertos — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.0 | `Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO` | fios-abertos | PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-ver |
+
 ## graduated-automation-elenxo-2026-07 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -287,12 +293,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
-
-## fios-abertos — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 3.0 | `Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO` | fios-abertos | PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-ver |
 
 ## catraca-regra49-2026-08 — 1 item(ns)
 
