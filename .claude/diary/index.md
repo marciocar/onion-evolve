@@ -1,10 +1,10 @@
-# Diário — plugin-lint-namespace
+# Diário — onion-evolve
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 120 entradas · **Stale:** 0 · **Compartilháveis:** 108 · **Com significância:** 51
+**Total:** 121 entradas · **Stale:** 0 · **Compartilháveis:** 109 · **Com significância:** 51
 
 Gerado em: 2026-09-04
 
@@ -12,6 +12,7 @@ Gerado em: 2026-09-04
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-09-04 | error | public 📤 | regra-n-sem-titulo-na-prosa-reincidi-duas-vezes-e-a-cura-e-um-hook-stop | — | 2026-12-03 | static |
 | 2026-09-04 | learning | public 📤 | readme-de-plugin-e-catalogo-gerado-nao-prosa-e-version-duplicada-esconde-update | — | 2026-12-03 | static |
 | 2026-09-04 | learning | public 📤 | link-vivo-no-core-morto-no-plugin-e-o-marketplace-json-que-envelheceu-calado | — | 2026-12-03 | static |
 | 2026-09-04 | decision | public 📤 | license-por-plugin-o-diretorio-oficial-exige-o-arquivo-nao-so-o-campo | — | 2026-12-03 | static |
