@@ -18,7 +18,7 @@ related_agents:
 related_commands:
   - /onion-product:branding
   - /onion-product:presentation
-  - /onion-work-tools:context-freshness
+  - /onion:context-freshness
 ---
 
 # /onion-design:identity — Identidade visual como spec-as-code

@@ -90,7 +90,7 @@ Nativas" (fonte única).
    grafo virou predecessor da avaliação em vez de destino dela). **Persista** a síntese
    no repo (`docs/**/research/*.md` ou local durável) — **nunca**
    a deixe só no `/tmp/.../tasks/*.output` **efêmero** do harness — **e materialize/atualize** o
-   `.kg.yaml` via `/onion-work-tools:kg` + `bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh` (exit 0). Fecha o ciclo
+   `.kg.yaml` via `/onion:kg` + `bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh` (exit 0). Fecha o ciclo
    `read(KG)→verify→act→write(KG)` ([knowledge-graph-sdaal.md](${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md)
    §SSOT-as-runtime) — é o **bookend simétrico** do read(KG) (passo 0 de `warm-up`/`catch-up`/`engineer:work`).
    **Mecanismo, não conselho:** skills do harness como `deep-research` despejam em `/tmp` efêmero — a
@@ -170,7 +170,7 @@ const synthesisPath = `docs/analysis/${slug}-${today}.md`;
 await write(synthesisPath, synthesisToMarkdown(synthesis));       // persiste no repo — nunca só /tmp efêmero
 
 const kgPath = `docs/onion/graph/${slug}-${today}.kg.yaml`;
-await agent(                                                      // ou: /onion-work-tools:kg <slug> (mesmo efeito)
+await agent(                                                      // ou: /onion:kg <slug> (mesmo efeito)
   `Modele a síntese consolidada como Knowledge Graph SDAAL (.kg.yaml): claims/evidência/decisões
    tipados, arestas SUPPORTS/REFUTES/SUPERSEDES. Escreva em ${kgPath}.\n\n${JSON.stringify(synthesis)}`,
   { schema: KgWriteSchema, model: "sonnet", effort: "medium" }
@@ -290,7 +290,7 @@ força), e a doutrina desta casa é que `fix-must-become-mechanism` vale **quand
 ## Referências
 
 - KB de doutrina e mapeamento de padrões: `docs/knowledge-base/concepts/agent-orchestration.md`
-- Comando faceta: `/onion-work-tools:orchestrate`
+- Comando faceta: `/onion:orchestrate`
 - Meta-spec de comandos (§10 Orquestração): `docs/meta-specs/commands.md`
 - Meta-spec de arquitetura (§4.2 dependências): `docs/meta-specs/architecture.md`
 - Skill relacionada: `onion-patterns` (estrutura e nomenclatura)

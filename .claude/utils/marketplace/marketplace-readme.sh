@@ -21,7 +21,7 @@ for pj in sorted(glob.glob(os.path.join(t,"plugins","*",".claude-plugin","plugin
     n=lambda pat: len([x for x in glob.glob(os.path.join(d,pat),recursive=True) if os.path.basename(x).lower()!="readme.md"])
     cmds=n("commands/**/*.md"); ags=n("agents/**/*.md"); sk=len(glob.glob(os.path.join(d,"skills","*","SKILL.md")))
     hj=jload(os.path.join(d,"hooks","hooks.json")); hooks=sum(len(h.get("hooks",[])) for ev in (hj.get("hooks",hj) if isinstance(hj,dict) else {}).values() if isinstance(ev,list) for h in ev)
-    cat={"onion":"core","onion-work-tools":"tools"}.get(name,"vertical")
+    cat={"onion":"core"}.get(name,"vertical")
     rows.append((name,cat,p.get("version","?"),cmds,ags,sk,hooks,p.get("description","")))
 order={"core":0,"vertical":1,"tools":2}; rows.sort(key=lambda r:(order[r[1]],r[0]))
 def short(s,n=110):
@@ -42,6 +42,7 @@ for name,cat,ver,c,a,s,h,desc in rows:
 L.append("")
 L.append("Instale só o que precisa: `onion` é o núcleo (obrigatório: orquestrador, motores KG, guardas, runtime); cada vertical acrescenta comandos e agentes de um domínio; `onion-work-tools` traz os utilitários de trabalho (censo, backlog, freshness). Cada plugin tem o seu README com o catálogo completo.\n")
 L.append("```\n/plugin install onion-engineering@%s\n/plugin install onion-product@%s\n```\n" % (mkt,mkt))
+L.append("## Migração (2026-09)\n\nTrês plugins foram absorvidos para o canal premiar bundles verticais coesos (pesquisa R1, 2026-09-04): `onion-work-tools` → `onion` · `onion-testing` → `onion-engineering` · `onion-docs` → `onion-product`. Quem tinha os antigos: `/plugin uninstall <antigo>@%s` e `/plugin install <novo>@%s`. Os nomes antigos não voltam (nomes de plugin são imutáveis no diretório).\n" % (mkt, mkt))
 L.append("## Manter em dia\n")
 L.append("| Ação | Slash | CLI |\n|---|---|---|")
 L.append(f"| Atualizar o marketplace | `/plugin marketplace update {mkt}` | `claude plugin marketplace update {mkt}` |")

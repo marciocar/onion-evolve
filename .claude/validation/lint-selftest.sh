@@ -1596,11 +1596,11 @@ run_kg_status_factor_selftests() {
   #     montava limpo e passava no lint — o plugin so morria no ambiente do adotante, longe de quem
   #     publicou. Foi curado A MAO nos dois manifestos quando aconteceu; agora e aresta de construcao.
   local asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
-  local mf="${REPO_ROOT}/.claude/utils/marketplace/verticals/onion-work-tools.manifest.sh"
+  local mf="${REPO_ROOT}/.claude/utils/marketplace/verticals/onion.manifest.sh"
   if [ ! -f "${asm}" ] || [ ! -f "${mf}" ]; then record_skip "status-factor: (h) assembler/manifesto ausente"; else
     d="$(mktemp -d)"
     sed 's#^\s*"\.claude/validation/lib/status-factor\.awk".*$##' "${mf}" > "$d/sem-lib.manifest.sh"
-    # (2026-09-03, Elenxo das faixas) ANTES este caso montava no plugins/onion-work-tools/ REAL (dest default do
+    # (2026-09-03, Elenxo das faixas) ANTES este caso montava no plugins/onion/ REAL (dest default do
     # assembler = SRC/plugins/<nome>, com rm -rf): regravava provenance.json no repo vivo a cada bancada e, sob
     # --jobs, corria com plugins_sync (que lê esse diretório). Agora o destino é um mktemp e "não tocou no
     # destino" é medido pelo snapshot da árvore, não por git status do repo vivo.
@@ -7838,7 +7838,7 @@ run_assemble_plugin_selftests() {
   # irmão morto em kb/ — a classe que acumulou 15 em dois plugins sem guarda nenhuma acusar —
   # e (ii) que o TÍTULO da irmã convertida permaneça legível (plain-text, não amputação).
   local mwt dwt
-  mwt="${REPO_ROOT}/.claude/utils/marketplace/verticals/onion-work-tools.manifest.sh"
+  mwt="${REPO_ROOT}/.claude/utils/marketplace/verticals/onion.manifest.sh"
   if [ ! -f "${mwt}" ]; then record_skip "assemble-plugin: (e4) manifesto work-tools ausente"; else
     dwt="$(mktemp -d)"
     bash "${helper}" "${mwt}" "${REPO_ROOT}" "${dwt}/wt" >/dev/null 2>&1
@@ -11468,7 +11468,7 @@ run_hook_autofix_selftests() {
   fi
   # (d) R19 alterada: assemble FALHO acusa E SOMA (era morte rc=2 sem sumário)
   ( cd "${hc}/repo" && rm -rf .claude/skills/onion-orchestration ) >/dev/null 2>&1
-  out="$(cd "${hc}/repo" && bash .claude/validation/lint-artifacts.sh --only="${hc}/repo/.claude/utils/marketplace/verticals/onion-work-tools.manifest.sh" 2>&1)" || true
+  out="$(cd "${hc}/repo" && bash .claude/validation/lint-artifacts.sh --only="${hc}/repo/.claude/utils/marketplace/verticals/onion.manifest.sh" 2>&1)" || true
   if _emit "${out}" | grep -q "assemble FALHOU" && _emit "${out}" | grep -q "Sumário"; then
     record_pass "hook-autofix: (d) assemble falho vira violation E o lint soma (morte silenciosa não volta)"
   else

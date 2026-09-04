@@ -97,7 +97,7 @@ export const UserProfileCard: React.FC<UserProfileCardProps> = ({ userId }) => {
 - **SEMPRE** manter `.env.example` atualizado com placeholders
 - Usar **prefixos por integração**: `CLICKUP_`, `JIRA_`, `GITHUB_`, `GAMMA_`, `POSTGRES_`
 - Comandos e agentes devem **funcionar sem integrações** quando possível
-- Se integração não configurada: avisar usuário e sugerir `/onion-work-tools:setup-integration`
+- Se integração não configurada: avisar usuário e sugerir `/onion:setup-integration`
 
 ```bash
 # .env.example correto

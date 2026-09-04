@@ -172,7 +172,7 @@ Operações disponíveis:
   ❌ Ler status de CI / criar Release
 
 💡 Para habilitar: autentique a CLI (\`gh auth login\`) ou
-   defina GH_TOKEN no .env e execute /onion-work-tools:setup-integration`
+   defina GH_TOKEN no .env e execute /onion:setup-integration`
     };
   }
 

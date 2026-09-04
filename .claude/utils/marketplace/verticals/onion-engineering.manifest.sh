@@ -1,15 +1,26 @@
-# Manifesto da vertical Engenharia → plugin onion-engineering (consumido por assemble-plugin.sh).
-# SSOT = .claude/; o plugin é artefato gerado. Camada 1 só (o task-manager/forge do consumidor via SDAAL).
+# onion-engineering — vertical de ENGENHARIA: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow +
+# sessões persistentes), gates pré-PR, especialistas de código E — desde 2026-09-04 (F2) — a geração e a
+# estratégia de TESTES (unit/integration/e2e, validate:workflow, QA), absorvendo onion-testing.
+# Ordem do COMMANDS[] é significativa (colisão de basename README.md/help.md — o último vence: engineer).
+# NOTA: os subcomandos aninhados de validate/ (collab/, qa-points/, test-strategy/) continuam fora — o assembler
+# achata a árvore; namespace aninhado exige tratamento próprio (dívida declarada, herdada do onion-testing).
+
 PLUGIN_NAME="onion-engineering"
 PLUGIN_VERSION="0.1.0"
-PLUGIN_DESC="Vertical de engenharia do Onion: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow + sessoes persistentes) + especialistas de codigo (Node/React/Postgres/NX/Docker) e gates pre-PR. Camada 1; task-manager e forge do consumidor via SDAAL."
-KEYWORDS=(engineering gitflow pull-request code-review nodejs react onion)
+PLUGIN_DESC="Vertical de engenharia do Onion: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow + sessões persistentes), gates pré-PR, especialistas de código (Node, React, Postgres, NX, Docker, segurança) e testes (unit/integration/e2e, estratégia de teste, QA story points)."
+KEYWORDS=(engineering gitflow pull-request code-review testing qa nodejs react onion)
 
-# ORDEM SIGNIFICATIVA: o assembler achata as pastas num commands/ plano e copia em ordem,
-# então em colisão de basename (README.md, help.md) a ÚLTIMA pasta vence. `engineer` por último
-# = seu README.md + help.md (visão da vertical inteira) sobrepõem os do `git` (só GitFlow).
-COMMANDS=(".claude/commands/git" ".claude/commands/engineer")
+# Ordem: o absorvido PRIMEIRO, o dono DEPOIS — na colisão de basename (README.md/help.md) o assembler deixa o último vencer.
+COMMANDS=(
+  ".claude/commands/test"
+  ".claude/commands/validate"
+  ".claude/commands/git"
+  ".claude/commands/engineer"
+)
 AGENTS=(
+  ".claude/agents/testing/test-agent.md"
+  ".claude/agents/testing/test-engineer.md"
+  ".claude/agents/testing/test-planner.md"
   ".claude/agents/git/gitflow-specialist.md"
   ".claude/agents/git/branch-code-reviewer.md"
   ".claude/agents/git/branch-documentation-writer.md"
@@ -27,30 +38,33 @@ AGENTS=(
   ".claude/agents/development/zen-engine-specialist.md"
   ".claude/agents/deployment/docker-specialist.md"
 )
+SKILLS=(
+  ".claude/skills/onion-engineering-context"
+)
+HOOKS=()
 UTILS=()
-# Motor de KG soberano — engineer:work.md cabeia `bash .claude/validation/kg-radar.sh` no passo-0
-# (KG-first, "mecanismo não conselho"). Sem ele no bundle, o comando empacotado herda um dead-ref
-# (pesquisa wf_ab57a814-c16 / docs/evolution/research/onion-tier-matrix-2026-07). Viaja o SCRIPT
-# (determinístico, awk/python/jq), nunca o DADO — o door gera seus próprios .kg.yaml soberanos
-# (public-door-vs-private-core.md §5). O assembler copia+reescreve o path (assemble-plugin.sh VALIDATION[]).
-# O fator de status vive em SITIO UNICO (lib/status-factor.awk) desde 2026-08-09 — a copia que
-# vivia dentro do kg-view DIVERGIU do radar e passou a pesar ZERO os nos `drifted`/`unverifiable`.
-# Sem a lib no bundle, o radar empacotado sai 2 com mensagem, nunca com fator errado em silencio
-# (medido: foi exatamente o que este plugin fez na 1a montagem sem ela).
-VALIDATION=(".claude/validation/kg-radar.sh" ".claude/validation/lib/status-factor.awk")
-# Skill de contexto: contrato SSOT mínimo + resolver de technical-context (torna a vertical
-# auto-suficiente em repos não-adotados). Ver .claude/skills/onion-engineering-context/.
-SKILLS=(".claude/skills/onion-engineering-context")
-# KB de framework EMBARCADO (tipo A) — os docs que os comandos mais citam (gitflow 19×, worklog 11×).
-# SSOT segue em docs/knowledge-base/; o plugin leva uma cópia gerada → funciona sem /meta:adopt.
+VALIDATION=(
+  ".claude/validation/kg-radar.sh"
+  ".claude/validation/lib/status-factor.awk"
+)
+TEMPLATES=()
 DOCS=(
   "docs/knowledge-base/frameworks/gitflow-patterns.md"
   "docs/knowledge-base/concepts/worklog-protocol.md"
 )
 
-# Capability Contract (auto-descrição — ADR onion-adr-capability-contract-2026-06).
+# Capability Contract (ADR onion-adr-capability-contract-2026-06): provides=o que entrega · requires=deps (type:value) · loads=contexto condicional · conformance=tier
 CONFORMANCE="silver"
-PROVIDES=("gitflow-faseado" "pull-request-lifecycle" "code-review-pre-pr" "code-specialists-node-react-postgres-nx-docker" "ssot-context-resolver")
+PROVIDES=(
+  "gitflow-faseado"
+  "pull-request-lifecycle"
+  "code-review-pre-pr"
+  "code-specialists-node-react-postgres-nx-docker"
+  "ssot-context-resolver"
+  "geracao-testes-unit-integration-e2e"
+  "estrategia-de-teste"
+  "qa-story-points"
+)
 REQUIRES=(
   "agent:gitflow-specialist"
   "agent:branch-code-reviewer"
@@ -60,8 +74,10 @@ REQUIRES=(
   "agent:postgres-specialist"
   "agent:docker-specialist"
   "skill:onion-engineering-context"
+  "agent:test-agent"
+  "agent:test-engineer"
+  "agent:test-planner"
 )
-# tipo A embarcado (kb/); tipo B resolvido pela skill (path do consumidor, nunca fixo).
 LOADS=(
   "embed:kb/gitflow-patterns.md"
   "embed:kb/worklog-protocol.md"

@@ -1,10 +1,10 @@
 {
   "name": "onion-engineering",
-  "version": "0.1.86",
-  "description": "Vertical de engenharia do Onion: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow + sessoes persistentes) + especialistas de codigo (Node/React/Postgres/NX/Docker) e gates pre-PR. Camada 1; task-manager e forge do consumidor via SDAAL.",
+  "version": "0.1.91",
+  "description": "Vertical de engenharia do Onion: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow + sessões persistentes), gates pré-PR, especialistas de código (Node, React, Postgres, NX, Docker, segurança) e testes (unit/integration/e2e, estratégia de teste, QA story points).",
   "author": { "name": "Onion - Marcio Carvalho" },
   "homepage": "https://github.com/marciocar/onion-evolve",
   "repository": "https://github.com/marciocar/onion-evolve",
   "license": "MIT",
-  "keywords": ["engineering","gitflow","pull-request","code-review","nodejs","react","onion"]
+  "keywords": ["engineering","gitflow","pull-request","code-review","testing","qa","nodejs","react","onion"]
 }
