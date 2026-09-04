@@ -10,7 +10,7 @@ meta:
                              # Claude Code (migalha cc-version-e-gatilho-de-estrategia) e qualquer
                              # mudança na página review-criteria, que é a fonte de 5 dos 15 achados.
   # kg-backlog-guard: on
-  # ═══ TETO: 31 NÓS. (1 question + 15 evidências web confirmadas + 1 mercado + 1 lacunas + 1 decisão
+  # ═══ TETO: 33 NÓS (onda 2, 2026-09-04: +2 — base rate de MCP embarcado e regime de review, gatilhos (i)/(ii) cumpridos; onda 1 = 31). (1 question + 15 evidências web confirmadas + 1 mercado + 1 lacunas + 1 decisão
   #     + 4 opções + 8 objeções sobreviventes do Elenxo, todas MEDIDAS no repo). Cresce só com fonte
   #     primária nova sobre a curadoria de PLUGINS (code.claude.com), base rate de terceiros
   #     (quantos plugins do diretório embarcam .mcp.json) ou medição própria de custo de contexto. ═══
@@ -435,6 +435,36 @@ nodes:
     label: 'OBJECAO SOBREVIVENTE 8: o achado 8 e duplicata do 7 — mesma URL, mesma pagina, mesmo mecanismo visto do outro lado do manifesto. Contado como achado independente com votos 3-0, distorce a contagem de evidencia a favor de (b) e faz a rodada parecer mais convergente do que e. Cura aplicada neste grafo: E_MARKETPLACE_JSON_MCPSERVERS entrou com impact rebaixado a 2 e a duplicidade declarada no proprio label, para que a contagem de nos nao seja lida como contagem de fatos independentes.'
     trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
 
+
+  # ── GATILHOS (i) e (ii) da reabertura de (b) — MEDIDOS em 2026-09-04 ────────────────────
+  - id: E_BASE_RATE_MCP_EMBARCADO_OFICIAL_0904
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'gh api sobre anthropics/claude-plugins-official (291 entradas; 270 plugin.json lidos no SHA pinado; .mcp.json na raiz, mcpServers inline no plugin.json e na entrada do marketplace, hooks/hooks.json)'
+    valid_from: 2026-09
+    source_tier: 9
+    source_kind: primary
+    label: 'MEDIDO — gatilho (ii) da reabertura de (b): 143 de 291 plugins do diretorio OFICIAL (49%) embarcam servidor MCP (128 com .mcp.json na raiz + 33 com mcpServers inline; 0 na entrada do marketplace); 48 embarcam hooks/hooks.json. Refuta a premissa de (c) "MCP embarcado e raro/penalizado na triagem": e a NORMA do venue. Nao muda a reprova de (b) COMO ESPECIFICADA (raiz do projeto, annotations, stdio) — muda o peso: (b) deixa de ser excecao e vira o padrao a cumprir. Dados: data/venue-official-probe-2026-09-04.json, data/crawl.py.'
+    trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/data/venue-official-probe-2026-09-04.json'
+
+  - id: E_REGIME_MCP_EMBUTIDO_E_DO_DIRETORIO_DE_PLUGINS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-04
+    verified_against: 'WebFetch claude.com/docs/plugins/submit ("separate and complementary directory from the Connectors Directory"; "a plugin can include any MCP of any kind in its .mcp.json"; "basic automated review"), connectors/building/submission ("The portal accepts remote MCP servers only. Local servers are distributed as desktop extensions or plugins"), review-criteria (escopo = servidores NO Connector Directory), Software Directory Policy §3.F e §5'
+    valid_from: 2026-09
+    source_tier: 10
+    source_kind: primary
+    label: 'MEDIDO — gatilho (i) da reabertura de (b): o regime de review de um MCP EMBUTIDO em plugin e o do DIRETORIO DE PLUGINS (revisao automatica basica + selo Verified opcional), NAO o do Connector Directory (que so aceita servidores REMOTOS submetidos a parte). Resolve a CONSTRAIN 1 (conflacao de regime): os 5 achados tier 10 do review-criteria valem contra (a) e NAO se aplicam a (b). Ressalva do proprio venue: "we strongly encourage using connectors that already exist in the Connectors Directory… will reduce the number of warnings shown to users" — MCP proprio embarcado passa, com mais avisos. §5 da Software Directory Policy (Additional Requirements for MCP Servers) nao diz se cobre MCP embutido — NAO ESTABELECIDO.'
+    trace: 'https://claude.com/docs/plugins/submit'
+
 edges:
   # ── evidência web -> pergunta ────────────────────────────────────────────────────────
   - from: E_ANTHROPIC_READ_WRITE_SEPARADOS
@@ -598,4 +628,11 @@ edges:
 
   - from: E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904
     to: C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA
+    edge_type: CONSTRAINS
+
+  - from: E_BASE_RATE_MCP_EMBARCADO_OFICIAL_0904
+    to: D_PLUGIN_MCP_POSTURE_0904
+    edge_type: CONSTRAINS
+  - from: E_REGIME_MCP_EMBUTIDO_E_DO_DIRETORIO_DE_PLUGINS
+    to: D_PLUGIN_MCP_POSTURE_0904
     edge_type: CONSTRAINS

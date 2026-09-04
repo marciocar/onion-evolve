@@ -12,7 +12,7 @@ meta:
                              # 65); (b) qualquer edição na página support.claude.com/13145358; (c) primeira
                              # submissão real do Onion ao diretório — o revisor é a medição que falta.
   # kg-backlog-guard: on
-  # ═══ TETO: 26 NÓS. Rodada fechada em 34 fontes / 8 claims externas (3 recortes de UMA página tier 9,
+  # ═══ TETO: 27 NÓS (onda 2, 2026-09-04: +1 — censo do venue por gh api, a CONSTRAIN 2 cumprida; onda 1 = 26). Rodada fechada em 34 fontes / 8 claims externas (3 recortes de UMA página tier 9,
   #     1 doc tier 10, 2 papers tier 6-7, 1 repo tier 5, 1 vendor-on-competitor tier 3) + 2 medições
   #     locais tier 10 feitas NESTA rodada sobre o repo. Cresce SÓ por: (a) observação do diretório VIVO
   #     (gh api sobre anthropics/claude-plugins-community contando descriptions não-inglesas; listagem com
@@ -370,6 +370,22 @@ nodes:
     label: 'OBJECAO SOBREVIVENTE (descarte por comodismo) — a UNICA evidencia quantitativa a favor do norte internacional sumiu sem contra-evidencia escrita. Se a objecao era "correlacao, nao causa", ela precisava estar no grafo. Ressalva propria, e ela e seria: o venue real NAO e o GitHub por estrelas — e um diretorio CURADO com contador de instalacoes, onde o mecanismo de descoberta e outro. Ou seja, a claim nao pode ser usada como prova da penalidade no diretorio; ela pode e deve ser usada como RAZAO PARA MEDIR o diretorio vivo antes de selar. E a mesma medicao que E_OBJECAO_MIRROR_NAO_FOI_MEDIDO pede.'
     trace: 'https://arxiv.org/html/2602.19446'
 
+
+  # ── CENSO DO VENUE (CONSTRAIN 2 cumprida — medido por gh api em 2026-09-04) ─────────────
+  - id: E_CENSO_VENUE_IDIOMA_0904
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'gh api repos/anthropics/claude-plugins-community + raw marketplace.json (2.282 entradas, 1,5 MB) e claude-plugins-official (291 entradas); heuristica de idioma por stopwords com spot-check dos 11 nao-ingleses; amostra alfabetica dos 60 primeiros plugin.json/README da community (cap declarado)'
+    valid_from: 2026-09
+    source_tier: 9
+    source_kind: primary
+    label: 'MEDIDO (a CONSTRAIN 2 pedia exatamente isto): marketplace COMUNITARIO = 2.282 plugins, 11 descriptions nao-inglesas (0,48%: ko 3, es 3, pt 2, ja 2, vi 1) — o pipeline ACEITA nao-EN (evidencia de comportamento); na amostra de 60, 0 plugin.json nao-ingles, 1 README nao-ingles (ja, com README.en.md ao lado) e 2 repos com README por idioma. Marketplace OFICIAL = 291 plugins, 0 descriptions nao-inglesas, 0 READMEs bilingues. Doc oficial (plugins-reference, plugins, plugin-marketplaces, discover-plugins): NENHUM campo de locale/idioma em plugin.json, marketplace.json ou SKILL.md; `metadata` e o unico campo livre. Consequencia: (i-linha) deixa de ser convencao sob evidencia ausente — o venue onde o Onion quer estar (oficial) e 100% EN nas superficies; nao-EN so existe na cauda do comunitario. Dados: data/venue-community-probe-2026-09-04.json, data/langcensus.py.'
+    trace: 'docs/evolution/research/plugin-language-policy-2026-09/data/venue-community-probe-2026-09-04.json'
+
 edges:
   # ── evidências sustentam a pergunta (11) ──
   - from: E_POLITICA_SEM_REQUISITO_DE_IDIOMA
@@ -496,3 +512,7 @@ edges:
   - from: E_OBJECAO_PENALIDADE_DE_DESCOBERTA_DESCARTADA
     to: C_OPCAO_II_BILINGUE_POR_CAMPOS
     edge_type: CONSTRAINS
+
+  - from: E_CENSO_VENUE_IDIOMA_0904
+    to: D_PLUGIN_LANGUAGE_POLICY_CANAL_PUBLICO
+    edge_type: SUPPORTS
