@@ -236,15 +236,15 @@ fi
 # a classe deixa de ser possível. Fonte≠derivação: a SSOT em docs/knowledge-base segue com os links
 # vivos — a conversão é só na CÓPIA do plugin, onde o alvo de fato não existe.
 # ---------------------------------------------------------------------------
-if [ -d "${DEST}/kb" ]; then
-  for f in "${DEST}/kb/"*.md; do
-    [ -f "${f}" ] || continue
-    while IFS= read -r tgt; do
-      [ -f "${DEST}/kb/${tgt}" ] && continue
-      tgt_esc="$(printf '%s' "${tgt}" | sed 's/\./\\./g')"
-      sed -i -E "s|\[([^][]*)\]\(${tgt_esc}(#[^)]*)?\)|\1|g" "${f}"
-    done < <(grep -oE '\]\([a-z0-9-]+\.md(#[^)]*)?\)' "${f}" | sed -E 's/^\]\(([a-z0-9-]+\.md).*/\1/' | sort -u)
-  done
+# GENERALIZADO em 2026-09-04 (REGRA 75): a cura acima só cobria kb/ e irmãs no MESMO diretório; medidos 123
+# links relativos mortos fora dela (commands 46, utils 31, kb 30, skills 17). Agora: todo .md do plugin,
+# qualquer caminho relativo (templates/ fica fora — aponta para o que o consumidor vai gerar). O helper da
+# REGRA 75 é o único lugar da regex; o assembler só o chama. Helper no core (dirname deste script), não no SRC.
+DL_HELPER="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/../../validation/plugin-dead-link-check.sh"
+if [ -f "${DL_HELPER}" ]; then
+  bash "${DL_HELPER}" "${SRC}" --rewrite "${DEST}" || printf 'assemble-plugin: dead-link-portability falhou (rc=%s) — REGRA 75 vai acusar\n' "$?" >&2
+else
+  printf 'assemble-plugin: helper de links mortos ausente (%s) — links relativos mortos ficam intactos\n' "${DL_HELPER}" >&2
 fi
 
 # Proveniência content-addressed (padrão gh skill): repository + ref + tree_sha.

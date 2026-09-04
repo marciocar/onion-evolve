@@ -334,7 +334,7 @@ Este comando se integra perfeitamente com:
 - **Sessions em `.claude/sessions/`**: Utiliza contexto das sessões ativas
 
 ### **📁 Uso da Sessão Ativa (worklog)**
-Se existir um worklog ativo em `.claude/sessions/` relacionado à task, siga o protocolo de leitura escalonado ([worklog-protocol.md §4](../../../docs/knowledge-base/concepts/worklog-protocol.md)) — não faça `cat` da pasta inteira:
+Se existir um worklog ativo em `.claude/sessions/` relacionado à task, siga o protocolo de leitura escalonado (worklog-protocol.md §4) — não faça `cat` da pasta inteira:
 - Leia o `STATE.md` primeiro (objetivo, `## Map`, progresso via `NEXT`)
 - Analise `context.md` para o escopo original e o Phase-Subtask Mapping
 - Examine `architecture.md` (só a seção relevante) para validar implementação vs design

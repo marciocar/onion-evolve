@@ -61,7 +61,7 @@ Este comando analisa o trabalho realizado na sessão atual, organiza a documenta
 - Extrai decisões e contexto
 
 ### 2. **Estruturação (registro ARCHIVED)**
-Este comando produz o **registro ARCHIVED** — o artefato histórico pós-merge (distinto do worklog ACTIVE que `/engineer/start` cria). Estrutura definida pela [SSOT §Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento):
+Este comando produz o **registro ARCHIVED** — o artefato histórico pós-merge (distinto do worklog ACTIVE que `/engineer/start` cria). Estrutura definida pela SSOT §Contrato de Sessão:
 ```
 .claude/sessions/archived/
 └── YYYY-MM-DD_HHMM_<slug>/
@@ -74,7 +74,7 @@ Este comando produz o **registro ARCHIVED** — o artefato histórico pós-merge
     └── commands-executed.txt  # Comandos usados
 ```
 
-> O registro ARCHIVED fica sob `archived/` para não colidir com os worklogs ACTIVE (nomeados por slug) no nível superior. Ao consolidar, valide o worklog de origem: deve existir `STATE.md` e **exatamente uma** fase `[ACTIVE]` (ou todas `[DONE]` se concluído) — ver [worklog-protocol.md §6](../../../docs/knowledge-base/concepts/worklog-protocol.md).
+> O registro ARCHIVED fica sob `archived/` para não colidir com os worklogs ACTIVE (nomeados por slug) no nível superior. Ao consolidar, valide o worklog de origem: deve existir `STATE.md` e **exatamente uma** fase `[ACTIVE]` (ou todas `[DONE]` se concluído) — ver worklog-protocol.md §6.
 
 ### 3. **Geração de Documentação**
 - **README.md**: Resumo executivo da sessão

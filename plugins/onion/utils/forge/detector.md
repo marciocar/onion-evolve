@@ -170,7 +170,7 @@ function parseRepoIdentity(remoteUrl: string): { owner: string; repo: string } |
   // owner = TODO o namespace entre o host e o último segmento (GitLab aninha subgrupos; GitHub tem 1 nível).
   // (2026-09-04, radar E3 rodada 3: a versão anterior devolvia owner = último segmento — gitlab.com/group/subgroup/project
   //  virava owner=subgroup — o mesmo defeito que o Claude Code 2.1.260 corrigiu em l.39/l.40 do changelog.)
-  const m = remoteUrl.match(/^(?:[a-z][a-z0-9+.-]*:\/\/)?(?:[^@\/]+@)?[^\/:]+[:\/](.+?)\/([^\/]+?)(?:\.git)?\/?$/);
+  const m = remoteUrl.match(/^(?:[a-z][a-z0-9+.-]*:\/\/)?(?:[^@\/]+@)?[^\/:]+:\/\/([^\/]+?)(?:\.git)?\/?$/);
   if (!m) return null;
   return { owner: m[1], repo: m[2] };
 }
@@ -224,7 +224,7 @@ const p = detectProviderFromRemoteUrl('git@github.com:acme/app.git'); // 'github
 
 - [Types](./types.md) — `ForgeConfig`, `ForgeTransport`, `ForgeProvider`
 - [Factory](./factory.md) — consome `config.transport`
-- [SDAAL](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+- SDAAL
 
 ---
 

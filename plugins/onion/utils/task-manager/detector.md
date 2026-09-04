@@ -397,7 +397,7 @@ console.log(status.message);
 
 - [Types](./types.md) - Definições de tipos (inclui `TaskManagerTransport` e campo `transport` em `ProviderConfig`)
 - [Factory](./factory.md) - Criação de adapters
-- [SDAAL](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md) - Padrão-pai
+- SDAAL - Padrão-pai
 
 ---
 

@@ -2,7 +2,7 @@
 
 ## 🎯 Propósito
 
-Implementação do `ITaskManager` para ClickUp, seguindo o padrão **SDAAL** (ver [specification-driven-ai-abstraction-layer.md](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)).
+Implementação do `ITaskManager` para ClickUp, seguindo o padrão **SDAAL** (ver specification-driven-ai-abstraction-layer.md).
 
 **Transporte padrão**: ClickUp REST API v2 via `fetch` — sem dependências externas.
 **Transporte opcional**: MCP ClickUp, ativado quando `TASK_MANAGER_TRANSPORT=mcp`.
@@ -788,7 +788,7 @@ function calculateProgress(task) {
 - [Interface ITaskManager](../interface.md)
 - [Types](../types.md)
 - [Factory](../factory.md)
-- [SDAAL — padrão-pai](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+- SDAAL — padrão-pai
 
 ---
 

@@ -51,7 +51,7 @@ Todo id opaco (`T1`, `#7`, `§8`, `$1`, `blip #9`, regra `r16`, PR `#144`) leva 
 2-5 palavras na 1ª menção** — ex.: `T1 (peer-ou-provisório)`, `#7 (.prettierignore no adopt)`. Ids nus
 economizam o autor e **gastam a cognição do leitor** (ele para e rebusca o significado). Com vários ids
 relacionados, dar um mini-glossário (tabela id → o quê). Vale para chat, docs, comentários, commits, PRs e
-mensagens ao usuário. Autoridade: meta-spec [`code-standards.md`](../../../docs/meta-specs/code-standards.md) §7.
+mensagens ao usuário. Autoridade: meta-spec `code-standards.md` §7.
 
 ## Exemplo correto
 

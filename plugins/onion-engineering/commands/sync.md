@@ -44,7 +44,7 @@ Segue a [Matriz de Branches Protegidas e Estratégia de Sync](${CLAUDE_PLUGIN_RO
 2. **Validar estado** — abortar se houver mudanças não commitadas; `git fetch origin --prune`.
 3. **Aplicar estratégia** (da matriz da KB): `feature/* → develop` (merge normal), branch protegida (`main`/`master`/`develop`) → **fast-forward apenas**; se FF falhar, instruir `/engineer/pr` (nunca forçar).
 4. **Cleanup** — se a feature já foi merged no remote, oferecer deletar a branch local.
-5. **Task Manager (opcional)** — se `TASK_MANAGER_PROVIDER` != `none`, registrar o sync via o adapter ([utils/task-manager/factory.md](../../utils/task-manager/factory.md)). Roteamento por provider é do adapter — **não reimplementar aqui**.
+5. **Task Manager (opcional)** — se `TASK_MANAGER_PROVIDER` != `none`, registrar o sync via o adapter (utils/task-manager/factory.md). Roteamento por provider é do adapter — **não reimplementar aqui**.
 
 ## 📤 Output Esperado
 
@@ -63,5 +63,5 @@ Em branch protegida sem FF possível, reportar bloqueio e o workflow correto (`/
 ## 🔗 Referências
 
 - Proteção e estratégia: [gitflow-patterns.md](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#matriz-de-branches-protegidas-e-estratégia-de-sync)
-- Sync de task: [utils/task-manager/factory.md](../../utils/task-manager/factory.md)
+- Sync de task: utils/task-manager/factory.md
 - Mentor (conflitos, troubleshooting): `@gitflow-specialist`

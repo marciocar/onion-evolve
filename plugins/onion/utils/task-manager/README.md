@@ -1,7 +1,7 @@
 # Task Manager Abstraction Layer
 
 > **Esta camada é uma instância concreta do padrão SDAAL (Specification-Driven AI Abstraction Layer).**
-> Consulte o padrão-pai em [`docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md`](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md) para entender os princípios de design, terminologia e diretrizes de extensão que regem esta implementação.
+> Consulte o padrão-pai em `docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md` para entender os princípios de design, terminologia e diretrizes de extensão que regem esta implementação.
 
 ## Propósito
 
@@ -116,7 +116,7 @@ Comando Onion
 
 ## Documentação relacionada
 
-- [`docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md`](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md) — padrão SDAAL (padrão-pai desta camada)
+- `docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md` — padrão SDAAL (padrão-pai desta camada)
 - `docs/knowledge-base/concepts/task-manager-abstraction.md` — Knowledge Base completa desta instância
 - `.env.example` — variáveis de ambiente disponíveis
 

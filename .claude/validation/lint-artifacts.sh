@@ -3885,6 +3885,60 @@ check_plugin_bare_paths() {
     violation "${sev}" "${REPO_ROOT}/${path}" "[plugin-bare-path/${cls}] ${msg}"
   done <<< "${out}"
 }
+
+# ===========================================================================
+# REGRA 75 — Link markdown relativo dentro de plugin resolve no plugin [HARD]
+# previne: `[irmã](../kb/x.md)` num plugin apontando para arquivo que não viajou — 404 no consumidor
+#   Medido 2026-09-04: 123 links relativos mortos em 5/8 plugins (o assembler só curava kb/ e irmãs no
+#   mesmo diretório). Cura generalizada no gerador (plugin-dead-link-check.sh --rewrite: link → texto do
+#   título; templates/ fora por desenho). HARD sem baseline: a cura vive no gerador.
+# ===========================================================================
+check_plugin_dead_links() {
+  local helper="${SCRIPT_DIR}/plugin-dead-link-check.sh"
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  [ -f "${helper}" ] || return 0
+  [ -d "${REPO_ROOT}/plugins" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/plugins/*|*/verticals/*.manifest.sh|*/assemble-plugin.sh|*/plugin-dead-link-check.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out sev cls path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev cls path msg; do
+    [ -n "${sev}" ] || continue
+    violation "HARD" "${REPO_ROOT}/${path}" "[plugin-link/${cls}] ${msg} — regenere: bash .claude/utils/marketplace/assemble-plugin.sh <manifesto>"
+  done <<< "${out}"
+}
+
+# ===========================================================================
+# REGRA 76 — marketplace.json da raiz é projeção do gerador [HARD]
+# previne: .claude-plugin/marketplace.json envelhecendo calado (o core também é marketplace instalável)
+#   Medido 2026-09-04: o arquivo estava no formato pré-2026-09-04 (version 0.1.0 em todas as entradas,
+#   sem displayName/category/tags) e nenhuma guarda o comparava ao gerador (a REGRA 37 só faz grep).
+#   Mesma classe da REGRA 62. Cura: o pre-commit regenera junto com os plugins (marketplace-root-check.sh
+#   --write, temp+mv — redirecionar direto TRUNCA o arquivo antes de o gerador ler o top-level).
+# ===========================================================================
+check_marketplace_root_sync() {
+  local helper="${SCRIPT_DIR}/marketplace-root-check.sh"
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/plugins/*|"${REPO_ROOT}"/.claude-plugin/marketplace.json|*/generate-marketplace.sh|*/marketplace-root-check.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out sev cls path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev cls path msg; do
+    [ -n "${sev}" ] || continue
+    violation "HARD" "${REPO_ROOT}/${path}" "[marketplace-raiz/${cls}] ${msg}"
+  done <<< "${out}"
+}
 check_commands_without_model
 check_research_kg_review_after
 check_kg_source_tier_confidence
@@ -3951,6 +4005,8 @@ check_backtick_path_refs
 check_plugin_namespace
 check_plugin_hooks_resolvable
 check_plugin_bare_paths
+check_plugin_dead_links
+check_marketplace_root_sync
 
 # ===========================================================================
 # SUMÁRIO FINAL

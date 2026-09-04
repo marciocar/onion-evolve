@@ -2,7 +2,7 @@
 
 ## 🎯 Propósito
 
-Implementação completa do `ITaskManager` para Jira (Cloud e Server/DC). É uma instância concreta do padrão **SDAAL** (Specification-Driven AI Abstraction Layer) — consulte [`docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md`](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md) para o contrato arquitetural pai.
+Implementação completa do `ITaskManager` para Jira (Cloud e Server/DC). É uma instância concreta do padrão **SDAAL** (Specification-Driven AI Abstraction Layer) — consulte `docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md` para o contrato arquitetural pai.
 
 **Transporte**: REST API é o **padrão e preferencial** (`TASK_MANAGER_TRANSPORT=api`, default). Atlassian MCP é **opcional e ativável** via `TASK_MANAGER_TRANSPORT=mcp` — quando configurado, o adapter delega para as ferramentas `mcp__claude_ai_Atlassian__*`; caso contrário, cai automaticamente para API.
 
@@ -877,7 +877,7 @@ O adapter suporta dois transportes, controlados por `TASK_MANAGER_TRANSPORT` no 
 - [Personal Access Tokens (Server/DC)](https://confluence.atlassian.com/enterprise/using-personal-access-tokens-1026032365.html)
 - [Interface ITaskManager](../interface.md)
 - [Types](../types.md)
-- [Padrão SDAAL](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+- Padrão SDAAL
 
 ---
 

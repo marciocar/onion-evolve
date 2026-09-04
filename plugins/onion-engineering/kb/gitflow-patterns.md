@@ -5,7 +5,7 @@
 
 > 🧭 **Esta KB é o motor GitFlow canônico (git local).** Os comandos `/git/*` e `/engineer/*` **citam** esta KB para lógica de branching/merge/tag/semver em vez de re-delegar ad-hoc ao `@gitflow-specialist`. O especialista permanece como **mentor para dúvidas interativas**, não como dependência de runtime por comando.
 >
-> Operações de **host remoto** (Pull Request, review, CI/checks, Release) **não** vivem aqui — pertencem ao adapter `.claude/utils/forge/` (SDAAL). Esta KB cobre só o **git local** (branch, merge, tag, push). Ver [interface.md §Fronteira local-vs-remoto](../../../.claude/utils/forge/interface.md).
+> Operações de **host remoto** (Pull Request, review, CI/checks, Release) **não** vivem aqui — pertencem ao adapter `.claude/utils/forge/` (SDAAL). Esta KB cobre só o **git local** (branch, merge, tag, push). Ver interface.md §Fronteira local-vs-remoto.
 
 ---
 
@@ -107,7 +107,7 @@ determinística, exposta pelo helper `${CLAUDE_PLUGIN_ROOT}/validation/resolve-i
 
 > Assim um repo adotado com branch de integração própria é respeitado sem depender de config local; o
 > `git config` que o `meta:adopt` seta é só atalho para o `git flow` nativo. Schema do stamp:
-> [`architecture.md §6.1`](../../meta-specs/architecture.md).
+> `architecture.md §6.1`.
 
 ---
 
@@ -886,7 +886,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Contrato de Sessão de Desenvolvimento
 
-> **Fonte única de verdade (SSOT)** para a estrutura de sessão que os comandos criam ao iniciar trabalho. **Todo** comando, agente, skill ou doc **cita** este contrato em vez de re-descrevê-lo. A mecânica de eficácia de IA (esquema do `STATE.md`, protocolo de leitura escalonado, prompt cache, checkpoint) vive no KB [worklog-protocol.md](../concepts/worklog-protocol.md), que esta seção referencia.
+> **Fonte única de verdade (SSOT)** para a estrutura de sessão que os comandos criam ao iniciar trabalho. **Todo** comando, agente, skill ou doc **cita** este contrato em vez de re-descrevê-lo. A mecânica de eficácia de IA (esquema do `STATE.md`, protocolo de leitura escalonado, prompt cache, checkpoint) vive no KB worklog-protocol.md, que esta seção referencia.
 
 ### Terminologia: worklog vs. transcript
 
@@ -895,7 +895,7 @@ Dois conceitos distintos — historicamente ambos chamados "sessão", o que gera
 - **Worklog** = a pasta `.claude/sessions/<slug>/` (estado em **arquivo**, durável; sobrevive a `/clear` e a troca de máquina). É o que este contrato define.
 - **Transcript** = a conversa **nativa** do Claude Code (`claude --resume`/`-c`, armazenada em JSONL sob `~/.claude/projects/`).
 
-São **complementares**: o transcript guarda o *raciocínio* (perdido no `/clear`); o worklog guarda o *estado comprometido* (sobrevive a tudo). Ver [worklog-protocol.md](../concepts/worklog-protocol.md) para o fluxo de resume frio vs. quente.
+São **complementares**: o transcript guarda o *raciocínio* (perdido no `/clear`); o worklog guarda o *estado comprometido* (sobrevive a tudo). Ver worklog-protocol.md para o fluxo de resume frio vs. quente.
 
 ### Estado ACTIVE — worklog de trabalho (nomeado por slug)
 
@@ -910,7 +910,7 @@ Ao iniciar uma feature/hotfix/release, o comando cria `.claude/sessions/<slug>/`
 └── notes.md         # Log append-only de decisões, links e pendências
 ```
 
-**`STATE.md`** — o **ponto de entrada de resume**. É o único arquivo que `/engineer/work`, `/onion` e `/engineer/warm-up` precisam ler para saber o estado. Seu ponteiro `## NEXT` é **autoritativo**; os badges do `plan.md` são detalhe humano subordinado (se divergirem, `STATE.md` vence e o comando sinaliza drift). Esquema completo em [worklog-protocol.md](../concepts/worklog-protocol.md).
+**`STATE.md`** — o **ponto de entrada de resume**. É o único arquivo que `/engineer/work`, `/onion` e `/engineer/warm-up` precisam ler para saber o estado. Seu ponteiro `## NEXT` é **autoritativo**; os badges do `plan.md` são detalhe humano subordinado (se divergirem, `STATE.md` vence e o comando sinaliza drift). Esquema completo em worklog-protocol.md.
 
 **`context.md`** — metadados estáveis + mapeamento de fases para o task manager:
 
@@ -974,7 +974,7 @@ Decida uma postura por projeto e registre-a no `.gitignore` com um comentário. 
 - **Slug determinístico**: derivado da branch; nunca inventar nome divergente da branch.
 - **Idempotência**: se o worklog já existe, não sobrescrever `notes.md`/`plan.md`/`STATE.md` — apenas complementar.
 - **Vínculo com task é opcional**: se `TASK_MANAGER_PROVIDER=none`, "Task vinculada" e os Subtask IDs ficam `—` e o worklog opera offline.
-- **Resume barato**: leia `STATE.md` primeiro (Tier-0); só carregue `plan.md` (bloco da fase `[ACTIVE]`), `architecture.md` ou `context.md` sob demanda. Nunca faça `cat` da pasta inteira (anti-pattern "Context Dump"). Protocolo completo em [worklog-protocol.md](../concepts/worklog-protocol.md).
+- **Resume barato**: leia `STATE.md` primeiro (Tier-0); só carregue `plan.md` (bloco da fase `[ACTIVE]`), `architecture.md` ou `context.md` sob demanda. Nunca faça `cat` da pasta inteira (anti-pattern "Context Dump"). Protocolo completo em worklog-protocol.md.
 
 ---
 

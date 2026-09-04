@@ -1,6 +1,6 @@
 # 🟠 Asana Adapter
 
-> Instância do padrão [SDAAL](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md).
+> Instância do padrão SDAAL.
 > Transporte **padrão: REST API**. MCP opcional via `TASK_MANAGER_TRANSPORT=mcp`.
 
 ---
@@ -538,7 +538,7 @@ const open = await tm.searchTasks({
 - [Asana API: Field Selection (opt_fields)](https://developers.asana.com/docs/inputoutput-options)
 - [Interface ITaskManager](../interface.md)
 - [Types](../types.md)
-- [SDAAL — Padrão-pai](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+- SDAAL — Padrão-pai
 
 ---
 

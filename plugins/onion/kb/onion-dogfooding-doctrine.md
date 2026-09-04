@@ -18,7 +18,7 @@
 | **Categoria** | Conceitos |
 | **Comando relacionado** | `meta:evolve` (sensor) · gate mecânico em `${CLAUDE_PLUGIN_ROOT}/validation/` |
 | **Padrão-irmão** | Doutrina de Modernização |
-| **Padrão-parente** | [Knowledge Graph SDAAL](knowledge-graph-sdaal.md) — o KG é o SSOT que o loop lê antes e escreve depois (§♻️ e §Onde se encaixa) · [`/onion-work-tools:diary`](../../../.claude/commands/meta/diary.md) — o re-teste de migalha é o "re-" em outra roupa |
+| **Padrão-parente** | [Knowledge Graph SDAAL](knowledge-graph-sdaal.md) — o KG é o SSOT que o loop lê antes e escreve depois (§♻️ e §Onde se encaixa) · `/onion-work-tools:diary` — o re-teste de migalha é o "re-" em outra roupa |
 
 ---
 
@@ -51,7 +51,7 @@ nova entrada do dogfood, não o fim.
    > revela **supersede** o que a rodada anterior concluiu (*"2º dogfood de campo"*, *"re-dogfood
    > geral do KG SDAAL"*). (a) fecha um loop; (b) **abre** um — é a instância de campo do "re-" (§♻️).
 4. **Validação adversarial é insumo, não ordem.** Veredito de revisor/subagente é hipótese a
-   **verificar com evidência** — rejeitável com prova (ver [@metaspec-gate-keeper](../../../.claude/agents/meta/metaspec-gate-keeper.md), Regra Zero: "evidência ou abstenção").
+   **verificar com evidência** — rejeitável com prova (ver @metaspec-gate-keeper, Regra Zero: "evidência ou abstenção").
 5. **Findings do uso são trabalho de agora**, não follow-up vago. Aprender e resolver no mesmo loop.
 
 ---
@@ -159,7 +159,7 @@ Nenhum dos três é opcional, e nenhum é novo — o que faltava era dizer que s
 | Instância | Onde vive (SSOT) | TTL | Sinal de vencimento | Reconciliação |
 |---|---|---|---|---|
 | **re-dogfood** do fix | esta doutrina (§🚦 item 3) | — | o fix existe | re-exercitar até passar |
-| **re-teste** de migalha | [`/onion-work-tools:diary review`](../../../.claude/commands/meta/diary.md) | `review_after` (90d) | ⏰ no boot (hook) | `superseded: true` (nunca apagar) |
+| **re-teste** de migalha | `/onion-work-tools:diary review` | `review_after` (90d) | ⏰ no boot (hook) | `superseded: true` (nunca apagar) |
 | **re-verificação** do KG | [knowledge-graph-sdaal §Frescor](knowledge-graph-sdaal.md#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou) | `verified_at` × `meta.baseline` | ⚠ STALE (radar `--freshness`) | `REFUTES`/`SUPERSEDES` (append-mostly) |
 
 O parentesco é **declarado, não analogia**: o gate de frescor do KG é filho do `review_after` do diário
@@ -187,7 +187,7 @@ hipótese**"* — **é esta doutrina**, em outra roupa.
 
 - Irmã: Doutrina de Modernização do Onion
 - Gate mecânico: [`lint-artifacts.sh`](${CLAUDE_PLUGIN_ROOT}/validation/lint-artifacts.sh) · [`lint-selftest.sh`](${CLAUDE_PLUGIN_ROOT}/validation/lint-selftest.sh) · [`inventory.sh`](${CLAUDE_PLUGIN_ROOT}/validation/inventory.sh)
-- Governança: [@metaspec-gate-keeper](../../../.claude/agents/meta/metaspec-gate-keeper.md) (Regra Zero — evidência ou abstenção)
+- Governança: @metaspec-gate-keeper (Regra Zero — evidência ou abstenção)
 - Co-evolução (upstream = dogfooding de campo): `docs/evolution/README.md` (interno do core) — *dimensão:* fonte canônica do protocolo doc-bridge core↔adotante, sinal bidirecional por markdown commitado (`inbox/` upstream, `inbound/` downstream); maestro humano orquestra e transporta, execução do que chega é gate humano
 - Reforço aplicado: `CONTRIBUTING.md` (fluxo de PR) · `${CLAUDE_PLUGIN_ROOT}/skills/onion-validation/SKILL.md` (regra de gerador) · `CLAUDE.md` (recall por sessão no core)
 - Evidência (PRs): self-heal de inventário (#126), limpeza `.claude/docs/` (#127), `/onion-work-tools:all-tools` (#128)

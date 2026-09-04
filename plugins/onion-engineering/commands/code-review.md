@@ -22,4 +22,4 @@ Este comando **mudou de lugar**. O gerenciamento de code review automático é u
 /meta/setup-code-review [auto|setup|validate|status]
 ```
 
-Comando canônico: [meta/setup-code-review.md](../meta/setup-code-review.md). Os argumentos são idênticos. Este alias é mantido por compatibilidade e será removido em iteração futura — atualize seus atalhos/documentação para `/onion-work-tools:setup-code-review`.
+Comando canônico: meta/setup-code-review.md. Os argumentos são idênticos. Este alias é mantido por compatibilidade e será removido em iteração futura — atualize seus atalhos/documentação para `/onion-work-tools:setup-code-review`.

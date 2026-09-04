@@ -16,15 +16,15 @@ estrela, este comando reorienta a **constelação** — o painel macro de todos 
 `discuss/*` do maestro, **gerado** por `${CLAUDE_PLUGIN_ROOT}/validation/constellation-map.sh` a partir do
 frontmatter + bloco Tier-0 de cada `docs/discussions/*/SEED.md`.
 
-> Doutrina: [constellation-of-studies.md](../../../docs/knowledge-base/concepts/constellation-of-studies.md)
-> · ADR: [onion-adr-constellation-operating-model-2026-07.md](../../../docs/analysis/onion-adr-constellation-operating-model-2026-07.md)
-> · Schema Tier-0: [docs/discussions/_template/SEED.md](../../../docs/discussions/_template/SEED.md)
+> Doutrina: constellation-of-studies.md
+> · ADR: onion-adr-constellation-operating-model-2026-07.md
+> · Schema Tier-0: docs/discussions/_template/SEED.md
 
 ## Invariantes (não-negociáveis — ADR §NÃO-fazer)
 
 - **Read-only estrito** — o mapa nunca escreve, nunca faz checkout, **nunca pusha** estrela alheia.
 - **Só-metadados** — lê APENAS o bloco frontmatter (1º `---` … 2º `---`) de cada SEED; o **corpo**
-  da discussão **nunca** é lido. É intake de metadados ([authorization-layers](../../../docs/knowledge-base/concepts/authorization-layers-intake-vs-execution.md)),
+  da discussão **nunca** é lido. É intake de metadados (authorization-layers),
   não leitura de conteúdo — é assim que o macro **não quebra o isolamento** da estrela.
 - **Single-machine** — lê SEEDs/beacons entre worktrees irmãs na mesma máquina (o eixo
   cross-máquina é a **Federação**, ortogonal).

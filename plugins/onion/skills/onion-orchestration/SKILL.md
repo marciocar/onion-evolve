@@ -22,7 +22,7 @@ A coordenação roda em JavaScript e custa **0 tokens de modelo**. O teto é de
 (default 200) soma subagentes de **toda a sessão** (conversa principal + fan-out), não por run isolado — e o
 mesmo vale para `CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` (default 200), o teto que já mordeu a casa. Suba o
 env var ou rode `/clear` para resetar a contagem — nunca desista da orquestração por teto esgotado. Detalhe e
-fontes: [agent-orchestration.md](../../../docs/knowledge-base/concepts/agent-orchestration.md) → "Primitivas
+fontes: agent-orchestration.md → "Primitivas
 Nativas" (fonte única).
 
 ## Instruções (passo a passo)
@@ -265,7 +265,7 @@ força), e a doutrina desta casa é que `fix-must-become-mechanism` vale **quand
 - **Nunca orqueste dentro de um subagente.** A orquestração mora no **nível
   principal** (skill/comando). Subagentes não disparam a orquestração — fan-out aninhado
   dentro de worker é mais caro e turvo. Por
-  [architecture.md §4.2](../../../docs/meta-specs/architecture.md), `agents/* →
+  architecture.md §4.2, `agents/* →
   commands/*` é proibido; logo **não existe** agente "worker-orchestrator".
 - **Coordenação JS custa 0 tokens.** Filtros, agregação, ranqueamento e
   roteamento entre etapas rodam em JavaScript — não gaste chamadas de modelo no
@@ -282,10 +282,10 @@ força), e a doutrina desta casa é que `fix-must-become-mechanism` vale **quand
 - **Run-id + trace.** Gere um identificador por run (custo 0 tokens) e inclua no relatório junto à referência do **Agent View**, para reprodutibilidade e inspeção.
 - **Falhar-alto em fase vazia (não no-op silencioso).** Se uma lista de trabalho **derivada** de uma fase fica vazia com entradas não-vazias (esperava N itens para julgar/processar, obteve 0), isso é **erro de orquestração**, não sucesso. Assert `derivada.length` antes de prosseguir e `log()` o descompasso — senão a fase no-opa e o run reporta "ok" tendo verificado nada. (Incidente real: filtro de juízes comparou caminho **absoluto** do worker com **relativo** → 0 juízes; o run reportou sucesso.)
 - **Correlação por chave estável, nunca por path.** Ao casar resultado-de-worker com configuração (qual julgar, qual estágio), use **label/índice** estável — não string-match de caminho, que quebra na fronteira absoluto-vs-relativo.
-- **Claim de localização de dado exige read-path verificado.** Em auditoria data-driven, worker que afirma *onde um dado vive* (tabela/arquivo/cache/env) cita o **read-path no código** (`arquivo:linha` de quem efetivamente lê na operação auditada) — senão o item nasce **hipótese**, nunca nó confirmado. No fan-in, **divergência de fonte** entre workers (ou worker×banco) é **achado** (provável split-brain), não ruído. (Caso real: tabela de nome óbvio quase produziu veredito falso — o motor lia outra; padrão [verify-read-path-first](../../../docs/knowledge-base/agentic-patterns/ai-strategies/verify-read-path-first.md), sinal de campo de um adotante.)
+- **Claim de localização de dado exige read-path verificado.** Em auditoria data-driven, worker que afirma *onde um dado vive* (tabela/arquivo/cache/env) cita o **read-path no código** (`arquivo:linha` de quem efetivamente lê na operação auditada) — senão o item nasce **hipótese**, nunca nó confirmado. No fan-in, **divergência de fonte** entre workers (ou worker×banco) é **achado** (provável split-brain), não ruído. (Caso real: tabela de nome óbvio quase produziu veredito falso — o motor lia outra; padrão verify-read-path-first, sinal de campo de um adotante.)
 - **Retomar a fase quebrada, não racionalizar.** Quando uma fase falha/no-opa, **corrija o script e retome** via `resumeFromRunId` (workers concluídos vêm do cache; só a fase corrigida roda) — não substitua a verificação perdida por um check **a jusante** (CI/lint) e a declare "equivalente". Um check determinístico cobre a dimensão *sintática*; verificadores semânticos cobrem *funcionalidade/qualidade* — **não são intercambiáveis**. Nomeie a dimensão não-verificada; quando possível, converta-a num **guard determinístico permanente**.
 - **Síntese que não persistiu = síntese perdida (não a deixe efêmera).** Orquestração que produz conhecimento fecha em `write(KG)` (passo 7): o output do harness vive no `/tmp` e **drifta** — o SSOT nunca o viu. Antes do relatório, **persista no repo + materialize `.kg.yaml` (radar exit 0)** e **nomeie o path**. "Esqueci de salvar" é exatamente o modo-de-falha que o KG-first foi criado pra matar (sinal de campo 2026-07-18: `deep-research` do harness não persiste no KG-SSOT).
-- **Claim sobre atual/emergente/popular exige verificação externa.** Worker de pesquisa que afirma algo **current/emerging/popular** — **versão · device · projeto/player · framework · tendência** — **verifica externo** (`WebSearch`/`WebFetch`) **antes** de o claim virar nó confirmado; senão nasce **hipótese**, nunca fato (mesma forma do read-path acima, com o **mundo externo** no lugar do read-path). `WebFetch` é **budget separado** do `WebSearch` (transporte esgotado ≠ desistir); ambos indisponíveis → o worker **marca "não verificado"**, não chuta. É o `verify(vivo)` do ciclo aplicado ao mundo externo (doutrina [verify-external-for-current](../../../docs/knowledge-base/concepts/verify-external-for-current.md)).
+- **Claim sobre atual/emergente/popular exige verificação externa.** Worker de pesquisa que afirma algo **current/emerging/popular** — **versão · device · projeto/player · framework · tendência** — **verifica externo** (`WebSearch`/`WebFetch`) **antes** de o claim virar nó confirmado; senão nasce **hipótese**, nunca fato (mesma forma do read-path acima, com o **mundo externo** no lugar do read-path). `WebFetch` é **budget separado** do `WebSearch` (transporte esgotado ≠ desistir); ambos indisponíveis → o worker **marca "não verificado"**, não chuta. É o `verify(vivo)` do ciclo aplicado ao mundo externo (doutrina verify-external-for-current).
 
 ## Referências
 

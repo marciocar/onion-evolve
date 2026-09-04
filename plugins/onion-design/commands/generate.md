@@ -41,12 +41,12 @@ passou no contraste calculado** e melhor atende o brief.
 - **NÃO** decide posicionamento → o brief vem de `/onion-product:branding` / `business-context`.
 - **NÃO** commita candidatas na SSOT automaticamente: vivem em staging (`/tmp` ou
   `docs/design-context/_candidates/`) até o **maestro** escolher e promover. Promover uma 2ª marca
-  na cascata pende do gatilho do [ADR de peer](../../../docs/design-context/decisions/onion-adr-design-peer-promotion.md).
+  na cascata pende do gatilho do ADR de peer.
 - **É OPT-IN de orquestração**: dispara a ferramenta `Workflow` (custo de N workers). Avisar escopo/custo antes.
 
 ## Fluxo (orquestração de subagentes — generate-and-filter)
 
-Padrão canônico da skill [`onion-orchestration`](../../skills/onion-orchestration/SKILL.md) (KB `agent-orchestration`).
+Padrão canônico da skill `onion-orchestration` (KB `agent-orchestration`).
 A orquestração mora **aqui** (comando, nível principal) — nunca dentro de um worker.
 
 ### 1. BRIEF + ângulos

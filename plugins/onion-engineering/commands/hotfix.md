@@ -53,7 +53,7 @@ CURRENT=$(git branch --show-current)
 
 ### Passo 2: Criar task emergencial (opcional — provider-agnóstico)
 
-Se `TASK_MANAGER_PROVIDER` != `none`, criar a task via o adapter ([utils/task-manager/factory.md](../../utils/task-manager/factory.md)) — **não** acoplar a provider específico:
+Se `TASK_MANAGER_PROVIDER` != `none`, criar a task via o adapter (utils/task-manager/factory.md) — **não** acoplar a provider específico:
 
 ```typescript
 const tm = getTaskManager();                 // resolve provider do .env
@@ -98,7 +98,7 @@ Criar `.claude/sessions/<slug>/` conforme o [Contrato de Sessão](${CLAUDE_PLUGI
 ## 🔗 Referências
 
 - Motor GitFlow (hotfix, semver): [gitflow-patterns.md §Template 4](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#template-4-emergency-hotfix)
-- Task Manager (criação provider-agnóstica): [utils/task-manager/factory.md](../../utils/task-manager/factory.md)
+- Task Manager (criação provider-agnóstica): utils/task-manager/factory.md
 - Contrato de sessão: [gitflow-patterns.md](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)
 - Mentor: `@gitflow-specialist`
 

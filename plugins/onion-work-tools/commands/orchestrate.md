@@ -33,7 +33,7 @@ saída a uma **verificação adversarial** antes de relatar.
 
 A orquestração mora **sempre no nível principal** (este comando + a skill
 `onion-orchestration`), nunca dentro de um subagente. Por
-[architecture.md §4.2](../../../docs/meta-specs/architecture.md) a dependência
+architecture.md §4.2 a dependência
 `agents/* → commands/*` é proibida — um agente sugere, não invoca comando. Logo
 **não existe** nem deve ser criado um agente "worker-orchestrator".
 
@@ -105,7 +105,7 @@ Com o padrão escolhido, autore um script da ferramenta **Workflow**. Use:
 - **Mutação (workers escrevem):** **particione por arquivos disjuntos** (sem
   corrida → **dispensa worktree**); use `isolation:'worktree'` **só** quando há
   sobreposição real ou branches independentes a fundir. Consolide numa **única
-  branch** → fluxo normal. Playbook completo + `DiffSchema`: [agent-orchestration.md §7](../../../docs/knowledge-base/concepts/agent-orchestration.md).
+  branch** → fluxo normal. Playbook completo + `DiffSchema`: agent-orchestration.md §7.
 - `budget` (teto de tokens) — **obrigatório** em qualquer `loop-until-done`.
 
 Aplique **model tiering**: opus orquestra no nível principal; workers mecânicos

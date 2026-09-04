@@ -150,7 +150,7 @@ Para **Next.js**: adicionar `ENV NEXT_TELEMETRY_DISABLED 1` no builder e copiar 
 
 Para **NX Monorepo**: usar `ARG APP_NAME=api-admin` e `RUN pnpm nx build ${APP_NAME} --configuration=production` no builder; no production copiar `dist/apps/${APP_NAME}`.
 
-> Dockerfiles completos (Node.js, Next.js, NX, Entrypoint com migrations): [docker-deployment.md § 1](../../../docs/knowledge-base/tools/docker-deployment.md)
+> Dockerfiles completos (Node.js, Next.js, NX, Entrypoint com migrations): docker-deployment.md § 1
 
 ### 3.2 Docker Compose Mínimo com PostgreSQL
 
@@ -185,7 +185,7 @@ volumes:
   postgres_data: { driver: local }
 ```
 
-> Compose completos (dev, multi-service, nginx, exemplos NX): [docker-deployment.md § 2-3](../../../docs/knowledge-base/tools/docker-deployment.md)
+> Compose completos (dev, multi-service, nginx, exemplos NX): docker-deployment.md § 2-3
 
 ### 3.3 Comandos Mais Usados
 
@@ -205,7 +205,7 @@ docker build --progress=plain --no-cache .   # build verbose
 docker network inspect ${APP_NAME}-network   # check connectivity
 ```
 
-> Referência completa de comandos e troubleshooting: [docker-deployment.md § 4-7](../../../docs/knowledge-base/tools/docker-deployment.md)
+> Referência completa de comandos e troubleshooting: docker-deployment.md § 4-7
 
 # Guidelines
 
@@ -324,4 +324,4 @@ Este agente foca em:
 
 ## Knowledge Base
 
-Conteúdo técnico detalhado (Dockerfiles completos, exemplos Docker Compose, comandos, troubleshooting, segurança): [docker-deployment.md](../../../docs/knowledge-base/tools/docker-deployment.md)
+Conteúdo técnico detalhado (Dockerfiles completos, exemplos Docker Compose, comandos, troubleshooting, segurança): docker-deployment.md

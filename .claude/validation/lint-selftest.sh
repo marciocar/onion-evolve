@@ -11235,6 +11235,62 @@ run_plugin_bare_path_selftests() {
 }
 _family run_plugin_bare_path_selftests
 
+# REGRA 75 — link relativo morto em plugin (helper plugin-dead-link-check.sh + cura --rewrite no assembler).
+# Modo consumido `--format tsv` (REGRA 59) e mutante (plugin editado à mão).
+run_plugin_dead_link_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/plugin-dead-link-check.sh" asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
+  [ -f "${h}" ] && [ -f "${asm}" ] || { record_fail "plugin-dead-link" "helper ou assembler ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "plugin-dead-link: python3 ausente"; return; }
+  local d out; d="$(mktemp -d)"
+  export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
+  mkdir -p "${d}/src/.claude/commands/alpha" "${d}/src/.claude/utils/marketplace/verticals" "${d}/src/docs/kb"
+  printf 'viva\n' > "${d}/src/docs/kb/viva.md"; printf 'morta\n' > "${d}/src/docs/kb/morta.md"
+  printf -- '---\nname: one\ndescription: Um.\n---\nVeja [viva](../../../docs/kb/viva.md), [morta](../../../docs/kb/morta.md) e [url](https://x/y.md).\n' > "${d}/src/.claude/commands/alpha/one.md"
+  printf 'PLUGIN_NAME="dl"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="x"\nKEYWORDS=(x)\nCOMMANDS=(.claude/commands/alpha)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=(docs/kb/viva.md)\n' > "${d}/src/.claude/utils/marketplace/verticals/dl.manifest.sh"
+  ( cd "${d}/src" && git init -q && git add -A && git commit -qm seed ) >/dev/null 2>&1
+  bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/dl.manifest.sh" "${d}/src" "${d}/src/plugins/dl" >/dev/null 2>&1 || true
+  out="$(cat "${d}/src/plugins/dl/commands/one.md" 2>/dev/null)"
+  # (a) a cura: a irmã embarcada (viva → kb/) segue link; a não-embarcada vira texto; URL intacta
+  if printf '%s' "${out}" | grep -q 'kb/viva.md' && printf '%s' "${out}" | grep -q ' morta ' && printf '%s' "${out}" | grep -q '\[url\](https://x/y.md)'; then
+    record_pass "plugin-dead-link: (a) assembler: irmã embarcada mantém link, não-embarcada vira texto, URL intacta"
+  else record_fail "plugin-dead-link: (a) cura" "$(printf '%s' "${out}" | tail -1 | cut -c1-200)"; fi
+  # (b) modo consumido: --format tsv vazio no plugin curado
+  out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
+  if [ -z "${out}" ]; then record_pass "plugin-dead-link: (b) --format tsv vazio no plugin curado"
+  else record_fail "plugin-dead-link: (b) tsv" "$(printf '%s' "${out}" | head -2 | tr '\n' ' ' | cut -c1-200)"; fi
+  # (c) mutante: link morto reintroduzido à mão → HARD; templates/ não conta
+  printf 'De novo: [morta](../kb/morta.md)\n' >> "${d}/src/plugins/dl/commands/one.md"
+  mkdir -p "${d}/src/plugins/dl/templates"; printf '[gera](../docs/x.md)\n' > "${d}/src/plugins/dl/templates/t.md"
+  out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
+  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 1 ] && printf '%s' "${out}" | grep -q 'morta.md'; then record_pass "plugin-dead-link: (c) mutante → 1 HARD; templates/ fora por desenho"
+  else record_fail "plugin-dead-link: (c) mutante" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+  rm -rf "${d}"
+}
+_family run_plugin_dead_link_selftests
+
+# REGRA 76 — marketplace.json da raiz == gerador (helper marketplace-root-check.sh; --write seguro).
+run_marketplace_root_sync_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/marketplace-root-check.sh"
+  [ -f "${h}" ] || { record_fail "marketplace-root-sync" "helper ausente"; return; }
+  local d out; d="$(mktemp -d)"
+  mkdir -p "${d}/r/.claude-plugin" "${d}/r/plugins/probe/.claude-plugin"
+  printf '{\n  "name": "probe",\n  "version": "0.1.3",\n  "description": "Sonda",\n  "author": { "name": "t" },\n  "keywords": ["a"],\n  "license": "MIT",\n  "homepage": "https://x",\n  "repository": "https://x"\n}\n' > "${d}/r/plugins/probe/.claude-plugin/plugin.json"
+  printf '{\n  "name": "probe-mkt",\n  "owner": { "name": "t" },\n  "plugins": []\n}\n' > "${d}/r/.claude-plugin/marketplace.json"
+  # (a) stale → HARD (modo consumido --format tsv)
+  out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q '^HARD	desatualizado'; then record_pass "marketplace-root-sync: (a) marketplace.json stale → HARD"
+  else record_fail "marketplace-root-sync: (a)" "$(printf '%s' "${out}" | cut -c1-200)"; fi
+  # (b) --write regenera com top-level preservado → limpo
+  bash "${h}" "${d}/r" --write >/dev/null 2>&1
+  out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
+  if [ -z "${out}" ] && grep -q '"probe-mkt"' "${d}/r/.claude-plugin/marketplace.json" && grep -q '"probe"' "${d}/r/.claude-plugin/marketplace.json"; then record_pass "marketplace-root-sync: (b) --write regenera (temp+mv), top-level preservado, limpo"
+  else record_fail "marketplace-root-sync: (b)" "$(printf '%s' "${out}" | cut -c1-200)"; fi
+  rm -rf "${d}"
+}
+_family run_marketplace_root_sync_selftests
+
+
 
 
 # ---------------------------------------------------------------------------

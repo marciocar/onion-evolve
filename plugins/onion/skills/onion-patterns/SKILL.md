@@ -46,7 +46,7 @@ Cada skill em pasta própria com `SKILL.md`. Opcionalmente:
 - `examples/` — exemplos de output
 
 ### `.claude/sessions/<feature-slug>/` (worklog)
-Estrutura definida pela **SSOT** — não redefina aqui: [gitflow-patterns.md §Contrato de Sessão](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento). Worklog ACTIVE = `STATE.md` (índice Tier-0, ponto de resume) + `context.md` (+ Phase-Subtask Mapping) + `architecture.md` + `plan.md` + `notes.md`. Mecânica de leitura/resume: [worklog-protocol.md](../../../docs/knowledge-base/concepts/worklog-protocol.md).
+Estrutura definida pela **SSOT** — não redefina aqui: gitflow-patterns.md §Contrato de Sessão. Worklog ACTIVE = `STATE.md` (índice Tier-0, ponto de resume) + `context.md` (+ Phase-Subtask Mapping) + `architecture.md` + `plan.md` + `notes.md`. Mecânica de leitura/resume: worklog-protocol.md.
 
 ## Nomenclatura
 
@@ -220,7 +220,7 @@ catálogo/SDAAL antes de introduzir dependência nova) → **materializar** (gat
 
 ### validação de doutrina — o **ELENXO** (superação de alto risco)
 
-> 📖 **SSOT: [`docs/knowledge-base/concepts/onion-elenxo-doctrine.md`](../../../docs/knowledge-base/concepts/onion-elenxo-doctrine.md)**
+> 📖 **SSOT: `docs/knowledge-base/concepts/onion-elenxo-doctrine.md`**
 > — a doutrina inteira (as 5 etapas com o que cada uma reprova, a medição da etapa 5, por que não há
 > gate mecânico, o Bulbo e a porosidade). Esta seção é **derivação**; divergiu, a KB ganha.
 >
@@ -244,7 +244,7 @@ RAZÃO e preserva DISSENT** · 5. **`write(KG)` com `SUPERSEDES`/`REFUTES`** (*A
 apagar).
 
 ⚠️ **A etapa 5 é a que mais falha, e é medida** — cicatriz registrada em
-[`kg-born-marker.sh:26`](../../validation/kg-born-marker.sh). Refutação que não virou **aresta** não é
+`kg-born-marker.sh:26`. Refutação que não virou **aresta** não é
 consultável: o próximo a perguntar *"isso já foi testado?"* re-deriva do zero.
 
 **Aristóteles ao invocar:** o Elenxo é caro (fan-out orquestrado + tier alto na refutação).

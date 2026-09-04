@@ -5,7 +5,7 @@ normaliza para a SSOT de tokens (`docs/design-context/`, W3C/DTCG). É o lado de
 design; o `design-sink/` é o lado de **saída** (DTCG → formato-alvo). **Anti-lock-in:** a SSOT é W3C/DTCG —
 neutra por formato; outra fonte = outro ingestor lendo/escrevendo a mesma SSOT.
 
-> **Por que script e não SDAAL** ([abstraction-doctrine](../../../docs/knowledge-base/concepts/onion-abstraction-doctrine.md)):
+> **Por que script e não SDAAL** (abstraction-doctrine):
 > há **1 ingestor real** (`file`); `figma`/`penpot` são costura. Teste do Eixo (a) reprova — provider único
 > é overhead sem ganho (whitepaper §13); e a transformação é **determinística sem LLM** → script (P1).
 > **Gatilho de graduação a SDAAL:** o **2º ingestor real** nascer.

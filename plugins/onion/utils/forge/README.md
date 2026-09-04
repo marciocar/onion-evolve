@@ -1,7 +1,7 @@
 # Forge Abstraction Layer
 
 > **Esta camada é uma instância concreta do padrão SDAAL (Specification-Driven AI Abstraction Layer).**
-> Consulte o padrão-pai em [`docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md`](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md). Adapter-irmão de referência: [`../task-manager/`](../task-manager/).
+> Consulte o padrão-pai em `docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md`. Adapter-irmão de referência: [`../task-manager/`](../task-manager/).
 
 ## Propósito
 
@@ -9,7 +9,7 @@ Camada de abstração que permite trocar o **forge** (host de código remoto: Gi
 
 ## 🧭 Escopo: só o host remoto
 
-Esta camada cobre **apenas operações de host remoto**. Git local (branch, merge, tag, **push**) permanece como chamadas `git` diretas nos comandos, orientadas pelo motor GitFlow ([gitflow-patterns.md](../../../docs/knowledge-base/frameworks/gitflow-patterns.md)). Ver [interface.md](./interface.md) §Fronteira local-vs-remoto.
+Esta camada cobre **apenas operações de host remoto**. Git local (branch, merge, tag, **push**) permanece como chamadas `git` diretas nos comandos, orientadas pelo motor GitFlow (gitflow-patterns.md). Ver [interface.md](./interface.md) §Fronteira local-vs-remoto.
 
 | Camada | Cobre | Não cobre |
 |---|---|---|
@@ -134,8 +134,8 @@ Comando Onion (após git push local)
 
 ## Documentação relacionada
 
-- [`docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md`](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md) — padrão SDAAL (padrão-pai)
-- [`docs/knowledge-base/frameworks/gitflow-patterns.md`](../../../docs/knowledge-base/frameworks/gitflow-patterns.md) — motor GitFlow (git local)
+- `docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md` — padrão SDAAL (padrão-pai)
+- `docs/knowledge-base/frameworks/gitflow-patterns.md` — motor GitFlow (git local)
 - [`../task-manager/`](../task-manager/) — adapter-irmão de referência
 - `.env.example` — variáveis `FORGE_*` disponíveis
 

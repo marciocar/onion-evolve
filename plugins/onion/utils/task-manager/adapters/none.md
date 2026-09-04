@@ -38,7 +38,7 @@ Isso evita espalhar `if (provider == null)` pelos comandos — eles chamam `getT
 
 - [Factory](../factory.md) — implementação `NoProviderAdapter`
 - [Interface ITaskManager](../interface.md) — contrato canônico
-- [SDAAL — Null Object](../../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+- SDAAL — Null Object
 
 ---
 

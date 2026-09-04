@@ -92,7 +92,7 @@ propagar a contradição para a documentação gerada.
 > **incentivo impresso no próprio texto** (reteste pago, etapa seguinte precificada) é evidência, não
 > suspeita. O que o fornecedor **concede contra o próprio interesse** é a parte de maior confiança do
 > documento. **Interesse qualifica a leitura, não a anula** — achado distinto e de lógica de negócio não
-> se relativiza. Doutrina: [evidence-source-interest.md](../../../docs/knowledge-base/concepts/evidence-source-interest.md).
+> se relativiza. Doutrina: evidence-source-interest.md.
 
 > **Modo não-interativo (infer-from-evidence).** Sem usuário disponível ou evidência completa,
 > não bloqueie: infira a partir do repo e dos artefatos existentes, **marque cada inferência**
@@ -176,7 +176,7 @@ docs/compliance-context/
 - **Template-base**: `${CLAUDE_PLUGIN_ROOT}/templates/compliance-context-template.md`
 - **Pasta-alvo**: `docs/compliance-context/`
 - **Comandos complementares**: `/onion-docs:build-tech-docs` · `/onion-docs:build-business-docs`
-- **Ciclo de vida (SSOT viva)**: [domain-context-lifecycle.md](../../../docs/knowledge-base/concepts/domain-context-lifecycle.md)
+- **Ciclo de vida (SSOT viva)**: domain-context-lifecycle.md
 - Orquestrador: @security-information-master · ISO 27001: @iso-27001-specialist · SOC2: @soc2-specialist
 
 ## ⚠️ Notas

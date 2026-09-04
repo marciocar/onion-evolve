@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 119 entradas · **Stale:** 0 · **Compartilháveis:** 107 · **Com significância:** 51
+**Total:** 120 entradas · **Stale:** 0 · **Compartilháveis:** 108 · **Com significância:** 51
 
 Gerado em: 2026-09-04
 
@@ -13,6 +13,7 @@ Gerado em: 2026-09-04
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
 | 2026-09-04 | learning | public 📤 | readme-de-plugin-e-catalogo-gerado-nao-prosa-e-version-duplicada-esconde-update | — | 2026-12-03 | static |
+| 2026-09-04 | learning | public 📤 | link-vivo-no-core-morto-no-plugin-e-o-marketplace-json-que-envelheceu-calado | — | 2026-12-03 | static |
 | 2026-09-04 | decision | public 📤 | license-por-plugin-o-diretorio-oficial-exige-o-arquivo-nao-so-o-campo | — | 2026-12-03 | static |
 | 2026-09-04 | error | public 📤 | hook-morto-e-silencioso-no-plugin-o-motor-nao-viajou-e-o-exit-0-escondeu | — | 2026-12-03 | static |
 | 2026-09-04 | learning | public 📤 | comando-de-plugin-e-plugin-cmd-o-lint-nao-via-porque-so-olhava-o-core | — | 2026-12-03 | static |

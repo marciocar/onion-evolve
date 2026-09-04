@@ -23,8 +23,8 @@ Ponto de entrada **único** para o ciclo de vida GitFlow. Substitui os antigos
 `git/{feature,release,hotfix}/{start,publish,finish}` (7 shims + 3 subpastas) por
 um dispatcher arg-driven. É um **orquestrador fino**: a lógica canônica mora no
 motor GitFlow ([gitflow-patterns.md](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md)),
-operações de host remoto no [forge adapter](../../utils/forge/interface.md) e sync
-de task no [task-manager adapter](../../utils/task-manager/factory.md).
+operações de host remoto no forge adapter e sync
+de task no task-manager adapter.
 
 ## 🚀 Como Usar
 
@@ -44,8 +44,8 @@ Sem args válidos → mostre esta ajuda e pare (não adivinhe).
 ## 🧭 Princípios (válidos para toda combinação)
 
 1. **Git local** (branch/checkout/merge/tag/**push**) = `git` direto, orientado pela KB. **Não** passa por adapter.
-2. **Host remoto** (PR/review/CI/Release) = sempre via [forge adapter](../../utils/forge/interface.md) — nunca `gh`/API em prosa (integrations.md §9).
-3. **Task (opcional)** — se `TASK_MANAGER_PROVIDER` != `none`, via [task-manager adapter](../../utils/task-manager/factory.md); roteamento/formatação por provider são do adapter — **não reimplementar aqui**.
+2. **Host remoto** (PR/review/CI/Release) = sempre via forge adapter — nunca `gh`/API em prosa (integrations.md §9).
+3. **Task (opcional)** — se `TASK_MANAGER_PROVIDER` != `none`, via task-manager adapter; roteamento/formatação por provider são do adapter — **não reimplementar aqui**.
 4. **Working directory limpo** antes de qualquer merge; em conflito → [§Template 6](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#template-6-resolução-de-conflitos).
 
 ## ⚡ Matriz de Roteamento
@@ -81,6 +81,6 @@ Reporte: combinação executada, branch resultante, ações de adapter realizada
 ## 📚 Referências
 
 - Motor GitFlow (Templates, semver, sessão, conflitos): [gitflow-patterns.md](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md)
-- Forge (PR/CI/Release): [utils/forge/interface.md](../../utils/forge/interface.md)
-- Sync de task: [utils/task-manager/factory.md](../../utils/task-manager/factory.md)
+- Forge (PR/CI/Release): utils/forge/interface.md
+- Sync de task: utils/task-manager/factory.md
 - Setup: `/onion-engineering:init` · Pós-merge: `/onion-engineering:sync` · Mentor: `@gitflow-specialist`

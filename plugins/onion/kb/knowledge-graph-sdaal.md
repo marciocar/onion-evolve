@@ -128,7 +128,7 @@ apaga, se **reconcilia** (mesmo parentesco do protocolo de re-teste do diário: 
 nunca deletar — `/onion-work-tools:diary review`).
 
 > **Normativo: `id` em INGLÊS, `label` em pt-BR.** Segue a skill `language-standards`/
-> [`code-standards`](../../meta-specs/code-standards.md) — `id` é identificador (código: inglês),
+> `code-standards` — `id` é identificador (código: inglês),
 > `label` é prosa lida por humano (pt-BR). **Custo real medido em campo** (sinal onion-pessoal-app,
 > 2026-07-19): quando os `id` derivaram para português, o **contrato entre artefatos quebrou** — o
 > `atom-map.md` nomeava `E_REPLY`/`E_PHOTO` e o `.kg.yaml` correspondente nomeava
@@ -496,10 +496,10 @@ mora aqui, mas **vive** nos loops.
 O passo KG-first é o **primeiro ato** dos três loops de retomada/execução do core — não um passo
 opcional no fim (ADR, proposta #5 ✅):
 
-- [`warm-up`](../../../.claude/commands/warm-up.md) — item 0, antes do README e da prosa dos docs;
-- [`catch-up`](../../../.claude/commands/catch-up.md) — passo 0, **acima do git** na reconstrução de
+- `warm-up` — item 0, antes do README e da prosa dos docs;
+- `catch-up` — passo 0, **acima do git** na reconstrução de
   "onde paramos";
-- [`engineer/work`](../../../.claude/commands/engineer/work.md) — passo 0, antes do `STATE.md`/git.
+- `engineer/work` — passo 0, antes do `STATE.md`/git.
 
 Nos três, o `allowed-tools` libera `Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh*)` — a trava sem a
 permissão seria conselho outra vez.
@@ -619,7 +619,7 @@ Cytoscape é *uma* implementação). Ver ≠ distribuir, uma camada acima.
 > de um adotante e se repete a cada adotante que assume uma área.
 
 O PFR completo (F0 inventário → F1 contrato → F2 `.kg.yaml` → F3 radar → F4 adaptador) vive no
-comando [`/onion-work-tools:kg`](../../../.claude/commands/meta/kg.md) §Modo map. O essencial doutrinário:
+comando `/onion-work-tools:kg` §Modo map. O essencial doutrinário:
 
 - **F1 tem 3 variantes — todas por identidade, não analogia** (o mesmo motor, o mesmo radar):
   1. **UI → atom-map** (contrato de átomos): 1 átomo = 1 fonte + 1 dono-de-exibição + 1

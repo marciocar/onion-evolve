@@ -92,9 +92,16 @@ if [ "${_autofix_on}" -eq 1 ] && [ -f "${ASM}" ] && [ -d "${VDIR}" ]; then
       fi
       # A8: se o add falhar, o rastro acima teria mentido — falha vira aviso explícito, nunca ||true mudo.
       git add "${REPO_ROOT}/plugins/${_name}" || echo "⚠️  git add de plugins/${_name} FALHOU — stagee à mão antes de commitar de novo."
+      _any_regen=1
     done
   fi
   rm -f "${_staged_f}" "${_pat_f}"
+  # REGRA 76: plugin regenerado ⇒ marketplace.json da raiz regenerado junto (temp+mv; redirecionar direto trunca).
+  MRC="${REPO_ROOT}/.claude/validation/marketplace-root-check.sh"
+  if [ "${_any_regen:-0}" -eq 1 ] && [ -f "${MRC}" ]; then
+    if bash "${MRC}" "${REPO_ROOT}" --write >/dev/null 2>&1; then git add "${REPO_ROOT}/.claude-plugin/marketplace.json" || echo "⚠️  git add de .claude-plugin/marketplace.json FALHOU — stagee à mão."
+    else echo "⚠️  marketplace.json NÃO regenerado (marketplace-root-check --write falhou) — a REGRA 76 vai acusar."; fi
+  fi
 fi
 
 # ── GATILHO DIRETO DO SUT (Q_GATILHO_DO_WIREIN, 3ª via — nem REGRA às pressas, nem esperar o

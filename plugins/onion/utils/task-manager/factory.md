@@ -456,7 +456,7 @@ const taskManager = getTaskManager({ forceProvider: 'linear' });
 - [Interface ITaskManager](./interface.md)
 - [Detector](./detector.md) — resolve provider + transporte efetivo
 - [Adapters](./adapters/) — documentam vias API (default) e MCP (opcional) de forma uniforme
-- [SDAAL — padrão-pai](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+- SDAAL — padrão-pai
 
 ---
 

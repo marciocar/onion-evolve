@@ -57,32 +57,32 @@ O ponto diferenciador central: o ciclo é **tri-dimensional e simétrico** — P
 
 ## 1.5 Invenções nomeadas — o catálogo canônico
 
-**Esta é a SSOT da lista** (o contrato que o [`/warm-up`](../../../.claude/commands/warm-up.md) declara).
+**Esta é a SSOT da lista** (o contrato que o `/warm-up` declara).
 Materiais derivados — o manual de adoção (`onion-adoption-manual.md` §1.3, interno do core — persona autobiográfica em 1ª pessoa "O Despertar", texto canônico do *Autobiographical Marketing*), press kit,
-artigos — **citam esta tabela**; não a reescrevem ([fonte ≠ derivação](../concepts/source-vs-derivation.md)).
+artigos — **citam esta tabela**; não a reescrevem (fonte ≠ derivação).
 
 **Critério de entrada:** emergiu da prática (não foi projetado), **ganhou nome próprio**, e tem casa
 canônica citável. Nome sem casa é órfão — entra na tabela só quando a casa existir.
 
 | Invenção | O que é | Casa canônica | Status |
 |---|---|---|---|
-| **Dogfood Doctrine** | toda mudança de core se valida **rodando o artefato**; fix → re-dogfood | [`onion-dogfooding-doctrine.md`](../concepts/onion-dogfooding-doctrine.md) | ✅ ativa |
-| **Modernization Doctrine** | qual padrão de refatoração aplicar sem ferir invariantes | [`onion-modernization-doctrine.md`](../concepts/onion-modernization-doctrine.md) | ✅ ativa |
-| **Abstraction Doctrine** | **quando** algo vira SDAAL (Teste do Eixo + Teste do Gatilho) | [`onion-abstraction-doctrine.md`](../concepts/onion-abstraction-doctrine.md) | ✅ ativa (2026-07-17) |
-| **Economy of Motors** | 3 motores (Transformer · SLM-ferramenta · Shell); use o mais barato capaz | [`onion-engine-economy.md`](../concepts/onion-engine-economy.md) | ✅ ativa |
-| **SDAAL** *(Specification-Driven AI Abstraction Layer)* | uma interface, N providers; o spec é o artefato e o LLM o runtime | [KB](../concepts/specification-driven-ai-abstraction-layer.md) · [whitepaper](../../sdaal/sdaal.md) | ✅ ativa |
-| **KG SDAAL** | investigação/domínio como grafo tipado; verdades **reconciliadas** (`REFUTES`/`SUPERSEDES`), radar determinístico | [`knowledge-graph-sdaal.md`](../concepts/knowledge-graph-sdaal.md) | ✅ ativa — **é infraestrutura**: 51 grafos, `kg-radar`, `kg-console`, `/onion-work-tools:kg`, `/onion:kg-freshness`, REGRAS 43/47/49/52 e regra path-scoped nativa |
-| **SSOT-as-runtime** | a SSOT é o **programa que se executa**: `read→verify→act→write`; KG-first + drive-to-verify | [KG SDAAL §SSOT-as-runtime](../concepts/knowledge-graph-sdaal.md#ssot-as-runtime--o-kg-é-o-primeiro-ato-mecanismo-não-conselho) | ✅ ativa (cabeada nos 3 loops) |
-| **`gated-until-trigger`** | o artefato nasce do **uso que o prove**, nunca de simetria/plano | [modernization §🚦](../concepts/onion-modernization-doctrine.md) | ✅ ativa |
-| **`declarado ≠ verificado`** | carimbo/doc/branch é DEV; só o artefato vivo é PROD | [verify-read-path-first](../agentic-patterns/ai-strategies/verify-read-path-first.md) (tabela da família) | ✅ ativa |
-| **`fonte ≠ derivação`** | fonte e nossa leitura em artefatos **fisicamente** separados; a derivação **cita** | [`source-vs-derivation.md`](../concepts/source-vs-derivation.md) | ✅ ativa |
-| **PFR** *(Padrão Faseado Retomável)* | sessão durável + `STATE.md` + retomada fria; fases nunca fundidas | `onion-adr-phased-resumable-pattern-2026-06.md` (ADR interno do core — nomeia o PFR, padrão já invariante L0; provisório, PR à meta-spec diferido até gatilho) + [método §2a](../concepts/onion-working-method.md) | 🟡 ADR provisório (a cravar em `commands.md §3`) |
+| **Dogfood Doctrine** | toda mudança de core se valida **rodando o artefato**; fix → re-dogfood | `onion-dogfooding-doctrine.md` | ✅ ativa |
+| **Modernization Doctrine** | qual padrão de refatoração aplicar sem ferir invariantes | `onion-modernization-doctrine.md` | ✅ ativa |
+| **Abstraction Doctrine** | **quando** algo vira SDAAL (Teste do Eixo + Teste do Gatilho) | `onion-abstraction-doctrine.md` | ✅ ativa (2026-07-17) |
+| **Economy of Motors** | 3 motores (Transformer · SLM-ferramenta · Shell); use o mais barato capaz | `onion-engine-economy.md` | ✅ ativa |
+| **SDAAL** *(Specification-Driven AI Abstraction Layer)* | uma interface, N providers; o spec é o artefato e o LLM o runtime | KB · whitepaper | ✅ ativa |
+| **KG SDAAL** | investigação/domínio como grafo tipado; verdades **reconciliadas** (`REFUTES`/`SUPERSEDES`), radar determinístico | `knowledge-graph-sdaal.md` | ✅ ativa — **é infraestrutura**: 51 grafos, `kg-radar`, `kg-console`, `/onion-work-tools:kg`, `/onion:kg-freshness`, REGRAS 43/47/49/52 e regra path-scoped nativa |
+| **SSOT-as-runtime** | a SSOT é o **programa que se executa**: `read→verify→act→write`; KG-first + drive-to-verify | KG SDAAL §SSOT-as-runtime | ✅ ativa (cabeada nos 3 loops) |
+| **`gated-until-trigger`** | o artefato nasce do **uso que o prove**, nunca de simetria/plano | modernization §🚦 | ✅ ativa |
+| **`declarado ≠ verificado`** | carimbo/doc/branch é DEV; só o artefato vivo é PROD | verify-read-path-first (tabela da família) | ✅ ativa |
+| **`fonte ≠ derivação`** | fonte e nossa leitura em artefatos **fisicamente** separados; a derivação **cita** | `source-vs-derivation.md` | ✅ ativa |
+| **PFR** *(Padrão Faseado Retomável)* | sessão durável + `STATE.md` + retomada fria; fases nunca fundidas | `onion-adr-phased-resumable-pattern-2026-06.md` (ADR interno do core — nomeia o PFR, padrão já invariante L0; provisório, PR à meta-spec diferido até gatilho) + método §2a | 🟡 ADR provisório (a cravar em `commands.md §3`) |
 | **Capability Contract** | o que um repo adotado pode esperar: Bronze/Silver/Gold — contrato **verificável** | `onion-adr-capability-contract-2026-06.md` (ADR interno do core — auto-descrição `provides/requires/loads/conformance`, tiers Bronze/Silver/Gold, validada pelo lint REGRA 20; visão-de-fora composta dos contratos, não registry à mão) + **7** `plugins/*/.claude-plugin/capability.json` | ✅ ativa — ADR **+ mecanismo** (REGRA 20 [HARD]) |
 | **Co-Evolution Protocol** *(doc-bridge)* | sinal bidirecional core↔adotante por arquivo commitado; sem runtime acoplado | `docs/evolution/README.md` (interno do core — fonte canônica do protocolo doc-bridge; maestro humano orquestra, execução do que chega é gate humano) + `/meta:co-*` | ✅ ativa |
-| **Breadcrumbs / migalhas** | sinal explícito **no artefato** que força **absorção** em vez de acomodação | [`breadcrumb-patterns.md`](../agentic-patterns/ai-strategies/breadcrumb-patterns.md) + `/onion-work-tools:diary` | ✅ ativa — 92 entradas, TTL + `conflict_class` por entrada, e o `personality-sync` F2 fez a **identidade emergir de 74 migalhas** |
-| **Object-led discovery** | o maestro dirige com o objeto; o Transformer executa com as peças certas | [KB](../agentic-patterns/ai-strategies/object-led-discovery.md) + `onion-adr-object-led-discovery-2026-07.md` (ADR interno do core — playbook espelhar→descobrir(object-led)→vestir(capability-fitting)→materializar→realimentar; "quem sabe sobre o objeto é o próprio objeto", Information Expert) | ✅ ativa |
+| **Breadcrumbs / migalhas** | sinal explícito **no artefato** que força **absorção** em vez de acomodação | `breadcrumb-patterns.md` + `/onion-work-tools:diary` | ✅ ativa — 92 entradas, TTL + `conflict_class` por entrada, e o `personality-sync` F2 fez a **identidade emergir de 74 migalhas** |
+| **Object-led discovery** | o maestro dirige com o objeto; o Transformer executa com as peças certas | KB + `onion-adr-object-led-discovery-2026-07.md` (ADR interno do core — playbook espelhar→descobrir(object-led)→vestir(capability-fitting)→materializar→realimentar; "quem sabe sobre o objeto é o próprio objeto", Information Expert) | ✅ ativa |
 | **Autobiographical Marketing** | o framework conta a própria história; os commits **são** a autobiografia | `onion-adoption-manual.md` (persona 1ª pessoa) + **onionevolve.com reformado** (2026-08-25, PR #672): /historia/ com a curva dos commits gerada do git, diário com 62 migalhas, /doutrinas/ com as cicatrizes datadas | ✅ ativa (2026-08-25 — deixou de ser só prosa de manual: virou site vivo com números derivados da SSOT em build) |
-| **Maestro's Aside** *(Aparte do Maestro)* | protocolo de entrada lateral tipada: marcador pt-BR no início da mensagem (`dúvida:`/`corrige:`/`paralelo:`…) → hook `UserPromptSubmit` injeta a rota canônica (recall, **não** gate); dispatcher p/ diário/memória/STATE/orquestração que já existem | [`maestro-aside.md`](../agentic-patterns/harness/maestro-aside.md) + hook+motor | ✅ ativa (2026-08-04) |
+| **Maestro's Aside** *(Aparte do Maestro)* | protocolo de entrada lateral tipada: marcador pt-BR no início da mensagem (`dúvida:`/`corrige:`/`paralelo:`…) → hook `UserPromptSubmit` injeta a rota canônica (recall, **não** gate); dispatcher p/ diário/memória/STATE/orquestração que já existem | `maestro-aside.md` + hook+motor | ✅ ativa (2026-08-04) |
 
 > **Manutenção:** ao nomear algo novo, **primeiro dê a casa**, depois adicione a linha. Nome anunciado
 > antes de existir é `declarado ≠ verificado` aplicado a nós mesmos — foi o que aconteceu com `KG-first` e
@@ -477,9 +477,9 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 - **Identidade canônica**: `CLAUDE.md` · `onion-review-2026-05.md` (interno do core)
 - **Auto-auditoria**: `onion-evolution-2026-06-15.md` (interno do core)
 - **Agent Teams ADR**: `onion-agent-teams-evaluation-2026-06.md` (interno do core)
-- **Federation v2**: `onion-federation-design-v2-2026-06.md` (interno do core) · [multi-repo-federation.md](../concepts/multi-repo-federation.md)
-- **Doutrina de orquestração**: [agent-orchestration.md](../concepts/agent-orchestration.md)
-- **Task Manager Abstraction**: [task-manager-abstraction.md](../concepts/task-manager-abstraction.md)
+- **Federation v2**: `onion-federation-design-v2-2026-06.md` (interno do core) · multi-repo-federation.md
+- **Doutrina de orquestração**: agent-orchestration.md
+- **Task Manager Abstraction**: task-manager-abstraction.md
 - **Getting started**: `docs/onion/getting-started.md`
 
 ---

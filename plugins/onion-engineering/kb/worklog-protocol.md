@@ -24,7 +24,7 @@
 
 Este KB define **como** um worklog do Onion extrai o máximo de eficácia da IA: integração com o transcript nativo do Claude Code, protocolo de leitura escalonado, ordenação prompt-cache-friendly, vocabulário de estado determinístico e checkpoint resistente a `/compact`.
 
-A **estrutura** do worklog (quais arquivos, ACTIVE vs ARCHIVED, versionamento) é definida na SSOT: [gitflow-patterns.md §Contrato de Sessão](../frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento). Este KB cobre a **mecânica de execução**; a SSOT cobre o **contrato**.
+A **estrutura** do worklog (quais arquivos, ACTIVE vs ARCHIVED, versionamento) é definida na SSOT: gitflow-patterns.md §Contrato de Sessão. Este KB cobre a **mecânica de execução**; a SSOT cobre o **contrato**.
 
 ---
 

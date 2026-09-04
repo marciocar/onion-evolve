@@ -270,7 +270,7 @@ class NoForgeAdapter implements IForge {
 - [Interface IForge](./interface.md)
 - [Detector](./detector.md) — resolve provider + transporte efetivo
 - [Adapters](./adapters/) — documentam vias CLI (default) e API (fallback)
-- [SDAAL — padrão-pai](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+- SDAAL — padrão-pai
 
 ---
 
