@@ -33,6 +33,7 @@ SKILLS=(
 )
 # Motor KG-SSOT (Elenxo/Dogfood-runtime). O status-factor.awk é SÍTIO ÚNICO — sem ele o radar sai 2.
 VALIDATION=(
+  ".claude/validation/aside-router.sh"   # motor do aside-router-hook.sh (REGRA 73: o hook cita, o motor viaja)
   ".claude/validation/kg-radar.sh"
   ".claude/validation/lib/status-factor.awk"
 )

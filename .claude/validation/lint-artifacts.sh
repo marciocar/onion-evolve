@@ -3827,6 +3827,64 @@ check_plugin_namespace() {
     violation "HARD" "${REPO_ROOT}/${path}" "[plugin-namespace/${cls}] ${msg} — regenere: bash .claude/utils/marketplace/assemble-plugin.sh <manifesto>"
   done <<< "${out}"
 }
+
+# ===========================================================================
+# REGRA 73 — Hook empacotado resolve no plugin instalado [HARD]
+# previne: hook morto e silencioso no plugin (script ausente, motor não embarcado, caminho $REPO/${CLAUDE_PLUGIN_ROOT}, matcher perdido)
+#   Medido 2026-09-04: plugins/onion/hooks/aside-router-hook.sh montava ENGINE="$REPO/${CLAUDE_PLUGIN_ROOT}/…"
+#   (variável absoluta prefixada) e o motor aside-router.sh não viajava; `[ -f ] || exit 0` engolia os
+#   dois erros. E o hooks.json gerado descartava o matcher `Bash` do core (PostToolUse em TODA tool).
+#   Lógica em plugin-hooks-check.sh. HARD sem baseline: o hook do core resolve o motor pelo próprio
+#   diretório, o manifesto embarca o motor e o gerador carrega o matcher — cura no gerador + fonte.
+# ===========================================================================
+check_plugin_hooks_resolvable() {
+  local helper="${SCRIPT_DIR}/plugin-hooks-check.sh"
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  [ -f "${helper}" ] || return 0
+  [ -d "${REPO_ROOT}/plugins" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/plugins/*|*/verticals/*.manifest.sh|*/assemble-plugin.sh|*/plugin-hooks-check.sh|"${REPO_ROOT}"/.claude/hooks/*|"${REPO_ROOT}"/.claude/settings.json) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out sev cls path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev cls path msg; do
+    [ -n "${sev}" ] || continue
+    violation "HARD" "${REPO_ROOT}/${path}" "[plugin-hook/${cls}] ${msg}"
+  done <<< "${out}"
+}
+
+# ===========================================================================
+# REGRA 74 — Caminho .claude/ NU dentro de plugin só resolve no core, com catraca [HARD + SOFT]
+# previne: comando/agente empacotado apontando .claude/{utils,commands,templates,…} que não viajou — ponteiro morto no consumidor
+#   Medido 2026-09-04: 124 refs nuas em 7/8 plugins (c4-templates, task-manager, templates de
+#   contexto, common:prompts:*), 7 delas em allowed-tools (o comando NASCE MORTO). O PATH-PORTABILITY
+#   só reescreve o que o manifesto embarca. A cura é de manifesto/fonte — manual — logo CATRACA:
+#   passivo no baseline = SOFT; novo = HARD; baseline só encolhe (CATRACA-VIOLADA vs origin/main).
+#   Lógica em plugin-bare-path-check.sh; baseline em plugin-bare-path-baseline.txt.
+# ===========================================================================
+check_plugin_bare_paths() {
+  local helper="${SCRIPT_DIR}/plugin-bare-path-check.sh"
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  [ -f "${helper}" ] || return 0
+  [ -d "${REPO_ROOT}/plugins" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      "${REPO_ROOT}"/plugins/*|*/verticals/*.manifest.sh|*/assemble-plugin.sh|*/plugin-bare-path-check.sh|*/plugin-bare-path-baseline.txt) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local out sev cls path msg
+  out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>/dev/null || true)"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev cls path msg; do
+    [ -n "${sev}" ] || continue
+    violation "${sev}" "${REPO_ROOT}/${path}" "[plugin-bare-path/${cls}] ${msg}"
+  done <<< "${out}"
+}
 check_commands_without_model
 check_research_kg_review_after
 check_kg_source_tier_confidence
@@ -3891,6 +3949,8 @@ check_federation_outbox_membership
 check_kg_narration_valid
 check_backtick_path_refs
 check_plugin_namespace
+check_plugin_hooks_resolvable
+check_plugin_bare_paths
 
 # ===========================================================================
 # SUMÁRIO FINAL
