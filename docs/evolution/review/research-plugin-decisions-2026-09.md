@@ -3,7 +3,7 @@ title: "Revisão — R2 (política de idioma) + R3 (postura MCP) em modo decisio
 date: 2026-09-04
 branch: research/plugin-decisions-2026-09
 reviewer: "condutor com runs EXECUTADOS: wf_bde10f3f-28c (105 workers, 7 confirmadas/18 refutadas) e wf_9ad3aba7-b48 (104 workers, 15/10); radar exit 0 nos dois grafos; SYNTHESIS como projeção com o veredito do ELENXO (não o resumo do run)"
-reviewed_diff_sha256: 5af6a0795886d78e6543a07679ecbb29b9525eba650f9cbd70b83d7a72a8e694
+reviewed_diff_sha256: b5bc41d2de74f600a51b45c0bf3532d25dd03e3ff39993b485d9eab7cf4b6be0
 findings_total: 5
 findings_real: 5
 verdict: APROVADO
