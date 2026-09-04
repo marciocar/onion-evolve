@@ -11117,6 +11117,11 @@ run_marketplace_readmes_selftests() {
   bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out2" >/dev/null 2>&1 || true
   if [ -f "${d}/out2/README.md" ] && cmp -s "${d}/readme-head1.md" "${d}/out2/README.md"; then record_pass "marketplace-readmes: (d) README content-stable entre HEADs (sem ref/data volátil)"
   else record_fail "marketplace-readmes: (d) content-stable" "README difere entre dois HEADs com as mesmas fontes: $(diff "${d}/readme-head1.md" "${d}/out2/README.md" 2>&1 | head -4 | tr '\n' ' ')"; fi
+  # (e) LICENSE por plugin (exigência do diretório oficial): copia do source
+  printf 'MIT License\n\nCopyright (c) 2026 Probe\n' > "${d}/src/LICENSE"
+  bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out" >/dev/null 2>&1 || true
+  if [ -f "${d}/out/LICENSE" ] && grep -q 'Copyright (c) 2026 Probe' "${d}/out/LICENSE"; then record_pass "marketplace-readmes: (e) LICENSE do source embarcado em cada plugin"
+  else record_fail "marketplace-readmes: (e) LICENSE" "ausente ou diferente do source"; fi
   rm -rf "${d}"
 }
 _family run_marketplace_readmes_selftests
