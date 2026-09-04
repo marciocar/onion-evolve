@@ -7901,11 +7901,14 @@ run_marketplace_generate_selftests() {
 
   # (a) deriva campos dos dois plugins (name/source/version)
   out="$(bash "${helper}" "${d}" 2>/dev/null)"
+  # (2026-09-04) SEM "version" por entrada: docs oficiais do marketplace — plugin.json é a autoridade e uma version
+  # duplicada/estagnada na entrada ESCONDE updates. Em vez dela: category (vertical por default) e displayName.
   if _emit "${out}" | grep -q '"name": "zeta"' \
      && _emit "${out}" | grep -q '"source": "./plugins/alpha"' \
-     && _emit "${out}" | grep -q '"version": "1.2.3"'; then
-    record_pass "generate-marketplace: deriva campos dos plugins"
-  else record_fail "generate-marketplace: deriva campos" "name/source/version ausentes na saída"; fi
+     && ! _emit "${out}" | grep -q '"version": "1.2.3"' \
+     && _emit "${out}" | grep -q '"category": "vertical"' && _emit "${out}" | grep -q '"displayName": "Onion · Zeta"'; then
+    record_pass "generate-marketplace: deriva campos dos plugins (category/displayName; SEM version por entrada — plugin.json é a autoridade)"
+  else record_fail "generate-marketplace: deriva campos" "name/source/category/displayName ausentes ou version vazou: $(_emit "${out}" | grep -E 'version|category|displayName' | head -3 | tr '\n' '|' | cut -c1-200)"; fi
 
   # (b) ordem determinística alfabética (alpha antes de zeta)
   if [ "$(printf '%s\n' "${out}" | grep -nF '"name": "alpha"' | head -1 | cut -d: -f1)" \
@@ -11070,6 +11073,46 @@ for (const u of ["git@github.com:owner/repo.git","https://github.com/owner/repo"
   else record_fail "forge-detector: (b) gitlab aninhado" "$(_emit "${out}" | tail -3 | tr '\n' '|')"; fi
 }
 _family run_forge_detector_selftests
+
+# Modo marketplace-readmes — READMEs GERADOS no padrão de referência de plugins/marketplaces do Claude Code (2026-09-04):
+# plugin-readme.sh (catálogo por plugin: comandos com namespace, agentes, skills, hooks, capability, proveniência) e
+# marketplace-readme.sh (quick start slash+CLI, tabela de plugins com contagens, manter em dia, política de versão, moat).
+# marketplace.json: entradas com displayName/category/tags/license e SEM version (plugin.json é a autoridade — docs oficiais).
+run_marketplace_readmes_selftests() {
+  local asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh" mat="${REPO_ROOT}/.claude/utils/marketplace/materialize-marketplace-repo.sh"
+  local prd="${REPO_ROOT}/.claude/utils/marketplace/plugin-readme.sh" mrd="${REPO_ROOT}/.claude/utils/marketplace/marketplace-readme.sh"
+  for f in "${asm}" "${mat}" "${prd}" "${mrd}"; do [ -f "${f}" ] || { record_fail "marketplace-readmes" "ausente: ${f}"; return; }; done
+  command -v python3 >/dev/null 2>&1 || { record_skip "marketplace-readmes: python3 ausente"; return; }
+  local d out rc; d="$(mktemp -d)"
+  mkdir -p "${d}/src/.claude/commands/quick" "${d}/src/.claude/agents/x" "${d}/src/.claude/utils/marketplace/verticals"
+  printf -- '---\nname: ping\ndescription: Responde pong para provar a rota. Segunda frase que nao entra.\ncategory: quick\ntags: [a, b, c]\nversion: "1.0.0"\nupdated: "2026-09-04"\n---\n# ping\n' > "${d}/src/.claude/commands/quick/ping.md"
+  printf -- '---\nname: probe-agent\ndescription: >\n  Agente de sonda que faz\n  duas linhas de descricao.\ncategory: development\ntags: [a, b, c]\nexpertise: [x, y, z]\nversion: "1.0.0"\nupdated: "2026-09-04"\n---\n# agente\n' > "${d}/src/.claude/agents/x/probe-agent.md"
+  printf 'PLUGIN_NAME="probe"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="Plugin de sonda da bancada"\nKEYWORDS=(probe sonda)\nCOMMANDS=(.claude/commands/quick/ping.md)\nAGENTS=(.claude/agents/x/probe-agent.md)\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\n' > "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh"
+  ( cd "${d}/src" && git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm seed ) >/dev/null 2>&1
+  rc=0; bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out" >/dev/null 2>&1 || rc=$?
+  # (a) README do plugin: título, comando com namespace + 1ª frase da description, agente com description dobrada juntada, proveniência
+  if [ "${rc}" -eq 0 ] && [ -f "${d}/out/README.md" ] && grep -qF '| `/probe:ping` | Responde pong para provar a rota. |' "${d}/out/README.md" \
+     && grep -qF '| `@probe-agent` | Agente de sonda que faz duas linhas de descricao. |' "${d}/out/README.md" \
+     && grep -q '^## Proveniência' "${d}/out/README.md" && grep -q 'tree_sha' "${d}/out/README.md"; then
+    record_pass "marketplace-readmes: (a) README do plugin gerado: /probe:ping + 1ª frase, agente com description dobrada, proveniência"
+  else record_fail "marketplace-readmes: (a) README do plugin" "rc=${rc}; $(grep -E 'probe:ping|probe-agent' "${d}/out/README.md" 2>/dev/null | head -2 | tr '\n' '|' | cut -c1-200)"; fi
+  # (b) marketplace: materializar num alvo git com o plugin montado ⇒ README com tabela (linha do probe, contagens) e manifesto sem version
+  mkdir -p "${d}/tgt/plugins"; ( cd "${d}/tgt" && git init -q ) >/dev/null 2>&1; cp -a "${d}/out" "${d}/tgt/plugins/probe"
+  out="$(bash "${mrd}" "${d}/tgt" "mkt-probe" 2>&1 || true)"
+  bash "${REPO_ROOT}/.claude/utils/marketplace/generate-marketplace.sh" "${d}/tgt" > "${d}/tgt/marketplace.json" 2>/dev/null || true
+  if grep -qE '^\| \[`probe`\]\(plugins/probe/README.md\) \| vertical \| `0\.1\.1` \| 1 \| 1 \| 0 \| 0 \|' "${d}/tgt/README.md" \
+     && grep -q '/plugin marketplace add marciocar/mkt-probe' "${d}/tgt/README.md" && grep -q '^## Manter em dia' "${d}/tgt/README.md" \
+     && python3 -c 'import json,sys; m=json.load(open(sys.argv[1])); e=m["plugins"][0]; sys.exit(0 if ("version" not in e and e.get("category")=="vertical" and e.get("tags")==["probe","sonda"] and e.get("displayName")) else 1)' "${d}/tgt/marketplace.json"; then
+    record_pass "marketplace-readmes: (b) README do marketplace com tabela/contagens e manifesto: category+tags+displayName, SEM version por entrada"
+  else record_fail "marketplace-readmes: (b) marketplace" "$(grep -E 'probe' "${d}/tgt/README.md" 2>/dev/null | head -1 | cut -c1-160) · $(head -c 200 "${d}/tgt/marketplace.json" 2>/dev/null | tr '\n' ' ')"; fi
+  # (c) README do plugin NÃO é editado à mão: re-montar reescreve (artefato gerado)
+  printf 'edicao manual\n' >> "${d}/out/README.md"
+  bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out" >/dev/null 2>&1 || true
+  if ! grep -q 'edicao manual' "${d}/out/README.md"; then record_pass "marketplace-readmes: (c) re-montagem sobrescreve edição manual (artefato gerado)"
+  else record_fail "marketplace-readmes: (c) gerado" "edição manual sobreviveu à re-montagem"; fi
+  rm -rf "${d}"
+}
+_family run_marketplace_readmes_selftests
 
 # ---------------------------------------------------------------------------
 # O harness testando a SI MESMO — os três desfechos não podem colapsar em dois
