@@ -11290,6 +11290,46 @@ run_marketplace_root_sync_selftests() {
 }
 _family run_marketplace_root_sync_selftests
 
+# REGRA 77 — contrato de dependência entre plugins (helper plugin-deps-check.sh; REQUIRES_PLUGINS no assembler;
+# README "Requer"/"Funciona melhor com"). Modo consumido `--format tsv` (REGRA 59) e mutantes.
+run_plugin_deps_contract_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/plugin-deps-check.sh" asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
+  [ -f "${h}" ] && [ -f "${asm}" ] || { record_fail "plugin-deps-contract" "helper ou assembler ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "plugin-deps-contract: python3 ausente"; return; }
+  local d out; d="$(mktemp -d)"
+  export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
+  mkdir -p "${d}/src/.claude/commands/alpha" "${d}/src/.claude/commands/beta" "${d}/src/.claude/skills/orch" "${d}/src/.claude/utils/marketplace/verticals"
+  printf -- '---\nname: orch\ndescription: Orquestra.\n---\n' > "${d}/src/.claude/skills/orch/SKILL.md"
+  printf -- '---\nname: one\ndescription: Um.\n---\nUsa a skill skills/orch e cita /beta:three.\n' > "${d}/src/.claude/commands/alpha/one.md"
+  printf -- '---\nname: three\ndescription: Tres.\n---\n' > "${d}/src/.claude/commands/beta/three.md"
+  printf 'PLUGIN_NAME="onion"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="core"\nKEYWORDS=(a)\nCOMMANDS=(.claude/commands/beta/three.md)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=(.claude/skills/orch)\nHOOKS=()\nDOCS=()\n' > "${d}/src/.claude/utils/marketplace/verticals/onion.manifest.sh"
+  printf 'PLUGIN_NAME="onion-x"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="x"\nKEYWORDS=(x)\nCOMMANDS=(.claude/commands/alpha)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\nREQUIRES_PLUGINS=(onion)\n' > "${d}/src/.claude/utils/marketplace/verticals/onion-x.manifest.sh"
+  ( cd "${d}/src" && git init -q && git add -A && git commit -qm seed ) >/dev/null 2>&1
+  for p in onion onion-x; do bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/${p}.manifest.sh" "${d}/src" "${d}/src/plugins/${p}" >/dev/null 2>&1 || true; done
+  # (a) REQUIRES_PLUGINS → capability.json plugin:onion + README "Requer"; menção de comando → "Funciona melhor com" NÃO (é dependência declarada)
+  if grep -q '"plugin:onion"' "${d}/src/plugins/onion-x/.claude-plugin/capability.json" 2>/dev/null && grep -q '^## Requer' "${d}/src/plugins/onion-x/README.md" && grep -q '`onion`' "${d}/src/plugins/onion-x/README.md"; then
+    record_pass "plugin-deps-contract: (a) REQUIRES_PLUGINS vira plugin:<x> no capability.json e seção Requer no README"
+  else record_fail "plugin-deps-contract: (a)" "$(cat "${d}/src/plugins/onion-x/.claude-plugin/capability.json" 2>/dev/null | tr -d '\n ' | cut -c1-160)"; fi
+  # (b) modo consumido: --format tsv limpo com o contrato coerente
+  out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
+  if [ -z "${out}" ]; then record_pass "plugin-deps-contract: (b) --format tsv vazio com contrato coerente"
+  else record_fail "plugin-deps-contract: (b) tsv" "$(printf '%s' "${out}" | head -2 | tr '\n' ' ' | cut -c1-200)"; fi
+  # (c) mutante 1: some a declaração → skill de outro plugin sem REQUIRES_PLUGINS = HARD; menção de comando = SOFT
+  printf 'PLUGIN_NAME="onion-x"\nCOMMANDS=(.claude/commands/alpha)\n' > "${d}/src/.claude/utils/marketplace/verticals/onion-x.manifest.sh"
+  out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q '^HARD	dependencia-nao-declarada'; then record_pass "plugin-deps-contract: (c) skill de outro plugin sem REQUIRES_PLUGINS → HARD"
+  else record_fail "plugin-deps-contract: (c) mutante" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  # (d) mutante 2: conhecimento duplicado (a mesma skill nos dois plugins) → HARD duplicado
+  mkdir -p "${d}/src/plugins/onion-x/skills/orch"; cp "${d}/src/plugins/onion/skills/orch/SKILL.md" "${d}/src/plugins/onion-x/skills/orch/SKILL.md"
+  out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q '^HARD	duplicado'; then record_pass "plugin-deps-contract: (d) skill duplicada em 2 plugins → HARD duplicado"
+  else record_fail "plugin-deps-contract: (d) duplicado" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+  rm -rf "${d}"
+}
+_family run_plugin_deps_contract_selftests
+
+
 
 
 

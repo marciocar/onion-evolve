@@ -142,7 +142,7 @@ CATEGORIES = [
      [5, 6, 13, 14, 15, 22, 48, 60, 71, 72, 73, 74, 75]),
     ("Fronteiras & contratos de arquitetura",
      "Proibições estruturais, documentação no lugar certo e os contratos de conformance e de adoção.",
-     [7, 18, 20, 40, 53]),
+     [7, 18, 20, 40, 53, 77]),
     ("SDAAL — abstração de provider",
      "O consumidor fala com a abstração, nunca com o provider direto.",
      [10, 11]),

@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**75 regras** no total — **66 HARD**, **19 SOFT**.
+**76 regras** no total — **67 HARD**, **20 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -74,6 +74,7 @@ Proibições estruturais, documentação no lugar certo e os contratos de confor
 | 20 | Capability Contract: tier de conformance cumprido | HARD | componente reivindica um tier de conformance que não cumpre |
 | 40 | Adotante: .onion-version DEVE estar trackeado no git | HARD | adotante com .onion-version não-trackeado — 156 falso-HARD |
 | 53 | Regra path-scoped declara `paths:` que casa algo real | HARD | regra em .claude/rules/ que nunca carrega — instrução que o modelo jamais vê |
+| 77 | Contrato de dependência entre plugins | HARD + SOFT | dois plugins embarcando a mesma skill/KB (cópias divergem) ou um plugin usando skill que só outro embarca sem declarar |
 
 ## SDAAL — abstração de provider
 

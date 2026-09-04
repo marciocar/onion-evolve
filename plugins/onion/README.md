@@ -105,6 +105,10 @@ Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT e
 
 Estes comandos aparecem no texto sem a barra inicial porque pertencem ao core do Onion (meta-fábrica ou outra superfície) e **não** são instalados por este plugin: `engineer:work`, `meta:adopt`, `meta:co-announce`, `meta:co-deliver`, `meta:create-agent`, `meta:create-command`, `meta:create-knowledge-base`, `meta:create-skill`, `meta:evolve`, `meta:federation-check`, `meta:graph`, `meta:inventory`, `meta:personality-sync`, `validate:collab`. Estão disponíveis num repo que adotou o Onion por vendorização (`.claude/` completo).
 
+## Funciona melhor com
+
+Comandos deste plugin citam: `onion-compliance`, `onion-engineering`, `onion-product`. Não é dependência — sem eles, essas menções apontam para comandos não instalados.
+
 ## Licença
 
 MIT (texto integral em `LICENSE`, na raiz do plugin) — © Onion · Marcio Carvalho. Site: https://onionevolve.com · Fonte: https://github.com/marciocar/onion-evolve

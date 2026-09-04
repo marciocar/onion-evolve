@@ -110,6 +110,25 @@ for _dp, _dn, _fn in os.walk(dest):
         for _m in _pat.finditer(_t): _seen.add(_m.group(0))
 if _seen:
     out.append("## Comandos do core citados (não distribuídos neste plugin)\n\nEstes comandos aparecem no texto sem a barra inicial porque pertencem ao core do Onion (meta-fábrica ou outra superfície) e **não** são instalados por este plugin: " + ", ".join("`" + x + "`" for x in sorted(_seen)) + ". Estão disponíveis num repo que adotou o Onion por vendorização (`.claude/` completo).\n")
+# REGRA 77 — contrato de dependência: "Requer" = plugin:<x> declarado no capability.json (dependência funcional);
+# "Funciona melhor com" = plugins cujos comandos este plugin CITA (derivado do artefato, informativo).
+_req_plugins = sorted(x.split(":",1)[1] for x in (cap.get("requires") or []) if isinstance(x, str) and x.startswith("plugin:"))
+if _req_plugins:
+    out.append("## Requer\n\nEste plugin depende de: " + ", ".join("`" + x + "`" for x in _req_plugins) + " — instale antes (`/plugin install " + _req_plugins[0] + "@" + mkt + "`).\n")
+_mentions = set()
+_pat_x = _re.compile(r"(?<![A-Za-z0-9_/.\-])/(onion(?:-[a-z0-9-]+)?):[a-z0-9-]+")
+for _dp, _dn, _fn in os.walk(dest):
+    if "/.claude-plugin" in _dp: continue
+    for _f in _fn:
+        if _f == "README.md" and _dp == dest: continue
+        if not (_f.endswith(".md") or _f.endswith(".sh")): continue
+        try: _t = open(os.path.join(_dp, _f), encoding="utf-8", errors="surrogateescape").read()
+        except Exception: continue
+        for _m in _pat_x.finditer(_t):
+            if _m.group(1) != name: _mentions.add(_m.group(1))
+_mentions -= set(_req_plugins)
+if _mentions:
+    out.append("## Funciona melhor com\n\nComandos deste plugin citam: " + ", ".join("`" + x + "`" for x in sorted(_mentions)) + ". Não é dependência — sem eles, essas menções apontam para comandos não instalados.\n")
 out.append("## Licença\n\n%s (texto integral em `LICENSE`, na raiz do plugin) — © Onion · Marcio Carvalho. Site: https://onionevolve.com · Fonte: https://github.com/%s\n" % (pj.get("license","MIT"), prov.get("repository","marciocar/onion-evolve")))
 open(os.path.join(dest,"README.md"),"w",encoding="utf-8").write("\n".join(out))
 print(f"plugin-readme: {name}: {len(cmds)} comandos, {len(agents)} agentes, {len(skills)} skills, {len(hooks)} hooks")
