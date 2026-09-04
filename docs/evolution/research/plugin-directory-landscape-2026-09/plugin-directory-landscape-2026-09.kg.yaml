@@ -1,0 +1,305 @@
+meta:
+  id: plugin-directory-landscape-2026-09
+  schema_version: "1"
+  baseline: 2026-09-04
+  review_after: 2026-10-04   # 30d: o tipo DOMINANTE aqui e FERRAMENTA/PLATAFORMA (diretorio oficial, politica de
+                             # curadoria, contagem de instalacoes do catalogo) — a cadencia de 30d da clausula 8;
+                             # a metade "mercado/capital" pediria 90d, mas nesta rodada ela nao produziu sinal.
+  # kg-backlog-guard: on
+  # ═══ TETO: 20 NÓS. Rodada fechada: cresce só se uma re-medição do mesmo delta emendar um achado. ═══
+  # Pesquisa /onion-research: paisagem de plugins e marketplaces do Claude Code em 2026-09 e os criterios
+  # que o diretorio oficial da Anthropic declara/pratica. 26 fontes, 30 claims; 15 claims sobreviveram aos
+  # votos adversariais (14 externas + 1 medicao local), 11 cairam (E_LACUNAS).
+  # O radar so enxerga arestas DENTRO de um arquivo: o vinculo com os grafos do corpus vai por trace:.
+  # Corpus conferido antes de buscar fora (clausula 0): nenhum no previo foi CONTRADITO por esta rodada —
+  # G2_CLAUDE_PLUGINS_ANALOGO e B4_10_ecosystem_native_plugins (federation-research-2026-06-reconciled) saem
+  # CORROBORADOS (par diretorio vetado + marketplace com safety scan; pin por SHA). Por isso nao ha
+  # SUPERSEDES/REFUTES cross-grafo nesta rodada — ausencia medida, nao esquecimento.
+nodes:
+  - id: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: 'Quais plugins e marketplaces de Claude Code se destacam em 2026-09 e que padroes de desenvolvimento seguem (granularidade 1-grande vs N-por-vertical, estrutura de plugin.json/marketplace.json, README, frontmatter de commands, namespacing /<plugin>:<cmd> e resolucao de /cmd nu, hooks e MCP embarcados, idioma/i18n, tamanho/vendoring, licenca, versionamento)? E que criterios o diretorio oficial declara ou pratica na curadoria? ABERTA no que a rodada nao fechou: frontmatter de commands, i18n/locale, tamanho/vendoring, licenca e versionamento nao tem fonte primaria publica (E_LACUNAS_PLUGIN_DIRECTORY_0904).'
+    verified_against: 'rodada de 2026-09-04: 26 fontes, 30 claims, 15 sobreviventes; primarias code.claude.com/docs, claude.com/docs/plugins/submit, claude.com/plugins, support.claude.com'
+    trace: 'https://clau.de/plugin-directory-submission'
+  - id: E_NAMESPACE_SEMPRE_QUALIFICADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-04
+    verified_against: 'https://code.claude.com/docs/en/plugins#submit-your-plugin-to-the-official-marketplace — votos 3-0'
+    source_tier: 10
+    source_kind: primary
+    label: 'Skills e comandos de plugin sao SEMPRE namespaceados como /<plugin-name>:<skill-name>, para evitar colisao entre plugins com skills de mesmo nome; NAO existe resolucao de /cmd nu para skills de plugin — o /skill-name standalone original e a copia namespaceada do plugin COEXISTEM, nenhuma sobrescreve a outra.'
+    trace: 'https://code.claude.com/docs/en/plugins#submit-your-plugin-to-the-official-marketplace'
+  - id: E_GRANULARIDADE_VERTICAL_COESA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.75
+    verified_at: 2026-09-04
+    valid_from: 2026-09
+    verified_against: 'https://claude.com/docs/plugins/submit — votos 2-1 (um voto adversarial contestou a forca do "explicitamente"; a claim sobreviveu rebaixada)'
+    source_tier: 10
+    source_kind: primary
+    label: 'O criterio de granularidade declarado pela Anthropic favorece explicitamente o plugin VERTICAL COESO (bundle de skills + MCP + commands + sub-agents por FUNCAO DE TRABALHO) em vez do plugin de ferramenta unica — resposta direta ao eixo "1 grande vs N pequenos".'
+    trace: 'https://claude.com/docs/plugins/submit'
+  - id: E_CURADORIA_DUAS_CAMADAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-04
+    valid_from: 2026-09
+    verified_against: 'https://claude.com/docs/plugins/submit — votos 3-0'
+    source_tier: 10
+    source_kind: primary
+    label: 'A curadoria e em DUAS CAMADAS: revisao automatica basica (CI) para todo plugin submetido, no ato da publicacao e a cada update subsequente do repo GitHub; mais um selo OPCIONAL "Anthropic Verified" de revisao manual adicional de qualidade/seguranca, sem garantia de que um plugin comunitario algum dia o receba.'
+    trace: 'https://claude.com/docs/plugins/submit'
+  - id: E_DIRETORIO_OFICIAL_AUTO_ADICIONADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-04
+    valid_from: 2026-09
+    verified_against: 'https://code.claude.com/docs/en/discover-plugins — votos 3-0'
+    source_tier: 10
+    source_kind: primary
+    label: 'O diretorio oficial de plugins da Anthropic (claude-plugins-official) e adicionado AUTOMATICAMENTE na primeira execucao interativa do Claude Code, e a curadoria/inclusao de plugins nele e a criterio EXCLUSIVO da Anthropic — nao ha processo de aplicacao com criterios publicos para essa camada.'
+    trace: 'https://code.claude.com/docs/en/discover-plugins'
+  - id: E_MARKETPLACE_COMUNITARIO_PIN_POR_SHA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-04
+    valid_from: 2026-09
+    verified_against: 'https://code.claude.com/docs/en/discover-plugins — votos 3-0'
+    source_tier: 10
+    source_kind: primary
+    label: 'Existe um marketplace COMUNITARIO separado (anthropics/claude-plugins-community) que hospeda plugins de terceiros aprovados por validacao automatizada e triagem de seguranca da Anthropic, com cada plugin FIXADO (pinned) a um commit SHA especifico no catalogo — distinto do diretorio oficial. Corrobora B4_10_ecosystem_native_plugins e G2_CLAUDE_PLUGINS_ANALOGO (federation-research-2026-06-reconciled).'
+    trace: 'https://code.claude.com/docs/en/discover-plugins'
+  - id: E_POLITICA_DESCRICAO_PRECISA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: 2026-09-04
+    valid_from: 2026
+    verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — votos 3-0'
+    source_tier: 10
+    source_kind: primary
+    label: 'A politica oficial exige que toda descricao de ferramenta/software listado em diretorios da Anthropic CORRESPONDA PRECISAMENTE a funcionalidade real, com linguagem natural estreita e nao ambigua — o campo description e contrato, nao marketing.'
+    trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+  - id: E_POLITICA_TRES_EXEMPLOS_E_SUPORTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-04
+    valid_from: 2026
+    verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — votos 3-0'
+    source_tier: 10
+    source_kind: primary
+    label: 'Quem submete software a diretorios da Anthropic deve fornecer AO MENOS TRES exemplos funcionais de prompts ou casos de uso, alem de politica de privacidade acessivel e canais de suporte/contato verificados — requisito de submissao, nao recomendacao.'
+    trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+  - id: E_REPO_PUBLICO_OBRIGATORIO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-04
+    valid_from: 2026-09
+    verified_against: 'https://claude.com/docs/connectors/building/review-criteria — votos 3-0'
+    source_tier: 9
+    source_kind: primary
+    label: 'O diretorio oficial exige que plugins submetidos apontem para um repositorio GitHub PUBLICO — codigo fechado nao e aceito. Consequencia direta para o Onion: so a porta publica (onion-plugins) e submissivel; o core privado nunca seria.'
+    trace: 'https://claude.com/docs/connectors/building/review-criteria'
+  - id: E_TOP_INSTALL_FRONTEND_DESIGN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-04
+    valid_from: 2026-09
+    verified_against: 'https://claude.com/plugins — votos 3-0'
+    source_tier: 9
+    source_kind: primary
+    label: 'O plugin "Frontend Design" e o MAIS INSTALADO do diretorio oficial de plugins do Claude Code, com 1.134.112 instalacoes.'
+    trace: 'https://claude.com/plugins'
+  - id: E_TOP_INSTALL_SUPERPOWERS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-04
+    valid_from: 2026-09
+    verified_against: 'https://claude.com/plugins — votos 3-0'
+    source_tier: 9
+    source_kind: primary
+    label: 'O plugin "Superpowers" (brainstorming e desenvolvimento de subagentes) e o SEGUNDO mais instalado, com 1.009.371 instalacoes — bundle vertical de funcao de trabalho, nao utilitario de ferramenta unica; converge com E_GRANULARIDADE_VERTICAL_COESA.'
+    trace: 'https://claude.com/plugins'
+  - id: E_CMD_NU_NAO_RESOLVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-09-04
+    verified_against: 'https://github.com/anthropics/claude-code/issues/15882 — votos 2-1 (issue aberta por terceiro; o voto contrario notou que e relato de usuario, nao spec)'
+    source_tier: 6
+    source_kind: forum
+    label: 'Um plugin chamado "foo" com um comando tambem chamado "foo" so e invocavel como /foo:foo — a forma NUA /foo nao resolve, contrariando a expectativa de resolucao implicita quando nao ha colisao. Confirma na pratica o que E_NAMESPACE_SEMPRE_QUALIFICADO declara na doc.'
+    trace: 'https://github.com/anthropics/claude-code/issues/15882'
+  - id: E_MIRROR_READONLY_NIGHTLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: 2026-09-04
+    valid_from: 2026-09
+    verified_against: 'https://github.com/anthropics/claude-plugins-community — votos 3-0'
+    source_tier: 6
+    source_kind: primary
+    label: 'O repositorio anthropics/claude-plugins-community e um ESPELHO read-only, sincronizado NIGHTLY a partir do marketplace interno da Anthropic — nao e a fonte de verdade para criterios de curadoria. Ler criterio no espelho e ler a projecao, nao a SSOT.'
+    trace: 'https://github.com/anthropics/claude-plugins-community'
+  - id: E_SESSIONSTART_HOOKS_EMBARCADOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: 2026-09-04
+    valid_from: 2026-08
+    verified_against: 'https://developers.redhat.com/articles/2026/08/18/securing-claude-code-plug-ins-best-practices-repository-security — votos 3-0; source_kind vendor-on-competitor (SEMPRE suspeito, clausula 7) — confianca rebaixada por isso, nao por dissenso'
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'Plugins do Claude Code podem EMBARCAR SessionStart hooks — comandos shell executados automaticamente em toda sessao, antes de qualquer interacao do usuario. E a superficie de risco que faz do pin por SHA (E_MARKETPLACE_COMUNITARIO_PIN_POR_SHA) mais que higiene de versao.'
+    trace: 'https://developers.redhat.com/articles/2026/08/18/securing-claude-code-plug-ins-best-practices-repository-security'
+  - id: E_MCP_SERVER_REGISTRAVEL_POR_PLUGIN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: 2026-09-04
+    valid_from: 2026-08
+    verified_against: 'https://developers.redhat.com/articles/2026/08/18/securing-claude-code-plug-ins-best-practices-repository-security — votos 3-0; source_kind vendor-on-competitor (suspeito por doutrina)'
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'Plugins podem REGISTRAR configuracao de servidor MCP, que o modelo passa a chamar como ferramentas — o .mcp.json embarcado e caminho suportado, nao gambiarra. Nenhum dos 8 plugins do Onion o exercita hoje (E_ONION_MEDIDO_LOCAL_0904).'
+    trace: 'https://developers.redhat.com/articles/2026/08/18/securing-claude-code-plug-ins-best-practices-repository-security'
+  - id: E_ONION_MEDIDO_LOCAL_0904
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'exploracao local no repo do core em 2026-09-04 (contagem por grep sobre .claude/ e sobre os manifestos dos plugins)'
+    source_tier: 10
+    source_kind: primary
+    label: 'MEDICAO LOCAL (o artefato antes da web, clausula 2): o Onion publica 8 plugins e carrega 544 referencias de comando no namespace do CORE (/categoria:cmd) em vez de /<plugin>:<cmd>, mais 124 caminhos .claude/ NUS. Cruzado com E_NAMESPACE_SEMPRE_QUALIFICADO e E_CMD_NU_NAO_RESOLVE, essas 544 referencias NAO RESOLVEM para quem instalou o Onion como plugin — e defeito de distribuicao, nao estilo. Alem disso: nenhum plugin embarca .mcp.json; tudo em pt-BR; o diretorio oficial exige plugin.json + README + LICENSE por plugin e nomes IMUTAVEIS; o marketplace.json ficou sem version por entrada.'
+    trace: 'docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml · projeção: docs/evolution/research/plugin-directory-landscape-2026-09/SYNTHESIS.md'
+  - id: E_MERCADO_PLUGIN_DIRECTORY_0904
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-04
+    valid_from: 2026-09
+    verified_against: 'https://claude.com/plugins (primaria, tier 9, votos 3-0); eixo E4 rodado, nenhuma rodada/M&A/down round/nota de analista sobreviveu aos votos'
+    source_tier: 9
+    source_kind: primary
+    label: 'MERCADO/CAPITAL — SEM SINAL DE CAPITAL: nenhuma rodada, M&A, down round ou nota de analista sobre o mercado de plugins/marketplaces do Claude Code sobreviveu aos votos adversariais nesta rodada. O que existe e sinal de TRACAO/DISTRIBUICAO, direto do catalogo oficial: Frontend Design com 1.134.112 instalacoes e Superpowers com 1.009.371 — dois bundles verticais na casa do MILHAO. Leitura: o canal de instalacao ja opera em escala de plataforma e a demanda se concentra em plugins de FUNCAO DE TRABALHO, nao em utilitarios. Ausencia de capital rastreavel e ela propria o achado: o valor esta sendo capturado pela plataforma, nao por startups de plugin.'
+    trace: 'https://claude.com/plugins'
+  - id: E_LACUNAS_PLUGIN_DIRECTORY_0904
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-04
+    verified_against: 'contabilidade da propria rodada: 26 fontes, 30 claims, 15 sobreviventes, 11 quedas, 0 nao-verificadas por falha de acesso'
+    source_tier: 10
+    source_kind: primary
+    label: 'LACUNAS E QUEDAS. (a) REFUTADAS/derrubadas nos votos, 11: os DOIS marketplaces publicos com o fluxo `claude plugin validate` + CI auto-bumpando o pin (code.claude.com/docs/en/plugins); o diretorio oficial como marketplace embutido e nao lista curada externa (claude.com/docs/plugins/submit); a alegacao de que a politica NAO documenta granularidade/estrutura/namespacing/i18n e remeteria a "Software Directory Terms" separado (support.claude.com); os 13 plugins em 4 categorias do marketplace.json oficial (anthropics/claude-code); o schema json.schemastore.org/claude-code-marketplace.json exigindo name/description/source/category/version por plugin (mesma fonte); o diretorio publicar SO revisao automatizada sem criterios tecnicos (claude.com/plugins); o namespace ser SEMPRE obrigatorio mesmo com a doc dizendo opcional (issue 15882); wshobson/agents como marketplace multi-harness de maior tracao por trajetoria com 39.4k estrelas (GitHub search created:>2025-06-01 sort=stars); o mirror redirecionar submissoes a clau.de sem criterios publicos (mesma busca); a curadoria comunitaria exigir varredura automatizada MAIS aprovacao manual (claude-plugins-community); e o marketplace operar sem vetting central, sem assinatura de codigo e sem sandboxing em runtime (Red Hat, vendor-on-competitor tier 4). (b) NAO VERIFICADAS por falha de acesso: 0. (c) CORTADAS por orcamento: 26 fontes e 30 claims foram o teto da rodada. (d) EIXOS QUE FICAM ABERTOS por ausencia de fonte primaria publica, nao por descuido: frontmatter de commands (argument-hint, description), politica de idioma/i18n e campo de locale (nenhuma fonte diz se plugin nao-EN e aceito — critico, o Onion e todo pt-BR), tamanho/vendoring, licenca e versionamento. Achado meta: a queda simultanea das duas claims de ESTRUTURA de marketplace.json e das duas de PROCESSO de curadoria diz que a documentacao publica descreve o QUE se submete, quase nada do COMO se valida.'
+    trace: 'https://clau.de/plugin-directory-submission'
+edges:
+  - from: E_NAMESPACE_SEMPRE_QUALIFICADO
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_GRANULARIDADE_VERTICAL_COESA
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_CURADORIA_DUAS_CAMADAS
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_DIRETORIO_OFICIAL_AUTO_ADICIONADO
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_MARKETPLACE_COMUNITARIO_PIN_POR_SHA
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_POLITICA_DESCRICAO_PRECISA
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_POLITICA_TRES_EXEMPLOS_E_SUPORTE
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_REPO_PUBLICO_OBRIGATORIO
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_TOP_INSTALL_FRONTEND_DESIGN
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_TOP_INSTALL_SUPERPOWERS
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_CMD_NU_NAO_RESOLVE
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_MIRROR_READONLY_NIGHTLY
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_SESSIONSTART_HOOKS_EMBARCADOS
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_MCP_SERVER_REGISTRAVEL_POR_PLUGIN
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_ONION_MEDIDO_LOCAL_0904
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_MERCADO_PLUGIN_DIRECTORY_0904
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_PLUGIN_DIRECTORY_0904
+    to: Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09
+    edge_type: SUPPORTS
+  - from: E_CMD_NU_NAO_RESOLVE
+    to: E_NAMESPACE_SEMPRE_QUALIFICADO
+    edge_type: SUPPORTS
+  - from: E_TOP_INSTALL_SUPERPOWERS
+    to: E_GRANULARIDADE_VERTICAL_COESA
+    edge_type: SUPPORTS
+  - from: E_NAMESPACE_SEMPRE_QUALIFICADO
+    to: E_ONION_MEDIDO_LOCAL_0904
+    edge_type: CONSTRAINS
