@@ -1,4 +1,4 @@
-# Diário — plugin-lint-namespace
+# Diário — onion-evolve
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
@@ -12,6 +12,7 @@ Gerado em: 2026-09-04
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-09-04 | error | public 📤 | regra-n-sem-titulo-na-prosa-reincidi-duas-vezes-e-a-cura-e-um-hook-stop | — | 2026-12-03 | static |
 | 2026-09-04 | learning | public 📤 | readme-de-plugin-e-catalogo-gerado-nao-prosa-e-version-duplicada-esconde-update | — | 2026-12-03 | static |
 | 2026-09-04 | decision | public 📤 | oito-plugins-viram-cinco-o-canal-premia-bundle-vertical-e-work-tools-era-saco-de-ferramentas | — | 2026-12-03 | static |
 | 2026-09-04 | learning | public 📤 | link-vivo-no-core-morto-no-plugin-e-o-marketplace-json-que-envelheceu-calado | — | 2026-12-03 | static |
