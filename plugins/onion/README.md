@@ -2,7 +2,7 @@
 
 Nucleo operacional do Sistema Onion: o orquestrador mestre (skill onion) + skills core (language-standards, patterns, validation, orchestration) + runtime (warm-up/catch-up) + os motores (kg-radar: knowledge-graph SSOT como runtime, doutrina Elenxo/Dogfood) + guardas (hook exit-2 deterministico, aside-router) + abstracoes SDAAL (task-manager Jira/ClickUp/Asana/Linear, forge github). Instala a capacidade; o adotante gera os PROPRIOS grafos. Nao inclui a meta-fabrica.
 
-**Versão** `0.1.164` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
+**Versão** `0.1.165` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
 
 ## Instalar
 
@@ -75,7 +75,7 @@ Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é 
 | Campo | Valor |
 |---|---|
 | Fonte | `marciocar/onion-evolve` |
-| tree_sha (hash do conteúdo das fontes) | `40c73b85f485` |
+| tree_sha (hash do conteúdo das fontes) | `085690610a5a` |
 
 Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 

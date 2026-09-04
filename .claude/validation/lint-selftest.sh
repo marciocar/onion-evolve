@@ -11173,6 +11173,69 @@ run_plugin_namespace_selftests() {
 }
 _family run_plugin_namespace_selftests
 
+# REGRA 73 — hook empacotado resolve no plugin instalado (helper plugin-hooks-check.sh) + o gerador de
+# hooks.json carrega o matcher do core. Exercita o modo consumido (`--format tsv`, REGRA 59) e o mutante.
+run_plugin_hooks_resolvable_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/plugin-hooks-check.sh" asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
+  [ -f "${h}" ] && [ -f "${asm}" ] || { record_fail "plugin-hooks-resolvable" "helper ou assembler ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "plugin-hooks-resolvable: python3 ausente"; return; }
+  local d out; d="$(mktemp -d)"
+  export GIT_AUTHOR_NAME=t GIT_AUTHOR_EMAIL=t@t GIT_COMMITTER_NAME=t GIT_COMMITTER_EMAIL=t@t
+  mkdir -p "${d}/src/.claude/hooks" "${d}/src/.claude/validation" "${d}/src/.claude/utils/marketplace/verticals"
+  printf '#!/usr/bin/env bash\nHERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"\nENGINE="${HERE}/../validation/engine.sh"\n[ -f "$ENGINE" ] || exit 0\nexit 0\n' > "${d}/src/.claude/hooks/g.sh"; chmod +x "${d}/src/.claude/hooks/g.sh"
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/src/.claude/validation/engine.sh"
+  printf '{"hooks":{"PostToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"bash \\"$CLAUDE_PROJECT_DIR/.claude/hooks/g.sh\\""}]}]}}\n' > "${d}/src/.claude/settings.json"
+  printf 'PLUGIN_NAME="hp"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="x"\nKEYWORDS=(x)\nCOMMANDS=()\nAGENTS=()\nUTILS=()\nVALIDATION=(.claude/validation/engine.sh)\nTEMPLATES=()\nSKILLS=()\nHOOKS=(.claude/hooks/g.sh)\nDOCS=()\n' > "${d}/src/.claude/utils/marketplace/verticals/hp.manifest.sh"
+  ( cd "${d}/src" && git init -q && git add -A && git commit -qm seed ) >/dev/null 2>&1
+  bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/hp.manifest.sh" "${d}/src" "${d}/src/plugins/hp" >/dev/null 2>&1 || true
+  # (a) hooks.json gerado carrega o matcher do core
+  if grep -q '"matcher": "Bash"' "${d}/src/plugins/hp/hooks/hooks.json" 2>/dev/null; then record_pass "plugin-hooks-resolvable: (a) hooks.json gerado carrega o matcher do core"
+  else record_fail "plugin-hooks-resolvable: (a) matcher" "$(cat "${d}/src/plugins/hp/hooks/hooks.json" 2>/dev/null | tr -d '\n ' | cut -c1-160)"; fi
+  # (b) modo consumido: --format tsv vazio no plugin correto
+  out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
+  if [ -z "${out}" ]; then record_pass "plugin-hooks-resolvable: (b) --format tsv vazio (hook + motor + matcher resolvem)"
+  else record_fail "plugin-hooks-resolvable: (b) tsv" "$(printf '%s' "${out}" | head -2 | tr '\n' ' ' | cut -c1-200)"; fi
+  # (c) mutante: motor removido + caminho $REPO/${CLAUDE_PLUGIN_ROOT} + matcher perdido → 3 classes HARD
+  rm -f "${d}/src/plugins/hp/validation/engine.sh"
+  printf 'ENGINE="$REPO/${CLAUDE_PLUGIN_ROOT}/validation/engine.sh"\n' >> "${d}/src/plugins/hp/hooks/g.sh"
+  sed -i 's/"matcher": "Bash",//' "${d}/src/plugins/hp/hooks/hooks.json"
+  out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q "motor-ausente" && printf '%s' "${out}" | grep -q "repo-prefixado" && printf '%s' "${out}" | grep -q "matcher-divergente"; then
+    record_pass "plugin-hooks-resolvable: (c) mutante → motor-ausente + repo-prefixado + matcher-divergente"
+  else record_fail "plugin-hooks-resolvable: (c) mutante" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-240)"; fi
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+  rm -rf "${d}"
+}
+_family run_plugin_hooks_resolvable_selftests
+
+# REGRA 74 — caminho .claude/ NU dentro de plugin, com catraca (helper plugin-bare-path-check.sh).
+# Modo consumido `--format tsv`; baseline via --emit-baseline; NOVO fora do baseline = HARD.
+run_plugin_bare_path_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/plugin-bare-path-check.sh"
+  [ -f "${h}" ] || { record_fail "plugin-bare-path" "helper ausente"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "plugin-bare-path: python3 ausente"; return; }
+  local d out; d="$(mktemp -d)"
+  mkdir -p "${d}/r/.claude/validation" "${d}/r/plugins/p/commands"
+  printf -- '---\nname: x\nallowed-tools: Bash(bash .claude/utils/co/relay.sh*)\n---\nVeja `.claude/utils/c4-templates.md`, `${CLAUDE_PLUGIN_ROOT}/utils/ok.md` e `.claude/sessions/x`.\n' > "${d}/r/plugins/p/commands/x.md"
+  # (a) sem baseline → NO-BASELINE + 2 NOVO (sessions/ e PLUGIN_ROOT não contam)
+  out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q "NO-BASELINE" && [ "$(printf '%s\n' "${out}" | grep -c "	NOVO	")" -eq 2 ]; then record_pass "plugin-bare-path: (a) sem baseline = NO-BASELINE + 2 NOVO (sessions/ e PLUGIN_ROOT não contam)"
+  else record_fail "plugin-bare-path: (a)" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  # (b) baseline emitido → passivo SOFT, allowed-tools sinalizado, 0 HARD
+  bash "${h}" "${d}/r" --emit-baseline > "${d}/r/.claude/validation/plugin-bare-path-baseline.txt"
+  out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
+  if ! printf '%s' "${out}" | grep -q "^HARD" && printf '%s' "${out}" | grep -q "ALLOWED-TOOLS" && printf '%s' "${out}" | grep -q "PASSIVO"; then record_pass "plugin-bare-path: (b) passivo baselined = SOFT; allowed-tools sinalizado"
+  else record_fail "plugin-bare-path: (b)" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  # (c) ref NOVA fora do baseline = HARD
+  printf 'Nova: `.claude/commands/common/templates/t.md`.\n' >> "${d}/r/plugins/p/commands/x.md"
+  out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
+  if printf '%s' "${out}" | grep -q "^HARD	NOVO"; then record_pass "plugin-bare-path: (c) ref nova fora do baseline = HARD"
+  else record_fail "plugin-bare-path: (c)" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
+  rm -rf "${d}"
+}
+_family run_plugin_bare_path_selftests
+
+
 
 # ---------------------------------------------------------------------------
 # O harness testando a SI MESMO — os três desfechos não podem colapsar em dois

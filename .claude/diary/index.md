@@ -4,7 +4,7 @@
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 118 entradas · **Stale:** 0 · **Compartilháveis:** 106 · **Com significância:** 51
+**Total:** 119 entradas · **Stale:** 0 · **Compartilháveis:** 107 · **Com significância:** 51
 
 Gerado em: 2026-09-04
 
@@ -14,6 +14,7 @@ Gerado em: 2026-09-04
 |---|---|---|---|---|---|---|
 | 2026-09-04 | learning | public 📤 | readme-de-plugin-e-catalogo-gerado-nao-prosa-e-version-duplicada-esconde-update | — | 2026-12-03 | static |
 | 2026-09-04 | decision | public 📤 | license-por-plugin-o-diretorio-oficial-exige-o-arquivo-nao-so-o-campo | — | 2026-12-03 | static |
+| 2026-09-04 | error | public 📤 | hook-morto-e-silencioso-no-plugin-o-motor-nao-viajou-e-o-exit-0-escondeu | — | 2026-12-03 | static |
 | 2026-09-04 | learning | public 📤 | comando-de-plugin-e-plugin-cmd-o-lint-nao-via-porque-so-olhava-o-core | — | 2026-12-03 | static |
 | 2026-09-03 | learning | public 📤 | versao-de-plugin-que-nao-anda-e-declaracao-o-updater-so-le-a-string | — | 2026-12-02 | static |
 | 2026-09-03 | learning | public 📤 | regra-n-titulo-o-numero-e-chave-o-titulo-e-significado | — | 2026-12-02 | static |

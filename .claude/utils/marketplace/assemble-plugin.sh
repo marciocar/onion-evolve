@@ -153,15 +153,16 @@ for fp in sorted(glob.glob(os.path.join(src, ".claude", "settings*.json"))):
             for hk in (grp.get("hooks") or []):
                 cmd = hk.get("command", "")
                 for bn in bundled:
-                    if bn in cmd and bn not in events.get(event, []):
-                        events.setdefault(event, []).append(bn)
+                    if bn in cmd and bn not in [x[0] for x in events.get(event, [])]:
+                        # (basename, matcher) — o matcher do core viaja; sem ele PostToolUse roda em TODA tool (REGRA 73)
+                        events.setdefault(event, []).append((bn, grp.get("matcher")))
 result = {"hooks": {}}
 for event, bns in events.items():
     result["hooks"][event] = [
-        {"hooks": [{"type": "command", "command": f'bash "${{CLAUDE_PLUGIN_ROOT}}/hooks/{bn}"'}]}
-        for bn in bns
+        ({"matcher": matcher} if matcher else {}) | {"hooks": [{"type": "command", "command": f'bash "${{CLAUDE_PLUGIN_ROOT}}/hooks/{bn}"'}]}
+        for bn, matcher in bns
     ]
-mapped = {bn for bns in events.values() for bn in bns}
+mapped = {bn for bns in events.values() for bn, _m in bns}
 missing = [bn for bn in bundled if bn not in mapped]
 if missing:
     sys.stderr.write("AVISO assemble: hook(s) sem evento no settings.json do core (NÃO registrados): %s\n" % ", ".join(missing))
