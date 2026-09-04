@@ -120,8 +120,15 @@ pelo gerenciador de plugins. **Não** é adoção/vendorização (esse é outro 
 \`\`\`
 
 \`onion\` é o núcleo operacional (orquestrador + skills core + runtime + motores KG-SSOT + SDAAL +
-doutrina). Verticais de domínio (engineering, product, compliance, design, docs, testing) e o
-\`onion-work-tools\` são plugins adicionais no mesmo marketplace.
+doutrina) — é ele que traz a ENTRADA: \`/onion:warm-up\`, \`/onion:catch-up\`, \`/onion:onion\`. Verticais de
+domínio (engineering, product, compliance, design, docs, testing) e o \`onion-work-tools\` são plugins
+adicionais no mesmo marketplace.
+
+**Instalado ≠ habilitado.** Se \`/onion:warm-up\` ou \`/onion:catch-up\` não aparecerem na sessão:
+\`claude plugin enable onion@${MKT_NAME}\` e reinicie o Claude Code (hooks só carregam em sessão nova).
+
+**Atualizar:** \`claude plugin marketplace update ${MKT_NAME} && claude plugin update onion@${MKT_NAME}\` —
+a versão de cada plugin é derivada do conteúdo (anda quando o conteúdo anda).
 
 ## Atualizar
 
