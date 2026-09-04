@@ -94,7 +94,7 @@ out.append("## Requisitos\n\n- Claude Code ≥ 2.1.239 (marketplace com `pluginR
 # Só campos CONTENT-STABLE aqui: ref/commit_date mudam a cada commit e fariam o README driftar (REGRA 19 acusou no CI, 2026-09-04).
 out.append("## Proveniência\n\n| Campo | Valor |\n|---|---|\n| Fonte | `%s` |\n| tree_sha (hash do conteúdo das fontes) | `%s` |\n\nRef e data do commit de origem estão em `.claude-plugin/provenance.json`.\n" % (prov.get("repository","?"), str(prov.get("tree_sha","?"))[:12]))
 out.append("Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT em `.claude/` do source. Não edite à mão: a próxima montagem sobrescreve.\n")
-out.append("## Licença\n\n%s — © Onion · Marcio Carvalho. Site: https://onionevolve.com · Fonte: https://github.com/%s\n" % (pj.get("license","MIT"), prov.get("repository","marciocar/onion-evolve")))
+out.append("## Licença\n\n%s (texto integral em `LICENSE`, na raiz do plugin) — © Onion · Marcio Carvalho. Site: https://onionevolve.com · Fonte: https://github.com/%s\n" % (pj.get("license","MIT"), prov.get("repository","marciocar/onion-evolve")))
 open(os.path.join(dest,"README.md"),"w",encoding="utf-8").write("\n".join(out))
 print(f"plugin-readme: {name}: {len(cmds)} comandos, {len(agents)} agentes, {len(skills)} skills, {len(hooks)} hooks")
 PY
