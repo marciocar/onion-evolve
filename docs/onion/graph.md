@@ -361,6 +361,17 @@ jira-specialist	related	/product/check
 jira-specialist	related	/product/task	
 jira-specialist	related	product-agent	
 jira-specialist	related	task-specialist	
+jogo-da-vida	adopts	onion-evolve	
+jogo-da-vida	mode	greenfield	
+jogo-da-vida	pin	7d1abf51ddb4	
+jogo-da-vida	specialization	expo-universal	
+jogo-da-vida	specialization	gamification	
+jogo-da-vida	specialization	kg-radar-js-port	
+jogo-da-vida	specialization	maagica	
+jogo-da-vida	specialization	pre-adoption-dogfood	
+jogo-da-vida	specialization	turborepo	
+jogo-da-vida	tier	standalone	
+jogo-da-vida	trust-advises	onion-evolve	
 linux-security-specialist	related	iso-27001-specialist	
 maestro	approves	assistant	conversa-plan-gate
 maestro	gates	assistant	conversa-plan-gate

@@ -60,6 +60,12 @@
 # Exit : 0 = todo `trace:` julgável resolve · 1 = há TARGET-MISSING · 2 = uso inválido
 set -euo pipefail
 
+# Predicado de FIXTURE — caminho ABSOLUTO resolvido ANTES de qualquer `cd`, e ausência é FAIL-CLOSED.
+# (A 1ª ligação usava `$(dirname "${BASH_SOURCE[0]}")` no ponto de uso e morria depois de um `cd`:
+#  o erro era engolido por `|| true` e o script dizia "nenhum grafo" — verde por vacuidade. 2026-09-05.)
+_KFP="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/kg-fixture-paths.sh"
+[ -f "${_KFP}" ] || { echo "ERRO: predicado de fixture ausente (${_KFP}) — sem ele a varredura de grafos ficaria VAZIA e verde por vacuidade." >&2; exit 2; }
+
 REPO_ROOT="$(cd "${1:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)" || {
   printf 'kg-trace-resolve: repo_root inválido\n' >&2; exit 2; }
 FORMAT=human
@@ -68,7 +74,10 @@ for a in "$@"; do case "$a" in --format) : ;; tsv) FORMAT=tsv ;; --format=tsv) F
 cd "${REPO_ROOT}"
 
 # Descoberta ao vivo — o glob hardcoded era 36% cego (achado da casa, REGRA do kg-grammar).
-GRAPHS="$(git ls-files '*.kg.yaml' 2>/dev/null | grep -v '/fixtures/' || true)"
+# ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
+#    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos
+#    deliberadamente inválidos de um adotante viraram 5 HARD no dia 1 da adoção dele.
+GRAPHS="$(git ls-files '*.kg.yaml' 2>/dev/null | bash "${_KFP}" --filter || true)"
 [ -n "${GRAPHS}" ] || { printf '  (nenhum .kg.yaml rastreado — nada a verificar)\n'; exit 0; }
 
 MISSING=0; JUDGED=0; SKIP_ABS=0; SKIP_EXT=0; SKIP_NOTPATH=0

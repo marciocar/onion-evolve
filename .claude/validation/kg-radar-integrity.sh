@@ -38,10 +38,15 @@
 #          REGRA 49 (cadência de carimbo) e do `/meta:kg-freshness` (mede contra o vivo).
 #          Mesma divisão declarada lá: o GATE cria a cadência, o WORKER testa a verdade.
 #
-# Descoberta dos grafos: `git ls-files '*.kg.yaml' | grep -v '/fixtures/'` — a forma canônica
-# (`.claude/rules/kg-grammar.md`); o glob hardcoded que existia antes era 36% cego.
-# `fixtures/` fica FORA por desenho: lá vivem grafos propositalmente inválidos que alimentam
-# o lint-selftest — gateá-los reprovaria o repo por ter testes.
+# Descoberta dos grafos: `git ls-files '*.kg.yaml'` filtrado pelo predicado ÚNICO
+# `kg-fixture-paths.sh --filter` — a forma canônica (`.claude/rules/kg-grammar.md`); o glob
+# hardcoded que existia antes era 36% cego.
+# FIXTURE fica FORA por desenho: lá vivem grafos propositalmente inválidos que alimentam o teste
+# — gateá-los reprovaria o repo por TER testes. E a isenção deixou de ser um `grep -v '/fixtures/'`
+# copiado em seis lugares: um adotante que portou o radar para JS pôs as fixtures em
+# `packages/kg/src/__fixtures__/` (convenção Vitest), o grep não casou, e os 5 grafos inválidos
+# viraram 5 HARD no dia 1 da adoção dele (medido 2026-09-05). O predicado cobre a CLASSE de
+# convenções e é auditável por `--list-exempt` — isenção em massa não passa calada.
 #
 # ⚠ PONTO CEGO DECLARADO (achado na revisão de 2026-08-03): `git ls-files` só vê o RASTREADO.
 # Um `.kg.yaml` recém-criado e ainda não commitado — o estado exato de uma investigação nova —
@@ -54,6 +59,12 @@
 # TSV : sev<TAB>tag<TAB>path<TAB>msg   (mesmo contrato dos irmãos: 29, 42, 45, 49)
 # Exit: 0 = sem HARD · 1 = HARD presente · 2 = erro de uso
 set -uo pipefail
+
+# Predicado de FIXTURE — caminho ABSOLUTO resolvido ANTES de qualquer `cd`, e ausência é FAIL-CLOSED.
+# (A 1ª ligação usava `$(dirname "${BASH_SOURCE[0]}")` no ponto de uso e morria depois de um `cd`:
+#  o erro era engolido por `|| true` e o script dizia "nenhum grafo" — verde por vacuidade. 2026-09-05.)
+_KFP="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/kg-fixture-paths.sh"
+[ -f "${_KFP}" ] || { echo "ERRO: predicado de fixture ausente (${_KFP}) — sem ele a varredura de grafos ficaria VAZIA e verde por vacuidade." >&2; exit 2; }
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 FMT=human
@@ -94,7 +105,10 @@ while IFS= read -r g; do
       "grafo REPROVA no radar de integridade (exit ${rc}) — reconcilie antes de seguir: ${detalhe:-<sem detalhe; rode: bash .claude/validation/kg-radar.sh ${g} --integrity>}"
     hard=$(( hard + 1 ))
   fi
-done < <(git ls-files '*.kg.yaml' | grep -v '/fixtures/')
+# ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
+#    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos
+#    deliberadamente inválidos de um adotante viraram 5 HARD no dia 1 da adoção dele.
+done < <(git ls-files '*.kg.yaml' | bash "${_KFP}" --filter)
 
 if [ "${FMT}" != "tsv" ]; then
   printf '  [kg-integridade] grafos verificados: %s · reprovando: %s\n' "${total}" "${hard}"

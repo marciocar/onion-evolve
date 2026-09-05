@@ -207,20 +207,10 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/starter-kg-inbox.sh" "$DEST" \
   || { echo "ABORTADO: a fila kg-inbox não nasceu em $DEST — sem ela o /meta:kg-inbox roteado não opera." >&2; exit 1; }
 
 # (2b) semente de PESQUISA — a rule .claude/rules/research-lens.md declara `paths: docs/evolution/research/**`;
-#      sem UM arquivo rastreado ali a REGRA 53 reprova HARD no dia 1 (medido 2026-09-02 na adoção da
-#      um adotante greenfield: TODO adotante greenfield nascia vermelho). O README também ensina a lente.
-if [ ! -f "$DEST/docs/evolution/research/README.md" ]; then
-  mkdir -p "$DEST/docs/evolution/research"
-  cat > "$DEST/docs/evolution/research/README.md" <<'PTR'
-# Pesquisas deste repo (grafo primeiro)
-
-Toda pesquisa/estudo/decisão nasce aqui como `<slug>-<AAAA-MM>/<slug>-<AAAA-MM>.kg.yaml` (SSOT) com a
-prosa como projeção. A lente carrega sozinha ao tocar esta pasta (`.claude/rules/research-lens.md`);
-a doutrina inteira está em `.claude/commands/common/prompts/research-doctrine.md`. Comece por
-`bash .claude/validation/kg-corpus-grep.sh <tema>` — o que os grafos já sabem — e, para pesquisar,
-`/onion-research <pergunta>`.
-PTR
-fi
+#      sem UM arquivo RASTREADO ali a REGRA 53 reprova HARD no dia 1 (medido 2026-09-02: todo adotante
+#      greenfield nascia vermelho). Idempotente; o README também ensina a lente.
+bash "$SOURCE_ROOT/.claude/utils/adopt/starter-research-seed.sh" "$DEST" \
+  || { echo "ABORTADO: a semente de pesquisa nao nasceu em $DEST (REGRA 53 reprova no dia 1)." >&2; exit 1; }
 
 # (3) branch de integração — setar git config local (CONVENIÊNCIA p/ `git flow` cru; o durável é o
 #     .onion-version, passo abaixo). No install, INTEGRATION_BRANCH vem do PASSO 0e (via STATE.md);
@@ -384,7 +374,12 @@ fi
 #        chegada, emite; já esteve, o alvo já tinha catraca, filtra. Assim o caminho do `--update`
 #        não depende de ninguém lembrar de passar uma flag (disciplina), e adoção de repo LEGADO
 #        (que TEM história) continua emitindo, como deve.
-if [ -f "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" ]; then
+# ⚠️ ORDEM (dogfood 2026-09-05, mesma classe da nota do (8c)): este passo LÊ `role:`, e na ADOÇÃO o
+#    carimbo só existe na Fase 5 — antes dele o `onion-version.sh` devolve `role: source` e o helper
+#    RECUSA achando que o alvo é o core (rc=2). Medido: sem re-rodar pós-carimbo o alvo herdaria 114
+#    chaves do core (kg-verification 28 + plugin-bare-path 86). No `--update` o stamp já existe.
+if [ -f "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" ] \
+   && [ -f "$DEST/.claude/.onion-version" ]; then   # sem stamp o role mente — deixa p/ a Fase 5
   bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$DEST" --ensure-from "$SOURCE_ROOT" || true
 fi
 ```
@@ -646,6 +641,11 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/write-stamp.sh" "$INSTALL_DIR" \
 #      seção ESTADO a cada leitura. Never-clobber: alvo que JÁ tem grafo não recebe nada.
 if [ -f "$SOURCE_ROOT/.claude/utils/adopt/seed-adoption-graph.sh" ]; then
   bash "$SOURCE_ROOT/.claude/utils/adopt/seed-adoption-graph.sh" "$INSTALL_DIR" "${GATE_FLAG:-}" || true
+fi
+
+# (9-na-adocao) BASELINES — AQUI, nao na Fase 3: o passo (9) le `role:` e o carimbo acabou de existir.
+if [ -f "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" ]; then
+  bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$INSTALL_DIR" --ensure-from "$SOURCE_ROOT" || true
 fi
 
 - **Commit durável (obrigatório):** aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)

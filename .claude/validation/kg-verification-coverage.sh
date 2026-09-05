@@ -64,6 +64,12 @@
 # Exit: 0 = sem HARD · 1 = HARD presente · 2 = erro de uso
 set -uo pipefail
 
+# Predicado de FIXTURE — caminho ABSOLUTO resolvido ANTES de qualquer `cd`, e ausência é FAIL-CLOSED.
+# (A 1ª ligação usava `$(dirname "${BASH_SOURCE[0]}")` no ponto de uso e morria depois de um `cd`:
+#  o erro era engolido por `|| true` e o script dizia "nenhum grafo" — verde por vacuidade. 2026-09-05.)
+_KFP="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/kg-fixture-paths.sh"
+[ -f "${_KFP}" ] || { echo "ERRO: predicado de fixture ausente (${_KFP}) — sem ele a varredura de grafos ficaria VAZIA e verde por vacuidade." >&2; exit 2; }
+
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 EMIT=0; FMT=human
 while [ $# -gt 0 ]; do
@@ -126,7 +132,10 @@ load_universe() {
   [ "${UNIVERSE_LOADED}" -eq 1 ] && return 0
   local f in_scope
   UNIVERSE="$(for f in $(git ls-files '*.kg.yaml' 2>/dev/null); do
-    case "$f" in */fixtures/*) in_scope=0 ;; *) in_scope=1 ;; esac
+    # ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
+#    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos
+#    deliberadamente inválidos de um adotante viraram 5 HARD no dia 1 da adoção dele.
+if bash "${_KFP}" --is-fixture "$f"; then in_scope=0; else in_scope=1; fi
     awk -v F="$f" -v D="${in_scope}" '
       function flush(   ) {
         if (id != "") printf "%s\037%s\037%s\037%s\037%s\037%s\037%s\n", F, id, plane, imp, st, ver, D

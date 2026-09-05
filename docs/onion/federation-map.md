@@ -20,6 +20,7 @@ flowchart TD
   onion_dist["onion-dist<br/>standalone · greenfield"]:::standalone
   sacola_de_ideias["sacola-de-ideias<br/>standalone · greenfield"]:::standalone
   portal_gamificacao["portal-gamificacao<br/>standalone · greenfield"]:::standalone
+  jogo_da_vida["jogo-da-vida<br/>standalone · greenfield"]:::standalone
   metagamify -->|adopts| onion_evolve
   pulse_mais -->|adopts| onion_evolve
   granaai -->|adopts| onion_evolve
@@ -35,6 +36,7 @@ flowchart TD
   onion_dist -->|adopts| onion_evolve
   sacola_de_ideias -->|adopts| onion_evolve
   portal_gamificacao -->|adopts| onion_evolve
+  jogo_da_vida -->|adopts| onion_evolve
   classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;
   classDef hub fill:#238636,color:#fff,stroke:#033a16;
   classDef standalone fill:#8957e5,color:#fff,stroke:#3c1e70;
@@ -59,3 +61,4 @@ flowchart TD
 | onion-dist | standalone | greenfield | distribution-algorithms, kg-sdaal-method, research-arm, benchmarking | `e88c1e11e051` |
 | sacola-de-ideias | standalone | greenfield | astro-site, institutional, greenfield-dogfood | `8e2517724c0a` |
 | portal-gamificacao | standalone | greenfield | gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers | `0432320ee697` |
+| jogo-da-vida | standalone | greenfield | gamification, maagica, expo-universal, turborepo, kg-radar-js-port, pre-adoption-dogfood | `7d1abf51ddb4` |
