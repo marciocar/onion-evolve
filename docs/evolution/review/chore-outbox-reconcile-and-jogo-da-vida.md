@@ -3,7 +3,7 @@ title: "Revisão — o dogfood de uma adoção achou 3 defeitos que 6 rodadas de
 date: 2026-09-05
 branch: chore/outbox-reconcile-and-jogo-da-vida
 reviewer: "1 refutador (opus, mandato de REFUTAR, default REPROVADO na dúvida) sobre o artefato COMPLETO, seguindo a calibração da sessão anterior (a 1ª passada rende os achados de PRODUTO). Antes dele, o próprio DOGFOOD da adoção — executar o artefato, não ler o diff — achou 3 defeitos."
-reviewed_diff_sha256: 68e87e8e583de08b16c0fcd4e226f765cbb08d851d456d14d83cdc148774a20b
+reviewed_diff_sha256: 818825d2925aa455d6cd2176d20114504c7e8ed3ed2e7cd1049d2059cbfa50f8
 findings_total: 17
 findings_real: 17
 verdict: APROVADO
@@ -88,6 +88,18 @@ Ampliada para qualquer produtor, ela achou de imediato **3 sítios pré-existent
 helpers escritos mais cedo hoje — curados também. (Cuidado que a cura exigiu: a 1ª passada do meu
 `sed` deixou `grep -q PAD` **sem entrada**, o que faria o selftest ler stdin e TRAVAR — pior que o
 defeito. As here-strings foram recolocadas e os dois selftests rodam em <60 s.)
+
+E ampliar a guarda para a CLASSE revelou **96 sítios pré-existentes em 23 arquivos**. Não converti os
+96 — converti os que estavam no caminho (10 das guardas novas, 1 em **produção** no
+`kg-provenance-coverage.sh`, 2 em selftest) e pus **catraca com baseline** no resto, que é a doutrina
+desta casa para dívida em massa (REGRAS 29/42/45/49/74): guarda que nasce vermelha em massa é guarda
+que alguém desliga. A varredura foi extraída para um EMISSOR (`pipe-verdict-check.sh`) com
+`--emit-baseline` e `--selftest`, porque sem o contrato que o `regen-baselines.sh` resolve o
+**adotante herdaria os 96 sítios tolerados do core** — o modo-de-falha que o regen existe para fechar
+(medido: 8 baselines, 7 resolvidos, o meu mantido "COMO VEIO DO CORE" até eu fazer o emissor
+mencionar o baseline). E a catraca **nasceu com o defeito que ela mede**: `_tol="$(grep -F …)"` sob
+`set -e` matava a suíte exatamente quando o arquivo NÃO estava no baseline — o caso que ela precisa
+acusar. O mutante não imprimiu nada, e foi o **banner de abort da bancada** que pegou.
 
 **A guarda cobria o EXEMPLO, não a CLASSE** — quarta manifestação do mesmo padrão nesta sessão, junto
 do vocabulário do filtro de fixture, do piso numérico e da nota de dívida que citava o literal.
