@@ -657,6 +657,16 @@ poc-venda-direta-pdi	specialization	greenfield-adoption
 poc-venda-direta-pdi	specialization	public-procurement	
 poc-venda-direta-pdi	tier	standalone	
 poc-venda-direta-pdi	trust-advises	onion-evolve	
+portal-gamificacao	adopts	onion-evolve	
+portal-gamificacao	mode	greenfield	
+portal-gamificacao	pin	0432320ee697	
+portal-gamificacao	specialization	collaborator-layer	
+portal-gamificacao	specialization	domain-kb-two-layers	
+portal-gamificacao	specialization	gamification	
+portal-gamificacao	specialization	kg-sealing-field-signal	
+portal-gamificacao	specialization	maagica	
+portal-gamificacao	tier	standalone	
+portal-gamificacao	trust-advises	onion-evolve	
 postgres-specialist	related	nodejs-specialist	
 presentation-orchestrator	related	/product/presentation	
 presentation-orchestrator	related	gamma-api-specialist	

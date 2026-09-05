@@ -5,7 +5,7 @@
 # POR QUÊ : desde 2026-09-05 o /meta:kg-inbox ROTEIA por papel — num repo adotado ele sela a fila
 #           LOCAL do próprio repo (a I3 é fronteira de REPO, não de papel). Sem a fila nascer na
 #           adoção, o comando roteado não tem onde operar no dia 1. Sinal de campo do
-#           portal-gamificacao (2026-09-04): o adotante teve de criar a fila E um comando local de
+#           um adotante (2026-09-04): o adotante teve de criar a fila E um comando local de
 #           selagem à mão porque o core recusava rodar em `role: adopted`.
 #
 # COMO    : idempotente por desenho — só cria o que estiver AUSENTE; NUNCA clobba fila em uso
@@ -19,7 +19,11 @@ Q="${DEST}/docs/evolution/kg-inbox"
 mkdir -p "${Q}/_sealed" "${Q}/_rejected"
 [ -f "${Q}/_sealed/.gitkeep" ]   || : > "${Q}/_sealed/.gitkeep"
 [ -f "${Q}/_rejected/.gitkeep" ] || : > "${Q}/_rejected/.gitkeep"
-[ -f "${Q}/README.md" ] && exit 0
+_verifica() {   # o script CONFERE o que produziu; `exit 0` seria só declaração sobre si mesmo
+  [ -f "${Q}/README.md" ] && [ -d "${Q}/_sealed" ] && [ -d "${Q}/_rejected" ] && exit 0
+  echo "starter-kg-inbox: a fila não ficou completa em ${Q} (README/_sealed/_rejected)" >&2; exit 1
+}
+[ -f "${Q}/README.md" ] && _verifica
 cat > "${Q}/README.md" <<'PTR'
 # Fila de propostas ao grafo (kg-inbox)
 
@@ -32,3 +36,4 @@ ALVO.
 **O grafo-alvo tem de ser um grafo DESTE repo** (`git ls-files '*.kg.yaml'`) — um escritor por repo.
 Conhecimento que mora noutro repo não se sela aqui: é rejeitado com o motivo, e o gap vira nó `open`.
 PTR
+_verifica

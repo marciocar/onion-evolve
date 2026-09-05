@@ -11369,7 +11369,7 @@ run_plugin_deps_contract_selftests() {
 }
 _family run_plugin_deps_contract_selftests
 
-# Três curas de sinal upstream (portal-gamificacao, 2026-09-04): enumeração rastreada no inventário,
+# Três curas de sinal upstream (2026-09-04): enumeração rastreada no inventário,
 # .claude/workflows na superfície de adoção, e assunto de commit em pt-BR no durable-commit.
 run_upstream_portal_fixes_selftests() {
   local inv="${SCRIPT_DIR}/inventory.sh" dc="${SCRIPT_DIR}/../utils/adopt/durable-commit.sh"
@@ -11451,6 +11451,12 @@ run_upstream_portal_fixes_selftests() {
   if [ ! -f "${adopt}" ]; then record_skip "upstream-portal: (d) adopt.md ausente"; else
     local sd blk; sd="$(mktemp -d)"; sd="$(cd "${sd}" && pwd -P)"
     blk="$(awk '/^# \(2a\) fila de PROPOSTAS/{f=1} /^# \(2b\) semente de PESQUISA/{f=0} f' "${adopt}")"
+    local blk_n; blk_n="$(printf '%s\n' "${blk}" | grep -c . || true)"
+    if [ -n "${blk}" ] && { [ "${blk_n}" -gt 12 ] || ! grep -q 'starter-kg-inbox.sh' <<< "${blk}"; }; then
+      record_fail "upstream-portal: (d) fatia do starter deriva de sentinela alheia" \
+        "a extração entre '(2a)' e '(2b)' devolveu ${blk_n} linha(s)$(grep -q 'starter-kg-inbox.sh' <<< "${blk}" || printf ' e SEM a chamada do helper') — confira a sentinela: renomear o comentário do bloco seguinte faz a fatia engolir o resto do adopt.md"
+      blk=""
+    fi
     if [ -z "${blk}" ]; then
       record_fail "upstream-portal: (d) fila kg-inbox no starter da adoção" \
         "bloco '(2a) fila de PROPOSTAS' não encontrado em adopt.md — o /meta:kg-inbox roteado por papel não tem onde operar no dia 1 do adotante"
@@ -11472,8 +11478,29 @@ run_upstream_portal_fixes_selftests() {
     rm -rf "${sd}"
   fi
 
+  # ── (d2) fail-CLOSED de verdade: o helper CONFERE o efeito e o chamador LÊ o rc ──────────────────
+  #     `exit 0` é declaração do script sobre si; a verificação é contar o que ele produziu. Sem isto,
+  #     um DEST read-only fazia a adoção seguir e o adotante nascer SEM fila, sem nada a jusante conferir.
+  local kh="${SCRIPT_DIR}/../utils/adopt/starter-kg-inbox.sh"
+  if [ ! -f "${kh}" ]; then record_skip "upstream-portal: (d2) starter-kg-inbox.sh ausente"; else
+    local ro rc2 d2miss=""
+    ro="$(mktemp -d)"; mkdir -p "${ro}/docs"; chmod -w "${ro}/docs"
+    bash "${kh}" "${ro}" >/dev/null 2>&1 && rc2=0 || rc2=1
+    chmod +w "${ro}/docs"; rm -rf "${ro}"
+    [ "${rc2}" -ne 0 ] || d2miss="${d2miss} helper-sai-0-sem-criar-a-fila(DEST somente-leitura)"
+    grep -A3 'starter-kg-inbox\.sh' "${adopt}" | grep -qE '\|\| *\{|\|\| *exit|KGI_RC' \
+      || d2miss="${d2miss} chamador-não-lê-o-rc(adopt.md segue com a adoção)"
+    grep -A4 'starter-kg-inbox\.sh' "${adopt}" | grep -qE 'ABORTADO|exit 1' \
+      || d2miss="${d2miss} chamador-não-aborta"
+    if [ -z "${d2miss}" ]; then
+      record_pass "upstream-portal: (d2) o helper confere o próprio efeito (rc≠0 em DEST somente-leitura) e o chamador ABORTA"
+    else
+      record_fail "upstream-portal: (d2) fail-closed da fila na adoção" "fail-open em:${d2miss}"
+    fi
+  fi
+
   # ── (e) /meta:kg-inbox ROTEIA por papel — em TODOS os passos que decidem, não só no Passo 1 ─────
-  #     Sinal de campo (portal-gamificacao, 2026-09-04): o comando parava em `role: adopted` e o
+  #     Sinal de campo (2026-09-04): o comando parava em `role: adopted` e o
   #     adotante ficou sem mecanismo de selagem (forjou um /portal:selar local). A I3 é fronteira de
   #     REPO, não de papel: o dono sela a fila DO PRÓPRIO repo.
   #     ⚠️ A 1ª versão desta guarda olhava SÓ o Passo 1 — e passou verde com o Passo 3 ainda
@@ -11487,10 +11514,23 @@ run_upstream_portal_fixes_selftests() {
     p3="$(awk '/^## Passo 3/{f=1;next} /^## Passo 4/{f=0} f' "${kgi}")"
     p4="$(awk '/^## Passo 4/{f=1;next} /^## Passo 5/{f=0} f' "${kgi}")"
     p5="$(awk '/^## Passo 5/{f=1;next} /^## Saída|^Saída:/{f=0} f' "${kgi}")"
-    # (e1) Passo 1 roteia e não recusa
-    grep -qE 'adopted\|hub`? → \*\*parar\*\*' <<< "${p1}" && emiss="${emiss} P1:recusa-por-papel-de-volta"
+    # (e1) Passo 1 roteia e não recusa — ancorado na ESTRUTURA (a linha da tabela nomeia o que SELA)
+    local row_adopted
+    row_adopted="$(grep -E '^\|.*adopted' <<< "${p1}" | head -1)"
+    [ -n "${row_adopted}" ] || emiss="${emiss} P1:sem-linha-de-tabela-para-adopted"
+    grep -q 'kg-inbox' <<< "${row_adopted}" \
+      || emiss="${emiss} P1:a-linha-de-adopted-não-nomeia-a-fila-que-sela"
+    # recusa na forma DIRETIVA (linha com `→`, como as regras se escrevem aqui) co-ocorrendo com o papel
+    grep -E '→' <<< "${p1}" | grep -E 'adopted|hub' \
+      | grep -qiE 'parar|pare|não sela|nao sela|não roda|nao roda|encerra|sem selar|abort' \
+      && emiss="${emiss} P1:recusa-por-papel-de-volta(forma diretiva)"
+    grep -qiE 'este comando não roda aqui|não tem portão no core' <<< "${p1}" \
+      && emiss="${emiss} P1:recusa-por-papel-de-volta(desvio para comando local)"
     grep -q 'adopted' <<< "${p1}" || emiss="${emiss} P1:não-menciona-adopted"
     grep -qiE 'rotear|roteamento' <<< "${p1}" || emiss="${emiss} P1:não-roteia"
+    # (e1b) e NADA no comando pode autorizar selar grafo de OUTRO repo — a I3 não tem exceção por decreto
+    grep -iE 'outro repo|repo alheio|grafo alheio' "${kgi}" | grep -qiE 'permitid|autoriz|pode selar' \
+      && emiss="${emiss} autoriza-selar-grafo-de-outro-repo(a I3 não abre por decreto)"
     # (e2) a invariante é sobre o ATO (o caminho do alvo), não sobre `meta.target` — campo que NENHUM
     #      produtor emite hoje (medido 2026-09-05: as 2 propostas reais do corpus não o trazem).
     grep -qi 'invariante é sobre o ATO' <<< "${p1}" \

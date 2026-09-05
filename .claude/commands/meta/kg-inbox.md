@@ -1,6 +1,6 @@
 ---
 name: kg-inbox
-description: Processa a fila de propostas de escrita no grafo (docs/evolution/kg-inbox/) — a perna de SELAGEM do write-leg (F4b). Lista as propostas pendentes, roda o radar advisory em cada uma, e para cada decide SELAR (integrar no grafo vivo + git mv → _sealed/) ou REJEITAR (git mv → _rejected/ com motivo). É o mecanismo que impede a fila de acumular sem controle. Human-in-the-loop na TRIAGEM (o que mora NESTE repo é juízo — o comando roteia por papel: o core sela doutrina do framework, um adotante sela o domínio dele), mecânico no resto.
+description: 'Processa a fila de propostas de escrita no grafo (docs/evolution/kg-inbox/) — a perna de SELAGEM do write-leg (F4b). Lista as propostas pendentes, roda o radar advisory em cada uma, e para cada decide SELAR (integrar no grafo vivo + git mv → _sealed/) ou REJEITAR (git mv → _rejected/ com motivo). É o mecanismo que impede a fila de acumular sem controle. Human-in-the-loop na TRIAGEM (o que mora NESTE repo é juízo — o comando roteia por papel: o core sela doutrina do framework, um adotante sela o domínio dele), mecânico no resto.'
 category: meta
 tags: [kg, kg-inbox, write-leg, sealing, i3, self-evolution, sdaal]
 version: "1.1.0"
@@ -103,7 +103,9 @@ Para cada proposta:
 3. `bash .claude/validation/kg-radar.sh <alvo>` → **DEVE exit 0**. Se reprovar, a selagem não fecha —
    corrigir a integração antes de mover.
 4. `git mv docs/evolution/kg-inbox/<proposta> docs/evolution/kg-inbox/_sealed/` e **prepend** ao
-   arquivo movido uma linha `# SELADO em <alvo> · <AAAA-MM-DD> · sessão do core` (Aufhebung: não some).
+   arquivo movido uma linha `# SELADO em <alvo> · <AAAA-MM-DD> · sessão de <role>` — **o papel do
+   Passo 1, não a palavra "core"**: num repo adotado o carimbo `sessão do core` declararia autor falso,
+   e proveniência errada é pior que proveniência ausente (Aufhebung: nada some).
 
 **REJEITAR** (fronteira/ruído):
 1. `git mv docs/evolution/kg-inbox/<proposta> docs/evolution/kg-inbox/_rejected/` e **prepend**

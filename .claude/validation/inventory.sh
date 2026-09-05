@@ -28,7 +28,7 @@ KB_DIR="${REPO_ROOT}/docs/knowledge-base"
 DOCS_DIR="${REPO_ROOT}/docs"
 
 # ---------------------------------------------------------------------------
-# ENUMERAÇÃO RASTREADA (sinal de campo portal-gamificacao, 2026-09-04): contar por `find` no filesystem
+# ENUMERAÇÃO RASTREADA (sinal de campo de um adotante, 2026-09-04): contar por `find` no filesystem
 # inclui arquivo GITIGNORADO — o inventário local ficava verde e o CI, num checkout limpo, reprovava a
 # REGRA 8. `git ls-files` vê o MESMO conjunto que o CI. Fallback para `find` quando não há git (adotante
 # pré-init, tarball): declarado, nunca silencioso.

@@ -52,7 +52,7 @@ if git -C "${DEST}" diff --cached --quiet 2>/dev/null; then
   exit 0
 fi
 
-# ASSUNTO EM pt-BR (sinal de campo portal-gamificacao, 2026-09-04): o prefixo Conventional é contrato de
+# ASSUNTO EM pt-BR (sinal de campo de um adotante, 2026-09-04): o prefixo Conventional é contrato de
 # máquina (inglês), o ASSUNTO é narrativa (pt-BR) — code-standards.md §3.4, ratificado em 2026-08-03. O
 # helper emitia "adopt to pin <x>" e a revisão adversarial do adotante pegou o desvio. `SUBJECT=` permite
 # ao alvo com outra política passar o seu; sem ele, o default segue a política da casa.
