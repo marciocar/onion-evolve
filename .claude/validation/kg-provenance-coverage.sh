@@ -222,7 +222,9 @@ scope_excluded() {
   # ACHA (fecha o pipe, head morre de SIGPIPE) — o falso-negativo silencioso que
   # deixaria todo ADR-sem-prefixo entrar no escopo.
   local fm; fm="$(head -n 20 "${REPO_DIR}/${rel}" 2>/dev/null || true)"
-  if printf '%s\n' "${fm}" | grep -qiE '^type:[[:space:]]*"?(adr|rfc)"?[[:space:]]*$'; then
+  # veredito por HERE-STRING, não por pipe: `<produtor> | grep -q` é corrida (o leitor fecha no 1º
+  # match, o escritor toma EPIPE, e sob pipefail o pipeline reprova com o padrão PRESENTE)
+  if grep -qiE '^type:[[:space:]]*"?(adr|rfc)"?[[:space:]]*$' <<< "${fm}"; then
     return 0
   fi
   return 1
