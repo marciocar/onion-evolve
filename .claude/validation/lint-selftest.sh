@@ -917,6 +917,32 @@ run_shell_pipefail_robustness_selftests() {
             "${REPO_ROOT}/.claude/hooks" \
             "${REPO_ROOT}/.githooks" 2>/dev/null \
           | grep -vE ':[[:space:]]*#' || true)"
+  # CATRACA por ARQUIVO: compara a contagem atual com a tolerada no baseline versionado. Sítio novo em
+  # arquivo fora da lista, ou acima da contagem, é HARD. (Ampliada para a CLASSE em 2026-09-05, a
+  # guarda achou 94 sítios pré-existentes — guarda que nasce vermelha em massa é guarda que se desliga.)
+  local _pvb="${SCRIPT_DIR}/pipe-verdict-baseline.txt" _novos="" _passivo=0
+  if [ -f "${_pvb}" ]; then
+    local _f _n _tol _atual
+    _atual="$(_emit "${vhits}" | sed 's|^'"${REPO_ROOT}"'/||' | awk -F: '{print $1}' | sort | uniq -c | awk '{printf "%s\t%s\n", $2, $1}')"
+    while IFS=$'\t' read -r _f _n; do
+      [ -n "${_f}" ] || continue
+      _tol="$(grep -F "${_f}"$'\t' "${_pvb}" 2>/dev/null | head -1 | cut -f2 || true)"
+      _tol="${_tol:-0}"
+      if [ "${_n}" -gt "${_tol}" ]; then
+        _novos="${_novos} ${_f}(${_n}>${_tol})"
+      else
+        _passivo=$(( _passivo + _n ))
+      fi
+    done <<< "${_atual}"
+    if [ -n "${_novos}" ]; then
+      record_fail "shell-pipefail: VEREDITO por <produtor>|grep -q ACIMA da catraca" \
+        "sítio NOVO da classe (o leitor fecha cedo, o escritor toma EPIPE, pipefail reprova com o padrão PRESENTE) — cure com here-string \`grep -q PAD <<< \"\$var\"\`:${_novos}"
+    else
+      record_pass "shell-pipefail: catraca da classe <produtor>|grep -q — ${_passivo} sítio(s) no passivo tolerado, ZERO novo (a métrica de saúde é o passivo DIMINUINDO)"
+    fi
+    return 0
+  fi
+
   if [ -z "${vhits}" ]; then
     record_pass "shell-pipefail: nenhum veredito por <produtor>|grep -q (o leitor fecha cedo, o escritor toma EPIPE e pipefail reprova; use here-string)"
   else

@@ -109,7 +109,7 @@ if [ "${SELFTEST:-0}" = "1" ]; then
   _d="$(mktemp -d)"
   _st_repo "$_d" 'bash "${SCRIPT_DIR}/alvo.sh" --modo' 'bash "${SCRIPT_DIR}/alvo.sh" --modo'
   _rc=0; _out="$(bash "${_st_me}" "$_d" 2>&1)" || _rc=$?
-  if [ "${_rc}" -eq 0 ] && ! printf '%s' "${_out}" | grep -q 'MODO-SEM-TESTE'; then
+  if [ "${_rc}" -eq 0 ] && ! grep -q 'MODO-SEM-TESTE' <<< "${_out}"; then
     _st_ok '(a) modo consumido E exercitado -> silencio, exit 0'
   else _st_bad '(a)' "acusou modo coberto (rc=${_rc}): ${_out}"; fi
   rm -rf "$_d"
@@ -119,7 +119,7 @@ if [ "${SELFTEST:-0}" = "1" ]; then
   _d="$(mktemp -d)"
   _st_repo "$_d" 'bash "${SCRIPT_DIR}/alvo.sh" --modo' 'bash "${SCRIPT_DIR}/outro.sh" --modo'
   _rc=0; _out="$(bash "${_st_me}" "$_d" 2>&1)" || _rc=$?
-  if [ "${_rc}" -eq 1 ] && printf '%s' "${_out}" | grep -q 'MODO-SEM-TESTE' \
+  if [ "${_rc}" -eq 1 ] && grep -q 'MODO-SEM-TESTE' <<< "${_out}" \
      && printf '%s' "${_out}" | grep -q 'alvo.sh' && printf '%s' "${_out}" | grep -q -- '--modo'; then
     _st_ok '(b) modo consumido e NAO exercitado -> acusa, exit 1, nomeando script e flag'
   else _st_bad '(b)' "nao acusou ou nao nomeou (rc=${_rc}): ${_out}"; fi
