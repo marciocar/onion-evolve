@@ -50,3 +50,11 @@ node_modules/
 # Python bytecode (MCP servers em ops/) — nunca versionar
 __pycache__/
 *.pyc
+
+# Fixture TRANSITÓRIA da bancada (run_marketplace_bundle_selftests): nasce e morre em
+# .claude/utils/marketplace/verticals/ porque o caso testa que o LINT, que varre esse dir, acusa
+# manifesto sem plugin. Enquanto ela existe, um `git add -A` concorrente a staja e o lint passa a
+# ver manifesto órfão → REGRA 19 HARD. Aconteceu 3× em 2026-09-05. Ignorar é a cura barata; mover a
+# fixture exigiria redesenhar o caso (ele PRECISA do dir vivo).
+.claude/**/__*__.*
+plugins/__*__/

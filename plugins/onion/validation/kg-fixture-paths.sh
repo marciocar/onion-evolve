@@ -62,7 +62,7 @@ case "${1:-}" in
     fails=0
     for p in \
       'packages/kg/src/__fixtures__/orphan.kg.yaml' \
-      '.claude/validation/fixtures/bad.kg.yaml' \
+      '${CLAUDE_PLUGIN_ROOT}/validation/fixtures/bad.kg.yaml' \
       'a/fixture/x.kg.yaml' \
       'pkg/testdata/y.kg.yaml' \
       'ui/__snapshots__/z.kg.yaml'

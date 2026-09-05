@@ -131,11 +131,12 @@ UNIVERSE=""; UNIVERSE_LOADED=0
 load_universe() {
   [ "${UNIVERSE_LOADED}" -eq 1 ] && return 0
   local f in_scope
+  # Isenção de FIXTURE pelo predicado ÚNICO (kg-fixture-paths.sh, 2026-09-05) — em UMA passada.
+  # A 1ª ligação chamava `--is-fixture` DENTRO do laço: 121 forks, 0,02 s → 2,23 s medidos. Os outros
+  # 4 consumidores já usavam `--filter` (1 fork); aqui a lista sai uma vez e é consultada em memória.
+  local _fx; _fx="$(git ls-files '*.kg.yaml' 2>/dev/null | bash "${_KFP}" --list-exempt-stdin || true)"
   UNIVERSE="$(for f in $(git ls-files '*.kg.yaml' 2>/dev/null); do
-    # ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
-#    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos
-#    deliberadamente inválidos de um adotante viraram 5 HARD no dia 1 da adoção dele.
-if bash "${_KFP}" --is-fixture "$f"; then in_scope=0; else in_scope=1; fi
+    case $'\n'"${_fx}"$'\n' in *$'\n'"${f}"$'\n'*) in_scope=0 ;; *) in_scope=1 ;; esac
     awk -v F="$f" -v D="${in_scope}" '
       function flush(   ) {
         if (id != "") printf "%s\037%s\037%s\037%s\037%s\037%s\037%s\n", F, id, plane, imp, st, ver, D

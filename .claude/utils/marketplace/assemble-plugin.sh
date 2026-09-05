@@ -77,11 +77,26 @@ for v in "${VALIDATION[@]}"; do
   case "${v}" in *.sh) : ;; *) continue ;; esac
   while IFS= read -r _need; do
     [ -n "${_need}" ] || continue
-    _target=".claude/validation/lib/${_need}"
+    case "${_need}" in
+      lib/*) _target=".claude/validation/${_need}" ;;
+      *)     _target=".claude/validation/${_need}" ;;
+    esac
     case " ${VALIDATION[*]} " in *" ${_target} "*) : ;;
       *) _missing_deps="${_missing_deps}\n  · ${v} precisa de ${_target}, que NAO esta no VALIDATION[] deste manifesto" ;;
     esac
-  done < <(grep -oE 'lib/[A-Za-z0-9_.-]+\.(awk|sh)' "${SRC}/${v}" 2>/dev/null | sed 's#^lib/##' | sort -u)
+    # DUAS formas de dep, e a 2a era invisivel ate 2026-09-05:
+    #   · lib/<x>.awk|sh          — a lib compartilhada (a unica que a 1a versao olhava)
+    #   · <irmao>.sh ao lado      — resolvido por `$(dirname "$BASH_SOURCE")/<irmao>.sh` ou por
+    #                               ${CLAUDE_PLUGIN_ROOT}/validation/<irmao>.sh no bundle
+  done < <( { grep -oE 'lib/[A-Za-z0-9_.-]+\.(awk|sh)' "${SRC}/${v}" 2>/dev/null
+              # dep IRMAO: so conta se for INVOCACAO em linha NAO-comentario — `bash <x>.sh`,
+              # `${VAR}/<x>.sh`, ou `$(dirname ...)/<x>.sh`. Citacao em comentario (`graph.sh:164`)
+              # NAO e dependencia: a 1a versao desta generalizacao lia prosa e reprovou o bundle todo.
+              grep -vE '^[[:space:]]*#' "${SRC}/${v}" 2>/dev/null \
+                | grep -oE '(bash[[:space:]]+|/)[A-Za-z0-9_.-]+\.sh' \
+                | grep -oE '[A-Za-z0-9_.-]+\.sh$' \
+                | while IFS= read -r _c; do [ -f "${SRC}/.claude/validation/${_c}" ] && printf '%s\n' "${_c}"; done
+            } | grep -v "^$(basename "${v}")$" | sort -u )
 done
 if [ -n "${_missing_deps}" ]; then
   printf 'ERRO: o bundle nao fecha o grafo de dependencias — o plugin nasceria morto no adotante:%b\n' "${_missing_deps}" >&2

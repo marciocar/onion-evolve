@@ -48,12 +48,21 @@ fi
 # NEVER-CLOBBER — e a pergunta certa é "o alvo TEM grafo?", não "este arquivo existe?": semear um
 # 2º grafo de adoção num repo que já mapeia o próprio domínio é ruído, ainda que o nome não colida.
 # Resolve AO VIVO, como o warm-up (git ls-files), com fallback em find p/ alvo ainda sem commit.
+# ⚠️ A isenção de FIXTURE vem do predicado ÚNICO (kg-fixture-paths.sh) e AQUI ela é load-bearing de
+#    um jeito diferente dos outros sítios: um `grep -v '/fixtures/'` incompleto faz uma FIXTURE DE
+#    TESTE responder "o alvo já tem grafo" — e a semente, que existe para dar ESTADO ao adotante,
+#    nunca nasce. Não é gate afrouxado: é CAPACIDADE CANCELADA, exatamente o buraco que este helper
+#    veio fechar. Medido 2026-09-05: adotante com só `packages/kg/src/__fixtures__/orphan.kg.yaml`
+#    (convenção Vitest) → `⊘ never-clobber` e ZERO grafos semeados.
+#    `--filter` serve aos dois caminhos porque filtra STDIN: vale para `git ls-files` e para `find`.
+_KFP="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../validation" && pwd)/kg-fixture-paths.sh"
+[ -f "${_KFP}" ] || { echo "  ✗ seed-adoption-graph: predicado de fixture ausente (${_KFP}) — sem ele uma FIXTURE de teste responde 'o alvo ja tem grafo' e a semente NAO nasce (medido 2026-09-05)." >&2; exit 2; }
 existing=""
 if git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1; then
-  existing="$(git -C "${DEST}" ls-files '*.kg.yaml' 2>/dev/null | grep -v '/fixtures/' | head -1 || true)"
+  existing="$(git -C "${DEST}" ls-files '*.kg.yaml' 2>/dev/null | bash "${_KFP}" --filter | head -1 || true)"
 fi
 if [ -z "${existing}" ]; then
-  existing="$(find "${DEST}/docs" -name '*.kg.yaml' -not -path '*/fixtures/*' 2>/dev/null | head -1 || true)"
+  existing="$(find "${DEST}/docs" -name '*.kg.yaml' 2>/dev/null | bash "${_KFP}" --filter | head -1 || true)"
 fi
 if [ -n "${existing}" ]; then
   echo "  ⊘ seed-adoption-graph: alvo já tem grafo (${existing#${DEST}/}) — nada semeado (never-clobber)."

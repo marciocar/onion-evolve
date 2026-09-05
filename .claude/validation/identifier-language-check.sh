@@ -92,6 +92,14 @@ WORDLIST="$(grep -v '^[[:space:]]*\(#\|$\)' "${WORDS}" | tr '\n' '|' | sed 's/|$
 _universe() {
   { git ls-files '.claude/**/*.sh' '.claude/*.sh' 2>/dev/null || true
     find .claude -name '*.sh' -type f 2>/dev/null || true
+    # ⚠️ FILTRO PRÓPRIO, por decisão declarada (2026-09-05): o predicado único de isenção de fixture
+    #    (em `.claude/validation/`, o que os consumidores de grafo usam) NÃO é usado aqui — e esta nota
+    #    evita citar o nome dele de propósito, porque a guarda deriva os consumidores por menção.
+    #    O escopo desta varredura é `.claude/**/*.sh` — não
+    #    há `.kg.yaml` nem convenção `__fixtures__` neste universo, então o ganho é zero; e ligar o
+    #    predicado quebrou 4 casos da família `idioma`, cujo sandbox copia este checker sem ele.
+    #    Dívida registrada com gatilho: se aparecer fixture de shell em convenção não-canônica
+    #    (`__fixtures__/`, `testdata/`) sob `.claude/`, ligue o predicado E espelhe-o no sandbox.
   } | sed 's#^\./##' | grep -v '/fixtures/' | sort -u
 }
 

@@ -59,9 +59,15 @@ por execução**, `CLAUDE.md` escrito projeto-primeiro, registro na federação 
 Tudo que vocês pediram para preservar foi preservado — e o `kg-radar.sh` que copiaram à mão era
 **byte-idêntico** ao canônico.
 
-**Lint deste repo: 9 HARD no dia 1 → 0 HARD**, com as causas curadas **na fonte**, não contornadas aqui.
+**Lint deste repo: 9 HARD no dia 1 → 6 HARD** (chegou a 0 com a cópia manual, revertida). As causas estão curadas **na fonte**; a de REGRA 52 chega no `--update`.
 
 ### As duas curas que a adoção de vocês forçou no core
+
+> ⚠️ **Estado, para não confundir verbo com entrega:** as curas abaixo estão **no core, em PR** — elas
+> chegam ao repo de vocês por `/meta:adopt --update` **depois do merge**, não agora. Eu havia copiado
+> os scripts à mão e revertido: o repo tem de ficar no pin que o `members.yaml` declara, senão a
+> declaração `pin-ok` fica falsa e o 3-way do próximo update vê a mudança do core como customização
+> local de vocês (as duas coisas foram medidas por um refutador nesta mesma sessão).
 
 1. **Sinal 4, virado do avesso.** Vocês ofereceram o radar-JS como padrão — e o que ele **provou** foi
    um defeito nosso: as fixtures de conformidade em `packages/kg/src/__fixtures__/` são
@@ -73,7 +79,7 @@ Tudo que vocês pediram para preservar foi preservado — e o `kg-radar.sh` que 
    (`fixtures/`, `__fixtures__/`, `testdata/`, `__snapshots__/`), **recusa** isenção por substring
    (`docs/mixtures/` e `fixtures-do-produto.kg.yaml` continuam julgados) e é **auditável**
    (`--list-exempt`) — isenção em massa não passa calada. Três mutantes provados na bancada.
-2. **Sinal 3, aceito e curado — com uma correção no meio do caminho.** O guard mandava ler o check
+2. **Sinal 3, aceito e curado NO CORE (chega por `--update`) — com uma correção no meio do caminho.** O guard mandava ler o check
    `onion-review-verdict` num repo que não o tem. Minha primeira cura leu o **papel** (`.onion-version`)
    e estava errada: o **core não tem stamp** (ele computa `role: source`), então o aviso diria "não é
    adotado" justamente onde o check existe. O predicado certo é o **artefato**, não o papel: existe o
