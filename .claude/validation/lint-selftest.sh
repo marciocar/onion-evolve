@@ -11545,6 +11545,16 @@ run_upstream_portal_fixes_selftests() {
     # é ali que a meia cura volta refraseada, e nenhuma lista de grafias a alcança.
     grep -vE '^\s*\|' <<< "${p3}" | grep -qE 'role: (adopted|hub)|`adopted`' \
       && emiss="${emiss} P3:papel-fora-da-tabela(prosa condiciona a decisão por papel)"
+    # ESTRUTURAL: o critério que MANDA SELAR não nomeia o core — nem no Passo 3 (c) nem no cabeçalho
+    # do Passo 4. Foi ali que a meia cura sobreviveu à 3ª rodada, um bullet abaixo de onde foi curada.
+    grep -E 'SELAR' <<< "${p3}" | grep -qiE 'do CORE|no CORE|pertence ao core' \
+      && emiss="${emiss} P3:o-critério-que-MANDA-selar-é-core-only"
+    grep -E '^\*\*SELAR\*\*' <<< "${p4}" | grep -qiE 'do core|no core' \
+      && emiss="${emiss} P4:cabeçalho-do-SELAR-é-core-only"
+    grep -qE 'SINAL REAL DESTE REPO' <<< "${p3}" || emiss="${emiss} P3:critério-positivo-não-é-deste-repo"
+    local p2; p2="$(awk '/^## Passo 2/{f=1;next} /^## Passo 3/{f=0} f' "${kgi}")"
+    grep -qiE 'cabeçalho é OPCIONAL|OPCIONAL, e num adotante' <<< "${p2}" \
+      || emiss="${emiss} P2:cabeçalho-tratado-como-obrigatório(o produtor não é vendorizado)"
     # e nenhuma linha do Passo 3 junta o papel a um token de RECUSA
     grep -E 'adopted|hub' <<< "${p3}" \
       | grep -qiE 'rejeit|_rejected|não sela|nao sela|nada sela|pertence ao core|só o core|so o core' \

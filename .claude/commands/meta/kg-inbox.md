@@ -60,7 +60,15 @@ canônica, e é ele que a bancada exercita.
 Listar `docs/evolution/kg-inbox/*.proposal.kg.yaml` (a raiz da fila — **não** `_sealed/`/`_rejected/`).
 Fila vazia → reportar "nada a selar" e parar. Com `--list`: só mostrar o inventário (Passo 3 sem decidir).
 
-Para cada proposta, ler o **cabeçalho** (`# origem: … · recebida: …`) — a proveniência importa na triagem.
+Para cada proposta, ler o **cabeçalho** (`# origem: … · recebida: …`) — a proveniência importa na
+triagem. **O cabeçalho é OPCIONAL, e num adotante ele provavelmente não existe:** quem o emite é o
+produtor MCP (`propose_kg_write`), que vive em `ops/` e **não é vendorizado** — logo a adoção entrega o
+CONSUMIDOR (este comando) sem o produtor. Num repo adotado a proposta nasce **à mão ou por comando
+local** (um adotante forjou o próprio `/portal:contribuir`): um `<slug>.proposal.kg.yaml` com `nodes:`/
+`edges:` basta, e sem cabeçalho a proveniência sai do git (`git log --diff-filter=A -- <arquivo>`) —
+nunca trate a ausência do cabeçalho como motivo de rejeição. **Limite declarado:** dar ao adotante um
+produtor de primeira classe é fio aberto (`Q_KG_INBOX_FORA_DO_PLUGIN` cobre o vizinho — quem instala),
+não parte desta cura.
 
 ## Passo 3 — Radar advisory + triagem (o juízo)
 
@@ -90,11 +98,16 @@ Para cada proposta:
 
    **(b) SINAL vs RUÍDO.** Artefato de teste, duplicata de nó já vivo, trivialidade → **REJEITAR** com motivo.
 
-   **(c) SINAL REAL DO CORE** → **SELAR**.
+   **(c) SINAL REAL DESTE REPO** → **SELAR** — o critério positivo é o **mesmo** dos dois papéis, e o
+   que muda é o que a coluna "mora aqui" da tabela (a) diz para o seu. Esta linha dizia *"do CORE"* até
+   2026-09-05, e é a **terceira** vez que a mesma meia cura foi achada nesta perna: primeiro na porta
+   (`Passo 1`), depois no filtro de fronteira (`(a)`), e por fim aqui, no fecho — a decisão travava no
+   critério positivo mesmo com a porta e o filtro já roteados. Quem revisa esta perna: **procure o
+   critério que MANDA selar**, não a porta.
 
 ## Passo 4 — Executar a decisão
 
-**SELAR** (a proposta é sinal real do core):
+**SELAR** (a proposta é sinal real **deste** repo — critério (c) do Passo 3):
 1. Escolher o **grafo vivo alvo** entre os deste repo — **descubra, não presuma a convenção**:
    `git ls-files '*.kg.yaml' | grep -v /fixtures/`. Prefira consolidar em grafo existente a proliferar
    grafos minúsculos. Se nenhum couber, crie um novo **na convenção DESTE repo** (o core usa
@@ -149,6 +162,6 @@ Saída:
 
 ## 🔗 Referências
 
-- Produtor da fila: `ops/mcp-onion-exec/server.py` (`propose_kg_write`) · README: `docs/evolution/kg-inbox/README.md`
+- Produtor da fila (**core-only**, `ops/` não é vendorizado): `ops/mcp-onion-exec/server.py` (`propose_kg_write`) · README: o `docs/evolution/kg-inbox/README.md` **deste** repo (`docs/evolution/` não viaja)
 - Doutrina write-leg: `docs/evolution/research/librechat-kg-runtime-2026-08/` (`D_WRITE_LEG_AS_PROPOSAL`, `Q_SEALING_NO_MECHANISM`)
 - Fronteira I3 / um escritor por repo: `docs/knowledge-base/concepts/knowledge-graph-sdaal.md`
