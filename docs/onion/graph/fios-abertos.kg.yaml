@@ -214,6 +214,26 @@ nodes:
     label: 'PERGUNTA (classe B, estreitada em 2026-09-04 pelo /meta:drive): por que o caso (e) da familia kg_backlog — que monta um sandbox `git archive HEAD`, roda o lint INTEIRO duas vezes (controle e mutante com um no `done` sem verified_at) e exige `h_mut > h_ctrl` — ja falhou 2 vezes em paralelo com o CONTADOR IGUAL (HARD 9->9), e nunca em serie? O que esta pergunta NAO e: a classe A (veredito por `_emit|grep -q`, que devolve falso sob leitor multi-thread) foi medida e curada em 2026-09-04 (here-string em 496 sitios + guarda de reintroducao) — e o (e) NAO decide por grep -q: ele extrai dois contadores com `_emit | sed -n | tail -1`, sem fechador precoce. Duas curas anteriores foram aplicadas e a classe recorreu: (1) a fixture caia sob `edges:` em vez de `nodes:` (curada, e recorreu no gate do adopt); (2) a cura do ESCRITOR (`_emit` imune a EPIPE) nao toca este caminho. Suspeitos vivos: subshell/escopo do contador no dispatcher do lint sob concorrencia; arquivo mutado fora do escopo da varredura no sandbox. GATILHO: proxima ocorrencia — a mensagem de falha JA imprime as HARD so-do-mutante (diff controle x mutante), que e o dado que abre a causa; sem ela, nao ha o que medir. Reproducao deliberada pos-cura: 0 falha(s) em 20 tentativas sob 4 concorrentes (nao reproduziu no volume testado — logo a classe B e RARA, nao inexistente: ela ja apareceu 2x em gate real).'
     verified_against: 'reproducao 2026-09-04: 20 tentativas do caso (e) sob 4 concorrentes, 0 falha(s); ocorrencias reais: f-par.log (2026-09-03) e gate do /meta:adopt (2026-09-03)'
 
+  - id: I_KB_GAMIFICACAO_RAMPA_GATED
+    node_type: decision
+    plane: DEV
+    impact: 2
+    confidence: 0.6
+    status: open
+    label: 'ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): o core tem docs/knowledge-base/education/{theories,applications} (fonte != derivacao) mas NADA de gamificacao alem do agente zen-engine-specialist (JDM). O adotante criou docs/knowledge-base/gamification/{sources,theories,applications,graph} seguindo o MESMO README de duas camadas, para mapear a metodologia do maestro e dois livros autorais em .kg.yaml. O que o core NAO faz agora, por desenho: a camada 1 (theories/) e material autoral do adotante — subir doutrina de propriedade de terceiro antes da licenca e o erro. GATILHO NOMEADO: a selagem do D_IP_LICENSE no grafo DO ADOTANTE — so entao a rampa gated de vertical (mesma da education) se abre para um plugin onion-gamification. RISCO REGISTRADO, independente do gatilho: docs/knowledge-base/ e path vendorizado no --update e hoje o never-clobber preserva porque gamification/ nao existe no core; se o core criar essa pasta, o merge em onion/vendor CONFLITA no adotante — quem criar avisa antes. O ganho reutilizavel imediato (sem gatilho) e o README de duas camadas como template de "KB de dominio de adotante".'
+    trace: 'docs/evolution/inbox/_processed/2026-09-04-kb-gamificacao-ausente.md'
+    verified_against: 'sinal de campo lido integralmente em 2026-09-05; medido no core: docs/knowledge-base/education/ existe, docs/knowledge-base/gamification/ NAO existe (logo o never-clobber ainda preserva)'
+
+  - id: I_ADOPT_CAMADA_COLABORADOR
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 0.6
+    status: open
+    label: 'ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): a skill onion-onboarding JA tem o ramo "colaborador visitante" — o que faltou foi a SUPERFICIE, o que a pessoa digita. O adotante forjou a receita completa num projeto a dois (dono + co-autor que NAO deve aprender o framework): AGENTS.md projeto-primeiro com o Onion so num bloco final, quatro comandos finos em .claude/commands/portal/ (start = catch-up+radar+backlog+recados, status, contribuir <tema>, ajuda) mais selar para o dono, docs/GUIA-COLABORADOR.md de duas paginas, um-escritor-por-ARQUIVO em tabela e settings.local.json para cortar prompts. Pedido: /meta:adopt --collaborator-layer (ou scaffold na onion-onboarding) que gere a camada com o nome do projeto. Por que NAO agora: N=1 — a receita e boa e ja funciona ONDE NASCEU; generalizar a partir de um caso e catedral, e o proprio adotante pode servir de molde por copia enquanto isso (pull-not-push aplicado a minha propria recomendacao). GATILHO NOMEADO: um SEGUNDO adotante pedir a mesma camada (ou o maestro mandar), e entao o scaffold nasce dos DOIS casos, nao de um.'
+    trace: 'docs/evolution/inbox/_processed/2026-09-04-camada-colaborador-visitante.md'
+    verified_against: 'sinal de campo lido integralmente em 2026-09-05; medido no core: a skill onion-onboarding tem o ramo colaborador-visitante e NAO tem scaffold de superficie; adotantes que pediram a camada = 1'
+
 edges:
   - from: I_JWKS_ATTEMPTED_AT
     to: W8_REAIS_EXECUTAVEIS
@@ -266,3 +286,9 @@ edges:
   - from: E_CURA_HERE_STRING_MEDIDA_0904
     to: Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE
     edge_type: CONSTRAINS
+  - from: I_KB_GAMIFICACAO_RAMPA_GATED
+    to: W8_REAIS_EXECUTAVEIS
+    edge_type: DEPENDS_ON
+  - from: I_ADOPT_CAMADA_COLABORADOR
+    to: W8_REAIS_EXECUTAVEIS
+    edge_type: DEPENDS_ON

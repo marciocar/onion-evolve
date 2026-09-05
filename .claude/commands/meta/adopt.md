@@ -199,6 +199,10 @@ Este repo é **CONSUMIDOR** do Onion. O protocolo canônico (3 fluxos) vive no c
 para receber relatórios de update/anúncios do core (downstream). Rode `/meta:co-evolve` para ler/gerenciar.
 PTR
 fi
+# (2a) fila de PROPOSTAS ao grafo (kg-inbox) — sem ela o /meta:kg-inbox, que desde 2026-09-05 ROTEIA por
+#      papel, não tem onde operar no dia 1 do adotante. Idempotente: nunca clobba fila em uso.
+bash "$SOURCE_ROOT/.claude/utils/adopt/starter-kg-inbox.sh" "$DEST"
+
 # (2b) semente de PESQUISA — a rule .claude/rules/research-lens.md declara `paths: docs/evolution/research/**`;
 #      sem UM arquivo rastreado ali a REGRA 53 reprova HARD no dia 1 (medido 2026-09-02 na adoção da
 #      um adotante greenfield: TODO adotante greenfield nascia vermelho). O README também ensina a lente.
