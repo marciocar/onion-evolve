@@ -911,16 +911,16 @@ run_shell_pipefail_robustness_selftests() {
   # Esta guarda impede a REINTRODUÇÃO do idioma frágil em posição de teste (mensagem pode manter pipe:
   # ali um truncamento não vira veredito falso).
   local vhits
-  vhits="$(grep -rnE '(^|if |elif |while |until |&& |\|\| |; )!? ?_emit "[^"]*" \| grep -q' \
+  vhits="$(grep -rnE '(^|if |elif |while |until |&& |\|\| |; )!? ?(_emit "[^"]*"|grep [^|]*|awk [^|]*|sed [^|]*|cat [^|]*|printf [^|]*) \| *grep -q' \
             "${REPO_ROOT}/.claude/validation" \
             "${REPO_ROOT}/.claude/utils" \
             "${REPO_ROOT}/.claude/hooks" \
             "${REPO_ROOT}/.githooks" 2>/dev/null \
           | grep -vE ':[[:space:]]*#' || true)"
   if [ -z "${vhits}" ]; then
-    record_pass "shell-pipefail: nenhum veredito por _emit|grep -q (leitor multi-thread devolve falso sob concorrência; use here-string)"
+    record_pass "shell-pipefail: nenhum veredito por <produtor>|grep -q (o leitor fecha cedo, o escritor toma EPIPE e pipefail reprova; use here-string)"
   else
-    record_fail "shell-pipefail: VEREDITO por _emit|grep -q (corrida do leitor, medida 2026-09-04)" \
+    record_fail "shell-pipefail: VEREDITO por <produtor>|grep -q (corrida do leitor; medida 2026-09-04, escopo ampliado 2026-09-05)" \
       "troque por here-string (grep -q PAD <<< \"\$var\"): $(_emit "${vhits}" | sed -n '1,3p' | tr '\n' ';')"
   fi
 }
@@ -11493,9 +11493,10 @@ run_upstream_portal_fixes_selftests() {
     bash "${kh}" "${ro}" >/dev/null 2>&1 && rc2=0 || rc2=1
     chmod +w "${ro}/docs"; rm -rf "${ro}"
     [ "${rc2}" -ne 0 ] || d2miss="${d2miss} helper-sai-0-sem-criar-a-fila(DEST somente-leitura)"
-    grep -A3 'starter-kg-inbox\.sh' "${adopt}" | grep -qE '\|\| *\{|\|\| *exit|KGI_RC' \
+    local _call; _call="$(grep -A4 'starter-kg-inbox\.sh' "${adopt}" || true)"
+    grep -qE '\|\| *\{|\|\| *exit|KGI_RC' <<< "${_call}" \
       || d2miss="${d2miss} chamador-não-lê-o-rc(adopt.md segue com a adoção)"
-    grep -A4 'starter-kg-inbox\.sh' "${adopt}" | grep -qE 'ABORTADO|exit 1' \
+    grep -qE 'ABORTADO|exit 1' <<< "${_call}" \
       || d2miss="${d2miss} chamador-não-aborta"
     if [ -z "${d2miss}" ]; then
       record_pass "upstream-portal: (d2) o helper confere o próprio efeito (rc≠0 em DEST somente-leitura) e o chamador ABORTA"
@@ -11526,16 +11527,16 @@ run_upstream_portal_fixes_selftests() {
     grep -q 'kg-inbox' <<< "${row_adopted}" \
       || emiss="${emiss} P1:a-linha-de-adopted-não-nomeia-a-fila-que-sela"
     # recusa na forma DIRETIVA (linha com `→`, como as regras se escrevem aqui) co-ocorrendo com o papel
-    grep -E '→' <<< "${p1}" | grep -E 'adopted|hub' \
-      | grep -qiE 'parar|pare|não sela|nao sela|não roda|nao roda|encerra|sem selar|abort' \
+    local _dir1; _dir1="$(grep -E '→' <<< "${p1}" | grep -E 'adopted|hub' || true)"
+    grep -qiE 'parar|pare|não sela|nao sela|não roda|nao roda|encerra|sem selar|abort' <<< "${_dir1}" \
       && emiss="${emiss} P1:recusa-por-papel-de-volta(forma diretiva)"
     grep -qiE 'este comando não roda aqui|não tem portão no core' <<< "${p1}" \
       && emiss="${emiss} P1:recusa-por-papel-de-volta(desvio para comando local)"
     grep -q 'adopted' <<< "${p1}" || emiss="${emiss} P1:não-menciona-adopted"
     grep -qiE 'rotear|roteamento' <<< "${p1}" || emiss="${emiss} P1:não-roteia"
     # (e1b) e NADA no comando pode autorizar selar grafo de OUTRO repo — a I3 não tem exceção por decreto
-    grep -iE 'outro repo|repo alheio|grafo alheio|qualquer árvore|qualquer arvore|de um vizinho' "${kgi}" \
-      | grep -qiE 'permitid|autoriz|pode selar|pode viver|inclusive' \
+    local _alien; _alien="$(grep -iE 'outro repo|repo alheio|grafo alheio|qualquer árvore|qualquer arvore|de um vizinho' "${kgi}" || true)"
+    grep -qiE 'permitid|autoriz|pode selar|pode viver|inclusive' <<< "${_alien}" \
       && emiss="${emiss} autoriza-selar-grafo-de-outro-repo(a I3 não abre por decreto)"
     # (e2) a invariante é sobre o ATO (o caminho do alvo), não sobre `meta.target` — campo que NENHUM
     #      produtor emite hoje (medido 2026-09-05: as 2 propostas reais do corpus não o trazem).
@@ -11552,7 +11553,8 @@ run_upstream_portal_fixes_selftests() {
     # Quem roteia é a tabela; prosa que menciona um `role:` está decidindo, e é ali que a meia cura volta.
     local step
     for step in P3:"${p3}" P4:"${p4}" P5:"${p5}"; do
-      grep -vE '^\s*\|' <<< "${step#*:}" | grep -qE 'role: *[a-z]|`adopted`|`hub`|`source`' \
+      local _prosa; _prosa="$(grep -vE '^\s*\|' <<< "${step#*:}" || true)"
+      grep -qE 'role: *[a-z]|`adopted`|`hub`|`source`' <<< "${_prosa}" \
         && emiss="${emiss} ${step%%:*}:papel-fora-da-tabela(prosa condiciona a decisão por papel)"
     done
     # ...e a TABELA não é santuário: a linha do papel adotado tem de DIZER o que mora aqui
@@ -11564,17 +11566,19 @@ run_upstream_portal_fixes_selftests() {
       || emiss="${emiss} P3:a-linha-de-adopted-não-diz-o-que-mora-aqui(coluna='${col3}')"
     # ESTRUTURAL: o critério que MANDA SELAR não nomeia o core — nem no Passo 3 (c) nem no cabeçalho
     # do Passo 4. Foi ali que a meia cura sobreviveu à 3ª rodada, um bullet abaixo de onde foi curada.
-    grep -E 'SELAR' <<< "${p3}" | grep -qiE 'do CORE|no CORE|pertence ao core' \
+    local _selar3; _selar3="$(grep -E 'SELAR' <<< "${p3}" || true)"
+    grep -qiE 'do CORE|no CORE|pertence ao core' <<< "${_selar3}" \
       && emiss="${emiss} P3:o-critério-que-MANDA-selar-é-core-only"
-    grep -E '^\*\*SELAR\*\*' <<< "${p4}" | grep -qiE 'do core|no core' \
+    local _selar4; _selar4="$(grep -E '^\*\*SELAR\*\*' <<< "${p4}" || true)"
+    grep -qiE 'do core|no core' <<< "${_selar4}" \
       && emiss="${emiss} P4:cabeçalho-do-SELAR-é-core-only"
     grep -qE 'SINAL REAL DESTE REPO' <<< "${p3}" || emiss="${emiss} P3:critério-positivo-não-é-deste-repo"
     local p2; p2="$(awk '/^## Passo 2/{f=1;next} /^## Passo 3/{f=0} f' "${kgi}")"
     grep -qiE 'cabeçalho é OPCIONAL|OPCIONAL, e num adotante' <<< "${p2}" \
       || emiss="${emiss} P2:cabeçalho-tratado-como-obrigatório(o produtor não é vendorizado)"
     # e nenhuma linha do Passo 3 junta o papel a um token de RECUSA
-    grep -E 'adopted|hub' <<< "${p3}" \
-      | grep -qiE 'rejeit|_rejected|não sela|nao sela|nada sela|pertence ao core|só o core|so o core' \
+    local _pap3; _pap3="$(grep -E 'adopted|hub' <<< "${p3}" || true)"
+    grep -qiE 'rejeit|_rejected|não sela|nao sela|nada sela|pertence ao core|só o core|so o core' <<< "${_pap3}" \
       && emiss="${emiss} P3:papel-co-ocorre-com-recusa(meia cura de volta)"
     # (e4) Passo 4 DESCOBRE o grafo-alvo em vez de presumir a convenção do core
     grep -qF "git ls-files '*.kg.yaml'" <<< "${p4}" || emiss="${emiss} P4:alvo-não-descoberto(git ls-files '*.kg.yaml')"
@@ -11582,7 +11586,8 @@ run_upstream_portal_fixes_selftests() {
       && ! grep -qi 'convenção DESTE repo' <<< "${p4}" && emiss="${emiss} P4:alvo-hard-coded-na-convenção-do-core"
     # (e5) Passo 5 carimba nó DESTE repo (no adotante não existe Q_SEALING_NO_MECHANISM)
     grep -qiE 'deste[[:space:]\n]*repo|num adotante' <<< "${p5}" || emiss="${emiss} P5:nó-a-carimbar-só-do-core"
-    grep -iE 'core' <<< "${p5}" | grep -qiE 'pule|não há|nao ha|encerre|só a sessão|so a sessao|apenas a sessão' \
+    local _core5; _core5="$(grep -iE 'core' <<< "${p5}" || true)"
+    grep -qiE 'pule|não há|nao ha|encerre|só a sessão|so a sessao|apenas a sessão' <<< "${_core5}" \
       && emiss="${emiss} P5:dispensa-o-fecho-por-papel(core juntado a uma dispensa)"
     grep -q 'verified_at' <<< "${p5}" && grep -q 'verified_against' <<< "${p5}" \
       || emiss="${emiss} P5:manda-carimbar-done-sem-exigir-verificação(REGRA 49 reprova HARD depois; o radar é cego a isso)"
@@ -11645,12 +11650,16 @@ run_kg_fixture_paths_selftests() {
     _n_cons=$(( _n_cons + 1 ))
     # USO, não MENÇÃO: os consumidores todos citam o predicado no comentário da cura, então casar a
     # menção deixaria um regredir 100% com a bancada verde (medido pelo Elenxo em 2026-09-05).
-    grep -vE '^[[:space:]]*#' "${_root2}/${c}" | grep -qE 'bash "\$\{_KFP\}"|kg-fixture-paths\.sh" --' \
+    # ⚠️ NADA DE VEREDITO ATRAVÉS DE PIPE. `grep arquivo | grep -q` é corrida: o leitor fecha no 1º
+    #    match, o escritor toma EPIPE e sob `set -o pipefail` o pipeline devolve FALHA com o padrão
+    #    PRESENTE. Foi a classe que EU curei em 496 sítios nesta sessão e reintroduzi aqui: local
+    #    1054/0, CI de 2 cores reprovando 1 caso. Conteúdo em VARIÁVEL, veredito por here-string.
+    local _code; _code="$(grep -vE '^[[:space:]]*#' "${_root2}/${c}" || true)"
+    grep -qF 'bash "${_KFP}"' <<< "${_code}" || grep -qF 'kg-fixture-paths.sh" --' <<< "${_code}" \
       || cmiss="${cmiss} ${c}:não-INVOCA-o-predicado(menção em comentário não conta)"
     # e nenhuma reintrodução do grep próprio, nas 3 grafias que escapavam da 1ª versão (aspas
     # simples, aspas duplas, alternação -E). Ancorado no PADRÃO, não na pontuação.
-    grep -vE '^[[:space:]]*#' "${_root2}/${c}" \
-      | grep -qE "grep -v[a-zA-Z]*[[:space:]]+[\"']?[^\"']*/fixtures/|-not -path .\*/fixtures/\*|case[^)]*\*/fixtures/\*\)" \
+    grep -qE "grep -v[a-zA-Z]*[[:space:]]+[\"']?[^\"']*/fixtures/|-not -path .\*/fixtures/\*|case[^)]*\*/fixtures/\*\)" <<< "${_code}" \
       && cmiss="${cmiss} ${c}:AINDA-tem-grep-próprio"
   done < <( (cd "${_root2}" && grep -rl 'kg-fixture-paths\.sh' .claude/validation .claude/utils 2>/dev/null) | sort -u )
   # Piso ANCORADO nos sítios onde o predicado é load-bearing, não num número digitado (o `>=7` que

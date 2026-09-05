@@ -114,15 +114,15 @@ _selftest() {
   local BL="${d}/r/.claude/validation/plugin-bare-path-baseline.txt"
   # (i) sem baseline → HARD NO-BASELINE + NOVO
   out="$(bash "$0" "${d}/r" --format tsv)"
-  if printf '%s' "${out}" | grep -q "NO-BASELINE" && [ "$(printf '%s\n' "${out}" | grep -c "	NOVO	")" -eq 2 ]; then echo "  ✅ (i) sem baseline = NO-BASELINE + 2 NOVO (sessions/ e PLUGIN_ROOT não contam)"; else echo "  ✗ (i): ${out}"; fails=$((fails+1)); fi
+  if grep -q "NO-BASELINE" <<< "${out}" && [ "$(printf '%s\n' "${out}" | grep -c "	NOVO	")" -eq 2 ]; then echo "  ✅ (i) sem baseline = NO-BASELINE + 2 NOVO (sessions/ e PLUGIN_ROOT não contam)"; else echo "  ✗ (i): ${out}"; fails=$((fails+1)); fi
   # (ii) emit → baseline; passivo tolerado (SOFT), allowed-tools marcado
   bash "$0" "${d}/r" --emit-baseline > "${BL}"
   out="$(bash "$0" "${d}/r" --format tsv)"
-  if ! printf '%s' "${out}" | grep -q "^HARD" && printf '%s' "${out}" | grep -q "ALLOWED-TOOLS" && printf '%s' "${out}" | grep -q "PASSIVO"; then echo "  ✅ (ii) passivo baselined = SOFT; allowed-tools sinalizado"; else echo "  ✗ (ii): ${out}"; fails=$((fails+1)); fi
+  if ! grep -q "^HARD" <<< "${out}" && grep -q "ALLOWED-TOOLS" <<< "${out}" && grep -q "PASSIVO" <<< "${out}"; then echo "  ✅ (ii) passivo baselined = SOFT; allowed-tools sinalizado"; else echo "  ✗ (ii): ${out}"; fails=$((fails+1)); fi
   # (iii) ref NOVA fora do baseline → HARD
   printf 'Nova: `.claude/commands/common/templates/t.md`.\n' >> "${d}/r/plugins/p/commands/x.md"
   out="$(bash "$0" "${d}/r" --format tsv)"
-  if printf '%s' "${out}" | grep -q "^HARD	NOVO"; then echo "  ✅ (iii) ref nova fora do baseline = HARD"; else echo "  ✗ (iii): ${out}"; fails=$((fails+1)); fi
+  if grep -q "^HARD	NOVO" <<< "${out}"; then echo "  ✅ (iii) ref nova fora do baseline = HARD"; else echo "  ✗ (iii): ${out}"; fails=$((fails+1)); fi
   [ "${fails}" -eq 0 ] && { echo "plugin-bare-path-check selftest: OK"; return 0; }
   echo "plugin-bare-path-check selftest: ${fails} falha(s)"; return 1
 }
