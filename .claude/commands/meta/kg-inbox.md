@@ -140,12 +140,22 @@ repo (no core, ex.: `Q_SEALING_NO_MECHANISM`; num adotante, o equivalente dele),
 `done` + rodar o radar (exit 0). O grafo é o backlog: nada fica parado sem o nó refletir. E vale para
 o gap que uma REJEIÇÃO abriu: ele nasce `open` aqui e é aqui que se fecha.
 
+⚠️ **`done` em `plane: PROD` exige `verified_at` E `verified_against` — e o radar NÃO reprova a falta.**
+A REGRA 49 (Nó plane:PROD de alto impacto carrega VERIFICAÇÃO, com catraca) é HARD para nó novo fora do
+baseline com `plane: PROD` e `impact >= 4` sem carimbo, e `status: done` está no escopo. O radar
+`--freshness` **detecta e para aí** (⚠ atenção, não reprova) — logo carimbar `done` com radar exit 0
+deixa a perna "fechada" e o **lint** reprova depois, aqui e no adotante que vendorizou o gate. A
+doutrina, literal no cabeçalho do grafo de fios abertos deste repo: *"ITEM só vira `done` em
+`plane: PROD` COM `verified_at` + `verified_against`. **QUEM NÃO CONSEGUE CARIMBAR NÃO PODE DECLARAR
+FEITO.**"* Não medi ⇒ não carimbo: o nó fica `open` com o motivo, nunca `done` sem prova. Feche com
+`bash .claude/validation/lint-artifacts.sh` (ou o gate do repo), não só com o radar.
+
 Saída:
 ```
 🧅 kg-inbox — N proposta(s) processada(s)
    ✅ SELADAS (M): <slug> → <grafo alvo>
    ⊘ REJEITADAS (K): <slug> (<motivo>)
-   📭 fila agora: 0 pendentes
+   📭 fila agora: <N> pendentes   ← 0 na passada da fila inteira; >0 quando se roda um `<slug>` só
    ▶ grafo(s) tocado(s): radar exit 0
 ```
 
