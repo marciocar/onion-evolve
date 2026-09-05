@@ -205,6 +205,14 @@
 | 5.4 | `Q_SENHA_CHAVE_ESTADO_2026_09` | identidade-onion-vps-2026-08 | ESTADO ATUAL da chave GPG com passphrase (substitui o no de 08-12 que misturava >=9 afirmacoes): a protecao FICA (decisao do maest |
 | 4.8 | `Q_MAIS_UM_IMUTAVEL_GATED` | identidade-onion-vps-2026-08 | O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda d |
 
+## onion-plugin-publication-2026-08 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 13.5 | `Q_PLUGIN_SEM_DRIVE_NEM_ADOPT` | onion-plugin-publication-2026-08 | SINAL DE CAMPO (adotante pre-adocao, 2026-09-05, medido): /meta:drive e /meta:adopt vivem SO no core — nao estao em plugins/onio |
+| 7.6 | `Q_MARKETPLACE_PUBLICO_EM_GERACAO_ANTIGA` | onion-plugin-publication-2026-08 | DIVIDA MEDIDA (sinal de campo 2026-09-05): o repo publico marciocar/onion-plugins esta na geracao PRE-CONSOLIDACAO (8 plugins) enq |
+| 5.4 | `Q_BEACON_NAO_LIBERA_NO_STOP` | onion-plugin-publication-2026-08 | ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o  |
+
 ## librechat-kg-runtime-2026-08 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -227,14 +235,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
-
-## onion-plugin-publication-2026-08 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.1 | `Q_PLUGIN_SEM_DRIVE_NEM_ADOPT` | onion-plugin-publication-2026-08 | SINAL DE CAMPO (adotante pre-adocao, 2026-09-05, medido): /meta:drive e /meta:adopt vivem SO no core — nao estao em plugins/onio |
-| 7.6 | `Q_MARKETPLACE_PUBLICO_EM_GERACAO_ANTIGA` | onion-plugin-publication-2026-08 | DIVIDA MEDIDA (sinal de campo 2026-09-05): o repo publico marciocar/onion-plugins esta na geracao PRE-CONSOLIDACAO (8 plugins) enq |
-| 5.7 | `Q_UPDATE_EXIGE_ADOCAO_INTEGRADA` | onion-plugin-publication-2026-08 | ACHADO DO 1o --update REAL DE UM GREENFIELD (2026-09-05, medido): o `vendor-branch update` recusa com rc=11 BASE CRUZADA enquanto  |
 
 ## onion-doctrine-elenxo-bulbo-2026-07 — 3 item(ns)
 

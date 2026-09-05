@@ -149,11 +149,55 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.95
-    status: open
+    status: superseded
     label: "ACHADO DO 1o --update REAL DE UM GREENFIELD (2026-09-05, medido): o `vendor-branch update` recusa com rc=11 BASE CRUZADA enquanto a branch de adocao nao estiver na integracao — e a recusa esta CORRETA. Causa estrutural: o `durable-commit.sh` staja `CLAUDE.md`, `docs/{business,technical,compliance}-context`, `.githooks`, `.prettierignore`, `.gitattributes`, `settings.json` (48 arquivos no caso medido). Isso e adocao LEGITIMA, mas NAO e framework para o vendor-branch — entao `onion/vendor` semeada de `onion/adopt` (o que a Fase 5 manda) nasce ENTRELACADA POR CONSTRUCAO em todo adotante greenfield, e o merge arrastaria produto para dentro do 3-way (conflito contabil, nao real). O guard mutou vendor (avancou ao pin novo) e NAO tocou a integracao — degradou no lugar certo. ⚠️ E o CONSERTO QUE O PROPRIO HELPER SUGERE (re-semear vendor de `develop`) esta ERRADO neste estado: daria base SEM o framework. A ordem correta e `onion/adopt` -> PR -> integracao -> `--update`, e ela agora esta escrita como PRECONDICAO no comando. O que fica ABERTO: (a) o helper poderia DETECTAR este caso especifico (adocao nao-integrada) e dizer 'integre a adocao', em vez do conserto genrico que aqui piora; (b) ou a Fase 5 poderia semear o vendor de um snapshot SO-FRAMEWORK, tornando a base limpa por construcao. GATILHO NOMEADO: o proximo adotante greenfield que rodar `--update` antes de integrar (vai bater no mesmo rc=11), OU a decisao do maestro entre (a) e (b)."
     verified_at: '2026-09-05'
     verified_against: 'medido no jogo-da-vida em 2026-09-05: rc=11 do vendor-branch update; 48 arquivos nao-framework em `git diff --name-only develop onion/adopt`; develop INTOCADA apos a recusa; vendor avancado a b967b71835f2; precondicao ausente do comando (grep = 0 hits) antes desta cura'
     trace: '.claude/utils/adopt/vendor-branch.sh'
+
+  - id: Q_VENDOR_ENTRELACADO_COM_PRODUTO
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: refuted
+    label: "CAUSA-RAIZ (estreitada em 2026-09-05 pelo 2o --update real, que REFUTOU a minha propria formulacao do MESMO DIA): o problema NAO e 'adocao nao integrada' — e que `onion/vendor` carrega SNAPSHOT DE PRODUTO, porque a Fase 5 a semeia de `onion/adopt` e o durable-commit staja CLAUDE.md, contextos, .githooks, .prettierignore, .gitattributes e settings.json. Consequencia: a divergencia CRESCE com o trabalho do proprio adotante. Medido em DOIS adotantes no mesmo dia: (a) recem-adotado, integracao parada → rc=11 BASE CRUZADA, 48 arquivos nao-framework divergentes; (b) adocao JA INTEGRADA e 11 PRs de produto desde entao → 97 divergentes e rc=10 com 29 CONFLITOS, dos quais 29/29 medidos byte-identicos ao core no pin antigo, ZERO customizacao local. Isso quebra a promessa estrutural do never-clobber ('conflito = customizacao local'): o adotante nao customizou nada e recebeu 29 conflitos contabeis. A cura NAO e detectar 'adocao nao integrada' (trata so o sintoma (a)); e semear o vendor de um snapshot SO-FRAMEWORK, tornando a base limpa por construcao e a divergencia impossivel. GATILHO: o proximo --update de qualquer adotante que tenha produzido desde a adocao (reproduz (b)), OU a decisao do maestro — e a mudanca vale para TODOS os adotantes, nao um."
+    verified_at: '2026-09-05'
+    verified_against: 'medido 2026-09-05 nos dois adotantes locais: um com rc=11 e 48 nao-framework; outro com adocao integrada, rc=10, 97 nao-framework e 29 conflitos, com 29/29 identicos ao pin antigo (sha256 contra `git show <pin>:<arquivo>`); resolucao pelo lado do framework VERIFICADA byte-a-byte contra o core no pin novo'
+    trace: '.claude/utils/adopt/vendor-branch.sh'
+
+  - id: Q_BEACON_NAO_LIBERA_NO_STOP
+    node_type: question
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: open
+    label: "ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o maestro ENCERROU — 664 min de idade — no repo onde ele acabara de autorizar a assumir. O beacon nao e liberado no encerramento, entao a guarda I3 acusa COLISAO FANTASMA. O dano nao e o falso-positivo: e que colisao fantasma ENSINA A IGNORAR o mecanismo — a guarda que existe para impedir dois escritores vira ruido que se contorna por habito, e ai nao protege o caso real. Note a assimetria: o beacon ACERTA ao detectar o vivo (detectou a minha propria sessao, 6 min, branch correta) e ERRA ao nao expirar o morto. Duas curas, nenhuma decidida: (a) TTL/heartbeat — beacon sem renovacao em N minutos deixa de contar como vivo; (b) liberacao no encerramento (hook Stop/SessionEnd), mais correto mas dependente de encerramento limpo — e um kill -9 nunca sera. Provavelmente as duas: (b) no caminho normal, (a) como rede. GATILHO: proxima vez que um beacon fantasma bloquear trabalho legitimo, OU a decisao do maestro."
+    verified_at: '2026-09-05'
+    verified_against: 'medido ao vivo em 2026-09-05: `session-beacon.sh check` devolveu rc=1 com DUAS linhas VIVA — a da sessao corrente (age=6min, branch correta) e a da sessao encerrada pelo maestro (age=664min); o rc=1 persistiu APOS o stop'
+    trace: '.claude/validation/session-beacon.sh'
+
+  - id: E_VENDOR_PRODUTO_REFUTADO_EM_SANDBOX
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    label: "REFUTACAO MEDIDA (2026-09-05, sandbox limpo): a hipotese 'o vendor conflita porque carrega snapshot de PRODUTO' e FALSA. Reproduzido exatamente: core v1 com framework, adotante com produto, onion/adopt com framework + CLAUDE.md + contextos (o que o durable-commit staja), vendor semeado DE onion/adopt como a Fase 5 manda, adocao integrada em develop, TRES commits de produto depois, e core v2 mudando SO framework — resultado: `merge limpo`, rc=0, ZERO conflitos, com o framework do adotante provado identico ao core v1 antes do teste. Ou seja: a topologia que eu acusei NAO produz o sintoma. Isto REFUTA o Q_VENDOR_ENTRELACADO_COM_PRODUTO, que por sua vez ja havia superado o Q_UPDATE_EXIGE_ADOCAO_INTEGRADA — DUAS explicacoes causais minhas para o MESMO sintoma, ambas derrubadas por medicao no mesmo dia. O que permanece VERDADEIRO e apenas o SINTOMA, que foi medido durante o incidente: um adotante real recebeu 29 conflitos no merge de onion/vendor com 29/29 arquivos byte-identicos ao core no pin antigo (zero customizacao local). A CAUSA e desconhecida. Suspeitos NAO testados: (a) o vendor daquele repo pode ter sido semeado por caminho diferente (a adocao foi feita por outra sessao, nao por mim) — o proprio helper cita um 'fallback do HEAD'; (b) updates anteriores podem ter avancado o vendor por outro caminho; (c) o `.gitattributes merge=union` provisionado pela adocao pode interagir com o 3-way. GATILHO para investigar: o proximo --update que conflitar — e ali a medicao a fazer PRIMEIRO e `git merge-base <vendor> <integracao>` e o conteudo do framework NA BASE, que e o que decide um 3-way e o que eu nao medi a tempo (o ORIG_HEAD foi sobrescrito por operacoes posteriores antes de eu pensar em olhar)."
+    verified_at: '2026-09-05'
+    verified_against: 'sandbox determinístico em /home/marcio/.claude/jobs/3e42276a/tmp/vendor_repro.sh: monta core+adotante do zero, semeia vendor de onion/adopt, integra, produz 3 commits de produto, avança o framework do core e roda `vendor-branch.sh update` → "framework atualizado via merge limpo", rc=0, 0 conflitos'
+    trace: '.claude/utils/adopt/vendor-branch.sh'
+
+  - id: E_DRIVE_NAO_E_MOAT_MAS_DEPS_NAO_VIAJAM
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    label: "MEDICAO que estreita o Q_PLUGIN_SEM_DRIVE_NEM_ADOPT e CORRIGE uma suposicao minha nele. Eu havia escrito que distribuir drive+adopt 'criaria a expectativa de rodar o que so a fonte pode rodar', tratando os dois como o mesmo caso. Medido: sao casos OPOSTOS. (1) O /meta:drive NAO escreve repo alheio — zero ocorrencias de DEST/TARGET/INSTALL_DIR no comando; ele conduz o plano-grafo DO REPO QUE O HOSPEDA. Logo NAO e MOAT, e e exatamente a capacidade que um adotante deveria ter (o proprio sinal de campo pediu isso). (2) O /meta:adopt e o oposto: escrever repo alheio E o proposito dele (60 ocorrencias de linguagem MOAT/repo-alheio/DEST) — ali a fronteira e real. (3) MAS o drive nao viaja hoje por uma razao TECNICA que nenhum dos 3 desenhos do no havia nomeado: as dependencias dele NAO estao no plugin — kg-drive-project.sh e kg-realign-project.sh ausentes, e o proprio /meta:realign (o verificador-por-turno que o laco P5 exige) tambem nao viaja. Publicar drive.md sozinho produziria comando NASCIDO MORTO, a classe que as REGRAS 73/74 perseguem. CONSEQUENCIA PARA A DECISAO: o desenho (a) do no ('portar so adopt --update') mira o comando ERRADO — o candidato natural e o DRIVE, e o custo dele e conhecido e pequeno: 2 scripts + 1 comando no manifesto. E dentro do adopt a fronteira nao e por comando e sim por MODO: `--update` atua no PROPRIO repo (auto-atualizacao, nao-MOAT) enquanto `adopt <alvo>` escreve terceiro (MOAT) — separacao que o no nao fazia. NENHUMA decisao tomada: isto e enquadramento medido para o maestro chamar."
+    verified_at: '2026-09-05'
+    verified_against: 'medido 2026-09-05 no core: `grep -oE DEST|TARGET|INSTALL_DIR` em drive.md = 0 ocorrencias vs 60 hits de linguagem MOAT em adopt.md; `ls plugins/onion/validation/` mostra kg-radar/session-beacon/kg-backlog-project presentes e kg-drive-project/kg-realign-project AUSENTES; plugins/onion/commands/realign.md AUSENTE; 26 comandos de meta/ nao viajam ao todo, a maioria por serem Camada 1 (autoria do framework) ou Camada 3 (federacao) — corretamente core-only'
+    trace: 'plugins/onion/commands/'
 
 edges:
   - from: E_PROJECT_DOOR_GATE_OPENED
@@ -192,3 +236,15 @@ edges:
   - from: Q_UPDATE_EXIGE_ADOCAO_INTEGRADA
     to: Q_PLUGIN_SEM_DRIVE_NEM_ADOPT
     edge_type: DEPENDS_ON
+  - from: Q_VENDOR_ENTRELACADO_COM_PRODUTO
+    to: Q_UPDATE_EXIGE_ADOCAO_INTEGRADA
+    edge_type: SUPERSEDES
+  - from: Q_BEACON_NAO_LIBERA_NO_STOP
+    to: Q_PLUGIN_SEM_DRIVE_NEM_ADOPT
+    edge_type: DEPENDS_ON
+  - from: E_VENDOR_PRODUTO_REFUTADO_EM_SANDBOX
+    to: Q_VENDOR_ENTRELACADO_COM_PRODUTO
+    edge_type: REFUTES
+  - from: E_DRIVE_NAO_E_MOAT_MAS_DEPS_NAO_VIAJAM
+    to: Q_PLUGIN_SEM_DRIVE_NEM_ADOPT
+    edge_type: SUPPORTS

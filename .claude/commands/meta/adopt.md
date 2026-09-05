@@ -698,13 +698,16 @@ já faz tmp→diff→aplicar (o diff mostra o que muda), e re-carimba `.onion-ve
 > hashes, maestro-gated): [ADR capability-update-out-of-git](../../../docs/analysis/onion-adr-capability-update-out-of-git-2026-07.md)
 > — implementação gated até o 1º caso real; até lá, o update docs-only é operação manual guiada pelo ADR.
 
-> ⚠️ **PRECONDIÇÃO (medida 2026-09-05, 1º `--update` real de greenfield): a adoção tem de estar
-> INTEGRADA.** Com `onion/adopt` fora da integração o `vendor-branch update` recusa (**rc=11 BASE
-> CRUZADA**) e está certo — o commit durável staja `CLAUDE.md`, contextos, `.githooks` (48 arquivos no
-> caso medido): adoção legítima que NÃO é framework, então `onion/vendor` semeada de `onion/adopt`
-> nasce entrelaçada **por construção** em todo greenfield. E **não siga o conserto que o helper
-> sugere** aqui (re-semear de `develop`): daria base SEM framework. Ordem: `onion/adopt` → PR →
-> integração → **então** `--update`.
+> ⚠️ **PRECONDIÇÃO (medida 2026-09-05, nos 2 primeiros `--update` reais): integre a adoção ANTES.**
+> Com `onion/adopt` fora da integração o `vendor-branch update` recusou **rc=11 BASE CRUZADA**; com ela
+> integrada, o update rodou (um limpo, outro com conflitos contábeis). Ordem que funcionou nos dois:
+> `onion/adopt` → PR → integração → **então** `--update`.
+>
+> **A CAUSA é desconhecida — duas explicações minhas caíram por medição no mesmo dia** (a 2ª por
+> sandbox, onde a topologia acusada mergeia rc=0). Se o seu `--update` conflitar: **meça a base
+> primeiro** (`git merge-base <vendor> <integração>` + o framework NELA, que é o que decide o 3-way), e
+> **não siga cego o conserto do helper** — num dos casos ele daria base SEM framework. Fio:
+> `E_VENDOR_PRODUTO_REFUTADO_EM_SANDBOX`.
 
 Repo já adotado → trazer atualizações do framework. **Reusa o stamp** (self-contained):
 

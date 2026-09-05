@@ -11475,6 +11475,24 @@ run_upstream_portal_fixes_selftests() {
     rm -rf "${t}"
   fi
 
+  # (c3) CLASSE, não caso: TODA mensagem de commit/merge dos utils de adoção tem assunto em pt-BR.
+  #      A cura de (c) parou no `durable-commit.sh` e o `vendor-branch.sh` seguiu emitindo
+  #      "update to pin <x>" — o commit que o adotante mais vê na própria história, e ele apareceu
+  #      no 1º `--update` real de um greenfield (2026-09-05). A cura cobriu o EXEMPLO, não a CLASSE.
+  local _msgs _en=""
+  _msgs="$(grep -rhE '(commit|merge)[^|]*-m "chore\(onion\): [^"]*"' "${SCRIPT_DIR}/../utils/adopt/"*.sh 2>/dev/null | grep -vE '^[[:space:]]*#' || true)"
+  while IFS= read -r _l; do
+    [ -n "${_l}" ] || continue
+    # prefixo Conventional é INGLÊS por contrato; o ASSUNTO é pt-BR. Verbo inglês logo após o `: ` acusa.
+    grep -qE 'chore\(onion\): (update|adopt|seed|apply|install|sync|promote|decouple) ' <<< "${_l}" \
+      && _en="${_en} $(cut -c1-70 <<< "${_l}")"
+  done <<< "${_msgs}"
+  if [ -z "${_en}" ]; then
+    record_pass "upstream-portal: (c3) CLASSE — nenhum assunto de commit/merge dos utils de adoção em INGLÊS"
+  else
+    record_fail "upstream-portal: (c3) idioma do assunto (classe)" "assunto em inglês (o prefixo é contrato de máquina; o ASSUNTO é narrativa pt-BR — code-standards §3.4):${_en}"
+  fi
+
   # ── (d) a FILA kg-inbox nasce na adoção: o bloco (2a) do starter é EXECUTADO num sandbox ────────
   #     Não basta grepar a prosa do adopt.md — "guarda que valida prosa não é guarda". Extraímos o
   #     bloco e rodamos: o que se prova é o EFEITO (README + _sealed/ + _rejected/), e a 2ª rodada
