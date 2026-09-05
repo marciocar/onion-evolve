@@ -11529,7 +11529,8 @@ run_upstream_portal_fixes_selftests() {
     grep -q 'adopted' <<< "${p1}" || emiss="${emiss} P1:não-menciona-adopted"
     grep -qiE 'rotear|roteamento' <<< "${p1}" || emiss="${emiss} P1:não-roteia"
     # (e1b) e NADA no comando pode autorizar selar grafo de OUTRO repo — a I3 não tem exceção por decreto
-    grep -iE 'outro repo|repo alheio|grafo alheio' "${kgi}" | grep -qiE 'permitid|autoriz|pode selar' \
+    grep -iE 'outro repo|repo alheio|grafo alheio|qualquer árvore|qualquer arvore|de um vizinho' "${kgi}" \
+      | grep -qiE 'permitid|autoriz|pode selar|pode viver|inclusive' \
       && emiss="${emiss} autoriza-selar-grafo-de-outro-repo(a I3 não abre por decreto)"
     # (e2) a invariante é sobre o ATO (o caminho do alvo), não sobre `meta.target` — campo que NENHUM
     #      produtor emite hoje (medido 2026-09-05: as 2 propostas reais do corpus não o trazem).
@@ -11544,8 +11545,11 @@ run_upstream_portal_fixes_selftests() {
     # ESTRUTURAL: fora das linhas de tabela (`|…`), o Passo 3 não condiciona a decisão por papel
     # NENHUM — nem pelo negativo (`role: adopted` → recusa) nem pelo positivo (`role: source` → segue).
     # Quem roteia é a tabela; prosa que menciona um `role:` está decidindo, e é ali que a meia cura volta.
-    grep -vE '^\s*\|' <<< "${p3}" | grep -qE 'role: *[a-z]|`adopted`|`hub`|`source`' \
-      && emiss="${emiss} P3:papel-fora-da-tabela(prosa condiciona a decisão por papel)"
+    local step
+    for step in P3:"${p3}" P4:"${p4}" P5:"${p5}"; do
+      grep -vE '^\s*\|' <<< "${step#*:}" | grep -qE 'role: *[a-z]|`adopted`|`hub`|`source`' \
+        && emiss="${emiss} ${step%%:*}:papel-fora-da-tabela(prosa condiciona a decisão por papel)"
+    done
     # ...e a TABELA não é santuário: a linha do papel adotado tem de DIZER o que mora aqui
     local row3 col3
     row3="$(grep -E '^\s*\|.*adopted' <<< "${p3}" | head -1)"
@@ -11573,6 +11577,8 @@ run_upstream_portal_fixes_selftests() {
       && ! grep -qi 'convenção DESTE repo' <<< "${p4}" && emiss="${emiss} P4:alvo-hard-coded-na-convenção-do-core"
     # (e5) Passo 5 carimba nó DESTE repo (no adotante não existe Q_SEALING_NO_MECHANISM)
     grep -qiE 'deste[[:space:]\n]*repo|num adotante' <<< "${p5}" || emiss="${emiss} P5:nó-a-carimbar-só-do-core"
+    grep -iE 'core' <<< "${p5}" | grep -qiE 'pule|não há|nao ha|encerre|só a sessão|so a sessao|apenas a sessão' \
+      && emiss="${emiss} P5:dispensa-o-fecho-por-papel(core juntado a uma dispensa)"
     grep -q 'verified_at' <<< "${p5}" && grep -q 'verified_against' <<< "${p5}" \
       || emiss="${emiss} P5:manda-carimbar-done-sem-exigir-verificação(REGRA 49 reprova HARD depois; o radar é cego a isso)"
     grep -qiE 'lint-artifacts|gate do repo' <<< "${p5}" \
