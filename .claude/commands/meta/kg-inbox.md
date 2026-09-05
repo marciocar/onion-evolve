@@ -21,11 +21,26 @@ proposta ao grafo vivo, ou a recusa. Sem ele a fila acumula sem controle (o gati
 > `/meta:co-evolve` (fila de mensagens entre repos). É o **consumidor** da fila `kg-inbox`, o
 > equivalente do "core sela" que o README da fila descreve.
 
-## Passo 1 — Guarda de papel (só CORE)
+## Passo 1 — Roteamento por papel (o dono do repo sela a fila DO PRÓPRIO repo)
 
 Ler `role:` do stamp `.claude/.onion-version` (só se ausente, cair para
-`bash .claude/validation/onion-version.sh`). `role: adopted|hub` → **parar**: o adotante tem a
-própria fila; a sessão do core não sela grafo alheio (I3). `role: source` → segue.
+`bash .claude/validation/onion-version.sh`) e rotear — **nunca parar por ser adotante**:
+
+| `role:` | fila que este comando sela | grafo-alvo permitido |
+|---|---|---|
+| `source` (core) | `docs/evolution/kg-inbox/` **deste** repo | grafos **deste** repo |
+| `adopted` \| `hub` | `docs/evolution/kg-inbox/` **deste** repo (a fila local do adotante) | grafos **deste** repo |
+
+A I3 (um escritor por repo) proíbe escrever **repo alheio** — não a própria fila. Até 2026-09-04 este
+comando confundia as duas coisas e **parava** em `role: adopted`, deixando o adotante sem mecanismo de
+selagem: um adotante com colaborador (dono + visitante que propõe nós) forjou um comando local
+`/portal:selar` para suprir, e sinalizou upstream. A forma é a mesma nos dois papéis — muda só quem é o
+dono. **O que segue proibido em qualquer papel:**
+proposta cujo `meta.target` aponta para fora deste repo (absoluto ou `../`) → **pare e reporte**
+— quem sela é a sessão do repo-alvo.
+
+Se a fila não existir (`docs/evolution/kg-inbox/` ausente), crie-a com o README do starter antes de
+seguir — em adoções feitas antes de 2026-09-05 ela pode não ter nascido.
 
 ## Passo 2 — Levantar a fila
 
@@ -89,8 +104,10 @@ Saída:
 
 ## ⚠️ Notas
 
-- **Selar é o único ato que escreve o grafo vivo a partir da fila** — e é do CORE. O produtor
-  (`propose_kg_write`) nunca escreve o vivo; este comando é o portão.
+- **Selar é o único ato que escreve o grafo vivo a partir da fila** — e é do DONO DO REPO (core na
+  fonte, maestro do adotante no adotante). O produtor (`propose_kg_write`) nunca escreve o vivo; este
+  comando é o portão. A fronteira que a I3 impõe é de REPO, não de papel: nenhuma sessão sela proposta
+  cujo alvo vive noutro repo.
 - **Radar exit 0 no alvo é gate de selagem** (não da proposta): integração que quebra o grafo não sela.
 - **Human-in-the-loop na triagem**, mecânico no `git mv` — a fronteira de repo (I3) é juízo, não regra
   de lista.

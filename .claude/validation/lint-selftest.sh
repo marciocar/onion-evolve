@@ -11443,6 +11443,55 @@ run_upstream_portal_fixes_selftests() {
     unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
     rm -rf "${t}"
   fi
+
+  # ── (d) a FILA kg-inbox nasce na adoção: o bloco (2a) do starter é EXECUTADO num sandbox ────────
+  #     Não basta grepar a prosa do adopt.md — "guarda que valida prosa não é guarda". Extraímos o
+  #     bloco e rodamos: o que se prova é o EFEITO (README + _sealed/ + _rejected/), e a 2ª rodada
+  #     prova a idempotência (o starter não clobba fila em uso).
+  if [ ! -f "${adopt}" ]; then record_skip "upstream-portal: (d) adopt.md ausente"; else
+    local sd blk; sd="$(mktemp -d)"; sd="$(cd "${sd}" && pwd -P)"
+    blk="$(awk '/^# \(2a\) fila de PROPOSTAS/{f=1} /^# \(2b\) semente de PESQUISA/{f=0} f' "${adopt}")"
+    if [ -z "${blk}" ]; then
+      record_fail "upstream-portal: (d) fila kg-inbox no starter da adoção" \
+        "bloco '(2a) fila de PROPOSTAS' não encontrado em adopt.md — o /meta:kg-inbox roteado por papel não tem onde operar no dia 1 do adotante"
+    else
+      DEST="${sd}" SOURCE_ROOT="${SCRIPT_DIR}/../.." bash -c "${blk}" >/dev/null 2>&1 || true
+      printf 'marca do adotante\n' >> "${sd}/docs/evolution/kg-inbox/README.md" 2>/dev/null || true
+      DEST="${sd}" SOURCE_ROOT="${SCRIPT_DIR}/../.." bash -c "${blk}" >/dev/null 2>&1 || true   # 2ª passada: idempotente
+      local dmiss=""
+      [ -f "${sd}/docs/evolution/kg-inbox/README.md" ] || dmiss="${dmiss} README.md"
+      [ -d "${sd}/docs/evolution/kg-inbox/_sealed" ]   || dmiss="${dmiss} _sealed/"
+      [ -d "${sd}/docs/evolution/kg-inbox/_rejected" ] || dmiss="${dmiss} _rejected/"
+      grep -q 'marca do adotante' "${sd}/docs/evolution/kg-inbox/README.md" 2>/dev/null || dmiss="${dmiss} idempotência(clobbou o README em uso)"
+      if [ -z "${dmiss}" ]; then
+        record_pass "upstream-portal: (d) a fila kg-inbox NASCE na adoção (bloco executado; 2ª passada idempotente)"
+      else
+        record_fail "upstream-portal: (d) fila kg-inbox no starter da adoção" "ausente/quebrado após executar o bloco:${dmiss}"
+      fi
+    fi
+    rm -rf "${sd}"
+  fi
+
+  # ── (e) /meta:kg-inbox ROTEIA por papel — não recusa o adotante ──────────────────────────────────
+  #     O sinal de campo (portal-gamificacao, 2026-09-04): o comando parava em `role: adopted` e o
+  #     adotante ficou sem mecanismo de selagem (forjou um /portal:selar local). A I3 é fronteira de
+  #     REPO, não de papel: o dono sela a fila DO PRÓPRIO repo.
+  local kgi="${SCRIPT_DIR}/../commands/meta/kg-inbox.md"
+  if [ ! -f "${kgi}" ]; then record_skip "upstream-portal: (e) kg-inbox.md ausente"; else
+    local p1 emiss=""
+    p1="$(awk '/^## Passo 1/{f=1;next} /^## Passo 2/{f=0} f' "${kgi}")"
+    grep -qE 'role: adopted\|hub.+\*\*parar\*\*|adopted\|hub` → \*\*parar\*\*' <<< "${p1}" \
+      && emiss="${emiss} recusa-por-papel-de-volta(→**parar** em role: adopted)"
+    grep -q 'adopted' <<< "${p1}" || emiss="${emiss} Passo-1-não-menciona-adopted"
+    grep -qiE 'rotear|roteamento' <<< "${p1}" || emiss="${emiss} Passo-1-não-roteia"
+    grep -qE 'meta\.target`? aponta para fora deste repo.*\*\*pare e reporte\*\*' <<< "${p1}" \
+      || emiss="${emiss} fronteira-de-REPO-não-declarada(meta.target fora deste repo → pare e reporte)"
+    if [ -z "${emiss}" ]; then
+      record_pass "upstream-portal: (e) /meta:kg-inbox roteia por papel e guarda a fronteira de REPO (o adotante sela a própria fila)"
+    else
+      record_fail "upstream-portal: (e) roteamento por papel no kg-inbox" "Passo 1 com:${emiss}"
+    fi
+  fi
 }
 _family run_upstream_portal_fixes_selftests
 
