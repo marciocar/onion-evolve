@@ -4,11 +4,11 @@ date: 2026-09-05
 branch: chore/outbox-reconcile-and-jogo-da-vida
 reviewer: "1 refutador (opus, mandato de REFUTAR, default REPROVADO na dúvida) sobre o artefato COMPLETO, seguindo a calibração da sessão anterior (a 1ª passada rende os achados de PRODUTO). Antes dele, o próprio DOGFOOD da adoção — executar o artefato, não ler o diff — achou 3 defeitos."
 reviewed_diff_sha256: 43360d81d1c19568bac7fa421094e701bc5dd1d49f4e458ef53f360b4f44c255
-findings_total: 16
-findings_real: 16
+findings_total: 17
+findings_real: 17
 verdict: APROVADO
 tokens: 0
-duration_min: 96
+duration_min: 132
 ---
 
 # Resíduo — REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)
@@ -74,6 +74,24 @@ comentário da guarda (a nota de dívida citava o nome do arquivo e criava um co
 derivação). As três curas: classe em vez de lista, sítios nomeados em vez de contagem, e descrição
 sem o literal.
 
+## O 17º achado veio do CI, não de revisor — e é a mesma classe pela terceira vez
+
+A bancada local deu **1054/0** e o `selftest` do CI **reprovou 1 caso**
+(`kg-fixture-paths (c)`, apontando `kg-backlog-project.sh`). Causa medida: eu **reintroduzi a classe
+que curei nesta mesma sessão em 496 sítios** — veredito através de PIPE. `grep <arquivo> | grep -q` é
+corrida: o leitor fecha no 1º match, o escritor toma EPIPE, e sob `set -o pipefail` o pipeline devolve
+FALHA com o padrão PRESENTE. Local passa; o CI de 2 cores expõe.
+
+E o que importa mais que os 10 sítios curados: **a guarda de reintrodução tinha escopo mais estreito
+que a classe.** Ela só via `_emit "…" | grep -q`, e o meu idioma era `grep <arquivo> | grep -q`.
+Ampliada para qualquer produtor, ela achou de imediato **3 sítios pré-existentes** nos `--selftest` de
+helpers escritos mais cedo hoje — curados também. (Cuidado que a cura exigiu: a 1ª passada do meu
+`sed` deixou `grep -q PAD` **sem entrada**, o que faria o selftest ler stdin e TRAVAR — pior que o
+defeito. As here-strings foram recolocadas e os dois selftests rodam em <60 s.)
+
+**A guarda cobria o EXEMPLO, não a CLASSE** — quarta manifestação do mesmo padrão nesta sessão, junto
+do vocabulário do filtro de fixture, do piso numérico e da nota de dívida que citava o literal.
+
 ## Limites DECLARADOS
 
 - **O adotante está a 6 HARD**, não a 0. Chegou a 0 durante a sessão com a cópia manual, que foi
@@ -84,6 +102,10 @@ sem o literal.
   não produz conflito espúrio (é o que o achado 7 previu).
 - **`tokens: 0`** — o custo do refutador não foi instrumentado (sem run de workflow com journal).
   Declarado, não estimado.
+- **Bancada local ≠ bancada do CI**, e agora está medido: o `--jobs auto` (8 workers × lint inteiro)
+  é caminho DIFERENTE do serial, e foi o CI que achou o veredito-por-pipe. Este gate final rodou os
+  dois. **Consequência operacional:** `--jobs auto` nesta máquina causou 3 kills por memória (com
+  9 sessões peer ativas); o gate passou a rodar lint em foreground + bancada com concorrência menor.
 - A REGRA 15 foi curada **no adotante** (carimbos), não no core: dar catraca a ela é fio aberto.
   **Gatilho:** o próximo adotante que já tenha contexto de domínio escrito.
 

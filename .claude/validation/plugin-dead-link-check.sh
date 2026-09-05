@@ -103,7 +103,7 @@ _selftest() {
   printf 'Veja [viva](../kb/viva.md), [morta](../kb/morta.md), [fora](../../../docs/x.md), [url](https://x/y.md), [ancora](#sec), [regex](.*\\.md) e [abs](/etc/x).\n' > "${d}/r/plugins/p/commands/c.md"
   printf 'Template: [gera](../docs/business-context/x.md)\n' > "${d}/r/plugins/p/templates/t.md"
   out="$(bash "$0" "${d}/r" --format tsv)"
-  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 2 ] && printf '%s' "${out}" | grep -q 'morta.md' && printf '%s' "${out}" | grep -q 'docs/x.md'; then echo "  ✅ (a) 2 mortos (irmã ausente, fora do plugin); URL/âncora/regex/abs/templates não contam"; else echo "  ✗ (a): ${out}"; fails=$((fails+1)); fi
+  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 2 ] && grep -q 'morta.md' <<< "${out}" && grep -q 'docs/x.md' <<< "${out}"; then echo "  ✅ (a) 2 mortos (irmã ausente, fora do plugin); URL/âncora/regex/abs/templates não contam"; else echo "  ✗ (a): ${out}"; fails=$((fails+1)); fi
   bash "$0" "${d}/r" --rewrite "${d}/r/plugins/p" >/dev/null
   out="$(cat "${d}/r/plugins/p/commands/c.md")"
   if [ "${out}" = 'Veja [viva](../kb/viva.md), morta, fora, [url](https://x/y.md), [ancora](#sec), [regex](.*\.md) e [abs](/etc/x).' ] && [ -z "$(bash "$0" "${d}/r" --format tsv)" ]; then echo "  ✅ (b) rewrite: só os mortos viram texto; scan limpo depois"; else echo "  ✗ (b): ${out}"; fails=$((fails+1)); fi
