@@ -144,6 +144,17 @@ nodes:
     verified_against: 'sinal de campo com o caso concreto (build-tech-docs em dois namespaces) em docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md; consolidacao 8->5 em main desde 2026-09-04 (commit bab64742)'
     trace: 'docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md'
 
+  - id: Q_UPDATE_EXIGE_ADOCAO_INTEGRADA
+    node_type: question
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: open
+    label: "ACHADO DO 1o --update REAL DE UM GREENFIELD (2026-09-05, medido): o `vendor-branch update` recusa com rc=11 BASE CRUZADA enquanto a branch de adocao nao estiver na integracao — e a recusa esta CORRETA. Causa estrutural: o `durable-commit.sh` staja `CLAUDE.md`, `docs/{business,technical,compliance}-context`, `.githooks`, `.prettierignore`, `.gitattributes`, `settings.json` (48 arquivos no caso medido). Isso e adocao LEGITIMA, mas NAO e framework para o vendor-branch — entao `onion/vendor` semeada de `onion/adopt` (o que a Fase 5 manda) nasce ENTRELACADA POR CONSTRUCAO em todo adotante greenfield, e o merge arrastaria produto para dentro do 3-way (conflito contabil, nao real). O guard mutou vendor (avancou ao pin novo) e NAO tocou a integracao — degradou no lugar certo. ⚠️ E o CONSERTO QUE O PROPRIO HELPER SUGERE (re-semear vendor de `develop`) esta ERRADO neste estado: daria base SEM o framework. A ordem correta e `onion/adopt` -> PR -> integracao -> `--update`, e ela agora esta escrita como PRECONDICAO no comando. O que fica ABERTO: (a) o helper poderia DETECTAR este caso especifico (adocao nao-integrada) e dizer 'integre a adocao', em vez do conserto genrico que aqui piora; (b) ou a Fase 5 poderia semear o vendor de um snapshot SO-FRAMEWORK, tornando a base limpa por construcao. GATILHO NOMEADO: o proximo adotante greenfield que rodar `--update` antes de integrar (vai bater no mesmo rc=11), OU a decisao do maestro entre (a) e (b)."
+    verified_at: '2026-09-05'
+    verified_against: 'medido no jogo-da-vida em 2026-09-05: rc=11 do vendor-branch update; 48 arquivos nao-framework em `git diff --name-only develop onion/adopt`; develop INTOCADA apos a recusa; vendor avancado a b967b71835f2; precondicao ausente do comando (grep = 0 hits) antes desta cura'
+    trace: '.claude/utils/adopt/vendor-branch.sh'
+
 edges:
   - from: E_PROJECT_DOOR_GATE_OPENED
     to: E_ONION_CORE_PLUGIN_BORN
@@ -178,3 +189,6 @@ edges:
   - from: Q_MARKETPLACE_PUBLICO_EM_GERACAO_ANTIGA
     to: E_PUBLIC_REPO_LIVE
     edge_type: CONSTRAINS
+  - from: Q_UPDATE_EXIGE_ADOCAO_INTEGRADA
+    to: Q_PLUGIN_SEM_DRIVE_NEM_ADOPT
+    edge_type: DEPENDS_ON
