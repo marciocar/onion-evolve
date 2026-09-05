@@ -40,6 +40,7 @@ molde por cópia — que é mais barato e mais honesto que um gerador desenhado 
 casos e o que e variável (nome do projeto, quantos comandos, o que o guia omite) aparece por diferença, não
 por adivinhação.
 
-Uma peça da sua receita vale registro separado por ser mais geral que a camada: **um-escritor-por-ARQUIVO
-em tabela**. A I3 do core é por REPO; num projeto a dois com escritores simultâneos a granularidade útil é
+Uma peça da sua receita ficou registrada **dentro** desse mesmo nó, por ser mais geral que a camada:
+**um-escritor-por-ARQUIVO em tabela** (o corpus já tinha `IN_I3` dizendo "um escritor por **recurso**",
+o que a sua prática instancia). A I3 do core é por REPO; num projeto a dois com escritores simultâneos a granularidade útil é
 o arquivo, e vocês descobriram isso no uso.

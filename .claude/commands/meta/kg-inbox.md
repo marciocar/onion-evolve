@@ -5,7 +5,7 @@ category: meta
 tags: [kg, kg-inbox, write-leg, sealing, i3, self-evolution, sdaal]
 version: "1.1.0"
 updated: "2026-09-05"
-allowed-tools: Read Write Edit Grep Glob Bash(ls docs/evolution/kg-inbox/*) Bash(git mv docs/evolution/kg-inbox/*) Bash(bash .claude/validation/kg-radar.sh*) Bash(bash .claude/validation/onion-version.sh) Bash(git -C * log*)
+allowed-tools: Read Write Edit Grep Glob Bash(ls docs/evolution/kg-inbox/*) Bash(git mv docs/evolution/kg-inbox/*) Bash(bash .claude/validation/kg-radar.sh*) Bash(bash .claude/validation/onion-version.sh) Bash(bash .claude/utils/adopt/starter-kg-inbox.sh*) Bash(git ls-files*) Bash(git -C * log*)
 argument-hint: "[--list | <slug-da-proposta>]  (sem arg = processa TODA a fila; --list = só mostra sem decidir)"
 ---
 
@@ -18,8 +18,10 @@ proposta ao grafo vivo, ou a recusa. Sem ele a fila acumula sem controle (o gati
 2 propostas paradas, medido 2026-08-21).
 
 > **O que este comando NÃO é.** Não é `propose_kg_write` (o *produtor* da proposta). Não é
-> `/meta:co-evolve` (fila de mensagens entre repos). É o **consumidor** da fila `kg-inbox`, o
-> equivalente do "core sela" que o README da fila descreve.
+> `/meta:co-evolve` (fila de mensagens entre repos). É o **consumidor** da fila `kg-inbox` **deste**
+> repo — o ato de selar, exercido por quem é dono do grafo. (O README da fila é local a cada repo e
+> `docs/evolution/` **não** viaja na adoção: no adotante vale o README que o starter do `/meta:adopt`
+> escreve, não este.)
 
 ## Passo 1 — Roteamento por papel (o dono do repo sela a fila DO PRÓPRIO repo)
 
@@ -46,8 +48,12 @@ reais do corpus (`_sealed/gap-web-search-capability-*`, `_rejected/grana-ai-mape
 campo seria **prosa inexequível** (a 1ª redação desta seção era). Logo: `meta.target`, **quando
 presente**, é lido e obedecido; a guarda que decide é o caminho do alvo, que existe sempre.
 
-Se a fila não existir (`docs/evolution/kg-inbox/` ausente), crie-a com o README do starter antes de
-seguir — em adoções feitas antes de 2026-09-05 ela pode não ter nascido.
+Se a fila não existir (`docs/evolution/kg-inbox/` ausente) — o caso de adoções feitas antes de
+2026-09-05 —, o caminho pronto é **`/meta:adopt --update`**, que reexecuta o pós-cópia e faz o starter
+(`.claude/utils/adopt/starter-kg-inbox.sh`) criá-la com README + `_sealed/` + `_rejected/`. Só se o
+update não for possível, rode o starter direto: `bash .claude/utils/adopt/starter-kg-inbox.sh .`
+(ele é idempotente e confere o próprio efeito). **Não improvise a fila à mão** — o starter é a forma
+canônica, e é ele que a bancada exercita.
 
 ## Passo 2 — Levantar a fila
 
