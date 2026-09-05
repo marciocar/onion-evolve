@@ -11541,10 +11541,18 @@ run_upstream_portal_fixes_selftests() {
     grep -qiE 'mora no CORE\?' <<< "${p3}" && emiss="${emiss} P3:filtro-ainda-core-only(mora no CORE?)"
     grep -qiE 'mora NESTE repo' <<< "${p3}" || emiss="${emiss} P3:fronteira-não-é-deste-repo"
     grep -q 'adopted' <<< "${p3}" || emiss="${emiss} P3:não-instancia-o-papel-adopted"
-    # ESTRUTURAL: fora das linhas de tabela (`|…`), o Passo 3 não condiciona a decisão por papel —
-    # é ali que a meia cura volta refraseada, e nenhuma lista de grafias a alcança.
-    grep -vE '^\s*\|' <<< "${p3}" | grep -qE 'role: (adopted|hub)|`adopted`' \
+    # ESTRUTURAL: fora das linhas de tabela (`|…`), o Passo 3 não condiciona a decisão por papel
+    # NENHUM — nem pelo negativo (`role: adopted` → recusa) nem pelo positivo (`role: source` → segue).
+    # Quem roteia é a tabela; prosa que menciona um `role:` está decidindo, e é ali que a meia cura volta.
+    grep -vE '^\s*\|' <<< "${p3}" | grep -qE 'role: *[a-z]|`adopted`|`hub`|`source`' \
       && emiss="${emiss} P3:papel-fora-da-tabela(prosa condiciona a decisão por papel)"
+    # ...e a TABELA não é santuário: a linha do papel adotado tem de DIZER o que mora aqui
+    local row3 col3
+    row3="$(grep -E '^\s*\|.*adopted' <<< "${p3}" | head -1)"
+    [ -n "${row3}" ] || emiss="${emiss} P3:sem-linha-de-tabela-para-adopted"
+    col3="$(sed 's/\\|/§/g' <<< "${row3}" | awk -F'|' '{print $3}' | sed 's/^ *//; s/ *$//')"
+    grep -qiE 'domínio deste repo|dominio deste repo' <<< "${col3}" \
+      || emiss="${emiss} P3:a-linha-de-adopted-não-diz-o-que-mora-aqui(coluna='${col3}')"
     # ESTRUTURAL: o critério que MANDA SELAR não nomeia o core — nem no Passo 3 (c) nem no cabeçalho
     # do Passo 4. Foi ali que a meia cura sobreviveu à 3ª rodada, um bullet abaixo de onde foi curada.
     grep -E 'SELAR' <<< "${p3}" | grep -qiE 'do CORE|no CORE|pertence ao core' \
@@ -11565,6 +11573,10 @@ run_upstream_portal_fixes_selftests() {
       && ! grep -qi 'convenção DESTE repo' <<< "${p4}" && emiss="${emiss} P4:alvo-hard-coded-na-convenção-do-core"
     # (e5) Passo 5 carimba nó DESTE repo (no adotante não existe Q_SEALING_NO_MECHANISM)
     grep -qiE 'deste[[:space:]\n]*repo|num adotante' <<< "${p5}" || emiss="${emiss} P5:nó-a-carimbar-só-do-core"
+    grep -q 'verified_at' <<< "${p5}" && grep -q 'verified_against' <<< "${p5}" \
+      || emiss="${emiss} P5:manda-carimbar-done-sem-exigir-verificação(REGRA 49 reprova HARD depois; o radar é cego a isso)"
+    grep -qiE 'lint-artifacts|gate do repo' <<< "${p5}" \
+      || emiss="${emiss} P5:fecha-só-com-o-radar(que detecta frescor e PARA AÍ)"
     if [ -z "${emiss}" ]; then
       record_pass "upstream-portal: (e) /meta:kg-inbox roteia por papel nos 4 passos que decidem, com a invariante no ATO (alvo dentro deste repo)"
     else
