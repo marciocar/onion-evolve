@@ -201,7 +201,10 @@ PTR
 fi
 # (2a) fila de PROPOSTAS ao grafo (kg-inbox) — sem ela o /meta:kg-inbox, que desde 2026-09-05 ROTEIA por
 #      papel, não tem onde operar no dia 1 do adotante. Idempotente: nunca clobba fila em uso.
-bash "$SOURCE_ROOT/.claude/utils/adopt/starter-kg-inbox.sh" "$DEST"
+#      O rc é LIDO: `exit 0` é declaração do script sobre si — sem ler, um DEST read-only faria o
+#      adotante nascer SEM fila e nada a jusante conferiria. O helper confere o próprio efeito.
+bash "$SOURCE_ROOT/.claude/utils/adopt/starter-kg-inbox.sh" "$DEST" \
+  || { echo "ABORTADO: a fila kg-inbox não nasceu em $DEST — sem ela o /meta:kg-inbox roteado não opera." >&2; exit 1; }
 
 # (2b) semente de PESQUISA — a rule .claude/rules/research-lens.md declara `paths: docs/evolution/research/**`;
 #      sem UM arquivo rastreado ali a REGRA 53 reprova HARD no dia 1 (medido 2026-09-02 na adoção da

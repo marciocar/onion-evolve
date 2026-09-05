@@ -52,12 +52,26 @@ mecanismo de selagem — foi por isso que vocês tiveram de forjar o `/portal:se
    `docs/evolution/kg-inbox/` com README, `_sealed/` e `_rejected/`, idempotente (não clobba fila em uso).
    Sem isso o comando roteado não tinha onde operar no dia 1.
 
-Guardas: caso `(d)` — o bloco `(2a)` do starter é **extraído e EXECUTADO** num sandbox, com 2ª passada
-para provar idempotência (3 mutantes) — e caso `(e)`, que varre os **quatro** passos que decidem (8
-mutantes, incluindo exatamente o cenário "Passo 1 roteia, Passo 3 recusa" que a primeira versão da guarda
-deixava passar verde). Duas correções na própria guarda ficaram registradas: ela casava com a frase sobre
-a I3 e passava com a invariante apagada, e duas asserções estavam conflacionadas (a frase do Passo 1
-cobria a ausência da guarda no Passo 4).
+Guardas, e vale contar o que elas custaram porque a primeira versão delas era ruim: caso `(d)` extrai o
+bloco `(2a)` do starter e o **EXECUTA** num sandbox (2ª passada prova idempotência; a fatia agora exige
+teto de linhas e a chamada do helper, senão renomear a sentinela do bloco vizinho a fazia engolir o
+arquivo); caso `(d2)` mede o **fail-closed** de verdade — helper contra um DEST somente-leitura tem de
+sair `rc≠0` e o chamador tem de abortar a adoção; caso `(e)` varre os **quatro** passos que decidem.
+
+Três rodadas adversariais bateram nessas guardas e **quatro delas passavam verdes com o defeito
+presente** — cada uma virou mutante do banco:
+- a versão que olhava só o `Passo 1` passava com o `Passo 3` ainda core-only (o defeito real deste PR);
+- a recusa por papel **reescrita** (`pare` em vez de `parar`; ou "este comando não roda aqui") passava,
+  porque a guarda decidia por **vocabulário**. Reancorada na **estrutura**: a linha da tabela do papel
+  `adopted` tem de **nomear a fila que ela sela**, a recusa é barrada na forma diretiva, e nada no
+  comando pode autorizar selar grafo de outro repo;
+- duas asserções estavam **conflacionadas** — a frase do `Passo 1` cobria a ausência da guarda no
+  `Passo 4`;
+- e a guarda casava com a própria **nota histórica** que citava a pergunta antiga (guarda de string não
+  distingue regra de citação → a nota passou a descrever, não citar).
+
+Limite declarado, porque a guarda é sobre um comando em markdown: ela prova a **forma**, não o
+comportamento do modelo lendo o comando. O que é executado de verdade é o starter (casos `(d)`/`(d2)`).
 
 Um pedaço fica ABERTO e com gatilho, para não te vender cura maior do que a entregue: a proposta que
 chega ao **core** pertencendo a **outro** repo — o caso-semente `grana-ai-mapeamento` — continua só

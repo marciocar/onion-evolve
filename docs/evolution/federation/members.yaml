@@ -455,6 +455,27 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  - id: portal-gamificacao
+    name: portal-gamificacao (Portal de Gamificação — MAAGICA, projeto a dois)
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter               # vendoriza o framework cheio (pin verificado por pin-integrity-check)
+    parent: onion-evolve
+    remote: github.com/marciocar/portal-gamificacao
+    local_path: "/home/marcio/portal-gamificacao"
+    onion_version: 0432320ee697   # pin-ok em 2026-09-05 (pin-integrity-check.sh, não o stamp cru)
+    adopted_at: 2026-09-04
+    mode: greenfield              # integration_branch: develop
+    personality_summary: "Portal de gamificação sobre a metodologia MAAGICA (MPIE/IFRS) e dois livros autorais do maestro, num PROJETO A DOIS: dono + professor universitário co-autor que usa Claude Code e não deve aprender o framework. Foi o 1º adotante a forjar a CAMADA DE COLABORADOR (comandos finos /portal:*, guia de 2 páginas, um-escritor-por-ARQUIVO) e a primeira KB de domínio de adotante em duas camadas (gamification/{sources,theories,applications,graph}); e o único a forjar um comando LOCAL de selagem (/portal:selar) porque o /meta:kg-inbox do core recusava rodar em role: adopted — sinal que virou a cura de 2026-09-05 (a I3 é fronteira de REPO, não de papel)."
+    specializations: [gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers]
+    personality_last_sync: 2026-09-05   # seed manual, na triagem dos 6 sinais de 2026-09-04
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>
