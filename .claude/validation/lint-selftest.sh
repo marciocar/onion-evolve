@@ -11537,10 +11537,18 @@ run_upstream_portal_fixes_selftests() {
       || emiss="${emiss} P1:invariante-ancorada-em-campo-fantasma(meta.target)"
     grep -qF 'GUARDA DO ATO' <<< "${p4}" || emiss="${emiss} P4:sem-guarda-do-ato(alvo dentro deste repo)"
     grep -qE 'pare e reporte' <<< "${p4}" || emiss="${emiss} P4:sem-parada-para-alvo-fora-do-repo"
-    # (e3) Passo 3 pergunta por ESTE repo e trata os DOIS papéis — o filtro que de fato decide
+    # (e3) Passo 3 pergunta por ESTE repo, trata os DOIS papéis, e o papel SÓ aparece na TABELA
     grep -qiE 'mora no CORE\?' <<< "${p3}" && emiss="${emiss} P3:filtro-ainda-core-only(mora no CORE?)"
     grep -qiE 'mora NESTE repo' <<< "${p3}" || emiss="${emiss} P3:fronteira-não-é-deste-repo"
     grep -q 'adopted' <<< "${p3}" || emiss="${emiss} P3:não-instancia-o-papel-adopted"
+    # ESTRUTURAL: fora das linhas de tabela (`|…`), o Passo 3 não condiciona a decisão por papel —
+    # é ali que a meia cura volta refraseada, e nenhuma lista de grafias a alcança.
+    grep -vE '^\s*\|' <<< "${p3}" | grep -qE 'role: (adopted|hub)|`adopted`' \
+      && emiss="${emiss} P3:papel-fora-da-tabela(prosa condiciona a decisão por papel)"
+    # e nenhuma linha do Passo 3 junta o papel a um token de RECUSA
+    grep -E 'adopted|hub' <<< "${p3}" \
+      | grep -qiE 'rejeit|_rejected|não sela|nao sela|nada sela|pertence ao core|só o core|so o core' \
+      && emiss="${emiss} P3:papel-co-ocorre-com-recusa(meia cura de volta)"
     # (e4) Passo 4 DESCOBRE o grafo-alvo em vez de presumir a convenção do core
     grep -qF "git ls-files '*.kg.yaml'" <<< "${p4}" || emiss="${emiss} P4:alvo-não-descoberto(git ls-files '*.kg.yaml')"
     grep -qE "^[^#]*docs/onion/graph/<slug>\.kg\.yaml" <<< "${p4}" \
