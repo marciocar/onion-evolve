@@ -3,7 +3,7 @@ title: "Revisão — o dogfood de uma adoção achou 3 defeitos que 6 rodadas de
 date: 2026-09-05
 branch: chore/outbox-reconcile-and-jogo-da-vida
 reviewer: "1 refutador (opus, mandato de REFUTAR, default REPROVADO na dúvida) sobre o artefato COMPLETO, seguindo a calibração da sessão anterior (a 1ª passada rende os achados de PRODUTO). Antes dele, o próprio DOGFOOD da adoção — executar o artefato, não ler o diff — achou 3 defeitos."
-reviewed_diff_sha256: 43360d81d1c19568bac7fa421094e701bc5dd1d49f4e458ef53f360b4f44c255
+reviewed_diff_sha256: 96ea23ca79643e3692fc8aa6f9ca3756315726a8a4ab4b9111c5c4e0ae7f38dd
 findings_total: 17
 findings_real: 17
 verdict: APROVADO
@@ -102,6 +102,9 @@ do vocabulário do filtro de fixture, do piso numérico e da nota de dívida que
   não produz conflito espúrio (é o que o achado 7 previu).
 - **`tokens: 0`** — o custo do refutador não foi instrumentado (sem run de workflow com journal).
   Declarado, não estimado.
+- **O SHA do resíduo se calcula com a ÁRVORE LIMPA.** Com mudança stajada e não-commitada o
+  `review-artifact-check.sh` usa `--cached BASE` em vez de `BASE..HEAD` — o meu cálculo divergiu e
+  gastou uma rodada. Commite primeiro, carimbe depois.
 - **Bancada local ≠ bancada do CI**, e agora está medido: o `--jobs auto` (8 workers × lint inteiro)
   é caminho DIFERENTE do serial, e foi o CI que achou o veredito-por-pipe. Este gate final rodou os
   dois. **Consequência operacional:** `--jobs auto` nesta máquina causou 3 kills por memória (com
