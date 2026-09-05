@@ -363,7 +363,7 @@ jira-specialist	related	product-agent
 jira-specialist	related	task-specialist	
 jogo-da-vida	adopts	onion-evolve	
 jogo-da-vida	mode	greenfield	
-jogo-da-vida	pin	7d1abf51ddb4	
+jogo-da-vida	pin	2e3f3a6f88ce	
 jogo-da-vida	specialization	expo-universal	
 jogo-da-vida	specialization	gamification	
 jogo-da-vida	specialization	kg-radar-js-port	
@@ -670,7 +670,7 @@ poc-venda-direta-pdi	tier	standalone
 poc-venda-direta-pdi	trust-advises	onion-evolve	
 portal-gamificacao	adopts	onion-evolve	
 portal-gamificacao	mode	greenfield	
-portal-gamificacao	pin	0432320ee697	
+portal-gamificacao	pin	2e3f3a6f88ce	
 portal-gamificacao	specialization	collaborator-layer	
 portal-gamificacao	specialization	domain-kb-two-layers	
 portal-gamificacao	specialization	gamification	

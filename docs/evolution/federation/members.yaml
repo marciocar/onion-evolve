@@ -462,7 +462,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/portal-gamificacao
     local_path: "/home/marcio/portal-gamificacao"
-    onion_version: 0432320ee697   # pin-ok em 2026-09-05 (pin-integrity-check.sh, não o stamp cru)
+    onion_version: 2e3f3a6f88ce   # pin-ok em 2026-09-05 apos o 1o --update (pin-integrity-check.sh, nao o stamp cru)
     adopted_at: 2026-09-04
     mode: greenfield              # integration_branch: develop
     personality_summary: "Portal de gamificação sobre a metodologia MAAGICA (MPIE/IFRS) e dois livros autorais do maestro, num PROJETO A DOIS: dono + professor universitário co-autor que usa Claude Code e não deve aprender o framework. Foi o 1º adotante a forjar a CAMADA DE COLABORADOR (comandos finos /portal:*, guia de 2 páginas, um-escritor-por-ARQUIVO) e a primeira KB de domínio de adotante em duas camadas (gamification/{sources,theories,applications,graph}); e o único a forjar um comando LOCAL de selagem (/portal:selar) porque o /meta:kg-inbox do core recusava rodar em role: adopted — sinal que virou a cura de 2026-09-05 (a I3 é fronteira de REPO, não de papel)."
@@ -483,7 +483,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/jogo-da-vida
     local_path: "/home/marcio/jogo-da-vida"
-    onion_version: 7d1abf51ddb4   # pin-ok em 2026-09-05 (pin-integrity-check.sh, nao o stamp cru)
+    onion_version: 2e3f3a6f88ce   # pin-ok em 2026-09-05 apos o 1o --update (pin-integrity-check.sh, nao o stamp cru)
     adopted_at: 2026-09-05
     mode: greenfield              # integration_branch: develop; producao = main
     personality_summary: "App de desenvolvimento pessoal gamificado sobre a metodologia MAAGICA — irmao do portal-gamificacao (mesmo corpus, produto distinto). Monorepo pnpm/Turborepo com app Expo universal (web+iOS+Android). Entregou uma feature INTEIRA antes de adotar, so com os plugins: 9 ADRs, worklog faseado completo com 4 revisores, grafo de dominio, e2e Playwright. Foi o adotante que PORTOU o kg-radar para JS com teste de conformidade JS<->sh (6 fixtures) — e cuja convencao __fixtures__ do Vitest expos que a isencao de fixture do core estava copiada em seis lugares com um vocabulario so."

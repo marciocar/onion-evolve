@@ -209,7 +209,7 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   fi
 
   # Merge do onion/vendor na integração (3-way; base comum). Conflito = never-clobber estrutural.
-  if git -C "$T" merge "$VENDOR" -m "chore(onion): update to pin ${PIN}" >/dev/null 2>&1; then
+  if git -C "$T" merge "$VENDOR" -m "chore(onion): atualizar o Onion para o pin ${PIN}" >/dev/null 2>&1; then
     echo "Onion: framework atualizado via merge limpo de $VENDOR (pin ${PIN})."
     return 0
   fi
