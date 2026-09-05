@@ -183,22 +183,12 @@ else
   cp "$SOURCE_ROOT/.claude/settings.json" "$DEST/.claude/settings.json"
 fi
 
-# (2) starter docs/evolution/ — cria só o que estiver AUSENTE (idempotente; não clobba canais em uso).
-#     DOIS canais simétricos: inbox/ (upstream: consumidor→core) + inbound/ (downstream: core→consumidor,
-#     relatório de adoção/update + anúncios). Ambos com _processed/ p/ lido/não-lido git-visível.
-for ch in inbox inbound; do
-  mkdir -p "$DEST/docs/evolution/$ch/_processed"
-  [ -f "$DEST/docs/evolution/$ch/_processed/.gitkeep" ] || : > "$DEST/docs/evolution/$ch/_processed/.gitkeep"
-done
-if [ ! -f "$DEST/docs/evolution/README.md" ]; then
-  cat > "$DEST/docs/evolution/README.md" <<'PTR'
-# Co-evolução (consumidor)
+# (2) starter docs/evolution/ — DOIS canais simétricos: inbox/ (upstream: consumidor→core) e
+#     inbound/ (downstream: relatório de adoção/update + anúncios), ambos com _processed/ p/
+#     lido/não-lido git-visível. Idempotente: nunca clobba canal em uso.
+bash "$SOURCE_ROOT/.claude/utils/adopt/starter-coevolution.sh" "$DEST" \
+  || { echo "ABORTADO: os canais de co-evolução não nasceram em $DEST." >&2; exit 1; }
 
-Este repo é **CONSUMIDOR** do Onion. O protocolo canônico (3 fluxos) vive no core
-(`onion-evolve/docs/evolution/`). Canais: `inbox/` para sinalizar o core (upstream) e `inbound/`
-para receber relatórios de update/anúncios do core (downstream). Rode `/meta:co-evolve` para ler/gerenciar.
-PTR
-fi
 # (2a) fila de PROPOSTAS ao grafo (kg-inbox) — sem ela o /meta:kg-inbox, que desde 2026-09-05 ROTEIA por
 #      papel, não tem onde operar no dia 1 do adotante. Idempotente: nunca clobba fila em uso.
 #      O rc é LIDO: `exit 0` é declaração do script sobre si — sem ler, um DEST read-only faria o
@@ -380,7 +370,11 @@ fi
 #    chaves do core (kg-verification 28 + plugin-bare-path 86). No `--update` o stamp já existe.
 if [ -f "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" ] \
    && [ -f "$DEST/.claude/.onion-version" ]; then   # sem stamp o role mente — deixa p/ a Fase 5
-  bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$DEST" --ensure-from "$SOURCE_ROOT" || true
+  bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$DEST" --ensure-from "$SOURCE_ROOT"; RB_RC=$?
+  # rc=3 (baseline não resolvido) AVISA; rc=2 (uso/papel) ABORTA — engolir o 2 com `|| true`, como
+  # as duas pontas faziam, faz o alvo herdar o passivo do core em silêncio (114 chaves medidas).
+  [ "$RB_RC" = 3 ] && echo "⚠️  regen-baselines: baseline(s) não resolvido(s) — confira antes do PR." >&2
+  [ "$RB_RC" = 2 ] && { echo "ABORTADO: regen-baselines recusou (rc=2) — o alvo herdaria o baseline do CORE." >&2; exit 1; }
 fi
 ```
 
@@ -645,7 +639,9 @@ fi
 
 # (9-na-adocao) BASELINES — AQUI, nao na Fase 3: o passo (9) le `role:` e o carimbo acabou de existir.
 if [ -f "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" ]; then
-  bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$INSTALL_DIR" --ensure-from "$SOURCE_ROOT" || true
+  bash "$SOURCE_ROOT/.claude/utils/adopt/regen-baselines.sh" "$INSTALL_DIR" --ensure-from "$SOURCE_ROOT"; RB_RC=$?
+  [ "$RB_RC" = 3 ] && echo "⚠️  regen-baselines: baseline(s) não resolvido(s) — confira antes do PR." >&2
+  [ "$RB_RC" = 2 ] && { echo "ABORTADO: regen-baselines recusou (rc=2) — o alvo herdaria o baseline do CORE." >&2; exit 1; }
 fi
 
 - **Commit durável (obrigatório):** aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)

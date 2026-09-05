@@ -11629,15 +11629,43 @@ run_kg_fixture_paths_selftests() {
   fi
 
   # (c) TODOS os consumidores passam pelo predicado — nenhum ficou com o grep próprio para envelhecer
-  local c cmiss=""
-  for c in kg-radar-integrity.sh kg-corpus-grep.sh kg-trace-resolve.sh kg-backlog-project.sh kg-verification-coverage.sh; do
-    [ -f "${SCRIPT_DIR}/${c}" ] || continue
-    grep -q 'kg-fixture-paths.sh' "${SCRIPT_DIR}/${c}" || cmiss="${cmiss} ${c}:não-usa-o-predicado"
-    grep -nE "^[^#]*grep -v.?E? *'/fixtures/'|^[^#]*\*/fixtures/\*\)" "${SCRIPT_DIR}/${c}" >/dev/null \
+  # ⚠️ A lista de consumidores é DERIVADA do corpus, não digitada — e o caminho é RELATIVO AO REPO,
+  #    sem `basename`: a 1ª derivação mangleava o path e testava `${SCRIPT_DIR}/<base>`, que só acha
+  #    `validation/`, então os consumidores em `utils/` eram descartados EM SILÊNCIO e a mensagem
+  #    ainda dizia "os 5". Lista que envelhece é a classe que este predicado combate; e derivação que
+  #    descarta calado é a mesma classe um nível acima.
+  local c cmiss="" _root2 _n_cons=0
+  _root2="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+  while IFS= read -r c; do
+    [ -n "${c}" ] || continue
+    # manifesto LISTA o predicado no VALIDATION[] (é o que faz o bundle não nascer morto) — não o
+    # CONSOME; e o próprio predicado e a bancada estão fora do escopo por construção.
+    case "${c}" in */kg-fixture-paths.sh|*/lint-selftest.sh|*.manifest.sh) continue ;; esac
+    [ -f "${_root2}/${c}" ] || { cmiss="${cmiss} ${c}:derivado-mas-inexistente"; continue; }
+    _n_cons=$(( _n_cons + 1 ))
+    # USO, não MENÇÃO: os consumidores todos citam o predicado no comentário da cura, então casar a
+    # menção deixaria um regredir 100% com a bancada verde (medido pelo Elenxo em 2026-09-05).
+    grep -vE '^[[:space:]]*#' "${_root2}/${c}" | grep -qE 'bash "\$\{_KFP\}"|kg-fixture-paths\.sh" --' \
+      || cmiss="${cmiss} ${c}:não-INVOCA-o-predicado(menção em comentário não conta)"
+    # e nenhuma reintrodução do grep próprio, nas 3 grafias que escapavam da 1ª versão (aspas
+    # simples, aspas duplas, alternação -E). Ancorado no PADRÃO, não na pontuação.
+    grep -vE '^[[:space:]]*#' "${_root2}/${c}" \
+      | grep -qE "grep -v[a-zA-Z]*[[:space:]]+[\"']?[^\"']*/fixtures/|-not -path .\*/fixtures/\*|case[^)]*\*/fixtures/\*\)" \
       && cmiss="${cmiss} ${c}:AINDA-tem-grep-próprio"
+  done < <( (cd "${_root2}" && grep -rl 'kg-fixture-paths\.sh' .claude/validation .claude/utils 2>/dev/null) | sort -u )
+  # Piso ANCORADO nos sítios onde o predicado é load-bearing, não num número digitado (o `>=7` que
+  # estava aqui passou a reprovar o estado CORRETO quando o 7º sítio foi revertido — e só apareceu na
+  # suíte completa, porque isolada eu a rodara antes). O seed é o crítico: ali a isenção incompleta
+  # CANCELA a semente do KG, em vez de afrouxar um gate.
+  local _obrig _falta=""
+  for _obrig in .claude/utils/adopt/seed-adoption-graph.sh .claude/validation/kg-radar-integrity.sh \
+                .claude/validation/kg-trace-resolve.sh .claude/validation/kg-backlog-project.sh \
+                .claude/validation/kg-corpus-grep.sh .claude/validation/kg-verification-coverage.sh; do
+    (cd "${_root2}" && grep -q 'kg-fixture-paths\.sh' "${_obrig}" 2>/dev/null) || _falta="${_falta} ${_obrig}"
   done
+  [ -z "${_falta}" ] || cmiss="${cmiss} sítio-obrigatório-sem-o-predicado:${_falta}"
   if [ -z "${cmiss}" ]; then
-    record_pass "kg-fixture-paths: (c) os 5 consumidores usam o predicado e nenhum guardou o grep próprio"
+    record_pass "kg-fixture-paths: (c) os ${_n_cons} consumidores DERIVADOS (6 obrigatórios conferidos por nome) invocam o predicado e nenhum guardou o grep próprio"
   else
     record_fail "kg-fixture-paths: (c) consumidores" "seis listas, um vocabulário —${cmiss}"
   fi
@@ -11671,11 +11699,35 @@ run_kg_fixture_paths_selftests() {
     record_fail "kg-fixture-paths: (d2) resolução do predicado" "verde-por-vacuidade em:${fmiss}"
   fi
 
+  # (d3) MUDEZ é irmã da AUSÊNCIA — e o (d2) só cobria a ausência. Sem branch `*)` no `case`, uma flag
+  #      com typo caía fora, o script saía 0 com STDOUT VAZIO, e o consumidor via ZERO grafos: verde
+  #      por vacuidade por UM caractere (medido 2026-09-05). E o par obrigatório: a cura da mudez
+  #      introduz `exit` num arquivo que TAMBÉM é biblioteca (`source … && kg_graphs`, uso documentado),
+  #      logo exige guarda de sourcing — sem ela o `source` sem args morria com rc=2 (também medido).
+  local mmiss="" rcm=0 rcs=0 nsrc=0
+  printf 'a/__fixtures__/x.kg.yaml\n' | bash "${h}" --filtre >/dev/null 2>&1 || rcm=$?
+  [ "${rcm}" -eq 2 ] || mmiss="${mmiss} flag-com-typo-não-recusa(rc=${rcm}, saída vazia = varredura vazia)"
+  rcm=0; bash "${h}" >/dev/null 2>&1 || rcm=$?
+  [ "${rcm}" -eq 2 ] || mmiss="${mmiss} sem-argumento-não-recusa(rc=${rcm})"
+  nsrc="$(bash -c "source '${h}' && kg_graphs '${SCRIPT_DIR}/../..'" 2>/dev/null | grep -c . || true)"
+  bash -c "source '${h}' && kg_graphs '${SCRIPT_DIR}/../..' >/dev/null" >/dev/null 2>&1 || rcs=$?
+  { [ "${rcs}" -eq 0 ] && [ "${nsrc}" -gt 0 ]; } \
+    || mmiss="${mmiss} source-quebrado(rc=${rcs}, ${nsrc} grafos — a cura da mudez precisa de guarda de sourcing)"
+  if [ -z "${mmiss}" ]; then
+    record_pass "kg-fixture-paths: (d3) mudez recusa (typo e sem-arg → exit 2) E o uso como biblioteca (source) segue vivo"
+  else
+    record_fail "kg-fixture-paths: (d3) mudez e sourcing" "verde-por-vacuidade ou biblioteca quebrada em:${mmiss}"
+  fi
+
   # (d) a isenção é AUDITÁVEL: --list-exempt e --graphs particionam o acervo sem perder nem duplicar
-  local n_all n_g n_x
-  n_all="$(git ls-files '*.kg.yaml' 2>/dev/null | grep -c . || true)"
-  n_g="$(bash "${h}" --graphs "${SCRIPT_DIR}/../.." | grep -c . || true)"
-  n_x="$(bash "${h}" --list-exempt "${SCRIPT_DIR}/../.." | grep -c . || true)"
+  # ⚠️ UM ROOT SÓ nos três: a 1ª versão comparava `git ls-files` relativo ao CWD contra `--graphs`
+  #    com ROOT absoluto — rodada de `docs/` a conta dava 90 vs 121 e o caso FALHAVA. Flaky que EU
+  #    introduzi; a bancada não faz `cd` para o REPO_ROOT, então CWD-dependência é defeito.
+  local n_all n_g n_x _root
+  _root="$(cd "${SCRIPT_DIR}/../.." && pwd)"
+  n_all="$( (cd "${_root}" && git ls-files '*.kg.yaml' 2>/dev/null) | grep -c . || true)"
+  n_g="$(bash "${h}" --graphs "${_root}" | grep -c . || true)"
+  n_x="$(bash "${h}" --list-exempt "${_root}" | grep -c . || true)"
   if [ "$(( n_g + n_x ))" -eq "${n_all}" ] && [ "${n_all}" -gt 0 ]; then
     record_pass "kg-fixture-paths: (d) partição exata do acervo (${n_g} julgados + ${n_x} isentos = ${n_all})"
   else
@@ -11716,6 +11768,67 @@ run_hook_reviewer_context_selftests() {
   fi
 }
 _family run_hook_reviewer_context_selftests
+
+# O BUNDLE fecha o grafo de dependências? (achado do Elenxo, 2026-09-05, medido dentro do host):
+# o `kg-backlog-project` empacotado passou a resolver `kg-fixture-paths.sh` ao lado e ABORTAR sem ele
+# (fail-closed correto) — e o assembler ACEITOU montar, porque a guarda de dependência dele só olhava
+# `lib/`. Dep IRMÃO em `validation/` era invisível: o plugin público nascia MORTO no consumidor.
+# É a classe que o próprio predicado combate — guarda de lista falha pelo VOCABULÁRIO — cometida no
+# mecanismo que deveria proteger contra ela.
+run_bundle_dep_closure_selftests() {
+  local asm="${SCRIPT_DIR}/../utils/marketplace/assemble-plugin.sh"
+  local man="${SCRIPT_DIR}/../utils/marketplace/verticals/onion.manifest.sh"
+  if [ ! -f "${asm}" ] || [ ! -f "${man}" ]; then record_skip "bundle-dep: assembler/manifesto ausente"; return; fi
+  local root="${SCRIPT_DIR}/../.."
+
+  # (a) o manifesto VIGENTE fecha o grafo — o assembler monta sem acusar dependência ausente
+  local d rc=0 out
+  d="$(mktemp -d)"
+  out="$(bash "${asm}" "${man}" "${root}" "${d}" 2>&1 || true)"
+  bash "${asm}" "${man}" "${root}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q 'nao fecha o grafo de dependencias' <<< "${out}"; then
+    record_pass "bundle-dep: (a) o manifesto vigente fecha o grafo de dependências (assembler monta limpo)"
+  else
+    record_fail "bundle-dep: (a) manifesto vigente" "rc=${rc}; $(grep 'precisa de' <<< "${out}" | head -2 | tr '\n' ' ')"
+  fi
+
+  # (b) COMPORTAMENTO no host: o consumidor empacotado roda em vez de abortar por dep ausente
+  local rp=0 op
+  if [ -d "${d}/validation" ]; then
+    local sb; sb="$(mktemp -d)"; mkdir -p "${sb}/docs/onion/graph"
+    printf 'meta:\n  id: x\nnodes:\n  - id: A\n    node_type: decision\n    status: open\nedges: []\n' > "${sb}/docs/onion/graph/x.kg.yaml"
+    ( cd "${sb}" && git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) >/dev/null 2>&1
+    op="$( cd "${sb}" && CLAUDE_PLUGIN_ROOT="${d}" bash "${d}/validation/kg-backlog-project.sh" --check 2>&1 || true )"
+    grep -q 'predicado de fixture ausente' <<< "${op}" && rp=1
+    rm -rf "${sb}"
+  fi
+  if [ "${rp}" -eq 0 ]; then
+    record_pass "bundle-dep: (b) o consumidor EMPACOTADO acha a dependência dentro do host (não nasce morto)"
+  else
+    record_fail "bundle-dep: (b) bundle morto no host" "o script empacotado abortou por dependência ausente — o predicado não está no VALIDATION[] do manifesto"
+  fi
+
+  # (c) MUTANTE: tirar a dep do manifesto tem de fazer o ASSEMBLER acusar — nomeando o arquivo certo
+  local mman rcm=0 outm
+  mman="$(mktemp)"; grep -v 'kg-fixture-paths.sh' "${man}" > "${mman}"
+  local d2; d2="$(mktemp -d)"
+  outm="$(bash "${asm}" "${mman}" "${root}" "${d2}" 2>&1 || true)"
+  bash "${asm}" "${mman}" "${root}" "${d2}" >/dev/null 2>&1 || rcm=$?
+  if [ "${rcm}" -ne 0 ] && grep -q 'precisa de .*kg-fixture-paths\.sh' <<< "${outm}"; then
+    record_pass "bundle-dep: (c) (MUT) dep IRMÃO fora do manifesto → assembler RECUSA nomeando o arquivo (não só lib/)"
+  else
+    record_fail "bundle-dep: (c) (MUT) dep irmão" "assembler aceitou (rc=${rcm}) — a guarda voltou a ver só lib/ e o bundle nasceria morto"
+  fi
+  # (d) e a guarda NÃO pode reprovar por PROSA: citação em comentário (`graph.sh:164`) não é dependência
+  if grep -q 'precisa de .*graph\.sh' <<< "${outm}"; then
+    record_fail "bundle-dep: (d) guarda lê prosa" "acusou graph.sh, que aparece só em CITAÇÃO de comentário — fail-closed excessivo (a 1ª generalização fez isso)"
+  else
+    record_pass "bundle-dep: (d) citação em comentário NÃO conta como dependência (a guarda lê invocação)"
+  fi
+  rm -rf "${d}" "${d2}"; rm -f "${mman}"
+}
+_family run_bundle_dep_closure_selftests
+
 
 
 

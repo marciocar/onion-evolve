@@ -60,6 +60,7 @@ UTILS=(
 VALIDATION=(
   ".claude/validation/kg-radar.sh"
   ".claude/validation/kg-backlog-project.sh"
+  ".claude/validation/kg-fixture-paths.sh"
   ".claude/validation/kg-backlog-check.sh"
   ".claude/validation/lib/status-factor.awk"
   ".claude/validation/kg-console.sh"
