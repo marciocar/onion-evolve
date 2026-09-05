@@ -11472,24 +11472,45 @@ run_upstream_portal_fixes_selftests() {
     rm -rf "${sd}"
   fi
 
-  # ── (e) /meta:kg-inbox ROTEIA por papel — não recusa o adotante ──────────────────────────────────
-  #     O sinal de campo (portal-gamificacao, 2026-09-04): o comando parava em `role: adopted` e o
+  # ── (e) /meta:kg-inbox ROTEIA por papel — em TODOS os passos que decidem, não só no Passo 1 ─────
+  #     Sinal de campo (portal-gamificacao, 2026-09-04): o comando parava em `role: adopted` e o
   #     adotante ficou sem mecanismo de selagem (forjou um /portal:selar local). A I3 é fronteira de
   #     REPO, não de papel: o dono sela a fila DO PRÓPRIO repo.
+  #     ⚠️ A 1ª versão desta guarda olhava SÓ o Passo 1 — e passou verde com o Passo 3 ainda
+  #     core-only ("Este conhecimento mora no CORE?" → REJEITAR contexto de adotante), isto é, com o
+  #     adotante recusado no filtro SEGUINTE. Meia cura é o modo de falha desta perna; por isso a
+  #     guarda varre os quatro passos que decidem, e não a porta de entrada.
   local kgi="${SCRIPT_DIR}/../commands/meta/kg-inbox.md"
   if [ ! -f "${kgi}" ]; then record_skip "upstream-portal: (e) kg-inbox.md ausente"; else
-    local p1 emiss=""
+    local p1 p3 p4 p5 emiss=""
     p1="$(awk '/^## Passo 1/{f=1;next} /^## Passo 2/{f=0} f' "${kgi}")"
-    grep -qE 'role: adopted\|hub.+\*\*parar\*\*|adopted\|hub` → \*\*parar\*\*' <<< "${p1}" \
-      && emiss="${emiss} recusa-por-papel-de-volta(→**parar** em role: adopted)"
-    grep -q 'adopted' <<< "${p1}" || emiss="${emiss} Passo-1-não-menciona-adopted"
-    grep -qiE 'rotear|roteamento' <<< "${p1}" || emiss="${emiss} Passo-1-não-roteia"
-    grep -qE 'meta\.target`? aponta para fora deste repo.*\*\*pare e reporte\*\*' <<< "${p1}" \
-      || emiss="${emiss} fronteira-de-REPO-não-declarada(meta.target fora deste repo → pare e reporte)"
+    p3="$(awk '/^## Passo 3/{f=1;next} /^## Passo 4/{f=0} f' "${kgi}")"
+    p4="$(awk '/^## Passo 4/{f=1;next} /^## Passo 5/{f=0} f' "${kgi}")"
+    p5="$(awk '/^## Passo 5/{f=1;next} /^## Saída|^Saída:/{f=0} f' "${kgi}")"
+    # (e1) Passo 1 roteia e não recusa
+    grep -qE 'adopted\|hub`? → \*\*parar\*\*' <<< "${p1}" && emiss="${emiss} P1:recusa-por-papel-de-volta"
+    grep -q 'adopted' <<< "${p1}" || emiss="${emiss} P1:não-menciona-adopted"
+    grep -qiE 'rotear|roteamento' <<< "${p1}" || emiss="${emiss} P1:não-roteia"
+    # (e2) a invariante é sobre o ATO (o caminho do alvo), não sobre `meta.target` — campo que NENHUM
+    #      produtor emite hoje (medido 2026-09-05: as 2 propostas reais do corpus não o trazem).
+    grep -qi 'invariante é sobre o ATO' <<< "${p1}" \
+      || emiss="${emiss} P1:invariante-ancorada-em-campo-fantasma(meta.target)"
+    grep -qF 'GUARDA DO ATO' <<< "${p4}" || emiss="${emiss} P4:sem-guarda-do-ato(alvo dentro deste repo)"
+    grep -qE 'pare e reporte' <<< "${p4}" || emiss="${emiss} P4:sem-parada-para-alvo-fora-do-repo"
+    # (e3) Passo 3 pergunta por ESTE repo e trata os DOIS papéis — o filtro que de fato decide
+    grep -qiE 'mora no CORE\?' <<< "${p3}" && emiss="${emiss} P3:filtro-ainda-core-only(mora no CORE?)"
+    grep -qiE 'mora NESTE repo' <<< "${p3}" || emiss="${emiss} P3:fronteira-não-é-deste-repo"
+    grep -q 'adopted' <<< "${p3}" || emiss="${emiss} P3:não-instancia-o-papel-adopted"
+    # (e4) Passo 4 DESCOBRE o grafo-alvo em vez de presumir a convenção do core
+    grep -qF "git ls-files '*.kg.yaml'" <<< "${p4}" || emiss="${emiss} P4:alvo-não-descoberto(git ls-files '*.kg.yaml')"
+    grep -qE "^[^#]*docs/onion/graph/<slug>\.kg\.yaml" <<< "${p4}" \
+      && ! grep -qi 'convenção DESTE repo' <<< "${p4}" && emiss="${emiss} P4:alvo-hard-coded-na-convenção-do-core"
+    # (e5) Passo 5 carimba nó DESTE repo (no adotante não existe Q_SEALING_NO_MECHANISM)
+    grep -qiE 'deste[[:space:]\n]*repo|num adotante' <<< "${p5}" || emiss="${emiss} P5:nó-a-carimbar-só-do-core"
     if [ -z "${emiss}" ]; then
-      record_pass "upstream-portal: (e) /meta:kg-inbox roteia por papel e guarda a fronteira de REPO (o adotante sela a própria fila)"
+      record_pass "upstream-portal: (e) /meta:kg-inbox roteia por papel nos 4 passos que decidem, com a invariante no ATO (alvo dentro deste repo)"
     else
-      record_fail "upstream-portal: (e) roteamento por papel no kg-inbox" "Passo 1 com:${emiss}"
+      record_fail "upstream-portal: (e) roteamento por papel no kg-inbox" "o comando roteia pela metade —${emiss}"
     fi
   fi
 }

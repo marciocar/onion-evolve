@@ -23,10 +23,12 @@ mkdir -p "${Q}/_sealed" "${Q}/_rejected"
 cat > "${Q}/README.md" <<'PTR'
 # Fila de propostas ao grafo (kg-inbox)
 
-Quem NÃO é dono do grafo **propõe** aqui (`<slug>.proposal.kg.yaml` com `meta.target` apontando o grafo
-deste repo); o **dono sela** com `/meta:kg-inbox` — que roteia por papel e, num repo adotado, sela esta
-fila local. Aceita vai por `append` no grafo-alvo e a proposta migra para `_sealed/`; recusada vai para
-`_rejected/` com o motivo num arquivo irmão. O gate de selagem é `kg-radar` exit 0 no ALVO.
+Quem NÃO é dono do grafo **propõe** aqui (`<slug>.proposal.kg.yaml`; se souber o grafo de destino,
+declare-o em `meta.target`); o **dono sela** com `/meta:kg-inbox` — que roteia por papel e, num repo
+adotado, sela esta fila local. Aceita vai por `append` no grafo-alvo e a proposta migra para `_sealed/`;
+recusada vai para `_rejected/` com o motivo num arquivo irmão. O gate de selagem é `kg-radar` exit 0 no
+ALVO.
 
-Proposta cujo `meta.target` aponta para fora deste repo não é selada aqui (um escritor por repo).
+**O grafo-alvo tem de ser um grafo DESTE repo** (`git ls-files '*.kg.yaml'`) — um escritor por repo.
+Conhecimento que mora noutro repo não se sela aqui: é rejeitado com o motivo, e o gap vira nó `open`.
 PTR
