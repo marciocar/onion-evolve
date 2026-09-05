@@ -189,6 +189,18 @@ nodes:
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 1/1 claims; juiz APROVADO. grep -n "Q_TENANT_WRITE_DESTINATION" -A40 no arquivo do nó; cat docs/evolution/k => O nó (1 claim: "destino correto para escrita de conhecimento no papel-de-negócio do tenant não exist…'
     label: "BURACO revelado pela selagem: a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/adotante), nao a kg-inbox do core. Hoje toda proposta cai no core — risco de fonte-paralela por repo. Gated: nasce quando houver multi-tenant KG routing"
 
+  - id: E_KG_INBOX_ROTEIA_POR_PAPEL_0905
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "METADE do buraco do Q_TENANT_WRITE_DESTINATION FECHADA, e a outra metade nomeada (2026-09-05, sinal de campo do portal-gamificacao). O gatilho declarado do Q_ era 'segunda proposta de conhecimento de tenant batendo no mesmo buraco OU decisao de desenhar o roteamento' — a decisao aconteceu: o /meta:kg-inbox passou a ROTEAR por papel em vez de parar em role: adopted, e a fronteira que a I3 impoe e de REPO, nao de papel. FECHADO: o tenant/adotante que tem repo Onion proprio agora TEM destino — a fila docs/evolution/kg-inbox/ DELE, que nasce na adocao (.claude/utils/adopt/starter-kg-inbox.sh), selada pela sessao DELE, contra um grafo que resolve no git ls-files DELE. O filtro de fronteira do Passo 3 tambem passou a se instanciar pelo papel: o que o core rejeita e o que um adotante sela. ABERTO (a outra metade, que este PR NAO resolve): a proposta que CHEGA ao core pertencendo a outro repo — o caso-semente grana-ai-mapeamento — continua so REJEITAVEL, sem transporte automatico para a fila do repo-dono; a rota de volta e manual (rejeitar + registrar o gap + o dono propor na fila dele). E o tenant SEM repo Onion (chat no papel-de-negocio do LibreChat) segue sem destino nenhum. GATILHO da metade restante: um adotante pedir o transporte core->fila-dele, ou um tenant sem repo produzir a 2a proposta."
+    verified_at: '2026-09-05'
+    verified_against: 'medido no core: .claude/commands/meta/kg-inbox.md Passos 1/3/4/5 roteados por papel (guarda (e) da familia upstream_portal_fixes varre os quatro, 8 mutantes provados — inclusive o cenario em que o Passo 1 roteia e o Passo 3 recusa, que a 1a versao da guarda deixava passar); .claude/utils/adopt/starter-kg-inbox.sh cria a fila (guarda (d) EXECUTA o bloco do starter, 3 mutantes); as 2 propostas reais do corpus nao trazem meta.target, logo a invariante da fronteira foi reancorada no ATO (caminho do alvo no git ls-files), nao no campo'
+    trace: 'docs/evolution/inbox/_processed/2026-09-04-kg-inbox-recusa-adotante.md'
+
 edges:
   - from: E_AGENTE_VITRINE_ONION
     to: D_TRIADE_MCP_POR_EIXO
@@ -256,3 +268,6 @@ edges:
   - from: E_SEALING_MECHANISM
     to: Q_TENANT_WRITE_DESTINATION
     edge_type: SUPPORTS
+  - from: E_KG_INBOX_ROTEIA_POR_PAPEL_0905
+    to: Q_TENANT_WRITE_DESTINATION
+    edge_type: CONSTRAINS
