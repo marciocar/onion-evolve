@@ -123,8 +123,20 @@ comercial de cliente)** em 5 arquivos, generalizados. Registrar adotante é ato 
   os literais é classe que **guarda de texto não fecha**; o que fecha a I3 é ela valer por MECANISMO no
   repo-alvo (o pre-commit/merge de lá), não por frase aqui. **Gatilho:** achado de força-de-guarda a
   partir daqui vira nó com gatilho nomeado, não nova rodada — senão a perna troca entrega por polimento.
-  (Balanço que justifica o teto: da 4ª à 6ª rodada o ataque foi só à força da guarda e achou 7 mutantes
-  verdes; o comportamento entregue está correto desde a 3ª.)
+  (Balanço que justifica o teto, e o número é do próprio refutador: dos **12 achados dele, os 3 que
+  mudaram o produto** — `Passo 3` core-only, `meta.target` fantasma, `Q_TENANT_WRITE_DESTINATION`
+  aberto — saíram todos da **primeira** passada, lendo o artefato inteiro; os 9 seguintes foram força
+  de guarda e **nenhum** mudaria o que o adotante experimenta. Ele fechou concordando com o teto pela
+  mesma razão: *"vocabulário não converge"*. Último ataque de comportamento dele — `allowed-tools`
+  contra o que os passos mandam rodar — **falhou**: os dois comandos novos (`git ls-files`, o starter)
+  já estão permitidos.)
+
+## Gate no SHA final (árvore limpa, medido)
+
+`lint-artifacts.sh` rc=0 — **0 HARD**, 8 SOFT (passivos com catraca) · bancada `--jobs auto`
+**1043 passaram / 0 falharam / 0 pularam** · `kg-radar --integrity --schema` **exit 0** nos dois grafos
+tocados (`fios-abertos`, `librechat-kg-runtime-2026-08`) · árvore conferida **antes e depois** da
+medição. Os checkpoints intermediários usaram `--no-verify`; este é o gate que vale.
 
 ## Fora de escopo (com gatilho nomeado)
 - Estreitar o label do `Q_TENANT_WRITE_DESTINATION` — flip de status, selo do maestro.
