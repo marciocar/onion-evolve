@@ -1,10 +1,11 @@
-# Baseline da CLASSE "veredito por <produtor>|grep -q" (catraca — REGRA da guarda shell-pipefail).
-# POR QUÊ: a guarda nasceu vendo só `_emit "…" | grep -q` e em 2026-09-05, ampliada para a CLASSE
-# (qualquer produtor), achou 96 sítios pré-existentes em 23 arquivos. Guarda que nasce vermelha em
-# massa é guarda que alguém desliga — a doutrina desta casa é catraca com baseline (REGRAS 29/42/45/49/74).
+# Baseline da CLASSE "veredito por <produtor>|grep -q" (catraca).
+# GERADO por pipe-verdict-check.sh --emit-baseline — não edite à mão.
+# POR QUÊ: a guarda nasceu vendo só `_emit "…" | grep -q`; ampliada para a CLASSE em 2026-09-05 achou
+# 94 sítios pré-existentes em 23 arquivos. Guarda que nasce vermelha em massa é guarda que alguém
+# desliga — a doutrina desta casa é catraca com baseline (REGRAS 29/42/45/49/74).
 # FORMATO: <arquivo><TAB><nº de sítios tolerados>. A métrica de saúde é este número DIMINUINDO.
-# Sítio NOVO em arquivo fora da lista, ou ACIMA da contagem tolerada, é HARD.
-# Cura de cada sítio: conteúdo numa variável + `grep -q PAD <<< "$var"` (medida: 0 falhas em 480).
+# Sítio NOVO em arquivo fora da lista, ou ACIMA da contagem, é HARD.
+# CURA: conteúdo numa variável + `grep -q PAD <<< "$var"` (medida: 0 falhas em 480).
 .claude/hooks/bash-empty-result-guard.sh	9
 .claude/hooks/lib/invocation-lines.sh	2
 .claude/hooks/premodelswitch-guard.sh	1
@@ -24,6 +25,7 @@
 .claude/validation/lint-artifacts.sh	8
 .claude/validation/lint-selftest.sh	18
 .claude/validation/marketplace-root-check.sh	1
+.claude/validation/pipe-verdict-check.sh	2
 .claude/validation/plugin-deps-check.sh	4
 .claude/validation/plugin-hooks-check.sh	2
 .claude/validation/plugin-namespace-check.sh	2

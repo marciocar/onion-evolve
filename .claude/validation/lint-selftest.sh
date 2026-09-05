@@ -910,39 +910,39 @@ run_shell_pipefail_robustness_selftests() {
   # (`grep -q PAD <<< "$saida"`), comparação em bash (`case`) ou arquivo temporário.
   # Esta guarda impede a REINTRODUÇÃO do idioma frágil em posição de teste (mensagem pode manter pipe:
   # ali um truncamento não vira veredito falso).
-  local vhits
-  vhits="$(grep -rnE '(^|if |elif |while |until |&& |\|\| |; )!? ?(_emit "[^"]*"|grep [^|]*|awk [^|]*|sed [^|]*|cat [^|]*|printf [^|]*) \| *grep -q' \
-            "${REPO_ROOT}/.claude/validation" \
-            "${REPO_ROOT}/.claude/utils" \
-            "${REPO_ROOT}/.claude/hooks" \
-            "${REPO_ROOT}/.githooks" 2>/dev/null \
-          | grep -vE ':[[:space:]]*#' || true)"
-  # CATRACA por ARQUIVO: compara a contagem atual com a tolerada no baseline versionado. Sítio novo em
-  # arquivo fora da lista, ou acima da contagem, é HARD. (Ampliada para a CLASSE em 2026-09-05, a
-  # guarda achou 94 sítios pré-existentes — guarda que nasce vermelha em massa é guarda que se desliga.)
-  local _pvb="${SCRIPT_DIR}/pipe-verdict-baseline.txt" _novos="" _passivo=0
-  if [ -f "${_pvb}" ]; then
-    local _f _n _tol _atual
-    _atual="$(_emit "${vhits}" | sed 's|^'"${REPO_ROOT}"'/||' | awk -F: '{print $1}' | sort | uniq -c | awk '{printf "%s\t%s\n", $2, $1}')"
-    while IFS=$'\t' read -r _f _n; do
-      [ -n "${_f}" ] || continue
-      _tol="$(grep -F "${_f}"$'\t' "${_pvb}" 2>/dev/null | head -1 | cut -f2 || true)"
-      _tol="${_tol:-0}"
-      if [ "${_n}" -gt "${_tol}" ]; then
-        _novos="${_novos} ${_f}(${_n}>${_tol})"
-      else
-        _passivo=$(( _passivo + _n ))
-      fi
-    done <<< "${_atual}"
-    if [ -n "${_novos}" ]; then
-      record_fail "shell-pipefail: VEREDITO por <produtor>|grep -q ACIMA da catraca" \
-        "sítio NOVO da classe (o leitor fecha cedo, o escritor toma EPIPE, pipefail reprova com o padrão PRESENTE) — cure com here-string \`grep -q PAD <<< \"\$var\"\`:${_novos}"
-    else
-      record_pass "shell-pipefail: catraca da classe <produtor>|grep -q — ${_passivo} sítio(s) no passivo tolerado, ZERO novo (a métrica de saúde é o passivo DIMINUINDO)"
-    fi
+  # A varredura vive no EMISSOR — `pipe-verdict-check.sh` —, não inline aqui: é o contrato
+  # `--emit-baseline` que o `regen-baselines.sh` resolve, e sem ele o ADOTANTE herdaria os sítios
+  # tolerados do CORE (o modo-de-falha que o regen existe para fechar).
+  local _pvc="${SCRIPT_DIR}/pipe-verdict-check.sh" _pvb="${SCRIPT_DIR}/pipe-verdict-baseline.txt"
+  if [ ! -f "${_pvc}" ]; then
+    record_fail "shell-pipefail: emissor da classe ausente" "sem ${_pvc} a catraca não sabe o que cobrar — e 'não sei' nunca vira verde"
     return 0
   fi
+  local _st; _st="$(bash "${_pvc}" --selftest 2>&1 || true)"
+  grep -q '^pipe-verdict-check selftest: OK' <<< "${_st}" \
+    || record_fail "shell-pipefail: o emissor da classe não passa no próprio selftest" "$(grep '✗' <<< "${_st}" | head -2 | tr '\n' ' ')"
+  local _atual _novos="" _passivo=0 _f _n _tol
+  _atual="$(bash "${_pvc}" "${REPO_ROOT}" 2>/dev/null || true)"
+  if [ ! -f "${_pvb}" ]; then
+    record_fail "shell-pipefail: baseline da classe ausente" "regenere com: bash ${_pvc} --emit-baseline > ${_pvb}"
+    return 0
+  fi
+  while IFS=$'\t' read -r _f _n; do
+    [ -n "${_f}" ] || continue
+    _tol="$(grep -F "${_f}"$'\t' "${_pvb}" 2>/dev/null | head -1 | cut -f2 || true)"; _tol="${_tol:-0}"
+    if [ "${_n}" -gt "${_tol}" ]; then _novos="${_novos} ${_f}(${_n}>${_tol})"
+    else _passivo=$(( _passivo + _n )); fi
+  done <<< "${_atual}"
+  if [ -n "${_novos}" ]; then
+    record_fail "shell-pipefail: VEREDITO por <produtor>|grep -q ACIMA da catraca" \
+      "sítio NOVO da classe (o leitor fecha cedo, o escritor toma EPIPE, pipefail reprova com o padrão PRESENTE) — cure com here-string \`grep -q PAD <<< \"\$var\"\`:${_novos}"
+  else
+    record_pass "shell-pipefail: catraca da classe <produtor>|grep -q — ${_passivo} sítio(s) no passivo tolerado, ZERO novo (emissor com selftest; a métrica de saúde é o passivo DIMINUINDO)"
+  fi
+  return 0
+}
 
+_shell_pipefail_resto_desativado() {
   if [ -z "${vhits}" ]; then
     record_pass "shell-pipefail: nenhum veredito por <produtor>|grep -q (o leitor fecha cedo, o escritor toma EPIPE e pipefail reprova; use here-string)"
   else
