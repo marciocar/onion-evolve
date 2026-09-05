@@ -292,16 +292,10 @@ else
   GATE_FLAG=--gate-unproven   # instalado, prova ADIADA ou verificador fora de alcance — o grafo diz isso
 fi
 
-# (6b) CI — OFERTA, nunca imposição (costurado 2026-08-16 a pedido do maestro).
-#      O githook de (6) é o gate LOCAL, e ele é pulável: `git commit --no-verify`. O CI é o
-#      que não se pula — e a medição de 2026-08-16 achou CI rodando a maquinaria em 1 de 7
-#      adotantes. Mas embarcar calado erraria três vezes, e as três estão travadas no helper:
-#      FORGE (1 dos 7 medidos não está no GitHub — o Onion tem adapter de forge para não
-#      assumir), CONTA ALHEIA (minutos de CI são do adotante) e DIA 1 VERMELHO (repo
-#      recém-adotado quase sempre tem violação; CI vermelho na primeira hora é o que faz
-#      apagarem o arquivo — perde-se o gate E a confiança).
-#      SEM --apply o helper apenas RELATA. Mostre o resultado ao dono, PERGUNTE, e só então
-#      rode com --apply. Nunca aplique por conta própria: é configuração e custo dele.
+# (6b) CI — OFERTA, nunca imposição. O githook de (6) é o gate LOCAL e é pulável (`--no-verify`); o CI
+#      é o que não se pula. SEM `--apply` o helper apenas RELATA: mostre ao dono, PERGUNTE, e só então
+#      rode com `--apply` — as três razões (forge do alvo, minutos da conta dele, dia-1-vermelho) estão
+#      no docstring do helper, que é a autoridade. Nunca aplique por conta própria.
 bash "$SOURCE_ROOT/.claude/utils/adopt/offer-onion-ci.sh" "$DEST" || true
 # ↑ rc≠0 aqui significa "lint do alvo reprovando" — NÃO aborta a adoção (o gate local de (6)
 #   já está vivo); é convite a consertar o lint e reofertar o CI depois.
@@ -703,6 +697,14 @@ já faz tmp→diff→aplicar (o diff mostra o que muda), e re-carimba `.onion-ve
 > `.claude/` tracked (vendor-branch, pin-canário, commit durável). Seguir o 4º modo (3-way por manifest de
 > hashes, maestro-gated): [ADR capability-update-out-of-git](../../../docs/analysis/onion-adr-capability-update-out-of-git-2026-07.md)
 > — implementação gated até o 1º caso real; até lá, o update docs-only é operação manual guiada pelo ADR.
+
+> ⚠️ **PRECONDIÇÃO (medida 2026-09-05, 1º `--update` real de greenfield): a adoção tem de estar
+> INTEGRADA.** Com `onion/adopt` fora da integração o `vendor-branch update` recusa (**rc=11 BASE
+> CRUZADA**) e está certo — o commit durável staja `CLAUDE.md`, contextos, `.githooks` (48 arquivos no
+> caso medido): adoção legítima que NÃO é framework, então `onion/vendor` semeada de `onion/adopt`
+> nasce entrelaçada **por construção** em todo greenfield. E **não siga o conserto que o helper
+> sugere** aqui (re-semear de `develop`): daria base SEM framework. Ordem: `onion/adopt` → PR →
+> integração → **então** `--update`.
 
 Repo já adotado → trazer atualizações do framework. **Reusa o stamp** (self-contained):
 
