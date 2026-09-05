@@ -21,6 +21,12 @@
 # Uso       : bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-backlog-project.sh [--write|--check]
 # =============================================================================
 set -uo pipefail
+
+# Predicado de FIXTURE — caminho ABSOLUTO resolvido ANTES de qualquer `cd`, e ausência é FAIL-CLOSED.
+# (A 1ª ligação usava `$(dirname "${BASH_SOURCE[0]}")` no ponto de uso e morria depois de um `cd`:
+#  o erro era engolido por `|| true` e o script dizia "nenhum grafo" — verde por vacuidade. 2026-09-05.)
+_KFP="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/kg-fixture-paths.sh"
+[ -f "${_KFP}" ] || { echo "ERRO: predicado de fixture ausente (${_KFP}) — sem ele a varredura de grafos ficaria VAZIA e verde por vacuidade." >&2; exit 2; }
 # LOCALE PINADO — a razao e a mesma que instalou o pre-requisito do iconv, e o defeito e
 # PIOR. Medido na revisao adversarial (2026-08-28):
 #   · `sort` sem LC_ALL=C usa a collation do locale no DESEMPATE: em en_US.UTF-8 dois nos
@@ -56,7 +62,10 @@ mapfile -t GRAPHS < <( {
   git ls-files '*.kg.yaml' | while read -r g; do
     grep -qE '^[[:space:]]*#[[:space:]]*kg-backlog-guard:[[:space:]]*on\b' "$g" 2>/dev/null && echo "$g"
   done
-} | grep -v '/fixtures/' | sort -u | while read -r g; do
+# ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
+#    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos
+#    deliberadamente inválidos de um adotante viraram 5 HARD no dia 1 da adoção dele.
+} | bash "${_KFP}" --filter | sort -u | while read -r g; do
   # opt-OUT: grafo que se declara ARQUIVO/pesquisa some do backlog (segue no radar --open-tsv).
   # Decisao do maestro 2026-08-23: superficie de controle limpa > completude (federation-research
   # de 2026-06 era 63% do backlog, ruido historico afundando o sinal da fila de decisao).

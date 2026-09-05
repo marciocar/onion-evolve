@@ -10,12 +10,21 @@
 # Por que existe (medido 2026-09-02, meta-research-lens): 27 grafos de pesquisa guardados e NENHUMA
 # pesquisa os lia antes de buscar fora — o único reuso era por eixo do radar. Custo: 0 tokens.
 set -uo pipefail
+
+# Predicado de FIXTURE — caminho ABSOLUTO resolvido ANTES de qualquer `cd`, e ausência é FAIL-CLOSED.
+# (A 1ª ligação usava `$(dirname "${BASH_SOURCE[0]}")` no ponto de uso e morria depois de um `cd`:
+#  o erro era engolido por `|| true` e o script dizia "nenhum grafo" — verde por vacuidade. 2026-09-05.)
+_KFP="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/kg-fixture-paths.sh"
+[ -f "${_KFP}" ] || { echo "ERRO: predicado de fixture ausente (${_KFP}) — sem ele a varredura de grafos ficaria VAZIA e verde por vacuidade." >&2; exit 2; }
 ROOT="${ONION_KG_CORPUS_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 JSON=0; ALL=0; TERMS=()
 for a in "$@"; do case "$a" in --json) JSON=1;; --all-status) ALL=1;; -h|--help) sed -n '2,10p' "$0"; exit 0;; *) TERMS+=("$a");; esac; done
 [ "${#TERMS[@]}" -gt 0 ] || { echo "uso: kg-corpus-grep.sh <termo> [termo...] [--json] [--all-status]" >&2; exit 2; }
 if [ -n "${ONION_KG_CORPUS_FILES:-}" ]; then files="${ONION_KG_CORPUS_FILES}"
-else files="$(cd "${ROOT}" && git ls-files '*.kg.yaml' 2>/dev/null | grep -v '/fixtures/' | sed "s|^|${ROOT}/|")"; fi
+# ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
+#    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos
+#    deliberadamente inválidos de um adotante viraram 5 HARD no dia 1 da adoção dele.
+else files="$(cd "${ROOT}" && git ls-files '*.kg.yaml' 2>/dev/null | bash "${_KFP}" --filter | sed "s|^|${ROOT}/|")"; fi
 [ -n "${files}" ] || { echo "kg-corpus-grep: FAIL-LOUD — nenhum .kg.yaml no corpus (${ROOT}); não devolvo '0 achados' por corpus vazio" >&2; exit 2; }
 LIST="$(mktemp)"; trap 'rm -f "${LIST}"' EXIT; printf '%s\n' "${files}" > "${LIST}"
 # a lista vai por ARQUIVO, não por pipe: o heredoc do python abaixo É o stdin (bug medido no 1º dogfood: "0 grafos")

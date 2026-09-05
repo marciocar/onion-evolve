@@ -386,6 +386,10 @@ record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} —
 # remendos — o proximo teste que copiar o motor nao precisa lembrar da lib.
 _lib_beside() {  # $1 = diretorio onde o motor copiado vai rodar
   mkdir -p "$1/lib" && cp "${SCRIPT_DIR}/lib/status-factor.awk" "$1/lib/" 2>/dev/null || true
+  # Predicado de FIXTURE: mesma classe de dependência da lib awk. Desde 2026-09-05 os consumidores de
+  # grafo resolvem `kg-fixture-paths.sh` em caminho ABSOLUTO e ABORTAM (exit 2) sem ele — fail-closed
+  # correto, que sem esta cópia mataria o mutante ANTES do defeito que ele existe para provar.
+  cp "${SCRIPT_DIR}/kg-fixture-paths.sh" "$1/" 2>/dev/null || true
 }
 
 # ── DISCIPLINA DO MUTATION TEST, EM UM LUGAR SÓ ────────────────────────────────────────────────
@@ -2295,7 +2299,7 @@ run_kg_trace_resolve_selftests() {
   # (e) (MUT) A GUARDA DE VACUIDADE — reproduz o incidente da construção: parser cego.
   #     Antes dela, o mutante saía 0 imprimindo ✅. Se este caso cair, o script voltou a poder
   #     mentir verde, que é pior do que não existir.
-  local mut; mut="$(mktemp -d)"; cp "${helper}" "${mut}/m.sh"
+  local mut; mut="$(mktemp -d)"; cp "${helper}" "${mut}/m.sh"; _lib_beside "${mut}"
   # O padrão casado aqui TEM de acompanhar o do script — quando ele mudou de `^    trace:` para
   # `^[[:space:]]+trace:`, este sed parou de casar e a guarda-da-guarda ACUSOU ("mutação não
   # aplicada"), em vez de passar vazia. É o comportamento correto, e a razão de ela existir.
@@ -3859,6 +3863,7 @@ run_vendor_baseline_removido_selftests() {
     cp "$vbh" "$d/.claude/utils/adopt/vendor-branch.sh"
     cp "${REPO_ROOT}/.claude/utils/adopt/durable-commit.sh" "${REPO_ROOT}/.claude/utils/adopt/regen-baselines.sh" "$d/.claude/utils/adopt/"
     cp "$cov" "$d/.claude/validation/"
+    cp "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "$d/.claude/validation/" 2>/dev/null || true
     printf 'meta:\n  domain: core-only\nnodes:\n  - id: E_FOREIGN_CORE_ONLY\n    node_type: evidence\n    plane: PROD\n    impact: 5\n    confidence: 0.9\n    label: "no core-only que o adotante nunca teve"\n' \
       > "$d/docs/discussions/core-only/foreign.kg.yaml"
     printf '# Baseline REGRA 49\ndocs/discussions/core-only/foreign.kg.yaml::E_FOREIGN_CORE_ONLY\n' \
@@ -11591,6 +11596,128 @@ run_upstream_portal_fixes_selftests() {
   fi
 }
 _family run_upstream_portal_fixes_selftests
+
+# Predicado ÚNICO de fixture (achado de campo da adoção greenfield de 2026-09-05): seis consumidores
+# repetiam `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos deliberadamente
+# inválidos de um adotante viraram 5 HARD da REGRA 52 no dia 1 dele, e as saídas eram apagar o teste
+# ou desligar a guarda. Aqui se prova (a) o predicado, (b) que os SEIS consumidores o usam, e (c) que
+# a isenção não virou fail-open por substring.
+run_kg_fixture_paths_selftests() {
+  local h="${SCRIPT_DIR}/kg-fixture-paths.sh"
+  if [ ! -f "${h}" ]; then record_skip "kg-fixture-paths: helper ausente"; return; fi
+
+  # (a) o selftest do próprio predicado (5 convenções isentas + 4 armadilhas que NÃO se isentam)
+  local out
+  out="$(bash "${h}" --selftest 2>&1 || true)"
+  if grep -q '^kg-fixture-paths selftest: OK' <<< "${out}"; then
+    record_pass "kg-fixture-paths: (a) predicado cobre a CLASSE de convenções e recusa as armadilhas de substring"
+  else
+    record_fail "kg-fixture-paths: (a) predicado" "$(printf '%s' "${out}" | grep '✗' | head -3 | tr '\n' ' ')"
+  fi
+
+  # (b) o achado de campo, verbatim: a convenção Vitest tem de ser isentada e a do core continuar isentada
+  local miss=""
+  bash "${h}" --is-fixture 'packages/kg/src/__fixtures__/orphan.kg.yaml' || miss="${miss} __fixtures__(Vitest)"
+  bash "${h}" --is-fixture '.claude/validation/fixtures/kg-drive/deadlock.kg.yaml' || miss="${miss} fixtures(core)"
+  # e o fail-open que um `grep -v fixtures` ingênuo abriria
+  bash "${h}" --is-fixture 'docs/onion/graph/fixtures-do-produto.kg.yaml' && miss="${miss} isentou-por-NOME-de-arquivo" || true
+  bash "${h}" --is-fixture 'docs/mixtures/y.kg.yaml' && miss="${miss} isentou-por-SUBSTRING(mixtures)" || true
+  if [ -z "${miss}" ]; then
+    record_pass "kg-fixture-paths: (b) __fixtures__ do Vitest isento, e nome-de-arquivo/substring NÃO isentam"
+  else
+    record_fail "kg-fixture-paths: (b) alcance da isenção" "falhou em:${miss}"
+  fi
+
+  # (c) TODOS os consumidores passam pelo predicado — nenhum ficou com o grep próprio para envelhecer
+  local c cmiss=""
+  for c in kg-radar-integrity.sh kg-corpus-grep.sh kg-trace-resolve.sh kg-backlog-project.sh kg-verification-coverage.sh; do
+    [ -f "${SCRIPT_DIR}/${c}" ] || continue
+    grep -q 'kg-fixture-paths.sh' "${SCRIPT_DIR}/${c}" || cmiss="${cmiss} ${c}:não-usa-o-predicado"
+    grep -nE "^[^#]*grep -v.?E? *'/fixtures/'|^[^#]*\*/fixtures/\*\)" "${SCRIPT_DIR}/${c}" >/dev/null \
+      && cmiss="${cmiss} ${c}:AINDA-tem-grep-próprio"
+  done
+  if [ -z "${cmiss}" ]; then
+    record_pass "kg-fixture-paths: (c) os 5 consumidores usam o predicado e nenhum guardou o grep próprio"
+  else
+    record_fail "kg-fixture-paths: (c) consumidores" "seis listas, um vocabulário —${cmiss}"
+  fi
+
+  # (d2) FAIL-CLOSED e caminho ABSOLUTO — a classe que eu introduzi ao ligar os consumidores e que só
+  #      o mutante de VACUIDADE do kg-trace pegou (o lint passou 0 HARD): `$(dirname "${BASH_SOURCE[0]}")`
+  #      no ponto de uso morre depois de um `cd`, o `|| true` engole o erro, e a varredura fica VAZIA —
+  #      verde por vacuidade em qualquer repo. Duas exigências, uma por sítio: caminho resolvido ANTES
+  #      de qualquer cd, e ausência do predicado = exit != 0, nunca silêncio.
+  local c fmiss=""
+  for c in kg-radar-integrity.sh kg-corpus-grep.sh kg-trace-resolve.sh kg-backlog-project.sh kg-verification-coverage.sh; do
+    [ -f "${SCRIPT_DIR}/${c}" ] || continue
+    grep -q '_KFP="\$(cd "\$(dirname "\${BASH_SOURCE\[0\]}")" && pwd)/kg-fixture-paths.sh"' "${SCRIPT_DIR}/${c}" \
+      || fmiss="${fmiss} ${c}:caminho-não-absoluto(morre após cd)"
+    grep -qE '\[ -f "\$\{_KFP\}" \] \|\| \{.*exit 2' "${SCRIPT_DIR}/${c}" \
+      || fmiss="${fmiss} ${c}:ausência-do-predicado-não-é-fail-closed"
+    grep -q 'dirname "${BASH_SOURCE\[0\]}")/kg-fixture-paths.sh"' "${SCRIPT_DIR}/${c}" \
+      && fmiss="${fmiss} ${c}:AINDA-resolve-no-ponto-de-uso"
+  done
+  # e a prova por COMPORTAMENTO: sem o predicado ao lado, o consumidor sai != 0 em vez de "nada a ver"
+  local sb2 rc2=0
+  sb2="$(mktemp -d)"; cp "${SCRIPT_DIR}/kg-trace-resolve.sh" "${sb2}/t.sh" 2>/dev/null || true
+  if [ -f "${sb2}/t.sh" ]; then
+    bash "${sb2}/t.sh" "${SCRIPT_DIR}/../.." --format tsv >/dev/null 2>&1 || rc2=$?
+    [ "${rc2}" -ne 0 ] || fmiss="${fmiss} comportamento:sem-o-predicado-saiu-0(fail-open)"
+  fi
+  rm -rf "${sb2}"
+  if [ -z "${fmiss}" ]; then
+    record_pass "kg-fixture-paths: (d2) predicado resolvido em caminho ABSOLUTO e ausência é fail-closed (medido por execução)"
+  else
+    record_fail "kg-fixture-paths: (d2) resolução do predicado" "verde-por-vacuidade em:${fmiss}"
+  fi
+
+  # (d) a isenção é AUDITÁVEL: --list-exempt e --graphs particionam o acervo sem perder nem duplicar
+  local n_all n_g n_x
+  n_all="$(git ls-files '*.kg.yaml' 2>/dev/null | grep -c . || true)"
+  n_g="$(bash "${h}" --graphs "${SCRIPT_DIR}/../.." | grep -c . || true)"
+  n_x="$(bash "${h}" --list-exempt "${SCRIPT_DIR}/../.." | grep -c . || true)"
+  if [ "$(( n_g + n_x ))" -eq "${n_all}" ] && [ "${n_all}" -gt 0 ]; then
+    record_pass "kg-fixture-paths: (d) partição exata do acervo (${n_g} julgados + ${n_x} isentos = ${n_all})"
+  else
+    record_fail "kg-fixture-paths: (d) partição do acervo" "julgados=${n_g} + isentos=${n_x} != total=${n_all} — isenção que não fecha a conta esconde grafo"
+  fi
+}
+_family run_kg_fixture_paths_selftests
+
+# Aviso de hook roteado pelo ARTEFATO, não pelo papel (sinal de campo de um repo PRÉ-ADOÇÃO,
+# 2026-09-05): o guard mandava ler o check `onion-review-verdict` num repo que não o tem — texto certo,
+# contexto errado, e aviso que manda caçar fantasma gasta a confiança do canal.
+run_hook_reviewer_context_selftests() {
+  local h="${SCRIPT_DIR}/../hooks/bash-empty-result-guard.sh"
+  if [ ! -f "${h}" ]; then record_skip "hook-reviewer-context: guard ausente"; return; fi
+  local core="${SCRIPT_DIR}/../.." out miss=""
+
+  # (a) repo COM o workflow do revisor → a mensagem que cita o check
+  out="$(printf '{"tool_input":{"command":"gh pr merge 1"}}' | CLAUDE_PROJECT_DIR="${core}" bash "${h}" 2>&1 || true)"
+  grep -q 'MERGE-SEM-FONTE-LIDA' <<< "${out}" || miss="${miss} core:não-cita-o-check"
+
+  # (b) repo SEM o workflow → a mensagem que NÃO manda procurar o check
+  local sb; sb="$(mktemp -d)"; git -C "${sb}" init -q 2>/dev/null
+  out="$(printf '{"tool_input":{"command":"gh pr merge 1"}}' | CLAUDE_PROJECT_DIR="${sb}" bash "${h}" 2>&1 || true)"
+  grep -q 'MERGE-SEM-REVISOR' <<< "${out}" || miss="${miss} sem-revisor:mensagem-errada"
+  grep -q 'onion-review-verdict.*em .gh pr checks' <<< "${out}" && miss="${miss} sem-revisor:AINDA-manda-procurar-o-check"
+
+  # (c) o predicado é o ARTEFATO, não o STAMP: um repo com stamp e SEM workflow não pode citar o check
+  #     (é o caso do adotante recém-adotado — e o CORE não tem stamp, então testar papel inverteria os dois)
+  mkdir -p "${sb}/.claude"; printf 'role: adopted\n' > "${sb}/.claude/.onion-version"
+  out="$(printf '{"tool_input":{"command":"gh pr merge 1"}}' | CLAUDE_PROJECT_DIR="${sb}" bash "${h}" 2>&1 || true)"
+  grep -q 'MERGE-SEM-REVISOR' <<< "${out}" || miss="${miss} adotado-sem-workflow:voltou-a-citar-o-check(predicado é papel, não artefato)"
+  rm -rf "${sb}"
+
+  if [ -z "${miss}" ]; then
+    record_pass "hook-reviewer-context: o aviso roteia pelo ARTEFATO (workflow do revisor), cobrindo core · adotado-sem-workflow · pré-adoção"
+  else
+    record_fail "hook-reviewer-context: roteamento do aviso" "manda caçar fantasma em:${miss}"
+  fi
+}
+_family run_hook_reviewer_context_selftests
+
+
 
 
 

@@ -122,6 +122,28 @@ nodes:
     verified_against: "dogfood de INSTALL num Claude Code limpo (claude 2.1.243): claude plugin marketplace add marciocar/onion-plugins + install onion@onion-plugins → skills/comandos/agente OK, mas `details` mostrou Hooks: 0 — os 2 hooks (exit-2 guard PostToolUse + aside-router UserPromptSubmit) viajavam como ARQUIVO INERTE. Causa: assemble-plugin.sh so copiava o .sh, deixava o registro 'a cargo do consumidor'. Cura: assemble gera hooks/hooks.json (auto-descoberto) mapeando cada hook ao evento do settings.json do core, path ${CLAUDE_PLUGIN_ROOT}. Re-dogfood: install → Hooks: 2. Provado por comportamento."
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "DOGFOOD de INSTALL pegou o que lint nenhum acharia: o plugin empacotava os hooks mas nao os ATIVAVA (Hooks: 0) — a guarda exit-2 (a capacidade que 'compra' o acoplamento ao Claude Code) chegava morta. Assemble agora gera o hooks.json que o Claude Code auto-descobre. Instalar o onion = ganhar a guarda de verdade. fix→re-dogfood no mesmo loop."
+  - id: Q_PLUGIN_SEM_DRIVE_NEM_ADOPT
+    node_type: question
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: open
+    label: "SINAL DE CAMPO (adotante pre-adocao, 2026-09-05, medido): /meta:drive e /meta:adopt vivem SO no core — nao estao em plugins/onion/commands/ nem em manifesto nenhum. Consequencia concreta relatada pelo remetente: para se ADOTAR ou para CONDUZIR um plano-grafo, o consumidor precisa abrir sessao NO CORE. E a mesma classe do Q_KG_INBOX_FORA_DO_PLUGIN (grafo librechat-kg-runtime-2026-08): comando cuja capacidade pressupoe artefato que o instalador nao tem. Aqui a razao e mais forte que no kg-inbox: o /meta:adopt ESCREVE repo alheio a partir da fonte (I3/MOAT) e o /meta:drive conduz plano-grafo do repo que o hospeda — distribui-los pelo marketplace criaria a expectativa de rodar o que so a fonte pode rodar. TRES desenhos possiveis, nenhum decidido: (a) portar so `adopt --update` (o consumidor se ATUALIZA sozinho, sem poder adotar terceiros); (b) nomear o SALTO AO CORE como movimento explicito do wizard/onboarding, com o comando local dizendo 'isto roda no core, e aqui esta como'; (c) manter como esta e documentar a fronteira. GATILHO NOMEADO: o proximo adotante que pedir `--update` sem sessao do core, OU a decisao do maestro sobre (a)/(b)/(c) — o que vier primeiro."
+    verified_at: '2026-09-05'
+    verified_against: 'medido 2026-09-05: ls plugins/onion/commands/ = 20 comandos, drive.md e adopt.md AUSENTES; grep -l "drive\|adopt" nos *.manifest.sh do marketplace = 0 hits; sinal de campo em docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md'
+    trace: 'plugins/onion/commands/'
+
+  - id: Q_MARKETPLACE_PUBLICO_EM_GERACAO_ANTIGA
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: open
+    label: "DIVIDA MEDIDA (sinal de campo 2026-09-05): o repo publico marciocar/onion-plugins esta na geracao PRE-CONSOLIDACAO (8 plugins) enquanto o core consolidou 8->5 (onion<-work-tools, engineering<-testing, product<-docs). Um adotante habilitou OS DOIS marketplaces e recebeu COMANDO DUPLICADO — `build-tech-docs` apareceu em `onion-docs:` e `onion-product:`; ele resolveu desabilitando o publico. Isto NAO e defeito de plugin: e a projecao publica atrasada em relacao a fonte, e o custo cai em quem instala. Duas metades: (1) publicar a consolidacao (materializar no clone + push do maestro — o ciclo ja existe e e conhecido); (2) o onboarding/adopt DETECTAR marketplaces em geracoes diferentes e avisar, porque atraso vai acontecer de novo por construcao (o push e humano). A (2) e a que sobrevive: sem ela, cada defasagem futura vira um adotante confuso. GATILHO: a (1) e trabalho de rotina do proximo ciclo de publicacao; a (2) abre quando um SEGUNDO adotante relatar duplicata, ou junto da (1) se o maestro quiser fechar de uma vez."
+    verified_at: '2026-09-05'
+    verified_against: 'sinal de campo com o caso concreto (build-tech-docs em dois namespaces) em docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md; consolidacao 8->5 em main desde 2026-09-04 (commit bab64742)'
+    trace: 'docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md'
+
 edges:
   - from: E_PROJECT_DOOR_GATE_OPENED
     to: E_ONION_CORE_PLUGIN_BORN
@@ -149,4 +171,10 @@ edges:
     edge_type: CONSTRAINS
   - from: E_KGFRESHNESS_GAP_IN_PLUGIN
     to: E_ONION_CORE_PLUGIN_BORN
+    edge_type: CONSTRAINS
+  - from: Q_PLUGIN_SEM_DRIVE_NEM_ADOPT
+    to: E_PUBLIC_REPO_LIVE
+    edge_type: DEPENDS_ON
+  - from: Q_MARKETPLACE_PUBLICO_EM_GERACAO_ANTIGA
+    to: E_PUBLIC_REPO_LIVE
     edge_type: CONSTRAINS

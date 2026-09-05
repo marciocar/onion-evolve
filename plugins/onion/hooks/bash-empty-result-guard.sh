@@ -292,11 +292,28 @@ fi
 # TETO DECLARADO: PostToolUse é posterior por definição — dispara DEPOIS do comando. Um PreToolUse
 # que negasse antes foi PROJETADO E REFUTADO em 2026-08-06 (N pós-cura = 0; ~1 em 3 merges seria
 # travado; e PreToolUse é substrato NÃO-VERIFICADO neste repo). Reabre só com um merge cego novo.
+# Papel NÃO é o predicado — o ARTEFATO é. Os dois avisos abaixo citam o check `onion-review-verdict`
+# e o gate da REGRA 56; ambos vêm do workflow do revisor. A 1ª redação desta cura testava o stamp
+# `.claude/.onion-version`, e o CORE não tem stamp (ele COMPUTA `role: source`) — o aviso diria "não é
+# adotado" exatamente onde o check existe (pego no dogfood, 2026-09-05). Testar o artefato cobre os
+# três casos de uma vez: core, adotado, e repo que só instalou os plugins.
+_tem_revisor() { local r="${CLAUDE_PROJECT_DIR:-.}"
+                 [ -f "${r}/.github/workflows/onion-review.yml" ] \
+                 || [ -f "${r}/.github/workflows/onion-validate.yml" ]; }
+
 if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:space:]]+pr[[:space:]]+merge([[:space:]]|$)'; then
-    add 'MERGE-SEM-FONTE-LIDA: `onion-review` sai VERDE POR DESENHO quando o revisor falha (soft-pass) — `pass` ali NÃO significa que houve revisão. A fonte é a linha `onion-review-verdict` em `gh pr checks <N>`. Se você não leu ESSA linha, você não sabe se este PR foi revisado.'
+    if _tem_revisor; then
+      add 'MERGE-SEM-FONTE-LIDA: `onion-review` sai VERDE POR DESENHO quando o revisor falha (soft-pass) — `pass` ali NÃO significa que houve revisão. A fonte é a linha `onion-review-verdict` em `gh pr checks <N>`. Se você não leu ESSA linha, você não sabe se este PR foi revisado.'
+    else
+      add 'MERGE-SEM-REVISOR: este repo NÃO tem o workflow do revisor Onion, logo o check `onion-review-verdict` NÃO existe aqui — não vá procurá-lo. O merge não tem revisor automático: leia os checks que ESTE repo tem (`gh pr checks <N>`). Para ganhar o revisor: `meta:adopt` (ou a oferta de CI, se já adotado).'
+    fi
 fi
 if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:space:]]+pr[[:space:]]+create([[:space:]]|$)'; then
-    add 'PR-SEM-PASSADA-ADVERSARIAL: abrir PR sem a passada adversarial deixa a revisão para um CI que estoura turnos justamente nos PRs grandes. O artefato de revisão é exigido pela REGRA 56 (`docs/evolution/review/<branch>.md`) — se ele não existe, o gate vai acusar e você vai descobrir tarde.'
+    if _tem_revisor; then
+      add 'PR-SEM-PASSADA-ADVERSARIAL: abrir PR sem a passada adversarial deixa a revisão para um CI que estoura turnos justamente nos PRs grandes. O artefato de revisão é exigido pela REGRA 56 (`docs/evolution/review/<branch>.md`) — se ele não existe, o gate vai acusar e você vai descobrir tarde.'
+    else
+      add 'PR-SEM-PASSADA-ADVERSARIAL: abrir PR sem passada adversarial deixa a revisão para depois. Este repo não tem o workflow do revisor Onion, então a REGRA 56 não o gateia — o resíduo em `docs/evolution/review/<branch>.md` é boa prática aqui, não obrigação. Não procure o gate: ele não existe sem o workflow.'
+    fi
 fi
 
 # (6) BRANCH NOMEADA EM pt-BR — `code-standards.md:39` exige branch em INGLÊS, e eu nomeei DUAS em
