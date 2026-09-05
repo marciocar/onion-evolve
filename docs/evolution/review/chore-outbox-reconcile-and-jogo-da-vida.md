@@ -3,7 +3,7 @@ title: "Revisão — o dogfood de uma adoção achou 3 defeitos que 6 rodadas de
 date: 2026-09-05
 branch: chore/outbox-reconcile-and-jogo-da-vida
 reviewer: "1 refutador (opus, mandato de REFUTAR, default REPROVADO na dúvida) sobre o artefato COMPLETO, seguindo a calibração da sessão anterior (a 1ª passada rende os achados de PRODUTO). Antes dele, o próprio DOGFOOD da adoção — executar o artefato, não ler o diff — achou 3 defeitos."
-reviewed_diff_sha256: 96ea23ca79643e3692fc8aa6f9ca3756315726a8a4ab4b9111c5c4e0ae7f38dd
+reviewed_diff_sha256: 68e87e8e583de08b16c0fcd4e226f765cbb08d851d456d14d83cdc148774a20b
 findings_total: 17
 findings_real: 17
 verdict: APROVADO
