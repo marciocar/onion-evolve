@@ -7613,13 +7613,45 @@ run_regen_baselines_selftests() {
   else record_fail "regen-baselines: no-op" "rc=${rc} (esperado 0) em alvo sem maquinaria"; fi
   rm -rf "${d}"
 
+  # (f) FORMAS DE CHAVE SEM SEPARADOR — `path<TAB>contagem` e o CAMINHO NU. O filtro exigia `::` ou
+  #     `|`, então essas duas passavam INTEIRAS e o adotante herdava a dívida do CORE, com a métrica
+  #     de saúde dele nascendo inflada para sempre. Medido no dia em que o baseline de caminho nu
+  #     estreou: 4 chaves do core sobreviviam no alvo, e as 9 estrangeiras do pipe-verdict também.
+  d="$(mktemp -d)"
+  mkdir -p "${d}/.claude/validation" "${d}/docs/meu"
+  printf 'role: adopted\n' > "${d}/.claude/.onion-version"
+  printf 'meu\n' > "${d}/docs/meu/existe.kg.yaml"
+  # três formas na MESMA baseline: nu-que-existe (fica), nu-que-não-existe (cai), TAB (cai), sem barra (fica)
+  printf '# c\ndocs/meu/existe.kg.yaml\ndocs/do-core/some.kg.yaml\ndocs/do-core/outro.sh\t7\nSEM_BARRA_NAO_E_CAMINHO\n' \
+    > "${d}/.claude/validation/kg-yaml-validity-baseline.txt"
+  ( cd "${d}" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm base ) >/dev/null 2>&1 || true
+  bash "${helper}" "${d}" >/dev/null 2>&1 || true
+  local _b="${d}/.claude/validation/kg-yaml-validity-baseline.txt"
+  if grep -q 'docs/meu/existe' "${_b}" && ! grep -q 'docs/do-core/some' "${_b}" \
+     && ! grep -q 'docs/do-core/outro' "${_b}" && grep -q 'SEM_BARRA' "${_b}"; then
+    record_pass "regen-baselines: (f) caminho NU e chave com TAB são filtrados; o que existe e o que não é caminho ficam"
+  else record_fail "regen-baselines: (f) formas de chave" "filtro cego a chave sem separador — o adotante herda dívida do core: $(tr '\n' ' ' < "${_b}")"; fi
+  rm -rf "${d}"
+
   # (e) o relatório não pode sair DEFORMADO: `grep -c` sem casamento imprime 0 E sai 1, então
   #     `grep -c || echo 0` emitia "0\n0" e quebrava a linha do relatório (defeito real, mesmo dia).
   d="$(mktemp -d)"
   git -C "${REPO_ROOT}" archive HEAD -- .claude/validation 2>/dev/null | tar -x -C "${d}" 2>/dev/null
   printf 'role: adopted\n' > "${d}/.claude/.onion-version"
-  out="$(bash "${helper}" "${d}" 2>/dev/null | grep -c 'chave(s)' || true)"
-  local lines; lines="$(bash "${helper}" "${d}" 2>/dev/null | grep -c '^  [✓✗]' || true)"
+  # ⚠️ O ALVO TEM DE SER UM REPO GIT — e não era. Adoção só existe sobre repo git, mas este sandbox
+  #    era um diretório solto, e emissor nenhum reclamava porque nenhum precisava de git. O primeiro
+  #    que precisou (kg-yaml-validity, cujo corpus é "grafo VERSIONADO") saiu 2 e deformou o relatório
+  #    — o CI pegou, a bancada local não, porque o sandbox nasce de `git archive HEAD` e o emissor só
+  #    passou a existir no HEAD depois do commit. Guarda cujo material de teste é irreal não guarda.
+  ( cd "${d}" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm base ) >/dev/null 2>&1 || true
+  # ⚠️ A ASSERÇÃO CONTA AS TRÊS FORMAS DE LINHA, não duas. O relatório tem `✓` (emitiu/filtrou),
+  #    `✗` (emissor falhou) e `·` (intacto) — e o modo depende de o baseline já estar VERSIONADO no
+  #    alvo. Ao tornar o sandbox um repo git de verdade, o modo virou "filtra" e as linhas `·`
+  #    passaram a existir; a asserção antiga só olhava `✓✗` e reprovava um relatório correto. O que
+  #    ela precisa provar continua sendo o mesmo: UMA linha bem-formada por baseline, nenhuma
+  #    deformada (o defeito real do `grep -c || echo 0`, que emitia "0\n0").
+  out="$(bash "${helper}" "${d}" 2>/dev/null | grep -cE 'chave\(s\)|emissor falhou' || true)"
+  local lines; lines="$(bash "${helper}" "${d}" 2>/dev/null | grep -c '^  [✓✗·]' || true)"
   if [ "${out}" = "${lines}" ] && [ "${out}" -gt 0 ]; then
     record_pass "regen-baselines: uma linha por baseline (relatório não deformado)"
   else record_fail "regen-baselines: relatório" "linhas com 'chave(s)'=${out} != linhas ✓/✗=${lines}"; fi

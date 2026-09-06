@@ -2,9 +2,9 @@
 title: "Resíduo da passada adversarial — o selo do maestro e a guarda reprovada duas vezes"
 date: 2026-09-06
 branch: fix/kg-yaml-validity-ratchet
-reviewed_diff_sha256: b5bb3dd41f276c23dc9041991d5d70a2c2fc59f35cca7c47ed7435a8856fe2c6
-findings_total: 19
-findings_real: 17
+reviewed_diff_sha256: 0935af6c8faeef9f0865136bd8f7766a61224b3e6dd4a6ed3b877bc5d97773c6
+findings_total: 21
+findings_real: 19
 tokens: 317211
 duration_min: 20
 verdict: REPROVADO-E-CURADO
@@ -99,3 +99,18 @@ novo `--status-tsv`, aditivo. Com ele: **1 de 90 grafos muda**, e é o caso alvo
 `ANOTAR` declarados: `regen-baselines --auto` não reconhece a forma de chave deste baseline (inócuo, o
 caminho de emissão funciona e foi provado em sandbox de adotante) e o escopo de `--only` herdado dos
 irmãos. Ambos ficam nomeados aqui em vez de silenciados.
+
+## Adendo — o CI achou o que a bancada local não podia achar
+
+O caso `regen-baselines: relatório` monta o sandbox com `git archive HEAD`: antes do commit, o emissor
+novo **não existia no HEAD**, então ele nunca era exercitado ali. Depois do commit, foi — e reprovou.
+Duas causas: o sandbox **não era um repo git** (adoção só existe sobre git; emissor nenhum reclamava
+porque nenhum precisava dele até o meu) e a asserção contava **duas das três** formas de linha do
+relatório.
+
+E isso derrubou o meu próprio `ANOTAR` do C1: o filtro de baseline era cego a chave **sem separador**.
+`path<TAB>contagem` e o **caminho nu** passavam inteiros, e **o adotante herdava a dívida do core** —
+`kg-yaml-validity` 4→0 e `pipe-verdict` **24→15** depois da cura, ou seja, 9 chaves estrangeiras
+sobreviviam em todo adotante sem que ninguém visse. Não era inócuo: inflava a métrica de saúde para
+sempre. Caso de bancada com as quatro formas na mesma baseline, e o mutante que devolve o
+comportamento antigo reprova.
