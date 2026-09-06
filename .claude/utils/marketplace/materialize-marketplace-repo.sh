@@ -66,7 +66,7 @@ JSON
 fi
 
 # Monta cada plugin publicável fresco no TARGET (SRC=core lê a fonte; DEST=alvo/plugins/<nome>).
-count=0
+count=0; PRODUZIDOS=""
 for m in "${VDIR}"/*.manifest.sh; do
   [ -f "${m}" ] || continue
   case "$(basename "${m}")" in __*) continue ;; esac   # ignora fixtures de teste
@@ -75,12 +75,14 @@ for m in "${VDIR}"/*.manifest.sh; do
   rm -rf "${TARGET}/plugins/${pname}"
   if bash "${ASM}" "${m}" "${SRC}" "${TARGET}/plugins/${pname}" >/dev/null 2>&1; then
     echo "  ✓ ${pname}"
+    PRODUZIDOS="${PRODUZIDOS} ${pname}"
     count=$((count+1))
   else
     echo "ERRO: falha ao montar '${pname}' de ${m}." >&2; exit 2
   fi
 done
 [ "${count}" -gt 0 ] || { echo "ERRO: nenhum plugin montado." >&2; exit 2; }
+
 
 # 2ª GUARDA DE MOAT (cinto-e-suspensório): nenhum plugin materializado pode conter ARQUIVO de
 # meta-fábrica nem grafo privado. A REGRA 61 já barra na declaração; aqui barra no resultado.
@@ -100,6 +102,48 @@ if [ -n "${leak}" ]; then
   exit 3
 fi
 
+# ---------------------------------------------------------------------------
+# PODA — plugin que SUMIU do core tem de sumir do marketplace.
+#
+# POR QUE EXISTE (medido 2026-09-06, ao materializar para publicar a consolidação 8→5). O laço de
+# build só remove o diretório do plugin que está prestes a reconstruir. Plugin que deixou de existir
+# no core NUNCA era removido do alvo — e o `marketplace.json` é gerado VARRENDO `TARGET/plugins/`,
+# então herdava os órfãos: 5 construídos, 8 diretórios, 8 entradas no catálogo, e o commit dizendo
+# "materializa (5 plugins)". `declarado != verificado` no artefato que vai para o PÚBLICO.
+#
+# ⚠️ QUATRO CICATRIZES DE UMA PASSADA ADVERSARIAL, todas medidas, nenhuma hipotética:
+#   (a) `rm -rf "${dir}/"` — com a BARRA FINAL que o glob `*/` sempre produz — ATRAVESSA SYMLINK e
+#       apaga o conteúdo do ALVO, fora do TARGET, com rc=0 e o link sobrevivendo para repetir na
+#       rodada seguinte. Aqui: symlink nunca é podado (só reportado), e o `rm` usa `${_d%/}`.
+#   (b) o marcador de "foi este script que gerou" NÃO é `plugin.json` (isso é marcador de SER
+#       plugin): é `provenance.json`, que o assemble escreve. Com `plugin.json`, um plugin que o
+#       maestro publicasse à mão no marketplace seria APAGADO — perda de dado no repo dele.
+#   (c) a poda enumerava com glob (cego a dot-dir) e o gerador do catálogo com `find` (que enxerga):
+#       um órfão OCULTO sobrevivia à poda E entrava no catálogo, mantendo vivo o próprio sintoma
+#       que esta seção existe para matar. Aqui a enumeração inclui ocultos.
+#   (d) a poda rodava ANTES da guarda de moat: um abort (exit 3) deixava o alvo PIOR que antes —
+#       catálogo apontando para diretório já apagado, irreversível. Agora roda DEPOIS.
+podados=""; simbolicos=""
+if [ -d "${TARGET}/plugins" ]; then
+  while IFS= read -r _d; do
+    [ -n "${_d}" ] || continue
+    _n="$(basename "${_d}")"
+    case " ${PRODUZIDOS} " in *" ${_n} "*) continue ;; esac
+    if [ -L "${_d}" ]; then
+      simbolicos="${simbolicos} ${_n}"; continue          # NUNCA seguir link para apagar
+    fi
+    if [ -f "${_d}/.claude-plugin/provenance.json" ]; then
+      rm -rf "${_d%/}"; podados="${podados} ${_n}"
+    else
+      echo "  ⚠️  ${_n}: em plugins/ sem provenance.json — NÃO podado (não foi gerado por este script)" >&2
+    fi
+  done <<EOF
+$(find "${TARGET}/plugins" -mindepth 1 -maxdepth 1 \( -type d -o -type l \) 2>/dev/null | LC_ALL=C sort)
+EOF
+fi
+[ -z "${podados}" ]   || echo "  ⊘ podado(s) do marketplace (não existem mais no core):${podados}"
+[ -z "${simbolicos}" ] || echo "  ⚠️  link(s) simbólico(s) em plugins/ IGNORADO(s) pela poda (apagar através deles sairia do alvo):${simbolicos}" >&2
+
 # Gera o marketplace.json self-contained (varre TARGET/plugins/*, preserva o topo semeado acima).
 bash "${GEN}" "${TARGET}" > "${TARGET}/.claude-plugin/marketplace.json.new" 2>/dev/null \
   && mv "${TARGET}/.claude-plugin/marketplace.json.new" "${TARGET}/.claude-plugin/marketplace.json" \
@@ -109,7 +153,14 @@ bash "${GEN}" "${TARGET}" > "${TARGET}/.claude-plugin/marketplace.json.new" 2>/d
 # (quick start slash+CLI, tabela de plugins com o que cada um traz, manter em dia, requisitos, política de versão, moat).
 bash "${HERE}/marketplace-readme.sh" "${TARGET}" "${MKT_NAME}" >&2 || { echo "ERRO: marketplace-readme.sh falhou" >&2; exit 2; }
 
-echo "Onion: marketplace '${MKT_NAME}' materializado em ${TARGET} (${count} plugins)."
+# ⚠️ A MENSAGEM DIZ AS DUAS CONTAS QUANDO ELAS DIVERGEM. `count` é quanto veio do CORE; o catálogo
+#    pode ter mais (plugin que o dono do marketplace publicou à mão, preservado pela poda). Dizer só
+#    um número num artefato público é a mesma classe de `declarado != verificado` que a poda cura.
+CAT_COUNT="$(python3 -c "import json,sys;print(len(json.load(open(sys.argv[1]))['plugins']))" \
+             "${TARGET}/.claude-plugin/marketplace.json" 2>/dev/null || printf '%s' "${count}")"
+if [ "${CAT_COUNT}" = "${count}" ]; then MSG_COUNT="${count} plugins"
+else MSG_COUNT="${count} do core · ${CAT_COUNT} no catálogo"; fi
+echo "Onion: marketplace '${MKT_NAME}' materializado em ${TARGET} (${MSG_COUNT})."
 
 # I3: comita NO alvo (escritor único = o repo do maestro), NUNCA push.
 if [ "${DO_COMMIT}" -eq 1 ]; then
@@ -118,7 +169,7 @@ if [ "${DO_COMMIT}" -eq 1 ]; then
   if git -C "${TARGET}" diff --cached --quiet 2>/dev/null; then
     echo "  (nada a commitar — já atualizado)"
   else
-    git -C "${TARGET}" commit -q --no-verify -m "chore(marketplace): materializa ${MKT_NAME} (${count} plugins) do source Onion" \
+    git -C "${TARGET}" commit -q --no-verify -m "chore(marketplace): materializa ${MKT_NAME} (${MSG_COUNT}) do source Onion" \
       && echo "  ✓ commit no alvo (SEM push — I3: o push é human-gated)."
   fi
 fi
