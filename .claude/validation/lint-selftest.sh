@@ -1152,6 +1152,75 @@ run_materialize_repo_selftests() {
   if [ "${leak}" = "0" ]; then
     record_pass "materialize-repo: (b) zero fonte de meta-fábrica/grafo no repo público (moat intacto)"
   else record_fail "materialize-repo: (b)" "${leak} vazamento(s) de moat no repo materializado"; fi
+  # (c) PODA — plugin que SUMIU do core tem de sumir do marketplace, e o catálogo refletir isso.
+  #     Medido 2026-09-06 ao materializar a consolidação 8→5: o laço só removia o diretório que ia
+  #     reconstruir, os órfãos sobreviviam, o catálogo (que varre `plugins/`) os herdava — 5
+  #     construídos, 8 no disco, 8 no catálogo, commit dizendo "5". No artefato que vai a PÚBLICO.
+  #
+  # ⚠️ ESTE BLOCO É CICATRIZ DE PASSADA ADVERSARIAL: a 1ª versão do caso (c) deixou QUATRO mutantes
+  #    vivos. Cada asserção abaixo mata um deles, e a lição está no par: um caso que compara dois
+  #    números que podem ZERAR JUNTOS (`catálogo == construídos`) passa quando a poda apaga tudo.
+  local _built _o _mans
+  _mans="$(find "${SCRIPT_DIR}/../utils/marketplace/verticals" -maxdepth 1 -name '*.manifest.sh' \
+            ! -name '__*' 2>/dev/null | grep -c . || true)"
+  _built="$(find "${tgt}/plugins" -mindepth 1 -maxdepth 1 -type d 2>/dev/null | grep -c . || true)"
+  # órfão normal · órfão OCULTO (a poda por glob era cega a dot-dir e o gerador do catálogo não)
+  for _o in __orfao_um__ .__orfao_oculto__; do
+    mkdir -p "${tgt}/plugins/${_o}/.claude-plugin"
+    printf '{"name":"%s","version":"0.0.1"}\n' "${_o}" > "${tgt}/plugins/${_o}/.claude-plugin/plugin.json"
+    printf '{"note":"gerado por assemble-plugin.sh"}\n' > "${tgt}/plugins/${_o}/.claude-plugin/provenance.json"
+  done
+  # plugin do DONO do marketplace: tem plugin.json, NÃO tem provenance → a poda não pode matar
+  mkdir -p "${tgt}/plugins/__do_dono__/.claude-plugin"
+  printf '{"name":"__do_dono__","version":"9.9.9"}\n' > "${tgt}/plugins/__do_dono__/.claude-plugin/plugin.json"
+  # nome que é PREFIXO de um produzido: pega match-por-substring sem o padding de espaços
+  mkdir -p "${tgt}/plugins/onio/.claude-plugin"
+  printf '{"name":"onio","version":"0.0.1"}\n' > "${tgt}/plugins/onio/.claude-plugin/plugin.json"
+  printf '{"note":"gerado por assemble-plugin.sh"}\n' > "${tgt}/plugins/onio/.claude-plugin/provenance.json"
+  # SYMLINK para fora do alvo com um segredo dentro: `rm -rf dir/` atravessa link e apaga o ALVO
+  local _outside; _outside="$(mktemp -d)"
+  printf 'nao apague\n' > "${_outside}/segredo.txt"
+  mkdir -p "${_outside}/.claude-plugin"; printf '{"note":"gerado por assemble-plugin.sh"}\n' > "${_outside}/.claude-plugin/provenance.json"
+  ln -s "${_outside}" "${tgt}/plugins/__link_para_outside__"
+  local _out2; rc=0; _out2="$(bash "${helper}" "${tgt}" --no-commit 2>&1)" || rc=$?
+  local _cat
+  _cat="$(python3 -c "import json,sys;print(len(json.load(open(sys.argv[1]))['plugins']))" "${tgt}/.claude-plugin/marketplace.json" 2>/dev/null || echo -1)"
+  local _fails=""
+  [ "${rc}" -eq 0 ] || _fails="${_fails} rc=${rc}"
+  [ "${_built}" -ge "${_mans}" ] 2>/dev/null || _fails="${_fails} construídos=${_built}<manifestos=${_mans}(vacuidade)"
+  [ ! -d "${tgt}/plugins/__orfao_um__" ]        || _fails="${_fails} órfão-sobreviveu"
+  [ ! -d "${tgt}/plugins/.__orfao_oculto__" ]   || _fails="${_fails} órfão-OCULTO-sobreviveu"
+  [ ! -d "${tgt}/plugins/onio" ]                || _fails="${_fails} órfão-prefixo-sobreviveu"
+  [ -d "${tgt}/plugins/__do_dono__" ]           || _fails="${_fails} APAGOU-plugin-sem-provenance(do dono)"
+  [ -f "${_outside}/segredo.txt" ]                 || _fails="${_fails} APAGOU-FORA-DO-ALVO-pelo-symlink"
+  [ "${_cat}" -ge "${_mans}" ] 2>/dev/null      || _fails="${_fails} catálogo=${_cat}<manifestos=${_mans}"
+  grep -q '⊘ podado' <<< "${_out2}"             || _fails="${_fails} poda-SILENCIOSA(relatório não diz o que apagou)"
+  grep -q 'NÃO podado' <<< "${_out2}"           || _fails="${_fails} preservação-silenciosa(não avisa o que deixou)"
+  grep -q 'simbólico' <<< "${_out2}"            || _fails="${_fails} symlink-ignorado-em-silêncio"
+  if [ -z "${_fails}" ]; then
+    record_pass "materialize-repo: (c) poda: órfão (inclusive OCULTO e prefixo) cai · plugin sem provenance FICA · symlink não é seguido · relatório diz tudo"
+  else record_fail "materialize-repo: (c) poda" "${_fails} — saída: $(tr '\n' ' ' <<< "${_out2}" | cut -c1-300)"; fi
+  rm -rf "${_outside}"
+  # (d) A SEGUNDA CAMADA, que o caso (c) NÃO alcança — e dizer isso é o ponto. Com o guarda `[ -L ]`
+  #     ativo, a barra final do `rm` nunca é exercitada: o mutante que a devolve SOBREVIVE ao (c),
+  #     medido. Defesa em profundidade inalcançável apodrece em silêncio, então aqui ela é fixada em
+  #     duas frentes: (1) o COMPORTAMENTO do `rm` é medido de verdade num sandbox, para que a razão
+  #     de existir do `%/` fique provada e não vire folclore; (2) e o script é conferido por forma —
+  #     a única asserção estrutural desta família, declarada como tal em vez de disfarçada.
+  local _sb; _sb="$(mktemp -d)"; mkdir -p "${_sb}/real" "${_sb}/p"
+  printf 'x\n' > "${_sb}/real/dado.txt"; ln -s "${_sb}/real" "${_sb}/p/link"
+  rm -rf "${_sb}/p/link/" 2>/dev/null || true
+  local _slash_deleted=0; [ -f "${_sb}/real/dado.txt" ] || _slash_deleted=1
+  printf 'x\n' > "${_sb}/real/dado.txt"
+  local _p="${_sb}/p/link/"; rm -rf "${_p%/}" 2>/dev/null || true
+  local _noslash_kept=0; [ -f "${_sb}/real/dado.txt" ] && _noslash_kept=1
+  rm -rf "${_sb}"
+  if [ "${_slash_deleted}" = "1" ] && [ "${_noslash_kept}" = "1" ] \
+     && grep -q 'rm -rf "${_d%/}"' "${helper}"; then
+    record_pass "materialize-repo: (d) rm -rf com BARRA atravessa symlink e sem barra nao — medido; o helper usa a forma segura"
+  else
+    record_fail "materialize-repo: (d)" "com-barra-apagou=${_slash_deleted} sem-barra-preservou=${_noslash_kept}; o helper usa a forma com barra? (a 2ª camada da poda está inerte)"
+  fi
   rm -rf "$(dirname "${tgt}")" 2>/dev/null
 }
 
