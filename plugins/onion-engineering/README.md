@@ -2,7 +2,7 @@
 
 Vertical de engenharia do Onion: fluxo faseado plan→start→work→pre-pr→pr→pr-update (GitFlow + sessões persistentes), gates pré-PR, especialistas de código (Node, React, Postgres, NX, Docker, segurança) e testes (unit/integration/e2e, estratégia de teste, QA story points).
 
-**Versão** `0.1.91` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
+**Versão** `0.1.92` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
 
 ## Instalar
 
@@ -97,7 +97,7 @@ Invocação: `/onion-engineering:<comando>` (namespace do plugin).
 | Campo | Valor |
 |---|---|
 | Fonte | `marciocar/onion-evolve` |
-| tree_sha (hash do conteúdo das fontes) | `68251c3f7306` |
+| tree_sha (hash do conteúdo das fontes) | `2ed627947f96` |
 
 Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 

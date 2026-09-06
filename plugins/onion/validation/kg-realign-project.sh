@@ -51,20 +51,40 @@ bash "$RADAR" "$GRAPH" --integrity --schema >/dev/null 2>&1 \
 EDGES="$(mktemp)"; FRESH="$(mktemp)"; trap 'rm -f "$EDGES" "$FRESH"' EXIT
 bash "$RADAR" "$GRAPH" --triples       2>/dev/null > "$EDGES"
 bash "$RADAR" "$GRAPH" --freshness-tsv 2>/dev/null > "$FRESH"
+# ⚠️ FEED PRÓPRIO PARA O STATUS. O `--freshness-tsv` OMITE nó de atenção zero — e todo `refuted` tem
+#    atenção zero, ou seja, o superador morto é exatamente quem falta ali. Usar o feed errado fazia a
+#    cura abaixo virar no-op silencioso (medido: 0 de 90 grafos mudaram, inclusive o que devia mudar).
+STATUS="$(mktemp)"; trap 'rm -f "${STATUS}"' EXIT
+bash "$RADAR" "$GRAPH" --status-tsv 2>/dev/null > "$STATUS"
 
 # Motor de classificação — 1 awk lê arestas + frescor e emite:  camada \t tipo \t atenção \t id \t rótulo-da-ação
+# ⚠️ TRÊS PASSADAS, e a 1ª existe por uma DIVERGÊNCIA DE DOUTRINA MEDIDA (2026-09-06). O radar
+#    exclui da reconciliação o superador MORTO — `supersederConta` (kg-radar.sh), com o comentário
+#    "os mortos (refuted/superseded), cuja própria superação é duvidosa". A camada 1 daqui contava
+#    QUALQUER aresta SUPERSEDES/REFUTES, então um alvo legitimamente reaberto sob um superador que
+#    CAIU virava drift tipo-(c) PERMANENTE: o radar dizia ✅ e o realign dizia REALINHAR, sobre o
+#    mesmo grafo. Duas doutrinas na mesma casa é o defeito que o próprio comentário do radar nomeia.
+#    Agora o status do superador é lido ANTES das arestas, e só superador VIVO cria dever de Aufhebung.
 FINDINGS="$(awk -v thr="$THRESH" '
-  # ---- fase 1: arestas (from EDGE to) ----
-  FILENAME==ARGV[1] {
+  FNR==1 { pass++ }
+  # ---- passada 1: status de cada nó (para saber se o SUPERADOR está vivo) ----
+  pass==1 { nodeStatus[$1]=$2; next }
+  # ---- passada 2: arestas (from EDGE to) ----
+  pass==2 {
     from=$1; e=$2; to=$3
     if (e=="DEPENDS_ON")      downstream[to]++            # to tem dependente a jusante (from precisa de to)
-    else if (e=="SUPERSEDES") { supTarget[to]=1 }        # to foi superado
-    else if (e=="REFUTES")    { refTarget[to]=1 }        # to foi refutado
+    else if (e=="SUPERSEDES" || e=="REFUTES") {
+      # o mesmo critério do radar: superador `open`/`refuted`/`superseded` NÃO conta
+      st = (from in nodeStatus) ? nodeStatus[from] : ""
+      if (st != "open" && st != "refuted" && st != "superseded") {
+        if (e=="SUPERSEDES") supTarget[to]=1; else refTarget[to]=1
+      }
+    }
     else if (e=="SUPPORTS")   { supports[to]++ }         # to recebe apoio (evidência)
     if (e=="TRACES_TO" || e=="SUPPORTS") binding[from]=1 # from tem vínculo declarado
     next
   }
-  # ---- fase 2: frescor (id type plane status impact conf att vat vagainst trace verdict) ----
+  # ---- passada 3: frescor (id type plane status impact conf att vat vagainst trace verdict) ----
   {
     id=$1; typ=$2; st=$4; imp=$5+0; att=$7+0; trace=$10; verdict=$11
     down = (id in downstream) ? downstream[id] : 0
@@ -93,7 +113,7 @@ FINDINGS="$(awk -v thr="$THRESH" '
       print "3\tbind\t" att "\t" id "\tbinding-drift: decisão sem trace:, sem TRACES_TO/SUPPORTS de saída E sem apoio de entrada — vínculo objetivo↔artefato ausente (nó solto)"
     }
   }
-' "$EDGES" "$FRESH")"
+' "$STATUS" "$EDGES" "$FRESH")"
 
 # agregados
 n_c=$(printf '%s\n' "$FINDINGS" | awk -F'\t' '$2=="c"' | grep -c . || true)

@@ -3941,6 +3941,62 @@ check_marketplace_root_sync() {
 }
 
 # ===========================================================================
+# REGRA 78 — `.kg.yaml` versionado é YAML VÁLIDO, com catraca [HARD + SOFT]
+# previne: grafo que o kg-radar aceita (parser awk sobre TEXTO) e que qualquer consumidor com lib YAML rejeita
+#   Medido 2026-09-06: CINCO .kg.yaml versionados com `kg-radar --integrity --schema` exit 0 e
+#   `yaml.safe_load` estourando — aspas não escapadas em `label:`/`trace:`, barra invertida antes de
+#   cifrão. O quinto foi escrito no PR que DENUNCIAVA a classe, dentro do label que a descreve: radar
+#   verde, lint 0 HARD, CI verde, merge. Descrever a classe não protege contra ela.
+#   Dano além da estética: a verdade do corpus passa a ser a do awk, não a do YAML — e foi essa fresta
+#   que permitiu, na bancada do predicado de selo, forjar uma aresta REFUTES DENTRO de um `label: |`.
+#   Cura é edição manual arquivo a arquivo, logo CATRACA: passivo no baseline = SOFT; novo = HARD.
+#   Lógica em kg-yaml-validity-check.sh; baseline em kg-yaml-validity-baseline.txt.
+# ===========================================================================
+check_kg_yaml_validity() {
+  local helper="${SCRIPT_DIR}/kg-yaml-validity-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      *.kg.yaml|*/kg-yaml-validity-check.sh|*/kg-yaml-validity-baseline.txt) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  # ⚠️ A FIAÇÃO NÃO PODE ENGOLIR O `exit 2` DO HELPER. O padrão copiado dos irmãos
+  #    (`... 2>/dev/null || true`) descarta código de saída E stderr — e nos irmãos isso é inócuo
+  #    porque eles degradam para exit 0. Este helper NÃO: ele sai 2 dizendo NAO VERIFICADO quando
+  #    PyYAML/git faltam, e PyYAML ausente é condição real medida nesta máquina. Com o `|| true`, a
+  #    REGRA 78 simplesmente não rodava e o lint declarava gate limpo — zero violação, zero stderr.
+  #    O mesmo anti-padrão já está descrito neste arquivo em `_gen_into`. Aqui o rc é LIDO.
+  # ⚠️ rc capturado com `if cmd; then … else … fi`, não com atribuição solta — é o "Suspeito nº 1"
+  #    que a bancada desta casa nomeia para morte-sob-`set -e`.
+  #    ⚠️ CORREÇÃO DE UMA AFIRMAÇÃO MINHA: eu escrevi aqui que ESTA função derrubava o lint sem
+  #    PyYAML. FALSO, e a medição que me convenceu estava viciada — eu rodava uma CÓPIA do lint em
+  #    /tmp, o que muda `SCRIPT_DIR` e desvia o caminho inteiro. Medido in-tree nos dois lados:
+  #    `origin/main` e esta branch abortam IGUALMENTE logo após a REGRA 39 quando falta `python3`.
+  #    O defeito é PRÉ-EXISTENTE e maior que esta regra (o sumário nunca sai), e está registrado
+  #    como fio aberto. O rigor abaixo continua valendo por si.
+  local out err rc sev cls path msg
+  err="$(mktemp 2>/dev/null || echo /dev/null)"; rc=0; out=""
+  if out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${err}")"; then rc=0; else rc=$?; fi
+  if [ "${rc:-0}" -ge 2 ] 2>/dev/null; then
+    violation "SOFT" "${REPO_ROOT}/.claude/validation/kg-yaml-validity-check.sh" \
+      "[kg-yaml/NAO-VERIFICADO] a guarda de validade YAML NÃO RODOU (rc=${rc}: $(head -1 "${err}" 2>/dev/null)) — o corpus não foi verificado; isto não é aprovação"
+    rm -f "${err}"; return 0
+  fi
+  rm -f "${err}"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev cls path msg; do
+    [ -n "${sev}" ] || continue
+    case "${path}" in /*) : ;; *) path="${REPO_ROOT}/${path#./}" ;; esac
+    violation "${sev}" "${path}" "[kg-yaml/${cls}] ${msg}"
+  done <<< "${out}"
+  # ⚠️ `return 0` EXPLÍCITO: o último `read` de um `while … done <<< …` devolve 1 (EOF) e a função
+  #    herdaria rc=1. Os irmãos escapam por acidente (degradam para saída vazia e retornam antes do
+  #    laço), não por desenho — aqui é explícito.
+  return 0
+}
+
+# ===========================================================================
 # REGRA 77 — Contrato de dependência entre plugins [HARD + SOFT]
 # previne: dois plugins embarcando a mesma skill/KB (cópias divergem) ou um plugin usando skill que só outro embarca sem declarar
 #   Medido 2026-09-04: onion e onion-work-tools embarcavam a mesma skill, o mesmo motor (3 md5) e a mesma
@@ -4040,6 +4096,7 @@ check_plugin_namespace
 check_plugin_hooks_resolvable
 check_plugin_bare_paths
 check_plugin_dead_links
+check_kg_yaml_validity
 check_marketplace_root_sync
 check_plugin_deps_contract
 

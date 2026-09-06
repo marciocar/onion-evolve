@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # kg-radar.sh — radar determinístico do Knowledge Graph SDAAL (motor soberano do core).
 #
-# Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--schema|--triples]
+# Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples]
 #      (sem flag = radar + state + reconcile + integrity + domain + provenance + freshness + schema)
 #
 # Doutrina: docs/knowledge-base/concepts/knowledge-graph-sdaal.md
@@ -90,7 +90,7 @@ STATUS_FACTOR="$(cat "${_LIB}")"
 
 FILE="${1:-}"
 MODE="${2:---all}"
-[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--schema|--triples]" >&2; exit 2; }
+[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples]" >&2; exit 2; }
 
 awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" "${STATUS_FACTOR}"'
 # ── DENYLIST, NÃO ALLOWLIST — a lição de 2026-08-07 ─────────────────────────────────────────
@@ -440,6 +440,17 @@ END {
   # LOCAL à fila (fazer status desconhecido SUBIR em vez de afundar onde o `--top N` corta); aqui o
   # consumidor é a paridade, que compara a lente contra o PAINEL. Usar 1.3 faria toda divergência de
   # status-fora-do-enum acusar peso, sem que nenhuma das duas implementações estivesse errada.
+  # --status-tsv — `id<TAB>status` de TODOS os nós, inclusive os de atenção ZERO.
+  # POR QUE EXISTE (2026-09-06): o `--freshness-tsv` OMITE o nó de atenção 0 (todo `refuted`), e o
+  # `kg-realign-project.sh` precisava justamente do status do SUPERADOR para aplicar o mesmo critério
+  # que este arquivo já aplica na reconciliação (`supersederConta`: superador morto não conta). Sem um
+  # feed completo, o realign acusava drift tipo-(c) PERMANENTE num grafo que este radar dava ✅ — duas
+  # doutrinas na mesma casa, sobre o mesmo grafo. Feed novo e aditivo; nenhum consumidor existente muda.
+  if (mode == "--status-tsv") {
+    for (i = 1; i <= nn; i++) printf "%s\t%s\n", order[i], nstatus[order[i]]
+    exit 0
+  }
+
   if (mode == "--weights-tsv") {
     for (i = 1; i <= nn; i++) {
       id = order[i]; sfw = statusFactor(nstatus[id]); if (sfw < 0) sfw = 0
