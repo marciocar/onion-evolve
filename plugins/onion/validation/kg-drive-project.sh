@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
+# raiz do plugin resolvida PELO PRÓPRIO ARQUIVO (o ambiente do shell não traz a variável)
+: "${CLAUDE_PLUGIN_ROOT:=$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)}"
 # =============================================================================
-# kg-drive-project.sh — o CENSO do /meta:drive: a FILA-PRONTA de um plano-grafo.
+# kg-drive-project.sh — o CENSO do /onion:drive: a FILA-PRONTA de um plano-grafo.
 #
 # Propósito : projetar, determinística e sem LLM, O QUE ESTÁ PRONTO PARA AVANÇAR
 #             num plano-grafo — os nós `status: open` cujos predecessores
@@ -18,14 +20,14 @@
 #             predecessor está SATISFEITO sse NÃO está no conjunto de abertos.
 #             (Só o `drive_kind:` opcional é lido do arquivo, à la owner: do backlog.)
 #
-# Uso       : bash .claude/validation/kg-drive-project.sh [<grafo.kg.yaml>] [--check]
+# Uso       : bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-drive-project.sh [<grafo.kg.yaml>] [--check]
 #             sem grafo → o plano de execução do core (fios-abertos.kg.yaml)
 #             --check   → só o veredito; exit 1 se há ABERTOS mas a FILA-PRONTA está
 #                         VAZIA (tudo bloqueado = anomalia de plano/deadlock)
 # =============================================================================
 set -uo pipefail
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"; cd "$ROOT"
-RADAR=".claude/validation/kg-radar.sh"
+RADAR="${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh"
 
 GRAPH_DEFAULT="docs/onion/graph/fios-abertos.kg.yaml"; GRAPH="$GRAPH_DEFAULT"; MODE="project"
 for a in "$@"; do
@@ -106,7 +108,7 @@ fi
 
 # projeção legível — a FILA-PRONTA que o driver consome
 printf '# Censo do plano — %s  ·  veredito: **%s**\n\n' "$(basename "$GRAPH" .kg.yaml)" "$V"
-printf '> Fila-pronta do `/meta:drive` (determinística, consome o radar). Nós `open` cujos\n'
+printf '> Fila-pronta do `/onion:drive` (determinística, consome o radar). Nós `open` cujos\n'
 printf '> predecessores `DEPENDS_ON` já fecharam, por atenção. `DEPENDS_ON` é GUARDA ("não faça B\n'
 printf '> antes de A"), não ordenação — a topológica dirigida é Fase 2 gated.\n\n'
 printf '**pronto=%s · bloqueado=%s · aberto=%s**\n\n' "$n_ready" "$n_blocked" "$n_open"

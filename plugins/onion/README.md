@@ -2,7 +2,7 @@
 
 Núcleo operacional do Sistema Onion: o orquestrador mestre (skill onion), runtime de knowledge graph (kg + radar soberano + kg-freshness), sessões e diário, orquestração de subagentes, condução (wizard/onboarding/retro), validação de meta-specs, co-evolução upstream e os adapters SDAAL de task-manager e forge.
 
-**Versão** `0.1.229` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
+**Versão** `0.1.235` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
 
 ## Instalar
 
@@ -22,12 +22,12 @@ claude plugin marketplace add marciocar/onion-plugins && claude plugin install o
 
 | Componente | Quantidade |
 |---|---|
-| Comandos | 20 |
+| Comandos | 22 |
 | Agentes | 2 |
 | Skills | 8 |
 | Hooks | 2 |
 
-**Capacidades (Capability Contract):** provê `master-orchestration`, `knowledge-graph-runtime`, `kg-freshness-reverify`, `sdaal-task-manager`, `sdaal-forge`, `session-runtime`, `dogfood-doctrine`, `language-standards`, `knowledge-graph-sdaal`, `learning-diary`, `orchestration`, `metaspec-validation`, `freshness-audits`, `constellation-map`, `co-evolution-upstream`, `guided-conduction`, `guided-onboarding`, `retro-feedback`; requer `skill:onion-orchestration`, `agent:metaspec-gate-keeper`.
+**Capacidades (Capability Contract):** provê `master-orchestration`, `knowledge-graph-runtime`, `kg-freshness-reverify`, `sdaal-task-manager`, `sdaal-forge`, `session-runtime`, `dogfood-doctrine`, `language-standards`, `knowledge-graph-sdaal`, `learning-diary`, `orchestration`, `metaspec-validation`, `freshness-audits`, `constellation-map`, `co-evolution-upstream`, `plan-graph-drive`, `plan-graph-realign`, `guided-conduction`, `guided-onboarding`, `retro-feedback`; requer `skill:onion-orchestration`, `agent:metaspec-gate-keeper`.
 
 ## Comandos
 
@@ -45,12 +45,14 @@ Invocação: `/onion:<comando>` (namespace do plugin).
 | `/onion:constellation` | 🗺️ O MAPA da Constelação de Estudos — visão macro das N estrelas (estudos discuss/*) lendo SÓ os metadados (frontmatter+Tier-0) de cada SEED. |
 | `/onion:context-freshness` | Audita o frescor dos contextos de domínio (docs/business-context/, docs/technical-context/, docs/compliance-context/) tratando-os como SSOT viva, não snapshot. |
 | `/onion:diary` | Gerencia o diário de aprendizado da instância Onion — sistema de breadcrumbs para o Transformer. |
+| `/onion:drive` | Conduz um plano-grafo até o fim com rigor Onion — censo→avança→Elenxo→dogfood→realign→checkpoint (degrau AUDIT) |
 | `/onion:kb-freshness` | Audita cada KB em docs/knowledge-base/ contra o fluxo ATUAL do Sistema Onion (ferramenta Workflow nativa, padrões canônicos 2026, lineup de modelos Claude vige… |
 | `/onion:kg-freshness` | RE-VERIFICA contra o vivo os nós de um .kg.yaml — o que o radar apenas DETECTA. |
 | `/onion:kg` | Modela uma investigação/auditoria longa como Knowledge Graph SDAAL (.kg.yaml): claims/evidência/decisões tipados, arestas SUPPORTS/REFUTES/SUPERSEDES, planes D… |
 | `/onion:metaspec-validate` | Valida um artefato/decisão contra as metaspecs vigentes, aplicando a constituição do @metaspec-gate-keeper. |
 | `/onion:onion` | Ponto de entrada inteligente para o Sistema Onion. |
 | `/onion:orchestrate` | Orquestra subagentes em paralelo (fan-out/fan-in) sobre uma tarefa, via a ferramenta nativa Workflow. |
+| `/onion:realign` | Revisão em camadas da jornada do plano × o vivo — o "selo realinhado" (passado/presente/futuro) |
 | `/onion:recover` | Recupera a identidade Onion de um repo adotado que perdeu contato com o framework: regenera .onion-version ausente/incompleto e o skeleton do CLAUDE.md. |
 | `/onion:setup-code-review` | Setup, validação e otimização de code review automático no CI (GitHub Actions). |
 | `/onion:setup-integration` | Configura integrações do Sistema Onion (Task Managers, Gamma, etc). |
@@ -95,7 +97,7 @@ Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é 
 | Campo | Valor |
 |---|---|
 | Fonte | `marciocar/onion-evolve` |
-| tree_sha (hash do conteúdo das fontes) | `a7996336b5fb` |
+| tree_sha (hash do conteúdo das fontes) | `1ea1c90274a8` |
 
 Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 

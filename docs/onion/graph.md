@@ -88,10 +88,14 @@
 - **onion** --loads--> embed:kb/behavior-over-declaration.md
 - **onion** --loads--> embed:kb/knowledge-graph-sdaal.md
 - **onion** --loads--> embed:kb/onion-dogfooding-doctrine.md
+- **onion** --loads--> embed:kb/onion-drive-doctrine.md
 - **onion** --loads--> embed:kb/onion-elenxo-doctrine.md
+- **onion** --loads--> embed:kb/onion-kg-ontology-hierarchy.md
 - **onion** --loads--> when:diary -> run:validation/diary-index.sh
+- **onion** --loads--> when:drive -> run:validation/kg-drive-project.sh (censo determinístico) + validation/kg-seal-exception.sh (predicado do selo)
 - **onion** --loads--> when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)
 - **onion** --loads--> when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)
+- **onion** --loads--> when:realign -> run:validation/kg-realign-project.sh (verificador-por-turno; --check é o dente)
 - **onion** --loads--> when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)
 - **onion** --provides--> co-evolution-upstream
 - **onion** --provides--> constellation-map
@@ -107,6 +111,8 @@
 - **onion** --provides--> master-orchestration
 - **onion** --provides--> metaspec-validation
 - **onion** --provides--> orchestration
+- **onion** --provides--> plan-graph-drive
+- **onion** --provides--> plan-graph-realign
 - **onion** --provides--> retro-feedback
 - **onion** --provides--> sdaal-forge
 - **onion** --provides--> sdaal-task-manager
@@ -132,10 +138,14 @@
 - onion **loads** embed:kb/behavior-over-declaration.md
 - onion **loads** embed:kb/knowledge-graph-sdaal.md
 - onion **loads** embed:kb/onion-dogfooding-doctrine.md
+- onion **loads** embed:kb/onion-drive-doctrine.md
 - onion **loads** embed:kb/onion-elenxo-doctrine.md
+- onion **loads** embed:kb/onion-kg-ontology-hierarchy.md
 - onion **loads** when:diary -> run:validation/diary-index.sh
+- onion **loads** when:drive -> run:validation/kg-drive-project.sh (censo determinístico) + validation/kg-seal-exception.sh (predicado do selo)
 - onion **loads** when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)
 - onion **loads** when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)
+- onion **loads** when:realign -> run:validation/kg-realign-project.sh (verificador-por-turno; --check é o dente)
 - onion **loads** when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)
 - onion **provides** co-evolution-upstream
 - onion **provides** constellation-map
@@ -151,6 +161,8 @@
 - onion **provides** master-orchestration
 - onion **provides** metaspec-validation
 - onion **provides** orchestration
+- onion **provides** plan-graph-drive
+- onion **provides** plan-graph-realign
 - onion **provides** retro-feedback
 - onion **provides** sdaal-forge
 - onion **provides** sdaal-task-manager
@@ -485,10 +497,14 @@ onion	has-member	zen-engine-specialist
 onion	loads	embed:kb/behavior-over-declaration.md	
 onion	loads	embed:kb/knowledge-graph-sdaal.md	
 onion	loads	embed:kb/onion-dogfooding-doctrine.md	
+onion	loads	embed:kb/onion-drive-doctrine.md	
 onion	loads	embed:kb/onion-elenxo-doctrine.md	
+onion	loads	embed:kb/onion-kg-ontology-hierarchy.md	
 onion	loads	when:diary -> run:validation/diary-index.sh	
+onion	loads	when:drive -> run:validation/kg-drive-project.sh (censo determinístico) + validation/kg-seal-exception.sh (predicado do selo)	
 onion	loads	when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)	
 onion	loads	when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)	
+onion	loads	when:realign -> run:validation/kg-realign-project.sh (verificador-por-turno; --check é o dente)	
 onion	loads	when:warm-up|catch-up -> read(KG) via validation/kg-radar.sh (motor; o adotante tem os proprios .kg.yaml)	
 onion	provides	co-evolution-upstream	
 onion	provides	constellation-map	
@@ -504,6 +520,8 @@ onion	provides	learning-diary
 onion	provides	master-orchestration	
 onion	provides	metaspec-validation	
 onion	provides	orchestration	
+onion	provides	plan-graph-drive	
+onion	provides	plan-graph-realign	
 onion	provides	retro-feedback	
 onion	provides	sdaal-forge	
 onion	provides	sdaal-task-manager	
