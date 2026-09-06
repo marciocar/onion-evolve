@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# raiz do plugin resolvida PELO PRÓPRIO ARQUIVO (o ambiente do shell não traz a variável)
+: "${CLAUDE_PLUGIN_ROOT:=$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)}"
 # =============================================================================
 # kg-provenance-coverage.sh — GATE DE PROVENIÊNCIA INVERTIDO (com catraca)
 #

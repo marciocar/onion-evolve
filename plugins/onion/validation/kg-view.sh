@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# raiz do plugin resolvida PELO PRÓPRIO ARQUIVO (o ambiente do shell não traz a variável)
+: "${CLAUDE_PLUGIN_ROOT:=$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)}"
 # =============================================================================
 # kg-view.sh — PROJEÇÃO legível/consumível de um .kg.yaml.
 #

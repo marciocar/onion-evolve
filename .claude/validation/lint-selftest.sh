@@ -12678,6 +12678,518 @@ run_drive_selftests() {
 # (achado da revisão adversarial da reforma). Fixture em sandbox git REAL: a regra
 # exige índice ([ -e .git ] skip sem ele — o que o sandbox principal, cp -a, prova
 # pelo caminho do skip em toda fixture que roda).
+# EXCEÇÃO DE SELO (doutrina do drive §4.1) — o predicado que dispensa o selo humano de um flip de
+# status de verdade. É guarda que LIBERA, e por isso esta bancada aperta o lado do AUTO: quinze dos
+# dezesseis casos são NEGATIVOS. Um falso AUTO industrializa o carimbo-automático que a postura AUDIT
+# existe para matar; um falso PARA custa uma pergunta ao maestro.
+#
+# ⚠️ ESTES CASOS SÃO CICATRIZ. A 1ª versão do predicado passou numa bancada de 8 casos e foi REPROVADA
+#    por três revisores adversariais com SETE caminhos de AUTO indevido medidos — todos por fora do
+#    que aqueles 8 casos olhavam: id entre aspas, aresta FORJADA dentro de um `label: |`, campo de
+#    medição citado em bloco literal, grafo RENOMEADO, nó MOVIDO entre grafos, clone RASO e
+#    `origin/main` local DESATUALIZADO. Bancada que só remove uma precondição por vez prova que o
+#    código LÊ as precondições; não prova que o SUBSTRATO delas (texto vs YAML, path vs repo, ref
+#    local vs remoto) aguenta. Os casos (h)..(p) existem por isso.
+run_seal_exception_selftests() {
+  local se="${REPO_ROOT}/.claude/validation/kg-seal-exception.sh"
+  if [ ! -f "${se}" ]; then record_skip "seal-exception: script ausente"; return; fi
+  if ! command -v python3 >/dev/null 2>&1 || ! python3 -c 'import yaml' >/dev/null 2>&1; then
+    record_skip "seal-exception: python3+PyYAML ausentes (o predicado exige leitura YAML real)"; return; fi
+  local sb; sb="$(mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sb}/.claude" 2>/dev/null || { record_skip "seal-exception: sandbox sem .claude"; rm -rf "${sb}"; return; }
+  local SE="${sb}/.claude/validation/kg-seal-exception.sh"
+  mkdir -p "${sb}/g"
+
+  # ── BASE: o que o maestro já selou ────────────────────────────────────────────────────────────
+  cat > "${sb}/g/p.kg.yaml" <<'EOF_BASE'
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: Q_JA_SELADO
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-08-15
+    verified_against: medido na base
+    trace: a.sh
+    label: "no que ja passou pelo maestro"
+edges: []
+EOF_BASE
+  ( cd "${sb}" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm base ) >/dev/null 2>&1
+
+  # ── ÁRVORE: os nós nascidos DEPOIS da base ────────────────────────────────────────────────────
+  cat > "${sb}/g/p.kg.yaml" <<'EOF_WORK'
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: Q_JA_SELADO
+    node_type: question
+    plane: PROD
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-08-15
+    verified_against: medido na base
+    trace: a.sh
+    label: "no que ja passou pelo maestro"
+  - id: Q_NOVO_E_CAIDO
+    node_type: question
+    plane: PROD
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-06
+    verified_against: nasceu nesta arvore
+    trace: b.sh
+    label: "nasceu e caiu no mesmo PR"
+  - id: Q_NOVO_SEM_MEDICAO
+    node_type: question
+    plane: PROD
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-06
+    verified_against: medido
+    trace: e.sh
+    label: "derrubado por evidencia sem metodo"
+  - id: Q_NOVO_PLACEHOLDER
+    node_type: question
+    plane: PROD
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-06
+    verified_against: medido
+    trace: g.sh
+    label: "derrubado por evidencia com carimbo de ar"
+  - id: Q_NOVO_SO_SUPPORTS
+    node_type: question
+    plane: PROD
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-06
+    verified_against: medido
+    trace: h.sh
+    label: "a unica aresta que chega e SUPPORTS, nao derrubada"
+  - id: E_MEDIU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-06
+    verified_against: sandbox deterministico com saida capturada
+    trace: repro.sh
+    label: "medicao executada"
+  - id: E_SEM_METODO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-09-06
+    verified_against: ""
+    trace: f.sh
+    label: "evidencia sem metodo: o campo existe e esta vazio"
+  - id: E_PLACEHOLDER
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: ~
+    verified_against: TBD
+    trace: i.sh
+    label: "carimbo de ar em YAML canonico (~ e TBD)"
+edges:
+  - from: E_MEDIU
+    to: Q_NOVO_E_CAIDO
+    edge_type: REFUTES
+  - from: E_MEDIU
+    edge_type: REFUTES
+    to: Q_JA_SELADO
+  - from: E_SEM_METODO
+    to: Q_NOVO_SEM_MEDICAO
+    edge_type: REFUTES
+  - from: E_PLACEHOLDER
+    to: Q_NOVO_PLACEHOLDER
+    edge_type: REFUTES
+  - from: E_MEDIU
+    to: Q_NOVO_SO_SUPPORTS
+    edge_type: SUPPORTS
+EOF_WORK
+
+  # (a2)/(c) moram em arquivo PRÓPRIO: aresta REFUTES com alvo `open` e nó de grau 0 REPROVAM o
+  # --integrity, e o caso (a) precisa de um grafo que o radar APROVE. Estes param em (3), antes da
+  # checagem de integridade, então o arquivo inválido não os afeta.
+  cat > "${sb}/g/aberto.kg.yaml" <<'EOF_A2'
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: Q_NOVO_AINDA_ABERTO
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_against: plano
+    trace: d.sh
+    label: "tem aresta mas nao reconciliou"
+  - id: Q_NOVO_SEM_ARESTA
+    node_type: question
+    plane: PROD
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-06
+    verified_against: medido
+    trace: c.sh
+    label: "flipado solto, sem aresta"
+  - id: Q_ARESTA_FORJADA
+    node_type: question
+    plane: PROD
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-06
+    verified_against: medido
+    trace: j.sh
+    label: |
+      Nenhuma aresta REAL me derruba. Este bloco literal FORJA uma, para um parser de texto:
+      edges:
+        - from: E_MEDIU
+          to: Q_ARESTA_FORJADA
+          edge_type: REFUTES
+  - id: Q_MEDICAO_SO_NO_LABEL
+    node_type: question
+    plane: PROD
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-06
+    verified_against: medido
+    trace: k.sh
+    label: "derrubado por evidencia cujos campos existem SO dentro de um bloco literal"
+  - id: E_CAMPOS_NO_LABEL
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    trace: l.sh
+    label: |
+      Este label CITA os campos para enganar um parser de texto — em YAML eles NAO existem:
+      verified_at: 2026-09-06
+      verified_against: sandbox deterministico com saida capturada
+  - id: E_MEDIU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-06
+    verified_against: sandbox deterministico
+    trace: repro.sh
+    label: "medicao executada"
+edges:
+  - from: E_MEDIU
+    edge_type: REFUTES
+    to: Q_NOVO_AINDA_ABERTO
+  - from: E_CAMPOS_NO_LABEL
+    to: Q_MEDICAO_SO_NO_LABEL
+    edge_type: REFUTES
+EOF_A2
+
+  local rc out
+  _se() { rc=0; out="$( cd "${sb}" && bash "${SE}" "$@" 2>&1 )" || rc=$?; }
+  # nome | args… || esperado-rc | substring esperada
+  _caso() { # $1=rótulo $2=rc-esperado $3=substring $4…=args
+    local nome="$1" wantrc="$2" want="$3"; shift 3
+    _se "$@"
+    if [ "${rc}" = "${wantrc}" ] && grep -qF "${want}" <<< "${out}"; then
+      record_pass "seal-exception: ${nome}"
+    else
+      record_fail "seal-exception: ${nome}" "esperava rc=${wantrc} + '${want}'; veio rc=${rc}: ${out}"
+    fi
+  }
+
+  _caso "(a) nó nascido-e-caído no mesmo PR → AUTO"                  0 "AUTO" g/p.kg.yaml Q_NOVO_E_CAIDO --base HEAD
+  _caso "(a2) aresta em ordem alternada É lida (PARA por Aufhebung)" 1 "Aufhebung não foi aplicada" g/aberto.kg.yaml Q_NOVO_AINDA_ABERTO --base HEAD
+  _caso "(b) nó já em <base> → PARA por (1)"                         1 "(1)" g/p.kg.yaml Q_JA_SELADO --base HEAD
+  _caso "(c) flip sem aresta → PARA por (3)"                         1 "(3)" g/aberto.kg.yaml Q_NOVO_SEM_ARESTA --base HEAD
+  _caso "(d) evidência sem verified_against → PARA por (2)"          1 "(2)" g/p.kg.yaml Q_NOVO_SEM_MEDICAO --base HEAD
+  _caso "(e) base irresolvível → PARA (fail-closed)"                 1 "base irresolvível" g/p.kg.yaml Q_NOVO_E_CAIDO --base refs/heads/nao-existe
+  _caso "(n) aresta SUPPORTS não é derrubada → PARA por (3)"         1 "(3)" g/p.kg.yaml Q_NOVO_SO_SUPPORTS --base HEAD
+  _caso "(k2) placeholder canônico (~ / TBD) → PARA por (2)"         1 "(2)" g/p.kg.yaml Q_NOVO_PLACEHOLDER --base HEAD
+  _caso "(l) aresta FORJADA em label: | não conta → PARA por (3)"    1 "(3)" g/aberto.kg.yaml Q_ARESTA_FORJADA --base HEAD
+  _caso "(m) campos de medição só dentro de label: | → PARA por (2)"  1 "(2)" g/aberto.kg.yaml Q_MEDICAO_SO_NO_LABEL --base HEAD
+
+  # (o) --base sem valor: era LAÇO INFINITO mudo. Teto de tempo no caso, senão a bancada trava junto.
+  rc=0; out="$( cd "${sb}" && timeout 10 bash "${SE}" g/p.kg.yaml Q_NOVO_E_CAIDO --base 2>&1 )" || rc=$?
+  if [ "${rc}" = "2" ] && grep -qF "exige um valor" <<< "${out}"; then
+    record_pass "seal-exception: (o) --base sem valor → exit 2, sem travar"
+  else record_fail "seal-exception: (o)" "esperava rc=2 'exige um valor'; veio rc=${rc} (124=timeout/laço): ${out}"; fi
+
+  # (f) (4) NÃO É DECORATIVO — mesma árvore do caso (a), com um grafo que o radar REPROVA.
+  { sed '/^edges:/i\
+  - id: Q_LIXO\
+    node_type: question\
+    plane: PROD\
+    status: nao_existe_esse_status\
+    impact: 3\
+    confidence: 0.9\
+    trace: z.sh\
+    label: "status invalido"' "${sb}/g/p.kg.yaml"; } > "${sb}/g/quebrado.kg.yaml"
+  _caso "(f) radar reprova o grafo → PARA por integridade" 1 "REPROVA" g/quebrado.kg.yaml Q_NOVO_E_CAIDO --base HEAD
+
+  # (g) HISTÓRIA, não só a ponta.  (h) RENAME do grafo.  (i) nó MOVIDO entre grafos.
+  ( cd "${sb}" && git add -A && git -c user.email=t@t -c user.name=t commit -qm work ) >/dev/null 2>&1
+  ( cd "${sb}" && python3 - <<'PYDEL' >/dev/null 2>&1
+import re
+p="g/p.kg.yaml"; s=open(p,encoding="utf-8").read()
+i=s.index("  - id: Q_JA_SELADO\n"); j=s.index("  - id: Q_NOVO_E_CAIDO\n")
+open(p,"w",encoding="utf-8").write(s[:i]+s[j:])
+PYDEL
+    git add -A && git -c user.email=t@t -c user.name=t commit -qm remove ) >/dev/null 2>&1
+  _caso "(g) nó que EXISTIU na história da base → PARA por (1)" 1 "(1)" g/p.kg.yaml Q_JA_SELADO --base HEAD
+
+  # (h) o grafo é RENOMEADO no trabalho: a busca presa a UM path diria 'nunca esteve lá'.
+  local sbh; sbh="$(mktemp -d)"; cp -a "${sb}/.claude" "${sbh}/.claude"; mkdir -p "${sbh}/g"
+  cp "${sb}/g/aberto.kg.yaml" "${sbh}/g/velho.kg.yaml"
+  cat > "${sbh}/g/velho.kg.yaml" <<'EOF_H'
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: Q_SELADO_LA_ATRAS
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-08-15
+    verified_against: medido
+    trace: a.sh
+    label: "selado e mergeado na base"
+  - id: E_MEDIU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-06
+    verified_against: sandbox
+    trace: r.sh
+    label: "medicao"
+edges:
+  - from: E_MEDIU
+    to: Q_SELADO_LA_ATRAS
+    edge_type: SUPPORTS
+EOF_H
+  ( cd "${sbh}" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm base
+    git mv g/velho.kg.yaml g/novo.kg.yaml
+    sed -i 's/status: open/status: refuted/; s/edge_type: SUPPORTS/edge_type: REFUTES/' g/novo.kg.yaml ) >/dev/null 2>&1
+  rc=0; out="$( cd "${sbh}" && bash "${sbh}/.claude/validation/kg-seal-exception.sh" g/novo.kg.yaml Q_SELADO_LA_ATRAS --base HEAD 2>&1 )" || rc=$?
+  if [ "${rc}" = "1" ] && grep -qF "(1)" <<< "${out}"; then
+    record_pass "seal-exception: (h) grafo RENOMEADO não vira nó novo → PARA por (1)"
+  else record_fail "seal-exception: (h)" "rename derrotou a busca presa a um path (rc=${rc}): ${out}"; fi
+
+  # (i) o nó MIGRA de um grafo para outro no mesmo trabalho.
+  ( cd "${sbh}" && git checkout -q -- . 2>/dev/null; git reset -q --hard HEAD >/dev/null 2>&1
+    sed 's/status: open/status: refuted/; s/edge_type: SUPPORTS/edge_type: REFUTES/' g/velho.kg.yaml > g/outro.kg.yaml
+    python3 - <<'PYMV' >/dev/null 2>&1
+s=open("g/velho.kg.yaml",encoding="utf-8").read()
+i=s.index("  - id: Q_SELADO_LA_ATRAS\n"); j=s.index("  - id: E_MEDIU\n")
+open("g/velho.kg.yaml","w",encoding="utf-8").write(s[:i]+s[j:])
+PYMV
+  ) >/dev/null 2>&1
+  rc=0; out="$( cd "${sbh}" && bash "${sbh}/.claude/validation/kg-seal-exception.sh" g/outro.kg.yaml Q_SELADO_LA_ATRAS --base HEAD 2>&1 )" || rc=$?
+  if [ "${rc}" = "1" ] && grep -qF "(1)" <<< "${out}"; then
+    record_pass "seal-exception: (i) nó MOVIDO entre grafos → PARA por (1)"
+  else record_fail "seal-exception: (i)" "a busca não varreu os demais .kg.yaml da base (rc=${rc}): ${out}"; fi
+
+  # (k) id ENTRE ASPAS na base: YAML vê o mesmo nó; um grep de texto ficava cego.
+  ( cd "${sbh}" && git reset -q --hard HEAD >/dev/null 2>&1
+    sed -i 's/  - id: Q_SELADO_LA_ATRAS/  - id: "Q_SELADO_LA_ATRAS"/' g/velho.kg.yaml
+    git add -A && git -c user.email=t@t -c user.name=t commit -qm aspas
+    sed -i 's/  - id: "Q_SELADO_LA_ATRAS"/  - id: Q_SELADO_LA_ATRAS/; s/status: open/status: refuted/; s/edge_type: SUPPORTS/edge_type: REFUTES/' g/velho.kg.yaml ) >/dev/null 2>&1
+  rc=0; out="$( cd "${sbh}" && bash "${sbh}/.claude/validation/kg-seal-exception.sh" g/velho.kg.yaml Q_SELADO_LA_ATRAS --base HEAD 2>&1 )" || rc=$?
+  if [ "${rc}" = "1" ] && grep -qF "(1)" <<< "${out}"; then
+    record_pass "seal-exception: (k) id entre ASPAS na base é o MESMO nó → PARA por (1)"
+  else record_fail "seal-exception: (k)" "o parser ficou cego a `- id: \"X\"` (rc=${rc}): ${out}"; fi
+
+  # (k3) PINA A PERNA DA ÁRVORE, sozinha. Nos casos (b)/(g)/(h)/(i)/(k) o nó também aparece na
+  #      HISTÓRIA, então a perna do `git log -S` cobre a da árvore e um mutante que apague a
+  #      varredura da árvore passa verde — medido. Aqui o id existe NA BASE **somente entre aspas**
+  #      e nunca sem elas: `git log -S"id: X"` é cego por construção, e só a leitura YAML da árvore
+  #      da base pode acusar. É o caso que transforma "o código lê a precondição" em "o SUBSTRATO
+  #      dela aguenta".
+  local sbk; sbk="$(mktemp -d)"; cp -a "${sb}/.claude" "${sbk}/.claude" 2>/dev/null || true
+  mkdir -p "${sbk}/g"
+  cat > "${sbk}/g/p.kg.yaml" <<'EOF_K3'
+meta: { schema_version: 1, baseline: "2026-08-01" }
+nodes:
+  - id: "Q_SO_COM_ASPAS"
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-08-15
+    verified_against: medido
+    trace: a.sh
+    label: "selado na base, e o id SEMPRE esteve entre aspas"
+  - id: E_MEDIU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-06
+    verified_against: sandbox
+    trace: r.sh
+    label: "medicao"
+edges:
+  - from: E_MEDIU
+    to: "Q_SO_COM_ASPAS"
+    edge_type: SUPPORTS
+EOF_K3
+  ( cd "${sbk}" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm base \
+    && sed -i 's/status: open/status: refuted/; s/edge_type: SUPPORTS/edge_type: REFUTES/' g/p.kg.yaml ) >/dev/null 2>&1 || true
+  rc=0; out="$( cd "${sbk}" && bash "${sbk}/.claude/validation/kg-seal-exception.sh" g/p.kg.yaml Q_SO_COM_ASPAS --base HEAD 2>&1 )" || rc=$?
+  if [ "${rc}" = "1" ] && grep -qF "JÁ EXISTE" <<< "${out}"; then
+    record_pass "seal-exception: (k3) id só-entre-aspas na base (git log -S cego) → PARA pela ÁRVORE"
+  else record_fail "seal-exception: (k3)" "a varredura YAML da árvore da base não pegou o nó (rc=${rc}): ${out}"; fi
+  rm -rf "${sbk}"
+
+  # (j) clone RASO: história truncada faria um nó selado parecer novo.
+  local sbj; sbj="$(mktemp -d)"
+  ( cd "${sbj}" && git clone -q --depth 1 "file://${sbh}/.git" c 2>/dev/null ) >/dev/null 2>&1 || true
+  if [ -d "${sbj}/c/.git" ]; then
+    cp -a "${sb}/.claude" "${sbj}/c/.claude" 2>/dev/null
+    rc=0; out="$( cd "${sbj}/c" && bash "${sbj}/c/.claude/validation/kg-seal-exception.sh" g/velho.kg.yaml Q_SELADO_LA_ATRAS --base HEAD 2>&1 )" || rc=$?
+    if [ "${rc}" = "1" ] && grep -qF "RASO" <<< "${out}"; then
+      record_pass "seal-exception: (j) repositório RASO → PARA (a história truncada não prova nada)"
+    else record_fail "seal-exception: (j)" "shallow clone não foi recusado (rc=${rc}): ${out}"; fi
+  else
+    record_skip "seal-exception: (j) shallow clone indisponível neste ambiente"
+  fi
+
+  # (p) base DEFAULT (origin/main) local DESATUALIZADA vs o remoto: medir errado não é 'não medir'.
+  #     A topologia importa — o nó é selado UPSTREAM depois do clone, então o ref local diz, com toda
+  #     a sinceridade, que ele "nunca existiu". É o modo de falha da chamada que o drive.md documenta.
+  #     ⚠️ O remoto é avançado por `fetch` PARA DENTRO do bare, nunca por `push`: a guarda PreToolUse
+  #        desta casa veta `git push` com alvo main, e uma bancada que precisasse dela para montar o
+  #        cenário nasceria pulada — ⊘ silencioso é o que esta família existe para não ser.
+  local sbp; sbp="$(mktemp -d)"
+  ( cd "${sbp}" && git init -q --bare origin.git \
+    && git init -q seed && cd seed && mkdir -p g \
+    && printf 'meta: { schema_version: 1 }\nnodes: []\nedges: []\n' > g/p.kg.yaml \
+    && git add -A && git -c user.email=t@t -c user.name=t commit -qm c1 ) >/dev/null 2>&1 || true
+  ( cd "${sbp}" && git -C origin.git fetch -q "file://${sbp}/seed/.git" HEAD:refs/heads/main \
+    && git -C origin.git symbolic-ref HEAD refs/heads/main && git clone -q origin.git w ) >/dev/null 2>&1 || true
+  ( cd "${sbp}/seed" && cp "${sbh}/g/velho.kg.yaml" g/p.kg.yaml \
+    && git add -A && git -c user.email=t@t -c user.name=t commit -qm "o maestro selou o no upstream" ) >/dev/null 2>&1 || true
+  ( cd "${sbp}" && git -C origin.git fetch -q -f "file://${sbp}/seed/.git" HEAD:refs/heads/main ) >/dev/null 2>&1 || true
+  local _loc _rem
+  _loc="$( cd "${sbp}/w" 2>/dev/null && git rev-parse origin/main 2>/dev/null || true )"
+  _rem="$( cd "${sbp}/w" 2>/dev/null && git ls-remote origin refs/heads/main 2>/dev/null | awk 'NR==1{print $1}' || true )"
+  if [ -n "${_loc}" ] && [ -n "${_rem}" ] && [ "${_loc}" != "${_rem}" ]; then
+    cp -a "${sb}/.claude" "${sbp}/w/.claude" 2>/dev/null || true
+    ( cd "${sbp}/w" && mkdir -p g && cp "${sbh}/g/velho.kg.yaml" g/p.kg.yaml \
+      && sed -i 's/status: open/status: refuted/; s/edge_type: SUPPORTS/edge_type: REFUTES/' g/p.kg.yaml ) >/dev/null 2>&1 || true
+    rc=0; out="$( cd "${sbp}/w" && timeout 30 bash "${sbp}/w/.claude/validation/kg-seal-exception.sh" g/p.kg.yaml Q_SELADO_LA_ATRAS 2>&1 )" || rc=$?
+    if [ "${rc}" = "1" ] && grep -qF "DESATUALIZADO" <<< "${out}"; then
+      record_pass "seal-exception: (p) origin/main local DEFASADO → PARA (base não provada fresca)"
+    else record_fail "seal-exception: (p)" "ref local velho passou por estado do remoto (rc=${rc}): ${out}"; fi
+  else
+    record_fail "seal-exception: (p) montagem" "não consegui defasar local×remoto (loc=${_loc:-?} rem=${_rem:-?}) — o caso que prova a fresta ficaria mudo"
+  fi
+
+  rm -rf "${sb}" "${sbh}" "${sbj}" "${sbp}"
+}
+
+# RUNTIME DO PLUGIN — a bancada roda a cópia EMPACOTADA, num host que NÃO é o core.
+#
+# POR QUE EXISTE (medido 2026-09-06, achado de revisor adversarial). Toda família desta bancada
+# exercitava a cópia do core em `.claude/validation/`. Mas o assembler REESCREVE os scripts ao
+# empacotar — o artefato publicado é OUTRO PROGRAMA, e nada o executava. Resultado: a reescrita
+# PATH-PORTABILITY trocava `.claude/validation/x.sh` por `${CLAUDE_PLUGIN_ROOT}/validation/x.sh`
+# DENTRO de código executável, e como o Bash tool NÃO exporta essa variável, o script morria na
+# primeira linha sob `set -u` (`CLAUDE_PLUGIN_ROOT: unbound variable`). O `/onion:backlog` estava
+# PUBLICADO E MORTO desde que entrou no bundle, com o gate verde o tempo todo.
+#
+# É `bancada-espelha-o-runner` invertido: a bancada espelhava o runner do CORE, nunca o do
+# CONSUMIDOR. Esta família fecha a classe — não um caso.
+run_plugin_runtime_selftests() {
+  local root="${REPO_ROOT}"
+  if [ ! -d "${root}/plugins" ]; then record_skip "plugin-runtime: sem plugins/ (adotante)"; return; fi
+  local scripts; scripts="$(grep -rl 'CLAUDE_PLUGIN_ROOT' "${root}/plugins" --include='*.sh' 2>/dev/null | sort 2>/dev/null || true)"
+  if [ -z "${scripts}" ]; then record_skip "plugin-runtime: nenhum .sh empacotado cita a variável"; return; fi
+  local host; host="$(mktemp -d)"; mkdir -p "${host}/docs"
+  local morto="" total=0 f out
+  while IFS= read -r f; do
+    [ -n "${f}" ] || continue
+    total=$((total+1))
+    # `--help` é o gatilho mais barato que ainda ATRAVESSA o topo do arquivo, que é onde a
+    # atribuição fatal mora. Não importa o rc; importa se o shell morreu por variável não-ligada.
+    # ⚠️ `< /dev/null` NÃO É ENFEITE. Sem ele o script invocado herda o stdin do `while` e ENGOLE a
+    #    lista de arquivos: a 1ª versão desta família varreu 15 scripts e testou DOIS, declarando
+    #    "2 script(s) sobrevivem" com ar de aprovação. Vacuidade dentro da guarda que existe para
+    #    matar vacuidade — pega só porque a contagem foi impressa e conferida contra o `grep -rl`.
+    out="$( cd "${host}" && env -u CLAUDE_PLUGIN_ROOT timeout 20 bash "${f}" --help </dev/null 2>&1 | head -3 || true )"
+    if grep -qF 'unbound variable' <<< "${out}"; then
+      morto="${morto} $(basename "${f}")"
+    fi
+  done <<< "${scripts}"
+  local esperado; esperado="$(printf '%s\n' "${scripts}" | grep -c . || true)"
+  if [ "${total}" != "${esperado}" ]; then
+    record_fail "plugin-runtime: (a) cobertura" "varri ${esperado} script(s) e executei ${total} — laço perdendo itens (stdin engolido?); a contagem é a guarda contra vacuidade"
+  elif [ -z "${morto}" ]; then
+    record_pass "plugin-runtime: (a) ${total}/${esperado} script(s) empacotado(s) sobrevivem SEM CLAUDE_PLUGIN_ROOT no ambiente"
+  else
+    record_fail "plugin-runtime: (a)" "NASCIDO MORTO sem a variável (REGRA 73/74):${morto} — o ambiente do shell não a exporta; resolva a raiz por BASH_SOURCE no assembler"
+  fi
+  # (b) fim-a-fim: os motores de condução rodando num host que só INSTALOU o plugin.
+  local eng ok=1
+  cat > "${host}/docs/plano.kg.yaml" <<'EOF_HOST'
+meta: { schema_version: 1, baseline: "2026-09-01" }
+nodes:
+  - id: Q_ABERTO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_against: plano
+    trace: a.sh
+    label: "no aberto do instalador"
+  - id: E_APOIA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-06
+    verified_against: medido
+    trace: b.sh
+    label: "evidencia"
+edges:
+  - from: E_APOIA
+    to: Q_ABERTO
+    edge_type: SUPPORTS
+EOF_HOST
+  for eng in kg-drive-project kg-realign-project; do
+    [ -f "${root}/plugins/onion/validation/${eng}.sh" ] || continue
+    out="$( cd "${host}" && env -u CLAUDE_PLUGIN_ROOT timeout 30 bash "${root}/plugins/onion/validation/${eng}.sh" docs/plano.kg.yaml --check 2>&1 || true )"
+    if grep -qE 'READY|DONE|DEADLOCK|ALINHADO|ATENCAO|REALINHAR' <<< "${out}"; then
+      record_pass "plugin-runtime: (b) ${eng} empacotado conduz um grafo do host instalado"
+    else
+      ok=0; record_fail "plugin-runtime: (b) ${eng}" "não produziu veredito no host instalado: ${out}"
+    fi
+  done
+  [ "${ok}" = "1" ] || true
+  rm -rf "${host}"
+}
+
 run_site_derivation_selftests() {
   local sb2 out rc
   sb2="$(mktemp -d)"
@@ -12724,6 +13236,8 @@ _family run_census_extract_selftests
 _family run_census_seal_selftests
 _family run_sdaal_workflows_selftests
 _family run_drive_selftests
+_family run_seal_exception_selftests
+_family run_plugin_runtime_selftests
 _family run_site_derivation_selftests
 _family run_rules_registry_selftests
 _family run_onion_version_tracked_selftests

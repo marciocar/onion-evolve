@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# raiz do plugin resolvida PELO PRÓPRIO ARQUIVO (o ambiente do shell não traz a variável)
+: "${CLAUDE_PLUGIN_ROOT:=$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)}"
 # =============================================================================
 # kg-fixture-paths.sh — o predicado ÚNICO de "este .kg.yaml é FIXTURE de teste?"
 #

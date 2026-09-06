@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# raiz do plugin resolvida PELO PRÓPRIO ARQUIVO (o ambiente do shell não traz a variável)
+: "${CLAUDE_PLUGIN_ROOT:=$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)}"
 # =============================================================================
 # kg-realign-project.sh — a REVISÃO EM CAMADAS da jornada do plano × o vivo.
 #
@@ -14,17 +16,17 @@
 #
 # Grafo-primeiro: NÃO reparseia YAML — consome `kg-radar --triples/--freshness-tsv/
 #             --open-tsv` (a atenção já vem calculada; o radar é a régua). Ontologia
-#             dos KINDS de grafo: docs/knowledge-base/concepts/onion-kg-ontology-hierarchy.md.
+#             dos KINDS de grafo: ${CLAUDE_PLUGIN_ROOT}/kb/onion-kg-ontology-hierarchy.md.
 #             ⚠️ O substrato é confiável na ESCRITA (radar reprova), não na LEITURA
 #             (a perna de leitura é conselho — este script revisa o que ESTÁ escrito).
 #
-# Uso       : bash .claude/validation/kg-realign-project.sh [<grafo.kg.yaml>] [--check]
+# Uso       : bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-realign-project.sh [<grafo.kg.yaml>] [--check]
 #             sem grafo → o plano de execução do core (docs/onion/graph/fios-abertos.kg.yaml)
 #             --check   → só o veredito; exit 1 se houver drift tipo-(c) (DENTE, não advisory)
 # =============================================================================
 set -uo pipefail
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"; cd "$ROOT"
-RADAR=".claude/validation/kg-radar.sh"
+RADAR="${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh"
 THRESH="${REALIGN_THRESHOLD:-15}"   # histerese: camada-3 só é recomendada acima disto (anti-thrashing)
 
 GRAPH_DEFAULT="docs/onion/graph/fios-abertos.kg.yaml"; GRAPH="$GRAPH_DEFAULT"; MODE="project"
@@ -73,7 +75,7 @@ FINDINGS="$(awk -v thr="$THRESH" '
     if (unrec) {                                  # CAMADA 1 → tipo (c): desorganiza passado/futuro
       print "1\tc\t" att "\t" id "\treconciliar: superado/refutado mas segue " st " (Aufhebung devida)"
     } else if (staleV && down>=1) {               # CAMADA 2 → tipo (b): custoso no futuro
-      print "2\tb\t" att "\t" id "\tre-medir (" verdict "): " down " dependente(s) a jusante — delegar /meta:kg-freshness"
+      print "2\tb\t" att "\t" id "\tre-medir (" verdict "): " down " dependente(s) a jusante — delegar /onion:kg-freshness"
     } else if (staleV) {                          # CAMADA 2 → tipo (a): inócuo
       print "2\ta\t" att "\t" id "\tanotar (" verdict "): sem dependentes — baixo custo"
     }
@@ -140,6 +142,6 @@ else printf '  _objetivo e vínculos intactos._\n'; fi
 printf '\n## Ação (dente, não advisory)\n'
 case "$V" in
   REALINHAR) printf '  ⛔ há drift tipo-(c): reconcilie no grafo (novo nó + SUPERSEDES/REFUTES datado, alvo → superseded/refuted) ANTES de seguir. `--check` sai ≠0.\n' ;;
-  ATENCAO)   printf '  ⚠️ drift custoso acumulado (agg=%s ≥ %s): rode `/meta:kg-freshness` nos (b) de alta atenção e reavalie a camada 3.\n' "$agg" "$THRESH" ;;
+  ATENCAO)   printf '  ⚠️ drift custoso acumulado (agg=%s ≥ %s): rode `/onion:kg-freshness` nos (b) de alta atenção e reavalie a camada 3.\n' "$agg" "$THRESH" ;;
   ALINHADO)  printf '  ✅ alinhado: drift abaixo do limiar (histerese) — sem realinhamento devido. Siga.\n' ;;
 esac

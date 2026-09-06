@@ -3,14 +3,14 @@ description: Conduz um plano-grafo até o fim com rigor Onion — censo→avanç
 allowed-tools: Bash, Read, Edit, Write, Task
 ---
 
-# 🚗 /meta:drive — conduzir um plano-grafo até o fim
+# 🚗 /onion:drive — conduzir um plano-grafo até o fim
 
 Invocado na execução de um plano, este comando usa **todo o poder do Onion** (dogfood, KG-SSOT-first/
 runtime, Elenxo, orquestração, SDAAL) para **avançar o plano** — pesquisando, medindo, executando,
-achando superação — com o `/meta:realign` como **verificador-por-turno**. É o reforço-prosa do maestro
+achando superação — com o `/onion:realign` como **verificador-por-turno**. É o reforço-prosa do maestro
 (*"siga até o final… nada parado sem controle"*) virado **maquinaria verificável e retomável**.
 
-> **Contrato canônico:** [`onion-drive-doctrine.md`](../../../docs/knowledge-base/concepts/onion-drive-doctrine.md)
+> **Contrato canônico:** [`onion-drive-doctrine.md`](${CLAUDE_PLUGIN_ROOT}/kb/onion-drive-doctrine.md)
 > (a escada, o laço, o roteamento por KIND, a tabela de selagem, as 6 regras, os anti-padrões). Este
 > comando é a versão EXECUTÁVEL desse contrato; a KB é a doutrina. Leia-a antes de conduzir.
 
@@ -24,14 +24,14 @@ achando superação — com o `/meta:realign` como **verificador-por-turno**. É
 ## Uso
 
 ```
-/meta:drive [<grafo.kg.yaml>=fios-abertos] [--max-nodes N=4] [--node <id>] [--budget <tokens>]
+/onion:drive [<grafo.kg.yaml>=fios-abertos] [--max-nodes N=4] [--node <id>] [--budget <tokens>]
 ```
 
 ## O laço (P0-P6)
 
 ### P0 — Legibilidade (para se falhar)
 ```bash
-bash .claude/validation/kg-radar.sh <grafo> --integrity --schema   # exit≠0 → PARE
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <grafo> --integrity --schema   # exit≠0 → PARE
 ```
 Não se conduz grafo que o motor não lê.
 
@@ -41,7 +41,7 @@ sela o lote anterior antes de nova passada. (Anti-thrashing; o degrau AUDIT é b
 
 ### P1 — Censo (determinístico)
 ```bash
-bash .claude/validation/kg-drive-project.sh <grafo>        # FILA-PRONTA + BLOQUEADOS
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-drive-project.sh <grafo>        # FILA-PRONTA + BLOQUEADOS
 ```
 `DONE` → nada a conduzir, encerre. `DEADLOCK` → **PARE** (predecessor travado; o bloqueador vira item
 de alta atenção). `READY` → siga. Complete o censo com os fios em-voo: `git worktree list`, `gh pr list`,
@@ -53,13 +53,13 @@ estouro). Um nó **em-voo nunca é re-selecionado** (status monotônico).
 
 ### P3 — Por nó (orquestra via `onion-orchestration`; teto 16 workers, budget/worker)
 1. **CLASSIFICAR** `drive_kind` (campo do nó, senão julgue: `question`→research · `claim`→verification · `decision`→execution/decision).
-2. **BEACON** `bash .claude/validation/session-beacon.sh check <repo>` **antes** de qualquer switch de worktree (I3).
+2. **BEACON** `bash ${CLAUDE_PLUGIN_ROOT}/validation/session-beacon.sh check <repo>` **antes** de qualquer switch de worktree (I3).
 3. **AVANÇAR** — roteie por KIND:
    | KIND | avançar = | delega a |
    |---|---|---|
    | **research** | colher evidência vs o vivo/externo | `onion-orchestration` fan-out-and-synthesize (+ WebSearch/WebFetch) + `write(KG)` |
-   | **verification** | MEDIR o nó contra o vivo | `/meta:kg-freshness --node <id>` (mede, propõe — worker nunca escreve) |
-   | **execution** | trabalho em **worktree própria até PR-verde** + dogfood | orquestração de execução (molde de fases do `/engineer:work`, conduzido até 1 PR) |
+   | **verification** | MEDIR o nó contra o vivo | `/onion:kg-freshness --node <id>` (mede, propõe — worker nunca escreve) |
+   | **execution** | trabalho em **worktree própria até PR-verde** + dogfood | orquestração de execução (molde de fases do `/onion-engineering:work`, conduzido até 1 PR) |
    | **decision** | enquadrar opções + Elenxo, **propor** a chamada | `adversarial-verification` |
 4. **ELENXO** (só peso doutrinário — nomear/invariar/superar): worker adversarial com mandato de **REFUTAR**, **default = REPROVADO na dúvida**; a objeção sobrevivente vira **nó preservado**, nunca descartada. Cumpra as 5 etapas (`onion-elenxo-doctrine.md`) — a 5ª (`write(KG)` com `SUPERSEDES`/`REFUTES`) é a que mais falha.
 5. **VEREDITO-DE-ESCRITA** — aplique a **tabela de selagem** (§ abaixo).
@@ -72,8 +72,8 @@ Toda execução: **rodou o artefato de verdade** + o **modo-de-falha** (não só
 ### P5 — Checkpoint em lote (escreve o `STATE.md` pendente)
 Consolide: PRs-verdes **para merge humano** · vereditos **DRIFTED/REFUTED para selo** · decisões propostas · C-gated. Feche a reconciliação:
 ```bash
-bash .claude/validation/kg-radar.sh <grafo> --integrity --schema   # exit 0 obrigatório
-bash .claude/validation/kg-realign-project.sh <grafo> --check       # drift residual do lote
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <grafo> --integrity --schema   # exit 0 obrigatório
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-realign-project.sh <grafo> --check       # drift residual do lote
 ```
 
 ### P6 — Pare
@@ -91,7 +91,7 @@ Aufhebung, o driver flipa sem parar quando o alvo **nasceu e caiu no mesmo PR**.
 olho; roda-se o predicado — **depois** de escrever a reconciliação (ele valida o par escrito) e
 **antes** de fechar o checkpoint. `PARA` ⇒ **desfaça o flip** e leve ao maestro.
 ```bash
-bash .claude/validation/kg-seal-exception.sh <grafo> <NODE_ID>   # exit 0 = AUTO · 1 = PARA (fail-closed)
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-seal-exception.sh <grafo> <NODE_ID>   # exit 0 = AUTO · 1 = PARA (fail-closed)
 ```
 Ele prova o que é provável por máquina: o id não está em nenhum `*.kg.yaml` da base nem na história
 dela (recusando repo raso e `origin/main` defasado) · a derrubada traz `verified_at`+`verified_against`
@@ -108,8 +108,8 @@ que põe o flip diante do maestro. `exit 0` não quer dizer "selado".
 - **Ordenação é GUARDA, não topológica** (Fase 1): `DEPENDS_ON` segura o dependente, não reordena. Topológica dirigida + degrau AUTOMATE + ponte prosa→grafo são **Fase 2 (gated)**.
 
 ## 🔗 Referências
-- Contrato/doutrina: [`onion-drive-doctrine.md`](../../../docs/knowledge-base/concepts/onion-drive-doctrine.md)
-- Censo: `.claude/validation/kg-drive-project.sh` · Verificador-por-turno: [`/meta:realign`](realign.md)
-- Predicado da exceção de selo: `.claude/validation/kg-seal-exception.sh` (doutrina §4.1)
-- Motores adapter: [`/meta:kg-freshness`](kg-freshness.md) · skill `onion-orchestration` · [`/meta:backlog`](backlog.md)
+- Contrato/doutrina: [`onion-drive-doctrine.md`](${CLAUDE_PLUGIN_ROOT}/kb/onion-drive-doctrine.md)
+- Censo: `${CLAUDE_PLUGIN_ROOT}/validation/kg-drive-project.sh` · Verificador-por-turno: [`/onion:realign`](realign.md)
+- Predicado da exceção de selo: `${CLAUDE_PLUGIN_ROOT}/validation/kg-seal-exception.sh` (doutrina §4.1)
+- Motores adapter: [`/onion:kg-freshness`](kg-freshness.md) · skill `onion-orchestration` · [`/onion:backlog`](backlog.md)
 - Escada/precedente (**core-only**, não viaja): ADR `onion-adr-autonomous-thread-runtime-2026-07`

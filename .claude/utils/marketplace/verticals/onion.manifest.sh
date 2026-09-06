@@ -3,6 +3,17 @@
 # validação de meta-specs, co-evolução upstream e os adapters SDAAL (task-manager, forge).
 # 2026-09-04 (F2 da revisão para o diretório oficial): ABSORVEU onion-work-tools — a pesquisa R1 mostrou que o
 # canal premia bundle vertical coeso, e work-tools era um saco de ferramentas que duplicava skill/motor/KB do núcleo.
+# 2026-09-06: ABSORVEU a CONDUÇÃO DE PLANO-GRAFO (/meta:drive + /meta:realign + os dois motores + o predicado
+# de selo). Decisão do maestro, com a fronteira medida: o drive conduz o plano-grafo DO REPO QUE O HOSPEDA
+# (zero ocorrências de DEST/TARGET/INSTALL_DIR nele) — não é MOAT; o /meta:adopt é o oposto e continua fora.
+# O /meta:kg-inbox NÃO entra, e a razão foi CORRIGIDA por revisor adversarial no mesmo PR: o 1º argumento
+# escrito aqui ("o produtor da fila vive em ops/, logo ninguém alimenta") é FALSO — o próprio comando diz,
+# desde 2026-09-05, que num repo adotado a proposta nasce à mão e que a ausência do cabeçalho nunca é
+# motivo de rejeição. O bloqueador REAL é outro e é mecânico: o `allowed-tools` do comando cita
+# `.claude/utils/adopt/starter-kg-inbox.sh`, caminho de meta-fábrica que a REGRA 61 barra do bundle; ele
+# ficaria NU no plugin e cai na classe ALLOWED-TOOLS da REGRA 74 — permissão que não casa no consumidor,
+# comando NASCIDO MORTO. Some-se a isso a pergunta de desenho que o fio já nomeia (onde o INSTALADOR
+# guarda fila e grafo). Ver Q_KG_INBOX_FORA_DO_PLUGIN em docs/evolution/research/librechat-kg-runtime-2026-08/.
 # REGRA 61: manifesto publicável NUNCA lista meta-fábrica (create-*/adopt/marketplace/decouple/evolve/absorb-skill/
 # federation-*) nem docs/onion/graph/*. co-evolve/co-relay (upstream) são permitidos por desenho.
 
@@ -28,6 +39,8 @@ COMMANDS=(
   ".claude/commands/meta/co-evolve.md"
   ".claude/commands/meta/co-relay.md"
   ".claude/commands/meta/backlog.md"
+  ".claude/commands/meta/drive.md"
+  ".claude/commands/meta/realign.md"
   ".claude/commands/quick/analysis.md"
   ".claude/commands/warm-up.md"
   ".claude/commands/catch-up.md"
@@ -62,6 +75,9 @@ VALIDATION=(
   ".claude/validation/kg-backlog-project.sh"
   ".claude/validation/kg-fixture-paths.sh"
   ".claude/validation/kg-backlog-check.sh"
+  ".claude/validation/kg-drive-project.sh"
+  ".claude/validation/kg-realign-project.sh"
+  ".claude/validation/kg-seal-exception.sh"
   ".claude/validation/lib/status-factor.awk"
   ".claude/validation/kg-console.sh"
   ".claude/validation/kg-view.sh"
@@ -78,6 +94,8 @@ TEMPLATES=()
 DOCS=(
   "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
   "docs/knowledge-base/concepts/onion-elenxo-doctrine.md"
+  "docs/knowledge-base/concepts/onion-drive-doctrine.md"
+  "docs/knowledge-base/concepts/onion-kg-ontology-hierarchy.md"
   "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
   "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
   "docs/knowledge-base/meta/onion-framework-identity.md"
@@ -101,6 +119,8 @@ PROVIDES=(
   "freshness-audits"
   "constellation-map"
   "co-evolution-upstream"
+  "plan-graph-drive"
+  "plan-graph-realign"
   "guided-conduction"
   "guided-onboarding"
   "retro-feedback"
@@ -118,4 +138,8 @@ LOADS=(
   "when:kg -> run:validation/kg-radar.sh (motor soberano; door gera seus proprios .kg.yaml)"
   "when:kg backfill -> run:validation/kg-provenance-coverage.sh (mede o passivo; --scope sem --baseline nao arma catraca)"
   "when:diary -> run:validation/diary-index.sh"
+  "embed:kb/onion-drive-doctrine.md"
+  "embed:kb/onion-kg-ontology-hierarchy.md"
+  "when:drive -> run:validation/kg-drive-project.sh (censo determinístico) + validation/kg-seal-exception.sh (predicado do selo)"
+  "when:realign -> run:validation/kg-realign-project.sh (verificador-por-turno; --check é o dente)"
 )

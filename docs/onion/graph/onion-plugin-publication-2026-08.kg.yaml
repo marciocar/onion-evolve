@@ -127,7 +127,7 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.9
-    status: open
+    status: done
     label: "SINAL DE CAMPO (adotante pre-adocao, 2026-09-05, medido): /meta:drive e /meta:adopt vivem SO no core — nao estao em plugins/onion/commands/ nem em manifesto nenhum. Consequencia concreta relatada pelo remetente: para se ADOTAR ou para CONDUZIR um plano-grafo, o consumidor precisa abrir sessao NO CORE. E a mesma classe do Q_KG_INBOX_FORA_DO_PLUGIN (grafo librechat-kg-runtime-2026-08): comando cuja capacidade pressupoe artefato que o instalador nao tem. Aqui a razao e mais forte que no kg-inbox: o /meta:adopt ESCREVE repo alheio a partir da fonte (I3/MOAT) e o /meta:drive conduz plano-grafo do repo que o hospeda — distribui-los pelo marketplace criaria a expectativa de rodar o que so a fonte pode rodar. TRES desenhos possiveis, nenhum decidido: (a) portar so `adopt --update` (o consumidor se ATUALIZA sozinho, sem poder adotar terceiros); (b) nomear o SALTO AO CORE como movimento explicito do wizard/onboarding, com o comando local dizendo 'isto roda no core, e aqui esta como'; (c) manter como esta e documentar a fronteira. GATILHO NOMEADO: o proximo adotante que pedir `--update` sem sessao do core, OU a decisao do maestro sobre (a)/(b)/(c) — o que vier primeiro."
     verified_at: '2026-09-05'
     verified_against: 'medido 2026-09-05: ls plugins/onion/commands/ = 20 comandos, drive.md e adopt.md AUSENTES; grep -l "drive\|adopt" nos *.manifest.sh do marketplace = 0 hits; sinal de campo em docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md'
@@ -199,6 +199,39 @@ nodes:
     verified_against: 'medido 2026-09-05 no core: `grep -oE DEST|TARGET|INSTALL_DIR` em drive.md = 0 ocorrencias vs 60 hits de linguagem MOAT em adopt.md; `ls plugins/onion/validation/` mostra kg-radar/session-beacon/kg-backlog-project presentes e kg-drive-project/kg-realign-project AUSENTES; plugins/onion/commands/realign.md AUSENTE; 26 comandos de meta/ nao viajam ao todo, a maioria por serem Camada 1 (autoria do framework) ou Camada 3 (federacao) — corretamente core-only'
     trace: 'plugins/onion/commands/'
 
+  - id: D_DRIVE_VIAJA_NO_PLUGIN
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: done
+    label: "DECISAO DO MAESTRO (2026-09-06, palavras dele: 'o drive deve viajar no plugin, o plugin deve ser completo'). FECHA o Q_PLUGIN_SEM_DRIVE_NEM_ADOPT na direcao que a medicao de 09-05 apontava, e nao no desenho (a) que o proprio no propunha. O QUE VIAJA: /meta:drive + /meta:realign (o verificador-por-turno que o laco P5 exige) + os motores kg-drive-project.sh e kg-realign-project.sh + o predicado novo kg-seal-exception.sh + a KB onion-drive-doctrine.md. O QUE NAO VIAJA, e por que: (a) /meta:adopt continua fora — escrever repo alheio E o proposito dele, logo e MOAT (60 hits de linguagem DEST/repo-alheio contra ZERO no drive); (b) /meta:kg-inbox continua fora POR MEDICAO e nao por esquecimento — o produtor da fila dele vive em ops/mcp-onion-exec/server.py, que nao e vendorizado, e a criacao da fila mora no starter do adopt, que a REGRA 61 barra de manifesto publicavel; publica-lo entregaria comando NASCIDO MORTO, exatamente a classe das REGRAS 73/74 que esta decisao existe para respeitar. A COMPLETUDE do plugin foi lida como 'todo comando publicado RESOLVE e RODA no host instalado', nao como 'todo comando do core viaja' — pela regra do NASCIDO MORTO as duas leituras sao opostas, e so a primeira e cumprivel."
+    verified_at: '2026-09-06'
+    verified_against: 'provado por EXECUCAO no host instalado (CLAUDE_PLUGIN_ROOT=plugins/onion, repo sintetico sem .claude/): kg-drive-project.sh devolveu "READY: pronto=2 bloqueado=1"; kg-realign-project.sh --check devolveu "ATENCAO: (c)=0 (b)=1 (a)=2 agg=15.0" rc=0; kg-seal-exception.sh percorreu as QUATRO precondicoes e devolveu AUTO rc=0 num grafo do proprio host, com o radar resolvido por BASH_SOURCE dentro do plugin. O harness tambem listou os comandos como `onion:drive` e `onion:realign` apos a montagem.'
+    trace: '.claude/utils/marketplace/verticals/onion.manifest.sh'
+
+  - id: E_EXCECAO_DE_SELO_VIROU_PREDICADO
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    label: "A excecao de selo aprovada pelo maestro em 2026-09-06 nao ficou em prosa: virou o predicado deterministico .claude/validation/kg-seal-exception.sh. A 1a VERSAO FOI REPROVADA por tres revisores adversariais com SETE caminhos de AUTO indevido MEDIDOS, todos por fora dos 8 casos que a bancada olhava: id entre aspas, aresta FORJADA dentro de um `label: |`, campos de medicao citados em bloco literal, grafo RENOMEADO, no MOVIDO entre grafos, clone RASO e `origin/main` local DESATUALIZADO. A LICAO E DE CLASSE: bancada que remove uma precondicao por vez prova que o codigo LE as precondicoes; nao prova que o SUBSTRATO delas aguenta — texto vs YAML, path vs repo, ref local vs remoto. A cura foi estrutural, nao lista: o grafo passou a ser lido por PyYAML (estrutura, nao texto), a busca de (1) varre TODOS os *.kg.yaml da base (arvore e historia), repo raso e base defasada param, e `--base` sem valor deixou de ser laco infinito. A bancada foi de 8 para 19 casos, 18 deles NEGATIVOS, e dois mutantes que ANTES sobreviviam (apagar a varredura da arvore; aceitar qualquer edge_type) agora morrem. ACHADO QUE SOBREVIVE AO PR: rodado sobre o lote de 09-05, o predicado SEPARA os dois flips daquele dia — Q_VENDOR_ENTRELACADO_COM_PRODUTO (nascido e caido no PR #810) sai AUTO, e Q_UPDATE_EXIGE_ADOCAO_INTEGRADA (criado no PR #809, ja em main) sai PARA. Eu flipei dois e declarei um; o segundo segue PENDENTE de selo do maestro."
+    verified_at: '2026-09-06'
+    verified_against: 'executado: `kg-seal-exception.sh <grafo> Q_VENDOR_ENTRELACADO_COM_PRODUTO --base b77f90f5^` → AUTO rc=0; o mesmo com Q_UPDATE_EXIGE_ADOCAO_INTEGRADA → PARA rc=1 por (1). Bancada: `lint-selftest.sh --families seal_exception` = 19 passaram / 0 falharam; mutacao da varredura da arvore → caso (k3) reprova; mutacao do edge_type → caso (n) reprova'
+    trace: '.claude/validation/kg-seal-exception.sh'
+
+  - id: Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA
+    node_type: question
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: open
+    label: "ACHADO LATERAL, medido 2026-09-06 ao trocar o predicado de selo para leitura YAML de verdade: QUATRO .kg.yaml versionados sao ACEITOS pelo kg-radar e REJEITADOS pelo PyYAML (bridge-produto-2026-08, maestro-vivo-2026-08, scope-inheritance-2026, identidade-onion-vps-2026-08). As causas sao de citacao: aspas nao escapadas dentro de `label:`/`trace:` entre aspas duplas, e um `\$` como escape desconhecido. POR QUE IMPORTA ALEM DA ESTETICA: o radar e o gate de todo .kg.yaml (REGRA 52) e ele parseia por awk sobre TEXTO — logo a arvore de verdade do corpus e a do awk, nao a do YAML, e foi exatamente essa fresta que permitiu os ataques de aresta-forjada-dentro-de-label medidos neste PR. Qualquer consumidor que leia o grafo com uma biblioteca YAML (o MCP, um app, um adotante) ve um corpus com quatro buracos. CURA PROVISORIA APLICADA NO PREDICADO, e so nele: grafo da base ilegivel vira leitura DEGRADADA por texto, que SUPER-inclui e por isso erra para o lado do PARA. GATILHO NOMEADO: (a) o proximo consumidor nao-awk do corpus (MCP/app/adotante) tropecar num destes quatro, OU (b) a decisao de fazer o radar validar YAML de verdade — o que e mudanca de gate e nao cabia neste PR."
+    verified_at: '2026-09-06'
+    verified_against: 'medido 2026-09-06: laco `for f in $(git ls-files "*.kg.yaml")` com `yaml.safe_load` devolveu 4 arquivos com SyntaxError/ScannerError, todos com `kg-radar --integrity --schema` exit 0'
+    trace: 'docs/onion/graph/'
+
 edges:
   - from: E_PROJECT_DOOR_GATE_OPENED
     to: E_ONION_CORE_PLUGIN_BORN
@@ -247,4 +280,16 @@ edges:
     edge_type: REFUTES
   - from: E_DRIVE_NAO_E_MOAT_MAS_DEPS_NAO_VIAJAM
     to: Q_PLUGIN_SEM_DRIVE_NEM_ADOPT
+    edge_type: SUPPORTS
+  - from: D_DRIVE_VIAJA_NO_PLUGIN
+    to: Q_PLUGIN_SEM_DRIVE_NEM_ADOPT
+    edge_type: SUPPORTS
+  - from: E_DRIVE_NAO_E_MOAT_MAS_DEPS_NAO_VIAJAM
+    to: D_DRIVE_VIAJA_NO_PLUGIN
+    edge_type: SUPPORTS
+  - from: E_EXCECAO_DE_SELO_VIROU_PREDICADO
+    to: D_DRIVE_VIAJA_NO_PLUGIN
+    edge_type: SUPPORTS
+  - from: E_EXCECAO_DE_SELO_VIROU_PREDICADO
+    to: Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA
     edge_type: SUPPORTS

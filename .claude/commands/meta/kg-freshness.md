@@ -259,6 +259,14 @@ const KgReverifySchema = {
 | **CONFIRMED** | medido e ainda verdade | **Único** edit in-place permitido: `verified_at: <hoje>` (+ `verified_against:` se faltava). Nada mais. |
 | **DRIFTED** | a verdade mudou; o nó não errou | **Novo** nó com a verdade atual + `SUPERSEDES` → antigo; antigo vira `status: superseded`. Nunca reescreva o label do antigo. |
 | **REFUTED** | o nó estava errado | **Novo** nó `evidence` (PROD, `verified_at`, `verified_against`, `trace`) + `REFUTES` → alvo; alvo vira `status: refuted`. |
+
+> **Exceção nomeada, e só uma** (`onion-drive-doctrine.md` §4.1, 2026-09-06): quando o alvo **nunca
+> foi selado** — o `id:` não está em nenhum `*.kg.yaml` da base nem na história dela, porque nasceu no
+> PR em curso — o flip `→refuted`/`→superseded` **não** exige um selo separado: o par nó+refutação
+> chega ao maestro como uma proposta só. Isso não é juízo de quem escreve: roda-se
+> `bash .claude/validation/kg-seal-exception.sh <grafo> <id>` (exit 0 = dispensa · 1 = PARA,
+> fail-closed). E o predicado **não** cobre a 4ª precondição: nomear o flip no checkpoint é humano.
+> Fora desse caso, a tabela acima vale inteira — o worker mede, o maestro escreve.
 | **UNVERIFIABLE** | não deu para medir | **NÃO TOCA `verified_at`.** Rebaixa `confidence` e/ou abre `question` + `DEPENDS_ON`. |
 
 **Antes de aplicar a linha CONFIRMED, leia a cobertura.** A tabela chaveia por `verdict`, mas o

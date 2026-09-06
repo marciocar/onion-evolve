@@ -1,15 +1,15 @@
-# Doutrina do `/meta:drive` — conduzir um plano-grafo até o fim, com rigor Onion
+# Doutrina do `/onion:drive` — conduzir um plano-grafo até o fim, com rigor Onion
 
 > **O que este doc é.** O **contrato canônico** do driver de plano: o laço, o roteamento do passo
 > AVANÇAR por KIND de nó, a **tabela de selagem** (onde o driver auto-avança e onde PARA), as 6 regras
 > de doutrina que ele encarna, e os anti-padrões. A **Fase 0** (o Censo determinístico) já existe como
-> mecanismo: `.claude/validation/kg-drive-project.sh`. A **Fase 1** (o laço em si, `/meta:drive`) é
+> mecanismo: `${CLAUDE_PLUGIN_ROOT}/validation/kg-drive-project.sh`. A **Fase 1** (o laço em si, `/onion:drive`) é
 > construída sobre este contrato. **Fase 2** (o degrau AUTOMATE) é gated.
 >
 > **Por que existe.** O reforço-prosa do maestro (*"siga com execução até o final… nada parado sem
-> controle"*) é **disciplina, não mecanismo**. O `/meta:realign` já mecanizou o *alinhamento*; este
+> controle"*) é **disciplina, não mecanismo**. O `/onion:realign` já mecanizou o *alinhamento*; este
 > mecaniza a *condução*. O precedente é o ADR `autonomous-thread-runtime` (a escada + o loop), que era
-> **prosa gated** — a 1ª passada do `/meta:drive` é o dogfood que o **sela** (proposed→accepted).
+> **prosa gated** — a 1ª passada do `/onion:drive` é o dogfood que o **sela** (proposed→accepted).
 
 ## 0. A escada de autonomia (do ADR `onion-adr-autonomous-thread-runtime-2026-07.md`)
 
@@ -54,8 +54,8 @@ P6   PARA             nenhuma passada nova enquanto o checkpoint pende (batch-co
 | KIND | node_type | "avançar" = | delega a (REUSADO) | produz |
 |---|---|---|---|---|
 | **research** | `question` | colher evidência vs o vivo/externo | `onion-orchestration` fan-out + Web* + `write(KG)` | `evidence` + `SUPPORTS`/`REFUTES` |
-| **verification** | `claim` | MEDIR o nó contra o vivo | `/meta:kg-freshness --node <id>` (mede, propõe) | veredito + `proposed_write` |
-| **execution** | `decision` (reversível) | trabalho em worktree até **PR-verde** + dogfood | orquestração de execução (molde de fases do `/engineer:work`, até 1 PR) | branch/PR + evidência |
+| **verification** | `claim` | MEDIR o nó contra o vivo | `/onion:kg-freshness --node <id>` (mede, propõe) | veredito + `proposed_write` |
+| **execution** | `decision` (reversível) | trabalho em worktree até **PR-verde** + dogfood | orquestração de execução (molde de fases do `/onion-engineering:work`, até 1 PR) | branch/PR + evidência |
 | **decision** | `decision` (não-tomada) | enquadrar + Elenxo, **propor** a chamada | `adversarial-verification` | `decision` PROPOSTO (não selado) |
 
 ## 4. Tabela de SELAGEM (postura AUDIT — mata o carimbo-automático)
@@ -75,7 +75,7 @@ P6   PARA             nenhuma passada nova enquanto o checkpoint pende (batch-co
 | **MOAT** | — | **NUNCA / PARA** |
 
 **Invariante que amarra:** *o único caminho para um `verified_at` novo passa por uma medição executada*
-(contrato do `/meta:kg-freshness`). O driver **apenda** evidência; quem **flipa** o status de verdade
+(contrato do `/onion:kg-freshness`). O driver **apenda** evidência; quem **flipa** o status de verdade
 (→`superseded`/→`refuted`) é o humano no checkpoint. O radar/realign viram o forcing-function do selo.
 
 ### 4.1 A exceção nomeada — **auto-refutação de nó NUNCA SELADO**
@@ -103,7 +103,7 @@ mais do que registrá-la.
    exceção. Flip silencioso não é exceção, é o carimbo-automático que o anti-padrão 1 do §6 proíbe.
 
 **O que é mecânico e o que não é — sem arredondar para cima.** O predicado
-[`kg-seal-exception.sh`](../../../.claude/validation/kg-seal-exception.sh) decide `AUTO`/`PARA` e sai
+[`kg-seal-exception.sh`](${CLAUDE_PLUGIN_ROOT}/validation/kg-seal-exception.sh) decide `AUTO`/`PARA` e sai
 `1` em toda dúvida (fail-closed). Mas ele **não cobre as quatro**:
 
 | precondição | quem decide | teto |
@@ -154,7 +154,7 @@ maestro. É a linha do `STATE.md` que põe o flip diante dele.
 3. **Toda cura vira mecanismo** — defeito→`SUPERSEDES` no grafo (velho preservado, Aufhebung) + mecanismo, não conselho. (`sync-gate-superacao-2026-08.kg.yaml`, `fix-must-become-mechanism`)
 4. **Grafo-primeiro, escreve-depois** — o driver **É** o forcing-function `read(KG)→act→write(KG)` (o Censo é o Passo 1 obrigatório); a perna de LEITURA do KG **não é mecanismo** ([[onion-kg-ontology-hierarchy]] §5) — o driver a supre lendo primeiro, mas não força absorção no lado humano.
 5. **Interface estável, motores como adapters** — o driver é a interface (`conduzir até o fim`); Elenxo/dogfood/kg-freshness/forge são adapters por trás de contratos (SDAAL, `integrations.md`).
-6. **Confie no comportamento, não na declaração** — cada gate validado por execução/entrega; *"exit-code é evidência, leitura é hipótese"*; cuidado com o teste no caminho errado. ([`behavior-over-declaration.md`](../agentic-patterns/ai-strategies/behavior-over-declaration.md))
+6. **Confie no comportamento, não na declaração** — cada gate validado por execução/entrega; *"exit-code é evidência, leitura é hipótese"*; cuidado com o teste no caminho errado. (`behavior-over-declaration.md`)
 
 ## 6. Anti-padrões (provar AUSENTES na verificação)
 
@@ -167,8 +167,8 @@ maestro. É a linha do `STATE.md` que põe o flip diante dele.
 7. **Colisão de worktree (I3)** — `session-beacon.sh check` antes de todo switch; abort-on-collision, nunca operar a árvore do main.
 
 ## Referências
-- Censo: [`../../../.claude/validation/kg-drive-project.sh`](../../../.claude/validation/kg-drive-project.sh) · fixtures (**core-only**, não viajam no plugin) em `.claude/validation/fixtures/kg-drive/`
-- Verificador-por-turno: [`/meta:realign`](../../../.claude/commands/meta/realign.md) · Motor: `kg-radar.sh`
-- Precedente/escada (**core-only**): ADR `onion-adr-autonomous-thread-runtime-2026-07` · KB [`graduated-automation-ladder.md`](graduated-automation-ladder.md)
-- Motores adapter: [`/meta:kg-freshness`](../../../.claude/commands/meta/kg-freshness.md) · skill `onion-orchestration` · [`agent-orchestration.md`](agent-orchestration.md)
+- Censo: [`${CLAUDE_PLUGIN_ROOT}/validation/kg-drive-project.sh`](${CLAUDE_PLUGIN_ROOT}/validation/kg-drive-project.sh) · fixtures (**core-only**, não viajam no plugin) em `${CLAUDE_PLUGIN_ROOT}/validation/fixtures/kg-drive/`
+- Verificador-por-turno: `/onion:realign` · Motor: `kg-radar.sh`
+- Precedente/escada (**core-only**): ADR `onion-adr-autonomous-thread-runtime-2026-07` · KB `graduated-automation-ladder.md`
+- Motores adapter: `/onion:kg-freshness` · skill `onion-orchestration` · `agent-orchestration.md`
 - Fonte-plano de exemplo (**core-only**): `docs/onion/graph/fios-abertos.kg.yaml` — num repo que instalou o plugin, o plano-grafo é o do próprio repo

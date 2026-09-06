@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# raiz do plugin resolvida PELO PRÓPRIO ARQUIVO (o ambiente do shell não traz a variável)
+: "${CLAUDE_PLUGIN_ROOT:=$(cd "$(dirname "${BASH_SOURCE[0]}")/../" && pwd)}"
 # diary-index.sh — Regenera .claude/diary/index.md a partir dos arquivos de entrada
 # Parte do gate mecânico do Onion (Economy of Motors: Shell = determinístico)
 # Uso: bash ${CLAUDE_PLUGIN_ROOT}/validation/diary-index.sh [<repo-root>]

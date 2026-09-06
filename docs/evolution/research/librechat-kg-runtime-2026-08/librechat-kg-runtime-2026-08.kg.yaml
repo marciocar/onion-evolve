@@ -213,6 +213,29 @@ nodes:
     verified_against: 'medido 2026-09-05: ls plugins/onion/commands/ = 20 arquivos, kg.md e kg-freshness.md presentes, kg-inbox.md AUSENTE; grep kg-inbox nos *.manifest.sh do marketplace = 0 hits'
     trace: 'plugins/onion/commands/'
 
+  - id: E_KG_INBOX_FORA_POR_MEDICAO_NAO_POR_ESQUECIMENTO
+    node_type: evidence
+    plane: PROD
+    impact: 2
+    confidence: 0.95
+    status: confirmed
+    label: "2026-09-06, ao completar o plugin, o /meta:kg-inbox foi RE-MEDIDO e FICOU DE FORA — e a RAZAO deste no foi CORRIGIDA por revisor adversarial ANTES do merge, o que vale registrar porque a 1a versao dele era um no que se declarava MEDIDO carregando inferencia. O argumento derrubado: 'o produtor da fila vive em ops/ (nao vendorizado), logo ninguem alimenta a fila num repo que instalou'. E FALSO — o proprio comando, curado em 2026-09-05, diz que num repo adotado a proposta nasce A MAO ou por comando local e que a ausencia do cabecalho de proveniencia NUNCA e motivo de rejeicao; e a criacao da fila e um starter de 39 linhas que faz dois mkdir. O BLOQUEADOR REAL e mecanico e outro: o `allowed-tools` do kg-inbox cita `.claude/utils/adopt/starter-kg-inbox.sh`, caminho de meta-fabrica que a REGRA 61 barra do manifesto publicavel; no bundle ele ficaria NU e cai na classe ALLOWED-TOOLS da REGRA 74 — permissao que nao casa no consumidor, comando NASCIDO MORTO. Somado a isso, segue de pe a pergunta de desenho que o Q_KG_INBOX_FORA_DO_PLUGIN ja nomeia: onde o INSTALADOR guarda fila e grafo. A EXCLUSAO estava certa; o argumento estava errado — e a diferenca importa, porque quem for reabrir o fio precisa atacar o allowed-tools, nao o produtor."
+    verified_at: '2026-09-06'
+    verified_against: 'medido 2026-09-06: `sed -n 8p .claude/commands/meta/kg-inbox.md` mostra `Bash(bash .claude/utils/adopt/starter-kg-inbox.sh*)` no allowed-tools; `wc -l` do starter = 39; o Passo 2 do mesmo comando (l.64-69) afirma que a proposta nasce a mao num adotante; a REGRA 61 vive em lint-artifacts.sh:1372 e a classe ALLOWED-TOOLS da REGRA 74 e a que o lint ja acusa em 3 artefatos do bundle atual'
+    trace: '.claude/commands/meta/kg-inbox.md'
+
+  - id: E_ARGUMENTO_CORRIGIDO_ANTES_DO_MERGE
+    node_type: evidence
+    plane: DEV
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    label: "META-REGISTRO (2026-09-06): o no acima foi EDITADO no lugar, sem Aufhebung, e isso e a doutrina sendo seguida e nao violada. A excecao §4.1 escrita no mesmo PR diz, no topo, que o caminho PREFERIDO para no que nasceu no PR e CORRIGIR O RASCUNHO — a Aufhebung preserva posicao que a CASA sustentou, nao erro de vinte minutos do proprio driver, e montar cerimonia de superacao sobre rascunho e gastar ritual para comprar autonomia. O no nunca esteve em origin/main; o predicado kg-seal-exception.sh confirma isso por construcao. O que fica registrado e o APRENDIZADO: um no com verified_at e confidence 0.95 pode estar carregando inferencia plausivel no lugar de medicao, e foi um revisor adversarial — nao o gate, que estava verde — quem separou os dois."
+    verified_at: '2026-09-06'
+    verified_against: 'a correcao foi aplicada no mesmo PR, antes do merge; o gate mecanico (lint 0 HARD) estava verde sobre a versao errada, e o achado veio da passada adversarial da REGRA 56'
+    trace: 'docs/evolution/review/feat-plugin-completo-drive.md'
+
+
 edges:
   - from: E_AGENTE_VITRINE_ONION
     to: D_TRIADE_MCP_POR_EIXO
@@ -286,3 +309,9 @@ edges:
   - from: Q_KG_INBOX_FORA_DO_PLUGIN
     to: E_KG_INBOX_ROTEIA_POR_PAPEL_0905
     edge_type: DEPENDS_ON
+  - from: E_KG_INBOX_FORA_POR_MEDICAO_NAO_POR_ESQUECIMENTO
+    to: Q_KG_INBOX_FORA_DO_PLUGIN
+    edge_type: SUPPORTS
+  - from: E_ARGUMENTO_CORRIGIDO_ANTES_DO_MERGE
+    to: E_KG_INBOX_FORA_POR_MEDICAO_NAO_POR_ESQUECIMENTO
+    edge_type: SUPPORTS

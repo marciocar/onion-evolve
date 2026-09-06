@@ -223,6 +223,27 @@ while IFS= read -r f; do
   sed -i 's#\(\.\./\)\{1,\}\${CLAUDE_PLUGIN_ROOT}#${CLAUDE_PLUGIN_ROOT}#g' "${f}" 2>/dev/null
   # Scripts bundlados: PROJECT default core-ascend → cwd do consumidor (portável; core intacto).
   case "${f}" in *.sh) sed -i 's|\${1:-\${REPO_ROOT}}|${1:-$(pwd)}|g' "${f}" 2>/dev/null ;; esac
+  # ⚠️ ${CLAUDE_PLUGIN_ROOT} NÃO EXISTE NO AMBIENTE DE UM SHELL — e o rewrite acima acabou de escrevê-lo
+  #    DENTRO de código executável. Em markdown a variável é substituída pelo Claude Code antes de o
+  #    comando rodar; num `.sh` ela é expansão de shell em runtime, e sob `set -u` o script morre na
+  #    PRIMEIRA linha: `CLAUDE_PLUGIN_ROOT: unbound variable`. Medido 2026-09-06 numa sessão viva: o
+  #    Bash tool NÃO exporta a variável (`env | grep CLAUDE` não a traz), e por isso
+  #    `kg-backlog-project.sh` estava PUBLICADO E MORTO desde que entrou no bundle, com o gate verde.
+  #    A cura é resolver a raiz PELO PRÓPRIO ARQUIVO (BASH_SOURCE), respeitando a variável quando ela
+  #    de fato vier do ambiente (hooks). Idempotente e proporcional à profundidade real do arquivo.
+  case "${f}" in *.sh)
+    _code="$(grep -vE '^[[:space:]]*#' "${f}" 2>/dev/null || true)"
+    if grep -qF '${CLAUDE_PLUGIN_ROOT}' <<< "${_code}"; then
+      _rel="${f#${DEST}/}"; _slashes="${_rel//[!\/]/}"; _up=""
+      for ((_k=0; _k<${#_slashes}; _k++)); do _up="${_up}../"; done
+      awk -v up="${_up}" '
+        NR==1 && /^#!/ { print; print "# raiz do plugin resolvida PELO PRÓPRIO ARQUIVO (o ambiente do shell não traz a variável)";
+                         print ": \"${CLAUDE_PLUGIN_ROOT:=$(cd \"$(dirname \"${BASH_SOURCE[0]}\")/" up "\" \&\& pwd)}\""; next }
+        { print }
+      ' "${f}" > "${f}.pr" 2>/dev/null && mv "${f}.pr" "${f}"
+    fi
+    ;;
+  esac
 done < <(find "${DEST}" -type f ! -path "*/.claude-plugin/*" 2>/dev/null)
 
 # ---------------------------------------------------------------------------
