@@ -1,0 +1,29 @@
+# Fixture kg-realign: CONTROLE da superseder-morto — mesmo desenho, mas o superador está VIVO
+# (`confirmed`). Aqui a Aufhebung É devida e o realign TEM de acusar (c). Sem este par, a cura do
+# superador morto poderia ter silenciado a camada 1 inteira sem ninguém notar.
+meta: { schema_version: 1, baseline: "2026-09-01" }
+nodes:
+  - id: Q_ALVO_NAO_RECONCILIADO
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-05
+    verified_against: medido
+    trace: a.sh
+    label: "foi superado por algo VIVO e segue open — Aufhebung devida"
+  - id: Q_SUPERADOR_VIVO
+    node_type: question
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-05
+    verified_against: medido
+    trace: b.sh
+    label: "superador vivo"
+edges:
+  - from: Q_SUPERADOR_VIVO
+    to: Q_ALVO_NAO_RECONCILIADO
+    edge_type: SUPERSEDES

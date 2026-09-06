@@ -149,7 +149,7 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.95
-    status: superseded
+    status: open
     label: "ACHADO DO 1o --update REAL DE UM GREENFIELD (2026-09-05, medido): o `vendor-branch update` recusa com rc=11 BASE CRUZADA enquanto a branch de adocao nao estiver na integracao — e a recusa esta CORRETA. Causa estrutural: o `durable-commit.sh` staja `CLAUDE.md`, `docs/{business,technical,compliance}-context`, `.githooks`, `.prettierignore`, `.gitattributes`, `settings.json` (48 arquivos no caso medido). Isso e adocao LEGITIMA, mas NAO e framework para o vendor-branch — entao `onion/vendor` semeada de `onion/adopt` (o que a Fase 5 manda) nasce ENTRELACADA POR CONSTRUCAO em todo adotante greenfield, e o merge arrastaria produto para dentro do 3-way (conflito contabil, nao real). O guard mutou vendor (avancou ao pin novo) e NAO tocou a integracao — degradou no lugar certo. ⚠️ E o CONSERTO QUE O PROPRIO HELPER SUGERE (re-semear vendor de `develop`) esta ERRADO neste estado: daria base SEM o framework. A ordem correta e `onion/adopt` -> PR -> integracao -> `--update`, e ela agora esta escrita como PRECONDICAO no comando. O que fica ABERTO: (a) o helper poderia DETECTAR este caso especifico (adocao nao-integrada) e dizer 'integre a adocao', em vez do conserto genrico que aqui piora; (b) ou a Fase 5 poderia semear o vendor de um snapshot SO-FRAMEWORK, tornando a base limpa por construcao. GATILHO NOMEADO: o proximo adotante greenfield que rodar `--update` antes de integrar (vai bater no mesmo rc=11), OU a decisao do maestro entre (a) e (b)."
     verified_at: '2026-09-05'
     verified_against: 'medido no jogo-da-vida em 2026-09-05: rc=11 do vendor-branch update; 48 arquivos nao-framework em `git diff --name-only develop onion/adopt`; develop INTOCADA apos a recusa; vendor avancado a b967b71835f2; precondicao ausente do comando (grep = 0 hits) antes desta cura'
@@ -227,10 +227,53 @@ nodes:
     impact: 3
     confidence: 0.95
     status: open
-    label: "ACHADO LATERAL, medido 2026-09-06 ao trocar o predicado de selo para leitura YAML de verdade: QUATRO .kg.yaml versionados sao ACEITOS pelo kg-radar e REJEITADOS pelo PyYAML (bridge-produto-2026-08, maestro-vivo-2026-08, scope-inheritance-2026, identidade-onion-vps-2026-08). As causas sao de citacao: aspas nao escapadas dentro de `label:`/`trace:` entre aspas duplas, e um `\$` como escape desconhecido. POR QUE IMPORTA ALEM DA ESTETICA: o radar e o gate de todo .kg.yaml (REGRA 52) e ele parseia por awk sobre TEXTO — logo a arvore de verdade do corpus e a do awk, nao a do YAML, e foi exatamente essa fresta que permitiu os ataques de aresta-forjada-dentro-de-label medidos neste PR. Qualquer consumidor que leia o grafo com uma biblioteca YAML (o MCP, um app, um adotante) ve um corpus com quatro buracos. CURA PROVISORIA APLICADA NO PREDICADO, e so nele: grafo da base ilegivel vira leitura DEGRADADA por texto, que SUPER-inclui e por isso erra para o lado do PARA. GATILHO NOMEADO: (a) o proximo consumidor nao-awk do corpus (MCP/app/adotante) tropecar num destes quatro, OU (b) a decisao de fazer o radar validar YAML de verdade — o que e mudanca de gate e nao cabia neste PR."
+    label: "ACHADO LATERAL, medido 2026-09-06 ao trocar o predicado de selo para leitura YAML de verdade: QUATRO .kg.yaml versionados sao ACEITOS pelo kg-radar e REJEITADOS pelo PyYAML (bridge-produto-2026-08, maestro-vivo-2026-08, scope-inheritance-2026, identidade-onion-vps-2026-08). As causas sao de citacao: aspas nao escapadas dentro de `label:`/`trace:` entre aspas duplas, e uma barra invertida antes de um cifrao, que o YAML le como escape desconhecido. POR QUE IMPORTA ALEM DA ESTETICA: o radar e o gate de todo .kg.yaml (REGRA 52) e ele parseia por awk sobre TEXTO — logo a arvore de verdade do corpus e a do awk, nao a do YAML, e foi exatamente essa fresta que permitiu os ataques de aresta-forjada-dentro-de-label medidos neste PR. Qualquer consumidor que leia o grafo com uma biblioteca YAML (o MCP, um app, um adotante) ve um corpus com quatro buracos. CURA PROVISORIA APLICADA NO PREDICADO, e so nele: grafo da base ilegivel vira leitura DEGRADADA por texto, que SUPER-inclui e por isso erra para o lado do PARA. GATILHO NOMEADO: (a) o proximo consumidor nao-awk do corpus (MCP/app/adotante) tropecar num destes quatro, OU (b) a decisao de fazer o radar validar YAML de verdade — o que e mudanca de gate e nao cabia neste PR."
     verified_at: '2026-09-06'
     verified_against: 'medido 2026-09-06: laco `for f in $(git ls-files "*.kg.yaml")` com `yaml.safe_load` devolveu 4 arquivos com SyntaxError/ScannerError, todos com `kg-radar --integrity --schema` exit 0'
     trace: 'docs/onion/graph/'
+
+  - id: D_SELO_DO_MAESTRO_REVERTEU_O_FLIP
+    node_type: decision
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: done
+    label: "SELO DO MAESTRO, 2026-09-06: ele REVERTEU o flip que eu fiz sem parar. Historico: no PR #810 eu marquei Q_UPDATE_EXIGE_ADOCAO_INTEGRADA como `superseded` por Q_VENDOR_ENTRELACADO_COM_PRODUTO. O no superado ja estava em `main` desde o PR #809, logo era selo do maestro e a tabela de selagem reservava o flip a ele; quem separou os dois flips daquele lote foi o predicado kg-seal-exception.sh criado no PR #811, rodado sobre o lote que o gerou. CRITERIO DA REVERSAO, de conteudo e nao formal: o no tinha duas metades, a causal caiu (refutada em sandbox) e a da PRECONDICAO nunca foi refutada — com o superador `refuted`, a metade viva ficaria sem portador vivo. A metade viva foi para C_PRECONDICAO_INTEGRACAO_SOBREVIVE. ⚠️ ESTE NO E `decision`, NAO `evidence`: a 1a versao dele era `evidence` carregando decisao e juizo, com carimbo que so ancorava a primeira metade — achado de revisor adversarial, e a mesma classe de no-que-se-declara-medido-carregando-inferencia que este PR ja pagou uma vez. ⚠️ DUAS AFIRMACOES MINHAS FORAM DERRUBADAS AQUI E FICAM REGISTRADAS: (1) eu escrevi que a aresta SUPERSEDES tinha de ser REMOVIDA por partir de no refutado — falso, o radar ja ignora superador morto por desenho (`supersederConta`), medido custo ZERO de ruido com a aresta de volta; apagar aresta ainda fere o append-mostly e rebaixa fato legivel-por-maquina a prosa. A aresta esta RESTAURADA. (2) eu escrevi 'a maioria e legitima, guarda nasceria vermelha em massa' — vale para a classe LARGA, mas a classe ESTREITA e mecanizavel e pequena: ver Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA, com 17/211 medidos."
+    verified_at: '2026-09-06'
+    verified_against: 'executado: `kg-seal-exception.sh <grafo> Q_UPDATE_EXIGE_ADOCAO_INTEGRADA --base b77f90f5^` → PARA rc=1 por (1) "JA EXISTE em b77f90f5^". A restauracao da aresta foi medida numa copia: `kg-radar.sh --all` rc=0 e a secao RECONCILIACAO fecha com "nenhum alvo de SUPERSEDES ficou por reconciliar". As contagens do corpus vem de scratchpad/conta.py (PyYAML sobre git ls-files), nao de regex ad-hoc — tres parsers ad-hoc tinham dado 9, 13 e 14 para a mesma pergunta.'
+    trace: 'docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml'
+  - id: C_PRECONDICAO_INTEGRACAO_SOBREVIVE
+    node_type: claim
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "A METADE DE Q_UPDATE_EXIGE_ADOCAO_INTEGRADA QUE SOBREVIVE, isolada em no proprio (2026-09-06). O no original afirmava DUAS coisas: (i) uma PRECONDICAO — o `vendor-branch update` recusa com rc=11 BASE CRUZADA enquanto a adocao nao estiver na integracao, e a recusa esta CORRETA, degradando no lugar certo (guard mutou vendor, nao tocou a integracao); e (ii) uma CAUSA — o entrelacamento vendor/produto seria a causa-raiz dos conflitos. A metade (ii) caiu duas vezes: estreitada pelo portal-gamificacao (adocao INTEGRADA e ainda assim 29 conflitos) e depois REFUTADA em sandbox deterministico. A metade (i) NUNCA foi refutada, esta escrita como precondicao no /meta:adopt e continua valendo. Este no existe porque a doutrina PROIBE reescrever o label de um no ja selado (kg-freshness: 'Nunca reescreva o label do antigo') — a 1a tentativa desta entrega fez exatamente isso e um revisor adversarial pegou. Entao o no antigo fica INTEITO, com a sua historia, e a metade viva ganha portador proprio, que e o que o radar e o backlog leem. O QUE FICA ACIONAVEL: o helper poderia DETECTAR a adocao nao-integrada e dizer 'integre a adocao', em vez do conserto generico que neste estado PIORA (re-semear vendor de `develop` daria base SEM framework)."
+    verified_at: '2026-09-05'
+    verified_against: 'medido no jogo-da-vida em 2026-09-05: rc=11 do vendor-branch update; 48 arquivos nao-framework em `git diff --name-only develop onion/adopt`; develop INTOCADA apos a recusa. A precondicao esta escrita em .claude/commands/meta/adopt.md'
+    trace: '.claude/commands/meta/adopt.md'
+
+  - id: Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA
+    node_type: question
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: open
+    label: "CANDIDATO A GUARDA, com o dado que EU NAO TINHA quando decidi nao mecanizar (2026-09-06). Eu recusei mecanizar a classe 'no superado por superador refutado' alegando que ela nasceria vermelha em massa. Um revisor adversarial refutou a alegacao e a medicao lhe deu razao: a classe UTIL nao e essa, e sim 'no `superseded` que nao recebe NENHUM superador VIVO' — e o discriminador JA EXISTE no radar (`supersederConta`, que ja exclui superador `refuted`/`superseded` da reconciliacao). Medido no corpus: 17 casos em 211 nos superseded (8%) em 7 arquivos — nao e massa. E o precedente milita A FAVOR: a guarda ⚠ de reconciliacao do proprio radar foi construida sobre 15 arestas, numero da mesma ordem. O que continua verdadeiro e mais estreito do que eu escrevi: a classe LARGA (superador refutado, 13 pares em 5 arquivos) e majoritariamente escada de Elenxo legitima — posicao derruba posicao e cai depois — e guarda ali seria ruido. A classe ESTREITA e outra coisa: ali o conhecimento superado ficou sem portador vivo, que foi exatamente o defeito deste PR. GATILHO NOMEADO: (a) o proximo caso em que um no superado sem superador vivo levar alguem a uma conclusao errada, OU (b) a decisao do maestro de armar a guarda como SOFT no realign camada 1 (drift tipo-c), que e onde ela pertence — nao como HARD no lint."
+    verified_at: '2026-09-06'
+    verified_against: 'medido com script reproduzivel (scratchpad/conta.py, PyYAML sobre `git ls-files "*.kg.yaml"`): 121 grafos, 4 ilegiveis para o PyYAML e nao contados; classe larga = 13 pares em 5 arquivos; classe estreita = 17 de 211 superseded (8%) em 7 arquivos. ⚠️ TRES parsers independentes deram 9, 13 e 14 para a classe larga — a verdade das arestas do corpus depende do parser, que e a propria motivacao da REGRA 78'
+    trace: '.claude/validation/kg-radar.sh'
+
+  - id: Q_LINT_ABORTA_SEM_PYTHON_E_NAO_DIZ
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: open
+    label: "FAIL-OPEN DE GATE, PRE-EXISTENTE, medido 2026-09-06 in-tree nos dois lados: sem `python3` no PATH, o `lint-artifacts.sh` ABORTA logo apos a REGRA 39 e NUNCA IMPRIME O SUMARIO — em `origin/main` e nesta branch, identicamente. Quem ler a saida ve uma lista de VIOLATION e nenhum veredito; quem automatizar pelo rc ve 1, que e o mesmo rc de 'ha violacao HARD'. Ou seja: 'a guarda nao rodou' e 'a guarda reprovou' sao indistinguiveis, e todas as regras dependentes de python (39, 66, 74, 77, 78 e outras) somem juntas. A migalha `pyyaml-missing-phantom-gate-fail` ja registra que PyYAML ausente e condicao REAL nesta maquina, e que ela produz fantasmas no pre-commit — este no nomeia a metade que faltava: nao sao so fantasmas, o gate INTEIRO se cala. ⚠️ COMO EU DESCOBRI, e a licao vale mais que o achado: eu havia CONCLUIDO que a culpa era da minha guarda nova, porque medi rodando uma COPIA do lint em /tmp — o que muda `SCRIPT_DIR` e desvia o caminho inteiro do programa. Medir no caminho errado nao e ter medido. GATILHO NOMEADO: (a) a proxima sessao em que o gate passar verde por ausencia de dependencia, OU (b) a decisao de fazer o lint declarar NAO-VERIFICADO por dependencia ausente em vez de morrer — que e mudanca de gate e precisa de selo."
+    verified_at: '2026-09-06'
+    verified_against: 'medido 2026-09-06 com um stub de `python3` que sai 1, rodando `lint-artifacts.sh` IN-TREE em duas arvores: worktree de origin/main e a branch de trabalho. Nos dois casos a ultima linha e a VIOLATION da REGRA 39 e `grep -c Sumario` = 0'
+    trace: '.claude/validation/lint-artifacts.sh'
 
 edges:
   - from: E_PROJECT_DOOR_GATE_OPENED
@@ -269,9 +312,6 @@ edges:
   - from: Q_UPDATE_EXIGE_ADOCAO_INTEGRADA
     to: Q_PLUGIN_SEM_DRIVE_NEM_ADOPT
     edge_type: DEPENDS_ON
-  - from: Q_VENDOR_ENTRELACADO_COM_PRODUTO
-    to: Q_UPDATE_EXIGE_ADOCAO_INTEGRADA
-    edge_type: SUPERSEDES
   - from: Q_BEACON_NAO_LIBERA_NO_STOP
     to: Q_PLUGIN_SEM_DRIVE_NEM_ADOPT
     edge_type: DEPENDS_ON
@@ -292,4 +332,19 @@ edges:
     edge_type: SUPPORTS
   - from: E_EXCECAO_DE_SELO_VIROU_PREDICADO
     to: Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA
+    edge_type: SUPPORTS
+  - from: D_SELO_DO_MAESTRO_REVERTEU_O_FLIP
+    to: Q_UPDATE_EXIGE_ADOCAO_INTEGRADA
+    edge_type: SUPPORTS
+  - from: Q_VENDOR_ENTRELACADO_COM_PRODUTO
+    to: Q_UPDATE_EXIGE_ADOCAO_INTEGRADA
+    edge_type: SUPERSEDES
+  - from: C_PRECONDICAO_INTEGRACAO_SOBREVIVE
+    to: Q_UPDATE_EXIGE_ADOCAO_INTEGRADA
+    edge_type: SUPPORTS
+  - from: D_SELO_DO_MAESTRO_REVERTEU_O_FLIP
+    to: Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA
+    edge_type: SUPPORTS
+  - from: D_SELO_DO_MAESTRO_REVERTEU_O_FLIP
+    to: Q_LINT_ABORTA_SEM_PYTHON_E_NAO_DIZ
     edge_type: SUPPORTS

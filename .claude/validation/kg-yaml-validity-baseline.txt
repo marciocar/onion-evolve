@@ -1,0 +1,7 @@
+# kg-yaml-validity-baseline — arquivos .kg.yaml que o PyYAML rejeita e que estão TOLERADOS.
+# Gerado por: bash .claude/validation/kg-yaml-validity-check.sh --emit-baseline
+# A métrica de saúde é esta lista ENCOLHENDO. Arquivo novo aqui = catraca frouxa.
+docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml
+docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
+docs/evolution/research/scope-inheritance-2026/scope-inheritance-2026.kg.yaml
+docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml

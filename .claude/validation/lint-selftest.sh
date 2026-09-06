@@ -12124,7 +12124,30 @@ run_realign_selftests() {
     "drift-a-benign|(a)=1|0"
     "drift-northstar|commit=1 bind=1|0"
     "bind-fp-supported-decision|bind=0|0"
+    # PAR que fixa o critério do SUPERADOR MORTO (2026-09-06). O radar já ignora superador
+    # `refuted`/`superseded` (`supersederConta`); a camada 1 daqui contava qualquer aresta, e um alvo
+    # legitimamente reaberto sob superador que CAIU virava (c) PERMANENTE — o radar dizia ✅ e o
+    # realign dizia REALINHAR sobre o MESMO grafo. O controle `superseder-vivo` existe porque a cura
+    # podia ter silenciado a camada inteira: sem ele, apagar a camada 1 passaria verde.
+    "superseder-morto|ALINHADO: (c)=0|0"
+    "superseder-vivo|REALINHAR: (c)=1|1"
   )
+  # O FEED tem de ser COMPLETO. A 1ª tentativa da cura leu o status do `--freshness-tsv`, que OMITE
+  # nó de atenção zero — e todo `refuted` tem atenção zero, ou seja, o superador morto é exatamente
+  # quem falta ali. A cura virou no-op silencioso (medido: 0 de 90 grafos mudaram, inclusive o que
+  # devia mudar) e SÓ a contagem contra o arquivo pegou. Este caso é essa contagem, mecanizada.
+  local _fm="${fx}/superseder-morto.kg.yaml" _rad="${REPO_ROOT}/.claude/validation/kg-radar.sh"
+  if [ -f "${_fm}" ] && [ -f "${_rad}" ]; then
+    local _nn _sn
+    _nn="$(grep -c '^  - id:' "${_fm}" || true)"
+    _sn="$(bash "${_rad}" "${_fm}" --status-tsv 2>/dev/null | grep -c . || true)"
+    if [ "${_nn}" = "${_sn}" ] && [ "${_nn}" -gt 0 ] 2>/dev/null; then
+      record_pass "realign: --status-tsv lista TODOS os ${_nn} nós (inclusive atenção zero)"
+    else record_fail "realign: --status-tsv incompleto" "arquivo tem ${_nn} nós, o feed devolveu ${_sn} — a cura do superador morto vira no-op"; fi
+    if bash "${_rad}" "${_fm}" --status-tsv 2>/dev/null | grep -q "Q_SUPERADOR_QUE_CAIU$(printf '\t')refuted"; then
+      record_pass "realign: --status-tsv traz o status do nó REFUTADO (o que o freshness-tsv omite)"
+    else record_fail "realign: --status-tsv sem o refutado" "o feed não traz o superador morto — foi assim que a 1ª cura ficou muda"; fi
+  fi
   local c name want wantrc rc out f
   for c in "${cases[@]}"; do
     name="${c%%|*}"; c="${c#*|}"; want="${c%|*}"; wantrc="${c##*|}"
@@ -13119,6 +13142,144 @@ EOF_K3
 #
 # É `bancada-espelha-o-runner` invertido: a bancada espelhava o runner do CORE, nunca o do
 # CONSUMIDOR. Esta família fecha a classe — não um caso.
+# REGRA 78 — `.kg.yaml` versionado é YAML VÁLIDO, com catraca.
+#
+# POR QUE EXISTE, e a origem é uma reincidência dentro da própria denúncia: o nó que descreve a classe
+# ("barra invertida antes de cifrão vira escape desconhecido") a COMETEU no seu label, e passou por
+# radar exit 0 + lint 0 HARD + CI verde + merge. Descrever a classe não protege contra ela.
+#
+# ⚠️ ESTA FAMÍLIA EXERCITA `--format tsv`, que é o modo que a PRODUÇÃO (lint-artifacts.sh) consome —
+#    a REGRA 59 (Modo que a produção consome é exercitado pela bancada) cobra exatamente isso, e foi
+#    ela que apontou a lacuna quando esta guarda nasceu sem bancada.
+run_kg_yaml_validity_selftests() {
+  local h="${REPO_ROOT}/.claude/validation/kg-yaml-validity-check.sh"
+  if [ ! -f "${h}" ]; then record_fail "kg-yaml-validity" "helper ausente"; return; fi
+  if ! command -v python3 >/dev/null 2>&1 || ! python3 -c 'import yaml' >/dev/null 2>&1; then
+    record_skip "kg-yaml-validity: python3+PyYAML ausentes"; return; fi
+  local d; d="$(mktemp -d)"; mkdir -p "${d}/r/.claude/validation" "${d}/r/g" "${d}/r/fx/fixtures"
+  printf 'meta: { schema_version: 1 }\nnodes: []\nedges: []\n' > "${d}/r/g/ok.kg.yaml"
+  ( cd "${d}/r" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm c1 ) >/dev/null 2>&1 || true
+  local out rc
+  # (a) corpus válido → silêncio, rc=0
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" = "0" ] && ! grep -q 'HARD' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (a) corpus válido → 0 HARD (modo --format tsv, o que a produção usa)"
+  else record_fail "kg-yaml-validity: (a)" "esperava silêncio, veio rc=${rc}: ${out}"; fi
+  # (b) arquivo NOVO inválido → HARD + rc=1. A quebra é a MESMA do defeito real: barra antes de cifrão.
+  printf 'meta: { schema_version: 1 }\nnodes:\n  - id: X\n    label: "escape \\$ invalido"\nedges: []\n' > "${d}/r/g/mau.kg.yaml"
+  ( cd "${d}/r" && git add -A ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" = "1" ] && grep -q 'HARD' <<< "${out}" && grep -q 'NO-BASELINE' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (b) grafo inválido novo → HARD + NO-BASELINE (catraca desarmada é DITA)"
+  else record_fail "kg-yaml-validity: (b)" "esperava rc=1 com HARD e NO-BASELINE, veio rc=${rc}: ${out}"; fi
+  # (c) baseline emitida → o mesmo arquivo vira PASSIVO SOFT, rc=0
+  bash "${h}" "${d}/r" --emit-baseline > "${d}/r/.claude/validation/kg-yaml-validity-baseline.txt" 2>/dev/null || true
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" = "0" ] && grep -q 'SOFT' <<< "${out}" && ! grep -q 'HARD' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (c) baseline armada → passivo SOFT, 0 HARD"
+  else record_fail "kg-yaml-validity: (c)" "esperava passivo SOFT rc=0, veio rc=${rc}: ${out}"; fi
+  # (d) a catraca APERTA: arquivo novo fora da baseline segue HARD mesmo com baseline armada
+  printf 'meta: { schema_version: 1 }\nnodes:\n  - id: Y\n    label: "outro \\$ ruim"\nedges: []\n' > "${d}/r/g/mau2.kg.yaml"
+  ( cd "${d}/r" && git add -A ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" = "1" ] && grep -q 'mau2' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (d) NOVO fora da baseline → HARD (a catraca aperta, não afrouxa)"
+  else record_fail "kg-yaml-validity: (d)" "arquivo novo passou com baseline armada (rc=${rc}): ${out}"; fi
+  # (e) FIXTURE inválida CONTA. Isentar fixture aqui seria isentar justamente o que a bancada usa
+  #     para provar que a guarda morde — e a casa já pagou por guarda cega ao próprio material de teste.
+  rm -f "${d}/r/g/mau.kg.yaml" "${d}/r/g/mau2.kg.yaml"
+  printf 'meta: { schema_version: 1 }\nnodes:\n  - id: Z\n    label: "fixture \\$ quebrada"\nedges: []\n' > "${d}/r/fx/fixtures/f.kg.yaml"
+  ( cd "${d}/r" && git add -A ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" = "1" ] && grep -q 'fixtures/f.kg.yaml' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (e) fixture inválida CONTA (não há isenção para material de teste)"
+  else record_fail "kg-yaml-validity: (e)" "fixture inválida passou (rc=${rc}): ${out}"; fi
+  # (f) FAIL-CLOSED: verificador que não roda tem de sair 2, NUNCA 0. Foi assim que a 1ª versão
+  #     mentiu — dois redirecionadores de entrada no mesmo comando, SyntaxError, e exit 0.
+  mkdir -p "${d}/stub"
+  printf '#!/usr/bin/env bash\nexit 1\n' > "${d}/stub/python3"; chmod +x "${d}/stub/python3"
+  rc=0; out="$( cd "${d}/r" && PATH="${d}/stub:${PATH}" bash "${h}" "${d}/r" --format tsv 2>&1 )" || rc=$?
+  if [ "${rc}" = "2" ]; then
+    record_pass "kg-yaml-validity: (f) PyYAML indisponível → exit 2 (NAO VERIFICADO), nunca 0"
+  else record_fail "kg-yaml-validity: (f)" "esperava exit 2 fail-closed, veio rc=${rc}: ${out}"; fi
+  # (g) O VERIFICADOR FALHA NO MEIO — o modo exato do fail-open da 1ª versão: `import yaml` passava,
+  #     a varredura estourava, e o script saía 0 declarando corpus limpo.
+  printf '#!/usr/bin/env bash\ncase "$*" in *"import yaml"*) exit 0 ;; esac\nexit 3\n' > "${d}/stub/python3"
+  chmod +x "${d}/stub/python3"
+  rc=0; out="$( cd "${d}/r" && PATH="${d}/stub:${PATH}" bash "${h}" "${d}/r" --format tsv 2>&1 )" || rc=$?
+  if [ "${rc}" = "2" ] && grep -qF "NAO VERIFICADO" <<< "${out}"; then
+    record_pass "kg-yaml-validity: (g) varredura que ESTOURA → exit 2 dizendo NAO VERIFICADO (o fail-open que existiu)"
+  else record_fail "kg-yaml-validity: (g)" "verificador quebrado passou por corpus limpo (rc=${rc}): ${out}"; fi
+  # (h) FORMA DO TSV, não só substring. A bancada anterior AFIRMAVA exercitar `--format tsv` e
+  #     assertava com `grep -q HARD`, que casa nos DOIS formatos — mutilar o ramo `tsv)` do `_out`
+  #     passava verde. E o TSV é load-bearing: o lint corta por TAB e conta como SOFT tudo que não
+  #     seja exatamente `HARD`, então formato humano vira FALSO VERDE no gate.
+  rm -f "${d}/r/fx/fixtures/f.kg.yaml"
+  printf 'meta: { schema_version: 1 }\nnodes:\n  - id: W\n    label: "quebra \$ tsv"\nedges: []\n' > "${d}/r/g/tsv.kg.yaml"
+  ( cd "${d}/r" && git add -A ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  local _campos; _campos="$(grep -F 'INVALIDO' <<< "${out}" | head -1 | awk -F'\t' '{print NF}')"
+  if [ "${_campos}" = "4" ]; then
+    record_pass "kg-yaml-validity: (h) --format tsv emite 4 campos por TAB (o lint corta por TAB)"
+  else record_fail "kg-yaml-validity: (h)" "esperava 4 campos TSV, veio '${_campos}' — o lint leria a linha inteira como severidade: ${out}"; fi
+  # (i) NOME COM ESPAÇO e NÃO-ASCII: `split()` estilhaçava o primeiro e recebia o segundo CITADO
+  #     (core.quotePath), produzindo HARD falso E cobertura ZERO no arquivo real.
+  rm -f "${d}/r/g/tsv.kg.yaml"
+  printf 'meta: { schema_version: 1 }\nnodes: []\nedges: []\n' > "${d}/r/g/plano de acao.kg.yaml"
+  printf 'meta: { schema_version: 1 }\nnodes: []\nedges: []\n' > "${d}/r/g/relatório.kg.yaml"
+  ( cd "${d}/r" && git add -A ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" = "0" ] && ! grep -q 'HARD' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (i) nome com espaço e não-ASCII lidos INTEIROS (sem HARD falso)"
+  else record_fail "kg-yaml-validity: (i)" "nome com espaço/acento produziu ruído (rc=${rc}): ${out}"; fi
+  # (j) I/O NÃO É ERRO DE YAML: arquivo apagado ainda no índice vira SOFT ILEGIVEL, nunca HARD
+  #     "não é YAML válido" — que mandaria consertar sintaxe de um arquivo que não existe.
+  rm -f "${d}/r/g/plano de acao.kg.yaml" "${d}/r/g/relatório.kg.yaml"
+  printf 'meta: { schema_version: 1 }\nnodes: []\nedges: []\n' > "${d}/r/g/sumido.kg.yaml"
+  ( cd "${d}/r" && git add -A && rm -f g/sumido.kg.yaml ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  if grep -q 'ILEGIVEL' <<< "${out}" && ! grep -qE 'HARD.*sumido' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (j) apagado-no-índice → SOFT ILEGIVEL, não HARD de YAML"
+  else record_fail "kg-yaml-validity: (j)" "erro de I/O reportado como veredito de conteúdo: ${out}"; fi
+  ( cd "${d}/r" && git rm -q --cached g/sumido.kg.yaml ) >/dev/null 2>&1 || true
+  # (k) MODOS EXCLUSIVOS: pedir emit E format decidia pela ORDEM, em silêncio — quem gerasse baseline
+  #     por script com a ordem "errada" gravava VIOLAÇÕES onde deveria ir baseline.
+  rc=0; out="$(bash "${h}" "${d}/r" --emit-baseline --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" = "2" ]; then
+    record_pass "kg-yaml-validity: (k) --emit-baseline + --format → exit 2 (a ordem decidia o modo)"
+  else record_fail "kg-yaml-validity: (k)" "esperava rc=2 de exclusividade, veio rc=${rc}: ${out}"; fi
+  # (l) CATRACA-VIOLADA: baseline que CRESCE vs origin/main é HARD. Sem isto, afrouxar custa uma
+  #     linha apendada num .txt, e o único sinal é um número SOFT que ninguém compara.
+  ( cd "${d}/r" && git add -A && git -c user.email=t@t -c user.name=t commit -qm base2 \
+      && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1 || true
+  printf 'g/inventado.kg.yaml\n' >> "${d}/r/.claude/validation/kg-yaml-validity-baseline.txt"
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" = "1" ] && grep -q 'CATRACA-VIOLADA' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (l) baseline CRESCENDO vs origin/main → HARD (catraca é mecanismo)"
+  else record_fail "kg-yaml-validity: (l)" "o baseline cresceu em silêncio (rc=${rc}): ${out}"; fi
+  # (n) O BASELINE CASA LINHA INTEIRA, não substring. Com `grep -qF`, um arquivo cujo caminho é
+  #     SUFIXO de uma entrada do baseline seria tolerado sem estar lá — a catraca perdoaria por
+  #     coincidência de nome. Mutante `-qxF`→`-qF` sobrevivia a todos os outros casos.
+  ( cd "${d}/r" && git rm -q --cached g/mau.kg.yaml 2>/dev/null; true ) >/dev/null 2>&1 || true
+  mkdir -p "${d}/r/g"
+  printf 'meta: { schema_version: 1 }\nnodes:\n  - id: SFX\n    label: "sufixo \$ ruim"\nedges: []\n' > "${d}/r/g/sufixo.kg.yaml"
+  printf '# baseline\nprofundo/g/sufixo.kg.yaml\n' > "${d}/r/.claude/validation/kg-yaml-validity-baseline.txt"
+  ( cd "${d}/r" && git add -A && git -c user.email=t@t -c user.name=t commit -qm sfx \
+      && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" = "1" ] && grep -qE 'HARD.*g/sufixo.kg.yaml' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (n) baseline casa LINHA INTEIRA — sufixo não é perdão"
+  else record_fail "kg-yaml-validity: (n)" "caminho que é SUFIXO de uma entrada foi tolerado (rc=${rc}): ${out}"; fi
+  # (m) RAIZ NÃO-GIT: `git ls-files` mudo virava SOFT verde "nada a validar" — três situações
+  #     distintas (sem corpus, sem repo, sem git) fundidas num sinal só, e o verde era o default.
+  mkdir -p "${d}/nao-git"
+  rc=0; out="$(bash "${h}" "${d}/nao-git" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" = "2" ]; then
+    record_pass "kg-yaml-validity: (m) raiz que não é repo git → exit 2, nunca 'nada a validar'"
+  else record_fail "kg-yaml-validity: (m)" "raiz não-git passou por corpus vazio (rc=${rc}): ${out}"; fi
+  rm -rf "${d}"
+}
+
 run_plugin_runtime_selftests() {
   local root="${REPO_ROOT}"
   if [ ! -d "${root}/plugins" ]; then record_skip "plugin-runtime: sem plugins/ (adotante)"; return; fi
@@ -13238,6 +13399,7 @@ _family run_sdaal_workflows_selftests
 _family run_drive_selftests
 _family run_seal_exception_selftests
 _family run_plugin_runtime_selftests
+_family run_kg_yaml_validity_selftests
 _family run_site_derivation_selftests
 _family run_rules_registry_selftests
 _family run_onion_version_tracked_selftests

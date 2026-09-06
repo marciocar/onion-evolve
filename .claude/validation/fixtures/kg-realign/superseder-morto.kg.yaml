@@ -1,0 +1,42 @@
+# Fixture kg-realign: o SUPERADOR está `refuted` e o alvo voltou a `open`. O radar já ignora
+# superador morto (supersederConta); esta fixture cobra o MESMO critério do realign — sem ela, o
+# realign acusava (c) PERMANENTE num grafo que o radar dá ✅. Veredito esperado: ALINHADO.
+meta: { schema_version: 1, baseline: "2026-09-01" }
+nodes:
+  - id: Q_ALVO_REABERTO
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-05
+    verified_against: medido
+    trace: a.sh
+    label: "foi superado por algo que depois caiu; voltou a viver"
+  - id: Q_SUPERADOR_QUE_CAIU
+    node_type: question
+    plane: PROD
+    status: refuted
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-05
+    verified_against: medido
+    trace: b.sh
+    label: "supersedeu o alvo e depois foi refutado em sandbox"
+  - id: E_DERRUBOU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-05
+    verified_against: sandbox deterministico
+    trace: r.sh
+    label: "a medicao que derrubou o superador"
+edges:
+  - from: Q_SUPERADOR_QUE_CAIU
+    to: Q_ALVO_REABERTO
+    edge_type: SUPERSEDES
+  - from: E_DERRUBOU
+    to: Q_SUPERADOR_QUE_CAIU
+    edge_type: REFUTES

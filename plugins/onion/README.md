@@ -2,7 +2,7 @@
 
 Núcleo operacional do Sistema Onion: o orquestrador mestre (skill onion), runtime de knowledge graph (kg + radar soberano + kg-freshness), sessões e diário, orquestração de subagentes, condução (wizard/onboarding/retro), validação de meta-specs, co-evolução upstream e os adapters SDAAL de task-manager e forge.
 
-**Versão** `0.1.235` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
+**Versão** `0.1.236` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
 
 ## Instalar
 
@@ -97,7 +97,7 @@ Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é 
 | Campo | Valor |
 |---|---|
 | Fonte | `marciocar/onion-evolve` |
-| tree_sha (hash do conteúdo das fontes) | `1ea1c90274a8` |
+| tree_sha (hash do conteúdo das fontes) | `6db8ec8d8a03` |
 
 Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 
