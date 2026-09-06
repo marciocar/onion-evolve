@@ -156,7 +156,17 @@ for bpath in "${VDIR}"/*-baseline.txt; do
       case "${line}" in ''|\#*) printf '%s\n' "${line}" >> "${tmpf}"; continue ;; esac
       # separadores de chave observados nos baselines desta casa: `path::hash` e `path|target`
       p="${line%%::*}"; [ "${p}" = "${line}" ] && p="${line%%|*}"
-      if [ "${p}" != "${line}" ] && case "${p}" in */*) true ;; *) false ;; esac; then
+      # ⚠️ E AS DUAS FORMAS SEM ESSES SEPARADORES, que a versão anterior deixava passar INTEIRAS:
+      #    `path<TAB>contagem` (pipe-verdict) e o CAMINHO NU (kg-yaml-validity). Sem isto, a chave
+      #    do core sobrevivia no adotante e a "métrica de saúde" dele nascia inflada para sempre —
+      #    a mesma contaminação já curada uma vez nesta casa, por outro baseline. O corte é o
+      #    PRIMEIRO campo delimitado por espaço em branco; o teste de existência abaixo continua
+      #    sendo o juiz, então entrada cujo arquivo EXISTE no alvo segue preservada.
+      [ "${p}" = "${line}" ] && p="${line%%[[:space:]]*}"
+      # A condição é a FORMA DE CAMINHO (tem barra), não a presença de separador: a versão anterior
+      # exigia `p != line`, o que excluía justamente a chave que É um caminho inteiro. Linha sem
+      # barra continua PRESERVADA — conservador, como o cabeçalho promete.
+      if case "${p}" in */*) true ;; *) false ;; esac; then
         if [ ! -e "${DEST}/${p}" ]; then foreign=$((foreign + 1)); continue; fi
       fi
       printf '%s\n' "${line}" >> "${tmpf}"
