@@ -98,7 +98,13 @@ for raw in sys.stdin.buffer.read().split(b"\0"):
         print("%s\tIO\t%s" % (name, str(e).replace("\n", " ")[:140]))
         continue
     try:
-        yaml.safe_load(txt)
+        # ⚠️ safe_load_ALL, e a lista() é obrigatória: `safe_load` recusa STREAM MULTI-DOCUMENTO, que
+        #    é YAML perfeitamente válido — e é EXATAMENTE a forma do grafo que a adoção semeia
+        #    (frontmatter `---` + o grafo). Medido 2026-09-07: 3 adotantes reais tinham o PRIMEIRO
+        #    grafo que o Onion lhes deu classificado como inválido por esta guarda, que nasceu ontem.
+        #    A pergunta certa é "isto parseia como YAML?", não "isto é UM documento?". Sem o list()
+        #    o gerador nem chega a parsear o 2º documento e o erro some.
+        list(yaml.safe_load_all(txt))
     except Exception as e:
         print("%s\tYAML\t%s" % (name, str(e).replace("\n", " ")[:140]))
 '

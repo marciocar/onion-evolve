@@ -1622,6 +1622,82 @@ run_decouple_source_selftests() {
 # nos nos que acabaram de provar que o mundo andou. E o `--assert-parity` nao via, porque comparava
 # CONTAGEM: as duas lentes concordavam em quantos nos existem e discordavam em QUAL era o mais
 # urgente, que e a unica pergunta que o painel responde.
+# MODOS COMPOSTOS do kg-radar — sinal de campo do adotante mvp-venda-direta-pdi, confirmado 2026-09-07.
+#
+# O radar lia `MODE="${2:---all}"` e o `$3` caía no chão EM SILÊNCIO: `--integrity --schema` rodava só a
+# integridade e devolvia exit 0 como se tivesse rodado as duas. 97 sítios no repo usam essa forma — dois
+# deles gates de PASSO ZERO (kg-drive-project / kg-realign-project, que PARAM se o radar reprovar) e o
+# predicado de selo. A casa inteira declarava prova mais forte do que a que rodava.
+#
+# ⚠️ O CASO (a) É O QUE IMPORTA e é contraintuitivo: NÃO basta assertar rc=0, porque o defeito
+#    ANTIGO TAMBÉM DAVA rc=0. Só a presença dos DOIS cabeçalhos separa "rodou os dois" de "rodou um e
+#    calou". Guarda que testa o rc de um fail-open não testa nada.
+run_radar_composable_modes_selftests() {
+  local rad="${REPO_ROOT}/.claude/validation/kg-radar.sh"
+  local fx="${REPO_ROOT}/.claude/validation/fixtures/kg-drive/predecessor-closed.kg.yaml"
+  if [ ! -f "${rad}" ] || [ ! -f "${fx}" ]; then record_skip "radar-composable: radar ou fixture ausente"; return; fi
+  local out rc
+  # (a) os DOIS modos rodam — provado pelos dois cabeçalhos, não pelo rc
+  rc=0; out="$(bash "${rad}" "${fx}" --integrity --schema 2>&1)" || rc=$?
+  if [ "${rc}" = "0" ] && grep -q 'INTEGRIDADE' <<< "${out}" && grep -q 'SCHEMA' <<< "${out}"; then
+    record_pass "radar-composable: (a) --integrity --schema roda OS DOIS (dois cabeçalhos, não só rc=0)"
+  else record_fail "radar-composable: (a)" "rc=${rc}; integridade=$(grep -c INTEGRIDADE <<< "${out}") schema=$(grep -c SCHEMA <<< "${out}") — o 2º modo caiu no chão"; fi
+  # (b) um modo só continua idêntico: nenhum dos 97 sítios muda de comportamento
+  rc=0; out="$(bash "${rad}" "${fx}" --integrity 2>&1)" || rc=$?
+  if [ "${rc}" = "0" ] && grep -q 'INTEGRIDADE' <<< "${out}" && ! grep -q 'SCHEMA' <<< "${out}"; then
+    record_pass "radar-composable: (b) um modo só permanece um modo só"
+  else record_fail "radar-composable: (b)" "chamada de modo único mudou de comportamento (rc=${rc}): ${out}"; fi
+  # (c) o rc é COMPOSTO: reprova se QUALQUER modo reprovar
+  local d; d="$(mktemp -d)"
+  sed 's/^    status: confirmed$/    status: nao_existe_esse_status/' "${fx}" > "${d}/mau.kg.yaml"
+  rc=0; out="$(bash "${rad}" "${d}/mau.kg.yaml" --integrity --schema 2>&1)" || rc=$?
+  if [ "${rc}" != "0" ]; then
+    record_pass "radar-composable: (c) grafo inválido → rc≠0 na forma composta"
+  else record_fail "radar-composable: (c)" "grafo inválido passou na forma composta — o fail-open voltou"; fi
+  # (h) O LAÇO TEM DE ENCERRAR O SCRIPT — e a asserção é por CONTAGEM DE SAÍDA, não por rc.
+  #     Achado de revisor adversarial: o mutante que apaga `exit "${_rc}"` sobrevivia a TODOS os
+  #     casos por rc, inclusive ao caso (e) que eu escrevi para matá-lo. Motivo medido: sem o exit,
+  #     o fluxo roda os modos no laço E DEPOIS cai no awk de novo com MODE="$2" — o veredito final
+  #     passa a ser o do PRIMEIRO modo, que é o defeito original. Por rc isso é indistinguível em
+  #     vários grafos; por CONTAGEM é exato: 2 modos têm de emitir 2 cabeçalhos, nunca 3.
+  rc=0; out="$(bash "${rad}" "${fx}" --integrity --schema 2>&1)" || rc=$?
+  local _heads; _heads="$(grep -c '^══' <<< "${out}" || true)"
+  if [ "${_heads}" = "2" ]; then
+    record_pass "radar-composable: (h) 2 modos = exatamente 2 cabeçalhos (o laço encerra; não recai no awk)"
+  else record_fail "radar-composable: (h)" "esperava 2 cabeçalhos, veio ${_heads} — sem o exit final o script roda os modos E recai no awk com \$2, e o veredito volta a ser o do 1º modo"; fi
+  # (e) O SEGUNDO MODO REPROVA E O PRIMEIRO PASSA — a assimetria que a cura existe para fechar,
+  #     e que os casos (a)-(d) NÃO testavam. Achado de revisor adversarial: o caso (c) usava um
+  #     grafo onde o PRIMEIRO modo reprova, então o mutante que apaga `exit "${_rc}"` SOBREVIVIA —
+  #     sem o exit, o fluxo cai no awk com MODE="$2" e o rc final é o do PRIMEIRO modo, que é o
+  #     defeito original de volta. Fixture: schema-divergent (integridade OK, schema ✗).
+  local _sdiv="${REPO_ROOT}/.claude/validation/fixtures/kg-schema/schema-divergent.kg.yaml"
+  if [ -f "${_sdiv}" ]; then
+    local _ri=0 _rs=0 _rc2=0
+    bash "${rad}" "${_sdiv}" --integrity >/dev/null 2>&1 || _ri=$?
+    bash "${rad}" "${_sdiv}" --schema    >/dev/null 2>&1 || _rs=$?
+    bash "${rad}" "${_sdiv}" --integrity --schema >/dev/null 2>&1 || _rc2=$?
+    if [ "${_ri}" = "0" ] && [ "${_rs}" != "0" ] && [ "${_rc2}" != "0" ]; then
+      record_pass "radar-composable: (e) 1º modo PASSA e 2º REPROVA → rc composto reprova (mata o mutante do exit)"
+    else record_fail "radar-composable: (e)" "integridade=${_ri} schema=${_rs} composto=${_rc2} — o rc do composto ficou preso ao PRIMEIRO modo"; fi
+  else record_skip "radar-composable: (e) fixture schema-divergent ausente"; fi
+  # (f) MODO DESCONHECIDO não pode sumir em silêncio — a classe curada estava a um typo de distância
+  rc=0; out="$(bash "${rad}" "${fx}" --integrity --schemaa 2>&1)" || rc=$?
+  if [ "${rc}" = "2" ]; then
+    record_pass "radar-composable: (f) modo desconhecido → exit 2, não fail-open silencioso"
+  else record_fail "radar-composable: (f)" "'--schemaa' passou despercebido (rc=${rc}) e ainda somou verde"; fi
+  # (g) ERRO DE USO continua sendo 2 na forma composta — contrato do cabeçalho do próprio script
+  rc=0; bash "${rad}" "/nao/existe/${RANDOM}.kg.yaml" --integrity --schema >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" = "2" ]; then
+    record_pass "radar-composable: (g) arquivo ausente → rc=2 (erro de uso), não 1 (grafo reprovado)"
+  else record_fail "radar-composable: (g)" "erro de uso virou ${rc} na forma composta — contrato do cabeçalho quebrado"; fi
+  # (d) TRÊS modos, para provar que o laço não para no segundo
+  rc=0; out="$(bash "${rad}" "${fx}" --integrity --schema --triples 2>&1)" || rc=$?
+  if grep -q 'INTEGRIDADE' <<< "${out}" && grep -q 'SCHEMA' <<< "${out}" && grep -qE '(SUPPORTS|DEPENDS_ON|REFUTES|SUPERSEDES)' <<< "${out}"; then
+    record_pass "radar-composable: (d) três modos rodam (o laço não para no segundo)"
+  else record_fail "radar-composable: (d)" "o 3º modo não saiu (rc=${rc})"; fi
+  rm -rf "${d}"
+}
+
 run_kg_status_factor_selftests() {
   local view="${SCRIPT_DIR}/kg-view.sh" radar="${SCRIPT_DIR}/kg-radar.sh"
   local lib="${SCRIPT_DIR}/lib/status-factor.awk"
@@ -13562,6 +13638,20 @@ run_kg_yaml_validity_selftests() {
   if [ "${rc}" = "1" ] && grep -qE 'HARD.*g/sufixo.kg.yaml' <<< "${out}"; then
     record_pass "kg-yaml-validity: (n) baseline casa LINHA INTEIRA — sufixo não é perdão"
   else record_fail "kg-yaml-validity: (n)" "caminho que é SUFIXO de uma entrada foi tolerado (rc=${rc}): ${out}"; fi
+  # (o) MULTI-DOCUMENTO É YAML VÁLIDO — e não era acadêmico: a 1ª versão desta guarda usava
+  #     `safe_load`, que recusa stream multi-documento, e é EXATAMENTE a forma do grafo que a adoção
+  #     semeia (frontmatter `---` + o grafo). Medido 2026-09-07: TRÊS adotantes reais tinham o
+  #     PRIMEIRO grafo que o Onion lhes deu classificado como inválido por uma guarda nascida no dia
+  #     anterior. A pergunta certa é "isto parseia como YAML?", não "isto é UM documento?".
+  local _mdoc; _mdoc="${d}/r/g/multidoc.kg.yaml"
+  printf -- '---\ngraph: semente\ntitle: "frontmatter do grafo semeado"\n---\nmeta: { schema_version: 1 }\nnodes: []\nedges: []\n' > "${_mdoc}"
+  ( cd "${d}/r" && git add -A ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  if ! grep -q 'multidoc' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (o) stream multi-documento é VÁLIDO (a forma do grafo semeado pela adoção)"
+  else record_fail "kg-yaml-validity: (o)" "acusou multi-documento como inválido — todo adotante recebe o 1º grafo reprovado: ${out}"; fi
+  rm -f "${_mdoc}"
+  ( cd "${d}/r" && git add -A ) >/dev/null 2>&1 || true
   # (m) RAIZ NÃO-GIT: `git ls-files` mudo virava SOFT verde "nada a validar" — três situações
   #     distintas (sem corpus, sem repo, sem git) fundidas num sinal só, e o verde era o default.
   mkdir -p "${d}/nao-git"
@@ -13702,6 +13792,7 @@ _family run_family_topology_selftests
 _family run_decouple_source_selftests
 _family run_kg_view_selftests
 _family run_kg_status_factor_selftests
+_family run_radar_composable_modes_selftests
 _family run_pretooluse_veto_selftests
 _family run_version_drift_selftests
 _family run_premodelswitch_guard_selftests
