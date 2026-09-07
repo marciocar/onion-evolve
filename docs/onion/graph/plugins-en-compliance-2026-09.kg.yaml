@@ -400,6 +400,51 @@ nodes:
     trace: .claude/utils/marketplace/public-face.sh
     label: "ENTREGUE — os TRES PAPEIS que viviam colapsados numa variavel so (assemble-plugin.sh:292, `git remote get-url origin`) agora sao distintos e vivem numa costura unica, `.claude/utils/marketplace/public-face.sh`: ORIGEM (so proveniencia, nunca link) · CASA (`ONION_PUBLIC_HOMEPAGE`) · CANAL (`ONION_PUBLIC_REPOSITORY`), os tres sobrescriveis por ambiente para quem forkar. Curados os 7 residuos NO GERADOR — plugin-readme.sh :95 e :132, marketplace-readme.sh :32 e :63, generate-marketplace.sh:40 — mais a catraca que faltava (REGRA 79, HARD, com 3 casos de bancada). CORRECAO DE DIAGNOSTICO, lida no conteudo e nao no grep: das 12 mencoes a `onion-evolve` na prosa dos plugins, 10 sao o IDENTIFICADOR do core (`role: source`, `can_correct_to`, mapeamento de papel) e nao endereco — apaga-las quebraria semantica de members.yaml; so 2 eram caminho navegavel para o repo privado (co-evolve.md:17 e :131) e essas foram curadas. Achado nao previsto: o `.claude-plugin/marketplace.json` do core se chamava `onion-evolve` enquanto o repo PUBLICO ja se chama `onion-plugins` — divergencia alinhada."
 
+  - id: E_README_DE_CATEGORIA_NAO_E_COMANDO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.98
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07: a causa unica se confirmou por CORRESPONDENCIA EXATA — os 3 plugins que reprovavam `claude plugin validate --strict` (design, engineering, product) sao exatamente os 3 que tinham `commands/README.md`, e os 2 que passavam (onion, onion-compliance) nao tinham; a saida da CLI dizia `Validating command: .../commands/README.md` seguida de `frontmatter: No frontmatter block found`. Depois da cura e da regeneracao dos 5: `for p in plugins/*/; do claude plugin validate $p --strict; done` sai rc 0 NOS CINCO, e `ls plugins/*/commands/README.md` nao encontra nenhum. O assembler agora anuncia o skip por categoria (6 linhas em stderr: test, validate, git, engineer, design, product)"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "ENTREGUE (PR 1) — o README.md de categoria deixa de viajar para dentro de `commands/`. A CLI valida TODO .md nessa pasta como comando, e o README de categoria nao tem frontmatter porque nao e comando; o `help.md`, que tem, continua indo. O skip e por BASENAME, deliberadamente previsivel: filtrar por 'nao tem frontmatter' faria um comando REAL mal-formado sumir calado, e sumir calado e pior que reprovar alto — a ausencia de frontmatter num comando de verdade ja e REGRA 1 no core. A CATRACA nao entra aqui de proposito: por o `claude plugin validate` no gate da casa e o D_PR03_GATE_VALIDATE_NA_CASA, no que o plano ja separou."
+
+  - id: E_GERADOR_E_INSUMO_DO_SINAL_DE_MUDANCA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.98
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07 (achado do Elenxo do PR 1, re-medido por mim antes de aceitar): depois da cura que tirou o README de categoria de `commands/`, o conteudo publicado de 3 plugins MUDOU e os dois sinais de mudanca ficaram PARADOS — version design 0.1.22=0.1.22, engineering 0.1.92=0.1.92, product 0.1.53=0.1.53, e tree_sha identico nos tres (56e2fddc, 2ed62794, 7773f2f9). Depois de por os geradores nas duas listas: design 0.1.22->0.1.43 / 56e2fddc->274bce03; engineering 0.1.92->0.1.113 / 2ed62794->2b3fd613; product 0.1.53->0.1.76 / 7773f2f9->1cbe123c; onion 0.1.237->0.1.253; onion-compliance 0.1.19->0.1.38. Gate: lint 0 HARD rc 0, bancada 1104 passaram / 0 falharam rc 0"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "O GERADOR E INSUMO — e nao estava em conjunto nenhum. `tree_sha` e a versao derivada eram calculados so sobre as FONTES do manifesto; o assembler, o plugin-readme.sh e a public-face.sh ficavam de fora. Consequencia MEDIDA, nao hipotetica: uma cura no gerador muda a SAIDA publicada e os dois sinais dizem 'nada mudou', entao `claude plugin update` responde 'already at the latest version' e o instalador fica com o artefato que reprova. E o MESMO modo de falha que a versao derivada nasceu para curar (sinal de campo 2026-09-03), reaparecendo por um flanco que ela nao cobria — behavior-over-declaration aplicado ao proprio sinal de drift. A cura poe os 5 geradores nas DUAS listas. DIRECAO ESCOLHIDA, declarada: bump A MAIS numa mudanca de comentario do gerador e um update no-op; bump A MENOS deixa o usuario travado — entao erra-se para o lado do excesso. O salto de versao e retroativo (conta o historico dos geradores), monotonico e semver-valido, uma vez so."
+
+  - id: Q_TREE_SHA_ENDERECA_ENTRADA_NAO_SAIDA
+    node_type: question
+    drive_kind: decision
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.85
+    verified_at: '2026-09-07'
+    verified_against: "levantado pelo Elenxo do PR 1 em 2026-09-07 e nao resolvido nele: o campo se chama content-addressed e a nota do provenance.json diz 'hash do ls-tree das fontes canonicas em .claude/' — ou seja, ele enderecca a ENTRADA. A cura de E_GERADOR_E_INSUMO_DO_SINAL_DE_MUDANCA amplia o conjunto de entradas (poe os geradores dentro), mas nao muda a natureza do endereco"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "DECISAO DO MAESTRO — `tree_sha` deve endereccar a SAIDA (o conteudo do plugin montado, excluindo o proprio provenance.json) em vez das ENTRADAS? A favor: e o que 'content-addressed' promete, e fecha por construcao toda classe de 'a saida mudou e o hash nao' — a cura de hoje fecha o flanco conhecido (geradores) e deixa os desconhecidos abertos. Contra: muda a SEMANTICA da REGRA 19 (SSOT anti-drift), que hoje le o campo como 'a fonte mudou sem regenerar' e passaria a ler 'a saida no disco difere da registrada' — outra pergunta, talvez melhor, mas outra; e exige cuidado de bootstrap (o hash mora dentro do dir que ele endereca). NAO foi puxado para o PR 1 de proposito: e redesenho de contrato, nao correcao de bug."
+
+  - id: Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO
+    node_type: claim
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.95
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07 no merge do PR #814: `ops/pr-merge-verified.sh 814` saiu rc 1 com a mensagem 'gh pr merge saiu com rc=1 — NAO declaro merge', e a causa foi `could not determine current branch: failed to run git: not on any branch` (HEAD destacado, para liberar a branch presa na worktree). O merge TINHA acontecido: `gh pr view 814` devolveu state MERGED e mergedAt 2026-09-07T15:52:31Z, os 3 commits entraram em main (9857681a, d2c9000c, 437dd680) e a branch remota foi apagada (`git ls-remote origin refs/heads/feat/plugins-en-compliance` = 0 linhas)"
+    trace: ops/pr-merge-verified.sh
+    label: "O caminho verificado de merge tem a falha INVERSA da que ele cura: da FALSO NEGATIVO. Ele existe para nunca declarar sucesso falso, e o desenho e bom — mas morre no passo 3 (rc do `gh pr merge`) e por isso NUNCA CHEGA ao passo 4, que e justamente a prova independente pelo ESTADO (`state=MERGED` + `mergedAt`). Assim ele nao distingue 'nao mergeou' de 'mergeou, a limpeza pos-merge e que falhou'. Mais seguro que o inverso, mas ainda engana: uma sessao futura pode tentar re-mergear ou entrar em panico, e a memoria do repo ja carrega uma explicacao PARCIAL deste sintoma (worktree segurando a branch) que hoje se mostrou nao ser a unica causa. CURA PROPOSTA, na propria filosofia dele: em rc != 0, CONSULTAR O ESTADO antes de morrer, e reportar em tres vias — nao mergeou (die) · mergeou e limpou (sucesso) · mergeou mas a limpeza falhou (sucesso com aviso acionavel). Sao poucas linhas; nao entrou no PR 1 por ser outro artefato e outro escopo."
+
 edges:
   - from: D_PR02_VERDADE_NO_ARTEFATO_PUBLICO
     to: D_PR01_STRICT_LIMPO
@@ -515,3 +560,15 @@ edges:
   - from: E_FACE_PUBLICA_VIROU_COSTURA_E_CATRACA
     to: D_CONTATO_DESACOPLADO
     edge_type: SUPPORTS
+  - from: E_README_DE_CATEGORIA_NAO_E_COMANDO
+    to: D_PR01_STRICT_LIMPO
+    edge_type: SUPPORTS
+  - from: E_GERADOR_E_INSUMO_DO_SINAL_DE_MUDANCA
+    to: D_PR01_STRICT_LIMPO
+    edge_type: SUPPORTS
+  - from: Q_TREE_SHA_ENDERECA_ENTRADA_NAO_SAIDA
+    to: E_GERADOR_E_INSUMO_DO_SINAL_DE_MUDANCA
+    edge_type: CONSTRAINS
+  - from: Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO
+    to: D_PR01_STRICT_LIMPO
+    edge_type: CONSTRAINS
