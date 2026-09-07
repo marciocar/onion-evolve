@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # kg-radar.sh — radar determinístico do Knowledge Graph SDAAL (motor soberano do core).
 #
-# Uso: bash .claude/validation/kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples]
+# Uso: bash .claude/validation/kg-radar.sh <arquivo.kg.yaml> [<modo>...]  (modos COMPÕEM: `--integrity --schema` roda os dois e reprova se qualquer um reprovar)\n       modos: --radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples
 #      (sem flag = radar + state + reconcile + integrity + domain + provenance + freshness + schema)
 #
 # Doutrina: docs/knowledge-base/concepts/knowledge-graph-sdaal.md
@@ -90,7 +90,51 @@ STATUS_FACTOR="$(cat "${_LIB}")"
 
 FILE="${1:-}"
 MODE="${2:---all}"
-[ -n "$FILE" ] && [ -f "$FILE" ] || { echo "uso: kg-radar.sh <arquivo.kg.yaml> [--radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples]" >&2; exit 2; }
+
+# ⚠️ MODOS COMPOSTOS — o `$3` caía no chão, EM SILÊNCIO. Sinal de campo do adotante
+# de um adotante (2026-08-31), confirmado aqui em 2026-09-07: `kg-radar.sh <g> --integrity
+# --schema` rodava SÓ a integridade e devolvia exit 0 como se tivesse rodado as duas. Medido: 97
+# sítios no repo usam essa forma, e dois deles são gates de PASSO ZERO (`kg-drive-project.sh` e
+# `kg-realign-project.sh`, que PARAM se o radar reprovar) — mais o predicado de selo criado hoje.
+# Ou seja: a casa inteira vinha declarando uma prova mais forte do que a que rodava.
+#
+# Por que re-invocar em vez de reescrever o awk: o veredito de cada modo já mora dentro do awk e
+# cada modo tem seu próprio `exit`. Um laço externo preserva TODOS os 97 sítios sem tocar em 700
+# linhas de parser, e o rc composto é o que a chamada sempre quis dizer: reprova se QUALQUER modo
+# reprovar. Chamada de um modo só não muda em nada — nem de caminho, nem de custo.
+#
+# ⚠️ E o alívio, medido antes de curar: rodado sozinho, o `--schema` passa em 91 de 91 grafos
+# versionados. Nenhum defeito foi publicado por causa disto — o que houve foi afirmação mais forte
+# que a medição, que é a classe que esta casa persegue.
+if [ "$#" -gt 2 ]; then
+  _rc=0
+  for _m in "${@:2}"; do
+    # ⚠️ ALLOWLIST: modo desconhecido era fail-open SILENCIOSO — `--schemaa` sumia e somava rc=0.
+    #    A classe curada aqui estava a um typo de distância de voltar pela porta ao lado.
+    case "${_m}" in
+      --radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness|--freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples|--all) : ;;
+      *) printf 'kg-radar: modo desconhecido: %s\n' "${_m}" >&2; exit 2 ;;
+    esac
+  done
+  for _m in "${@:2}"; do
+    bash "${BASH_SOURCE[0]}" "${FILE}" "${_m}"; _one=$?
+    # ⚠️ 2 é ERRO DE USO/ARQUIVO e NÃO pode virar 1 (grafo reprovado) — contrato escrito no
+    #    cabeçalho deste arquivo. Antes, arquivo ausente + forma composta devolvia 1.
+    [ "${_one}" -eq 2 ] && exit 2
+    [ "${_one}" -eq 0 ] || _rc=1
+  done
+  exit "${_rc}"
+fi
+# ⚠️ LITERAL EM ASPAS SIMPLES + printf. A 1ª versão desta mensagem trazia `--integrity --schema`
+#    entre CRASES dentro de aspas DUPLAS: o shell tentava EXECUTAR, emitia "command not found",
+#    comia o exemplo e ainda imprimia `\n` literal. É o mesmo defeito que este autor curou, no
+#    mesmo dia, em seed-adoption-graph.sh — a partir de um sinal de campo sobre exatamente isso.
+[ -n "$FILE" ] && [ -f "$FILE" ] || {
+  printf '%s\n' 'uso: kg-radar.sh <arquivo.kg.yaml> [<modo>...]' \
+    '      os modos COMPÕEM: "--integrity --schema" roda os dois e reprova se qualquer um reprovar' \
+    '      modos: --radar|--state|--reconcile|--integrity|--domain|--provenance|--freshness' \
+    '             --freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples' >&2
+  exit 2; }
 
 awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" "${STATUS_FACTOR}"'
 # ── DENYLIST, NÃO ALLOWLIST — a lição de 2026-08-07 ─────────────────────────────────────────

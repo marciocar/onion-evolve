@@ -172,6 +172,43 @@ verifica contra a fonte externa viva, nunca do cutoff).
 
 ---
 
+## Caso 5 — `npm view versions`: a lista que declara maturidade que o pacote não tem
+
+**Sinal de campo de um adotante, 2026-09-07.** Ao escolher a biblioteca de componentes, a
+consulta natural — *"quais versões existem?"* — devolveu isto para `@base-ui-components/react`:
+
+```
+$ npm view @base-ui-components/react versions
+[ … '1.0.0-beta.7', '1.0.0-rc.0' ]
+```
+
+Leitura óbvia e errada: *"só pre-releases, a biblioteca não tem release estável"*. O campo que
+desmente está a um comando de distância, e ninguém o consulta:
+
+```
+$ npm view @base-ui-components/react deprecated
+Package was renamed to @base-ui/react
+$ npm view @base-ui/react version
+1.8.0
+```
+
+A lista de versões **é verdadeira e mesmo assim engana**: ela descreve fielmente o histórico *daquele
+nome*, e o nome foi abandonado. Maturidade não vive no histórico do identificador — vive no pacote
+para onde o identificador aponta. É o mesmo formato dos casos 1–4: o artefato **declara** (uma lista
+de releases) e o **comportamento** (o campo `deprecated`) diz outra coisa.
+
+O que transfere não é Base UI, é a ordem: **`deprecated` antes de `versions`** sempre que a conclusão
+for sobre estabilidade, maturidade ou abandono. Custa um comando; e o erro que ele evita — descartar
+uma biblioteca estável por causa de um nome morto, ou adotar o nome morto e receber avisos para
+sempre — só aparece semanas depois, no `pnpm install` de outra pessoa.
+
+**Corolário para qualquer registry**, não só npm: onde existe renomeação/transferência (npm, PyPI,
+crates, Docker Hub, GitHub repos com `moved`), a listagem de versões/tags é sobre o **nome** e o
+veredito de maturidade é sobre o **destino**. Perguntar ao nome sobre o destino é a mesma classe de
+`exit-code-não-é-a-verificação`: resposta legítima para uma pergunta que não era a que importava.
+
+---
+
 ## A regra generalizável
 
 > Ao **adotar, herdar ou gatear** qualquer artefato, verifique o **comportamento**, não a

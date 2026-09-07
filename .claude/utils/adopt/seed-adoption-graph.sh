@@ -88,7 +88,7 @@ case "${GATE}" in
             GATE_LABEL="O gate determinístico foi PROVADO POR EXECUÇÃO na adoção (hook nativo via core.hooksPath, commit-sonda barrado com o lint reprovando) — não por existência de arquivo. Isso importa porque a medição de 2026-08-16 achou o gate INERTE em 4 de 6 adotantes (husky sombreando o hooksPath, hooksPath para diretório vazio, hook ausente), e nenhum caso era visível sem executar."
             GATE_VERIF="verify-adopter-gate-executado-na-adocao" ;;
   unproven) GATE_STATUS="open"
-            GATE_LABEL="O gate está INSTALADO mas NÃO foi provado por execução nesta adoção (alvo sem commits, ou lint indisponível no momento). Instalar não é sinônimo de proteger: rode 'bash ops/verify-adopter-gate.sh <este-repo>' a partir do core, ou faça um commit que viole o lint de propósito e confirme que ele é BARRADO. Enquanto isto for `open`, a proteção deste repo é declarada, não verificada."
+            GATE_LABEL="O gate está INSTALADO mas NÃO foi provado por execução nesta adoção (alvo sem commits, ou lint indisponível no momento). Instalar não é sinônimo de proteger: rode 'bash ops/verify-adopter-gate.sh <este-repo>' a partir do core, ou faça um commit que viole o lint de propósito e confirme que ele é BARRADO. Enquanto isto for \`open\`, a proteção deste repo é declarada, não verificada."
             GATE_VERIF="nao-verificado-gate-declarado-e-nao-provado" ;;
   *)        GATE_STATUS="open"
             GATE_LABEL="O gate foi instalado; se ele BARRA de fato, ninguém mediu nesta adoção (o semeador não recebeu --gate-proven nem --gate-unproven). Prove antes de confiar: 'bash ops/verify-adopter-gate.sh <este-repo>' do core."

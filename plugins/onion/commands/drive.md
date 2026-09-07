@@ -44,8 +44,21 @@ sela o lote anterior antes de nova passada. (Anti-thrashing; o degrau AUDIT é b
 bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-drive-project.sh <grafo>        # FILA-PRONTA + BLOQUEADOS
 ```
 `DONE` → nada a conduzir, encerre. `DEADLOCK` → **PARE** (predecessor travado; o bloqueador vira item
-de alta atenção). `READY` → siga. Complete o censo com os fios em-voo: `git worktree list`, `gh pr list`,
-inbox.
+de alta atenção). `READY` → siga.
+
+**Complete o censo com os fios em-voo — e leia ESTADO, nunca nome.** `git worktree list` e `gh pr list`
+dizem **onde** olhar; o que foi feito só o **status dos nós** responde. Rode o censo em cada grafo em
+jogo, inclusive os de outras worktrees e o de `origin/main`:
+```bash
+git worktree list                                   # descobre ONDE, não O QUÊ
+bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-drive-project.sh <grafo>  # rode em CADA grafo em jogo
+```
+⚠️ **Nome de branch é declaração, não estado** (medido 2026-09-07): uma passada leu
+`fix/merge-verified-false-negative` na worktree e concluiu *"o plano não começou"* — enquanto o grafo
+dele tinha **12 nós fechados e o PR 1 em `main`**. A branch estava naquele nome por um item pedido pelo
+maestro, não por desvio. É a mesma classe que este comando persegue: confiar no que o artefato
+**declara** em vez do que ele **faz** — três linhas depois de o próprio comando dizer que *o status do
+nó É o progresso*. O `inbox` entra igual: conte arquivos, não lembre.
 
 ### P2 — Selecionar o lote
 Top `--max-nodes` da FILA-PRONTA (ordem = atenção). Respeite `--budget` (pare de selecionar ao projetar

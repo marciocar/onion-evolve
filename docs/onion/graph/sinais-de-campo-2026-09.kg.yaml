@@ -1,0 +1,63 @@
+meta:
+  id: sinais-de-campo-2026-09
+  schema_version: "1"
+  baseline: 2026-09-07
+  # TRIAGEM dos sinais de campo dos adotantes, rodada de 2026-09-07. Existe como grafo proprio porque
+  # o fios-abertos tem teto de 20 nos declarado no proprio meta: e "onda nova exige onda COLHIDA" —
+  # despejar triagem la seria inflar o backlog para nao pensar, que e o que aquele teto impede.
+  # Fonte: os inboxes dos adotantes, NAO relayados (o relay e ato do maestro, nao do agente).
+nodes:
+  - id: E_RADAR_IGNORAVA_O_SEGUNDO_MODO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07: `kg-radar.sh <g> --integrity --schema` imprimia SO o cabecalho INTEGRIDADE; `--schema` sozinho imprime o dele. Causa: MODE=${2:---all} le so o $2. Sitios com a forma de dois modos, medidos por tipo: 22 ocorrencias em 6 arquivos .sh (executavel, incluindo os dois gates de passo zero e o predicado de selo) + 67 em 52 .md (prosa) + 6 outros. Rodando --schema sozinho: 0 reprovam entre os 92 grafos versionados nao-fixture (o corpus tem 125 no total; as 2 fixtures que reprovam existem para isso)"
+    trace: .claude/validation/kg-radar.sh
+    label: "SINAL DE CAMPO DO ADOTANTE poc-venda-direta-pdi (2026-08-31), CONFIRMADO no core em 2026-09-07: o kg-radar aceitava dois modos e rodava so o primeiro, EM SILENCIO, devolvendo exit 0 como se tivesse rodado os dois. O adotante contou 9 sitios; medido aqui sao 22 ocorrencias executaveis em 6 arquivos .sh — e dois deles sao gates de PASSO ZERO (kg-drive-project.sh e kg-realign-project.sh, que PARAM se o radar reprovar), mais o predicado de selo kg-seal-exception.sh criado no mesmo dia. DANO REAL: nao houve. Rodado sozinho, o --schema passa em 91 de 91 grafos versionados — nenhum defeito foi publicado. O dano foi de OUTRA natureza: durante toda a sessao de 2026-09-06/07 eu declarei 'radar --integrity --schema exit 0' como prova, e o schema nunca rodou. Afirmacao mais forte que a medicao, na guarda que existe para impedir exatamente isso. ⚠️ E O NO ERRADO ERA ESTE: a 1a versao dele afirmava '97 sitios' num verified_against, com confidence 0.95. O numero saiu de um grep preguicoso (linha que cita o radar e tem algum '--'), nao de contagem de invocacao. Um revisor adversarial mediu 5x menos. Num no cuja tese e 'afirmacao mais forte que a medicao', a medicao da propria tese estava inflada e carimbada como verificada — o defeito que o no denuncia, cometido pelo no. CURA: modos COMPOEM — o radar re-invoca a si mesmo um por modo e o rc reprova se qualquer um reprovar; preserva os 97 sitios sem tocar nas 700 linhas do parser. LICAO DA BANCADA, que e o que sobrevive: o caso que prova a cura NAO pode assertar rc=0, porque o defeito antigo TAMBEM dava rc=0 — so a presenca dos dois cabecalhos separa 'rodou os dois' de 'rodou um e calou'. Guarda que testa o rc de um fail-open nao testa nada."
+
+  - id: E_LISTA_DE_VERSOES_MENTE_SOBRE_MATURIDADE
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-09-07'
+    verified_against: "medido na fonte em 2026-09-07: `npm view @base-ui-components/react versions` termina em 1.0.0-rc.0 (parece imaturo); `npm view @base-ui-components/react deprecated` devolve 'Package was renamed to @base-ui/react'; `npm view @base-ui/react version` devolve 1.8.0 estavel"
+    trace: docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md
+    label: "SINAL DE CAMPO DO portal-gamificacao (2026-09-07) que NUNCA VIROU ARQUIVO — viveu so na mensagem do commit 5f9e02d, e chegou aqui pelo maestro. A licao nao e sobre Base UI: `npm view <pkg> versions` MENTE SOBRE MATURIDADE quando o pacote foi renomeado. A lista e verdadeira e mesmo assim engana, porque descreve fielmente o historico DAQUELE NOME, e o nome foi abandonado; maturidade vive no pacote para onde o identificador aponta. A checagem barata que precede qualquer conclusao sobre estabilidade e `npm view <pkg> deprecated`. Vale para todo registry com renomeacao/transferencia (npm, PyPI, crates, Docker Hub, repo com `moved`): a listagem e sobre o NOME, o veredito de maturidade e sobre o DESTINO. Registrado como Caso 5 da KB behavior-over-declaration, que VIAJA no plugin onion — entao a licao alcanca os adotantes, nao so o core. ACHADO COLATERAL sobre o proprio canal: um aprendizado que fica na mensagem de commit nao chega a lugar nenhum; o inbox existe para isso e nao foi usado."
+
+  - id: C_O_CAMPO_ACHA_DECLARADO_MAIOR_QUE_MEDIDO
+    node_type: claim
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-09-07'
+    verified_against: "os dois sinais desta rodada, medidos no core: o radar rodava um modo e devolvia exit 0 como se fossem dois; e `npm view versions` descreve fielmente o historico de um nome abandonado e por isso engana sobre maturidade. Em ambos o artefato responde a verdade a uma pergunta que nao era a que importava"
+    trace: docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md
+    label: "A CLASSE que une os sinais desta rodada, e a razao de eles viverem no mesmo grafo: o que os adotantes acham no campo nao sao bugs de logica — sao artefatos que DECLARAM mais do que medem, e que respondem com verdade a uma pergunta diferente da que se fez. O radar respondia 'a integridade passa' quando se perguntou 'integridade E schema passam'. O npm respondia 'estas sao as versoes DESTE NOME' quando se perguntou 'esta biblioteca e madura'. Nenhum dos dois mente; os dois enganam. ⚠️ ESTE NO EXISTE POR UMA CORRECAO DE ESTRUTURA: a 1a versao do grafo ligava um sinal ao outro com SUPPORTS, o que era FALSO — um nao apoia o outro, sao independentes — e a aresta so existia para calar a regra de no orfao. Aresta de conveniencia e afirmacao de relacao que a evidencia nao sustenta, dentro do SSOT. Achado de revisor adversarial."
+
+  - id: E_CENSO_EM_VOO_LE_NOME_DE_BRANCH
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07: o censo do grafo do plano em origin/main devolve pronto=12 bloqueado=13 sobre 39 nos, com 12 fechados — entre eles D_PR01_STRICT_LIMPO (PR #815 mergeado). A afirmacao contraria ('o plano ainda nao comecou') foi produzida lendo `git worktree list` e vendo a branch `fix/merge-verified-false-negative`, que nao e no do plano"
+    trace: .claude/commands/meta/drive.md
+    label: "DEFEITO DE METODO NO PROPRIO /meta:drive, cometido por mim e apanhado pela sessao que conduz o plano. O P1 manda 'completar o censo com os fios em-voo: git worktree list, gh pr list, inbox' — e `git worktree list` devolve NOME DE BRANCH, que e DECLARACAO, nao estado. Eu li 'a worktree esta em fix/merge-verified-false-negative' e conclui 'o plano nao comecou', quando o plano tinha 12 nos fechados e o PR 1 dele em main. A branch estava naquele nome porque o maestro mandou curar um falso-negativo do ops/pr-merge-verified.sh que aparecera no merge do #814 — item pedido, nao desvio. ⚠️ A IRONIA E O ACHADO: o mesmo comando diz, tres linhas acima, que 'o status do no E o progresso'; e a classe do erro e exatamente a que esta sessao passou o dia cacando — confiar no que o artefato DECLARA em vez do que ele FAZ. CURA DE MECANISMO, nao de disciplina: o censo em-voo tem de ler o STATUS DOS NOS dos grafos em jogo (inclusive os de outras worktrees e o de origin/main), e usar `git worktree list` so para saber ONDE olhar — nunca para inferir O QUE foi feito. Nome de branch responde 'onde a sessao esta', jamais 'quanto do plano andou'."
+
+edges:
+  - from: E_RADAR_IGNORAVA_O_SEGUNDO_MODO
+    to: C_O_CAMPO_ACHA_DECLARADO_MAIOR_QUE_MEDIDO
+    edge_type: SUPPORTS
+  - from: E_LISTA_DE_VERSOES_MENTE_SOBRE_MATURIDADE
+    to: C_O_CAMPO_ACHA_DECLARADO_MAIOR_QUE_MEDIDO
+    edge_type: SUPPORTS
+  - from: E_CENSO_EM_VOO_LE_NOME_DE_BRANCH
+    to: C_O_CAMPO_ACHA_DECLARADO_MAIOR_QUE_MEDIDO
+    edge_type: SUPPORTS
