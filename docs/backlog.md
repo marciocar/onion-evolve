@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**167 itens abertos** em 40 grafo(s) com aberto (de 62 no escopo) · 40 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**166 itens abertos** em 40 grafo(s) com aberto (de 61 no escopo) · 40 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -49,13 +49,12 @@
 | 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
 
-## plugins-en-compliance-2026-09 — 25 item(ns)
+## plugins-en-compliance-2026-09 — 24 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 47.5 | `D_PR10_LEGAL_E_SUPORTE` | plugins-en-compliance-2026-09 | PR 10 — os requisitos 3.A, 3.B, 3.C e 3.F. SSOT em .claude/utils/marketplace/legal/ (PRIVACY, SUPPORT, SECURITY, CODE_OF_CONDUCT |
 | 19.0 | `D_PR02_VERDADE_NO_ARTEFATO_PUBLICO` | plugins-en-compliance-2026-09 | PR 2 — parar de mentir no artefato publico. TRES correcoes: (a) plugin-readme.sh:92 e marketplace-readme.sh:57 passam a descreve |
-| 14.4 | `Q_MX_DO_ONIONEVOLVE` | plugins-en-compliance-2026-09 | GATE DO MAESTRO (instrumento humano — o painel DNS da Hostinger nao e superficie do driver): publicar MX + SPF para onionevolve. |
 | 13.5 | `D_PR04_EMENDA_L0` | plugins-en-compliance-2026-09 | PR 4 — a CONSTRAIN 1: emendar a L0 ANTES de qualquer linha de gerador. Quadro §1 (:41-42) passa a tratar description:/argument- |
 | 13.5 | `D_PR06_FLIP_PARA_EN` | plugins-en-compliance-2026-09 | PR 6 — o flip da superficie. surface_lang: en; en.json completo; as 5 PLUGIN_DESC dos manifestos em EN; materialize-marketplace- |
 | 10.8 | `D_PR05_ASSENTO_DE_IDIOMA` | plugins-en-compliance-2026-09 | PR 5 — o assento unico, com saida BYTE-IDENTICA. Cria lang.conf (versionado), lang.local.conf (never-clobber do adotante; sobrev |

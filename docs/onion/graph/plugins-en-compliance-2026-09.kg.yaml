@@ -324,13 +324,13 @@ nodes:
     node_type: question
     drive_kind: execution
     plane: PROD
-    status: open
+    status: done
     impact: 4
     confidence: 0.9
     verified_at: '2026-09-07'
     verified_against: "aberto 2026-09-07 a partir de E_ONIONEVOLVE_NAO_RECEBE_EMAIL — zero MX em dois resolvers, zero SPF, 25 e 587 recusados no A record"
     trace: .claude/utils/marketplace/assemble-plugin.sh
-    label: "GATE DO MAESTRO (instrumento humano — o painel DNS da Hostinger nao e superficie do driver): publicar MX + SPF para onionevolve.com e criar a caixa suporte@. ACEITE EXECUTAVEL, nesta ordem: (1) `dig @1.1.1.1 +short MX onionevolve.com` devolve pelo menos um host; (2) `dig @1.1.1.1 +short TXT onionevolve.com` traz um registro `v=spf1`; (3) um envio de fora chega na caixa e o maestro confirma. BLOQUEIA o PR 10 por DEPENDS_ON, e nao por CONSTRAINS, DE PROPOSITO: o censo do drive so imprime bloqueio de DEPENDS_ON, entao uma restricao seria invisivel na proxima passada e o e-mail acabaria estampado por omissao — fail-closed num artefato publico e irreversivel. Se o maestro preferir destravar o resto do PR 10 (PRIVACY, SECURITY, CODE_OF_CONDUCT, security.txt sem e-mail), a mudanca e trocar esta aresta para CONSTRAINS — decisao dele, nao minha."
+    label: "FECHADO 2026-09-07: os tres passos do aceite cumpridos — (1) MX e (2) SPF medidos por mim no DNS, (3) chegada da caixa CONFIRMADA PELO MAESTRO (ver E_CAIXA_DE_SUPORTE_RECEBE). Desbloqueia o D_PR10_LEGAL_E_SUPORTE. GATE DO MAESTRO (instrumento humano — o painel DNS da Hostinger nao e superficie do driver): publicar MX + SPF para onionevolve.com e criar a caixa suporte@. ACEITE EXECUTAVEL, nesta ordem: (1) `dig @1.1.1.1 +short MX onionevolve.com` devolve pelo menos um host; (2) `dig @1.1.1.1 +short TXT onionevolve.com` traz um registro `v=spf1`; (3) um envio de fora chega na caixa e o maestro confirma. BLOQUEIA o PR 10 por DEPENDS_ON, e nao por CONSTRAINS, DE PROPOSITO: o censo do drive so imprime bloqueio de DEPENDS_ON, entao uma restricao seria invisivel na proxima passada e o e-mail acabaria estampado por omissao — fail-closed num artefato publico e irreversivel. Se o maestro preferir destravar o resto do PR 10 (PRIVACY, SECURITY, CODE_OF_CONDUCT, security.txt sem e-mail), a mudanca e trocar esta aresta para CONSTRAINS — decisao dele, nao minha."
 
   - id: E_ELENXO_DESACOPLAR_APROVADO_COM_RESSALVA
     node_type: evidence
@@ -444,6 +444,17 @@ nodes:
     verified_against: "medido 2026-09-07 no merge do PR #814: `ops/pr-merge-verified.sh 814` saiu rc 1 com a mensagem 'gh pr merge saiu com rc=1 — NAO declaro merge', e a causa foi `could not determine current branch: failed to run git: not on any branch` (HEAD destacado, para liberar a branch presa na worktree). O merge TINHA acontecido: `gh pr view 814` devolveu state MERGED e mergedAt 2026-09-07T15:52:31Z, os 3 commits entraram em main (9857681a, d2c9000c, 437dd680) e a branch remota foi apagada (`git ls-remote origin refs/heads/feat/plugins-en-compliance` = 0 linhas)"
     trace: ops/pr-merge-verified.sh
     label: "O caminho verificado de merge tem a falha INVERSA da que ele cura: da FALSO NEGATIVO. Ele existe para nunca declarar sucesso falso, e o desenho e bom — mas morre no passo 3 (rc do `gh pr merge`) e por isso NUNCA CHEGA ao passo 4, que e justamente a prova independente pelo ESTADO (`state=MERGED` + `mergedAt`). Assim ele nao distingue 'nao mergeou' de 'mergeou, a limpeza pos-merge e que falhou'. Mais seguro que o inverso, mas ainda engana: uma sessao futura pode tentar re-mergear ou entrar em panico, e a memoria do repo ja carrega uma explicacao PARCIAL deste sintoma (worktree segurando a branch) que hoje se mostrou nao ser a unica causa. CURA PROPOSTA, na propria filosofia dele: em rc != 0, CONSULTAR O ESTADO antes de morrer, e reportar em tres vias — nao mergeou (die) · mergeou e limpou (sucesso) · mergeou mas a limpeza falhou (sucesso com aviso acionavel). Sao poucas linhas; nao entrou no PR 1 por ser outro artefato e outro escopo."
+
+  - id: E_CAIXA_DE_SUPORTE_RECEBE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-07'
+    verified_against: "passo (3) do aceite de Q_MX_DO_ONIONEVOLVE cumprido em 2026-09-07: e-mail de teste com marcador ONION-MX-01 enviado da conta Gmail do maestro (id 1a07d037501df700) — DELIBERADAMENTE de fora do dominio onionevolve.com, para atravessar a internet em vez de circular dentro do proprio servidor — e o MAESTRO CONFIRMOU o recebimento ('email recebido'). Junto com os passos (1) e (2) ja medidos por mim no DNS (MX mx1/mx2.hostinger.com nos dois resolvers; SPF v=spf1 include:_spf.mail.hostinger.com ~all; DMARC p=none; mx1:25 respondendo 220-ESMTP), o aceite dos tres passos esta completo"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "MEDIDO — marcio@onionevolve.com RECEBE. Fecha a distancia entre 'o dominio aceita correio' (que o DNS provava) e 'esta caixa recebe' (que so a chegada prova) — e e a segunda que o requisito 3.B cobra. PROVENIENCIA DA EVIDENCIA, declarada: os passos (1) e (2) eu medi; o passo (3) e RELATO DO MAESTRO, porque a caixa nao e superficie que eu leia. Nao e medicao minha e nao vou apresenta-la como se fosse. Com isto o e-mail pode entrar em author.email dos 5 plugin.json, no SUPPORT.md e no security.txt — que e o que o PR 10 faz."
 
 edges:
   - from: D_PR02_VERDADE_NO_ARTEFATO_PUBLICO
@@ -572,3 +583,6 @@ edges:
   - from: Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO
     to: D_PR01_STRICT_LIMPO
     edge_type: CONSTRAINS
+  - from: E_CAIXA_DE_SUPORTE_RECEBE
+    to: Q_MX_DO_ONIONEVOLVE
+    edge_type: SUPPORTS

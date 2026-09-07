@@ -56,10 +56,26 @@ die() { printf '✗ %s\n' "$*"; exit 1; }
 # ANTERIOR — e o merge saiu 1 SEGUNDO depois de os runs novos nascerem, lendo verde velho. A cura:
 # amarrar a leitura ao SHA do head e exigir que os check-runs DESSE SHA existam e estejam completos.
 # (Sem check-run algum para o head = a janela da corrida → recusar e mandar esperar, nunca assumir.)
+# ── ÂNCORA DE ESTADO (topo, antes de qualquer gate) ───────────────────────────────────
+# Ler o estado DEPOIS de um `gh` que falhou só prova algo se soubermos que o PR não estava
+# mergeado ANTES. Reprovada pelo Elenxo em 2026-09-07 na 1a versao: a leitura engolia o erro
+# do `gh` e devolvia string vazia, nenhum `case` a barrava, e o ramo "mergeou mas a limpeza
+# falhou" declarava sucesso para um merge de OUTRA PESSOA, feito dias antes. Cura: LER VAZIO
+# E ERRO SAO A MESMA COISA AQUI — nao consigo saber, entao nao prossigo (fail-closed).
+# Fica no TOPO porque a mensagem certa ("ja estava mergeado") tem de ser alcancavel; atras dos
+# gates de check, um PR ja mergeado morria dizendo "check-run concluiu em falha", diagnostico errado.
+pr_state() { gh pr view "$PR" "${REPO_ARG[@]}" --json state,mergedAt --jq '"\(.state)|\(.mergedAt)"' 2>/dev/null; }
+state_before="$(pr_state)"
+[ -z "$state_before" ] && die "não consegui LER o estado do PR #${PR} antes do merge (gh falhou/sem auth?) — não prossigo: sem a âncora, qualquer falha adiante viraria falso positivo"
+case "$state_before" in
+  MERGED\|*) die "PR #${PR} JÁ ESTAVA MERGED antes desta execução (mergedAt=${state_before#*|}) — não declaro merge que não foi meu" ;;
+esac
+
 HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOid' 2>/dev/null)"
 [ -z "$HEAD_SHA" ] && die "não consegui ler o headRefOid do PR #${PR}"
 OWNER_REPO="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRepository,headRepositoryOwner \
   --jq '.headRepositoryOwner.login + "/" + .headRepository.name' 2>/dev/null)"
+HEAD_REF="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefName --jq '.headRefName' 2>/dev/null)"
 head_runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
   --jq '.check_runs[] | .name + "\t" + .status + "\t" + (.conclusion // "-")' 2>/dev/null)"
 [ -z "$head_runs" ] && die "ZERO check-runs registrados para o head ${HEAD_SHA:0:8} — provável janela pós-push; espere os checks nascerem (a corrida do #634)"
@@ -94,6 +110,11 @@ fi
 # merge legítimo (4/4 verdes, CLEAN). Agora: tenta --rebase; se a saída disser "can't be
 # rebased", degrada p/ --squash com os MESMOS gates já validados (checks+veredito lidos acima).
 # NÃO afrouxa nada: o squash só muda como o histórico entra, não SE os gates passaram.
+# t0 — instante ANTES do merge. A âncora cobre só o "antes"; a janela âncora→merge é onde a
+# corrida vive (outra pessoa, --auto, merge queue). Um mergedAt ANTERIOR a t0 nao pode ser deste
+# run. Tolerancia de 300s para desvio de relogio entre esta maquina e o GitHub — e se a data nao
+# for parseavel, FAIL-CLOSED (nao declaro o que nao consigo datar).
+t0="$(date -u +%s)"
 merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --rebase "${DEL[@]}" 2>&1)"; rc=$?
 if [ "$rc" -ne 0 ]; then
   if printf '%s' "$merge_out" | grep -qi "can't be rebased\|cannot be rebased"; then
@@ -101,22 +122,86 @@ if [ "$rc" -ne 0 ]; then
     merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --squash "${DEL[@]}" 2>&1)"; rc=$?
   fi
 fi
-[ "$rc" -ne 0 ] && die "gh pr merge saiu com rc=${rc} — NÃO declaro merge (foi assim que o #618 'mergeou' sem mergear). Saída: $(printf '%s' "$merge_out" | tail -1)"
+# ── rc != 0 NÃO É, SOZINHO, "não mergeou" (defeito medido 2026-09-07, PR #814) ─────────
+# A v1 morria aqui e NUNCA chegava ao passo 4 — a prova pelo ESTADO. Resultado: no merge do
+# #814 o `gh` mergeou, apagou a branch e SÓ ENTÃO falhou (`could not determine current branch`,
+# HEAD destacado); o script declarou "NÃO declaro merge" para um merge que aconteceu. Falso
+# NEGATIVO é mais seguro que o inverso, mas ainda engana: a sessão seguinte tenta re-mergear.
+# A cura é a própria filosofia do script — o sucesso é afirmado pelo ESTADO, nunca pelo comando;
+# então o FRACASSO também não pode ser afirmado pelo comando sem consultar o estado.
+# Isto NÃO afrouxa a guarda: só um estado MERGED **que não existia antes** conta como sucesso,
+# e o passo 4 continua sendo quem declara. O que muda é a via do meio, que faltava:
+#   não mergeou → die  ·  mergeou e limpou → sucesso  ·  mergeou, limpeza falhou → sucesso + aviso
+if [ "$rc" -ne 0 ]; then
+  state_after="$(pr_state)"
+  # Vazio NAO e "nao mergeou": e "nao consegui ler". Direcao segura e a mesma (die), mas a
+  # MENSAGEM tem de dizer qual das duas — afirmar estado='' e inventar um estado que ninguem leu,
+  # que e a reincidencia do defeito do #623 documentado acima, so que com o sinal invertido.
+  [ -z "$state_after" ] && die "gh pr merge saiu com rc=${rc} e eu NÃO CONSEGUI LER o estado do PR depois (gh falhou?) — não declaro nem merge nem não-merge. Saída do gh: $(printf '%s' "$merge_out" | tail -1)"
+  # O `gh` dizendo que o PR JÁ estava mergeado nunca pode virar sucesso deste run — barra antes
+  # de qualquer aritmética de data, e sem depender de relógio nenhum.
+  if printf '%s' "$merge_out" | grep -qi "already been merged\|not mergeable"; then
+    die "gh pr merge saiu com rc=${rc} dizendo que o PR já estava mergeado/não-mergeável — o merge NÃO foi deste run. Saída: $(printf '%s' "$merge_out" | tail -1)"
+  fi
+  case "$state_after" in
+    MERGED\|null|MERGED\|"")
+      die "gh pr merge saiu com rc=${rc} e o estado diz MERGED com mergedAt nulo — inconsistente, não declaro. Saída: $(printf '%s' "$merge_out" | tail -1)" ;;
+    MERGED\|*)
+      _ma="${state_after#*|}"
+      _mts="$(date -u -d "${_ma}" +%s 2>/dev/null || true)"
+      [ -z "${_mts}" ] && die "o PR está MERGED (mergedAt=${_ma}) mas não consegui DATAR esse carimbo — não atribuo a este run sem poder compará-lo com t0"
+      if [ "${_mts}" -lt $(( t0 - 300 )) ]; then
+        die "o PR está MERGED, mas mergedAt=${_ma} é ANTERIOR ao início deste merge — o merge foi de outra execução/pessoa (corrida ou --auto). NÃO declaro merge que não foi meu"
+      fi
+      say "⚠️  o \`gh pr merge\` saiu com rc=${rc}, MAS o merge ACONTECEU (mergedAt=${_ma}, posterior a t0)."
+      say "⚠️  o que falhou foi um passo PÓS-merge (tipicamente apagar a branch — exige branch atual)."
+      say "⚠️  saída do gh: $(printf '%s' "$merge_out" | tail -1)"
+      if [ -n "${HEAD_REF}" ]; then
+        if git ls-remote --exit-code origin "refs/heads/${HEAD_REF}" >/dev/null 2>&1; then
+          say "⚠️  a branch remota SOBROU. Apague com:  git push origin --delete ${HEAD_REF}"
+        else
+          say "✓  a branch remota ${HEAD_REF} já não existe — nada a limpar."
+        fi
+      else
+        say "⚠️  não li o headRefName; confira a branch remota à mão: git ls-remote origin"
+      fi
+      ;;
+    *)
+      die "gh pr merge saiu com rc=${rc} e o PR NÃO está MERGED (estado lido='${state_after%%|*}') — NÃO declaro merge (foi assim que o #618 'mergeou' sem mergear). Saída: $(printf '%s' "$merge_out" | tail -1)" ;;
+  esac
+fi
 
 # 4 — prova independente: o ESTADO, não o comando
-state="$(gh pr view "$PR" "${REPO_ARG[@]}" --json state,mergedAt --jq '"\(.state)|\(.mergedAt)"' 2>/dev/null)"
+state="$(pr_state)"
+# ASSIMETRIA CURADA (Elenxo 2026-09-07, risco 6): o bloco de rc!=0 acima matava em `MERGED|""`
+# (mergedAt string VAZIA) e este aqui não tinha o padrão — `MERGED|` cairia em `MERGED|*` e
+# declararia SUCESSO com mergedAt vazio. Apertar um lado e deixar o outro frouxo é como o
+# defeito volta pela porta que ninguém olhou. E estado ILEGÍVEL (gh mudo) não é "não mergeou":
+# é "não sei", e aqui isso também tem de matar, com a mensagem dizendo qual dos dois.
+[ -z "$state" ] && die "o merge retornou 0 mas eu NÃO CONSEGUI LER o estado do PR (gh falhou?) — não declaro o que não li"
 case "$state" in
-  MERGED\|null) die "estado diz MERGED mas mergedAt é nulo — inconsistente, não declaro" ;;
+  MERGED\|null|MERGED\|)
+    die "estado diz MERGED mas mergedAt é nulo/vazio — inconsistente, não declaro" ;;
   MERGED\|*)
     printf '✓ PR #%s MERGED — provado pelo ESTADO (mergedAt=%s)\n' "$PR" "${state#*|}"
     # SUPERAÇÃO (2026-08-26): o sync de main vive AQUI DENTRO — estruturalmente inacessível
     # sem o merge provado pelo estado. Cura o erro que me deixou em main após um merge RECUSADO
     # (o `checkout main` encadeado, não condicionado). Agora "não consigo" repetir, nem esquecendo.
+    #
+    # MAS NÃO MATA (Elenxo 2026-09-07, risco 5): o `die` aqui fazia o script sair rc=1 DEPOIS do
+    # `✓ MERGED` — e `git checkout main` falha quando `main` está tomada por OUTRO worktree, que é
+    # exatamente a família de cenário que gerou o #814. Um rc≠0 após um merge PROVADO é o falso
+    # negativo que este PR inteiro existe para matar; reintroduzi-lo pelo sync seria circular.
+    # O rc deste script responde pelo MERGE, que é o trabalho dele; sincronizar `main` é cortesia.
     if [ "${DO_SYNC:-0}" = 1 ]; then
       say "sync: merge provado — checkout main + pull"
-      git checkout main -q && git pull --ff-only origin main -q \
-        && say "main sincronizada: $(git rev-parse --short HEAD)" \
-        || die "merge PROVADO, mas o sync de main falhou — resolva à mão (git checkout main && git pull --ff-only)"
+      if git checkout main -q && git pull --ff-only origin main -q; then
+        say "main sincronizada: $(git rev-parse --short HEAD)"
+      else
+        say "⚠️  o merge está PROVADO, mas o sync de main falhou (main tomada por outro worktree?)."
+        say "⚠️  isto NÃO invalida o merge e NÃO muda o rc. Sincronize à mão quando puder:"
+        say "⚠️     git checkout main && git pull --ff-only origin main"
+      fi
     fi
     ;;
   *)            die "o merge retornou 0 mas o estado do PR é '${state%%|*}' — declaração ≠ verificação" ;;
