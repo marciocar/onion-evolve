@@ -3,7 +3,7 @@ title: "Revisão — o README de categoria não é comando; e o gerador é insum
 date: 2026-09-07
 branch: fix/plugin-strict-readme
 reviewer: "Elenxo adversarial com mandato de REFUTAR (worker `elenxo-pr01`, veredito APROVADO-COM-RESSALVA), com re-medição independente do condutor sobre a alegação de maior impacto (versão e tree_sha parados). Gate no SHA final: lint 0 HARD rc=0 · bancada 1104/0 rc=0 · `claude plugin validate --strict` rc=0 nos 5"
-reviewed_diff_sha256: cbb81c6409c73b5621632294bea6932617307bece7ce02b858a30d48a31ead23
+reviewed_diff_sha256: 8c684b610e5e8dff8dcac3abb2ec2bc42a34d9d69270c87563e9e35a6419d987
 findings_total: 6
 findings_real: 5
 verdict: APROVADO-COM-RESSALVA
