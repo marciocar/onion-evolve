@@ -3,7 +3,7 @@ title: "Revisão — desacoplar a fonte privada: a face pública vira costura ú
 date: 2026-09-07
 branch: feat/plugins-en-compliance
 reviewer: "Elenxo adversarial com mandato de REFUTAR (worker `elenxo-desacoplar`, veredito APROVADO-COM-RESSALVA) + re-medição independente do condutor contra o vivo (DNS/SMTP, clone público, `claude plugin validate --strict` 2.1.263); gate no SHA final: lint 0 HARD rc=0 · bancada 1101/0 rc=0 · kg-trace-resolve 1737/1737"
-reviewed_diff_sha256: 1a7dc920cd2f4b9c5031f537f5f4c452a2a87f036f2141b562c51679e1c838c2
+reviewed_diff_sha256: 6263a10adc7ce4b8841ccf5673ea6d1eab0f7a5fd1bdb7425549cd4c4b631d3a
 findings_total: 8
 findings_real: 7
 verdict: APROVADO-COM-RESSALVA
@@ -65,6 +65,17 @@ final; ele é **inteiramente mecânico**, sem uma linha de conteúdo novo:
 
 A lição fica: **o SHA do resíduo nasce do estado FINAL commitado**, não do índice pré-hook, quando
 o hook é ele próprio um gerador.
+
+**Segundo re-carimbo (`1a7dc920…` → `6263a10a…`), e a fricção que ele expõe.** O commit que fecha
+`Q_RESIDUOS_DA_FONTE_PRIVADA_NO_PUBLICO` no grafo mudou o diff outra vez, e a REGRA 56 barrou —
+corretamente, porque ela não sabe distinguir "o código mudou" de "o registro do fecho mudou". Como
+`docs/evolution/review/` é excluído do hash, a saída é carimbar o SHA do ÍNDICE **no mesmo commit**
+que carrega a mudança. Delta desta vez: apenas `docs/backlog.md` (projeção regenerada) e o `status`
++ `label` do nó fechado no `.kg.yaml`. Nenhuma linha de código.
+
+Fica registrado como fricção conhecida, não como defeito a consertar aqui: todo commit pós-revisão
+num PR aberto — inclusive um que só carimba grafo — exige re-carimbo, e o caminho certo é sempre
+recomputar o SHA do índice antes de commitar, nunca `--no-verify`.
 
 ## Fora de escopo
 - `Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO` — `onionevolve.com/en/` dá 404 e o site não tem página de
