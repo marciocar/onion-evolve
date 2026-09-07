@@ -3,7 +3,7 @@ title: "Revisão — desacoplar a fonte privada: a face pública vira costura ú
 date: 2026-09-07
 branch: feat/plugins-en-compliance
 reviewer: "Elenxo adversarial com mandato de REFUTAR (worker `elenxo-desacoplar`, veredito APROVADO-COM-RESSALVA) + re-medição independente do condutor contra o vivo (DNS/SMTP, clone público, `claude plugin validate --strict` 2.1.263); gate no SHA final: lint 0 HARD rc=0 · bancada 1101/0 rc=0 · kg-trace-resolve 1737/1737"
-reviewed_diff_sha256: 03213ff39d1e64f571720b477c6cdd116c9e3f1c63891f65f0a7386e8e83a909
+reviewed_diff_sha256: 1a7dc920cd2f4b9c5031f537f5f4c452a2a87f036f2141b562c51679e1c838c2
 findings_total: 8
 findings_real: 7
 verdict: APROVADO-COM-RESSALVA
@@ -50,6 +50,21 @@ duration_min: 55
    violações nos sítios reais; contra a curada, zero — com os 5 `provenance.json` ainda carregando o
    slug, o que prova a isenção no mesmo run. Mais 3 casos de bancada (home crua → HARD ·
    `provenance.json` → limpo · URL pública → limpo).
+
+## Nota sobre o re-carimbo do SHA
+
+O primeiro carimbo (`03213ff3…`) **caducou no próprio commit**: o pre-commit regenera os plugins
+bundlados por conta própria, e isso mudou o diff DEPOIS de eu o hashear. O gate acusou
+`ARTEFATO-CADUCO` — corretamente. Antes de re-carimbar, medi o delta entre o diff revisado e o
+final; ele é **inteiramente mecânico**, sem uma linha de conteúdo novo:
+
+- 4 `provenance.json` com `ref`/`commit_date` re-churnados pelo gerador (campos voláteis que o
+  `lint-artifacts.sh:1216` já exclui do diff de drift);
+- `plugins/onion/` com a versão derivada `0.1.236 → 0.1.237` — a versão anda porque o conteúdo
+  andou (`co-evolve.md`), que é exatamente o comportamento pretendido.
+
+A lição fica: **o SHA do resíduo nasce do estado FINAL commitado**, não do índice pré-hook, quando
+o hook é ele próprio um gerador.
 
 ## Fora de escopo
 - `Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO` — `onionevolve.com/en/` dá 404 e o site não tem página de
