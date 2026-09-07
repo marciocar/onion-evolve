@@ -1,0 +1,353 @@
+meta:
+  id: plugins-en-compliance-2026-09
+  schema_version: "1"
+  baseline: 2026-09-07
+  # PLANO-GRAFO CONDUZIVEL da frente "plugins em conformidade TOP PREMIUM e em ingles integral".
+  # Existe porque o /meta:drive NAO le markdown: o censo e kg-drive-project.sh sobre este arquivo, e o
+  # STATUS DO NO E O PROGRESSO. Um no `decision` por PR (drive_kind: execution), com o criterio de aceite
+  # EXECUTAVEL no label; um no `question` por decisao que e do maestro — o censo os reporta BLOQUEADOS e e
+  # assim que o drive nao os atropela.
+  # Plano de origem: ~/.claude/plans/humble-squishing-simon.md (2026-09-07).
+  # Decisoes do maestro que o gateiam: converter onion-plugins no lugar tudo EN · Opcao 3 (corpos inclusive)
+  # faseada · L0 com excecao nomeada + knob do adotante · compliance total antes de submeter · worktree propria.
+  # DEGRAU: o drive conduz cada no ate PR-VERDE. Merge no main, push no repo publico, emenda da L0 e o
+  # dogfood de roteamento sao do maestro — MOAT ou instrumento humano.
+nodes:
+  - id: D_PR01_STRICT_LIMPO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.95
+    drive_kind: execution
+    verified_against: "medido 2026-09-07: 3 de 5 plugins reprovam claude plugin validate --strict"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "PR 1 — o gate da Anthropic passa nos 5. Causa unica medida: assemble-plugin.sh:229 copia o commands/README.md, que nao tem frontmatter, e a CLI o valida como comando. Pular o basename README.md na copia de commands/ (o help.md tem frontmatter e fica) e regenerar os 5 plugins. ACEITE: `for p in plugins/*/; do claude plugin validate $p --strict; done` sai 0 nos cinco."
+
+  - id: D_PR02_VERDADE_NO_ARTEFATO_PUBLICO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.95
+    drive_kind: execution
+    verified_against: "medido 2026-09-07: o README publicado afirma que os hooks VETAM (falso: PostToolUse roda depois e so anexa aviso), que nenhum dado sai (falso: 6+ comandos declaram Bash(cat .env*), 4 declaram WebSearch, adapters instruem chamar ClickUp/Jira/GitHub/Gamma, post-review-comment.sh chama gh api) e vende onion-work-tools, que nao existe mais"
+    trace: .claude/utils/marketplace/plugin-readme.sh
+    label: "PR 2 — parar de mentir no artefato publico. TRES correcoes: (a) plugin-readme.sh:92 e marketplace-readme.sh:57 passam a descrever o que os hooks FAZEM, por evento — PostToolUse anexa aviso e nao impede nada, UserPromptSubmit injeta recall sob marcador — e dizem como desligar; (b) marketplace-readme.sh:43 deriva o texto da lista REAL de plugins, matando o onion-work-tools fantasma; (c) generate-marketplace.sh:75 emite category do vocabulario oficial (development/productivity/design), mais strict:true, $schema e o mapa renames. POR QUE E impact 5: auto-descricao falsa sobre tool-calling e sobre privacidade e a rota mais curta para rejeicao, e a Policy diz que privacy policy INCOMPLETA e rejeicao imediata. ACEITE: REGRA 19 e REGRA 76 verdes e nenhuma das tres afirmacoes falsas sobrevive a um grep no repo publico."
+
+  - id: D_PR03_GATE_VALIDATE_NA_CASA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    drive_kind: execution
+    verified_against: "medido 2026-09-07: o gate da casa nunca rodou claude plugin validate; a reprovacao de 3/5 so apareceu quando um revisor adversarial rodou a CLI a mao"
+    trace: .claude/validation/lint-artifacts.sh
+    label: "PR 3 — o gate da Anthropic vira gate da casa. Helper .claude/validation/plugin-cli-validate.sh no contrato TSV de plugin-bare-path-check.sh:20; REGRA nova no lint-artifacts.sh; 3a guarda no materialize-marketplace-repo.sh ANTES da poda (guarda que aborta tem de abortar antes de destruir — a cicatriz ja esta escrita naquele arquivo); familia na bancada. Sem a CLI no PATH: SOFT com classe NO-CLI dizendo que NAO JULGOU, nunca fail-open silencioso. ACEITE: a familia reprova uma fixture invalida e o lint acusa quando um plugin regride."
+
+  - id: D_PR04_EMENDA_L0
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    drive_kind: decision
+    verified_against: "medido 2026-09-07: code-standards.md:42 diz 'YAML frontmatter (valores narrativos): pt-BR aceito' e :48 proibe misturar idiomas na mesma camada — a opcao (i') selada em 2026-09-04 viola as duas; a §9 exige PR proprio + bump de versao + plano de migracao"
+    trace: docs/meta-specs/code-standards.md
+    label: "PR 4 — a CONSTRAIN 1: emendar a L0 ANTES de qualquer linha de gerador. Quadro §1 (:41-42) passa a tratar description:/argument-hint: como CAMPO DE MAQUINA (gatilho de roteamento, nao rotulo) em ingles, corpo em pt-BR; §1.3 nova define SUPERFICIE PUBLICADA GERADA e declara o assento unico do idioma; bump de versao; plano de migracao apontando para o baseline que so encolhe. A skill language-standards e reescrita no MESMO PR — publicar em PRs separados abriria uma janela em que a skill contradiz a L0 vigente. ⚠️ ESTE NO NAO E AUTO-SELAVEL: mudanca de constituicao. O drive propoe o texto e PARA; quem sela e o @metaspec-gate-keeper mais o maestro. ACEITE: gate-keeper aprova e /onion:metaspec-validate sai limpo."
+
+  - id: D_PR05_ASSENTO_DE_IDIOMA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    drive_kind: execution
+    verified_against: "medido 2026-09-07: grep -rnoE 'ONION_[A-Z_]+' em .claude/utils/marketplace devolve exatamente 2 variaveis, nenhuma de idioma; a superficie publica tem 5 origens de texto e nenhuma atras de parametro"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "PR 5 — o assento unico, com saida BYTE-IDENTICA. Cria lang.conf (versionado), lang.local.conf (never-clobber do adotante; sobrevive ao --update porque adopt.md:127 usa git archive HEAD e ele nao existe no HEAD do core), lang.sh (resolve o conf por dirname BASH_SOURCE ANTES de qualquer cd — cicatriz ja paga em assemble-plugin.sh:257 e identifier-language-check.sh:47), lib/messages.py com t(key,**kw) e messages/{en,pt-BR}.json. Os 60 blocos de prosa fixa (26 em plugin-readme.sh + 34 em marketplace-readme.sh) viram chaves com placeholders NOMEADOS. NAO usar variavel de ambiente como assento: check_plugins_sync regenera sem env (lint-artifacts.sh:1210) e a catraca oscilaria com o shell de quem commita. NESTE PR surface_lang FICA pt-BR. ACEITE: REGRA 19 verde SEM regenerar nada — e a prova de que o refactor e puro."
+
+  - id: D_PR06_FLIP_PARA_EN
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    drive_kind: execution
+    verified_against: "medido 2026-09-07: marketplace oficial tem 291 plugins e ZERO descricoes nao-inglesas; o comunitario tem 11 em 2.282 (0,48%), 2 em portugues"
+    trace: .claude/utils/marketplace/lang.conf
+    label: "PR 6 — o flip da superficie. surface_lang: en; en.json completo; as 5 PLUGIN_DESC dos manifestos em EN; materialize-marketplace-repo.sh:59 e generate-marketplace.sh:41 via t(); flag --reseed-metadata ⚠️ SEM ELA O FLIP SAI INCOMPLETO E NINGUEM VE, porque generate-marketplace.sh:42-49 PRESERVA VERBATIM o topo existente do marketplace.json — os dois arquivos (raiz do core e repo publico) tem metadata.description em pt-BR hoje e nao seriam corrigidos por re-materializacao; README.pt-BR.md companion gerado pelo mesmo pipeline; regenerar os 5. NAO toca description: de artefato — risco de roteamento zero neste PR. ACEITE: REGRA 19 + REGRA 76 verdes e nenhum texto pt-BR sobra na superficie emitida."
+
+  - id: D_PR07_REGRA_FRONTMATTER_EN
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    drive_kind: execution
+    verified_against: "medido 2026-09-07: 176 description: na fonte e 135 embarcadas, 100% pt-BR; nenhuma guarda mecanica de idioma cobre markdown (a REGRA 60 so olha identificador em .sh)"
+    trace: .claude/validation/lint-artifacts.sh
+    label: "PR 7 — a catraca ANTES da migracao. REGRA nova + plugin-language-check.sh + lib/lang-classify.py (promove o classify() de research/plugin-language-policy-2026-09/data/langcensus.py, que ja rodou contra 2.573 entradas reais do venue) + baseline nascendo com as 176, que SO ENCOLHE. Escopo: SO o valor entre os dois ---, chaves description e argument-hint, NUNCA abaixo do frontmatter (a varredura a mao ja errou assim, acusando 48 sobras que eram todas comentario). Parser: a semantica de frontmatter() de plugin-readme.sh:23-38 — julgar por outro parser daria veredito diferente do artefato publicado. Retorna 0 sob IS_DERIVED: o adotante escolhe o idioma dele. ACEITE: fixture pt-BR TEM que reprovar; baseline crescer e HARD."
+
+  - id: D_PR08_FRONTEIRA_DO_BUNDLE
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    drive_kind: execution
+    verified_against: "medido 2026-09-07: 23 referencias a common:prompts:* nos plugins e ZERO arquivos commands/common/ embarcados — inclusive a R15.2 que protege o co-evolve, que ingere conteudo depositado por outro agente sem passar por commit"
+    trace: .claude/utils/marketplace/verticals/onion.manifest.sh
+    label: "PR 8 — fechar a superficie da secao 2 (anti-injecao). TIRAR do bundle: co-evolve e co-relay (relacao core<->adotante, nao capacidade de quem instala; e o guard-rail que os protege e ponteiro morto no consumidor — 2.F com prova) e language-standards (manda o assistente responder em pt-BR SEM o usuario pedir: override de preferencia do usuario, o pior caso individual da auditoria, e contradiz projecao internacional). EMBARCAR utils/wizard, que cura 2 dos 3 comandos que nascem mortos. roles.yaml:44-45 muda no mesmo PR, senao a REGRA 37 acusa. ACEITE: classe ALLOWED-TOOLS da REGRA 74 vai a ZERO e nenhuma ref a common:prompts:* sobra sem arquivo."
+
+  - id: D_PR09_DESCRICOES_DESCRITIVAS
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    drive_kind: execution
+    verified_against: "medido 2026-09-07: >=7 descriptions de skill terminam em 'Ative mesmo sem o usuario mencionar X'; custo de contexto always-on do plugin onion = ~5.017 tokens contra ~669 do compliance"
+    trace: .claude/skills/onion-orchestration/SKILL.md
+    label: "PR 9 — parar de dizer ao Claude COMO SE COMPORTAR. O criterio literal de rejeicao e 'Describe what the tool does. Do not tell Claude how to behave.' e >=7 descriptions instruem o roteador a ativar CONTRA o sinal do usuario. Converter para forma descritiva de aplicabilidade ('Cobre X. Aplicavel quando o trabalho envolve Y.') — a informacao de gatilho se preserva, o imperativo some. Cai junto com o orcamento de contexto: descricao estreita e mais curta E passa no criterio, um trabalho e dois requisitos. Resolver tambem a tri-colisao do nome `onion` (skill + agent + comando aparecem os tres na UI). ACEITE: zero imperativo de ativacao nas descriptions publicadas e claude plugin details mostra custo menor que o medido hoje."
+
+  - id: D_PR10_LEGAL_E_SUPORTE
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.95
+    drive_kind: execution
+    verified_against: "medido 2026-09-07: nao existe PRIVACY*, TERMS*, SUPPORT*, SECURITY* nem CODE_OF_CONDUCT* em lugar nenhum — nem no core, nem nos plugins, nem no site/; grep -ci privac nos 6 READMEs = 0"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "PR 10 — os requisitos 3.A, 3.B, 3.C e 3.F. SSOT em .claude/utils/marketplace/legal/ (PRIVACY, SUPPORT, SECURITY, CODE_OF_CONDUCT) copiada para a raiz de CADA plugin no mesmo ponto onde o LICENSE ja e copiado (assemble-plugin.sh:364-368), mais a raiz do marketplace, mais site/src/pages/legal/*, mais site/public/.well-known/security.txt (prova de controle de dominio, 3.F). O PRIVACY carrega uma TABELA GERADA varrendo o bundle: provedor · qual comando pode originar · qual credencial · de onde vem · que dado sai · e a afirmacao que importa: nao ha proxy, nao ha chave nossa, nao recebemos copia. Secao ## Privacidade, dados e suporte gerada no README entre Requisitos e Proveniencia. ACEITE: os 4 arquivos existem nos 5 plugins e a tabela lista os fluxos que o grep encontra, nao os que eu lembro."
+
+  - id: D_PR11_EXEMPLOS_EXECUTAVEIS
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    drive_kind: execution
+    verified_against: "medido 2026-09-07: grep -ci exemplo nos 6 READMEs = 0, contra o requisito 3.E de >=3 exemplos funcionais; e `claude plugin eval` existe nativo, lendo <plugin>/evals/**/case.yaml com --ablation with-without"
+    trace: .claude/utils/marketplace/verticals/onion.manifest.sh
+    label: "PR 11 — o requisito 3.E, em duas camadas com UMA fonte. Array EXAMPLES=() em cada manifesto, formato slug|prompt do usuario|superficie que dispara|como se verifica. Camada A: secao ## Exemplos gerada no README, ANTES do catalogo de comandos — o revisor tem de bater nos exemplos primeiro. Camada B: o mesmo array gera evals/<slug>/case.yaml, e ai `claude plugin eval --ablation with-without` prova que o exemplo RODA e que foi o plugin que o fez rodar. Mais evals/scaffold.sh e o repositorio-sandbox, que responde 3.D sem backend: nao temos conta porque nao temos servico, o equivalente e um repo minimo com TASK_MANAGER_PROVIDER=none. ⚠️ o campo de manifesto e experimental.evals — risco declarado; a camada A sobrevive sozinha se a B quebrar. ACEITE: >=3 por plugin, cada slug com case.yaml correspondente, e a guarda reprova quem tiver 2."
+
+  - id: D_PR12_DOC_E_HIGIENE
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    drive_kind: execution
+    trace: .claude/utils/marketplace/plugin-readme.sh
+    label: "PR 12 — 3.C e higiene competitiva. Secoes GERADAS no README: ## Como funciona (o que carrega sempre versus sob invocacao, com o numero real do claude plugin details; onde os artefatos escrevem; e a fronteira honesta — scripts em validation/ sao deterministicos, os .md sao instrucoes lidas por um modelo e o resultado varia); ## Solucao de problemas (tabela sintoma/causa/cura com os fatos ja medidos: instalado != habilitado, hooks so carregam em sessao nova, o aviso do guard e PostToolUse e nao impede nada, python3 ausente degrada); ## Limitacoes conhecidas DERIVADA do baseline da REGRA 74 — declarar limitacao medida e mais forte que esperar que ninguem tropece. Mais CHANGELOG.md por plugin (do mesmo _vsrc[] que ja deriva a versao, custo humano zero) e SETUP.md em onion e onion-product, comecando por 'sem nenhuma credencial o plugin funciona'."
+
+  - id: D_FASE_A_SKILLS_EN
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    drive_kind: execution
+    trace: .claude/skills/onion/SKILL.md
+    label: "ONDA 4 FASE A — as 8 skills de onion.manifest.sh:54-63 em EN, frontmatter E corpo. Primeira por ser o menor conjunto com a MAIOR sensibilidade: skill ativa por descricao, sem o usuario digitar comando. Dogfood obrigatorio no MESMO PR: corte duro 100% re-testado nos artefatos cuja description negocia ativacao (medido: 4 arquivos com 'Ative mesmo sem') e amostra das 8 skills. O usuario CONTINUA DIGITANDO pt-BR; duas sessoes novas, mesma frase-gatilho, antes e depois; registrar verbatim ativou/nao ativou/ativou o errado. ⚠️ O INSTRUMENTO AUTOMATICO NAO EXISTE: instructions-loaded.jsonl so registra CLAUDE.md (medido, 15/15 linhas). A observacao e humana e vira evidence com verified_against verbatim. Reverter: git revert + assemble nos 5 manifestos."
+
+  - id: D_FASE_B_DESIGN_COMPLIANCE_EN
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    drive_kind: execution
+    trace: .claude/utils/marketplace/verticals/onion-design.manifest.sh
+    label: "ONDA 4 FASE B — onion-design e onion-compliance em EN (13 artefatos). Menor superficie e sem skill, entao e a fase que valida o processo com risco baixo antes das massas. Mesmo protocolo de dogfood e de reversao da Fase A; baseline da REGRA de frontmatter encolhe no mesmo PR."
+
+  - id: D_FASE_C_ONION_EN
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    drive_kind: execution
+    trace: .claude/commands/meta/kg.md
+    label: "ONDA 4 FASE C — o resto do plugin onion (24 artefatos), incluindo /onion:onion e /onion:kg. Aqui o dogfood importa mais: sao os comandos de entrada do produto. Amostra de ~19 probes (1 por namespace + 3 agentes) mais o corte duro. Baseline encolhe."
+
+  - id: D_FASE_D_ENGINEERING_EN
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    drive_kind: execution
+    trace: .claude/utils/marketplace/verticals/onion-engineering.manifest.sh
+    label: "ONDA 4 FASE D — onion-engineering (41 artefatos) em EN. Massa media. Mesmo protocolo; baseline encolhe."
+
+  - id: D_FASE_E_PRODUCT_EN
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    drive_kind: execution
+    trace: .claude/utils/marketplace/verticals/onion-product.manifest.sh
+    label: "ONDA 4 FASE E — onion-product (49 artefatos) em EN. Maior massa do bundle. Mesmo protocolo; baseline encolhe."
+
+  - id: D_FASE_F_META_FABRICA_EN
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.85
+    drive_kind: execution
+    trace: .claude/validation/lint-artifacts.sh
+    label: "ONDA 4 FASE F — os 38 artefatos NAO embarcados (meta-fabrica). Por que existem nesta onda: deixar 38 description: em pt-BR na mesma camada dos demais e exatamente o que code-standards.md:48 proibe. Ao fim desta fase o baseline ZERA e e APAGADO, e a regra de frontmatter vira HARD pura — plano de migracao que nao termina com o contador em zero e declaracao, nao migracao."
+
+  - id: Q_REPO_FONTE_E_PRIVADO
+    node_type: question
+    drive_kind: decision
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.95
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07: gh repo view marciocar/onion-evolve --json visibility devolve PRIVATE, e assemble-plugin.sh:340-341 escreve homepage e repository derivados do remote em todos os 5 plugin.json"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "DECISAO DO MAESTRO — o repo-fonte e PRIVADO e e para onde tudo aponta. Consequencia em cadeia: homepage e repository dos 5 plugins sao 404 publico; o README diz 'Fonte: github.com/marciocar/onion-evolve'; e o UNICO canal de suporte declarado e esse 404 — o que derruba o requisito 3.B sozinho. Duas saidas: (a) abrir o onion-evolve; (b) desacoplar — homepage para onionevolve.com, repository e issues para onion-plugins, e provenance.repository continua marcando a fonte sem apresenta-la como endereco de suporte. Isto BLOQUEIA o PR 10 (suporte) e a submissao. Nao e decisao do driver."
+
+  - id: Q_EMAIL_DE_SUPORTE_VERIFICADO
+    node_type: question
+    drive_kind: decision
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07: author nos 5 plugin.json e objeto so com name, sem email nem url; 49 dos 291 plugins do diretorio oficial declaram author.email"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "DECISAO DO MAESTRO — qual e-mail de suporte. O requisito 3.B exige contato verificado, e author.email do plugin.json fica PUBLICO PARA SEMPRE (o nome do plugin e imutavel; o manifesto e reescrito, mas o que ja foi instalado carrega o que viu). Pessoal ou suporte@onionevolve.com? Isto BLOQUEIA o PR 10."
+
+  - id: Q_CATEGORY_DO_COMPLIANCE
+    node_type: question
+    drive_kind: decision
+    plane: PROD
+    status: open
+    impact: 2
+    confidence: 0.9
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07 no marketplace.json do diretorio oficial (n=291): development 120, productivity 52, database 38, monitoring 20, security 18, deployment 9, design 8, automation 3, learning 3, testing 2, location 2, migration 1, math 1 — e nem `core` nem `vertical` existem"
+    trace: .claude/utils/marketplace/generate-marketplace.sh
+    label: "DECISAO DO MAESTRO — em que categoria oficial entra o onion-compliance. Nenhuma categoria do vocabulario diz compliance ou governanca. `productivity` e chute; `security` seria enganoso porque compliance nao e appsec, e descricao que nao corresponde a funcionalidade e criterio de rejeicao (2.B). As outras quatro estao decididas: onion e onion-engineering em development, onion-product em productivity, onion-design em design."
+
+  - id: Q_TETO_DE_CONTEXTO
+    node_type: question
+    drive_kind: decision
+    plane: PROD
+    status: open
+    impact: 2
+    confidence: 0.9
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07 com claude plugin details: onion ~5.017 tokens always-on, onion-product ~3.981, onion-engineering ~3.453, onion-design ~1.262, onion-compliance ~669"
+    trace: .claude/utils/marketplace/plugin-readme.sh
+    label: "DECISAO DO MAESTRO — qual teto de contexto a catraca cobra. A UI mostra Context cost ANTES do install e agrupa plugins nao usados sugerindo desinstalar, entao peso virou superficie competitiva. O onion a ~5k always-on parece caro contra ~669 do compliance, mas nao ha percentil publico do diretorio para calibrar — sem numero do maestro a guarda nasce arbitraria, e guarda arbitraria e a que se aprende a ignorar."
+
+  - id: Q_SEMVER_DA_L0
+    node_type: question
+    drive_kind: decision
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07: code-standards.md:4 esta em 1.0.0; a linha :42 ('frontmatter narrativo: pt-BR aceito') e REVOGADA, nao ampliada, e 176 artefatos dependiam dela"
+    trace: docs/meta-specs/code-standards.md
+    label: "DECISAO DO @metaspec-gate-keeper — 2.0.0 ou 1.1.0. Revogar uma linha da qual 176 artefatos dependem tem cara de major; se o gate-keeper julgar que a revogacao esta coberta pelo plano de migracao (o baseline que so encolhe ate zerar), 1.1.0 e defensavel. O driver nao antecipa essa chamada."
+
+  - id: Q_SUBMISSAO_AO_PORTAL
+    node_type: question
+    drive_kind: decision
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.9
+    verified_at: '2026-09-07'
+    verified_against: "levantado 2026-09-07: a submissao exige org Team/Enterprise com Directory management access, ou role Developer/Admin/Owner no Console; e o diretorio OFICIAL nao tem processo de aplicacao — 'There is no application process'"
+    trace: docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml
+    label: "ATO DO MAESTRO — apertar o botao. O submissivel e o marketplace COMUNITARIO; o oficial e curadoria discricionaria da Anthropic e o selo Verified nao e solicitavel. Os campos reais do formulario continuam NAO-VERIFICADOS (autenticado, nao fetchavel) — e essa e a maior lacuna do levantamento: abrir o formulario e capturar os campos resolve tambem a duvida residual sobre idioma."
+
+  - id: E_PLANO_NASCEU_DE_TRES_MEDICOES
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: '2026-09-07'
+    verified_against: "tres frentes de pesquisa rodadas em 2026-09-07: (1) retrato medido do nosso corpus e dos geradores; (2) a politica da Anthropic lida na fonte hoje (Software Directory Policy atualizada 2026-04-15, review-criteria, plugins-reference); (3) 25 repos lusofonos examinados mais o paper arXiv:2602.19446 (9,14 bi de mensagens, 62,5 mil repos). Custo somado ~325k tokens de subagente"
+    trace: docs/analysis/plugins-en-compliance-2026-09-plano.md
+    label: "PROVENIENCIA DESTE PLANO. Ele nao saiu de opiniao: as tres frentes derrubaram duas premissas que eu tinha antes de medir. (a) O clau.de/plugin-directory-submission NAO leva ao diretorio oficial — o submissivel e o COMUNITARIO, o oficial nao tem processo de aplicacao e o selo Verified nao e solicitavel. (b) NAO existe requisito publicado de idioma em lugar nenhum da politica; o que existe e taxa-base: o marketplace oficial tem 291 plugins e ZERO descricoes nao-inglesas, e o comunitario 11 em 2.282. (c) O idioma segue o ESCOPO do produto, nao a nacionalidade do time — 25 de 25 repos examinados obedecem, e projeto de dominio brasileiro chega a 11 mil estrelas em pt-BR. (d) O que de fato bloqueia nao e idioma: dos 5 requisitos duros cumprimos um e meio, tres plugins reprovam o validate --strict, o canal de suporte declarado e um 404, e o README afirma coisas FALSAS sobre privacidade e sobre o que os hooks fazem. O plano completo, com a ordem de PRs e os riscos declarados, vive no trace."
+
+edges:
+  - from: D_PR02_VERDADE_NO_ARTEFATO_PUBLICO
+    to: D_PR01_STRICT_LIMPO
+    edge_type: DEPENDS_ON
+  - from: D_PR03_GATE_VALIDATE_NA_CASA
+    to: D_PR01_STRICT_LIMPO
+    edge_type: DEPENDS_ON
+  - from: D_PR05_ASSENTO_DE_IDIOMA
+    to: D_PR04_EMENDA_L0
+    edge_type: DEPENDS_ON
+  - from: D_PR06_FLIP_PARA_EN
+    to: D_PR05_ASSENTO_DE_IDIOMA
+    edge_type: DEPENDS_ON
+  - from: D_PR07_REGRA_FRONTMATTER_EN
+    to: D_PR06_FLIP_PARA_EN
+    edge_type: DEPENDS_ON
+  - from: D_PR09_DESCRICOES_DESCRITIVAS
+    to: D_PR08_FRONTEIRA_DO_BUNDLE
+    edge_type: DEPENDS_ON
+  - from: D_PR10_LEGAL_E_SUPORTE
+    to: Q_REPO_FONTE_E_PRIVADO
+    edge_type: DEPENDS_ON
+  - from: D_PR10_LEGAL_E_SUPORTE
+    to: Q_EMAIL_DE_SUPORTE_VERIFICADO
+    edge_type: DEPENDS_ON
+  - from: D_PR11_EXEMPLOS_EXECUTAVEIS
+    to: D_PR01_STRICT_LIMPO
+    edge_type: DEPENDS_ON
+  - from: D_PR12_DOC_E_HIGIENE
+    to: D_PR10_LEGAL_E_SUPORTE
+    edge_type: DEPENDS_ON
+  - from: D_FASE_A_SKILLS_EN
+    to: D_PR07_REGRA_FRONTMATTER_EN
+    edge_type: DEPENDS_ON
+  - from: D_FASE_B_DESIGN_COMPLIANCE_EN
+    to: D_FASE_A_SKILLS_EN
+    edge_type: DEPENDS_ON
+  - from: D_FASE_C_ONION_EN
+    to: D_FASE_B_DESIGN_COMPLIANCE_EN
+    edge_type: DEPENDS_ON
+  - from: D_FASE_D_ENGINEERING_EN
+    to: D_FASE_C_ONION_EN
+    edge_type: DEPENDS_ON
+  - from: D_FASE_E_PRODUCT_EN
+    to: D_FASE_D_ENGINEERING_EN
+    edge_type: DEPENDS_ON
+  - from: D_FASE_F_META_FABRICA_EN
+    to: D_FASE_E_PRODUCT_EN
+    edge_type: DEPENDS_ON
+  - from: Q_SEMVER_DA_L0
+    to: D_PR04_EMENDA_L0
+    edge_type: CONSTRAINS
+  - from: Q_CATEGORY_DO_COMPLIANCE
+    to: D_PR02_VERDADE_NO_ARTEFATO_PUBLICO
+    edge_type: CONSTRAINS
+  - from: Q_TETO_DE_CONTEXTO
+    to: D_PR09_DESCRICOES_DESCRITIVAS
+    edge_type: CONSTRAINS
+  - from: Q_SUBMISSAO_AO_PORTAL
+    to: D_PR12_DOC_E_HIGIENE
+    edge_type: DEPENDS_ON
+  - from: E_PLANO_NASCEU_DE_TRES_MEDICOES
+    to: D_PR01_STRICT_LIMPO
+    edge_type: SUPPORTS
