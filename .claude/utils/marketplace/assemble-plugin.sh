@@ -288,6 +288,11 @@ fi
 # no pre-commit (onde HEAD≠staged) e independente de SRC/DEST absolutos. Lista "blobsha relpath"
 # ordenada → hash. Determinístico; muda só quando o conteúdo das fontes muda. (ref/commit_date vêm
 # do HEAD e são VOLÁTEIS — o drift-guard os ignora; só o tree_sha é o sinal de drift de conteúdo.)
+# Face pública (SSOT em public-face.sh): `repository` abaixo é a ORIGEM e serve SÓ à proveniência.
+# `homepage` e `repository` do manifesto são a CASA e o CANAL PÚBLICOS — papéis distintos desde
+# 2026-09-07 (nó D_CONTATO_DESACOPLADO): a origem é privada e não pode ser publicada como endereço.
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/public-face.sh"
+
 url="$(git -C "${SRC}" remote get-url origin 2>/dev/null || true)"
 repository="$(printf '%s' "${url}" | sed -E 's#(git@|https://)([^/:]+)[/:]##; s#\.git$##')"
 [ -n "${repository}" ] || repository="local/${PLUGIN_NAME}"
@@ -337,8 +342,8 @@ cat > "${DEST}/.claude-plugin/plugin.json" <<EOF
   "version": "${PLUGIN_VERSION}",
   "description": "${PLUGIN_DESC}",
   "author": { "name": "Onion - Marcio Carvalho" },
-  "homepage": "https://github.com/${repository}",
-  "repository": "https://github.com/${repository}",
+  "homepage": "${ONION_PUBLIC_HOMEPAGE}",
+  "repository": "${ONION_PUBLIC_REPOSITORY}",
   "license": "MIT",
   "keywords": ${kw_json}
 }

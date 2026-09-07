@@ -76,7 +76,7 @@ nodes:
     confidence: 0.9
     drive_kind: execution
     verified_against: "medido 2026-09-07: marketplace oficial tem 291 plugins e ZERO descricoes nao-inglesas; o comunitario tem 11 em 2.282 (0,48%), 2 em portugues"
-    trace: .claude/utils/marketplace/lang.conf
+    trace: .claude/utils/marketplace/generate-marketplace.sh
     label: "PR 6 — o flip da superficie. surface_lang: en; en.json completo; as 5 PLUGIN_DESC dos manifestos em EN; materialize-marketplace-repo.sh:59 e generate-marketplace.sh:41 via t(); flag --reseed-metadata ⚠️ SEM ELA O FLIP SAI INCOMPLETO E NINGUEM VE, porque generate-marketplace.sh:42-49 PRESERVA VERBATIM o topo existente do marketplace.json — os dois arquivos (raiz do core e repo publico) tem metadata.description em pt-BR hoje e nao seriam corrigidos por re-materializacao; README.pt-BR.md companion gerado pelo mesmo pipeline; regenerar os 5. NAO toca description: de artefato — risco de roteamento zero neste PR. ACEITE: REGRA 19 + REGRA 76 verdes e nenhum texto pt-BR sobra na superficie emitida."
 
   - id: D_PR07_REGRA_FRONTMATTER_EN
@@ -208,7 +208,7 @@ nodes:
     node_type: question
     drive_kind: decision
     plane: PROD
-    status: open
+    status: done
     impact: 3
     confidence: 0.95
     verified_at: '2026-09-07'
@@ -220,7 +220,7 @@ nodes:
     node_type: question
     drive_kind: decision
     plane: PROD
-    status: open
+    status: done
     impact: 3
     confidence: 0.9
     verified_at: '2026-09-07'
@@ -287,6 +287,119 @@ nodes:
     trace: docs/analysis/plugins-en-compliance-2026-09-plano.md
     label: "PROVENIENCIA DESTE PLANO. Ele nao saiu de opiniao: as tres frentes derrubaram duas premissas que eu tinha antes de medir. (a) O clau.de/plugin-directory-submission NAO leva ao diretorio oficial — o submissivel e o COMUNITARIO, o oficial nao tem processo de aplicacao e o selo Verified nao e solicitavel. (b) NAO existe requisito publicado de idioma em lugar nenhum da politica; o que existe e taxa-base: o marketplace oficial tem 291 plugins e ZERO descricoes nao-inglesas, e o comunitario 11 em 2.282. (c) O idioma segue o ESCOPO do produto, nao a nacionalidade do time — 25 de 25 repos examinados obedecem, e projeto de dominio brasileiro chega a 11 mil estrelas em pt-BR. (d) O que de fato bloqueia nao e idioma: dos 5 requisitos duros cumprimos um e meio, tres plugins reprovam o validate --strict, o canal de suporte declarado e um 404, e o README afirma coisas FALSAS sobre privacidade e sobre o que os hooks fazem. O plano completo, com a ordem de PRs e os riscos declarados, vive no trace."
 
+  - id: D_CONTATO_DESACOPLADO
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-07'
+    verified_against: "DECIDIDO pelo maestro na invocacao do /meta:drive de 2026-09-07 (saida b) e medido na mesma sessao: `gh repo view marciocar/onion-plugins --json visibility,hasIssuesEnabled` devolve PUBLIC + issues on; `curl -L https://onionevolve.com/` devolve 200; `gh repo view marciocar/onion-evolve` segue PRIVATE. Censo dos sitios que hoje apontam para a fonte privada (grep -rln 'marciocar/onion-evolve' fora de docs/ e .git): os 5 plugin.json (homepage+repository, l.6-7), os 5 README.md gerados, os 5 provenance.json, .claude-plugin/marketplace.json (10 pares homepage/repository, l.20-69, MAIS o campo `name: onion-evolve` na l.2), assemble-plugin.sh:340-341 (o gerador), plugin-readme.sh:95 e :132, marketplace-readme.sh:32 e marketplace-root-check.sh:12"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "DECIDIDO — desacoplar (saida b); NAO abrir o onion-evolve. `homepage` passa a https://onionevolve.com; `repository` e o canal de issues passam a https://github.com/marciocar/onion-plugins; `provenance.repository` continua marcando marciocar/onion-evolve como ORIGEM, sem apresenta-la como endereco de suporte. O censo achou DOIS residuos que a formulacao original nao nomeia e que o PR 2 / PR 10 tem de cobrir: (1) plugin-readme.sh:95 imprime `Fonte: <provenance.repository>` no README PUBLICO — proveniencia vazando como endereco 404; a linha tem de dizer que a fonte e privada, ou imprimir so o tree_sha; (2) .claude-plugin/marketplace.json:2 chama o marketplace de `onion-evolve` e marketplace-root-check.sh:12 documenta `/plugin marketplace add marciocar/onion-evolve` — o comando de instalacao publicado 404a. ACEITE: `grep -rn 'marciocar/onion-evolve' plugins/ .claude-plugin/ *.md` so casa dentro de provenance.json, e nenhuma ocorrencia sob homepage, repository, `Fonte:` ou `marketplace add`."
+
+  - id: D_EMAIL_SUPORTE_E_O_DO_DOMINIO
+    node_type: decision
+    plane: PROD
+    status: superseded
+    impact: 3
+    confidence: 0.95
+    verified_at: '2026-09-07'
+    verified_against: "DECIDIDO pelo maestro na invocacao do /meta:drive de 2026-09-07: e-mail de suporte = suporte@onionevolve.com (nao o pessoal). Estado medido do artefato: `author` nos 5 plugin.json (l.5) e objeto so com `name`, sem email nem url"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "DECIDIDO — o contato de suporte e suporte@onionevolve.com, do dominio, nao o pessoal. Destino: author.email dos 5 plugin.json (assemble-plugin.sh:339), o SUPPORT.md do PR 10 e o site/public/.well-known/security.txt. A ESCOLHA esta selada; a PRECONDICAO nao — ver E_ONIONEVOLVE_NAO_RECEBE_EMAIL e o gate Q_MX_DO_ONIONEVOLVE. Como author.email fica publico para sempre, o endereco so entra no artefato DEPOIS de provar entrega."
+
+  - id: E_ONIONEVOLVE_NAO_RECEBE_EMAIL
+    node_type: evidence
+    plane: PROD
+    status: superseded
+    impact: 4
+    confidence: 0.98
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07 nesta sessao, pelos DOIS caminhos que a RFC 5321 permite: (a) MX explicito — `dig @1.1.1.1 +short MX onionevolve.com` e `dig @8.8.8.8 +short MX onionevolve.com` devolvem VAZIO nos dois resolvers, e `dig +short TXT onionevolve.com` tambem (sem SPF); (b) fallback implicit-MX no A record — `dig +short A onionevolve.com` = 179.197.65.94, e conexao TCP nesse IP volta `Connection refused` em 25 e em 587. O dominio EXISTE e serve web (SOA pixel.dns-parking.com serial 2026090602, NS da Hostinger, HTTPS 200) — o que falta e correio, so correio"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "MEDIDO — suporte@onionevolve.com e INDELIVERAVEL hoje. Isto NAO refuta a escolha do maestro (D_EMAIL_SUPORTE_E_O_DO_DOMINIO segue de pe); refuta a PRECONDICAO de que estampa-la ja satisfaz o requisito 3.B, que pede contato de suporte VERIFICADO. Estampar no artefato publico um endereco que bounce e pior que nao declarar contato: falha o 3.B com evidencia contra, e author.email nao volta atras. Por que a medicao foi ate o 587 e ate o fallback: 'sem MX' sozinho nao prova indisponibilidade — a RFC manda tentar o A. Tentei; recusa."
+
+  - id: Q_MX_DO_ONIONEVOLVE
+    node_type: question
+    drive_kind: execution
+    plane: PROD
+    status: open
+    impact: 4
+    confidence: 0.9
+    verified_at: '2026-09-07'
+    verified_against: "aberto 2026-09-07 a partir de E_ONIONEVOLVE_NAO_RECEBE_EMAIL — zero MX em dois resolvers, zero SPF, 25 e 587 recusados no A record"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "GATE DO MAESTRO (instrumento humano — o painel DNS da Hostinger nao e superficie do driver): publicar MX + SPF para onionevolve.com e criar a caixa suporte@. ACEITE EXECUTAVEL, nesta ordem: (1) `dig @1.1.1.1 +short MX onionevolve.com` devolve pelo menos um host; (2) `dig @1.1.1.1 +short TXT onionevolve.com` traz um registro `v=spf1`; (3) um envio de fora chega na caixa e o maestro confirma. BLOQUEIA o PR 10 por DEPENDS_ON, e nao por CONSTRAINS, DE PROPOSITO: o censo do drive so imprime bloqueio de DEPENDS_ON, entao uma restricao seria invisivel na proxima passada e o e-mail acabaria estampado por omissao — fail-closed num artefato publico e irreversivel. Se o maestro preferir destravar o resto do PR 10 (PRIVACY, SECURITY, CODE_OF_CONDUCT, security.txt sem e-mail), a mudanca e trocar esta aresta para CONSTRAINS — decisao dele, nao minha."
+
+  - id: E_ELENXO_DESACOPLAR_APROVADO_COM_RESSALVA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: '2026-09-07'
+    verified_against: "Elenxo adversarial rodado 2026-09-07 contra D_CONTATO_DESACOPLADO, com mandato de REFUTAR. Tres ataques mecanicos CAIRAM, medidos: (1) `claude plugin validate --strict` (claude 2.1.263) sobre uma copia de plugins/onion-compliance com homepage=https://onionevolve.com e repository=https://github.com/marciocar/onion-plugins devolve `Validation passed` rc=0 — o split nao quebra o manifesto; (2) nenhum consumidor mecanico resolve a URL de provenance.repository — `grep -rn provenance.json` em .claude/ docs/ site/ acha so lint-artifacts.sh:1216,1221-1222 (que EXCLUI provenance.json do diff e compara so tree_sha) e materialize-marketplace-repo.sh:135 (usa o arquivo como marcador de existencia para a poda), zero fetch/clone; (3) sem contradicao doutrinaria — a REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente) tem por sujeito nome de CLIENTE derivado do members.yaml, e install!=adopt segue preservado nos textos que a carregam"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "ELENXO: APROVADO-COM-RESSALVA. A saida (b) sobrevive a todo ataque mecanico, e a derivacao e de UMA variavel so — assemble-plugin.sh:292 (`repository` <- git remote get-url origin) alimenta :308 provenance, :340 homepage e :341 repository; separar os tres e edicao no gerador, nao configuracao. A OBJECAO QUE SOBREVIVE e sobre o ACEITE, nao sobre a decisao: issues habilitadas sao um CANAL, nao o 'contato verificado' que o 3.B pede, e o e-mail escolhido nao entrega (ver E_ONIONEVOLVE_NAO_RECEBE_EMAIL). Logo o criterio de aceite do PR 10 NAO pode ser '3.B resolvido' — tem de ser 'o 404 saiu de toda superficie publica E o canal de suporte aponta para repo publico com issues', com a suficiencia para 3.B pendente do Q_MX_DO_ONIONEVOLVE. HONESTIDADE DECLARADA: o texto literal do requisito 3.B NAO existe neste repo — o que existe e a parafrase do maestro em docs/analysis/plugins-en-compliance-2026-09-plano.md:42 e no label de Q_EMAIL_DE_SUPORTE_VERIFICADO; ninguem aqui pode decidir se 'issues publicas' basta."
+
+  - id: Q_RESIDUOS_DA_FONTE_PRIVADA_NO_PUBLICO
+    node_type: question
+    drive_kind: execution
+    plane: PROD
+    status: open
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07 no CLONE PUBLICO VIVO /home/marcio/onion-plugins: `grep -rc onion-evolve` somando as linhas da 50 OCORRENCIAS fora do .git. Entre elas, o pior caso confirmado a mao: `grep -rn 'Fonte: https://github.com/marciocar/onion-evolve' /home/marcio/onion-plugins/plugins/*/README.md` devolve 5 hits (onion:116, onion-product:124, onion-engineering:116, onion-compliance:78, onion-design:76) — HYPERLINK 404 publicado, emitido por plugin-readme.sh:132 a partir de prov['repository'] e nao do plugin.json"
+    trace: .claude/utils/marketplace/plugin-readme.sh
+    label: "SETE residuos que o desacoplamento como formulado NAO alcanca — e o 1o a tese CRIA por construcao (manter provenance privado mantem o link morto). (1) plugin-readme.sh:132 emite `Fonte: https://github.com/<provenance>` como LINK nos 5 READMEs publicos; (2) plugin-readme.sh:95 repete a fonte na tabela Proveniencia (code span, nao link — aceitavel se for consciente); (3) marketplace-readme.sh:32 tem a fonte HARDCODED, fora do alcance de qualquer mudanca no assemble; (4) marketplace-readme.sh:63 diz 'PRs de conteudo vao para o source, nao para este repositorio' — com issues no publico e source privado, o artefato convida contribuicao e fecha a porta dela; (5) prosa DENTRO dos plugins publicados cita o repo privado como caminho navegavel — co-evolve.md (4, inclusive `onion-evolve/docs/evolution/README.md`), recover.md (2), kb/onion-framework-identity.md (3), kb/knowledge-graph-sdaal.md, agents/metaspec-gate-keeper.md, onion-design/commands/{generate,identity}.md; (6) NAO HA CATRACA NO ALVO — a REGRA 19 varre plugins/ do CORE, nao o repo publico, entao as 50 ocorrencias (mais os 10 pares homepage/repository de .claude-plugin/marketplace.json) so mudam no proximo materialize + push human-gated; (7) generate-marketplace.sh:40 tem default `top_name=onion-evolve` — inocuo hoje (o publico esta semeado com onion-plugins) mas e o nome privado como fallback num gerador de artefato publico. ACEITE: no CLONE PUBLICO, `grep -rn 'marciocar/onion-evolve' --exclude-dir=.git .` so casa dentro de provenance.json — e a cura vive no GERADOR mais uma guarda que reprove a reincidencia, nunca em edicao a mao."
+
+  - id: Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO
+    node_type: question
+    drive_kind: execution
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.95
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07 com curl e no fonte: https://onionevolve.com/ = 200, https://onionevolve.com/en/ = 404, https://onionevolve.com/en/doutrinas/ = 200; `ls site/src/pages/en/` devolve so `doutrinas` e `maquinaria` (sem index.astro); `grep -il 'suporte|contato|support|contact'` em site/src/pages/ devolve 4 arquivos e NENHUM e pagina de contato (os hits sao a palavra SUPPORTS de aresta de grafo, ex. site/src/pages/index.astro:178)"
+    trace: site/src/pages
+    label: "A casa para onde o desacoplamento manda o publico nao tem porta nem balcao. `homepage` passa a apontar para onionevolve.com, mas /en/ da 404 (ha /en/doutrinas/ e /en/maquinaria/ sem indice que os reuna) e o site NAO TEM pagina de contato/suporte — num plano cuja frente e 'ingles integral' e cujo PR 10 e justamente suporte, mandar o instalador anglofono para um 404 e a mesma classe de defeito que se esta curando nos plugins. ACEITE: `curl -o /dev/null -w '%{http_code}' https://onionevolve.com/en/` devolve 200 E existe uma pagina de suporte/contato linkada da home, para onde SUPPORT.md e author.url possam apontar. CONSTRAINS o PR 10 e nao DEPENDS_ON: e trabalho de site, separavel — mas se o maestro quiser fail-closed como no Q_MX_DO_ONIONEVOLVE, e trocar a aresta."
+
+  - id: E_ONIONEVOLVE_AGORA_TEM_CORREIO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07, DEPOIS de o maestro cadastrar o correio na Hostinger: `dig +short MX onionevolve.com` devolve `5 mx1.hostinger.com` e `10 mx2.hostinger.com` nos dois resolvers (1.1.1.1 e 8.8.8.8); `dig +short TXT onionevolve.com` = `v=spf1 include:_spf.mail.hostinger.com ~all`; `_dmarc.onionevolve.com` = `v=DMARC1; p=none`; `autodiscover.onionevolve.com` = CNAME autodiscover.mail.hostinger.com; e mx1.hostinger.com:25 responde banner `220-ESMTP mx.hostinger.com` com STARTTLS anunciado. INCONCLUSIVO por projeto: a sonda SMTP RCPT devolveu `550 5.5.1 Protocol error` TAMBEM para o controle `naoexiste-zzz9@onionevolve.com` — o servidor recusa dialogo antes do STARTTLS, entao a sonda nao diz nada sobre a caixa; nao e evidencia contra"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "SUPERA a medicao da manha: onionevolve.com PASSOU A TER CORREIO. Os passos (1) MX e (2) SPF do aceite de Q_MX_DO_ONIONEVOLVE estao VERDES, medidos. O passo (3) — um envio de fora CHEGAR na caixa — segue por verificar, e e por isso que Q_MX_DO_ONIONEVOLVE NAO foi fechado: a diferenca entre 'o dominio aceita correio' e 'esta caixa recebe' e exatamente a que o requisito 3.B cobra, e author.email nao volta atras. Um e-mail de teste entregue fecha o no."
+
+  - id: D_EMAIL_SUPORTE_E_MARCIO_ARROBA
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 3
+    confidence: 0.95
+    verified_at: '2026-09-07'
+    verified_against: "DECIDIDO pelo maestro em 2026-09-07, no selo do checkpoint da passada 1: 'cadastrei no hostinger e mudei o email para marcio@onionevolve.com ele deve ser o email do suporte'. Substitui a escolha da mesma sessao por suporte@onionevolve.com, que nunca chegou a ser estampada em artefato nenhum — `author` nos 5 plugin.json segue objeto so com `name`"
+    trace: .claude/utils/marketplace/assemble-plugin.sh
+    label: "DECIDIDO — o contato de suporte e marcio@onionevolve.com (revoga suporte@onionevolve.com, escolhido horas antes na mesma sessao e nunca publicado). Destino inalterado: author.email dos 5 plugin.json (assemble-plugin.sh:339), o SUPPORT.md do PR 10 e o security.txt. A ressalva do Elenxo continua valendo palavra por palavra: o aceite do PR 10 nao e '3.B resolvido', e 'o 404 saiu de toda superficie publica E o suporte aponta para repo publico com issues' — e o e-mail so entra no artefato depois do passo (3) de Q_MX_DO_ONIONEVOLVE."
+
+  - id: E_FACE_PUBLICA_VIROU_COSTURA_E_CATRACA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-07'
+    verified_against: "medido 2026-09-07 apos a cura, no proprio repo: (1) varredura por AUSENCIA — `grep -rlE 'github\\.com/marciocar/onion-evolve' plugins/ .claude-plugin/marketplace.json` fora de provenance.json devolve ZERO, onde antes casava em 11 arquivos (10 pares no marketplace.json + 2 campos em cada um dos 5 plugin.json + 1 link em cada um dos 5 README); (2) a REGRA 79 rodou contra a arvore DEFEITUOSA e acusou 11 violacoes nos sitios reais, e contra a arvore curada acusa ZERO — com os 5 provenance.json ainda carregando o slug, o que prova a isencao no mesmo run; (3) `lint-artifacts.sh` completo: 0 HARD, 11 SOFT (passivos com catraca), rc 0; (4) `lint-selftest.sh --jobs auto`: 1101 passaram, 0 falharam, rc 0 — 1098 antes, mais os 3 casos novos da familia plugin-private-url; (5) `kg-trace-resolve.sh`: 1737/1737 julgaveis resolvem, TARGET-MISSING 0"
+    trace: .claude/utils/marketplace/public-face.sh
+    label: "ENTREGUE — os TRES PAPEIS que viviam colapsados numa variavel so (assemble-plugin.sh:292, `git remote get-url origin`) agora sao distintos e vivem numa costura unica, `.claude/utils/marketplace/public-face.sh`: ORIGEM (so proveniencia, nunca link) · CASA (`ONION_PUBLIC_HOMEPAGE`) · CANAL (`ONION_PUBLIC_REPOSITORY`), os tres sobrescriveis por ambiente para quem forkar. Curados os 7 residuos NO GERADOR — plugin-readme.sh :95 e :132, marketplace-readme.sh :32 e :63, generate-marketplace.sh:40 — mais a catraca que faltava (REGRA 79, HARD, com 3 casos de bancada). CORRECAO DE DIAGNOSTICO, lida no conteudo e nao no grep: das 12 mencoes a `onion-evolve` na prosa dos plugins, 10 sao o IDENTIFICADOR do core (`role: source`, `can_correct_to`, mapeamento de papel) e nao endereco — apaga-las quebraria semantica de members.yaml; so 2 eram caminho navegavel para o repo privado (co-evolve.md:17 e :131) e essas foram curadas. Achado nao previsto: o `.claude-plugin/marketplace.json` do core se chamava `onion-evolve` enquanto o repo PUBLICO ja se chama `onion-plugins` — divergencia alinhada."
+
 edges:
   - from: D_PR02_VERDADE_NO_ARTEFATO_PUBLICO
     to: D_PR01_STRICT_LIMPO
@@ -350,4 +463,55 @@ edges:
     edge_type: DEPENDS_ON
   - from: E_PLANO_NASCEU_DE_TRES_MEDICOES
     to: D_PR01_STRICT_LIMPO
+    edge_type: SUPPORTS
+  - from: D_CONTATO_DESACOPLADO
+    to: Q_REPO_FONTE_E_PRIVADO
+    edge_type: SUPERSEDES
+  - from: D_EMAIL_SUPORTE_E_O_DO_DOMINIO
+    to: Q_EMAIL_DE_SUPORTE_VERIFICADO
+    edge_type: SUPERSEDES
+  - from: D_CONTATO_DESACOPLADO
+    to: D_PR10_LEGAL_E_SUPORTE
+    edge_type: CONSTRAINS
+  - from: D_EMAIL_SUPORTE_E_O_DO_DOMINIO
+    to: D_PR10_LEGAL_E_SUPORTE
+    edge_type: CONSTRAINS
+  - from: E_ONIONEVOLVE_NAO_RECEBE_EMAIL
+    to: Q_MX_DO_ONIONEVOLVE
+    edge_type: SUPPORTS
+  - from: D_PR10_LEGAL_E_SUPORTE
+    to: Q_MX_DO_ONIONEVOLVE
+    edge_type: DEPENDS_ON
+  - from: E_ELENXO_DESACOPLAR_APROVADO_COM_RESSALVA
+    to: D_CONTATO_DESACOPLADO
+    edge_type: SUPPORTS
+  - from: E_ELENXO_DESACOPLAR_APROVADO_COM_RESSALVA
+    to: Q_RESIDUOS_DA_FONTE_PRIVADA_NO_PUBLICO
+    edge_type: CAUSES
+  - from: Q_RESIDUOS_DA_FONTE_PRIVADA_NO_PUBLICO
+    to: D_PR02_VERDADE_NO_ARTEFATO_PUBLICO
+    edge_type: CONSTRAINS
+  - from: Q_RESIDUOS_DA_FONTE_PRIVADA_NO_PUBLICO
+    to: D_PR10_LEGAL_E_SUPORTE
+    edge_type: CONSTRAINS
+  - from: Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO
+    to: D_PR10_LEGAL_E_SUPORTE
+    edge_type: CONSTRAINS
+  - from: E_ONIONEVOLVE_AGORA_TEM_CORREIO
+    to: E_ONIONEVOLVE_NAO_RECEBE_EMAIL
+    edge_type: SUPERSEDES
+  - from: E_ONIONEVOLVE_AGORA_TEM_CORREIO
+    to: Q_MX_DO_ONIONEVOLVE
+    edge_type: SUPPORTS
+  - from: D_EMAIL_SUPORTE_E_MARCIO_ARROBA
+    to: D_EMAIL_SUPORTE_E_O_DO_DOMINIO
+    edge_type: SUPERSEDES
+  - from: D_EMAIL_SUPORTE_E_MARCIO_ARROBA
+    to: D_PR10_LEGAL_E_SUPORTE
+    edge_type: CONSTRAINS
+  - from: E_FACE_PUBLICA_VIROU_COSTURA_E_CATRACA
+    to: Q_RESIDUOS_DA_FONTE_PRIVADA_NO_PUBLICO
+    edge_type: SUPPORTS
+  - from: E_FACE_PUBLICA_VIROU_COSTURA_E_CATRACA
+    to: D_CONTATO_DESACOPLADO
     edge_type: SUPPORTS

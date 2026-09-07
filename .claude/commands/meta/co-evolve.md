@@ -14,7 +14,7 @@ argument-hint: "(sem argumentos — lê o estado de co-evolução deste repo)"
 Mostra a posição **deste repo** no modelo de co-evolução do Onion, lê o `inbox` e orienta o que fazer.
 **Read-only por padrão** — só move mensagens para `_processed/` quando você confirmar.
 
-> Modelo (resumo autossuficiente — o protocolo canônico completo vive em `onion-evolve/docs/evolution/`):
+> Modelo (resumo autossuficiente — o protocolo canônico completo vive em `docs/evolution/` do repositório-fonte, que é privado; o que segue basta para operar):
 > 3 fluxos — **downstream** core→projetos (releases/anúncios) · **upstream** projetos→core (sinal/bug/pedido-de-ajuda
 > via `inbox/`) · **handoff** dentro do repo (worktrees + um escritor por escopo). O humano é o **maestro**;
 > coordenação é **git-async** (sem IA-fala-IA).
@@ -128,4 +128,6 @@ deduplica por conteúdo na entrega; esta linha cobre entregas de carteiros antig
 
 ## Referência canônica
 
-`onion-evolve/docs/evolution/README.md` (modelo dos 3 fluxos + ritual) e `rfc/rfc-0001-co-evolution-comms.md`.
+`docs/evolution/README.md` (modelo dos 3 fluxos + ritual) e `rfc/rfc-0001-co-evolution-comms.md`, **no
+repositório-fonte — que é privado**. Instalado por plugin, você não os abre: o resumo acima é
+autossuficiente para operar, e dúvidas vão para as issues do marketplace público.

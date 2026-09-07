@@ -9,9 +9,13 @@ set -uo pipefail
 TARGET="${1:-}"; MKT="${2:-onion-plugins}"
 [ -d "${TARGET}/plugins" ] || { echo "marketplace-readme: TARGET sem plugins/: ${TARGET}" >&2; exit 2; }
 command -v python3 >/dev/null 2>&1 || { echo "marketplace-readme: python3 ausente" >&2; exit 2; }
-TARGET="${TARGET}" MKT="${MKT}" python3 - <<'PY'
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/public-face.sh"
+TARGET="${TARGET}" MKT="${MKT}" ONION_PUBLIC_HOMEPAGE="${ONION_PUBLIC_HOMEPAGE}" ONION_PUBLIC_REPOSITORY="${ONION_PUBLIC_REPOSITORY}" python3 - <<'PY'
 import json, os, glob
 t=os.environ["TARGET"]; mkt=os.environ["MKT"]
+# Face pública (public-face.sh): o source é PRIVADO — este README nunca o publica como endereço.
+HOMEPAGE=os.environ.get("ONION_PUBLIC_HOMEPAGE","https://onionevolve.com")
+PUBREPO=os.environ.get("ONION_PUBLIC_REPOSITORY","https://github.com/marciocar/onion-plugins")
 def jload(p):
     try: return json.load(open(p,encoding="utf-8"))
     except Exception: return {}
@@ -29,7 +33,7 @@ def short(s,n=110):
 L=[]
 L.append(f"# 🧅 {mkt} — o Sistema Onion como plugins do Claude Code\n")
 L.append("O **Onion** é um framework operacional para desenvolvimento com IA: workflows faseados e retomáveis (produto → engenharia → compliance), um grafo de conhecimento como fonte de verdade em runtime (KG-SSOT), guardas determinísticas por hook e abstrações de provider (SDAAL). Este marketplace entrega essa **capacidade** como plugins instaláveis e atualizáveis pelo gerenciador de plugins — sem vendorizar nada no seu repositório.\n")
-L.append("Fonte: https://github.com/marciocar/onion-evolve · Site: https://onionevolve.com · Licença: MIT\n")
+L.append("Site: %s · Issues e suporte: %s · Licença: MIT\n" % (HOMEPAGE, PUBREPO))
 L.append("## Quick start\n")
 L.append("```\n/plugin marketplace add marciocar/%s\n/plugin install onion@%s\n```\n" % (mkt,mkt))
 L.append("Reinicie o Claude Code depois de instalar (hooks só carregam em sessão nova). Comece por `/onion:warm-up` (contexto do projeto) ou `/onion:catch-up` (onde você parou); `/onion:onion` orienta o que fazer a seguir.\n")
@@ -60,7 +64,7 @@ L.append("- **É** instalação de capacidade: read-only, versionada, atualizáv
 L.append("## Estrutura de cada plugin\n")
 L.append("```\nplugins/<nome>/\n├── .claude-plugin/\n│   ├── plugin.json        # manifesto (name, version derivada, description, keywords, license)\n│   ├── capability.json    # Capability Contract: provides / requires / loads\n│   └── provenance.json    # repository + ref + tree_sha do conteúdo (content-addressed)\n├── commands/  agents/  skills/  hooks/   # o que o plugin expõe (namespace /<nome>:<comando>)\n├── kb/  utils/  validation/              # doutrina e motores embarcados (quando aplicável)\n├── README.md                             # catálogo gerado do próprio plugin\n└── LICENSE                               # licença por plugin (exigência do diretório oficial)\n```\n")
 L.append("## Contribuir e reportar\n")
-L.append("Issues e sinais em https://github.com/marciocar/onion-evolve (o source). Os plugins aqui são **artefatos gerados** do source por `materialize-marketplace-repo.sh` — PRs de conteúdo vão para o source, não para este repositório.\n")
+L.append("**Issues, dúvidas e relatos de bug: %s/issues.** É o canal de suporte deste projeto.\n\nOs plugins aqui são **artefatos gerados** por `materialize-marketplace-repo.sh` a partir de um repositório-fonte **privado**, então este repositório não recebe PRs de conteúdo: uma correção proposta numa issue é aplicada no source e chega aqui na materialização seguinte. Abrir a issue é o caminho — e é o caminho inteiro.\n" % PUBREPO)
 L.append("## Licença\n\nMIT — © Onion · Marcio Carvalho.\n\n---\n🧅 Gerado do source por `materialize-marketplace-repo.sh` + `marketplace-readme.sh` (Sistema Onion). Não edite à mão: a próxima materialização sobrescreve.\n")
 open(os.path.join(t,"README.md"),"w",encoding="utf-8").write("\n".join(L))
 print(f"marketplace-readme: {len(rows)} plugins na tabela")

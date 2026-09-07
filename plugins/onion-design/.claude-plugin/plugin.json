@@ -3,8 +3,8 @@
   "version": "0.1.22",
   "description": "Vertical de design do Onion: identidade visual como spec-as-code (tokens W3C/DTCG), gate WCAG e materializacao via design-sink. Auto-adapta ao design-context do consumidor.",
   "author": { "name": "Onion - Marcio Carvalho" },
-  "homepage": "https://github.com/marciocar/onion-evolve",
-  "repository": "https://github.com/marciocar/onion-evolve",
+  "homepage": "https://onionevolve.com",
+  "repository": "https://github.com/marciocar/onion-plugins",
   "license": "MIT",
   "keywords": ["design","design-tokens","wcag","dtcg","onion","sdaal"]
 }

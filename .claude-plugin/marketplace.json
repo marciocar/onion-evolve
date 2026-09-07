@@ -1,5 +1,5 @@
 {
-  "name": "onion-evolve",
+  "name": "onion-plugins",
   "owner": {
     "name": "Onion"
   },
@@ -17,8 +17,8 @@
       "category": "vertical",
       "tags": ["compliance","iso-27001","iso-22301","soc2","pmbok","onion"],
       "license": "MIT",
-      "homepage": "https://github.com/marciocar/onion-evolve",
-      "repository": "https://github.com/marciocar/onion-evolve",
+      "homepage": "https://onionevolve.com",
+      "repository": "https://github.com/marciocar/onion-plugins",
       "author": { "name": "Onion - Marcio Carvalho" }
     },
     {
@@ -29,8 +29,8 @@
       "category": "vertical",
       "tags": ["design","design-tokens","wcag","dtcg","onion","sdaal"],
       "license": "MIT",
-      "homepage": "https://github.com/marciocar/onion-evolve",
-      "repository": "https://github.com/marciocar/onion-evolve",
+      "homepage": "https://onionevolve.com",
+      "repository": "https://github.com/marciocar/onion-plugins",
       "author": { "name": "Onion - Marcio Carvalho" }
     },
     {
@@ -41,8 +41,8 @@
       "category": "vertical",
       "tags": ["engineering","gitflow","pull-request","code-review","testing","qa","nodejs","react","onion"],
       "license": "MIT",
-      "homepage": "https://github.com/marciocar/onion-evolve",
-      "repository": "https://github.com/marciocar/onion-evolve",
+      "homepage": "https://onionevolve.com",
+      "repository": "https://github.com/marciocar/onion-plugins",
       "author": { "name": "Onion - Marcio Carvalho" }
     },
     {
@@ -53,8 +53,8 @@
       "category": "vertical",
       "tags": ["product","backlog","task-management","story-points","discovery","docs","c4","mermaid","spec-as-code","onion"],
       "license": "MIT",
-      "homepage": "https://github.com/marciocar/onion-evolve",
-      "repository": "https://github.com/marciocar/onion-evolve",
+      "homepage": "https://onionevolve.com",
+      "repository": "https://github.com/marciocar/onion-plugins",
       "author": { "name": "Onion - Marcio Carvalho" }
     },
     {
@@ -65,8 +65,8 @@
       "category": "core",
       "tags": ["onion","orchestration","knowledge-graph","sdaal","dogfood","elenxo","runtime","diary","metaspec","co-evolution"],
       "license": "MIT",
-      "homepage": "https://github.com/marciocar/onion-evolve",
-      "repository": "https://github.com/marciocar/onion-evolve",
+      "homepage": "https://onionevolve.com",
+      "repository": "https://github.com/marciocar/onion-plugins",
       "author": { "name": "Onion - Marcio Carvalho" }
     }
   ]

@@ -37,7 +37,11 @@ json_escape() { printf '%s' "$1" | sed 's/\\/\\\\/g; s/"/\\"/g'; }
 field() { sed -n "s/.*\"$2\"[[:space:]]*:[[:space:]]*\"\\(.*\\)\".*/\\1/p" "$1" | head -1; }
 
 # --- top-level: preserva do marketplace.json existente, senão default do repo ---
-top_name="onion-evolve"; top_owner_name="Onion"; top_owner_email=""
+# O default do nome do marketplace é o repo PÚBLICO, nunca o source privado: este arquivo é
+# artefato público, e um fallback com o nome privado é o nome errado à espera de um dia sem
+# marketplace.json prévio (resíduo (7) do nó Q_RESIDUOS_DA_FONTE_PRIVADA_NO_PUBLICO).
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/public-face.sh"
+top_name="${ONION_MARKETPLACE_NAME}"; top_owner_name="Onion"; top_owner_email=""
 top_desc="Marketplace de plugins Onion (verticais como spec-as-code)."; top_ver="0.1.0"; top_root="./plugins"
 if [ -f "${MKT}" ]; then
   v="$(field "${MKT}" name)";                    [ -n "${v}" ] && top_name="${v}"

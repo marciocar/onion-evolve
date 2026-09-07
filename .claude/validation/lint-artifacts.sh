@@ -3055,6 +3055,47 @@ check_site_no_private_deeplinks() {
 }
 
 # ===========================================================================
+# REGRA 79 — Artefato de plugin não publica o repo-fonte PRIVADO como endereço [HARD]
+# previne: plugin/marketplace publicando a URL do source privado — 404 no instalador
+#   Irmã da REGRA 35, um degrau mais apertada e noutra superfície. A 35 protege `site/`
+#   e ISENTA a home crua do repo; aqui a home crua é justamente o defeito: até 2026-09-07
+#   `assemble-plugin.sh` derivava UMA variável (`git remote get-url origin`) e a usava em
+#   TRÊS papéis — proveniência, `homepage` e `repository` do manifesto —, publicando o
+#   source PRIVADO como casa e como canal de suporte do projeto. Medido no clone público
+#   vivo: 5 hyperlinks 404 nos READMEs de plugin (emitidos por plugin-readme.sh) e 10
+#   pares homepage/repository em .claude-plugin/marketplace.json.
+#   Superfície: plugins/** e .claude-plugin/marketplace.json. `provenance.json` é a ÚNICA
+#   isenção — lá o slug é marca de ORIGEM content-addressed, não endereço navegável, e
+#   nenhum consumidor resolve a URL (medido: lint-artifacts o exclui do diff; a poda o usa
+#   como marcador de existência).
+#   A face pública vive numa costura só: .claude/utils/marketplace/public-face.sh.
+#   O slug privado é DERIVADO do remote `origin`, não digitado — quem forkar herda a guarda.
+# ===========================================================================
+check_plugin_no_private_source_url() {
+  local root="${REPO_ROOT}"
+  local src_slug
+  src_slug="$(git -C "${root}" remote get-url origin 2>/dev/null | sed -E 's#(git@|https://)([^/:]+)[/:]##; s#\.git$##' || true)"
+  [ -n "${src_slug}" ] || return 0
+  # Só vale quando a origem é de fato privada; num fork público a guarda não tem sujeito.
+  case "${ONION_SOURCE_IS_PRIVATE:-1}" in 1) : ;; *) return 0 ;; esac
+  local f hits
+  while IFS= read -r f; do
+    [ -n "${f}" ] || continue
+    case "${f}" in */provenance.json) continue ;; esac
+    if [ -n "${ONLY_PATH}" ]; then
+      case "${f}" in "${ONLY_PATH}"|"${ONLY_PATH}"/*) : ;; *) continue ;; esac
+    fi
+    hits="$(grep -oE "github\.com/${src_slug}[^\"'\'')* ]*" "${f}" 2>/dev/null | sort -u || true)"
+    [ -n "${hits}" ] || continue
+    while IFS= read -r h; do
+      [ -n "${h}" ] || continue
+      violation "HARD" "${f#${root}/}" "[plugin/404-privado] artefato público cita o repo-fonte PRIVADO como endereço: ${h} — a casa e o canal vêm de public-face.sh (ONION_PUBLIC_HOMEPAGE / ONION_PUBLIC_REPOSITORY); só provenance.json pode carregar o slug de origem"
+    done <<< "${hits}"
+  done < <( { find "${root}/plugins" -type f \( -name '*.md' -o -name '*.json' \) 2>/dev/null; \
+              [ -f "${root}/.claude-plugin/marketplace.json" ] && printf '%s\n' "${root}/.claude-plugin/marketplace.json"; } | LC_ALL=C sort )
+}
+
+# ===========================================================================
 # REGRA 36 — Superfície VENDORIZADA sem nome comercial de cliente [HARD]
 # previne: nome comercial de cliente vazando em superfície vendorizada
 #   O que /meta:adopt copia (.claude/{agents,commands,skills,utils,validation,
@@ -4084,6 +4125,7 @@ check_projection_safety
 check_federation_projection
 check_migalhas_sync
 check_site_no_private_deeplinks
+check_plugin_no_private_source_url
 check_vendored_surface_clean
 check_frontmatter_model_category
 check_rules_registry_sync

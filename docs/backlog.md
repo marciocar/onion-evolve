@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**142 itens abertos** em 39 grafo(s) com aberto (de 60 no escopo) · 39 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**167 itens abertos** em 40 grafo(s) com aberto (de 61 no escopo) · 40 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -48,6 +48,36 @@
 | 5.2 | `C_p4_audit_trail` | m3-federation-admin-2026-07 | REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivad |
 | 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
+
+## plugins-en-compliance-2026-09 — 25 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 47.5 | `D_PR10_LEGAL_E_SUPORTE` | plugins-en-compliance-2026-09 | PR 10 — os requisitos 3.A, 3.B, 3.C e 3.F. SSOT em .claude/utils/marketplace/legal/ (PRIVACY, SUPPORT, SECURITY, CODE_OF_CONDUCT |
+| 19.0 | `D_PR01_STRICT_LIMPO` | plugins-en-compliance-2026-09 | PR 1 — o gate da Anthropic passa nos 5. Causa unica medida: assemble-plugin.sh:229 copia o commands/README.md, que nao tem front |
+| 19.0 | `D_PR02_VERDADE_NO_ARTEFATO_PUBLICO` | plugins-en-compliance-2026-09 | PR 2 — parar de mentir no artefato publico. TRES correcoes: (a) plugin-readme.sh:92 e marketplace-readme.sh:57 passam a descreve |
+| 19.0 | `Q_RESIDUOS_DA_FONTE_PRIVADA_NO_PUBLICO` | plugins-en-compliance-2026-09 | SETE residuos que o desacoplamento como formulado NAO alcanca — e o 1o a tese CRIA por construcao (manter provenance privado man |
+| 14.4 | `Q_MX_DO_ONIONEVOLVE` | plugins-en-compliance-2026-09 | GATE DO MAESTRO (instrumento humano — o painel DNS da Hostinger nao e superficie do driver): publicar MX + SPF para onionevolve. |
+| 13.5 | `D_PR04_EMENDA_L0` | plugins-en-compliance-2026-09 | PR 4 — a CONSTRAIN 1: emendar a L0 ANTES de qualquer linha de gerador. Quadro §1 (:41-42) passa a tratar description:/argument- |
+| 13.5 | `D_PR06_FLIP_PARA_EN` | plugins-en-compliance-2026-09 | PR 6 — o flip da superficie. surface_lang: en; en.json completo; as 5 PLUGIN_DESC dos manifestos em EN; materialize-marketplace- |
+| 10.8 | `D_PR05_ASSENTO_DE_IDIOMA` | plugins-en-compliance-2026-09 | PR 5 — o assento unico, com saida BYTE-IDENTICA. Cria lang.conf (versionado), lang.local.conf (never-clobber do adotante; sobrev |
+| 10.8 | `D_PR07_REGRA_FRONTMATTER_EN` | plugins-en-compliance-2026-09 | PR 7 — a catraca ANTES da migracao. REGRA nova + plugin-language-check.sh + lib/lang-classify.py (promove o classify() de resear |
+| 10.8 | `D_PR09_DESCRICOES_DESCRITIVAS` | plugins-en-compliance-2026-09 | PR 9 — parar de dizer ao Claude COMO SE COMPORTAR. O criterio literal de rejeicao e 'Describe what the tool does. Do not tell Cl |
+| 10.2 | `D_FASE_A_SKILLS_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE A — as 8 skills de onion.manifest.sh:54-63 em EN, frontmatter E corpo. Primeira por ser o menor conjunto com a MAIOR |
+| 10.2 | `D_FASE_C_ONION_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE C — o resto do plugin onion (24 artefatos), incluindo /onion:onion e /onion:kg. Aqui o dogfood importa mais: sao os  |
+| 9.0 | `D_PR08_FRONTEIRA_DO_BUNDLE` | plugins-en-compliance-2026-09 | PR 8 — fechar a superficie da secao 2 (anti-injecao). TIRAR do bundle: co-evolve e co-relay (relacao core<->adotante, nao capaci |
+| 9.0 | `D_PR11_EXEMPLOS_EXECUTAVEIS` | plugins-en-compliance-2026-09 | PR 11 — o requisito 3.E, em duas camadas com UMA fonte. Array EXAMPLES=() em cada manifesto, formato slug·prompt do usuario·su |
+| 8.1 | `D_PR12_DOC_E_HIGIENE` | plugins-en-compliance-2026-09 | PR 12 — 3.C e higiene competitiva. Secoes GERADAS no README: ## Como funciona (o que carrega sempre versus sob invocacao, com o  |
+| 7.7 | `D_FASE_B_DESIGN_COMPLIANCE_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE B — onion-design e onion-compliance em EN (13 artefatos). Menor superficie e sem skill, entao e a fase que valida o  |
+| 7.7 | `D_FASE_D_ENGINEERING_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE D — onion-engineering (41 artefatos) em EN. Massa media. Mesmo protocolo; baseline encolhe. |
+| 7.7 | `D_FASE_E_PRODUCT_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE E — onion-product (49 artefatos) em EN. Maior massa do bundle. Mesmo protocolo; baseline encolhe. |
+| 7.2 | `D_PR03_GATE_VALIDATE_NA_CASA` | plugins-en-compliance-2026-09 | PR 3 — o gate da Anthropic vira gate da casa. Helper .claude/validation/plugin-cli-validate.sh no contrato TSV de plugin-bare-pa |
+| 5.7 | `Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO` | plugins-en-compliance-2026-09 | A casa para onde o desacoplamento manda o publico nao tem porta nem balcao. `homepage` passa a apontar para onionevolve.com, mas / |
+| 5.4 | `Q_SEMVER_DA_L0` | plugins-en-compliance-2026-09 | DECISAO DO @metaspec-gate-keeper — 2.0.0 ou 1.1.0. Revogar uma linha da qual 176 artefatos dependem tem cara de major; se o gate |
+| 5.4 | `Q_SUBMISSAO_AO_PORTAL` | plugins-en-compliance-2026-09 | ATO DO MAESTRO — apertar o botao. O submissivel e o marketplace COMUNITARIO; o oficial e curadoria discricionaria da Anthropic e |
+| 5.1 | `D_FASE_F_META_FABRICA_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE F — os 38 artefatos NAO embarcados (meta-fabrica). Por que existem nesta onda: deixar 38 description: em pt-BR na me |
+| 3.6 | `Q_CATEGORY_DO_COMPLIANCE` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — em que categoria oficial entra o onion-compliance. Nenhuma categoria do vocabulario diz compliance ou gover |
+| 3.6 | `Q_TETO_DE_CONTEXTO` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — qual teto de contexto a catraca cobra. A UI mostra Context cost ANTES do install e agrupa plugins nao usado |
 
 ## plugin-directory-landscape-2026-09 — 1 item(ns)
 

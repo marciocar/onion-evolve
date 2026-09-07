@@ -1314,6 +1314,46 @@ run_site_deeplink_selftests() {
   rm -f "${tf}"
 }
 
+# REGRA 79 — irmã da 35 noutra superfície e um degrau mais apertada: em plugins/ e no
+# marketplace.json, a HOME CRUA do source privado também é defeito (lá ela vira `homepage`,
+# `repository` e canal de suporte — 404 para o instalador). A isenção de provenance.json é
+# load-bearing: sem ela a guarda acusaria os 5 arquivos que DEVEM carregar o slug de origem,
+# e uma guarda que grita no lugar certo pelo motivo errado é a que se aprende a ignorar.
+run_plugin_private_url_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  local plugdir="${REPO_ROOT}/plugins"
+  [ -d "${plugdir}" ] || { record_pass "plugin-private-url: sem plugins/ — nada a testar (adotante)"; return; }
+  local slug
+  slug="$(git -C "${REPO_ROOT}" remote get-url origin 2>/dev/null | sed -E 's#(git@|https://)([^/:]+)[/:]##; s#\.git$##' || true)"
+  [ -n "${slug}" ] || { record_pass "plugin-private-url: sem remote origin — guarda sem sujeito"; return; }
+  # Fixture no dir VIVO (o caso testa a guarda REAL, que varre plugins/). Coberta pelo
+  # .gitignore em `plugins/__*__/`; removida no RETURN.
+  local fdir="${plugdir}/__selftest79__"
+  trap 'rm -rf "'"${fdir}"'"' RETURN
+  mkdir -p "${fdir}/.claude-plugin"
+  local out rc=0 tf="${fdir}/README.md"
+  # (a) home CRUA do source privado num artefato de plugin → HARD (é o degrau a mais vs REGRA 35)
+  printf 'Fonte: https://github.com/%s\n' "${slug}" > "${tf}"
+  out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
+  if grep -q 'plugin/404-privado' <<< "${out}"; then
+    record_pass "plugin-private-url: (a) home crua do source privado em plugins/ → HARD"
+  else record_fail "plugin-private-url: (a)" "home crua não foi pega: rc=${rc} out=${out}"; fi
+  # (b) provenance.json com o MESMO slug → limpo (a isenção; lá é marca de origem, não endereço)
+  local pf="${fdir}/.claude-plugin/provenance.json"
+  printf '{ "repository": "%s", "tree_sha": "deadbeef" }\n' "${slug}" > "${pf}"
+  rc=0; out="$(bash "${lint}" --only="${pf}" 2>&1)" || rc=$?
+  if ! grep -q 'plugin/404-privado' <<< "${out}"; then
+    record_pass "plugin-private-url: (b) provenance.json com o slug de origem → limpo (isenção)"
+  else record_fail "plugin-private-url: (b)" "isenção do provenance quebrou: ${out}"; fi
+  # (c) URL do repo PÚBLICO → limpo (não superreage a github.com)
+  printf 'Issues: https://github.com/marciocar/onion-plugins/issues\n' > "${tf}"
+  rc=0; out="$(bash "${lint}" --only="${tf}" 2>&1)" || rc=$?
+  if ! grep -q 'plugin/404-privado' <<< "${out}"; then
+    record_pass "plugin-private-url: (c) URL do repo público → limpo (sem superreação a github.com)"
+  else record_fail "plugin-private-url: (c)" "falso-positivo no canal público: ${out}"; fi
+  rm -rf "${fdir}"
+}
+
 # Modo rules-registry — REGRA 39. O gerador projeta os docstrings '# REGRA N — …' de
 # lint-artifacts.sh no registro vendorizado lint-rules.md, com severidade derivada do corpo
 # UNIDA ao tag declarado. As duas catracas de clareza (número duplicado, regra órfã) são
@@ -13486,6 +13526,7 @@ _family run_hook_autofix_selftests
 _family run_kg_reverify_schema_selftests
 _family run_backtick_ref_selftests
 _family run_site_deeplink_selftests
+_family run_plugin_private_url_selftests
 _family run_deploy_site_selftests
 _family run_install_caddy_config_selftests
 _family run_realign_selftests

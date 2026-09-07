@@ -2,7 +2,7 @@
 
 Núcleo operacional do Sistema Onion: o orquestrador mestre (skill onion), runtime de knowledge graph (kg + radar soberano + kg-freshness), sessões e diário, orquestração de subagentes, condução (wizard/onboarding/retro), validação de meta-specs, co-evolução upstream e os adapters SDAAL de task-manager e forge.
 
-**Versão** `0.1.236` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
+**Versão** `0.1.237` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
 
 ## Instalar
 
@@ -96,10 +96,10 @@ Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é 
 
 | Campo | Valor |
 |---|---|
-| Fonte | `marciocar/onion-evolve` |
-| tree_sha (hash do conteúdo das fontes) | `6db8ec8d8a03` |
+| Origem | `marciocar/onion-evolve` (repositório privado) |
+| tree_sha (hash do conteúdo das fontes) | `23073b057881` |
 
-Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
+A origem identifica DE ONDE este artefato foi gerado; o canal público de instalação, issues e suporte é https://github.com/marciocar/onion-plugins. Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 
 Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT em `.claude/` do source. Não edite à mão: a próxima montagem sobrescreve.
 
@@ -113,4 +113,4 @@ Comandos deste plugin citam: `onion-compliance`, `onion-engineering`, `onion-pro
 
 ## Licença
 
-MIT (texto integral em `LICENSE`, na raiz do plugin) — © Onion · Marcio Carvalho. Site: https://onionevolve.com · Fonte: https://github.com/marciocar/onion-evolve
+MIT (texto integral em `LICENSE`, na raiz do plugin) — © Onion · Marcio Carvalho. Site: https://onionevolve.com · Issues e suporte: https://github.com/marciocar/onion-plugins

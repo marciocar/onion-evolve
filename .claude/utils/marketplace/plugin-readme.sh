@@ -12,9 +12,17 @@ set -uo pipefail
 DEST="${1:-}"; MKT="${2:-onion-plugins}"
 [ -d "${DEST}/.claude-plugin" ] || { echo "plugin-readme: DEST inválido: ${DEST}" >&2; exit 2; }
 command -v python3 >/dev/null 2>&1 || { echo "plugin-readme: python3 ausente — README do plugin não gerado" >&2; exit 0; }
-DEST="${DEST}" MKT="${MKT}" python3 - <<'PY'
+. "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/public-face.sh"
+DEST="${DEST}" MKT="${MKT}" ONION_PUBLIC_HOMEPAGE="${ONION_PUBLIC_HOMEPAGE}" ONION_PUBLIC_REPOSITORY="${ONION_PUBLIC_REPOSITORY}" ONION_SOURCE_IS_PRIVATE="${ONION_SOURCE_IS_PRIVATE}" python3 - <<'PY'
 import json, os, re, glob
 dest=os.environ["DEST"]; mkt=os.environ["MKT"]
+# Face pública (public-face.sh): a ORIGEM em provenance é privada e NUNCA vira link — só marca de origem.
+HOMEPAGE=os.environ.get("ONION_PUBLIC_HOMEPAGE","https://onionevolve.com")
+PUBREPO=os.environ.get("ONION_PUBLIC_REPOSITORY","https://github.com/marciocar/onion-plugins")
+SRC_PRIVATE=os.environ.get("ONION_SOURCE_IS_PRIVATE","1")=="1"
+def source_label(slug):
+    slug=slug or "?"
+    return ("`%s` (repositório privado)" % slug) if SRC_PRIVATE else ("https://github.com/%s" % slug)
 def jload(p):
     try: return json.load(open(p, encoding="utf-8"))
     except Exception: return {}
@@ -92,7 +100,7 @@ if hooks:
     out.append("Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é a capacidade que só existe no Claude Code. Nenhum envia dados para fora; todos rodam local.\n")
 out.append("## Requisitos\n\n- Claude Code ≥ 2.1.239 (marketplace com `pluginRoot`); `bash`, `git`, `awk`; `python3` (motores KG e censos); `jq` opcional.\n- Este plugin instala **capacidade** (read-only, atualizável pelo gerenciador). Não é adoção: para vendorizar o Onion num repo, o canal é `meta:adopt` (comando do core, não distribuído por plugin) no repositório-fonte.\n")
 # Só campos CONTENT-STABLE aqui: ref/commit_date mudam a cada commit e fariam o README driftar (REGRA 19 acusou no CI, 2026-09-04).
-out.append("## Proveniência\n\n| Campo | Valor |\n|---|---|\n| Fonte | `%s` |\n| tree_sha (hash do conteúdo das fontes) | `%s` |\n\nRef e data do commit de origem estão em `.claude-plugin/provenance.json`.\n" % (prov.get("repository","?"), str(prov.get("tree_sha","?"))[:12]))
+out.append("## Proveniência\n\n| Campo | Valor |\n|---|---|\n| Origem | %s |\n| tree_sha (hash do conteúdo das fontes) | `%s` |\n\nA origem identifica DE ONDE este artefato foi gerado; o canal público de instalação, issues e suporte é %s. Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.\n" % (source_label(prov.get("repository")), str(prov.get("tree_sha","?"))[:12], PUBREPO))
 out.append("Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT em `.claude/` do source. Não edite à mão: a próxima montagem sobrescreve.\n")
 # Comandos do CORE citados e NÃO distribuídos neste plugin (o assembler tirou a barra deles: `meta:adopt`).
 # Derivado do próprio artefato — content-stable. Sem esta seção o leitor vê `meta:adopt` e não sabe por quê.
@@ -129,7 +137,7 @@ for _dp, _dn, _fn in os.walk(dest):
 _mentions -= set(_req_plugins)
 if _mentions:
     out.append("## Funciona melhor com\n\nComandos deste plugin citam: " + ", ".join("`" + x + "`" for x in sorted(_mentions)) + ". Não é dependência — sem eles, essas menções apontam para comandos não instalados.\n")
-out.append("## Licença\n\n%s (texto integral em `LICENSE`, na raiz do plugin) — © Onion · Marcio Carvalho. Site: https://onionevolve.com · Fonte: https://github.com/%s\n" % (pj.get("license","MIT"), prov.get("repository","marciocar/onion-evolve")))
+out.append("## Licença\n\n%s (texto integral em `LICENSE`, na raiz do plugin) — © Onion · Marcio Carvalho. Site: %s · Issues e suporte: %s\n" % (pj.get("license","MIT"), HOMEPAGE, PUBREPO))
 open(os.path.join(dest,"README.md"),"w",encoding="utf-8").write("\n".join(out))
 print(f"plugin-readme: {name}: {len(cmds)} comandos, {len(agents)} agentes, {len(skills)} skills, {len(hooks)} hooks")
 PY
