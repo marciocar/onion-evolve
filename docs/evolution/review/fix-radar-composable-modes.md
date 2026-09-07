@@ -2,7 +2,7 @@
 title: "Resíduo da passada adversarial — o Elenxo achou mais defeito na cura do que havia no sinal"
 date: 2026-09-07
 branch: fix/radar-composable-modes
-reviewed_diff_sha256: 413a8a6eaeb1f65c75109849a397291bc5af2f7724872ce752867a3967e46dba
+reviewed_diff_sha256: 75926e64171dd3e8248da7d8cfddd84aff2a79a9c0db8b4564f3026a63c9f55c
 findings_total: 15
 findings_real: 15
 tokens: 172486
