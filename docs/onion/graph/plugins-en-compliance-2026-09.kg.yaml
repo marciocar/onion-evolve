@@ -16,13 +16,13 @@ nodes:
   - id: D_PR01_STRICT_LIMPO
     node_type: decision
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 0.95
     drive_kind: execution
     verified_against: "medido 2026-09-07: 3 de 5 plugins reprovam claude plugin validate --strict"
     trace: .claude/utils/marketplace/assemble-plugin.sh
-    label: "PR 1 — o gate da Anthropic passa nos 5. Causa unica medida: assemble-plugin.sh:229 copia o commands/README.md, que nao tem frontmatter, e a CLI o valida como comando. Pular o basename README.md na copia de commands/ (o help.md tem frontmatter e fica) e regenerar os 5 plugins. ACEITE: `for p in plugins/*/; do claude plugin validate $p --strict; done` sai 0 nos cinco."
+    label: "FECHADO 2026-09-07 no PR #815 (head 2ac15815), CI verde nos quatro checks — lint-onion-artifacts 1m9s, onion-review 2m23s, onion-review-verdict 3s (a FONTE do veredito, nao o soft-pass do onion-review), selftest 22m13s; merge no main segue do maestro (MOAT). A entrega foi alem do nó: ver E_README_DE_CATEGORIA_NAO_E_COMANDO e, sobretudo, E_GERADOR_E_INSUMO_DO_SINAL_DE_MUDANCA — sem esta segunda a correcao nao chegaria a quem instalou. PR 1 — o gate da Anthropic passa nos 5. Causa unica medida: assemble-plugin.sh:229 copia o commands/README.md, que nao tem frontmatter, e a CLI o valida como comando. Pular o basename README.md na copia de commands/ (o help.md tem frontmatter e fica) e regenerar os 5 plugins. ACEITE: `for p in plugins/*/; do claude plugin validate $p --strict; done` sai 0 nos cinco."
 
   - id: D_PR02_VERDADE_NO_ARTEFATO_PUBLICO
     node_type: decision
