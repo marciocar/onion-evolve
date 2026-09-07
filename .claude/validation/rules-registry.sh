@@ -162,9 +162,10 @@ CATEGORIES = [
      [24, 25, 28, 38, 46, 66]),
     ("Projeção & privacidade",
      "O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e "
-     "deep-link privado nunca vazam; e o compose commitado nunca publica porta em "
+     "deep-link privado nunca vazam (nem a HOME crua do source privado, num artefato de "
+     "plugin); e o compose commitado nunca publica porta em "
      "0.0.0.0 nem sobe com segredo de fallback.",
-     [30, 33, 34, 35, 36, 45, 61, 64]),
+     [30, 33, 34, 35, 36, 45, 61, 64, 79]),
     ("Processo com resíduo",
      "O trabalho PROPOSTO carrega rastro material de ter sido revisado — o gate cria a cadência, "
      "o worker testa a verdade.",

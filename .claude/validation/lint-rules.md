@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**77 regras** no total — **68 HARD**, **21 SOFT**.
+**78 regras** no total — **69 HARD**, **21 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -154,7 +154,7 @@ Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.
 
 ## Projeção & privacidade
 
-O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e deep-link privado nunca vazam; e o compose commitado nunca publica porta em 0.0.0.0 nem sobe com segredo de fallback.
+O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e deep-link privado nunca vazam (nem a HOME crua do source privado, num artefato de plugin); e o compose commitado nunca publica porta em 0.0.0.0 nem sobe com segredo de fallback.
 
 | Nº | Regra | Severidade | O que previne |
 |---:|-------|:----------:|---------------|
@@ -166,6 +166,7 @@ O que pode sair para superfícies públicas ou vendorizadas — nome de cliente 
 | 45 | Link vendorizado não aponta caminho core-privado, com catraca | HARD + SOFT | link vivo em superfície vendorizada para caminho core-privado — morto no adotante |
 | 61 | Fronteira de MOAT: manifesto de plugin publicável não vaza meta-fábrica nem grafo privado | HARD | publicar a AUTO-REPLICAÇÃO (create-*/adopt/marketplace/decouple) ou o SSOT PRIVADO do core |
 | 64 | Compose sem bind local ou com segredo em fallback literal | HARD + SOFT | porta publicada em todas as interfaces (o Docker ignora o firewall do HOST — ufw/iptables |
+| 79 | Artefato de plugin não publica o repo-fonte PRIVADO como endereço | HARD | plugin/marketplace publicando a URL do source privado — 404 no instalador |
 
 ## Processo com resíduo
 
