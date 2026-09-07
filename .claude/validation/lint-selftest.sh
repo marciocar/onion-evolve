@@ -7957,6 +7957,119 @@ run_githook_selftests() {
 # (design = com utils/gate; compliance = agentes-pesado, sem utils/gate → prova de
 # generalização), estrutura, determinismo, manifest 8 campos, proveniência, falhas.
 # ---------------------------------------------------------------------------
+# ═══ ops/pr-merge-verified.sh — as CINCO vias, com `gh` esbo�ado ═══════════════════════
+# POR QUE EXISTE (defeito medido 2026-09-07, merge do PR #814): o script morria no rc do
+# `gh pr merge` e NUNCA chegava ao passo 4 — a prova pelo ESTADO. No #814 o `gh` mergeou,
+# apagou a branch e SO ENTAO falhou (HEAD destacado, "could not determine current branch");
+# o script declarou "NAO declaro merge" para um merge que aconteceu. Falso NEGATIVO e mais
+# seguro que o inverso, mas engana: a sessao seguinte tenta re-mergear.
+# A ancora `state_before` e o que impede a cura de virar falso POSITIVO — sem ela, um PR ja
+# mergeado por outra pessoa faria qualquer falha nossa parecer sucesso.
+# O `gh` e esbocado porque o SUT fala com a rede; o esboco ESPELHA as consultas reais
+# (headRefOid, headRepositoryOwner, statusCheckRollup, check-runs, pr checks, state+mergedAt).
+run_pr_merge_verified_selftests() {
+  local sut="${REPO_ROOT}/ops/pr-merge-verified.sh"
+  [ -f "${sut}" ] || { record_skip "pr-merge-verified: ops/ ausente (adotante) → pulado"; return; }
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  cat > "${d}/gh" <<'STUB'
+#!/usr/bin/env bash
+args="$*"
+case "$args" in
+  *"pr view"*headRefOid*)          echo "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"; exit 0 ;;
+  *"pr view"*headRepositoryOwner*) echo "owner/repo"; exit 0 ;;
+  *"pr view"*headRefName*)         echo "feat/alguma-coisa"; exit 0 ;;
+  *"pr view"*statusCheckRollup*)   echo "SUCCESS"; exit 0 ;;
+  *"pr view"*state,mergedAt*)
+      n=$(cat "${STUB_N}" 2>/dev/null || echo 0); n=$((n+1)); echo "$n" > "${STUB_N}"
+      if [ "$n" -eq 1 ]; then v="${GH_STATE_BEFORE}"; else v="${GH_STATE_AFTER}"; fi
+      [ -n "$v" ] && echo "$v"; exit 0 ;;
+  *"api "*check-runs*)             printf 'selftest\tcompleted\tsuccess\n'; exit 0 ;;
+  *"pr checks"*)                   printf 'selftest\tpass\t1s\turl\n'; exit 0 ;;
+  *"pr merge"*)                    printf '%s\n' "${GH_MERGE_OUT}"; exit "${GH_MERGE_RC}" ;;
+esac
+exit 0
+STUB
+  chmod +x "${d}/gh"
+  local _mv_rc _mv_out
+  _mv() { # $1=before $2=after $3=merge_rc $4=merge_out
+    echo 0 > "${d}/n"
+    _mv_out="$(PATH="${d}:${PATH}" STUB_N="${d}/n" GH_STATE_BEFORE="$1" GH_STATE_AFTER="$2" \
+               GH_MERGE_RC="$3" GH_MERGE_OUT="$4" bash "${sut}" 999 2>&1)"
+    _mv_rc=$?
+  }
+  local M="MERGED|2026-09-07T18:00:00Z"
+
+  _mv "OPEN|null" "${M}" 0 "merged"
+  if [ "${_mv_rc}" -eq 0 ] && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (a) merge limpo ⇒ sucesso provado pelo estado"
+  else record_fail "pr-merge-verified: (a)" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  M="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)"   # posterior a t0 — sem isto a barreira da corrida barra
+  _mv "OPEN|null" "${M}" 1 "could not determine current branch"
+  if [ "${_mv_rc}" -eq 0 ] && grep -q "MAS o merge ACONTECEU" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (b) rc≠0 com merge FEITO ⇒ sucesso + aviso (o defeito do #814)"
+  else record_fail "pr-merge-verified: (b) falso negativo voltou" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  _mv "OPEN|null" "OPEN|null" 1 "merge conflict"
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "NÃO está MERGED" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (c) rc≠0 sem merge ⇒ die (a guarda original intacta)"
+  else record_fail "pr-merge-verified: (c) guarda afrouxou" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  _mv "MERGED|2026-09-01T00:00:00Z" "MERGED|2026-09-01T00:00:00Z" 0 "merged"
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "JÁ ESTAVA MERGED antes" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (d) já mergeado antes ⇒ die (a cura não vira falso positivo)"
+  else record_fail "pr-merge-verified: (d) falso positivo" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  _mv "OPEN|null" "MERGED|null" 1 "erro"
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "mergedAt nulo" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (e) MERGED com mergedAt nulo ⇒ die (inconsistente)"
+  else record_fail "pr-merge-verified: (e)" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  # ── os quatro casos que o Elenxo de 2026-09-07 REPROVOU na 1a versao da cura ──────────
+  # (f) e o falso positivo PROVADO: a ancora nao lia (gh em falha, string vazia), nenhum `case`
+  #     barrava, e o ramo (b) atribuia a este run um merge de OUTRA PESSOA feito dias antes.
+  local OLD="MERGED|2026-09-04T10:00:00Z"
+  _mv "" "${OLD}" 1 "the pull request has already been merged"
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "não consegui LER o estado" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (f) âncora ilegível ⇒ die (o falso positivo do Elenxo)"
+  else record_fail "pr-merge-verified: (f) FALSO POSITIVO" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  # (g) barreira que NAO depende de relogio: o proprio gh dizendo que ja estava mergeado.
+  _mv "OPEN|null" "${OLD}" 1 "X the pull request has already been merged."
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "já estava mergeado" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (g) gh diz 'already been merged' ⇒ die (sem usar relógio)"
+  else record_fail "pr-merge-verified: (g)" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  # (h) CORRIDA na janela ancora->merge (outra pessoa, --auto, merge queue): mergedAt < t0.
+  _mv "OPEN|null" "${OLD}" 1 "could not determine current branch"
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "ANTERIOR ao início" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (h) mergedAt anterior a t0 ⇒ die (corrida/merge de terceiro)"
+  else record_fail "pr-merge-verified: (h) corrida não coberta" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  # (i) state_after ilegivel: a DIRECAO ja era segura (die), mas a mensagem afirmava estado=''
+  #     — inventar um estado que ninguem leu e a reincidencia do defeito do #623.
+  _mv "OPEN|null" "" 1 "erro de rede"
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "NÃO CONSEGUI LER o estado do PR depois" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (i) estado pós-merge ilegível ⇒ die que DIZ que não leu"
+  else record_fail "pr-merge-verified: (i)" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  # (j) SIMETRIA do passo 4 (Elenxo, risco 6): com rc=0 o passo 4 nao tinha o padrao
+  #     `MERGED|` (mergedAt string VAZIA) e cairia em `MERGED|*`, declarando SUCESSO com
+  #     mergedAt vazio — enquanto o bloco de rc!=0 ja matava no mesmo caso. Apertar um lado
+  #     e deixar o outro frouxo e como o defeito volta pela porta que ninguem olhou.
+  _mv "OPEN|null" "MERGED|" 0 "merged"
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "nulo/vazio" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (j) rc=0 com mergedAt VAZIO ⇒ die (simetria com o ramo rc≠0)"
+  else record_fail "pr-merge-verified: (j) assimetria" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  # (k) estado ILEGIVEL com rc=0 tambem mata, e a mensagem diz que NAO LEU (nao inventa estado).
+  _mv "OPEN|null" "" 0 "merged"
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "NÃO CONSEGUI LER o estado do PR" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (k) rc=0 com estado ilegível ⇒ die que DIZ que não leu"
+  else record_fail "pr-merge-verified: (k)" "rc=${_mv_rc} out=${_mv_out}"; fi
+  unset -f _mv
+}
+
 run_assemble_plugin_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
   local mdesign="${REPO_ROOT}/.claude/utils/marketplace/verticals/onion-design.manifest.sh"
@@ -10937,6 +11050,7 @@ _family run_seed_adoption_graph_selftests
 # Core-only: já pula gracioso sem plugins/ (ver função). O `|| true` é rede de segurança —
 # um abort imprevisto sob set -e jamais esconde os modos self-contained seguintes (de-id).
 _family run_assemble_plugin_selftests || true
+_family run_pr_merge_verified_selftests || true
 _family run_marketplace_generate_selftests || true
 _family run_bootstrap_vertical_selftests || true
 _family run_scaffold_book_selftests || true
