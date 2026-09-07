@@ -113,8 +113,36 @@ mkdir -p "${DEST}/.claude-plugin" "${DEST}/commands" "${DEST}/agents" 2>/dev/nul
   || { echo "AVISO: não criou ${DEST} (permissão?) — plugin não montado." >&2; exit 0; }
 
 # commands/ — dir → *.md de dentro; arquivo → o arquivo.
+# ⚠️ O README de categoria NÃO VIAJA (medido 2026-09-07): `claude plugin validate --strict` valida
+#    TODO .md em commands/ como comando, e o README de categoria não tem frontmatter — "No
+#    frontmatter block found" reprovava 3 dos 5 plugins (design, engineering, product; os outros
+#    dois só passavam por não terem README na sua categoria). O `help.md` TEM frontmatter e segue.
+#    O skip é por NOME, deliberadamente previsível: filtrar por "não tem frontmatter" faria um
+#    comando real mal-formado sumir calado, e sumir calado é pior que reprovar alto — a ausência
+#    de frontmatter num comando de verdade já é REGRA 1 no core.
+#    O casamento é case-insensitive sobre o RADICAL, espelhando a prior art da camada de geração
+#    (`plugin-readme.sh:56` e `:61`, `base.lower()=="readme"`): a decisão "README em commands/ não
+#    é comando" já existia lá, e duas metades do mesmo pipeline concordando em FORMAS DIFERENTES é
+#    o defeito que volta calado (`readme.md` minúsculo passaria pelo assembler e reprovaria).
+#    Vale nos DOIS ramos — o de arquivo avulso também é superfície viva (o manifesto de product
+#    faz cherry-pick de `.claude/commands/docs/help.md` por ali), e assimetria entre ramos é como
+#    se inverte um argumento sem ninguém ver.
+_is_category_readme() {
+  local _b; _b="$(basename "${1}")"; _b="${_b%.*}"
+  [ "$(printf '%s' "${_b}" | tr '[:upper:]' '[:lower:]')" = "readme" ]
+}
 for c in "${COMMANDS[@]}"; do
-  if [ -d "${SRC}/${c}" ]; then cp "${SRC}/${c}"/*.md "${DEST}/commands/" 2>/dev/null
+  if [ -d "${SRC}/${c}" ]; then
+    for _md in "${SRC}/${c}"/*.md; do
+      [ -e "${_md}" ] || continue
+      if _is_category_readme "${_md}"; then
+        printf 'assemble-plugin: %s: %s não viaja (README de categoria não é comando)\n' "${c}" "$(basename "${_md}")" >&2
+        continue
+      fi
+      cp "${_md}" "${DEST}/commands/" 2>/dev/null
+    done
+  elif _is_category_readme "${SRC}/${c}"; then
+    printf 'assemble-plugin: %s não viaja (README de categoria não é comando)\n' "${c}" >&2
   else cp "${SRC}/${c}" "${DEST}/commands/" 2>/dev/null; fi
 done
 # agents/ — arquivos.
@@ -293,6 +321,24 @@ fi
 # 2026-09-07 (nó D_CONTATO_DESACOPLADO): a origem é privada e não pode ser publicada como endereço.
 . "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/public-face.sh"
 
+# GERADORES SÃO INSUMO (medido 2026-09-07, Elenxo do PR 1). `tree_sha` e a versão derivada eram
+# calculados só sobre as FONTES do manifesto — e o assembler, o gerador de README e a face pública
+# não estavam em nenhum dos dois conjuntos. Consequência medida: a cura que tirou o README de
+# categoria de dentro de `commands/` MUDOU o conteúdo publicado de 3 plugins e, ainda assim,
+# `tree_sha` ficou idêntico e a versão travada (design 0.1.22, engineering 0.1.92, product 0.1.53)
+# — `claude plugin update` responderia "already at the latest version" e o instalador ficaria com
+# o artefato que reprova. É exatamente o modo de falha que a versão derivada nasceu para curar,
+# reaparecendo por um flanco que ela não cobria: mudar o GERADOR muda a SAÍDA.
+# Ausente = ignorado (adotante sem a maquinaria de marketplace segue montando).
+_GEN=()
+for _g in .claude/utils/marketplace/assemble-plugin.sh \
+          .claude/utils/marketplace/plugin-readme.sh \
+          .claude/utils/marketplace/public-face.sh \
+          .claude/validation/plugin-namespace-check.sh \
+          .claude/validation/plugin-dead-link-check.sh; do
+  [ -f "${SRC}/${_g}" ] && _GEN+=("${_g}")
+done
+
 url="$(git -C "${SRC}" remote get-url origin 2>/dev/null || true)"
 repository="$(printf '%s' "${url}" | sed -E 's#(git@|https://)([^/:]+)[/:]##; s#\.git$##')"
 [ -n "${repository}" ] || repository="local/${PLUGIN_NAME}"
@@ -300,7 +346,7 @@ ref="$(git -C "${SRC}" rev-parse HEAD 2>/dev/null || echo unknown)"
 commit_date="$(git -C "${SRC}" show -s --format=%cI HEAD 2>/dev/null || echo unknown)"
 tree_sha="$(
   {
-    for p in "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" "${SKILLS[@]}" "${HOOKS[@]}" "${DOCS[@]}"; do
+    for p in "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" "${SKILLS[@]}" "${HOOKS[@]}" "${DOCS[@]}" ${_GEN[@]+"${_GEN[@]}"}; do
       if [ -d "${SRC}/${p}" ]; then ( cd "${SRC}" && find "${p}" -type f ); else printf '%s\n' "${p}"; fi
     done | LC_ALL=C sort | while IFS= read -r rel; do
       printf '%s %s\n' "$(git -C "${SRC}" hash-object "${SRC}/${rel}" 2>/dev/null || echo nohash)" "${rel}"
@@ -326,7 +372,7 @@ EOF
 # concordam). Monotônica, semver-válida, muda exatamente quando o conteúdo muda; regenerada pela REGRA 19.
 # Sem git (alvo sem histórico) mantém a versão do manifesto. ONION_PLUGIN_VERSION_DERIVED=0 desliga (bancada/legado).
 if [ "${ONION_PLUGIN_VERSION_DERIVED:-1}" = "1" ] && git -C "${SRC}" rev-parse --verify HEAD >/dev/null 2>&1; then
-  _vsrc=(); for p in "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" "${SKILLS[@]}" "${HOOKS[@]}" "${DOCS[@]}"; do _vsrc+=("${p}"); done
+  _vsrc=(); for p in "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" "${SKILLS[@]}" "${HOOKS[@]}" "${DOCS[@]}" ${_GEN[@]+"${_GEN[@]}"}; do _vsrc+=("${p}"); done
   _mrel="${MANIFEST#${SRC}/}"; [ -f "${SRC}/${_mrel}" ] && _vsrc+=("${_mrel}")
   _n="$(git -C "${SRC}" rev-list --count HEAD -- "${_vsrc[@]}" 2>/dev/null || echo 0)"
   git -C "${SRC}" diff --cached --quiet -- "${_vsrc[@]}" 2>/dev/null || _n=$(( _n + 1 ))

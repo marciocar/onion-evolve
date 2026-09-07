@@ -8077,6 +8077,43 @@ run_assemble_plugin_selftests() {
     record_pass "assemble-plugin: proveniência repository+ref+tree_sha"
   else record_fail "assemble-plugin: proveniência" "campos de proveniência ausentes/vazios"; fi
 
+  # (d2) README de categoria NÃO viaja para commands/, e o resto viaja. O `design` monta de um DIR
+  #      (.claude/commands/design, que TEM README.md) — se o skip quebrar, `claude plugin validate
+  #      --strict` volta a reprovar 3 dos 5 plugins, calado, porque o --strict não está no gate.
+  if [ ! -e "${d}/design/commands/README.md" ] && [ ! -e "${d}/design/commands/readme.md" ] \
+     && ls "${d}/design/commands/"*.md >/dev/null 2>&1; then
+    record_pass "assemble-plugin: README de categoria não viaja p/ commands/ (e os comandos viajam)"
+  else record_fail "assemble-plugin: README em commands/" "README de categoria viajou, ou commands/ ficou vazio"; fi
+
+  # (d3) o casamento é case-insensitive sobre o RADICAL e NÃO superreage. Espelha a prior art de
+  #      plugin-readme.sh:56 (`base.lower()=="readme"`); as duas metades do pipeline têm de
+  #      concordar na FORMA, senão um `readme.md` minúsculo passa por uma e é ignorado pela outra.
+  _isr() { local _b; _b="$(basename "${1}")"; _b="${_b%.*}"; [ "$(printf '%s' "${_b}" | tr '[:upper:]' '[:lower:]')" = "readme" ]; }
+  local _bad=""
+  for _n in README.md readme.md ReadMe.md README.markdown; do _isr "/x/${_n}" || _bad="${_bad} ${_n}(deixou passar)"; done
+  for _n in help.md notreadme.md readme-do-usuario.md; do _isr "/x/${_n}" && _bad="${_bad} ${_n}(barrou demais)"; done
+  if [ -z "${_bad}" ]; then
+    record_pass "assemble-plugin: skip do README é case-insensitive no radical, sem superreação"
+  else record_fail "assemble-plugin: predicado do README" "casos errados:${_bad}"; fi
+  unset -f _isr
+
+  # (d4) O GERADOR É INSUMO dos dois sinais de mudança. Medido 2026-09-07: tirar o README de
+  #      categoria de `commands/` mudou o conteúdo publicado de 3 plugins e, ainda assim,
+  #      `tree_sha` ficou idêntico e a versão travada — `claude plugin update` diria "already at
+  #      the latest version" e a correção não chegaria a quem instalou. A cura põe os geradores
+  #      nas DUAS listas; este caso trava a regressão de removê-los de UMA delas (que é o jeito
+  #      silencioso de o defeito voltar: o outro sinal ainda anda e parece que está tudo certo).
+  #      ⚠️ ESCOPO DECLARADO: é teste ESTRUTURAL — prova que `_GEN` alimenta as duas listas, não
+  #      que o hash de fato muda quando o gerador muda (isso exigiria mutar o gerador vivo).
+  local _asm_src; _asm_src="$(cat "${helper}" 2>/dev/null)"
+  local _n_gen_decl _n_tree _n_vsrc
+  _n_gen_decl="$(printf '%s' "${_asm_src}" | grep -cE '^_GEN=\(' || true)"
+  # As duas listas são as ÚNICAS linhas que expandem _GEN dentro de um `for p in ... ; do`.
+  _n_tree="$(printf '%s' "${_asm_src}" | grep -cF '"${DOCS[@]}" ${_GEN[@]+"${_GEN[@]}"}; do' || true)"
+  if [ "${_n_gen_decl}" -ge 1 ] && [ "${_n_tree}" -eq 2 ]; then
+    record_pass "assemble-plugin: geradores são insumo do tree_sha E da versão derivada (estrutural)"
+  else record_fail "assemble-plugin: gerador-insumo" "_GEN declarado=${_n_gen_decl}, listas alimentadas=${_n_tree} (esperado 2: tree_sha e _vsrc)"; fi
+
   # (e) determinismo: 2ª montagem (mesmo HEAD) → mesmo tree_sha
   local t1 t2; t1="$(jq -r '.tree_sha' "${d}/design/.claude-plugin/provenance.json" 2>/dev/null)"
   bash "${helper}" "${mdesign}" "${REPO_ROOT}" "${d}/design2" >/dev/null 2>&1
