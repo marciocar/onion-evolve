@@ -1,0 +1,170 @@
+version: 1
+kind: plan
+meta:
+  slug: testes-evidencia-2026-09
+  title: "Testes, evidência e métrica de IA — a onda que cura o medível antes de pesquisar"
+  purpose: |
+    Plano-grafo da onda pedida pelo maestro em 2026-09-08: "mais controle e visibilidade dos
+    testes, evidências (incluindo visuais) e, ao mesmo tempo, lidar e metrificar com a IA".
+
+    Existe porque o censo do `fios-abertos` não via este trabalho: ele vivia num arquivo de plano,
+    e trabalho sem nó é trabalho sem controle — a própria tese do /meta:drive.
+
+    A ordem não é acidental: cura-se o que já é medível SEM pesquisa (onda 0), e só então se gasta
+    pesquisa no que exige estado da arte. O inverso produziria uma pesquisa citando como estado
+    atual um painel que já se sabia falso.
+  review_after: '2026-10-08'
+
+nodes:
+  - id: E_PAINEL_INVENTADO_E_DOC_STALE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: 'commit 346673a7; grep dos números; bash consumed-mode-check.sh → 40 pares · 0 sem teste'
+    label: "DUAS FALSIDADES no material de testes, nenhuma pega por guarda — as duas pegas por alguém rodando o comando. (1) `docs/onion/testing-validation-system.md` publicava painel ASCII com Coverage 85% · Unit Tests 247 · Mutation 74%, e NENHUM tinha produtor: eram as metas da seção anterior redesenhadas como medição, num documento de TESTES. (2) `docs/onion/maintenance-checklist.md` dizia que a guarda de modo consumido estava DESLIGADA; está ligada, é HARD, e mede 40 pares com 0 sem teste — o texto ficou stale no wire-in de 2026-08-13 e enganou uma exploração desta casa antes de qualquer humano."
+    trace: 'docs/onion/testing-validation-system.md; docs/onion/maintenance-checklist.md'
+
+  - id: E_BANCADA_NAO_CONTAVA_PARA_NINGUEM
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: 'commit 7d104066; bancada 1127/1127 STRICT --jobs auto em 685s, TSV de 164 linhas'
+    label: "A bancada sabia tudo e não contava para ninguém: o resultado morria no log do job. Sem resultado legível por máquina não há série histórica, nem painel, nem detector de flaky. Curado com `--report`, e a restrição que importa é de PROCESSO, não de formato: escreve o PAI (worker concorrente se sobrescreveria), depois da CONTAGEM e antes do VEREDITO (há quatro saídas — relatório que só sai no verde é inútil), e a escrita NÃO pode mudar o rc. Três casos na bancada provam, incluindo a condição de aceite: a flag não altera a contagem."
+    trace: '.claude/validation/lint-selftest.sh'
+
+  - id: E_NUMEROS_DO_HARNESS_DIVERGEM_ENTRE_SI
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: 'medido: 1127 casos · 155 famílias · 78 regras; comentários dizem 689, 980, ~850 e 18'
+    label: "Os números do próprio harness vivem em COMENTÁRIO e divergem entre si: 689 no workflow, 980 no pre-commit, ~850 numa análise — e a medição de hoje dá 1127. O documento de testes citava 18 regras contra as 78 do registro. Sem gerador e sem catraca, todo número escrito à mão envelhece em semanas. É a mesma classe do painel inventado, um grau abaixo: não é ficção, é defasagem — e as duas enganam igual."
+    trace: '.github/workflows/onion-selftest.yml; .githooks/pre-commit'
+
+  - id: I_HARNESS_INVENTORY
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: "ONDA 0.3 — SSOT gerada dos números do harness (`harness-inventory.sh --markdown|--json` → `docs/onion/testing-inventory.md`), com catraca byte-a-byte. Molde: `inventory.sh`. ACEITE: editar o .md à mão reprova HARD, e os comentários dos workflows param de citar número e passam a citar o arquivo."
+
+  - id: I_EVIDENCIA_DE_TERMINAL_NO_CI
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    label: "ONDA 0.4 — a saída real da bancada e do lint vira artefato de CI + `$GITHUB_STEP_SUMMARY`. A técnica já está no repo (`onion-review.yml` faz summary); falta aplicá-la aos workflows de TESTE, que hoje não têm nem artefato nem sumário."
+
+  - id: I_LEDGER_DOS_RESIDUOS
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "ONDA 0.5 — ledger dos 262 resíduos da REGRA 56, que já têm 6 campos preenchidos em 262/262. ZERO instrumentação nova. Deriva custo/retorno por rodada de IA: uma amostra real dá 6 achados por 1,9M tokens = 317k tokens por achado real — número que existe hoje e ninguém calculou."
+
+  - id: I_SERIE_HISTORICA_DA_BANCADA
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: "ONDA 0.6 — série histórica (`selftest-runs.jsonl` + coletor), molde LITERAL do ledger GTM, inclusive quem aperta o botão: o CI não commita; o cron local escreve e o humano commita. Bônus: o `schedule: 17 4 * * *` já roda a bancada inteira todo dia — é detector de flaky pronto esperando um ledger."
+
+  - id: I_PAINEL_DO_ESTADO
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.75
+    label: "ONDA 0.7 — o painel (`docs/onion/testing-state.md`, gerado e catracado). CINCO defesas contra virar o segundo painel inventado: célula sem comando não é impressa · catraca byte-a-byte · métrica sem produtor imprime `⊘ NÃO MEDIDO` · guarda de vacuidade no gerador · o painel declara a própria idade."
+
+  - id: Q_PESQUISA_E2E_E_METRICA
+    node_type: question
+    drive_kind: research
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: "AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CLI de LLM sem mockar o modelo, e como se prova que um gate reprova quando deve; R2 `ai-test-metrics-2026-09` — como se mede eficácia e custo de gates e revisores de IA. Nenhuma é `mode: decision`: medido no repo, decisão custa 3,5M-7M sozinha e não cabe. A decisão do stack fica com o maestro."
+
+  - id: E_A_REGUA_QUE_FALTAVA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: 'bash .claude/validation/review-ledger.sh sobre docs/evolution/review (262 residuos)'
+    trace: '.claude/validation/review-ledger.sh'
+    label: "ONDA 0.5 ENTREGUE — os 262 residuos da REGRA 56 (PR carrega residuo adversarial) foram agregados pela primeira vez, com ZERO instrumentacao nova: os 6 campos ja estavam la ha meses. A regua que faltava: 106.881 tokens e 4,3 minutos por achado REAL. Sobre os 170 residuos com tokens > 0 — 1331 achados, 1099 reais (83% de precisao), 416 corrigidos, 117,4M tokens, 4.710 minutos. Os outros 92 declaram `tokens: 0` e renderam 206 achados reais: contados para nao sumirem, fora da media porque divisao por zero nao e media."
+
+  - id: E_O_LEDGER_TINHA_O_DEFEITO_QUE_CACA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: 'a 1a versao do review-ledger.sh, corrigida no mesmo loop'
+    trace: '.claude/validation/review-ledger.sh (particao de tres estados + assercao de fechamento)'
+    label: "O leitor nasceu com a mesma classe de defeito que existe para medir: reportava `incompletos: 0` enquanto usava 170 de 262 residuos — os 92 com `tokens: 0` caiam num teste de veracidade do shell e evaporavam em silencio, e o numero impresso PARECIA cobrir o conjunto todo. A cura nao foi corrigir o teste: foi particionar em TRES estados nomeados (tokens>0 / `tokens: 0` declarado / campo AUSENTE) e ASSERTAR que a particao fecha em 262. Ausencia e custo-zero sao coisas diferentes, e so o nome as separa."
+
+  - id: Q_VEREDITO_DO_RESIDUO_E_TEXTO_LIVRE
+    node_type: question
+    drive_kind: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "72 formas DISTINTAS de veredito em 262 residuos (APROVADO=160, CONFORME=42, CORRIGIDO=22, e uma cauda de 69 formas que sao frase inteira). O campo e texto livre, entao NAO sustenta serie: nao da para dizer 'a taxa de reprovacao caiu' sem um vocabulario fechado. Padronizar e decisao do maestro — o ledger apenas mede e recusa fingir que a cauda e ruido."
+
+edges:
+  - from: I_HARNESS_INVENTORY
+    to: E_NUMEROS_DO_HARNESS_DIVERGEM_ENTRE_SI
+    edge_type: DEPENDS_ON
+  - from: I_EVIDENCIA_DE_TERMINAL_NO_CI
+    to: E_BANCADA_NAO_CONTAVA_PARA_NINGUEM
+    edge_type: DEPENDS_ON
+  - from: I_LEDGER_DOS_RESIDUOS
+    to: E_BANCADA_NAO_CONTAVA_PARA_NINGUEM
+    edge_type: DEPENDS_ON
+  - from: I_SERIE_HISTORICA_DA_BANCADA
+    to: E_BANCADA_NAO_CONTAVA_PARA_NINGUEM
+    edge_type: DEPENDS_ON
+  - from: I_PAINEL_DO_ESTADO
+    to: I_HARNESS_INVENTORY
+    edge_type: DEPENDS_ON
+  - from: I_PAINEL_DO_ESTADO
+    to: I_SERIE_HISTORICA_DA_BANCADA
+    edge_type: DEPENDS_ON
+  - from: I_PAINEL_DO_ESTADO
+    to: E_PAINEL_INVENTADO_E_DOC_STALE
+    edge_type: DEPENDS_ON
+  - from: Q_PESQUISA_E2E_E_METRICA
+    to: I_LEDGER_DOS_RESIDUOS
+    edge_type: DEPENDS_ON
+  - from: E_A_REGUA_QUE_FALTAVA
+    to: I_LEDGER_DOS_RESIDUOS
+    edge_type: SUPPORTS
+  - from: E_O_LEDGER_TINHA_O_DEFEITO_QUE_CACA
+    to: E_A_REGUA_QUE_FALTAVA
+    edge_type: SUPPORTS
+  - from: Q_VEREDITO_DO_RESIDUO_E_TEXTO_LIVRE
+    to: E_A_REGUA_QUE_FALTAVA
+    edge_type: DEPENDS_ON

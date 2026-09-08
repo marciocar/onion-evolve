@@ -11393,6 +11393,52 @@ PYI
 }
 _family run_selftest_lanes_selftests
 
+# ── review_ledger — a camada de MÉTRICA tem UMA família na bancada, e é esta ──────────────────
+#
+#  Teto declarado no plano de 2026-09-08: a instrumentação de métrica recebe UMA família e ZERO
+#  baselines. Se precisar de mais, o desenho está errado — instrumento mais caro que o
+#  instrumentado é o risco nº3 desta onda, e o repo já tem 73 scripts e 155 famílias.
+run_review_ledger_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/review-ledger.sh"
+  if [ ! -f "${sut}" ]; then record_skip "review-ledger: leitor ausente"; return; fi
+  local d out rc
+  d="$(mktemp -d)"
+  # (a) DIRETÓRIO VAZIO É `NÃO MEDIDO`, jamais "nenhum achado". É a guarda de vacuidade da casa
+  #     aplicada a um LEITOR: um ledger que soma zero sobre zero arquivos parece saúde.
+  if out="$(bash "${sut}" --dir "${d}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -q 'NÃO MEDIDO' <<< "${out}"; then
+    record_pass "review-ledger: (a) diretório vazio ⇒ rc=2 NÃO MEDIDO (não 'zero achados')"
+  else record_fail "review-ledger: (a) vacuidade" "rc=${rc}; $(tail -1 <<< "${out}" | cut -c1-90)"; fi
+  # (b) diretório inexistente também reprova — ausência de alvo não vira zero silencioso
+  if out="$(bash "${sut}" --dir "${d}/nao-existe" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ]; then record_pass "review-ledger: (b) diretório ausente ⇒ rc=2"
+  else record_fail "review-ledger: (b) dir ausente" "rc=${rc}"; fi
+  # (c) A PARTIÇÃO FECHA: com-tokens + zerados + ausentes == total. Esta é a condição de aceite,
+  #     e nasceu de um defeito DESTE script: a 1ª versão dizia "incompletos: 0" e usava 170 de
+  #     262 — os 92 com `tokens: 0` sumiam num teste falsy, sem aparecer em lugar nenhum.
+  out="$(bash "${sut}" --resumo 2>&1 || true)"
+  local tot com zer aus
+  tot="$(grep -oP 'LEDGER DA REVISÃO ADVERSARIAL — \K[0-9]+' <<< "${out}" || echo 0)"
+  com="$(grep -oP 'tokens > 0 \(entram na média\)\s+\K[0-9]+' <<< "${out}" || echo 0)"
+  zer="$(grep -oP '`tokens: 0` declarado\s+\K[0-9]+' <<< "${out}" || echo 0)"
+  aus="$(grep -oP 'campo AUSENTE\s+\K[0-9]+' <<< "${out}" || echo 0)"
+  if [ "${tot}" -gt 0 ] && [ "$(( com + zer + aus ))" -eq "${tot}" ]; then
+    record_pass "review-ledger: (c) partição fecha — ${com}+${zer}+${aus} = ${tot} resíduos"
+  else record_fail "review-ledger: (c) partição não fecha" "com=${com} zer=${zer} aus=${aus} tot=${tot}"; fi
+  # (d) o TSV tem uma linha por resíduo (cabeçalho + N), e nenhuma célula vazia — vazio viraria
+  #     coluna deslocada no consumidor, que é como um ledger passa a mentir sem ninguém ver.
+  out="$(bash "${sut}" --tsv 2>/dev/null || true)"
+  local n vazias
+  n="$(printf '%s\n' "${out}" | tail -n +2 | grep -c . || true)"
+  vazias="$(printf '%s\n' "${out}" | tail -n +2 | awk -F'\t' '{for(i=1;i<=NF;i++) if($i=="") c++} END{print c+0}')"
+  if [ "${n}" -eq "${tot}" ] && [ "${vazias}" -eq 0 ]; then
+    record_pass "review-ledger: (d) --tsv = ${n} linhas (1 por resíduo), zero célula vazia"
+  else record_fail "review-ledger: (d) --tsv" "linhas=${n} esperado=${tot} células vazias=${vazias}"; fi
+  rm -rf "${d}"
+}
+_family run_review_ledger_selftests
+
+
 # Modo claude-md-fuse — D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO (sinal upstream do 1º adotante greenfield, 2026-09-03): na adoção, um
 # CLAUDE.md pré-existente que é BOILERPLATE de template (só comandos/estrutura/links) é FUNDIDO no esqueleto Onion-first,
 # original preservado em seção nomeada; CLAUDE.md com regras reais segue never-clobber (helper recusa com exit 3).
