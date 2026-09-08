@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**166 itens abertos** em 40 grafo(s) com aberto (de 62 no escopo) · 40 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**177 itens abertos** em 41 grafo(s) com aberto (de 63 no escopo) · 41 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -48,6 +48,22 @@
 | 5.2 | `C_p4_audit_trail` | m3-federation-admin-2026-07 | REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivad |
 | 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
+
+## ocr-local-sei-2026-09 — 11 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 54.0 | `Q_OCR_LOCAL_SEI_0908` | ocr-local-sei-2026-09 | Qual motor de OCR LOCAL escolher para ler PDF-imagem de documento administrativo brasileiro do SEI (fonte serifada, tabelas, carim |
+| 45.0 | `D_OCR_LOCAL_SEI_0908` | ocr-local-sei-2026-09 | DECISAO ABERTA (o maestro sela): qual motor de OCR local adotar para as 26 paginas do SEI sob NDA, sendo 3 vinculantes? Opcoes nom |
+| 14.0 | `C_OPCAO_PROCEDIMENTO_CONSENSO_DOIS_MOTORES` | ocr-local-sei-2026-09 | OPCAO (9) — O PROCEDIMENTO, que o Elenxo recomenda decidir ANTES do motor: consenso entre 2 motores ARQUITETURALMENTE INDEPENDEN |
+| 9.0 | `C_OPCAO_BASELINE_SEM_OCR_PDFTOTEXT` | ocr-local-sei-2026-09 | OPCAO (8) — O PASSO 0, e a de maior confianca do grafo (0.9): antes de instalar QUALQUER motor, rodar `pdftotext -layout` e `pdf |
+| 6.0 | `C_OPCAO_TESSERACT5_TESSDATA_BEST` | ocr-local-sei-2026-09 | OPCAO (1): Tesseract 5 instalado por apt com por.traineddata do tessdata_best — saida TSV com confidence e bounding box POR PALA |
+| 3.6 | `C_OPCAO_DOCTR_TORCH_VENV` | ocr-local-sei-2026-09 | OPCAO (3): docTR (python-doctr + torch) em venv isolado. Compatibilidade com Python 3.12 CONFIRMADA em tier 9 (E_DOCTR_PYTHON_311_ |
+| 3.2 | `C_OPCAO_DOTSOCR_3B_CPU` | ocr-local-sei-2026-09 | OPCAO (5): dots.ocr / dots.mocr 3B em CPU, sem flash-attn/vLLM (que nao instalam sem GPU). O arco do dossie aponta este como estad |
+| 2.7 | `C_OPCAO_DOCLING_IBM` | ocr-local-sei-2026-09 | OPCAO (7): Docling (IBM, Apache-2.0) — CANDIDATO AUSENTE DO ESCOPO ORIGINAL da pergunta, que apareceu como vencedor em TABELA no |
+| 2.7 | `C_OPCAO_PADDLEOCR_VL_CPU` | ocr-local-sei-2026-09 | OPCAO (2): PaddleOCR / PaddleOCR-VL 0.9B em CPU, venv isolado. Confianca 0.3: TODAS as claims a favor foram refutadas nesta rodada |
+| 2.4 | `C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA` | ocr-local-sei-2026-09 | OPCAO (4): Surya (datalab-to) — NAO RECOMENDAVEL A PARTIR DESTE DOSSIE, e a razao nao e desempenho: e que o corpo de evidencia s |
+| 1.2 | `C_OPCAO_MINERU_OLMOCR` | ocr-local-sei-2026-09 | OPCAO (6): MinerU 2.5 / olmOCR. Praticamente NAO PESQUISADOS nesta rodada — aparecem so como termo de comparacao dentro de claim |
 
 ## plugins-en-compliance-2026-09 — 24 item(ns)
 
