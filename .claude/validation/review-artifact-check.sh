@@ -176,7 +176,7 @@ ART="${REVIEW_DIR}/${SLUG}.md"
 # `:${ART}` le o INDICE; `HEAD:${ART}` le o commit. Arvore suja -> indice; limpa -> HEAD.
 if git diff --quiet HEAD 2>/dev/null; then _ART_REF="HEAD:${ART}"; else _ART_REF=":${ART}"; fi
 if ! git cat-file -e "${_ART_REF}" 2>/dev/null; then
-  _out HARD ARTEFATO-AUSENTE "${ART}" "PR #${PR_NUM} aberto e sem resíduo de revisão. Rode a passada adversarial e registre o resultado em ${ART} (campos: reviewed_diff_sha256 · findings_total · findings_real · tokens · duration_min · verdict). O hash deste diff é ${DIFF_SHA}."
+  _out HARD ARTEFATO-AUSENTE "${ART}" "PR #${PR_NUM} aberto e sem resíduo de revisão. Rode a passada adversarial e registre o resultado em ${ART} (campos: reviewed_diff_sha256 · findings_total · findings_real · tokens · duration_min · verdict — este ultimo em vocabulario FECHADO: APROVADO | CORRIGIDO | REPROVADO | REPROVADO_E_CURADO | SEM_ACHADOS; a narrativa vai em 'nota:', e 'elenxo: sim|nao' declara se houve passada adversarial). O hash deste diff é ${DIFF_SHA}."
   [ "${FORMAT}" = tsv ] || printf '  (o verde do onion-review é soft-pass — não substitui esta passada)\n'
   exit 1
 fi
@@ -209,6 +209,44 @@ done
 [ -n "$(_field verdict)" ] || FALTAM="${FALTAM}${FALTAM:+, }verdict"
 if [ -n "${FALTAM}" ]; then
   _out HARD CAMPO-DE-REAVALIACAO-AUSENTE "${ART}" "faltam: ${FALTAM}. São o dado da reavaliação em N=10 — sem eles a cadência 'todo PR' não pode ser julgada, e a falsificação declarada deste mecanismo é justamente chegar ao 10º PR sem os campos."
+  exit 1
+fi
+
+# ---------------------------------------------------------------------------
+# VOCABULÁRIO FECHADO DO `verdict:` — selado pelo maestro em 2026-09-08.
+#
+# POR QUE, medido e não sentido: `review-ledger.sh` agregou os 262 resíduos existentes e
+# achou **72 formas DISTINTAS** de veredito (71 se a caixa for ignorada — `conforme` minúsculo
+# era uma delas). Sessenta e duas ocorrem UMA vez, e são frase inteira:
+# `ELENXO-DERRUBOU-CINCO-AFIRMACOES-MINHAS-E-ACHOU-UMA-BOMBA-RELOGIO`. Campo de texto livre
+# NÃO sustenta série: não se pode dizer "a taxa de reprovação caiu" sem vocabulário fechado,
+# e a régua da revisão adversarial (hoje 106.881 tokens por achado real) fica sem eixo.
+#
+# A CAUDA NÃO ERA RUÍDO — eram TRÊS campos espremidos num só, e a partição revelou dois deles:
+#   · 8 resíduos usavam o slot para dizer que o Elenxo NÃO rodou (`SEM-ELENXO-...`) — método;
+#   · 8 diziam `HARD-MAS-NAO-COMO-ESTAVA-...` — um veredito real que faltava no enum:
+#     a revisão REPROVOU e a cura entrou no mesmo PR. É a métrica de eficácia da revisão.
+#   · 15 traziam a narrativa do achado — isso vira `nota:`, campo livre que não some.
+#
+# PROSPECTIVA POR CONSTRUÇÃO, não por baseline: esta guarda só julga o resíduo do PR CORRENTE
+# (`${ART}` deriva da branch atual). Os 262 antigos nunca entram em julgamento e não se
+# reescrevem — histórico não se reescreve nesta casa. A série começa aqui, com duas eras
+# declaradas, e o ledger imprime as duas.
+#
+# CAIXA É TOLERADA, VOCABULÁRIO NÃO. `aprovado` passa e é normalizado; `CONFORME` não passa.
+# A régua desta casa é que em guarda de lista o defeito dominante é o VOCABULÁRIO, não a
+# lógica — reprovar por caixa seria falso-positivo travante sem ganho de série.
+# ---------------------------------------------------------------------------
+# SEPARADOR TAMBÉM É TOLERADO, e não por generosidade: `REPROVADO-E-CURADO` JÁ EXISTIA 5× no
+# corpus, com hífen, enquanto `APROVADO_APOS_CORRECAO` usava underscore. A grafia mista é do
+# histórico real desta casa — reprovar por `-` vs `_` seria inventar um defeito. A normalização
+# só casa a PALAVRA INTEIRA: `CORRIGIDO-E-RE-REVISADO` continua fora do vocabulário, como deve.
+VERDICT_ENUM="APROVADO CORRIGIDO REPROVADO REPROVADO_E_CURADO SEM_ACHADOS"
+_VERD="$(_field verdict | tr 'a-z' 'A-Z' | tr '-' '_')"
+_VERD_OK=0
+for _v in ${VERDICT_ENUM}; do [ "${_VERD}" = "${_v}" ] && _VERD_OK=1; done
+if [ "${_VERD_OK}" -ne 1 ]; then
+  _out HARD VERDICT-FORA-DO-VOCABULARIO "${ART}" "verdict: '${_VERD}' nao esta no vocabulario fechado (${VERDICT_ENUM}). Selado em 2026-09-08 porque 262 residuos produziram 72 formas distintas e o campo deixou de sustentar serie. Se o que voce quer dizer nao cabe num dos cinco, o lugar e o campo livre 'nota:' — o veredito continua sendo um dos cinco. REPROVADO_E_CURADO existe para o caso 'a revisao reprovou e a cura entrou neste mesmo PR'."
   exit 1
 fi
 

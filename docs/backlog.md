@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**184 itens abertos** em 42 grafo(s) com aberto (de 64 no escopo) · 42 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**183 itens abertos** em 42 grafo(s) com aberto (de 64 no escopo) · 42 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -240,7 +240,7 @@
 |--:|---|---|---|
 | 19.2 | `Q_WEBSEARCH_CAP_2_1_258` | websearch-cap-2026-09 | Qual e o teto de chamadas WebSearch por sessao no Claude Code 2.1.258 — a env var CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION, seu  |
 
-## testes-evidencia-2026-09 — 7 item(ns)
+## testes-evidencia-2026-09 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -250,7 +250,6 @@
 | 9.6 | `I_SERIE_HISTORICA_DA_BANCADA` | testes-evidencia-2026-09 | ONDA 0.6 — série histórica (`selftest-runs.jsonl` + coletor), molde LITERAL do ledger GTM, inclusive quem aperta o botão: o C |
 | 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
 | 6.8 | `I_EVIDENCIA_DE_TERMINAL_NO_CI` | testes-evidencia-2026-09 | ONDA 0.4 — a saída real da bancada e do lint vira artefato de CI + `$GITHUB_STEP_SUMMARY`. A técnica já está no repo (`onion |
-| 5.4 | `Q_VEREDITO_DO_RESIDUO_E_TEXTO_LIVRE` | testes-evidencia-2026-09 | 72 formas DISTINTAS de veredito em 262 residuos (APROVADO=160, CONFORME=42, CORRIGIDO=22, e uma cauda de 69 formas que sao frase i |
 
 ## identidade-onion-vps-2026-08 — 5 item(ns)
 
