@@ -19,7 +19,22 @@ LINT="${RULES_LINT_SRC:-${SCRIPT_DIR}/lint-artifacts.sh}"
 [ -f "${LINT}" ] || { echo "rules-registry: lint-artifacts.sh ausente" >&2; exit 3; }
 command -v python3 >/dev/null 2>&1 || { echo "rules-registry: python3 ausente" >&2; exit 3; }
 
-python3 - "${LINT}" <<'PY'
+# ---------------------------------------------------------------------------
+# MODO --counts (2026-09-08): o MESMO parser devolve as contagens em KEY=VALUE.
+# EXISTE PARA QUE NÃO EXISTA UM SEGUNDO CONTADOR. O `harness-inventory.sh` precisa do número
+# de regras, e a tentação era reparsear `lint-rules.md` — que é markdown e MENTE: o título da
+# REGRA 3 (Campo model: restrito à allowlist) contém pipes ESCAPADOS, e qualquer split ingênuo
+# por `|` perde essa linha (medido: 77 em vez de 78, e um HARD a menos). Dois contadores para
+# uma população é exatamente a divergência que esta onda existe para curar.
+# O DEFAULT NÃO MUDA UM BYTE: a catraca da REGRA 62 (Projeção GERADA em sincronia com a fonte)
+# compara `lint-rules.md` byte-a-byte, então alterar a saída sem argumento reprovaria o repo.
+MODE="${1:---markdown}"
+case "${MODE}" in
+  --markdown|--counts) : ;;
+  *) echo "uso: rules-registry.sh [--markdown|--counts]" >&2; exit 2 ;;
+esac
+
+python3 - "${LINT}" "${MODE}" <<'PY'
 import re, sys
 
 lint = sys.argv[1]
@@ -148,7 +163,7 @@ CATEGORIES = [
      [10, 11]),
     ("SSOT anti-drift",
      "Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, plugins, topologia.",
-     [8, 9, 16, 19, 21, 27, 37, 39, 41, 50, 59, 62, 63, 70, 76]),
+     [8, 9, 16, 19, 21, 27, 37, 39, 41, 50, 59, 62, 63, 70, 76, 80]),
     ("KG & proveniência",
      "Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca "
      "(por citação e por marcador autodeclarado); e frescor doutrinário — afirmação "
@@ -247,6 +262,16 @@ for title, desc, nums in CATEGORIES:
     for x in present:
         out.append("| %d | %s | %s | %s |" % (x, esc(rules[x]['title']), labels[x], esc(rules[x]['previne'])))
     out.append("")
+
+if len(sys.argv) > 2 and sys.argv[2] == '--counts':
+    # HARD e SOFT contam por UNIÃO (uma regra HARD+SOFT entra nas duas) — é a mesma definição
+    # da linha em prosa que este gerador já publica. Divergir aqui faria a SSOT contradizer o
+    # próprio documento que ela cita. `RULES_BOTH` sai explícito para a soma ser AUDITÁVEL:
+    # HARD + SOFT - BOTH = TOTAL. Sem ele, 69+21=90 contra 78 parece erro e não é.
+    both = sum(1 for l in labels.values() if 'HARD' in l and 'SOFT' in l)
+    sys.stdout.write('RULES_TOTAL=%d\nRULES_HARD=%d\nRULES_SOFT=%d\nRULES_BOTH=%d\n'
+                     % (total, hard, soft, both))
+    sys.exit(0)
 
 sys.stdout.write('\n'.join(out).rstrip('\n') + '\n')
 PY

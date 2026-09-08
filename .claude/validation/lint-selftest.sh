@@ -142,7 +142,7 @@ SELFTEST_CHILD="${ONION_SELFTEST_CHILD:-0}"; SELFTEST_AFFECTED=(); SELFTEST_AFFE
 SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHARD:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry"
+SELFTEST_CORE_ONLY_FAMILIES="harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -1118,10 +1118,25 @@ run_moat_boundary_selftests() {
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"
   local vdir="${SCRIPT_DIR}/../utils/marketplace/verticals"
   [ -d "${vdir}" ] || { record_pass "moat-boundary: sem verticals/ — nada a testar"; return; }
-  local mf="${vdir}/__mbguard__.manifest.sh" out rc
+  # ⚠️ NOME ÚNICO POR PROCESSO, e isto curou um FLAKY medido em 2026-09-08. A fixture nascia com
+  # nome FIXO (`__mbguard__.manifest.sh`) num diretório da ÁRVORE VIVA. Dois processos tocando o
+  # repo ao mesmo tempo — uma bancada sobrevivente de um commit morto por OOM e a rodada nova —
+  # compartilhavam o MESMO arquivo: um escrevia o GREEN enquanto o outro esperava o RED, e o `rm -f`
+  # do primeiro apagava a fixture do segundo. Sintoma: (a) e (c) alternando falha sem padrão, cada
+  # uma verde quando rodada sozinha. `$$` no nome torna as fixtures disjuntas.
+  # [[bench-fixtures-in-live-tree-are-stageable]] — a mesma classe, um grau adiante: fixture na
+  # árvore viva não é só ESTAJÁVEL, é DISPUTÁVEL.
+  local mfbase="__mbguard__$$.manifest.sh"
+  local mf="${vdir}/${mfbase}" out rc
   trap 'rm -f "'"${mf}"'"' RETURN
   # grep pela violação da PRÓPRIA fixture (a guarda varre TODOS os manifestos — evita contaminação)
   local sig='manifesto de plugin PUBLIC'   # (2026-09-03) a linha VIOLATION passou a trazer 'REGRA N (Título): ' entre o arquivo e a mensagem
+  # ⚠️ O PREDICADO TEM DE CASAR AS DUAS COISAS NA MESMA LINHA — arquivo E assinatura do moat.
+  # Casar só a assinatura deixa (a)/(b) verdes por violação de manifesto ALHEIO; casar só o
+  # arquivo reprova (c) por regra que não é a testada — a fixture GREEN dispara legitimamente as
+  # REGRAS 19 (Plugins de vertical sincronizados com as fontes) e 27 (Dependência de script de
+  # comando empacotado), que nada têm a ver com o moat. Medido em 2026-09-08, nas duas direções.
+  _moat_hit() { grep -F "${mfbase}" <<< "$1" | grep -qF "${sig}"; }
   # (a) RED abrangente — todo tipo de moat que o revisor apontou (C1): auto-evolução, federação
   #     downstream+ledger, absorb-skill (fábrica), grafo FORA de docs/onion/graph (o life-KG privado).
   cat > "${mf}" <<'RED'
@@ -1138,7 +1153,7 @@ REQUIRES=()
 LOADS=()
 RED
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
-  if grep -qF "${sig}" <<< "${out}"&& grep -qF "__mbguard__.manifest.sh: REGRA" <<< "${out}"; then
+  if _moat_hit "${out}"; then
     record_pass "moat-boundary: (a) evolve/federação/absorb-skill/life-KG → HARD (C1 do revisor)"
   else record_fail "moat-boundary: (a)" "vazamento C1 não pego: rc=${rc}"; fi
   # (b) RED por DIRETÓRIO-PAI (C2): declarar commands/meta (dir) arrasta a fábrica; a guarda checa a
@@ -1155,7 +1170,7 @@ REQUIRES=()
 LOADS=()
 RED
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
-  if grep -qF "${sig}" <<< "${out}"&& grep -qF "__mbguard__.manifest.sh: REGRA" <<< "${out}"; then
+  if _moat_hit "${out}"; then
     record_pass "moat-boundary: (b) declaração por DIRETÓRIO-PAI → HARD pela expansão (C2 do revisor)"
   else record_fail "moat-boundary: (b)" "bypass por dir-pai não pego: rc=${rc}"; fi
   # (c) GREEN — capacidade + upstream (co-evolve/co-relay) + produto (create-task-structure) + dir de
@@ -1174,7 +1189,12 @@ REQUIRES=()
 LOADS=()
 GREEN
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
-  if ! grep -qF "${sig}" <<< "${out}"; then
+  # ⚠️ ESCOPADO À PRÓPRIA FIXTURE, e a assimetria com (a)/(b) era um DEFEITO. Este caso grepava o
+  # `sig` GLOBALMENTE, mas a guarda varre TODOS os manifestos do diretório — então QUALQUER outro
+  # manifesto violando a regra (a fixture RED de um processo concorrente, por exemplo) reprovava
+  # este caso por algo que não é dele. Um caso GREEN que falha por manifesto alheio não mede a
+  # guarda: mede a vizinhança.
+  if ! _moat_hit "${out}"; then
     record_pass "moat-boundary: (c) capacidade+upstream+produto+dir limpos → sem HARD"
   else record_fail "moat-boundary: (c)" "falso-positivo em manifesto de capacidade limpo"; fi
   rm -f "${mf}"
@@ -1402,6 +1422,89 @@ run_plugin_private_url_selftests() {
     record_pass "plugin-private-url: (c) URL do repo público → limpo (sem superreação a github.com)"
   else record_fail "plugin-private-url: (c)" "falso-positivo no canal público: ${out}"; fi
   rm -rf "${fdir}"
+}
+
+# Modo harness-inventory — REGRA 80. A SSOT gerada dos números do PRÓPRIO harness. Nasceu de
+# `689 asserções` sobreviver em três comentários de CI depois de a medição dar 1135: número do
+# harness escrito à mão envelhece calado e é lido como medição. O caso (c) é o que mais importa
+# e é o único que não é óbvio — ver o comentário dele.
+run_harness_inventory_selftests() {
+  local gen="${SCRIPT_DIR}/harness-inventory.sh"
+  if [ ! -f "${gen}" ]; then record_fail "harness-inventory" "gerador ausente: ${gen}"; return; fi
+  local out rc
+
+  # (a) os três modos produzem saída, e o --json é JSON de verdade (não "parece JSON").
+  #
+  # ⚠️ CADA MODO É INVOCADO COM A FLAG LITERAL, e um laço `for m in --markdown ...` seria ERRADO
+  # aqui — a REGRA 59 (Modo que a produção consome é exercitado pela bancada) me reprovou por
+  # isso ao estrear esta família: com a flag vindo de variável, o detector a classifica como
+  # DINÂMICA e a tira de julgamento, então `--markdown` (o modo que a catraca da REGRA 80
+  # consome) ficava sem teste enquanto o caso parecia cobri-lo. Laço economiza três linhas e
+  # compra um falso-verde no modo que mais importa. [[bancada-espelha-o-runner]]
+  local failed="" _rc_md=0 _rc_js=0 _rc_env=0
+  bash "${gen}" --markdown >/dev/null 2>&1 || _rc_md=$?
+  bash "${gen}" --json     >/dev/null 2>&1 || _rc_js=$?
+  bash "${gen}" --env      >/dev/null 2>&1 || _rc_env=$?
+  [ "${_rc_md}" -eq 0 ]  || failed="${failed} --markdown(rc=${_rc_md})"
+  [ "${_rc_js}" -eq 0 ]  || failed="${failed} --json(rc=${_rc_js})"
+  [ "${_rc_env}" -eq 0 ] || failed="${failed} --env(rc=${_rc_env})"
+  [ -n "$(bash "${gen}" --markdown)" ] || failed="${failed} --markdown(vazio)"
+  [ -n "$(bash "${gen}" --env)" ]      || failed="${failed} --env(vazio)"
+  if [ -z "${failed}" ] && bash "${gen}" --json | python3 -c 'import json,sys; json.load(sys.stdin)' 2>/dev/null; then
+    record_pass "harness-inventory: (a) --markdown/--json/--env produzem saída e o JSON parseia"
+  else record_fail "harness-inventory: (a) modos" "modos com problema:${failed:-nenhum}; ou o --json não parseia"; fi
+
+  # (b) arg desconhecido → exit 2. Sem isto, um typo cairia no default e o chamador acharia
+  #     que pediu outra coisa — a mesma classe de silêncio que os outros geradores já curaram.
+  rc=0; bash "${gen}" --nao-existe >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then
+    record_pass "harness-inventory: (b) arg desconhecido → exit 2 (não cai no default calado)"
+  else record_fail "harness-inventory: (b) arg desconhecido" "esperava rc=2, veio ${rc}"; fi
+
+  # (c) ⭐ A PROVA DE IGUALDADE — o coração desta família.
+  #     O gerador conta famílias pelo `^_family ` estático porque `--list` custa ~2s e a catraca
+  #     da REGRA 80 o chama a cada lint. Mas o modo que a PRODUÇÃO consome para enumerar famílias
+  #     é o `--list`. Se os dois divergirem, a SSOT publica um número que nada usa — e o harness
+  #     deixa de espelhar o runner sem ninguém ver. É a lição que esta casa já pagou 5 vezes
+  #     [[bancada-espelha-o-runner]]. O barato só é legítimo enquanto ESTA asserção passar.
+  local n_estatico n_list
+  n_estatico="$(bash "${gen}" --env | sed -n 's/^HARNESS_FAMILIES=//p')"
+  n_list="$(bash "${SCRIPT_DIR}/lint-selftest.sh" --list | grep -c .)"
+  if [ -n "${n_estatico}" ] && [ "${n_estatico}" = "${n_list}" ]; then
+    record_pass "harness-inventory: (c) contador BARATO (^_family) == modo CONSUMIDO (--list) — ${n_list} famílias"
+  else record_fail "harness-inventory: (c) igualdade" "estático=${n_estatico} vs --list=${n_list} — a SSOT publicaria um número que a produção não usa"; fi
+
+  # (d) FALHA ALTO quando um produtor some. Uma SSOT que vale meio artefato é pior que nenhuma:
+  #     a catraca passaria a comparar bytes contra um estado degradado e chamaria isso de verdade.
+  local sb; sb="$(mktemp -d)"
+  mkdir -p "${sb}/.claude/validation" "${sb}/docs/onion"
+  cp "${gen}" "${sb}/.claude/validation/"
+  cp "${SCRIPT_DIR}/lint-selftest.sh" "${SCRIPT_DIR}/lint-artifacts.sh" "${sb}/.claude/validation/" 2>/dev/null || true
+  # manifest.tsv DELIBERADAMENTE ausente
+  ( cd "${sb}" && git init -q && git add -A >/dev/null 2>&1 ) 2>/dev/null
+  rc=0; out="$( cd "${sb}" && bash .claude/validation/harness-inventory.sh --env 2>&1 )" || rc=$?
+  if [ "${rc}" -eq 2 ] && grep -qi 'manifest' <<< "${out}"; then
+    record_pass "harness-inventory: (d) produtor ausente → exit 2 NOMEANDO o que faltou (não linha zerada)"
+  else record_fail "harness-inventory: (d) falha alto" "esperava rc=2 nomeando o manifesto; rc=${rc} out=${out}"; fi
+  rm -rf "${sb}"
+
+  # (e) O NÚMERO ESTÁTICO NÃO É O EXECUTADO, e a SSOT tem de dizer isso em voz alta. Há 907
+  #     sítios de asserção contra 1135 execuções — sítio dentro de laço dispara N vezes.
+  #     Publicar o estático como "tamanho da bancada" trocaria uma defasagem por um erro de
+  #     categoria, que foi como `689` sobreviveu. A marca `⊘ NÃO MEDIDO` é o terceiro desfecho.
+  out="$(bash "${gen}" --markdown)"
+  if grep -q '⊘ \*\*NÃO MEDIDO\*\*' <<< "${out}" && grep -q 'asserções executadas' <<< "${out}"; then
+    record_pass "harness-inventory: (e) o que RODOU imprime ⊘ NÃO MEDIDO, e o sítio estático se declara não-executado"
+  else record_fail "harness-inventory: (e) terceiro desfecho" "a SSOT não distingue o que EXISTE do que RODOU — é assim que um número estático vira 'tamanho da bancada'"; fi
+
+  # (f) (MUT) sem a comparação de diff na REGRA 80, um .md editado à mão passa. Guarda que
+  #     nunca rejeitou é vacuidade — e esta guarda existe justamente contra edição à mão.
+  local mut; mut="$(mktemp -d)"; cp "${SCRIPT_DIR}/lint-artifacts.sh" "${mut}/m.sh"
+  sed -i 's|^     ! diff -q "${tracked}" "${tmp}" >/dev/null 2>&1; then|     false; then|' "${mut}/m.sh"
+  if grep -q '     false; then' "${mut}/m.sh"; then
+    record_pass "harness-inventory: (f) (MUT) a mutação da comparação foi aplicável — o diff é o dente da REGRA 80"
+  else record_fail "harness-inventory: (f) (MUT)" "a mutação NÃO foi aplicada — a âncora do diff mudou e o teste não prova nada"; fi
+  rm -rf "${mut}"
 }
 
 # Modo rules-registry — REGRA 39. O gerador projeta os docstrings '# REGRA N — …' de
@@ -13974,6 +14077,7 @@ _family run_seal_exception_selftests
 _family run_plugin_runtime_selftests
 _family run_kg_yaml_validity_selftests
 _family run_site_derivation_selftests
+_family run_harness_inventory_selftests
 _family run_rules_registry_selftests
 _family run_onion_version_tracked_selftests
 _family run_hub_role_guard_selftests

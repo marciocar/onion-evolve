@@ -48,7 +48,8 @@ jobs:
   lint-onion-artifacts:
     runs-on: ubuntu-latest
     # ── DIVISÃO DE 2026-08-16: este job é o GATE SOBRE A MUDANÇA (lê o diff e reprova o
-    #    artefato). A BANCADA (lint-selftest.sh, 689 asserções) saiu para `onion-selftest.yml`
+    #    artefato). A BANCADA (lint-selftest.sh, 689 asserções À ÉPOCA — o número de hoje vive
+    #    em `docs/onion/testing-inventory.md`) saiu para `onion-selftest.yml`
     #    porque é TESTE DE REGRESSÃO DA MAQUINARIA, e os dois têm gatilhos diferentes.
     #    Medido: a bancada era 686s de 729s — 94% do CI — e rodava em todo PR; dos 8 PRs
     #    daquele dia, 6 tocaram ZERO arquivo de maquinaria e esperaram 12 min por uma suíte

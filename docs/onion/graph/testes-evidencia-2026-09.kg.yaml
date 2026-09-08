@@ -53,7 +53,7 @@ nodes:
     node_type: decision
     drive_kind: execution
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 0.8
     label: "ONDA 0.3 — SSOT gerada dos números do harness (`harness-inventory.sh --markdown|--json` → `docs/onion/testing-inventory.md`), com catraca byte-a-byte. Molde: `inventory.sh`. ACEITE: editar o .md à mão reprova HARD, e os comentários dos workflows param de citar número e passam a citar o arquivo."
@@ -156,6 +156,72 @@ nodes:
     trace: 'docs/evolution/review/*.md'
     label: "A cauda de 62 formas-de-uma-ocorrencia nao era ruido: eram TRES campos espremidos num slot so. 8 residuos usavam o veredito para declarar METODO (`SEM-ELENXO-...`, que nao houve passada adversarial); 8 declaravam um VEREDITO que faltava no enum (reprovou e curou no mesmo PR); 15 traziam a NARRATIVA do achado. A cura da forma e separar: `verdict:` fechado, `elenxo: sim|nao` para o metodo, `nota:` livre para a narrativa. Os dois ultimos entram ACEITOS e documentados, nao obrigatorios — nesta casa guarda vira HARD depois de se provar, nunca antes (foi assim que a REGRA 59 nasceu, e ela refutou o proprio plano que a criou)."
 
+  - id: E_SSOT_DO_HARNESS_COM_CATRACA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: 'lint-artifacts.sh 0 HARD + dogfood: editar o .md a mao reprova REGRA 80'
+    trace: '.claude/validation/harness-inventory.sh'
+    label: "ONDA 0.3 ENTREGUE — `harness-inventory.sh --markdown|--json|--env` gera `docs/onion/testing-inventory.md`, catracado byte-a-byte pela REGRA 80 (Numeros do harness saem de SSOT gerada, nunca de comentario), core-only para o adotante nao nascer vermelho. Dogfood: trocar 157 por 999 a mao reprova HARD. Os tres comentarios de CI que diziam `689 assercoes` NAO foram reescritos — sao snapshots datados de 2026-08-16 e historico nao se reescreve; ficaram marcados como da epoca, apontando a SSOT para o numero de hoje."
+
+  - id: E_EXISTE_NAO_E_RODOU
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: '913 sitios estaticos de record_* contra 1135 assercoes executadas na mesma arvore'
+    trace: 'docs/onion/testing-inventory.md'
+    label: "A DISTINCAO QUE O PAINEL VAI HERDAR: o que EXISTE e o que RODOU sao duas fontes, nao uma. Ha 913 sitios estaticos de `record_pass|record_fail|record_skip` contra 1135 assercoes efetivamente executadas — a diferenca sao sitios dentro de laco, que disparam N vezes. Publicar o estatico como `tamanho da bancada` trocaria uma defasagem por um ERRO DE CATEGORIA. Por isso a SSOT conta so o que existe e imprime `⊘ NAO MEDIDO` para o que rodou, ate a serie historica existir. E o terceiro desfecho da onda, aplicado ao proprio inventario."
+
+  - id: E_A_MAQUINARIA_REPROVOU_A_PROPRIA_CURA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: 'lint-artifacts.sh sobre o proprio commit em construcao'
+    trace: '.claude/validation/lint-selftest.sh (run_harness_inventory_selftests)'
+    label: "Ao estrear, a familia nova levou DUAS HARD das guardas que ela vinha reforcar, e nenhuma foi trivial. (1) REGRA 59 (Modo que a producao consome e exercitado pela bancada): eu testei os tres modos com `for m in --markdown --json --env`, e flag vinda de VARIAVEL e classificada como dinamica e sai de julgamento — entao `--markdown`, o modo que a catraca da REGRA 80 consome, ficava sem teste enquanto o caso PARECIA cobri-lo. Laco economiza tres linhas e compra falso-verde no modo que mais importa. (2) REGRA 60 (Identificador de codigo em INGLES): escrevi `local falhou`. O valor do registro nao e o conserto — e que o gatilho foi MECANICO, sem ninguem perguntar."
+
+  - id: E_UNTRACKED_TORNA_A_PROJECAO_INSTAVEL
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: 'duas ocorrencias medidas em 2026-09-08, ambas barradas pelo gate antes de qualquer dano'
+    trace: '.claude/validation/kg-backlog-project.sh + .claude/validation/harness-inventory.sh'
+    label: "CLASSE, nao caso (2 ocorrencias no mesmo dia): projecao que enumera por `git ls-files` e INSTAVEL enquanto a fonte esta untracked — ela muda no instante do `git add`, e quem gerou antes de estajar carrega um artefato ja defasado. (1) o grafo da onda untracked fez `backlog-projection: em-dia` reprovar, porque o sandbox da bancada faz `git add -A` e enxergava 46 grafos contra 45 da arvore viva; (2) o proprio `harness-inventory.sh` untracked contou 70 scripts de validacao, e 71 depois de estajado. SEM GUARDA NOVA, e a razao e medida: um detector de untracked sob os caminhos contados dispararia em toda sessao de trabalho normal, e falso-positivo travante e o modo de falha que esta casa mais paga. A cura ja existe e FUNCIONOU as duas vezes — o gate roda sobre o estado estajado e barrou antes do commit. A ordem correta e: `git add` primeiro, gerar depois."
+
+  - id: E_FIXTURE_NA_ARVORE_VIVA_E_DISPUTAVEL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: 'moat_boundary 3/3 apos a cura; antes, (a) e (c) alternavam falha sem padrao'
+    trace: '.claude/validation/lint-selftest.sh (run_moat_boundary_selftests)'
+    label: "FLAKY CURADO, com DUAS causas independentes que se mascaravam. (1) A fixture nascia com nome FIXO num diretorio da ARVORE VIVA: dois processos tocando o repo — uma bancada sobrevivente de um commit morto por OOM e a rodada nova — disputavam o MESMO arquivo, um escrevendo o GREEN enquanto o outro esperava o RED, e o `rm -f` de um apagava a fixture do outro. Cura: `$$` no nome. (2) O predicado dos tres casos era assimetrico e errado nas duas direcoes: (a)/(b) casavam a assinatura do moat GLOBALMENTE — ficariam verdes por violacao de manifesto ALHEIO — e (c) casava so o arquivo, reprovando por regra que nao e a testada (a fixture GREEN dispara legitimamente as REGRAS 19 e 27). Cura: um predicado unico que exige arquivo E assinatura NA MESMA LINHA. Um caso GREEN que falha por manifesto alheio nao mede a guarda: mede a vizinhanca."
+
+  - id: E_FIXTURE_NA_ARVORE_VIVA_CORRE_COM_AS_FAIXAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: '2026-09-08'
+    verified_against: 'as 3 falhas passam ISOLADAS (14/14) e so aparecem sob --jobs auto'
+    trace: '.claude/validation/lint-selftest.sh:1121'
+    label: "FLAKY COM CAUSA NOMEADA (nao 'as vezes falha'): a fixture `__mbguard__.manifest.sh` nasce na ARVORE VIVA por desenho — o caso testa o LINT, que varre o diretorio real, entao sandbox nao serviria. Sob `--jobs auto`, as familias `plugins_sync` e `moat_boundary` varrem esse MESMO diretorio ao mesmo tempo e enxergam um manifesto sem plugin correspondente: 2 falsos `plugins-sync: __mbguard__ em-sync` e 1 falso `moat-boundary: (c)`. As tres passam ISOLADAS (14/14). Agrava com pressao de memoria, que muda o escalonamento dos workers — na mesma maquina um worker foi MORTO no meio da familia e deixou a fixture orfa, e a REGRA 19 (Plugins de vertical sincronizados com as fontes) acusou um plugin que nunca deveria existir. CURA CANDIDATA, nao aplicada nesta onda: os varredores honrarem a convencao `__*__` que o .gitignore ja reserva para fixture de bancada. Nao aplicada porque muda guardas fora do escopo desta onda no fim de uma sessao longa — e mudanca no susto e o que esta casa proibe."
+
 edges:
   - from: I_HARNESS_INVENTORY
     to: E_NUMEROS_DO_HARNESS_DIVERGEM_ENTRE_SI
@@ -195,4 +261,25 @@ edges:
     edge_type: SUPPORTS
   - from: E_A_CAUDA_ERAM_TRES_CAMPOS
     to: D_VOCABULARIO_FECHADO_DO_VEREDITO
+    edge_type: SUPPORTS
+  - from: E_SSOT_DO_HARNESS_COM_CATRACA
+    to: I_HARNESS_INVENTORY
+    edge_type: SUPPORTS
+  - from: E_SSOT_DO_HARNESS_COM_CATRACA
+    to: E_NUMEROS_DO_HARNESS_DIVERGEM_ENTRE_SI
+    edge_type: SUPPORTS
+  - from: E_EXISTE_NAO_E_RODOU
+    to: I_PAINEL_DO_ESTADO
+    edge_type: CONSTRAINS
+  - from: E_A_MAQUINARIA_REPROVOU_A_PROPRIA_CURA
+    to: E_SSOT_DO_HARNESS_COM_CATRACA
+    edge_type: SUPPORTS
+  - from: E_UNTRACKED_TORNA_A_PROJECAO_INSTAVEL
+    to: E_SSOT_DO_HARNESS_COM_CATRACA
+    edge_type: CONSTRAINS
+  - from: E_FIXTURE_NA_ARVORE_VIVA_E_DISPUTAVEL
+    to: E_UNTRACKED_TORNA_A_PROJECAO_INSTAVEL
+    edge_type: SUPPORTS
+  - from: E_FIXTURE_NA_ARVORE_VIVA_CORRE_COM_AS_FAIXAS
+    to: E_BANCADA_NAO_CONTAVA_PARA_NINGUEM
     edge_type: SUPPORTS
