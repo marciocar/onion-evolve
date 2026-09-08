@@ -1,7 +1,7 @@
 name: Onion Guard Selftest
 
 # ── POR QUE ESTE WORKFLOW EXISTE SEPARADO (medido em 2026-08-16) ─────────────────────────
-# A bancada (`lint-selftest.sh`, 689 asserções · 28 fixtures) levava 686s de 729s do job —
+# A bancada (`lint-selftest.sh`, 689 asserções · 28 fixtures EM 2026-08-16) levava 686s de 729s —
 # **94% do CI**. E ela roda em TODO PR. Medição dos 8 PRs daquele dia: **6 tocaram ZERO
 # arquivo de maquinaria**; cada um esperou ~12 min por uma suíte que não podia lhes dizer
 # nada, porque a bancada prova as GUARDAS, e as guardas não mudaram naquele diff.
@@ -41,8 +41,11 @@ jobs:
   selftest:
     runs-on: ubuntu-latest
     # 25 min: medido 908s (15,1 min) local na KVM 8 com 646 guardas; o runner é mais rápido
-    # (686s com 689). A folga existe porque a suíte CRESCE por desenho — e o teto colado no
-    # trabalho já existente foi o que cancelou o job em 15m02s em 2026-08-06.
+    # (686s com 689). Os dois números são de 2026-08 e NÃO se reescrevem — snapshot histórico
+    # explica a folga que se escolheu naquele dia. O tamanho de HOJE está em
+    # `docs/onion/testing-inventory.md` (SSOT gerada, catracada pela REGRA 80), e a suíte
+    # CRESCE por desenho: foi teto colado no trabalho existente que cancelou o job em 15m02s
+    # em 2026-08-06.
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5

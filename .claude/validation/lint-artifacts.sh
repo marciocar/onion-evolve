@@ -1086,6 +1086,49 @@ check_generated_projection_sync() {
 }
 
 # ===========================================================================
+# REGRA 80 — Números do harness saem de SSOT gerada, nunca de comentário [HARD]
+# previne: contagem sobre o próprio harness escrita à mão, que envelhece calada e é citada como medição
+#
+# Gatilho MEDIDO (2026-09-08). Os números do harness viviam em COMENTÁRIO e divergiam entre
+# si: `689 asserções` no `onion-selftest.yml` (duas vezes), `689` de novo no
+# `onion-validate.yml`, `~850` numa análise — e a bancada daquele dia contou **1135**. Nenhum
+# tinha gerador, nenhum tinha catraca, e — isto é o que importa — todos foram escritos por
+# alguém que os mediu de verdade, na época. É a classe do painel inventado que esta onda
+# apagou, um grau abaixo: não é ficção, é DEFASAGEM. As duas enganam igual, e a defasagem
+# engana por mais tempo, porque um dia foi verdade e ninguém tem motivo para desconfiar.
+#
+# O QUE ELA NÃO FAZ, e a fronteira é o desenho todo: não julga se a bancada é BOA, nem quantas
+# asserções PASSARAM. Ela garante que o que EXISTE está contado por máquina. O que RODOU é
+# resultado de execução e vive na série histórica — o inventário imprime `⊘ NÃO MEDIDO` para
+# isso em vez de um número, que é a terceira saída desta onda inteira.
+#
+# CUSTO: o gerador é estático de propósito (grep + git ls-files + dois helpers de ~0,2s).
+# Contar famílias pelo `--list` custaria 2s a cada lint; conta-se pelo `^_family ` e a BANCADA
+# prova que os dois números batem. Sem essa prova o barato poderia medir outra coisa que o
+# caro — que é exatamente como um harness deixa de espelhar o runner.
+# ===========================================================================
+check_harness_inventory_drift() {
+  # CORE-ONLY, e não por timidez: `docs/onion/testing-inventory.md` é SSOT do harness DESTE
+  # repo. O adotante recebe `.claude/validation/` vendorizado mas não tem (nem deve ter) o doc
+  # do core — exigi-lo faria todo adotante NASCER VERMELHO num arquivo que não é dele. É a
+  # mesma doutrina já escrita neste arquivo para as catracas de baseline.
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  local gen="${SCRIPT_DIR}/harness-inventory.sh"
+  local tracked="${REPO_ROOT}/docs/onion/testing-inventory.md"
+  [ -f "${gen}" ] || { violation "HARD" "${gen}" "harness-inventory.sh ausente — a SSOT dos números do harness não pode ser computada"; return; }
+  if [ ! -f "${tracked}" ]; then
+    violation "HARD" "${tracked}" "docs/onion/testing-inventory.md ausente — rode 'bash .claude/validation/harness-inventory.sh --markdown > docs/onion/testing-inventory.md'"
+    return
+  fi
+  local tmp; tmp="$(mktemp)"
+  if _gen_into "${tmp}" "${tracked}" "docs/onion/testing-inventory.md" -- bash "${gen}" --markdown &&
+     ! diff -q "${tracked}" "${tmp}" >/dev/null 2>&1; then
+    violation "HARD" "${tracked}" "inventário do harness desatualizado vs o harness real — regenere com 'bash .claude/validation/harness-inventory.sh --markdown > docs/onion/testing-inventory.md'. Número do harness escrito à mão foi o que produziu '689 asserções' em três comentários de CI depois de deixar de ser verdade."
+  fi
+  rm -f "${tmp}"
+}
+
+# ===========================================================================
 # REGRA 63 — Colheita de grafo emite os ids colhidos no resíduo de revisão [HARD]
 # previne: nó removido de um .kg.yaml sem registro consultável de que existiu — a promessa "a história fica no artefato de revisão" cumprida só na letra
 #
@@ -4114,6 +4157,7 @@ check_review_artifact
 check_kg_seal
 check_kg_backlog
 check_consumed_modes
+check_harness_inventory_drift
 check_identifier_language
 check_doctrine_freshness
 check_kg_born_marker
