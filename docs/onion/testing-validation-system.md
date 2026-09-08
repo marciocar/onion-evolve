@@ -44,7 +44,7 @@ O Sistema de Testes e Validação é composto por **4 camadas integradas** (que 
 
 ┌─────────────────────────────────────────────────────────────┐
 │  🛡️ AUTO-TESTE DE GUARDAS DETERMINÍSTICAS                    │
-│  ├─ lint-artifacts.sh - guardas do framework (18 regras)   │
+│  ├─ lint-artifacts.sh - guardas do framework (ver registro) │
 │  ├─ fixtures/ + manifest.tsv - inputs ruins/bons conhecidos │
 │  └─ lint-selftest.sh - assere que cada guarda ainda reage  │
 └─────────────────────────────────────────────────────────────┘
@@ -379,7 +379,7 @@ Escala:
 
 ## 🛡️ Camada 5 (Meta): Auto-teste de Guardas Determinísticas
 
-As 4 camadas acima validam o **projeto-alvo**. A 5ª camada é **meta**: valida as próprias **guardas determinísticas** do framework — `.claude/validation/lint-artifacts.sh` (18 regras — as HARD bloqueiam o CI via `onion-validate.yml`, as SOFT alertam) e validadores irmãos como `federation-contract-validate.sh`.
+As 4 camadas acima validam o **projeto-alvo**. A 5ª camada é **meta**: valida as próprias **guardas determinísticas** do framework — `.claude/validation/lint-artifacts.sh` (o número de regras vive em [`lint-rules.md`](../../.claude/validation/lint-rules.md), **gerado** por `rules-registry.sh` — não se digita aqui; as HARD bloqueiam o CI via `onion-validate.yml`, as SOFT alertam) e validadores irmãos como `federation-contract-validate.sh`.
 
 **Problema que resolve**: uma guarda que silenciosamente para de funcionar (regex quebrada, allowlist larga demais) não é pega por nada — é a meta-falha "guarda parcial" aplicada às próprias guardas. A disciplina de *failure-mode test* (criar input ruim → confirmar que a guarda flagra) funcionava de forma **ad-hoc**; esta camada a torna **permanente e bloqueante no CI**.
 
@@ -485,24 +485,23 @@ Toda guarda determinística nova nasce com (a) fixture de failure-mode no manife
 - Bug Detection Rate: >85%
 - User Story Coverage: 100%
 
-### Dashboard Integrado
+### Dashboard — o que existe, e o que NÃO existia aqui
 
-```
-┌─── WHITE-BOX (DEV) ────┐  ┌─── BLACK-BOX (QA) ────┐  ┌─── GREY-BOX (CROSS) ───┐
-│ Coverage: 85% ✅       │  │ QA Velocity: 24pts ✅  │  │ API Tests: 47 ✅       │
-│ Unit Tests: 247 ✅     │  │ Stories Tested: 8/10⚠️ │  │ Integration: 23 ✅     │
-│ Mutation: 74% ✅       │  │ Bugs Found: 12 📊      │  │ Contract Tests: 15 ✅  │
-│ Execution: 25s ✅      │  │ Estimation Acc: 87% ✅ │  │ Peer Reviews: 5 ✅     │
-└────────────────────────┘  └────────────────────────┘  └─────────────────────────┘
+⚠️ **Até 2026-09-08 esta seção trazia um painel ASCII com números concretos** — `Coverage: 85% ✅ ·
+Unit Tests: 247 ✅ · Mutation: 74% ✅ · Bugs Found: 12` — e **nenhum deles tinha produtor**. Eram
+as metas da seção anterior redesenhadas como se fossem medição.
 
-┌───────────────── SPRINT OVERVIEW ─────────────────────┐
-│ Combined Velocity: 47pts (Dev: 20, QA: 24, Cross: 3) │
-│ Sprint Progress: ▓▓▓▓▓▓▓░░░ 75%                       │
-│ Quality Gate: ✅ ALL PERSPECTIVES PASSING              │
-│ Risk Score: 🟨 MEDIUM (cross-browser pending)         │
-│ Deployment Ready: ⏳ 2 stories pending final QA      │
-└────────────────────────────────────────────────────────┘
-```
+Isso é exatamente o defeito que o Onion persegue em todo o resto do repositório
+([`behavior-over-declaration`](../knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md)):
+um artefato afirmando sobre si o que o vivo não sustenta. Pior num documento de TESTES, que é onde
+o leitor vai justamente buscar o que foi medido.
+
+**A régua, e ela vale para qualquer painel que venha a existir:** nenhuma célula é impressa sem o
+**comando que a produziu** ao lado. Métrica sem produtor imprime `⊘ NÃO MEDIDO` — nunca um número.
+É o mesmo terceiro desfecho que a bancada já usa (`⊘` jamais conta como `✓`).
+
+As metas acima seguem valendo como **alvo para o projeto do adotante**. Elas não descrevem este
+repositório, que não tem código de aplicação nem medidor de cobertura.
 
 ---
 
