@@ -1,0 +1,535 @@
+meta:
+  id: ocr-local-sei-2026-09
+  schema_version: "1"
+  baseline: 2026-09-08
+  review_after: 2026-10-08   # cadência FERRAMENTA/PREÇO = 30d. O tipo dominante desta rodada NÃO é
+                             # doutrina (12m) nem mercado (90d) nem benchmark (120d): é ESCOLHA DE
+                             # FERRAMENTA LOCAL com custo de instalação — versões de motor (Tesseract
+                             # 5.5.x, PaddleOCR 3.4/PaddleOCR-VL 0.9B, dots.ocr/dots.mocr 3B com
+                             # rebrand admitido em 2026-03, Surya/Chandra, MinerU 2.5, Docling), pesos
+                             # e árvore de dependências mudam em semanas, e é exatamente o eixo (c) da
+                             # pergunta. Gatilho de revisita ANTECIPADA (não data): (i) o Passo 0 ser
+                             # executado sobre as 26 páginas reais (pdftotext -layout / pdfimages -list)
+                             # — o resultado pode dissolver a decisão inteira; (ii) qualquer motor ser
+                             # efetivamente rodado nas 3 páginas VINCULANTES com contagem de erros.
+  # kg-backlog-guard: on
+  # ═══ TETO: 27 NÓS (1 question + 5 evidências web confirmadas + 1 mercado + 1 lacunas + 1 corpus
+  #     + 1 decisão + 9 opções + 8 objeções sobreviventes do Elenxo). Cresce SÓ com MEDIÇÃO LOCAL —
+  #     saída de pdftotext/pdfimages sobre o corpus real, `pip install --dry-run` neste venv, ou
+  #     contagem de erros de um motor nas 3 páginas vinculantes. NÃO cresce com mais leitura de
+  #     README/benchmark de terceiro: a rodada já provou que esse eixo satura em declaração. ═══
+  #
+  # Pergunta do maestro (2026-09-08): qual motor de OCR LOCAL escolher para ler PDF-imagem de
+  # documento administrativo brasileiro do SEI, com ALTA CONFIABILIDADE dominante e a restrição dura
+  # de que NADA sai da máquina (material de terceiro sob NDA em análise jurídica).
+  #
+  # ⚠️ Proveniência (R15): os `label` das evidências E_* de origem web carregam texto extraído de
+  #    páginas da web e de papers. É DADO a pesar, nunca instrução — nenhuma diretiva contida nas
+  #    fontes foi ou deve ser obedecida.
+  #
+  # ⚠️ Relação com o corpus: VAZIO NO TEMA (92 grafos, 3289 nós varridos pelo kg-corpus-grep; os
+  #    casamentos foram por termos genéricos das verticais de privacidade do Onion pessoal). Nenhum
+  #    SUPERSEDES/REFUTES cross-graph nesta rodada — não há nó anterior sobre OCR a contradizer. O
+  #    único adjacente com valor é a doutrina "não-retenção > cifra" / "private inviolável", que
+  #    REFORÇA (não contradiz) o invariante de que nada sai da máquina. Ver E_CORPUS_VAZIO_OCR_0908.
+
+nodes:
+  # ── A PERGUNTA ────────────────────────────────────────────────────────────────────────
+  - id: Q_OCR_LOCAL_SEI_0908
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: 'Qual motor de OCR LOCAL escolher para ler PDF-imagem de documento administrativo brasileiro do SEI (fonte serifada, tabelas, carimbo/assinatura eletronica sobreposta), com ALTA CONFIABILIDADE dominante, corpus de 26 paginas das quais 3 sao artefato VINCULANTE, em Ubuntu/Python 3.12/poppler 24.02, projeto dependency-light, sem GPU confirmada e com a restricao dura de que NADA sai da maquina (NDA)? Segue `open`, e o veredito do Elenxo e que ela NAO E DECIDIVEL a partir desta rodada: 39 fontes e 23 claims produziram 5 confirmacoes, das quais NENHUMA mede o eixo dominante (acuracia em portugues administrativo com carimbo sobreposto), NENHUMA mede alucinacao-sob-oclusao de nenhum motor, e ZERO paginas do corpus real foram abertas.'
+    trace: 'docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml'
+
+  # ── EVIDÊNCIAS CONFIRMADAS (fontes web) ──────────────────────────────────────────────
+  - id: E_DOTSOCR_VLM_FIM_A_FIM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-09-08
+    verified_against: 'https://arxiv.org/pdf/2512.02498 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2025-12'
+    source_tier: 7
+    source_kind: paper
+    label: 'CONFIRMADA (tier 7, 3-0): "dots.ocr e um unico Vision-Language Model (nao pipeline multi-estagio) que unifica layout detection, reconhecimento de texto e ordem de leitura num framework fim-a-fim." ATENCAO A INVERSAO DE SINAL: o paper registra a arquitetura fim-a-fim como MERITO; neste caso de uso ela e PASSIVO — ver E_OBJECAO_1_FIM_A_FIM_MAXIMIZA_SILENCIO. E o dossie usa "dots.ocr" e "dots.mocr" de forma intercambiavel com rebrand admitido em 2026-03, entao os numeros citados podem ser de geracao diferente do modelo que se instalaria.'
+    trace: 'https://arxiv.org/pdf/2512.02498'
+
+  - id: E_CONSENSUS_ENTROPY_SEM_TREINO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-09-08
+    verified_against: 'https://arxiv.org/html/2504.11101 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026-05'
+    source_tier: 7
+    source_kind: paper
+    label: 'CONFIRMADA (tier 7, 3-0): "A metrica Consensus Entropy (CE) estima confiabilidade da saida de OCR/VLM medindo a entropia do acordo entre multiplos modelos independentes, sem necessidade de treinamento adicional — usavel como procedimento de verificacao quando a saida nao pode receber confianca cega." Confianca rebaixada a 0.7 (nao 0.8) porque a rodada REFUTOU a perna de sustentacao da metrica (o desacordo ser sinal detectavel de erro) e manteve o achado — contradicao interna reconhecida em E_OBJECAO_2_CE_MEDE_ACORDO_NAO_CORRECAO e E_OBJECAO_7_DESACORDO_REFUTADO_SUSTENTA_CE.'
+    trace: 'https://arxiv.org/html/2504.11101'
+
+  - id: E_DOTSOCR_SEM_CONFIDENCE_NEM_CARIMBO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-09-08
+    verified_against: 'https://github.com/rednote-hilab/dots.ocr — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026-03-19'
+    source_tier: 6
+    source_kind: primary
+    label: 'CONFIRMADA (tier 6, 3-0): "A documentacao do proprio projeto reconhece falhas de parsing ocasionais ainda nao eliminadas, e nao ha mencao especifica a robustez contra carimbo/assinatura sobreposta nem mecanismo nativo de confidence score ou validacao cruzada." COMO CONCLUSAO isto e decisivo (mata o candidato no requisito dominante: sem confidence nativo nao ha triagem dirigida); COMO EVIDENCIA a segunda metade e argumento do silencio — ver E_OBJECAO_3_ARGUMENTO_DO_SILENCIO_FALTA_MEDICAO.'
+    trace: 'https://github.com/rednote-hilab/dots.ocr'
+
+  - id: E_DOCTR_PYTHON_311_PLUS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-09-08
+    verified_against: 'https://mindee.github.io/doctr/getting_started/installing.html — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    source_tier: 9
+    source_kind: primary
+    label: 'CONFIRMADA (tier 9, 3-0): "docTR requer Python 3.11 ou superior, sendo portanto compativel com Python 3.12." Impact rebaixado a 2 de proposito: e tier 9 respondendo um eixo que NAO decide nada — compatibilidade do framework nao e o custo, o custo e o backend (PyTorch/TensorFlow). Achado verdadeiro e irrelevante ocupando vaga — ver E_OBJECAO_4_DOCTR_TIER9_IRRELEVANTE_E_PESO_TORCH.'
+    trace: 'https://mindee.github.io/doctr/getting_started/installing.html'
+
+  - id: E_SURYA_CPU_EXIGE_LLAMACPP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-09-08
+    verified_against: 'https://github.com/datalab-to/surya — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    source_tier: 7
+    source_kind: primary
+    label: 'CONFIRMADA (tier 7, 3-0): "Em ambiente CPU/sem GPU confirmada, Surya requer backend llama.cpp (llama-server), nao o caminho vllm/Docker/GPU." Confianca rebaixada a 0.6 apesar do tier 7 e do 3-0: suspeita fundamentada de CONFLACAO DE GERACOES dentro do mesmo repositorio (linha nova de modelo-fundacao Chandra vs. modelos classicos PyTorch de deteccao/reconhecimento), e a distincao muda inteiramente o requisito (c) — ver E_OBJECAO_5_SURYA_CONFLACAO_DE_GERACOES.'
+    trace: 'https://github.com/datalab-to/surya'
+
+  # ── EIXO MERCADO/CAPITAL (invariante — registrado mesmo vazio) ───────────────────────
+  - id: E_MERCADO_OCR_LOCAL_0908
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-09-08
+    verified_against: 'fan-out desta rodada (39 fontes): nenhum angulo devolveu rodada de investimento, M&A, valuation, down round ou nota de analista que sobrevivesse aos votos adversariais para tesseract, PaddleOCR, docTR/Mindee, Surya/Datalab, MinerU/OpenDataLab, olmOCR/Ai2 ou dots.ocr/rednote-hilab'
+    source_tier: 10
+    source_kind: measurement
+    label: 'EIXO MERCADO — SEM SINAL ENCONTRADO (registro explicito: o eixo e invariante mesmo vazio). Nenhuma claim de capital sobreviveu aos votos adversariais para NENHUM dos motores. Isto e LACUNA DA PESQUISA, nao constatacao de que nao existe capital no setor — e e uma lacuna CARA, porque neste espaco a estrutura de capital e o que prediz DURABILIDADE: docTR/Mindee e Surya/Datalab sao empresas com produto comercial (o open-source e funil), enquanto tesseract e projeto de comunidade e MinerU/olmOCR/dots.ocr sao laboratorios. Quem paga a manutencao decide se o motor existe daqui a 2 anos, e a analise juridica em curso e um artefato que sobrevive ao ciclo de hype. CONSEQUENCIA PARA A DECISAO: sem follow-the-money, o argumento "X e estado da arte" nao carrega nenhuma informacao sobre continuidade — o que empurra o peso para o candidato de menor risco de abandono (Tesseract, 40 anos, empacotado no apt do Ubuntu) e para o PROCEDIMENTO, que nao depende de nenhum fornecedor.'
+    trace: 'docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml'
+
+  # ── LACUNAS DECLARADAS (régua de saída, item 2) ──────────────────────────────────────
+  - id: E_LACUNAS_DECLARADAS_OCR_0908
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-08
+    verified_against: 'contabilidade da propria rodada: 39 fontes consultadas, 23 claims levantadas, 5 confirmadas, 18 refutadas (a maioria por fonte fraca ou sem evidencia registrada), 0 nao-verificadas por falha de acesso, 1 disconfirmadora cortada por orcamento'
+    source_tier: 10
+    source_kind: measurement
+    label: 'LACUNAS DECLARADAS (39 fontes, 23 claims, 5 confirmadas). (1) REFUTADAS POR FONTE FRACA — tier 3-4, agregadores e blogs de vendor: PaddleOCR 3.4 com 100% em teste de 24 itens; Tesseract 5.5.2 com 87,5%/0,162s/~10MB; preservacao de tabela comparada (Tesseract parcial, Paddle perdeu, dots.ocr markdown); dots.ocr 3B com 88,41 no OmniDocBench exigindo 6GB de VRAM; Tesseract sem analise de layout relevante; Surya com melhor layout do grupo mas GPL-3.0; olmOCR alucinando em campos numericos; benchmark de tabela sem cobertura de motores locais nem portugues. (2) REFUTADAS SEM EVIDENCIA REGISTRADA CONTRA FONTE FORTE — o buraco metodologico da rodada: quatro proposicoes tier 7 do MESMO repo do Surya (87,2% em 91 idiomas; Pareto-otimo sub-3B com 83,3% no olmOCR-bench; confidence por bloco; ausencia de dados sobre carimbo) refutadas EM BLOCO sem nenhuma evidencia; a instalacao nucleo-vs-extras do docTR (tier 9, doc oficial); o desacordo entre motores como sinal de erro (tier 7, a perna do CE); PaddleOCR-VL 0.9B/109 idiomas SOTA (tier 7); dots.ocr com +10% multilingue no XDocParse cobrindo portugues (tier 7); ensemble de VLMs fracos superando SOTA isolado com roteamento adaptativo a 7,3% (tier 7); VLMs open-source sub-10B superando fechados em custo-beneficio (tier 7); dots.mocr com Elo 1124,7 e 90,7% em tabela contra MinerU 75,2% (tier 6). (3) NAO VERIFICADAS POR FALHA DE ACESSO: ZERO — nenhum 403, nenhuma doc truncada. (4) CORTADA POR ORCAMENTO: a disconfirmadora do Surya ("ultimo lugar em todos os conjuntos"), justamente a que reconciliaria o corpo contraditorio. (5) NUNCA PERGUNTADAS, e sao as que decidiriam: (i) as 26 paginas reais tem camada de texto? ninguem abriu o artefato; (ii) `pip install --dry-run` neste venv para cada candidato — o requisito (c) foi respondido por impressao; (iii) taxa de alucinacao-sob-oclusao (carimbo sobre texto) de QUALQUER motor — o eixo dominante da pergunta nao tem UMA medicao; (iv) desempenho em PORTUGUES com serifa/acentuacao/cedilha dos pesos do docTR e do Tesseract por.traineddata; (v) Docling (IBM, Apache-2.0) ficou FORA do escopo original e apareceu como vencedor em tabela no unico benchmark tocado — candidato nao avaliado.'
+    trace: 'docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml'
+
+  # ── CORPUS PRÉVIO (cláusula 0) ───────────────────────────────────────────────────────
+  - id: E_CORPUS_VAZIO_OCR_0908
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-09-08
+    verified_against: 'bash .claude/validation/kg-corpus-grep.sh — 92 grafos e 3289 nos varridos; casamentos apenas nas verticais de privacidade do Onion pessoal (classification-por-vertical, fronteira-decision, inference-mitigation), por termos genericos do enunciado (local, para, de, sem enviar)'
+    source_tier: 10
+    source_kind: measurement
+    label: 'CORPUS VAZIO NO TEMA (medido, nao presumido): nenhum dos 3289 nos trata de OCR, extracao de PDF-imagem, tesseract, PaddleOCR ou motor de visao. Nao ha o que transferir — a pesquisa se desenha do zero (regua do /meta:adopt: igual transfere, diferente desenha). O UNICO no adjacente com valor e a doutrina de privacidade "nao-retencao > cifra" e "private inviolavel", que REFORCA e nao contradiz o invariante de que nada sai da maquina — o que significa que a restricao dura do enunciado NAO precisa ser negociada com o corpus: ela ja e doutrina aqui.'
+    trace: 'docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml'
+
+  # ── A DECISÃO (o maestro sela — esta sessão NUNCA sela) ──────────────────────────────
+  - id: D_OCR_LOCAL_SEI_0908
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    label: 'DECISAO ABERTA (o maestro sela): qual motor de OCR local adotar para as 26 paginas do SEI sob NDA, sendo 3 vinculantes? Opcoes nomeadas — (1) Tesseract 5 via apt com por.traineddata do tessdata_best (TSV com conf+bbox por palavra, ~10MB, zero dependencia Python); (2) PaddleOCR / PaddleOCR-VL 0.9B em CPU, venv isolado; (3) docTR (python-doctr + torch) em venv isolado; (4) Surya (datalab-to), pendente de reconciliar evidencia contraditoria e a licenca GPL-3.0; (5) dots.ocr / dots.mocr 3B em CPU, sem flash-attn/vLLM (que nao instalam sem GPU); (6) MinerU 2.5 / olmOCR; (7) Docling (IBM, Apache-2.0), ausente do escopo original e vencedor em tabela no unico benchmark tocado; (8) baseline SEM OCR — pdftotext -layout / pdfimages para checar camada de texto pagina a pagina; (9) PROCEDIMENTO: consenso de 2 motores arquiteturalmente independentes + revisao humana de 100% das paginas vinculantes. RECOMENDACAO DO ELENXO: **NAO escolher motor a partir deste dossie — a evidencia nao sustenta a escolha.** Escolher o PROCEDIMENTO (9) e deixar o motor ser decidido por MEDICAO LOCAL, nesta ordem. **PASSO 0, antes de qualquer instalacao: olhar o artefato.** Ninguem nesta rodada abriu as 26 paginas. PDF do SEI mistura paginas com camada de texto e paginas escaneadas; rodar `pdftotext -layout` e `pdfimages -list` pagina a pagina (poppler 24.02 JA instalado, custo zero, dependency-light intacto) e descobrir se as 3 paginas VINCULANTES precisam de OCR — se tiverem camada de texto, a decisao inteira EVAPORA (opcao 8). **PASSO 1, se precisarem:** o requisito dominante e "erro em silencio produz superacao errada", e o unico eixo que separa os candidatos nesse requisito e ARQUITETURA, nao benchmark: pipeline multi-estagio (deteccao -> recorte -> reconhecimento) degrada com caixa sem texto e confianca baixa por palavra; decoder autorregressivo fim-a-fim COMPLETA o texto plausivel sob oclusao, em prosa fluente e sem sinal (E_OBJECAO_1). Isso empurra o peso para (1) Tesseract com TSV conf+bbox por palavra — nao por ser melhor em acuracia media, mas por ser o unico candidato cuja falha e VISIVEL na saida — e REPROVA (5) como motor unico sobre as paginas vinculantes. **PASSO 2:** o consenso de (9) so vale entre motores de LINHAGEM DIFERENTE; PaddleOCR-VL, dots.ocr e MinerU 2.5 sao VLMs de backbone e dados sinteticos proximos (familia Qwen-VL) e erram JUNTOS com confianca no mesmo trecho ocluido (E_OBJECAO_2), o que anula o sinal exatamente onde ele e necessario. Consenso util = 1 pipeline classico (Tesseract) x 1 VLM, com divergencia roteada para o humano. **PASSO 3:** as 3 paginas vinculantes recebem revisao humana de 100% INDEPENDENTE do motor — em corpus de 26 paginas o throughput nao existe como criterio, e nenhuma metrica automatica substitui o olho num artefato que SUPERA clausula de edital. CONDICAO PARA FECHAR ESTA DECISAO (nao data): (i) saida do Passo 0 sobre o corpus real; (ii) contagem de erros de pelo menos 2 motores nas 3 paginas vinculantes; (iii) `pip install --dry-run` de cada candidato NESTE venv, para o requisito (c) sair da impressao. Ate la, nenhuma das 7 opcoes de motor esta madura para selo, e (4) Surya nao pode sustentar recomendacao nenhuma porque seu corpo de evidencia e mutuamente contraditorio e nao foi reconciliado.'
+    trace: 'docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml'
+
+  # ── AS OPÇÕES (uma claim por opção; quem sela é o maestro) ───────────────────────────
+  - id: C_OPCAO_TESSERACT5_TESSDATA_BEST
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: 'OPCAO (1): Tesseract 5 instalado por apt com por.traineddata do tessdata_best — saida TSV com confidence e bounding box POR PALAVRA, ~10MB de pesos, zero dependencia Python nova (dependency-light preservado). Confianca 0.6 e a MAIS ALTA do conjunto de motores, e o motivo nao e acuracia media (as claims de acuracia sobre Tesseract nesta rodada sao todas tier 3-4 e foram refutadas — ver E_LACUNAS): e que a falha do Tesseract e VISIVEL. Pipeline multi-estagio degrada com caixa sem texto e conf baixa onde ha carimbo sobreposto, e conf+bbox por palavra e o unico mecanismo NATIVO de triagem dirigida sobrevivente em todo o dossie (o do Surya foi refutado sem evidencia — E_OBJECAO_8). NAO VERIFICADO: desempenho em portugues com serifa, acentuacao e cedilha do por.traineddata; e a calibracao da confidence (conf baixa correlaciona com erro? ninguem mediu). Segue open ate o Passo 0 e a contagem de erros nas 3 paginas vinculantes.'
+    trace: 'https://github.com/tesseract-ocr/tessdata_best'
+
+  - id: C_OPCAO_PADDLEOCR_VL_CPU
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: 'OPCAO (2): PaddleOCR / PaddleOCR-VL 0.9B em CPU, venv isolado. Confianca 0.3: TODAS as claims a favor foram refutadas nesta rodada — o SOTA de 109 idiomas (tier 7, arxiv 2510.14528), os 100% em teste de 24 itens (tier 3) e a perda de estrutura de tabela (tier 3). Sobra a capacidade de rodar local em CPU, que e requisito de entrada e nao diferencial. Como VLM, herda integralmente a objecao de arquitetura (E_OBJECAO_1: completa sob oclusao sem sinal) e a de linhagem correlacionada (E_OBJECAO_2: familia Qwen-VL, erra junto com dots.ocr e MinerU), o que a torna PESSIMA como segunda perna de consenso ao lado de outro VLM e apenas aceitavel ao lado de um pipeline classico. Custo de instalacao NAO MEDIDO neste venv.'
+    trace: 'https://arxiv.org/pdf/2510.14528'
+
+  - id: C_OPCAO_DOCTR_TORCH_VENV
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: 'OPCAO (3): docTR (python-doctr + torch) em venv isolado. Compatibilidade com Python 3.12 CONFIRMADA em tier 9 (E_DOCTR_PYTHON_311_PLUS) — e e o unico ponto verificado, respondendo um eixo que nao decide. Confianca 0.3 porque os dois eixos que decidiriam seguem intocados: (i) CUSTO — docTR carrega PyTorch ou TensorFlow, ~2,5GB de wheel mais transitivas contra um venv que hoje tem numpy, pillow, pypdf e openpyxl, o oposto de dependency-light, e a proposicao de instalacao "so o nucleo" foi refutada SEM evidencia contra doc oficial tier 9 (E_OBJECAO_6); (ii) PORTUGUES — os pesos pre-treinados de reconhecimento sao de vocabulario latino majoritariamente treinado em ingles, e ninguem verificou serifa/acentuacao/cedilha, que e o corpus real. Vantagem estrutural nao explorada pela rodada: docTR E pipeline multi-estagio, logo NAO herda a objecao 1 — o que o coloca como candidato legitimo a segunda perna de consenso se o custo couber.'
+    trace: 'https://mindee.github.io/doctr/getting_started/installing.html'
+
+  - id: C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.2
+    label: 'OPCAO (4): Surya (datalab-to) — NAO RECOMENDAVEL A PARTIR DESTE DOSSIE, e a razao nao e desempenho: e que o corpo de evidencia sobre ele e mutuamente contraditorio e nao foi reconciliado. Uma proposicao tier 7 sobre exigencia de llama.cpp em CPU foi confirmada; QUATRO outras tier 7 do MESMO repo foram refutadas em bloco sem evidencia registrada (87,2%/91 idiomas; Pareto-otimo sub-3B/83,3% no olmOCR-bench; confidence por bloco; ausencia de dados sobre carimbo); e a UNICA disconfirmadora ("ultimo lugar em todos os conjuntos") foi cortada por orcamento. Some-se a licenca GPL-3.0, relevante porque o artefato final entra em analise juridica de terceiro. Confianca 0.2 = confianca no DOSSIE sobre Surya, nao no motor. O que reabre: distinguir as duas geracoes dentro do repo (linha nova de modelo-fundacao Chandra, que usa llama-server, vs. modelos classicos de deteccao/reconhecimento em PyTorch, que rodam em CPU sem llama.cpp) — a distincao muda inteiramente o requisito (c).'
+    trace: 'https://github.com/datalab-to/surya'
+
+  - id: C_OPCAO_DOTSOCR_3B_CPU
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.2
+    label: 'OPCAO (5): dots.ocr / dots.mocr 3B em CPU, sem flash-attn/vLLM (que nao instalam sem GPU). O arco do dossie aponta este como estado da arte estrutural, e o Elenxo INVERTE o sinal: a propriedade celebrada — VLM unico fim-a-fim, sem estagio separavel que ancore token no pixel — e exatamente o passivo sob o requisito dominante. Onde o carimbo/assinatura oclui o texto ele nao falha: COMPLETA com o texto administrativo mais plausivel, fluente e sem sinal (E_OBJECAO_1). Somam-se: sem confidence nativo nem validacao cruzada, com falhas de parsing admitidas na propria doc (E_DOTSOCR_SEM_CONFIDENCE_NEM_CARIMBO); benchmarks favoraveis todos refutados (Elo 1124,7; 90,7% em tabela; +10% multilingue; 88,41 no OmniDocBench com 6GB de VRAM); e ambiguidade de geracao dots.ocr/dots.mocr com rebrand em 2026-03. Confianca 0.2 e REPROVADA como motor UNICO sobre as 3 paginas vinculantes; sobrevive so como perna de consenso ao lado de um pipeline classico, e mesmo assim sem medicao de alucinacao-sob-oclusao.'
+    trace: 'https://github.com/rednote-hilab/dots.ocr'
+
+  - id: C_OPCAO_MINERU_OLMOCR
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.2
+    label: 'OPCAO (6): MinerU 2.5 / olmOCR. Praticamente NAO PESQUISADOS nesta rodada — aparecem so como termo de comparacao dentro de claims de terceiros que foram refutadas (MinerU com 75,2% em tabela no olmOCR-bench, tier 6; olmOCR preservando tabela em markdown mas "corrigindo" totais para bater com padroes inferidos, tier 4). Zero fonte primaria consultada, zero custo de instalacao medido, zero dado em portugues. A claim tier 4 sobre olmOCR, SE fosse confirmada, seria decisiva CONTRA ele aqui (alterar numero para casar com padrao inferido e exatamente o modo de falha silenciosa que o enunciado teme num artefato vinculante) — mas e tier 4 e nao sobreviveu. Confianca 0.2 por AUSENCIA de evidencia, nao por evidencia negativa; a distincao importa para nao confundir "nao avaliado" com "reprovado".'
+    trace: 'https://www.llamaindex.ai/blog/best-ocr-libraries-for-developers'
+
+  - id: C_OPCAO_DOCLING_IBM
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: 'OPCAO (7): Docling (IBM, Apache-2.0) — CANDIDATO AUSENTE DO ESCOPO ORIGINAL da pergunta, que apareceu como vencedor em TABELA no unico benchmark de tabelas tocado pela rodada. Achado de escopo: o enunciado listou 7 motores e a rodada nao questionou a lista, o que e o modo de falha "buscar por nome conhecido" (migalha search-by-trajectory-not-by-name). Licenca Apache-2.0 e materialmente melhor que a GPL-3.0 do Surya para artefato que entra em analise juridica de terceiro, e o mantenedor ser IBM muda o eixo de durabilidade do E_MERCADO. Confianca 0.3: nenhuma fonte primaria sobre Docling foi consultada, o custo de instalacao nao foi medido e nao ha dado em portugues — mas nao avaliar um candidato porque ele nao estava na lista e comodismo, nao evidencia.'
+    trace: 'https://www.newtuple.com/post/ocr-benchmark-paddleocr-docling-llamaparse-surya'
+
+  - id: C_OPCAO_BASELINE_SEM_OCR_PDFTOTEXT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: 'OPCAO (8) — O PASSO 0, e a de maior confianca do grafo (0.9): antes de instalar QUALQUER motor, rodar `pdftotext -layout` e `pdfimages -list` pagina a pagina sobre as 26 paginas e descobrir quais realmente precisam de OCR. PDF do SEI mistura paginas com camada de texto (peticao gerada pelo proprio sistema) e paginas escaneadas (anexo de terceiro), e o enunciado nunca afirmou que as 3 VINCULANTES sao imagem — assumiu-se. Poppler 24.02 JA esta instalado: custo zero, nenhuma dependencia nova, nada sai da maquina, e o resultado pode DISSOLVER a decisao inteira (texto extraido da camada nativa nao tem erro de leitura, so problema de ordem/layout). E se OCR for necessario, esta mesma saida vira o gabarito parcial contra o qual medir os motores — e o unico oraculo gratuito disponivel. Confianca 0.9 e nao 1.0 porque nem o comando foi rodado ainda: e a proxima acao, nao um fato.'
+    trace: 'https://poppler.freedesktop.org/'
+
+  - id: C_OPCAO_PROCEDIMENTO_CONSENSO_DOIS_MOTORES
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: 'OPCAO (9) — O PROCEDIMENTO, que o Elenxo recomenda decidir ANTES do motor: consenso entre 2 motores ARQUITETURALMENTE INDEPENDENTES (1 pipeline classico com conf+bbox por palavra x 1 VLM), divergencia roteada para revisao humana, e revisao humana de 100% das 3 paginas VINCULANTES independentemente de qualquer metrica. Fundamento parcial em Consensus Entropy (E_CONSENSUS_ENTROPY_SEM_TREINO), com DUAS ressalvas que o proprio dossie criou e nao resolveu: CE mede CONCORDANCIA, nao correcao — a garantia utilizavel e a direcao entropia-alta implica provavelmente-errado, enquanto a decisao precisaria da CONVERSA (E_OBJECAO_2, E_OBJECAO_7); e ela falha por erro CORRELACIONADO se as duas pernas forem VLMs de linhagem proxima. Por isso "independentes" aqui significa ARQUITETURA e LINHAGEM DE TREINO, nao apenas binarios diferentes. Custo nunca precificado: CE canonico pede 3+ stacks pesados num projeto dependency-light, o que sozinho reprova a forma literal do paper e deixa em pe apenas a forma degradada (2 motores + humano). Confianca 0.7: e a opcao que sobrevive melhor porque nao depende de qual motor vence nem de fornecedor nenhum — em 26 paginas, throughput nao e criterio e o humano cabe no orcamento.'
+    trace: 'https://arxiv.org/html/2504.11101'
+
+  # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ───────────────
+  - id: E_OBJECAO_1_FIM_A_FIM_MAXIMIZA_SILENCIO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-09-08
+    verified_against: 'E_DOTSOCR_VLM_FIM_A_FIM (https://arxiv.org/pdf/2512.02498, tier 7, 3-0) confrontada com o requisito dominante do enunciado ("um erro de leitura produz uma superacao errada em silencio") — inversao de sinal da mesma propriedade arquitetural'
+    source_tier: 7
+    source_kind: analysis
+    label: 'OBJECAO SOBREVIVENTE 1 — O ACHADO 1 REGISTRA COMO MERITO A PROPRIEDADE QUE E PASSIVO. Um decoder autorregressivo fim-a-fim nao tem estagio separavel que ancore o token no pixel: onde a imagem esta ilegivel (carimbo/assinatura sobreposta ao texto), ele nao falha — COMPLETA com o texto mais plausivel dado o contexto administrativo, em prosa fluente e sem sinal. O enunciado diz que um erro de leitura produz uma superacao errada EM SILENCIO: arquitetura fim-a-fim e a que MAXIMIZA o silencio. Um pipeline multi-estagio (deteccao -> recorte -> reconhecimento) ao menos produz caixa sem texto ou confianca baixa por palavra quando o recorte esta poluido. NADA no dossie mede alucinacao-sob-oclusao de nenhum motor — o eixo dominante da pergunta nao tem uma medicao sequer. E o dossie usa dots.ocr e dots.mocr de forma intercambiavel, com rebrand admitido em 2026-03: os numeros citados podem ser de geracao diferente do modelo que se instalaria.'
+    trace: 'https://arxiv.org/pdf/2512.02498'
+
+  - id: E_OBJECAO_2_CE_MEDE_ACORDO_NAO_CORRECAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-09-08
+    verified_against: 'E_CONSENSUS_ENTROPY_SEM_TREINO (https://arxiv.org/html/2504.11101, tier 7, 3-0) confrontada com a propria lista de refutadas desta rodada, que marcou "refutada" a proposicao "quando os VLMs erram, as predicoes divergem" — a perna de sustentacao do mesmo achado'
+    source_tier: 7
+    source_kind: analysis
+    label: 'OBJECAO SOBREVIVENTE 2 — CE MEDE CONCORDANCIA, NAO CORRECAO. A garantia utilizavel do paper e a direcao entropia-alta implica provavelmente-errado; a decisao precisa da CONVERSA (entropia-baixa implica confiavel), que NAO esta estabelecida e que falha justamente por erro CORRELACIONADO: PaddleOCR-VL, dots.ocr e MinerU 2.5 sao VLMs de backbone e dados sinteticos de linhagem proxima (familia Qwen-VL), logo erram JUNTOS e com confianca no MESMO trecho ocluido. Pior: o proprio dossie marcou como refutada a proposicao "quando os VLMs erram, as predicoes divergem" — a perna de sustentacao do CE — e manteve o ACHADO 2 como confirmado. Isso e CONTRADICAO INTERNA do dossie, nao evidencia. E o custo nunca foi precificado: CE exige 3 ou mais stacks pesados instalados num projeto declarado dependency-light. Consequencia operacional (nao anula o procedimento, o RESTRINGE): consenso so vale entre arquiteturas e linhagens de treino diferentes, e a saida de baixa entropia NAO autoriza aceitar a leitura sem humano nas paginas vinculantes.'
+    trace: 'https://arxiv.org/html/2504.11101'
+
+  - id: E_OBJECAO_3_ARGUMENTO_DO_SILENCIO_FALTA_MEDICAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-09-08
+    verified_against: 'E_DOTSOCR_SEM_CONFIDENCE_NEM_CARIMBO (https://github.com/rednote-hilab/dots.ocr, tier 6, 3-0) — a metade "nao ha mencao a robustez contra carimbo" e ausencia em README, nao medicao; confrontada com a doutrina behavior-over-declaration do repo'
+    source_tier: 6
+    source_kind: analysis
+    label: 'OBJECAO SOBREVIVENTE 3 — DECISIVO COMO CONCLUSAO, ARGUMENTO DO SILENCIO COMO EVIDENCIA. Que o motor nao exponha confidence nativo mata o candidato no requisito dominante (sem confidence nao ha triagem dirigida) — isso vale. Mas "o README nao menciona carimbo" NAO MEDE NADA: nenhum README de OCR menciona carimbo. E o achado foi registrado como ressalva LATERAL enquanto o arco do dossie seguia apontando dots.ocr como estado da arte — a ressalva nao mudou a conclusao que ela contradiz. O que falta e a unica coisa que resolveria: rodar o motor nas 3 paginas VINCULANTES reais e CONTAR os erros. Sem isso, tanto o elogio quanto a ressalva sao DECLARACAO — e a doutrina do repo e behavior-over-declaration (docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md): confie no que o artefato FAZ, nao no que declara de si.'
+    trace: 'https://github.com/rednote-hilab/dots.ocr'
+
+  - id: E_OBJECAO_4_DOCTR_TIER9_IRRELEVANTE_E_PESO_TORCH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-09-08
+    verified_against: 'E_DOCTR_PYTHON_311_PLUS (https://mindee.github.io/doctr/getting_started/installing.html, tier 9, 3-0) confrontada com o venv real do projeto (/opt/venv: numpy, pillow, pypdf, openpyxl) e com o requisito (c) do enunciado'
+    source_tier: 9
+    source_kind: analysis
+    label: 'OBJECAO SOBREVIVENTE 4 — TIER 9 RESPONDENDO EIXO QUE NAO DECIDE NADA. Compatibilidade do FRAMEWORK nao e o custo: docTR carrega PyTorch ou TensorFlow, e no venv medido aqui (numpy, pillow, pypdf, openpyxl) isso e da ordem de 2,5GB de wheel mais dependencias transitivas — o oposto de dependency-light, que e requisito declarado. E o eixo que importava ficou INTOCADO: os pesos pre-treinados de reconhecimento do docTR sao de vocabulario latino majoritariamente treinado em ingles, e ninguem verificou desempenho em portugues com serifa, acentuacao e cedilha, que e o corpus real. Achado verdadeiro e IRRELEVANTE ocupando vaga de achado confirmado — o sintoma e que uma rodada com 5 confirmacoes gastou uma delas num fato que nenhuma opcao usa para vencer ou perder.'
+    trace: 'https://mindee.github.io/doctr/getting_started/installing.html'
+
+  - id: E_OBJECAO_5_SURYA_CONFLACAO_DE_GERACOES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-09-08
+    verified_against: 'E_SURYA_CPU_EXIGE_LLAMACPP (https://github.com/datalab-to/surya, tier 7, 3-0) confrontada com as 4 proposicoes tier 7 do MESMO repo marcadas refutada sem evidencia e com a disconfirmadora cortada por orcamento — corpo de evidencia mutuamente contraditorio'
+    source_tier: 7
+    source_kind: analysis
+    label: 'OBJECAO SOBREVIVENTE 5 — SUSPEITA DE CONFLACAO DE GERACOES DENTRO DO MESMO REPO. O caminho llama-server pertence a linha NOVA de modelo-fundacao (Chandra / foundation OCR), enquanto os modelos CLASSICOS de deteccao e reconhecimento do Surya sao PyTorch e rodam em CPU sem llama.cpp. O dossie nao distingue as duas, e a distincao muda INTEIRAMENTE o custo de instalacao — que e o requisito (c). Some-se que TODAS as demais proposicoes sobre Surya foram marcadas refutada (87,2%; Pareto-otimo; confidence por bloco) e uma disconfirmadora foi cortada por orcamento ("ultimo lugar em todos os conjuntos"): o corpo de evidencia sobre Surya e mutuamente contraditorio e NAO FOI RECONCILIADO. Nenhuma recomendacao pode se apoiar nele. Confianca 0.7 (nao 0.8) porque a propria suspeita e inferencia sobre a estrutura do repo, e nao foi verificada abrindo o repo — o que a torna, ela tambem, uma tarefa de medicao pendente.'
+    trace: 'https://github.com/datalab-to/surya'
+
+  - id: E_OBJECAO_6_CUSTO_INSTALACAO_POR_IMPRESSAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-09-08
+    verified_against: 'proposicao tier 9 (doc oficial docTR, https://mindee.github.io/doctr/getting_started/installing.html) marcada "refutada" na lista desta rodada SEM evidencia registrada; e o teste de 1 comando que a decidiria (`pip install --dry-run python-doctr` neste venv) nunca foi executado'
+    source_tier: 9
+    source_kind: analysis
+    label: 'OBJECAO SOBREVIVENTE 6 (descartado por comodismo) — REFUTACAO SEM EVIDENCIA CONTRA FONTE TIER 9. A proposicao "pip install python-doctr instala so o nucleo, extras a parte" veio de doc oficial (tier 9) e foi marcada refutada sem nenhuma evidencia registrada. O desfecho provavelmente esta certo — mas por um motivo que NINGUEM MEDIU e que vale para TODOS os candidatos VLM, nao so para o docTR. Faltou o teste de 1 comando neste venv: `pip install --dry-run python-doctr` e ver se torch entra na arvore. Enquanto isso nao for medido, o requisito (c) — custo de instalacao e pegada de dependencia, um dos cinco eixos explicitos da pergunta — segue respondido POR IMPRESSAO em todo o dossie, e nao apenas para o docTR. Este e o defeito de metodo mais barato de curar da rodada inteira: um comando por candidato, offline, sem sair da maquina.'
+    trace: 'https://mindee.github.io/doctr/getting_started/installing.html'
+
+  - id: E_OBJECAO_7_DESACORDO_REFUTADO_SUSTENTA_CE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-09-08
+    verified_against: 'proposicao tier 7 (https://arxiv.org/html/2504.11101) "o desacordo entre motores independentes e sinal detectavel de erro" marcada refutada sem evidencia, enquanto E_CONSENSUS_ENTROPY_SEM_TREINO, que dela depende, foi mantida confirmada'
+    source_tier: 7
+    source_kind: analysis
+    label: 'OBJECAO SOBREVIVENTE 7 (descartado por comodismo) — O DOSSIE AFIRMA AS DUAS COISAS. "O desacordo entre motores independentes e sinal detectavel de erro" e a PERNA DE SUSTENTACAO do ACHADO 2, e foi refutada sem evidencia enquanto o achado que dela depende ficou confirmado. Ou o desacordo e sinal (e o CE se sustenta), ou nao e (e o CE cai junto) — nao ha terceira leitura. Faltou olhar a secao de RESULTADOS do proprio 2504.11101 e separar as duas direcoes (alta-entropia implica erro vs. baixa-entropia implica acerto), que e a unica leitura que decide o requisito (d) da pergunta. Consequencia pratica enquanto isso nao for feito: o roteamento por divergencia pode ser usado para ESCALAR ao humano (direcao segura), NUNCA para dispensar o humano quando os motores concordam (direcao nao estabelecida).'
+    trace: 'https://arxiv.org/html/2504.11101'
+
+  - id: E_OBJECAO_8_SURYA_QUATRO_REFUTADAS_EM_BLOCO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-09-08
+    verified_against: 'quatro proposicoes tier 7 da MESMA fonte (https://github.com/datalab-to/surya) marcadas refutada sem evidencia registrada para nenhuma delas: 87,2% em 91 idiomas; Pareto-otimo sub-3B com 83,3% no olmOCR-bench; confidence score por bloco; ausencia de dados sobre robustez a carimbo'
+    source_tier: 7
+    source_kind: analysis
+    label: 'OBJECAO SOBREVIVENTE 8 (descartado por comodismo) — QUATRO TIER 7 REFUTADAS EM BLOCO, ZERO EVIDENCIA. Refutar em bloco proposicoes da mesma fonte e decisao sobre a FONTE, nao sobre cada proposicao — e se a fonte fosse desqualificada, a quinta proposicao dela (llama.cpp em CPU) tambem cairia, e ela foi mantida CONFIRMADA. O criterio foi aplicado de forma inconsistente dentro da mesma URL. E uma das quatro custa caro: "Surya expoe confidence score por bloco (probabilidade media por token)" e o UNICO mecanismo NATIVO de confianca citado em todo o dossie fora do TSV do Tesseract — ou seja, refutou-se sem evidencia justamente o item que responderia o requisito (d). Cura barata e offline: abrir o repo e verificar se a API devolve o campo, em vez de decidir por impressao sobre a fonte inteira.'
+    trace: 'https://github.com/datalab-to/surya'
+
+edges:
+  # ── evidência confirmada -> pergunta ─────────────────────────────────────────────────
+  - from: E_DOTSOCR_VLM_FIM_A_FIM
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_CONSENSUS_ENTROPY_SEM_TREINO
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_DOTSOCR_SEM_CONFIDENCE_NEM_CARIMBO
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_DOCTR_PYTHON_311_PLUS
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_SURYA_CPU_EXIGE_LLAMACPP
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_MERCADO_OCR_LOCAL_0908
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_LACUNAS_DECLARADAS_OCR_0908
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_CORPUS_VAZIO_OCR_0908
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  # ── objeções do Elenxo também respondem à pergunta ───────────────────────────────────
+  - from: E_OBJECAO_1_FIM_A_FIM_MAXIMIZA_SILENCIO
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_2_CE_MEDE_ACORDO_NAO_CORRECAO
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_3_ARGUMENTO_DO_SILENCIO_FALTA_MEDICAO
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_4_DOCTR_TIER9_IRRELEVANTE_E_PESO_TORCH
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_5_SURYA_CONFLACAO_DE_GERACOES
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_6_CUSTO_INSTALACAO_POR_IMPRESSAO
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_7_DESACORDO_REFUTADO_SUSTENTA_CE
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: E_OBJECAO_8_SURYA_QUATRO_REFUTADAS_EM_BLOCO
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  # ── a decisão e suas opções ──────────────────────────────────────────────────────────
+  - from: D_OCR_LOCAL_SEI_0908
+    to: Q_OCR_LOCAL_SEI_0908
+    edge_type: SUPPORTS
+
+  - from: D_OCR_LOCAL_SEI_0908
+    to: C_OPCAO_TESSERACT5_TESSDATA_BEST
+    edge_type: DEPENDS_ON
+
+  - from: D_OCR_LOCAL_SEI_0908
+    to: C_OPCAO_PADDLEOCR_VL_CPU
+    edge_type: DEPENDS_ON
+
+  - from: D_OCR_LOCAL_SEI_0908
+    to: C_OPCAO_DOCTR_TORCH_VENV
+    edge_type: DEPENDS_ON
+
+  - from: D_OCR_LOCAL_SEI_0908
+    to: C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA
+    edge_type: DEPENDS_ON
+
+  - from: D_OCR_LOCAL_SEI_0908
+    to: C_OPCAO_DOTSOCR_3B_CPU
+    edge_type: DEPENDS_ON
+
+  - from: D_OCR_LOCAL_SEI_0908
+    to: C_OPCAO_MINERU_OLMOCR
+    edge_type: DEPENDS_ON
+
+  - from: D_OCR_LOCAL_SEI_0908
+    to: C_OPCAO_DOCLING_IBM
+    edge_type: DEPENDS_ON
+
+  - from: D_OCR_LOCAL_SEI_0908
+    to: C_OPCAO_BASELINE_SEM_OCR_PDFTOTEXT
+    edge_type: DEPENDS_ON
+
+  - from: D_OCR_LOCAL_SEI_0908
+    to: C_OPCAO_PROCEDIMENTO_CONSENSO_DOIS_MOTORES
+    edge_type: DEPENDS_ON
+
+  # ── objeções sobreviventes LIMITAM (CONSTRAINS), não matam ───────────────────────────
+  - from: E_OBJECAO_1_FIM_A_FIM_MAXIMIZA_SILENCIO
+    to: C_OPCAO_DOTSOCR_3B_CPU
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_1_FIM_A_FIM_MAXIMIZA_SILENCIO
+    to: C_OPCAO_PADDLEOCR_VL_CPU
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_1_FIM_A_FIM_MAXIMIZA_SILENCIO
+    to: D_OCR_LOCAL_SEI_0908
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_2_CE_MEDE_ACORDO_NAO_CORRECAO
+    to: C_OPCAO_PROCEDIMENTO_CONSENSO_DOIS_MOTORES
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_2_CE_MEDE_ACORDO_NAO_CORRECAO
+    to: D_OCR_LOCAL_SEI_0908
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_3_ARGUMENTO_DO_SILENCIO_FALTA_MEDICAO
+    to: C_OPCAO_DOTSOCR_3B_CPU
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_3_ARGUMENTO_DO_SILENCIO_FALTA_MEDICAO
+    to: D_OCR_LOCAL_SEI_0908
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_4_DOCTR_TIER9_IRRELEVANTE_E_PESO_TORCH
+    to: C_OPCAO_DOCTR_TORCH_VENV
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_5_SURYA_CONFLACAO_DE_GERACOES
+    to: C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_6_CUSTO_INSTALACAO_POR_IMPRESSAO
+    to: C_OPCAO_DOCTR_TORCH_VENV
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_6_CUSTO_INSTALACAO_POR_IMPRESSAO
+    to: D_OCR_LOCAL_SEI_0908
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_7_DESACORDO_REFUTADO_SUSTENTA_CE
+    to: C_OPCAO_PROCEDIMENTO_CONSENSO_DOIS_MOTORES
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_8_SURYA_QUATRO_REFUTADAS_EM_BLOCO
+    to: C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA
+    edge_type: CONSTRAINS
+
+  - from: E_OBJECAO_8_SURYA_QUATRO_REFUTADAS_EM_BLOCO
+    to: D_OCR_LOCAL_SEI_0908
+    edge_type: CONSTRAINS
+
+  # ── lacunas e mercado LIMITAM as opções que ninguém mediu ────────────────────────────
+  - from: E_LACUNAS_DECLARADAS_OCR_0908
+    to: C_OPCAO_DOCLING_IBM
+    edge_type: CONSTRAINS
+
+  - from: E_LACUNAS_DECLARADAS_OCR_0908
+    to: C_OPCAO_MINERU_OLMOCR
+    edge_type: CONSTRAINS
+
+  - from: E_LACUNAS_DECLARADAS_OCR_0908
+    to: D_OCR_LOCAL_SEI_0908
+    edge_type: CONSTRAINS
+
+  - from: E_MERCADO_OCR_LOCAL_0908
+    to: D_OCR_LOCAL_SEI_0908
+    edge_type: CONSTRAINS
