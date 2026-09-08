@@ -115,15 +115,47 @@ if fr:
     print(f"\n  ── A RÉGUA QUE FALTAVA")
     print(f"  tokens por achado REAL            {tk//fr:>12,}".replace(",", "."))
     print(f"  minutos por achado REAL           {mi/fr:>12.1f}")
-# O campo `verdict` é TEXTO LIVRE, e a dispersão é o achado: agrupar por família em vez de
-# despejar 70 linhas. A dispersão em si vai declarada — é ela que impede qualquer série.
-fam = {}
+# ── AS DUAS ERAS DO `verdict:` ────────────────────────────────────────────────────────────
+# Em 2026-09-08 o maestro selou o vocabulário FECHADO, e a guarda entrou em
+# `review-artifact-check.sh` julgando só o resíduo do PR corrente. Logo os 262 anteriores NÃO
+# se reescrevem (histórico não se reescreve nesta casa) e a série passa a ter duas eras.
+#
+# ESTE LEITOR IMPRIME AS DUAS, e a de LEGADO nunca desaparece do relatório: uma métrica que
+# some quando fica inconveniente é a mesma classe do painel inventado que esta onda apagou.
+# O que muda com o tempo é a proporção — e é isso que se acompanha.
+ENUM = ("APROVADO", "CORRIGIDO", "REPROVADO", "REPROVADO_E_CURADO", "SEM_ACHADOS")
+def _canon(k):
+    """Caixa e separador normalizam; a PALAVRA não. `REPROVADO-E-CURADO` e
+    `REPROVADO_E_CURADO` são o mesmo veredito escrito em duas épocas — tratá-los como
+    formas distintas inflaria a dispersão com um defeito que não existe. Já
+    `CORRIGIDO-E-RE-REVISADO` normaliza para algo que NÃO está no enum, e continua legado."""
+    return k.upper().replace("-", "_")
+
+canon, legado = {}, {}
 for k, v in ver.items():
+    alvo = canon if _canon(k) in ENUM else legado
+    alvo[_canon(k)] = alvo.get(_canon(k), 0) + v
+n_canon, n_legado = sum(canon.values()), sum(legado.values())
+
+print(f"\n  ── VOCABULÁRIO DO VEREDITO (fechado em 2026-09-08)")
+print(f"  no vocabulário            {n_canon:>4}   " +
+      (" · ".join(f"{k}={v}" for k, v in sorted(canon.items(), key=lambda x: -x[1])) or "—"))
+print(f"  LEGADO (texto livre)      {n_legado:>4}   {len(legado)} formas distintas, anteriores ao selo")
+if n_canon:
+    print(f"  cobertura do enum         {100*n_canon//tot:>3}%   sobe sozinha: só resíduo NOVO é julgado")
+else:
+    print(f"  cobertura do enum        ⊘ NÃO MEDIDO — nenhum resíduo pós-selo ainda")
+
+# A dispersão do LEGADO continua declarada: é ela que justificou o selo, e apagá-la seria
+# apagar a evidência da própria decisão.
+fam = {}
+for k, v in legado.items():
     raiz = re.split(r"[-_ ]", k.upper(), 1)[0] or "(vazio)"
     fam[raiz] = fam.get(raiz, 0) + v
-print(f"\n  veredito por família: " + " · ".join(f"{k}={v}" for k, v in sorted(fam.items(), key=lambda x: -x[1])))
-print(f"  ⚠ {len(ver)} formas DISTINTAS de veredito em {tot} resíduos — o campo é texto livre e")
-print(f"    não sustenta série. Padronizá-lo é decisão do maestro, não deste leitor.")
+if fam:
+    print(f"\n  legado por família: " + " · ".join(f"{k}={v}" for k, v in sorted(fam.items(), key=lambda x: -x[1])))
+    print(f"  ⚠ {len(legado)} formas DISTINTAS no legado — a evidência que motivou fechar o vocabulário.")
+    print(f"    Não se reescreve: a série começa no 1º resíduo pós-selo.")
 if incompletos:
     print(f"\n  ⚠ resíduos com campo ausente (não entram na conta, e por isso aparecem):")
     for a, f in incompletos[:8]:

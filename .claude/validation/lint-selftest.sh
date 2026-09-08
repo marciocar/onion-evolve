@@ -5877,7 +5877,12 @@ run_review_artifact_selftests() {
     { printf -- '---\n'
       printf 'reviewed_diff_sha256: %s\n' "$2"
       if [ "$3" = "1" ]; then
-        printf 'findings_total: 3\nfindings_real: 2\ntokens: 118000\nduration_min: 11\nverdict: corrigido-antes-do-PR\n'
+        # ⚠️ O DEFAULT TEM DE ESTAR NO VOCABULÁRIO FECHADO. Até 2026-09-08 esta linha emitia
+        # `verdict: corrigido-antes-do-PR` — texto livre — e ela é a fixture do CAMINHO FELIZ:
+        # no instante em que o enum virou HARD, cinco casos verdes ficaram vermelhos de uma vez.
+        # Foi o harness expondo que ele não espelhava mais o runner, exatamente como esta casa já
+        # mediu 3× ao trocar uma dependência para fail-closed. [[fail-closed-exposes-incomplete-harness]]
+        printf 'findings_total: 3\nfindings_real: 2\ntokens: 118000\nduration_min: 11\nverdict: %s\n' "${4:-CORRIGIDO}"
       fi
       printf -- '---\n\n# revisao\n'
     } > "$1/docs/evolution/review/feat-x.md"
@@ -6077,6 +6082,63 @@ run_review_artifact_selftests() {
     else record_fail "review-artifact: (l) impasse" "o artefato em stage nao foi visto (ref=${_ref}) — o hook bloquearia o commit que o adiciona"; fi
   else record_skip "review-artifact: (j)(k) sandbox git nao montou"; fi
   rm -rf "${rw}"
+
+  # ═══ VOCABULÁRIO FECHADO DO `verdict:` (selado 2026-09-08) ═══════════════════════════════
+  # Nasceu de MEDIÇÃO, não de gosto: o `review-ledger.sh` agregou 262 resíduos e achou 72 formas
+  # distintas de veredito, 62 delas ocorrendo UMA vez e sendo frase inteira. Campo livre não
+  # sustenta série — e a série é o ponto inteiro de medir a revisão adversarial.
+
+  # (m) CAIXA é tolerada. `aprovado` minúsculo era uma das 72 formas (`conforme` vs `CONFORME`
+  #     sozinho já produzia duas). Reprovar por caixa seria falso-positivo travante sem ganho
+  #     nenhum de série — em guarda de lista o defeito dominante é o VOCABULÁRIO, não a caixa.
+  _mk_pr_repo
+  _art "${d}" "$(_sha_of "${d}")" 1 "aprovado"
+  rc=0; out="$(_run "${d}")" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "review-artifact: (m) verdict em minúscula → PASSA (a caixa normaliza; o vocabulário é que fecha)"
+  else record_fail "review-artifact: (m) caixa" "rc=${rc} out=${out} — reprovar por caixa é falso-positivo travante"; fi
+  rm -rf "${d}"
+
+  # (n) FORA DO VOCABULÁRIO → HARD, e a mensagem tem de ENSINAR o caminho: quem tem uma frase para
+  #     dizer põe em `nota:`, não no slot que a série lê. Guarda que só nega ensina a contorná-la.
+  _mk_pr_repo
+  _art "${d}" "$(_sha_of "${d}")" 1 "ELENXO-DERRUBOU-CINCO-AFIRMACOES-MINHAS"
+  rc=0; out="$(_run "${d}")" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'VERDICT-FORA-DO-VOCABULARIO' <<< "${out}" && grep -q 'nota:' <<< "${out}"; then
+    record_pass "review-artifact: (n) veredito em texto livre → HARD, e a mensagem nomeia \`nota:\` como o lugar da narrativa"
+  else record_fail "review-artifact: (n) fora do vocabulário" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (o) REPROVADO_E_CURADO EXISTE, e não é enfeite: 8 dos 262 resíduos usaram a cauda livre
+  #     (`HARD-MAS-NAO-COMO-ESTAVA-...`) para dizer exatamente isto — a revisão reprovou e a cura
+  #     entrou no MESMO PR. É a métrica de eficácia da revisão; fundi-la em APROVADO apagaria o
+  #     único número que responde "a revisão adversarial fez o PR mudar?".
+  _mk_pr_repo
+  _art "${d}" "$(_sha_of "${d}")" 1 "REPROVADO_E_CURADO"
+  rc=0; out="$(_run "${d}")" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "review-artifact: (o) REPROVADO_E_CURADO é valor de 1ª classe (a revisão que MUDOU o PR não vira APROVADO)"
+  else record_fail "review-artifact: (o) reprovado-e-curado" "rc=${rc} out=${out}"; fi
+  rm -rf "${d}"
+
+  # (p) (MUT) sem a checagem de enum, o texto livre PASSA. Sem esta mutação, (n) poderia estar
+  #     reprovando por qualquer outro motivo do helper — guarda que nunca rejeitou é vacuidade.
+  local mutv; mutv="$(mktemp -d)"; cp "${helper}" "${mutv}/m.sh"
+  sed -i 's/^if \[ "${_VERD_OK}" -ne 1 \]; then/if false; then/' "${mutv}/m.sh"
+  if grep -q 'if false; then' "${mutv}/m.sh"; then
+    _mk_pr_repo
+    _art "${d}" "$(_sha_of "${d}")" 1 "FRASE-INTEIRA-NO-SLOT-DA-SERIE"
+    rc=0
+    ( cd "${d}" && GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF=feat/x GITHUB_REF_NAME=99/merge \
+        bash "${mutv}/m.sh" "${d}" >/dev/null 2>&1 ) || rc=$?
+    if [ "${rc}" -eq 0 ]; then
+      record_pass "review-artifact: (p) (MUT) sem a checagem de enum o texto livre PASSA — o vocabulário é load-bearing"
+    else record_fail "review-artifact: (p) (MUT)" "mutante ainda reprovou (rc=${rc}) — (n) passa por outro motivo"; fi
+    rm -rf "${d}"
+  else
+    record_fail "review-artifact: (p) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+  rm -rf "${mutv}"
 
 }
 

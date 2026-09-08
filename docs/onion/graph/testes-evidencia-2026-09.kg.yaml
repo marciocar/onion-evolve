@@ -129,10 +129,32 @@ nodes:
     node_type: question
     drive_kind: decision
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.9
     label: "72 formas DISTINTAS de veredito em 262 residuos (APROVADO=160, CONFORME=42, CORRIGIDO=22, e uma cauda de 69 formas que sao frase inteira). O campo e texto livre, entao NAO sustenta serie: nao da para dizer 'a taxa de reprovacao caiu' sem um vocabulario fechado. Padronizar e decisao do maestro — o ledger apenas mede e recusa fingir que a cauda e ruido."
+
+  - id: D_VOCABULARIO_FECHADO_DO_VEREDITO
+    node_type: decision
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: 'selo do maestro em 2026-09-08 + bancada review_artifact 17/17 com prova de mutacao'
+    trace: '.claude/validation/review-artifact-check.sh (VERDICT_ENUM)'
+    label: "SELADO pelo maestro em 2026-09-08: o `verdict:` do residuo da REGRA 56 (PR carrega residuo adversarial) fecha em CINCO valores — APROVADO | CORRIGIDO | REPROVADO | REPROVADO_E_CURADO | SEM_ACHADOS. CONFORME funde em APROVADO (42 contra 157 era vocabulario de epoca, nao distincao). REPROVADO_E_CURADO nao e enfeite: e a unica metrica que responde 'a revisao adversarial FEZ o PR mudar?' — 8 residuos ja diziam isso pela cauda livre (`HARD-MAS-NAO-COMO-ESTAVA-...`) e 5 ja escreviam o proprio termo com hifen. Caixa e separador normalizam (a grafia mista e do historico real); a PALAVRA nao. PROSPECTIVA POR CONSTRUCAO: a guarda so julga o residuo do PR corrente, entao os 262 antigos nunca entram em julgamento e nao se reescrevem. O ledger imprime as DUAS eras e a de legado nunca some — metrica que desaparece quando fica inconveniente e a classe do painel inventado que esta onda apagou."
+
+  - id: E_A_CAUDA_ERAM_TRES_CAMPOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-08'
+    verified_against: 'agrupamento das 72 formas por primeiro token sobre docs/evolution/review'
+    trace: 'docs/evolution/review/*.md'
+    label: "A cauda de 62 formas-de-uma-ocorrencia nao era ruido: eram TRES campos espremidos num slot so. 8 residuos usavam o veredito para declarar METODO (`SEM-ELENXO-...`, que nao houve passada adversarial); 8 declaravam um VEREDITO que faltava no enum (reprovou e curou no mesmo PR); 15 traziam a NARRATIVA do achado. A cura da forma e separar: `verdict:` fechado, `elenxo: sim|nao` para o metodo, `nota:` livre para a narrativa. Os dois ultimos entram ACEITOS e documentados, nao obrigatorios — nesta casa guarda vira HARD depois de se provar, nunca antes (foi assim que a REGRA 59 nasceu, e ela refutou o proprio plano que a criou)."
 
 edges:
   - from: I_HARNESS_INVENTORY
@@ -168,3 +190,9 @@ edges:
   - from: Q_VEREDITO_DO_RESIDUO_E_TEXTO_LIVRE
     to: E_A_REGUA_QUE_FALTAVA
     edge_type: DEPENDS_ON
+  - from: D_VOCABULARIO_FECHADO_DO_VEREDITO
+    to: Q_VEREDITO_DO_RESIDUO_E_TEXTO_LIVRE
+    edge_type: SUPPORTS
+  - from: E_A_CAUDA_ERAM_TRES_CAMPOS
+    to: D_VOCABULARIO_FECHADO_DO_VEREDITO
+    edge_type: SUPPORTS
