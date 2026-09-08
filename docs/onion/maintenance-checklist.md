@@ -435,6 +435,13 @@ de diagnóstico) **rejuvenesce o atime e zera o relógio**. Nada consegue envelh
   simultâneas no MESMO repo ainda não são recomendadas: famílias que leem o repo vivo (`git status
   plugins/`, `git archive HEAD`) e um caso intermitente conhecido (`kg-backlog (e)`,
   `Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO`) — a falha falsa de 2026-08 tinha esta forma.
-- **`consumed-mode-check.sh`** está desligado (zero consumidores) e sem `--selftest` próprio. Rodado
-  à mão, acha **4 modos de produção sem teste**. Não é rotina — é item no grafo
-  (`I_CONSUMED_MODE_CHECK_GANHA_TESTE_E_LIGA`); fica citado aqui só para não parecer esquecido.
+- **`consumed-mode-check.sh` está LIGADO** — e esta linha dizia o contrário até 2026-09-08.
+  É a REGRA 59, chamada incondicionalmente em `lint-artifacts.sh:4116`, severidade HARD. Medido
+  agora (`bash .claude/validation/consumed-mode-check.sh`, rc=0):
+  `pares de produção: 40 · sem teste: 0`.
+  ⚠️ **Por que isto importa mais do que a correção em si:** o texto antigo ("desligado, zero
+  consumidores, 4 modos sem teste") ficou stale quando o wire-in aconteceu em 2026-08-13, e
+  enganou uma exploração desta casa em 2026-09-08 — que repassou a falsidade ao maestro antes de
+  medir. É a mesma classe do painel inventado que vivia em `testing-validation-system.md`:
+  documento afirmando estado que o vivo desmente. Nenhum dos dois foi pego por guarda; os dois
+  foram pegos por alguém rodando o comando.

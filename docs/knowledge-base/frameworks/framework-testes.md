@@ -629,8 +629,16 @@ describe('Performance Sob Carga', () => {
 ```
 
 ### Dashboard Integrado Completo
+
+> ⚠️ **Os números abaixo são ILUSTRAÇÃO DE LAYOUT, não medição.** Nenhum deles é produzido
+> por ferramenta alguma — servem para mostrar a FORMA de um painel de três perspectivas.
+> Ao construir o seu, a régua é: célula sem o comando que a produziu não é impressa, e
+> métrica sem produtor imprime `⊘ NÃO MEDIDO` em vez de um número.
+> *(Rótulo acrescentado em 2026-09-08: a cópia deste bloco em `docs/onion/testing-validation-system.md`
+> vinha sendo lida como o estado real do próprio Onion.)*
+
 ```
-📊 COMPLETE TESTING DASHBOARD
+📊 COMPLETE TESTING DASHBOARD (ilustrativo)
 
 ┌─── WHITE-BOX (DEV) ────┐  ┌─── BLACK-BOX (QA) ────┐  ┌─── GREY-BOX (CROSS) ───┐
 │ Coverage: 85% ✅       │  │ QA Velocity: 24pts ✅  │  │ API Tests: 47 ✅       │
