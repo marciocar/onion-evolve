@@ -127,6 +127,15 @@ STRICT="${ONION_SELFTEST_STRICT:-0}"
 #   --jobs N|auto              N workers (auto = nproc); 1 = serial (default)
 #   --timing                   imprime ⏱ por família (para calibrar a partição)
 #   --dry-run                  imprime a seleção (faixa) e sai sem rodar nada
+#   --report <ABS.tsv>         grava o resultado legível por máquina: uma linha por família
+#                              (familia⇥pass⇥fail⇥skip⇥segundos), as linhas FAIL/SKIP nomeadas
+#                              e um TOTAL. Caminho ABSOLUTO. Escrito pelo PAI, depois da
+#                              contagem e ANTES do veredito — falha de I/O NÃO muda o rc.
+#                              ⚠️ Família FATIADA (`fixtures`) aparece UMA VEZ POR SHARD —
+#                              medido: 8 linhas com --jobs 8. A soma continua batendo com o
+#                              TOTAL; quem consome AGRUPA por nome. Emitir uma linha só
+#                              exigiria o pai somar shards e esconderia a distribuição real
+#                              do trabalho, que é justamente o que se quer ver.
 SELFTEST_LIST=0; SELFTEST_MAP=0; SELFTEST_TIMING="${ONION_SELFTEST_TIMING:-0}"
 SELFTEST_JOBS="${ONION_SELFTEST_JOBS:-1}"; SELFTEST_FAMILIES="${ONION_SELFTEST_FAMILIES:-}"
 SELFTEST_CHILD="${ONION_SELFTEST_CHILD:-0}"; SELFTEST_AFFECTED=(); SELFTEST_AFFECTED_STAGED=0; SELFTEST_DRY=0
@@ -143,6 +152,8 @@ while [ $# -gt 0 ]; do
     --list) SELFTEST_LIST=1 ;;
     --map) SELFTEST_MAP=1 ;;
     --timing) SELFTEST_TIMING=1 ;;
+    --report) shift; SELFTEST_REPORT="${1:-}" ;;
+    --report=*) SELFTEST_REPORT="${1#--report=}" ;;
     --child) SELFTEST_CHILD=1 ;;
     --dry-run) SELFTEST_DRY=1 ;;
     --jobs) shift; SELFTEST_JOBS="${1:-1}" ;;
@@ -156,6 +167,39 @@ while [ $# -gt 0 ]; do
   esac
   shift
 done
+# ── RELATÓRIO LEGÍVEL POR MÁQUINA (2026-09-08) ────────────────────────────────────────────────
+#
+#  A bancada sabia tudo e não contava para ninguém: o resultado morria no log do job. Sem isto não
+#  há série histórica, nem painel, nem detector de flaky — todos precisam de um resultado que uma
+#  máquina leia.
+#
+#  ⚠️ TRÊS RESTRIÇÕES, e cada uma paga por um defeito que esta suíte já teve:
+#   (a) QUEM ESCREVE É O PAI, nunca o `--child`. Workers concorrentes escrevendo o mesmo arquivo se
+#       sobrescrevem, e o verde resultante teria perdido metade dos casos.
+#   (b) ESCREVE DEPOIS DA CONTAGEM, ANTES DO VEREDITO. O plano original dizia "depois do veredito",
+#       mas há QUATRO saídas (STRICT, vacuidade, FAIL, OK): relatório que só sai no verde é inútil,
+#       porque é na FALHA que ele mais serve.
+#   (c) A ESCRITA NÃO PODE MUDAR O VEREDITO. Falha de I/O avisa em stderr e segue — o rc da suíte é
+#       sobre as guardas, jamais sobre o disco.
+#  Caminho ABSOLUTO obrigatório: famílias fazem `cd` em sandbox, e caminho relativo cairia em lugar
+#  imprevisível — o mesmo modo de falha que já custou a esta suíte um `_lib_beside` inteiro.
+SELFTEST_REPORT="${SELFTEST_REPORT:-}"
+REPORT_ROWS=()
+if [ -n "${SELFTEST_REPORT}" ]; then
+  case "${SELFTEST_REPORT}" in
+    /*) ;;
+    *) echo "lint-selftest: --report exige caminho ABSOLUTO (recebi '${SELFTEST_REPORT}')" >&2; exit 2 ;;
+  esac
+  # ⚠️ `--list`/`--map`/`--dry-run` saem ANTES de rodar guarda nenhuma. Aceitar `--report` junto
+  #    deles produziria silêncio — nenhum arquivo, nenhum aviso — e quem lesse a ausência do TSV
+  #    concluiria "a bancada não achou nada" em vez de "a bancada não rodou". É a confusão entre
+  #    AUSÊNCIA e RESULTADO que esta suíte persegue em todo o resto; recusar é mais barato.
+  if [ "${SELFTEST_LIST}" = "1" ] || [ "${SELFTEST_MAP}" = "1" ] || [ "${SELFTEST_DRY}" = "1" ]; then
+    echo "lint-selftest: --report não combina com --list/--map/--dry-run (nenhuma guarda roda; não há o que relatar)" >&2
+    exit 2
+  fi
+fi
+
 if [ "${SELFTEST_JOBS}" = "auto" ]; then SELFTEST_JOBS="$(nproc 2>/dev/null || echo 1)"; fi
 case "${SELFTEST_JOBS}" in ''|*[!0-9]*) SELFTEST_JOBS=1 ;; esac
 [ "${SELFTEST_JOBS}" -ge 1 ] || SELFTEST_JOBS=1
@@ -186,7 +230,12 @@ _family() {
     esac
   fi
   t0="${SECONDS}"
+  local _p0="${PASS}" _f0="${FAIL}" _s0="${SKIP}"
   "${fn}"
+  # delta por família — a granularidade é FAMÍLIA e não CASO de propósito: os nomes de quem FALHOU
+  # já viajam pelo protocolo, e registrar os ~980 nomes de quem passou engordaria o trailer 6× sem
+  # responder nenhuma pergunta que já não esteja respondida.
+  REPORT_ROWS+=( "${name}"$'\t'"$(( PASS - _p0 ))"$'\t'"$(( FAIL - _f0 ))"$'\t'"$(( SKIP - _s0 ))"$'\t'"$(( SECONDS - t0 ))" )
   if [ -n "${SELFTEST_QUEUE:-}" ] && [ "${name}" != "fixtures" ]; then : > "${SELFTEST_QUEUE}/done/${name}"; fi
   # Família que instala `trap … RETURN` (limpeza de tmp) deixaria o trap armado para o retorno DESTE
   # wrapper, onde as `local` dela já não existem — sob set -u isso matou a suíte no 1º dogfood da faixa
@@ -301,6 +350,7 @@ if [ "${SELFTEST_JOBS}" -gt 1 ] && [ "${SELFTEST_CHILD}" = "0" ] && [ "${SELFTES
         echo "  ✗✗ worker ${i} terminou SEM o trailer de soma (exit ${_rc}) — os casos dele NÃO contam como verdes"
       else
         set -- ${_counts}; PASS=$((PASS + $2)); FAIL=$((FAIL + $3)); SKIP=$((SKIP + $4))
+        while IFS= read -r _row; do REPORT_ROWS+=("${_row#*$'\t'}"); done < <(grep -E $'^#ONION_SELFTEST_FAMILY\t' "${_tdir}/${i}.out" || true)
         while IFS=$'\t' read -r _tag _case; do FAILED_CASES+=("${_case}"); done < <(grep -E $'^#ONION_SELFTEST_FAILED\t' "${_tdir}/${i}.out" || true)
         while IFS=$'\t' read -r _tag _case; do SKIPPED_CASES+=("${_case}"); done < <(grep -E $'^#ONION_SELFTEST_SKIPPED\t' "${_tdir}/${i}.out" || true)
       fi
@@ -11307,6 +11357,38 @@ PYI
   if grep -qx '#ONION_SELFTEST_COUNTS 2 0 0' <<< "${out}"; then
     record_pass "selftest-lanes: (n) ONION_SELFTEST_SHARD=1/2 ⇒ metade do manifest (2 de 4)"
   else record_fail "selftest-lanes: (n) shard child" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
+
+  # ── (o)-(q) --report: o relatório legível por máquina não pode custar a integridade da suíte ──
+  #
+  #  A pergunta que estes três casos respondem NÃO é "o TSV sai?" — é "instrumentar a bancada
+  #  mudou a bancada?". Esta suíte já morreu calada uma vez e já deu falso ✗ por EPIPE em 337
+  #  sítios; escrita de arquivo aqui dentro é exatamente a classe de mudança que reintroduz isso.
+  local rep="${d}/rep.tsv"
+  # (o) caminho RELATIVO reprova: famílias fazem `cd` em sandbox e o arquivo cairia em lugar
+  #     imprevisível — o mesmo modo de falha que já custou a esta suíte um `_lib_beside` inteiro.
+  out="$(bash "${copy}" --families ladder_integrity --report rel.tsv 2>&1)" && rc=0 || rc=$?
+  if [ "${rc}" -eq 2 ] && grep -q 'caminho ABSOLUTO' <<< "${out}"; then
+    record_pass "selftest-lanes: (o) --report com caminho relativo ⇒ rc=2, e diz por quê"
+  else record_fail "selftest-lanes: (o) --report relativo" "rc=${rc}; $(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
+  # (p) A CONDIÇÃO DE ACEITE: a flag não altera a contagem. Sem este caso, `--report` poderia
+  #     engolir um ✗ e ninguém saberia — o relatório sairia bonito sobre uma suíte menor.
+  local sem com
+  sem="$(bash "${copy}" --families ladder_integrity 2>&1 | grep -E '^  (Passaram|Pularam|Falharam)')"
+  com="$(bash "${copy}" --families ladder_integrity --report "${rep}" 2>&1 | grep -E '^  (Passaram|Pularam|Falharam)')"
+  if [ -n "${sem}" ] && [ "${sem}" = "${com}" ]; then
+    record_pass "selftest-lanes: (p) --report NÃO altera a contagem (mesma soma com e sem a flag)"
+  else record_fail "selftest-lanes: (p) --report altera contagem" "sem=[$(tr '\n' '|' <<< "${sem}")] com=[$(tr '\n' '|' <<< "${com}")]"; fi
+  # (q) o TOTAL do TSV é a SOMA das linhas de família — um relatório cuja aritmética não fecha é
+  #     pior que relatório nenhum: ele parece medição.
+  if [ -f "${rep}" ] && head -1 "${rep}" | grep -q '^familia'; then
+    local somap totp
+    somap="$(awk -F'\t' '$1!="familia" && $1!="TOTAL" && $1!="FAIL" && $1!="SKIP" {s+=$2} END{print s+0}' "${rep}")"
+    totp="$(awk -F'\t' '$1=="TOTAL"{print $2+0}' "${rep}")"
+    if [ -n "${totp}" ] && [ "${somap}" = "${totp}" ]; then
+      record_pass "selftest-lanes: (q) TOTAL do --report = soma das famílias (${totp})"
+    else record_fail "selftest-lanes: (q) aritmética do --report" "soma das famílias=${somap} TOTAL=${totp:-<ausente>}"; fi
+  else record_fail "selftest-lanes: (q) --report não produziu TSV com cabeçalho" "arquivo=${rep}"; fi
+
   rm -rf "${d}"
 }
 _family run_selftest_lanes_selftests
@@ -13816,11 +13898,24 @@ _family run_federation_projection_selftests
 #    veredito final, que é o único ponto em que a suíte de fato chegou ao fim.
 if [ "${SELFTEST_LIST}" = "1" ]; then SUMMARY_PRINTED=1; exit 0; fi
 if [ "${SELFTEST_CHILD}" = "1" ]; then
+  for r in "${REPORT_ROWS[@]}"; do printf '#ONION_SELFTEST_FAMILY\t%s\n' "${r}"; done
   for c in "${FAILED_CASES[@]}"; do printf '#ONION_SELFTEST_FAILED\t%s\n' "${c}"; done
   for c in "${SKIPPED_CASES[@]}"; do printf '#ONION_SELFTEST_SKIPPED\t%s\n' "${c}"; done
   echo "#ONION_SELFTEST_COUNTS ${PASS} ${FAIL} ${SKIP}"
   SUMMARY_PRINTED=1; exit 0
 fi
+# ── escrita do relatório: PAI, contagem completa, ANTES do veredito, sem poder mudá-lo ─────────
+if [ -n "${SELFTEST_REPORT}" ]; then
+  {
+    printf 'familia\tpass\tfail\tskip\tsegundos\n'
+    for _r in "${REPORT_ROWS[@]}"; do printf '%s\n' "${_r}"; done
+    for _c in "${FAILED_CASES[@]}"; do printf 'FAIL\t%s\n' "${_c}"; done
+    for _c in "${SKIPPED_CASES[@]}"; do printf 'SKIP\t%s\n' "${_c}"; done
+    printf 'TOTAL\t%s\t%s\t%s\t%s\n' "${PASS}" "${FAIL}" "${SKIP}" "${SECONDS}"
+  } > "${SELFTEST_REPORT}" 2>/dev/null \
+    || echo "  ⚠ --report: não consegui escrever em ${SELFTEST_REPORT} (o veredito abaixo NÃO muda por isso)" >&2
+fi
+
 echo ""
 echo "=== Sumário do auto-teste de guardas ==="
 echo "  Passaram : ${PASS}"
