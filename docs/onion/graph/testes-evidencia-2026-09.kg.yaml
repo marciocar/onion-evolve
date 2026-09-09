@@ -62,7 +62,7 @@ nodes:
     node_type: decision
     drive_kind: execution
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 0.85
     label: "ONDA 0.4 — a saída real da bancada e do lint vira artefato de CI + `$GITHUB_STEP_SUMMARY`. A técnica já está no repo (`onion-review.yml` faz summary); falta aplicá-la aos workflows de TESTE, que hoje não têm nem artefato nem sumário."
@@ -71,7 +71,7 @@ nodes:
     node_type: decision
     drive_kind: execution
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.9
     label: "ONDA 0.5 — ledger dos 262 resíduos da REGRA 56, que já têm 6 campos preenchidos em 262/262. ZERO instrumentação nova. Deriva custo/retorno por rodada de IA: uma amostra real dá 6 achados por 1,9M tokens = 317k tokens por achado real — número que existe hoje e ninguém calculou."
@@ -89,7 +89,7 @@ nodes:
     node_type: decision
     drive_kind: execution
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.75
     label: "ONDA 0.7 — o painel (`docs/onion/testing-state.md`, gerado e catracado). CINCO defesas contra virar o segundo painel inventado: célula sem comando não é impressa · catraca byte-a-byte · métrica sem produtor imprime `⊘ NÃO MEDIDO` · guarda de vacuidade no gerador · o painel declara a própria idade."
@@ -255,6 +255,50 @@ nodes:
     trace: '.claude/validation/lint-selftest.sh (selftest-series caso (b))'
     label: "CLASSE NOVA, e ela generaliza a tese desta onda: a guarda de idempotencia procurava a chave `\"dia\":\"...\"` SEM espacos, e o `json.dumps` default escreve `\"dia\": \"...\"`. A guarda nunca casava — o coletor gravou o mesmo envelope duas vezes seguidas na primeira invocacao. GUARDA QUE CHECA UM FORMATO QUE O ESCRITOR NAO PRODUZ E GUARDA NENHUMA, e ela e PIOR que guarda ausente: desativa a desconfianca de quem le o codigo e ve uma verificacao ali. Irma de `exit 0 e declaracao, nao verificacao` e de `o resumo impresso tambem e declaracao` — a familia toda diz que o verificador e o verificado tem de se falar no MESMO formato. Cura: escritor compacto + o caso (b) como fixture obrigatoria."
 
+  - id: E_EVIDENCIA_DE_TERMINAL_NO_CI_LIGADA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: '2026-09-09'
+    verified_against: 'familia ci_evidence 9/9, incluindo o caso que assere que o WORKFLOW invoca o gerador'
+    trace: 'ops/testing/selftest-summary.sh + .github/workflows/onion-selftest.yml'
+    label: "ONDA 0.4 ENTREGUE — a saida da bancada e do lint viram ARTEFATO (`upload-artifact`, 30 dias) e SUMARIO (`$GITHUB_STEP_SUMMARY`) nos dois workflows de teste, com `if: always()` — a evidencia que importa e a do job que FALHOU; sem `always` o CI so guarda prova de sucesso. O gerador virou SCRIPT (`selftest-summary.sh`) e nao shell dentro do YAML, porque shell embutido em workflow e a UNICA peca do gate que nenhuma guarda exercita: nao roda local, nao entra na bancada, e so se descobre quebrada no dia em que alguem precisa dela. Como script, ganhou familia e a REGRA 59 (Modo que a producao consome e exercitado pela bancada) passa a vigiar a flag do wire-in."
+
+  - id: E_O_SUMARIO_REPORTA_NAO_JULGA
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: '2026-09-09'
+    verified_against: 'caso (f) da familia ci_evidence: sumario com falhas ainda sai 0'
+    trace: 'ops/testing/selftest-summary.sh'
+    label: "FRONTEIRA DELIBERADA: o gerador de sumario NUNCA reprova um build — sai 0 sempre que conseguiu dizer a verdade, inclusive quando a verdade e `nao foi medido`. Dois juizes para o mesmo fato criam o dia em que discordam e ninguem sabe qual vale; o veredito e do passo da bancada. E o terceiro desfecho vale aqui tambem: relatorio ausente ou sem linha TOTAL e a assinatura da bancada que morreu antes da soma, entao o sumario imprime `⊘ NAO MEDIDO` e NOMEIA a suspeita — nunca zeros. Um sumario com `0 falhas` sobre uma bancada abortada seria o painel inventado, agora no CI."
+
+  - id: E_PAINEL_GERADO_COM_CINCO_DEFESAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-09'
+    verified_against: 'familia testing_state 6/6 + dogfood: editar o .md a mao reprova REGRA 81'
+    trace: '.claude/validation/testing-state.sh + docs/onion/testing-state.md'
+    label: "ONDA 0.7 ENTREGUE — `testing-state.sh` gera `docs/onion/testing-state.md` dos produtores de 0.2-0.6, catracado pela REGRA 81 (Painel de estado e GERADO dos produtores, nunca redigido). As cinco defesas TEM FIXTURE cada uma: (1) celula sem comando nao e impressa — asserido MECANICAMENTE, toda linha com numero em negrito precisa de uma 3a coluna com crase; (2) catraca byte-a-byte, provada por dogfood; (3) `⊘ NAO MEDIDO` presente no painel real; (4) zero produtor vivo derruba o gerador (provado por mutacao); (5) declara a idade da medicao. O painel publicado hoje traz TRES `⊘` honestos — flaky com 1 execucao nao mede repeticao, e nao ha suite de teste de codigo neste repo."
+
+  - id: E_ARTEFATO_CATRACADO_NAO_IMPRIME_HOJE
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: '2026-09-09'
+    verified_against: 'caso (c) da familia testing_state trava a decisao'
+    trace: '.claude/validation/testing-state.sh'
+    label: "SUPERA A DEFESA 5 COMO O PLANO A ESCREVEU. O plano pedia `o painel declara a propria idade (data do ultimo envelope vs. HOJE)`. Um artefato com catraca byte-a-byte que imprime a data corrente MUDA TODO DIA — uma violacao HARD por dia, sem que nada tenha acontecido. Guarda que grita sem motivo treina o leitor a ignora-la, e ai ela nao serve para o dia em que o motivo existe. Entao o painel imprime a data do ULTIMO ENVELOPE (deterministica, vem do dado) e declara a CADENCIA esperada; o relogio fica com quem le e com o cron, nunca dentro do arquivo versionado. O caso (c) da bancada TRAVA isso: sem ele, alguem `conserta` a idade pondo `date +%F` no gerador e a catraca vira ruido diario. Regra geral: relogio em artefato catracado e defeito, nao feature."
+
 edges:
   - from: I_HARNESS_INVENTORY
     to: E_NUMEROS_DO_HARNESS_DIVERGEM_ENTRE_SI
@@ -331,3 +375,18 @@ edges:
   - from: E_SERIE_DA_BANCADA_EXISTE
     to: I_PAINEL_DO_ESTADO
     edge_type: SUPPORTS
+  - from: E_EVIDENCIA_DE_TERMINAL_NO_CI_LIGADA
+    to: I_EVIDENCIA_DE_TERMINAL_NO_CI
+    edge_type: SUPPORTS
+  - from: E_O_SUMARIO_REPORTA_NAO_JULGA
+    to: E_EVIDENCIA_DE_TERMINAL_NO_CI_LIGADA
+    edge_type: SUPPORTS
+  - from: E_PAINEL_GERADO_COM_CINCO_DEFESAS
+    to: I_PAINEL_DO_ESTADO
+    edge_type: SUPPORTS
+  - from: E_PAINEL_GERADO_COM_CINCO_DEFESAS
+    to: E_PAINEL_INVENTADO_E_DOC_STALE
+    edge_type: SUPPORTS
+  - from: E_ARTEFATO_CATRACADO_NAO_IMPRIME_HOJE
+    to: E_PAINEL_GERADO_COM_CINCO_DEFESAS
+    edge_type: CONSTRAINS

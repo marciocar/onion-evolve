@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**79 regras** no total — **70 HARD**, **21 SOFT**.
+**80 regras** no total — **71 HARD**, **21 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -107,6 +107,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 70 | fallbackModel do settings.json é PROJEÇÃO da escada de modelos (eixo E6) | HARD | a escada (session_models + session_floor em docs/onion/radar-baselines.yaml) e o fallback nativo do |
 | 76 | marketplace.json da raiz é projeção do gerador | HARD | .claude-plugin/marketplace.json envelhecendo calado (o core também é marketplace instalável) |
 | 80 | Números do harness saem de SSOT gerada, nunca de comentário | HARD | contagem sobre o próprio harness escrita à mão, que envelhece calada e é citada como medição |
+| 81 | Painel de estado é GERADO dos produtores, nunca redigido | HARD | painel de testes com número sem produtor — metas redesenhadas como medição, que foi o defeito real deste repo |
 
 ## KG & proveniência
 
