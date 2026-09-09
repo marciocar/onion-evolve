@@ -80,7 +80,7 @@ nodes:
     node_type: decision
     drive_kind: execution
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 0.8
     label: "ONDA 0.6 — série histórica (`selftest-runs.jsonl` + coletor), molde LITERAL do ledger GTM, inclusive quem aperta o botão: o CI não commita; o cron local escreve e o humano commita. Bônus: o `schedule: 17 4 * * *` já roda a bancada inteira todo dia — é detector de flaky pronto esperando um ledger."
@@ -222,6 +222,39 @@ nodes:
     trace: '.claude/validation/lint-selftest.sh:1121'
     label: "FLAKY COM CAUSA NOMEADA (nao 'as vezes falha'): a fixture `__mbguard__.manifest.sh` nasce na ARVORE VIVA por desenho — o caso testa o LINT, que varre o diretorio real, entao sandbox nao serviria. Sob `--jobs auto`, as familias `plugins_sync` e `moat_boundary` varrem esse MESMO diretorio ao mesmo tempo e enxergam um manifesto sem plugin correspondente: 2 falsos `plugins-sync: __mbguard__ em-sync` e 1 falso `moat-boundary: (c)`. As tres passam ISOLADAS (14/14). Agrava com pressao de memoria, que muda o escalonamento dos workers — na mesma maquina um worker foi MORTO no meio da familia e deixou a fixture orfa, e a REGRA 19 (Plugins de vertical sincronizados com as fontes) acusou um plugin que nunca deveria existir. CURA CANDIDATA, nao aplicada nesta onda: os varredores honrarem a convencao `__*__` que o .gitignore ja reserva para fixture de bancada. Nao aplicada porque muda guardas fora do escopo desta onda no fim de uma sessao longa — e mudanca no susto e o que esta casa proibe."
 
+  - id: E_SERIE_DA_BANCADA_EXISTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-09'
+    verified_against: 'primeiro envelope real coletado: 1148 pass / 0 fail / 158 familias / 905s, sha 379784d3'
+    trace: 'ops/testing/collect-selftest.sh + docs/onion/metrics/selftest-runs.jsonl'
+    label: "ONDA 0.6 ENTREGUE — `collect-selftest.sh` transforma o `--report` da bancada em um ENVELOPE por execucao em `selftest-runs.jsonl`. Modos: coleta · `--resumo` · `--flaky`. O DESENHO QUE IMPORTA: ele NAO roda a bancada, INGERE o relatorio de quem ja rodou. A bancada custa ~15 min, ja roda todo dia na main (`schedule: 17 4 * * *`) e em cada pre-commit; reinvoca-la seria o instrumento mais caro que o instrumentado — e nesta maquina isso matou dois workers por memoria em 2026-09-08. Quem aperta o botao e o humano: o script escreve, o CI nunca commita (molde literal do ledger GTM). Custo MEDIDO: 11,9 KB por envelope, ~4,3 MB/ano em execucao diaria."
+
+  - id: E_O_CAMPO_QUE_NAO_CONTAVA_O_QUE_O_NOME_DIZ
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-09'
+    verified_against: '165 linhas de relatorio para 158 familias; os 8 shards de `fixtures` somam 12x6+11x2 = 94, exatamente as 94 fixtures do manifesto'
+    trace: 'ops/testing/collect-selftest.sh (familias x linhas_relatorio)'
+    label: "O coletor nasceu com DOIS numeros meus errados, e os dois sao a classe que esta onda persegue — cometida DENTRO dela. (1) o campo `familias` contava LINHAS: a familia `fixtures` e FATIADA em 8 shards e cada shard emite a sua linha, entao 165 linhas para 158 familias. Campo cujo NOME nao e o que ele conta engana exatamente como o painel inventado. Curado em dois campos: `familias` (distintas) e `linhas_relatorio`. (2) o docstring declarava `~6 KB por envelope, ~2 MB/ano` como CUSTO MEDIDO — era estimativa minha; o arquivo real da 11,9 KB. Numero estimado apresentado como medido, num arquivo cuja razao de existir e nao fazer isso. Os dois pegos por dogfood na primeira coleta real, nao por releitura."
+
+  - id: E_IDEMPOTENCIA_CHECAVA_FORMATO_QUE_NINGUEM_ESCREVIA
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-09'
+    verified_against: 'primeira invocacao do coletor gravou o MESMO envelope 2x'
+    trace: '.claude/validation/lint-selftest.sh (selftest-series caso (b))'
+    label: "CLASSE NOVA, e ela generaliza a tese desta onda: a guarda de idempotencia procurava a chave `\"dia\":\"...\"` SEM espacos, e o `json.dumps` default escreve `\"dia\": \"...\"`. A guarda nunca casava — o coletor gravou o mesmo envelope duas vezes seguidas na primeira invocacao. GUARDA QUE CHECA UM FORMATO QUE O ESCRITOR NAO PRODUZ E GUARDA NENHUMA, e ela e PIOR que guarda ausente: desativa a desconfianca de quem le o codigo e ve uma verificacao ali. Irma de `exit 0 e declaracao, nao verificacao` e de `o resumo impresso tambem e declaracao` — a familia toda diz que o verificador e o verificado tem de se falar no MESMO formato. Cura: escritor compacto + o caso (b) como fixture obrigatoria."
+
 edges:
   - from: I_HARNESS_INVENTORY
     to: E_NUMEROS_DO_HARNESS_DIVERGEM_ENTRE_SI
@@ -282,4 +315,19 @@ edges:
     edge_type: SUPPORTS
   - from: E_FIXTURE_NA_ARVORE_VIVA_CORRE_COM_AS_FAIXAS
     to: E_BANCADA_NAO_CONTAVA_PARA_NINGUEM
+    edge_type: SUPPORTS
+  - from: E_SERIE_DA_BANCADA_EXISTE
+    to: I_SERIE_HISTORICA_DA_BANCADA
+    edge_type: SUPPORTS
+  - from: E_SERIE_DA_BANCADA_EXISTE
+    to: E_BANCADA_NAO_CONTAVA_PARA_NINGUEM
+    edge_type: SUPPORTS
+  - from: E_O_CAMPO_QUE_NAO_CONTAVA_O_QUE_O_NOME_DIZ
+    to: E_SERIE_DA_BANCADA_EXISTE
+    edge_type: SUPPORTS
+  - from: E_IDEMPOTENCIA_CHECAVA_FORMATO_QUE_NINGUEM_ESCREVIA
+    to: E_SERIE_DA_BANCADA_EXISTE
+    edge_type: SUPPORTS
+  - from: E_SERIE_DA_BANCADA_EXISTE
+    to: I_PAINEL_DO_ESTADO
     edge_type: SUPPORTS

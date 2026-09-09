@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**182 itens abertos** em 42 grafo(s) com aberto (de 64 no escopo) · 42 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**181 itens abertos** em 42 grafo(s) com aberto (de 64 no escopo) · 42 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -198,6 +198,15 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
+## testes-evidencia-2026-09 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 22.5 | `I_PAINEL_DO_ESTADO` | testes-evidencia-2026-09 | ONDA 0.7 — o painel (`docs/onion/testing-state.md`, gerado e catracado). CINCO defesas contra virar o segundo painel inventado:  |
+| 18.0 | `I_LEDGER_DOS_RESIDUOS` | testes-evidencia-2026-09 | ONDA 0.5 — ledger dos 262 resíduos da REGRA 56, que já têm 6 campos preenchidos em 262/262. ZERO instrumentação nova. Deriv |
+| 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
+| 6.8 | `I_EVIDENCIA_DE_TERMINAL_NO_CI` | testes-evidencia-2026-09 | ONDA 0.4 — a saída real da bancada e do lint vira artefato de CI + `$GITHUB_STEP_SUMMARY`. A técnica já está no repo (`onion |
+
 ## m2-bridge-logto-2026-07 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -239,16 +248,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 19.2 | `Q_WEBSEARCH_CAP_2_1_258` | websearch-cap-2026-09 | Qual e o teto de chamadas WebSearch por sessao no Claude Code 2.1.258 — a env var CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION, seu  |
-
-## testes-evidencia-2026-09 — 5 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 18.8 | `I_PAINEL_DO_ESTADO` | testes-evidencia-2026-09 | ONDA 0.7 — o painel (`docs/onion/testing-state.md`, gerado e catracado). CINCO defesas contra virar o segundo painel inventado:  |
-| 18.0 | `I_LEDGER_DOS_RESIDUOS` | testes-evidencia-2026-09 | ONDA 0.5 — ledger dos 262 resíduos da REGRA 56, que já têm 6 campos preenchidos em 262/262. ZERO instrumentação nova. Deriv |
-| 9.6 | `I_SERIE_HISTORICA_DA_BANCADA` | testes-evidencia-2026-09 | ONDA 0.6 — série histórica (`selftest-runs.jsonl` + coletor), molde LITERAL do ledger GTM, inclusive quem aperta o botão: o C |
-| 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
-| 6.8 | `I_EVIDENCIA_DE_TERMINAL_NO_CI` | testes-evidencia-2026-09 | ONDA 0.4 — a saída real da bancada e do lint vira artefato de CI + `$GITHUB_STEP_SUMMARY`. A técnica já está no repo (`onion |
 
 ## identidade-onion-vps-2026-08 — 5 item(ns)
 
