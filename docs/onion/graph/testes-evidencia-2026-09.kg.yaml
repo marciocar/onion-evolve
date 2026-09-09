@@ -299,6 +299,48 @@ nodes:
     trace: '.claude/validation/testing-state.sh'
     label: "SUPERA A DEFESA 5 COMO O PLANO A ESCREVEU. O plano pedia `o painel declara a propria idade (data do ultimo envelope vs. HOJE)`. Um artefato com catraca byte-a-byte que imprime a data corrente MUDA TODO DIA — uma violacao HARD por dia, sem que nada tenha acontecido. Guarda que grita sem motivo treina o leitor a ignora-la, e ai ela nao serve para o dia em que o motivo existe. Entao o painel imprime a data do ULTIMO ENVELOPE (deterministica, vem do dado) e declara a CADENCIA esperada; o relogio fica com quem le e com o cron, nunca dentro do arquivo versionado. O caso (c) da bancada TRAVA isso: sem ele, alguem `conserta` a idade pondo `date +%F` no gerador e a catraca vira ruido diario. Regra geral: relogio em artefato catracado e defeito, nao feature."
 
+  - id: E_DOC_AFIRMA_ESTADO_QUE_O_VIVO_DESMENTE
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-09'
+    verified_against: 'quatro instancias medidas: painel inventado, maintenance-checklist, verified_against de dois nos de agosto'
+    trace: 'docs/onion/graph/testes-evidencia-2026-09.kg.yaml'
+    label: "CLASSE, com QUATRO instancias medidas e nenhuma inventada. (1) `testing-validation-system.md` publicava `Coverage: 85% · Mutation: 74%` sem produtor — metas redesenhadas como medicao. (2) `maintenance-checklist.md` dizia a REGRA 59 (Modo que a producao consome e exercitado pela bancada) DESLIGADA; esta ligada, HARD, 40 pares, 0 sem teste — e enganou uma exploracao desta casa ANTES de enganar qualquer humano. (3) o `verified_against` de `E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO` cita `0 e 0 violacoes`; o lint do main hoje sai com 2 HARD + 24 SOFT por razoes alheias ao que o no prova — quem lesse sem re-medir concluiria `o lint esta limpo`. (4) o `trace` de `E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE` cita l.205-211 de um script que cresceu para 254 linhas. O PADRAO: nenhuma das quatro e mentira; TODAS foram verdade quando escritas. Defasagem engana por mais tempo que ficcao, porque um dia foi verdade e ninguem tem motivo para desconfiar. A cura nao e escrever melhor — e o carimbo VENCER (REGRA 67) e a re-medicao ser barata."
+
+  - id: E_O_SCHEMA_DO_KG_FRESHNESS_NAO_RODA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-09'
+    verified_against: 'os 16 workers da 1a tentativa de R0 morreram todos com API Error 400'
+    trace: '.claude/commands/meta/kg-freshness.md'
+    label: "O comando `/meta:kg-freshness`, COMO DOCUMENTADO, NAO EXECUTA. Os 16 workers da 1a tentativa de R0 morreram com `API Error: 400 tools.custom.input_schema: input_schema does not support oneOf, allOf, or anyOf at the top level`. As TRES guardas condicionais que a doutrina do comando chama de load-bearing — escritas em 2026-08-12 depois de um defeito real — nao podem ser expressas num tool schema. A cura ja estava escrita no proprio doc, uma secao adiante: `JSON Schema nao compara duas propriedades entre si... a promessa so se cumpre no FAN-IN, em JS, custo 0 tokens`. Valia para a cobertura; vale para as tres. Ironia util: o documento continha o diagnostico e a cura, e mesmo assim prescrevia a forma que nao roda — declarado x verificado, dentro do comando que existe para separar os dois."
+
+  - id: E_AS_GUARDAS_DO_FANIN_SAO_LOAD_BEARING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-09'
+    verified_against: 'R0 run wf_5b2f274e-83d: 16 workers, 5 rebaixamentos no fan-in'
+    trace: '/tmp/claude-1000/r0/final.json'
+    label: "MEDIDO, nao suposto: dos 16 nos do R0, os workers declararam 9 CONFIRMED / 6 DRIFTED / 1 UNVERIFIABLE; apos o fan-in vale 6 / 4 / 6. CINCO rebaixamentos, um TERCO da amostra. Quatro por G1 (veredito positivo COM `blocked_by` preenchido — dizer `nao consegui medir isto` e `esta confirmado` na mesma respiracao) e um por G2: `E_MEDICAO_NAO_OBSERVADA_ERA_MINHA` declarou CONFIRMED tendo medido 5 de 6 afirmacoes, que e LITERALMENTE o defeito de 2026-08-12 que criou a guarda, reproduzido. Sem o fan-in, 5 nos receberiam carimbo indevido. E a prova pratica de que CONFIRMED e o desfecho para onde um worker escorrega: e o unico que nao pede justificativa."
+
+  - id: Q_BLOCKED_BY_ESTA_SOBRECARREGADO
+    node_type: question
+    drive_kind: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUARDAS_COERENTES` mediu 3/3 TOTAL e escreveu em `blocked_by`: `Nenhum bloqueio de acesso — toda medicao foi read-only. O unico nao-medido: nao reexecutei o workflow completo`. Isso e RESSALVA, nao impedimento. O schema do worker nao tem onde por uma ressalva que nao bloqueia, entao ela vaza para o campo que rebaixa. E a MESMA classe do `verdict` dos 262 residuos, que virava frase inteira por falta de um campo `nota:` — e a cura la foi partir o campo. Pergunta ao maestro: o contrato do worker ganha um `caveat:` (ressalva que NAO rebaixa) alem do `blocked_by` (impedimento que rebaixa)? Se sim, os quatro nos rebaixados por G1 merecem re-medicao com o contrato novo antes de qualquer carimbo."
+
 edges:
   - from: I_HARNESS_INVENTORY
     to: E_NUMEROS_DO_HARNESS_DIVERGEM_ENTRE_SI
@@ -390,3 +432,12 @@ edges:
   - from: E_ARTEFATO_CATRACADO_NAO_IMPRIME_HOJE
     to: E_PAINEL_GERADO_COM_CINCO_DEFESAS
     edge_type: CONSTRAINS
+  - from: E_DOC_AFIRMA_ESTADO_QUE_O_VIVO_DESMENTE
+    to: E_PAINEL_INVENTADO_E_DOC_STALE
+    edge_type: SUPPORTS
+  - from: E_AS_GUARDAS_DO_FANIN_SAO_LOAD_BEARING
+    to: E_O_SCHEMA_DO_KG_FRESHNESS_NAO_RODA
+    edge_type: SUPPORTS
+  - from: Q_BLOCKED_BY_ESTA_SOBRECARREGADO
+    to: E_AS_GUARDAS_DO_FANIN_SAO_LOAD_BEARING
+    edge_type: DEPENDS_ON

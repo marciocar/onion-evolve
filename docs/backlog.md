@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**178 itens abertos** em 42 grafo(s) com aberto (de 64 no escopo) · 42 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**179 itens abertos** em 42 grafo(s) com aberto (de 64 no escopo) · 42 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -301,10 +301,11 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
-## testes-evidencia-2026-09 — 1 item(ns)
+## testes-evidencia-2026-09 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
+| 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
 | 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
 
 ## federation-health-2026-07 — 1 item(ns)

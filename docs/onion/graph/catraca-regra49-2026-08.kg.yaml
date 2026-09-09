@@ -152,7 +152,7 @@ nodes:
   - id: E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO
     node_type: evidence
     plane: PROD
-    status: confirmed
+    status: superseded
     impact: 5
     confidence: 1.0
     verified_at: 2026-08-08
@@ -185,7 +185,7 @@ nodes:
   - id: C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA
     node_type: claim
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 4
     confidence: 0.9
     verified_at: 2026-08-08
@@ -300,8 +300,8 @@ nodes:
     impact: 4
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-24
-    verified_against: "medido por comportamento no /meta:adopt --update da granaai (2026-08-24, via fork em worktree isolado): o merge de onion/vendor traz o baseline do core (merge=union) com 47 chaves onion-pessoal-marcio ao HEAD da develop; regen-baselines --filter filtra o WORKING TREE (47→0), mas kg-verificacao/REMOVIDO le o baseline do HEAD COMMITTADO (git show HEAD:baseline, 47) vs o working (0) e classifica a filtragem como no-removido-sem-aposentar → 47 HARD. Os ARQUIVOS onion-pessoal NAO vazaram (0 na granaai antes e depois). Roll back limpo, granaai intocada."
+    verified_at: '2026-09-09'
+    verified_against: 'R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d): grep -n -A25 "id: E_UPDATE_FILTER_REMOVIDO_COLLISION" docs/onion/graph/catraca-regra49-2026-08.kg.yaml; sed -n 140,200p .claude/utils/adopt/vendor-b'
     label: "BUG de mecanismo no --update de adotante NAO-greenfield: regen-baselines (filtra divida estrangeira no working) COLIDE com kg-verificacao/REMOVIDO (compara contra o HEAD committado, que o merge deixou nao-filtrado) → 47 HARD sobre nos que o adotante NUNCA teve. Greenfield (PoC) nao bate (sem baseline prévio); regulado-com-historia (granaai) bate"
   - id: D_CURE_AMEND_FILTERED_BASELINE_INTO_MERGE
     node_type: decision
@@ -427,6 +427,28 @@ nodes:
     verified_at: 2026-09-01
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 4/4 — git log --oneline -- .claude/validation/kg-verification-baseline.txt (achei 88099af3 e e86'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A premissa central ("toda a evidência é sintética"; "o laço nunca executou no corpus real, nem uma vez") está morta: 3 dogfoods reais já ocorreram desde 2026-08-08 — REMOVIDO (08-24, <membro>), CARIMBADO (08-27, D_linha_vermelha) e mais 13 saídas medidas (09-01) — todos registrados NO PRÓPRIO grafo '
+
+  - id: E_A_DISCIPLINA_VIROU_MECANISMO_DE_PAINEL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: '2026-09-09'
+    verified_against: "grep do texto `comando que a produziu` em testing-validation-system.md:499-501 e framework-testes.md:633-637, medido 2026-09-09"
+    trace: 'docs/onion/testing-validation-system.md'
+    label: "R0 2026-09-09 — a regra pratica que este no documentou NASCENDO como disciplina manual de sessao (2026-08-08, 'rode o comando antes de agir sobre a nota') foi GENERALIZADA E MECANIZADA em 2026-09-08 como norma de painel: 'nenhuma celula e impressa sem o comando que a produziu ao lado; metrica sem produtor imprime NAO MEDIDO'. Os dois exemplos do no seguem verificaveis e batem com o vivo — a branch feat/maestro-aside de fato nao existe mais, e fix-revisor-invisivel.md confirma verbatim a premissa medida como falsa. O no nao errou; ele descreve a ORIGEM, e hoje a regra e estrutural, exigida de qualquer painel novo."
+
+  - id: E_A_CURA_DO_GIT_DIR_VIVE_MAS_O_LINT_DO_MAIN_NAO_ESTA_LIMPO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-09'
+    verified_against: 'lint-artifacts.sh rodado com e sem GIT_DIR, diff das violacoes VAZIO; contagem do main hoje, medido 2026-09-09'
+    trace: '.claude/validation/lint-artifacts.sh (_gen_into)'
+    label: "R0 2026-09-09 — o NUCLEO do no CONFIRMA-SE: com e sem GIT_DIR o lint produz a MESMA lista de violacoes (diff vazio), entao `_gen_into` de fato neutraliza o efeito de GIT_DIR sobre a deteccao de toplevel. O que ficou obsoleto e o `verified_against`, que cita literalmente '0 e 0 violacoes': o lint do main hoje sai com 2 HARD + 24 SOFT, por motivos ALHEIOS ao GIT_DIR (REGRA 19 plugins fora de sincronia, REGRA 49 baseline, REGRA 65 versao do Claude Code, REGRAS 74/77/78). E crescimento de 5 semanas de vida do repo, nao regressao do defeito que o no refuta — mas quem lesse o no sem re-medir concluiria 'o lint do main esta limpo', o que ja nao e verdade."
 
 edges:
   # o defeito e a forma da cura
@@ -569,4 +591,10 @@ edges:
     edge_type: SUPERSEDES
   - from: E_CENSO0901_Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_
     to: Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES
+    edge_type: SUPERSEDES
+  - from: E_A_DISCIPLINA_VIROU_MECANISMO_DE_PAINEL
+    to: C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA
+    edge_type: SUPERSEDES
+  - from: E_A_CURA_DO_GIT_DIR_VIVE_MAS_O_LINT_DO_MAIN_NAO_ESTA_LIMPO
+    to: E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO
     edge_type: SUPERSEDES
