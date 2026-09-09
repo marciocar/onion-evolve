@@ -141,6 +141,11 @@ HOJE="$(date +%F)"
 AGORA="$(date -Is)"
 SHA="$(git -C "${ROOT}" rev-parse HEAD 2>/dev/null || echo 'nao-declarado')"
 BRANCH="$(git -C "${ROOT}" rev-parse --abbrev-ref HEAD 2>/dev/null || echo 'nao-declarado')"
+# ÁRVORE SUJA — o `sha` sozinho MENTE por omissão. Um envelope que diz `sha: abc1234` sobre uma
+# árvore com mudanças não-commitadas afirma ter medido um commit que não foi o que rodou; duas
+# execuções do MESMO sha podem então divergir legitimamente, e quem lê a série conclui flaky
+# onde havia edição. Medido no 1º envelope real desta casa, em 2026-09-09.
+if git -C "${ROOT}" diff --quiet HEAD 2>/dev/null; then DIRTY=false; else DIRTY=true; fi
 
 mkdir -p "${OUT}"
 
@@ -154,10 +159,11 @@ if [ -f "${LEDGER}" ] && grep -q "\"dia\":\"${HOJE}\",\"source\":\"${SOURCE}\",\
 fi
 
 python3 - "${REPORT}" "${LEDGER}" "${HOJE}" "${AGORA}" "${SOURCE}" "${SHA}" "${BRANCH}" \
-         "${JOBS}" "${STRICT}" "${RUN_URL}" <<'PY'
+         "${JOBS}" "${STRICT}" "${RUN_URL}" "${DIRTY}" <<'PY'
 import json, sys
 
-rep, ledger, hoje, agora, source, sha, branch, jobs, strict, run_url = sys.argv[1:11]
+rep, ledger, hoje, agora, source, sha, branch, jobs, strict, run_url, _dirty = sys.argv[1:12]
+dirty = (_dirty == 'true')
 
 fams, total = [], None
 with open(rep, encoding='utf-8') as fh:
@@ -195,7 +201,7 @@ if soma != total['pass']:
 
 env = {
     "dia": hoje, "source": source, "sha": sha,          # a chave de idempotência, nesta ordem
-    "ts": agora, "branch": branch,
+    "ts": agora, "branch": branch, "dirty": dirty,
     "jobs": jobs, "strict": strict, "run_url": run_url or "nao-declarado",
     "pass": total['pass'], "fail": total['fail'], "skip": total['skip'],
     "segundos": total['segundos'],

@@ -77,4 +77,33 @@ jobs:
           ONION_SELFTEST_STRICT: '1'
         # --jobs auto: faixa paralela (D_BANCADA_FAIXAS_E_MAPA, 2026-09-03) — cada worker é um
         # processo --child com o mesmo cabeçalho; worker sem trailer de soma = FALHA no pai.
-        run: bash .claude/validation/lint-selftest.sh --jobs auto
+        # --report: o resultado passa a existir FORA do log (ONDA 0.2). `tee` guarda a saída
+        # bruta como artefato — o log do job expira e leva junto a única evidência de por que
+        # uma guarda reprovou.
+        run: |
+          set -o pipefail
+          bash .claude/validation/lint-selftest.sh --jobs auto \
+            --report "${GITHUB_WORKSPACE}/selftest-report.tsv" 2>&1 | tee selftest.log
+
+      # `if: always()` NOS DOIS PASSOS ABAIXO É O PONTO INTEIRO: a evidência que importa é a do
+      # job que FALHOU. Sem isso, o CI só guarda prova de sucesso — e prova de sucesso não
+      # ajuda ninguém a consertar nada.
+      - name: Sumário legível no job (a bancada conta o que fez)
+        if: always()
+        run: |
+          bash ops/testing/selftest-summary.sh \
+            --report "${GITHUB_WORKSPACE}/selftest-report.tsv" \
+            --titulo "Auto-teste das guardas" \
+            --run-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
+            >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Evidência de terminal como artefato
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: selftest-evidence-${{ github.run_id }}
+          path: |
+            selftest.log
+            selftest-report.tsv
+          if-no-files-found: warn
+          retention-days: 30

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # review-ledger.sh — o que as 262 rodadas de revisão adversarial CUSTARAM e DEVOLVERAM.
 #
-# Uso: bash .claude/validation/review-ledger.sh [--tsv|--resumo|--json] [--dir <path>]
+# Uso: bash .claude/validation/review-ledger.sh [--tsv|--resumo|--json|--env] [--dir <path>]
 #   0 = leu · 2 = uso inválido, diretório ausente ou ZERO resíduos (nunca "0 achados" por vacuidade)
 #
 # POR QUE EXISTE (medido 2026-09-08)
@@ -24,7 +24,7 @@ set -uo pipefail
 DIR="docs/evolution/review"; MODE="--resumo"
 while [ $# -gt 0 ]; do
   case "$1" in
-    --tsv|--resumo|--json) MODE="$1" ;;
+    --tsv|--resumo|--json|--env) MODE="$1" ;;
     --dir) shift; DIR="${1:-}" ;;
     -h|--help) sed -n '2,6p' "$0"; exit 0 ;;
     *) echo "review-ledger: argumento desconhecido '$1'" >&2; exit 2 ;;
@@ -75,6 +75,14 @@ if mode == "--tsv":
 if mode == "--json":
     print(json.dumps({"residuos": linhas, "incompletos": incompletos}, ensure_ascii=False, indent=2))
     sys.exit(0)
+
+# `--env` reusa TODO o cálculo do modo humano e só troca a apresentação. A saída humana é uma
+# sequência longa de prints; silenciá-la por REDIRECIONAMENTO é preferível a passar um flag por
+# quarenta chamadas — menos sítios para uma delas escapar e vazar prosa no meio do KEY=VALUE.
+_stdout_real = None
+if mode == "--env":
+    import io
+    _stdout_real, sys.stdout = sys.stdout, io.StringIO()
 
 tot = len(linhas)
 # ⚠️ TRÊS ESTADOS, e a 1ª versão deste script tinha DOIS — o defeito que ele existe para caçar,
@@ -160,4 +168,26 @@ if incompletos:
     print(f"\n  ⚠ resíduos com campo ausente (não entram na conta, e por isso aparecem):")
     for a, f in incompletos[:8]:
         print(f"     {a[:52]:<52} falta: {','.join(f)}")
+
+if mode == "--env":
+    # KEY=VALUE para o PAINEL. Existe pelo mesmo motivo do `rules-registry --counts`: a
+    # alternativa era o painel reparsear a saída HUMANA deste script — texto alinhado, com
+    # acento e ⊘. Segundo parser sobre a mesma população é a divergência que esta onda cura.
+    #
+    # ⚠️ `PRECISAO_PCT` usa `{100*fr/ft:.0f}` — a MESMA expressão da linha humana, de propósito.
+    # A 1ª versão usava `//` (piso) e imprimia 82 enquanto o modo humano imprimia 83, sobre os
+    # mesmos 1099/1331. Dois números para o mesmo fato, no mesmo arquivo, separados por uma
+    # barra: é a classe inteira desta onda, cometida em dez linhas de código.
+    sys.stdout = _stdout_real
+    print(f"R56_RESIDUOS={tot}")
+    print(f"R56_COM_TOKENS={len(linhas) - len(zerados)}")
+    print(f"R56_ACHADOS={ft}")
+    print(f"R56_ACHADOS_REAIS={fr}")
+    print(f"R56_PRECISAO_PCT={format(100*fr/ft, '.0f') if ft else 0}")
+    print(f"R56_TOKENS={tk}")
+    print(f"R56_MINUTOS={mi}")
+    print(f"R56_TOKENS_POR_ACHADO_REAL={(tk//fr) if fr else 0}")
+    print(f"R56_VOCAB_OK={n_canon}")
+    print(f"R56_VOCAB_LEGADO={n_legado}")
+    sys.exit(0)
 PY

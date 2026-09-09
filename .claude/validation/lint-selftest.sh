@@ -142,7 +142,7 @@ SELFTEST_CHILD="${ONION_SELFTEST_CHILD:-0}"; SELFTEST_AFFECTED=(); SELFTEST_AFFE
 SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHARD:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry"
+SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -11558,6 +11558,157 @@ PYI
 }
 _family run_selftest_lanes_selftests
 
+# ── testing_state — O PAINEL (ONDA 0.7) ──────────────────────────────────────────────────────
+#
+#  As cinco defesas contra virar o SEGUNDO painel inventado não são cerimônia: o cadáver do
+#  primeiro está no git (`Coverage: 85% · Mutation: 74%`, zero produtores, meses no ar). Cada
+#  caso aqui é a fixture de uma delas.
+run_testing_state_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/testing-state.sh"
+  if [ ! -f "${sut}" ]; then record_skip "testing-state: gerador ausente (SUT não exercido)"; return; fi
+  local out rc
+
+  # (a) DEFESA 1 — toda célula impressa carrega o COMANDO que a produz. Asserção MECÂNICA, não
+  #     visual: cada linha de tabela com valor em negrito tem de ter uma terceira coluna com
+  #     crase. É o que teria impedido `Coverage: 85%` de nascer — ninguém escreve o comando de
+  #     um número que não mediu.
+  out="$(bash "${sut}" --markdown 2>&1)" || { record_fail "testing-state: (a) gerador" "não rodou: ${out}"; return; }
+  local sem_produtor
+  sem_produtor="$(grep -E '^\| .* \| \*\*[^*]+\*\* \|' <<< "${out}" | grep -vc '`' || true)"
+  if [ "${sem_produtor}" = "0" ]; then
+    record_pass "testing-state: (a) toda célula com número carrega o COMANDO ao lado (defesa 1)"
+  else record_fail "testing-state: (a) célula sem produtor" "${sem_produtor} célula(s) com número e SEM comando — é assim que o painel inventado nasce"; fi
+
+  # (b) DEFESA 3 — o terceiro desfecho existe no painel real. Hoje há seções genuinamente não
+  #     medidas (flaky com poucas execuções, cobertura de código inexistente); se um dia
+  #     nenhuma `⊘` aparecer, ou o repo mede tudo, ou o painel voltou a inventar.
+  if grep -q '⊘ \*\*NÃO MEDIDO\*\*' <<< "${out}"; then
+    record_pass "testing-state: (b) o painel imprime ⊘ NÃO MEDIDO onde não mediu (defesa 3)"
+  else record_fail "testing-state: (b) terceiro desfecho" "nenhum ⊘ no painel — ou o repo passou a medir TUDO, ou voltou a inventar"; fi
+
+  # (c) DEFESA 5 — o painel declara a idade da medição SEM imprimir "hoje". Artefato catracado
+  #     que carrega a data corrente produz uma HARD por dia sem que nada aconteça, e guarda que
+  #     grita sem motivo ensina a ser ignorada. Este caso trava a decisão: sem ele, alguém
+  #     "conserta" a idade pondo `date +%F` no gerador e a catraca vira ruído diário.
+  local hoje; hoje="$(date +%F)"
+  if grep -q 'última medição:' <<< "${out}" && ! grep -q "hoje.*${hoje}\|${hoje}.*hoje" <<< "${out}"; then
+    record_pass "testing-state: (c) declara a data da MEDIÇÃO e NÃO imprime 'hoje' (defesa 5 sem catraca-ruído)"
+  else record_fail "testing-state: (c) idade" "o painel imprime a data corrente — a catraca passaria a reprovar todo dia por nada"; fi
+
+  # (d) DEFESA 4 (MUT) — zero produtor vivo derruba o gerador. Painel vazio E catracado é pior
+  #     que painel nenhum: vira verde por vacuidade, o modo de falha que esta casa mais paga.
+  local mut; mut="$(mktemp -d)"
+  cp "${sut}" "${mut}/m.sh"
+  sed -i 's/^VIVOS=0$/VIVOS=0; _FORCA_VAZIO=1/' "${mut}/m.sh"
+  sed -i 's|^if HARNESS_ENV=.*|if [ -z "${_FORCA_VAZIO:-}" ] \&\& HARNESS_ENV="$(bash "${SCRIPT_DIR}/harness-inventory.sh" --env 2>/dev/null)"; then|' "${mut}/m.sh"
+  sed -i 's|^if R56_ENV=.*|if [ -z "${_FORCA_VAZIO:-}" ] \&\& R56_ENV="$(bash "${SCRIPT_DIR}/review-ledger.sh" --env 2>/dev/null)"; then|' "${mut}/m.sh"
+  sed -i 's|^if \[ -f "${LEDGER}" \] && \[ -s "${LEDGER}" \]; then|if [ -z "${_FORCA_VAZIO:-}" ] \&\& [ -f "${LEDGER}" ] \&\& [ -s "${LEDGER}" ]; then|' "${mut}/m.sh"
+  if grep -q '_FORCA_VAZIO=1' "${mut}/m.sh"; then
+    rc=0; out="$(bash "${mut}/m.sh" --markdown 2>&1)" || rc=$?
+    if [ "${rc}" -eq 2 ] && grep -qi 'vacui' <<< "${out}"; then
+      record_pass "testing-state: (d) zero produtor vivo → exit 2 nomeando VACUIDADE (defesa 4), não painel vazio"
+    else record_fail "testing-state: (d) vacuidade" "esperava rc=2 nomeando vacuidade; rc=${rc} out=$(head -c 200 <<< "${out}")"; fi
+  else
+    record_fail "testing-state: (d) vacuidade" "a mutação NÃO foi aplicada — o teste não prova nada"
+  fi
+  rm -rf "${mut}"
+
+  # (e) arg desconhecido → exit 2 (não cai no default calado).
+  rc=0; bash "${sut}" --nao-existe >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then
+    record_pass "testing-state: (e) arg desconhecido → exit 2"
+  else record_fail "testing-state: (e) arg" "esperava 2, veio ${rc}"; fi
+
+  # (f) O PAINEL DECLARA O QUE NÃO MEDE. Sem esta seção, a ausência de uma linha sobre cobertura
+  #     de código é lida como "não é problema" em vez de "não existe suíte". Ausência silenciosa
+  #     é a forma mais barata de mentir num painel.
+  out="$(bash "${sut}" --markdown 2>&1)"
+  if grep -q 'NÃO mede' <<< "${out}" && grep -q 'Cobertura de código' <<< "${out}"; then
+    record_pass "testing-state: (f) o painel declara o que NÃO mede (ausência nomeada, não silenciosa)"
+  else record_fail "testing-state: (f) fronteiras" "sem a seção de não-medidos, a ausência vira 'sem problema'"; fi
+}
+
+# ── ci_evidence — o SUMÁRIO do CI (ONDA 0.4) ─────────────────────────────────────────────────
+#
+#  O gerador do `$GITHUB_STEP_SUMMARY` virou SCRIPT justamente para caber aqui. Shell embutido
+#  em YAML é a única peça do gate que nenhuma guarda exercita: não roda local, não entra na
+#  bancada, e só se descobre que quebrou no dia em que alguém precisa dele para entender uma
+#  falha — e encontra o bloco vazio.
+run_ci_evidence_selftests() {
+  local sut="${REPO_ROOT}/ops/testing/selftest-summary.sh"
+  if [ ! -f "${sut}" ]; then record_skip "ci-evidence: gerador de sumário ausente (SUT não exercido)"; return; fi
+  local d out rc
+  d="$(mktemp -d)"
+
+  # (a) VERDE: a tabela sai com os números do relatório, e nenhum deles é digitado.
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\nbeta\t5\t0\t0\t9\nTOTAL\t12\t0\t0\t12\n' > "${d}/ok.tsv"
+  rc=0; out="$(bash "${sut}" --report "${d}/ok.tsv" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q '✅' <<< "${out}" && grep -q '| \*\*12\*\* |' <<< "${out}" \
+     && grep -q 'Nenhuma família falhou' <<< "${out}"; then
+    record_pass "ci-evidence: (a) relatório verde → tabela com a soma e o ícone ✅"
+  else record_fail "ci-evidence: (a) verde" "rc=${rc} out=${out}"; fi
+
+  # (b) VERMELHO: o sumário tem de NOMEAR quem falhou. Um sumário que só diz "2 falhas" obriga
+  #     quem lê a abrir o log — e o log é justamente o que expira.
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\nbeta\t3\t2\t0\t9\nTOTAL\t10\t2\t0\t12\n' > "${d}/red.tsv"
+  rc=0; out="$(bash "${sut}" --report "${d}/red.tsv" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q '❌' <<< "${out}" && grep -q '`beta` — 2 falha' <<< "${out}"; then
+    record_pass "ci-evidence: (b) falha → o sumário NOMEIA a família (não obriga a abrir o log que expira)"
+  else record_fail "ci-evidence: (b) vermelho" "rc=${rc} out=${out}"; fi
+
+  # (c) ⊘ NÃO MEDIDO — o caso que motivou o script. Relatório ausente é a assinatura da bancada
+  #     que morreu antes da soma; imprimir "0 falhas" aqui seria o painel inventado, no CI.
+  rc=0; out="$(bash "${sut}" --report "${d}/nao-existe.tsv" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q '⊘' <<< "${out}" && grep -q 'NÃO MEDIDO' <<< "${out}" \
+     && ! grep -qE '\| \*\*0\*\* \|' <<< "${out}"; then
+    record_pass "ci-evidence: (c) relatório ausente → ⊘ NÃO MEDIDO e NENHUM zero impresso"
+  else record_fail "ci-evidence: (c) ausente" "rc=${rc} out=${out}"; fi
+
+  # (d) relatório SEM `TOTAL` → mesmo tratamento, com a suspeita NOMEADA (abortou antes da soma).
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\n' > "${d}/semtotal.tsv"
+  rc=0; out="$(bash "${sut}" --report "${d}/semtotal.tsv" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'abortou antes da soma' <<< "${out}"; then
+    record_pass "ci-evidence: (d) relatório sem TOTAL → ⊘ nomeando 'abortou antes da soma'"
+  else record_fail "ci-evidence: (d) sem TOTAL" "rc=${rc} out=${out}"; fi
+
+  # (e) A SOMA QUE NÃO FECHA é DENUNCIADA no próprio sumário. Sem isto, um relatório truncado
+  #     produziria uma tabela bonita com um total que nenhuma parte sustenta.
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\nTOTAL\t999\t0\t0\t3\n' > "${d}/naofecha.tsv"
+  rc=0; out="$(bash "${sut}" --report "${d}/naofecha.tsv" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'A SOMA NÃO FECHA' <<< "${out}" && grep -q '999' <<< "${out}"; then
+    record_pass "ci-evidence: (e) TOTAL que não bate com as partes → o sumário DENUNCIA no próprio bloco"
+  else record_fail "ci-evidence: (e) soma" "rc=${rc} out=${out}"; fi
+
+  # (f) ELE REPORTA, NÃO JULGA. Mesmo com falhas, sai 0: o veredito é do passo da bancada. Dois
+  #     juízes para o mesmo fato criam o dia em que discordam e ninguém sabe qual vale.
+  rc=0; bash "${sut}" --report "${d}/red.tsv" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "ci-evidence: (f) sumário com falhas ainda sai 0 — ele REPORTA, quem julga é a bancada"
+  else record_fail "ci-evidence: (f) fronteira" "saiu ${rc} — o gerador estaria julgando o build junto com a bancada"; fi
+
+  # (g) arg desconhecido → exit 2 (não cai num default calado).
+  rc=0; bash "${sut}" --nao-existe >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then
+    record_pass "ci-evidence: (g) arg desconhecido → exit 2"
+  else record_fail "ci-evidence: (g) arg" "esperava 2, veio ${rc}"; fi
+
+  # (h) O WORKFLOW CHAMA ESTE SCRIPT DE VERDADE. Sem esta asserção, o gerador poderia estar
+  #     perfeito e desligado — que é a forma mais cara de guarda: passa na bancada e não roda.
+  local wf="${REPO_ROOT}/.github/workflows/onion-selftest.yml"
+  if [ -f "${wf}" ] && grep -q 'ops/testing/selftest-summary.sh' "${wf}" \
+     && grep -q 'GITHUB_STEP_SUMMARY' "${wf}" && grep -q 'upload-artifact' "${wf}"; then
+    record_pass "ci-evidence: (h) o workflow da bancada de fato INVOCA o gerador, escreve no STEP_SUMMARY e sobe artefato"
+  else record_fail "ci-evidence: (h) wire-in" "o gerador existe mas o workflow não o chama — guarda perfeita e desligada"; fi
+
+  # (i) `if: always()` nos passos de evidência. É o ponto inteiro: a evidência que importa é a
+  #     do job que FALHOU. Sem always, o CI só guarda prova de sucesso.
+  if [ -f "${wf}" ] && [ "$(grep -c 'if: always()' "${wf}")" -ge 2 ]; then
+    record_pass "ci-evidence: (i) os passos de evidência têm 'if: always()' — o CI guarda prova de FALHA, não só de sucesso"
+  else record_fail "ci-evidence: (i) always" "menos de 2 'if: always()' no workflow — a evidência sumiria justo quando é necessária"; fi
+
+  rm -rf "${d}"
+}
+
 # ── selftest_series — a SÉRIE HISTÓRICA da bancada (ONDA 0.6) ────────────────────────────────
 #
 #  O coletor NÃO roda a bancada: ingere o `--report` de quem já rodou. Logo os casos aqui são
@@ -11606,6 +11757,20 @@ run_selftest_series_selftests() {
      && grep -q '"pass":30' "${led}"; then
     record_pass "selftest-series: (a2) família fatiada em shards conta 1 família e 3 linhas — o campo diz o que conta"
   else record_fail "selftest-series: (a2) shard" "rc=${rc} out=${out} ledger=$(head -c 260 "${led}" 2>/dev/null)"; fi
+  rm -rf "${sb}"
+
+  # (a3) O ENVELOPE DECLARA SE A ÁRVORE ESTAVA SUJA. O `sha` sozinho mente por omissão: um
+  #      envelope que diz `sha: abc1234` sobre uma árvore com mudanças não-commitadas afirma ter
+  #      medido um commit que não foi o que rodou. Duas execuções do MESMO sha podem então
+  #      divergir legitimamente, e quem lê a série conclui FLAKY onde houve edição — o detector
+  #      passaria a inventar a categoria que ele existe para medir.
+  _mk_series_sb
+  rep="${sb}/r.tsv"
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\nTOTAL\t7\t0\t0\t3\n' > "${rep}"
+  bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local >/dev/null 2>&1
+  if grep -qE '"dirty":(true|false)' "${led}"; then
+    record_pass "selftest-series: (a3) o envelope declara \`dirty\` — o sha sozinho mentiria por omissão"
+  else record_fail "selftest-series: (a3) dirty" "envelope sem o campo: $(head -c 240 "${led}" 2>/dev/null)"; fi
   rm -rf "${sb}"
 
   # (b) IDEMPOTÊNCIA — e este caso é a FIXTURE OBRIGATÓRIA do defeito que o motivou. Na 1ª
@@ -11726,6 +11891,8 @@ run_review_ledger_selftests() {
   else record_fail "review-ledger: (d) --tsv" "linhas=${n} esperado=${tot} células vazias=${vazias}"; fi
   rm -rf "${d}"
 }
+_family run_testing_state_selftests
+_family run_ci_evidence_selftests
 _family run_selftest_series_selftests
 _family run_review_ledger_selftests
 

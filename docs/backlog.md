@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**181 itens abertos** em 42 grafo(s) com aberto (de 64 no escopo) · 42 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**178 itens abertos** em 42 grafo(s) com aberto (de 64 no escopo) · 42 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -198,15 +198,6 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## testes-evidencia-2026-09 — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 22.5 | `I_PAINEL_DO_ESTADO` | testes-evidencia-2026-09 | ONDA 0.7 — o painel (`docs/onion/testing-state.md`, gerado e catracado). CINCO defesas contra virar o segundo painel inventado:  |
-| 18.0 | `I_LEDGER_DOS_RESIDUOS` | testes-evidencia-2026-09 | ONDA 0.5 — ledger dos 262 resíduos da REGRA 56, que já têm 6 campos preenchidos em 262/262. ZERO instrumentação nova. Deriv |
-| 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
-| 6.8 | `I_EVIDENCIA_DE_TERMINAL_NO_CI` | testes-evidencia-2026-09 | ONDA 0.4 — a saída real da bancada e do lint vira artefato de CI + `$GITHUB_STEP_SUMMARY`. A técnica já está no repo (`onion |
-
 ## m2-bridge-logto-2026-07 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -309,6 +300,12 @@
 | 7.5 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
+
+## testes-evidencia-2026-09 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
 
 ## federation-health-2026-07 — 1 item(ns)
 

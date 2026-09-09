@@ -71,7 +71,53 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Executar linter determinístico de artefatos Onion
-        run: bash .claude/validation/lint-artifacts.sh
+        # `tee` porque o log do job EXPIRA e leva junto a única evidência de por que uma regra
+        # reprovou. `pipefail` porque sem ele o rc seria o do `tee` — sempre 0 — e o gate
+        # passaria a aprovar tudo em silêncio. É a classe `exit 0 é declaração, não verificação`
+        # aplicada ao próprio encanamento do CI.
+        run: |
+          set -o pipefail
+          bash .claude/validation/lint-artifacts.sh 2>&1 | tee lint-artifacts.log
+
+      # `if: always()`: a evidência que importa é a do job que FALHOU.
+      - name: Sumário do lint no job
+        if: always()
+        run: |
+          {
+            if [ ! -f lint-artifacts.log ]; then
+              echo "## ⊘ Lint de artefatos — NÃO MEDIDO"
+              echo ""
+              echo "O log não existe: o passo do lint não chegou a rodar. Isto NÃO é 'zero violações'."
+            else
+              hard="$(grep -cE '^VIOLATION.*\[?HARD|Violações HARD *: *[1-9]' lint-artifacts.log || true)"
+              echo "## $([ "${hard}" -gt 0 ] && echo '❌' || echo '✅') Lint determinístico de artefatos"
+              echo ""
+              echo '```'
+              grep -E '^  (Violações|Total)' lint-artifacts.log || echo '(sem bloco de sumário no log)'
+              echo '```'
+              echo ""
+              if grep -q '^VIOLATION' lint-artifacts.log; then
+                echo "<details><summary>violações nomeadas</summary>"
+                echo ""
+                echo '```'
+                grep '^VIOLATION' lint-artifacts.log | cut -c1-300
+                echo '```'
+                echo ""
+                echo "</details>"
+              fi
+            fi
+            echo ""
+            echo "<sub>run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}</sub>"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Evidência de terminal como artefato
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lint-evidence-${{ github.run_id }}
+          path: lint-artifacts.log
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Gate determinístico de design tokens (DTCG + refs + WCAG)
         run: |

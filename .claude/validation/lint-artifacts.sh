@@ -1108,6 +1108,11 @@ check_generated_projection_sync() {
 # caro — que é exatamente como um harness deixa de espelhar o runner.
 # ===========================================================================
 check_harness_inventory_drift() {
+  # REGRA DE REPO, NÃO DE ARQUIVO — sai cedo sob `--only`, como `check_review_artifact` já fazia.
+  # Sem isto, cada lint de arquivo ÚNICO regenerava a SSOT inteira (que chama rules-registry e
+  # consumed-mode-check): a bancada invoca o lint centenas de vezes com `--only`, e a guarda
+  # passava a custar segundos por caso sem julgar nada relacionado ao arquivo pedido.
+  [ -n "${ONLY_PATH}" ] && return 0
   # CORE-ONLY, e não por timidez: `docs/onion/testing-inventory.md` é SSOT do harness DESTE
   # repo. O adotante recebe `.claude/validation/` vendorizado mas não tem (nem deve ter) o doc
   # do core — exigi-lo faria todo adotante NASCER VERMELHO num arquivo que não é dele. É a
@@ -1124,6 +1129,46 @@ check_harness_inventory_drift() {
   if _gen_into "${tmp}" "${tracked}" "docs/onion/testing-inventory.md" -- bash "${gen}" --markdown &&
      ! diff -q "${tracked}" "${tmp}" >/dev/null 2>&1; then
     violation "HARD" "${tracked}" "inventário do harness desatualizado vs o harness real — regenere com 'bash .claude/validation/harness-inventory.sh --markdown > docs/onion/testing-inventory.md'. Número do harness escrito à mão foi o que produziu '689 asserções' em três comentários de CI depois de deixar de ser verdade."
+  fi
+  rm -f "${tmp}"
+}
+
+# ===========================================================================
+# REGRA 81 — Painel de estado é GERADO dos produtores, nunca redigido [HARD]
+# previne: painel de testes com número sem produtor — metas redesenhadas como medição, que foi o defeito real deste repo
+#
+# Gatilho MEDIDO, e o cadáver estava no repo: até 2026-09-08 `testing-validation-system.md`
+# publicava `Coverage: 85% · Unit Tests: 247 · Mutation: 74% · Bugs Found: 12`. NENHUM tinha
+# produtor — eram as metas da seção anterior redesenhadas como medição, num documento sobre
+# TESTES. Sobreviveu meses porque ninguém desconfia de uma tabela.
+#
+# O QUE ESTA REGRA GARANTE, e é só isto: que o painel publicado é BYTE-A-BYTE o que o gerador
+# produz. Ela NÃO julga se os produtores medem bem — isso é das guardas de cada um. Mas fecha o
+# caminho pelo qual o painel inventado nasceu: alguém DIGITAR um número ali.
+#
+# As outras quatro defesas vivem no gerador, não aqui, porque são propriedades da GERAÇÃO:
+# célula sem comando não é impressa · métrica sem produtor imprime ⊘ NÃO MEDIDO · zero produtor
+# vivo derruba o gerador · o painel não imprime "hoje" (artefato catracado com data de hoje
+# produz uma HARD por dia, e guarda que grita sem motivo ensina a ser ignorada).
+# ===========================================================================
+check_testing_state_drift() {
+  # REGRA DE REPO, NÃO DE ARQUIVO (mesma razão da REGRA 80) — e aqui pesa mais: o painel chama
+  # TRÊS produtores, então um `--only` de uma linha disparava a geração do painel inteiro.
+  [ -n "${ONLY_PATH}" ] && return 0
+  # CORE-ONLY pela mesma razão da REGRA 80: o painel é deste repo; exigi-lo do adotante o faria
+  # nascer vermelho num arquivo que não é dele.
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  local gen="${SCRIPT_DIR}/testing-state.sh"
+  local tracked="${REPO_ROOT}/docs/onion/testing-state.md"
+  [ -f "${gen}" ] || { violation "HARD" "${gen}" "testing-state.sh ausente — o painel não pode ser computado"; return; }
+  if [ ! -f "${tracked}" ]; then
+    violation "HARD" "${tracked}" "docs/onion/testing-state.md ausente — rode 'bash .claude/validation/testing-state.sh --markdown > docs/onion/testing-state.md'"
+    return
+  fi
+  local tmp; tmp="$(mktemp)"
+  if _gen_into "${tmp}" "${tracked}" "docs/onion/testing-state.md" -- bash "${gen}" --markdown &&
+     ! diff -q "${tracked}" "${tmp}" >/dev/null 2>&1; then
+    violation "HARD" "${tracked}" "painel de estado desatualizado vs os produtores — regenere com 'bash .claude/validation/testing-state.sh --markdown > docs/onion/testing-state.md'. O painel anterior deste repo publicava 'Coverage: 85%' sem produtor nenhum; a catraca existe para que um número digitado à mão não sobreviva a um lint."
   fi
   rm -f "${tmp}"
 }
@@ -4158,6 +4203,7 @@ check_kg_seal
 check_kg_backlog
 check_consumed_modes
 check_harness_inventory_drift
+check_testing_state_drift
 check_identifier_language
 check_doctrine_freshness
 check_kg_born_marker
