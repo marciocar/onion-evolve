@@ -53,7 +53,7 @@ nodes:
   - id: E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE
     node_type: evidence
     plane: PROD
-    status: confirmed
+    status: superseded
     impact: 4
     confidence: 0.95
     verified_at: 2026-09-02
@@ -277,6 +277,17 @@ nodes:
     label: 'Quanto os campos findings_total/findings_real/verdict do residuo R56 correspondem a achados REAIS quando o revisor e a propria sessao? Sem numero hoje. A medicao e o experimento Q_EXP_AUTO_REVISAO_5_1 (fable KG): achados exclusivos da auto-revisao vs revisor externo no mesmo diff. Se a taxa for ~0 (como em 08-02), o campo e cerimonia e a cura e retirar a auto-revisao do caminho, nao endurecer o campo. GATILHO: proximo PR com residuo >= 4 achados (o mesmo do experimento).'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml'
 
+  - id: E_O_VERDICT_GANHOU_VOCABULARIO_MAS_NAO_VERIFICACAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-09'
+    verified_against: 'leitura de .claude/validation/review-artifact-check.sh (VERDICT_ENUM) contra o label do no, medido 2026-09-09'
+    trace: '.claude/validation/review-artifact-check.sh'
+    label: "R0 2026-09-09 — a TESE CENTRAL do no continua VERDADEIRA: so `reviewed_diff_sha256` e verificado contra algo que o modelo nao controla. O que mudou e a formulacao literal sobre UM dos tres campos: em 2026-09-08 (selado pelo maestro) o `verdict` ganhou vocabulario FECHADO de 5 valores (APROVADO | CORRIGIDO | REPROVADO | REPROVADO_E_CURADO | SEM_ACHADOS), tolerando caixa e separador mas nao a palavra. Isso NAO e verificacao cruzada — o modelo ainda escolhe livremente qual dos cinco declarar, sem prova de que e verdade —, mas ja nao e 'passa sempre que estiver presente'. `findings_total` e `findings_real` permanecem exatamente como descritos: so numericos. O `trace` do no cita l.205-211 e o script cresceu de 211 para 254 linhas, entao a citacao por linha caducou."
+
 edges:
   - from: E_VETO_UNICO_ANTES_DA_RODADA
     to: Q_GATES_TEXTUAIS
@@ -368,3 +379,6 @@ edges:
   - from: Q_REGRA56_VERACIDADE_DOS_ACHADOS
     to: E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE
     edge_type: DEPENDS_ON
+  - from: E_O_VERDICT_GANHOU_VOCABULARIO_MAS_NAO_VERIFICACAO
+    to: E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE
+    edge_type: SUPERSEDES

@@ -345,7 +345,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.9
-    status: confirmed
+    status: superseded
     verified_at: 2026-08-30
     verified_against: 'os 3 nos de evidencia E_FURO*_0804, cada um medido de forma independente em 2026-08-04'
     label: 'RESPOSTA PARCIAL A Q_GUARDAS_COERENTES: ha lacuna, e ela tem TRES FORMAS DISTINTAS que produzem o MESMO sintoma (verde sem ter olhado) — (1) PRUNE: a guarda se apaga no lugar onde roda; (2) ESCOPO: a pasta nunca entra na varredura; (3) SEMANTICA: o veredito nao cobre a dimensao em que o erro mora. Corrigir uma NAO corrige as outras, e nenhuma das tres e detectavel pela saida da propria guarda — todas dizem OK. E por isso que o fix pontual foi vetado'
@@ -378,8 +378,8 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-30
-    verified_against: 'o farol aciona I3 (um escritor por repo); fantasma travava o repo por ate 8h'
+    verified_at: '2026-09-09'
+    verified_against: 'R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d): grep -n -A 25 id: C_GUARDA_QUE_GRITA_ERRADO docs/onion/graph/guardas-revisao-2026-08.kg.yaml (nó+aresta) ; grep -n -B2 -A12 id: E_FAROL_ANUNCIAVA_F'
     label: 'INSTANCIA DA LACUNA DE COBERTURA no lado caro: nao e guarda que ninguem ve nem guarda que ninguem roda — e guarda que RODA E MENTE. Ela nao falha em silencio: emite um aviso confiante que a sessao leitora repassa como fato ao maestro, com recomendacao de conduta junto. Guarda que grita errado ensina a ignorar guarda'
 
   - id: D_MEDIR_O_DONO_NAO_O_CARIMBO
@@ -389,8 +389,8 @@ nodes:
     impact: 5
     confidence: 0.95
     status: confirmed
-    verified_at: 2026-08-28
-    verified_against: 'session-beacon.sh verdict + 25 casos na bancada (live/declared/orphan/graca/host-alheio/carimbo-corrompido/sonda-elege/sonda-sobe/sonda-rejeita/preserva-dono/sweep) + 5 mutacoes que reprovam'
+    verified_at: '2026-09-09'
+    verified_against: 'R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d): grep -n -A25 "id: D_MEDIR_O_DONO_NAO_O_CARIMBO" docs/onion/graph/guardas-revisao-2026-08.kg.yaml; grep -n "owner_pid|owner_start|proc_starttime|beacon'
     label: 'CURA A (behavior-over-declaration): o beacon grava owner_pid + owner_start (starttime do /proc, defesa contra REUSO DE PID) e o veredito passa a ser MEDIDO — live (dono vivo) · declared (dono nao medido: cai no TTL e BLOQUEIA, conservador) · orphan (dono medido morto: nao bloqueia, sweep remove) · stale. Direcao do erro escolhida: falso orphan reabre o incidente W1xW2 que criou o farol, falso declared so custa uma verificacao — logo ausencia de prova cai no comportamento antigo, NUNCA em pode-escrever'
 
   - id: D_AVISO_CARREGA_O_QUE_VALE
@@ -515,6 +515,17 @@ nodes:
     verified_at: 2026-08-29
     verified_against: 'python3 -c "yaml.safe_load(...)" sobre os 75 .kg.yaml rastreados (sem fixtures): 71 validos, 4 invalidos. Apos a colheita do fios-abertos restam 3: identidade-onion-vps-2026-08 (l.142), bridge-produto-2026-08 (l.278), scope-inheritance-2026 (l.555)'
     label: 'DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML de verdade — aspas quebradas dentro de `label:` (ex.: um `sha512:$(...)` com aspas embutidas, um `"recuperei a senha"` dentro de string simples, um `\$in` em string dupla). NADA nunca pegou porque o radar e awk LINHA-A-LINHA e tolera; qualquer consumidor com parser real quebra. O fios-abertos era um deles e voltou a ser valido por acidente da colheita — os nos defeituosos sairam. GATILHO para fechar: consertar os 3 restantes E nascer a guarda determinística (um `yaml.safe_load` por arquivo no lint) — mas NESTA ORDEM, porque guarda HARD antes do conserto reprova o repo inteiro'
+
+  - id: E_A_FORMA_PRUNE_DEIXOU_DE_SER_INVISIVEL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: '2026-09-09'
+    verified_against: 'bash .claude/validation/lint-artifacts.sh + leitura de check_scan_sanity e safe-count.sh, medido 2026-09-09'
+    trace: '.claude/validation/lint-artifacts.sh (check_scan_sanity)'
+    label: "R0 2026-09-09 — a TAXONOMIA das tres formas de verde-sem-olhar segue valida, mas a alegacao UNIVERSAL de indetectabilidade nao cobre mais a forma PRUNE. Depois de 2026-08-04 a maquinaria ganhou `check_scan_sanity`, uma checagem HARD que usa `safe-count.sh` como chao-de-verdade e APARECE na saida da guarda quando a varredura fica cega (0 arquivos onde deveria ver >0) — cobre poda-que-se-come e raiz-que-nunca-entra. As outras duas formas seguem EXATAMENTE como descritas: ESCOPO (kg-born-marker.sh e kg-provenance-coverage.sh nao enxergam docs/evolution/*.md da raiz, reportando 166/166 verde) e SEMANTICO (--integrity nao checa contradicao textual entre SUPPORTS). Drift por a maquinaria ter andado, nao erro do no."
 
 edges:
   - from: C_LACUNA_E_COBERTURA
@@ -688,3 +699,6 @@ edges:
   - from: Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO
     to: C_LACUNA_E_COBERTURA
     edge_type: SUPPORTS
+  - from: E_A_FORMA_PRUNE_DEIXOU_DE_SER_INVISIVEL
+    to: C_TRES_FORMAS_DE_VERDE_SEM_OLHAR_0804
+    edge_type: SUPERSEDES
