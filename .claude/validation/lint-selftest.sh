@@ -142,7 +142,7 @@ SELFTEST_CHILD="${ONION_SELFTEST_CHILD:-0}"; SELFTEST_AFFECTED=(); SELFTEST_AFFE
 SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHARD:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
-SELFTEST_CORE_ONLY_FAMILIES="harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry"
+SELFTEST_CORE_ONLY_FAMILIES="selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
@@ -11558,6 +11558,131 @@ PYI
 }
 _family run_selftest_lanes_selftests
 
+# ── selftest_series — a SÉRIE HISTÓRICA da bancada (ONDA 0.6) ────────────────────────────────
+#
+#  O coletor NÃO roda a bancada: ingere o `--report` de quem já rodou. Logo os casos aqui são
+#  sobre o CONTRATO DE INGESTÃO — e cada um existe porque um relatório mentiroso é indistinguível
+#  de um verdadeiro para quem só lê a soma.
+#
+#  ⚠️ Sandbox obrigatório: o coletor deriva o destino do PRÓPRIO caminho (`ROOT/../..`), então a
+#  cópia num tmpdir escreve o ledger LÁ. Sem isso, cada rodada da bancada sujaria
+#  `docs/onion/metrics/selftest-runs.jsonl` com envelopes de teste — e a série existe justamente
+#  para não ser contaminada por dado que não é medição.
+run_selftest_series_selftests() {
+  local sut="${REPO_ROOT}/ops/testing/collect-selftest.sh"
+  if [ ! -f "${sut}" ]; then record_skip "selftest-series: coletor ausente (SUT não exercido)"; return; fi
+  local sb rep out rc led
+  _mk_series_sb() {   # monta um sandbox com o coletor em ops/testing/ e devolve em $sb
+    sb="$(mktemp -d)"
+    mkdir -p "${sb}/ops/testing" "${sb}/docs/onion/metrics"
+    cp "${sut}" "${sb}/ops/testing/collect-selftest.sh"
+    led="${sb}/docs/onion/metrics/selftest-runs.jsonl"
+  }
+
+  # (a) INGESTÃO + a partição fechando. O caminho feliz, mas ele assere a SOMA, não só o rc:
+  #     um coletor que gravasse zeros sairia 0 e passaria num teste que só olha o exit code.
+  _mk_series_sb
+  rep="${sb}/r.tsv"
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\nbeta\t5\t1\t0\t9\nTOTAL\t12\t1\t0\t12\n' > "${rep}"
+  rc=0; out="$(bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && [ -f "${led}" ] \
+     && grep -q '"pass":12' "${led}" && grep -q '"familias":2' "${led}" \
+     && grep -q '"familias_com_falha":\["beta"\]' "${led}"; then
+    record_pass "selftest-series: (a) ingere o relatório e NOMEIA a família que falhou (não só a soma)"
+  else record_fail "selftest-series: (a) ingestão" "rc=${rc} out=${out} ledger=$(cat "${led}" 2>/dev/null | head -c 200)"; fi
+  rm -rf "${sb}"
+
+  # (a2) SHARD: a mesma família em N linhas conta UMA família, e as somas se preservam. A
+  #      família `fixtures` é fatiada em 8 shards e cada shard emite a sua linha — medido
+  #      2026-09-09: 165 linhas para 158 famílias. A 1ª versão deste coletor gravava
+  #      `"familias": len(fams)`, ou seja, contava LINHAS e chamava de famílias. Campo cujo
+  #      NOME não é o que ele conta é a classe que esta onda persegue, cometida dentro dela;
+  #      este caso é a fixture obrigatória dela.
+  _mk_series_sb
+  rep="${sb}/r.tsv"
+  printf 'familia\tpass\tfail\tskip\tsegundos\nfixtures\t12\t0\t0\t30\nfixtures\t11\t0\t0\t20\nalfa\t7\t0\t0\t3\nTOTAL\t30\t0\t0\t53\n' > "${rep}"
+  rc=0; out="$(bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q '"familias":2,' "${led}" && grep -q '"linhas_relatorio":3' "${led}" \
+     && grep -q '"pass":30' "${led}"; then
+    record_pass "selftest-series: (a2) família fatiada em shards conta 1 família e 3 linhas — o campo diz o que conta"
+  else record_fail "selftest-series: (a2) shard" "rc=${rc} out=${out} ledger=$(head -c 260 "${led}" 2>/dev/null)"; fi
+  rm -rf "${sb}"
+
+  # (b) IDEMPOTÊNCIA — e este caso é a FIXTURE OBRIGATÓRIA do defeito que o motivou. Na 1ª
+  #     versão o coletor gravou o MESMO envelope duas vezes: a guarda procurava a chave
+  #     `"dia":"…"` sem espaços e o `json.dumps` default escrevia `"dia": "…"`. Guarda que checa
+  #     um formato que o escritor não produz é guarda nenhuma — a classe desta onda inteira,
+  #     cometida DENTRO dela. Pego pelo dogfood na 1ª invocação, não por releitura.
+  _mk_series_sb
+  rep="${sb}/r.tsv"
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\nTOTAL\t7\t0\t0\t3\n' > "${rep}"
+  bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local >/dev/null 2>&1
+  bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local >/dev/null 2>&1
+  if [ "$(grep -c '^{' "${led}" || true)" = "1" ]; then
+    record_pass "selftest-series: (b) coletar 2× a mesma (dia,source,sha) grava UMA linha — a chave existe no formato que o escritor produz"
+  else record_fail "selftest-series: (b) idempotência" "esperava 1 envelope, achei $(grep -c '^{' "${led}" || true) — a guarda checa um formato que o escritor não emite"; fi
+  rm -rf "${sb}"
+
+  # (c) RELATÓRIO SEM `TOTAL` → rc=2. É a assinatura da bancada que ABORTOU antes da soma
+  #     (worker morto, SIGPIPE, OOM — os três já medidos aqui). Coletar isso registraria como
+  #     execução o que não foi uma, e a série passaria a mentir para baixo em silêncio.
+  _mk_series_sb
+  rep="${sb}/r.tsv"
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\n' > "${rep}"
+  rc=0; out="$(bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local 2>&1)" || rc=$?
+  if [ "${rc}" -eq 2 ] && grep -qi 'TOTAL' <<< "${out}" && [ ! -f "${led}" ]; then
+    record_pass "selftest-series: (c) relatório sem TOTAL → rc=2 e NADA gravado (bancada abortada não é execução)"
+  else record_fail "selftest-series: (c) sem TOTAL" "rc=${rc} out=${out}; ledger existe? $([ -f "${led}" ] && echo SIM || echo nao)"; fi
+  rm -rf "${sb}"
+
+  # (d) A PARTIÇÃO TEM DE FECHAR. Um TOTAL que não bate com as partes é um número que PARECE
+  #     medido. Mesma asserção do ledger dos resíduos, pela mesma razão.
+  _mk_series_sb
+  rep="${sb}/r.tsv"
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\nTOTAL\t999\t0\t0\t3\n' > "${rep}"
+  rc=0; out="$(bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local 2>&1)" || rc=$?
+  if [ "${rc}" -eq 2 ] && grep -q '999' <<< "${out}" && [ ! -f "${led}" ]; then
+    record_pass "selftest-series: (d) soma das famílias ≠ TOTAL → rc=2 nomeando os dois números"
+  else record_fail "selftest-series: (d) partição" "rc=${rc} out=${out}"; fi
+  rm -rf "${sb}"
+
+  # (e) `--source` em vocabulário FECHADO. A lição dos 262 resíduos aplicada ANTES de doer: a
+  #     comparação CI × local é o que a série existe para permitir, e texto livre a destrói.
+  _mk_series_sb
+  rep="${sb}/r.tsv"
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\nTOTAL\t7\t0\t0\t3\n' > "${rep}"
+  rc=0; out="$(bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source minha-maquina 2>&1)" || rc=$?
+  if [ "${rc}" -eq 2 ] && grep -q 'local|ci|precommit|cron' <<< "${out}"; then
+    record_pass "selftest-series: (e) --source fora do vocabulário → rc=2 listando os aceitos"
+  else record_fail "selftest-series: (e) vocabulário de source" "rc=${rc} out=${out}"; fi
+  rm -rf "${sb}"
+
+  # (f) LEITURA sobre ledger AUSENTE é ⊘ NÃO MEDIDO, nunca "zero flaky". O terceiro desfecho
+  #     desta onda, aplicado ao detector: ausência de observação não é evidência de saúde.
+  _mk_series_sb
+  rc=0; out="$(bash "${sb}/ops/testing/collect-selftest.sh" --flaky 2>&1)" || rc=$?
+  if [ "${rc}" -eq 2 ] && grep -q 'NÃO MEDIDO' <<< "${out}"; then
+    record_pass "selftest-series: (f) --flaky sem ledger → rc=2 ⊘ NÃO MEDIDO (não 'nenhum flaky')"
+  else record_fail "selftest-series: (f) flaky sem ledger" "rc=${rc} out=${out}"; fi
+  rm -rf "${sb}"
+
+  # (g) (MUT) sem a asserção de partição, o TOTAL mentiroso de (d) é COLETADO. Guarda que nunca
+  #     rejeitou é vacuidade — e esta guarda é a única coisa entre a série e um número inventado.
+  _mk_series_sb
+  sed -i 's/^if soma != total\[.pass.\]:/if False:/' "${sb}/ops/testing/collect-selftest.sh"
+  if grep -q '^if False:' "${sb}/ops/testing/collect-selftest.sh"; then
+    rep="${sb}/r.tsv"
+    printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\nTOTAL\t999\t0\t0\t3\n' > "${rep}"
+    rc=0; bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local >/dev/null 2>&1 || rc=$?
+    if [ "${rc}" -eq 0 ] && grep -q '"pass":999' "${led}" 2>/dev/null; then
+      record_pass "selftest-series: (g) (MUT) sem a asserção de partição o TOTAL mentiroso ENTRA na série — ela é load-bearing"
+    else record_fail "selftest-series: (g) (MUT)" "mutante ainda recusou (rc=${rc}) — (d) passa por outro motivo"; fi
+  else
+    record_fail "selftest-series: (g) (MUT)" "a mutação NÃO foi aplicada — a âncora mudou e o teste não prova nada"
+  fi
+  rm -rf "${sb}"
+}
+
 # ── review_ledger — a camada de MÉTRICA tem UMA família na bancada, e é esta ──────────────────
 #
 #  Teto declarado no plano de 2026-09-08: a instrumentação de métrica recebe UMA família e ZERO
@@ -11601,6 +11726,7 @@ run_review_ledger_selftests() {
   else record_fail "review-ledger: (d) --tsv" "linhas=${n} esperado=${tot} células vazias=${vazias}"; fi
   rm -rf "${d}"
 }
+_family run_selftest_series_selftests
 _family run_review_ledger_selftests
 
 
