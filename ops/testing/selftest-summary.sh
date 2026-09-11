@@ -66,9 +66,13 @@ awk -F'\t' -v titulo="${TITULO}" -v runurl="${RUN_URL}" '
   $1 == "TOTAL"   { tp=$2; tf=$3; ts=$4; tsec=$5; next }
   NF >= 5 {
     linhas++; fam[$1]=1
-    if ($3+0 > 0) { falhas[$1] += $3 }
-    if ($4+0 > 0) { skips[$1]  += $4 }
-    if ($5+0 > lenta_seg) { lenta_seg=$5+0; lenta=$1 }
+    # ⚠️ CAMPO ILEGÍVEL NÃO PODE SUMIR. `$3+0` converte qualquer não-numérico em 0, então uma
+    # família com `fail` corrompido saía da seção "Famílias que falharam" — enquanto o TOTAL
+    # podia dizer ❌. Cabeçalho contradizendo o corpo: quem lê vê o ícone vermelho e a lista
+    # vazia, e conclui que o vermelho veio de outro lugar. Ilegível vira CLASSE PRÓPRIA.
+    if ($3 ~ /^[0-9]+$/) { if ($3+0 > 0) falhas[$1] += $3 } else { ilegivel[$1] = ilegivel[$1] " fail=" $3 }
+    if ($4 ~ /^[0-9]+$/) { if ($4+0 > 0) skips[$1]  += $4 } else { ilegivel[$1] = ilegivel[$1] " skip=" $4 }
+    if ($5 ~ /^[0-9]+$/ && $5+0 > lenta_seg) { lenta_seg=$5+0; lenta=$1 }
   }
   END {
     nfam = 0; for (k in fam) nfam++
@@ -88,7 +92,14 @@ awk -F'\t' -v titulo="${TITULO}" -v runurl="${RUN_URL}" '
       for (k in skips) printf "- `%s` — %d ⊘\n", k, skips[k]
       printf "\n"
     }
-    if (tf+0 == 0 && ts+0 == 0) printf "Nenhuma família falhou ou pulou.\n\n"
+    n_ileg = 0; for (k in ilegivel) n_ileg++
+    if (n_ileg > 0) {
+      printf "### ⊘ Famílias com campo ILEGÍVEL (não entram na contagem — e por isso aparecem)\n\n"
+      for (k in ilegivel) printf "- `%s` —%s\n", k, ilegivel[k]
+      printf "\nUm campo não-numérico vira 0 em qualquer soma. Contado como zero, ele sairia desta\n"
+      printf "página em silêncio e o total diria outra coisa — que é a contradição que esta seção evita.\n\n"
+    }
+    if (tf+0 == 0 && ts+0 == 0 && n_ileg == 0) printf "Nenhuma família falhou ou pulou.\n\n"
     if (lenta != "") printf "Família mais lenta: `%s` (%ds).\n\n", lenta, lenta_seg
     printf "<sub>Gerado por `ops/testing/selftest-summary.sh` a partir do `--report` da bancada — "
     printf "nenhum número aqui foi digitado.</sub>\n"

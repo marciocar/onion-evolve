@@ -28,7 +28,14 @@
 set -uo pipefail
 
 REPO="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-[ -d "${REPO}/.git" ] || { echo "✗ '${REPO}' não é um repositório git"; exit 2; }
+# ⚠️ `rev-parse --git-dir`, NÃO `[ -d .git ]`. Numa WORKTREE o `.git` é um ARQUIVO (ponteiro para
+# o gitdir do repo principal), então o teste de diretório reprovava — e a adoção `legacy`/`regulated`
+# SEMPRE instala em worktree (Fase 2a do /meta:adopt). Efeito medido em 2026-09-11, adotando um
+# monorepo NX: o passo BLOQUEANTE da prova de vida do gate falhava por 100% dos casos desse modo,
+# dizendo "não é um repositório git" sobre uma worktree válida. O próprio install-onion-githook.sh,
+# que chama este verificador, já usava a forma correta uma linha acima — as duas pontas discordavam.
+# Classe: a checagem perguntava "o .git é diretório?" quando a pergunta é "isto é um repo git?".
+git -C "${REPO}" rev-parse --git-dir >/dev/null 2>&1 || { echo "✗ '${REPO}' não é um repositório git"; exit 2; }
 cd "$REPO" || exit 2
 
 ok() { printf '  ✓ %s\n' "$*"; }

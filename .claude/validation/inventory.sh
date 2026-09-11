@@ -35,8 +35,22 @@ DOCS_DIR="${REPO_ROOT}/docs"
 # ---------------------------------------------------------------------------
 _tracked_or_find() {   # $1=dir → lista arquivos RASTREADOS sob o dir (ou todos, sem git)
   local dir="$1"
+  # ⚠️ A CONDIÇÃO É "HOUVE RESULTADO?", NÃO "HÁ GIT?" — e a diferença custou uma SSOT mentirosa
+  # no histórico de um adotante. Sinal de campo 2026-09-08, adoção greenfield real: o repo É git
+  # desde o `git init` do PASSO 0c, mas o framework recém-copiado ainda está UNTRACKED, então
+  # `git ls-files` devolve VAZIO e o fallback para `find` NUNCA dispara. Resultado medido:
+  # `inventory.md` com `Comandos 0 · Agentes 0` e rc=0, com 146 e 60 arquivos no disco — e o
+  # `inventory.md` tem catraca byte-a-byte (REGRA 8), então o adotante commitou uma SSOT que
+  # DECLARA uma superfície que não existe. Assimetria que localizou o defeito: Skills e KBs
+  # saíram certos, porque não passam por aqui.
+  # A cura é a pergunta certa: se a enumeração rastreada veio VAZIA e o diretório TEM arquivos,
+  # cai no `find`. Ausência de resultado não é resultado.
+  local out=""
   if git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
-    git -C "${REPO_ROOT}" ls-files -- "${dir#${REPO_ROOT}/}" 2>/dev/null | sed "s|^|${REPO_ROOT}/|"
+    out="$(git -C "${REPO_ROOT}" ls-files -- "${dir#${REPO_ROOT}/}" 2>/dev/null | sed "s|^|${REPO_ROOT}/|")"
+  fi
+  if [ -n "${out}" ]; then
+    printf '%s\n' "${out}"
   else
     find "${dir}" -type f -print 2>/dev/null
   fi

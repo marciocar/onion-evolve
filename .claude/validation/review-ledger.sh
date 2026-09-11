@@ -180,7 +180,12 @@ if mode == "--env":
     # barra: é a classe inteira desta onda, cometida em dez linhas de código.
     sys.stdout = _stdout_real
     print(f"R56_RESIDUOS={tot}")
-    print(f"R56_COM_TOKENS={len(linhas) - len(zerados)}")
+    # ⚠️ CONTA A POPULAÇÃO QUE O NOME DIZ. A 1ª versão era `len(linhas) - len(zerados)` — total
+    # menos os de custo zero —, e nessa conta um resíduo com o campo AUSENTE entraria como "com
+    # tokens". Hoje os ausentes são 0 e os dois números coincidem, mas o campo prometia o que a
+    # conta não garantia: bastaria um resíduo sem o campo para o painel dizer que a média cobre
+    # um resíduo que ela não cobre. [[duas-grandezas-contadas-como-uma]]
+    print(f"R56_COM_TOKENS={sum(1 for r in linhas if (num(r['tokens']) or 0) > 0)}")
     print(f"R56_ACHADOS={ft}")
     print(f"R56_ACHADOS_REAIS={fr}")
     print(f"R56_PRECISAO_PCT={format(100*fr/ft, '.0f') if ft else 0}")

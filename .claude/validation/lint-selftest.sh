@@ -1492,19 +1492,72 @@ run_harness_inventory_selftests() {
   #     sítios de asserção contra 1135 execuções — sítio dentro de laço dispara N vezes.
   #     Publicar o estático como "tamanho da bancada" trocaria uma defasagem por um erro de
   #     categoria, que foi como `689` sobreviveu. A marca `⊘ NÃO MEDIDO` é o terceiro desfecho.
+  # (e) O QUE EXISTE × O QUE RODOU — e este caso testa a DISTINÇÃO, não uma string.
+  #
+  # ⚠️ A 1ª versão asseria literalmente `⊘ NÃO MEDIDO` na seção "O que RODOU". Isso amarrou o
+  # teste ao estado "ainda não há série": quando o ledger passou a existir, a asserção virou
+  # falso-vermelho — e, pior, ela tinha deixado passar o defeito REAL, que era a frase
+  # "…que ainda não existe" ser ESTÁTICA no gerador e nunca deixar de ser impressa. Testar a
+  # string prendeu o teste a um estado do mundo; testar a DERIVAÇÃO é o que pega o defeito.
+  #
+  # Agora exercita os DOIS estados: com ledger (tem de contar envelopes) e sem (tem de dizer
+  # zero, sem afirmar "não existe" como fato imutável).
   out="$(bash "${gen}" --markdown)"
-  if grep -q '⊘ \*\*NÃO MEDIDO\*\*' <<< "${out}" && grep -q 'asserções executadas' <<< "${out}"; then
-    record_pass "harness-inventory: (e) o que RODOU imprime ⊘ NÃO MEDIDO, e o sítio estático se declara não-executado"
-  else record_fail "harness-inventory: (e) terceiro desfecho" "a SSOT não distingue o que EXISTE do que RODOU — é assim que um número estático vira 'tamanho da bancada'"; fi
+  local sbl; sbl="$(mktemp -d)"
+  mkdir -p "${sbl}/.claude/validation" "${sbl}/docs/onion/metrics"
+  cp -a "${SCRIPT_DIR}"/*.sh "${sbl}/.claude/validation/" 2>/dev/null || true
+  cp -a "${SCRIPT_DIR}/fixtures" "${sbl}/.claude/validation/fixtures" 2>/dev/null || true
+  ( cd "${sbl}" && git init -q && git add -A >/dev/null 2>&1 ) 2>/dev/null
+  local out_empty; out_empty="$( cd "${sbl}" && bash .claude/validation/harness-inventory.sh --markdown 2>/dev/null )" || true
+  local n_com n_sem
+  # extração pelo NÚMERO entre asteriscos na linha que fala de envelope — robusta à pontuação
+  # em volta (a 1ª versão deste extrator errou o parêntese e o caso reprovou por si mesmo).
+  n_com="$(grep -o '\*\*[0-9]\{1,\}\*\* envelope' <<< "${out}"       | head -1 | tr -cd '0-9')"
+  n_sem="$(grep -o '\*\*[0-9]\{1,\}\*\* envelope' <<< "${out_empty}" | head -1 | tr -cd '0-9')"
+  if grep -q 'asserções executadas' <<< "${out}" \
+     && [ -n "${n_com}" ] && [ "${n_com}" -ge 1 ] \
+     && [ "${n_sem:-x}" = "0" ]; then
+    record_pass "harness-inventory: (e) o número de envelopes é DERIVADO do ledger (${n_com} com série, 0 sem) — não é frase estática"
+  else record_fail "harness-inventory: (e) terceiro desfecho" "com série=${n_com:-ausente} (esperava >=1), sem série=${n_sem:-ausente} (esperava 0) — se algum vier ausente, a seção voltou a AFIRMAR em vez de derivar, que é o defeito achado no PR"; fi
+  rm -rf "${sbl}"
 
-  # (f) (MUT) sem a comparação de diff na REGRA 80, um .md editado à mão passa. Guarda que
-  #     nunca rejeitou é vacuidade — e esta guarda existe justamente contra edição à mão.
-  local mut; mut="$(mktemp -d)"; cp "${SCRIPT_DIR}/lint-artifacts.sh" "${mut}/m.sh"
-  sed -i 's|^     ! diff -q "${tracked}" "${tmp}" >/dev/null 2>&1; then|     false; then|' "${mut}/m.sh"
-  if grep -q '     false; then' "${mut}/m.sh"; then
-    record_pass "harness-inventory: (f) (MUT) a mutação da comparação foi aplicável — o diff é o dente da REGRA 80"
-  else record_fail "harness-inventory: (f) (MUT)" "a mutação NÃO foi aplicada — a âncora do diff mudou e o teste não prova nada"; fi
-  rm -rf "${mut}"
+  # (f) (MUT) — E ELE EXECUTA O MUTANTE, o que a 1ª versão NÃO fazia.
+  #
+  # ⚠️ A versão anterior deste caso asseria apenas que o `sed` casou a âncora, e o próprio
+  # rótulo dizia "a mutação foi APLICÁVEL". Isso não prova nada sobre a guarda: prova que uma
+  # string existe no arquivo. Foi apresentado como prova de mutação e não era — achado da
+  # passada adversarial do PR desta onda, e é a mesma classe do painel inventado: um artefato
+  # afirmando uma cobertura que ele não tem. Mutation test que não RODA o mutante é decoração.
+  #
+  # A prova agora é por COMPORTAMENTO: monta um repo-sandbox com o painel/SSOT DESSINCRONIZADOS,
+  # roda o lint ORIGINAL (tem de acusar) e o MUTADO (tem de calar). Se os dois acusarem ou os
+  # dois calarem, a comparação de diff não é o dente da regra e o caso reprova.
+  local mut sb2 rc_orig rc_mut out_orig out_mut
+  mut="$(mktemp -d)"; sb2="$(mktemp -d)"
+  cp "${SCRIPT_DIR}/lint-artifacts.sh" "${mut}/m.sh"
+  sed -i 's|^     ! diff -q "${tracked}" "${tmp}" >/dev/null 2>&1; then|     false; then|g' "${mut}/m.sh"
+  local n_mut; n_mut="$(grep -c '^     false; then' "${mut}/m.sh" || true)"
+  # A âncora é COMPARTILHADA pelas REGRAS 80 e 81 (as duas usam a mesma linha de diff), então
+  # `g` muta as duas — e o contador diz quantas. Menos de 2 significa que uma delas mudou de
+  # forma e este caso deixou de cobri-la: reprova em vez de passar sobre cobertura parcial.
+  mkdir -p "${sb2}/.claude/validation" "${sb2}/docs/onion/metrics"
+  cp -a "${SCRIPT_DIR}"/*.sh "${sb2}/.claude/validation/" 2>/dev/null || true
+  cp -a "${SCRIPT_DIR}/fixtures" "${sb2}/.claude/validation/fixtures" 2>/dev/null || true
+  cp "${mut}/m.sh" "${sb2}/.claude/validation/m.sh"
+  ( cd "${sb2}" && git init -q && git add -A >/dev/null 2>&1 ) 2>/dev/null
+  # SSOT deliberadamente DESSINCRONIZADA da geração
+  bash "${SCRIPT_DIR}/harness-inventory.sh" --markdown > "${sb2}/docs/onion/testing-inventory.md" 2>/dev/null || true
+  printf 'DRIFT INJETADO A MAO\n' >> "${sb2}/docs/onion/testing-inventory.md"
+  ( cd "${sb2}" && git add -A >/dev/null 2>&1 ) 2>/dev/null
+  rc_orig=0; out_orig="$( cd "${sb2}" && bash .claude/validation/lint-artifacts.sh 2>&1 )" || rc_orig=$?
+  rc_mut=0;  out_mut="$(  cd "${sb2}" && bash .claude/validation/m.sh 2>&1 )" || rc_mut=$?
+  local hit_orig hit_mut
+  hit_orig="$(grep -c 'REGRA 80' <<< "${out_orig}" || true)"
+  hit_mut="$(grep -c 'REGRA 80' <<< "${out_mut}" || true)"
+  if [ "${n_mut}" -ge 2 ] && [ "${hit_orig}" -ge 1 ] && [ "${hit_mut}" -eq 0 ]; then
+    record_pass "harness-inventory: (f) (MUT) o lint ORIGINAL acusa o drift e o MUTADO CALA — a comparação de diff é o dente (mutante EXECUTADO, ${n_mut} sítios mutados)"
+  else record_fail "harness-inventory: (f) (MUT)" "sítios mutados=${n_mut} (esperava >=2); original acusou=${hit_orig} (esperava >=1); mutante acusou=${hit_mut} (esperava 0) — a guarda não é load-bearing OU a âncora caducou"; fi
+  rm -rf "${mut}" "${sb2}"
 }
 
 # Modo rules-registry — REGRA 39. O gerador projeta os docstrings '# REGRA N — …' de
@@ -1632,6 +1685,39 @@ run_onion_version_tracked_selftests() {
 # NÃO flagado; (b) source → o MESMO doc É flagado (sem scoping); (c) adotante → doc Onion-owned AINDA
 # flagado (o scoping não desliga a regra p/ os docs certos). [[fix-must-become-mechanism]]
 run_inventory_adopter_scope_selftests() {
+  # (untracked) ⭐ A CURA DA AUSÊNCIA-LIDA-COMO-RESULTADO, provada no cenário que a motivou.
+  #
+  # Sinal de campo 2026-09-08, adoção greenfield REAL: o repo É git desde o `git init`, mas o
+  # framework recém-copiado ainda está UNTRACKED — `git ls-files` devolve vazio e o fallback para
+  # `find` NUNCA disparava, porque a condição perguntava "há git?" em vez de "houve resultado?".
+  # Resultado medido no adotante: `inventory.md` com `Comandos 0 · Agentes 0` e rc=0, com 146 e 60
+  # arquivos no disco. E o `inventory.md` tem catraca byte-a-byte (REGRA 8 — Inventário canônico
+  # sincronizado com o filesystem), então ele COMMITOU uma SSOT que declara superfície inexistente.
+  #
+  # Este caso exercita exatamente esse estado: git init, arquivos no disco, NADA rastreado.
+  local dinv; dinv="$(mktemp -d)"
+  ( cd "${dinv}" && git init -q ) 2>/dev/null
+  # ⚠️ A FIXTURE PRECISA DAS ÁRVORES QUE O GERADOR VARRE. Medido ao montar este caso: com
+  # `docs/knowledge-base`, `docs/onion` e `.claude/skills` ausentes, o `inventory.sh` devolve
+  # saída VAZIA com rc=0 — produziu nada e declarou sucesso. Fixture incompleta faria este caso
+  # reprovar por ausência de árvore, não pelo defeito que ele mede.
+  mkdir -p "${dinv}/.claude/validation" "${dinv}/.claude/commands/meta" "${dinv}/.claude/agents/dev" \
+           "${dinv}/.claude/skills" "${dinv}/docs/onion" "${dinv}/docs/knowledge-base"
+  cp "${SCRIPT_DIR}/inventory.sh" "${dinv}/.claude/validation/" 2>/dev/null
+  local i
+  for i in 1 2 3; do printf -- '---\nname: c%s\ndescription: x\n---\n' "$i" > "${dinv}/.claude/commands/meta/c$i.md"; done
+  for i in 1 2; do printf -- '---\nname: a%s\ndescription: x\ntools: Read\n---\n' "$i" > "${dinv}/.claude/agents/dev/a$i.md"; done
+  local inv_out n_cmd n_agt
+  # stderr CAPTURADO junto: engoli-lo faria "o gerador morreu" e "o defeito voltou" darem o
+  # mesmo `ausente`, e a mensagem de falha acusaria a coisa errada.
+  inv_out="$( cd "${dinv}" && bash .claude/validation/inventory.sh --env 2>&1 )" || true
+  n_cmd="$(sed -n 's/^ONION_COMMANDS_TOTAL=//p' <<< "${inv_out}" | head -1)"
+  n_agt="$(sed -n 's/^ONION_AGENTS_TOTAL=//p' <<< "${inv_out}" | head -1)"
+  if [ "${n_cmd:-x}" = "3" ] && [ "${n_agt:-x}" = "2" ]; then
+    record_pass "inventory: (untracked) git presente + framework NÃO rastreado → conta do disco (3 cmd, 2 agt), não emite SSOT zerada"
+  else record_fail "inventory: (untracked) ausência lida como resultado" "comandos=${n_cmd:-ausente} (esperava 3), agentes=${n_agt:-ausente} (esperava 2). Se vier 0, a condição voltou a perguntar 'há git?' em vez de 'houve resultado?' — e o adotante greenfield commita SSOT mentirosa."; fi
+  rm -rf "${dinv}"
+
   local lint="${SCRIPT_DIR}/lint-artifacts.sh"; local inv="${SCRIPT_DIR}/inventory.sh"
   [ -f "${lint}" ] || return 0
   [ -f "${inv}" ] || { record_skip "inventory-adopter-scope: inventory.sh ausente → pulado"; return; }
@@ -9227,7 +9313,20 @@ run_corelay_selftests() {
 run_codeliver_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/co-evolution/co-deliver.sh"
   if [ ! -f "${helper}" ]; then record_fail "co-deliver" "helper ausente: ${helper}"; return; fi
-  local core adopter other rc
+  local core adopter other rc out
+
+  # builder do ALVO: um adotante de verdade PROVA que é adotante. Desde 2026-09-11 o carteiro
+  # valida o destino por EVIDÊNCIA (`.claude/.onion-version` com `role: adopted|hub`) em vez de
+  # `[ -d ]` — porque `é diretório?` aceitava QUALQUER diretório gravável da máquina, e um
+  # adotante mediu o custo: uma entrega caiu num clone sem `.claude/`, virou arquivo órfão num
+  # repo que não tem hook para sinalizá-lo, e um aviso de SEGURANÇA ficou 26 dias sem tratamento.
+  # As fixtures não tinham stamp, então a cura fail-closed as derrubou — e a regra desta casa é
+  # curar o HARNESS, nunca afrouxar a guarda. [[fail-closed-exposes-incomplete-harness]]
+  mk_deliver_adopter() {   # $1 = dir do adotante
+    git -C "$1" init -q
+    mkdir -p "$1/docs/evolution" "$1/.claude"
+    printf 'framework: onion-evolve\nrole: adopted\nsource_commit: deadbeef1234\n' > "$1/.claude/.onion-version"
+  }
 
   # builder: core temp (repo git + members.yaml + outbox com 1 rascunho); $2 = local_path (vazio = sem path)
   mk_deliver_core() {
@@ -9242,7 +9341,7 @@ run_codeliver_selftests() {
   }
 
   # (a) resolve local_path do members.yaml (com comentário inline) — SEM --target
-  core="$(mktemp -d)"; adopter="$(mktemp -d)"; git -C "${adopter}" init -q; mkdir -p "${adopter}/docs/evolution"
+  core="$(mktemp -d)"; adopter="$(mktemp -d)"; mk_deliver_adopter "${adopter}"
   mk_deliver_core "${core}" "${adopter}"
   rc=0; ( cd "${core}" && bash "${helper}" alvo ) >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 0 ] && [ -f "${adopter}/docs/evolution/inbound/2026-01-01-anuncio.md" ]; then
@@ -9259,7 +9358,7 @@ run_codeliver_selftests() {
 
   # (c) --target é soberano (vence o local_path do members.yaml)
   core="$(mktemp -d)"; adopter="$(mktemp -d)"; other="$(mktemp -d)"
-  git -C "${adopter}" init -q; git -C "${other}" init -q; mkdir -p "${other}/docs/evolution"
+  mk_deliver_adopter "${adopter}"; mk_deliver_adopter "${other}"
   mk_deliver_core "${core}" "${adopter}"
   rc=0; ( cd "${core}" && bash "${helper}" alvo --target "${other}" ) >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 0 ] && [ -f "${other}/docs/evolution/inbound/2026-01-01-anuncio.md" ] \
@@ -9267,6 +9366,31 @@ run_codeliver_selftests() {
     record_pass "co-deliver: --target soberano sobre members.yaml"
   else record_fail "co-deliver: --target" "exit ${rc} — entrega não foi (só) ao --target"; fi
   rm -rf "${core}" "${adopter}" "${other}"
+
+  # (d) ⭐ O ALVO SEM STAMP É RECUSADO — a cura do sinal de um adotante, provada por comportamento.
+  #     Antes, `[ -d ]` bastava: qualquer diretório gravável era destino, e o critério de sucesso
+  #     do carteiro era `o cp retornou 0`. Do lado do core a entrega parecia concluída; do lado
+  #     do adotante a mensagem não existia. NENHUM DOS DOIS LADOS PERCEBIA.
+  core="$(mktemp -d)"; other="$(mktemp -d)"   # `other` é diretório gravável e NÃO é adotante
+  mk_deliver_core "${core}" ""
+  rc=0; out="$( cd "${core}" && bash "${helper}" alvo --target "${other}" 2>&1 )" || rc=$?
+  if [ "${rc}" -eq 2 ] && grep -q 'onion-version' <<< "${out}" \
+     && [ ! -e "${other}/docs/evolution/inbound" ]; then
+    record_pass "co-deliver: (d) alvo SEM .onion-version → recusa alto e NÃO entrega (o cp que retorna 0 deixou de ser o critério)"
+  else record_fail "co-deliver: (d) evidência de adoção" "rc=${rc} (esperava 2); entregou? $([ -e "${other}/docs/evolution/inbound" ] && echo SIM || echo nao). Se entregou, o carteiro voltou a aceitar qualquer diretório gravável."; fi
+  rm -rf "${core}" "${other}"
+
+  # (e) STAMP com papel ERRADO também recusa — downstream vai para CONSUMIDOR, e entregar
+  #     noutro papel põe o anúncio onde ninguém o lê.
+  core="$(mktemp -d)"; other="$(mktemp -d)"
+  git -C "${other}" init -q; mkdir -p "${other}/docs/evolution" "${other}/.claude"
+  printf 'framework: onion-evolve\nrole: source\n' > "${other}/.claude/.onion-version"
+  mk_deliver_core "${core}" ""
+  rc=0; out="$( cd "${core}" && bash "${helper}" alvo --target "${other}" 2>&1 )" || rc=$?
+  if [ "${rc}" -eq 2 ] && grep -qi 'role' <<< "${out}"; then
+    record_pass "co-deliver: (e) stamp com role: source → recusa (downstream é para consumidor)"
+  else record_fail "co-deliver: (e) papel do alvo" "rc=${rc} out=${out}"; fi
+  rm -rf "${core}" "${other}"
 }
 
 # ---------------------------------------------------------------------------
@@ -11619,6 +11743,43 @@ run_testing_state_selftests() {
     record_pass "testing-state: (e) arg desconhecido → exit 2"
   else record_fail "testing-state: (e) arg" "esperava 2, veio ${rc}"; fi
 
+  # (g) ⭐ A REGRA 81 É EXERCITADA PELO CAMINHO QUE A PRODUÇÃO USA — e este caso existe porque
+  #     ela NÃO ERA. A passada adversarial do PR provou por mutação: desligou `check_testing_state_drift`
+  #     inteira (`if false`) e `--families testing_state` deu 6 PASS / 0 FAIL. A guarda HARD que esta
+  #     onda existe para entregar podia sumir sem nenhum caso reclamar.
+  #
+  #     DUAS causas somadas, ambas minhas: (1) eu adicionei `[ -n "${ONLY_PATH}" ] && return 0` para
+  #     curar performance, e TODA fixture da bancada chama o lint com `--only` — a regra virou
+  #     estruturalmente inalcançável por esse caminho; (2) as duas famílias que rodam o lint COMPLETO
+  #     carimbam `role: adopted`, o que dispara o outro early-return (`IS_DERIVED`). Somadas, zero
+  #     caminhos de teste chegavam nela.
+  #
+  #     Por isso este caso monta um sandbox SEM stamp (IS_DERIVED=0) e roda o lint COMPLETO (sem
+  #     `--only`): é o único par de condições em que a guarda executa. E prova por COMPORTAMENTO —
+  #     original acusa, mutante cala —, não por existência de string.
+  local mut81 sb81 rc81 out81 hit81_orig hit81_mut
+  mut81="$(mktemp -d)"; sb81="$(mktemp -d)"
+  cp "${SCRIPT_DIR}/lint-artifacts.sh" "${mut81}/m.sh"
+  sed -i 's|^     ! diff -q "${tracked}" "${tmp}" >/dev/null 2>&1; then|     false; then|g' "${mut81}/m.sh"
+  local n81; n81="$(grep -c '^     false; then' "${mut81}/m.sh" || true)"
+  mkdir -p "${sb81}/.claude/validation" "${sb81}/docs/onion/metrics"
+  cp -a "${SCRIPT_DIR}"/*.sh "${sb81}/.claude/validation/" 2>/dev/null || true
+  cp -a "${SCRIPT_DIR}/fixtures" "${sb81}/.claude/validation/fixtures" 2>/dev/null || true
+  cp "${mut81}/m.sh" "${sb81}/.claude/validation/m.sh"
+  ( cd "${sb81}" && git init -q && git add -A >/dev/null 2>&1 ) 2>/dev/null
+  # painel gerado e DEPOIS adulterado à mão — o cenário exato que a REGRA 81 existe para pegar
+  bash "${SCRIPT_DIR}/testing-state.sh" --markdown > "${sb81}/docs/onion/testing-state.md" 2>/dev/null || true
+  printf 'LINHA INJETADA A MAO\n' >> "${sb81}/docs/onion/testing-state.md"
+  ( cd "${sb81}" && git add -A >/dev/null 2>&1 ) 2>/dev/null
+  out81="$( cd "${sb81}" && bash .claude/validation/lint-artifacts.sh 2>&1 )" || true
+  hit81_orig="$(grep -c 'REGRA 81' <<< "${out81}" || true)"
+  out81="$( cd "${sb81}" && bash .claude/validation/m.sh 2>&1 )" || true
+  hit81_mut="$(grep -c 'REGRA 81' <<< "${out81}" || true)"
+  if [ "${n81}" -ge 2 ] && [ "${hit81_orig}" -ge 1 ] && [ "${hit81_mut}" -eq 0 ]; then
+    record_pass "testing-state: (g) a REGRA 81 é ALCANÇADA no lint completo sem stamp, e some no mutante — guarda load-bearing, não inalcançável"
+  else record_fail "testing-state: (g) alcance da REGRA 81" "sítios mutados=${n81} (esperava >=2); original acusou=${hit81_orig} (esperava >=1); mutante acusou=${hit81_mut} (esperava 0). Se orig=0, a regra voltou a ser inalcançável pelo caminho de teste — que foi o defeito achado no PR."; fi
+  rm -rf "${mut81}" "${sb81}"
+
   # (f) O PAINEL DECLARA O QUE NÃO MEDE. Sem esta seção, a ausência de uma linha sobre cobertura
   #     de código é lida como "não é problema" em vez de "não existe suíte". Ausência silenciosa
   #     é a forma mais barata de mentir num painel.
@@ -11686,6 +11847,41 @@ run_ci_evidence_selftests() {
     record_pass "ci-evidence: (f) sumário com falhas ainda sai 0 — ele REPORTA, quem julga é a bancada"
   else record_fail "ci-evidence: (f) fronteira" "saiu ${rc} — o gerador estaria julgando o build junto com a bancada"; fi
 
+  # (g2) O SUMÁRIO DO LINT exige PROVA DE TÉRMINO. Log truncado — a assinatura de lint abortado
+  #      por OOM/SIGPIPE/worker morto, os três já medidos aqui — tem zero `VIOLATION` e zero bloco
+  #      de sumário. A versão embutida no YAML contava esse zero e imprimia ✅: VERDE SOBRE
+  #      EXECUÇÃO ABORTADA, no artefato que existe para contar a verdade do gate.
+  # ⚠️ A ÂNCORA DO VEREDITO É O CABEÇALHO (`^## ✅`), não o caractere solto. A 1ª versão desta
+  #    asserção procurava `✅` em QUALQUER lugar da saída e reprovou — corretamente, mas pelo motivo
+  #    errado: o ⊘ carrega a frase `um sumário que imprimisse ✅ aqui seria verde sobre execução
+  #    abortada`, e o caractere está na PROSA DE AVISO. Asserção que casa o símbolo em vez da
+  #    POSIÇÃO onde ele significa veredito proíbe o texto de explicar a si mesmo.
+  local sutl="${REPO_ROOT}/ops/testing/lint-summary.sh"
+  if [ -f "${sutl}" ]; then
+    local dl; dl="$(mktemp -d)"
+    printf 'VIOLATION: x: REGRA 1 algo\n=== Sumário ===\n  Violações HARD : 2\n  Violações SOFT : 5\n' > "${dl}/cheio.log"
+    printf 'VIOLATION: x: REGRA 1 algo\n' > "${dl}/truncado.log"
+    printf '=== Sumário ===\n  Violações HARD : 0\n  Violações SOFT : 3\n' > "${dl}/verde.log"
+    local o_cheio o_trunc o_verde
+    o_cheio="$(bash "${sutl}" --log "${dl}/cheio.log" 2>&1)"
+    o_trunc="$(bash "${sutl}" --log "${dl}/truncado.log" 2>&1)"
+    o_verde="$(bash "${sutl}" --log "${dl}/verde.log" 2>&1)"
+    if grep -q '❌' <<< "${o_cheio}" && grep -q '| \*\*2\*\* |' <<< "${o_cheio}" \
+       && grep -q '⊘' <<< "${o_trunc}" && grep -q 'abortou antes de somar' <<< "${o_trunc}" \
+       && ! grep -q '^## ✅' <<< "${o_trunc}" \
+       && grep -q '✅' <<< "${o_verde}"; then
+      record_pass "ci-evidence: (g2) log truncado → ⊘ NÃO MEDIDO (nunca ✅); log com bloco de término → veredito real"
+    else record_fail "ci-evidence: (g2) prova de término" "truncado devia dar ⊘ e nunca ✅ — se deu verde, voltou a contar zero de log abortado como zero de violação"; fi
+    # (g3) formato mudou: bloco existe mas o campo não parseia ⇒ também é ⊘, não zero.
+    printf '=== Sumário ===\n  Violacoes HARD = dois\n' > "${dl}/formato.log"
+    if grep -q '⊘' <<< "$(bash "${sutl}" --log "${dl}/formato.log" 2>&1)"; then
+      record_pass "ci-evidence: (g3) bloco presente mas campo ilegível → ⊘ (não inventa número de formato desconhecido)"
+    else record_fail "ci-evidence: (g3) formato" "inventou veredito sobre um formato que não reconhece"; fi
+    rm -rf "${dl}"
+  else
+    record_fail "ci-evidence: (g2) prova de término" "ops/testing/lint-summary.sh ausente — o workflow o invoca"
+  fi
+
   # (g) arg desconhecido → exit 2 (não cai num default calado).
   rc=0; bash "${sut}" --nao-existe >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 2 ]; then
@@ -11728,6 +11924,12 @@ run_selftest_series_selftests() {
     mkdir -p "${sb}/ops/testing" "${sb}/docs/onion/metrics"
     cp "${sut}" "${sb}/ops/testing/collect-selftest.sh"
     led="${sb}/docs/onion/metrics/selftest-runs.jsonl"
+    # ⚠️ GIT REAL, COM COMMIT. Sem isto o `rev-parse HEAD` do coletor falha, o SHA vira o literal
+    # `nao-declarado`, e TODA asserção de idempotência desta família rodava na chave DEGENERADA —
+    # nunca na chave real (dia, source, sha) que a produção usa. Descoberto em 2026-09-11 ao curar
+    # o achado de que chave-que-não-identifica não pode deduplicar: o caso (b) quebrou, e quebrou
+    # por estar certo. É [[testar-no-caminho-errado-e-nao-testar]] dentro da própria bancada.
+    ( cd "${sb}" && git init -q && git -c user.email=t@t -c user.name=t commit --allow-empty -qm seed ) 2>/dev/null
   }
 
   # (a) INGESTÃO + a partição fechando. O caminho feliz, mas ele assere a SOMA, não só o rc:
@@ -11771,6 +11973,47 @@ run_selftest_series_selftests() {
   if grep -qE '"dirty":(true|false)' "${led}"; then
     record_pass "selftest-series: (a3) o envelope declara \`dirty\` — o sha sozinho mentiria por omissão"
   else record_fail "selftest-series: (a3) dirty" "envelope sem o campo: $(head -c 240 "${led}" 2>/dev/null)"; fi
+  rm -rf "${sb}"
+
+  # (d2) A PARTIÇÃO FECHA NOS TRÊS PILARES, não só em `pass`. A 1ª versão checava só o `pass`,
+  #      então `fail`/`skip` inconsistentes entravam e PERSISTIAM — e são justamente os dois que o
+  #      detector de flaky lê para decidir. A guarda protegia o número que ninguém usa para decidir.
+  _mk_series_sb
+  rep="${sb}/r.tsv"
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t1\t0\t3\nTOTAL\t7\t99\t0\t3\n' > "${rep}"
+  rc=0; out="$(bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local 2>&1)" || rc=$?
+  if [ "${rc}" -eq 2 ] && grep -q "'fail'" <<< "${out}" && [ ! -f "${led}" ]; then
+    record_pass "selftest-series: (d2) TOTAL com \`fail\` que não bate → rc=2 NOMEANDO o pilar (não só \`pass\`)"
+  else record_fail "selftest-series: (d2) partição nos 3 pilares" "rc=${rc} out=${out} — fail/skip inconsistentes entrariam no ledger que o detector de flaky lê"; fi
+  rm -rf "${sb}"
+
+  # (d3) SHA NÃO RESOLVIDO desativa a idempotência, e COLETA. A chave (dia, source, sha) com
+  #      `sha=nao-declarado` COLIDE entre execuções genuinamente diferentes — a segunda seria
+  #      descartada como duplicata e uma medição real sumiria em silêncio. Entre perder um run e
+  #      guardar um duplicado, o duplicado é o erro barato: o ledger é append-only e o `ts`
+  #      desambigua; o run perdido não volta.
+  _mk_series_sb
+  rm -rf "${sb}/.git"          # sem git ⇒ rev-parse falha ⇒ SHA vira 'nao-declarado'
+  rep="${sb}/r.tsv"
+  printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\nTOTAL\t7\t0\t0\t3\n' > "${rep}"
+  bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local >/dev/null 2>&1
+  out="$(bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local 2>&1)" || true
+  if [ "$(grep -c '^{' "${led}" 2>/dev/null || echo 0)" = "2" ] && grep -qi 'idempotência desativada' <<< "${out}"; then
+    record_pass "selftest-series: (d3) sha não resolvido → idempotência DESLIGADA e o 2º run é COLETADO (perder medição é pior que duplicar)"
+  else record_fail "selftest-series: (d3) chave que não identifica" "envelopes=$(grep -c '^{' "${led}" 2>/dev/null || echo 0) (esperava 2); out=${out}"; fi
+  rm -rf "${sb}"
+
+  # (d4) FLAKY conta EXECUÇÕES, não linhas de shard. Uma família fatiada emite N linhas na MESMA
+  #      execução; contar linhas fazia `falhou 3/8` para um run só — FLAKY inventado onde não houve
+  #      execução em que a família passou. O detector fabricava a categoria que existe para medir.
+  _mk_series_sb
+  rep="${sb}/r.tsv"
+  printf 'familia\tpass\tfail\tskip\tsegundos\nshardada\t5\t1\t0\t3\nshardada\t5\t1\t0\t3\nshardada\t5\t0\t0\t3\nTOTAL\t15\t2\t0\t9\n' > "${rep}"
+  bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local >/dev/null 2>&1
+  out="$(bash "${sb}/ops/testing/collect-selftest.sh" --flaky 2>&1)" || true
+  if grep -q 'falhou   1/1' <<< "${out}" && grep -q 'SEMPRE VERMELHA' <<< "${out}"; then
+    record_pass "selftest-series: (d4) família fatiada em 3 shards numa execução conta 1/1 → SEMPRE VERMELHA, não FLAKY inventado"
+  else record_fail "selftest-series: (d4) shard no detector" "out=${out} — se disser 2/3, o detector voltou a contar LINHAS e fabrica flaky"; fi
   rm -rf "${sb}"
 
   # (b) IDEMPOTÊNCIA — e este caso é a FIXTURE OBRIGATÓRIA do defeito que o motivou. Na 1ª
@@ -11834,8 +12077,11 @@ run_selftest_series_selftests() {
   # (g) (MUT) sem a asserção de partição, o TOTAL mentiroso de (d) é COLETADO. Guarda que nunca
   #     rejeitou é vacuidade — e esta guarda é a única coisa entre a série e um número inventado.
   _mk_series_sb
-  sed -i 's/^if soma != total\[.pass.\]:/if False:/' "${sb}/ops/testing/collect-selftest.sh"
-  if grep -q '^if False:' "${sb}/ops/testing/collect-selftest.sh"; then
+  # ⚠️ ÂNCORA RE-DERIVADA: a checagem virou LAÇO sobre os três pilares quando se curou que ela
+  # fechava só o `pass`. O caso (g) acusou alto — `a mutação NÃO foi aplicada` — em vez de passar
+  # decorativo, que é exatamente o que um mutation test tem de fazer quando o SUT muda de forma.
+  sed -i "s/^    if _soma != total\[_pilar\]:/    if False:/" "${sb}/ops/testing/collect-selftest.sh"
+  if grep -q 'if False:' "${sb}/ops/testing/collect-selftest.sh"; then
     rep="${sb}/r.tsv"
     printf 'familia\tpass\tfail\tskip\tsegundos\nalfa\t7\t0\t0\t3\nTOTAL\t999\t0\t0\t3\n' > "${rep}"
     rc=0; bash "${sb}/ops/testing/collect-selftest.sh" --report "${rep}" --source local >/dev/null 2>&1 || rc=$?

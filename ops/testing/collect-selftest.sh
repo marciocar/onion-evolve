@@ -84,12 +84,20 @@ if not linhas:
 
 # Uma família é FLAKY quando falhou em ALGUMA execução e passou em outra. Falhar SEMPRE não é
 # flaky — é defeito, e chamá-lo de flaky é como o mecanismo aprende a ignorar o vermelho.
+# ⚠️ CONTA EXECUÇÕES, NÃO LINHAS. Uma família FATIADA em shards emite N linhas na MESMA
+# execução (medido: `fixtures` em 8 shards). A 1ª versão fazia `append` por LINHA, então
+# `apareceu_em` contava 8 para um run só — e uma família que falhou em 3 dos 8 shards de UMA
+# execução aparecia como `3 de 8`, ou seja, FLAKY, quando não houve nenhuma execução em que
+# ela passou. O detector inventava exatamente a categoria que existe para medir.
+# A chave passa a ser o par (família, dia): `set`, não `list`.
 falhou_em, apareceu_em = {}, {}
 for e in linhas:
     for f in e['familias_detalhe']:
-        apareceu_em.setdefault(f['familia'], []).append(e['dia'])
+        apareceu_em.setdefault(f['familia'], set()).add(e['dia'])
         if f['fail'] > 0:
-            falhou_em.setdefault(f['familia'], []).append(e['dia'])
+            falhou_em.setdefault(f['familia'], set()).add(e['dia'])
+falhou_em   = {k: sorted(v) for k, v in falhou_em.items()}
+apareceu_em = {k: sorted(v) for k, v in apareceu_em.items()}
 
 print(f"═══ DETECTOR DE FLAKY — sobre {len(linhas)} execução(ões)\n")
 if not falhou_em:
@@ -153,7 +161,17 @@ mkdir -p "${OUT}"
 # vez ao dia; aqui um mesmo dia legitimamente tem várias execuções — pre-commit, CI, local — e
 # colapsá-las por dia APAGARIA justamente o par que revela flaky (a mesma árvore, dois
 # resultados). O sha entra na chave por isso.
-if [ -f "${LEDGER}" ] && grep -q "\"dia\":\"${HOJE}\",\"source\":\"${SOURCE}\",\"sha\":\"${SHA}\"" "${LEDGER}"; then
+# ⚠️ A IDEMPOTÊNCIA SÓ VALE COM CHAVE QUE IDENTIFICA. Se o `git rev-parse` falhou, o SHA vira o
+# literal `nao-declarado` — e aí a chave (dia, source, nao-declarado) COLIDE entre execuções
+# genuinamente diferentes: a segunda seria DESCARTADA como duplicata, e uma medição real
+# desapareceria em silêncio. Achado da passada adversarial. Entre perder um run e guardar um
+# duplicado, guardar o duplicado é o erro barato: o ledger é append-only e o par (ts, sha)
+# permite desambiguar depois; o run perdido não volta.
+if [ "${SHA}" = "nao-declarado" ]; then
+  echo "collect-selftest: sha NÃO RESOLVIDO — idempotência desativada para este envelope." >&2
+  echo "  A chave (dia, source, sha) não identificaria a execução, e descartar por uma chave que" >&2
+  echo "  não identifica perderia medição real. Coletando; desambigue por 'ts' se houver duplicata." >&2
+elif [ -f "${LEDGER}" ] && grep -q "\"dia\":\"${HOJE}\",\"source\":\"${SOURCE}\",\"sha\":\"${SHA}\"" "${LEDGER}"; then
   echo "collect-selftest: (${HOJE}, ${SOURCE}, ${SHA:0:8}) já coletado — idempotente, nada a fazer."
   exit 0
 fi
@@ -193,11 +211,17 @@ if not fams:
 
 # A PARTIÇÃO TEM DE FECHAR. É a mesma asserção que o ledger dos resíduos carrega, e existe pela
 # mesma razão: um total que não bate com as partes é um número que parece medido e não é.
-soma = sum(f['pass'] for f in fams)
-if soma != total['pass']:
-    sys.stderr.write(f"collect-selftest: soma das familias ({soma}) != TOTAL ({total['pass']}). "
-                     "O relatorio nao fecha — nao se coleta um total que nao bate com as partes.\n")
-    sys.exit(2)
+# OS TRÊS PILARES, não só `pass`. A 1ª versão fechava a partição apenas em `pass`, então um
+# relatório com `fail`/`skip` inconsistentes entrava e PERSISTIA — e são justamente os dois que o
+# detector de flaky lê. Achado da passada adversarial: a guarda protegia o número que ninguém
+# usa para decidir e deixava passar os dois que decidem.
+for _pilar in ('pass', 'fail', 'skip'):
+    _soma = sum(f[_pilar] for f in fams)
+    if _soma != total[_pilar]:
+        sys.stderr.write(f"collect-selftest: soma das familias em '{_pilar}' ({_soma}) != TOTAL "
+                         f"({total[_pilar]}). O relatorio nao fecha — nao se coleta um total que "
+                         "nao bate com as partes.\n")
+        sys.exit(2)
 
 env = {
     "dia": hoje, "source": source, "sha": sha,          # a chave de idempotência, nesta ordem

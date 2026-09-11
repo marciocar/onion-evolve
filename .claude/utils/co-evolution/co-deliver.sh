@@ -99,6 +99,28 @@ if [ -z "${TARGET}" ]; then
   fi
 fi
 [ -d "${TARGET}" ] || { echo "ERRO: --target não é diretório: ${TARGET}" >&2; exit 2; }
+# ⚠️ "É DIRETÓRIO?" NÃO É A PERGUNTA — a pergunta é "É ADOTANTE?". Com o teste anterior, QUALQUER
+# diretório gravável da máquina era destino válido, e o critério de sucesso do carteiro virava "o
+# `cp` retornou 0". Custo MEDIDO por um adotante (2026-08-31): ele mantinha dois clones do mesmo
+# remote e só um era adotante; a entrega caiu no outro — um checkout sem `.claude/`, sem
+# `.onion-version`, cujo `.gitignore` ignora `.claude/` inteiro. O arquivo virou árvore órfã e
+# untracked num repo que NUNCA poderia sinalizá-lo. Do lado do core a entrega parecia concluída;
+# do lado do adotante a mensagem não existia. NENHUM DOS DOIS LADOS TINHA COMO PERCEBER SOZINHO, e
+# um aviso de SEGURANÇA ficou 26 dias sem tratamento por causa disso.
+# A cura é a proposta do próprio adotante: o destino se resolve por EVIDÊNCIA DE ADOÇÃO.
+if [ ! -f "${TARGET}/.claude/.onion-version" ]; then
+  echo "ERRO: '${TARGET}' não tem .claude/.onion-version — não é um adotante." >&2
+  echo "  O carteiro entrega em quem PROVA ser adotante, não em qualquer diretório gravável." >&2
+  echo "  Entregar aqui criaria um arquivo órfão num repo que não tem hook para sinalizá-lo," >&2
+  echo "  e o core marcaria a entrega como concluída — falha silenciosa nos dois lados." >&2
+  echo "  Se o alvo certo é outro checkout, resolva pelo 'local_path' do members.yaml." >&2
+  exit 2
+fi
+if ! grep -qE '^[[:space:]]*role:[[:space:]]*(adopted|hub)[[:space:]]*(#.*)?$' "${TARGET}/.claude/.onion-version"; then
+  echo "ERRO: '${TARGET}' tem stamp, mas o 'role:' não é adopted nem hub." >&2
+  echo "  Downstream vai para CONSUMIDOR. Entregar noutro papel põe o anúncio onde ninguém o lê." >&2
+  exit 2
+fi
 [ -e "${TARGET}/.git" ] || { echo "ERRO: --target não parece um repo git: ${TARGET}" >&2; exit 2; }
 
 # --- Monta a lista de arquivos de outbox a entregar ---

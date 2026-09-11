@@ -301,7 +301,7 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_at: '2026-09-09'
-    verified_against: 'R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d): grep -n -A25 "id: E_UPDATE_FILTER_REMOVIDO_COLLISION" docs/onion/graph/catraca-regra49-2026-08.kg.yaml; sed -n 140,200p .claude/utils/adopt/vendor-b'
+    verified_against: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A25 \"id: E_UPDATE_FILTER_REMOVIDO_COLLISION\" docs/onion/graph/catraca-regra49-2026-08.kg.yaml; sed -n '140,200p' .claude/utils/adopt/vendor-branch.sh; sed -n '280,345p' .claude/validation/kg-verification-coverage.sh; grep -n \"filter\\|--filter\\|bmode\" .claude/utils/adopt/regen-baselines.sh"
     label: "BUG de mecanismo no --update de adotante NAO-greenfield: regen-baselines (filtra divida estrangeira no working) COLIDE com kg-verificacao/REMOVIDO (compara contra o HEAD committado, que o merge deixou nao-filtrado) → 47 HARD sobre nos que o adotante NUNCA teve. Greenfield (PoC) nao bate (sem baseline prévio); regulado-com-historia (granaai) bate"
   - id: D_CURE_AMEND_FILTERED_BASELINE_INTO_MERGE
     node_type: decision

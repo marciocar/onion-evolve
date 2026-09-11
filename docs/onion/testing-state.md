@@ -13,7 +13,7 @@
 | Dimensão | Nº | Produtor |
 |---|---:|---|
 | Famílias na bancada | **160** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **939** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **949** | `bash .claude/validation/harness-inventory.sh --env` |
 | Regras do lint | **80** | `bash .claude/validation/rules-registry.sh --counts` |
 | — HARD | **71** | `bash .claude/validation/rules-registry.sh --counts` |
 | Pares de modo consumido | **42** | `bash .claude/validation/consumed-mode-check.sh .` |
@@ -26,14 +26,14 @@ Detalhe completo: [`testing-inventory.md`](testing-inventory.md) (SSOT gerada, c
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Asserções que passaram | **1164** | `bash ops/testing/collect-selftest.sh --resumo` |
+| Asserções que passaram | **1174** | `bash ops/testing/collect-selftest.sh --resumo` |
 | Falharam | **0** | `bash ops/testing/collect-selftest.sh --resumo` |
 | Pularam (⊘) | **0** | `bash ops/testing/collect-selftest.sh --resumo` |
 | Famílias distintas | **160** | `bash ops/testing/collect-selftest.sh --resumo` |
-| Duração (s) | **750** | `bash ops/testing/collect-selftest.sh --resumo` |
+| Duração (s) | **978** | `bash ops/testing/collect-selftest.sh --resumo` |
 
-- **última medição: 2026-09-09** · origem `local` · árvore `01d1df49`
-- execuções na série: **1**
+- **última medição: 2026-09-11** · origem `local` · árvore `61fc1a74`
+- execuções na série: **2**
 - cadência esperada: a bancada roda **todo dia** na main (`onion-selftest.yml`, `schedule: 17 4 * * *`)
   e em cada pre-commit. Um envelope muito mais velho que isso significa que a COLETA parou —
   não que a bancada parou.
@@ -44,7 +44,7 @@ Detalhe completo: [`testing-inventory.md`](testing-inventory.md) (SSOT gerada, c
 
 ## 3. Flaky
 
-⊘ **NÃO MEDIDO** — 1 execução(ões) na série.
+⊘ **NÃO MEDIDO** — 2 execução(ões) na série.
 
 Flaky é uma propriedade da REPETIÇÃO: mede-se em dezenas de execuções, não em unidades.
 Com esta amostra, "nenhuma falha" seria **ausência de observação** apresentada como saúde —
@@ -54,15 +54,15 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **262** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados totais | **1331** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados REAIS | **1099** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **263** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados totais | **1345** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados REAIS | **1113** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **83%** | `bash .claude/validation/review-ledger.sh --env` |
-| Tokens por achado REAL | **106881** | `bash .claude/validation/review-ledger.sh --env` |
-| Vereditos no vocabulário | **172** | `bash .claude/validation/review-ledger.sh --env` |
+| Tokens por achado REAL | **107217** | `bash .claude/validation/review-ledger.sh --env` |
+| Vereditos no vocabulário | **173** | `bash .claude/validation/review-ledger.sh --env` |
 | — legado (texto livre) | **90** | `bash .claude/validation/review-ledger.sh --env` |
 
-A média de tokens cobre os **170** resíduos com custo > 0; os demais declaram `tokens: 0`
+A média de tokens cobre os **171** resíduos com custo > 0; os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero
 não é média — mas seus achados continuam contados no total.
 
