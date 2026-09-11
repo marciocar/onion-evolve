@@ -21,3 +21,61 @@ o que nenhuma sessão faz é selar proposta cujo alvo vive noutro repo.
 
 **Invariante.** O radar de uma proposta é ADVISORY aqui (ela ainda não é fonte); o gate real é
 a selagem pelo dono. Uma proposta nunca é lida como estado por warm-up/catch-up.
+
+## O MODO PROPOSTA, e por que ele precisou existir
+
+Até 2026-09-11 este README e a INTEGRIDADE do radar se contradiziam, e quem pagava era o primeiro
+a usar a fila. O fluxo acima manda propor **um nó**; a INTEGRIDADE exige **grau ≥ 1 com a aresta no
+mesmo arquivo**. A proposta documentada, portanto, **nunca passava** — `rc=1`, `nó órfão (grau 0)`.
+Não era bug de nenhum dos dois lados: é uma regra de **grafo fechado** cobrada de um **fragmento**,
+que por definição só fecha quando aterrissa no destino.
+
+O radar agora reconhece a proposta por **qualquer um** de dois gatilhos e afrouxa **exatamente duas**
+cobranças:
+
+| gatilho | `meta.target:` presente · ou o nome termina em `.proposal.kg.yaml` |
+|---|---|
+| **relaxado** | grau 0 · referência para fora do arquivo — e as duas saem **CONTADAS** na saída |
+| **inalterado** | id duplicado · chave repetida · `node_type` · `plane` · `layer` · `status` · `impact` · `confidence` · `edge_type` |
+
+O modo **nunca é silencioso**: ele imprime `◆ MODO PROPOSTA` e diz por qual gatilho entrou, porque
+quem lê um `✅` precisa saber que leu o ✅ de um fragmento e não o de um grafo.
+
+### Exemplo que PASSA (copie este)
+
+```yaml
+meta:
+  id: proposta-exemplo
+  schema_version: "1"
+  target: docs/onion/graph/fios-abertos.kg.yaml   # ← o gatilho, e o destino da selagem
+nodes:
+  - id: P_O_QUE_EU_PROPONHO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "A afirmação proposta, em uma frase que se possa refutar."
+edges: []                                         # vazio é legítimo aqui
+```
+
+```
+$ bash .claude/validation/kg-radar.sh <proposta> --integrity --schema
+  ◆ MODO PROPOSTA (meta.target: docs/onion/graph/fios-abertos.kg.yaml) — este arquivo é FRAGMENTO…
+  ℹ relaxado pelo MODO PROPOSTA: 1 nó(s) de grau 0 · 0 referência(s) para fora do arquivo
+  ✅ fragmento bem formado (1 nós, 0 arestas) — o gate do grafo fechado é a SELAGEM
+```
+
+Ligar o nó novo a um que **já vive no destino** também é legítimo — a referência sai contada como
+relaxada, não reprovada:
+
+```yaml
+edges:
+  - from: P_O_QUE_EU_PROPONHO
+    to: C_UM_NO_QUE_JA_EXISTE_NO_TARGET
+    edge_type: SUPPORTS
+```
+
+**O relaxamento acaba na selagem.** Integrado ao grafo vivo, o fragmento volta a ser cobrado como
+grafo fechado: lá o grau 0 e a referência pendurada são erro de novo. Bancada: família
+`kg_proposal_mode` (6 casos, com mutante que executa).

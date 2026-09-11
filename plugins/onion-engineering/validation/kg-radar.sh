@@ -296,6 +296,12 @@ section == "edges" && /^[[:space:]]*on:/ { v = $0; sub(/^[[:space:]]*on:/, "", v
 # meta: campos de governança de frescor/schema (proposta #1/#2 — ADR kg-freshness-gate)
 section == "meta" && /^[[:space:]]*schema_version:/ { v = $0; sub(/^[[:space:]]*schema_version:/, "", v); metaSchema = trim(v); next }
 section == "meta" && /^[[:space:]]*baseline:/       { v = $0; sub(/^[[:space:]]*baseline:/, "", v);       metaBaseline = trim(v); next }
+# `target:` é o que faz de um arquivo uma PROPOSTA: ele declara o grafo vivo onde o conteúdo vai
+# aterrissar. Ver a GUARDA DE MODO PROPOSTA na INTEGRIDADE para o que isso muda — e o que não muda.
+# COMENTÁRIO INLINE SAI. `target:` é um CAMINHO que a selagem consome, e o exemplo do próprio
+# README traz ` # ← o gatilho` na mesma linha: sem esta poda o valor vira caminho+comentário. O
+# padrão é o do YAML — só ESPAÇO seguido de `#` abre comentário, então `a#b` continua inteiro.
+section == "meta" && /^[[:space:]]*target:/         { v = $0; sub(/^[[:space:]]*target:/, "", v); sub(/[[:space:]]+#.*$/, "", v); metaTarget = trim(v); next }
 
 END {
   VN = "entity claim decision question evidence artifact state event rule invariant policy"
@@ -780,6 +786,30 @@ END {
 
   if (mode == "--all" || mode == "--integrity") {
     print "══ INTEGRIDADE ══"
+
+    # ── MODO PROPOSTA ─────────────────────────────────────────────────────────────────────────
+    # DOIS CONTRATOS DO FRAMEWORK SE CONTRADIZIAM, e o preço era pago pelo primeiro que usasse a
+    # fila. `docs/evolution/kg-inbox/README.md` manda um agente externo PROPOR um nó; a INTEGRIDADE
+    # exige grau >= 1 com a aresta no MESMO arquivo. A proposta documentada — um nó, nenhuma aresta
+    # — portanto NUNCA passava: reproduzido em rc=1 com `nó órfão (grau 0)`. Não é bug de nenhum dos
+    # dois lados: é uma regra de GRAFO FECHADO aplicada a um FRAGMENTO que, por definição, só fecha
+    # quando aterrissa no destino.
+    #
+    # O que o modo relaxa, e SÓ isto: grau 0 e referência para fora do arquivo. Tudo o que se pode
+    # decidir olhando só o fragmento continua valendo — id duplicado, chave repetida, node_type,
+    # plane, layer, status, impact, confidence, edge_type. A alternativa que foi descartada era
+    # excluir a fila do `ci.yml`: aquela deixaria a proposta SEM QUALQUER gate, e um fragmento mal
+    # formado só apareceria na hora de selar, que é o pior momento possível.
+    #
+    # ELE NUNCA É SILENCIOSO. Um gate que afrouxa sem dizer é a mesma classe que esta casa persegue:
+    # quem lê `✅` precisa saber que leu o ✅ de um fragmento, não o de um grafo.
+    isProposal = (metaTarget != "" || arq ~ /\.proposal\.kg\.yaml$/)
+    if (isProposal) {
+      propWhy = (metaTarget != "" ? "meta.target: " metaTarget : "sufixo .proposal.kg.yaml")
+      print "  ◆ MODO PROPOSTA (" propWhy ") — este arquivo é FRAGMENTO, não grafo fechado."
+      print "    Relaxados: grau 0 e referência para fora do arquivo. Todo o resto continua reprovando."
+    }
+
     for (id in dup) { print "  ✗ id duplicado: " id; problems++ }
     # Chave repetida DENTRO de um nó: o parser sobrescreve calado e o arquivo passa a afirmar
     # duas verdades. Reprova — quem carimba tem de SUBSTITUIR, não INSERIR (medido 2026-08-12).
@@ -789,14 +819,24 @@ END {
       problems++
     }
     for (i = 1; i <= ne; i++) {
-      if (!(efrom[i] in nodeSeen)) { print "  ✗ aresta " i ": from aponta nó inexistente: " efrom[i]; problems++ }
-      if (!(eto[i]   in nodeSeen)) { print "  ✗ aresta " i ": to aponta nó inexistente: " eto[i]; problems++ }
+      # Referência para fora do arquivo: num grafo fechado é erro; num fragmento é o CASO NORMAL —
+      # a proposta liga o nó novo a um nó que já vive no destino. Contada, nunca engolida.
+      if (!(efrom[i] in nodeSeen)) {
+        if (isProposal) { dangling++ } else { print "  ✗ aresta " i ": from aponta nó inexistente: " efrom[i]; problems++ }
+      }
+      if (!(eto[i]   in nodeSeen)) {
+        if (isProposal) { dangling++ } else { print "  ✗ aresta " i ": to aponta nó inexistente: " eto[i]; problems++ }
+      }
       if (index(VE, etype[i]) == 0 || etype[i] == "") { print "  ✗ aresta " i ": edge_type inválido: [" etype[i] "]"; problems++ }
-      if (eon[i] != "" && !(eon[i] in nodeSeen)) { print "  ✗ aresta " i ": on aponta evento inexistente: " eon[i]; problems++ }
+      if (eon[i] != "" && !(eon[i] in nodeSeen)) {
+        if (isProposal) { dangling++ } else { print "  ✗ aresta " i ": on aponta evento inexistente: " eon[i]; problems++ }
+      }
     }
     for (i = 1; i <= nn; i++) {
       id = order[i]
-      if (deg[id] == 0) { print "  ✗ nó órfão (grau 0): " id; problems++ }
+      if (deg[id] == 0) {
+        if (isProposal) { orphan++ } else { print "  ✗ nó órfão (grau 0): " id; problems++ }
+      }
       if (index(VN, ntype[id]) == 0 || ntype[id] == "") { print "  ✗ " id ": node_type inválido: [" ntype[id] "]"; problems++ }
       if (index(VP, plane[id]) == 0 || plane[id] == "") { print "  ✗ " id ": plane inválido: [" plane[id] "]"; problems++ }
       if (index(VL, layer[id]) == 0) { print "  ✗ " id ": layer inválido: [" layer[id] "]"; problems++ }
@@ -807,7 +847,14 @@ END {
         print "  ✗ CONTRADIÇÃO: " id " recebe REFUTES mas segue status=" nstatus[id] " (reconciliar: refuted ou superseded)"; problems++
       }
     }
-    if (problems == 0) print "  ✅ sem contradições estruturais (" nn " nós, " ne " arestas)"
+    # O QUE FOI RELAXADO SAI NUMERADO. Sem esta linha o modo proposta seria exatamente o defeito
+    # que ele cura, uma camada acima: um ✅ que não conta o que deixou de cobrar.
+    if (isProposal && (orphan > 0 || dangling > 0)) {
+      print "  ℹ relaxado pelo MODO PROPOSTA: " orphan+0 " nó(s) de grau 0 · " dangling+0 " referência(s) para fora do arquivo"
+      print "    — são erro ao SELAR no destino, onde o grafo volta a ser fechado; aqui não são."
+    }
+    if (problems == 0 && isProposal) print "  ✅ fragmento bem formado (" nn " nós, " ne " arestas) — o gate do grafo fechado é a SELAGEM"
+    else if (problems == 0) print "  ✅ sem contradições estruturais (" nn " nós, " ne " arestas)"
     print ""
   }
 

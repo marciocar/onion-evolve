@@ -176,7 +176,7 @@ nodes:
     node_type: decision
     drive_kind: execution
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.95
     label: "SELADO pelo maestro 2026-09-11: o radar reconhece `meta.target` OU o sufixo `.proposal.kg.yaml` e roda em MODO PROPOSTA — valida schema, tipos, planes e ids, mas NAO exige grau >= 1 nem resolve aresta para fora do arquivo. Cura a contradicao entre dois contratos do framework: o `kg-inbox/README.md` manda propor UM no, e a integridade exige grau >= 1 com aresta no MESMO arquivo, entao a proposta documentada NUNCA passa (reproduzido: rc=1, `no orfao`). Escolhida sobre a alternativa de excluir a fila do `ci.yml` porque aquela deixaria a fila sem QUALQUER gate — proposta mal formada so apareceria ao selar. URGENTE POR ALCANCE: todo adotante ja herda a fila quebrada, e eu instalei mais uma no granaa-ai horas antes de ler o sinal. Entrega: 1 guarda, 1 fixture, 1 mutante — e o README ganha um exemplo que PASSA, porque hoje o primeiro a usar a fila descobre o conflito por reprovacao."
@@ -214,10 +214,32 @@ nodes:
     node_type: decision
     drive_kind: execution
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.9
     label: "SELADO pelo maestro em 2026-09-10: a paridade de censo vira REGRA no core, irma da REGRA 78 (`.kg.yaml` versionado e YAML VALIDO, com catraca) e com a mesma catraca. A 78 fecha `e YAML valido`; esta fecha `os dois leitores concordam sobre QUEM E NO`. Molde: o `kg_parity.py` do adotante — replica a maquina de estados do radar e confronta a populacao contra PyYAML; contrato 0 concordam / 1 divergem NOMEANDO os fantasmas / 2 NAO MEDIDO. REQUISITO NAO-NEGOCIAVEL que o adotante descobriu na pele: a 1a versao da guarda deles ancorava em dois espacos fixos e NAO VIA o no forjado a seis — media, saia 0, e nao replicava nada. Guarda que nao replica o contador que DA O VEREDITO e decoracao."
+
+  - id: E_MODO_PROPOSTA_ENTREGUE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-11'
+    verified_against: 'reproduzido antes (rc=1, no orfao) e depois (rc=0, MODO PROPOSTA anunciado); familia kg_proposal_mode 7/7; mutante da poda de comentario EXECUTADO e reprovado'
+    trace: '.claude/validation/kg-radar.sh'
+    label: "A contradicao entre os dois contratos esta fechada: o radar reconhece `meta.target` OU o sufixo `.proposal.kg.yaml` e entra em MODO PROPOSTA, relaxando EXATAMENTE duas cobrancas — grau 0 e referencia para fora do arquivo — e CONTANDO as duas na saida. Todo o resto (id duplicado, chave repetida, node_type, plane, layer, status, impact, confidence, edge_type) continua reprovando, provado por mutante que EXECUTA. O modo nunca e silencioso: imprime `MODO PROPOSTA` e por qual gatilho entrou. Nao-regressao medida em 40 grafos vivos, zero. Os dois READMEs (core e o starter que o /meta:adopt escreve no adotante) ganharam o exemplo que PASSA, e o exemplo do core foi extraido do doc e rodado VERBATIM — foi esse dogfood que achou um defeito meu: o parser engolia o comentario YAML inline, e `target` e o CAMINHO que a selagem consome."
+
+  - id: E_PARIDADE_DE_CENSO_E_REGRA_82
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-11'
+    verified_against: 'corpus do core: 128 grafos, 124 medidos, 0 HARD; fantasma forjado pego e NOMEADO; familia kg_census_parity 6/6; mutante da ancora fixa EXECUTADO e reprovado por 3 casos'
+    trace: '.claude/validation/kg-census-parity-check.sh'
+    label: "A REGRA 82 (Os dois leitores do corpus CONCORDAM sobre quem e no) esta no lint, irma da REGRA 78 e com a mesma catraca. O motor REPLICA a maquina de estados do radar linha a linha, e isso nao e estilo: o caso (d) da bancada confronta os DOIS contadores no mesmo arquivo e exige igualdade, e o mutante que ancora em dois espacos fixos — o defeito exato que a 1a guarda do adotante tinha — reprova em TRES casos. Medido no corpus real: 0 HARD em 128 grafos; os 4 nao-medidos sao passivo da REGRA 78 e saem roteados para ela, nunca como silencio nem como paridade OK. Sem divergencia, o baseline nasce desnecessario e qualquer divergencia nova ja e HARD."
 
 edges:
   - from: E_A_PERNA_DE_LEITURA_TEM_PRECO
@@ -279,4 +301,10 @@ edges:
     edge_type: DEPENDS_ON
   - from: E_LABEL_ESCONDE_NO_FANTASMA_DO_CENSO
     to: E_DEZ_SINAIS_TRIADOS_COM_MEDICAO
+    edge_type: SUPPORTS
+  - from: E_MODO_PROPOSTA_ENTREGUE
+    to: D_O_RADAR_GANHA_MODO_PROPOSTA
+    edge_type: SUPPORTS
+  - from: E_PARIDADE_DE_CENSO_E_REGRA_82
+    to: D_PARIDADE_DE_CENSO_VIRA_REGRA
     edge_type: SUPPORTS
