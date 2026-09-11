@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**194 itens abertos** em 43 grafo(s) com aberto (de 65 no escopo) · 43 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**192 itens abertos** em 43 grafo(s) com aberto (de 65 no escopo) · 43 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -271,15 +271,13 @@
 | 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
 | 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
 
-## inbox-sinais-2026-09 — 12 item(ns)
+## inbox-sinais-2026-09 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 13.5 | `I_A_FILA_DE_PROPOSTAS_PASSA_NO_GATE` | inbox-sinais-2026-09 | URGENTE por alcance: todo adotante ja herda a fila quebrada, e eu instalei mais uma hoje. Duas saidas que o sinal enquadra: (a) o  |
 | 10.8 | `Q_DESIGN_SINK_TEM_DOIS_SINKS_REAIS` | inbox-sinais-2026-09 | DOIS sinais independentes, do portal-gamificacao (2026-09-07) e do jogo-da-vida (2026-09-07), pedem a mesma coisa por caminhos dif |
 | 10.8 | `Q_ONION_RESEARCH_NAO_DISTINGUE_VAZIO_DE_INALCANCAVEL` | inbox-sinais-2026-09 | Duas rodadas no mesmo dia, mesmo tema: a de busca aberta deu 13 claims de blog de escritorio que VENDE registro de marca (tier 3-5 |
 | 9.5 | `D_A_KB_PASSA_A_DIZER_O_QUE_O_MOTOR_FAZ` | inbox-sinais-2026-09 | SELADO pelo maestro 2026-09-11: alinhar a KB ao MOTOR, nao o contrario. `knowledge-graph-sdaal.md:195-196` promete CINCO reprovaco |
-| 9.5 | `I_CURAR_A_AUSENCIA_LIDA_COMO_RESULTADO` | inbox-sinais-2026-09 | Cura de RAIZ nos tres sitios, porque a pergunta errada e a mesma: cair no fallback quando o RESULTADO e vazio, nao so quando falta |
 | 9.0 | `I_LIGAR_A_PERNA_DE_LEITURA` | inbox-sinais-2026-09 | PRIMEIRO da fila por retorno sobre custo, e o unico que teria evitado o caso do sinal. A classe de hook JA EXISTE e roda a todo co |
 | 9.0 | `Q_POR_QUE_DRIFTED_NUNCA_FOI_USADO` | inbox-sinais-2026-09 | `drifted` = 0 em 3.715 nos, com o slot construido, peso 1.3 (o UNICO fator que SOBE) e o racional escrito. Nao e falta de motor. O |
 | 9.0 | `Q_SUPERACAO_DA_FONTE_INALCANCAVEL` | inbox-sinais-2026-09 | O maestro selou `falhar alto + distinguir vazio de inalcancavel` E PEDIU MAIS: `pensar na melhor superacao disso`. Entao NAO vira  |
