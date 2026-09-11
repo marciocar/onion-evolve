@@ -4126,6 +4126,54 @@ check_kg_yaml_validity() {
 }
 
 # ===========================================================================
+# REGRA 82 — Os dois leitores do corpus CONCORDAM sobre quem é nó [HARD + SOFT]
+# previne: grafo válido em que o radar (awk sobre texto) e o PyYAML veem populações DIFERENTES
+#   Sinal de campo do venda-direta-pdi (pin 5dcc706b2233), REPRODUZIDO no core em 30 segundos: um
+#   `.kg.yaml` PERFEITAMENTE VÁLIDO com um nó `B_ESCONDIDO` escrito DENTRO do bloco `label: |` de
+#   outro. PyYAML vê 2 nós; o kg-radar — QUE É QUEM EMITE O VEREDITO — anuncia 3, e o nó forjado
+#   pesa na centralidade. Todos os gates verdes, inclusive a REGRA 78, que está CERTA: o arquivo é
+#   YAML válido. A 78 fecha a metade SINTÁTICA; esta fecha a do CENSO.
+#   Causa: o matcher do radar casa `- id:` com QUALQUER indentação dentro de `nodes:`, sem rastrear
+#   blocos literais — permissividade correta para um motor awk, e o preço declarado da economia de
+#   motores. Preço só é aceitável se alguém o cobrar.
+#   ⚠️ O motor REPLICA a máquina de estados do radar linha a linha (requisito que o adotante
+#   descobriu na pele: a 1ª guarda deles ancorava em dois espaços fixos e não via o nó forjado a
+#   seis — media, saía 0, e não replicava nada). Catraca igual à da 78.
+#   Lógica em kg-census-parity-check.sh; baseline em kg-census-parity-baseline.txt.
+# ===========================================================================
+check_kg_census_parity() {
+  local helper="${SCRIPT_DIR}/kg-census-parity-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      *.kg.yaml|*/kg-census-parity-check.sh|*/kg-census-parity-baseline.txt|*/kg-radar.sh) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  # ⚠️ O rc É LIDO, nunca engolido com `|| true` — este helper sai 2 dizendo NAO MEDIDO quando
+  #    PyYAML/git faltam, e PyYAML ausente é condição REAL medida nesta máquina. Engolir o 2
+  #    faria a regra não rodar e o lint declarar gate limpo: zero violação, zero stderr. É a
+  #    mesma cicatriz que a irmã 78 carrega documentada.
+  local out err rc sev cls path msg
+  err="$(mktemp 2>/dev/null || echo /dev/null)"; rc=0; out=""
+  if out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${err}")"; then rc=0; else rc=$?; fi
+  if [ "${rc:-0}" -ge 2 ] 2>/dev/null; then
+    violation "SOFT" "${REPO_ROOT}/.claude/validation/kg-census-parity-check.sh" \
+      "[kg-parity/NAO-MEDIDO] a guarda de paridade de censo NÃO RODOU (rc=${rc}: $(head -1 "${err}" 2>/dev/null)) — o corpus não foi confrontado; isto não é aprovação"
+    rm -f "${err}"; return 0
+  fi
+  rm -f "${err}"
+  [ -n "${out}" ] || return 0
+  while IFS=$'\t' read -r sev cls path msg; do
+    [ -n "${sev}" ] || continue
+    case "${path}" in /*) : ;; *) path="${REPO_ROOT}/${path#./}" ;; esac
+    violation "${sev}" "${path}" "[kg-parity/${cls}] ${msg}"
+  done <<< "${out}"
+  # `return 0` explícito: o último `read` devolve 1 (EOF) e a função herdaria rc=1.
+  return 0
+}
+
+# ===========================================================================
 # REGRA 77 — Contrato de dependência entre plugins [HARD + SOFT]
 # previne: dois plugins embarcando a mesma skill/KB (cópias divergem) ou um plugin usando skill que só outro embarca sem declarar
 #   Medido 2026-09-04: onion e onion-work-tools embarcavam a mesma skill, o mesmo motor (3 md5) e a mesma
@@ -4229,6 +4277,7 @@ check_plugin_hooks_resolvable
 check_plugin_bare_paths
 check_plugin_dead_links
 check_kg_yaml_validity
+check_kg_census_parity
 check_marketplace_root_sync
 check_plugin_deps_contract
 

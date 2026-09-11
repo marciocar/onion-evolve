@@ -7043,6 +7043,203 @@ run_kg_radar_integrity_selftests() {
   rm -rf "$d"
 }
 
+run_kg_census_parity_selftests() {
+  local helper="${REPO_ROOT}/.claude/validation/kg-census-parity-check.sh"
+  if [ ! -f "${helper}" ]; then record_fail "kg-paridade" "helper ausente"; return; fi
+  if ! python3 -c 'import yaml' 2>/dev/null; then record_skip "kg-paridade" "PyYAML ausente"; return; fi
+  local d out rc
+
+  # $1=dir · $2=limpo|forjado|forjado-fundo
+  # `forjado-fundo` e o REQUISITO NAO-NEGOCIAVEL: o no vive a SEIS espacos. A 1a guarda do adotante
+  # ancorava em dois fixos e NAO O VIA — media, saia 0, e nao replicava nada.
+  _mkpar() {
+    mkdir -p "$1/docs"
+    { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
+      printf '  - id: A_VISIVEL\n    node_type: claim\n    plane: DEV\n    status: open\n'
+      printf '    impact: 3\n    confidence: 0.8\n'
+      case "$2" in
+        limpo) printf '    label: "um label comum"\n' ;;
+        forjado)
+          printf '    label: |\n      texto do bloco literal\n'
+          printf '      - id: B_ESCONDIDO\n        node_type: evidence\n        plane: PROD\n'
+          printf '        status: confirmed\n        impact: 5\n        confidence: 0.99\n' ;;
+        forjado-fundo)
+          printf '    label: |\n      texto do bloco literal\n'
+          printf '      nivel a mais para empurrar a indentacao:\n'
+          printf '      - id: B_FUNDO\n          node_type: evidence\n' ;;
+      esac
+      printf '  - id: C_VISIVEL\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n'
+      printf '    impact: 3\n    confidence: 0.9\n    label: "outro no"\n'
+      printf 'edges:\n  - from: C_VISIVEL\n    to: A_VISIVEL\n    edge_type: SUPPORTS\n'
+      case "$2" in
+        forjado)       printf '  - from: B_ESCONDIDO\n    to: A_VISIVEL\n    edge_type: SUPPORTS\n' ;;
+        forjado-fundo) printf '  - from: B_FUNDO\n    to: A_VISIVEL\n    edge_type: SUPPORTS\n' ;;
+      esac
+    } > "$1/docs/t.kg.yaml"
+    ( cd "$1" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
+  }
+
+  # (a) O CASO DO SINAL: no forjado dentro de `label: |` → HARD, com o fantasma NOMEADO.
+  d="$(mktemp -d)"; _mkpar "$d" forjado
+  rc=0; out="$(bash "${helper}" "$d" --format tsv 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q '^HARD.*DIVERGE.*B_ESCONDIDO' <<< "${out}"; then
+    record_pass "kg-paridade: (a) no forjado em bloco literal → HARD com o fantasma NOMEADO"
+  else record_fail "kg-paridade: (a)" "rc=${rc} — nao pegou o fantasma: ${out}"; fi
+  rm -rf "$d"
+
+  # (b) NAO-VACUIDADE: o MESMO grafo sem o forjado → silencio. Se a guarda reprovasse sempre,
+  #     (a) nao provaria nada.
+  d="$(mktemp -d)"; _mkpar "$d" limpo
+  rc=0; out="$(bash "${helper}" "$d" --format tsv 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q '^HARD' <<< "${out}"; then
+    record_pass "kg-paridade: (b) grafo limpo → silencio (a guarda nao reprova sempre)"
+  else record_fail "kg-paridade: (b)" "falso-positivo em grafo so: rc=${rc} ${out}"; fi
+  rm -rf "$d"
+
+  # (c) MUT DO REQUISITO NAO-NEGOCIAVEL — e o unico caso desta familia que justifica a familia.
+  #     O no forjado a SEIS espacos. Guarda que ancora em dois fixos passa aqui e e decoracao.
+  d="$(mktemp -d)"; _mkpar "$d" forjado-fundo
+  rc=0; out="$(bash "${helper}" "$d" --format tsv 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'B_FUNDO' <<< "${out}"; then
+    record_pass "kg-paridade: (c) MUT no forjado a SEIS espacos e VISTO — a guarda replica o matcher, nao uma indentacao fixa"
+  else record_fail "kg-paridade: (c)" "rc=${rc} — a guarda ancora em profundidade fixa (o defeito que o adotante pagou): ${out}"; fi
+  rm -rf "$d"
+
+  # (d) O motor REPLICA o radar, e isto se PROVA confrontando os dois contadores no mesmo arquivo.
+  #     Sem este caso, (a) poderia passar com um contador que so por acaso da outro numero.
+  d="$(mktemp -d)"; _mkpar "$d" forjado
+  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "$d/"; _lib_beside "$d"
+  local radar_n parity_n
+  # `|| true`: sob pipefail o radar sai 1 no grafo forjado e a ATRIBUICAO herda o rc, matando a
+  # suite. O que interessa aqui e o NUMERO que ele imprime, nao o veredito dele.
+  radar_n="$(bash "$d/kg-radar.sh" "$d/docs/t.kg.yaml" --integrity 2>/dev/null | sed -n 's/.*(\([0-9]\{1,\}\) nós.*/\1/p' | head -1 || true)"
+  parity_n="$(bash "${helper}" "$d" --format tsv 2>/dev/null | sed -n 's/.*radar=\([0-9]\{1,\}\).*/\1/p' | head -1 || true)"
+  if [ -n "${radar_n}" ] && [ "${radar_n}" = "${parity_n}" ]; then
+    record_pass "kg-paridade: (d) o contador da guarda BATE com o do radar (${radar_n}) — replica, nao aproxima"
+  else record_fail "kg-paridade: (d)" "a guarda conta ${parity_n:-?} e o radar ${radar_n:-?} — nao esta replicando o contador que DA o veredito"; fi
+  rm -rf "$d"
+
+  # (e) NAO MEDIDO e desfecho de 1a classe: raiz sem git sai 2, nunca 0.
+  d="$(mktemp -d)"; mkdir -p "$d/docs"; : > "$d/docs/t.kg.yaml"
+  rc=0; bash "${helper}" "$d" --format tsv >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ]; then
+    record_pass "kg-paridade: (e) raiz sem git → rc=2 NAO MEDIDO (nunca 0)"
+  else record_fail "kg-paridade: (e)" "rc=${rc} — ausencia de ambiente virou aprovacao"; fi
+  rm -rf "$d"
+
+  # (f) YAML invalido e da REGRA 78, nao desta: sai SOFT NAO-MEDIDO, nunca HARD de paridade e
+  #     nunca silencio. Duas regras cobrando o mesmo arquivo pela mesma coisa e ruido.
+  d="$(mktemp -d)"; _mkpar "$d" limpo
+  printf '  - id: D_QUEBRADO\n    label: "aspas nao fechadas\n' >> "$d/docs/t.kg.yaml"
+  ( cd "$d" && git add -A && git -c user.email=t@t -c user.name=t commit -qm y ) 2>/dev/null
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if grep -q '^SOFT.*NAO-MEDIDO' <<< "${out}" && ! grep -q '^HARD' <<< "${out}"; then
+    record_pass "kg-paridade: (f) YAML invalido vira SOFT NAO-MEDIDO — a cobranca e da REGRA 78"
+  else record_fail "kg-paridade: (f)" "roteamento errado entre 78 e 82: ${out}"; fi
+  rm -rf "$d"
+}
+
+run_kg_proposal_mode_selftests() {
+  local radar="${REPO_ROOT}/.claude/validation/kg-radar.sh"
+  if [ ! -f "${radar}" ]; then record_fail "kg-proposta" "radar ausente"; return; fi
+  local d rc out
+
+  # Um sandbox com o radar DE VERDADE ao lado da sua lib (fail-closed: sem _lib_beside o radar
+  # sai 2 e todo caso vira falso-verde por rc errado — classe já medida nesta casa).
+  _mkp() {
+    mkdir -p "$1/.claude/validation"
+    cp "${radar}" "$1/.claude/validation/"; _lib_beside "$1/.claude/validation"
+  }
+  # $1=dir $2=arquivo $3=com-target|sem-target
+  _prop() {
+    { printf 'meta:\n  id: p\n  schema_version: "1"\n'
+      [ "$3" = com-target ] && printf '  target: docs/onion/graph/fios-abertos.kg.yaml\n'
+      printf 'nodes:\n  - id: P_UM\n    node_type: claim\n    plane: DEV\n    status: open\n'
+      printf '    impact: 3\n    confidence: 0.8\n    label: "um no so, como o README manda"\n'
+      printf 'edges: []\n'
+    } > "$1/$2"
+  }
+
+  # (a) O CASO QUE CRIOU ESTE MODO: a proposta documentada — UM nó, nenhuma aresta — reprovava
+  #     com `no orfao (grau 0)`. rc=1 reproduzido antes da cura.
+  d="$(mktemp -d)"; _mkp "$d"; _prop "$d" p.proposal.kg.yaml com-target
+  rc=0; bash "$d/.claude/validation/kg-radar.sh" "$d/p.proposal.kg.yaml" --integrity --schema >"$d/o" 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'MODO PROPOSTA' "$d/o"; then
+    record_pass "kg-proposta: (a) proposta de UM no passa, e o modo se ANUNCIA"
+  else record_fail "kg-proposta: (a)" "rc=${rc} — a proposta documentada ainda nao passa: $(head -3 "$d/o" | tr '\n' ' ')"; fi
+  rm -rf "$d"
+
+  # (b) O SUFIXO sozinho dispara o modo (o contrato tem DOIS gatilhos; testar so um deixa o
+  #     outro livre para apodrecer).
+  d="$(mktemp -d)"; _mkp "$d"; _prop "$d" p.proposal.kg.yaml sem-target
+  rc=0; bash "$d/.claude/validation/kg-radar.sh" "$d/p.proposal.kg.yaml" --integrity --schema >"$d/o" 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'sufixo .proposal.kg.yaml' "$d/o"; then
+    record_pass "kg-proposta: (b) o sufixo sozinho dispara o modo"
+  else record_fail "kg-proposta: (b)" "rc=${rc} — sufixo nao dispara: $(head -3 "$d/o" | tr '\n' ' ')"; fi
+  rm -rf "$d"
+
+  # (c) NAO-REGRESSAO, e e ela que impede a cura de virar buraco: MESMO conteudo, nome comum e
+  #     sem target → volta a ser grafo fechado e o orfao REPROVA.
+  d="$(mktemp -d)"; _mkp "$d"; _prop "$d" comum.kg.yaml sem-target
+  rc=0; bash "$d/.claude/validation/kg-radar.sh" "$d/comum.kg.yaml" --integrity --schema >"$d/o" 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'grau 0' "$d/o" && ! grep -q 'MODO PROPOSTA' "$d/o"; then
+    record_pass "kg-proposta: (c) grafo COMUM com orfao continua reprovando"
+  else record_fail "kg-proposta: (c)" "rc=${rc} — o modo vazou para grafo comum: $(head -3 "$d/o" | tr '\n' ' ')"; fi
+  rm -rf "$d"
+
+  # (d) MUT — e este mutante EXECUTA, que foi o achado da passada adversarial de 2026-09-11:
+  #     os dois casos (MUT) das REGRAS 80/81 asseriam que o `sed` casou a ancora, nunca que o
+  #     mutante PASSA. Aqui a asserção e sobre o rc do radar MUTADO, nao sobre o sed.
+  #     A mutação: relaxar TUDO em modo proposta (isProposal desligando o checador de tipo).
+  #     Se o radar mutado ACEITASSE `node_type: bananas` numa proposta, a guarda seria decoração.
+  d="$(mktemp -d)"; _mkp "$d"; _prop "$d" p.proposal.kg.yaml com-target
+  sed -i 's/node_type: claim/node_type: bananas/' "$d/p.proposal.kg.yaml"
+  rc=0; bash "$d/.claude/validation/kg-radar.sh" "$d/p.proposal.kg.yaml" --integrity --schema >"$d/o" 2>&1 || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'node_type inv' "$d/o"; then
+    record_pass "kg-proposta: (d) MUT proposta com node_type invalido REPROVA — o modo relaxa grau, nao o resto"
+  else record_fail "kg-proposta: (d)" "rc=${rc} — MODO PROPOSTA virou passe-livre: $(head -5 "$d/o" | tr '\n' ' ')"; fi
+  rm -rf "$d"
+
+  # (e) O RELAXAMENTO SAI NUMERADO. Um gate que afrouxa sem contar e o proprio defeito que esta
+  #     onda persegue, uma camada acima: um ✅ que nao diz o que deixou de cobrar.
+  d="$(mktemp -d)"; _mkp "$d"; _prop "$d" p.proposal.kg.yaml com-target
+  out="$(rc=0; bash "$d/.claude/validation/kg-radar.sh" "$d/p.proposal.kg.yaml" --integrity 2>&1 || true)"
+  if grep -qE 'relaxado pelo MODO PROPOSTA: 1 ' <<< "${out}"; then
+    record_pass "kg-proposta: (e) o que foi relaxado sai CONTADO, nao engolido"
+  else record_fail "kg-proposta: (e)" "relaxamento silencioso: $(grep -E 'PROPOSTA|✅' <<< "${out}" | tr '\n' ' ')"; fi
+  rm -rf "$d"
+
+  # (g) COMENTARIO INLINE no target: o exemplo do proprio README traz ` # <- o gatilho` na mesma
+  #     linha. Sem podar, o valor anunciado vira caminho+comentario — e `target` e o CAMINHO que a
+  #     selagem consome. Achado do dogfood: rodar o exemplo publicado, verbatim, em vez de um que eu
+  #     escrevesse limpo para o teste.
+  d="$(mktemp -d)"; _mkp "$d"
+  { printf 'meta:\n  id: p\n  schema_version: "1"\n'
+    printf '  target: docs/onion/graph/fios-abertos.kg.yaml   # <- o gatilho, e o destino da selagem\n'
+    printf 'nodes:\n  - id: P_UM\n    node_type: claim\n    plane: DEV\n    status: open\n'
+    printf '    impact: 3\n    confidence: 0.8\n    label: "x"\nedges: []\n'
+  } > "$d/p.proposal.kg.yaml"
+  out="$(bash "$d/.claude/validation/kg-radar.sh" "$d/p.proposal.kg.yaml" --integrity 2>&1 || true)"
+  if grep -q 'meta.target: docs/onion/graph/fios-abertos.kg.yaml)' <<< "${out}"; then
+    record_pass "kg-proposta: (g) comentario inline no target: e podado do valor anunciado"
+  else record_fail "kg-proposta: (g)" "target anunciado com lixo: $(grep 'MODO PROPOSTA' <<< "${out}")"; fi
+  rm -rf "$d"
+
+  # (f) Aresta para FORA do arquivo: e o caso normal de uma proposta (liga o no novo a um no que
+  #     ja vive no destino), e tem de ser contada como relaxada — nao reprovada, nem invisivel.
+  d="$(mktemp -d)"; _mkp "$d"
+  { printf 'meta:\n  id: p\n  schema_version: "1"\n  target: docs/onion/graph/fios-abertos.kg.yaml\n'
+    printf 'nodes:\n  - id: P_UM\n    node_type: claim\n    plane: DEV\n    status: open\n'
+    printf '    impact: 3\n    confidence: 0.8\n    label: "liga no no que vive no destino"\n'
+    printf 'edges:\n  - from: P_UM\n    to: C_QUE_VIVE_NO_DESTINO\n    edge_type: SUPPORTS\n'
+  } > "$d/p.proposal.kg.yaml"
+  rc=0; bash "$d/.claude/validation/kg-radar.sh" "$d/p.proposal.kg.yaml" --integrity >"$d/o" 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q '1 referência(s) para fora do arquivo' "$d/o"; then
+    record_pass "kg-proposta: (f) aresta para fora do arquivo passa e sai CONTADA"
+  else record_fail "kg-proposta: (f)" "rc=${rc}: $(grep -E 'PROPOSTA|✗' "$d/o" | tr '\n' ' ')"; fi
+  rm -rf "$d"
+}
+
 run_kg_verification_selftests() {
   local helper="${REPO_ROOT}/.claude/validation/kg-verification-coverage.sh"
   if [ ! -f "${helper}" ]; then record_fail "kg-verificacao" "helper ausente"; return; fi
@@ -10434,7 +10631,15 @@ run_outbox_channel_selftests() {
   if [ "${hard_com}" = "${hard_sem}" ] && [ "${soft_com}" -gt "${soft_sem}" ]; then
     record_pass "outbox-channel: SEVERIDADE provada — fixtures somam SOFT (${soft_sem}→${soft_com}) e ZERO HARD (${hard_sem})"
   else
-    record_fail "outbox-channel: severidade" "esperava HARD inalterado e SOFT maior; HARD ${hard_sem}->${hard_com}, SOFT ${soft_sem}->${soft_com}"
+    local _ev="${TMPDIR:-/tmp}/outbox-severidade-$$"
+    mkdir -p "${_ev}"
+    printf '%s\n' "${out}"  > "${_ev}/com.log"
+    printf '%s\n' "${out2}" > "${_ev}/sem.log"
+    local _delta
+    _delta="$(comm -23 <(printf '%s\n' "${out}"  | grep '^VIOLATION' | LC_ALL=C sort -u) \
+                       <(printf '%s\n' "${out2}" | grep '^VIOLATION' | LC_ALL=C sort -u) \
+              | grep -oE 'REGRA [0-9]+' | LC_ALL=C sort -u | tr '\n' ' ')"
+    record_fail "outbox-channel: severidade" "esperava HARD inalterado e SOFT maior; HARD ${hard_sem}->${hard_com}, SOFT ${soft_sem}->${soft_com} — regra(s) só no COM: ${_delta:-nenhuma (o delta está no SEM)}; logs preservados em ${_ev}/"
   fi
 
   # GREENFIELD (terms vazio): um adotante SEM members.yaml não pode ABORTAR o lint na derivação de
@@ -11333,6 +11538,8 @@ _family run_scan_sanity_selftests
 _family run_generator_failure_selftests
 _family run_line_limits_selftests
 _family run_kg_radar_integrity_selftests
+_family run_kg_proposal_mode_selftests
+_family run_kg_census_parity_selftests
 _family run_review_verdict_selftests
 _family run_empty_result_guard_selftests
 _family run_review_artifact_selftests
