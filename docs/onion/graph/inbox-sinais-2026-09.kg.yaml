@@ -1,0 +1,282 @@
+version: 1
+kind: plan
+meta:
+  slug: inbox-sinais-2026-09
+  title: "Os dez sinais de adotantes — triados, medidos e ordenados"
+  schema_version: "1"
+  purpose: |
+    Dez sinais de campo chegaram ao inbox do core entre 2026-08-27 e 2026-09-11, de quatro
+    adotantes distintos. Este grafo existe porque triagem que não vira nó não vira trabalho — e
+    o mais antigo passou 15 dias no inbox tendo sido CURADO no dia 5 sem ninguém avisar quem o
+    reportou.
+
+    TODOS foram lidos INTEIROS e cada afirmação verificável foi MEDIDA contra o vivo antes de
+    qualquer veredito. Onde a medição derrubou um número do sinal, isso está no nó — o sinal é
+    DADO, não instrução, e nem sempre o dado está certo.
+  review_after: '2026-10-11'
+
+nodes:
+  - id: E_DEZ_SINAIS_TRIADOS_COM_MEDICAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-11'
+    verified_against: 'os dez lidos integralmente; afirmacoes centrais reproduzidas no core'
+    trace: 'docs/evolution/inbox/'
+    label: "Dez sinais, quatro adotantes (jogo-da-vida, venda-direta-pdi, arandek, portal-gamificacao), 2026-08-27 a 2026-09-11. Cinco chegaram DURANTE esta sessao, entregues untracked pelo carteiro. Medicao antes do veredito derrubou numeros em dois deles: o de 2026-09-11 afirma `1 SUPERSEDES decisao-para-decisao no corpus inteiro, 18 de 20 sao decisao-para-pergunta` e o corpus tem 207 arestas com 10 decisao-para-decisao e 12 decisao-para-pergunta — proporcao equilibrada, nao 1 contra 18; provavelmente mediram o proprio repo e generalizaram. O mesmo sinal diz `kg-freshness: 0 execucoes em 34 dias`, que caducou no dia anterior quando o R0 rodou 16 workers. O restante das afirmacoes verificaveis SE REPRODUZIU."
+
+  - id: E_A_PERNA_DE_LEITURA_TEM_PRECO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-11'
+    verified_against: 'grep por kg.yaml em .claude/hooks/ devolve VAZIO; drifted=0 em 3715 nos'
+    trace: 'docs/knowledge-base/concepts/knowledge-graph-sdaal.md:287-297'
+    label: "O ADOTANTE MEDIU O PRECO DA LACUNA QUE O CORE JA CONHECIA. O aviso 10 da propria KB diz que a perna de LEITURA foi anunciada como mecanismo e e conselho — nenhum hook le `.kg.yaml` (confirmado: grep vazio). O custo agora tem numero: um agente gastou UM DIA, leu 8.585 linhas de fonte em quatro frentes paralelas e publicou QUATRO teses erradas em sequencia, todas derrubadas pelo autor e nenhuma pelo metodo, num repo cujo `maagica.kg.yaml` respondia a pergunta central em QUATRO nos. O agravante: ele CITOU o grafo no proprio prompt — como checklist de conferencia, nunca como fonte de verdade. Nao foi falta de acesso nem de contexto: foi falta de mecanismo. A frase que o sinal cunha e agora medicao: `o grafo que nao e lido e indistinguivel do grafo que nao foi escrito`. E vale para mim: passei esta sessao inteira sem abrir grafo antes de agir."
+
+  - id: E_ONZE_PONTOS_ONDE_A_DOUTRINA_PROMETE_E_O_CODIGO_NAO_FAZ
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: '2026-09-11'
+    verified_against: 'tres achados reproduzidos por medicao direta no core'
+    trace: '.claude/validation/kg-radar.sh'
+    label: "Um adotante foi LER a doutrina para construir em cima dela e conferiu se e verdade no codigo — em onze pontos nao e, cada um com arquivo:linha dos DOIS lados. Reproduzi tres por medicao direta: (2) o radar NAO detecta ciclo `DEPENDS_ON` — `grep ciclo` = 0, e `A->B->A` passa com exit 0, embora a KB prometa que a integridade reprova; (6) o motor NAO le `valid_from`/`source_tier`/`source_kind` — grep = 0 — e NOVE grafos ja preenchem `valid_from` para um consumidor que nao existe; (9) `drifted` = 0 em 3.715 nos, com o slot construido, peso 1.3 e racional escrito. PLACAR das cinco reprovacoes prometidas na KB: UMA implementada (orfaos), tres ausentes, uma rebaixada a aviso. A lista correta do que barra esta no cabecalho do motor, nao na KB. `A perna de escrita funciona; a de leitura e a de reconciliacao, nao`."
+
+  - id: E_A_FILA_KG_INBOX_NAO_PASSA_NO_PROPRIO_GATE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-11'
+    verified_against: 'fixture de proposta com UM no: kg-radar --integrity --schema devolve rc=1, no orfao'
+    trace: '.claude/validation/kg-radar.sh (secao INTEGRIDADE)'
+    label: "DOIS CONTRATOS DO FRAMEWORK SE CONTRADIZEM, e reproduzi em 30 segundos: o `kg-inbox/README.md` manda propor UM no num `.proposal.kg.yaml`; a integridade do radar exige grau >= 1 em todo no, e aresta precisa de dois nos NO MESMO ARQUIVO. Logo uma proposta de um no so — que e o caso comum e o que o README descreve — NUNCA passa. Fixture medida: rc=1, `no orfao (grau 0)`. E o `ci.yml` que a adocao instala varre TODO `.kg.yaml` versionado fora de `fixtures/`, entao commitar a proposta pelo caminho DOCUMENTADO deixa o CI vermelho ate o dono selar. AGRAVANTE MEDIDO NESTA SESSAO: instalei essa fila no `granaa-ai` uma hora antes de ler o sinal — todo adotante a herda quebrada, e o primeiro que usar descobre por reprovacao."
+
+  - id: E_AUSENCIA_LIDA_COMO_RESULTADO_EM_TRES_SITIOS
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-11'
+    verified_against: 'tres sitios medidos: inventory.sh:38, co-deliver.sh:101, verify-adopter-gate.sh:31'
+    trace: '.claude/validation/inventory.sh:38'
+    label: "CLASSE com TRES sitios, e o terceiro achei sozinho hoje, adotando. (1) `inventory.sh:38` pergunta `ha git?` e nao `houve resultado?` — no greenfield o framework esta copiado mas untracked, `git ls-files` volta vazio, o fallback nunca dispara, e a SSOT sai com 0 comandos e rc=0. (2) `co-deliver.sh:101` valida o alvo com `[ -d ]` — qualquer diretorio gravavel e destino valido; custo medido pelo arandek: uma mensagem entregue no checkout errado ficou 26 DIAS sem tratamento. (3) `ops/verify-adopter-gate.sh:31` usava `[ -d .git ]`, que e FALSO em worktree — e a adocao legacy/regulated SEMPRE instala em worktree, entao o passo BLOQUEANTE da prova de vida do gate falhava em 100% desse modo. O proprio instalador que o chama ja usava `rev-parse --git-dir`, a forma certa, uma linha acima: as duas pontas discordavam. CURADO hoje. As tres perguntam a coisa errada — e `harness-inventory.sh`, que nasceu nesta onda, herdou a mesma: 5 scripts e 14 hooks em disco, emite 0 nos quatro contadores."
+
+  - id: E_SINAL_CURADO_SEM_AVISAR_QUEM_REPORTOU
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-11'
+    verified_against: 'os tres defeitos do sinal de 2026-08-27 medidos como curados; o sinal seguia no inbox'
+    trace: 'docs/evolution/inbox/_processed/2026-08-27-adopt-greenfield-tres-defeitos.md'
+    label: "O `venda-direta-pdi` reportou TRES defeitos de adocao greenfield em 2026-08-27. Medidos em 2026-09-11: os tres estao curados — crase escapada, `source_commit` com fallback (comentario datado 09-02), e o `regen-baselines` com guarda de stamp movido para depois do carimbo (dogfood 09-05). O sinal ficou QUINZE DIAS no inbox como se estivesse pendente, e o remetente nunca soube. MESMA CLASSE do anuncio do arandek, com o sinal invertido: la a medicao existia e nao viajou; aqui a CURA existia e nao viajou. O doc-bridge tem produtor e carteiro, e NAO TEM o ato de fechar o laco com quem reportou."
+
+  - id: I_LIGAR_A_PERNA_DE_LEITURA
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "PRIMEIRO da fila por retorno sobre custo, e o unico que teria evitado o caso do sinal. A classe de hook JA EXISTE e roda a todo commit; falta a fiacao — nenhum deles le `.kg.yaml`. GATILHO E EVENTO, NAO RELOGIO, e o adotante fundamenta: `review_after` JA E um temporizador, esta em 16 grafos e nao fez ninguem revisitar nada, porque relogio produz lote de obrigacoes fora de contexto — foi assim que a pratica de ADR virou cemiterio. E agendar por relogio e MOAT declarado nesta casa. NASCE COMO CATRACA, nunca bloqueando: gate que impede trabalho e contornado com `--no-verify` na primeira sexta-feira, e ai se perde o mecanismo E a informacao."
+
+  - id: I_O_RADAR_PARA_DE_ESCONDER_O_VENCIMENTO
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "SEGUNDO, e nao e feature nova — e parar de esconder. Hoje o `kg-radar.sh` sai VERDE com grafo vencido; quem cobra `review_after` e a REGRA 67 (Grafo vencido), SOFT, no lint. Quem roda so o radar — que e o instrumento que todos rodam — acha que esta em dia. Mostrar `N nos fora da validade` na saida do radar. Dois sinais independentes pedem isto (o de 2026-09-10 como achado 7, o de 2026-09-11 como necessidade 2)."
+
+  - id: I_A_FILA_DE_PROPOSTAS_PASSA_NO_GATE
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "URGENTE por alcance: todo adotante ja herda a fila quebrada, e eu instalei mais uma hoje. Duas saidas que o sinal enquadra: (a) o radar reconhece `meta.target` ou o sufixo `.proposal.kg.yaml` e roda em MODO PROPOSTA — valida schema, tipos, planes e ids, mas nao exige grau >= 1 nem resolve aresta para fora do arquivo; (b) se a fila deve ficar fora do gate, o `ci.yml` que a adocao instala precisa dizer isso, acrescentando `kg-inbox` a exclusao que ja existe para `fixtures/`. Em qualquer das duas, o `README.md` da fila precisa de um exemplo QUE PASSA — hoje ele descreve o formato e o primeiro a usar descobre o conflito por reprovacao."
+
+  - id: I_CURAR_A_AUSENCIA_LIDA_COMO_RESULTADO
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.95
+    label: "Cura de RAIZ nos tres sitios, porque a pergunta errada e a mesma: cair no fallback quando o RESULTADO e vazio, nao so quando falta a ferramenta; validar o alvo do carteiro por EVIDENCIA DE ADOCAO (`.claude/.onion-version` com `role: adopted`), nao por `[ -d ]`; e assertiva de contradicao — superficie com arquivos em disco e contagem zero sai NAO-ZERO em vez de emitir SSOT mentirosa. O terceiro sitio (`verify-adopter-gate.sh:31`) JA FOI CURADO hoje, por ter bloqueado uma adocao real."
+
+  - id: I_FECHAR_O_LACO_COM_QUEM_REPORTOU
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    label: "O doc-bridge tem produtor (`co-announce`) e carteiro (`co-deliver`), e nao tem o ato de RESPONDER. Consequencia medida duas vezes: um sinal curado em 5 dias ficou 15 no inbox sem o remetente saber, e um anuncio afirmou `portas OK` contra o relatorio da propria leva. Duas curas que o arandek propos e que se sustentam: quando o anuncio descreve estado verificavel, DERIVAR o numero do artefato de medicao (baseline da catraca, saida do gate) ou dizer NAO MEDIDO; e guarda barata — anuncio e relatorio da mesma leva nao podem discordar sobre uma contagem que ambos citam."
+
+  - id: Q_POR_QUE_DRIFTED_NUNCA_FOI_USADO
+    node_type: question
+    drive_kind: research
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "`drifted` = 0 em 3.715 nos, com o slot construido, peso 1.3 (o UNICO fator que SOBE) e o racional escrito. Nao e falta de motor. O adotante propoe a leitura que o proprio autor do modelo MAAGICA sustenta — Rosario (2005): a fase de avaliacao `nao se centra na mera CONSTATACAO de eventuais erros de planejamento, mas sim no REDESENHO de estrategias`. Reenquadra o zero: ninguem deixa de carimbar por preguica, deixa porque CARIMBAR E BARATO E NAO ENTREGA NADA. Proposta: um `drifted` SEM aresta para algo novo esta incompleto, e o radar avisa — o carimbo passa a exigir o PAR, o desvio E o redesenho. Achar isto vale mais que qualquer feature nova: e a diferenca entre um grafo que e memoria e um que e arquivo morto."
+
+  - id: Q_DESIGN_SINK_TEM_DOIS_SINKS_REAIS
+    node_type: question
+    drive_kind: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "DOIS sinais independentes, do portal-gamificacao (2026-09-07) e do jogo-da-vida (2026-09-07), pedem a mesma coisa por caminhos diferentes: o `tokens-to-css-vars.sh` emite tema PLANO (zero mencoes a modo/dark — medido) e o README do design-sink ja declara `adapter reutilizavel pendente`. O primeiro precisa de css com os tres estados do viewer; o segundo precisa de NUMEROS e objetos, porque React Native consome `fontSize: 16` e molas do Reanimated, nao string. O ACHADO COLATERAL pesa mais que o adapter e os dois o relatam: o `lint-design-tokens.sh` so mede os pares que `contrast-pairs.json` DECLARA e pula em silencio quando o arquivo falta — custo medido: quatro candidatas com `brand.500` entre 1.71 e 2.60 contra fundo escuro (alvo 3.0) passariam. O segundo sinal traz mais quatro achados no mesmo gate (composites sem checagem de alias orfao, `_candidates/` dentro da varredura, fail-open sem jq). DECISAO DO MAESTRO: forma canonica do ramo de modo na SSOT e se nasce `tokens-to-ts.mjs` generico."
+
+  - id: Q_ONION_RESEARCH_NAO_DISTINGUE_VAZIO_DE_INALCANCAVEL
+    node_type: question
+    drive_kind: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    label: "Duas rodadas no mesmo dia, mesmo tema: a de busca aberta deu 13 claims de blog de escritorio que VENDE registro de marca (tier 3-5) por 4,52M tokens; a corrigida pelo Elenxo, com fontes PRIMARIAS nomeadas (INPI, WIPO, EUIPO, USPTO), deu ZERO claims e nenhum grafo por 1,46M. A RODADA COM O DESENHO CERTO DEVOLVEU MENOS QUE A ERRADA — quem aprende a licao do Elenxo e punido. Causa: as fontes primarias desse dominio nao sao documentos, sao APLICACOES com sessao, JavaScript e as vezes captcha; o `WebFetch` bate na porta e volta vazio, e o coletor nao distingue `a fonte disse que nao ha nada` de `nao consegui entrar`. Vale para qualquer base publica consultavel so por formulario: processos, licitacoes, cadastros regulatorios, patentes. Agravante: `kgPath: null` SEM erro — zero claims nao escreve grafo e o run devolve SUCESSO, porque o gate `sem radar 0 o run erra` nao dispara quando nao houve grafo para julgar."
+
+  - id: Q_AGENTE_EXPO_REACT_NATIVE
+    node_type: question
+    drive_kind: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.9
+    label: "O `react-developer` e orientado a web: cita shadcn/ui dez vezes, Next.js 13, e nao menciona React Native, Expo, Reanimated nem React Compiler. Num app Expo SDK 57 universal ele funcionou nos lotes L3-L6 SO PORQUE o prompt do condutor carregava toda a doutrina — o conhecimento veio do modelo e do contexto, nao do agente. DECISAO DO MAESTRO: variante `expo-developer` nova ou secao RN no existente."
+
+  - id: D_A_KB_PASSA_A_DIZER_O_QUE_O_MOTOR_FAZ
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.95
+    label: "SELADO pelo maestro 2026-09-11: alinhar a KB ao MOTOR, nao o contrario. `knowledge-graph-sdaal.md:195-196` promete CINCO reprovacoes e o `kg-radar.sh` implementa UMA (no orfao); tres estao ausentes (ciclo `DEPENDS_ON` — `grep ciclo` = 0 e `A->B->A` passa com exit 0; `decision done` fora de PROD; `refuted` recebendo `SUPPORTS`) e uma foi rebaixada a AVISO (migalha pendente). A lista CORRETA do que barra ja existe, escrita no cabecalho do proprio motor (`kg-radar.sh:27-29`) — a KB e que ficou para tras. Escopo desta cura: a KB passa a dizer o que o motor FAZ. Vale tambem para `atencao = PageRank ponderado`, que no codigo e `impact x conf x sf x (1 + grau)` sem iteracao, amortecimento nem normalizacao, com grau NAO-DIRECIONADO. E para `valid_from`/`source_tier`/`source_kind`, que a gramatica declara e o motor nao le — com NOVE grafos ja preenchendo `valid_from` para um consumidor inexistente. NAO fecha as tres guardas ausentes: isso fica com gatilho nomeado, porque prometer menos e honesto e prometer o que nao existe faz adotante construir sobre areia."
+
+  - id: D_O_RADAR_GANHA_MODO_PROPOSTA
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.95
+    label: "SELADO pelo maestro 2026-09-11: o radar reconhece `meta.target` OU o sufixo `.proposal.kg.yaml` e roda em MODO PROPOSTA — valida schema, tipos, planes e ids, mas NAO exige grau >= 1 nem resolve aresta para fora do arquivo. Cura a contradicao entre dois contratos do framework: o `kg-inbox/README.md` manda propor UM no, e a integridade exige grau >= 1 com aresta no MESMO arquivo, entao a proposta documentada NUNCA passa (reproduzido: rc=1, `no orfao`). Escolhida sobre a alternativa de excluir a fila do `ci.yml` porque aquela deixaria a fila sem QUALQUER gate — proposta mal formada so apareceria ao selar. URGENTE POR ALCANCE: todo adotante ja herda a fila quebrada, e eu instalei mais uma no granaa-ai horas antes de ler o sinal. Entrega: 1 guarda, 1 fixture, 1 mutante — e o README ganha um exemplo que PASSA, porque hoje o primeiro a usar a fila descobre o conflito por reprovacao."
+
+  - id: D_O_GATE_WCAG_PARA_DE_PULAR_EM_SILENCIO
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.95
+    label: "SELADO pelo maestro 2026-09-11, com escopo DELIBERADAMENTE estreito: desta leva entra SO o furo do gate WCAG, nao o provider de tema nem o sink TypeScript. `lint-design-tokens.sh:118` pula a checagem em silencio quando falta `contrast-pairs.json` e sai 0 — entao `passou no gate` vira afirmacao mais forte do que o gate mediu. Custo MEDIDO por um adotante: quatro candidatas de paleta com `brand.500` entre 1.71 e 2.60 contra fundo escuro (alvo 3.0), e NENHUMA teria sido barrada. Um segundo adotante relata o mesmo furo por outro caminho e acrescenta tres irmaos no mesmo gate (composites `typography`/`shadow` passam sem checagem de alias orfao; a varredura inclui `_candidates/`, que o proprio `/design:generate` manda usar como staging; e fail-open sem `jq`). Cura: gate sai != 0 quando `docs/design-context/` existe e a ferramenta ou a governanca faltam. Os dois sinks reais (css com os tres estados do viewer, e TypeScript para React Native) ficam GATED com gatilho nomeado."
+
+  - id: Q_SUPERACAO_DA_FONTE_INALCANCAVEL
+    node_type: question
+    drive_kind: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "O maestro selou `falhar alto + distinguir vazio de inalcancavel` E PEDIU MAIS: `pensar na melhor superacao disso`. Entao NAO vira execucao direta — passa por SDAAL e Elenxo antes de selar, que e o caminho que esta casa exige de toda superacao. O FATO medido pelo adotante: duas rodadas no mesmo dia, mesmo tema; a de busca aberta deu 13 claims de blog de escritorio que VENDE registro de marca por 4,52M tokens; a corrigida pelo Elenxo, com fontes PRIMARIAS nomeadas, deu ZERO claims e nenhum grafo por 1,46M — A RODADA COM O DESENHO CERTO DEVOLVEU MENOS QUE A ERRADA, o que inverte o incentivo de aprender a licao. O DIAGNOSTICO RASO e `o WebFetch nao alcanca aplicacao com sessao`. A pergunta de superacao e outra: o pipeline trata TODA fonte como documento buscavel, e uma classe inteira de fontes primarias — INPI, WIPO, EUIPO, processos, licitacoes, cadastros regulatorios, patentes — sao APLICACOES. O que o adotante fez no lugar e a pista: verificacao direta por shell num endpoint publico (`registro.br/v2/ajax/avail/raw`), 26 nomes em segundos com a resposta crua no log. Ou seja, a fonte ERA alcancavel — por outro VERBO. Candidatos a superar, a serem refutados antes de escolher: marcar `fetch_kind` no roster e o Scope avisar ANTES de gastar; ponte para automacao de navegador onde ela existe; fase declarada de verificacao HUMANA que devolve a lista exata do que conferir; ou SDAAL de colheita, em que `fetch` e so um dos adapters ao lado de `shell`, `api` e `browser`."
+
+  - id: E_LABEL_ESCONDE_NO_FANTASMA_DO_CENSO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-10'
+    verified_against: 'fixture reproduzida no core: PyYAML ve 2 nos, kg-radar anuncia 3 nos 2 arestas, ambos os gates rc=0'
+    trace: '.claude/validation/kg-radar.sh'
+    label: "Sinal do venda-direta-pdi (pin 5dcc706b2233), REPRODUZIDO no core em 30 segundos: um `.kg.yaml` PERFEITAMENTE VALIDO em que os dois leitores veem grafos DIFERENTES com todos os gates verdes. Um no `B_ESCONDIDO` escrito DENTRO do bloco `label: |` de outro, com aresta SUPPORTS saindo dele. PyYAML ve 2 nos; o `kg-radar.sh` — QUE E QUEM EMITE O VEREDITO — anuncia `3 nos, 2 arestas`, e o no forjado pesa na centralidade. A REGRA 78 (`.kg.yaml` versionado e YAML VALIDO, com catraca) sai rc=0 e esta CERTA: o arquivo E valido. Causa: o matcher casa `- id:` com QUALQUER indentacao dentro de `nodes:`, sem rastrear blocos literais — permissividade correta para um motor awk, e o preco declarado da economia de motores. A REGRA 78 fechou a metade SINTATICA; a do CENSO estava aberta. MESMA CLASSE ja registrada: o docstring da REGRA 78 diz que `foi essa fresta que permitiu forjar uma aresta REFUTES DENTRO de um label`."
+
+  - id: D_PARIDADE_DE_CENSO_VIRA_REGRA
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "SELADO pelo maestro em 2026-09-10: a paridade de censo vira REGRA no core, irma da REGRA 78 (`.kg.yaml` versionado e YAML VALIDO, com catraca) e com a mesma catraca. A 78 fecha `e YAML valido`; esta fecha `os dois leitores concordam sobre QUEM E NO`. Molde: o `kg_parity.py` do adotante — replica a maquina de estados do radar e confronta a populacao contra PyYAML; contrato 0 concordam / 1 divergem NOMEANDO os fantasmas / 2 NAO MEDIDO. REQUISITO NAO-NEGOCIAVEL que o adotante descobriu na pele: a 1a versao da guarda deles ancorava em dois espacos fixos e NAO VIA o no forjado a seis — media, saia 0, e nao replicava nada. Guarda que nao replica o contador que DA O VEREDITO e decoracao."
+
+edges:
+  - from: E_A_PERNA_DE_LEITURA_TEM_PRECO
+    to: E_DEZ_SINAIS_TRIADOS_COM_MEDICAO
+    edge_type: SUPPORTS
+  - from: E_ONZE_PONTOS_ONDE_A_DOUTRINA_PROMETE_E_O_CODIGO_NAO_FAZ
+    to: E_DEZ_SINAIS_TRIADOS_COM_MEDICAO
+    edge_type: SUPPORTS
+  - from: E_A_FILA_KG_INBOX_NAO_PASSA_NO_PROPRIO_GATE
+    to: E_DEZ_SINAIS_TRIADOS_COM_MEDICAO
+    edge_type: SUPPORTS
+  - from: E_AUSENCIA_LIDA_COMO_RESULTADO_EM_TRES_SITIOS
+    to: E_DEZ_SINAIS_TRIADOS_COM_MEDICAO
+    edge_type: SUPPORTS
+  - from: E_SINAL_CURADO_SEM_AVISAR_QUEM_REPORTOU
+    to: E_DEZ_SINAIS_TRIADOS_COM_MEDICAO
+    edge_type: SUPPORTS
+  - from: I_LIGAR_A_PERNA_DE_LEITURA
+    to: E_A_PERNA_DE_LEITURA_TEM_PRECO
+    edge_type: DEPENDS_ON
+  - from: I_O_RADAR_PARA_DE_ESCONDER_O_VENCIMENTO
+    to: E_ONZE_PONTOS_ONDE_A_DOUTRINA_PROMETE_E_O_CODIGO_NAO_FAZ
+    edge_type: DEPENDS_ON
+  - from: I_A_FILA_DE_PROPOSTAS_PASSA_NO_GATE
+    to: E_A_FILA_KG_INBOX_NAO_PASSA_NO_PROPRIO_GATE
+    edge_type: DEPENDS_ON
+  - from: I_CURAR_A_AUSENCIA_LIDA_COMO_RESULTADO
+    to: E_AUSENCIA_LIDA_COMO_RESULTADO_EM_TRES_SITIOS
+    edge_type: DEPENDS_ON
+  - from: I_FECHAR_O_LACO_COM_QUEM_REPORTOU
+    to: E_SINAL_CURADO_SEM_AVISAR_QUEM_REPORTOU
+    edge_type: DEPENDS_ON
+  - from: Q_POR_QUE_DRIFTED_NUNCA_FOI_USADO
+    to: E_ONZE_PONTOS_ONDE_A_DOUTRINA_PROMETE_E_O_CODIGO_NAO_FAZ
+    edge_type: DEPENDS_ON
+  - from: Q_DESIGN_SINK_TEM_DOIS_SINKS_REAIS
+    to: E_DEZ_SINAIS_TRIADOS_COM_MEDICAO
+    edge_type: DEPENDS_ON
+  - from: Q_ONION_RESEARCH_NAO_DISTINGUE_VAZIO_DE_INALCANCAVEL
+    to: E_DEZ_SINAIS_TRIADOS_COM_MEDICAO
+    edge_type: DEPENDS_ON
+  - from: Q_AGENTE_EXPO_REACT_NATIVE
+    to: E_DEZ_SINAIS_TRIADOS_COM_MEDICAO
+    edge_type: DEPENDS_ON
+  - from: D_A_KB_PASSA_A_DIZER_O_QUE_O_MOTOR_FAZ
+    to: E_ONZE_PONTOS_ONDE_A_DOUTRINA_PROMETE_E_O_CODIGO_NAO_FAZ
+    edge_type: DEPENDS_ON
+  - from: D_O_RADAR_GANHA_MODO_PROPOSTA
+    to: I_A_FILA_DE_PROPOSTAS_PASSA_NO_GATE
+    edge_type: SUPPORTS
+  - from: D_O_GATE_WCAG_PARA_DE_PULAR_EM_SILENCIO
+    to: Q_DESIGN_SINK_TEM_DOIS_SINKS_REAIS
+    edge_type: SUPPORTS
+  - from: Q_SUPERACAO_DA_FONTE_INALCANCAVEL
+    to: Q_ONION_RESEARCH_NAO_DISTINGUE_VAZIO_DE_INALCANCAVEL
+    edge_type: DEPENDS_ON
+  - from: D_PARIDADE_DE_CENSO_VIRA_REGRA
+    to: E_LABEL_ESCONDE_NO_FANTASMA_DO_CENSO
+    edge_type: DEPENDS_ON
+  - from: E_LABEL_ESCONDE_NO_FANTASMA_DO_CENSO
+    to: E_DEZ_SINAIS_TRIADOS_COM_MEDICAO
+    edge_type: SUPPORTS

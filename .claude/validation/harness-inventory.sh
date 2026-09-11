@@ -106,6 +106,21 @@ HOOKS="$(_count_tracked '.claude/hooks/*.sh')"
 WORKFLOWS="$(_count_tracked '.github/workflows/*.yml')"
 BASELINES="$(_count_tracked '.claude/validation/*-baseline.txt')"
 
+# ---------------------------------------------------------------------------
+# O ESTADO DA SÉRIE É MEDIDO, NÃO AFIRMADO.
+# A 1ª versão desta seção tinha a frase "…`selftest-runs.jsonl`, que ainda não existe" como
+# STRING ESTÁTICA no heredoc. O arquivo passou a existir no commit ANTERIOR desta mesma branch,
+# e o gerador seguiu dizendo que não — para sempre, mesmo com centenas de execuções acumuladas.
+# A REGRA 80 ficava VERDE porque ela compara o .md com o GERADOR, e era o gerador que mentia.
+# Achado pela passada adversarial do PR, e é exatamente o painel inventado dentro do gerador que
+# o substituiu: uma afirmação sobre o mundo, sem produtor, num arquivo cuja regra é não ter isso.
+LEDGER_SERIE="${REPO_ROOT}/docs/onion/metrics/selftest-runs.jsonl"
+if [ -s "${LEDGER_SERIE}" ]; then
+  SERIE_N="$(grep -c '^{' "${LEDGER_SERIE}" || true)"
+else
+  SERIE_N=0
+fi
+
 emit_env() {
   cat <<EOF
 HARNESS_FAMILIES=${FAMILIES}
@@ -181,9 +196,9 @@ emit_markdown() {
 
 ## O que RODOU
 
-⊘ **NÃO MEDIDO** — não há série histórica de execução ainda. Este arquivo conta o que
-**existe**; quantas asserções de fato **passaram** é resultado de execução e pertence a
-\`docs/onion/metrics/selftest-runs.jsonl\`, que ainda não existe.
+Este arquivo conta o que **existe**. Quantas asserções de fato **passaram** é resultado de
+execução, vive em \`docs/onion/metrics/selftest-runs.jsonl\` (**${SERIE_N}** envelope(s)
+coletado(s)) e é projetado em [\`testing-state.md\`](testing-state.md).
 
 A distinção não é formalismo. Há **${ASSERT_SITES}** sítios estáticos de asserção e a última
 execução completa contou **mais** que isso, porque sítio dentro de laço dispara N vezes.

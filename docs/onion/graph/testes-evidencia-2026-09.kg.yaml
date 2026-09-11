@@ -229,7 +229,7 @@ nodes:
     impact: 4
     confidence: 0.95
     verified_at: '2026-09-09'
-    verified_against: 'primeiro envelope real coletado: 1148 pass / 0 fail / 158 familias / 905s, sha 379784d3'
+    verified_against: 'primeiro envelope real, LIDO do ledger commitado: 1164 pass / 0 fail / 160 familias em 167 linhas / 750s, sha 01d1df49, dirty=true'
     trace: 'ops/testing/collect-selftest.sh + docs/onion/metrics/selftest-runs.jsonl'
     label: "ONDA 0.6 ENTREGUE — `collect-selftest.sh` transforma o `--report` da bancada em um ENVELOPE por execucao em `selftest-runs.jsonl`. Modos: coleta · `--resumo` · `--flaky`. O DESENHO QUE IMPORTA: ele NAO roda a bancada, INGERE o relatorio de quem ja rodou. A bancada custa ~15 min, ja roda todo dia na main (`schedule: 17 4 * * *`) e em cada pre-commit; reinvoca-la seria o instrumento mais caro que o instrumentado — e nesta maquina isso matou dois workers por memoria em 2026-09-08. Quem aperta o botao e o humano: o script escreve, o CI nunca commita (molde literal do ledger GTM). Custo MEDIDO: 11,9 KB por envelope, ~4,3 MB/ano em execucao diaria."
 
@@ -341,6 +341,44 @@ nodes:
     confidence: 0.9
     label: "QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUARDAS_COERENTES` mediu 3/3 TOTAL e escreveu em `blocked_by`: `Nenhum bloqueio de acesso — toda medicao foi read-only. O unico nao-medido: nao reexecutei o workflow completo`. Isso e RESSALVA, nao impedimento. O schema do worker nao tem onde por uma ressalva que nao bloqueia, entao ela vaza para o campo que rebaixa. E a MESMA classe do `verdict` dos 262 residuos, que virava frase inteira por falta de um campo `nota:` — e a cura la foi partir o campo. Pergunta ao maestro: o contrato do worker ganha um `caveat:` (ressalva que NAO rebaixa) alem do `blocked_by` (impedimento que rebaixa)? Se sim, os quatro nos rebaixados por G1 merecem re-medicao com o contrato novo antes de qualquer carimbo."
 
+  - id: E_ELENXO_REPROVOU_A_ONDA_0
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-09'
+    verified_against: 'run wf_7cd5ae40-511: 6 dimensoes com mandato de refutar, 20 agentes, 1,87M tokens, 14 achados / 14 REAIS'
+    trace: 'docs/evolution/review/feat-testing-visibility-onda0.md'
+    label: "A passada adversarial do PR REPROVOU a entrega: 14 achados, 14 confirmados como REAIS, ZERO descartados no verify (11 ALTA, 3 MEDIA). Eu entreguei uma onda inteira sobre declarado-nao-e-verificado e cometi a MESMA CLASSE quatro vezes DENTRO dela: (1) o gerador da SSOT afirmava por string estatica que `selftest-runs.jsonl` nao existia, um commit depois de ele passar a existir; (2) e (3) os dois casos `(MUT)` das REGRAS 80 e 81 NAO EXECUTAVAM o mutante — asseriam so que o `sed` casou a ancora, e o proprio rotulo admitia `a mutacao foi APLICAVEL`; (4) o no `E_SERIE_DA_BANCADA_EXISTE` cita numeros que nao batem com o envelope commitado. NADA disso apareceu no lint nem na bancada. So apareceu quando seis revisores com mandato de REFUTAR foram olhar. O verificador de cada achado tinha vies INVERTIDO (default: derrubar), e ainda assim 14/14 sobreviveram."
+
+  - id: I_CURAR_O_RESIDUO_DO_ELENXO
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.95
+    label: "BLOQUEIA O PR DA ONDA 0. Restam DEZ dos 14 achados (quatro ja curados: o gerador que afirmava, os dois MUT que nao executavam, e o .md que deles derivava). Por gravidade: (a) a REGRA 81 (Painel de estado e GERADO dos produtores, nunca redigido) NUNCA e exercitada pela bancada — provado por mutacao, guarda inteira desligada e `--families testing_state` da 6 PASS / 0 FAIL; duas causas somadas, o `--only` que eu adicionei e o `role: adopted` das duas familias de lint completo; (b) o sumario do CI mostra ✅ quando o lint ABORTA antes de somar (2 achados na mesma linha); (c) a particao do coletor so fecha o pilar `pass` — `fail`/`skip` inconsistentes entram e persistem; (d) o detector de flaky classifica familia SEMPRE vermelha como FLAKY quando ela e fatiada em shards; (e) a idempotencia DESCARTA execucao real quando o sha nao resolve; (f) `verified_against` truncado em ~205 chars em 6 carimbos do R0, cortando o comando no meio; (g) o no `E_SERIE_DA_BANCADA_EXISTE` com numeros que nao batem; (h) `selftest-summary` omite familia com `fail` nao-numerico contradizendo o proprio icone; (i) `R56_COM_TOKENS` com nome que nao bate com a populacao que alimenta a media."
+
+  - id: I_AUSENCIA_LIDA_COMO_RESULTADO
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.95
+    label: "ENTRA NO MESMO PR, e a razao e que o defeito esta num arquivo que o PR INTRODUZ. Sinal do adotante (2026-09-08): `inventory.sh:38` pergunta `ha git?` e nao `houve resultado?` — num greenfield o framework esta copiado mas untracked, `git ls-files` volta vazio, o fallback para `find` NUNCA dispara, e a SSOT sai com `0 comandos, 0 agentes` e rc=0. O adotante commitou uma SSOT que DECLARA uma superficie que nao existe. MEDIDO AQUI EM 2026-09-10: o `harness-inventory.sh` que esta neste PR HERDA a classe — 5 scripts e 14 hooks em disco, ele emite 0 nos quatro contadores, rc=0. Cura de raiz: cair no `find` quando o RESULTADO e vazio (nao so quando falta git) MAIS assertiva de contradicao (arquivos em disco + contagem zero = sai nao-zero). ISTO CORRIGE UM JULGAMENTO MEU: em 2026-09-09 registrei a classe em E_UNTRACKED_TORNA_A_PROJECAO_INSTAVEL e decidi NAO por guarda, argumentando falso-positivo travante. O sinal mostra que no greenfield nao e ruido — e SSOT zerada indo para o historico de um adotante."
+
+  - id: D_PR_DA_ONDA_0
+    node_type: decision
+    drive_kind: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    label: "O PR da Onda 0 + R0: 9 commits, 35 arquivos, 3144 insercoes, SHA canonico 4ac84bdc. NAO ABRE enquanto o residuo do Elenxo e a cura de raiz da ausencia-lida-como-resultado nao fecharem — abrir agora seria pedir merge de um lote que a propria maquinaria reprovou em 14 pontos. O residuo da REGRA 56 (PR carrega residuo adversarial) ja tem os numeros REAIS para escrever (14 achados / 14 reais / 1,87M tokens / 16 min) e sai no vocabulario FECHADO que o maestro selou — sera o primeiro residuo da era nova. Merge e 100% do maestro."
+
 edges:
   - from: I_HARNESS_INVENTORY
     to: E_NUMEROS_DO_HARNESS_DIVERGEM_ENTRE_SI
@@ -440,4 +478,20 @@ edges:
     edge_type: SUPPORTS
   - from: Q_BLOCKED_BY_ESTA_SOBRECARREGADO
     to: E_AS_GUARDAS_DO_FANIN_SAO_LOAD_BEARING
+    edge_type: DEPENDS_ON
+  - from: I_CURAR_O_RESIDUO_DO_ELENXO
+    to: E_ELENXO_REPROVOU_A_ONDA_0
+    edge_type: DEPENDS_ON
+  # CONSTRAINS, nao SUPERSEDES, e a razao e mecanica: a reconciliacao do radar so conta
+  # superseder `confirmed` (kg-radar.sh:233). Uma aresta SUPERSEDES saindo de um no `open`
+  # fica INVISIVEL para a guarda — fail-open dentro da propria correcao. A Aufhebung real
+  # entra quando a cura landar, com um no de evidencia `confirmed`.
+  - from: I_AUSENCIA_LIDA_COMO_RESULTADO
+    to: E_UNTRACKED_TORNA_A_PROJECAO_INSTAVEL
+    edge_type: CONSTRAINS
+  - from: D_PR_DA_ONDA_0
+    to: I_CURAR_O_RESIDUO_DO_ELENXO
+    edge_type: DEPENDS_ON
+  - from: D_PR_DA_ONDA_0
+    to: I_AUSENCIA_LIDA_COMO_RESULTADO
     edge_type: DEPENDS_ON

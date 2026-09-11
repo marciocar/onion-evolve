@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**179 itens abertos** em 42 grafo(s) com aberto (de 64 no escopo) · 42 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**196 itens abertos** em 43 grafo(s) com aberto (de 65 no escopo) · 43 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -261,6 +261,35 @@
 | 5.4 | `Q_BEACON_NAO_LIBERA_NO_STOP` | onion-plugin-publication-2026-08 | ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o  |
 | 5.4 | `Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA` | onion-plugin-publication-2026-08 | CANDIDATO A GUARDA, com o dado que EU NAO TINHA quando decidi nao mecanizar (2026-09-06). Eu recusei mecanizar a classe 'no supera |
 
+## testes-evidencia-2026-09 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 14.2 | `I_AUSENCIA_LIDA_COMO_RESULTADO` | testes-evidencia-2026-09 | ENTRA NO MESMO PR, e a razao e que o defeito esta num arquivo que o PR INTRODUZ. Sinal do adotante (2026-09-08): `inventory.sh:38` |
+| 14.2 | `I_CURAR_O_RESIDUO_DO_ELENXO` | testes-evidencia-2026-09 | BLOQUEIA O PR DA ONDA 0. Restam DEZ dos 14 achados (quatro ja curados: o gerador que afirmava, os dois MUT que nao executavam, e o |
+| 13.5 | `D_PR_DA_ONDA_0` | testes-evidencia-2026-09 | O PR da Onda 0 + R0: 9 commits, 35 arquivos, 3144 insercoes, SHA canonico 4ac84bdc. NAO ABRE enquanto o residuo do Elenxo e a cura |
+| 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
+| 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
+
+## inbox-sinais-2026-09 — 14 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 13.5 | `I_A_FILA_DE_PROPOSTAS_PASSA_NO_GATE` | inbox-sinais-2026-09 | URGENTE por alcance: todo adotante ja herda a fila quebrada, e eu instalei mais uma hoje. Duas saidas que o sinal enquadra: (a) o  |
+| 10.8 | `Q_DESIGN_SINK_TEM_DOIS_SINKS_REAIS` | inbox-sinais-2026-09 | DOIS sinais independentes, do portal-gamificacao (2026-09-07) e do jogo-da-vida (2026-09-07), pedem a mesma coisa por caminhos dif |
+| 10.8 | `Q_ONION_RESEARCH_NAO_DISTINGUE_VAZIO_DE_INALCANCAVEL` | inbox-sinais-2026-09 | Duas rodadas no mesmo dia, mesmo tema: a de busca aberta deu 13 claims de blog de escritorio que VENDE registro de marca (tier 3-5 |
+| 9.5 | `D_A_KB_PASSA_A_DIZER_O_QUE_O_MOTOR_FAZ` | inbox-sinais-2026-09 | SELADO pelo maestro 2026-09-11: alinhar a KB ao MOTOR, nao o contrario. `knowledge-graph-sdaal.md:195-196` promete CINCO reprovaco |
+| 9.5 | `D_O_RADAR_GANHA_MODO_PROPOSTA` | inbox-sinais-2026-09 | SELADO pelo maestro 2026-09-11: o radar reconhece `meta.target` OU o sufixo `.proposal.kg.yaml` e roda em MODO PROPOSTA — valida |
+| 9.5 | `I_CURAR_A_AUSENCIA_LIDA_COMO_RESULTADO` | inbox-sinais-2026-09 | Cura de RAIZ nos tres sitios, porque a pergunta errada e a mesma: cair no fallback quando o RESULTADO e vazio, nao so quando falta |
+| 9.0 | `D_PARIDADE_DE_CENSO_VIRA_REGRA` | inbox-sinais-2026-09 | SELADO pelo maestro em 2026-09-10: a paridade de censo vira REGRA no core, irma da REGRA 78 (`.kg.yaml` versionado e YAML VALIDO,  |
+| 9.0 | `I_LIGAR_A_PERNA_DE_LEITURA` | inbox-sinais-2026-09 | PRIMEIRO da fila por retorno sobre custo, e o unico que teria evitado o caso do sinal. A classe de hook JA EXISTE e roda a todo co |
+| 9.0 | `Q_POR_QUE_DRIFTED_NUNCA_FOI_USADO` | inbox-sinais-2026-09 | `drifted` = 0 em 3.715 nos, com o slot construido, peso 1.3 (o UNICO fator que SOBE) e o racional escrito. Nao e falta de motor. O |
+| 9.0 | `Q_SUPERACAO_DA_FONTE_INALCANCAVEL` | inbox-sinais-2026-09 | O maestro selou `falhar alto + distinguir vazio de inalcancavel` E PEDIU MAIS: `pensar na melhor superacao disso`. Entao NAO vira  |
+| 7.6 | `D_O_GATE_WCAG_PARA_DE_PULAR_EM_SILENCIO` | inbox-sinais-2026-09 | SELADO pelo maestro 2026-09-11, com escopo DELIBERADAMENTE estreito: desta leva entra SO o furo do gate WCAG, nao o provider de te |
+| 7.2 | `I_O_RADAR_PARA_DE_ESCONDER_O_VENCIMENTO` | inbox-sinais-2026-09 | SEGUNDO, e nao e feature nova — e parar de esconder. Hoje o `kg-radar.sh` sai VERDE com grafo vencido; quem cobra `review_after` |
+| 6.8 | `I_FECHAR_O_LACO_COM_QUEM_REPORTOU` | inbox-sinais-2026-09 | O doc-bridge tem produtor (`co-announce`) e carteiro (`co-deliver`), e nao tem o ato de RESPONDER. Consequencia medida duas vezes: |
+| 5.4 | `Q_AGENTE_EXPO_REACT_NATIVE` | inbox-sinais-2026-09 | O `react-developer` e orientado a web: cita shadcn/ui dez vezes, Next.js 13, e nao menciona React Native, Expo, Reanimated nem Rea |
+
 ## librechat-kg-runtime-2026-08 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -300,13 +329,6 @@
 | 7.5 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
-
-## testes-evidencia-2026-09 — 2 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
-| 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
 
 ## federation-health-2026-07 — 1 item(ns)
 

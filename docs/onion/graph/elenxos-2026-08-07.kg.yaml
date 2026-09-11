@@ -88,7 +88,7 @@ nodes:
     impact: 5
     confidence: 1.0
     verified_at: '2026-09-09'
-    verified_against: 'R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d): grep -n -A 25 "id: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE" docs/onion/graph/elenxos-2026-08-07.kg.yaml (nó + evidências filhas E_SITIO_HARD_SEM_COBERTURA,'
+    verified_against: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A 25 \"id: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE\" docs/onion/graph/elenxos-2026-08-07.kg.yaml (nó + evidências filhas E_SITIO_HARD_SEM_COBERTURA, E_STEP_DE_CI_SEM_SELFTEST, E_BANCADA_QUE_NAO_SE_VERIFICAVA, e as arestas SUPPORTS); find . -iname \"*selftest-summary*\" -o -iname \"*collect-selftest*\" -o -iname \"*review-ledger*\" -o -iname \"*harness-inventory*\" -o -iname \"*testing-state*\"; grep -rn \"REGRA 80\\|REGRA 81\" docs/ ; sed -n '160,300p' docs/onion/graph/testes-evidencia-2026-09.kg.yaml"
     label: "TESE: o defeito sobrevive exatamente onde nenhum teste olha, e o tempo de sobrevivencia mede a lacuna de cobertura, nao a raridade do bug. TRES instancias medidas em 2026-08-07, em PRs independentes: (1) o sitio de REFUTES que REPROVA era o unico sem cobertura — revertendo so ele, 0 diffs em 438 comparacoes; (2) o step de CI que posta era codigo sem selftest, e o revisor ficou invisivel por 15 commits; (3) a bancada de fixtures nao se verificava, e tres malformacoes identicas acusaram o SUT inocente por 4 rodadas"
 
   - id: E_SITIO_HARD_SEM_COBERTURA
@@ -202,7 +202,7 @@ nodes:
     impact: 4
     confidence: 1.0
     verified_at: '2026-09-09'
-    verified_against: 'R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d): grep -n "gh api|gh pr|gh issue|gh release|gh workflow" .github/workflows/*.yml (filtrado por não-comentário); grep -rln "post-review-comment.sh|forge/'
+    verified_against: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n \"gh api|gh pr|gh issue|gh release|gh workflow\" .github/workflows/*.yml (filtrado por não-comentário); grep -rln \"post-review-comment.sh|forge/adapters|task-manager/adapters\" .github/workflows/; sed -n '501,514p' .claude/utils/forge/adapters/github.md (tabela de 12 operações IForge); grep -n \"gh api\" .claude/utils/forge/post-review-comment.sh; find . -iname 'harness-inventory.sh' -o -iname 'review-ledger.sh' -o -iname 'collect-selftest.sh' -o -iname 'selftest-summary.sh' -o -iname 'testing-state.sh' | grep -v node_modules; grep -l 'forge\\|task-manager' <esses 5 scripts>; grep -rln '<nome-do-script>' .github/workflows/"
     label: "ABERTO, e a F4 so tapou o primeiro caso: o SDAAL e Markdown lido por LLM ('documentacao substitui codigo executavel'). Um step de GitHub Actions e SHELL PURO — nao ha LLM ali para ler a spec. Logo um workflow NUNCA pode 'chamar a abstracao', e foi por isso que o onion-review postava com `gh api` cru: sem isencao declarada, e literalmente a operacao que setup-code-review.md:71 manda fazer pelo adapter, no workflow que esse mesmo comando distribui. Medido: ZERO usos do adapter em qualquer workflow. A F4 materializou UMA operacao (addReviewComment, transporte cli). As outras 14 seguem sem consumidor nao-LLM"
 
   - id: E_LINT_NAO_ENXERGA_WORKFLOWS
