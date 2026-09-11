@@ -374,8 +374,39 @@ EOF
 if [ "${ONION_PLUGIN_VERSION_DERIVED:-1}" = "1" ] && git -C "${SRC}" rev-parse --verify HEAD >/dev/null 2>&1; then
   _vsrc=(); for p in "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" "${SKILLS[@]}" "${HOOKS[@]}" "${DOCS[@]}" ${_GEN[@]+"${_GEN[@]}"}; do _vsrc+=("${p}"); done
   _mrel="${MANIFEST#${SRC}/}"; [ -f "${SRC}/${_mrel}" ] && _vsrc+=("${_mrel}")
-  _n="$(git -C "${SRC}" rev-list --count HEAD -- "${_vsrc[@]}" 2>/dev/null || echo 0)"
-  git -C "${SRC}" diff --cached --quiet -- "${_vsrc[@]}" 2>/dev/null || _n=$(( _n + 1 ))
+  # ⚠️ A CONTAGEM É SOBRE A LINHA PRINCIPAL, NÃO SOBRE A BRANCH — e isto é cura de um defeito
+  # MEDIDO em 2026-09-11, não precaução. A versão anterior contava os commits do HEAD e previa o
+  # próximo com "+1 se há staged". Sob SQUASH-MERGE — que é como esta casa funde — N commits da
+  # branch viram UM no main: a branch publicava N a mais, o main ganhava 1, e a projeção nascia
+  # dessincronizada DO LADO DE LÁ, onde nenhum gate de PR olha. Medido no vivo: `origin/main`
+  # publicava 0.1.255 enquanto a árvore do próprio main derivava 0.1.254 — a REGRA 19 (Plugins de
+  # vertical sincronizados com as fontes) falharia no main, e uma versão que ANDA PARA TRÁS faz
+  # `claude plugin update` responder "already at the latest version" a quem já instalou.
+  #
+  # A cura não é contar melhor: é trocar o REFERENCIAL. Contando sobre `origin/main`, a branch
+  # para de adivinhar quantos commits ela terá depois do squash e prevê SEMPRE UM — que é
+  # exatamente o que o squash entrega. Merge-estável por construção.
+  #
+  # A comparação é contra o ÍNDICE porque ele cobre os dois consumidores de uma vez: no pre-commit
+  # o índice traz o que está em stage; num checkout de CI ele é igual ao HEAD, e a diferença vem
+  # dos commits da branch. Uma só pergunta responde "há pendência?" nos dois casos.
+  #
+  # TETO DECLARADO: dois PRs que tocam fontes, mergeados SEM rebase entre eles, publicam o mesmo
+  # número. É detectável (a REGRA 19 acusa no main) e o fluxo de merge desta casa exige branch
+  # atualizada — mas está escrito aqui porque guarda com teto não-declarado vira promessa.
+  _vbase=""
+  for _cand in origin/main origin/master main master; do
+    git -C "${SRC}" rev-parse --verify --quiet "${_cand}" >/dev/null 2>&1 && { _vbase="${_cand}"; break; }
+  done
+  if [ -n "${_vbase}" ]; then
+    _n="$(git -C "${SRC}" rev-list --count "${_vbase}" -- "${_vsrc[@]}" 2>/dev/null || echo 0)"
+    git -C "${SRC}" diff --cached --quiet "${_vbase}" -- "${_vsrc[@]}" 2>/dev/null || _n=$(( _n + 1 ))
+  else
+    # Sem linha principal alcançável (adotante, clone raso, repo recém-nascido) NÃO HÁ referencial
+    # merge-estável — então cai no comportamento antigo, que ao menos anda com o conteúdo local.
+    _n="$(git -C "${SRC}" rev-list --count HEAD -- "${_vsrc[@]}" 2>/dev/null || echo 0)"
+    git -C "${SRC}" diff --cached --quiet -- "${_vsrc[@]}" 2>/dev/null || _n=$(( _n + 1 ))
+  fi
   PLUGIN_VERSION="${PLUGIN_VERSION%.*}.${_n}"
 fi
 

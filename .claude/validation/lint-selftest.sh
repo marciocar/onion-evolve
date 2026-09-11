@@ -12526,6 +12526,41 @@ run_plugin_version_derived_selftests() {
   v1="$(ONION_PLUGIN_VERSION_DERIVED=0 bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out2" >/dev/null 2>&1; grep -oE '"version": *"[^"]+"' "${d}/out2/.claude-plugin/plugin.json" | grep -oE '[0-9.]+')"
   if [ "${v1}" = "0.1.0" ]; then record_pass "plugin-version-derived: (d) ONION_PLUGIN_VERSION_DERIVED=0 ⇒ versão do manifesto (legado)"
   else record_fail "plugin-version-derived: (d)" "esperava 0.1.0, veio ${v1}"; fi
+
+  # ── (e) MERGE-ESTABILIDADE — o caso que esta familia existia sem cobrir, e o defeito passou ──
+  # Medido no vivo em 2026-09-11: `origin/main` publicava 0.1.255 enquanto a arvore do proprio main
+  # derivava 0.1.254. Causa: a contagem era sobre os commits do HEAD, e o SQUASH-MERGE colapsa N
+  # commits da branch em UM no main. A branch previa N a mais; o main ganhava 1.
+  # A asercao e sobre a ARITMETICA, nao sobre um numero fixo: uma branch com DOIS commits tocando
+  # fontes tem de publicar EXATAMENTE main+1 — porque e isso que o squash entrega.
+  local e; e="$(mktemp -d)"
+  mkdir -p "${e}/src/.claude/commands/quick" "${e}/src/.claude/utils/marketplace/verticals"
+  printf -- '---\nname: ping\ndescription: x\ncategory: quick\ntags: [a, b, c]\nversion: "1.0.0"\nupdated: "2026-09-03"\n---\n# ping\n' > "${e}/src/.claude/commands/quick/ping.md"
+  printf 'PLUGIN_NAME="probe"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="probe"\nKEYWORDS=(probe)\nCOMMANDS=(.claude/commands/quick/ping.md)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\n' > "${e}/src/.claude/utils/marketplace/verticals/probe.manifest.sh"
+  ( cd "${e}/src" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm seed
+    # um "remoto" local, para que origin/main exista como a linha principal de verdade
+    git clone -q --bare . "${e}/origin.git" && git remote add origin "${e}/origin.git" && git fetch -q origin ) >/dev/null 2>&1
+  _vere() { bash "${asm}" "${e}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${e}/src" "${e}/out" >/dev/null 2>&1; grep -oE '"version": *"[^"]+"' "${e}/out/.claude-plugin/plugin.json" | grep -oE '[0-9.]+'; }
+  local base_v branch_v base_n
+  base_v="$(_vere)"
+  base_n="${base_v##*.}"
+  ( cd "${e}/src" && git checkout -q -b feat
+    printf '# c1\n' >> .claude/commands/quick/ping.md && git add -A && git -c user.email=t@t -c user.name=t commit -qm c1
+    printf '# c2\n' >> .claude/commands/quick/ping.md && git add -A && git -c user.email=t@t -c user.name=t commit -qm c2 ) >/dev/null 2>&1
+  branch_v="$(_vere)"
+  if [ "${branch_v}" = "0.1.$(( base_n + 1 ))" ]; then
+    record_pass "plugin-version-derived: (e) branch com DOIS commits nas fontes publica main+1 (${base_v} -> ${branch_v}) — merge-estavel sob squash"
+  else record_fail "plugin-version-derived: (e)" "main=${base_v}, branch=${branch_v}; esperado 0.1.$(( base_n + 1 )) — a contagem voltou a ser sobre a BRANCH e o squash vai dessincronizar o main"; fi
+
+  # (f) SEM LINHA PRINCIPAL ALCANCAVEL (adotante, clone raso) a guarda NAO pode morrer nem zerar:
+  #     cai no comportamento antigo, que ao menos anda com o conteudo local. Degradacao DECLARADA.
+  ( cd "${e}/src" && git checkout -q main && git remote remove origin && git branch -qD feat ) >/dev/null 2>&1
+  local sem_base; sem_base="$(_vere)"
+  if [ -n "${sem_base}" ] && [ "${sem_base}" != "0.1.0" ]; then
+    record_pass "plugin-version-derived: (f) sem origin/ a versao ainda deriva do conteudo local (${sem_base}) — degrada, nao morre"
+  else record_fail "plugin-version-derived: (f)" "sem origin/ a versao virou '${sem_base}' — adotante ficaria com versao travada"; fi
+  rm -rf "${e}"
+
   rm -rf "${d}"
 }
 _family run_plugin_version_derived_selftests

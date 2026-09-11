@@ -97,7 +97,7 @@ Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é 
 | Campo | Valor |
 |---|---|
 | Origem | `marciocar/onion-evolve` (repositório privado) |
-| tree_sha (hash do conteúdo das fontes) | `8f2c7de603fe` |
+| tree_sha (hash do conteúdo das fontes) | `e5a2c5b011f8` |
 
 A origem identifica DE ONDE este artefato foi gerado; o canal público de instalação, issues e suporte é https://github.com/marciocar/onion-plugins. Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 

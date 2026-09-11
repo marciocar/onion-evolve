@@ -104,7 +104,7 @@ nodes:
     node_type: decision
     drive_kind: execution
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.9
     label: "URGENTE por alcance: todo adotante ja herda a fila quebrada, e eu instalei mais uma hoje. Duas saidas que o sinal enquadra: (a) o radar reconhece `meta.target` ou o sufixo `.proposal.kg.yaml` e roda em MODO PROPOSTA — valida schema, tipos, planes e ids, mas nao exige grau >= 1 nem resolve aresta para fora do arquivo; (b) se a fila deve ficar fora do gate, o `ci.yml` que a adocao instala precisa dizer isso, acrescentando `kg-inbox` a exclusao que ja existe para `fixtures/`. Em qualquer das duas, o `README.md` da fila precisa de um exemplo QUE PASSA — hoje ele descreve o formato e o primeiro a usar descobre o conflito por reprovacao."
@@ -113,7 +113,7 @@ nodes:
     node_type: decision
     drive_kind: execution
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.95
     label: "Cura de RAIZ nos tres sitios, porque a pergunta errada e a mesma: cair no fallback quando o RESULTADO e vazio, nao so quando falta a ferramenta; validar o alvo do carteiro por EVIDENCIA DE ADOCAO (`.claude/.onion-version` com `role: adopted`), nao por `[ -d ]`; e assertiva de contradicao — superficie com arquivos em disco e contagem zero sai NAO-ZERO em vez de emitir SSOT mentirosa. O terceiro sitio (`verify-adopter-gate.sh:31`) JA FOI CURADO hoje, por ter bloqueado uma adocao real."
