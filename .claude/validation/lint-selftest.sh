@@ -7064,9 +7064,12 @@ run_kg_census_parity_selftests() {
           printf '      - id: B_ESCONDIDO\n        node_type: evidence\n        plane: PROD\n'
           printf '        status: confirmed\n        impact: 5\n        confidence: 0.99\n' ;;
         forjado-fundo)
+          # PROFUNDIDADE DIFERENTE DE (a), e isto foi achado adversarial: os dois casos estavam a
+          # SEIS espacos, entao nenhum mutante de profundidade separava (c) de (a) — (c) se
+          # declarava 'o unico caso que justifica a familia' sem discriminar nada. Agora sao DOZE.
           printf '    label: |\n      texto do bloco literal\n'
-          printf '      nivel a mais para empurrar a indentacao:\n'
-          printf '      - id: B_FUNDO\n          node_type: evidence\n' ;;
+          printf '        sub-nivel:\n          sub-sub:\n'
+          printf '            - id: B_FUNDO\n              node_type: evidence\n' ;;
       esac
       printf '  - id: C_VISIVEL\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n'
       printf '    impact: 3\n    confidence: 0.9\n    label: "outro no"\n'
@@ -7105,18 +7108,72 @@ run_kg_census_parity_selftests() {
   else record_fail "kg-paridade: (c)" "rc=${rc} — a guarda ancora em profundidade fixa (o defeito que o adotante pagou): ${out}"; fi
   rm -rf "$d"
 
-  # (d) O motor REPLICA o radar, e isto se PROVA confrontando os dois contadores no mesmo arquivo.
-  #     Sem este caso, (a) poderia passar com um contador que so por acaso da outro numero.
-  d="$(mktemp -d)"; _mkpar "$d" forjado
-  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "$d/"; _lib_beside "$d"
-  local radar_n parity_n
-  # `|| true`: sob pipefail o radar sai 1 no grafo forjado e a ATRIBUICAO herda o rc, matando a
-  # suite. O que interessa aqui e o NUMERO que ele imprime, nao o veredito dele.
-  radar_n="$(bash "$d/kg-radar.sh" "$d/docs/t.kg.yaml" --integrity 2>/dev/null | sed -n 's/.*(\([0-9]\{1,\}\) nós.*/\1/p' | head -1 || true)"
-  parity_n="$(bash "${helper}" "$d" --format tsv 2>/dev/null | sed -n 's/.*radar=\([0-9]\{1,\}\).*/\1/p' | head -1 || true)"
-  if [ -n "${radar_n}" ] && [ "${radar_n}" = "${parity_n}" ]; then
-    record_pass "kg-paridade: (d) o contador da guarda BATE com o do radar (${radar_n}) — replica, nao aproxima"
-  else record_fail "kg-paridade: (d)" "a guarda conta ${parity_n:-?} e o radar ${radar_n:-?} — nao esta replicando o contador que DA o veredito"; fi
+  # (d) A GUARDA SEGUE O MOTOR VIVO — e este caso nasceu de um achado adversarial que derrubou
+  #     a versao anterior dele. Antes a guarda TRANSCREVIA a maquina de estados do radar para
+  #     Python, e o caso (d) conferia UM numero num fixture. Mutar um caractere no matcher do
+  #     radar nao era detectado: a guarda passava a acusar um motor que NAO EXISTE MAIS, e este
+  #     caso APLAUDIA. A cura foi estrutural (a guarda INVOCA `kg-radar.sh --status-tsv` em vez de
+  #     imitar), e a asercao passa a ser sobre isso: com o radar MUTADO, a guarda tem de concordar
+  #     com o motor mutado — nao com a memoria do antigo.
+  d="$(mktemp -d)"; mkdir -p "$d/val/lib" "$d/docs"
+  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${helper}" "$d/val/"
+  cp "${REPO_ROOT}/.claude/validation/lib/status-factor.awk" "$d/val/lib/"
+  # grafo SAO e comum: os dois leitores concordam, entao silencio
+  { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
+    printf '  - id: A_REAL\n    node_type: claim\n    plane: DEV\n    status: open\n'
+    printf '    impact: 3\n    confidence: 0.8\n    label: "x"\nedges: []\n'
+  } > "$d/docs/z.kg.yaml"
+  ( cd "$d" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
+  rc=0; out="$(bash "$d/val/kg-census-parity-check.sh" "$d" --format tsv 2>/dev/null)" || rc=$?
+  if [ "${rc}" -ne 0 ] || [ -n "${out}" ]; then
+    record_fail "kg-paridade: (d) pre-condicao" "grafo sao ja acusa antes da mutacao: rc=${rc} ${out}"
+  else
+    # MUTANTE NO RADAR: o matcher passa a aceitar `- id:` na coluna 0 (`+` -> `*`).
+    sed -i 's|/\^\[\[:space:\]\]+- id:/|/^[[:space:]]*- id:/|' "$d/val/kg-radar.sh"
+    rc=0; out="$(bash "$d/val/kg-census-parity-check.sh" "$d" --format tsv 2>/dev/null)" || rc=$?
+    if [ "${rc}" -eq 0 ] && [ -z "${out}" ]; then
+      record_pass "kg-paridade: (d) com o radar MUTADO a guarda segue o motor VIVO — nao acusa um contador que deixou de existir"
+    else record_fail "kg-paridade: (d)" "a guarda congelou no motor antigo (transcricao em vez de invocacao): rc=${rc} ${out}"; fi
+  fi
+  rm -rf "$d"
+
+  # (d2) O CASO QUE A TRANSCRICAO PERDIA: `[[:space:]]` do awk aceita CR; `lstrip(" \t")` nao.
+  #      Com CR entre a indentacao o arquivo SEGUE YAML-VALIDO, o radar conta o fantasma, o PyYAML
+  #      nao — e a versao transcrita saia 0 COM SAIDA VAZIA no proprio caso que da nome a REGRA 82.
+  d="$(mktemp -d)"; mkdir -p "$d/docs"
+  python3 - "$d/docs/cr.kg.yaml" <<'PYCR'
+import sys
+txt = ('meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
+ '  - id: A_REAL\n    node_type: claim\n    plane: DEV\n    status: open\n'
+ '    impact: 3\n    confidence: 0.8\n    label: |\n'
+ '      prosa\n'
+ '      \r      - id: G_CR\n'
+ '      depois\n'
+ 'edges: []\n')
+open(sys.argv[1], 'w', newline='').write(txt)
+PYCR
+  ( cd "$d" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
+  rc=0; out="$(bash "${helper}" "$d" --format tsv 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'G_CR' <<< "${out}"; then
+    record_pass "kg-paridade: (d2) fantasma indentado com CR e pego e NOMEADO (a transcricao saia 0 com saida vazia)"
+  else record_fail "kg-paridade: (d2)" "rc=${rc} — o caso do CR voltou a passar: ${out}"; fi
+  rm -rf "$d"
+
+  # (d3) RADAR FORA DO AR != radar viu zero. Achado no dogfood da propria cura: num sandbox sem a
+  #      lib ao lado, a guarda leu saida vazia como `radar=0` e acusou DIVERGE num grafo SAO —
+  #      ausencia lida como RESULTADO, a classe exata que esta onda cura.
+  d="$(mktemp -d)"; mkdir -p "$d/val/lib" "$d/docs"
+  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${helper}" "$d/val/"
+  { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
+    printf '  - id: A_REAL\n    node_type: claim\n    plane: DEV\n    status: open\n'
+    printf '    impact: 3\n    confidence: 0.8\n    label: "x"\nedges: []\n'
+  } > "$d/docs/z.kg.yaml"
+  ( cd "$d" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
+  # a lib NAO foi copiada: o radar sai 2
+  rc=0; out="$(bash "$d/val/kg-census-parity-check.sh" "$d" --format tsv 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'RADAR-NAO-RESPONDEU' <<< "${out}" && ! grep -q 'DIVERGE' <<< "${out}"; then
+    record_pass "kg-paridade: (d3) radar fora do ar vira HARD NAO MEDIDO — nunca 'radar=0' lido como divergencia"
+  else record_fail "kg-paridade: (d3)" "rc=${rc} — ausencia do motor virou resultado: ${out}"; fi
   rm -rf "$d"
 
   # (e) NAO MEDIDO e desfecho de 1a classe: raiz sem git sai 2, nunca 0.
@@ -7199,6 +7256,251 @@ run_kg_proposal_mode_selftests() {
     record_pass "kg-proposta: (d) MUT proposta com node_type invalido REPROVA — o modo relaxa grau, nao o resto"
   else record_fail "kg-proposta: (d)" "rc=${rc} — MODO PROPOSTA virou passe-livre: $(head -5 "$d/o" | tr '\n' ' ')"; fi
   rm -rf "$d"
+
+  # (d4) A TABELA DO README PROMETE NOVE COBRANCAS — e a bancada exercitava UMA. Achado
+  #      adversarial 2026-09-11: o refutador mutou o radar de verdade e SEIS sobreviveram (id
+  #      duplicado, CONTRADICAO por REFUTES, plane, chave repetida, edge_type, impact) — todos
+  #      relaxados numa proposta, todos verdes. Documentacao que promete o que a guarda nao cobra
+  #      e a mesma classe que esta onda cura, escrita em prosa.
+  #      Aqui cada cobranca tem seu FRAGMENTO MAL FORMADO, e o que se afirma e o rc do radar
+  #      sobre ele: se o MODO PROPOSTA virasse passe-livre, cada uma destas linhas reprovaria.
+  d="$(mktemp -d)"; _mkp "$d"
+  _malformed() {   # $1=nome  $2..=corpo do nodes/edges
+    { printf 'meta:\n  id: p\n  schema_version: "1"\n  target: docs/onion/graph/x.kg.yaml\n'
+      shift 0; cat
+    } > "$d/$1.proposal.kg.yaml"
+  }
+  _rc_of() { rc=0; bash "$d/.claude/validation/kg-radar.sh" "$d/$1.proposal.kg.yaml" --integrity >"$d/o" 2>&1 || rc=$?; printf '%s' "${rc}"; }
+
+  _malformed dup <<'YML'
+nodes:
+  - id: P_UM
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "a"
+  - id: P_UM
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "b"
+edges: []
+YML
+  _malformed contra <<'YML'
+nodes:
+  - id: P_A
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    label: "a"
+  - id: P_E
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    label: "e"
+edges:
+  - from: P_E
+    to: P_A
+    edge_type: REFUTES
+YML
+  # ⚠️ `chave repetida` no radar significa CARIMBO repetido (verified_at/verified_against), nao
+  #    qualquer chave — medido ao escrever este caso: `label:` duas vezes passa, porque o motor
+  #    nunca olhou para isso. A 1a versao da fixture usava `label:` e a tabela do README prometia
+  #    `chave repetida` generica. Os dois foram alinhados AO MOTOR, que e a unica fonte.
+  _malformed chave <<'YML'
+nodes:
+  - id: P_UM
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: '2026-09-01'
+    verified_at: '2026-09-11'
+    label: "a"
+edges: []
+YML
+  _malformed aresta <<'YML'
+nodes:
+  - id: P_UM
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "a"
+  - id: P_DOIS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "b"
+edges:
+  - from: P_UM
+    to: P_DOIS
+    edge_type: BANANAS
+YML
+  _malformed conf <<'YML'
+nodes:
+  - id: P_UM
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 7.5
+    label: "a"
+edges: []
+YML
+  _malformed stat <<'YML'
+nodes:
+  - id: P_UM
+    node_type: claim
+    plane: DEV
+    status: bananas
+    impact: 3
+    confidence: 0.8
+    label: "a"
+edges: []
+YML
+
+  local _unguarded="" _c
+  for _c in "dup:id duplicado" "contra:CONTRADICAO por REFUTES" "chave:carimbo repetido (verified_at)" \
+            "aresta:edge_type invalido" "conf:confidence fora de 0-1" "stat:status invalido"; do
+    if [ "$(_rc_of "${_c%%:*}")" != "1" ]; then _unguarded="${_unguarded} ${_c#*:};"; fi
+  done
+  if [ -z "${_unguarded}" ]; then
+    record_pass "kg-proposta: (d4) as SEIS cobrancas que o README promete inalteradas REPROVAM dentro de uma proposta"
+  else record_fail "kg-proposta: (d4)" "o MODO PROPOSTA relaxou o que a doc diz cobrar:${_unguarded}"; fi
+  rm -rf "$d"
+
+  # (h) AS TRES PORTAS DE ATIVACAO ACIDENTAL, fechadas na passada adversarial de 2026-09-11.
+  #     Um relaxamento de gate NUNCA pode ser ligado por acidente num grafo vivo — e as tres
+  #     estavam abertas: `target:` aninhado em sub-mapa; `target:` dentro de bloco literal (a
+  #     classe que o proprio kg-radar.sh DECLARA ter curado, e que ali cai para o lado fail-open);
+  #     e `meta:` REABERTO depois de `nodes:`, que desligava tudo com duas linhas no fim.
+  d="$(mktemp -d)"; _mkp "$d"
+  _door() {   # $1=nome  (corpo via stdin) — arquivo de nome COMUM, nunca .proposal
+    cat > "$d/$1.kg.yaml"
+    rc=0; bash "$d/.claude/validation/kg-radar.sh" "$d/$1.kg.yaml" --integrity >"$d/o_$1" 2>&1 || rc=$?
+    if [ "${rc}" -eq 1 ] && ! grep -q 'MODO PROPOSTA' "$d/o_$1"; then printf ''; else printf ' %s' "$1"; fi
+  }
+  _open_doors=""
+  _open_doors="${_open_doors}$(_door aninhado <<'YML'
+meta:
+  id: t
+  schema_version: "1"
+  migracao:
+    target: docs/onion/graph/novo.kg.yaml
+nodes:
+  - id: A
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "x"
+edges: []
+YML
+)"
+  _open_doors="${_open_doors}$(_door bloco <<'YML'
+meta:
+  id: t
+  schema_version: "1"
+  nota: |
+    A selagem funciona assim:
+    target: docs/onion/graph/destino.kg.yaml
+nodes:
+  - id: A
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "x"
+edges: []
+YML
+)"
+  _open_doors="${_open_doors}$(_door reaberto <<'YML'
+meta:
+  id: t
+  schema_version: "1"
+nodes:
+  - id: A
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "x"
+edges: []
+meta:
+  target: qualquer-coisa
+YML
+)"
+  # ⚠️ E O REABERTO ENTRE `nodes:` E `edges:` — porta SEPARADA, achada na varredura de mutacao:
+  #    a fixture acima poe o meta depois de `edges:`, e a regra de `edges:` ja fecha metaClosed
+  #    sozinha. Um mutante que tirasse o fechamento do `nodes:` passava ileso. Duas regras fecham
+  #    a porta; testar so uma deixa a outra livre para apodrecer.
+  _open_doors="${_open_doors}$(_door reaberto-antes-de-edges <<'YML'
+meta:
+  id: t
+  schema_version: "1"
+nodes:
+  - id: A
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: "x"
+meta:
+  target: qualquer-coisa
+edges: []
+YML
+)"
+  if [ -z "${_open_doors}" ]; then
+    record_pass "kg-proposta: (h) as tres portas de ativacao ACIDENTAL continuam fechadas (aninhado, bloco literal, meta reaberto)"
+  else record_fail "kg-proposta: (h)" "grafo vivo ligou o modo por acidente em:${_open_doors}"; fi
+  rm -rf "$d"
+
+  # (i) O GATILHO `meta.target` SOZINHO — sem o sufixo no nome. O caso (b) cobre o sufixo sozinho,
+  #     mas todo caso com `target:` TAMBEM tinha o sufixo: um mutante que apagasse o gatilho
+  #     `meta.target` passava 7/7 (achado adversarial). O contrato declara OR de DOIS gatilhos;
+  #     metade dele estava sem guarda.
+  d="$(mktemp -d)"; _mkp "$d"; _prop "$d" nome-comum.kg.yaml com-target
+  rc=0; bash "$d/.claude/validation/kg-radar.sh" "$d/nome-comum.kg.yaml" --integrity >"$d/o" 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'meta.target' "$d/o"; then
+    record_pass "kg-proposta: (i) `meta.target` sozinho (nome de arquivo COMUM) dispara o modo — o outro gatilho tem guarda propria"
+  else record_fail "kg-proposta: (i)" "rc=${rc} — o gatilho meta.target nao dispara sem o sufixo: $(head -3 "$d/o" | tr '\n' ' ')"; fi
+  rm -rf "$d"
+
+  # (j) O GATE DE CADENCIA NAO PODE ESCONDER O RELAXAMENTO. Achado adversarial: o kg-radar.sh
+  #     declara no codigo que o modo "nunca e silencioso", e era — no `kg-radar-integrity.sh`,
+  #     que so olha a saida quando rc != 0. Em modo proposta o rc e 0, entao a linha sumia e o
+  #     gate imprimia "sem contradicao estrutural em NENHUM grafo do repo" sobre um grafo com
+  #     duas cobrancas desligadas. Um ✅ inventado, num gate que roda sozinho.
+  local _ig="${REPO_ROOT}/.claude/validation/kg-radar-integrity.sh"
+  if [ ! -f "${_ig}" ]; then record_skip "kg-proposta: (j) kg-radar-integrity.sh ausente"; else
+    d="$(mktemp -d)"; mkdir -p "$d/docs/onion/graph" "$d/.claude/validation/lib"
+    cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${_ig}" "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "$d/.claude/validation/"
+    cp "${REPO_ROOT}/.claude/validation/lib/status-factor.awk" "$d/.claude/validation/lib/"
+    printf 'meta:\n  id: p\n  schema_version: "1"\n  target: docs/onion/graph/destino.kg.yaml\nnodes:\n  - id: P_UM\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.8\n    label: "x"\nedges: []\n' > "$d/docs/onion/graph/vivo.kg.yaml"
+    ( cd "$d" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
+    out="$(bash "$d/.claude/validation/kg-radar-integrity.sh" "$d" 2>&1 || true)"
+    if grep -q 'MODO.PROPOSTA' <<< "${out}" && ! grep -q 'em nenhum grafo do repo' <<< "${out}"; then
+      record_pass "kg-proposta: (j) o gate de CADENCIA nomeia o grafo relaxado e para de dizer 'nenhum grafo'"
+    else record_fail "kg-proposta: (j)" "o gate de cadencia esconde o relaxamento: $(tr '\n' ' ' <<< "${out}" | cut -c1-200)"; fi
+    rm -rf "$d"
+  fi
 
   # (e) O RELAXAMENTO SAI NUMERADO. Um gate que afrouxa sem contar e o proprio defeito que esta
   #     onda persegue, uma camada acima: um ✅ que nao diz o que deixou de cobrar.
@@ -8708,22 +9010,38 @@ run_assemble_plugin_selftests() {
   else record_fail "assemble-plugin: predicado do README" "casos errados:${_bad}"; fi
   unset -f _isr
 
-  # (d4) O GERADOR É INSUMO dos dois sinais de mudança. Medido 2026-09-07: tirar o README de
-  #      categoria de `commands/` mudou o conteúdo publicado de 3 plugins e, ainda assim,
-  #      `tree_sha` ficou idêntico e a versão travada — `claude plugin update` diria "already at
-  #      the latest version" e a correção não chegaria a quem instalou. A cura põe os geradores
-  #      nas DUAS listas; este caso trava a regressão de removê-los de UMA delas (que é o jeito
-  #      silencioso de o defeito voltar: o outro sinal ainda anda e parece que está tudo certo).
-  #      ⚠️ ESCOPO DECLARADO: é teste ESTRUTURAL — prova que `_GEN` alimenta as duas listas, não
-  #      que o hash de fato muda quando o gerador muda (isso exigiria mutar o gerador vivo).
-  local _asm_src; _asm_src="$(cat "${helper}" 2>/dev/null)"
-  local _n_gen_decl _n_tree _n_vsrc
-  _n_gen_decl="$(printf '%s' "${_asm_src}" | grep -cE '^_GEN=\(' || true)"
-  # As duas listas são as ÚNICAS linhas que expandem _GEN dentro de um `for p in ... ; do`.
-  _n_tree="$(printf '%s' "${_asm_src}" | grep -cF '"${DOCS[@]}" ${_GEN[@]+"${_GEN[@]}"}; do' || true)"
-  if [ "${_n_gen_decl}" -ge 1 ] && [ "${_n_tree}" -eq 2 ]; then
-    record_pass "assemble-plugin: geradores são insumo do tree_sha E da versão derivada (estrutural)"
-  else record_fail "assemble-plugin: gerador-insumo" "_GEN declarado=${_n_gen_decl}, listas alimentadas=${_n_tree} (esperado 2: tree_sha e _vsrc)"; fi
+  # (d4) O GERADOR É INSUMO — e este caso passou de ESTRUTURAL para COMPORTAMENTAL em 2026-09-12,
+  #      porque o mecanismo que ele vigiava deixou de existir.
+  #      Medido 2026-09-07: tirar o README de categoria de `commands/` mudou o conteúdo publicado
+  #      de 3 plugins e, ainda assim, `tree_sha` ficou idêntico e a versão travada — `claude plugin
+  #      update` diria "already at the latest version" e a correção não chegaria a quem instalou.
+  #      A cura de então pôs os geradores em DUAS listas (`tree_sha` e `_vsrc`), e este caso contava
+  #      as duas. Quando a versão virou FATO COMMITADO, `_vsrc` sumiu: a versão passou a derivar do
+  #      `tree_sha`, então o sinal viaja por UM caminho, não dois.
+  #      ⚠️ A versão anterior deste caso teria reprovado a troca por CONTAR LISTAS — asserção sobre
+  #      a implementação, não sobre a garantia. Agora ele MUTA UM GERADOR DE VERDADE e exige que a
+  #      versão ande. É a única forma que sobrevive a trocar o mecanismo por baixo.
+  local _g; _g="$(mktemp -d)"
+  mkdir -p "${_g}/src/.claude/commands/quick" "${_g}/src/.claude/utils/marketplace/verticals"
+  cp -r "${REPO_ROOT}/.claude/utils/marketplace" "${_g}/src/.claude/utils/" 2>/dev/null || true
+  printf -- '---\nname: ping\ndescription: x\ncategory: quick\ntags: [a, b, c]\nversion: "1.0.0"\nupdated: "2026-09-03"\n---\n# ping\n' > "${_g}/src/.claude/commands/quick/ping.md"
+  printf 'PLUGIN_NAME="gprobe"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="g"\nKEYWORDS=(g)\nCOMMANDS=(.claude/commands/quick/ping.md)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\n' > "${_g}/src/.claude/utils/marketplace/verticals/gprobe.manifest.sh"
+  ( cd "${_g}/src" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm seed ) >/dev/null 2>&1
+  _gver() { bash "${_g}/src/.claude/utils/marketplace/assemble-plugin.sh" \
+              "${_g}/src/.claude/utils/marketplace/verticals/gprobe.manifest.sh" "${_g}/src" >/dev/null 2>&1
+            sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "${_g}/src/plugins/gprobe/.claude-plugin/plugin.json" | head -1; }
+  _gver >/dev/null
+  ( cd "${_g}/src" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen ) >/dev/null 2>&1
+  local _gv0 _gv1
+  _gv0="$(_gver)"
+  # MUTA O GERADOR — nada de fonte de conteúdo muda, só o script que PRODUZ a saída.
+  printf '\n# mutacao do gerador para a bancada\n' >> "${_g}/src/.claude/utils/marketplace/plugin-readme.sh"
+  _gv1="$(_gver)"
+  if [ -n "${_gv0}" ] && [ "${_gv0}" != "${_gv1}" ]; then
+    record_pass "assemble-plugin: mudar o GERADOR anda a versão (${_gv0} → ${_gv1}) — a garantia sobrevive à troca de mecanismo"
+  else record_fail "assemble-plugin: gerador-insumo" "gerador mudou e a versão ficou em ${_gv0} → ${_gv1} — quem instalou não receberia a correção"; fi
+  unset -f _gver
+  rm -rf "${_g}"
 
   # (e) determinismo: 2ª montagem (mesmo HEAD) → mesmo tree_sha
   local t1 t2; t1="$(jq -r '.tree_sha' "${d}/design/.claude-plugin/provenance.json" 2>/dev/null)"
@@ -9996,14 +10314,14 @@ KGEOF
 
     local o0 h0 s0 o1 h1 s1 o2 h2 s2
     o0="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sbl}" 2>&1 || true)"
-    h0="$(printf '%s' "${o0}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
-    s0="$(printf '%s' "${o0}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
+    h0="$(printf '%s' "${o0}" | awk -F': *' '/HARD[[:space:]]*:/{print $2; exit}')"
+    s0="$(printf '%s' "${o0}" | awk -F': *' '/SOFT[[:space:]]*:/{print $2; exit}')"
 
     # (1) documento NOVO sem nó e fora do baseline ⇒ soma exatamente 1 HARD.
     mkdir -p "$(dirname "${sb}/${probe_novo}")"   # adotante sem docs/analysis/: o printf abortava a suíte (medido na cópia da Sacola, 2026-09-03)
     printf '# sonda nova\n' > "${sb}/${probe_novo}"
     o1="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe_novo}" 2>&1 || true)"
-    h1="$(printf '%s' "${o1}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
+    h1="$(printf '%s' "${o1}" | awk -F': *' '/HARD[[:space:]]*:/{print $2; exit}')"
     if [ "${h1}" = "$((h0 + 1))" ] && grep -qF "${probe_novo}" <<< "${o1}"; then
       record_pass "kg-provenance: (P1) SEVERIDADE por DELTA — documento novo sem nó soma HARD (${h0}→${h1})"
     else
@@ -10016,8 +10334,8 @@ KGEOF
     printf '# sonda passivo\n' > "${sb}/${probe_pass}"
     printf '%s\n' "${probe_pass}" >> "${sbl}"
     o2="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe_pass}" 2>&1 || true)"
-    h2="$(printf '%s' "${o2}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
-    s2="$(printf '%s' "${o2}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
+    h2="$(printf '%s' "${o2}" | awk -F': *' '/HARD[[:space:]]*:/{print $2; exit}')"
+    s2="$(printf '%s' "${o2}" | awk -F': *' '/SOFT[[:space:]]*:/{print $2; exit}')"
     if [ "${h2}" = "${h0}" ]; then
       record_pass "kg-provenance: (P1) SEVERIDADE por DELTA — documento do baseline NÃO soma HARD (${h0}→${h2}, SOFT ${s0}→${s2})"
     else
@@ -10490,10 +10808,10 @@ run_kg_born_marker_selftests() {
       record_fail "kg-born-marker: delta setup" "sandbox sem migalha real p/ baseline do delta"
     else
       o0="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${base_crumb}" 2>&1 || true)"
-      h0="$(printf '%s' "${o0}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
+      h0="$(printf '%s' "${o0}" | awk -F': *' '/HARD[[:space:]]*:/{print $2; exit}')"
       printf '%s\n' '---' 'type: decision' 'kg: docs/analysis/nao-existe-selftest.kg.yaml' '---' '# sonda' > "${sb}/${probe}"
       o1="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe}" 2>&1 || true)"
-      h1="$(printf '%s' "${o1}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
+      h1="$(printf '%s' "${o1}" | awk -F': *' '/HARD[[:space:]]*:/{print $2; exit}')"
       if [ "${h1}" = "$((h0 + 1))" ] && grep -qF "${probe}" <<< "${o1}"; then
         record_pass "kg-born-marker: SEVERIDADE por DELTA — migalha com kg: pendurado soma HARD no lint real (${h0}→${h1})"
       else
@@ -10567,8 +10885,8 @@ run_outbox_channel_selftests() {
 
   local out hard_com soft_com
   out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  hard_com="$(printf '%s' "${out}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
-  soft_com="$(printf '%s' "${out}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
+  hard_com="$(awk -F': *' '/HARD[[:space:]]*:/{print $2; exit}' <<< "${out}")"
+  soft_com="$(awk -F': *' '/SOFT[[:space:]]*:/{print $2; exit}' <<< "${out}")"
 
   grep -qF "selftest-com-canal" <<< "${out}"\
     && record_fail "outbox-channel: com canal" "falso-positivo — acusou membro que TEM inbound/" \
@@ -10618,14 +10936,25 @@ run_outbox_channel_selftests() {
          "${sb_sem}/docs/evolution/federation/outbox/selftest-nao-vendoriza" \
          "${sb_sem}/docs/evolution/federation/outbox/selftest-orfao-xyz" \
          "${sb_sem}/docs/evolution/federation/outbox/selftest-so-processed"
+  # ⚠️ E O PADRAO E ANCORADO EM ASCII, nunca em `Viola..es`. O `..` conta CARACTERES: em UTF-8 o
+  #    `ç` e o `õ` valem 1 cada e o padrao casa; no locale C valem 2 BYTES cada e ele NAO casa.
+  #    O hook de git roda em locale C — entao a extracao voltava VAZIA so no pre-commit, e a mesma
+  #    bancada que eu rodava dava 1198/0. Medido nos dois locales sobre o MESMO log preservado.
+  #    Sete familias reprovavam por isto, todas por "delta HARD" que nunca chegava.
+  # ⚠️ HERE-STRING, NUNCA `printf | awk ... exit`. Classe já registrada nesta casa (EPIPE do
+  #    escritor quando o leitor fecha cedo, sob pipefail) e ela MORDEU aqui em 2026-09-12: a
+  #    REGRA 82 aumentou a saída do lint, a corrida cruzou o buffer do cano, as quatro extrações
+  #    voltaram VAZIAS e o caso reprovou com `HARD ->, SOFT ->` — sobre uma medição que estava
+  #    CERTA (32=32, SOFT 10→13, confirmado nos logs que a própria cura do diagnóstico preservou).
+  #    A guarda `shell-pipefail` nomeou o sítio irmão no kg-radar-integrity.sh na mesma rodada.
   local out2 hard_sem soft_sem
   # re-mede o COM no mesmo ambiente congelado do SEM (o `out` de cima serviu aos casos 1-6, não à severidade)
   out="$(cd "${sb}" && env -i PATH="/usr/bin:/bin" HOME="${sb}" bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  hard_com="$(printf '%s' "${out}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
-  soft_com="$(printf '%s' "${out}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
+  hard_com="$(awk -F': *' '/HARD[[:space:]]*:/{print $2; exit}' <<< "${out}")"
+  soft_com="$(awk -F': *' '/SOFT[[:space:]]*:/{print $2; exit}' <<< "${out}")"
   out2="$(cd "${sb_sem}" && env -i PATH="/usr/bin:/bin" HOME="${sb_sem}" bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  hard_sem="$(printf '%s' "${out2}" | awk -F': *' '/Viola..es HARD/{print $2; exit}')"
-  soft_sem="$(printf '%s' "${out2}" | awk -F': *' '/Viola..es SOFT/{print $2; exit}')"
+  hard_sem="$(awk -F': *' '/HARD[[:space:]]*:/{print $2; exit}' <<< "${out2}")"
+  soft_sem="$(awk -F': *' '/SOFT[[:space:]]*:/{print $2; exit}' <<< "${out2}")"
 
   rm -rf "${sb_sem}"
   if [ "${hard_com}" = "${hard_sem}" ] && [ "${soft_com}" -gt "${soft_sem}" ]; then
@@ -10636,9 +10965,15 @@ run_outbox_channel_selftests() {
     printf '%s\n' "${out}"  > "${_ev}/com.log"
     printf '%s\n' "${out2}" > "${_ev}/sem.log"
     local _delta
-    _delta="$(comm -23 <(printf '%s\n' "${out}"  | grep '^VIOLATION' | LC_ALL=C sort -u) \
-                       <(printf '%s\n' "${out2}" | grep '^VIOLATION' | LC_ALL=C sort -u) \
-              | grep -oE 'REGRA [0-9]+' | LC_ALL=C sort -u | tr '\n' ' ')"
+    # ⚠️ `|| true` NOS DOIS NIVEIS, e nao e decoracao: sob `set -euo pipefail` um `grep` que nao
+    #    casa nada sai 1, o `pipefail` propaga, e a ATRIBUICAO derruba a suite inteira via `set -e`.
+    #    `_family` chama a funcao sem `||`, entao morria tudo. Medido na passada adversarial: o
+    #    ramo do delta vazio — que esta mensagem PREVE com `${_delta:-nenhuma}` — era inalcancavel,
+    #    e o `record_fail` que nomeia a regra oscilante nunca rodava. Eu curei o diagnostico e
+    #    quebrei o paciente: a mudanca feita para tornar a falha LEGIVEL matava a bancada.
+    _delta="$( { comm -23 <(printf '%s\n' "${out}"  | { grep '^VIOLATION' || true; } | LC_ALL=C sort -u) \
+                          <(printf '%s\n' "${out2}" | { grep '^VIOLATION' || true; } | LC_ALL=C sort -u) \
+                 | { grep -oE 'REGRA [0-9]+' || true; } | LC_ALL=C sort -u | tr '\n' ' '; } || true)"
     record_fail "outbox-channel: severidade" "esperava HARD inalterado e SOFT maior; HARD ${hard_sem}->${hard_com}, SOFT ${soft_sem}->${soft_com} — regra(s) só no COM: ${_delta:-nenhuma (o delta está no SEM)}; logs preservados em ${_ev}/"
   fi
 
@@ -10648,7 +10983,7 @@ run_outbox_channel_selftests() {
   # rodando o lint DENTRO da cópia limpa de um adotante (o core é o pior oráculo do que viaja).
   rm -f "${sb}/docs/evolution/federation/members.yaml"
   local out3; out3="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if grep -q 'Viola..es HARD' <<< "${out3}"; then
+  if grep -qE 'HARD[[:space:]]*:' <<< "${out3}"; then
     record_pass "outbox-channel: (GREENFIELD) sem members.yaml → lint COMPLETA (REGRA 36 não aborta com terms vazio)"
   else record_fail "outbox-channel: greenfield" "lint abortou num adotante sem members.yaml (terms vazio + set -e na REGRA 36)"; fi
 
@@ -12509,57 +12844,144 @@ run_plugin_version_derived_selftests() {
   printf -- '---\nname: ping\ndescription: x\ncategory: quick\ntags: [a, b, c]\nversion: "1.0.0"\nupdated: "2026-09-03"\n---\n# ping\n' > "${d}/src/.claude/commands/quick/ping.md"
   printf 'PLUGIN_NAME="probe"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="probe"\nKEYWORDS=(probe)\nCOMMANDS=(.claude/commands/quick/ping.md)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\n' > "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh"
   ( cd "${d}/src" && git init -q && git add -A && git -c user.email=t@t -c user.name=t commit -qm seed ) >/dev/null 2>&1
-  _ver() { bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out" >/dev/null 2>&1; grep -oE '"version": *"[^"]+"' "${d}/out/.claude-plugin/plugin.json" | grep -oE '[0-9.]+'; }
-  v1="$(_ver)"; v2="$(_ver)"
-  if [ "${v1}" = "${v2}" ] && [ "${v1}" = "0.1.1" ]; then record_pass "plugin-version-derived: (a) versão = 0.1.<commits das fontes> (${v1}); mesma fonte ⇒ mesma versão"
-  else record_fail "plugin-version-derived: (a)" "v1=${v1} v2=${v2} (esperado 0.1.1 e igual)"; fi
-  printf '# ping v2\n' >> "${d}/src/.claude/commands/quick/ping.md"; ( cd "${d}/src" && git add -A ) >/dev/null 2>&1
-  v3="$(_ver)"
-  ( cd "${d}/src" && git -c user.email=t@t -c user.name=t commit -qm change ) >/dev/null 2>&1
-  v4="$(_ver)"
-  if [ "${v3}" = "0.1.2" ] && [ "${v4}" = "0.1.2" ]; then record_pass "plugin-version-derived: (b) fonte alterada no índice ⇒ 0.1.2 antes E depois do commit (pre-commit = CI)"
-  else record_fail "plugin-version-derived: (b)" "índice sujo=${v3} pós-commit=${v4} (esperado 0.1.2/0.1.2)"; fi
-  printf '# outro\n' > "${d}/src/README.md"; ( cd "${d}/src" && git add -A && git -c user.email=t@t -c user.name=t commit -qm unrelated ) >/dev/null 2>&1
+  # GERA NO CANONICO (`<src>/plugins/<name>`), que e de onde o fato commitado e lido. Gerar num
+  # `out/` lateral faria todo caso partir de "sem anterior" e o contrato nao seria exercitado.
+  _ver() { bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" >/dev/null 2>&1; sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "${d}/src/plugins/probe/.claude-plugin/plugin.json" | head -1; }
+  # ⚠️ OS CASOS (a)(b)(c) FORAM REESCRITOS, nao remendados. Eles codificavam a semantica ANTIGA
+  #    (`0.1.<n de commits que tocaram as fontes>`), que caiu na passada adversarial de 2026-09-11.
+  #    Ajustar so os numeros esperados manteria a forma de um contrato que nao existe mais — e
+  #    teste que afirma um contrato morto e pior que teste ausente: ele da confianca no errado.
+
+  # (a) A VERSAO SAI DO FATO COMMITADO, nao do historico. Sem plugin gerado ainda, fica a do
+  #     manifesto; gerado e commitado, a proxima geracao parte DAQUELE numero.
   v1="$(_ver)"
-  if [ "${v1}" = "0.1.2" ]; then record_pass "plugin-version-derived: (c) commit que NÃO toca as fontes não anda a versão"
-  else record_fail "plugin-version-derived: (c)" "esperava 0.1.2 após commit alheio, veio ${v1}"; fi
+  ( cd "${d}/src" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen ) >/dev/null 2>&1
+  v2="$(_ver)"
+  if [ "${v1}" = "0.1.0" ] && [ "${v2}" = "0.1.0" ]; then
+    record_pass "plugin-version-derived: (a) 1a geracao usa a versao do manifesto (${v1}) e nao anda sozinha depois de commitada"
+  else record_fail "plugin-version-derived: (a)" "v1=${v1} v2=${v2} (esperado 0.1.0 nas duas — a versao nao pode nascer de historico)"; fi
+
+  # (b) CONTEUDO MUDOU ⇒ +1, e o numero e o MESMO antes e depois do commit. E o invariante que faz
+  #     o pre-commit e o CI concordarem: os dois derivam da ARVORE, nao do estado do indice.
+  printf '# ping v2\n' >> "${d}/src/.claude/commands/quick/ping.md"
+  v3="$(_ver)"
+  ( cd "${d}/src" && git add -A && git -c user.email=t@t -c user.name=t commit -qm change ) >/dev/null 2>&1
+  v4="$(_ver)"
+  if [ "${v3}" = "0.1.1" ] && [ "${v4}" = "0.1.1" ]; then
+    record_pass "plugin-version-derived: (b) conteudo mudou ⇒ 0.1.1, identico antes E depois do commit (pre-commit = CI)"
+  else record_fail "plugin-version-derived: (b)" "antes=${v3} depois=${v4} (esperado 0.1.1/0.1.1)"; fi
+
+  # (c) COMMIT QUE NAO TOCA AS FONTES nao anda a versao — o `tree_sha` nao muda, logo nao ha +1.
+  #     Intencao preservada do caso original; so a aritmetica mudou de referencial.
+  printf '# outro\n' > "${d}/src/README.md"
+  ( cd "${d}/src" && git add -A && git -c user.email=t@t -c user.name=t commit -qm unrelated ) >/dev/null 2>&1
+  v1="$(_ver)"
+  if [ "${v1}" = "0.1.1" ]; then
+    record_pass "plugin-version-derived: (c) commit que NAO toca as fontes nao anda a versao (${v1})"
+  else record_fail "plugin-version-derived: (c)" "esperava 0.1.1 apos commit alheio, veio ${v1}"; fi
+
   v1="$(ONION_PLUGIN_VERSION_DERIVED=0 bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${d}/src" "${d}/out2" >/dev/null 2>&1; grep -oE '"version": *"[^"]+"' "${d}/out2/.claude-plugin/plugin.json" | grep -oE '[0-9.]+')"
   if [ "${v1}" = "0.1.0" ]; then record_pass "plugin-version-derived: (d) ONION_PLUGIN_VERSION_DERIVED=0 ⇒ versão do manifesto (legado)"
   else record_fail "plugin-version-derived: (d)" "esperava 0.1.0, veio ${v1}"; fi
 
-  # ── (e) MERGE-ESTABILIDADE — o caso que esta familia existia sem cobrir, e o defeito passou ──
-  # Medido no vivo em 2026-09-11: `origin/main` publicava 0.1.255 enquanto a arvore do proprio main
-  # derivava 0.1.254. Causa: a contagem era sobre os commits do HEAD, e o SQUASH-MERGE colapsa N
-  # commits da branch em UM no main. A branch previa N a mais; o main ganhava 1.
-  # A asercao e sobre a ARITMETICA, nao sobre um numero fixo: uma branch com DOIS commits tocando
-  # fontes tem de publicar EXATAMENTE main+1 — porque e isso que o squash entrega.
-  local e; e="$(mktemp -d)"
-  mkdir -p "${e}/src/.claude/commands/quick" "${e}/src/.claude/utils/marketplace/verticals"
-  printf -- '---\nname: ping\ndescription: x\ncategory: quick\ntags: [a, b, c]\nversion: "1.0.0"\nupdated: "2026-09-03"\n---\n# ping\n' > "${e}/src/.claude/commands/quick/ping.md"
-  printf 'PLUGIN_NAME="probe"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="probe"\nKEYWORDS=(probe)\nCOMMANDS=(.claude/commands/quick/ping.md)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\n' > "${e}/src/.claude/utils/marketplace/verticals/probe.manifest.sh"
-  ( cd "${e}/src" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm seed
-    # um "remoto" local, para que origin/main exista como a linha principal de verdade
-    git clone -q --bare . "${e}/origin.git" && git remote add origin "${e}/origin.git" && git fetch -q origin ) >/dev/null 2>&1
-  _vere() { bash "${asm}" "${e}/src/.claude/utils/marketplace/verticals/probe.manifest.sh" "${e}/src" "${e}/out" >/dev/null 2>&1; grep -oE '"version": *"[^"]+"' "${e}/out/.claude-plugin/plugin.json" | grep -oE '[0-9.]+'; }
-  local base_v branch_v base_n
-  base_v="$(_vere)"
-  base_n="${base_v##*.}"
-  ( cd "${e}/src" && git checkout -q -b feat
-    printf '# c1\n' >> .claude/commands/quick/ping.md && git add -A && git -c user.email=t@t -c user.name=t commit -qm c1
-    printf '# c2\n' >> .claude/commands/quick/ping.md && git add -A && git -c user.email=t@t -c user.name=t commit -qm c2 ) >/dev/null 2>&1
-  branch_v="$(_vere)"
-  if [ "${branch_v}" = "0.1.$(( base_n + 1 ))" ]; then
-    record_pass "plugin-version-derived: (e) branch com DOIS commits nas fontes publica main+1 (${base_v} -> ${branch_v}) — merge-estavel sob squash"
-  else record_fail "plugin-version-derived: (e)" "main=${base_v}, branch=${branch_v}; esperado 0.1.$(( base_n + 1 )) — a contagem voltou a ser sobre a BRANCH e o squash vai dessincronizar o main"; fi
+  # ── A VERSAO E UM FATO COMMITADO — um caso por REQUISITO ────────────────────────────────────
+  # Os casos (e)..(i) nasceram de uma passada adversarial que reprovou as DUAS tentativas
+  # anteriores. A licao: enquanto a versao for funcao do HISTORICO ou do REMOTO, ela nao pode ser
+  # ao mesmo tempo reproduzivel-da-arvore (o que a REGRA 19 exige) e estavel (o que um PR aberto
+  # exige). Cada caso abaixo prende UM dos quatro requisitos, e cada um morreu com mutante proprio.
+  local e out1 out2
+  _setup_repo() {   # $1 = dir; repo com um plugin ja GERADO e commitado
+    e="$1"; mkdir -p "${e}/.claude/commands/quick" "${e}/.claude/utils/marketplace/verticals"
+    cp -r "${REPO_ROOT}/.claude/utils/marketplace" "${e}/.claude/utils/" 2>/dev/null || true
+    printf -- '---\nname: ping\ndescription: x\ncategory: quick\ntags: [a, b, c]\nversion: "1.0.0"\nupdated: "2026-09-03"\n---\n# ping\n' > "${e}/.claude/commands/quick/ping.md"
+    printf 'PLUGIN_NAME="probe"\nPLUGIN_VERSION="0.1.0"\nPLUGIN_DESC="probe"\nKEYWORDS=(probe)\nCOMMANDS=(.claude/commands/quick/ping.md)\nAGENTS=()\nUTILS=()\nVALIDATION=()\nTEMPLATES=()\nSKILLS=()\nHOOKS=()\nDOCS=()\n' > "${e}/.claude/utils/marketplace/verticals/probe.manifest.sh"
+    ( cd "${e}" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm seed ) >/dev/null 2>&1
+  }
+  _regen() { bash "${asm}" "$1/.claude/utils/marketplace/verticals/probe.manifest.sh" "$1" "${2:-$1/plugins/probe}" >/dev/null 2>&1; }
+  _vof()   { sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$1/.claude-plugin/plugin.json" | head -1; }
+  _bump()  { printf '# %s\n' "$2" >> "$1/.claude/commands/quick/ping.md"
+             _regen "$1"
+             ( cd "$1" && git add -A && git -c user.email=t@t -c user.name=t commit -qm "$2" ) >/dev/null 2>&1; }
 
-  # (f) SEM LINHA PRINCIPAL ALCANCAVEL (adotante, clone raso) a guarda NAO pode morrer nem zerar:
-  #     cai no comportamento antigo, que ao menos anda com o conteudo local. Degradacao DECLARADA.
-  ( cd "${e}/src" && git checkout -q main && git remote remove origin && git branch -qD feat ) >/dev/null 2>&1
-  local sem_base; sem_base="$(_vere)"
-  if [ -n "${sem_base}" ] && [ "${sem_base}" != "0.1.0" ]; then
-    record_pass "plugin-version-derived: (f) sem origin/ a versao ainda deriva do conteudo local (${sem_base}) — degrada, nao morre"
-  else record_fail "plugin-version-derived: (f)" "sem origin/ a versao virou '${sem_base}' — adotante ficaria com versao travada"; fi
-  rm -rf "${e}"
+  # (e) REQUISITO 1 — MESMA ARVORE, MESMO NUMERO. E o que a REGRA 19 compara: ela regenera num
+  #     mktemp e confronta com o canonico. Se os dois nao derivarem igual, o gate reprova SEMPRE.
+  #     ⚠️ Este caso pegou um defeito REAL antes de qualquer commit: a 1a versao lia o fato
+  #     commitado DEPOIS do `rm -rf "${DEST}"`, entao regenerar no canonico zerava a versao para
+  #     0.1.0 — um plugin com 255 publicadas voltaria a zero.
+  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
+  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen ) >/dev/null 2>&1
+  # ⚠️ A VERSAO COMMITADA TEM DE DIVERGIR DA DO MANIFESTO, senao o caso nao discrimina: um motor
+  #    que lesse o anterior do lugar ERRADO cairia no default do manifesto e daria o MESMO numero
+  #    por acidente. Medido — o mutante "le o anterior do DEST" (o bug do `rm -rf`, que aconteceu
+  #    de verdade) sobrevivia a este caso enquanto as duas versoes eram 0.1.0.
+  _bump "$e" antes-da-comparacao
+  local _canon_v _temp_v _t; _t="$(mktemp -d)"
+  _regen "$e"; _canon_v="$(_vof "$e/plugins/probe")"
+  _regen "$e" "$_t/probe"; _temp_v="$(_vof "$_t/probe")"
+  if [ -n "${_canon_v}" ] && [ "${_canon_v}" = "${_temp_v}" ]; then
+    if [ "${_canon_v}" = "0.1.0" ]; then
+      record_fail "plugin-version-derived: (e)" "os dois deram 0.1.0 (o default do manifesto) — o caso nao discrimina; a fixture precisa de versao commitada != manifesto"
+    else
+      record_pass "plugin-version-derived: (e) canonico e temp derivam o MESMO numero (${_canon_v}, != manifesto) — e o que a REGRA 19 compara"
+    fi
+  else record_fail "plugin-version-derived: (e)" "canonico=${_canon_v} temp=${_temp_v} — a REGRA 19 reprovaria sempre"; fi
+  rm -rf "$_t" "$e"
+
+  # (f) REQUISITO 2 — IMUNE AO SQUASH-MERGE, que e como esta casa funde. A tentativa 1 quebrava
+  #     aqui: N commits da branch viravam UM no main, a branch publicava N a mais.
+  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
+  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen ) >/dev/null 2>&1
+  local _base_v _branch_v _main_v _re_v
+  _base_v="$(_vof "$e/plugins/probe")"
+  ( cd "$e" && git checkout -qb feat ) >/dev/null 2>&1
+  _bump "$e" c1; _bump "$e" c2
+  _branch_v="$(_vof "$e/plugins/probe")"
+  ( cd "$e" && git checkout -q main && git merge --squash -q feat >/dev/null 2>&1 && git -c user.email=t@t -c user.name=t commit -qm squash ) >/dev/null 2>&1
+  _main_v="$(_vof "$e/plugins/probe")"
+  _regen "$e"; _re_v="$(_vof "$e/plugins/probe")"
+  if [ "${_branch_v}" = "${_main_v}" ] && [ "${_main_v}" = "${_re_v}" ] && [ "${_branch_v}" != "${_base_v}" ]; then
+    record_pass "plugin-version-derived: (f) squash real: branch previu ${_branch_v}, main ficou ${_main_v}, regeneracao no main deu ${_re_v} — os tres batem"
+  else record_fail "plugin-version-derived: (f)" "base=${_base_v} branch=${_branch_v} main-pos-squash=${_main_v} regenerado=${_re_v} — o squash dessincronizou"; fi
+  rm -rf "$e"
+
+  # (g) REQUISITO 3 — ESTAVEL AO QUE OUTRO PR FAZ. A tentativa 2 quebrava aqui: a versao virava
+  #     funcao do REMOTO e um PR aberto passava a reprovar a REGRA 19 sozinho quando OUTRO mergeava.
+  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
+  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen && git checkout -qb meupr ) >/dev/null 2>&1
+  _bump "$e" meu
+  local _before _after; _before="$(_vof "$e/plugins/probe")"
+  ( cd "$e" && git stash -q -u 2>/dev/null; git checkout -q main && git checkout -qb outro ) >/dev/null 2>&1
+  _bump "$e" outro
+  ( cd "$e" && git checkout -q main && git merge --squash -q outro >/dev/null 2>&1 && git -c user.email=t@t -c user.name=t commit -qm sq2 && git checkout -q meupr ) >/dev/null 2>&1
+  _regen "$e"; _after="$(_vof "$e/plugins/probe")"
+  if [ "${_before}" = "${_after}" ]; then
+    record_pass "plugin-version-derived: (g) o PR aberto ficou em ${_before} enquanto OUTRO mergeava — versao nao e funcao do remoto"
+  else record_fail "plugin-version-derived: (g)" "o PR aberto mudou de ${_before} para ${_after} sozinho — a REGRA 19 reprovaria um PR que ninguem tocou"; fi
+  rm -rf "$e"
+
+  # (h) REQUISITO 4 — NAO CONGELA SOB GITFLOW. A tentativa 2 congelava: `main` parado, `develop`
+  #     andando, cinco commits e o MESMO numero — literalmente o dano que ela invocava como razao.
+  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
+  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen && git checkout -qb develop ) >/dev/null 2>&1
+  local _seq="" _k
+  for _k in d1 d2 d3; do _bump "$e" "${_k}"; _seq="${_seq} $(_vof "$e/plugins/probe")"; done
+  if [ "$(printf '%s\n' ${_seq} | sort -u | grep -c . || true)" = "3" ]; then
+    record_pass "plugin-version-derived: (h) em GitFlow (main parado, develop andando) a versao ANDA:${_seq}"
+  else record_fail "plugin-version-derived: (h)" "a versao congelou em develop:${_seq}"; fi
+  rm -rf "$e"
+
+  # (i) IDEMPOTENCIA — regenerar sem mudar conteudo NAO pode andar. Sem isto a versao dispararia a
+  #     cada invocacao do lint e a REGRA 19 nunca fecharia.
+  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
+  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen ) >/dev/null 2>&1
+  local _i1 _i2 _i3
+  _regen "$e"; _i1="$(_vof "$e/plugins/probe")"
+  _regen "$e"; _i2="$(_vof "$e/plugins/probe")"
+  _regen "$e"; _i3="$(_vof "$e/plugins/probe")"
+  if [ "${_i1}" = "${_i2}" ] && [ "${_i2}" = "${_i3}" ]; then
+    record_pass "plugin-version-derived: (i) tres regeneracoes sem mudar conteudo mantem ${_i1} — a versao nao dispara sozinha"
+  else record_fail "plugin-version-derived: (i)" "a versao andou sem mudanca de conteudo: ${_i1} ${_i2} ${_i3}"; fi
+  rm -rf "$e"
 
   rm -rf "${d}"
 }
@@ -12613,7 +13035,14 @@ run_marketplace_readmes_selftests() {
   mkdir -p "${d}/tgt/plugins"; ( cd "${d}/tgt" && git init -q ) >/dev/null 2>&1; cp -a "${d}/out" "${d}/tgt/plugins/probe"
   out="$(bash "${mrd}" "${d}/tgt" "mkt-probe" 2>&1 || true)"
   bash "${REPO_ROOT}/.claude/utils/marketplace/generate-marketplace.sh" "${d}/tgt" > "${d}/tgt/marketplace.json" 2>/dev/null || true
-  if grep -qE '^\| \[`probe`\]\(plugins/probe/README.md\) \| vertical \| `0\.1\.1` \| 1 \| 1 \| 0 \| 0 \|' "${d}/tgt/README.md" \
+  # ⚠️ A VERSAO ESPERADA E DERIVADA, NAO LITERAL. A versao anterior deste caso travava `0.1.1` —
+  #    numero da semantica antiga (contagem de commits). Quando a versao virou FATO COMMITADO o
+  #    caso reprovou por conta de um literal, nao por defeito: ele afirmava o NUMERO em vez da
+  #    PROPRIEDADE (a linha do marketplace mostra a versao real daquele plugin). Derivado, ele
+  #    sobrevive a qualquer troca futura de mecanismo — e continua pegando a linha errada.
+  local _mkv; _mkv="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "${d}/tgt/plugins/probe/.claude-plugin/plugin.json" 2>/dev/null | head -1)"
+  [ -n "${_mkv}" ] || _mkv="0.0.0-ausente"
+  if grep -qE "^\| \[\`probe\`\]\(plugins/probe/README.md\) \| vertical \| \`${_mkv//./\\.}\` \| 1 \| 1 \| 0 \| 0 \|" "${d}/tgt/README.md" \
      && grep -q '/plugin marketplace add marciocar/mkt-probe' "${d}/tgt/README.md" && grep -q '^## Manter em dia' "${d}/tgt/README.md" \
      && python3 -c 'import json,sys; m=json.load(open(sys.argv[1])); e=m["plugins"][0]; sys.exit(0 if ("version" not in e and e.get("category")=="vertical" and e.get("tags")==["probe","sonda"] and e.get("displayName")) else 1)' "${d}/tgt/marketplace.json"; then
     record_pass "marketplace-readmes: (b) README do marketplace com tabela/contagens e manifesto: category+tags+displayName, SEM version por entrada"

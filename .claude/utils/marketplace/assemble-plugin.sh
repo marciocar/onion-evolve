@@ -108,6 +108,25 @@ for h in "${HOOKS[@]}"; do [ -f "${SRC}/${h}" ] || { echo "ERRO: hook fonte ause
 for d in "${DOCS[@]}"; do [ -f "${SRC}/${d}" ] || { echo "ERRO: doc-KB fonte ausente (arquivo): ${d}" >&2; exit 2; }; done
 
 # Montagem limpa (idempotente).
+# ── O ESTADO COMMITADO, LIDO ANTES DE QUALQUER ESCRITA ────────────────────────────────────────
+# A versão é um FATO COMMITADO, não uma derivação de histórico — e os dois insumos (a versão
+# publicada e o `tree_sha` que ela descreve) vivem NA ÁRVORE. Por isso qualquer checkout da mesma
+# árvore deriva o mesmo número, que é exatamente o que a REGRA 19 precisa para comparar.
+#
+# ⚠️ LÊ DO CANÔNICO (`${SRC}/plugins/<name>`), NUNCA DO `DEST`. Os dois consumidores desta função
+#    são o pre-commit (DEST = o canônico) e a REGRA 19 (DEST = um mktemp descartável). Se o
+#    anterior viesse do DEST, a regeneração em temp não teria anterior e o gate reprovaria SEMPRE.
+#    Lendo do canônico, os dois leem a MESMA coisa e concordam por construção.
+#
+# ⚠️ E A POSIÇÃO É PARTE DA CURA, não organização: isto TEM de vir antes do `rm -rf "${DEST}"` da
+#    linha abaixo. Quando DEST É o canônico (o caso do pre-commit), aquele `rm -rf` APAGA o fato
+#    commitado — e a 1ª versão desta cura lia depois dele e derivava `0.1.0`, zerando a versão de
+#    um plugin com 255 publicadas. Medido no primeiro dogfood, antes de qualquer commit.
+_canon="${SRC}/plugins/${PLUGIN_NAME}/.claude-plugin"
+_prior_version=""; _prior_tree=""
+[ -f "${_canon}/plugin.json" ]     && _prior_version="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p'   "${_canon}/plugin.json"     | head -1)"
+[ -f "${_canon}/provenance.json" ] && _prior_tree="$(sed -n    's/.*"tree_sha"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "${_canon}/provenance.json" | head -1)"
+
 rm -rf "${DEST}" 2>/dev/null
 mkdir -p "${DEST}/.claude-plugin" "${DEST}/commands" "${DEST}/agents" 2>/dev/null \
   || { echo "AVISO: não criou ${DEST} (permissão?) — plugin não montado." >&2; exit 0; }
@@ -365,49 +384,55 @@ cat > "${DEST}/.claude-plugin/provenance.json" <<EOF
 EOF
 
 # KEYWORDS bash array → JSON array (sem jq).
-# VERSÃO DERIVADA DO CONTEÚDO (sinal de campo 2026-09-03: `claude plugin update` compara só a string de versão —
-# "already at the latest version (0.1.0)" com o cache 89 arquivos atrás do repo). Uma versão que não anda é
-# declaração (behavior-over-declaration). Aqui: PLUGIN_VERSION = <major.minor do manifesto>.<N>, N = commits que
-# tocaram as fontes canônicas deste plugin (+1 se o índice tem mudança pendente nelas — assim o pre-commit e o CI
-# concordam). Monotônica, semver-válida, muda exatamente quando o conteúdo muda; regenerada pela REGRA 19.
-# Sem git (alvo sem histórico) mantém a versão do manifesto. ONION_PLUGIN_VERSION_DERIVED=0 desliga (bancada/legado).
-if [ "${ONION_PLUGIN_VERSION_DERIVED:-1}" = "1" ] && git -C "${SRC}" rev-parse --verify HEAD >/dev/null 2>&1; then
-  _vsrc=(); for p in "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" "${SKILLS[@]}" "${HOOKS[@]}" "${DOCS[@]}" ${_GEN[@]+"${_GEN[@]}"}; do _vsrc+=("${p}"); done
-  _mrel="${MANIFEST#${SRC}/}"; [ -f "${SRC}/${_mrel}" ] && _vsrc+=("${_mrel}")
-  # ⚠️ A CONTAGEM É SOBRE A LINHA PRINCIPAL, NÃO SOBRE A BRANCH — e isto é cura de um defeito
-  # MEDIDO em 2026-09-11, não precaução. A versão anterior contava os commits do HEAD e previa o
-  # próximo com "+1 se há staged". Sob SQUASH-MERGE — que é como esta casa funde — N commits da
-  # branch viram UM no main: a branch publicava N a mais, o main ganhava 1, e a projeção nascia
-  # dessincronizada DO LADO DE LÁ, onde nenhum gate de PR olha. Medido no vivo: `origin/main`
-  # publicava 0.1.255 enquanto a árvore do próprio main derivava 0.1.254 — a REGRA 19 (Plugins de
-  # vertical sincronizados com as fontes) falharia no main, e uma versão que ANDA PARA TRÁS faz
-  # `claude plugin update` responder "already at the latest version" a quem já instalou.
-  #
-  # A cura não é contar melhor: é trocar o REFERENCIAL. Contando sobre `origin/main`, a branch
-  # para de adivinhar quantos commits ela terá depois do squash e prevê SEMPRE UM — que é
-  # exatamente o que o squash entrega. Merge-estável por construção.
-  #
-  # A comparação é contra o ÍNDICE porque ele cobre os dois consumidores de uma vez: no pre-commit
-  # o índice traz o que está em stage; num checkout de CI ele é igual ao HEAD, e a diferença vem
-  # dos commits da branch. Uma só pergunta responde "há pendência?" nos dois casos.
-  #
-  # TETO DECLARADO: dois PRs que tocam fontes, mergeados SEM rebase entre eles, publicam o mesmo
-  # número. É detectável (a REGRA 19 acusa no main) e o fluxo de merge desta casa exige branch
-  # atualizada — mas está escrito aqui porque guarda com teto não-declarado vira promessa.
-  _vbase=""
-  for _cand in origin/main origin/master main master; do
-    git -C "${SRC}" rev-parse --verify --quiet "${_cand}" >/dev/null 2>&1 && { _vbase="${_cand}"; break; }
-  done
-  if [ -n "${_vbase}" ]; then
-    _n="$(git -C "${SRC}" rev-list --count "${_vbase}" -- "${_vsrc[@]}" 2>/dev/null || echo 0)"
-    git -C "${SRC}" diff --cached --quiet "${_vbase}" -- "${_vsrc[@]}" 2>/dev/null || _n=$(( _n + 1 ))
+# VERSÃO DERIVADA DO CONTEÚDO — e a TERCEIRA tentativa de acertar o mecanismo, porque as duas
+# primeiras erraram por baixo do mesmo pressuposto: que a versão podia ser CALCULADA do histórico.
+#
+# O sinal original (2026-09-03): `claude plugin update` compara só a STRING de versão, então um
+# manifesto parado em 0.1.0 deixa o updater no-op com o cache 89 arquivos atrás. Versão que não
+# anda é declaração (behavior-over-declaration).
+#
+# TENTATIVA 1 — contar os commits do HEAD, +1 se há staged. Quebrava no SQUASH-MERGE, que é como
+#   esta casa funde: N commits da branch viram UM no main, a branch publicava N a mais e o main
+#   ganhava 1. Medido no vivo: `origin/main` publicava 0.1.255 e a árvore do próprio main derivava
+#   0.1.254 — a REGRA 19 falhando no main, onde nenhum gate de PR olha.
+# TENTATIVA 2 — contar sobre `origin/main`. Consertava o squash (confirmado com `merge --squash`
+#   real) e introduzia DOIS modos de falha novos, achados na passada adversarial: (a) a versão
+#   virava função do REMOTO, então um PR aberto passava a reprovar a REGRA 19 sozinho assim que
+#   OUTRO PR mergeava, sem nada mudar nele; (b) sob GitFlow, com `main` parado e `develop` andando,
+#   a versão CONGELAVA — literalmente o dano que ela invocava como justificativa.
+#
+# A lição das duas: enquanto a versão for função do HISTÓRICO ou do REMOTO, ela não pode ser ao
+# mesmo tempo reproduzível-da-árvore (o que a REGRA 19 exige) e estável (o que um PR aberto exige).
+# São requisitos incompatíveis nesse eixo.
+#
+# TENTATIVA 3, a desta linha: a versão é um FATO COMMITADO.
+#     versão nova = versão COMMITADA + (o `tree_sha` mudou ? 1 : 0)
+# Os dois insumos vivem na árvore. Consequências, todas MEDIDAS com squash real antes de escrever:
+#   · mesma árvore ⇒ mesmo número, sempre (a REGRA 19 passa a comparar algo estável);
+#   · imune ao squash — a branch previu 3, o main pós-squash ficou 3, a regeneração no main deu 3;
+#   · imune ao que OUTRO PR faz — o PR aberto ficou em 4 enquanto outro mergeava;
+#   · não congela sob GitFlow, porque anda por MUDANÇA DE CONTEÚDO e não por posição no grafo;
+#   · monotônica por construção: o único movimento possível é +1.
+#
+# TETO DECLARADO, e ele encolheu mas não sumiu: dois PRs concorrentes que tocam fontes e são
+# mergeados SEM rebase entre si publicam o mesmo número. O fluxo de merge desta casa exige branch
+# atualizada, e com rebase o segundo lê a versão do primeiro e segue para N+2. Está escrito aqui
+# porque guarda com teto não-declarado vira promessa.
+#
+# `ONION_PLUGIN_VERSION_DERIVED=0` desliga (bancada/legado): fica a versão do manifesto.
+if [ "${ONION_PLUGIN_VERSION_DERIVED:-1}" = "1" ]; then
+  if [ -n "${_prior_version}" ]; then
+    _n="${_prior_version##*.}"
+    case "${_n}" in ''|*[!0-9]*) _n=0 ;; esac
+    # A COMPARAÇÃO É DE CONTEÚDO, não de data nem de commit: `tree_sha` já é o hash das fontes
+    # canônicas (e inclui os GERADORES desde 2026-09-07, porque mudar o gerador muda a saída).
+    [ "${tree_sha}" = "${_prior_tree}" ] || _n=$(( _n + 1 ))
+    PLUGIN_VERSION="${PLUGIN_VERSION%.*}.${_n}"
   else
-    # Sem linha principal alcançável (adotante, clone raso, repo recém-nascido) NÃO HÁ referencial
-    # merge-estável — então cai no comportamento antigo, que ao menos anda com o conteúdo local.
-    _n="$(git -C "${SRC}" rev-list --count HEAD -- "${_vsrc[@]}" 2>/dev/null || echo 0)"
-    git -C "${SRC}" diff --cached --quiet -- "${_vsrc[@]}" 2>/dev/null || _n=$(( _n + 1 ))
+    # PRIMEIRA GERAÇÃO deste plugin (ou alvo sem o canônico ao lado): não há fato commitado de que
+    # partir. Fica a versão do manifesto — e a PRÓXIMA geração já terá de onde contar.
+    :
   fi
-  PLUGIN_VERSION="${PLUGIN_VERSION%.*}.${_n}"
 fi
 
 kw_json=""; for k in "${KEYWORDS[@]}"; do kw_json="${kw_json}\"${k}\","; done; kw_json="[${kw_json%,}]"

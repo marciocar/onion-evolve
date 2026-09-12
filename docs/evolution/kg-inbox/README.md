@@ -36,7 +36,7 @@ cobranças:
 | gatilho | `meta.target:` presente · ou o nome termina em `.proposal.kg.yaml` |
 |---|---|
 | **relaxado** | grau 0 · referência para fora do arquivo — e as duas saem **CONTADAS** na saída |
-| **inalterado** | id duplicado · chave repetida · `node_type` · `plane` · `layer` · `status` · `impact` · `confidence` · `edge_type` |
+| **inalterado** | id duplicado · carimbo repetido (`verified_at`/`verified_against`) · contradição por `REFUTES` · `node_type` · `plane` · `layer` · `status` · `impact` · `confidence` · `edge_type` |
 
 O modo **nunca é silencioso**: ele imprime `◆ MODO PROPOSTA` e diz por qual gatilho entrou, porque
 quem lê um `✅` precisa saber que leu o ✅ de um fragmento e não o de um grafo.
@@ -61,10 +61,20 @@ edges: []                                         # vazio é legítimo aqui
 
 ```
 $ bash .claude/validation/kg-radar.sh <proposta> --integrity --schema
-  ◆ MODO PROPOSTA (meta.target: docs/onion/graph/fios-abertos.kg.yaml) — este arquivo é FRAGMENTO…
+══ INTEGRIDADE ══
+  ◆ MODO PROPOSTA (meta.target: docs/onion/graph/fios-abertos.kg.yaml) — este arquivo é FRAGMENTO, não grafo fechado.
+    Relaxados: grau 0 e referência para fora do arquivo. Todo o resto continua reprovando.
   ℹ relaxado pelo MODO PROPOSTA: 1 nó(s) de grau 0 · 0 referência(s) para fora do arquivo
+    — são erro ao SELAR no destino, onde o grafo volta a ser fechado; aqui não são.
   ✅ fragmento bem formado (1 nós, 0 arestas) — o gate do grafo fechado é a SELAGEM
+
+══ SCHEMA — versão da gramática do .kg.yaml (✗ reprova na divergência) ══
+  ✅ schema_version 1 (bate com o radar)
 ```
+
+*(transcrito VERBATIM da execução — a 1ª versão deste bloco mostrava três linhas editadas e omitia
+a seção `SCHEMA` inteira, apesar de o comando pedir `--schema`. Doc que reescreve a saída do
+programa é a mesma classe que este arquivo inteiro está curando.)*
 
 Ligar o nó novo a um que **já vive no destino** também é legítimo — a referência sai contada como
 relaxada, não reprovada:
@@ -77,5 +87,5 @@ edges:
 ```
 
 **O relaxamento acaba na selagem.** Integrado ao grafo vivo, o fragmento volta a ser cobrado como
-grafo fechado: lá o grau 0 e a referência pendurada são erro de novo. Bancada: família
-`kg_proposal_mode` (6 casos, com mutante que executa).
+grafo fechado: lá o grau 0 e a referência pendurada são erro de novo. Bancada: família `kg_proposal_mode`, com mutante que executa — e um caso que exercita
+CADA cobrança desta linha dentro de uma proposta, porque tabela em prosa não guarda nada.

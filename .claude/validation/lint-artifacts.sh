@@ -4155,8 +4155,17 @@ check_kg_census_parity() {
   #    faria a regra não rodar e o lint declarar gate limpo: zero violação, zero stderr. É a
   #    mesma cicatriz que a irmã 78 carrega documentada.
   local out err rc sev cls path msg
+  # ESCOPO REAL sob `--only`. Antes o filtro barrava a ENTRADA mas o helper varria os 128 grafos:
+  # reportava violação de arquivo ALHEIO (que o chamador não pediu) e cobrava +22% por invocação,
+  # em cada uma das 33 fixtures .kg.yaml rastreadas. Medido: 16,1s → 0,22s com o escopo ligado.
+  local _scope=()
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      *.kg.yaml) _scope=(--file "${ONLY_PATH#"${REPO_ROOT}"/}") ;;
+    esac
+  fi
   err="$(mktemp 2>/dev/null || echo /dev/null)"; rc=0; out=""
-  if out="$(bash "${helper}" "${REPO_ROOT}" --format tsv 2>"${err}")"; then rc=0; else rc=$?; fi
+  if out="$(bash "${helper}" "${REPO_ROOT}" --format tsv ${_scope+"${_scope[@]}"} 2>"${err}")"; then rc=0; else rc=$?; fi
   if [ "${rc:-0}" -ge 2 ] 2>/dev/null; then
     violation "SOFT" "${REPO_ROOT}/.claude/validation/kg-census-parity-check.sh" \
       "[kg-parity/NAO-MEDIDO] a guarda de paridade de censo NÃO RODOU (rc=${rc}: $(head -1 "${err}" 2>/dev/null)) — o corpus não foi confrontado; isto não é aprovação"
