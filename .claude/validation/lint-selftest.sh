@@ -1172,7 +1172,13 @@ RED
   rc=0; out="$(bash "${lint}" --only="${mf}" 2>&1)" || rc=$?
   if _moat_hit "${out}"; then
     record_pass "moat-boundary: (b) declaração por DIRETÓRIO-PAI → HARD pela expansão (C2 do revisor)"
-  else record_fail "moat-boundary: (b)" "bypass por dir-pai não pego: rc=${rc}"; fi
+  else
+    # A FALHA CARREGA A PROVA. Esta reprovou no CI e passou local nos DOIS locales (2026-09-12), e a
+    # mensagem antiga dava so o rc — nada sobre o que o lint DE FATO disse. `flaky sem saida
+    # capturada e flaky para sempre`: aqui saem as violacoes que citaram a fixture (ou a nota de que
+    # NENHUMA citou) e as primeiras HARD, que e o que separa "a guarda nao viu" de "o lint morreu".
+    record_fail "moat-boundary: (b)" "bypass por dir-pai nao pego: rc=${rc}; citando a fixture: [$( { grep -F "${mfbase}" <<< "${out}" || true; } | head -3 | tr '\n' '|' | cut -c1-300)]; 1as HARD do lint: [$( { grep '^VIOLATION' <<< "${out}" || true; } | head -2 | cut -c1-160 | tr '\n' '|')]"
+  fi
   # (c) GREEN — capacidade + upstream (co-evolve/co-relay) + produto (create-task-structure) + dir de
   #     skill/utils limpos: NÃO dispara (o comentário que MENCIONA meta-fábrica também não).
   cat > "${mf}" <<'GREEN'

@@ -2,10 +2,10 @@
 title: 'Resíduo adversarial — MODO PROPOSTA, paridade de censo e a versão do plugin'
 date: 2026-09-12
 branch: fix/kg-proposal-mode-and-census-parity
-reviewed_diff_sha256: daed3f8277560404ab9a9624e154a557a4035c2b5fb478acedf212e7bc50cce1
-findings_total: 37
-findings_real: 37
-findings_fixed: 34
+reviewed_diff_sha256: d6a997e801589fd3736cdff352e8118a8eb66fa4f171f25bfe3d665aa1f38878
+findings_total: 38
+findings_real: 38
+findings_fixed: 35
 tokens: 509478
 duration_min: 96
 verdict: REPROVADO_E_CURADO
@@ -95,6 +95,17 @@ exige) e estável (o que um PR aberto exige).
 
 Agora é um **fato commitado**: `versão nova = versão COMMITADA + (tree_sha mudou ? 1 : 0)`. Os dois
 insumos vivem na árvore. Um caso de bancada por requisito, com **squash-merge real**.
+
+## O 38º achado veio do CI, depois deste resíduo escrito
+
+`moat-boundary: (b)` reprovou no CI e passa local nos DOIS locales, com a bancada completa dando
+**1198/0 aqui e 1197/1 lá**. Nenhum arquivo de moat no diff.
+
+Não chamei de flaky sem prova: curei o **diagnóstico**. A falha agora carrega a saída do lint e diz
+se alguma violação citou a fixture — o que separa *"a guarda não viu"* de *"o lint morreu antes de
+chegar nela"*. Mesma cura que o `outbox-channel` recebeu nesta onda, e lá ela pagou na hora.
+
+**Fica em aberto se a próxima rodada do CI repetir** — e aí virá com a prova.
 
 ## O que fica ABERTO, declarado
 
