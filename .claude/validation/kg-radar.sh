@@ -202,13 +202,15 @@ function trabalhoPendente(s) { return (s != "confirmed" && s != "done" && s != "
 
 function trim(s) { gsub(/^[[:space:]]+|[[:space:]]+$/, "", s); gsub(/^["'\'']|["'\'']$/, "", s); return s }
 
-BEGIN { section = ""; nid = ""; ne = 0 }
+BEGIN { section = ""; nid = ""; ne = 0; metaClosed = 0; metaFieldIndent = -1 }
 
 # comentários e vazio fora de valores
 /^[[:space:]]*#/ { next }
 
-/^nodes:/ { section = "nodes"; next }
-/^edges:/ { section = "edges"; nid = ""; next }
+# `metaClosed` marca aqui, e NAO numa regra propria: as trocas de secao tem `next`, entao uma
+# regra posterior para `/^nodes:/` nunca executaria — foi o defeito da 1a tentativa desta cura.
+/^nodes:/ { section = "nodes"; metaClosed = 1; next }
+/^edges:/ { section = "edges"; nid = ""; metaClosed = 1; next }
 /^meta:/  { section = "meta"; next }
 
 # Legibilidade da gramática (guarda anti-fail-open — sinal de campo 2026-07-17): conta as
@@ -298,10 +300,42 @@ section == "meta" && /^[[:space:]]*schema_version:/ { v = $0; sub(/^[[:space:]]*
 section == "meta" && /^[[:space:]]*baseline:/       { v = $0; sub(/^[[:space:]]*baseline:/, "", v);       metaBaseline = trim(v); next }
 # `target:` é o que faz de um arquivo uma PROPOSTA: ele declara o grafo vivo onde o conteúdo vai
 # aterrissar. Ver a GUARDA DE MODO PROPOSTA na INTEGRIDADE para o que isso muda — e o que não muda.
+# ── O GATILHO DA PROPOSTA, e ele é ESTREITO DE PROPÓSITO ──────────────────────────────────────
+# A 1ª versão casava `^[[:space:]]*target:` — qualquer indentação, em qualquer lugar de `meta:`.
+# A passada adversarial de 2026-09-11 abriu TRÊS portas de ativação acidental num grafo vivo, e as
+# três reprovam pelo mesmo motivo: um relaxamento de gate nunca pode ser ligado por acidente.
+#   (a) `target:` ANINHADO em sub-mapa (`meta: → migracao: → target:`) ligava o modo;
+#   (b) `target:` dentro de um bloco literal (`nota: |`) ligava o modo — e esta é a classe que este
+#       arquivo DECLARA ter curado em l.246-258. A ancoragem cobre contra SUBSTRING, não contra
+#       prosa indentada que começa com o token. Nos campos antigos (schema_version/baseline) a
+#       falha cai para o lado barulhento; neste ela cai para o lado FAIL-OPEN;
+#   (c) `meta:` REABERTO depois de `nodes:` desligava as duas cobranças com duas linhas no fim de
+#       qualquer grafo.
+# As três curas, na ordem em que fecham:
+#   1. `metaClosed` — só o PRIMEIRO bloco meta conta, e ele acaba quando `nodes:`/`edges:` abre;
+#   2. `metaFieldIndent` — `target:` só vale na MESMA indentação dos outros campos diretos de meta,
+#      travada pelo primeiro campo visto. Isto fecha (a) E (b) de uma vez: sub-mapa é mais fundo, e
+#      conteúdo de bloco literal também — por construção da gramática YAML.
+# A indentação do primeiro campo direto de `meta:` trava a régua. Só ela — e isto é resultado de
+# MEDIÇÃO, não de economia: a 1ª versão desta cura rastreava blocos literais (`nota: |`) em
+# paralelo, e a varredura de mutação mostrou que desligar esse rastreio NÃO muda veredito nenhum.
+# É redundante por construção: conteúdo de bloco YAML é sempre MAIS indentado que a chave que o
+# abre, logo nunca casa a indentação de um campo direto. Guarda que não pode rejeitar nada é
+# exatamente o que esta onda está removendo do resto da casa — não vou deixá-la aqui.
+section == "meta" && metaFieldIndent < 0 && /^[[:space:]]+[A-Za-z_][A-Za-z0-9_]*:/ {
+  metaFieldIndent = match($0, /[^[:space:]]/) - 1
+}
+
 # COMENTÁRIO INLINE SAI. `target:` é um CAMINHO que a selagem consome, e o exemplo do próprio
 # README traz ` # ← o gatilho` na mesma linha: sem esta poda o valor vira caminho+comentário. O
 # padrão é o do YAML — só ESPAÇO seguido de `#` abre comentário, então `a#b` continua inteiro.
-section == "meta" && /^[[:space:]]*target:/         { v = $0; sub(/^[[:space:]]*target:/, "", v); sub(/[[:space:]]+#.*$/, "", v); metaTarget = trim(v); next }
+section == "meta" && metaClosed == 0 && /^[[:space:]]+target:/ {
+  if (match($0, /[^[:space:]]/) - 1 == metaFieldIndent) {
+    v = $0; sub(/^[[:space:]]*target:/, "", v); sub(/[[:space:]]+#.*$/, "", v); metaTarget = trim(v)
+    metaTargetSeen = 1
+  }
+  next
+}
 
 END {
   VN = "entity claim decision question evidence artifact state event rule invariant policy"
@@ -804,6 +838,13 @@ END {
     # ELE NUNCA É SILENCIOSO. Um gate que afrouxa sem dizer é a mesma classe que esta casa persegue:
     # quem lê `✅` precisa saber que leu o ✅ de um fragmento, não o de um grafo.
     isProposal = (metaTarget != "" || arq ~ /\.proposal\.kg\.yaml$/)
+    # `target:` PRESENTE MAS VAZIO: o arquivo se declara proposta e o modo não engata — fail-closed,
+    # que é a direção certa, mas MUDO. Quem escreveu a chave acredita estar em modo proposta e
+    # recebe exatamente o erro que o modo existe para não dar. Dizer o porquê custa uma linha.
+    if (!isProposal && metaTargetSeen) {
+      print "  ⚠ `target:` está presente em meta: mas VAZIO — o MODO PROPOSTA NÃO foi ativado."
+      print "    Declare o grafo de destino, ou renomeie o arquivo para *.proposal.kg.yaml."
+    }
     if (isProposal) {
       propWhy = (metaTarget != "" ? "meta.target: " metaTarget : "sufixo .proposal.kg.yaml")
       print "  ◆ MODO PROPOSTA (" propWhy ") — este arquivo é FRAGMENTO, não grafo fechado."

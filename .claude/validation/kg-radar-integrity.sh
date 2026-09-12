@@ -91,7 +91,7 @@ cd "${REPO_ROOT}" || exit 2
 # inventa veredito). Declarar que não sabe é o comportamento correto.
 [ -f "${RADAR}" ] || exit 0
 
-hard=0; total=0
+hard=0; total=0; proposta=0; fora=0
 while IFS= read -r g; do
   [ -n "${g}" ] || continue
   total=$(( total + 1 ))
@@ -104,6 +104,25 @@ while IFS= read -r g; do
     emit HARD CONTRADICAO "${g}" \
       "grafo REPROVA no radar de integridade (exit ${rc}) — reconcilie antes de seguir: ${detalhe:-<sem detalhe; rode: bash .claude/validation/kg-radar.sh ${g} --integrity>}"
     hard=$(( hard + 1 ))
+  elif grep -q 'MODO PROPOSTA' <<< "${out}"; then
+    # ⚠️ RELAXAMENTO NÃO PODE DESAPARECER AQUI. Achado adversarial 2026-09-11: o `kg-radar.sh`
+    #    declara no código que o MODO PROPOSTA "nunca é silencioso" — e era, exatamente neste
+    #    gate, que é o único que roda por CADÊNCIA. Como o modo sai rc=0, o `out` era descartado
+    #    e este laço imprimia "sem contradicao estrutural em nenhum grafo do repo" sobre um
+    #    grafo com duas cobranças DESLIGADAS por auto-declaração do próprio arquivo.
+    #    É o ✅ inventado que esta onda persegue, uma camada acima — e num gate de cadência ele
+    #    dura até alguém desconfiar, que é a definição de invisível.
+    proposta=$(( proposta + 1 ))
+    # ESCOPO: dentro da fila de propostas o relaxamento É o contrato documentado, e avisar a cada
+    # rodada é ruído que treina a pessoa a ignorar o aviso — o oposto do que esta cura quer. Lá o
+    # grafo é CONTADO (o resumo abaixo o mostra) mas não gera linha. FORA da fila, cada um é
+    # nomeado: é ali que o relaxamento não deveria estar acontecendo.
+    case "${g}" in
+      *docs/evolution/kg-inbox/*) continue ;;
+    esac
+    fora=$(( fora + 1 ))
+    emit SOFT MODO-PROPOSTA "${g}" \
+      "grafo passou em MODO PROPOSTA — grau 0 e referência para fora do arquivo NÃO foram cobrados aqui ($(sed -n 's/^[[:space:]]*ℹ[[:space:]]*\(relaxado pelo MODO PROPOSTA.*\)/\1/p' <<< "${out}" | head -1 || true)). Isto é legítimo num fragmento da fila de propostas e SUSPEITO em qualquer outro lugar: o gate do grafo fechado é a SELAGEM"
   fi
 # ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
 #    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos
@@ -112,8 +131,17 @@ done < <(git ls-files '*.kg.yaml' | bash "${_KFP}" --filter)
 
 if [ "${FMT}" != "tsv" ]; then
   printf '  [kg-integridade] grafos verificados: %s · reprovando: %s\n' "${total}" "${hard}"
+  if [ "${proposta}" -gt 0 ]; then
+    printf '  [kg-integridade] %s grafo(s) em MODO PROPOSTA (%s fora da fila kg-inbox) — cobranças de grafo FECHADO relaxadas ali.\n' "${proposta}" "${fora}"
+  fi
   if [ "${hard}" -eq 0 ]; then
-    printf '  [kg-integridade] sem contradicao estrutural em nenhum grafo do repo.\n'
+    if [ "${proposta}" -gt 0 ]; then
+      # O resumo NAO pode dizer "nenhum" quando houve relaxamento: seria a mesma frase para dois
+      # fatos diferentes, e quem le o gate por cadencia so ve a frase.
+      printf '  [kg-integridade] sem contradicao estrutural nos grafos COBRADOS (ver os em MODO PROPOSTA acima).\n'
+    else
+      printf '  [kg-integridade] sem contradicao estrutural em nenhum grafo do repo.\n'
+    fi
   fi
 fi
 
