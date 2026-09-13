@@ -1,0 +1,813 @@
+{
+ "question": "No contexto de EMPREGO (relação de poder assimétrica entre organização e colaborador), qual é o critério operacional que separa o compartilhamento LEGÍTIMO e indissociável entre dado do indivíduo e dado da organização da VIGILÂNCIA — e como esse critério se articula com um Company Brain (grafo de conhecimento reconciliado da organização), com o Second Brain (conhecimento pessoal) e com o Onion? POSIÇÃO A TESTAR (do maestro, não do adotante): informações do indivíduo que tenham influência e relação com a empresa, e informações da empresa que tenham influência e relação com o indivíduo, têm um nível INDISSOCIÁVEL de compartilhamento nos dois sentidos, respeitando a singularidade da informação e protegendo empresa e indivíduo — nem 'tudo', nem 'nada'. POSIÇÃO RIVAL (do adotante jogo-da-vida): colaboradores entram só como AUTORES de decisões, nunca como dados. RESTRIÇÃO MATEMÁTICA JÁ MEDIDA pelo adotante em produto vivo (testemunho): agregado com consentimento parcial vaza o indivíduo por diferença em times de 3 a 5; anonimizar a dois ou três é dedutível. Eixos obrigatórios: (1) regulação de dado de trabalhador — LGPD, GDPR art. 88, legítimo interesse vs consentimento sob subordinação, jurisprudência de monitoramento de empregado; (2) arte de produto — Company Brain, enterprise knowledge graph, Microsoft Viva/Workplace Analytics e as controvérsias de 'productivity score', Glean, Notion, Second Brain/PKM; (3) pesquisa acadêmica — contextual integrity (Nissenbaum), privacidade diferencial em times pequenos, k-anonimato e ataques de diferença, surveillance studies no trabalho; (4) teoria da autodeterminação (Deci e Ryan) aplicada a sistemas de monitoramento; (5) mercado e capital — o que vende, o que foi processado ou revertido, onde há backlash de trabalhadores.",
+ "today": "2026-09-13",
+ "kgPath": "/home/marcio/onion-evolve-fronteira/docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml",
+ "radarExit": 0,
+ "summary": "Resposta: o que esta rodada confirmou aponta para um critério baseado na FINALIDADE, e não na partilha em si. Um fluxo entre o dado do indivíduo e o da organização é legítimo quando atende a quatro condições: (a) está preso a um conjunto fechado de propósitos declarados antes; (b) não se apoia no consentimento do empregado, porque sob subordinação ele só vale se a recusa não trouxer prejuízo; (c) não é aproveitado para outra finalidade; (d) mesmo com acordo coletivo, continua preso aos princípios, às bases legais e às regras de dado sensível do GDPR (CJEU C-65/23). Isso apoia a POSIÇÃO do maestro, a partilha 'indissociável' nos dois sentidos, mas só como 'indissociável por finalidade', e não por influência ou relação genérica. A posição do adotante, de colaborador só como autor, fica como caso extremo e conservador desse mesmo critério, e não como rival de outra natureza. O mercado vai no sentido oposto: o Glean junta cada pessoa num nó de identidade único, e o Viva Insights deixa gestores compararem o uso de Copilot entre equipes. O limite matemático do adotante (vazamento por diferença em times de 3 a 5 pessoas) NÃO foi confirmado por fonte externa nesta rodada: as claims sobre o tamanho mínimo de grupo do Viva foram refutadas. Por isso ele segue como testemunho de produto vivo, e não como fato verificado.",
+ "market": "Sem sinal de CAPITAL encontrado nesta rodada. Nenhuma claim confirmada trata de rodada de investimento, valuation, M&A, down round, processo judicial contra fornecedor ou recuo de produto por pressão de trabalhadores. Os únicos sinais de mercado confirmados são de PRODUTO: (1) o Glean, referência de Company Brain, reconcilia a pessoa como identidade unificada; (2) a Microsoft ampliou em out/2025 a comparação gerencial de uso de IA por equipe no Viva Insights, inclusive contra empresas parecidas. Leitura: o produto que se vende hoje trata o indivíduo como dado e oferece comparação para gestores, e não 'colaborador só como autor'. O backlash de trabalhadores (o caso Productivity Score de 2020 e a reversão parcial da Microsoft) e o capital de Glean, Notion e ferramentas de PKM não foram cobertos com evidência confirmada. É preciso rodar o eixo de mercado de novo antes de citar tese de capital.",
+ "findings": [
+  {
+   "claim": "Princípio da finalidade como núcleo do critério: o dado de monitoramento no trabalho só pode servir a um conjunto FECHADO de propósitos declarados antes. No exemplo belga: saúde e segurança, proteção de ativos, controle de produção e controle do trabalho realizado. O que foi coletado para um propósito não pode ser reaproveitado livremente para outro. É a régua que limita o que um Company Brain pode absorver do indivíduo.",
+   "confidence": "high",
+   "sources": [
+    "https://academic.oup.com/idpl/article/12/4/276/6668508"
+   ],
+   "evidence": "Artigo acadêmico (International Data Privacy Law, OUP, 2022), tier 8, votos 3-0. No corpus, conversa diretamente com PO_L1_ESCOPO (schema-mask por propósito) e PO_L2_PROPOSITO (monitor de categoria de dado × propósito). Igual, portanto transfere: a arte jurídica já exige o que o corpus desenhou como camada técnica.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Sob relação de emprego, o consentimento do empregado é rejeitado como base legal, salvo quando ele pode recusar sem consequência adversa. O motivo é o desequilíbrio de poder da subordinação.",
+   "confidence": "medium",
+   "sources": [
+    "https://www.gdpr-expert.com/article.html?mid=16&id=88&compare=9"
+   ],
+   "evidence": "Fonte analista (tier 6), votos 3-0. É coerente com a linha conhecida dos reguladores europeus, mas esta rodada não trouxe a fonte primária (EDPB/WP29). Consequência para o desenho: não se pode mediar a 'partilha indissociável' do maestro por consentimento. A base tem de ser outra (contrato, obrigação legal, legítimo interesse com teste de balanceamento). Isso separa este caso do C_MEMBRO_SOBERANO do corpus, em que o membro escolhe. Diferente, portanto é preciso desenhar.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "CJEU C-65/23: um acordo coletivo sobre tratamento de dado de trabalhador continua sujeito aos princípios do Art. 5, às bases do Art. 6(1) e às condições do Art. 9(1-2) para dado sensível. Um acordo coletivo sozinho não legitima vigilância.",
+   "confidence": "medium",
+   "sources": [
+    "https://www.gdpr-expert.com/article.html?mid=16&id=88&compare=9"
+   ],
+   "evidence": "Fonte analista (tier 6) comentando decisão do CJEU, votos 3-0. Merece conferência no texto primário da decisão (curia.europa.eu). Implicação: a legitimidade não se 'negocia' em bloco. Cada fluxo precisa passar individualmente pelos princípios, o que sustenta um mecanismo por fluxo (predicado e propósito), e não um termo guarda-chuva.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "O Glean monta uma visão consolidada de cada pessoa (identidade unificada), juntando sinais de todas as aplicações conectadas. No produto de referência de Company Brain, o indivíduo é reconciliado como NÓ DE IDENTIDADE, e não apenas como autor de conteúdo.",
+   "confidence": "medium",
+   "sources": [
+    "https://docs.glean.com/security/knowledge-graph"
+   ],
+   "evidence": "Documentação do próprio fornecedor (tier 5; fonte primária para descrever o próprio produto), votos 3-0. É o contraponto direto à posição do adotante (colaborador só como autor): a arte dominante já trata a pessoa como dado. Pelo corpus (EN_FRONTEIRA: o dano é o CRUZAMENTO), um nó de identidade unificado é exatamente a superfície de cruzamento.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "A Microsoft lançou no Viva Insights (Copilot Dashboard e benchmarks de agentes) um recurso que permite a gestores monitorar e comparar como as equipes usam o Copilot, inclusive contra dados anonimizados de empresas parecidas.",
+   "confidence": "medium",
+   "sources": [
+    "https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/"
+   ],
+   "evidence": "Agregador (tier 5), out/2025, votos 3-0. Mostra que a Workplace Analytics continua indo para a comparação gerencial entre equipes, a mesma classe da controvérsia do 'productivity score'. A controvérsia original de 2020 não foi confirmada nesta rodada.",
+   "vote": "3-0"
+  },
+  {
+   "claim": "Essa ferramenta do Viva mede o percentual de usuários ativos de Copilot, a adoção por aplicativo do M365 e o percentual de usuários recorrentes. 'Usuário ativo' é quem fez ação intencional com um recurso de IA.",
+   "confidence": "low",
+   "sources": [
+    "https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/"
+   ],
+   "evidence": "Agregador (tier 5), votos 2-1 (dissenso). Não ficou claro se as métricas chegam ao nível individual ou só ao agregado. Isso é justamente o ponto crítico para a restrição de times pequenos.",
+   "vote": "2-1"
+  }
+ ],
+ "caveats": "1) Das 25 claims avaliadas, 19 foram refutadas. O saldo confirmado é estreito e concentrado em regulação da UE e em duas fontes de produto. 2) LGPD e jurisprudência brasileira (TST, ANPD, monitoramento de e-mail corporativo) NÃO foram cobertas, e o adotante é brasileiro. É a lacuna mais grave: a transferência GDPR→LGPD não pode ser presumida. O Art. 7º/IX e o legítimo interesse da LGPD têm teste próprio, e a ANPD tem guia específico. 3) Os eixos acadêmicos (Nissenbaum aplicada ao trabalho, privacidade diferencial em times pequenos, k-anonimato e ataques de diferença, surveillance studies) e a autodeterminação de Deci e Ryan ficaram SEM claim confirmada. As claims de integridade contextual e function creep foram refutadas nesta rodada, embora o corpus já tenha PO_INFERENCIA e C_INFERENCIA. 4) A restrição matemática do adotante (times de 3 a 5 vazam por diferença) segue testemunho, sem fonte externa confirmada. Frente ao corpus: IGUAL, portanto transfere. A finalidade fechada vira PO_L1_ESCOPO/PO_L2_PROPOSITO; o filtro por composição de quase-identificadores (PO_L3_FILTRO) e o ledger de ε monotônico (PO_BUDGET) respondem ao ataque por diferença; a regra 'só predicado provado sai' (ST_EMISSAO) vale igual. DIFERENTE, portanto é preciso desenhar. O corpus pressupõe membro SOBERANO que decide partilhar (C_MEMBRO_SOBERANO, PO_DISCLOSURE_VC); sob subordinação o consentimento deixa de ser base válida, e o controle do fluxo precisa de base legal e finalidade impostas pelo MECANISMO, e não escolhidas pelo colaborador. Surge também uma direção nova: o fluxo empresa→indivíduo (o que da organização afeta a pessoa e deve chegar a ela), que o corpus não modela. 5) O 'critério operacional' da summary é SÍNTESE do sintetizador sobre as confirmadas, e não um critério que alguma fonte enuncie pronto. A claim de 'lacuna doutrinária: não existe limiar uniforme' foi refutada, mas o oposto também não foi provado.",
+ "openQuestions": [
+  "Qual base legal da LGPD (execução de contrato, obrigação legal, legítimo interesse com LIA) sustenta cada direção do fluxo 'indissociável' (indivíduo→empresa e empresa→indivíduo) sem apoiar no consentimento, que sob subordinação é inválido?",
+  "A 'influência e relação com a empresa' do maestro pode ser operacionalizada como lista FECHADA de finalidades declaradas antes (princípio da finalidade), com cada fluxo emitido como predicado ligado a uma finalidade (PO_DISCLOSURE_VC + PO_L1_ESCOPO)? Ou 'influência' é aberta demais e reabre o function creep?",
+  "Em times de 3 a 5 pessoas, a resposta é supressão (sem dado abaixo de k, como se diz do Viva), privacidade diferencial com ledger de ε (PO_BUDGET) ou restrição estrutural (só predicado sobre decisão, nunca métrica de pessoa, como defende o adotante)? Qual delas sobrevive ao ataque por diferença entre consultas consecutivas?",
+  "A reconciliação da pessoa como nó de identidade unificado (padrão Glean) é compatível com um Company Brain do Onion, ou o grafo deve manter o colaborador como AUTOR (aresta de proveniência) e exigir predicado com finalidade para qualquer atributo da pessoa?",
+  "Como modelar o fluxo empresa→indivíduo (a informação da organização que afeta o colaborador e deve chegar a ele, como mudança de política, avaliação ou decisão que o afeta), que o corpus não tem, como obrigação de transparência, e não só como permissão?",
+  "Onde está o dado de capital e de backlash: há processos, recuos de produto ou perda de clientes ligados a analytics de produtividade individual (Productivity Score, bossware), ou seja, a tese 'vigilância não vende' tem sinal de mercado ou só regulatório?",
+  "A autodeterminação de Deci e Ryan dá um critério MENSURÁVEL (percepção de controle e autonomia do colaborador sobre o fluxo) que complemente o critério jurídico da finalidade no gate de adoção?"
+ ],
+ "refuted": [
+  {
+   "claim": "Art. 88 GDPR delega aos Estados-membros a regulação de dados de trabalhadores, mas a implementação diverge fortemente entre países quanto a se consentimento é aceitável sob subordinação econômica — Portugal proíbe consentimento quando há vantagem econômica/legal para o trabalhador oferecida pelo empregador, enquanto a Alemanha o permite nesse mesmo caso, revelando que o próprio critério de 'consentimento livre' não tem consenso jurisprudencial na UE.",
+   "vote": "0-3",
+   "source": "https://academic.oup.com/idpl/article/12/4/276/6668508",
+   "tier": 8
+  },
+  {
+   "claim": "O critério operacional dominante na jurisprudência europeia (caso Bărbulescu v. Romênia, TEDH) para separar monitoramento legítimo de vigilância abusiva é um teste de proporcionalidade composto: notificação prévia obrigatória, limites explícitos de extensão/intrusão do monitoramento, existência de interesse legítimo declarado, necessidade estrita (não mera conveniência), e consideração das consequências para o empregado monitorado.",
+   "vote": "0-3",
+   "source": "https://academic.oup.com/idpl/article/12/4/276/6668508",
+   "tier": 8
+  },
+  {
+   "claim": "O artigo aponta explicitamente uma lacuna doutrinária: mesmo com Art. 88 GDPR, não existe um limiar operacional claro e uniforme que separe dado organizacional legítimo de vigilância — a fronteira permanece contestada e dependente de implementação nacional fragmentada, o que enfraquece a posição de que exista hoje um critério jurídico pronto e indissociável a se importar diretamente para o desenho de um Company Brain.",
+   "vote": "1-2",
+   "source": "https://academic.oup.com/idpl/article/12/4/276/6668508",
+   "tier": 8
+  },
+  {
+   "claim": "A violação da integridade contextual no monitoramento de funcionários ocorre por function creep: dados coletados para um propósito restrito de trabalho são depois reutilizados para outros fins.",
+   "vote": "0-3",
+   "source": "https://academic.oup.com/jcmc/article/28/4/zmad007/7210235",
+   "tier": 8
+  },
+  {
+   "claim": "Funcionários consideram vigilância ilegítima quando o monitoramento captura imagens/vídeos do espaço doméstico, uma intrusão na privacidade do lar distinta da vigilância de atividades estritamente laborais.",
+   "vote": "1-2",
+   "source": "https://academic.oup.com/jcmc/article/28/4/zmad007/7210235",
+   "tier": 8
+  },
+  {
+   "claim": "O critério operacional proposto para legitimidade do fluxo de dados empregador-empregado combina quatro elementos: consentimento informado, propósito específico declarado, limites claros de acesso e duração, e impossibilidade de reuso (function creep).",
+   "vote": "0-3",
+   "source": "https://academic.oup.com/jcmc/article/28/4/zmad007/7210235",
+   "tier": 8
+  },
+  {
+   "claim": "O Microsoft Viva Insights (ex-Workplace Analytics) impõe um tamanho mínimo de grupo padrão de 5 pessoas para exibir qualquer métrica agregada derivada de dados de RH, e o administrador não pode configurar esse limite abaixo de 5 — mecanismo operacional explícito de proteção contra reidentificação em grupos pequenos.",
+   "vote": "0-3",
+   "source": "https://learn.microsoft.com/en-us/viva/insights/Privacy/Privacy-considerations",
+   "tier": 6
+  },
+  {
+   "claim": "A regra de tamanho mínimo de grupo se aplica apenas a gráficos derivados de dados de RH (atributos organizacionais como gestor, cidade, nível); grupos abaixo do limiar simplesmente não exibem dado nenhum (barra cinza/branca sem dado), em vez de exibir dado degradado ou ruidoso.",
+   "vote": "0-3",
+   "source": "https://learn.microsoft.com/en-us/viva/insights/Privacy/Privacy-considerations",
+   "tier": 6
+  },
+  {
+   "claim": "GDPR Art. 88 exige que o processamento de dados no contexto de emprego seja estritamente necessário para um propósito legítimo (necessidade estrita), com informação efetiva ao empregado sobre monitoramento (transparência) e proporcional — mesmo quando amparado por acordo coletivo.",
+   "vote": "0-3",
+   "source": "https://www.gdpr-expert.com/article.html?mid=16&id=88&compare=9",
+   "tier": 6
+  },
+  {
+   "claim": "A Microsoft Viva Insights aplica tamanho mínimo de grupo de 5 pessoas como proteção padrão contra reidentificação em dados agregados, configurável para cima pelo administrador — evidência direta e quantitativa a favor da restrição matemática testemunhada pelo adotante (vazamento por diferença em times de 3 a 5).",
+   "vote": "0-3",
+   "source": "https://learn.microsoft.com/en-us/viva/insights/advanced/privacy/privacy",
+   "tier": 6
+  },
+  {
+   "claim": "A Microsoft usa privacidade diferencial (ajuste aleatório de observações individuais que se cancela no agregado) especificamente para organization insights, argumentando que revelar tudo compromete a privacidade individual e não revelar nada é inútil — é o critério operacional intermediário entre 'tudo' e 'nada' que a posição do maestro busca.",
+   "vote": "0-3",
+   "source": "https://learn.microsoft.com/en-us/viva/insights/advanced/privacy/privacy",
+   "tier": 6
+  },
+  {
+   "claim": "A Microsoft passou a exigir agregação mínima de dados de peer group em pelo menos 20 empresas diferentes antes de expor métricas de produtividade/adoção de IA, como camada de proteção contra identificação individual.",
+   "vote": "0-3",
+   "source": "https://winbuzzer.com/2025/10/23/microsofts-new-workplace-tracking-tools-spark-new-privacy-debate-xcxwbn/",
+   "tier": 5
+  },
+  {
+   "claim": "Mesmo com proteção formal de opt-out individual, a estrutura de poder assimétrica do emprego permite que gestores contornem o consentimento pedindo educadamente que colaboradores ativem o rastreamento, criando pressão de pares dentro das equipes.",
+   "vote": "0-3",
+   "source": "https://winbuzzer.com/2025/10/23/microsofts-new-workplace-tracking-tools-spark-new-privacy-debate-xcxwbn/",
+   "tier": 5
+  },
+  {
+   "claim": "O Glean Knowledge Graph aplica um limiar de privacidade que só permite coleta/exposição de dados de atividade quando agregados através de múltiplos usuários (padrão tipo k-anonimato), não individualmente.",
+   "vote": "0-3",
+   "source": "https://docs.glean.com/security/knowledge-graph",
+   "tier": 5
+  },
+  {
+   "claim": "O artigo identifica um risco de má interpretação: gestores podem equiparar alto uso de Copilot a alto desempenho, incentivando colaboradores a 'jogar o sistema' com ações superficiais de IA só para inflar métricas — evidência do critério de vigilância quando dado vira proxy avaliativo desconectado de valor real.",
+   "vote": "0-3",
+   "source": "https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/",
+   "tier": 5
+  },
+  {
+   "claim": "A Meta passou a capturar movimentos de mouse e keystrokes de funcionários para treinar modelos de IA, prática relatada como vigilância corporativa de dado do colaborador sem separação clara entre dado de trabalho e dado pessoal.",
+   "vote": "0-3",
+   "source": "https://news.ycombinator.com/item?id=47851948",
+   "tier": 2
+  },
+  {
+   "claim": "A relação de trabalho é caracterizada juridicamente como uma assimetria de poder que invalida consentimento como base legal suficiente por si só — o trabalhador é tratado como 'duplamente vulnerável' (como cidadão/consumidor e como trabalhador dependente), fundamentando por que legítimo interesse (com teste de proporcionalidade), e não consentimento, deve ser a base legal preferencial para processamento de dados de trabalhadores.",
+   "vote": "0-3",
+   "source": "https://academic.oup.com/idpl/article/12/4/276/6668508",
+   "tier": 8
+  },
+  {
+   "claim": "A legitimidade do compartilhamento de dados no trabalho é violada quando o monitoramento carece de limites temporais claros, por exemplo ao continuar após o retorno ao escritório sem escopo definido.",
+   "vote": "0-3",
+   "source": "https://academic.oup.com/jcmc/article/28/4/zmad007/7210235",
+   "tier": 8
+  },
+  {
+   "claim": "Mulheres relatam maior preocupação com a coleta de dados de saúde no monitoramento corporativo, refletindo vulnerabilidades históricas como discriminação por gestação — evidência de que a legitimidade percebida da vigilância não é neutra e depende da posição de poder do indivíduo.",
+   "vote": "0-3",
+   "source": "https://academic.oup.com/jcmc/article/28/4/zmad007/7210235",
+   "tier": 8
+  }
+ ],
+ "unverified": [],
+ "notVerifiedByBudget": [
+  {
+   "claim": "O rastreamento de localização introduzido pela Microsoft em ferramentas de workplace é opt-out por padrão e o administrador da organização não pode conceder esse consentimento em nome do colaborador — o consentimento é individual.",
+   "source": "https://winbuzzer.com/2025/10/23/microsofts-new-workplace-tracking-tools-spark-new-privacy-debate-xcxwbn/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O antecessor Productivity Score da Microsoft gerou backlash imediato porque nomeava indivíduos diretamente nas métricas, o que motivou o desenho atual centrado em agregação por grupo em vez de indivíduo.",
+   "source": "https://winbuzzer.com/2025/10/23/microsofts-new-workplace-tracking-tools-spark-new-privacy-debate-xcxwbn/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Histogramas são uma exceção deliberada à regra de tamanho mínimo de grupo: podem exibir um 'bin' com um único indivíduo, porque o eixo do histograma é baseado em métricas comportamentais (não em atributos de RH) e o indivíduo fica agrupado por faixa de valor (mínimo de 0,5 hora), não por grupo organizacional identificável.",
+   "source": "https://learn.microsoft.com/en-us/viva/insights/Privacy/Privacy-considerations",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A página não menciona privacidade diferencial, k-anonimato ou ataques de dedução por diferença de conjunto (set-difference attack) como mecanismo formal — a proteção declarada é um limiar fixo de contagem (threshold-based suppression), não um modelo matemático de privacidade com garantias comprováveis, o que é uma lacuna relevante frente à restrição matemática citada pelo adotante (vazamento por diferença em times de 3 a 5).",
+   "source": "https://learn.microsoft.com/en-us/viva/insights/Privacy/Privacy-considerations",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Os dados de atividade (telemetria de uso/comportamento) do Glean permanecem isolados dentro do projeto GCP exclusivo do cliente, como garantia de localidade — mas a documentação não especifica governança de consentimento do colaborador individual sobre esses dados.",
+   "source": "https://docs.glean.com/security/knowledge-graph",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O controle de acesso do Glean Knowledge Graph é configurado no nível de item individual de conteúdo organizacional (inclusão/exclusão), e não como um mecanismo de consentimento do indivíduo sobre seus próprios dados pessoais no grafo.",
+   "source": "https://docs.glean.com/security/knowledge-graph",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A comunidade técnica (HN) reage à notícia enquadrando-a como vigilância predatória, não como compartilhamento legítimo bilateral — reforçando a posição rival de que dado de colaborador vira insumo de treinamento sem reciprocidade nem proteção do indivíduo.",
+   "source": "https://news.ycombinator.com/item?id=47851948",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "O Art. 88 do GDPR permite processamento de dados de emprego legítimo para fins de gestão, planejamento e organização do trabalho, contradizendo a posição de que colaboradores devem entrar apenas como 'autores', nunca como 'dados'.",
+   "source": "https://www.gdpr-expert.com/article.html?mid=16&id=88&compare=9",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Em 2020 a Microsoft enfrentou forte backlash de privacidade com o 'Productivity Score', criticado por pesquisador como ferramenta de vigilância no ambiente de trabalho ('this is so problematic at many levels' — Wolfie Christl), e respondeu removendo nomes de usuários e agregando os dados.",
+   "source": "https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Para mitigar exposição individual em comparações externas, a Microsoft usa modelos matemáticos randomizados e garante coortes de comparação com ao menos 20 empresas diferentes; internamente usa médias ponderadas por papel — mas o artigo não trata do problema de reidentificação por diferença em grupos pequenos.",
+   "source": "https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "Viva Insights também usa 'distribution masking' para evitar que resultados agregados revelem que 'quase todos' ou 'quase ninguém' de um grupo se encaixa num perfil, porque isso equivaleria a expor informação sobre cada indivíduo do grupo — uma terceira camada de proteção matemática além do tamanho mínimo de grupo e da privacidade diferencial.",
+   "source": "https://learn.microsoft.com/en-us/viva/insights/advanced/privacy/privacy",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A Microsoft reconhece explicitamente que atributos organizacionais combinados (função, cargo, localização, organização) que isoladamente não identificam ninguém podem, juntos, permitir que um analista infira a identidade de um indivíduo — validando o ataque de diferença citado pelo adotante mesmo fora do agregado, no nível de linha de dados.",
+   "source": "https://learn.microsoft.com/en-us/viva/insights/advanced/privacy/privacy",
+   "reason": "orçamento maxVerify"
+  },
+  {
+   "claim": "A Microsoft trata monitoramento de colaborador como matéria sujeita a legítimo interesse sob GDPR, exigindo que a organização (como controladora de dados) determine e documente esse legítimo interesse antes do processamento, e recomenda avaliação de impacto de proteção de dados (DPIA) para usos de maior risco, como perfilamento ou decisões automatizadas sobre empregados.",
+   "source": "https://learn.microsoft.com/en-us/viva/insights/advanced/privacy/privacy",
+   "reason": "orçamento maxVerify"
+  }
+ ],
+ "budgetDropped": [
+  {
+   "url": "https://www.mondaq.com/data-protection/687846/gdpr-update-the-processing-of-personal-data-in-the-employment-context",
+   "title": "GDPR Update: The Processing Of Personal Data In The Employment Context",
+   "angle": "regulação de dado de trabalhador",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://employsome.com/blog/gdpr-hr/",
+   "title": "GDPR for HR 2026: Article 88 & Member State Compliance Guide",
+   "angle": "regulação de dado de trabalhador",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://gstride.ai/blog/gdpr-compliant-employee-monitoring/",
+   "title": "GDPR-Compliant Employee Monitoring: 25-Point 2026 Checklist",
+   "angle": "regulação de dado de trabalhador",
+   "relevance": "low"
+  },
+  {
+   "url": "https://rencore.com/en/blog/productivity-privacy-viva-insights-governance/",
+   "title": "Navigating productivity and privacy: A deep dive into Viva Insights governance",
+   "angle": "Company Brain / Workplace Analytics controvérsia",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.npifinancial.com/blog/microsoft-viva-insights-has-microsoft-found-the-balance-between-productivity-and-privacy",
+   "title": "Microsoft Viva Insights – Has Microsoft Found the Balance Between Productivity and Privacy?",
+   "angle": "Company Brain / Workplace Analytics controvérsia",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.glean.com/blog/knowledge-graph-agentic-engine",
+   "title": "How knowledge graphs work and why they are the key to context for enterprise AI",
+   "angle": "Company Brain / Workplace Analytics controvérsia",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://spdp.di.unimi.it/papers/tdp2023.pdf",
+   "title": "k-Anonymity — Transactions on Data Privacy 16 (2023)",
+   "angle": "privacidade em grupos pequenos",
+   "relevance": "high"
+  },
+  {
+   "url": "https://iapp.org/news/a/aggregating-over-anonymized-data",
+   "title": "Aggregating over anonymized data — IAPP",
+   "angle": "privacidade em grupos pequenos",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC2858714/",
+   "title": "A method for managing re-identification risk from small geographic areas in Canada",
+   "angle": "privacidade em grupos pequenos",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://dualitytech.com/blog/k-anonymity-explained/",
+   "title": "K-Anonymity: Is It Still Enough for Enterprise Data Privacy?",
+   "angle": "privacidade em grupos pequenos",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.mdpi.com/2673-7116/6/1/6",
+   "title": "Digital Panopticon: How Remote Work Monitoring Shapes Employee Behavior and Motivation",
+   "angle": "contextual integrity e vigilância no trabalho",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://pearl.umd.edu/wp-content/uploads/2024/04/Kumar_etal-2024-CSCW-CI.pdf",
+   "title": "A Roadmap for Applying the Contextual Integrity Framework in Sociotechnical Systems (Kumar et al., CSCW 2024)",
+   "angle": "contextual integrity e vigilância no trabalho",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://arxiv.org/pdf/2604.21308",
+   "title": "CI-Work: Benchmarking Contextual Integrity in Enterprise LLM Agents",
+   "angle": "contextual integrity e vigilância no trabalho",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.sciencedirect.com/science/article/pii/S2451958822000616",
+   "title": "The impact of electronic monitoring on employees' job satisfaction, stress, performance, and counterproductive work behavior: A meta-analysis",
+   "angle": "autodeterminação e monitoramento",
+   "relevance": "high"
+  },
+  {
+   "url": "https://cyberpsychology.eu/article/view/35298",
+   "title": "Electronic performance monitoring: The role of reactance, trust, and privacy concerns in predicting job satisfaction in the post-pandemic workplace",
+   "angle": "autodeterminação e monitoramento",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.researchgate.net/publication/360422243_How_Algorithmic_Management_Influences_Worker_Motivation_A_Self-Determination_Theory_Perspective",
+   "title": "How Algorithmic Management Influences Worker Motivation: A Self-Determination Theory Perspective",
+   "angle": "autodeterminação e monitoramento",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.sciencedirect.com/science/article/abs/pii/S0040162525005517",
+   "title": "Integrating human support with algorithmic control: Psychological reactance in platform work",
+   "angle": "autodeterminação e monitoramento",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC13503175/",
+   "title": "The algorithmic management paradox: a structured integrative review of perceived autonomy on performance in digital workplaces",
+   "angle": "autodeterminação e monitoramento",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.glean.com/press/glean-introduces-third-generation-ai-assistant-new-enterprise-graph-to-enable-the-superintelligent-enterprise",
+   "title": "Glean Introduces Third-Generation AI Assistant, New Enterprise Graph",
+   "angle": "produtos Company Brain vs PKM pessoal",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.techtarget.com/enterprise-software/feature/Monitoring-productivity-of-employees-crosses-privacy-boundaries",
+   "title": "Monitoring productivity of employees crosses privacy boundaries (TechTarget)",
+   "angle": "produtos Company Brain vs PKM pessoal",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.glean.com/blog/gartner-innovation-guide-gen-ai-knowledge-management-2025",
+   "title": "Glean named Emerging Leader — Gartner Innovation Guide for Gen AI Knowledge Management 2025",
+   "angle": "produtos Company Brain vs PKM pessoal",
+   "relevance": "low"
+  },
+  {
+   "url": "https://aiopsschool.com/blog/what-your-employer-can-see-on-claude-enterprise-a-complete-transparency-guide/",
+   "title": "What Your Employer Can See on Claude Enterprise: A Complete Transparency Guide",
+   "angle": "claude-code-atual",
+   "relevance": "high"
+  },
+  {
+   "url": "https://generalanalysis.com/guides/claude-code-enterprise-security-deployment",
+   "title": "Claude Code Enterprise Security Deployment: Managed Settings, Hooks, Telemetry",
+   "angle": "claude-code-atual",
+   "relevance": "high"
+  },
+  {
+   "url": "https://generalanalysis.com/guides/claude-compliance-api",
+   "title": "Claude Compliance API: Coverage, Gaps, and How to Use It",
+   "angle": "claude-code-atual",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://systemprompt.io/guides/enterprise-claude-code-managed-settings",
+   "title": "Enterprise Claude Code with Managed Settings",
+   "angle": "claude-code-atual",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://fedscoop.com/social-media-ai-surveillance-unions-state-dhs-lawsuit/",
+   "title": "State, DHS sued by union groups over AI-fueled surveillance programs",
+   "angle": "mercado-capital",
+   "relevance": "high"
+  },
+  {
+   "url": "https://iapp.org/news/a/cfpb-takes-on-enforcement-measures-to-prevent-employee-monitoring",
+   "title": "US agencies take stand against AI-driven employee monitoring (CFPB)",
+   "angle": "mercado-capital",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.glean.com/press/glean-raises-150m-series-f-at-7-2b-valuation-to-accelerate-enterprise-ai-agent-innovation-globally",
+   "title": "Glean Series F ($150M, $7.2B) + growth round $768M (ago/2026)",
+   "angle": "mercado-capital",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.researchandmarkets.com/report/global-employee-monitoring-market",
+   "title": "Employee Monitoring Software Market Report 2026 (USD 4.59B → 8.29B, CAGR 15.9%)",
+   "angle": "mercado-capital",
+   "relevance": "low"
+  },
+  {
+   "url": "https://github.com/caelstewart/company-brain",
+   "title": "caelstewart/company-brain — temporal knowledge graph for AI agents",
+   "angle": "repos-trajetoria",
+   "relevance": "high"
+  },
+  {
+   "url": "https://github.com/Toni-Agent/company-brain-starter",
+   "title": "Toni-Agent/company-brain-starter — sanitized starter for a durable AI company brain",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/nemock/company-brain",
+   "title": "nemock/company-brain — AI-native company knowledge graph em markdown compatível com Obsidian",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.zdnet.com/article/employee-surveillance-is-on-the-rise-privacy-campaigners-are-worried-for-us-all/",
+   "title": "ZDNet — 'There's been a big rise in monitoring workers at home' (216 pts na HN)",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://github.com/agno-agi/scout",
+   "title": "agno-agi/scout — \"Open Source Company Brain\" (724★, criado 2026-02-03)",
+   "angle": "repos-trajetoria",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10026198/",
+   "title": "A policy primer and roadmap on AI worker surveillance and productivity scoring tools",
+   "angle": "analistas",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.gartner.com/en/newsroom/press-releases/how-employee-productivity-monitoring-has-evolved",
+   "title": "How Employee Productivity Monitoring Has Evolved – And What's Next for HR",
+   "angle": "analistas",
+   "relevance": "high"
+  },
+  {
+   "url": "https://www.hrgrapevine.com/us/content/article/2025-01-24-a-closer-look-at-gartners-2025-workplace-predictions-report",
+   "title": "A closer look at Gartner's 2025 Workplace Predictions Report",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.technology.org/2026/07/24/what-employers-actually-track-in-2026-inside-the-monitoring-stack/",
+   "title": "What Employers Actually Track in 2026: Inside the Monitoring Stack",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.employee-monitoring.net/resources/employee-monitoring-statistics-2026",
+   "title": "Employee Monitoring Statistics 2026 — 80+ Facts and Data Points",
+   "angle": "analistas",
+   "relevance": "medium"
+  },
+  {
+   "url": "https://www.teamblind.com/post/are-internal-feedback-surveys-truly-anonymous-mkko7hsu",
+   "title": "Are internal feedback surveys truly anonymous? — Blind",
+   "angle": "comunidade",
+   "relevance": "high"
+  },
+  {
+   "url": "https://askamanager.org/?p=20992",
+   "title": "askamanager.org — thread sobre (des)anonimização de pesquisas internas",
+   "angle": "comunidade",
+   "relevance": "medium"
+  }
+ ],
+ "decision": {
+  "options": [
+   "A — posição do maestro: compartilhamento indissociável bidirecional, respeitando a singularidade (nem tudo, nem nada)",
+   "B — posição rival do adotante: colaborador só como AUTOR de decisão, nunca como dado",
+   "C — A restringida: fluxo por propósito com assimetria de padrão (organização→indivíduo aberto; indivíduo→organização só predicado), sob critério Bărbulescu + defesa matemática contra diferença",
+   "D — GATED: não selar agora; rodada complementar para LGPD/TST, autodeterminação e as fontes de privacidade em grupos pequenos que não foram lidas"
+  ],
+  "objections": [
+   {
+    "target": "Achado 1 — CJEU C-65/23: 'um acordo coletivo não basta para legitimar vigilância'",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Fonte tier 6 (gdpr-expert.com) quando o primário existe (EUR-Lex CELEX 62023CJ0065, curia docid=293835). O caso (MK v K GmbH, 19/12/2024, reenvio do Bundesarbeitsgericht) trata da transferência de dados de empregados do SAP para um servidor da controladora nos EUA com base em Betriebsvereinbarung — não de monitoramento. O que o tribunal decidiu é que o acordo coletivo não afasta os arts. 5, 6(1) e 9 e que o juiz nacional revisa a necessidade. Dizer que 'não basta para legitimar vigilância' é extrapolação do enquadramento. E é jurisdição UE: não diz nada sobre LGPD/CLT, eixo pedido e ausente."
+   },
+   {
+    "target": "Achado 2 — consentimento rejeitado sob subordinação",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A regra é verdadeira, mas vem de fonte tier 6 enquanto a fonte primária é tier alto: EDPB Guidelines 05/2020 sobre consentimento, §3.1.1 (desequilíbrio de poder no emprego) e WP29 Opinion 2/2017. Nenhum dos dois documentos diz 'rejeitado': dizem 'improvável na maioria dos casos', com exceção. A divergência nacional descartada (BDSG §26(2) admite consentimento quando há vantagem ao empregado) enfraquece a generalização. Nada sobre a LGPD (arts. 7, 8 §3 e 10, legítimo interesse) nem sobre a ANPD."
+   },
+   {
+    "target": "Achado 3 — Glean reconcilia o indivíduo como nó de identidade",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A inferência confunde duas coisas: identidade usada para aplicar permissões (ACL por item de conteúdo, como a própria descartada 'cortada' registra) e o indivíduo como SUJEITO de dado comportamental avaliado. Um nó de identidade para busca que respeita permissão é compatível com a posição rival ('autor'). O achado refuta a rival só quando o grafo expõe sinais de atividade por pessoa a terceiros, e isso a doc não afirma. É um único fornecedor, fonte primária em proveito próprio (tier 5)."
+   },
+   {
+    "target": "Achado 4 — Viva Copilot Dashboard permite ao gestor 'monitorar' uso de IA",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A fonte é winbuzzer (tier 5), com manchete sensacionalista ('lets your boss track'). A própria descartada 'cortada' do mesmo artigo registra coorte externa de ≥20 empresas e modelos randomizados. O changelog da Microsoft (Petri/M365 Admin: 'Minimum group size update for Copilot Dashboard') informa grupo mínimo de 10 por padrão, reduzível a 5. O verbo 'monitorar' sugere visão individual, que a arquitetura declarada não entrega. Falta ler o anúncio primário no Tech Community."
+   },
+   {
+    "target": "Achado 5 — 'métricas individuais/agregadas'",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Votação 2-1, e o termo 'individuais' não se sustenta na doc da Microsoft: o Copilot Dashboard aplica grupo mínimo (padrão 10, piso 5) e os benchmarks são por coorte. Métrica individual para o gestor seria outro produto. O achado precisa perder 'individuais' ou mostrar a tela primária que exibe o indivíduo."
+   },
+   {
+    "target": "Achado 6 — finalidade como conjunto FECHADO de propósitos (exemplo belga)",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "A lista citada (saúde/segurança, proteção de ativos, controle de produção, controle do trabalho) é do direito belga por tecnologia: CCT nº 68, de câmeras. A CCT nº 81, de comunicações eletrônicas, tem outra lista. Não se generaliza. No GDPR a finalidade NÃO é lista fechada: o art. 6(4) permite tratamento posterior compatível. LGPD art. 6º I (finalidade) e II (adequação) dão a mesma regra aberta. Serve como analogia de desenho (propósito pré-declarado por fluxo), não como regra jurídica importável."
+   },
+   {
+    "target": "Conjunto de achados — eixos obrigatórios não cobertos",
+    "kind": "finding",
+    "survives": true,
+    "evidence": "Zero achados sobre LGPD, ANPD ou jurisprudência do TST sobre monitoramento de e-mail corporativo (eixo 1 BR). Zero sobre autodeterminação (Deci & Ryan, eixo 4). Contextual Integrity só aparece em descartes. Privacidade diferencial e ataques de diferença (eixo 3) só em descartes ou cortes. Nenhum achado confronta a restrição matemática do adotante: o piso de grupo não impede o ataque 'tracker' (Denning, Denning & Schwartz 1979) nem a reconstrução por consultas (Dinur & Nissim 2003). A pergunta central (critério indissociável vs vigilância) está SEM evidência direta."
+   },
+   {
+    "target": "Descarte: divergência Art. 88 Portugal × Alemanha sobre consentimento",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "O detalhe português pode estar mal lido: a Lei 58/2019, art. 28(3), diz que o consentimento 'não constitui requisito de legitimidade' em certos casos, e a CNPD desaplicou dispositivos. A tese de fragmentação nacional, porém, é sustentada por C-34/21 (Hauptpersonalrat, 30/03/2023): regra nacional que só repete o GDPR não vale como art. 88. Refutou-se o detalhe e jogou-se fora a tese. Faltou ler a C-34/21 e o §26 BDSG pós-acórdão."
+   },
+   {
+    "target": "Descarte: teste Bărbulescu (TEDH) como critério operacional",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Bărbulescu v. Romênia (Grande Câmara, 5/9/2017, app. 61496/08, §121) lista exatamente notificação prévia, extensão/grau de intrusão, razões legítimas, meios menos intrusivos, consequências e salvaguardas. López Ribalda II (2019) confirma. O único ponto frágil é 'necessidade estrita' no lugar de 'meio menos intrusivo'. É o candidato mais forte a critério operacional e foi descartado sem evidência contrária."
+   },
+   {
+    "target": "Descarte: lacuna doutrinária, sem limiar uniforme UE",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É coerente com C-34/21 (fragmentação) e com C-65/23, que harmoniza só o piso (arts. 5/6/9) e não o limiar. Nenhuma evidência a refuta. É constraint direta: não existe critério jurídico pronto para importar ao desenho do Company Brain."
+   },
+   {
+    "target": "Descarte: violação de CI 'ocorre por function creep'",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Em Nissenbaum (Privacy in Context, 2010) a violação é qualquer mudança nos parâmetros do fluxo (atores, tipo de informação, princípio de transmissão), não só a reutilização para outro propósito. Function creep é UM mecanismo. Refutar a exclusividade é legítimo, mas o elemento continua como um dos vetores."
+   },
+   {
+    "target": "Descarte: imagens do espaço doméstico como vigilância ilegítima",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Nenhuma evidência contrária foi citada. É aplicação direta de CI (mudança de contexto casa→trabalho) e se ancora no art. 8 da CEDH (vida privada/domicílio). Peso secundário para o Company Brain, mas faltou olhar amostra e método do estudo tier 8."
+   },
+   {
+    "target": "Descarte: critério de 4 elementos incluindo 'consentimento informado'",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Contradiz o Achado 2 e o EDPB 05/2020 §3.1.1: sob subordinação o consentimento não é base confiável. O critério com consentimento no núcleo é refutado pela própria evidência confirmada. Os outros 3 elementos (propósito, limites de acesso/duração, sem reuso) sobrevivem em outros descartes."
+   },
+   {
+    "target": "Descarte: Viva grupo mínimo 5, sem configurar abaixo de 5",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Verificado na doc da Microsoft (learn.microsoft.com/viva/insights/privacy/privacy-considerations, legacy Workplace Analytics): 'The default minimum group size is five... you cannot set the group size to lower than five'. O descarte talvez tenha confundido com o Copilot Dashboard (padrão 10, piso 5). É verdadeiro por superfície e não deveria ter caído."
+   },
+   {
+    "target": "Descarte: regra de grupo só para gráficos derivados de RH; abaixo do limiar não mostra nada",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Verificado verbatim na mesma página: 'The minimum group size rule applies to charts that display information derived from HR data' e 'gray and white columns... represent no data'. Supressão, não ruído: confirmado."
+   },
+   {
+    "target": "Descarte: Art. 88 exige necessidade estrita, transparência e proporcionalidade mesmo com acordo coletivo",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É a mesma tese do Achado 1 (C-65/23), que foi CONFIRMADO por 3-0. Descartar isto e confirmar aquilo é inconsistência interna. O art. 88(2) exige, no texto, 'suitable and specific measures' com ênfase em transparência e sistemas de monitoramento."
+   },
+   {
+    "target": "Descarte: Viva grupo mínimo 5 configurável para cima, a favor da restrição do adotante",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Os fatos estão verificados (piso 5, ajustável para cima). A leitura 'a favor da restrição do adotante' é que merece objeção, não descarte: o piso de 5 coincide com a faixa 3-5 que o adotante mediu, mas não defende contra diferença entre grupos sobrepostos (grupo de 6 menos grupo de 5 = 1 pessoa; tracker attack, Denning 1979). A Microsoft também usa distribution masking (ver cortado), o que indica que ela mesma sabe que o limiar não basta."
+   },
+   {
+    "target": "Descarte: privacidade diferencial da Microsoft como meio-termo entre 'tudo' e 'nada'",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Nenhuma evidência contrária. O cortado 'distribution masking' e o cortado 'atributos combinados permitem inferir' vêm da mesma família de docs e são coerentes. É o único achado que responde matematicamente à restrição do adotante. Faltou ler a doc primária de DP da Microsoft e verificar o ε e o escopo (só organization insights?)."
+   },
+   {
+    "target": "Descarte: agregação de peer group em ≥20 empresas",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Um item 'cortado por orçamento' do MESMO artigo afirma 'coortes de comparação com ao menos 20 empresas diferentes'. Refutar aqui e confirmar lá é contradição interna do pipeline."
+   },
+   {
+    "target": "Descarte: gestor contorna o opt-out pedindo 'educadamente'",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É a consequência prática do mesmo fundamento do Achado 2 (EDPB 05/2020: o empregado não recusa livremente). Sem evidência contrária. É relevante para a posição do maestro: 'protegendo o indivíduo' não pode depender de opt-out sob subordinação."
+   },
+   {
+    "target": "Descarte: Glean só expõe atividade agregada multiusuário",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Nenhuma evidência citada e não é contraditório com o Achado 3 (identidade ≠ exposição de atividade). Faltou reler docs.glean.com/security/knowledge-graph, a mesma fonte do Achado 3, procurando 'threshold/aggregate'. Na dúvida, sobrevive."
+   },
+   {
+    "target": "Descarte: gaming de métrica (alto uso de Copilot = alto desempenho)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "O mecanismo é bem estabelecido (lei de Goodhart/Campbell) e foi a crítica central ao Productivity Score de 2020. O achado em si é hipótese de artigo tier 5, não observação. Sobrevive como constraint de desenho (dado não vira proxy avaliativo), com a ressalva de que falta estudo empírico, por exemplo Bernstein 2012, 'transparency paradox'."
+   },
+   {
+    "target": "Descarte: Meta capturando mouse/keystrokes para treinar IA",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Tier 2 (relato de comunidade/imprensa sem primário). Descarte legítimo por qualidade de fonte, mas reabrir se aparecer reportagem tier ≥5 ou documento interno."
+   },
+   {
+    "target": "Descarte: trabalhador 'duplamente vulnerável'; legítimo interesse preferível ao consentimento",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Coerente com WP29 Opinion 2/2017 (bases preferenciais: contrato, obrigação legal, legítimo interesse com teste de balanceamento) e com o Achado 2. 'Preferencial' exagera um pouco (contrato e obrigação legal vêm antes), mas o núcleo é correto. No Brasil há análogo: LGPD art. 10 (legítimo interesse com LIA) e o guia da ANPD sobre legítimo interesse."
+   },
+   {
+    "target": "Descarte: ausência de limite temporal como violação",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É subsumido pelo art. 5(1)(e) GDPR (limitação da conservação) e pelo item 'extensão' de Bárbulescu. Sem evidência contrária. Peso baixo como achado autônomo, mas é elemento legítimo do critério."
+   },
+   {
+    "target": "Descarte: preocupação maior de mulheres com dado de saúde",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Sem refutação citada. Liga-se ao art. 9 GDPR e à LGPD art. 11 (dado sensível) e ao PO_INFERENCIA do corpus: dado inócuo herda a sensibilidade inferível (gestação). Periférico ao critério, mas confirma que a legitimidade percebida não é neutra à posição de poder."
+   },
+   {
+    "target": "Cortado: rastreamento de localização da Microsoft, consentimento só individual",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Cortado por orçamento. Faltou verificar o fato: o recurso de localização automática por Wi-Fi no Teams foi comunicado como desligado por padrão, dependente de ação do usuário. 'Opt-out por padrão' pode estar invertido. O ponto relevante (o admin não consente pelo empregado) precisa do primário."
+   },
+   {
+    "target": "Cortado: backlash do Productivity Score (nomeava indivíduos)",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É o caso de mercado mais documentado do eixo 5: crítica de Wolfie Christl em nov/2020 e remoção de nomes anunciada pela Microsoft (Jared Spataro) em 1º/12/2020. Cortar a principal evidência de reversão por backlash é comodismo."
+   },
+   {
+    "target": "Cortado: histograma exibe bin com 1 indivíduo",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Verificado verbatim: 'Even if a bin in a histogram contained data for only one individual, the histogram still displays that data', justificado pelo bin mínimo de 0,5 h e pelo grupo-filtro acima do limiar. É evidência crítica da restrição do adotante: um bin de 1 combinado com filtros sobrepostos permite o ataque de diferença."
+   },
+   {
+    "target": "Cortado: a página do Viva não menciona DP/k-anonimato, só limiar fixo",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Verificado para a página legacy de privacy considerations: só limiar, hash de assunto e exclusões. Não há garantia formal. Relevante: o limiar sozinho não defende contra diferença (Denning 1979). Ressalva: outras docs da Microsoft falam em DP para organization insights."
+   },
+   {
+    "target": "Cortado: telemetria do Glean isolada no GCP do cliente, sem governança de consentimento individual",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Localidade protege a empresa do fornecedor, não o empregado da empresa. É exatamente a lacuna do eixo pessoa×empregador. Cortado sem leitura."
+   },
+   {
+    "target": "Cortado: ACL do Glean por item, não consentimento do indivíduo",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Refina o Achado 3: o controle é da organização sobre conteúdo, o indivíduo não tem controle sobre o próprio nó. É constraint central para a articulação com o Second Brain (C_MEMBRO_SOBERANO do corpus)."
+   },
+   {
+    "target": "Cortado: reação do HN enquadrando como vigilância predatória",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É o eixo comunidade/backlash exigido. Tier baixo como fato, mas válido como sinal de percepção. Faltou medir a trajetória (pontos/comentários via HN Algolia)."
+   },
+   {
+    "target": "Cortado: Art. 88 permite dado de emprego para gestão/planejamento, contradizendo a rival",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Texto literal do art. 88(1): 'planning and organisation of work, equality and diversity in the workplace, health and safety at work'. Verificável no próprio regulamento. Refuta juridicamente o 'nunca como dado' da rival (a rival pode ser escolha de produto, não exigência legal) e foi cortado por orçamento."
+   },
+   {
+    "target": "Cortado: Productivity Score 2020, Christl e remoção de nomes",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Duplicata do cortado anterior. Mesma evidência documentada (nov-dez/2020)."
+   },
+   {
+    "target": "Cortado: modelos randomizados + ≥20 empresas; não trata diferença em grupos pequenos",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Contradiz o descarte 'refutada' dos ≥20. E a lacuna que aponta (não trata diferença interna em times pequenos) é exatamente a restrição do adotante."
+   },
+   {
+    "target": "Cortado: distribution masking ('quase todos'/'quase ninguém')",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É a 3ª camada matemática e responde diretamente ao vazamento por homogeneidade (o ataque de homogeneidade contra k-anonimato, Machanavajjhala et al. 2006, l-diversity). Cortar isto deixa a resposta à restrição do adotante sem mecanismo."
+   },
+   {
+    "target": "Cortado: atributos organizacionais combinados permitem inferir identidade",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "É o reconhecimento pelo fornecedor do problema de quase-identificadores (Sweeney 2002). Valida o testemunho do adotante e o PO_L3_FILTRO do corpus (composição de quase-identificadores)."
+   },
+   {
+    "target": "Cortado: legítimo interesse documentado + DPIA para perfilamento de empregados",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Coerente com o art. 35 GDPR e os critérios do WP248 do EDPB, em que titular vulnerável (empregado) e monitoramento sistemático disparam DPIA. Análogo na LGPD: art. 38 (RIPD). É o mecanismo procedimental que falta no critério."
+   },
+   {
+    "target": "Fonte não lida: iapp.org/news/a/aggregating-over-anonymized-data",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Trata diretamente de agregação sobre dado anonimizado, o núcleo da restrição matemática do adotante. Não ler a fonte mais pertinente ao eixo 3 é comodismo."
+   },
+   {
+    "target": "Fonte não lida: spdp.di.unimi.it/papers/tdp2023.pdf",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Paper acadêmico (UniMi, grupo de privacidade de dados, tier alto) sobre privacidade em grupos pequenos. Eixo 3 sem evidência primária justamente por não ler."
+   },
+   {
+    "target": "Fonte não lida: ncbi PMC2858714",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Literatura revisada sobre re-identificação/anonimização em pequenas células (tradição de disclosure control em saúde, com regras de supressão de célula <5/<11). É o análogo metodológico mais maduro do limiar do Viva."
+   },
+   {
+    "target": "Fonte não lida: dualitytech.com k-anonymity explained",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Blog de fornecedor (PETs), explicativo. O conteúdo é substituível por Sweeney 2002 e Machanavajjhala 2006 (primários). Descarte por tier é aceitável."
+   },
+   {
+    "target": "Fonte não lida: glean.com/blog/knowledge-graph-agentic-engine",
+    "kind": "discarded-by-comodismo",
+    "survives": true,
+    "evidence": "Primeira parte sobre o próprio produto, necessária para resolver a objeção do Achado 3 (identidade para ACL vs pessoa como sujeito de atividade) e o descarte do limiar agregado do Glean."
+   },
+   {
+    "target": "Fonte não lida: rencore.com Viva Insights governance",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Fornecedor de governança M365 (conflito de interesse, tier baixo). A doc da Microsoft Learn cobre o mesmo ponto em fonte primária (verificada nesta rodada)."
+   },
+   {
+    "target": "Fonte não lida: npifinancial.com Viva Insights balance",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Consultoria de licenciamento Microsoft, tier baixo. Substituível pela doc primária e pela cobertura do Productivity Score de 2020."
+   },
+   {
+    "target": "Fontes não lidas: mondaq GDPR employment / employsome / gstride.ai",
+    "kind": "discarded-by-evidence",
+    "survives": false,
+    "evidence": "Mondaq é resumo de escritório (tier médio). Employsome e gstride são fornecedores de software de RH/monitoramento, com conflito de interesse direto sobre 'monitoramento compatível'. O primário que as substitui é EDPB 05/2020, WP29 2/2017, C-65/23 e C-34/21. Ressalva: o eixo LGPD/ANPD continua sem nenhuma fonte, lida ou não."
+   }
+  ],
+  "recommendation": "Recomendo C como direção e D como condição de selo: não selar C antes da rodada complementar. A posição A sobrevive como TESE (a posição B cai tanto no direito quanto na prática de produto: o art. 88(1) GDPR autoriza dado de emprego para planejamento e organização do trabalho, e o Glean reconcilia a pessoa como nó de identidade). Mas A NÃO sobrevive como critério operacional: 'indissociável' sem mecanismo é exatamente o que a restrição matemática do adotante derruba. A restrição do adotante NÃO foi refutada. Pelo contrário, a própria Microsoft a confirma (piso de grupo 5, bin de histograma com 1 pessoa, distribution masking, reconhecimento de que atributos combinados reidentificam). CONSTRAINTS que sobrevivem e devem entrar em C: (1) Base legal nunca é consentimento sob subordinação (EDPB 05/2020 §3.1.1); é legítimo interesse documentado, com DPIA/RIPD (art. 35 GDPR / art. 38 LGPD). (2) O critério legítimo×vigilância é o teste de Bărbulescu (GC 2017, §121) aplicado por FLUXO, e não por dado: notificação, extensão, razão legítima, meio menos intrusivo, consequências, salvaguardas. Acordo coletivo não dispensa isso (C-65/23). (3) Finalidade pré-declarada por fluxo, com proibição de reuso. É analogia de desenho: a lista fechada belga não se generaliza (o art. 6(4) permite uso compatível). (4) Nenhum agregado sobre indivíduos que dependa só de limiar de contagem. Precisa de defesa contra ataque de diferença/tracker (Denning 1979; Dinur-Nissim 2003): orçamento de ε monotônico (PO_BUDGET do corpus), auditoria de consultas sobrepostas e masking de distribuição. Times de 3 a 5 ficam FORA de qualquer agregado comportamental. (5) Dado de colaborador nunca vira proxy avaliativo (lição do Productivity Score, revertido em dez/2020, e de Goodhart). (6) Assimetria de padrão: o fluxo organização→indivíduo é aberto por padrão (direito de acesso/transparência); o fluxo indivíduo→organização sai do Second Brain SOBERANO só como predicado provado (PO_DISCLOSURE_VC, C_MEMBRO_SOBERANO). O indivíduo aparece no Company Brain como AUTOR/ator com identidade para ACL, e não como sujeito de telemetria. Na prática, isso incorpora o que B tem de certo sem o absoluto 'nunca dado'. (7) Opt-out não conta como proteção sob subordinação (o gestor 'pede educadamente'). GATES de D antes de selar: LGPD/ANPD/TST inteiramente ausentes do corpus e da rodada; autodeterminação (Deci & Ryan) sem nenhum achado; fontes centrais de grupos pequenos não lidas (IAPP, tdp2023, PMC2858714); resolver as inconsistências internas do pipeline (≥20 empresas refutado e confirmado ao mesmo tempo; C-65/23 confirmado enquanto a mesma tese no art. 88 foi refutada; o piso 5 do Viva foi refutado, mas está verificado na doc da Microsoft).",
+  "sealedBy": "maestro (nó D_ open no grafo; tabela de selagem do /meta:drive)"
+ },
+ "stats": {
+  "anglesTopic": 6,
+  "anglesFixed": 5,
+  "sources": 15,
+  "claims": 38,
+  "verified": 25,
+  "confirmed": 6,
+  "refuted": 19,
+  "unverified": 0,
+  "dupes": 6,
+  "maxFetch": 15,
+  "maxVerify": 25
+ }
+}
