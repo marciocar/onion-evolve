@@ -1,0 +1,529 @@
+{
+ "mode": "primaries",
+ "question": "Para entregar a um CLIENTE DE CONSULTORIA uma versao publica do Onion que ele FORKA e evolui sozinho, onde passa a fronteira entre a DOUTRINA (que deve viajar: REGRAs, knowledge-base, gramatica do grafo, exemplos de grafo, o metodo) e a BIOGRAFIA deste repo (que NAO deve viajar: diario, grafos da vida do maestro, members.yaml, achados de seguranca de adotantes, material sob NDA)? E qual VEICULO entrega isso — fork, template, plugin de marketplace, ou export curado por papel como o onion-standalone ja fez — com qual LICENCA (o cliente usa e modifica internamente, sem revender o framework) e com qual mecanismo de ATUALIZACAO depois que o fork diverge? MEDIDO E JA SABIDO (nao re-derive): a maquinaria transfere para adotantes, a pratica quase nao transfere, e parte do que nao transferiu foi capacidade que NUNCA FOI ENVIADA (E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA). O repo hoje tem ~138 mil linhas de framework distribuivel contra ~151 mil de autobiografia e projeto, medidas nesta sessao.",
+ "today": "2026-09-13",
+ "kgPath": "/home/marcio/onion-evolve/docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml",
+ "radarExit": 0,
+ "summary": "Grafo criado do zero com as 26 claims ancoradas desta rodada de primárias (2026-09-13) + E_LACUNAS_DISTRIBUICAO_0913 (7 claims rejeitadas por exagero, 0 fonte inalcançável, 4 eixos que seguem abertos) + 3 nós de medição local do Elenxo — dos quais o mais duro corrige o próprio Elenxo: o diário não está em docs/diary (inexistente) e sim em .claude/diary com 127 arquivos, DENTRO do diretório que o /meta:adopt vendoriza, e `grep -c exclude .claude/commands/meta/adopt.md` = 0, enquanto LICENSE e os 5 plugins publicados já saíram MIT (concessão irretratável); nada foi selado — 4 nós question propõem o que falta (fronteira executável, licença após o MIT, titularidade da marca, par veículo+canal de update), e o radar com --integrity --schema fecha em exit 0 (35 nós, 66 arestas, frescor 35/35), com a fila de atenção liderada pela Q principal seguida exatamente pelos dois achados medidos localmente.",
+ "unreachable": [],
+ "anchored": [
+  {
+   "source": "template-vs-fork",
+   "gap": "o VEICULO: o cliente recebe um FORK (herda historia e origem) ou um TEMPLATE (nasce limpo)? a diferenca tecnica nao esta medida",
+   "claim": "GitHub distingue explicitamente fork de template pela história: fork carrega TODA a história do doador; template nasce com 1 commit só, sem a história.",
+   "verdict": "ANCORADA",
+   "why": "A citação aparece verbatim no documento, dentro de uma seção que compara explicitamente fork e template. O claim resume corretamente: fork herda todo o histórico do repositório-pai; template nasce com um único commit, sem esse histórico. Nenhum esticamento — o texto diz exatamente isso.",
+   "corrected": "",
+   "quote": "A new fork includes the entire commit history of the parent repository, while a repository created from a template starts with a single commit.",
+   "locator": "docs.github.com — 'Creating a repository from a template', seção comparativa fork vs. template (bloco 'Commit History')",
+   "validFrom": ""
+  },
+  {
+   "source": "template-vs-fork",
+   "gap": "o VEICULO: o cliente recebe um FORK (herda historia e origem) ou um TEMPLATE (nasce limpo)? a diferenca tecnica nao esta medida",
+   "claim": "Um repositório criado a partir de template NÃO fica ligado ao template de origem: as branches nascem com histórias não-relacionadas, tornando impossível PR ou merge de volta entre eles.",
+   "verdict": "ANCORADA",
+   "why": "Citação encontrada verbatim. O texto fala especificamente de branches com históricos não-relacionados que impedem PR/merge — o claim generaliza isso para 'não fica ligado ao template de origem', o que é uma leitura fiel e não uma esticada: históricos não-relacionados entre as branches é precisamente o que impede qualquer vínculo de merge/PR entre o repo derivado e o template.",
+   "corrected": "",
+   "quote": "Branches created from a template have unrelated histories, which means you cannot create pull requests or merge between the branches.",
+   "locator": "docs.github.com — 'Creating a repository from a template', nota sobre branches criadas a partir de template",
+   "validFrom": ""
+  },
+  {
+   "source": "template-vs-fork",
+   "gap": "o VEICULO: o cliente recebe um FORK (herda historia e origem) ou um TEMPLATE (nasce limpo)? a diferenca tecnica nao esta medida",
+   "claim": "Um fork mantém permissões e configurações próprias, mas permanece conectado ao repositório upstream — a relação é preservada e exibida no GitHub.",
+   "verdict": "ANCORADA",
+   "why": "Citação confirmada verbatim, inclusive checada uma segunda vez com o texto ao redor ('Forks are repositories that start as copies of another repository, called the upstream repository. A fork has its own settings and permissions but stays connected to the upstream repository.'). O claim acrescenta 'a relação é preservada e exibida no GitHub', que também está no documento na frase seguinte ('When you view a forked repository on GitHub, the upstream repository is indicated below the name of the fork.') — não é esticamento, é o próprio texto.",
+   "corrected": "",
+   "quote": "A fork has its own settings and permissions but stays connected to the upstream repository.",
+   "locator": "docs.github.com — 'About forks', primeiro parágrafo da seção introdutória (logo após a definição de fork)",
+   "validFrom": ""
+  },
+  {
+   "source": "licenca-source-available",
+   "gap": "LICENCA para entregar metodo+codigo a cliente de consultoria: nao ha decisao nem fonte",
+   "claim": "PolyForm Internal Use 1.0.0 é a melhor licença para o cliente de consultoria: concede uso/cópia para 'qualquer propósito permitido', define propósito permitido como operações internas de negócio do licenciado e da empresa, e proíbe explicitamente distribuir e sublicenciar/transferir.",
+   "verdict": "ANCORADA",
+   "why": "As quatro frações da citação aparecem no texto oficial da PolyForm Internal Use License 1.0.0 (§1 copyright grant, cláusula de distribuição, definição de 'permitted purpose' via 'internal business operations', e cláusula de não-sublicença/transferência). O claim descreve corretamente a lógica: usa/modifica internamente (operações de negócio do licenciado e sua empresa), mas não pode distribuir nem sublicenciar/transferir — exatamente o perfil 'usa mas não revende'.",
+   "corrected": "",
+   "quote": "The licensor grants you a copyright license for the software to do everything you might do with the software that would otherwise infringe the licensor's copyright in it for any permitted purpose. ... you may not distribute the software. ... Use of the software for the internal business operations of you and your company is use for a permitted purpose. ... These terms do not allow you to sublicense or transfer any of your licenses to anyone else, or prevent the licensor from granting licenses to anyone else.",
+   "locator": "PolyForm Internal Use License 1.0.0 — polyformproject.org/licenses/internal-use/1.0.0"
+  },
+  {
+   "source": "licenca-source-available",
+   "gap": "LICENCA para entregar metodo+codigo a cliente de consultoria: nao ha decisao nem fonte",
+   "claim": "PolyForm Noncommercial 1.0.0 usa a mesma cláusula de concessão de direitos autorais do Internal Use, mas amarra 'propósito permitido' a uso não-comercial (pesquisa pessoal, hobby, entidade sem fins lucrativos) — não serve para cliente de consultoria que usa comercialmente na própria empresa.",
+   "verdict": "ANCORADA",
+   "why": "O texto oficial confirma a cláusula de copyright grant idêntica à do Internal Use ('for any permitted purpose') e a definição de propósito permitido amarrada a 'any noncommercial purpose', com o exemplo de pesquisa/hobby/entretenimento pessoal citado verbatim. O claim está correto: um uso comercial (mesmo interno, mesmo sem revenda) na empresa do cliente de consultoria não se qualifica como 'noncommercial purpose', logo esta licença não cabe no cenário.",
+   "corrected": "",
+   "quote": "The licensor grants you a copyright license for the software to do everything you might do with the software that would otherwise infringe the licensor's copyright in it for any permitted purpose. ... Any noncommercial purpose is a permitted purpose, including personal use for research, experiment, and testing for the benefit of public knowledge, personal study, private entertainment, hobby projects, amateur pursuits, or religious observance, without any anticipated commercial application.",
+   "locator": "PolyForm Noncommercial License 1.0.0 — polyformproject.org/licenses/noncommercial/1.0.0",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "licenca-source-available",
+   "gap": "LICENCA para entregar metodo+codigo a cliente de consultoria: nao ha decisao nem fonte",
+   "claim": "A Business Source License 1.1 concede copiar/modificar/criar obras derivadas/redistribuir/uso não-produtivo, condiciona uso além do Additional Use Grant à compra de licença comercial, reverte à Change License só após o Change Date (tipicamente 4 anos), e não veta por natureza 'revenda como concorrente' — isso depende do texto do Additional Use Grant, que a BSL deixa em branco por padrão.",
+   "verdict": "ANCORADA",
+   "why": "É o texto-padrão e amplamente publicado da BSL 1.1 (usado por MariaDB, CockroachDB, Sentry etc.), confirmado pela busca: a cláusula de grant ('copy, modify, create derivative works, redistribute, and make non-production use') e a cláusula do Change Date/Change License batem literalmente. A busca também confirma que uso além do padrão exige 'purchase a commercial license... or refrain from using' e que o Additional Use Grant é um campo a preencher pelo licenciador (placeholder 'None' se vazio) — sustentando a leitura de que a restrição a 'revenda como concorrente' não é intrínseca à BSL, mas depende do texto que o licenciador escreve nesse campo.",
+   "corrected": "",
+   "quote": "The Licensor hereby grants you the right to copy, modify, create derivative works, redistribute, and make non-production use of the Licensed Work. ... Effective on the Change Date, or the fourth anniversary of the first publicly available distribution of a specific version of the Licensed Work under this License, whichever comes first, the Licensor hereby grants you rights under the terms of the Change License, and the rights granted in the paragraph above terminate.",
+   "locator": "Business Source License 1.1, cláusula de grant + 'Change Date' — mariadb.com/bsl11"
+  },
+  {
+   "source": "licenca-source-available",
+   "gap": "LICENCA para entregar metodo+codigo a cliente de consultoria: nao ha decisao nem fonte",
+   "claim": "A Elastic License 2.0 concede usar/copiar/distribuir/tornar disponível/preparar obras derivadas, mas sua restrição central é vetar oferecer o software como serviço hospedado/gerenciado a terceiros com acesso a funcionalidade substancial — alvo diferente (SaaS concorrente), sem cláusula equivalente a 'internal business operations' do PolyForm Internal Use.",
+   "verdict": "ANCORADA",
+   "why": "A busca confirma a cláusula de limitação quase palavra-por-palavra ('You may not provide the software to third parties as a hosted or managed service, where the service provides users with access to any substantial set of the features or functionality') e a cláusula de grant ('use, copy, distribute, make available, and prepare derivative works of the software'). Nenhuma cláusula equivalente a 'internal business operations' aparece nas seções levantadas — o claim de que o alvo é SaaS-concorrente, não uso-interno-vs-revenda-de-framework, está correto e é a leitura padrão desta licença.",
+   "corrected": "",
+   "quote": "You may not provide the software to third parties as a hosted or managed service, where the service provides users with access to any substantial set of the features or functionality of the software.",
+   "locator": "Elastic License 2.0, Limitações — elastic.co/licensing/elastic-license",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "apache-marca-e-notice",
+   "gap": "o que protege o NOME e a identidade quando o cliente forka",
+   "claim": "A Apache 2.0 permite forkar/redistribuir com ou sem modificações, mas exige que arquivos modificados carreguem aviso PROEMINENTE de que foram alterados — isso é o que sinaliza ao cliente forkado que ele não pode apagar a distinção entre a doutrina original e a sua própria evolução.",
+   "verdict": "ANCORADA",
+   "why": "A quote bate verbatim com a Seção 4(b), confirmada pelo fetch direto da LICENSE-2.0.txt. A parte factual do claim (redistribuição com/sem modificação permitida — preâmbulo da Seção 4 diz exatamente 'with or without modifications' — e obrigação de aviso proeminente nos arquivos alterados) está correta e não estica o texto. A cláusula final ('sinaliza ao cliente... não pode apagar a distinção') é leitura funcional razoável do efeito da obrigação de aviso, não uma citação, e não contradiz o texto — é inferência plausível, não exagero.",
+   "corrected": "",
+   "quote": "You must cause any modified files to carry prominent notices stating that You changed the files",
+   "locator": "Apache License 2.0, Seção 4, alínea (b)",
+   "sourceTier": 10,
+   "validFrom": ""
+  },
+  {
+   "source": "apache-marca-e-notice",
+   "gap": "o que protege o NOME e a identidade quando o cliente forka",
+   "claim": "A licença NÃO concede nenhuma permissão de uso de nome/marca do licenciante (o 'Onion', no caso do maestro) — a permissividade do código é estritamente separada da marca; isso é o texto que 'impede' o cliente de chamar o fork dele pelo nome do maestro.",
+   "verdict": "ANCORADA",
+   "why": "Quote conferida verbatim contra o fetch direto da Seção 6. O claim central (nenhuma permissão de marca é concedida, salvo a exceção de descrever a origem/reproduzir o NOTICE) reproduz fielmente o texto. O verbo 'impede' aparece entre aspas no próprio claim, sinalizando que é leitura funcional (ausência de permissão de licença, não proibição direta por si — a proibição efetiva vem do direito marcário, articulado na claim 3) e não uma citação; não distorce o que a seção diz.",
+   "corrected": "",
+   "quote": "This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Work and reproducing the content of the NOTICE file",
+   "locator": "Apache License 2.0, Seção 6, Trademarks",
+   "sourceTier": 10,
+   "validFrom": ""
+  },
+  {
+   "source": "apache-marca-e-notice",
+   "gap": "o que protege o NOME e a identidade quando o cliente forka",
+   "claim": "A política da ASF confirma na prática o que a Seção 6 declara em tese: derivados podem existir sob marca PRÓPRIA do forker, mas nunca sob nome confusamente similar ao do projeto original — o teste é 'likelihood of confusion', não a permissividade da licença.",
+   "verdict": "ANCORADA",
+   "why": "A quote aparece verbatim (como prefixo de uma frase mais longa, que ainda inclui '... or the _ProjectName_ graphic logo trademarks' — omissão que não distorce o sentido). O texto completo confirma exatamente o claim: derivados podem usar marca própria do forker, mas trademark law proíbe marca 'confusingly similar' ao nome/marca original. O termo 'likelihood of confusion' citado no claim não está literalmente na passagem, mas é o nome padrão do teste jurídico que 'confusingly similar' evoca — paráfrase correta do padrão legal subjacente, não um exagero do que a política diz.",
+   "corrected": "",
+   "quote": "you may not apply trademarks to your derivative works of _ProjectName_ software that are confusingly similar to \"_ProjectName_\" or \"Apache _ProjectName_\"",
+   "locator": "Apache Software Foundation, Apache Trademark Policy (apache.org/foundation/marks/), seção sobre derivative works",
+   "sourceTier": 9,
+   "validFrom": ""
+  },
+  {
+   "source": "metodo-publicado-a-parte",
+   "gap": "arte externa de DISTRIBUIR METODO (nao so codigo): como quem faz isso separa doutrina de biografia",
+   "claim": "GitLab declara que seu handbook é public-first e publicamente acessível como política deliberada de transparência, não um acréscimo tardio — o análogo mais próximo em fonte primária de 'doutrina viaja publicamente'.",
+   "verdict": "ANCORADA",
+   "why": "A citação aparece verbatim no artigo. O texto sustenta cada elemento do claim: 'intentional' cobre 'deliberado/não é acréscimo tardio', 'handbook-first' + 'publicly accessible to all' + 'in valuing transparency' cobrem 'público como política de transparência'. A cláusula final ('análogo mais próximo de doutrina viaja publicamente') é enquadramento interpretativo do leitor, não uma alegação factual sobre o texto — não distorce o que a fonte diz.",
+   "corrected": "",
+   "quote": "GitLab is intentional about documenting in a manner that creates a single source of truth. It operates handbook-first, and in valuing transparency, makes its handbook publicly accessible to all.",
+   "locator": "handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/ — abertura do corpo do artigo, logo após o título 'The importance of a handbook-first approach to communication'"
+  },
+  {
+   "source": "metodo-publicado-a-parte",
+   "gap": "arte externa de DISTRIBUIR METODO (nao so codigo): como quem faz isso separa doutrina de biografia",
+   "claim": "O GitLab dá uma RAZÃO explícita para escolher o público em vez de um wiki interno: exposição pública cria accountability que um repositório privado/interno não cria, porque este pode 'apodrecer' visivelmente sem pressão externa.",
+   "verdict": "ANCORADA",
+   "why": "Citação verbatim confirmada, na mesma seção. O claim parafraseia fielmente: 'accountability' está no texto, e o contraste 'wiki interno apodrece' vs. 'handbook aberto ao mundo' é exatamente o mecanismo descrito ('easier to let... rot').",
+   "corrected": "",
+   "quote": "Public handbooks lead to accountability. It's easier to let an internal wiki rot than it is a handbook which is open to the world.",
+   "locator": "handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/ — mesma seção 'Make handbook-first a value', frase seguinte à citação legal"
+  },
+  {
+   "source": "metodo-publicado-a-parte",
+   "gap": "arte externa de DISTRIBUIR METODO (nao so codigo): como quem faz isso separa doutrina de biografia",
+   "claim": "A thoughtbot licencia o playbook como Creative Commons Attribution-NonCommercial especificamente para que outros possam usar as táticas 'na sua própria empresa' — uma licença que permite uso/adaptação interna mas bloqueia a revenda comercial do próprio método.",
+   "verdict": "ANCORADA",
+   "why": "Citação verbatim confirmada. O texto liga explicitamente a licença CC BY-NC ao propósito declarado ('so you may... use our tactics in your own company'). A caracterização legal adicional do claim (permite uso/adaptação interna, bloqueia revenda comercial) é uma leitura padrão e correta do que 'NonCommercial' significa na licença CC, não uma extrapolação além do que o texto e a licença citada sustentam.",
+   "corrected": "",
+   "quote": "The playbook is free and licensed as Creative Commons Attribution-NonCommercial so you may learn from, or use, our tactics in your own company.",
+   "locator": "thoughtbot.com/playbook — rodapé, logo antes da linha de copyright"
+  },
+  {
+   "source": "scaffolding-que-atualiza",
+   "gap": "depois do fork, como o metodo do doador ATUALIZA no repo do cliente sem apagar o que ele mudou",
+   "claim": "When the doador's change and the dono's customization collide, Copier does NOT auto-resolve silently — default behavior is to write git-merge-style conflict markers into the file for a human to resolve.",
+   "verdict": "ANCORADA",
+   "why": "Citação verbatim (a única diferença são backticks estilísticos em torno de 'git merge' no claim, ausentes na página, mas irrelevante ao conteúdo). O texto confirma exatamente: `--conflict inline` é o default, e o comportamento é escrever marcadores de conflito no arquivo, comparados explicitamente aos marcadores de `git merge`.",
+   "corrected": "",
+   "quote": "Updates the file with conflict markers. This is quite similar to the conflict markers created when a git merge command encounters a conflict.",
+   "locator": "copier.readthedocs.io/en/stable/updating/ — opção `--conflict inline` (default)",
+   "validFrom": ""
+  },
+  {
+   "source": "scaffolding-que-atualiza",
+   "gap": "depois do fork, como o metodo do doador ATUALIZA no repo do cliente sem apagar o que ele mudou",
+   "claim": "Copier offers an alternate conflict mode that isolates unmergeable diffs into separate .rej files rather than inlining markers into the tracked file.",
+   "verdict": "ANCORADA",
+   "why": "Citação verbatim (mesma observação trivial sobre backticks em '.rej'). O claim descreve corretamente o modo `--conflict rej` como alternativa ao `inline`, isolando os diffs não resolvidos em arquivo separado em vez de marcadores inline no arquivo rastreado.",
+   "corrected": "",
+   "quote": "Creates a separate .rej file for each file with conflicts. These files contain the unresolved diffs.",
+   "locator": "copier.readthedocs.io/en/stable/updating/ — opção `--conflict rej`",
+   "validFrom": ""
+  },
+  {
+   "source": "scaffolding-que-atualiza",
+   "gap": "depois do fork, como o metodo do doador ATUALIZA no repo do cliente sem apagar o que ele mudou",
+   "claim": "Copier warns that hand-editing the stored answers file breaks the update mechanism's assumption, because it silently misattributes which answers produced the current state.",
+   "verdict": "ANCORADA",
+   "why": "Citação verbatim, dentro do bloco 'Important' que abre com 'Never update .copier-answers.yml manually.' O claim resume fielmente o mecanismo descrito: editar o arquivo de respostas à mão engana o algoritmo de diff inteligente sobre qual conjunto de respostas de fato produziu o estado atual do subprojeto.",
+   "corrected": "",
+   "quote": "This will trick Copier, making it believe that those modified answers produced the current subproject, while it was produced by a different answers set.",
+   "locator": "copier.readthedocs.io/en/stable/updating/ — seção 'Never change the answers file manually' (bloco 'Important')",
+   "validFrom": ""
+  },
+  {
+   "source": "scaffolding-que-atualiza",
+   "gap": "depois do fork, como o metodo do doador ATUALIZA no repo do cliente sem apagar o que ele mudou",
+   "claim": "Cruft's declared update flow is a review-then-apply gate — the tool surfaces the incoming template diff and requires the owner to review it before it lands, rather than pushing the doador's change straight into the fork.",
+   "verdict": "ANCORADA",
+   "why": "Citação verbatim (a página não usa backticks em torno de 'cruft update', diferença tipográfica irrelevante). Frase seguinte confirma o fluxo completo: 'If you accept the changes cruft will apply them to your project and update the .cruft.json file for you' — ou seja, é de fato revisão-antes-de-aplicar, com aceite explícito do dono, exatamente como o claim descreve.",
+   "corrected": "",
+   "quote": "To update an existing project, that was created using cruft, run `cruft update` in the root of the project. If there are any updates, cruft will have you review them before applying.",
+   "locator": "cruft.github.io/cruft/ — seção 'Updating a Project'",
+   "validFrom": ""
+  },
+  {
+   "source": "claude-code-plugin-distribuicao",
+   "gap": "o veiculo nativo: o marketplace de plugins ja e canal, e nao esta medido para ESTE caso",
+   "claim": "2. The only documented place for shipping written documentation with a plugin is a README.md at the plugin root, listed as a sharing step, not as a loaded component type.",
+   "verdict": "ANCORADA",
+   "why": "A frase aparece verbatim (só com a formatação em negrito do bullet removida: '1. **Add documentation**: Include a `README.md` with installation and usage instructions') dentro de '### Share your plugins', um passo de checklist de publicação — não uma linha da tabela 'Plugin structure overview'. Nenhuma outra parte do documento nomeia um diretório/arquivo para documentação ou knowledge-base. O claim é preciso.",
+   "corrected": "",
+   "quote": "Add documentation: Include a README.md with installation and usage instructions",
+   "locator": "code.claude.com/docs/en/plugins, seção 'Share your plugins' (confirmada)",
+   "validFrom": ""
+  },
+  {
+   "source": "claude-code-plugin-distribuicao",
+   "gap": "o veiculo nativo: o marketplace de plugins ja e canal, e nao esta medido para ESTE caso",
+   "claim": "4. No public-repository requirement exists for a marketplace a user adds themselves; private repositories are explicitly supported for that path.",
+   "verdict": "ANCORADA",
+   "why": "A frase aparece verbatim, exatamente como citada, abrindo a seção 'Private repositories': 'Claude Code supports installing plugins from private repositories. If you distribute your marketplace through Organization settings > Plugins instead, [...] a plugin source it can't authenticate to must be public.' O claim está correto: para marketplace adicionado pelo próprio usuário (`/plugin marketplace add`), não há exigência de repositório público. Ressalva: o LOCATOR citado ('seção Public vs. Private Repository Requirements') é um nome de seção que não existe no documento real — o heading verdadeiro é 'Private repositories'.",
+   "corrected": "",
+   "quote": "Claude Code supports installing plugins from private repositories.",
+   "locator": "code.claude.com/docs/en/plugin-marketplaces — heading real é 'Private repositories' (NÃO existe um heading chamado 'Public vs. Private Repository Requirements' no documento; esse nome não corresponde a nenhum título real da página)",
+   "validFrom": ""
+  },
+  {
+   "source": "claude-code-plugin-distribuicao",
+   "gap": "o veiculo nativo: o marketplace de plugins ja e canal, e nao esta medido para ESTE caso",
+   "claim": "5. The documented way to keep a plugin private to a team while still using the plugin channel is hosting its marketplace in a private repository, distinct from submitting to Anthropic's public community/official marketplaces.",
+   "verdict": "ANCORADA",
+   "why": "Frase verbatim (só o link markdown do original — '[private repository](/docs/en/plugin-marketplaces#private-repositories)' — foi lido como texto puro): 'Once your plugin is in a marketplace, others can install it [...]. To keep a plugin internal to your team, host the marketplace in a private repository.' Está na mesma seção 'Share your plugins' que trata, logo depois, da submissão aos marketplaces públicos oficiais/comunitários — a distinção do claim é exatamente a que o texto faz.",
+   "corrected": "",
+   "quote": "To keep a plugin internal to your team, host the marketplace in a private repository.",
+   "locator": "code.claude.com/docs/en/plugins, seção 'Share your plugins' (confirmada)",
+   "validFrom": ""
+  },
+  {
+   "source": "claude-code-plugin-distribuicao",
+   "gap": "o veiculo nativo: o marketplace de plugins ja e canal, e nao esta medido para ESTE caso",
+   "claim": "6. Under organization-managed distribution (Organization settings > Plugins), sources under a different owner or on a different host must be public, because org sync fetches every non-same-owner source without credentials.",
+   "verdict": "ANCORADA",
+   "why": "Citação verbatim, dentro do bullet: 'Organization sync fetches every other source without credentials, so github.com repositories under a different owner and repositories on other hosts, such as GitLab or Bitbucket, must be public.' Confirma exatamente o mecanismo causal do claim (sync sem credenciais → exige público). Mesma ressalva de locator do claim 4: o nome de seção citado não é o heading real da página.",
+   "corrected": "",
+   "quote": "github.com repositories under a different owner and repositories on other hosts, such as GitLab or Bitbucket, must be public.",
+   "locator": "code.claude.com/docs/en/plugin-marketplaces — heading real é 'Distribute through organization settings' (não 'Public vs. Private Repository Requirements', nome que não existe no documento)",
+   "validFrom": ""
+  },
+  {
+   "source": "open-core-na-pratica",
+   "gap": "o corte comercial: o que fica no fechado quando se abre o nucleo, e o que a arte externa mede sobre isso",
+   "claim": "GitLab's declared open-core cut criterion is buyer persona, not feature type or usage scale: open source if the likely buyer is an individual contributor, source-available/paid otherwise.",
+   "verdict": "ANCORADA",
+   "why": "Quote is verbatim (only a paragraph line-break separates the two sentences in source, no wording change). The document frames this explicitly as the test GitLab applies ('To determine what is open source and what not we ask ourselves'), and no other criterion (feature type, usage scale) is offered anywhere else in the doc as the decision rule, so the claim's framing holds.",
+   "corrected": "",
+   "quote": "To determine what is open source and what not we ask ourselves: **Who cares the most about the feature**. If the likely buyer is an individual contributor the feature will be open source, otherwise it will be source-available (proprietary).",
+   "locator": "Section 'What Features Are Paid-Only' (lines 41-42 of stewardship.md)",
+   "validFrom": ""
+  },
+  {
+   "source": "open-core-na-pratica",
+   "gap": "o corte comercial: o que fica no fechado quando se abre o nucleo, e o que a arte externa mede sobre isso",
+   "claim": "The criterion is about who cares relatively more, not exclusivity — every paid feature still has individual-contributor value, and tiering follows depth/breadth of usage.",
+   "verdict": "ANCORADA",
+   "why": "Verbatim match across the quoted sentences. The claim's paraphrase (relative-caring, not exclusivity; depth/breadth of usage drives tier benefit) is exactly what these lines say.",
+   "corrected": "",
+   "quote": "There aren't any features that are only useful to managers, directors, and executives. So for every source-available feature there will be an individual contributor who cares about it. We're not saying that there aren't any individual contributors that care about the feature, just that we think that other buyers are relatively more likely to care about it. The more of GitLab that you use the more likely it is that you benefit from a higher tier.",
+   "locator": "Section 'What Features Are Paid-Only' (lines 44-48 of stewardship.md)",
+   "validFrom": ""
+  },
+  {
+   "source": "open-core-na-pratica",
+   "gap": "o corte comercial: o que fica no fechado quando se abre o nucleo, e o que a arte externa mede sobre isso",
+   "claim": "GitLab commits to a floor: the open codebase has all features essential to running the product at real scale, with no artificial limits — the paid side is additive, never a crippled core.",
+   "verdict": "ANCORADA",
+   "why": "Verbatim quote (markdown link syntax around 'requiring a trademarked header' stripped, text unchanged); these are indeed promise items 4 and 5 in the numbered list. 'Paid side is additive, never a crippled core' is a fair gloss of these two promises together with promise 1 (never move an open feature to paid), not an added claim the text contradicts.",
+   "corrected": "",
+   "quote": "The open source codebase will have all the features that are essential to running a large 'forge' with public and private repositories. 1. The open source codebase will not contain any artificial limits (repositories, users, size, performance, requiring a trademarked header, etc.).",
+   "locator": "Section 'Promises', items 4-5 (lines 23-24 of stewardship.md)"
+  },
+  {
+   "source": "open-core-na-pratica",
+   "gap": "o corte comercial: o que fica no fechado quando se abre o nucleo, e o que a arte externa mede sobre isso",
+   "claim": "The stewardship promise explicitly excludes GitLab Inc.'s own hosted SaaS operation — the cut applies to the distributed codebase, not the operator's live multi-tenant service, which may carry its own usage limits.",
+   "verdict": "ANCORADA",
+   "why": "Verbatim quote (source has an invisible zero-width-space character before 'GitLab SaaS' in line 36, otherwise identical). The claim's paraphrase — codebase-scoped promise, SaaS may carry its own limits — is exactly what the section states.",
+   "corrected": "",
+   "quote": "Our stewardship promise applies only to the GitLab open source codebase, not to GitLab, Inc services such as GitLab Software as a Service (SaaS). For GitLab SaaS, we may add limits around usage (e.g., storage, compute, traffic) or proxies for usage (e.g., number of users in a group) as we seek to optimize costs and revenues.",
+   "locator": "Section 'Software as a Service' (lines 35-36 of stewardship.md)"
+  },
+  {
+   "source": "open-core-na-pratica",
+   "gap": "o corte comercial: o que fica no fechado quando se abre o nucleo, e o que a arte externa mede sobre isso",
+   "claim": "GitLab keeps the two sides physically separated in the repository itself — a dedicated proprietary directory inside the main tree plus a fully open-source downstream mirror repo — as the mechanism making the cut auditable.",
+   "verdict": "ANCORADA",
+   "why": "Verbatim quote (markdown link markup around 'separate directory for EE code' and 'Git repo downstream that is open source only' stripped, wording unchanged); it is indeed the final item in the 12-item Promises list. The claim's characterization as a physical, auditable mechanism matches the promise's own stated purpose ('We will always make it clear what is proprietary and what is open source code. This will be implemented with...').",
+   "corrected": "",
+   "quote": "This will be implemented with a separate directory for EE code and a Git repo downstream that is open source only.",
+   "locator": "Section 'Promises', final (12th) bullet (line 31 of stewardship.md)",
+   "validFrom": ""
+  }
+ ],
+ "rejected": [
+  {
+   "source": "metodo-publicado-a-parte",
+   "gap": "arte externa de DISTRIBUIR METODO (nao so codigo): como quem faz isso separa doutrina de biografia",
+   "claim": "A única fronteira que o GitLab declara para o que fica FORA do handbook público é uma restrição LEGAL, não uma categoria de 'vida interna da empresa' — i.e., o default é público, e a exceção é estritamente legal, não doutrinária.",
+   "verdict": "EXAGERADA",
+   "why": "A citação existe verbatim e é uma recomendação a OUTRAS empresas (não uma auto-descrição do que o próprio GitLab omite). O claim afirma que essa é 'A ÚNICA fronteira que o GitLab declara' em todo o handbook — isso é um salto: a página verificada (um artigo entre milhares no handbook) não sustenta uma afirmação de exaustividade sobre todas as fronteiras que o GitLab já declarou em qualquer lugar do site. A frase real é uma recomendação pontual, não uma declaração de política exaustiva.",
+   "corrected": "O GitLab recomenda a outras empresas tornar seus handbooks públicos 'to whatever degree you legally can' — a única ressalva explícita NESTA passagem é legal; o texto não afirma (nem esta página permite concluir) que essa seja a única fronteira que o GitLab já declarou em todo o handbook.",
+   "quote": "To whatever degree you legally can, consider making your company handbook public.",
+   "locator": "handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/ — seção 'Make handbook-first a value', citando Darren (Head of Remote) e Gabe"
+  },
+  {
+   "source": "metodo-publicado-a-parte",
+   "gap": "arte externa de DISTRIBUIR METODO (nao so codigo): como quem faz isso separa doutrina de biografia",
+   "claim": "A thoughtbot enquadra explicitamente seu playbook como um relato evolutivo e imperfeito da prática interna ('as melhores formas que encontramos até agora'), não uma transferência acabada ou completa da operação interna da empresa — um reconhecimento implícito de que o que é publicado é um subconjunto curado, não tudo.",
+   "verdict": "EXAGERADA",
+   "why": "A citação bate verbatim (com o itálico do 'so far' no HTML original). O núcleo do claim — evolutivo, 'até agora', não uma transferência completa/finalizada — é bem sustentado pelo texto ('best ways we've found so far' + 'things we've learned based on our own experiences', frase seguinte). Mas a cláusula final ('reconhecimento implícito de que é um subconjunto CURADO, não tudo') estica o texto: 'so far' fala de evolução no TEMPO (o método muda conforme aprendem mais), não de seleção de TÓPICOS/conteúdo omitido. O texto não toca no que fica de fora nem em curadoria de escopo.",
+   "corrected": "A thoughtbot enquadra o playbook como um relato evolutivo do que funcionou 'até agora', explicitamente não como um método finalizado ou completo — um reconhecimento de imperfeição e mudança ao longo do tempo. O texto não afirma nem implica que o conteúdo publicado seja um subconjunto curado de uma prática interna maior; essa leitura ultrapassa o que a fonte diz.",
+   "quote": "This playbook details the best ways we've found _so far_ to run our company and make successful web and mobile products.",
+   "locator": "thoughtbot.com/playbook — parágrafo de abertura, logo após a descrição da empresa"
+  },
+  {
+   "source": "scaffolding-que-atualiza",
+   "gap": "depois do fork, como o metodo do doador ATUALIZA no repo do cliente sem apagar o que ele mudou",
+   "claim": "Copier's update mechanism is a three-way diff: it regenerates a fresh copy from the NEW template version and diffs it against the current (customized) project, so the patch applied is only what the TEMPLATE changed, not a raw overwrite.",
+   "verdict": "EXAGERADA",
+   "why": "A citação existe verbatim, mas a leitura do claim inverte o mecanismo em dois pontos que o próprio diagrama da página desenha explicitamente. (1) A cópia fresca é regenerada a partir da versão ATUAL/já-instalada do template ('current template version', ancorada em 'template_current'), não da versão NOVA — a versão nova ('template_latest') só entra depois, num passo separado chamado 'update' (que atualiza o projeto in-place perguntando e reexecuta tasks). (2) O diff computado nesse passo (fresh-atual vs. projeto-customizado) captura o que o DONO mudou, não o que o TEMPLATE mudou — é esse diff-do-dono que é reaplicado por cima do projeto já atualizado para a versão nova (passo 'apply'), preservando a customização. O claim troca as pontas: diz que o diff é 'o que o template mudou' quando o texto e o diagrama mostram o oposto — é o diff do dono que sobrevive à atualização.",
+   "corrected": "Copier regenera uma cópia fresca do projeto na versão do template ATUALMENTE em uso (não na nova), e compara essa cópia fresca com o projeto customizado para isolar o que o DONO mudou (não o que o template mudou); só depois, num passo separado, atualiza o projeto para a versão mais nova do template, e reaplica por cima o diff do dono — preservando a customização em vez de sobrescrevê-la.",
+   "quote": "It regenerates a fresh project from the current template version. Then, it compares both version to get the diff from \"fresh project\" to \"current project\".",
+   "locator": "copier.readthedocs.io/en/stable/updating/ — seção 'How the update works' (confirmado também no diagrama mermaid da página: template_current → project_regen)",
+   "validFrom": ""
+  },
+  {
+   "source": "scaffolding-que-atualiza",
+   "gap": "depois do fork, como o metodo do doador ATUALIZA no repo do cliente sem apagar o que ele mudou",
+   "claim": "Copier explicitly frames the update as respecting the fork's evolution by replaying the same answers used at generation time, not asking the user to redo configuration.",
+   "verdict": "EXAGERADA",
+   "why": "A citação está correta e verbatim. Mas a cláusula acrescentada pelo claim — 'not asking the user to redo configuration' — contradiz outro trecho da MESMA página: 'Run copier update. Answer the questions. They'll default to your answers on your last update.' Ou seja, por padrão o Copier volta a perguntar as mesmas questões (só com as respostas anteriores como default) — o usuário só escapa de responder de novo se passar `--defaults` explicitamente. O texto citado fala em 'usar as respostas' como default, não em dispensar o usuário de reconfigurar.",
+   "corrected": "Copier reaproveita as respostas da última vez como valor-padrão ao atualizar ('by using the answers you provided when copied last time'), mas por padrão ainda reapresenta o mesmo questionário ao dono — só com `copier update --defaults` ele evita repetir as perguntas.",
+   "quote": "Copier will do its best to respect your project evolution by using the answers you provided when copied last time.",
+   "locator": "copier.readthedocs.io/en/stable/updating/ (parágrafo logo após o comando `copier update`)",
+   "validFrom": ""
+  },
+  {
+   "source": "claude-code-plugin-distribuicao",
+   "gap": "o veiculo nativo: o marketplace de plugins ja e canal, e nao esta medido para ESTE caso",
+   "claim": "1. A plugin's recognized directories/files are a fixed enumerated set: skills/, commands/, agents/, hooks/, .mcp.json, .lsp.json, monitors/, bin/, settings.json — no directory type is named for documentation or knowledge-base content.",
+   "verdict": "EXAGERADA",
+   "why": "O conteúdo da tabela confere e a conclusão do claim é verdadeira (nenhuma linha da tabela é para docs/KB), mas a QUOTE fornecida não é uma substring verbatim: ela pula a linha inteira de `commands/` entre `skills/` e `agents/`, e remove a formatação de tabela (pipes, backticks) do original. É uma citação editada/comprimida, não uma extração literal.",
+   "corrected": "A tabela real (seção 'Plugin structure overview') lista: `.claude-plugin/` (manifesto plugin.json), `skills/`, `commands/` (linha que a citação PULA — 'Skills as flat Markdown files. Use skills/ for new plugins'), `agents/`, `hooks/`, `.mcp.json`, `.lsp.json`, `monitors/`, `bin/` e `settings.json`. A citação dada concatena as células sem os pipes/backticks originais e OMITE a linha `commands/` inteira entre `skills/` e `agents/` — não existe como substring contínua no documento. Dito isso, o CLAIM (nenhum tipo de diretório é nomeado para documentação/KB) está correto e sustentado pela tabela completa — a lista do próprio claim já inclui commands/ corretamente.",
+   "quote": "skills/ | Plugin root | Skills as <name>/SKILL.md directories agents/ | Plugin root | Custom agent definitions hooks/ | Plugin root | Event handlers in hooks.json .mcp.json | Plugin root | MCP server configurations",
+   "locator": "code.claude.com/docs/en/plugins, seção 'Plugin structure overview' (confirmada — é o nome real do heading)",
+   "validFrom": ""
+  },
+  {
+   "source": "claude-code-plugin-distribuicao",
+   "gap": "o veiculo nativo: o marketplace de plugins ja e canal, e nao esta medido para ESTE caso",
+   "claim": "3. Anything in a plugin folder that is not a recognized manifest/component is simply skipped by the loader without error — extra files sit inert rather than being actively loaded.",
+   "verdict": "EXAGERADA",
+   "why": "A citação é literal e está na seção certa, mas o claim generaliza o escopo: o texto fala de subpastas SEM MANIFESTO dentro de uma pasta que agrega múltiplos plugins, não de 'qualquer coisa não-reconhecida dentro da pasta de UM plugin' em geral. É esticar o que a frase sustenta.",
+   "corrected": "A frase é verbatim, mas está no contexto específico de carregar uma PASTA QUE CONTÉM VÁRIOS PLUGINS (via `--plugin-dir` apontando para uma pasta, requer Claude Code v2.1.265+): 'Claude Code reads the folder's top level to decide which plugins load... Each immediate subfolder that has a `.claude-plugin/plugin.json` manifest loads as a separate plugin. Claude Code skips everything else in the folder without reporting an error, including plugins that have no manifest.' Ou seja, o que é pulado sem erro são SUBPASTAS sem manifesto dentro de uma pasta-de-plugins — o texto não afirma, de forma geral, que qualquer arquivo/pasta não reconhecida DENTRO de um único plugin já manifestado (ex.: uma pasta `docs/` extra) seja silenciosamente ignorada.",
+   "quote": "Claude Code skips everything else in the folder without reporting an error, including plugins that have no manifest.",
+   "locator": "code.claude.com/docs/en/plugins, seção 'Test your plugins locally' (confirmada)",
+   "validFrom": ""
+  },
+  {
+   "source": "open-core-na-pratica",
+   "gap": "o corte comercial: o que fica no fechado quando se abre o nucleo, e o que a arte externa mede sobre isso",
+   "claim": "Once open-sourced a feature never returns to paid — the direction of travel is asymmetric: open-to-paid forbidden, paid-to-open happens routinely when GitLab judges a feature was mis-tiered.",
+   "verdict": "EXAGERADA",
+   "why": "The quoted promise-1 text is verbatim and supports the 'forbidden' half of the claim. But 'happens routinely' overstates the document's own framing of the reverse direction, which twice uses 'on occasion' (lines 119, 121) and 'from time to time' (line 68) for paid-to-open moves — language of occasional/exceptional correction, not a routine, regular occurrence.",
+   "corrected": "Once open-sourced a feature never moves to a paid tier (Promise 1). The reverse direction is real but the document does not characterize it as routine: elsewhere it says the reverse move happens only 'on occasion' / 'from time to time' ('On occasion, the reverse does happen where we open source a previously source-available feature' — 'From time to time we do open source a feature that was previously proprietary'), and that GitLab 'won't hesitate' to do so when a tier was set too high — readiness to act, not a stated regular cadence.",
+   "quote": "When a feature is open source we won't move that feature to a paid tier. Features might be removed from the open source codebase in other cases, for example when combining features from multiple tiers into one new feature. To be clear, this promise only applies to open sourced features, features in paid tiers might move to a higher tier.",
+   "locator": "Section 'Promises', item 1 (line 20 of stewardship.md)"
+  }
+ ],
+ "elenxo": {
+  "objections": [
+   {
+    "target": "[template-vs-fork] claim 1 — fork herda toda a história; template nasce com 1 commit",
+    "survives": true,
+    "evidence": "Prova MENOS do que a rodada precisa. O claim mede o canal HISTÓRIA; a biografia deste repo vaza pela ÁRVORE. Medido nesta sessão em /home/marcio/onion-evolve: docs/diary/ povoado (2026-07-01-audit-dogfood-finds-code-bugs.md etc.), docs/evolution/federation/members.yaml e docs/analysis/arandek-repo-exposure-2026-08.md estão no working tree. Um template de 1 commit desses arquivos publica a biografia inteira com história limpa. 'Template nasce limpo' é verdadeiro sobre commits e falso sobre conteúdo."
+   },
+   {
+    "target": "[template-vs-fork] claim 2 — históricos não-relacionados impedem PR/merge entre template e derivado",
+    "survives": true,
+    "evidence": "A citação é sólida, mas refuta o uso que a rodada quer dar a ela: não sustenta template como veículo, sustenta que template e canal de atualização por git são MUTUAMENTE EXCLUSIVOS. Quem escolhe template contrai dívida imediata na lacuna [scaffolding-que-atualiza] — precisa de um segundo mecanismo que esta rodada não mediu."
+   },
+   {
+    "target": "[template-vs-fork] claim 3 — fork mantém settings próprios e permanece conectado ao upstream",
+    "survives": true,
+    "evidence": "'Conectado' no texto do GitHub é relação de UI/rede (fork network, sync fork), não mecanismo de atualização nem fronteira de privacidade. E a conexão é bidirecional em VISIBILIDADE: o fork exibe publicamente a origem. Nada disso resolve 'doutrina viaja, biografia não' — um fork copia a árvore inteira, incluindo os três arquivos medidos acima."
+   },
+   {
+    "target": "[licenca-source-available] claim 4 — PolyForm Internal Use permite uso interno e proíbe distribuir/sublicenciar",
+    "survives": true,
+    "evidence": "A citação é exata e a licença faz o que diz — mas não alcança o corpus que já saiu. MEDIDO: /home/marcio/onion-evolve/LICENSE = 'MIT License / Copyright (c) 2026 Marcio Carvalho', e plugins/onion, plugins/onion-product, plugins/onion-engineering, plugins/onion-compliance, plugins/onion-design carregam LICENSE MIT cada um, já publicados (memória onion-plugin-marketplace-publication-state, LICENSE por plugin, PR #791). Licença nova não retrai concessão MIT já dada sobre o mesmo material. Segunda objeção: PolyForm é licença de SOFTWARE e a maior parte do que deve viajar é PROSA (knowledge-base, REGRAs, gramática do grafo); e 'you and your company' não cobre o óbvio de consultoria (subsidiárias, PJs, terceiros)."
+   },
+   {
+    "target": "[licenca-source-available] claim 5 — PolyForm Noncommercial amarra 'permitido' a uso não-comercial",
+    "survives": true,
+    "evidence": "A eliminação está correta, mas a rodada não aplicou o próprio critério: ela segue recomendando a thoughtbot CC BY-NC (claim 13) como análogo — a MESMA cláusula NC que o claim 5 acabou de descartar por não servir a cliente comercial. A rodada carrega essa contradição sem resolvê-la."
+   },
+   {
+    "target": "[licenca-source-available] claim 6 — BSL 1.1 não veta revenda por natureza; depende do Additional Use Grant",
+    "survives": true,
+    "evidence": "Prova que a BSL é ESQUELETO, não decisão — o campo que decide fica em branco. E o Change Date entrega ao cliente, por cronômetro (até 4 anos), exatamente o direito que a rodada quer negar. Nenhuma redação de Additional Use Grant foi produzida: opção nomeada, não instruída."
+   },
+   {
+    "target": "[licenca-source-available] claim 7 — Elastic 2.0 veta serviço hospedado/gerenciado, não uso interno",
+    "survives": true,
+    "evidence": "O próprio claim reconhece que o alvo é outro (SaaS concorrente). Num framework de método entregue a consultoria não há 'serviço hospedado' a vetar — a ELv2 seria permissiva justamente no eixo que importa (o cliente redistribuir o método). Eliminação bem feita, decisão não avançada."
+   },
+   {
+    "target": "[apache-marca-e-notice] claim 8 — Apache §4(b) exige aviso proeminente em arquivos modificados",
+    "survives": true,
+    "evidence": "Descreve uma licença que o artefato NÃO usa. Medido: LICENSE = MIT, sem §4(b) — MIT exige apenas preservar aviso de copyright e permissão, nenhuma obrigação de sinalizar arquivo alterado. A propriedade apresentada como protetora não existe hoje, e adotá-la exigiria relicenciar — impossível retroativamente sobre o que já saiu MIT (ver claim 4)."
+   },
+   {
+    "target": "[apache-marca-e-notice] claim 9 — a licença não concede uso de nome/marca",
+    "survives": true,
+    "evidence": "Verdadeiro sobre Apache e inerte aqui: (a) o repo é MIT, que não tem cláusula de marca — a ausência de §6 não cria proteção, apenas remete tudo à lei de marcas; (b) nada foi medido sobre titularidade/registro do nome 'Onion', palavra genérica. A rodada respondeu 'a licença não dá direito de marca' quando a pergunta era 'o que PROTEGE o nome'."
+   },
+   {
+    "target": "[apache-marca-e-notice] claim 10 — política da ASF proíbe derivados com nome confusamente similar",
+    "survives": true,
+    "evidence": "É política de uma FUNDAÇÃO que possui marcas registradas, não regra decorrente da licença. Só é executável por quem tem o mesmo ativo (marca registrada + política publicada + capacidade de exigir); nenhum dos três foi medido do lado do maestro. Transportar a política sem o ativo é declarar proteção inexistente — declarado≠verificado."
+   },
+   {
+    "target": "[metodo-publicado-a-parte] claim 11 — GitLab é handbook-first e público por política deliberada",
+    "survives": true,
+    "evidence": "Prova que existe precedente de publicar MÉTODO e nada sobre a FRONTEIRA nomeada. Um handbook corporativo não tem análogo do que aqui não pode viajar (diário pessoal, grafos da vida do maestro, achado de segurança de adotante, material sob NDA). A claim vizinha que tocaria a fronteira foi REJEITADA na ancoragem; sem ela, 11 é só existência de precedente."
+   },
+   {
+    "target": "[metodo-publicado-a-parte] claim 12 — handbook público cria accountability que wiki interno não cria",
+    "survives": true,
+    "evidence": "Argumento de VALOR de publicar, não de onde cortar — e apontado para o lado errado do risco desta rodada. O risco medido aqui não é doutrina apodrecer por falta de plateia; é biografia vazar por falta de filtro (`grep -n exclude .claude/commands/meta/adopt.md` = ZERO). Usar 12 como razão para abrir empurra na direção do risco não mitigado."
+   },
+   {
+    "target": "[metodo-publicado-a-parte] claim 13 — thoughtbot licencia o playbook em CC BY-NC para uso 'na sua própria empresa'",
+    "survives": true,
+    "evidence": "Contradiz o que a rodada quer dele. NonCommercial exclui uso primariamente voltado a vantagem comercial; cliente de consultoria aplicando o método para operar negócio com fins lucrativos é o caso ambíguo/bloqueado — o mesmo defeito pelo qual a rodada descartou PolyForm Noncommercial (claim 5). Como análogo de 'usa internamente, não revende', CC BY-NC é a ferramenta errada."
+   },
+   {
+    "target": "[scaffolding-que-atualiza] claim 14 — Copier grava marcadores de conflito em vez de auto-resolver",
+    "survives": true,
+    "evidence": "Prova a EXIGÊNCIA (colisão resolvida por humano, nunca em silêncio), não a aplicabilidade. O modelo do Copier é projeto GERADO a partir de respostas; o Onion é VENDORIZAÇÃO de corpus (.claude/ copiado), sem answers file nem parametrização. Duas claims de Copier desta rodada foram REJEITADAS por inverter a direção do mecanismo — a compreensão do fluxo pela rodada não está estabelecida."
+   },
+   {
+    "target": "[scaffolding-que-atualiza] claim 15 — modo alternativo isola diffs em arquivos .rej",
+    "survives": true,
+    "evidence": "Opção da mesma ferramenta; herda a objeção da 14 (modelo answers-driven ≠ artefato real). E agrava o pior modo de falha: conflito silenciosamente ignorado num corpus de centenas de markdowns, onde ninguém abre um .rej órfão — oposto da doutrina local de falha visível (exit 2)."
+   },
+   {
+    "target": "[scaffolding-que-atualiza] claim 16 — editar à mão o arquivo de respostas quebra o update",
+    "survives": true,
+    "evidence": "Prova que o mecanismo do Copier tem ponto de fragilidade humano e SILENCIOSO ('trick Copier') — a categoria que esta casa trata como defeito de classe (guarda que não grita não é guarda). Como evidência, pesa CONTRA adotar Copier, e ninguém mediu se a falha seria detectável no artefato real."
+   },
+   {
+    "target": "[scaffolding-que-atualiza] claim 17 — cruft exige revisão antes de aplicar o diff do template",
+    "survives": true,
+    "evidence": "A citação é da página de apresentação e descreve INTENÇÃO ('cruft will have you review them'), sem especificar mecanismo (aplica patch? gera diff? o que ocorre na falha?). É declaração do artefato sobre si — exatamente o que a doutrina local manda não aceitar sem medir comportamento. Nenhum `cruft update` foi executado nesta rodada."
+   },
+   {
+    "target": "[claude-code-plugin-distribuicao] claim 18 — o único lugar documentado para documentação num plugin é o README.md",
+    "survives": true,
+    "evidence": "Prova menos do que a conclusão implícita ('plugin não carrega doutrina'), que é falsa pelo próprio artefato: skills/ e commands/ SÃO markdown carregado e o Onion já embarca 13 skills — doutrina viaja hoje como skill/comando. Além disso a claim 1 do bloco (enumeração fechada de diretórios) caiu por citação editada, então a premissa 'nenhum tipo é para docs' não está ancorada."
+   },
+   {
+    "target": "[claude-code-plugin-distribuicao] claim 19 — marketplaces em repositório privado são suportados",
+    "survives": true,
+    "evidence": "Duas objeções. (a) Processo: o verificador registrou LOCATOR inventado (heading inexistente) — a citação passou, mas o entorno veio de reconstrução, e o mesmo leitor produziu 3 rejeições neste bloco. (b) Substância: instalar de repo privado exige dar ao cliente CREDENCIAL do repo privado do maestro — exatamente o acesso que a rodada quer negar, pois é lá que vivem diário, members.yaml e achados de adotante."
+   },
+   {
+    "target": "[claude-code-plugin-distribuicao] claim 20 — hospedar o marketplace em repo privado mantém o plugin interno ao time",
+    "survives": true,
+    "evidence": "Resolve privacidade do CANAL, não o pedido da rodada. Plugin é relação de CONSUMO — 'install≠adopt' já é doutrina registrada (onion-plugin-marketplace-publication-state). A rodada pede veículo onde o cliente FORKA E EVOLUI sozinho; o canal de plugin entrega o oposto: o cliente recebe versões, não soberania sobre o corpus."
+   },
+   {
+    "target": "[claude-code-plugin-distribuicao] claim 21 — na distribuição por org, fontes de outro dono/host devem ser públicas",
+    "survives": true,
+    "evidence": "Constrange apenas o caminho org-sync, que a rodada não escolheu. Combinada com E_REPO_PUBLICO_OBRIGATORIO (diretório oficial exige repo público), desenha um binário — público de verdade ou privado com credencial compartilhada — que a rodada não decidiu. Fato constrangedor não é decisão tomada."
+   },
+   {
+    "target": "[open-core-na-pratica] claim 22 — o critério do GitLab é persona compradora",
+    "survives": true,
+    "evidence": "Erro de categoria. O corte do GitLab é COMERCIAL (o que se vende) numa empresa com SaaS pago; o corte desta rodada é PRIVACIDADE/CONFIDENCIALIDADE (diário, grafos de vida, achado de segurança de terceiro, NDA). Biografia não é retida para ser vendida — é retida porque não pode sair. Aplicar 'quem se importa mais' ao diário do maestro responde pergunta que ninguém fez."
+   },
+   {
+    "target": "[open-core-na-pratica] claim 23 — é sobre quem se importa relativamente mais; o tier segue profundidade de uso",
+    "survives": true,
+    "evidence": "Herda o erro de categoria da 22 e adiciona um próprio: 'tiering por profundidade de uso' pressupõe features mensuráveis num produto multi-tenant; o objeto aqui é corpus de prosa + maquinaria shell, sem eixo de profundidade. A claim vizinha sobre irreversibilidade paid→open foi REJEITADA ('routinely' superestimado), o que enfraquece o bloco como guia de política."
+   },
+   {
+    "target": "[open-core-na-pratica] claim 24 — piso: o lado aberto tem tudo que é essencial, sem limites artificiais",
+    "survives": false,
+    "evidence": "A objeção não fica de pé: é a única norma externa da rodada que bate num defeito JÁ MEDIDO. E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA registra review-artifact-check.sh nunca vendorizado nos 11 adotantes — literalmente um buraco artificial no lado que viaja. A claim 24 converte esse achado interno em critério de aceitação do export: se falta no bundle algo essencial para RODAR o método, o bundle está reprovado por norma, não por gosto."
+   },
+   {
+    "target": "[open-core-na-pratica] claim 25 — a promessa de stewardship exclui o SaaS do próprio GitLab",
+    "survives": true,
+    "evidence": "Carve-out para um modelo de operador que não existe aqui (o maestro não opera serviço multi-tenant sobre o Onion). Prova que o GitLab reservou espaço comercial, não como separar doutrina de biografia. Zero tração na pergunta da rodada."
+   },
+   {
+    "target": "[open-core-na-pratica] claim 26 — separação física: diretório dedicado no tronco + repo downstream só-aberto",
+    "survives": false,
+    "evidence": "Objeção não fica de pé: é o único mecanismo ancorado que responde a pergunta central — o repo do cliente é GERADO por filtro a partir do tronco, não é cópia do tronco, e a separação vive no layout, tornando o corte auditável. Ressalva que não derruba a claim: o custo do retrofit é não medido — hoje docs/ mistura doutrina (knowledge-base, meta-specs) e biografia (diary, analysis, evolution/federation) na mesma árvore, e `grep -n exclude .claude/commands/meta/adopt.md` devolve ZERO (a única menção a 'diary' em .claude/utils/adopt/*.sh é o grep de pin obsoleto em write-stamp.sh l.106-107, que não é filtro de cópia)."
+   }
+  ],
+  "gapsClosed": [
+   "[template-vs-fork] — fechada na metade MECÂNICA: fork herda toda a história e mantém linkage upstream (claims 1 e 3); template nasce com 1 commit e com históricos NÃO-RELACIONADOS, impossibilitando PR/merge de volta (claim 2). Consequência ancorada: template e atualização-por-git são MUTUAMENTE EXCLUSIVOS — o veículo não pode ser escolhido sem escolher junto o mecanismo de update.",
+   "[open-core-na-pratica] — fechada no que importava: o mecanismo com precedente é SEPARAÇÃO FÍSICA (diretório dedicado + repo downstream espelho só-aberto, claim 26) e o piso do lado que viaja é 'tudo que é essencial, sem limites artificiais' (claim 24). O piso condena por norma externa o defeito já medido em E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA (review-artifact-check.sh nunca vendorizado).",
+   "[scaffolding-que-atualiza] — fechada na EXIGÊNCIA, não na ferramenta: a arte externa converge em colisão resolvida por HUMANO e nunca em silêncio — marcadores inline por default (claim 14), .rej como alternativa (claim 15), review-antes-de-aplicar (claim 17). Isso vira critério de aceitação do mecanismo de update, venha ele de onde vier."
+  ],
+  "gapsOpen": [
+   "[licenca-source-available] — a FONTE fechou (PolyForm Internal Use, claim 4; eliminações 5/6/7), a DECISÃO não. MEDIDO nesta sessão: /home/marcio/onion-evolve/LICENSE é 'MIT License / Copyright (c) 2026 Marcio Carvalho' e plugins/{onion,onion-product,onion-engineering,onion-compliance,onion-design}/LICENSE são MIT, já publicados (memória onion-plugin-marketplace-publication-state, PR #791). Licença restritiva nova não retrai concessão MIT já dada — antes de escolher licença é preciso medir O QUE já saiu sob MIT.",
+   "[apache-marca-e-notice] — aberta: claims 8/9/10 descrevem Apache 2.0 e política da ASF, e o artefato é MIT (medido), sem §4(b) (aviso de arquivo modificado) e sem §6 (marcas). Nada foi medido sobre titularidade/registro do nome 'Onion' — palavra genérica, sem marca comprovada. Perguntou-se 'o que PROTEGE o nome' e respondeu-se 'a licença não dá direito de marca'.",
+   "[metodo-publicado-a-parte] — aberta: as DUAS claims que tocariam a fronteira foram REJEITADAS na ancoragem (a 'única fronteira é legal' do GitLab, por exaustividade indevida; o 'subconjunto curado' da thoughtbot, porque 'so far' fala de tempo e não de escopo). Sobrou existência de precedente público (11) e a razão para publicar (12) — nenhuma linha externa dizendo ONDE o corte passa.",
+   "[claude-code-plugin-distribuicao] — aberta para ESTE caso: o canal de plugin é CONSUMO ('install≠adopt', doutrina já registrada), e a rodada pediu veículo onde o cliente EVOLUI o método sozinho. Claims 19/20 resolvem privacidade do canal, não soberania no repo do cliente; a 19 teve locator fabricado e a claim 1 do bloco caiu por citação editada.",
+   "[template-vs-fork] — o canal de VAZAMENTO segue aberto: template limpa a HISTÓRIA, não a ÁRVORE. Medido: docs/diary/ povoado, docs/evolution/federation/members.yaml presente, docs/analysis/arandek-repo-exposure-2026-08.md presente (achado de segurança REDIGIDO E NÃO ENVIADO), e `grep -n exclude .claude/commands/meta/adopt.md` = ZERO. Nenhuma claim mediu o filtro, que é onde a fronteira de fato se executa.",
+   "[scaffolding-que-atualiza] — aberta na APLICAÇÃO: Copier/Cruft modelam projeto GERADO a partir de respostas; o Onion vendoriza corpus. O mecanismo que JÁ EXISTE aqui não foi tocado por nenhuma claim: /meta:adopt --update + .claude/utils/adopt/vendor-branch.sh, que a memória adopt-update-e-papel-cego registra como papel-cego (--update ignora o papel e publicaria meta-fábrica e .claude/diary numa porta PÚBLICA).",
+   "[export curado por papel] — o precedente citado do corpus não corresponde a flag viva. MEDIDO: .claude/commands/meta/adopt.md l.9 aceita `--role adopted|hub`; 'standalone' aparece só como papel de MEMBRO da federação (co-announce.md l.102-103, co-deliver.md l.46, federation-member.md l.50). B5_11_onion_standalone_nascida descreve movimento histórico, não mecanismo invocável hoje — precisa ser re-derivado contra o vivo, não citado."
+  ],
+  "recommendation": "O que a rodada SUSTENTA, tudo ancorado: (1) template e atualização-por-git são incompatíveis (claim 2) — o veículo não se escolhe sem escolher junto o mecanismo de update; (2) o desenho com precedente externo é o da claim 26 — o repo do cliente é GERADO por filtro a partir do tronco (espelho downstream só-aberto), nunca cópia do tronco com pastas deletadas depois; (3) todo update deve expor colisão a um humano, nunca resolver em silêncio (claims 14/15/17); (4) piso da claim 24 — o que viaja tem que RODAR, e o defeito já medido (review-artifact-check.sh nunca vendorizado, E_O_CORPUS_NAO_TRANSFERE) é violação desse piso, não azar.\n\nO que a rodada NÃO SUSTENTA: (a) nenhuma decisão de licença — LICENSE do repo e dos 5 plugins é MIT (medido) e já publicado; PolyForm Internal Use não retroage, e o corpus é majoritariamente PROSA, para a qual licença de software é forma errada; (b) nenhuma proteção de nome — Apache §4(b)/§6 e a política da ASF descrevem ativos que este artefato não tem; (c) o canal de plugin como veículo — entrega consumo, não fork evoluível; (d) o critério open-core por persona compradora — erro de categoria: biografia não é retida para ser vendida, é retida por privacidade/NDA.\n\nGATE antes de qualquer veículo: a partição das ~138k linhas de framework vs ~151k de autobiografia tem que virar ALLOWLIST executável (o que COPIA), nunca denylist do que exclui — a doutrina local já mede que guarda por lista falha pelo VOCABULÁRIO (guarda-por-lista-falha-pelo-vocabulario, 3× num dia), e denylist falha ABERTA: arquivo novo de biografia entra no bundle por default. Allowlist falha fechada.\n\nDescartes por comodismo que devolvo como objeção viva (cláusula 6): (i) 'forka e apaga as pastas à mão na entrega' — classe temporario-evapora-vira-incidente, e o artefato hoje não tem filtro nenhum (`grep -n exclude` em adopt.md = ZERO); (ii) 'deixa MIT, é mais fácil' — sob MIT o cliente pode revender o framework, o único limite que a pergunta declarou querer; não decidir É decidir pelo permissivo; (iii) 'usa o marketplace, já está pronto' — troca o pedido (cliente evolui sozinho) pelo que já se tem (cliente consome); (iv) 'cita o precedente do onion-standalone' — medido: não existe `--role standalone` no adopt vivo. Antes de nova rodada de fontes externas, meça o PRÓPRIO mecanismo: /meta:adopt --update e vendor-branch.sh, que nenhuma claim tocou e que a memória já registra como papel-cego."
+ },
+ "stats": {
+  "sources": 7,
+  "reached": 7,
+  "anchored": 26,
+  "rejected": 7,
+  "nodesAdded": 35,
+  "edgesAdded": 66,
+  "nodesTotal": 35
+ }
+}
