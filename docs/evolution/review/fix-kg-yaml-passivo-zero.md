@@ -2,10 +2,10 @@
 title: 'Resíduo adversarial — passivo YAML zerado, a causa real da r16 e a classe de locale virando guarda'
 date: 2026-09-13
 branch: fix/kg-yaml-passivo-zero
-reviewed_diff_sha256: e8e3d7dc87b78d55e36206d2d4167d28c932eeb1145461e413a3b4ecdc828295
-findings_total: 18
-findings_real: 18
-findings_fixed: 17
+reviewed_diff_sha256: 0e5989b42c7e18abd0ff0cd0419ffc232634458db53a5c541c1e9b0f7e32e1eb
+findings_total: 19
+findings_real: 19
+findings_fixed: 18
 tokens: 216265
 duration_min: 19
 verdict: REPROVADO_E_CURADO
@@ -105,6 +105,11 @@ emissor confirmando 0. Não é "flaky": é um veredito que mentia às vezes e ag
   runner de 2 núcleos; a cura é pela forma (duas passadas por here-string), a mesma que a casa mediu com 0 falhas
   em 480 contra essa classe. O mutante com assinatura inexistente reprova (a) e (b). **Declaro o limite:** se
   recorrer, a causa não é o pipe, e a mensagem da falha já traz o que faltar.
+
+- **O teto da `selftest` no CI ficou abaixo do tempo real.** No SHA `da4600e6` a suíte passou inteira no
+  runner (1202/0, com todos os passos `success`), mas terminou aos 25m03s de um teto de 25 min, e o job saiu
+  "cancelado". É a classe que o próprio comentário do workflow registra desde 2026-08-06. O teto foi para 40 min
+  com a medição anotada, e se encostar de novo a resposta é paralelizar no runner.
 
 ## O que fica declarado, não curado
 
