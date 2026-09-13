@@ -4510,8 +4510,43 @@ run_compose_settings_selftests() {
 # previne: script de workflow quebrado (o modo-de-falha medido: `node --check` sozinho MENTE porque o
 # corpo tem `return` de topo — o runtime embrulha em async; a bancada embrulha igual), skill sem
 # auto-ativação, roster de fontes ilegível (a guarda de fontes nasceria verde-vazia).
+# ── predicado de FORMA da ANCORAGEM (modo primaries, F5) — lido do ARQUIVO REAL e reusado contra MUTANTES ──
+# A pergunta é ESTRUTURAL, não textual: existe um ancorador, e ele é uma chamada agent() SEPARADA da do
+# leitor? Se o próprio leitor "confere" a citação que ele mesmo extraiu, a fase não existe — e foi ela que
+# pegou 14 de 76 claims no dogfood (13 exageradas, 1 não encontrada), defeito que a votação 3/2 não pega.
+# Imprime SEMPRE o motivo da reprovação (flaky sem saída capturada é flaky para sempre).
+_research_primaries_anchoring_form() {
+  local f="$1" ler anc
+  grep -qF "if (MODE === 'primaries') {" "${f}" || { echo "sem o bloco do modo primaries"; return 1; }
+  ler="$(awk 'index($0,"label: \047ler:\047") && index($0,"phase: \047Leitura\047") && index($0,"schema: READ_SCHEMA") && /agent\(/ {print NR; exit}' "${f}" || true)"
+  anc="$(awk 'index($0,"label: \047ancorar:\047") && index($0,"phase: \047Ancoragem\047") && index($0,"schema: ANCHOR_SCHEMA") && /agent\(/ {print NR; exit}' "${f}" || true)"
+  [ -n "${ler}" ] || { echo "sem chamada agent() de LEITOR (label ler:, phase Leitura, schema READ_SCHEMA)"; return 1; }
+  [ -n "${anc}" ] || { echo "sem chamada agent() de ANCORADOR (label ancorar:, phase Ancoragem, schema ANCHOR_SCHEMA)"; return 1; }
+  [ "${ler}" != "${anc}" ] || { echo "leitor e ancorador na MESMA chamada agent() (linha ${anc}) — não são agentes separados"; return 1; }
+  grep -qF "verdict: { enum: ['ANCORADA', 'EXAGERADA', 'NAO-ENCONTRADA'] }" "${f}" || { echo "ANCHOR_SCHEMA sem os 3 vereditos"; return 1; }
+  grep -qF 'Abra o documento você mesmo' "${f}" || { echo "prompt do ancorador não manda REABRIR o documento (independência do leitor)"; return 1; }
+  grep -qF 'Default na dúvida: NAO-ENCONTRADA' "${f}" || { echo "prompt do ancorador sem o default NAO-ENCONTRADA"; return 1; }
+  return 0
+}
+
+# ── roda o CORPO do workflow com stubs e IMPRIME o JSON devolvido ──
+# `node --check` sozinho MENTE (o corpo tem `return` de topo; o runtime embrulha em async). Aqui o corpo é
+# embrulhado igual ao runner E o valor de retorno é capturado — é ele que carrega o erro nomeado do fail-loud.
+_research_workflow_run_body() {
+  local wfile="$1" argsjs="$2" d out
+  d="$(mktemp -d)"
+  { printf '%s\n' "const args=${argsjs};const agent=async()=>({});const pipeline=async(items,...st)=>Promise.all(items.map(async(i,ix)=>{let r=i;for(const f of st)r=await f(r,i,ix);return r}));const parallel=async(th)=>Promise.all(th.map(t=>t()));const phase=()=>{};const log=()=>{};" '(async()=>{'
+    awk 'f{print} /^}$/ && !f {f=1}' "${wfile}"
+    printf '%s\n' '})().then(r=>console.log(JSON.stringify(r||{}))).catch(e=>console.log(JSON.stringify({thrown:String(e)})));'
+  } > "${d}/body.mjs"
+  out="$(node "${d}/body.mjs" 2>&1 || true)"
+  rm -rf "${d}"
+  printf '%s\n' "${out}"
+}
+
 run_research_workflow_selftests() {
   local wf="${REPO_ROOT}/.claude/workflows/onion-research.js" sk="${REPO_ROOT}/.claude/skills/onion-research/SKILL.md" rs="${REPO_ROOT}/docs/onion/radar-sources.yaml"
+  local rd="${REPO_ROOT}/.claude/commands/common/prompts/research-doctrine.md"
   for f in "${wf}" "${sk}" "${rs}"; do [ -f "${f}" ] || { record_fail "research-workflow" "ausente: ${f}"; return; }; done
   if ! command -v node >/dev/null 2>&1; then record_skip "research-workflow: node ausente → sintaxe não verificada"; else
     local d; d="$(mktemp -d)"
@@ -4547,6 +4582,70 @@ run_research_workflow_selftests() {
   local n; n=$(grep -cE '^  - id: ' "${rs}")
   [ "${n}" -ge 5 ] && grep -q "vendor-on-competitor" "${rs}" && record_pass "research-workflow: (e) radar-sources.yaml com ${n} eixos e tier vendor-on-competitor declarado" \
     || record_fail "research-workflow: (e)" "roster com ${n} eixos ou sem vendor-on-competitor"
+
+  # ── modo PRIMÁRIAS (F5): as lacunas JÁ TÊM NOME — Leitura → Ancoragem → Elenxo → write(KG) ──
+  # previne: (1) o modo cair em varredura calado quando quem chama esquece as fontes — a varredura custou
+  # 291k tokens/nó (wf_88199ba9-b9a) contra 42k das primárias (wf_1865aba9-e20) na MESMA pergunta;
+  # (2) a ANCORAGEM ser podada por "simplificação" — é ela que reabre o documento e confere a citação.
+  # (j) fail-loud EXECUTADO (não greppado): sem args.sources o modo devolve ERRO NOMEADO.
+  if command -v node >/dev/null 2>&1; then
+    local j1 j2
+    j1="$(_research_workflow_run_body "${wf}" '{mode:"primaries",question:"q",today:"2026-01-01"}')"
+    if grep -qF 'modo primaries SEM args.sources' <<< "${j1}"; then
+      record_pass "research-workflow: (j) mode primaries sem args.sources ⇒ erro NOMEADO (fail-loud; nunca cai em varredura)"
+    else record_fail "research-workflow: (j)" "esperava erro nomeado citando args.sources, veio: ${j1:0:220}"; fi
+    j2="$(_research_workflow_run_body "${wf}" '{mode:"primaries",question:"q",today:"2026-01-01",kgPath:"x.kg.yaml",sources:[{key:"k1",gap:"g",prompt:"leia o documento X"}]}')"
+    if grep -qF 'modo primaries SEM args.sources' <<< "${j2}"; then
+      record_fail "research-workflow: (j2)" "com sources NOMEADAS o modo ainda reclamou de args.sources: ${j2:0:220}"
+    else record_pass "research-workflow: (j2) com args.sources NOMEADAS o modo segue — o erro é da ausência, não do modo"; fi
+  fi
+  # (n) FAIL-CLOSED da ancoragem: veredito ANCORADA sem quote/locator é DECLARAÇÃO, não citação — e o
+  #     REBAIXAMENTO acontece no MOTOR, não no prompt. Medido na 1ª execução real do modo (wf_44d33784-fe6):
+  #     13 de 22 claims saíram ANCORADAS com `quote` vazia e `locator` '—'; o Elenxo cravou que "enquanto o
+  #     gate aceitar campo vazio, contar claims ancoradas não mede nada". Este caso assere sobre o ARQUIVO
+  #     REAL: o rebaixamento existe, cita o veredito novo, e o schema do leitor exige citação com tamanho.
+  local fc_why=""
+  grep -qF "AFIRMADA-SEM-CITACAO" "${wf}" || fc_why="sem o veredito de rebaixamento AFIRMADA-SEM-CITACAO"
+  [ -n "${fc_why}" ] || grep -qE "semCitacao *=.*(quote|locator)" "${wf}" || fc_why="sem predicado que detecte quote/locator vazios"
+  [ -n "${fc_why}" ] || grep -qE "quote: \{ type: 'string', minLength: [0-9]+" "${wf}" || fc_why="o schema do leitor não exige quote com tamanho mínimo"
+  if [ -z "${fc_why}" ]; then
+    record_pass "research-workflow: (n) ancoragem FALHA FECHADA — ANCORADA sem citação é rebaixada no motor, e o schema exige quote com tamanho"
+  else record_fail "research-workflow: (n)" "fail-closed da ancoragem ausente no arquivo real: ${fc_why}"; fi
+  # (n2) MUTANTE do (n): sem o rebaixamento, o caso acima REPROVA — senão ele mede prosa.
+  local nm nwhy
+  nm="$(mktemp -d)"; grep -vF "rec.verdict = 'AFIRMADA-SEM-CITACAO'" "${wf}" > "${nm}/w.js"
+  nwhy=""
+  grep -qF "AFIRMADA-SEM-CITACAO" "${nm}/w.js" && nwhy="o mutante nao removeu o rebaixamento"
+  if [ -z "${nwhy}" ]; then
+    record_pass "research-workflow: (n2) MUTANTE sem o rebaixamento no motor ⇒ o predicado de (n) reprova"
+  else record_fail "research-workflow: (n2)" "${nwhy}"; fi
+  rm -rf "${nm}"
+
+  # (k) a ANCORAGEM existe no ARQUIVO REAL e é um agent() SEPARADO do leitor (forma do script, não cópia dele)
+  local form_why
+  if form_why="$(_research_primaries_anchoring_form "${wf}")"; then
+    record_pass "research-workflow: (k) modo primaries tem fase de ANCORAGEM e ela é um agent() separado do leitor"
+  else record_fail "research-workflow: (k)" "forma da ancoragem reprovou no arquivo real: ${form_why}"; fi
+  # (l) MUTANTE: o predicado de (k) é SENSÍVEL. M1 = a fase some; M2 = a fase vira estrutura sem agente
+  # (o leitor "confere" a si mesmo). Os dois têm de REPROVAR, senão (k) está medindo prosa.
+  local dm why1 why2
+  dm="$(mktemp -d)"
+  grep -vF "phase: 'Ancoragem'" "${wf}" > "${dm}/m1.js" || true
+  sed "s/agent(ANCHOR_PROMPT(s, r), {/__inline_anchor({/" "${wf}" > "${dm}/m2.js"
+  if why1="$(_research_primaries_anchoring_form "${dm}/m1.js")"; then
+    record_fail "research-workflow: (l1)" "MUTANTE que REMOVE a fase de ancoragem PASSOU no predicado (k) — a guarda não mede nada"
+  else record_pass "research-workflow: (l1) mutante que REMOVE a ancoragem reprova em (k): ${why1}"; fi
+  if why2="$(_research_primaries_anchoring_form "${dm}/m2.js")"; then
+    record_fail "research-workflow: (l2)" "MUTANTE com ancoragem SEM agent() próprio PASSOU no predicado (k)"
+  else record_pass "research-workflow: (l2) mutante que tira o agent() da ancoragem reprova em (k): ${why2}"; fi
+  rm -rf "${dm}"
+  # (m) o modo está DOCUMENTADO onde se decide: a skill traz a assinatura e a doutrina traz o gatilho de escolha
+  if grep -qF "mode: 'primaries'" "${sk}" && grep -qF 'sources:' "${sk}" && grep -qF 'wf_1865aba9-e20' "${sk}"; then
+    record_pass "research-workflow: (m1) SKILL.md documenta mode primaries com sources e o custo medido (run id)"
+  else record_fail "research-workflow: (m1)" "SKILL.md sem a assinatura do modo primaries ou sem o run id do custo medido"; fi
+  if [ -f "${rd}" ] && grep -qF "mode: 'primaries'" "${rd}" && grep -qF 'wf_88199ba9-b9a' "${rd}"; then
+    record_pass "research-workflow: (m2) research-doctrine.md traz o gatilho varredura × primárias com os dois custos medidos"
+  else record_fail "research-workflow: (m2)" "doutrina sem o gatilho de escolha varredura × primárias (ou sem os run ids)"; fi
 }
 
 run_research_lens_selftests() {

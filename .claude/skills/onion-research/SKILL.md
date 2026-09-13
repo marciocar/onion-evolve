@@ -57,6 +57,47 @@ A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 c
    tabela de selagem do `/meta:drive` (KIND decision). O retorno traz `decision: {options, objections,
    recommendation}`.
 
+7. **Se as lacunas JÁ TÊM NOME** (rodada complementar, revisita dirigida, ou qualquer pergunta cujo eixo
+   um run anterior já declarou): passe `mode: 'primaries'` e a lista de fontes NOMEADAS. O pipeline vira
+   **Leitura → Ancoragem → Elenxo → write(KG)** — Scope/Search/Fetch/Verify **não rodam**.
+   ```
+   Workflow({ scriptPath: '.claude/workflows/onion-research.js', args: {
+     mode: 'primaries', question: '<a pergunta / o que esta rodada precisa fechar>', today: '<hoje>',
+     corpus: '<bloco do corpus acima, verbatim>',
+     kgPath: '<.kg.yaml — se JÁ EXISTE o write APENDA (Aufhebung); se não, cria>',
+     sources: [ { key: 'lgpd-bases',            // id curto da fonte (vira o label do agente)
+                  gap:  'a lacuna NOMEADA que ela fecha',
+                  prompt: 'o documento e como chegar nele (o quê ler, quais artigos/seções, em que site)' } ] } })
+   ```
+   - **Leitura** (1 leitor por fonte, sonnet/medium): lê o documento INTEIRO por WebFetch/WebSearch. Claim só
+     existe com `quote` **verbatim** (30-400 chars) + `locator`; sem citação, não existe. `reachable=false`
+     quando não chegou — nunca inventa.
+   - **Ancoragem** (1 verificador por fonte, **agente SEPARADO** do leitor, sonnet/high): **reabre o documento**
+     e responde *"a citação existe? o claim estica o texto?"* → `ANCORADA` · `EXAGERADA` (com `corrected`) ·
+     `NAO-ENCONTRADA`. **Default na dúvida: NAO-ENCONTRADA.** Claim rejeitada aqui **nunca vira nó** — entra
+     na contabilidade do `E_LACUNAS_…`.
+   - **Fail-loud**: `mode: 'primaries'` sem `sources` utilizável devolve **erro nomeado** e não escreve nada.
+     O modo **nunca** cai em varredura sozinho — se as lacunas não têm nome, peça varredura explicitamente.
+
+   **Gatilho de escolha (a régua, não o gosto):**
+
+   | Estado da pergunta | Modo | Por quê |
+   |---|---|---|
+   | Campo DESCONHECIDO, as lacunas **não têm nome** | `research` / `decision` (varredura larga) | é preciso DESCOBRIR quais são as fontes |
+   | As lacunas **JÁ TÊM NOME** (rodada complementar, revisita dirigida, eixo declarado por um run anterior) | `primaries` | não se paga descoberta duas vezes; paga-se leitura e ancoragem |
+
+   **Custo medido na MESMA pergunta** (indivíduo × organização, 2026-09-13):
+
+   | Modo | Run | Tokens | Agentes | Nós | Por nó | Veredito |
+   |---|---|---|---|---|---|---|
+   | varredura (`decision`) | `wf_88199ba9-b9a` | 7.282.373 | 105 | 25 | ≈291k | **19 de 25** claims refutadas — a maioria por **fonte fraca**, não por evidência contra |
+   | primárias (`primaries`) | `wf_1865aba9-e20` | 2.680.149 | 28 | 64 | ≈42k | 13/13 fontes alcançadas · **62 ancoradas** · **14 rejeitadas na ancoragem** (13 exageradas, 1 não encontrada) |
+
+   Os dois retornos estão versionados em
+   `docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/data/`. A **ancoragem** é a peça que
+   pegou o defeito que a votação 3/2 da varredura não pegava: lá três juízes discutem a claim; aqui um
+   verificador **reabre o documento**.
+
 ## Fronteiras declaradas
 
 - Só a sessão principal roda o workflow (opt-in por comando); subagente não orquestra.

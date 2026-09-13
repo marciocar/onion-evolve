@@ -5,7 +5,15 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**193 itens abertos** em 44 grafo(s) com aberto (de 66 no escopo) · 44 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**195 itens abertos** em 44 grafo(s) com aberto (de 66 no escopo) · 44 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+
+## compartilhamento-individuo-organizacao-2026-09 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 135.0 | `Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE` | compartilhamento-individuo-organizacao-2026-09 | No contexto de EMPREGO (relacao de poder assimetrica), qual e o criterio operacional que separa o compartilhamento LEGITIMO e indi |
+| 25.0 | `Q_R3_EMENDAS_DE_MECANISMO_AO_DESENHO_DE_C` | compartilhamento-individuo-organizacao-2026-09 | TRES EMENDAS DE MECANISMO PROPOSTAS AO DESENHO DA OPCAO C, com evidencia ancorada nesta rodada — o maestro decide; D_INDIVIDUAL_ |
+| 17.5 | `Q_R2_REVISAO_DO_SELO_C` | compartilhamento-individuo-organizacao-2026-09 | QUATRO EMENDAS PROPOSTAS A C, com evidencia ancorada, mais um LIMITE DURO de jurisdicao BR — o maestro decide, nada aqui foi sel |
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -48,12 +56,6 @@
 | 5.2 | `C_p4_audit_trail` | m3-federation-admin-2026-07 | REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivad |
 | 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
-
-## compartilhamento-individuo-organizacao-2026-09 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 60.0 | `Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE` | compartilhamento-individuo-organizacao-2026-09 | No contexto de EMPREGO (relacao de poder assimetrica), qual e o criterio operacional que separa o compartilhamento LEGITIMO e indi |
 
 ## ocr-local-sei-2026-09 — 11 item(ns)
 

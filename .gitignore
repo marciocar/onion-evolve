@@ -58,3 +58,8 @@ __pycache__/
 # fixture exigiria redesenhar o caso (ele PRECISA do dir vivo).
 .claude/**/__*__.*
 plugins/__*__/
+
+# Scratchpad da SESSÃO — parking-lot de nota e material baixado para leitura (PDFs de fonte primária,
+# rascunho de script). É transitório por definição: o que vale vira nó no grafo, caso de bancada ou
+# documento. Em 2026-09-13 um run de pesquisa baixou 748 KB de PDF de terceiro aqui.
+.claude/scratchpad/

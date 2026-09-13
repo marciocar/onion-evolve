@@ -1,0 +1,1198 @@
+{
+ "today": "2026-09-13",
+ "sources": 13,
+ "unreachable": [],
+ "anchoredCount": 62,
+ "rejectedCount": 14,
+ "anchored": [
+  {
+   "source": "lgpd-bases",
+   "gap": "eixo BR: base legal do fluxo sob subordinação",
+   "claim": "Claim 4: o legítimo interesse exige medida ATIVA de transparência, não apenas ausência de objeção do titular.",
+   "verdict": "ANCORADA",
+   "why": "Art. 10 §2º, confirmado em duas fontes independentes: 'O controlador deverá adotar medidas para garantir a transparência do tratamento de dados baseado em seu legítimo interesse.' A quote é substring exata do texto oficial. O dever de 'adotar medidas' é textualmente uma obrigação ativa, e o claim não estica esse ponto — a contraposição a 'mera ausência de objeção' é leitura razoável do dever afirmativo, sem inventar conteúdo.",
+   "corrected": ""
+  },
+  {
+   "source": "anpd-legitimo-interesse",
+   "gap": "eixo BR: como a autoridade lê o legítimo interesse",
+   "claim": "O guia estrutura o legítimo interesse em teste de balanceamento com três fases: finalidade, necessidade e balanceamento/salvaguardas.",
+   "verdict": "ANCORADA",
+   "why": "Confirmado na p.31: 'O modelo de teste recomendado pela ANPD possui três fases, que se baseiam na LGPD e nas definições e nos parâmetros de interpretação expostos neste Texto. As fases do teste, descritas com mais detalhes no Anexo II, são as seguintes:' seguido por 'FASE 1. FINALIDADE' (p.31), 'FASE 2. NECESSIDADE' (p.32) e 'FASE 3. BALANCEAMENTO E SALVAGUARDAS' (p.32). A citação fornecida no claim omite silenciosamente o trecho 'e nas definições e' (entre 'na LGPD' e 'nos parâmetros') sem marcar com [...] — é uma imprecisão pequena de transcrição, mas o conteúdo e a estrutura de três fases estão corretos e o locator (p.31-32) bate.",
+   "corrected": "'O modelo de teste recomendado pela ANPD possui três fases, que se baseiam na LGPD e nas definições e nos parâmetros de interpretação expostos neste Texto. As fases do teste, descritas com mais detalhes no Anexo II, são as seguintes: FASE 1. FINALIDADE [...] FASE 2. NECESSIDADE [...] FASE 3. BALANCEAMENTO E SALVAGUARDAS'",
+   "quote": "O modelo de teste recomendado pela anpd possui três fases, que se baseiam na lgpd e nos parâmetros de interpretação expostos neste Texto. As fases do teste [...] são as seguintes: fase 1. finalidade [...] fase 2. necessidade [...] fase 3. balanceamento e salvaguardas",
+   "locator": "Seção 'Teste de balanceamento', p. 31-32"
+  },
+  {
+   "source": "anpd-legitimo-interesse",
+   "gap": "eixo BR: como a autoridade lê o legítimo interesse",
+   "claim": "A fase de necessidade exige que só os dados estritamente necessários à finalidade pretendida sejam tratados, privilegiando formas menos intrusivas.",
+   "verdict": "ANCORADA",
+   "why": "Quote verbatim na p.32, dentro de 'FASE 2. NECESSIDADE', citando o art. 10 §1º da LGPD: 'quando o tratamento for baseado no legítimo interesse do controlador, somente os dados pessoais estritamente necessários para a finalidade pretendida poderão ser tratados'. A mesma seção continua: 'É importante privilegiar formas menos intrusivas para atingir a finalidade, além de analisar se é possível alcançá-la de uma forma menos onerosa e com menores riscos ao titular.' — sustenta integralmente o claim, sem exagero.",
+   "corrected": "",
+   "quote": "quando o tratamento for baseado no legítimo interesse do controlador, somente os dados pessoais estritamente necessários para a finalidade pretendida poderão ser tratados",
+   "locator": "Fase 2 (Necessidade), p. 32"
+  },
+  {
+   "source": "anpd-legitimo-interesse",
+   "gap": "eixo BR: como a autoridade lê o legítimo interesse",
+   "claim": "A fase de balanceamento avalia o risco/impacto sobre o titular frente ao interesse do controlador/terceiro, adotando salvaguardas; o padrão exigido não é impacto zero, mas mitigação.",
+   "verdict": "ANCORADA",
+   "why": "Quote verbatim na p.33 (continuação da FASE 3, iniciada na p.32): 'Cabe destacar que a existência de um possível risco ou impacto negativo sobre os titulares dos dados não afasta, por si só, a possibilidade de tratamento dos dados pessoais com base no legítimo interesse. O que a LGPD exige não é o impacto zero, mas, sim, que eventuais impactos sejam minimizados e levados em consideração na adoção de salvaguardas [...]'. Claim reflete exatamente o texto.",
+   "corrected": "",
+   "quote": "o que a lgpd exige não é o impacto zero, mas, sim, que eventuais impactos sejam minimizados e levados em consideração na adoção de salvaguardas",
+   "locator": "Fase 3 (Balanceamento e salvaguardas), p. 33"
+  },
+  {
+   "source": "anpd-legitimo-interesse",
+   "gap": "eixo BR: como a autoridade lê o legítimo interesse",
+   "claim": "A legítima expectativa do titular deve ser avaliada com base em fatores objetivos: relação prévia, fonte/forma da coleta, contexto/período, e finalidade pretendida — não depende do que um titular específico esperaria.",
+   "verdict": "ANCORADA",
+   "why": "P.23: 'A análise não precisa considerar um titular específico, mas o que poderá ser admitido ou considerado aceitável na situação concreta do tratamento.' seguido pela lista literal (a)-(d): 'a existência de uma relação prévia do controlador com o titular; a fonte e a forma da coleta dos dados, isto é, se a coleta foi realizada diretamente pelo controlador, se os dados foram compartilhados por terceiros ou coletados de fontes públicas; o contexto e o período de coleta dos dados; e a finalidade pretendida da coleta dos dados e a sua compatibilidade com o tratamento baseado no legítimo interesse'. Quote e claim batem exatamente, incluindo o ponto 'não depende do titular específico'.",
+   "corrected": "",
+   "quote": "a existência de uma relação prévia do controlador com o titular; a fonte e a forma da coleta dos dados [...]; o contexto e o período de coleta dos dados; e a finalidade pretendida da coleta dos dados e a sua compatibilidade com o tratamento baseado no legítimo interesse",
+   "locator": "Seção 'Legítima expectativa do titular', p. 23"
+  },
+  {
+   "source": "anpd-legitimo-interesse",
+   "gap": "eixo BR: como a autoridade lê o legítimo interesse",
+   "claim": "Exemplo oficial do guia trata diretamente de monitoramento de empregados: software de rastreamento de atividades/webcam foi considerado incompatível com o legítimo interesse por excesso e por vulnerabilidade do empregado.",
+   "verdict": "ANCORADA",
+   "why": "'EXEMPLO 7 — Instalação de software para rastrear atividades e medir a produtividade de funcionários' (p.24) descreve exatamente webcam + registro de tudo o que é digitado. A Análise (p.24-25) traz o trecho citado verbatim: 'no contexto da relação de emprego, os empregados estão em posição de maior vulnerabilidade em face de seu empregador, não possuindo meios efetivos de oposição ao tratamento. Por tais razões, o tratamento não poderia ser realizado e não seria admissível o recurso à hipótese legal do legítimo interesse'. Claim e quote conferem plenamente.",
+   "corrected": "",
+   "quote": "no contexto da relação de emprego, os empregados estão em posição de maior vulnerabilidade em face de seu empregador, não possuindo meios efetivos de oposição ao tratamento. Por tais razões, o tratamento não poderia ser realizado e não seria admissível o recurso à hipótese legal do legítimo interesse",
+   "locator": "Exemplo 7 'Instalação de software para rastrear atividades e medir a produtividade de funcionários' — Análise, p. 24-25"
+  },
+  {
+   "source": "anpd-legitimo-interesse",
+   "gap": "eixo BR: como a autoridade lê o legítimo interesse",
+   "claim": "No mesmo exemplo, a ANPD registra que a coleta ia além do necessário e que a vulnerabilidade do empregado retira eficácia da 'legítima expectativa' mesmo que previamente informada em política de privacidade.",
+   "verdict": "ANCORADA",
+   "why": "P.24-25, mesma Análise do Exemplo 7: '...contraria a sua legítima expectativa, mesmo que esta atividade possa ter sido previamente informada e constar da política de privacidade. Deve-se considerar, especialmente, que a coleta vai muito além do necessário para o atendimento das finalidades pretendidas, de modo que não seria razoável esperar que tamanha coleta de dados fosse realizada pelo empregador.' O [...] no quote fornecido substitui corretamente o trecho intermediário ('Deve-se considerar... finalidades pretendidas, de modo que'), preservando o sentido. Claim corresponde ao texto.",
+   "corrected": "",
+   "quote": "mesmo que esta atividade possa ter sido previamente informada e constar da política de privacidade [...] não seria razoável esperar que tamanha coleta de dados fosse realizada pelo empregador",
+   "locator": "Exemplo 7, Análise, p. 24-25 (texto contínuo entre páginas)"
+  },
+  {
+   "source": "tst-monitoramento",
+   "gap": "eixo BR: jurisprudência trabalhista sobre monitoramento",
+   "claim": "Critério de propriedade da ferramenta: o e-mail corporativo é qualificado juridicamente como ferramenta de trabalho da empresa, não meio de comunicação pessoal do empregado.",
+   "verdict": "ANCORADA",
+   "why": "A quote aparece verbatim na notícia do TST (confirmada em 2 fetches independentes, inclusive pedindo reprodução literal). O claim conecta essa frase a uma segunda ideia (não é canal pessoal) que está no MESMO texto, só em frases vizinhas — é uma síntese correta do critério de propriedade, não um estiramento.",
+   "corrected": "\"Esse meio eletrônico fornecido pela empresa, afirmou, tem natureza jurídica equivalente a uma ferramenta de trabalho.\" A cláusula \"não meio de comunicação pessoal do empregado\" não está nesta frase exata, mas é sustentada por outras frases do mesmo acórdão (\"destina-se ao uso estritamente profissional\"; a privacidade constitucional \"dizem respeito apenas à comunicação estritamente pessoal\") — é síntese fiel, não distorção.",
+   "quote": "esse meio eletrônico fornecido pela empresa, afirmou, tem natureza jurídica equivalente a uma ferramenta de trabalho",
+   "locator": "RR-613/2000-013-10-00.7, 1ª Turma do TST — notícia tst.jus.br \"TST admite que empresa investigue e-mail de trabalho do empregado\""
+  },
+  {
+   "source": "tst-monitoramento",
+   "gap": "eixo BR: jurisprudência trabalhista sobre monitoramento",
+   "claim": "Critério de finalidade: o uso do e-mail corporativo é vinculado estritamente ao fim profissional, salvo consentimento em contrário do empregador.",
+   "verdict": "ANCORADA",
+   "why": "A quote com reticências salta um trecho ('...tem natureza jurídica equivalente a uma ferramenta de trabalho. Dessa forma,...'), mas a reticência é honesta: não inverte nem esconde a condição — o claim já registra explicitamente 'salvo consentimento em contrário do empregador', que é justamente o trecho pulado pela reticência. Sem distorção de sentido.",
+   "corrected": "Frase completa e contígua no original: \"Esse meio eletrônico fornecido pela empresa, afirmou, tem natureza jurídica equivalente a uma ferramenta de trabalho. Dessa forma, a não ser que o empregador consinta que haja outra utilização, destina-se ao uso estritamente profissional.\" A reticência do leitor une o início da 1ª frase ao fim da 2ª, mas preserva o sentido (o \"salvo consentimento\" do claim corresponde exatamente à cláusula condicional real).",
+   "quote": "Esse meio eletrônico fornecido pela empresa...destina-se ao uso estritamente profissional",
+   "locator": "RR-613/2000-013-10-00.7, 1ª Turma do TST — notícia tst.jus.br \"TST admite que empresa investigue e-mail de trabalho do empregado\""
+  },
+  {
+   "source": "tst-monitoramento",
+   "gap": "eixo BR: jurisprudência trabalhista sobre monitoramento",
+   "claim": "O controle do empregador sobre as mensagens deve ser moderado, generalizado e impessoal — não dirigido, contínuo e individualizado a um único empregado sem razão.",
+   "verdict": "ANCORADA",
+   "why": "Quote encontrada verbatim. O claim parafraseia o mesmo critério pelo lado oposto (o que NÃO é permitido) — 'não dirigido, contínuo e individualizado a um único empregado sem razão' é a negação lógica direta de 'moderado, generalizado e impessoal', não uma informação nova inventada.",
+   "corrected": "\"O empregador pode exercer, de forma moderada, generalizada e impessoal, o controle sobre as mensagens enviadas e recebidas pela caixa de e-mail por ele fornecida.\"",
+   "quote": "O empregador pode exercer, de forma moderada, generalizada e impessoal, o controle",
+   "locator": "RR-613/2000-013-10-00.7, 1ª Turma do TST — notícia tst.jus.br \"TST admite que empresa investigue e-mail de trabalho do empregado\""
+  },
+  {
+   "source": "tst-monitoramento",
+   "gap": "eixo BR: jurisprudência trabalhista sobre monitoramento",
+   "claim": "Câmeras de monitoramento em locais coletivos de trabalho são lícitas como medida de controle e fiscalização da prestação de serviços, desde que não ofendam direitos de personalidade do trabalhador — mas a instalação em vestiários/banheiros é ilícita pela exposição do corpo do empregado.",
+   "verdict": "ANCORADA",
+   "why": "As duas metades do claim são sustentadas por duas quotes verbatim confirmadas na mesma notícia (RR-21162-51.2015.5.04.0014): a regra geral de licitude do controle em locais coletivos, e a exceção de ilicitude em vestiários/banheiros pela exposição corporal. Sem estiramento.",
+   "corrected": "\"a legislação autoriza a adoção, pelos empregadores, de medidas de controle e fiscalização da prestação de serviços, desde que não ofendam direitos de personalidade do trabalhador\" + \"instalação de câmeras em vestiários e banheiros, pela possível exposição de partes do corpo dos empregados\" (reconhecida como ofensa à dignidade em outros casos julgados pelo TST).",
+   "quote": "a legislação autoriza a adoção, pelos empregadores, de medidas de controle e fiscalização da prestação de serviços, desde que não ofendam direitos de personalidade do trabalhador",
+   "locator": "RR-21162-51.2015.5.04.0014, 1ª Turma do TST — notícia tst.jus.br \"Fiscalização de empregados por meio de câmeras em locais coletivos é considerada lícita\""
+  },
+  {
+   "source": "tst-monitoramento",
+   "gap": "eixo BR: jurisprudência trabalhista sobre monitoramento",
+   "claim": "O núcleo essencial do direito à intimidade só é preservado quando a exposição às câmeras serve ao melhor controle da atividade laboral sem atingi-lo — ou seja, a proporcionalidade é medida pelo equilíbrio entre finalidade de controle e o núcleo protegido de intimidade.",
+   "verdict": "ANCORADA",
+   "why": "Quote encontrada verbatim e confirmada em fetch dedicado. O claim acrescenta a palavra 'proporcionalidade' como nome do critério, que não está nesta frase citada — é rótulo do leitor, não do acórdão — mas a descrição do mecanismo (equilíbrio entre controle e núcleo de intimidade) corresponde exatamente ao que a frase diz, sem inflar o alcance da decisão.",
+   "corrected": "\"em circunstâncias como as verificadas no caso, a exposição dos trabalhadores às câmeras permite ao empregador o melhor controle da atividade laboral, sem afetar o núcleo essencial do direito de intimidade dos trabalhadores.\" O termo 'proporcionalidade' é rótulo interpretativo do leitor, não palavra literal do acórdão nesta passagem — mas descreve fielmente a estrutura de equilíbrio que a frase expressa.",
+   "quote": "a exposição dos trabalhadores às câmeras permite ao empregador o melhor controle da atividade laboral, sem afetar o núcleo essencial do direito de intimidade dos trabalhadores",
+   "locator": "RR-21162-51.2015.5.04.0014, 1ª Turma do TST — notícia tst.jus.br \"Fiscalização de empregados por meio de câmeras em locais coletivos é considerada lícita\""
+  },
+  {
+   "source": "edpb-consentimento",
+   "gap": "primária do consentimento sob subordinação (a rodada 1 usou tier 6)",
+   "claim": "1. O EDPB NÃO diz que o consentimento do empregado é 'rejeitado' em bloco — diz que é IMPROVÁVEL (unlikely) que seja livre, e por isso PROBLEMÁTICO como base legal na maioria dos casos.",
+   "verdict": "ANCORADA",
+   "why": "Texto real do §21, p.9: 'it is unlikely that the data subject is able to deny his/her employer consent to data processing without experiencing the fear or real risk of detrimental effects as a result of a refusal. It is unlikely that an employee would be able to respond freely to a request for consent from his/her employer to, for example, activate monitoring systems such as camera observation in a workplace, or to fill out assessment forms, without feeling any pressure to consent. Therefore, the EDPB deems it problematic for employers to process personal data of current or future employees on the basis of consent as it is unlikely to be freely given.' A citação usa reticências para elidir o trecho do meio (exemplos de câmeras/formulários) sem alterar o sentido — a substância bate exatamente. O claim descreve com precisão o vocabulário do primário: 'unlikely' + 'problematic', nunca 'rejected'.",
+   "corrected": ""
+  },
+  {
+   "source": "edpb-consentimento",
+   "gap": "primária do consentimento sob subordinação (a rodada 1 usou tier 6)",
+   "claim": "2. Para a maioria do processamento de dados no trabalho, a base legal NÃO pode e NÃO deve ser o consentimento do empregado — formulação normativa forte, mas restrita a 'a maioria'.",
+   "verdict": "ANCORADA",
+   "why": "Frase final do §21, p.9, citada palavra por palavra: 'For the majority of such data processing at work, the lawful basis cannot and should not be the consent of the employees (Article 6(1)(a)) due to the nature of the relationship between employer and employee.' O claim reproduz exatamente o escopo ('a maioria', não 'todos os casos') que o texto declara.",
+   "corrected": ""
+  },
+  {
+   "source": "edpb-consentimento",
+   "gap": "primária do consentimento sob subordinação (a rodada 1 usou tier 6)",
+   "claim": "3. A exceção primária explícita: consentimento do empregado pode ser válido em circunstâncias EXCEPCIONAIS, quando não houver NENHUMA consequência adversa, seja qual for a escolha do empregado.",
+   "verdict": "ANCORADA",
+   "why": "§22, p.9, citado literalmente: 'Given the imbalance of power between an employer and its staff members, employees can only give free consent in exceptional circumstances, when it will have no adverse consequences at all whether or not they give consent.' Match exato, sem edição.",
+   "corrected": ""
+  },
+  {
+   "source": "edpb-consentimento",
+   "gap": "primária do consentimento sob subordinação (a rodada 1 usou tier 6)",
+   "claim": "4. Exemplo prático (filmagem de escritório): quem não consente é realocado sem penalidade — ilustra a barra alta, não a impossibilidade total.",
+   "verdict": "ANCORADA",
+   "why": "Exemplo 5, item numerado 23 no PDF, p.9: 'A film crew is going to be filming in a certain part of an office. The employer asks all the employees who sit in that area for their consent to be filmed, as they may appear in the background of the video. Those who do not want to be filmed are not penalised in any way but instead are given equivalent desks elsewhere in the building for the duration of the filming.' A citação elide apenas 'as they may appear in the background of the video' com reticências, sem distorcer. Locator (parágrafo 23, Exemplo 5, p.9) bate exatamente com a numeração do documento.",
+   "corrected": ""
+  },
+  {
+   "source": "edpb-consentimento",
+   "gap": "primária do consentimento sob subordinação (a rodada 1 usou tier 6)",
+   "claim": "6. O documento generaliza: desequilíbrio de poder não se limita a autoridades públicas e empregadores — o teste de fundo é liberdade real de escolha, sem decepção, intimidação, coerção ou consequências negativas significativas.",
+   "verdict": "ANCORADA",
+   "why": "§24, p.9, citado quase literalmente: 'Imbalances of power are not limited to public authorities and employers, they may also occur in other situations. As highlighted by the WP29 in several Opinions, consent can only be valid if the data subject is able to exercise a real choice, and there is no risk of deception, intimidation, coercion or significant negative consequences (e.g. substantial extra costs) if he/she does not consent.' A citação termina em 'significant negative consequences' sem marcar a elisão do parêntese '(e.g. substantial extra costs) if he/she does not consent', mas não distorce o sentido — o claim resume corretamente o teste de fundo.",
+   "corrected": ""
+  },
+  {
+   "source": "barbulescu",
+   "gap": "o critério operacional candidato, descartado por comodismo na rodada 1",
+   "claim": "Bărbulescu §121 lists six factors (i-vi: prior notification given in advance/clear about nature; extent/degree of intrusion covering flow vs. content, scope, duration, number of people with access; legitimate reasons with weightier justification for content; less intrusive alternatives; consequences for the employee and use of results; adequate safeguards including no content access without prior notice).",
+   "verdict": "ANCORADA",
+   "why": "The quoted opening sentence and factor (i) appear verbatim in §121 of the judgment. Checked against the full text, all six enumerated factors (i)-(vi) are accurately paraphrased: (i) notification 'clear about the nature of the monitoring and given in advance'; (ii) 'distinction ... between monitoring of the flow of communications and of their content ... limited in time and the number of people who had access ... spatial limits'; (iii) legitimate reasons + 'content ... requires weightier justification'; (iv) less intrusive methods; (v) consequences for the employee + use of results; (vi) adequate safeguards, specifically that 'the employer cannot access the actual content of the communications concerned unless the employee has been notified in advance.' No stretching found.",
+   "corrected": ""
+  },
+  {
+   "source": "barbulescu",
+   "gap": "o critério operacional candidato, descartado por comodismo na rodada 1",
+   "claim": "López Ribalda II explicitly extends the Bărbulescu criteria (and Köpke) mutatis mutandis to video-surveillance, restating essentially the same six factors adapted to CCTV (level of privacy in the area, limitations in time/space, number of people with access to results).",
+   "verdict": "ANCORADA",
+   "why": "The quote matches §116 verbatim exactly as given. The judgment then lists six factors (i)-(vi) adapting Bărbulescu's list to video-surveillance, and factor (ii) reads: 'the level of privacy in the area being monitored should be taken into account, together with any limitations in time and space and the number of people who have access to the results' — matching the claim's parenthetical precisely.",
+   "corrected": ""
+  },
+  {
+   "source": "barbulescu",
+   "gap": "o critério operacional candidato, descartado por comodismo na rodada 1",
+   "claim": "López Ribalda II qualifies notification as just one criterion among others (not an independent veto); if information is lacking, safeguards from the other criteria matter more; the Court found no violation despite acknowledged absence of prior information.",
+   "verdict": "ANCORADA",
+   "why": "Quote matches §131 verbatim. The judgment's own subsequent reasoning (§§132-135, and the eventual disposition) confirms no violation was found notwithstanding the acknowledged failure to give prior information (§133: employer's 'failure ... to provide them with the prior information' was noted but not decisive; §134-135 conclude proportionality was satisfied).",
+   "corrected": ""
+  },
+  {
+   "source": "barbulescu",
+   "gap": "o critério operacional candidato, descartado por comodismo na rodada 1",
+   "claim": "López Ribalda II adds a gloss absent from Bărbulescu: mere suspicion does not justify covert surveillance, but reasonable suspicion of serious misconduct plus extent of losses can be weighty justification, especially with concerted action by multiple employees threatening smooth functioning.",
+   "verdict": "ANCORADA",
+   "why": "Quote matches §134 verbatim exactly, including the immediately following sentence about 'concerted action by several employees' creating 'a general atmosphere of mistrust in the workplace' — this reasoning about suspicion-based justification for covert video-surveillance has no counterpart in Bărbulescu (which concerns correspondence monitoring, not suspicion-triggered covert surveillance).",
+   "corrected": ""
+  },
+  {
+   "source": "cjeu-c65-23",
+   "gap": "a primária do achado que a rodada 1 extrapolou",
+   "claim": "O caso trata de TRANSFERÊNCIA de dados de RH (envio de dados de empregados da matriz alemã para servidor da controladora nos EUA via SAP/Workday), NÃO de monitoramento no local de trabalho.",
+   "verdict": "ANCORADA",
+   "why": "Confirmado no §15 do acórdão (verificado via EUR-Lex, texto integral): a ré transferiu dados pessoais de empregados do software SAP para um servidor da controladora do grupo D nos EUA. A citação bate literalmente. O §17 confirma que a disputa é sobre dados transferidos além do que o acordo autorizava (contato pessoal, dados contratuais/remuneração, número de seguro social, ID fiscal). Não há qualquer elemento de monitoramento no local de trabalho — é caso de transferência internacional de dados de RH, exatamente como afirma o claim.",
+   "corrected": "",
+   "quote": "The defendant in the main proceedings transferred various personal data of its employees from the SAP software to a server of the D group's parent company in the United States.",
+   "locator": "§15 (fatos do processo principal), conforme extraído de EUR-Lex CELEX 62023CJ0065"
+  },
+  {
+   "source": "cjeu-c65-23",
+   "gap": "a primária do achado que a rodada 1 extrapolou",
+   "claim": "Ruling 1: acordo/norma nacional sob art. 88(1) deve obrigar cumprimento não só do art. 88(2) mas também dos arts. 5, 6(1) e 9(1)/(2) — o acordo coletivo não substitui nem afrouxa os requisitos gerais do GDPR.",
+   "verdict": "ANCORADA",
+   "why": "A quote bate palavra por palavra com o dispositivo (Ruling 1) conforme extraído do texto integral no EUR-Lex: 'must be interpreted as meaning that a provision of national law...must have the effect of requiring its addressees to comply not only with the requirements arising from Article 88(2)...but also with those arising from Article 5, Article 6(1) and Article 9(1) and (2) thereof.' A leitura do claim (não substitui/não afrouxa os requisitos gerais) é conclusão correta e proporcional ao texto.",
+   "corrected": ""
+  },
+  {
+   "source": "cjeu-c65-23",
+   "gap": "a primária do achado que a rodada 1 extrapolou",
+   "claim": "Ruling 2: quando um acordo coletivo (incl. Betriebsvereinbarung) se enquadra no art. 88(1), a margem de discricionariedade das partes sobre 'necessidade' não impede controle judicial PLENO sobre essa necessidade.",
+   "verdict": "ANCORADA",
+   "why": "Quote confirmada literalmente no dispositivo (Ruling 2) via EUR-Lex: '...the margin of discretion that the parties to that agreement have to determine whether the processing...is \"necessary\"...does not prevent the national court from carrying out a full judicial review in that regard.' Bate exatamente com o claim.",
+   "corrected": ""
+  },
+  {
+   "source": "cjeu-c65-23",
+   "gap": "a primária do achado que a rodada 1 extrapolou",
+   "claim": "O cabeçalho/ementa oficial do caso já rotula o tema como 'Scope of judicial review' e 'Margin of discretion...', confirmando que Betriebsvereinbarung é tratado como espécie de 'collective agreement' sob o art. 88(1).",
+   "verdict": "ANCORADA",
+   "why": "A quote do cabeçalho de descritores bate palavra por palavra com o texto extraído do EUR-Lex ('...Processing on the basis of a collective agreement – Margin of discretion...– Scope of judicial review'). A inferência de que Betriebsvereinbarung é tratada como espécie de 'collective agreement' também é textualmente sustentada: o §36 do acórdão cita o Recital 155 do GDPR dizendo que o conceito de 'collective agreement' no art. 88 inclui 'works agreements, such as that at issue in the main proceedings', e a própria corte de reenvio (§22) trata o acordo (Betriebsvereinbarung/works agreement) como 'collective agreement' na acepção do art. 88.",
+   "corrected": ""
+  },
+  {
+   "source": "cjeu-c65-23",
+   "gap": "a primária do achado que a rodada 1 extrapolou",
+   "claim": "O tribunal rejeita que o art. 88 permita às partes de um acordo coletivo margem que 'afrouxe ou desconsidere' a exigência de necessidade — necessidade é padrão obrigatório, não negociável.",
+   "verdict": "ANCORADA",
+   "why": "Quote confirmada palavra por palavra no §56 do acórdão (texto integral obtido via EUR-Lex, não apenas sumário/OJ como o próprio claim hedgeava com cautela): 'Article 88 of that regulation cannot be interpreted as meaning that the parties to a collective agreement have a margin of discretion which would allow them to introduce \"more specific rules\" resulting in that requirement of necessity being applied less strictly or even disregarded.' O locator do claim (§56) está correto, e a ressalva de não-confirmação byte-a-byte feita pelo próprio leitor foi superada pela verificação direta agora feita no corpo integral do julgamento.",
+   "corrected": ""
+  },
+  {
+   "source": "cjeu-c34-21",
+   "gap": "fragmentação nacional do art. 88 (objeção reaberta pelo Elenxo)",
+   "claim": "Uma regra nacional só é 'regra mais específica' do art. 88(1) se satisfizer as condições do art. 88(2) — é o próprio dispositivo da sentença, não obiter.",
+   "verdict": "ANCORADA",
+   "why": "A citação bate literalmente com o ponto 1 do dispositivo (operative part): 'Article 88 of Regulation (EU) 2016/679 ... must be interpreted as meaning that national legislation cannot constitute a \"more specific rule\", within the meaning of paragraph 1 of that article, where it does not satisfy the conditions laid down in paragraph 2 of that article.' É de fato o dispositivo, não obiter. A mesma formulação reaparece verbatim no §75 (confirmado); §74 traz a versão conceitual equivalente (não idêntica, mas consistente com 'reiterado'). A única parte não verificável foi o número de página exato (p. 20), que é detalhe de paginação de PDF, não de conteúdo.",
+   "corrected": "",
+   "quote": "Article 88 of Regulation (EU) 2016/679 ... must be interpreted as meaning that national legislation cannot constitute a 'more specific rule', within the meaning of paragraph 1 of that article, where it does not satisfy the conditions laid down in paragraph 2 of that article.",
+   "locator": "operative part, point 1 (p. 20); reiterado no §74-75"
+  },
+  {
+   "source": "cjeu-c34-21",
+   "gap": "fragmentação nacional do art. 88 (objeção reaberta pelo Elenxo)",
+   "claim": "O conteúdo exigido da regra mais específica: conteúdo normativo próprio da área regulada, distinto das regras gerais do regulamento — este é o critério textual que ancora tudo o resto.",
+   "verdict": "ANCORADA",
+   "why": "Citação confirmada verbatim no §61: 'the rules referred to in that provision must have a normative content specific to the area regulated, which is distinct from the general rules of that regulation.' Confirmado também que o §74 retoma a mesma fórmula ('Apart from having a normative content specific to the area regulated, which is distinct from the general rules of that regulation...'), como o claim indica.",
+   "corrected": "",
+   "quote": "the rules referred to in that provision must have a normative content specific to the area regulated, which is distinct from the general rules of that regulation",
+   "locator": "§61 (retomado no §74)"
+  },
+  {
+   "source": "cjeu-c34-21",
+   "gap": "fragmentação nacional do art. 88 (objeção reaberta pelo Elenxo)",
+   "claim": "Regra que apenas repete/reitera as condições de licitude (art. 6) e os princípios de tratamento (art. 5) do RGPD, ou que apenas remete a eles, NÃO PODE ser regra mais específica.",
+   "verdict": "ANCORADA",
+   "why": "Citação bate literalmente com o §71: 'the \"more specific rules\", adopted on the basis of Article 88(1) of that regulation, cannot be limited to a reiteration of the conditions for the lawfulness of personal data processing and the principles of that processing, set out, respectively, in Article 6 and Article 5 of that regulation, or to a reference to those conditions and principles.' O §65 traz de fato uma formulação-irmã, mais genérica ('those rules cannot be limited to reiterating the provisions of that regulation...'), sem nomear os artigos 5/6 especificamente — descrita corretamente pelo leitor como 'formulação irmã', não como quote idêntica.",
+   "corrected": "",
+   "quote": "the 'more specific rules', adopted on the basis of Article 88(1) of that regulation, cannot be limited to a reiteration of the conditions for the lawfulness of personal data processing and the principles of that processing, set out, respectively, in Article 6 and Article 5 of that regulation, or to a reference to those conditions and principles",
+   "locator": "§71 (regra geral) e §65 (formulação irmã)"
+  },
+  {
+   "source": "cjeu-c34-21",
+   "gap": "fragmentação nacional do art. 88 (objeção reaberta pelo Elenxo)",
+   "claim": "Aplicação concreta ao caso: dispositivos que condicionam o tratamento a 'necessidade' para fins ligados ao emprego apenas reiteram a condição de licitude já prevista no art. 6(1)(b) RGPD, sem acrescentar regra mais específica no sentido do art. 88(1); não parecem ter conteúdo normativo próprio.",
+   "verdict": "ANCORADA",
+   "why": "Texto integral do §81 confirmado verbatim, incluindo as duas frases citadas: '...appear to reiterate the condition for general lawfulness of processing already set out in point (b) of the first subparagraph of Article 6(1) of the GDPR, without adding a more specific rule within the meaning of Article 88(1) of that regulation. Indeed, such provisions do not appear to have a normative content specific to the area regulated, which is distinct from the general rules of that regulation.' O claim reflete exatamente o que o parágrafo diz, sem esticar (nota: o tribunal usa 'appear to' — juízo qualificado ao tribunal de reenvio — o claim preserva isso com 'apenas reiteram... não parecem ter').",
+   "corrected": "",
+   "quote": "provisions such as Paragraph 23(1) of the HDSIG and Paragraph 86(4) of the HBG ... appear to reiterate the condition for general lawfulness of processing already set out in point (b) of the first subparagraph of Article 6(1) of the GDPR, without adding a more specific rule within the meaning of Article 88(1) of that regulation. Indeed, such provisions do not appear to have a normative content specific to the area regulated, which is distinct from the general rules of that regulation.",
+   "locator": "§81"
+  },
+  {
+   "source": "cjeu-c34-21",
+   "gap": "fragmentação nacional do art. 88 (objeção reaberta pelo Elenxo)",
+   "claim": "Consequência jurídica: se a regra nacional não passa no art. 88(1)/(2), deve em princípio ser afastada por primazia do direito da UE, exceto se ela mesma servir de base legal válida sob o art. 6(3) RGPD (em conjugação com o considerando 45).",
+   "verdict": "ANCORADA",
+   "why": "Citação confirmada verbatim, idêntica no §89 e no ponto 2 do dispositivo: 'the application of national provisions adopted ... must be disregarded where those provisions do not comply with the conditions and limits laid down in Article 88(1) and (2), unless those provisions constitute a legal basis referred to in Article 6(3) of that regulation, which complies with the requirements laid down by that regulation.' A menção ao considerando 45 não foi verificada diretamente nos parágrafos lidos, mas é consistente com a base doutrinária do art. 6(3) GDPR e não está sendo citada como quote — é contexto do leitor, não uma citação a checar.",
+   "corrected": "",
+   "quote": "the application of national provisions adopted to ensure the protection of employees' rights and freedoms in respect of the processing of their personal data in the employment context must be disregarded where those provisions do not comply with the conditions and limits laid down in Article 88(1) and (2), unless those provisions constitute a legal basis referred to in Article 6(3) of that regulation, which complies with the requirements laid down by that regulation",
+   "locator": "operative part, point 2 (p. 20); idêntico no §89, mecanismo nos §82-88"
+  },
+  {
+   "source": "cjeu-c34-21",
+   "gap": "fragmentação nacional do art. 88 (objeção reaberta pelo Elenxo)",
+   "claim": "A margem de discricionariedade dada aos Estados-Membros pela cláusula de abertura do art. 88 deve ser exercida sem comprometer o conteúdo e os objetivos do regulamento.",
+   "verdict": "ANCORADA",
+   "why": "Citação confirmada verbatim no §59: 'when the Member States exercise the option granted to them by an opening clause of the GDPR, they must use their discretion under the conditions and within the limits laid down by the provisions of that regulation and must therefore legislate in such a way as not to undermine the content and objectives of that regulation.' Confirmado também que o §73 cita expressamente a Opinião do Advogado-Geral nos pontos 56, 70 e 73 ('As the Advocate General observed, in essence, in points 56, 70 and 73 of his Opinion...'), batendo exatamente com o locator indicado pelo leitor.",
+   "corrected": "",
+   "quote": "when the Member States exercise the option granted to them by an opening clause of the GDPR, they must use their discretion under the conditions and within the limits laid down by the provisions of that regulation and must therefore legislate in such a way as not to undermine the content and objectives of that regulation",
+   "locator": "§59 (aplicado ao art. 88 nos §72-73, citando a Opinião do AG, pontos 56/70/73)"
+  },
+  {
+   "source": "tracker-attack",
+   "gap": "a restrição matemática do adotante, sem fonte externa até aqui",
+   "claim": "CLAIM 1: O ataque tracker é definido como uma fórmula característica que decompõe o conhecimento prévio do questionador sobre um indivíduo em partes respondíveis, permitindo recompor estatísticas sobre uma query-set pequena (abaixo do piso k) que, isolada, seria recusada.",
+   "verdict": "ANCORADA",
+   "why": "A citação bate quase literalmente com o texto (p.80, Seção 4): 'Suppose that the formula C believed to identify I can be decomposed into the product C = A · B, such that COUNT(A · B̄) and COUNT(A) are both answerable: [eq 1] ... The formula T = A · B̄ is called the individual tracker (of I) because it helps the questioner \"track down\" additional characteristics of I.' A caracterização do claim (decompor conhecimento prévio em partes respondíveis para reconstruir estatística de query-set abaixo do piso k) corresponde exatamente ao mecanismo descrito na abertura da Seção 4, que parte explicitamente do problema de Schlörer com query sets restritos a [k, n-k].",
+   "corrected": ""
+  },
+  {
+   "source": "tracker-attack",
+   "gap": "a restrição matemática do adotante, sem fonte externa até aqui",
+   "claim": "CLAIM 3: A conclusão central do paper (na introdução) é que restringir severamente o tamanho mínimo/máximo das query sets torna o banco inútil como fonte estatística, mas ainda assim NÃO garante o sigilo dos registros confidenciais.",
+   "verdict": "ANCORADA",
+   "why": "Citação verbatim confirmada na p.77, último parágrafo da Introdução (logo após 'The conclusion is that statistical databases are almost always subject to compromise.' e antes da subseção 'Literature'): 'Severe restrictions on allowable query set sizes will render the database useless as a source of statistical information but will not secure the confidential records.' O claim reflete fielmente o conteúdo e a localização da frase.",
+   "corrected": ""
+  },
+  {
+   "source": "tracker-attack",
+   "gap": "a restrição matemática do adotante, sem fonte externa até aqui",
+   "claim": "CLAIM 4: O paper generaliza o resultado com o general tracker: uma única fórmula (sem conhecimento prévio de ninguém específico) já basta para responder qualquer query proibida em bancos que tenham classes distinguíveis suficientes, e a maioria dos bancos possui um general tracker — logo a ausência declarada de tracker não garante segurança.",
+   "verdict": "ANCORADA",
+   "why": "Confirmado verbatim no Abstract (p.76, topo do artigo): 'General trackers always exist if there are enough distinguishable classes of individuals in the database, in which case the trackers have a simple form. Almost all databases have a general tracker, and general trackers are almost always easy to find. Security is not guaranteed by the lack of a general tracker.' A elipse do claim omite corretamente apenas a cláusula intermediária ('in which case the trackers have a simple form'), sem alterar o sentido. O restante do Abstract também confirma que o general tracker 'permits calculating statistics for arbitrary query sets, without requiring preknowledge of anything in the database' — batendo com 'sem conhecimento prévio de ninguém específico'.",
+   "corrected": ""
+  },
+  {
+   "source": "tracker-attack",
+   "gap": "a restrição matemática do adotante, sem fonte externa até aqui",
+   "claim": "CLAIM 5: O próprio exemplo motivador mostra que a restrição k (piso mínimo) e n−k (teto máximo) são exatamente as defesas que a técnica do tracker foi desenhada para quebrar, e o texto afirma que a compromissão é possível mesmo para valores de k relativamente grandes.",
+   "verdict": "ANCORADA",
+   "why": "Ambos os trechos aparecem verbatim na p.80 (fim da Seção 3 'Compromise' / abertura da Seção 4): 'Example 1 illustrates why a lower bound, say k, must be imposed on the size of the smallest allowable query set.' e, poucas linhas depois (após a definição de q(C) com os símbolos k e n-k e a observação 'k ≤ n/2'), 'The following sections show that compromise is possible even for relatively large values of k.' A elipse do claim omite material intermediário (Example 2, a redefinição formal de q(C), a nota k≤n/2) mas não distorce o sentido: o texto de fato liga os exemplos 1 e 2 (k e n-k) diretamente à introdução dos trackers na seção seguinte.",
+   "corrected": ""
+  },
+  {
+   "source": "dinur-nissim",
+   "gap": "idem — reconstrução por consultas",
+   "claim": "O resultado central é um algoritmo de reconstrução polinomial: se as respostas a subset-sums têm perturbação aditiva menor que O(√n), um adversário poly-time reconstrói uma base candidata com distância de Hamming ≤ εn — quase toda a base é recuperada.",
+   "verdict": "ANCORADA",
+   "why": "A quote é o Abstract literal, encontrado palavra por palavra. O conteúdo do claim é a síntese correta de Abstract + Teorema 3 (D não-privada com dist(c,d)<εn para todo ε constante quando a perturbação é o(√n)) e da Definição 3 (Non-Privacy). Único ponto frouxo: o claim escreve 'menor que O(√n)' onde o texto usa o-pequeno (o(√n), assintoticamente mais lento que √n), não O-grande; é imprecisão de notação, não esticamento de conteúdo — a ideia substantiva (abaixo do limiar √n → reconstrução quase total) está correta.",
+   "corrected": ""
+  },
+  {
+   "source": "dinur-nissim",
+   "gap": "idem — reconstrução por consultas",
+   "claim": "Teorema 3: qualquer algoritmo de banco de dados cuja perturbação seja o(√n) é poly(n)-não-privado — um número polinomial de consultas basta para quebrar a privacidade.",
+   "verdict": "ANCORADA",
+   "why": "Quote do Teorema 3 encontrado verbatim na Seção 3.2, p.5 ('Theorem 3. Let D = (d, A) be a database where A is within o(√n) perturbation then D is poly(n)-non-private.'). A leitura 'número polinomial de consultas basta' é suportada explicitamente pelo texto logo após a Definição 3: 'Note that Definition 3 implicitly bounds the number of queries the adversary issues by t(n)' — como D é poly(n)-non-private, t(n) é polinomial.",
+   "corrected": ""
+  },
+  {
+   "source": "dinur-nissim",
+   "gap": "idem — reconstrução por consultas",
+   "claim": "O número de consultas na prova construtiva do Teorema 3 é t = n·(log n)², escolhidas uniformemente ao acaso entre subconjuntos de [n], bastando para reconstruir via LP+arredondamento uma base a distância de Hamming < εn.",
+   "verdict": "ANCORADA",
+   "why": "Quote encontrado quase verbatim na 'Query phase' da prova do Teorema 3 (Seção 3.2, p.5): 'Let t = n(log n)^2. For 1 ≤ j ≤ t choose uniformly at random qj ⊆R [n], and set āqj ← A(qj).' A descrição do restante do algoritmo (LP na 'Weeding phase' + arredondamento na 'Rounding phase' produzindo dist(c',d)<εn) confere exatamente com o corpo da prova nas páginas 5-6.",
+   "corrected": ""
+  },
+  {
+   "source": "dinur-nissim",
+   "gap": "idem — reconstrução por consultas",
+   "claim": "Teorema 2 (adversário ilimitado, todas as 2^n consultas): perturbação o(n) já é insuficiente; o adversário reconstrói a base inteira em tempo exponencial via fase de 'weeding' que testa candidatos contra todas as respostas.",
+   "verdict": "ANCORADA",
+   "why": "Quote do Teorema 2 encontrado verbatim na Seção 3.1, p.5. A prova mostra exatamente uma 'Query Phase' (para todo q ⊆ [n]) seguida de 'Weeding Phase' que testa cada candidato c∈{0,1}^n contra TODAS as respostas armazenadas — casa com o claim. 'Reconstrói a base inteira' é levemente forte (o teorema garante dist(c,d)=o(n), não exatidão perfeita), mas a própria introdução da Seção 3 usa a mesma linguagem: 'an adversary should be able to efficiently reconstruct the entire database very accurately' — então a formulação do claim ecoa o próprio vocabulário do paper, não é esticamento indevido.",
+   "corrected": ""
+  },
+  {
+   "source": "dinur-nissim",
+   "gap": "idem — reconstrução por consultas",
+   "claim": "O modelo de consulta é 'agregados sobre subconjunto pequeno/arbitrário': q é subconjunto de índices e a resposta exata é a soma dos bits da base nesses índices — estrutura que, repetida sobre subconjuntos sobrepostos, gera o sistema de restrições explorado na reconstrução.",
+   "verdict": "ANCORADA",
+   "why": "Quote é a Definição 1 (Statistical Databases), encontrada verbatim na Seção 2.1, p.4: 'A statistical query (query for short) is a subset q ⊆ [n]. The (exact) answer to a query q is the sum of all database entries specified by q i.e. aq = ∑i∈q di.' A extensão sobre 'subconjuntos sobrepostos geram o sistema de restrições' é paráfrase correta do mecanismo real da prova (o LP da Weeding Phase do Teorema 3 usa exatamente t consultas aleatórias sobrepostas como restrições), não é uma citação adicional mas está fielmente descrita pela mecânica exposta nas páginas 5-6.",
+   "corrected": ""
+  },
+  {
+   "source": "k-anonimato",
+   "gap": "grupos pequenos: as fontes cortadas por orçamento",
+   "claim": "k-anonymity's requirement is only that every combination of quasi-identifying values in the released dataset be shared by at least k respondents (indistinguishability), not that sensitive values themselves are protected from disclosure.",
+   "verdict": "ANCORADA",
+   "why": "A citação bate literalmente com a Seção 2.2, p.28 do PDF ('The privacy requirement enforced by k-anonymity [62] demands that any released information should be indistinguishably related to no less than a certain number (k) of respondents'). O claim descreve corretamente o requisito (indistinguibilidade de combinações de QI) e a lacuna (não cobre valor sensível) — essa lacuna é exatamente o tema da Seção 2.3 do mesmo artigo, então não há exagero.",
+   "corrected": "",
+   "quote": "any released information should be indistinguishably related to no less than a certain number (k) of respondents",
+   "locator": "Seção 2.2, p.28"
+  },
+  {
+   "source": "k-anonimato",
+   "gap": "grupos pequenos: as fontes cortadas por orçamento",
+   "claim": "The paper is explicit that k-anonymity alone does not stop attribute disclosure: it is 'only a starting point' and needs further requirements to prevent leakage caused by homogeneity and external knowledge attacks.",
+   "verdict": "ANCORADA",
+   "why": "Citação exata (Seção 2.3, p.30, primeiro parágrafo): 'The privacy requirement of k-anonymity is explicitly formulated to protect respondents' identities, is only a starting point for protecting privacy and further steps are needed to prevent attribute disclosure, which can be otherwise possible due to value homogeneity and external knowledge attacks' (o original continua com ', as follows.', omitido sem prejuízo). O claim é uma paráfrase fiel, sem esticar.",
+   "corrected": "",
+   "quote": "The privacy requirement of k-anonymity is explicitly formulated to protect respondents' identities, is only a starting point for protecting privacy and further steps are needed to prevent attribute disclosure, which can be otherwise possible due to value homogeneity and external knowledge attacks",
+   "locator": "Seção 2.3, p.30"
+  },
+  {
+   "source": "k-anonimato",
+   "gap": "grupos pequenos: as fontes cortadas por orçamento",
+   "claim": "Homogeneity attack: even in a 3-anonymous dataset, if a whole equivalence class (a small group of >=k records sharing QI values) shares the same sensitive value, a recipient who knows someone is in that group learns the sensitive attribute with certainty despite not pinpointing the exact record.",
+   "verdict": "ANCORADA",
+   "why": "Ambas as partes da citação (definição de homogeneidade e o exemplo do COVID-19) aparecem literalmente na p.30, Seção 2.3, incluindo a frase entre parênteses '(homogeneity attack)'. O '...' no meio marca corretamente a omissão do texto de contexto (a descrição do destinatário/registro). O claim descreve com precisão o mecanismo (classe de equivalência = ao menos k registros; certeza sem apontar o registro exato).",
+   "corrected": "",
+   "quote": "The problem of homogeneity occurs when all records in an equivalence class (i.e., the set of at least k records with the same value for QI attributes) in a k-anonymous dataset assume the same value for the sensitive attribute. ... the recipient can discover that he suffers from COVID-19, which is the only value assumed by all records in the class (homogeneity attack).",
+   "locator": "Seção 2.3, p.30"
+  },
+  {
+   "source": "k-anonimato",
+   "gap": "grupos pequenos: as fontes cortadas por orçamento",
+   "claim": "The paper also shows an external-knowledge (background knowledge) attack: combining an equivalence class with outside facts (e.g., knowing a friend is a marathon runner) lets a recipient eliminate implausible sensitive values and deduce the true one even though the class has more than one value.",
+   "verdict": "ANCORADA",
+   "why": "Citação exata na p.30 ('Due to the fact that short breath and cough would not be possible for a runner practicing for a marathon, the recipient can discover that her friend suffers from dermatitis (external knowledge)'). Confere com o texto: a última classe de equivalência da Fig.3 tem 3 valores distintos (Dermatitis, Short breath, Cough) — não homogênea — e o conhecimento externo elimina os dois implausíveis, exatamente como o claim descreve.",
+   "corrected": "",
+   "quote": "Due to the fact that short breath and cough would not be possible for a runner practicing for a marathon, the recipient can discover that her friend suffers from dermatitis (external knowledge).",
+   "locator": "Seção 2.3, p.30"
+  },
+  {
+   "source": "k-anonimato",
+   "gap": "grupos pequenos: as fontes cortadas por orçamento",
+   "claim": "Even l-diversity (the fix for homogeneity) does not fully close the gap for small/skewed groups: skewness attack shows that when the sensitive-value distribution inside an equivalence class departs from the overall population, membership in that class alone raises the probability of a sensitive attribute — an aggregation-over-small-group leak.",
+   "verdict": "ANCORADA",
+   "why": "Citação exata na p.31, Seção 2.3 ('The skewness attack occurs when the value distribution for the sensitive attribute observable in an ℓ-diverse equivalence class differs from that observable in the overall population...'). O exemplo do próprio artigo confirma a leitura do claim: 2 de 3 registros da classe têm COVID-19 (>0.6 de probabilidade), e se essa taxa for muito maior que a da população geral, pertencer à classe já eleva a probabilidade do atributo sensível — é o que o claim descreve; 'aggregation-over-small-group leak' é rótulo do próprio leitor, mas descreve fielmente o mecanismo do texto.",
+   "corrected": "",
+   "quote": "The skewness attack occurs when the value distribution for the sensitive attribute observable in an l-diverse equivalence class differs from that observable in the overall population (or in the overall l-diverse dataset).",
+   "locator": "Seção 2.3, p.31"
+  },
+  {
+   "source": "k-anonimato",
+   "gap": "grupos pequenos: as fontes cortadas por orçamento",
+   "claim": "The IAPP piece shows the general mechanism by which aggregation over anonymized/suppressed data re-identifies a small group: 'windowing attacks' slice data by overlapping time windows to isolate and reconstruct values for small groups that individually should have been suppressed/protected.",
+   "verdict": "ANCORADA",
+   "why": "Citação confirmada verbatim no artigo IAPP: 'A particularly common, slightly more-complex version of this pitfall comes when giving viewers the ability to slice data by time.' O parágrafo do 'windowing attack' (comparação de janelas de tempo sobrepostas para reconstruir um dado de um único dia que deveria estar suprimido) bate com a descrição do claim; 'small groups' é generalização leve mas fiel ao mecanismo (isolar um valor individual/pequeno grupo via cruzamento de agregados).",
+   "corrected": "",
+   "quote": "A particularly common, slightly more-complex version of this pitfall comes when giving viewers the ability to slice data by time.",
+   "locator": "IAPP, \"Aggregating Over Anonymized Data\" (seção sobre suppression/windowing attacks)"
+  },
+  {
+   "source": "deci-ryan-monitoramento",
+   "gap": "autodeterminação: zero achados na rodada 1, e é a régua que o adotante propôs",
+   "claim": "More constraints/target control over how/when monitoring happens is associated with better fairness, justice, and autonomy perceptions and lower privacy invasion — a direct positive condition under which monitoring frustrates autonomy less.",
+   "verdict": "ANCORADA",
+   "why": "Citação literal e correta (p.25 §5.3, corroborada pela Tabela 6, p.24): correlações e ICs batem exatamente — atitudes amplas ρ̄=.17[.08;.25], justiça/imparcialidade ρ̄=.27[.10;.45], autonomia ρ̄=.22[.12;.31], invasão de privacidade ρ̄=-.20[-.32;-.08]. O claim não estica: a correlação positiva com autonomia (percepção, a variável de resultado medida) sustenta razoavelmente a leitura de que mais controle do alvo é uma condição empírica em que o monitoramento frustra menos a autonomia percebida.",
+   "corrected": ""
+  },
+  {
+   "source": "deci-ryan-monitoramento",
+   "gap": "autodeterminação: zero achados na rodada 1, e é a régua que o adotante propôs",
+   "claim": "Transparency is associated with more positive attitudes but does not measurably change performance; insufficient data to test its effect on stress specifically.",
+   "verdict": "ANCORADA",
+   "why": "Citação essencialmente literal (p.25 §5.5); os números batem com o texto e a Tabela 6 (atitudes ρ̄=.25[.11;.39]; justiça ρ̄=.21; comprometimento ρ̄=.35; suporte percebido ρ̄=.37; satisfação ρ̄=.26). Pequena imprecisão na emenda da citação: o original diz '...to test H3c regarding the moderating effects of transparency on stress/strain', e a citação do leitor reordena para '...to test the moderating effects of transparency on stress/strain' sem marcar a supressão de 'H3c regarding' com reticências — desvio trivial de fidelidade textual, não de sentido. Substância do claim confere: 'Results did not show that transparency had any effect on performance overall' (p.25) e 'insufficient sample (K = 2) to test H3c... on stress/strain' (p.25).",
+   "corrected": ""
+  },
+  {
+   "source": "deci-ryan-monitoramento",
+   "gap": "autodeterminação: zero achados na rodada 1, e é a régua que o adotante propôs",
+   "claim": "The communicated purpose of monitoring showed little to no moderating effect on performance, attitudes, or stress/strain — subjective experience mattered more than the organization's stated rationale.",
+   "verdict": "ANCORADA",
+   "why": "Citação literal (Discussão §6.1, p.27, reticências marcam a supressão correta de frases intermediárias): 'An unexpected finding was how little the effects of monitoring appeared to differ based on the explicit purpose communicated to workers... Our null findings suggest the possibility that the way EPM is psychologically experienced is more important than what an organization communicates to employees.' O claim resume fielmente essa conclusão-síntese dos autores. Não verifiquei diretamente, nas páginas obtidas, os números específicos de propósito× estresse/tensão (essa tabela ficou fora do trecho lido), mas a frase de síntese no texto é declaradamente ampla ('the effects of monitoring', não restrita a performance) e o claim não vai além dela.",
+   "corrected": ""
+  },
+  {
+   "source": "viva-grupo-minimo",
+   "gap": "a claim refutada pelo pipeline mas verificável na doc do fornecedor",
+   "claim": "1. Copilot Dashboard default minimum group size é 10, não 5 (refuta 'piso 5' uniforme).",
+   "verdict": "ANCORADA",
+   "why": "A citação aparece verbatim no doc 'Manage settings for the Microsoft Copilot Dashboard...', na seção exata 'Set minimum group size for the Copilot Dashboard and Agent Dashboard': \"The dashboards' adoption and impact pages provide group-level metrics for groups that meet or exceed the minimum group size you set, which by default is 10 employees.\" O claim reflete exatamente isso, sem esticar.",
+   "corrected": ""
+  },
+  {
+   "source": "viva-grupo-minimo",
+   "gap": "a claim refutada pelo pipeline mas verificável na doc do fornecedor",
+   "claim": "2. No admin center, o piso absoluto ao configurar o Copilot Dashboard não pode ser menor que 5, mesmo com default de 10.",
+   "verdict": "ANCORADA",
+   "why": "Citação exata confirmada, mesma seção, passo 3: \"Enter your preferred minimum group size, which must be at least five, then select Save.\" Combinado com a frase anterior (default 10), o claim descreve corretamente 'default 10, piso 5' para este produto especificamente.",
+   "corrected": ""
+  },
+  {
+   "source": "viva-grupo-minimo",
+   "gap": "a claim refutada pelo pipeline mas verificável na doc do fornecedor",
+   "claim": "3. No Viva Insights geral (legado), o default é 5 e não pode ser menor que 5.",
+   "verdict": "ANCORADA",
+   "why": "Citação exata na página 'Viva Insights privacy considerations' (marcada no topo como doc legado do Workplace Analytics), seção 'Minimum group size': \"A minimum group size helps maintain employee privacy by ensuring that people cannot be easily identified through group attributes. The default minimum group size is five.\" A mesma seção também confirma o piso: \"you cannot set the group size to lower than five.\" Claim corretamente escopado ao produto legado, distinto do Copilot Dashboard (claims 1-2).",
+   "corrected": ""
+  },
+  {
+   "source": "viva-grupo-minimo",
+   "gap": "a claim refutada pelo pipeline mas verificável na doc do fornecedor",
+   "claim": "4. Microsoft afirma explicitamente que combinar atributos organizacionais com dados de linha de-identificados pode permitir que um analista infira identidade individual.",
+   "verdict": "ANCORADA",
+   "why": "Citação verbatim confirmada em 'Advanced analysis privacy', seção 'Personal data, de-identified data, and calculated data': \"these attributes might provide enough context or be combined with other information such that an analyst can infer individual identity\". Claim descreve exatamente o mecanismo declarado.",
+   "corrected": ""
+  },
+  {
+   "source": "viva-grupo-minimo",
+   "gap": "a claim refutada pelo pipeline mas verificável na doc do fornecedor",
+   "claim": "5. Microsoft dá exemplo concreto: nenhuma coluna isolada identifica, mas juntas os atributos devem ser tratados como dado pessoal potencial.",
+   "verdict": "ANCORADA",
+   "why": "Citação exata confirmada logo após a tabela de exemplo (person identifier/after hours/email hours/function/title/organization), mesma seção do claim 4: \"While it might not be possible to identify the user with any single one of the other columns (function, title, organization, and region), together these attributes might enable an analyst to identify a person. So, this group of attributes should be treated as potential personal data.\" Nota: o texto-fonte cita 'region' entre parênteses mas a tabela de exemplo não tem coluna region — inconsistência do próprio documento-fonte, não do claim, que apenas reporta a frase como está.",
+   "corrected": ""
+  },
+  {
+   "source": "viva-grupo-minimo",
+   "gap": "a claim refutada pelo pipeline mas verificável na doc do fornecedor",
+   "claim": "6. Microsoft define 'distribution masking' e diz a quais superfícies se aplica.",
+   "verdict": "ANCORADA",
+   "why": "Citação verbatim confirmada na seção 'Distribution masking' de 'Advanced analysis privacy': \"Aggregated results are protected by obscuring or masking results that would otherwise reveal that “almost all” or “almost none” of the group fit the profile, because that would effectively give you information about every individual in the group. This masking applies to organization insights for leaders and managers in the Viva Insights web app.\"",
+   "corrected": ""
+  },
+  {
+   "source": "viva-grupo-minimo",
+   "gap": "a claim refutada pelo pipeline mas verificável na doc do fornecedor",
+   "claim": "7. Microsoft nomeia três estratégias de proteção de dados agregados, uma delas masked distributions.",
+   "verdict": "ANCORADA",
+   "why": "Citação exata confirmada na tabela 'Data classification fundamentals', linha 'Aggregated data': \"Organization insights provide leaders and managers with protected results by enforcing three strategies: minimum group sizes, differential privacy, and masked distributions.\"",
+   "corrected": ""
+  },
+  {
+   "source": "mercado-capital",
+   "gap": "eixo mercado/capital: sem sinal confirmado na rodada 1",
+   "claim": "Glean levantou Series F de US$150M a valuation de US$7,2B, sinal de capital forte investindo em analytics/IA corporativa sobre uso de ferramentas de trabalho.",
+   "verdict": "ANCORADA",
+   "why": "A frase é o título verbatim de glean.com/blog/glean-series-f-announcement ('Glean raises $150M Series F at $7.2B valuation to transform how companies use AI to accelerate innovation'), confirmado por fetch direto. Os fatos (US$150M, US$7,2B, junho/2025, liderado por Wellington Management) batem com o press release oficial e cobertura (Businesswire, Crunchbase News). Ressalva de locator: o título citado é o do BLOG de anúncio, não da página glean.com/press — o press release formal (mesma notícia, distribuído via Businesswire/Goodwin) usa um título ligeiramente diferente ('...to Accelerate Enterprise AI Agent Innovation Globally'). Hoje glean.com/press não lista mais este item na primeira página (rolou por idade), mas isso não afeta a substância do claim.",
+   "corrected": "Locator mais preciso: glean.com/blog/glean-series-f-announcement (não glean.com/press, que hospeda uma versão com título distinto para o mesmo evento).",
+   "quote": "Glean raises $150M Series F at $7.2B valuation to transform how companies use AI to accelerate innovation",
+   "locator": "glean.com/press, título e corpo do press release da Série F"
+  },
+  {
+   "source": "mercado-capital",
+   "gap": "eixo mercado/capital: sem sinal confirmado na rodada 1",
+   "claim": "Microsoft recuou de recurso do Productivity Score que expunha nomes individuais, após crítica pública de vigilância — precedente de reação/recuo de produto por pressão.",
+   "verdict": "ANCORADA",
+   "why": "Quote confirmada verbatim e na ordem original no post do Microsoft 365 Blog de 1º/dez/2020, assinado por Jared Spataro (CVP): 'First, we're removing user names from the product. During preview, we added a feature that showed end-user names and associated actions over a 28-day period.' O claim descreve corretamente o recuo por pressão pública (amplamente documentado por Register, Neowin, BankInfoSecurity etc.).",
+   "corrected": "",
+   "quote": "we're removing user names from the product. During preview, we added a feature that showed end-user names and associated actions over a 28-day period.",
+   "locator": "Microsoft 365 Blog, \"Our commitment to privacy in Microsoft Productivity Score\", Jared Spataro, 1º de dezembro de 2020"
+  },
+  {
+   "source": "mercado-capital",
+   "gap": "eixo mercado/capital: sem sinal confirmado na rodada 1",
+   "claim": "Microsoft reformulou a interface para deixar claro que a métrica é de adoção organizacional, não de comportamento individual, e vedou acesso a dados por usuário.",
+   "verdict": "ANCORADA",
+   "why": "Quote confirmada verbatim no mesmo post: 'No one in the organization will be able to use Productivity Score to access data about how an individual user is using apps and services in Microsoft 365.' Consistente com a cobertura da época sobre a reformulação do produto.",
+   "corrected": "",
+   "quote": "No one in the organization will be able to use Productivity Score to access data about how an individual user is using apps and services in Microsoft 365.",
+   "locator": "Microsoft 365 Blog, mesmo post, 1º de dezembro de 2020"
+  },
+  {
+   "source": "mercado-capital",
+   "gap": "eixo mercado/capital: sem sinal confirmado na rodada 1",
+   "claim": "Ação judicial (BIPA) alega que dashcams com IA da Netradyne capturaram e compartilharam dados biométricos faciais de motoristas sem consentimento — ação privada contra vigilância por IA no trabalho.",
+   "verdict": "ANCORADA",
+   "why": "Quote confirmada verbatim no artigo do ClassAction.org: 'without first informing her or obtaining consent, the defendant captured, retained and shared with third parties her facial scans'. Verifiquei a petição inicial original (PDF, Case 3:23-cv-01443-LAB-JLB, U.S. District Court, S.D. California) — carimbo 'Filed 08/07/23' confirma a data 07/08/2023 citada no locator (formato BR = 7 de agosto de 2023). Réu nomeado na capa é 'Netraduyne, Inc.' (grafia da petição), mas trata-se da mesma empresa Netradyne referida na cobertura de imprensa.",
+   "corrected": "",
+   "quote": "captured, retained and shared with third parties\" drivers' facial scans without \"informing her or obtaining consent",
+   "locator": "Ross v. Netradyne, Inc., Nº 3:23-cv-01443 (citado por ClassAction.org, ação ajuizada em 07/08/2023 sob a Illinois BIPA)"
+  },
+  {
+   "source": "mercado-capital",
+   "gap": "eixo mercado/capital: sem sinal confirmado na rodada 1",
+   "claim": "Motorista demitido processa Figueroa Tank Lines e a fornecedora de monitoramento por vídeo com IA (Samsara), alegando vigilância contínua e encoberta via análise de vídeo por IA gerando 'incidentes de distração' fora do propósito declarado de segurança.",
+   "verdict": "ANCORADA",
+   "why": "Quote confirmada verbatim no artigo da CDLLife: 'used the Samsara system to engage in continuous and covert monitoring of drivers through AI-assisted video analysis, generating so-called \"distraction incidents\" unrelated to accidents or external safety events.' Datas conferem: demissão em 04/08/2025 (4 de agosto de 2025) e câmeras instaladas em maio de 2025; o artigo também confirma que as câmeras foram apresentadas aos motoristas como destinadas 'primarily for accident investigation and safety purposes', sustentando o 'fora do propósito declarado' do claim.",
+   "corrected": "",
+   "quote": "used the Samsara system to engage in continuous and covert monitoring of drivers through AI-assisted video analysis, generating so-called \"distraction incidents\" unrelated to accidents or external safety events",
+   "locator": "Garcia v. Figueroa Tank Lines / Samsara, Inc. (relatado por CDLLife, 2026; demissão em 04/08/2025, câmeras instaladas em maio de 2025)"
+  }
+ ],
+ "rejected": [
+  {
+   "source": "lgpd-bases",
+   "gap": "eixo BR: base legal do fluxo sob subordinação",
+   "claim": "Claim 1: LGPD lista consentimento como 1 entre dez hipóteses (ao lado de contrato e obrigação legal, que não dependem de vontade livre); em relação de emprego essas bases alternativas (V e II) dispensam o consentimento exatamente onde a liberdade do titular é estruturalmente reduzida.",
+   "verdict": "EXAGERADA",
+   "why": "A citação do inciso V é literal. Mas a lei em nenhum artigo citado fala de emprego/subordinação ou de 'liberdade estruturalmente reduzida' — essa conclusão é construção do leitor sobre o texto, apresentada como se decorresse diretamente da lei.",
+   "corrected": "Confirmado: Art. 7º tem incisos I a X (dez hipóteses), sendo consentimento apenas o inciso I; os incisos II (obrigação legal) e V (execução de contrato) são bases objetivas que não dependem de manifestação de vontade do titular — isso está correto e o quote do inciso V é verbatim. Mas a lei NÃO menciona relação de emprego, subordinação, nem 'liberdade estruturalmente reduzida' em nenhum lugar dos arts. 7º, 9º, 10, 11 ou 20 — essa é uma inferência/argumento do leitor projetado sobre o texto, não algo que a LGPD declara. O claim deveria distinguir o que é texto legal (dez hipóteses, V e II independem de consentimento) do que é interpretação do leitor (aplicação ao contexto de emprego)."
+  },
+  {
+   "source": "lgpd-bases",
+   "gap": "eixo BR: base legal do fluxo sob subordinação",
+   "claim": "Claim 2: legítimo interesse só fundamenta tratamento para finalidades legítimas ancoradas em situações concretas, e a lei nomeia as DUAS situações-modelo ACEITAS.",
+   "verdict": "EXAGERADA",
+   "why": "A quote 'apoio e promoção de atividades do controlador' está correta e é o inciso I. Mas o caput do art. 10 expressamente qualifica a lista como não-exaustiva ('não se limitam a'), o que contradiz 'as duas situações-modelo aceitas' do claim.",
+   "corrected": "O caput do Art. 10 diz: '...para finalidades legítimas, consideradas a partir de situações concretas, que incluem, MAS NÃO SE LIMITAM A' — ou seja, os incisos I e II são exemplos NÃO exaustivos, não 'as duas situações aceitas'. O quote do inciso I é verbatim, mas o claim inverte o sentido do caput ao tratar a lista como fechada/taxativa quando o próprio texto diz o oposto."
+  },
+  {
+   "source": "lgpd-bases",
+   "gap": "eixo BR: base legal do fluxo sob subordinação",
+   "claim": "Claim 3: quando a base é legítimo interesse, a lei limita o escopo ao estritamente necessário para a finalidade pretendida.",
+   "verdict": "EXAGERADA",
+   "why": "O núcleo substantivo do claim está certo (escopo limitado ao estritamente necessário), mas a string citada não corresponde palavra-por-palavra ao texto oficial — os verbos e o sujeito da frase foram alterados.",
+   "corrected": "Texto oficial do §1º (confirmado em duas fontes independentes): 'Quando o tratamento for baseado no legítimo interesse do controlador, somente os dados pessoais estritamente necessários para a finalidade pretendida poderão ser tratados.' O quote apresentado ('somente dados \\\"estritamente necessários...\\\" podem ser processados') troca 'os dados pessoais' por 'dados' e 'poderão ser tratados' por 'podem ser processados' — não é a redação verbatim, é paráfrase com aspas internas fabricadas para simular citação exata."
+  },
+  {
+   "source": "lgpd-bases",
+   "gap": "eixo BR: base legal do fluxo sob subordinação",
+   "claim": "Claim 5: a autoridade nacional pode EXIGIR relatório de impacto especificamente quando o fundamento for legítimo interesse.",
+   "verdict": "EXAGERADA",
+   "why": "O claim troca o verbo legal 'solicitar' por 'exigir', que tem força modal mais forte (obrigação vs. faculdade de pedir) — é a mesma inconsistência entre o texto do próprio claim ('exigir') e sua própria quote ('solicitar' seria o esperado, mas nem a quote citada bate literalmente com o §3º oficial, que traz a ressalva de sigilo comercial/industrial omitida).",
+   "corrected": "Texto oficial do §3º: 'A autoridade nacional poderá SOLICITAR ao controlador relatório de impacto à proteção de dados pessoais, quando o tratamento tiver como fundamento seu interesse legítimo, observados os segredos comercial e industrial.' A lei usa 'solicitar' (pedido), não 'exigir' (imposição/obrigação); e a quote apresentada omite tanto 'ao controlador' quanto a ressalva final 'observados os segredos comercial e industrial'."
+  },
+  {
+   "source": "lgpd-bases",
+   "gap": "eixo BR: base legal do fluxo sob subordinação",
+   "claim": "Claim 6: para dados sensíveis a regra é consentimento específico e destacado, com dispensa só nas hipóteses taxativas do inciso II — restringindo ainda mais o legítimo interesse em contextos de subordinação com dados sensíveis do empregado.",
+   "verdict": "EXAGERADA",
+   "why": "A substância (consentimento específico/destacado como regra, dispensas taxativas no inciso II) está correta, mas (a) a quote não é verbatim (verbo 'consentir' virou substantivo 'consentimento', ordem alterada) e (b) a aplicação ao 'contexto de subordinação' do empregado é inferência do leitor não presente no texto do Art. 11.",
+   "corrected": "Texto oficial do Art. 11, inciso I (confirmado): 'quando o titular ou seu responsável legal CONSENTIR, de forma específica e destacada, para finalidades específicas' — não 'consentimento do titular ou seu responsável legal... para finalidades específicas' como citado (troca de verbo por substantivo, mesma ideia mas não verbatim). Além disso, a lei não menciona 'contextos de subordinação' nem 'dados sensíveis do empregado' em nenhum artigo citado — isso é extensão do leitor, não texto da LGPD."
+  },
+  {
+   "source": "tst-monitoramento",
+   "gap": "eixo BR: jurisprudência trabalhista sobre monitoramento",
+   "claim": "A senha pessoal do e-mail corporativo protege o sigilo empresarial perante terceiros, não a privacidade do empregado frente ao próprio empregador — e a proteção constitucional de sigilo de correspondência alcança só a comunicação estritamente pessoal.",
+   "verdict": "EXAGERADA",
+   "why": "A QUOTE citada pelo leitor ('a não ser que o empregador consinta que haja outra utilização') EXISTE no documento, verbatim — mas pertence à frase sobre FINALIDADE profissional (é a mesma cláusula usada como evidência do claim 2), não fala de senha nem de sigilo perante terceiros. É uma citação trocada/mal-atribuída: o claim em si é substancialmente correto (o texto real sobre senha diz exatamente isso, encontrado à parte), mas a evidência anexada a ele não o sustenta — por isso EXAGERADA, não ANCORADA.",
+   "corrected": "A quote correta para este claim (não a que foi citada) é: \"a senha pessoal fornecida pela empresa ao empregado para o acesso de sua caixa de e-mail não é uma forma de proteção para evitar que o empregador tenha acesso ao conteúdo das mensagens. Ao contrário, [...] ela serve para proteger o próprio empregador para evitar que terceiros tenham acesso às informações da empresa.\" A parte sobre sigilo de correspondência é apoiada por outro trecho do mesmo acórdão: os direitos à privacidade/sigilo de correspondência dizem respeito apenas à comunicação estritamente pessoal.",
+   "quote": "a não ser que o empregador consinta que haja outra utilização",
+   "locator": "RR-613/2000-013-10-00.7, 1ª Turma do TST — notícia tst.jus.br \"TST admite que empresa investigue e-mail de trabalho do empregado\""
+  },
+  {
+   "source": "edpb-consentimento",
+   "gap": "primária do consentimento sob subordinação (a rodada 1 usou tier 6)",
+   "claim": "5. O EDPB ancora sua conclusão diretamente no WP29 Opinion 2/2017 (WP249), citando página 6-7 E parágrafo 6.2 como fonte do raciocínio sobre a maioria dos casos e sobre a base legal — atribuídos à nota de rodapé 20.",
+   "verdict": "EXAGERADA",
+   "why": "A QUOTE fornecida ('See Opinion 2/2017 on data processing at work, page 6-7.') existe verbatim e é de fato a nota 20 ligada ao parágrafo 21 — isso está correto. Mas o CLAIM afirma que essa mesma âncora cita 'página 6-7 e parágrafo 6.2', quando na verdade 'parágrafo 6.2' é citação de OUTRAS notas (19 e 21), não da nota 20. É uma conflação de três footnotes distintas apresentada como uma citação única — exagera o que aquela nota específica contém.",
+   "corrected": "A nota de rodapé 20 (ligada à frase 'For the majority... due to the nature of the relationship between employer and employee' do §21) diz APENAS: 'See Opinion 2/2017 on data processing at work, page 6-7.' — sem menção a 'parágrafo 6.2'. A citação a 'parágrafo 6.2' do WP249 aparece em DUAS OUTRAS notas distintas: a nota 19 (ligada a '...without feeling any pressure to consent', que cita também WP187 pp.12-14, WP48 cap.10 e WP55 §4.2, além de WP249 §6.2) e a nota 21 (ligada ao §22, 'exceptional circumstances... no adverse consequences at all', que cita só WP249 §6.2). O claim funde três notas de rodapé diferentes numa só, atribuindo à nota 20 uma citação de parágrafo que não está nela."
+  },
+  {
+   "source": "barbulescu",
+   "gap": "o critério operacional candidato, descartado por comodismo na rodada 1",
+   "claim": "Factor (iii) itself requires the domestic authorities to distinguish flow-monitoring from content-monitoring, and expressly states that monitoring content demands a weightier justification than merely monitoring that communication occurred.",
+   "verdict": "EXAGERADA",
+   "why": "The quoted words do appear verbatim in §121(iii), and (iii) does say content-monitoring 'requires weightier justification.' But the claim misattributes the flow-vs-content DISTINCTION to factor (iii): that explicit distinguishing instruction ('a distinction should be made between monitoring of the flow of communications and of their content') is in factor (ii), not (iii). Factor (iii) only addresses legitimate reasons/justification for monitoring communications and accessing content, plus the weightier-justification rule for content — it does not itself instruct authorities to 'distinguish' flow from content.",
+   "corrected": "The flow-vs-content distinction is drawn in §121(ii) ('a distinction should be made between monitoring of the flow of communications and of their content'); §121(iii) separately requires legitimate reasons for monitoring communications/accessing content and states that content-monitoring, being more invasive, requires weightier justification."
+  },
+  {
+   "source": "barbulescu",
+   "gap": "o critério operacional candidato, descartado por comodismo na rodada 1",
+   "claim": "§122 adds a seventh, procedural requirement distinct from the six substantive factors: the employee must have access to a remedy before an INDEPENDENT judicial body able to determine whether those criteria were observed and whether the measure was lawful.",
+   "verdict": "EXAGERADA",
+   "why": "The block quote given matches §122 verbatim, and §122 is indeed a distinct 'Lastly' procedural add-on after the six §121 factors. However, the surrounding claim prose inserts the word 'independent' before 'judicial body' — Bărbulescu §122 itself only says 'a judicial body with jurisdiction to determine ...', with no 'independent' qualifier. That word appears only in López Ribalda's later paraphrase of this holding (its own §115: 'an independent judicial body'), not in Bărbulescu's original text being cited.",
+   "corrected": "Bărbulescu §122: 'the domestic authorities should ensure that an employee whose communications have been monitored has access to a remedy before a judicial body with jurisdiction to determine, at least in substance, how the criteria outlined above were observed and whether the impugned measures were lawful' — no 'independent' in the original; that gloss comes from López Ribalda §115's restatement of this holding."
+  },
+  {
+   "source": "tracker-attack",
+   "gap": "a restrição matemática do adotante, sem fonte externa até aqui",
+   "claim": "CLAIM 2: O paper prova explicitamente que a compromissão via tracker NÃO depende de ausência de decomposição — ou seja, o piso mínimo de contagem (k) não impede a reconstrução do indivíduo.",
+   "verdict": "EXAGERADA",
+   "why": "A frase citada existe literalmente na p.81, logo após as eqs. 2-5 e a menção ao resultado de Schlörer/Palme: 'This compromise is not prevented by the lack of a decomposition of C giving answerable A and T.' Mas essa sentença especificamente fala sobre a AUSÊNCIA DE UMA DECOMPOSIÇÃO diretamente respondível de C em A e T (isto é, quando A e T não satisfazem a eq. 1 por si só) — e a frase seguinte explica a solução: Schlörer mostrou que fórmulas não-respondíveis A e T podem ser trocadas por A+M e T+M usando uma 'máscara' M que preenche o query set com registros irrelevantes. A sentença NÃO é uma afirmação direta sobre o piso k não impedir a reconstrução (essa tese mais geral aparece alhures no artigo — Abstract, Introdução, abertura da Seção 4 — mas não nesta frase pontual). O claim conflaciona 'decomposição' com 'piso k', esticando o escopo da sentença citada.",
+   "corrected": "A frase diz que a compromissão não é impedida pela FALTA DE UMA DECOMPOSIÇÃO diretamente respondível de C em A e T — pois a técnica da 'máscara' M (A+M, T+M) torna A e T respondíveis mesmo quando originalmente não satisfazem a eq. (1). Não é uma afirmação sobre o piso k em si; a tese mais ampla de que k não garante segurança está sustentada em outras partes do artigo (Abstract, Introdução p.77, abertura da Seção 4 p.80), não nesta sentença específica."
+  },
+  {
+   "source": "deci-ryan-monitoramento",
+   "gap": "autodeterminação: zero achados na rodada 1, e é a régua que o adotante propôs",
+   "claim": "EPM presence increases worker stress regardless of the specific characteristics of how monitoring is done — the frustration is structural, not fixable by tweaking monitoring style.",
+   "verdict": "EXAGERADA",
+   "why": "A citação é literal (Abstract, Ravid et al. 2023, p.5): 'Moreover, findings indicate that the presence of EPM is associated with increased worker stress, regardless of the characteristics of monitoring.' Mas essa frase resume a Presence Analysis (monitorado vs não-monitorado); a MESMA meta-análise, na Degree Analysis (§5.3, Tabela 6, p.23-25), encontra que invasividade (uma característica de estilo) SIM modera estresse/tensão (ρ̄ geral = .20 [.10;.29]; amplitude/breadth ρ̄ = .22 [.12;.31]) — contradizendo 'regardless of characteristics' e 'not fixable by tweaking style'. O próprio artigo (p.27) ainda abre a possibilidade oposta: '... it remains possible that workers feel significantly less stressed when they perceive EPM to be for their own growth and development, and future research should examine this possibility.' O claim estica uma frase-resumo em conclusão estrutural que o restante do artigo qualifica.",
+   "corrected": "A presença de EPM está associada a mais estresse quando comparado a nenhum monitoramento, mas dentro dos estudos COM monitoramento a invasividade (amplitude, especificidade) modera esse efeito — mais invasivo = mais estresse/tensão (ρ̄=.20-.22) — e os autores deixam em aberto que EPM com propósito de desenvolvimento possa reduzir o estresse, questão ainda não testada."
+  },
+  {
+   "source": "deci-ryan-monitoramento",
+   "gap": "autodeterminação: zero achados na rodada 1, e é a régua que o adotante propôs",
+   "claim": "EPM does not deliver the performance gains organizations expect — no evidence across 94 samples that monitoring improves task performance.",
+   "verdict": "EXAGERADA",
+   "why": "A citação 'Results provide no evidence that EPM improves worker performance' é literal (Abstract, p.5) e a conclusão sobre performance é real (Discussão, p.28: 'we found little evidence for the effects of monitoring... on performance behaviors. Small or nonsignificant effects were observed across a variety of performance criteria'). Mas o claim gruda o número '94 samples' (K total da meta-análise inteira, cobrindo atitudes+estresse+performance+CWB, per Abstract: 'K = 94 independent samples, N = 23,461') especificamente ao achado de performance — só um subconjunto desses 94 estudos mediu performance (ex.: Tabela 6, linha 'Broad performance' sob Invasividade tem K=9, N=2451; 'Task performance' K=4). Nenhuma das 94 amostras testou monitoramento-como-um-todo unicamente para performance; o número foi importado do total da meta-análise para dar peso a um achado que descansa numa fatia bem menor dos estudos.",
+   "corrected": "Nenhuma evidência de que EPM melhora a performance do trabalhador — achado tirado do subconjunto de estudos com medida de performance dentro da meta-análise de 94 amostras (K=94 é o total do estudo, não o N específico de performance)."
+  },
+  {
+   "source": "deci-ryan-monitoramento",
+   "gap": "autodeterminação: zero achados na rodada 1, e é a régua que o adotante propôs",
+   "claim": "Invasiveness — breadth, target specificity, low constraints/target control — is where the negative attitudinal and stress effects concentrate; less invasive designs show measurably less harm; closest empirical analogue to 'autonomy control' as a moderator.",
+   "verdict": "EXAGERADA",
+   "why": "As duas frases citadas aparecem literalmente no artigo (p.25, unidas por reticências legítimas que marcam a supressão de 'We predicted that invasiveness moderates the effects of EPM on attitudes/stress/strain such that'), e o número ρ̄=.20[.10;.29] é exato (Tabela 6/§5.3). Invasividade de fato modera atitudes (ρ̄=-.17) E estresse/tensão (ρ̄=.20) — isso procede. MAS o claim atribui a concentração do efeito de ESTRESSE também a 'low constraints/target control' especificamente — e o próprio texto diz o contrário: 'Too few studies examined the relationship between constraints/target control and stress/strain (K = 2) to include in analyses' (p.25). A Tabela 6 confirma: a linha 'Constraints/Target control' não tem NENHUMA estimativa de estresse/tensão listada. Ou seja, o subelemento constraints/target control nunca foi testado contra estresse — atribuir a ele concentração do efeito de estresse é dado que o artigo explicitamente diz não existir.",
+   "corrected": "Invasividade em conjunto (amplitude/breadth + baixos constraints/controle-do-alvo, definição agregada) modera negativamente atitudes (ρ̄=-.17) e positivamente estresse/tensão (ρ̄=.20); mas isoladamente, o subelemento constraints/target control foi testado contra atitudes, justiça, autonomia e invasão de privacidade — não contra estresse/tensão, por amostra insuficiente (K=2)."
+  },
+  {
+   "source": "mercado-capital",
+   "gap": "eixo mercado/capital: sem sinal confirmado na rodada 1",
+   "claim": "Sindicatos conquistaram cláusulas contratuais restringindo IA/automação no trabalho: obrigação de negociar antes de implementar decisão de IA (Culinary Workers, Las Vegas) e proibição total de tecnologia portuária totalmente automatizada (ILA).",
+   "verdict": "NAO-ENCONTRADA",
+   "why": "A URL do locator (curionic.net/2026/07/ai-labor-relations-unions-collective-bargaining-workers-2026.html) retorna 404 'That page can't be found' no site ao vivo (confirmado via curl com user-agent de navegador), o arquivo de julho/2026 do próprio site não lista nenhum post desse tema, e não há snapshot no Wayback Machine para essa URL. Uma busca pela string exata da quote não retornou nenhuma ocorrência verbatim na web. Não consigo confirmar que a citação exista como descrita — mesmo que a tese de fundo (ILA resiste a automação total desde a convenção de 2018; Culinary Workers de Las Vegas tem cláusula de bargaining pré-implementação de IA) seja real e verificável por outras fontes (FreightWaves, Labor Notes, laborunionnews.substack.com), a fonte específica citada (Curionic) não pôde ser localizada com essa quote.",
+   "corrected": "A tese de fundo é sustentável com outras fontes primárias: ILA-USMX (2018 e atualização 2025, ver Labor Notes 'Longshore Deal Secures New Automation Language') e cobertura sobre a cláusula de bargaining da Culinary Workers Union — mas não pela fonte Curionic citada, cuja página não existe/não foi localizada.",
+   "quote": "the International Longshoremen's Association negotiated a complete prohibition on fully automated port technology",
+   "locator": "Curionic, \"AI and Labor Relations in 2026...\" (julho de 2026), citando cláusulas de acordo coletivo ILA"
+  }
+ ],
+ "elenxo": {
+  "objections": [
+   {
+    "target": "C1 [lgpd-bases] Claim 4 — legítimo interesse exige medida ATIVA de transparência",
+    "survives": true,
+    "evidence": "Única claim do texto legal da LGPD que sobreviveu à ancoragem — e chega SEM quote e SEM locator no dossiê. As outras 5 do mesmo leitor caíram como EXAGERADAS (verbo 'solicitar'→'exigir', quote não-verbatim, inferência de 'subordinação' ausente no art. 11). O eixo estatutário BR, que era ZERO no round 1 (E_OBJECTION_MANDATORY_AXES_UNCOVERED), segue sem citação própria conferível: quem carrega o eixo é o GUIA da ANPD, não a lei."
+   },
+   {
+    "target": "C2 [anpd-legitimo-interesse] teste de balanceamento em 3 fases",
+    "survives": true,
+    "evidence": "Prova um PROCEDIMENTO (finalidade→necessidade→balanceamento), não um LIMIAR. Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE pede o critério que SEPARA; teste cujo output é juízo caso-a-caso é o que E_OBJECTION_NO_UNIFORM_EU_THRESHOLD já dizia não existir. Ganha-se jurisdição BR, não mecanismo. E guia de autoridade ≠ norma vinculante."
+   },
+   {
+    "target": "C3 [anpd-legitimo-interesse] fase de necessidade — só o estritamente necessário, forma menos intrusiva",
+    "survives": true,
+    "evidence": "É o análogo BR do fator (iv) de Bărbulescu. O valor é CONVERGÊNCIA, não novidade — e 'estritamente necessário' não tem piso mensurável para agregados: não distingue agregado-com-piso de agregado-sem-piso, que é exatamente onde a decisão vive."
+   },
+   {
+    "target": "C4 [anpd-legitimo-interesse] balanceamento exige mitigação, NÃO impacto zero",
+    "survives": true,
+    "evidence": "Corta CONTRA a leitura forte de C. Se o padrão é mitigação: (a) o desenho de C entrega MAIS do que a lei pede — é escolha de produto, não conformidade; (b) arma o adversário com a doutrina 'piso de grupo + masking já é mitigação suficiente', enquanto C33-C36 e C42-C47 mostram que o vazamento persiste. A fonte serve aos dois lados."
+   },
+   {
+    "target": "C5 [anpd-legitimo-interesse] legítima expectativa por fatores OBJETIVOS",
+    "survives": true,
+    "evidence": "A expectativa se mede por relação prévia/fonte/contexto/finalidade — não pelo que o titular específico quer. ENFRAQUECE juridicamente o pilar 'soberania do indivíduo' de C (Second Brain soberano): a recusa subjetiva não é a régua legal. C sobrevive como desenho acima do piso, nunca como decorrência dele."
+   },
+   {
+    "target": "C6 [anpd-legitimo-interesse] Exemplo 7 — rastreamento de atividade/produtividade de empregado NÃO passa no legítimo interesse",
+    "survives": true,
+    "evidence": "Achado mais on-axis da rodada e o primeiro do eixo BR — mas prova o EXTREMO, não a linha: webcam + rastreio de produtividade cai por excesso e vulnerabilidade; nada diz sobre telemetria agregada com finalidade declarada e piso. A objeção sobrevive como 'prova menos que um critério'. O ganho, porém, é grande: REFUTA qualquer desenho que roteie telemetria de atividade da pessoa ao empregador sob legítimo interesse — inclusive leitura frouxa do canal indivíduo→organização de C."
+   },
+   {
+    "target": "C7 [anpd-legitimo-interesse] política de privacidade prévia NÃO cura o excesso",
+    "survives": true,
+    "evidence": "Golpe direto no pilar 'notificação prévia' que C importou de Bărbulescu §121(i): no BR, informar antes não legitima. Com C20 (notificação não é veto), o resultado é que notificação nem basta nem é estritamente exigida — C não pode mantê-la como CONDIÇÃO DE ENTRADA do fluxo."
+   },
+   {
+    "target": "C8 [tst-monitoramento] e-mail corporativo = ferramenta de trabalho",
+    "survives": true,
+    "evidence": "Locator é NOTÍCIA do tst.jus.br sobre RR-613/2000-013-10-00.7 (1ª Turma, ~2005), não ementa nem acórdão — e é pré-LGPD. Mesmo defeito de tier que o grafo puniu em E_OBJECTION_C65_23_EXTRAPOLATED ('citado de fonte tier 6 quando o primário existe'). E transpor 'propriedade da ferramenta' de e-mail para nós de um Company Brain é analogia, não holding."
+   },
+   {
+    "target": "C9 [tst-monitoramento] finalidade estritamente profissional do e-mail",
+    "survives": true,
+    "evidence": "Mesmo defeito de fonte. E o vetor aponta para o EMPREGADOR: justifica acesso a artefato de trabalho. Serve ao lado org→artefato de C, não à metade que a decisão precisa defender."
+   },
+   {
+    "target": "C10 [tst-monitoramento] controle 'moderado, generalizado e impessoal'",
+    "survives": true,
+    "evidence": "O mais próximo de um critério operacional BR obtido, e mapeia na assimetria de C (impessoal = nada dirigido ao indivíduo). Mas: vem de notícia, não do acórdão; foi dito para controle de CONTEÚDO de e-mail; e um Company Brain que agrega contribuição por pessoa é discutivelmente 'individualizado' mesmo sem gestor lendo. Usável como vocabulário de desenho, não como regra importada."
+   },
+   {
+    "target": "C11 [tst-monitoramento] câmeras lícitas em local coletivo, ilícitas em vestiário/banheiro",
+    "survives": true,
+    "evidence": "Prova regra ESPACIAL amarrada à exposição do corpo. Transpor 'vestiário' para 'dado íntimo' num grafo de conhecimento é a mesma extrapolação de enquadramento punida em C-65/23. Vale como intuição de zona proibida, não como holding transponível."
+   },
+   {
+    "target": "C12 [tst-monitoramento] núcleo essencial da intimidade / proporcionalidade",
+    "survives": true,
+    "evidence": "'Núcleo essencial' é padrão sem fronteira mensurável — reproduz no BR o achado de E_OBJECTION_NO_UNIFORM_EU_THRESHOLD. A rodada queria fechar essa lacuna no eixo BR e trouxe o mesmo vazio com outro sotaque."
+   },
+   {
+    "target": "C13 [edpb-consentimento] consentimento é IMPROVÁVEL, não rejeitado em bloco",
+    "survives": true,
+    "evidence": "Quote vazia no dossiê. Substantivamente só RE-CONFIRMA um nó existente (E_OBJECTION_CONSENT_NOT_REJECTED_BUT_UNLIKELY): fecha lacuna de TIER, não de conhecimento."
+   },
+   {
+    "target": "C14 [edpb-consentimento] para a maioria do processamento no trabalho a base não pode ser consentimento",
+    "survives": true,
+    "evidence": "Quote vazia. Reforça o já modelado. O que a decisão precisava — qual base sustenta CADA direção do fluxo assimétrico — segue sem resposta: a fonte fala do tratamento em bloco, não de fluxos direcionais."
+   },
+   {
+    "target": "C15 [edpb-consentimento] exceção: válido quando NENHUMA consequência adversa",
+    "survives": true,
+    "evidence": "Quote vazia. Abre porta para features opt-in de C, mas C6 (empregado sem meios efetivos de oposição) e C48 (só controle real move o ponteiro) a fecham na prática: C não deve desenhar nada que dependa de opt-in do empregado como salvaguarda."
+   },
+   {
+    "target": "C16 [edpb-consentimento] exemplo da filmagem: quem não consente é realocado sem penalidade",
+    "survives": true,
+    "evidence": "Quote vazia. Mostra a barra: a alternativa tem de existir e ser gratuita. Nenhum Company Brain oferece 'realocação sem penalidade' como fallback — o exemplo prova que a exceção é praticamente inalcançável no caso de uso, não que ajuda C."
+   },
+   {
+    "target": "C17 [edpb-consentimento] teste de fundo = liberdade real de escolha",
+    "survives": true,
+    "evidence": "Quote vazia. É a base para absorver R1-obj#20 (gestor contorna o opt-out 'pedindo educadamente') — mas isso é um nó a criar, não uma lacuna já fechada no artefato."
+   },
+   {
+    "target": "C18 [barbulescu] os seis fatores do §121",
+    "survives": true,
+    "evidence": "Quote vazia, e o ponto central: os seis fatores são checklist de REVISÃO JUDICIAL ex post sobre medida concreta — nenhum tem forma avaliável em runtime. C se vende como 'a única com mecanismo verificável' e ancora o mecanismo num critério não mecanizável. O trabalho de virar predicado executável está TODO por fazer; a rodada não o fez."
+   },
+   {
+    "target": "C19 [barbulescu] López Ribalda II estende os critérios a videovigilância",
+    "survives": true,
+    "evidence": "A extensão vai de comunicações para CCTV — ambas vigilância humana direta. Nada estende os fatores a agregação estatística/grafo de conhecimento, que é o objeto da decisão. A cadeia de analogia segue sem o último elo, exatamente onde C precisa dele."
+   },
+   {
+    "target": "C20 [barbulescu] notificação é UM critério, não veto; sem violação apesar da ausência de informação prévia",
+    "survives": true,
+    "evidence": "REFUTA a leitura de C que trata notificação prévia como porta de entrada. O piso legal é MAIS BAIXO que o desenho de C. Duplo efeito: C deve declarar notificação como escolha de produto, e saber que um adotante pressionado tem cobertura jurisprudencial para removê-la — a proteção tem de vir do mecanismo, não da citação."
+   },
+   {
+    "target": "C21 [barbulescu] suspeita razoável de falta grave + extensão das perdas justifica vigilância OCULTA",
+    "survives": true,
+    "evidence": "O achado mais desconfortável para C: o desenho não tem NENHUM caminho de exceção investigativa, e a jurisprudência abençoa o oculto sob suspeita razoável, sobretudo com ação concertada de vários empregados. Sem modo investigativo declarado, gated e auditável, a organização real contorna o mecanismo no primeiro incidente — e o contorno é lícito."
+   },
+   {
+    "target": "C22 [cjeu-c65-23] o caso é TRANSFERÊNCIA (SAP→matriz EUA), não monitoramento (§15)",
+    "survives": true,
+    "evidence": "E_OBJECTION_C65_23_EXTRAPOLATED sai de 'afirmação de UM agente' para confirmada no primário (EUR-Lex CELEX 62023CJ0065). O limite imposto ao nó continua válido e agora é irrefutável: C não pode citar C-65/23 como regra de vigilância."
+   },
+   {
+    "target": "C23 [cjeu-c65-23] Ruling 1 — acordo sob art. 88(1) deve cumprir arts. 5, 6(1) e 9",
+    "survives": true,
+    "evidence": "Prova um PISO, não um critério. Resolve R1-obj#16 a favor da tese descartada, expondo a inconsistência interna do round 1. E é UE: o análogo BR (acordo coletivo/CCT, CLT art. 611-A) segue com ZERO fonte — a única do eixo sindical foi NÃO-ENCONTRADA (404)."
+   },
+   {
+    "target": "C24 [cjeu-c65-23] Ruling 2 — controle judicial PLENO sobre a necessidade",
+    "survives": true,
+    "evidence": "Confirma que 'necessidade' é revisável por juiz — isto é, o critério decisivo é justamente o que nenhum mecanismo automatiza. Reforça, não dissolve, a objeção central contra o 'mecanismo verificável' de C."
+   },
+   {
+    "target": "C25 [cjeu-c65-23] Betriebsvereinbarung é espécie de 'collective agreement' do art. 88(1)",
+    "survives": true,
+    "evidence": "Detalhe de enquadramento; não move a decisão. Serve só para impedir que se alegue que acordo de empresa escapa do art. 88."
+   },
+   {
+    "target": "C26 [cjeu-c65-23] necessidade não é negociável pelas partes do acordo",
+    "survives": true,
+    "evidence": "Consequência útil: em C, nenhuma 'combinação com o time' legitima fluxo que não passe no teste de necessidade. Mas é piso, não limiar — e é UE."
+   },
+   {
+    "target": "C27 [cjeu-c34-21] regra nacional só é 'mais específica' se cumprir o art. 88(2) (dispositivo)",
+    "survives": true,
+    "evidence": "Confirma no primário a tese de E_OBJECTION_ART88_NATIONAL_FRAGMENTATION — a objeção do round 1 SOBREVIVE e deixa de ser afirmação de um agente. Prometer critério jurídico europeu único segue vedado a C."
+   },
+   {
+    "target": "C28 [cjeu-c34-21] §61 — a regra precisa de conteúdo normativo PRÓPRIO, distinto das regras gerais",
+    "survives": true,
+    "evidence": "O achado que mais deveria mudar C, e a rodada não o explora: uma política do Onion que apenas reafirma 'finalidade + necessidade + proporcionalidade' não tem conteúdo normativo próprio — é decorativa pelo padrão do próprio TJUE. O critério só existe se carregar conteúdo concreto: limiar, budget de consultas, denylist de predicados, regra de masking."
+   },
+   {
+    "target": "C29 [cjeu-c34-21] §71 — repetir arts. 5/6 ou remeter a eles NÃO pode ser regra mais específica",
+    "survives": true,
+    "evidence": "Formulação irmã de C28 e a mais citável. Aplicada ao artefato: o label atual de C_OPCAO_C é em boa parte reiteração de princípios (finalidade, proporcionalidade, Bărbulescu) — cai no vício que o acórdão nomeia."
+   },
+   {
+    "target": "C30 [cjeu-c34-21] §81 — dispositivos que só condicionam à 'necessidade' apenas reiteram o art. 6(1)(b)",
+    "survives": true,
+    "evidence": "Aplicação concreta do vício, e serve de teste de aceitação do desenho: se cada cláusula do critério de C puder ser substituída por 'seja necessário', a cláusula não existe."
+   },
+   {
+    "target": "C31 [cjeu-c34-21] regra nacional não-conforme é afastada, salvo se valer como art. 6(3)",
+    "survives": true,
+    "evidence": "Mecânica jurídica sem efeito no desenho do Company Brain; entra como contexto, não como constraint. Prova menos do que o peso que a citação sugere."
+   },
+   {
+    "target": "C32 [cjeu-c34-21] a margem do art. 88 não pode comprometer conteúdo e objetivos do regulamento",
+    "survives": true,
+    "evidence": "Genérico; subsumido por C27-C30. Não adiciona limiar."
+   },
+   {
+    "target": "C33 [tracker-attack] o tracker decompõe conhecimento prévio e recompõe estatística abaixo do piso k",
+    "survives": true,
+    "evidence": "Quote vazia. E o regime é de banco estatístico com classes distinguíveis e query sets respondíveis — NÃO um time de 3 a 5. Prova a CLASSE ('piso de contagem não é defesa'), não o caso do adotante. Citá-la para 'times de 3 a 5' repete o erro de escala punido em C-65/23."
+   },
+   {
+    "target": "C34 [tracker-attack] restringir tamanho mínimo/máximo torna o banco inútil E ainda não garante sigilo",
+    "survives": true,
+    "evidence": "Mais duro do que C admite: sugere que pode NÃO existir configuração de piso simultaneamente útil e segura. Se valer no regime do Company Brain, o canal indivíduo→organização só é seguro quando sua saída é gerencialmente pobre — e isso tem de estar escrito na decisão, não ser descoberto pelo adotante em produção."
+   },
+   {
+    "target": "C35 [tracker-attack] general tracker existe na maioria dos bancos",
+    "survives": true,
+    "evidence": "Quote vazia. Reforça 'ausência declarada de tracker não é segurança' — behavior-over-declaration aplicado a privacidade. Mas segue no regime de banco grande."
+   },
+   {
+    "target": "C36 [tracker-attack] k e n−k são as defesas que o tracker foi desenhado para quebrar; compromisso mesmo com k grande",
+    "survives": true,
+    "evidence": "Melhor munição externa obtida para a restrição do adotante e para R1-obj#17 ('grupo de 6 menos grupo de 5 = 1 pessoa'). Ainda assim prova a insuficiência do piso — não quantifica a faixa 3-5 nem cobre consentimento parcial, que é o mecanismo específico que o adotante mediu."
+   },
+   {
+    "target": "C37 [dinur-nissim] perturbação o(√n) ⇒ reconstrução poly-time a distância ≤ εn",
+    "survives": true,
+    "evidence": "Quote vazia e resultado ASSINTÓTICO em n. Para um time de 5 o teorema é vazio — ali morde aritmética trivial de diferença. O uso correto é outro e maior: aplicado ao Company Brain inteiro (n = centenas), prova que grafo que responde muitas consultas agregadas com ruído pequeno é reconstruível — funda PO_BUDGET, não a tese do time pequeno. A rodada não fez esse re-escopo."
+   },
+   {
+    "target": "C38 [dinur-nissim] Teorema 3 — perturbação o(√n) é poly(n)-não-privada",
+    "survives": true,
+    "evidence": "Mesmo re-escopo: prova que ruído insuficiente + volume de consultas quebra privacidade; nada sobre grupos de 3 a 5."
+   },
+   {
+    "target": "C39 [dinur-nissim] t = n·(log n)² consultas aleatórias bastam",
+    "survives": true,
+    "evidence": "Quantifica o ORÇAMENTO de consultas — o insumo mais concreto da rodada para desenhar PO_BUDGET. Mas expõe o outro lado: com n pequeno, t é pequeno, e o budget teria de ser tão apertado que volta a C34 (útil vs seguro)."
+   },
+   {
+    "target": "C40 [dinur-nissim] Teorema 2 — adversário ilimitado, o(n) já é insuficiente",
+    "survives": true,
+    "evidence": "Modelo de adversário irreal para o caso (2^n consultas, tempo exponencial). Prova menos do que o peso retórico sugere."
+   },
+   {
+    "target": "C41 [dinur-nissim] modelo de consulta = soma sobre subconjunto arbitrário",
+    "survives": true,
+    "evidence": "É a premissa que decide a aplicabilidade — e NÃO foi testada contra o Company Brain. Se o grafo só responde predicados provados (o desenho de C), o modelo de subset-sum arbitrário não se aplica diretamente. Sem verificar isso, citar Dinur-Nissim a favor OU contra C é conjectura."
+   },
+   {
+    "target": "C42 [k-anonimato] k-anonimato garante indistinguibilidade, não proteção do valor sensível",
+    "survives": true,
+    "evidence": "Sobrevive como limite ao que qualquer piso de grupo entrega — inclusive o do Viva. Mas é sobre microdados publicados, não sobre grafo interativo; a transposição é do leitor."
+   },
+   {
+    "target": "C43 [k-anonimato] o próprio paper diz que k-anonimato é 'só um ponto de partida'",
+    "survives": true,
+    "evidence": "Confirma R1-obj#17/#30 (limiar sozinho não defende). Prova menos que 'a restrição do adotante está certa': prova que a defesa que o mercado usa é reconhecidamente incompleta."
+   },
+   {
+    "target": "C44 [k-anonimato] ataque de homogeneidade em classe de equivalência pequena",
+    "survives": true,
+    "evidence": "ESTE é o resultado que fala do regime do adotante (grupo pequeno, valor sensível homogêneo → divulgação certa do atributo sem identificar o registro) e é a melhor âncora externa da rodada — melhor que tracker e Dinur-Nissim, que são de n grande. A objeção sobrevive por escopo: microdados, não consultas; e a cura conhecida (l-diversity/t-closeness) não foi avaliada contra o desenho de C."
+   },
+   {
+    "target": "C45 [k-anonimato] ataque por conhecimento externo elimina valores implausíveis",
+    "survives": true,
+    "evidence": "Casa com o corpus (classification-por-vertical/PO_INFERENCIA). Confirma que num time pequeno o COLEGA é o adversário com conhecimento externo — cenário que C não modela: C modela organização↔indivíduo, não par↔par dentro do time."
+   },
+   {
+    "target": "C46 [k-anonimato] ataque de assimetria (skewness) vaza mesmo sob l-diversity",
+    "survives": true,
+    "evidence": "Fecha a rota de escape: nem a correção canônica do k-anonimato salva grupo pequeno/enviesado. Para C: piso de grupo + l-diversity NÃO é desenho suficiente; ou há budget/masking, ou o canal não abre."
+   },
+   {
+    "target": "C47 [k-anonimato/IAPP] windowing attacks — janelas de tempo sobrepostas reconstroem o grupo pequeno",
+    "survives": true,
+    "evidence": "Fecha R1-obj#40 (fonte não lida) e nomeia o vetor mais provável num produto real: a UI que deixa o gestor escolher o período. É constraint concreto e ausente de C hoje — C fala de predicado e budget, não de composição temporal de recortes."
+   },
+   {
+    "target": "C48 [deci-ryan-monitoramento] mais constraints/controle do alvo ⇒ mais justiça/autonomia, menos invasão",
+    "survives": true,
+    "evidence": "Única alavanca POSITIVA medida da rodada — e C não a tem: dá finalidade declarada e egresso por predicado, não dá botão sobre COMO e QUANDO. Sobrevive como exigência de desenho, não como refutação. Ressalva: a fonte é meta-análise de EPM (Ravid et al. 2023), proxy de Deci & Ryan, que segue não lido — e o eixo 4 foi pedido nominalmente."
+   },
+   {
+    "target": "C49 [deci-ryan-monitoramento] transparência melhora atitudes, não desempenho; sem dado sobre estresse",
+    "survives": true,
+    "evidence": "Esvazia transparência como salvaguarda no desfecho que importa. 'Atitudes' é autorrelato. Com C7 (política prévia não cura) e C20 (notificação não é veto), o pilar de transparência de C perde as três pernas ao mesmo tempo."
+   },
+   {
+    "target": "C50 [deci-ryan-monitoramento] a finalidade COMUNICADA teve pouco ou nenhum efeito moderador",
+    "survives": true,
+    "evidence": "O achado mais adverso ao NOME da opção C ('fluxo por finalidade'). Se declarar o propósito quase não altera desempenho, atitudes nem estresse, purpose-binding é artefato de governança e prova jurídica — não proteção da pessoa. C tem de parar de reivindicar benefício experiencial da declaração e amarrar a finalidade a limitação EXECUTÁVEL — o mesmo que C28/C29 exigem pelo flanco jurídico."
+   },
+   {
+    "target": "C-rejeitadas [deci-ryan-monitoramento] as 3 claims reprovadas carregam o dado que C mais precisava",
+    "survives": true,
+    "evidence": "As rejeições revelam que invasividade MODERA estresse (ρ̄=.20 [.10;.29]) e atitudes (ρ̄=-.17) — ou seja, desenho importa, que é a premissa de C. Mas isso só aparece no texto da REPROVAÇÃO do verificador; nenhum desses números virou claim ancorada. O insumo mais favorável a C está no dossiê em forma inutilizável como citação."
+   },
+   {
+    "target": "C51 [viva-grupo-minimo] Copilot Dashboard: default 10, não 5",
+    "survives": false,
+    "evidence": "Prova exatamente o que foi medido e bate com E_OBJECTION_VIVA_MONITOR_VERB_OVERSTATES e E_OBJECTION_INDIVIDUAL_METRICS_UNSUPPORTED ('padrão 10, reduzível a 5'). Sem daylight entre citação e uso."
+   },
+   {
+    "target": "C52 [viva-grupo-minimo] piso absoluto 5 no admin center",
+    "survives": false,
+    "evidence": "Confirma o piso e fecha R1-obj#14 sem sobra interpretativa."
+   },
+   {
+    "target": "C53 [viva-grupo-minimo] Viva Insights legado: default 5, não configurável abaixo de 5",
+    "survives": false,
+    "evidence": "Resolve a contradição interna do round 1: os dois pisos diferentes eram duas SUPERFÍCIES diferentes, não erro. Fecha R1-obj#14 verbatim."
+   },
+   {
+    "target": "C54 [viva-grupo-minimo] combinar atributos organizacionais com linha de-identificada permite inferir identidade",
+    "survives": false,
+    "evidence": "Admissão do fornecedor CONTRA o próprio interesse — tier alto para esta finalidade. Prova o que o round precisava: quase-identificadores compostos re-identificam, validando o testemunho do adotante e PO_L3_FILTRO do corpus. Fecha R1-obj#38."
+   },
+   {
+    "target": "C55 [viva-grupo-minimo] exemplo: nenhuma coluna identifica, juntas devem ser tratadas como dado pessoal",
+    "survives": false,
+    "evidence": "Mesma admissão, com exemplo concreto. Sem exagero entre citação e uso."
+   },
+   {
+    "target": "C56 [viva-grupo-minimo] definição de distribution masking e A QUAIS SUPERFÍCIES se aplica",
+    "survives": true,
+    "evidence": "O detalhe que o dossiê registra e não explora: o masking é ESCOPADO POR SUPERFÍCIE — logo não protege onde não está ligado. Para quem copiar o padrão Viva, a proteção é configuração, não propriedade. E ε e escopo da privacidade diferencial seguem não lidos (R1-obj#18/#30 de pé)."
+   },
+   {
+    "target": "C57 [viva-grupo-minimo] três estratégias de proteção de agregados, uma delas masked distributions",
+    "survives": true,
+    "evidence": "Fecha R1-obj#37 como fato, mas a leitura decisiva é outra: a Microsoft empilha masking SOBRE o piso de grupo — admissão prática de que o piso sozinho não basta. Confirma a restrição do adotante por comportamento do mercado, não por matemática."
+   },
+   {
+    "target": "C58 [mercado-capital] Glean: Series F US$150M a US$7,2B",
+    "survives": true,
+    "evidence": "Tira o round 1 do 'SEM SINAL DE CAPITAL' (E_MERCADO_NO_CAPITAL_SIGNAL_EMPLOYEE_DATA), mas prova que busca/IA corporativa é financiada — não que analytics de comportamento do empregado seja o que se compra. Press release do próprio fornecedor. Prova menos do que o eixo pedia."
+   },
+   {
+    "target": "C59 [mercado-capital] Microsoft removeu nomes individuais do Productivity Score (01/12/2020, primário)",
+    "survives": false,
+    "evidence": "Fecha R1-obj#28 e #35 no primário (blog M365, Jared Spataro). É o precedente documentado de recuo por pressão pública que o round 1 havia cortado por orçamento."
+   },
+   {
+    "target": "C60 [mercado-capital] 'ninguém poderá acessar dados de como um usuário individual usa o M365'",
+    "survives": true,
+    "evidence": "A citação está certa; a LEITURA fácil está errada e precisa ser dita: o recuo de 2020 não virou tendência — a mesma Microsoft entregou em out/2025 comparação gerencial por equipe (C51/C52). A linha não foi abolida, foi deslocada para agregado-com-piso. É essa a lição de mercado, não 'backlash funciona'."
+   },
+   {
+    "target": "C61 [mercado-capital] Ross v. Netradyne (BIPA, dashcams com IA)",
+    "survives": true,
+    "evidence": "É ALEGAÇÃO, não julgado; BIPA é lei biométrica de Illinois, nicho; locator é ClassAction.org, não o docket. Prova que há litígio, não que a prática foi declarada ilícita."
+   },
+   {
+    "target": "C62 [mercado-capital] Garcia v. Figueroa Tank Lines / Samsara",
+    "survives": true,
+    "evidence": "Item mais fraco do dossiê: veículo setorial (CDLLife), sem número de processo verificado, alegação não adjudicada, cronologia estranha no próprio locator (demissão 04/08/2025, 'relatado 2026'). Não deve entrar no grafo como evidência de nada além de 'há atividade litigiosa', e em tier baixo."
+   },
+   {
+    "target": "R1-obj#12 — imagens do espaço doméstico como vigilância ilegítima",
+    "survives": true,
+    "evidence": "PARCIAL. C11 (TST: vestiário/banheiro ilícito pela exposição do corpo) dá âncora BR para 'zona proibida pela natureza do espaço', mas o estudo tier 8 sobre home office não foi lido. Continua de pé."
+   },
+   {
+    "target": "R1-obj#14 — Viva grupo mínimo 5, não configurável abaixo",
+    "survives": false,
+    "evidence": "RESOLVIDA por C52 e C53: piso 5 no legado e piso absoluto 5 no Copilot Dashboard (default 10). O descarte do round 1 era indevido; a contradição aparente eram duas superfícies."
+   },
+   {
+    "target": "R1-obj#15 — regra de grupo só para gráficos derivados de RH; abaixo do limiar não exibe nada",
+    "survives": true,
+    "evidence": "NÃO ENDEREÇADA. Nenhuma claim da rodada 2 cobre o escopo da regra nem supressão-vs-ruído. C56 é adjacente (masking escopado), não idêntica."
+   },
+   {
+    "target": "R1-obj#16 — art. 88 exige necessidade/transparência/proporcionalidade mesmo com acordo coletivo",
+    "survives": false,
+    "evidence": "RESOLVIDA a favor da tese descartada, no primário: C23 (arts. 5/6(1)/9 continuam obrigatórios), C24 (controle judicial pleno) e C26 (necessidade não negociável). A inconsistência interna do round 1 fica selada."
+   },
+   {
+    "target": "R1-obj#17 — piso 5 não defende contra diferença entre grupos sobrepostos",
+    "survives": false,
+    "evidence": "RESOLVIDA/CONFIRMADA por C36 (k e n−k são as defesas que o tracker quebra), C44/C46 (homogeneidade e skewness em classe pequena), C47 (windowing), C54/C55 (Microsoft admite composição de quase-identificadores) e C57 (a própria MS empilha masking sobre o piso)."
+   },
+   {
+    "target": "R1-obj#18 — privacidade diferencial da Microsoft como meio-termo",
+    "survives": true,
+    "evidence": "PARCIAL. C56/C57 confirmam que masked distributions existe e é nomeada, mas ε, garantia formal e escopo completo seguem sem doc primária de DP."
+   },
+   {
+    "target": "R1-obj#19 — coorte de ≥20 empresas (contradição interna do pipeline)",
+    "survives": true,
+    "evidence": "NÃO ENDEREÇADA por nenhuma fonte da rodada 2. A contradição entre o descarte e o item cortado do mesmo artigo permanece sem juiz."
+   },
+   {
+    "target": "R1-obj#20 — gestor contorna o opt-out 'pedindo educadamente'",
+    "survives": false,
+    "evidence": "RESOLVIDA em substância por C15/C17 (válido só sem NENHUMA consequência adversa; teste = liberdade real sem coerção) + C6 (ANPD: empregado sem meios efetivos de oposição) + C48 (só controle real do alvo move o ponteiro). Deve virar nó: opt-out não é salvaguarda sob subordinação."
+   },
+   {
+    "target": "R1-obj#21 — Glean só expõe atividade agregada multiusuário",
+    "survives": true,
+    "evidence": "NÃO ENDEREÇADA: a rodada 2 tocou o Glean só pelo press release da Série F (C58). docs.glean.com e o blog do knowledge graph seguem não relidos."
+   },
+   {
+    "target": "R1-obj#22 — gaming de métrica (Goodhart) / transparency paradox",
+    "survives": true,
+    "evidence": "PARCIAL e enfraquecida: C49/C50 (transparência e finalidade não movem desempenho) e C59/C60 (recuo do Productivity Score) sustentam o constraint 'dado não vira proxy avaliativo', mas nenhum estudo empírico de Goodhart nem Bernstein 2012 foi lido."
+   },
+   {
+    "target": "R1-obj#24 — trabalhador duplamente vulnerável; legítimo interesse preferível",
+    "survives": false,
+    "evidence": "RESOLVIDA COM INVERSÃO DE SINAL: C2-C5 dão a estrutura do LIA no BR, e C6/C7 mostram que o legítimo interesse FALHA justamente para rastreio de atividade/produtividade de empregado, e que política de privacidade não cura. 'Preferível' vira 'estruturado porém indisponível para este uso'."
+   },
+   {
+    "target": "R1-obj#25 — ausência de limite temporal como violação",
+    "survives": false,
+    "evidence": "RESOLVIDA/absorvida: C18 (fator (ii) inclui duração) e C19 (López Ribalda: limitações no tempo e no espaço). Agora com fonte primária."
+   },
+   {
+    "target": "R1-obj#26 — preocupação desigual com dado de saúde / sensibilidade herdada",
+    "survives": true,
+    "evidence": "PARCIAL: C44-C46 dão o mecanismo genérico (divulgação de atributo em grupo pequeno), mas a claim de LGPD art. 11 caiu como EXAGERADA e nenhum estudo do eixo foi lido."
+   },
+   {
+    "target": "R1-obj#27 — rastreamento de localização no Teams, consentimento individual",
+    "survives": true,
+    "evidence": "NÃO ENDEREÇADA. O primário nunca foi buscado; a possível inversão ('opt-out por padrão') segue sem verificação."
+   },
+   {
+    "target": "R1-obj#28 e #35 — backlash do Productivity Score (nomeava indivíduos)",
+    "survives": false,
+    "evidence": "RESOLVIDAS no primário por C59 e C60 (Microsoft 365 Blog, 01/12/2020). Era a maior lacuna de mercado do round 1 — fechada, com a ressalva de C60 (o recuo não virou tendência)."
+   },
+   {
+    "target": "R1-obj#29 — histograma do Viva exibe bin com 1 indivíduo",
+    "survives": true,
+    "evidence": "NÃO RE-VERIFICADA. É a evidência mais OPERACIONAL da restrição do adotante dentro de um produto em produção — piso de grupo convivendo com bin unitário — e a rodada complementar não a tocou. De pé, e a mais cara das que sobraram."
+   },
+   {
+    "target": "R1-obj#30 — a página do Viva não menciona DP/k-anonimato, só limiar",
+    "survives": true,
+    "evidence": "PARCIAL com sinal trocado: C56/C57 mostram que a Microsoft SIM nomeia masked distributions e três estratégias — mas escopadas por superfície e sem ε. Sobrevive redefinida: não é 'só limiar', é 'proteção desigual entre superfícies, sem garantia formal'."
+   },
+   {
+    "target": "R1-obj#31 — telemetria do Glean isolada no GCP protege a empresa, não o empregado",
+    "survives": true,
+    "evidence": "NÃO ENDEREÇADA. É exatamente a lacuna do eixo pessoa×empregador e continua sem leitura."
+   },
+   {
+    "target": "R1-obj#32 — ACL por item: o indivíduo não controla o próprio nó",
+    "survives": true,
+    "evidence": "Sobrevive e GANHA PESO com C48 (controle do alvo é a única alavanca com efeito medido). Deve virar constraint de primeira classe na articulação com o Second Brain (C_MEMBRO_SOBERANO do corpus), não ficar como descarte."
+   },
+   {
+    "target": "R1-obj#33 — reação da comunidade (HN) como sinal de percepção",
+    "survives": true,
+    "evidence": "PARCIAL: C61/C62 trazem sinais mais duros (litígio), mas a trajetória de comunidade segue sem medição (HN Algolia nunca consultado)."
+   },
+   {
+    "target": "R1-obj#34 — art. 88(1) admite dado de emprego para planejamento/organização do trabalho",
+    "survives": true,
+    "evidence": "PARCIAL: C27-C32 confirmam o art. 88 como cláusula de abertura sujeita a arts. 5/6/9, mas a enumeração literal ('planning and organisation of work') nunca foi citada verbatim — e o grafo a cita num label sem tê-la verificado (o próprio label admite: 'claim CORTADA por orcamento, NAO verificada')."
+   },
+   {
+    "target": "R1-obj#36 — modelos randomizados + ≥20 empresas não tratam diferença em times pequenos",
+    "survives": true,
+    "evidence": "PARCIAL: a insuficiência geral está provada (C34, C36, C44-C47), mas a doc primária da randomização do Viva segue não lida."
+   },
+   {
+    "target": "R1-obj#37 — distribution masking",
+    "survives": false,
+    "evidence": "RESOLVIDA por C56 e C57 (definição, superfícies e as três estratégias nomeadas)."
+   },
+   {
+    "target": "R1-obj#38 — atributos combinados permitem inferir identidade",
+    "survives": false,
+    "evidence": "RESOLVIDA por C54 e C55, em admissão do próprio fornecedor contra o próprio interesse."
+   },
+   {
+    "target": "R1-obj#39 — legítimo interesse documentado + DPIA/RIPD para perfilamento de empregados",
+    "survives": true,
+    "evidence": "PARCIAL: C4 sustenta salvaguardas documentadas na fase 3 do LIA, mas o gatilho procedimental (LGPD art. 38 / WP248) não foi ancorado — e a claim do art. 10 §3 caiu por troca de verbo. O mecanismo procedimental que faltava continua faltando."
+   },
+   {
+    "target": "R1-obj#40 — fonte não lida: IAPP, aggregating over anonymized data",
+    "survives": false,
+    "evidence": "RESOLVIDA: C47 lê a fonte e extrai o windowing attack."
+   },
+   {
+    "target": "R1-obj#41 — fonte não lida: spdp.di.unimi.it/papers/tdp2023.pdf",
+    "survives": false,
+    "evidence": "RESOLVIDA: C42-C46 vêm dela, com quotes verbatim e locators por seção/página."
+   },
+   {
+    "target": "R1-obj#42 — fonte não lida: ncbi PMC2858714 (supressão de célula pequena em saúde)",
+    "survives": true,
+    "evidence": "NÃO LIDA nesta rodada. tdp2023 cobre terreno adjacente, mas a tradição de disclosure control com regra de célula <5/<11 — o análogo metodológico mais maduro do piso do Viva — continua ausente."
+   },
+   {
+    "target": "R1-obj#44 — fonte não lida: glean.com/blog/knowledge-graph-agentic-engine",
+    "survives": true,
+    "evidence": "NÃO LIDA. A objeção do Achado 3 (identidade para ACL vs pessoa como sujeito) segue sem o material que a resolveria."
+   },
+   {
+    "target": "ARTEFATO — D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION está `status: done` com `plane: DEV`",
+    "survives": true,
+    "evidence": "`.claude/rules/kg-grammar.md` diz: 'decision só vira done verificada em PROD'. O nó está done no plano DEV e o radar passa (rc=0, medido isolado, não por pipe). Grep em .claude/validation/kg-radar.sh: 16 ocorrências de PROD, nenhuma cobrindo 'decision done exige PROD' — a regra está escrita e não é mecanizada. Fail-open silencioso: vale por disciplina, que é a cura que o próprio core recusa."
+   },
+   {
+    "target": "ARTEFATO — C_OPCAO_D ('não selar agora') segue `confirmed` ao lado de uma decisão `done`",
+    "survives": true,
+    "evidence": "O grafo afirma ao mesmo tempo 'GATED: não selar agora' (C_OPCAO_D_GATED_COMPLEMENTARY_ROUND, confirmed) e a decisão selada (D_, done). O radar não vê contradição porque não há aresta REFUTES/SUPERSEDES entre elas. Cumprida a condição, D deve ser reconciliada (superseded pelo cumprimento) ou o grafo segue instruindo a não selar o que já foi selado."
+   },
+   {
+    "target": "ARTEFATO — label e meta ficaram desatualizados após o selo",
+    "survives": true,
+    "evidence": "O label de D_ ainda abre com 'DECISAO ABERTA (o maestro sela)' e o comentário de meta (l.33) ainda diz 'D_... nasce open. Quem sela é o maestro', ambos com status done. E E_OBJECTION_MANDATORY_AXES_UNCOVERED ainda impõe 'nenhuma opcao pode ser selada nesta rodada', CONSTRAINS sobre decisão já selada e sobre eixos que esta rodada cobriu em parte. Três textos que mentem sobre o estado."
+   }
+  ],
+  "gapsClosed": [
+   "Eixo 1 (BR) deixou de ser ZERO: o Guia de Legítimo Interesse da ANPD entra com teste de 3 fases (C2), necessidade estrita (C3), padrão de mitigação (C4), expectativa objetiva (C5) e — decisivo — o Exemplo 7, que julga monitoramento de produtividade de empregado INCOMPATÍVEL com legítimo interesse por excesso e vulnerabilidade (C6), e nega que política de privacidade prévia cure o excesso (C7). E_OBJECTION_MANDATORY_AXES_UNCOVERED perde a metade 'eixo 1'.",
+   "Critério BR de controle nomeado: 'moderado, generalizado e impessoal' (C10) mais regra espacial dura — câmera lícita em local coletivo, ilícita em vestiário/banheiro (C11). Vocabulário de desenho que o round 1 não tinha em nenhuma jurisdição nacional.",
+   "Bărbulescu §121 lido no primário e confirmado (C18), com López Ribalda II estendendo a videovigilância (C19): E_OBJECTION_BARBULESCU_DISCARDED_BY_COMODISMO sai de 'afirmação de um agente' para ancorada.",
+   "C-65/23 lido no primário: confirma que é caso de TRANSFERÊNCIA (C22, §15) e que o acordo coletivo não afasta arts. 5/6(1)/9 nem a revisão judicial plena da necessidade (C23, C24, C26). E_OBJECTION_C65_23_EXTRAPOLATED confirmada; R1-obj#16 resolvida.",
+   "C-34/21 lido no dispositivo: fragmentação confirmada (C27) e, novo, o teste de conteúdo normativo PRÓPRIO (C28 §61, C29 §71, C30 §81) — regra que só reitera finalidade/necessidade não é regra. E_OBJECTION_ART88_NATIONAL_FRAGMENTATION ancorada.",
+   "Eixo 3 (matemática de grupos pequenos) ganhou corpo: tracker (C33-C36), Dinur-Nissim (C37-C41), k-anonimato com homogeneidade, conhecimento externo e skewness (C42-C46) e windowing attack do IAPP (C47). R1-obj#40 e #41 (fontes não lidas) fechadas.",
+   "Admissão do fornecedor: a Microsoft declara que atributos organizacionais combinados com linha de-identificada permitem inferir identidade (C54, C55) e empilha masked distributions sobre o piso de grupo (C56, C57). R1-obj#37 e #38 fechadas — a restrição do adotante passa a ter confirmação por comportamento de mercado, não só por testemunho.",
+   "Pisos do Viva medidos e a contradição interna dissolvida: Copilot Dashboard default 10 / piso 5 (C51, C52); Viva Insights legado default 5 / piso 5 (C53). R1-obj#14 fechada.",
+   "Mercado/capital sai de 'SEM SINAL': Glean Series F US$150M a US$7,2B (C58), recuo primário do Productivity Score em 01/12/2020 com remoção de nomes e vedação de dado por usuário (C59, C60), e dois litígios de vigilância por IA no trabalho (C61, C62). R1-obj#28 e #35 fechadas — E_MERCADO_NO_CAPITAL_SIGNAL_EMPLOYEE_DATA precisa ser reescrita.",
+   "Eixo 4 coberto por proxy — e com resultado ADVERSO ao pressuposto de C: constraints/controle do alvo é a única alavanca com efeito medido (C48); transparência muda atitude, não desempenho, e não há dado sobre estresse (C49); finalidade COMUNICADA quase não modera nada (C50).",
+   "R1-obj#20 (opt-out contornado sob subordinação) resolvida em substância por C15/C17 + C6 + C48; R1-obj#24 resolvida com inversão de sinal; R1-obj#25 (limite temporal) absorvida por C18/C19."
+  ],
+  "gapsOpen": [
+   "Eixo 4 NÃO foi cumprido como pedido: Deci & Ryan (autodeterminação) segue não lido; chegou meta-análise de EPM (Ravid et al. 2023) como proxy, e 3 de suas 6 claims caíram como EXAGERADAS — inclusive as que carregavam os números de moderação (ρ̄=.20 estresse, ρ̄=-.17 atitudes), que só aparecem no texto das reprovações e nunca viraram citação utilizável.",
+   "Texto legal da LGPD: 5 de 6 claims REPROVADAS (verbo trocado, quote não-verbatim, inferência de 'subordinação' inexistente no art. 11). A única ancorada (C1) veio sem quote e sem locator. O eixo estatutário BR segue sem citação própria conferível — quem o sustenta é o guia da ANPD.",
+   "ANPD: nenhuma DECISÃO ou sanção sobre monitoramento de empregado foi lida, só guia interpretativo. E o TST foi citado por NOTÍCIA do tst.jus.br, não por acórdão/ementa, com o caso-âncora (RR-613/2000) pré-LGPD.",
+   "Negociação coletiva no BR: ZERO fonte. A única tentativa do eixo sindical/acordo coletivo (Curionic) é NÃO-ENCONTRADA (404, sem snapshot no Wayback). O análogo brasileiro do art. 88 GDPR (CCT / CLT art. 611-A) continua em branco — e é justamente o que C-65/23 e C-34/21 regulam na UE.",
+   "DPIA/RIPD como gatilho procedimental (LGPD art. 38, WP248 do EDPB) não ancorado; a claim do art. 10 §3 caiu por troca de 'solicitar' por 'exigir'. R1-obj#39 de pé.",
+   "Nenhuma fonte quantifica o regime de 3 a 5 pessoas. Tracker e Dinur-Nissim são assintóticos em n grande (DN precisa de ~n·(log n)² consultas); citá-los para um time de 5 repete o erro de escala que o próprio grafo puniu em C-65/23. O que fala do regime pequeno é k-anonimato/homogeneidade/skewness (C44-C46), e sobre microdados publicados, não sobre grafo interativo.",
+   "Aplicabilidade não testada: ninguém verificou se o canal 'só predicado provado' de C cai no modelo de subset-sum de Dinur-Nissim (C41). Sem isso, invocar DN a favor OU contra C é conjectura.",
+   "ε e garantia formal da privacidade diferencial da Microsoft seguem sem doc primária; e o masking é escopado por superfície (C56), logo é configuração, não propriedade. R1-obj#18 e #30 de pé.",
+   "R1-obj#29 (histograma do Viva exibindo bin com 1 indivíduo) NÃO foi re-verificada — é a evidência mais operacional da restrição do adotante dentro de um produto em produção, e a rodada complementar não a tocou.",
+   "Seguem integralmente de pé, sem nenhuma fonte da rodada 2: R1-obj#15 (escopo da regra de grupo), #19 (coorte ≥20, contradição interna), #21 (Glean só agregado), #27 (localização no Teams), #31 (localidade protege a empresa, não o empregado), #32 (indivíduo não controla o próprio nó), #33 (trajetória de comunidade), #42 (PMC2858714, supressão de célula pequena em saúde), #44 (blog do knowledge graph do Glean). Parciais de pé: #12, #22, #26, #30, #34, #36, #39.",
+   "Second Brain / PKM / Notion: eixo declarado como lacuna em E_LACUNAS_COMPARTILHAMENTO_0913 e com ZERO fonte também nesta rodada — e é metade da articulação que a pergunta central pede.",
+   "Nenhuma fonte mede o desenho ASSIMÉTRICO que é o coração de C: ninguém testou se devolver à pessoa o dado dela reduz dano percebido, nem se o canal organização→indivíduo tem efeito distinto do inverso. A tese central de C continua sem evidência direta — o diagnóstico de E_OBJECTION_MANDATORY_AXES_UNCOVERED, agora em escopo menor.",
+   "Litígio como sinal é fraco: C61 é alegação sob lei biométrica de Illinois citada por ClassAction.org; C62 vem de veículo setorial sem docket e com cronologia inconsistente. Não sustentam 'o mercado está sendo condenado', só 'há atividade litigiosa'.",
+   "Defeitos mecânicos do artefato, não fechados: D_ está `done` em `plane: DEV` contra a gramática (.claude/rules/kg-grammar.md) e o radar não cobre a regra (rc=0 medido); C_OPCAO_D segue `confirmed` dizendo 'não selar agora' ao lado da decisão selada; o label de D_ ainda abre com 'DECISAO ABERTA' e o meta l.33 ainda diz que ela 'nasce open'; E_OBJECTION_MANDATORY_AXES_UNCOVERED ainda impõe 'nenhuma opção pode ser selada nesta rodada'."
+  ],
+  "recommendation": "A opção C SOBREVIVE como desenho — nenhuma fonte desta rodada a refuta, e três objeções que a restringiam (C-65/23 extrapolado, fragmentação do art. 88, Bărbulescu descartado por comodismo) passaram de afirmação de um agente para ancoradas no primário. Mas a condição do selo foi cumprida DE FORMA DESIGUAL: eixo 3 (matemática) e eixo 5 (mercado) fechados; eixo 1 (BR) fechado só pelo guia da ANPD, com o texto legal reprovado 5/6 e o TST lido por notícia; eixo 4 cumprido por proxy; e o análogo BR de acordo coletivo caiu numa fonte 404.\n\nQUATRO MUDANÇAS OBRIGATÓRIAS EM C, todas com evidência ancorada:\n(1) REBAIXAR a finalidade declarada de proteção a artefato de governança. C50 mostra que finalidade comunicada quase não modera atitude, desempenho nem estresse; C28/C29/C30 (TJUE §61/§71/§81) dizem pelo flanco jurídico que regra que só reitera finalidade/necessidade não tem conteúdo normativo próprio. O critério de C precisa carregar conteúdo concreto — limiar, budget de consultas, denylist de predicados, regra de masking — ou é decorativo pelos dois padrões ao mesmo tempo.\n(2) ADICIONAR a alavanca que mede. C48: constraints/controle do alvo é a ÚNICA característica com efeito positivo medido (mais justiça e autonomia percebidas, menos invasão). C dá finalidade declarada e egresso por predicado, e nenhum botão sobre COMO e QUANDO. Sem controle real (escopo, janela, inspeção, veto), C otimiza o que não move o ponteiro — e isso promove R1-obj#32 a constraint de primeira classe.\n(3) REBAIXAR a notificação prévia de porta de entrada a salvaguarda obrigatória porém insuficiente: C7 (ANPD — política de privacidade prévia não cura o excesso) e C20 (López Ribalda II — notificação é um critério entre outros, sem violação mesmo com ausência de informação prévia) derrubam as duas pernas. O portão passa a ser necessidade + minimização, e C deve parar de reivindicar fundamento legal para o que é escolha de produto acima do piso.\n(4) DECLARAR um regime de exceção investigativa. C21: a Grande Câmara admite vigilância OCULTA sob suspeita razoável de falta grave com perdas relevantes. C não tem esse caminho — e mecanismo sem porta de exceção é contornado no primeiro incidente, com cobertura jurisprudencial. Ou C cria modo investigativo gated, logado e revisável ex post, ou escreve que o recusa e que a organização terá de sair do mecanismo.\n\nLIMITE DURO NOVO, de jurisdição BR: o Exemplo 7 da ANPD (C6) reprova rastreio de atividade/produtividade de empregado sob legítimo interesse, com a vulnerabilidade do empregado retirando eficácia da legítima expectativa. Logo o canal indivíduo→organização de C não pode carregar telemetria de atividade da pessoa em NENHUM grau de agregação: 'só predicado provado' tem de ser lido como predicado sobre artefato de trabalho e decisão, nunca sobre atividade/produtividade — o que exige denylist de vocabulário além do budget.\n\nSOBRE A RESTRIÇÃO MATEMÁTICA DO ADOTANTE (agregado vaza o indivíduo em times de 3 a 5): GANHOU FONTE EXTERNA PARCIALMENTE, e a distinção importa. GANHOU para a CLASSE — piso de contagem é exatamente a defesa que o tracker foi desenhado para quebrar, inclusive com k grande (C36); divulgação de atributo em classe de equivalência pequena por homogeneidade, conhecimento externo e skewness, sobrevivendo até a l-diversity (C44-C46); reconstrução por fatiamento temporal sobreposto (C47); admissão da própria Microsoft de que atributos combinados re-identificam (C54/C55), com masking empilhado sobre o piso (C57), isto é, o mercado PAGA a restrição. NÃO GANHOU para o NÚMERO — nenhuma fonte quantifica 3 a 5: tracker e Dinur-Nissim são resultados de n grande (DN precisa de ~n·(log n)² consultas) e usá-los para um time de cinco é a mesma extrapolação de escala que o grafo puniu em C-65/23; o que serve ao time pequeno é o k-anonimato, e sobre microdados publicados, não sobre grafo interativo. O uso CORRETO de Dinur-Nissim é outro e maior: re-escopado ao Company Brain inteiro (n = centenas), funda o PO_BUDGET — e nem isso foi testado contra o modelo de consulta de C (C41). Portanto E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS deve ser reescrito como CONFIRMADO NA CLASSE e NÃO-QUANTIFICADO NA FAIXA, com a âncora empírica mais próxima sendo prática de produto (piso 10/5 + masking por superfície), não matemática.\n\nAÇÃO: selar C com as quatro emendas e abrir uma rodada 3 CURTA e NOMEADA, com exatamente quatro alvos, não genérica — (a) acórdão/ementa do TST (RR-613/2000-013-10-00.7 e RR-21162-51.2015.5.04.0014) mais qualquer decisão da ANPD sobre monitoramento; (b) Deci & Ryan primário OU a Tabela 6 de Ravid ancorada com quote; (c) a página do Viva com o bin de 1 indivíduo (R1-obj#29) e o ε do DP; (d) acordo coletivo BR (CLT art. 611-A) como análogo do art. 88. E, antes de qualquer coisa, CURAR O ARTEFATO: D_ está `done` em `plane: DEV` contra a gramática escrita, com o radar passando rc=0 porque a regra nunca virou mecanismo (16 ocorrências de PROD em kg-radar.sh, nenhuma cobrindo 'decision done exige PROD'); C_OPCAO_D segue `confirmed` mandando não selar ao lado da decisão selada; e três textos — o label de D_, o comentário de meta l.33 e o limite de E_OBJECTION_MANDATORY_AXES_UNCOVERED — ainda afirmam que nada pode ser selado. Um grafo que mente sobre o próprio estado é pior que uma lacuna declarada."
+ },
+ "kg": {
+  "kgPath": "/home/marcio/onion-evolve/docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml",
+  "radarExit": 0,
+  "nodesAdded": 64,
+  "edgesAdded": 79,
+  "nodesTotal": 89,
+  "summary": "A rodada complementar da opção D foi apendada ao grafo (Aufhebung: nada reescrito) — 64 nós novos (62 claims ancoradas + a contabilidade E_R2_LACUNAS_RODADA_COMPLEMENTAR_0913 + a proposta Q_R2_REVISAO_DO_SELO_C) e 79 arestas, com 4 SUPERSEDES onde o primário substitui o agregador da rodada 1 (EDPB sobre o consentimento \"rejeitado\", EUR-Lex sobre C-65/23, learn.microsoft.com sobre o piso de grupo do Viva, Série F do Glean sobre o \"sem sinal de capital\"), 14 SUPPORTS externos elevando a restrição matemática do adotante de testemunho a primário (Denning 1979, Dinur & Nissim 2003, k-anonimato/l-diversity/IAPP, a própria Microsoft) e 15 CONSTRAINS limitando a opção C sem tocar no selo do maestro; radar --integrity --schema exit 0 (e radar completo também 0) em 89 nós / 129 arestas."
+ }
+}

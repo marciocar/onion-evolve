@@ -13,7 +13,7 @@
 | Dimensão | Nº | Produtor |
 |---|---:|---|
 | Famílias na bancada | **162** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **983** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **992** | `bash .claude/validation/harness-inventory.sh --env` |
 | Regras do lint | **81** | `bash .claude/validation/rules-registry.sh --counts` |
 | — HARD | **72** | `bash .claude/validation/rules-registry.sh --counts` |
 | Pares de modo consumido | **43** | `bash .claude/validation/consumed-mode-check.sh .` |
@@ -54,15 +54,15 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **268** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados totais | **1448** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados REAIS | **1214** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **269** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados totais | **1482** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados REAIS | **1247** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **84%** | `bash .claude/validation/review-ledger.sh --env` |
-| Tokens por achado REAL | **99312** | `bash .claude/validation/review-ledger.sh --env` |
-| Vereditos no vocabulário | **178** | `bash .claude/validation/review-ledger.sh --env` |
+| Tokens por achado REAL | **99937** | `bash .claude/validation/review-ledger.sh --env` |
+| Vereditos no vocabulário | **179** | `bash .claude/validation/review-ledger.sh --env` |
 | — legado (texto livre) | **90** | `bash .claude/validation/review-ledger.sh --env` |
 
-A média de tokens cobre os **175** resíduos com custo > 0; os demais declaram `tokens: 0`
+A média de tokens cobre os **176** resíduos com custo > 0; os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero
 não é média — mas seus achados continuam contados no total.
 
