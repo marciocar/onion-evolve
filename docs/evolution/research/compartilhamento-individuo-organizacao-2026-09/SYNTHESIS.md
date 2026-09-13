@@ -18,7 +18,8 @@ review_after: 2026-12-12
 > resposta ao sinal do adotante jogo-da-vida (`docs/evolution/inbox/_processed/2026-09-13-fronteira-pessoa-empregador-no-company-brain.md`).
 > Alimenta `Q_RESEARCH_COMPARTILHAMENTO_INDIVIDUO_ORGANIZACAO` em
 > `docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml`. **Nada aqui está selado**: o
-> nó `D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION` é `open`, e a decisão é do maestro.
+> nó `D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION` foi **selado pelo maestro em 2026-09-13**: **opção C como
+> direção, com a rodada complementar (opção D) como condição**. Nada de C vira desenho antes dela.
 >
 > O retorno estruturado do run inteiro está versionado em
 > [`data/wf_88199ba9-b9a-return.json`](data/wf_88199ba9-b9a-return.json). Tudo o que esta síntese cita e o
@@ -74,7 +75,7 @@ autoria já é dado pessoal, porque quem decidiu o quê é inferível (`PO_INFER
 | C — A restringida: fluxo por propósito, assimetria de padrão | `C_OPCAO_C_PURPOSE_BOUND_ASYMMETRIC_FLOW` | 0,60 | **direção recomendada pelo Elenxo** |
 | D — GATED: rodada complementar antes de selar | `C_OPCAO_D_GATED_COMPLEMENTARY_ROUND` | 0,65 | **condição do selo** |
 
-**Recomendação do Elenxo: C como direção, D como condição.** O grafo modela como `CONSTRAINS` de C as
+**Recomendação do Elenxo: C como direção, D como condição — SELADA pelo maestro em 2026-09-13.** O grafo modela como `CONSTRAINS` de C as
 objeções `E_OBJECTION_C65_23_EXTRAPOLATED`, `E_OBJECTION_CONSENT_NOT_REJECTED_BUT_UNLIKELY`,
 `E_OBJECTION_BELGIAN_CLOSED_LIST_NOT_GENERAL`, `E_OBJECTION_MANDATORY_AXES_UNCOVERED`,
 `E_OBJECTION_ART88_NATIONAL_FRAGMENTATION` e `E_OBJECTION_NO_UNIFORM_EU_THRESHOLD`.
@@ -213,4 +214,5 @@ Deci e Ryan), com poucas fontes e leitura integral.
 4. **Eixo de mercado de novo:** capital do Glean, processos e recuos de produto por pressão de trabalhadores.
 5. **Banco de provas do adotante:** submeter a opção C, com a restrição organização→indivíduo acima, ao
    critério de falseamento do jogo-da-vida (times de 3 a 5).
-6. **O maestro sela** `D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION` depois de 1–5.
+6. ~~O maestro sela `D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION`~~ — **SELADO em 2026-09-13** (C + rodada
+   complementar). O que resta é 1–5; o item 1 deixa de ser sugestão e passa a ser **condição do selo**.

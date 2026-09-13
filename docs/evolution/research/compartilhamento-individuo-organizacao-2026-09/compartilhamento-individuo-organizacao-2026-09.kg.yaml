@@ -171,25 +171,25 @@ nodes:
   - id: C_OPCAO_A_BIDIRECTIONAL_INSEPARABLE_SHARING
     node_type: claim
     plane: DEV
-    status: open
+    status: superseded
     impact: 4
     confidence: 0.45
-    label: 'OPCAO A — posicao do maestro: compartilhamento indissociavel bidirecional, respeitando a singularidade (nem tudo, nem nada). A favor: sobrevive como TESE — ha partilha legitima nos dois sentidos (o art. 88(1) GDPR preve que Estados-membros regulem o tratamento no emprego, inclusive para planejamento e organizacao do trabalho — claim CORTADA por orcamento, NAO verificada). Nunca foi proposta como criterio: o maestro pediu a pesquisa justamente para ter um. Limite: indissociavel sem mecanismo e exatamente o que a restricao matematica do adotante derruba (diferenca em times de 3 a 5), e nao existe limiar juridico pronto para importar. Restringida por E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS, E_OBJECTION_MANDATORY_AXES_UNCOVERED, E_OBJECTION_BARBULESCU_DISCARDED_BY_COMODISMO e E_OBJECTION_NO_UNIFORM_EU_THRESHOLD.'
+    label: 'OPCAO A — posicao do maestro: compartilhamento indissociavel bidirecional, respeitando a singularidade (nem tudo, nem nada). A favor: sobrevive como TESE — ha partilha legitima nos dois sentidos (o art. 88(1) GDPR preve que Estados-membros regulem o tratamento no emprego, inclusive para planejamento e organizacao do trabalho — claim CORTADA por orcamento, NAO verificada). Nunca foi proposta como criterio: o maestro pediu a pesquisa justamente para ter um. Limite: indissociavel sem mecanismo e exatamente o que a restricao matematica do adotante derruba (diferenca em times de 3 a 5), e nao existe limiar juridico pronto para importar. Restringida por E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS, E_OBJECTION_MANDATORY_AXES_UNCOVERED, E_OBJECTION_BARBULESCU_DISCARDED_BY_COMODISMO e E_OBJECTION_NO_UNIFORM_EU_THRESHOLD. NAO ESCOLHIDA no selo do maestro 2026-09-13 (opcao C + rodada complementar). A tese SOBREVIVE em C, que e A restringida por mecanismo; o que foi superado e A como criterio SEM mecanismo.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml'
 
   - id: C_OPCAO_B_EMPLOYEE_ONLY_AS_AUTHOR
     node_type: claim
     plane: DEV
-    status: open
+    status: superseded
     impact: 3
     confidence: 0.3
-    label: 'OPCAO B — posicao rival do adotante jogo-da-vida: colaborador so como AUTOR de decisao, nunca como dado. A favor: e a unica que zera o ataque por diferenca por construcao, e o Elenxo mostrou que o no de identidade do Glean (permissao por item) e compativel com ela. Contra: nao e exigencia legal, e escolha de produto (a lei admitir mais — Barbulescu, art. 88 — nao refuta desenho que coleta menos); o limite real e pratico (autoria JA e dado pessoal — quem decidiu o que, quando, com que resultado e inferivel; corpus classification-por-vertical/PO_INFERENCIA). Nao foi REFUTADA por evidencia: o achado que a derrubaria (Glean) foi limitado. Restringida por E_OBJECTION_BARBULESCU_DISCARDED_BY_COMODISMO.'
+    label: 'OPCAO B — posicao rival do adotante jogo-da-vida: colaborador so como AUTOR de decisao, nunca como dado. A favor: e a unica que zera o ataque por diferenca por construcao, e o Elenxo mostrou que o no de identidade do Glean (permissao por item) e compativel com ela. Contra: nao e exigencia legal, e escolha de produto (a lei admitir mais — Barbulescu, art. 88 — nao refuta desenho que coleta menos); o limite real e pratico (autoria JA e dado pessoal — quem decidiu o que, quando, com que resultado e inferivel; corpus classification-por-vertical/PO_INFERENCIA). Nao foi REFUTADA por evidencia: o achado que a derrubaria (Glean) foi limitado. Restringida por E_OBJECTION_BARBULESCU_DISCARDED_BY_COMODISMO. NAO ESCOLHIDA no selo do maestro 2026-09-13 (opcao C + rodada complementar). O que B tem de certo entra em C: o individuo aparece no Company Brain como AUTOR e identidade de ACL, nao como sujeito de telemetria; o absoluto `nunca dado` e que nao foi adotado.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml'
 
   - id: C_OPCAO_C_PURPOSE_BOUND_ASYMMETRIC_FLOW
     node_type: claim
     plane: DEV
-    status: open
+    status: confirmed
     impact: 5
     confidence: 0.6
     label: 'OPCAO C — A restringida: fluxo por proposito com assimetria de padrao (organizacao->individuo aberto SO para o dado da propria pessoa e as decisoes que a afetam — agregado de terceiros mostrado ao time cai no falseamento de D_JOGO_DA_VIDA_E_BANCO_DE_PROVAS; individuo->organizacao so PREDICADO), sob o criterio Barbulescu (notificacao previa, grau de intrusao, razao legitima, meio menos intrusivo, consequencias, salvaguardas — Grande Camara 2017, §121) + defesa matematica contra diferenca (piso de grupo NAO basta; budget de consultas/composicao). A favor: preserva a tese de A, transpoe ao eixo empregador as politicas que o corpus ja tem para pessoa x federacao (PO_DISCLOSURE_VC, PO_BUDGET, PO_L3_FILTRO) e e a unica com mecanismo verificavel. Contra: C-65/23 e consentimento vieram de fonte tier 6 e extrapolados; finalidade nao e lista fechada; fragmentacao nacional (C-34/21) impede um criterio unico; nada lido sobre LGPD/TST nem sobre o ataque tracker. Restringida por E_OBJECTION_C65_23_EXTRAPOLATED, E_OBJECTION_CONSENT_NOT_REJECTED_BUT_UNLIKELY, E_OBJECTION_BELGIAN_CLOSED_LIST_NOT_GENERAL, E_OBJECTION_MANDATORY_AXES_UNCOVERED, E_OBJECTION_ART88_NATIONAL_FRAGMENTATION e E_OBJECTION_NO_UNIFORM_EU_THRESHOLD.'
@@ -198,7 +198,7 @@ nodes:
   - id: C_OPCAO_D_GATED_COMPLEMENTARY_ROUND
     node_type: claim
     plane: DEV
-    status: open
+    status: confirmed
     impact: 4
     confidence: 0.65
     label: 'OPCAO D — GATED: nao selar agora; rodada complementar para LGPD (arts. 7, 8 §3, 10; legitimo interesse) + ANPD + TST (monitoramento de e-mail corporativo), autodeterminacao (Deci & Ryan aplicada a monitoramento) e as fontes de privacidade em grupos pequenos nao lidas (Denning 1979 tracker, Dinur & Nissim 2003, privacidade diferencial em times pequenos), mais o primario do Viva (Tech Community) e C-34/21. A favor: a pergunta central esta SEM evidencia direta e o eixo BR, que e o do adotante, tem zero fonte. Contra: adiar nao protege ninguem enquanto o adotante opera; por isso D e CONDICAO DE SELO de C, nao alternativa a ela. Sustentada por E_LACUNAS_COMPARTILHAMENTO_0913.'
@@ -208,9 +208,11 @@ nodes:
   - id: D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION
     node_type: decision
     plane: DEV
-    status: open
+    status: done
     impact: 5
-    confidence: 0.55
+    confidence: 0.7
+    verified_at: '2026-09-13'
+    verified_against: 'selado pelo maestro 2026-09-13: opcao C (fluxo por finalidade, assimetria de padrao) como DIRECAO, com a rodada complementar da opcao D como CONDICAO — nada de C vira desenho antes dela'
     label: 'DECISAO ABERTA (o maestro sela): qual criterio separa compartilhamento legitimo e indissociavel da vigilancia no eixo pessoa x empregador do Company Brain, entre (A) compartilhamento indissociavel bidirecional respeitando a singularidade, (B) colaborador so como AUTOR de decisao, nunca como dado, (C) A restringida — fluxo por proposito com assimetria de padrao (organizacao->individuo aberto so para o dado da propria pessoa; individuo->organizacao so predicado) sob criterio Barbulescu + defesa matematica contra diferenca, (D) GATED — rodada complementar antes de selar. RECOMENDACAO DO ELENXO: C como DIRECAO e D como CONDICAO DE SELO — nao selar C antes da rodada complementar. A posicao A sobrevive como TESE; B nao e exigida por lei (e escolha de produto) e o no de identidade do Glean e compativel com ela (permissao, nao sujeito avaliado). A tese A pede um criterio operacional, porque indissociavel sem mecanismo e exatamente o que a restricao matematica do adotante derruba. A restricao do adotante NAO foi refutada; a propria Microsoft a confirma ao impor piso de grupo (padrao 10, reduzivel a 5) — e piso de grupo sozinho nao para o ataque tracker, por isso C exige defesa contra composicao de consultas. Articulacao: Second Brain = soberano do individuo (nada sai sem predicado); Company Brain = devolve a pessoa o que e dela e o que a afeta, e recebe individuo->organizacao so como predicado com proposito declarado; Onion = o mecanismo verificavel que aplica o criterio (corpus: PO_DISCLOSURE_VC, PO_BUDGET, PO_L3_FILTRO, fronteira-decision/D_FRONTEIRA segue open).'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml · projeção: docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/SYNTHESIS.md'
 
@@ -500,3 +502,10 @@ edges:
   - from: E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS
     to: C_OPCAO_A_BIDIRECTIONAL_INSEPARABLE_SHARING
     edge_type: CONSTRAINS
+  # o selo do maestro (2026-09-13): C escolhida com D como condicao; A e B nao escolhidas
+  - from: D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION
+    to: C_OPCAO_A_BIDIRECTIONAL_INSEPARABLE_SHARING
+    edge_type: SUPERSEDES
+  - from: D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION
+    to: C_OPCAO_B_EMPLOYEE_ONLY_AS_AUTHOR
+    edge_type: SUPERSEDES

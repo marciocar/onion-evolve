@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**198 itens abertos** em 44 grafo(s) com aberto (de 66 no escopo) · 44 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**193 itens abertos** em 44 grafo(s) com aberto (de 66 no escopo) · 44 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -49,16 +49,11 @@
 | 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
 
-## compartilhamento-individuo-organizacao-2026-09 — 6 item(ns)
+## compartilhamento-individuo-organizacao-2026-09 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 60.0 | `Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE` | compartilhamento-individuo-organizacao-2026-09 | No contexto de EMPREGO (relacao de poder assimetrica), qual e o criterio operacional que separa o compartilhamento LEGITIMO e indi |
-| 39.0 | `C_OPCAO_C_PURPOSE_BOUND_ASYMMETRIC_FLOW` | compartilhamento-individuo-organizacao-2026-09 | OPCAO C — A restringida: fluxo por proposito com assimetria de padrao (organizacao->individuo aberto SO para o dado da propria p |
-| 30.2 | `D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION` | compartilhamento-individuo-organizacao-2026-09 | DECISAO ABERTA (o maestro sela): qual criterio separa compartilhamento legitimo e indissociavel da vigilancia no eixo pessoa x emp |
-| 14.4 | `C_OPCAO_A_BIDIRECTIONAL_INSEPARABLE_SHARING` | compartilhamento-individuo-organizacao-2026-09 | OPCAO A — posicao do maestro: compartilhamento indissociavel bidirecional, respeitando a singularidade (nem tudo, nem nada). A f |
-| 7.8 | `C_OPCAO_D_GATED_COMPLEMENTARY_ROUND` | compartilhamento-individuo-organizacao-2026-09 | OPCAO D — GATED: nao selar agora; rodada complementar para LGPD (arts. 7, 8 §3, 10; legitimo interesse) + ANPD + TST (monitoram |
-| 2.7 | `C_OPCAO_B_EMPLOYEE_ONLY_AS_AUTHOR` | compartilhamento-individuo-organizacao-2026-09 | OPCAO B — posicao rival do adotante jogo-da-vida: colaborador so como AUTOR de decisao, nunca como dado. A favor: e a unica que  |
 
 ## ocr-local-sei-2026-09 — 11 item(ns)
 
