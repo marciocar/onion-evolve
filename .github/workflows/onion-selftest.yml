@@ -46,7 +46,11 @@ jobs:
     # `docs/onion/testing-inventory.md` (SSOT gerada, catracada pela REGRA 80), e a suíte
     # CRESCE por desenho: foi teto colado no trabalho existente que cancelou o job em 15m02s
     # em 2026-08-06.
-    timeout-minutes: 25
+    # 2026-09-13: A MESMA CLASSE, DE NOVO — 1202 guardas, a soma saiu 1202/0 aos 24m59s e o job foi
+    # CANCELADO aos 25m03s (PR #822, run 34772891707): verde inteiro, marcado cancelado por 3 s. As rodadas
+    # de 09-12/13 já iam de 18 a 23 min. 40 min dá ~60% de folga sobre o medido; se encostar de novo, o
+    # sinal é a suíte ter crescido, e a resposta é paralelizar no runner, não subir o teto outra vez.
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v5
         with:
