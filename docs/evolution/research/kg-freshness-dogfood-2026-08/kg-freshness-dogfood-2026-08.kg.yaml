@@ -2,6 +2,7 @@ meta:
   id: kg-freshness-dogfood-2026-08
   schema_version: "1"
   baseline: 2026-08-29
+  review_after: 2026-09-28
   # O 3o USO de /meta:kg-freshness — e ele reprovou a si mesmo, e depois a revisao me reprovou.
   #
   # O comando nasceu em 2026-07-27 e ganhou as guardas de schema em 2026-08-12. ⚠️ NAO e o
@@ -382,7 +383,7 @@ nodes:
     verified_at: 2026-08-30
     verified_against: 'selo do maestro 2026-08-30, sobre a tabela de calibracao (FP 20% na acusacao, SUB 0/7, fabricacao pega)'
     label: 'DECISAO B SELADA PELO MAESTRO (2026-08-30): o juiz adversarial opus/high vira ETAPA FIXA do /meta:kg-freshness — sempre roda; os vereditos dele PERMANECEM PROPOSTA que o maestro sela (nada muda no invariante worker-mede-maestro-sela). Base: calibracao com padrao-ouro — FP de 20% na acusacao de subcontagem, ZERO erro na direcao perigosa (SUB 0/7), e o unico mecanismo que pegou um ls curado vendido como verbatim. Em runs grandes o juizo PODE ser escopado aos CONFIRMED (o desfecho barato de fabricar), com o corte DECLARADO no relatorio.'
-    trace: '.claude/commands/meta/kg-freshness.md (tiering) · calibration-gold-standard-2026-08-29.md'
+    trace: '.claude/commands/meta/kg-freshness.md (tiering) · calibration-gold-standard-2026-08-29.md · projeção: docs/evolution/research/kg-freshness-dogfood-2026-08/SYNTHESIS.md'
 
   - id: D_C_CENSO_190_JUIZ_EM_CONFIRMED
     node_type: decision

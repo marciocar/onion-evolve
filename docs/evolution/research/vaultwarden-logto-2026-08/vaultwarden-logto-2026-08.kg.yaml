@@ -4,6 +4,7 @@ meta:
   layer: audit
   baseline: 2026-08-10
   date: 2026-08-10
+  review_after: 2026-09-09
   note: >
     Pesquisa profunda: adicionar Vaultwarden (cofre self-hosted) a VPS do Onion, integrado ao Logto.
     Tres frentes: estado externo do produto/SSO (fonte datada), terreno medido na propria VPS, e uma
@@ -134,6 +135,7 @@ nodes:
 
   # ── VEREDITO ────────────────────────────────────────────────────────────────
   - id: D_VIAVEL_COM_EXPECTATIVA_CALIBRADA
+    trace: 'docs/evolution/research/vaultwarden-logto-2026-08/vaultwarden-logto-2026-08.kg.yaml · projeção: docs/evolution/research/vaultwarden-logto-2026-08/SYNTHESIS.md'
     node_type: decision
     plane: DEV
     status: confirmed
