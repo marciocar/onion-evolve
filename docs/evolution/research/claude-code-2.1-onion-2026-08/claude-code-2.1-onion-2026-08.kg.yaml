@@ -4,6 +4,7 @@ meta:
   layer: audit
   baseline: 2026-08-16
   date: 2026-08-16
+  review_after: 2026-09-15
   note: >
     KG-SSOT da pergunta do maestro (2026-08-16): atualizamos o Claude Code (nativo
     2.1.232 → 2.1.233) — o que mudou nas versões até aqui, o que isso altera no que o
@@ -176,6 +177,7 @@ nodes:
     verified_at: 2026-08-16
     verified_against: RATIFICADA-pelo-maestro-2026-08-16-e-materializada-em-ADR
     label: "A SUPERAÇÃO, na forma que sobreviveu ao ataque: o Onion não supera por injetar contexto (skills/comandos/subagentes — a plataforma dá e a safra de 2026 replica), nem por 'tratar conhecimento como artefato verificável' (Cruxible e AsDecided já fazem, um com mais rigor). Supera por INDUSTRIALIZAR A REINCIDÊNCIA: cada defeito REAL medido vira guarda determinística que roda FORA da janela de contexto, exercitada por bancada, num catálogo cuja SEVERIDADE É DERIVADA DO COMPORTAMENTO da guarda (rules-registry.sh) e não do que ela declara — e o mesmo loop é aplicado contra si mesmo, a ponto de publicar NÃO CONSTRUIR sobre a própria cura preferida. Slogan corrigido: o mercado otimiza CONTEXTO; os concorrentes de nicho otimizam PROVA; o Onion otimiza REINCIDÊNCIA. O que não se copia num fim de semana não é o radar (734 linhas de awk) — é a arqueologia de defeito: 59 REGRAs amarradas a danos datados, 689 asserções, ~460 PRs de história, e a disposição de perder em público. RATIFICADA pelo maestro em 2026-08-16 e materializada em `docs/analysis/onion-adr-superacao-reincidencia-2026-08.md`, COM a perna de LEITURA declarada buraco aberto — nunca como capacidade entregue."
+    trace: 'docs/evolution/research/claude-code-2.1-onion-2026-08/claude-code-2.1-onion-2026-08.kg.yaml · projeção: docs/evolution/research/claude-code-2.1-onion-2026-08/SYNTHESIS.md'
 
   - id: Q_RISCO_ACERVO_VIRA_CEMITERIO
     node_type: question

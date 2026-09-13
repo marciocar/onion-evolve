@@ -248,7 +248,7 @@ nodes:
     impact: 4
     confidence: 0.7
     label: 'DECISAO PROPOSTA: dos 4 itens do MOAT do /meta:drive (merge · deploy · repo alheio · relogio), o merge ganhou veto neste PR; deploy (rsync/systemctl/sudo cp fora de ops/deploy-site.sh e ops/update-bridge.sh), escrita em repo alheio (git -C /home/marcio/<adotante> push) e relogio (crontab/CronCreate/systemd timer) seguem PROSA. Cura na mesma forma (PreToolUse + lib + bancada), mas a assinatura tem de ser por ALVO (path servido, remote alheio, unidade timer), nao por vocabulario — rsync/systemctl sao legitimos fora de deploy. GATILHO: 1o dogfood em que a sessao executa deploy/cron/push-alheio fora do wrapper (o PostToolUse ja avisa; quando avisar, vira veto), OU a proxima onda de guardas.'
-    trace: '.claude/commands/meta/drive.md'
+    trace: '.claude/commands/meta/drive.md · projeção: docs/evolution/research/audit-textual-gates-2026-09/SYNTHESIS.md'
 
   - id: Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO
     node_type: question
