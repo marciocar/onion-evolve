@@ -1188,7 +1188,10 @@ run_moat_boundary_selftests() {
   # arquivo reprova (c) por regra que não é a testada — a fixture GREEN dispara legitimamente as
   # REGRAS 19 (Plugins de vertical sincronizados com as fontes) e 27 (Dependência de script de
   # comando empacotado), que nada têm a ver com o moat. Medido em 2026-09-08, nas duas direções.
-  _moat_hit() { grep -F "${mfbase}" <<< "$1" | grep -qF "${sig}"; }
+  # SEM PIPE NO VEREDITO. Medido no CI de 2026-09-13 (PR #822): a saída do lint TINHA a linha da REGRA 61
+  # citando a fixture com a assinatura, e `grep -F … | grep -qF …` devolveu FALSO. É a classe pipe-verdict
+  # (o leitor que fecha cedo sob pipefail) que só o runner de 2 núcleos expõe. Duas passadas por here-string.
+  _moat_hit() { local _h; _h="$(grep -F "${mfbase}" <<< "$1" || true)"; grep -qF "${sig}" <<< "${_h}"; }
   # (a) RED abrangente — todo tipo de moat que o revisor apontou (C1): auto-evolução, federação
   #     downstream+ledger, absorb-skill (fábrica), grafo FORA de docs/onion/graph (o life-KG privado).
   cat > "${mf}" <<'RED'

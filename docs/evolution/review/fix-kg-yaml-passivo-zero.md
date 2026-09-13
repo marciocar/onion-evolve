@@ -2,10 +2,10 @@
 title: 'Resíduo adversarial — passivo YAML zerado, a causa real da r16 e a classe de locale virando guarda'
 date: 2026-09-13
 branch: fix/kg-yaml-passivo-zero
-reviewed_diff_sha256: 0d3e94ce402a38e62ffa04f0694a602a9310d1901123391845592c90f49be75e
-findings_total: 17
-findings_real: 17
-findings_fixed: 16
+reviewed_diff_sha256: e8e3d7dc87b78d55e36206d2d4167d28c932eeb1145461e413a3b4ecdc828295
+findings_total: 18
+findings_real: 18
+findings_fixed: 17
 tokens: 216265
 duration_min: 19
 verdict: REPROVADO_E_CURADO
@@ -97,6 +97,14 @@ emissor confirmando 0. Não é "flaky": é um veredito que mentia às vezes e ag
 - **`line 7540: meta.target: command not found`:** crase sem escape dentro de um rótulo entre aspas duplas
   (`kg-proposta: (i)`). A crase era executada como comando e o rótulo impresso perdia a palavra. Pré-existente
   no `main`; escapada.
+
+- **`moat-boundary: (b)` voltou a reprovar só no CI, e desta vez com a prova** que a cura de diagnóstico
+  do #819 passou a imprimir. O lint **viu** a violação: a REGRA 61 (Fronteira de MOAT: manifesto de plugin
+  publicável não vaza meta-fábrica nem grafo privado) citava a fixture com a assinatura esperada. Quem negou foi o
+  predicado do teste, `grep -F … | grep -qF …`, um veredito por pipe. A falsidade exata não se reproduz fora do
+  runner de 2 núcleos; a cura é pela forma (duas passadas por here-string), a mesma que a casa mediu com 0 falhas
+  em 480 contra essa classe. O mutante com assinatura inexistente reprova (a) e (b). **Declaro o limite:** se
+  recorrer, a causa não é o pipe, e a mensagem da falha já traz o que faltar.
 
 ## O que fica declarado, não curado
 
