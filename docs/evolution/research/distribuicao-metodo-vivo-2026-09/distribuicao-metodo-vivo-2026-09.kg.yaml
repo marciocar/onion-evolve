@@ -1,0 +1,640 @@
+meta:
+  id: distribuicao-metodo-vivo-2026-09
+  schema_version: "1"
+  baseline: 2026-09-13
+  review_after: 2026-10-13   # 30d: o tipo DOMINANTE desta rodada e FERRAMENTA/PLATAFORMA — 11 das 26 claims
+                             # ancoradas descrevem comportamento de produto vivo (semantica de fork/template do
+                             # GitHub, update do Copier/Cruft, canal de plugin do Claude Code), a cadencia de 30d
+                             # da clausula 8. As 7 claims de texto de licenca e as 8 de metodo publicado pediriam
+                             # 12m (doutrina), mas quem CADUCA primeiro manda: se a plataforma mudar, a resposta
+                             # de VEICULO muda antes de qualquer licenca mudar.
+  # kg-backlog-guard: on
+  # ═══ TETO: 35 NÓS. Rodada de PRIMARIAS executada em 2026-09-13 (grafo criado nesta rodada). Cresce só se
+  #     uma re-medicao das mesmas fontes emendar um achado, ou se o maestro abrir a rodada de VEICULO. ═══
+  # Pesquisa /onion-research mode=primaries: onde passa a fronteira entre a DOUTRINA que deve viajar para um
+  # cliente de consultoria que forka e evolui sozinho, e a BIOGRAFIA deste repo que nao deve viajar; qual
+  # VEICULO, qual LICENCA e qual mecanismo de ATUALIZACAO depois que o fork diverge.
+  # Contabilidade: 15 documentos primarios lidos inteiros em 7 lacunas ja nomeadas, 33 claims submetidas a
+  # ancoragem por verificador independente, 26 ANCORADAS (viram no), 7 EXAGERADAS (nao viram no — entram em
+  # E_LACUNAS_DISTRIBUICAO_0913), 0 fonte inalcancavel. Mais 3 nos de MEDICAO LOCAL produzidos pelo Elenxo.
+  # Corpus conferido antes de ler fora (clausula 0): nenhum no previo foi CONTRADITO. Esta rodada CORROBORA
+  # E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA (claude-code-2.1-onion-2026-08) por um angulo novo — la
+  # a capacidade nao viajou por nao ter sido vendorizada; aqui mede-se que a maquinaria NAO TEM SEQUER O FILTRO
+  # (grep exclude no adopt.md = ZERO). O gatilho de Q_COLD_ADOPTER (onion-identity-2026-07) DISPAROU: consultoria
+  # e adotante frio com canal. B5_11_onion_standalone_nascida (federation-research-2026-06-reconciled) permanece
+  # o unico precedente de export curado por papel. C_POSTURA_ACOPLAMENTO e E_REPO_PUBLICO_OBRIGATORIO
+  # (plugin-directory-landscape-2026-09) seguem validos e agora tem contraparte medida: o diretorio OFICIAL exige
+  # repo publico, mas o marketplace PROPRIO do maestro nao (E_MARKETPLACE_PROPRIO_SEM_EXIGENCIA_DE_PUBLICO).
+  # O radar so enxerga arestas DENTRO de um arquivo: o vinculo com o corpus vai por trace:, nao por aresta.
+  # NAO HA SUPERSEDES nesta rodada — ausencia MEDIDA: o grafo nasceu agora, nao ha no interno a corrigir, e
+  # aresta cross-grafo o radar nao le. Nenhuma decision foi selada: quem sela e o maestro.
+nodes:
+  - id: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-09-13
+    verified_against: 'rodada de primarias 2026-09-13: 15 documentos primarios em 7 lacunas nomeadas, 33 claims, 26 ancoradas, 7 rejeitadas na ancoragem, 0 fonte inalcancavel'
+    label: 'Para entregar a um CLIENTE DE CONSULTORIA uma versao publica do Onion que ele FORKA e evolui sozinho: onde passa a fronteira entre a DOUTRINA que viaja (REGRAs, knowledge-base, gramatica do grafo, exemplos de grafo, o metodo) e a BIOGRAFIA que nao viaja (diario, grafos da vida do maestro, members.yaml, achados de seguranca de adotantes, material sob NDA)? Qual VEICULO (fork, template, plugin de marketplace, export curado por papel), qual LICENCA (usa e modifica internamente, sem revender o framework) e qual mecanismo de ATUALIZACAO depois que o fork diverge? ABERTA no que a rodada NAO fechou: o veiculo nao foi decidido, a licenca nao foi redigida e o canal de update nao foi pareado ao veiculo — ver E_LACUNAS_DISTRIBUICAO_0913 e as quatro Q_ derivadas.'
+    trace: 'corpus: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA (claude-code-2.1-onion-2026-08) · Q_COLD_ADOPTER (onion-identity-2026-07) · B5_11_onion_standalone_nascida (federation-research-2026-06-reconciled) · projeção: docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md'
+  - id: E_FORK_CARREGA_HISTORIA_TEMPLATE_NASCE_LIMPO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-13
+    verified_against: 'docs.github.com — Creating a repository from a template, secao comparativa fork vs. template, bloco Commit History; QUOTE verbatim: "A new fork includes the entire commit history of the parent repository, while a repository created from a template starts with a single commit." — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'O GitHub distingue explicitamente fork de template pela HISTORIA: o fork carrega TODA a historia de commits do repositorio pai; o repositorio criado a partir de template nasce com UM unico commit, sem historia. Isto resolve o canal HISTORIA da fronteira — e so ele.'
+    trace: 'https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template'
+  - id: E_TEMPLATE_SEM_PR_DE_VOLTA_HISTORIAS_NAO_RELACIONADAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-13
+    verified_against: 'docs.github.com — Creating a repository from a template, nota sobre branches criadas a partir de template; QUOTE verbatim: "Branches created from a template have unrelated histories, which means you cannot create pull requests or merge between the branches." — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'Repositorio criado a partir de template NAO fica ligado ao template de origem: as branches nascem com historias nao-relacionadas, o que torna impossivel abrir PR ou fazer merge entre eles. Consequencia direta para esta rodada: escolher TEMPLATE e escolher, no mesmo ato, ficar SEM canal de atualizacao por git — template e update-por-merge sao mutuamente exclusivos.'
+    trace: 'https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template'
+  - id: E_FORK_MANTEM_CONEXAO_COM_UPSTREAM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'docs.github.com — About forks, primeiro paragrafo da secao introdutoria logo apos a definicao de fork; QUOTE verbatim: "A fork has its own settings and permissions but stays connected to the upstream repository." — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'O fork mantem settings e permissoes proprios mas permanece CONECTADO ao repositorio upstream, e o GitHub exibe essa relacao. Leitura restrita exigida pelo Elenxo: conectado aqui e relacao de UI/rede (fork network, sync fork), NAO mecanismo de atualizacao nem fronteira de privacidade — e a conexao e bidirecional em VISIBILIDADE, o fork exibe publicamente a origem.'
+    trace: 'https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks'
+  - id: E_POLYFORM_INTERNAL_USE_USO_INTERNO_SEM_DISTRIBUIR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'PolyForm Internal Use License 1.0.0 — polyformproject.org/licenses/internal-use/1.0.0; QUOTE verbatim: "you may not distribute the software" + "Use of the software for the internal business operations of you and your company is use for a permitted purpose." + "These terms do not allow you to sublicense or transfer any of your licenses to anyone else" — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'A PolyForm Internal Use 1.0.0 e, entre as lidas, a licenca que mais se aproxima do pedido: concede o que de outro modo infringiria o copyright para qualquer proposito PERMITIDO, define proposito permitido como as operacoes internas de negocio do licenciado e da sua empresa, e proibe explicitamente DISTRIBUIR e SUBLICENCIAR/TRANSFERIR.'
+    trace: 'https://polyformproject.org/licenses/internal-use/1.0.0'
+  - id: E_POLYFORM_NONCOMMERCIAL_NAO_SERVE_A_CLIENTE_COMERCIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-13
+    verified_against: 'PolyForm Noncommercial License 1.0.0 — polyformproject.org/licenses/noncommercial/1.0.0; QUOTE verbatim: "Any noncommercial purpose is a permitted purpose, including personal use for research, experiment, and testing for the benefit of public knowledge, personal study, private entertainment, hobby projects, amateur pursuits, or religious observance, without any anticipated commercial application." — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'A PolyForm Noncommercial 1.0.0 usa a MESMA clausula de concessao de direitos autorais da Internal Use, mas amarra proposito permitido a uso NAO-COMERCIAL (pesquisa pessoal, hobby, entidade sem fins lucrativos). Nao serve a cliente de consultoria que usa comercialmente na propria empresa — eliminada por evidencia, nao por gosto.'
+    trace: 'https://polyformproject.org/licenses/noncommercial/1.0.0'
+  - id: E_BSL_E_ESQUELETO_COM_CHANGE_DATE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'Business Source License 1.1 — mariadb.com/bsl11, clausula de grant + Change Date; QUOTE verbatim: "The Licensor hereby grants you the right to copy, modify, create derivative works, redistribute, and make non-production use of the Licensed Work." e "Effective on the Change Date, or the fourth anniversary of the first publicly available distribution of a specific version of the Licensed Work under this License, whichever comes first, the Licensor hereby grants you rights under the terms of the Change License" — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'A BSL 1.1 concede copiar, modificar, criar obras derivadas, redistribuir e uso nao-produtivo; condiciona o uso alem do Additional Use Grant a licenca comercial; e reverte a Change License no Change Date (tipicamente 4 anos). NAO veta por natureza revenda como concorrente — isso depende do texto do Additional Use Grant, que a BSL deixa EM BRANCO por padrao. Logo: a BSL e ESQUELETO, nao decisao; e o Change Date entrega ao cliente por cronometro exatamente o direito que se quer negar.'
+    trace: 'https://mariadb.com/bsl11'
+  - id: E_ELASTIC_V2_VETA_SAAS_NAO_USO_INTERNO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: 2026-09-13
+    verified_against: 'Elastic License 2.0, secao Limitations — elastic.co/licensing/elastic-license; QUOTE verbatim: "You may not provide the software to third parties as a hosted or managed service, where the service provides users with access to any substantial set of the features or functionality of the software." — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'A Elastic License 2.0 concede usar, copiar, distribuir, tornar disponivel e preparar obras derivadas; sua restricao central e vetar oferecer o software como servico hospedado/gerenciado a terceiros. Alvo DIFERENTE (SaaS concorrente), sem nada equivalente a operacoes internas de negocio da PolyForm — num framework de metodo entregue a consultoria nao ha servico hospedado a vetar, e a ELv2 seria permissiva justamente no eixo que importa: o cliente redistribuir o metodo.'
+    trace: 'https://www.elastic.co/licensing/elastic-license'
+  - id: E_APACHE_AVISO_PROEMINENTE_EM_ARQUIVO_MODIFICADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-13
+    verified_against: 'Apache License 2.0, Secao 4, alinea (b); QUOTE verbatim: "You must cause any modified files to carry prominent notices stating that You changed the files" — ancorada por verificador independente'
+    source_tier: 10
+    source_kind: primary
+    label: 'A Apache 2.0 permite forkar e redistribuir com ou sem modificacoes, mas EXIGE que todo arquivo modificado carregue aviso PROEMINENTE de que foi alterado. E o mecanismo textual que sinaliza ao cliente forkado que ele nao pode apagar a distincao entre a doutrina original e a sua propria evolucao.'
+    trace: 'https://www.apache.org/licenses/LICENSE-2.0'
+  - id: E_LICENCA_NAO_CONCEDE_MARCA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-13
+    verified_against: 'Apache License 2.0, Secao 6, Trademarks; QUOTE verbatim: "This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Work and reproducing the content of the NOTICE file" — ancorada por verificador independente'
+    source_tier: 10
+    source_kind: primary
+    label: 'A licenca NAO concede nenhuma permissao de uso de nome ou marca do licenciante: a permissividade do codigo e estritamente separada da MARCA. E o texto que impede o cliente de chamar o fork dele pelo nome do doador — mas repare no que ele faz: remete a lei de marcas, nao cria protecao por si.'
+    trace: 'https://www.apache.org/licenses/LICENSE-2.0'
+  - id: E_ASF_DERIVADO_SOB_MARCA_PROPRIA_SEM_CONFUSAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'Apache Software Foundation, Apache Trademark Policy (apache.org/foundation/marks/), secao sobre derivative works; QUOTE verbatim: "you may not apply trademarks to your derivative works of _ProjectName_ software that are confusingly similar to "_ProjectName_" or "Apache _ProjectName_"" — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'A politica da ASF confirma na pratica o que a Secao 6 declara em tese: derivados podem existir sob marca PROPRIA do forker, nunca sob nome confusamente similar ao do projeto original — o teste e likelihood of confusion, nao a permissividade da licenca. Limite declarado: e politica de uma FUNDACAO que POSSUI marcas registradas, executavel so por quem tem o mesmo ativo.'
+    trace: 'https://www.apache.org/foundation/marks/'
+  - id: E_GITLAB_HANDBOOK_FIRST_PUBLICO_POR_POLITICA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/ — abertura do corpo do artigo, logo apos o titulo The importance of a handbook-first approach to communication; QUOTE verbatim: "GitLab is intentional about documenting in a manner that creates a single source of truth. It operates handbook-first, and in valuing transparency, makes its handbook publicly accessible to all." — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'O GitLab declara que seu handbook e public-first e publicamente acessivel como POLITICA deliberada de transparencia, nao acrescimo tardio — o analogo mais proximo, em fonte primaria, de doutrina que viaja publicamente. Limite: prova EXISTENCIA de precedente e nada sobre a FRONTEIRA nomeada, porque handbook corporativo nao tem analogo de diario pessoal, grafo da vida do maestro, achado de seguranca de adotante ou material sob NDA.'
+    trace: 'https://handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/'
+  - id: E_HANDBOOK_PUBLICO_CRIA_ACCOUNTABILITY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-09-13
+    verified_against: 'handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/ — secao Make handbook-first a value, frase seguinte a citacao anterior; QUOTE verbatim: "Public handbooks lead to accountability. It is easier to let an internal wiki rot than it is a handbook which is open to the world." — ancorada por verificador independente (a forma original usa a contracao)'
+    source_tier: 9
+    source_kind: primary
+    label: 'O GitLab da uma RAZAO explicita para escolher o publico em vez de wiki interno: exposicao publica cria accountability que repositorio interno nao cria, porque este apodrece sem pressao externa. E argumento de VALOR de publicar, nao de ONDE CORTAR — e aponta para um risco diferente do desta rodada.'
+    trace: 'https://handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/'
+  - id: E_THOUGHTBOT_PLAYBOOK_CC_BY_NC
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-09-13
+    verified_against: 'thoughtbot.com/playbook — rodape, logo antes da linha de copyright; QUOTE verbatim: "The playbook is free and licensed as Creative Commons Attribution-NonCommercial so you may learn from, or use, our tactics in your own company." — ancorada por verificador independente'
+    source_tier: 8
+    source_kind: primary
+    label: 'A thoughtbot licencia o playbook como Creative Commons Attribution-NonCommercial justamente para que outros usem as taticas na propria empresa: precedente de METODO publicado a parte, com licenca que permite uso e adaptacao mas bloqueia revenda comercial do metodo. Contradicao que a rodada NAO resolveu: e a MESMA clausula NC que esta rodada descartou em E_POLYFORM_NONCOMMERCIAL_NAO_SERVE_A_CLIENTE_COMERCIAL.'
+    trace: 'https://thoughtbot.com/playbook'
+  - id: E_COPIER_CONFLITO_INLINE_NUNCA_EM_SILENCIO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'copier.readthedocs.io/en/stable/updating/ — opcao --conflict inline (default); QUOTE verbatim: "Updates the file with conflict markers. This is quite similar to the conflict markers created when a git merge command encounters a conflict." — ancorada por verificador independente'
+    source_tier: 8
+    source_kind: primary
+    label: 'Quando a mudanca do DOADOR colide com a customizacao do DONO, o Copier nao auto-resolve em silencio: o comportamento padrao e escrever marcadores de conflito no estilo git merge, para um humano resolver. Esta e a EXIGENCIA que o mecanismo de atualizacao do Onion precisa herdar — colisao resolvida por humano, nunca calada.'
+    trace: 'https://copier.readthedocs.io/en/stable/updating/'
+  - id: E_COPIER_MODO_REJ_ISOLA_O_DIFF
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'copier.readthedocs.io/en/stable/updating/ — opcao --conflict rej; QUOTE verbatim: "Creates a separate .rej file for each file with conflicts. These files contain the unresolved diffs." — ancorada por verificador independente'
+    source_tier: 8
+    source_kind: primary
+    label: 'O Copier oferece um modo alternativo que ISOLA os diffs nao-mesclaveis em arquivos .rej separados, em vez de injetar marcadores dentro do arquivo versionado — util quando o arquivo do dono nao pode ser sujado pelo processo de update.'
+    trace: 'https://copier.readthedocs.io/en/stable/updating/'
+  - id: E_COPIER_ANSWERS_NAO_SE_EDITA_A_MAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'copier.readthedocs.io/en/stable/updating/ — secao Never change the answers file manually, bloco Important; QUOTE verbatim: "This will trick Copier, making it believe that those modified answers produced the current subproject, while it was produced by a different answers set." — ancorada por verificador independente'
+    source_tier: 8
+    source_kind: primary
+    label: 'O Copier avisa que editar a mao o arquivo de respostas QUEBRA a premissa do mecanismo de update, porque passa a atribuir silenciosamente ao estado atual um conjunto de respostas que nao o produziu. Licao transportavel: todo canal de update por scaffolding tem um estado de proveniencia que, se mentir, faz o update mentir junto — declarado que nao bate com verificado, na propria ferramenta.'
+    trace: 'https://copier.readthedocs.io/en/stable/updating/'
+  - id: E_CRUFT_UPDATE_E_PORTAO_DE_REVISAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'cruft.github.io/cruft/ — secao Updating a Project; QUOTE verbatim: "To update an existing project, that was created using cruft, run cruft update in the root of the project. If there are any updates, cruft will have you review them before applying." — ancorada por verificador independente'
+    source_tier: 8
+    source_kind: primary
+    label: 'O fluxo de update declarado pelo Cruft e um PORTAO revisar-depois-aplicar: a ferramenta mostra o diff que chega do template e exige revisao do dono antes de aplicar, em vez de empurrar a mudanca do doador direto para dentro do fork. Segundo precedente independente do Copier para a mesma exigencia.'
+    trace: 'https://cruft.github.io/cruft/'
+  - id: E_PLUGIN_SO_LEVA_README_NA_RAIZ
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'code.claude.com/docs/en/plugins, secao Share your plugins; QUOTE verbatim: "Add documentation: Include a README.md with installation and usage instructions" — ancorada por verificador independente'
+    source_tier: 10
+    source_kind: primary
+    label: 'O unico lugar documentado para enviar DOCUMENTACAO ESCRITA junto com um plugin e um README.md na raiz do plugin, listado como passo de compartilhamento e NAO como tipo de componente carregado. Consequencia para esta rodada: o canal de plugin transporta MAQUINARIA (skills, commands, agents, hooks), nao o corpus de PROSA (knowledge-base, REGRAs, gramatica do grafo, exemplos) que e justamente a doutrina que precisa viajar.'
+    trace: 'https://code.claude.com/docs/en/plugins'
+  - id: E_MARKETPLACE_PROPRIO_SEM_EXIGENCIA_DE_PUBLICO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'code.claude.com/docs/en/plugin-marketplaces — o heading real e Private repositories (NAO existe heading chamado Public vs. Private Repository Requirements nesta pagina); QUOTE verbatim: "Claude Code supports installing plugins from private repositories." — ancorada por verificador independente'
+    source_tier: 10
+    source_kind: primary
+    label: 'Nao existe exigencia de repositorio publico para um marketplace que o proprio usuario adiciona: repositorios privados sao explicitamente suportados nesse caminho. Isto DELIMITA E_REPO_PUBLICO_OBRIGATORIO (plugin-directory-landscape-2026-09), que vale para o DIRETORIO OFICIAL — o canal de plugin tem duas portas, e so uma exige publicidade.'
+    trace: 'https://code.claude.com/docs/en/plugin-marketplaces'
+  - id: E_PLUGIN_INTERNO_VIA_MARKETPLACE_PRIVADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'code.claude.com/docs/en/plugins, secao Share your plugins; QUOTE verbatim: "To keep a plugin internal to your team, host the marketplace in a private repository." — ancorada por verificador independente'
+    source_tier: 10
+    source_kind: primary
+    label: 'O caminho documentado para manter um plugin privado ao time, ainda usando o canal de plugin, e hospedar o seu marketplace em repositorio PRIVADO — distinto de submeter aos marketplaces publicos comunitario/oficial da Anthropic. E o veiculo candidato para entrega a cliente de consultoria sem publicar nada.'
+    trace: 'https://code.claude.com/docs/en/plugins'
+  - id: E_ORG_SETTINGS_EXIGE_PUBLICO_FORA_DO_OWNER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'code.claude.com/docs/en/plugin-marketplaces — heading real Distribute through organization settings (nao Public vs. Private Repository Requirements, nome inexistente no documento); QUOTE verbatim: "github.com repositories under a different owner and repositories on other hosts, such as GitLab or Bitbucket, must be public." — ancorada por verificador independente'
+    source_tier: 10
+    source_kind: primary
+    label: 'Na distribuicao gerenciada por organizacao (Organization settings > Plugins), fontes sob outro OWNER ou em outro host precisam ser PUBLICAS, porque a sincronizacao da org busca toda fonte que nao seja do mesmo owner sem credencial. Consequencia dura para consultoria: o marketplace privado so fica privado enquanto o cliente instalar por conta propria; no caminho gerenciado pela organizacao DELE, um repo do maestro seria fonte de outro owner e teria de ser publico.'
+    trace: 'https://code.claude.com/docs/en/plugin-marketplaces'
+  - id: E_GITLAB_CORTE_POR_PERSONA_DE_COMPRADOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'GitLab stewardship.md, secao What Features Are Paid-Only, linhas 41-42; QUOTE verbatim: "To determine what is open source and what not we ask ourselves: **Who cares the most about the feature**. If the likely buyer is an individual contributor the feature will be open source, otherwise it will be source-available (proprietary)." — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'O criterio de corte open-core declarado pelo GitLab e a PERSONA DO COMPRADOR, nao o tipo da feature nem a escala de uso: aberto se o comprador provavel for um contribuidor individual, source-available/pago caso contrario. E o analogo mais util desta rodada para desenhar a fronteira doutrina/biografia por CRITERIO NOMEADO em vez de por lista de pastas.'
+    trace: 'https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md'
+  - id: E_CORTE_E_RELATIVO_NAO_EXCLUSIVO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'GitLab stewardship.md, secao What Features Are Paid-Only, linhas 44-48; QUOTE verbatim: "There aren not any features that are only useful to managers, directors, and executives. So for every source-available feature there will be an individual contributor who cares about it." (a forma original usa a contracao) + "The more of GitLab that you use the more likely it is that you benefit from a higher tier." — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'O criterio e sobre quem se importa RELATIVAMENTE mais, nao sobre exclusividade: toda feature paga ainda tem valor para o contribuidor individual, e o tiering segue profundidade e amplitude de uso. Limita a leitura ingenua do corte: fronteira por persona nao produz duas pilhas disjuntas, produz uma gradacao — e quem desenhar a fronteira do Onion assim tera itens que doem dos dois lados.'
+    trace: 'https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md'
+  - id: E_PISO_ABERTO_SEM_LIMITE_ARTIFICIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'GitLab stewardship.md, secao Promises, itens 4-5, linhas 23-24; QUOTE verbatim: "The open source codebase will have all the features that are essential to running a large forge with public and private repositories." + "The open source codebase will not contain any artificial limits (repositories, users, size, performance, requiring a trademarked header, etc.)." — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'O GitLab se compromete com um PISO: a base aberta tem todas as features essenciais para operar o produto em escala real, sem limites artificiais — o lado pago e ADITIVO, nunca um core mutilado. Transportado para esta rodada: a versao que o cliente forka precisa RODAR DE VERDADE (gate determinístico, radar, dogfood), senao o que viaja e demo, nao metodo.'
+    trace: 'https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md'
+  - id: E_PROMESSA_NAO_COBRE_O_SAAS_DO_PROPRIO_VENDOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'GitLab stewardship.md, secao Software as a Service, linhas 35-36; QUOTE verbatim: "Our stewardship promise applies only to the GitLab open source codebase, not to GitLab, Inc services such as GitLab Software as a Service (SaaS). For GitLab SaaS, we may add limits around usage (e.g., storage, compute, traffic) or proxies for usage (e.g., number of users in a group) as we seek to optimize costs and revenues." — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'A promessa de stewardship exclui explicitamente o SaaS operado pelo proprio vendor: o corte vale para a base de codigo DISTRIBUIDA, nao para o servico multi-tenant vivo, que pode ter limites proprios. Limita E_PISO_ABERTO_SEM_LIMITE_ARTIFICIAL — o piso e promessa sobre o que VIAJA, nao sobre o que o doador OPERA.'
+    trace: 'https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md'
+  - id: E_SEPARACAO_FISICA_DIRETORIO_E_MIRROR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'GitLab stewardship.md, secao Promises, 12o e ultimo bullet, linha 31; QUOTE verbatim: "This will be implemented with a separate directory for EE code and a Git repo downstream that is open source only." — ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    label: 'O GitLab mantem os dois lados FISICAMENTE separados no proprio repositorio — um diretorio dedicado ao codigo proprietario dentro da arvore principal, mais um repo espelho downstream somente open source — e e essa separacao fisica que torna o corte AUDITAVEL. E o desenho de mecanismo mais diretamente transportavel desta rodada: fronteira que nao vira diretorio (ou filtro de export) nao e fronteira, e intencao.'
+    trace: 'https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md'
+  - id: E_BIOGRAFIA_VIVE_DENTRO_DO_CLAUDE_QUE_O_ADOPT_VENDORIZA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-13
+    verified_against: 'medicao local em /home/marcio/onion-evolve nesta rodada: ls .claude/diary | wc -l = 127 arquivos (o primeiro e 2026-07-01-audit-dogfood-finds-code-bugs.md); grep -c exclude .claude/commands/meta/adopt.md = 0; docs/evolution/federation/members.yaml e docs/analysis/arandek-repo-exposure-2026-08.md presentes no working tree. CORRECAO de rota feita nesta medicao: o Elenxo citou docs/diary, que NAO EXISTE — o diario vive em .claude/diary, ou seja, DENTRO do diretorio que o /meta:adopt vendoriza'
+    source_tier: 10
+    source_kind: local-measurement
+    label: 'A biografia nao vaza pela HISTORIA, vaza pela ARVORE — e pior do que o Elenxo supos: os 127 arquivos do diario vivem em .claude/diary, DENTRO do diretorio que o /meta:adopt copia, e o adopt.md nao tem UMA ocorrencia da palavra exclude (zero mecanismo de filtro). members.yaml e o achado de seguranca do arandek estao no working tree. Logo: template de 1 commit publica a biografia inteira com historia limpa, e fork publica tudo duas vezes. O filtro nao existe hoje em nenhum dos veiculos.'
+    trace: '.claude/diary/ · .claude/commands/meta/adopt.md · docs/evolution/federation/members.yaml · docs/analysis/arandek-repo-exposure-2026-08.md'
+  - id: E_LICENCA_ATUAL_E_MIT_JA_CONCEDIDA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-13
+    verified_against: 'medicao local nesta rodada: head -3 LICENSE = "MIT License / Copyright (c) 2026 Marcio Carvalho"; ls plugins/*/LICENSE = 5 arquivos (onion, onion-product, onion-engineering, onion-compliance, onion-design), todos comecando com "MIT License" e ja publicados (memoria onion-plugin-marketplace-publication-state, PR 791)'
+    source_tier: 10
+    source_kind: local-measurement
+    label: 'O artefato de hoje e MIT, e a concessao MIT JA SAIU: o repo e os 5 plugins publicados carregam MIT. Licenca nova nao retrai concessao ja dada sobre o mesmo material — qualquer opcao source-available so alcanca o que for publicado DAQUI PARA A FRENTE. Segunda limitacao medida: MIT nao tem clausula de marca nem obrigacao de sinalizar arquivo alterado, entao as protecoes descritas em E_APACHE_AVISO_PROEMINENTE_EM_ARQUIVO_MODIFICADO e E_LICENCA_NAO_CONCEDE_MARCA descrevem uma licenca que este artefato NAO usa.'
+    trace: 'LICENSE · plugins/onion/LICENSE · plugins/onion-product/LICENSE · plugins/onion-engineering/LICENSE · plugins/onion-compliance/LICENSE · plugins/onion-design/LICENSE'
+  - id: E_MASSA_138K_DISTRIBUIVEL_VS_151K_BIOGRAFIA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-09-13
+    verified_against: 'medicao da sessao repassada pelo orquestrador desta rodada: ~138 mil linhas de framework distribuivel contra ~151 mil de autobiografia e projeto. NAO re-medida por este escritor — confianca 0.7 por isso; re-medir antes de usar como base de corte'
+    source_tier: 10
+    source_kind: local-measurement
+    label: 'A massa do repo esta partida quase ao meio: cerca de 138 mil linhas de framework distribuivel contra cerca de 151 mil de autobiografia e projeto. Nao e um apendice biografico num framework — sao duas metades de tamanho comparavel, e a maior delas e a que NAO deve viajar. Isso desqualifica qualquer veiculo que copie a arvore inteira e faz da fronteira uma necessidade de mecanismo, nao de bom senso.'
+    trace: 'medicao da sessao de 2026-09-13'
+  - id: E_LACUNAS_DISTRIBUICAO_0913
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-13
+    verified_against: 'contabilidade da propria rodada: 15 documentos primarios lidos inteiros em 7 lacunas nomeadas, 33 claims submetidas a ancoragem independente, 26 ANCORADAS, 7 EXAGERADAS, 0 NAO-ENCONTRADAS, 0 fonte inalcancavel'
+    source_tier: 10
+    source_kind: primary
+    label: 'LACUNAS E QUEDAS DA RODADA DE 2026-09-13. (a) FONTES: 15 documentos primarios lidos inteiros; INALCANCAVEIS: 0. (b) CLAIMS: 33 submetidas, 26 ancoradas, 7 REJEITADAS como EXAGERADAS — (1) que a UNICA fronteira declarada pelo GitLab para o que fica FORA do handbook publico seja legal: a frase existe, mas e recomendacao a OUTRAS empresas e o claim afirmava exaustividade que uma pagina entre milhares nao sustenta; (2) que a thoughtbot reconheca implicitamente publicar um SUBCONJUNTO CURADO: o so far do texto fala de evolucao no TEMPO, nao de selecao de topicos; (3) que o update do Copier seja um three-way diff contra a versao NOVA do template: o proprio diagrama mostra o inverso — a copia fresca vem da versao ATUAL/ja instalada e o diff captura o que o DONO mudou, nao o que o template mudou; (4) que o Copier dispense o usuario de reconfigurar: a mesma pagina diz que ele volta a perguntar, so com as respostas anteriores como default, salvo --defaults explicito; (5) que os diretorios reconhecidos de um plugin sejam um conjunto fixo enumerado: a conclusao e verdadeira mas a QUOTE fornecida era citacao editada, pulava a linha de commands e removia a formatacao de tabela; (6) que qualquer arquivo nao-reconhecido dentro da pasta de UM plugin seja ignorado: o texto fala de subpastas SEM MANIFESTO numa pasta que agrega varios plugins; (7) que mover feature de pago para aberto aconteca ROTINEIRAMENTE no GitLab: o documento usa on occasion e from time to time, linguagem de correcao ocasional. (c) EIXOS QUE CONTINUAM ABERTOS, por ausencia de fonte e nao por descuido: o VEICULO nao foi decidido (nenhuma fonte compara fork vs template vs plugin vs export curado para corpus de PROSA); a LICENCA nao foi redigida (nenhum Additional Use Grant de BSL escrito, nenhuma medicao sobre titularidade ou registro da marca Onion, palavra generica); o CANAL DE UPDATE nao foi pareado ao veiculo (Copier e Cruft geram projeto a partir de respostas, o Onion VENDORIZA corpus — o modelo nao transfere sem desenho); e nao ha fonte sobre como um fork divergente reintegra DOUTRINA sem reintegrar BIOGRAFIA. (d) ACHADO META: das 7 quedas, 4 sao da mesma familia — o leitor leu a intencao do mecanismo e nao a direcao dele (Copier 2x), ou generalizou o escopo de uma frase (plugin 2x). Em rodada de primarias o erro dominante nao e inventar citacao, e ESTICAR o que ela sustenta.'
+    trace: 'docs/evolution/research/distribuicao-metodo-vivo-2026-09/'
+  - id: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    verified_at: 2026-09-13
+    verified_against: 'medido nesta rodada: grep -c exclude .claude/commands/meta/adopt.md = 0; .claude/diary com 127 arquivos dentro do diretorio vendorizado'
+    label: 'A fronteira doutrina/biografia vira MECANISMO onde? As duas formas com precedente sao: (a) separacao FISICA como o GitLab faz — diretorio dedicado na arvore mais espelho downstream so com o que viaja (E_SEPARACAO_FISICA_DIRETORIO_E_MIRROR); (b) filtro de EXPORT por papel, que o Onion ja praticou uma vez em B5_11_onion_standalone_nascida. Hoje nao existe nenhuma das duas: o adopt nao tem exclude e o diario mora dentro de .claude/. Pergunta derivada obrigatoria: qual CRITERIO NOMEADO decide o corte item a item, no lugar de uma lista de pastas que envelhece — o analogo de quem-se-importa-mais do GitLab aplicado a doutrina vs biografia. NAO SELADA: quem sela e o maestro.'
+    trace: 'corpus: B5_11_onion_standalone_nascida (federation-research-2026-06-reconciled) · E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA (claude-code-2.1-onion-2026-08)'
+  - id: Q_LICENCA_APOS_MIT_JA_CONCEDIDA
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    verified_at: 2026-09-13
+    verified_against: 'medido nesta rodada: LICENSE = MIT e 5 plugins publicados com LICENSE MIT'
+    label: 'Se a concessao MIT ja saiu (repo mais 5 plugins publicados), o que uma licenca nova ainda alcanca? A rodada eliminou por evidencia a PolyForm Noncommercial (uso comercial interno do cliente nao e proposito permitido) e a Elastic 2.0 (veta SaaS, nao redistribuicao do metodo); deixou a BSL como ESQUELETO cujo campo decisivo ficou em branco e que devolve o direito por cronometro no Change Date; e deixou a PolyForm Internal Use como a mais proxima do pedido, com duas duvidas nao medidas: ela e licenca de SOFTWARE e a maior parte do que deve viajar e PROSA, e a expressao you and your company nao diz se cobre subsidiarias, PJs e terceiros — o caso normal de consultoria. Pergunta: qual instrumento, e redigido por quem, para qual metade do material? NAO SELADA.'
+    trace: 'https://polyformproject.org/licenses/internal-use/1.0.0'
+  - id: Q_MARCA_ONION_TITULARIDADE_NAO_MEDIDA
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    verified_at: 2026-09-13
+    verified_against: 'ausencia medida nesta rodada: nenhuma fonte consultada trata de titularidade, registro ou politica de marca do lado do maestro'
+    label: 'O que PROTEGE o nome Onion se o cliente forkar? A rodada mostrou que a licenca apenas NAO CONCEDE marca (Apache Secao 6) e que a politica da ASF so e executavel por quem POSSUI marca registrada mais politica publicada mais capacidade de exigir. Nenhum desses tres ativos foi medido do lado do maestro, e Onion e palavra generica. Transportar a politica sem o ativo seria declarar protecao inexistente — declarado que nao bate com verificado. Pergunta: medir titularidade/registro antes de prometer qualquer protecao de nome ao cliente. NAO SELADA.'
+    trace: 'https://www.apache.org/foundation/marks/'
+  - id: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    verified_at: 2026-09-13
+    verified_against: 'ancorado nesta rodada: template nasce com historias nao-relacionadas e nao aceita PR/merge de volta; Copier e Cruft exigem revisao humana da colisao'
+    label: 'Veiculo e canal de atualizacao NAO sao duas escolhas, sao uma: quem escolhe TEMPLATE contrai, no mesmo ato, a divida de um segundo mecanismo de update que esta rodada nao mediu (historias nao-relacionadas matam PR e merge); quem escolhe FORK herda conexao de UI mas copia a arvore inteira, biografia junto; quem escolhe PLUGIN em marketplace privado transporta maquinaria mas nao o corpus de prosa, e perde a privacidade se o cliente distribuir pela organizacao dele. A exigencia que os tres precedentes de scaffolding concordam: colisao entre doador e dono se resolve por HUMANO, com o diff a vista, nunca em silencio. Pergunta: qual par veiculo+canal, sabendo que o modelo do Copier/Cruft (gerar projeto a partir de respostas) nao e o do Onion (vendorizar corpus)? NAO SELADA.'
+    trace: 'https://copier.readthedocs.io/en/stable/updating/ · https://cruft.github.io/cruft/'
+edges:
+  - from: E_FORK_CARREGA_HISTORIA_TEMPLATE_NASCE_LIMPO
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_TEMPLATE_SEM_PR_DE_VOLTA_HISTORIAS_NAO_RELACIONADAS
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_FORK_MANTEM_CONEXAO_COM_UPSTREAM
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_POLYFORM_INTERNAL_USE_USO_INTERNO_SEM_DISTRIBUIR
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_POLYFORM_NONCOMMERCIAL_NAO_SERVE_A_CLIENTE_COMERCIAL
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_BSL_E_ESQUELETO_COM_CHANGE_DATE
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_ELASTIC_V2_VETA_SAAS_NAO_USO_INTERNO
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_APACHE_AVISO_PROEMINENTE_EM_ARQUIVO_MODIFICADO
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_LICENCA_NAO_CONCEDE_MARCA
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_ASF_DERIVADO_SOB_MARCA_PROPRIA_SEM_CONFUSAO
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_GITLAB_HANDBOOK_FIRST_PUBLICO_POR_POLITICA
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_HANDBOOK_PUBLICO_CRIA_ACCOUNTABILITY
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_THOUGHTBOT_PLAYBOOK_CC_BY_NC
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_COPIER_CONFLITO_INLINE_NUNCA_EM_SILENCIO
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_COPIER_MODO_REJ_ISOLA_O_DIFF
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_COPIER_ANSWERS_NAO_SE_EDITA_A_MAO
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_CRUFT_UPDATE_E_PORTAO_DE_REVISAO
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_PLUGIN_SO_LEVA_README_NA_RAIZ
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_MARKETPLACE_PROPRIO_SEM_EXIGENCIA_DE_PUBLICO
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_PLUGIN_INTERNO_VIA_MARKETPLACE_PRIVADO
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_ORG_SETTINGS_EXIGE_PUBLICO_FORA_DO_OWNER
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_GITLAB_CORTE_POR_PERSONA_DE_COMPRADOR
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_CORTE_E_RELATIVO_NAO_EXCLUSIVO
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_PISO_ABERTO_SEM_LIMITE_ARTIFICIAL
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_PROMESSA_NAO_COBRE_O_SAAS_DO_PROPRIO_VENDOR
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_SEPARACAO_FISICA_DIRETORIO_E_MIRROR
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_BIOGRAFIA_VIVE_DENTRO_DO_CLAUDE_QUE_O_ADOPT_VENDORIZA
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_LICENCA_ATUAL_E_MIT_JA_CONCEDIDA
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_MASSA_138K_DISTRIBUIVEL_VS_151K_BIOGRAFIA
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_DISTRIBUICAO_0913
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: E_BIOGRAFIA_VIVE_DENTRO_DO_CLAUDE_QUE_O_ADOPT_VENDORIZA
+    to: E_FORK_CARREGA_HISTORIA_TEMPLATE_NASCE_LIMPO
+    edge_type: CONSTRAINS
+  - from: E_BIOGRAFIA_VIVE_DENTRO_DO_CLAUDE_QUE_O_ADOPT_VENDORIZA
+    to: E_FORK_MANTEM_CONEXAO_COM_UPSTREAM
+    edge_type: CONSTRAINS
+  - from: E_BIOGRAFIA_VIVE_DENTRO_DO_CLAUDE_QUE_O_ADOPT_VENDORIZA
+    to: E_HANDBOOK_PUBLICO_CRIA_ACCOUNTABILITY
+    edge_type: CONSTRAINS
+  - from: E_MASSA_138K_DISTRIBUIVEL_VS_151K_BIOGRAFIA
+    to: E_FORK_CARREGA_HISTORIA_TEMPLATE_NASCE_LIMPO
+    edge_type: CONSTRAINS
+  - from: E_LICENCA_ATUAL_E_MIT_JA_CONCEDIDA
+    to: E_POLYFORM_INTERNAL_USE_USO_INTERNO_SEM_DISTRIBUIR
+    edge_type: CONSTRAINS
+  - from: E_LICENCA_ATUAL_E_MIT_JA_CONCEDIDA
+    to: E_APACHE_AVISO_PROEMINENTE_EM_ARQUIVO_MODIFICADO
+    edge_type: CONSTRAINS
+  - from: E_LICENCA_ATUAL_E_MIT_JA_CONCEDIDA
+    to: E_LICENCA_NAO_CONCEDE_MARCA
+    edge_type: CONSTRAINS
+  - from: E_LICENCA_ATUAL_E_MIT_JA_CONCEDIDA
+    to: E_ASF_DERIVADO_SOB_MARCA_PROPRIA_SEM_CONFUSAO
+    edge_type: CONSTRAINS
+  - from: E_POLYFORM_NONCOMMERCIAL_NAO_SERVE_A_CLIENTE_COMERCIAL
+    to: E_THOUGHTBOT_PLAYBOOK_CC_BY_NC
+    edge_type: CONSTRAINS
+  - from: E_BSL_E_ESQUELETO_COM_CHANGE_DATE
+    to: Q_LICENCA_APOS_MIT_JA_CONCEDIDA
+    edge_type: CONSTRAINS
+  - from: E_TEMPLATE_SEM_PR_DE_VOLTA_HISTORIAS_NAO_RELACIONADAS
+    to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    edge_type: CONSTRAINS
+  - from: E_COPIER_ANSWERS_NAO_SE_EDITA_A_MAO
+    to: E_COPIER_CONFLITO_INLINE_NUNCA_EM_SILENCIO
+    edge_type: CONSTRAINS
+  - from: E_PLUGIN_SO_LEVA_README_NA_RAIZ
+    to: E_PLUGIN_INTERNO_VIA_MARKETPLACE_PRIVADO
+    edge_type: CONSTRAINS
+  - from: E_ORG_SETTINGS_EXIGE_PUBLICO_FORA_DO_OWNER
+    to: E_PLUGIN_INTERNO_VIA_MARKETPLACE_PRIVADO
+    edge_type: CONSTRAINS
+  - from: E_PROMESSA_NAO_COBRE_O_SAAS_DO_PROPRIO_VENDOR
+    to: E_PISO_ABERTO_SEM_LIMITE_ARTIFICIAL
+    edge_type: CONSTRAINS
+  - from: E_CORTE_E_RELATIVO_NAO_EXCLUSIVO
+    to: E_GITLAB_CORTE_POR_PERSONA_DE_COMPRADOR
+    edge_type: CONSTRAINS
+  - from: E_SEPARACAO_FISICA_DIRETORIO_E_MIRROR
+    to: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
+    edge_type: SUPPORTS
+  - from: E_GITLAB_CORTE_POR_PERSONA_DE_COMPRADOR
+    to: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
+    edge_type: SUPPORTS
+  - from: E_BIOGRAFIA_VIVE_DENTRO_DO_CLAUDE_QUE_O_ADOPT_VENDORIZA
+    to: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
+    edge_type: SUPPORTS
+  - from: E_MASSA_138K_DISTRIBUIVEL_VS_151K_BIOGRAFIA
+    to: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
+    edge_type: SUPPORTS
+  - from: E_PISO_ABERTO_SEM_LIMITE_ARTIFICIAL
+    to: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
+    edge_type: SUPPORTS
+  - from: E_LICENCA_ATUAL_E_MIT_JA_CONCEDIDA
+    to: Q_LICENCA_APOS_MIT_JA_CONCEDIDA
+    edge_type: SUPPORTS
+  - from: E_POLYFORM_INTERNAL_USE_USO_INTERNO_SEM_DISTRIBUIR
+    to: Q_LICENCA_APOS_MIT_JA_CONCEDIDA
+    edge_type: SUPPORTS
+  - from: E_POLYFORM_NONCOMMERCIAL_NAO_SERVE_A_CLIENTE_COMERCIAL
+    to: Q_LICENCA_APOS_MIT_JA_CONCEDIDA
+    edge_type: SUPPORTS
+  - from: E_ELASTIC_V2_VETA_SAAS_NAO_USO_INTERNO
+    to: Q_LICENCA_APOS_MIT_JA_CONCEDIDA
+    edge_type: SUPPORTS
+  - from: E_THOUGHTBOT_PLAYBOOK_CC_BY_NC
+    to: Q_LICENCA_APOS_MIT_JA_CONCEDIDA
+    edge_type: SUPPORTS
+  - from: E_LICENCA_NAO_CONCEDE_MARCA
+    to: Q_MARCA_ONION_TITULARIDADE_NAO_MEDIDA
+    edge_type: SUPPORTS
+  - from: E_ASF_DERIVADO_SOB_MARCA_PROPRIA_SEM_CONFUSAO
+    to: Q_MARCA_ONION_TITULARIDADE_NAO_MEDIDA
+    edge_type: SUPPORTS
+  - from: E_APACHE_AVISO_PROEMINENTE_EM_ARQUIVO_MODIFICADO
+    to: Q_MARCA_ONION_TITULARIDADE_NAO_MEDIDA
+    edge_type: SUPPORTS
+  - from: E_COPIER_CONFLITO_INLINE_NUNCA_EM_SILENCIO
+    to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    edge_type: SUPPORTS
+  - from: E_COPIER_MODO_REJ_ISOLA_O_DIFF
+    to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    edge_type: SUPPORTS
+  - from: E_CRUFT_UPDATE_E_PORTAO_DE_REVISAO
+    to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    edge_type: SUPPORTS
+  - from: E_FORK_MANTEM_CONEXAO_COM_UPSTREAM
+    to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    edge_type: SUPPORTS
+  - from: E_PLUGIN_INTERNO_VIA_MARKETPLACE_PRIVADO
+    to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    edge_type: SUPPORTS
+  - from: E_MARKETPLACE_PROPRIO_SEM_EXIGENCIA_DE_PUBLICO
+    to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_DISTRIBUICAO_0913
+    to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    edge_type: SUPPORTS

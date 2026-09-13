@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**195 itens abertos** em 44 grafo(s) com aberto (de 66 no escopo) · 44 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**200 itens abertos** em 45 grafo(s) com aberto (de 67 no escopo) · 45 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 3 item(ns)
 
@@ -24,6 +24,16 @@
 | 7.5 | `C_OPCAO_A_CONECTOR_REMOTO_PUBLICO` | plugin-mcp-posture-2026-09 | OPCAO (a): expor a triade existente (onion-kg read-only 6 tools, onion-exec 4 tools com write-como-proposta, onion-framework 5 too |
 | 5.6 | `C_OPCAO_C_NADA_AGORA_SDAAL` | plugin-mcp-posture-2026-09 | OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem |
 | 1.8 | `C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA` | plugin-mcp-posture-2026-09 | OPCAO (d) — NAO CONSIDERADA NA DECISAO, CORTADA POR ORCAMENTO NESTA RODADA: skill-bundle — skills locais via git-subdir (stric |
+
+## distribuicao-metodo-vivo-2026-09 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 93.0 | `Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09` | distribuicao-metodo-vivo-2026-09 | Para entregar a um CLIENTE DE CONSULTORIA uma versao publica do Onion que ele FORKA e evolui sozinho: onde passa a fronteira entre |
+| 22.5 | `Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR` | distribuicao-metodo-vivo-2026-09 | Veiculo e canal de atualizacao NAO sao duas escolhas, sao uma: quem escolhe TEMPLATE contrai, no mesmo ato, a divida de um segundo |
+| 17.5 | `Q_LICENCA_APOS_MIT_JA_CONCEDIDA` | distribuicao-metodo-vivo-2026-09 | Se a concessao MIT ja saiu (repo mais 5 plugins publicados), o que uma licenca nova ainda alcanca? A rodada eliminou por evidencia |
+| 15.0 | `Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT` | distribuicao-metodo-vivo-2026-09 | A fronteira doutrina/biografia vira MECANISMO onde? As duas formas com precedente sao: (a) separacao FISICA como o GitLab faz —  |
+| 8.0 | `Q_MARCA_ONION_TITULARIDADE_NAO_MEDIDA` | distribuicao-metodo-vivo-2026-09 | O que PROTEGE o nome Onion se o cliente forkar? A rodada mostrou que a licenca apenas NAO CONCEDE marca (Apache Secao 6) e que a p |
 
 ## kg-multi-graph-view-2026-09 — 10 item(ns)
 
