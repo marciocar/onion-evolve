@@ -12,4 +12,4 @@ comandos por semanas com a SSOT em 102, sem nenhum feeder disparar.
 removendo a alternativa NOVA do pré-filtro, logo não testava a alternativa que veio
 com ela. É o mesmo mascaramento do 'getting-started' já documentado na Regra 16.
 Sem nenhum outro numeral+substantivo aqui, o arquivo só alcança o feeder pela
-alternativa `comandos[[:space:]]*[—:–-][[:space:]]*[0-9]`.
+alternativa `comandos[[:space:]]*(—|–|:|-)[[:space:]]*[0-9]` — alternância, não conjunto: em locale C um conjunto `[—…]` casa um BYTE do travessão (2026-09-13).

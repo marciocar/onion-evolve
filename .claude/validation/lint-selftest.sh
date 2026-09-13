@@ -389,8 +389,19 @@ SANDBOX="$(mktemp -d)"
 _bench_on_exit() { _bench_abort_guard; rm -rf "${SANDBOX:-}"; }
   rm -f "${_FIXTURE_NODE:-}" 2>/dev/null || true   # nó-fixture do (e) de kg-backlog (mktemp no top-level)
 trap _bench_on_exit EXIT
-cp -a "${REPO_ROOT}/.claude"   "${SANDBOX}/.claude"
-cp -a "${REPO_ROOT}/docs"      "${SANDBOX}/docs"
+# A CÓPIA EXCLUI AS FIXTURES TRANSITÓRIAS DE OUTROS CASOS. Casos como marketplace-bundle e
+#    moat-boundary criam fixtures NA ÁRVORE VIVA (eles testam o LINT, que varre o dir real), com a
+#    convenção `__*__` que o .gitignore já declara; um `cp -a` no instante errado as herdaria no sandbox.
+#    A exclusão usa a convenção `__*__` que o .gitignore declara (aqui ela vale para .claude/ e docs/ inteiros).
+#    ⚠️ Esta higiene NÃO era a causa do `r16-count-drift/bad-invocaveis-invertida` que só reprovava na
+#    suíte, como a 1ª redação deste comentário afirmava. Medido 2026-09-13: a causa era LOCALE — o conjunto
+#    `[—:–-]` da REGRA 16 não casa o travessão no GNU grep em locale C (o da suíte e do hook), e o teste
+#    "isolado" rodava na minha shell UTF-8. Curado com alternância; guarda de forma: caso `shell-locale`.
+#    ⚠️ E O EMPACOTADOR TOLERA ARQUIVO VIVO. `tar` sai 1 com "file changed as we read it" (o `cp -a`
+#    saía 0) e há escritores vivos aqui dentro — beacons, session-lifecycle.jsonl, instructions-loaded.jsonl.
+#    Sob `set -euo pipefail` isso matava a suíte na cópia. rc 1 do tar = "mudou durante a leitura", não erro.
+{ tar -C "${REPO_ROOT}" --warning=no-file-changed -cf - --exclude='__*__.*' --exclude='__*__' .claude docs \
+    || [ "$?" -eq 1 ]; } | tar -C "${SANDBOX}" -xf -
 cp -a "${REPO_ROOT}/CLAUDE.md" "${SANDBOX}/CLAUDE.md"
 
 # ---------------------------------------------------------------------------
@@ -529,7 +540,11 @@ run_lint_fixture() {
   case "${verdict}" in
     bad)
       if [ -z "${cited}" ]; then
-        record_fail "${fixture}" "esperava violação citando a fixture, nenhuma apareceu (guarda quebrada?)"
+        # A FALHA CARREGA A PROVA: número da SSOT, linha injetada, sumário e 1as violações do lint. Foi
+        # esta saída que separou "a regra não viu" de "o lint morreu antes" no r16 de 2026-09-13 — a regra
+        # rodou, viu 116 e não citou: era locale (ver o caso `shell-locale`). Flaky sem saída é flaky
+        # para sempre.
+        record_fail "${fixture}" "esperava violação citando a fixture, nenhuma apareceu (guarda quebrada?) · SSOT_CMD_TOTAL=[${SSOT_CMD_TOTAL:-VAZIO}] SSOT_CMD_DRIFT=[${SSOT_CMD_DRIFT:-VAZIO}] · linha injetada: [$( { grep -iE 'invoc|comandos' "${src}" 2>/dev/null || true; } | head -1 | sed -e "s/__ONION_COMMANDS_DRIFT__/${SSOT_CMD_DRIFT}/g" | cut -c1-90)] · sumário do lint: [$( { grep -E 'HARD[[:space:]]*:|SOFT[[:space:]]*:' <<< "${out}" || true; } | tr '\n' ' ' | cut -c1-120)] · 1as violações: [$( { grep '^VIOLATION' <<< "${out}" || true; } | head -2 | cut -c1-140 | tr '\n' '|')]"
       elif [ -n "${keyword}" ] && ! grep -qF "${keyword}" <<< "${cited}"; then
         record_fail "${fixture}" "violação apareceu sem o keyword '${keyword}' (regra errada disparou?)"
       else
@@ -940,16 +955,53 @@ run_shell_pipefail_robustness_selftests() {
   #    strings de mensagem deste guard (onde o token vem colado a aspas).
   # Cobre validation/ + utils/ + hooks/ + .githooks/. `sed -n` (não o fechador) por dogfood.
   hits="$(grep -rnE 'sort[^|]*\|[[:space:]]*head([[:space:]]+-|[[:space:]]*$)' \
-            "${REPO_ROOT}/.claude/validation" \
-            "${REPO_ROOT}/.claude/utils" \
-            "${REPO_ROOT}/.claude/hooks" \
-            "${REPO_ROOT}/.githooks" 2>/dev/null \
+            "${REPO_ROOT}/.claude/validation/" \
+            "${REPO_ROOT}/.claude/utils/" \
+            "${REPO_ROOT}/.claude/hooks/" \
+            "${REPO_ROOT}/.githooks/" 2>/dev/null \
           | grep -vE ':[[:space:]]*#' || true)"
   if [ -z "${hits}" ]; then
     record_pass "shell-pipefail: nenhum pipeline sort→fechador-precoce frágil nos scripts strict-mode (drene com sed -n '1p')"
   else
     record_fail "shell-pipefail: pipeline sort→fechador-precoce frágil sob pipefail" \
       "drene com sed em vez de fechar cedo (sem EPIPE): $(_emit "${hits}" | sed -n '1,3p' | tr '\n' ';')"
+  fi
+
+  # ── CLASSE DE LOCALE, MEDIDA em 2026-09-13: conjunto `[...]` com caractere MULTIBYTE numa regex.
+  # Em locale C (o do hook de pre-commit) o conjunto casa UM BYTE do caractere, nunca o caractere: a
+  # REGRA 16 (Contagem de inventário-TOTAL divergente da SSOT) tinha `comandos[[:space:]]*[—:–-]` e
+  # ficava CEGA a `Comandos — 116 invocáveis` no hook, enxergando só em UTF-8. Foi a causa real do
+  # `r16-count-drift/bad-invocaveis-invertida` que "só falhava na suíte": a suíte roda em C, o teste
+  # isolado rodava na minha shell UTF-8. Eu tinha fechado este fio como INÓCUO por uma medição feita no
+  # locale errado. Cura: alternância `(—|–|:|-)`, que casa a SEQUÊNCIA de bytes em qualquer locale.
+  # A guarda é de FORMA (varre bytes, não lista de caracteres) — o vocabulário não tem como faltar.
+  local _mb_hits
+  _mb_hits="$(python3 - "${REPO_ROOT}" <<'PY' 2>&1 || true
+import os, re, sys
+root = sys.argv[1]
+code = re.compile(rb'grep|sed|awk|=~|gsub|sub\(|match\(|split\(|case|\*\[|re=')
+cls = re.compile(rb'\[(?:\[:[a-z]+:\]|\\.|[^\]\s/\[\\])*[\x80-\xff](?:\[:[a-z]+:\]|\\.|[^\]\s/\[\\])*\]')
+pyre = re.compile(rb're\.(match|sub|search|compile|findall|fullmatch)\(')  # regex PYTHON (str Unicode) é imune ao locale do shell
+for d in ('.claude/validation', '.claude/utils', '.claude/hooks', '.githooks', 'ops'):
+    for dp, _, fs in os.walk(os.path.join(root, d)):
+        if '/fixtures' in dp:
+            continue
+        for f in fs:
+            if not (f.endswith('.sh') or d == '.githooks'):
+                continue
+            p = os.path.join(dp, f)
+            for i, l in enumerate(open(p, 'rb'), 1):
+                if l.lstrip().startswith(b'#') or not code.search(l) or pyre.search(l):
+                    continue
+                for m in cls.finditer(l):
+                    print('%s:%d: %s' % (os.path.relpath(p, root), i, m.group(0).decode('utf-8', 'replace')))
+PY
+)"
+  if [ -z "${_mb_hits}" ]; then
+    record_pass "shell-locale: nenhum conjunto [...] com caractere multibyte em regex de shell (use alternância (a|b))"
+  else
+    record_fail "shell-locale: conjunto [...] com caractere multibyte — em locale C casa um BYTE, não o caractere" \
+      "troque por alternância (—|–|x): $(_emit "${_mb_hits}" | sed -n '1,3p' | tr '\n' ';')"
   fi
 
   # ── 2ª CLASSE, MEDIDA em 2026-09-04 (o `/meta:drive` abriu o nó Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO):
@@ -8641,11 +8693,31 @@ run_regen_baselines_selftests() {
   #    passaram a existir; a asserção antiga só olhava `✓✗` e reprovava um relatório correto. O que
   #    ela precisa provar continua sendo o mesmo: UMA linha bem-formada por baseline, nenhuma
   #    deformada (o defeito real do `grep -c || echo 0`, que emitia "0\n0").
-  out="$(bash "${helper}" "${d}" 2>/dev/null | grep -cE 'chave\(s\)|emissor falhou' || true)"
-  local lines; lines="$(bash "${helper}" "${d}" 2>/dev/null | grep -c '^  [✓✗·]' || true)"
-  if [ "${out}" = "${lines}" ] && [ "${out}" -gt 0 ]; then
+  #    ⚠️ E A ASSERÇÃO NÃO ENUMERA FRASES — foi assim que ela quebrou. A versão anterior contava
+  #    `chave(s)|emissor falhou` e o relatório tem uma TERCEIRA forma, `emissor NÃO resolvido`:
+  #    ela entrava em `lines` (tem marcador) e não em `out` (frase fora da lista), dando 9 != 10
+  #    num relatório CORRETO. Classe registrada nesta casa: em guarda de lista o defeito dominante
+  #    é o VOCABULÁRIO, não a lógica. Agora a asserção olha a FORMA — marcador, nome e carga útil —
+  #    que é o que `não deformado` quer dizer, e sobrevive a frase nova.
+  #    ⚠️ E AS DUAS CONTAGENS SAEM DE UMA PASSADA SÓ, com o marcador comparado como TOKEN e não
+  #    por bracket. Motivo medido em 2026-09-13: `·` é U+00B7 (2 bytes) e `✓` tem 3; num bracket
+  #    `[✓✗·]` sob locale C o padrão casa UM BYTE e depois exige o espaço que não vem — a contagem
+  #    com `grep -E` voltava 0 enquanto a com `grep` básico voltava 10, e o caso reprovava com
+  #    `0 != 10` num relatório correto. Duas contagens de fontes diferentes podem discordar; uma
+  #    passada só, não. E a tentativa anterior de cura (bracket no -E) TROUXE este defeito para
+  #    dentro da cura — a classe do dia, cometida ao curá-la.
+  local _rep; _rep="$(bash "${helper}" "${d}" 2>/dev/null)"
+  #    ⚠️ E "NÃO DEFORMADO" INCLUI A LINHA ÓRFÃ. A passada adversarial de 2026-09-13 montou o defeito
+  #    que o caso nomeia — `%s chave(s)` recebendo "0\n0" — e as duas contagens acima davam 2 = 2: a
+  #    sobra "0 → N chave(s)" vira linha SEM marcador, que nenhuma das duas via. Agora toda linha
+  #    não-vazia do stdout tem de começar por um marcador conhecido; linha sem marcador É a deformação.
+  local lines orphan
+  lines="$(awk '$1=="✓"||$1=="✗"||$1=="·"{n++} END{print n+0}' <<< "${_rep}")"
+  out="$(awk '($1=="✓"||$1=="✗"||$1=="·") && NF>=3 {n++} END{print n+0}' <<< "${_rep}")"
+  orphan="$(awk 'NF>0 && !($1=="✓"||$1=="✗"||$1=="·"||$1=="+"||$1=="→"||$1=="⊘") {n++} END{print n+0}' <<< "${_rep}")"
+  if [ "${out}" = "${lines}" ] && [ "${out}" -gt 0 ] && [ "${orphan}" = "0" ]; then
     record_pass "regen-baselines: uma linha por baseline (relatório não deformado)"
-  else record_fail "regen-baselines: relatório" "linhas com 'chave(s)'=${out} != linhas ✓/✗=${lines}"; fi
+  else record_fail "regen-baselines: relatório" "linhas com carga=${out} · linhas com marcador=${lines} · linhas SEM marcador=${orphan}: $(awk 'NF>0 && !($1=="✓"||$1=="✗"||$1=="·"||$1=="+"||$1=="→"||$1=="⊘")' <<< "${_rep}" | sed -n '1,2p' | tr '\n' '|')"; fi
   rm -rf "${d}"
 }
 
@@ -12711,6 +12783,12 @@ run_claude_md_fuse_selftests() {
   out="$(bash "${h}" --classify "${d}/rules-prose.md" 2>&1 || true)"
   if [ "${out}" = "rules" ]; then record_pass "claude-md-fuse: (c) parágrafo de prosa ≥ 25 palavras ⇒ rules (recusa no incerto)"
   else record_fail "claude-md-fuse: (c)" "esperava rules, veio: ${out}"; fi
+  # (f) LOCALE C, o do hook: marcador ACENTUADO em minúscula. `[ÓO]` casava um BYTE e `-i` não dobra caixa de
+  #     multibyte em C — "é obrigatório" virava boilerplate e a fusão furava o never-clobber (passada 2026-09-13).
+  printf '# Projeto Z\n\n- é obrigatório rodar os testes antes do merge.\n' > "${d}/rules-accent.md"
+  out="$(LC_ALL=C LANG=C bash "${h}" --classify "${d}/rules-accent.md" 2>&1 || true)"
+  if [ "${out}" = "rules" ]; then record_pass "claude-md-fuse: (f) 'é obrigatório' em LC_ALL=C ⇒ rules (marcador acentuado sobrevive ao locale do hook)"
+  else record_fail "claude-md-fuse: (f) locale C" "esperava rules, veio: ${out}"; fi
   rc=0; bash "${h}" --fuse "${d}/astro.md" "${d}/skel.md" "${d}/fused.md" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 0 ] && [ "$(head -1 "${d}/fused.md")" = "# 🧅 Alvo — regras do projeto" ] \
      && grep -q '^## 🛠️ Desenvolvimento — conteúdo original do template (Astro Starter Kit: Basics)' "${d}/fused.md" \
@@ -12975,6 +13053,36 @@ run_plugin_version_derived_selftests() {
     record_pass "plugin-version-derived: (h) em GitFlow (main parado, develop andando) a versao ANDA:${_seq}"
   else record_fail "plugin-version-derived: (h)" "a versao congelou em develop:${_seq}"; fi
   rm -rf "$e"
+
+  # (j) O TETO DA VERSAO E BARRADO DUAS VEZES — e este caso existe porque eu afirmei o contrario.
+  #     Dois PRs concorrentes, da mesma base, calculam o MESMO numero. A afirmacao de 2026-09-12 foi
+  #     que no esquema de fato commitado a colisao passaria CALADA. Medido com squash real em
+  #     2026-09-13, e falso, e o selo do maestro fechou a decisao SEM codigo por isso. O que sobra e
+  #     garantir que as duas barreiras nao sumam em silencio numa mudanca de formato da projecao:
+  #       (j1) o GIT conflita no merge do 2o PR — as projecoes divergem;
+  #       (j2) resolvido DESCUIDADO (aceitando um lado), a REGRA 19 acusa drift, porque o tree_sha
+  #            commitado e de UM lado e a arvore real e A+B.
+  e="$(mktemp -d)"; _setup_repo "$e"; _regen "$e"
+  ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm gen ) >/dev/null 2>&1
+  ( cd "$e" && git checkout -qb prA ) >/dev/null 2>&1; _bump "$e" A
+  ( cd "$e" && git checkout -q main && git checkout -qb prB ) >/dev/null 2>&1
+  printf '# B\n' > "$e/.claude/commands/quick/extra-b.md"
+  sed -i 's|COMMANDS=(.claude/commands/quick/ping.md)|COMMANDS=(.claude/commands/quick/ping.md .claude/commands/quick/extra-b.md)|' "$e/.claude/utils/marketplace/verticals/probe.manifest.sh"
+  _regen "$e"; ( cd "$e" && git add -A && git -c user.email=t@t -c user.name=t commit -qm B ) >/dev/null 2>&1
+  local _merge_rc=0 _vA _j2_c _j2_d _t
+  ( cd "$e" && git checkout -q main && git merge --squash -q prA >/dev/null 2>&1 && git -c user.email=t@t -c user.name=t commit -qm sqA ) >/dev/null 2>&1
+  _vA="$(_vof "$e/plugins/probe")"
+  ( cd "$e" && git merge --squash prB ) >/dev/null 2>&1 || _merge_rc=$?
+  if [ "${_merge_rc}" -ne 0 ]; then
+    record_pass "plugin-version-derived: (j1) 2o PR concorrente sem rebase CONFLITA no git — a colisao nao entra calada"
+  else record_fail "plugin-version-derived: (j1)" "o merge do 2o PR NAO conflitou — a 1a barreira do teto sumiu (formato da projecao mudou?)"; fi
+  # resolucao DESCUIDADA: aceita o plugins/ de um lado
+  ( cd "$e" && git checkout --theirs plugins/ && git add -A && git -c user.email=t@t -c user.name=t commit -qm sqB-descuidado ) >/dev/null 2>&1
+  _j2_c="$(_vof "$e/plugins/probe")"; _t="$(mktemp -d)"; _regen "$e" "$_t/probe"; _j2_d="$(_vof "$_t/probe")"
+  if [ -n "${_j2_c}" ] && [ "${_j2_c}" != "${_j2_d}" ]; then
+    record_pass "plugin-version-derived: (j2) resolucao descuidada e pega pela REGRA 19 — commitado ${_j2_c}, derivado ${_j2_d}"
+  else record_fail "plugin-version-derived: (j2)" "commitado ${_j2_c} = derivado ${_j2_d} — a 2a barreira do teto sumiu: a colisao passaria calada"; fi
+  rm -rf "$_t" "$e"
 
   # (i) IDEMPOTENCIA — regenerar sem mudar conteudo NAO pode andar. Sem isto a versao dispararia a
   #     cada invocacao do lint e a REGRA 19 nunca fecharia.

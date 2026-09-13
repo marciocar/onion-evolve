@@ -51,7 +51,13 @@ thresh_days=$(( THRESH_MONTHS * 30 ))
 # `Última Atualização:` (corpo). 1ª ocorrência. Vazio = sem carimbo.
 extract_stamp() {
   local f="$1" s
-  s="$(grep -iE '^[[:space:]]*date:[[:space:]]*[0-9]{4}-[0-9]{2}-[0-9]{2}|[Úu]ltima [Aa]tualiza[çc][ãa]o' "$f" 2>/dev/null \
+  # ⚠️ ALTERNÂNCIA EXPLÍCITA, NUNCA CONJUNTO COM CARACTERE MULTI-BYTE. A versão anterior usava
+  #    `[Úu]ltima [Aa]tualiza[çc][ãa]o`: em UTF-8 `Ú`, `ç` e `ã` valem 1 caractere e o conjunto
+  #    funciona; em locale C valem 2 BYTES cada e o bracket vira indefinido. Medido 2026-09-13:
+  #    o MESMO arquivo saía `stale` em C.UTF-8 e `no-stamp` em C — e o hook de git roda em C,
+  #    então a métrica de frescor MENTIA no único ambiente que importa. A cura não é achar o
+  #    conjunto certo: é não depender de conjunto quando o alfabeto é multi-byte.
+  s="$(grep -E '^[[:space:]]*[Dd][Aa][Tt][Ee]:[[:space:]]*[0-9]{4}-[0-9]{2}-[0-9]{2}|(Última|última|Ultima|ultima|ÚLTIMA|ULTIMA) (Atualização|atualização|Atualizacao|atualizacao|ATUALIZAÇÃO|ATUALIZACAO)' "$f" 2>/dev/null \
         | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1)"
   printf '%s' "${s}"
 }

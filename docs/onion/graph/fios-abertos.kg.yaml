@@ -53,56 +53,6 @@ nodes:
     verified_against: 'etapa 3 da ordem explicita do maestro (vai na ordem, 2026-09-01); itens = secao 1 da listagem REAL, so os executaveis pelo condutor'
     label: 'Onda 8 — pagar os REAIS: o fix do JWKS no bridge, o lint enxergando .github/workflows, a instrumentacao GTM persistida, o auto-off do console Logto, e os fechamentos triviais de grafo que a revisao-total ja mediu.'
 
-  - id: I_JWKS_ATTEMPTED_AT
-    node_type: decision
-    plane: DEV
-    impact: 4
-    confidence: 0.9
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: PR onion-bridge#65 aberto (fix jwksAttemptedAt, tsc rc=0) — merge/deploy do bridge e ato do maestro'
-    label: 'Bridge: implementar jwksAttemptedAt (piso na TENTATIVA, nao so no sucesso) em src/identity.ts — PR na branch do clone dev; merge/deploy do bridge e do maestro.'
-
-  - id: I_LINT_VE_WORKFLOWS
-    node_type: decision
-    plane: DEV
-    impact: 4
-    confidence: 0.85
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: PR #758 (REGRA 10 estendida a .github/workflows; bancada 2/2; vivo em silencio)'
-    label: 'Estender o _find das regras SDAAL (no-direct-provider-calls e irmas) para incluir .github/workflows/*.yml, com caso de bancada provando a mordida.'
-
-  - id: I_GTM_JSONL_PERSISTIDO
-    node_type: decision
-    plane: DEV
-    impact: 4
-    confidence: 0.8
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: ops/gtm/collect-metrics.sh + ledgers em docs/onion/metrics/ (coleta real 4/4, idempotencia provada, cron 12:30 instalado, --resumo agregador)'
-    label: 'Persistir a saida --jsonl dos scripts de instrumentacao GTM num ledger versionado + cron diario (precedente offsite-cron) + agregador simples de leitura.'
-
-  - id: I_CONSOLE_AUTOOFF
-    node_type: decision
-    plane: DEV
-    impact: 3
-    confidence: 0.85
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: onion-logto@master — systemd-run transient 60min, timer provado; dogfood achou o console LIGADO por esquecimento (o caso real)'
-    label: 'onion-vps-logto/console.sh: case on) ganha systemd-run --unit=onion-logto-console-autooff desligando o console admin apos janela — o loopback nao fica aberto por esquecimento.'
-
-  - id: I_FECHAMENTOS_TRIVIAIS
-    node_type: decision
-    plane: DEV
-    impact: 3
-    confidence: 0.9
-    status: done
-    verified_at: 2026-09-01
-    verified_against: 'PAGO: C_reuse_readmodel->done, recarimbo C_a2a_gate_narrow, selo C_commodity_vs_diff, Q_BRANCH_MAIN->done (lineage product no members.yaml, validate rc=0)'
-    label: 'Fechamentos de grafo ja medidos: C_reuse_readmodel->done (recomendacao cumprida via REGRA 66), recarimbo C_a2a_gate_narrow, selo C_commodity_vs_diff, Q_BRANCH_MAIN (lineage product no members.yaml).'
-
   - id: E_W8_FECHAMENTO_FONTES
     node_type: evidence
     plane: DEV
@@ -113,27 +63,6 @@ nodes:
     verified_against: 'radar --integrity --schema exit 0 nos 9 grafos tocados; 0 alvos de SUPERSEDES pendentes (eram 13 em 8 grafos); bancada census-seal (d) PASS e FAIL com a regra removida'
     label: 'Fechamento dos nos-FONTE da Onda 8 (o fios-abertos marcava done, as fontes seguiam open): C_console_autooff_gap e E_LINT_NAO_ENXERGA_WORKFLOWS SUPERSEDED por evidencia medida; C_a2a_gate_narrow open->confirmed; Q_JWKS segue open com E_W8_JWKS_PR65_ABERTO (fecha no deploy do maestro). ACHADO no caminho: o census-seal emitia SUPERSEDES para TODO DRIFTED — 13 alvos ainda com trabalho pendente ficaram open sob SUPERSEDES; 7 refinados para CONSTRAINS (regra do radar), 6 flipados para superseded (premissa morta); e a regra virou mecanismo: aresta pela realidade (MORTO/FORA => SUPERSEDES, senao CONSTRAINS).'
 
-  - id: Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE
-    node_type: question
-    plane: DEV
-    impact: 4
-    confidence: 0.85
-    status: done
-    label: 'A bancada vendorizada (lint-selftest.sh) NAO PODE passar no adotante: medido em 2026-09-02 no 1o adotante greenfield do pin 8e2517724c0a — SELFTEST_RC=1, 19 casos ✗ (18 em r16-count-drift, 1 em r22-evolution-links) e a suite aborta antes da soma sob set -e. Causa estrutural: inventory_scope_excluded() exclui fixtures e, em repo derivado, tudo fora de docs/onion/ e CLAUDE.onion.md (posto de proposito em 2026-08-06 para o adotante nao nascer vermelho) — o que torna as assercoes dessas familias insatisfaziveis la. Opcoes: (a) marcar as familias core-only e pular quando o stamp diz role: adopted; (b) fixtures proprias do adotante; (c) nao vendorizar a bancada. GATILHO: proximo /meta:adopt --update de um adotante (medir la) OU o maestro selar (a).' # RESPONDIDA 2026-09-03 (cura (a) selada): ver E_BANCADA_NO_ADOTANTE_MEDIDA_0903
-    verified_at: '2026-09-03'
-    verified_against: 'copia da Sacola com .claude/ atual e role: adopted: 789 ok / 0 falhas / 66 skips visiveis, rc=0 (adopter-bench4)'
-    trace: 'docs/evolution/inbox/_processed/2026-09-02-sinal-research-lens-rule-nasce-hard-no-adotante.md'
-
-  - id: D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO
-    node_type: decision
-    plane: PROD
-    impact: 4
-    confidence: 0.9
-    status: done
-    label: 'DECISAO PROPOSTA (sinal upstream do 1o adotante greenfield, 2026-09-03; maestro verbatim: "fundir da melhor forma para aproveitamento do Onion, o core deveria mandar pronto e resolvido"): hoje o /meta:adopt, ao achar CLAUDE.md pre-existente, deixa CLAUDE.onion.md ao lado (never-clobber) e um item "fundir ou nao — decisao do maestro" — resultado: quem abre o repo pelo CLAUDE.md (o arquivo que o harness carrega) NAO ve o Onion (papel, contextos, warm-up, gate). Opcoes: (1) FUNDIR na adocao quando o CLAUDE.md existente e reconhecivel como boilerplate de template (Astro/Next/Vite: so comandos e links, sem regras de projeto) — o conteudo vira secao "Desenvolvimento" do esqueleto Onion-first; never-clobber segue para CLAUDE.md com regras reais; (2) sempre fundir, original preservado integralmente em secao nomeada, diff visivel no commit da adocao; (3) manter e so avisar mais alto. Recomendacao do adotante: (1). Implementacao de referencia: o CLAUDE.md fundido da sacola-de-ideias. GATILHO: proxima adocao greenfield OU selo do maestro.' # SELADA 2026-09-03 (opcao 1): helper .claude/utils/adopt/claude-md-fuse.sh (--classify boilerplate|rules, --fuse; recusa exit 3 em regras) + familia claude_md_fuse (5 casos) + Fase 3 do /meta:adopt chama o helper; dogfood REAL da adocao = proxima greenfield
-    verified_at: '2026-09-03'
-    verified_against: 'bancada: run_claude_md_fuse_selftests 5/5 (boilerplate Astro funde; marcador NUNCA e prosa >=25 palavras recusam); adopt.md Fase 3'
-    trace: 'docs/evolution/inbox/_processed/2026-09-03-sinal-adocao-deveria-entregar-claude-md-fundido.md'
   - id: D_BANCADA_FAIXAS_E_MAPA
     node_type: decision
     plane: PROD
@@ -144,6 +73,7 @@ nodes:
     verified_at: '2026-09-03'
     verified_against: 'run #4 paralelo: 994 casos / 0 falhas / 519 s (par8-final2.log); hook pre-commit --affected-staged --jobs auto; CI --jobs auto'
     trace: 'docs/analysis/bancada-faixas-e-mapa-2026-09.md'
+
   - id: E_BANCADA_FAIXAS_MEDIDA
     node_type: evidence
     plane: PROD
@@ -163,27 +93,6 @@ nodes:
     label: 'PERGUNTA: por que kg-backlog (e) (dois lints completos num sandbox de git archive HEAD; espera HARD ctrl+1 no mutante done-sem-verified_at) falhou 1 vez em 4 runs paralelos de 8 workers (HARD 9->9) e nunca em serie? O lint mostrou-se deterministico sob carga (E_BANCADA_FAIXAS_MEDIDA), nao ha timeout no caminho do lint, o sandbox e privado. Suspeitos: leitura do repo vivo pelo lint do sandbox (git sem origin, provenance), parse do contador (sed|tail -1) sob saida truncada. Gatilho: proxima ocorrencia — o caso agora imprime as HARD so-do-mutante na mensagem de falha; dai abre-se a causa. 2a OCORRENCIA 2026-09-03 (gate do adopt, 1/1 run paralelo; serie passa): a mensagem nova mostrou HARD so-no-mutante = [] — o lint do mutante NAO viu no novo. Causa candidata achada no codigo: _fixture_done_nu fazia cat >> no FIM do arquivo, e fios-abertos termina em edges: — o no-fixture caia sob edges, nao sob nodes (o parser tolerava as vezes). Curado: o no entra antes de edges:. Se recorrer com a cura, a causa e outra.'
     verified_at: '2026-09-04'
     verified_against: 'f-par.log (1 falha), par8.log/par8q.log/f-par2.log (0 falhas), 2026-09-03; SUPERSEDIDO em 2026-09-04 pelo /meta:drive: a pergunta abrangia UMA classe e a medicao a partiu em DUAS (A curada: veredito por _emit|grep -q sob leitor multi-thread; B aberta: o contador de HARD nao sobe no mutante do caso (e), que NAO decide por grep -q). Reproducao pos-cura do (e): 0 falha(s) em 20 tentativas sob 4 concorrentes'
-  - id: E_BANCADA_NO_ADOTANTE_MEDIDA_0903
-    node_type: evidence
-    plane: PROD
-    impact: 4
-    confidence: 0.9
-    status: confirmed
-    label: 'MEDIDO 2026-09-03 na copia de um adotante greenfield (Sacola) com o .claude/ ATUAL e role: adopted, familia a familia em serie (mapa v2): 118 famílias passam; 12 reprovam por SSOT/maquinaria que so o core tem (radar-baselines, members.yaml, radar-sources, marketplace, moat, outbox, bundling, registro de regras); 3 abortam por robustez (pipeline vazio sob pipefail em resolve_target; docs/analysis/ ausente em kg_coverage; docs/backlog.md ausente em backlog_projection) e, curadas, reprovam por semantica do core. Cura (a): SELFTEST_ROLE do stamp + SELFTEST_CORE_ONLY_FAMILIES (15, por dado) + fixtures r16/r22 pulam com skip VISIVEL nomeando o motivo; no core rodam. Prova de ponta a ponta com --jobs 4: 789 ok / 0 falhas / 66 skips (15 familias x1 + 44 fixtures + 7 tooling), rc=0, 136 s. O mapa v1 (pin velho) misturava helpers ausentes com core-only — so o mapa com .claude/ atual separa as causas. STRICT no adotante reprova os skips: declarado, decisao do adotante.'
-    trace: 'docs/evolution/review/fix-bench-adopter-core-only.md'
-    verified_at: '2026-09-03'
-    verified_against: 'adopter-map2.tsv (134 familias em serie) + adopter-bench4.log (--jobs 4) na copia $CLAUDE_JOB_DIR/tmp/adopter-copy'
-  - id: I_FORGE_PARSE_GITLAB_SUBGRUPOS
-    node_type: decision
-    plane: PROD
-    impact: 3
-    confidence: 0.9
-    status: done
-    label: 'ITEM (radar E3 rodada 3, 2026-09-04, medido pelo juiz): o parseRepoIdentity do spec do forge SDAAL (.claude/utils/forge/detector.md) devolve owner = ULTIMO segmento — para gitlab.com/group/subgroup/project.git da owner=subgroup, para group/sub1/sub2/project.git da owner=sub2; o namespace e descartado. Para o GitLab a identidade e o caminho inteiro. A plataforma corrigiu o mesmo defeito em 2.1.260 (l.39/l.40). Cura: owner = tudo entre o host e o ultimo segmento (GitHub continua 1 nivel); caso de bancada com os 3 exemplos. Gatilho: proximo PR que toque o forge OU adotante GitLab.' # FEITO 2026-09-04: regex captura o namespace inteiro; familia forge_detector extrai a regex do proprio detector.md e prova os 5 casos (GitHub 1 nivel inalterado)
-    verified_at: '2026-09-04'
-    verified_against: 'run_forge_detector_selftests 2/2 (regex extraida do detector.md, node); regex velha reprova o caso aninhado (modo de falha provado)'
-    trace: '.claude/utils/forge/detector.md'
-
   - id: E_CAUSA_ABERTA_LEITOR_MULTITHREAD_0904
     node_type: evidence
     plane: PROD
@@ -234,46 +143,88 @@ nodes:
     trace: 'docs/evolution/inbox/_processed/2026-09-04-camada-colaborador-visitante.md'
     verified_against: 'sinal de campo lido integralmente em 2026-09-05; medido no core: a skill onion-onboarding tem o ramo colaborador-visitante e NAO tem scaffold de superficie; adotantes que pediram a camada = 1'
 
+  - id: E_BURACO_ENTRE_78_E_82_MEDIDO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-12'
+    verified_against: 'intersecao medida no corpus vivo: 4 de 4 arquivos, comm -12 entre a saida NAO-MEDIDO da 82 e o baseline da 78'
+    trace: '.claude/validation/kg-census-parity-check.sh'
+    label: "Os 4 grafos que a REGRA 82 (Os dois leitores do corpus CONCORDAM sobre quem e no) NAO consegue medir sao BYTE A BYTE os 4 que a REGRA 78 (`.kg.yaml` versionado e YAML VALIDO, com catraca) TOLERA pelo baseline. Medido: intersecao 4/4. Consequencia: nesses arquivos nenhuma das duas cobra em HARD, e um no forjado dentro de bloco literal passa pelas DUAS. Nao e duplicidade, e BURACO. Ja esta NOMEADO e CONTADO na saida da 82 (classe BURACO-78-82), o que o torna visivel — mas visivel nao e coberto."
+
+  - id: D_COMO_FECHAR_O_BURACO_78_82
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-12'
+    verified_against: 'passivo da REGRA 78 medido 4 → 0 e NAO-MEDIDO da REGRA 82 medido 4 → 0 apos a cura dos quatro YAML'
+    label: "SELADO pelo maestro 2026-09-12: opcao (a) — consertar os 4 YAML invalidos, e o buraco fecha SOZINHO porque a REGRA 82 (Os dois leitores do corpus CONCORDAM sobre quem e no) passa a medi-los. Cura de RAIZ: nenhum mecanismo novo, nenhum terceiro leitor. EXECUTADO e MEDIDO: passivo da REGRA 78 (`.kg.yaml` versionado e YAML VALIDO, com catraca) 4 → 0; NAO-MEDIDO da 82 4 → 0; a classe BURACO-78-82 desapareceu por falta de materia."
+
+  - id: E_OS_QUATRO_ERAM_QUATRO_CLASSES_DE_ESCAPE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: '2026-09-12'
+    verified_against: 'os 4 arquivos re-medidos apos a cura: radar, PyYAML e a contagem anterior do radar BATEM nos tres (43/64/56/40 nos), zero no perdido ou inventado'
+    trace: '.claude/validation/kg-yaml-validity-baseline.txt'
+    label: "Os 4 defeitos eram QUATRO CLASSES DIFERENTES de escape, e isso e o que torna a catraca da REGRA 78 (`.kg.yaml` versionado e YAML VALIDO, com catraca) mais valiosa do que parecia: (1) escalar de aspas duplas ABERTO e nunca fechado; (2) aspa SIMPLES dentro de escalar de aspas simples — em YAML se escapa DOBRANDO, nunca com barra; (3) `\\$` como escape DESCONHECIDO em aspas duplas (a intencao era o literal `$in`, operador do Mongo — a barra nao fazia nada); (4) aspa DUPLA dentro de escalar de aspas duplas; e uma QUINTA forma, que a passada adversarial achou depois (bridge-produto l.310): TEXTO DEPOIS da aspa de fechamento — a ressalva `[RESSALVA C2 ...]` fora do escalar, que sobrou como uma aspa perdida no meio do label ate ser removida. Dois arquivos tinham MAIS DE UM defeito — o parser so mostra o primeiro, entao `consertei o que ele apontou` nao e `o arquivo esta bom`: o laco tem de iterar ate o parser calar. A verificacao que vale nao e `parseia`, e `os tres leitores concordam sobre a populacao`: radar, PyYAML e a contagem de antes."
+
+  - id: E_LOCALE_FRAGIL_EM_TRES_SITIOS_PRE_EXISTENTES
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-13'
+    verified_against: 'o GNU grep 3.11 que os scripts usam (/usr/bin/grep), entrada real `Comandos — 116 invocáveis`: com `[—:–-]` casa VAZIO em LC_ALL=C e casa em C.UTF-8; com `(—|–|:|-)` casa nos dois. O lint inteiro num sandbox (origin/main e árvore viva) em C: a fixture r16 bad-invocaveis-invertida NAO e citada; em C.UTF-8 e citada'
+    trace: '.claude/validation/lint-artifacts.sh (REGRA 16, pre-filtro e extrator) · .claude/utils/adopt/claude-md-fuse.sh · .claude/validation/lint-selftest.sh (shell-locale)'
+    label: "⚠️ CORRIGIDO DUAS VEZES, e a 2a correcao desfaz a 1a. A 1a redacao (2026-09-12) dizia que a classe de locale sobrevivia em 3 sitios. A 2a (mesmo dia) a declarou INOCUA: `grep -oiE` com `[—:–-]` casaria identico em C e C.UTF-8. ERA MEDICAO NO CAMINHO ERRADO: na shell interativa desta sessao `grep` e uma FUNCAO que chama o ugrep (casa por caractere em qualquer locale); os scripts rodam o GNU grep 3.11, que em locale C le o conjunto BYTE A BYTE e nao casa o travessao. MEDIDO em 2026-09-13 com /usr/bin/grep: a REGRA 16 (Contagem de inventario-TOTAL divergente da SSOT) fica CEGA a `Comandos — N invocaveis` no hook de pre-commit (que roda em C) — fail-open real, o `mais grave` da 1a redacao estava certo. E a CAUSA do `r16-count-drift/bad-invocaveis-invertida` que so reprovava na suite: a suite roda em C, o teste isolado rodava na shell UTF-8. Sitios reais, contados pela guarda contra o origin/main: 2 no lint-artifacts (extrator + pre-filtro), 1 no claude-md-fuse (`OBRIGAT[ÓO]RI[OA]`, que em C nao casa o acentuado, e o `-i` nao dobra caixa de multibyte), 3 no context-freshness-metric (curados antes neste PR) e 1 no lint-selftest, mais 2 no projection-safety (`gsub(/[—–\/;,]/`) — este NAO era inocuo: com membro `ÓTICA-Z` ou apostrofo tipografico, em C os termos saiam partidos (`TICA-Z`, `Dona`) e a guarda da REGRA 30 comparava pedacos; so parecia inocuo porque o members.yaml de hoje nao tem esses bytes. O python do rules-registry segue imune. Licao de METODO que sobrevive as duas correcoes: medir comportamento de script exige o BINARIO do script (`command grep` ou o proprio script), nunca a ferramenta da shell interativa."
+
+  - id: D_CURAR_O_LOCALE_PRE_EXISTENTE
+    node_type: decision
+    drive_kind: execution
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: '2026-09-13'
+    verified_against: 'fixture r16 bad-invocaveis-invertida citada no lint em LC_ALL=C apos a cura (antes: 0 citacoes); familia shell_pipefail_robustness 3/3 em C; MUTANTE reintroduzindo `[ÓO]` no claude-md-fuse faz a guarda shell-locale reprovar citando o sitio'
+    trace: '.claude/validation/lint-artifacts.sh · .claude/utils/adopt/claude-md-fuse.sh · .claude/validation/lint-selftest.sh (shell-locale)'
+    label: "CURADO COM CODIGO, depois de ter sido fechado sem codigo por uma medicao errada (ver E_LOCALE_FRAGIL_EM_TRES_SITIOS_PRE_EXISTENTES). Os 3 conjuntos multibyte viraram alternancia — `(—|–|:|-)` e `OBRIGAT(Ó|O)RI[OA]` —, que casa a SEQUENCIA de bytes em qualquer locale. E a classe virou MECANISMO: a familia shell_pipefail_robustness ganhou o caso `shell-locale`, uma guarda de FORMA que varre os bytes das regex de shell (validation, utils, hooks, .githooks, ops) atras de conjunto `[...]` com caractere nao-ASCII — nao ha lista de caracteres para faltar. O criterio de aceite anterior continua valendo e agora e o que pegou o defeito: a bancada em LC_ALL=C tem de dar o MESMO resultado do locale interativo."
+
+  - id: E_TETO_DA_VERSAO_E_SO_PROSA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: '2026-09-13'
+    verified_against: 'squash-merge REAL de dois PRs concorrentes em sandbox: o git CONFLITA em plugins/<name>/README.md; resolvido descuidadamente (aceitando um lado), a REGRA 19 regenera e acusa DRIFT (commitado 0.1.1, derivado 0.1.2)'
+    trace: '.claude/utils/marketplace/assemble-plugin.sh'
+    label: "⚠️ ESTE NO FOI CORRIGIDO PELA MEDICAO QUE ELE MESMO PEDIA — e a afirmacao original foi levada ao maestro DUAS VEZES como achado. A 1a redacao dizia que o teto da versao (dois PRs concorrentes sem rebase publicam o mesmo numero) ficara MUDO no esquema de fato commitado, `trocou-se um teto ruidoso por um mudo`. MEDIDO com squash-merge real, e FALSO: a colisao e barrada DUAS VEZES, independentes. (1) O GIT conflita — as duas PRs regeneram a projecao do plugin e ela diverge, entao o merge automatico e recusado. (2) Se alguem resolver o conflito DESCUIDADO, aceitando um lado, a REGRA 19 (Plugins de vertical (plugins/*) sincronizados com as fontes) regenera e acusa DRIFT: quem resolve pega o `tree_sha` de UM lado, mas a arvore real e A+B, logo o hash diverge e o derivado anda (0.1.1 commitado, 0.1.2 derivado). A segunda barreira funciona POR CAUSA do desenho de fato commitado, nao apesar dele. Quinta hipotese minha derrubada por medicao em 2026-09-12/13 — todas pela mesma via: afirmar o defeito pelo formato suspeito, sem executar."
+
+  - id: D_O_TETO_DA_VERSAO_GANHA_GUARDA_OU_ACEITE
+    node_type: decision
+    drive_kind: decision
+    plane: DEV
+    status: done
+    impact: 3
+    confidence: 0.95
+    verified_at: '2026-09-13'
+    verified_against: 'selado pelo maestro 2026-09-13 apos a simulacao com squash real: fechar sem codigo'
+    label: "SELADO pelo maestro 2026-09-13: FECHAR SEM CODIGO. A guarda recomendada — comparar no CI do main a versao publicada com a do commit anterior — e REDUNDANTE: a protecao ja existe em duas camadas independentes (conflito do git + drift da REGRA 19 (Plugins de vertical (plugins/*) sincronizados com as fontes)), medidas em E_TETO_DA_VERSAO_E_SO_PROSA. Acrescentar mecanismo sem gatilho e o que esta casa evita. O que fica: um caso de bancada que PRENDE as duas barreiras, para que uma mudanca no formato da projecao nao remova a primeira em silencio."
+
 edges:
-  - from: I_JWKS_ATTEMPTED_AT
-    to: W8_REAIS_EXECUTAVEIS
-    edge_type: SUPPORTS
-  - from: I_LINT_VE_WORKFLOWS
-    to: W8_REAIS_EXECUTAVEIS
-    edge_type: SUPPORTS
-  - from: I_GTM_JSONL_PERSISTIDO
-    to: W8_REAIS_EXECUTAVEIS
-    edge_type: SUPPORTS
-  - from: I_CONSOLE_AUTOOFF
-    to: W8_REAIS_EXECUTAVEIS
-    edge_type: SUPPORTS
-  - from: I_FECHAMENTOS_TRIVIAIS
-    to: W8_REAIS_EXECUTAVEIS
-    edge_type: SUPPORTS
   - from: E_W8_FECHAMENTO_FONTES
     to: W8_REAIS_EXECUTAVEIS
     edge_type: SUPPORTS
-  - from: Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE
-    to: W8_REAIS_EXECUTAVEIS
-    edge_type: DEPENDS_ON
-  - from: D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO
-    to: W8_REAIS_EXECUTAVEIS
-    edge_type: DEPENDS_ON
-  - from: D_BANCADA_FAIXAS_E_MAPA
-    to: W8_REAIS_EXECUTAVEIS
-    edge_type: DEPENDS_ON
-  - from: E_BANCADA_FAIXAS_MEDIDA
-    to: D_BANCADA_FAIXAS_E_MAPA
-    edge_type: SUPPORTS
-  - from: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
-    to: D_BANCADA_FAIXAS_E_MAPA
-    edge_type: DEPENDS_ON
-  - from: E_BANCADA_NO_ADOTANTE_MEDIDA_0903
-    to: Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE
-    edge_type: SUPPORTS
-  - from: I_FORGE_PARSE_GITLAB_SUBGRUPOS
-    to: W8_REAIS_EXECUTAVEIS
-    edge_type: DEPENDS_ON
   - from: E_CAUSA_ABERTA_LEITOR_MULTITHREAD_0904
     to: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
     edge_type: SUPPORTS
@@ -291,4 +242,25 @@ edges:
     edge_type: DEPENDS_ON
   - from: I_ADOPT_CAMADA_COLABORADOR
     to: W8_REAIS_EXECUTAVEIS
+    edge_type: DEPENDS_ON
+  - from: D_COMO_FECHAR_O_BURACO_78_82
+    to: E_BURACO_ENTRE_78_E_82_MEDIDO
+    edge_type: DEPENDS_ON
+  - from: D_CURAR_O_LOCALE_PRE_EXISTENTE
+    to: E_LOCALE_FRAGIL_EM_TRES_SITIOS_PRE_EXISTENTES
+    edge_type: DEPENDS_ON
+  - from: D_O_TETO_DA_VERSAO_GANHA_GUARDA_OU_ACEITE
+    to: E_TETO_DA_VERSAO_E_SO_PROSA
+    edge_type: DEPENDS_ON
+  - from: E_OS_QUATRO_ERAM_QUATRO_CLASSES_DE_ESCAPE
+    to: D_COMO_FECHAR_O_BURACO_78_82
+    edge_type: SUPPORTS
+  - from: D_BANCADA_FAIXAS_E_MAPA
+    to: W8_REAIS_EXECUTAVEIS
+    edge_type: DEPENDS_ON
+  - from: E_BANCADA_FAIXAS_MEDIDA
+    to: D_BANCADA_FAIXAS_E_MAPA
+    edge_type: SUPPORTS
+  - from: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
+    to: D_BANCADA_FAIXAS_E_MAPA
     edge_type: DEPENDS_ON
