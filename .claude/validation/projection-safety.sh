@@ -235,7 +235,7 @@ derive_terms() {
         ann = names[i]
         sub(/[[:space:]]*ver[[:space:]]+[^,;]*/, "", ann)   # ponteiro p/ doc não é nome
         gsub(markers, "", ann)
-        gsub(/[—–\/;,]/, "\n", ann)                          # separadores → tokens
+        gsub(/—|–|\/|;|,/, "\n", ann)                          # separadores → tokens
         split(ann, parts, "\n")
         for (j in parts) {
           t = parts[j]
@@ -303,7 +303,7 @@ if [ "${FEDERATION}" = "1" ]; then
       ann=substr(line,RSTART+1,RLENGTH-2)
       if (ann !~ markers) next
       sub(/[[:space:]]*ver[[:space:]]+[^,;]*/,"",ann)
-      gsub(markers,"",ann); gsub(/[—–\/;,]/,"\n",ann)
+      gsub(markers,"",ann); gsub(/—|–|\/|;|,/,"\n",ann)
       nn=split(ann,parts,"\n")
       for (j=1;j<=nn;j++){ t=parts[j]; gsub(/^[[:space:]]+|[[:space:]]+$/,"",t)
         if (t=="") continue; if (length(t)<4) continue

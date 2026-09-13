@@ -27,7 +27,7 @@ classify() {
     case "${line}" in
       ''|'#'*|'|'*|'>'*|'<!--'*) continue ;;                           # vazio, título, tabela, citação, comentário
     esac
-    if printf '%s' "${line}" | grep -qiE '\b(MUST|NUNCA|SEMPRE|OBRIGAT[ÓO]RI[OA]|never|always|do not|don'\''t|proibido|forbidden)\b'; then
+    if printf '%s' "${line}" | grep -qiE '\b(MUST|NUNCA|SEMPRE|obrigat(ó|Ó|o|O)ri[oa]|never|always|do not|don'\''t|proibido|forbidden)\b'; then
       echo rules; return 0
     fi
     # linha só de link/comando (bullet com backticks ou URL) não é prosa

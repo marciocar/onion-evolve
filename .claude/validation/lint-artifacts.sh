@@ -528,7 +528,7 @@ check_kebab_case_filenames() {
     # Detecta violações: letra maiúscula (exceto toda a extensão) ou espaço ou underscore
     local name_part="${base%.*}"  # remove extensão para checagem
 
-    if echo "${name_part}" | grep -qE '[A-Z]| |_'; then
+    if grep -qE '[A-Z]| |_' <<< "${name_part}"; then
       violation "SOFT" "${file}" "filename não segue kebab-case (maiúsculas, espaço ou underscore em '${base}') — renomeie '${base}' para kebab-case"
     fi
   done < <(_find "${CLAUDE_DIR}" -name "*.md" ! -path "*/validation/fixtures/*" -print0 2>/dev/null)
@@ -1494,7 +1494,7 @@ check_moat_boundary() {
       while IFS= read -r ef; do
         [ -n "${ef}" ] || continue
         bn="$(basename "${ef}")"
-        if printf '%s' "${bn}" | grep -qE "${moat_base}" || printf '%s' "/${ef}" | grep -qE "${moat_path}"; then
+        if grep -qE "${moat_base}" <<< "${bn}" || grep -qE "${moat_path}" <<< "/${ef}"; then
           bad="${bad}${entry}→${ef} "
         fi
       done <<< "${files}"
@@ -1853,7 +1853,7 @@ check_abstraction_methods_exist() {
     local m
     while IFS= read -r m; do
       [ -z "${m}" ] && continue
-      if ! printf '%s\n' "${methods}" | grep -qx "${m}"; then
+      if ! grep -qx "${m}" <<< "${methods}"; then
         local where
         where=$(grep -nE "(taskManager|tm|forge)\.${m}\(" "${file}" | head -2 | sed 's/^/      /')
         violation "HARD" "${file}" "método de abstração inexistente na interface: '${m}()' (use um método de ITaskManager/IForge — ex.: searchTasks). Ocorrências:
@@ -1881,11 +1881,11 @@ check_agent_tool_names() {
   while IFS= read -r -d '' agent; do
     while IFS= read -r tool; do
       [ -z "${tool}" ] && continue
-      if echo "${tool}" | grep -qE "^(${CURSOR})$"; then
+      if grep -qE "^(${CURSOR})$" <<< "${tool}"; then
         violation "HARD" "${agent}" "tool name estilo-Cursor: '${tool}' — use nome nativo do Claude Code (Read/Write/Edit/Bash/Grep/Glob/WebSearch/WebFetch/TodoWrite)"
-      elif echo "${tool}" | grep -qE '^mcp_[A-Za-z]' && ! echo "${tool}" | grep -qE '^mcp__'; then
+      elif grep -qE '^mcp_[A-Za-z]' <<< "${tool}" && ! grep -qE '^mcp__' <<< "${tool}"; then
         violation "HARD" "${agent}" "tool MCP em formato inválido: '${tool}' — Claude Code usa 'mcp__<server>__<tool>' (duplo underscore)"
-      elif echo "${tool}" | grep -qiE '^mcp__(claude_ai_)?(clickup|jira|atlassian|asana|linear|github|gitlab|bitbucket)__'; then
+      elif grep -qiE '^mcp__(claude_ai_)?(clickup|jira|atlassian|asana|linear|github|gitlab|bitbucket)__' <<< "${tool}"; then
         case "${agent}" in
           */clickup-specialist.md|*/jira-specialist.md) : ;;   # especialistas de provider podem
           *) violation "HARD" "${agent}" "tool MCP de provider direto no frontmatter: '${tool}' — providers de task/forge vão via adapter SDAAL (taskManager.*/forge.*), não mcp__<provider>__* (integrations §9; só adapters/especialistas)" ;;
@@ -2107,11 +2107,11 @@ check_inventory_total_drift() {
       case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
       n="$(printf '%s' "${line}" | grep -oiE '\([0-9]+ total' | grep -oE '[0-9]+' | head -1 || true)"
       [ -z "${n}" ] && continue
-      if printf '%s' "${line}" | grep -qiE 'agentes'; then
+      if grep -qiE 'agentes' <<< "${line}"; then
         if [ "${n}" != "${agent}" ]; then
           violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT: '(${n} total)' (esperado ${agent}) — /meta:inventory"
         fi
-      elif printf '%s' "${line}" | grep -qiE 'comandos'; then
+      elif grep -qiE 'comandos' <<< "${line}"; then
         if [ "${n}" != "${cmd}" ]; then
           violation "SOFT" "${f}" "contagem-total de comandos divergente da SSOT: '(${n} total)' (esperado ${cmd}) — /meta:inventory"
         fi
@@ -2125,7 +2125,7 @@ check_inventory_total_drift() {
     while IFS= read -r line; do
       [ -z "${line}" ] && continue
       case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
-      if printf '%s' "${line}" | grep -qiE 'paralel|orquestração de workers|orquestração paralela|orchestrator-worker|frota|fan-out|simultân|supervision'; then continue; fi
+      if grep -qiE 'paralel|orquestração de workers|orquestração paralela|orchestrator-worker|frota|fan-out|simultân|supervision' <<< "${line}"; then continue; fi
       n="$(printf '%s' "${line}" | grep -oiE '(^|[^0-9-])[0-9]+\+ comandos' | grep -oE '[0-9]+' | head -1 || true)"
       if [ -n "${n}" ] && [ "${n}" != "${cmd}" ]; then
         violation "SOFT" "${f}" "contagem aproximada de comandos divergente da SSOT: '${n}+ comandos' (esperado ${cmd}+) — /meta:inventory"
@@ -2177,11 +2177,11 @@ check_inventory_total_drift() {
     while IFS= read -r line; do
       [ -z "${line}" ] && continue
       case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
-      if printf '%s' "${line}" | grep -qiE 'paralel|orquestração de workers|orquestração paralela|orchestrator-worker|frota|fan-out|simultân|supervision|trabalhando|criad'; then continue; fi
+      if grep -qiE 'paralel|orquestração de workers|orquestração paralela|orchestrator-worker|frota|fan-out|simultân|supervision|trabalhando|criad' <<< "${line}"; then continue; fi
       # '(N agentes)' parentético = contagem POR-CATEGORIA/breakdown (ex.: header
       # 'AGENTES ESPECIALIZADOS (3 agentes)'), não total — pula mesmo com marcador.
-      if printf '%s' "${line}" | grep -qE '\([0-9]+ agentes\)'; then continue; fi
-      printf '%s' "${line}" | grep -qiE 'agentes especializados|agentes\*{0,2} (de )?IA' || continue
+      if grep -qE '\([0-9]+ agentes\)' <<< "${line}"; then continue; fi
+      grep -qiE 'agentes especializados|agentes\*{0,2} (de )?IA' <<< "${line}" || continue
       n="$(printf '%s' "${line}" | grep -oiE '[0-9]+ agentes' | grep -oE '^[0-9]+' | head -1 || true)"
       if [ -n "${n}" ] && [ "${n}" != "${agent}" ]; then
         violation "SOFT" "${f}" "contagem-total de agentes divergente da SSOT: '${n} agentes (especializados/IA)' (esperado ${agent}) — /meta:inventory"
@@ -2202,7 +2202,7 @@ check_inventory_total_drift() {
     while IFS= read -r line; do
       [ -z "${line}" ] && continue
       case "${line}" in [[:space:]]*\|*|\|*) continue ;; esac
-      printf '%s' "${line}" | grep -qE '\.claude/skills/|skills de orquestração' || continue
+      grep -qE '\.claude/skills/|skills de orquestração' <<< "${line}" || continue
       n="$(printf '%s' "${line}" | grep -oiE '[0-9]+ skills' | grep -oE '^[0-9]+' | head -1 || true)"
       if [ -n "${n}" ] && [ "${n}" != "${skill}" ]; then
         violation "SOFT" "${f}" "contagem-total de skills divergente da SSOT: '${n} skills' (esperado ${skill}) — /meta:inventory"
@@ -2270,7 +2270,7 @@ check_inventory_total_drift() {
       if [ -n "${n}" ] && [ "${n}" != "${cmd}" ]; then
         violation "SOFT" "${f}" "contagem-total de comandos divergente da SSOT (forma invertida com separador): '${n} invocáveis' (esperado ${cmd}) — derive de inventory.md (/meta:inventory)"
       fi
-    done < <(grep -oiE 'comandos[[:space:]]*[—:–-][[:space:]]*[0-9]+[[:space:]]+invocáveis' "${f}" 2>/dev/null | grep -oE '[0-9]+')
+    done < <(grep -oiE 'comandos[[:space:]]*(—|–|:|-)[[:space:]]*[0-9]+[[:space:]]+invocáveis' "${f}" 2>/dev/null | grep -oE '[0-9]+')
 
     # (b) CONJUNTIVA: '51 agentes e 99 comandos' / '102 comandos e 51 agentes'.
     #     Dois substantivos de inventário ligados por 'e' formam frase-de-total — é o que
@@ -2297,7 +2297,7 @@ check_inventory_total_drift() {
       grep -qF "${pair}" "${f}" 2>/dev/null && continue
       # GUARDAS DE VOCABULÁRIO dos irmãos: breakdown em tabela e métrica de frota não são total.
       case "${pair}" in *'|'*) continue ;; esac
-      printf '%s' "${pair}" | grep -qiE 'paralel|frota|fan-out|simultân' && continue
+      grep -qiE 'paralel|frota|fan-out|simultân' <<< "${pair}" && continue
       an="$(printf '%s' "${pair}" | grep -oiE '[0-9]+[[:space:]]+agentes' | grep -oE '^[0-9]+' | head -1 || true)"
       cn="$(printf '%s' "${pair}" | grep -oiE '[0-9]+[[:space:]]+comandos' | grep -oE '^[0-9]+' | head -1 || true)"
       [ -n "${an}" ] && [ "${an}" != "${agent}" ] && \
@@ -2358,7 +2358,7 @@ check_inventory_total_drift() {
   #   afirmar um superset que o `grep` linha-a-linha estruturalmente não pode entregar; fingir
   #   cobertura seria a própria classe que esta regra veio curar.
   done < <(_find "${CLAUDE_DIR}" "${REPO_ROOT}/docs" -name "*.md" -print0 2>/dev/null \
-    | xargs -0 -r grep -lZ -iE '[0-9]+\+?[[:space:]]+(comandos|agentes|knowledge[[:space:]]+bases|categorias|skills)|\([0-9]+[[:space:]]+total|^\|[[:space:]]*(comandos|comandos[[:space:]]+invocáveis|agentes|agentes[[:space:]]+especializados|skills|knowledge[[:space:]]+bases)[[:space:]]*\||(comandos|agentes|skills|knowledge[[:space:]]+bases)[[:space:]]*\([0-9]|comandos[[:space:]]*[—:–-][[:space:]]*[0-9]|^\|[[:space:]]*\*{0,2}total\*{0,2}[[:space:]]*\|' 2>/dev/null)
+    | xargs -0 -r grep -lZ -iE '[0-9]+\+?[[:space:]]+(comandos|agentes|knowledge[[:space:]]+bases|categorias|skills)|\([0-9]+[[:space:]]+total|^\|[[:space:]]*(comandos|comandos[[:space:]]+invocáveis|agentes|agentes[[:space:]]+especializados|skills|knowledge[[:space:]]+bases)[[:space:]]*\||(comandos|agentes|skills|knowledge[[:space:]]+bases)[[:space:]]*\([0-9]|comandos[[:space:]]*(—|–|:|-)[[:space:]]*[0-9]|^\|[[:space:]]*\*{0,2}total\*{0,2}[[:space:]]*\|' 2>/dev/null)
 }
 
 # ===========================================================================
@@ -3733,7 +3733,7 @@ check_radar_staleness() {
       *"last_run: "*)
         lr="${line#*last_run: }"
         axes=$((axes+1))
-        if ! printf '%s' "${lr}" | grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$'; then
+        if ! grep -qE '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' <<< "${lr}"; then
           violation "HARD" "${bl}" "REGRA 65: eixo '${axis}' com last_run ilegível ('${lr}') — baseline datada é o contrato; corrija ou remova o eixo"
           continue
         fi

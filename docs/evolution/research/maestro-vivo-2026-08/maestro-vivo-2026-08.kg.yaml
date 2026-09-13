@@ -553,7 +553,7 @@ nodes:
     confidence: 1.0
     verified_at: 2026-08-31
     verified_against: 'claude -p --dangerously-skip-permissions em sandbox: comando com marcador proibido BLOQUEADO (exit 2 do PreToolUse; prova.txt ausente) e controle PASSOU (controle.txt criado) — veredito pelo filesystem, nao pela mensagem'
-    label: 'MEDIDO 2026-08-31: o exit 2 de PreToolUse barra a acao SOB bypassPermissions — a metade 'barra sob bypass' da frase-moat e VERDADEIRA e exercitada; a metade 'compra o acoplamento' se sustenta pelo CONJUNTO, nao pelo primitivo (Elenxo da passada: FailproofAI produtiza o mesmo primitivo). O veredito ERRADO do confronto acertou o diagnostico (nunca-exercitada) e a cura (provar) fechou no mesmo dia. Aberto com gatilho: 1o uso REAL de PreToolUse no core fecha a distancia sandbox->producao.'
+    label: 'MEDIDO 2026-08-31: o exit 2 de PreToolUse barra a acao SOB bypassPermissions — a metade ''barra sob bypass'' da frase-moat e VERDADEIRA e exercitada; a metade ''compra o acoplamento'' se sustenta pelo CONJUNTO, nao pelo primitivo (Elenxo da passada: FailproofAI produtiza o mesmo primitivo). O veredito ERRADO do confronto acertou o diagnostico (nunca-exercitada) e a cura (provar) fechou no mesmo dia. Aberto com gatilho: 1o uso REAL de PreToolUse no core fecha a distancia sandbox->producao.'
     trace: "docs/analysis/pretooluse-proof-2026-08.md · docs/evolution/research/maestro-vivo-2026-08/data/pretooluse-sandbox/OBSERVADO.md"
 
   - id: E_BENCHMARK_DO_GATE_PUBLICADO

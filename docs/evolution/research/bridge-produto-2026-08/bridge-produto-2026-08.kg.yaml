@@ -274,7 +274,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    label: "Zep/Graphiti (memória bi-temporal) supera Mem0 (líder de mercado, US$23,9M) em benchmark público por +30% relativo — mas a Anthropic já entregou memória editável/temporal-ish grátis para TODOS os tiers desde 02/03/2026 (D1/B2). — POR QUE DECIDE: Valida a aposta técnica do KG-SSOT/kg-radar com evidência de mercado, mas encolhe a janela de diferenciação: o maior player já normalizou memória persistente e legível. Decisivo para DO rápido, não DEFER — a vantagem temporal do Bridge tem prazo de validade. FONTE: https://weavai.app (benchmark LongMemEval 63,8%% vs 49,0%% = +30%% relativo; funding Mem0 US$23,9M — 3,9 seed + 20 Series A — via TechCrunch 2025-10-28. 10º Elenxo: URL e confidence corrigidas — o nó fundia 2 lentes sob a URL errada e era a ÚNICA inflação de confidence do grafo)
+    label: "Zep/Graphiti (memória bi-temporal) supera Mem0 (líder de mercado, US$23,9M) em benchmark público por +30% relativo — mas a Anthropic já entregou memória editável/temporal-ish grátis para TODOS os tiers desde 02/03/2026 (D1/B2). — POR QUE DECIDE: Valida a aposta técnica do KG-SSOT/kg-radar com evidência de mercado, mas encolhe a janela de diferenciação: o maior player já normalizou memória persistente e legível. Decisivo para DO rápido, não DEFER — a vantagem temporal do Bridge tem prazo de validade. FONTE: https://weavai.app (benchmark LongMemEval 63,8%% vs 49,0%% = +30%% relativo; funding Mem0 US$23,9M — 3,9 seed + 20 Series A — via TechCrunch 2025-10-28. 10º Elenxo: URL e confidence corrigidas — o nó fundia 2 lentes sob a URL errada e era a ÚNICA inflação de confidence do grafo)"
     trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
 
   - id: E_PROGRESSO_VISIVEL_3X_RETENCAO
@@ -307,7 +307,7 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.85
-    label: "Open WebUI trocou de licença 6 vezes terminando numa cláusula de branding obrigatório acima de 50 usuários/30 dias — comunidade reage chamando de 'open-washing' (A1/C2). — POR QUE DECIDE: É a lacuna de confiança mais barata e mais rápida de capturar: compromisso público de licença honesta desde o dia 1 é decisão de baixo custo e alto retorno de posicionamento. Decisivo para DO imediato (declaração de licença), não depende de nenhuma feature nova. FONTE: https://docs.openwebui.com/license/" [RESSALVA C2: cadeia de 6 licenças e reação 'open-washing' vêm da lente C2, que declarou Reddit INACESSÍVEL e triangulou por fontes secundárias — confiança reduzida propagada, como o critic pediu]
+    label: 'Open WebUI trocou de licença 6 vezes terminando numa cláusula de branding obrigatório acima de 50 usuários/30 dias — comunidade reage chamando de ''open-washing'' (A1/C2). — POR QUE DECIDE: É a lacuna de confiança mais barata e mais rápida de capturar: compromisso público de licença honesta desde o dia 1 é decisão de baixo custo e alto retorno de posicionamento. Decisivo para DO imediato (declaração de licença), não depende de nenhuma feature nova. FONTE: https://docs.openwebui.com/license/ [RESSALVA C2: cadeia de 6 licenças e reação ''open-washing'' vêm da lente C2, que declarou Reddit INACESSÍVEL e triangulou por fontes secundárias — confiança reduzida propagada, como o critic pediu]'
     trace: "docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md"
 
   - id: E_OIDC_TABLE_STAKE_MAL_RESOLVIDO
