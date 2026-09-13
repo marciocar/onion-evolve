@@ -2,7 +2,7 @@
 title: 'Resíduo adversarial — passivo YAML zerado, a causa real da r16 e a classe de locale virando guarda'
 date: 2026-09-13
 branch: fix/kg-yaml-passivo-zero
-reviewed_diff_sha256: 0e5989b42c7e18abd0ff0cd0419ffc232634458db53a5c541c1e9b0f7e32e1eb
+reviewed_diff_sha256: 4a1de3b69921dc608a3e3f000e615d6e9088a1475e98966ab2417fa348d0a2ed
 findings_total: 19
 findings_real: 19
 findings_fixed: 18
