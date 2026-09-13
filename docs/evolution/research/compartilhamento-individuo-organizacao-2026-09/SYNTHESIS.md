@@ -37,6 +37,28 @@ review_after: 2026-12-12
 | Claims | 38 extraídas → **25 verificadas** (6 confirmadas, 19 refutadas) · 13 cortadas | `stats` do run |
 | Elenxo | 47 objeções, **40 sobreviventes** (33 descartes por comodismo reabertos) · **10 viraram nó** | `logs` do run + grafo |
 
+### Rodada 2 — a complementar (condição do selo), `wf_1865aba9-e20`
+
+| Item | Valor |
+|---|---|
+| Tokens · workers · parede | 2.680.149 · 28 · 35 min |
+| Fontes | **13 primárias NOMEADAS**, 13 alcançadas, 0 inalcançáveis |
+| Claims | 76 submetidas à ancoragem → **62 ancoradas**, **14 rejeitadas** (13 exageradas, 1 não encontrada) |
+| Elenxo | 95 objeções, 78 sobreviventes · 11 lacunas fechadas, 14 abertas |
+| Custo por nó | **≈ 42 mil** (64 nós) — contra **≈ 291 mil** da rodada 1 |
+
+
+### Rodada 3 — os quatro alvos nomeados, `wf_44d33784-fe6` (1ª execução real do `mode: 'primaries'`)
+
+| Item | Valor |
+|---|---|
+| Tokens · workers | 1.376.410 · 14 |
+| Fontes | 6 nomeadas, 6 alcançadas |
+| Claims | 30 → **22 "ancoradas"**, 8 rejeitadas — mas **13 das 22 chegaram sem citação** (ver abaixo) |
+| Elenxo | 22 objeções, 21 sobrevivem · 4 lacunas fechadas, 7 abertas |
+
+Retornos dos três runs versionados em [`data/`](data/).
+
 ## Veredito
 
 **A posição do maestro sobrevive como TESE.** Nas palavras dele, há partilha indissociável nos dois sentidos,
@@ -125,6 +147,70 @@ As fontes de capital e de reação de trabalhadores ficaram **não lidas**: Seri
 sindicatos, a reversão do Productivity Score (2020), relatório de mercado de monitoramento. **Não cite tese de
 capital a partir desta rodada.**
 
+## O que a rodada 2 fechou, e o limite que ela trouxe do Brasil
+
+**O limite mais duro é brasileiro e não estava em nenhuma opção.** O Exemplo 7 do guia de legítimo interesse
+da ANPD reprova rastreio de atividade e produtividade de empregado sob essa base legal, e diz por quê: *"no
+contexto da relação de emprego, os empregados estão em posição de maior vulnerabilidade em face de seu
+empregador, não possuindo meios efetivos de oposição ao tratamento"* — e a política de privacidade prévia
+**não cura** o excesso. Consequência direta para C: o canal indivíduo→organização **não pode carregar
+telemetria de atividade em nenhum grau de agregação**. "Só predicado provado" tem de ser lido como predicado
+sobre **artefato de trabalho e decisão**, nunca sobre atividade.
+
+**Três objeções saíram de "afirmação de um agente" para ancoradas no primário:** Bărbulescu §121 (o teste de
+seis fatores), C-65/23 (é caso de transferência de dados de RH, não de monitoramento) e C-34/21 (regra
+nacional que só repete o regulamento não vale como regra do art. 88).
+
+**A restrição matemática do adotante ganhou fonte externa PARA A CLASSE, não para o número.** Piso de contagem
+é exatamente a defesa que o ataque tracker foi desenhado para quebrar, inclusive com k grande; k-anonimato cai
+por homogeneidade, conhecimento externo e assimetria; a própria Microsoft admite que atributos organizacionais
+combinados permitem inferir identidade, e empilha masking sobre o piso — isto é, **o mercado paga a
+restrição**. Mas nenhuma fonte quantifica times de 3 a 5: tracker e Dinur–Nissim são resultados assintóticos,
+e usá-los para um time de cinco seria a mesma extrapolação de escala que este grafo puniu em C-65/23.
+
+**Mercado saiu de "sem sinal":** Series F do Glean (US$ 150M a US$ 7,2B) e o recuo primário do Productivity
+Score em 01/12/2020, com remoção de nomes e vedação de dado por usuário.
+
+## As quatro emendas propostas a C — e o que elas NÃO são
+
+Estão em `Q_R2_REVISAO_DO_SELO_C`, **abertas**. O selo não foi tocado: elas atingem o DESENHO de C, não a
+direção, e quem decide é o maestro.
+
+1. **A finalidade declarada não é proteção.** A evidência mede que finalidade comunicada quase não move
+   atitude, desempenho nem estresse; e o TJUE diz, pelo flanco jurídico, que regra que só reitera finalidade e
+   necessidade não tem conteúdo normativo próprio. C precisa de conteúdo concreto — limiar, budget de
+   consultas, denylist de predicados, masking — ou é decorativa pelos dois padrões ao mesmo tempo.
+2. **Falta a alavanca que mede.** Controle do alvo (escopo, janela, inspeção, veto) é a única característica
+   com efeito positivo medido. C dá finalidade e egresso por predicado, e nenhum botão sobre como e quando.
+3. **Notificação prévia cai de portão a salvaguarda** obrigatória porém insuficiente. O portão passa a ser
+   necessidade mais minimização.
+4. **Falta um regime de exceção investigativa.** A Grande Câmara admite vigilância oculta sob suspeita razoável
+   de falta grave. Mecanismo sem porta de exceção é contornado no primeiro incidente — ou C cria um modo
+   investigativo gated, logado e revisável, ou declara que o recusa.
+
+## O que a rodada 3 fechou — e o gate que ela expôs
+
+**Fechou:**
+- **O eixo 4 saiu do zero.** Deci e Ryan lidos no primário, com citação e página, e a meta-análise de
+  monitoramento eletrônico (K=94, N=23.461) dá o achado mais útil contra o lado "benefício" do balanceamento:
+  **monitorar não melhora desempenho, e a mera presença associa-se a mais estresse.**
+- **O piso de grupo sai do lugar de salvaguarda.** A doc da Microsoft admite **bin de histograma com um único
+  indivíduo**, e o piso se aplica ao filtro, não ao bin. E a "privacidade diferencial" que ela declara **não
+  tem ε documentado**: a garantia é qualitativa. Isso fecha a objeção que vinha desde a rodada 1.
+- **A ANPD não tem decisão sancionadora sobre monitoramento de trabalhador** — ausência medida, não presumida.
+
+**E expôs um defeito no gate que eu mesmo acabara de mecanizar:** **13 das 22 claims voltaram marcadas
+`ANCORADA` com citação vazia.** O `write(KG)` as escreveu com ressalva e tier rebaixado, mas o pipeline as
+contou como ancoradas. O Elenxo cravou: *"enquanto o gate aceitar campo vazio, contar claims ancoradas não
+mede nada"*. Curado **no motor**, não no prompt: o schema exige citação com tamanho, o ancorador devolve a
+citação que ele conferiu, e veredito `ANCORADA` sem citação é rebaixado para `AFIRMADA-SEM-CITACAO`. Bancada
+com mutante provado.
+
+**Uma conclusão da rodada 3 foi refutada por medição minha:** ela concluiu que não há análogo brasileiro do
+art. 88 do GDPR *porque a lista do art. 611-A da CLT seria fechada*. Baixei o texto oficial: o caput diz
+**"entre outros"**. A lista é exemplificativa e a conclusão cai. A pergunta volta melhor colocada — o critério
+é o Tema 1046 do STF e a indisponibilidade do art. 5º, X da Constituição.
+
 ## NÃO-VERIFICADOS
 
 **Eixos obrigatórios sem nenhuma claim confirmada** (`E_OBJECTION_MANDATORY_AXES_UNCOVERED`, `E_LACUNAS_COMPARTILHAMENTO_0913`):
@@ -196,6 +282,20 @@ A rodada mostrou que nem A nem B fecham a questão sozinhas, e que a opção C t
 provas que precisava aparecer antes de qualquer selo. **Não valeria** repetir o formato de varredura larga na
 rodada complementar. Ela deve ir direto às primárias nomeadas (LGPD/ANPD/TST, EDPB, Bărbulescu, IAPP/k-anonimato,
 Deci e Ryan), com poucas fontes e leitura integral.
+
+## O que fica aberto, por ordem do maestro
+
+*"O objetivo é avançar para o fechamento; o que faltar de verificação de legislação e afins será visto em
+paralelo e informado no futuro."* Estas lacunas **não bloquearam o fechamento** — ficam declaradas, com o
+gatilho sendo o maestro informar:
+
+- **O critério brasileiro não está ancorado em acórdão.** As 4 claims do TST chegaram sem citação e sem
+  localizador, e estão no grafo com tier rebaixado e ressalva no rótulo.
+- **A ponte teoria→monitoramento não tem primário.** Deci e Ryan não falam de monitoramento eletrônico; a
+  premissa de dano psicológico se apoia na meta-análise, não na teoria.
+- **Negociação coletiva no Brasil:** a pergunta está aberta e melhor colocada (Tema 1046, art. 5º X da CF).
+- **A restrição do adotante segue não quantificada na faixa de 3 a 5.**
+- **As quatro emendas a C** (`Q_R2_REVISAO_DO_SELO_C`) esperam selo. Nada foi selado por mim.
 
 ## Backlog
 

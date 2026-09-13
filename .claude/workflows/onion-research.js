@@ -36,6 +36,16 @@ const CADENCE_OVERRIDE = Number(A.cadenceDays || 0)   // F4: força a cadência 
 const KG_PATH = REVISIT || String(A.kgPath || ('docs/evolution/research/' + SLUG + '-' + TODAY.slice(0, 7) + '/' + SLUG + '-' + TODAY.slice(0, 7) + '.kg.yaml'))
 let CORPUS = String(A.corpus || '')
 const MODE = String(A.mode || 'research')
+// ─── mode: 'primaries' — as lacunas JÁ TÊM NOME (F5) ───
+// args.sources: [{ key, gap, prompt }] — a fonte primária, a lacuna que ela fecha, e como chegar nela.
+// Sem `sources` o modo NÃO EXISTE: erro nomeado. Cair em varredura silenciosamente seria trocar 42k
+// tokens/nó por 291k sem ninguém ver — exatamente o que este modo existe para não fazer.
+const SOURCES = Array.isArray(A.sources)
+  ? A.sources.filter(s => s && typeof s === 'object')
+      .map(s => ({ key: String(s.key || '').trim(), gap: String(s.gap || '').trim(), prompt: String(s.prompt || '').trim() }))
+      .filter(s => s.key && s.prompt)
+  : []
+if (MODE === 'primaries' && SOURCES.length === 0) return { error: "modo primaries SEM args.sources utilizável: exige [{key, gap, prompt}] com pelo menos 1 fonte NOMEADA (key e prompt não-vazios). Recebido: " + (Array.isArray(A.sources) ? A.sources.length + ' item(ns), 0 válido(s)' : typeof A.sources) + ". Este modo NUNCA cai em varredura sozinho — se as lacunas ainda não têm nome, peça mode 'research'/'decision' explicitamente." }
 const MAX_FETCH = Number((A.budget && A.budget.maxFetch) || 15)
 const MAX_VERIFY_CLAIMS = Number((A.budget && A.budget.maxVerify) || 25)
 const VOTES_PER_CLAIM = 3
@@ -96,6 +106,167 @@ const corpusLines = CORPUS.split('\n').filter(l => /^[^\t#][^\t]*\t[A-Z][A-Z0-9_
 log(corpusLines > 0 ? ('Corpus: ' + corpusLines + ' nó(s) já conhecidos entram no Scope, na síntese, no Elenxo e no write(KG)')
   : CORPUS.trim() ? ('Corpus: fornecido em formato NÃO-CANÔNICO (' + CORPUS.trim().length + ' chars, 0 linhas grafo<TAB>ID) — a skill manda o bloco do kg-corpus-grep.sh VERBATIM; entra como prosa no Scope, na síntese, no Elenxo e no write(KG)')
   : 'Corpus: VAZIO/não fornecido — a skill deveria ter rodado kg-corpus-grep.sh (declarado, não fatal)')
+
+// ─── Modo PRIMÁRIAS (F5, só com mode: 'primaries'): Leitura → Ancoragem → Elenxo → write(KG) ───
+// Scope/Search/Fetch/Verify NÃO rodam: as fontes já vêm NOMEADAS em args.sources. O que a varredura
+// gasta para DESCOBRIR fonte, este modo gasta para LER a fonte inteira e ANCORAR cada claim.
+// Medido na MESMA pergunta (2026-09-13, indivíduo × organização):
+//   varredura  wf_88199ba9-b9a → 7.282.373 tokens · 105 agentes · 25 nós ≈ 291k/nó · 19 de 25 claims
+//              REFUTADAS, a maioria por FONTE FRACA (não por evidência contra).
+//   primárias  wf_1865aba9-e20 → 2.680.149 tokens ·  28 agentes · 64 nós ≈  42k/nó · 13/13 fontes
+//              alcançadas · 62 claims ancoradas · 14 REJEITADAS na ancoragem (13 exageradas, 1 não
+//              encontrada) — defeito que a votação 3/2 da varredura NÃO pega: lá 3 juízes discutem a
+//              claim, aqui 1 verificador REABRE o documento e confere a citação.
+if (MODE === 'primaries') {
+  const READ_SCHEMA = { type: 'object', required: ['source', 'reachable', 'claims', 'notes'], properties: {
+    source: { type: 'string' }, reachable: { type: 'boolean' }, notes: { type: 'string' },
+    claims: { type: 'array', maxItems: 6, items: { type: 'object', required: ['claim', 'quote', 'locator', 'answersGap'], properties: {
+      claim: { type: 'string', minLength: 1 }, quote: { type: 'string', minLength: 30 }, locator: { type: 'string', minLength: 2 }, answersGap: { type: 'string' },
+      sourceTier: { type: 'integer', minimum: 1, maximum: 10 }, validFrom: { type: 'string' } } } } } }
+  const ANCHOR_SCHEMA = { type: 'object', required: ['source', 'verdicts'], properties: {
+    source: { type: 'string' },
+    verdicts: { type: 'array', items: { type: 'object', required: ['claim', 'quoteFound', 'claimMatchesText', 'verdict', 'why'], properties: {
+      claim: { type: 'string' }, quoteFound: { type: 'boolean' }, claimMatchesText: { type: 'boolean' },
+      verdict: { enum: ['ANCORADA', 'EXAGERADA', 'NAO-ENCONTRADA'] }, why: { type: 'string' }, corrected: { type: 'string' },
+      quote: { type: 'string' }, locator: { type: 'string' } } } } } }
+  const PRIMARIES_ELENXO_SCHEMA = { type: 'object', required: ['objections', 'gapsClosed', 'gapsOpen', 'recommendation'], properties: {
+    recommendation: { type: 'string' },
+    gapsClosed: { type: 'array', items: { type: 'string' } }, gapsOpen: { type: 'array', items: { type: 'string' } },
+    objections: { type: 'array', items: { type: 'object', required: ['target', 'survives', 'evidence'], properties: {
+      target: { type: 'string' }, survives: { type: 'boolean' }, evidence: { type: 'string' } } } } } }
+  // reaproveita o contrato do write(KG) e acrescenta o total do grafo (este modo APENDA tanto quanto cria)
+  const KG_SCHEMA_PRIMARIES = { ...KG_SCHEMA, required: [...KG_SCHEMA.required, 'nodesTotal'],
+    properties: { ...KG_SCHEMA.properties, nodesTotal: { type: 'integer' } } }
+  // o ancorador é BARATO e CÉTICO: sonnet/high — o caro é ler o documento inteiro, não conferir a citação
+  const TIER_ANCHOR = { model: 'sonnet', effort: 'high' }
+
+  const READ_PROMPT = (s) =>
+    '## Leitor de fonte PRIMÁRIA — leitura integral, claim só com citação\n\n' + WEB_NOTE +
+    '\nHoje: ' + TODAY + '\n\n## Pergunta da rodada\n' + QUESTION +
+    '\n\n## Sua fonte\n' + s.prompt +
+    '\n\n## Lacuna que ela deve fechar\n' + (s.gap || '(não declarada — diga no `notes` o que a fonte fecha)') +
+    '\n\n## Regras\n' +
+    '1. Use WebFetch/WebSearch para CHEGAR ao documento e LEIA-O por inteiro (várias chamadas se preciso). Se for PDF ou estiver bloqueado, tente espelho oficial; se não conseguir, devolva reachable=false e diga o que tentou — NÃO invente.\n' +
+    '2. Cada claim carrega `quote` VERBATIM do documento (30-400 caracteres) e `locator` (artigo, parágrafo, seção, página). **Sem citação, o claim não existe.**\n' +
+    '3. Prefira o que o documento DECIDE ou MEDE ao que ele comenta. Não parafraseie para o lado que a pergunta quer.\n' +
+    '4. No máximo 6 claims. Melhor 3 ancorados que 6 vagos.\n' +
+    '5. `answersGap`: em uma frase, o que este claim responde da lacuna. `sourceTier` 1-10 (escala DREAM: 9-10 lei/tribunal/autoridade/doc oficial · 7-8 paper, engenheiro reconhecido, analista · 4-6 imprensa técnica, agregador · 1-3 fórum, blog, fornecedor sobre concorrente). `validFrom` quando o documento disser desde quando o fato vale.\n\n' +
+    'Somente saída estruturada.'
+
+  const ANCHOR_PROMPT = (s, r) =>
+    '## Verificador de ANCORAGEM — a citação existe mesmo, e o claim é o que o texto diz?\n\n' + WEB_NOTE +
+    '\nHoje: ' + TODAY + '\n\n## Fonte\n' + s.prompt +
+    '\n\n## Claims a conferir (de um leitor que diz ter lido o documento)\n' +
+    r.claims.map((c, i) => (i + 1) + '. CLAIM: ' + webText(c.claim) + '\n   QUOTE: "' + webText(c.quote) + '"\n   LOCATOR: ' + webText(c.locator)).join('\n') +
+    '\n\n## Tarefa\nAbra o documento você mesmo — não confie no relato do leitor. Para cada claim: (a) a `quote` aparece no documento, nessas palavras? (b) o claim diz o que o texto diz, sem esticar?\n' +
+    'Veredito **ANCORADA** · **EXAGERADA** (e então `corrected` traz a formulação que o texto sustenta) · **NAO-ENCONTRADA**. **Default na dúvida: NAO-ENCONTRADA.** Seja específico em `why`.\n\n' +
+    'Somente saída estruturada.'
+
+  phase('Leitura')
+  log('Modo PRIMÁRIAS: ' + SOURCES.length + ' fonte(s) NOMEADA(S), leitura integral — sem Scope/Search/Fetch/Verify. Medido 2026-09-13 na mesma pergunta: varredura 291k tokens/nó (19 de 25 claims refutadas, a maioria por fonte fraca) × primárias 42k tokens/nó.')
+  const readings = await pipeline(
+    SOURCES,
+    (s) => agent(READ_PROMPT(s), { label: 'ler:' + s.key, phase: 'Leitura', schema: READ_SCHEMA, model: TIER.collect.model, effort: TIER.collect.effort }),
+    // ANCORAGEM: agente SEPARADO e independente do leitor — reabre o documento e julga a citação.
+    // Sem esta fase o modo vira "um agente afirma e ninguém confere" (14 de 76 claims caíram AQUI no dogfood).
+    (r, s) => {
+      if (!r || !r.reachable || !r.claims || !r.claims.length) return { source: s.key, gap: s.gap, reading: r, anchor: null }
+      return agent(ANCHOR_PROMPT(s, r), { label: 'ancorar:' + s.key, phase: 'Ancoragem', schema: ANCHOR_SCHEMA, model: TIER_ANCHOR.model, effort: TIER_ANCHOR.effort })
+        .then(a => ({ source: s.key, gap: s.gap, reading: r, anchor: a }))
+    }
+  )
+  const readOk = (readings || []).filter(Boolean)
+  const unreachable = readOk.filter(x => !x.reading || !x.reading.reachable).map(x => x.source)
+  const anchored = []; const rejected = []
+  for (const x of readOk) {
+    if (!x.anchor || !Array.isArray(x.anchor.verdicts)) continue
+    for (const v of x.anchor.verdicts) {
+      const rec = { source: x.source, gap: x.gap, claim: v.claim, verdict: v.verdict, why: v.why, corrected: v.corrected || '' }
+      // O casamento por texto EXATO falha quando o ancorador reescreve o claim — e aí a citação se perde
+      // em silêncio. Casa por prefixo normalizado antes de desistir.
+      const norm = t => String(t || '').toLowerCase().replace(/\s+/g, ' ').trim()
+      const cl = ((x.reading && x.reading.claims) || [])
+      const orig = cl.find(c => c.claim === v.claim)
+        || cl.find(c => norm(c.claim) === norm(v.claim))
+        || cl.find(c => norm(c.claim).slice(0, 60) && norm(v.claim).includes(norm(c.claim).slice(0, 60)))
+        || cl.find(c => norm(v.claim).slice(0, 60) && norm(c.claim).includes(norm(v.claim).slice(0, 60)))
+      if (orig) { rec.quote = orig.quote; rec.locator = orig.locator; rec.sourceTier = orig.sourceTier; rec.validFrom = orig.validFrom || '' }
+      // a citação que o ANCORADOR conferiu tem precedência sobre a do leitor (ele abriu o documento por último)
+      if (String(v.quote || '').trim()) rec.quote = v.quote
+      if (String(v.locator || '').trim()) rec.locator = v.locator
+      // FAIL-CLOSED: `ANCORADA` sem citação é DECLARAÇÃO, não ancoragem. Medido em 2026-09-13 (run
+      // wf_44d33784-fe6, a 1ª execução real deste modo): 13 de 22 claims saíram ANCORADAS com `quote`
+      // vazia e `locator` '—', e o Elenxo cravou — "enquanto o gate aceitar campo vazio, contar claims
+      // ancoradas não mede nada". O veredito é REBAIXADO aqui, no motor; não se pede disciplina ao agente.
+      const semCitacao = !String(rec.quote || '').trim() || !String(rec.locator || '').trim() || String(rec.locator).trim() === '—'
+      if (v.verdict === 'ANCORADA' && semCitacao) {
+        rec.verdict = 'AFIRMADA-SEM-CITACAO'
+        rec.why = 'REBAIXADA pelo motor: veredito ANCORADA sem quote/locator — declaração não é citação. ' + String(rec.why || '')
+        rejected.push(rec)
+      } else if (v.verdict === 'ANCORADA') anchored.push(rec)
+      else rejected.push(rec)
+    }
+  }
+  log('Leitura: ' + (SOURCES.length - unreachable.length) + '/' + SOURCES.length + ' fontes alcançadas · inalcançáveis: ' + (unreachable.length ? unreachable.join(', ') : 'nenhuma'))
+  log('Ancoragem: ' + anchored.length + ' claim(s) ANCORADA(S) · ' + rejected.length + ' rejeitada(s) (exagerada ou não encontrada)')
+  if (anchored.length === 0 && rejected.length === 0) return { error: 'modo primaries sem NENHUMA claim ancorada ou rejeitada — nenhuma fonte primária foi lida de fato (inalcançáveis: ' + (unreachable.join(', ') || 'nenhuma declarada') + '). Nada escrito; a rodada NÃO conta como feita.', unreachable, sources: SOURCES.map(s => s.key) }
+
+  phase('Elenxo')
+  const pElenxo = await agent(
+    '## Refutador (Elenxo) — mandato: REPROVAR. Default na dúvida: a objeção SOBREVIVE.\n\n' + WEB_NOTE +
+    '\nHoje: ' + TODAY + '\n\n## Pergunta / lacunas desta rodada\n' + QUESTION +
+    '\n\n## Lacunas NOMEADAS que as fontes deviam fechar\n' + SOURCES.map(s => '- [' + s.key + '] ' + (s.gap || '(não declarada)')).join('\n') +
+    '\n\n## O que os grafos já sabiam\n' + (CORPUS || '(corpus vazio)') +
+    '\n\n## Claims ANCORADAS (citação conferida por um segundo agente que reabriu o documento)\n' +
+    anchored.map((c, i) => (i + 1) + '. [' + c.source + '] ' + webText(c.claim) + '\n   QUOTE: "' + webText(c.quote) + '"\n   LOCATOR: ' + webText(c.locator || '—')).join('\n') +
+    '\n\n## Claims REJEITADAS na ancoragem (o leitor afirmou; o verificador não achou no texto)\n' +
+    (rejected.length ? rejected.map(c => '- [' + c.source + '] ' + webText(c.claim) + ' → ' + c.verdict + ': ' + webText(c.why)).join('\n') : '(nenhuma)') +
+    '\n\n## Fontes inalcançáveis\n' + (unreachable.length ? unreachable.join(', ') : '(nenhuma)') +
+    '\n\n## Tarefa\n' +
+    '1. Para cada claim ancorada, uma objeção concreta: ela prova o que a rodada precisa, ou prova MENOS? (`survives=true` se a objeção fica de pé).\n' +
+    '2. `gapsClosed`: as lacunas NOMEADAS acima que esta rodada fechou COM evidência ancorada. `gapsOpen`: as que continuam abertas — inclusive por fonte inalcançável ou por claim rejeitada na ancoragem.\n' +
+    '3. `recommendation`: o que a rodada sustenta e o que ela NÃO sustenta. Descarte por comodismo/orçamento volta como objeção sobrevivente (cláusula 6 da doutrina).\n\n' +
+    'Somente saída estruturada. Evidência específica, citando a fonte ou o id do nó.',
+    { label: 'elenxo-primarias', phase: 'Elenxo', schema: PRIMARIES_ELENXO_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
+  if (pElenxo) log('Elenxo: ' + pElenxo.objections.length + ' objeções (' + pElenxo.objections.filter(o => o.survives).length + ' sobrevivem) · lacunas fechadas: ' + pElenxo.gapsClosed.length + ' · abertas: ' + pElenxo.gapsOpen.length)
+
+  phase('write(KG)')
+  const pKg = await agent(
+    '## write(KG) — escreva o grafo desta rodada de primárias e prove que o radar o lê\n\n' +
+    'Pergunta: "' + QUESTION + '"\nData de hoje (verified_at): ' + TODAY + '\nCaminho do grafo: ' + KG_PATH + '\n\n' +
+    'Leia ANTES: `.claude/rules/kg-grammar.md`, `.claude/commands/common/prompts/research-doctrine.md` (cláusulas 7-8) e, **se o arquivo já existir, o grafo inteiro**.\n\n' +
+    '## Regra de escrita\n' +
+    '- Se `' + KG_PATH + '` **já existe**: NÃO reescreva — **APENDE** nós e arestas preservando tudo (Aufhebung). Suba o `# ═══ TETO: N NÓS ═══` para o número REAL ao fim e reescreva a justificativa dizendo que esta rodada de primárias foi executada em ' + TODAY + '.\n' +
+    '- Se **não existe**: crie (com o diretório), meta com id, `schema_version "1"`, baseline ' + TODAY + ', `review_after` (cadência: ferramenta/preço 30d · modelos 45d · mercado 90d · benchmark 120d · doutrina 12m — escolha pelo tipo dominante e justifique em comentário), `# kg-backlog-guard: on` e `# ═══ TETO: N NÓS ═══`.\n' +
+    '- Formato estrito: uma chave por linha; arestas em bloco (`- from:`/`to:`/`edge_type:`); id em inglês SEM acento, label em pt-BR.\n\n' +
+    '## O que escrever\n' +
+    '1. 1 nó `evidence` por claim ANCORADA (plane DEV, status confirmed, `verified_at` ' + TODAY + ', `verified_against` = a citação + o locator + "ancorada por verificador independente", `source_tier` pelo que o leitor declarou (lei/tribunal/autoridade 9-10; fornecedor/agregador menor), `trace` = URL, `valid_from` quando houver).\n' +
+    '2. 1 nó `evidence` `E_LACUNAS_…` com a CONTABILIDADE desta rodada: fontes lidas × inalcançáveis, claims ancoradas × REJEITADAS na ancoragem (com o motivo), e as lacunas que CONTINUAM abertas (do Elenxo `gapsOpen`). Claim rejeitada na ancoragem **nunca** vira nó de evidência — entra aqui.\n' +
+    '3. Onde a evidência nova CORRIGE um nó que já existe no grafo, escreva o nó novo + aresta `SUPERSEDES` para o antigo e mude o status do antigo para `superseded` (reconciliação; nunca apague).\n' +
+    '4. Onde ela SUSTENTA um claim/opção existente, `SUPPORTS`; onde LIMITA, `CONSTRAINS`.\n' +
+    '5. **Você NUNCA sela.** Nó `decision` já `done` não se toca; se esta rodada sugere revisão do selo, escreva um nó `question` `Q_…` propondo e pare por aí.\n\n' +
+    '## Dados desta rodada\n### Claims ANCORADAS\n' +
+    anchored.map(c => '- [' + c.source + ' | ' + webText(c.locator || '—') + ' | tier=' + (c.sourceTier || '?') + '] ' + webText(c.claim) + ' | QUOTE: "' + webText(c.quote) + '"').join('\n') +
+    '\n\n### REJEITADAS na ancoragem (não viram nó; entram na contabilidade)\n' +
+    (rejected.length ? rejected.map(c => '- [' + c.source + '] ' + webText(c.claim) + ' → ' + c.verdict + ': ' + webText(c.why)).join('\n') : '(nenhuma)') +
+    '\n\n### Fontes inalcançáveis\n' + (unreachable.length ? unreachable.join(', ') : '(nenhuma)') +
+    '\n\n### Corpus prévio\n' + (CORPUS || '(vazio)') +
+    '\n\n### Elenxo\n' + JSON.stringify(pElenxo || {}).slice(0, 7000) +
+    '\n\n## Passos\n1. Read do arquivo (se existir). 2. Write/Edit. 3. `bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema` — capture o exit code; se ≠ 0, CORRIJA e rode de novo (máx 3 tentativas). 4. Devolva kgPath, radarExit (o último), nodes (os ADICIONADOS nesta rodada), edges (idem), nodesTotal (o total do grafo ao fim) e summary (1 frase).\n\n' +
+    'Somente saída estruturada.',
+    { label: 'write-kg-primarias', phase: 'write(KG)', schema: KG_SCHEMA_PRIMARIES, model: TIER.judge.model, effort: TIER.judge.effort })
+  if (!pKg) return { error: 'write(KG) não devolveu resultado — o grafo não foi escrito. Nada selado.', question: QUESTION, anchoredCount: anchored.length, elenxo: pElenxo }
+  if (pKg.radarExit !== 0) return { error: 'radar exit ' + pKg.radarExit + ' em ' + pKg.kgPath + ' — grafo escrito mas ILEGÍVEL pelo motor; não conte a rodada como feita.', question: QUESTION, kgPath: pKg.kgPath, radarExit: pKg.radarExit }
+  log('write(KG): ' + pKg.kgPath + ' — +' + pKg.nodes + ' nós / +' + pKg.edges + ' arestas, total ' + pKg.nodesTotal + ', radar exit ' + pKg.radarExit)
+
+  return {
+    mode: 'primaries', question: QUESTION, today: TODAY, kgPath: pKg.kgPath, radarExit: pKg.radarExit,
+    summary: pKg.summary, unreachable, anchored, rejected,
+    elenxo: pElenxo ? { objections: pElenxo.objections, gapsClosed: pElenxo.gapsClosed, gapsOpen: pElenxo.gapsOpen, recommendation: pElenxo.recommendation } : null,
+    stats: { sources: SOURCES.length, reached: SOURCES.length - unreachable.length, anchored: anchored.length, rejected: rejected.length,
+      nodesAdded: pKg.nodes, edgesAdded: pKg.edges, nodesTotal: pKg.nodesTotal },
+  }
+}
 
 // ─── Revisit (F4, só com args.revisit): re-medir os nós de evidência VENCIDOS de um grafo existente ───
 const REVISIT_SCHEMA = { type: 'object', required: ['nodes', 'reviewAfter', 'cadenceDays'], properties: {

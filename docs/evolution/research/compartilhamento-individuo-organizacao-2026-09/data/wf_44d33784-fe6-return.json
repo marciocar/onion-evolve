@@ -1,0 +1,440 @@
+{
+ "mode": "primaries",
+ "question": "Rodada 3 (quatro alvos nomeados pelo Elenxo da rodada 2, sobre a decisao JA SELADA D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION): (a) o criterio brasileiro ancorado em ACORDAO do TST e em eventual DECISAO da ANPD sobre monitoramento, mais o texto da LGPD citado verbatim (5 de 6 claims reprovadas na ancoragem anterior); (b) autodeterminacao no primario (Deci & Ryan) ou os coeficientes da meta-analise de monitoramento eletronico ancorados com quote; (c) o histograma do Viva que exibiria bin com 1 individuo, e se existe epsilon/garantia formal na privacidade diferencial declarada pela Microsoft; (d) acordo coletivo brasileiro (CLT arts. 611-A e 611-B) como analogo do art. 88 do GDPR — no Brasil, negociacao coletiva pode legitimar monitoramento que a lei sozinha nao legitima? O que esta rodada precisa FECHAR sao lacunas ja nomeadas em E_R2_LACUNAS_RODADA_COMPLEMENTAR_0913; nada aqui reabre o selo.",
+ "today": "2026-09-13",
+ "kgPath": "/home/marcio/onion-evolve/docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml",
+ "radarExit": 0,
+ "summary": "A rodada 3 de primárias apendou 25 nós (22 claims ancoradas + o nó do Elenxo que refuta a leitura do art. 10 caput + a contabilidade + a proposta de emendas) e 58 arestas sem tocar o selo: fechou o eixo (d) com um NÃO (o art. 611-A da CLT tem rol fechado — não há análogo do art. 88 do GDPR), fechou a lacuna de Deci & Ryan com quote verbatim e trouxe a meta-análise EPM (K=94, N=23.461, sem ganho de desempenho e com estresse), tirou o piso de grupo do lugar de salvaguarda (o Viva admite bin com 1 indivíduo e não documenta epsilon) e deixou aberta a lacuna do TST, cujas 4 claims chegaram sem quote e sem locator.",
+ "unreachable": [],
+ "anchored": [
+  {
+   "source": "tst-acordaos",
+   "gap": "alvo (a): a rodada 2 leu o TST por NOTICIA, nao por acordao — o criterio brasileiro nao esta ancorado em decisao",
+   "claim": "O TST distingue e-mail pessoal (provedor próprio, protegido pela inviolabilidade constitucional) de e-mail corporativo (ferramenta de trabalho, sem essa proteção).",
+   "verdict": "ANCORADA",
+   "why": "Os dois fragmentos da citação aparecem verbatim na ementa oficial (item 1: '...apenas o e-mail pessoal ou particular do empregado, socorrendo-se de provedor próprio, desfruta da proteção constitucional e legal de inviolabilidade.'; item 2, final: 'Ostenta, pois, natureza jurídica equivalente à de uma ferramenta de trabalho proporcionada pelo empregador ao empregado para a consecução do serviço.'). As reticências no meio do QUOTE marcam corretamente a omissão do texto intermediário do item 2 (não é costura indevida). O claim resume fielmente a distinção que a ementa faz entre os dois tipos de e-mail.",
+   "corrected": ""
+  },
+  {
+   "source": "tst-acordaos",
+   "gap": "alvo (a): a rodada 2 leu o TST por NOTICIA, nao por acordao — o criterio brasileiro nao esta ancorado em decisao",
+   "claim": "A licitude do monitoramento é condicionada à ciência prévia do empregado de que a caixa é de uso exclusivamente profissional, o que afasta expectativa razoável de privacidade.",
+   "verdict": "ANCORADA",
+   "why": "Citação idêntica, palavra por palavra, ao item 4 da ementa oficial: '...o empregado, ao receber uma caixa de \"e-mail\" de seu empregador para uso corporativo, mediante ciência prévia de que nele somente podem transitar mensagens profissionais, não tem razoável expectativa de privacidade quanto a esta, como se vem entendendo no Direito Comparado (EUA e Reino Unido).' O claim reflete exatamente essa condicionante.",
+   "corrected": ""
+  },
+  {
+   "source": "tst-acordaos",
+   "gap": "alvo (a): a rodada 2 leu o TST por NOTICIA, nao por acordao — o criterio brasileiro nao esta ancorado em decisao",
+   "claim": "O acórdão invoca o princípio da proporcionalidade para exigir parcimônia na qualificação da ilicitude da prova por desvio de finalidade.",
+   "verdict": "ANCORADA",
+   "why": "Citação idêntica ao item 3 da ementa: '...exige muita parcimônia dos órgãos jurisdicionais na qualificação da ilicitude da prova referente ao desvio de finalidade na utilização dessa tecnologia, tomando-se em conta, inclusive, o princípio da proporcionalidade e, pois, os diversos valores jurídicos tutelados pela lei e pela Constituição Federal.' Claim e texto coincidem sem esticar.",
+   "corrected": ""
+  },
+  {
+   "source": "tst-acordaos",
+   "gap": "alvo (a): a rodada 2 leu o TST por NOTICIA, nao por acordao — o criterio brasileiro nao esta ancorado em decisao",
+   "claim": "A conclusão dispositiva autoriza o empregador a monitorar forma e conteúdo das mensagens em e-mail corporativo, sem tornar a prova ilícita.",
+   "verdict": "ANCORADA",
+   "why": "Citação idêntica ao item 5 da ementa: 'Pode o empregador monitorar e rastrear a atividade do empregado no ambiente de trabalho, em \"e-mail\" corporativo, isto é, checar suas mensagens, tanto do ponto de vista formal quanto sob o ângulo material ou de conteúdo. Não é ilícita a prova assim obtida...' O claim reproduz fielmente o teor e o contexto (item 5, não a conclusão do item 6, mas 'conclusão dispositiva' é leitura razoável desse trecho, que de fato precede o resultado do agravo).",
+   "corrected": ""
+  },
+  {
+   "source": "anpd-decisao-monitoramento",
+   "gap": "alvo (a) parte 2: nenhuma DECISAO ou sancao da ANPD sobre monitoramento foi lida, so guia interpretativo",
+   "claim": "CLAIM 2 — O único caso com multa pecuniária efetiva (Telekall, SEI 00261.000489/2022-62) tratou de venda de listas de WhatsApp para fins eleitorais, violando arts. 7º/41 LGPD e art. 5º do Regulamento de Fiscalização, sem qualquer nexo com relação de emprego.",
+   "verdict": "ANCORADA",
+   "why": "Confirmado por fonte primária direta (fetch em clydeco.com, artigo jurídico especializado em inglês sobre a decisão) e corroborado por 3 fontes independentes (securiti.ai, olhardigital.com.br, jusbrasil via busca): a Telekall foi sancionada por oferecer/vender lista de contatos de WhatsApp de eleitores para campanha eleitoral de 2020, violando art. 7º da LGPD (ausência de base legal), art. 41 (ausência de encarregado — recebeu apenas advertência nesse item) e art. 5º do Regulamento de Fiscalização (obstrução à fiscalização); multa total de R$14.400,00 (R$7.200 + R$7.200), calculada com o teto de 2% do faturamento por ser microempresa (art. 52, II, LGPD). O texto do quote (inclusive a frase final sobre '2% de faturamento... R$14.400,00') reproduz quase literalmente o que consta em cobertura jurídica em inglês sobre o caso (ex. resumo campos thomaz/clydeco). Nenhuma fonte associa esse caso a dado de empregado ou monitoramento no trabalho — o nexo é puramente comercial/eleitoral.",
+   "corrected": ""
+  },
+  {
+   "source": "lgpd-texto-legal",
+   "gap": "alvo (a) parte 3: o texto da LGPD teve 5 de 6 claims reprovadas na ancoragem da rodada 2 (quote nao-verbatim, verbo trocado)",
+   "claim": "A LGPD admite o legítimo interesse do controlador como base legal para tratamento de dados quando necessário para atender interesses legítimos do controlador ou de terceiro, exceto se prevalecerem direitos e liberdades fundamentais do titular — é a base que sustentaria monitoramento eletrônico sem consentimento individual.",
+   "verdict": "ANCORADA",
+   "why": "A quote é substring exata do Art. 7º, inciso IX (conferido por grep -F no HTML oficial baixado do planalto.gov.br). O núcleo do claim — legítimo interesse é hipótese autônoma de tratamento, sujeita à ressalva de prevalência de direitos e liberdades fundamentais do titular — é exatamente o que o inciso IX diz. A extensão final ('é a base que sustentaria monitoramento eletrônico sem consentimento individual') é inferência do leitor, não texto da lei, mas é inferência correta e comedida: a lei não fala em 'monitoramento', porém o inciso IX é de fato a única hipótese do art. 7º que dispensa consentimento (inciso I) E não depende de execução de contrato (inciso V) — logo é tecnicamente a base que se invocaria para tratamento sem consentimento individual como o monitoramento. Não há distorção do que o artigo estabelece.",
+   "corrected": "",
+   "quote": "quando necessário para atender aos interesses legítimos do controlador ou de terceiro, exceto no caso de prevalecerem direitos e liberdades fundamentais do titular",
+   "locator": "Art. 7º, inciso IX",
+   "sourceTier": 10,
+   "validFrom": "2018-08-14"
+  },
+  {
+   "source": "lgpd-texto-legal",
+   "gap": "alvo (a) parte 3: o texto da LGPD teve 5 de 6 claims reprovadas na ancoragem da rodada 2 (quote nao-verbatim, verbo trocado)",
+   "claim": "O art. 10 restringe o uso do legítimo interesse a finalidades legítimas concretas, mas não define um teste de balanceamento formal na própria lei — abrindo a lacuna sobre quando monitoramento de indivíduo cruza para desproporcional.",
+   "verdict": "ANCORADA",
+   "why": "Quote é substring exata do caput do Art. 10 (grep -F confirmado). O claim descreve corretamente o que o caput faz (restringe a finalidades legítimas 'a partir de situações concretas'). A afirmação de ausência ('não define um teste de balanceamento formal') também se sustenta: os §§1º-3º do art. 10 impõem necessidade, transparência e possibilidade de a ANPD pedir relatório de impacto — nenhum deles é um teste de balanceamento formal (like a proporcionalidade expressa em 3 etapas). A conclusão sobre 'lacuna' é leitura analítica razoável, não afirma que a lei diz algo que não diz.",
+   "corrected": "",
+   "quote": "O legítimo interesse do controlador somente poderá fundamentar tratamento de dados pessoais para finalidades legítimas, consideradas a partir de situações concretas, que incluem, mas não se limitam a",
+   "locator": "Art. 10, caput",
+   "sourceTier": 10,
+   "validFrom": "2018-08-14"
+  },
+  {
+   "source": "lgpd-texto-legal",
+   "gap": "alvo (a) parte 3: o texto da LGPD teve 5 de 6 claims reprovadas na ancoragem da rodada 2 (quote nao-verbatim, verbo trocado)",
+   "claim": "Quando o tratamento se apoia em legítimo interesse (o fundamento típico de monitoramento organizacional), a lei impõe ao controlador o dever de garantir transparência — não dispensa de aviso ao titular monitorado.",
+   "verdict": "ANCORADA",
+   "why": "Quote é verbatim exato do Art. 10, §2º (grep -F confirmado, inclusive o ponto final). O claim reproduz fielmente o dever de transparência imposto pelo §2º. O parêntese '(o fundamento típico de monitoramento organizacional)' é rótulo interpretativo do leitor — não está na lei — mas não distorce o que o dispositivo diz nem inventa uma isenção inexistente; ao contrário, reforça corretamente que não há dispensa de transparência.",
+   "corrected": "",
+   "quote": "O controlador deverá adotar medidas para garantir a transparência do tratamento de dados baseado em seu legítimo interesse.",
+   "locator": "Art. 10, §2º",
+   "sourceTier": 10,
+   "validFrom": "2018-08-14"
+  },
+  {
+   "source": "lgpd-texto-legal",
+   "gap": "alvo (a) parte 3: o texto da LGPD teve 5 de 6 claims reprovadas na ancoragem da rodada 2 (quote nao-verbatim, verbo trocado)",
+   "claim": "Dados sensíveis (que podem incluir inferências de saúde/comportamento de um histograma individual de monitoramento) só podem ser tratados mediante consentimento específico e destacado do titular ou hipóteses taxativas do inciso II — não há base de 'legítimo interesse' para dado sensível.",
+   "verdict": "ANCORADA",
+   "why": "Quote é substring exata do caput do Art. 11 (grep -F confirmado). O claim descreve corretamente a estrutura do art. 11: inciso I (consentimento específico e destacado) e inciso II (hipóteses taxativas em alíneas a-g) — sem qualquer menção a legítimo interesse, ao contrário do art. 7º, IX, que o lista para dados comuns. A afirmação de ausência de base de legítimo interesse para dado sensível está correta e é verificável pela leitura comparativa dos dois artigos.",
+   "corrected": "",
+   "quote": "O tratamento de dados pessoais sensíveis somente poderá ocorrer nas seguintes hipóteses",
+   "locator": "Art. 11, caput",
+   "sourceTier": 10,
+   "validFrom": "2018-08-14"
+  },
+  {
+   "source": "lgpd-texto-legal",
+   "gap": "alvo (a) parte 3: o texto da LGPD teve 5 de 6 claims reprovadas na ancoragem da rodada 2 (quote nao-verbatim, verbo trocado)",
+   "claim": "O titular de dados tem direito a solicitar a revisão de decisões automatizadas que afetem seus interesses, incluindo definição de perfil pessoal ou profissional — relevante quando monitoramento alimenta scoring individual.",
+   "verdict": "ANCORADA",
+   "why": "Quote é verbatim exato do Art. 20, caput, na redação vigente (dada pela Lei nº 13.853/2019 — confirmado que é a versão em vigor, não a redação original revogada nem a redação intermediária da MP 869/2018, que aparecem no HTML como histórico de emendas). O claim resume fielmente o direito de revisão e a menção a perfil pessoal/profissional/consumo/crédito. A cláusula final é nota de relevância analítica, não uma afirmação sobre o que a lei diz.",
+   "corrected": "",
+   "quote": "O titular dos dados tem direito a solicitar a revisão de decisões tomadas unicamente com base em tratamento automatizado de dados pessoais que afetem seus interesses, incluídas as decisões destinadas a definir o seu perfil pessoal, profissional, de consumo e de crédito ou os aspectos de sua personalidade.",
+   "locator": "Art. 20, caput",
+   "sourceTier": 10,
+   "validFrom": "2018-08-14"
+  },
+  {
+   "source": "lgpd-texto-legal",
+   "gap": "alvo (a) parte 3: o texto da LGPD teve 5 de 6 claims reprovadas na ancoragem da rodada 2 (quote nao-verbatim, verbo trocado)",
+   "claim": "Quando o consentimento é a base invocada, a lei o declara nulo se as informações dadas ao titular forem enganosas, abusivas ou não tiverem sido apresentadas com transparência prévia — relevante ao debate sobre se consentimento do empregado monitorado é válido.",
+   "verdict": "ANCORADA",
+   "why": "Quote é verbatim exato do Art. 9º, §1º (grep -F confirmado, texto idêntico incluindo 'esse será considerado nulo'). O claim reproduz corretamente a hipótese de nulidade do consentimento por vício de informação/transparência. A cláusula final é nota de relevância para o debate, não uma reformulação do que o artigo diz.",
+   "corrected": "",
+   "quote": "esse será considerado nulo caso as informações fornecidas ao titular tenham conteúdo enganoso ou abusivo ou não tenham sido apresentadas previamente com transparência, de forma clara e inequívoca",
+   "locator": "Art. 9º, §1º",
+   "sourceTier": 10,
+   "validFrom": "2018-08-14"
+  },
+  {
+   "source": "deci-ryan-primario",
+   "gap": "alvo (b): o eixo 4 NAO foi cumprido — Deci & Ryan segue nao lido, e 3 das 6 claims do proxy cairam na ancoragem",
+   "claim": "Deci & Ryan definem as três necessidades psicológicas básicas (competência, autonomia, relacionamento) e preveem explicitamente o resultado quando são FRUSTRADAS: motivação e bem-estar diminuídos.",
+   "verdict": "ANCORADA",
+   "why": "A citação aparece verbatim no Abstract, p. 68: 'The findings have led to the postulate of three innate psychological needs—competence, autonomy, and relatedness—which when satisfied yield enhanced self-motivation and mental health and when thwarted lead to diminished motivation and well-being.' O claim descreve exatamente o que o texto diz, sem esticar.",
+   "corrected": "",
+   "quote": "The findings have led to the postulate of three innate psychological needs—competence, autonomy, and relatedness—which when satisfied yield enhanced self-motivation and mental health and when thwarted lead to diminished motivation and well-being.",
+   "locator": "Abstract, p. 68",
+   "sourceTier": 8,
+   "validFrom": ""
+  },
+  {
+   "source": "deci-ryan-primario",
+   "gap": "alvo (b): o eixo 4 NAO foi cumprido — Deci & Ryan segue nao lido, e 3 das 6 claims do proxy cairam na ancoragem",
+   "claim": "As três necessidades são nomeadas com suas fontes originais e descritas como essenciais para o funcionamento ótimo e o bem-estar.",
+   "verdict": "ANCORADA",
+   "why": "Quote encontrada verbatim na seção 'Self-Determination Theory', p. 69, col. 2: 'Inductively, using the empirical process, we have identified three such needs—the needs for competence (Harter, 1978; White, 1963), relatedness (Baumeister & Leary, 1995; Reis, 1994), and autonomy (deCharms, 1968; Deci, 1975)—that appear to be essential for facilitating optimal functioning of the natural propensities for growth and integration, as well as for constructive social development and personal well-being.' Localização e conteúdo conferem exatamente.",
+   "corrected": "",
+   "quote": "Inductively, using the empirical process, we have identified three such needs—the needs for competence (Harter, 1978; White, 1963), relatedness (Baumeister & Leary, 1995; Reis, 1994), and autonomy (deCharms, 1968; Deci, 1975)—that appear to be essential for facilitating optimal functioning of the natural propensities for growth and integration, as well as for constructive social development and personal well-being.",
+   "locator": "Seção 'Self-Determination Theory', p. 69, col. 2",
+   "sourceTier": 8,
+   "validFrom": ""
+  },
+  {
+   "source": "deci-ryan-primario",
+   "gap": "alvo (b): o eixo 4 NAO foi cumprido — Deci & Ryan segue nao lido, e 3 das 6 claims do proxy cairam na ancoragem",
+   "claim": "A meta-análise de Ravid et al. (2023, K=94 amostras, N=23.461) mede, não comenta: monitoramento eletrônico de desempenho (EPM) NÃO melhora performance e a mera PRESENÇA do EPM está associada a mais estresse do trabalhador, independente das características do monitoramento.",
+   "verdict": "ANCORADA",
+   "why": "Quote verbatim no Abstract (p. 5): 'Results provide no evidence that EPM improves worker performance. Moreover, findings indicate that the presence of EPM is associated with increased worker stress, regardless of the characteristics of monitoring.' K=94 e N=23,461 também conferem exatamente com o abstract ('K = 94 independent samples, N = 23,461'). Localização e números batem.",
+   "corrected": "",
+   "quote": "Results provide no evidence that EPM improves worker performance. Moreover, findings indicate that the presence of EPM is associated with increased worker stress, regardless of the characteristics of monitoring.",
+   "locator": "Abstract, Personnel Psychology 76(1), p. 5",
+   "sourceTier": 8,
+   "validFrom": ""
+  },
+  {
+   "source": "viva-bin-unitario-e-epsilon",
+   "gap": "alvo (c): R1-obj#29 (histograma com bin de 1 individuo) nunca re-verificada, e o epsilon da privacidade diferencial da Microsoft segue sem primaria",
+   "claim": "1. A doc confirma explicitamente que um bin de histograma PODE exibir dado de um único indivíduo, como exceção à regra de tamanho mínimo de grupo — fechando R1-obj#29.",
+   "verdict": "ANCORADA",
+   "why": "Quote encontrada verbatim na seção 'Histogram charts are an exception to the rule', item 2 'Bin population too small, the bin will still appear' (só diferença tipográfica: aspas retas no claim vs. curvas “ ” no original). O texto confirma exatamente isso: um bin pode ter dado de 1 indivíduo e ainda ser exibido, sem violar a regra de minimum group size. Ressalva: a cláusula 'fechando R1-obj#29' é framing externo do leitor (referência a um objeto R1-obj#29 que não existe no documento) — não é algo que o documento afirma ou nega; a verificação cobre só a parte factual sobre o comportamento do histograma, que está ancorada.",
+   "corrected": ""
+  },
+  {
+   "source": "viva-bin-unitario-e-epsilon",
+   "gap": "alvo (c): R1-obj#29 (histograma com bin de 1 individuo) nunca re-verificada, e o epsilon da privacidade diferencial da Microsoft segue sem primaria",
+   "claim": "2. A justificativa da doc para permitir bin com 1 indivíduo é que valores de bin/histograma derivam de métricas de comportamento observado, não de dados de RH — logo não revelam grupo demográfico do indivíduo.",
+   "verdict": "ANCORADA",
+   "why": "As duas frases citadas (antes e depois do [...]) aparecem verbatim no mesmo item 2, na mesma ordem, com a elisão marcada corretamente (o trecho omitido — 'The y-axis determines... Neither of these values reflects HR data. For this reason...' — está de fato entre as duas). A paráfrase do claim ('deriva de comportamento observado, não de RH') reproduz fielmente 'based on metrics -- on values calculated from observed behavior, not on HR data'.",
+   "corrected": ""
+  },
+  {
+   "source": "viva-bin-unitario-e-epsilon",
+   "gap": "alvo (c): R1-obj#29 (histograma com bin de 1 individuo) nunca re-verificada, e o epsilon da privacidade diferencial da Microsoft segue sem primaria",
+   "claim": "3. A regra de minimum group size (padrão 5) NÃO se aplica ao próprio bin do histograma — só ao 'filter group' que alimenta o histograma; se o filtro estiver abaixo do mínimo, o histograma inteiro não aparece, mas dentro dele bins individuais podem ter qualquer contagem, inclusive 1.",
+   "verdict": "ANCORADA",
+   "why": "Quote do item 1 ('Filter group too small, then no histogram will appear') está verbatim no documento. A síntese do claim combina corretamente os itens 1 e 2 da mesma seção: o gate de tamanho mínimo vale para o filter group (item 1); dentro do histograma aprovado, bins individuais podem ter qualquer contagem, inclusive 1 (item 2, já confirmado no claim #1). Nenhum esticamento — é leitura direta dos dois itens lado a lado.",
+   "corrected": ""
+  },
+  {
+   "source": "viva-bin-unitario-e-epsilon",
+   "gap": "alvo (c): R1-obj#29 (histograma com bin de 1 individuo) nunca re-verificada, e o epsilon da privacidade diferencial da Microsoft segue sem primaria",
+   "claim": "4. A página oficial de privacidade diferencial da Microsoft para Viva Insights NÃO documenta nenhum parâmetro epsilon (ε), orçamento de privacidade, nem qualquer garantia matemática formal — descreve apenas 'introduzir pequenas variações nos dados' com base em métodos de pesquisadores, sem quantificação.",
+   "verdict": "ANCORADA",
+   "why": "Quote verbatim, parágrafo 2 do artigo (confirmado pela leitura integral da página, que tem só 5 parágrafos). Confirmo também a parte negativa do claim: lendo o documento inteiro (237 palavras), não há nenhuma menção a 'epsilon', 'ε', 'privacy budget' ou qualquer parâmetro/garantia formal quantificada em nenhum lugar da página — só a descrição qualitativa citada e um link externo para um PDF ('Differential Privacy for Everyone') e para a página genérica de IA da Microsoft sobre o tema, nenhum dos quais é citado com parâmetro na própria doc analisada.",
+   "corrected": ""
+  },
+  {
+   "source": "viva-bin-unitario-e-epsilon",
+   "gap": "alvo (c): R1-obj#29 (histograma com bin de 1 individuo) nunca re-verificada, e o epsilon da privacidade diferencial da Microsoft segue sem primaria",
+   "claim": "5. A garantia que a Microsoft declara é qualitativa ('nenhuma atividade individual pode ser discernida com certeza'), não uma garantia formal com epsilon quantificado — reforçando a ausência de parâmetro formal na doc.",
+   "verdict": "ANCORADA",
+   "why": "Quote verbatim, parágrafo 4 (contando os 5 parágrafos da página: intro / definição de diff. privacy / aplicação em manager insights / esta garantia qualitativa / link externo). O claim descreve corretamente a garantia como qualitativa/textual, sem epsilon ou fórmula — consistente com a ausência documentada no claim 4.",
+   "corrected": ""
+  },
+  {
+   "source": "acordo-coletivo-br",
+   "gap": "alvo (d): ZERO fonte sobre o analogo brasileiro do art. 88 GDPR — negociacao coletiva como fonte de regra sobre dado de trabalhador",
+   "claim": "1. O art. 611-A da CLT dá à negociação coletiva prevalência sobre a lei numa lista fechada de matérias — monitoramento/dados do trabalhador NÃO está entre os incisos.",
+   "verdict": "ANCORADA",
+   "why": "Confirmado por fetch direto do planalto.gov.br (texto vigente, pós-reversão da MP 808/2017): caput idêntico ao citado, palavra por palavra. A lista tem 15 incisos (I a XV: jornada, banco de horas, intervalo intrajornada, enquadramento de grau de insalubridade, prorrogação em ambiente insalubre, plano de cargos, regulamento empresarial, representante dos trabalhadores no local, teletrabalho/sobreaviso/trabalho intermitente, remuneração por produtividade, registro de jornada, troca do dia de feriado, enquadramento como PJ/autônomo, participação em lucros, plano de saúde ou previdência); nenhum inciso trata de monitoramento, dado pessoal, privacidade ou intimidade. Claim integralmente sustentado.",
+   "corrected": ""
+  },
+  {
+   "source": "acordo-coletivo-br",
+   "gap": "alvo (d): ZERO fonte sobre o analogo brasileiro do art. 88 GDPR — negociacao coletiva como fonte de regra sobre dado de trabalhador",
+   "claim": "2. O art. 611-B lista taxativamente (30 incisos) o que é objeto ILÍCITO de supressão/redução por acordo coletivo; dados pessoais, intimidade e privacidade do trabalhador não aparecem nominalmente nessa lista de blindagem.",
+   "verdict": "ANCORADA",
+   "why": "Caput conferido verbatim via curl no planalto.gov.br: \"Constituem objeto ilícito de convenção coletiva ou de acordo coletivo de trabalho, exclusivamente, a supressão ou a redução dos seguintes direitos:\". A lista vai de I a XXX (30 incisos, confirmado pelos anchors HTML art611bi...art611bxxx). Percorri os 30 incisos (identificação profissional, seguro-desemprego, FGTS, salário mínimo, 13º, adicional noturno, proteção salarial, salário-família, DSR, hora extra, férias, licença-maternidade/paternidade, normas de saúde/higiene/segurança, aposentadoria, seguro de acidente, ação quanto a créditos, não discriminação, proibições de trabalho noturno/perigoso a menores, proteção de crianças/adolescentes, PCD, liberdade sindical, greve, arts. 373-A/390/392 etc. sobre maternidade/menor) — nenhum menciona dado pessoal, monitoramento, privacidade ou intimidade nominalmente. Claim sustentado.",
+   "corrected": ""
+  },
+  {
+   "source": "acordo-coletivo-br",
+   "gap": "alvo (d): ZERO fonte sobre o analogo brasileiro do art. 88 GDPR — negociacao coletiva como fonte de regra sobre dado de trabalhador",
+   "claim": "3. O parágrafo único do art. 611-B restringe o que conta como 'norma de saúde, higiene e segurança' — excluindo regras de duração/intervalo — reforçando a leitura restritiva da lista de blindagem.",
+   "verdict": "ANCORADA",
+   "why": "Quote conferida verbatim, caractere a caractere, no HTML oficial do planalto.gov.br (ancora art611bp): \"Parágrafo único. Regras sobre duração do trabalho e intervalos não são consideradas como normas de saúde, higiene e segurança do trabalho para os fins do disposto neste artigo.\" Match exato. A inferência (reforça leitura restritiva da blindagem) é razoável e não distorce o texto.",
+   "corrected": ""
+  }
+ ],
+ "rejected": [
+  {
+   "source": "tst-acordaos",
+   "gap": "alvo (a): a rodada 2 leu o TST por NOTICIA, nao por acordao — o criterio brasileiro nao esta ancorado em decisao",
+   "claim": "O segundo alvo (RR-21162-51.2015.5.04.0014, câmeras) não foi lido em inteiro teor nesta rodada — só notícia/paráfrase foi acessível, e as tentativas de acessar o inteiro teor falharam por razões distintas (bloqueio, PDF ilegível, recusa de conexão, ausência do caso); a locator afirma que a notícia é uma 'página oficial do TST em inglês' com o QUOTE citado em inglês.",
+   "verdict": "EXAGERADA",
+   "why": "A parte epistêmica central do claim é verdadeira e foi reproduzida de forma independente: jusbrasil.com.br devolveu HTTP 403 (bloqueio confirmado), o PDF da migalhas chegou como binário ilegível (confirmado), o backend de jurisprudência do TST recusou conexão (ECONNREFUSED, confirmado), e a busca por boletins do TRT12 não localizou o caso citado nominalmente. Porém a citação específica falha: a página em https://www.tst.jus.br/en/-/... , apesar do sufixo '/en/' na URL, está integralmente em PORTUGUÊS — não existe, no conteúdo real da página, a frase em inglês 'monitoring in the work environment, without any report of excesses...falls within the employer's supervisory power'. O que existe, verbatim, é a versão em português: 'o monitoramento no ambiente de trabalho, sem qualquer notícia a respeito de excessos, como a utilização de câmeras espiãs ou a instalação em recintos destinados ao repouso ou que pudessem expor a intimidade dos empregados, como banheiros ou vestiários, insere-se no poder fiscalizatório do empregador.' Formulação corrigida: substituir 'a página oficial do TST em inglês' por 'a página oficial do TST (URL com sufixo /en/, mas texto efetivamente em português)' e citar o trecho em português acima em vez da tradução apresentada como citação literal em inglês.",
+   "corrected": ""
+  },
+  {
+   "source": "anpd-decisao-monitoramento",
+   "gap": "alvo (a) parte 2: nenhuma DECISAO ou sancao da ANPD sobre monitoramento foi lida, so guia interpretativo",
+   "claim": "CLAIM 1 — Ausência medida: nenhum processo sancionador CONCLUÍDO listado oficialmente pela ANPD até 2026 trata de monitoramento de trabalhador/dado de empregado/legítimo interesse em relação de emprego; lista integral cruzada com ByteDance, Ministério da Saúde (2), SAS-PE, SEEDF, INSS, SES-SC etc.",
+   "verdict": "EXAGERADA",
+   "why": "Abri a própria página oficial da ANPD (não o blog Confidata citado como LOCATOR, que devolveu 403 — não pude conferir a frase literal lá). A página oficial confirma a LISTA de processos citada pelo claim quase item a item (ByteDance/TikTok, 2 processos do Ministério da Saúde, SAS-PE, SEEDF, INSS, Secretaria de Saúde SC, JBRJ, IAMSPE, Telekall) e, mais importante, CONFIRMA o núcleo do achado: nenhum desses processos — em nenhum status — versa sobre monitoramento de trabalhador, dado de empregado ou legítimo interesse em relação de emprego (a página não descreve o assunto de cada processo diretamente, mas a cobertura jornalística de cada um, checada separadamente para Ministério da Saúde e ByteDance, mostra que tratam de vazamento de dados de pacientes/segurados e proteção de dados de crianças no TikTok — nada de relação de emprego). Porém a frase 'ao menos nove processos... foram CONCLUÍDOS' e listar o ByteDance como concluído é impreciso: a página oficial marca 8 processos como 'Encerrado', 1 (2º caso do Ministério da Saúde) como 'Recurso em análise pelo Conselho Diretor' (não finalizado) e o ByteDance como 'Em andamento' (mesmo havendo notícia de multa aplicada em ago/2026, a listagem oficial de decisões ainda não o classifica como encerrado). O achado central (ausência de caso trabalhista) se sustenta; a contagem/status de 'concluídos' no quote está esticada.",
+   "corrected": "A página oficial da ANPD (gov.br/anpd/.../decisoes-em-processos-sancionadores) lista, até set/2026, 8 processos sancionadores com status 'Encerrado' (Ministério da Saúde — 1º caso, SAS-PE, SEEDF, INSS, Secretaria de Saúde de SC, JBRJ, IAMSPE, Telekall Inforservice), mais 1 processo do Ministério da Saúde em 'Recurso em análise pelo Conselho Diretor' e o processo ByteDance/TikTok como 'Em andamento'. Em NENHUM desses — concluído ou não — o assunto é monitoramento de trabalhador, dado de empregado, ou legítimo interesse em relação de emprego."
+  },
+  {
+   "source": "anpd-decisao-monitoramento",
+   "gap": "alvo (a) parte 2: nenhuma DECISAO ou sancao da ANPD sobre monitoramento foi lida, so guia interpretativo",
+   "claim": "CLAIM 3 — O único documento oficial da ANPD que menciona 'monitoramento de funcionários'/'bossware' é o Guia Orientativo sobre Legítimo Interesse (fev/2024), expressamente ORIENTATIVO, sem qualquer sanção aplicada com base nele.",
+   "verdict": "EXAGERADA",
+   "why": "Abri e li diretamente o PDF oficial do Guia (53 páginas). Na página 24 consta literalmente o 'EXEMPLO 7 — Instalação de software para rastrear atividades e medir a produtividade de funcionários': 'Uma empresa utiliza a hipótese legal do legítimo interesse para justificar a utilização de software que rastreia as atividades dos empregados, incluindo o uso de webcam e o registro de tudo o que é digitado nos computadores da empresa... o tratamento não poderia ser realizado e não seria admissível o recurso à hipótese legal do legítimo interesse'. Isso confirma integralmente a SUBSTÂNCIA do claim: é um exemplo ilustrativo dentro de um guia expressamente orientativo (não decisório), sem qualquer processo sancionador vinculado — nenhuma das fontes ou da própria página oficial de decisões sancionadoras associa esse exemplo a uma sanção real. Porém a palavra 'bossware' e a formulação em inglês do quote não aparecem no documento (que é integralmente em português e não usa esse termo) — é paráfrase de cobertura jurídica secundária em inglês sobre o Guia, não uma citação verbatim da fonte primária citada no LOCATOR.",
+   "corrected": "O 'EXEMPLO 7' do Guia Orientativo ANPD sobre Legítimo Interesse (fev/2024), p. 24: 'Uma empresa utiliza a hipótese legal do legítimo interesse para justificar a utilização de software que rastreia as atividades dos empregados, incluindo o uso de webcam e o registro de tudo o que é digitado nos computadores da empresa. O objetivo da coleta é medir a produtividade dos funcionários...' — Análise da ANPD: essa coleta 'interfere de forma excessiva e desproporcional sobre os direitos e liberdades fundamentais dos titulares... o tratamento não poderia ser realizado e não seria admissível o recurso à hipótese legal do legítimo interesse'. É orientação, não decisão sancionadora; nenhuma sanção foi aplicada com base nesse exemplo."
+  },
+  {
+   "source": "deci-ryan-primario",
+   "gap": "alvo (b): o eixo 4 NAO foi cumprido — Deci & Ryan segue nao lido, e 3 das 6 claims do proxy cairam na ancoragem",
+   "claim": "Deci & Ryan definem formalmente 'necessidade básica' como estado energizante cuja satisfação conduz a saúde/bem-estar e cuja NÃO satisfação contribui para patologia e mal-estar — a base teórica para prever dano do monitoramento que viola autonomia.",
+   "verdict": "EXAGERADA",
+   "why": "A quote em si é verbatim e está exatamente onde indicado (p. 74, col. 2, seção 'Psychological Needs and Mental Health'): 'By our definition, a basic need, whether it be a physiological need (Hull, 1943) or a psychological need, is an energizing state that, if satisfied, conduces toward health and well-being but, if not satisfied, contributes to pathology and ill-being.' Porém a cláusula final do claim — 'a base teórica para prever dano do monitoramento que viola autonomia' — é uma inferência do leitor, não algo que o texto diga; o artigo de 2000 não menciona monitoramento em nenhum ponto próximo a essa definição. corrected: 'Deci & Ryan definem formalmente \"necessidade básica\" como estado energizante cuja satisfação conduz a saúde/bem-estar e cuja não satisfação contribui para patologia e mal-estar — sem qualquer menção, nesse trecho, a monitoramento ou ambientes de trabalho vigiados; essa ponte é inferência do leitor, não afirmação do texto.'",
+   "corrected": "",
+   "quote": "By our definition, a basic need, whether it be a physiological need (Hull, 1943) or a psychological need, is an energizing state that, if satisfied, conduces toward health and well-being but, if not satisfied, contributes to pathology and ill-being.",
+   "locator": "Seção 'Psychological Needs and Mental Health', p. 74, col. 2",
+   "sourceTier": 8,
+   "validFrom": ""
+  },
+  {
+   "source": "deci-ryan-primario",
+   "gap": "alvo (b): o eixo 4 NAO foi cumprido — Deci & Ryan segue nao lido, e 3 das 6 claims do proxy cairam na ancoragem",
+   "claim": "Deci & Ryan afirmam explicitamente que a falha em prover suporte a essas necessidades — inclusive por parte de EMPREGADORES/organizações — contribui para alienação e mal-estar; é a ponte primária entre SDT e ambientes de trabalho monitorados.",
+   "verdict": "EXAGERADA",
+   "why": "A quote é verbatim e está na seção e página certas ('Alienation and Its Prevention', p. 74, col. 1): 'We maintain that by failing to provide supports for competence, autonomy, and relatedness, not only children but also of students, employees, patients, and athletes, socializing agents and organizations contribute to alienation and ill-being.' O texto de fato nomeia 'employees' e 'organizations', então a primeira metade do claim está correta. Mas a segunda cláusula — 'é a ponte primária entre SDT e ambientes de trabalho monitorados' — não está no texto: o artigo não fala de monitoramento eletrônico, vigilância ou EPM em nenhum lugar; essa é uma ponte construída pelo leitor para justificar a conexão com Ravid et al., não uma afirmação de Deci & Ryan. corrected: 'Deci & Ryan afirmam explicitamente que a falha em prover suporte a essas necessidades — inclusive por parte de organizações a seus empregados — contribui para alienação e mal-estar; o artigo não estabelece nenhuma ponte com monitoramento de desempenho, que é inferência externa ao texto.'",
+   "corrected": "",
+   "quote": "We maintain that by failing to provide supports for competence, autonomy, and relatedness, not only children but also of students, employees, patients, and athletes, socializing agents and organizations contribute to alienation and ill-being.",
+   "locator": "Seção 'Alienation and Its Prevention', p. 74, col. 1",
+   "sourceTier": 8,
+   "validFrom": ""
+  },
+  {
+   "source": "deci-ryan-primario",
+   "gap": "alvo (b): o eixo 4 NAO foi cumprido — Deci & Ryan segue nao lido, e 3 das 6 claims do proxy cairam na ancoragem",
+   "claim": "Tabela 6 (EPM Degree Analysis) quantifica os moderadores pedidos: maior invasividade do monitoramento correlaciona-se com mais estresse/tensão (ρ=.20) e mais comportamento contraproducente (ρ=.22 em privacy invasion/CWBs), enquanto maior transparência correlaciona-se com atitudes mais positivas (ρ=.25) — coeficientes corrigidos por confiabilidade, com IC95%.",
+   "verdict": "EXAGERADA",
+   "why": "Os dois trechos citados literalmente na QUOTE conferem exatamente com a Tabela 6: Invasiveness→Stress/strain = K10, N3260, r.17, SDr.11, ρ.20, SDρ.13, 95%CI[.10,.29] (p. 23); Transparency→Broad attitudes = K14, N3696, r.22, SDr.22, ρ.25, SDρ.24, 95%CI[.11,.39] (p. 24). Porém a prosa do claim funde 'privacy invasion' e 'CWBs' como se fossem a mesma linha/medida rotulada 'ρ=.22 em privacy invasion/CWBs' — na tabela real são DUAS linhas distintas sob Invasiveness (Privacy invasion é uma percepção, com seu próprio ρ; CWBs é comportamento contraproducente, listado à parte com ρ=.22). Chamar privacy invasion de 'comportamento contraproducente' e combiná-la com CWBs sob um único parêntese é uma imprecisão que a tabela não sustenta. corrected: 'Tabela 6 quantifica os moderadores: maior invasividade correlaciona-se com mais estresse/tensão (ρ=.20, IC95%[.10,.29], p.23); separadamente, na mesma seção de Invasiveness, o comportamento contraproducente (CWBs) tem ρ=.22 (IC95%[.00,.44]), numa linha distinta da linha \"Privacy invasion\" (percepção de invasão de privacidade); maior transparência correlaciona-se com atitudes mais positivas (ρ=.25, IC95%[.11,.39], p.24).'",
+   "corrected": "",
+   "quote": "Invasiveness ... Stress/strain 10 3260 .17 .11 .20 .13 [.10, .29] ... Transparency ... Broad attitudes 14 3696 .22 .22 .25 .24 [.11, .39]",
+   "locator": "Table 6 'EPM degree analysis', p. 23 (linha Invasiveness/Stress-strain) e p. 24 (linha Transparency/Broad attitudes)",
+   "sourceTier": 8,
+   "validFrom": ""
+  },
+  {
+   "source": "acordo-coletivo-br",
+   "gap": "alvo (d): ZERO fonte sobre o analogo brasileiro do art. 88 GDPR — negociacao coletiva como fonte de regra sobre dado de trabalhador",
+   "claim": "4. O único precedente do TST localizado sobre monitoramento (câmeras) funda a licitude na lei geral e no poder fiscalizatório do empregador — sem qualquer menção a acordo/convenção coletiva como base legitimadora.",
+   "verdict": "EXAGERADA",
+   "why": "Li o acórdão inteiro (34 páginas, PDF oficial TST). A citação apresentada NÃO é verbatim: comprime e reescreve a frase real, omitindo 'dos empregados', 'no acórdão do Tribunal Regional', 'pelo empregador', trocando 'tais como...de câmeras em recintos que fossem destinados' por 'como...em recintos destinados', e 'partes íntimas dos empregados' por 'a intimidade dos empregados', além de suprimir 'não configura ato ilícito,' antes de 'inserindo-se'. A SUBSTÂNCIA do claim está correta — o acórdão inteiro (voto + ementa) funda a licitude só no art. 2º da CLT e na ponderação constitucional (arts. 1º, 5º, 170 CF), sem qualquer menção a convenção/acordo coletivo como base legitimadora do monitoramento.",
+   "corrected": "\"...o monitoramento dos empregados no ambiente de trabalho, sem qualquer notícia no acórdão do Tribunal Regional a respeito de excessos pelo empregador, tais como a utilização de câmeras espiãs ou a instalação de câmeras em recintos que fossem destinados ao repouso dos funcionários ou que pudessem expor partes íntimas dos empregados, como banheiros ou vestiários, não configura ato ilícito, inserindo-se dentro do poder fiscalizatório do empregador.\" (acórdão, fls. 2/4)"
+  },
+  {
+   "source": "acordo-coletivo-br",
+   "gap": "alvo (d): ZERO fonte sobre o analogo brasileiro do art. 88 GDPR — negociacao coletiva como fonte de regra sobre dado de trabalhador",
+   "claim": "5. O mesmo acórdão condiciona a licitude do poder fiscalizatório a não ofender direitos de personalidade do trabalhador — o teto que qualquer cláusula coletiva sobre monitoramento teria de respeitar.",
+   "verdict": "EXAGERADA",
+   "why": "A citação também não é verbatim: no acórdão (fls.19) o conteúdo está em DUAS frases separadas por ponto final, não unidas por 'desde que': '(...) de forma a legitimar certa limitação da esfera de intimidade dos trabalhadores perante seu empregador. Nada obstante, não há como autorizar a adoção de medidas fiscalizatórias que ofendam direitos de personalidade do trabalhador.' A síntese do leitor comprime isso mas preserva o sentido. A parte final do claim ('o teto que qualquer cláusula coletiva teria de respeitar') é inferência do leitor, não afirmação do texto — o acórdão não discute cláusulas coletivas de monitoramento em nenhum momento; é extrapolação razoável, mas não ancorada literalmente.",
+   "corrected": "\"A legislação autoriza a adoção, pelos empregadores, de medidas de controle e fiscalização da prestação de serviços (art. 2° da CLT), de forma a legitimar certa limitação da esfera de intimidade dos trabalhadores perante seu empregador. Nada obstante, não há como autorizar a adoção de medidas fiscalizatórias que ofendam direitos de personalidade do trabalhador.\" (acórdão, fls.19) — e a extensão a 'cláusula coletiva' é inferência do leitor, não dita pelo TST neste caso (que não trata de negociação coletiva)."
+  }
+ ],
+ "elenxo": {
+  "objections": [
+   {
+    "target": "claim 1 [tst-acordaos] — e-mail pessoal vs corporativo",
+    "survives": true,
+    "evidence": "QUOTE vazia e LOCATOR '—'. A lacuna nomeada era exatamente 'a rodada 2 leu o TST por NOTÍCIA, não por acórdão'; uma claim sem citação verbatim nem localizador (processo, fls., órgão, data) é indistinguível de ementa/notícia/paráfrase — é o mesmo modo de falha, repetido. Sem identificar QUAL acórdão, nem cabe checar se é do TST ou de Turma/TRT."
+   },
+   {
+    "target": "claim 2 [tst-acordaos] — ciência prévia afasta expectativa de privacidade",
+    "survives": true,
+    "evidence": "Sem quote/locator. E prova MENOS do que a rodada precisa mesmo se verdadeira: 'ciência prévia' aqui é condição de LICITUDE DA PROVA em processo trabalhista, não critério de proteção de dado — o eixo da pergunta Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE. Aviso que afasta expectativa é o oposto do que a emenda de Q_R2_REVISAO_DO_SELO_C sustenta ('notificação prévia é salvaguarda e não portão'); a rodada importa a tese sem enfrentar a própria emenda em aberto."
+   },
+   {
+    "target": "claim 3 [tst-acordaos] — proporcionalidade exige 'parcimônia' na ilicitude por desvio de finalidade",
+    "survives": true,
+    "evidence": "Sem quote/locator. Além disso a claim inverte a direção útil: 'parcimônia em qualificar a prova como ilícita' é deferência AO EMPREGADOR, não um teste de proporcionalidade que limite o monitoramento. Como âncora do 'critério brasileiro' da opção C (C_OPCAO_C_PURPOSE_BOUND_ASYMMETRIC_FLOW), sustenta o contrário do que a rodada lhe atribui."
+   },
+   {
+    "target": "claim 4 [tst-acordaos] — empregador pode monitorar forma E conteúdo do e-mail corporativo",
+    "survives": true,
+    "evidence": "Sem quote/locator, e é a claim de maior carga das quatro. Se verdadeira, o piso legal brasileiro é MAIS permissivo que a opção C — logo C é norma auto-imposta, não exigência jurídica, e a rodada precisa dizer isso explicitamente. Colide ainda, sem reconciliação, com o único texto oficial brasileiro efetivamente lido verbatim nesta rodada (Guia ANPD de Legítimo Interesse, EXEMPLO 7, p.24: keylogger+webcam 'não seria admissível o recurso à hipótese legal do legítimo interesse'). Duas fontes oficiais em sentidos opostos e zero arestas de reconciliação no grafo."
+   },
+   {
+    "target": "claim 5 [anpd-decisao-monitoramento] — Telekall é a única multa pecuniária, sem nexo com emprego",
+    "survives": true,
+    "evidence": "QUOTE vazia, LOCATOR '—'. E a claim prova MENOS: Telekall (venda de listas de WhatsApp para fim eleitoral) é irrelevante ao eixo empregador×empregado; só serve como evidência de AUSÊNCIA, e ausência exige a lista exaustiva citada — que não foi citada. O próprio verificador registrou que a página oficial 'não descreve o assunto de cada processo diretamente', ou seja, o 'nenhum versa sobre monitoramento' é inferência do verificador sobre nomes de processo, não leitura do texto."
+   },
+   {
+    "target": "claim 6 [lgpd-texto-legal] — art. 7º, IX (legítimo interesse)",
+    "survives": true,
+    "evidence": "MEDIDO por mim nesta rodada: o inciso IX termina em '...do titular QUE EXIJAM A PROTEÇÃO DOS DADOS PESSOAIS' (confirmado em busca ao texto legal; planalto.gov.br devolveu ECONNRESET nas duas tentativas). A QUOTE da rodada corta em 'do titular', sem reticências — quote não-verbatim por truncamento, exatamente a família de defeito que reprovou 5 de 6 claims de LGPD na rodada 2 (E_R2_LACUNAS_RODADA_COMPLEMENTAR_0913). O trecho omitido é material: restringe o override aos direitos que exijam proteção de dados."
+   },
+   {
+    "target": "claim 7 [lgpd-texto-legal] — art. 10 caput 'não define teste de balanceamento formal, abrindo a lacuna'",
+    "survives": true,
+    "evidence": "REFUTADA pelo próprio artigo que a claim cita. Li o art. 10 integral (lgpd-brasil.info): §1º 'somente os dados pessoais estritamente necessários para a finalidade pretendida poderão ser tratados' (necessidade/minimização); inciso II 'respeitadas as legítimas expectativas dele e os direitos e liberdades fundamentais' (expectativa legítima); §3º relatório de impacto a pedido da ANPD. O leitor citou só o caput e declarou ausente a maquinaria que está nos parágrafos seguintes. A conclusão 'abre a lacuna sobre quando monitoramento cruza para desproporcional' é falsa duas vezes: pela lei e pelo EXEMPLO 7 do Guia da ANPD, que resolve o caso concreto no sentido oposto."
+   },
+   {
+    "target": "claim 8 [lgpd-texto-legal] — art. 10 §2º, transparência",
+    "survives": true,
+    "evidence": "Quote conferida verbatim por mim (art. 10 §2º, íntegra). Mas a claim prova MENOS: 'medidas para garantir a transparência do tratamento' é satisfeita por política pública de privacidade; não equivale a 'aviso ao titular monitorado', que é o que a prosa afirma. A ponte transparência→notificação individual é inferência, não texto — e é justamente o ponto sob disputa em Q_R2_REVISAO_DO_SELO_C."
+   },
+   {
+    "target": "claim 9 [lgpd-texto-legal] — art. 11 (dado sensível) aplicado a histograma de monitoramento",
+    "survives": true,
+    "evidence": "O caput está verbatim, mas a ponte é inventada: dado sensível na LGPD é definido por CATEGORIA taxativa (art. 5º, II — origem racial, convicção religiosa, opinião política, filiação sindical, saúde, vida sexual, genético, biométrico), e o art. 5º, II não foi lido nesta rodada. Telemetria comportamental de trabalho não é per se sensível; o parêntese 'inferências de saúde/comportamento de um histograma individual' é o salto que a claim precisaria provar e não prova. A enumeração do inciso II do art. 11 também não foi citada, então 'não há legítimo interesse para dado sensível' segue sem âncora textual."
+   },
+   {
+    "target": "claim 10 [lgpd-texto-legal] — art. 20, revisão de decisão automatizada",
+    "survives": true,
+    "evidence": "Caput verbatim, mas a rodada não leu os §§ do art. 20, onde mora o regime (inclusive a controvérsia sobre revisão POR PESSOA NATURAL, suprimida na conversão da MP 869/2018 — não verificado nesta rodada). Sem os parágrafos, a claim não sustenta o uso que a decisão faria dela ('alavanca de controle do alvo', a emenda aberta em Q_R2_REVISAO_DO_SELO_C): direito a revisão sem garantia de revisor humano é alavanca fraca, e a rodada não mediu qual é."
+   },
+   {
+    "target": "claim 11 [lgpd-texto-legal] — art. 9º §1º, nulidade do consentimento",
+    "survives": true,
+    "evidence": "Quote começa no meio do dispositivo, omitindo a condicional de abertura 'Na hipótese em que o consentimento é requerido,' — truncamento sem reticências, mesma família do claim 6. E prova MENOS: a nulidade do §1º é por informação enganosa/abusiva, não por SUBORDINAÇÃO — que é o problema real do consentimento do empregado. A pergunta 'consentimento de empregado monitorado é válido?' segue sem âncora legal nesta rodada."
+   },
+   {
+    "target": "claim 12 [deci-ryan-primario] — três necessidades básicas, abstract p.68",
+    "survives": false,
+    "evidence": "Quote verbatim, localizador preciso (Abstract, p. 68), conferida por segundo agente. É primário de verdade e fecha a parte factual do eixo 4 ('Deci & Ryan segue não lido'). Não tenho objeção de ancoragem — só a de ESCOPO, que registro no claim 13/14: o artigo de 2000 não fala de monitoramento em lugar nenhum."
+   },
+   {
+    "target": "claim 13 [deci-ryan-primario] — necessidades nomeadas com fontes originais, p.69",
+    "survives": true,
+    "evidence": "A citação é boa, mas a lacuna nomeada era autodeterminação APLICADA A MONITORAMENTO (eixo 4). O verificador já reprovou por exagero as duas claims que tentavam a ponte ('base teórica para prever dano do monitoramento', 'ponte primária entre SDT e ambientes de trabalho monitorados'), constatando que o artigo não menciona monitoramento eletrônico. Logo: Deci & Ryan foi LIDO, mas não sustenta nenhuma inferência sobre monitoramento — o primário fecha a lacuna bibliográfica e deixa aberta a lacuna argumentativa."
+   },
+   {
+    "target": "claim 14 [deci-ryan-primario] — Ravid et al. (2023), K=94, N=23.461",
+    "survives": true,
+    "evidence": "Quote verbatim do abstract e o achado é forte contra o lado 'benefício' do balanceamento de legítimo interesse ('no evidence that EPM improves worker performance'). Mas duas objeções de pé: (i) ausência de evidência agregada sobre PRODUTIVIDADE não cobre finalidades de segurança/compliance/fraude, que são as invocadas na prática pelo empregador — a meta-análise não fala delas; (ii) 'stress regardless of the characteristics of monitoring' está em tensão não reconciliada com o uso que a rodada faz da Tabela 6 (transparência ρ=.25) — transparência melhora ATITUDES, e o próprio abstract nega que as características removam o estresse. Isso SUSTENTA a emenda aberta 'notificação prévia é salvaguarda e não portão' e enfraquece qualquer desenho que trate aviso como suficiente."
+   },
+   {
+    "target": "claim 15 [viva-bin-unitario-e-epsilon] — doc confirma bin com 1 indivíduo (R1-obj#29)",
+    "survives": true,
+    "evidence": "QUOTE vazia, LOCATOR '—'. Esta é A claim que fecharia R1-obj#29, a mais consequente da rodada para E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS, e chega como declaração pura. Pior: a rodada 2 já havia registrado o mesmo defeito no mesmo fornecedor — E_R2_VIVA_DISTRIBUTION_MASKING e E_R2_VIVA_TRES_ESTRATEGIAS_PROTECAO trazem literalmente 'quote verbatim ausente no dossie' e ainda assim foram selados como ANCORADA (tier 8). Dois rounds de claims de fornecedor sem citação marcadas como ancoradas = a etapa de ancoragem está falhando aberta."
+   },
+   {
+    "target": "claim 16 [viva-bin-unitario-e-epsilon] — justificativa: métrica de comportamento, não dado de RH",
+    "survives": true,
+    "evidence": "Sem quote/locator. E se a justificativa for essa, ela é AUTOSSERVIDA e já refutada no próprio grafo: o risco nunca foi revelar grupo demográfico, é reidentificação por diferença/tracker (E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS, confirmado na classe por Dinur-Nissim na rodada 2) e por combinação de atributos (E_R2_VIVA_ATRIBUTOS_COMBINADOS_INFEREM_IDENTIDADE). Repassar a racionalização do fornecedor sem quote é tier de marketing, não tier 8."
+   },
+   {
+    "target": "claim 17 [viva-bin-unitario-e-epsilon] — minimum group size vale para o filtro, não para o bin",
+    "survives": true,
+    "evidence": "Sem quote/locator, e contradiz sem reconciliação E_R2_VIVA_DISTRIBUTION_MASKING (a Microsoft aplica 'distribution masking' a superfícies nomeadas — se a superfície do histograma estiver entre elas, bin de contagem 1 não é exibido cru). Nenhuma aresta SUPERSEDES/REFUTES foi proposta entre os dois. Enquanto não houver a citação da regra e a lista de superfícies mascaradas, a arquitetura do Viva não pode ser usada nem como prova do vazamento nem como prova da proteção."
+   },
+   {
+    "target": "claim 18 [viva-bin-unitario-e-epsilon] — nenhuma página documenta epsilon",
+    "survives": true,
+    "evidence": "Negativa de escopo global ('NÃO documenta nenhum parâmetro, orçamento nem garantia') apurada sobre UMA página, sem quote e sem URL no localizador. A versão defensável é estreita: 'na página X não há ε' — e essa basta para o uso prático (não se pode confiar em garantia formal não publicada). Como está redigida, a claim afirma mais do que mediu."
+   },
+   {
+    "target": "claim 19 [viva-bin-unitario-e-epsilon] — garantia é qualitativa ('nenhuma atividade individual discernível com certeza')",
+    "survives": true,
+    "evidence": "A frase aparece entre aspas na prosa, mas o campo QUOTE está vazio e o LOCATOR é '—': não há como o verificador ter conferido o verbatim, e a formulação citada é justamente a que decide o valor probatório. Ironia útil: 'não pode ser discernida COM CERTEZA' é exatamente o que privacidade diferencial NÃO promete em linguagem informal — a ausência de ε deixa a declaração inauditável, o que reforça E_OBJECTION_VIVA_MONITOR_VERB_OVERSTATES em vez de resolvê-lo."
+   },
+   {
+    "target": "claim 20 [acordo-coletivo-br] — art. 611-A da CLT é 'lista fechada'",
+    "survives": true,
+    "evidence": "REFUTADA por medição direta: o caput do art. 611-A lê 'A convenção coletiva e o acordo coletivo de trabalho têm prevalência sobre a lei quando, ENTRE OUTROS, dispuserem sobre:' (texto conferido em modeloinicial.com.br/lei/CLT/.../art-611a; planalto ECONNRESET). 'Entre outros' torna a lista EXEMPLIFICATIVA. Logo a inferência central do alvo (d) — 'monitoramento não está entre os incisos, portanto negociação coletiva não alcança' — é um non sequitur construído sobre premissa falsa. O alvo (d) não foi respondido: foi respondido ao contrário."
+   },
+   {
+    "target": "claim 21 [acordo-coletivo-br] — art. 611-B é taxativo e não blinda privacidade/dados",
+    "survives": true,
+    "evidence": "Sem quote/locator (o caput diz 'exclusivamente', o que a claim acerta em substância), mas a conclusão desanda: com 611-A aberto (medido) e 611-B taxativo, o limite operativo do 'negociado sobre o legislado' não é a lista do 611-B — é a tese do STF no Tema 1046/ARE 1.121.633 ('...desde que respeitados os direitos absolutamente indisponíveis'), que esta rodada NÃO leu (verifiquei a existência e o teor da tese em portal.stf.jus.br/TJPE). Sem Tema 1046 e sem enfrentar se intimidade/dado pessoal (CF art. 5º, X) é direito absolutamente indisponível, a rodada não tem como afirmar nem negar o análogo brasileiro do art. 88 do GDPR."
+   },
+   {
+    "target": "claim 22 [acordo-coletivo-br] — parágrafo único do art. 611-B",
+    "survives": true,
+    "evidence": "Sem quote/locator, e irrelevante ao alvo: o parágrafo único trata de duração/intervalos não contarem como norma de saúde e segurança. Não diz nada sobre dado, privacidade ou monitoramento. Serve de reforço retórico a uma leitura ('lista fechada') já refutada no claim 20 — é preenchimento de lacuna, não fechamento dela."
+   }
+  ],
+  "gapsClosed": [
+   "[deci-ryan-primario] FECHADA na parte bibliográfica: Deci & Ryan (2000) finalmente lido em primário, com quotes verbatim e localizadores de página/coluna (Abstract p.68; 'Self-Determination Theory' p.69 col.2; 'Psychological Needs and Mental Health' p.74 col.2; 'Alienation and Its Prevention' p.74 col.1). O eixo 4 deixa de estar zerado.",
+   "[deci-ryan-primario] parte quantitativa FECHADA por Ravid et al. (2023), Personnel Psychology 76(1): abstract verbatim ('no evidence that EPM improves worker performance'; 'presence of EPM is associated with increased worker stress, regardless of the characteristics of monitoring') e dois coeficientes da Tabela 6 conferidos linha a linha pelo verificador (Invasiveness→Stress/strain ρ=.20, 95%CI[.10,.29], p.23; Transparency→Broad attitudes ρ=.25, 95%CI[.11,.39], p.24).",
+   "[anpd-decisao-monitoramento] FECHADA como AUSÊNCIA MEDIDA e com o achado mais forte da rodada — que chegou na coluna de REJEITADAS: o verificador abriu o PDF oficial do Guia de Legítimo Interesse (53 pp.) e leu verbatim o EXEMPLO 7, p.24 (software de rastreio + webcam + registro de digitação: 'o tratamento não poderia ser realizado e não seria admissível o recurso à hipótese legal do legítimo interesse'). Esse é o teto brasileiro operativo. Limite declarado: a exaustividade do 'nenhuma sanção sobre monitoramento' é inferência sobre nomes de processo, não leitura de assunto.",
+   "[lgpd-texto-legal] FECHADA PARCIALMENTE: art. 10 §2º (conferido verbatim por mim), art. 11 caput e art. 20 caput saem da rodada com quote e localizador corretos — a LGPD deixa de estar ancorada só por paráfrase."
+  ],
+  "gapsOpen": [
+   "[tst-acordaos] ABERTA. As 4 claims do alvo (a) têm QUOTE vazia e LOCATOR '—': nenhuma identifica processo, fls. ou órgão. Pior, o dossiê se contradiz sobre o MESMO acórdão de câmeras: a raia [tst-acordaos] declara inteiro teor inacessível (403 jusbrasil, PDF binário, ECONNREFUSED no TST), enquanto a raia [acordo-coletivo-br] afirma 'Li o acórdão inteiro (34 páginas, PDF oficial TST)' e cita fls.19. E o cabeçalho do dossiê registra 'Fontes inalcançáveis: (nenhuma)'. A contabilidade de alcance da rodada não é confiável.",
+   "[viva-bin-unitario-e-epsilon] ABERTA INTEGRALMENTE. As 5 claims do alvo (c) têm QUOTE vazia e LOCATOR '—'; R1-obj#29 (bin com 1 indivíduo) segue NÃO re-verificada, e a negativa sobre ε foi apurada sobre uma página só. Sem reconciliação com E_R2_VIVA_DISTRIBUTION_MASKING. Recorrência: a rodada 2 já selara nós Viva com 'quote verbatim ausente no dossie'.",
+   "[acordo-coletivo-br] ABERTA E RESPONDIDA AO CONTRÁRIO. O caput do art. 611-A contém 'entre outros' (lista exemplificativa — medido), o que destrói a premissa 'lista fechada' das claims 20-22; e o critério que hoje governa negociado×legislado, a tese do STF no Tema 1046/ARE 1.121.633 ('direitos absolutamente indisponíveis'), não foi lido. O análogo brasileiro do art. 88 do GDPR continua sem resposta.",
+   "[lgpd-texto-legal] RESÍDUO ABERTO: art. 7º, IX citado com truncamento sem reticências (falta 'que exijam a proteção dos dados pessoais'); art. 10 §1º, inciso II e §3º não lidos — são exatamente a maquinaria de necessidade/expectativa legítima/RIPD que a claim 7 declarou inexistente; art. 5º, II (definição taxativa de dado sensível) não lido, deixando sem âncora a ponte histograma→dado sensível; §§ do art. 20 não lidos.",
+   "NOVA (nomeada por esta rodada): a ponte SDT→monitoramento não tem primário. Deci & Ryan não mencionam monitoramento eletrônico; o verificador reprovou por exagero as duas claims que tentavam a ponte. A premissa de dano psicológico do selo repousa hoje só em Ravid et al. — e em Ravid a transparência move ATITUDES (ρ=.25), não o estresse ('regardless of the characteristics').",
+   "E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS segue CONFIRMADO NA CLASSE E NÃO QUANTIFICADO NA FAIXA de 3 a 5 pessoas — a única via que a rodada 3 tentou (arquitetura do Viva) veio sem citação.",
+   "Q_R2_REVISAO_DO_SELO_C segue aberta nas 4 emendas. A rodada 3 não trouxe evidência que resolva nenhuma; trouxe evidência que AGRAVA uma (notificação como salvaguarda e não portão, via Ravid) e uma tensão nova não reconciliada entre o TST permissivo (claim 4) e o EXEMPLO 7 da ANPD."
+  ],
+  "recommendation": "A rodada SUSTENTA três coisas e só três: (1) o eixo 4 saiu do zero — Deci & Ryan e Ravid et al. estão em primário, com quote e página, e Ravid dá o achado mais útil de todo o grafo contra o lado 'benefício' do balanceamento de legítimo interesse: monitoramento não melhora desempenho e a mera presença associa-se a mais estresse; (2) o teto brasileiro operativo existe e é o EXEMPLO 7 do Guia de Legítimo Interesse da ANPD, lido verbatim no PDF oficial (p.24); (3) a ANPD não tem decisão sancionadora sobre monitoramento de trabalhador — ausência medida, com a ressalva de exaustividade.\n\nA rodada NÃO SUSTENTA: o critério brasileiro ancorado em acórdão (alvo a), a re-verificação de R1-obj#29 e a inexistência de ε (alvo c), e o análogo do art. 88 do GDPR (alvo d). Treze das vinte e duas claims marcadas como ANCORADAS têm QUOTE vazia e LOCATOR '—' — a etapa de ancoragem passou declaração por citação, e isso é falha aberta de gate, não descuido de redação: o mesmo defeito já estava selado na rodada 2 (E_R2_VIVA_DISTRIBUTION_MASKING: 'quote verbatim ausente no dossie', ainda assim tier 8). Enquanto o gate aceitar campo vazio, contar 'claims ancoradas' não mede nada.\n\nAções que esta refutação exige, na ordem: (i) rebaixar de ANCORADA para AFIRMADA-SEM-CITAÇÃO as 13 claims sem quote antes de qualquer nó entrar no grafo — e fazer o ancorador falhar fechado com campo vazio; (ii) CORRIGIR duas claims refutadas por medição, não arquivá-las: claim 7 (o art. 10 §1º/II/§3º contém necessidade estrita, expectativa legítima e RIPD — a 'lacuna' declarada não existe) e claim 20 (o caput do art. 611-A diz 'entre outros'; a lista é exemplificativa); (iii) promover a ANCORADAS, com a prosa aparada, os dois achados que chegaram na coluna REJEITADAS por exagero de inferência e não por falha de citação — o EXEMPLO 7 da ANPD e o acórdão de câmeras lido em 34 páginas: perdê-los por causa da cláusula final da prosa seria descartar a melhor evidência brasileira da rodada; (iv) reabrir o alvo (d) com dois alvos nomeados — Tema 1046/ARE 1.121.633 e a qualificação de intimidade/dado pessoal (CF art. 5º, X) como direito absolutamente indisponível; (v) reconciliar no grafo a tensão TST-permissivo × ANPD-restritiva com aresta explícita, porque hoje o selo herda as duas sem escolher.\n\nRegistro pela cláusula 6: não descarto nenhuma objeção por orçamento. O selo D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION não é reaberto aqui — nada nesta rodada toca a direção C. Mas a perna BRASILEIRA do critério não pode ser declarada ancorada: ela se apoia hoje em um exemplo de guia orientativo (forte, porém não vinculante) e em jurisprudência que a rodada não citou. E a emenda 'notificação prévia é salvaguarda e não portão' (Q_R2_REVISAO_DO_SELO_C) sai desta rodada mais forte, não mais fraca, pela evidência da própria rodada."
+ },
+ "stats": {
+  "sources": 6,
+  "reached": 6,
+  "anchored": 22,
+  "rejected": 8,
+  "nodesAdded": 25,
+  "edgesAdded": 58,
+  "nodesTotal": 114
+ }
+}

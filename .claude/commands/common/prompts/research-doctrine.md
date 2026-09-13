@@ -24,6 +24,34 @@
 | 9 | **Decisões revisáveis, nunca apagadas** | `SUPERSEDES`/`REFUTES` · `/meta:kg-freshness` | Supersessão é operação nomeada; re-testar, nunca re-carimbar. |
 | 10 | **Ferramenta sem uso é custo** | contrato de custo no frontmatter (`run_id/tokens/agents/duration_min`) · `valeu-a-pena` | Toda síntese declara o que custou e o que devolveu; regressão de custo/nó é achado. |
 
+## Duas formas de rodada — e o gatilho que escolhe (não é gosto, é o estado da pergunta)
+
+A cláusula 3 (fontes amplas) e a 7 (escolher fontes é dado + campo + guarda) se realizam de **duas formas**,
+e o que decide é se **as lacunas já têm nome**:
+
+| Estado da pergunta | Forma | Mecanismo |
+|---|---|---|
+| Campo **desconhecido**, lacunas **sem nome** | **varredura larga** — descobrir quais são as fontes | `mode: 'research'` / `'decision'`: Scope → Search → Fetch → Verify (3 votos, 2 refutam) → Synthesize → write(KG) |
+| Lacunas **JÁ NOMEADAS** — rodada complementar, revisita dirigida, ou pergunta cujo eixo um run anterior declarou | **primárias nomeadas** — ler a fonte inteira e ancorar cada claim | `mode: 'primaries'` + `args.sources: [{key, gap, prompt}]`: Leitura → **Ancoragem** → Elenxo → write(KG) |
+
+**A ancoragem é a peça nova** (e é o que compra o modo): o claim só existe com `quote` **verbatim** + `locator`,
+e um **segundo agente, independente do leitor, reabre o documento** e julga — `ANCORADA` · `EXAGERADA` ·
+`NAO-ENCONTRADA`, **default na dúvida NAO-ENCONTRADA**. É outra coisa que a votação adversarial 3/2: lá três
+juízes **discutem a claim**; aqui um verificador **confere o texto**. Claim rejeitada na ancoragem nunca vira
+nó — entra na contabilidade do `E_LACUNAS_…` (cláusula 8, lacuna vira nó).
+
+**Custo medido na MESMA pergunta** (indivíduo × organização, 2026-09-13 — cláusula 10, ferramenta sem uso é custo):
+
+| Forma | Run | Tokens | Agentes | Nós | Por nó | O que a rodada revelou |
+|---|---|---|---|---|---|---|
+| varredura larga | `wf_88199ba9-b9a` | 7.282.373 | 105 | 25 | ≈291k | **19 de 25** claims refutadas, a maioria **por fonte fraca** — pagou-se busca para descobrir fonte que o Verify depois derrubou por tier |
+| primárias nomeadas | `wf_1865aba9-e20` | 2.680.149 | 28 | 64 | ≈42k | **13/13** fontes alcançadas · **62 claims ancoradas** · **14 rejeitadas na ancoragem** (13 exageradas, 1 não encontrada) |
+
+Retornos versionados em `docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/data/`.
+**7× menos token por nó não é desconto: é a descoberta já paga.** Usar primárias num campo desconhecido só
+move a descoberta para fora da maquinaria — por isso o modo **falha com erro nomeado** sem `args.sources`,
+em vez de cair em varredura calado.
+
 ## Régua de saída (o que uma pesquisa Onion entrega, sempre)
 
 1. **Grafo primeiro** (`.kg.yaml`, radar exit 0, TETO declarado) — a prosa é projeção.
