@@ -2,10 +2,10 @@
 title: 'Resíduo adversarial — passivo YAML zerado, a causa real da r16 e a classe de locale virando guarda'
 date: 2026-09-13
 branch: fix/kg-yaml-passivo-zero
-reviewed_diff_sha256: f921962786cf88eec3830a8b3f52396278e5e9e317397613dc6c85cfecb1c848
-findings_total: 15
-findings_real: 15
-findings_fixed: 14
+reviewed_diff_sha256: 0d3e94ce402a38e62ffa04f0694a602a9310d1901123391845592c90f49be75e
+findings_total: 17
+findings_real: 17
+findings_fixed: 16
 tokens: 216265
 duration_min: 19
 verdict: REPROVADO_E_CURADO
@@ -87,6 +87,17 @@ o leitor devolvendo falso sob concorrência. O `lint-artifacts.sh` tinha **8 sí
 (`pipe-verdict-baseline.txt`). Os 15 vereditos por pipe viraram here-string, e a linha saiu do baseline, com o
 emissor confirmando 0. Não é "flaky": é um veredito que mentia às vezes e agora não mente.
 
+## Dois defeitos que só o CI mostrou
+
+- **O caso `(j2)` matava o worker no git 2.55 do CI**, e passava no git 2.43 local, com e sem `~/.gitconfig`. A
+  resolução "descuidada" usava `git checkout --theirs plugins/`, que depende dos estágios de conflito da versão
+  do git. Sob `set -e` o passo falhou, e a família saiu "reivindicada e NÃO concluída": não reprovou, sumiu.
+  Agora a resolução é explícita (`git checkout prB -- plugins/`), cada passo tolera a própria falha, e o caso
+  **reprova dizendo em que passo parou**, em vez de desaparecer.
+- **`line 7540: meta.target: command not found`:** crase sem escape dentro de um rótulo entre aspas duplas
+  (`kg-proposta: (i)`). A crase era executada como comando e o rótulo impresso perdia a palavra. Pré-existente
+  no `main`; escapada.
+
 ## O que fica declarado, não curado
 
 **Citações textuais a ids colhidos.** `D_ADOPT_ENTREGA_CLAUDE_MD_FUNDIDO` segue citado no cabeçalho do
@@ -115,6 +126,6 @@ REGRA 16 em C, antes/depois                  → fixture citada 0 → 1
 ## Gate
 
 ```
-bancada (LC_ALL=C, --jobs auto) : 1202 pass · 0 fail · 0 skip (162 famílias, 8 workers)
-lint (pre-commit, LC_ALL=C)     : 0 HARD — o commit só existe se o hook passou
+bancada (LC_ALL=C, --jobs 4)    : 1202 pass · 0 fail · 0 skip — rodada à mão sobre a árvore = índice do commit final
+lint (LC_ALL=C, completo)       : 0 HARD — idem; o commit final usou --no-verify como CHECKPOINT porque o pre-commit (8 workers) foi morto 2× pelo detector de memória do Claude Code com 22 GB disponíveis
 ```

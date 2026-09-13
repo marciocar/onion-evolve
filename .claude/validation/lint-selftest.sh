@@ -7537,7 +7537,7 @@ YML
   d="$(mktemp -d)"; _mkp "$d"; _prop "$d" nome-comum.kg.yaml com-target
   rc=0; bash "$d/.claude/validation/kg-radar.sh" "$d/nome-comum.kg.yaml" --integrity >"$d/o" 2>&1 || rc=$?
   if [ "${rc}" -eq 0 ] && grep -q 'meta.target' "$d/o"; then
-    record_pass "kg-proposta: (i) `meta.target` sozinho (nome de arquivo COMUM) dispara o modo — o outro gatilho tem guarda propria"
+    record_pass "kg-proposta: (i) \`meta.target\` sozinho (nome de arquivo COMUM) dispara o modo — o outro gatilho tem guarda propria"
   else record_fail "kg-proposta: (i)" "rc=${rc} — o gatilho meta.target nao dispara sem o sufixo: $(head -3 "$d/o" | tr '\n' ' ')"; fi
   rm -rf "$d"
 
@@ -13076,12 +13076,20 @@ run_plugin_version_derived_selftests() {
   if [ "${_merge_rc}" -ne 0 ]; then
     record_pass "plugin-version-derived: (j1) 2o PR concorrente sem rebase CONFLITA no git — a colisao nao entra calada"
   else record_fail "plugin-version-derived: (j1)" "o merge do 2o PR NAO conflitou — a 1a barreira do teto sumiu (formato da projecao mudou?)"; fi
-  # resolucao DESCUIDADA: aceita o plugins/ de um lado
-  ( cd "$e" && git checkout --theirs plugins/ && git add -A && git -c user.email=t@t -c user.name=t commit -qm sqB-descuidado ) >/dev/null 2>&1
-  _j2_c="$(_vof "$e/plugins/probe")"; _t="$(mktemp -d)"; _regen "$e" "$_t/probe"; _j2_d="$(_vof "$_t/probe")"
-  if [ -n "${_j2_c}" ] && [ "${_j2_c}" != "${_j2_d}" ]; then
+  # resolucao DESCUIDADA: aceita o plugins/ de UM lado (o do prB), por checkout EXPLICITO da branch e
+  # nao por `--theirs`. Medido 2026-09-13: o caso passava no git 2.43 local e MATAVA o worker no git 2.55
+  # do CI (a familia "reivindicada e NAO concluida") — a resolucao por estagio de conflito depende da
+  # versao do git, e um passo que falha sob `set -e` nao reprova, some. Agora nenhum passo pode sumir:
+  # cada um tolera a falha e o caso REPROVA dizendo em qual parou.
+  local _j2_step="ok"
+  ( cd "$e" && git checkout prB -- plugins/ && git add -A && git -c user.email=t@t -c user.name=t commit -qm sqB-descuidado ) >/dev/null 2>&1 || _j2_step="resolucao-nao-commitou"
+  _t="$(mktemp -d)"
+  _j2_c="$(_vof "$e/plugins/probe" 2>/dev/null || true)"
+  _regen "$e" "$_t/probe" || _j2_step="${_j2_step}+regen-falhou"
+  _j2_d="$(_vof "$_t/probe" 2>/dev/null || true)"
+  if [ "${_j2_step}" = "ok" ] && [ -n "${_j2_c}" ] && [ -n "${_j2_d}" ] && [ "${_j2_c}" != "${_j2_d}" ]; then
     record_pass "plugin-version-derived: (j2) resolucao descuidada e pega pela REGRA 19 — commitado ${_j2_c}, derivado ${_j2_d}"
-  else record_fail "plugin-version-derived: (j2)" "commitado ${_j2_c} = derivado ${_j2_d} — a 2a barreira do teto sumiu: a colisao passaria calada"; fi
+  else record_fail "plugin-version-derived: (j2)" "passo=${_j2_step} · commitado=[${_j2_c}] derivado=[${_j2_d}] — se os dois batem, a 2a barreira do teto sumiu e a colisao passaria calada"; fi
   rm -rf "$_t" "$e"
 
   # (i) IDEMPOTENCIA — regenerar sem mudar conteudo NAO pode andar. Sem isto a versao dispararia a
