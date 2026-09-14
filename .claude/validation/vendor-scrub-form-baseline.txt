@@ -4,11 +4,19 @@
 # Legítimos aqui: sigla do ofício (M&A, Q&A, V&V), nome FICTÍCIO de exemplo, citação acadêmica.
 # Nome de cliente REAL não se tolera: remove-se do texto.
 .claude/agents/product/extract-meeting-specialist.md|Firebase
-.claude/agents/product/pain-price-specialist.md|Espec
+.claude/agents/product/pain-price-specialist.md|Específico
 .claude/agents/product/pain-price-specialist.md|StartupXYZ
 .claude/commands/product/analyze-pain-price.md|TechStartup
+.claude/validation/lint-artifacts.sh|PoC
+.claude/validation/lint-selftest.sh|PoC
 .claude/validation/vendor-scrub-form-check.sh|Acme
 .claude/validation/vendor-scrub-form-check.sh|Acme&Co
 .claude/validation/vendor-scrub-form-check.sh|Baker&Sons
+.claude/validation/vendor-scrub-form-check.sh|IBM Brasil
+.claude/validation/vendor-scrub-form-check.sh|Itaú
+.claude/validation/vendor-scrub-form-check.sh|XY&Z
+.claude/validation/vendor-scrub-form-check.sh|Xyz
+docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md|Startup
 docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md|Firebase
 docs/knowledge-base/education/README.md|Winne&Hadwin
+docs/knowledge-base/platforms/runflow.md|Tool

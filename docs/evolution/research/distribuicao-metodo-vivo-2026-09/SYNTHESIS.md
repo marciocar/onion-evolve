@@ -84,22 +84,25 @@ autobiografia e projeto. O que "sobra" é maior que o que viaja — não é res�
 
 ## NÃO-VERIFICADOS
 
-- **Licença (`Q_LICENCA_APOS_MIT_JA_CONCEDIDA`):** a fonte fechou — PolyForm Internal Use é a que cabe no
-  caso ("usa e modifica internamente, não distribui, não sublicencia"). A **decisão** não: MIT já saiu, não
-  retroage, e o corpus é majoritariamente **prosa**, para a qual licença de software é a forma errada (a
-  thoughtbot usa Creative Commons no playbook).
-- **Marca (`Q_MARCA_ONION_TITULARIDADE_NAO_MEDIDA`):** nada foi medido sobre titularidade ou registro do
-  nome "Onion". A licença apenas **não concede**; ela não protege.
-- **Fronteira executável (`Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT`):** separação física no tronco ou allowlist no
-  gerador — as duas com precedente, nenhuma implementada.
-- **Plugin como veículo (`Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR`):** o canal de plugin entrega **consumo**
-  (install ≠ adopt), e a pergunta pede um repo que o cliente **evolui**. Marketplace privado e distribuição
-  por organização existem, mas resolvem privacidade, não evolução.
-- **O mecanismo próprio não foi medido:** nenhuma claim tocou o `/meta:adopt --update` nem o
-  `vendor-branch.sh` — e a memória já os registra como **papel-cego**. O Elenxo é explícito: antes de nova
-  rodada externa, **medir o que já existe aqui**.
-- **A fronteira em quem publica método:** as duas claims que tocariam o corte doutrina × vida interna
-  **caíram na ancoragem** por exaustividade indevida.
+> **Estado desta lista em 2026-09-14.** Ela foi escrita em 09-13 e **quatro dos seis itens deixaram de ser
+> verdade** com as seções que vieram depois — a passada adversarial pegou a contradição, porque eu editei o
+> arquivo em volta dela sem reconciliá-la. Não se apaga (Aufhebung): cada item fica com o que o superou.
+
+- ~~**Licença (`Q_LICENCA_APOS_MIT_JA_CONCEDIDA`):** a fonte fechou … a **decisão** não~~ — **SUPERADO**: o
+  maestro selou em 09-14 (`D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC`). O que a rodada apurou sobre PolyForm e
+  sobre prosa continua valendo como razão da escolha.
+- ~~**Marca:** nada foi medido sobre titularidade ou registro~~ — **PARCIALMENTE SUPERADO**: a rodada de
+  marca de 09-14 mediu **custo, classe e o que a lei dá sem registro** (5 nós `E_MARCA_*`). Segue não
+  medida a **colidência real na base do INPI** — e é ela que gateia `Q_MARCA_DEPOSITAR_CLASSE_42_AGORA`.
+- ~~**Fronteira executável:** as duas com precedente, nenhuma implementada~~ — **SUPERADO**: a allowlist é a
+  SSOT `vendor-manifest.sh`, e a fronteira desceu do diretório ao arquivo (`--stub-baselines`).
+- **Plugin como veículo:** segue válido como razão — install ≠ adopt. O veículo selado usa o `/meta:adopt`
+  no repo do cliente exatamente por isso.
+- ~~**O mecanismo próprio não foi medido**~~ — **SUPERADO** pela seção "A medição do mecanismo próprio",
+  que é o que o Elenxo exigiu. Nota: o `--update` e o `vendor-branch.sh` foram medidos; **`--role` continua
+  papel-cego**, agora com a agravante de existir como flag que não corta.
+- **A fronteira em quem publica método:** segue não verificada — as duas claims caíram na ancoragem por
+  exaustividade indevida, e nenhuma rodada posterior a retomou.
 
 ## valeu-a-pena
 
@@ -139,11 +142,22 @@ plugins e comandos; o corte da consultoria é papel para **pathspec**. Eu tinha 
 2. **A fronteira desceu do diretório ao arquivo:** `--stub-baselines` cura na **emissão** (o passivo do
    core não vira dívida do cliente) e `--check-bundle` reprova se um baseline emitido citar caminho
    privado.
-3. **`--role` nasce no transporte** (`adopted|hub|standalone`), com papel desconhecido falhando alto. O
-   corte por papel — tirar a meta-fábrica do `standalone`, como o `onion-standalone` provou — fica
-   **nomeado e não implementado**: é execução, não decisão.
+3. **`--role` é VALIDADO e não corta nada — e esta frase é uma correção.** A redação anterior desta
+   seção dizia que *"o `--role` nasce no transporte"*, insinuando que ele já recorta a lista. **Não
+   recorta**: a passada adversarial de 2026-09-14 mediu `--role adopted|hub|standalone` e as três
+   listas são **idênticas**; no código, `ROLE` é inicializado, parseado, validado contra os três
+   nomes — e **nunca mais lido**. O que existe hoje é o vocabulário do papel e a recusa alta a papel
+   desconhecido; o corte segue **nomeado e não implementado**.
+   **E isto é pior que o gap anterior, não melhor:** antes não havia papel nenhum e quem publicasse
+   um standalone sabia que precisava cortar à mão. Agora há uma flag que aceita `standalone` e
+   entrega a meta-fábrica inteira — **63 arquivos** (`adopt`, `marketplace`, `vertical`,
+   `federation-transport`, `wizard`) mais os 43 comandos de `meta/`. Gap aberto virou **gap
+   invisível**, que é a forma que esta casa mais persegue. Fio irmão: [[adopt-update-e-papel-cego]].
 
-Bancada: família `vendor_manifest` com 8 casos, incluindo mutante que reprova quando a lista literal volta.
+Bancada: família `vendor_manifest` com 8 casos. O **mutante** é o `(g)` — reprova quando um caminho de
+material sob NDA entra na lista; a asserção sobre a lista literal é o caso `(h)`, um `grep` nas quatro
+superfícies vivas, e **não** um mutante. (A redação anterior trocava os dois: chamava de mutante o que
+não muta nada — e a garantia que ela vendia era justamente a que não existia.)
 
 ## O que o maestro selou em 2026-09-14
 
@@ -179,8 +193,9 @@ sem ampersand e sem âncora continua invisível — alargar o padrão mataria a 
 
 1. **Levar o `onion-standalone` público ao core atual completo** — é o veículo selado, e a publicação em si é
    ato do maestro (outward-facing).
-2. **Implementar o corte por papel** no `--role standalone`, agora que o transporte tem papel — mesmo com o
-   corte selado em "tudo", o mecanismo continua existindo para quem quiser menos.
+2. **Implementar o corte por papel** no `--role standalone` — hoje a flag é aceita e não corta nada (as
+   três listas são idênticas). Enquanto isso não for feito, `--role standalone` **não deve ser usado como
+   se recortasse**: ele entrega a base inteira, meta-fábrica incluída.
 3. **Busca de colidência no INPI** (10 minutos do maestro) — é a condição declarada de
    `Q_MARCA_DEPOSITAR_CLASSE_42_AGORA`.
 4. ~~Medir o mecanismo próprio~~ · ~~desenhar a allowlist executável~~ · ~~o maestro decide as quatro

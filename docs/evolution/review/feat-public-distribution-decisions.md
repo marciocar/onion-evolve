@@ -2,19 +2,20 @@
 title: 'Resíduo — as decisões da distribuição pública, e o vazamento que só a decisão de publicar encontrou'
 date: 2026-09-14
 branch: feat/public-distribution-decisions
-reviewed_diff_sha256: be129b380c965c04d2facafdb52e4062db5b9f3cbad526e7744f6af76c83681b
-findings_total: 7
-findings_real: 7
-findings_fixed: 6
-tokens: 0
-duration_min: 0
+reviewed_diff_sha256: dad5f6876e236e1b3fcabd5eb6c6c421409756b4812dd06a633746ed85f42eb0
+findings_total: 23
+findings_real: 23
+findings_fixed: 17
+tokens: 561316
+duration_min: 39
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >-
-  Este PR não é código novo: é o SELO de sete decisões do maestro mais a cura que a primeira delas obrigou.
-  O achado que domina o resíduo não veio de passada adversarial — veio da regra de medir antes de publicar:
-  havia nome comercial de um cliente real em dois arquivos que viajam para todo adotante, e a guarda que
-  existe exatamente para isso não o via.
+  O selo de sete decisões do maestro, a cura que a primeira delas obrigou, e uma passada adversarial que
+  REPROVOU o próprio PR. O CI não revisou (o revisor morreu com 9 negações de permissão e caiu em
+  soft-pass); o maestro mandou rodar a passada própria e ela pagou: 3 refutadores independentes, 16 HARD.
+  A ironia que ela expôs é o achado central — a guarda que eu escrevi PORQUE guarda-de-lista falha pelo
+  vocabulário estava, ela própria, atrás do gate da lista, e morta no destino da maioria dos adotantes.
 ---
 
 # Selei sete decisões, a decisão de publicar achou o vazamento, e uma mensagem prestativa quebrou a adoção
@@ -122,6 +123,87 @@ guarda que passa isolada e degrada na faixa paralela por **ambiente herdado**, n
 esta mudança. O que fica como fio próprio: **skip silencioso é fail-open** — um sumário que anuncia
 "1226 exercidas" quando 1228 existiam trata ausência como aprovação. Gatilho para curar: a próxima vez
 que um caso sumir da faixa, ou o primeiro defeito real que escapar por ali.
+
+## A passada adversarial de verdade — 3 refutadores, 16 HARD, e ela reprovou
+
+O `onion-review-verdict` do CI ficou **vermelho por desenho**: o revisor semântico morreu com
+`permission_denials_count: 9` (tentou postar comentário, não tem ferramenta) e caiu em soft-pass. O
+mecanismo diz que mergear assim é decisão humana consciente; o maestro mandou rodar a passada própria.
+
+Três refutadores independentes, com lentes distintas (maquinaria e shell · o artefato mente? · pelo lado
+do adotante, simulando a adoção inteira). **Os três REPROVARAM.** Os que eram meus, e que curei aqui:
+
+**1. A cura para "lista falha pelo vocabulário" estava atrás do gate da lista.** A metade por FORMA
+nasceu como bloco no fim de `check_vendored_surface_clean`, e ali ficava atrás de **dois `return 0` que
+não são dela**: `IS_LEAF` (isenção de adotante-folha, que existe por CIRCULARIDADE da derivação — a forma
+não tem essa circularidade) e `[ -n "${terms}" ]`. Consequências medidas: em `role: adopted` — **o destino
+da maioria** — o detector era **código morto**; e com `members.yaml` enxuto ele não varria nada, **em
+silêncio**. Cura estrutural: função própria (`check_vendored_surface_form`), chamada ao lado da irmã.
+Quem não compartilha a precondição não compartilha a função.
+
+**2. O detector não pegava metade do vazamento que o motivou.** O identificador real tinha duas partes —
+sigla com ampersand e nome em caixa alta mais substantivo. O ampersand pegava a primeira; a âncora **não
+pegava a segunda, na mesma frase**, porque o padrão exigia `[A-Z][a-z]`. Se o cliente se chamasse só pela
+segunda metade, a guarda nasceria **cega para o caso que a criou**. Junto caíam preposição
+(`cliente da X`), dois-pontos (`adotante: X`) e acento (`PoC Itaú` virava a chave `Ita` sob `LC_ALL=C`, e
+tolerar `Ita` passa a tolerar `Itamar`). **Cura medida em duas voltas:** a primeira aceitou caixa alta
+sozinha e o repo saltou de 9 para **36 candidatos**, 27 deles ênfase de prosa (`adotante NÃO registrado`).
+A segunda exige **segundo token em forma de nome** — 17 candidatos, e o teto passou a ser declarado com
+número em vez de suposição.
+
+**3. O `--selftest` do detector media uma réplica.** Re-implementava o `grep` inline em vez de chamar
+`_scan`; mutar `_scan` para `return 0` deixava **produção cega e selftest verde**. Agora ele chama o
+caminho real — provado com mutante (`rc=1`, não pegou nenhum dos 5 nomes).
+
+**4. A metade por FORMA ignorava `--only`** e reportava violação de arquivo **alheio**, quebrando o
+contrato do flag num lint que a bancada invoca centenas de vezes. Caso `(h)` cobre.
+
+**5. `_archive_staged` desfazia a própria cura em 17% das vezes.** `git write-tree` disputa
+`.git/index.lock` com os workers paralelos e caía para HEAD atrás de `2>/dev/null || true` — medido pelo
+refutador: 16 falhas silenciosas em 90 chamadas. **Declarado como teto**, não curado aqui: a cura é
+repassar a falha, e ela mexe no laço das faixas.
+
+**6. A guarda me pegou duas vezes escrevendo os próprios comentários.** Ao explicar o defeito eu
+**reintroduzi o nome do cliente** no arquivo da guarda que existe para pegá-lo — e o detector o acusou. E
+o exemplo `empresa GRANAAI` que usei foi pego pela **primeira** metade da REGRA 36, porque `granaai` é
+adotante registrado. Os dois saíram; a explicação ficou com a FORMA, sem o identificador.
+
+**7. O `# REGRA 36 —` do cabeçalho novo virou uma segunda declaração da regra** para o
+`rules-registry.sh`, que abortou por duplicata e derrubou dois geradores. Cabeçalho reescrito para não
+casar o padrão de declaração.
+
+### As afirmações falsas que o artefato fazia, corrigidas
+
+- **`--role` é decorativo.** Eu escrevia que ele *"nasce no transporte"*. Medido: `adopted|hub|standalone`
+  devolvem listas **idênticas**; `ROLE` é inicializado, parseado, validado e **nunca mais lido**. Pior que
+  o gap anterior: antes não havia papel, agora há flag que aceita `standalone` e entrega a meta-fábrica
+  (63 arquivos + 43 comandos de `meta/`). **Gap aberto virou gap invisível.**
+- **Os mutantes.** Eu descrevia como mutante, nas duas famílias, um caso que não muta nada — e a garantia
+  que a prosa vendia era justamente a que não existia.
+- **`LICENSE-DOCS` dizia que "este repositório" foi publicado sob MIT.** Ele é **privado**. E faltava o
+  que mais importa: **doze arquivos de `plugins/*/kb/` já publicaram a doutrina sob MIT** (Elenxo,
+  dogfooding, KG-SDAAL, ontologia, behavior-over-declaration; três byte-idênticos à knowledge-base). A
+  licença nova reivindicava NC sobre o que ela mesma declara irretratável.
+- **A licença não viajava.** Manifesto com 11 raízes, **nenhuma** de licença, enquanto **quatro** delas
+  são o material que o `LICENSE-DOCS` cobre. Adotante commitava 104 arquivos NC num repo com o LICENSE
+  dele: relicenciamento silencioso feito pela nossa máquina. **Curado:** `LICENSE` e `LICENSE-DOCS` entram
+  no manifesto (13 raízes).
+- **A seção NÃO-VERIFICADOS contradizia quatro afirmações do próprio arquivo** — eu editei em volta dela
+  sem reconciliar. Agora cada item traz o que o superou (Aufhebung, não apagamento).
+- **A síntese estreitou o desconto do INPI** para "com CNPJ ME/EPP/MEI"; o nó-fonte diz apenas *"440,00
+  com desconto"*. A projeção afirmava mais que a fonte.
+
+### O que os refutadores acharam e NÃO entra aqui (fio próprio, gatilho nomeado)
+
+- **O adotante greenfield nasce com 1–2 HARD** porque `docs/onion/` nunca é criado no alvo e o erro é
+  engolido por `2>/dev/null || true`. **Pré-existente** (confirmado em `27179d37^`), mas é passivo do core
+  cobrado do adotante. Gatilho: a próxima adoção real.
+- **`--check-bundle` usa regex redigida** (`docs/(discussions|analysis|materials|applying)/`) em vez da
+  SSOT que o mesmo arquivo acabou de criar — `docs/onion` não está nela, então grafo do core passa como
+  "bundle limpo".
+- **`plugins/` — a superfície de fato PÚBLICA — não é varrida** por detector nenhum.
+- **`projection-safety.sh --emit-terms` escreve erro em stdout**; o lint ignora o rc e usa as linhas de
+  erro **como termos de busca**, desarmando a primeira metade da REGRA 36 sem uma palavra.
 
 ## O que fica ABERTO, com dono e gatilho
 

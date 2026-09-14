@@ -439,6 +439,31 @@ SSOT_KB_DRIFT="$(( ${SSOT_KB_TOTAL:-0} + 5 ))"
 record_pass() { PASS=$((PASS + 1)); echo "  ✓ ${1}"; }
 record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} — ${2}"; }
 
+# _archive_staged <destdir> <pathspec...> — extrai para <destdir> a superfície do que VAI SER
+# COMMITADO, e não a do que já está commitado.
+#
+# ⚠️ POR QUE O ÍNDICE E NÃO `HEAD` — recorrência CURADA em 2026-09-14, na SEGUNDA ocorrência:
+# fixture que nasce de `git archive HEAD` testa o estado JÁ COMMITADO, então a mudança que está
+# no staging é INVISÍVEL para ela. O efeito medido é sempre o mesmo e é o pior possível: a
+# bancada local passa verde, o commit entra, e o CI reprova sobre o mesmo código — porque no CI
+# a mudança já é HEAD.
+#   1ª (registrada no caso (e) desta família): o emissor `kg-yaml-validity` só passou a existir
+#      no HEAD depois do commit; o sandbox não era repo git e o relatório saiu deformado.
+#   2ª (esta): uma mensagem de remediação nova pôs `--emit-baseline` no `lint-artifacts.sh` pela
+#      primeira vez, tornando o LINT candidato a emissor de 8 baselines. Bancada local 1227/0/0,
+#      CI com 2 falhas, mesmo código.
+# A 1ª ficou NOMEADA e SEM CURA — por isso voltou. `git write-tree` materializa a árvore do
+# ÍNDICE, que é exatamente o que o pre-commit vai commitar: a bancada passa a espelhar o runner.
+# Sem índice legível (repo sem commit, merge em conflito) cai para HEAD e o comportamento antigo.
+_archive_staged() {
+  local _dest="$1"; shift
+  local _tree
+  _tree="$(git -C "${REPO_ROOT}" write-tree 2>/dev/null || true)"
+  [ -n "${_tree}" ] || _tree=HEAD
+  git -C "${REPO_ROOT}" archive "${_tree}" -- "$@" 2>/dev/null | tar -x -C "${_dest}" 2>/dev/null
+}
+
+
 # ── COPIAR O RADAR/A LENTE PARA MUTAR: a lib VAI JUNTO ──────────────────────────────────────────
 # Desde 2026-08-09 o fator de status vive em SITIO UNICO (`lib/status-factor.awk`) e os consumidores
 # saem 2 sem ele — de proposito, porque fonte ausente nunca vira aprovacao. Consequencia medida: SEIS
@@ -4275,6 +4300,51 @@ run_vendor_scrub_form_selftests() {
     record_pass "vendor-scrub-form: (f) M&A, Q&A e V&V não viram candidato (1 letra de cada lado)"
   else record_fail "vendor-scrub-form: (f)" "sigla do ofício virou candidato: ${out:0:200}"; fi
   rm -rf "${d}" "${mut}"
+
+  # ── (g) A METADE POR FORMA RODA EM `role: adopted` E SEM `members.yaml` ────────────────────────
+  # Os DOIS defeitos que a passada adversarial de 2026-09-14 achou, e que matavam a guarda no
+  # destino que mais importa. Ela nasceu como bloco no fim de `check_vendored_surface_clean` e
+  # ficou atrás de dois `return 0` que não são dela:
+  #   · `IS_LEAF` — a isenção de adotante-folha existe por CIRCULARIDADE da derivação do
+  #     members.yaml; a forma não tem essa circularidade e morria junto. Em `role: adopted` — o
+  #     destino da MAIORIA — o detector era código morto.
+  #   · `terms` vazio — a guarda que existe PORQUE a lista não vê o não-registrado só rodava SE a
+  #     lista produzisse vocabulário. Com members.yaml enxuto, silêncio.
+  # Este caso prova os dois pela BORDA REAL (o lint inteiro num alvo simulado), não pelo predicado.
+  local _gd _gout
+  _gd="$(mktemp -d)"
+  _archive_staged "${_gd}" .claude/validation .claude/utils .claude/commands
+  mkdir -p "${_gd}/.claude" "${_gd}/docs/evolution/federation"
+  printf 'role: adopted\n' > "${_gd}/.claude/.onion-version"                 # FOLHA: IS_LEAF=1
+  printf 'members: []\n' > "${_gd}/docs/evolution/federation/members.yaml"   # e SEM vocabulário
+  printf 'a PoC Zelda&Filhos foi medida\n' > "${_gd}/.claude/commands/vaza-g.md"
+  _gout="$(cd "${_gd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if grep -q 'vendor-scrub/FORMA' <<< "${_gout}" && grep -q 'Zelda&Filhos' <<< "${_gout}"; then
+    record_pass "vendor-scrub-form: (g) a metade por FORMA roda em role:adopted E com members.yaml vazio"
+  else record_fail "vendor-scrub-form: (g)" "o detector não cobrou num adotante-folha sem termos derivados — voltou a ser código morto no destino majoritário"; fi
+
+  # (g-MUT) prova que (g) não é vacuidade: sem o nome plantado, nenhum HARD de FORMA aparece.
+  rm -f "${_gd}/.claude/commands/vaza-g.md"
+  _gout="$(cd "${_gd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
+  if ! grep -q 'Zelda&Filhos' <<< "${_gout}"; then
+    record_pass "vendor-scrub-form: (g-MUT) sem o nome plantado a guarda cala — (g) mede o nome, não o ruído"
+  else record_fail "vendor-scrub-form: (g-MUT)" "acusou o nome que já foi removido — (g) não prova nada"; fi
+  rm -rf "${_gd}"
+
+  # ── (h) `--only` NÃO carrega a varredura de repo ──────────────────────────────────────────────
+  # A 1ª redação varria ${REPO_ROOT} inteiro mesmo sob `--only`, quebrando o contrato do flag
+  # (`REGRA DE REPO, NÃO DE ARQUIVO — sai cedo sob --only`) e reportando violação de arquivo
+  # ALHEIO. A bancada invoca o lint com `--only` centenas de vezes: cada uma carregava o repo.
+  local _hd _hout
+  _hd="$(mktemp -d)"
+  _archive_staged "${_hd}" .claude/validation .claude/utils .claude/commands
+  printf 'a PoC Zelda&Filhos foi medida\n' > "${_hd}/.claude/commands/vaza-h.md"
+  printf '# limpo\n' > "${_hd}/.claude/commands/limpo-h.md"
+  _hout="$(cd "${_hd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${_hd}/.claude/commands/limpo-h.md" 2>&1 || true)"
+  if ! grep -q 'vendor-scrub/FORMA' <<< "${_hout}"; then
+    record_pass "vendor-scrub-form: (h) sob --only a metade por FORMA sai cedo (não reporta arquivo alheio)"
+  else record_fail "vendor-scrub-form: (h)" "sob --only reportou candidato de OUTRO arquivo — contrato do --only quebrado"; fi
+  rm -rf "${_hd}"
 }
 _family run_vendor_scrub_form_selftests
 
@@ -8805,30 +8875,6 @@ run_task_manager_hook_selftests() {
 # de catraca, e numa adoção greenfield real o `kg-verification-baseline.txt` chegou com 47 chaves
 # de grafos do CORE → o lint do adotante nasceu com 47 HARD cobrando nós que ele nunca teve. O
 # caso (b) abaixo é ESSE defeito, reduzido a fixture: se alguém quebrar a regeneração, ele volta.
-# _archive_staged <destdir> <pathspec...> — extrai para <destdir> a superfície do que VAI SER
-# COMMITADO, e não a do que já está commitado.
-#
-# ⚠️ POR QUE O ÍNDICE E NÃO `HEAD` — recorrência CURADA em 2026-09-14, na SEGUNDA ocorrência:
-# fixture que nasce de `git archive HEAD` testa o estado JÁ COMMITADO, então a mudança que está
-# no staging é INVISÍVEL para ela. O efeito medido é sempre o mesmo e é o pior possível: a
-# bancada local passa verde, o commit entra, e o CI reprova sobre o mesmo código — porque no CI
-# a mudança já é HEAD.
-#   1ª (registrada no caso (e) desta família): o emissor `kg-yaml-validity` só passou a existir
-#      no HEAD depois do commit; o sandbox não era repo git e o relatório saiu deformado.
-#   2ª (esta): uma mensagem de remediação nova pôs `--emit-baseline` no `lint-artifacts.sh` pela
-#      primeira vez, tornando o LINT candidato a emissor de 8 baselines. Bancada local 1227/0/0,
-#      CI com 2 falhas, mesmo código.
-# A 1ª ficou NOMEADA e SEM CURA — por isso voltou. `git write-tree` materializa a árvore do
-# ÍNDICE, que é exatamente o que o pre-commit vai commitar: a bancada passa a espelhar o runner.
-# Sem índice legível (repo sem commit, merge em conflito) cai para HEAD e o comportamento antigo.
-_archive_staged() {
-  local _dest="$1"; shift
-  local _tree
-  _tree="$(git -C "${REPO_ROOT}" write-tree 2>/dev/null || true)"
-  [ -n "${_tree}" ] || _tree=HEAD
-  git -C "${REPO_ROOT}" archive "${_tree}" -- "$@" 2>/dev/null | tar -x -C "${_dest}" 2>/dev/null
-}
-
 run_regen_baselines_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/regen-baselines.sh"
   if [ ! -f "${helper}" ]; then record_fail "regen-baselines" "helper ausente: ${helper}"; return; fi
