@@ -9,7 +9,7 @@ meta:
                              # 12m (doutrina), mas quem CADUCA primeiro manda: se a plataforma mudar, a resposta
                              # de VEICULO muda antes de qualquer licenca mudar.
   # kg-backlog-guard: on
-  # ═══ TETO: 35 NÓS. Rodada de PRIMARIAS executada em 2026-09-13 (grafo criado nesta rodada). Cresce só se
+  # ═══ TETO: 39 NÓS (era 35: +4 pela MEDIÇÃO do mecanismo próprio, que o Elenxo impôs antes de nova fonte externa). Rodada de PRIMARIAS executada em 2026-09-13 (grafo criado nesta rodada). Cresce só se
   #     uma re-medicao das mesmas fontes emendar um achado, ou se o maestro abrir a rodada de VEICULO. ═══
   # Pesquisa /onion-research mode=primaries: onde passa a fronteira entre a DOUTRINA que deve viajar para um
   # cliente de consultoria que forka e evolui sozinho, e a BIOGRAFIA deste repo que nao deve viajar; qual
@@ -439,6 +439,59 @@ nodes:
     verified_against: 'ancorado nesta rodada: template nasce com historias nao-relacionadas e nao aceita PR/merge de volta; Copier e Cruft exigem revisao humana da colisao'
     label: 'Veiculo e canal de atualizacao NAO sao duas escolhas, sao uma: quem escolhe TEMPLATE contrai, no mesmo ato, a divida de um segundo mecanismo de update que esta rodada nao mediu (historias nao-relacionadas matam PR e merge); quem escolhe FORK herda conexao de UI mas copia a arvore inteira, biografia junto; quem escolhe PLUGIN em marketplace privado transporta maquinaria mas nao o corpus de prosa, e perde a privacidade se o cliente distribuir pela organizacao dele. A exigencia que os tres precedentes de scaffolding concordam: colisao entre doador e dono se resolve por HUMANO, com o diff a vista, nunca em silencio. Pergunta: qual par veiculo+canal, sabendo que o modelo do Copier/Cruft (gerar projeto a partir de respostas) nao e o do Onion (vendorizar corpus)? NAO SELADA.'
     trace: 'https://copier.readthedocs.io/en/stable/updating/ · https://cruft.github.io/cruft/'
+  # ── MEDIÇÃO DO MECANISMO PRÓPRIO (o Elenxo impôs: medir o que já existe antes de fonte externa nova) ──
+  - id: E_ADOPT_JA_E_ALLOWLIST_MEDIDO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-13'
+    verified_against: 'procedimento de copia do adopt.md rodado VERBATIM num diretorio vazio: 680 arquivos chegaram; diario, sessions, beacons, identity, scratchpad, worktrees, settings.local.json, docs/{evolution,analysis,discussions,materials,applying,onion} e backlog.md NAO chegaram. Confirmado em 6 adotantes reais: zero tem .claude/diary ou members.yaml'
+    source_tier: 10
+    source_kind: internal-measurement
+    label: 'A FRONTEIRA DE DIRETORIO JA ESTA RESOLVIDA, e eu tinha afirmado o contrario. O `/meta:adopt` NAO copia arvore: ele usa ALLOWLIST de 11 pathspecs mais `git archive HEAD` — duas barreiras em serie, e a segunda garante que untracked/ignored nunca viajam. O `grep -c exclude` que eu citei como prova de ausencia de filtro deu ZERO porque o desenho NAO USA DENYLIST — que e exatamente o que a rodada de primarias recomendou. Medido por execucao, nao por leitura.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: E_QUATRO_COPIAS_DA_MESMA_LISTA_DUAS_DRIFTADAS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-13'
+    verified_against: 'adopt.md copiava 11 pathspecs; o `roots=` da REGRA 36 varria 9 e o `VENDORED_ROOTS` da REGRA 45 varria 9 — `.claude/rules` e `.claude/workflows` viajavam SEM ser varridos por nome comercial de cliente nem por link core-privado'
+    source_tier: 10
+    source_kind: internal-measurement
+    label: 'ERAM QUATRO COPIAS DA MESMA LISTA, nao tres como a medicao inicial disse: adopt.md (duas vezes, transporte e delta do --update), vendor-branch.sh, o `roots=` da REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente) e o `VENDORED_ROOTS` da REGRA 45 (Link vendorizado nao aponta caminho core-privado, com catraca). As DUAS guardas estavam defasadas do transporte. Guarda que varre MENOS do que o transporte emite e fail-open com cara de cobertura. CURADO: SSOT unica em vendor-manifest.sh, consumida pelas quatro superficies, com caso de bancada que reprova se a lista literal voltar.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: E_BASELINES_SAO_INDICE_DO_REPO_PRIVADO_E_JA_CHEGARAM
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: '2026-09-13'
+    verified_against: 'medido nos repos entregues: sacola-de-ideias 24 linhas, jogo-da-vida 24, venda-direta-pdi 24, portal-gamificacao 24, onion-adopt-granaa-ai 25 — todas citando docs/discussions, docs/analysis ou docs/materials do core; onion-standalone: 0 (nao passou pelo caminho padrao)'
+    source_tier: 10
+    source_kind: internal-measurement
+    label: 'A BIOGRAFIA QUE VAZA HOJE VAZA DENTRO DE DIRETORIO PERMITIDO. Os `*-baseline.txt` de .claude/validation/ sao INDICE NOMINAL do repo privado — 32 paths unicos, entre eles 5 arquivos do grafo pessoal do maestro — e nao sao LINK, entao a REGRA 45 nao os ve. Ja chegaram a 5 adotantes. CURADO na EMISSAO (nao no destino): `--stub-baselines` reescreve o baseline com o mesmo cabecalho que o regen-baselines semeia, e `--check-bundle` reprova se algum baseline emitido citar caminho privado. Para um cliente de consultoria, que forka e le tudo, a fronteira precisava descer do diretorio ao ARQUIVO — e desceu.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: E_ROLES_YAML_E_OUTRA_GRANULARIDADE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: '2026-09-13'
+    verified_against: 'resolve-role-bundle.sh resolve VERTICAIS (plugins) e WORK_TOOLS (comandos) a partir de roles.yaml; o corte do onion-standalone (274 arquivos a menos, zero a mais, meta-fabrica fora) e corte de PATHSPEC. Sao SSOTs de coisas diferentes; nenhuma invocacao de resolve-role-bundle.sh existe no adopt.md'
+    source_tier: 10
+    source_kind: internal-measurement
+    label: 'O `roles.yaml` NAO resolve o problema do transporte, e eu tinha proposto liga-lo ao adopt como se resolvesse. Ele mapeia papel->plugins/comandos; o corte que a consultoria precisa e papel->PATHSPEC. O `--role` do vendor-manifest.sh nasce com os tres papeis do transporte (adopted|hub|standalone) e hoje entrega a mesma base para os tres: o corte por papel (tirar a meta-fabrica do standalone, como o onion-standalone provou em 2026-07-19) fica NOMEADO e nao implementado — e essa e a proxima execucao, nao uma decisao do maestro.'
+    trace: '.claude/utils/marketplace/roles.yaml'
+
 edges:
   - from: E_FORK_CARREGA_HISTORIA_TEMPLATE_NASCE_LIMPO
     to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
@@ -638,3 +691,15 @@ edges:
   - from: E_LACUNAS_DISTRIBUICAO_0913
     to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
     edge_type: SUPPORTS
+  - from: E_ADOPT_JA_E_ALLOWLIST_MEDIDO
+    to: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
+    edge_type: SUPPORTS
+  - from: E_QUATRO_COPIAS_DA_MESMA_LISTA_DUAS_DRIFTADAS
+    to: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
+    edge_type: SUPPORTS
+  - from: E_BASELINES_SAO_INDICE_DO_REPO_PRIVADO_E_JA_CHEGARAM
+    to: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
+    edge_type: SUPPORTS
+  - from: E_ROLES_YAML_E_OUTRA_GRANULARIDADE
+    to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    edge_type: CONSTRAINS

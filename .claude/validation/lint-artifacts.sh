@@ -3213,8 +3213,19 @@ check_vendored_surface_clean() {
   # [[vendor-scrub-blind-spot]] · irmão do GAP3 (approx-count adopter-aware, dogfood de campo 2026-07-24).
   # (o crédito nominal do adotante fica no diário privado — esta guarda cobra isso, inclusive de mim)
   [ "${IS_LEAF}" -eq 1 ] && return 0
-  local roots=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks \
-               docs/meta-specs docs/knowledge-base docs/sdaal)
+  # RAÍZES DERIVADAS DO TRANSPORTE, não redigidas. Medido 2026-09-13: esta lista tinha 9 raízes e o
+  # `/meta:adopt` copiava 11 — `.claude/rules` e `.claude/workflows` VIAJAVAM e não eram varridos por
+  # nome comercial de cliente. Guarda que varre menos do que o transporte emite é fail-open com cara de
+  # cobertura. A SSOT é `.claude/utils/adopt/vendor-manifest.sh`; sem ela, FALHA FECHADA (lista vazia
+  # reprovaria tudo, então a ausência é HARD nomeada, nunca silêncio).
+  local _vm="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" roots=()
+  if [ -x "${_vm}" ] || [ -f "${_vm}" ]; then
+    while IFS= read -r _r; do [ -n "${_r}" ] && roots+=("${_r}"); done < <(bash "${_vm}" --repo "${REPO_ROOT}" --emit-scrub-roots 2>/dev/null || true)
+  fi
+  if [ "${#roots[@]}" -eq 0 ]; then
+    violation "HARD" ".claude/utils/adopt/vendor-manifest.sh" "REGRA 36 nao pode julgar: a SSOT do manifesto de vendorizacao nao respondeu (ausente ou vazia) — sem saber O QUE VIAJA, varrer e teatro. Restaure o script ou rode: bash .claude/utils/adopt/vendor-manifest.sh --emit-scrub-roots"
+    return 0
+  fi
   local targets=() r
   if [ -n "${ONLY_PATH}" ]; then
     local under=0

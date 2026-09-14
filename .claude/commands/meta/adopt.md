@@ -107,26 +107,24 @@ Usado pela **Fase 2** e pelo **`--update`**. Snippet self-contained (shell novo 
 SOURCE_ROOT="$(git rev-parse --show-toplevel)"
 DEST="<INSTALL_DIR — ver Fase 2>"
 
-# (a) MANIFESTO filtrado: só pathspecs que EXISTEM em HEAD — git archive aborta (exit 128) se um
-#     pathspec não casa nada. Filtrar evita o erro críptico de tar.
-want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows
-      docs/meta-specs docs/knowledge-base docs/sdaal)
-#     ⚠️ Novo path docs/ vendorizado aqui → refletir em .claude/utils/adopt/prettierignore-onion.tpl
-#       (proteção de formatador, passo (5) do Procedimento pós-cópia). .claude/* já coberto por `.claude/`.
-#     .claude/hooks: scripts dos SessionStart/PreCompact (incl. co-evolução "you have mail"). O REGISTRO
-#       dos hooks vive em .claude/settings.json → tratado na Fase 3 (never-clobber, não entra no cp cego).
-#     NÃO incluir .env.example aqui — é específico do alvo (clobber). Tratado em (e), never-clobber.
-#     NÃO incluir docs/evolution/ aqui — os canais inbox/inbound são infra LOCAL de cada repo; copiá-los
-#       clobaria o inbox/inbound EM USO do alvo. São provisionados idempotente (never-clobber) pelo passo
-#       (2) do «Procedimento de Configuração pós-cópia» — que roda tanto na adoção (Fase 3) quanto no --update.
-manifest=(); for p in "${want[@]}"; do
-  git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p" | grep -q . && manifest+=("$p")
-done
+# (a) MANIFESTO — a lista NÃO mora aqui: SSOT em `.claude/utils/adopt/vendor-manifest.sh`, que já
+#     filtra pelo que existe em HEAD (git archive aborta com pathspec vazio) e documenta o que NÃO
+#     viaja e por quê. Path novo, exclusão nova ou papel novo mexe-se LÁ — e um path docs/ novo
+#     pede eco em .claude/utils/adopt/prettierignore-onion.tpl.
+mapfile -t manifest < <(bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-manifest.sh" --role "${ONION_ROLE:-adopted}" --repo "$SOURCE_ROOT")
 
 # (b) Extrair para TMP (git archive = só a árvore TRACKED de HEAD → settings.local.json, sessions/,
 #     .onion-version, docs/{analysis,materials,applying} ficam AUTOMATICAMENTE de fora).
 TMP="$(mktemp -d)"
 git -C "$SOURCE_ROOT" archive HEAD -- "${manifest[@]}" | tar -x -C "$TMP"
+
+# (b.1) STUB DOS BASELINES — a biografia que a allowlist de DIRETÓRIO não alcança. Os `*-baseline.txt`
+#       de .claude/validation/ são índice NOMINAL do repo privado (medido 2026-09-13: 32 paths de
+#       docs/{discussions,analysis,materials}, incluindo 5 arquivos do grafo pessoal do maestro) e já
+#       chegaram assim a 5 adotantes. O passivo do CORE não é dívida do cliente: o baseline vai como
+#       stub e o `regen-baselines.sh` (passo 4 do pós-cópia) o preenche do corpus do ALVO.
+bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-manifest.sh" --stub-baselines "$TMP"
+bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-manifest.sh" --check-bundle "$TMP"   # exit 1 = NÃO copie
 
 # (c) DIFF vs o alvo (dry-run): novos, alterados e CONFLITOS (customização local) aparecem aqui.
 diff -rq "$TMP" "$DEST" 2>/dev/null || true
@@ -733,10 +731,10 @@ fi
 [ -n "$PIN_OK" ] && [ "$ADOPTED_COMMIT" = "$NOW" ] && { echo "Já atualizado ($NOW)."; exit 0; }
 
 # DELTA do framework desde a adoção (manifesto filtrado, como no Procedimento):
-want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows
-      docs/meta-specs docs/knowledge-base docs/sdaal .env.example)
-# ⚠️ Novo path docs/ vendorizado aqui → refletir em .claude/utils/adopt/prettierignore-onion.tpl (passo (5)).
-manifest=(); for p in "${want[@]}"; do git -C "$SOURCE_ROOT" ls-tree HEAD -- "$p" | grep -q . && manifest+=("$p"); done
+# A lista é a MESMA do transporte, e vem da SSOT (vendor-manifest.sh) — só o delta olha `.env.example`,
+# que no transporte é never-clobber e por isso não entra no manifesto.
+mapfile -t manifest < <(bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-manifest.sh" --repo "$SOURCE_ROOT")
+git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.env.example)
 # Delta só com pin VERIFICADO (senão o range mente); a cópia segura abaixo não depende do delta.
 [ -n "$PIN_OK" ] && git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"
 ```

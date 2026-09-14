@@ -29,9 +29,9 @@ VENDOR="onion/vendor"
 _manifest() {  # $1=SOURCE_ROOT → imprime pathspecs existentes, um por linha
   # .claude/workflows: a skill onion-research instrui Workflow({scriptPath:'.claude/workflows/onion-research.js'}) —
   # sem o dir o comando NASCE MORTO no adotante (sinal de campo de um adotante, 2026-09-04).
-  local want=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows \
-              docs/meta-specs docs/knowledge-base docs/sdaal) p
-  for p in "${want[@]}"; do git -C "$1" ls-tree HEAD -- "$p" | grep -q . && printf '%s\n' "$p"; done
+  # A lista vive UMA vez, em vendor-manifest.sh (SSOT). Quatro cópias eram três a mais, e duas já
+  # tinham driftado (medido 2026-09-13).
+  bash "${HERE}/vendor-manifest.sh" --repo "$1"
 }
 
 # ── GUARDA DE BASE CRUZADA ──────────────────────────────────────────────────────────────────
