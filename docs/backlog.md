@@ -292,7 +292,7 @@
 | 6.4 | `A_ADOTANTE_GREENFIELD_NASCE_COM_HARD` | passada-adversarial-2026-09 | ABERTO (pre-existente, medido pela simulacao de adocao): o adotante greenfield nasce com 4 HARD — `docs/onion/` nunca e criado n |
 | 6.4 | `A_ROLE_DECORATIVO_NO_TRANSPORTE` | passada-adversarial-2026-09 | ABERTO: `--role adopted·hub·standalone` devolve listas IDENTICAS — ROLE e inicializado, parseado, validado e nunca mais lido.  |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
-| 5.6 | `A_CURAR_O_REVISOR_DO_CI_COM_MECANISMO` | passada-adversarial-2026-09 | ABERTO: tirar do prompt a instrucao em prosa `nao tente postar comentario` e impedir a tentativa por MECANISMO (ferramenta ausente |
+| 5.6 | `A_CURAR_O_REVISOR_DO_CI_COM_MECANISMO` | passada-adversarial-2026-09 | CURA ESCRITA EM 2026-09-14, VALIDACAO PENDENTE — segue `open` de proposito. O que nomeou o alvo foi a propria medicao guardada n |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 
 ## inbox-sinais-2026-09 — 10 item(ns)

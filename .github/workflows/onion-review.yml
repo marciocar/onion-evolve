@@ -166,9 +166,27 @@ jobs:
           # tentativas. Seria REGRESSAO ESTRITA — hoje o revisor roda 41 turnos com sucesso.
           # Para reabilitar seria preciso passar o schema por ARQUIVO, e o input nao aceita isso
           # neste pin. Fio registrado; nao adivinhe de novo.
+          # ⚠️ `--allowedTools` EXPLÍCITO, e ele é a CURA da morte por negação de permissão.
+          # MEDIDO em 2026-09-14 (PR #827, 5 ciclos, revisor NUNCA revisou): `permission_denials_count: 9`,
+          # parada em 18 de 60 turnos, credencial sã (pré-voo HTTP 200). A assinatura já estava
+          # registrada algumas linhas acima, de 2026-08-07: `permission_denials_count: 14` E
+          # `No buffered inline comments` — e é essa segunda frase que NOMEIA o subsistema. Ele não
+          # tenta comentar solto: tenta postar COMENTÁRIO INLINE DE REVIEW, e morre acumulando negação.
+          # A defesa que existia era uma INSTRUÇÃO EM PROSA no prompt ("NÃO tente postar comentário");
+          # ele a ignorou nas DUAS ocorrências. Conselho onde precisava de mecanismo.
+          # Com a allowlist explícita a ferramenta não está na lista dele — não há o que tentar.
+          # O conjunto é o que o mandato de fato exige: LER. O prompt já proíbe tocar a árvore
+          # ("NUNCA modifique a árvore de trabalho — revise só com comandos de LEITURA").
+          # ⚠️ TETO DECLARADO, e ele é grande: ISTO NÃO PÔDE SER VALIDADO NO PR QUE O ESCREVEU.
+          # PR que edita este arquivo faz a action SE AUTO-PULAR (o caso BENIGNO do verdict, algumas
+          # centenas de linhas abaixo), então o fix sai verde SEM ter sido exercido. Quem confere é o
+          # PR SEGUINTE ao merge: se o revisor voltar a revisar, a cura pegou; se morrer em t=0 com
+          # zero turnos, a allowlist está estreita demais e o caminho é alargá-la — nunca removê-la,
+          # porque sem ela a morte por negação volta.
           claude_args: |
             --model claude-sonnet-5
             --max-turns 60
+            --allowedTools Read Grep Glob Bash
 
       # ═══ O SINAL VERDADEIRO (2026-08-03) ═══
       # `steps.review.outcome` MENTE: a action sai com exit 0 mesmo quando o agente morre —
@@ -259,9 +277,27 @@ jobs:
           # tentativas. Seria REGRESSAO ESTRITA — hoje o revisor roda 41 turnos com sucesso.
           # Para reabilitar seria preciso passar o schema por ARQUIVO, e o input nao aceita isso
           # neste pin. Fio registrado; nao adivinhe de novo.
+          # ⚠️ `--allowedTools` EXPLÍCITO, e ele é a CURA da morte por negação de permissão.
+          # MEDIDO em 2026-09-14 (PR #827, 5 ciclos, revisor NUNCA revisou): `permission_denials_count: 9`,
+          # parada em 18 de 60 turnos, credencial sã (pré-voo HTTP 200). A assinatura já estava
+          # registrada algumas linhas acima, de 2026-08-07: `permission_denials_count: 14` E
+          # `No buffered inline comments` — e é essa segunda frase que NOMEIA o subsistema. Ele não
+          # tenta comentar solto: tenta postar COMENTÁRIO INLINE DE REVIEW, e morre acumulando negação.
+          # A defesa que existia era uma INSTRUÇÃO EM PROSA no prompt ("NÃO tente postar comentário");
+          # ele a ignorou nas DUAS ocorrências. Conselho onde precisava de mecanismo.
+          # Com a allowlist explícita a ferramenta não está na lista dele — não há o que tentar.
+          # O conjunto é o que o mandato de fato exige: LER. O prompt já proíbe tocar a árvore
+          # ("NUNCA modifique a árvore de trabalho — revise só com comandos de LEITURA").
+          # ⚠️ TETO DECLARADO, e ele é grande: ISTO NÃO PÔDE SER VALIDADO NO PR QUE O ESCREVEU.
+          # PR que edita este arquivo faz a action SE AUTO-PULAR (o caso BENIGNO do verdict, algumas
+          # centenas de linhas abaixo), então o fix sai verde SEM ter sido exercido. Quem confere é o
+          # PR SEGUINTE ao merge: se o revisor voltar a revisar, a cura pegou; se morrer em t=0 com
+          # zero turnos, a allowlist está estreita demais e o caminho é alargá-la — nunca removê-la,
+          # porque sem ela a morte por negação volta.
           claude_args: |
             --model claude-sonnet-5
             --max-turns 60
+            --allowedTools Read Grep Glob Bash
 
       - name: Veredito da 2ª tentativa (is_error, não o outcome)
         id: v2
