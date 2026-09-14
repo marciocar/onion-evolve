@@ -2,13 +2,13 @@
 title: 'Resíduo — as decisões da distribuição pública, e o vazamento que só a decisão de publicar encontrou'
 date: 2026-09-14
 branch: feat/public-distribution-decisions
-reviewed_diff_sha256: d3e547662d69ab595e014dbc51e8290ef80f71f400d2a4e95a825222895c6464
+reviewed_diff_sha256: 470847a59778af2530f9cf4642f48e3a08fa8ddc62c96ca69d951ef11b08f3ec
 findings_total: 5
 findings_real: 5
 findings_fixed: 5
 tokens: 0
 duration_min: 0
-verdict: CURADO
+verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >-
   Este PR não é código novo: é o SELO de sete decisões do maestro mais a cura que a primeira delas obrigou.
@@ -48,7 +48,7 @@ Ele só apareceu porque a decisão de publicar obrigou a medir. Sem a publicaç�
 
 1. **O nome saiu do texto**, nos dois arquivos, neste PR.
 2. **A guarda passou a asserir FORMA** — `.claude/validation/vendor-scrub-form-check.sh`, ligado na segunda
-   metade da REGRA 36: ampersand corporativo (pelo menos um lado com 2+ caracteres, o que já elimina M&A,
+   metade da REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente): ampersand corporativo (pelo menos um lado com 2+ caracteres, o que já elimina M&A,
    Q&A, V&V, R&D) e âncora de contexto (`PoC`/`cliente`/`adotante`/`empresa` seguida de nome próprio).
    Forma gera **candidato**, nunca veredito: o legítimo vai para um baseline que **só encolhe**, candidato
    novo é HARD — idioma das REGRAS 45 (Link vendorizado não aponta caminho core-privado, com catraca) e 49
@@ -68,7 +68,7 @@ execução: **8 HARD, todas o baseline acusando a si mesmo**. Cura: o scan exclu
 próprio script, para explicar a forma. Ficaram no baseline com a razão escrita — é passivo tolerado, não
 vazamento.
 
-**3. O teto da REGRA 16.** Corrigido no PR anterior, mas vale registrar aqui porque a classe é a mesma: o
+**3. O teto da REGRA 16 (Contagem de inventário-TOTAL divergente da SSOT).** Corrigido no PR anterior, mas vale registrar aqui porque a classe é a mesma: o
 conjunto `[...]` com caractere multibyte casa **byte** no GNU grep sob locale C. Continua valendo a
 guarda `shell-locale` da bancada.
 
@@ -92,7 +92,7 @@ dispararia e o lint do sandbox sairia com dezenas de HARD.
 ## Gate
 
 ```
-bancada (LC_ALL=C, --jobs 4) : ver o corpo do PR (rodada no SHA final)
+bancada (LC_ALL=C, --jobs 4) : 1227 pass · 0 fail · 0 skip (164 famílias, 859s)
 lint (LC_ALL=C, completo)    : 0 HARD
 radar --integrity --schema   : exit 0 nos dois grafos
   distribuição               : 52 nós · 91 arestas · realign ALINHADO
