@@ -454,12 +454,32 @@ record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} —
 #      CI com 2 falhas, mesmo código.
 # A 1ª ficou NOMEADA e SEM CURA — por isso voltou. `git write-tree` materializa a árvore do
 # ÍNDICE, que é exatamente o que o pre-commit vai commitar: a bancada passa a espelhar o runner.
-# Sem índice legível (repo sem commit, merge em conflito) cai para HEAD e o comportamento antigo.
+# ⚠️ E A 1ª VERSÃO DESTA CURA DESFAZIA A SI MESMA, EM SILÊNCIO — medido na passada adversarial do
+# mesmo dia, e a taxa é alta: `git write-tree` PRECISA do `.git/index.lock`, e estas chamadas vivem
+# em QUATRO famílias que rodam como workers PARALELOS contra o mesmo REPO_ROOT (o CI usa
+# `--jobs auto`). Disputa medida neste repo: 2 workers ⇒ 33% de falha · 3 ⇒ 56% · 4 ⇒ 58% · 6 ⇒ 70%.
+# Cada falha caía no `|| true` e voltava para HEAD — isto é, a bancada revertia, probabilisticamente
+# e sem uma palavra, ao EXATO defeito que esta função cura.
+#
+# Duas defesas, e a segunda é a que importa:
+#   · RETENTAR com espera curta — a disputa é breve (o lock some quando o vizinho termina), então a
+#     esmagadora maioria das colisões se resolve sozinha numa 2ª ou 3ª tentativa.
+#   · FALAR quando desistir. Cair para HEAD continua sendo o comportamento (a bancada não pode
+#     abortar por contenção), mas agora a linha SAI: fixture do commitado é um resultado diferente,
+#     e "silêncio" é o que fez a 1ª versão parecer curada por meia sessão.
+# Sem índice legível (repo sem commit, merge em conflito) o fallback é o mesmo, e também é dito.
 _archive_staged() {
   local _dest="$1"; shift
-  local _tree
-  _tree="$(git -C "${REPO_ROOT}" write-tree 2>/dev/null || true)"
-  [ -n "${_tree}" ] || _tree=HEAD
+  local _tree="" _try
+  for _try in 1 2 3 4 5; do
+    _tree="$(git -C "${REPO_ROOT}" write-tree 2>/dev/null || true)"
+    [ -n "${_tree}" ] && break
+    sleep 0.2
+  done
+  if [ -z "${_tree}" ]; then
+    _tree=HEAD
+    echo "  ⚠️ _archive_staged: git write-tree não respondeu em 5 tentativas (disputa de .git/index.lock ou índice ilegível) — fixture caiu para HEAD, ou seja para o JÁ COMMITADO. Um caso que dependa do staged pode dar falso-verde aqui." >&2
+  fi
   git -C "${REPO_ROOT}" archive "${_tree}" -- "$@" 2>/dev/null | tar -x -C "${_dest}" 2>/dev/null
 }
 
@@ -4318,15 +4338,24 @@ run_vendor_scrub_form_selftests() {
   printf 'role: adopted\n' > "${_gd}/.claude/.onion-version"                 # FOLHA: IS_LEAF=1
   printf 'members: []\n' > "${_gd}/docs/evolution/federation/members.yaml"   # e SEM vocabulário
   printf 'a PoC Zelda&Filhos foi medida\n' > "${_gd}/.claude/commands/vaza-g.md"
+  # ⚠️ EXIGIR QUE O LINT TENHA COMPLETADO, antes de julgar o que ele disse. Sem isto o caso mente
+  #    nos DOIS sentidos, e a passada adversarial provou os dois injetando um `exit 7` no sandbox:
+  #    (g) reprovava com a mensagem "voltou a ser código morto" — diagnóstico ERRADO, que mandaria
+  #    o próximo leitor consertar o lugar errado; e (g-MUT) PASSAVA por vacuidade, porque o lint
+  #    nem chegou na guarda. Ausência de acusação só vale como evidência se houve acusador.
   _gout="$(cd "${_gd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if grep -q 'vendor-scrub/FORMA' <<< "${_gout}" && grep -q 'Zelda&Filhos' <<< "${_gout}"; then
+  if ! grep -q 'Sumário' <<< "${_gout}"; then
+    record_fail "vendor-scrub-form: (g) o lint não completou" "o sandbox abortou antes do sumário — o caso NÃO mediu a guarda (saída: ${_gout: -200})"
+  elif grep -q 'vendor-scrub/FORMA' <<< "${_gout}" && grep -q 'Zelda&Filhos' <<< "${_gout}"; then
     record_pass "vendor-scrub-form: (g) a metade por FORMA roda em role:adopted E com members.yaml vazio"
   else record_fail "vendor-scrub-form: (g)" "o detector não cobrou num adotante-folha sem termos derivados — voltou a ser código morto no destino majoritário"; fi
 
   # (g-MUT) prova que (g) não é vacuidade: sem o nome plantado, nenhum HARD de FORMA aparece.
   rm -f "${_gd}/.claude/commands/vaza-g.md"
   _gout="$(cd "${_gd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh 2>&1 || true)"
-  if ! grep -q 'Zelda&Filhos' <<< "${_gout}"; then
+  if ! grep -q 'Sumário' <<< "${_gout}"; then
+    record_fail "vendor-scrub-form: (g-MUT) o lint não completou" "silêncio por aborto não é silêncio por ausência do nome"
+  elif ! grep -q 'Zelda&Filhos' <<< "${_gout}"; then
     record_pass "vendor-scrub-form: (g-MUT) sem o nome plantado a guarda cala — (g) mede o nome, não o ruído"
   else record_fail "vendor-scrub-form: (g-MUT)" "acusou o nome que já foi removido — (g) não prova nada"; fi
   rm -rf "${_gd}"

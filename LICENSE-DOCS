@@ -88,3 +88,15 @@ que esta licença cobre (docs/knowledge-base, docs/meta-specs, docs/sdaal,
 LICENSE-DOCS. Enquanto o transporte não os levar, esta licença vale para quem a
 lê AQUI, e nenhum adotante foi notificado dela — que é o oposto do que a própria
 CC BY-NC 4.0 (§3.a) exige de quem redistribui.
+
+E a cura óbvia foi TENTADA E REVERTIDA no mesmo dia, o que vale registrar porque
+diz onde o conserto tem de acontecer: pôr LICENSE na lista do transporte faz o
+adopt SOBRESCREVER o LICENSE do alvo (o passo de cópia é um `cp -R` e o único
+never-clobber por-arquivo é o .env.example). Um aviso proprietário na raiz do
+repo do cliente viraria MIT em nome do autor do core — relicenciamento
+silencioso na direção mais grave, produzido pela cura contra relicenciamento
+silencioso. E há uma segunda perna: no caminho `--update` existe outra lista de
+caminhos, independente da primeira, que também não as carrega.
+
+O conserto é never-clobber por-arquivo mais a unificação dessa segunda lista, e
+tem fio próprio. Gatilho: a primeira consultoria que forkar.
