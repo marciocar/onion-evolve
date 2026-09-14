@@ -78,8 +78,20 @@ _maybe_core_private='(analysis|onion|evolution|discussions|applying|materials|pl
 # O incômodo maior era a MÉTRICA: o guard drenou 101 links da KB até o baseline zerar e
 # DECLAROU VITÓRIA com o mesmo modo de falha vivo na porta ao lado — `declarado ≠ verificado`
 # dentro da própria métrica de saúde de uma guarda. [[fix-must-become-mechanism]]
-VENDORED_ROOTS=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation
-                .claude/hooks docs/meta-specs docs/knowledge-base docs/sdaal)
+# RAÍZES DERIVADAS DO TRANSPORTE (SSOT: .claude/utils/adopt/vendor-manifest.sh). Medido 2026-09-13:
+# esta lista tinha 9 raízes contra as 11 que o /meta:adopt copia — `.claude/rules` e `.claude/workflows`
+# viajavam e nenhuma das duas guardas de vendorização os via. Fallback explícito (nunca vazio: lista
+# vazia zeraria a guarda em silêncio, que é o modo de falha que o cabeçalho acima já narra).
+VENDORED_ROOTS=()
+_VM="$(cd "$(dirname "${BASH_SOURCE[0]}")/../utils/adopt" 2>/dev/null && pwd)/vendor-manifest.sh"
+if [ -f "${_VM}" ]; then
+  while IFS= read -r _r; do [ -n "${_r}" ] && VENDORED_ROOTS+=("${_r}"); done < <(bash "${_VM}" --emit-scrub-roots 2>/dev/null || true)
+fi
+if [ "${#VENDORED_ROOTS[@]}" -eq 0 ]; then
+  echo "AVISO: vendor-manifest.sh nao respondeu — usando a lista de fallback (pode estar defasada)" >&2
+  VENDORED_ROOTS=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation
+                  .claude/hooks .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal)
+fi
 
 # Extrai (rel|resolved_rel) de cada link relativo core-privado vivo do corpus vendorizado.
 collect_violations() { # <repo_dir>  -> stdout: "<rel>|<resolved_rel>"

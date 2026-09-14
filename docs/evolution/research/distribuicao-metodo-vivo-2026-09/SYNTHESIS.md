@@ -107,11 +107,49 @@ não é o preço: é que ela **derrubou três premissas** com as quais eu ia des
 precedente inexistente e a ausência de filtro. Qualquer proposta de veículo feita sem isso teria nascido
 sobre chão falso.
 
+## A medição do mecanismo próprio (2026-09-14) — e os três parafusos apertados
+
+O Elenxo impôs: antes de nova fonte externa, **medir o que já existe aqui**. Medido, e o resultado
+derruba a terceira premissa da seção anterior.
+
+**A fronteira de diretório JÁ estava resolvida** (`E_ADOPT_JA_E_ALLOWLIST_MEDIDO`). O `/meta:adopt` não
+copia árvore: usa **allowlist de 11 pathspecs** mais `git archive HEAD` — duas barreiras em série.
+Rodado num diretório vazio: **680 arquivos, zero biografia**. O `grep -c exclude` que eu citei como
+prova de ausência de filtro deu zero **porque o desenho não usa denylist** — exatamente o que a rodada
+recomendou.
+
+**Eram quatro cópias da mesma lista, não três** (`E_QUATRO_COPIAS_DA_MESMA_LISTA_DUAS_DRIFTADAS`), e as
+**duas guardas** estavam defasadas do transporte: `.claude/rules` e `.claude/workflows` viajavam sem ser
+varridos por nome de cliente nem por link core-privado.
+
+**O que vaza hoje vaza dentro de diretório permitido** (`E_BASELINES_SAO_INDICE_DO_REPO_PRIVADO_E_JA_CHEGARAM`):
+os `*-baseline.txt` são índice nominal do repo privado — 32 paths, 5 deles do grafo pessoal do maestro —
+e **já chegaram a 5 adotantes**. Não são link, então a REGRA 45 (Link vendorizado não aponta caminho
+core-privado, com catraca) não os vê.
+
+**E o `roles.yaml` não resolvia isto** (`E_ROLES_YAML_E_OUTRA_GRANULARIDADE`): ele mapeia papel para
+plugins e comandos; o corte da consultoria é papel para **pathspec**. Eu tinha proposto ligá-lo ao
+`adopt` como se resolvesse.
+
+**Os três parafusos, apertados neste PR:**
+
+1. **SSOT única** em `.claude/utils/adopt/vendor-manifest.sh`, consumida pelas quatro superfícies. As duas
+   guardas passam a **derivar** as raízes do transporte, com fail-loud se a SSOT não responder.
+2. **A fronteira desceu do diretório ao arquivo:** `--stub-baselines` cura na **emissão** (o passivo do
+   core não vira dívida do cliente) e `--check-bundle` reprova se um baseline emitido citar caminho
+   privado.
+3. **`--role` nasce no transporte** (`adopted|hub|standalone`), com papel desconhecido falhando alto. O
+   corte por papel — tirar a meta-fábrica do `standalone`, como o `onion-standalone` provou — fica
+   **nomeado e não implementado**: é execução, não decisão.
+
+Bancada: família `vendor_manifest` com 8 casos, incluindo mutante que reprova quando a lista literal volta.
+
 ## Backlog
 
 1. **Medir o mecanismo próprio** (`/meta:adopt --update`, `vendor-branch.sh`): o que já copia, o que já
    exclui, e o que ele faria hoje com `.claude/diary` e `members.yaml`.
 2. **Desenhar a allowlist executável**, com caso de bancada que reprove quando um arquivo novo de biografia
    entra no pacote.
-3. **O maestro decide** as quatro perguntas abertas: fronteira, licença depois do MIT, marca, e o par
+3. **Implementar o corte por papel** no `--role standalone` (meta-fábrica fora), agora que o transporte tem papel.
+4. **O maestro decide** as quatro perguntas abertas: fronteira, licença depois do MIT, marca, e o par
    veículo + canal de atualização.

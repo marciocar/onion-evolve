@@ -30,9 +30,9 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 93.0 | `Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09` | distribuicao-metodo-vivo-2026-09 | Para entregar a um CLIENTE DE CONSULTORIA uma versao publica do Onion que ele FORKA e evolui sozinho: onde passa a fronteira entre |
-| 22.5 | `Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR` | distribuicao-metodo-vivo-2026-09 | Veiculo e canal de atualizacao NAO sao duas escolhas, sao uma: quem escolhe TEMPLATE contrai, no mesmo ato, a divida de um segundo |
+| 25.0 | `Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR` | distribuicao-metodo-vivo-2026-09 | Veiculo e canal de atualizacao NAO sao duas escolhas, sao uma: quem escolhe TEMPLATE contrai, no mesmo ato, a divida de um segundo |
+| 22.5 | `Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT` | distribuicao-metodo-vivo-2026-09 | A fronteira doutrina/biografia vira MECANISMO onde? As duas formas com precedente sao: (a) separacao FISICA como o GitLab faz —  |
 | 17.5 | `Q_LICENCA_APOS_MIT_JA_CONCEDIDA` | distribuicao-metodo-vivo-2026-09 | Se a concessao MIT ja saiu (repo mais 5 plugins publicados), o que uma licenca nova ainda alcanca? A rodada eliminou por evidencia |
-| 15.0 | `Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT` | distribuicao-metodo-vivo-2026-09 | A fronteira doutrina/biografia vira MECANISMO onde? As duas formas com precedente sao: (a) separacao FISICA como o GitLab faz —  |
 | 8.0 | `Q_MARCA_ONION_TITULARIDADE_NAO_MEDIDA` | distribuicao-metodo-vivo-2026-09 | O que PROTEGE o nome Onion se o cliente forkar? A rodada mostrou que a licenca apenas NAO CONCEDE marca (Apache Secao 6) e que a p |
 
 ## kg-multi-graph-view-2026-09 — 10 item(ns)

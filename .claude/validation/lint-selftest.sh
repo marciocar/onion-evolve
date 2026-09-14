@@ -453,6 +453,18 @@ _lib_beside() {  # $1 = diretorio onde o motor copiado vai rodar
   cp "${SCRIPT_DIR}/kg-fixture-paths.sh" "$1/" 2>/dev/null || true
 }
 
+# IRMÃOS DO adopt/, pela mesma razão do _lib_beside acima. Desde 2026-09-14 o `vendor-branch.sh`
+# resolve o manifesto por `${HERE}/vendor-manifest.sh` (a SSOT do que viaja). Um mutation test que
+# copia SÓ o motor para um tmp deixa o mutante sem manifesto: ele devolve vazio, nada é copiado, e o
+# caso acusa "não reproduz" onde há cura. Mordeu DUAS vezes no mesmo dia (vendor-branch (g-MUT) e
+# vendor-baseline-removido (RED/MUT)) — por isso é UM helper, não dois remendos.
+_adopt_sibs_beside() {  # $1 = diretório onde o motor copiado vai rodar
+  local f
+  for f in vendor-manifest.sh durable-commit.sh regen-baselines.sh; do
+    cp "${REPO_ROOT}/.claude/utils/adopt/${f}" "$1/" 2>/dev/null || true
+  done
+}
+
 # ── DISCIPLINA DO MUTATION TEST, EM UM LUGAR SÓ ────────────────────────────────────────────────
 # Um mutation test só prova algo se TRÊS coisas forem verdade, e a casa já perdeu duas delas em
 # dias seguidos:
@@ -4191,18 +4203,97 @@ run_vendor_pin_selftests() {
   else record_fail "vendor-branch: (PIN vazio)" "esperava rc=2, veio ${_rc}"; fi
 
   # MUTAÇÃO: desfeita a validação, o lixo passa — prova que o teste é load-bearing.
+  # O mutante roda FORA do dir dos irmãos: sem vendor-manifest.sh ao lado ele falharia por
+  # outro motivo (fail-closed correto) e o caso acusaria "não prova nada" onde há cura.
+  local pinmut; pinmut="$(mktemp -d)"
   sed 's|if ! git -C "$SRC" cat-file -e "${PIN}^{commit}" 2>/dev/null; then|if false; then|' \
-      "${helper}" > "${t}.mut.sh"
-  _rc=0; bash "${t}.mut.sh" update "$t" "$core" "vnextpin" "$ib" >/dev/null 2>&1 || _rc=$?
+      "${helper}" > "${pinmut}/mut.sh"
+  _adopt_sibs_beside "${pinmut}"
+  _rc=0; bash "${pinmut}/mut.sh" update "$t" "$core" "vnextpin" "$ib" >/dev/null 2>&1 || _rc=$?
   if [ "${_rc}" -ne 2 ]; then
     record_pass "vendor-branch: (PIN/MUT) sem a validação o lixo passa — a guarda é load-bearing"
   else record_fail "vendor-branch: (PIN/MUT)" "com a validação desfeita ainda recusou — o teste não prova nada"; fi
-  rm -f "${t}.mut.sh"
+  rm -rf "${pinmut}"
 
 }
 
 # Modo vendor-pin — o pin entra provando ser commit (achado de campo 2026-07-21). ⚠️ Até 2026-09-03 esta linha estava DENTRO do corpo da função: a família nunca rodou — o --list da faixa a expôs..
 _family run_vendor_pin_selftests
+
+# Modo vendor-manifest — a SSOT do que VIAJA do core para o adotante, por papel. Nasceu em 2026-09-13
+# quando a medição mostrou QUATRO cópias da mesma lista (adopt.md, vendor-branch.sh, o `roots=` da
+# REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) e o `VENDORED_ROOTS` da REGRA 45
+# (Link vendorizado não aponta caminho core-privado, com catraca)) — e as duas guardas já estavam
+# DESSINCRONIZADAS do transporte: `.claude/rules` e `.claude/workflows` viajavam e não eram varridos.
+run_vendor_manifest_selftests() {
+  local vm="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
+  if [ ! -f "${vm}" ]; then record_fail "vendor-manifest" "SSOT ausente: ${vm}"; return; fi
+  local out rc n
+  # (a) o manifesto responde e é NÃO-VAZIO — lista vazia zeraria o transporte em silêncio
+  out="$(bash "${vm}" --repo "${REPO_ROOT}" 2>&1)"; n="$(printf '%s\n' "${out}" | grep -c . || true)"
+  if [ "${n}" -ge 8 ] && grep -qx '.claude/validation' <<< "${out}"; then
+    record_pass "vendor-manifest: (a) manifesto responde com ${n} pathspecs e inclui .claude/validation"
+  else record_fail "vendor-manifest: (a)" "manifesto com ${n} linha(s): ${out:0:200}"; fi
+  # (b) BIOGRAFIA NUNCA está no manifesto — allowlist falha FECHADA (o que não está, não viaja)
+  local leaked="" b
+  for b in .claude/diary .claude/sessions .claude/beacons docs/evolution docs/analysis docs/discussions docs/onion; do
+    grep -qx "${b}" <<< "${out}" && leaked="${leaked} ${b}"
+  done
+  if [ -z "${leaked}" ]; then record_pass "vendor-manifest: (b) nenhuma raiz de BIOGRAFIA no manifesto (diário, sessões, evolution, analysis, discussions, onion)"
+  else record_fail "vendor-manifest: (b)" "biografia no manifesto:${leaked}"; fi
+  # (c) --emit-scrub-roots é O MESMO conjunto do transporte — é ele que as REGRAS 36 e 45 consomem.
+  #     Se divergir, a guarda varre menos do que se emite: fail-open com cara de cobertura.
+  local scrub; scrub="$(bash "${vm}" --repo "${REPO_ROOT}" --emit-scrub-roots 2>&1)"
+  # O scrub é a superfície DECLARADA e não consulta git (as guardas rodam em sandbox SEM repositório);
+  # o manifesto é declarado ∩ HEAD. Logo scrub ⊇ manifesto — e nunca o contrário, que seria a guarda
+  # varrendo MENOS do que se emite.
+  local missing; missing="$(comm -13 <(printf '%s\n' "${scrub}" | sort) <(printf '%s\n' "${out}" | sort) | tr '\n' ' ')"
+  if [ -z "${missing// /}" ]; then record_pass "vendor-manifest: (c) --emit-scrub-roots CONTÉM todo o manifesto (a guarda nunca varre menos do que o transporte emite)"
+  else record_fail "vendor-manifest: (c)" "o transporte emite raiz que o scrub não varre: ${missing}"; fi
+  # (c2) o scrub NÃO depende de git: sem repositório ele tem de responder igual — medido 2026-09-14,
+  #      quando a 1ª versão consultava HEAD, devolvia vazio no sandbox e o fail-closed da REGRA 36
+  #      reprovava o repo inteiro com 43 HARD.
+  local sb2; sb2="$(mktemp -d)"; mkdir -p "${sb2}/.claude/utils/adopt"; cp "${vm}" "${sb2}/.claude/utils/adopt/"
+  local scrub2; scrub2="$(bash "${sb2}/.claude/utils/adopt/vendor-manifest.sh" --repo "${sb2}" --emit-scrub-roots 2>&1)"
+  if [ "${scrub2}" = "${scrub}" ]; then record_pass "vendor-manifest: (c2) --emit-scrub-roots responde IGUAL fora de repositório git (a guarda roda no sandbox)"
+  else record_fail "vendor-manifest: (c2)" "scrub mudou sem git: [${scrub2:0:160}]"; fi
+  local rc3=0; bash "${sb2}/.claude/utils/adopt/vendor-manifest.sh" --repo "${sb2}" >/dev/null 2>&1 || rc3=$?
+  if [ "${rc3}" = "2" ]; then record_pass "vendor-manifest: (c3) o MANIFESTO (transporte) falha alto sem git — nunca copia às cegas"
+  else record_fail "vendor-manifest: (c3)" "manifesto sem git devolveu rc=${rc3} (esperado 2)"; fi
+  rm -rf "${sb2}"
+  # (d) papel desconhecido FALHA ALTO (rc=2), nunca cai num default silencioso
+  rc=0; out="$(bash "${vm}" --role papel-que-nao-existe 2>&1)" || rc=$?
+  if [ "${rc}" = "2" ] && grep -qi 'role desconhecido' <<< "${out}"; then
+    record_pass "vendor-manifest: (d) --role desconhecido ⇒ rc=2 nomeando o erro (nunca default calado)"
+  else record_fail "vendor-manifest: (d)" "rc=${rc}: ${out:0:160}"; fi
+  # (e) --check-bundle PEGA baseline que cita caminho privado do core, e --stub-baselines CURA.
+  #     É a classe medida em campo: 5 adotantes receberam 24-25 linhas de índice nominal do repo privado.
+  local d; d="$(mktemp -d)"; mkdir -p "$d/.claude/validation"
+  printf '# b\ndocs/discussions/onion-pessoal-marcio/proto/marcio.kg.yaml::abc\n' > "$d/.claude/validation/x-baseline.txt"
+  rc=0; out="$(bash "${vm}" --check-bundle "$d" 2>&1)" || rc=$?
+  if [ "${rc}" = "1" ] && grep -q 'BIOGRAFIA-NO-BUNDLE' <<< "${out}"; then
+    record_pass "vendor-manifest: (e) --check-bundle REPROVA baseline com caminho privado do core"
+  else record_fail "vendor-manifest: (e)" "rc=${rc}: ${out:0:200}"; fi
+  bash "${vm}" --stub-baselines "$d" >/dev/null 2>&1
+  rc=0; out="$(bash "${vm}" --check-bundle "$d" 2>&1)" || rc=$?
+  if [ "${rc}" = "0" ] && ! grep -q 'onion-pessoal-marcio' "$d/.claude/validation/x-baseline.txt"; then
+    record_pass "vendor-manifest: (f) --stub-baselines CURA na emissão (o passivo do core não vira dívida do cliente)"
+  else record_fail "vendor-manifest: (f)" "rc=${rc} e o baseline ainda cita privado: $(head -2 "$d/.claude/validation/x-baseline.txt" | tr '\n' ' ')"; fi
+  # (g) MUTANTE: sem o stub, (f) reprova — o predicado tem de ser sensível ao mecanismo, não à prosa
+  printf '# b\ndocs/materials/cliente-sob-nda.md\n' > "$d/.claude/validation/x-baseline.txt"
+  rc=0; bash "${vm}" --check-bundle "$d" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" = "1" ]; then record_pass "vendor-manifest: (g) MUTANTE docs/materials (NDA) também reprova — a guarda é por FORMA, não por lista de nomes"
+  else record_fail "vendor-manifest: (g)" "docs/materials passou (rc=${rc}) — a guarda está casando só um caminho"; fi
+  rm -rf "$d"
+  # (h) OS CONSUMIDORES consomem mesmo: nenhuma das quatro superfícies pode ter a lista literal de volta
+  local dup=""
+  grep -q 'want=(.claude/agents' "${REPO_ROOT}/.claude/commands/meta/adopt.md" 2>/dev/null && dup="${dup} adopt.md"
+  grep -q 'want=(.claude/agents' "${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh" 2>/dev/null && dup="${dup} vendor-branch.sh"
+  grep -q 'roots=(.claude/agents' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" 2>/dev/null && dup="${dup} lint-artifacts.sh"
+  if [ -z "${dup}" ]; then record_pass "vendor-manifest: (h) as superfícies CONSOMEM a SSOT — nenhuma cópia literal da lista sobrou"
+  else record_fail "vendor-manifest: (h)" "cópia literal da lista ainda em:${dup}"; fi
+}
+_family run_vendor_manifest_selftests
 
 run_vendor_branch_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh"
@@ -4329,6 +4420,11 @@ run_vendor_branch_selftests() {
   # vacuidade (um gate que nunca dispara passaria em (g) se o caso não fosse realmente cruzado).
   local mutd; mutd="$(mktemp -d)"
   sed 's/^  if ! alien="\$(_vendor_is_framework_pure.*$/  if false; then :/' "${helper}" > "${mutd}/mut.sh"
+  # A SSOT do manifesto vive AO LADO do helper (vendor-manifest.sh) e ele a resolve por ${HERE}.
+  # Copiar só o motor deixaria o mutante sem manifesto → exit 2 (fail-closed correto) e o caso
+  # acusaria "vacuidade" onde há cura. É a mesma classe do _lib_beside, e a cura é a mesma: copiar
+  # a dependência junto (medido 2026-09-13, na 1ª execução depois de a lista virar SSOT).
+  _adopt_sibs_beside "${mutd}"
   if ! grep -q '_vendor_is_framework_pure "\$T"' "${mutd}/mut.sh"; then
     git -C "$t5" merge --abort 2>/dev/null || true
     git -C "$t5" reset -q --hard HEAD
@@ -4427,7 +4523,7 @@ run_vendor_baseline_removido_selftests() {
   # mutado precisa dos IRMÃOS ao lado — o vendor-branch os resolve por `$HERE`; num mktemp isolado o
   # update falharia por outro motivo e daria falso-verde (testar-no-caminho-errado-é-não-testar).
   local mutdir; mutdir="$(mktemp -d)"
-  cp "${REPO_ROOT}/.claude/utils/adopt/durable-commit.sh" "${REPO_ROOT}/.claude/utils/adopt/regen-baselines.sh" "$mutdir/"
+  _adopt_sibs_beside "$mutdir"
   awk '/^  # >>> D_CURE-baseline-preserve/{skip=1} !skip{print} /^  # <<< D_CURE-baseline-preserve/{skip=0}' \
     "$vb" > "$mutdir/vendor-branch.sh"
   # sanidade: a mutação removeu MESMO o bloco (senão o RED não prova nada — guarda-por-lista-falha-pelo-vocabulário)
@@ -13529,13 +13625,17 @@ run_upstream_portal_fixes_selftests() {
   fi
 
   # ── (b) .claude/workflows viaja na adoção: sem ele a skill onion-research aponta p/ script ausente ──
-  local miss="" _nw
-  # Exige a string DENTRO do `want=` e IGNORA comentário: o mutante desta bancada passou verde porque o
-  # comentário explicativo (que também cita .claude/workflows) satisfazia um grep solto — guarda que casa
-  # prosa não é guarda (medido no próprio dogfood, 2026-09-04).
-  if ! grep -qE '^[^#]*want=\(.*\.claude/workflows' "${vb}" 2>/dev/null; then miss="${miss} vendor-branch.sh(want=)"; fi
-  _nw="$(grep -cE '^[^#]*want=\(.*\.claude/workflows' "${adopt}" 2>/dev/null || true)"; [ -n "${_nw}" ] || _nw=0
-  if [ "${_nw}" -lt 2 ]; then miss="${miss} adopt.md(want= x2, achou ${_nw})"; fi
+  local miss=""
+  # Desde 2026-09-14 a lista NÃO mora mais nos consumidores: SSOT em vendor-manifest.sh. Asserir o
+  # literal `want=(` aqui mediria a CÓPIA, não o transporte — e foi o que reprovou quando a SSOT nasceu.
+  # Agora a pergunta certa: o transporte EMITE .claude/workflows, e os dois consumidores o CONSOMEM?
+  local vmsh="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
+  if [ ! -f "${vmsh}" ]; then miss="${miss} vendor-manifest.sh(SSOT ausente)"
+  elif ! bash "${vmsh}" --emit-scrub-roots 2>/dev/null | grep -qx '.claude/workflows'; then
+    miss="${miss} vendor-manifest.sh(.claude/workflows fora da superfície)"
+  fi
+  grep -q 'vendor-manifest.sh' "${vb}" 2>/dev/null || miss="${miss} vendor-branch.sh(não consome a SSOT)"
+  grep -q 'vendor-manifest.sh' "${adopt}" 2>/dev/null || miss="${miss} adopt.md(não consome a SSOT)"
   if [ -z "${miss}" ]; then
     record_pass "upstream-portal: (b) .claude/workflows na superfície de adoção (a skill onion-research resolve no adotante)"
   else
