@@ -65,6 +65,26 @@ derivado existe sob marca PRÓPRIA. Um trabalho derivado deste material não pod
 se apresentar como "Onion" nem usar a identidade visual do projeto. A
 titularidade do nome está em medição.
 
-NÃO RETROAGE. O que já foi publicado sob MIT — este repositório e os plugins do
-marketplace — continua sob MIT. Esta licença vale para o material de método
-daqui em diante.
+NÃO RETROAGE, E O QUE JÁ SAIU É MAIS DO QUE PARECE.
+
+Este repositório é PRIVADO; o que foi de fato publicado são os PLUGINS do
+marketplace (marciocar/onion-plugins), cada um com o seu LICENSE MIT. E eles
+carregam doutrina: doze arquivos em plugins/*/kb/, entre eles a doutrina do
+Elenxo, a de dogfooding, a do grafo (KG-SDAAL), a ontologia e
+behavior-over-declaration. Três são byte-idênticos à knowledge-base; os demais
+diferem só por desreferência de link.
+
+Logo: essas doutrinas JÁ ESTÃO PÚBLICAS SOB MIT, de forma irretratável, e esta
+licença não as recolhe. O que CC BY-NC 4.0 cobre é o material de método daqui
+em diante — o que ainda não saiu, e as versões futuras do que saiu.
+
+Dizer o contrário seria reivindicar o que já foi dado.
+
+A LICENÇA NÃO VIAJA HOJE — e isto é um defeito conhecido, não um desenho. O
+manifesto de adoção (.claude/utils/adopt/vendor-manifest.sh) tem onze raízes e
+NENHUMA é arquivo de licença, enquanto quatro delas são justamente o material
+que esta licença cobre (docs/knowledge-base, docs/meta-specs, docs/sdaal,
+.claude/rules). Quem adotou até 2026-09-14 recebeu o método sem LICENSE e sem
+LICENSE-DOCS. Enquanto o transporte não os levar, esta licença vale para quem a
+lê AQUI, e nenhum adotante foi notificado dela — que é o oposto do que a própria
+CC BY-NC 4.0 (§3.a) exige de quem redistribui.

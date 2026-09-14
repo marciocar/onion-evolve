@@ -3267,26 +3267,50 @@ check_vendored_surface_clean() {
     done < <(grep -rilF -- "${term}" "${targets[@]}" 2>/dev/null | sort -u)
   done <<< "${terms}"
 
-  # ── SEGUNDA METADE: por FORMA, porque a primeira falha pelo VOCABULÁRIO ────────────────────
-  # A derivação do members.yaml está certa (nome hardcoded num script é o próprio vazamento), mas
-  # cliente NÃO REGISTRADO é invisível para ela. Medido 2026-09-14: o nome de um cliente de PoC
-  # viajava em DOIS arquivos e a guarda nunca cobrou. Classe [[guarda-por-lista-falha-pelo-vocabulario]].
-  # O detector por forma gera CANDIDATO (ampersand corporativo e âncora de contexto), e a catraca
-  # decide: no baseline = passivo tolerado; NOVO = HARD. Mesmo idioma das REGRAS 45 e 49.
+}
+
+# ===========================================================================
+# Segunda metade da REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente): por FORMA,
+# porque a primeira falha pelo VOCABULÁRIO.
+# (o cabeçalho NÃO usa a forma `# REGRA <n> — <título>`: esse é o padrão que o rules-registry.sh
+#  lê como DECLARAÇÃO de regra, e um segundo `# REGRA 36 —` faz o gerador abortar por duplicata)
+#
+# A derivação do `members.yaml` está certa (nome hardcoded num script é o próprio vazamento), mas
+# cliente NÃO REGISTRADO é invisível para ela. Medido 2026-09-14: o nome de um cliente de PoC
+# viajava em DOIS arquivos e a guarda nunca cobrou. Classe [[guarda-por-lista-falha-pelo-vocabulario]].
+#
+# ⚠️ POR QUE ESTA METADE É FUNÇÃO SEPARADA, e não um bloco no fim da irmã (defeito MEDIDO na
+# passada adversarial de 2026-09-14, e é a ironia exata da tese): escrita DENTRO de
+# `check_vendored_surface_clean`, ela ficava atrás de DOIS `return 0` que não são dela —
+#   · `[ "${IS_LEAF}" -eq 1 ] && return 0` — a isenção de adotante-folha existe por CIRCULARIDADE
+#     (no adotante o `members.yaml` é o vendorizado do core, então a derivação acusava o dono do
+#     próprio nome). A forma NÃO tem essa circularidade, e morria junto: em `role: adopted` — o
+#     destino da MAIORIA — o detector era código morto. Provado por mutante: nome de cliente
+#     injetado passa em `adopted` e é pego em `hub`.
+#   · `[ -n "${terms}" ] || return 0` — pior ainda: a guarda que existe PORQUE a lista não vê o
+#     não-registrado só rodava SE a lista produzisse vocabulário. Com `members.yaml` enxuto (um
+#     hub, um fork do core), `grep -c vendor-scrub/FORMA` dava 0 enquanto o detector, chamado
+#     direto no mesmo sandbox, achava os dois vazamentos. Em silêncio.
+# A cura é estrutural, não um `if` a mais: quem não compartilha a precondição não compartilha a
+# função. Esta roda para TODO papel e sem depender de registro nenhum.
+# ===========================================================================
+check_vendored_surface_form() {
   local _form="${SCRIPT_DIR}/vendor-scrub-form-check.sh" _fbase="${SCRIPT_DIR}/vendor-scrub-form-baseline.txt"
-  if [ -f "${_form}" ]; then
-    local _fnow _fprev _fnew
-    _fnow="$(bash "${_form}" "${REPO_ROOT}" 2>/dev/null || true)"
-    _fprev="$(grep -v '^#' "${_fbase}" 2>/dev/null | grep -v '^[[:space:]]*$' || true)"
-    _fnew="$(comm -23 <(printf '%s\n' "${_fnow}" | grep -v '^[[:space:]]*$' | sort -u) \
-                      <(printf '%s\n' "${_fprev}" | sort -u) || true)"
-    if [ -n "${_fnew//[[:space:]]/}" ]; then
-      while IFS='|' read -r _ff _ft; do
-        [ -n "${_ff}" ] || continue
-        violation "HARD" "${_ff}" "[vendor-scrub/FORMA] candidato a nome comercial '${_ft}' NOVO na superfície vendorizada — a derivação do members.yaml não o vê (cliente não registrado é invisível). Se for cliente REAL, remova do texto; se for legítimo (sigla, nome fictício, citação), regenere: bash .claude/validation/vendor-scrub-form-check.sh --emit-baseline > .claude/validation/vendor-scrub-form-baseline.txt"
-      done <<< "${_fnew}"
-    fi
-  fi
+  [ -f "${_form}" ] || return 0
+  # REGRA DE REPO, NÃO DE ARQUIVO — sai cedo sob `--only`. O detector varre a superfície INTEIRA
+  # (é o ponto: candidato novo em qualquer lugar dela), então sob escopo de arquivo ele reportaria
+  # violação de arquivo ALHEIO e quebraria o contrato do `--only`. Mesmo padrão das irmãs de repo.
+  [ -n "${ONLY_PATH:-}" ] && return 0
+  local _fnow _fprev _fnew
+  _fnow="$(bash "${_form}" "${REPO_ROOT}" 2>/dev/null || true)"
+  _fprev="$(grep -v '^#' "${_fbase}" 2>/dev/null | grep -v '^[[:space:]]*$' || true)"
+  _fnew="$(comm -23 <(printf '%s\n' "${_fnow}" | grep -v '^[[:space:]]*$' | sort -u) \
+                    <(printf '%s\n' "${_fprev}" | sort -u) || true)"
+  [ -n "${_fnew//[[:space:]]/}" ] || return 0
+  while IFS='|' read -r _ff _ft; do
+    [ -n "${_ff}" ] || continue
+    violation "HARD" "${_ff}" "[vendor-scrub/FORMA] candidato a nome comercial '${_ft}' NOVO na superfície vendorizada — a derivação do members.yaml não o vê (cliente não registrado é invisível). Se for cliente REAL, remova do texto; se for legítimo (sigla, nome fictício, citação), regenere: bash .claude/validation/vendor-scrub-form-check.sh --emit-baseline > .claude/validation/vendor-scrub-form-baseline.txt"
+  done <<< "${_fnew}"
 }
 
 # ===========================================================================
@@ -4306,6 +4330,7 @@ check_migalhas_sync
 check_site_no_private_deeplinks
 check_plugin_no_private_source_url
 check_vendored_surface_clean
+check_vendored_surface_form
 check_frontmatter_model_category
 check_rules_registry_sync
 check_onion_version_tracked

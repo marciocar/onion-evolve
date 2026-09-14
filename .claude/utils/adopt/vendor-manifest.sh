@@ -46,7 +46,16 @@ case "${ROLE}" in adopted|hub|standalone) : ;; *) echo "ERRO: --role desconhecid
 # ── A LISTA, por papel ────────────────────────────────────────────────────────────────────────
 # BASE: o que TODO papel recebe. Framework + doutrina; nada de biografia.
 _base=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks
-       .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal)
+       .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal
+       LICENSE LICENSE-DOCS)
+# ⚠️ AS DUAS LICENÇAS VIAJAM DESDE 2026-09-14, e a ausência delas era defeito medido: a lista tinha
+# ONZE raízes e NENHUMA era licença, enquanto QUATRO delas (.claude/rules, docs/meta-specs,
+# docs/knowledge-base, docs/sdaal) são exatamente o material que o LICENSE-DOCS declara CC BY-NC.
+# Os adotantes até aquela data receberam 104 arquivos de método SEM uma linha de licença, e o
+# commit deles caiu num repo que carrega o LICENSE do próprio dono — relicenciamento silencioso,
+# feito pela nossa máquina de transporte. A CC BY-NC 4.0 §3.a exige o aviso na redistribuição;
+# quem redistribuía era este script.
+# (never-clobber é do adopt: alvo que já tem LICENSE próprio não é sobrescrito — ver Fase 3)
 # NÃO entram, e o motivo de cada um:
 #   .env.example                  → específico do alvo (never-clobber, Fase 3 do adopt)
 #   docs/evolution/               → inbox/inbound são infra LOCAL do alvo; copiar clobaria o que está em uso
