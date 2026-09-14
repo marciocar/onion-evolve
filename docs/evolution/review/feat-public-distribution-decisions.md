@@ -2,7 +2,7 @@
 title: 'Resíduo — as decisões da distribuição pública, e o vazamento que só a decisão de publicar encontrou'
 date: 2026-09-14
 branch: feat/public-distribution-decisions
-reviewed_diff_sha256: dad5f6876e236e1b3fcabd5eb6c6c421409756b4812dd06a633746ed85f42eb0
+reviewed_diff_sha256: aecd8abede959a3ea027179f23e0ff33c77389b2319a517ac56b61bdcbbc5468
 findings_total: 23
 findings_real: 23
 findings_fixed: 17
