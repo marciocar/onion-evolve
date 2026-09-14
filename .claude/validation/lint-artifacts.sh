@@ -3266,6 +3266,27 @@ check_vendored_surface_clean() {
       violation "HARD" "${f#${REPO_ROOT}/}" "[vendor-scrub] identificador de adotante '${term}' na superfície vendorizada — viaja p/ todo adotante (cross-tenant por adoção); generalize (o crédito nominal fica no diário privado)"
     done < <(grep -rilF -- "${term}" "${targets[@]}" 2>/dev/null | sort -u)
   done <<< "${terms}"
+
+  # ── SEGUNDA METADE: por FORMA, porque a primeira falha pelo VOCABULÁRIO ────────────────────
+  # A derivação do members.yaml está certa (nome hardcoded num script é o próprio vazamento), mas
+  # cliente NÃO REGISTRADO é invisível para ela. Medido 2026-09-14: o nome de um cliente de PoC
+  # viajava em DOIS arquivos e a guarda nunca cobrou. Classe [[guarda-por-lista-falha-pelo-vocabulario]].
+  # O detector por forma gera CANDIDATO (ampersand corporativo e âncora de contexto), e a catraca
+  # decide: no baseline = passivo tolerado; NOVO = HARD. Mesmo idioma das REGRAS 45 e 49.
+  local _form="${SCRIPT_DIR}/vendor-scrub-form-check.sh" _fbase="${SCRIPT_DIR}/vendor-scrub-form-baseline.txt"
+  if [ -f "${_form}" ]; then
+    local _fnow _fprev _fnew
+    _fnow="$(bash "${_form}" "${REPO_ROOT}" 2>/dev/null || true)"
+    _fprev="$(grep -v '^#' "${_fbase}" 2>/dev/null | grep -v '^[[:space:]]*$' || true)"
+    _fnew="$(comm -23 <(printf '%s\n' "${_fnow}" | grep -v '^[[:space:]]*$' | sort -u) \
+                      <(printf '%s\n' "${_fprev}" | sort -u) || true)"
+    if [ -n "${_fnew//[[:space:]]/}" ]; then
+      while IFS='|' read -r _ff _ft; do
+        [ -n "${_ff}" ] || continue
+        violation "HARD" "${_ff}" "[vendor-scrub/FORMA] candidato a nome comercial '${_ft}' NOVO na superfície vendorizada — a derivação do members.yaml não o vê (cliente não registrado é invisível). Se for cliente REAL, remova do texto; se for legítimo (sigla, nome fictício, citação), regenere: bash .claude/validation/vendor-scrub-form-check.sh --emit-baseline > .claude/validation/vendor-scrub-form-baseline.txt"
+      done <<< "${_fnew}"
+    fi
+  fi
 }
 
 # ===========================================================================

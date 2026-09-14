@@ -12,13 +12,13 @@
 
 | Dimensão | Nº | Produtor |
 |---|---:|---|
-| Famílias na bancada | **163** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **996** | `bash .claude/validation/harness-inventory.sh --env` |
+| Famílias na bancada | **164** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **1002** | `bash .claude/validation/harness-inventory.sh --env` |
 | Regras do lint | **81** | `bash .claude/validation/rules-registry.sh --counts` |
 | — HARD | **72** | `bash .claude/validation/rules-registry.sh --counts` |
-| Pares de modo consumido | **44** | `bash .claude/validation/consumed-mode-check.sh .` |
+| Pares de modo consumido | **46** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | `bash .claude/validation/consumed-mode-check.sh .` |
-| Baselines de catraca | **9** | `git ls-files '.claude/validation/*-baseline.txt'` |
+| Baselines de catraca | **10** | `git ls-files '.claude/validation/*-baseline.txt'` |
 
 Detalhe completo: [`testing-inventory.md`](testing-inventory.md) (SSOT gerada, catracada).
 
@@ -54,13 +54,13 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **271** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **272** | `bash .claude/validation/review-ledger.sh --env` |
 | Achados totais | **1522** | `bash .claude/validation/review-ledger.sh --env` |
 | Achados REAIS | **1285** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **84%** | `bash .claude/validation/review-ledger.sh --env` |
 | Tokens por achado REAL | **98157** | `bash .claude/validation/review-ledger.sh --env` |
 | Vereditos no vocabulário | **181** | `bash .claude/validation/review-ledger.sh --env` |
-| — legado (texto livre) | **90** | `bash .claude/validation/review-ledger.sh --env` |
+| — legado (texto livre) | **91** | `bash .claude/validation/review-ledger.sh --env` |
 
 A média de tokens cobre os **178** resíduos com custo > 0; os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero

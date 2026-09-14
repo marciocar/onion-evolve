@@ -9,7 +9,7 @@ meta:
                              # 12m (doutrina), mas quem CADUCA primeiro manda: se a plataforma mudar, a resposta
                              # de VEICULO muda antes de qualquer licenca mudar.
   # kg-backlog-guard: on
-  # ═══ TETO: 39 NÓS (era 35: +4 pela MEDIÇÃO do mecanismo próprio, que o Elenxo impôs antes de nova fonte externa). Rodada de PRIMARIAS executada em 2026-09-13 (grafo criado nesta rodada). Cresce só se
+  # ═══ TETO: 52 NÓS (era 50: +2 pelo SCRUB POR FORMA — o vazamento real de nome de cliente na superfície que viaja, achado porque a decisão de publicar obrigou a medir antes) (era 49: +1 pela decisão de limpar os 5 adotantes no próximo update) (era 43: +6 pela rodada de MARCA que o selo D_MARCA_MEDIR_ANTES_DE_DECIDIR pediu) (era 39: +4 pelas DECISÕES do maestro de 2026-09-14, que fecham 4 das 5 perguntas) (era 35: +4 pela MEDIÇÃO do mecanismo próprio, que o Elenxo impôs antes de nova fonte externa). Rodada de PRIMARIAS executada em 2026-09-13 (grafo criado nesta rodada). Cresce só se
   #     uma re-medicao das mesmas fontes emendar um achado, ou se o maestro abrir a rodada de VEICULO. ═══
   # Pesquisa /onion-research mode=primaries: onde passa a fronteira entre a DOUTRINA que deve viajar para um
   # cliente de consultoria que forka e evolui sozinho, e a BIOGRAFIA deste repo que nao deve viajar; qual
@@ -32,12 +32,12 @@ nodes:
   - id: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.6
     verified_at: 2026-09-13
     verified_against: 'rodada de primarias 2026-09-13: 15 documentos primarios em 7 lacunas nomeadas, 33 claims, 26 ancoradas, 7 rejeitadas na ancoragem, 0 fonte inalcancavel'
-    label: 'Para entregar a um CLIENTE DE CONSULTORIA uma versao publica do Onion que ele FORKA e evolui sozinho: onde passa a fronteira entre a DOUTRINA que viaja (REGRAs, knowledge-base, gramatica do grafo, exemplos de grafo, o metodo) e a BIOGRAFIA que nao viaja (diario, grafos da vida do maestro, members.yaml, achados de seguranca de adotantes, material sob NDA)? Qual VEICULO (fork, template, plugin de marketplace, export curado por papel), qual LICENCA (usa e modifica internamente, sem revender o framework) e qual mecanismo de ATUALIZACAO depois que o fork diverge? ABERTA no que a rodada NAO fechou: o veiculo nao foi decidido, a licenca nao foi redigida e o canal de update nao foi pareado ao veiculo — ver E_LACUNAS_DISTRIBUICAO_0913 e as quatro Q_ derivadas.'
+    label: 'RESPONDIDA 2026-09-14 pelo conjunto das quatro decisoes do maestro mais a execucao do PR #826. A fronteira: viaja o framework mais a doutrina (11 pathspecs, inclusive a meta-fabrica por decisao); nao viaja a biografia (diario, sessoes, members.yaml, analises, discussoes, grafos da vida) — e a parte que vazava DENTRO de diretorio permitido (os baselines) foi curada na emissao. Veiculo, licenca e marca tem no proprio. O que resta e execucao nomeada, nao pergunta. Texto original: Para entregar a um CLIENTE DE CONSULTORIA uma versao publica do Onion que ele FORKA e evolui sozinho: onde passa a fronteira entre a DOUTRINA que viaja (REGRAs, knowledge-base, gramatica do grafo, exemplos de grafo, o metodo) e a BIOGRAFIA que nao viaja (diario, grafos da vida do maestro, members.yaml, achados de seguranca de adotantes, material sob NDA)? Qual VEICULO (fork, template, plugin de marketplace, export curado por papel), qual LICENCA (usa e modifica internamente, sem revender o framework) e qual mecanismo de ATUALIZACAO depois que o fork diverge? ABERTA no que a rodada NAO fechou: o veiculo nao foi decidido, a licenca nao foi redigida e o canal de update nao foi pareado ao veiculo — ver E_LACUNAS_DISTRIBUICAO_0913 e as quatro Q_ derivadas.'
     trace: 'corpus: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA (claude-code-2.1-onion-2026-08) · Q_COLD_ADOPTER (onion-identity-2026-07) · B5_11_onion_standalone_nascida (federation-research-2026-06-reconciled) · projeção: docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md'
   - id: E_FORK_CARREGA_HISTORIA_TEMPLATE_NASCE_LIMPO
     node_type: evidence
@@ -402,42 +402,42 @@ nodes:
   - id: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.5
     verified_at: 2026-09-13
     verified_against: 'medido nesta rodada: grep -c exclude .claude/commands/meta/adopt.md = 0; .claude/diary com 127 arquivos dentro do diretorio vendorizado'
-    label: 'A fronteira doutrina/biografia vira MECANISMO onde? As duas formas com precedente sao: (a) separacao FISICA como o GitLab faz — diretorio dedicado na arvore mais espelho downstream so com o que viaja (E_SEPARACAO_FISICA_DIRETORIO_E_MIRROR); (b) filtro de EXPORT por papel, que o Onion ja praticou uma vez em B5_11_onion_standalone_nascida. Hoje nao existe nenhuma das duas: o adopt nao tem exclude e o diario mora dentro de .claude/. Pergunta derivada obrigatoria: qual CRITERIO NOMEADO decide o corte item a item, no lugar de uma lista de pastas que envelhece — o analogo de quem-se-importa-mais do GitLab aplicado a doutrina vs biografia. NAO SELADA: quem sela e o maestro.'
+    label: 'RESPONDIDA 2026-09-14 pela EXECUCAO (PR #826, mergeado): a fronteira virou ALLOWLIST no gerador — SSOT unica em vendor-manifest.sh, consumida pelas quatro superficies, com as guardas derivando dela; e desceu do diretorio ao ARQUIVO via --stub-baselines e --check-bundle. A opcao (a) da pergunta (separacao fisica no tronco, como o GitLab) NAO foi escolhida: o tronco ja separa por diretorio e a allowlist falha fechada. Texto original: A fronteira doutrina/biografia vira MECANISMO onde? As duas formas com precedente sao: (a) separacao FISICA como o GitLab faz — diretorio dedicado na arvore mais espelho downstream so com o que viaja (E_SEPARACAO_FISICA_DIRETORIO_E_MIRROR); (b) filtro de EXPORT por papel, que o Onion ja praticou uma vez em B5_11_onion_standalone_nascida. Hoje nao existe nenhuma das duas: o adopt nao tem exclude e o diario mora dentro de .claude/. Pergunta derivada obrigatoria: qual CRITERIO NOMEADO decide o corte item a item, no lugar de uma lista de pastas que envelhece — o analogo de quem-se-importa-mais do GitLab aplicado a doutrina vs biografia. NAO SELADA: quem sela e o maestro.'
     trace: 'corpus: B5_11_onion_standalone_nascida (federation-research-2026-06-reconciled) · E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA (claude-code-2.1-onion-2026-08)'
   - id: Q_LICENCA_APOS_MIT_JA_CONCEDIDA
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.5
     verified_at: 2026-09-13
     verified_against: 'medido nesta rodada: LICENSE = MIT e 5 plugins publicados com LICENSE MIT'
-    label: 'Se a concessao MIT ja saiu (repo mais 5 plugins publicados), o que uma licenca nova ainda alcanca? A rodada eliminou por evidencia a PolyForm Noncommercial (uso comercial interno do cliente nao e proposito permitido) e a Elastic 2.0 (veta SaaS, nao redistribuicao do metodo); deixou a BSL como ESQUELETO cujo campo decisivo ficou em branco e que devolve o direito por cronometro no Change Date; e deixou a PolyForm Internal Use como a mais proxima do pedido, com duas duvidas nao medidas: ela e licenca de SOFTWARE e a maior parte do que deve viajar e PROSA, e a expressao you and your company nao diz se cobre subsidiarias, PJs e terceiros — o caso normal de consultoria. Pergunta: qual instrumento, e redigido por quem, para qual metade do material? NAO SELADA.'
+    label: 'RESPONDIDA 2026-09-14 por D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC: codigo segue MIT (nao retroage), metodo sai sob CC BY-NC — implementado em LICENSE-DOCS e na secao de licenca do README. Texto original: Se a concessao MIT ja saiu (repo mais 5 plugins publicados), o que uma licenca nova ainda alcanca? A rodada eliminou por evidencia a PolyForm Noncommercial (uso comercial interno do cliente nao e proposito permitido) e a Elastic 2.0 (veta SaaS, nao redistribuicao do metodo); deixou a BSL como ESQUELETO cujo campo decisivo ficou em branco e que devolve o direito por cronometro no Change Date; e deixou a PolyForm Internal Use como a mais proxima do pedido, com duas duvidas nao medidas: ela e licenca de SOFTWARE e a maior parte do que deve viajar e PROSA, e a expressao you and your company nao diz se cobre subsidiarias, PJs e terceiros — o caso normal de consultoria. Pergunta: qual instrumento, e redigido por quem, para qual metade do material? NAO SELADA.'
     trace: 'https://polyformproject.org/licenses/internal-use/1.0.0'
   - id: Q_MARCA_ONION_TITULARIDADE_NAO_MEDIDA
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 0.5
     verified_at: 2026-09-13
     verified_against: 'ausencia medida nesta rodada: nenhuma fonte consultada trata de titularidade, registro ou politica de marca do lado do maestro'
-    label: 'O que PROTEGE o nome Onion se o cliente forkar? A rodada mostrou que a licenca apenas NAO CONCEDE marca (Apache Secao 6) e que a politica da ASF so e executavel por quem POSSUI marca registrada mais politica publicada mais capacidade de exigir. Nenhum desses tres ativos foi medido do lado do maestro, e Onion e palavra generica. Transportar a politica sem o ativo seria declarar protecao inexistente — declarado que nao bate com verificado. Pergunta: medir titularidade/registro antes de prometer qualquer protecao de nome ao cliente. NAO SELADA.'
+    label: 'RESPONDIDA 2026-09-14 pela rodada de primarias que o selo pediu (E_MARCA_INPI_CUSTO_E_CLASSE, E_MARCA_ONION_FORTE_NA_LEI_FRACA_NO_CAMPO, E_MARCA_SEM_REGISTRO_SO_PRECEDENCIA_E_CONCORRENCIA_DESLEAL, E_MARCA_CLAUSULA_DE_RENAME_SO_TEM_DENTES_COM_REGISTRO). O que segue aberto e a DECISAO de depositar, em Q_MARCA_DEPOSITAR_CLASSE_42_AGORA, gated na busca de colidencia. Texto original: O que PROTEGE o nome Onion se o cliente forkar? A rodada mostrou que a licenca apenas NAO CONCEDE marca (Apache Secao 6) e que a politica da ASF so e executavel por quem POSSUI marca registrada mais politica publicada mais capacidade de exigir. Nenhum desses tres ativos foi medido do lado do maestro, e Onion e palavra generica. Transportar a politica sem o ativo seria declarar protecao inexistente — declarado que nao bate com verificado. Pergunta: medir titularidade/registro antes de prometer qualquer protecao de nome ao cliente. NAO SELADA.'
     trace: 'https://www.apache.org/foundation/marks/'
   - id: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 5
     confidence: 0.5
     verified_at: 2026-09-13
     verified_against: 'ancorado nesta rodada: template nasce com historias nao-relacionadas e nao aceita PR/merge de volta; Copier e Cruft exigem revisao humana da colisao'
-    label: 'Veiculo e canal de atualizacao NAO sao duas escolhas, sao uma: quem escolhe TEMPLATE contrai, no mesmo ato, a divida de um segundo mecanismo de update que esta rodada nao mediu (historias nao-relacionadas matam PR e merge); quem escolhe FORK herda conexao de UI mas copia a arvore inteira, biografia junto; quem escolhe PLUGIN em marketplace privado transporta maquinaria mas nao o corpus de prosa, e perde a privacidade se o cliente distribuir pela organizacao dele. A exigencia que os tres precedentes de scaffolding concordam: colisao entre doador e dono se resolve por HUMANO, com o diff a vista, nunca em silencio. Pergunta: qual par veiculo+canal, sabendo que o modelo do Copier/Cruft (gerar projeto a partir de respostas) nao e o do Onion (vendorizar corpus)? NAO SELADA.'
+    label: 'RESPONDIDA 2026-09-14 por D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT: o par e o onion-standalone publico (vitrine) mais o /meta:adopt no repo do cliente, cujo `onion/vendor` JA e o canal de atualizacao — merge com conflito git real. Texto original: Veiculo e canal de atualizacao NAO sao duas escolhas, sao uma: quem escolhe TEMPLATE contrai, no mesmo ato, a divida de um segundo mecanismo de update que esta rodada nao mediu (historias nao-relacionadas matam PR e merge); quem escolhe FORK herda conexao de UI mas copia a arvore inteira, biografia junto; quem escolhe PLUGIN em marketplace privado transporta maquinaria mas nao o corpus de prosa, e perde a privacidade se o cliente distribuir pela organizacao dele. A exigencia que os tres precedentes de scaffolding concordam: colisao entre doador e dono se resolve por HUMANO, com o diff a vista, nunca em silencio. Pergunta: qual par veiculo+canal, sabendo que o modelo do Copier/Cruft (gerar projeto a partir de respostas) nao e o do Onion (vendorizar corpus)? NAO SELADA.'
     trace: 'https://copier.readthedocs.io/en/stable/updating/ · https://cruft.github.io/cruft/'
   # ── MEDIÇÃO DO MECANISMO PRÓPRIO (o Elenxo impôs: medir o que já existe antes de fonte externa nova) ──
   - id: E_ADOPT_JA_E_ALLOWLIST_MEDIDO
@@ -491,6 +491,162 @@ nodes:
     source_kind: internal-measurement
     label: 'O `roles.yaml` NAO resolve o problema do transporte, e eu tinha proposto liga-lo ao adopt como se resolvesse. Ele mapeia papel->plugins/comandos; o corte que a consultoria precisa e papel->PATHSPEC. O `--role` do vendor-manifest.sh nasce com os tres papeis do transporte (adopted|hub|standalone) e hoje entrega a mesma base para os tres: o corte por papel (tirar a meta-fabrica do standalone, como o onion-standalone provou em 2026-07-19) fica NOMEADO e nao implementado — e essa e a proxima execucao, nao uma decisao do maestro.'
     trace: '.claude/utils/marketplace/roles.yaml'
+
+  # ══ AS QUATRO DECISOES DO MAESTRO (2026-09-14) ══════════════════════════════════════════════
+  - id: D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 0.85
+    verified_at: '2026-09-14'
+    verified_against: 'selado pelo maestro 2026-09-14, em resposta a quatro perguntas apresentadas com opcoes e recomendacao'
+    label: 'SELADA: o veiculo e o onion-standalone PUBLICO como vitrine do metodo MAIS o /meta:adopt rodando no repo DO CLIENTE — com a ressalva do maestro: `pode ser opcao 1 mas com todos os comandos e funcionalidades do core atual`. Descartadas: core publico novo para forkar (fork sem upstream ativo apodrece e a atualizacao vira PR manual), template (historicos nao-relacionados: NAO existe merge de volta — medido na doc do GitHub) e marketplace privado (entrega CONSUMO, install != adopt). O REENQUADRAMENTO que sustenta a escolha: o /meta:adopt com `onion/vendor` JA E um mecanismo de fork-com-atualizacao, e melhor que template ou copier — o framework vive numa branch do repo do cliente, o update chega por merge e a customizacao dele vira CONFLITO GIT REAL (never-clobber estrutural). O cliente nao forka o core: ele recebe o framework onde vai usa-lo.'
+    trace: 'docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md'
+
+  - id: D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 0.8
+    verified_at: '2026-09-14'
+    verified_against: 'selado pelo maestro 2026-09-14, em resposta a quatro perguntas apresentadas com opcoes e recomendacao'
+    label: 'SELADA: o que viaja e TUDO, inclusive a meta-fabrica (adopt, marketplace, wizard, federacao). Descartado o corte do onion-standalone de 2026-07-19 (274 arquivos a menos) e descartada a entrega so-maquinaria — esta ultima por evidencia: a maquinaria JA transfere (9 de 11 adotantes) e a PRATICA nao (grafo autoral 3 de 7, diario 1 de 7), entao mandar so o motor e repetir o que nao pegou. CONSEQUENCIA QUE O MAESTRO ASSUME, nomeada antes da execucao: como o standalone e PUBLICO, isto publica a maquina de fabricar Onion para QUALQUER UM, nao so para quem contrata. Defensavel pela doutrina da casa (o fosso e o mecanismo verificavel mais o dogfood mais a autobiografia, nao o codigo), e diferente de `dar ao cliente`. O `--role` do transporte segue existindo para quem quiser corte menor; para este veiculo ele entrega a base inteira.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.8
+    verified_at: '2026-09-14'
+    verified_against: 'selado pelo maestro 2026-09-14, em resposta a quatro perguntas apresentadas com opcoes e recomendacao'
+    label: 'SELADA: licenca DUAL. O CODIGO segue MIT — a concessao ja saiu no repo e nos 5 plugins publicados e NAO retroage, e permissivo ajuda adocao. O material de METODO (knowledge-base, REGRAs comentadas, exemplos de grafo, curso) sai sob Creative Commons Attribution-NonCommercial, que e a forma certa para PROSA e tem precedente medido nesta rodada (a thoughtbot licencia o playbook dela assim, explicitamente para que outros possam usar sem revender). Descartadas: MIT em tudo (aceitaria revenda do framework, o unico limite que a pergunta queria) e PolyForm Internal Use (licenca de software aplicada a prosa e forma errada, e a fricao e maior). O que esta decisao NAO alcanca: nada do que ja foi publicado sob MIT.'
+    trace: 'docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md'
+
+  - id: D_MARCA_MEDIR_ANTES_DE_DECIDIR
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 4
+    confidence: 0.85
+    verified_at: '2026-09-14'
+    verified_against: 'selado pelo maestro 2026-09-14, em resposta a quatro perguntas apresentadas com opcoes e recomendacao'
+    label: 'SELADA: MEDIR antes de decidir. Nada foi medido sobre titularidade, registro, classe ou colisao do nome `Onion` — e licenca nenhuma protege marca (Apache Secao 6 apenas NAO CONCEDE; a politica da ASF confirma que derivados existem sob marca propria). A rodada de primarias e curta e nomeada: INPI (classes de software e servicos, custo, prazo, exame de colidencia), quem mais usa `Onion` em software, e o que um contrato de consultoria pode limitar entre as partes sem registro. Descartadas por ora: registrar ja (custo e prazo antes da primeira consultoria) e nao registrar (deixa o nome sem defesa fora do contrato). Gatilho: a rodada volta, o maestro sela.'
+    trace: 'docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md'
+
+  # ── MARCA: a rodada que o selo D_MARCA_MEDIR_ANTES_DE_DECIDIR pediu (2026-09-14) ──
+  - id: E_MARCA_INPI_CUSTO_E_CLASSE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: '2026-09-14'
+    verified_against: 'Tabela de Retribuicoes do INPI (PDF oficial, Portaria GM/MDIC 110/2025), codigo 389 "Pedido de registro de marca (com especificacao pre-aprovada) - valor por classe" R$ 880,00 / 440,00 com desconto; codigos 372/373 "Primeiro decenio de vigencia... e expedicao de certificado" R$ 0,00; codigo 374 prorrogacao R$ 1.000,00 / 500,00. Classes NCL 13a ed.: 42 cobre "projeto e desenvolvimento de hardware e de software de computador", "consultoria tecnologica" e "software enquanto servico (SaaS)"; 41 cobre "provimento de treinamento"; 9 so se houver software distribuido como copia'
+    source_tier: 10
+    source_kind: primary-gov
+    label: 'CUSTO E CLASSE MEDIDOS. O nucleo do negocio (consultoria + framework + SaaS) cai INTEIRO na classe 42: R$ 880,00 cheio ou R$ 440,00 com desconto de ME/EPP/MEI, POR CLASSE. Achado nao-obvio: a CONCESSAO e o primeiro decenio custam R$ 0,00 — o custo esta todo no deposito e, dez anos depois, na prorrogacao (R$ 1.000,00). Tres classes (9+41+42) sairiam por R$ 2.640,00 / R$ 1.320,00. PRAZO MEDIO DE EXAME: NAO MEDIDO (estatisticas do INPI atras de login e de painel Power BI) — so os prazos LEGAIS foram lidos: 60 dias de publicacao para oposicao (art. 158) e vigencia de 10 anos da concessao (art. 133).'
+    trace: 'https://www.gov.br/inpi/pt-br/servicos/marcas/custos-e-pagamento'
+
+  - id: E_MARCA_ONION_FORTE_NA_LEI_FRACA_NO_CAMPO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: '2026-09-14'
+    verified_against: 'LPI art. 124 VI barra o que e generico/descritivo EM RELACAO ao produto — "onion" nao descreve software, logo e marca ARBITRARIA (a categoria mais forte). Contra: RFC 7686 (out/2015) registra ".onion" como Special-Use Domain Name na IANA; Tor Project usa "onion services"; Jeffrey Palermo publicou "Onion Architecture" em 29/07/2008 e o padrao tem 18 anos de uso corrente; pacote npm `onion` existe desde 11/06/2011'
+    source_tier: 9
+    source_kind: primary-law
+    label: 'A TESOURA QUE DECIDE: juridicamente FORTE, praticamente FRACA. Nao ha barreira de distintividade — "cebola" nao descreve software, entao o registro e possivel. Mas EXCLUSIVIDADE PRATICA nao se compra: no vocabulario de software o termo ja carrega tres referentes fortes (Tor/.onion na IANA, o padrao Onion Architecture de Palermo, e o jornal). O vizinho mais proximo do produto e justamente o padrao arquitetural homonimo. Registrar na 42 daria direito de barrar CONCORRENTE de servico de TI; nao daria controle sobre o termo nem resolveria a colisao semantica. O risco aqui e de POSICIONAMENTO, nao de ilegalidade.'
+    trace: 'https://www.rfc-editor.org/rfc/rfc7686.txt'
+
+  - id: E_MARCA_SEM_REGISTRO_SO_PRECEDENCIA_E_CONCORRENCIA_DESLEAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: '2026-09-14'
+    verified_against: 'LPI art. 129 caput: "A propriedade da marca adquire-se pelo registro validamente expedido... sendo assegurado ao titular seu uso exclusivo em todo o territorio nacional"; art. 129 §1o da a quem usa de boa-fe ha 6 meses o "direito de precedencia AO REGISTRO"; arts. 195 III/IV/V (concorrencia desleal) e 209 (perdas e danos) — tradução oficial da LPI hospedada pelo proprio INPI, porque o Planalto caiu (ECONNRESET x5)'
+    source_tier: 9
+    source_kind: primary-law
+    label: 'O QUE PROTEGE SEM REGISTRO, e o limite exato: o uso anterior da PRECEDENCIA AO REGISTRO (art. 129 §1o), que e municao DEFENSIVA — serve para opor-se no INPI se um terceiro depositar —, e NAO direito de excluir terceiro. Propriedade so nasce do registro (art. 129 caput). O que sobra contra terceiro e concorrencia desleal (art. 195) e perdas e danos (art. 209), que exigem PROVAR confusao ou desvio de clientela. Precedencia sem exercicio vira nada quando o registro alheio se consolida. Um CONTRATO de consultoria pode declarar o sinal, licenciar uso limitado e revogavel, proibir registro pelo cliente e obrigar rename na rescisao — mas so INTER PARTES.'
+    trace: 'https://www.gov.br/inpi/pt-br/servicos/marcas/arquivos/legislacao/lpitradpmsrevpms.pdf'
+
+  - id: E_MARCA_CLAUSULA_DE_RENAME_SO_TEM_DENTES_COM_REGISTRO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: '2026-09-14'
+    verified_against: 'ASF FAQ: "If you distribute modified versions of Apache Software you must do so under a new name"; ASF policy: "you may not apply trademarks to your derivative works... that are confusingly similar"; Linux Foundation: "A copyright license, even an open source copyright license, does not include an implied right or license to use a trademark". Caso concreto medido: AWS anuncia o fork OpenSearch em 12/04/2021 ("we will rename our existing Amazon Elasticsearch Service") e a Elastic declara em 16/02/2022 que "resolved the trademark infringement lawsuit"'
+    source_tier: 9
+    source_kind: primary-org
+    label: 'A CLAUSULA-MODELO EXISTE E E CURTA — "distribuiu modificado, renomeie" — mas os DENTES vem do registro. A politica da ASF e da Linux Foundation governa quem COOPERA: funciona no dia a dia porque quase ninguem quer brigar. Quando alguem quis brigar (Amazon), o que resolveu foi PROCESSO POR INFRACAO DE MARCA REGISTRADA, e o desfecho foi exatamente o rename. Nuance a registrar: a propria ASF trata o Secao 6 da Apache 2.0 como CONDICAO DE USO do software ("This policy is already summarized in section 6... and so it is a condition for your use of ASF software") — postura declarada da fundacao, nao decisao judicial.'
+    trace: 'https://www.apache.org/foundation/marks/faq/'
+
+  - id: E_MARCA_LACUNAS_DA_RODADA_0914
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: '2026-09-14'
+    verified_against: 'contabilidade da propria rodada: busca.inpi.gov.br/pePI exige sessao (GET direto devolve 302), WIPO Brand Database exige CAPTCHA Altcha, nenhum Chrome conectado para dirigir a busca; estatisticas do INPI atras de login e de painel Power BI; Planalto ECONNRESET x5 e Camara HTTP 429; USPTO e TMview exigem JS; WebSearch esgotado em 200/200 na sessao (contornado por Bing com &format=rss)'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'A LACUNA QUE PODE DERRUBAR A RECOMENDACAO INTEIRA: a COLIDENCIA REAL de "Onion" na base do INPI NAO foi medida — a busca exige sessao de navegador e nenhuma rota automatica funcionou. Sao 10 minutos do maestro em busca.inpi.gov.br/pePI (clicar Continuar para acesso anonimo e buscar "onion" por marca). Tambem NAO medidos: prazo medio de exame, regra oficial do simbolo de registro (ausencia medida — nenhuma pagina oficial de marcas trata dele), Codigo Civil art. 1.166 sobre nome empresarial, e registros de "Onion" no USPTO/EUIPO. O texto em portugues da LPI veio da traducao oficial hospedada pelo INPI porque o Planalto caiu.'
+    trace: 'docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md'
+
+  - id: Q_MARCA_DEPOSITAR_CLASSE_42_AGORA
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: 'PROPOSTA AO MAESTRO (nao selada): depositar SO a classe 42 agora, com especificacao pre-aprovada — R$ 880,00, ou R$ 440,00 se o CNPJ for ME/EPP/MEI, com concessao a R$ 0,00. Razao: e o preco mais baixo que converte o FRAGIL direito de precedencia (art. 129 §1o, apenas defensivo) em propriedade oponivel justamente na classe onde consultoria de TI, SaaS e o framework vivem; 41 e 9 ficam para depois. CONDICAO ANTES DE SELAR: a colidencia real na base do INPI nao foi medida (E_MARCA_LACUNAS_DA_RODADA_0914) e e a evidencia que pode derrubar a recomendacao inteira. E o vizinho semantico (Onion Architecture, 18 anos de uso) e questao de POSICIONAMENTO, a resolver na narrativa da marca e nao no INPI.'
+    trace: 'docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md'
+
+  - id: D_LIMPAR_BASELINES_NO_PROXIMO_UPDATE
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.85
+    verified_at: '2026-09-14'
+    verified_against: 'selado pelo maestro 2026-09-14: limpar no proximo /meta:adopt --update de cada adotante, um repo por vez, com o gate de la — em vez de cinco PRs hoje'
+    label: 'SELADA: os 5 adotantes que ja receberam o indice nominal do repo privado (24-25 linhas cada) sao limpos NO PROXIMO UPDATE de cada um, nao hoje. O `--stub-baselines` do PR #826 ja faz a emissao limpa, entao o proximo update de cada repo o corrige sozinho. Razao: respeita I3 (um escritor por repo) e nao exige abrir cinco PRs em repos com gates proprios. CUSTO ACEITO E DECLARADO: as linhas seguem la ate o proximo update de cada adotante. Deixa de ser aceitavel se algum desses repos virar PUBLICO ou ganhar terceiros — esse e o gatilho de reabertura.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  # ── SCRUB POR FORMA: o vazamento que a REGRA 36 nao via, achado ao medir antes de publicar (2026-09-14) ──
+  - id: E_VAZAMENTO_REAL_DE_CLIENTE_NA_SUPERFICIE_QUE_VIAJA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'medicao no proprio repo: nome comercial de um cliente real de PoC encontrado em DOIS arquivos dentro da superficie vendorizada (.claude/commands/meta/adopt.md e .claude/utils/adopt/regen-baselines.sh), ambos emitidos pelo transporte do /meta:adopt'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'A REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente) NAO VIU um vazamento real, e a razao e estrutural: ela deriva os termos do members.yaml, entao CLIENTE QUE NUNCA FOI REGISTRADO E INVISIVEL PARA ELA. Derivar do registro e certo — nome hardcoded num script E o proprio vazamento — mas o defeito dominante em guarda de lista e o VOCABULARIO, nao a logica. Achado so porque a decisao de publicar obrigou a medir antes; sem a publicacao em vista, o nome do cliente seguiria viajando para todo adotante novo.'
+    trace: '.claude/validation/vendor-scrub-form-check.sh'
+
+  - id: D_SCRUB_POR_FORMA_CURADO_ANTES_DE_PUBLICAR
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 0.85
+    verified_at: '2026-09-14'
+    verified_against: 'selado pelo maestro 2026-09-14: curar antes de publicar, nao depois; nome do cliente removido dos dois arquivos no mesmo PR'
+    label: 'SELADA: o nome do cliente sai do texto AGORA (antes de qualquer publicacao), e a guarda passa a asserir a FORMA e nao a lista. O detector novo (.claude/validation/vendor-scrub-form-check.sh) pega duas formas na superficie que viaja: AMPERSAND CORPORATIVO (com pelo menos um lado de 2+ caracteres, o que ja exclui M&A, Q&A, V&V, R&D) e ANCORA DE CONTEXTO (PoC/cliente/adotante/empresa seguida de nome proprio). Forma gera CANDIDATO, nunca veredito: o legitimo (sigla do oficio, nome ficticio de exemplo, citacao academica) vai para um baseline que SO ENCOLHE, e candidato novo e HARD — o mesmo idioma das REGRAS 45 (Link vendorizado nao aponta caminho core-privado, com catraca) e 49 (Catraca de passivo declarado). TETO DECLARADO: nome comercial SEM ampersand e SEM ancora continua invisivel; alargar o padrao mataria a guarda de falso-positivo. Ligado na segunda metade da REGRA 36, com familia vendor_scrub_form de 6 casos e mutante provado.'
+    trace: '.claude/validation/vendor-scrub-form-check.sh'
 
 edges:
   - from: E_FORK_CARREGA_HISTORIA_TEMPLATE_NASCE_LIMPO
@@ -703,3 +859,66 @@ edges:
   - from: E_ROLES_YAML_E_OUTRA_GRANULARIDADE
     to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
     edge_type: CONSTRAINS
+  - from: D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT
+    to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    edge_type: SUPPORTS
+  - from: D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPPORTS
+  - from: D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC
+    to: Q_LICENCA_APOS_MIT_JA_CONCEDIDA
+    edge_type: SUPPORTS
+  - from: D_MARCA_MEDIR_ANTES_DE_DECIDIR
+    to: Q_MARCA_ONION_TITULARIDADE_NAO_MEDIDA
+    edge_type: SUPPORTS
+  - from: E_ADOPT_JA_E_ALLOWLIST_MEDIDO
+    to: D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT
+    edge_type: SUPPORTS
+  - from: E_BASELINES_SAO_INDICE_DO_REPO_PRIVADO_E_JA_CHEGARAM
+    to: D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
+    edge_type: CONSTRAINS
+  - from: E_MARCA_INPI_CUSTO_E_CLASSE
+    to: Q_MARCA_DEPOSITAR_CLASSE_42_AGORA
+    edge_type: SUPPORTS
+  - from: E_MARCA_ONION_FORTE_NA_LEI_FRACA_NO_CAMPO
+    to: Q_MARCA_DEPOSITAR_CLASSE_42_AGORA
+    edge_type: CONSTRAINS
+  - from: E_MARCA_SEM_REGISTRO_SO_PRECEDENCIA_E_CONCORRENCIA_DESLEAL
+    to: Q_MARCA_DEPOSITAR_CLASSE_42_AGORA
+    edge_type: SUPPORTS
+  - from: E_MARCA_CLAUSULA_DE_RENAME_SO_TEM_DENTES_COM_REGISTRO
+    to: Q_MARCA_DEPOSITAR_CLASSE_42_AGORA
+    edge_type: SUPPORTS
+  - from: E_MARCA_LACUNAS_DA_RODADA_0914
+    to: Q_MARCA_DEPOSITAR_CLASSE_42_AGORA
+    edge_type: CONSTRAINS
+  - from: E_MARCA_CLAUSULA_DE_RENAME_SO_TEM_DENTES_COM_REGISTRO
+    to: D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC
+    edge_type: CONSTRAINS
+  - from: D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT
+    to: Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR
+    edge_type: SUPERSEDES
+  - from: D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC
+    to: Q_LICENCA_APOS_MIT_JA_CONCEDIDA
+    edge_type: SUPERSEDES
+  - from: D_MARCA_MEDIR_ANTES_DE_DECIDIR
+    to: Q_MARCA_ONION_TITULARIDADE_NAO_MEDIDA
+    edge_type: SUPERSEDES
+  - from: E_ADOPT_JA_E_ALLOWLIST_MEDIDO
+    to: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
+    edge_type: SUPERSEDES
+  - from: D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
+    to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
+    edge_type: SUPERSEDES
+  - from: E_BASELINES_SAO_INDICE_DO_REPO_PRIVADO_E_JA_CHEGARAM
+    to: D_LIMPAR_BASELINES_NO_PROXIMO_UPDATE
+    edge_type: SUPPORTS
+  - from: E_VAZAMENTO_REAL_DE_CLIENTE_NA_SUPERFICIE_QUE_VIAJA
+    to: D_SCRUB_POR_FORMA_CURADO_ANTES_DE_PUBLICAR
+    edge_type: SUPPORTS
+  - from: D_SCRUB_POR_FORMA_CURADO_ANTES_DE_PUBLICAR
+    to: D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
+    edge_type: CONSTRAINS
+  - from: E_VAZAMENTO_REAL_DE_CLIENTE_NA_SUPERFICIE_QUE_VIAJA
+    to: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
+    edge_type: SUPPORTS

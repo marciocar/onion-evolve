@@ -333,7 +333,7 @@ fi
 #     para evitar. A catraca só é adotável se o baseline for do ALVO, não do core.
 #
 #     ⚠️ ESTE PASSO JÁ COBRIU 1 DE 5 — e o modo-de-falha acima ACONTECEU (medido 2026-08-17, adoção
-#     greenfield real da PoC BW&P / HPE Autos): ele regenerava só o `kg-coverage-baseline.txt`, e o irmão
+#     greenfield real de uma PoC de cliente): ele regenerava só o `kg-coverage-baseline.txt`, e o irmão
 #     `kg-verification-baseline.txt` chegou com **47 chaves de grafos do core** → o lint do alvo nasceu
 #     com **47 violações HARD** cobrando nós que o adotante nunca teve. O comentário deste passo já
 #     descrevia o defeito com precisão; faltava aplicá-lo aos outros quatro. Agora o helper VARRE

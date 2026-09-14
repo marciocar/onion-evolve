@@ -14,7 +14,8 @@ review_after: 2026-12-12
 
 # Indivíduo × organização: onde a partilha indissociável vira vigilância
 
-> **Projeção** do grafo (25 nós, 48 arestas, radar exit 0). Pesquisa aberta pelo maestro em 2026-09-13 em
+> **Projeção** do grafo (116 nós, 191 arestas, radar exit 0 — as três rodadas mais o selo das emendas).
+> Pesquisa aberta pelo maestro em 2026-09-13 em
 > resposta ao sinal do adotante jogo-da-vida (`docs/evolution/inbox/_processed/2026-09-13-fronteira-pessoa-empregador-no-company-brain.md`).
 > Alimenta `Q_RESEARCH_COMPARTILHAMENTO_INDIVIDUO_ORGANIZACAO` em
 > `docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml`. **Nada aqui está selado**: o
@@ -171,10 +172,17 @@ e usá-los para um time de cinco seria a mesma extrapolação de escala que este
 **Mercado saiu de "sem sinal":** Series F do Glean (US$ 150M a US$ 7,2B) e o recuo primário do Productivity
 Score em 01/12/2020, com remoção de nomes e vedação de dado por usuário.
 
-## As quatro emendas propostas a C — e o que elas NÃO são
+## As quatro emendas a C — **SELADAS em 2026-09-14** (`D_R2_EMENDAS_A_C_SELADAS`)
 
-Estão em `Q_R2_REVISAO_DO_SELO_C`, **abertas**. O selo não foi tocado: elas atingem o DESENHO de C, não a
-direção, e quem decide é o maestro.
+Foram propostas em `Q_R2_REVISAO_DO_SELO_C` e o maestro **adotou as quatro**: elas passam a ser parte de C,
+não críticas a C. A razão declarada para não esperar as sete lacunas legais que seguem abertas: **as quatro
+têm evidência ancorada e nenhuma delas depende de TST por acórdão, de decisão sancionadora da ANPD nem do
+regime de negociação coletiva** — essas o maestro vê em paralelo e informa. Logo C já tem desenho utilizável.
+
+Junto delas vale o **limite duro brasileiro** já medido na rodada 2: o Exemplo 7 do guia da ANPD reprova
+rastreio de atividade e produtividade de empregado sob legítimo interesse. O canal indivíduo→organização não
+carrega telemetria de atividade em **nenhum** grau de agregação, e `só predicado provado` lê-se como
+**predicado sobre artefato de trabalho e decisão**.
 
 1. **A finalidade declarada não é proteção.** A evidência mede que finalidade comunicada quase não move
    atitude, desempenho nem estresse; e o TJUE diz, pelo flanco jurídico, que regra que só reitera finalidade e
@@ -295,7 +303,8 @@ gatilho sendo o maestro informar:
   premissa de dano psicológico se apoia na meta-análise, não na teoria.
 - **Negociação coletiva no Brasil:** a pergunta está aberta e melhor colocada (Tema 1046, art. 5º X da CF).
 - **A restrição do adotante segue não quantificada na faixa de 3 a 5.**
-- **As quatro emendas a C** (`Q_R2_REVISAO_DO_SELO_C`) esperam selo. Nada foi selado por mim.
+- ~~**As quatro emendas a C** (`Q_R2_REVISAO_DO_SELO_C`) esperam selo~~ — **SELADAS em 2026-09-14** pelo
+  maestro (`D_R2_EMENDAS_A_C_SELADAS`). As lacunas acima seguem abertas e **não bloqueiam o desenho**.
 
 ## Backlog
 

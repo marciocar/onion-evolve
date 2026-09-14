@@ -5,15 +5,14 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**200 itens abertos** em 45 grafo(s) com aberto (de 67 no escopo) · 45 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**195 itens abertos** em 45 grafo(s) com aberto (de 67 no escopo) · 45 grupo(s). **Nenhum nó declara `owner:`** — o agrupamento é por GRAFO (o fallback). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
-## compartilhamento-individuo-organizacao-2026-09 — 3 item(ns)
+## compartilhamento-individuo-organizacao-2026-09 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 135.0 | `Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE` | compartilhamento-individuo-organizacao-2026-09 | No contexto de EMPREGO (relacao de poder assimetrica), qual e o criterio operacional que separa o compartilhamento LEGITIMO e indi |
 | 25.0 | `Q_R3_EMENDAS_DE_MECANISMO_AO_DESENHO_DE_C` | compartilhamento-individuo-organizacao-2026-09 | TRES EMENDAS DE MECANISMO PROPOSTAS AO DESENHO DA OPCAO C, com evidencia ancorada nesta rodada — o maestro decide; D_INDIVIDUAL_ |
-| 17.5 | `Q_R2_REVISAO_DO_SELO_C` | compartilhamento-individuo-organizacao-2026-09 | QUATRO EMENDAS PROPOSTAS A C, com evidencia ancorada, mais um LIMITE DURO de jurisdicao BR — o maestro decide, nada aqui foi sel |
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -24,16 +23,6 @@
 | 7.5 | `C_OPCAO_A_CONECTOR_REMOTO_PUBLICO` | plugin-mcp-posture-2026-09 | OPCAO (a): expor a triade existente (onion-kg read-only 6 tools, onion-exec 4 tools com write-como-proposta, onion-framework 5 too |
 | 5.6 | `C_OPCAO_C_NADA_AGORA_SDAAL` | plugin-mcp-posture-2026-09 | OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem |
 | 1.8 | `C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA` | plugin-mcp-posture-2026-09 | OPCAO (d) — NAO CONSIDERADA NA DECISAO, CORTADA POR ORCAMENTO NESTA RODADA: skill-bundle — skills locais via git-subdir (stric |
-
-## distribuicao-metodo-vivo-2026-09 — 5 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 93.0 | `Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09` | distribuicao-metodo-vivo-2026-09 | Para entregar a um CLIENTE DE CONSULTORIA uma versao publica do Onion que ele FORKA e evolui sozinho: onde passa a fronteira entre |
-| 25.0 | `Q_VEICULO_E_CANAL_DE_UPDATE_SAO_UM_PAR` | distribuicao-metodo-vivo-2026-09 | Veiculo e canal de atualizacao NAO sao duas escolhas, sao uma: quem escolhe TEMPLATE contrai, no mesmo ato, a divida de um segundo |
-| 22.5 | `Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT` | distribuicao-metodo-vivo-2026-09 | A fronteira doutrina/biografia vira MECANISMO onde? As duas formas com precedente sao: (a) separacao FISICA como o GitLab faz —  |
-| 17.5 | `Q_LICENCA_APOS_MIT_JA_CONCEDIDA` | distribuicao-metodo-vivo-2026-09 | Se a concessao MIT ja saiu (repo mais 5 plugins publicados), o que uma licenca nova ainda alcanca? A rodada eliminou por evidencia |
-| 8.0 | `Q_MARCA_ONION_TITULARIDADE_NAO_MEDIDA` | distribuicao-metodo-vivo-2026-09 | O que PROTEGE o nome Onion se o cliente forkar? A rodada mostrou que a licenca apenas NAO CONCEDE marca (Apache Secao 6) e que a p |
 
 ## kg-multi-graph-view-2026-09 — 10 item(ns)
 
@@ -257,6 +246,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 19.2 | `Q_WEBSEARCH_CAP_2_1_258` | websearch-cap-2026-09 | Qual e o teto de chamadas WebSearch por sessao no Claude Code 2.1.258 — a env var CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION, seu  |
+
+## distribuicao-metodo-vivo-2026-09 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 18.0 | `Q_MARCA_DEPOSITAR_CLASSE_42_AGORA` | distribuicao-metodo-vivo-2026-09 | PROPOSTA AO MAESTRO (nao selada): depositar SO a classe 42 agora, com especificacao pre-aprovada — R$ 880,00, ou R$ 440,00 se o  |
 
 ## identidade-onion-vps-2026-08 — 5 item(ns)
 

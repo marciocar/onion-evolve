@@ -13,8 +13,9 @@ review_after: 2026-10-13
 
 # Distribuir o método vivo, sem distribuir a vida
 
-> **Projeção** do grafo (35 nós, 66 arestas, radar exit 0). Rodada de **primárias nomeadas** — o modo que
-> nasceu nesta mesma sessão. Nada aqui está selado: **cinco perguntas** esperam o maestro.
+> **Projeção** do grafo (52 nós, 91 arestas, radar exit 0). Rodada de **primárias nomeadas** — o modo que
+> nasceu nesta mesma sessão. As **cinco perguntas foram respondidas pelo maestro em 2026-09-14**; o que
+> resta aberto está na última seção, com gatilho nomeado.
 > Retorno do run versionado em [`data/`](data/).
 
 ## A pergunta
@@ -144,12 +145,44 @@ plugins e comandos; o corte da consultoria é papel para **pathspec**. Eu tinha 
 
 Bancada: família `vendor_manifest` com 8 casos, incluindo mutante que reprova quando a lista literal volta.
 
+## O que o maestro selou em 2026-09-14
+
+Quatro perguntas foram apresentadas com opções e recomendação; as quatro voltaram decididas.
+
+| Selo | Nó | O que ficou |
+|---|---|---|
+| **Veículo** | `D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT` | `onion-standalone` **público** como vitrine **mais** o `/meta:adopt` rodando no repo **do cliente** — com a ressalva dele: *"com todos os comandos e funcionalidades do core atual"*. O reenquadramento que sustenta: `/meta:adopt` com `onion/vendor` **já é** fork-com-atualização, e melhor que template — o update chega por merge e a customização do cliente vira **conflito git real**. |
+| **Corte** | `D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA` | Viaja **tudo, inclusive a meta-fábrica**. A consequência está nomeada e assumida: o standalone é público, logo isto publica a máquina de fabricar Onion para qualquer um. Defensável pela doutrina da casa — o fosso é o mecanismo verificável, o dogfood e a autobiografia, não o código. A evidência que fechou: a maquinaria **já** transfere (9 de 11 adotantes) e a prática **não** (grafo autoral 3 de 7), então mandar só o motor repete o que não pegou. |
+| **Licença** | `D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC` | **Dual**: código segue MIT (a concessão já saiu e não retroage); método sob **CC BY-NC 4.0** — `LICENSE-DOCS` neste PR, com a tabela no README. Precedente medido: a thoughtbot licencia o playbook assim, pela mesma razão declarada. |
+| **Marca** | `D_MARCA_MEDIR_ANTES_DE_DECIDIR` → `Q_MARCA_DEPOSITAR_CLASSE_42_AGORA` | Medir antes. A rodada rodou: **R$ 880,00, ou R$ 440,00 com CNPJ ME/EPP/MEI**, classe 42, especificação pré-aprovada — o preço mais baixo que converte o frágil direito de precedência (art. 129 §1º) em propriedade oponível. **Não selado**, e a razão é honesta: a colidência real de "onion" na base do INPI **não foi medida** — a busca exige sessão de navegador. São 10 minutos do maestro em `busca.inpi.gov.br/pePI`. |
+
+E dois selos derivados: `D_LIMPAR_BASELINES_NO_PROXIMO_UPDATE` (os 5 adotantes se curam no próximo
+`--update` de cada, não em cinco PRs hoje — gatilho de reabertura: algum deles virar público ou ganhar
+terceiros) e `D_SCRUB_POR_FORMA_CURADO_ANTES_DE_PUBLICAR`, abaixo.
+
+## O vazamento que a decisão de publicar encontrou
+
+Medir antes de publicar achou **nome comercial de um cliente real de PoC em dois arquivos que viajam para
+todo adotante** (`E_VAZAMENTO_REAL_DE_CLIENTE_NA_SUPERFICIE_QUE_VIAJA`). A REGRA 36 (Superfície VENDORIZADA
+sem nome comercial de cliente) nunca cobrou, e a razão é estrutural: ela deriva os termos do `members.yaml`,
+então **cliente que nunca foi registrado é invisível para ela**. É a classe
+`guarda-por-lista-falha-pelo-vocabulário` — em guarda de lista o defeito dominante é o vocabulário, não a
+lógica.
+
+O nome saiu do texto no mesmo PR, e a guarda passou a asserir **forma**: `vendor-scrub-form-check.sh` pega
+ampersand corporativo (com um lado de 2+ caracteres, o que já exclui M&A e Q&A) e âncora de contexto
+(`PoC`/`cliente`/`adotante`/`empresa` seguida de nome próprio). Forma gera **candidato**, nunca veredito: o
+legítimo vai para um baseline que **só encolhe**, candidato novo é HARD. **Teto declarado:** nome comercial
+sem ampersand e sem âncora continua invisível — alargar o padrão mataria a guarda de falso-positivo.
+
 ## Backlog
 
-1. **Medir o mecanismo próprio** (`/meta:adopt --update`, `vendor-branch.sh`): o que já copia, o que já
-   exclui, e o que ele faria hoje com `.claude/diary` e `members.yaml`.
-2. **Desenhar a allowlist executável**, com caso de bancada que reprove quando um arquivo novo de biografia
-   entra no pacote.
-3. **Implementar o corte por papel** no `--role standalone` (meta-fábrica fora), agora que o transporte tem papel.
-4. **O maestro decide** as quatro perguntas abertas: fronteira, licença depois do MIT, marca, e o par
-   veículo + canal de atualização.
+1. **Levar o `onion-standalone` público ao core atual completo** — é o veículo selado, e a publicação em si é
+   ato do maestro (outward-facing).
+2. **Implementar o corte por papel** no `--role standalone`, agora que o transporte tem papel — mesmo com o
+   corte selado em "tudo", o mecanismo continua existindo para quem quiser menos.
+3. **Busca de colidência no INPI** (10 minutos do maestro) — é a condição declarada de
+   `Q_MARCA_DEPOSITAR_CLASSE_42_AGORA`.
+4. ~~Medir o mecanismo próprio~~ · ~~desenhar a allowlist executável~~ · ~~o maestro decide as quatro
+   perguntas~~ — **feitos**: a medição virou a SSOT `vendor-manifest.sh`, a allowlist é ela, e as quatro
+   perguntas estão na tabela acima.

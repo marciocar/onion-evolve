@@ -4225,6 +4225,59 @@ _family run_vendor_pin_selftests
 # REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) e o `VENDORED_ROOTS` da REGRA 45
 # (Link vendorizado não aponta caminho core-privado, com catraca)) — e as duas guardas já estavam
 # DESSINCRONIZADAS do transporte: `.claude/rules` e `.claude/workflows` viajavam e não eram varridos.
+# Modo vendor-scrub por FORMA — a segunda metade da REGRA 36 (Superfície VENDORIZADA sem nome
+# comercial de cliente). A primeira deriva os termos do members.yaml e por isso é CEGA a cliente não
+# registrado: medido 2026-09-14, o nome de um cliente de PoC viajava em dois arquivos e a guarda
+# nunca cobrou. Esta família prova que a metade por forma vê o que a por lista não vê.
+run_vendor_scrub_form_selftests() {
+  local sc="${REPO_ROOT}/.claude/validation/vendor-scrub-form-check.sh"
+  local bl="${REPO_ROOT}/.claude/validation/vendor-scrub-form-baseline.txt"
+  if [ ! -f "${sc}" ]; then record_fail "vendor-scrub-form" "detector ausente: ${sc}"; return; fi
+  local out rc
+  # (a) o SELFTEST do próprio detector passa — sem ele a catraca não sabe o que cobra
+  rc=0; out="$(bash "${sc}" --selftest 2>&1)" || rc=$?
+  if [ "${rc}" = "0" ] && grep -q 'selftest: OK' <<< "${out}"; then
+    record_pass "vendor-scrub-form: (a) o detector passa no próprio selftest (pega ampersand corporativo, cala em M&A/Q&A)"
+  else record_fail "vendor-scrub-form: (a)" "rc=${rc}: ${out:0:200}"; fi
+  # (b) o modo de SCAN que a produção consome responde e o repo está LIMPO contra o baseline
+  rc=0; out="$(bash "${sc}" "${REPO_ROOT}" 2>&1)" || rc=$?
+  local novos; novos="$(comm -23 <(printf '%s\n' "${out}" | grep -v '^[[:space:]]*$' | sort -u) \
+                                <(grep -v '^#' "${bl}" 2>/dev/null | grep -v '^[[:space:]]*$' | sort -u) | tr '\n' ' ')"
+  if [ "${rc}" = "0" ] && [ -z "${novos// /}" ]; then
+    record_pass "vendor-scrub-form: (b) modo scan responde e nenhum candidato NOVO fora do baseline"
+  else record_fail "vendor-scrub-form: (b)" "rc=${rc} candidatos novos: ${novos:0:200}"; fi
+  # (c) --emit-baseline é o modo que a catraca consome: tem cabeçalho e o mesmo conteúdo do scan
+  rc=0; out="$(bash "${sc}" --emit-baseline 2>&1)" || rc=$?
+  if [ "${rc}" = "0" ] && grep -q '^# Baseline de CANDIDATOS' <<< "${out}" && grep -q 'SÓ PODE ENCOLHER' <<< "${out}"; then
+    record_pass "vendor-scrub-form: (c) --emit-baseline emite cabeçalho de catraca (só encolhe)"
+  else record_fail "vendor-scrub-form: (c)" "rc=${rc}: ${out:0:200}"; fi
+  # (d) O QUE A OUTRA METADE NÃO VÊ: cliente NÃO registrado no members.yaml. É a razão de existir.
+  local d; d="$(mktemp -d)"; mkdir -p "${d}/.claude/utils/adopt" "${d}/.claude/commands" "${d}/docs/knowledge-base"
+  cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" "${d}/.claude/utils/adopt/"
+  printf 'a adoção da PoC Zelda&Filhos mostrou que\n' > "${d}/.claude/commands/vaza.md"
+  rc=0; out="$(bash "${sc}" "${d}" 2>&1)" || rc=$?
+  if grep -q 'Zelda&Filhos' <<< "${out}"; then
+    record_pass "vendor-scrub-form: (d) pega nome comercial de cliente NÃO registrado (o buraco da derivação por members.yaml)"
+  else record_fail "vendor-scrub-form: (d)" "não viu o nome não-registrado: rc=${rc} out=${out:0:200}"; fi
+  # (e) MUTANTE: sem o padrão de ampersand, (d) reprova — o predicado é sensível ao mecanismo
+  local mut; mut="$(mktemp -d)"
+  sed "s/^_PAT_AMP=.*/_PAT_AMP='ESTE_PADRAO_NAO_CASA_NADA'/" "${sc}" > "${mut}/m.sh"
+  if grep -q 'ESTE_PADRAO_NAO_CASA_NADA' "${mut}/m.sh"; then
+    out="$(bash "${mut}/m.sh" "${d}" 2>&1 || true)"
+    if ! grep -q 'Zelda&Filhos' <<< "${out}"; then
+      record_pass "vendor-scrub-form: (e) MUTANTE sem o padrão de ampersand deixa o nome passar — o padrão é load-bearing"
+    else record_fail "vendor-scrub-form: (e)" "mutante ainda pegou o nome — o teste não prova nada"; fi
+  else record_fail "vendor-scrub-form: (e) setup" "a mutação não foi aplicada"; fi
+  # (f) SIGLA DO OFÍCIO não vira candidato — senão a guarda morre de falso-positivo e é desligada
+  printf 'discussão sobre M&A e Q&A e V&V no mercado\n' > "${d}/.claude/commands/vaza.md"
+  out="$(bash "${sc}" "${d}" 2>&1 || true)"
+  if [ -z "${out//[[:space:]]/}" ]; then
+    record_pass "vendor-scrub-form: (f) M&A, Q&A e V&V não viram candidato (1 letra de cada lado)"
+  else record_fail "vendor-scrub-form: (f)" "sigla do ofício virou candidato: ${out:0:200}"; fi
+  rm -rf "${d}" "${mut}"
+}
+_family run_vendor_scrub_form_selftests
+
 run_vendor_manifest_selftests() {
   local vm="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
   if [ ! -f "${vm}" ]; then record_fail "vendor-manifest" "SSOT ausente: ${vm}"; return; fi
