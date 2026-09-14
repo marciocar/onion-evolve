@@ -1,10 +1,10 @@
 ---
 name: pr
 description: Criar Pull Request com integração GitFlow e sync automático.
-allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Grep Glob Bash(cat .env*) Bash(bash .claude/validation/*)
+allowed-tools: Bash, Read, Edit, Write, Grep, Glob, Task, Skill
 category: engineer
 tags: [pr, gitflow, workflow]
-version: "3.5.0"
+version: "3.5.1"
 updated: "2026-09-14"
 related_agents:
   - gitflow-specialist
@@ -74,10 +74,19 @@ Siga estes passos para criar o PR:
    > **Por que isto é passo e não conselho** (medido em 2026-09-14, PR #827): eu rodei os refutadores
    > só **depois** de três ciclos de CI, e eles acharam **16 HARD** — entre os quais uma guarda nova
    > que era **código morto no destino da maioria dos adotantes** e uma flag `--role` que o artefato
-   > afirmava recortar e não recortava. Custo deles: **~560k tokens, ~19 min de parede**. Custo do
-   > primeiro CI: **24 min**. Eles **caberiam inteiros dentro da primeira espera**. Em vez disso
-   > gastei ~100 min de CI descobrindo em série o que 3 agentes paralelos achariam de uma vez — e o
-   > revisor do CI, que deveria cobrir isso, morreu em soft-pass sem revisar nada.
+   > afirmava recortar e não recortava. Custo deles: **~568k tokens** e **19,5 min de parede** (três
+   > em paralelo; a parede é a do mais lento).
+   >
+   > **Os três ciclos de CI custaram 19,0 · 24,2 · 24,2 min** — `gh run view` nos três runs, não
+   > estimativa. Contra **112 min de parede** total (12:44→14:36), a descoberta paralela custaria
+   > **~20**.
+   >
+   > ⚠️ **A 1ª redação deste bloco dizia "primeiro CI: 24 min" e "eles caberiam INTEIROS dentro da
+   > primeira espera".** Os dois eram falsos, e um refutador os mediu: o primeiro CI durou **19,0**
+   > min, e 19,5 min de refutação **não cabem** nele — estouram por ~30 segundos. Eu havia escolhido
+   > o número que fazia o argumento fechar. O argumento **sobrevive sem ele**, e é mais honesto
+   > assim: a refutação cabe folgada no 2º e no 3º ciclo, empata com o 1º, e o ganho real não é
+   > caber numa espera — é **os ciclos deixarem de ser três**.
 
    **Quando é obrigatório:** o PR toca `.claude/` (aí a bancada roda no CI e a espera é de ~25 min).
    Docs-only pequeno dispensa — o custo de montar e ler o retorno supera o ganho. O corte prático é

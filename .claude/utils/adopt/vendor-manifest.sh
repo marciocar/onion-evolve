@@ -46,16 +46,31 @@ case "${ROLE}" in adopted|hub|standalone) : ;; *) echo "ERRO: --role desconhecid
 # ── A LISTA, por papel ────────────────────────────────────────────────────────────────────────
 # BASE: o que TODO papel recebe. Framework + doutrina; nada de biografia.
 _base=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks
-       .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal
-       LICENSE LICENSE-DOCS)
-# ⚠️ AS DUAS LICENÇAS VIAJAM DESDE 2026-09-14, e a ausência delas era defeito medido: a lista tinha
-# ONZE raízes e NENHUMA era licença, enquanto QUATRO delas (.claude/rules, docs/meta-specs,
-# docs/knowledge-base, docs/sdaal) são exatamente o material que o LICENSE-DOCS declara CC BY-NC.
-# Os adotantes até aquela data receberam 104 arquivos de método SEM uma linha de licença, e o
-# commit deles caiu num repo que carrega o LICENSE do próprio dono — relicenciamento silencioso,
-# feito pela nossa máquina de transporte. A CC BY-NC 4.0 §3.a exige o aviso na redistribuição;
-# quem redistribuía era este script.
-# (never-clobber é do adopt: alvo que já tem LICENSE próprio não é sobrescrito — ver Fase 3)
+       .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal)
+# ⚠️ A LICENÇA NÃO ESTÁ AQUI, E A AUSÊNCIA É UM DEFEITO ABERTO — não um desenho.
+#
+# O problema é real e medido: QUATRO destas raízes (.claude/rules, docs/meta-specs,
+# docs/knowledge-base, docs/sdaal) são exatamente o material que o `LICENSE-DOCS` declara CC BY-NC,
+# e nenhuma licença as acompanha. Os adotantes recebem ~104 arquivos de método sem uma linha de
+# licença, e o commit deles cai num repo que carrega o LICENSE do próprio dono. A CC BY-NC 4.0 §3.a
+# exige o aviso na redistribuição; quem redistribui é este script.
+#
+# ⚠️ E POR QUE A CURA ÓBVIA ESTÁ ERRADA — medido em 2026-09-14, e o teste foi executado: pôr
+# `LICENSE LICENSE-DOCS` nesta lista faz o transporte SOBRESCREVER o LICENSE do alvo. O passo (d)
+# da cópia segura é `cp -R "$TMP"/. "$DEST"/`, e o único never-clobber por-arquivo é o
+# `.env.example` (`grep -c LICENSE` no adopt.md dava ZERO). Um aviso proprietário na raiz do repo
+# do cliente viraria MIT no nome do autor do core — relicenciamento silencioso na direção MAIS
+# GRAVE, feito pela cura que existia para impedir relicenciamento silencioso.
+#
+# A CURA CERTA tem duas pernas e NENHUMA cabe aqui:
+#   (1) never-clobber por-arquivo no adopt, no molde do `.env.example` (alvo que já tem LICENSE
+#       recebe `LICENSE.onion`, e o merge é do maestro);
+#   (2) a QUINTA CÓPIA da lista: `.claude/utils/adopt/durable-commit.sh:43` tem um `ONION_PATHS`
+#       hardcoded e independente desta SSOT — no caminho `--update` a licença não viajaria mesmo
+#       estando aqui. O PR #826 criou esta SSOT para matar "quatro cópias da mesma lista"; havia
+#       uma quinta, e só a passada adversarial a achou.
+# Fio próprio, com gatilho: a primeira consultoria que forkar. Ver o resíduo de
+# `feat/public-distribution-decisions`.
 # NÃO entram, e o motivo de cada um:
 #   .env.example                  → específico do alvo (never-clobber, Fase 3 do adopt)
 #   docs/evolution/               → inbox/inbound são infra LOCAL do alvo; copiar clobaria o que está em uso

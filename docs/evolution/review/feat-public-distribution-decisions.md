@@ -2,12 +2,12 @@
 title: 'Resíduo — as decisões da distribuição pública, e o vazamento que só a decisão de publicar encontrou'
 date: 2026-09-14
 branch: feat/public-distribution-decisions
-reviewed_diff_sha256: aecd8abede959a3ea027179f23e0ff33c77389b2319a517ac56b61bdcbbc5468
-findings_total: 23
-findings_real: 23
-findings_fixed: 17
-tokens: 561316
-duration_min: 39
+reviewed_diff_sha256: 26e8b72310cfa5f38aa3666e766d19c7d335df8732a13301a554c4e90175aad3
+findings_total: 32
+findings_real: 32
+findings_fixed: 23
+tokens: 1129000
+duration_min: 58
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >-
@@ -218,14 +218,79 @@ casar o padrão de declaração.
   coletiva) seguem abertas **por ordem do maestro** — ele vê em paralelo e informa. Não bloqueiam o desenho
   de C, e a razão está escrita no próprio selo.
 
+## A SEGUNDA rodada de refutadores — e ela rodou DENTRO da espera do CI
+
+O maestro perguntou como ser mais eficiente nas esperas de gate. A resposta estava medida nesta própria
+sessão: **o desperdício não era a espera — era a espera ser SERIAL com a descoberta.** Isso virou o passo
+6 do `/engineer:pr`, e o passo foi **aplicado no PR que o criou**: dois refutadores dispararam junto com o
+push de `98b35bc5`, em paralelo ao CI. **Os dois reprovaram: 9 HARD.**
+
+E o achado mais duro é sobre o próprio passo que eu acabara de escrever:
+
+**1. O passo 6 nasceu MORTO.** O `allowed-tools` do `/engineer:pr` era
+`Bash(git *) Bash(gh *) Read Edit Write Grep Glob …` — **sem `Task`, sem `Workflow`, sem `Skill`**. Um
+passo que declara *"obrigatório"* disparar subagente, num comando que não tem permissão para isso. É a
+classe que o próprio lint desta casa persegue e nomeia: *"a permissão não casa; o comando nasce MORTO"*.
+Os irmãos fazem certo (`meta/census.md` tem `Task, Workflow`; `meta/drive.md` tem `Task`). Curado.
+
+**2. Eu escolhi o número que fazia o argumento fechar.** O passo 6 afirmava *"custo do primeiro CI:
+24 min"* e *"eles caberiam INTEIROS dentro da primeira espera"*. Medido pelo refutador com
+`gh run view`: o primeiro CI durou **19,0 min** (24,2 são o 2º e o 3º), e os refutadores levaram
+**19,5 min** de parede — **não cabem**, estouram por ~30 segundos. Corrigido com os três números reais,
+e o argumento **sobrevive sem a muleta**: o ganho não é caber numa espera, é os ciclos deixarem de ser
+três. Registro isto com todas as letras porque é a falha mais perigosa que cometi hoje — não um bug, um
+número escolhido para vencer uma discussão, dentro de um arquivo que vira doutrina.
+
+**3. A minha cura das licenças era ativamente danosa.** Pôr `LICENSE` no manifesto faz o adopt
+**sobrescrever o LICENSE do adotante** — o passo de cópia é `cp -R` incondicional e o único
+never-clobber por-arquivo é o `.env.example` (`grep -c LICENSE` no `adopt.md` = **0**; o
+never-clobber que eu afirmei no comentário **não existe**). Um aviso proprietário na raiz do repo de um
+cliente viraria MIT em nome do autor do core: **relicenciamento silencioso na direção mais grave,
+produzido pela cura contra relicenciamento silencioso.** Os dois refutadores mediram isso
+independentemente. **Revertido.**
+
+**4. Havia uma QUINTA cópia da lista.** O PR #826 criou a SSOT `vendor-manifest.sh` para matar *"quatro
+cópias da mesma lista"*. `.claude/utils/adopt/durable-commit.sh:43` tem um `ONION_PATHS` hardcoded e
+independente dela — então no caminho `--update` a licença não viajaria **mesmo estando no manifesto**.
+Só a passada adversarial a achou. É fio próprio, com gatilho: a primeira consultoria que forkar.
+
+**5. `_archive_staged` era pior do que a 1ª medição dizia.** Não 17%: **33% com 2 workers, 56% com 3,
+58% com 4, 70% com 6** — e as chamadas vivem em quatro famílias que rodam em paralelo contra o mesmo
+`REPO_ROOT`. Cada falha caía no `|| true` e revertia, **em silêncio**, ao defeito que a função cura.
+Curado com retry curto **e uma linha que sai quando ele desiste** — o silêncio foi o que fez a 1ª versão
+parecer curada por meia sessão.
+
+**6. `(g)` e `(g-MUT)` mentiam nos dois sentidos quando o lint abortava.** Provado injetando `exit 7` no
+sandbox: `(g)` reprovava com o diagnóstico **errado** (mandaria consertar o lugar errado) e `(g-MUT)`
+**passava por vacuidade**. Agora os dois exigem que o sumário do lint exista antes de julgar — ausência
+de acusação só vale como evidência se houve acusador.
+
+**O que os refutadores confirmaram que está certo** (medido, não presumido): o adotante nasce com os
+**mesmos 4 HARD** de antes do PR — o diff **não o piora**, e os quatro são pré-existentes; a metade por
+FORMA **roda de fato** em `role: adopted` e sem `members.yaml` (o mesmo mutante passava em silêncio em
+`d3780081`); o baseline de forma **não é passivo do core** (0 de 17 chaves órfãs no alvo); **10/10**
+baselines resolvem emissor; `--role` é decorativo e a síntese **agora diz isso**; e os dois grafos batem
+exatamente com o que as sínteses declaram.
+
 ## Gate
 
 ```
-bancada (LC_ALL=C, --jobs 4) : 1226 pass · 0 fail · 1 ⊘ (ambiente, medido 25/25 isolado)
+bancada (LC_ALL=C, --jobs 4) : 1232 pass · 0 fail · 0 ⊘   (rodada no commit 60bbe67d)
 lint (LC_ALL=C, completo)    : 0 HARD
 radar --integrity --schema   : exit 0 nos dois grafos
   distribuição               : 52 nós · 91 arestas · realign ALINHADO
   compartilhamento           : 116 nós · 191 arestas · realign ALINHADO
-família vendor_scrub_form    : 6 casos, com mutante que reprova quando a exclusão do baseline cai
-commit                       : SEM --no-verify (ordem do maestro)
+família vendor_scrub_form    : 9 casos (a–f + g/g-MUT/h). O MUTANTE de (g) é staged e reprova
+                               quando a chamada de check_vendored_surface_form é removida;
+                               o de (e) prova que o padrão de ampersand é load-bearing.
+família vendor_manifest      : 8 casos (a–h)
+CI (SHA 98b35bc5)            : lint pass · selftest pass (15m49s) · onion-review-verdict FAIL
+                               por desenho — o revisor semântico não revisou (soft-pass)
+commit                       : SEM --no-verify (ordem do maestro), em todos
 ```
+
+⚠️ **O que este Gate NÃO cobre, e é teto estrutural:** o `reviewed_diff_sha256` é recomputado a cada
+commit, então ele passa a cobrir código escrito **depois** da passada adversarial que o resíduo
+descreve. A guarda sai verde porque o hash casa — não porque a refutação viu aquele código. A 2ª
+rodada de refutadores (sobre `d3780081..98b35bc5`) foi disparada exatamente para fechar essa janela,
+e o que ela achou está acima.
