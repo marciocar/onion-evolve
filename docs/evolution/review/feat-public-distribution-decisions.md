@@ -2,10 +2,10 @@
 title: 'Resíduo — as decisões da distribuição pública, e o vazamento que só a decisão de publicar encontrou'
 date: 2026-09-14
 branch: feat/public-distribution-decisions
-reviewed_diff_sha256: 470847a59778af2530f9cf4642f48e3a08fa8ddc62c96ca69d951ef11b08f3ec
-findings_total: 5
-findings_real: 5
-findings_fixed: 5
+reviewed_diff_sha256: be129b380c965c04d2facafdb52e4062db5b9f3cbad526e7744f6af76c83681b
+findings_total: 7
+findings_real: 7
+findings_fixed: 6
 tokens: 0
 duration_min: 0
 verdict: REPROVADO_E_CURADO
@@ -17,7 +17,7 @@ nota: >-
   existe exatamente para isso não o via.
 ---
 
-# Selei sete decisões, e a decisão de publicar achou o vazamento
+# Selei sete decisões, a decisão de publicar achou o vazamento, e uma mensagem prestativa quebrou a adoção
 
 ## O que este PR sela
 
@@ -76,6 +76,53 @@ guarda `shell-locale` da bancada.
 detector por forma consome a SSOT e roda em sandbox sem repositório. Se a lista viesse vazia, o fail-closed
 dispararia e o lint do sandbox sairia com dezenas de HARD.
 
+## O defeito que só o CI pegou — e a recorrência que estava registrada SEM cura
+
+O `selftest` reprovou no CI **depois** de a bancada local passar 1227/0/0, no mesmo código. Duas falhas
+na família `regen-baselines`, e a causa é minha:
+
+**Eu pus a string `--emit-baseline` no `lint-artifacts.sh` pela primeira vez** (`grep -c` era 0, virou 1),
+dentro de uma *mensagem de remediação* — "*se for legítimo, regenere: bash ... --emit-baseline > ...*".
+O `regen-baselines.sh` resolve o emissor de cada baseline por dois predicados: o script menciona
+`--emit-baseline` **e** menciona aquele baseline. Como o LINT cita **todo** baseline (ao dizer como
+consertá-lo), aquela única linha o tornou candidato a emissor de **8 dos 10 de uma vez**. Todo
+`emitter_count` virou 2, o helper exige exatamente 1, e **nada foi regenerado** — o adotante voltaria a
+nascer com o passivo do core.
+
+Uma mensagem prestativa quebrou a maquinaria de adoção.
+
+**Por que o local não viu e o CI viu, e esta é a parte que importa:** a fixture da família nasce de
+`git archive HEAD` — ela testa o estado **já commitado**, não o que está no staging. A mudança ficou
+invisível para a bancada até *depois* do commit; no CI ela já era HEAD.
+
+**E isso já estava escrito no próprio arquivo, como recorrência conhecida** (caso `(e)` da mesma
+família): *"o CI pegou, a bancada local não, porque o sandbox nasce de `git archive HEAD` e o emissor só
+passou a existir no HEAD depois do commit"*. Ficou **nomeada e sem cura** — por isso voltou. Esta é a
+segunda ocorrência.
+
+**As três curas, todas mecanismo:**
+
+1. **`lint-artifacts.sh` entra na exclusão**, com a regra escrita em vez de o caso: *quem fala de todos
+   os baselines não é emissor de nenhum*. Bancada e lint são **consumidores universais** — citam por
+   ofício. Teto declarado no código: continua sendo uma lista, e lista falha pelo vocabulário.
+2. **A fixture passa a nascer do ÍNDICE** (`git write-tree`), não do HEAD — helper `_archive_staged`, 4
+   sítios. A bancada passa a espelhar o que o pre-commit vai commitar, que é o idioma
+   `bancada-espelha-o-runner`. Sem índice legível cai para HEAD.
+3. **Caso `(g)` mais mutante** — a rede que substitui a lista: todo baseline resolve **exatamente 1**
+   emissor; sem a exclusão, **8 voltam a ficar ambíguos**. Provado nos dois sentidos.
+
+## A medição que não fecha, declarada em vez de arredondada
+
+A bancada final deu **1226 pass · 0 fail · 1 pulado**, e a conta com os 2 casos novos **não fecha**:
+`regen-ensure-from` foi de 2 para 4 (meus casos), mas `session-beacon` caiu de **25 para 22**, com
+apenas **1** deles contabilizado como `⊘`. Dois casos evaporaram sem entrar em nenhuma contagem.
+
+Medido isolado: `--families session_beacon` dá **25/25 verde**. É a classe já registrada nesta casa —
+guarda que passa isolada e degrada na faixa paralela por **ambiente herdado**, não por carga e não por
+esta mudança. O que fica como fio próprio: **skip silencioso é fail-open** — um sumário que anuncia
+"1226 exercidas" quando 1228 existiam trata ausência como aprovação. Gatilho para curar: a próxima vez
+que um caso sumir da faixa, ou o primeiro defeito real que escapar por ali.
+
 ## O que fica ABERTO, com dono e gatilho
 
 - **A colidência de "onion" na base do INPI não foi medida** — a busca exige sessão de navegador e nenhuma
@@ -92,7 +139,7 @@ dispararia e o lint do sandbox sairia com dezenas de HARD.
 ## Gate
 
 ```
-bancada (LC_ALL=C, --jobs 4) : 1227 pass · 0 fail · 0 skip (164 famílias, 859s)
+bancada (LC_ALL=C, --jobs 4) : 1226 pass · 0 fail · 1 ⊘ (ambiente, medido 25/25 isolado)
 lint (LC_ALL=C, completo)    : 0 HARD
 radar --integrity --schema   : exit 0 nos dois grafos
   distribuição               : 52 nós · 91 arestas · realign ALINHADO

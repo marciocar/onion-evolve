@@ -186,12 +186,31 @@ for bpath in "${VDIR}"/*-baseline.txt; do
   fi
 
   # Resolve o EMISSOR: script que (a) aceita --emit-baseline e (b) menciona este baseline.
+  #
+  # ── OS TRÊS QUE NÃO SÃO EMISSORES, E A REGRA QUE OS UNE ─────────────────────────────────
   # `lint-selftest.sh` é a BANCADA — ela cita todos os baselines por exercitá-los, e tomá-la
   # por emissor faria o helper regenerar cinco arquivos com a saída da suíte de testes.
+  #
+  # `lint-artifacts.sh` é o LINT, e entrou nesta lista em 2026-09-14 por um defeito MEDIDO:
+  # uma mensagem de remediação nova — *"regenere: bash ... --emit-baseline > ...baseline.txt"* —
+  # pôs a string `--emit-baseline` no lint pela PRIMEIRA VEZ (`grep -c` era 0, virou 1). Como o
+  # lint cita TODO baseline nas mensagens de como consertá-lo, aquela única linha o tornou
+  # candidato a emissor de **8 dos 10** baselines de uma vez, `emitter_count` virou 2 em todos, e
+  # a adoção parou de regenerar qualquer um. O adotante voltaria a nascer com o passivo do core.
+  #
+  # A REGRA, e ela é o que impede a próxima recorrência: **quem FALA de todos os baselines não é
+  # emissor de nenhum.** Emissor é o script de UMA guarda, que emite O SEU baseline. Bancada e
+  # lint são consumidores universais — citam por ofício, não por emitir.
+  #
+  # ⚠️ TETO DECLARADO: isto continua sendo uma LISTA, e nesta casa guarda de lista falha pelo
+  # VOCABULÁRIO. O critério robusto seria "implementa `--emit-baseline` num dispatch de
+  # argumento" em vez de "menciona a string", mas distinguir isso em shell é frágil. A rede que
+  # substitui a lista é o caso de bancada com mutante: qualquer consumidor universal futuro
+  # reprova o `regen-baselines` inteiro, ruidosamente, na primeira adoção simulada.
   emitter=""
   emitter_count=0
   for s in "${VDIR}"/*.sh; do
-    case "$(basename "${s}")" in lint-selftest.sh|regen-baselines.sh) continue ;; esac
+    case "$(basename "${s}")" in lint-selftest.sh|lint-artifacts.sh|regen-baselines.sh) continue ;; esac
     grep -q -- '--emit-baseline' "${s}" 2>/dev/null || continue
     grep -q "${bname}" "${s}" 2>/dev/null || continue
     emitter="${s}"; emitter_count=$((emitter_count + 1))

@@ -8805,6 +8805,30 @@ run_task_manager_hook_selftests() {
 # de catraca, e numa adoção greenfield real o `kg-verification-baseline.txt` chegou com 47 chaves
 # de grafos do CORE → o lint do adotante nasceu com 47 HARD cobrando nós que ele nunca teve. O
 # caso (b) abaixo é ESSE defeito, reduzido a fixture: se alguém quebrar a regeneração, ele volta.
+# _archive_staged <destdir> <pathspec...> — extrai para <destdir> a superfície do que VAI SER
+# COMMITADO, e não a do que já está commitado.
+#
+# ⚠️ POR QUE O ÍNDICE E NÃO `HEAD` — recorrência CURADA em 2026-09-14, na SEGUNDA ocorrência:
+# fixture que nasce de `git archive HEAD` testa o estado JÁ COMMITADO, então a mudança que está
+# no staging é INVISÍVEL para ela. O efeito medido é sempre o mesmo e é o pior possível: a
+# bancada local passa verde, o commit entra, e o CI reprova sobre o mesmo código — porque no CI
+# a mudança já é HEAD.
+#   1ª (registrada no caso (e) desta família): o emissor `kg-yaml-validity` só passou a existir
+#      no HEAD depois do commit; o sandbox não era repo git e o relatório saiu deformado.
+#   2ª (esta): uma mensagem de remediação nova pôs `--emit-baseline` no `lint-artifacts.sh` pela
+#      primeira vez, tornando o LINT candidato a emissor de 8 baselines. Bancada local 1227/0/0,
+#      CI com 2 falhas, mesmo código.
+# A 1ª ficou NOMEADA e SEM CURA — por isso voltou. `git write-tree` materializa a árvore do
+# ÍNDICE, que é exatamente o que o pre-commit vai commitar: a bancada passa a espelhar o runner.
+# Sem índice legível (repo sem commit, merge em conflito) cai para HEAD e o comportamento antigo.
+_archive_staged() {
+  local _dest="$1"; shift
+  local _tree
+  _tree="$(git -C "${REPO_ROOT}" write-tree 2>/dev/null || true)"
+  [ -n "${_tree}" ] || _tree=HEAD
+  git -C "${REPO_ROOT}" archive "${_tree}" -- "$@" 2>/dev/null | tar -x -C "${_dest}" 2>/dev/null
+}
+
 run_regen_baselines_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/regen-baselines.sh"
   if [ ! -f "${helper}" ]; then record_fail "regen-baselines" "helper ausente: ${helper}"; return; fi
@@ -8823,7 +8847,7 @@ run_regen_baselines_selftests() {
 
   # (b) O DEFEITO ORIGINAL: baseline herdado com paths do core → regenerado para o corpus do ALVO.
   d="$(mktemp -d)"
-  git -C "${REPO_ROOT}" archive HEAD -- .claude/validation 2>/dev/null | tar -x -C "${d}" 2>/dev/null
+  _archive_staged "${d}" .claude/validation
   printf 'role: adopted\n' > "${d}/.claude/.onion-version"
   printf '# herdado do core\ndocs/discussions/x/proto/y.kg.yaml::15c1995fb0f2\n' \
     > "${d}/.claude/validation/kg-verification-baseline.txt"
@@ -8869,7 +8893,7 @@ run_regen_baselines_selftests() {
   #     helper): era defeito da BANCADA, não do SUT. Fixture pobre acusa o código inocente.
   d="$(mktemp -d)"
   git -C "${d}" init -q 2>/dev/null
-  git -C "${REPO_ROOT}" archive HEAD -- .claude/validation 2>/dev/null | tar -x -C "${d}" 2>/dev/null
+  _archive_staged "${d}" .claude/validation
   mkdir -p "${d}/.claude/validation" "${d}/docs/legado"
   : > "${d}/docs/legado/antigo.md"
   printf 'role: adopted\n' > "${d}/.claude/.onion-version"
@@ -8930,7 +8954,7 @@ run_regen_baselines_selftests() {
   # (e) o relatório não pode sair DEFORMADO: `grep -c` sem casamento imprime 0 E sai 1, então
   #     `grep -c || echo 0` emitia "0\n0" e quebrava a linha do relatório (defeito real, mesmo dia).
   d="$(mktemp -d)"
-  git -C "${REPO_ROOT}" archive HEAD -- .claude/validation 2>/dev/null | tar -x -C "${d}" 2>/dev/null
+  _archive_staged "${d}" .claude/validation
   printf 'role: adopted\n' > "${d}/.claude/.onion-version"
   # ⚠️ O ALVO TEM DE SER UM REPO GIT — e não era. Adoção só existe sobre repo git, mas este sandbox
   #    era um diretório solto, e emissor nenhum reclamava porque nenhum precisava de git. O primeiro
@@ -9003,6 +9027,57 @@ run_regen_ensure_from_selftests() {
   else record_fail "regen-ensure-from: (b)" "sem a flag o baseline apareceu/passou (rc=$rc2) — o teste não prova"; fi
   unset -f _mk_preca
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+
+  # ── (g) CONSUMIDOR UNIVERSAL NÃO É EMISSOR — a rede que substitui a lista ──────────────────
+  # Defeito MEDIDO em 2026-09-14: uma mensagem de remediação nova pôs a string `--emit-baseline`
+  # no `lint-artifacts.sh` pela primeira vez. Como o LINT cita TODO baseline (ao dizer como
+  # consertá-lo), aquela linha o tornou candidato a emissor de 8 dos 10 de uma vez: cada
+  # `emitter_count` virou 2, nada foi regenerado, e o adotante voltaria a nascer com o passivo
+  # do core. Nenhuma guarda viu — o `regen-baselines` falha RUIDOSAMENTE, mas só quando rodado.
+  #
+  # Este caso é a rede: ele prova que a exclusão dos consumidores universais é LOAD-BEARING, e
+  # qualquer consumidor futuro que ganhe a string reprova aqui, na adoção simulada.
+  local _gd _gv _gcount
+  _gd="$(mktemp -d)"; git -C "${_gd}" init -q 2>/dev/null
+  _archive_staged "${_gd}" .claude/validation
+  _gv="${_gd}/.claude/validation"
+  # conta, com o MESMO predicado do helper, quantos emissores cada baseline resolve
+  _gcount=0
+  for _gb in "${_gv}"/*-baseline.txt; do
+    [ -e "${_gb}" ] || continue
+    local _gn _gi=0
+    _gn="$(basename "${_gb}")"
+    for _gs in "${_gv}"/*.sh; do
+      case "$(basename "${_gs}")" in lint-selftest.sh|lint-artifacts.sh|regen-baselines.sh) continue ;; esac
+      grep -q -- '--emit-baseline' "${_gs}" 2>/dev/null || continue
+      grep -q "${_gn}" "${_gs}" 2>/dev/null || continue
+      _gi=$((_gi + 1))
+    done
+    [ "${_gi}" -eq 1 ] || _gcount=$((_gcount + 1))
+  done
+  if [ "${_gcount}" -eq 0 ]; then
+    record_pass "regen-ensure-from: (g) todo baseline resolve EXATAMENTE 1 emissor (consumidor universal excluído)"
+  else record_fail "regen-ensure-from: (g) emissor ambíguo" "${_gcount} baseline(s) não resolvem 1 emissor — um consumidor universal (lint/bancada) ganhou a string --emit-baseline, ou um emissor sumiu"; fi
+
+  # (g-MUT) a exclusão é load-bearing: sem `lint-artifacts.sh` na lista, o lint volta a contar
+  #         como emissor e a ambiguidade reaparece. Se este mutante NÃO acusar, (g) é vacuidade.
+  _gcount=0
+  for _gb in "${_gv}"/*-baseline.txt; do
+    [ -e "${_gb}" ] || continue
+    local _gn2 _gi2=0
+    _gn2="$(basename "${_gb}")"
+    for _gs in "${_gv}"/*.sh; do
+      case "$(basename "${_gs}")" in lint-selftest.sh|regen-baselines.sh) continue ;; esac   # ← lint NÃO excluído
+      grep -q -- '--emit-baseline' "${_gs}" 2>/dev/null || continue
+      grep -q "${_gn2}" "${_gs}" 2>/dev/null || continue
+      _gi2=$((_gi2 + 1))
+    done
+    [ "${_gi2}" -eq 1 ] || _gcount=$((_gcount + 1))
+  done
+  if [ "${_gcount}" -gt 0 ]; then
+    record_pass "regen-ensure-from: (g-MUT) sem a exclusão do lint a ambiguidade volta (${_gcount} baselines) — (g) é load-bearing"
+  else record_fail "regen-ensure-from: (g-MUT)" "sem a exclusão nada mudou — o caso (g) não prova nada"; fi
+  rm -rf "${_gd}"
 }
 
 # Modo seed-adoption-graph — exercita .claude/utils/adopt/seed-adoption-graph.sh.
@@ -9022,7 +9097,7 @@ run_seed_adoption_graph_selftests() {
   _seed_fixture() {   # alvo com a maquinaria vendorizada + stamp
     local dd; dd="$(mktemp -d)"
     git -C "${dd}" init -q 2>/dev/null
-    git -C "${REPO_ROOT}" archive HEAD -- .claude/validation .claude/rules 2>/dev/null | tar -x -C "${dd}" 2>/dev/null
+    _archive_staged "${dd}" .claude/validation .claude/rules
     mkdir -p "${dd}/.claude"
     printf 'framework: onion-evolve\ncommit: abc123def456\nrole: adopted\nmode: greenfield\nadopted_at: 2026-08-17\nintegration_branch: main\n' \
       > "${dd}/.claude/.onion-version"
