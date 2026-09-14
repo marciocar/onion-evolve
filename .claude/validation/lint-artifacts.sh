@@ -956,11 +956,23 @@ check_branch_agent_distinction() {
 # morto, reprovando até a fixture `good`. Falso-positivo medido no dogfood, 2026-08-03:
 # a guarda acusaria a si mesma no próprio auto-teste. Fora de repo git, cai para `find`.
 _rule_glob_matches() { # $1=glob
-  local g="$1" pat
+  local g="$1" pat _ls
   if git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
-    git -C "${REPO_ROOT}" ls-files -- "${g}"        | grep -q . && return 0
+    # ⚠️ SEM PIPE, e a razão é um HARD ESPÚRIO que só o CI produziu (2026-09-14, PR #827):
+    # a forma anterior era `git ls-files -- "$g" | grep -q .`. Sob `set -euo pipefail` (l.74) isso
+    # é uma CORRIDA: `grep -q` sai no PRIMEIRO casamento, e o `git ls-files` que ainda tem bytes a
+    # escrever leva EPIPE e sai 141 — o `pipefail` propaga o 141, o `&&` não dispara, e a regra
+    # viva é acusada de morta. `docs/evolution/research/**` casa 139 arquivos (10 KB, várias
+    # chamadas de `write`), então a janela existe; numa máquina ociosa o git termina antes de o
+    # grep sequer rodar (medido: 0 falhas em 200 tentativas locais) e num runner de 2 núcleos sob
+    # carga, não. É a classe [[pipefail-epipe-early-closer-class]], e o modo de falha é o pior
+    # possível: verde no dev, vermelho no CI, sobre um arquivo que ninguém tocou.
+    # Capturar em variável não tem leitor que feche cedo — 10 KB de caminho é barato.
+    _ls="$(git -C "${REPO_ROOT}" ls-files -- "${g}")" || _ls=""
+    [ -n "${_ls}" ] && return 0
     # o harness escreve '**/x'; o pathspec do git resolve o mesmo com o sufixo puro
-    git -C "${REPO_ROOT}" ls-files -- "${g#\*\*/}"  | grep -q . && return 0
+    _ls="$(git -C "${REPO_ROOT}" ls-files -- "${g#\*\*/}")" || _ls=""
+    [ -n "${_ls}" ] && return 0
     return 1
   fi
   pat="${g##*/}"                                   # '**/*.kg.yaml' → '*.kg.yaml'
