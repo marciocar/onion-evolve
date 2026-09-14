@@ -243,7 +243,7 @@ nodes:
     impact: 4
     confidence: 0.7
     owner: core
-    label: 'ABERTO: tirar do prompt a instrucao em prosa `nao tente postar comentario` e impedir a tentativa por MECANISMO (ferramenta ausente que nao seja tentada, ou mandato que nao peca postagem). Gatilho: o proximo PR que cair em soft-pass — ou seja, o proximo PR grande.'
+    label: 'CURA ESCRITA EM 2026-09-14, VALIDACAO PENDENTE — segue `open` de proposito. O que nomeou o alvo foi a propria medicao guardada no workflow: `permission_denials_count: 14` E `No buffered inline comments` (2026-08-07), mais `9` no PR #827 — a segunda frase diz que ele tenta postar COMENTARIO INLINE DE REVIEW, nao comentario solto. A defesa era INSTRUCAO EM PROSA no prompt, ignorada nas duas ocorrencias. Cura: `--allowedTools Read Grep Glob Bash` explicito nos dois sitios (tentativa e retry) — a ferramenta deixa de existir na lista dele, entao nao ha o que tentar. NAO FOI VALIDADA: PR que edita onion-review.yml faz a action SE AUTO-PULAR, entao o fix saiu verde sem ser exercido. Gatilho para fechar: o PR SEGUINTE ao merge — revisor volta a revisar (cura pegou) ou morre em t=0 com zero turnos (allowlist estreita demais; alargar, nunca remover).'
     trace: '.github/workflows/onion-review.yml'
 
   - id: A_LICENCA_VIAJA_COM_NEVER_CLOBBER_E_QUINTA_COPIA

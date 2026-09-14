@@ -2,7 +2,7 @@
 title: 'Resíduo — as decisões da distribuição pública, e o vazamento que só a decisão de publicar encontrou'
 date: 2026-09-14
 branch: feat/public-distribution-decisions
-reviewed_diff_sha256: ccec4325f681cd3f63d987bb70b3c506f2b09c0635bc003c41e7d3d77c4c1e5c
+reviewed_diff_sha256: ac00cad2f3e413c32a5961d45e8f53c6c85c7421afd42f0f345a81af4cf02b44
 findings_total: 32
 findings_real: 32
 findings_fixed: 23
@@ -271,6 +271,33 @@ FORMA **roda de fato** em `role: adopted` e sem `members.yaml` (o mesmo mutante 
 `d3780081`); o baseline de forma **não é passivo do core** (0 de 17 chaves órfãs no alvo); **10/10**
 baselines resolvem emissor; `--role` é decorativo e a síntese **agora diz isso**; e os dois grafos batem
 exatamente com o que as sínteses declaram.
+
+## A cura do revisor do CI — escrita, NÃO validada
+
+O merge foi **recusado pelo `ops/pr-merge-verified.sh`**: ele barra qualquer check falho e não tem
+flag de override. O único vermelho era o `onion-review-verdict`, que sinaliza que o revisor semântico
+não revisou. O mecanismo fez exatamente o que existe para fazer — pôr a decisão diante de um humano.
+
+O maestro mandou curar o revisor primeiro, e o alvo veio de uma medição que a casa **já tinha
+guardado** no próprio workflow: `permission_denials_count: 14` **e `No buffered inline comments`**
+(2026-08-07), mais `9` neste PR. É a segunda frase que nomeia o subsistema — ele não tenta comentar
+solto, tenta postar **comentário inline de review**, e morre acumulando negação. Credencial sã
+(pré-voo HTTP 200), parada em 18 de 60 turnos.
+
+A defesa que existia era uma **instrução em prosa** no prompt (*"NÃO tente postar comentário"*), e ele
+a ignorou nas duas ocorrências. Conselho onde precisava de mecanismo.
+
+**Cura:** `--allowedTools Read Grep Glob Bash` explícito nos dois sítios (tentativa e retry). A
+ferramenta deixa de existir na lista dele — não há o que tentar. O conjunto é o que o mandato exige,
+já que o prompt proíbe tocar a árvore.
+
+**⚠️ TETO, e ele é grande: isto NÃO PÔDE SER VALIDADO no PR que o escreveu.** PR que edita
+`onion-review.yml` faz a action **se auto-pular** (o caso BENIGNO do verdict, documentado no próprio
+arquivo porque o check já gritou no caso inócuo uma vez). O fix sai verde **sem ter sido exercido**, e
+isso é também o que destrava este merge — legitimamente, pela semântica documentada, mas sem prova.
+Quem confere é o **PR seguinte**: revisor volta a revisar (pegou) ou morre em t=0 com zero turnos
+(allowlist estreita demais — alargar, nunca remover). O nó `A_CURAR_O_REVISOR_DO_CI_COM_MECANISMO`
+segue `open` de propósito, com esse gatilho escrito.
 
 ## Gate
 
