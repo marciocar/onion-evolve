@@ -1,0 +1,70 @@
+Creative Commons Attribution-NonCommercial 4.0 International (CC BY-NC 4.0)
+
+Copyright (c) 2026 Marcio Carvalho
+
+═══════════════════════════════════════════════════════════════════════════════
+O QUE ESTA LICENÇA COBRE, E O QUE NÃO COBRE
+═══════════════════════════════════════════════════════════════════════════════
+
+Este repositório tem DUAS licenças, porque tem duas naturezas.
+
+  CÓDIGO  → MIT (ver LICENSE). Scripts, hooks, comandos, agentes, skills,
+            workflows e tudo que EXECUTA. Permissivo por escolha: ajuda adoção,
+            e a concessão já foi feita publicamente — ela não retroage.
+
+  MÉTODO  → esta licença, CC BY-NC 4.0. O material que ENSINA e ARGUMENTA:
+
+              docs/knowledge-base/     as doutrinas e os padrões
+              docs/meta-specs/         a constituição do framework
+              docs/sdaal/              o padrão de abstração
+              .claude/rules/           as REGRAS, com o porquê de cada uma
+              exemplos de grafo (.kg.yaml) publicados como material de método
+
+Licença de software aplicada a prosa é a forma errada: MIT fala de "software"
+e de "cópias substanciais", vocabulário que não descreve uma doutrina. Creative
+Commons descreve. É também o que a thoughtbot faz com o playbook dela, e pela
+mesma razão declarada: para que outros possam usar sem revender.
+
+═══════════════════════════════════════════════════════════════════════════════
+EM UMA FRASE
+═══════════════════════════════════════════════════════════════════════════════
+
+Use o método no seu trabalho, adapte, cite a origem. Não o venda como produto
+nem como curso seu.
+
+  PODE   usar dentro da sua empresa, inclusive em trabalho que gera receita
+         (o produto que você constrói COM o método é seu, e não é obra derivada
+         desta documentação);
+         adaptar, traduzir, recortar;
+         republicar com atribuição, sob a mesma condição não-comercial.
+
+  NÃO    revender a documentação, empacotá-la como curso, treinamento pago ou
+         material de consultoria de terceiro sem autorização escrita.
+
+ATRIBUIÇÃO: cite "Sistema Onion — https://onionevolve.com" e indique se houve
+modificação.
+
+Uso comercial da documentação exige autorização: marciocar@gmail.com
+
+═══════════════════════════════════════════════════════════════════════════════
+TEXTO LEGAL COMPLETO
+═══════════════════════════════════════════════════════════════════════════════
+
+Esta é uma referência legível. A licença que vale é o texto oficial:
+https://creativecommons.org/licenses/by-nc/4.0/legalcode
+
+Resumo oficial: https://creativecommons.org/licenses/by-nc/4.0/
+
+═══════════════════════════════════════════════════════════════════════════════
+O QUE ESTA LICENÇA NÃO FAZ
+═══════════════════════════════════════════════════════════════════════════════
+
+NÃO CONCEDE MARCA. Nenhuma licença concede — a Apache 2.0 diz isso em letra
+(§6), e a política da Apache Software Foundation confirma na prática: um
+derivado existe sob marca PRÓPRIA. Um trabalho derivado deste material não pode
+se apresentar como "Onion" nem usar a identidade visual do projeto. A
+titularidade do nome está em medição.
+
+NÃO RETROAGE. O que já foi publicado sob MIT — este repositório e os plugins do
+marketplace — continua sob MIT. Esta licença vale para o material de método
+daqui em diante.

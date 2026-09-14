@@ -94,7 +94,18 @@ Veja **[CONTRIBUTING.md](CONTRIBUTING.md)**.
 
 ## 📄 Licença
 
-Distribuído sob a licença **MIT** — veja **[LICENSE](LICENSE)**.
+**Duas licenças, porque são duas naturezas:**
+
+| o quê | licença | |
+|---|---|---|
+| **código** — scripts, hooks, comandos, agentes, skills, workflows | **MIT** | [LICENSE](LICENSE) |
+| **método** — `docs/knowledge-base/`, `docs/meta-specs/`, `docs/sdaal/`, `.claude/rules/` e exemplos de grafo | **CC BY-NC 4.0** | [LICENSE-DOCS](LICENSE-DOCS) |
+
+Em uma frase: **use o método no seu trabalho, adapte, cite a origem — não o venda como produto nem
+como curso seu.** O que você constrói *com* o Onion é seu; a documentação que ensina o método é que
+não se revende. Uso comercial da documentação exige autorização.
+
+Nenhuma das duas concede **marca**: um trabalho derivado não se apresenta como "Onion".
 
 O Onion se inspira em ideias de **interface unificada** para orquestração com IA; referência conceitual: [Esperanto, de Luis Novo](https://github.com/lfnovo/esperanto).
 
