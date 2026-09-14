@@ -1,0 +1,365 @@
+meta:
+  id: passada-adversarial-2026-09
+  schema_version: "1"
+  baseline: 2026-09-14
+  review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
+  # kg-backlog-guard: on
+  # ═══ TETO: 23 NÓS. Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
+  # O CI nao revisou o PR #827 (o revisor morreu com permission_denials_count: 9 e caiu em soft-pass);
+  # o maestro mandou rodar a passada propria. DUAS rodadas, 5 refutadores com LENTES distintas
+  # (maquinaria/shell · o artefato mente? · pelo lado do adotante), ~1,13M tokens. As duas REPROVARAM:
+  # 25 achados HARD, 23 curados no mesmo PR e 6 declarados com gatilho. Regua: veredito de refutador e
+  # HIPOTESE — todo achado aqui foi RE-MEDIDO por mim antes de entrar (um deles citava URL que dava 404).
+  # Este grafo existe porque a prosa evapora: os achados viviam so em commit, residuo e comentario, e a
+  # migalha radar-is-runtime-investigations-born-as-graph ja registra 8 passadas de Elenxo perdidas assim.
+
+nodes:
+  - id: Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA
+    node_type: question
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: '2026-09-14'
+    verified_against: 'duas rodadas medidas no PR #827: gates mecanicos VERDES (lint 0 HARD, bancada 1232/0/0, selftest CI pass) e 25 HARD achados pelos refutadores no MESMO codigo'
+    label: 'RESPONDIDA: o gate mecanico e a passada adversarial medem coisas DIFERENTES, e a diferenca nao e de grau. Os tres gates estavam VERDES quando os refutadores acharam 25 HARD — entre eles uma guarda que era codigo morto no destino da maioria dos adotantes, uma flag que o artefato afirmava recortar e nao recortava, e um passo de comando que nascia sem a permissao que ele proprio declara obrigatoria. O gate responde `o artefato viola alguma regra escrita?`; a passada responde `o artefato FAZ o que DIZ que faz?`. Nenhum lint desta casa faz a segunda pergunta.'
+    trace: 'docs/evolution/review/feat-public-distribution-decisions.md'
+
+  # ── A CLASSE DOMINANTE: 3 ocorrencias em guardas DIFERENTES no mesmo dia ──
+  - id: C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'tres ocorrencias medidas em tres guardas distintas no mesmo dia, cada uma com comando e saida no residuo do PR #827'
+    label: 'Em guarda que enumera VOCABULARIO, o defeito dominante e a lista estar incompleta — nunca a logica estar errada. E a lista nunca esta completa, porque o mundo ganha termos novos e a guarda nao. A cura estrutural e sempre a mesma: asserir a FORMA e deixar a CATRACA julgar (candidato legitimo entra no baseline uma vez; candidato novo e HARD). Isto ja era migalha nesta casa; hoje virou medicao com N=3 em um dia.'
+    trace: '.claude/validation/vendor-scrub-form-check.sh'
+
+  - id: E_LISTA_1_REGRA36_NAO_VE_CLIENTE_NAO_REGISTRADO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'medicao no proprio repo: nome comercial de cliente real de PoC em DOIS arquivos da superficie vendorizada, e a REGRA 36 nunca cobrou'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OCORRENCIA 1 — a REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente) deriva os termos do members.yaml, entao CLIENTE QUE NUNCA FOI REGISTRADO e invisivel para ela. Derivar do registro e o desenho CERTO (nome hardcoded num script E o proprio vazamento); o furo e o vocabulario. Achado so porque a decisao de publicar obrigou a medir antes.'
+    trace: '.claude/validation/vendor-scrub-form-check.sh'
+
+  - id: E_LISTA_2_REGEN_BASELINES_TOMOU_O_LINT_POR_EMISSOR
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'grep -c --emit-baseline no lint-artifacts.sh: era 0, virou 1 com uma mensagem de remediacao; 8 dos 10 baselines passaram a resolver 2 emissores e NENHUM foi regenerado'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OCORRENCIA 2 — uma MENSAGEM PRESTATIVA quebrou a maquinaria de adocao. Ao escrever `regenere: bash ... --emit-baseline > ...` num aviso do lint, a string entrou no arquivo pela primeira vez; como o LINT cita TODO baseline (ao dizer como conserta-lo), ele virou candidato a emissor de 8 de uma vez. A regra que faltava: quem FALA de todos os baselines nao e emissor de NENHUM — bancada e lint sao consumidores universais.'
+    trace: '.claude/utils/adopt/regen-baselines.sh'
+
+  - id: E_LISTA_3_CATRACA_DO_EPIPE_SEM_GIT_E_SEM_BASH
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'o detector pipe-verdict-check.sh enumerava _emit|grep|awk|sed|cat|printf; as duas instancias do dia tinham produtor `git` e `bash`, ambos fora da lista'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OCORRENCIA 3, E A MAIS INSTRUTIVA: JA EXISTIA CATRACA para a classe do EPIPE, com baseline e selftest — e ela nao viu nenhuma das duas instancias, porque o PRODUTOR era enumerado. Guarda madura, com mecanismo completo, cega pelo mesmo motivo das outras duas. Cura: o detector passa a asserir a FORMA (qualquer produtor em posicao de veredito seguido de | grep -q). Custo medido: 88 para 137 sitios, absorvidos como passivo.'
+    trace: '.claude/validation/pipe-verdict-check.sh'
+
+  # ── A CLASSE EPIPE: recorrencia que estava registrada SEM cura ──
+  - id: C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'duas instancias medidas no mesmo dia, ambas com o padrao PRESENTE e o veredito FALSO; 0 falhas em 200 tentativas locais contra reprovacao no runner de 2 nucleos'
+    label: '`<produtor> | grep -q PADRAO` em posicao de VEREDITO, sob `set -euo pipefail`, e uma CORRIDA: o grep casa e SAI, o produtor que ainda tem bytes leva EPIPE e sai 141, o pipefail propaga, e o veredito sai FALSO COM O PADRAO PRESENTE. O modo de falha e o mais caro que existe — VERDE no dev, VERMELHO no CI, sobre arquivo que ninguem tocou — porque manda o proximo leitor procurar no lugar errado. Nao depende de tamanho grande: bastam varias chamadas de write (10 KB ja bastam) e um runner sob carga.'
+    trace: '.claude/validation/lint-artifacts.sh'
+
+  - id: E_EPIPE_ACUSOU_REGRA_VIVA_DE_MORTA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'CI do PR #827 reprovou com 1 HARD que nao reproduz local; o glob docs/evolution/research/** casa 139 arquivos rastreados (10 KB de caminhos)'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'INSTANCIA A: `git ls-files -- "$g" | grep -q .` no matcher de globs da regra path-scoped acusou `.claude/rules/research-lens.md` de nunca carregar. A regra esta VIVA e casa 139 arquivos. Medido: 0 falhas em 200 tentativas locais — a corrida so perde num runner de 2 nucleos sob carga.'
+    trace: '.claude/validation/lint-artifacts.sh'
+
+  - id: E_EPIPE_ACUSOU_O_TRANSPORTE_DE_NAO_CARREGAR
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'a bancada reprovou upstream-portal (b) no mesmo minuto em que a instancia A foi curada; .claude/workflows e a 8a de 11 linhas emitidas'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'INSTANCIA B, achada pela bancada MINUTOS depois de eu curar a A: `bash vendor-manifest.sh --emit-scrub-roots | grep -qx .claude/workflows` acusou o transporte de nao carregar um diretorio que ele carrega. Sobram 3 linhas para o SIGPIPE. Curar a classe num arquivo fez o vizinho aparecer — e e por isso que cura de SITIO nao encerra classe.'
+    trace: '.claude/validation/lint-selftest.sh'
+
+  - id: E_A_RECORRENCIA_ESTAVA_NOMEADA_E_SEM_CURA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: '2026-09-14'
+    verified_against: 'o caso (e) da familia regen_baselines ja trazia a frase, escrita numa passada anterior, sem cura anexada'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O PADRAO DE META-FALHA: a fixture da bancada nascia de `git archive HEAD` — testava o JA COMMITADO, nao o staging — e isso JA ESTAVA ESCRITO no proprio arquivo (`o CI pegou, a bancada local nao, porque o sandbox nasce de git archive HEAD`). Ficou NOMEADA e SEM CURA, e por isso voltou. Erro conhecido que nao ganha cura anexada nao e conhecimento: e uma nota de rodape que o proximo leitor ignora.'
+    trace: '.claude/validation/lint-selftest.sh'
+
+  # ── O QUE A PASSADA ACHOU NOS MEUS PROPRIOS ARTEFATOS ──
+  - id: E_A_GUARDA_NOVA_ERA_CODIGO_MORTO_NO_DESTINO_MAJORITARIO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'mutante provado: nome de cliente injetado passa em role:adopted e e pego em role:hub; com members.yaml enxuto o detector nao varria nada'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'A IRONIA CENTRAL DA RODADA: a metade por FORMA — escrita PORQUE guarda-de-lista falha pelo vocabulario — nasceu como bloco no fim da funcao irma e ficou atras de DOIS `return 0` que nao sao dela. O `IS_LEAF` (isencao de adotante-folha, que existe por CIRCULARIDADE da derivacao) a matava em `role: adopted`, o destino da MAIORIA; e o `[ -n "$terms" ]` a gateava em a LISTA produzir vocabulario. A cura que existe porque a lista falha so rodava se a lista funcionasse. Cura estrutural: funcao propria — quem nao compartilha a precondicao nao compartilha a funcao.'
+    trace: '.claude/validation/lint-artifacts.sh'
+
+  - id: E_O_DETECTOR_NAO_PEGAVA_METADE_DO_VAZAMENTO_QUE_O_MOTIVOU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: '2026-09-14'
+    verified_against: 'rodado sobre o texto original do vazamento: o ampersand pega a primeira metade, a ancora NAO pega a segunda (caixa alta) na mesma frase'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O detector por forma nascia cego para METADE do identificador que o motivou: o padrao exigia [A-Z][a-z] e a segunda metade era sigla em caixa alta. Se o cliente se chamasse so por ela, a guarda nasceria cega para o proprio caso que a criou. Junto caiam preposicao, dois-pontos e acento (sob LC_ALL=C o acento truncava a chave, e tolerar o prefixo tolera todo homografo no arquivo). Curado em DUAS voltas: a 1a aceitou caixa alta sozinha e o repo saltou de 9 para 36 candidatos (27 de prosa); a 2a exige segundo token em forma de nome — 17 candidatos.'
+    trace: '.claude/validation/vendor-scrub-form-check.sh'
+
+  - id: E_O_PASSO_QUE_EU_ESCREVI_NASCIA_MORTO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'allowed-tools do /engineer:pr nao tinha Task, Workflow nem Skill; os irmaos meta/census e meta/drive tem'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'Escrevi um passo que declara OBRIGATORIO disparar subagente, num comando SEM permissao para isso — a classe que o proprio lint desta casa nomeia (`a permissao nao casa; o comando nasce MORTO`). Achado no PRIMEIRO uso do passo, pelo refutador que o proprio passo mandou disparar. O mecanismo se autorrefutou em uso real, que e o unico jeito de saber.'
+    trace: '.claude/commands/engineer/pr.md'
+
+  - id: E_ESCOLHI_O_NUMERO_QUE_FECHAVA_O_ARGUMENTO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'gh run view nos tres runs: 19,0 · 24,2 · 24,2 min. Eu escrevera `primeiro CI: 24 min` e `cabem inteiros`; os refutadores levaram 19,5 min de parede'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O ACHADO MAIS PERIGOSO DO DIA, e nao e um bug: num arquivo que vira DOUTRINA e VIAJA para adotantes, escrevi `custo do primeiro CI: 24 min` e `eles caberiam INTEIROS dentro da primeira espera`. O primeiro CI durou 19,0 min (24,2 sao o 2o e o 3o) e a refutacao levou 19,5 — NAO cabem, estouram por ~30s. Eu havia escolhido o numero que fazia o argumento fechar. O argumento sobrevive sem a muleta e fica mais honesto: o ganho nao e caber numa espera, e os ciclos deixarem de ser tres.'
+    trace: '.claude/commands/engineer/pr.md'
+
+  - id: E_A_CURA_DAS_LICENCAS_ERA_ATIVAMENTE_DANOSA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'dois refutadores mediram independentemente: com LICENSE no manifesto, o cp -R do adopt sobrescreve o LICENSE do alvo; grep -c LICENSE no adopt.md = 0'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'Pus LICENSE no manifesto para impedir relicenciamento silencioso, e isso PRODUZIA relicenciamento silencioso na direcao MAIS GRAVE: o passo de copia e um `cp -R` incondicional e o unico never-clobber por-arquivo e o .env.example — o never-clobber que meu comentario AFIRMAVA nao existe. Um aviso proprietario na raiz do repo de um cliente de consultoria viraria MIT em nome do autor do core. REVERTIDO.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: E_HAVIA_UMA_QUINTA_COPIA_DA_LISTA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: '2026-09-14'
+    verified_against: 'durable-commit.sh:43 tem ONION_PATHS hardcoded e independente da SSOT criada no PR #826'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O PR #826 criou a SSOT vendor-manifest.sh para matar `quatro copias da mesma lista`. Havia uma QUINTA, em durable-commit.sh — entao no caminho --update a licenca nao viajaria nem estando no manifesto. A varredura que fundou a SSOT parou nos consumidores obvios; so a passada adversarial, que simula a ADOCAO INTEIRA, alcancou o quinto. Contar copias nao e o mesmo que provar que nao ha mais nenhuma.'
+    trace: '.claude/utils/adopt/durable-commit.sh'
+
+  # ── A DECISAO QUE SAIU DISSO ──
+  - id: D_PASSADA_ADVERSARIAL_VIRA_PASSO_EM_PARALELO_AO_CI
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 0.85
+    verified_at: '2026-09-14'
+    verified_against: 'selado pelo maestro 2026-09-14 (`faz virar mecanismo no /engineer:pr`) e DOGFOODADO no PR que o criou: a 2a rodada rodou dentro da espera do CI e achou 9 HARD'
+    label: 'SELADA: a passada adversarial vira PASSO 6 do /engineer:pr, disparada no MESMO movimento do PR e em PARALELO ao CI — nunca depois dele. O CI e FILA, nao barreira: enquanto roda, a sessao esta ociosa e o diff ja esta estavel. UM REFUTADOR POR LENTE (maquinaria · o artefato mente? · pelo lado do adotante), porque tres copias do mesmo prompt convergem no mesmo ponto cego. E a clausula que PROTEGE O PROPOSITO: o achado entra NESTE PR — sem ela, mais agentes geram mais achados que geram mais ciclos, e o laco expande em vez de fechar.'
+    trace: '.claude/commands/engineer/pr.md'
+
+  - id: E_O_REVISOR_DO_CI_NAO_REVISA_HA_DUAS_OCORRENCIAS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: '2026-09-14'
+    verified_against: 'permission_denials_count: 9 no PR #827 e 14 em 2026-08-07, registrado no proprio workflow; pre-voo da credencial HTTP 200, logo nao e auth'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O revisor semantico do CI NAO revisou nenhum dos cinco ciclos deste PR: ele tenta postar comentario, nao tem ferramenta para isso, e morre com negacoes de permissao. A unica defesa hoje e uma INSTRUCAO EM PROSA no prompt dizendo `nao tente postar comentario` — e ele a ignora, duas ocorrencias medidas. Conselho onde precisava de mecanismo. Enquanto isso, todo PR grande cai em soft-pass e o check de veredito vermelho vira ruido que se aprende a ignorar, que e como uma guarda morre.'
+    trace: '.github/workflows/onion-review.yml'
+
+  # ── OS FIOS ABERTOS, com dono e gatilho ──
+  # ⚠️ `plane: DEV` nos A_*, e a REGRA 49 (Nó plane:PROD de alto impacto carrega VERIFICAÇÃO, com
+  # catraca) me ensinou isto ao reprovar a 1ª redação: AÇÃO ABERTA É PLANO, não afirmação sobre
+  # produção. O que foi MEDIDO são as evidências (E_*, todas plane:PROD com verified_at e o comando
+  # que provou); o que ainda se pretende fazer não pode carimbar produção sem nunca ter olhado.
+  - id: A_CURAR_O_REVISOR_DO_CI_COM_MECANISMO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    owner: core
+    label: 'ABERTO: tirar do prompt a instrucao em prosa `nao tente postar comentario` e impedir a tentativa por MECANISMO (ferramenta ausente que nao seja tentada, ou mandato que nao peca postagem). Gatilho: o proximo PR que cair em soft-pass — ou seja, o proximo PR grande.'
+    trace: '.github/workflows/onion-review.yml'
+
+  - id: A_LICENCA_VIAJA_COM_NEVER_CLOBBER_E_QUINTA_COPIA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    owner: core
+    label: 'ABERTO, com as duas pernas nomeadas: (1) never-clobber por-arquivo no adopt, no molde do .env.example (alvo que ja tem LICENSE recebe LICENSE.onion); (2) unificar o ONION_PATHS do durable-commit.sh com a SSOT, senao a licenca nao viaja no --update. As duas juntas, porque curar so a segunda arma o vendor-branch a abortar por BASE CRUZADA. Gatilho: a primeira consultoria que forkar.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    owner: core
+    label: 'ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e o que se empurra para o repo ABERTO onion-plugins. A superficie mais exposta e a unica sem detector. Hoje sem vazamento vivo (so espelhos de termos ja tolerados), mas README de plugin e versao derivada sao conteudo so-plugin, onde a guarda nunca olha. Gatilho: a proxima publicacao no marketplace.'
+    trace: '.claude/validation/vendor-scrub-form-check.sh'
+
+  - id: A_ROLE_DECORATIVO_NO_TRANSPORTE
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    owner: core
+    label: 'ABERTO: `--role adopted|hub|standalone` devolve listas IDENTICAS — ROLE e inicializado, parseado, validado e nunca mais lido. E PIOR que o gap anterior: antes nao havia papel e quem publicasse um standalone sabia que precisava cortar a mao; agora ha flag que aceita `standalone` e entrega a meta-fabrica inteira (63 arquivos mais os 43 comandos de meta/). Gap aberto virou gap INVISIVEL. Gatilho: levar o onion-standalone publico ao core atual.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: A_ADOTANTE_GREENFIELD_NASCE_COM_HARD
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    owner: core
+    label: 'ABERTO (pre-existente, medido pela simulacao de adocao): o adotante greenfield nasce com 4 HARD — `docs/onion/` nunca e criado no alvo e o erro e engolido por 2>/dev/null, mais tres ponteiros mortos para .claude/settings.json. Nenhum deles vem deste PR (o diff NAO piora o adotante), mas passivo do core cobrado do cliente e divida nossa. Gatilho: a proxima adocao real.'
+    trace: '.claude/commands/meta/adopt.md'
+
+  - id: A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    owner: core
+    label: 'ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado — dois casos evaporaram sem entrar em contagem nenhuma. Isolada da 25/25. Um sumario que anuncia `1226 exercidas` quando 1228 existiam trata AUSENCIA como aprovacao. Gatilho: a proxima vez que um caso sumir da faixa, ou o primeiro defeito real que escapar por ali.'
+    trace: '.claude/validation/lint-selftest.sh'
+
+edges:
+  - from: E_LISTA_1_REGRA36_NAO_VE_CLIENTE_NAO_REGISTRADO
+    to: C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO
+    edge_type: SUPPORTS
+  - from: E_LISTA_2_REGEN_BASELINES_TOMOU_O_LINT_POR_EMISSOR
+    to: C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO
+    edge_type: SUPPORTS
+  - from: E_LISTA_3_CATRACA_DO_EPIPE_SEM_GIT_E_SEM_BASH
+    to: C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO
+    edge_type: SUPPORTS
+  - from: E_EPIPE_ACUSOU_REGRA_VIVA_DE_MORTA
+    to: C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO
+    edge_type: SUPPORTS
+  - from: E_EPIPE_ACUSOU_O_TRANSPORTE_DE_NAO_CARREGAR
+    to: C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO
+    edge_type: SUPPORTS
+  - from: E_LISTA_3_CATRACA_DO_EPIPE_SEM_GIT_E_SEM_BASH
+    to: C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO
+    edge_type: SUPPORTS
+  - from: E_A_GUARDA_NOVA_ERA_CODIGO_MORTO_NO_DESTINO_MAJORITARIO
+    to: Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA
+    edge_type: SUPPORTS
+  - from: E_O_PASSO_QUE_EU_ESCREVI_NASCIA_MORTO
+    to: Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA
+    edge_type: SUPPORTS
+  - from: E_ESCOLHI_O_NUMERO_QUE_FECHAVA_O_ARGUMENTO
+    to: Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA
+    edge_type: SUPPORTS
+  - from: E_A_CURA_DAS_LICENCAS_ERA_ATIVAMENTE_DANOSA
+    to: Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA
+    edge_type: SUPPORTS
+  - from: E_HAVIA_UMA_QUINTA_COPIA_DA_LISTA
+    to: Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA
+    edge_type: SUPPORTS
+  - from: E_O_DETECTOR_NAO_PEGAVA_METADE_DO_VAZAMENTO_QUE_O_MOTIVOU
+    to: E_LISTA_1_REGRA36_NAO_VE_CLIENTE_NAO_REGISTRADO
+    edge_type: SUPPORTS
+  - from: E_A_RECORRENCIA_ESTAVA_NOMEADA_E_SEM_CURA
+    to: C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO
+    edge_type: SUPPORTS
+  - from: D_PASSADA_ADVERSARIAL_VIRA_PASSO_EM_PARALELO_AO_CI
+    to: Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA
+    edge_type: CONSTRAINS
+  - from: E_O_REVISOR_DO_CI_NAO_REVISA_HA_DUAS_OCORRENCIAS
+    to: D_PASSADA_ADVERSARIAL_VIRA_PASSO_EM_PARALELO_AO_CI
+    edge_type: SUPPORTS
+  - from: A_CURAR_O_REVISOR_DO_CI_COM_MECANISMO
+    to: E_O_REVISOR_DO_CI_NAO_REVISA_HA_DUAS_OCORRENCIAS
+    edge_type: DEPENDS_ON
+  - from: A_LICENCA_VIAJA_COM_NEVER_CLOBBER_E_QUINTA_COPIA
+    to: E_A_CURA_DAS_LICENCAS_ERA_ATIVAMENTE_DANOSA
+    edge_type: DEPENDS_ON
+  - from: A_LICENCA_VIAJA_COM_NEVER_CLOBBER_E_QUINTA_COPIA
+    to: E_HAVIA_UMA_QUINTA_COPIA_DA_LISTA
+    edge_type: DEPENDS_ON
+  - from: A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR
+    to: C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO
+    edge_type: DEPENDS_ON
+  - from: A_ROLE_DECORATIVO_NO_TRANSPORTE
+    to: Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA
+    edge_type: DEPENDS_ON
+  - from: A_ADOTANTE_GREENFIELD_NASCE_COM_HARD
+    to: Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA
+    edge_type: DEPENDS_ON
+  - from: A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN
+    to: Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA
+    edge_type: DEPENDS_ON

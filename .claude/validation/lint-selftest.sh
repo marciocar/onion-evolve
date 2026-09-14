@@ -13833,9 +13833,18 @@ run_upstream_portal_fixes_selftests() {
   # literal `want=(` aqui mediria a CÓPIA, não o transporte — e foi o que reprovou quando a SSOT nasceu.
   # Agora a pergunta certa: o transporte EMITE .claude/workflows, e os dois consumidores o CONSOMEM?
   local vmsh="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
+  # ⚠️ SEM PIPE PARA O `grep -q` — a forma anterior (`… --emit-scrub-roots | grep -qx …`) é uma
+  # CORRIDA, e ela REPROVOU este caso ao vivo em 2026-09-14: `.claude/workflows` é a 8ª de 11
+  # linhas, então o `grep -qx` casa e SAI enquanto o `printf '%s\n' "${_base[@]}"` do manifesto
+  # ainda tem 3 linhas para escrever — SIGPIPE, saída 141, `pipefail` propaga, e o `!` transforma
+  # a falha de pipe em "fora da superfície". A guarda acusou o transporte de não carregar um
+  # diretório que ele carrega. Mesma classe curada no `lint-artifacts.sh` neste mesmo commit
+  # ([[pipefail-epipe-early-closer-class]]); capturar em variável não tem leitor que feche cedo.
+  local _roots=""
   if [ ! -f "${vmsh}" ]; then miss="${miss} vendor-manifest.sh(SSOT ausente)"
-  elif ! bash "${vmsh}" --emit-scrub-roots 2>/dev/null | grep -qx '.claude/workflows'; then
-    miss="${miss} vendor-manifest.sh(.claude/workflows fora da superfície)"
+  else
+    _roots="$(bash "${vmsh}" --emit-scrub-roots 2>/dev/null)" || _roots=""
+    grep -qx '.claude/workflows' <<< "${_roots}" || miss="${miss} vendor-manifest.sh(.claude/workflows fora da superfície)"
   fi
   grep -q 'vendor-manifest.sh' "${vb}" 2>/dev/null || miss="${miss} vendor-branch.sh(não consome a SSOT)"
   grep -q 'vendor-manifest.sh' "${adopt}" 2>/dev/null || miss="${miss} adopt.md(não consome a SSOT)"
@@ -14103,7 +14112,14 @@ run_kg_fixture_paths_selftests() {
     # simples, aspas duplas, alternação -E). Ancorado no PADRÃO, não na pontuação.
     grep -qE "grep -v[a-zA-Z]*[[:space:]]+[\"']?[^\"']*/fixtures/|-not -path .\*/fixtures/\*|case[^)]*\*/fixtures/\*\)" <<< "${_code}" \
       && cmiss="${cmiss} ${c}:AINDA-tem-grep-próprio"
-  done < <( (cd "${_root2}" && grep -rl 'kg-fixture-paths\.sh' .claude/validation .claude/utils 2>/dev/null) | sort -u )
+  # ⚠️ SÓ `.sh` — consumidor é quem EXECUTA, e um arquivo de DADOS que cita o nome não executa nada.
+  # Medido em 2026-09-14: ao alargar o detector da classe EPIPE, `kg-fixture-paths.sh` entrou no
+  # `pipe-verdict-baseline.txt` (formato `<arquivo><TAB><contagem>`), e este `grep -rl` tomou o
+  # BASELINE por consumidor — exigindo que um `.txt` invocasse um predicado. Cascata de guardas: um
+  # detector alargado alimenta um baseline, o baseline vira "menção", e a guarda vizinha lê menção
+  # como uso. É a mesma classe de sempre (a enumeração por string não distingue DADO de CÓDIGO), e
+  # a cura é a de sempre: restringir pela FORMA do que pode ser consumidor, não pela string.
+  done < <( (cd "${_root2}" && grep -rl --include='*.sh' 'kg-fixture-paths\.sh' .claude/validation .claude/utils 2>/dev/null) | sort -u )
   # Piso ANCORADO nos sítios onde o predicado é load-bearing, não num número digitado (o `>=7` que
   # estava aqui passou a reprovar o estado CORRETO quando o 7º sítio foi revertido — e só apareceu na
   # suíte completa, porque isolada eu a rodara antes). O seed é o crítico: ali a isenção incompleta

@@ -34,7 +34,22 @@ _scan() {  # $1=root · <arquivo><TAB><contagem>, relativo ao root
   for d in .claude/validation .claude/utils .claude/hooks .githooks; do [ -d "${r}/${d}" ] && dirs+=("${r}/${d}"); done
   [ "${#dirs[@]}" -gt 0 ] || return 0
   local hits
-  hits="$(grep -rnE "(^|if |elif |while |until |&& |\|\| |; )!? ?(_emit \"[^\"]*\"|grep [^|]*|awk [^|]*|sed [^|]*|cat [^|]*|printf [^|]*) \| *grep -q" \
+  # ⚠️ O PRODUTOR NÃO É MAIS UMA LISTA — e a troca foi paga com dois defeitos no mesmo dia.
+  # A forma anterior enumerava `_emit|grep|awk|sed|cat|printf`, e em 2026-09-14 a classe mordeu
+  # DUAS VEZES por produtores que não estavam na lista:
+  #   · `git ls-files -- "$g" | grep -q .`        (lint-artifacts.sh) — acusou REGRA VIVA de morta
+  #     no CI, sobre arquivo que ninguém tocou. 139 caminhos, 10 KB: o grep casa e sai, o git leva
+  #     EPIPE, o pipefail propaga.
+  #   · `bash vendor-manifest.sh --emit-scrub-roots | grep -qx '.claude/workflows'` (lint-selftest.sh)
+  #     — `.claude/workflows` é a 8ª de 11 linhas, então sobram 3 para o SIGPIPE. A guarda acusou o
+  #     transporte de não carregar um diretório que ele carrega.
+  # Nenhum dos dois estava na lista, e os dois são a MESMA classe. É o padrão que esta casa já
+  # nomeou: em guarda de lista o defeito dominante é o VOCABULÁRIO, não a lógica — então a guarda
+  # passa a asserir a FORMA: QUALQUER produtor em posição de veredito seguido de `| grep -q`.
+  # Custo medido da troca: 88 → 109 sítios (+21), todos absorvidos pela catraca como passivo.
+  # O que continua fora, por desenho: `| grep -q` dentro de MENSAGEM (ali o truncamento não vira
+  # veredito) e linha comentada — os dois filtrados abaixo.
+  hits="$(grep -rnE "(^|if |elif |while |until |&& |\|\| |; )!? ?[^|;]+ \| *grep -q" \
             "${dirs[@]}" 2>/dev/null || true)"
   hits="$(grep -vE ':[[:space:]]*#' <<< "${hits}" || true)"
   [ -n "${hits}" ] || return 0
