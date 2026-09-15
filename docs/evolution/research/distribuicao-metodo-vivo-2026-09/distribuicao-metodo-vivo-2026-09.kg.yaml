@@ -9,7 +9,7 @@ meta:
                              # 12m (doutrina), mas quem CADUCA primeiro manda: se a plataforma mudar, a resposta
                              # de VEICULO muda antes de qualquer licenca mudar.
   # kg-backlog-guard: on
-  # ═══ TETO: 52 NÓS (era 50: +2 pelo SCRUB POR FORMA — o vazamento real de nome de cliente na superfície que viaja, achado porque a decisão de publicar obrigou a medir antes) (era 49: +1 pela decisão de limpar os 5 adotantes no próximo update) (era 43: +6 pela rodada de MARCA que o selo D_MARCA_MEDIR_ANTES_DE_DECIDIR pediu) (era 39: +4 pelas DECISÕES do maestro de 2026-09-14, que fecham 4 das 5 perguntas) (era 35: +4 pela MEDIÇÃO do mecanismo próprio, que o Elenxo impôs antes de nova fonte externa). Rodada de PRIMARIAS executada em 2026-09-13 (grafo criado nesta rodada). Cresce só se
+  # ═══ TETO: 54 NÓS (era 52: +2 pela busca no INPI executada e pelo fio da especificação, 2026-09-15) (era 50: +2 pelo SCRUB POR FORMA — o vazamento real de nome de cliente na superfície que viaja, achado porque a decisão de publicar obrigou a medir antes) (era 49: +1 pela decisão de limpar os 5 adotantes no próximo update) (era 43: +6 pela rodada de MARCA que o selo D_MARCA_MEDIR_ANTES_DE_DECIDIR pediu) (era 39: +4 pelas DECISÕES do maestro de 2026-09-14, que fecham 4 das 5 perguntas) (era 35: +4 pela MEDIÇÃO do mecanismo próprio, que o Elenxo impôs antes de nova fonte externa). Rodada de PRIMARIAS executada em 2026-09-13 (grafo criado nesta rodada). Cresce só se
   #     uma re-medicao das mesmas fontes emendar um achado, ou se o maestro abrir a rodada de VEICULO. ═══
   # Pesquisa /onion-research mode=primaries: onde passa a fronteira entre a DOUTRINA que deve viajar para um
   # cliente de consultoria que forka e evolui sozinho, e a BIOGRAFIA deste repo que nao deve viajar; qual
@@ -593,23 +593,25 @@ nodes:
   - id: E_MARCA_LACUNAS_DA_RODADA_0914
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: superseded
     impact: 5
     confidence: 0.9
     verified_at: '2026-09-14'
     verified_against: 'contabilidade da propria rodada: busca.inpi.gov.br/pePI exige sessao (GET direto devolve 302), WIPO Brand Database exige CAPTCHA Altcha, nenhum Chrome conectado para dirigir a busca; estatisticas do INPI atras de login e de painel Power BI; Planalto ECONNRESET x5 e Camara HTTP 429; USPTO e TMview exigem JS; WebSearch esgotado em 200/200 na sessao (contornado por Bing com &format=rss)'
     source_tier: 10
     source_kind: internal-audit
-    label: 'A LACUNA QUE PODE DERRUBAR A RECOMENDACAO INTEIRA: a COLIDENCIA REAL de "Onion" na base do INPI NAO foi medida — a busca exige sessao de navegador e nenhuma rota automatica funcionou. Sao 10 minutos do maestro em busca.inpi.gov.br/pePI (clicar Continuar para acesso anonimo e buscar "onion" por marca). Tambem NAO medidos: prazo medio de exame, regra oficial do simbolo de registro (ausencia medida — nenhuma pagina oficial de marcas trata dele), Codigo Civil art. 1.166 sobre nome empresarial, e registros de "Onion" no USPTO/EUIPO. O texto em portugues da LPI veio da traducao oficial hospedada pelo INPI porque o Planalto caiu.'
+    label: 'SUPERADO EM 2026-09-15 NA LACUNA PRINCIPAL (E_MARCA_BUSCA_INPI_EXECUTADA_0915): o maestro rodou a busca e ela DERRUBOU a recomendacao, como este no previa. AS DEMAIS LACUNAS DESTE NO SEGUEM ABERTAS e nao foram medidas: prazo medio de exame, regra oficial do simbolo de registro, Codigo Civil art. 1.166 sobre nome empresarial, e registros de `Onion` no USPTO/EUIPO. Texto original: A LACUNA QUE PODE DERRUBAR A RECOMENDACAO INTEIRA: a COLIDENCIA REAL de "Onion" na base do INPI NAO foi medida — a busca exige sessao de navegador e nenhuma rota automatica funcionou. Sao 10 minutos do maestro em busca.inpi.gov.br/pePI (clicar Continuar para acesso anonimo e buscar "onion" por marca). Tambem NAO medidos: prazo medio de exame, regra oficial do simbolo de registro (ausencia medida — nenhuma pagina oficial de marcas trata dele), Codigo Civil art. 1.166 sobre nome empresarial, e registros de "Onion" no USPTO/EUIPO. O texto em portugues da LPI veio da traducao oficial hospedada pelo INPI porque o Planalto caiu.'
     trace: 'docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md'
 
   - id: Q_MARCA_DEPOSITAR_CLASSE_42_AGORA
     node_type: question
     plane: DEV
-    status: open
+    status: done
     impact: 5
-    confidence: 0.6
-    label: 'PROPOSTA AO MAESTRO (nao selada): depositar SO a classe 42 agora, com especificacao pre-aprovada — R$ 880,00, ou R$ 440,00 se o CNPJ for ME/EPP/MEI, com concessao a R$ 0,00. Razao: e o preco mais baixo que converte o FRAGIL direito de precedencia (art. 129 §1o, apenas defensivo) em propriedade oponivel justamente na classe onde consultoria de TI, SaaS e o framework vivem; 41 e 9 ficam para depois. CONDICAO ANTES DE SELAR: a colidencia real na base do INPI nao foi medida (E_MARCA_LACUNAS_DA_RODADA_0914) e e a evidencia que pode derrubar a recomendacao inteira. E o vizinho semantico (Onion Architecture, 18 anos de uso) e questao de POSICIONAMENTO, a resolver na narrativa da marca e nao no INPI.'
+    confidence: 0.85
+    verified_at: '2026-09-15'
+    verified_against: 'a condicao declarada foi CUMPRIDA — o maestro rodou a busca no pePI em 2026-09-15 (E_MARCA_BUSCA_INPI_EXECUTADA_0915), e o resultado derrubou a recomendacao original como o proprio no previa que poderia'
+    label: 'RESPONDIDA, E A RECOMENDACAO ORIGINAL CAIU — como o proprio no dizia que poderia. A proposta era depositar `ONION` puro na classe 42; a busca achou o 933007990 VIVO nessa exata classe (requerido em 19/12/2023, aguardando exame), anterior a qualquer deposito de hoje. A nova recomendacao e `ONION EVOLVE` NOMINATIVA na classe 42, e ela e MELHOR por tres razoes independentes: (1) ZERO colidencia na base — `onion evolve` nao devolveu nada; (2) `onion` sozinho e GENERICO (cebola), e baixa distintividade intrinseca ja era risco de indeferimento por si so, independente do Carlos Vinicius; (3) dissolve o vizinho semantico `Onion Architecture` (18 anos de uso), que era questao de posicionamento. E e o nome REAL: o site e onionevolve.com. NOMINATIVA e nao mista, porque protege a PALAVRA — mista protege o conjunto com o desenho. Texto original da proposta: depositar SO a classe 42 agora, com especificacao pre-aprovada — R$ 880,00 ou R$ 440,00 com desconto (o desconto vale para PESSOA NATURAL tambem, nao so CNPJ ME/EPP/MEI — corrigido na passada adversarial de 2026-09-14), concessao a R$ 0,00; 41 e 9 ficam para depois.'
     trace: 'docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md'
 
   - id: D_LIMPAR_BASELINES_NO_PROXIMO_UPDATE
@@ -647,6 +649,29 @@ nodes:
     verified_against: 'selado pelo maestro 2026-09-14: curar antes de publicar, nao depois; nome do cliente removido dos dois arquivos no mesmo PR'
     label: 'SELADA: o nome do cliente sai do texto AGORA (antes de qualquer publicacao), e a guarda passa a asserir a FORMA e nao a lista. O detector novo (.claude/validation/vendor-scrub-form-check.sh) pega duas formas na superficie que viaja: AMPERSAND CORPORATIVO (com pelo menos um lado de 2+ caracteres, o que ja exclui M&A, Q&A, V&V, R&D) e ANCORA DE CONTEXTO (PoC/cliente/adotante/empresa seguida de nome proprio). Forma gera CANDIDATO, nunca veredito: o legitimo (sigla do oficio, nome ficticio de exemplo, citacao academica) vai para um baseline que SO ENCOLHE, e candidato novo e HARD — o mesmo idioma das REGRAS 45 (Link vendorizado nao aponta caminho core-privado, com catraca) e 49 (Catraca de passivo declarado). TETO DECLARADO: nome comercial SEM ampersand e SEM ancora continua invisivel; alargar o padrao mataria a guarda de falso-positivo. Ligado na segunda metade da REGRA 36, com familia vendor_scrub_form de 6 casos e mutante provado.'
     trace: '.claude/validation/vendor-scrub-form-check.sh'
+
+  - id: E_MARCA_BUSCA_INPI_EXECUTADA_0915
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'busca do maestro em busca.inpi.gov.br/pePI em 2026-09-15 as 11:19 (base atualizada ate 15/09/2026): termo `onion` devolveu 9 processos; termo `onion evolve` devolveu ZERO'
+    source_tier: 10
+    source_kind: primary-registry
+    label: 'A COLIDENCIA FOI MEDIDA, e ela DERRUBA a recomendacao de depositar `ONION` puro. Dos 9 processos de `onion`, o que decide e o 933007990 (CARLOS VINICIUS DE JESUS SANTOS, 19/12/2023, NCL(12) 42, marca MISTA): esta VIVO — `Marca requerida / Aguardando exame de merito` — e e ANTERIOR a qualquer deposito de hoje. Se deferido, um pedido de `ONION` nominativa em 42 cai por colidencia (LPI art. 124, XIX). O outro processo em 42, o 826663907 (Onion Sistemas Imobiliarios, 2004), esta ARQUIVADO e nao bloqueia. Fora da 42 ha dois vivos em 35: 915978512 (Rodrigo Cavalcanti, REGISTRO EM VIGOR) e 943418925 (Bruno Martins, requerida). E A SAIDA ESTAVA NA MESMA BUSCA: `onion evolve` devolveu NENHUM RESULTADO. TETO DECLARADO pelo proprio INPI na pagina: busca satisfatoria NAO garante registro — o exame refaz a busca e decide.'
+    trace: 'https://busca.inpi.gov.br/pePI'
+
+  - id: A_MARCA_LER_ESPECIFICACAO_DO_933007990
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    owner: maestro
+    label: 'ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42 e LARGA — vai de design de software a analise quimica. Se a especificacao dele estiver longe de software/TI, a coexistencia com `ONION EVOLVE` fica ainda mais confortavel, e ate caberia discutir se `ONION` puro ainda tem alguma chance. Ver tambem o ANDAMENTO: se ja houve publicacao, oposicao, ou prazo correndo. Gatilho: antes do deposito.'
+    trace: 'https://busca.inpi.gov.br/pePI'
 
 edges:
   - from: E_FORK_CARREGA_HISTORIA_TEMPLATE_NASCE_LIMPO
@@ -922,3 +947,12 @@ edges:
   - from: E_VAZAMENTO_REAL_DE_CLIENTE_NA_SUPERFICIE_QUE_VIAJA
     to: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
     edge_type: SUPPORTS
+  - from: E_MARCA_BUSCA_INPI_EXECUTADA_0915
+    to: Q_MARCA_DEPOSITAR_CLASSE_42_AGORA
+    edge_type: CONSTRAINS
+  - from: E_MARCA_BUSCA_INPI_EXECUTADA_0915
+    to: E_MARCA_LACUNAS_DA_RODADA_0914
+    edge_type: SUPERSEDES
+  - from: A_MARCA_LER_ESPECIFICACAO_DO_933007990
+    to: E_MARCA_BUSCA_INPI_EXECUTADA_0915
+    edge_type: DEPENDS_ON
