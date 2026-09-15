@@ -310,7 +310,8 @@ done
 # (8) SSOT inventory.md + graph.md — REGENERA do filesystem do alvo. As REGRAS 8 e 21 as exigem e o
 #     hook nativo recém-instalado bloqueia o 1º commit sem elas; sem regenerar, o --update as deixa
 #     STALE quando o framework muda contagens. Helper testável (família ssot_projections).
-bash "$SOURCE_ROOT/.claude/utils/adopt/regen-ssot-projections.sh" "$DEST"
+bash "$SOURCE_ROOT/.claude/utils/adopt/regen-ssot-projections.sh" "$DEST" \
+  || { echo "ABORTADO: as projeções SSOT do alvo não foram geradas — ele nasceria com HARD das REGRAS 8/21"; exit 1; }
 
 # (8c) SEMENTE DO KG — movida para DEPOIS do carimbo (Fase 5): o seed lê mode/role/source_commit do stamp; rodando antes, os três saíam "(não carimbado)" (medido 2026-09-02, num adotante greenfield).
 
@@ -558,13 +559,11 @@ fi
   incl. o "you have mail") e cria o starter de co-evolução (`inbox/_processed/` + README-ponteiro). Os
   *scripts* dos hooks já vieram via `.claude/hooks/` (manifesto da Fase 2); o **registro** é o passo (1) do
   Procedimento. Fecha o trio no alvo: o hook tem o que escanear (`inbox/`) e o `/meta:co-evolve` orienta o consumidor.
-- **Gerar o inventário DO ALVO** — o lint vendorizado (R8) exige `docs/onion/inventory.md` e o
-  hook nativo bloqueia o commit da adoção sem ele (gap descoberto no dogfood de um adotante,
-  2026-07-05 — o 1º commit foi bloqueado pelo próprio hook recém-instalado):
-  ```bash
-  mkdir -p "$INSTALL_DIR/docs/onion"
-  (cd "$INSTALL_DIR" && bash .claude/validation/inventory.sh --markdown > docs/onion/inventory.md)
-  ```
+- **As projeções SSOT do alvo** (`docs/onion/{inventory,graph}.md`, REGRAS 8 e 21) são geradas pelo
+  passo (8) da Configuração pós-cópia, que a Fase 3 já invoca. **Não há bloco aqui de propósito:**
+  até 2026-09-15 este bullet trazia uma SEGUNDA implementação, e ela era a INCOMPLETA — gerava o
+  `inventory.md` e nunca o `graph.md`, então o operador que seguisse só esta metade entregava um
+  adotante com 1 HARD. Duas implementações do mesmo passo é o vetor de drift que a extração fecha.
 - Regenerar `docs/INDEX.md` do alvo (`/docs:build-index`). Checkpoint: `NEXT: Fase 4`.
 
 ### Fase 4 — Configurar integrações (ambiente) — **RODA NO ALVO**

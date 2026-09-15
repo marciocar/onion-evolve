@@ -12588,7 +12588,10 @@ run_ssot_projections_selftests() {
 
   # (a-MUT) sem o `mkdir`, o redirect falha e o `|| true` ENGOLE — prova que (a) mede algo.
   local mut="${d}/m.sh"
-  sed 's|^mkdir -p "${DEST}/docs/onion"$|: # MUTANTE: sem mkdir|' "${h}" > "${mut}"
+  #     ⚠️ A âncora casa o INÍCIO da linha, não a linha inteira: o `mkdir` ganhou um `|| exit 3` na
+  #     mesma linha quando o helper passou a falhar alto, e uma âncora `$`-terminada deixou de casar
+  #     (medido — o caso virou `setup` fail, que é a falha FECHADA correta, mas cega a guarda).
+  sed 's|^mkdir -p "${DEST}/docs/onion".*|: # MUTANTE: sem mkdir|' "${h}" > "${mut}"
   if ! cmp -s "${h}" "${mut}"; then
     mkdir -p "${d}/b"
     _archive_staged "${d}/b" .claude/validation .claude/commands .claude/agents .claude/skills
@@ -12604,20 +12607,43 @@ run_ssot_projections_selftests() {
     record_pass "ssot-projections: (b) idempotente (o --update re-roda sem quebrar)"
   else record_fail "ssot-projections: (b)" "a 2ª execução destruiu a projeção"; fi
 
-  # (c) FALHA DE GERADOR não aborta a adoção — o `|| true` fica, e é deliberado: o lint do alvo
-  #     cobra depois com mensagem própria. O que a cura mudou é a falha deixar de ser MANUFATURADA.
-  mkdir -p "${d}/c/.claude/validation"
+  # (c) UM gerador falha, o OUTRO entrega → a adoção segue (o `|| true` é deliberado: o lint do alvo
+  #     cobra depois, com mensagem própria). Mas ZERO projeções tem de FALHAR ALTO.
+  #     ⚠️ A 1ª redação deste caso era VACUOSA e a passada adversarial provou: ela plantava só um
+  #     gerador quebrado e exigia rc=0 — mas o script não tem `set -e`, então o `|| true` é INERTE
+  #     para essa propriedade, e o mutante que o remove passava idêntico. O caso provava apenas que
+  #     o script termina em `echo`. Agora ele exerce a DISTINÇÃO que importa: parcial segue, zero
+  #     aborta — e é essa distinção que impede a adoção de reportar verde tendo gerado nada.
+  _archive_staged "${d}/c" .claude/validation .claude/commands .claude/agents .claude/skills
   printf '#!/usr/bin/env bash\nexit 1\n' > "${d}/c/.claude/validation/inventory.sh"
   local _rc=0; bash "${h}" "${d}/c" >/dev/null 2>&1 || _rc=$?
-  if [ "${_rc}" -eq 0 ]; then
-    record_pass "ssot-projections: (c) gerador que falha não aborta a adoção (o lint do alvo cobra depois)"
-  else record_fail "ssot-projections: (c)" "rc=${_rc} — um gerador quebrado no alvo derrubaria a adoção inteira"; fi
+  local _rc0=0; mkdir -p "${d}/c0"; bash "${h}" "${d}/c0" >/dev/null 2>&1 || _rc0=$?
+  if [ "${_rc}" -eq 0 ] && [ "${_rc0}" -ne 0 ]; then
+    record_pass "ssot-projections: (c) gerador parcial SEGUE (rc=0); ZERO projeções FALHA ALTO (rc=${_rc0})"
+  else record_fail "ssot-projections: (c)" "parcial=${_rc} (esperado 0) · zero=${_rc0} (esperado ≠0) — helper que anuncia ✓ sem gerar nada faz o alvo nascer vermelho com a adoção dizendo verde"; fi
+
+  # (c2) ARQUIVO 0-BYTE não fica no disco: ele faz o alvo colher HARD da REGRA 8 (inventário
+  #      desatualizado) enquanto o relatório some com a linha. Ausente é estado que a guarda do alvo
+  #      sabe nomear; vazio, ela lê como drift.
+  _archive_staged "${d}/e" .claude/validation .claude/commands .claude/agents .claude/skills
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${d}/e/.claude/validation/inventory.sh"
+  bash "${h}" "${d}/e" >/dev/null 2>&1 || true
+  if [ ! -e "${d}/e/docs/onion/inventory.md" ]; then
+    record_pass "ssot-projections: (c2) saída vazia NÃO deixa arquivo 0-byte (o alvo colheria REGRA 8)"
+  else record_fail "ssot-projections: (c2)" "arquivo vazio ficou no disco — o alvo nasce com HARD e o helper reporta sucesso"; fi
 
   # (d) O ADOPT chama o helper (fora de comentário) — senão a extração deixou o passo órfão.
-  local _code; _code="$(grep -vE '^[[:space:]]*#' "${REPO_ROOT}/.claude/commands/meta/adopt.md" || true)"
-  if grep -qF 'regen-ssot-projections.sh' <<< "${_code}"; then
-    record_pass "ssot-projections: (d) o adopt invoca o helper (menção em comentário não conta)"
-  else record_fail "ssot-projections: (d)" "o helper existe e ninguém o chama — o passo ficou órfão na extração"; fi
+  #     ⚠️ INVOCAÇÃO, não MENÇÃO — e a 1ª redação era fail-open de substring: a passada adversarial
+  #     trocou a linha por prosa markdown e o caso APROVOU com o passo órfão. Agora o predicado exige
+  #     a FORMA do chamado (`bash ... regen-ssot-projections.sh` com argumento), e que o rc seja LIDO:
+  #     os vizinhos (2)/(2a)/(2b) abortam, e este não lia — até o `exit 3` do helper morria sem dono.
+  local _code; _code="$(grep -vE '^[[:space:]]*#|^>' "${REPO_ROOT}/.claude/commands/meta/adopt.md" || true)"
+  local _dm=""
+  grep -qE 'bash [^|]*regen-ssot-projections\.sh" +"\$DEST"' <<< "${_code}" || _dm="${_dm} sem-invocação"
+  grep -qE 'regen-ssot-projections\.sh" +"\$DEST" +\\' <<< "${_code}" || _dm="${_dm} rc-não-lido(sem ||-abort)"
+  if [ -z "${_dm}" ]; then
+    record_pass "ssot-projections: (d) o adopt INVOCA o helper e LÊ o rc (menção em prosa não satisfaz)"
+  else record_fail "ssot-projections: (d)" "falhou em:${_dm} — helper órfão, ou falha dele engolida pelo chamador"; fi
   rm -rf "${d}"
 }
 
