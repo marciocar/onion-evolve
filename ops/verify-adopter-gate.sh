@@ -128,9 +128,9 @@ else
     FALHOU=1
   elif [ "$LRC" -ne 0 ] && [ "$RC" -ne 0 ]; then
     ok "o commit foi BARRADO pelo gate do Onion com o lint reprovando — bloqueio provado"
+    BLOQUEIO_PROVADO=1
   else
     info "lint limpo agora: o BLOQUEIO não foi exercido (só a execução) — declarado, não aprovado"
-    BLOQUEIO_PROVADO=0
   fi
 fi
 
@@ -146,7 +146,11 @@ echo
 # Mantendo a string `GATE VIVO` apenas no caso provado, o consumidor fica correto POR CONSTRUÇÃO.
 #
 # Um gate que roda e sempre passa é indistinguível de um gate quebrado até o dia em que precisa barrar.
-if [ "$FALHOU" -eq 0 ] && [ "${BLOQUEIO_PROVADO:-1}" -eq 1 ]; then
+# ⚠️ DEFAULT 0 — FAIL-CLOSED, e o CI pegou a 1ª versão com default 1. Com `:-1` o ramo "bloqueio NÃO
+# avaliado" (o hook nem executou, comum em ambiente sem identidade git configurada) caía no veredito
+# de PROVADO, porque eu só zerava a flag no ramo do lint-limpo. Prova é o que se OBSERVA: o default
+# de "provei" nunca pode ser sim. Só o ramo que VÊ o commit ser barrado carimba 1.
+if [ "$FALHOU" -eq 0 ] && [ "${BLOQUEIO_PROVADO:-0}" -eq 1 ]; then
   echo "✓ GATE VIVO — bloqueio PROVADO por execução, não por existência de arquivo"
   exit 0
 fi

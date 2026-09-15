@@ -12948,7 +12948,11 @@ run_adopter_gate_selftests() {
     git -C "${r}" config core.hooksPath "$2" >/dev/null 2>&1
     printf 'x\n' > "${r}/a.txt"
     git -C "${r}" add -A >/dev/null 2>&1
-    git -C "${r}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+    # ⚠️ `|| true` no commit da FIXTURE, e não é frouxidão: com o lint fake REPROVANDO (o caso d2), o
+    #    hook barra este commit de propósito, o git sai ≠0 e sob `set -e` a suíte inteira morre.
+    #    A fixture precisa do hook ATIVO para o caso medir; logo o rc esperado aqui é ≠0.
+    #    Por isso o commit-base é feito com `--no-verify`: ele existe só para dar HEAD ao alvo.
+    git -C "${r}" -c user.email=t@t -c user.name=t commit -qm base --no-verify >/dev/null 2>&1 || true
   }
 
   # (a) hooksPath RELATIVO — a forma que sempre funcionou. Serve de controle: se ele reprovar, o
@@ -12993,9 +12997,25 @@ run_adopter_gate_selftests() {
   #     veredito. Um gate que roda e sempre passa é indistinguível de um gate quebrado até o dia em
   #     que precisa barrar algo.
   #     A fixture (a) tem lint LIMPO (o hook sai 0), então é o caso "executou, não barrou".
-  if ! grep -q 'GATE VIVO' <<< "${out_a}" && grep -q 'INSTALADO E EXECUTANDO' <<< "${out_a}"; then
-    record_pass "adopter-gate: (d) gate que EXECUTA mas não BARRA não é declarado VIVO — o veredito distingue"
-  else record_fail "adopter-gate: (d)" "veredito trata 'executou' como 'barrou' — e o próprio script imprime a distinção logo acima; um gate que nunca barrou é indistinguível de um quebrado"; fi
+  #     ⚠️ O CASO NÃO PODE EXIGIR A FRASE DE UM RAMO QUE O AMBIENTE TALVEZ NÃO ALCANCE — o CI pegou
+  #     a 1ª redação: lá o hook do sandbox NÃO executa, o verificador sai pelo ramo `bloqueio NÃO
+  #     avaliado`, e o caso reprovava por não achar `INSTALADO E EXECUTANDO`. Estava medindo o
+  #     AMBIENTE, não a guarda. O invariante real é mais simples e é independente de ambiente:
+  #     **sem bloqueio observado, o veredito NÃO diz `GATE VIVO`**. E para não virar vácuo (passar
+  #     porque nada rodou), o par (d2) exige o SIM no caso em que o bloqueio É exercido.
+  if ! grep -q 'GATE VIVO' <<< "${out_a}"; then
+    record_pass "adopter-gate: (d) sem bloqueio observado, o veredito NÃO declara GATE VIVO"
+  else record_fail "adopter-gate: (d)" "veredito trata 'executou' (ou 'nem avaliei') como 'barrou' — um gate que nunca barrou é indistinguível de um quebrado"; fi
+
+  # (d2) O PAR QUE IMPEDE O VÁCUO: com o lint do alvo REPROVANDO, o commit é barrado e aí — e só aí —
+  #      o veredito pode dizer GATE VIVO. Sem este caso, (d) passaria num ambiente onde nada roda.
+  local rp="${d}/provado"; mkdir -p "${rp}"; _mk_alvo "${rp}" ".githooks" 1
+  local out_p; out_p="$(bash "${v}" "${rp}" 2>&1 || true)"
+  if grep -q 'bloqueio provado' <<< "${out_p}"; then
+    if grep -q 'GATE VIVO' <<< "${out_p}"; then
+      record_pass "adopter-gate: (d2) com o bloqueio EXERCIDO o veredito diz GATE VIVO — (d) não é vácuo"
+    else record_fail "adopter-gate: (d2)" "o commit foi barrado e o veredito NÃO declarou VIVO — a distinção virou recusa cega"; fi
+  else record_skip "adopter-gate: (d2)" "o ambiente não executou o hook do sandbox (sem bloqueio observável) — (d) fica sem o par que o tira do vácuo"; fi
 
   # (e) O CONSUMIDOR FICA CORRETO POR CONSTRUÇÃO. `install-onion-githook.sh` faz `grep 'GATE VIVO'`
   #     para carimbar `--gate-proven` na semente do KG do alvo. Enquanto a string saía nos dois casos,

@@ -2,10 +2,10 @@
 title: 'Resíduo — o verificador que provava comportamento decidia por string'
 date: 2026-09-15
 branch: fix/adopter-gate-hookspath-string-compare
-reviewed_diff_sha256: acae318dc1bdb1987e1496c6a9c8686cb54916035a63bb0de7f422ad9385000d
-findings_total: 4
-findings_real: 4
-findings_fixed: 4
+reviewed_diff_sha256: dfb88f59658e733fd3dad73237aef98c1d7f9eaa99244c4b5d009285f4e490a9
+findings_total: 5
+findings_real: 5
+findings_fixed: 5
 tokens: 0
 duration_min: 0
 verdict: REPROVADO_E_CURADO
@@ -129,10 +129,27 @@ remove. Ferramenta que apaga tem de provar o que **não** apaga.
 anti-commit-na-default-branch, e pela mesma razão (apagar untracked no repo de outro é aposta maior).
 Gatilho para promover: um adotante reportar fixture órfã reprovando o lint dele.
 
+## O quinto, e quem pegou foi o CI
+
+A cura do achado 2 tinha um **fail-open dentro dela**: `BLOQUEIO_PROVADO` com default `1`, zerado só
+no ramo do lint-limpo. O ramo *"bloqueio NÃO avaliado"* (hook nem executou) chegava ao veredito como
+**provado**. Default de prova nunca pode ser sim — `prova é o que se OBSERVA`. Agora o default é `0`
+e só o ramo que **vê** o commit ser barrado carimba `1`.
+
+E o caso `(d)` que eu escrevi para travar isso **media o ambiente, não a guarda**: exigia a frase de
+um ramo que o CI não alcança (lá o hook do sandbox não executa). Reescrito para o invariante — *sem
+bloqueio observado, o veredito não diz `GATE VIVO`* — com `(d2)` exigindo o **sim** quando o bloqueio
+é exercido, para o par não virar vácuo. Ambiente que não executa hook faz `(d2)` **pular declarando**,
+nunca passar calado.
+
+Terceira vez no dia que uma captura matou a suíte sob `set -e`: a fixture do `(d2)` tem lint
+reprovando **de propósito**, então o hook barra o commit-base dela. O commit-base agora é
+`--no-verify` — ele existe só para dar `HEAD` ao alvo.
+
 ## Gate
 
 ```
-famílias novas      : adopter_gate 6/6 · sweep_fixtures 5/5
+famílias novas      : adopter_gate 7/7 · sweep_fixtures 5/5
 radar / integrity    : exit 0 (34 nós)
 realign              : ALINHADO
 commit               : SEM --no-verify

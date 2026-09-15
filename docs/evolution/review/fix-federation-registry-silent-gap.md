@@ -2,7 +2,7 @@
 title: 'Resíduo — o sinal apontou um caso, a varredura achou 9 de 19'
 date: 2026-09-15
 branch: fix/adopter-gate-hookspath-string-compare
-reviewed_diff_sha256: acae318dc1bdb1987e1496c6a9c8686cb54916035a63bb0de7f422ad9385000d
+reviewed_diff_sha256: dfb88f59658e733fd3dad73237aef98c1d7f9eaa99244c4b5d009285f4e490a9
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
