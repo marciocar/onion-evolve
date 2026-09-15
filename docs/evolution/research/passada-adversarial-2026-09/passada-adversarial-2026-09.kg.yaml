@@ -4,7 +4,7 @@ meta:
   baseline: 2026-09-14
   review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 33 NÓS (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
+  # ═══ TETO: 35 NÓS (era 34: +1 pelo veredito que confundia EXECUTAR com BARRAR — chegou por sinal de campo de um adotante) (era 33: +1 pelo verificador do gate que decidia por string e abortou uma adoção real — achado pelo dogfood da própria entrega) (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
   # O CI nao revisou o PR #827 (o revisor morreu com permission_denials_count: 9 e caiu em soft-pass);
   # o maestro mandou rodar a passada propria. DUAS rodadas, 5 refutadores com LENTES distintas
   # (maquinaria/shell · o artefato mente? · pelo lado do adotante), ~1,13M tokens. As duas REPROVARAM:
@@ -346,6 +346,28 @@ nodes:
     label: 'CONSUMIR UMA SSOT TORNA A DEFASAGEM DELA CONSEQUENTE. `work_tool_sets.full` do roles.yaml foi escrito quando `inventory`, `kg-freshness`, `backlog`, `drive`, `radar`, `realign`, `graph`, `census` e `kg-inbox` nao existiam, e nada media a lista contra o que o alvo precisa. Enquanto o transporte ignorava o papel a defasagem era inofensiva; no instante em que o corte passou a consumir o arquivo, ela virou ENTREGA ERRADA — o standalone nasceria sem o motor do proprio metodo. O maestro apontou ("mesmo o kg e metas tem que ir com standalone core geral"; "hub ... todo") e a medicao confirmou. O criterio que fecha e objetivo: comando que as mensagens das guardas mandam o ALVO rodar tem de viajar para o alvo — entregar a guarda sem o comando da cura e dar uma instrucao impossivel de cumprir. standalone: 14 -> 23 comandos. Licao de segunda ordem: passar a consumir uma SSOT exige MEDIR se ela ainda e verdadeira, porque ate ali ninguem pagava o preco de ela nao ser.'
     trace: '.claude/utils/marketplace/roles.yaml'
 
+  - id: E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'adocao real do jogo-da-vida abortou com rc=1; `core.hooksPath` = /home/marcio/jogo-da-vida/.githooks (absoluto) contra a comparacao `[ "${DIR}" != ".githooks" ]`; apos a cura com -ef o mesmo alvo devolve GATE VIVO'
+    label: 'O VERIFICADOR QUE EXISTE PARA PROVAR COMPORTAMENTO DECIDIA POR DECLARACAO DE PATH — e ABORTOU UMA ADOCAO REAL. `ops/verify-adopter-gate.sh` comparava `core.hooksPath` por STRING contra `.githooks`; um alvo com o caminho na forma ABSOLUTA (que o git aceita e resolve para o MESMO diretorio) reprovava. O veredito saia contradizendo as proprias linhas seguintes do script: `✗ o git IGNORA o hook` impresso LOGO ACIMA de `✓ o hook EXECUTOU no commit` e `✓ o commit foi BARRADO — bloqueio provado`. O `ABS` resolvido ja era calculado 15 linhas antes, exatamente para isto; so esta checagem nao o usava. E a causa de FUNDO nao e o operador `!=`: e que `ops/verify-adopter-gate.sh` tinha ZERO cobertura de bancada, sendo ele quem a adocao consulta para decidir se ENTREGOU o produto. Guarda sem bancada e guarda cujo defeito so aparece no repo de um cliente. Curado: comparacao por IDENTIDADE (`-ef`) + familia `adopter_gate` (4 casos), com mutante que devolve a comparacao a string e prova o caso, e um caso que mantem o fail-closed do gate SOMBREADO (husky ocupando o hooksPath) para a cura nao virar fail-open.'
+    trace: 'ops/verify-adopter-gate.sh'
+
+  - id: E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'sinal de campo de um adotante (inbox 2026-09-15) + leitura do verificador: o `info` imprime "o BLOQUEIO nao foi exercido — declarado, nao aprovado" e o veredito 3 linhas abaixo diz "GATE VIVO — provado por execucao"'
+    label: 'O VEREDITO APAGAVA UMA DISTINCAO QUE O PROPRIO SCRIPT IMPRIMIA. Com o lint do alvo limpo, o verificador dizia textualmente que o bloqueio NAO fora exercido e mesmo assim fechava com `GATE VIVO — provado por execucao`. Executar e barrar sao afirmacoes diferentes, e um gate que roda e sempre passa e indistinguivel de um gate quebrado ate o dia em que precisa barrar. O estrago nao parava no texto: o `adopt.md` faz `grep GATE VIVO` na saida para carimbar `--gate-proven` na semente do KG do adotante — entao o GRAFO DO CLIENTE afirmava prova que ninguem fez, o defeito exato que aquele passo declara existir para nao repetir. Curado mantendo a string `GATE VIVO` EXCLUSIVA do caso provado: o consumidor fica correto POR CONSTRUCAO, nao por disciplina. Chegou por SINAL DE CAMPO, no mesmo dia da adocao — o adotante viu o relatorio afirmar prova contra um no `open` no grafo dele.'
+    trace: 'ops/verify-adopter-gate.sh'
+
   - id: A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE
     node_type: decision
     plane: PROD
@@ -517,3 +539,10 @@ edges:
   - from: E_A_SSOT_DO_ESCOPO_ESTAVA_DEFASADA
     to: E_A_SSOT_DO_ESCOPO_JA_EXISTIA
     edge_type: CONSTRAINS
+  - from: E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING
+    to: A_ROLE_DECORATIVO_NO_TRANSPORTE
+    edge_type: SUPPORTS
+
+  - from: E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR
+    to: E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING
+    edge_type: SUPPORTS

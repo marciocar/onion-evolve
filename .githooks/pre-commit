@@ -34,6 +34,16 @@ if [ "${_ONION_BRANCH}" = "${_ONION_DEFAULT}" ]; then
   echo "   Escape consciente (merge/hotfix): git commit --no-verify" >&2
   exit 1
 fi
+# ── VARREDURA DE FIXTURES ÓRFÃS — ANTES do lint, e a ordem é o ponto ─────────────────────────
+# A bancada cria fixtures NA ÁRVORE VIVA (deliberado: ela exercita guardas que só existem num repo
+# de verdade). Rodada INTERROMPIDA as deixa para trás, e o lint seguinte as lê como artefatos REAIS:
+# medido 3x em 2026-09-15, uma delas com 271 HARD — todas fixtures, nenhuma do código.
+# As três vezes a cura foi eu LEMBRAR de limpar, e cura-que-depende-de-lembrar não é cura.
+# O helper é conservador por construção (só untracked/ignorado, nome derivado da própria bancada,
+# `__fixtures__` e `node_modules/` fora) e NUNCA silencioso — ver o docstring dele.
+_SWEEP="${REPO_ROOT}/.claude/validation/sweep-orphan-fixtures.sh"
+[ -f "${_SWEEP}" ] && bash "${_SWEEP}" || true
+
 LINT="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
 
 # Sem o linter no repo (ex.: projeto-alvo sem .claude/validation) → não bloqueia.
