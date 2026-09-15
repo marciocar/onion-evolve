@@ -12702,11 +12702,55 @@ run_role_cut_selftests() {
     record_pass "role-cut: (b) o bundle standalone tem ${_n_sa} arquivos e o CONTRATO (vendor-manifest.sh) viajou"
   else record_fail "role-cut: (b)" "archive rc=${_rc} · arquivos=${_n_sa} · contrato no bundle=$(grep -cx '.claude/utils/adopt/vendor-manifest.sh' "${_lst}" || true)"; fi
 
-  # (b2) …e nada MAIS da fábrica passou clandestino.
-  local _vaz; _vaz="$(grep -E '^\.claude/(utils/(adopt|marketplace|wizard|vertical|federation-transport)/|commands/meta/|validation/federation-)' "${_lst}" | grep -vx '.claude/utils/adopt/vendor-manifest.sh' || true)"
-  if [ -z "${_vaz}" ]; then
-    record_pass "role-cut: (b2) nenhum arquivo da meta-fábrica vazou para o bundle standalone"
-  else record_fail "role-cut: (b2)" "vazaram: $(printf '%s' "${_vaz}" | tr '\n' ' ')"; fi
+  # (b2) O CORTE BATE COM O PRECEDENTE, medido por ORÁCULO INDEPENDENTE.
+  #      ⚠️ A 1ª redação era TAUTOLÓGICA e a passada adversarial pegou: ela fazia `grep -E` dos MESMOS
+  #      7 prefixos do `_role_cut`, então o nome do caso dizia "nenhum arquivo da meta-fábrica vazou"
+  #      e a asserção real era "os excludes funcionaram". Um caso que pergunta ao código o que o
+  #      código respondeu. Agora o oráculo é o `roles.yaml` (SSOT do escopo por papel, guardada pela
+  #      REGRA 37) — fonte que o corte CONSOME mas não define.
+  local _resolver="${REPO_ROOT}/.claude/utils/marketplace/resolve-role-bundle.sh"
+  if [ -f "${_resolver}" ]; then
+    local _tools; _tools="$(bash "${_resolver}" standalone --tools 2>/dev/null)"
+    local _faltou="" _vazou="" _c _nome
+    while IFS= read -r _c; do
+      [ -n "${_c}" ] || continue
+      grep -qx ".claude/commands/meta/${_c}.md" "${_lst}" || _faltou="${_faltou} ${_c}"
+    done <<< "${_tools}"
+    while IFS= read -r _c; do
+      case "${_c}" in .claude/commands/meta/*) : ;; *) continue ;; esac
+      _nome="$(basename "${_c}" .md)"
+      grep -qxF "${_nome}" <<< "${_tools}" || _vazou="${_vazou} ${_nome}"
+    done < "${_lst}"
+    if [ -z "${_faltou}" ] && [ -z "${_vazou}" ]; then
+      record_pass "role-cut: (b2) os comandos do bundle batem EXATAMENTE com roles.yaml (oráculo independente do corte)"
+    else record_fail "role-cut: (b2)" "faltaram:${_faltou:- —} · vazaram:${_vazou:- —} — o transporte divergiu da SSOT do escopo por papel"; fi
+  else record_skip "role-cut: (b2)" "resolve-role-bundle.sh ausente — sem oráculo independente, o caso não mede"; fi
+
+  # (b3) O PAPEL DE FIDELIDADE TOTAL EXISTE, E É MEDIDO. Ordem do maestro (2026-09-15): *"vamos
+  #      mandar tudo incluindo meta fábrica, temos que ter um que tenha tudo do core para trabalhar
+  #      como o core"*. Esse papel é o `hub`, e o que ele recebe tem de ser a superfície INTEIRA —
+  #      não "quase tudo", não "tudo menos um detalhe que ninguém notou".
+  #      Sem este caso, o dia em que alguém acrescentar um corte para `hub` — por simetria, por
+  #      engano, por "aproveitar que já está cortando" — nada reprova. Um papel que deveria trabalhar
+  #      como o core viraria um core mutilado em silêncio, que é a classe deste PR inteiro.
+  local _hub _hub_lst="${d}/hub.lst" _hub_tar="${d}/hub.tar"
+  _hub="$(bash "${vm}" --role hub --repo "${REPO_ROOT}" 2>/dev/null)"
+  local _hub_spec=(); mapfile -t _hub_spec <<< "${_hub}"
+  git -C "${REPO_ROOT}" archive HEAD -- "${_hub_spec[@]}" > "${_hub_tar}" 2>/dev/null
+  tar -tf "${_hub_tar}" 2>/dev/null | grep -v '/$' | sort > "${_hub_lst}" || true
+  # ⚠️ O ORÁCULO TEM DE SER HEAD, NÃO O ÍNDICE — e foi este caso que pegou o próprio defeito, no gate
+  #    de 2026-09-15: `git ls-files` lista o ÍNDICE (inclui arquivo stajado e ainda não commitado),
+  #    enquanto `git archive HEAD` copia HEAD. Comparar os dois acusa divergência a cada arquivo novo
+  #    em voo — falso positivo por construção, e ele reprova justamente quando alguém está
+  #    acrescentando superfície, que é quando a guarda mais precisa ser confiável.
+  local _core_lst="${d}/core.lst"
+  git -C "${REPO_ROOT}" ls-tree -r --name-only HEAD -- .claude/agents .claude/commands .claude/skills \
+      .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows \
+      docs/meta-specs docs/knowledge-base docs/sdaal 2>/dev/null | sort > "${_core_lst}"
+  local _n_exc; _n_exc="$(grep -c ':(exclude)' <<< "${_hub}" || true)"
+  if [ "${_n_exc}" -eq 0 ] && cmp -s "${_hub_lst}" "${_core_lst}"; then
+    record_pass "role-cut: (b3) o hub recebe a superfície INTEIRA do core ($(grep -c . "${_core_lst}") arquivos, 0 excludes) — trabalha como o core"
+  else record_fail "role-cut: (b3)" "hub com ${_n_exc} exclude(s) e $(diff "${_hub_lst}" "${_core_lst}" | grep -c '^[<>]' || true) arquivo(s) divergentes — o papel de fidelidade TOTAL deixou de ser total"; fi
 
   # (c) SEM O CONTRATO, a guarda do ALVO falha FECHADA. É a medição que derrubou a 1ª tentativa de
   #     corte: tirar `.claude/utils/adopt` inteiro leva a SSOT junto, e `vendor-scrub-form-check.sh`
@@ -12766,6 +12810,37 @@ run_role_cut_selftests() {
     record_pass "role-cut: (e2) repo SEM superfície Onion → manifesto vazio FALHA ALTO (rc=${_rc_v}); pathspec ausente copiaria o repo inteiro"
   else record_fail "role-cut: (e2)" "manifesto vazio saiu 0 — o consumidor copiaria o repositório INTEIRO (pathspec ausente = todos), biografia e segredos junto"; fi
 
+  # (k) A SSOT DO ESCOPO NÃO PODE DEFASAR EM SILÊNCIO — o critério é medido, não opinado:
+  #     **comando que as mensagens das guardas mandam o ALVO rodar tem de viajar para o alvo.**
+  #     Entregar a guarda sem o comando que ela manda rodar é dar uma instrução impossível de cumprir.
+  #     Foi assim que `work_tool_sets.full` ficou defasado: escrito quando `inventory`, `kg-freshness`,
+  #     `backlog`, `drive`, `radar`, `realign`, `graph`, `census` e `kg-inbox` não existiam, e nada
+  #     media a lista contra o que o alvo precisa. Enquanto o transporte ignorava o papel, a defasagem
+  #     não tinha consequência; no instante em que o corte passou a CONSUMIR este arquivo, ela virou
+  #     entrega errada — o standalone nasceria sem o motor do próprio método (`/meta:inventory` é
+  #     citado 32x nas mensagens, `/meta:kg-freshness` 27x).
+  #
+  #     EXCEÇÕES, e cada uma tem razão nomeada: são comandos citados por guardas que NÃO rodam num
+  #     alvo — autoria do framework (`adopt`, `create-*`, `evolve`) e federação cross-empresa
+  #     (`federation-*`, `co-announce`, `co-deliver`, este último já no conjunto `downstream`).
+  if [ -f "${_resolver}" ]; then
+    local _full; _full="$(bash "${_resolver}" standalone --tools 2>/dev/null)"
+    local _citados _c _orfaos=""
+    _citados="$(grep -ohE '/meta:[a-z][a-z-]+' "${REPO_ROOT}"/.claude/validation/*.sh | sed 's|/meta:||' | sort -u)"
+    while IFS= read -r _c; do
+      [ -n "${_c}" ] || continue
+      case "${_c}" in
+        adopt|evolve|create-*|federation-*|co-announce|co-deliver) continue ;;  # fábrica/federação
+        nao|federation-) continue ;;                                            # falsos positivos do grep
+      esac
+      [ -f "${REPO_ROOT}/.claude/commands/meta/${_c}.md" ] || continue          # comando que não existe
+      grep -qxF "${_c}" <<< "${_full}" || _orfaos="${_orfaos} ${_c}"
+    done <<< "${_citados}"
+    if [ -z "${_orfaos}" ]; then
+      record_pass "role-cut: (k) todo comando que as guardas mandam rodar VIAJA para o standalone (nenhuma instrução impossível)"
+    else record_fail "role-cut: (k)" "as guardas mandam rodar, e o papel NÃO recebe:${_orfaos} — o alvo colhe a violação e não tem o comando da cura. Acrescente a work_tool_sets.full em roles.yaml, ou declare a exceção com razão"; fi
+  else record_skip "role-cut: (k)" "resolve-role-bundle.sh ausente"; fi
+
   # (f) `--emit-scrub-roots` IGNORA o papel, e isso é DESENHO: as guardas que o consomem varrem
   #     DIRETÓRIOS; cortar aqui as faria varrer MENOS. Varrer mais do que viaja nunca é fail-open —
   #     varrer menos é. A assimetria entre os dois modos é o lado seguro.
@@ -12776,16 +12851,61 @@ run_role_cut_selftests() {
     record_pass "role-cut: (f) --emit-scrub-roots é IGUAL nos dois papéis (a varredura não encolhe com o corte)"
   else record_fail "role-cut: (f)" "o papel encolheu a superfície de VARREDURA — a REGRA 36 passaria a varrer menos do que existe no alvo"; fi
 
-  # (g) OS CONSUMIDORES PASSAM O PAPEL. O corte da instalação não vale nada se o `--update` o desfizer:
-  #     o papel é do ALVO, então o `--update` o lê do STAMP dele, e o vendor-branch o propaga.
-  local _g=""
-  local _code; _code="$(grep -vE '^[[:space:]]*#|^>' "${REPO_ROOT}/.claude/commands/meta/adopt.md" || true)"
-  grep -qE 'vendor-manifest\.sh" --role "\$TARGET_ROLE"' <<< "${_code}" || _g="${_g} adopt--update(sem-papel-do-alvo)"
-  grep -qE 'TARGET_ROLE=.*onion-version' <<< "${_code}" || _g="${_g} adopt--update(papel-não-vem-do-stamp)"
-  grep -qE 'vendor-manifest\.sh" --role "\$\{ONION_ROLE:-adopted\}"' "${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh" || _g="${_g} vendor-branch(não-propaga)"
-  if [ -z "${_g}" ]; then
-    record_pass "role-cut: (g) --update lê o papel do STAMP DO ALVO e o vendor-branch o propaga (o corte sobrevive à atualização)"
-  else record_fail "role-cut: (g)" "falhou em:${_g} — um update cego republicaria a meta-fábrica no standalone"; fi
+  # (g) O PAPEL CHEGA A QUEM COPIA — medido EXECUTANDO, não por grep.
+  #     ⚠️ A 1ª redação fazia três `grep` de string literal no adopt.md e no vendor-branch.sh e dava
+  #     record_pass "o corte sobrevive à atualização". Guarda `behavior-over-declaration` que testava
+  #     a DECLARAÇÃO — e a passada adversarial provou que ela aprovava um caminho QUEBRADO: o
+  #     `TARGET_ROLE` lido do stamp alimentava só o `diff --stat` informativo, e quem COPIA no
+  #     `--update` é o `vendor-branch.sh`, que lê `ONION_ROLE` — env var que ninguém atribuía. 106
+  #     arquivos da meta-fábrica caíam num alvo `role: standalone`, com a bancada verde.
+  local vb="${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh"
+  if [ -f "${vb}" ]; then
+    local _n_sem _n_com
+    _n_sem="$(ONION_ROLE= bash "${vb}" --print-manifest "${REPO_ROOT}" 2>/dev/null | grep -c ':(exclude)' || true)"
+    _n_com="$(ONION_ROLE=standalone bash "${vb}" --print-manifest "${REPO_ROOT}" 2>/dev/null | grep -c ':(exclude)' || true)"
+    if [ "${_n_com}" -gt "${_n_sem}" ]; then
+      record_pass "role-cut: (g) ONION_ROLE=standalone faz o vendor-branch CORTAR (${_n_com} excludes vs ${_n_sem} sem papel) — medido executando"
+    else record_fail "role-cut: (g)" "sem papel=${_n_sem} excludes · com standalone=${_n_com} — o papel não alcança quem COPIA no --update"; fi
+  else record_fail "role-cut: (g) setup" "vendor-branch.sh ausente"; fi
+
+  # (g2) …e o `--update` do adopt.md EXPORTA o papel, senão ele não chega ao vendor-branch.
+  local _code2; _code2="$(grep -vE '^[[:space:]]*#|^>' "${REPO_ROOT}/.claude/commands/meta/adopt.md" || true)"
+  if grep -qE 'export ONION_ROLE="\$TARGET_ROLE"' <<< "${_code2}"; then
+    record_pass "role-cut: (g2) o --update EXPORTA ONION_ROLE do stamp do alvo (sem export, o vendor-branch não vê)"
+  else record_fail "role-cut: (g2)" "TARGET_ROLE é lido mas não EXPORTADO — alimenta só o diff --stat e a cópia real roda cega"; fi
+
+  # (h) O PAPEL PODE SER CARIMBADO. Corte que não entra no stamp é corte que nunca acontece: até
+  #     2026-09-15 o `write-stamp.sh` recusava `standalone`, e o único standalone do mundo (o repo
+  #     PÚBLICO) carrega `role: adopted` até hoje.
+  local ws="${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh"
+  local _t="${d}/stamp"; mkdir -p "${_t}/.claude"
+  local _rc_s=0
+  bash "${ws}" "${_t}" --framework x --commit abc123 --commit-date 2026-01-01 --role standalone >/dev/null 2>&1 || _rc_s=$?
+  if [ "${_rc_s}" -eq 0 ] && grep -qx 'role: standalone' "${_t}/.claude/.onion-version" 2>/dev/null; then
+    record_pass "role-cut: (h) write-stamp.sh carimba 'standalone' — o papel que corta tem porta de entrada"
+  else record_fail "role-cut: (h)" "rc=${_rc_s} — o stamp recusa o papel que o transporte aprendeu a cortar; a perna do --update cura ZERO casos"; fi
+
+  # (i) O CONSUMIDOR LÊ O rc DO MANIFESTO. É o caminho por onde o repo INTEIRO vaza: `mapfile` engole
+  #     o rc, o array fica vazio e `git archive HEAD --` sem pathspec significa TODOS para o git —
+  #     medido 2026-09-15: 2222 arquivos, 353 de biografia, o diário inteiro, rc=0.
+  local _i=""
+  grep -qE 'resolve-manifest\.sh"' <<< "${_code2}" || _i="${_i} não-usa-o-helper-que-lê-o-rc"
+  grep -qE 'resolve-manifest\.sh"[^|]*\\$' <<< "${_code2}" || _i="${_i} rc-não-lido(sem ||-abort)"
+  if [ -z "${_i}" ]; then
+    record_pass "role-cut: (i) o adopt LÊ o rc do manifesto e CONTA o array antes de virar pathspec"
+  else record_fail "role-cut: (i)" "falhou em:${_i} — manifesto que falha vira 'git archive HEAD --', que copia o repositório INTEIRO com rc=0"; fi
+
+  # (j) CAMINHO COM ACENTO/ESPAÇO NÃO VAZA. `git ls-tree --name-only` aplica C-quoting e o `case` por
+  #     prefixo deixa de casar — em silêncio, para uma porta PÚBLICA, num repo pt-BR. E o resultado
+  #     dependia de `core.quotePath`, config PESSOAL do operador.
+  local _vm_src; _vm_src="$(cat "${vm}")"
+  local _j=""
+  grep -q 'core.quotePath=false' <<< "${_vm_src}" || _j="${_j} sem-quotePath"
+  grep -qE "ls-tree -r -z --name-only" <<< "${_vm_src}" || _j="${_j} sem--z"
+  grep -qE "read -r -d '' _f" <<< "${_vm_src}" || _j="${_j} leitor-não-NUL"
+  if [ -z "${_j}" ]; then
+    record_pass "role-cut: (j) a enumeração é NUL-separada e imune a core.quotePath (acento/espaço não vazam)"
+  else record_fail "role-cut: (j)" "falhou em:${_j} — caminho com acento sai C-quotado, o prefixo não casa e o arquivo VAZA em silêncio"; fi
 
   rm -rf "${d}"
 }

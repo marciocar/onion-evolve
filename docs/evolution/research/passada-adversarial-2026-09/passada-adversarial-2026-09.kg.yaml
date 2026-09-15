@@ -4,7 +4,7 @@ meta:
   baseline: 2026-09-14
   review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 28 NÓS (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
+  # ═══ TETO: 33 NÓS (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
   # O CI nao revisou o PR #827 (o revisor morreu com permission_denials_count: 9 e caiu em soft-pass);
   # o maestro mandou rodar a passada propria. DUAS rodadas, 5 refutadores com LENTES distintas
   # (maquinaria/shell · o artefato mente? · pelo lado do adotante), ~1,13M tokens. As duas REPROVARAM:
@@ -283,13 +283,68 @@ nodes:
   - id: E_CORTE_POR_PAPEL_MEDIDO_0915
     node_type: evidence
     plane: PROD
+    status: superseded
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'git archive dos dois papeis + tar -t + lint no sandbox extraido'
+    label: 'SUPERADO NO MESMO PR pela passada adversarial. Afirmava "nenhum arquivo da meta-fabrica vazou alem do contrato" com base num caso de bancada TAUTOLOGICO: ele fazia grep dos MESMOS 7 prefixos do `_role_cut`, entao perguntava ao codigo o que o codigo respondera. Os numeros de arquivo estavam certos (685 -> 578); a AFIRMACAO sobre o que vazou, nao.'
+    trace: '.claude/validation/lint-selftest.sh'
+
+  - id: E_CORTE_ESTAVA_INVERTIDO_MEDIDO_0915
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'ls do repo PUBLICO onion-standalone (corte manual de 2026-07-19) + resolve-role-bundle.sh standalone --tools + bundle extraido e lintado'
+    label: 'O CORTE ESTAVA INVERTIDO em relacao ao precedente que ele afirmava mecanizar. O onion-standalone MANTEVE 14 dos 43 comandos de `meta/` — `kg` (o norte NS1, citado por 31 sobreviventes), `setup-integration` (o fallback que o proprio CLAUDE.md manda sugerir), `diary`, `orchestrate`, `co-evolve` — e cortou a meta-fabrica ARQUIVO A ARQUIVO (−274). A 1a versao fazia o oposto: apagava `commands/meta/` inteiro (−107) e mantinha `skills/onion-publish` e `agents/meta/*-creator-*`, que o manual removera. E os 29 cortados NAO compartilham prefixo, entao prefixo nunca poderia reproduzir o corte. Consequencia de metodo: as 27 ocorrencias de REGRA 22 que eu declarei em stderr como "doutrina citando caminho do core" eram, medidas, o corte levando comandos que deviam ficar — diagnostico errado ANUNCIADO como medicao. Com o corte derivado do roles.yaml e a SSOT do escopo corrigida elas caem para 9.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: E_A_SSOT_DO_ESCOPO_JA_EXISTIA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'bash .claude/utils/marketplace/resolve-role-bundle.sh standalone --tools devolve exatamente os 14 comandos que o corte manual manteve'
+    label: 'A FRONTEIRA NAO VIVIA SO EM PROSA — e eu afirmei que vivia, duas vezes, inclusive num comentario do proprio manifesto ("os dois sao SSOTs de coisas diferentes"). `roles.yaml` declara o escopo por papel e `resolve-role-bundle.sh <papel> --tools` JA devolvia os 14 exatos do precedente, alem de `downstream: false` e os verticais. As duas alternativas que cheguei a implementar — lista de prefixos, depois campo `travels:` no frontmatter de cada comando — eram SEGUNDAS SSOTs do mesmo fato, repetindo uma camada acima a duplicacao que o PR #826 curou. Licao de metodo, e ela e maior que este PR: antes de declarar que algo so existe em prosa, PROCURE O RESOLVEDOR. O custo de nao procurar foi duas implementacoes descartadas e uma decisao do maestro tomada sobre premissa falsa.'
+    trace: '.claude/utils/marketplace/roles.yaml'
+
+  - id: E_O_MANIFESTO_QUE_FALHA_COPIAVA_TUDO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'mapfile com papel invalido -> array vazio -> git archive HEAD -- : 2222 arquivos no tar, 353 de biografia, rc=0'
+    label: 'O VAZAMENTO MAIOR, e ele e PRE-EXISTENTE que as minhas guardas novas tornaram ALCANCAVEL. `mapfile -t manifest < <(script)` ENGOLE o rc do produtor. Com o manifesto saindo ≠0 (papel desconhecido, repo sem superficie) o array fica VAZIO, e `git archive HEAD --` sem pathspec significa TODOS para o git: 2222 arquivos, o diario inteiro, docs/discussions e materials, rc=0. As guardas `exit 2/3` que eu acrescentei ao manifesto AUMENTARAM as portas para esse estado sem que ninguem do outro lado as lesse. Guarda que o consumidor nao le e decoracao — a mesma classe do nome deste no, uma camada adiante. Curado: o adopt captura o rc e CONTA o array antes de virar pathspec.'
+    trace: '.claude/commands/meta/adopt.md'
+
+  - id: E_CORTE_QUE_NAO_SE_CARIMBA_NAO_ACONTECE
+    node_type: evidence
+    plane: PROD
     status: confirmed
     impact: 4
     confidence: 0.95
     verified_at: '2026-09-15'
-    verified_against: 'git archive dos dois papeis + tar -t + lint no sandbox extraido, com a Configuracao pos-copia aplicada'
-    label: 'MEDIDO: o corte funciona e o preco esta contado. adopted=685 arquivos / 32 HARD / 8 SOFT; standalone=578 arquivos / 69 HARD / 23 SOFT. Nenhum arquivo da meta-fabrica vazou alem do contrato, e as guardas do alvo que consomem a SSOT seguiram verdes no standalone (`vendor-scrub-form-check` rc=0, `kb-vendored-link-check` rc=0 sem avisos, `--emit-scrub-roots` 11 linhas).'
-    trace: '.claude/validation/lint-selftest.sh'
+    verified_against: 'write-stamp.sh --role standalone saia 2; /home/marcio/onion-standalone/.claude/.onion-version carrega role: adopted'
+    label: 'O MECANISMO NAO TINHA PORTA DE ENTRADA. O transporte aprendeu a cortar por papel e o `--update` aprendeu a LER o papel do stamp — mas `write-stamp.sh` recusava `standalone` (so `adopted|hub`), e o unico standalone do mundo, o repo PUBLICO, carrega `role: adopted` ate hoje. Somado ao `ONION_ROLE` que nenhum codigo atribuia, o corte nao disparava para adotante NENHUM que exista: gap invisivel trocado por gap invisivel, que e exatamente a tese do no que este PR fecha. Curado: o stamp aceita o papel e o `--update` EXPORTA `ONION_ROLE` para quem copia.'
+    trace: '.claude/utils/adopt/write-stamp.sh'
+
+  - id: E_A_SSOT_DO_ESCOPO_ESTAVA_DEFASADA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'contagem das mencoes a /meta:* nas mensagens de .claude/validation/*.sh: inventory 32x, kg-freshness 27x, drive 5x, radar 4x, backlog 3x, kg-inbox 3x'
+    label: 'CONSUMIR UMA SSOT TORNA A DEFASAGEM DELA CONSEQUENTE. `work_tool_sets.full` do roles.yaml foi escrito quando `inventory`, `kg-freshness`, `backlog`, `drive`, `radar`, `realign`, `graph`, `census` e `kg-inbox` nao existiam, e nada media a lista contra o que o alvo precisa. Enquanto o transporte ignorava o papel a defasagem era inofensiva; no instante em que o corte passou a consumir o arquivo, ela virou ENTREGA ERRADA — o standalone nasceria sem o motor do proprio metodo. O maestro apontou ("mesmo o kg e metas tem que ir com standalone core geral"; "hub ... todo") e a medicao confirmou. O criterio que fecha e objetivo: comando que as mensagens das guardas mandam o ALVO rodar tem de viajar para o alvo — entregar a guarda sem o comando da cura e dar uma instrucao impossivel de cumprir. standalone: 14 -> 23 comandos. Licao de segunda ordem: passar a consumir uma SSOT exige MEDIR se ela ainda e verdadeira, porque ate ali ninguem pagava o preco de ela nao ser.'
+    trace: '.claude/utils/marketplace/roles.yaml'
 
   - id: A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE
     node_type: decision
@@ -300,7 +355,7 @@ nodes:
     owner: core
     verified_at: '2026-09-15'
     verified_against: 'delta de lint entre os dois bundles extraidos, por REGRA'
-    label: 'ABERTO E DECLARADO (o residuo do corte, e ele NAO e defeito do corte): o bundle standalone nasce com 69 HARD contra 32 do adopted, e o delta e de duas classes, as duas da DOUTRINA QUE VIAJA. (a) REGRA 22, 27 ocorrencias: KB vendorizada linka `../../../.claude/commands/meta/<cmd>.md` — link RELATIVO de sistema de arquivos para um comando que o papel legitimamente nao recebe. A forma certa e o NOME do comando (`/meta:kg`), que viaja para todo papel; o caminho no disco nao. E a mesma familia que a REGRA 45 ja ensina para link core-privado. (b) REGRA 16, 14 ocorrencias: prosa com contagem fixa (`109 comandos`) num bundle de 67 — [[count-drift-grep-whole-docs-before-commit]] um andar acima, porque aqui a populacao muda POR PAPEL. Por que fica aberto e nao vira escopo deste PR: sao ~41 referencias em ~20 arquivos de doutrina, e curar exige decidir a FORMA canonica de citar comando em superficie vendorizada — decisao de desenho, nao conserto mecanico. O que este PR garante e que o numero e VISIVEL: o manifesto imprime o residuo medido em stderr quando o papel corta. Gatilho: a primeira publicacao real de um standalone pelo `/meta:adopt`.'
+    label: 'ABERTO E DECLARADO (o residuo do corte). NUMEROS CORRIGIDOS depois da passada adversarial: com o corte derivado do roles.yaml E a SSOT do escopo atualizada, o bundle nasce com 47 HARD contra 32 do adopted (era 69 -> 50 -> 47 conforme o corte foi ficando certo). (a) REGRA 22, 9 ocorrencias: KB vendorizada linka `../../../.claude/commands/meta/<cmd>.md` — link RELATIVO de sistema de arquivos para um comando que o papel legitimamente nao recebe. A forma certa e o NOME do comando (`/meta:kg`), que viaja para todo papel; o caminho no disco nao. E a mesma familia que a REGRA 45 ja ensina para link core-privado. (b) REGRA 16, 11 ocorrencias: prosa com contagem fixa (`109 comandos`) num bundle de 67 — [[count-drift-grep-whole-docs-before-commit]] um andar acima, porque aqui a populacao muda POR PAPEL. Por que fica aberto e nao vira escopo deste PR: sao ~41 referencias em ~20 arquivos de doutrina, e curar exige decidir a FORMA canonica de citar comando em superficie vendorizada — decisao de desenho, nao conserto mecanico. O que este PR garante e que o numero e VISIVEL: o manifesto imprime o residuo medido em stderr quando o papel corta. Gatilho: a primeira publicacao real de um standalone pelo `/meta:adopt`.'
     trace: '.claude/commands/meta/adopt.md'
 
   - id: E_MANIFESTO_VAZIO_ERA_TODOS
@@ -447,3 +502,18 @@ edges:
   - from: E_MANIFESTO_VAZIO_ERA_TODOS
     to: A_ROLE_DECORATIVO_NO_TRANSPORTE
     edge_type: SUPPORTS
+  - from: E_CORTE_ESTAVA_INVERTIDO_MEDIDO_0915
+    to: E_CORTE_POR_PAPEL_MEDIDO_0915
+    edge_type: SUPERSEDES
+  - from: E_A_SSOT_DO_ESCOPO_JA_EXISTIA
+    to: A_ROLE_DECORATIVO_NO_TRANSPORTE
+    edge_type: CONSTRAINS
+  - from: E_O_MANIFESTO_QUE_FALHA_COPIAVA_TUDO
+    to: A_ROLE_DECORATIVO_NO_TRANSPORTE
+    edge_type: SUPPORTS
+  - from: E_CORTE_QUE_NAO_SE_CARIMBA_NAO_ACONTECE
+    to: A_ROLE_DECORATIVO_NO_TRANSPORTE
+    edge_type: SUPPORTS
+  - from: E_A_SSOT_DO_ESCOPO_ESTAVA_DEFASADA
+    to: E_A_SSOT_DO_ESCOPO_JA_EXISTIA
+    edge_type: CONSTRAINS

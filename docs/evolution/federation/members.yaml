@@ -476,6 +476,17 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  # ⚠️ COLISÃO DE VOCABULÁRIO, nomeada em 2026-09-15 — leia antes de "corrigir" um `role:` aqui.
+  # `role:` NESTE arquivo é o TIER TOPOLÓGICO (source | hub | standalone): quem adota quem. `role:` no
+  # `.claude/.onion-version` de um adotante é o PAPEL DE TRANSPORTE (adopted | hub | standalone): o que
+  # ele RECEBE. São escalas diferentes, e 13 dos 15 membros são `standalone` aqui e `adopted` lá — não
+  # é divergência, é a normalidade.
+  #
+  # A armadilha: desde o PR #833 o papel do STAMP CORTA (um `standalone` lá perde a meta-fábrica —
+  # adopt, create-*, federation-*, evolve). A palavra passou a significar duas coisas, e copiar o valor
+  # de um arquivo para o outro tira capacidade de um adotante em silêncio. Eu mesmo fiz isso ao ler as
+  # duas escalas como uma; quem reprovou foi a REGRA 66 (Registro da federação validado no gate
+  # (members.yaml)), porque `adopted` não pertence ao vocabulário DESTE arquivo.
   - id: jogo-da-vida
     name: jogo-da-vida (Jogo da Vida — app de desenvolvimento pessoal gamificado, MAAGICA)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados

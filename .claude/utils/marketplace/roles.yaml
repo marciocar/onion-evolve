@@ -39,6 +39,28 @@ work_tool_sets:
     - setup-code-review
     - co-evolve              # co-evolução upstream: ler o inbox do core
     - co-relay               # co-evolução upstream: sinalizar o core
+    # ── A MAQUINARIA DO MÉTODO (KG + SSOTs geradas) — acrescentada em 2026-09-15 ──────────────
+    # Este conjunto foi escrito quando estes comandos ainda não existiam, e ficou defasado em
+    # silêncio: nada media a lista contra o que o alvo de fato precisa. O corte por papel do
+    # transporte (vendor-manifest.sh) passou a CONSUMIR este arquivo, e aí a defasagem virou
+    # entrega errada — o standalone nasceria sem o motor do próprio método.
+    #
+    # O critério não é gosto, é medição: **comando que as guardas do ALVO mandam rodar tem de
+    # viajar**. Contado nas mensagens de .claude/validation/*.sh — `/meta:inventory` aparece 32
+    # vezes ("rode /meta:inventory"), `/meta:kg-freshness` 27, `/meta:drive` 5, `/meta:radar` 4,
+    # `/meta:backlog` 3, `/meta:kg-inbox` 3. Entregar a guarda sem o comando que ela manda rodar é
+    # dar ao adotante uma instrução que ele não pode cumprir.
+    #
+    # E é o norte NS1 (KG/conhecimento): o standalone é solo-COMPLETO, não solo-mutilado.
+    - inventory              # motor: validation/inventory.sh — SSOT do inventário (REGRA 8/16)
+    - graph                  # motor: validation/graph.sh — projeção do grafo (REGRA 21)
+    - kg-freshness           # re-medir o grafo contra o vivo (re-testar, nunca re-carimbar)
+    - kg-inbox               # entrada de conhecimento no grafo
+    - backlog                # projeção dos nós open (REGRA 62)
+    - realign                # realinhar o plano-grafo com o vivo
+    - radar                  # radar de mundo com baseline datada (REGRA 65)
+    - drive                  # conduzir um plano-grafo até o fim
+    - census                 # censo do backlog medido, não lembrado
   # DOWNSTREAM — carteiro core→adotante. Só quem TEM sub-adotados (source; hub quando a seam
   # org-marketplace abrir). std/consumer têm exposes_downstream vazio por definição → não recebem.
   downstream:

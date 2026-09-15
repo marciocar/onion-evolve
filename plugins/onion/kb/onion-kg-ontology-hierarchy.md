@@ -19,7 +19,7 @@
 Não confunda:
 - **KG SDAAL** (`.kg.yaml`) — grafo de **conhecimento de investigação/domínio**. É o objeto deste doc.
   Motor: `${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh`. Store: `docs/onion/graph/`, `docs/evolution/research/`.
-- **`meta:graph`** — grafo **sócio-técnico da spec-as-code** (o framework se descrevendo). TBox próprio em
+- **`/onion:graph`** — grafo **sócio-técnico da spec-as-code** (o framework se descrevendo). TBox próprio em
   `onion-relation-vocabulary.md`; gerado por `${CLAUDE_PLUGIN_ROOT}/validation/graph.sh` →
   `docs/onion/graph.md`. **Não** é `.kg.yaml` e **não** é revisado pelo radar.
 

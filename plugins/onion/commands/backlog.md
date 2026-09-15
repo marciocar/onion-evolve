@@ -75,11 +75,11 @@ quase-vazia.
 ## ⚠️ Notas
 - **Melhoria sobre o gerador da PoC** (o adotante-oráculo, que originou este mecanismo): consome
   `--open-tsv` em vez de parser regex frágil; lê `owner:` como campo do nó em vez de derivá-lo do id.
-- **Verbo solto em `meta/`**; não funde nem dispara workflows faseados. Espelha `meta:inventory`
+- **Verbo solto em `meta/`**; não funde nem dispara workflows faseados. Espelha `/onion:inventory`
   (gerador determinístico + comando fino).
 
 ## 🔗 Referências
 - Gerador: `${CLAUDE_PLUGIN_ROOT}/validation/kg-backlog-project.sh` · Fonte: `${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh --open-tsv`
 - Guarda do grafo de backlog (cap+carimbo): `${CLAUDE_PLUGIN_ROOT}/validation/kg-backlog-check.sh` (REGRA 58)
 - Grafo de backlog cross-grafo + contrato de leitura: `docs/onion/graph/fios-abertos.kg.yaml`
-- Irmão-molde: `meta:inventory` (a outra projeção determinística da casa)
+- Irmão-molde: `/onion:inventory` (a outra projeção determinística da casa)

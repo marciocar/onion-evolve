@@ -15,7 +15,7 @@ allowed-tools: Read Write Edit Grep Glob Bash(bash ${CLAUDE_PLUGIN_ROOT}/validat
 argument-hint: "[<arquivo.kg.yaml> | novo <slug> | map <área> | diagnose <slug> | backfill [<escopo>]]  (vazio = localizar .kg.yaml existente e rodar radar)"
 related_commands:
   - meta:evolve
-  - meta:graph
+  - /onion:graph
   - /onion:co-evolve
 related_agents:
   - research-agent
@@ -46,7 +46,7 @@ impressão do modelo.
   redesenhar/refatorar — o contrato primeiro, o pixel/refactor depois (ver Modo map abaixo).
 
 **NÃO** usar para: lista simples de tarefas (use o task manager) · estrutura do próprio framework
-(use `meta:graph`, que é outra lente — derivada da spec-as-code, sem store).
+(use `/onion:graph`, que é outra lente — derivada da spec-as-code, sem store).
 
 ## 📁 Store (eixo SDAAL)
 
@@ -511,4 +511,4 @@ Antes de qualquer projeção cruzar fronteira (material pro cliente, sinal pro c
 - Doutrina: [knowledge-graph-sdaal.md](${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md)
 - Motor: `${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh` (soberano; awk determinístico)
 - Vertical: onion-adr-verticals-investigation-cartography-2026-07.md
-- Lente irmã (estrutura do framework): `meta:graph`
+- Lente irmã (estrutura do framework): `/onion:graph`

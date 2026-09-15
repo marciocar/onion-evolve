@@ -6,7 +6,7 @@ description: |
   retomável. Greenfield-first. NÃO é CLI — roda dentro do Claude Code.
   Relacionado: /docs:reverse-consolidate, /meta:setup-integration, /docs:build-tech-docs.
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(diff *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(cp *) Bash(tar *) Bash(rm -rf "$TMP") Bash(mktemp *) Bash(cat > *) Bash(mkdir *) Bash(printf *)
-argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--role adopted|hub] [--integration-branch <nome>] [--in-place] [--update] [--promote-hub] [--dry-run]"
+argument-hint: "<path-local | git-url> [--mode greenfield|legacy|regulated] [--role adopted|hub|standalone] [--integration-branch <nome>] [--in-place] [--update] [--promote-hub] [--dry-run]"
 category: meta
 version: "1.10.0"
 updated: "2026-07-23"
@@ -107,11 +107,11 @@ Usado pela **Fase 2** e pelo **`--update`**. Snippet self-contained (shell novo 
 SOURCE_ROOT="$(git rev-parse --show-toplevel)"
 DEST="<INSTALL_DIR — ver Fase 2>"
 
-# (a) MANIFESTO — a lista NÃO mora aqui: SSOT em `.claude/utils/adopt/vendor-manifest.sh`, que já
-#     filtra pelo que existe em HEAD (git archive aborta com pathspec vazio) e documenta o que NÃO
-#     viaja e por quê. Path novo, exclusão nova ou papel novo mexe-se LÁ — e um path docs/ novo
-#     pede eco em .claude/utils/adopt/prettierignore-onion.tpl.
-mapfile -t manifest < <(bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-manifest.sh" --role "${ONION_ROLE:-adopted}" --repo "$SOURCE_ROOT")
+# (a) MANIFESTO — a lista não mora aqui (SSOT: `vendor-manifest.sh`) e o rc dela é LIDO por um helper:
+#     `mapfile` engole rc, e pathspec AUSENTE é TODOS para o git, não NENHUM — medido 2026-09-15, um
+#     manifesto falhando fez `git archive HEAD --` copiar 2222 arquivos (353 de biografia) com rc=0.
+mapfile -t manifest < <(bash "$SOURCE_ROOT/.claude/utils/adopt/resolve-manifest.sh" "$SOURCE_ROOT" "${ONION_ROLE:-adopted}") \
+  || { echo "ABORTADO: manifesto de transporte não resolvido."; exit 1; }
 
 # (b) Extrair para TMP (git archive = só a árvore TRACKED de HEAD → settings.local.json, sessions/,
 #     .onion-version, docs/{analysis,materials,applying} ficam AUTOMATICAMENTE de fora).
@@ -120,9 +120,9 @@ git -C "$SOURCE_ROOT" archive HEAD -- "${manifest[@]}" | tar -x -C "$TMP"
 
 # (b.1) STUB DOS BASELINES — a biografia que a allowlist de DIRETÓRIO não alcança. Os `*-baseline.txt`
 #       de .claude/validation/ são índice NOMINAL do repo privado (medido 2026-09-13: 32 paths de
-#       docs/{discussions,analysis,materials}, incluindo 5 arquivos do grafo pessoal do maestro) e já
-#       chegaram assim a 5 adotantes. O passivo do CORE não é dívida do cliente: o baseline vai como
-#       stub e o `regen-baselines.sh` (passo 4 do pós-cópia) o preenche do corpus do ALVO.
+#       docs/{discussions,analysis,materials}, 5 do grafo pessoal do maestro) e já chegaram a 5
+#       adotantes. O passivo do CORE não é dívida do cliente: vai stub, e o `regen-baselines.sh`
+#       (passo 4 do pós-cópia) preenche do corpus do ALVO.
 bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-manifest.sh" --stub-baselines "$TMP"
 bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-manifest.sh" --check-bundle "$TMP"   # exit 1 = NÃO copie
 
@@ -729,7 +729,13 @@ fi
 # (`onion-version.sh` hardcoda `role: source` por ser a identidade da FONTE — não serve aqui).
 TARGET_ROLE="$(awk '/^role:/{print $2; exit}' "$TARGET/.claude/.onion-version")"
 [ -n "$TARGET_ROLE" ] || TARGET_ROLE=adopted   # stamp sem campo role → adotado por definição
-mapfile -t manifest < <(bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-manifest.sh" --role "$TARGET_ROLE" --repo "$SOURCE_ROOT")
+# ⚠️ O EXPORT é o que faz o papel chegar ao `vendor-branch.sh`, que é quem COPIA no --update. Sem ele
+# o TARGET_ROLE alimentava só o `diff --stat` abaixo e a atualização rodava cega (medido 2026-09-15:
+# `ONION_ROLE` era lido por dois arquivos e atribuído por NENHUM — 106 arquivos da meta-fábrica caíam
+# num alvo `role: standalone` com a bancada verde).
+export ONION_ROLE="$TARGET_ROLE"
+mapfile -t manifest < <(bash "$SOURCE_ROOT/.claude/utils/adopt/resolve-manifest.sh" "$SOURCE_ROOT" "$TARGET_ROLE") \
+  || { echo "ABORTADO: manifesto não resolvido para o papel '$TARGET_ROLE' do alvo."; exit 1; }
 git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.env.example)
 # Delta só com pin VERIFICADO (senão o range mente); a cópia segura abaixo não depende do delta.
 [ -n "$PIN_OK" ] && git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"

@@ -37,6 +37,17 @@ _manifest() {  # $1=SOURCE_ROOT → imprime pathspecs existentes, um por linha
   bash "${HERE}/vendor-manifest.sh" --role "${ONION_ROLE:-adopted}" --repo "$1"
 }
 
+# `--print-manifest <SOURCE_ROOT>` — expõe a decisão de transporte que este helper toma, para que
+# ela possa ser MEDIDA em vez de inferida. Nasceu porque a bancada "provava" a propagação do papel
+# com três `grep` de string literal, e a passada adversarial (2026-09-15) mostrou que ela aprovava um
+# caminho quebrado: 106 arquivos da meta-fábrica caindo num alvo `role: standalone`, tudo verde.
+# Guarda `behavior-over-declaration` que testa declaração não é guarda.
+if [ "${1:-}" = "--print-manifest" ]; then
+  [ -n "${2:-}" ] || { echo "uso: vendor-branch.sh --print-manifest <SOURCE_ROOT>" >&2; exit 2; }
+  _manifest "$2"
+  exit 0
+fi
+
 # ── GUARDA DE BASE CRUZADA ──────────────────────────────────────────────────────────────────
 # Um `onion/vendor` só é fonte-de-merge legítima para uma integração se, em relação à BASE do
 # merge com ela, ele mudou APENAS framework. Quando o seed cai no fallback (_seed do HEAD da

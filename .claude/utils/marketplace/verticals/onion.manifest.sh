@@ -46,6 +46,15 @@ COMMANDS=(
   ".claude/commands/catch-up.md"
   ".claude/commands/onion.md"
   ".claude/commands/meta/kg-freshness.md"
+  # ── Acrescentados em 2026-09-15, e foi a REGRA 37 (Mapa role→bundle (roles.yaml) consistente com
+  #    os verticais) que os cobrou: o conjunto `work_tool_sets.full` ganhou a maquinaria do método, e
+  #    a guarda reprovou na hora por eles não estarem empacotados aqui. Exatamente o trabalho que eu
+  #    havia declarado que ela faz — declaração que só vale porque foi exercida.
+  ".claude/commands/meta/inventory.md"
+  ".claude/commands/meta/graph.md"
+  ".claude/commands/meta/kg-inbox.md"
+  ".claude/commands/meta/radar.md"
+  ".claude/commands/meta/census.md"
 )
 AGENTS=(
   ".claude/agents/meta/metaspec-gate-keeper.md"
@@ -69,6 +78,10 @@ UTILS=(
   ".claude/utils/diagnose"
   ".claude/utils/task-manager"
   ".claude/utils/forge"
+  # Motor do /meta:census, que entrou em work_tool_sets.full. Sem ele o comando viaja e não roda —
+  # dead-ref, que é a REGRA 27 (Dependência de script de comando empacotado) na forma mais crua:
+  # entregar metade do comando. UTILS aceita DIRETÓRIO (o assemble valida com `-d`).
+  ".claude/utils/census"
 )
 VALIDATION=(
   ".claude/validation/kg-radar.sh"
@@ -89,6 +102,13 @@ VALIDATION=(
   ".claude/validation/kg-provenance-coverage.sh"
   ".claude/validation/resolve-integration-branch.sh"
   ".claude/validation/aside-router.sh"
+  # ── Motores dos comandos acrescentados em 2026-09-15. A REGRA 27 (Dependência de script de comando
+  #    empacotado) os cobrou: comando que declara um script em allowed-tools e cujo motor não viaja
+  #    no bundle é DEAD-REF — o adotante recebe o comando e ele não roda. Entregar meio comando é a
+  #    mesma classe de entregar a guarda sem o comando da cura.
+  ".claude/validation/inventory.sh"
+  ".claude/validation/graph.sh"
+  ".claude/validation/kg-census-extract.sh"
 )
 TEMPLATES=()
 DOCS=(

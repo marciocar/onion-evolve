@@ -669,7 +669,7 @@ instância implementa com seu stack; o core permanece determinístico até a esc
 
 ## Relações
 
-- **≠ `meta:graph`**: aquele é a lente sócio-técnica da *spec-as-code* (estrutura do framework);
+- **≠ `/onion:graph`**: aquele é a lente sócio-técnica da *spec-as-code* (estrutura do framework);
   este é o grafo do *conhecimento de uma investigação* (claims/decisões/evidência). Complementares.
 - **Parentesco**: protocolo de re-teste do diário (`/onion:diary review`); doutrina de dogfood
   ([onion-dogfooding-doctrine](onion-dogfooding-doctrine.md)) — "invoque o artefato e observe" é a

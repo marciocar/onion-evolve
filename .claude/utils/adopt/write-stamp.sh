@@ -21,7 +21,7 @@
 #     com ela, os 3 restantes eram SSOT viva (technical-context/index.md, project.kg.yaml) — o alvo.
 #
 # Uso : write-stamp.sh <target_root> --framework <n> --commit <sha> --commit-date <AAAA-MM-DD>
-#         [--adopted-from <url>] [--mode <m>] [--role <adopted|hub>] [--integration-branch <b>]
+#         [--adopted-from <url>] [--mode <m>] [--role <adopted|hub|standalone>] [--integration-branch <b>]
 #         [--members <members.yaml>] [--member-id <id>]
 #   --role: papel de adoção. Default 'adopted' (consumidor). 'hub' = empresa que adota os próprios
 #           projetos (Camada 2 — pode rodar /meta:adopt local; ver adopter-onboarding.md). Sem --role
@@ -71,7 +71,12 @@ else
 fi
 # Default + validação do papel de ADOÇÃO (source não carrega stamp — é lido ao vivo por onion-version.sh).
 [ -n "${ROLE}" ] || ROLE="adopted"
-case "${ROLE}" in adopted|hub) : ;; *) echo "ERRO: --role deve ser 'adopted' ou 'hub' (veio '${ROLE}')" >&2; exit 2 ;; esac
+# ⚠️ `standalone` entrou em 2026-09-15, e a ausência dele era um MECANISMO SEM PORTA DE ENTRADA: o
+# transporte aprendeu a cortar por papel, o `--update` aprendeu a LER o papel do stamp — e o stamp
+# recusava justamente o papel que corta. Medido pela passada adversarial: o único standalone do mundo
+# (o repo PÚBLICO onion-standalone) carrega `role: adopted`, então um `--update` nele republicaria a
+# meta-fábrica exatamente como antes. Corte que não pode ser carimbado é corte que não acontece.
+case "${ROLE}" in adopted|hub|standalone) : ;; *) echo "ERRO: --role deve ser 'adopted', 'hub' ou 'standalone' (veio '${ROLE}')" >&2; exit 2 ;; esac
 
 # restauração do adopted_at perdido (re-carimbo pré-fix) — do members.yaml do core, nunca inventado
 if [ -n "${OLD_EXISTS}" ] && [ -z "${ADOPTED_AT}" ] && [ -n "${MEMBERS}" ] && [ -n "${MEMBER_ID}" ] \

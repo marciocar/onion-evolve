@@ -1,127 +1,216 @@
 ---
-title: 'Resíduo — o corte por papel, e a guarda nova que aprovava a si mesma'
+title: 'Resíduo — o corte estava invertido, e a SSOT que eu disse não existir já existia'
 date: 2026-09-15
 branch: fix/adopt-role-cut-transport
-reviewed_diff_sha256: PENDENTE
-findings_total: 3
-findings_real: 3
-findings_fixed: 2
+reviewed_diff_sha256: 21f1f0f2f36ce98f01ab1433474f84d6af50dec89beee3b07721cc4c7f37b736
+findings_total: 13
+findings_real: 13
+findings_fixed: 13
 tokens: 0
 duration_min: 0
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >-
-  Três medições fixaram o desenho e a segunda derrubou a primeira tentativa inteira. Mas o achado
-  que dói é o terceiro: a bancada que eu escrevi para provar o corte reprovou num caso, e investigar
-  POR QUE ela reprovava revelou um fail-open maior — manifesto vazio com rc=0, que para o `git`
-  significa TODOS e não NENHUM. A primeira versão da minha guarda nova aprovava a si mesma pelo
-  mesmo motivo.
+  Os três refutadores REPROVARAM, de três lentes independentes, e convergiram no mesmo lugar: a cura
+  repetiu o pecado do nó uma camada acima. O corte não disparava para adotante NENHUM que exista
+  (papel incarimbável + env var que ninguém atribuía), e quando disparava cortava o lado ERRADO —
+  o precedente manteve os 14 comandos que eu apagava. Duas implementações inteiras foram ao lixo, e
+  a segunda porque eu afirmei, em comentário de código, que a fronteira só vivia em prosa. Vivia num
+  resolvedor que eu não procurei.
 ---
 
-# O `--role` cortava zero arquivos — e curar isso exigia descobrir o que NÃO pode ser cortado
+# O corte estava invertido — e a SSOT que eu disse não existir já existia
 
-## O nó, verbatim
+## O que o nó pedia
 
 > `--role adopted|hub|standalone` devolve listas IDÊNTICAS — ROLE é inicializado, parseado, validado
-> e nunca mais lido. É PIOR que o gap anterior: antes não havia papel e quem publicasse um standalone
-> sabia que precisava cortar à mão; agora há flag que aceita `standalone` e entrega a meta-fábrica
-> inteira. **Gap aberto virou gap INVISÍVEL.**
+> e nunca mais lido. **Gap aberto virou gap INVISÍVEL.**
 
-## As três medições que fixaram o desenho
+## O que os três refutadores acharam
 
-| # | O que mediu | Resultado | O que mudou no desenho |
-|---|---|---|---|
-| 1 | `:(exclude)` vs positivo | **exclude vence, em qualquer ordem** | o corte é emitido **arquivo a arquivo**; não se poupa arquivo dentro de diretório cortado |
-| 2 | lint no bundle cortado | **REGRA 36 HARD** | cortar `utils/adopt` inteiro leva a SSOT junto → nasceu o **CONTRATO** |
-| 3 | `git archive` com tudo excluído | **rc=0, tar VAZIO** | contar o que sobra virou obrigação do manifesto |
+Nove achados HARD, todos curados aqui. Os quatro que mudam o desenho:
 
-A medição **2** derrubou a primeira tentativa inteira. `.claude/utils/adopt` é o coração da
-meta-fábrica — cortá-lo parece óbvio. Mas `vendor-manifest.sh` mora lá dentro, e três guardas do
-**ALVO** o leem: `lint-artifacts.sh` (REGRA 36, **fail-closed deliberado**), `vendor-scrub-form-check.sh`
-(`exit 2`) e `kb-vendored-link-check.sh` (fallback defasado). O standalone nasceria **vermelho** —
-trocando um gap invisível por outro.
+### 1. O corte estava INVERTIDO em relação ao precedente que ele dizia mecanizar
 
-Daí a distinção que o arquivo agora carrega:
+O `onion-standalone` — repo **público**, cortado à mão em 2026-07-19 — **manteve 14 dos 43** comandos
+de `meta/` e removeu a meta-fábrica **arquivo a arquivo** (−274). A minha primeira versão fazia o
+oposto: apagava `commands/meta/` inteiro (−107) e mantinha `skills/onion-publish` e
+`agents/meta/*-creator-*`, que o manual removera.
 
-> **a FÁBRICA não viaja; a PLANTA que as guardas do alvo leem, sim.**
+Entre os apagados estavam **`/meta:kg`** (o norte NS1, citado por 31 arquivos sobreviventes) e
+**`/meta:setup-integration`** — o fallback que o próprio CLAUDE.md manda sugerir. O adotante perderia
+comandos que o orquestrador continua mandando invocar.
 
-## O corte é DERIVADO, não uma lista
+**E isso reescreveu o meu diagnóstico do resíduo.** Eu havia declarado em stderr, como medição, que
+as 27 ocorrências de REGRA 22 (Links relativos quebrados em docs/evolution/ e docs/knowledge-base/)
+eram "doutrina citando caminho do core". Eram o corte levando comandos que deviam ficar. Com o corte
+certo caem para 13.
 
-A lista de arquivos a cortar sai de `git ls-tree` sobre **prefixos de caminho**. Helper de adoção
-criado amanhã dentro de `.claude/utils/adopt/` **nasce cortado**, sem ninguém lembrar de acrescentá-lo.
-É a cura da classe [[guarda-por-lista-falha-pelo-vocabulario]] aplicada ao transporte: asserir a
-**FORMA** (o prefixo), nunca os nomes. A única lista manual é o CONTRATO — uma entrada, e a bancada
-prova que ela está completa.
+### 2. A SSOT do escopo por papel já existia — e eu escrevi que não
 
-## O achado que a própria bancada produziu
+`bash .claude/utils/marketplace/resolve-role-bundle.sh standalone --tools` devolve **exatamente os
+14**. `roles.yaml` declara os verticais e `downstream: false`.
 
-O caso `(e)` reprovou. A causa imediata era fixture irreal (o contrato sempre sobrevive, então o
-manifesto nunca chegava a zero). Investigar isso expôs o defeito real:
+Cheguei a implementar **duas** alternativas — lista de prefixos, depois um campo `travels:` no
+frontmatter de cada comando — e as duas eram **segundas SSOTs do mesmo fato**, repetindo a duplicação
+que o PR #826 curou (*"a mesma lista vivia TRÊS vezes, e uma já tinha driftado"*). Pior: o comentário
+que eu mesmo escrevi no manifesto **racionalizava ignorá-la** (*"os dois são SSOTs de coisas
+diferentes"*).
 
-> Para o `git`, **pathspec AUSENTE significa TODOS**, não NENHUM.
+> Antes de declarar que algo só existe em prosa, **procure o resolvedor.**
 
-Um repo sem nenhuma raiz da superfície Onion emitia manifesto **vazio com rc=0**. Quem lesse só o rc
-copiaria o **repositório inteiro** — biografia e segredos junto. E a primeira versão da minha própria
-guarda nova **aprovava a si mesma**: ela contava com `diff-tree --` sem pathspec, que casa tudo.
+O custo de não procurar foram duas implementações descartadas e uma decisão do maestro tomada sobre
+premissa falsa.
 
-Classe [[exit-code-nao-e-a-verificacao]], agora um andar acima — no transporte.
+### 3. O corte não disparava para adotante nenhum que exista
 
-## O corte da instalação não vale nada se o `--update` o desfizer
+Duas causas somadas, e cada uma sozinha bastava:
 
-Duas pontas estavam cegas ao papel, e enquanto ele era decorativo isso não tinha efeito observável:
+- `write-stamp.sh` **recusava** `standalone` (só `adopted|hub`). O papel que o transporte aprendeu a
+  cortar não podia entrar no stamp que o transporte aprendeu a ler.
+- `ONION_ROLE` era lido por dois arquivos e **atribuído por nenhum**. O `--update` copia pelo merge do
+  `vendor-branch.sh`, que roda `adopted`; meu `TARGET_ROLE` alimentava só o `diff --stat`.
 
-- `adopt.md --update` não passava `--role`. Agora lê o papel do **STAMP DO ALVO** (`onion-version.sh`
-  hardcoda `role: source` por ser a identidade da FONTE — não serve aqui).
-- `vendor-branch.sh` não propagava. Agora propaga por `ONION_ROLE`.
+O único standalone do mundo carrega `role: adopted` até hoje. **Gap invisível trocado por gap
+invisível** — a tese exata do nó que este PR fecha.
 
-## O resíduo, medido e DECLARADO (não curado aqui)
+### 4. O manifesto que falha copiava o repositório inteiro
 
-| bundle (pós-configuração) | arquivos | HARD | SOFT |
-|---|---|---|---|
-| `adopted` | 685 | 32 | 8 |
-| `standalone` | **578** | **69** | 23 |
+`mapfile -t manifest < <(script)` **engole o rc**. Com o manifesto saindo ≠0, o array fica vazio — e
+para o git **pathspec ausente significa TODOS**: 2222 arquivos, 353 de biografia, o diário inteiro,
+`rc=0`.
 
-O delta é de **duas classes, ambas da doutrina que viaja** — não do corte:
+É **pré-existente**, e as guardas `exit 2/3` que eu acrescentei ao manifesto **aumentaram as portas**
+para esse estado sem que ninguém do outro lado as lesse. Guarda que o consumidor não lê é decoração —
+a mesma classe do `--role`, uma camada adiante.
 
-- **REGRA 22 (×27)** — KB vendorizada linka `../../../.claude/commands/meta/<cmd>.md`. Link
-  **relativo de sistema de arquivos** para um comando que o papel legitimamente não recebe. A forma
-  certa é o **nome** do comando (`/meta:kg`), que viaja para todo papel.
-- **REGRA 16 (×14)** — prosa com contagem fixa (`109 comandos`) num bundle de 67.
+## E a bancada que eu escrevi aprovava tudo isso
 
-**Por que fica aberto:** são ~41 referências em ~20 arquivos de doutrina, e curar exige decidir a
-**forma canônica** de citar comando em superfície vendorizada — decisão de desenho, não conserto
-mecânico. O que este PR garante é que o número é **VISÍVEL**: o manifesto imprime o resíduo medido em
-stderr sempre que o papel corta. Nó `A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE`, gatilho nomeado.
+- **(b2)** era tautológico: fazia `grep` dos **mesmos 7 prefixos** do `_role_cut`. Perguntava ao
+  código o que o código respondera. Agora o oráculo é o `roles.yaml` — fonte que o corte **consome**
+  mas não define.
+- **(g)** eram três `grep` de string literal dando `record_pass "o corte sobrevive à atualização"`.
+  Uma guarda `behavior-over-declaration` testando a declaração — e aprovando um caminho quebrado.
+  Agora executa: `ONION_ROLE=standalone` produz **93 excludes** contra **0** sem papel.
 
-## `--emit-scrub-roots` ignora o papel, e isso é desenho
+### 5. A SSOT do escopo estava DEFASADA, e o corte a tornou consequente
 
-As guardas que o consomem varrem **diretórios**; um `:(exclude)` ali as faria varrer **menos**.
-Varrer mais do que viaja nunca é fail-open — varrer menos é. A assimetria entre os dois modos é o
-lado seguro, e a bancada a fixa no caso `(f)`.
+O maestro apontou: *"mesmo o kg e metas tem que ir com standalone core geral"* — e `hub` recebe tudo.
+Medido, ele estava certo e o problema era `work_tool_sets.full`, escrito quando `inventory`,
+`kg-freshness`, `backlog`, `drive`, `radar`, `realign`, `graph`, `census` e `kg-inbox` **não
+existiam**. Enquanto o transporte ignorava o papel, a defasagem não tinha consequência; quando o
+corte passou a CONSUMIR o arquivo, virou entrega errada.
+
+O critério que fecha isso é medido, não opinado:
+
+> **Comando que as mensagens das guardas mandam o ALVO rodar tem de viajar para o alvo.**
+
+Contado nas mensagens de `.claude/validation/*.sh`: `/meta:inventory` aparece **32×** ("rode
+/meta:inventory"), `/meta:kg-freshness` 27×, `/meta:drive` 5×, `/meta:radar` 4×. Entregar a guarda
+sem o comando da cura é dar ao adotante uma instrução impossível de cumprir. O standalone passou de
+14 para **23** comandos, e o caso `(k)` da bancada impede a lista de defasar de novo.
+
+### 6. O papel de fidelidade TOTAL existe, e agora é medido
+
+Ordem do maestro: *"vamos mandar tudo incluindo meta fábrica, temos que ter um que tenha tudo do core
+para trabalhar como o core"*. Esse papel é o **`hub`** — e a medição confirma: **685 arquivos, zero
+excludes, byte a byte a superfície do core**, com a meta-fábrica inteira (os 43 comandos de `meta/`,
+`utils/{adopt,marketplace,wizard,vertical,federation-transport}`, `validation/federation-*`).
+
+Isso já era verdade, mas **por default, não por invariante** — nada reprovaria o dia em que alguém
+acrescentasse um corte para `hub` por simetria ou engano, e o papel que deveria trabalhar como o core
+viraria um core mutilado em silêncio. É a classe deste PR inteiro. O caso `(b3)` trava.
+
+### 7. `standalone` passou a significar duas coisas — e eu caí na armadilha primeiro
+
+Vi `members.yaml` dizer `standalone` para o jogo-da-vida e o stamp dizer `adopted`, li como
+divergência e "corrigi" o registro. **Estava errado, e a REGRA 66 (Registro da federação validado no
+gate (members.yaml)) me reprovou na hora:** `adopted` não pertence ao vocabulário daquele arquivo.
+
+São **duas escalas**, não um conflito:
+
+| arquivo | o que `role:` significa | vocabulário |
+|---|---|---|
+| `members.yaml` | **tier topológico** — quem adota quem | `source \| hub \| standalone` |
+| `.claude/.onion-version` | **papel de transporte** — o que o alvo RECEBE | `adopted \| hub \| standalone` |
+
+**13 dos 15 membros** são `standalone` no registro e `adopted` no stamp. Não é divergência — é a
+normalidade, e o registro nunca mentiu.
+
+**Mas o achado é real, e é desta família:** até hoje a colisão era inerte. Depois deste PR, um
+`standalone` no **stamp** corta a meta-fábrica; um `standalone` no **registro** descreve treze repos
+que recebem tudo. Copiar o valor de um arquivo para o outro — o gesto que eu acabei de fazer — tira
+capacidade de um adotante **em silêncio**. A colisão está agora nomeada em comentário no próprio
+`members.yaml`, onde o próximo leitor a encontra antes de "corrigir" alguma coisa.
+
+Quem me pegou foi uma guarda que já existia. É o contraponto honesto do resto deste resíduo: nem
+toda cura aqui veio de refutador — esta veio do gate, fazendo o que promete.
+
+### 8. O empacotador copiava lixo do ambiente — e o local se auto-isentava
+
+O `assemble-plugin.sh` montava `UTILS` com `cp -R` do **diretório inteiro**. Ao empacotar
+`.claude/utils/census` (que eu acrescentei nesta rodada), o `__pycache__/*.pyc` — que existe no disco
+de quem roda python e **não** no commit — foi junto.
+
+O resultado é o pior formato de defeito: o bundle montado **localmente** tinha o `.pyc`, o montado no
+**CI** (checkout limpo) não, e a REGRA 19 (Plugins de vertical (plugins/*) sincronizados com as
+fontes) acusava "fora de sincronia" **só no CI**. Verde na máquina, vermelho no servidor, e nada no
+diff que explicasse — a máquina do operador se isentando pelo próprio lixo.
+
+**A cura tem DUAS metades, e a primeira sozinha não bastou** — o CI reprovou de novo e me obrigou a
+achar a segunda:
+
+1. **a cópia**: `UTILS` era `cp -R` do diretório; passa a copiar só o que `git ls-files` lista;
+2. **o cálculo do `tree_sha`**: era `find <dir> -type f`, que varre o **disco**. O `.pyc` entrava no
+   hash, então o `tree_sha` calculado localmente **nunca** ia bater com o de um checkout limpo.
+
+A segunda é a que importa mais, porque `tree_sha` é o sinal de drift do plugin: *content-addressed só
+vale se o conteúdo endereçado for o mesmo para todo mundo* — e o que é igual para todo mundo é o que
+está **rastreado**. Provado por execução: com e sem o `__pycache__` no disco, o hash agora é o mesmo.
+
+É a mesma doutrina que o transporte de adoção já aplica com `git archive HEAD`. Ela valia num canal e
+não no outro.
+
+Pré-existente, e só ficou alcançável porque este PR foi o primeiro a pôr em `UTILS` um diretório com
+artefato gerado dentro.
+
+## Curado junto
+
+- **C-quoting**: `git ls-tree --name-only` escapa acento/espaço, o `case` por prefixo deixa de casar e
+  o arquivo **vaza em silêncio** — numa porta pública, num repo pt-BR. E o resultado dependia de
+  `core.quotePath`, config **pessoal** do operador. Agora `-z` + `read -r -d ''`.
+- **`.claude/commands/` inteiro cortado**: a primeira tentativa do fail-closed varreu todas as
+  categorias e zerou os 146 comandos do bundle. Fail-closed onde ninguém é obrigado a declarar não é
+  rigor, é apagamento.
+- **REGRA 5 (Limites de linhas (por TIPO de artefato — tamanho saudável ≠ número universal))**: a
+  resolução do manifesto virou `resolve-manifest.sh` — 804 → 800 linhas.
+
+## O resíduo que FICA, medido
+
+| bundle (pós-configuração) | arquivos | HARD |
+|---|---|---|
+| `adopted` | 685 | 32 |
+| `standalone` | **601** | **47** |
+
+REGRA 22 ×9 e REGRA 16 (Contagem de inventário-TOTAL divergente da SSOT) ×11 — agora genuinamente
+doutrina citando a meta-fábrica cortada. Nó `A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE`, aberto
+com gatilho.
+
+A progressão conta a história: **69 → 50 → 47 HARD** conforme o corte foi ficando certo. Número que
+cai sozinho quando o desenho melhora é sinal de que ele media o desenho, não o ruído.
 
 ## Bancada
 
-Família `role_cut`, **11 casos**:
-
-```
-(a)      standalone ≠ adopted (o papel corta)
-(a2)     some a meta-fábrica, FICA a doutrina
-(a-MUT)  sem _role_cut o standalone volta a ser adopted — (a) é load-bearing
-(b)      bundle REAL (git archive + tar): 578 arquivos e o CONTRATO viajou
-(b2)     nada mais da fábrica vazou
-(c)      sem o contrato a guarda do ALVO falha FECHADA (rc=2)
-(d)      helper NOVO sob prefixo cortado nasce cortado (derivado, não lista)
-(e)      corte que cancela TUDO sai ≠0 em vez de virar bundle vazio
-(e2)     repo sem superfície → manifesto vazio FALHA ALTO (pathspec ausente = todos)
-(f)      --emit-scrub-roots IGUAL nos dois papéis
-(g)      --update lê o papel do STAMP DO ALVO e o vendor-branch propaga
-```
+Família `role_cut`, **17 casos**, dos quais 8 nasceram desta passada: `(b2)` com oráculo independente,
+`(g)` por execução, `(g2)` export do papel, `(h)` stamp carimbável, `(i)` rc lido pelo consumidor,
+`(j)` enumeração NUL-separada, `(k)` a SSOT do escopo não defasa em silêncio, `(b3)` o hub é fidelidade TOTAL.
 
 ## Gate
 
 ```
-bancada completa : PENDENTE
-lint (LC_ALL=C)  : PENDENTE
-radar / integrity: exit 0
+bancada completa : 1260 pass · 0 fail · 0 skip
+lint (LC_ALL=C)  : 0 HARD
+radar / integrity: exit 0 (33 nós)
+família role_cut : 17/17
 commit           : SEM --no-verify
 ```

@@ -5,11 +5,11 @@ category: meta
 tags: [kg, kg-inbox, write-leg, sealing, i3, self-evolution, sdaal]
 version: "1.1.0"
 updated: "2026-09-05"
-allowed-tools: Read Write Edit Grep Glob Bash(ls docs/evolution/kg-inbox/*) Bash(git mv docs/evolution/kg-inbox/*) Bash(bash .claude/validation/kg-radar.sh*) Bash(bash .claude/validation/onion-version.sh) Bash(git ls-files*) Bash(git -C * log*)
+allowed-tools: Read Write Edit Grep Glob Bash(ls docs/evolution/kg-inbox/*) Bash(git mv docs/evolution/kg-inbox/*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh) Bash(git ls-files*) Bash(git -C * log*)
 argument-hint: "[--list | <slug-da-proposta>]  (sem arg = processa TODA a fila; --list = só mostra sem decidir)"
 ---
 
-# 🧅 /meta:kg-inbox — selar a fila de propostas de escrita no grafo
+# 🧅 /onion:kg-inbox — selar a fila de propostas de escrita no grafo
 
 A perna que faltava do **write-leg (F4b)**: `propose_kg_write` (via MCP `onion-exec`, ou qualquer
 produtor) grava uma **proposta** em `docs/evolution/kg-inbox/<slug>-<ts>.proposal.kg.yaml` — **nunca
@@ -18,15 +18,15 @@ proposta ao grafo vivo, ou a recusa. Sem ele a fila acumula sem controle (o gati
 2 propostas paradas, medido 2026-08-21).
 
 > **O que este comando NÃO é.** Não é `propose_kg_write` (o *produtor* da proposta). Não é
-> `/meta:co-evolve` (fila de mensagens entre repos). É o **consumidor** da fila `kg-inbox` **deste**
+> `/onion:co-evolve` (fila de mensagens entre repos). É o **consumidor** da fila `kg-inbox` **deste**
 > repo — o ato de selar, exercido por quem é dono do grafo. (O README da fila é local a cada repo e
-> `docs/evolution/` **não** viaja na adoção: no adotante vale o README que o starter do `/meta:adopt`
+> `docs/evolution/` **não** viaja na adoção: no adotante vale o README que o starter do `meta:adopt`
 > escreve, não este.)
 
 ## Passo 1 — Roteamento por papel (o dono do repo sela a fila DO PRÓPRIO repo)
 
 Ler `role:` do stamp `.claude/.onion-version` (só se ausente, cair para
-`bash .claude/validation/onion-version.sh`) e rotear — **nunca parar por ser adotante**:
+`bash ${CLAUDE_PLUGIN_ROOT}/validation/onion-version.sh`) e rotear — **nunca parar por ser adotante**:
 
 | `role:` | fila que este comando sela | grafo-alvo permitido |
 |---|---|---|
@@ -49,7 +49,7 @@ campo seria **prosa inexequível** (a 1ª redação desta seção era). Logo: `m
 presente**, é lido e obedecido; a guarda que decide é o caminho do alvo, que existe sempre.
 
 Se a fila não existir (`docs/evolution/kg-inbox/` ausente) — o caso de adoções feitas antes de
-2026-09-05 —, o caminho pronto é **`/meta:adopt --update`**, que reexecuta o pós-cópia e faz o
+2026-09-05 —, o caminho pronto é **`meta:adopt --update`**, que reexecuta o pós-cópia e faz o
 `starter-kg-inbox.sh` criá-la com README + `_sealed/` + `_rejected/`. Só se o update não for
 possível, rode o starter direto (ele é idempotente e confere o próprio efeito). **Não improvise a
 fila à mão** — o starter é a forma canônica, e é ele que a bancada exercita.
@@ -57,7 +57,7 @@ fila à mão** — o starter é a forma canônica, e é ele que a bancada exerci
 > ⚠️ O starter mora na maquinaria de ADOÇÃO, que não viaja para todo papel nem é empacotada no
 > plugin. Por isso ele é citado pelo NOME e não pelo caminho do core (REGRA 74 (Caminho .claude/ NU
 > dentro de plugin só resolve no core, com catraca)), e saiu do `allowed-tools`: semear a fila é
-> trabalho do `/meta:adopt`; deste comando é TRIAR o que já está nela.
+> trabalho do `meta:adopt`; deste comando é TRIAR o que já está nela.
 
 ## Passo 2 — Levantar a fila
 
@@ -77,7 +77,7 @@ não parte desta cura.
 ## Passo 3 — Radar advisory + triagem (o juízo)
 
 Para cada proposta:
-1. `bash .claude/validation/kg-radar.sh <proposta>` — advisory, **não** gate (a proposta é fragmento;
+1. `bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <proposta>` — advisory, **não** gate (a proposta é fragmento;
    órfãos/impact são esperados). Absorver integridade e o teor dos nós.
 2. Ler os `nodes:`/`edges:` e **decidir** por estes critérios, nesta ordem:
 
@@ -88,7 +88,7 @@ Para cada proposta:
    | `role:` | mora aqui (candidato a SELAR) | não mora aqui (**REJEITAR** + registrar o gap) |
    |---|---|---|
    | `source` (core) | o **próprio framework**: capacidade, gap, doutrina, decisão de arquitetura | contexto de **negócio de adotante/tenant** (produto, mercado, cliente) — mora no repo dele |
-   | `adopted` \| `hub` | o **domínio deste repo**: produto, negócio, cliente, decisão de arquitetura DAQUI | doutrina do **framework** (isso é sinal upstream: vai por `/meta:co-relay` ao core, não por selagem aqui) · conhecimento de um **terceiro** repo |
+   | `adopted` \| `hub` | o **domínio deste repo**: produto, negócio, cliente, decisão de arquitetura DAQUI | doutrina do **framework** (isso é sinal upstream: vai por `/onion:co-relay` ao core, não por selagem aqui) · conhecimento de um **terceiro** repo |
 
    Note a simetria, e que ela não é cosmética: o que o core rejeita por fronteira é exatamente o que
    um adotante SELA, e vice-versa. Até 2026-09-05 esta seção perguntava apenas pelo core — então
@@ -123,7 +123,7 @@ Para cada proposta:
    **pare e reporte**, e não sele.
 2. Integrar os `nodes:`/`edges:` no alvo — **renomear id na colisão**, e **conectar** cada nó novo ao
    grafo (nunca deixar órfão grau 0). Ajustar `impact` para 1-5 se vier fora.
-3. `bash .claude/validation/kg-radar.sh <alvo>` → **DEVE exit 0**. Se reprovar, a selagem não fecha —
+3. `bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <alvo>` → **DEVE exit 0**. Se reprovar, a selagem não fecha —
    corrigir a integração antes de mover.
 4. `git mv docs/evolution/kg-inbox/<proposta> docs/evolution/kg-inbox/_sealed/` e **prepend** ao
    arquivo movido uma linha `# SELADO em <alvo> · <AAAA-MM-DD> · sessão de <role>` — **o papel do
@@ -152,7 +152,7 @@ deixa a perna "fechada" e o **lint** reprova depois, aqui e no adotante que vend
 doutrina, literal no cabeçalho do grafo de fios abertos deste repo: *"ITEM só vira `done` em
 `plane: PROD` COM `verified_at` + `verified_against`. **QUEM NÃO CONSEGUE CARIMBAR NÃO PODE DECLARAR
 FEITO.**"* Não medi ⇒ não carimbo: o nó fica `open` com o motivo, nunca `done` sem prova. Feche com
-`bash .claude/validation/lint-artifacts.sh` (ou o gate do repo), não só com o radar.
+`bash ${CLAUDE_PLUGIN_ROOT}/validation/lint-artifacts.sh` (ou o gate do repo), não só com o radar.
 
 Saída:
 ```
@@ -178,4 +178,4 @@ Saída:
 
 - Produtor da fila (**core-only**, `ops/` não é vendorizado): `ops/mcp-onion-exec/server.py` (`propose_kg_write`) · README: o `docs/evolution/kg-inbox/README.md` **deste** repo (`docs/evolution/` não viaja)
 - Doutrina write-leg: `docs/evolution/research/librechat-kg-runtime-2026-08/` (`D_WRITE_LEG_AS_PROPOSAL`, `Q_SEALING_NO_MECHANISM`)
-- Fronteira I3 / um escritor por repo: `docs/knowledge-base/concepts/knowledge-graph-sdaal.md`
+- Fronteira I3 / um escritor por repo: `${CLAUDE_PLUGIN_ROOT}/kb/knowledge-graph-sdaal.md`
