@@ -4,7 +4,7 @@ meta:
   baseline: 2026-09-14
   review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 35 NÓS (era 34: +1 pelo veredito que confundia EXECUTAR com BARRAR — chegou por sinal de campo de um adotante) (era 33: +1 pelo verificador do gate que decidia por string e abortou uma adoção real — achado pelo dogfood da própria entrega) (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
+  # ═══ TETO: 36 NÓS (era 35: +1 pela varredura disco×registro, que transformou o caso único do sinal numa classe medida — 9 de 19) (era 34: +1 pelo veredito que confundia EXECUTAR com BARRAR — chegou por sinal de campo de um adotante) (era 33: +1 pelo verificador do gate que decidia por string e abortou uma adoção real — achado pelo dogfood da própria entrega) (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
   # O CI nao revisou o PR #827 (o revisor morreu com permission_denials_count: 9 e caiu em soft-pass);
   # o maestro mandou rodar a passada propria. DUAS rodadas, 5 refutadores com LENTES distintas
   # (maquinaria/shell · o artefato mente? · pelo lado do adotante), ~1,13M tokens. As duas REPROVARAM:
@@ -368,6 +368,17 @@ nodes:
     label: 'O VEREDITO APAGAVA UMA DISTINCAO QUE O PROPRIO SCRIPT IMPRIMIA. Com o lint do alvo limpo, o verificador dizia textualmente que o bloqueio NAO fora exercido e mesmo assim fechava com `GATE VIVO — provado por execucao`. Executar e barrar sao afirmacoes diferentes, e um gate que roda e sempre passa e indistinguivel de um gate quebrado ate o dia em que precisa barrar. O estrago nao parava no texto: o `adopt.md` faz `grep GATE VIVO` na saida para carimbar `--gate-proven` na semente do KG do adotante — entao o GRAFO DO CLIENTE afirmava prova que ninguem fez, o defeito exato que aquele passo declara existir para nao repetir. Curado mantendo a string `GATE VIVO` EXCLUSIVA do caso provado: o consumidor fica correto POR CONSTRUCAO, nao por disciplina. Chegou por SINAL DE CAMPO, no mesmo dia da adocao — o adotante viu o relatorio afirmar prova contra um no `open` no grafo dele.'
     trace: 'ops/verify-adopter-gate.sh'
 
+  - id: E_METADE_DO_PARQUE_FORA_DO_REGISTRO_DA_FEDERACAO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'ops/audit-adopters-registry.sh /home/marcio — varredura por STAMP (.claude/.onion-version com role != source) cruzada com members.yaml: 19 adotantes no disco, 9 sem entrada'
+    label: 'O SINAL APONTOU UM CASO; A VARREDURA REVELOU UMA CLASSE — 9 de 19 adotantes no disco (47%) estao FORA do registro da federacao. Alguns sao residuo (onion-pedro-old, onion-pedro-hub-bak, onion-adopt-granaa-ai = worktree de adocao), mas ha repos REAIS na lista: aura, gustavo-pulga, rhilo-metagamify, poc-venda-direta-pdi, venda-direta-pdi, venda-direta-pdi-entrega. CONSEQUENCIA: o core nao resolve o `--target` do /meta:co-deliver para nenhum deles, entao todo anuncio futuro do CHANGELOG fica SEM DESTINATARIO — e cada um segue verde, porque o hook do adotante conta o que CHEGOU, nao o que deveria ter chegado. POR QUE NENHUM GATE ACUSOU, e e a licao: a reconciliacao `outbox x inbound` compara o que o core transportou contra o que chegou, e para um membro que NAO EXISTE ela compara DOIS CONJUNTOS VAZIOS e sai limpa. Toda guarda desta casa pergunta pelo que ESTA; esta precisou perguntar pelo que DEVERIA ESTAR, e para isso precisou de uma fonte independente — o disco. Ausencia nao dispara nada por construcao. O numero (9) e do maestro decidir: parte e lixo a podar, parte e registro a fazer, e a distincao exige julgamento (NDA, id, papel).'
+    trace: 'ops/audit-adopters-registry.sh'
+
   - id: A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE
     node_type: decision
     plane: PROD
@@ -545,4 +556,7 @@ edges:
 
   - from: E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR
     to: E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING
+    edge_type: SUPPORTS
+  - from: E_METADE_DO_PARQUE_FORA_DO_REGISTRO_DA_FEDERACAO
+    to: A_ROLE_DECORATIVO_NO_TRANSPORTE
     edge_type: SUPPORTS

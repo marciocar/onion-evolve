@@ -636,12 +636,12 @@ fi
 
 - Resumo: superfície instalada, modo, `INSTALL_DIR`, stamp, branch `onion/adopt`.
 - **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
-  (`DEST="$INSTALL_DIR"`, `OP=adopt`, `PIN=$SRC_COMMIT`, `PREV` vazio na 1ª adoção). O relatório fica em
-  `docs/evolution/inbound/` do alvo (git-visível) → o hook "you have mail" o sinaliza na sessão do alvo.
-- **Próximos NO ALVO:** `/warm-up` → `/onion` → `/docs:build-tech-docs`.
-- **Rampa da federação:** oferecer **rodar** `/meta:federation-member register --id <slug> --target <INSTALL_DIR>`
-  (o pin já carimbado desta adoção entra VERIFICADO por `pin-integrity-check.sh`). Human-in-the-loop —
-  oferece, não força; mas agora há **mecanismo** (OP-1 REGISTRAR), não só edição manual de `members.yaml`.
+  (`DEST="$INSTALL_DIR"`, `OP=adopt`, `PIN=$SRC_COMMIT`, `PREV` vazio na 1ª). Cai em `inbound/` (git-visível) → o hook sinaliza no alvo.
+- **Próximos NO ALVO:** `/warm-up` → `/onion` → `/docs:build-tech-docs`.- **Rampa da federação — CONFIRA, não confie na memória:** `bash "$SOURCE_ROOT/.claude/utils/adopt/check-member-registered.sh" "$INSTALL_DIR"`
+  (rc=3 = fora do registro; avisa, não aborta). Registrar é passo SEPARADO e esquecível sem consequência
+  visível — medido 2026-09-15: **9 de 19** adotantes fora, e sem entrada o `/meta:co-deliver` não resolve
+  `--target` (anúncio sem destinatário). Registre: `/meta:federation-member register --id <slug> --target
+  <INSTALL_DIR>`; alvo sob NDA pede **nome neutro**. Parque inteiro: `ops/audit-adopters-registry.sh`.
 
 ---
 
