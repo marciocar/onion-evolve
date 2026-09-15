@@ -62,8 +62,18 @@ else
   fi
   [ -x "${ABS}/pre-commit" ] || { no "pre-commit existe mas NÃO é executável"; FALHOU=1; }
 fi
-# o caso metagamify: hook do Onion existe noutro diretório, mas o git não olha para lá
-if [ -f "${REPO}/.githooks/pre-commit" ] && [ "${DIR}" != ".githooks" ]; then
+# o caso metagamify: hook do Onion existe noutro diretório, mas o git não olha para lá.
+#
+# ⚠️ COMPARAÇÃO POR IDENTIDADE (`-ef`), NUNCA POR STRING — medido 2026-09-15, e o defeito ABORTAVA
+# ADOÇÃO LEGÍTIMA. O teste era `[ "${DIR}" != ".githooks" ]`, e um alvo com
+# `core.hooksPath=/home/<user>/<repo>/.githooks` (forma ABSOLUTA, que o git aceita e resolve igual)
+# reprovava: mesmo diretório, string diferente. Pior, o veredito saía CONTRADIZENDO as próprias
+# linhas seguintes deste script — "✗ o git IGNORA o hook" logo acima de "✓ o hook EXECUTOU" e
+# "✓ o commit foi BARRADO, bloqueio provado". Um verificador cuja razão de existir é provar
+# COMPORTAMENTO decidindo por DECLARAÇÃO de path.
+# O `ABS` já era calculado 15 linhas acima exatamente para isto; esta checagem é que não o usava.
+_ONION_HOOKS="${REPO}/.githooks"
+if [ -f "${_ONION_HOOKS}/pre-commit" ] && ! [ "${ABS}" -ef "${_ONION_HOOKS}" ]; then
   no "há hook do Onion em .githooks/ que o git IGNORA (hooksPath aponta para '${DIR}')"
   FALHOU=1
 fi
@@ -120,12 +130,30 @@ else
     ok "o commit foi BARRADO pelo gate do Onion com o lint reprovando — bloqueio provado"
   else
     info "lint limpo agora: o BLOQUEIO não foi exercido (só a execução) — declarado, não aprovado"
+    BLOQUEIO_PROVADO=0
   fi
 fi
 
 echo
+# ⚠️ O VEREDITO DISTINGUE EXECUTAR de BARRAR — sinal de campo de um adotante, 2026-09-15. Até então a
+# linha final dizia "GATE VIVO — provado por execução" nos DOIS casos, e o `info` logo acima já dizia
+# o contrário com todas as letras: "o BLOQUEIO não foi exercido — declarado, não aprovado". O script
+# sabia a diferença e o veredito a apagava.
+#
+# E o estrago não parava no texto: o `install-onion-githook.sh` faz `grep 'GATE VIVO'` para carimbar
+# `--gate-proven` na semente do KG do adotante. O grafo passava a AFIRMAR PROVA QUE NINGUÉM FEZ —
+# exatamente o defeito que aquele passo existe para não repetir ("só afirma prova quem VÊ a prova").
+# Mantendo a string `GATE VIVO` apenas no caso provado, o consumidor fica correto POR CONSTRUÇÃO.
+#
+# Um gate que roda e sempre passa é indistinguível de um gate quebrado até o dia em que precisa barrar.
+if [ "$FALHOU" -eq 0 ] && [ "${BLOQUEIO_PROVADO:-1}" -eq 1 ]; then
+  echo "✓ GATE VIVO — bloqueio PROVADO por execução, não por existência de arquivo"
+  exit 0
+fi
 if [ "$FALHOU" -eq 0 ]; then
-  echo "✓ GATE VIVO — provado por execução, não por existência de arquivo"
+  echo "⚠️ GATE INSTALADO E EXECUTANDO — mas o BLOQUEIO não foi exercido (o lint do alvo está limpo)."
+  echo "   Isto é DECLARAÇÃO, não prova: rode de novo com uma violação HARD plantada, ou aguarde o"
+  echo "   primeiro commit que reprove. O grafo do alvo deve registrar isto como 'open', não 'confirmed'."
   exit 0
 fi
 echo "✗ GATE INERTE OU PARCIAL — os pontos com ✗ acima são o que o git realmente faz"

@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**198 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 46 grupo(s), agrupados por `owner:` (4 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**199 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 46 grupo(s), agrupados por `owner:` (5 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 2 item(ns)
 
@@ -341,6 +341,13 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
+## maestro — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.8 | `Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN` | distribuicao-metodo-vivo-2026-09 | PERGUNTA DO MAESTRO (2026-09-15): e se a meta-fabrica for liberada para o plugin PUBLICO? Hoje a REGRA 61 (Fronteira de MOAT: mani |
+| 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
+
 ## federation-health-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -386,12 +393,6 @@
 | 4.5 | `Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE` | fios-abertos | PERGUNTA (classe B, estreitada em 2026-09-04 pelo /meta:drive): por que o caso (e) da familia kg_backlog — que monta um sandbox  |
 | 3.6 | `I_ADOPT_CAMADA_COLABORADOR` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): a skill onion-onboarding JA tem o ram |
 | 2.4 | `I_KB_GAMIFICACAO_RAMPA_GATED` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): o core tem docs/knowledge-base/educat |
-
-## maestro — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
 
 ## vps-shared-tools-2026-07 — 1 item(ns)
 

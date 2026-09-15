@@ -12910,9 +12910,174 @@ run_role_cut_selftests() {
   rm -rf "${d}"
 }
 
+# ---------------------------------------------------------------------------
+# adopter_gate — o verificador do gate decide por COMPORTAMENTO, não por string de path
+#
+# Nasceu de um defeito que ABORTOU UMA ADOÇÃO REAL (um adotante, 2026-09-15). O verificador
+# comparava `core.hooksPath` por STRING contra `.githooks`; um alvo com o caminho na forma ABSOLUTA
+# (`/home/<user>/<repo>/.githooks` — que o git aceita e resolve para o mesmo lugar) reprovava.
+#
+# E o veredito saía CONTRADIZENDO as próprias linhas seguintes do script:
+#     ✗ há hook do Onion em .githooks/ que o git IGNORA
+#     ✓ o hook EXECUTOU no commit (assinatura observada)
+#     ✓ o commit foi BARRADO pelo gate do Onion — bloqueio provado
+# Um verificador cuja razão de existir é provar comportamento, decidindo por declaração de path —
+# `behavior-over-declaration` invertido, dentro da guarda que existe para aplicá-lo.
+#
+# A causa de FUNDO é esta família não existir: `ops/verify-adopter-gate.sh` tinha ZERO cobertura, e é
+# ele que a adoção usa para decidir se ENTREGOU o produto. Guarda sem bancada é guarda cujo defeito
+# só aparece no alvo de um cliente.
+# ---------------------------------------------------------------------------
+run_adopter_gate_selftests() {
+  local v="${REPO_ROOT}/ops/verify-adopter-gate.sh"
+  if [ ! -f "${v}" ]; then record_skip "adopter-gate" "ops/verify-adopter-gate.sh ausente (core-only)"; return; fi
+  local d; d="$(mktemp -d)"
+
+  # fixture: repo com hook do Onion em .githooks/ e UM commit (o verificador exige HEAD p/ a sonda)
+  # ⚠️ A FIXTURE ESPELHA O QUE O VERIFICADOR MEDE, e a 1ª versão não espelhava: ele detecta execução
+  #    pela ASSINATURA no stdout do commit (`Onion pre-commit`) e só avalia BLOQUEIO se existir
+  #    `.claude/validation/lint-artifacts.sh` no alvo. Sem os dois, o caminho que o caso (d) precisa
+  #    exercitar nunca é alcançado — e o caso mediria outra coisa, achando que mede o veredito.
+  _mk_alvo() {  # $1=dir  $2=valor de core.hooksPath  [$3=rc do lint fake: 0 limpo (default) | 1 reprova]
+    local r="$1"; mkdir -p "${r}/.githooks" "${r}/.claude/validation"
+    printf '#!/usr/bin/env bash\nexit %s\n' "${3:-0}" > "${r}/.claude/validation/lint-artifacts.sh"
+    chmod +x "${r}/.claude/validation/lint-artifacts.sh"
+    printf '#!/usr/bin/env bash\necho "Onion pre-commit"\nbash "$(git rev-parse --show-toplevel)/.claude/validation/lint-artifacts.sh"\n' > "${r}/.githooks/pre-commit"
+    chmod +x "${r}/.githooks/pre-commit"
+    git -C "${r}" init -q >/dev/null 2>&1
+    git -C "${r}" config core.hooksPath "$2" >/dev/null 2>&1
+    printf 'x\n' > "${r}/a.txt"
+    git -C "${r}" add -A >/dev/null 2>&1
+    git -C "${r}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+  }
+
+  # (a) hooksPath RELATIVO — a forma que sempre funcionou. Serve de controle: se ele reprovar, o
+  #     defeito é outro e (b) não prova nada.
+  local ra="${d}/rel"; mkdir -p "${ra}"; _mk_alvo "${ra}" ".githooks"
+  local out_a; out_a="$(bash "${v}" "${ra}" 2>&1 || true)"   # o verificador SAI ≠0 ao reprovar; sob set -e a atribuição mataria a suíte
+  if ! grep -q 'que o git IGNORA' <<< "${out_a}"; then
+    record_pass "adopter-gate: (a) hooksPath RELATIVO não acusa 'o git IGNORA' (controle)"
+  else record_fail "adopter-gate: (a)" "o controle já reprova — a fixture não representa um alvo são"; fi
+
+  # (b) hooksPath ABSOLUTO — o caso que abortou a adoção real. MESMO diretório, string diferente.
+  local rb="${d}/abs"; mkdir -p "${rb}"; _mk_alvo "${rb}" "${rb}/.githooks"
+  local out_b; out_b="$(bash "${v}" "${rb}" 2>&1 || true)"
+  if ! grep -q 'que o git IGNORA' <<< "${out_b}"; then
+    record_pass "adopter-gate: (b) hooksPath ABSOLUTO aponta o MESMO diretório e NÃO é acusado de ignorado"
+  else record_fail "adopter-gate: (b)" "caminho absoluto para o mesmo diretório reprova — a comparação voltou a ser por STRING, e isso ABORTA adoção legítima (medido num adotante, 2026-09-15)"; fi
+
+  # (b-MUT) devolver a comparação para string faz (b) REPROVAR — prova que (b) mede o `-ef`.
+  local mut="${d}/v-mut.sh"
+  sed 's|! \[ "${ABS}" -ef "${_ONION_HOOKS}" \]|[ "${DIR}" != ".githooks" ]|' "${v}" > "${mut}"
+  if ! cmp -s "${v}" "${mut}"; then
+    local out_m; out_m="$(bash "${mut}" "${rb}" 2>&1 || true)"
+    if grep -q 'que o git IGNORA' <<< "${out_m}"; then
+      record_pass "adopter-gate: (b-MUT) com a comparação por STRING o caso (b) REPROVA — (b) é load-bearing"
+    else record_fail "adopter-gate: (b-MUT)" "o mutante passou — (b) não prova que a cura está no -ef"; fi
+  else record_fail "adopter-gate: (b-MUT) setup" "a mutação não foi aplicada (a âncora do sed mudou?)"; fi
+
+  # (c) O CASO QUE A GUARDA EXISTE PARA PEGAR continua pegando — hook do Onion em .githooks/ mas o
+  #     git olhando para OUTRO lugar (o caso do husky ocupando o hooksPath). Sem este caso a
+  #     cura do (b) poderia ter sido "nunca acusar", que é fail-open.
+  local rc="${d}/outro"; mkdir -p "${rc}/.husky"
+  _mk_alvo "${rc}" ".husky"
+  printf '#!/usr/bin/env bash\nexit 0\n' > "${rc}/.husky/pre-commit"; chmod +x "${rc}/.husky/pre-commit"
+  local out_c; out_c="$(bash "${v}" "${rc}" 2>&1 || true)"
+  if grep -q 'que o git IGNORA' <<< "${out_c}"; then
+    record_pass "adopter-gate: (c) hook do Onion IGNORADO de verdade (hooksPath → .husky) AINDA acusa — a cura não virou fail-open"
+  else record_fail "adopter-gate: (c)" "o caso real de gate sombreado deixou de ser acusado — a cura do (b) abriu a guarda"; fi
+
+  # (d) EXECUTAR ≠ BARRAR, e o veredito tem de distinguir. Sinal de campo de um adotante, 2026-09-15:
+  #     o script imprimia `· lint limpo agora: o BLOQUEIO não foi exercido — declarado, não aprovado`
+  #     e TRÊS LINHAS DEPOIS `✓ GATE VIVO — provado por execução`. Sabia a diferença e a apagava no
+  #     veredito. Um gate que roda e sempre passa é indistinguível de um gate quebrado até o dia em
+  #     que precisa barrar algo.
+  #     A fixture (a) tem lint LIMPO (o hook sai 0), então é o caso "executou, não barrou".
+  if ! grep -q 'GATE VIVO' <<< "${out_a}" && grep -q 'INSTALADO E EXECUTANDO' <<< "${out_a}"; then
+    record_pass "adopter-gate: (d) gate que EXECUTA mas não BARRA não é declarado VIVO — o veredito distingue"
+  else record_fail "adopter-gate: (d)" "veredito trata 'executou' como 'barrou' — e o próprio script imprime a distinção logo acima; um gate que nunca barrou é indistinguível de um quebrado"; fi
+
+  # (e) O CONSUMIDOR FICA CORRETO POR CONSTRUÇÃO. `install-onion-githook.sh` faz `grep 'GATE VIVO'`
+  #     para carimbar `--gate-proven` na semente do KG do alvo. Enquanto a string saía nos dois casos,
+  #     o GRAFO DO ADOTANTE afirmava prova que ninguém fez — o defeito exato que aquele passo declara
+  #     existir para não repetir ("só afirma prova quem VÊ a prova"). A cura é a string ser exclusiva
+  #     do caso provado; este caso prova que o acoplamento é o certo, e não só que o texto mudou.
+  local _inst="${REPO_ROOT}/.claude/commands/meta/adopt.md"
+  if [ -f "${_inst}" ] && grep -q "grep -q 'GATE VIVO'" "${_inst}"; then
+    if ! grep -q 'GATE VIVO' <<< "${out_a}"; then
+      record_pass "adopter-gate: (e) alvo sem bloqueio exercido NÃO casa o grep do instalador — o KG nasce 'open', não 'confirmed'"
+    else record_fail "adopter-gate: (e)" "o instalador carimbaria --gate-proven num alvo que só EXECUTOU — o grafo do adotante afirmaria prova inexistente"; fi
+  else record_skip "adopter-gate: (e)" "o adopt.md não consome a string 'GATE VIVO' (acoplamento mudou — re-derive o caso)"; fi
+
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
+# sweep_fixtures — a varredura que APAGA prova o que NÃO apaga
+#
+# Ferramenta que remove arquivo precisa provar as recusas, não os acertos: acertar é o caso fácil.
+# Três recusas são load-bearing e cada uma nasceu de uma medição: RASTREADO (nunca se toca no que
+# está no git), `node_modules/` (a 1ª versão o apagaria e quebraria o site), e `__fixtures__` (é
+# convenção de Vitest/Jest de projeto real, não artefato desta bancada).
+# ---------------------------------------------------------------------------
+run_sweep_fixtures_selftests() {
+  local sw="${REPO_ROOT}/.claude/validation/sweep-orphan-fixtures.sh"
+  if [ ! -f "${sw}" ]; then record_fail "sweep-fixtures" "helper ausente: ${sw}"; return; fi
+  local d; d="$(mktemp -d)"; local r="${d}/repo"
+  mkdir -p "${r}/.claude/validation" "${r}/node_modules/dep/src" "${r}/src"
+  # a bancada do sandbox declara os nomes; o helper DERIVA deles (não inventa)
+  printf '# __mbguard__ __selftest-deeplink__ __fixtures__\n' > "${r}/.claude/validation/lint-selftest.sh"
+  cp "${sw}" "${r}/.claude/validation/"
+  git -C "${r}" init -q >/dev/null 2>&1
+  printf 'node_modules/\n' > "${r}/.gitignore"
+
+  # RASTREADO que casa o padrão — o caso que torna a ferramenta segura
+  printf 'conteudo real\n' > "${r}/src/__mbguard__tracked.txt"
+  git -C "${r}" add -A >/dev/null 2>&1
+  git -C "${r}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+
+  # órfãs untracked + o vizinho de terceiro + a convenção alheia
+  printf 'x\n' > "${r}/__mbguard__99.sh"
+  printf 'x\n' > "${r}/__selftest-deeplink__.html"
+  mkdir -p "${r}/node_modules/dep/src/__fixtures__"; printf 'x\n' > "${r}/node_modules/dep/src/__fixtures__/a.js"
+  mkdir -p "${r}/src/__fixtures__"; printf 'x\n' > "${r}/src/__fixtures__/b.js"
+
+  ( cd "${r}" && bash .claude/validation/sweep-orphan-fixtures.sh >/dev/null 2>&1 ) || true
+
+  local _f=""
+  [ -f "${r}/__mbguard__99.sh" ]            && _f="${_f} órfã-simples-sobreviveu"
+  [ -f "${r}/__selftest-deeplink__.html" ]  && _f="${_f} órfã-com-hífen-sobreviveu"
+  if [ -z "${_f}" ]; then
+    record_pass "sweep-fixtures: (a) fixtures órfãs untracked (inclusive com HÍFEN no nome) são removidas"
+  else record_fail "sweep-fixtures: (a)" "falhou em:${_f} — derivação estreita limpa o que lembra e deixa o resto"; fi
+
+  if [ -f "${r}/src/__mbguard__tracked.txt" ]; then
+    record_pass "sweep-fixtures: (b) arquivo RASTREADO que casa o padrão NÃO é tocado"
+  else record_fail "sweep-fixtures: (b)" "apagou arquivo versionado — a varredura virou destrutiva"; fi
+
+  if [ -f "${r}/node_modules/dep/src/__fixtures__/a.js" ]; then
+    record_pass "sweep-fixtures: (c) caminho sob node_modules/ é RECUSADO (dependência de terceiro)"
+  else record_fail "sweep-fixtures: (c)" "apagou dentro de node_modules — quebraria a build de quem depende"; fi
+
+  if [ -f "${r}/src/__fixtures__/b.js" ]; then
+    record_pass "sweep-fixtures: (d) '__fixtures__' fora do alcance — é convenção de projeto, não artefato da bancada"
+  else record_fail "sweep-fixtures: (d)" "apagou convenção alheia (Vitest/Jest) — pior que o problema que o helper resolve"; fi
+
+  # (e) --dry-run NÃO remove. Sem este caso, quem inspeciona antes de confiar seria punido por isso.
+  printf 'x\n' > "${r}/__mbguard__dry.sh"
+  ( cd "${r}" && bash .claude/validation/sweep-orphan-fixtures.sh --dry-run >/dev/null 2>&1 ) || true
+  if [ -f "${r}/__mbguard__dry.sh" ]; then
+    record_pass "sweep-fixtures: (e) --dry-run relata e NÃO remove"
+  else record_fail "sweep-fixtures: (e)" "--dry-run apagou — a inspeção antes de confiar virou armadilha"; fi
+
+  rm -rf "${d}"
+}
+
 _family run_license_travels_selftests
 _family run_ssot_projections_selftests
 _family run_role_cut_selftests
+_family run_adopter_gate_selftests
+_family run_sweep_fixtures_selftests
 _family run_seed_adoption_graph_selftests
 
 # Modo assemble-plugin — idem (empacota vertical Design como plugin; dest em mktemp).

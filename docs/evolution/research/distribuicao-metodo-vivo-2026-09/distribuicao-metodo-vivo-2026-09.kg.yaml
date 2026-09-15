@@ -9,7 +9,7 @@ meta:
                              # 12m (doutrina), mas quem CADUCA primeiro manda: se a plataforma mudar, a resposta
                              # de VEICULO muda antes de qualquer licenca mudar.
   # kg-backlog-guard: on
-  # ═══ TETO: 54 NÓS (era 52: +2 pela busca no INPI executada e pelo fio da especificação, 2026-09-15) (era 50: +2 pelo SCRUB POR FORMA — o vazamento real de nome de cliente na superfície que viaja, achado porque a decisão de publicar obrigou a medir antes) (era 49: +1 pela decisão de limpar os 5 adotantes no próximo update) (era 43: +6 pela rodada de MARCA que o selo D_MARCA_MEDIR_ANTES_DE_DECIDIR pediu) (era 39: +4 pelas DECISÕES do maestro de 2026-09-14, que fecham 4 das 5 perguntas) (era 35: +4 pela MEDIÇÃO do mecanismo próprio, que o Elenxo impôs antes de nova fonte externa). Rodada de PRIMARIAS executada em 2026-09-13 (grafo criado nesta rodada). Cresce só se
+  # ═══ TETO: 55 NÓS (era 54: +1 pela pergunta do maestro sobre liberar a meta-fábrica ao plugin PÚBLICO — reabre, pelo lado do plugin, a fronteira que D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA fechou pelo lado do adopt) (era 52: +2 pela busca no INPI executada e pelo fio da especificação, 2026-09-15) (era 50: +2 pelo SCRUB POR FORMA — o vazamento real de nome de cliente na superfície que viaja, achado porque a decisão de publicar obrigou a medir antes) (era 49: +1 pela decisão de limpar os 5 adotantes no próximo update) (era 43: +6 pela rodada de MARCA que o selo D_MARCA_MEDIR_ANTES_DE_DECIDIR pediu) (era 39: +4 pelas DECISÕES do maestro de 2026-09-14, que fecham 4 das 5 perguntas) (era 35: +4 pela MEDIÇÃO do mecanismo próprio, que o Elenxo impôs antes de nova fonte externa). Rodada de PRIMARIAS executada em 2026-09-13 (grafo criado nesta rodada). Cresce só se
   #     uma re-medicao das mesmas fontes emendar um achado, ou se o maestro abrir a rodada de VEICULO. ═══
   # Pesquisa /onion-research mode=primaries: onde passa a fronteira entre a DOUTRINA que deve viajar para um
   # cliente de consultoria que forka e evolui sozinho, e a BIOGRAFIA deste repo que nao deve viajar; qual
@@ -29,6 +29,16 @@ meta:
   # NAO HA SUPERSEDES nesta rodada — ausencia MEDIDA: o grafo nasceu agora, nao ha no interno a corrigir, e
   # aresta cross-grafo o radar nao le. Nenhuma decision foi selada: quem sela e o maestro.
 nodes:
+  - id: Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    owner: maestro
+    label: 'PERGUNTA DO MAESTRO (2026-09-15): e se a meta-fabrica for liberada para o plugin PUBLICO? Hoje a REGRA 61 (Fronteira de MOAT: manifesto de plugin publicavel nao vaza meta-fabrica nem grafo privado) a barra. Tres camadas, e so a segunda e bloqueante. (1) O QUE DESTRAVA, e e real: o plugin passa a se AUTO-PROPAGAR — quem instala roda `/meta:adopt` e cria novos adotantes, e `create-*` para autorar comandos/agentes. O framework vira ferramenta de FABRICA publica, nao so de trabalho. (2) O QUE VAZA, e e o motivo da regra: a meta-fabrica nao e so codigo, ela carrega os ENDERECOS DA CASA. `federation-*` opera o `members.yaml`, que tem nome de cliente sob NDA e `local_path` de maquina; `marketplace/*` aponta para o repo de publicacao do maestro; `adopt.md` referencia `docs/analysis/`, `docs/applying/` e ADRs que vivem no core PRIVADO. Publicar a fabrica publica a TOPOLOGIA DE QUEM SE ATENDE. (3) O QUE QUEBRA MECANICAMENTE: medido em 2026-09-15, `inventory`, `census` e `kg-inbox` tinham dependencias de layout-core que nao sobrevivem ao empacotamento (o plugin realoca tudo sob ${CLAUDE_PLUGIN_ROOT}); a fabrica tem muito mais disso — `adopt` resolve `$SOURCE_ROOT` por `git rev-parse` SUPONDO que a fonte E o core. O CAMINHO QUE EXISTIRIA: separar a FABRICA (mecanica — copiar, carimbar, semear) da BIOGRAFIA DA FEDERACAO (quem, onde, sob que contrato). Hoje as duas moram juntas, e e essa fusao, nao a fabrica em si, que a REGRA 61 esta de fato barrando. Gatilho: o maestro querer que o Onion se propague sem passar por ele.'
+    trace: '.claude/utils/marketplace/verticals/onion.manifest.sh'
+
   - id: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
     node_type: question
     plane: DEV
@@ -955,4 +965,8 @@ edges:
     edge_type: SUPERSEDES
   - from: A_MARCA_LER_ESPECIFICACAO_DO_933007990
     to: E_MARCA_BUSCA_INPI_EXECUTADA_0915
+    edge_type: DEPENDS_ON
+  # A pergunta REABRE a fronteira que esta decisão fechou — pelo lado do plugin, não do adopt.
+  - from: Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN
+    to: D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
     edge_type: DEPENDS_ON
