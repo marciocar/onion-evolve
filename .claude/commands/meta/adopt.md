@@ -132,16 +132,18 @@ diff -rq "$TMP" "$DEST" 2>/dev/null || true
 # (d) Após confirmação do maestro: aplicar (cp preserva o que NÃO está no manifesto).
 cp -R "$TMP"/. "$DEST"/ && rm -rf "$TMP"
 
-# (e) .env.example — NEVER-CLOBBER por-arquivo: quase sempre existe no alvo e é específico dele
-#     (vars do projeto). Se o alvo já tem, escrever o do Onion como .env.example.onion (merge fica
-#     a cargo do maestro); senão, copiar direto. Mesma doutrina do CLAUDE.md (Fase 5).
-if git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q .; then
-  if [ -f "$DEST/.env.example" ]; then
-    git -C "$SOURCE_ROOT" show HEAD:.env.example > "$DEST/.env.example.onion"
+# (e) NEVER-CLOBBER por-arquivo — .env.example, LICENSE, LICENSE-DOCS: específicos do ALVO, logo
+#     FORA do manifesto (dentro, o `cp -R` de (d) os sobrescreveria: aviso proprietário de cliente
+#     virando MIT do core, revertido em 2026-09-14). Sem isto o adotante recebe ~104 arquivos de
+#     método SEM licença. PAR: `durable-commit.sh` staja as grafias. Nó A_LICENCA_VIAJA_*.
+for _f in .env.example LICENSE LICENSE-DOCS; do
+  git -C "$SOURCE_ROOT" ls-tree HEAD -- "$_f" | grep -q . || continue
+  if [ -f "$DEST/$_f" ]; then
+    git -C "$SOURCE_ROOT" show "HEAD:$_f" > "$DEST/${_f}.onion"
   else
-    git -C "$SOURCE_ROOT" show HEAD:.env.example > "$DEST/.env.example"
+    git -C "$SOURCE_ROOT" show "HEAD:$_f" > "$DEST/$_f"
   fi
-fi
+done
 ```
 
 > Hoje o apply é cópia-por-cima após revisão do diff (conflitos **surgem**, o maestro decide). Merge

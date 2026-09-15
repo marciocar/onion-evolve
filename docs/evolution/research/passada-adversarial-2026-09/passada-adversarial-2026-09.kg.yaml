@@ -249,13 +249,14 @@ nodes:
 
   - id: A_LICENCA_VIAJA_COM_NEVER_CLOBBER_E_QUINTA_COPIA
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
     impact: 5
-    confidence: 0.8
-    owner: core
-    label: 'ABERTO, com as duas pernas nomeadas: (1) never-clobber por-arquivo no adopt, no molde do .env.example (alvo que ja tem LICENSE recebe LICENSE.onion); (2) unificar o ONION_PATHS do durable-commit.sh com a SSOT, senao a licenca nao viaja no --update. As duas juntas, porque curar so a segunda arma o vendor-branch a abortar por BASE CRUZADA. Gatilho: a primeira consultoria que forkar.'
-    trace: '.claude/utils/adopt/vendor-manifest.sh'
+    confidence: 0.9
+    verified_at: '2026-09-15'
+    verified_against: 'dogfood dos DOIS cenarios por execucao: alvo virgem recebe LICENSE e LICENSE-DOCS; alvo com LICENSE proprietario PRESERVA o dele (Apache/Cliente Ficticio intacto) e recebe o nosso como LICENSE.onion. Familia license_travels 5/5 com mutante provado — a copia cega CLOBRA, logo o caso (b) prova algo.'
+    label: 'FECHADO com as duas pernas, e a SEGUNDA PREMISSA DO PROPRIO NO CAIU NA MEDICAO. (1) NEVER-CLOBBER no adopt, passo (f), pelo molde exato do .env.example: a licenca fica FORA do manifesto de transporte de proposito — se entrasse, cairia no $TMP e o `cp -R` incondicional do passo (d) sobrescreveria o LICENSE do alvo, que e o relicenciamento silencioso na direcao MAIS GRAVE (aviso proprietario de cliente virando MIT em nome do autor do core). Alvo que ja tem o seu recebe `LICENSE.onion`; o merge e decisao do maestro DO ALVO. (2) STAGING no durable-commit, as 4 grafias: sem ele o arquivo chega UNTRACKED — some num git clean, e no --update o worktree e removido --force. Curar so uma metade nao entrega nada. CORRECAO DA PREMISSA: eu havia chamado o ONION_PATHS do durable-commit de `QUINTA COPIA da mesma lista`, e a leitura estava ERRADA — medido, ele usa `.claude` INTEIRO (superset das 8 raizes .claude/* da SSOT) e acrescenta os ARTEFATOS GERADOS na adocao (CLAUDE.md, docs/onion, os tres contextos, .githooks), que nao viajam do core. Propositos diferentes: a SSOT diz o que COPIA, o ONION_PATHS diz o que se COMMITA no alvo. Unifica-los quebraria a durabilidade dos gerados — a cura certa era ACRESCENTAR, nao unificar. Licao: `copia da mesma lista` foi diagnostico por SEMELHANCA DE FORMA; so a comparacao lado a lado mostrou que sao coisas distintas.'
+    trace: '.claude/commands/meta/adopt.md'
 
   - id: A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR
     node_type: decision

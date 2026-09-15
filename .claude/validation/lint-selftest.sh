@@ -12479,7 +12479,87 @@ _family run_session_velocity_selftests
 # Modo githook — idem (hook nativo Onion; cenários self-contained em mktemp).
 _family run_githook_selftests
 _family run_regen_baselines_selftests
+# ── LICENÇA QUE VIAJA: o par never-clobber (adopt) + staging (durable-commit) ──────────────────
+# O QUE ESTA FAMÍLIA PROTEGE, e são DUAS METADES que só valem juntas (medido 2026-09-14/15):
+#   · METADE 1 — a AUSÊNCIA: quatro raízes do manifesto (.claude/rules, docs/meta-specs,
+#     docs/knowledge-base, docs/sdaal) são exatamente o material que o LICENSE-DOCS declara CC BY-NC,
+#     e nenhuma licença as acompanhava. O adotante recebia ~104 arquivos de método SEM uma linha de
+#     licença e os commitava num repo que carrega o LICENSE DELE.
+#   · METADE 2 — a cura INGÊNUA era PIOR: pôr LICENSE no manifesto de transporte foi tentado e
+#     revertido no mesmo dia, porque o `cp -R` incondicional do passo (d) do adopt trocava um aviso
+#     proprietário na raiz do repo do cliente pelo MIT em nome do autor do core.
+# E há uma terceira armadilha, que é por que o staging entra aqui: escrever a licença no alvo sem
+# STAJÁ-LA deixa o arquivo untracked — chega e nunca é commitado, some num `git clean`, e no
+# `--update` o worktree é removido `--force`. Curar só uma metade não entrega nada.
+run_license_travels_selftests() {
+  local adopt="${REPO_ROOT}/.claude/commands/meta/adopt.md"
+  local durable="${REPO_ROOT}/.claude/utils/adopt/durable-commit.sh"
+  local vm="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
+  if [ ! -f "${adopt}" ] || [ ! -f "${durable}" ] || [ ! -f "${vm}" ]; then
+    record_fail "license-travels" "artefato ausente (adopt.md/durable-commit.sh/vendor-manifest.sh)"; return
+  fi
+
+  # (a) A LICENÇA NÃO PODE ESTAR NO MANIFESTO DE TRANSPORTE — se estiver, o `cp -R` clobra o alvo.
+  local _roots; _roots="$(bash "${vm}" --emit-scrub-roots 2>/dev/null || true)"
+  if grep -qiE '^LICENSE' <<< "${_roots}"; then
+    record_fail "license-travels: (a) licença NO manifesto" "LICENSE no transporte ⇒ entra no \$TMP e o cp -R do passo (d) SOBRESCREVE o LICENSE do alvo — foi medido e revertido em 2026-09-14"
+  else
+    record_pass "license-travels: (a) licença FORA do manifesto (o cp -R não a alcança)"
+  fi
+
+  # (b) NEVER-CLOBBER de verdade, exercido: alvo virgem recebe; alvo com LICENSE próprio preserva.
+  local d; d="$(mktemp -d)"; mkdir -p "${d}/virgem" "${d}/proprio"
+  printf 'Apache License 2.0\nCopyright (c) 2026 Alvo Ficticio - proprietario\n' > "${d}/proprio/LICENSE"
+  local _dest _lic _lt
+  for _dest in "${d}/virgem" "${d}/proprio"; do
+    for _lic in LICENSE LICENSE-DOCS; do
+      # sem pipe: `ls-tree | grep -q` é a corrida de EPIPE que produziu HARD espúrio em 2026-09-14
+      _lt="$(git -C "${REPO_ROOT}" ls-tree HEAD -- "${_lic}" 2>/dev/null || true)"
+      [ -n "${_lt}" ] || continue
+      if [ -f "${_dest}/${_lic}" ]; then
+        git -C "${REPO_ROOT}" show "HEAD:${_lic}" > "${_dest}/${_lic}.onion" 2>/dev/null
+      else
+        git -C "${REPO_ROOT}" show "HEAD:${_lic}" > "${_dest}/${_lic}" 2>/dev/null
+      fi
+    done
+  done
+  local _miss=""
+  [ -f "${d}/virgem/LICENSE" ]           || _miss="${_miss} virgem-sem-LICENSE"
+  [ -f "${d}/virgem/LICENSE-DOCS" ]      || _miss="${_miss} virgem-sem-LICENSE-DOCS"
+  [ -f "${d}/proprio/LICENSE.onion" ]    || _miss="${_miss} proprio-sem-LICENSE.onion"
+  grep -q 'Alvo Ficticio' "${d}/proprio/LICENSE" 2>/dev/null || _miss="${_miss} PROPRIO-CLOBRADO"
+  if [ -z "${_miss}" ]; then
+    record_pass "license-travels: (b) alvo virgem RECEBE, alvo com licença própria PRESERVA (o nosso vira .onion)"
+  else record_fail "license-travels: (b) never-clobber" "falhou em:${_miss}"; fi
+
+  # (b-MUT) sem o ramo `.onion`, o LICENSE do alvo é SOBRESCRITO — prova que (b) é load-bearing.
+  printf 'Apache License 2.0\nCopyright (c) 2026 Alvo Ficticio - proprietario\n' > "${d}/proprio/LICENSE"
+  git -C "${REPO_ROOT}" show HEAD:LICENSE > "${d}/proprio/LICENSE" 2>/dev/null   # MUTANTE: cópia cega
+  if ! grep -q 'Alvo Ficticio' "${d}/proprio/LICENSE" 2>/dev/null; then
+    record_pass "license-travels: (b-MUT) sem o never-clobber o LICENSE do alvo É sobrescrito — (b) prova algo"
+  else record_fail "license-travels: (b-MUT)" "a cópia cega não clobrou — o mutante não exerce o risco"; fi
+  rm -rf "${d}"
+
+  # (c) O ADOPT tem o passo de never-clobber (a metade que ESCREVE).
+  local _code; _code="$(grep -vE '^[[:space:]]*#' "${adopt}" || true)"
+  if grep -q 'LICENSE-DOCS' <<< "${_code}" && grep -q '\.onion' <<< "${_code}"; then
+    record_pass "license-travels: (c) o adopt escreve a licença por never-clobber (fora de comentário)"
+  else record_fail "license-travels: (c) adopt sem o passo" "menção em comentário não conta — o procedimento precisa EXECUTAR o never-clobber"; fi
+
+  # (d) O DURABLE-COMMIT staja as licenças (a metade que DURA). Sem isto o arquivo chega untracked,
+  #     some num `git clean`, e no --update o worktree é removido --force.
+  local _dcode; _dcode="$(grep -vE '^[[:space:]]*#' "${durable}" || true)"
+  local _falta=""
+  for _lic in LICENSE LICENSE.onion LICENSE-DOCS LICENSE-DOCS.onion; do
+    grep -qF "${_lic}" <<< "${_dcode}" || _falta="${_falta} ${_lic}"
+  done
+  if [ -z "${_falta}" ]; then
+    record_pass "license-travels: (d) o durable-commit staja as 4 grafias (chega E dura)"
+  else record_fail "license-travels: (d) staging incompleto" "sem estas o arquivo fica untracked:${_falta}"; fi
+}
+
 _family run_regen_ensure_from_selftests
+_family run_license_travels_selftests
 _family run_seed_adoption_graph_selftests
 
 # Modo assemble-plugin — idem (empacota vertical Design como plugin; dest em mktemp).
