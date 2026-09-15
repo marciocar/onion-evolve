@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**201 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 46 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**200 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 46 grupo(s), agrupados por `owner:` (5 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 2 item(ns)
 
@@ -284,7 +284,7 @@
 | 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
 | 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
 
-## core — 6 item(ns)
+## core — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -292,7 +292,6 @@
 | 6.4 | `A_ADOTANTE_GREENFIELD_NASCE_COM_HARD` | passada-adversarial-2026-09 | ABERTO (pre-existente, medido pela simulacao de adocao): o adotante greenfield nasce com 4 HARD — `docs/onion/` nunca e criado n |
 | 6.4 | `A_ROLE_DECORATIVO_NO_TRANSPORTE` | passada-adversarial-2026-09 | ABERTO: `--role adopted·hub·standalone` devolve listas IDENTICAS — ROLE e inicializado, parseado, validado e nunca mais lido.  |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
-| 5.6 | `A_CURAR_O_REVISOR_DO_CI_COM_MECANISMO` | passada-adversarial-2026-09 | CURA ESCRITA EM 2026-09-14, VALIDACAO PENDENTE — segue `open` de proposito. O que nomeou o alvo foi a propria medicao guardada n |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 
 ## inbox-sinais-2026-09 — 10 item(ns)
