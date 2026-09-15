@@ -238,12 +238,13 @@ nodes:
   # que provou); o que ainda se pretende fazer não pode carimbar produção sem nunca ter olhado.
   - id: A_CURAR_O_REVISOR_DO_CI_COM_MECANISMO
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: done
     impact: 4
-    confidence: 0.7
-    owner: core
-    label: 'CURA ESCRITA EM 2026-09-14, VALIDACAO PENDENTE — segue `open` de proposito. O que nomeou o alvo foi a propria medicao guardada no workflow: `permission_denials_count: 14` E `No buffered inline comments` (2026-08-07), mais `9` no PR #827 — a segunda frase diz que ele tenta postar COMENTARIO INLINE DE REVIEW, nao comentario solto. A defesa era INSTRUCAO EM PROSA no prompt, ignorada nas duas ocorrencias. Cura: `--allowedTools Read Grep Glob Bash` explicito nos dois sitios (tentativa e retry) — a ferramenta deixa de existir na lista dele, entao nao ha o que tentar. NAO FOI VALIDADA: PR que edita onion-review.yml faz a action SE AUTO-PULAR, entao o fix saiu verde sem ser exercido. Gatilho para fechar: o PR SEGUINTE ao merge — revisor volta a revisar (cura pegou) ou morre em t=0 com zero turnos (allowlist estreita demais; alargar, nunca remover).'
+    confidence: 0.95
+    verified_at: '2026-09-14'
+    verified_against: 'medido no PR #828, o PRIMEIRO depois do merge da cura e pelo CAMINHO REAL (nao edita onion-review.yml, logo sem auto-pulo): permission_denials_count 0 (era 9, e 14 em 2026-08-07) · is_error false (era true) · num_turns 8 COMPLETOS (antes 18 morrendo, ou 1 sem partir) · total_cost_usd 0.37 (trabalho real, nao morte em t=0). onion-review-verdict SUCCESS de verdade, nao soft-pass.'
+    label: 'FECHADO — A CURA PEGOU, e o alvo veio de evidencia que dormia ha CINCO SEMANAS. O revisor semantico do CI nao revisava desde 2026-08-07: tentava postar COMENTARIO INLINE DE REVIEW, acumulava negacao de permissao e morria. A frase que nomeava o subsistema — `No buffered inline comments` — estava registrada NO PROPRIO WORKFLOW desde a 1a ocorrencia, ao lado do `permission_denials_count: 14`, e ninguem a leu como o alvo que era: liam o numero, nao a frase. A defesa existente era INSTRUCAO EM PROSA no prompt (`NAO tente postar comentario`), ignorada nas duas ocorrencias — conselho onde precisava de mecanismo. Cura: `--allowedTools Read Grep Glob Bash` nos dois sitios (tentativa e retry); a ferramenta deixa de existir na lista dele, entao nao ha o que tentar. TETO QUE VALEU: a cura nao pode ser validada no PR que a escreveu (PR que edita onion-review.yml faz a action se auto-pular), e por isso este no nasceu `open` com o gatilho escrito — fechou no PR SEGUINTE, como previsto. LICAO DE METODO: cinco ciclos de CI do PR #827 sairam com o verdict vermelho e eu li aquilo como `o de sempre`; alarme que a gente aprende a ignorar ja morreu antes de quebrar.'
     trace: '.github/workflows/onion-review.yml'
 
   - id: A_LICENCA_VIAJA_COM_NEVER_CLOBBER_E_QUINTA_COPIA
