@@ -721,7 +721,15 @@ fi
 # DELTA do framework desde a adoção (manifesto filtrado, como no Procedimento):
 # A lista é a MESMA do transporte, e vem da SSOT (vendor-manifest.sh) — só o delta olha `.env.example`,
 # que no transporte é never-clobber e por isso não entra no manifesto.
-mapfile -t manifest < <(bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-manifest.sh" --repo "$SOURCE_ROOT")
+#
+# ⚠️ O PAPEL VEM DO STAMP DO ALVO, e antes de 2026-09-15 esta linha NÃO O PASSAVA. Enquanto o `--role`
+# era decorativo isso não tinha efeito observável; no instante em que ele passou a CORTAR, um
+# `--update` cego republicaria a meta-fábrica inteira num alvo standalone — desfazendo o corte da
+# instalação pela porta dos fundos da atualização. O papel é do ALVO, então lê-se o stamp DELE
+# (`onion-version.sh` hardcoda `role: source` por ser a identidade da FONTE — não serve aqui).
+TARGET_ROLE="$(awk '/^role:/{print $2; exit}' "$TARGET/.claude/.onion-version")"
+[ -n "$TARGET_ROLE" ] || TARGET_ROLE=adopted   # stamp sem campo role → adotado por definição
+mapfile -t manifest < <(bash "$SOURCE_ROOT/.claude/utils/adopt/vendor-manifest.sh" --role "$TARGET_ROLE" --repo "$SOURCE_ROOT")
 git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.env.example)
 # Delta só com pin VERIFICADO (senão o range mente); a cópia segura abaixo não depende do delta.
 [ -n "$PIN_OK" ] && git -C "$SOURCE_ROOT" diff --stat "$ADOPTED_COMMIT"..HEAD -- "${manifest[@]}"

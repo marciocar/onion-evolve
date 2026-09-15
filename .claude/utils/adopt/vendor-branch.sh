@@ -26,12 +26,15 @@ HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VENDOR="onion/vendor"
 
 # Superfície L1+L2 (mesma do adopt.md; filtrada pelo que existe no core em HEAD).
+# O PAPEL entra por ONION_ROLE (default adopted). O merge de vendor-branch é o caminho do `--update`,
+# e desde 2026-09-15 o papel CORTA de verdade — um vendor semeado sem papel republicaria a meta-fábrica
+# num alvo standalone a cada atualização, desfazendo o corte da instalação.
 _manifest() {  # $1=SOURCE_ROOT → imprime pathspecs existentes, um por linha
   # .claude/workflows: a skill onion-research instrui Workflow({scriptPath:'.claude/workflows/onion-research.js'}) —
   # sem o dir o comando NASCE MORTO no adotante (sinal de campo de um adotante, 2026-09-04).
   # A lista vive UMA vez, em vendor-manifest.sh (SSOT). Quatro cópias eram três a mais, e duas já
   # tinham driftado (medido 2026-09-13).
-  bash "${HERE}/vendor-manifest.sh" --repo "$1"
+  bash "${HERE}/vendor-manifest.sh" --role "${ONION_ROLE:-adopted}" --repo "$1"
 }
 
 # ── GUARDA DE BASE CRUZADA ──────────────────────────────────────────────────────────────────
