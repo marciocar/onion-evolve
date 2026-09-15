@@ -40,9 +40,23 @@ git -C "${DEST}" rev-parse --verify "${BR}" >/dev/null 2>&1 \
 # Inclui os ARTEFATOS GERADOS na adoção (CLAUDE.md, inventário, .gitattributes, contextos de domínio) —
 # achado de campo 2026-07-09 (adoção greenfield de um adotante de campo): sem eles, ficavam uncommitted = a mesma
 # lacuna de durabilidade que #301 fecha p/ o framework. `git add` só staja o que mudou → seguro no --update.
+# ⚠️ LICENSE/LICENSE-DOCS (e os `.onion`) ENTRARAM EM 2026-09-15, e sem eles a cura do adopt seria
+# meia-cura: o passo (f) do procedimento ESCREVE a licença no alvo por never-clobber, mas se ela não
+# for STAJADA aqui o arquivo fica untracked — chega e nunca é commitado, some num `git clean`, e o
+# `--update` roda num worktree que é removido `--force` no fim. Medido em 2026-09-14: o transporte
+# declarava carregar a licença e o destino não a guardava. É a classe `declarado ≠ verificado`
+# aplicada a um par de metades — curar só uma delas não entrega nada.
+# As quatro grafias entram porque o never-clobber decide entre `X` e `X.onion` em tempo de execução.
+#
+# ⚠️ E NÃO, esta lista NÃO é a 5ª cópia do manifesto de transporte — foi assim que eu a li primeiro,
+# e a leitura estava errada. Ela usa `.claude` INTEIRO (superset das 8 raízes `.claude/*` da SSOT) e
+# acrescenta os ARTEFATOS GERADOS na adoção, que não viajam do core: CLAUDE.md, docs/onion, os três
+# contextos de domínio, .githooks. Propósitos diferentes — a SSOT diz o que COPIA, esta diz o que se
+# COMMITA no alvo. Unificá-las quebraria a durabilidade dos gerados.
 ONION_PATHS=(.claude docs/meta-specs docs/knowledge-base docs/sdaal docs/evolution \
              docs/onion docs/business-context docs/technical-context docs/compliance-context \
-             CLAUDE.md CLAUDE.onion.md .gitattributes .prettierignore .githooks .env.example.onion)
+             CLAUDE.md CLAUDE.onion.md .gitattributes .prettierignore .githooks .env.example.onion \
+             LICENSE LICENSE.onion LICENSE-DOCS LICENSE-DOCS.onion)
 add=(); for p in "${ONION_PATHS[@]}"; do [ -e "${DEST}/${p}" ] && add+=("${p}"); done
 [ "${#add[@]}" -gt 0 ] && git -C "${DEST}" add -- "${add[@]}" 2>/dev/null
 
