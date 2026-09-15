@@ -2,7 +2,7 @@
 title: 'Resíduo — o verificador que provava comportamento decidia por string'
 date: 2026-09-15
 branch: fix/adopter-gate-hookspath-string-compare
-reviewed_diff_sha256: PENDENTE
+reviewed_diff_sha256: acae318dc1bdb1987e1496c6a9c8686cb54916035a63bb0de7f422ad9385000d
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
