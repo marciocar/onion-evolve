@@ -12647,8 +12647,152 @@ run_ssot_projections_selftests() {
   rm -rf "${d}"
 }
 
+# ---------------------------------------------------------------------------
+# role_cut — o `--role` CORTA de verdade (antes de 2026-09-15 era decorativo)
+#
+# O nó `A_ROLE_DECORATIVO_NO_TRANSPORTE`: `--role adopted|hub|standalone` devolvia listas IDÊNTICAS.
+# O papel era inicializado, parseado, VALIDADO — e nunca mais lido. Pior que o gap anterior: antes
+# não havia papel, e quem publicasse um standalone sabia que precisava cortar à mão; com a flag
+# aceitando `standalone` e entregando a meta-fábrica inteira, o gap aberto virou gap INVISÍVEL.
+#
+# Esta família fixa as quatro propriedades que fazem o corte ser MECANISMO e não declaração:
+# corta · o contrato sobrevive · o corte é DERIVADO de HEAD · corte que engole tudo FALHA ALTO.
+# ---------------------------------------------------------------------------
+run_role_cut_selftests() {
+  local vm="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
+  if [ ! -f "${vm}" ]; then record_fail "role-cut" "SSOT ausente: ${vm}"; return; fi
+  local d; d="$(mktemp -d)"
+
+  # (a) O CORTE EXISTE — standalone ≠ adopted. É literalmente o predicado que o nó denunciava falso.
+  local _ad _sa
+  _ad="$(bash "${vm}" --role adopted --repo "${REPO_ROOT}" 2>/dev/null)"
+  _sa="$(bash "${vm}" --role standalone --repo "${REPO_ROOT}" 2>/dev/null)"
+  if [ -n "${_ad}" ] && [ -n "${_sa}" ] && [ "${_ad}" != "${_sa}" ]; then
+    record_pass "role-cut: (a) --role standalone devolve lista DIFERENTE de adopted (o papel corta)"
+  else record_fail "role-cut: (a)" "as listas dos papéis voltaram a ser idênticas — o --role virou decorativo de novo"; fi
+
+  # (a2) …e o corte é do lado CERTO: quem some é a meta-fábrica, não a doutrina.
+  local _fab=0
+  grep -q ':(exclude).claude/commands/meta/' <<< "${_sa}" && _fab=$((_fab+1))
+  grep -q ':(exclude).claude/utils/marketplace/' <<< "${_sa}" && _fab=$((_fab+1))
+  grep -q ':(exclude).claude/validation/federation-' <<< "${_sa}" && _fab=$((_fab+1))
+  if [ "${_fab}" -eq 3 ] && ! grep -q ':(exclude)docs/knowledge-base' <<< "${_sa}"; then
+    record_pass "role-cut: (a2) o standalone perde a meta-fábrica e MANTÉM a doutrina (kb intacta)"
+  else record_fail "role-cut: (a2)" "fábrica cortada=${_fab}/3 · doutrina cortada=$(grep -c ':(exclude)docs/knowledge-base' <<< "${_sa}" || true)"; fi
+
+  # (a-MUT) esvaziar `_role_cut` faz standalone voltar a ser adopted — prova que (a) mede algo.
+  local mut="${d}/vm-mut.sh"
+  sed 's|^    standalone)|    standalone) : ;;\n    __nunca__)|' "${vm}" > "${mut}"
+  if ! cmp -s "${vm}" "${mut}"; then
+    local _m; _m="$(bash "${mut}" --role standalone --repo "${REPO_ROOT}" 2>/dev/null)"
+    if [ "${_m}" = "${_ad}" ]; then
+      record_pass "role-cut: (a-MUT) sem o _role_cut o standalone volta a ser IDÊNTICO a adopted — (a) é load-bearing"
+    else record_fail "role-cut: (a-MUT)" "o mutante ainda corta — (a) não prova que o corte vem de _role_cut"; fi
+  else record_fail "role-cut: (a-MUT) setup" "a mutação não foi aplicada"; fi
+
+  # (b) O CONTRATO SOBREVIVE AO CORTE, no bundle DE VERDADE (git archive, não na lista).
+  #     ⚠️ Medido 2026-09-15: `:(exclude)` VENCE o positivo em qualquer ordem, e `git archive` devolve
+  #     rc=0 com tar VAZIO. Por isso o caso extrai o tar e CONTA — asserir a lista não bastaria.
+  local _spec=(); mapfile -t _spec <<< "${_sa}"
+  local _tar="${d}/sa.tar"; local _rc=0
+  git -C "${REPO_ROOT}" archive HEAD -- "${_spec[@]}" > "${_tar}" 2>/dev/null || _rc=$?
+  local _lst="${d}/sa.lst"; tar -tf "${_tar}" 2>/dev/null | grep -v '/$' > "${_lst}" || true
+  local _n_sa; _n_sa="$(grep -c . "${_lst}" || true)"
+  if [ "${_rc}" -eq 0 ] && [ "${_n_sa}" -gt 0 ] && grep -qx '.claude/utils/adopt/vendor-manifest.sh' "${_lst}"; then
+    record_pass "role-cut: (b) o bundle standalone tem ${_n_sa} arquivos e o CONTRATO (vendor-manifest.sh) viajou"
+  else record_fail "role-cut: (b)" "archive rc=${_rc} · arquivos=${_n_sa} · contrato no bundle=$(grep -cx '.claude/utils/adopt/vendor-manifest.sh' "${_lst}" || true)"; fi
+
+  # (b2) …e nada MAIS da fábrica passou clandestino.
+  local _vaz; _vaz="$(grep -E '^\.claude/(utils/(adopt|marketplace|wizard|vertical|federation-transport)/|commands/meta/|validation/federation-)' "${_lst}" | grep -vx '.claude/utils/adopt/vendor-manifest.sh' || true)"
+  if [ -z "${_vaz}" ]; then
+    record_pass "role-cut: (b2) nenhum arquivo da meta-fábrica vazou para o bundle standalone"
+  else record_fail "role-cut: (b2)" "vazaram: $(printf '%s' "${_vaz}" | tr '\n' ' ')"; fi
+
+  # (c) SEM O CONTRATO, a guarda do ALVO falha FECHADA. É a medição que derrubou a 1ª tentativa de
+  #     corte: tirar `.claude/utils/adopt` inteiro leva a SSOT junto, e `vendor-scrub-form-check.sh`
+  #     (REGRA 36) deixa de saber o que varrer. Varrer sem saber o que viaja é teatro — por isso a
+  #     guarda sai ≠0, e por isso o contrato existe.
+  local sb="${d}/sem-contrato"; mkdir -p "${sb}"
+  tar -xf "${_tar}" -C "${sb}" 2>/dev/null || true
+  rm -f "${sb}/.claude/utils/adopt/vendor-manifest.sh"
+  local _rc_g=0; ( cd "${sb}" && bash .claude/validation/vendor-scrub-form-check.sh >/dev/null 2>&1 ) || _rc_g=$?
+  if [ "${_rc_g}" -ne 0 ]; then
+    record_pass "role-cut: (c) sem o contrato a guarda do alvo FALHA FECHADA (rc=${_rc_g}) — o contrato é load-bearing"
+  else record_fail "role-cut: (c)" "a guarda passou SEM a SSOT (rc=0) — ou ela virou fail-open, ou o contrato deixou de ser necessário"; fi
+
+  # (d) O CORTE É DERIVADO DE HEAD, não uma lista a manter: helper NOVO sob um prefixo cortado nasce
+  #     cortado sem ninguém acrescentá-lo. É a cura da classe `guarda-por-lista-falha-pelo-vocabulário`
+  #     aplicada ao transporte — assere-se a FORMA (o prefixo), não os nomes.
+  local r="${d}/repo"; mkdir -p "${r}/.claude/utils/adopt" "${r}/.claude/commands/git" "${r}/docs/meta-specs"
+  cp "${vm}" "${r}/.claude/utils/adopt/vendor-manifest.sh"
+  printf '#!/usr/bin/env bash\n# helper inventado AGORA\n' > "${r}/.claude/utils/adopt/helper-novissimo.sh"
+  printf 'x\n' > "${r}/.claude/commands/git/x.md"; printf 'y\n' > "${r}/docs/meta-specs/y.md"
+  git -C "${r}" init -q >/dev/null 2>&1
+  git -C "${r}" add -A >/dev/null 2>&1
+  git -C "${r}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+  local _novo; _novo="$(bash "${vm}" --role standalone --repo "${r}" 2>/dev/null)"
+  if grep -q ':(exclude).claude/utils/adopt/helper-novissimo.sh' <<< "${_novo}"; then
+    record_pass "role-cut: (d) helper NOVO sob prefixo cortado nasce cortado (o corte sai de HEAD, não de lista)"
+  else record_fail "role-cut: (d)" "o helper novo NÃO foi cortado — o corte voltou a ser lista, e lista drifta"; fi
+
+  # (e) CORTE QUE ENGOLE TUDO FALHA ALTO. Medido: `git archive` com todos os positivos cancelados
+  #     devolve rc=0 e tar VAZIO — o consumidor lê o rc e conclui "copiei"; o alvo recebe nada.
+  #     Contar o que sobrou é a única verificação honesta (`exit-code-nao-e-a-verificacao`).
+  # ⚠️ O mutante zera TAMBÉM o contrato: com ele o manifesto nunca chega a zero (o contrato sempre
+  #    sobrevive), e o caso reprovaria por fixture irreal em vez de por defeito — foi o 1º resultado
+  #    desta família, e a investigação dele achou o furo real que o caso (e2) abaixo fixa.
+  local mut2="${d}/vm-tudo.sh"
+  sed -e 's|^        \.claude/utils/adopt/ \\|        .claude/ \\\n        docs/ \\|' \
+      -e 's|^_ROLE_CONTRACT=.*|_ROLE_CONTRACT=()|' "${vm}" > "${mut2}"
+  if ! cmp -s "${vm}" "${mut2}"; then
+    local _rc_e=0; bash "${mut2}" --role standalone --repo "${r}" >/dev/null 2>&1 || _rc_e=$?
+    if [ "${_rc_e}" -ne 0 ]; then
+      record_pass "role-cut: (e) corte que cancela TUDO sai ≠0 (rc=${_rc_e}) em vez de emitir manifesto que vira bundle vazio"
+    else record_fail "role-cut: (e)" "manifesto que não casa arquivo nenhum saiu 0 — o git archive sairia 0 com tar VAZIO, em silêncio"; fi
+  else record_fail "role-cut: (e) setup" "a mutação não foi aplicada"; fi
+
+  # (e2) MANIFESTO VAZIO ≠ "nada a copiar". Para o git, pathspec AUSENTE significa TODOS: um repo sem
+  #      nenhuma raiz da superfície emitia lista vazia com rc=0, e quem lesse o rc copiaria o
+  #      repositório inteiro — biografia, segredos e tudo. Achado pela própria bancada deste corte,
+  #      investigando por que (e) reprovava. A 1ª versão da guarda de (e) aprovava a si mesma pelo
+  #      mesmo motivo (contava com `diff-tree --` sem pathspec, que casa tudo).
+  local rv="${d}/repo-vazio"; mkdir -p "${rv}/src"
+  printf 'x\n' > "${rv}/src/a.txt"; printf 'segredo\n' > "${rv}/SENHAS.txt"
+  git -C "${rv}" init -q >/dev/null 2>&1
+  git -C "${rv}" add -A >/dev/null 2>&1
+  git -C "${rv}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+  local _rc_v=0; bash "${vm}" --repo "${rv}" >/dev/null 2>&1 || _rc_v=$?
+  if [ "${_rc_v}" -ne 0 ]; then
+    record_pass "role-cut: (e2) repo SEM superfície Onion → manifesto vazio FALHA ALTO (rc=${_rc_v}); pathspec ausente copiaria o repo inteiro"
+  else record_fail "role-cut: (e2)" "manifesto vazio saiu 0 — o consumidor copiaria o repositório INTEIRO (pathspec ausente = todos), biografia e segredos junto"; fi
+
+  # (f) `--emit-scrub-roots` IGNORA o papel, e isso é DESENHO: as guardas que o consomem varrem
+  #     DIRETÓRIOS; cortar aqui as faria varrer MENOS. Varrer mais do que viaja nunca é fail-open —
+  #     varrer menos é. A assimetria entre os dois modos é o lado seguro.
+  local _s1 _s2
+  _s1="$(bash "${vm}" --role adopted --repo "${REPO_ROOT}" --emit-scrub-roots 2>/dev/null)"
+  _s2="$(bash "${vm}" --role standalone --repo "${REPO_ROOT}" --emit-scrub-roots 2>/dev/null)"
+  if [ -n "${_s1}" ] && [ "${_s1}" = "${_s2}" ]; then
+    record_pass "role-cut: (f) --emit-scrub-roots é IGUAL nos dois papéis (a varredura não encolhe com o corte)"
+  else record_fail "role-cut: (f)" "o papel encolheu a superfície de VARREDURA — a REGRA 36 passaria a varrer menos do que existe no alvo"; fi
+
+  # (g) OS CONSUMIDORES PASSAM O PAPEL. O corte da instalação não vale nada se o `--update` o desfizer:
+  #     o papel é do ALVO, então o `--update` o lê do STAMP dele, e o vendor-branch o propaga.
+  local _g=""
+  local _code; _code="$(grep -vE '^[[:space:]]*#|^>' "${REPO_ROOT}/.claude/commands/meta/adopt.md" || true)"
+  grep -qE 'vendor-manifest\.sh" --role "\$TARGET_ROLE"' <<< "${_code}" || _g="${_g} adopt--update(sem-papel-do-alvo)"
+  grep -qE 'TARGET_ROLE=.*onion-version' <<< "${_code}" || _g="${_g} adopt--update(papel-não-vem-do-stamp)"
+  grep -qE 'vendor-manifest\.sh" --role "\$\{ONION_ROLE:-adopted\}"' "${REPO_ROOT}/.claude/utils/adopt/vendor-branch.sh" || _g="${_g} vendor-branch(não-propaga)"
+  if [ -z "${_g}" ]; then
+    record_pass "role-cut: (g) --update lê o papel do STAMP DO ALVO e o vendor-branch o propaga (o corte sobrevive à atualização)"
+  else record_fail "role-cut: (g)" "falhou em:${_g} — um update cego republicaria a meta-fábrica no standalone"; fi
+
+  rm -rf "${d}"
+}
+
 _family run_license_travels_selftests
 _family run_ssot_projections_selftests
+_family run_role_cut_selftests
 _family run_seed_adoption_graph_selftests
 
 # Modo assemble-plugin — idem (empacota vertical Design como plugin; dest em mktemp).

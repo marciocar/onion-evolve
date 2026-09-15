@@ -330,6 +330,14 @@
 | 4.8 | `Q_RADAR_WIDGET_PARALLEL_FORMULA` | onion-doctrine-elenxo-bulbo-2026-07 | o RadarWidget de /maquinaria/ (site) DUPLICA a tabela de statusFactor do kg-radar.sh (conferida fator a fator na revisao adversari |
 | 1.6 | `Q_BULBO_DIAGRAM` | onion-doctrine-elenxo-bulbo-2026-07 | um visual do Bulbo (cebola cortada: as 4 camadas + o corte que revela tudo) e candidato quando graduar — vale o espaco? [ATUALIZ |
 
+## core — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 7.6 | `A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE` | passada-adversarial-2026-09 | ABERTO E DECLARADO (o residuo do corte, e ele NAO e defeito do corte): o bundle standalone nasce com 69 HARD contra 32 do adopted, |
+| 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
+| 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
+
 ## gtm-decisions-2026-07 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -338,14 +346,6 @@
 | 7.5 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
-
-## core — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 6.4 | `A_ROLE_DECORATIVO_NO_TRANSPORTE` | passada-adversarial-2026-09 | ABERTO: `--role adopted·hub·standalone` devolve listas IDENTICAS — ROLE e inicializado, parseado, validado e nunca mais lido.  |
-| 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
-| 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 
 ## federation-health-2026-07 — 1 item(ns)
 

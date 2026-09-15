@@ -4,7 +4,7 @@ meta:
   baseline: 2026-09-14
   review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 25 NÓS (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
+  # ═══ TETO: 28 NÓS (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
   # O CI nao revisou o PR #827 (o revisor morreu com permission_denials_count: 9 e caiu em soft-pass);
   # o maestro mandou rodar a passada propria. DUAS rodadas, 5 refutadores com LENTES distintas
   # (maquinaria/shell · o artefato mente? · pelo lado do adotante), ~1,13M tokens. As duas REPROVARAM:
@@ -270,12 +270,48 @@ nodes:
 
   - id: A_ROLE_DECORATIVO_NO_TRANSPORTE
     node_type: decision
-    plane: DEV
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.95
+    owner: core
+    verified_at: '2026-09-15'
+    verified_against: 'bundle EXTRAIDO e contado: `--role adopted` 685 arquivos, `--role standalone` 578 (107 cortados, delta exato do prefixo da meta-fabrica); familia `role_cut` da bancada 11/11, com mutante provando que o corte vem de _role_cut e nao de outro lugar.'
+    label: 'CURADO: o `--role` CORTA. O corte e DERIVADO de HEAD por PREFIXO de caminho (helper novo dentro de `.claude/utils/adopt/` nasce cortado sem lista a manter — cura da classe guarda-por-lista-falha-pelo-vocabulario aplicada ao transporte), e a unica lista manual e o CONTRATO. Tres medicoes fixaram o desenho, e a segunda derrubou a 1a tentativa: (1) `:(exclude)` VENCE o positivo em qualquer ordem — nao se poupa arquivo dentro de diretorio cortado, o corte tem de ser emitido arquivo a arquivo; (2) cortar `.claude/utils/adopt` INTEIRO leva junto o proprio `vendor-manifest.sh`, e a REGRA 36 falha FECHADA sem ele (`lint-artifacts` HARD, `vendor-scrub-form-check` exit 2) — o standalone nasceria VERMELHO, trocando um gap invisivel por outro; dai a distincao a FABRICA nao viaja, a PLANTA que as guardas do alvo leem, sim; (3) o corte da instalacao nao vale nada se o `--update` o desfizer — o papel agora vem do STAMP DO ALVO (`onion-version.sh` hardcoda `role: source`, nao serve) e o `vendor-branch.sh` o propaga. `--emit-scrub-roots` IGNORA o papel de proposito: varrer mais do que viaja nunca e fail-open, varrer menos e.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: E_CORTE_POR_PAPEL_MEDIDO_0915
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'git archive dos dois papeis + tar -t + lint no sandbox extraido, com a Configuracao pos-copia aplicada'
+    label: 'MEDIDO: o corte funciona e o preco esta contado. adopted=685 arquivos / 32 HARD / 8 SOFT; standalone=578 arquivos / 69 HARD / 23 SOFT. Nenhum arquivo da meta-fabrica vazou alem do contrato, e as guardas do alvo que consomem a SSOT seguiram verdes no standalone (`vendor-scrub-form-check` rc=0, `kb-vendored-link-check` rc=0 sem avisos, `--emit-scrub-roots` 11 linhas).'
+    trace: '.claude/validation/lint-selftest.sh'
+
+  - id: A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE
+    node_type: decision
+    plane: PROD
     status: open
     impact: 4
-    confidence: 0.8
+    confidence: 0.95
     owner: core
-    label: 'ABERTO: `--role adopted|hub|standalone` devolve listas IDENTICAS — ROLE e inicializado, parseado, validado e nunca mais lido. E PIOR que o gap anterior: antes nao havia papel e quem publicasse um standalone sabia que precisava cortar a mao; agora ha flag que aceita `standalone` e entrega a meta-fabrica inteira (63 arquivos mais os 43 comandos de meta/). Gap aberto virou gap INVISIVEL. Gatilho: levar o onion-standalone publico ao core atual.'
+    verified_at: '2026-09-15'
+    verified_against: 'delta de lint entre os dois bundles extraidos, por REGRA'
+    label: 'ABERTO E DECLARADO (o residuo do corte, e ele NAO e defeito do corte): o bundle standalone nasce com 69 HARD contra 32 do adopted, e o delta e de duas classes, as duas da DOUTRINA QUE VIAJA. (a) REGRA 22, 27 ocorrencias: KB vendorizada linka `../../../.claude/commands/meta/<cmd>.md` — link RELATIVO de sistema de arquivos para um comando que o papel legitimamente nao recebe. A forma certa e o NOME do comando (`/meta:kg`), que viaja para todo papel; o caminho no disco nao. E a mesma familia que a REGRA 45 ja ensina para link core-privado. (b) REGRA 16, 14 ocorrencias: prosa com contagem fixa (`109 comandos`) num bundle de 67 — [[count-drift-grep-whole-docs-before-commit]] um andar acima, porque aqui a populacao muda POR PAPEL. Por que fica aberto e nao vira escopo deste PR: sao ~41 referencias em ~20 arquivos de doutrina, e curar exige decidir a FORMA canonica de citar comando em superficie vendorizada — decisao de desenho, nao conserto mecanico. O que este PR garante e que o numero e VISIVEL: o manifesto imprime o residuo medido em stderr quando o papel corta. Gatilho: a primeira publicacao real de um standalone pelo `/meta:adopt`.'
+    trace: '.claude/commands/meta/adopt.md'
+
+  - id: E_MANIFESTO_VAZIO_ERA_TODOS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'repo de teste sem nenhuma raiz da superficie Onion: manifesto saia com ZERO pathspecs e rc=0'
+    label: 'ACHADO PELA PROPRIA BANCADA DESTE CORTE, investigando por que o caso (e) reprovava. Para o git, pathspec AUSENTE significa TODOS, nao NENHUM: um repo sem nenhuma raiz da superficie emitia manifesto vazio com rc=0, e o consumidor que lesse so o rc copiaria o REPOSITORIO INTEIRO — biografia e segredos junto. E a 1a versao da minha propria guarda nova aprovava a si mesma pelo mesmo motivo: contava com `diff-tree --` sem pathspec, que casa tudo. Curado: manifesto vazio e falha de precondicao (exit 3), nunca "nada a copiar". Classe `exit-code-nao-e-a-verificacao`, agora no transporte.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
 
   - id: A_ADOTANTE_GREENFIELD_NASCE_COM_HARD
@@ -401,4 +437,13 @@ edges:
     edge_type: CONSTRAINS
   - from: E_MKDIR_ERA_DEFEITO_REAL_MEDIDO_0915
     to: A_ADOTANTE_GREENFIELD_NASCE_COM_HARD
+    edge_type: SUPPORTS
+  - from: E_CORTE_POR_PAPEL_MEDIDO_0915
+    to: A_ROLE_DECORATIVO_NO_TRANSPORTE
+    edge_type: SUPPORTS
+  - from: A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE
+    to: E_CORTE_POR_PAPEL_MEDIDO_0915
+    edge_type: DEPENDS_ON
+  - from: E_MANIFESTO_VAZIO_ERA_TODOS
+    to: A_ROLE_DECORATIVO_NO_TRANSPORTE
     edge_type: SUPPORTS
