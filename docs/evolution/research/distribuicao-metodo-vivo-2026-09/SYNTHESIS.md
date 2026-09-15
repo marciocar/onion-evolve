@@ -13,7 +13,7 @@ review_after: 2026-10-13
 
 # Distribuir o método vivo, sem distribuir a vida
 
-> **Projeção** do grafo (52 nós, 91 arestas, radar exit 0). Rodada de **primárias nomeadas** — o modo que
+> **Projeção** do grafo (54 nós, 94 arestas, radar exit 0). Rodada de **primárias nomeadas** — o modo que
 > nasceu nesta mesma sessão. As **cinco perguntas foram respondidas pelo maestro em 2026-09-14**; o que
 > resta aberto está na última seção, com gatilho nomeado.
 > Retorno do run versionado em [`data/`](data/).
@@ -91,9 +91,11 @@ autobiografia e projeto. O que "sobra" é maior que o que viaja — não é res�
 - ~~**Licença (`Q_LICENCA_APOS_MIT_JA_CONCEDIDA`):** a fonte fechou … a **decisão** não~~ — **SUPERADO**: o
   maestro selou em 09-14 (`D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC`). O que a rodada apurou sobre PolyForm e
   sobre prosa continua valendo como razão da escolha.
-- ~~**Marca:** nada foi medido sobre titularidade ou registro~~ — **PARCIALMENTE SUPERADO**: a rodada de
-  marca de 09-14 mediu **custo, classe e o que a lei dá sem registro** (5 nós `E_MARCA_*`). Segue não
-  medida a **colidência real na base do INPI** — e é ela que gateia `Q_MARCA_DEPOSITAR_CLASSE_42_AGORA`.
+- ~~**Marca:** nada foi medido sobre titularidade ou registro~~ — **SUPERADO em 2026-09-15**: a rodada de
+  09-14 mediu custo, classe e o que a lei dá sem registro, e o maestro rodou a **busca no pePI** em 09-15
+  (`E_MARCA_BUSCA_INPI_EXECUTADA_0915`) — a colidência que gateava o selo **está medida, e derrubou a
+  recomendação**. Seguem não medidas as lacunas MENORES daquele nó: prazo de exame, regra do símbolo de
+  registro, art. 1.166 do Código Civil e registros no USPTO/EUIPO.
 - ~~**Fronteira executável:** as duas com precedente, nenhuma implementada~~ — **SUPERADO**: a allowlist é a
   SSOT `vendor-manifest.sh`, e a fronteira desceu do diretório ao arquivo (`--stub-baselines`).
 - **Plugin como veículo:** segue válido como razão — install ≠ adopt. O veículo selado usa o `/meta:adopt`
@@ -168,7 +170,7 @@ Quatro perguntas foram apresentadas com opções e recomendação; as quatro vol
 | **Veículo** | `D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT` | `onion-standalone` **público** como vitrine **mais** o `/meta:adopt` rodando no repo **do cliente** — com a ressalva dele: *"com todos os comandos e funcionalidades do core atual"*. O reenquadramento que sustenta: `/meta:adopt` com `onion/vendor` **já é** fork-com-atualização, e melhor que template — o update chega por merge e a customização do cliente vira **conflito git real**. |
 | **Corte** | `D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA` | Viaja **tudo, inclusive a meta-fábrica**. A consequência está nomeada e assumida: o standalone é público, logo isto publica a máquina de fabricar Onion para qualquer um. Defensável pela doutrina da casa — o fosso é o mecanismo verificável, o dogfood e a autobiografia, não o código. A evidência que fechou: a maquinaria **já** transfere (9 de 11 adotantes) e a prática **não** (grafo autoral 3 de 7), então mandar só o motor repete o que não pegou. |
 | **Licença** | `D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC` | **Dual**: código segue MIT (a concessão já saiu e não retroage); método sob **CC BY-NC 4.0** — `LICENSE-DOCS` neste PR, com a tabela no README. Precedente medido: a thoughtbot licencia o playbook assim, pela mesma razão declarada. |
-| **Marca** | `D_MARCA_MEDIR_ANTES_DE_DECIDIR` → `Q_MARCA_DEPOSITAR_CLASSE_42_AGORA` | Medir antes. A rodada rodou: **R$ 880,00, ou R$ 440,00 com CNPJ ME/EPP/MEI**, classe 42, especificação pré-aprovada — o preço mais baixo que converte o frágil direito de precedência (art. 129 §1º) em propriedade oponível. **Não selado**, e a razão é honesta: a colidência real de "onion" na base do INPI **não foi medida** — a busca exige sessão de navegador. São 10 minutos do maestro em `busca.inpi.gov.br/pePI`. |
+| **Marca** | `D_MARCA_MEDIR_ANTES_DE_DECIDIR` → `Q_MARCA_DEPOSITAR_CLASSE_42_AGORA` | Medir antes — **e a medição derrubou a recomendação**, ver a seção abaixo. Custo: **R$ 880,00, ou R$ 440,00** com desconto (vale para **pessoa natural** também, não só ME/EPP/MEI), classe 42, especificação pré-aprovada, concessão a R$ 0,00. |
 
 E dois selos derivados: `D_LIMPAR_BASELINES_NO_PROXIMO_UPDATE` (os 5 adotantes se curam no próximo
 `--update` de cada, não em cinco PRs hoje — gatilho de reabertura: algum deles virar público ou ganhar
@@ -188,6 +190,56 @@ ampersand corporativo (com um lado de 2+ caracteres, o que já exclui M&A e Q&A)
 (`PoC`/`cliente`/`adotante`/`empresa` seguida de nome próprio). Forma gera **candidato**, nunca veredito: o
 legítimo vai para um baseline que **só encolhe**, candidato novo é HARD. **Teto declarado:** nome comercial
 sem ampersand e sem âncora continua invisível — alargar o padrão mataria a guarda de falso-positivo.
+
+
+## A busca no INPI foi feita — e derrubou a recomendação, como o nó previa
+
+O selo de 2026-09-14 dizia *"medir antes de decidir"*, e nomeava a condição: **a colidência real de
+"onion" na base do INPI não foi medida — e é a evidência que pode derrubar a recomendação inteira.**
+
+O maestro rodou a busca em **2026-09-15, 11:19**, em `busca.inpi.gov.br/pePI` (base atualizada até
+15/09). Derrubou.
+
+### O bloqueador
+
+| Processo | Classe | Situação | Bloqueia? |
+|---|---|---|---|
+| **933007990** · Carlos Vinícius de Jesus Santos · 19/12/2023 · mista | **42** | **requerida, aguardando exame de mérito** | **SIM — vivo e anterior** |
+| 826663907 · Onion Sistemas Imobiliários · 2004 | 42 | arquivado | não |
+| 915978512 · Rodrigo Cavalcanti | 35 | registro em vigor | não em 42 |
+| 943418925 · Bruno Martins · 2026 | 35 | requerida | não em 42 |
+
+Os outros cinco (classes 36, 37, 35, 28, 30) estão arquivados ou indeferidos.
+
+O `933007990` está **vivo na exata classe pretendida** e é **anterior** a qualquer depósito de hoje.
+Se for deferido, um pedido de `ONION` nominativa em 42 cai por colidência (LPI art. 124, XIX).
+
+### A saída estava na mesma busca
+
+```
+"onion evolve"  →  NENHUM RESULTADO
+```
+
+### A nova recomendação, e ela é MELHOR
+
+**Depositar `ONION EVOLVE`, NOMINATIVA, classe 42.** Três razões independentes:
+
+1. **Zero colidência** na base.
+2. **`onion` sozinho é genérico** (cebola). Baixa distintividade intrínseca já era risco de
+   indeferimento **por si só** — independente do `933007990`.
+3. **Dissolve o vizinho semântico.** `Onion Architecture` (18 anos de uso) deixa de ser conversa.
+
+E é o **nome real**: o site é `onionevolve.com`. **Nominativa e não mista** — protege a *palavra*,
+que é o que interessa; mista protege o conjunto com o desenho.
+
+### O que ainda falta, e é barato
+
+`A_MARCA_LER_ESPECIFICACAO_DO_933007990` — a classe 42 é **larga** (de design de software a análise
+química). Se a especificação do bloqueador estiver longe de TI, a coexistência fica mais confortável.
+No pePI: **Marcas → pesquisa por número** → `933007990`, ver **especificação** e **andamento**.
+
+⚠️ **Teto declarado pelo próprio INPI**, na página do resultado: busca satisfatória **não garante
+registro** — o exame refaz a busca e decide.
 
 ## Backlog
 
