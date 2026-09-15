@@ -307,25 +307,12 @@ for rule in 'docs/evolution/**/CHANGELOG.md merge=union' 'docs/evolution/**/_pro
   grep -qxF "$rule" "$DEST/.gitattributes" 2>/dev/null || printf '%s\n' "$rule" >> "$DEST/.gitattributes"
 done
 
-# (8) SSOT inventory.md — REGENERA do filesystem do alvo pós-cópia (o inventory.sh vendorizado é a
-#     autoridade; ROOT = repo do alvo). Sem isto, o --update deixava docs/onion/inventory.md STALE quando
-#     o framework mudou contagens (novo comando/agente/KB) → check_inventory_sync HARD bloqueava o 1º
-#     commit do adotante (B4 / adopt-update-hardening; declarado≠verificado na adoção — a SSOT gerada não
-#     pode driftar em silêncio). Determinístico, sem LLM. Idempotente (regenera do filesystem).
-if [ -f "$DEST/.claude/validation/inventory.sh" ]; then
-  bash "$DEST/.claude/validation/inventory.sh" --markdown > "$DEST/docs/onion/inventory.md" 2>/dev/null || true
-fi
-
-# (8b) SSOT graph.md — REGENERA (mesma razão do inventory: a REGRA 21 exige docs/onion/graph.md e o hook
-#      NATIVO recém-instalado bloqueia o 1º commit da adoção sem ele. Gap achado ao DOGFOODAR o adopt
-#      canônico 2026-07-23 — o hand-roll gerava o graph à mão e mascarava a ausência; o --no-verify do
-#      commit durável mascararia commitando vermelho. Determinístico, idempotente, sem LLM.
-if [ -f "$DEST/.claude/validation/graph.sh" ]; then
-  bash "$DEST/.claude/validation/graph.sh" --markdown > "$DEST/docs/onion/graph.md" 2>/dev/null || true
-fi
+# (8) SSOT inventory.md + graph.md — REGENERA do filesystem do alvo. As REGRAS 8 e 21 as exigem e o
+#     hook nativo recém-instalado bloqueia o 1º commit sem elas; sem regenerar, o --update as deixa
+#     STALE quando o framework muda contagens. Helper testável (família ssot_projections).
+bash "$SOURCE_ROOT/.claude/utils/adopt/regen-ssot-projections.sh" "$DEST"
 
 # (8c) SEMENTE DO KG — movida para DEPOIS do carimbo (Fase 5): o seed lê mode/role/source_commit do stamp; rodando antes, os três saíam "(não carimbado)" (medido 2026-09-02, num adotante greenfield).
-
 
 # (9) BASELINES de catraca — REGENERA **TODOS** do corpus do alvo (mesmo padrão do passo 8, mesma razão).
 #     O manifesto copia `.claude/validation/` INTEIRO, então TODO baseline DO CORE viaja junto. Sem
