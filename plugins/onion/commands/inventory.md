@@ -5,11 +5,11 @@ category: meta
 tags: [inventory, ssot, counts, generator, self-evolution]
 version: "1.0.0"
 updated: "2026-06-14"
-allowed-tools: Read Edit Bash(bash .claude/validation/inventory.sh*) Bash(bash .claude/validation/lint-artifacts.sh*) Bash(find *) Bash(diff *)
+allowed-tools: Read Edit Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/inventory.sh*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/lint-artifacts.sh*) Bash(find *) Bash(diff *)
 argument-hint: "(sem argumentos — sempre regenera tudo do filesystem)"
 ---
 
-# /meta:inventory — Inventário Canônico (SSOT)
+# /onion:inventory — Inventário Canônico (SSOT)
 
 ## 🎯 Objetivo
 
@@ -22,14 +22,14 @@ e nos guias **derivam** deste inventário, não o contradizem.
 > entropizam a cada recurso criado. A SSOT + o guard de lint
 > (`check_inventory_sync` em `lint-artifacts.sh`) tornam o drift **impossível de
 > mergear** — é o braço de **auto-evolução** do framework. Relacionado:
-> `/docs:build-index` (navegação de `docs/`) e `/meta:evolve` D8 (reporta drift).
+> `/onion-product:build-index` (navegação de `docs/`) e `meta:evolve` D8 (reporta drift).
 
 ## ⚡ Execução
 
 ### Passo 1 — Regenerar o inventário (determinístico, sem LLM)
 
 ```bash
-bash .claude/validation/inventory.sh --markdown > docs/onion/inventory.md
+bash ${CLAUDE_PLUGIN_ROOT}/validation/inventory.sh --markdown > docs/onion/inventory.md
 ```
 
 O script (`inventory.sh`) é a autoridade: conta `commands/` (invocáveis, exceto
@@ -39,14 +39,14 @@ O script (`inventory.sh`) é a autoridade: conta `commands/` (invocáveis, excet
 ### Passo 2 — Capturar os totais canônicos
 
 ```bash
-bash .claude/validation/inventory.sh --env
+bash ${CLAUDE_PLUGIN_ROOT}/validation/inventory.sh --env
 # ONION_COMMANDS_TOTAL / ONION_AGENTS_TOTAL / ONION_SKILLS_TOTAL / ONION_KBS_TOTAL …
 ```
 
 ### Passo 3 — Propagar para os derivados (determinístico, sem reescrita à mão)
 
 ```bash
-bash .claude/validation/lint-artifacts.sh --fix
+bash ${CLAUDE_PLUGIN_ROOT}/validation/lint-artifacts.sh --fix
 ```
 
 O lint **sabe**, por arquivo, qual é a contagem correta (computa do filesystem) e
@@ -64,7 +64,7 @@ Idempotente — rodar de novo é no-op. **Fecha o loop**: "gerar" agora é acopl
 ### Passo 4 — Validar
 
 ```bash
-bash .claude/validation/lint-artifacts.sh   # 0 HARD e 0 SOFT (drift de contagem zerado)
+bash ${CLAUDE_PLUGIN_ROOT}/validation/lint-artifacts.sh   # 0 HARD e 0 SOFT (drift de contagem zerado)
 ```
 
 Se ainda acusar drift, é um caso **fora do escopo do `--fix`** (breakdown por categoria,
@@ -90,6 +90,6 @@ material derivado) — reconcilie à mão, ou um recurso mudou após o Passo 1 (
 
 ## 🔗 Referências
 
-- SSOT: `.claude/validation/inventory.sh` · Artefato: `docs/onion/inventory.md`
-- Guard: `.claude/validation/lint-artifacts.sh` (Regra 8 — `check_inventory_sync`)
-- Relacionados: `/docs:build-index`, `/meta:evolve` (D8), `/meta:kb-freshness`
+- SSOT: `${CLAUDE_PLUGIN_ROOT}/validation/inventory.sh` · Artefato: `docs/onion/inventory.md`
+- Guard: `${CLAUDE_PLUGIN_ROOT}/validation/lint-artifacts.sh` (Regra 8 — `check_inventory_sync`)
+- Relacionados: `/onion-product:build-index`, `meta:evolve` (D8), `/onion:kb-freshness`

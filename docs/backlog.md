@@ -334,7 +334,7 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 7.6 | `A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE` | passada-adversarial-2026-09 | ABERTO E DECLARADO (o residuo do corte, e ele NAO e defeito do corte): o bundle standalone nasce com 69 HARD contra 32 do adopted, |
+| 7.6 | `A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE` | passada-adversarial-2026-09 | ABERTO E DECLARADO (o residuo do corte). NUMEROS CORRIGIDOS depois da passada adversarial: com o corte derivado do roles.yaml E a  |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
 

@@ -2,7 +2,7 @@
 
 Núcleo operacional do Sistema Onion: o orquestrador mestre (skill onion), runtime de knowledge graph (kg + radar soberano + kg-freshness), sessões e diário, orquestração de subagentes, condução (wizard/onboarding/retro), validação de meta-specs, co-evolução upstream e os adapters SDAAL de task-manager e forge.
 
-**Versão** `0.1.256` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
+**Versão** `0.1.262` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
 
 ## Instalar
 
@@ -22,7 +22,7 @@ claude plugin marketplace add marciocar/onion-plugins && claude plugin install o
 
 | Componente | Quantidade |
 |---|---|
-| Comandos | 22 |
+| Comandos | 27 |
 | Agentes | 2 |
 | Skills | 8 |
 | Hooks | 2 |
@@ -40,18 +40,23 @@ Invocação: `/onion:<comando>` (namespace do plugin).
 | `/onion:analyze-complex-problem` | Análise estruturada de problemas complexos com template oficial. |
 | `/onion:backlog` | Regenerar docs/backlog.md — a projeção humana do trabalho ABERTO do core, a partir dos nós abertos (status open) da camada canônica (docs/onion/graph) + grafos… |
 | `/onion:catch-up` | Briefing de retomada — reconstrói "onde paramos" de sinais duráveis (git recente, sessão ACTIVE, memória, inbox) após queda/saída de sessão. |
+| `/onion:census` | Censo populacional do backlog — mede os nós open contra o VIVO (censo+realidade) com juiz fixo, sela pela tabela AUDIT e projeta a listagem REAL. |
 | `/onion:co-evolve` | Orienta a sessão na co-evolução Onion core↔derivados — detecta o papel do repo (core/consumidor via .claude/.onion-version), lê o inbox de mensagens pendentes,… |
 | `/onion:co-relay` | Carteiro-LOCAL do doc-bridge (UPSTREAM) — espelho do meta:co-deliver. |
 | `/onion:constellation` | 🗺️ O MAPA da Constelação de Estudos — visão macro das N estrelas (estudos discuss/*) lendo SÓ os metadados (frontmatter+Tier-0) de cada SEED. |
 | `/onion:context-freshness` | Audita o frescor dos contextos de domínio (docs/business-context/, docs/technical-context/, docs/compliance-context/) tratando-os como SSOT viva, não snapshot. |
 | `/onion:diary` | Gerencia o diário de aprendizado da instância Onion — sistema de breadcrumbs para o Transformer. |
 | `/onion:drive` | Conduz um plano-grafo até o fim com rigor Onion — censo→avança→Elenxo→dogfood→realign→checkpoint (degrau AUDIT) |
+| `/onion:graph` | Consulta a lente sócio-técnica do Onion (grafo gerado da spec-as-code) — impacto reverso, caminho entre necessidade e capacidade, e órfãos. |
+| `/onion:inventory` | Regenerar o inventário canônico do Sistema Onion (comandos, agentes, skills, KBs) a partir do filesystem. |
 | `/onion:kb-freshness` | Audita cada KB em docs/knowledge-base/ contra o fluxo ATUAL do Sistema Onion (ferramenta Workflow nativa, padrões canônicos 2026, lineup de modelos Claude vige… |
 | `/onion:kg-freshness` | RE-VERIFICA contra o vivo os nós de um .kg.yaml — o que o radar apenas DETECTA. |
+| `/onion:kg-inbox` | Processa a fila de propostas de escrita no grafo (docs/evolution/kg-inbox/) — a perna de SELAGEM do write-leg (F4b). |
 | `/onion:kg` | Modela uma investigação/auditoria longa como Knowledge Graph SDAAL (.kg.yaml): claims/evidência/decisões tipados, arestas SUPPORTS/REFUTES/SUPERSEDES, planes D… |
 | `/onion:metaspec-validate` | Valida um artefato/decisão contra as metaspecs vigentes, aplicando a constituição do @metaspec-gate-keeper. |
 | `/onion:onion` | Ponto de entrada inteligente para o Sistema Onion. |
 | `/onion:orchestrate` | Orquestra subagentes em paralelo (fan-out/fan-in) sobre uma tarefa, via a ferramenta nativa Workflow. |
+| `/onion:radar` | Percepção externa do Onion — re-mede os 6 eixos de mundo (KG-agente, self-improving, ecossistema Claude Code, capital, gates determinísticos, fronteira de mode… |
 | `/onion:realign` | Revisão em camadas da jornada do plano × o vivo — o "selo realinhado" (passado/presente/futuro) |
 | `/onion:recover` | Recupera a identidade Onion de um repo adotado que perdeu contato com o framework: regenera .onion-version ausente/incompleto e o skeleton do CLAUDE.md. |
 | `/onion:setup-code-review` | Setup, validação e otimização de code review automático no CI (GitHub Actions). |
@@ -97,7 +102,7 @@ Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é 
 | Campo | Valor |
 |---|---|
 | Origem | `marciocar/onion-evolve` (repositório privado) |
-| tree_sha (hash do conteúdo das fontes) | `2b065611ccfa` |
+| tree_sha (hash do conteúdo das fontes) | `7fefa858af67` |
 
 A origem identifica DE ONDE este artefato foi gerado; o canal público de instalação, issues e suporte é https://github.com/marciocar/onion-plugins. Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 
@@ -105,7 +110,7 @@ Artefato GERADO por `assemble-plugin.sh` + `plugin-readme.sh` a partir da SSOT e
 
 ## Comandos do core citados (não distribuídos neste plugin)
 
-Estes comandos aparecem no texto sem a barra inicial porque pertencem ao core do Onion (meta-fábrica ou outra superfície) e **não** são instalados por este plugin: `engineer:work`, `meta:adopt`, `meta:co-announce`, `meta:co-deliver`, `meta:create-agent`, `meta:create-command`, `meta:create-knowledge-base`, `meta:create-skill`, `meta:evolve`, `meta:federation-check`, `meta:graph`, `meta:inventory`, `meta:personality-sync`, `validate:collab`. Estão disponíveis num repo que adotou o Onion por vendorização (`.claude/` completo).
+Estes comandos aparecem no texto sem a barra inicial porque pertencem ao core do Onion (meta-fábrica ou outra superfície) e **não** são instalados por este plugin: `engineer:work`, `meta:adopt`, `meta:co-announce`, `meta:co-deliver`, `meta:create-agent`, `meta:create-command`, `meta:create-knowledge-base`, `meta:create-skill`, `meta:evolve`, `meta:federation-check`, `meta:personality-sync`, `validate:collab`. Estão disponíveis num repo que adotou o Onion por vendorização (`.claude/` completo).
 
 ## Funciona melhor com
 

@@ -101,7 +101,15 @@ _base=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/vali
 #
 #   standalone → porta PÚBLICA: recebe o método, não a fábrica que o publica. 108 de 685 arquivos
 #                saem (medido 2026-09-15); é o corte que o onion-standalone fez à mão em 2026-07-19.
-#   hub/adopted→ NADA sai, e isto é DESENHO DECLARADO, não omissão: no eixo de PATHSPEC os dois são
+#   hub       → NADA sai, e isto é INVARIANTE, não default. Ordem do maestro (2026-09-15): *"vamos
+#                mandar tudo incluindo meta fábrica, temos que ter um que tenha tudo do core para
+#                trabalhar como o core"*. O hub é esse papel: ele re-distribui para os projetos da
+#                empresa, então precisa da fábrica INTEIRA — adopt, marketplace, wizard, vertical,
+#                federation-transport e os 43 comandos de meta/. Medido: 685 arquivos, ZERO excludes,
+#                byte a byte a superfície do core. A bancada trava isso no caso (b3), porque um corte
+#                acrescentado aqui por simetria transformaria, em silêncio, o papel de fidelidade
+#                total num core mutilado.
+#   adopted   → NADA sai, e isto é DESENHO DECLARADO, não omissão: no eixo de PATHSPEC os dois são
 #                idênticos ao core, porque o hub re-distribui para os projetos da empresa e precisa
 #                da fábrica. O que separa hub de adopted é `roles.yaml` (VERTICAIS e WORK_TOOLS) —
 #                outra granularidade, outro SSOT. Declarar isso aqui é o que impede a próxima
@@ -118,11 +126,44 @@ _role_cut() {  # $1=papel → subcaminhos a cortar, um por linha (vazio = nada a
         .claude/utils/wizard/ \
         .claude/utils/vertical/ \
         .claude/utils/federation-transport/ \
-        .claude/commands/meta/ \
         .claude/validation/federation-
       ;;
     *) : ;;
   esac
+}
+
+# ── O CORTE DE COMANDOS SAI DO `roles.yaml`, A SSOT QUE JÁ EXISTIA ────────────────────────────
+# ⚠️ DUAS VERSÕES ANTERIORES DESTE BLOCO ESTAVAM ERRADAS, e a passada adversarial (2026-09-15)
+# derrubou as duas:
+#
+#   (1) cortar `.claude/commands/meta/` INTEIRO por prefixo. Medido contra o precedente que o
+#       cabeçalho afirma mecanizar — o repo PÚBLICO onion-standalone, cortado à mão em 2026-07-19 —
+#       isso está INVERTIDO: o corte manual MANTEVE os 14 comandos de `meta/` e removeu a
+#       meta-fábrica arquivo a arquivo. O corte por prefixo levava junto o norte NS1 (`/meta:kg`,
+#       citado por 31 sobreviventes) e o fallback que o próprio CLAUDE.md manda sugerir
+#       (`/meta:setup-integration`). Magnitude: manual −274 arquivos; o meu, −107, do lado errado.
+#
+#   (2) declarar `travels:` no frontmatter de cada comando. Estruturalmente melhor que a lista, e
+#       ainda assim errado: seria uma SEGUNDA SSOT do mesmo fato. `roles.yaml` JÁ declara o escopo
+#       por papel, e `resolve-role-bundle.sh <papel> --tools` JÁ devolve exatamente os 14 comandos do
+#       precedente. Criar o campo era repetir, uma camada acima, a duplicação que o PR #826 curou
+#       ("a mesma lista vivia TRÊS vezes, e uma já tinha driftado").
+#
+# O que vale: **o transporte CONSOME a SSOT do escopo por papel**, não a reimplementa. A REGRA 37
+# (Mapa role→bundle (roles.yaml) consistente com os verticais) já guarda esse arquivo contra drift,
+# então o corte herda uma guarda que existe em vez de pedir uma nova.
+_emit_command_excludes() {  # $1=REPO $2=papel → :(exclude) dos comandos de meta/ fora do escopo do papel
+  local _repo="$1" _papel="$2" _f _base_nome _tools _resolver
+  [ -n "$(_role_cut "${_papel}")" ] || return 0   # papel que não corta nada também não corta comando
+  _resolver="${_repo}/.claude/utils/marketplace/resolve-role-bundle.sh"
+  [ -f "${_resolver}" ] || return 0               # sem a SSOT não se adivinha: o corte de comando não acontece
+  _tools="$(bash "${_resolver}" "${_papel}" --tools 2>/dev/null)" || return 0
+  [ -n "${_tools}" ] || return 0                  # papel sem work_tools declarados → não corta comando
+  while IFS= read -r -d '' _f; do
+    [ -n "${_f}" ] || continue
+    _base_nome="$(basename "${_f}" .md)"
+    grep -qxF "${_base_nome}" <<< "${_tools}" || printf ':(exclude)%s\n' "${_f}"
+  done < <(git -C "${_repo}" -c core.quotePath=false ls-tree -r -z --name-only HEAD -- .claude/commands/meta)
 }
 
 # CONTRATO — arquivos que vivem DENTRO de um subcaminho cortado e AINDA ASSIM viajam, porque uma
@@ -149,18 +190,26 @@ _is_contract() {  # $1=path → 0 se o arquivo é contrato (viaja apesar do cort
 #   · exclude vence positivo (medição (1) do cabeçalho), logo poupar o contrato exige NÃO excluí-lo
 #     — e isso só é expressável enumerando.
 # Derivado de HEAD: helper novo dentro de um subcaminho cortado nasce cortado, sem lista a manter.
+# ⚠️ `-c core.quotePath=false` E `-z` NÃO SÃO ESTILO — medido 2026-09-15 pela passada adversarial.
+# `git ls-tree -r --name-only` aplica C-quoting: um caminho com acento sai como
+# `".claude/utils/adopt/acentua\303\247\303\243o.sh"`, com aspas e escapes. O `case` por prefixo então
+# NÃO casa, nenhum `:(exclude)` é emitido, e o arquivo VAZA — em silêncio, para uma porta PÚBLICA,
+# num repo escrito em pt-BR. Pior: o resultado dependia de `core.quotePath`, config PESSOAL do
+# operador — o mesmo comando cortava ou vazava conforme quem rodasse. `-z` remove o quoting de vez
+# (separador NUL), e `read -r -d ''` o consome. Hoje o repo tem 0 caminhos assim; a guarda é para o
+# dia em que tiver, e esse dia não avisa.
 _emit_role_excludes() {  # $1=REPO $2=papel
   local _repo="$1" _papel="$2" _f _pre _cuts
   _cuts="$(_role_cut "${_papel}")"
   [ -n "${_cuts}" ] || return 0
-  while IFS= read -r _f; do
+  while IFS= read -r -d '' _f; do
     [ -n "${_f}" ] || continue
     _is_contract "${_f}" && continue
     while IFS= read -r _pre; do
       [ -n "${_pre}" ] || continue
       case "${_f}" in "${_pre}"*) printf ':(exclude)%s\n' "${_f}"; break ;; esac
     done <<< "${_cuts}"
-  done < <(git -C "${_repo}" ls-tree -r --name-only HEAD -- "${_base[@]}")
+  done < <(git -C "${_repo}" -c core.quotePath=false ls-tree -r -z --name-only HEAD -- "${_base[@]}")
 }
 
 # ── DOIS MODOS, e a diferença é DELIBERADA ────────────────────────────────────────────────────
@@ -189,6 +238,7 @@ if [ "${MODE}" = "manifest" ]; then
     [ -n "$(git -C "${REPO}" ls-tree HEAD -- "${local_p}")" ] && _spec+=("${local_p}")
   done
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_role_excludes "${REPO}" "${ROLE}")
+  while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_command_excludes "${REPO}" "${ROLE}")
 
   # ⚠️ FAIL-LOUD CONTRA O BUNDLE VAZIO SILENCIOSO — medido 2026-09-15: `git archive` devolve rc=0
   # com tar de ZERO arquivos quando os `:(exclude)` cancelam tudo. Quem consome este manifesto lê o

@@ -226,7 +226,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 | Criar novo agente | `meta:create-agent` — contextualizado no ecossistema |
 | Criar novo comando | `meta:create-command` |
 | Validar conformidade | `/onion:metaspec-validate` |
-| Inventário automático | `meta:inventory` — SSOT gerada do filesystem |
+| Inventário automático | `/onion:inventory` — SSOT gerada do filesystem |
 
 ---
 

@@ -169,7 +169,21 @@ for a in "${AGENTS[@]}"; do cp "${SRC}/${a}" "${DEST}/agents/" 2>/dev/null; done
 # utils/ — dirs (só cria a pasta se houver).
 if [ "${#UTILS[@]}" -gt 0 ]; then
   mkdir -p "${DEST}/utils" 2>/dev/null
-  for u in "${UTILS[@]}"; do cp -R "${SRC}/${u}" "${DEST}/utils/" 2>/dev/null; done
+  # ⚠️ SÓ O QUE É RASTREADO VIAJA — `cp -R` copiava o diretório INTEIRO, lixo gitignorado incluído.
+  # Medido 2026-09-15, e o modo de falha é o pior tipo: `.claude/utils/census/__pycache__/*.pyc`
+  # existe no disco de quem roda python e NÃO no commit. O bundle montado LOCALMENTE ficava com o
+  # .pyc, o montado no CI (checkout limpo) sem ele, e a REGRA 19 (Plugins de vertical (plugins/*)
+  # sincronizados com as fontes) acusava "fora de sincronia" só no CI. O local se AUTO-ISENTAVA pelo
+  # lixo do próprio ambiente — verde na máquina, vermelho no servidor, sem nada no diff que explicasse.
+  # É a mesma doutrina que o transporte de adoção já aplica com `git archive HEAD`: o que não está
+  # rastreado não existe para quem recebe.
+  for u in "${UTILS[@]}"; do
+    while IFS= read -r -d '' _f; do
+      _rel="${_f#.claude/utils/}"
+      mkdir -p "${DEST}/utils/$(dirname "${_rel}")" 2>/dev/null
+      cp "${SRC}/${_f}" "${DEST}/utils/${_rel}" 2>/dev/null
+    done < <(git -C "${SRC}" ls-files -z -- "${u}" 2>/dev/null)
+  done
 fi
 # validation/ — arquivos, PRESERVANDO subdiretório relativo a .claude/validation/.
 # (Flat vira validation/<arquivo>; aninhado como vendor/kg-console/cytoscape.min.js
@@ -366,7 +380,14 @@ commit_date="$(git -C "${SRC}" show -s --format=%cI HEAD 2>/dev/null || echo unk
 tree_sha="$(
   {
     for p in "${COMMANDS[@]}" "${AGENTS[@]}" "${UTILS[@]}" "${VALIDATION[@]}" "${TEMPLATES[@]}" "${SKILLS[@]}" "${HOOKS[@]}" "${DOCS[@]}" ${_GEN[@]+"${_GEN[@]}"}; do
-      if [ -d "${SRC}/${p}" ]; then ( cd "${SRC}" && find "${p}" -type f ); else printf '%s\n' "${p}"; fi
+      # ⚠️ `git ls-files`, NUNCA `find` — medido 2026-09-15, e é a metade do defeito que a cura da
+      # cópia não alcançou. `find` varre o DISCO: `.claude/utils/census/__pycache__/*.pyc` existe na
+      # máquina de quem roda python, não no commit, e entrava no hash. Resultado: `tree_sha` calculado
+      # localmente ≠ calculado num checkout limpo, e a REGRA 19 (Plugins de vertical (plugins/*)
+      # sincronizados com as fontes) acusava drift SÓ NO CI, sem nada no diff que explicasse.
+      # Content-addressed só vale se o conteúdo endereçado for o MESMO para todo mundo — e o que é
+      # igual para todo mundo é o que está rastreado.
+      if [ -d "${SRC}/${p}" ]; then git -C "${SRC}" ls-files -- "${p}"; else printf '%s\n' "${p}"; fi
     done | LC_ALL=C sort | while IFS= read -r rel; do
       printf '%s %s\n' "$(git -C "${SRC}" hash-object "${SRC}/${rel}" 2>/dev/null || echo nohash)" "${rel}"
     done
