@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**199 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 46 grupo(s), agrupados por `owner:` (4 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**198 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 46 grupo(s), agrupados por `owner:` (3 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 2 item(ns)
 
@@ -339,11 +339,10 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
-## core — 4 item(ns)
+## core — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 6.4 | `A_ADOTANTE_GREENFIELD_NASCE_COM_HARD` | passada-adversarial-2026-09 | ABERTO (pre-existente, medido pela simulacao de adocao): o adotante greenfield nasce com 4 HARD — `docs/onion/` nunca e criado n |
 | 6.4 | `A_ROLE_DECORATIVO_NO_TRANSPORTE` | passada-adversarial-2026-09 | ABERTO: `--role adopted·hub·standalone` devolve listas IDENTICAS — ROLE e inicializado, parseado, validado e nunca mais lido.  |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |

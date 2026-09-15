@@ -4,7 +4,7 @@ meta:
   baseline: 2026-09-14
   review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 23 NÓS. Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
+  # ═══ TETO: 24 NÓS (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
   # O CI nao revisou o PR #827 (o revisor morreu com permission_denials_count: 9 e caiu em soft-pass);
   # o maestro mandou rodar a passada propria. DUAS rodadas, 5 refutadores com LENTES distintas
   # (maquinaria/shell · o artefato mente? · pelo lado do adotante), ~1,13M tokens. As duas REPROVARAM:
@@ -280,12 +280,13 @@ nodes:
 
   - id: A_ADOTANTE_GREENFIELD_NASCE_COM_HARD
     node_type: decision
-    plane: DEV
-    status: open
+    plane: PROD
+    status: refuted
     impact: 4
-    confidence: 0.8
-    owner: core
-    label: 'ABERTO (pre-existente, medido pela simulacao de adocao): o adotante greenfield nasce com 4 HARD — `docs/onion/` nunca e criado no alvo e o erro e engolido por 2>/dev/null, mais tres ponteiros mortos para .claude/settings.json. Nenhum deles vem deste PR (o diff NAO piora o adotante), mas passivo do core cobrado do cliente e divida nossa. Gatilho: a proxima adocao real.'
+    confidence: 0.9
+    verified_at: '2026-09-15'
+    verified_against: 'simulacao de adocao COMPLETA (manifesto -> git archive -> settings.json -> starter-research-seed -> mkdir docs/onion -> inventory/graph -> regen-baselines --ensure-from -> commit) + lint-artifacts DENTRO do alvo: rc=0, HARD=0, SOFT=8'
+    label: 'REFUTADO — O ADOTANTE GREENFIELD NASCE VERDE (0 HARD). O no afirmava 4 HARD (`docs/onion` nunca criado + tres ponteiros mortos para .claude/settings.json) e a afirmacao era ARTEFATO DE SIMULACAO INCOMPLETA: os tres ponteiros resolvem quando o passo (1) da Configuracao pos-copia COPIA o settings.json (ele e rastreado no core mas nao viaja no manifesto — e o procedimento o instala), e a `research-lens` carrega quando o passo (2b) roda o `starter-research-seed.sh`, helper que existe EXATAMENTE porque regra path-scoped precisa que o path exista no destino. CADEIA DE ERRO, e ela e a licao: (1) o no nasceu de uma simulacao parcial; (2) um refutador mediu 0 e eu tratei como hipotese, certo; (3) ao RE-MEDIR eu tambem pulei passos e cheguei a 4, confirmando o numero errado por outro caminho; (4) so a simulacao COMPLETA deu 0. Tres medicoes, duas erradas, todas minhas. Classe testar-no-caminho-errado-e-nao-testar em serie: o adotante real roda o procedimento INTEIRO — medir um pedaco dele e chamar de adocao produz fantasmas, e o pior deles quase me fez declarar CORE-ONLY uma regra de doutrina que todo adotante deve ter. O que SOBREVIVE e virou cura propria: o bloco (8)/(8b) redirecionava para `docs/onion/` sem `mkdir`, e o `|| true` engolia o erro — o alvo nascia verde ou vermelho conforme QUAL METADE do documento o operador seguisse (o bullet da Fase 3 tem o mkdir, o bloco shell nao tinha).'
     trace: '.claude/commands/meta/adopt.md'
 
   - id: A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN
@@ -297,6 +298,19 @@ nodes:
     owner: core
     label: 'ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado — dois casos evaporaram sem entrar em contagem nenhuma. Isolada da 25/25. Um sumario que anuncia `1226 exercidas` quando 1228 existiam trata AUSENCIA como aprovacao. Gatilho: a proxima vez que um caso sumir da faixa, ou o primeiro defeito real que escapar por ali.'
     trace: '.claude/validation/lint-selftest.sh'
+
+  - id: E_ADOCAO_COMPLETA_NASCE_VERDE_MEDIDA_0915
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-15'
+    verified_against: 'lint-artifacts.sh rodado DENTRO do alvo simulado apos o procedimento completo: rc=0, Violacoes HARD: 0, SOFT: 8'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'A ADOCAO COMPLETA ENTREGA UM ADOTANTE VERDE, e os passos que pareciam dispensaveis sao os que fazem isso: o (1) COPIA o settings.json (rastreado no core, fora do manifesto — quem o instala e o procedimento, nao o transporte) e faz tres ponteiros em backtick resolverem; o (2b) roda o `starter-research-seed.sh`, que SEMEIA `docs/evolution/research/` e faz a rule path-scoped carregar no alvo. ESTE E O DESENHO CERTO PARA REGRA QUE VIAJA: doutrina de framework NAO vira core-only quando o path nao existe no destino — o transporte SEMEIA o path. A tipologia completa do que viaja: doutrina vai COM SEMENTE do path que a ativa; biografia fica FORA do manifesto (allowlist falha fechada); config do alvo entra por NEVER-CLOBBER ou merge; licenca chega com NOME PROPRIO.'
+    trace: '.claude/utils/adopt/starter-research-seed.sh'
 
 edges:
   - from: E_LISTA_1_REGRA36_NAO_VE_CLIENTE_NAO_REGISTRADO
@@ -365,3 +379,6 @@ edges:
   - from: A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN
     to: Q_O_QUE_A_PASSADA_ADVERSARIAL_ACHA_QUE_O_GATE_NAO_ACHA
     edge_type: DEPENDS_ON
+  - from: E_ADOCAO_COMPLETA_NASCE_VERDE_MEDIDA_0915
+    to: A_ADOTANTE_GREENFIELD_NASCE_COM_HARD
+    edge_type: REFUTES

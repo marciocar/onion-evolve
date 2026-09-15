@@ -470,6 +470,7 @@ record_fail() { FAIL=$((FAIL + 1)); FAILED_CASES+=("${1}"); echo "  ✗ ${1} —
 # Sem índice legível (repo sem commit, merge em conflito) o fallback é o mesmo, e também é dito.
 _archive_staged() {
   local _dest="$1"; shift
+  mkdir -p "${_dest}"   # o tar falha em destino inexistente e o pipefail mata a suíte (2026-09-15)
   local _tree="" _try
   for _try in 1 2 3 4 5; do
     _tree="$(git -C "${REPO_ROOT}" write-tree 2>/dev/null || true)"
@@ -12561,7 +12562,67 @@ run_license_travels_selftests() {
 }
 
 _family run_regen_ensure_from_selftests
+# ── PROJEÇÕES SSOT no alvo: o `mkdir` que decidia se o adotante nascia verde ou vermelho ──────
+# O QUE PROTEGE (medido 2026-09-15): `docs/onion/{inventory,graph}.md` são exigidas pelas REGRAS 8 e
+# 21 no alvo. O bloco que as gerava redirecionava para `docs/onion/` SEM `mkdir`, e o `|| true`
+# ENGOLIA o "No such file or directory" — o arquivo nunca existia, em silêncio, e o adotante nascia
+# com HARD. O bullet da Fase 3 TINHA o mkdir; o bloco da Configuração pós-cópia não: o resultado
+# dependia de QUAL METADE do documento o operador seguisse. Extraído para helper — uma
+# implementação, um comportamento — e este caso prova que o `mkdir` é load-bearing.
+run_ssot_projections_selftests() {
+  local h="${REPO_ROOT}/.claude/utils/adopt/regen-ssot-projections.sh"
+  if [ ! -f "${h}" ]; then record_fail "ssot-projections" "helper ausente: ${h}"; return; fi
+  local d; d="$(mktemp -d)"
+
+  # (a) alvo SEM docs/onion (o caso real da adoção greenfield) → o helper CRIA e gera.
+  #     ⚠️ A FIXTURE COPIA A SUPERFÍCIE VENDORIZADA, não um `inventory.sh` pelado: num sandbox sem
+  #     `.claude/{commands,agents,skills}` o gerador sai rc=0 com SAÍDA VAZIA (não há o que
+  #     inventariar), e o caso reprovaria por fixture irreal em vez de por defeito. O alvo de
+  #     verdade tem a superfície inteira — o harness espelha o runner.
+  mkdir -p "${d}/a"
+  _archive_staged "${d}/a" .claude/validation .claude/commands .claude/agents .claude/skills
+  bash "${h}" "${d}/a" >/dev/null 2>&1 || true
+  if [ -s "${d}/a/docs/onion/inventory.md" ]; then
+    record_pass "ssot-projections: (a) alvo sem docs/onion → o helper cria o diretório e GERA"
+  else record_fail "ssot-projections: (a)" "sem o mkdir o redirect falha e o arquivo nunca existe (o adotante nasce com HARD da REGRA 8)"; fi
+
+  # (a-MUT) sem o `mkdir`, o redirect falha e o `|| true` ENGOLE — prova que (a) mede algo.
+  local mut="${d}/m.sh"
+  sed 's|^mkdir -p "${DEST}/docs/onion"$|: # MUTANTE: sem mkdir|' "${h}" > "${mut}"
+  if ! cmp -s "${h}" "${mut}"; then
+    mkdir -p "${d}/b"
+    _archive_staged "${d}/b" .claude/validation .claude/commands .claude/agents .claude/skills
+    bash "${mut}" "${d}/b" >/dev/null 2>&1 || true
+    if [ ! -s "${d}/b/docs/onion/inventory.md" ]; then
+      record_pass "ssot-projections: (a-MUT) sem o mkdir o arquivo NÃO nasce e o erro é engolido — (a) é load-bearing"
+    else record_fail "ssot-projections: (a-MUT)" "o mutante gerou mesmo assim — (a) não prova nada"; fi
+  else record_fail "ssot-projections: (a-MUT) setup" "a mutação não foi aplicada"; fi
+
+  # (b) IDEMPOTENTE — re-rodar não quebra nem duplica (o --update roda isto de novo).
+  bash "${h}" "${d}/a" >/dev/null 2>&1 || true
+  if [ -s "${d}/a/docs/onion/inventory.md" ]; then
+    record_pass "ssot-projections: (b) idempotente (o --update re-roda sem quebrar)"
+  else record_fail "ssot-projections: (b)" "a 2ª execução destruiu a projeção"; fi
+
+  # (c) FALHA DE GERADOR não aborta a adoção — o `|| true` fica, e é deliberado: o lint do alvo
+  #     cobra depois com mensagem própria. O que a cura mudou é a falha deixar de ser MANUFATURADA.
+  mkdir -p "${d}/c/.claude/validation"
+  printf '#!/usr/bin/env bash\nexit 1\n' > "${d}/c/.claude/validation/inventory.sh"
+  local _rc=0; bash "${h}" "${d}/c" >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" -eq 0 ]; then
+    record_pass "ssot-projections: (c) gerador que falha não aborta a adoção (o lint do alvo cobra depois)"
+  else record_fail "ssot-projections: (c)" "rc=${_rc} — um gerador quebrado no alvo derrubaria a adoção inteira"; fi
+
+  # (d) O ADOPT chama o helper (fora de comentário) — senão a extração deixou o passo órfão.
+  local _code; _code="$(grep -vE '^[[:space:]]*#' "${REPO_ROOT}/.claude/commands/meta/adopt.md" || true)"
+  if grep -qF 'regen-ssot-projections.sh' <<< "${_code}"; then
+    record_pass "ssot-projections: (d) o adopt invoca o helper (menção em comentário não conta)"
+  else record_fail "ssot-projections: (d)" "o helper existe e ninguém o chama — o passo ficou órfão na extração"; fi
+  rm -rf "${d}"
+}
+
 _family run_license_travels_selftests
+_family run_ssot_projections_selftests
 _family run_seed_adoption_graph_selftests
 
 # Modo assemble-plugin — idem (empacota vertical Design como plugin; dest em mktemp).

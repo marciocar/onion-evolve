@@ -43,3 +43,6 @@
 {"session_id":"d0f4c96f-0884-497d-af95-1ef7b8b7aa33","branch":"main","started_at":1787878851,"ended_at":1788074780,"duration_s":195929}
 {"session_id":"34071e30-5e24-4ac8-af26-70018664687f","branch":"fix/kg-yaml-passivo-zero","started_at":1789303251,"ended_at":1789432704,"duration_s":129453}
 {"session_id":"b573c857-42f9-48c1-b699-ccbd9f5fa978","branch":"fix/kg-yaml-passivo-zero","started_at":1789304090,"ended_at":1789304091,"duration_s":1}
+{"session_id":"30c389a5-781f-4cf8-8be8-5fd6c2b105f2","branch":"fix/licenca-viaja-never-clobber","started_at":1789432747,"ended_at":1789472820,"duration_s":40073}
+{"session_id":"d6bb8861-5ff6-4c2b-afc3-44274f1aeeba","branch":"main","started_at":1789304092,"ended_at":1789432691,"duration_s":128599}
+{"session_id":"7d688f92-ec5e-475c-b932-e0f7f9971ec0","branch":"main","started_at":1789472828,"ended_at":1789472846,"duration_s":18}
