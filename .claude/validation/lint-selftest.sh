@@ -12492,70 +12492,72 @@ _family run_regen_baselines_selftests
 # STAJÁ-LA deixa o arquivo untracked — chega e nunca é commitado, some num `git clean`, e no
 # `--update` o worktree é removido `--force`. Curar só uma metade não entrega nada.
 run_license_travels_selftests() {
+  local emit="${REPO_ROOT}/.claude/utils/adopt/emit-licenses.sh"
   local adopt="${REPO_ROOT}/.claude/commands/meta/adopt.md"
   local durable="${REPO_ROOT}/.claude/utils/adopt/durable-commit.sh"
-  local vm="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
-  if [ ! -f "${adopt}" ] || [ ! -f "${durable}" ] || [ ! -f "${vm}" ]; then
-    record_fail "license-travels" "artefato ausente (adopt.md/durable-commit.sh/vendor-manifest.sh)"; return
+  if [ ! -f "${emit}" ] || [ ! -f "${adopt}" ] || [ ! -f "${durable}" ]; then
+    record_fail "license-travels" "artefato ausente (emit-licenses.sh/adopt.md/durable-commit.sh)"; return
   fi
+  local d; d="$(mktemp -d)"
 
-  # (a) A LICENÇA NÃO PODE ESTAR NO MANIFESTO DE TRANSPORTE — se estiver, o `cp -R` clobra o alvo.
-  local _roots; _roots="$(bash "${vm}" --emit-scrub-roots 2>/dev/null || true)"
-  if grep -qiE '^LICENSE' <<< "${_roots}"; then
-    record_fail "license-travels: (a) licença NO manifesto" "LICENSE no transporte ⇒ entra no \$TMP e o cp -R do passo (d) SOBRESCREVE o LICENSE do alvo — foi medido e revertido em 2026-09-14"
-  else
-    record_pass "license-travels: (a) licença FORA do manifesto (o cp -R não a alcança)"
-  fi
+  # (a) NOME PRÓPRIO — o arquivo NÃO pode chegar como `LICENSE`. Na raiz ele rege o repositório
+  #     INTEIRO por convenção, e o MIT do core ali declararia a titularidade do autor do core sobre
+  #     o código que o adotante ainda vai escrever. Recusado por medição em 2026-09-15.
+  mkdir -p "${d}/virgem"
+  bash "${emit}" "${d}/virgem" "${REPO_ROOT}" >/dev/null 2>&1 || true
+  local _m=""
+  [ -f "${d}/virgem/LICENSE-ONION" ]      || _m="${_m} sem-LICENSE-ONION"
+  [ -f "${d}/virgem/LICENSE-ONION-DOCS" ] || _m="${_m} sem-LICENSE-ONION-DOCS"
+  [ -f "${d}/virgem/LICENSE" ]            && _m="${_m} CRIOU-LICENSE-NA-RAIZ(reivindica o repo do adotante)"
+  if [ -z "${_m}" ]; then
+    record_pass "license-travels: (a) chega como LICENSE-ONION, NUNCA como LICENSE na raiz"
+  else record_fail "license-travels: (a) nome próprio" "falhou em:${_m}"; fi
 
-  # (b) NEVER-CLOBBER de verdade, exercido: alvo virgem recebe; alvo com LICENSE próprio preserva.
-  local d; d="$(mktemp -d)"; mkdir -p "${d}/virgem" "${d}/proprio"
+  # (b) O LICENSE DO ADOTANTE É INTOCÁVEL — e sem never-clobber, porque não há colisão.
+  mkdir -p "${d}/proprio"
   printf 'Apache License 2.0\nCopyright (c) 2026 Alvo Ficticio - proprietario\n' > "${d}/proprio/LICENSE"
-  local _dest _lic _lt
-  for _dest in "${d}/virgem" "${d}/proprio"; do
-    for _lic in LICENSE LICENSE-DOCS; do
-      # sem pipe: `ls-tree | grep -q` é a corrida de EPIPE que produziu HARD espúrio em 2026-09-14
-      _lt="$(git -C "${REPO_ROOT}" ls-tree HEAD -- "${_lic}" 2>/dev/null || true)"
-      [ -n "${_lt}" ] || continue
-      if [ -f "${_dest}/${_lic}" ]; then
-        git -C "${REPO_ROOT}" show "HEAD:${_lic}" > "${_dest}/${_lic}.onion" 2>/dev/null
-      else
-        git -C "${REPO_ROOT}" show "HEAD:${_lic}" > "${_dest}/${_lic}" 2>/dev/null
-      fi
-    done
-  done
-  local _miss=""
-  [ -f "${d}/virgem/LICENSE" ]           || _miss="${_miss} virgem-sem-LICENSE"
-  [ -f "${d}/virgem/LICENSE-DOCS" ]      || _miss="${_miss} virgem-sem-LICENSE-DOCS"
-  [ -f "${d}/proprio/LICENSE.onion" ]    || _miss="${_miss} proprio-sem-LICENSE.onion"
-  grep -q 'Alvo Ficticio' "${d}/proprio/LICENSE" 2>/dev/null || _miss="${_miss} PROPRIO-CLOBRADO"
-  if [ -z "${_miss}" ]; then
-    record_pass "license-travels: (b) alvo virgem RECEBE, alvo com licença própria PRESERVA (o nosso vira .onion)"
-  else record_fail "license-travels: (b) never-clobber" "falhou em:${_miss}"; fi
+  bash "${emit}" "${d}/proprio" "${REPO_ROOT}" >/dev/null 2>&1 || true
+  if grep -q 'Alvo Ficticio' "${d}/proprio/LICENSE" 2>/dev/null && [ -f "${d}/proprio/LICENSE-ONION" ]; then
+    record_pass "license-travels: (b) o LICENSE do adotante fica INTACTO e o nosso chega ao lado"
+  else record_fail "license-travels: (b)" "o LICENSE do alvo foi tocado, ou o LICENSE-ONION não chegou"; fi
 
-  # (b-MUT) sem o ramo `.onion`, o LICENSE do alvo é SOBRESCRITO — prova que (b) é load-bearing.
-  printf 'Apache License 2.0\nCopyright (c) 2026 Alvo Ficticio - proprietario\n' > "${d}/proprio/LICENSE"
-  git -C "${REPO_ROOT}" show HEAD:LICENSE > "${d}/proprio/LICENSE" 2>/dev/null   # MUTANTE: cópia cega
-  if ! grep -q 'Alvo Ficticio' "${d}/proprio/LICENSE" 2>/dev/null; then
-    record_pass "license-travels: (b-MUT) sem o never-clobber o LICENSE do alvo É sobrescrito — (b) prova algo"
-  else record_fail "license-travels: (b-MUT)" "a cópia cega não clobrou — o mutante não exerce o risco"; fi
-  rm -rf "${d}"
+  # (b-MUT) MUTANTE QUE A 1ª BANCADA NÃO TINHA, e é o que ela falhou em pegar: o refutador provou
+  #   que com CÓPIA CEGA no lugar do never-clobber a família dava 5/5 verde — fail-open para o risco
+  #   primário. Aqui o mutante ataca o EMISSOR REAL (sed sobre o arquivo), não uma reimplementação
+  #   do laço dentro do teste: (b) só prova algo se o mutante reprovar.
+  local mut="${d}/mut"; mkdir -p "${mut}"
+  sed 's|_dst="${_pair##\*:}"|_dst="${_pair%%:*}"|' "${emit}" > "${mut}/m.sh" 2>/dev/null
+  if ! cmp -s "${emit}" "${mut}/m.sh"; then
+    mkdir -p "${d}/mutalvo"; printf 'DO CLIENTE\n' > "${d}/mutalvo/LICENSE"
+    bash "${mut}/m.sh" "${d}/mutalvo" "${REPO_ROOT}" >/dev/null 2>&1 || true
+    if ! grep -q 'DO CLIENTE' "${d}/mutalvo/LICENSE" 2>/dev/null; then
+      record_pass "license-travels: (b-MUT) emitir com o nome NU sobrescreve o LICENSE do alvo — (a)/(b) provam algo"
+    else record_fail "license-travels: (b-MUT)" "o mutante não clobrou — o par (a)/(b) é vacuidade"; fi
+  else record_fail "license-travels: (b-MUT) setup" "a mutação não foi aplicada ao emissor"; fi
 
-  # (c) O ADOPT tem o passo de never-clobber (a metade que ESCREVE).
-  local _code; _code="$(grep -vE '^[[:space:]]*#' "${adopt}" || true)"
-  if grep -q 'LICENSE-DOCS' <<< "${_code}" && grep -q '\.onion' <<< "${_code}"; then
-    record_pass "license-travels: (c) o adopt escreve a licença por never-clobber (fora de comentário)"
-  else record_fail "license-travels: (c) adopt sem o passo" "menção em comentário não conta — o procedimento precisa EXECUTAR o never-clobber"; fi
+  # (c) OS DOIS CAMINHOS chamam o emissor — e este caso existe porque a 1ª cura NÃO alcançava o
+  #     `--update`: ela vivia no Procedimento de CÓPIA SEGURA, que o `--update` não invoca, e
+  #     `grep -in licenç` no adopt.md devolvia UMA ocorrência. Os 9 adotantes existentes ficavam de
+  #     fora — que eram a justificativa inteira da cura. Asserir o CHAMADO no bloco compartilhado.
+  #     ⚠️ O range do awk fecha na PRÓXIMA `## `, não na própria: `/^## X/,/^## /` casaria a linha
+  #     inicial com o terminador e devolveria UMA linha (medido). `f` só liga depois de imprimir.
+  local _sec; _sec="$(awk '/^## ⚙️ Procedimento de Configuração pós-cópia/{f=1;print;next} f&&/^## /{exit} f' "${adopt}" || true)"
+  if grep -qF 'emit-licenses.sh' <<< "${_sec}"; then
+    record_pass "license-travels: (c) a Configuração pós-cópia (Fase 3 E --update) chama o emissor"
+  else record_fail "license-travels: (c) o --update não alcança" "o emissor não é chamado do bloco que AMBOS os caminhos invocam — a cura não chega a adotante existente"; fi
 
-  # (d) O DURABLE-COMMIT staja as licenças (a metade que DURA). Sem isto o arquivo chega untracked,
-  #     some num `git clean`, e no --update o worktree é removido --force.
-  local _dcode; _dcode="$(grep -vE '^[[:space:]]*#' "${durable}" || true)"
+  # (d) STAGING — token EXATO, não substring: o refutador provou que `grep -F LICENSE` casava dentro
+  #     de `LICENSE.onion`, então remover a grafia nua passava verde. Aqui o casamento é de linha
+  #     inteira sobre os tokens do array.
+  local _tok; _tok="$(grep -A4 '^ONION_PATHS=(' "${durable}" | tr ' ' '\n' | tr -d '()\\' || true)"
   local _falta=""
-  for _lic in LICENSE LICENSE.onion LICENSE-DOCS LICENSE-DOCS.onion; do
-    grep -qF "${_lic}" <<< "${_dcode}" || _falta="${_falta} ${_lic}"
+  local _t; for _t in LICENSE-ONION LICENSE-ONION-DOCS; do
+    grep -qxF "${_t}" <<< "${_tok}" || _falta="${_falta} ${_t}"
   done
   if [ -z "${_falta}" ]; then
-    record_pass "license-travels: (d) o durable-commit staja as 4 grafias (chega E dura)"
+    record_pass "license-travels: (d) o durable-commit staja as duas (token exato, não substring)"
   else record_fail "license-travels: (d) staging incompleto" "sem estas o arquivo fica untracked:${_falta}"; fi
+  rm -rf "${d}"
 }
 
 _family run_regen_ensure_from_selftests

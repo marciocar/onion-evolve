@@ -132,18 +132,14 @@ diff -rq "$TMP" "$DEST" 2>/dev/null || true
 # (d) Após confirmação do maestro: aplicar (cp preserva o que NÃO está no manifesto).
 cp -R "$TMP"/. "$DEST"/ && rm -rf "$TMP"
 
-# (e) NEVER-CLOBBER por-arquivo — .env.example, LICENSE, LICENSE-DOCS: específicos do ALVO, logo
-#     FORA do manifesto (dentro, o `cp -R` de (d) os sobrescreveria: aviso proprietário de cliente
-#     virando MIT do core, revertido em 2026-09-14). Sem isto o adotante recebe ~104 arquivos de
-#     método SEM licença. PAR: `durable-commit.sh` staja as grafias. Nó A_LICENCA_VIAJA_*.
-for _f in .env.example LICENSE LICENSE-DOCS; do
-  git -C "$SOURCE_ROOT" ls-tree HEAD -- "$_f" | grep -q . || continue
-  if [ -f "$DEST/$_f" ]; then
-    git -C "$SOURCE_ROOT" show "HEAD:$_f" > "$DEST/${_f}.onion"
+# (e) .env.example — NEVER-CLOBBER: existe no alvo e é dele. Quem já tem recebe `.env.example.onion`.
+if git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q .; then
+  if [ -f "$DEST/.env.example" ]; then
+    git -C "$SOURCE_ROOT" show HEAD:.env.example > "$DEST/.env.example.onion"
   else
-    git -C "$SOURCE_ROOT" show "HEAD:$_f" > "$DEST/$_f"
+    git -C "$SOURCE_ROOT" show HEAD:.env.example > "$DEST/.env.example"
   fi
-done
+fi
 ```
 
 > Hoje o apply é cópia-por-cima após revisão do diff (conflitos **surgem**, o maestro decide). Merge
@@ -170,6 +166,10 @@ DEST="<INSTALL_DIR (Fase 3) | TARGET (--update)>"
 #     settings.local.json ignorados). Sinal de campo: um adotante legacy (2026-07-24, ignorava .claude/ em 2 linhas).
 #     Sem .gitignore ou sem ignore cego → no-op. Helper testável (lint-selftest.sh: scope-gitignore).
 bash "$SOURCE_ROOT/.claude/utils/adopt/scope-claude-gitignore.sh" "$DEST"
+
+# (0.5) LICENÇAS com NOME PRÓPRIO — nunca `LICENSE` (na raiz rege o REPO INTEIRO). Aqui porque é o
+#     único bloco que Fase 3 E `--update` invocam. Porquê completo: no helper.
+bash "$SOURCE_ROOT/.claude/utils/adopt/emit-licenses.sh" "$DEST" "$SOURCE_ROOT"
 
 # (1) settings.json — MERGE never-clobber dos hooks Onion (registro do "you have mail" + worklog).
 #     Helper testável e idempotente (.claude/utils/adopt/merge-onion-hooks.sh; coberto por
