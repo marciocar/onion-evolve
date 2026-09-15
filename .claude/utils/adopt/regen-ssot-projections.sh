@@ -24,12 +24,38 @@ set -uo pipefail
 DEST="${1:?uso: regen-ssot-projections.sh <DEST>}"
 [ -d "${DEST}" ] || { echo "ERRO: alvo inexistente: '${DEST}'" >&2; exit 2; }
 
-_n=0
-mkdir -p "${DEST}/docs/onion"
+# ⚠️ FAIL-LOUD, e ele entrou porque a 1ª versão MENTIA VERDE — medido 2026-09-15 na passada
+# adversarial: com `docs/onion` existindo como ARQUIVO, ou com os dois geradores ausentes, o helper
+# imprimia `✓ 0 projeção(ões)` e saía 0. Anunciava sucesso tendo gerado nada, e o alvo nascia
+# vermelho enquanto a adoção reportava verde. É a MESMA classe que o docstring acima diz curar (o
+# `|| true` engolindo o rc): a 1ª cura tratou só o caso ENOENT, não a classe.
+# O irmão `emit-licenses.sh`, neste mesmo diretório, já fazia o certo (`exit 3` sem emissão).
+mkdir -p "${DEST}/docs/onion" || { echo "ERRO: não consegui criar '${DEST}/docs/onion' (existe como arquivo?)" >&2; exit 3; }
+[ -d "${DEST}/docs/onion" ] || { echo "ERRO: '${DEST}/docs/onion' não é diretório" >&2; exit 3; }
+
+_n=0 _vazias=""
 for _pair in "inventory.sh:inventory.md" "graph.sh:graph.md"; do
   _gen="${_pair%%:*}"; _out="${_pair##*:}"
   [ -f "${DEST}/.claude/validation/${_gen}" ] || continue
   bash "${DEST}/.claude/validation/${_gen}" --markdown > "${DEST}/docs/onion/${_out}" 2>/dev/null || true
-  [ -s "${DEST}/docs/onion/${_out}" ] && _n=$((_n + 1))
+  if [ -s "${DEST}/docs/onion/${_out}" ]; then
+    _n=$((_n + 1))
+  else
+    # ⚠️ ARQUIVO 0-BYTE NÃO FICA NO DISCO: ele faz o alvo colher HARD da REGRA 8 (inventário
+    # desatualizado vs filesystem) enquanto o relatório aqui some com a linha. Remover é honesto —
+    # ausente é um estado que a guarda do alvo sabe nomear; vazio, ela lê como drift.
+    rm -f "${DEST}/docs/onion/${_out}"
+    _vazias="${_vazias} ${_out}"
+  fi
 done
+
+# ⚠️ O `|| true` do laço FICA (gerador que falha por ambiente do alvo não derruba a adoção — o lint
+# de lá cobra depois, com mensagem própria). O que NÃO pode é ESTE script declarar sucesso sem ter
+# produzido nada: zero projeções com geradores presentes é falha de ambiente, e falha em silêncio é
+# o que fez o adotante nascer vermelho com a adoção dizendo verde.
+if [ "${_n}" -eq 0 ]; then
+  echo "ERRO: nenhuma projeção SSOT gerada em '${DEST}/docs/onion' — o alvo vai nascer com HARD das REGRAS 8/21 (geradores ausentes ou saída vazia:${_vazias:- —})" >&2
+  exit 3
+fi
+[ -z "${_vazias}" ] || echo "  ⚠️ saída VAZIA (arquivo removido, o alvo cobrará):${_vazias}" >&2
 echo "  ✓ ${_n} projeção(ões) SSOT regenerada(s) no alvo (docs/onion/)"

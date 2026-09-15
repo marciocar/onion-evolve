@@ -2,7 +2,7 @@
 title: 'Resíduo — três medições, duas erradas, e a que quase apagou um defeito real'
 date: 2026-09-15
 branch: fix/adopt-docs-onion-mkdir
-reviewed_diff_sha256: 7d8849361ef2b59c88cb438a21eb2fd0d9994dfd1f91b3227795e32f44386985
+reviewed_diff_sha256: 2677a9c040e68146d1731806e6e9cecb1e4ea0e5a7345b23c4d6486b0bed31d5
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
