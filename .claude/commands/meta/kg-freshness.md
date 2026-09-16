@@ -120,12 +120,12 @@ Contrato do worker (cada cláusula paga por um erro real desta casa):
 - **Bloqueio de acesso só vale TENTADO.** Antes de declarar `permission denied`, **eleve** —
   `sudo ls`, `sudo cat`, `sudo -u <dono>`. Ler é read-only, logo elevar para LER não fere a
   cláusula READ-ONLY acima (elevar para MUTAR fere, e continua proibido). *Medido 2026-08-12:*
-  um worker declarou `permission denied` em `/home/onion/onion-bridge/src/`, carimbou o nó por
+  um worker declarou `permission denied` no diretório de outra conta de serviço, carimbou o nó por
   inferência indireta, e `sudo ls` lia o diretório — ele já usara `sudo` em quatro comandos da
   mesma medição. Falta de acesso é hipótese até você ter tentado ([[verify-access-before-specifying]]).
   **Distinga o bloqueio de FS do bloqueio de HARNESS** (delta Claude Code 2.1.257, radar E3
   2026-09-02): com `permissions.blockReadsOutsideWorkingDirectories` ativo, leitura fora dos
-  working dirs (`/home/marcio/<adotante>`, `/home/onion/onion-bridge`) é recusada pelo *harness* —
+  working dirs da sessão é recusada pelo *harness* —
   `sudo` **não vence**, porque a parede não é o filesystem. Nesse caso devolva `UNVERIFIABLE` com
   `blocked_by: harness bloqueia leitura fora dos working dirs (<path>)` sem gastar elevação; o
   maestro decide liberar o diretório (`--add-dir`) e re-rodar. Elevar contra a parede errada é o

@@ -83,8 +83,8 @@ Delegar para o agente com contexto coletado.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 📊 Estrutura:
-∟ 109 comandos em 10 categorias
-∟ 51 agentes especializados
+∟ comandos invocáveis, por categoria (contagem na SSOT gerada: `docs/onion/inventory.md`)
+∟ agentes especializados, por categoria
 ∟ Task Manager Abstraction (Jira/ClickUp/Asana/Linear)
 
 🚀 Comandos Principais:

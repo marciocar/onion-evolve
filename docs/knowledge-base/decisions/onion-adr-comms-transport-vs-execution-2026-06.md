@@ -167,7 +167,7 @@ o maestro bastam.
 
 - Eixo prévio (formato vs runtime): `onion-federation-adr-a2a-format-interop-2026-06.md` (core-only)
 - Federação (fases, ledger): `onion-federation-design-v2-2026-06.md` (core-only)
-- Doutrina dos 3 fluxos: [`../evolution/README.md`](../../evolution/README.md)
+- Doutrina dos 3 fluxos: `../evolution/README.md` (core-only)
 - Determinístico-vs-LLM + fail-safe: [`../knowledge-base/concepts/multi-repo-federation.md`](../../knowledge-base/concepts/multi-repo-federation.md)
 - Workflow vs Agent Teams + control-before-autonomy: [`../knowledge-base/concepts/agent-orchestration.md`](../../knowledge-base/concepts/agent-orchestration.md)
 - Sinais de campo: `../evolution/inbox/_processed/2026-06-19-flow-a-report-and-bidirectional-mail.md` · `../evolution/inbox/_processed/2026-06-19-mgfy-adocao-update-a0fdf35.md`

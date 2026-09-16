@@ -18,7 +18,7 @@
 | **Categoria** | Conceitos |
 | **Comando relacionado** | `/meta:evolve` (sensor) · gate mecânico em `.claude/validation/` |
 | **Padrão-irmão** | [Doutrina de Modernização](onion-modernization-doctrine.md) |
-| **Padrão-parente** | [Knowledge Graph SDAAL](knowledge-graph-sdaal.md) — o KG é o SSOT que o loop lê antes e escreve depois (§♻️ e §Onde se encaixa) · [`/meta:diary`](../../../.claude/commands/meta/diary.md) — o re-teste de migalha é o "re-" em outra roupa |
+| **Padrão-parente** | [Knowledge Graph SDAAL](knowledge-graph-sdaal.md) — o KG é o SSOT que o loop lê antes e escreve depois (§♻️ e §Onde se encaixa) · `/meta:diary` — o re-teste de migalha é o "re-" em outra roupa |
 
 ---
 
@@ -159,7 +159,7 @@ Nenhum dos três é opcional, e nenhum é novo — o que faltava era dizer que s
 | Instância | Onde vive (SSOT) | TTL | Sinal de vencimento | Reconciliação |
 |---|---|---|---|---|
 | **re-dogfood** do fix | esta doutrina (§🚦 item 3) | — | o fix existe | re-exercitar até passar |
-| **re-teste** de migalha | [`/meta:diary review`](../../../.claude/commands/meta/diary.md) | `review_after` (90d) | ⏰ no boot (hook) | `superseded: true` (nunca apagar) |
+| **re-teste** de migalha | `/meta:diary` | `review_after` (90d) | ⏰ no boot (hook) | `superseded: true` (nunca apagar) |
 | **re-verificação** do KG | [knowledge-graph-sdaal §Frescor](knowledge-graph-sdaal.md#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou) | `verified_at` × `meta.baseline` | ⚠ STALE (radar `--freshness`) | `REFUTES`/`SUPERSEDES` (append-mostly) |
 
 O parentesco é **declarado, não analogia**: o gate de frescor do KG é filho do `review_after` do diário

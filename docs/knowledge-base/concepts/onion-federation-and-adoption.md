@@ -159,7 +159,7 @@ contradição estrutural).
 
 ## 4. O processo de adoção, passo a passo
 
-Fonte: [`/meta:adopt`](../../../.claude/commands/meta/adopt.md) (única via de entrada na federação —
+Fonte: `/meta:adopt` (única via de entrada na federação —
 "NÃO é CLI standalone", roda dentro de uma sessão Claude Code que já é a fonte).
 
 ### 4.1 Contrato de Segurança (antes de qualquer fase)
@@ -366,6 +366,6 @@ entre o repo A e o repo B pode mudar sem quebrar o B".
 - [federation-usage-modes.md](federation-usage-modes.md) — a matriz canônica dos 5 eixos (cenário/controle/tier/operação/topologia) + gatilhos de graduação
 - [source-vs-derivation.md](source-vs-derivation.md) — a doutrina que rege como este próprio documento deve se comportar
 - [public-door-vs-private-core.md](public-door-vs-private-core.md) — o litmus porta pública ≠ core privado (§6.7)
-- [`/meta:adopt`](../../../.claude/commands/meta/adopt.md) — o comando fonte de toda a §4
-- [`/meta:co-evolve`](../../../.claude/commands/meta/co-evolve.md) — o orientador do doc-bridge leve (§4.6)
+- `/meta:adopt` — o comando fonte de toda a §4
+- `/meta:co-evolve` — o orientador do doc-bridge leve (§4.6)
 - `members.yaml` (interno do core) — os perfis reais da §6 (uso interno)

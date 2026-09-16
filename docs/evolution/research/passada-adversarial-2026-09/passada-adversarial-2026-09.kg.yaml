@@ -4,7 +4,7 @@ meta:
   baseline: 2026-09-14
   review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 36 NÓS (era 35: +1 pela varredura disco×registro, que transformou o caso único do sinal numa classe medida — 9 de 19) (era 34: +1 pelo veredito que confundia EXECUTAR com BARRAR — chegou por sinal de campo de um adotante) (era 33: +1 pelo verificador do gate que decidia por string e abortou uma adoção real — achado pelo dogfood da própria entrega) (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
+  # ═══ TETO: 39 NÓS (era 36: +3 pela PASSADA ADVERSARIAL da cura do A_DOUTRINA — duas lacunas de COBERTURA (plugins/ fora da varredura; predicado de privacidade por nome completo) e a fronteira medida entre caminho-de-máquina NARRATIVO (curado) e FUNCIONAL (parametrização, gated)) (era 35: +1 pela varredura disco×registro, que transformou o caso único do sinal numa classe medida — 9 de 19) (era 34: +1 pelo veredito que confundia EXECUTAR com BARRAR — chegou por sinal de campo de um adotante) (era 33: +1 pelo verificador do gate que decidia por string e abortou uma adoção real — achado pelo dogfood da própria entrega) (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
   # O CI nao revisou o PR #827 (o revisor morreu com permission_denials_count: 9 e caiu em soft-pass);
   # o maestro mandou rodar a passada propria. DUAS rodadas, 5 refutadores com LENTES distintas
   # (maquinaria/shell · o artefato mente? · pelo lado do adotante), ~1,13M tokens. As duas REPROVARAM:
@@ -382,13 +382,26 @@ nodes:
   - id: A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE
     node_type: decision
     plane: PROD
-    status: open
+    status: done
     impact: 4
     confidence: 0.95
     owner: core
-    verified_at: '2026-09-15'
-    verified_against: 'delta de lint entre os dois bundles extraidos, por REGRA'
-    label: 'ABERTO E DECLARADO (o residuo do corte). NUMEROS CORRIGIDOS depois da passada adversarial: com o corte derivado do roles.yaml E a SSOT do escopo atualizada, o bundle nasce com 47 HARD contra 32 do adopted (era 69 -> 50 -> 47 conforme o corte foi ficando certo). (a) REGRA 22, 9 ocorrencias: KB vendorizada linka `../../../.claude/commands/meta/<cmd>.md` — link RELATIVO de sistema de arquivos para um comando que o papel legitimamente nao recebe. A forma certa e o NOME do comando (`/meta:kg`), que viaja para todo papel; o caminho no disco nao. E a mesma familia que a REGRA 45 ja ensina para link core-privado. (b) REGRA 16, 11 ocorrencias: prosa com contagem fixa (`109 comandos`) num bundle de 67 — [[count-drift-grep-whole-docs-before-commit]] um andar acima, porque aqui a populacao muda POR PAPEL. Por que fica aberto e nao vira escopo deste PR: sao ~41 referencias em ~20 arquivos de doutrina, e curar exige decidir a FORMA canonica de citar comando em superficie vendorizada — decisao de desenho, nao conserto mecanico. O que este PR garante e que o numero e VISIVEL: o manifesto imprime o residuo medido em stderr quando o papel corta. Gatilho: a primeira publicacao real de um standalone pelo `/meta:adopt`.'
+    verified_at: '2026-09-16'
+    verified_against: 'lint completo rodado DENTRO dos bundles adopted/hub/standalone montados da arvore de trabalho (git stash create) e de main, por REGRA; e diff do conjunto normalizado de violacoes entre os dois lados, nos tres papeis'
+    label: 'ABERTO E DECLARADO (o residuo do corte). NUMEROS CORRIGIDOS depois da passada adversarial: com o corte derivado do roles.yaml E a SSOT do escopo atualizada, o bundle nasce com 47 HARD contra 32 do adopted (era 69 -> 50 -> 47 conforme o corte foi ficando certo). (a) REGRA 22, 9 ocorrencias: KB vendorizada linka `../../../.claude/commands/meta/<cmd>.md` — link RELATIVO de sistema de arquivos para um comando que o papel legitimamente nao recebe. A forma certa e o NOME do comando (`/meta:kg`), que viaja para todo papel; o caminho no disco nao. E a mesma familia que a REGRA 45 ja ensina para link core-privado. (b) REGRA 16, 11 ocorrencias: prosa com contagem fixa (`109 comandos`) num bundle de 67 — [[count-drift-grep-whole-docs-before-commit]] um andar acima, porque aqui a populacao muda POR PAPEL. Por que fica aberto e nao vira escopo deste PR: sao ~41 referencias em ~20 arquivos de doutrina, e curar exige decidir a FORMA canonica de citar comando em superficie vendorizada — decisao de desenho, nao conserto mecanico. O que este PR garante e que o numero e VISIVEL: o manifesto imprime o residuo medido em stderr quando o papel corta. Gatilho: a primeira publicacao real de um standalone pelo `/meta:adopt`.
+      ── CURADO EM 2026-09-16, e os numeros de cima ficam como estavam porque sao o que eu media ENTAO.
+      Re-medido hoje contra `main` (que ja tinha os 13 ADRs promovidos, e por isso a conta subiu): o
+      bundle `standalone` de main nascia com 88 violacoes (55 HARD), sendo REGRA 22 = 16 e REGRA 16 = 11.
+      Depois da cura: REGRA 22 = 0 e REGRA 16 = 0 nos TRES papeis (adopted 5->0, hub 5->0, standalone
+      16->0), total do standalone 88->58. Nenhum papel regrediu: `diff` do conjunto normalizado de
+      violacoes main->arvore devolve ZERO linhas novas em adopted, hub e standalone. (a) a forma canonica
+      ficou sendo o NOME INVOCAVEL (`/meta:adopt`), nunca o caminho no disco, e biografia que nao viaja
+      ganha `(core-only)` em vez de link. (b) a cura da contagem NAO foi atualizar o numero: foi parar de
+      fixar em prosa que viaja uma contagem que depende do PAPEL — core 109 comandos contra 90 do
+      standalone; nenhum literal pode estar certo nos dois, entao a prosa passou a apontar a SSOT gerada
+      (`docs/onion/inventory.md`), que cada alvo regenera do proprio filesystem. Medido: so a contagem de
+      COMANDOS diverge hoje; agentes, skills e KBs coincidem nos tres papeis — e a coincidencia nao e
+      garantia, porque o corte e por PREFIXO de caminho.'
     trace: '.claude/commands/meta/adopt.md'
 
   - id: E_MANIFESTO_VAZIO_ERA_TODOS
@@ -449,7 +462,54 @@ nodes:
     label: 'A METADE VERDADEIRA DO NO, medida pela passada adversarial do PR #831 e que eu NAO tinha medido: no merge-base, o procedimento completo entregava 1 HARD. O bullet da Fase 3 salvava o `inventory.md` — mas gerava SOMENTE ele, nunca o `graph.md` (REGRA 21). Entao nem o operador que lia o documento inteiro escapava: as DUAS implementacoes do mesmo passo estavam erradas, cada uma de um jeito. Eu media `com mkdir vs sem mkdir` e concluia que o mkdir era a unica variavel; a variavel real era QUANTAS PROJECOES cada metade do documento gerava. Licao: ao comparar dois caminhos, medir o RESULTADO de cada um, nunca so a diferenca que eu ja tinha nomeado.'
     trace: '.claude/commands/meta/adopt.md'
 
+  - id: E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-16'
+    verified_against: 'vendor-manifest.sh --emit-scrub-roots listava 11 raizes e NENHUMA era plugins/; e lint completo rodado depois de acrescenta-la achou 6 candidatos que nenhuma guarda via'
+    label: 'A GUARDA NAO OLHAVA O TRANSPORTE MAIS PUBLICO QUE EXISTE. `--emit-scrub-roots` — a SSOT que as REGRAS 36 e 45 consomem para saber O QUE VARRER — emitia 11 raizes sob `.claude/` e `docs/`, e `plugins/` nao estava entre elas. O marketplace publica aquele diretorio para qualquer pessoa. Na medicao o CONTEUDO estava limpo, e essa e exatamente a frase perigosa: limpo era o conteudo, nao a COBERTURA. E a tese do cabecalho do proprio `vendor-manifest.sh` ("guarda que varre menos do que o transporte emite e fail-open com cara de cobertura") aplicada um andar acima dela mesma — `plugins/` nao estava nem no transporte que a SSOT descreve, entao ninguem o olhava. CURADO com uma lista SEPARADA (`_SCRUB_EXTRA`), emitida so no modo scrub: por em `_base` faria o plugin montado VIAJAR dentro do bundle, que e outra coisa e esta errada. A assimetria ja era desenho declarado: varrer mais do que viaja nunca e fail-open; varrer menos e. Achado por refutador adversarial, nao por leitura minha.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: E_PADRAO_PRIVADO_FIXAVA_UM_NOME_E_O_IRMAO_PASSAVA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-16'
+    verified_against: 'grep do prefixo da familia na superficie que viaja: 6 citacoes num motor e numa KB que o padrao anterior nao casava, duas delas ja dentro do plugin publico montado'
+    label: 'O `_priv` do `--check-bundle` — a guarda que reprova biografia dentro de um bundle — fixava o NOME COMPLETO de um repo do vertical pessoal. A familia tem mais de um repo, e o irmao passava batido: 6 citacoes viajavam, e duas ja estavam no plugin PUBLICO montado. Mesma classe de C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO, agora no predicado de privacidade: o defeito e o VOCABULARIO, nao a logica. CURADO trocando o nome completo pelo PREFIXO da familia — que cobre inclusive o repo que ninguem criou ainda — e neutralizando as 6 citacoes, que passaram a creditar o SINAL DE CAMPO sem nomear o repo. A licao que fica: predicado de privacidade escrito por enumeracao envelhece a cada repo novo; escrito por prefixo, nao.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO
+    node_type: decision
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.9
+    owner: maestro
+    verified_at: '2026-09-16'
+    verified_against: 'grep de /home/<conta>/ e do host de backend nas 11 raizes de varredura: 14 sitios remanescentes, todos em codigo funcional (defaults de varredura, endpoints, URL de pull)'
+    label: 'ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles tem desfechos OPOSTOS. (1) NARRATIVA — anedota de campo, topologia de hospedagem, ponteiro para documento do core: 7 sitios, CURADOS neste PR (inclusive a secao 10 da KB de identidade, que descrevia backend, TLS e o caminho do clone em disco, e que viaja no `plugins/onion/kb/` publico). (2) FUNCIONAL — `vps-exposure-check.sh` varre diretorios de backup por default, `a2a-agent-card.sh` publica endpoint, `inbox-pull.sh` tem URL de core: 14 sitios. Ali o caminho NAO e prosa a limpar, e VALOR PADRAO a PARAMETRIZAR, e parametrizar destino e desenho, nao limpeza. E exatamente a peca (4) que o no Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN ja nomeia como a unica que o criterio "sem segredo" nao resolve sozinho: `marketplace/*` publica NO REPO DO MAESTRO. Gatilho: a decisao do maestro sobre parametrizar destino — a mesma decisao cobre os dois.'
+    trace: '.claude/validation/vps-exposure-check.sh'
+
 edges:
+  # a cobertura ampliada foi o que EXPOS o residuo: sem varrer plugins/ ninguem o teria medido
+  - from: E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA
+    to: A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO
+    edge_type: SUPPORTS
+  - from: A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO
+    to: A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE
+    edge_type: CONSTRAINS
+  - from: E_PADRAO_PRIVADO_FIXAVA_UM_NOME_E_O_IRMAO_PASSAVA
+    to: C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO
+    edge_type: SUPPORTS
+  - from: E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA
+    to: C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO
+    edge_type: SUPPORTS
   - from: E_LISTA_1_REGRA36_NAO_VE_CLIENTE_NAO_REGISTRADO
     to: C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO
     edge_type: SUPPORTS

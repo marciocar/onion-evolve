@@ -168,7 +168,7 @@ maestro. É a linha do `STATE.md` que põe o flip diante dele.
 
 ## Referências
 - Censo: [`../../../.claude/validation/kg-drive-project.sh`](../../../.claude/validation/kg-drive-project.sh) · fixtures (**core-only**, não viajam no plugin) em `.claude/validation/fixtures/kg-drive/`
-- Verificador-por-turno: [`/meta:realign`](../../../.claude/commands/meta/realign.md) · Motor: `kg-radar.sh`
+- Verificador-por-turno: `/meta:realign` · Motor: `kg-radar.sh`
 - Precedente/escada (**core-only**): ADR `onion-adr-autonomous-thread-runtime-2026-07` · KB [`graduated-automation-ladder.md`](graduated-automation-ladder.md)
-- Motores adapter: [`/meta:kg-freshness`](../../../.claude/commands/meta/kg-freshness.md) · skill `onion-orchestration` · [`agent-orchestration.md`](agent-orchestration.md)
+- Motores adapter: `/meta:kg-freshness` · skill `onion-orchestration` · [`agent-orchestration.md`](agent-orchestration.md)
 - Fonte-plano de exemplo (**core-only**): `docs/onion/graph/fios-abertos.kg.yaml` — num repo que instalou o plugin, o plano-grafo é o do próprio repo

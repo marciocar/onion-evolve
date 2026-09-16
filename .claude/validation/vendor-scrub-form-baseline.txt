@@ -20,3 +20,9 @@ docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md|Startup
 docs/knowledge-base/concepts/meeting-transcription-to-knowledge-base.md|Firebase
 docs/knowledge-base/education/README.md|Winne&Hadwin
 docs/knowledge-base/platforms/runflow.md|Tool
+plugins/onion-product/agents/extract-meeting-specialist.md|Firebase
+plugins/onion-product/agents/pain-price-specialist.md|Específico
+plugins/onion-product/agents/pain-price-specialist.md|StartupXYZ
+plugins/onion-product/commands/analyze-pain-price.md|TechStartup
+plugins/onion-product/kb/identificar-precificar-dor-cliente.md|Startup
+plugins/onion-product/kb/meeting-transcription-to-knowledge-base.md|Firebase

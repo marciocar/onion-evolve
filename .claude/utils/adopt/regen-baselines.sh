@@ -10,7 +10,7 @@
 #
 # MEDIDO numa adoção greenfield real (PoC de cliente, 2026-08-17): o irmão
 # `kg-verification-baseline.txt` chegou com **47 chaves de grafos do core** (docs/discussions,
-# onion-pessoal, bridge-produto) e o lint do alvo nasceu com **47 violações HARD**, todas
+# verticais privados do core) e o lint do alvo nasceu com **47 violações HARD**, todas
 # `[kg-verificacao/REMOVIDO]` — o adotante era cobrado por nós que nunca teve. Cinco baselines
 # viajam; a adoção regenerava um. A cura é regenerar todos.
 #

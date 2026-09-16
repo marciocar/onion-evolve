@@ -36,7 +36,7 @@ doc-bridge de verdade), a IA:
 3. **Escalou ao humano** "em qual branch? push ou não?" — quando o **ADR 3-atos** já diz que **transporte é
    Ato-1 (determinístico)**. Erro de classificação: tratou mecânica de Ato-1 como juízo de Ato-3.
 
-**Lacuna real:** o core já tinha o padrão certo para *downstream* — o [`/meta:co-deliver`](../../../.claude/commands/meta/co-deliver.md)
+**Lacuna real:** o core já tinha o padrão certo para *downstream* — o `/meta:co-deliver`
 + `co-deliver.sh`, que **entrega-sem-commit** (escreve o arquivo **untracked** no canal do alvo; o hook conta
 arquivos → notifica; o **commit é da sessão home do destino**). Faltava o **espelho upstream**
 (adotante→core `inbox/`). co-deliver é core-only + downstream-only.

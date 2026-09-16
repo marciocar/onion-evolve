@@ -99,7 +99,7 @@ ou, em falha:
 ## 🔗 Referências
 
 - Formato + máquina de segurança: [multi-repo-federation.md](../../../docs/knowledge-base/concepts/multi-repo-federation.md) (§2, §4)
-- Workflow do maestro: design v2 §6 ([onion-federation-design-v2-2026-06.md](../../../docs/analysis/onion-federation-design-v2-2026-06.md))
+- Workflow do maestro: design v2 §6 (`onion-federation-design-v2-2026-06`, core-only)
 - Lado consumer: `/meta:federation-check` (lê esta entrada de inbox)
 - Átomo local (pré-requisito): `/meta:federation-register`
 - Validação: `.claude/validation/federation-contract-validate.sh`

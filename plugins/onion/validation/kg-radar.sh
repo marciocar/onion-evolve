@@ -235,7 +235,7 @@ section == "nodes" && nid != "" {
   # existia — mas só para `trace:` (comentário abaixo) — e ficou fechada em 1 de 7 campos. Agora
   # a ancoragem cobre a classe inteira EM TODAS AS SEÇÕES: `nodes` (node_type/plane/layer/impact/
   # confidence/status/verified_*/label), `edges` (to/edge_type/on) e `meta` (schema_version/baseline).
-  # Crédito: sinal de campo da estrela onion-pessoal-app (2026-07-19), que pushou um grafo quebrado
+  # Crédito: sinal de campo de uma estrela adotante (2026-07-19), que pushou um grafo quebrado
   # exatamente por isto — um repo que FALA de layers/status escreve esses tokens em prosa o tempo todo.
   # Âncora também no `sub`: casar ancorado e extrair solto (`.*campo:`) recortaria pela ÚLTIMA
   # ocorrência da linha, devolvendo o rabo do label quando o valor cita o próprio token.

@@ -503,7 +503,7 @@ Antes de qualquer projeção cruzar fronteira (material pro cliente, sinal pro c
 - **Fase-2 semântica** (método, não código do core): embeddings + cosseno para flag de redundância
   entre nós — cada instância implementa com seu stack (soberania); o core fica no determinístico.
 - 1º dogfood real (56 nós/81 arestas em um adotante; 37 nós/33 arestas no core): ver
-  onion-evolution-2026-07-04.md e o sinal
+  `onion-evolution-2026-07-04` (core-only) e o sinal
   2026-07-04-kg-primeiro-dogfood-federacao.md.
 
 ## 🔗 Referências

@@ -30,7 +30,7 @@ related_agents:
 Olhar para o **próprio Sistema Onion** com fan-out de auditores e produzir um
 **backlog priorizado de refatorações de modernização**, com evidência citada
 (`arquivo:linha`) e o **padrão de refatoração** recomendado por item. É a
-automação contínua da [Baseline de V&V manual](../../../docs/analysis/onion-vv-baseline-2026-06.md):
+automação contínua da Baseline de V&V manual (`onion-vv-baseline-2026-06`, core-only):
 em vez de auditar à mão, dispara uma orquestração e sintetiza.
 
 **Read-only sobre `.claude/`.** O comando **nunca muta `.claude/`**. Ele escreve em
@@ -249,5 +249,5 @@ regra da [Doutrina de Modernização](../../../docs/knowledge-base/concepts/onio
 - Doutrina de orquestração: [agent-orchestration.md](../../../docs/knowledge-base/concepts/agent-orchestration.md)
 - Composição: `/meta:kb-freshness` (D4) · `/meta:metaspec-validate` (D5) · `/meta:context-freshness` (D9)
 - Atuadores: `/meta:create-command|agent|skill|abstraction|knowledge-base`
-- Baseline manual que automatiza: [onion-vv-baseline-2026-06.md](../../../docs/analysis/onion-vv-baseline-2026-06.md)
+- Baseline manual que automatiza: `onion-vv-baseline-2026-06` (core-only)
 - Skill de fan-out: `onion-orchestration` · Meta-spec: [commands.md §10](../../../docs/meta-specs/commands.md)

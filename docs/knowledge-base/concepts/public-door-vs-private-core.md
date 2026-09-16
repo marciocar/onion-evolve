@@ -53,7 +53,7 @@ Verificado ao vivo via `gh` em 2026-07-19:
 
 1. **A fonte pode ser privada; a porta, não.** Adoção externa **nunca** deve depender de acesso ao
    core. Se o core é privado por design, a porta pública é **obrigatória** (ou a família assume, por
-   escrito, que só há adoção assistida via [`/meta:adopt`](../../../.claude/commands/meta/adopt.md)
+   escrito, que só há adoção assistida via `/meta:adopt`
    — o que é uma decisão, não um acidente).
 2. **A porta é derivação — cita/deriva, não é a fonte.** Um port público (destilação/espelho) segue
    [`fonte ≠ derivação`](source-vs-derivation.md): "uma só fonte". Publicar uma porta **não** é

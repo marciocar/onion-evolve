@@ -240,9 +240,9 @@ pnpm nx graph
 
 ## Next Steps
 
-- 📖 [Development Workflow](../guides/development-workflow.md)
-- 🏗️ [Project Structure](../architecture/components.md)
-- 🧪 [Running Tests](../guides/testing.md)
+- 📖 Development Workflow
+- 🏗️ Project Structure
+- 🧪 Running Tests
 ```
 
 ---

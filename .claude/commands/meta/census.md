@@ -62,5 +62,5 @@ rodapé — e recalibra o `price_per_node` da próxima invocação (atualize est
 
 - Extrator: `.claude/validation/kg-census-extract.sh` · Molde: `.claude/utils/census/census-workflow.mjs`
 - Selagem/listagem: `.claude/utils/census/census-seal.py` · Bancada: `run_census_extract_selftests`
-- Semântica do censo: `docs/analysis/backlog-real-2026-09.md` (1ª listagem) · calibração do juiz:
+- Semântica do censo: `backlog-real-2026-09` (core-only) (1ª listagem) · calibração do juiz:
   `docs/evolution/research/kg-freshness-dogfood-2026-08/calibration-gold-standard-2026-08-29.md`
