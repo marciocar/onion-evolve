@@ -2,7 +2,7 @@
 title: 'Resíduo — a guarda não olhava o transporte mais público que existe'
 date: 2026-09-16
 branch: docs/free-meta-factory-private-pointers
-reviewed_diff_sha256: e2b75895cb3b0e64c27be3ebdb208387ca4cf786ccd427f4f07b2665944fabf8
+reviewed_diff_sha256: 577c20e38b78945b373d6b86cc670d51d5ad29fe5bb1fc27edc0e51b8bfb2c13
 findings_total: 12
 findings_real: 11
 findings_fixed: 11
