@@ -25,12 +25,31 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
   Code para tirar vantagem da sua estrutura e maquinaria, **mas mantendo independência sempre que
   isso for mais vantajoso e o acoplamento não for necessidade***. Acople só quando a capacidade
   ganha não existe fora — nunca por conveniência nem por simetria.
-- **CORE ≠ FAMÍLIA** — estas linhas descrevem **este repo** (o core). Existe uma **família multi-IDE
-  pública e CONGELADA** (`onion`, `onion-cursor`, `onion-antigravity`, `onion-copilot`,
-  `onion-architect`, `onion-mini`, `onion-standalone`): material de curso e **prova de
-  portabilidade**, não linha de manutenção ativa. Sem esta distinção, quem lê conclui que os repos
-  públicos violam a doutrina — **conclusão errada, já cometida em 2026-08-02**. SSOT:
+- **CORE ≠ FAMÍLIA** — estas linhas descrevem **este repo** (o core). Existe uma **família
+  multi-IDE pública**, e ela tem **dois regimes**, não um:
+  - **CONGELADOS** (`onion`, `onion-cursor`, `onion-antigravity`, `onion-copilot`,
+    `onion-architect`, `onion-mini`, `onion-standalone`): material de curso e prova de
+    portabilidade, **não** linha de manutenção ativa.
+  - **LINHA VIVA** (`onion-codex`, decisão do maestro em **2026-09-16**): mantido, com gate
+    determinístico próprio (`.codex/validation/` + `Onion Validate (Codex)` no CI).
+  Sem esta distinção, quem lê conclui que os repos públicos violam a doutrina — **conclusão
+  errada, já cometida em 2026-08-02**. SSOT:
   `docs/onion/graph/onion-identity-2026-07.kg.yaml` (`C_CORE_NAO_E_FAMILIA`, `C_POSTURA_ACOPLAMENTO`)
+
+  > ⚠️ **`onion-codex` estava FORA desta lista até 2026-09-16, e a omissão custou.** Repo público,
+  > nome começando em `onion-` — a combinação exata que faz a REGRA 36 (Superfície VENDORIZADA sem
+  > nome comercial de cliente) não o enxergar, porque ela deriva termos do `members.yaml` e ignora
+  > o prefixo `onion-`. Doutrina que não lista um repo não o protege. (Ele também **não está** no
+  > `members.yaml`; registrar é ato de segurança, não burocracia — [[vendor-scrub-blind-spot]].)
+
+  > **Por que "linha viva" NÃO revoga o abandono do multi-IDE de 2026-05-18** (linha abaixo), e a
+  > diferença é de OBJETO: aquela decisão abandonou o **agnosticismo como direção de produto do
+  > core** — parar de gastar energia em portabilidade para poder usar recursos de fronteira. Manter
+  > **um** porte vivo é outra coisa: é **prova de portabilidade EXECUTÁVEL**, e ela se pagou no
+  > primeiro dia. Em 2026-09-16 o porte revelou um buraco que o core não via: a REGRA 3 (Campo
+  > model: restrito à allowlist sonnet|opus|haiku|fable) lê `model:` em **frontmatter** e não
+  > enxergaria `model = "gpt-5.4"` fixado em **TOML** — que foi o que quebrou o `@onion` lá. Um
+  > substrato diferente é o único lugar onde se descobre o que a guarda do core assume sem dizer.
 - Cobre **três dimensões peer** do ciclo: produto, engenharia, compliance/governança
 - **Workflows faseados retomáveis** com sessões persistentes — `product/collect→feature` (descoberta a backlog) e `engineer/plan→pr-update` (planejamento a entrega) são invariantes do framework, não devem ser consolidados
 - `.onion/` (estrutura agnóstica) e plano v4.0 FASES 5-9 (CLI standalone, multi-IDE, aprendizado contínuo) foram **formalmente abandonados em 2026-05-18**

@@ -755,7 +755,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.95
-    status: confirmed
+    status: superseded
     verified_at: 2026-08-02
     verified_against: leitura-do-CLAUDE.md-mais-gh-api
     label: "A DISTINCAO QUE FALTAVA NA DOUTRINA: CLAUDE.md:9-10 ('nao e distribuido publicamente' + 'Plataforma unica: Claude Code') descreve O CORE (onion-evolve) e e lido como descrevendo TUDO. A FAMILIA multi-IDE e outro objeto, com outro proposito (curso + prova de portabilidade) e outro ciclo de vida (CONGELADO). Sem a distincao escrita, quem le conclui violacao — foi exatamente o que esta sessao concluiu, errado, em 2026-08-02"
@@ -1009,7 +1009,23 @@ nodes:
     label: "RESPOSTA a Q_TESTEMUNHO_NAO_MEDIVEL_0804 (drive W9, 2026-09-02): SIM, precisam de marcador proprio — e ele existe: evidence_class: testimony (default ausente = measured). O radar para de tratar o testemunho como mensuravel (nao cobra STALE-OLD; verdict TESTIMONY; conta em linha propria), acusa relato SEM marcador (TESTIMONY-UNMARKED, so quando o alvo COMECA por relato- — o carimbo de censo que CITA o vocabulario nao e acusado, a classe guarda-por-vocabulario mordeu no 1o dogfood) e acusa testemunho que se diz PROD (MISPLANED: relato nao cruza com artefato vivo). O extrator do censo nao enfileira testemunho (74k tokens/no para concluir UNVERIFIABLE por construcao). Os 4 nos desta SSOT (E_ORIGEM_CURSOR_AGNOSTICO, E_PORTE_PARA_O_CURSO, D_CLAUDE_CODE_POR_CAPACIDADE, C_FATIAS_JA_TESTADAS) foram classificados e reclassificados PROD->DEV; E_FAMILIA_MULTIIDE_CONGELADA segue medido (fonte primaria gh-api; o relato apoia). Teto declarado: o marcador e opt-in — relato carimbado com alvo que NAO comece por relato- continua invisivel."
     trace: ".claude/validation/kg-radar.sh"
 
+  - id: D_FAMILIA_TEM_DOIS_REGIMES_2026_09
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    owner: maestro
+    verified_at: 2026-09-16
+    verified_against: "decisao do maestro em 2026-09-16 ('linha viva'), com o porte medido no mesmo dia: 0 scripts de guarda antes, 4 guardas + bancada 11/11 + gate no CI depois"
+    label: "SELADA PELO MAESTRO: a familia nao tem UM regime, tem DOIS. CONGELADOS (onion, onion-cursor, onion-antigravity, onion-copilot, onion-architect, onion-mini, onion-standalone) seguem como material de curso e prova de portabilidade. LINHA VIVA: `onion-codex`, mantido com gate determinístico proprio. DUAS CORRECOES DE FATO que esta decisao carrega. (1) `onion-codex` NUNCA ESTEVE na lista do CLAUDE.md — repo PUBLICO, prefixo `onion-`, e portanto invisivel a REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente), que deriva termos do members.yaml e ignora esse prefixo; doutrina que nao lista um repo nao o protege, e ele tambem nao esta no registro. (2) 'linha viva' NAO revoga o abandono do multi-IDE de 2026-05-18: aquilo abandonou o AGNOSTICISMO COMO DIRECAO DE PRODUTO DO CORE; manter UM porte vivo e prova de portabilidade EXECUTAVEL, outro objeto. E ela se pagou no primeiro dia: o porte revelou que a REGRA 3 (Campo model: restrito a allowlist sonnet|opus|haiku|fable) le `model:` em FRONTMATTER e nao enxergaria `model = \"gpt-5.4\"` fixado em TOML — o defeito que quebrou o @onion la. Substrato diferente e o unico lugar onde se descobre o que a guarda do core assume sem dizer."
+    trace: 'CLAUDE.md'
+
 edges:
+  - from: D_FAMILIA_TEM_DOIS_REGIMES_2026_09
+    to: C_CORE_NAO_E_FAMILIA
+    edge_type: SUPERSEDES
   - from: D_NORTHSTAR_NS1_KG
     to: Q_NORTHSTAR
     edge_type: SUPERSEDES
