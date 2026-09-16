@@ -221,7 +221,37 @@ nodes:
     verified_against: 'selado pelo maestro 2026-09-13 apos a simulacao com squash real: fechar sem codigo'
     label: "SELADO pelo maestro 2026-09-13: FECHAR SEM CODIGO. A guarda recomendada — comparar no CI do main a versao publicada com a do commit anterior — e REDUNDANTE: a protecao ja existe em duas camadas independentes (conflito do git + drift da REGRA 19 (Plugins de vertical (plugins/*) sincronizados com as fontes)), medidas em E_TETO_DA_VERSAO_E_SO_PROSA. Acrescentar mecanismo sem gatilho e o que esta casa evita. O que fica: um caso de bancada que PRENDE as duas barreiras, para que uma mudanca no formato da projecao nao remova a primeira em silencio."
 
+  - id: A_ANUNCIO_DERIVA_O_NUMERO_DA_MEDICAO
+    node_type: decision
+    plane: PROD
+    status: open
+    impact: 4
+    confidence: 0.95
+    owner: core
+    verified_at: '2026-09-16'
+    verified_against: 'sinal de campo de um adotante (2026-08-31), triado e re-medido em 2026-09-16: a metade do transporte JA FOI CURADA (co-deliver.sh:111 exige .claude/.onion-version com role adopted|hub); a metade do RELATO segue viva'
+    label: "A METADE VIVA DE UM SINAL CUJA OUTRA METADE JA FOI CURADA — registrada aqui para o arquivamento do sinal nao apagar o achado. O anuncio que viaja ao adotante AFIRMOU estado verificavel do repo dele ('as portas estao OK: nenhuma sem prefixo de bind') enquanto a catraca da MESMA leva tinha contado 38 exposicoes, e o relatorio DENTRO da propria branch dizia o numero certo. Dois artefatos da mesma leva, discordando: um dizia 0, o outro 38. O adotante que le so o anuncio — que e o unico documento que chega ANTES do merge — conclui que nao ha o que fazer, e a divida tolerada pela catraca fica tolerada para sempre porque ninguem foi avisado. O mesmo anuncio citava '3 fallbacks de senha' onde o padrao produzia 19 em 10 variaveis: quem aplicasse 'o fix de 3 linhas' curaria 16% da classe achando ter curado a classe. A CURA PROPOSTA pelo adotante, que e a certa: quando o /meta:co-announce descreve estado verificavel, DERIVAR o numero do artefato de medicao (baseline da catraca, saida do gate) em vez de reafirmar em prosa; e quando o numero nao estiver disponivel na geracao, dizer 'nao medido' em vez de afirmar o estado. Guarda barata que cabe junto: anuncio e relatorio da mesma leva nao podem discordar sobre uma contagem que ambos citam. Classe: declarado != medido, no unico artefato que viaja sozinho."
+    trace: '.claude/commands/meta/co-announce.md'
+
+  - id: A_PERNA_DE_LEITURA_DO_KG_E_CONSELHO
+    node_type: decision
+    plane: PROD
+    status: open
+    impact: 5
+    confidence: 0.95
+    owner: core
+    verified_at: '2026-09-16'
+    verified_against: 'medido no core: `grep -l "\.kg\.yaml" .claude/hooks/*.sh` = ZERO hooks; `grep -c review_after .claude/validation/kg-radar.sh` = 0'
+    label: "O GRAFO QUE NAO E LIDO E INDISTINGUIVEL DO GRAFO QUE NAO FOI ESCRITO — a frase e de um adotante, e ele a comprou com um dia de trabalho. Caso medido (sinal de 2026-09-11): a sessao leu 8.585 linhas de fonte em quatro frentes e publicou QUATRO teses erradas em sequencia, todas derrubadas por correcao do autor e nenhuma pelo metodo, num corpus que tinha a resposta em QUATRO NOS de um `.kg.yaml` que ele mesmo CITOU no proprio prompt — como checklist de conferencia, nunca como fonte. Nao foi falta de acesso nem de contexto: foi falta de MECANISMO. A doutrina anuncia a perna de leitura como mecanismo e ela e conselho (o proprio core ja se corrigiu no texto em 2026-08-16 e manteve o registro); o que faltava era alguem medir o preco, e agora esta medido. DUAS MEDICOES do core confirmam o diagnostico maior: `drifted` = 0 em 3.715 nos (o laco de reconciliacao esta construido e PARADO) e, das 20 arestas SUPERSEDES do corpus, 18 sao decisao->pergunta — ou seja o sistema quase so CONCLUI, quase nunca REVISA. ORDEM por retorno sobre custo, proposta pelo adotante e aceita: (1) ligar o hook de leitura — a classe ja existe e roda a todo commit, falta a fiacao; (2) o radar PARAR DE SAIR VERDE com grafo vencido (nao e feature, e parar de esconder: hoje so a REGRA 67 SOFT menciona, e quem roda o radar acha que esta em dia); (3) exigir o par desvio<->redesenho para o carimbo `drifted` valer algo; (4) gatilho por contradicao, o unico que precisa de desenho. E o que NAO fazer, tambem dele: nada nasce BLOQUEANDO (gate que impede trabalho e contornado com --no-verify na primeira sexta-feira, e ai se perde o mecanismo E a informacao) e nada por RELOGIO (review_after ja e um temporizador, esta em 16 grafos, e nao fez ninguem revisitar nada)."
+    trace: '.claude/hooks/'
+
 edges:
+  - from: A_PERNA_DE_LEITURA_DO_KG_E_CONSELHO
+    to: D_COMO_FECHAR_O_BURACO_78_82
+    edge_type: CONSTRAINS
+  - from: A_ANUNCIO_DERIVA_O_NUMERO_DA_MEDICAO
+    to: D_COMO_FECHAR_O_BURACO_78_82
+    edge_type: CONSTRAINS
   - from: E_W8_FECHAMENTO_FONTES
     to: W8_REAIS_EXECUTAVEIS
     edge_type: SUPPORTS

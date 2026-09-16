@@ -69,7 +69,8 @@ _KFP="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/kg-fixture-paths.sh"
 REPO_ROOT="$(cd "${1:-$(dirname "${BASH_SOURCE[0]}")/../..}" 2>/dev/null && pwd)" || {
   printf 'kg-trace-resolve: repo_root inválido\n' >&2; exit 2; }
 FORMAT=human
-for a in "$@"; do case "$a" in --format) : ;; tsv) FORMAT=tsv ;; --format=tsv) FORMAT=tsv ;; esac; done
+EMIT_INDEX=0; INDEX=""
+for a in "$@"; do case "$a" in --format) : ;; tsv) FORMAT=tsv ;; --format=tsv) FORMAT=tsv ;; --emit-index) EMIT_INDEX=1 ;; esac; done
 
 cd "${REPO_ROOT}"
 
@@ -129,6 +130,17 @@ while IFS= read -r g; do
     # A 3ª raiz (pai do grafo) NÃO se aplica quando o grafo está na raiz do repo: ali `..` sai
     # DO REPO. Medido: um `trace:` apontando para um repo-irmão resolvia verde na máquina do
     # maestro e vermelho no clone do CI — gate dependente de quem tem o quê no disco ao lado.
+    # ── ÍNDICE DE LEITURA (--emit-index) ──────────────────────────────────────────────────────
+    # O MESMO parser que julga a âncora emite o índice que o hook de leitura consome. Um segundo
+    # extrator de `trace:` seria a 2ª cópia da gramática — a classe que esta casa chama de dois
+    # leitores discordando sobre quem é nó (e que a REGRA 82 existe para pegar).
+    if [ "${EMIT_INDEX}" -eq 1 ]; then
+      if [ -e "${target}" ]; then INDEX="${INDEX}${target}	${nid}	${g}
+"
+      elif [ -e "${gdir}/${target}" ]; then INDEX="${INDEX}${gdir}/${target}	${nid}	${g}
+"
+      fi
+    fi
     if [ -e "${target}" ] || [ -e "${gdir}/${target}" ]; then continue; fi
     if [ "${gdir}" != "." ] && [ -e "${gdir}/../${target}" ]; then continue; fi
     MISSING=$((MISSING + 1))
@@ -193,6 +205,17 @@ if [ "${JUDGED}" -eq 0 ] && [ "$((SKIP_ABS + SKIP_EXT + SKIP_NOTPATH))" -eq 0 ];
   if printf '%s\n' "${GRAPHS}" | xargs -d '\n' grep -lE '^[[:space:]]+trace:' -- 2>/dev/null | grep -q .; then
     VACUO=1
   fi
+fi
+
+if [ "${EMIT_INDEX}" -eq 1 ]; then
+  # Falha FECHADA na vacuidade: índice vazio faria o hook de leitura ficar MUDO para sempre,
+  # e mudo é indistinguível de "não há grafo" — o fail-open exato que este índice existe para curar.
+  if [ "${VACUO}" -eq 1 ] || [ -z "${INDEX}" ]; then
+    echo "ERRO kg-trace-resolve --emit-index: índice VAZIO (parser leu 0 nós com trace resolvível)" >&2
+    exit 3
+  fi
+  printf '%s' "${INDEX}" | LC_ALL=C sort -u
+  exit 0
 fi
 
 if [ "${FORMAT}" = tsv ]; then

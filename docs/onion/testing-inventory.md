@@ -11,16 +11,16 @@
 
 | Dimensão | Nº | Produtor |
 |----------|---:|----------|
-| Famílias na bancada | **170** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
-| Sítios de asserção (**não** asserções executadas) | **1050** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
+| Famílias na bancada | **171** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
+| Sítios de asserção (**não** asserções executadas) | **1053** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
 | Linhas do manifesto de fixtures | **94** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
 | Arquivos de fixture rastreados | **136** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
-| Regras do lint | **82** | `bash .claude/validation/rules-registry.sh --counts` |
-| — das quais HARD | **73** | idem |
+| Regras do lint | **83** | `bash .claude/validation/rules-registry.sh --counts` |
+| — das quais HARD | **74** | idem |
 | — das quais SOFT | **22** | idem |
 | — HARD **e** SOFT (contadas nas duas) | **13** | idem |
-| Pares de modo consumido (REGRA 59) | **46** | `bash .claude/validation/consumed-mode-check.sh .` |
+| Pares de modo consumido (REGRA 59) | **47** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | idem |
 | Scripts de validação | **75** | `git ls-files '.claude/validation/*.sh'` |
 | Hooks | **15** | `git ls-files '.claude/hooks/*.sh'` |
@@ -33,7 +33,7 @@ Este arquivo conta o que **existe**. Quantas asserções de fato **passaram** é
 execução, vive em `docs/onion/metrics/selftest-runs.jsonl` (**2** envelope(s)
 coletado(s)) e é projetado em [`testing-state.md`](testing-state.md).
 
-A distinção não é formalismo. Há **1050** sítios estáticos de asserção e a última
+A distinção não é formalismo. Há **1053** sítios estáticos de asserção e a última
 execução completa contou **mais** que isso, porque sítio dentro de laço dispara N vezes.
 Publicar o número estático como "tamanho da bancada" trocaria uma defasagem por um erro de
 categoria — e foi por confundir os dois que `689 asserções` sobreviveu em três comentários
