@@ -107,3 +107,29 @@ catraca no lint pertence a esta lista.** Hoje são quatro (REGRAS 8, 21, 80, 81)
 leitura (REGRA 84, fora do laço por ser TSV em vez de markdown).
 
 Lint após a cura: **0 HARD**, 12 SOFT.
+
+---
+
+# Adendo 2 — a bancada do CI pegou o que a minha passada local não rodou
+
+O `selftest` do CI reprovou em `shell_pipefail_robustness` com **dois sítios novos da classe**, e
+os dois são meus:
+
+1. **`kg-read-leg.sh:50`** — `… | sort -u | head -8 | paste`. O `head` **fecha o pipe** ao atingir a
+   conta, o produtor a montante toma EPIPE e, sob `pipefail`, o status vira 141. Trocado por
+   `sed -n '1,8p'`, que **drena** a entrada até o fim — mesma saída, sem corrida.
+2. **`lint-selftest.sh`** — as minhas famílias novas usavam `printf '%s' "${out}" | grep -q …`
+   **17 vezes**, empurrando o contador da catraca de 41 para 43. Trocados por here-string
+   (`grep -q PAD <<< "$var"`): sem pipe, sem EPIPE.
+
+**É a terceira vez no mesmo dia que a classe `pipefail-epipe-early-closer` me pega** — antes no
+harness do porte Codex e nos filtros da REGRA 83 (Id de modelo VERSIONADO só na SSOT declarada).
+Nos três casos eu conhecia a classe e escrevi o defeito assim mesmo. Isso é dado sobre mim, não
+sobre a guarda: o padrão `produtor | grep -q` é o reflexo, e só a catraca o intercepta.
+
+E vale registrar por que o CI pegou e a minha passada local não: **eu rodei só as famílias que
+julguei afetadas.** A `shell_pipefail_robustness` varre o repo inteiro atrás da classe — ela é
+afetada por *qualquer* script novo, e eu não a tinha na lista. Rodar "as famílias afetadas" é uma
+heurística minha; a passada cheia do CI é que é o gate.
+
+Bancadas após a cura: `shell_pipefail_robustness` 3/3 · `kg_read_leg` + `model_ssot` 11/11.

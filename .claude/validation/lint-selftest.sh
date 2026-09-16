@@ -14228,7 +14228,7 @@ run_plugin_namespace_selftests() {
   # (a) o assembler CURA: mesmo-plugin e cross viram /<plugin>:<cmd>; dangling perde a barra; URL intacta
   bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe-a.manifest.sh" "${d}/src" "${d}/src/plugins/probe-a" >/dev/null 2>&1 || true
   out="$(cat "${d}/src/plugins/probe-a/commands/one.md" 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '`/probe-a:two`' && printf '%s' "${out}" | grep -q '`/probe-b:three`' && printf '%s' "${out}" | grep -q '`meta:adopt`' && printf '%s' "${out}" | grep -q 'https://x/meta:nao' && ! printf '%s' "${out}" | grep -q '/alpha:two'; then
+  if grep -q '`/probe-a:two`' <<< "${out}" && grep -q '`/probe-b:three`' <<< "${out}" && grep -q '`meta:adopt`' <<< "${out}" && grep -q 'https://x/meta:nao' <<< "${out}" && ! grep -q '/alpha:two' <<< "${out}"; then
     record_pass "plugin-namespace: (a) assembler reescreve mesmo-plugin+cross para /<plugin>:<cmd>, dangling sem barra, URL intacta"
   else record_fail "plugin-namespace: (a) cura" "$(printf '%s' "${out}" | grep -n 'alpha:two\|beta:three\|meta:adopt' | head -3 | tr '\n' ' ')"; fi
   # (b) README lista os comandos do core citados e não distribuídos
@@ -14242,7 +14242,7 @@ run_plugin_namespace_selftests() {
   # (d) MUTANTE: plugin editado à mão volta ao namespace do core → 3 classes, HARD
   printf 'Rode /alpha:two, /beta:three e /meta:adopt.\n' >> "${d}/src/plugins/probe-a/commands/one.md"
   out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
-  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 3 ] && printf '%s' "${out}" | grep -q 'mesmo-plugin' && printf '%s' "${out}" | grep -q 'cross-plugin' && printf '%s' "${out}" | grep -q 'dangling'; then
+  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 3 ] && grep -q 'mesmo-plugin' <<< "${out}" && grep -q 'cross-plugin' <<< "${out}" && grep -q 'dangling' <<< "${out}"; then
     record_pass "plugin-namespace: (d) mutante à mão → 3 HARD (mesmo-plugin, cross-plugin, dangling)"
   else record_fail "plugin-namespace: (d) mutante" "esperava 3 HARD: $(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   # (e) idempotência: re-montar produz o mesmo arquivo (a cura não acumula)
@@ -14334,7 +14334,7 @@ run_plugin_dead_link_selftests() {
   bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/dl.manifest.sh" "${d}/src" "${d}/src/plugins/dl" >/dev/null 2>&1 || true
   out="$(cat "${d}/src/plugins/dl/commands/one.md" 2>/dev/null)"
   # (a) a cura: a irmã embarcada (viva → kb/) segue link; a não-embarcada vira texto; URL intacta
-  if printf '%s' "${out}" | grep -q 'kb/viva.md' && printf '%s' "${out}" | grep -q ' morta ' && printf '%s' "${out}" | grep -q '\[url\](https://x/y.md)'; then
+  if grep -q 'kb/viva.md' <<< "${out}" && grep -q ' morta ' <<< "${out}" && grep -q '\[url\](https://x/y.md)' <<< "${out}"; then
     record_pass "plugin-dead-link: (a) assembler: irmã embarcada mantém link, não-embarcada vira texto, URL intacta"
   else record_fail "plugin-dead-link: (a) cura" "$(printf '%s' "${out}" | tail -1 | cut -c1-200)"; fi
   # (b) modo consumido: --format tsv vazio no plugin curado
@@ -14345,7 +14345,7 @@ run_plugin_dead_link_selftests() {
   printf 'De novo: [morta](../kb/morta.md)\n' >> "${d}/src/plugins/dl/commands/one.md"
   mkdir -p "${d}/src/plugins/dl/templates"; printf '[gera](../docs/x.md)\n' > "${d}/src/plugins/dl/templates/t.md"
   out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
-  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 1 ] && printf '%s' "${out}" | grep -q 'morta.md'; then record_pass "plugin-dead-link: (c) mutante → 1 HARD; templates/ fora por desenho"
+  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 1 ] && grep -q 'morta.md' <<< "${out}"; then record_pass "plugin-dead-link: (c) mutante → 1 HARD; templates/ fora por desenho"
   else record_fail "plugin-dead-link: (c) mutante" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
   rm -rf "${d}"
@@ -14362,7 +14362,7 @@ run_marketplace_root_sync_selftests() {
   printf '{\n  "name": "probe-mkt",\n  "owner": { "name": "t" },\n  "plugins": []\n}\n' > "${d}/r/.claude-plugin/marketplace.json"
   # (a) stale → HARD (modo consumido --format tsv)
   out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '^HARD	desatualizado'; then record_pass "marketplace-root-sync: (a) marketplace.json stale → HARD"
+  if grep -q '^HARD	desatualizado' <<< "${out}"; then record_pass "marketplace-root-sync: (a) marketplace.json stale → HARD"
   else record_fail "marketplace-root-sync: (a)" "$(printf '%s' "${out}" | cut -c1-200)"; fi
   # (b) --write regenera com top-level preservado → limpo
   bash "${h}" "${d}/r" --write >/dev/null 2>&1
@@ -14400,12 +14400,12 @@ run_plugin_deps_contract_selftests() {
   # (c) mutante 1: some a declaração → skill de outro plugin sem REQUIRES_PLUGINS = HARD; menção de comando = SOFT
   printf 'PLUGIN_NAME="onion-x"\nCOMMANDS=(.claude/commands/alpha)\n' > "${d}/src/.claude/utils/marketplace/verticals/onion-x.manifest.sh"
   out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '^HARD	dependencia-nao-declarada'; then record_pass "plugin-deps-contract: (c) skill de outro plugin sem REQUIRES_PLUGINS → HARD"
+  if grep -q '^HARD	dependencia-nao-declarada' <<< "${out}"; then record_pass "plugin-deps-contract: (c) skill de outro plugin sem REQUIRES_PLUGINS → HARD"
   else record_fail "plugin-deps-contract: (c) mutante" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   # (d) mutante 2: conhecimento duplicado (a mesma skill nos dois plugins) → HARD duplicado
   mkdir -p "${d}/src/plugins/onion-x/skills/orch"; cp "${d}/src/plugins/onion/skills/orch/SKILL.md" "${d}/src/plugins/onion-x/skills/orch/SKILL.md"
   out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '^HARD	duplicado'; then record_pass "plugin-deps-contract: (d) skill duplicada em 2 plugins → HARD duplicado"
+  if grep -q '^HARD	duplicado' <<< "${out}"; then record_pass "plugin-deps-contract: (d) skill duplicada em 2 plugins → HARD duplicado"
   else record_fail "plugin-deps-contract: (d) duplicado" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
   rm -rf "${d}"
@@ -16491,7 +16491,7 @@ run_kg_read_leg_selftests() {
 
   # (a) arquivo COBERTO por nó → o hook fala, e diz QUAL nó
   out="$(printf '{"tool_input":{"file_path":"%s/src/alvo.ts"}}' "${sb2}" | bash "${h}" 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q 'C_NO_QUE_FALA'; then
+  if grep -q 'C_NO_QUE_FALA' <<< "${out}"; then
     record_pass "kg-read-leg: (a) arquivo com nó → avisa e nomeia o id"
   else record_fail "kg-read-leg: (a)" "não avisou sobre arquivo coberto (saída: ${out:0:120})"; fi
 
@@ -16527,7 +16527,7 @@ run_kg_read_leg_selftests() {
   printf 'meta:\n  id: g\n  schema_version: "1"\nnodes:\n  - id: C_X\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: x\n    trace: "src/alvo.ts"\nedges: []\n' > "${sbi}/docs/onion/graph/g.kg.yaml"
   ( cd "${sbi}" && git init -q . && git add -A ) >/dev/null 2>&1
   out="$(bash "${sbi}/.claude/validation/kg-trace-resolve.sh" "${sbi}" --emit-index 2>&1 || true)"
-  if printf '%s' "${out}" | grep -q '^src/alvo.ts	C_X	'; then
+  if grep -q '^src/alvo.ts	C_X	' <<< "${out}"; then
     record_pass "kg-read-leg: (f) --emit-index emite o par alvo→nó (modo consumido, REGRA 59)"
   else record_fail "kg-read-leg: (f)" "--emit-index não emitiu o par (saída: ${out:0:140})"; fi
 
