@@ -2,7 +2,7 @@
 title: 'Resíduo — o pré-voo media a coisa adjacente, e por isso a falha chegava muda'
 date: 2026-09-16
 branch: fix/review-preflight-exercises-real-path
-reviewed_diff_sha256: PENDENTE
+reviewed_diff_sha256: cfb5893193b8980225959fff631415680661a08e306a18891d16885fae3caf51
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
