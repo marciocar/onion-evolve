@@ -2,7 +2,7 @@
 title: 'Resíduo — promover ADRs ao knowledge-base publicou 32 nomes que eu não tinha visto'
 date: 2026-09-16
 branch: docs/promote-adrs-to-knowledge-base
-reviewed_diff_sha256: PENDENTE
+reviewed_diff_sha256: 779ff6e575e9029154aa82e9ef0a7a31116bb46534c8aa4fe10bc5c7305899f9
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
