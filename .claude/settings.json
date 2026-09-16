@@ -136,6 +136,15 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-merge-gate.sh\""
           }
         ]
+      },
+      {
+        "matcher": "Read",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/kg-read-leg.sh\""
+          }
+        ]
       }
     ],
     "PreModelSwitch": [
