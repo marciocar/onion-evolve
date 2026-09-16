@@ -88,8 +88,13 @@ if isinstance(doc, dict):
         members = []
 
     ROLES = {"source", "hub", "standalone", "consumer"}
-    KINDS = {"source", "adopter", "distillation", "door", "method"}
-    NONVENDOR = {"distillation", "method"}       # onion_version: n/a
+    # `port` entrou em 2026-09-16 com o registro do onion-codex. Ele NÃO é `distillation`:
+    # destilação é reescrita curada da MESMA doutrina no MESMO substrato; porte é TRADUÇÃO para
+    # OUTRO substrato (aqui, `.codex/` + `.agents/skills/` no lugar de `.claude/`). Chamar porte
+    # de destilação economizaria uma linha e mentiria sobre o objeto — e é justamente por
+    # vocabulário, não por lógica, que guarda de lista falha.
+    KINDS = {"source", "adopter", "distillation", "door", "method", "port"}
+    NONVENDOR = {"distillation", "method", "port"}       # onion_version: n/a (não vendoriza .claude/)
     VENDOR = {"adopter", "door"}                 # pin real obrigatório
     TRUST_LISTS = ("can_receive_from", "can_advise_to", "can_correct_to",
                    "diary_readable_by", "exposes_downstream")

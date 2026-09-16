@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**81 regras** no total — **72 HARD**, **22 SOFT**.
+**82 regras** no total — **73 HARD**, **22 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -108,6 +108,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 76 | marketplace.json da raiz é projeção do gerador | HARD | .claude-plugin/marketplace.json envelhecendo calado (o core também é marketplace instalável) |
 | 80 | Números do harness saem de SSOT gerada, nunca de comentário | HARD | contagem sobre o próprio harness escrita à mão, que envelhece calada e é citada como medição |
 | 81 | Painel de estado é GERADO dos produtores, nunca redigido | HARD | painel de testes com número sem produtor — metas redesenhadas como medição, que foi o defeito real deste repo |
+| 83 | Id de modelo VERSIONADO só na SSOT declarada | HARD | versão literal de modelo espalhada por config, que caduca sem aviso |
 
 ## KG & proveniência
 

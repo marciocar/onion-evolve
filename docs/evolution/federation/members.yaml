@@ -267,6 +267,35 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  # PORTE PARA OUTRO SUBSTRATO (não adotante, não destilação) — o Onion traduzido para OpenAI Codex
+  # (`.codex/` + `.agents/skills/` no lugar de `.claude/`). REGISTRADO em 2026-09-16, e o registro é
+  # ATO DE SEGURANÇA, não burocracia: repo PÚBLICO cujo nome começa em `onion-` é invisível à
+  # REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente), que deriva termos do próprio
+  # members.yaml e ignora esse prefixo. Ficou 3 meses público e fora de qualquer varredura.
+  # LINHA VIVA por decisão do maestro (2026-09-16) — é o único porte mantido; os demais da família
+  # seguem congelados. Justificativa medida: no primeiro dia de manutenção ele revelou um buraco do
+  # core (a REGRA 3 lê `model:` em frontmatter e não enxerga `model = "..."` em TOML).
+  - id: onion-codex
+    name: onion-codex (porte para OpenAI Codex — prova de portabilidade EXECUTÁVEL, linha viva)
+    role: standalone            # T3 — deriva do core sem vendorizar .claude/
+    kind: port          # TRADUCAO de substrato (.codex/ + .agents/skills/); onion_version: n/a — NAO vendoriza
+    parent: onion-evolve
+    remote: github.com/marciocar/onion-codex   # PÚBLICO
+    local_path: "/home/marcio/onion-codex-main"   # clonado 2026-09-16; o sufixo -main vem do nome do diretório, não de branch
+    onion_version: n/a          # sem stamp: porte reescreve o substrato, não copia .claude/
+    adopted_at: 2026-06-04      # data do cut-over Claude Code → Codex
+    mode: distilled             # anotação livre; o trust engine só valida role
+    personality_summary: "O Onion falando Codex: AGENTS.md como constituição, subagentes em .codex/agents/*.toml e invocáveis em .agents/skills/. Mantido como PROVA DE PORTABILIDADE EXECUTÁVEL — o valor não é ter dois repos, é que um substrato diferente revela o que a guarda do core assume sem dizer."
+    specializations: [substrate-port, openai-codex, portability-proof, deterministic-guards]
+    personality_last_sync: 2026-09-16
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
   # BRAÇO DE PESQUISA (não adotante-produto) — dogfood do MÉTODO KG SDAAL num cérebro de vida N=1.
   # Federado 2026-07-14 (F3-lite: ponteiro de membro; o KG bruto é PRIVADO, nunca sai). Caveat intra-órbita
   # segue north-star: prova o MÉTODO, não o MERCADO (Q_COLD_ADOPTER aberto; Marcio = centro da órbita).

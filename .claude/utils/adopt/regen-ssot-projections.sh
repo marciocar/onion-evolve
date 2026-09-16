@@ -34,7 +34,14 @@ mkdir -p "${DEST}/docs/onion" || { echo "ERRO: não consegui criar '${DEST}/docs
 [ -d "${DEST}/docs/onion" ] || { echo "ERRO: '${DEST}/docs/onion' não é diretório" >&2; exit 3; }
 
 _n=0 _vazias=""
-for _pair in "inventory.sh:inventory.md" "graph.sh:graph.md"; do
+# ⚠️ A LISTA ERA CURTA DEMAIS, e o preço foi medido em 2026-09-16: `testing-state.md` (REGRA 81)
+# ficou de fora e a catraca reprovou o CI QUATRO VEZES no mesmo dia, sempre pela mesma causa — eu
+# regenerava o painel numa branch, abria outra a partir de main e ele nascia defasado de novo.
+# Quatro repetições da mesma correção é a definição de defeito que devia ser mecanismo: a doutrina
+# desta casa diz que erro recorrente vira REGISTRO com cura anexada, não disciplina de quem lembra.
+# Toda projeção GERADA que tenha catraca no lint pertence a esta lista — quem acrescentar uma guarda
+# de projeção nova e esquecer daqui vai pagar o mesmo pedágio.
+for _pair in "inventory.sh:inventory.md" "graph.sh:graph.md" "testing-state.sh:testing-state.md"; do
   _gen="${_pair%%:*}"; _out="${_pair##*:}"
   [ -f "${DEST}/.claude/validation/${_gen}" ] || continue
   bash "${DEST}/.claude/validation/${_gen}" --markdown > "${DEST}/docs/onion/${_out}" 2>/dev/null || true

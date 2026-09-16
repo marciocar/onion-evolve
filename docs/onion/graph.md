@@ -550,6 +550,15 @@ onion-arthur	specialization	greenfield-adoption
 onion-arthur	specialization	storytelling	
 onion-arthur	tier	standalone	
 onion-arthur	trust-advises	onion-evolve	
+onion-codex	adopts	onion-evolve	
+onion-codex	mode	distilled	
+onion-codex	pin	n/a	
+onion-codex	specialization	deterministic-guards	
+onion-codex	specialization	openai-codex	
+onion-codex	specialization	portability-proof	
+onion-codex	specialization	substrate-port	
+onion-codex	tier	standalone	
+onion-codex	trust-advises	onion-evolve	
 onion-compliance	loads	when:build -> resolve:compliance-context (skill onion-compliance-context)	
 onion-compliance	loads	when:framework=iso27001 -> template:compliance_iso27001_template.md	
 onion-compliance	loads	when:framework=soc2 -> template:compliance_soc2_template.md	
