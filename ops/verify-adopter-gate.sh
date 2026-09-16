@@ -96,7 +96,13 @@ trap cleanup EXIT
 git read-tree HEAD >/dev/null 2>&1 || true   # índice temporário parte do HEAD
 printf 'sonda do gate — apagada automaticamente\n' > "$PROBE"
 git add "$PROBE" >/dev/null 2>&1
-SAIDA="$(git -c commit.gpgsign=false commit -m "chore: onion gate probe (descartável)" 2>&1)"
+# ⚠️ IDENTIDADE EXPLÍCITA no commit-sonda — medido no CI em 2026-09-15. Sem `user.email`/`user.name`
+# o git RECUSA o commit antes de chamar o hook, e o verificador conclui "o hook não executou" quando
+# o que faltou foi CONFIGURAÇÃO. Num runner de CI limpo (sem git global) isso torna o passo de
+# BLOQUEIO ineludível: ele nunca é alcançado, e o caso da bancada que o exercita PULA — o que, em
+# modo STRICT, reprova (e reprova certo: guarda que não roda no CI é guarda que não existe).
+# A identidade é do SONDA e morre com ele (`-c`, não `config`): não toca a configuração do alvo.
+SAIDA="$(git -c commit.gpgsign=false -c user.email=onion-gate-probe@local -c user.name='Onion Gate Probe' commit -m "chore: onion gate probe (descartável)" 2>&1)"
 RC=$?
 [ "$RC" -eq 0 ] && CRIOU_COMMIT=1
 
