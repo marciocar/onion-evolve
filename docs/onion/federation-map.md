@@ -12,6 +12,7 @@ flowchart TD
   gustavo_pulga["gustavo-pulga<br/>standalone · greenfield"]:::standalone
   onion_mini["onion-mini<br/>standalone · distilled"]:::standalone
   onion_standalone["onion-standalone<br/>standalone · greenfield"]:::standalone
+  onion_codex["onion-codex<br/>standalone · distilled"]:::standalone
   marcio_pessoal["marcio-pessoal<br/>standalone · regulated"]:::standalone
   onion_pedro["onion-pedro<br/>standalone · greenfield"]:::standalone
   onion_arthur["onion-arthur<br/>standalone · greenfield"]:::standalone
@@ -28,6 +29,7 @@ flowchart TD
   gustavo_pulga -->|adopts| onion_evolve
   onion_mini -->|adopts| onion_evolve
   onion_standalone -->|adopts| onion_evolve
+  onion_codex -->|adopts| onion_evolve
   marcio_pessoal -->|adopts| onion_evolve
   onion_pedro -->|adopts| onion_evolve
   onion_arthur -->|adopts| onion_evolve
@@ -53,6 +55,7 @@ flowchart TD
 | gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `c9eb2c40bc3b` |
 | onion-mini | standalone | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
 | onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `514dda85833a` |
+| onion-codex | standalone | distilled | substrate-port, openai-codex, portability-proof, deterministic-guards | `n/a` |
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |
 | onion-pedro | standalone | greenfield | field-dogfood, greenfield-adoption, compliance | `165e1e13b11f` |
 | onion-arthur | standalone | greenfield | greenfield-adoption, design, branding, storytelling | `165e1e13b11f` |

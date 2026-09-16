@@ -29,6 +29,10 @@ permissions:
 
 jobs:
   diagnose:
+    # SSOT do modelo — a MESMA chave do onion-review.yml. Diagnosticar com modelo
+    # DIFERENTE do que o revisor usa é diagnosticar outro sistema.
+    env:
+      REVIEW_MODEL: claude-sonnet-5
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: ${{ github.event.pull_request.head.repo.fork == false || github.event_name == 'workflow_dispatch' }}
@@ -74,7 +78,7 @@ jobs:
             -H "x-api-key: ${KEY}" \
             -H "anthropic-version: 2023-06-01" \
             -H "content-type: application/json" \
-            -d '{"model":"claude-sonnet-5","max_tokens":16,"messages":[{"role":"user","content":"responda apenas: ok"}]}' 2>&1)"
+            -d "{\"model\":\"${REVIEW_MODEL}\",\"max_tokens\":16,\"messages\":[{\"role\":\"user\",\"content\":\"responda apenas: ok\"}]}" 2>&1)"
           rc=$?
           http="${code%% *}"; secs="${code##* }"
           # Só metadados do erro — NUNCA o corpo inteiro, nunca a chave.
@@ -109,7 +113,7 @@ jobs:
           code="$(curl -sS -o "${body}" --max-time 60 -w '%{http_code} %{time_total}' \
             https://api.anthropic.com/v1/messages \
             -H "x-api-key: ${limpa}" -H "anthropic-version: 2023-06-01" -H "content-type: application/json" \
-            -d '{"model":"claude-sonnet-5","max_tokens":16,"messages":[{"role":"user","content":"ok"}]}' 2>&1)"
+            -d "{\"model\":\"${REVIEW_MODEL}\",\"max_tokens\":16,\"messages\":[{\"role\":\"user\",\"content\":\"ok\"}]}" 2>&1)"
           http="${code%% *}"; secs="${code##* }"
           etype="$(jq -r '.error.type // "—"' "${body}" 2>/dev/null || echo '—')"
           echo "normalizada → http=${http} tempo=${secs}s tipo=${etype}"

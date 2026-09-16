@@ -1999,6 +1999,74 @@ check_context_freshness_stamp() {
   done
 }
 
+
+# ===========================================================================
+# REGRA 83 — Id de modelo VERSIONADO só na SSOT declarada [HARD]
+# previne: versão literal de modelo espalhada por config, que caduca sem aviso
+#   CONTRA-FLUXO DO PORTE (2026-09-16). Esta REGRA não nasceu aqui: nasceu no porte
+#   Codex, e o core não a tinha. Lá, `model = "gpt-5.4"` estava fixado em `config.toml`
+#   e em 47 agentes; quando a OpenAI mudou o lineup, o `@onion` PAROU DE INICIAR — o
+#   modelo do perfil não existia mais para a conta. A REGRA 3 (Campo model: restrito à
+#   allowlist sonnet|opus|haiku|fable) cobre o frontmatter de comando/agente e resolveria
+#   o caso se ele fosse `model:` em markdown; ela NÃO enxerga `model =` em TOML, nem
+#   `"model":` num payload JSON, nem uma variável de workflow. O buraco só apareceu porque
+#   existe um substrato diferente para pisar nele — é literalmente o que uma prova de
+#   portabilidade serve para fazer.
+#
+#   O QUE ELA COBRA: id de modelo com VERSÃO (claude-sonnet-5, gpt-5.4, gemini-3-1…) em
+#   arquivo de CONFIGURAÇÃO/EXECUÇÃO da superfície que viaja, fora das SSOTs declaradas.
+#   O que NÃO cobra, e a fronteira é deliberada:
+#     · PROSA/KB que documenta o panorama de modelos (agent-orchestration.md cita 24 —
+#       é documentação de catálogo de terceiro, não configuração nossa; frescor dali é
+#       assunto da REGRA 42 (Gate de FRESCOR DOUTRINÁRIO, com catraca));
+#     · COMENTÁRIO (`#`) — registro histórico de medição não é pin;
+#     · FIXTURE de bancada — dado de teste precisa do literal para testar o literal.
+#   Sem esses três recortes a guarda acusaria 5 sítios legítimos e 1 real, e guarda que
+#   grita no inócuo ensina a ser ignorada.
+#
+#   SSOTs DECLARADAS (o literal PODE viver aqui, e só aqui):
+#     · .claude/settings.json → fallbackModel  (projeção da escada; REGRA 70)
+#     · env REVIEW_MODEL nos workflows de review (uma chave, lida pelas chamadas)
+# ===========================================================================
+check_model_version_fora_da_ssot() {
+  local f hit n
+  while IFS= read -r f; do
+    case "${f}" in
+      */fixtures/*|*lint-selftest.sh|*review-verdict.sh) continue ;;
+      */settings.json) continue ;;   # SSOT declarada (fallbackModel, REGRA 70)
+    esac
+    # ⚠️ A VARIÁVEL DO `read` TEM DE SER A MESMA DO CORPO. Medido 2026-09-16: o rename que curou
+    # a REGRA 60 (Identificador de código em INGLÊS) trocou o corpo e ESQUECEU o `read`, e sob
+    # `set -u` o lint MORREU nesta linha — em silêncio para quem só olhava o sumário, porque a
+    # morte aconteceu no meio e as guardas seguintes nem rodaram. A bancada pegou; o olho, não.
+    while IFS= read -r hit; do
+      n="${hit%%:*}"; hit="${hit#*:}"
+      # ⚠️ SEM PIPE NOS FILTROS, e a razão é medida: `printf "$x" | grep -q P && continue` sob
+      # `pipefail` é a classe `pipefail-epipe-early-closer` — o `grep -q` fecha cedo, o `printf`
+      # leva EPIPE, o status do pipeline vira 141 e o `&& continue` NÃO DISPARA. O filtro existe,
+      # parece correto, e não filtra nada: os dois casos de falso-positivo da bancada reprovaram
+      # exatamente assim. Casamento de padrão do próprio bash não abre processo nem pipe.
+      # comentário (shell/yaml/toml) não é configuração — é registro histórico de medição
+      case "${hit}" in [[:space:]]*\#*|\#*) continue ;; esac
+      # a própria declaração da SSOT é o lugar onde o literal DEVE morar
+      case "${hit}" in *REVIEW_MODEL*:*) continue ;; esac
+      violation "HARD" "${f#"${REPO_ROOT}/"}:${n}" "REGRA 83 (Id de modelo VERSIONADO só na SSOT declarada): versão literal de modelo em configuração, fora da SSOT — ela caduca sem aviso e o agente PARA DE INICIAR quando o lineup muda (medido no porte Codex, 2026-09-16). Aponte para a SSOT (env REVIEW_MODEL / fallbackModel) em vez de repetir o literal."
+      # ⚠️ O PADRÃO FOI CALIBRADO CONTRA AS FORMAS REAIS, e a 1ª redação não casava NENHUMA.
+      # Ela exigia dois grupos numéricos (`-[a-z0-9]+-?[0-9]+`) e morria em `gpt-5.4`, porque ali
+      # o segundo grupo é `.4`, não `-4`. A bancada pegou — com a guarda escrita, plugada e
+      # "verde", que é o pior estado possível: cobertura declarada e nula. Formas que ela PRECISA
+      # casar, todas medidas neste repo: gpt-5.4 · claude-sonnet-5 · claude-opus-5 ·
+      # claude-fable-5-1 · claude-haiku-4-5-20251001 · "model":"..." em payload JSON.
+    done < <(grep -nE '(model|MODEL)[^A-Za-z0-9]{0,6}[:=][^A-Za-z]{0,6}"?(claude|gpt|gemini|llama)-[a-z0-9.-]*[0-9]' "${f}" || true)
+  # ⚠️ `_find`, NUNCA `find` cru — e isto custou uma reprovação da bancada. O helper poda
+  # `.claude/worktrees/` (worktrees git locais, gitignored) e respeita `--only`; um `find` cru
+  # varre os worktrees e acusa o LINT DE OUTRA BRANCH como se fosse artefato deste repo. O
+  # próprio `_find` documenta essa poda em dez linhas, e eu a reintroduzi ao duplicar a varredura
+  # em vez de reusar o helper. Guarda nova que abre sua própria varredura herda zero calibração.
+  done < <(_find "${REPO_ROOT}/.claude" "${REPO_ROOT}/.github/workflows" -type f \
+             \( -name '*.toml' -o -name '*.json' -o -name '*.yml' -o -name '*.yaml' -o -name '*.sh' \) -print 2>/dev/null || true)
+}
+
 # ===========================================================================
 # REGRA 16 — Contagem de inventário-TOTAL divergente da SSOT [SOFT]
 # previne: contagem-TOTAL do inventário divergindo da SSOT
@@ -3771,6 +3839,7 @@ check_no_direct_provider_calls
 check_abstraction_methods_exist
 check_context_freshness_stamp
 check_inventory_total_drift
+check_model_version_fora_da_ssot
 check_frontmatter_scalar_colon
 check_no_claude_docs
 check_evolution_links

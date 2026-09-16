@@ -16427,6 +16427,53 @@ run_site_derivation_selftests() {
   rm -rf "${sb2}"
 }
 
+
+# ── REGRA 83 (Id de modelo VERSIONADO só na SSOT declarada) ────────────────────────────────────
+# A guarda nasceu do CONTRA-FLUXO do porte Codex (2026-09-16): lá `model = "gpt-5.4"` fixado em
+# config parou o agente quando o lineup mudou, e o core não tinha guarda que enxergasse isso —
+# a REGRA 3 lê `model:` em frontmatter, não `model =` em TOML nem `"model":` em payload JSON.
+# Os casos (c) e (d) são os que dão VALOR à guarda: sem eles ela acusaria comentário histórico e
+# a própria SSOT, e guarda que grita no inócuo ensina a ser ignorada.
+run_model_ssot_selftests() {
+  local sb2 out rc
+  sb2="$(mktemp -d)"
+  cp -a "${SANDBOX}/.claude" "${sb2}/.claude"
+  cp "${SANDBOX}/CLAUDE.md" "${sb2}/CLAUDE.md" 2>/dev/null || printf '# stub\n' > "${sb2}/CLAUDE.md"
+  mkdir -p "${sb2}/.github/workflows"
+
+  # (a) MUTANTE: pin de versão em config TOML — a forma exata que quebrou o porte
+  # ⚠️ `--only` aponta para o PRÓPRIO mutante, não para o CLAUDE.md: a guarda varre via `_find`,
+  # que respeita o escopo. Apontar para fora das raízes faria a bancada medir o ESCOPO em vez da
+  # GUARDA — e passar por vacuidade, que é o modo de falha que esta bancada existe para impedir.
+  printf 'model = "gpt-5.4"\n' > "${sb2}/.claude/pin.toml"
+  rc=0; out="$(bash "${sb2}/.claude/validation/lint-artifacts.sh" --only="${sb2}/.claude/pin.toml" 2>&1)" || rc=$?
+  if grep -q 'REGRA 83' <<< "${out}"; then record_pass "model-ssot: (a) pin em TOML → HARD"
+  else record_fail "model-ssot: (a)" "pin em TOML não acusou (rc=${rc})"; fi
+  rm -f "${sb2}/.claude/pin.toml"
+
+  # (b) MUTANTE: o mesmo pin em payload JSON dentro de workflow — outra FORMA, mesmo defeito
+  printf 'jobs:\n  x:\n    steps:\n      - run: |\n          curl -d \x27{"model":"claude-sonnet-5"}\x27\n' \
+    > "${sb2}/.github/workflows/pin.yml"
+  rc=0; out="$(bash "${sb2}/.claude/validation/lint-artifacts.sh" --only="${sb2}/.github/workflows/pin.yml" 2>&1)" || rc=$?
+  if grep -q 'REGRA 83' <<< "${out}"; then record_pass "model-ssot: (b) pin em payload JSON de workflow → HARD"
+  else record_fail "model-ssot: (b)" "pin em JSON não acusou (rc=${rc})"; fi
+  rm -f "${sb2}/.github/workflows/pin.yml"
+
+  # (c) COMENTÁRIO não é pin — é registro histórico de medição, e apagá-lo destruiria evidência
+  printf '# medido: model=claude-sonnet-5 respondeu HTTP 200 fora do CI\n' > "${sb2}/.github/workflows/nota.yml"
+  rc=0; out="$(bash "${sb2}/.claude/validation/lint-artifacts.sh" --only="${sb2}/.github/workflows/nota.yml" 2>&1)" || rc=$?
+  if grep -q 'REGRA 83' <<< "${out}"; then record_fail "model-ssot: (c)" "acusou COMENTÁRIO (falso-positivo)"
+  else record_pass "model-ssot: (c) comentário histórico NÃO é pin"; fi
+  rm -f "${sb2}/.github/workflows/nota.yml"
+
+  # (d) A PRÓPRIA SSOT é onde o literal DEVE morar — acusá-la seria exigir que ele não exista
+  printf 'jobs:\n  x:\n    env:\n      REVIEW_MODEL: claude-sonnet-5\n' > "${sb2}/.github/workflows/ssot.yml"
+  rc=0; out="$(bash "${sb2}/.claude/validation/lint-artifacts.sh" --only="${sb2}/.github/workflows/ssot.yml" 2>&1)" || rc=$?
+  if grep -q 'REGRA 83' <<< "${out}"; then record_fail "model-ssot: (d)" "acusou a própria declaração da SSOT"
+  else record_pass "model-ssot: (d) a declaração da SSOT é o lugar legítimo do literal"; fi
+  rm -rf "${sb2}"
+}
+
 _family run_hook_autofix_selftests
 _family run_kg_reverify_schema_selftests
 _family run_backtick_ref_selftests
@@ -16453,6 +16500,7 @@ _family run_rules_registry_selftests
 _family run_onion_version_tracked_selftests
 _family run_hub_role_guard_selftests
 _family run_inventory_adopter_scope_selftests
+_family run_model_ssot_selftests
 _family run_family_topology_selftests
 _family run_decouple_source_selftests
 _family run_kg_view_selftests
