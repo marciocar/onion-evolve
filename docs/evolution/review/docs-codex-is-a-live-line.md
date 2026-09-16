@@ -2,7 +2,7 @@
 title: 'Resíduo — a doutrina não listava um repo público, e por isso não o protegia'
 date: 2026-09-16
 branch: docs/codex-is-a-live-line
-reviewed_diff_sha256: 95756dd8cc6f0944301ef3dd19ef0825def74b4de013324f0cadb16631a71919
+reviewed_diff_sha256: 9be59d6d0a0b73c07b262d92b86ea2e7a9701e930461cb52348568758ad37770
 findings_total: 10
 findings_real: 10
 findings_fixed: 10
