@@ -11,7 +11,7 @@ related:
   - inbox/_processed/2026-06-19-sinal-adocao-a0fdf35.md (adotante é cego / silêncio≠consentimento)
   - inbox/_processed/2026-06-19-flow-a-report-and-bidirectional-mail.md (you-have-mail bidirecional)
   - inbox/_processed/2026-06-24-sinal-branching-trunk-based-vs-develop.md (onde vive o canal)
-  - docs/analysis/onion-adr-comms-transport-vs-execution-2026-06.md (ADR 3-atos)
+  - ../../../knowledge-base/decisions/onion-adr-comms-transport-vs-execution-2026-06.md (ADR 3-atos)
 ---
 
 # Sinal de campo ao maestro principal — mecânica de transporte do regime manual (2026-06-25)

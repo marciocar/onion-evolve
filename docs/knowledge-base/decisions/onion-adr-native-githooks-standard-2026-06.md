@@ -25,10 +25,10 @@ related:
 
 ## Contexto
 
-A adoção do `rhilo-metagamify` (legacy, 2026-06-27) bateu num atrito reproduzível: o projeto usa
+A adoção de um adotante legacy (2026-06-27) bateu num atrito reproduzível: o projeto usa
 **husky v8 + lint-staged**, e a worktree de instalação (`onion/adopt`) não tem `node_modules` → o
 pre-commit invoca `prettier`/`eslint` ausentes → **`ENOENT`**, `lint-staged` reverte, o commit da
-adoção **não acontece**. 2º adotante a bater nisso (após arandek). Sinal de campo:
+adoção **não acontece**. 2º adotante a bater nisso. Sinal de campo:
 `docs/evolution/inbox/_processed/2026-06-27-adopt-legacy-husky-precommit-enoent.md`.
 
 A investigação "husky ainda faz sentido em 2026?" revelou o quadro real:

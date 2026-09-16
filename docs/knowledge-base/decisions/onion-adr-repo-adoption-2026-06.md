@@ -7,9 +7,9 @@ decision-scope: adoption / installability
 supersedes: none
 related:
   - ../meta-specs/architecture.md
-  - ../applying/README.md
+  - (doutrina de adoção — core-only)
   - ../knowledge-base/concepts/multi-repo-federation.md
-  - onion-federation-adr-a2a-format-interop-2026-06.md
+  - onion-federation-adr-a2a-format-interop-2026-06 (core-only)
 ---
 
 # ADR — Adoção de repositório: comando in-platform, não CLI
@@ -154,10 +154,10 @@ incremento que entrega valor real reusando `reverse-consolidate` + `setup-integr
 
 ## Referências
 
-- [`architecture.md`](../meta-specs/architecture.md) — §3 instalável · §5/§7 anti-CLI · §6.1 versionamento
-- [`applying/README.md`](../applying/README.md) — doutrina de adoção (prosa que o comando operacionaliza)
-- [`multi-repo-federation.md`](../knowledge-base/concepts/multi-repo-federation.md) — federação (arco a jusante)
-- [`onion-federation-adr-a2a-format-interop-2026-06.md`](onion-federation-adr-a2a-format-interop-2026-06.md) — ADR irmão (mesmo padrão)
+- [`architecture.md`](../../meta-specs/architecture.md) — §3 instalável · §5/§7 anti-CLI · §6.1 versionamento
+- a doutrina de adoção (`applying/`, core-only) — doutrina de adoção (prosa que o comando operacionaliza)
+- [`multi-repo-federation.md`](../../knowledge-base/concepts/multi-repo-federation.md) — federação (arco a jusante)
+- `onion-federation-adr-a2a-format-interop-2026-06.md` (core-only) — ADR irmão (mesmo padrão)
 - `/docs:reverse-consolidate` · `/meta:setup-integration` · `/docs:build-*-docs` — atuadores reusados
 
 ---

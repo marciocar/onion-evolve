@@ -230,7 +230,7 @@
     {
      "item": "meta:constellation",
      "etiqueta": "sub-usado",
-     "evidencia": "`git log --oneline --since=\"45 days ago\" | grep -ci /meta:constellation` = 1 e `git log --oneline --all | grep -ci /meta:constellation` também = 1 — a ÚNICA execução da vida do comando caiu dentro da janela. docs/analysis/onion-adr-constellation-operating-model-2026-07.md:70 descreve a Fase 1 ('mapa') como 'gatilho: já cumprido'.",
+     "evidencia": "`git log --oneline --since=\"45 days ago\" | grep -ci /meta:constellation` = 1 e `git log --oneline --all | grep -ci /meta:constellation` também = 1 — a ÚNICA execução da vida do comando caiu dentro da janela. ../../../../knowledge-base/decisions/onion-adr-constellation-operating-model-2026-07.md:70 descreve a Fase 1 ('mapa') como 'gatilho: já cumprido'.",
      "oportunidade": "O 'mapa de estrelas' da constelação de repos foi gerado 1 vez e tratado como marco cumprido, não como rotina — decidir se ele deveria ser recorrente (drift do mapa vs. realidade) ou se de fato é ritual único."
     }
    ],
@@ -376,7 +376,7 @@
     {
      "item": "design/generate.md",
      "etiqueta": "sub-usado",
-     "evidencia": "8 hits em docs/analysis/onion-adr-design-extends-kg-2026-07.md, docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml (2026-08-16) e outros — mas find . -iname \"*brand*variant*\" -o -iname \"*generated-identit*\" -> 0 artefato de saida no filesystem.",
+     "evidencia": "8 hits em ../../../../knowledge-base/decisions/onion-adr-design-extends-kg-2026-07.md, docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml (2026-08-16) e outros — mas find . -iname \"*brand*variant*\" -o -iname \"*generated-identit*\" -> 0 artefato de saida no filesystem.",
      "oportunidade": "Discutido/planejado em ADR e KG, mas nenhum artefato de identidade gerado localmente sobrevive no repo — confirmar se roda fora do core ou nunca produziu saida persistida."
     },
     {

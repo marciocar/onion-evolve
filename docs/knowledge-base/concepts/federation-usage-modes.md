@@ -8,7 +8,7 @@ related:
   - ../../applying/adoption-lifecycle.md
   - ../../evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md
   - ../../onion/co-evolution-reference.md
-  - ../../analysis/onion-adr-ledger-format-location-2026-06.md
+  - ../decisions/onion-adr-ledger-format-location-2026-06.md
   - ../../analysis/onion-federation-adr-a2a-format-interop-2026-06.md
 ---
 

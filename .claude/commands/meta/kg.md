@@ -32,7 +32,7 @@ impressão do modelo.
 
 > Doutrina: [knowledge-graph-sdaal.md](../../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md)
 > (inclui a nota *"git merge não reconcilia verdades"*, confirmada em campo).
-> Rampa da vertical: [ADR verticals](../../../docs/analysis/onion-adr-verticals-investigation-cartography-2026-07.md).
+> Rampa da vertical: [ADR verticals](../../../docs/knowledge-base/decisions/onion-adr-verticals-investigation-cartography-2026-07.md).
 
 ## 🟢 Quando usar
 
@@ -499,7 +499,7 @@ Antes de qualquer projeção cruzar fronteira (material pro cliente, sinal pro c
   vivo — é o que aposenta o ⚠ STALE-MISSING e deixa o próximo leitor (humano ou IA) confiar sem re-checar.
 - **Átomos de UI** (design) são nós `layer: domain`: átomo `READS` sua fonte (1 só — fonte-única),
   `TRACES_TO` o componente dono; o `SourceTag` do adotante é a aresta *renderizada*, não motor do core.
-  Doutrina: [ADR design-extends-kg](../../../docs/analysis/onion-adr-design-extends-kg-2026-07.md).
+  Doutrina: [ADR design-extends-kg](../../../docs/knowledge-base/decisions/onion-adr-design-extends-kg-2026-07.md).
 - **Fase-2 semântica** (método, não código do core): embeddings + cosseno para flag de redundância
   entre nós — cada instância implementa com seu stack (soberania); o core fica no determinístico.
 - 1º dogfood real (56 nós/81 arestas em um adotante; 37 nós/33 arestas no core): ver
@@ -510,5 +510,5 @@ Antes de qualquer projeção cruzar fronteira (material pro cliente, sinal pro c
 
 - Doutrina: [knowledge-graph-sdaal.md](../../../docs/knowledge-base/concepts/knowledge-graph-sdaal.md)
 - Motor: `.claude/validation/kg-radar.sh` (soberano; awk determinístico)
-- Vertical: [onion-adr-verticals-investigation-cartography-2026-07.md](../../../docs/analysis/onion-adr-verticals-investigation-cartography-2026-07.md)
+- Vertical: [onion-adr-verticals-investigation-cartography-2026-07.md](../../../docs/knowledge-base/decisions/onion-adr-verticals-investigation-cartography-2026-07.md)
 - Lente irmã (estrutura do framework): `/meta:graph`

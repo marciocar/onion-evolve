@@ -83,5 +83,5 @@ sinal              → /meta:co-evolve   → /meta:co-announce → /meta:co-deli
 ## Referências
 
 - Protocolo dos 3 fluxos: [docs/evolution/README.md](../evolution/README.md) · [RFC-0001](../evolution/rfc/rfc-0001-co-evolution-comms.md)
-- ADRs: [vocabulário](../analysis/onion-adr-coevolution-flow-naming-2026-06.md) · [formato/localização do ledger](../analysis/onion-adr-ledger-format-location-2026-06.md)
+- ADRs: [vocabulário](../analysis/onion-adr-coevolution-flow-naming-2026-06.md) · [formato/localização do ledger](../knowledge-base/decisions/onion-adr-ledger-format-location-2026-06.md)
 - Registro de adotantes: [members.yaml](../evolution/federation/members.yaml) · Anúncios: [CHANGELOG](../evolution/federation/CHANGELOG.md)

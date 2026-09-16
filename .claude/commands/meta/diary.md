@@ -237,7 +237,7 @@ degrada para "—" quando ausente), review_after, conflict_class — ordenada po
 
 Quando o hook sinalizar **⏰** (entradas com `review_after` vencido), rodar o protocolo de re-teste —
 **nunca re-carimbar sem re-testar** (risco nº1 documentado: reflexão falsa persistida vira erro
-auto-reforçante — [ADR work-models §4](../../../docs/analysis/onion-adr-work-models-session-topologies-2026-07.md)):
+auto-reforçante — [ADR work-models §4](../../../docs/knowledge-base/decisions/onion-adr-work-models-session-topologies-2026-07.md)):
 
 1. **Listar vencidas:** entradas com `review_after < hoje` (o `index.md` já as marca ⏰).
 2. **Re-testar cada uma contra evidência ATUAL, dirigido pela `conflict_class`** (não contra a

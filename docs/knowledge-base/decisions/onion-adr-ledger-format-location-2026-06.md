@@ -22,12 +22,12 @@ related:
 > **Última Atualização:** 2026-06-24 · **Status: PROPOSTO (provisório).** Responde a uma pergunta de
 > arquitetura (*"o ledger deveria virar outro formato, ou um repo neutro dedicado?"*) **sem** re-arquitetar:
 > nomeia o veredito, ancora em evidência + invariantes, e difere a execução por gatilho. Espelha o método do
-> [ADR-PFR](onion-adr-phased-resumable-pattern-2026-06.md): provisório primeiro, evidência antes de lei.
+> ADR-PFR (core-only): provisório primeiro, evidência antes de lei.
 
 ## Contexto
 
 Na operação real de 2026-06-24, o maestro sentiu o atrito do **transporte manual** do doc-bridge ao
-entregar um veredito (RFC-0002) ao adotante `rhilo-metagamify`: `cp` à mão, canal `inbound/` desconectado
+entregar um veredito (RFC-0002) a um adotante: `cp` à mão, canal `inbound/` desconectado
 por branch (mora em `develop`, mas o dev ativo estava em `rhilo/wrr-dose-next`), e fragilidade de arquivo
 untracked. Disso veio a pergunta: **trocar o formato do ledger? mover para um repo neutro dedicado? qual o
 padrão dominante em jun/2026?**

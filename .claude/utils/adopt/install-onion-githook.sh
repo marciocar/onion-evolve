@@ -9,7 +9,7 @@
 #             REGISTRAR hooks — trabalho que o core.hooksPath faz nativo de graça)
 #             e dissolve, na raiz, o atrito ENOENT da adoção legacy
 #             (inbox/_processed/2026-06-27-adopt-legacy-husky-precommit-enoent.md).
-#             Decisão: docs/analysis/onion-adr-native-githooks-standard-2026-06.md
+#             Decisão: ../../../docs/knowledge-base/decisions/onion-adr-native-githooks-standard-2026-06.md
 #
 # Mecânica  : (1) copia githook-pre-commit-onion.tpl → <DEST>/.githooks/pre-commit
 #                 (NEVER-CLOBBER, 3 casos: idêntico → no-op; hook ONION

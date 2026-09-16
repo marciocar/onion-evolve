@@ -78,7 +78,7 @@ Plano **cognitivo** resolve por concatenação/precedência nativa (grátis). Pl
   doc-bridge/entrega-sem-commit), maestro-gated — coerente com regulado/never-live-pull (RFC-0004).
   Design completo (detecção declarado≠verificado, 3-way por manifest de hashes, gate dry-run→apply,
   proveniência via relatório tracked no `inbound/`): ver
-  [`onion-adr-capability-update-out-of-git-2026-07.md`](../../analysis/onion-adr-capability-update-out-of-git-2026-07.md).
+  [`onion-adr-capability-update-out-of-git-2026-07.md`](../../knowledge-base/decisions/onion-adr-capability-update-out-of-git-2026-07.md).
   A implementação abre no 1º `--update` docs-only real do time Grana.Ai.
 - **Role/forma como proveniência no plano config — 1º passo ENTREGUE:** os gates agora polimorfam por
   papel (guarda `role: adopted` nos checks de marketplace do lint, fix de 2026-07-10 + selftest

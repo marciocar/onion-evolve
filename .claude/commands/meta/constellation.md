@@ -17,7 +17,7 @@ estrela, este comando reorienta a **constelação** — o painel macro de todos 
 frontmatter + bloco Tier-0 de cada `docs/discussions/*/SEED.md`.
 
 > Doutrina: [constellation-of-studies.md](../../../docs/knowledge-base/concepts/constellation-of-studies.md)
-> · ADR: [onion-adr-constellation-operating-model-2026-07.md](../../../docs/analysis/onion-adr-constellation-operating-model-2026-07.md)
+> · ADR: [onion-adr-constellation-operating-model-2026-07.md](../../../docs/knowledge-base/decisions/onion-adr-constellation-operating-model-2026-07.md)
 > · Schema Tier-0: [docs/discussions/_template/SEED.md](../../../docs/discussions/_template/SEED.md)
 
 ## Invariantes (não-negociáveis — ADR §NÃO-fazer)

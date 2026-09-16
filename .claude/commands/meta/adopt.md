@@ -20,7 +20,7 @@ Operacionalizar a doutrina [`docs/applying/`](../../../docs/applying/README.md) 
 faseado**: apontar o Onion para um repo/pasta e "assumir o controle" — **instalar** o framework
 (durável) ou **operar in-place** (efêmero), reusando atuadores existentes. Greenfield-first.
 
-> **Decisão de design:** [ADR de Adoção](../../../docs/analysis/onion-adr-repo-adoption-2026-06.md).
+> **Decisão de design:** [ADR de Adoção](../../../docs/knowledge-base/decisions/onion-adr-repo-adoption-2026-06.md).
 
 > **Régua de decisão** (ao decidir "reusar atuador existente" vs "desenhar fresh"): aplique a
 > [régua de transferência](../../../docs/knowledge-base/concepts/transfer-heuristic-aristotle.md) —
@@ -261,7 +261,7 @@ bash "$SOURCE_ROOT/.claude/utils/adopt/merge-prettierignore.sh" "$DEST"
 #     atrito ENOENT da adoção legacy com husky (não só avisa --no-verify): o hook nativo degrada
 #     gracioso sem node_modules. Never-clobber (pre-commit próprio → sidecar .onion); husky detectado →
 #     avisa migração; core.hooksPath só seta se UNSET. Helper testável (lint-selftest.sh: githook).
-#     Doutrina: docs/analysis/onion-adr-native-githooks-standard-2026-06.md
+#     Doutrina: ../../../docs/knowledge-base/decisions/onion-adr-native-githooks-standard-2026-06.md
 #     ⚠️ PROVA DE VIDA (2026-08-16): desde esta data o instalador não devolve apenas "fiz a minha
 #     parte" — ele PROVA por execução que o gate roda (commit-sonda descartável, índice temporário,
 #     não toca o índice do alvo) e sai NÃO-ZERO se o gate estiver inerte. Motivo medido: o passo de
@@ -681,7 +681,7 @@ já faz tmp→diff→aplicar (o diff mostra o que muda), e re-carimba `.onion-ve
 > **⚠️ Forma docs-only:** se o alvo NÃO versiona `.claude/` (verificar: `git -C "$TARGET" ls-tree HEAD -- .claude`
 > vazio + `.claude/` em disco), o fluxo abaixo **não se aplica à superfície de capability** — ele assume
 > `.claude/` tracked (vendor-branch, pin-canário, commit durável). Seguir o 4º modo (3-way por manifest de
-> hashes, maestro-gated): [ADR capability-update-out-of-git](../../../docs/analysis/onion-adr-capability-update-out-of-git-2026-07.md)
+> hashes, maestro-gated): [ADR capability-update-out-of-git](../../../docs/knowledge-base/decisions/onion-adr-capability-update-out-of-git-2026-07.md)
 > — implementação gated até o 1º caso real; até lá, o update docs-only é operação manual guiada pelo ADR.
 
 > ⚠️ **PRECONDIÇÃO (medida 2026-09-05, nos 2 primeiros `--update` reais): integre a adoção ANTES.**
@@ -793,7 +793,7 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
 
 ## 🔗 Referências
 
-- **Decisão:** [ADR de Adoção](../../../docs/analysis/onion-adr-repo-adoption-2026-06.md)
+- **Decisão:** [ADR de Adoção](../../../docs/knowledge-base/decisions/onion-adr-repo-adoption-2026-06.md)
 - **Doutrina:** [`applying/`](../../../docs/applying/README.md) (greenfield/legacy/regulated)
 - **Stamp:** `.claude/validation/onion-version.sh` · `architecture.md §6.1`
 - **Atuadores reusados:** `/docs:reverse-consolidate` · `/meta:setup-integration` · `/docs:build-*-docs` · `/docs:build-index`

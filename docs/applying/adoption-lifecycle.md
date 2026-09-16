@@ -94,5 +94,5 @@
 - Guias por cenário: [`applying-greenfield.md`](./applying-greenfield.md) · [`applying-legacy.md`](./applying-legacy.md) · [`applying-regulated.md`](./applying-regulated.md)
 - Comando: [`.claude/commands/meta/adopt.md`](../../.claude/commands/meta/adopt.md)
 - Co-evolução (downstream/upstream/handoff) + linguagem ubíqua: [`docs/evolution/README.md`](../evolution/README.md)
-- ADR de adoção: [`onion-adr-repo-adoption-2026-06.md`](../analysis/onion-adr-repo-adoption-2026-06.md)
+- ADR de adoção: [`onion-adr-repo-adoption-2026-06.md`](../knowledge-base/decisions/onion-adr-repo-adoption-2026-06.md)
 - Requisitos de qualidade (card 6): [`onion-vision-concept-map-2026-06.md`](../analysis/onion-vision-concept-map-2026-06.md)

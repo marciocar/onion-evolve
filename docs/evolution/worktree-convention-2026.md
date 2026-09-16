@@ -2,7 +2,7 @@
 
 > **Codifica a prática de campo do metagamify** (crédito: o adotante adotou `~/worktrees/**` por conta
 > própria e o layout provou-se melhor que o exemplo ad-hoc do manual). O **comportamento** de worktrees
-> já era doutrina (topologia W3, um-escritor-por-escopo, handoff commitado — [ADR work-models](../analysis/onion-adr-work-models-session-topologies-2026-07.md),
+> já era doutrina (topologia W3, um-escritor-por-escopo, handoff commitado — [ADR work-models](../knowledge-base/decisions/onion-adr-work-models-session-topologies-2026-07.md),
 > [fluxo Handoff](README.md#handoff--dentro-de-um-repo-sessões-paralelas)); o que faltava era decidir
 > **localização e nomenclatura**. Fundamentação de mercado (julho/2026) ao final.
 
@@ -56,7 +56,7 @@ ferramentas de mercado (gwq) assumem — o maestro acha qualquer worktree com um
 ## Comportamento (já doutrina — esta convenção NÃO redefine)
 
 - **W3 — duas sessões, mesmo repo**: handoff por worktree, **um escritor por escopo**, handoff
-  **commitado** antes de trocar de ponta ([ADR work-models](../analysis/onion-adr-work-models-session-topologies-2026-07.md) ·
+  **commitado** antes de trocar de ponta ([ADR work-models](../knowledge-base/decisions/onion-adr-work-models-session-topologies-2026-07.md) ·
   [federation-usage-modes §1.0](../knowledge-base/concepts/federation-usage-modes.md)).
 - **Um único `.git`**: worktrees compartilham o repositório; a branch fica presa ao worktree que a
   tem em checkout. O maestro rotaciona — não os agentes.

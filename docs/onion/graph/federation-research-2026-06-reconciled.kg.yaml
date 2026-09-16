@@ -4181,7 +4181,7 @@ nodes:
     impact: 3
     confidence: 0.7
     verified_at: 2026-07-21
-    trace: "docs/analysis/onion-adr-capability-update-out-of-git-2026-07.md · docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md §4.1"
+    trace: "../../knowledge-base/decisions/onion-adr-capability-update-out-of-git-2026-07.md · docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md §4.1"
     label: "A dimensão 'forma de adoção' (full|docs-only|in-place) — não prevista pelos 4 streams e vinda de ground-truth o membro regulado — ganhou nome e ADR próprio; a implementação do 4º modo de proveniência segue gated"
   - id: SY4_prod_topology_adr_coerente
     node_type: evidence
@@ -6003,7 +6003,7 @@ nodes:
     impact: 3
     confidence: 0.7
     verified_at: 2026-07-21
-    trace: ".claude/utils/adopt/vendor-branch.sh · .claude/commands/meta/adopt.md:56,221,467-469,554 · docs/analysis/onion-adr-adopt-vendor-branch-merge-2026-07.md"
+    trace: ".claude/utils/adopt/vendor-branch.sh · .claude/commands/meta/adopt.md:56,221,467-469,554 · ../../knowledge-base/decisions/onion-adr-adopt-vendor-branch-merge-2026-07.md"
     label: "PROVA: o Achado 2 (merge de vendor-branch em vez de copy-over) também virou realidade — vendor-branch.sh + adopt.md descrevendo --update como 'git merge de onion/vendor' 3-way com .gitattributes merge=union, e ADR próprio."
   - id: SY5_marketplace_live
     node_type: claim

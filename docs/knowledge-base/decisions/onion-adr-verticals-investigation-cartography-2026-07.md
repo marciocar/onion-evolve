@@ -53,7 +53,7 @@ planes DEV↔PROD; radar de atenção), e a pesquisa multi-fonte alimenta esse g
 
 **Anatomia (espinha + alimentador, acoplamento fraco):**
 - **Espinha**: Knowledge Graph SDAAL — doutrina em
-  [knowledge-graph-sdaal.md](../knowledge-base/concepts/knowledge-graph-sdaal.md) (Tijolo 1 pronto).
+  [knowledge-graph-sdaal.md](../../knowledge-base/concepts/knowledge-graph-sdaal.md) (Tijolo 1 pronto).
 - **Alimentador**: `@research-agent` / deep-research — o output de pesquisa é um lote de nós
   `evidence` com confiança, prontos para o grafo.
 - **Condição anti-conflito** (por que juntas não conflitam): a pesquisa continua utilizável
@@ -70,8 +70,8 @@ planes DEV↔PROD; radar de atenção), e a pesquisa multi-fonte alimenta esse g
 | Fase | O quê | Gatilho | Estado (2026-07-04) |
 |---|---|---|---|
 | F0 | Este ADR + capability draft | decisão do maestro | ✅ feito |
-| F1 | 1º dogfood do KG na federação (D3: reconciliar pesquisa-da-dose × motor via `wrr-audit.kg.yaml`) | execução na sessão rhilo + **sinal upstream com o resultado** | ✅ **concluído** (sinal [`2026-07-04-kg-primeiro-dogfood-federacao`](../evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md): 56 nós, 81 arestas, radar sem contradições; inclui **fluxo reverso** — o grafo refutou o framing original PROD→DEV) |
-| F2 | `/meta:kg` + store `kg-yaml` no core | F1 concluído + 1ª investigação real do core modelada em `.kg.yaml` | ✅ **executado 2026-07-04** — veículo foi a rodada de `/meta:evolve`: [relatório](onion-evolution-2026-07-04.md) + [`onion-evolution-2026-07.kg.yaml`](../onion/graph/onion-evolution-2026-07.kg.yaml) (37 nós/33 arestas, integridade ✅) + motor soberano `kg-radar.sh` + comando `/meta:kg` nascido da vivência. Interface SDAAL formal (`utils/investigation/`) diferida ao 2º provider real (costura pronta) |
+| F1 | 1º dogfood do KG na federação (D3: reconciliar pesquisa-da-dose × motor via `wrr-audit.kg.yaml`) | execução na sessão rhilo + **sinal upstream com o resultado** | ✅ **concluído** (sinal [`2026-07-04-kg-primeiro-dogfood-federacao`](../../evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md): 56 nós, 81 arestas, radar sem contradições; inclui **fluxo reverso** — o grafo refutou o framing original PROD→DEV) |
+| F2 | `/meta:kg` + store `kg-yaml` no core | F1 concluído + 1ª investigação real do core modelada em `.kg.yaml` | ✅ **executado 2026-07-04** — veículo foi a rodada de `/meta:evolve`: relatório (core-only) + [`onion-evolution-2026-07.kg.yaml`](../../onion/graph/onion-evolution-2026-07.kg.yaml) (37 nós/33 arestas, integridade ✅) + motor soberano `kg-radar.sh` + comando `/meta:kg` nascido da vivência. Interface SDAAL formal (`utils/investigation/`) diferida ao 2º provider real (costura pronta) |
 | F3 | manifesto `onion-investigation.manifest.sh` → plugin no marketplace | ≥2 artefatos maduros (mesmo critério que graduou design/compliance) | ⏳ gated |
 
 **Capability draft** (rascunho — vira `capability.json` só na F3):
@@ -96,7 +96,7 @@ existem: GERAR (`/docs:build-*-docs`) e VALIDAR (`/meta:context-freshness`). Nã
 
 **Mecânica:** a mesma tese do `graph.sh` — grafo **derivado** da spec-as-code, sem store externo
 — apontada para `docs/*-context/`. TBox = extensão do
-[onion-relation-vocabulary](../knowledge-base/concepts/onion-relation-vocabulary.md) com
+[onion-relation-vocabulary](../../knowledge-base/concepts/onion-relation-vocabulary.md) com
 predicados de domínio. Liga com a visão breadcrumbs (estrutura de decisão navegável — a aposta
 com lastro da pesquisa 2026-07).
 
@@ -114,7 +114,7 @@ cartografar aqui**. Sem conteúdo, qualquer comando nasceria não-dogfoodável.
 | Fase | O quê | Gatilho | Estado (2026-07-03) |
 |---|---|---|---|
 | F0 | Este ADR + capability draft | decisão do maestro | ✅ feito |
-| F1 | 1º dogfood da cartografia | adotante com contextos populados (candidato natural: **rhilo-app** — 3 contextos ativos, 5+ meses de sessões) OU core popular contexto próprio | ⏳ gated |
+| F1 | 1º dogfood da cartografia | adotante com contextos populados (candidato natural: **um adotante** — 3 contextos ativos, 5+ meses de sessões) OU core popular contexto próprio | ⏳ gated |
 | F2 | comando de cartografia (nome a decidir no dogfood) sobre o motor `graph.sh` estendido | F1 revelar as consultas que importam | ⏳ gated |
 | F3 | manifesto → plugin | ≥2 artefatos maduros | ⏳ gated |
 
@@ -140,7 +140,7 @@ cartografar aqui**. Sem conteúdo, qualquer comando nasceria não-dogfoodável.
   `architecture.md §8` não está em jogo aqui; investigação e cartografia são **capacidades**,
   não dimensões).
 
-A identidade manda ([onion-review-2026-05.md](onion-review-2026-05.md)): construir à frente do
+A identidade manda (onion-review-2026-05.md (core-only)): construir à frente do
 gatilho foi o erro do plano v4.0. Este ADR é o anti-v4.0 — desenho registrado, construção gated.
 
 ## Consequências

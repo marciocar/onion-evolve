@@ -16,7 +16,7 @@ related:
 
 ## Contexto
 
-Dois sinais de campo do adotante **gustavo-pulga** (dogfood da vertical-cliente "Tornak") pediram ao core que
+Dois sinais de campo de um adotante (dogfood de uma vertical-cliente) pediram ao core que
 promova a **1ª classe** um padrão que ele replicou **à mão** a partir do DNA do próprio `onion`:
 
 - **A1** — "vertical de projeto" = **hub homônimo + help contextual + resolver de SSOT/book + bootstrap**.
@@ -43,11 +43,11 @@ Este ADR é o **design pass** (não implementação), fundamentado em duas explo
 ## Decisão 1 — reconciliar as DUAS acepções de "vertical"
 
 O core já usa "vertical" com um sentido: **plugin empacotado de uma DIMENSÃO** (engineering, product, testing…).
-O sinal usa outro: **projeto-cliente scaffoldado com hub próprio** (tornak). São **a mesma máquina, sujeitos
+O sinal usa outro: **projeto-cliente scaffoldado com hub próprio**. São **a mesma máquina, sujeitos
 diferentes**:
 
 > O padrão **vertical-hub** (hub + help-contextual + resolver-de-SSOT + bootstrap) aplica-se tanto a uma
-> **dimensão do framework** (engineering) quanto a um **projeto-cliente** (tornak). As verticais próprias do
+> **dimensão do framework** (engineering) quanto a um **projeto-cliente**. As verticais próprias do
 > Onion são só as **instâncias-dogfood** desse padrão. `/meta:create-vertical` gera o padrão para **qualquer
 > sujeito**.
 
@@ -100,7 +100,7 @@ vertical-hub gerado nunca embute contagens/listas; deriva da SSOT (é o modelo d
   Logo o **refactor do adopt fica DEFERIDO** (alto-risco/baixo-retorno num comando sensível): o create-vertical
   usa o próprio `scaffold-book-dir.sh`, e o adopt pode adotá-lo quando for aberto de novo (risco menor, momento certo).
 - **F2 — fiação:** o comando `/meta:create-vertical` orquestrando os `create-*` + os helpers de F1 + sync/lint.
-- **F3 — campo (dogfood):** rodar num projeto real descartável; idealmente o gustavo re-dogfooda o Tornak com a
+- **F3 — campo (dogfood):** rodar num projeto real descartável; idealmente o gustavo re-dogfooda o a vertical-cliente com a
   ferramenta de 1ª classe (fecha o loop com a origem do sinal).
 - **F4 — face de design (B3), gated:** skill de marca + onboarding auto-guiado no bootstrap. Separado.
 

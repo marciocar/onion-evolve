@@ -316,7 +316,7 @@ nodes:
     confidence: 1.0
     status: done
     label: "Nao portar radar.js do rhilo — soberania: cada instancia implementa seu motor deterministico"
-    trace: "docs/analysis/onion-adr-verticals-investigation-cartography-2026-07.md:1"
+    trace: "../../knowledge-base/decisions/onion-adr-verticals-investigation-cartography-2026-07.md:1"
 
   # ── Rodada de atuação 2026-07-04 (quick-wins S) — o grafo dirigiu, o codigo mudou ──
   - id: E_VERIFY_ADOPT

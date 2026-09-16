@@ -91,7 +91,7 @@ Para cada, resumir `title`/`date`/`type` do frontmatter. Canal vazio/ausente →
 ## Passo 3.5 — Propor rascunho (responder-gated, topologia W6)
 
 Havendo mensagem pendente (📬/📥) ou migalha vencida (⏰), **proponha — nunca execute**
-([ADR work-models](../../../docs/analysis/onion-adr-work-models-session-topologies-2026-07.md) §2:
+([ADR work-models](../../../docs/knowledge-base/decisions/onion-adr-work-models-session-topologies-2026-07.md) §2:
 atos 1-2 automáticos; o ato 3 vira *propor→confirmar*):
 
 - **CORE com 📬:** redigir o **rascunho de triagem** (veredito: fix/feature/backlog/informativo + resposta

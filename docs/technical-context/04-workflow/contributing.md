@@ -252,7 +252,7 @@ a doutrina que generaliza esse princípio.
 ### Instalação do pre-commit hook nativo (git hook, sem dependências)
 
 O core usa **git hooks nativos** via `core.hooksPath`, não Husky (decisão registrada em
-`docs/analysis/onion-adr-native-githooks-standard-2026-06.md`,
+`../../knowledge-base/decisions/onion-adr-native-githooks-standard-2026-06.md`,
 `.claude/utils/adopt/install-onion-githook.sh:12`). Ativação **opt-in**, uma vez por clone
 (`.githooks/pre-commit:12-13`):
 

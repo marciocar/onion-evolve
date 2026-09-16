@@ -30,7 +30,7 @@ SDAAL, camadas-de-liberação, doc-bridge), **dispersas**; falta o **modelo que 
 ## Decisão
 
 **1. Nomear e documentar o modelo — "Constelação de Estudos"** (KB
-[constellation-of-studies](../knowledge-base/concepts/constellation-of-studies.md)): maestro = sol/dono,
+[constellation-of-studies](../../knowledge-base/concepts/constellation-of-studies.md)): maestro = sol/dono,
 estudo = estrela, core = observatório sob convite (3 serviços: mapa/radar/carteiro). Loop: isolar → explorar
 fundo → recolher ao macro → reconciliar → promover/descartar.
 

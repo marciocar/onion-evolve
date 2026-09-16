@@ -219,7 +219,7 @@ CONTEXT FRESHNESS REPORT — AAAA-MM-DD
 ## Referências
 
 - Doutrina do ciclo de vida: [domain-context-lifecycle.md](../../../docs/knowledge-base/concepts/domain-context-lifecycle.md)
-- ADR: [onion-adr-domain-context-lifecycle-2026-06.md](../../../docs/analysis/onion-adr-domain-context-lifecycle-2026-06.md) (§Gatilho — este comando é o Tijolo 2)
+- ADR: [onion-adr-domain-context-lifecycle-2026-06.md](../../../docs/knowledge-base/decisions/onion-adr-domain-context-lifecycle-2026-06.md) (§Gatilho — este comando é o Tijolo 2)
 - Molde reusado: [`/meta:kb-freshness`](kb-freshness.md)
 - Geradores (primeiro tick): `/docs:build-business-docs` · `/docs:build-tech-docs` · `/docs:build-compliance-docs`
 - Doutrina de orquestração: [agent-orchestration.md](../../../docs/knowledge-base/concepts/agent-orchestration.md) · Skill: `onion-orchestration`
