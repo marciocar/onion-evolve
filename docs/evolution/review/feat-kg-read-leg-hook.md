@@ -89,3 +89,21 @@ o índice resolve, e os 7 casos de bancada reagem. O que **falta** provar é o h
 
 Os outros três itens da ordem proposta pelo adotante (radar avisar vencimento · exigir o par
 desvio↔redesenho · gatilho por contradição) ficam em `A_PERNA_DE_LEITURA_DO_KG_E_CONSELHO`, abertos.
+
+---
+
+# Adendo — a 5ª reprovação pela mesma causa, e o que ela ensinou
+
+O CI do próprio PR reprovou em REGRA 80 (Números do harness saem de SSOT gerada, nunca de
+comentário) e REGRA 81 (Painel de estado é GERADO dos produtores, nunca redigido). É a **quinta**
+vez no dia que uma projeção gerada derruba o gate pela mesma causa estrutural.
+
+De manhã eu "curei" isso acrescentando `testing-state.md` ao `regen-ssot-projections.sh`. À noite a
+**REGRA 80** cobrou o `testing-inventory.md`, que eu também não tinha posto. **Curar um item de uma
+lista que devia ser completa é curar o caso, não a classe** — e a classe volta no mesmo dia.
+
+O critério agora está escrito no arquivo, para não haver terceira: **toda projeção gerada com
+catraca no lint pertence a esta lista.** Hoje são quatro (REGRAS 8, 21, 80, 81), mais o índice de
+leitura (REGRA 84, fora do laço por ser TSV em vez de markdown).
+
+Lint após a cura: **0 HARD**, 12 SOFT.
