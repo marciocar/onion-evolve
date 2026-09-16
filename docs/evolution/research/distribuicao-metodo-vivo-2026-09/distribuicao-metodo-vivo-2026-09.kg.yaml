@@ -9,7 +9,7 @@ meta:
                              # 12m (doutrina), mas quem CADUCA primeiro manda: se a plataforma mudar, a resposta
                              # de VEICULO muda antes de qualquer licenca mudar.
   # kg-backlog-guard: on
-  # ═══ TETO: 55 NÓS (era 54: +1 pela pergunta do maestro sobre liberar a meta-fábrica ao plugin PÚBLICO — reabre, pelo lado do plugin, a fronteira que D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA fechou pelo lado do adopt) (era 52: +2 pela busca no INPI executada e pelo fio da especificação, 2026-09-15) (era 50: +2 pelo SCRUB POR FORMA — o vazamento real de nome de cliente na superfície que viaja, achado porque a decisão de publicar obrigou a medir antes) (era 49: +1 pela decisão de limpar os 5 adotantes no próximo update) (era 43: +6 pela rodada de MARCA que o selo D_MARCA_MEDIR_ANTES_DE_DECIDIR pediu) (era 39: +4 pelas DECISÕES do maestro de 2026-09-14, que fecham 4 das 5 perguntas) (era 35: +4 pela MEDIÇÃO do mecanismo próprio, que o Elenxo impôs antes de nova fonte externa). Rodada de PRIMARIAS executada em 2026-09-13 (grafo criado nesta rodada). Cresce só se
+  # ═══ TETO: 58 NÓS (era 55: +3 pela EXECUÇÃO dos três terços — a conta dos 59 ponteiros virou medição nos três papéis, a lacuna de COBERTURA que a conta não via (plugins/ fora da varredura), e a peça (4) isolada como a única que falta para o maestro selar; a camada 3 do /meta:realign acusou o Q_LIBERAR sem apoio e estas três arestas são a cura) (era 54: +1 pela pergunta do maestro sobre liberar a meta-fábrica ao plugin PÚBLICO — reabre, pelo lado do plugin, a fronteira que D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA fechou pelo lado do adopt) (era 52: +2 pela busca no INPI executada e pelo fio da especificação, 2026-09-15) (era 50: +2 pelo SCRUB POR FORMA — o vazamento real de nome de cliente na superfície que viaja, achado porque a decisão de publicar obrigou a medir antes) (era 49: +1 pela decisão de limpar os 5 adotantes no próximo update) (era 43: +6 pela rodada de MARCA que o selo D_MARCA_MEDIR_ANTES_DE_DECIDIR pediu) (era 39: +4 pelas DECISÕES do maestro de 2026-09-14, que fecham 4 das 5 perguntas) (era 35: +4 pela MEDIÇÃO do mecanismo próprio, que o Elenxo impôs antes de nova fonte externa). Rodada de PRIMARIAS executada em 2026-09-13 (grafo criado nesta rodada). Cresce só se
   #     uma re-medicao das mesmas fontes emendar um achado, ou se o maestro abrir a rodada de VEICULO. ═══
   # Pesquisa /onion-research mode=primaries: onde passa a fronteira entre a DOUTRINA que deve viajar para um
   # cliente de consultoria que forka e evolui sozinho, e a BIOGRAFIA deste repo que nao deve viajar; qual
@@ -685,7 +685,55 @@ nodes:
     label: 'ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42 e LARGA — vai de design de software a analise quimica. Se a especificacao dele estiver longe de software/TI, a coexistencia com `ONION EVOLVE` fica ainda mais confortavel, e ate caberia discutir se `ONION` puro ainda tem alguma chance. Ver tambem o ANDAMENTO: se ja houve publicacao, oposicao, ou prazo correndo. Gatilho: antes do deposito.'
     trace: 'https://busca.inpi.gov.br/pePI'
 
+  - id: E_OS_TRES_TERCOS_EXECUTADOS_PR836
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: '2026-09-16'
+    verified_against: 'lint-artifacts.sh rodado DENTRO dos bundles adopted/hub/standalone montados da arvore de trabalho e de main, por REGRA; grep por ausencia na superficie que viaja e em plugins/; PRs #835 e #836'
+    label: 'A CONTA DOS 59 PONTEIROS, EXECUTADA — os tres tercos do Q_LIBERAR tiveram os tres desfechos que o no previu, e nenhum deles mudou de ideia no caminho. [A] 20 citacoes de DIRETORIO NU ficaram: elas descrevem a FRONTEIRA (dizem o que NAO viaja); remove-las apagaria a explicacao da propria allowlist. [B] 20 ADRs PROMOVIDOS ao docs/knowledge-base/ no PR #835, que viaja — e a passada daquele PR achou 32 nomes que iam junto, inclusive o cliente de um adotante que nenhum grep por id do members.yaml alcancaria. [C] 19 documentos NOMEADOS neutralizados no PR #836: citacao pelo nome sem caminho, marcada `(core-only)`. Medido no bundle standalone: REGRA 22 16->0 e REGRA 16 11->0 nos tres papeis, total 88->58, e o diff do conjunto normalizado devolve ZERO violacao nova em adopted, hub e standalone. O criterio do maestro ("sem nada pessoal, sem segredo, sem identificacao de empresa") deixou de ser promessa e virou medicao nos tres papeis.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: E_A_COBERTURA_FALTAVA_ONDE_MAIS_IMPORTAVA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-16'
+    verified_against: 'vendor-manifest.sh --emit-scrub-roots listava 11 raizes e nenhuma era plugins/; e grep do prefixo da familia do vertical pessoal achou 6 citacoes, duas ja dentro do plugin publico montado'
+    label: 'O QUE A CONTA DOS 59 NAO VIA, e so a passada adversarial desta cura achou: o no Q_LIBERAR mediu PONTEIROS dentro da fabrica e concluiu que o criterio nao precisava de mecanismo novo, so de resolver os 59. Estava certo sobre os 59 e errado sobre o mecanismo, por uma razao de ESCOPO: as tres maquinas que ele cita (REGRA 36, --stub-baselines, REGRA 45) consomem `--emit-scrub-roots`, e aquela SSOT nao incluia `plugins/` — o diretorio que o marketplace publica para qualquer pessoa. O conteudo estava limpo; a COBERTURA nao existia. Junto, o `_priv` do --check-bundle fixava o NOME COMPLETO de um repo do vertical pessoal quando a familia tem varios, e o irmao viajava. Curados no PR #836 (lista `_SCRUB_EXTRA` so no modo scrub, e predicado por PREFIXO). A licao para esta pergunta: "o criterio nao precisa de mecanismo novo" so vale depois de conferir se o mecanismo existente ALCANCA o transporte — e o mais publico deles era o que ninguem varria. Ver E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA no grafo passada-adversarial-2026-09.'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+
+  - id: A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    owner: maestro
+    verified_at: '2026-09-16'
+    verified_against: 'grep de caminho de maquina nas 11 raizes de varredura: 7 sitios narrativos curados no PR #836, 14 remanescentes todos em codigo funcional'
+    label: 'O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate onde limpeza chega — inclusive a secao 10 da KB de identidade, que publicava backend, TLS e o caminho do clone em disco dentro do plugin PUBLICO, e tres anedotas com o diretorio home. Restam 14 sitios com caminho de maquina em CODIGO FUNCIONAL (defaults de varredura de backup, endpoint A2A, URL de pull do inbox). Ali o caminho nao e prosa a limpar: e VALOR PADRAO a parametrizar. E o mesmo eixo da peca (4) que o proprio Q_LIBERAR nomeia — `marketplace/*` publica NO REPO DO MAESTRO, e numa fabrica liberada quem instala publica no DELE. Uma decisao cobre as duas: destino e parametro, nao constante. Gatilho: o maestro decidir a forma do parametro (env, .env do adotante, ou campo do stamp). Espelho executado no grafo passada-adversarial-2026-09 como A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO.'
+    trace: '.claude/utils/marketplace/assemble-plugin.sh'
+
 edges:
+  # o apoio que faltava: a camada 3 do /meta:realign acusou o Q_LIBERAR como objetivo
+  # aberto de alto impacto SEM APOIO — o trabalho existia, mas tinha sido escrito noutro grafo
+  - from: E_OS_TRES_TERCOS_EXECUTADOS_PR836
+    to: Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN
+    edge_type: SUPPORTS
+  - from: E_A_COBERTURA_FALTAVA_ONDE_MAIS_IMPORTAVA
+    to: Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN
+    edge_type: SUPPORTS
+  - from: A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO
+    to: Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN
+    edge_type: CONSTRAINS
+  - from: E_A_COBERTURA_FALTAVA_ONDE_MAIS_IMPORTAVA
+    to: D_SCRUB_POR_FORMA_CURADO_ANTES_DE_PUBLICAR
+    edge_type: SUPPORTS
   - from: E_FORK_CARREGA_HISTORIA_TEMPLATE_NASCE_LIMPO
     to: Q_FRONTEIRA_DOUTRINA_BIOGRAFIA_2026_09
     edge_type: SUPPORTS
