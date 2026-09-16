@@ -133,3 +133,25 @@ afetada por *qualquer* script novo, e eu não a tinha na lista. Rodar "as famíl
 heurística minha; a passada cheia do CI é que é o gate.
 
 Bancadas após a cura: `shell_pipefail_robustness` 3/3 · `kg_read_leg` + `model_ssot` 11/11.
+
+---
+
+# Adendo 3 — contaminação cross-branch: `git stash` não leva o que não é rastreado
+
+O CI reprovou em REGRA 19 (Plugins de vertical (plugins/*) sincronizados com as fontes) apontando
+`plugins/onion-design` — um plugin que este PR não tem razão nenhuma de tocar.
+
+**Causa, medida:** enquanto o #839 rodava, puxei o fio do design-sink noutra branch e criei
+`.claude/utils/design-sink/tokens-to-theme.sh` — **arquivo novo, não rastreado**. Ao voltar para cá
+usei `git stash`, que **só guarda o que o git já rastreia**: o arquivo novo ficou no disco. O
+`git add -A` do commit seguinte o varreu para dentro deste PR, e como ele é fonte do design-sink, a
+REGRA 19 passou a exigir o `plugins/onion-design` regenerado — num PR sobre hook de leitura.
+
+**Cura:** o arquivo sai daqui (`git rm`) e volta para a branch a que pertence, com o conteúdo
+preservado fora da árvore antes da remoção.
+
+**A lição, que é de método e não de git:** `git stash` sem `-u` é uma troca de contexto
+**incompleta**, e `git add -A` transforma o resto num commit que ninguém revisou. É a mesma família
+de `rebase-failed-never-reset-soft` — trabalho de uma branch aparecendo noutra sem que o autor peça.
+O sinal barato de detectar: no `git diff origin/main...HEAD --name-only`, procurar arquivo que **não
+tem relação com o tema do PR**. Aqui bastava olhar `design` num PR de hook de KG.
