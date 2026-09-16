@@ -31,9 +31,9 @@ e dá **paridade** aos três geradores para que o primeiro tick já nasça consi
 Implementação`.
 
 > **Atualização 2026-06-17 — Tijolo 2 ENTREGUE.** A camada *Manage* foi implementada:
-> comando [`/meta:context-freshness`](../../.claude/commands/meta/context-freshness.md) +
+> comando [`/meta:context-freshness`](../../../.claude/commands/meta/context-freshness.md) +
 > extensão de `inventory.sh` (conta `*-context/`) e `lint-artifacts.sh` (Regra 15 — carimbo
-> de frescor) + composição **D9** no [`/meta:evolve`](../../.claude/commands/meta/evolve.md).
+> de frescor) + composição **D9** no [`/meta:evolve`](../../../.claude/commands/meta/evolve.md).
 
 ---
 
@@ -72,7 +72,7 @@ especialistas com apenas `Read Bash(grep *)`).
 
 1. **Contexto de domínio é SSOT viva com ciclo CRUD+, não geração-snapshot.** A geração é o
    primeiro tick. A gramática de operações (Pesos/Formato/Adicionar/Remover/Alterar/Inferir/
-   Agrupar/Reorganizar/Validar) vive na KB [domain-context-lifecycle.md](../knowledge-base/concepts/domain-context-lifecycle.md).
+   Agrupar/Reorganizar/Validar) vive na KB [domain-context-lifecycle.md](../../knowledge-base/concepts/domain-context-lifecycle.md).
 
 2. **Três domínios peer + critério de promoção.** Business/technical/compliance são peers. As
    sub-camadas Decisional (ADRs) e Operacional/Runtime ficam *dentro* de `technical-context/`.
@@ -125,7 +125,7 @@ especialistas com apenas `Read Bash(grep *)`).
 ## Gatilho de Implementação (Tijolo 2 — a camada *Manage* executável)
 
 Construir quando o Tijolo 1 estiver em uso e a primeira drift de contexto aparecer. **Reusa, não
-reimplementa**, o molde de [`/meta:kb-freshness`](../../.claude/commands/meta/kb-freshness.md):
+reimplementa**, o molde de [`/meta:kb-freshness`](../../../.claude/commands/meta/kb-freshness.md):
 
 1. **Comando de audit de frescor de contexto** — verdito `CURRENT/STALE/HISTORICAL`, threshold
    herdado (`≤18 meses`), fan-out via `onion-orchestration` (worker haiku → fan-in sonnet), retorno
@@ -140,10 +140,10 @@ reimplementa**, o molde de [`/meta:kb-freshness`](../../.claude/commands/meta/kb
 
 ## Referências
 
-- [`architecture.md`](../meta-specs/architecture.md) — §1.3 pastas `*-context/` · nova seção de ciclo de vida de contexto
-- [`domain-context-lifecycle.md`](../knowledge-base/concepts/domain-context-lifecycle.md) — a gramática CRUD+ (explainer)
-- [`onion-modernization-doctrine.md`](../knowledge-base/concepts/onion-modernization-doctrine.md) — doutrina-vizinha (peso/acoplamento)
-- [`/meta:kb-freshness`](../../.claude/commands/meta/kb-freshness.md) — molde reusado pelo Tijolo 2
+- [`architecture.md`](../../meta-specs/architecture.md) — §1.3 pastas `*-context/` · nova seção de ciclo de vida de contexto
+- [`domain-context-lifecycle.md`](../../knowledge-base/concepts/domain-context-lifecycle.md) — a gramática CRUD+ (explainer)
+- [`onion-modernization-doctrine.md`](../../knowledge-base/concepts/onion-modernization-doctrine.md) — doutrina-vizinha (peso/acoplamento)
+- [`/meta:kb-freshness`](../../../.claude/commands/meta/kb-freshness.md) — molde reusado pelo Tijolo 2
 - `/docs:build-business-docs` · `/docs:build-tech-docs` · `/docs:build-compliance-docs` — os geradores (primeiro tick)
 
 ---

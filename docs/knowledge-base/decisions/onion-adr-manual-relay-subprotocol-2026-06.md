@@ -18,7 +18,7 @@ related:
 
 # ADR — Sub-protocolo do transporte manual de co-evolução (relay upstream)
 
-> **Status: ACEITO** (2026-06-27). Responde ao sinal de campo **S2** (`rhilo-metagamify`, 2026-06-25): o
+> **Status: ACEITO** (2026-06-27). Responde ao sinal de campo **S2** (um adotante, 2026-06-25): o
 > regime *manual* do doc-bridge não tinha sub-protocolo determinístico, e a IA improvisou — commitou
 > cross-repo na branch errada e escalou ao humano decisões que o ADR 3-atos já classifica como Ato-1
 > determinístico. Este ADR fixa o **como** do regime pré-carteiro-distribuído, reusando o padrão que o core
@@ -36,7 +36,7 @@ doc-bridge de verdade), a IA:
 3. **Escalou ao humano** "em qual branch? push ou não?" — quando o **ADR 3-atos** já diz que **transporte é
    Ato-1 (determinístico)**. Erro de classificação: tratou mecânica de Ato-1 como juízo de Ato-3.
 
-**Lacuna real:** o core já tinha o padrão certo para *downstream* — o [`/meta:co-deliver`](../../.claude/commands/meta/co-deliver.md)
+**Lacuna real:** o core já tinha o padrão certo para *downstream* — o [`/meta:co-deliver`](../../../.claude/commands/meta/co-deliver.md)
 + `co-deliver.sh`, que **entrega-sem-commit** (escreve o arquivo **untracked** no canal do alvo; o hook conta
 arquivos → notifica; o **commit é da sessão home do destino**). Faltava o **espelho upstream**
 (adotante→core `inbox/`). co-deliver é core-only + downstream-only.

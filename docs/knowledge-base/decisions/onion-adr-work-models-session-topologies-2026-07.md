@@ -2,16 +2,16 @@
 
 > **Status:** ACEITO (2026-07-02) · **Tipo:** decisão durável (permanece em `docs/analysis/` como ADR)
 > **Decisor:** maestro (checkpoint 2026-07-02, 2 decisões confirmadas à luz de pesquisa fundamentada)
-> **Insumos:** [pesquisa deep-research](onion-work-models-research-2026-07.md) (24 claims verificados 3-votos) ·
+> **Insumos:** pesquisa deep-research (core-only) (24 claims verificados 3-votos) ·
 > [ADR comms-transport-vs-execution](onion-adr-comms-transport-vs-execution-2026-06.md) (os 3 atos) ·
-> [KB federation-usage-modes](../knowledge-base/concepts/federation-usage-modes.md) (eixos A-D)
+> [KB federation-usage-modes](../../knowledge-base/concepts/federation-usage-modes.md) (eixos A-D)
 > **Contexto:** reconstrução do planejamento "modelos de trabalho" — de onde se trabalha em quê, entre
 > source e adotados — perdido em sessão de outro notebook; fragmentos existiam em 5 artefatos sem nome de eixo.
 
 ## 1. Decisão central — o Eixo E (topologia de sessão; valores W1-W7)
 
 Fica instituído o **Eixo E — modelo de trabalho/sessão** (valores W1-W7), complementar aos eixos A-D da
-[KB federation-usage-modes](../knowledge-base/concepts/federation-usage-modes.md). Ele responde **"quem
+[KB federation-usage-modes](../../knowledge-base/concepts/federation-usage-modes.md). Ele responde **"quem
 trabalha onde, a partir de onde"** — pergunta que os outros eixos não respondem (A/B = momento da adoção;
 C = posição na rede; D = cada comando).
 
@@ -126,8 +126,8 @@ Guardas: lint-selftest modo `session-beacon` (7 casos, incl. regressão da colis
 
 O comportamento de W3 (um escritor por escopo, handoff commitado) sempre foi doutrina; a **localização**
 dos worktrees duráveis do maestro era ad-hoc (`~/<nome>-atual` no manual, sem regra). Codificado em
-[`worktree-convention-2026.md`](../evolution/worktree-convention-2026.md): layout umbrella
-**`~/worktrees/<repo>/<branch-slug>/`** (crédito: prática de campo do metagamify; padrão de mercado
+[`worktree-convention-2026.md`](../../evolution/worktree-convention-2026.md): layout umbrella
+**`~/worktrees/<repo>/<branch-slug>/`** (crédito: prática de campo de um adotante; padrão de mercado
 gwq para fluxos paralelos com agentes IA). Efêmeros tool-managed (vendor-branch/mktemp, adopt legacy,
 `Workflow isolation`, `.claude/worktrees/` do harness) ficam fora — continuam gerenciados por quem os
 cria. Caveat registrado na convenção: o farol de sessão é por working-tree — worktrees irmãs não se

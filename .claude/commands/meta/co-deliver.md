@@ -13,7 +13,7 @@ argument-hint: "<member-id> [<outbox-file>] --target <path-local-do-adotante> [-
 
 Transporta um anúncio downstream do `federation/outbox/<id>/` (staging do core) para o `inbound/` de um
 adotante **na mesma máquina** — automatizando o `cp` que o maestro fazia à mão. Materializa o **Carteiro-local
-mínimo** liberado (NÃO-gated) pelo [ADR de formato/localização do ledger](../../../docs/analysis/onion-adr-ledger-format-location-2026-06.md)
+mínimo** liberado (NÃO-gated) pelo [ADR de formato/localização do ledger](../../../docs/knowledge-base/decisions/onion-adr-ledger-format-location-2026-06.md)
 (Decisão 3).
 
 > **O que este comando NÃO é.** Não gera o anúncio — isso é o [`/meta:co-announce`](co-announce.md) (producer,
@@ -87,5 +87,5 @@ processa lá. Saída sugerida:
 
 - Producer do rascunho: [`/meta:co-announce`](co-announce.md)
 - Orientação/gestão: [`/meta:co-evolve`](co-evolve.md) · Protocolo: [docs/evolution/README.md](../../../docs/evolution/README.md)
-- Decisão que o libera (não-gated): [ADR ledger formato/localização](../../../docs/analysis/onion-adr-ledger-format-location-2026-06.md)
+- Decisão que o libera (não-gated): [ADR ledger formato/localização](../../../docs/knowledge-base/decisions/onion-adr-ledger-format-location-2026-06.md)
 - Hook: `.claude/hooks/co-evolution-inbox-check.sh` · Registro: [members.yaml](../../../docs/evolution/federation/members.yaml)

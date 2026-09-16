@@ -2,7 +2,7 @@
 title: "ADR/Spec — capability-update fora-do-git: o 4º modo de proveniência (adoção docs-only)"
 date: 2026-07-10
 type: adr
-status: proposto — DESIGN ONLY; implementação GATED até o 1º --update docs-only real (granaai)
+status: proposto — DESIGN ONLY; implementação GATED até o 1º `--update` docs-only real num adotante
 decision-scope: adoption / capability delivery / out-of-git provenance
 supersedes: none
 related:
@@ -10,7 +10,7 @@ related:
   - ../evolution/rfc/rfc-0004-a2a-live-interop.md
   - ../evolution/inbox/_processed/2026-07-10-rfc5-docs-only-adoption-ground-truth.md
   - onion-adr-adopt-vendor-branch-merge-2026-07.md
-  - onion-adr-granaai-consolidation-2026-07.md
+  - (ADR de consolidação de um adotante — core-only, não referenciável daqui)
   - ../../.claude/commands/meta/co-deliver.md
   - ../../.claude/utils/adopt/write-stamp.sh
 ---
@@ -19,25 +19,25 @@ related:
 
 | Campo | Valor |
 |-------|-------|
-| **Origem** | RFC-0005 §4.1 (adendo 2026-07-10) — sinal ground-truth Grana.Ai (PR #1127 do alvo) |
+| **Origem** | RFC-0005 §4.1 (adendo 2026-07-10) — sinal ground-truth um adotante (PR #1127 do alvo) |
 | **Decisão** | `--update` de capability em adotante **docs-only** = **entrega-fora-do-git** com 3-way por **manifest de hashes**, maestro-gated |
 | **Superfície** | só `.claude/` (+ `CLAUDE.md` se fora do git no alvo); a superfície **docs** continua no vendor-branch (tracked) |
 | **Constrói sobre** | vendor-branch (Achado #2, o 3-way *com* git) · co-deliver (I3, entrega-sem-commit) · `write-stamp.sh` (stamp em disco) · `--show-scope` (proveniência auditável, PR #320) |
-| **Status** | **DESIGN ONLY** — implementação gated; "estoura no 1º `--update` do time Grana.Ai — desenhar antes disso" (RFC-0005 §4.1) ✅ desenhado |
+| **Status** | **DESIGN ONLY** — implementação gated; "estoura no 1º `--update` do time um adotante — desenhar antes disso" (RFC-0005 §4.1) ✅ desenhado |
 
 ## 1. Contexto e problema
 
-No dia seguinte ao aceite da RFC-0005, o time Grana.Ai materializou em `master` uma adoção
+No dia seguinte ao aceite da RFC-0005, o time um adotante materializou em `master` uma adoção
 **docs-only** (PR #1127 do alvo, Mauricio: *"`.claude/` (capability layer) and `CLAUDE.md` stay OUT
 of git"*), coexistindo com a adoção **full** em `develop`. Evidência verificada no clone local
 read-only (2026-07-10):
 
 ```
-$ git -C /home/marcio/granaai ls-tree origin/master -- .claude | wc -l   → 0   (não-tracked)
-$ git -C /home/marcio/granaai ls-tree origin/master -- CLAUDE.md | wc -l → 0   (não-tracked)
-$ git -C /home/marcio/granaai ls-tree origin/master --name-only -- docs  → docs (tracked)
-$ git -C /home/marcio/granaai ls-tree origin/develop -- .claude | wc -l  → 1   (tracked — full)
-$ ls /home/marcio/granaai/.claude → agents commands hooks settings.json … (capability EM DISCO)
+$ git -C <repo-do-adotante> ls-tree origin/master -- .claude | wc -l   → 0   (não-tracked)
+$ git -C <repo-do-adotante> ls-tree origin/master -- CLAUDE.md | wc -l → 0   (não-tracked)
+$ git -C <repo-do-adotante> ls-tree origin/master --name-only -- docs  → docs (tracked)
+$ git -C <repo-do-adotante> ls-tree origin/develop -- .claude | wc -l  → 1   (tracked — full)
+$ ls <repo-do-adotante>/.claude → agents commands hooks settings.json … (capability EM DISCO)
 ```
 
 **Por que o `--update` atual quebra no docs-only** (fluxo do `adopt.md` §"Atualizar um repo adotado"):
@@ -157,7 +157,7 @@ Três registros complementares, do menos ao mais durável:
 - **Selftests futuros** (padrão da casa, self-contained em mktemp): baseline→update-limpo ·
   customizado→CONFLITO-não-clobra (sidecar) · local-only intocado · idempotência ·
   primeiro-update-sem-manifest (baseline do pin) · form no stamp/members divergente→aviso.
-- **Dogfood de campo:** o 1º `--update` docs-only real no granaai `master` (gate deste ADR abre a
+- **Dogfood de campo:** o 1º `--update` docs-only real num adotante, na `master` dele (gate deste ADR abre a
   implementação nesse momento).
 - Gate mecânico: `lint-artifacts` + `lint-selftest` verdes.
 

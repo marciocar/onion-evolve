@@ -30,7 +30,7 @@ não depende de "lembrar de reconhecer" — a **estrutura** (hook) faz a rota em
 
 Três invariantes que o protocolo respeita:
 - **Maestro é fonte confiável** (R15.2, [untrusted-content-provenance](../../../../.claude/commands/common/prompts/untrusted-content-provenance.md)): o aparte do maestro **não** é envelopado como untrusted — isso é só para conteúdo de terceiros.
-- **Efeito irreversível cruza gate** (Ato 3 / W6 — ADR de work-models/topologias de sessão, `docs/analysis/onion-adr-work-models-session-topologies-2026-07.md`, interno do core): `-etapa:` e `guarda-regra:` injetam **propor→confirmar**, não auto-executam.
+- **Efeito irreversível cruza gate** (Ato 3 / W6 — ADR de work-models/topologias de sessão, `../../decisions/onion-adr-work-models-session-topologies-2026-07.md`, interno do core): `-etapa:` e `guarda-regra:` injetam **propor→confirmar**, não auto-executam.
 - **Custo-zero quando vazio**: mensagem sem marcador não emite nada (não polui o contexto) — mesma disciplina de motd dos hooks `session-beacon`/`co-evolution-inbox-check`.
 
 ## O vocabulário (conjunto FECHADO)

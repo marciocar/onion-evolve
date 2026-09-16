@@ -14,7 +14,7 @@ argument-hint: "[<signal-file>] --target <path-local-do-core> [--from <dir>] [--
 Transporta um **sinal** que o adotante escreveu (`docs/evolution/inbox/`) para o `inbox/` do **core na mesma
 máquina** — automatizando o `cp` que o maestro fazia à mão. É o **espelho UPSTREAM** do [`/meta:co-deliver`]
 (co-deliver.md) (que é downstream, core→adotante). Materializa o sub-protocolo do regime manual fixado no
-[ADR de relay manual](../../../docs/analysis/onion-adr-manual-relay-subprotocol-2026-06.md).
+[ADR de relay manual](../../../docs/knowledge-base/decisions/onion-adr-manual-relay-subprotocol-2026-06.md).
 
 > **O que este comando NÃO é.** Não escreve o sinal — isso é a sessão do adotante (autor). Este é o
 > **carteiro**: pega o sinal pronto no inbox/ e o **relaya** ao core. E não é o transporte distribuído
@@ -93,5 +93,5 @@ Saída sugerida (ORIENTE o próximo passo — não pergunte se deve commitar):
 
 - Espelho downstream: [`/meta:co-deliver`](co-deliver.md)
 - Orientação/gestão: [`/meta:co-evolve`](co-evolve.md) · Protocolo: [docs/evolution/README.md](../../../docs/evolution/README.md)
-- Sub-protocolo (decisão): [ADR de relay manual](../../../docs/analysis/onion-adr-manual-relay-subprotocol-2026-06.md) · Eixo dos 3 atos: [ADR transporte vs execução](../../../docs/analysis/onion-adr-comms-transport-vs-execution-2026-06.md)
+- Sub-protocolo (decisão): [ADR de relay manual](../../../docs/knowledge-base/decisions/onion-adr-manual-relay-subprotocol-2026-06.md) · Eixo dos 3 atos: [ADR transporte vs execução](../../../docs/knowledge-base/decisions/onion-adr-comms-transport-vs-execution-2026-06.md)
 - Hook: `.claude/hooks/co-evolution-inbox-check.sh` · Registro: [members.yaml](../../../docs/evolution/federation/members.yaml)

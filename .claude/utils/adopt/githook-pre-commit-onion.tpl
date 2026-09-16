@@ -6,7 +6,7 @@
 # Mecanismo dependency-free; degrada GRACIOSO quando faltam ferramentas (ex.:
 # worktree sem node_modules) — pula a etapa em vez de explodir com ENOENT.
 # Espelha o padrão do próprio core Onion (.githooks/pre-commit).
-# Doutrina: docs/analysis/onion-adr-native-githooks-standard-2026-06.md
+# Doutrina: ../../../docs/knowledge-base/decisions/onion-adr-native-githooks-standard-2026-06.md
 #
 # Ordem: (1) lint Onion determinístico (se presente) → (2) lint-staged do projeto
 # (se presente E node_modules presente). Cada etapa ausente = skip gracioso.

@@ -2,7 +2,7 @@
 # =============================================================================
 # vendor-branch.sh — /meta:adopt --update via MERGE de vendor-branch (never-clobber ESTRUTURAL).
 #
-# Achado #2 do /meta:evolve (docs/analysis/onion-adr-adopt-vendor-branch-merge-2026-07.md).
+# Achado #2 do /meta:evolve (../../../docs/knowledge-base/decisions/onion-adr-adopt-vendor-branch-merge-2026-07.md).
 # Migra o apply de copy-over (cp -R + diff a revisar, clobável) para um 3-way merge git: a customização
 # local do adotante vira CONFLITO git de verdade (resolvível), não some silenciosamente.
 #

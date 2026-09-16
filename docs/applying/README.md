@@ -60,7 +60,7 @@ Esta doutrina **já está operacionalizada** no comando faseado in-platform
 dentro do Claude Code). Ele cobre: modelos de controle (instalar / operar in-place / worktree), detecção
 de modo (greenfield/legacy/regulated), stamp de versão `.onion-version`, `--integration-branch <nome>`,
 `--update` (re-cópia deliberada), e reusa `/docs:reverse-consolidate` + `/meta:setup-integration`. Decisão:
-[ADR de Adoção de Repositório](../analysis/onion-adr-repo-adoption-2026-06.md). Estes guias são a **doutrina
+[ADR de Adoção de Repositório](../knowledge-base/decisions/onion-adr-repo-adoption-2026-06.md). Estes guias são a **doutrina
 por cenário** que o comando aplica.
 
 Para o **ciclo de vida completo** (adoção → update → revisão → sincronização) **por modo**, ver

@@ -203,7 +203,7 @@ Equivalente canônico: **`/meta:inventory`**. Mecanismo: `common:prompts:invento
 
 ## 🔗 Referências
 
-- ADR: `docs/analysis/onion-adr-create-vertical-2026-07.md` (4 decisões + mapa COMPOR vs NOVO)
+- ADR: `../../../docs/knowledge-base/decisions/onion-adr-create-vertical-2026-07.md` (4 decisões + mapa COMPOR vs NOVO)
 - Helpers F1: `.claude/utils/vertical/{bootstrap-new-project,scaffold-book-dir}.sh` · `.claude/utils/marketplace/generate-marketplace.sh`
 - Plugin: `.claude/utils/marketplace/{assemble-plugin.sh,roles.yaml,verticals/*.manifest.sh}`
 - Fragmento de sync: `common:prompts:inventory-sync-after-create`

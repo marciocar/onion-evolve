@@ -18,15 +18,15 @@ related:
 |-------|-------|
 | **Decisão** | A vertical de **design** e o **KG-SDAAL** são **eixos ortogonais**, não concorrentes: design **DIVERGE** (generativo — largar N versões, gate WCAG decide) e o KG **REGE** (rastreabilidade + fonte-única, depois de decidir). A rastreabilidade de átomos de front (`atom-map`/`SourceTag`) **estende o KG dogfoodado** — **não** constrói um 2º grafo/registro de "fonte da verdade". |
 | **Escopo** | Design + investigação (KG). Não toca produto/engenharia/compliance nem o transporte. |
-| **Status** | ✅ **Aceito (doutrinário)** — 2026-07-09. Doutrina; **zero código agora**. A materialização (átomos de design como nós do KG) fica **gated no artefato** `atom-map` do metagamify (declarado≠verificado). **Gate SATISFEITO em 2026-07-09** — o artefato real chegou via relay do rhilo-app ([inbox/_processed/2026-07-09-artefato-command-center-atom-map.md](../evolution/inbox/_processed/2026-07-09-artefato-command-center-atom-map.md)): ~35 átomos com fonte/dono-de-exibição/dono-de-escrita, ledger de de-dup e invariante grep-verificável. **Materialização EXECUTADA em 2026-07-10** (branch `feat/kg-domain-layer`): átomo = nó `layer: domain`, fonte-única = checagem do radar-de-domínio (`kg-radar.sh`), doutrina na KB [knowledge-graph-sdaal §design/atom-map](../knowledge-base/concepts/knowledge-graph-sdaal.md). |
-| **Origem** | Síntese do maestro ao triar o sinal 2 do metagamify (SDAAL→design): "cara-crachá interessante… a questão é manter eficiência e eficácia **sem sobrepor**". |
+| **Status** | ✅ **Aceito (doutrinário)** — 2026-07-09. Doutrina; **zero código agora**. A materialização (átomos de design como nós do KG) fica **gated no artefato** `atom-map` de um adotante (declarado≠verificado). **Gate SATISFEITO em 2026-07-09** — o artefato real chegou via relay de OUTRO adotante ([inbox/_processed/2026-07-09-artefato-command-center-atom-map.md](../../evolution/inbox/_processed/2026-07-09-artefato-command-center-atom-map.md)): ~35 átomos com fonte/dono-de-exibição/dono-de-escrita, ledger de de-dup e invariante grep-verificável. **Materialização EXECUTADA em 2026-07-10** (branch `feat/kg-domain-layer`): átomo = nó `layer: domain`, fonte-única = checagem do radar-de-domínio (`kg-radar.sh`), doutrina na KB [knowledge-graph-sdaal §design/atom-map](../../knowledge-base/concepts/knowledge-graph-sdaal.md). |
+| **Origem** | Síntese do maestro ao triar o sinal 2 de um adotante (SDAAL→design): "cara-crachá interessante… a questão é manter eficiência e eficácia **sem sobrepor**". |
 
 ---
 
 ## Status
 ✅ **Aceito (doutrinário)** — 2026-07-09. Decide a **postura de não-sobreposição**; a implementação (nós de
-design no KG + checagem de integridade) liga quando o artefato `atom-map` real chegar (relay do metagamify).
-**Update (mesmo dia, triagem noturna):** o artefato chegou — relay do **rhilo-app** (não do metagamify),
+design no KG + checagem de integridade) liga quando o artefato `atom-map` real chegar (relay de um adotante).
+**Update (mesmo dia, triagem noturna):** o artefato chegou — relay de OUTRO adotante (não do que pediu),
 arquivado em `../evolution/inbox/_processed/2026-07-09-artefato-command-center-atom-map.md`. O gate está
 satisfeito; a materialização é item de backlog aberto (não executado nesta triagem).
 **Update 2026-07-10:** materialização **executada** junto com a promoção da camada domain (sinal
@@ -37,7 +37,7 @@ radar-de-domínio e doutrina na KB. `SourceTag` permanece adaptador do adotante 
 Duas forças convergiram e **pareciam competir**:
 1. **Vertical de design (generativa):** `brand-generator` larga N candidatas → gate **WCAG** decide
    (`/design:generate`). É *explorar o espaço*.
-2. **Sinal do metagamify (estrutural):** ao redesenhar o front, o mesmo método do KG-SDAAL curou a UI "por
+2. **Sinal de um adotante (estrutural):** ao redesenhar o front, o mesmo método do KG-SDAAL curou a UI "por
    identidade, não por analogia": **`atom-map`** (1 átomo = 1 fonte + 1 dono-de-exibição + 1 dono-de-escrita) +
    **`SourceTag`** (rastreabilidade como componente) + invariante de fonte-única verificável por grep.
 
@@ -54,7 +54,7 @@ função, contra "eficiência e eficácia sem sobrepor".
   fonte-única no front) é **framework**; a *impl React* (`SourceTag`) é **do adotante** — absorve-se o conceito,
   não o código.
 - **O "cara-crachá" = a checagem de integridade.** Verificar que o valor **renderizado** (dono-de-exibição)
-  usa o crachá da sua **fonte real** (dono-de-escrita) é o padrão [`verify-read-path-first`](../knowledge-base/agentic-patterns/ai-strategies/verify-read-path-first.md)
+  usa o crachá da sua **fonte real** (dono-de-escrita) é o padrão [`verify-read-path-first`](../../knowledge-base/agentic-patterns/ai-strategies/verify-read-path-first.md)
   aplicado ao frontend → vira uma **checagem de integridade do KG** (radar do `/meta:kg`, irmã do gate do
   `.kg.yaml`), **não** um mecanismo novo de design.
 - **"2+ versões" não conflita com fonte-única.** São eixos de versão distintos: **candidatas** (no espaço,
@@ -68,9 +68,9 @@ função, contra "eficiência e eficácia sem sobrepor".
   integridade no radar do `/meta:kg`. Generation continua a **frente divergente**; o KG continua a
   **governança atrás**; o `SourceTag` é **adaptador**.
 - **Alinha** com `onion-adr-verticals-investigation-cartography` (KG-SDAAL como espinha da investigação) e com
-  a resposta downstream ao metagamify (vertical design já existe; mapear atom-map contra ela).
+  a resposta downstream ao adotante (vertical design já existe; mapear atom-map contra ela).
 
 ## Gatilho de materialização (gated)
-Ligar quando o **`atom-map` real** do metagamify for relayado (o sinal pediu; ainda não ancorado no core —
+Ligar quando o **`atom-map` real** de um adotante for relayado (o sinal pediu; ainda não ancorado no core —
 declarado≠verificado). Aí: 1 dogfood modelando átomos de design no KG + a checagem de integridade. Até lá,
 **doutrina de postura**, sem código.

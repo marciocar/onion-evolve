@@ -47,7 +47,7 @@ Detalhes e fronteiras: [ADR transporte por pull](../analysis/onion-adr-federatio
 
 ## Princípios (estado da arte 2026)
 
-- **Orquestração, não autonomia:** o humano (você) é o **maestro**; agentes rodam async, cada um no seu escopo. O risco que se controla é **ler+interpretar+executar** automático sem gate — **não** "agentes se falarem". **Transportar** e **notificar** mensagens podem ser automáticos (determinísticos); **executar** o que chega é gate humano. A2A é ortogonal. Por isso o **A2A-runtime cross-repo fica `hold`** (auto-execução distribuída + atomicidade multi-repo inexistente), não por proibir conversa. Eixo completo: [`../analysis/onion-adr-comms-transport-vs-execution-2026-06.md`](../analysis/onion-adr-comms-transport-vs-execution-2026-06.md).
+- **Orquestração, não autonomia:** o humano (você) é o **maestro**; agentes rodam async, cada um no seu escopo. O risco que se controla é **ler+interpretar+executar** automático sem gate — **não** "agentes se falarem". **Transportar** e **notificar** mensagens podem ser automáticos (determinísticos); **executar** o que chega é gate humano. A2A é ortogonal. Por isso o **A2A-runtime cross-repo fica `hold`** (auto-execução distribuída + atomicidade multi-repo inexistente), não por proibir conversa. Eixo completo: [`../knowledge-base/decisions/onion-adr-comms-transport-vs-execution-2026-06.md`](../knowledge-base/decisions/onion-adr-comms-transport-vs-execution-2026-06.md).
 - **Coordenação = git-async:** mensagens são **markdown commitado** (padrão *drop-box* / GitHub Squad). "Async dentro do repo escala melhor que tempo-real."
 - **Um escritor por repo:** cada repo tem uma sessão dona; **git worktrees** para paralelismo no mesmo repo
   (layout canônico: [`worktree-convention-2026.md`](worktree-convention-2026.md)).
@@ -99,7 +99,7 @@ com o repo** ("o Onion do Arandek", "a sessão do metagamify").
 - **Carteiro (transporte automático)** 🟠 *a-desenhar:* hoje o **relay entre repos é manual** (o maestro
   cruza as pontas). O carteiro automatiza só **transporte + notificação** (atos 1-2), nunca a execução
   (ato 3): **pull pelo destino** (respeita "um escritor por repo"), reusando ledger git + scripts
-  determinísticos. Design no [ADR do eixo](../analysis/onion-adr-comms-transport-vs-execution-2026-06.md); liga no gatilho de graduação.
+  determinísticos. Design no [ADR do eixo](../knowledge-base/decisions/onion-adr-comms-transport-vs-execution-2026-06.md); liga no gatilho de graduação.
   - **Carteiro-local** (`/meta:co-deliver`/`/meta:co-relay`) já automatiza o caso **1-máquina** (filesystem
     compartilhado). Para um membro em **máquina diferente**, sem esses atalhos: ver
     [`federation/onboarding-remote-member.md`](federation/onboarding-remote-member.md).
@@ -116,7 +116,7 @@ com o repo** ("o Onion do Arandek", "a sessão do metagamify").
   (`~/worktrees/<repo>/<branch-slug>` — crédito: prática de campo do metagamify).
 - O handoff é uma das **7 topologias de sessão** (Eixo E, valores W1-W7 — quem trabalha onde, a partir de onde): a
   taxonomia completa (source-por-path, sessão-do-alvo, responder-gated, ⏰ reflexão etc.) vive no
-  [ADR work-models](../analysis/onion-adr-work-models-session-topologies-2026-07.md) + KB
+  [ADR work-models](../knowledge-base/decisions/onion-adr-work-models-session-topologies-2026-07.md) + KB
   [federation-usage-modes §1.0](../knowledge-base/concepts/federation-usage-modes.md).
 
 ## Notificação & gerenciamento do inbox ("you have mail")
@@ -157,7 +157,7 @@ herdam** o mesmo "you have mail".
 |---|---|
 | Coordenação por arquivo commitado no repo | *drop-box* do GitHub Squad — async no repo escala melhor que tempo-real |
 | Humano maestro, agentes async por escopo | "Coerência por orquestração, não autonomia" (consenso 2026) |
-| A2A-runtime cross-repo = `hold` | risco = auto-execução distribuída (ato 3 sem gate) + atomicidade multi-repo inexistente; A2A v1.2 (LF) é peso cross-org enterprise. Não é "proibir conversa" — ver [ADR do eixo](../analysis/onion-adr-comms-transport-vs-execution-2026-06.md) |
+| A2A-runtime cross-repo = `hold` | risco = auto-execução distribuída (ato 3 sem gate) + atomicidade multi-repo inexistente; A2A v1.2 (LF) é peso cross-org enterprise. Não é "proibir conversa" — ver [ADR do eixo](../knowledge-base/decisions/onion-adr-comms-transport-vs-execution-2026-06.md) |
 | Registro + pin de versão | manifest-pinning (textbook); multi-repo custa 15–30% em coordenação |
 
 Fontes: [GitHub Squad](https://github.blog/ai-and-ml/github-copilot/how-squad-runs-coordinated-ai-agents-inside-your-repository/) · [Orchestration not autonomy](https://mikemason.ca/writing/ai-coding-agents-jan-2026/) · [LF Agent2Agent](https://www.linuxfoundation.org/press/linux-foundation-launches-the-agent2agent-protocol-project-to-enable-secure-intelligent-communication-between-ai-agents) · [Multi-repo coordination tax](https://medium.com/@kantmusk/the-20-coordination-tax-every-multi-repo-javascript-team-pays-in-2026-f58d1a6b85d3)
