@@ -47,11 +47,15 @@ rel="${target#"${root}/"}"
 rows="$(LC_ALL=C grep -F "$(printf '%s\t' "${rel}")" "${IDX}" 2>/dev/null | LC_ALL=C awk -F'\t' -v a="${rel}" '$1 == a' || true)"
 [ -n "${rows}" ] || exit 0
 
-ids="$(printf '%s\n' "${rows}" | cut -f2 | LC_ALL=C sort -u | head -8 | paste -sd' ' -)"
+# ⚠️ `sed -n '1,Np'` em vez de `head -N`: o head FECHA O PIPE ao atingir a conta, o produtor
+# a montante toma EPIPE e, sob `pipefail`, o status do comando inteiro vira 141. `sed` DRENA a
+# entrada até o fim — mesma saída, sem corrida. É a classe `pipefail-epipe-early-closer`, e este
+# é o terceiro sítio dela que eu escrevo no mesmo dia.
+ids="$(printf '%s\n' "${rows}" | cut -f2 | LC_ALL=C sort -u | sed -n '1,8p' | tr '\n' ' ')"
 # ⚠️ `paste -sd' · '` NÃO junta com " · ": o -d é um CONJUNTO de delimitadores e o paste usa um
 # caractere por junção, ciclando — a saída sai com bytes soltos no meio dos nomes. Medido no 1º
 # teste deste hook. `awk` junta com a string inteira, que é o que se queria.
-graphs="$(printf '%s\n' "${rows}" | cut -f3 | LC_ALL=C sort -u | head -3 | awk '{ printf "%s%s", (NR>1 ? " · " : ""), $0 }')"
+graphs="$(printf '%s\n' "${rows}" | cut -f3 | LC_ALL=C sort -u | sed -n '1,3p' | awk '{ printf "%s%s", (NR>1 ? " · " : ""), $0 }')"
 n="$(printf '%s\n' "${rows}" | wc -l | tr -d ' ')"
 
 python3 - "$rel" "$ids" "$graphs" "$n" <<'PY'
