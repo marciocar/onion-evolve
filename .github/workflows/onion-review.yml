@@ -29,6 +29,10 @@ jobs:
     if: ${{ github.event.pull_request.head.repo.fork == false }}
     env:
       HAS_ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
+      # SSOT do modelo do revisor. Estava escrito TRÊS vezes depois desta cura (as duas chamadas
+      # e o pré-voo), e um pré-voo que exercita um modelo diferente do que o revisor usa é pior
+      # que pré-voo nenhum: aprova o caminho errado. Uma cópia só, e o drift acaba por construção.
+      REVIEW_MODEL: claude-sonnet-5
     outputs:
       revisou: ${{ steps.v1.outputs.revisou == 'true' && 'true' || steps.v2.outputs.revisou }}
       motivo1: ${{ steps.v1.outputs.motivo }}
@@ -66,24 +70,63 @@ jobs:
       #
       # Este pré-voo converte 6 minutos de mistério em 1 segundo de causa dita. `/v1/models`
       # é o alvo por não consumir tokens. Nunca imprime o secret — só o código HTTP.
-      - name: Pré-voo — a credencial responde? (a action mascara 401 como hang)
+      # ⚠️ O PRÉ-VOO MEDIA A COISA ADJACENTE (medido 2026-09-16, PR #836). `/v1/models` foi
+      # escolhido por não consumir tokens — e é exatamente por isso que ele NÃO PROVA NADA sobre
+      # a capacidade de rodar o revisor: listar modelos é uma leitura que uma chave sem saldo, ou
+      # sem permissão para o modelo do revisor naquele workspace, responde 200 do mesmo jeito.
+      #
+      # O que se mediu quando ele disse "HTTP 200" e o revisor morreu assim mesmo: a sessão
+      # INICIALIZA (`Claude Code initialized`, modelo certo) e morre em 413 ms com
+      # `num_turns: 1`, `total_cost_usd: 0`, `permission_denials_count: 0` e NENHUMA mensagem.
+      # Custo zero com morte instantânea é a assinatura de uma chamada REJEITADA ANTES DE FATURAR.
+      # E as outras hipóteses foram REFUTADAS por medição, não descartadas por raciocínio: os 4
+      # hooks de SessionStart saem rc=0 em ambiente nu; e a invocação idêntica (mesmos flags,
+      # mesma CLI, clone raso da própria branch, settings e 14 hooks presentes) sai `is_error:
+      # false`. O repositório não é a causa; a credencial do runner é.
+      #
+      # Por isso o pré-voo agora EXERCITA O CAMINHO REAL: `POST /v1/messages` com o MESMO modelo
+      # do revisor e `max_tokens: 1`. Custa uma fração de centavo e responde a única pergunta que
+      # importa — "esta chave consegue rodar ESTE modelo agora?". É a doutrina
+      # `behavior-over-declaration` aplicada à guarda que existia para não confiar em declaração:
+      # confie no que o artefato FAZ, não no que um endpoint adjacente declara.
+      #
+      # E ele IMPRIME O CORPO da resposta no erro (nunca o segredo — o corpo de erro da API traz
+      # `type`/`message`, não credencial). Sem isso a falha chega muda, que foi o que custou a
+      # investigação inteira: `is_error` sem mensagem não diz se é saldo, permissão de modelo ou
+      # workspace, e essas três têm consertos diferentes.
+      - name: Pré-voo — a credencial consegue RODAR o modelo do revisor?
         id: preflight
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
         env:
           KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          MODELO: ${{ env.REVIEW_MODEL }}
         run: |
           set +e
-          code="$(curl -sS -o /dev/null --max-time 30 -w '%{http_code}' \
-            https://api.anthropic.com/v1/models \
-            -H "x-api-key: ${KEY}" -H "anthropic-version: 2023-06-01" 2>/dev/null)"
+          corpo="$(mktemp)"
+          code="$(curl -sS -o "${corpo}" --max-time 30 -w '%{http_code}' \
+            https://api.anthropic.com/v1/messages \
+            -H "x-api-key: ${KEY}" -H "anthropic-version: 2023-06-01" \
+            -H 'content-type: application/json' \
+            -d "{\"model\":\"${MODELO}\",\"max_tokens\":1,\"messages\":[{\"role\":\"user\",\"content\":\"ok\"}]}" 2>/dev/null)"
           [ -z "${code}" ] && code=000
-          echo "pré-voo: HTTP ${code}"
+          echo "pré-voo (POST /v1/messages, modelo ${MODELO}, max_tokens=1): HTTP ${code}"
           if [ "${code}" = "200" ]; then
             echo "ok=true" >> "${GITHUB_OUTPUT}"; echo "http=200" >> "${GITHUB_OUTPUT}"
+            echo "causa=" >> "${GITHUB_OUTPUT}"
           else
+            # O corpo de erro da API é `{"type":"error","error":{"type":...,"message":...}}` — nunca
+            # traz credencial. Imprimi-lo é o que transforma `is_error` mudo em causa acionável.
+            # `tr -d '\n'` + `cut` porque o corpo é JSON de uma linha só na prática, e um
+            # ::warning:: com quebra de linha some do sumário do Actions. Sem python aqui: script
+            # embutido em bloco `run: |` é onde a indentação do YAML quebra em silêncio.
+            causa="$(tr -d '\n' < "${corpo}" | cut -c1-300)"
+            [ -z "${causa}" ] && causa="(corpo vazio)"
             echo "ok=false" >> "${GITHUB_OUTPUT}"; echo "http=${code}" >> "${GITHUB_OUTPUT}"
-            echo "::warning::pré-voo da credencial falhou (HTTP ${code}) — o revisor NÃO será chamado. Chamá-lo agora custaria ~6min e devolveria 'is_error' sem mensagem, porque a action não repassa erro de auth."
+            echo "causa=${causa}" >> "${GITHUB_OUTPUT}"
+            echo "causa da API: ${causa}"
+            echo "::warning::pré-voo falhou (HTTP ${code}) — ${causa}. O revisor NÃO será chamado: ele morreria em ~400ms com 'is_error' e custo ZERO, sem mensagem nenhuma, porque a action não repassa o erro da API."
           fi
+          rm -f "${corpo}"
 
       # RESILIÊNCIA (2026-07-14): continue-on-error faz um CRASH do agente (is_error)
       # NÃO reprovar o PR. Motivo (achado por dogfood): este job só fica VERMELHO quando
@@ -184,7 +227,7 @@ jobs:
           # zero turnos, a allowlist está estreita demais e o caminho é alargá-la — nunca removê-la,
           # porque sem ela a morte por negação volta.
           claude_args: |
-            --model claude-sonnet-5
+            --model ${{ env.REVIEW_MODEL }}
             --max-turns 60
             --allowedTools Read Grep Glob Bash
 
@@ -295,7 +338,7 @@ jobs:
           # zero turnos, a allowlist está estreita demais e o caminho é alargá-la — nunca removê-la,
           # porque sem ela a morte por negação volta.
           claude_args: |
-            --model claude-sonnet-5
+            --model ${{ env.REVIEW_MODEL }}
             --max-turns 60
             --allowedTools Read Grep Glob Bash
 
@@ -404,6 +447,7 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PREFLIGHT_OK: ${{ steps.preflight.outputs.ok }}
           PREFLIGHT_HTTP: ${{ steps.preflight.outputs.http }}
+          PREFLIGHT_CAUSA: ${{ steps.preflight.outputs.causa }}
         run: |
           # ═══ ALARME SÓ QUANDO EXIGE DECISÃO (2026-08-04) ═══
           # Sinal de campo do maestro: "não entendo porque estamos sempre com esta mensagem".
@@ -426,7 +470,11 @@ jobs:
           elif [ "${PREFLIGHT_OK}" != "true" ]; then
             # Credencial: a causa que a action esconde atrás de um hang, e a única do lote cujo
             # conserto não é código.
-            nota=" **Causa medida: a credencial do CI não autentica** (pré-voo: HTTP \`${PREFLIGHT_HTTP}\`). O revisor sequer foi chamado — a action não repassa erro de auth, ela pendura ~180s e devolve \`is_error\` sem mensagem. Conserto: gravar um \`ANTHROPIC_API_KEY\` válido no repo."
+            # A CAUSA AGORA VEM DA API, não de uma suposição nossa: o pré-voo exercita
+            # POST /v1/messages e captura o corpo do erro. "Credencial inválida", "saldo
+            # insuficiente" e "modelo não permitido neste workspace" têm consertos
+            # DIFERENTES, e antes desta cura as três chegavam como o mesmo silêncio.
+            nota=" **Causa medida, dita pela própria API** (pré-voo \`POST /v1/messages\` com o modelo do revisor, HTTP \`${PREFLIGHT_HTTP}\`): \`${PREFLIGHT_CAUSA}\`. O revisor sequer foi chamado — chamá-lo devolveria \`is_error\` em ~400ms, custo ZERO e sem mensagem, porque a action não repassa o erro da API. Conserto: o que a linha acima disser (chave, saldo, ou acesso ao modelo no workspace)."
           elif git diff --name-only "${BASE_SHA}" HEAD | grep -q '^\.github/workflows/onion-review\.yml$'; then
             # DUAS CONDIÇÕES, não uma — e a segunda entrou na revisão adversarial de 2026-08-06.
             # O diff sozinho é PROXY da causa, não a causa. Enquanto `benigno` só suprimia
