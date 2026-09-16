@@ -50,7 +50,13 @@ _n=0 _vazias=""
 # desta casa diz que erro recorrente vira REGISTRO com cura anexada, não disciplina de quem lembra.
 # Toda projeção GERADA que tenha catraca no lint pertence a esta lista — quem acrescentar uma guarda
 # de projeção nova e esquecer daqui vai pagar o mesmo pedágio.
-for _pair in "inventory.sh:inventory.md" "graph.sh:graph.md" "testing-state.sh:testing-state.md"; do
+# ⚠️ 2ª AMPLIAÇÃO NO MESMO DIA, e a recorrência é o achado. Hoje de manhã acrescentei
+# `testing-state.md` depois de a REGRA 81 reprovar QUATRO vezes; à noite a REGRA 80 reprovou pelo
+# mesmo motivo com `testing-inventory.md`, que eu também não tinha posto. Curar UM item de uma
+# lista que devia ser completa é curar o caso, não a classe — e a classe cobra de novo no mesmo dia.
+# CRITÉRIO, para não haver terceira: TODA projeção gerada com catraca no lint pertence a esta lista.
+# Hoje são quatro (REGRAS 8, 21, 80, 81) mais o índice de leitura (REGRA 84, fora do laço por ser TSV).
+for _pair in "inventory.sh:inventory.md" "graph.sh:graph.md" "testing-state.sh:testing-state.md" "harness-inventory.sh:testing-inventory.md"; do
   _gen="${_pair%%:*}"; _out="${_pair##*:}"
   [ -f "${DEST}/.claude/validation/${_gen}" ] || continue
   bash "${DEST}/.claude/validation/${_gen}" --markdown > "${DEST}/docs/onion/${_out}" 2>/dev/null || true

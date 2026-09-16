@@ -23,7 +23,7 @@
 | Pares de modo consumido (REGRA 59) | **47** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | idem |
 | Scripts de validação | **75** | `git ls-files '.claude/validation/*.sh'` |
-| Hooks | **15** | `git ls-files '.claude/hooks/*.sh'` |
+| Hooks | **16** | `git ls-files '.claude/hooks/*.sh'` |
 | Workflows de CI | **4** | `git ls-files '.github/workflows/*.yml'` |
 | Baselines de catraca | **10** | `git ls-files '.claude/validation/*-baseline.txt'` |
 
