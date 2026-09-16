@@ -2,10 +2,10 @@
 title: 'Resíduo — o verificador que provava comportamento decidia por string'
 date: 2026-09-15
 branch: fix/adopter-gate-hookspath-string-compare
-reviewed_diff_sha256: dfb88f59658e733fd3dad73237aef98c1d7f9eaa99244c4b5d009285f4e490a9
-findings_total: 5
-findings_real: 5
-findings_fixed: 5
+reviewed_diff_sha256: 5fb9bb7ec6014ebc284571bab88fe3252756f9712280efe4e2ce883865e5c0fa
+findings_total: 6
+findings_real: 6
+findings_fixed: 6
 tokens: 0
 duration_min: 0
 verdict: REPROVADO_E_CURADO
@@ -146,10 +146,27 @@ Terceira vez no dia que uma captura matou a suíte sob `set -e`: a fixture do `(
 reprovando **de propósito**, então o hook barra o commit-base dela. O commit-base agora é
 `--no-verify` — ele existe só para dar `HEAD` ao alvo.
 
+## O sexto, e o CI recusou o meu "pulo honesto"
+
+O `(d2)` que eu escrevi para não medir o ambiente **pulava** no CI, e eu tinha projetado isso como
+saída honesta. O CI roda em **STRICT**, onde `⊘ NÃO VERIFICADO` **não é aprovação** — e reprovou com
+`FALHOU (STRICT) — 1 guarda não pôde ser exercida`, mesmo com **1271 passando e 0 falhando**.
+
+Está certo, e a régua é melhor que a minha: **guarda que não roda no CI é guarda que não existe.** Um
+skip declarado resolve a honestidade do relatório e não resolve a cobertura.
+
+**A causa era configuração, não ambiente:** o commit-sonda do verificador não passava identidade git.
+Num runner limpo (sem `user.email`/`user.name` globais) o git **recusa o commit antes de chamar o
+hook** — e o verificador concluía *"o hook não executou"* quando o que faltava era `git config`.
+
+Curado no lugar certo: identidade **do próprio sonda**, via `-c` (morre com ele, não toca a
+configuração do alvo). Provado reproduzindo a condição do CI com `HOME` vazio — **7/7, zero skips**,
+onde antes pulava.
+
 ## Gate
 
 ```
-famílias novas      : adopter_gate 7/7 · sweep_fixtures 5/5
+famílias novas      : adopter_gate 7/7 (zero skips, provado com HOME sem git config) · sweep_fixtures 5/5
 radar / integrity    : exit 0 (34 nós)
 realign              : ALINHADO
 commit               : SEM --no-verify
