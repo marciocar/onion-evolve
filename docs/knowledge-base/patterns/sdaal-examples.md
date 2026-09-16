@@ -89,7 +89,7 @@ await manager.send({ ... });
 
 ## 📚 Documentação Relacionada
 
-- [SDAAL Pattern](../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md)
+- [SDAAL Pattern](../concepts/specification-driven-ai-abstraction-layer.md)
 - [Interface](./interface.md)
 - [Factory](./factory.md)
 
@@ -604,5 +604,5 @@ class NoProviderAdapter implements {{interface_name}} {
 
 - [SDAAL Pattern (conceitual)](../concepts/specification-driven-ai-abstraction-layer.md)
 - [Task Manager Abstraction (referência real)](../concepts/task-manager-abstraction.md)
-- [Comando /meta/create-abstraction](../../../.claude/commands/meta/create-abstraction.md)
+- `/meta:create-abstraction`
 - Template base: skill `common:templates:abstraction-template`

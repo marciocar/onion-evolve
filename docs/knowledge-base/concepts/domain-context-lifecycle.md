@@ -27,7 +27,7 @@
 **Relacionados no Onion:**
 - [Doutrina de Modernização do Onion](onion-modernization-doctrine.md) — vizinha (peso/acoplamento de artefatos)
 - Meta-specs: [architecture.md](../../meta-specs/architecture.md) · [code-standards.md](../../meta-specs/code-standards.md)
-- [`/meta:kb-freshness`](../../../.claude/commands/meta/kb-freshness.md) — molde reusável da fase *Manage*
+- `/meta:kb-freshness` — molde reusável da fase *Manage*
 
 ---
 
@@ -87,15 +87,15 @@ Recorte por **dono × ritmo × decisão**, nunca por organograma. O projeto-alvo
 
 ## 🔄 A fase *Manage* (contrato para a camada executável)
 
-Esta KB define a **doutrina**. A execução da fase *Manage* (auditar frescor de contexto, barrar staleness no CI, compor no loop de auto-evolução) **reusa o molde já existente** de [`/meta:kb-freshness`](../../../.claude/commands/meta/kb-freshness.md), em vez de inventar maquinaria nova:
+Esta KB define a **doutrina**. A execução da fase *Manage* (auditar frescor de contexto, barrar staleness no CI, compor no loop de auto-evolução) **reusa o molde já existente** de `/meta:kb-freshness`, em vez de inventar maquinaria nova:
 
 - **Verdito** por arquivo: `CURRENT` / `STALE` / `HISTORICAL`.
 - **Threshold de frescor** herdado: cada arquivo carrega `Última Atualização`; ausente ou **> 18 meses** = candidato a STALE.
 - **Fan-out** via [`onion-orchestration`](../../../.claude/skills/onion-orchestration/SKILL.md) (pattern `fan-out-and-synthesize`): worker por arquivo/diretório (tier haiku) → fan-in (tier sonnet) → retorno no formato `FreshnessSchema[]`.
-- **Composição** no [`/meta:evolve`](../../../.claude/commands/meta/evolve.md) como dimensão **no fluxo principal** — como D4/D5 hoje delegam a `kb-freshness`/`metaspec-validate` sem aninhar orquestração dentro de orquestração.
+- **Composição** no `/meta:evolve` como dimensão **no fluxo principal** — como D4/D5 hoje delegam a `kb-freshness`/`metaspec-validate` sem aninhar orquestração dentro de orquestração.
 
 > **Tijolo 2 entregue (2026-06-17):** a fase *Manage* é executada pelo comando
-> [`/meta:context-freshness`](../../../.claude/commands/meta/context-freshness.md) (veredito
+> `/meta:context-freshness` (veredito
 > CURRENT/STALE/HISTORICAL, fan-out via `onion-orchestration`, contradição cross-domínio no fan-in),
 > com a Regra 15 do lint exigindo o carimbo de frescor e a dimensão D9 do `/meta:evolve`
 > compondo a auditoria. Esta KB é a doutrina (Tijolo 1) que esse comando executa.

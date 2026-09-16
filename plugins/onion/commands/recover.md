@@ -4,8 +4,8 @@ description: |
   Recupera a identidade Onion de um repo adotado que perdeu contato com o framework:
   regenera .onion-version ausente/incompleto e o skeleton do CLAUDE.md. Nunca sobrescreve
   customizações locais (never-clobber). Use quando Claude Code abre "cego" ao Onion mesmo
-  com .claude/ instalado. Para repos sem .claude/ algum, usar docs/applying/rescue-prompt.md.
-  Relacionado: meta:adopt --update, docs/applying/rescue-prompt.md.
+  com .claude/ instalado. Para repos sem .claude/ algum, usar `rescue-prompt` (core-only).
+  Relacionado: meta:adopt --update, `rescue-prompt` (core-only).
 allowed-tools: Read Write Edit Glob Grep Bash(git *) Bash(bash *) Bash(awk *) Bash(grep *) Bash(ls *) Bash(cat *) Bash(mkdir *) Bash(touch *) Bash(date *)
 argument-hint: "[--dry-run]"
 category: meta
@@ -24,7 +24,7 @@ fonte. Cobre dois sintomas:
 - `CLAUDE.md` sem skeleton Onion → nenhum roteamento de task manager, idioma ou branches
 
 > **Pré-requisito:** `.claude/` com agents/commands/skills deve existir. Se não existe, o repo está
-> totalmente orphaned — use `docs/applying/rescue-prompt.md`
+> totalmente orphaned — use `rescue-prompt` (core-only)
 > (funciona sem Onion instalado).
 
 ---
@@ -334,7 +334,7 @@ grep -q "instância adotada\|adopted" "$REPO/CLAUDE.md" 2>/dev/null \
 
 # 3. .claude/ core presente
 [ -d "$REPO/.claude/agents" ] && [ -d "$REPO/.claude/commands" ] \
-  && echo "✅ .claude/: core presente" || echo "❌ .claude/: incompleto — usar rescue-prompt.md"
+  && echo "✅ .claude/: core presente" || echo "❌ .claude/: incompleto — usar o rescue-prompt (core-only)"
 
 # 4. Adapter do task manager existe
 TM="$(grep "^TASK_MANAGER_PROVIDER" "$REPO/.env" 2>/dev/null | cut -d= -f2 | tr -d ' ')"
@@ -382,5 +382,5 @@ Co-Authored-By: Claude Sonnet 4.6 <noreply@anthropic.com>"
 | `.claude/` intacto, stamp/CLAUDE.md quebrados | **Este comando** (`/onion:recover`) |
 | `.claude/` desatualizado (nova versão do core) | `meta:adopt --update <path>` (da sessão do core) |
 | `.claude/` parcialmente ausente (utils/, hooks/) | `meta:adopt --update <path>` (da sessão do core) |
-| Sem `.claude/` algum | `docs/applying/rescue-prompt.md` |
+| Sem `.claude/` algum | `rescue-prompt` (core-only) |
 | Quer adoção inicial | `meta:adopt <path>` (da sessão do core) |

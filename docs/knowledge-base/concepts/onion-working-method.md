@@ -121,7 +121,7 @@ O loop fecha no **KG** nas duas pontas: `read(KG)` antes de auditar (§0), `writ
 (`verified_at`/STALE) são **o mesmo invariante**: *declarado ≠ verificado; re-testar, nunca re-carimbar*.
 
 - **Fonte canônica:** [Dogfooding Doctrine §♻️](onion-dogfooding-doctrine.md) (o enunciado + as 3
-  instâncias) · mecânica: [`/meta:diary review`](../../../.claude/commands/meta/diary.md) ·
+  instâncias) · mecânica: `/meta:diary` ·
   [KG §Frescor](knowledge-graph-sdaal.md#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou).
 
 ### 3b. Revisão adversarial e fechar o loop
@@ -177,7 +177,7 @@ hierarquia L0-L3). Esta KB **cita**; cada uma permanece SSOT do seu tipo:
 | **Regra global** | disciplina do executor | carrega toda sessão, multi-projeto | `~/.claude/rules/working-discipline.md` |
 | **Memória** | estado/feedback entre sessões | por-dev, privada, recall automático | `~/.claude/projects/<repo>/memory/` |
 | **KG** (`.kg.yaml`) | **o que é verdade agora** (estado/domínio) | grafo tipado, **append-mostly**, verdades reconciliadas (`REFUTES`/`SUPERSEDES`), com frescor (`verified_at`) | `docs/onion/graph/*.kg.yaml` · motor `kg-radar.sh` · [KG SDAAL](knowledge-graph-sdaal.md) |
-| **Diário** (migalha) | o que o Transformer **deve absorver** | frontmatter estruturado, TTL (`review_after`), re-teste dirigido (`conflict_class`) | `.claude/diary/` · [`/meta:diary`](../../../.claude/commands/meta/diary.md) · RFC-0003 §2.3 |
+| **Diário** (migalha) | o que o Transformer **deve absorver** | frontmatter estruturado, TTL (`review_after`), re-teste dirigido (`conflict_class`) | `.claude/diary/` · `/meta:diary` · RFC-0003 §2.3 |
 
 **Caminho de graduação:** uma decisão nasce **ADR** (provisório) → pode **cravar em meta-spec** (lei) num PR
 constitucional (ex.: o PFR está nesse caminho). Esta KB descreve o estado vigente e aponta para o artefato

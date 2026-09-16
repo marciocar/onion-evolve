@@ -18,7 +18,7 @@
 | **Data de Criação** | 2026-07-19 |
 | **Última Atualização** | 2026-07-19 |
 | **Categoria** | Conceitos |
-| **Origem** | Sinal de co-evolução (upstream) 2026-07-19, `discuss/onion-pessoal-app` (VPS) — pedido explícito do maestro de recomendar ao core |
+| **Origem** | Sinal de co-evolução (upstream) 2026-07-19, de um vertical privado do core — pedido explícito do maestro de recomendar ao core |
 | **Padrão-parente** | [Knowledge Graph SDAAL](knowledge-graph-sdaal.md) §SSOT-as-runtime (a perna `verify(vivo)`) · [Fonte ≠ Derivação](source-vs-derivation.md) (família do `declarado≠verificado`) |
 
 ---

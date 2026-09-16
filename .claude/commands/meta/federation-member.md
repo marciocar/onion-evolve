@@ -143,7 +143,7 @@ ou, em falha:
 
 ## 🔗 Referências
 
-- Spec (OP-1..4 + gate FECHADO da plataforma): `docs/analysis/onion-m3-federation-admin-spec-2026-07.md` — o desenho command-side da federação no core (core-privado; no adotante não existe)
+- Spec (OP-1..4 + gate FECHADO da plataforma): `onion-m3-federation-admin-spec-2026-07` (core-only) — o desenho command-side da federação no core (core-privado; no adotante não existe)
 - Grafo do fio: `docs/onion/graph/m3-federation-admin-2026-07.kg.yaml` (nó `C_op_register`)
 - Validação: `.claude/validation/members-validate.sh` · pin: `.claude/validation/pin-integrity-check.sh`
 - Precedente comando↔script: `/meta:inventory` ↔ `.claude/validation/inventory.sh`

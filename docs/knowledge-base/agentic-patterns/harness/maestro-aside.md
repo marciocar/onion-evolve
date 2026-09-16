@@ -62,7 +62,7 @@ Cada marcador aponta o mecanismo **nativo do Claude Code** + o **mecanismo Onion
 |---|---|---|
 | `dúvida:` | **`/btw`** — pergunta lateral efêmera enquanto trabalha (vê o contexto, não entra no histórico); `f` forka p/ ter ferramentas | — |
 | `corrige:` | **agora** → `Esc` (interrompe **mantendo** o trabalho) e reorienta · **depois** → `Enter` (ENFILEIRA; aplica na próxima fronteira de passo, custo-zero) | worklog: registrar a virada em `notes.md` |
-| `reforço:` | `additionalContext` (canal de absorção) | [`/meta:diary`](../../../../.claude/commands/meta/diary.md) `significance:` se revela identidade |
+| `reforço:` | `additionalContext` (canal de absorção) | `/meta:diary` `significance:` se revela identidade |
 | `nota:` | anotação efêmera | `notes.md` append-only / scratchpad ([worklog-protocol](../../concepts/worklog-protocol.md)) |
 | `guarda:` | **auto-memory** ("lembre que…" → grava em `~/.claude/projects/<proj>/memory/`); `/memory` p/ navegar | `/meta:diary` (aprendizado, com `conflict_class`+`review_after`); [session-memory-lifecycle](../../concepts/session-memory-lifecycle.md) |
 | `+etapa:` | TodoWrite / plano | `STATE.md` bloco `NEXT` / `plan.md` |

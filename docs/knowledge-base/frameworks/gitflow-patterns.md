@@ -5,7 +5,7 @@
 
 > 🧭 **Esta KB é o motor GitFlow canônico (git local).** Os comandos `/git/*` e `/engineer/*` **citam** esta KB para lógica de branching/merge/tag/semver em vez de re-delegar ad-hoc ao `@gitflow-specialist`. O especialista permanece como **mentor para dúvidas interativas**, não como dependência de runtime por comando.
 >
-> Operações de **host remoto** (Pull Request, review, CI/checks, Release) **não** vivem aqui — pertencem ao adapter `.claude/utils/forge/` (SDAAL). Esta KB cobre só o **git local** (branch, merge, tag, push). Ver [interface.md §Fronteira local-vs-remoto](../../../.claude/utils/forge/interface.md).
+> Operações de **host remoto** (Pull Request, review, CI/checks, Release) **não** vivem aqui — pertencem ao adapter `.claude/utils/forge/` (SDAAL). Esta KB cobre só o **git local** (branch, merge, tag, push). Ver `interface.md` (helper do core).
 
 ---
 

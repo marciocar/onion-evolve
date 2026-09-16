@@ -12,7 +12,7 @@ argument-hint: "[--reconcile | <data-ou-slug-da-entrada>]  (sem arg = última en
 # 📣 /meta:co-announce — Anunciar mudança aos adotantes (downstream, doc-bridge)
 
 Transforma uma entrada do `docs/evolution/federation/CHANGELOG.md` num **anúncio pronto-para-transportar**
-no `inbound/` do adotante. Fecha o gap do [backlog #6](../../../docs/analysis/onion-coevolution-backlog-2026-06-18.md):
+no `inbound/` do adotante. Fecha o gap do backlog #6 (`onion-coevolution-backlog-2026-06-18`, core-only):
 a capacidade de downstream existe, mas o anúncio **nunca era exercido** ao shipar — dependia de o humano lembrar.
 
 > **O que este comando NÃO é.** Não é o relatório auto-emitido de `/meta:adopt --update` (esse é
@@ -185,4 +185,4 @@ ou, sem destinatário:
 - Protocolo dos 3 fluxos: [docs/evolution/README.md](../../../docs/evolution/README.md)
 - Registro de adotantes: [members.yaml](../../../docs/evolution/federation/members.yaml) · Anúncios: [CHANGELOG.md](../../../docs/evolution/federation/CHANGELOG.md)
 - Ledger de contratos (federação formal): [`/meta:federation-publish`](federation-publish.md)
-- Origem: backlog de co-evolução [item #6](../../../docs/analysis/onion-coevolution-backlog-2026-06-18.md)
+- Origem: backlog de co-evolução item #6 (`onion-coevolution-backlog-2026-06-18`, core-only)

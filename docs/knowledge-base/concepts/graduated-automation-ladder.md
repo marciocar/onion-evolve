@@ -70,7 +70,7 @@ A KB **nomeia** o que o dogfood já forjou (o padrão "candidato entra por USO")
    pulando o gate**.
 2. **Camada de contenção** — o que torna seguro destravar: `entrega-sem-commit`/`committed:false` (I3),
    `never-clobber`, `apply_mode:propose-only` (regulado), path-allowlist, budget-cap do loop, rollback
-   ([`/meta:federation-rollback`](../../../.claude/commands/meta/federation-rollback.md)).
+   (`/meta:federation-rollback`).
 3. **Modo de enforcement** — como a garantia é feita, em ordem de robustez: **estrutural > determinístico >
    gated** ([`onion-guardrails.md §3`](onion-guardrails.md)). O estrutural é o topo: torna o erro
    *impossível por construção*.
@@ -85,7 +85,7 @@ uma vez o que nunca foi automatizado".
 ## O espectro A2A (o caso concreto — federação)
 
 O canal A2A já materializa a escada em 4 faixas (fonte:
-[`a2a-verify.sh`](../../../.claude/utils/federation-transport/a2a-verify.sh) + RFC-0004): **Automático**
+`a2a-verify.sh` (helper do core) + RFC-0004): **Automático**
 (atos 1-2, co-announce/deliver/relay, o verify emite veredito) · **GATED-humano** (aceitar/aplicar sinal —
 `a2a-accept.sh` é o ato humano) · **GATED-com-degradação** (`mode:regulated → propose-only / never-live-pull`)
 · **PROIBIDO** (IA-fala-IA autônoma cross-repo — a linha vermelha). O invariante: `gated:true`/`committed:false`
@@ -118,7 +118,7 @@ Confirmadas pela exploração como território **não pisado** (ver o grafo do E
 - A linha intake≠execução: [`authorization-layers-intake-vs-execution.md`](authorization-layers-intake-vs-execution.md)
 - Catraca + 3 modos: [`onion-guardrails.md`](onion-guardrails.md) §3/§7/§8
 - Fronteira medir≠decidir: [`onion-engine-economy.md`](onion-engine-economy.md)
-- Transporte A2A: RFC-0004 · [`a2a-verify.sh`](../../../.claude/utils/federation-transport/a2a-verify.sh)
+- Transporte A2A: RFC-0004 · `a2a-verify.sh` (helper do core)
 - **O Elenxo (grafo):** `graduated-automation-elenxo-2026-07.kg.yaml` (grafo interno do core; não vendorizado).
   *Dimensão:* o movimento adversarial que **gerou** esta KB — 3 exploradores refutaram "já temos automação
   graduada" / "AUTOMATE pronto" / "a escada está completa"; a evidência mostrou doutrina ~75% já existente mas

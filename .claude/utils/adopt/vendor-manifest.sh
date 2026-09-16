@@ -225,8 +225,22 @@ _emit_role_excludes() {  # $1=REPO $2=papel
 #   inteira, e a assimetria é o lado seguro dos dois modos.
 # `--role/manifest`  = a superfície declarada ∩ HEAD (o transporte real; `git archive` aborta com
 #   pathspec que não casa nada). Sem git, FALHA ALTO — transporte que não sabe o que existe não copia.
+# ── A VARREDURA COBRE ALÉM DO TRANSPORTE — e o `plugins/` é o motivo ─────────────────────────
+# Medido 2026-09-16, por refutador adversarial: `plugins/` NÃO era raiz de varredura, e é o transporte
+# MAIS PÚBLICO que existe nesta casa (o marketplace publica aquele diretório para qualquer um). O
+# conteúdo estava limpo na medição — e essa é exatamente a frase perigosa: limpo era o CONTEÚDO, não
+# a COBERTURA. É a tese do cabeçalho deste arquivo aplicada a si mesmo, "guarda que varre menos do que
+# o transporte emite é fail-open com cara de cobertura", um andar acima: `plugins/` não estava nem no
+# transporte que esta SSOT descreve, então nenhuma guarda o olhava.
+#
+# ⚠️ POR QUE ISTO É UMA LISTA SEPARADA, e não uma entrada em `_base`: `_base` é o MANIFESTO — o que
+# `git archive` copia para o adotante. Um `plugins` ali faria o plugin montado VIAJAR dentro do bundle,
+# que é outra coisa e está errada. A assimetria é o desenho declarado dez linhas acima: varrer mais do
+# que viaja nunca é fail-open; varrer menos é. Portanto o extra só sai no modo `scrub`.
+_SCRUB_EXTRA=(plugins)
+
 if [ "${MODE}" = "scrub" ]; then
-  printf '%s\n' "${_base[@]}"
+  printf '%s\n' "${_base[@]}" "${_SCRUB_EXTRA[@]}"
   exit 0
 fi
 
@@ -294,7 +308,11 @@ fi
 # A cura correta é EMITIR STUB — o baseline do adotante nasce do corpus DELE (regen-baselines.sh
 # --ensure-from já faz isso); o passivo do core não é dívida do cliente.
 [ -d "${BUNDLE}" ] || { echo "ERRO: ${MODE} exige diretório existente: '${BUNDLE}'" >&2; exit 2; }
-_priv='docs/(discussions|analysis|materials|applying)/|onion-pessoal-marcio'
+# ⚠️ O padrão anterior fixava UM nome completo do vertical pessoal, e era ESTREITO DEMAIS (medido
+# 2026-09-16, refutador adversarial): a família tem mais de um repo, e o irmão passava batido —
+# inclusive para dentro do plugin PÚBLICO. Guarda por lista falha pelo VOCABULÁRIO, não pela lógica;
+# o PREFIXO cobre a família inteira, inclusive o repo que ninguém criou ainda.
+_priv='docs/(discussions|analysis|materials|applying)/|onion-pessoal'
 
 # --stub-baselines: a CURA, aplicada na EMISSÃO e não no destino. O cabeçalho é o MESMO que o
 # `regen-baselines.sh --ensure-from` semeia, de propósito: os dois mecanismos têm de concordar sobre

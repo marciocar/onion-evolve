@@ -114,7 +114,7 @@ verifica contra a fonte externa viva, nunca do cutoff).
   `healthCheckGracePeriodSeconds:900` faz o `aws ecs wait services-stable` reportar "estável"
   mesmo assim — invisível ao pipeline.
 - **Trace:** `docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md`;
-  `source_commit 65d8a7501a03`; stack `/home/marcio/onion-logto` commit `7c008b2`.
+  `source_commit 65d8a7501a03`; stack do IdP (core-only) no commit `7c008b2`.
 - **Cura (mecanismo):** pin explícito + verificador automatizado (`check-version.sh`) que
   compara o pin corrente contra o último release e reporta o delta, em cron semanal — **nunca
   `latest`** (pull/restart de rotina pode subir versão cuja migração de banco ninguém aplicou =

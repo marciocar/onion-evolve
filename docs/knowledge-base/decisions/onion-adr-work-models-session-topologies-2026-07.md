@@ -126,7 +126,7 @@ Guardas: lint-selftest modo `session-beacon` (7 casos, incl. regressão da colis
 
 O comportamento de W3 (um escritor por escopo, handoff commitado) sempre foi doutrina; a **localização**
 dos worktrees duráveis do maestro era ad-hoc (`~/<nome>-atual` no manual, sem regra). Codificado em
-[`worktree-convention-2026.md`](../../evolution/worktree-convention-2026.md): layout umbrella
+`worktree-convention-2026.md` (core-only): layout umbrella
 **`~/worktrees/<repo>/<branch-slug>/`** (crédito: prática de campo de um adotante; padrão de mercado
 gwq para fluxos paralelos com agentes IA). Efêmeros tool-managed (vendor-branch/mktemp, adopt legacy,
 `Workflow isolation`, `.claude/worktrees/` do harness) ficam fora — continuam gerenciados por quem os

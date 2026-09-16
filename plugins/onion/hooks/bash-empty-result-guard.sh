@@ -5,7 +5,7 @@
 #   1. `ls -d <path-errado>` → vazio → concluí "o workflow não sobreviveu". Estava vivo; o path
 #      é que omitia um segmento. Relancei em duplicata.
 #   2. `bash script > /tmp/x 2>&1; RC=$?` … `tail x | ...; echo $?` → li o exit do `tail`, não do script.
-#   3. `sudo -n ls /home/onion/.../.env.bak-*` → o glob expande no MEU shell (sem acesso a /home/onion),
+#   3. `sudo -n ls <dir-de-outra-conta>/.env.bak-*` → o glob expande no MEU shell (que não tem acesso),
 #      não sob sudo; `2>/dev/null` engoliu o erro; `wc -l` deu 0 → "a dívida sumiu". Eram 7.
 #
 # O PADRÃO COMUM, e é UM só: resultado VAZIO/ZERO por motivo OPERACIONAL (sem acesso, path errado,

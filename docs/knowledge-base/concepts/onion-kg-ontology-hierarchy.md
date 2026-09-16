@@ -106,7 +106,7 @@ método KG**, não uma consumidora com grafo próprio. Grafos são por-investiga
   [`kg-getting-started.md`](kg-getting-started.md)
 - Fronteira cross-grafo: `docs/onion/graph/fios-abertos.kg.yaml §FRONTEIRA` · overlay:
   `docs/onion/graph/constellation.kg.yaml` + [`constellation-of-studies.md`](constellation-of-studies.md)
-- Comandos: [`/meta:kg`](../../../.claude/commands/meta/kg.md) ·
-  [`/meta:backlog`](../../../.claude/commands/meta/backlog.md) ·
-  [`/meta:kg-freshness`](../../../.claude/commands/meta/kg-freshness.md)
+- Comandos: `/meta:kg` ·
+  `/meta:backlog` ·
+  `/meta:kg-freshness`
 - Perna-de-leitura: `docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md`

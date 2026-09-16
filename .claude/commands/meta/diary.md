@@ -66,7 +66,7 @@ INSTANCE_ID="$(awk '/^instance:/{print $2}' "$REPO/.claude/.onion-version" 2>/de
 4. **Affects** — quais dimensões esta entrada afeta: `engineering`, `product`, `compliance`, `design`, `meta`
 5. **Slug** — nome curto para o arquivo (ex: `oauth-session-learning`)
 6. **Classe de conflito** — COMO esta migalha pode ser invalidada? (vocabulário
-   [MemConflict](../../../docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md) — a
+   MemConflict (`onion-intelligent-breadcrumbs-research-2026-07`, core-only) — a
    estrutura de decisão que dirige o re-teste; pesquisa 2026-07: o estado da arte reconhece só ~25%
    das contradições porque a memória não carrega estrutura de invalidação):
    - `dynamic` — o fato muda com o tempo/mundo (pin, versão, comportamento de script). Re-teste:

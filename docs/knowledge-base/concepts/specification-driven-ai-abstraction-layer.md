@@ -637,7 +637,7 @@ O [Task Manager Abstraction](task-manager-abstraction.md) é a **instância can�
 ## 📚 Recursos Adicionais
 
 ### Internos (Sistema Onion)
-- [Comando /meta/create-abstraction](../../../.claude/commands/meta/create-abstraction.md) - Gerador automático de SDAAL
+- `/meta:create-abstraction` - Gerador automático de SDAAL
 - [Template de Abstração](../../../.claude/commands/common/templates/abstraction-template.md) - Template base
 
 ### Externos

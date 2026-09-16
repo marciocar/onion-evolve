@@ -57,4 +57,4 @@ bash .claude/validation/graph.sh --triples
 - O grafo é **gerado**: para mudar uma aresta, edite a fonte (`actors.yaml`, capability contract,
   frontmatter) e regenere — nunca edite `graph.md` à mão.
 - Wiring pleno de auto-routing no `@onion` (GraphRAG) é follow-up gated — ver
-  `docs/analysis/onion-research-self-describing-components-2026-06.md`.
+  `onion-research-self-describing-components-2026-06` (core-only).

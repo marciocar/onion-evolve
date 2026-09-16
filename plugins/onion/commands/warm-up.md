@@ -71,7 +71,7 @@ Estabelecer contexto completo do projeto incluindo:
 
 ### 4.5 Identidade e Ecossistema (quem o Onion É — não só o que tem)
 - ✅ Revisar `${CLAUDE_PLUGIN_ROOT}/kb/onion-framework-identity.md` — **SSOT de identidade/posicionamento** (pitch, invenções nomeadas, materiais derivados)
-- ✅ Conhecer `docs/applying/onion-adoption-manual.md` — a **persona autobiográfica** (1ª pessoa) + ecossistema vivo: adotantes reais, **Onion-Bridge** (mobile via Agent SDK) e o site **`onionevolve.com`** (autobiografia pública; backend `app.onionevolve.com` com clone do core no VPS)
+- ✅ Conhecer o **manual de adoção** (`onion-adoption-manual`, core-only) — a **persona autobiográfica** (1ª pessoa) e o ecossistema vivo que a doutrina de adoção descreve
 - ✅ Sem esta etapa, a sessão sabe *operar* o framework mas não sabe *quem ele é* — perguntas de identidade/persona/site ficam sem resposta
 
 ### 4.6 Aparte do Maestro — canal lateral tipado (side-channel)
@@ -92,12 +92,12 @@ Estabelecer contexto completo do projeto incluindo:
 - `docs/onion/agents-reference.md` - Todos os agentes
 - `docs/meta-specs/index.md` - Meta especificações
 - `${CLAUDE_PLUGIN_ROOT}/kb/onion-framework-identity.md` - SSOT de identidade/posicionamento
-- `docs/applying/onion-adoption-manual.md` - Persona autobiográfica + ecossistema (Onion-Bridge, onionevolve.com)
+- `onion-adoption-manual` (core-only) - Persona autobiográfica + ecossistema
 - `docs/evolution/README.md` - Modelo de co-evolução core↔derivados (se presente)
 
 ### Estrutura de Comandos
-- 109 comandos em 10 categorias
-- 51 agentes especializados em 9 categorias
+- os comandos invocáveis, por categoria (contagem na SSOT gerada: `docs/onion/inventory.md`)
+- os agentes especializados, por categoria
 - Knowledge Bases estruturadas para IA
 
 ## 💡 Quando Usar Este Warm-up

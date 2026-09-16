@@ -90,7 +90,7 @@ achados de autorização eram distintos e de lógica de negócio: **esses não s
 
 ## 🔌 Onde dói mais (superfícies de ingestão)
 
-- **[`/meta:kg`](../../../.claude/commands/meta/kg.md)** — ao modelar evidência de terceiro como nó.
+- **`/meta:kg`** — ao modelar evidência de terceiro como nó.
 - **Vertical de compliance** — ao montar pacote de auditoria a partir de relatório de fornecedor.
 - **Pesquisa/deep-research** — ao citar fonte com interesse comercial. ⚠️ *A skill `deep-research` é do
   harness, não artefato do core: aqui a doutrina é referência para quem a usa, não wire-in.*

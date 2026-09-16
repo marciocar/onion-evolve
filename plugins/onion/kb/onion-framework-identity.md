@@ -16,6 +16,13 @@ date: 2026-06-15
 
 ---
 
+> ⚠️ **Contagens não aparecem em número fixo aqui, e isso é desenho.**
+> Este documento **viaja** para todo adotante, e a população depende do PAPEL: o core tem um número,
+> um `standalone` tem outro (medido 2026-09-16: 109 contra 90 comandos). Número literal em prosa que
+> viaja só pode estar certo para um papel — nos demais ele vira violação da REGRA 16 (Contagem de
+> inventário-TOTAL divergente da SSOT), que é exatamente a guarda que manda contagem vir da **SSOT
+> gerada**. Cite `docs/onion/inventory.md`, que cada alvo regenera do próprio filesystem.
+
 ## 📋 Metadata
 
 | Campo | Valor |
@@ -41,7 +48,7 @@ date: 2026-06-15
 
 ### Pitch de 2 minutos
 
-O Sistema Onion é um **framework de orquestração de desenvolvimento** que vive inteiramente em `.claude/` — uma pasta de configuração do Claude Code. Ao instalar o Onion num projeto, o time ganha **109 comandos invocáveis**, **51 agentes especializados de IA** e **13 skills** de orquestração, cobrindo três dimensões **peer**: produto (discovery → backlog), engenharia (planejamento → PR) e compliance (ISO 27001, SOC2, PMBOK, ISO 22301). O Onion se conecta ao gerenciador de tarefas existente (Jira, ClickUp, Asana ou Linear) via uma camada de abstração agnóstica (SDAAL) e ao host de código (GitHub; GitLab/Bitbucket têm a **costura pronta**, não implementados — o gatilho declarado é *um adotante que os use*) via adapter de forge. Não é uma CLI, não tem pacote npm, não exige mudança de stack — é configuração pura que transforma o Claude Code no cérebro orquestrador do fluxo de trabalho.
+O Sistema Onion é um **framework de orquestração de desenvolvimento** que vive inteiramente em `.claude/` — uma pasta de configuração do Claude Code. Ao instalar o Onion num projeto, o time ganha **os comandos invocáveis**, **os agentes especializados de IA** e **as skills** de orquestração, cobrindo três dimensões **peer**: produto (discovery → backlog), engenharia (planejamento → PR) e compliance (ISO 27001, SOC2, PMBOK, ISO 22301). O Onion se conecta ao gerenciador de tarefas existente (Jira, ClickUp, Asana ou Linear) via uma camada de abstração agnóstica (SDAAL) e ao host de código (GitHub; GitLab/Bitbucket têm a **costura pronta**, não implementados — o gatilho declarado é *um adotante que os use*) via adapter de forge. Não é uma CLI, não tem pacote npm, não exige mudança de stack — é configuração pura que transforma o Claude Code no cérebro orquestrador do fluxo de trabalho.
 
 *(Fontes: `CLAUDE.md` §Inventário; `onion-review-2026-05.md` §1 — Revisão Analítica de Maio/2026, interno do core: o snapshot que consolidou a identidade canônica (framework template em `.claude/`, plataforma única Claude Code, três dimensões peer) e o abandono formal de `.onion/`/CLI standalone/v4.0; veredito "substancialmente completo em cobertura, pré-aplicável em validação")*
 
@@ -92,7 +99,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 
 | # | Problema | Sem Onion | Com Onion |
 |---|----------|-----------|-----------|
-| 1 | Orquestração manual da IA | Prompts ad-hoc por tarefa, sem memória de workflow nem tiering de agentes | 109 comandos = workflows codificados (`/onion-engineering:plan` já sabe delegar a `@task-specialist`) |
+| 1 | Orquestração manual da IA | Prompts ad-hoc por tarefa, sem memória de workflow nem tiering de agentes | comandos = workflows codificados (`/onion-engineering:plan` já sabe delegar a `@task-specialist`) |
 | 2 | Cada integração de task manager é caso especial | Reescrever prompts/formatos por provider (Jira exige ADF, ClickUp Unicode, Asana HTML) | SDAAL Task Manager Abstraction — `TASK_MANAGER_PROVIDER` no `.env` roteia ao adapter certo, formatação tipada |
 | 3 | Trabalho interrompido = contexto perdido | Reexplicar contexto do zero a cada retomada de sessão | Workflows faseados retomáveis + `STATE.md` (ponteiro Tier-0 ~1KB) em `.claude/sessions/` |
 | 4 | Compliance é silo separado do dev | Documentação ISO/SOC2 criada depois, manualmente, desconectada da entrega | 5 agentes de compliance integrados ao mesmo ciclo; `/onion-compliance:build-compliance-docs` gera a partir do estado real |
@@ -120,9 +127,9 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 │    onion-wizard · onion-onboarding · onion-retro               │
 ├──────────────────┬──────────────────────────────────────────┤
 │  COMMANDS         │  AGENTS (.claude/agents/)                 │
-│  (.claude/        │  51 especialistas em 9 categorias:        │
+│  (.claude/        │  especialistas, por categoria:             │
 │  commands/)       │    development · product · git            │
-│  109 workflows em │    meta · compliance · testing             │
+│  workflows em     │    meta · compliance · testing             │
 │  10 categorias    │    review · research · deployment          │
 ├──────────────────┴──────────────────────────────────────────┤
 │  ABSTRAÇÕES (.claude/utils/) — padrão SDAAL                    │
@@ -137,9 +144,9 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 
 ### As 5 camadas
 
-1. **Comandos** (`.claude/commands/`) — 109 arquivos Markdown invocáveis por categoria (`/product:*`, `/engineer:*`, `/git:*`, `/docs:*`, `/meta:*`, `/validate:*`, `/test:*`, `/design:*`, `/development:*`, `/quick:*`). Cada um define `allowed-tools` (escopo de permissão), `model` (tier de custo) e a lógica de orquestração. Comandos definem **o que fazer e como** — não *quem sabe fazer*.
-2. **Agentes** (`.claude/agents/`) — 51 especialistas em 9 categorias (development, product, git, meta, compliance, testing, review, research, deployment). Sabem **fazer**: `@jira-specialist` opera JQL+ADF, `@metaspec-gate-keeper` valida arquitetura, `@react-developer` escreve componentes.
-3. **Skills** (`.claude/skills/`) — 12 programas de orquestração de alto nível. `onion-orchestration` é o mais poderoso: autora scripts `Workflow` nativos do Claude Code para fan-out paralelo de agentes, com tiering de modelos por tier (haiku para scan/classificação, sonnet para raciocínio, opus para julgamento adversarial — sem fixar versão exata).
+1. **Comandos** (`.claude/commands/`) — arquivos Markdown invocáveis por categoria (`/product:*`, `/engineer:*`, `/git:*`, `/docs:*`, `/meta:*`, `/validate:*`, `/test:*`, `/design:*`, `/development:*`, `/quick:*`). Cada um define `allowed-tools` (escopo de permissão), `model` (tier de custo) e a lógica de orquestração. Comandos definem **o que fazer e como** — não *quem sabe fazer*.
+2. **Agentes** (`.claude/agents/`) — especialistas por categoria (development, product, git, meta, compliance, testing, review, research, deployment). Sabem **fazer**: `@jira-specialist` opera JQL+ADF, `@metaspec-gate-keeper` valida arquitetura, `@react-developer` escreve componentes.
+3. **Skills** (`.claude/skills/`) — programas de orquestração de alto nível. `onion-orchestration` é o mais poderoso: autora scripts `Workflow` nativos do Claude Code para fan-out paralelo de agentes, com tiering de modelos por tier (haiku para scan/classificação, sonnet para raciocínio, opus para julgamento adversarial — sem fixar versão exata).
 4. **Abstrações** (`.claude/utils/`) — padrão SDAAL em dois eixos: **Task Manager** (Jira/ClickUp/Asana/Linear, API-first com MCP opcional) e **Forge** (GitHub hoje, GitLab/Bitbucket com costura pronta). Comandos nunca chamam a API do provider direto — sempre via adapter, que resolve transporte, formatação e fallback.
 5. **Documentação constitucional** (`docs/`) — Meta-specs L0 (constituição), Knowledge Bases (107 documentos estruturados para consumo por IA), Business/Technical/Compliance Contexts (Spec as Code gerados por `/docs:build-*-docs`).
 
@@ -272,12 +279,19 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 
 ## 6. Métricas e Evidências
 
+> As quatro primeiras métricas **dependem do papel**, e por isso a coluna *Valor* manda ler a SSOT
+> em vez de trazer literal. Medido 2026-09-16 nos três bundles: hoje só a **contagem de comandos**
+> de fato diverge (core 109 × `standalone` 90); agentes, skills e KBs coincidem nos três papéis. A
+> coincidência não é garantia — o corte é por **prefixo de caminho**, então um recorte futuro que
+> toque `.claude/agents/` ou `docs/knowledge-base/` move esses números sem avisar ninguém. Rode
+> `/onion:inventory` **neste** repo e leia `docs/onion/inventory.md`, gerada do filesystem local.
+
 | Métrica | Valor | Fonte |
 |---------|-------|-------|
-| Comandos invocáveis | 109 (10 categorias + root) | `docs/onion/inventory.md` (SSOT gerada) |
-| Agentes especializados | 51 (9 categorias) | `docs/onion/inventory.md` (SSOT gerada) |
-| Skills | 13 | `docs/onion/inventory.md` (SSOT gerada) |
-| Knowledge Bases | 107 | `docs/onion/inventory.md` (SSOT gerada) |
+| Comandos invocáveis (por categoria + root) | depende do papel — ver a SSOT | `docs/onion/inventory.md` (SSOT gerada) |
+| Agentes especializados (por categoria) | depende do papel — ver a SSOT | `docs/onion/inventory.md` (SSOT gerada) |
+| Skills | depende do papel — ver a SSOT | `docs/onion/inventory.md` (SSOT gerada) |
+| Knowledge Bases | depende do papel — ver a SSOT | `docs/onion/inventory.md` (SSOT gerada) |
 | Task Manager providers suportados | 4 (Jira, ClickUp, Asana, Linear) | `CLAUDE.md` §Task Manager |
 | PRs na jornada completa de auto-evolução (Agent Teams + Federation + Evolve) | 22 | ⚠️ **não-verificável** — a fonte (`.claude/sessions/INDEX.md`) é **gitignored**; número congelado-no-tempo, sem como re-medir |
 | Workers no `meta:evolve` | 28 agentes | onion-evolution-2026-06-15.md §0 |
@@ -354,7 +368,7 @@ grafo: `docs/onion/graph/onion-identity-2026-07.kg.yaml` → `C_CORE_NAO_E_FAMIL
 | Escopo | Instruções para uma sessão | Framework reutilizável instalável |
 | Task Manager | Não existe | 4 providers via SDAAL (API-first) |
 | Compliance | Não existe | ISO 27001, SOC2, PMBOK, ISO 22301 integrados |
-| Orquestração | Manual, caso a caso | 109 workflows + 51 agentes + 13 skills |
+| Orquestração | Manual, caso a caso | workflows + agentes + skills (contagem na SSOT gerada) |
 | Multi-repo | Não existe | Federation v2 com topologia peer |
 | Auto-evolução | Não existe | `meta:evolve` audita 10 dimensões |
 | Sessions retomáveis | Não existe | `STATE.md` + worklog persistente |
@@ -427,18 +441,18 @@ Agentes como `@iso-27001-specialist` e `@soc2-specialist` leem o estado real do 
 
 ## 10. Ecossistema Vivo (2026-07)
 
-> Fonte: `onion-adoption-manual.md` (interno do core, Partes I-II) +
+> Fonte: `onion-adoption-manual` (core-only, Partes I-II) +
 > verificação ao vivo em 2026-07-03 (endpoints respondendo).
 
 - **Persona autobiográfica**: o Onion conta a própria história em 1ª pessoa — é a invenção
   *Autobiographical Marketing* ([§1.5](#15-invenções-nomeadas--o-catálogo-canônico); os commits são a
   autobiografia; os docs gerados de si são o portfólio). O texto canônico da persona é o **Manual de Adoção**
-  (`docs/applying/onion-adoption-manual.md`, prólogo "O Despertar").
-- **Onion-Bridge (mobile) — deployed**: ponte fina (repo privado `~/onion-bridge`, Node 22 + Hono
-  + PWA Android) que expõe o framework via `@anthropic-ai/claude-agent-sdk` com `cwd` no core.
-  **No ar**: site público **`onionevolve.com`** ("Onion Evolute — A Autobiografia de um Framework
-  Vivo") e backend **`app.onionevolve.com`** (VPS com Caddy/TLS + clone do core em
-  `/home/onion/onion-evolve`), deploy ~2026-06-29.
+  (`onion-adoption-manual`, core-only, prólogo "O Despertar").
+- **Onion-Bridge (mobile) — deployed**: ponte fina (repo privado, Node 22 + Hono + PWA Android) que
+  expõe o framework via `@anthropic-ai/claude-agent-sdk` com `cwd` no core. **No ar** desde
+  ~2026-06-29: o site público **`onionevolve.com`** ("Onion Evolute — A Autobiografia de um
+  Framework Vivo") e um backend próprio atrás de TLS. A topologia de hospedagem (hosts, caminhos de
+  máquina, unidades de serviço) é **operação do core** e não viaja — quem adota monta a sua.
 - **Adotantes reais**: vários adotantes em campo — co-evolução ativa (lineages mapeadas em
   `docs/evolution/federation/members.yaml`), sessões persistentes (Jira/ADF, multi-contexto) e um adotante da
   vertical educacional (materiais publicados).

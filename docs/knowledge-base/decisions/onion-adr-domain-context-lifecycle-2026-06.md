@@ -31,9 +31,9 @@ e dá **paridade** aos três geradores para que o primeiro tick já nasça consi
 Implementação`.
 
 > **Atualização 2026-06-17 — Tijolo 2 ENTREGUE.** A camada *Manage* foi implementada:
-> comando [`/meta:context-freshness`](../../../.claude/commands/meta/context-freshness.md) +
+> comando `/meta:context-freshness` +
 > extensão de `inventory.sh` (conta `*-context/`) e `lint-artifacts.sh` (Regra 15 — carimbo
-> de frescor) + composição **D9** no [`/meta:evolve`](../../../.claude/commands/meta/evolve.md).
+> de frescor) + composição **D9** no `/meta:evolve`.
 
 ---
 
@@ -125,7 +125,7 @@ especialistas com apenas `Read Bash(grep *)`).
 ## Gatilho de Implementação (Tijolo 2 — a camada *Manage* executável)
 
 Construir quando o Tijolo 1 estiver em uso e a primeira drift de contexto aparecer. **Reusa, não
-reimplementa**, o molde de [`/meta:kb-freshness`](../../../.claude/commands/meta/kb-freshness.md):
+reimplementa**, o molde de `/meta:kb-freshness`:
 
 1. **Comando de audit de frescor de contexto** — verdito `CURRENT/STALE/HISTORICAL`, threshold
    herdado (`≤18 meses`), fan-out via `onion-orchestration` (worker haiku → fan-in sonnet), retorno
@@ -143,7 +143,7 @@ reimplementa**, o molde de [`/meta:kb-freshness`](../../../.claude/commands/meta
 - [`architecture.md`](../../meta-specs/architecture.md) — §1.3 pastas `*-context/` · nova seção de ciclo de vida de contexto
 - [`domain-context-lifecycle.md`](../../knowledge-base/concepts/domain-context-lifecycle.md) — a gramática CRUD+ (explainer)
 - [`onion-modernization-doctrine.md`](../../knowledge-base/concepts/onion-modernization-doctrine.md) — doutrina-vizinha (peso/acoplamento)
-- [`/meta:kb-freshness`](../../../.claude/commands/meta/kb-freshness.md) — molde reusado pelo Tijolo 2
+- `/meta:kb-freshness` — molde reusado pelo Tijolo 2
 - `/docs:build-business-docs` · `/docs:build-tech-docs` · `/docs:build-compliance-docs` — os geradores (primeiro tick)
 
 ---

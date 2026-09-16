@@ -3,7 +3,7 @@
 > **O que este doc é.** A **rampa prática** para o método Knowledge Graph SDAAL: você sai daqui com um
 > `.kg.yaml` rodando o radar. A doutrina densa (por que grafo, camadas, teoria) vive em
 > [`knowledge-graph-sdaal.md`](knowledge-graph-sdaal.md); o comando que orquestra é
-> [`/meta:kg`](../../../.claude/commands/meta/kg.md); o padrão-pai é
+> `/meta:kg`; o padrão-pai é
 > [SDAAL](specification-driven-ai-abstraction-layer.md). Aqui é o **fazer**.
 
 ## 1. Quando usar (e quando NÃO)
@@ -144,6 +144,6 @@ Flags úteis: `--reconcile` (só a escada de refutações), `--triples` (emite o
 
 ## 🔗 Aprofundamento
 - Doutrina completa (por que grafo, camada domain, SSOT-as-runtime): [`knowledge-graph-sdaal.md`](knowledge-graph-sdaal.md)
-- O comando orquestrador: [`/meta:kg`](../../../.claude/commands/meta/kg.md)
+- O comando orquestrador: `/meta:kg`
 - O padrão-pai: [SDAAL](specification-driven-ai-abstraction-layer.md)
 - O motor: `.claude/validation/kg-radar.sh` (cabeçalho-doutrina auto-explicativo)
