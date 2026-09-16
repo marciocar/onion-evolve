@@ -2,7 +2,7 @@
 title: 'Resíduo — a perna de leitura do KG deixou de ser conselho'
 date: 2026-09-16
 branch: feat/kg-read-leg-hook
-reviewed_diff_sha256: PENDENTE
+reviewed_diff_sha256: f2bc56224301d9a77ddeca884166d912db3eca362bf17618c09aba4438ae58ed
 findings_total: 8
 findings_real: 8
 findings_fixed: 8
