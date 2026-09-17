@@ -2,7 +2,7 @@
 title: 'Resíduo — o ciclo era prosa, e a prosa tinha 377 commits de dívida'
 date: 2026-09-17
 branch: feat/door-cycle-mechanized
-reviewed_diff_sha256: PENDENTE
+reviewed_diff_sha256: ddc0bb6eeb2ba5c92c167db3357d4ebc8e39c80c22a093681d416c12f23ef8f8
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
