@@ -17096,7 +17096,13 @@ run_regen_completude_selftests() {
   # ISENÇÕES DECLARADAS, com a razão — nunca uma lista muda. Quem isentar sem razão escrita está
   # repetindo o defeito uma camada acima.
   local _isentos=(
-    "federation-console.sh"     # projeta em docs/evolution/federation/ — superfície CORE-ONLY, não viaja
+    # ⚠️ RAZÃO CORRIGIDA no mesmo dia em que foi escrita: eu havia justificado com "projeta em
+    # docs/evolution/federation/", e é FALSO — ele também gera `docs/onion/federation-map.md` e
+    # `docs/onion/federation-console.html`, que ficam onde o `regen-ssot-projections.sh` escreve.
+    # O veredito (isento) continua certo; a razão, não. E razão errada é pior que ausente: o
+    # próximo lê a justificativa, confere o caminho, vê que não bate, e passa a duvidar da lista
+    # inteira. O motivo VERDADEIRO é o mesmo do a2a-agent-card.
+    "federation-console.sh"     # deriva de docs/evolution/federation/members.yaml — CORE-ONLY: sem registro, não há mapa nem console a gerar
     "marketplace-root-check.sh" # marketplace é CORE-ONLY (só a fonte publica plugin)
     "vendor-scrub-form-check.sh" # emite BASELINE, não projeção: baseline é LEDGER DO ALVO e o do core nunca viaja
     "kg-view.sh"                # visualizador POR-GRAFO (exige argumento), não gerador de projeção
