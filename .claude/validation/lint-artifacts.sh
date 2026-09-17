@@ -2096,6 +2096,41 @@ check_kg_read_index_sync() {
   fi
 }
 
+
+# ===========================================================================
+# REGRA 85 — Porta pública espelha o core, com catraca [HARD]
+# previne: a porta MENTIR sobre o que o core é, por falta de re-materialização
+#   O `materialize-door.sh` resolve o COMO se publica. O QUANDO era uma frase —
+#   "toda leva mergeada em main que toque a superfície que viaja" — e frase não
+#   dispara. Medido 2026-09-17: `onion-standalone` estava 377 commits atrás na
+#   superfície que viaja, parado desde 2026-07-19. Não é negligência de ninguém:
+#   é o modo de falha previsível de um gatilho que depende de alguém lembrar.
+#   E o custo é específico: porta defasada não fica "desatualizada", ela MENTE
+#   sobre o core para quem a usa como referência.
+#   CATRACA, nunca muro: reprovar toda porta defasada nasceria vermelho (377) e
+#   seria desligada na primeira sexta-feira. O passivo entra no baseline e SÓ
+#   ENCOLHE; porta que ANDA PARA TRÁS é HARD. Porta nova nasce com teto BAIXO,
+#   porque não tem passivo a carregar.
+#   Conta só commit que tocou as raízes de `--emit-scrub-roots`: commit de
+#   biografia não defasa a porta — ela não o receberia de qualquer forma.
+# ===========================================================================
+check_door_staleness() {
+  local sc="${SCRIPT_DIR}/door-staleness-check.sh"
+  [ -f "${sc}" ] || return 0
+  local out rc=0
+  out="$(bash "${sc}" "${REPO_ROOT}" 2>&1)" || rc=$?
+  [ "${rc}" -eq 0 ] && return 0
+  local line
+  while IFS= read -r line; do
+    case "${line}" in
+      *ANDOU-PARA-TRAS*|*SEM-BASELINE*|*PIN-DESCONHECIDO*)
+        violation "HARD" "docs/evolution/federation/members.yaml" "REGRA 85 (Porta pública espelha o core, com catraca): ${line} — re-materialize (bash ops/materialize-door.sh <clone>) e atualize o pin no registro, ou baixe o teto em door-staleness-baseline.txt se a porta foi publicada. Porta defasada MENTE sobre o core."
+        ;;
+      ERRO*) violation "HARD" ".claude/validation/door-staleness-check.sh" "REGRA 85 (Porta pública espelha o core, com catraca): a guarda não pôde julgar — ${line}" ;;
+    esac
+  done <<< "${out}"
+}
+
 # ===========================================================================
 # REGRA 16 — Contagem de inventário-TOTAL divergente da SSOT [SOFT]
 # previne: contagem-TOTAL do inventário divergindo da SSOT
@@ -3870,6 +3905,7 @@ check_context_freshness_stamp
 check_inventory_total_drift
 check_model_version_fora_da_ssot
 check_kg_read_index_sync
+check_door_staleness
 check_frontmatter_scalar_colon
 check_no_claude_docs
 check_evolution_links

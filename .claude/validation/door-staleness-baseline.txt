@@ -1,0 +1,11 @@
+# Catraca de DEFASAGEM DE PORTA — quantos commits da superfície que viaja cada porta
+# tolera estar atrás. SÓ ENCOLHE: a métrica de saúde é o número DIMINUINDO.
+# Regenere com: bash .claude/validation/door-staleness-check.sh --emit-baseline
+#
+# onion-standalone 377 — o PASSIVO MEDIDO em 2026-09-17, e a razão desta guarda existir. A porta
+#   está parada desde 2026-07-19 porque o ciclo de re-materialização era PROSA. Não é negligência:
+#   é o modo de falha previsível de um gatilho que depende de alguém lembrar.
+# onion-core 1 — porta NOVA nasce com teto baixo: não tem passivo a carregar, e o 1 é o commit
+#   desta própria leva. Se ela subir, a guarda reprova — que é o ponto.
+onion-standalone 377
+onion-core 1

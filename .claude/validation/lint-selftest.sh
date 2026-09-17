@@ -16658,6 +16658,75 @@ run_sandbox_gc_selftests() {
   rm -rf "${d}"
 }
 
+
+# ── O CICLO DA PORTA, MECANIZADO (REGRA 85) ───────────────────────────────────────────────────
+# A guarda nasceu de um número, não de uma intuição: o `onion-standalone` estava 377 commits atrás
+# na superfície que viaja. O caso (c) é o que dá valor — commit de BIOGRAFIA não pode defasar a
+# porta, senão a catraca vira ruído e o operador aprende a ignorá-la.
+run_door_cycle_selftests() {
+  local sb2 out rc
+  sb2="$(mktemp -d)"
+  mkdir -p "${sb2}/.claude/validation" "${sb2}/.claude/utils/adopt" "${sb2}/docs/evolution/federation" "${sb2}/.claude/agents" "${sb2}/docs/analysis"
+  cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" "${sb2}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" "${sb2}/.claude/utils/adopt/"
+  # ⚠️ A ORDEM DOS COMMITS É O HARNESS, e a 1ª redação a errou: eu tirava o pin ANTES de commitar
+  # o baseline, e o baseline vive em `.claude/validation/` — que É superfície que viaja. A porta
+  # nascia 1 commit atrás POR CONSTRUÇÃO, e o caso (a) reprovava a guarda por defeito MEU.
+  # Ordem certa: tudo que VIAJA primeiro, pin depois, `members.yaml` por último — ele mora em
+  # `docs/evolution/federation/`, que NÃO viaja, então gravá-lo não defasa nada.
+  printf '# a\n' > "${sb2}/.claude/agents/a.md"; printf '# bio\n' > "${sb2}/docs/analysis/bio.md"
+  printf 'porta-x 0\n' > "${sb2}/.claude/validation/door-staleness-baseline.txt"
+  ( cd "${sb2}" && git init -q . && git add -A && git -c user.email=t@l -c user.name=t commit -qm base ) >/dev/null 2>&1
+  local pin; pin="$(git -C "${sb2}" rev-parse --short=12 HEAD)"
+  printf 'members:\n  - id: porta-x\n    kind: door\n    onion_version: %s\n' "${pin}" > "${sb2}/docs/evolution/federation/members.yaml"
+  # ⚠️ o `|| true` NÃO é decoração: `git commit` sem nada a commitar sai 1, e sob `set -e` isso
+  # MATA a suíte inteira — foi o que aconteceu ao sobrar um commit duplicado nesta reescrita.
+  ( cd "${sb2}" && git add -A && git -c user.email=t@l -c user.name=t commit -qm registro ) >/dev/null 2>&1 || true
+
+  # (a) porta EM DIA com o pin → dentro da catraca
+  rc=0; out="$(bash "${sb2}/.claude/validation/door-staleness-check.sh" "${sb2}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "door-cycle: (a) porta no pin → dentro da catraca"
+  else record_fail "door-cycle: (a)" "acusou porta em dia (rc=${rc}): ${out:0:110}"; fi
+
+  # (b) commit na SUPERFÍCIE QUE VIAJA → defasa, e a catraca reprova
+  printf '# b\n' > "${sb2}/.claude/agents/b.md"
+  ( cd "${sb2}" && git add -A && git -c user.email=t@l -c user.name=t commit -qm viaja ) >/dev/null 2>&1
+  rc=0; out="$(bash "${sb2}/.claude/validation/door-staleness-check.sh" "${sb2}" 2>&1)" || rc=$?
+  if [ "${rc}" -ne 0 ] && grep -q 'ANDOU-PARA-TRAS' <<< "${out}"; then
+    record_pass "door-cycle: (b) commit na superfície que viaja defasa a porta → HARD"
+  else record_fail "door-cycle: (b)" "não acusou defasagem (rc=${rc}): ${out:0:110}"; fi
+
+  # (c) commit de BIOGRAFIA não defasa — ela nunca o receberia. Sem este recorte a catraca
+  #     dispararia a cada commit do core e seria desligada.
+  # ⚠️ SANDBOX PRÓPRIO, e a razão é a mesma armadilha que já me pegou duas vezes nesta família: o
+  # baseline VIVE em `.claude/validation/`, que É superfície que viaja. Mexer nele para preparar o
+  # caso muda o que o caso mede. Sandbox separado torna o único commit pós-pin o de biografia —
+  # que é exatamente a hipótese sob teste.
+  local sbc; sbc="$(mktemp -d)"
+  mkdir -p "${sbc}/.claude/validation" "${sbc}/.claude/utils/adopt" "${sbc}/docs/evolution/federation" "${sbc}/.claude/agents" "${sbc}/docs/analysis"
+  cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" "${sbc}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" "${sbc}/.claude/utils/adopt/"
+  printf '# a\n' > "${sbc}/.claude/agents/a.md"
+  printf 'porta-x 0\n' > "${sbc}/.claude/validation/door-staleness-baseline.txt"
+  ( cd "${sbc}" && git init -q . && git add -A && git -c user.email=t@l -c user.name=t commit -qm base ) >/dev/null 2>&1
+  local pinc; pinc="$(git -C "${sbc}" rev-parse --short=12 HEAD)"
+  printf 'members:\n  - id: porta-x\n    kind: door\n    onion_version: %s\n' "${pinc}" > "${sbc}/docs/evolution/federation/members.yaml"
+  printf '# so biografia\n' > "${sbc}/docs/analysis/bio2.md"
+  ( cd "${sbc}" && git add -A && git -c user.email=t@l -c user.name=t commit -qm biografia ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${sbc}/.claude/validation/door-staleness-check.sh" "${sbc}" 2>&1)" || rc=$?
+  rm -rf "${sbc}"
+  if [ "${rc}" -eq 0 ]; then record_pass "door-cycle: (c) commit de biografia NÃO defasa a porta"
+  else record_fail "door-cycle: (c)" "biografia contou como defasagem: ${out:0:110}"; fi
+
+  # (d) FAIL-CLOSED: sem registro a guarda DECLARA que não sabe, nunca aprova em silêncio
+  rm -f "${sb2}/docs/evolution/federation/members.yaml"
+  rc=0; out="$(bash "${sb2}/.claude/validation/door-staleness-check.sh" "${sb2}" 2>&1)" || rc=$?
+  if [ "${rc}" -ne 0 ] && grep -q 'ERRO' <<< "${out}"; then
+    record_pass "door-cycle: (d) sem registro falha FECHADA (declara que não sabe)"
+  else record_fail "door-cycle: (d)" "sem registro passou em silêncio (rc=${rc})"; fi
+  rm -rf "${sb2}"
+}
+
 _family run_hook_autofix_selftests
 _family run_kg_reverify_schema_selftests
 _family run_backtick_ref_selftests
@@ -16685,6 +16754,7 @@ _family run_onion_version_tracked_selftests
 _family run_hub_role_guard_selftests
 _family run_inventory_adopter_scope_selftests
 _family run_door_selftests
+_family run_door_cycle_selftests
 _family run_model_ssot_selftests
 _family run_kg_read_leg_selftests
 _family run_sandbox_gc_selftests
