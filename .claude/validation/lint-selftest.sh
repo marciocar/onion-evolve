@@ -6799,6 +6799,45 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (b2) \`until ! pgrep -f\` → avisa que o laço espera por SI MESMO"
   else record_fail "empty-result-guard: (b2)" "não reagiu ao pgrep -f auto-casante: ${out}"; fi
 
+  # (b3) REAGE: LAÇO DE ESPERA SEM TETO — o irmão do (b2), e a prova de que é CLASSE está na
+  #      reincidência: o (b2) curou `until ! pgrep` depois de 1h06 preso, e um mês depois o mesmo
+  #      dano voltou por outra porta — 2h21 esperando checks de CI que nunca iam nascer, porque o
+  #      PR estava CONFLICTING e o GitHub não dispara `pull_request` sem conseguir computar o merge.
+  #      A condição `-ge 3` era inalcançável e nada dizia isso: silêncio é indistinguível de espera.
+  out="$(_erg '"until [ \"$(gh api repos/o/r/commits/abc/check-runs --jq length)\" -ge 3 ]; do sleep 60; done"' '""' || true)"
+  if grep -q 'LAÇO-DE-ESPERA-SEM-TETO' <<< "${out}"; then
+    record_pass "empty-result-guard: (c1) laço de espera sem prazo → avisa (2h21 medidos)"
+  else record_fail "empty-result-guard: (c1)" "não reagiu ao laço sem teto: ${out}"; fi
+
+  # (b4) CALA com teto E saída que distingue os dois casos — a cura recomendada tem de desarmar a
+  #      guarda, senão ela pune quem a obedece e vira fadiga (a lição do caso (d) desta família).
+  out="$(_erg '"fim=$((SECONDS+1800)); until [ -f /tmp/x ]; do [ $SECONDS -gt $fim ] && { echo DESISTI; break; }; sleep 60; done"' '""' || true)"
+  if ! grep -q 'LAÇO-DE-ESPERA-SEM-TETO' <<< "${out}"; then
+    record_pass "empty-result-guard: (c2) laço COM teto e saída explícita → cala (a cura desarma)"
+  else record_fail "empty-result-guard: (c2)" "puniu quem obedeceu à recomendação: ${out}"; fi
+
+  # (b5) CALA em comando que só MENCIONA a palavra — a lição que esta guarda já pagou DUAS vezes
+  #      (detector (5), e o (3b) por não reusar a cura): sem âncora em posição de comando, um
+  #      `grep -n until` e até a mensagem de commit que DESCREVE a regra seriam acusados.
+  out="$(_erg '"grep -rn \"until\" .claude/hooks/ | head -5"' '"x"' || true)"
+  if ! grep -q 'LAÇO-DE-ESPERA-SEM-TETO' <<< "${out}"; then
+    record_pass "empty-result-guard: (c3) comando que só MENCIONA 'until' → cala (âncora de posição)"
+  else record_fail "empty-result-guard: (c3)" "falso-positivo em comando de leitura: ${out}"; fi
+
+  # (b6) CALA em laço sobre lista FINITA — `while read` sem `sleep` termina sozinho; cobrá-lo seria
+  #      acusar o idioma mais comum de shell do repo (90 laços em scripts commitados).
+  out="$(_erg '"while IFS= read -r f; do echo \"$f\"; done < lista.txt"' '"x"' || true)"
+  if ! grep -q 'LAÇO-DE-ESPERA-SEM-TETO' <<< "${out}"; then
+    record_pass "empty-result-guard: (c4) laço sobre lista finita (sem sleep) → cala"
+  else record_fail "empty-result-guard: (c4)" "acusou iteração finita: ${out}"; fi
+
+  # (b7) CALA sob `timeout(1)` — teto EXTERNO conta igual. O ponto da guarda é o teto EXISTIR, nunca
+  #      a forma de escrevê-lo; regra que só aceita um dialeto vira cerimônia.
+  out="$(_erg '"timeout 300 bash -c \"until [ -f /tmp/x ]; do sleep 5; done\""' '""' || true)"
+  if ! grep -q 'LAÇO-DE-ESPERA-SEM-TETO' <<< "${out}"; then
+    record_pass "empty-result-guard: (c5) teto externo via timeout(1) → cala"
+  else record_fail "empty-result-guard: (c5)" "não reconheceu timeout(1) como teto: ${out}"; fi
+
   # (b2b) COBERTURA — a 2ª versão exigia que o cluster com `f` fosse o PRIMEIRO token, e escapavam
   #       `pkill -9 -f` (a forma mais comum do mundo real), `-a -f`, `-u root -f` e a longa `--full`.
   #       Promessa maior que cobertura é `declarado != verificado` dentro da própria guarda.
