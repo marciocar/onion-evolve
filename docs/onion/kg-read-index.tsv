@@ -315,6 +315,7 @@
 .claude/validation/lint-artifacts.sh	E_GAP1_SKIP	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/validation/lint-artifacts.sh	E_MOAT_GUARD_HARDENED_BY_REVIEW	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 .claude/validation/lint-artifacts.sh	E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
+.claude/validation/lint-artifacts.sh	E_O_DIAGNOSTICO_QUE_A_DOUTRINA_MANDA_RODAR_ESTAVA_MORTO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-artifacts.sh	E_QUATRO_LENTES_CONVERGIRAM_SEM_SE_VER	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .claude/validation/lint-artifacts.sh	E_REGRA16_NAO_ALCANCA_POR_VOCABULARIO	docs/onion/graph/context-freshness-2026-08-12.kg.yaml
 .claude/validation/lint-artifacts.sh	E_REGRESSAO_16S_86S_E_CONCENTRADA_NAO_LINEAR	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml

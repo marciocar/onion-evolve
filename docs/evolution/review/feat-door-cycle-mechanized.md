@@ -3,9 +3,9 @@ title: 'Resíduo — o ciclo era prosa; e o meu dogfood media no substrato errad
 date: 2026-09-17
 branch: feat/door-cycle-mechanized
 reviewed_diff_sha256: 54972b72548293ac73ff004471109f4df90af8726200b39012f7737d0801c7b2
-findings_total: 11
-findings_real: 11
-findings_fixed: 11
+findings_total: 13
+findings_real: 13
+findings_fixed: 13
 tokens: 0
 duration_min: 0
 verdict: REPROVADO_E_CURADO
@@ -298,3 +298,60 @@ exceção mudou isso com razão: um hub que recebe a chave privada do core não 
 **vaza**. A invariante certa não é "nenhum exclude", é "nenhum exclude **além** dos de identidade,
 que são declarados" — e a lista esperada é lida da SSOT, nunca redigida no caso, senão o oráculo vira
 opinião. Qualquer exclude novo para `hub` continua reprovando, que era o ponto do caso.
+
+
+---
+
+# Achado 12 — o diagnóstico que a doutrina manda rodar estava MORTO
+
+O `onion-review-verdict` reprovou este PR: o revisor semântico morreu duas vezes
+(`is_error:true`, `turnos=1, custo=0`) — e **não é crédito nem credencial**, porque o pré-voo deu
+`HTTP 200` contra `claude-sonnet-5`.
+
+O próprio `onion-review.yml` diz o que fazer, e diz com uma nota epistêmica rara:
+
+> *"este comentário já mentiu duas vezes … não reescreva causa neste bloco sem rodar o diagnóstico
+> (`onion-review-diagnose.yml`)"*
+
+Fui rodar. Resposta:
+
+```
+HTTP 422: failed to parse workflow: (Line: 39, Col: 5): 'env' is already defined
+```
+
+**O instrumento estava inexecutável há um dia** — quebrado por `3d39372e` (2026-09-16), trabalho meu,
+que acrescentou um bloco `env:` sem ver que já havia outro. A doutrina mandava não adivinhar e
+apontava para uma ferramenta morta; adivinhar virava a única coisa que sobrava.
+
+**Por que nada pegou**, e é a forma do defeito: `workflow_dispatch` só falha quando alguém *dispara*,
+e o gatilho `pull_request` do arquivo é restrito a ele mesmo — ninguém mais o tocou desde a quebra. O
+`harness-inventory.sh` **contava** os workflows e nunca os **lia**. Contar não é validar, e uma SSOT
+que conta artefato quebrado exibe um número com cara de saúde.
+
+Curado com a **REGRA 86 (Workflow de CI PARSEIA como YAML)**, HARD.
+
+## Achado 13 — e a bancada pegou a minha própria cura pela metade
+
+A 1ª redação da REGRA 86 usava `yaml.safe_load` nu. O caso (b) reprovou:
+
+```
+✗ workflow-parse: (b) — não pegou o env duplicado
+```
+
+**O YAML padrão ACEITA chave duplicada** (fica com a última); o parser do GitHub a **rejeita**. Ou
+seja: a regra nova passava verde no defeito **exato** que a originou. Loader estrito, que levanta na
+duplicata — o contrato do consumidor real, não o do parser mais próximo.
+
+Duas lições de forma, as duas já registradas nesta casa e as duas reincidentes hoje:
+
+- **[[bancada-espelha-o-runner]]** — a 1ª versão do harness *sourceava* o lint inteiro; o top-level
+  fazia seu trabalho sob `>/dev/null` e a função saía muda. Dois casos reprovavam por defeito **do
+  harness**, com o SUT correto. Trocado pela extração da função, que é o padrão desta família.
+- **`out="$(_wp_run)"` sob `set -e`** matou a suíte antes do primeiro ✓ — o rc da substituição é o
+  rc do comando. O aviso da própria bancada ("ABORTOU ANTES DA SOMA") foi o que me disse.
+
+E o registro de regras cobrou na hora certa: `harness-inventory.sh` saiu `rc=2` com *"REGRA(S) sem
+categoria: [86]"*, e o `regen-ssot-projections.sh` **removeu** a projeção em vez de escrever lixo,
+avisando *"saída VAZIA (arquivo removido, o alvo cobrará)"*. Classificada em **Integridade do próprio
+gate** — a categoria que pergunta *"eu cheguei a olhar?"* —, porque um workflow que não parseia não é
+um gate que falhou: é um gate que **nunca rodou**.

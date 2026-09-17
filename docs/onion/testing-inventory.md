@@ -11,13 +11,13 @@
 
 | Dimensão | Nº | Produtor |
 |----------|---:|----------|
-| Famílias na bancada | **175** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
+| Famílias na bancada | **176** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
 | Sítios de asserção (**não** asserções executadas) | **1067** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
 | Linhas do manifesto de fixtures | **94** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
 | Arquivos de fixture rastreados | **136** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
-| Regras do lint | **84** | `bash .claude/validation/rules-registry.sh --counts` |
-| — das quais HARD | **75** | idem |
+| Regras do lint | **85** | `bash .claude/validation/rules-registry.sh --counts` |
+| — das quais HARD | **76** | idem |
 | — das quais SOFT | **22** | idem |
 | — HARD **e** SOFT (contadas nas duas) | **13** | idem |
 | Pares de modo consumido (REGRA 59) | **49** | `bash .claude/validation/consumed-mode-check.sh .` |

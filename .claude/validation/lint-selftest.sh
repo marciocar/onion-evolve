@@ -16922,6 +16922,59 @@ _family run_hub_role_guard_selftests
 _family run_inventory_adopter_scope_selftests
 _family run_door_selftests
 _family run_door_cycle_selftests
+# ── REGRA 86: workflow que não parseia é workflow MORTO, e o repo não sabe ────────────────────
+# Nasceu de um `env:` duplicado que deixou o `onion-review-diagnose.yml` inexecutável por um dia
+# inteiro — e era exatamente o instrumento que a doutrina manda rodar antes de escrever causa
+# sobre o revisor. O harness CONTAVA os workflows e nunca os LIA.
+run_workflow_parse_selftests() {
+  command -v python3 >/dev/null 2>&1 || { record_skip "workflow-parse: python3 ausente"; return; }
+  python3 -c 'import yaml' 2>/dev/null || { record_skip "workflow-parse: PyYAML ausente (o SUT tambem pula)"; return; }
+  local sb out
+  sb="$(mktemp -d)"
+  mkdir -p "${sb}/.github/workflows"
+  ( cd "${sb}" && git init -q . ) >/dev/null 2>&1
+  # ⚠️ EXTRAI A FUNÇÃO, não sourceia o lint inteiro — a 1ª redação sourceava, o top-level do
+  # `lint-artifacts.sh` fazia seu trabalho sob `>/dev/null` e a função saía muda: dois casos
+  # reprovavam por defeito DO HARNESS, com o SUT correto. É [[bancada-espelha-o-runner]] de novo.
+  { sed -n '/^check_workflows_parse()/,/^}/p' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    printf 'violation() { printf "%%s|%%s|%%s\\n" "$1" "$2" "$3"; }\n'
+  } > "${sb}/sut.sh"
+  _wp_run() { ( cd "${sb}" && REPO_ROOT="${sb}" bash -c 'source "'"${sb}"'/sut.sh"; check_workflows_parse' 2>&1 || true ); }
+
+  # (a) workflow VÁLIDO → silêncio
+  printf 'name: ok\non:\n  push: {}\njobs:\n  j:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo oi\n' > "${sb}/.github/workflows/bom.yml"
+  ( cd "${sb}" && git add -A ) >/dev/null 2>&1
+  out="$(_wp_run)"
+  if ! grep -q 'REGRA 86' <<< "${out}"; then record_pass "workflow-parse: (a) workflow válido não gera violação"
+  else record_fail "workflow-parse: (a)" "falso positivo em YAML válido: ${out:0:140}"; fi
+
+  # (b) O DEFEITO DE ORIGEM: `env:` duplicado no mesmo job. O `yaml.safe_load` NU aceita chave
+  #     duplicada (fica com a última) e o GitHub REJEITA — a 1ª redação da REGRA 86 passava verde
+  #     neste arquivo, isto é, não pegava o defeito que a criou. Este caso é o que forçou o loader
+  #     estrito; sem ele a guarda nasceria meia, e meia-cura aqui é cura nenhuma.
+  printf 'name: x\non:\n  workflow_dispatch:\njobs:\n  j:\n    env:\n      A: 1\n    runs-on: ubuntu-latest\n    env:\n      B: 2\n    steps:\n      - run: echo oi\n' > "${sb}/.github/workflows/quebrado.yml"
+  ( cd "${sb}" && git add -A ) >/dev/null 2>&1
+  out="$(_wp_run)"
+  if grep -q 'REGRA 86' <<< "${out}"; then record_pass "workflow-parse: (b) env duplicado (o defeito de origem) → HARD"
+  else record_fail "workflow-parse: (b)" "não pegou o env duplicado — o defeito que criou a regra passaria de novo: ${out:0:140}"; fi
+
+  # (c) a violação NOMEIA o arquivo — "algum workflow quebrado" não é acionável
+  if grep -q 'quebrado.yml' <<< "${out}"; then record_pass "workflow-parse: (c) a violação nomeia o arquivo culpado"
+  else record_fail "workflow-parse: (c)" "violação sem o nome do arquivo: ${out:0:140}"; fi
+
+  # (d) arquivo NÃO-RASTREADO não é julgado: rascunho local não é CI
+  ( cd "${sb}" && git rm -q --cached .github/workflows/quebrado.yml ) >/dev/null 2>&1
+  rm -f "${sb}/.github/workflows/quebrado.yml"
+  printf 'isto: nao\n  eh: yaml valido\n' > "${sb}/.github/workflows/rascunho.yml"
+  out="$(_wp_run)"
+  if ! grep -q 'rascunho.yml' <<< "${out}"; then record_pass "workflow-parse: (d) arquivo não-rastreado não é julgado (rascunho local não é CI)"
+  else record_fail "workflow-parse: (d)" "julgou arquivo untracked — reprovaria por lixo local"; fi
+
+  unset -f _wp_run
+  rm -rf "${sb}"
+}
+
+_family run_workflow_parse_selftests
 _family run_role_scope_selftests
 _family run_model_ssot_selftests
 _family run_kg_read_leg_selftests

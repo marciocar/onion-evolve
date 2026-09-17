@@ -2254,6 +2254,54 @@ check_door_staleness() {
 }
 
 # ===========================================================================
+# REGRA 86 — Workflow de CI PARSEIA como YAML [HARD]
+# previne: workflow inexecutável passando por existente, e guarda morta por sintaxe
+#   Medido 2026-09-17: `onion-review-diagnose.yml` tinha DOIS blocos `env:` no mesmo
+#   job e o YAML inteiro não parseava. Ele ficou INEXECUTÁVEL — e com ele a instrução
+#   que o `onion-review.yml` dá em prosa: *"não reescreva causa neste bloco sem rodar
+#   o diagnóstico"*. A doutrina mandava não adivinhar e apontava para um instrumento
+#   morto; adivinhar virava a única coisa que sobrava.
+#   POR QUE NADA PEGOU, e é a forma do defeito: o `workflow_dispatch` só falha quando
+#   alguém DISPARA, e o gatilho `pull_request` do arquivo é restrito a ele mesmo —
+#   ninguém mais o tocou desde que quebrou (um dia inteiro). O harness CONTAVA os
+#   workflows (`harness-inventory.sh`) e nunca os LIA: contar não é validar, e SSOT
+#   que conta artefato quebrado conta um número que parece saúde.
+#   Guarda que só se exercita quando invocada à mão envelhece calada.
+# ===========================================================================
+check_workflows_parse() {
+  command -v python3 >/dev/null 2>&1 || return 0   # sem parser não se opina (skip gracioso)
+  local wf
+  while IFS= read -r wf; do
+    [ -n "${wf}" ] || continue
+    [ -f "${REPO_ROOT}/${wf}" ] || continue
+    # ⚠️ `yaml.safe_load` SOZINHO NÃO BASTA, e a bancada me pegou nisto na primeira redação desta
+    # guarda: o YAML padrão ACEITA chave duplicada (fica com a última), enquanto o parser do
+    # GitHub a REJEITA. Ou seja, a versão ingênua desta regra passaria verde no defeito EXATO que
+    # a originou (`env:` duplicado) — meia-cura, que nesta casa é cura nenhuma. O loader abaixo
+    # levanta na duplicata, que é o contrato do consumidor real.
+    local err
+    err="$(python3 - "${REPO_ROOT}/${wf}" 2>&1 <<'PYWF'
+import sys, yaml
+class Estrito(yaml.SafeLoader): pass
+def _sem_duplicata(loader, node, deep=False):
+    vistas = set()
+    for k, _ in node.value:
+        chave = loader.construct_object(k, deep=deep)
+        if chave in vistas:
+            raise yaml.constructor.ConstructorError(
+                None, None, "chave duplicada: '%s' (o GitHub rejeita; o YAML padrao aceita e fica com a ultima)" % (chave,), k.start_mark)
+        vistas.add(chave)
+    return yaml.SafeLoader.construct_mapping(loader, node, deep)
+Estrito.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _sem_duplicata)
+with open(sys.argv[1], encoding='utf-8') as fh:
+    yaml.load(fh, Loader=Estrito)
+PYWF
+)" && continue
+    violation "HARD" "${wf}" "REGRA 86 (Workflow de CI PARSEIA como YAML): o arquivo NÃO parseia — o GitHub recusa o workflow inteiro e ele fica inexecutável, mas segue no repo parecendo vivo ($(printf '%s' "${err}" | tr '\n' ' ' | cut -c1-160))"
+  done < <(git -C "${REPO_ROOT}" ls-files '.github/workflows/*.yml' '.github/workflows/*.yaml' 2>/dev/null)
+}
+
+# ===========================================================================
 # REGRA 16 — Contagem de inventário-TOTAL divergente da SSOT [SOFT]
 # previne: contagem-TOTAL do inventário divergindo da SSOT
 #   Checa SÓ frases-de-total CANÔNICAS contra inventory.sh — nunca 'N comandos' cru
@@ -4028,6 +4076,7 @@ check_inventory_total_drift
 check_model_version_fora_da_ssot
 check_kg_read_index_sync
 check_door_staleness
+check_workflows_parse
 check_frontmatter_scalar_colon
 check_no_claude_docs
 check_evolution_links
