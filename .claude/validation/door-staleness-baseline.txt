@@ -7,5 +7,16 @@
 #   é o modo de falha previsível de um gatilho que depende de alguém lembrar.
 # onion-core 1 — porta NOVA nasce com teto baixo: não tem passivo a carregar, e o 1 é o commit
 #   desta própria leva. Se ela subir, a guarda reprova — que é o ponto.
-onion-standalone 378
-onion-core 2
+#
+# ⚠️ ESTA CATRACA CRESCE DENTRO DO PR, E NADA MECÂNICO IMPEDE — defeito NOMEADO em 2026-09-17,
+#   não curado aqui. O teto vive na MESMA superfície que ele julga: toda leva que toca
+#   `.claude/**` afasta a porta em +N, a REGRA 85 fica HARD, e o único jeito de fechar o gate de
+#   dentro do PR é subir o número — exatamente o movimento que o cabeçalho proíbe. A porta só pode
+#   ser re-materializada a partir de main MERGEADA, então a cura de verdade nunca está disponível
+#   quando o gate cobra. É a mesma armadilha que me pegou três vezes nesta onda (baseline que mora
+#   na superfície julgada), agora um andar acima — e é catraca por DISCIPLINA, não por mecanismo,
+#   que é justamente o que esta casa não aceita.
+#   Cura provável: comparar contra o teto de `origin/main`, nunca contra o arquivo da árvore.
+#   Gatilho: a primeira vez que este número subir sem que a porta tenha sido re-materializada.
+onion-standalone 380
+onion-core 4
