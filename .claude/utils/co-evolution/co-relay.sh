@@ -77,16 +77,24 @@ role_field() {  # extrai 'role:' do stamp (tira comentário inline, aspas, espa�
     | sed -E 's/^[[:space:]]*role:[[:space:]]*//; s/[[:space:]]*#.*$//; s/[[:space:]]*$//; s/"//g; s/'\''//g'
 }
 if [ ! -f "${STAMP}" ]; then
-  echo "ERRO: ${STAMP} ausente — co-relay roda no ADOTANTE (role: adopted ou hub)." >&2
+  echo "ERRO: ${STAMP} ausente — co-relay roda no ALVO (role: adopted, hub ou standalone)." >&2
   echo "      Sem stamp = core/fonte ou pré-adoção; o core não relaya upstream (use /meta:co-announce)." >&2
   exit 2
 fi
 ROLE="$(role_field "${STAMP}")"
-if [ "${ROLE}" != "adopted" ]; then
-  echo "ERRO: role='${ROLE:-vazio}' no stamp — co-relay é só para ADOTANTE (role: adopted)." >&2
-  echo "      O core (role: source) anuncia downstream via /meta:co-announce, não relaya upstream." >&2
-  exit 2
-fi
+# ⚠️ `hub` ENTRA, e a omissão custou um sinal entregue à mão (2026-09-17). A condição antiga era
+# `!= "adopted"`, enquanto a mensagem de stamp-ausente logo acima já prometia "adopted ou hub" e o
+# espelho downstream `co-deliver.sh` valida `role:(adopted|hub)` e só entrega a hub/standalone
+# (T1/T3, RFC-0003 §2.1). Ou seja: o core ENTREGAVA anúncios à porta por desenho declarado, e a
+# porta não podia responder — o doc-bridge mecanizado num sentido só, justamente na superfície
+# PÚBLICA, que é a que mais gera sinal de primeira impressão. A assimetria era desta linha.
+case "${ROLE}" in
+  adopted|hub|standalone) : ;;
+  *)
+    echo "ERRO: role='${ROLE:-vazio}' no stamp — co-relay é só para ALVO (role: adopted, hub ou standalone)." >&2
+    echo "      O core (role: source) anuncia downstream via /meta:co-announce, não relaya upstream." >&2
+    exit 2 ;;
+esac
 
 # --- Resolve alvo (o CORE): --target é sempre obrigatório (sem members.yaml no adotante) ---
 [ -n "${TARGET}" ] || { echo "ERRO: --target <path-do-core> é obrigatório (o adotante não tem members.yaml)." >&2; usage; }

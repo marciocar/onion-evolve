@@ -16767,6 +16767,69 @@ run_role_scope_selftests() {
   if [ "${out}" = "NAO" ]; then record_pass "role-scope: (c) com corpus PRESENTE não recorta (o corte é sobre não receber)"
   else record_fail "role-scope: (c)" "recortou com .kg.yaml presente — esconderia corpus quebrado"; fi
   rm -rf "${sb2}"
+
+  # ── REGRA PATH-SCOPED cujo OBJETO não viaja (sinal da porta, 2026-09-17) ────────────────────
+  # A allowlist do transporte leva `.claude/rules/` inteiro e deixa `docs/evolution/` para trás.
+  # As duas decisões estão certas isoladas; juntas fazem uma regra que SÓ PODE reprovar no alvo.
+  local sb3 vm
+  sb3="$(mktemp -d)"
+  mkdir -p "${sb3}/.claude/validation" "${sb3}/.claude/utils/adopt"
+  vm="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
+  cp "${vm}" "${sb3}/.claude/utils/adopt/" 2>/dev/null || true
+  {
+    sed -n '/^_PAPEL_DESTE_REPO=""/,/^}/p'      "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    sed -n '/^_glob_literal_prefix()/,/^}/p'    "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    sed -n '/^_superficie_que_viaja()/,/^}/p'   "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    sed -n '/^_regra_sem_objeto_no_papel()/,/^}/p' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    sed -n '/^_rule_glob_matches()/,/^}/p'      "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  } > "${sb3}/pred2.sh"
+  _rs_run() { # $1=role ('' = fonte) $2=expr a avaliar
+    local _r="$1"
+    if [ -n "${_r}" ]; then printf 'role: %s\n' "${_r}" > "${sb3}/.claude/.onion-version"
+    else rm -f "${sb3}/.claude/.onion-version"; fi
+    REPO_ROOT="${sb3}" CLAUDE_DIR="${sb3}/.claude" bash -c '
+      source "'"${sb3}"'/pred2.sh"
+      '"$2"'' 2>&1
+  }
+
+  # (d) papel HUB + glob sob superfície core-only → RECORTA (SOFT declarado, nunca HARD cego)
+  out="$(_rs_run hub '_regra_sem_objeto_no_papel "docs/evolution/research/**" && echo RECORTA || echo NAO')"
+  if [ "${out}" = "RECORTA" ]; then record_pass "role-scope: (d) hub + glob em superfície que NÃO viaja → recorta"
+  else record_fail "role-scope: (d)" "não recortou: ${out} — a porta reprova numa regra que não pode carregar"; fi
+
+  # (e) a MESMA regra na FONTE segue HARD: lá a árvore é completa, glob morto é defeito de verdade
+  out="$(_rs_run '' '_regra_sem_objeto_no_papel "docs/evolution/research/**" && echo RECORTA || echo NAO')"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (e) na FONTE o mesmo glob NÃO é recortado"
+  else record_fail "role-scope: (e)" "recortou na fonte — regra morta passaria a dormir no core"; fi
+
+  # (f) glob que MIRA superfície que viaja não ganha isenção nenhuma, mesmo no hub
+  out="$(_rs_run hub '_regra_sem_objeto_no_papel ".claude/commands/**" && echo RECORTA || echo NAO')"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (f) glob sobre superfície que VIAJA continua cobrado no hub"
+  else record_fail "role-scope: (f)" "recortou glob que viaja — a isenção virou fail-open"; fi
+
+  # (g) FAIL-CLOSED: sem a SSOT do transporte não se concede isenção (nunca 'não sei' virar 'passa')
+  mv "${sb3}/.claude/utils/adopt/vendor-manifest.sh" "${sb3}/vm.bak" 2>/dev/null || true
+  out="$(_rs_run hub '_regra_sem_objeto_no_papel "docs/evolution/research/**" && echo RECORTA || echo NAO')"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (g) sem vendor-manifest a isenção NÃO é concedida (fail-closed)"
+  else record_fail "role-scope: (g)" "isentou sem SSOT do transporte — fail-open"; fi
+  mv "${sb3}/vm.bak" "${sb3}/.claude/utils/adopt/vendor-manifest.sh" 2>/dev/null || true
+
+  # (h) O RAMO NÃO-GIT NÃO PODE MENTIR. `${g##*/}` de 'a/b/**' é '**', e `find -name '**'` casa
+  #     QUALQUER arquivo: num destino sem `git init` toda regra path-scoped passava trivialmente.
+  #     Foi assim que um dogfood da porta declarou 0 HARD enquanto a porta real reprovava.
+  printf 'oi\n' > "${sb3}/qualquer.txt"
+  out="$(_rs_run hub '_rule_glob_matches "docs/evolution/research/**" && echo CASA || echo NAO')"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (h) ramo não-git respeita o PREFIXO (não casa por '**')"
+  else record_fail "role-scope: (h)" "o ramo não-git casou glob sem objeto — a guarda mente fora do git"; fi
+
+  # (i) e o mesmo ramo continua ACHANDO o que existe de verdade (a cura não pode cegar a guarda)
+  mkdir -p "${sb3}/docs/evolution/research" && printf 'x\n' > "${sb3}/docs/evolution/research/a.md"
+  out="$(_rs_run hub '_rule_glob_matches "docs/evolution/research/**" && echo CASA || echo NAO')"
+  if [ "${out}" = "CASA" ]; then record_pass "role-scope: (i) ramo não-git ainda casa quando o objeto EXISTE"
+  else record_fail "role-scope: (i)" "a cura cegou a guarda: ${out}"; fi
+
+  unset -f _rs_run
+  rm -rf "${sb3}"
 }
 
 _family run_hook_autofix_selftests

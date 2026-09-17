@@ -4,7 +4,7 @@ meta:
   baseline: 2026-09-14
   review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 39 NÓS (era 36: +3 pela PASSADA ADVERSARIAL da cura do A_DOUTRINA — duas lacunas de COBERTURA (plugins/ fora da varredura; predicado de privacidade por nome completo) e a fronteira medida entre caminho-de-máquina NARRATIVO (curado) e FUNCIONAL (parametrização, gated)) (era 35: +1 pela varredura disco×registro, que transformou o caso único do sinal numa classe medida — 9 de 19) (era 34: +1 pelo veredito que confundia EXECUTAR com BARRAR — chegou por sinal de campo de um adotante) (era 33: +1 pelo verificador do gate que decidia por string e abortou uma adoção real — achado pelo dogfood da própria entrega) (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
+  # ═══ TETO: 41 NÓS (era 39: +2 pelo SINAL DA PORTA de 2026-09-17, que REFUTOU um "0 HARD" declarado por mim — a guarda de rule path-scoped dava vereditos OPOSTOS em git e nao-git, e a allowlist do transporte separa uma regra do objeto dela por desenho) (era 36: +3 pela PASSADA ADVERSARIAL da cura do A_DOUTRINA — duas lacunas de COBERTURA (plugins/ fora da varredura; predicado de privacidade por nome completo) e a fronteira medida entre caminho-de-máquina NARRATIVO (curado) e FUNCIONAL (parametrização, gated)) (era 35: +1 pela varredura disco×registro, que transformou o caso único do sinal numa classe medida — 9 de 19) (era 34: +1 pelo veredito que confundia EXECUTAR com BARRAR — chegou por sinal de campo de um adotante) (era 33: +1 pelo verificador do gate que decidia por string e abortou uma adoção real — achado pelo dogfood da própria entrega) (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
   # O CI nao revisou o PR #827 (o revisor morreu com permission_denials_count: 9 e caiu em soft-pass);
   # o maestro mandou rodar a passada propria. DUAS rodadas, 5 refutadores com LENTES distintas
   # (maquinaria/shell · o artefato mente? · pelo lado do adotante), ~1,13M tokens. As duas REPROVARAM:
@@ -484,6 +484,28 @@ nodes:
     label: 'O `_priv` do `--check-bundle` — a guarda que reprova biografia dentro de um bundle — fixava o NOME COMPLETO de um repo do vertical pessoal. A familia tem mais de um repo, e o irmao passava batido: 6 citacoes viajavam, e duas ja estavam no plugin PUBLICO montado. Mesma classe de C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO, agora no predicado de privacidade: o defeito e o VOCABULARIO, nao a logica. CURADO trocando o nome completo pelo PREFIXO da familia — que cobre inclusive o repo que ninguem criou ainda — e neutralizando as 6 citacoes, que passaram a creditar o SINAL DE CAMPO sem nomear o repo. A licao que fica: predicado de privacidade escrito por enumeracao envelhece a cada repo novo; escrito por prefixo, nao.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
 
+  - id: E_A_GUARDA_DAVA_VEREDITOS_OPOSTOS_EM_GIT_E_NAO_GIT
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.98
+    verified_at: '2026-09-17'
+    verified_against: 'lint-artifacts.sh rodado na porta REAL (/home/marcio/onion-core, repo git, pin 7a3504e6b121): 1 HARD em .claude/rules/research-lens.md — contra o "rc=0, 0 HARD" que eu declarei do MESMO pin, medido num destino materializado SEM git init'
+    label: 'O `_rule_glob_matches` tinha dois ramos e eles DISCORDAVAM. Em repo git usava `git ls-files`; fora dele, `find -name "${g##*/}"` — e `${g##*/}` de `docs/evolution/research/**` e `**`, um curinga que casa QUALQUER arquivo. Consequencia: num destino sem `git init` toda regra path-scoped passava trivialmente. Eu materializei a porta de dogfood num destino assim e declarei 0 HARD; a porta real e repo git e reprovava. O modo de falha e o pior desta casa: a medicao BARATA era a que mentia, e foi a que escolhi — [[testar-no-caminho-errado-e-nao-testar]] dentro do harness da propria porta, o instrumento que deveria prevenir exatamente isso. Quem achou nao fui eu: foi a PORTA, num sinal de campo escrito por uma sessao limpa dela. CURADO: o ramo nao-git passa a respeitar o PREFIXO literal do glob, como o pathspec do git faz, com dois casos de bancada segurando os dois lados (nao casar quando o objeto falta; ainda casar quando existe — cura que cega a guarda nao e cura).'
+    trace: '.claude/validation/lint-artifacts.sh'
+
+  - id: C_REGRA_VENDORIZADA_CUJO_OBJETO_NAO_VIAJA
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: '2026-09-17'
+    verified_against: 'diff -q das duas copias de .claude/rules/research-lens.md (byte-identicas) x git ls-files docs/evolution/research/** nos dois repos: 140 arquivos no core, 0 na porta'
+    label: 'CLASSE, nao caso: uma regra path-scoped viaja com `.claude/**` enquanto o OBJETO do glob dela fica para tras na allowlist, e no alvo ela so PODE reprovar. As duas decisoes estao certas isoladas — `.claude/` viaja inteiro; `docs/evolution/` nao viaja porque inbox/inbound sao infra LOCAL do alvo (vendor-manifest.sh:91). Juntas produzem regra morta por construcao. A irma `kg-grammar.md` sobrevive por ACASO: seu glob `**/*.kg.yaml` casa as fixtures de `.claude/validation/`, que viajam — sorte do glob, nao imunidade de desenho. Por isso e classe: hoje N=1, e a cada rule nova o dado e sorteado outra vez. CURADO com guarda papel-consciente que DECLARA a isencao ([papel/SEM-OBJETO], vocabulario ja usado pelo door-staleness-check) em vez de reprovar cego, e cujo predicado DERIVA da SSOT do transporte (`vendor-manifest.sh --emit-scrub-roots`) em vez de repetir uma lista de prefixos que envelheceria sozinha. Tres invariantes na bancada: na FONTE a mesma ausencia segue HARD (senao o recorte vira fail-open universal); glob que mira superficie que VIAJA continua cobrado em qualquer papel; e sem o manifesto NAO se concede isencao (fail-closed — "nao sei" nunca vira "passa").'
+    trace: '.claude/validation/lint-artifacts.sh'
+
   - id: A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO
     node_type: decision
     plane: PROD
@@ -497,6 +519,13 @@ nodes:
     trace: '.claude/validation/vps-exposure-check.sh'
 
 edges:
+  # o sinal veio da PORTA e derrubou uma afirmacao minha: o dogfood e que estava no substrato errado
+  - from: E_A_GUARDA_DAVA_VEREDITOS_OPOSTOS_EM_GIT_E_NAO_GIT
+    to: C_REGRA_VENDORIZADA_CUJO_OBJETO_NAO_VIAJA
+    edge_type: SUPPORTS
+  - from: C_REGRA_VENDORIZADA_CUJO_OBJETO_NAO_VIAJA
+    to: A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE
+    edge_type: SUPPORTS
   # a cobertura ampliada foi o que EXPOS o residuo: sem varrer plugins/ ninguem o teria medido
   - from: E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA
     to: A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO

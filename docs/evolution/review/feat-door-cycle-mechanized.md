@@ -1,11 +1,11 @@
 ---
-title: 'Resíduo — o ciclo era prosa, e a prosa tinha 377 commits de dívida'
+title: 'Resíduo — o ciclo era prosa; e o meu dogfood media no substrato errado'
 date: 2026-09-17
 branch: feat/door-cycle-mechanized
 reviewed_diff_sha256: 9207780f89c5f68be5fc932307c04e3c84535a5b5682ed4c12e9216fdd246041
-findings_total: 4
-findings_real: 4
-findings_fixed: 4
+findings_total: 6
+findings_real: 6
+findings_fixed: 6
 tokens: 0
 duration_min: 0
 verdict: CORRIGIDO
@@ -13,7 +13,10 @@ elenxo: nao
 nota: >-
   O número que justifica esta entrega já existia e ninguém o tinha medido: a porta anterior estava
   377 commits atrás. Os três defeitos de harness que a bancada me cobrou são todos a MESMA
-  armadilha — o baseline da guarda vive na superfície que ela julga.
+  armadilha — o baseline da guarda vive na superfície que ela julga. Os dois achados da segunda
+  rodada não vieram de mim: vieram da PORTA, num sinal de campo, e o primeiro deles REFUTA o
+  "0 HARD" que eu declarei desta mesma branch. A causa não foi desatenção — foi medir num
+  substrato onde a guarda dá o veredito oposto.
 ---
 
 # 377
@@ -110,3 +113,73 @@ A REGRA 85 (Porta pública espelha o core, com catraca) acusou as duas portas de
 porque os commits desta leva mexeram na superfície que viaja. Baseline atualizado
 (`onion-standalone 378`, `onion-core 2`). **O ciclo fechou sobre si mesmo na primeira volta**, que é
 o teste que eu não teria como encomendar.
+
+
+---
+
+# Segunda rodada — o sinal veio da porta, e ele me refutou
+
+Entre o carimbo anterior e este, a porta materializada abriu uma sessão limpa, rodou `/warm-up` e o
+próprio lint, e escreveu um sinal ao core. Ele reprova exatamente o que o commit anterior desta branch
+afirma no título: *"a porta passa no próprio lint"*.
+
+```
+/home/marcio/onion-core  (role: hub, pin 7a3504e6b121)
+  Violações HARD : 1   ← .claude/rules/research-lens.md: nenhum glob de 'paths:' casa arquivo rastreado
+  Violações SOFT : 6
+```
+
+Eu tinha declarado `rc=0 — nenhuma violação HARD`. **A declaração era minha e estava errada.**
+
+## Achado 5 — a guarda dá vereditos OPOSTOS nos dois substratos
+
+`_rule_glob_matches` tem dois ramos. Em repo git usa `git ls-files`. Fora dele:
+
+```bash
+pat="${g##*/}"                       # 'docs/evolution/research/**'  →  '**'
+find "${REPO_ROOT}" -name "${pat}"   # -name '**' casa QUALQUER arquivo
+```
+
+O meu dogfood materializou a porta num destino **sem `git init`**. Ali toda regra path-scoped passa
+trivialmente, porque `-name '**'` é um curinga que casa tudo. A porta real é repo git, e reprova.
+
+O modo de falha é o pior que existe nesta casa: **a medição barata era a que mentia**, e ela é a que eu
+escolhi. É [[testar-no-caminho-errado-e-nao-testar]] dentro do harness da própria porta — o mesmo erro
+que a doutrina descreve, cometido no instrumento que deveria preveni-lo.
+
+O ramo não-git agora respeita o **prefixo literal** do glob, como o pathspec do git faz. Dois casos de
+bancada seguram os dois lados: (h) não casar quando o objeto não existe, (i) ainda casar quando existe
+— porque cura que cega a guarda não é cura.
+
+## Achado 6 — a allowlist separa a regra do objeto dela, e isso é CLASSE
+
+| | core | porta (`hub`) |
+|---|---|---|
+| `.claude/rules/research-lens.md` | presente | presente, **byte-idêntica** |
+| `docs/evolution/research/**` (o objeto) | 140 arquivos | **0** — não viaja, por desenho |
+| veredito | regra útil | **HARD**, regra morta |
+
+`.claude/**` viaja inteiro; `docs/evolution/` fica de fora porque *"inbox/inbound são infra LOCAL do
+alvo"* (`vendor-manifest.sh:91`). As duas decisões estão certas isoladas. Juntas produzem uma regra que
+**só pode** reprovar no alvo.
+
+A irmã `kg-grammar.md` sobrevive por **acaso**: o glob `**/*.kg.yaml` casa as fixtures de
+`.claude/validation/`, que viajam. Não é imunidade de desenho — é sorte do glob. Por isso o achado é
+classe e não caso: hoje N=1, e a cada rule nova o dado é sorteado outra vez.
+
+A cura declara a isenção em vez de reprovar cego, e o predicado **deriva da SSOT do transporte**
+(`vendor-manifest.sh --emit-scrub-roots`) em vez de repetir aqui uma lista de prefixos que envelheceria
+sozinha. Três invariantes na bancada: na **fonte** a mesma ausência segue HARD (senão o recorte vira
+fail-open universal); glob que mira superfície que **viaja** continua cobrado em qualquer papel; e sem
+o manifesto **não se concede isenção** — fail-closed, porque "não sei" nunca pode virar "passa".
+
+## A nota secundária do sinal, que era um fio solto de desenho
+
+A porta descobriu o problema **ao tentar entregar o sinal**: `co-relay.sh:85` testava
+`!= "adopted"` e mandava `hub` para o `exit 2` — enquanto a mensagem de erro três linhas acima já
+prometia *"adopted ou hub"*, e o espelho downstream `co-deliver.sh:119` **aceita** `hub` e só entrega a
+`hub`/`standalone`.
+
+Ou seja: o core **entrega** anúncios à porta por desenho declarado, e a porta **não podia responder**. O
+doc-bridge estava mecanizado num sentido só — justamente na superfície pública, que é a que mais gera
+sinal de primeira impressão. Este sinal chegou à mão por causa disso.

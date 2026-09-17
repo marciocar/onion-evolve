@@ -1002,6 +1002,57 @@ check_branch_agent_distinction() {
 # lint-selftest é uma CÓPIA sem `.git` — ali `git ls-files` falha e TODO glob pareceria
 # morto, reprovando até a fixture `good`. Falso-positivo medido no dogfood, 2026-08-03:
 # a guarda acusaria a si mesma no próprio auto-teste. Fora de repo git, cai para `find`.
+_glob_literal_prefix() { # $1=glob → maior prefixo SEM curinga ('' se o glob já começa com um)
+  local g="$1" acc="" seg
+  # `set -f` NÃO é zelo: a expansão sem aspas abaixo sofre PATHNAME EXPANSION, e o argumento é
+  # literalmente um glob — sem isto, `docs/evolution/research/**` viraria a lista de arquivos do cwd.
+  local _noglob=1; case "$-" in *f*) _noglob=0 ;; esac
+  set -f
+  local IFS=/
+  for seg in ${g}; do
+    case "${seg}" in *'*'*|*'?'*|*'['*) break ;; esac
+    [ -n "${seg}" ] || continue
+    acc="${acc:+${acc}/}${seg}"
+  done
+  [ "${_noglob}" -eq 1 ] && set +f
+  printf '%s' "${acc}"
+}
+
+# As raízes que o TRANSPORTE declara viajar — SSOT única (`vendor-manifest.sh --emit-scrub-roots`),
+# nunca uma lista repetida aqui. FAIL-CLOSED: manifesto ausente/vazio devolve vazio, e quem consulta
+# trata isso como "não sei" — ou seja, NÃO concede isenção nenhuma.
+_superficie_que_viaja() {
+  [ -n "${_SURF_VIAJA_CACHE:-}" ] && { printf '%s' "${_SURF_VIAJA_CACHE}"; return 0; }
+  local mf="${CLAUDE_DIR}/utils/adopt/vendor-manifest.sh"
+  if [ -f "${mf}" ]; then
+    _SURF_VIAJA_CACHE="$(bash "${mf}" --emit-scrub-roots 2>/dev/null)" || _SURF_VIAJA_CACHE=""
+  else
+    _SURF_VIAJA_CACHE=""
+  fi
+  printf '%s' "${_SURF_VIAJA_CACHE}"
+}
+
+# Verdadeiro quando NENHUM glob desta regra aponta para superfície que viaja — isto é, o objeto da
+# regra é core-only e, num alvo, ela é estruturalmente incapaz de casar. No papel `source` a árvore é
+# completa: ali a mesma ausência continua HARD (é regra morta de verdade, não falta de objeto).
+_regra_sem_objeto_no_papel() { # $1=globs (um por linha)
+  [ "$(_papel)" = "source" ] && return 1
+  local surf g prefix r dentro=0
+  surf="$(_superficie_que_viaja)"
+  [ -n "${surf}" ] || return 1          # fail-closed: sem SSOT do transporte, não se concede isenção
+  while IFS= read -r g; do
+    [ -n "${g}" ] || continue
+    prefix="$(_glob_literal_prefix "${g}")"
+    [ -n "${prefix}" ] || return 1      # glob que começa em curinga varre o repo todo: tem objeto aqui
+    while IFS= read -r r; do
+      [ -n "${r}" ] || continue
+      case "${prefix}/" in "${r}/"*) dentro=1; break ;; esac
+    done <<< "${surf}"
+    [ "${dentro}" -eq 1 ] && return 1   # ao menos um glob mira superfície que viaja → cobrança válida
+  done <<< "$1"
+  return 0
+}
+
 _rule_glob_matches() { # $1=glob
   local g="$1" pat _ls
   if git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
@@ -1022,9 +1073,25 @@ _rule_glob_matches() { # $1=glob
     [ -n "${_ls}" ] && return 0
     return 1
   fi
-  pat="${g##*/}"                                   # '**/*.kg.yaml' → '*.kg.yaml'
-  [ -n "${pat}" ] || return 1
-  find "${REPO_ROOT}" -name "${pat}" -not -path '*/.git/*' -print -quit | grep -q .
+  # ⚠️ RAMO NÃO-GIT — e ele MENTIU (2026-09-17, medido). A forma anterior era
+  # `find "${REPO_ROOT}" -name "${g##*/}"`, e `${g##*/}` de `docs/evolution/research/**` é `**`:
+  # um `-name '**'` casa QUALQUER arquivo do repo. Resultado: num destino sem `git init` toda regra
+  # path-scoped passava trivialmente. Foi exatamente assim que um dogfood da porta declarou
+  # "0 HARD" enquanto a porta real (repo git) reprovava — a guarda dava vereditos OPOSTOS nos dois
+  # substratos, e o barato era o que eu media. Classe [[testar-no-caminho-errado-e-nao-testar]].
+  # Agora o ramo não-git respeita o PREFIXO literal do glob, como o pathspec do git faz.
+  local prefix root _hit
+  prefix="$(_glob_literal_prefix "${g}")"
+  root="${REPO_ROOT}${prefix:+/${prefix}}"
+  [ -e "${root}" ] || return 1
+  pat="${g##*/}"
+  case "${pat}" in
+    ''|'*'|'**')                                   # sufixo puro-curinga: basta haver arquivo sob o prefixo
+      _hit="$(find "${root}" -type f -not -path '*/.git/*' -print -quit 2>/dev/null)" ;;
+    *)                                             # '**/*.kg.yaml' → '*.kg.yaml', procurado SOB o prefixo
+      _hit="$(find "${root}" -name "${pat}" -not -path '*/.git/*' -print -quit 2>/dev/null)" ;;
+  esac
+  [ -n "${_hit}" ]                                 # sem pipe: `find | grep -q` é a corrida EPIPE de sempre
 }
 
 check_rules_pathscoped() {
@@ -1053,7 +1120,15 @@ check_rules_pathscoped() {
       if _rule_glob_matches "${g}"; then matched=1; break; fi
     done <<< "${globs}"
     if [ "${matched}" -eq 0 ]; then
-      violation "HARD" "${rule}" "nenhum glob de 'paths:' casa arquivo rastreado ($(printf '%s' "${globs}" | tr '\n' ' ')) — a regra existe no disco e NUNCA carrega — corrija o glob para casar um arquivo real rastreado (git ls-files), ou remova a regra se obsoleta"
+      # A allowlist do transporte separa a regra do objeto dela: `.claude/**` viaja inteiro, mas
+      # `docs/evolution/` não (é infra LOCAL do alvo, por desenho do vendor-manifest). As duas
+      # decisões estão certas isoladas; juntas produzem uma regra que SÓ PODE reprovar no alvo.
+      # A guarda declara a isenção — nunca passa calada — e mantém a cobrança viva no `source`.
+      if _regra_sem_objeto_no_papel "${globs}"; then
+        violation "SOFT" "${rule}" "[papel/SEM-OBJETO] papel '$(_papel)' não recebe o objeto desta regra: nenhum glob de 'paths:' ($(printf '%s' "${globs}" | tr '\n' ' ')) aponta para superfície que VIAJA (vendor-manifest.sh --emit-scrub-roots) — a regra chegou com o framework, o objeto dela é core-only; ela dorme aqui, e a cobrança segue HARD na fonte"
+      else
+        violation "HARD" "${rule}" "nenhum glob de 'paths:' casa arquivo rastreado ($(printf '%s' "${globs}" | tr '\n' ' ')) — a regra existe no disco e NUNCA carrega — corrija o glob para casar um arquivo real rastreado (git ls-files), ou remova a regra se obsoleta"
+      fi
     fi
   done < <(_find "${rules_dir}" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
