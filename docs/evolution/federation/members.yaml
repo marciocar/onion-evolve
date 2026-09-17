@@ -273,6 +273,41 @@ members:
   # porta. O `onion_version` abaixo é o pin de onde ela foi materializada, e é o que a guarda de
   # ciclo compara contra a superfície que viaja — porta sem re-materialização envelhece, e o
   # `onion-standalone` (372 commits atrás, medido 2026-09-17) é a prova de que isso acontece.
+  - id: vendas-pdi-enterprise
+    # ⚠️ SLUG NEUTRO POR DECISÃO, não por acaso (maestro, 2026-09-17). O pedido original nomeava o
+    #    cliente no identificador, e o identificador é justamente o que vai para as superfícies
+    #    PROJETADAS (federation-console.html, federation-map.md). A casa já pagou por isso: um nome
+    #    comercial entrou numa entrada deste mesmo arquivo e APARECEU no console, e o lint não pegou
+    #    porque a guarda reconhece por LISTA e não conhecia o nome — falha por vocabulário. Quem é o
+    #    cliente vive no CLAUDE.md do adotante, nunca aqui.
+    name: vendas-pdi-enterprise (adotante de campo — vendas enterprise, cliente sob NDA)
+    # ⚠️ `standalone` aqui e `adopted` no `.claude/.onion-version` NÃO se contradizem — respondem a
+    #    perguntas diferentes: o carimbo diz a RELAÇÃO com o framework (este repo vendoriza o Onion),
+    #    o registro diz o TIER na rede (T3: adota o core direto, sem sub-adotados). Escrevi `adopted`
+    #    aqui na 1ª tentativa e o `members-validate.sh` recusou, nomeando o vocabulário aceito —
+    #    guarda fazendo exatamente o que deve: barrar antes, não deixar drift entrar calado.
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter
+    parent: onion-evolve
+    remote: n/a                 # repo LOCAL; o remoto privado é ato do maestro (outward-facing)
+    local_path: "/home/marcio/vendas-pdi-enterprise"
+    onion_version: f5ec0dcf2dfb # pin da adoção 2026-09-17, commit MERGEADO em main
+    adopted_at: 2026-09-17
+    mode: greenfield            # repo novo; gate PROVADO por execução: lint 0 HARD / 8 SOFT
+    # ⚠️ CONFIDENCIALIDADE — material do cliente sob NDA vive em `material/`, IGNORADO pelo git
+    #    desde o PRIMEIRO commit, e NUNCA entra em commit/PR/nome de arquivo. Repo privado protege
+    #    contra terceiros; não protege contra o repo ser clonado, espelhado ou aberto por engano.
+    personality_summary: "Adotante de campo em vendas enterprise: o repo é a fonte do método e das especificações que alimentam o agente do LibreChat onde o cliente opera. Material bruto não viaja; o que viaja é o que deriva dele."
+    specializations: [vendas, spec-as-code, rag-bridge]
+    personality_last_sync: 2026-09-17
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
   - id: onion-core
     name: onion-core (porta pública do core — maquinaria completa, papel hub, sem biografia)
     role: standalone            # T3 — recebe o bundle, não adota um projeto
