@@ -145,6 +145,7 @@
 .claude/utils/adopt/scope-claude-gitignore.sh	D_FIX_GAP2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/utils/adopt/starter-research-seed.sh	E_ADOCAO_COMPLETA_NASCE_VERDE_MEDIDA_0915	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/transfer-ownership.sh	TX_transfer	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
+.claude/utils/adopt/vendor-branch.sh	C_PATHSPEC_DE_EXCLUSAO_DESLIGOU_DUAS_GUARDAS	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/vendor-branch.sh	C_trigger_is_fallback_seed	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
 .claude/utils/adopt/vendor-branch.sh	D_CURE_PRESERVE_ADOPTER_BASELINE	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/utils/adopt/vendor-branch.sh	D_SCRUB_FROZEN_POISON_IN_VENDORS	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
