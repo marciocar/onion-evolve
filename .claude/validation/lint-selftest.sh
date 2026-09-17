@@ -6838,6 +6838,15 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (c5) teto externo via timeout(1) → cala"
   else record_fail "empty-result-guard: (c5)" "não reconheceu timeout(1) como teto: ${out}"; fi
 
+  # (c6) CALA quando `until`/`sleep` aparecem DENTRO DE UMA STRING — falso-positivo medido minutos
+  #      depois de a guarda nascer: `ps … | awk '/until |sleep /'` foi acusado, porque o separador
+  #      `tr ';&|'` não respeita aspas e partiu o regex num fragmento que ABRE com `until `. É a
+  #      lição (ii) deste arquivo pela terceira vez. Cura: laço de verdade tem `do`/`done`; menção não.
+  out="$(_erg '"ps -eo pid,cmd | awk \"/until |sleep |check-runs/\" | head -5"' '"x"' || true)"
+  if ! grep -q 'LAÇO-DE-ESPERA-SEM-TETO' <<< "${out}"; then
+    record_pass "empty-result-guard: (c6) 'until|sleep' dentro de string → cala (exige do/done)"
+  else record_fail "empty-result-guard: (c6)" "falso-positivo por menção em regex: ${out:0:140}"; fi
+
   # (b2b) COBERTURA — a 2ª versão exigia que o cluster com `f` fosse o PRIMEIRO token, e escapavam
   #       `pkill -9 -f` (a forma mais comum do mundo real), `-a -f`, `-u root -f` e a longa `--full`.
   #       Promessa maior que cobertura é `declarado != verificado` dentro da própria guarda.
