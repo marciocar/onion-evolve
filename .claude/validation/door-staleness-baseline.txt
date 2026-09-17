@@ -17,5 +17,10 @@
 # trabalho em VOO, que a porta não teria como espelhar; aqui o trabalho está MERGEADO, a porta de
 # fato ficou para trás, e a catraca está fazendo exatamente o que existe para fazer. O `onion-core`
 # volta a 0 na re-materialização logo a seguir; o 373 do `onion-standalone` é o passivo real.
-onion-standalone 373
-onion-core 1
+#
+# 2026-09-17, pós-re-materialização: `onion-core` volta a ZERO — a porta foi refeita do `main`
+# mergeado (pin 79456b1e21de) e espelha o core exatamente. É a catraca funcionando no sentido
+# que interessa: o número DIMINUINDO. O `onion-standalone` sobe para 374 porque a leva do #842
+# entrou em main e aquela porta segue parada desde 2026-07-19 — passivo real, não ruído.
+onion-standalone 374
+onion-core 0
