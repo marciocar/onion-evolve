@@ -4,7 +4,7 @@ meta:
   baseline: 2026-09-14
   review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 41 NÓS (era 39: +2 pelo SINAL DA PORTA de 2026-09-17, que REFUTOU um "0 HARD" declarado por mim — a guarda de rule path-scoped dava vereditos OPOSTOS em git e nao-git, e a allowlist do transporte separa uma regra do objeto dela por desenho) (era 36: +3 pela PASSADA ADVERSARIAL da cura do A_DOUTRINA — duas lacunas de COBERTURA (plugins/ fora da varredura; predicado de privacidade por nome completo) e a fronteira medida entre caminho-de-máquina NARRATIVO (curado) e FUNCIONAL (parametrização, gated)) (era 35: +1 pela varredura disco×registro, que transformou o caso único do sinal numa classe medida — 9 de 19) (era 34: +1 pelo veredito que confundia EXECUTAR com BARRAR — chegou por sinal de campo de um adotante) (era 33: +1 pelo verificador do gate que decidia por string e abortou uma adoção real — achado pelo dogfood da própria entrega) (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
+  # ═══ TETO: 42 NOS (era 41: +1 pela ESTEIRA da catraca da porta, descoberta DIRIGINDO o proprio mecanismo: a guarda media pin..HEAD da branch, entao o commit que sobe o teto invalidava o teto) (era 39: +2 pelo SINAL DA PORTA de 2026-09-17, que REFUTOU um "0 HARD" declarado por mim — a guarda de rule path-scoped dava vereditos OPOSTOS em git e nao-git, e a allowlist do transporte separa uma regra do objeto dela por desenho) (era 36: +3 pela PASSADA ADVERSARIAL da cura do A_DOUTRINA — duas lacunas de COBERTURA (plugins/ fora da varredura; predicado de privacidade por nome completo) e a fronteira medida entre caminho-de-máquina NARRATIVO (curado) e FUNCIONAL (parametrização, gated)) (era 35: +1 pela varredura disco×registro, que transformou o caso único do sinal numa classe medida — 9 de 19) (era 34: +1 pelo veredito que confundia EXECUTAR com BARRAR — chegou por sinal de campo de um adotante) (era 33: +1 pelo verificador do gate que decidia por string e abortou uma adoção real — achado pelo dogfood da própria entrega) (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
   # O CI nao revisou o PR #827 (o revisor morreu com permission_denials_count: 9 e caiu em soft-pass);
   # o maestro mandou rodar a passada propria. DUAS rodadas, 5 refutadores com LENTES distintas
   # (maquinaria/shell · o artefato mente? · pelo lado do adotante), ~1,13M tokens. As duas REPROVARAM:
@@ -506,6 +506,17 @@ nodes:
     label: 'CLASSE, nao caso: uma regra path-scoped viaja com `.claude/**` enquanto o OBJETO do glob dela fica para tras na allowlist, e no alvo ela so PODE reprovar. As duas decisoes estao certas isoladas — `.claude/` viaja inteiro; `docs/evolution/` nao viaja porque inbox/inbound sao infra LOCAL do alvo (vendor-manifest.sh:91). Juntas produzem regra morta por construcao. A irma `kg-grammar.md` sobrevive por ACASO: seu glob `**/*.kg.yaml` casa as fixtures de `.claude/validation/`, que viajam — sorte do glob, nao imunidade de desenho. Por isso e classe: hoje N=1, e a cada rule nova o dado e sorteado outra vez. CURADO com guarda papel-consciente que DECLARA a isencao ([papel/SEM-OBJETO], vocabulario ja usado pelo door-staleness-check) em vez de reprovar cego, e cujo predicado DERIVA da SSOT do transporte (`vendor-manifest.sh --emit-scrub-roots`) em vez de repetir uma lista de prefixos que envelheceria sozinha. Tres invariantes na bancada: na FONTE a mesma ausencia segue HARD (senao o recorte vira fail-open universal); glob que mira superficie que VIAJA continua cobrado em qualquer papel; e sem o manifesto NAO se concede isencao (fail-closed — "nao sei" nunca vira "passa").'
     trace: '.claude/validation/lint-artifacts.sh'
 
+  - id: E_A_CATRACA_DA_PORTA_ERA_ESTEIRA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: '2026-09-17'
+    verified_against: 'observado ao vivo em tres tentativas de fechar o mesmo gate na branch feat/door-cycle-mechanized: 378 -> 380 -> 381, cada subida de teto invalidada pelo proprio commit que a fez; depois da cura, a medicao honesta contra merge-base devolveu 372/0'
+    label: 'A catraca da REGRA 85 media `git log <pin>..HEAD` — HEAD da BRANCH. Consequencia estrutural: todo commit que toca `.claude/**` afasta a porta em +1; subir o teto para destravar EXIGE um commit; esse commit afasta de novo. Esteira, nao catraca. E a saida legitima nao existia: a porta so pode ser re-materializada a partir de main MERGEADA, logo a cura que o gate cobra nunca esta disponivel quando ele cobra — guarda satisfazivel so pos-merge nao e gate de pre-merge. Descoberto DIRIGINDO o mecanismo que eu mesmo tinha acabado de construir; nenhum refutador apontou, foi o uso. CURADO: a ponta passa a ser o `merge-base` com o ramo default (fallback declarado para HEAD sem remote — mais estrito, nunca mais frouxo). O efeito colateral prova a cura: os tetos CAIRAM de 378/2 para 372/0 sem ninguem re-materializar nada, porque os numeros antigos cobravam por trabalho em voo que a porta nao teria como espelhar. A catraca nao afrouxou; ficou honesta. Bancada: (e) commit em voo nao defasa, (f) o MESMO commit ja em main defasa — cura que cega a guarda nao e cura.'
+    trace: '.claude/validation/door-staleness-check.sh'
+
   - id: A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO
     node_type: decision
     plane: PROD
@@ -519,6 +530,9 @@ nodes:
     trace: '.claude/validation/vps-exposure-check.sh'
 
 edges:
+  - from: E_A_CATRACA_DA_PORTA_ERA_ESTEIRA
+    to: C_REGRA_VENDORIZADA_CUJO_OBJETO_NAO_VIAJA
+    edge_type: SUPPORTS
   # o sinal veio da PORTA e derrubou uma afirmacao minha: o dogfood e que estava no substrato errado
   - from: E_A_GUARDA_DAVA_VEREDITOS_OPOSTOS_EM_GIT_E_NAO_GIT
     to: C_REGRA_VENDORIZADA_CUJO_OBJETO_NAO_VIAJA

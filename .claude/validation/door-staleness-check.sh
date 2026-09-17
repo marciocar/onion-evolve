@@ -56,15 +56,36 @@ PY
 )"
 [ -n "${_doors}" ] || { echo "door-staleness: nenhuma porta com pin no registro — nada a julgar."; exit 0; }
 
+# A PONTA a medir: o último ponto que de fato está no ramo default (ver a nota abaixo, no `log`).
+_TIP="HEAD"
+for _ref in origin/main origin/master; do
+  git -C "${REPO}" rev-parse --verify --quiet "${_ref}" >/dev/null || continue
+  _mb="$(git -C "${REPO}" merge-base HEAD "${_ref}" 2>/dev/null)" || _mb=""
+  [ -n "${_mb}" ] && { _TIP="${_mb}"; break; }
+done
+
 _out=""; _fail=0
 while IFS=$'\t' read -r _id _pin; do
   [ -n "${_id}" ] || continue
   if ! git -C "${REPO}" rev-parse --verify --quiet "${_pin}^{commit}" >/dev/null; then
     _out="${_out}${_id}\tPIN-DESCONHECIDO\t${_pin}\n"; _fail=1; continue
   fi
-  # `git log <pin>..HEAD -- <raízes>` conta só o que MEXEU no que viaja. Commit de biografia
-  # não defasa a porta — ela não o receberia de qualquer forma, e contá-lo seria ruído.
-  _n="$(git -C "${REPO}" log --oneline "${_pin}..HEAD" -- "${_roots[@]}" | grep -c . || true)"
+  # Conta só o que MEXEU no que viaja: commit de biografia não defasa a porta — ela não o
+  # receberia de qualquer forma, e contá-lo seria ruído.
+  #
+  # ⚠️ A PONTA É O QUE JÁ ESTÁ EM MAIN, NUNCA O `HEAD` DA BRANCH — e a forma anterior (`..HEAD`)
+  # tornava esta guarda ESTRUTURALMENTE INSATISFAZÍVEL dentro de um PR. Medido ao vivo em
+  # 2026-09-17: cada commit que toca `.claude/**` afasta a porta em +1; subir o teto para destravar
+  # exige um commit, que afasta de novo, que reprova de novo. Esteira, não catraca — 378 → 380 → 381
+  # em três tentativas de fechar o mesmo gate. E a saída legítima não existia: a porta só pode ser
+  # re-materializada a partir de main MERGEADA, então a cura que o gate cobra nunca está disponível
+  # quando ele cobra. Uma guarda que só pode ser satisfeita depois do merge não é gate de pré-merge.
+  # Medir contra o `merge-base` diz o que a porta PODERIA espelhar hoje: trabalho em voo ainda não é
+  # algo que ela pudesse ter. Quando a branch merga, main anda, o número sobe com honestidade — e aí
+  # sim a re-materialização é possível, que é exatamente o gatilho que esta guarda existe para dar.
+  # FALLBACK declarado: sem `origin/<default>` local (clone raso, repo sem remote) cai em HEAD, o
+  # comportamento antigo — mais estrito, nunca mais frouxo.
+  _n="$(git -C "${REPO}" log --oneline "${_pin}..${_TIP}" -- "${_roots[@]}" | grep -c . || true)"
   _lim=""
   [ -f "${BASELINE}" ] && _lim="$(awk -v id="${_id}" '$1==id {print $2; exit}' "${BASELINE}")"
   if [ "${EMIT}" -eq 1 ]; then _out="${_out}${_id} ${_n}\n"; continue; fi

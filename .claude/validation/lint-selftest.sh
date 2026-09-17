@@ -16725,6 +16725,47 @@ run_door_cycle_selftests() {
     record_pass "door-cycle: (d) sem registro falha FECHADA (declara que não sabe)"
   else record_fail "door-cycle: (d)" "sem registro passou em silêncio (rc=${rc})"; fi
   rm -rf "${sb2}"
+
+  # (e) O COMMIT EM VOO NUMA BRANCH NÃO DEFASA A PORTA — e sem isto a guarda é ESTEIRA, não catraca.
+  #     Medido ao vivo em 2026-09-17: medindo `pin..HEAD`, cada commit que toca `.claude/**` afasta
+  #     em +1, e subir o teto para destravar EXIGE um commit, que afasta de novo. 378 → 380 → 381 em
+  #     três tentativas de fechar o mesmo gate, e a saída legítima (re-materializar) só existe DEPOIS
+  #     do merge. Guarda satisfazível só pós-merge não é gate de pré-merge.
+  local sbm pinm rcm outm
+  sbm="$(mktemp -d)"
+  mkdir -p "${sbm}/upstream" "${sbm}/work"
+  # upstream = o "main" remoto; work = o clone onde a branch trabalha
+  ( cd "${sbm}/upstream" && git init -q -b main . \
+      && mkdir -p .claude/validation .claude/utils/adopt .claude/agents docs/evolution/federation \
+      && cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" .claude/validation/ \
+      && cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" .claude/utils/adopt/ \
+      && printf '# a\n' > .claude/agents/a.md \
+      && printf 'porta-x 0\n' > .claude/validation/door-staleness-baseline.txt \
+      && git add -A && git -c user.email=t@l -c user.name=t commit -qm base ) >/dev/null 2>&1
+  pinm="$(git -C "${sbm}/upstream" rev-parse --short=12 HEAD)"
+  ( cd "${sbm}/upstream" && mkdir -p docs/evolution/federation \
+      && printf 'members:\n  - id: porta-x\n    kind: door\n    onion_version: %s\n' "${pinm}" > docs/evolution/federation/members.yaml \
+      && git add -A && git -c user.email=t@l -c user.name=t commit -qm registro ) >/dev/null 2>&1 || true
+  git clone -q "${sbm}/upstream" "${sbm}/work" >/dev/null 2>&1
+  ( cd "${sbm}/work" && git remote set-head origin -a >/dev/null 2>&1; git checkout -q -b feat/em-voo \
+      && printf '# em voo\n' > .claude/agents/b.md \
+      && git add -A && git -c user.email=t@l -c user.name=t commit -qm "toca superficie que viaja" ) >/dev/null 2>&1
+  rcm=0; outm="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" 2>&1)" || rcm=$?
+  if [ "${rcm}" -eq 0 ]; then
+    record_pass "door-cycle: (e) commit EM VOO na branch não defasa a porta (ponta = merge-base)"
+  else record_fail "door-cycle: (e)" "cobrou por trabalho ainda fora de main — a catraca vira esteira (rc=${rcm}): ${outm:0:140}"; fi
+
+  # (f) …e o mesmo commit, JÁ em main, defasa de verdade — a cura não pode cegar a guarda
+  # main "anda": faz o ff-only local e move o ref remoto à mão — `git push` para um clone NÃO-bare
+  # com main checada fora é RECUSADO, e sob `set -e` o subshell não-zero MATA a suíte (foi o que
+  # aconteceu na 1ª redação: a bancada abortou em (f) sem registrar ✗ nenhum).
+  ( cd "${sbm}/work" && git checkout -q main && git merge -q --ff-only feat/em-voo \
+      && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1 || true
+  rcm=0; outm="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" 2>&1)" || rcm=$?
+  if [ "${rcm}" -ne 0 ] && grep -q 'ANDOU-PARA-TRAS' <<< "${outm}"; then
+    record_pass "door-cycle: (f) o MESMO commit já em main defasa → HARD (a cura não cegou a guarda)"
+  else record_fail "door-cycle: (f)" "não acusou defasagem depois do merge (rc=${rcm}): ${outm:0:140}"; fi
+  rm -rf "${sbm}"
 }
 
 

@@ -230,6 +230,7 @@
 .claude/validation/automation-ladder-registry.txt	D_AGREGACAO_CROSS_REPO_E_MOAT	docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml
 .claude/validation/consumed-mode-check.sh	Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .claude/validation/diary-index.sh	D_GUARDA_DO_MARCADOR_NA_FONTE	docs/onion/graph/residuos-2026-08-18.kg.yaml
+.claude/validation/door-staleness-check.sh	E_A_CATRACA_DA_PORTA_ERA_ESTEIRA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/federation-console.sh	C_not_backstage	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/federation-console.sh	E_GIT_DIR_QUEBRA_A_RAIZ_DENTRO_DE_WORKTREE	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/federation-console.sh	E_console	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
@@ -293,6 +294,7 @@
 .claude/validation/lint-artifacts.sh	C_CAPABILITY_NAO_PODE_LEVAR_BLANKET_SKIP	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .claude/validation/lint-artifacts.sh	C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .claude/validation/lint-artifacts.sh	C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/validation/lint-artifacts.sh	C_REGRA_VENDORIZADA_CUJO_OBJETO_NAO_VIAJA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-artifacts.sh	C_refut_kebab_compliance	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
 .claude/validation/lint-artifacts.sh	C_vendor_scrub_caught_me_again	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/validation/lint-artifacts.sh	D_CORRIGIR_R47	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
@@ -305,6 +307,7 @@
 .claude/validation/lint-artifacts.sh	D_REGRA62_CATRACA_DE_PROJECAO	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/validation/lint-artifacts.sh	D_rule_46_outbox_membership	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/validation/lint-artifacts.sh	D_veredito_saudavel	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
+.claude/validation/lint-artifacts.sh	E_A_GUARDA_DAVA_VEREDITOS_OPOSTOS_EM_GIT_E_NAO_GIT	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-artifacts.sh	E_A_GUARDA_NOVA_ERA_CODIGO_MORTO_NO_DESTINO_MAJORITARIO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-artifacts.sh	E_CATRACAS_SAO_ATESTACAO_AUTODECLARADA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/validation/lint-artifacts.sh	E_EPIPE_ACUSOU_REGRA_VIVA_DE_MORTA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml

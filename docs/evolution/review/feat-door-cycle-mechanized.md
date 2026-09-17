@@ -3,9 +3,9 @@ title: 'Resíduo — o ciclo era prosa; e o meu dogfood media no substrato errad
 date: 2026-09-17
 branch: feat/door-cycle-mechanized
 reviewed_diff_sha256: 460ff75d8a9f10a00ff7532a2c701ce82ed12596871ef5c08973a98113bec1a5
-findings_total: 6
-findings_real: 6
-findings_fixed: 6
+findings_total: 7
+findings_real: 7
+findings_fixed: 7
 tokens: 0
 duration_min: 0
 verdict: CORRIGIDO
@@ -183,3 +183,37 @@ prometia *"adopted ou hub"*, e o espelho downstream `co-deliver.sh:119` **aceita
 Ou seja: o core **entrega** anúncios à porta por desenho declarado, e a porta **não podia responder**. O
 doc-bridge estava mecanizado num sentido só — justamente na superfície pública, que é a que mais gera
 sinal de primeira impressão. Este sinal chegou à mão por causa disso.
+
+
+## Achado 7 — a catraca que eu acabara de construir era uma ESTEIRA
+
+Este não veio de sinal nem de refutador. Veio de **usar** o mecanismo.
+
+A guarda media `git log <pin>..HEAD` — HEAD da **branch**. Então:
+
+```
+378 → 380 → 381     três tentativas de fechar o MESMO gate
+```
+
+Cada commit que toca `.claude/**` afasta a porta em +1. Subir o teto para destravar **exige um
+commit**. Esse commit afasta de novo. E a saída legítima não existia: a porta só se re-materializa a
+partir de `main` **mergeada**, então a cura que o gate cobra nunca está disponível quando ele cobra.
+
+**Guarda satisfazível só depois do merge não é gate de pré-merge.** Eu tinha escrito, no baseline, que
+isto era "catraca por disciplina, não por mecanismo" e que a cura provável era comparar contra
+`origin/main` — e então tentei destravar mais uma vez e a esteira andou de novo. Aí deixou de ser uma
+nota e virou bloqueio do merge.
+
+Curado: a ponta é o **`merge-base`** com o ramo default. Trabalho em voo ainda não é algo que a porta
+pudesse espelhar; quando a branch merga, `main` anda e o número sobe com honestidade — que é
+exatamente o gatilho que esta guarda existe para dar. Fallback declarado: sem `origin/<default>`
+local, cai em `HEAD` — o comportamento antigo, mais estrito, nunca mais frouxo.
+
+**O efeito colateral é a prova:** os tetos **caíram** de `378/2` para `372/0` sem ninguém
+re-materializar nada. Os números antigos cobravam por trabalho em voo. A catraca não afrouxou —
+ficou honesta. Bancada: (e) commit em voo não defasa · (f) o **mesmo** commit já em main defasa.
+
+E houve um erro meu no caminho, que o próprio harness pegou: o caso (f) usava `git push` para um
+clone **não-bare** com `main` checada fora — recusado, subshell não-zero, e sob `set -e` a bancada
+**abortou antes da soma**, exibindo cinco ✓ e nenhum ✗. O aviso que ela imprime nessa situação existe
+justamente porque cinco ✓ parecem verde. Trocado por `update-ref` no ref remoto.
