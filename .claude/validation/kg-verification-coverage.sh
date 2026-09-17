@@ -52,7 +52,7 @@
 #   nada teve tempo de envelhecer. Regra de expiração sobre conjunto vazio é cerimônia elegante.
 #   GATILHO PARA ABRIR: >=20 nós no escopo com `verified_at` mais velho que 30 dias. Aí a classe
 #   nasce com dado real. O desenho (derivar a classe do `trace:`/`verified_against:`, sem tocar a
-#   gramática) está em docs/analysis/onion-adr-kg-halflife-2026-08.md.
+#   gramática) está em `onion-adr-kg-halflife-2026-08` (core-only).
 #
 # Uso : bash .claude/validation/kg-verification-coverage.sh [<repo_root>] [--emit-baseline] [--format tsv]
 # SEPARADORES (invariante, declarado UMA vez): registro INTERNO usa \037 (US); a SAIDA usa \t

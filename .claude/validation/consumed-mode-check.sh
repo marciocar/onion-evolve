@@ -12,7 +12,7 @@
 #
 # ═══ JOIN OBSERVADO, NUNCA INFERIDO — e é essa a diferença que a torna possível ═══
 # A primeira tentativa do gate "regra sem teste" morreu porque casava por NOME DE FUNÇÃO: heurística,
-# 8 falsos positivos (docs/analysis/onion-guardas-mapa-2026-08.md:277-280). Aqui não há inferência:
+# 8 falsos positivos (`onion-guardas-mapa-2026-08` (core-only):277-280). Aqui não há inferência:
 # lê-se a INVOCAÇÃO REAL dos dois lados — `bash "${helper}" … --flags` na produção e no selftest — e
 # compara-se o conjunto de flags. Se a produção consome uma combinação que o teste nunca exercita,
 # existe um caminho vivo sem cobertura. É fato observável, não julgamento.
@@ -41,7 +41,7 @@
 # A 6ª não é separável de uma invocação real por regex — distingui-la exigiria parser de shell.
 # Ligar assim significaria HARD com falso-positivo, que nesta casa é TRAVAMENTO, não ruído; e foi
 # exatamente por 8 falsos positivos que a heurística do gate 6a morreu
-# (docs/analysis/onion-guardas-mapa-2026-08.md:277-280). Prometer cobertura que a extração não
+# (`onion-guardas-mapa-2026-08` (core-only):277-280). Prometer cobertura que a extração não
 # sustenta seria a classe C — a manchete afirmando mais que a evidência — aplicada ao remédio.
 #
 # ELE JÁ SE PAGOU MESMO ASSIM, e é por isso que fica: na 1ª execução real pegou um defeito MEU,

@@ -2763,7 +2763,7 @@ check_kg_provenance_coverage() {
 #   testa a verdade é o worker do kg-freshness, contra o vivo.
 #   Toda a lógica (escopo, catraca, fail-closed) vive em kg-verification-coverage.sh.
 #   MEIA-VIDA POR CLASSE fica GATED (hoje 0 nós com carimbo vencido — regra sobre conjunto
-#   vazio é cerimônia): docs/analysis/onion-adr-kg-halflife-2026-08.md.
+#   vazio é cerimônia): `onion-adr-kg-halflife-2026-08` (core-only).
 # ===========================================================================
 check_kg_verification_coverage() {
   local helper="${SCRIPT_DIR}/kg-verification-coverage.sh"

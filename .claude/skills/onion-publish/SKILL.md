@@ -70,7 +70,7 @@ plugin.json/frontmatter). Se a CLI não existir no ambiente, diga que o passo é
 ## Referências
 - Helper determinístico: `.claude/utils/marketplace/materialize-marketplace-repo.sh`
 - Guarda de moat: REGRA 61 (`.claude/validation/lint-artifacts.sh` → `check_moat_boundary`)
-- Doutrina: `docs/analysis/onion-distribution-strategy-2026-06.md` (L1 distribui / L2-L3 moat),
-  `docs/analysis/onion-plugin-marketplace-runbook-2026-07.md` (Fase 5 publicação)
+- Doutrina: `onion-distribution-strategy-2026-06` (core-only) (L1 distribui / L2-L3 moat),
+  `onion-plugin-marketplace-runbook-2026-07` (core-only) (Fase 5 publicação)
 - Grafo: `docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml`
 - Par: `onion-wizard` (movimentos da família), `onion-onboarding` (ajuda a CONHECER)

@@ -119,4 +119,4 @@ aos 3 é overclaim: Absorção é estático-estrutural; Proveniência só aponta
 - SSOT-as-runtime: [knowledge-graph-sdaal.md](../../concepts/knowledge-graph-sdaal.md) §SSOT-as-runtime (§236)
 - Dogfooding (re-testar, nunca re-carimbar): [onion-dogfooding-doctrine.md](../../concepts/onion-dogfooding-doctrine.md)
 - Diário (Trilha viva): `/meta:diary` · migalha `2026-07-18-self-reinforcing-radar-loop`
-- Origem (draft v1, só-Absorção): pesquisa `docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md`
+- Origem (draft v1, só-Absorção): pesquisa `onion-intelligent-breadcrumbs-research-2026-07` (core-only)

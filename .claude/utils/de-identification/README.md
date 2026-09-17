@@ -65,4 +65,4 @@ echo "$red"   | bash "$S" --restore --map /tmp/m.tsv    # → original
 
 **Versão**: 0.1.0
 **Criado em**: 2026-06-27
-**ADR**: `docs/analysis/onion-adr-slm-as-tool-de-identification-2026-06.md`
+**ADR**: `onion-adr-slm-as-tool-de-identification-2026-06` (core-only)
