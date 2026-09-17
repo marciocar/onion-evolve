@@ -3,9 +3,9 @@ title: 'Resíduo — o baseline que viajava populado era o vazamento'
 date: 2026-09-17
 branch: chore/door-pin-reconcile
 reviewed_diff_sha256: 5714ad3d20a639aceb41d3427e387e0fea42b340e8f94476beac562566a9b66d
-findings_total: 4
-findings_real: 4
-findings_fixed: 3
+findings_total: 6
+findings_real: 6
+findings_fixed: 5
 tokens: 0
 duration_min: 0
 verdict: CORRIGIDO
@@ -93,3 +93,39 @@ gerador.
 
 **NÃO curado aqui, de propósito:** trocar o oráculo muda a bancada e pede gate inteiro; este PR é
 sobre o pin. **Gatilho:** a próxima projeção que envelhecer sem o `regen_completude` ter avisado.
+
+
+---
+
+# Achado 5 — o laço de 2h21, e a guarda que já conhecia a classe
+
+O maestro perguntou se havia um shell rodando há 2 horas. Havia: PID 3751529, **2h21**, batendo na
+API do GitHub a cada 60s por check-runs que **nunca iam nascer** — o PR estava `CONFLICTING`, e o
+GitHub não dispara `pull_request` quando não consegue computar o merge. A condição `-ge 3` era
+inalcançável e **nada dizia isso**.
+
+Eu ia perguntar se valia mecanizar. O maestro respondeu que eu podia descobrir sozinho — e a medição
+deu uma resposta **melhor que as duas opções que eu havia oferecido**:
+
+> `bash-empty-result-guard.sh:174` já documenta `until ! pgrep …` **preso 1h06**.
+
+Não era guarda nova (objeto errado: o defeito vive em comando de sessão, que lint nenhum vê) nem
+disciplina. Era **reincidência de uma classe já curada, entrando por outra porta**: no (3b) a
+condição não podia virar *falsa* por defeito do padrão; no (3c) ela não vira *verdadeira* porque a
+**premissa caiu**.
+
+O detector **não julga a condição** — nenhum regex sabe qual premissa caiu. Cobra a única coisa que
+sempre cabe: **um teto e uma saída que distinga "pronto" de "desisti"**. Desarma com `SECONDS`,
+`timeout(1)`, `break`, contador ou `--max-time`: o ponto é o teto existir, não o dialeto.
+
+## Achado 6 — a bancada me pegou duas vezes escrevendo a própria cura
+
+1. **Escopo errado.** O separador `tr ';&|'` parte `until …; do sleep 60; done` em três, e o pedaço
+   que abre com `until` **não contém `sleep`**. Julgando o fragmento, o detector calava justamente na
+   forma que o originou. Certo é: **âncora** no fragmento (para não acusar quem só menciona a
+   palavra) e **presença de espera** no comando inteiro.
+2. **Colisão de rótulos.** Nomeei meus casos `(b3)`–`(b7)`, que já existiam nesta família — quem
+   lesse a saída depois veria dois `(b3)` com vereditos diferentes. Renomeados para `(c1)`–`(c5)`.
+
+Cinco casos novos, incluindo os três que **impedem a guarda de virar fadiga**: comando que só
+menciona `until` cala, iteração sobre lista finita cala, e `timeout(1)` externo cala. Família: 35/35.
