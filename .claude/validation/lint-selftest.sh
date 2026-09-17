@@ -6847,6 +6847,21 @@ run_empty_result_guard_selftests() {
     record_pass "empty-result-guard: (c6) 'until|sleep' dentro de string → cala (exige do/done)"
   else record_fail "empty-result-guard: (c6)" "falso-positivo por menção em regex: ${out:0:140}"; fi
 
+  # (c7) REAGE: crase dentro de `-m "…"` — o shell EXECUTA em vez de citar. Medido nesta sessão:
+  #      `docs/` entre crases virou `Is a directory` e a palavra SUMIU da mensagem commitada. Dano
+  #      cosmético naquela vez; a classe não é — mensagem de commit é onde se NARRA `rm -rf`.
+  out="$(_erg '"git commit -m \"cura o (docs/) e segue\""' '""' || true)"
+  out="$(_erg "\"git commit -m \\\"cura o \`docs/\` e segue\\\"\"" '""' || true)"
+  if grep -q 'CRASE-EM-MENSAGEM-DE-COMMIT' <<< "${out}"; then
+    record_pass "empty-result-guard: (c7) crase em -m \"…\" → avisa que o shell EXECUTA"
+  else record_fail "empty-result-guard: (c7)" "não reagiu à crase em mensagem de commit: ${out:0:140}"; fi
+
+  # (c8) CALA no heredoc CITADO — a cura recomendada tem de desarmar a guarda, senão pune quem obedece
+  out="$(_erg '"git commit -F - <<'"'"'MSG'"'"'"' '""' || true)"
+  if ! grep -q 'CRASE-EM-MENSAGEM-DE-COMMIT' <<< "${out}"; then
+    record_pass "empty-result-guard: (c8) heredoc citado → cala (a cura desarma)"
+  else record_fail "empty-result-guard: (c8)" "puniu quem usou heredoc citado: ${out:0:140}"; fi
+
   # (b2b) COBERTURA — a 2ª versão exigia que o cluster com `f` fosse o PRIMEIRO token, e escapavam
   #       `pkill -9 -f` (a forma mais comum do mundo real), `-a -f`, `-u root -f` e a longa `--full`.
   #       Promessa maior que cobertura é `declarado != verificado` dentro da própria guarda.
