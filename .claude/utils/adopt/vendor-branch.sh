@@ -29,6 +29,19 @@ VENDOR="onion/vendor"
 # O PAPEL entra por ONION_ROLE (default adopted). O merge de vendor-branch é o caminho do `--update`,
 # e desde 2026-09-15 o papel CORTA de verdade — um vendor semeado sem papel republicaria a meta-fábrica
 # num alvo standalone a cada atualização, desfazendo o corte da instalação.
+# ⚠️ NEM TODO CONSUMIDOR DO MANIFESTO ACEITA MAGIA DE PATHSPEC — e ignorar isso clobou uma
+# customização na bancada (vendor-branch §8, 2026-09-17). O manifesto passou a carregar
+# `:(exclude)…jwks/*.pem` (a chave privada não viaja). `git archive` aceita essa magia e DEVE
+# recebê-la — é o transporte. Mas `git ls-tree` a RECUSA: ele erra, o `2>/dev/null` engole o erro,
+# a variável volta vazia, e `_clean_baseline` lê esse vazio como "não existe baseline limpo" —
+# então ramifica do HEAD e o merge sobrescreve a customização do adotante EM SILÊNCIO. Uma linha
+# de segurança desligou a guarda never-clobber, pelo caminho mais banal: saída vazia com rc
+# escondido ([[exit-code-nao-e-a-verificacao]]).
+# Quem COMPARA árvores usa só os positivos; quem TRANSPORTA usa o manifesto inteiro.
+_manifest_positivo() {  # $1=SOURCE_ROOT → só as raízes positivas (sem `:(magia)`)
+  _manifest "$1" | grep -v '^:(' || true
+}
+
 _manifest() {  # $1=SOURCE_ROOT → imprime pathspecs existentes, um por linha
   # .claude/workflows: a skill onion-research instrui Workflow({scriptPath:'.claude/workflows/onion-research.js'}) —
   # sem o dir o comando NASCE MORTO no adotante (sinal de campo de um adotante, 2026-09-04).
@@ -67,7 +80,7 @@ _vendor_is_framework_pure() {  # <TARGET> <SOURCE_ROOT> <INTEGRATION_BRANCH> →
   local T="$1" SRC="$2" IB="$3" mb mf changed
   mb="$(git -C "$T" merge-base "$VENDOR" "$IB" 2>/dev/null)" || return 0
   [ -n "$mb" ] || return 0
-  mf="$(_manifest "$SRC")"; [ -n "$mf" ] || return 0
+  mf="$(_manifest_positivo "$SRC")"; [ -n "$mf" ] || return 0   # aqui se COMPARA, não se transporta
   changed="$(git -C "$T" diff --name-only "$mb" "$VENDOR" 2>/dev/null)" || return 0
   [ -n "$changed" ] || return 0
   # Remove do diff tudo que está sob o manifesto de framework; o que sobrar é produto alheio.
@@ -103,9 +116,17 @@ _clean_baseline() {  # <SRC> <T> <PIN> <IB>
   local SRC="$1" T="$2" PIN="$3" IB="$4" fw ref c cur
   [ -n "$PIN" ] || return 0
   git -C "$SRC" rev-parse --verify "${PIN}^{commit}" >/dev/null 2>&1 || return 0
-  fw="$(_manifest "$SRC")"; [ -n "$fw" ] || return 0
+  fw="$(_manifest_positivo "$SRC")"; [ -n "$fw" ] || return 0
   # shellcheck disable=SC2086
-  ref="$(git -C "$SRC" ls-tree -r "$PIN" -- $fw 2>/dev/null | awk '{print $3" "$4}' | LC_ALL=C sort)"
+  local _lt_err; _lt_err="$(mktemp)"
+  ref="$(git -C "$SRC" ls-tree -r "$PIN" -- $fw 2>"${_lt_err}" | awk '{print $3" "$4}' | LC_ALL=C sort)"
+  # FALA quando o comando falhou: "sem baseline" e "não consegui olhar" não podem soar igual — a
+  # diferença entre os dois é um merge que preserva a customização e um que a apaga.
+  if [ -s "${_lt_err}" ]; then
+    echo "⚠️  Onion: ls-tree recusou o manifesto ao procurar o baseline limpo — NÃO é 'sem baseline':" >&2
+    sed 's/^/      /' "${_lt_err}" >&2
+  fi
+  rm -f "${_lt_err}"
   [ -n "$ref" ] || return 0
   # shellcheck disable=SC2086
   for c in $(git -C "$T" rev-list "$IB" -- $fw 2>/dev/null); do

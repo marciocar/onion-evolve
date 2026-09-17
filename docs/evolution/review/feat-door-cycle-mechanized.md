@@ -3,12 +3,12 @@ title: 'Resíduo — o ciclo era prosa; e o meu dogfood media no substrato errad
 date: 2026-09-17
 branch: feat/door-cycle-mechanized
 reviewed_diff_sha256: c513ec86c13ce4c33ea1fe429291e23f2a354188907f976fd808e559bc9be46a
-findings_total: 7
-findings_real: 7
-findings_fixed: 7
+findings_total: 11
+findings_real: 11
+findings_fixed: 11
 tokens: 0
 duration_min: 0
-verdict: CORRIGIDO
+verdict: REPROVADO_E_CURADO
 elenxo: nao
 nota: >-
   O número que justifica esta entrega já existia e ninguém o tinha medido: a porta anterior estava
@@ -235,3 +235,66 @@ total como cobertura.
 inesperado no status, quando a suíte seguinte os apagou. A bancada limpa ao final — mas se ela morre
 no meio (kill, timeout, `set -e`), os artefatos ficam. Curado por `.gitignore`: ignorar é mecanismo,
 lembrar de conferir não é.
+
+
+---
+
+# A bancada reprovou a pilha inteira — e tinha razão
+
+Rodada completa: **1301 ✓ / 4 ✗**, reprodutíveis numa árvore limpa. A primeira coisa que fiz foi
+medir se eram minhas: as mesmas três famílias numa worktree do `merge-base`.
+
+```
+merge-base (origin/main)   35 ✓ / 0 ✗
+branch                     31 ✓ / 4 ✗
+```
+
+**Regressões desta pilha.** Eu tinha registrado a suspeita oposta ("provavelmente pré-existentes") —
+a medição a derrubou. As quatro têm **uma causa comum**, e ela é a coisa mais séria desta onda.
+
+## A classe: uma linha de segurança desligou duas guardas de outra família
+
+A cura que impede a **chave privada** de viajar é um pathspec `:(exclude)` no manifesto de
+transporte. Ela entrou, e:
+
+**(1) `vendor-manifest` — o fail-loud contra o bundle vazio ficou MORTO.** O `:(exclude)` era
+apendado **antes** da guarda `[ "${#_spec[@]}" -eq 0 ]`, então o array nunca era vazio. E a segunda
+guarda caiu junto, porque um spec composto **só** de exclusão casa *tudo menos aquilo*: num repo sem
+superfície Onion o manifesto saía **rc=0 mandando copiar o repositório inteiro** — biografia e
+segredos junto. O comentário que descreve exatamente esse desastre estava três linhas acima, intacto,
+enquanto a guarda que ele justifica não funcionava.
+
+**(2) `vendor-branch` — a customização do adotante era SOBRESCRITA.** `git ls-tree` **recusa** magia
+de pathspec. Ele errava, o `2>/dev/null` engolia, a variável voltava vazia, e `_clean_baseline` lia
+esse vazio como *"não existe baseline limpo"* — ramificava do HEAD e o merge apagava a customização.
+Medido na reprodução manual:
+
+```
+antes:  cmd v1 CUSTOM
+depois: cmd v2          rc=0
+```
+
+Um `rc=0` e um arquivo do adotante perdido, em silêncio, na rota `--update`.
+
+**O que a classe diz:** uma linha de segurança **não é local**. Ela muda o *valor* que atravessa
+todos os consumidores, e cada consumidor tem contrato próprio — `git archive` aceita a magia e
+**deve** recebê-la (é o transporte); `ls-tree` a recusa. E os dois defeitos falharam por **saída
+vazia com rc escondido**, não por lógica errada: [[exit-code-nao-e-a-verificacao]] duas vezes no
+mesmo commit.
+
+Curas: a precondição conta só os **positivos** e roda **antes** de apendar a exclusão · quem
+**compara** árvores usa `_manifest_positivo`, quem **transporta** usa o manifesto inteiro · o
+`ls-tree` que falha agora **fala**, porque *"sem baseline"* e *"não consegui olhar"* não podem soar
+igual — a diferença entre os dois é um merge que preserva a customização e um que a apaga.
+
+## E dois casos de bancada que estavam certos para o que sabiam
+
+`vendor-manifest (c)` acusava a exclusão de identidade de ser superfície não-varrida — mas
+`:(exclude)` é o **oposto** de uma raiz: ele subtrai. A guarda lia ao contrário, reprovando
+justamente a linha que impede a chave de viajar. Filtrado.
+
+`role-cut (b3)` exigia **zero** excludes no `hub` ("fidelidade TOTAL", palavras do maestro). A
+exceção mudou isso com razão: um hub que recebe a chave privada do core não trabalha como o core,
+**vaza**. A invariante certa não é "nenhum exclude", é "nenhum exclude **além** dos de identidade,
+que são declarados" — e a lista esperada é lida da SSOT, nunca redigida no caso, senão o oráculo vira
+opinião. Qualquer exclude novo para `hub` continua reprovando, que era o ponto do caso.

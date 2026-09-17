@@ -4418,7 +4418,11 @@ run_vendor_manifest_selftests() {
   # O scrub é a superfície DECLARADA e não consulta git (as guardas rodam em sandbox SEM repositório);
   # o manifesto é declarado ∩ HEAD. Logo scrub ⊇ manifesto — e nunca o contrário, que seria a guarda
   # varrendo MENOS do que se emite.
-  local missing; missing="$(comm -13 <(printf '%s\n' "${scrub}" | sort) <(printf '%s\n' "${out}" | sort) | tr '\n' ' ')"
+  # ⚠️ SÓ AS RAÍZES POSITIVAS ENTRAM NA COMPARAÇÃO. Um `:(exclude)…` é o OPOSTO de uma raiz: ele
+  # SUBTRAI superfície, então nunca pode ser "superfície que o scrub deixou de varrer". Sem este
+  # filtro o caso reprovava a exclusão de identidade (`…/jwks/*.pem`), acusando de fail-open
+  # justamente a linha que impede uma chave privada de viajar — a guarda lendo ao contrário.
+  local missing; missing="$(comm -13 <(printf '%s\n' "${scrub}" | sort) <(printf '%s\n' "${out}" | grep -v '^:(' | sort) | tr '\n' ' ')"
   if [ -z "${missing// /}" ]; then record_pass "vendor-manifest: (c) --emit-scrub-roots CONTÉM todo o manifesto (a guarda nunca varre menos do que o transporte emite)"
   else record_fail "vendor-manifest: (c)" "o transporte emite raiz que o scrub não varre: ${missing}"; fi
   # (c2) o scrub NÃO depende de git: sem repositório ele tem de responder igual — medido 2026-09-14,
@@ -12751,6 +12755,11 @@ run_role_cut_selftests() {
   #      Sem este caso, o dia em que alguém acrescentar um corte para `hub` — por simetria, por
   #      engano, por "aproveitar que já está cortando" — nada reprova. Um papel que deveria trabalhar
   #      como o core viraria um core mutilado em silêncio, que é a classe deste PR inteiro.
+  # A lista de exceções sai da SSOT (o próprio manifesto), nunca redigida aqui — senão o caso
+  # aprova o que o código disser, que é o contrário de um oráculo.
+  local _IDENTITY_EXCLUDES_ESPERADOS=()
+  mapfile -t _IDENTITY_EXCLUDES_ESPERADOS < <(sed -n "s/^_IDENTITY_EXCLUDES=(\\('\\)\\(.*\\)'.*)$/\\2/p" "${vm}")
+  [ "${#_IDENTITY_EXCLUDES_ESPERADOS[@]}" -gt 0 ] || record_fail "role-cut: (b3) setup" "não consegui ler _IDENTITY_EXCLUDES do manifesto — o oráculo do caso virou opinião"
   local _hub _hub_lst="${d}/hub.lst" _hub_tar="${d}/hub.tar"
   _hub="$(bash "${vm}" --role hub --repo "${REPO_ROOT}" 2>/dev/null)"
   local _hub_spec=(); mapfile -t _hub_spec <<< "${_hub}"
@@ -12765,10 +12774,22 @@ run_role_cut_selftests() {
   git -C "${REPO_ROOT}" ls-tree -r --name-only HEAD -- .claude/agents .claude/commands .claude/skills \
       .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows \
       docs/meta-specs docs/knowledge-base docs/sdaal 2>/dev/null | sort > "${_core_lst}"
-  local _n_exc; _n_exc="$(grep -c ':(exclude)' <<< "${_hub}" || true)"
-  if [ "${_n_exc}" -eq 0 ] && cmp -s "${_hub_lst}" "${_core_lst}"; then
-    record_pass "role-cut: (b3) o hub recebe a superfície INTEIRA do core ($(grep -c . "${_core_lst}") arquivos, 0 excludes) — trabalha como o core"
-  else record_fail "role-cut: (b3)" "hub com ${_n_exc} exclude(s) e $(diff "${_hub_lst}" "${_core_lst}" | grep -c '^[<>]' || true) arquivo(s) divergentes — o papel de fidelidade TOTAL deixou de ser total"; fi
+  # ⚠️ "TOTAL" GANHOU UMA EXCEÇÃO, E ELA É NOMEADA. A 1ª redação exigia ZERO excludes no `hub`, e
+  # estava certa para o que sabia então. Depois a segurança decidiu que a CHAVE PRIVADA do
+  # transporte de federação não viaja para papel nenhum — e um hub que recebe a chave privada do
+  # core não "trabalha como o core": ele vaza. Então a invariante correta não é "nenhum exclude",
+  # é "nenhum exclude ALÉM dos de identidade, que são declarados e justificados". Assim a guarda
+  # segue load-bearing: qualquer exclude NOVO para `hub` — por simetria, por engano, por
+  # "aproveitar que já está cortando" — continua reprovando, que é o ponto do caso.
+  local _exc_hub _exc_esp
+  _exc_hub="$(grep '^:(' <<< "${_hub}" | sort || true)"
+  _exc_esp="$(printf '%s\n' "${_IDENTITY_EXCLUDES_ESPERADOS[@]}" | sort)"
+  # a divergência de ARQUIVOS tem de ser exatamente o que aqueles excludes removem, nem um a mais
+  local _div; _div="$(diff "${_hub_lst}" "${_core_lst}" | grep '^[<>]' | sed 's/^[<>] //' || true)"
+  local _div_fora; _div_fora="$(grep -v '/jwks/.*\.pem$' <<< "${_div}" | grep -c . || true)"
+  if [ "${_exc_hub}" = "${_exc_esp}" ] && [ "${_div_fora}" -eq 0 ]; then
+    record_pass "role-cut: (b3) o hub recebe a superfície INTEIRA do core ($(grep -c . "${_core_lst}") arquivos) menos SÓ a chave privada de identidade — trabalha como o core sem vazar"
+  else record_fail "role-cut: (b3)" "hub com exclude(s) inesperado(s) [$(tr '\n' ' ' <<< "${_exc_hub}")] e ${_div_fora} arquivo(s) divergentes fora da exceção nomeada — a fidelidade deixou de ser total por algo que ninguém declarou"; fi
 
   # (c) SEM O CONTRATO, a guarda do ALVO falha FECHADA. É a medição que derrubou a 1ª tentativa de
   #     corte: tirar `.claude/utils/adopt` inteiro leva a SSOT junto, e `vendor-scrub-form-check.sh`

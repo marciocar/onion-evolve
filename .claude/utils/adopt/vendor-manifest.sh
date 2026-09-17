@@ -262,10 +262,9 @@ if [ "${MODE}" = "manifest" ]; then
   done
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_role_excludes "${REPO}" "${ROLE}")
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_command_excludes "${REPO}" "${ROLE}")
-  # A exclusão de IDENTIDADE entra DEPOIS das de papel e vale nos três: `:(exclude)` sempre vence o
-  # positivo, em qualquer ordem, então a posição é estética — o que importa é que ela não dependa
-  # do papel. Quem o bundle NOMEIA não é assunto de quanta fábrica ele leva.
-  _spec+=("${_IDENTITY_EXCLUDES[@]}")
+  # A exclusão de IDENTIDADE vale nos três papéis: quem o bundle NOMEIA não é assunto de quanta
+  # fábrica ele leva. Mas a POSIÇÃO dela não é estética — ela entra DEPOIS da guarda de
+  # precondição abaixo, e a razão é um fail-open que a bancada pegou em 2026-09-17.
 
   # ⚠️ FAIL-LOUD CONTRA O BUNDLE VAZIO SILENCIOSO — medido 2026-09-15: `git archive` devolve rc=0
   # com tar de ZERO arquivos quando os `:(exclude)` cancelam tudo. Quem consome este manifesto lê o
@@ -275,10 +274,23 @@ if [ "${MODE}" = "manifest" ]; then
   # (caso (e), 2026-09-15). Um repo sem nenhuma raiz da superfície emitia manifesto VAZIO com rc=0;
   # pior, a contagem abaixo roda `diff-tree -- ` sem pathspec, que casa o REPOSITÓRIO INTEIRO — a
   # guarda nova aprovaria a si mesma. Manifesto vazio é falha de precondição, nunca "nada a copiar".
-  if [ "${#_spec[@]}" -eq 0 ]; then
+  # ⚠️ CONTA SÓ O QUE É POSITIVO — e esta linha é a cura de um fail-open MEDIDO. A forma anterior
+  # testava `${#_spec[@]}` depois de já ter apendado `_IDENTITY_EXCLUDES`, então o array NUNCA era
+  # vazio e esta guarda estava MORTA. Pior: a segunda guarda (`_n_sobrou`) também caía, porque um
+  # spec composto SÓ de `:(exclude)` casa TUDO MENOS aquilo — num repo alheio o manifesto saía
+  # rc=0 mandando copiar o repositório inteiro, biografia e segredos junto, exatamente o desastre
+  # que o comentário acima descreve. Quem achou foi a bancada (role-cut (e2)), não uma leitura.
+  # A lição é de forma, não de lógica: guarda de PRECONDIÇÃO tem de rodar antes de qualquer coisa
+  # que engorde o que ela mede — [[bancada-espelha-o-runner]] um andar acima.
+  _n_pos=0; for local_p in "${_spec[@]:-}"; do case "${local_p}" in ':('*) : ;; '') : ;; *) _n_pos=$((_n_pos+1)) ;; esac; done
+  if [ "${_n_pos}" -eq 0 ]; then
     echo "ERRO: manifesto VAZIO para '${REPO}' — nenhuma raiz da superfície Onion existe em HEAD. Pathspec ausente significa TODOS para o git: seguir daqui copiaria o repositório inteiro." >&2
     exit 3
   fi
+
+  # Só AGORA a exclusão de identidade entra: ela subtrai superfície, e subtrair de um conjunto
+  # vazio de positivos é o que produzia o "copia tudo".
+  _spec+=("${_IDENTITY_EXCLUDES[@]}")
 
   # `git ls-tree` recusa magia de pathspec; `git diff-tree` (comando de diff) a aceita — contra a
   # ÁRVORE VAZIA ele lista exatamente os arquivos que o `git archive` copiaria.
