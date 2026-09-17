@@ -11,4 +11,4 @@ Atalhos leves para tarefas pontuais que não exigem um workflow faseado. Use qua
 ## 🔗 Referências
 - Template usado: [`../common/templates/analysis-template.md`](../common/templates/analysis-template.md)
 - Análise estruturada e mais profunda: [`/meta:analyze-complex-problem`](../meta/analyze-complex-problem.md)
-- Inventário canônico de comandos/agentes: [`../../../docs/onion/inventory.md`](../../../docs/onion/inventory.md)
+- Inventário canônico de comandos/agentes: ``../../../docs/onion/inventory.md`` (core-only, não viaja)

@@ -363,4 +363,4 @@ Toda guarda determinística **nova** (ou alteração de uma existente) nasce com
 
 ### 11.2 Contrato executável
 
-`.claude/validation/lint-selftest.sh` é o **contrato executável** desta regra: injeta cada fixture do manifest, roda a guarda como caixa-preta e assere o veredito real contra o esperado. Roda no CI logo após o linter (ver [ci.md](../onion/ci.md)). Uma guarda quebrada faz o selftest — e portanto o CI — falhar, em vez de degradar em silêncio. Escopo deliberadamente determinístico: não testa comportamento de LLM (coberto, não-deterministicamente, por `/meta:metaspec-validate` + `onion-review.yml`).
+`.claude/validation/lint-selftest.sh` é o **contrato executável** desta regra: injeta cada fixture do manifest, roda a guarda como caixa-preta e assere o veredito real contra o esperado. Roda no CI logo após o linter (ver `ci.md` (core-only, não viaja)). Uma guarda quebrada faz o selftest — e portanto o CI — falhar, em vez de degradar em silêncio. Escopo deliberadamente determinístico: não testa comportamento de LLM (coberto, não-deterministicamente, por `/meta:metaspec-validate` + `onion-review.yml`).

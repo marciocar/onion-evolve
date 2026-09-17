@@ -182,7 +182,7 @@ ou, sem destinatário:
 
 - Consumidor/orientação: [`/meta:co-evolve`](co-evolve.md) (lê inbox/inbound, gerencia)
 - Envelope irmão: [`/meta:adopt`](adopt.md) § Procedimento de Relatório Downstream
-- Protocolo dos 3 fluxos: [docs/evolution/README.md](../../../docs/evolution/README.md)
-- Registro de adotantes: [members.yaml](../../../docs/evolution/federation/members.yaml) · Anúncios: [CHANGELOG.md](../../../docs/evolution/federation/CHANGELOG.md)
+- Protocolo dos 3 fluxos: `docs/evolution/README.md` (core-only, não viaja)
+- Registro de adotantes: `members.yaml` (core-only, não viaja) · Anúncios: `CHANGELOG.md` (core-only, não viaja)
 - Ledger de contratos (federação formal): [`/meta:federation-publish`](federation-publish.md)
 - Origem: backlog de co-evolução item #6 (`onion-coevolution-backlog-2026-06-18`, core-only)

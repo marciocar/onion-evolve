@@ -504,7 +504,7 @@ Antes de qualquer projeção cruzar fronteira (material pro cliente, sinal pro c
   entre nós — cada instância implementa com seu stack (soberania); o core fica no determinístico.
 - 1º dogfood real (56 nós/81 arestas em um adotante; 37 nós/33 arestas no core): ver
   `onion-evolution-2026-07-04` (core-only) e o sinal
-  [2026-07-04-kg-primeiro-dogfood-federacao.md](../../../docs/evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md).
+  `2026-07-04-kg-primeiro-dogfood-federacao.md` (core-only, não viaja).
 
 ## 🔗 Referências
 

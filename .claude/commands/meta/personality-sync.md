@@ -76,6 +76,6 @@ fecham a Fase 2. `--dry-run` mostra tudo sem escrever.
 - **Âncora obrigatória:** afirmação sem fonte no Passo 2 é o mesmo que pin declarado sem verificar — não entra.
 
 ## 🔗 Referências
-- Spec: [RFC-0003 §2.4](../../../docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md) · Roadmap F2 (§4)
+- Spec: `RFC-0003 §2.4` (core-only, não viaja) · Roadmap F2 (§4)
 - Fonte da evidência: [`/meta:diary`](diary.md) (o diário é a matéria-prima) · `.claude/.onion-version` · git
-- Transporte upstream (adotante): [`/meta:co-relay`](co-relay.md) · Registro: [members.yaml](../../../docs/evolution/federation/members.yaml)
+- Transporte upstream (adotante): [`/meta:co-relay`](co-relay.md) · Registro: `members.yaml` (core-only, não viaja)

@@ -3,9 +3,9 @@ title: 'Resíduo — o baseline que viajava populado era o vazamento'
 date: 2026-09-17
 branch: chore/door-pin-reconcile
 reviewed_diff_sha256: f461b0400c0706f23401b97f4c6e6fd50d6118b099fc67bd2f4c5c9ff9b4f7bd
-findings_total: 10
-findings_real: 10
-findings_fixed: 9
+findings_total: 11
+findings_real: 11
+findings_fixed: 11
 tokens: 0
 duration_min: 0
 verdict: CORRIGIDO
@@ -192,3 +192,36 @@ Foram 12 pushes hoje, a 23 min de bancada cada. A tentação é cortar pushes �
 que teriam ido para `main`, e mais cedo pegou quatro regressões de `vendor-manifest`/`vendor-branch`,
 uma delas mandando **copiar o repositório inteiro**. O que dá para cortar sem perda é o que fiz
 algumas vezes: empurrar *antes* de o gate local fechar.
+
+
+---
+
+# Achado 11 — o acoplamento que este resíduo declarou ABERTO fechou na mesma sessão
+
+Acima está escrito, como fio aberto: *"a porta pública só fica verde quando a dívida da REGRA 45 no
+core chegar a ZERO"*. Com autorização plena do maestro, foi atacado.
+
+```
+antes:   Links core-privados: 22 · Baseline: 24 entradas
+depois:  Links core-privados:  0 · Baseline:  0 entradas
+```
+
+22 links migrados para **texto + gloss `(core-only, não viaja)`** em 15 arquivos. A forma importa: o
+rótulo **vira texto**, então quem lê no alvo continua vendo o NOME do documento e sabendo que ele não
+viaja — em vez de um link que não resolve, que é a pior das três opções (pior que a ausência, porque
+promete e falha).
+
+**Os pares vieram da própria guarda**, não de lista minha: o script lê a saída do
+`kb-vendored-link-check.sh` e migra o que ela nomeia. Lista redigida à mão é o defeito que esta casa
+já pagou várias vezes hoje — e aqui a SSOT estava a um `subprocess` de distância.
+
+Dois casos não casaram no primeiro padrão, e **isso é informação**: em `docs/meta-specs/` o link é
+relativo (`../analysis/…`), sem o prefixo `docs/`. Curados por **basename + verificação de que o
+diretório é core-only** — nunca por basename solto, que migraria um link legítimo homônimo.
+
+E a guarda declarou, sozinha, algo que eu não teria notado: **suspendeu a catraca de CRESCIMENTO
+nesta rodada porque o escopo mudou** (ganhou `plugins/`). *"Passivos de escopos distintos não são
+comparáveis."* É o oposto do fail-open — a guarda preferindo dizer que não pode julgar.
+
+Efeito colateral medido: os SOFT do lint caíram de **15 para 13**, porque as duas entradas obsoletas
+do baseline saíram com ele.

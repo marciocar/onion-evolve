@@ -59,4 +59,4 @@ Agentes especialistas de execução técnica do Onion: backend, frontend, banco,
 - Comandos que delegam a estes agentes: [`/engineer:*`](../../commands/engineer/README.md), [`/docs:*`](../../commands/docs/README.md), [`/product:*`](../../commands/product/README.md), [`/design:*`](../../commands/design/README.md)
 - Agentes irmãos: [`review/`](../review/) (`@code-reviewer`), [`testing/`](../testing/) (`@test-engineer`), [`product/`](../product/) (`@product-agent`, `@task-specialist`)
 - Abstrações: Task Manager (`.claude/utils/task-manager/`) e Forge (`.claude/utils/forge/`) — adapters SDAAL que os specialists de provider servem
-- KBs: [`docs/knowledge-base/`](../../../docs/knowledge-base/) · Inventário canônico: [`docs/onion/inventory.md`](../../../docs/onion/inventory.md)
+- KBs: [`docs/knowledge-base/`](../../../docs/knowledge-base/) · Inventário canônico: ``docs/onion/inventory.md`` (core-only, não viaja)

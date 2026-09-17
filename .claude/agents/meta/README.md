@@ -17,4 +17,4 @@ Agentes que **constroem e governam o próprio Sistema Onion**: criam comandos, a
 - Índice da categoria de comandos: [`meta/` commands](../../commands/meta/README.md)
 - Skills do core: [`.claude/skills/`](../../skills/) (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-orchestration`)
 - Metaspecs (constituição L0): [`docs/meta-specs/`](../../../docs/meta-specs/)
-- Inventário canônico: [`docs/onion/inventory.md`](../../../docs/onion/inventory.md)
+- Inventário canônico: ``docs/onion/inventory.md`` (core-only, não viaja)

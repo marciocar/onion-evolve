@@ -15,8 +15,8 @@ quem quiser outro alvo escreve outro conversor lendo a mesma SSOT.
 | Provider | Saída | Status |
 |----------|-------|--------|
 | **`css-vars`** | `:root { --color-... }` (CSS custom properties) | ✅ implementado (`tokens-to-css-vars.sh`) — universal, zero dependência |
-| `tailwind` | `@theme { --color-...: ... }` (Tailwind v4) | 🟡 **output de referência validado** em [`docs/materials/theme.tailwind.css`](../../../docs/materials/theme.tailwind.css) (materializado via `@design-system-specialist`, gate verde) · **adapter reutilizável 🔜** |
-| `shadcn` | `:root { --background/--primary/--ring/… }` (19 vars shadcn/ui, hex v4) | 🟡 **output de referência validado** em [`docs/materials/theme.shadcn.css`](../../../docs/materials/theme.shadcn.css) (gate verde, contrastes calculados) · **adapter reutilizável 🔜** |
+| `tailwind` | `@theme { --color-...: ... }` (Tailwind v4) | 🟡 **output de referência validado** em ``docs/materials/theme.tailwind.css`` (core-only, não viaja) (materializado via `@design-system-specialist`, gate verde) · **adapter reutilizável 🔜** |
+| `shadcn` | `:root { --background/--primary/--ring/… }` (19 vars shadcn/ui, hex v4) | 🟡 **output de referência validado** em ``docs/materials/theme.shadcn.css`` (core-only, não viaja) (gate verde, contrastes calculados) · **adapter reutilizável 🔜** |
 | `style-dictionary` | build multi-plataforma (CSS/TS/Swift/Kotlin) | 🔜 adapter (dependência node, opcional) |
 | `artifact-design` | preview/dogfood visual via skill nativa | 🔜 |
 | `none` | no-op (fallback gracioso) | ✅ |
