@@ -41,6 +41,18 @@ on:
       - 'docs/**'
       - 'CLAUDE.md'
 
+# ── CANCELA O RUN SUPERADO ────────────────────────────────────────────────────────────────
+# MEDIDO em 2026-09-17: 397 min de CI num dia, 281 deles (71%) na bancada, e pelo menos 53
+# min em runs cujo head foi substituído por um push novo ANTES de terminarem. Ninguém leu
+# aqueles vereditos — o `pr-merge-verified.sh` ancora os checks no HEAD ATUAL e recusa
+# qualquer outro, então resultado de head velho não decide nada, por desenho.
+# o lint é barato, mas o princípio é o mesmo: veredito de head velho não decide nada.
+# NÃO custa eficácia: cancela só o que já era irrelevante. O que NUNCA se cancela é o run
+# do head que vai mergear — esse termina, porque é ele que o gate lê.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
