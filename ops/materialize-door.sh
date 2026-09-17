@@ -195,6 +195,54 @@ privado, e não aqui.
 CLAUDEMD
 echo "  (5) raiz da porta: README.md · CLAUDE.md · LICENSE · LICENSE-DOCS"
 
+# ── (6) A PORTA PRECISA SABER QUEM É, E TER AS PROJEÇÕES QUE AS PRÓPRIAS GUARDAS COBRAM ──────
+# Os três achados vieram da 1ª sessão REAL dentro da porta (`/warm-up`, 2026-09-17) — não de mim:
+#
+#  (a) `onion-version.sh` respondia `role: source` NA PORTA. O fallback sem stamp é `source` por
+#      desenho (repo-fonte não carrega stamp), e a porta não tinha stamp — então ela se
+#      APRESENTAVA COMO A FONTE, contradizendo o próprio README que diz "PROJEÇÃO, não a fonte".
+#      Identidade errada não é cosmética: comandos que decidem por papel (co-relay, adopt, publish)
+#      passam a decidir errado.
+#  (b) LINT DA PORTA: 41 HARD, 22 deles REGRA 45 (Link vendorizado não aponta caminho core-privado,
+#      com catraca). O `--stub-baselines` esvazia o baseline — que é certo, o passivo do core não é
+#      dívida do alvo — mas NINGUÉM o re-emitia do corpus da porta. Metade da cura entregue é cura
+#      nenhuma: a porta nascia vermelha no próprio gate que ela distribui.
+#  (c) `docs/onion/` não viaja (é biografia+projeção do core), mas as REGRAS 8 e 21 cobram
+#      `inventory.md` e `graph.md` — e o CLAUDE.md que este script escreve MANDAVA lê-los. A porta
+#      apontava para um arquivo que ela não tinha.
+#
+# Os três se curam com helpers que JÁ EXISTEM. Escrever um quarto seria a quarta cópia.
+mkdir -p "${DEST}/.claude"
+cat > "${DEST}/.claude/.onion-version" <<STAMP
+# Carimbo de identidade da PORTA — escrito por ops/materialize-door.sh.
+# Sem ele o onion-version.sh cai no fallback 'source' e a porta se declara a FONTE.
+role: ${ROLE}
+adopted_from: ${_slug}
+onion_version: ${_pin_ph}
+materialized_at: $(date -u +%Y-%m-%d)
+STAMP
+echo "  (6) carimbo de identidade: role=${ROLE} (sem ele a porta se declara 'source')"
+
+# `settings.json` NÃO está no manifesto — e é deliberado: ele carrega hooks e permissões da
+# INSTÂNCIA, e um adotante não deve herdar as do core. Mas TRÊS docs que viajam o citam em
+# backtick, e a REGRA 48 (Referência de caminho `.claude/…` em backtick (prosa) que não resolve)
+# reprova ponteiro morto. O `/meta:adopt` resolve isso no passo (1) da Configuração pós-cópia, com
+# MERGE never-clobber; a porta não tinha passo equivalente e nascia com 3 HARD.
+# Aqui a cópia é DIRETA, e a diferença é de objeto: a porta não tem instância prévia a preservar —
+# ela É a materialização. Never-clobber protegeria um estado que não existe.
+if [ ! -f "${DEST}/.claude/settings.json" ] && [ -f "${REPO_ROOT}/.claude/settings.json" ]; then
+  cp "${REPO_ROOT}/.claude/settings.json" "${DEST}/.claude/settings.json"
+  echo "  (6) settings.json copiado (3 docs que viajam o citam; sem ele a REGRA 48 reprova ponteiro morto)"
+fi
+
+if [ -f "${DEST}/.claude/utils/adopt/regen-ssot-projections.sh" ]; then
+  bash "${DEST}/.claude/utils/adopt/regen-ssot-projections.sh" "${DEST}" 2>&1 | sed 's/^/  (6) /' || true
+fi
+if [ -f "${DEST}/.claude/utils/adopt/regen-baselines.sh" ]; then
+  # As catracas do core foram esvaziadas no passo (2); aqui elas renascem do corpus DA PORTA.
+  bash "${DEST}/.claude/utils/adopt/regen-baselines.sh" "${DEST}" 2>&1 | tail -2 | sed 's/^/  (6) /' || true
+fi
+
 _pin="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD)"
 cat <<FIM
 

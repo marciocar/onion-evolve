@@ -65,3 +65,48 @@ não cresce em silêncio**, que é o que faltava.
 
 E ela não publica nada: publicar segue humano (I3). O ciclo agora **avisa**; fechá-lo continua
 sendo um ato.
+
+---
+
+# Adendo — a sessão dentro da porta refutou o meu trabalho em quatro pontos
+
+O maestro rodou `/warm-up` no `onion-core` publicado. O lint **da própria porta**: **41 HARD**.
+
+Quatro achados, e o padrão comum é o mais instrutivo: **eu entreguei metade de cada cura.**
+
+| achado | a metade que faltou |
+|---|---|
+| `onion-version.sh` respondia **`role: source`** numa projeção que o README chama de "não a fonte" | escrevi o README que diz "projeção" e não carimbei a identidade que faz o repo **saber** disso |
+| **22× REGRA 45 (Link vendorizado não aponta caminho core-privado, com catraca)** | o `--stub-baselines` **esvazia** o baseline (certo) e ninguém o **re-emitia** do corpus da porta |
+| `inventory.md`/`graph.md` ausentes, com o `CLAUDE.md` mandando lê-los | cortei `docs/onion/` sem gerar o substituto |
+| **3× REGRA 48 (Referência de caminho `.claude/…` em backtick (prosa) que não resolve)** | `settings.json` não viaja **de propósito**, mas três docs que viajam o citam |
+
+Os três primeiros se curaram com helpers que **já existiam** (`regen-baselines.sh`,
+`regen-ssot-projections.sh`) — escrever um quarto teria sido a quarta cópia.
+
+## O recorte por papel, que é a peça de doutrina
+
+Sobravam guardas acusando HARD enquanto **declaravam honestamente não ter julgado** — sem
+`.kg.yaml`, sem `members.yaml`, sem PR. Elas estavam certas em não passar em silêncio e erradas em
+tratar **ausência legítima** como defeito: uma porta que não recebe o corpus do core não pode ser
+cobrada pela validade dele.
+
+**E não virou silêncio** — seria trocar um fail-closed por um fail-open. Virou SOFT com classe
+própria, `[papel/SEM-OBJETO]`, visível e contável. **No repo-fonte a mesma ausência continua HARD**,
+porque ali ela *é* defeito — é o caso (b) da bancada. E o caso (c) garante que o corte é sobre **não
+receber**, nunca sobre "está ruim": corpus presente e quebrado segue HARD em qualquer papel.
+
+**Resultado: 41 HARD → 0.**
+
+## O que me custou uma depuração
+
+O predicado invocava `onion-version.sh` por dentro de `$( )` — onde o cache nunca persiste, e o
+caminho quente abria um bash por violação. Passou a **ler o stamp direto**: mesma fonte, mais barato
+e mais previsível que perguntar ao script que a lê.
+
+## A catraca cobrou a própria leva que a criou
+
+A REGRA 85 (Porta pública espelha o core, com catraca) acusou as duas portas de andarem para trás —
+porque os commits desta leva mexeram na superfície que viaja. Baseline atualizado
+(`onion-standalone 378`, `onion-core 2`). **O ciclo fechou sobre si mesmo na primeira volta**, que é
+o teste que eu não teria como encomendar.

@@ -7,5 +7,5 @@
 #   é o modo de falha previsível de um gatilho que depende de alguém lembrar.
 # onion-core 1 — porta NOVA nasce com teto baixo: não tem passivo a carregar, e o 1 é o commit
 #   desta própria leva. Se ela subir, a guarda reprova — que é o ponto.
-onion-standalone 377
-onion-core 1
+onion-standalone 378
+onion-core 2

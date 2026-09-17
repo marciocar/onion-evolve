@@ -305,10 +305,57 @@ _rule_label() {   # $1 = mensagem · $2 = função chamadora → mensagem com "R
   esac
 }
 
+# ══ RECORTE POR PAPEL — "não pude julgar" não é a mesma coisa em todo repo ════════════════════
+# Medido 2026-09-17, na 1ª sessão REAL dentro da porta pública: o lint dela acusava HARD em guardas
+# que declaravam honestamente NÃO TER JULGADO — sem `.kg.yaml`, sem `members.yaml`, sem PR. As
+# guardas estavam certas em não passar em silêncio; erradas em tratar AUSÊNCIA LEGÍTIMA como
+# defeito. Uma porta que não recebe o corpus do core não pode ser cobrada pela validade dele.
+#
+# ⚠️ E NÃO VIRA SILÊNCIO — seria trocar um fail-closed por um fail-open. Vira SOFT com classe
+# PRÓPRIA (`[papel/SEM-OBJETO]`), que aparece no sumário, é contável, e diz o papel e a classe. A
+# distinção que importa: no repo-FONTE a mesma ausência continua HARD, porque ali ela É defeito.
+_PAPEL_DESTE_REPO=""
+_papel() {
+  [ -n "${_PAPEL_DESTE_REPO}" ] && { printf '%s' "${_PAPEL_DESTE_REPO}"; return; }
+  # ⚠️ LÊ O STAMP DIRETO, não invoca o `onion-version.sh`. Duas razões, e a segunda é a que me
+  # custou uma depuração: (1) `violation()` roda centenas de vezes e cada chamada abriria um bash;
+  # (2) o predicado é consultado de DENTRO de `$( )`, e ali o cache nunca persiste — o custo vira
+  # o caminho quente. O stamp é a mesma fonte que o `onion-version.sh` lê; ler o dado é mais
+  # barato e mais previsível que perguntar ao script que o lê.
+  local stamp="${REPO_ROOT}/.claude/.onion-version"
+  if [ -f "${stamp}" ]; then
+    _PAPEL_DESTE_REPO="$(awk '/^role:/{print $2; exit}' "${stamp}" 2>/dev/null)"
+  fi
+  [ -n "${_PAPEL_DESTE_REPO}" ] || _PAPEL_DESTE_REPO="source"
+  printf '%s' "${_PAPEL_DESTE_REPO}"
+}
+# A ausência só é LEGÍTIMA se o objeto de fato não existe E o papel não é a fonte. Existir-e-estar-
+# quebrado continua HARD em qualquer papel: o recorte é sobre NÃO RECEBER, nunca sobre "está ruim".
+_sem_objeto_no_papel() {
+  local msg="$1"
+  [ "$(_papel)" = "source" ] && return 1
+  case "${msg}" in
+    *kg-selo/ISENCAO*|*kg-parity/NAO-MEDIDO*|*kg-yaml/NAO-VERIFICADO*|*kg-verificacao/*)
+      [ -z "$(git -C "${REPO_ROOT}" ls-files '*.kg.yaml' 2>/dev/null | head -1)" ] && return 0 ;;
+    *review-artifact/ISENCAO*)
+      return 0 ;;   # PR é do fluxo do core; porta/adotante não tem o mesmo objeto
+    *REGRA\ 85*|*door-staleness*)
+      [ ! -f "${REPO_ROOT}/docs/evolution/federation/members.yaml" ] && return 0 ;;
+    *frescor-doutrinário/CATRACA-INDISPONIVEL*)
+      return 0 ;;   # a catraca do core nasce do corpus DELE; o alvo emite a própria
+  esac
+  return 1
+}
+
 violation() {
   local severity="$1"   # HARD | SOFT
   local file="$2"
   local rule="$3"
+
+  if [ "${severity}" = "HARD" ] && _sem_objeto_no_papel "${rule}"; then
+    severity="SOFT"
+    rule="[papel/SEM-OBJETO] papel '$(_papel)' não recebe o objeto desta guarda — ${rule}"
+  fi
 
   # Caminho relativo à raiz do repo para mensagens mais legíveis
   local rel_file="${file#${REPO_ROOT}/}"

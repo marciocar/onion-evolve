@@ -16727,6 +16727,48 @@ run_door_cycle_selftests() {
   rm -rf "${sb2}"
 }
 
+
+# ── RECORTE POR PAPEL: "não pude julgar" não é a mesma coisa em todo repo ─────────────────────
+# Nasceu da 1ª sessão REAL dentro da porta pública: o lint dela acusava 41 HARD, e a massa eram
+# guardas declarando honestamente NÃO TER JULGADO — sem `.kg.yaml`, sem `members.yaml`, sem PR.
+# O caso (b) é o que impede a cura de virar fail-open: no repo-FONTE a mesma ausência segue HARD.
+run_role_scope_selftests() {
+  local sb2 out
+  sb2="$(mktemp -d)"
+  mkdir -p "${sb2}/.claude/validation" "${sb2}/docs"
+  cp "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" "${sb2}/.claude/validation/"
+  # extrai só o predicado — testar a unidade, não a suíte de 4 minutos
+  sed -n '/^_PAPEL_DESTE_REPO=""/,/^}/p' "${sb2}/.claude/validation/lint-artifacts.sh" > "${sb2}/pred.sh"
+  sed -n '/^_sem_objeto_no_papel()/,/^}/p' "${sb2}/.claude/validation/lint-artifacts.sh" >> "${sb2}/pred.sh"
+
+  # (a) papel HUB sem corpus → a ausência é legítima, a guarda recorta
+  printf 'role: hub\n' > "${sb2}/.claude/.onion-version"
+  out="$(REPO_ROOT="${sb2}" SCRIPT_DIR="${sb2}/.claude/validation" bash -c '
+    source "'"${sb2}"'/pred.sh"
+    _sem_objeto_no_papel "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
+  if [ "${out}" = "RECORTA" ]; then record_pass "role-scope: (a) papel hub sem corpus → recorta (ausência legítima)"
+  else record_fail "role-scope: (a)" "não recortou no papel hub: ${out}"; fi
+
+  # (b) A MESMA ausência no repo-FONTE segue HARD — sem isto o recorte vira fail-open universal
+  rm -f "${sb2}/.claude/.onion-version"
+  out="$(REPO_ROOT="${sb2}" SCRIPT_DIR="${sb2}/.claude/validation" bash -c '
+    source "'"${sb2}"'/pred.sh"
+    _sem_objeto_no_papel "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (b) na FONTE a mesma ausência NÃO é recortada (lá é defeito)"
+  else record_fail "role-scope: (b)" "recortou na fonte — o recorte virou fail-open universal"; fi
+
+  # (c) objeto PRESENTE e quebrado continua HARD em qualquer papel: o recorte é sobre NÃO RECEBER,
+  #     nunca sobre "está ruim". Sem este caso, um `.kg.yaml` inválido na porta passaria.
+  printf 'role: hub\n' > "${sb2}/.claude/.onion-version"
+  ( cd "${sb2}" && git init -q . && printf 'meta:\n  id: x\n' > x.kg.yaml && git add -A ) >/dev/null 2>&1
+  out="$(REPO_ROOT="${sb2}" SCRIPT_DIR="${sb2}/.claude/validation" bash -c '
+    source "'"${sb2}"'/pred.sh"
+    _sem_objeto_no_papel "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (c) com corpus PRESENTE não recorta (o corte é sobre não receber)"
+  else record_fail "role-scope: (c)" "recortou com .kg.yaml presente — esconderia corpus quebrado"; fi
+  rm -rf "${sb2}"
+}
+
 _family run_hook_autofix_selftests
 _family run_kg_reverify_schema_selftests
 _family run_backtick_ref_selftests
@@ -16755,6 +16797,7 @@ _family run_hub_role_guard_selftests
 _family run_inventory_adopter_scope_selftests
 _family run_door_selftests
 _family run_door_cycle_selftests
+_family run_role_scope_selftests
 _family run_model_ssot_selftests
 _family run_kg_read_leg_selftests
 _family run_sandbox_gc_selftests
