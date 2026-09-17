@@ -392,3 +392,31 @@ não gerador · `a2a-agent-card.sh` deriva do `members.yaml`, core-only.
 
 E o caso carrega **mutante**: tirar `rules-registry.sh` da lista tem de fazer o oráculo reprovar —
 senão ele vira um `grep` que sempre acha algo, e guarda que não sabe reprovar não guarda nada.
+
+
+---
+
+# Post-scriptum — o CI não rodou, e a causa não era o CI
+
+Depois do push com o gate local verde (bancada 1318/0, lint 0 HARD), **zero check-runs nasceram**
+para o head novo. Vinte e cinco minutos de silêncio.
+
+A primeira hipótese era a lição desta própria leva se voltando contra mim — a REGRA 86 (Workflow de
+CI PARSEIA como YAML) usa um loader estrito **porque** o GitHub é mais rígido que o `yaml.safe_load`,
+então talvez o meu conserto do `onion-review-diagnose.yml` passasse aqui e fosse recusado lá.
+Medido: `gh api …/actions/workflows` devolve os quatro **`active`**. Não era isso.
+
+Era `mergeable=CONFLICTING`. **O GitHub não dispara `pull_request` quando não consegue computar o
+merge** — e o #840 entrou em `main` com `--rebase`, reescrevendo os SHAs que esta branch ainda
+carregava dos tempos da pilha.
+
+E houve uma medição mentirosa no meio: `git merge-tree` sobre a base comum devolveu **zero
+conflitos**, e o merge real deu **dois** — `ops/materialize-door.sh` (add/add) e
+`docs/onion/testing-state.md`. Anotado porque a tentação era confiar no ensaio: o `merge-tree` da
+forma antiga não enxerga add/add como o merge de verdade enxerga.
+
+Resolução **com medição, não com `--ours` cego**: extraí os dois lados do `materialize-door.sh` e
+comparei — o meu tem 260 linhas, o de `main` tem 115, e o `diff` mostra **zero** linhas exclusivas do
+lado de lá. Superset estrito, então tomar o meu é conclusão, não preferência. A projeção
+`testing-state.md` foi **regenerada**, nunca resolvida à mão — é gerada, e resolver conflito à mão
+numa projeção é escrever à mão o que a máquina deriva.
