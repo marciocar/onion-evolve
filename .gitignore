@@ -63,3 +63,12 @@ plugins/__*__/
 # rascunho de script). É transitório por definição: o que vale vira nó no grafo, caso de bancada ou
 # documento. Em 2026-09-13 um run de pesquisa baixou 748 KB de PDF de terceiro aqui.
 .claude/scratchpad/
+
+# ── FIXTURES DE BANCADA QUE NASCEM NA ÁRVORE VIVA ────────────────────────────────────────────
+# A bancada cria alguns artefatos EM ÁRVORE (não em sandbox) porque a guarda que eles exercitam
+# só existe no repo real. Ela os apaga ao final — mas se a suíte morre no meio (kill, timeout,
+# `set -e`), eles ficam, e o `git add -A` da sessão os varre para dentro de um commit qualquer.
+# Aconteceu em 2026-09-17: dois deles entraram num commit de cura da porta e só apareceram como
+# `D` inesperado no status depois. Ignorar é o mecanismo; lembrar de conferir não é.
+.claude/utils/marketplace/verticals/__mbguard__*
+site/__selftest-*

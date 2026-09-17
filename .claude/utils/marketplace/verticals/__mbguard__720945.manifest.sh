@@ -1,9 +1,0 @@
-PLUGIN_NAME="__mbguard__"
-PLUGIN_VERSION="0.1.0"
-PLUGIN_DESC="fixture"
-KEYWORDS=(test)
-COMMANDS=(".claude/commands/meta")
-CONFORMANCE="bronze"
-PROVIDES=("x")
-REQUIRES=()
-LOADS=()
