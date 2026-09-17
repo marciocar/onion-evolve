@@ -16974,6 +16974,107 @@ run_workflow_parse_selftests() {
   rm -rf "${sb}"
 }
 
+# ── O ESCAPE DE DISPENSA DO MERGE VERIFICADO (2026-09-17) ────────────────────────────────────
+# `ops/pr-merge-verified.sh` ganhou `--dispensa <check> --motivo <texto>`, autorizado pelo maestro
+# para o caso em que o gate DETERMINÍSTICO está verde e só a revisão SEMÂNTICA não rodou. Toda
+# válvula dessas morre virando override geral, então ela nasce com bancada: o que se testa aqui não
+# é que ela DEIXA passar, é tudo o que ela CONTINUA barrando. O `gh` é dublado — a alternativa
+# seria exercitar o SUT contra o forge de verdade, que é o oposto de um teste.
+run_merge_dispensa_selftests() {
+  local sut="${REPO_ROOT}/ops/pr-merge-verified.sh"
+  [ -f "${sut}" ] || { record_skip "merge-dispensa: ops/pr-merge-verified.sh ausente"; return; }
+  local sb out rc
+  sb="$(mktemp -d)"; mkdir -p "${sb}/bin"
+  cat > "${sb}/bin/gh" <<'STUB'
+#!/usr/bin/env bash
+# dublê de `gh` — responde só o que o SUT pergunta; o resto sai não-zero (fail-loud)
+_args="$*"
+case "${_args}" in
+  *"--json state,mergedAt"*)
+    # ⚠️ O DUBLÊ TEM DE TER ESTADO. A 1ª versão respondia "OPEN|" SEMPRE, então o SUT mergeava e
+    # logo depois lia "não mergeou" — e o caso do caminho FELIZ reprovava por defeito do dublê,
+    # com o SUT correto. A prova independente do SUT (relê o estado e exige MERGED+mergedAt) é
+    # justamente o que ele tem de mais forte; um dublê sem estado não consegue exercitá-la.
+    if [ -f "${STUB_STATE:-/nonexistent}" ]; then echo "MERGED|$(cat "${STUB_STATE}")"; else echo "OPEN|"; fi ;;
+  *"--json headRefOid"*)        echo "deadbeefcafe0000000000000000000000000000" ;;
+  *"--json headRepository,headRepositoryOwner"*) echo "o/r" ;;
+  *"--json headRefName"*)       echo "feat/x" ;;
+  *check-runs*)                 printf '%s\n' "${STUB_RUNS}" ;;
+  "pr checks"*)                 printf '%s\n' "${STUB_CHECKS}" ;;
+  *statusCheckRollup*)          printf '%s\n' "${STUB_VERDICT}" ;;
+  "pr comment"*)                [ "${STUB_COMMENT_FAIL:-0}" = 1 ] && exit 1; echo "comentado" ;;
+  "pr merge"*)
+    echo "MERGOU-DE-MENTIRA"
+    [ "${STUB_MERGE_FAIL:-0}" = 1 ] && exit 1
+    [ -n "${STUB_STATE:-}" ] && date -u +%Y-%m-%dT%H:%M:%SZ > "${STUB_STATE}"
+    exit 0 ;;
+  *)                            echo "gh-stub: pergunta não prevista: ${_args}" >&2; exit 9 ;;
+esac
+STUB
+  chmod +x "${sb}/bin/gh"
+  # cenário-base: bancada e lint VERDES, só o veredito semântico falhando
+  export STUB_RUNS=$'lint-onion-artifacts\tcompleted\tsuccess\nselftest\tcompleted\tsuccess\nonion-review\tcompleted\tsuccess\nonion-review-verdict\tcompleted\tfailure'
+  export STUB_CHECKS=$'lint-onion-artifacts\tpass\t1m\nselftest\tpass\t29m\nonion-review\tpass\t1m\nonion-review-verdict\tfail\t4s'
+  export STUB_VERDICT="FAILURE"
+  _md() { ( export PATH="${sb}/bin:${PATH}" STUB_STATE="${sb}/merged.stamp"; rm -f "${sb}/merged.stamp"
+            cd "${sb}" && bash "${sut}" 842 "$@" 2>&1 || true ); }
+
+  # (a) o caso autorizado: só o veredito semântico falho, e ele é dispensado por nome
+  out="$(_md --dispensa onion-review-verdict --motivo "gate determinístico verde")"
+  if grep -q 'DISPENSADO' <<< "${out}" && grep -q 'dispensa registrada' <<< "${out}" \
+     && grep -q 'MERGED' <<< "${out}" && ! grep -q '✗' <<< "${out}"; then
+    record_pass "merge-dispensa: (a) veredito semântico falho + dispensa nomeada → registra e merge PROVADO pelo estado"
+  else record_fail "merge-dispensa: (a)" "não prosseguiu: ${out:0:160}"; fi
+
+  # (b) A DISPENSA É NOME A NOME: outro check falho continua matando o merge. Sem este caso o
+  #     escape vira override geral no primeiro dia em que dois checks caírem juntos.
+  out="$(STUB_RUNS=$'lint-onion-artifacts\tcompleted\tfailure\nonion-review-verdict\tcompleted\tfailure' \
+         STUB_CHECKS=$'lint-onion-artifacts\tfail\t1m\nonion-review-verdict\tfail\t4s' \
+         _md --dispensa onion-review-verdict --motivo "x")"
+  if grep -q 'NÃO foi dispensado' <<< "${out}" && grep -q 'lint-onion-artifacts' <<< "${out}"; then
+    record_pass "merge-dispensa: (b) outro check falho NÃO é dispensado junto (nomeia o culpado)"
+  else record_fail "merge-dispensa: (b)" "deixou passar com outro check falho: ${out:0:160}"; fi
+
+  # (c) DISPENSA PREVENTIVA é recusada — dispensar check verde é cheque em branco para a próxima
+  #     vez que ele falhar, e ninguém releria o comando naquele dia.
+  out="$(STUB_RUNS=$'lint-onion-artifacts\tcompleted\tsuccess\nonion-review-verdict\tcompleted\tsuccess' \
+         STUB_CHECKS=$'lint-onion-artifacts\tpass\t1m\nonion-review-verdict\tpass\t4s' \
+         STUB_VERDICT=SUCCESS _md --dispensa onion-review-verdict --motivo "x")"
+  if grep -q 'preventiva' <<< "${out}"; then
+    record_pass "merge-dispensa: (c) dispensar check que NÃO está falhando é recusado"
+  else record_fail "merge-dispensa: (c)" "aceitou dispensa preventiva: ${out:0:160}"; fi
+
+  # (d) só check que se DECLARA informativo entra — a lista não é um campo livre
+  out="$(_md --dispensa selftest --motivo "x")"
+  if grep -q 'NÃO é dispensável' <<< "${out}"; then
+    record_pass "merge-dispensa: (d) check fora da lista de dispensáveis é recusado"
+  else record_fail "merge-dispensa: (d)" "dispensou check não-listado: ${out:0:160}"; fi
+
+  # (e) sem motivo escrito é override, não dispensa
+  out="$(_md --dispensa onion-review-verdict)"
+  if grep -q 'exige --motivo' <<< "${out}"; then
+    record_pass "merge-dispensa: (e) dispensa sem --motivo é recusada"
+  else record_fail "merge-dispensa: (e)" "aceitou dispensa sem motivo: ${out:0:160}"; fi
+
+  # (f) O REGISTRO É PRECONDIÇÃO: se o comentário no PR falha, o merge NÃO acontece. É a metade
+  #     que o maestro pediu ("registrando qual check foi dispensado") — e uma dispensa que só
+  #     existe no terminal de quem mergeou é indistinguível de merge por fora do gate.
+  out="$(STUB_COMMENT_FAIL=1 _md --dispensa onion-review-verdict --motivo "x")"
+  if grep -q 'REGISTRAR' <<< "${out}" && ! grep -q 'MERGOU-DE-MENTIRA' <<< "${out}"; then
+    record_pass "merge-dispensa: (f) registro que falha ABORTA o merge (registro é precondição)"
+  else record_fail "merge-dispensa: (f)" "mergeou sem registrar a dispensa: ${out:0:160}"; fi
+
+  # (g) sem --dispensa, nada muda: check falho continua recusando (o caminho normal é intocado)
+  out="$(_md)"
+  if grep -q '✗' <<< "${out}" && ! grep -q 'DISPENSADO' <<< "${out}"; then
+    record_pass "merge-dispensa: (g) sem --dispensa o comportamento antigo é idêntico"
+  else record_fail "merge-dispensa: (g)" "o caminho sem dispensa mudou: ${out:0:160}"; fi
+
+  unset -f _md; unset STUB_RUNS STUB_CHECKS STUB_VERDICT
+  rm -rf "${sb}"
+}
+
+_family run_merge_dispensa_selftests
 _family run_workflow_parse_selftests
 _family run_role_scope_selftests
 _family run_model_ssot_selftests
