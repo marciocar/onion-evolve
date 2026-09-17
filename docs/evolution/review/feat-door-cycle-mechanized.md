@@ -2,7 +2,7 @@
 title: 'Resíduo — o ciclo era prosa; e o meu dogfood media no substrato errado'
 date: 2026-09-17
 branch: feat/door-cycle-mechanized
-reviewed_diff_sha256: 67fe59ae46c7bace9c4db19dd60539b9ae6afc76c9a0c9a8c6598834cc510117
+reviewed_diff_sha256: 460ff75d8a9f10a00ff7532a2c701ce82ed12596871ef5c08973a98113bec1a5
 findings_total: 6
 findings_real: 6
 findings_fixed: 6
