@@ -2,7 +2,7 @@
 title: 'Resíduo — a porta subiu nua, e a chave do cliente só não subiu por um .gitignore alheio'
 date: 2026-09-17
 branch: feat/door-completeness
-reviewed_diff_sha256: 0b0aa2d4cdf9483fab90556272d79472a0a7987fc2092ae87b2d101d1387153f
+reviewed_diff_sha256: ca6c2f4ca9d4418d7f9be030c22ece48b88547eb45e878b34163f0cb06e23607
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
