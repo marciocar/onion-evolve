@@ -217,3 +217,21 @@ E houve um erro meu no caminho, que o próprio harness pegou: o caso (f) usava `
 clone **não-bare** com `main` checada fora — recusado, subshell não-zero, e sob `set -e` a bancada
 **abortou antes da soma**, exibindo cinco ✓ e nenhum ✗. O aviso que ela imprime nessa situação existe
 justamente porque cinco ✓ parecem verde. Trocado por `update-ref` no ref remoto.
+
+
+## Duas coisas medidas de passagem, nomeadas e não curadas
+
+**O contador de sítios de asserção subestima.** Adicionei **8 casos** de bancada e a projeção
+`testing-inventory.md` subiu **1065 → 1067**. O padrão é `^\s*(record_pass|record_fail|record_skip) `
+— ancorado no início da linha —, e a forma idiomática desta família escreve
+`if …; then record_pass "…"` / `else record_fail "…"; fi`, onde o verbo vem depois de `then `/`else `.
+Os casos (a)(b)(c) que já existiam têm a mesma forma, então o número **sempre** subestimou; não é
+regressão desta leva. Fica nomeado porque o arquivo se declara SSOT gerada, e um número gerado que
+subestima é pior que um ausente — ele parece medido. Gatilho: a próxima vez que alguém citar esse
+total como cobertura.
+
+**A bancada escreve na árvore viva, e o `git add -A` varre.** Dois artefatos
+(`__mbguard__*`, `site/__selftest-*`) entraram num commit meu e só apareceram depois, como `D`
+inesperado no status, quando a suíte seguinte os apagou. A bancada limpa ao final — mas se ela morre
+no meio (kill, timeout, `set -e`), os artefatos ficam. Curado por `.gitignore`: ignorar é mecanismo,
+lembrar de conferir não é.
