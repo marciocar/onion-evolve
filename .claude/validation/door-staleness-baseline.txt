@@ -11,5 +11,11 @@
 #   mediam `pin..HEAD` da BRANCH, então carregavam commits em voo que a porta não teria como
 #   espelhar — a guarda cobrava por trabalho que ainda não existia em main. Corrigida a ponta para
 #   o `merge-base`, o passivo REAL apareceu, e é menor. A catraca não afrouxou: ficou honesta.
-onion-standalone 372
-onion-core 0
+#
+# 2026-09-17, pós-merge do #840: a `main` ANDOU de verdade (4 commits na superfície que viaja), e
+# os números subiram 372→373 e 0→1. Isto NÃO é a esteira curada acima: ali o teto crescia por
+# trabalho em VOO, que a porta não teria como espelhar; aqui o trabalho está MERGEADO, a porta de
+# fato ficou para trás, e a catraca está fazendo exatamente o que existe para fazer. O `onion-core`
+# volta a 0 na re-materialização logo a seguir; o 373 do `onion-standalone` é o passivo real.
+onion-standalone 373
+onion-core 1
