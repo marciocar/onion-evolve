@@ -160,7 +160,7 @@ postgres, milvus/minio/attu) ficaram **expostos à internet pública** em `179.1
 persistida em `onion-vps-docker-firewall.service` (systemd oneshot, `After=docker.service`, idempotente).
 
 **Por que isto pertence a esta doutrina, não só ao registro do incidente**
-(`docs/analysis/onion-vps-network-exposure-2026-08.md`): o veredito F0 diz *"atrás do bridge"* como
+(`onion-vps-network-exposure-2026-08` (core-only)): o veredito F0 diz *"atrás do bridge"* como
 propriedade arquitetural — mas o Docker ignorava o `ufw` no nível de rede, por baixo de qualquer
 decisão de aplicação. A contenção por systemd unit é **mecanismo**, não disciplina — o padrão que
 `fix-must-become-mechanism` já exige em outras doutrinas do core: todo ajuste que vem
@@ -201,7 +201,7 @@ nomeia (env switch fictício), só que na camada de rede em vez de configuraçã
 - **Reprovação de F2 (a lição de premissas medidas):**
   `docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md`.
 - **Incidente de rede (o invariante "atrás do bridge" testado):**
-  `docs/analysis/onion-vps-network-exposure-2026-08.md`.
+  `onion-vps-network-exposure-2026-08` (core-only).
 - **Esqueleto de referência vivo (repo-por-ferramenta):** `/home/marcio/onion-vps-logto/`.
 - **Critério de graduação (o Teste do Eixo/Gatilho, citado não recopiado):**
   [Doutrina de Abstração do Onion](onion-abstraction-doctrine.md).

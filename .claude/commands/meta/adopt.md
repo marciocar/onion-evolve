@@ -16,7 +16,7 @@ updated: "2026-07-23"
 
 ## Objetivo
 
-Operacionalizar a doutrina [`docs/applying/`](../../../docs/applying/README.md) como **comando
+Operacionalizar a doutrina `README` (core-only) como **comando
 faseado**: apontar o Onion para um repo/pasta e "assumir o controle" — **instalar** o framework
 (durável) ou **operar in-place** (efêmero), reusando atuadores existentes. Greenfield-first.
 
@@ -794,7 +794,7 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
 ## 🔗 Referências
 
 - **Decisão:** [ADR de Adoção](../../../docs/knowledge-base/decisions/onion-adr-repo-adoption-2026-06.md)
-- **Doutrina:** [`applying/`](../../../docs/applying/README.md) (greenfield/legacy/regulated)
+- **Doutrina:** `README` (core-only) (greenfield/legacy/regulated)
 - **Stamp:** `.claude/validation/onion-version.sh` · `architecture.md §6.1`
 - **Atuadores reusados:** `/docs:reverse-consolidate` · `/meta:setup-integration` · `/docs:build-*-docs` · `/docs:build-index`
 - **Rampa a jusante:** [federação multi-repo](../../../docs/knowledge-base/concepts/multi-repo-federation.md)

@@ -266,4 +266,4 @@ doutrinário**. Para escolha reversível de baixo risco, fan-out simples basta. 
 - Skill relacionada: `language-standards` (idioma e docs)
 - Skill relacionada: `onion-validation` (regras de validação)
 - Agente: `@metaspec-gate-keeper` (valida conformidade)
-- Playbooks/catálogo (#9): `docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md` (doutrina) · `docs/analysis/onion-adr-phased-resumable-pattern-2026-06.md` (PFR = execução)
+- Playbooks/catálogo (#9): `docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md` (doutrina) · `onion-adr-phased-resumable-pattern-2026-06` (core-only) (PFR = execução)

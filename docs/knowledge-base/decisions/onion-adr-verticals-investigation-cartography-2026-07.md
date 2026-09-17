@@ -10,12 +10,12 @@ deciders: maestro + sessão de evolução
 context_freshness: 2026-07-04
 related:
   - docs/knowledge-base/concepts/knowledge-graph-sdaal.md (doutrina da espinha da vertical A)
-  - docs/analysis/onion-parecer-rhilo-lineages-2026-07.md (D3 = 1º dogfood do KG — gatilho F1 da vertical A)
-  - docs/analysis/onion-intelligent-breadcrumbs-research-2026-07.md (lastro: estrutura de decisão ✅; armazenamento executável gated)
+  - `onion-parecer-rhilo-lineages-2026-07` (core-only) (D3 = 1º dogfood do KG — gatilho F1 da vertical A)
+  - `onion-intelligent-breadcrumbs-research-2026-07` (core-only) (lastro: estrutura de decisão ✅; armazenamento executável gated)
   - docs/knowledge-base/concepts/domain-context-lifecycle.md (ciclo que a vertical B completa com a operação NAVEGAR)
   - docs/knowledge-base/concepts/onion-relation-vocabulary.md (TBox a estender na vertical B)
-  - docs/analysis/onion-adr-exchange-unit-2026-06.md (anatomia da vertical/plugin — o molde LEGO)
-  - docs/analysis/onion-adr-design-peer-promotion-2026-06.md — ver docs/design-context/decisions/onion-adr-design-peer-promotion.md (critério peer NÃO se aplica aqui; verticais ≠ contextos peer)
+  - `onion-adr-exchange-unit-2026-06` (core-only) (anatomia da vertical/plugin — o molde LEGO)
+  - `onion-adr-design-peer-promotion-2026-06` (core-only) — ver docs/design-context/decisions/onion-adr-design-peer-promotion.md (critério peer NÃO se aplica aqui; verticais ≠ contextos peer)
 ---
 
 # ADR — Verticais de Investigação e Cartografia de Contextos

@@ -115,7 +115,7 @@ específico: por que ele está do jeito que está, que incidente moldou cada gua
 
 ## 4. docker-compose.yml — bind 127.0.0.1 sempre
 
-**Regra dura, motivada por incidente real** (docs/analysis/onion-vps-network-exposure-2026-08.md):
+**Regra dura, motivada por incidente real** (`onion-vps-network-exposure-2026-08` (core-only)):
 o Docker fura o `ufw` por padrão (injeta regras em `DOCKER-FORWARD` **antes** da cadeia do ufw) —
 uma porta publicada sem bind explícito fica exposta à internet mesmo com o firewall de host
 "fechado". A contenção perimetral (`DOCKER-USER` default-deny) é rede de segurança, **não** a cura
@@ -309,9 +309,9 @@ não capacidade ganha. Aplique o esqueleto (ou a correção de uma peça faltant
 - [`integrations.md`](../../meta-specs/integrations.md) §2 — estrutura obrigatória de adapter
   (o lado Onion, ver §1.1 deste doc para a distinção)
 - `docs/onion/graph/vps-shared-tools-2026-07.kg.yaml` — F0 framing catálogo (nó `D_framing_catalogo`)
-- `docs/analysis/onion-vps-network-exposure-2026-08.md` — incidente que motivou a regra de bind
+- `onion-vps-network-exposure-2026-08` (core-only) — incidente que motivou a regra de bind
   `127.0.0.1` (§4)
-- `docs/analysis/onion-adr-sdaal-nested-two-level-2026-07.md` — recursão canal→solução (contexto de
+- `onion-adr-sdaal-nested-two-level-2026-07` (core-only) — recursão canal→solução (contexto de
   quando um domínio vira adapter aninhado, ex. `MESSAGING_PROVIDER`/`MESSAGING_WHATSAPP_PROVIDER`)
 - `/home/marcio/onion-vps-logto/` — referência viva citada em todo este documento
 - `/home/marcio/onion-evolve/ops/bridge-auth/logto-provision.sh` — referência de `provision.sh`

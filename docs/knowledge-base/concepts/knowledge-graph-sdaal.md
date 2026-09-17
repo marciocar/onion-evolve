@@ -598,7 +598,7 @@ self-contained (grafo interativo Cytoscape + veredito do `kg-radar.sh` embutido)
 `federation-console.sh` (zero backend, zero CDN, determinístico). Ver ≠ distribuir.
 
 **A IA que EXPLICA o grafo — narração pré-cozida** (ratificado no ADR *console rico do KG*,
-`docs/analysis/onion-adr-kg-console-rich-2026-07.md` — decisão de arquitetura core-only). O console evoluiu de
+`onion-adr-kg-console-rich-2026-07` (core-only) — decisão de arquitetura core-only). O console evoluiu de
 SVG estático para um grafo Cytoscape com **encoding epistêmico** (tamanho ∝ atenção, opacidade ∝
 confiança, borda por status, halo âmbar = stale, aresta por SUPPORTS/REFUTES⊣/SUPERSEDES⇢) e um
 **tour narrado** que conduz o leitor por atenção — a narrativa é o que torna o grafo grande legível

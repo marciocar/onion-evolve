@@ -9,7 +9,7 @@
 # model-switch.jsonl). Nunca veta (exit 0 sempre): é instrumento, não guarda. A leitura é a projeção
 # `bash .claude/validation/instructions-loaded-census.sh` (por arquivo × load_reason, N sessões).
 # Doutrina: podar por comportamento, nunca por contagem de linha — o censo só aponta CANDIDATAS (arquivo que só
-# carrega em session_start mas é doutrina de escopo; paths: que nunca casam). Protocolo: docs/analysis/poda-instrucoes-protocolo-2026-09.md
+# carrega em session_start mas é doutrina de escopo; paths: que nunca casam). Protocolo: `poda-instrucoes-protocolo-2026-09` (core-only)
 # =============================================================================
 input="$(cat 2>/dev/null || true)"
 [ -n "${input}" ] || exit 0

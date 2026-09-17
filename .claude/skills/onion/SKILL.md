@@ -111,7 +111,7 @@ Branch atual:
 3. **P2 — Semântica ou invocação explícita?** Domínio/expertise recorrente → **skill** (SKILL.md <500 linhas + `references/`/`scripts/` sob demanda — progressive disclosure). Ponto de entrada consciente `/nome` com juízo de quando → **comando** fino. Conhecimento de fundo lido pontual (doutrina/ADR) → **KB**. Especialista delegável → **agente** (`.claude/agents/<categoria>/`). Façade multi-provider → **abstração SDAAL** — mas só passando no **Teste do Eixo**: ≥2 implementações **reais** (não prometidas) · escolha do `.env`, não do autor · consumidor **precisa** ser cego. Falhou uma → **script** (P1). 1 provider real + N prometidos = script; o 2º provider real é o gatilho. Critério: [abstraction-doctrine](../../../docs/knowledge-base/concepts/onion-abstraction-doctrine.md).
 4. **P3 — Irreversível?** Muta estado externo sem undo (push --force, deploy, merge de release, bulk task-manager) → **+ gate humano** (camada ORTOGONAL — soma-se a qualquer caixa de P2).
 
-**Combinação canônica** (procedimento completo ≈ combinação, não átomo): script (controle) + comando (juízo) + KB/ADR (doutrina) + gate (se irreversível). Template no core: vertical `co-*` (`co-*.sh` + `co-*.md` + ADR + human-gate). Detalhe: [discovery S1](../../../docs/analysis/onion-toolbox-s1-scoping-2026-06.md).
+**Combinação canônica** (procedimento completo ≈ combinação, não átomo): script (controle) + comando (juízo) + KB/ADR (doutrina) + gate (se irreversível). Template no core: vertical `co-*` (`co-*.sh` + `co-*.md` + ADR + human-gate). Detalhe: `onion-toolbox-s1-scoping-2026-06` (core-only).
 
 ---
 

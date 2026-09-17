@@ -60,7 +60,7 @@ class LocalSlmAdapter implements IDeIdentifier {
 ## 🧭 Princípio de design
 
 - **Composição, não substituição:** o caminho robusto é `regex (formato fixo)` ⨉ `local-slm (contextual)` numa pipeline — determinístico primeiro, juízo depois.
-- **Schema fixo = caso ideal de SLM:** extração de PII com saída estruturada é exatamente onde um modelo pequeno ganha do gigante (10–30x mais barato), conforme `docs/analysis/panorama-ia-generativa-2026-06.md`.
+- **Schema fixo = caso ideal de SLM:** extração de PII com saída estruturada é exatamente onde um modelo pequeno ganha do gigante (10–30x mais barato), conforme `panorama-ia-generativa-2026-06` (core-only).
 
 ---
 
