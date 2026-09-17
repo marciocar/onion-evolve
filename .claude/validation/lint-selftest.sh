@@ -16546,7 +16546,19 @@ run_door_selftests() {
   else
     record_fail "door: (c)" "materialize-door abortou — a porta não monta"
   fi
-  rm -rf "${d3}" "${sb2}"
+  # (e) A MATERIALIZAÇÃO É AUTORITATIVA: arquivo que saiu do manifesto SAI da porta. Sem isto,
+  #     `tar -x` sobrepõe sem apagar e a porta segue publicando o que o core parou de enviar —
+  #     medido na 2ª materialização real, com as chaves de cliente sobrevivendo à própria exclusão.
+  local d4; d4="$(mktemp -d)"; rm -rf "${d4}"
+  if bash "${REPO_ROOT}/ops/materialize-door.sh" "${d4}" >/dev/null 2>&1; then
+    : > "${d4}/INTRUSO-DE-MATERIALIZACAO-ANTERIOR.md"
+    if bash "${REPO_ROOT}/ops/materialize-door.sh" "${d4}" >/dev/null 2>&1; then
+      if [ -f "${d4}/INTRUSO-DE-MATERIALIZACAO-ANTERIOR.md" ]; then
+        record_fail "door: (e)" "arquivo da materialização anterior SOBREVIVEU — a porta publicaria o que saiu do manifesto"
+      else record_pass "door: (e) materialização AUTORITATIVA (o que sai do manifesto sai da porta)"; fi
+    else record_fail "door: (e)" "2ª materialização abortou"; fi
+  else record_fail "door: (e)" "1ª materialização abortou"; fi
+  rm -rf "${d4}" "${d3}" "${sb2}"
 }
 
 # ── A PERNA DE LEITURA (hook kg-read-leg.sh + REGRA 84) ───────────────────────────────────────

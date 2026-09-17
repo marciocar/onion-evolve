@@ -80,3 +80,23 @@ curados no **#840**, não mergeado. Esta entrega **depende** daquela; empilhei.
 O `--check-bundle` (c) só enxerga id que esteja no `members.yaml`. Cliente **não registrado**
 continua invisível — é a mesma lacuna que a migalha `vendor-scrub-blind-spot` nomeia, e registrar
 adotante segue sendo ato de segurança.
+
+---
+
+# Adendo — a 2ª materialização achou o defeito que só a 2ª poderia achar
+
+Com as chaves já excluídas do transporte, re-materializei a porta. **Elas continuavam lá.**
+
+`tar -x` **sobrepõe, não apaga**. O manifesto novo não as traz, mas o destino guardava as da
+primeira vez — e a porta seguiria publicando **o que o core decidiu parar de enviar**, sem que nada
+avisasse. É a classe `exit-code-nao-e-a-verificacao` aplicada ao **estado**: o rc do `tar` diz que
+extraiu, não que o destino **espelha** o bundle.
+
+**Passo (0): a materialização vira AUTORITATIVA** — a superfície anterior é removida antes de
+extrair, com guarda de destino (só limpa diretório vazio ou que já pareça uma porta, para que um
+caminho digitado errado não vire `rm -rf` no que estivesse lá). O caso (e) da bancada prende isso
+com um intruso plantado entre duas materializações.
+
+**Este defeito só existe na segunda vez.** Uma bancada que materializasse uma vez daria verde para
+sempre — e o ciclo de re-materialização, que é a condição para a porta não envelhecer, é
+exatamente o que executa a segunda.

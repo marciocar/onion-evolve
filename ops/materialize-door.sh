@@ -56,6 +56,26 @@ if [ "${#SPEC[@]}" -eq 0 ]; then
   exit 3
 fi
 mkdir -p "${DEST}" || { echo "ERRO: não consegui criar ${DEST}" >&2; exit 3; }
+
+# ── (0) LIMPAR A SUPERFÍCIE ANTES DE EXTRAIR — `tar -x` não remove o que saiu do manifesto ───
+# Medido 2026-09-17, na SEGUNDA materialização: o core passou a EXCLUIR as chaves nomeadas por
+# cliente do transporte, o manifesto novo não as traz — e elas continuavam na porta, porque
+# `tar -x` sobrepõe mas não apaga. A porta seguiria publicando o que o core decidiu parar de
+# enviar, e nada avisaria. É a classe `exit-code-nao-e-a-verificacao` aplicada ao ESTADO: o rc do
+# tar diz que extraiu, não que o destino ESPELHA o bundle.
+# A materialização passa a ser AUTORITATIVA: o que não está no bundle não fica na porta.
+#
+# ⚠️ GUARDA DE DESTINO, porque isto apaga arquivos: só limpa diretório VAZIO ou que já pareça uma
+# porta (tem `.claude/`). Um caminho digitado errado não vira `rm -rf` no que quer que estivesse lá.
+if [ -n "$(ls -A "${DEST}" 2>/dev/null | grep -v '^\.git$' || true)" ]; then
+  if [ ! -d "${DEST}/.claude" ]; then
+    echo "ERRO: '${DEST}' não está vazio e não parece uma porta (sem .claude/). Recuse-se a limpar um destino desconhecido." >&2
+    exit 3
+  fi
+  find "${DEST}" -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} + || {
+    echo "ERRO: falha ao limpar a superfície anterior de ${DEST}" >&2; exit 3; }
+  echo "  (0) superfície anterior removida — a materialização é AUTORITATIVA (o que saiu do manifesto sai da porta)"
+fi
 git -C "${REPO_ROOT}" archive --format=tar HEAD -- "${SPEC[@]}" | tar -x -C "${DEST}" || {
   echo "ERRO: falha ao extrair o bundle" >&2; exit 3; }
 _n="$(find "${DEST}" -type f -not -path '*/.git/*' | wc -l)"
