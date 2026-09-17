@@ -2067,6 +2067,35 @@ check_model_version_fora_da_ssot() {
              \( -name '*.toml' -o -name '*.json' -o -name '*.yml' -o -name '*.yaml' -o -name '*.sh' \) -print 2>/dev/null || true)
 }
 
+
+# ===========================================================================
+# REGRA 84 — Índice de leitura do KG em sincronia com os traces [HARD]
+# previne: o hook da perna de leitura mentir POR OMISSÃO
+#   `docs/onion/kg-read-index.tsv` é PROJEÇÃO GERADA de todos os `trace:` do corpus, e é o
+#   que o hook `kg-read-leg.sh` consulta em 8 ms (gerar custa 7.722 ms — por isso é índice
+#   commitado, e não varredura ao vivo). Um índice defasado não faz o hook gritar errado:
+#   faz ele FICAR CALADO sobre um nó que existe. E calado é indistinguível de "não há grafo",
+#   que é exatamente o fail-open que a perna de leitura foi ligada para curar.
+#   Nó novo com `trace:` sem regenerar o índice = a perna de leitura nasce cega para ele.
+# ===========================================================================
+check_kg_read_index_sync() {
+  local idx="${REPO_ROOT}/docs/onion/kg-read-index.tsv"
+  local gen="${SCRIPT_DIR}/kg-trace-resolve.sh"
+  [ -f "${gen}" ] || return 0
+  if [ ! -f "${idx}" ]; then
+    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice AUSENTE — o hook da perna de leitura fica calado para o corpus inteiro. Gere: bash .claude/validation/kg-trace-resolve.sh . --emit-index > docs/onion/kg-read-index.tsv"
+    return
+  fi
+  local novo; novo="$(bash "${gen}" "${REPO_ROOT}" --emit-index 2>/dev/null || true)"
+  if [ -z "${novo}" ]; then
+    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): o GERADOR devolveu vazio — não regenere por cima (sobrescreveria o índice bom). Falha de ambiente ou parser: rode o gerador à mão e leia o stderr."
+    return
+  fi
+  if ! printf '%s\n' "${novo}" | LC_ALL=C diff -q - "${idx}" >/dev/null 2>&1; then
+    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice DEFASADO vs os \`trace:\` do corpus — o hook de leitura está cego para os nós que faltam. Regenere: bash .claude/validation/kg-trace-resolve.sh . --emit-index > docs/onion/kg-read-index.tsv"
+  fi
+}
+
 # ===========================================================================
 # REGRA 16 — Contagem de inventário-TOTAL divergente da SSOT [SOFT]
 # previne: contagem-TOTAL do inventário divergindo da SSOT
@@ -3840,6 +3869,7 @@ check_abstraction_methods_exist
 check_context_freshness_stamp
 check_inventory_total_drift
 check_model_version_fora_da_ssot
+check_kg_read_index_sync
 check_frontmatter_scalar_colon
 check_no_claude_docs
 check_evolution_links
