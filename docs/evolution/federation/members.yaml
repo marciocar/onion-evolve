@@ -280,9 +280,21 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/onion-core   # PÚBLICO desde 2026-09-17
     local_path: "/home/marcio/onion-core"
-    onion_version: ddb7cd3562cc   # pin da 2a materializacao (a 1a saiu sem raiz e com .pem de cliente no bundle)
+    # ⚠️ HISTORIA REESCRITA em 2026-09-17, e a razao e um VAZAMENTO MEDIDO: o baseline
+    #    `kb-vendored-link-baseline.txt` viajou POPULADO nas materializacoes anteriores, nomeando 22
+    #    caminhos CORE-PRIVADOS (dois ADRs, um RFC, o template de discussoes, uma mensagem de inbox)
+    #    num repo PUBLICO — exatamente a topologia que o `--stub-baselines` existe para reter.
+    #    A porta e PROJECAO GERADA: a historia dela nao tem valor autoral, entao a cura foi um commit
+    #    orfao unico + force-push, e nao ha nada a preservar nisso. LIMITE DECLARADO: o objeto antigo
+    #    segue acessivel por SHA ate o GC do GitHub, e quem clonou tem copia — o force-push torna
+    #    INALCANCAVEL, nunca inexistente.
+    onion_version: 79456b1e21de   # pin da 3a materializacao (historia orfa, baseline vazio, 714 arquivos)
     adopted_at: 2026-09-17
     mode: greenfield            # repo vazio -> materializacao pelo manifesto (nunca copia de disco)
+    # ⚠️ A PORTA NASCE COM 22 HARD DA REGRA 45, E ISSO E O ESTADO VERDADEIRO, NAO REGRESSAO. A
+    #    superficie vendorizada linka para caminhos core-privados, e o ledger que os tolerava so
+    #    funcionava NOMEANDO esses caminhos — era ele o vazamento. Acoplamento que ninguem tinha
+    #    declarado: a porta so fica verde quando a divida da REGRA 45 no core chegar a ZERO.
     personality_summary: "A porta pública do core: a maquinaria COMPLETA (comandos, agentes, skills, guardas, meta-fábrica) sem a biografia. Nasceu no dia em que o core foi fechado, e existe porque método viaja e história não. É PROJEÇÃO — não recebe PR; correção feita nela é sobrescrita na próxima materialização."
     specializations: [public-door, full-machinery, hub-role, deterministic-guards]
     personality_last_sync: 2026-09-17
