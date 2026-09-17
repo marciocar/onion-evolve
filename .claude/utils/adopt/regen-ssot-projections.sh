@@ -54,8 +54,16 @@ _n=0 _vazias=""
 # `testing-state.md` depois de a REGRA 81 reprovar QUATRO vezes; à noite a REGRA 80 reprovou pelo
 # mesmo motivo com `testing-inventory.md`, que eu também não tinha posto. Curar UM item de uma
 # lista que devia ser completa é curar o caso, não a classe — e a classe cobra de novo no mesmo dia.
-# CRITÉRIO, para não haver terceira: TODA projeção gerada com catraca no lint pertence a esta lista.
-# Hoje são quatro (REGRAS 8, 21, 80, 81) mais o índice de leitura (REGRA 84, fora do laço por ser TSV).
+# ⚠️ 3ª AMPLIAÇÃO — E O CRITÉRIO EM PROSA NÃO IMPEDIU (2026-09-17). A linha abaixo dizia "para não
+# haver terceira", e houve: `lint-rules.md` (REGRA 39) é projeção gerada com catraca no lint e não
+# estava aqui — a REGRA 86 entrou no registro e o gate reprovou pelo MESMO motivo, terceira vez.
+# O que isso ensina não é sobre esta lista, é sobre CRITÉRIO ESCRITO: ele descreve o dever e não o
+# executa. A cura de verdade é a bancada `regen_completude`, que DERIVA o conjunto esperado das
+# próprias mensagens do lint (toda violação que diz "regenere: bash .claude/validation/<gen>" nomeia
+# um par projeção↔gerador) e reprova quando um par não é coberto por este script. Lista conferida
+# por máquina, nunca por quem lembrou.
+# CRITÉRIO: TODA projeção gerada com catraca no lint pertence a esta lista.
+# Hoje são cinco (REGRAS 8, 21, 39, 80, 81) mais o índice de leitura (REGRA 84, fora do laço por ser TSV).
 for _pair in "inventory.sh:inventory.md" "graph.sh:graph.md" "testing-state.sh:testing-state.md" "harness-inventory.sh:testing-inventory.md"; do
   _gen="${_pair%%:*}"; _out="${_pair##*:}"
   [ -f "${DEST}/.claude/validation/${_gen}" ] || continue
@@ -70,6 +78,17 @@ for _pair in "inventory.sh:inventory.md" "graph.sh:graph.md" "testing-state.sh:t
     _vazias="${_vazias} ${_out}"
   fi
 done
+
+# `lint-rules.md` fica FORA do laço por duas diferenças de forma, não por ser menos importante:
+# ele nasce em `.claude/validation/` (não em `docs/onion/`) e o gerador não toma `--markdown`.
+if [ -f "${DEST}/.claude/validation/rules-registry.sh" ]; then
+  _lr="$(bash "${DEST}/.claude/validation/rules-registry.sh" 2>/dev/null)" || _lr=""
+  if [ -n "${_lr}" ]; then
+    printf '%s\n' "${_lr}" > "${DEST}/.claude/validation/lint-rules.md"; _n=$((_n + 1))
+  else
+    _vazias="${_vazias} lint-rules.md"   # NÃO sobrescreve com vazio: o registro bom vale mais que um 0-byte
+  fi
+fi
 
 # ⚠️ O `|| true` do laço FICA (gerador que falha por ambiente do alvo não derruba a adoção — o lint
 # de lá cobra depois, com mensagem própria). O que NÃO pode é ESTE script declarar sucesso sem ter

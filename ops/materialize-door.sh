@@ -56,6 +56,26 @@ if [ "${#SPEC[@]}" -eq 0 ]; then
   exit 3
 fi
 mkdir -p "${DEST}" || { echo "ERRO: não consegui criar ${DEST}" >&2; exit 3; }
+
+# ── (0) LIMPAR A SUPERFÍCIE ANTES DE EXTRAIR — `tar -x` não remove o que saiu do manifesto ───
+# Medido 2026-09-17, na SEGUNDA materialização: o core passou a EXCLUIR as chaves nomeadas por
+# cliente do transporte, o manifesto novo não as traz — e elas continuavam na porta, porque
+# `tar -x` sobrepõe mas não apaga. A porta seguiria publicando o que o core decidiu parar de
+# enviar, e nada avisaria. É a classe `exit-code-nao-e-a-verificacao` aplicada ao ESTADO: o rc do
+# tar diz que extraiu, não que o destino ESPELHA o bundle.
+# A materialização passa a ser AUTORITATIVA: o que não está no bundle não fica na porta.
+#
+# ⚠️ GUARDA DE DESTINO, porque isto apaga arquivos: só limpa diretório VAZIO ou que já pareça uma
+# porta (tem `.claude/`). Um caminho digitado errado não vira `rm -rf` no que quer que estivesse lá.
+if [ -n "$(ls -A "${DEST}" 2>/dev/null | grep -v '^\.git$' || true)" ]; then
+  if [ ! -d "${DEST}/.claude" ]; then
+    echo "ERRO: '${DEST}' não está vazio e não parece uma porta (sem .claude/). Recuse-se a limpar um destino desconhecido." >&2
+    exit 3
+  fi
+  find "${DEST}" -mindepth 1 -maxdepth 1 ! -name '.git' -exec rm -rf {} + || {
+    echo "ERRO: falha ao limpar a superfície anterior de ${DEST}" >&2; exit 3; }
+  echo "  (0) superfície anterior removida — a materialização é AUTORITATIVA (o que saiu do manifesto sai da porta)"
+fi
 git -C "${REPO_ROOT}" archive --format=tar HEAD -- "${SPEC[@]}" | tar -x -C "${DEST}" || {
   echo "ERRO: falha ao extrair o bundle" >&2; exit 3; }
 _n="$(find "${DEST}" -type f -not -path '*/.git/*' | wc -l)"
@@ -97,6 +117,131 @@ if [ -n "${_leak}" ]; then
   exit 1
 fi
 echo "  (4) varredura independente: nenhum ponteiro a documento privado nomeado"
+
+# ── (5) A RAIZ DA PORTA — o que o manifesto não leva porque o adotante não deve receber ──────
+# Medido 2026-09-17, na 1ª materialização real: a porta subiu com README, LICENSE, CLAUDE.md e
+# AGENTS.md AUSENTES — 4 de 4. Repo público sem README é ruim de receber; sem LICENSE é pior, e
+# não por estilo: SEM licença o padrão legal é "todos os direitos reservados", o oposto do que uma
+# porta existe para dizer. E sem CLAUDE.md o Onion não se apresenta a quem clona.
+#
+# ⚠️ AQUI O `LICENSE` NU É CORRETO, e no adotante seria ERRADO — a diferença é de OBJETO. No repo
+# do cliente, um `LICENSE` na raiz rege O REPOSITÓRIO INTEIRO, inclusive o código que ele ainda vai
+# escrever: por isso o `emit-licenses.sh` entrega `LICENSE-ONION` lá. Na PORTA, o repositório É o
+# Onion; um `LICENSE-ONION` ali seria a evasiva, não a proteção.
+_slug="$(basename "${DEST}")"
+_pin_ph="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD)"
+cp "${REPO_ROOT}/LICENSE" "${DEST}/LICENSE" 2>/dev/null || echo "  (5) AVISO: LICENSE do core não encontrada" >&2
+cp "${REPO_ROOT}/LICENSE-DOCS" "${DEST}/LICENSE-DOCS" 2>/dev/null || true
+cat > "${DEST}/README.md" <<README
+# 🧅 Onion — a maquinaria
+
+> **Este repositório é uma PROJEÇÃO, não a fonte.** Ele é materializado do core por
+> \`ops/materialize-door.sh\` e **não recebe PR** — uma correção feita aqui é sobrescrita na próxima
+> materialização. O caminho de contribuição é o canal de sinais descrito em \`docs/evolution/\`.
+
+O Onion é um framework de método executável para Claude Code: comandos invocáveis, agentes
+especializados, skills e — o que o distingue — **guardas determinísticas** que reprovam em CI. Ele
+cobre três dimensões peer do ciclo: produto, engenharia e compliance.
+
+## O que está aqui, e o que não está
+
+**Está:** a maquinaria completa — \`.claude/\` (comandos, agentes, skills, hooks, utils, validation),
+as meta-specs e a knowledge base.
+
+**Não está, e é desenho:** a **biografia** do core — diário, análises, discussões, registro da
+federação e materiais. Método viaja; história, não. A allowlist que decide isso é
+\`.claude/utils/adopt/vendor-manifest.sh\`, e ela falha FECHADA: o que não está declarado não viaja.
+
+## Como usar
+
+\`\`\`bash
+git clone https://github.com/marciocar/${_slug}.git
+cd ${_slug} && claude
+\`\`\`
+
+Depois, \`/warm-up\` para o contexto e \`/onion\` para a orientação. As guardas rodam com
+\`bash .claude/validation/lint-artifacts.sh\`.
+
+## Licenças
+
+**Código** (\`.claude/**\`, scripts): MIT — \`LICENSE\`.
+**Documentação e doutrina** (\`docs/**\`): CC BY-NC 4.0 — \`LICENSE-DOCS\`.
+
+---
+
+Materializado do core no pin \`${_pin_ph}\` · papel \`${ROLE}\`.
+README
+
+cat > "${DEST}/CLAUDE.md" <<CLAUDEMD
+# 🧅 Sistema Onion
+
+Este repositório **é** o Onion: um framework de método executável em \`.claude/\`.
+
+- **Comandos** em \`.claude/commands/\` por categoria · **agentes** em \`.claude/agents/<categoria>/\`
+- **Guardas determinísticas** em \`.claude/validation/\` — rode \`bash .claude/validation/lint-artifacts.sh\`
+- **Contagens canônicas** vivem em \`docs/onion/inventory.md\` (SSOT gerada do filesystem). Nunca
+  edite os números à mão; rode \`/meta:inventory\`.
+
+## Idioma
+
+Chat, comentários, documentação e mensagens: **pt-BR**. Código, variáveis, nomes de arquivo e de
+branch, e o prefixo Conventional dos commits: **inglês**.
+
+## O que este repositório NÃO tem
+
+É uma **projeção** do core: a biografia (diário, análises, discussões, registro da federação) não
+viaja por desenho. Se um comando citar um documento marcado \`(core-only)\`, ele existe — no core
+privado, e não aqui.
+CLAUDEMD
+echo "  (5) raiz da porta: README.md · CLAUDE.md · LICENSE · LICENSE-DOCS"
+
+# ── (6) A PORTA PRECISA SABER QUEM É, E TER AS PROJEÇÕES QUE AS PRÓPRIAS GUARDAS COBRAM ──────
+# Os três achados vieram da 1ª sessão REAL dentro da porta (`/warm-up`, 2026-09-17) — não de mim:
+#
+#  (a) `onion-version.sh` respondia `role: source` NA PORTA. O fallback sem stamp é `source` por
+#      desenho (repo-fonte não carrega stamp), e a porta não tinha stamp — então ela se
+#      APRESENTAVA COMO A FONTE, contradizendo o próprio README que diz "PROJEÇÃO, não a fonte".
+#      Identidade errada não é cosmética: comandos que decidem por papel (co-relay, adopt, publish)
+#      passam a decidir errado.
+#  (b) LINT DA PORTA: 41 HARD, 22 deles REGRA 45 (Link vendorizado não aponta caminho core-privado,
+#      com catraca). O `--stub-baselines` esvazia o baseline — que é certo, o passivo do core não é
+#      dívida do alvo — mas NINGUÉM o re-emitia do corpus da porta. Metade da cura entregue é cura
+#      nenhuma: a porta nascia vermelha no próprio gate que ela distribui.
+#  (c) `docs/onion/` não viaja (é biografia+projeção do core), mas as REGRAS 8 e 21 cobram
+#      `inventory.md` e `graph.md` — e o CLAUDE.md que este script escreve MANDAVA lê-los. A porta
+#      apontava para um arquivo que ela não tinha.
+#
+# Os três se curam com helpers que JÁ EXISTEM. Escrever um quarto seria a quarta cópia.
+mkdir -p "${DEST}/.claude"
+cat > "${DEST}/.claude/.onion-version" <<STAMP
+# Carimbo de identidade da PORTA — escrito por ops/materialize-door.sh.
+# Sem ele o onion-version.sh cai no fallback 'source' e a porta se declara a FONTE.
+role: ${ROLE}
+adopted_from: ${_slug}
+onion_version: ${_pin_ph}
+materialized_at: $(date -u +%Y-%m-%d)
+STAMP
+echo "  (6) carimbo de identidade: role=${ROLE} (sem ele a porta se declara 'source')"
+
+# `settings.json` NÃO está no manifesto — e é deliberado: ele carrega hooks e permissões da
+# INSTÂNCIA, e um adotante não deve herdar as do core. Mas TRÊS docs que viajam o citam em
+# backtick, e a REGRA 48 (Referência de caminho `.claude/…` em backtick (prosa) que não resolve)
+# reprova ponteiro morto. O `/meta:adopt` resolve isso no passo (1) da Configuração pós-cópia, com
+# MERGE never-clobber; a porta não tinha passo equivalente e nascia com 3 HARD.
+# Aqui a cópia é DIRETA, e a diferença é de objeto: a porta não tem instância prévia a preservar —
+# ela É a materialização. Never-clobber protegeria um estado que não existe.
+if [ ! -f "${DEST}/.claude/settings.json" ] && [ -f "${REPO_ROOT}/.claude/settings.json" ]; then
+  cp "${REPO_ROOT}/.claude/settings.json" "${DEST}/.claude/settings.json"
+  echo "  (6) settings.json copiado (3 docs que viajam o citam; sem ele a REGRA 48 reprova ponteiro morto)"
+fi
+
+if [ -f "${DEST}/.claude/utils/adopt/regen-ssot-projections.sh" ]; then
+  bash "${DEST}/.claude/utils/adopt/regen-ssot-projections.sh" "${DEST}" 2>&1 | sed 's/^/  (6) /' || true
+fi
+if [ -f "${DEST}/.claude/utils/adopt/regen-baselines.sh" ]; then
+  # As catracas do core foram esvaziadas no passo (2); aqui elas renascem do corpus DA PORTA.
+  bash "${DEST}/.claude/utils/adopt/regen-baselines.sh" "${DEST}" 2>&1 | tail -2 | sed 's/^/  (6) /' || true
+fi
 
 _pin="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD)"
 cat <<FIM

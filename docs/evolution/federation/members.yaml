@@ -267,6 +267,33 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  # PORTA PÚBLICA DO CORE (nasceu 2026-09-17, no mesmo movimento em que o core FECHOU). É a face
+  # que distribui a maquinaria COMPLETA — papel `hub`, meta-fábrica inclusa — sem a biografia.
+  # Materializada por `ops/materialize-door.sh`, que é AUTORITATIVO: o que sai do manifesto sai da
+  # porta. O `onion_version` abaixo é o pin de onde ela foi materializada, e é o que a guarda de
+  # ciclo compara contra a superfície que viaja — porta sem re-materialização envelhece, e o
+  # `onion-standalone` (372 commits atrás, medido 2026-09-17) é a prova de que isso acontece.
+  - id: onion-core
+    name: onion-core (porta pública do core — maquinaria completa, papel hub, sem biografia)
+    role: standalone            # T3 — recebe o bundle, não adota um projeto
+    kind: door          # DISTRIBUI a maquinaria; o proposito e ser a face publica do core
+    parent: onion-evolve
+    remote: github.com/marciocar/onion-core   # PÚBLICO desde 2026-09-17
+    local_path: "/home/marcio/onion-core"
+    onion_version: ddb7cd3562cc   # pin da 2a materializacao (a 1a saiu sem raiz e com .pem de cliente no bundle)
+    adopted_at: 2026-09-17
+    mode: greenfield            # repo vazio -> materializacao pelo manifesto (nunca copia de disco)
+    personality_summary: "A porta pública do core: a maquinaria COMPLETA (comandos, agentes, skills, guardas, meta-fábrica) sem a biografia. Nasceu no dia em que o core foi fechado, e existe porque método viaja e história não. É PROJEÇÃO — não recebe PR; correção feita nela é sobrescrita na próxima materialização."
+    specializations: [public-door, full-machinery, hub-role, deterministic-guards]
+    personality_last_sync: 2026-09-17
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
   # PORTE PARA OUTRO SUBSTRATO (não adotante, não destilação) — o Onion traduzido para OpenAI Codex
   # (`.codex/` + `.agents/skills/` no lugar de `.claude/`). REGISTRADO em 2026-09-16, e o registro é
   # ATO DE SEGURANÇA, não burocracia: repo PÚBLICO cujo nome começa em `onion-` é invisível à

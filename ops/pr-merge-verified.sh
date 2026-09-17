@@ -25,13 +25,32 @@
 #           merge recusado, 2026-08-26). Superação de sync-only-after-merge-succeeds, virada mecanismo.
 set -uo pipefail
 
-PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch]}"; shift || true
+PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch] [--dispensa <check> --motivo <texto>]}"; shift || true
 REPO_ARG=()
 DEL=(--delete-branch)
 DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ramo do merge PROVADO
+
+# ── ESCAPE NOMEADO: dispensar UM check, com registro (2026-09-17) ────────────────────────
+# O maestro autorizou mergear sem a revisão semântica quando o gate DETERMINÍSTICO está
+# verde — "com o escape registrando qual check foi dispensado". O desenho abaixo existe para
+# que isso NÃO vire override geral, que é como toda válvula dessas morre:
+#   · só dispensa check que se DECLARA informativo (a lista abaixo, não qualquer nome);
+#   · o check dispensado tem de estar de fato FALHANDO — dispensa preventiva é recusada;
+#   · qualquer OUTRO check falho continua matando o merge;
+#   · `--motivo` é obrigatório, e o registro vai para o PR (comentário) ANTES do merge —
+#     se o registro falhar, o merge não acontece. Registro é precondição, não cortesia:
+#     dispensa que só existe no terminal de quem mergeou é dispensa que ninguém audita.
+# A lista é curta DE PROPÓSITO. Ampliá-la é ato deliberado, com o porquê escrito aqui.
+#   onion-review-verdict → ele próprio diz de si: "não bloqueia o merge — informa. A decisão
+#   de mergear sem revisão semântica é humana e deve ser consciente". O escape é a forma
+#   CONSCIENTE dessa decisão; sem ele, o caminho real vira mergear por fora do gate.
+_DISPENSAVEIS=(onion-review-verdict)
+DISPENSA=(); MOTIVO=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
+    --dispensa) DISPENSA+=("${2:?--dispensa exige o NOME do check}"); shift 2 ;;
+    --motivo) MOTIVO="${2:?--motivo exige texto}"; shift 2 ;;
     # BASE DE STACK: apagar a branch da base FECHA o PR filho (não re-aponta) — está
     # registrado como mecânica de stack desde 2026-07. Ao mergear uma base com PR
     # empilhado em cima, use --keep-branch; o GitHub re-aponta o filho, e a branch se
@@ -44,6 +63,20 @@ done
 
 say() { printf '  %s\n' "$*"; }
 die() { printf '✗ %s\n' "$*"; exit 1; }
+
+_em() { # $1=agulha, resto=palheiro → 0 se presente
+  local a="$1"; shift
+  local x; for x in "$@"; do [ "$x" = "$a" ] && return 0; done; return 1
+}
+_dispensado() { [ "${#DISPENSA[@]}" -eq 0 ] && return 1; _em "$1" "${DISPENSA[@]}"; }
+
+if [ "${#DISPENSA[@]}" -gt 0 ]; then
+  [ -n "$MOTIVO" ] || die "--dispensa exige --motivo: dispensa sem razão escrita é override, e override não se audita"
+  for _d in "${DISPENSA[@]}"; do
+    _em "$_d" "${_DISPENSAVEIS[@]}" \
+      || die "check '${_d}' NÃO é dispensável — a lista é [${_DISPENSAVEIS[*]}], e só entra nela check que se declara informativo. Ampliar é ato deliberado: edite _DISPENSAVEIS com o porquê."
+  done
+fi
 
 # 1+2 — checks e a FONTE do veredito
 # ⚠️ `gh pr checks` sai NÃO-ZERO quando algum check FALHOU (e 8 quando há pendente) — não só
@@ -81,22 +114,50 @@ head_runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?per_page
 [ -z "$head_runs" ] && die "ZERO check-runs registrados para o head ${HEAD_SHA:0:8} — provável janela pós-push; espere os checks nascerem (a corrida do #634)"
 printf '%s\n' "$head_runs" | awk -F'\t' '$2!="completed"{exit 1}' \
   || die "check-run do head ${HEAD_SHA:0:8} ainda não-completo — merge recusado (esperar não é opcional)"
-printf '%s\n' "$head_runs" | awk -F'\t' '$3=="failure"||$3=="cancelled"||$3=="timed_out"{exit 1}' \
-  || die "check-run do head ${HEAD_SHA:0:8} concluiu em falha — merge recusado"
-say "✓ check-runs ancorados no head ${HEAD_SHA:0:8}: todos completos, nenhum falho"
+# Falhos do head, um por linha — e a dispensa é aplicada NOME A NOME, nunca em bloco.
+_falhos="$(printf '%s\n' "$head_runs" | awk -F'\t' '$3=="failure"||$3=="cancelled"||$3=="timed_out"{print $1}')"
+_nao_dispensados=""
+while IFS= read -r _f; do
+  [ -n "$_f" ] || continue
+  _dispensado "$_f" || _nao_dispensados="${_nao_dispensados}${_f} "
+done <<< "$_falhos"
+[ -n "${_nao_dispensados// /}" ] \
+  && die "check-run do head ${HEAD_SHA:0:8} concluiu em falha e NÃO foi dispensado: ${_nao_dispensados}— merge recusado"
+# Dispensa PREVENTIVA é recusada: só se dispensa o que de fato está falhando agora.
+for _d in "${DISPENSA[@]:-}"; do
+  [ -n "$_d" ] || continue
+  printf '%s\n' "$_falhos" | grep -qxF "$_d" \
+    || die "'--dispensa ${_d}' recusada: esse check NÃO está falhando no head ${HEAD_SHA:0:8}. Dispensa preventiva é cheque em branco para a próxima vez que ele falhar."
+done
+if [ "${#DISPENSA[@]}" -gt 0 ]; then
+  say "⚠️  check(s) DISPENSADO(S) por decisão humana: ${DISPENSA[*]}"
+  say "    motivo: ${MOTIVO}"
+else
+  say "✓ check-runs ancorados no head ${HEAD_SHA:0:8}: todos completos, nenhum falho"
+fi
 
 checks="$(gh pr checks "$PR" "${REPO_ARG[@]}" 2>&1)"
 GHRC=$?
 [ -z "$checks" ] && die "não consegui ler os checks do PR #${PR} (saída vazia, rc=${GHRC})"
 printf '%s\n' "$checks" | sed 's/^/  /'
 printf '%s\n' "$checks" | awk '{print $2}' | grep -q pending && die "há check PENDENTE — merge recusado (esperar não é opcional)"
-printf '%s\n' "$checks" | awk '{print $2}' | grep -q fail && die "há check FALHO — merge recusado"
+# mesma leitura pelo 2º ângulo (`gh pr checks`), com a MESMA dispensa nome-a-nome
+_f2="$(printf '%s\n' "$checks" | awk '$2=="fail"{print $1}')"
+_n2=""
+while IFS= read -r _f; do
+  [ -n "$_f" ] || continue
+  _dispensado "$_f" || _n2="${_n2}${_f} "
+done <<< "$_f2"
+[ -n "${_n2// /}" ] && die "há check FALHO não dispensado: ${_n2}— merge recusado"
 
 verdict="$(gh pr view "$PR" "${REPO_ARG[@]}" --json statusCheckRollup \
   --jq '.statusCheckRollup[] | select(.name=="onion-review-verdict") | (.conclusion // .state)' 2>/dev/null)"
 if [ -z "$verdict" ]; then
   say "⚠️  sem linha 'onion-review-verdict' neste repo — a revisão adversarial NÃO foi medida aqui."
   say "    (repos sem o gate: o resíduo da REGRA 56 e a passada humana são a única cobertura)"
+elif [ "$verdict" != "SUCCESS" ] && _dispensado onion-review-verdict; then
+  say "⚠️  onion-review-verdict = ${verdict} — DISPENSADO por decisão humana, não aprovado."
+  say "    O gate determinístico (lint + bancada) é a cobertura que sobra; a semântica NÃO foi medida."
 elif [ "$verdict" != "SUCCESS" ]; then
   die "onion-review-verdict = ${verdict} — o revisor NÃO aprovou (o 'pass' do onion-review é soft e não vale)"
 else
@@ -114,6 +175,30 @@ fi
 # corrida vive (outra pessoa, --auto, merge queue). Um mergedAt ANTERIOR a t0 nao pode ser deste
 # run. Tolerancia de 300s para desvio de relogio entre esta maquina e o GitHub — e se a data nao
 # for parseavel, FAIL-CLOSED (nao declaro o que nao consigo datar).
+# ── REGISTRO DA DISPENSA — PRECONDIÇÃO DO MERGE, não cortesia ────────────────────────────
+# A dispensa vive no PR, onde qualquer um a lê depois, e não no terminal de quem mergeou. Se o
+# comentário não for postado, o merge NÃO acontece: uma dispensa que ninguém consegue auditar é
+# indistinguível de um merge por fora do gate — que é exatamente o que este escape existe para
+# evitar. O comentário nomeia O CHECK, o MOTIVO e o HEAD, porque "dispensei um check" sem dizer
+# qual é a mesma classe de declaração vazia que este script inteiro combate.
+if [ "${#DISPENSA[@]}" -gt 0 ]; then
+  _reg="$(printf '%s\n' \
+    "## ⚠️ Merge com check DISPENSADO" \
+    "" \
+    "Este PR foi mergeado por \`ops/pr-merge-verified.sh\` com dispensa **nomeada** de check." \
+    "" \
+    "| | |" \
+    "|---|---|" \
+    "| check(s) dispensado(s) | \`${DISPENSA[*]}\` |" \
+    "| motivo | ${MOTIVO} |" \
+    "| head | \`${HEAD_SHA}\` |" \
+    "" \
+    "Os demais checks do head passaram — a dispensa é **nome a nome**, e qualquer outro check falho teria recusado o merge. O que este check mediria **não foi medido**." )"
+  gh pr comment "$PR" "${REPO_ARG[@]}" --body "$_reg" >/dev/null 2>&1 \
+    || die "não consegui REGISTRAR a dispensa no PR #${PR} — merge abortado. O registro é precondição: dispensa que só existe no meu terminal não se audita."
+  say "✓ dispensa registrada no PR #${PR} (comentário), antes do merge"
+fi
+
 t0="$(date -u +%s)"
 merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --rebase "${DEL[@]}" 2>&1)"; rc=$?
 if [ "$rc" -ne 0 ]; then

@@ -305,10 +305,57 @@ _rule_label() {   # $1 = mensagem · $2 = função chamadora → mensagem com "R
   esac
 }
 
+# ══ RECORTE POR PAPEL — "não pude julgar" não é a mesma coisa em todo repo ════════════════════
+# Medido 2026-09-17, na 1ª sessão REAL dentro da porta pública: o lint dela acusava HARD em guardas
+# que declaravam honestamente NÃO TER JULGADO — sem `.kg.yaml`, sem `members.yaml`, sem PR. As
+# guardas estavam certas em não passar em silêncio; erradas em tratar AUSÊNCIA LEGÍTIMA como
+# defeito. Uma porta que não recebe o corpus do core não pode ser cobrada pela validade dele.
+#
+# ⚠️ E NÃO VIRA SILÊNCIO — seria trocar um fail-closed por um fail-open. Vira SOFT com classe
+# PRÓPRIA (`[papel/SEM-OBJETO]`), que aparece no sumário, é contável, e diz o papel e a classe. A
+# distinção que importa: no repo-FONTE a mesma ausência continua HARD, porque ali ela É defeito.
+_PAPEL_DESTE_REPO=""
+_papel() {
+  [ -n "${_PAPEL_DESTE_REPO}" ] && { printf '%s' "${_PAPEL_DESTE_REPO}"; return; }
+  # ⚠️ LÊ O STAMP DIRETO, não invoca o `onion-version.sh`. Duas razões, e a segunda é a que me
+  # custou uma depuração: (1) `violation()` roda centenas de vezes e cada chamada abriria um bash;
+  # (2) o predicado é consultado de DENTRO de `$( )`, e ali o cache nunca persiste — o custo vira
+  # o caminho quente. O stamp é a mesma fonte que o `onion-version.sh` lê; ler o dado é mais
+  # barato e mais previsível que perguntar ao script que o lê.
+  local stamp="${REPO_ROOT}/.claude/.onion-version"
+  if [ -f "${stamp}" ]; then
+    _PAPEL_DESTE_REPO="$(awk '/^role:/{print $2; exit}' "${stamp}" 2>/dev/null)"
+  fi
+  [ -n "${_PAPEL_DESTE_REPO}" ] || _PAPEL_DESTE_REPO="source"
+  printf '%s' "${_PAPEL_DESTE_REPO}"
+}
+# A ausência só é LEGÍTIMA se o objeto de fato não existe E o papel não é a fonte. Existir-e-estar-
+# quebrado continua HARD em qualquer papel: o recorte é sobre NÃO RECEBER, nunca sobre "está ruim".
+_sem_objeto_no_papel() {
+  local msg="$1"
+  [ "$(_papel)" = "source" ] && return 1
+  case "${msg}" in
+    *kg-selo/ISENCAO*|*kg-parity/NAO-MEDIDO*|*kg-yaml/NAO-VERIFICADO*|*kg-verificacao/*)
+      [ -z "$(git -C "${REPO_ROOT}" ls-files '*.kg.yaml' 2>/dev/null | head -1)" ] && return 0 ;;
+    *review-artifact/ISENCAO*)
+      return 0 ;;   # PR é do fluxo do core; porta/adotante não tem o mesmo objeto
+    *REGRA\ 85*|*door-staleness*)
+      [ ! -f "${REPO_ROOT}/docs/evolution/federation/members.yaml" ] && return 0 ;;
+    *frescor-doutrinário/CATRACA-INDISPONIVEL*)
+      return 0 ;;   # a catraca do core nasce do corpus DELE; o alvo emite a própria
+  esac
+  return 1
+}
+
 violation() {
   local severity="$1"   # HARD | SOFT
   local file="$2"
   local rule="$3"
+
+  if [ "${severity}" = "HARD" ] && _sem_objeto_no_papel "${rule}"; then
+    severity="SOFT"
+    rule="[papel/SEM-OBJETO] papel '$(_papel)' não recebe o objeto desta guarda — ${rule}"
+  fi
 
   # Caminho relativo à raiz do repo para mensagens mais legíveis
   local rel_file="${file#${REPO_ROOT}/}"
@@ -955,6 +1002,57 @@ check_branch_agent_distinction() {
 # lint-selftest é uma CÓPIA sem `.git` — ali `git ls-files` falha e TODO glob pareceria
 # morto, reprovando até a fixture `good`. Falso-positivo medido no dogfood, 2026-08-03:
 # a guarda acusaria a si mesma no próprio auto-teste. Fora de repo git, cai para `find`.
+_glob_literal_prefix() { # $1=glob → maior prefixo SEM curinga ('' se o glob já começa com um)
+  local g="$1" acc="" seg
+  # `set -f` NÃO é zelo: a expansão sem aspas abaixo sofre PATHNAME EXPANSION, e o argumento é
+  # literalmente um glob — sem isto, `docs/evolution/research/**` viraria a lista de arquivos do cwd.
+  local _noglob=1; case "$-" in *f*) _noglob=0 ;; esac
+  set -f
+  local IFS=/
+  for seg in ${g}; do
+    case "${seg}" in *'*'*|*'?'*|*'['*) break ;; esac
+    [ -n "${seg}" ] || continue
+    acc="${acc:+${acc}/}${seg}"
+  done
+  [ "${_noglob}" -eq 1 ] && set +f
+  printf '%s' "${acc}"
+}
+
+# As raízes que o TRANSPORTE declara viajar — SSOT única (`vendor-manifest.sh --emit-scrub-roots`),
+# nunca uma lista repetida aqui. FAIL-CLOSED: manifesto ausente/vazio devolve vazio, e quem consulta
+# trata isso como "não sei" — ou seja, NÃO concede isenção nenhuma.
+_superficie_que_viaja() {
+  [ -n "${_SURF_VIAJA_CACHE:-}" ] && { printf '%s' "${_SURF_VIAJA_CACHE}"; return 0; }
+  local mf="${CLAUDE_DIR}/utils/adopt/vendor-manifest.sh"
+  if [ -f "${mf}" ]; then
+    _SURF_VIAJA_CACHE="$(bash "${mf}" --emit-scrub-roots 2>/dev/null)" || _SURF_VIAJA_CACHE=""
+  else
+    _SURF_VIAJA_CACHE=""
+  fi
+  printf '%s' "${_SURF_VIAJA_CACHE}"
+}
+
+# Verdadeiro quando NENHUM glob desta regra aponta para superfície que viaja — isto é, o objeto da
+# regra é core-only e, num alvo, ela é estruturalmente incapaz de casar. No papel `source` a árvore é
+# completa: ali a mesma ausência continua HARD (é regra morta de verdade, não falta de objeto).
+_regra_sem_objeto_no_papel() { # $1=globs (um por linha)
+  [ "$(_papel)" = "source" ] && return 1
+  local surf g prefix r dentro=0
+  surf="$(_superficie_que_viaja)"
+  [ -n "${surf}" ] || return 1          # fail-closed: sem SSOT do transporte, não se concede isenção
+  while IFS= read -r g; do
+    [ -n "${g}" ] || continue
+    prefix="$(_glob_literal_prefix "${g}")"
+    [ -n "${prefix}" ] || return 1      # glob que começa em curinga varre o repo todo: tem objeto aqui
+    while IFS= read -r r; do
+      [ -n "${r}" ] || continue
+      case "${prefix}/" in "${r}/"*) dentro=1; break ;; esac
+    done <<< "${surf}"
+    [ "${dentro}" -eq 1 ] && return 1   # ao menos um glob mira superfície que viaja → cobrança válida
+  done <<< "$1"
+  return 0
+}
+
 _rule_glob_matches() { # $1=glob
   local g="$1" pat _ls
   if git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
@@ -975,9 +1073,25 @@ _rule_glob_matches() { # $1=glob
     [ -n "${_ls}" ] && return 0
     return 1
   fi
-  pat="${g##*/}"                                   # '**/*.kg.yaml' → '*.kg.yaml'
-  [ -n "${pat}" ] || return 1
-  find "${REPO_ROOT}" -name "${pat}" -not -path '*/.git/*' -print -quit | grep -q .
+  # ⚠️ RAMO NÃO-GIT — e ele MENTIU (2026-09-17, medido). A forma anterior era
+  # `find "${REPO_ROOT}" -name "${g##*/}"`, e `${g##*/}` de `docs/evolution/research/**` é `**`:
+  # um `-name '**'` casa QUALQUER arquivo do repo. Resultado: num destino sem `git init` toda regra
+  # path-scoped passava trivialmente. Foi exatamente assim que um dogfood da porta declarou
+  # "0 HARD" enquanto a porta real (repo git) reprovava — a guarda dava vereditos OPOSTOS nos dois
+  # substratos, e o barato era o que eu media. Classe [[testar-no-caminho-errado-e-nao-testar]].
+  # Agora o ramo não-git respeita o PREFIXO literal do glob, como o pathspec do git faz.
+  local prefix root _hit
+  prefix="$(_glob_literal_prefix "${g}")"
+  root="${REPO_ROOT}${prefix:+/${prefix}}"
+  [ -e "${root}" ] || return 1
+  pat="${g##*/}"
+  case "${pat}" in
+    ''|'*'|'**')                                   # sufixo puro-curinga: basta haver arquivo sob o prefixo
+      _hit="$(find "${root}" -type f -not -path '*/.git/*' -print -quit 2>/dev/null)" ;;
+    *)                                             # '**/*.kg.yaml' → '*.kg.yaml', procurado SOB o prefixo
+      _hit="$(find "${root}" -name "${pat}" -not -path '*/.git/*' -print -quit 2>/dev/null)" ;;
+  esac
+  [ -n "${_hit}" ]                                 # sem pipe: `find | grep -q` é a corrida EPIPE de sempre
 }
 
 check_rules_pathscoped() {
@@ -1006,7 +1120,15 @@ check_rules_pathscoped() {
       if _rule_glob_matches "${g}"; then matched=1; break; fi
     done <<< "${globs}"
     if [ "${matched}" -eq 0 ]; then
-      violation "HARD" "${rule}" "nenhum glob de 'paths:' casa arquivo rastreado ($(printf '%s' "${globs}" | tr '\n' ' ')) — a regra existe no disco e NUNCA carrega — corrija o glob para casar um arquivo real rastreado (git ls-files), ou remova a regra se obsoleta"
+      # A allowlist do transporte separa a regra do objeto dela: `.claude/**` viaja inteiro, mas
+      # `docs/evolution/` não (é infra LOCAL do alvo, por desenho do vendor-manifest). As duas
+      # decisões estão certas isoladas; juntas produzem uma regra que SÓ PODE reprovar no alvo.
+      # A guarda declara a isenção — nunca passa calada — e mantém a cobrança viva no `source`.
+      if _regra_sem_objeto_no_papel "${globs}"; then
+        violation "SOFT" "${rule}" "[papel/SEM-OBJETO] papel '$(_papel)' não recebe o objeto desta regra: nenhum glob de 'paths:' ($(printf '%s' "${globs}" | tr '\n' ' ')) aponta para superfície que VIAJA (vendor-manifest.sh --emit-scrub-roots) — a regra chegou com o framework, o objeto dela é core-only; ela dorme aqui, e a cobrança segue HARD na fonte"
+      else
+        violation "HARD" "${rule}" "nenhum glob de 'paths:' casa arquivo rastreado ($(printf '%s' "${globs}" | tr '\n' ' ')) — a regra existe no disco e NUNCA carrega — corrija o glob para casar um arquivo real rastreado (git ls-files), ou remova a regra se obsoleta"
+      fi
     fi
   done < <(_find "${rules_dir}" -name "*.md" ! -iname 'readme.md' -print0 2>/dev/null)
 }
@@ -2094,6 +2216,89 @@ check_kg_read_index_sync() {
   if ! printf '%s\n' "${novo}" | LC_ALL=C diff -q - "${idx}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice DEFASADO vs os \`trace:\` do corpus — o hook de leitura está cego para os nós que faltam. Regenere: bash .claude/validation/kg-trace-resolve.sh . --emit-index > docs/onion/kg-read-index.tsv"
   fi
+}
+
+
+# ===========================================================================
+# REGRA 85 — Porta pública espelha o core, com catraca [HARD]
+# previne: a porta MENTIR sobre o que o core é, por falta de re-materialização
+#   O `materialize-door.sh` resolve o COMO se publica. O QUANDO era uma frase —
+#   "toda leva mergeada em main que toque a superfície que viaja" — e frase não
+#   dispara. Medido 2026-09-17: `onion-standalone` estava 377 commits atrás na
+#   superfície que viaja, parado desde 2026-07-19. Não é negligência de ninguém:
+#   é o modo de falha previsível de um gatilho que depende de alguém lembrar.
+#   E o custo é específico: porta defasada não fica "desatualizada", ela MENTE
+#   sobre o core para quem a usa como referência.
+#   CATRACA, nunca muro: reprovar toda porta defasada nasceria vermelho (377) e
+#   seria desligada na primeira sexta-feira. O passivo entra no baseline e SÓ
+#   ENCOLHE; porta que ANDA PARA TRÁS é HARD. Porta nova nasce com teto BAIXO,
+#   porque não tem passivo a carregar.
+#   Conta só commit que tocou as raízes de `--emit-scrub-roots`: commit de
+#   biografia não defasa a porta — ela não o receberia de qualquer forma.
+# ===========================================================================
+check_door_staleness() {
+  local sc="${SCRIPT_DIR}/door-staleness-check.sh"
+  [ -f "${sc}" ] || return 0
+  local out rc=0
+  out="$(bash "${sc}" "${REPO_ROOT}" 2>&1)" || rc=$?
+  [ "${rc}" -eq 0 ] && return 0
+  local line
+  while IFS= read -r line; do
+    case "${line}" in
+      *ANDOU-PARA-TRAS*|*SEM-BASELINE*|*PIN-DESCONHECIDO*)
+        violation "HARD" "docs/evolution/federation/members.yaml" "REGRA 85 (Porta pública espelha o core, com catraca): ${line} — re-materialize (bash ops/materialize-door.sh <clone>) e atualize o pin no registro, ou baixe o teto em door-staleness-baseline.txt se a porta foi publicada. Porta defasada MENTE sobre o core."
+        ;;
+      ERRO*) violation "HARD" ".claude/validation/door-staleness-check.sh" "REGRA 85 (Porta pública espelha o core, com catraca): a guarda não pôde julgar — ${line}" ;;
+    esac
+  done <<< "${out}"
+}
+
+# ===========================================================================
+# REGRA 86 — Workflow de CI PARSEIA como YAML [HARD]
+# previne: workflow inexecutável passando por existente, e guarda morta por sintaxe
+#   Medido 2026-09-17: `onion-review-diagnose.yml` tinha DOIS blocos `env:` no mesmo
+#   job e o YAML inteiro não parseava. Ele ficou INEXECUTÁVEL — e com ele a instrução
+#   que o `onion-review.yml` dá em prosa: *"não reescreva causa neste bloco sem rodar
+#   o diagnóstico"*. A doutrina mandava não adivinhar e apontava para um instrumento
+#   morto; adivinhar virava a única coisa que sobrava.
+#   POR QUE NADA PEGOU, e é a forma do defeito: o `workflow_dispatch` só falha quando
+#   alguém DISPARA, e o gatilho `pull_request` do arquivo é restrito a ele mesmo —
+#   ninguém mais o tocou desde que quebrou (um dia inteiro). O harness CONTAVA os
+#   workflows (`harness-inventory.sh`) e nunca os LIA: contar não é validar, e SSOT
+#   que conta artefato quebrado conta um número que parece saúde.
+#   Guarda que só se exercita quando invocada à mão envelhece calada.
+# ===========================================================================
+check_workflows_parse() {
+  command -v python3 >/dev/null 2>&1 || return 0   # sem parser não se opina (skip gracioso)
+  local wf
+  while IFS= read -r wf; do
+    [ -n "${wf}" ] || continue
+    [ -f "${REPO_ROOT}/${wf}" ] || continue
+    # ⚠️ `yaml.safe_load` SOZINHO NÃO BASTA, e a bancada me pegou nisto na primeira redação desta
+    # guarda: o YAML padrão ACEITA chave duplicada (fica com a última), enquanto o parser do
+    # GitHub a REJEITA. Ou seja, a versão ingênua desta regra passaria verde no defeito EXATO que
+    # a originou (`env:` duplicado) — meia-cura, que nesta casa é cura nenhuma. O loader abaixo
+    # levanta na duplicata, que é o contrato do consumidor real.
+    local err
+    err="$(python3 - "${REPO_ROOT}/${wf}" 2>&1 <<'PYWF'
+import sys, yaml
+class Estrito(yaml.SafeLoader): pass
+def _sem_duplicata(loader, node, deep=False):
+    vistas = set()
+    for k, _ in node.value:
+        chave = loader.construct_object(k, deep=deep)
+        if chave in vistas:
+            raise yaml.constructor.ConstructorError(
+                None, None, "chave duplicada: '%s' (o GitHub rejeita; o YAML padrao aceita e fica com a ultima)" % (chave,), k.start_mark)
+        vistas.add(chave)
+    return yaml.SafeLoader.construct_mapping(loader, node, deep)
+Estrito.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, _sem_duplicata)
+with open(sys.argv[1], encoding='utf-8') as fh:
+    yaml.load(fh, Loader=Estrito)
+PYWF
+)" && continue
+    violation "HARD" "${wf}" "REGRA 86 (Workflow de CI PARSEIA como YAML): o arquivo NÃO parseia — o GitHub recusa o workflow inteiro e ele fica inexecutável, mas segue no repo parecendo vivo ($(printf '%s' "${err}" | tr '\n' ' ' | cut -c1-160))"
+  done < <(git -C "${REPO_ROOT}" ls-files '.github/workflows/*.yml' '.github/workflows/*.yaml' 2>/dev/null)
 }
 
 # ===========================================================================
@@ -3870,6 +4075,8 @@ check_context_freshness_stamp
 check_inventory_total_drift
 check_model_version_fora_da_ssot
 check_kg_read_index_sync
+check_door_staleness
+check_workflows_parse
 check_frontmatter_scalar_colon
 check_no_claude_docs
 check_evolution_links

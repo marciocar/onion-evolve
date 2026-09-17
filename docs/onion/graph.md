@@ -580,6 +580,15 @@ onion-compliance	requires	template:compliance_iso22301_template.md
 onion-compliance	requires	template:compliance_iso27001_template.md	
 onion-compliance	requires	template:compliance_pmbok_template.md	
 onion-compliance	requires	template:compliance_soc2_template.md	
+onion-core	adopts	onion-evolve	
+onion-core	mode	greenfield	
+onion-core	pin	ddb7cd3562cc	
+onion-core	specialization	deterministic-guards	
+onion-core	specialization	full-machinery	
+onion-core	specialization	hub-role	
+onion-core	specialization	public-door	
+onion-core	tier	standalone	
+onion-core	trust-advises	onion-evolve	
 onion-design	loads	when:brief -> kb-or-context:business-context	
 onion-design	loads	when:material -> reuse:presentation/canva	
 onion-design	provides	design-tokens-w3c-dtcg	

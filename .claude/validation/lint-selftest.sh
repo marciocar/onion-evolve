@@ -4418,7 +4418,11 @@ run_vendor_manifest_selftests() {
   # O scrub é a superfície DECLARADA e não consulta git (as guardas rodam em sandbox SEM repositório);
   # o manifesto é declarado ∩ HEAD. Logo scrub ⊇ manifesto — e nunca o contrário, que seria a guarda
   # varrendo MENOS do que se emite.
-  local missing; missing="$(comm -13 <(printf '%s\n' "${scrub}" | sort) <(printf '%s\n' "${out}" | sort) | tr '\n' ' ')"
+  # ⚠️ SÓ AS RAÍZES POSITIVAS ENTRAM NA COMPARAÇÃO. Um `:(exclude)…` é o OPOSTO de uma raiz: ele
+  # SUBTRAI superfície, então nunca pode ser "superfície que o scrub deixou de varrer". Sem este
+  # filtro o caso reprovava a exclusão de identidade (`…/jwks/*.pem`), acusando de fail-open
+  # justamente a linha que impede uma chave privada de viajar — a guarda lendo ao contrário.
+  local missing; missing="$(comm -13 <(printf '%s\n' "${scrub}" | sort) <(printf '%s\n' "${out}" | grep -v '^:(' | sort) | tr '\n' ' ')"
   if [ -z "${missing// /}" ]; then record_pass "vendor-manifest: (c) --emit-scrub-roots CONTÉM todo o manifesto (a guarda nunca varre menos do que o transporte emite)"
   else record_fail "vendor-manifest: (c)" "o transporte emite raiz que o scrub não varre: ${missing}"; fi
   # (c2) o scrub NÃO depende de git: sem repositório ele tem de responder igual — medido 2026-09-14,
@@ -12751,6 +12755,11 @@ run_role_cut_selftests() {
   #      Sem este caso, o dia em que alguém acrescentar um corte para `hub` — por simetria, por
   #      engano, por "aproveitar que já está cortando" — nada reprova. Um papel que deveria trabalhar
   #      como o core viraria um core mutilado em silêncio, que é a classe deste PR inteiro.
+  # A lista de exceções sai da SSOT (o próprio manifesto), nunca redigida aqui — senão o caso
+  # aprova o que o código disser, que é o contrário de um oráculo.
+  local _IDENTITY_EXCLUDES_ESPERADOS=()
+  mapfile -t _IDENTITY_EXCLUDES_ESPERADOS < <(sed -n "s/^_IDENTITY_EXCLUDES=(\\('\\)\\(.*\\)'.*)$/\\2/p" "${vm}")
+  [ "${#_IDENTITY_EXCLUDES_ESPERADOS[@]}" -gt 0 ] || record_fail "role-cut: (b3) setup" "não consegui ler _IDENTITY_EXCLUDES do manifesto — o oráculo do caso virou opinião"
   local _hub _hub_lst="${d}/hub.lst" _hub_tar="${d}/hub.tar"
   _hub="$(bash "${vm}" --role hub --repo "${REPO_ROOT}" 2>/dev/null)"
   local _hub_spec=(); mapfile -t _hub_spec <<< "${_hub}"
@@ -12765,10 +12774,22 @@ run_role_cut_selftests() {
   git -C "${REPO_ROOT}" ls-tree -r --name-only HEAD -- .claude/agents .claude/commands .claude/skills \
       .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows \
       docs/meta-specs docs/knowledge-base docs/sdaal 2>/dev/null | sort > "${_core_lst}"
-  local _n_exc; _n_exc="$(grep -c ':(exclude)' <<< "${_hub}" || true)"
-  if [ "${_n_exc}" -eq 0 ] && cmp -s "${_hub_lst}" "${_core_lst}"; then
-    record_pass "role-cut: (b3) o hub recebe a superfície INTEIRA do core ($(grep -c . "${_core_lst}") arquivos, 0 excludes) — trabalha como o core"
-  else record_fail "role-cut: (b3)" "hub com ${_n_exc} exclude(s) e $(diff "${_hub_lst}" "${_core_lst}" | grep -c '^[<>]' || true) arquivo(s) divergentes — o papel de fidelidade TOTAL deixou de ser total"; fi
+  # ⚠️ "TOTAL" GANHOU UMA EXCEÇÃO, E ELA É NOMEADA. A 1ª redação exigia ZERO excludes no `hub`, e
+  # estava certa para o que sabia então. Depois a segurança decidiu que a CHAVE PRIVADA do
+  # transporte de federação não viaja para papel nenhum — e um hub que recebe a chave privada do
+  # core não "trabalha como o core": ele vaza. Então a invariante correta não é "nenhum exclude",
+  # é "nenhum exclude ALÉM dos de identidade, que são declarados e justificados". Assim a guarda
+  # segue load-bearing: qualquer exclude NOVO para `hub` — por simetria, por engano, por
+  # "aproveitar que já está cortando" — continua reprovando, que é o ponto do caso.
+  local _exc_hub _exc_esp
+  _exc_hub="$(grep '^:(' <<< "${_hub}" | sort || true)"
+  _exc_esp="$(printf '%s\n' "${_IDENTITY_EXCLUDES_ESPERADOS[@]}" | sort)"
+  # a divergência de ARQUIVOS tem de ser exatamente o que aqueles excludes removem, nem um a mais
+  local _div; _div="$(diff "${_hub_lst}" "${_core_lst}" | grep '^[<>]' | sed 's/^[<>] //' || true)"
+  local _div_fora; _div_fora="$(grep -v '/jwks/.*\.pem$' <<< "${_div}" | grep -c . || true)"
+  if [ "${_exc_hub}" = "${_exc_esp}" ] && [ "${_div_fora}" -eq 0 ]; then
+    record_pass "role-cut: (b3) o hub recebe a superfície INTEIRA do core ($(grep -c . "${_core_lst}") arquivos) menos SÓ a chave privada de identidade — trabalha como o core sem vazar"
+  else record_fail "role-cut: (b3)" "hub com exclude(s) inesperado(s) [$(tr '\n' ' ' <<< "${_exc_hub}")] e ${_div_fora} arquivo(s) divergentes fora da exceção nomeada — a fidelidade deixou de ser total por algo que ninguém declarou"; fi
 
   # (c) SEM O CONTRATO, a guarda do ALVO falha FECHADA. É a medição que derrubou a 1ª tentativa de
   #     corte: tirar `.claude/utils/adopt` inteiro leva a SSOT junto, e `vendor-scrub-form-check.sh`
@@ -16493,6 +16514,74 @@ run_model_ssot_selftests() {
 }
 
 
+# ── A PORTA PÚBLICA: identidade fora, raiz dentro ─────────────────────────────────────────────
+# As duas curas desta família nasceram da PRIMEIRA materialização real (2026-09-17), e as duas são
+# do tipo que só aparece publicando: o bundle levava chave nomeada por cliente (salva de subir por
+# um `.gitignore` do destino — acidente, não desenho) e a porta subiu sem README/LICENSE/CLAUDE.md.
+run_door_selftests() {
+  local sb2 out rc
+  sb2="$(mktemp -d)"
+
+  # (a) chave nomeada por membro NÃO viaja, em NENHUM papel
+  local r pem_total=0
+  for r in adopted hub standalone; do
+    local d; d="$(mktemp -d)"
+    local -a sp=(); mapfile -t sp < <(bash "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" --role "${r}" --repo "${REPO_ROOT}" 2>/dev/null)
+    git -C "${REPO_ROOT}" archive --format=tar HEAD -- "${sp[@]}" 2>/dev/null | tar -x -C "${d}" 2>/dev/null
+    pem_total=$(( pem_total + $(find "${d}" -name '*.pem' | wc -l) ))
+    rm -rf "${d}"
+  done
+  if [ "${pem_total}" -eq 0 ]; then
+    record_pass "door: (a) chave nomeada por membro não viaja em nenhum papel (identidade ≠ corte de papel)"
+  else record_fail "door: (a)" "${pem_total} .pem no transporte — o nome do cliente viaja no nome do arquivo"; fi
+
+  # (b) o --check-bundle REPROVA arquivo nomeado por membro. Sem este caso, a guarda de (a) seria a
+  #     única barreira, e barreira única não tem quem a verifique.
+  mkdir -p "${sb2}/.claude/validation" "${sb2}/x"
+  local _id; _id="$(grep -E '^\s+- id:' "${REPO_ROOT}/docs/evolution/federation/members.yaml" \
+                     | sed 's/.*- id:[[:space:]]*//' | tr -d '"'"'"'' | grep -vE '^onion-|^marcio' | head -1)"
+  if [ -n "${_id}" ]; then
+    : > "${sb2}/x/${_id}-1.pem"
+    rc=0; out="$(bash "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" --check-bundle "${sb2}" 2>&1)" || rc=$?
+    if [ "${rc}" -ne 0 ] && grep -q 'NOMEADO POR MEMBRO' <<< "${out}"; then
+      record_pass "door: (b) --check-bundle reprova arquivo nomeado por membro do registro"
+    else record_fail "door: (b)" "não reprovou (rc=${rc}): ${out:0:100}"; fi
+    rm -f "${sb2}/x/${_id}-1.pem"
+  else
+    record_fail "door: (b)" "nenhum membro não-próprio no registro para montar o mutante"
+  fi
+
+  # (c) a porta materializada tem raiz COMPLETA. Público sem LICENSE não é estilo: sem licença o
+  #     padrão legal é "todos os direitos reservados", o oposto do que uma porta existe para dizer.
+  local d3; d3="$(mktemp -d)"; rm -rf "${d3}"
+  if bash "${REPO_ROOT}/ops/materialize-door.sh" "${d3}" >/dev/null 2>&1; then
+    local faltam=""
+    for f in README.md CLAUDE.md LICENSE LICENSE-DOCS; do [ -f "${d3}/${f}" ] || faltam="${faltam} ${f}"; done
+    if [ -z "${faltam}" ]; then record_pass "door: (c) raiz completa (README · CLAUDE.md · LICENSE · LICENSE-DOCS)"
+    else record_fail "door: (c)" "faltam na raiz:${faltam}"; fi
+    # (d) o LICENSE da porta é NU, não LICENSE-ONION: aqui o repositório É o Onion. No adotante
+    #     seria o inverso, e o emit-licenses.sh faz o inverso lá — a diferença é de OBJETO.
+    if [ -f "${d3}/LICENSE" ] && [ ! -f "${d3}/LICENSE-ONION" ]; then
+      record_pass "door: (d) LICENSE nu na porta (no adotante seria LICENSE-ONION — objetos diferentes)"
+    else record_fail "door: (d)" "licença na forma errada para uma porta"; fi
+  else
+    record_fail "door: (c)" "materialize-door abortou — a porta não monta"
+  fi
+  # (e) A MATERIALIZAÇÃO É AUTORITATIVA: arquivo que saiu do manifesto SAI da porta. Sem isto,
+  #     `tar -x` sobrepõe sem apagar e a porta segue publicando o que o core parou de enviar —
+  #     medido na 2ª materialização real, com as chaves de cliente sobrevivendo à própria exclusão.
+  local d4; d4="$(mktemp -d)"; rm -rf "${d4}"
+  if bash "${REPO_ROOT}/ops/materialize-door.sh" "${d4}" >/dev/null 2>&1; then
+    : > "${d4}/INTRUSO-DE-MATERIALIZACAO-ANTERIOR.md"
+    if bash "${REPO_ROOT}/ops/materialize-door.sh" "${d4}" >/dev/null 2>&1; then
+      if [ -f "${d4}/INTRUSO-DE-MATERIALIZACAO-ANTERIOR.md" ]; then
+        record_fail "door: (e)" "arquivo da materialização anterior SOBREVIVEU — a porta publicaria o que saiu do manifesto"
+      else record_pass "door: (e) materialização AUTORITATIVA (o que sai do manifesto sai da porta)"; fi
+    else record_fail "door: (e)" "2ª materialização abortou"; fi
+  else record_fail "door: (e)" "1ª materialização abortou"; fi
+  rm -rf "${d4}" "${d3}" "${sb2}"
+}
+
 # ── A PERNA DE LEITURA (hook kg-read-leg.sh + REGRA 84) ───────────────────────────────────────
 # O hook nasce de um sinal de campo com preço medido: uma sessão publicou QUATRO teses erradas
 # num corpus que tinha a resposta em quatro nós de um grafo que ela mesma citou. A bancada aqui
@@ -16590,6 +16679,221 @@ run_sandbox_gc_selftests() {
   rm -rf "${d}"
 }
 
+
+# ── O CICLO DA PORTA, MECANIZADO (REGRA 85) ───────────────────────────────────────────────────
+# A guarda nasceu de um número, não de uma intuição: o `onion-standalone` estava 377 commits atrás
+# na superfície que viaja. O caso (c) é o que dá valor — commit de BIOGRAFIA não pode defasar a
+# porta, senão a catraca vira ruído e o operador aprende a ignorá-la.
+run_door_cycle_selftests() {
+  local sb2 out rc
+  sb2="$(mktemp -d)"
+  mkdir -p "${sb2}/.claude/validation" "${sb2}/.claude/utils/adopt" "${sb2}/docs/evolution/federation" "${sb2}/.claude/agents" "${sb2}/docs/analysis"
+  cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" "${sb2}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" "${sb2}/.claude/utils/adopt/"
+  # ⚠️ A ORDEM DOS COMMITS É O HARNESS, e a 1ª redação a errou: eu tirava o pin ANTES de commitar
+  # o baseline, e o baseline vive em `.claude/validation/` — que É superfície que viaja. A porta
+  # nascia 1 commit atrás POR CONSTRUÇÃO, e o caso (a) reprovava a guarda por defeito MEU.
+  # Ordem certa: tudo que VIAJA primeiro, pin depois, `members.yaml` por último — ele mora em
+  # `docs/evolution/federation/`, que NÃO viaja, então gravá-lo não defasa nada.
+  printf '# a\n' > "${sb2}/.claude/agents/a.md"; printf '# bio\n' > "${sb2}/docs/analysis/bio.md"
+  printf 'porta-x 0\n' > "${sb2}/.claude/validation/door-staleness-baseline.txt"
+  ( cd "${sb2}" && git init -q . && git add -A && git -c user.email=t@l -c user.name=t commit -qm base ) >/dev/null 2>&1
+  local pin; pin="$(git -C "${sb2}" rev-parse --short=12 HEAD)"
+  printf 'members:\n  - id: porta-x\n    kind: door\n    onion_version: %s\n' "${pin}" > "${sb2}/docs/evolution/federation/members.yaml"
+  # ⚠️ o `|| true` NÃO é decoração: `git commit` sem nada a commitar sai 1, e sob `set -e` isso
+  # MATA a suíte inteira — foi o que aconteceu ao sobrar um commit duplicado nesta reescrita.
+  ( cd "${sb2}" && git add -A && git -c user.email=t@l -c user.name=t commit -qm registro ) >/dev/null 2>&1 || true
+
+  # (a) porta EM DIA com o pin → dentro da catraca
+  rc=0; out="$(bash "${sb2}/.claude/validation/door-staleness-check.sh" "${sb2}" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "door-cycle: (a) porta no pin → dentro da catraca"
+  else record_fail "door-cycle: (a)" "acusou porta em dia (rc=${rc}): ${out:0:110}"; fi
+
+  # (b) commit na SUPERFÍCIE QUE VIAJA → defasa, e a catraca reprova
+  printf '# b\n' > "${sb2}/.claude/agents/b.md"
+  ( cd "${sb2}" && git add -A && git -c user.email=t@l -c user.name=t commit -qm viaja ) >/dev/null 2>&1
+  rc=0; out="$(bash "${sb2}/.claude/validation/door-staleness-check.sh" "${sb2}" 2>&1)" || rc=$?
+  if [ "${rc}" -ne 0 ] && grep -q 'ANDOU-PARA-TRAS' <<< "${out}"; then
+    record_pass "door-cycle: (b) commit na superfície que viaja defasa a porta → HARD"
+  else record_fail "door-cycle: (b)" "não acusou defasagem (rc=${rc}): ${out:0:110}"; fi
+
+  # (c) commit de BIOGRAFIA não defasa — ela nunca o receberia. Sem este recorte a catraca
+  #     dispararia a cada commit do core e seria desligada.
+  # ⚠️ SANDBOX PRÓPRIO, e a razão é a mesma armadilha que já me pegou duas vezes nesta família: o
+  # baseline VIVE em `.claude/validation/`, que É superfície que viaja. Mexer nele para preparar o
+  # caso muda o que o caso mede. Sandbox separado torna o único commit pós-pin o de biografia —
+  # que é exatamente a hipótese sob teste.
+  local sbc; sbc="$(mktemp -d)"
+  mkdir -p "${sbc}/.claude/validation" "${sbc}/.claude/utils/adopt" "${sbc}/docs/evolution/federation" "${sbc}/.claude/agents" "${sbc}/docs/analysis"
+  cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" "${sbc}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" "${sbc}/.claude/utils/adopt/"
+  printf '# a\n' > "${sbc}/.claude/agents/a.md"
+  printf 'porta-x 0\n' > "${sbc}/.claude/validation/door-staleness-baseline.txt"
+  ( cd "${sbc}" && git init -q . && git add -A && git -c user.email=t@l -c user.name=t commit -qm base ) >/dev/null 2>&1
+  local pinc; pinc="$(git -C "${sbc}" rev-parse --short=12 HEAD)"
+  printf 'members:\n  - id: porta-x\n    kind: door\n    onion_version: %s\n' "${pinc}" > "${sbc}/docs/evolution/federation/members.yaml"
+  printf '# so biografia\n' > "${sbc}/docs/analysis/bio2.md"
+  ( cd "${sbc}" && git add -A && git -c user.email=t@l -c user.name=t commit -qm biografia ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${sbc}/.claude/validation/door-staleness-check.sh" "${sbc}" 2>&1)" || rc=$?
+  rm -rf "${sbc}"
+  if [ "${rc}" -eq 0 ]; then record_pass "door-cycle: (c) commit de biografia NÃO defasa a porta"
+  else record_fail "door-cycle: (c)" "biografia contou como defasagem: ${out:0:110}"; fi
+
+  # (d) FAIL-CLOSED: sem registro a guarda DECLARA que não sabe, nunca aprova em silêncio
+  rm -f "${sb2}/docs/evolution/federation/members.yaml"
+  rc=0; out="$(bash "${sb2}/.claude/validation/door-staleness-check.sh" "${sb2}" 2>&1)" || rc=$?
+  if [ "${rc}" -ne 0 ] && grep -q 'ERRO' <<< "${out}"; then
+    record_pass "door-cycle: (d) sem registro falha FECHADA (declara que não sabe)"
+  else record_fail "door-cycle: (d)" "sem registro passou em silêncio (rc=${rc})"; fi
+  rm -rf "${sb2}"
+
+  # (e) O COMMIT EM VOO NUMA BRANCH NÃO DEFASA A PORTA — e sem isto a guarda é ESTEIRA, não catraca.
+  #     Medido ao vivo em 2026-09-17: medindo `pin..HEAD`, cada commit que toca `.claude/**` afasta
+  #     em +1, e subir o teto para destravar EXIGE um commit, que afasta de novo. 378 → 380 → 381 em
+  #     três tentativas de fechar o mesmo gate, e a saída legítima (re-materializar) só existe DEPOIS
+  #     do merge. Guarda satisfazível só pós-merge não é gate de pré-merge.
+  local sbm pinm rcm outm
+  sbm="$(mktemp -d)"
+  mkdir -p "${sbm}/upstream" "${sbm}/work"
+  # upstream = o "main" remoto; work = o clone onde a branch trabalha
+  ( cd "${sbm}/upstream" && git init -q -b main . \
+      && mkdir -p .claude/validation .claude/utils/adopt .claude/agents docs/evolution/federation \
+      && cp "${REPO_ROOT}/.claude/validation/door-staleness-check.sh" .claude/validation/ \
+      && cp "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" .claude/utils/adopt/ \
+      && printf '# a\n' > .claude/agents/a.md \
+      && printf 'porta-x 0\n' > .claude/validation/door-staleness-baseline.txt \
+      && git add -A && git -c user.email=t@l -c user.name=t commit -qm base ) >/dev/null 2>&1
+  pinm="$(git -C "${sbm}/upstream" rev-parse --short=12 HEAD)"
+  ( cd "${sbm}/upstream" && mkdir -p docs/evolution/federation \
+      && printf 'members:\n  - id: porta-x\n    kind: door\n    onion_version: %s\n' "${pinm}" > docs/evolution/federation/members.yaml \
+      && git add -A && git -c user.email=t@l -c user.name=t commit -qm registro ) >/dev/null 2>&1 || true
+  git clone -q "${sbm}/upstream" "${sbm}/work" >/dev/null 2>&1
+  ( cd "${sbm}/work" && git remote set-head origin -a >/dev/null 2>&1; git checkout -q -b feat/em-voo \
+      && printf '# em voo\n' > .claude/agents/b.md \
+      && git add -A && git -c user.email=t@l -c user.name=t commit -qm "toca superficie que viaja" ) >/dev/null 2>&1
+  rcm=0; outm="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" 2>&1)" || rcm=$?
+  if [ "${rcm}" -eq 0 ]; then
+    record_pass "door-cycle: (e) commit EM VOO na branch não defasa a porta (ponta = merge-base)"
+  else record_fail "door-cycle: (e)" "cobrou por trabalho ainda fora de main — a catraca vira esteira (rc=${rcm}): ${outm:0:140}"; fi
+
+  # (f) …e o mesmo commit, JÁ em main, defasa de verdade — a cura não pode cegar a guarda
+  # main "anda": faz o ff-only local e move o ref remoto à mão — `git push` para um clone NÃO-bare
+  # com main checada fora é RECUSADO, e sob `set -e` o subshell não-zero MATA a suíte (foi o que
+  # aconteceu na 1ª redação: a bancada abortou em (f) sem registrar ✗ nenhum).
+  ( cd "${sbm}/work" && git checkout -q main && git merge -q --ff-only feat/em-voo \
+      && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1 || true
+  rcm=0; outm="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" 2>&1)" || rcm=$?
+  if [ "${rcm}" -ne 0 ] && grep -q 'ANDOU-PARA-TRAS' <<< "${outm}"; then
+    record_pass "door-cycle: (f) o MESMO commit já em main defasa → HARD (a cura não cegou a guarda)"
+  else record_fail "door-cycle: (f)" "não acusou defasagem depois do merge (rc=${rcm}): ${outm:0:140}"; fi
+  rm -rf "${sbm}"
+}
+
+
+# ── RECORTE POR PAPEL: "não pude julgar" não é a mesma coisa em todo repo ─────────────────────
+# Nasceu da 1ª sessão REAL dentro da porta pública: o lint dela acusava 41 HARD, e a massa eram
+# guardas declarando honestamente NÃO TER JULGADO — sem `.kg.yaml`, sem `members.yaml`, sem PR.
+# O caso (b) é o que impede a cura de virar fail-open: no repo-FONTE a mesma ausência segue HARD.
+run_role_scope_selftests() {
+  local sb2 out
+  sb2="$(mktemp -d)"
+  mkdir -p "${sb2}/.claude/validation" "${sb2}/docs"
+  cp "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" "${sb2}/.claude/validation/"
+  # extrai só o predicado — testar a unidade, não a suíte de 4 minutos
+  sed -n '/^_PAPEL_DESTE_REPO=""/,/^}/p' "${sb2}/.claude/validation/lint-artifacts.sh" > "${sb2}/pred.sh"
+  sed -n '/^_sem_objeto_no_papel()/,/^}/p' "${sb2}/.claude/validation/lint-artifacts.sh" >> "${sb2}/pred.sh"
+
+  # (a) papel HUB sem corpus → a ausência é legítima, a guarda recorta
+  printf 'role: hub\n' > "${sb2}/.claude/.onion-version"
+  out="$(REPO_ROOT="${sb2}" SCRIPT_DIR="${sb2}/.claude/validation" bash -c '
+    source "'"${sb2}"'/pred.sh"
+    _sem_objeto_no_papel "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
+  if [ "${out}" = "RECORTA" ]; then record_pass "role-scope: (a) papel hub sem corpus → recorta (ausência legítima)"
+  else record_fail "role-scope: (a)" "não recortou no papel hub: ${out}"; fi
+
+  # (b) A MESMA ausência no repo-FONTE segue HARD — sem isto o recorte vira fail-open universal
+  rm -f "${sb2}/.claude/.onion-version"
+  out="$(REPO_ROOT="${sb2}" SCRIPT_DIR="${sb2}/.claude/validation" bash -c '
+    source "'"${sb2}"'/pred.sh"
+    _sem_objeto_no_papel "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (b) na FONTE a mesma ausência NÃO é recortada (lá é defeito)"
+  else record_fail "role-scope: (b)" "recortou na fonte — o recorte virou fail-open universal"; fi
+
+  # (c) objeto PRESENTE e quebrado continua HARD em qualquer papel: o recorte é sobre NÃO RECEBER,
+  #     nunca sobre "está ruim". Sem este caso, um `.kg.yaml` inválido na porta passaria.
+  printf 'role: hub\n' > "${sb2}/.claude/.onion-version"
+  ( cd "${sb2}" && git init -q . && printf 'meta:\n  id: x\n' > x.kg.yaml && git add -A ) >/dev/null 2>&1
+  out="$(REPO_ROOT="${sb2}" SCRIPT_DIR="${sb2}/.claude/validation" bash -c '
+    source "'"${sb2}"'/pred.sh"
+    _sem_objeto_no_papel "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (c) com corpus PRESENTE não recorta (o corte é sobre não receber)"
+  else record_fail "role-scope: (c)" "recortou com .kg.yaml presente — esconderia corpus quebrado"; fi
+  rm -rf "${sb2}"
+
+  # ── REGRA PATH-SCOPED cujo OBJETO não viaja (sinal da porta, 2026-09-17) ────────────────────
+  # A allowlist do transporte leva `.claude/rules/` inteiro e deixa `docs/evolution/` para trás.
+  # As duas decisões estão certas isoladas; juntas fazem uma regra que SÓ PODE reprovar no alvo.
+  local sb3 vm
+  sb3="$(mktemp -d)"
+  mkdir -p "${sb3}/.claude/validation" "${sb3}/.claude/utils/adopt"
+  vm="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
+  cp "${vm}" "${sb3}/.claude/utils/adopt/" 2>/dev/null || true
+  {
+    sed -n '/^_PAPEL_DESTE_REPO=""/,/^}/p'      "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    sed -n '/^_glob_literal_prefix()/,/^}/p'    "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    sed -n '/^_superficie_que_viaja()/,/^}/p'   "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    sed -n '/^_regra_sem_objeto_no_papel()/,/^}/p' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    sed -n '/^_rule_glob_matches()/,/^}/p'      "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  } > "${sb3}/pred2.sh"
+  _rs_run() { # $1=role ('' = fonte) $2=expr a avaliar
+    local _r="$1"
+    if [ -n "${_r}" ]; then printf 'role: %s\n' "${_r}" > "${sb3}/.claude/.onion-version"
+    else rm -f "${sb3}/.claude/.onion-version"; fi
+    REPO_ROOT="${sb3}" CLAUDE_DIR="${sb3}/.claude" bash -c '
+      source "'"${sb3}"'/pred2.sh"
+      '"$2"'' 2>&1
+  }
+
+  # (d) papel HUB + glob sob superfície core-only → RECORTA (SOFT declarado, nunca HARD cego)
+  out="$(_rs_run hub '_regra_sem_objeto_no_papel "docs/evolution/research/**" && echo RECORTA || echo NAO')"
+  if [ "${out}" = "RECORTA" ]; then record_pass "role-scope: (d) hub + glob em superfície que NÃO viaja → recorta"
+  else record_fail "role-scope: (d)" "não recortou: ${out} — a porta reprova numa regra que não pode carregar"; fi
+
+  # (e) a MESMA regra na FONTE segue HARD: lá a árvore é completa, glob morto é defeito de verdade
+  out="$(_rs_run '' '_regra_sem_objeto_no_papel "docs/evolution/research/**" && echo RECORTA || echo NAO')"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (e) na FONTE o mesmo glob NÃO é recortado"
+  else record_fail "role-scope: (e)" "recortou na fonte — regra morta passaria a dormir no core"; fi
+
+  # (f) glob que MIRA superfície que viaja não ganha isenção nenhuma, mesmo no hub
+  out="$(_rs_run hub '_regra_sem_objeto_no_papel ".claude/commands/**" && echo RECORTA || echo NAO')"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (f) glob sobre superfície que VIAJA continua cobrado no hub"
+  else record_fail "role-scope: (f)" "recortou glob que viaja — a isenção virou fail-open"; fi
+
+  # (g) FAIL-CLOSED: sem a SSOT do transporte não se concede isenção (nunca 'não sei' virar 'passa')
+  mv "${sb3}/.claude/utils/adopt/vendor-manifest.sh" "${sb3}/vm.bak" 2>/dev/null || true
+  out="$(_rs_run hub '_regra_sem_objeto_no_papel "docs/evolution/research/**" && echo RECORTA || echo NAO')"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (g) sem vendor-manifest a isenção NÃO é concedida (fail-closed)"
+  else record_fail "role-scope: (g)" "isentou sem SSOT do transporte — fail-open"; fi
+  mv "${sb3}/vm.bak" "${sb3}/.claude/utils/adopt/vendor-manifest.sh" 2>/dev/null || true
+
+  # (h) O RAMO NÃO-GIT NÃO PODE MENTIR. `${g##*/}` de 'a/b/**' é '**', e `find -name '**'` casa
+  #     QUALQUER arquivo: num destino sem `git init` toda regra path-scoped passava trivialmente.
+  #     Foi assim que um dogfood da porta declarou 0 HARD enquanto a porta real reprovava.
+  printf 'oi\n' > "${sb3}/qualquer.txt"
+  out="$(_rs_run hub '_rule_glob_matches "docs/evolution/research/**" && echo CASA || echo NAO')"
+  if [ "${out}" = "NAO" ]; then record_pass "role-scope: (h) ramo não-git respeita o PREFIXO (não casa por '**')"
+  else record_fail "role-scope: (h)" "o ramo não-git casou glob sem objeto — a guarda mente fora do git"; fi
+
+  # (i) e o mesmo ramo continua ACHANDO o que existe de verdade (a cura não pode cegar a guarda)
+  mkdir -p "${sb3}/docs/evolution/research" && printf 'x\n' > "${sb3}/docs/evolution/research/a.md"
+  out="$(_rs_run hub '_rule_glob_matches "docs/evolution/research/**" && echo CASA || echo NAO')"
+  if [ "${out}" = "CASA" ]; then record_pass "role-scope: (i) ramo não-git ainda casa quando o objeto EXISTE"
+  else record_fail "role-scope: (i)" "a cura cegou a guarda: ${out}"; fi
+
+  unset -f _rs_run
+  rm -rf "${sb3}"
+}
+
 _family run_hook_autofix_selftests
 _family run_kg_reverify_schema_selftests
 _family run_backtick_ref_selftests
@@ -16616,6 +16920,229 @@ _family run_rules_registry_selftests
 _family run_onion_version_tracked_selftests
 _family run_hub_role_guard_selftests
 _family run_inventory_adopter_scope_selftests
+_family run_door_selftests
+_family run_door_cycle_selftests
+# ── REGRA 86: workflow que não parseia é workflow MORTO, e o repo não sabe ────────────────────
+# Nasceu de um `env:` duplicado que deixou o `onion-review-diagnose.yml` inexecutável por um dia
+# inteiro — e era exatamente o instrumento que a doutrina manda rodar antes de escrever causa
+# sobre o revisor. O harness CONTAVA os workflows e nunca os LIA.
+run_workflow_parse_selftests() {
+  command -v python3 >/dev/null 2>&1 || { record_skip "workflow-parse: python3 ausente"; return; }
+  python3 -c 'import yaml' 2>/dev/null || { record_skip "workflow-parse: PyYAML ausente (o SUT tambem pula)"; return; }
+  local sb out
+  sb="$(mktemp -d)"
+  mkdir -p "${sb}/.github/workflows"
+  ( cd "${sb}" && git init -q . ) >/dev/null 2>&1
+  # ⚠️ EXTRAI A FUNÇÃO, não sourceia o lint inteiro — a 1ª redação sourceava, o top-level do
+  # `lint-artifacts.sh` fazia seu trabalho sob `>/dev/null` e a função saía muda: dois casos
+  # reprovavam por defeito DO HARNESS, com o SUT correto. É [[bancada-espelha-o-runner]] de novo.
+  { sed -n '/^check_workflows_parse()/,/^}/p' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    printf 'violation() { printf "%%s|%%s|%%s\\n" "$1" "$2" "$3"; }\n'
+  } > "${sb}/sut.sh"
+  _wp_run() { ( cd "${sb}" && REPO_ROOT="${sb}" bash -c 'source "'"${sb}"'/sut.sh"; check_workflows_parse' 2>&1 || true ); }
+
+  # (a) workflow VÁLIDO → silêncio
+  printf 'name: ok\non:\n  push: {}\njobs:\n  j:\n    runs-on: ubuntu-latest\n    steps:\n      - run: echo oi\n' > "${sb}/.github/workflows/bom.yml"
+  ( cd "${sb}" && git add -A ) >/dev/null 2>&1
+  out="$(_wp_run)"
+  if ! grep -q 'REGRA 86' <<< "${out}"; then record_pass "workflow-parse: (a) workflow válido não gera violação"
+  else record_fail "workflow-parse: (a)" "falso positivo em YAML válido: ${out:0:140}"; fi
+
+  # (b) O DEFEITO DE ORIGEM: `env:` duplicado no mesmo job. O `yaml.safe_load` NU aceita chave
+  #     duplicada (fica com a última) e o GitHub REJEITA — a 1ª redação da REGRA 86 passava verde
+  #     neste arquivo, isto é, não pegava o defeito que a criou. Este caso é o que forçou o loader
+  #     estrito; sem ele a guarda nasceria meia, e meia-cura aqui é cura nenhuma.
+  printf 'name: x\non:\n  workflow_dispatch:\njobs:\n  j:\n    env:\n      A: 1\n    runs-on: ubuntu-latest\n    env:\n      B: 2\n    steps:\n      - run: echo oi\n' > "${sb}/.github/workflows/quebrado.yml"
+  ( cd "${sb}" && git add -A ) >/dev/null 2>&1
+  out="$(_wp_run)"
+  if grep -q 'REGRA 86' <<< "${out}"; then record_pass "workflow-parse: (b) env duplicado (o defeito de origem) → HARD"
+  else record_fail "workflow-parse: (b)" "não pegou o env duplicado — o defeito que criou a regra passaria de novo: ${out:0:140}"; fi
+
+  # (c) a violação NOMEIA o arquivo — "algum workflow quebrado" não é acionável
+  if grep -q 'quebrado.yml' <<< "${out}"; then record_pass "workflow-parse: (c) a violação nomeia o arquivo culpado"
+  else record_fail "workflow-parse: (c)" "violação sem o nome do arquivo: ${out:0:140}"; fi
+
+  # (d) arquivo NÃO-RASTREADO não é julgado: rascunho local não é CI
+  ( cd "${sb}" && git rm -q --cached .github/workflows/quebrado.yml ) >/dev/null 2>&1
+  rm -f "${sb}/.github/workflows/quebrado.yml"
+  printf 'isto: nao\n  eh: yaml valido\n' > "${sb}/.github/workflows/rascunho.yml"
+  out="$(_wp_run)"
+  if ! grep -q 'rascunho.yml' <<< "${out}"; then record_pass "workflow-parse: (d) arquivo não-rastreado não é julgado (rascunho local não é CI)"
+  else record_fail "workflow-parse: (d)" "julgou arquivo untracked — reprovaria por lixo local"; fi
+
+  unset -f _wp_run
+  rm -rf "${sb}"
+}
+
+# ── O ESCAPE DE DISPENSA DO MERGE VERIFICADO (2026-09-17) ────────────────────────────────────
+# `ops/pr-merge-verified.sh` ganhou `--dispensa <check> --motivo <texto>`, autorizado pelo maestro
+# para o caso em que o gate DETERMINÍSTICO está verde e só a revisão SEMÂNTICA não rodou. Toda
+# válvula dessas morre virando override geral, então ela nasce com bancada: o que se testa aqui não
+# é que ela DEIXA passar, é tudo o que ela CONTINUA barrando. O `gh` é dublado — a alternativa
+# seria exercitar o SUT contra o forge de verdade, que é o oposto de um teste.
+run_merge_dispensa_selftests() {
+  local sut="${REPO_ROOT}/ops/pr-merge-verified.sh"
+  [ -f "${sut}" ] || { record_skip "merge-dispensa: ops/pr-merge-verified.sh ausente"; return; }
+  local sb out rc
+  sb="$(mktemp -d)"; mkdir -p "${sb}/bin"
+  cat > "${sb}/bin/gh" <<'STUB'
+#!/usr/bin/env bash
+# dublê de `gh` — responde só o que o SUT pergunta; o resto sai não-zero (fail-loud)
+_args="$*"
+case "${_args}" in
+  *"--json state,mergedAt"*)
+    # ⚠️ O DUBLÊ TEM DE TER ESTADO. A 1ª versão respondia "OPEN|" SEMPRE, então o SUT mergeava e
+    # logo depois lia "não mergeou" — e o caso do caminho FELIZ reprovava por defeito do dublê,
+    # com o SUT correto. A prova independente do SUT (relê o estado e exige MERGED+mergedAt) é
+    # justamente o que ele tem de mais forte; um dublê sem estado não consegue exercitá-la.
+    if [ -f "${STUB_STATE:-/nonexistent}" ]; then echo "MERGED|$(cat "${STUB_STATE}")"; else echo "OPEN|"; fi ;;
+  *"--json headRefOid"*)        echo "deadbeefcafe0000000000000000000000000000" ;;
+  *"--json headRepository,headRepositoryOwner"*) echo "o/r" ;;
+  *"--json headRefName"*)       echo "feat/x" ;;
+  *check-runs*)                 printf '%s\n' "${STUB_RUNS}" ;;
+  "pr checks"*)                 printf '%s\n' "${STUB_CHECKS}" ;;
+  *statusCheckRollup*)          printf '%s\n' "${STUB_VERDICT}" ;;
+  "pr comment"*)                [ "${STUB_COMMENT_FAIL:-0}" = 1 ] && exit 1; echo "comentado" ;;
+  "pr merge"*)
+    echo "MERGOU-DE-MENTIRA"
+    [ "${STUB_MERGE_FAIL:-0}" = 1 ] && exit 1
+    [ -n "${STUB_STATE:-}" ] && date -u +%Y-%m-%dT%H:%M:%SZ > "${STUB_STATE}"
+    exit 0 ;;
+  *)                            echo "gh-stub: pergunta não prevista: ${_args}" >&2; exit 9 ;;
+esac
+STUB
+  chmod +x "${sb}/bin/gh"
+  # cenário-base: bancada e lint VERDES, só o veredito semântico falhando
+  export STUB_RUNS=$'lint-onion-artifacts\tcompleted\tsuccess\nselftest\tcompleted\tsuccess\nonion-review\tcompleted\tsuccess\nonion-review-verdict\tcompleted\tfailure'
+  export STUB_CHECKS=$'lint-onion-artifacts\tpass\t1m\nselftest\tpass\t29m\nonion-review\tpass\t1m\nonion-review-verdict\tfail\t4s'
+  export STUB_VERDICT="FAILURE"
+  _md() { ( export PATH="${sb}/bin:${PATH}" STUB_STATE="${sb}/merged.stamp"; rm -f "${sb}/merged.stamp"
+            cd "${sb}" && bash "${sut}" 842 "$@" 2>&1 || true ); }
+
+  # (a) o caso autorizado: só o veredito semântico falho, e ele é dispensado por nome
+  out="$(_md --dispensa onion-review-verdict --motivo "gate determinístico verde")"
+  if grep -q 'DISPENSADO' <<< "${out}" && grep -q 'dispensa registrada' <<< "${out}" \
+     && grep -q 'MERGED' <<< "${out}" && ! grep -q '✗' <<< "${out}"; then
+    record_pass "merge-dispensa: (a) veredito semântico falho + dispensa nomeada → registra e merge PROVADO pelo estado"
+  else record_fail "merge-dispensa: (a)" "não prosseguiu: ${out:0:160}"; fi
+
+  # (b) A DISPENSA É NOME A NOME: outro check falho continua matando o merge. Sem este caso o
+  #     escape vira override geral no primeiro dia em que dois checks caírem juntos.
+  out="$(STUB_RUNS=$'lint-onion-artifacts\tcompleted\tfailure\nonion-review-verdict\tcompleted\tfailure' \
+         STUB_CHECKS=$'lint-onion-artifacts\tfail\t1m\nonion-review-verdict\tfail\t4s' \
+         _md --dispensa onion-review-verdict --motivo "x")"
+  if grep -q 'NÃO foi dispensado' <<< "${out}" && grep -q 'lint-onion-artifacts' <<< "${out}"; then
+    record_pass "merge-dispensa: (b) outro check falho NÃO é dispensado junto (nomeia o culpado)"
+  else record_fail "merge-dispensa: (b)" "deixou passar com outro check falho: ${out:0:160}"; fi
+
+  # (c) DISPENSA PREVENTIVA é recusada — dispensar check verde é cheque em branco para a próxima
+  #     vez que ele falhar, e ninguém releria o comando naquele dia.
+  out="$(STUB_RUNS=$'lint-onion-artifacts\tcompleted\tsuccess\nonion-review-verdict\tcompleted\tsuccess' \
+         STUB_CHECKS=$'lint-onion-artifacts\tpass\t1m\nonion-review-verdict\tpass\t4s' \
+         STUB_VERDICT=SUCCESS _md --dispensa onion-review-verdict --motivo "x")"
+  if grep -q 'preventiva' <<< "${out}"; then
+    record_pass "merge-dispensa: (c) dispensar check que NÃO está falhando é recusado"
+  else record_fail "merge-dispensa: (c)" "aceitou dispensa preventiva: ${out:0:160}"; fi
+
+  # (d) só check que se DECLARA informativo entra — a lista não é um campo livre
+  out="$(_md --dispensa selftest --motivo "x")"
+  if grep -q 'NÃO é dispensável' <<< "${out}"; then
+    record_pass "merge-dispensa: (d) check fora da lista de dispensáveis é recusado"
+  else record_fail "merge-dispensa: (d)" "dispensou check não-listado: ${out:0:160}"; fi
+
+  # (e) sem motivo escrito é override, não dispensa
+  out="$(_md --dispensa onion-review-verdict)"
+  if grep -q 'exige --motivo' <<< "${out}"; then
+    record_pass "merge-dispensa: (e) dispensa sem --motivo é recusada"
+  else record_fail "merge-dispensa: (e)" "aceitou dispensa sem motivo: ${out:0:160}"; fi
+
+  # (f) O REGISTRO É PRECONDIÇÃO: se o comentário no PR falha, o merge NÃO acontece. É a metade
+  #     que o maestro pediu ("registrando qual check foi dispensado") — e uma dispensa que só
+  #     existe no terminal de quem mergeou é indistinguível de merge por fora do gate.
+  out="$(STUB_COMMENT_FAIL=1 _md --dispensa onion-review-verdict --motivo "x")"
+  if grep -q 'REGISTRAR' <<< "${out}" && ! grep -q 'MERGOU-DE-MENTIRA' <<< "${out}"; then
+    record_pass "merge-dispensa: (f) registro que falha ABORTA o merge (registro é precondição)"
+  else record_fail "merge-dispensa: (f)" "mergeou sem registrar a dispensa: ${out:0:160}"; fi
+
+  # (g) sem --dispensa, nada muda: check falho continua recusando (o caminho normal é intocado)
+  out="$(_md)"
+  if grep -q '✗' <<< "${out}" && ! grep -q 'DISPENSADO' <<< "${out}"; then
+    record_pass "merge-dispensa: (g) sem --dispensa o comportamento antigo é idêntico"
+  else record_fail "merge-dispensa: (g)" "o caminho sem dispensa mudou: ${out:0:160}"; fi
+
+  unset -f _md; unset STUB_RUNS STUB_CHECKS STUB_VERDICT
+  rm -rf "${sb}"
+}
+
+# ── A LISTA DE PROJEÇÕES É CONFERIDA POR MÁQUINA (2026-09-17) ────────────────────────────────
+# `regen-ssot-projections.sh` foi ampliado TRÊS vezes pela mesma causa — uma projeção com catraca
+# no lint que ninguém pôs na lista (testing-state 09-16 manhã · testing-inventory 09-16 noite ·
+# lint-rules 09-17). Na 2ª vez escrevi lá um CRITÉRIO em prosa — "toda projeção gerada com catraca
+# pertence a esta lista, para não haver terceira" — e houve terceira. É a lição que interessa:
+# critério escrito DESCREVE o dever, não o executa. Este caso EXECUTA, derivando o conjunto
+# esperado das próprias mensagens do lint.
+run_regen_completude_selftests() {
+  local regen="${REPO_ROOT}/.claude/utils/adopt/regen-ssot-projections.sh"
+  [ -f "${regen}" ] || { record_skip "regen-completude: regen-ssot-projections.sh ausente"; return; }
+
+  # ORÁCULO: toda guarda que manda regenerar nomeia o gerador na própria mensagem.
+  local _geradores; _geradores="$(grep -ohE 'regenere[^"]{0,40}bash \.claude/validation/[a-z0-9-]+\.sh' \
+      "${REPO_ROOT}"/.claude/validation/*.sh 2>/dev/null | grep -oE '[a-z0-9-]+\.sh$' | sort -u)"
+  if [ -z "${_geradores}" ]; then
+    record_fail "regen-completude: oráculo" "nenhuma mensagem 'regenere: bash .claude/validation/*.sh' encontrada — o padrão mudou e este caso virou decorativo (pior que ausente)"
+    return
+  fi
+
+  # ISENÇÕES DECLARADAS, com a razão — nunca uma lista muda. Quem isentar sem razão escrita está
+  # repetindo o defeito uma camada acima.
+  local _isentos=(
+    "federation-console.sh"     # projeta em docs/evolution/federation/ — superfície CORE-ONLY, não viaja
+    "marketplace-root-check.sh" # marketplace é CORE-ONLY (só a fonte publica plugin)
+    "vendor-scrub-form-check.sh" # emite BASELINE, não projeção: baseline é LEDGER DO ALVO e o do core nunca viaja
+    "kg-view.sh"                # visualizador POR-GRAFO (exige argumento), não gerador de projeção
+    # ⚠️ ACHADO PELO PRÓPRIO CASO, na 1ª execução dele (2026-09-17): eu tinha varrido à mão e
+    # perdido este, porque a frase da mensagem dele difere um pouco das outras. O oráculo derivado
+    # achou o QUINTO gerador na estreia — que é exatamente a diferença entre conferir por máquina e
+    # conferir por quem lembrou.
+    "a2a-agent-card.sh"         # deriva de docs/evolution/federation/members.yaml — CORE-ONLY: sem o registro, não há card a emitir no alvo
+  )
+  local _falta="" _g _x _ok
+  while IFS= read -r _g; do
+    [ -n "${_g}" ] || continue
+    _ok=0
+    grep -q "${_g}" "${regen}" && _ok=1
+    for _x in "${_isentos[@]}"; do [ "${_x}" = "${_g}" ] && _ok=1; done
+    [ "${_ok}" -eq 1 ] || _falta="${_falta}${_g} "
+  done <<< "${_geradores}"
+
+  if [ -z "${_falta// /}" ]; then
+    record_pass "regen-completude: toda projeção que o lint manda regenerar está no regen-ssot (ou isenta COM razão)"
+  else
+    record_fail "regen-completude" "gerador(es) que o lint manda rodar e que o regen-ssot NÃO cobre nem isenta: ${_falta}— o adotante vai nascer com a catraca vermelha, terceira vez que isso acontece"
+  fi
+
+  # E o caso-mutante: se `rules-registry.sh` sair da lista, este oráculo TEM de reprovar. Sem ele o
+  # caso passa a ser um `grep` que sempre acha algo, e guarda que não sabe reprovar não guarda nada.
+  local _mut; _mut="$(mktemp)"
+  grep -v 'rules-registry.sh' "${regen}" > "${_mut}"
+  _falta=""
+  while IFS= read -r _g; do
+    [ -n "${_g}" ] || continue
+    _ok=0
+    grep -q "${_g}" "${_mut}" && _ok=1
+    for _x in "${_isentos[@]}"; do [ "${_x}" = "${_g}" ] && _ok=1; done
+    [ "${_ok}" -eq 1 ] || _falta="${_falta}${_g} "
+  done <<< "${_geradores}"
+  rm -f "${_mut}"
+  if grep -q 'rules-registry' <<< "${_falta}"; then
+    record_pass "regen-completude: (MUT) tirar rules-registry da lista faz o oráculo reprovar"
+  else record_fail "regen-completude: (MUT)" "o oráculo não reage à remoção — o caso é decorativo"; fi
+}
+
+_family run_regen_completude_selftests
+_family run_merge_dispensa_selftests
+_family run_workflow_parse_selftests
+_family run_role_scope_selftests
 _family run_model_ssot_selftests
 _family run_kg_read_leg_selftests
 _family run_sandbox_gc_selftests

@@ -29,14 +29,21 @@ permissions:
 
 jobs:
   diagnose:
-    # SSOT do modelo — a MESMA chave do onion-review.yml. Diagnosticar com modelo
-    # DIFERENTE do que o revisor usa é diagnosticar outro sistema.
-    env:
-      REVIEW_MODEL: claude-sonnet-5
     runs-on: ubuntu-latest
     timeout-minutes: 10
     if: ${{ github.event.pull_request.head.repo.fork == false || github.event_name == 'workflow_dispatch' }}
+    # ⚠️ UM SÓ BLOCO `env:` — havia DOIS, e o YAML inteiro não parseava. O workflow ficou
+    # INEXECUTÁVEL, e com ele a instrução que o `onion-review.yml` dá em prosa: *"não reescreva
+    # causa neste bloco sem rodar o diagnóstico"*. A doutrina mandava não adivinhar e apontava
+    # para um instrumento morto — então adivinhar era a única coisa que sobrava. Descoberto em
+    # 2026-09-17 ao tentar rodá-lo: HTTP 422, "'env' is already defined (Line: 39, Col: 5)".
+    # Por que ninguém viu: o `workflow_dispatch` só falha quando alguém DISPARA, e o gatilho de
+    # `pull_request` é restrito ao próprio arquivo — que ninguém mais tocou desde que quebrou.
+    # Guarda que só se exercita quando invocada à mão é guarda que envelhece calada.
     env:
+      # SSOT do modelo — a MESMA chave do onion-review.yml. Diagnosticar com modelo
+      # DIFERENTE do que o revisor usa é diagnosticar outro sistema.
+      REVIEW_MODEL: claude-sonnet-5
       HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
     steps:
       - name: O secret existe?

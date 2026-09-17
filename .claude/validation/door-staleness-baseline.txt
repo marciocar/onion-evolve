@@ -1,0 +1,21 @@
+# Catraca de DEFASAGEM DE PORTA — quantos commits da superfície que viaja cada porta
+# tolera estar atrás. SÓ ENCOLHE: a métrica de saúde é o número DIMINUINDO.
+# Regenere com: bash .claude/validation/door-staleness-check.sh --emit-baseline
+#
+# onion-standalone 372 — o PASSIVO MEDIDO, e a razão desta guarda existir. A porta está parada
+#   desde 2026-07-19 porque o ciclo de re-materialização era PROSA. Não é negligência: é o modo de
+#   falha previsível de um gatilho que depende de alguém lembrar.
+# onion-core 0 — porta NOVA nasce sem passivo. Se subir sem re-materialização, a guarda reprova.
+#
+# ⚠️ POR QUE OS NÚMEROS CAÍRAM (378/2 → 372/0) SEM NINGUÉM RE-MATERIALIZAR NADA: os tetos antigos
+#   mediam `pin..HEAD` da BRANCH, então carregavam commits em voo que a porta não teria como
+#   espelhar — a guarda cobrava por trabalho que ainda não existia em main. Corrigida a ponta para
+#   o `merge-base`, o passivo REAL apareceu, e é menor. A catraca não afrouxou: ficou honesta.
+#
+# 2026-09-17, pós-merge do #840: a `main` ANDOU de verdade (4 commits na superfície que viaja), e
+# os números subiram 372→373 e 0→1. Isto NÃO é a esteira curada acima: ali o teto crescia por
+# trabalho em VOO, que a porta não teria como espelhar; aqui o trabalho está MERGEADO, a porta de
+# fato ficou para trás, e a catraca está fazendo exatamente o que existe para fazer. O `onion-core`
+# volta a 0 na re-materialização logo a seguir; o 373 do `onion-standalone` é o passivo real.
+onion-standalone 373
+onion-core 1

@@ -233,6 +233,17 @@ nodes:
     label: "A METADE VIVA DE UM SINAL CUJA OUTRA METADE JA FOI CURADA — registrada aqui para o arquivamento do sinal nao apagar o achado. O anuncio que viaja ao adotante AFIRMOU estado verificavel do repo dele ('as portas estao OK: nenhuma sem prefixo de bind') enquanto a catraca da MESMA leva tinha contado 38 exposicoes, e o relatorio DENTRO da propria branch dizia o numero certo. Dois artefatos da mesma leva, discordando: um dizia 0, o outro 38. O adotante que le so o anuncio — que e o unico documento que chega ANTES do merge — conclui que nao ha o que fazer, e a divida tolerada pela catraca fica tolerada para sempre porque ninguem foi avisado. O mesmo anuncio citava '3 fallbacks de senha' onde o padrao produzia 19 em 10 variaveis: quem aplicasse 'o fix de 3 linhas' curaria 16% da classe achando ter curado a classe. A CURA PROPOSTA pelo adotante, que e a certa: quando o /meta:co-announce descreve estado verificavel, DERIVAR o numero do artefato de medicao (baseline da catraca, saida do gate) em vez de reafirmar em prosa; e quando o numero nao estiver disponivel na geracao, dizer 'nao medido' em vez de afirmar o estado. Guarda barata que cabe junto: anuncio e relatorio da mesma leva nao podem discordar sobre uma contagem que ambos citam. Classe: declarado != medido, no unico artefato que viaja sozinho."
     trace: '.claude/commands/meta/co-announce.md'
 
+  - id: Q_POR_QUE_O_REVISOR_SEMANTICO_MORRE
+    node_type: question
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    owner: core
+    verified_against: 'medido em 2026-09-17 no PR #842: onion-review saiu is_error:true nas DUAS tentativas com turnos=1 e custo=0, enquanto o pre-voo (POST /v1/messages, claude-sonnet-5, max_tokens=1) devolveu HTTP 200'
+    label: "O GATE SEMANTICO ESTA CEGO E NINGUEM SABE POR QUE — e o que ele cobre nao tem outra camada. Compromisso, nao fato: os achados vivem em `passada-adversarial-2026-09` (`E_O_DIAGNOSTICO_QUE_A_DOUTRINA_MANDA_RODAR_ESTAVA_MORTO`). O QUE JA ESTA DESCARTADO POR MEDICAO, para ninguem repetir: (a) credencial/credito — o pre-voo da HTTP 200 contra o MESMO modelo; (b) versao da action — testada nas duas pontas em 2026-08-03, falham identico; (c) tamanho do diff no prompt — o prompt NAO embute o diff, manda o revisor rodar `git diff`. O sintoma restante e especifico: morre ANTES de gerar, sem cobrar, nas duas tentativas. POR QUE ISTO E RISCO E NAO ROTINA: enquanto durar, todo merge passa so pelo gate DETERMINISTICO, e foi preciso criar um escape de dispensa NOMEADA E REGISTRADA no `pr-merge-verified.sh` para que a decisao de mergear sem revisao semantica fosse consciente em vez de virar merge por fora do gate. Escape existe; o buraco que ele contorna, nao foi fechado. GATILHO (mecanico, nao relogio): o proximo PR que tocar `.claude/` roda o revisor de novo — se morrer igual, rodar `.github/workflows/onion-review-diagnose.yml`, que so agora VOLTOU a ser executavel (estava com `env:` duplicado e nao parseava; a REGRA 86 nasceu disso). E o aviso epistemico do proprio `onion-review.yml` vale aqui: aquele bloco ja mentiu DUAS vezes sobre a causa — nao escreva a terceira sem rodar o diagnostico."
+    trace: '.github/workflows/onion-review.yml'
+
   - id: A_PERNA_DE_LEITURA_DO_KG_E_CONSELHO
     node_type: decision
     plane: PROD
@@ -294,3 +305,6 @@ edges:
   - from: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
     to: D_BANCADA_FAIXAS_E_MAPA
     edge_type: DEPENDS_ON
+  - from: Q_POR_QUE_O_REVISOR_SEMANTICO_MORRE
+    to: W8_REAIS_EXECUTAVEIS
+    edge_type: CONSTRAINS

@@ -163,7 +163,7 @@ CATEGORIES = [
      [10, 11]),
     ("SSOT anti-drift",
      "Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, plugins, topologia.",
-     [8, 9, 16, 19, 21, 27, 37, 39, 41, 50, 59, 62, 63, 70, 76, 80, 81, 83, 84]),
+     [8, 9, 16, 19, 21, 27, 37, 39, 41, 50, 59, 62, 63, 70, 76, 80, 81, 83, 84, 85]),
     ("KG & proveniência",
      "Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca "
      "(por citação e por marcador autodeclarado); e frescor doutrinário — afirmação "
@@ -189,8 +189,11 @@ CATEGORIES = [
      "As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a "
      "olhar?' — porque varredura cega devolve zero violações, que é indistinguível de "
      "conformidade. Categoria nova em 2026-08-04, quando o lint rodou de dentro de um "
-     "worktree de harness e varreu 0 dos 51 agentes sem emitir uma linha de aviso.",
-     [54]),
+     "worktree de harness e varreu 0 dos 51 agentes sem emitir uma linha de aviso. "
+     "A REGRA 86 entrou aqui em 2026-09-17 pelo mesmo motivo, um andar acima: um workflow "
+     "que não PARSEIA não é um gate que falhou, é um gate que nunca rodou — e o repo o "
+     "contava como existente.",
+     [54, 86]),
 ]
 
 seen = {}
