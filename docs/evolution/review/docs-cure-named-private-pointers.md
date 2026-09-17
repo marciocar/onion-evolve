@@ -2,7 +2,7 @@
 title: 'Resíduo — a porta pública barrou a si mesma, e por isso pode nascer limpa'
 date: 2026-09-17
 branch: docs/cure-named-private-pointers
-reviewed_diff_sha256: c8cbea868c19a7b9a1a5ab55b48cff156a7f0b1974a057f72111793472400182
+reviewed_diff_sha256: 0b552d4bf96ee54b2dbdfce8ffdb3b3a393da8fe07940c465e9ac9803fd38e27
 findings_total: 6
 findings_real: 6
 findings_fixed: 6
