@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**82 regras** no total — **73 HARD**, **22 SOFT**.
+**83 regras** no total — **74 HARD**, **22 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -109,6 +109,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 80 | Números do harness saem de SSOT gerada, nunca de comentário | HARD | contagem sobre o próprio harness escrita à mão, que envelhece calada e é citada como medição |
 | 81 | Painel de estado é GERADO dos produtores, nunca redigido | HARD | painel de testes com número sem produtor — metas redesenhadas como medição, que foi o defeito real deste repo |
 | 83 | Id de modelo VERSIONADO só na SSOT declarada | HARD | versão literal de modelo espalhada por config, que caduca sem aviso |
+| 84 | Índice de leitura do KG em sincronia com os traces | HARD | o hook da perna de leitura mentir POR OMISSÃO |
 
 ## KG & proveniência
 

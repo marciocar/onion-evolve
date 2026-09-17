@@ -40,6 +40,24 @@
 
 set -euo pipefail
 
+
+# ══ AUTO-GC DESLIGADO EM TODO SANDBOX — a causa da morte do worker 0 no CI ════════════════════
+# Medido 2026-09-16, com QUATRO reprovações seguidas no CI e a bancada inteira VERDE localmente
+# (1283/0 com `--jobs auto`). A linha que matava, no meio da faixa paralela:
+#
+#     rm: cannot remove '/tmp/tmp.74xoKPesoc/.git/objects': Directory not empty
+#
+# Sob `set -e` esse `rm` não-zero mata o worker na hora — e o pai reporta "família reivindicada e
+# NÃO concluída", que é honesto mas não diz a causa. A causa é o `git gc --auto`: `git add`/`git
+# commit` num sandbox disparam um gc em SEGUNDO PLANO, e o `rm -rf` da limpeza chega antes de ele
+# soltar `.git/objects`. Na minha máquina o gc termina primeiro; nos 4 workers do runner, não —
+# é a mesma família de "passa isolada, morre na faixa" que a casa já registrou como AMBIENTE, não
+# carga.
+#
+# A cura é de MECANISMO e cobre os 55 `git init` de uma vez, inclusive os que ninguém escreveu
+# ainda: `GIT_CONFIG_*` aplica-se a TODA invocação de git na árvore de processos. Desativar o gc
+# num sandbox descartável não custa nada — ele vive segundos e é apagado.
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=gc.auto GIT_CONFIG_VALUE_0=0
 # ── A BANCADA NÃO PODE MORRER CALADA ───────────────────────────────────────────────────────────
 # Medido em 2026-08-08: reescrevi um mutation test usando `cmd; rc=$?` — padrão que, sob `set -e`,
 # MATA a suíte no `cmd` que retorna != 0, antes da atribuição. A bancada abortou logo depois do caso
@@ -14228,7 +14246,7 @@ run_plugin_namespace_selftests() {
   # (a) o assembler CURA: mesmo-plugin e cross viram /<plugin>:<cmd>; dangling perde a barra; URL intacta
   bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/probe-a.manifest.sh" "${d}/src" "${d}/src/plugins/probe-a" >/dev/null 2>&1 || true
   out="$(cat "${d}/src/plugins/probe-a/commands/one.md" 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '`/probe-a:two`' && printf '%s' "${out}" | grep -q '`/probe-b:three`' && printf '%s' "${out}" | grep -q '`meta:adopt`' && printf '%s' "${out}" | grep -q 'https://x/meta:nao' && ! printf '%s' "${out}" | grep -q '/alpha:two'; then
+  if grep -q '`/probe-a:two`' <<< "${out}" && grep -q '`/probe-b:three`' <<< "${out}" && grep -q '`meta:adopt`' <<< "${out}" && grep -q 'https://x/meta:nao' <<< "${out}" && ! grep -q '/alpha:two' <<< "${out}"; then
     record_pass "plugin-namespace: (a) assembler reescreve mesmo-plugin+cross para /<plugin>:<cmd>, dangling sem barra, URL intacta"
   else record_fail "plugin-namespace: (a) cura" "$(printf '%s' "${out}" | grep -n 'alpha:two\|beta:three\|meta:adopt' | head -3 | tr '\n' ' ')"; fi
   # (b) README lista os comandos do core citados e não distribuídos
@@ -14242,7 +14260,7 @@ run_plugin_namespace_selftests() {
   # (d) MUTANTE: plugin editado à mão volta ao namespace do core → 3 classes, HARD
   printf 'Rode /alpha:two, /beta:three e /meta:adopt.\n' >> "${d}/src/plugins/probe-a/commands/one.md"
   out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
-  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 3 ] && printf '%s' "${out}" | grep -q 'mesmo-plugin' && printf '%s' "${out}" | grep -q 'cross-plugin' && printf '%s' "${out}" | grep -q 'dangling'; then
+  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 3 ] && grep -q 'mesmo-plugin' <<< "${out}" && grep -q 'cross-plugin' <<< "${out}" && grep -q 'dangling' <<< "${out}"; then
     record_pass "plugin-namespace: (d) mutante à mão → 3 HARD (mesmo-plugin, cross-plugin, dangling)"
   else record_fail "plugin-namespace: (d) mutante" "esperava 3 HARD: $(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   # (e) idempotência: re-montar produz o mesmo arquivo (a cura não acumula)
@@ -14334,7 +14352,7 @@ run_plugin_dead_link_selftests() {
   bash "${asm}" "${d}/src/.claude/utils/marketplace/verticals/dl.manifest.sh" "${d}/src" "${d}/src/plugins/dl" >/dev/null 2>&1 || true
   out="$(cat "${d}/src/plugins/dl/commands/one.md" 2>/dev/null)"
   # (a) a cura: a irmã embarcada (viva → kb/) segue link; a não-embarcada vira texto; URL intacta
-  if printf '%s' "${out}" | grep -q 'kb/viva.md' && printf '%s' "${out}" | grep -q ' morta ' && printf '%s' "${out}" | grep -q '\[url\](https://x/y.md)'; then
+  if grep -q 'kb/viva.md' <<< "${out}" && grep -q ' morta ' <<< "${out}" && grep -q '\[url\](https://x/y.md)' <<< "${out}"; then
     record_pass "plugin-dead-link: (a) assembler: irmã embarcada mantém link, não-embarcada vira texto, URL intacta"
   else record_fail "plugin-dead-link: (a) cura" "$(printf '%s' "${out}" | tail -1 | cut -c1-200)"; fi
   # (b) modo consumido: --format tsv vazio no plugin curado
@@ -14345,7 +14363,7 @@ run_plugin_dead_link_selftests() {
   printf 'De novo: [morta](../kb/morta.md)\n' >> "${d}/src/plugins/dl/commands/one.md"
   mkdir -p "${d}/src/plugins/dl/templates"; printf '[gera](../docs/x.md)\n' > "${d}/src/plugins/dl/templates/t.md"
   out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
-  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 1 ] && printf '%s' "${out}" | grep -q 'morta.md'; then record_pass "plugin-dead-link: (c) mutante → 1 HARD; templates/ fora por desenho"
+  if [ "$(printf '%s\n' "${out}" | grep -c '^HARD')" -eq 1 ] && grep -q 'morta.md' <<< "${out}"; then record_pass "plugin-dead-link: (c) mutante → 1 HARD; templates/ fora por desenho"
   else record_fail "plugin-dead-link: (c) mutante" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
   rm -rf "${d}"
@@ -14362,7 +14380,7 @@ run_marketplace_root_sync_selftests() {
   printf '{\n  "name": "probe-mkt",\n  "owner": { "name": "t" },\n  "plugins": []\n}\n' > "${d}/r/.claude-plugin/marketplace.json"
   # (a) stale → HARD (modo consumido --format tsv)
   out="$(bash "${h}" "${d}/r" --format tsv 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '^HARD	desatualizado'; then record_pass "marketplace-root-sync: (a) marketplace.json stale → HARD"
+  if grep -q '^HARD	desatualizado' <<< "${out}"; then record_pass "marketplace-root-sync: (a) marketplace.json stale → HARD"
   else record_fail "marketplace-root-sync: (a)" "$(printf '%s' "${out}" | cut -c1-200)"; fi
   # (b) --write regenera com top-level preservado → limpo
   bash "${h}" "${d}/r" --write >/dev/null 2>&1
@@ -14400,12 +14418,12 @@ run_plugin_deps_contract_selftests() {
   # (c) mutante 1: some a declaração → skill de outro plugin sem REQUIRES_PLUGINS = HARD; menção de comando = SOFT
   printf 'PLUGIN_NAME="onion-x"\nCOMMANDS=(.claude/commands/alpha)\n' > "${d}/src/.claude/utils/marketplace/verticals/onion-x.manifest.sh"
   out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '^HARD	dependencia-nao-declarada'; then record_pass "plugin-deps-contract: (c) skill de outro plugin sem REQUIRES_PLUGINS → HARD"
+  if grep -q '^HARD	dependencia-nao-declarada' <<< "${out}"; then record_pass "plugin-deps-contract: (c) skill de outro plugin sem REQUIRES_PLUGINS → HARD"
   else record_fail "plugin-deps-contract: (c) mutante" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   # (d) mutante 2: conhecimento duplicado (a mesma skill nos dois plugins) → HARD duplicado
   mkdir -p "${d}/src/plugins/onion-x/skills/orch"; cp "${d}/src/plugins/onion/skills/orch/SKILL.md" "${d}/src/plugins/onion-x/skills/orch/SKILL.md"
   out="$(bash "${h}" "${d}/src" --format tsv 2>/dev/null)"
-  if printf '%s' "${out}" | grep -q '^HARD	duplicado'; then record_pass "plugin-deps-contract: (d) skill duplicada em 2 plugins → HARD duplicado"
+  if grep -q '^HARD	duplicado' <<< "${out}"; then record_pass "plugin-deps-contract: (d) skill duplicada em 2 plugins → HARD duplicado"
   else record_fail "plugin-deps-contract: (d) duplicado" "$(printf '%s' "${out}" | tr '\n' ' ' | cut -c1-200)"; fi
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
   rm -rf "${d}"
@@ -16531,6 +16549,103 @@ run_door_selftests() {
   rm -rf "${d3}" "${sb2}"
 }
 
+# ── A PERNA DE LEITURA (hook kg-read-leg.sh + REGRA 84) ───────────────────────────────────────
+# O hook nasce de um sinal de campo com preço medido: uma sessão publicou QUATRO teses erradas
+# num corpus que tinha a resposta em quatro nós de um grafo que ela mesma citou. A bancada aqui
+# prova as três coisas que o hook promete: FALA quando há nó, CALA quando não há, e não quebra
+# quando o índice some. O caso (d) é o que impede a fraude mais barata — um hook que fala sempre.
+run_kg_read_leg_selftests() {
+  local sb2 out h idx
+  sb2="$(mktemp -d)"
+  mkdir -p "${sb2}/.claude/hooks" "${sb2}/docs/onion"
+  cp "${REPO_ROOT}/.claude/hooks/kg-read-leg.sh" "${sb2}/.claude/hooks/"
+  h="${sb2}/.claude/hooks/kg-read-leg.sh"
+  idx="${sb2}/docs/onion/kg-read-index.tsv"
+  printf 'src/alvo.ts\tC_NO_QUE_FALA\tdocs/onion/graph/g.kg.yaml\n' > "${idx}"
+
+  # (a) arquivo COBERTO por nó → o hook fala, e diz QUAL nó
+  out="$(printf '{"tool_input":{"file_path":"%s/src/alvo.ts"}}' "${sb2}" | bash "${h}" 2>&1 || true)"
+  if grep -q 'C_NO_QUE_FALA' <<< "${out}"; then
+    record_pass "kg-read-leg: (a) arquivo com nó → avisa e nomeia o id"
+  else record_fail "kg-read-leg: (a)" "não avisou sobre arquivo coberto (saída: ${out:0:120})"; fi
+
+  # (b) a saída é JSON válido com additionalContext — se não for, o harness IGNORA em silêncio
+  if printf '%s' "${out}" | python3 -c 'import json,sys; d=json.load(sys.stdin); assert d["hookSpecificOutput"]["additionalContext"]' 2>/dev/null; then
+    record_pass "kg-read-leg: (b) devolve JSON com hookSpecificOutput.additionalContext"
+  else record_fail "kg-read-leg: (b)" "saída não é o contrato de hook (o harness ignoraria calado)"; fi
+
+  # (c) arquivo NÃO coberto → silêncio. Hook que fala sempre vira ruído e é desligado.
+  out="$(printf '{"tool_input":{"file_path":"%s/src/outro.ts"}}' "${sb2}" | bash "${h}" 2>&1 || true)"
+  if [ -z "${out}" ]; then record_pass "kg-read-leg: (c) arquivo sem nó → calado"
+  else record_fail "kg-read-leg: (c)" "falou sobre arquivo não coberto: ${out:0:120}"; fi
+
+  # (d) PREFIXO não conta como cobertura: `alvo.ts` no índice não pode casar `alvo.ts.bak`,
+  #     senão o aviso aponta nós de OUTRO arquivo — pior que silêncio, porque parece informação.
+  out="$(printf '{"tool_input":{"file_path":"%s/src/alvo.ts.bak"}}' "${sb2}" | bash "${h}" 2>&1 || true)"
+  if [ -z "${out}" ]; then record_pass "kg-read-leg: (d) prefixo NÃO casa (alvo.ts não cobre alvo.ts.bak)"
+  else record_fail "kg-read-leg: (d)" "casou por prefixo — apontaria nós do arquivo errado"; fi
+
+  # (f) O MODO QUE A PRODUÇÃO CONSOME É EXERCITADO AQUI (REGRA 59). O hook depende de
+  #     `kg-trace-resolve.sh --emit-index`; modo consumido em produção e não coberto pela bancada
+  #     é modo que ninguém sabe se ainda funciona — e o índice falhando em silêncio deixa a perna
+  #     de leitura cega, que é o defeito original de volta por outra porta.
+  local sbi; sbi="$(mktemp -d)"
+  mkdir -p "${sbi}/.claude/validation" "${sbi}/docs/onion/graph" "${sbi}/src"
+  # A dependência é FAIL-CLOSED por desenho (sem o predicado de fixture a varredura ficaria
+  # vazia e o script prefere abortar) — o harness tem de copiar o motor INTEIRO, não só o topo.
+  # É a classe `fail-closed-exposes-incomplete-harness`: trocar uma dependência para fail-closed
+  # quebra todo harness que copiava o motor sem ela.
+  cp "${REPO_ROOT}/.claude/validation/kg-trace-resolve.sh" "${sbi}/.claude/validation/"
+  cp "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "${sbi}/.claude/validation/" 2>/dev/null || true
+  printf '# alvo\n' > "${sbi}/src/alvo.ts"
+  printf 'meta:\n  id: g\n  schema_version: "1"\nnodes:\n  - id: C_X\n    node_type: claim\n    plane: DEV\n    status: open\n    impact: 1\n    confidence: 0.5\n    label: x\n    trace: "src/alvo.ts"\nedges: []\n' > "${sbi}/docs/onion/graph/g.kg.yaml"
+  ( cd "${sbi}" && git init -q . && git add -A ) >/dev/null 2>&1
+  out="$(bash "${sbi}/.claude/validation/kg-trace-resolve.sh" "${sbi}" --emit-index 2>&1 || true)"
+  if grep -q '^src/alvo.ts	C_X	' <<< "${out}"; then
+    record_pass "kg-read-leg: (f) --emit-index emite o par alvo→nó (modo consumido, REGRA 59)"
+  else record_fail "kg-read-leg: (f)" "--emit-index não emitiu o par (saída: ${out:0:140})"; fi
+
+  # (g) FALHA FECHADA: corpus sem nenhum trace resolvível não pode devolver índice vazio com rc=0 —
+  #     o regenerador escreveria um índice vazio e o hook ficaria calado para SEMPRE.
+  printf 'meta:\n  id: g\n  schema_version: "1"\nnodes: []\nedges: []\n' > "${sbi}/docs/onion/graph/g.kg.yaml"
+  ( cd "${sbi}" && git add -A ) >/dev/null 2>&1
+  local rci=0; bash "${sbi}/.claude/validation/kg-trace-resolve.sh" "${sbi}" --emit-index >/dev/null 2>&1 || rci=$?
+  if [ "${rci}" -ne 0 ]; then record_pass "kg-read-leg: (g) índice vazio FALHA FECHADA (rc=${rci}), não escreve cegueira"
+  else record_fail "kg-read-leg: (g)" "índice vazio devolveu rc=0 — o regenerador gravaria um índice cego"; fi
+  rm -rf "${sbi}"
+
+  # (e) SEM índice o hook não pode quebrar o Read: ele degrada calado, e quem cobra a ausência
+  #     é a REGRA 84 no lint — cada um no seu papel.
+  rm -f "${idx}"
+  out="$(printf '{"tool_input":{"file_path":"%s/src/alvo.ts"}}' "${sb2}" | bash "${h}" 2>&1 || true)"
+  if [ -z "${out}" ]; then record_pass "kg-read-leg: (e) sem índice degrada calado (quem cobra é a REGRA 84)"
+  else record_fail "kg-read-leg: (e)" "sem índice produziu saída: ${out:0:120}"; fi
+  rm -rf "${sb2}"
+}
+
+
+# ── A CURA DA MORTE DO WORKER TEM BANCADA (senão é fé) ────────────────────────────────────────
+# Uma cura de ambiente é a mais fácil de perder: some numa refatoração e ninguém nota até o CI
+# morrer de novo, quatro reprovações depois. Este caso prende o mecanismo.
+run_sandbox_gc_selftests() {
+  local d
+  d="$(mktemp -d)"
+  ( cd "${d}" && git init -q . ) >/dev/null 2>&1
+  if [ "$(git -C "${d}" config gc.auto 2>/dev/null)" = "0" ]; then
+    record_pass "sandbox-gc: (a) todo sandbox herda gc.auto=0 (o gc em 2º plano matava o worker no CI)"
+  else
+    record_fail "sandbox-gc: (a)" "sandbox SEM gc.auto=0 — o \`rm -rf\` da limpeza volta a correr contra o gc"
+  fi
+  # (b) o mecanismo é por ENV, não por chamada: prova que vale para git init que NINGUÉM editou —
+  #     é o que distingue mecanismo de disciplina.
+  if [ "${GIT_CONFIG_COUNT:-0}" = "1" ] && [ "${GIT_CONFIG_KEY_0:-}" = "gc.auto" ]; then
+    record_pass "sandbox-gc: (b) a cura é por ENV — alcança os 55 git init e os que ainda não existem"
+  else
+    record_fail "sandbox-gc: (b)" "GIT_CONFIG_* ausente — a cura viraria disciplina por sítio"
+  fi
+  rm -rf "${d}"
+}
+
 _family run_hook_autofix_selftests
 _family run_kg_reverify_schema_selftests
 _family run_backtick_ref_selftests
@@ -16559,6 +16674,8 @@ _family run_hub_role_guard_selftests
 _family run_inventory_adopter_scope_selftests
 _family run_door_selftests
 _family run_model_ssot_selftests
+_family run_kg_read_leg_selftests
+_family run_sandbox_gc_selftests
 _family run_family_topology_selftests
 _family run_decouple_source_selftests
 _family run_kg_view_selftests

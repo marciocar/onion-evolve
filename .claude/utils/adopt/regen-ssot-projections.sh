@@ -33,6 +33,15 @@ DEST="${1:?uso: regen-ssot-projections.sh <DEST>}"
 mkdir -p "${DEST}/docs/onion" || { echo "ERRO: não consegui criar '${DEST}/docs/onion' (existe como arquivo?)" >&2; exit 3; }
 [ -d "${DEST}/docs/onion" ] || { echo "ERRO: '${DEST}/docs/onion' não é diretório" >&2; exit 3; }
 
+# O índice de leitura do KG não usa `--markdown` (é TSV) nem vive sob o mesmo molde, então
+# sai do laço — mas pertence à mesma lista por natureza: projeção GERADA com catraca no lint.
+if [ -f "${DEST}/.claude/validation/kg-trace-resolve.sh" ]; then
+  _idx="$(bash "${DEST}/.claude/validation/kg-trace-resolve.sh" "${DEST}" --emit-index 2>/dev/null || true)"
+  # Só escreve se veio conteúdo: índice vazio faria o hook da perna de leitura ficar calado
+  # para o corpus inteiro, e calado é indistinguível de "não há grafo" (REGRA 84).
+  [ -n "${_idx}" ] && printf '%s\n' "${_idx}" > "${DEST}/docs/onion/kg-read-index.tsv"
+fi
+
 _n=0 _vazias=""
 # ⚠️ A LISTA ERA CURTA DEMAIS, e o preço foi medido em 2026-09-16: `testing-state.md` (REGRA 81)
 # ficou de fora e a catraca reprovou o CI QUATRO VEZES no mesmo dia, sempre pela mesma causa — eu
@@ -41,7 +50,13 @@ _n=0 _vazias=""
 # desta casa diz que erro recorrente vira REGISTRO com cura anexada, não disciplina de quem lembra.
 # Toda projeção GERADA que tenha catraca no lint pertence a esta lista — quem acrescentar uma guarda
 # de projeção nova e esquecer daqui vai pagar o mesmo pedágio.
-for _pair in "inventory.sh:inventory.md" "graph.sh:graph.md" "testing-state.sh:testing-state.md"; do
+# ⚠️ 2ª AMPLIAÇÃO NO MESMO DIA, e a recorrência é o achado. Hoje de manhã acrescentei
+# `testing-state.md` depois de a REGRA 81 reprovar QUATRO vezes; à noite a REGRA 80 reprovou pelo
+# mesmo motivo com `testing-inventory.md`, que eu também não tinha posto. Curar UM item de uma
+# lista que devia ser completa é curar o caso, não a classe — e a classe cobra de novo no mesmo dia.
+# CRITÉRIO, para não haver terceira: TODA projeção gerada com catraca no lint pertence a esta lista.
+# Hoje são quatro (REGRAS 8, 21, 80, 81) mais o índice de leitura (REGRA 84, fora do laço por ser TSV).
+for _pair in "inventory.sh:inventory.md" "graph.sh:graph.md" "testing-state.sh:testing-state.md" "harness-inventory.sh:testing-inventory.md"; do
   _gen="${_pair%%:*}"; _out="${_pair##*:}"
   [ -f "${DEST}/.claude/validation/${_gen}" ] || continue
   bash "${DEST}/.claude/validation/${_gen}" --markdown > "${DEST}/docs/onion/${_out}" 2>/dev/null || true
