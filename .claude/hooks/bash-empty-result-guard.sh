@@ -272,30 +272,35 @@ fi
 # um TETO, e uma saída que DIGA QUAL DOS DOIS CASOS ocorreu.
 #
 # Sem isso, "ainda esperando" e "vai esperar para sempre" têm exatamente a mesma aparência: silêncio.
+#
+# ⚠️ ESTE BLOCO USA HERE-STRING, NUNCA `printf … | grep -q` — e a bancada me cobrou isso na 1ª
+# redação, com a catraca subindo de 10 para 12 sítios. `grep -q` fecha no primeiro casamento, o
+# escritor toma EPIPE, e sob `pipefail` o comando reprova COM O PADRÃO PRESENTE. Escrever a guarda
+# do laço sem-teto usando o defeito que outra guarda persegue seria cômico se não fosse reincidência.
 # É a doutrina de monitoramento desta casa aplicada ao próprio operador — *se isto falhasse agora,
 # o meu filtro emitiria alguma coisa?*. O meu não emitiria.
 #
 # ÂNCORA em posição de comando (a lição do (5), que o (3b) pagou de novo por não reusar): só conta
 # `until`/`while` que ABRE statement, senão `grep -n 'until' arquivo` e esta própria mensagem de
 # commit seriam acusados.
-_loop_sem_teto=0
+_unbounded_wait=0
 while IFS= read -r _stmt; do
-  _c="$(printf '%s' "${_stmt}" | sed -E 's/^[[:space:]]*//; s/^(!|\(|\{)[[:space:]]+//; s/^[[:space:]]*//')"
+  _c="$(sed -E 's/^[[:space:]]*//; s/^(!|\(|\{)[[:space:]]+//; s/^[[:space:]]*//' <<< "${_stmt}")"
   case "${_c}" in until\ *|while\ *) ;; *) continue ;; esac
   # ⚠️ O `sleep` É LIDO NO COMANDO INTEIRO, NUNCA NO FRAGMENTO — e a bancada me pegou nisto na 1ª
   # redação: o separador `tr ';&|'` parte `until …; do sleep 60; done` em TRÊS pedaços, e o pedaço
   # que abre com `until` não contém `sleep` nenhum. Julgar o fragmento fazia o detector calar
   # justamente na forma que o originou. O escopo certo é: ÂNCORA no fragmento (para não acusar quem
   # só menciona a palavra), PRESENÇA DE ESPERA no comando (porque o corpo do laço mora noutro pedaço).
-  printf '%s' "${cmd}" | grep -qE '(^|[[:space:];&|])sleep([[:space:]]|$)' || continue
+  grep -qE '(^|[[:space:];&|])sleep([[:space:]]|$)' <<< "${cmd}" || continue
   # DESARMES — qualquer forma de teto conta, porque o ponto é o teto existir, não como se escreve:
   #   SECONDS/$EPOCHSECONDS/date +%s → relógio · timeout(1) → teto externo · break → saída explícita
   #   contador (`i=$((i+1))`) → teto por iteração · --max-time/--deadline → teto do próprio cliente
-  printf '%s' "${cmd}" | grep -qE '(SECONDS|EPOCHSECONDS|date \+%s|(^|[[:space:]])timeout[[:space:]]|(^|[[:space:];&|])break([[:space:]]|$)|\+[[:space:]]*1[[:space:]]*\)\)|--max-time|--deadline)' && continue
-  _loop_sem_teto=1
+  grep -qE '(SECONDS|EPOCHSECONDS|date \+%s|(^|[[:space:]])timeout[[:space:]]|(^|[[:space:];&|])break([[:space:]]|$)|\+[[:space:]]*1[[:space:]]*\)\)|--max-time|--deadline)' <<< "${cmd}" && continue
+  _unbounded_wait=1
 done <<< "$(printf '%s' "${cmd}" | tr ';&|' '\n')"
 
-if [ "${_loop_sem_teto}" -eq 1 ]; then
+if [ "${_unbounded_wait}" -eq 1 ]; then
   add 'LAÇO-DE-ESPERA-SEM-TETO: um `until`/`while` com `sleep` e SEM prazo espera PARA SEMPRE quando a premissa cai — e esperar parece trabalhar (medido 2026-09-17: 2h21 batendo na API por checks que nunca iam nascer, porque o PR estava CONFLICTING). Ponha um teto E uma saída que distinga os dois casos: `fim=$((SECONDS+1800)); until <cond>; do [ $SECONDS -gt $fim ] && { echo "DESISTI: teto, condição nunca satisfeita"; break; }; sleep 60; done`. O teto sozinho não basta — sem a mensagem, "pronto" e "desisti" ficam indistinguíveis.'
 fi
 

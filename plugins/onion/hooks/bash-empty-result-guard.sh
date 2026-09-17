@@ -257,6 +257,53 @@ elif [ "${_pg_self}" -eq 1 ]; then
   add 'PGREP-QUE-SE-ENCONTRA: `pgrep -f`/`pkill -f` casa a linha de comando do PRÓPRIO shell que o roda — o padrão está escrito ali. Num `until ! pgrep ...` isso trava PARA SEMPRE (medido: 1h06 esperando por si mesmo). Cura mais forte: `pgrep -A -f` (`--ignore-ancestors`). Alternativas: o idioma do colchete `pgrep -f "[l]int-selftest"` (só serve se a forma NUA não estiver na mesma linha) ou esperar por PID com `kill -0`. E nunca mate com um padrão e confira com outro: a conferência tem de usar EXATAMENTE o padrão do `pkill`.'
 fi
 
+# (3c) LAÇO DE ESPERA SEM TETO — irmão do (3b), e a mesma família de dano: esperar parece trabalhar.
+#
+# MEDIDO EM 2026-09-17, e o que prova ser classe é a REINCIDÊNCIA depois da cura: o (3b) já tinha
+# nomeado `until ! pgrep …` preso 1h06, e um mês depois eu escrevi
+#     until [ "$(gh api …/check-runs --jq '… | length')" = "0" ] && [ … -ge 3 ]; do sleep 60; done
+# para um head cujos checks NUNCA nasceram (o PR estava CONFLICTING, e o GitHub não dispara
+# `pull_request` quando não consegue computar o merge). `length` ficou 0 para sempre, a condição
+# `-ge 3` virou inalcançável, e o laço girou 2h21 batendo na API a cada 60s. Quem viu foi o maestro.
+#
+# A diferença entre (3b) e (3c) importa: lá a condição não podia virar falsa por um defeito DO
+# PADRÃO; aqui ela não vira verdadeira porque a PREMISSA caiu. Nenhum regex sabe qual premissa é
+# essa — por isso a guarda não tenta julgar a condição. Ela cobra a única coisa que sempre cabe:
+# um TETO, e uma saída que DIGA QUAL DOS DOIS CASOS ocorreu.
+#
+# Sem isso, "ainda esperando" e "vai esperar para sempre" têm exatamente a mesma aparência: silêncio.
+#
+# ⚠️ ESTE BLOCO USA HERE-STRING, NUNCA `printf … | grep -q` — e a bancada me cobrou isso na 1ª
+# redação, com a catraca subindo de 10 para 12 sítios. `grep -q` fecha no primeiro casamento, o
+# escritor toma EPIPE, e sob `pipefail` o comando reprova COM O PADRÃO PRESENTE. Escrever a guarda
+# do laço sem-teto usando o defeito que outra guarda persegue seria cômico se não fosse reincidência.
+# É a doutrina de monitoramento desta casa aplicada ao próprio operador — *se isto falhasse agora,
+# o meu filtro emitiria alguma coisa?*. O meu não emitiria.
+#
+# ÂNCORA em posição de comando (a lição do (5), que o (3b) pagou de novo por não reusar): só conta
+# `until`/`while` que ABRE statement, senão `grep -n 'until' arquivo` e esta própria mensagem de
+# commit seriam acusados.
+_unbounded_wait=0
+while IFS= read -r _stmt; do
+  _c="$(sed -E 's/^[[:space:]]*//; s/^(!|\(|\{)[[:space:]]+//; s/^[[:space:]]*//' <<< "${_stmt}")"
+  case "${_c}" in until\ *|while\ *) ;; *) continue ;; esac
+  # ⚠️ O `sleep` É LIDO NO COMANDO INTEIRO, NUNCA NO FRAGMENTO — e a bancada me pegou nisto na 1ª
+  # redação: o separador `tr ';&|'` parte `until …; do sleep 60; done` em TRÊS pedaços, e o pedaço
+  # que abre com `until` não contém `sleep` nenhum. Julgar o fragmento fazia o detector calar
+  # justamente na forma que o originou. O escopo certo é: ÂNCORA no fragmento (para não acusar quem
+  # só menciona a palavra), PRESENÇA DE ESPERA no comando (porque o corpo do laço mora noutro pedaço).
+  grep -qE '(^|[[:space:];&|])sleep([[:space:]]|$)' <<< "${cmd}" || continue
+  # DESARMES — qualquer forma de teto conta, porque o ponto é o teto existir, não como se escreve:
+  #   SECONDS/$EPOCHSECONDS/date +%s → relógio · timeout(1) → teto externo · break → saída explícita
+  #   contador (`i=$((i+1))`) → teto por iteração · --max-time/--deadline → teto do próprio cliente
+  grep -qE '(SECONDS|EPOCHSECONDS|date \+%s|(^|[[:space:]])timeout[[:space:]]|(^|[[:space:];&|])break([[:space:]]|$)|\+[[:space:]]*1[[:space:]]*\)\)|--max-time|--deadline)' <<< "${cmd}" && continue
+  _unbounded_wait=1
+done <<< "$(printf '%s' "${cmd}" | tr ';&|' '\n')"
+
+if [ "${_unbounded_wait}" -eq 1 ]; then
+  add 'LAÇO-DE-ESPERA-SEM-TETO: um `until`/`while` com `sleep` e SEM prazo espera PARA SEMPRE quando a premissa cai — e esperar parece trabalhar (medido 2026-09-17: 2h21 batendo na API por checks que nunca iam nascer, porque o PR estava CONFLICTING). Ponha um teto E uma saída que distinga os dois casos: `fim=$((SECONDS+1800)); until <cond>; do [ $SECONDS -gt $fim ] && { echo "DESISTI: teto, condição nunca satisfeita"; break; }; sleep 60; done`. O teto sozinho não basta — sem a mensagem, "pronto" e "desisti" ficam indistinguíveis.'
+fi
+
 # (4) comando de DESCOBERTA com saída vazia — o caso que mais custou (o falso "não sobreviveu").
 # CALIBRAÇÃO ANTI-RUÍDO (o risco real de qualquer alarme é virar fadiga e ser ignorado):
 #   · `grep -q`/`grep -c` são TESTE e CONTAGEM, não descoberta-para-ler — vazio ali é resposta, não sinal.

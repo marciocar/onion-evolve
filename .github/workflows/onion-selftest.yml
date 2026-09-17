@@ -34,6 +34,23 @@ on:
     - cron: '17 4 * * *'
   workflow_dispatch: {}
 
+# ── CANCELA O RUN SUPERADO ────────────────────────────────────────────────────────────────
+# MEDIDO em 2026-09-17: 397 min de CI num dia, 281 deles (71%) na bancada, e pelo menos 53
+# min em runs cujo head foi substituído por um push novo ANTES de terminarem. Ninguém leu
+# aqueles vereditos — o `pr-merge-verified.sh` ancora os checks no HEAD ATUAL e recusa
+# qualquer outro, então resultado de head velho não decide nada, por desenho.
+# a bancada custa 23 min; run superado é 23 min de resposta que ninguém vai ler.
+# NÃO custa eficácia: cancela só o que já era irrelevante. O que NUNCA se cancela é o run
+# do head que vai mergear — esse termina, porque é ele que o gate lê.
+concurrency:
+  # ⚠️ O `schedule` TEM GRUPO PRÓPRIO, e isto não é detalhe: a rede noturna roda a bancada
+  # INTEIRA na main e é ela que justifica qualquer filtro nos PRs (o comentário do topo diz
+  # isso com todas as letras — três pontos cegos nasceram de filtro SEM rede embaixo). Com
+  # grupo compartilhado, um push na main cancelaria a rede — eu teria cortado justamente a
+  # cobertura que torna o corte seguro, que é o modo de falha mais idiota possível.
+  group: ${{ github.workflow }}-${{ github.event_name == 'schedule' && 'nightly' || (github.event.pull_request.number || github.ref) }}
+  cancel-in-progress: true
+
 permissions:
   contents: read
 
