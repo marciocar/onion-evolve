@@ -1,6 +1,6 @@
 {
   "name": "onion",
-  "version": "0.1.270",
+  "version": "0.1.271",
   "conformance": "silver",
   "provides": ["master-orchestration","knowledge-graph-runtime","kg-freshness-reverify","sdaal-task-manager","sdaal-forge","session-runtime","dogfood-doctrine","language-standards","knowledge-graph-sdaal","learning-diary","orchestration","metaspec-validation","freshness-audits","constellation-map","co-evolution-upstream","plan-graph-drive","plan-graph-realign","guided-conduction","guided-onboarding","retro-feedback"],
   "requires": ["skill:onion-orchestration","agent:metaspec-gate-keeper"],

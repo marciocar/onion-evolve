@@ -287,6 +287,13 @@ _unbounded_wait=0
 while IFS= read -r _stmt; do
   _c="$(sed -E 's/^[[:space:]]*//; s/^(!|\(|\{)[[:space:]]+//; s/^[[:space:]]*//' <<< "${_stmt}")"
   case "${_c}" in until\ *|while\ *) ;; *) continue ;; esac
+  # ⚠️ EXIGE `do` E `done` NO COMANDO — falso-positivo MEDIDO minutos depois de eu escrever esta
+  # guarda: um `ps … | awk '/until |sleep /'` foi acusado, porque o separador `tr ';&|'` não
+  # respeita ASPAS e partiu o regex do awk num fragmento que começa com `until `. O caso (c3) já
+  # cobria `grep -rn "until"`, mas não alternância dentro de string — a mesma lição (ii) deste
+  # arquivo, terceira vez. Laço de verdade tem corpo; menção não tem.
+  grep -qE '(^|[[:space:];&|])do([[:space:]]|$)' <<< "${cmd}" || continue
+  grep -qE '(^|[[:space:];&|])done([[:space:]]|$)' <<< "${cmd}" || continue
   # ⚠️ O `sleep` É LIDO NO COMANDO INTEIRO, NUNCA NO FRAGMENTO — e a bancada me pegou nisto na 1ª
   # redação: o separador `tr ';&|'` parte `until …; do sleep 60; done` em TRÊS pedaços, e o pedaço
   # que abre com `until` não contém `sleep` nenhum. Julgar o fragmento fazia o detector calar
