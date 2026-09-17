@@ -311,6 +311,26 @@ if [ "${_unbounded_wait}" -eq 1 ]; then
   add 'LAÇO-DE-ESPERA-SEM-TETO: um `until`/`while` com `sleep` e SEM prazo espera PARA SEMPRE quando a premissa cai — e esperar parece trabalhar (medido 2026-09-17: 2h21 batendo na API por checks que nunca iam nascer, porque o PR estava CONFLICTING). Ponha um teto E uma saída que distinga os dois casos: `fim=$((SECONDS+1800)); until <cond>; do [ $SECONDS -gt $fim ] && { echo "DESISTI: teto, condição nunca satisfeita"; break; }; sleep 60; done`. O teto sozinho não basta — sem a mensagem, "pronto" e "desisti" ficam indistinguíveis.'
 fi
 
+# (3d) CRASE DENTRO DE MENSAGEM DE COMMIT ASPAS-DUPLAS — o shell EXECUTA, não cita.
+#
+# MEDIDO em 2026-09-17, no meio de um commit desta própria sessão: uma mensagem com `docs/` entre
+# crases, dentro de `-m "…"`, virou substituição de comando. O shell tentou EXECUTAR `docs/`, cuspiu
+# `Is a directory`, e a mensagem foi para a história com a palavra COMIDA. O dano daquela vez foi
+# cosmético; a classe não é. Crase em aspas duplas executa QUALQUER COISA, e mensagem de commit é
+# justamente onde se escreve `rm -rf`, `git reset` e afins ao NARRAR o que se fez ou o que se evitou.
+#
+# O idioma markdown desta casa usa crase o tempo todo (`REGRA 45`, `--emit-baseline`), então o risco
+# é ESTRUTURAL, não distração: escrever bem em pt-BR e citar código é exatamente o que dispara.
+#
+# A cura é a forma, não o cuidado: HEREDOC CITADO (`git commit -F - <<'MSG'`) — as aspas simples no
+# delimitador desligam toda expansão. Aspas simples no `-m` também servem, mas quebram no primeiro
+# apóstrofo, que em pt-BR aparece.
+if grep -qE '(^|[[:space:];&|])git[[:space:]]+commit' <<< "${cmd}" \
+   && grep -qE '\-(m|F)[[:space:]]*"' <<< "${cmd}" \
+   && grep -q '`' <<< "${cmd}"; then
+  add 'CRASE-EM-MENSAGEM-DE-COMMIT: há crase dentro de `-m "…"`/`-F "…"` — em aspas DUPLAS o shell EXECUTA o conteúdo da crase em vez de citá-lo (medido 2026-09-17: `docs/` virou `Is a directory` e a palavra sumiu da história; com um comando destrutivo ali dentro, ele teria RODADO). Use heredoc CITADO: `git commit -F - <<'"'"'MSG'"'"'` … `MSG` — as aspas simples no delimitador desligam toda expansão.'
+fi
+
 # (4) comando de DESCOBERTA com saída vazia — o caso que mais custou (o falso "não sobreviveu").
 # CALIBRAÇÃO ANTI-RUÍDO (o risco real de qualquer alarme é virar fadiga e ser ignorado):
 #   · `grep -q`/`grep -c` são TESTE e CONTAGEM, não descoberta-para-ler — vazio ali é resposta, não sinal.
