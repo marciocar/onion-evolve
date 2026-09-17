@@ -242,6 +242,7 @@
 .claude/validation/guardrails/onion-effect-gate.sh	E_WIRE_IN_LIVE	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/validation/harness-inventory.sh	E_SSOT_DO_HARNESS_COM_CATRACA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/inventory.sh	E_AUSENCIA_LIDA_COMO_RESULTADO_EM_TRES_SITIOS	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
+.claude/validation/kb-vendored-link-check.sh	E_A_DIVIDA_DA_REGRA_45_ERA_O_QUE_PRENDIA_A_PORTA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/kg-backlog-project.sh	C_OPCAO_O2_CONSUMIDOR_IRMAO_LACO	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
 .claude/validation/kg-backlog-project.sh	C_OPCAO_O7_BACKLOG_PARAMETRIZA_RAIZ	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
 .claude/validation/kg-born-marker.sh	D_NAO_AMPLIAR_R43	docs/onion/graph/guardas-revisao-2026-08.kg.yaml

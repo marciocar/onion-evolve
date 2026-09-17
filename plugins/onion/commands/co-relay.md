@@ -92,6 +92,6 @@ Saída sugerida (ORIENTE o próximo passo — não pergunte se deve commitar):
 ## 🔗 Referências
 
 - Espelho downstream: `meta:co-deliver`
-- Orientação/gestão: [`/onion:co-evolve`](co-evolve.md) · Protocolo: docs/evolution/README.md
+- Orientação/gestão: [`/onion:co-evolve`](co-evolve.md) · Protocolo: `docs/evolution/README.md` (core-only, não viaja)
 - Sub-protocolo (decisão): ADR de relay manual · Eixo dos 3 atos: ADR transporte vs execução
-- Hook: `.claude/hooks/co-evolution-inbox-check.sh` · Registro: members.yaml
+- Hook: `.claude/hooks/co-evolution-inbox-check.sh` · Registro: `members.yaml` (core-only, não viaja)

@@ -58,6 +58,6 @@ Comandos que **constroem, auditam, integram e co-evoluem o próprio Sistema Onio
 - **Skills de orquestração**: [`onion`](../../skills/onion/SKILL.md) (orquestrador mestre), [`onion-orchestration`](../../skills/onion-orchestration/SKILL.md) (orquestração), [`onion-patterns`](../../skills/onion-patterns/SKILL.md), [`onion-validation`](../../skills/onion-validation/SKILL.md)
 - **Agentes que esta categoria aciona**: `@command-creator-specialist`, `@agent-creator-specialist`, `@agent-skills-specialist`, `@research-agent`, `@metaspec-gate-keeper`, `@code-reviewer`
 - **Gate determinístico**: [`.claude/validation/`](../../validation/) (lint + selftest + inventory) — o dogfood mecânico que o CI roda
-- **SSOT do inventário**: [`docs/onion/inventory.md`](../../../docs/onion/inventory.md) — gerada por `/meta:inventory`, nunca editada à mão
+- **SSOT do inventário**: ``docs/onion/inventory.md`` (core-only, não viaja) — gerada por `/meta:inventory`, nunca editada à mão
 - **Padrão SDAAL**: [`docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md`](../../../docs/knowledge-base/concepts/specification-driven-ai-abstraction-layer.md) — base do `create-abstraction` e da federation
 - **Comandos irmãos**: [`/engineer:pre-pr`](../engineer/pre-pr.md) (validação pré-PR), [`/docs:build-index`](../docs/build-index.md) (índices de docs)

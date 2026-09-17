@@ -1,28 +1,4 @@
 # Baseline de links vendorizados p/ caminho core-privado — PASSIVO TOLERADO.
 # Gerado por: bash .claude/validation/kb-vendored-link-check.sh --emit-baseline > .claude/validation/kb-vendored-link-baseline.txt
 # formato: <rel>|<resolved_core_private_rel>. SÓ PODE ENCOLHER (migre link→gloss e remova a linha).
-# scope: .claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal
-.claude/agents/development/README.md|docs/onion/inventory.md
-.claude/agents/meta/README.md|docs/onion/inventory.md
-.claude/agents/meta/onion.md|docs/onion/inventory.md
-.claude/commands/engineer/warm-up.md|docs/evolution/README.md
-.claude/commands/meta/README.md|docs/onion/inventory.md
-.claude/commands/meta/adopt.md|docs/applying/README.md
-.claude/commands/meta/co-announce.md|docs/evolution/README.md
-.claude/commands/meta/co-announce.md|docs/evolution/federation/CHANGELOG.md
-.claude/commands/meta/co-announce.md|docs/evolution/federation/members.yaml
-.claude/commands/meta/co-deliver.md|docs/evolution/README.md
-.claude/commands/meta/co-deliver.md|docs/evolution/federation/members.yaml
-.claude/commands/meta/co-relay.md|docs/evolution/README.md
-.claude/commands/meta/co-relay.md|docs/evolution/federation/members.yaml
-.claude/commands/meta/constellation.md|docs/discussions/_template/SEED.md
-.claude/commands/meta/kg.md|docs/evolution/inbox/_processed/2026-07-04-kg-primeiro-dogfood-federacao.md
-.claude/commands/meta/personality-sync.md|docs/evolution/federation/members.yaml
-.claude/commands/meta/personality-sync.md|docs/evolution/rfc/rfc-0003-federated-identity-collective-intelligence.md
-.claude/commands/quick/README.md|docs/onion/inventory.md
-.claude/skills/onion/SKILL.md|docs/analysis/onion-toolbox-s1-scoping-2026-06.md
-.claude/utils/design-sink/README.md|docs/materials/theme.shadcn.css
-.claude/utils/design-sink/README.md|docs/materials/theme.tailwind.css
-docs/meta-specs/architecture.md|docs/analysis/onion-adr-branch-roles-sdaal-2026-07.md
-docs/meta-specs/commands.md|docs/onion/ci.md
-docs/meta-specs/index.md|docs/analysis/onion-review-2026-05.md
+# scope: .claude/agents .claude/commands .claude/skills .claude/utils .claude/validation .claude/hooks .claude/rules .claude/workflows docs/meta-specs docs/knowledge-base docs/sdaal plugins

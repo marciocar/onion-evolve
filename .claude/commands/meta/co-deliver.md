@@ -86,6 +86,6 @@ processa lá. Saída sugerida:
 ## 🔗 Referências
 
 - Producer do rascunho: [`/meta:co-announce`](co-announce.md)
-- Orientação/gestão: [`/meta:co-evolve`](co-evolve.md) · Protocolo: [docs/evolution/README.md](../../../docs/evolution/README.md)
+- Orientação/gestão: [`/meta:co-evolve`](co-evolve.md) · Protocolo: `docs/evolution/README.md` (core-only, não viaja)
 - Decisão que o libera (não-gated): [ADR ledger formato/localização](../../../docs/knowledge-base/decisions/onion-adr-ledger-format-location-2026-06.md)
-- Hook: `.claude/hooks/co-evolution-inbox-check.sh` · Registro: [members.yaml](../../../docs/evolution/federation/members.yaml)
+- Hook: `.claude/hooks/co-evolution-inbox-check.sh` · Registro: `members.yaml` (core-only, não viaja)

@@ -85,7 +85,7 @@ sem nomes cravados), para o mesmo gate-keeper funcionar em qualquer projeto-alvo
 
 ## 📜 Meta Specs Disponíveis
 
-> Todas as 5 meta-specs foram criadas em 2026-05-18 como parte da execução do Plano de Saneamento Onion 2026-05 (tarefas T2.1 a T2.5; plano executado e removido na curadoria de 2026-06-14 — ver [análise de identidade](../analysis/onion-review-2026-05.md) e git history).
+> Todas as 5 meta-specs foram criadas em 2026-05-18 como parte da execução do Plano de Saneamento Onion 2026-05 (tarefas T2.1 a T2.5; plano executado e removido na curadoria de 2026-06-14 — ver `análise de identidade` (core-only, não viaja) e git history).
 
 ### 🤖 [agents.md](./agents.md) — ATIVA (v1.0.0, 2026-05-18)
 Padrões para agentes:

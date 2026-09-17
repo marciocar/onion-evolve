@@ -282,7 +282,7 @@ senão a branch principal `main`/`master`). Consumido pelo `/engineer:pr`. Vive 
 quando ausente, a detecção (passo 3) adapta-se ao repo a cada PR.
 
 > **PROPOSTO (design-alvo, gated — não shipped):** `integration_branch` é **um papel de branch**. O ADR
-> [branch-roles-sdaal](../analysis/onion-adr-branch-roles-sdaal-2026-07.md) generaliza a resolução de base de
+> `onion-adr-branch-roles-sdaal-2026-07` (core-only, não viaja) generaliza a resolução de base de
 > **1 papel** para **N papéis** por faceta (fluxo/ambiente/linhagem), via um mapa `branch_roles:` no stamp:
 > ```yaml
 > branch_roles:            # PROPOSTO — schema-alvo; consumido só a partir da Fase 1 (gated)
