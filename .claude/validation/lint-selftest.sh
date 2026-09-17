@@ -17074,6 +17074,72 @@ STUB
   rm -rf "${sb}"
 }
 
+# ── A LISTA DE PROJEÇÕES É CONFERIDA POR MÁQUINA (2026-09-17) ────────────────────────────────
+# `regen-ssot-projections.sh` foi ampliado TRÊS vezes pela mesma causa — uma projeção com catraca
+# no lint que ninguém pôs na lista (testing-state 09-16 manhã · testing-inventory 09-16 noite ·
+# lint-rules 09-17). Na 2ª vez escrevi lá um CRITÉRIO em prosa — "toda projeção gerada com catraca
+# pertence a esta lista, para não haver terceira" — e houve terceira. É a lição que interessa:
+# critério escrito DESCREVE o dever, não o executa. Este caso EXECUTA, derivando o conjunto
+# esperado das próprias mensagens do lint.
+run_regen_completude_selftests() {
+  local regen="${REPO_ROOT}/.claude/utils/adopt/regen-ssot-projections.sh"
+  [ -f "${regen}" ] || { record_skip "regen-completude: regen-ssot-projections.sh ausente"; return; }
+
+  # ORÁCULO: toda guarda que manda regenerar nomeia o gerador na própria mensagem.
+  local _geradores; _geradores="$(grep -ohE 'regenere[^"]{0,40}bash \.claude/validation/[a-z0-9-]+\.sh' \
+      "${REPO_ROOT}"/.claude/validation/*.sh 2>/dev/null | grep -oE '[a-z0-9-]+\.sh$' | sort -u)"
+  if [ -z "${_geradores}" ]; then
+    record_fail "regen-completude: oráculo" "nenhuma mensagem 'regenere: bash .claude/validation/*.sh' encontrada — o padrão mudou e este caso virou decorativo (pior que ausente)"
+    return
+  fi
+
+  # ISENÇÕES DECLARADAS, com a razão — nunca uma lista muda. Quem isentar sem razão escrita está
+  # repetindo o defeito uma camada acima.
+  local _isentos=(
+    "federation-console.sh"     # projeta em docs/evolution/federation/ — superfície CORE-ONLY, não viaja
+    "marketplace-root-check.sh" # marketplace é CORE-ONLY (só a fonte publica plugin)
+    "vendor-scrub-form-check.sh" # emite BASELINE, não projeção: baseline é LEDGER DO ALVO e o do core nunca viaja
+    "kg-view.sh"                # visualizador POR-GRAFO (exige argumento), não gerador de projeção
+    # ⚠️ ACHADO PELO PRÓPRIO CASO, na 1ª execução dele (2026-09-17): eu tinha varrido à mão e
+    # perdido este, porque a frase da mensagem dele difere um pouco das outras. O oráculo derivado
+    # achou o QUINTO gerador na estreia — que é exatamente a diferença entre conferir por máquina e
+    # conferir por quem lembrou.
+    "a2a-agent-card.sh"         # deriva de docs/evolution/federation/members.yaml — CORE-ONLY: sem o registro, não há card a emitir no alvo
+  )
+  local _falta="" _g _x _ok
+  while IFS= read -r _g; do
+    [ -n "${_g}" ] || continue
+    _ok=0
+    grep -q "${_g}" "${regen}" && _ok=1
+    for _x in "${_isentos[@]}"; do [ "${_x}" = "${_g}" ] && _ok=1; done
+    [ "${_ok}" -eq 1 ] || _falta="${_falta}${_g} "
+  done <<< "${_geradores}"
+
+  if [ -z "${_falta// /}" ]; then
+    record_pass "regen-completude: toda projeção que o lint manda regenerar está no regen-ssot (ou isenta COM razão)"
+  else
+    record_fail "regen-completude" "gerador(es) que o lint manda rodar e que o regen-ssot NÃO cobre nem isenta: ${_falta}— o adotante vai nascer com a catraca vermelha, terceira vez que isso acontece"
+  fi
+
+  # E o caso-mutante: se `rules-registry.sh` sair da lista, este oráculo TEM de reprovar. Sem ele o
+  # caso passa a ser um `grep` que sempre acha algo, e guarda que não sabe reprovar não guarda nada.
+  local _mut; _mut="$(mktemp)"
+  grep -v 'rules-registry.sh' "${regen}" > "${_mut}"
+  _falta=""
+  while IFS= read -r _g; do
+    [ -n "${_g}" ] || continue
+    _ok=0
+    grep -q "${_g}" "${_mut}" && _ok=1
+    for _x in "${_isentos[@]}"; do [ "${_x}" = "${_g}" ] && _ok=1; done
+    [ "${_ok}" -eq 1 ] || _falta="${_falta}${_g} "
+  done <<< "${_geradores}"
+  rm -f "${_mut}"
+  if grep -q 'rules-registry' <<< "${_falta}"; then
+    record_pass "regen-completude: (MUT) tirar rules-registry da lista faz o oráculo reprovar"
+  else record_fail "regen-completude: (MUT)" "o oráculo não reage à remoção — o caso é decorativo"; fi
+}
+
+_family run_regen_completude_selftests
 _family run_merge_dispensa_selftests
 _family run_workflow_parse_selftests
 _family run_role_scope_selftests

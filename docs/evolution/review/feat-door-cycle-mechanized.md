@@ -3,9 +3,9 @@ title: 'Resíduo — o ciclo era prosa; e o meu dogfood media no substrato errad
 date: 2026-09-17
 branch: feat/door-cycle-mechanized
 reviewed_diff_sha256: bbe8d33986e0677366ee41994a5819815b07c984315b80c4a143441c21167e2d
-findings_total: 13
-findings_real: 13
-findings_fixed: 13
+findings_total: 14
+findings_real: 14
+findings_fixed: 14
 tokens: 0
 duration_min: 0
 verdict: REPROVADO_E_CURADO
@@ -355,3 +355,40 @@ categoria: [86]"*, e o `regen-ssot-projections.sh` **removeu** a projeção em v
 avisando *"saída VAZIA (arquivo removido, o alvo cobrará)"*. Classificada em **Integridade do próprio
 gate** — a categoria que pergunta *"eu cheguei a olhar?"* —, porque um workflow que não parseia não é
 um gate que falhou: é um gate que **nunca rodou**.
+
+
+---
+
+# Achado 14 — o critério escrito não impediu a terceira vez
+
+A REGRA 39 (Registro de REGRAS derivado e em paridade com as guardas) reprovou: a REGRA 86 entrou
+no registro e `lint-rules.md` — projeção **gerada**, com catraca no lint — não estava na lista do
+`regen-ssot-projections.sh`.
+
+É a **terceira** ampliação da mesma lista pela mesma causa:
+
+```
+09-16 manhã   testing-state.md    (REGRA 81)  ← depois de reprovar 4× no CI
+09-16 noite   testing-inventory.md (REGRA 80)
+09-17         lint-rules.md        (REGRA 39)  ← aqui
+```
+
+Na segunda vez eu escrevi **no próprio arquivo**: *"CRITÉRIO, para não haver terceira: toda projeção
+gerada com catraca no lint pertence a esta lista."* E houve terceira.
+
+**Essa é a lição, e ela não é sobre a lista.** Critério escrito **descreve** o dever; não o
+**executa**. A cura real é a bancada `regen_completude`, que **deriva** o conjunto esperado das
+próprias mensagens do lint — toda violação que diz `regenere: bash .claude/validation/<gen>` nomeia
+um par projeção↔gerador — e reprova quando um par não é coberto nem **isento com razão escrita**.
+
+Na **estreia** ela achou um quinto gerador que a minha varredura manual tinha perdido
+(`a2a-agent-card.sh`, cuja frase difere um pouco das outras). É exatamente a diferença entre
+conferir por máquina e conferir por quem lembrou.
+
+As quatro isenções são declaradas com o porquê, nunca uma lista muda: `federation-console.sh` e
+`marketplace-root-check.sh` projetam em superfície core-only · `vendor-scrub-form-check.sh` emite
+**baseline**, que é ledger do alvo e o do core nunca viaja · `kg-view.sh` é visualizador por-grafo,
+não gerador · `a2a-agent-card.sh` deriva do `members.yaml`, core-only.
+
+E o caso carrega **mutante**: tirar `rules-registry.sh` da lista tem de fazer o oráculo reprovar —
+senão ele vira um `grep` que sempre acha algo, e guarda que não sabe reprovar não guarda nada.
