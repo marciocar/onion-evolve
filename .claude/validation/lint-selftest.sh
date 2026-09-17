@@ -16474,6 +16474,63 @@ run_model_ssot_selftests() {
   rm -rf "${sb2}"
 }
 
+
+# ── A PORTA PÚBLICA: identidade fora, raiz dentro ─────────────────────────────────────────────
+# As duas curas desta família nasceram da PRIMEIRA materialização real (2026-09-17), e as duas são
+# do tipo que só aparece publicando: o bundle levava chave nomeada por cliente (salva de subir por
+# um `.gitignore` do destino — acidente, não desenho) e a porta subiu sem README/LICENSE/CLAUDE.md.
+run_door_selftests() {
+  local sb2 out rc
+  sb2="$(mktemp -d)"
+
+  # (a) chave nomeada por membro NÃO viaja, em NENHUM papel
+  local r pem_total=0
+  for r in adopted hub standalone; do
+    local d; d="$(mktemp -d)"
+    local -a sp=(); mapfile -t sp < <(bash "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" --role "${r}" --repo "${REPO_ROOT}" 2>/dev/null)
+    git -C "${REPO_ROOT}" archive --format=tar HEAD -- "${sp[@]}" 2>/dev/null | tar -x -C "${d}" 2>/dev/null
+    pem_total=$(( pem_total + $(find "${d}" -name '*.pem' | wc -l) ))
+    rm -rf "${d}"
+  done
+  if [ "${pem_total}" -eq 0 ]; then
+    record_pass "door: (a) chave nomeada por membro não viaja em nenhum papel (identidade ≠ corte de papel)"
+  else record_fail "door: (a)" "${pem_total} .pem no transporte — o nome do cliente viaja no nome do arquivo"; fi
+
+  # (b) o --check-bundle REPROVA arquivo nomeado por membro. Sem este caso, a guarda de (a) seria a
+  #     única barreira, e barreira única não tem quem a verifique.
+  mkdir -p "${sb2}/.claude/validation" "${sb2}/x"
+  local _id; _id="$(grep -E '^\s+- id:' "${REPO_ROOT}/docs/evolution/federation/members.yaml" \
+                     | sed 's/.*- id:[[:space:]]*//' | tr -d '"'"'"'' | grep -vE '^onion-|^marcio' | head -1)"
+  if [ -n "${_id}" ]; then
+    : > "${sb2}/x/${_id}-1.pem"
+    rc=0; out="$(bash "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" --check-bundle "${sb2}" 2>&1)" || rc=$?
+    if [ "${rc}" -ne 0 ] && grep -q 'NOMEADO POR MEMBRO' <<< "${out}"; then
+      record_pass "door: (b) --check-bundle reprova arquivo nomeado por membro do registro"
+    else record_fail "door: (b)" "não reprovou (rc=${rc}): ${out:0:100}"; fi
+    rm -f "${sb2}/x/${_id}-1.pem"
+  else
+    record_fail "door: (b)" "nenhum membro não-próprio no registro para montar o mutante"
+  fi
+
+  # (c) a porta materializada tem raiz COMPLETA. Público sem LICENSE não é estilo: sem licença o
+  #     padrão legal é "todos os direitos reservados", o oposto do que uma porta existe para dizer.
+  local d3; d3="$(mktemp -d)"; rm -rf "${d3}"
+  if bash "${REPO_ROOT}/ops/materialize-door.sh" "${d3}" >/dev/null 2>&1; then
+    local faltam=""
+    for f in README.md CLAUDE.md LICENSE LICENSE-DOCS; do [ -f "${d3}/${f}" ] || faltam="${faltam} ${f}"; done
+    if [ -z "${faltam}" ]; then record_pass "door: (c) raiz completa (README · CLAUDE.md · LICENSE · LICENSE-DOCS)"
+    else record_fail "door: (c)" "faltam na raiz:${faltam}"; fi
+    # (d) o LICENSE da porta é NU, não LICENSE-ONION: aqui o repositório É o Onion. No adotante
+    #     seria o inverso, e o emit-licenses.sh faz o inverso lá — a diferença é de OBJETO.
+    if [ -f "${d3}/LICENSE" ] && [ ! -f "${d3}/LICENSE-ONION" ]; then
+      record_pass "door: (d) LICENSE nu na porta (no adotante seria LICENSE-ONION — objetos diferentes)"
+    else record_fail "door: (d)" "licença na forma errada para uma porta"; fi
+  else
+    record_fail "door: (c)" "materialize-door abortou — a porta não monta"
+  fi
+  rm -rf "${d3}" "${sb2}"
+}
+
 _family run_hook_autofix_selftests
 _family run_kg_reverify_schema_selftests
 _family run_backtick_ref_selftests
@@ -16500,6 +16557,7 @@ _family run_rules_registry_selftests
 _family run_onion_version_tracked_selftests
 _family run_hub_role_guard_selftests
 _family run_inventory_adopter_scope_selftests
+_family run_door_selftests
 _family run_model_ssot_selftests
 _family run_family_topology_selftests
 _family run_decouple_source_selftests

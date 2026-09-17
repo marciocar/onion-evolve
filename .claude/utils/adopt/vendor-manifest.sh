@@ -244,6 +244,15 @@ if [ "${MODE}" = "scrub" ]; then
   exit 0
 fi
 
+# ── EXCLUSÃO UNIVERSAL: chave de membro nunca viaja, em NENHUM papel ─────────────────────────
+# Não é corte de papel — é fronteira de identidade. `jwks/<membro>-N.pem` é chave PÚBLICA (não há
+# segredo a proteger), mas o NOME DO ARQUIVO é o nome do cliente, e ele viajava para todo adotante
+# e para a porta pública. Medido 2026-09-17 na 1ª materialização real: duas chaves no bundle,
+# salvas de subir só por um `.gitignore` do destino — acidente, não desenho.
+# Fica fora do `_role_cut` de propósito: o corte por papel é sobre QUANTA fábrica o alvo recebe;
+# este é sobre QUEM o bundle nomeia, e a resposta é a mesma nos três papéis.
+_IDENTITY_EXCLUDES=(':(exclude).claude/utils/federation-transport/jwks/*.pem')
+
 if [ "${MODE}" = "manifest" ]; then
   git -C "${REPO}" rev-parse HEAD >/dev/null 2>&1 || {
     echo "ERRO: '${REPO}' não é repositório git com HEAD — o manifesto de transporte é declarado ∩ HEAD; use --emit-scrub-roots para a superfície declarada" >&2; exit 2; }
@@ -253,6 +262,10 @@ if [ "${MODE}" = "manifest" ]; then
   done
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_role_excludes "${REPO}" "${ROLE}")
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_command_excludes "${REPO}" "${ROLE}")
+  # A exclusão de IDENTIDADE entra DEPOIS das de papel e vale nos três: `:(exclude)` sempre vence o
+  # positivo, em qualquer ordem, então a posição é estética — o que importa é que ela não dependa
+  # do papel. Quem o bundle NOMEIA não é assunto de quanta fábrica ele leva.
+  _spec+=("${_IDENTITY_EXCLUDES[@]}")
 
   # ⚠️ FAIL-LOUD CONTRA O BUNDLE VAZIO SILENCIOSO — medido 2026-09-15: `git archive` devolve rc=0
   # com tar de ZERO arquivos quando os `:(exclude)` cancelam tudo. Quem consome este manifesto lê o
@@ -327,6 +340,34 @@ if [ "${MODE}" = "stub" ]; then
   done
   echo "stub aplicado em ${_n} baseline(s) — o passivo do core não viaja como dívida do cliente"
   exit 0
+fi
+
+# ── (c) ARQUIVO NOMEADO POR MEMBRO — a forma que quase passou, e passou por SORTE ─────────────
+# Medido 2026-09-17, na PRIMEIRA materialização real da porta pública: o bundle carregava
+#   .claude/utils/federation-transport/jwks/<membro>-1.pem   (duas, nomeando dois adotantes)
+# Não são segredo — chave PÚBLICA de JWKS —, mas o NOME DO ARQUIVO é o nome do cliente, e ele viaja
+# num repo público. Não subiram só porque o alvo tinha um `jwks/.gitignore` com `*.pem`; sem esse
+# acidente, teriam. Guarda que depende do .gitignore do DESTINO não é guarda.
+# A derivação é do `members.yaml` (mesma fonte da REGRA 36), e ela é FAIL-OPEN por desenho: sem o
+# registro não há o que derivar, e o silêncio é declarado — porque um bundle montado fora do core
+# legitimamente não tem o registro à mão.
+_members="${REPO}/docs/evolution/federation/members.yaml"
+if [ -f "${_members}" ]; then
+  _named=""
+  while IFS= read -r _id; do
+    [ -n "${_id}" ] || continue
+    case "${_id}" in onion-*|marcio*|"") continue ;; esac   # prefixo da própria casa não é cliente
+    while IFS= read -r _f; do
+      [ -n "${_f}" ] && _named="${_named}${_f#"${BUNDLE}/"} (nomeia '${_id}')
+"
+    done < <(find "${BUNDLE}" -type f -name "*${_id}*" -not -path '*/.git/*' 2>/dev/null)
+  done < <(grep -E '^\s+- id:' "${_members}" | sed 's/.*- id:[[:space:]]*//' | tr -d '"' | tr -d "'")
+  if [ -n "${_named}" ]; then
+    echo "✗ bundle carrega arquivo NOMEADO POR MEMBRO do registro (o nome do cliente viaja no nome do arquivo):" >&2
+    printf '%s' "${_named}" | sed 's|^|  |' >&2
+    echo "  Remova do transporte (o manifesto não deve levá-los) ou renomeie sem o id do membro." >&2
+    exit 1
+  fi
 fi
 
 _hits=""

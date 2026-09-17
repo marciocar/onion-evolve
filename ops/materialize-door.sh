@@ -98,6 +98,83 @@ if [ -n "${_leak}" ]; then
 fi
 echo "  (4) varredura independente: nenhum ponteiro a documento privado nomeado"
 
+# ── (5) A RAIZ DA PORTA — o que o manifesto não leva porque o adotante não deve receber ──────
+# Medido 2026-09-17, na 1ª materialização real: a porta subiu com README, LICENSE, CLAUDE.md e
+# AGENTS.md AUSENTES — 4 de 4. Repo público sem README é ruim de receber; sem LICENSE é pior, e
+# não por estilo: SEM licença o padrão legal é "todos os direitos reservados", o oposto do que uma
+# porta existe para dizer. E sem CLAUDE.md o Onion não se apresenta a quem clona.
+#
+# ⚠️ AQUI O `LICENSE` NU É CORRETO, e no adotante seria ERRADO — a diferença é de OBJETO. No repo
+# do cliente, um `LICENSE` na raiz rege O REPOSITÓRIO INTEIRO, inclusive o código que ele ainda vai
+# escrever: por isso o `emit-licenses.sh` entrega `LICENSE-ONION` lá. Na PORTA, o repositório É o
+# Onion; um `LICENSE-ONION` ali seria a evasiva, não a proteção.
+_slug="$(basename "${DEST}")"
+_pin_ph="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD)"
+cp "${REPO_ROOT}/LICENSE" "${DEST}/LICENSE" 2>/dev/null || echo "  (5) AVISO: LICENSE do core não encontrada" >&2
+cp "${REPO_ROOT}/LICENSE-DOCS" "${DEST}/LICENSE-DOCS" 2>/dev/null || true
+cat > "${DEST}/README.md" <<README
+# 🧅 Onion — a maquinaria
+
+> **Este repositório é uma PROJEÇÃO, não a fonte.** Ele é materializado do core por
+> \`ops/materialize-door.sh\` e **não recebe PR** — uma correção feita aqui é sobrescrita na próxima
+> materialização. O caminho de contribuição é o canal de sinais descrito em \`docs/evolution/\`.
+
+O Onion é um framework de método executável para Claude Code: comandos invocáveis, agentes
+especializados, skills e — o que o distingue — **guardas determinísticas** que reprovam em CI. Ele
+cobre três dimensões peer do ciclo: produto, engenharia e compliance.
+
+## O que está aqui, e o que não está
+
+**Está:** a maquinaria completa — \`.claude/\` (comandos, agentes, skills, hooks, utils, validation),
+as meta-specs e a knowledge base.
+
+**Não está, e é desenho:** a **biografia** do core — diário, análises, discussões, registro da
+federação e materiais. Método viaja; história, não. A allowlist que decide isso é
+\`.claude/utils/adopt/vendor-manifest.sh\`, e ela falha FECHADA: o que não está declarado não viaja.
+
+## Como usar
+
+\`\`\`bash
+git clone https://github.com/marciocar/${_slug}.git
+cd ${_slug} && claude
+\`\`\`
+
+Depois, \`/warm-up\` para o contexto e \`/onion\` para a orientação. As guardas rodam com
+\`bash .claude/validation/lint-artifacts.sh\`.
+
+## Licenças
+
+**Código** (\`.claude/**\`, scripts): MIT — \`LICENSE\`.
+**Documentação e doutrina** (\`docs/**\`): CC BY-NC 4.0 — \`LICENSE-DOCS\`.
+
+---
+
+Materializado do core no pin \`${_pin_ph}\` · papel \`${ROLE}\`.
+README
+
+cat > "${DEST}/CLAUDE.md" <<CLAUDEMD
+# 🧅 Sistema Onion
+
+Este repositório **é** o Onion: um framework de método executável em \`.claude/\`.
+
+- **Comandos** em \`.claude/commands/\` por categoria · **agentes** em \`.claude/agents/<categoria>/\`
+- **Guardas determinísticas** em \`.claude/validation/\` — rode \`bash .claude/validation/lint-artifacts.sh\`
+- **Contagens canônicas** vivem em \`docs/onion/inventory.md\` (SSOT gerada do filesystem). Nunca
+  edite os números à mão; rode \`/meta:inventory\`.
+
+## Idioma
+
+Chat, comentários, documentação e mensagens: **pt-BR**. Código, variáveis, nomes de arquivo e de
+branch, e o prefixo Conventional dos commits: **inglês**.
+
+## O que este repositório NÃO tem
+
+É uma **projeção** do core: a biografia (diário, análises, discussões, registro da federação) não
+viaja por desenho. Se um comando citar um documento marcado \`(core-only)\`, ele existe — no core
+privado, e não aqui.
+CLAUDEMD
+echo "  (5) raiz da porta: README.md · CLAUDE.md · LICENSE · LICENSE-DOCS"
+
 _pin="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD)"
 cat <<FIM
 
