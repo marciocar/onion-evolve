@@ -2,7 +2,7 @@
 title: 'Resíduo — o baseline que viajava populado era o vazamento'
 date: 2026-09-17
 branch: chore/door-pin-reconcile
-reviewed_diff_sha256: 851d0a2ae0a07e2cf9ca749a9d27c8f18061b15ae78842d9a64d45c4878a1175
+reviewed_diff_sha256: f461b0400c0706f23401b97f4c6e6fd50d6118b099fc67bd2f4c5c9ff9b4f7bd
 findings_total: 10
 findings_real: 10
 findings_fixed: 9
