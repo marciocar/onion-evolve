@@ -40,6 +40,24 @@
 
 set -euo pipefail
 
+
+# ══ AUTO-GC DESLIGADO EM TODO SANDBOX — a causa da morte do worker 0 no CI ════════════════════
+# Medido 2026-09-16, com QUATRO reprovações seguidas no CI e a bancada inteira VERDE localmente
+# (1283/0 com `--jobs auto`). A linha que matava, no meio da faixa paralela:
+#
+#     rm: cannot remove '/tmp/tmp.74xoKPesoc/.git/objects': Directory not empty
+#
+# Sob `set -e` esse `rm` não-zero mata o worker na hora — e o pai reporta "família reivindicada e
+# NÃO concluída", que é honesto mas não diz a causa. A causa é o `git gc --auto`: `git add`/`git
+# commit` num sandbox disparam um gc em SEGUNDO PLANO, e o `rm -rf` da limpeza chega antes de ele
+# soltar `.git/objects`. Na minha máquina o gc termina primeiro; nos 4 workers do runner, não —
+# é a mesma família de "passa isolada, morre na faixa" que a casa já registrou como AMBIENTE, não
+# carga.
+#
+# A cura é de MECANISMO e cobre os 55 `git init` de uma vez, inclusive os que ninguém escreveu
+# ainda: `GIT_CONFIG_*` aplica-se a TODA invocação de git na árvore de processos. Desativar o gc
+# num sandbox descartável não custa nada — ele vive segundos e é apagado.
+export GIT_CONFIG_COUNT=1 GIT_CONFIG_KEY_0=gc.auto GIT_CONFIG_VALUE_0=0
 # ── A BANCADA NÃO PODE MORRER CALADA ───────────────────────────────────────────────────────────
 # Medido em 2026-08-08: reescrevi um mutation test usando `cmd; rc=$?` — padrão que, sob `set -e`,
 # MATA a suíte no `cmd` que retorna != 0, antes da atribuição. A bancada abortou logo depois do caso
@@ -16549,6 +16567,29 @@ run_kg_read_leg_selftests() {
   rm -rf "${sb2}"
 }
 
+
+# ── A CURA DA MORTE DO WORKER TEM BANCADA (senão é fé) ────────────────────────────────────────
+# Uma cura de ambiente é a mais fácil de perder: some numa refatoração e ninguém nota até o CI
+# morrer de novo, quatro reprovações depois. Este caso prende o mecanismo.
+run_sandbox_gc_selftests() {
+  local d
+  d="$(mktemp -d)"
+  ( cd "${d}" && git init -q . ) >/dev/null 2>&1
+  if [ "$(git -C "${d}" config gc.auto 2>/dev/null)" = "0" ]; then
+    record_pass "sandbox-gc: (a) todo sandbox herda gc.auto=0 (o gc em 2º plano matava o worker no CI)"
+  else
+    record_fail "sandbox-gc: (a)" "sandbox SEM gc.auto=0 — o \`rm -rf\` da limpeza volta a correr contra o gc"
+  fi
+  # (b) o mecanismo é por ENV, não por chamada: prova que vale para git init que NINGUÉM editou —
+  #     é o que distingue mecanismo de disciplina.
+  if [ "${GIT_CONFIG_COUNT:-0}" = "1" ] && [ "${GIT_CONFIG_KEY_0:-}" = "gc.auto" ]; then
+    record_pass "sandbox-gc: (b) a cura é por ENV — alcança os 55 git init e os que ainda não existem"
+  else
+    record_fail "sandbox-gc: (b)" "GIT_CONFIG_* ausente — a cura viraria disciplina por sítio"
+  fi
+  rm -rf "${d}"
+}
+
 _family run_hook_autofix_selftests
 _family run_kg_reverify_schema_selftests
 _family run_backtick_ref_selftests
@@ -16577,6 +16618,7 @@ _family run_hub_role_guard_selftests
 _family run_inventory_adopter_scope_selftests
 _family run_model_ssot_selftests
 _family run_kg_read_leg_selftests
+_family run_sandbox_gc_selftests
 _family run_family_topology_selftests
 _family run_decouple_source_selftests
 _family run_kg_view_selftests

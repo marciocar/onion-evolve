@@ -12,8 +12,8 @@
 
 | Dimensão | Nº | Produtor |
 |---|---:|---|
-| Famílias na bancada | **171** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **1053** | `bash .claude/validation/harness-inventory.sh --env` |
+| Famílias na bancada | **172** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **1057** | `bash .claude/validation/harness-inventory.sh --env` |
 | Regras do lint | **83** | `bash .claude/validation/rules-registry.sh --counts` |
 | — HARD | **74** | `bash .claude/validation/rules-registry.sh --counts` |
 | Pares de modo consumido | **47** | `bash .claude/validation/consumed-mode-check.sh .` |

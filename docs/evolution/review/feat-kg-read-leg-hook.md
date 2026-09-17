@@ -155,3 +155,34 @@ preservado fora da árvore antes da remoção.
 de `rebase-failed-never-reset-soft` — trabalho de uma branch aparecendo noutra sem que o autor peça.
 O sinal barato de detectar: no `git diff origin/main...HEAD --name-only`, procurar arquivo que **não
 tem relação com o tema do PR**. Aqui bastava olhar `design` num PR de hook de KG.
+
+---
+
+# Adendo 4 — a morte do worker no CI tinha causa, e ela não era carga
+
+Quatro reprovações seguidas do `selftest`, sempre no mesmo ponto: o **worker 0 morre sem somar**,
+deixando `regen_baselines` reivindicada e não concluída. E a bancada inteira **verde localmente**
+com `--jobs auto`: **1283 passaram, 0 falharam**.
+
+Passa isolada, morre na faixa. A casa já tinha classificado isso como *ambiente herdado*, sem
+causa nomeada. Agora tem, e estava numa linha do log:
+
+```
+rm: cannot remove '/tmp/tmp.74xoKPesoc/.git/objects': Directory not empty
+```
+
+**A causa:** `git add`/`git commit` num sandbox disparam **`git gc --auto` em segundo plano**, e o
+`rm -rf` da limpeza chega antes de ele soltar `.git/objects`. Sob `set -e`, esse `rm` não-zero mata
+o worker na hora. Na minha máquina o gc termina primeiro; nos 4 workers do runner, não.
+
+**A cura é de mecanismo, não de sítio.** Havia **55 `git init`** na bancada e **zero** com
+`gc.auto` desligado. Corrigir um a um seria disciplina — e a lista cresceria com o próximo autor.
+`GIT_CONFIG_*` exportado no topo aplica-se a **toda** invocação de git na árvore de processos:
+uma linha alcança os 55 e os que ainda não existem. Desligar gc num sandbox descartável não custa
+nada; ele vive segundos e é apagado.
+
+A família `sandbox_gc` prende a cura — sem ela, a próxima refatoração a remove e o CI volta a
+morrer quatro vezes antes de alguém desconfiar.
+
+**O que isto ensina sobre a minha passada:** eu rodei famílias isoladas o dia todo e li verde. A
+bancada completa em paralelo é outro sistema — e é o que o CI roda.
