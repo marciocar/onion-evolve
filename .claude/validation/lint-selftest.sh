@@ -16849,6 +16849,36 @@ run_door_cycle_selftests() {
   if [ "${rcm}" -ne 0 ] && grep -q 'ANDOU-PARA-TRAS' <<< "${outm}"; then
     record_pass "door-cycle: (f) o MESMO commit já em main defasa → HARD (a cura não cegou a guarda)"
   else record_fail "door-cycle: (f)" "não acusou defasagem depois do merge (rc=${rcm}): ${outm:0:140}"; fi
+
+  # (g) A CATRACA NÃO CONTA O PRÓPRIO LIVRO-CAIXA — sem isto ela é ESTEIRA, uma volta acima da (e).
+  #     Medido 2026-09-18: o commit que reconcilia o pin depois de uma materialização toca quatro
+  #     arquivos e só UM está na superfície que viaja: este baseline. Reconciliar a porta DEFASAVA a
+  #     porta, e um teto 0 exigia um PR depois de todo PR. Legitimidade da exclusão: a guarda já
+  #     exclui biografia porque a porta não a receberia; aqui a porta RECEBE o arquivo, mas a
+  #     REGRA 85 nela é [papel/SEM-OBJETO], então o conteúdo é INERTE no alvo.
+  # ⚠️ O ORÁCULO É O NÚMERO ANTES x DEPOIS, nunca o pass/fail: o caso (f) ACIMA já deixou a porta
+  #    1 atrás de propósito, então "ANDOU-PARA-TRAS" aqui seria resíduo dele, não veredito sobre o
+  #    livro-caixa. A 1ª redação deste caso reprovou por isso — defeito do CASO, com o SUT correto.
+  local _antes _depois
+  _antes="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" --emit-baseline 2>/dev/null | awk '{print $2}')"
+  ( cd "${sbm}/work" && printf 'porta-x 0\n# nota nova\n' > .claude/validation/door-staleness-baseline.txt \
+      && git add -A && git -c user.email=t@l -c user.name=t commit -qm "so o livro-caixa" \
+      && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1 || true
+  _depois="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" --emit-baseline 2>/dev/null | awk '{print $2}')"
+  if [ "${_antes}" = "${_depois}" ]; then
+    record_pass "door-cycle: (g) commit que só mexe no PRÓPRIO baseline não move a distância (${_antes}→${_depois})"
+  else record_fail "door-cycle: (g)" "o livro-caixa conta contra si mesmo (${_antes}→${_depois}) — a catraca virou esteira"; fi
+
+  # (h) …e uma mudança REAL de framework no mesmo commit VOLTA a contar — a exclusão é cirúrgica,
+  #     não um salvo-conduto para qualquer commit que também toque o baseline.
+  ( cd "${sbm}/work" && printf '# framework de verdade\n' > .claude/agents/c.md \
+      && printf 'porta-x 0\n# outra nota\n' > .claude/validation/door-staleness-baseline.txt \
+      && git add -A && git -c user.email=t@l -c user.name=t commit -qm "framework + livro-caixa" \
+      && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1 || true
+  rcm=0; outm="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" 2>&1)" || rcm=$?
+  if grep -q 'ANDOU-PARA-TRAS' <<< "${outm}"; then
+    record_pass "door-cycle: (h) mudança REAL junto do baseline volta a contar (exclusão cirúrgica)"
+  else record_fail "door-cycle: (h)" "a exclusão virou salvo-conduto — framework novo passou batido: ${outm:0:140}"; fi
   rm -rf "${sbm}"
 }
 

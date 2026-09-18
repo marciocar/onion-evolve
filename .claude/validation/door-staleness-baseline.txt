@@ -27,5 +27,11 @@
 # que é a 1ª versão da porta a passar no PRÓPRIO lint (0 HARD), depois de a dívida da REGRA 45
 # chegar a zero. `onion-standalone` sobe a 381: a main andou 7 commits e aquela porta segue parada
 # desde 2026-07-19 — passivo real, e o único número desta catraca que ainda cresce.
+#
+# 2026-09-18: a catraca parou de contar o PRÓPRIO livro-caixa, e os números caíram sem ninguém
+# materializar nada — 383→381 e 2→1. O que sumiu eram commits que só ajustavam ESTE arquivo: o
+# teto morava na superfície que ele julga, então reconciliar a porta defasava a porta e um teto 0
+# exigia um PR depois de todo PR. O `onion-core 1` que sobra é HONESTO: é o
+# `regen-core-projections.sh`, mudança real de framework que a porta ainda não recebeu.
 onion-standalone 381
-onion-core 0
+onion-core 1
