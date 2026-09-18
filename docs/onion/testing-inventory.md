@@ -22,7 +22,7 @@
 | — HARD **e** SOFT (contadas nas duas) | **13** | idem |
 | Pares de modo consumido (REGRA 59) | **49** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | idem |
-| Scripts de validação | **76** | `git ls-files '.claude/validation/*.sh'` |
+| Scripts de validação | **77** | `git ls-files '.claude/validation/*.sh'` |
 | Hooks | **16** | `git ls-files '.claude/hooks/*.sh'` |
 | Workflows de CI | **4** | `git ls-files '.github/workflows/*.yml'` |
 | Baselines de catraca | **11** | `git ls-files '.claude/validation/*-baseline.txt'` |
