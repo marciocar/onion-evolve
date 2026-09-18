@@ -2,7 +2,7 @@
 title: 'Resíduo — o refutador refez cada medição, e a maioria dos meus números estava errada'
 date: 2026-09-18
 branch: chore/door-pin-and-ratchet-after-847
-reviewed_diff_sha256: 2e5e22cccd26368d02e9dec12f225e510fab86ffdc284e1d4d70dd7fb89142a4
+reviewed_diff_sha256: 0456bdbb68857808ca5a7536da83c7a03fa2d312818abeaffa26087ad67aa307
 findings_total: 8
 findings_real: 8
 findings_fixed: 8
@@ -10,6 +10,11 @@ tokens: 159772
 duration_min: 15
 verdict: REPROVADO_E_CURADO
 elenxo: sim
+cobertura_declarada: >-
+  O refutador leu as MEDICOES deste PR. O fecho do no do revisor semantico, acrescentado depois a
+  pedido do maestro, NAO passou por ele — e append de evidencia medida por comportamento (checks do
+  CI nos #846/#847), sem superficie de execucao. Declarado para o hash nao sugerir cobertura que nao
+  houve.
 nota: >-
   PR sem código novo: só baseline, projeções e nós de grafo. Por isso o mandato do refutador foi
   refazer cada MEDIÇÃO afirmada. Ele derrubou seis das minhas afirmações e achou um defeito de

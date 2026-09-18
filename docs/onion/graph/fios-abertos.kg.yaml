@@ -237,10 +237,11 @@ nodes:
     node_type: question
     plane: DEV
     impact: 4
-    confidence: 0.9
-    status: open
+    confidence: 1.0
+    status: done
     owner: core
-    verified_against: 'medido em 2026-09-17 no PR #842: onion-review saiu is_error:true nas DUAS tentativas com turnos=1 e custo=0, enquanto o pre-voo (POST /v1/messages, claude-sonnet-5, max_tokens=1) devolveu HTTP 200'
+    verified_at: '2026-09-18'
+    verified_against: 'RESPONDIDA por comportamento em 2026-09-18: reposto o credito, onion-review rodou pass em 8m1s (#846) e 5m3s (#847) com veredito lido da fonte; o fato mora em passada-adversarial-2026-09 / E_REVISOR_SEMANTICO_VOLTOU_A_RODAR_COM_CREDITO. O estado anterior (medido no #842: is_error:true, turnos=1, custo=0, com pre-voo HTTP 200) era o mesmo sintoma visto sem a causa.'
     label: "O GATE SEMANTICO ESTA CEGO E NINGUEM SABE POR QUE — e o que ele cobre nao tem outra camada. Compromisso, nao fato: os achados vivem em `passada-adversarial-2026-09` (`E_O_DIAGNOSTICO_QUE_A_DOUTRINA_MANDA_RODAR_ESTAVA_MORTO`). O QUE JA ESTA DESCARTADO POR MEDICAO, para ninguem repetir: (a) credencial/credito — o pre-voo da HTTP 200 contra o MESMO modelo; (b) versao da action — testada nas duas pontas em 2026-08-03, falham identico; (c) tamanho do diff no prompt — o prompt NAO embute o diff, manda o revisor rodar `git diff`. O sintoma restante e especifico: morre ANTES de gerar, sem cobrar, nas duas tentativas. POR QUE ISTO E RISCO E NAO ROTINA: enquanto durar, todo merge passa so pelo gate DETERMINISTICO, e foi preciso criar um escape de dispensa NOMEADA E REGISTRADA no `pr-merge-verified.sh` para que a decisao de mergear sem revisao semantica fosse consciente em vez de virar merge por fora do gate. Escape existe; o buraco que ele contorna, nao foi fechado. GATILHO (mecanico, nao relogio): o proximo PR que tocar `.claude/` roda o revisor de novo — se morrer igual, rodar `.github/workflows/onion-review-diagnose.yml`, que so agora VOLTOU a ser executavel (estava com `env:` duplicado e nao parseava; a REGRA 86 nasceu disso). E o aviso epistemico do proprio `onion-review.yml` vale aqui: aquele bloco ja mentiu DUAS vezes sobre a causa — nao escreva a terceira sem rodar o diagnostico."
     trace: '.github/workflows/onion-review.yml'
 
