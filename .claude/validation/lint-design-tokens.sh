@@ -36,12 +36,22 @@ echo "=== Onion Lint Design Tokens — ${DC} ==="
 if [ ! -d "${DC}" ]; then
   echo "design-context ausente — nada a validar (ok p/ adotante sem design)."; exit 0
 fi
-if ! command -v jq >/dev/null 2>&1; then
-  echo "AVISO: jq ausente — validação de tokens PULADA (instale jq)." >&2; exit 0
-fi
-if ! command -v awk >/dev/null 2>&1; then
-  echo "AVISO: awk ausente — validação de tokens PULADA." >&2; exit 0
-fi
+# ⚠️ FERRAMENTA AUSENTE COM `design-context` PRESENTE É FALHA, NUNCA "PULADA" — sinal de campo de
+# 2026-09-07 (jogo-da-vida, item 6), com custo medido: sem `jq` o gate saía `exit 0` dizendo PULADA,
+# e **um tint a 1,38:1 virava tema aprovado**. O consumidor teve de tratar o "PULADA" como FALHA por
+# conta própria — o que significa que cada adotante reimplementa a desconfiança que o gate deveria ter.
+# A diferença que importa: `design-context` AUSENTE é legítimo (adotante sem design, `exit 0` acima);
+# ferramenta ausente com o contexto PRESENTE é "não pude julgar", e guarda que não pode julgar
+# DECLARA que não sabe — nunca aprova. É o mesmo precedente da REGRA 36, que sai HARD nomeando a
+# ausência quando o manifesto de transporte não responde.
+_falta_ferramenta() {
+  echo "  ✗ HARD: ${1} ausente — a validação NÃO PÔDE ser feita, e ${DC} EXISTE." >&2
+  echo "    Isto não é 'pulada': sem medir, um contraste reprovado passaria por aprovado" >&2
+  echo "    (medido em campo: 1,38:1 virou tema com exit 0). Instale ${1} ou declare o porquê." >&2
+  exit 2
+}
+command -v jq  >/dev/null 2>&1 || _falta_ferramenta jq
+command -v awk >/dev/null 2>&1 || _falta_ferramenta awk
 
 mapfile -t FILES < <(find "${DC}" -type f -name '*.tokens.json' | sort)
 if [ "${#FILES[@]}" -eq 0 ]; then
@@ -114,8 +124,35 @@ if [ -f "${PAIRS}" ] && jq -e . "${PAIRS}" >/dev/null 2>&1; then
     fi
   done < <(jq -r '.pairs[] | [.fg, .bg, (.min|tostring), (.note//"")] | @tsv' "${PAIRS}")
   [ "${wcag_fail}" -eq 0 ] && ok "contraste WCAG dos pares declarados OK"
+
+  # ⚠️ O GATE SÓ MEDE O QUE A GOVERNANÇA DECLARA — e esse é o ponto cego que um adotante mediu em
+  # 2026-09-07 (portal-gamificacao): com a SSOT trazendo `color.dark.*` e a governança declarando só
+  # o tema claro, o gate APROVA EM SILÊNCIO uma paleta ilegível no escuro. "Passou no gate" vira uma
+  # afirmação mais forte do que o gate mediu — a classe que esta casa persegue em toda guarda.
+  # CUSTO MEDIDO, não hipótese: as quatro candidatas daquele projeto tinham `brand.500` entre 1,71 e
+  # 2,60 contra fundo escuro (alvo 3,0), e NENHUMA teria sido barrada.
+  # Aviso, não reprovação: a governança é do projeto, e pode haver razão para não cobrir um modo. O
+  # que não se admite é o silêncio — a guarda declara o que NÃO mediu.
+  # A fonte é o array TOK, que o parse acima já preencheu — não uma variável inventada. (A 1ª
+  # redação deste bloco citou duas que NÃO EXISTEM no script; `set -u` não pega porque eu havia
+  # escrito `${VAR:-}`, e o efeito seria a guarda calar para sempre: fail-open dentro da cura de
+  # um fail-open. Conferir a existência do que se lê é a metade barata de qualquer guarda.)
+  _tem_escuro=0
+  for _k in "${!TOK[@]}"; do case "${_k}" in color.dark.*) _tem_escuro=1; break ;; esac; done
+  if [ "${_tem_escuro}" -eq 1 ]; then
+    if ! jq -e '[.pairs[] | select((.fg|test("dark")) or (.bg|test("dark")))] | length > 0' "${PAIRS}" >/dev/null 2>&1; then
+      echo "  ⚠ A SSOT tem ramo de modo ESCURO (color.dark.*) e a governança NÃO declara nenhum par"
+      echo "    com ele — o contraste do tema escuro NÃO FOI MEDIDO. O gate está dizendo menos do que"
+      echo "    parece: 'passou' aqui significa 'passou no claro'. Declare os pares do escuro em"
+      echo "    ${PAIRS#"${DC}/"} (medido em campo: 4 paletas com brand.500 a 1,71-2,60 contra fundo"
+      echo "    escuro passariam inteiras)."
+    fi
+  fi
 else
-  echo "  (sem governance/contrast-pairs.json — checagem WCAG pulada)"
+  # Sem governança declarada, o gate NÃO mediu contraste nenhum — e dizer "pulada" sem dizer o que
+  # isso custa é como o "PULADA" do jq: uma palavra que soa benigna sobre uma lacuna que não é.
+  echo "  ⚠ sem governance/contrast-pairs.json — NENHUM contraste WCAG foi medido neste projeto."
+  echo "    O gate validou forma e aliases, não legibilidade. Não conclua 'acessível' a partir daqui."
 fi
 
 # --- Sumário ----------------------------------------------------------------

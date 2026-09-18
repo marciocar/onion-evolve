@@ -10223,6 +10223,57 @@ run_design_tokens_selftests() {
   rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 0 ]; then record_pass "design-tokens: válidos passam"
   else record_fail "design-tokens: válidos" "esperava exit 0, veio ${rc}"; fi
+
+  # ── OS TRÊS FAIL-OPENS QUE DOIS ADOTANTES MEDIRAM EM CAMPO (2026-09-07) ──────────────────────
+  # Os três são a mesma classe: o gate dizia MENOS do que parecia, e "passou no gate" virava uma
+  # afirmação mais forte do que o gate mediu.
+
+  # (e) SSOT com ramo ESCURO + governança só do CLARO → o gate DECLARA que não mediu o escuro.
+  #     Custo medido pelo portal-gamificacao: 4 candidatas com brand.500 entre 1,71 e 2,60 contra
+  #     fundo escuro (alvo 3,0) e NENHUMA seria barrada — "aprovou em silêncio uma paleta ilegível".
+  d="$(mktemp -d)"; mkdc "${d}"
+  printf '%s' '{"color":{"$type":"color","ink":{"$value":"#1A1714"},"paper":{"$value":"#FFFFFF"},"text":{"$value":"{color.ink}"},"dark":{"paper":{"$value":"#101010"}}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  printf '%s' '{"pairs":[{"fg":"color.text","bg":"color.paper","min":4.5,"note":"so o claro"}]}' \
+    > "${d}/docs/design-context/governance/contrast-pairs.json"
+  local out_dark; out_dark="$(bash "${gate}" "${d}" 2>&1 || true)"
+  if grep -q 'ramo de modo ESCURO' <<< "${out_dark}"; then
+    record_pass "design-tokens: (e) SSOT com dark + governança só do claro → declara que NÃO mediu o escuro"
+  else record_fail "design-tokens: (e)" "aprovou em silêncio com o escuro sem pares: ${out_dark:0:160}"; fi
+
+  # (f) …e NÃO reprova por isso: a governança é do projeto, e pode haver razão para não cobrir um
+  #     modo. O que não se admite é o SILÊNCIO. Se este caso cair, o aviso virou muro.
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "design-tokens: (f) o aviso do escuro NÃO reprova (avisa, não bloqueia)"
+  else record_fail "design-tokens: (f)" "o aviso virou reprovação (rc=${rc})"; fi
+
+  # (g) governança AUSENTE → diz que NENHUM contraste foi medido, em vez de "pulada" benigna
+  rm -f "${d}/docs/design-context/governance/contrast-pairs.json"
+  local out_sem; out_sem="$(bash "${gate}" "${d}" 2>&1 || true)"
+  if grep -q 'NENHUM contraste WCAG foi medido' <<< "${out_sem}"; then
+    record_pass "design-tokens: (g) sem governança → declara que não mediu legibilidade"
+  else record_fail "design-tokens: (g)" "'pulada' sem dizer o custo: ${out_sem:0:160}"; fi
+  rm -rf "${d}"
+
+  # (h) FERRAMENTA AUSENTE com design-context PRESENTE → FALHA, nunca exit 0. Custo medido pelo
+  #     jogo-da-vida: sem jq o gate saía 0 dizendo PULADA e um tint a 1,38:1 virava tema aprovado.
+  d="$(mktemp -d)"; mkdc "${d}"; mkdir -p "${d}/bin"
+  printf '%s' '{"color":{"a":{"$value":"#000000"}}}' > "${d}/docs/design-context/semantic/c.tokens.json"
+  local _b _p
+  for _b in bash sh grep sed awk cat tr sort mktemp rm dirname basename; do
+    _p="$(command -v "${_b}" 2>/dev/null)" && ln -sf "${_p}" "${d}/bin/${_b}"
+  done
+  rc=0; PATH="${d}/bin" bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -ne 0 ]; then record_pass "design-tokens: (h) jq ausente com contexto PRESENTE → falha (rc=${rc}), nunca 'PULADA'"
+  else record_fail "design-tokens: (h)" "seguiu fail-open sem jq — 1,38:1 passaria por aprovado"; fi
+
+  # (i) …e o caminho GRACIOSO sobrevive: sem design-context, exit 0 (adotante sem design é legítimo).
+  #     Sem este caso, a cura de (h) puniria todo adotante que não faz design.
+  local e; e="$(mktemp -d)"
+  rc=0; bash "${gate}" "${e}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "design-tokens: (i) sem design-context segue gracioso (exit 0)"
+  else record_fail "design-tokens: (i)" "a cura puniu adotante sem design (rc=${rc})"; fi
+  rm -rf "${d}" "${e}"
   rm -rf "${d}"
 
   # (b) alias órfão → HARD (exit 1)
