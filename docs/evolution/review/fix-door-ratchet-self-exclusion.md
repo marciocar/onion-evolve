@@ -2,7 +2,7 @@
 title: 'Resíduo — a catraca contava o próprio livro-caixa'
 date: 2026-09-18
 branch: fix/door-ratchet-self-exclusion
-reviewed_diff_sha256: 7a8a339d5bdcc535738c0170e1c3395bedd96700af8b4bde118054ae4b5f631b
+reviewed_diff_sha256: cc3c34358ae14110a537bad77aa95adb884eb8b3d656f02e9f0fec83837e6370
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
