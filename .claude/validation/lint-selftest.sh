@@ -16859,15 +16859,15 @@ run_door_cycle_selftests() {
   # ⚠️ O ORÁCULO É O NÚMERO ANTES x DEPOIS, nunca o pass/fail: o caso (f) ACIMA já deixou a porta
   #    1 atrás de propósito, então "ANDOU-PARA-TRAS" aqui seria resíduo dele, não veredito sobre o
   #    livro-caixa. A 1ª redação deste caso reprovou por isso — defeito do CASO, com o SUT correto.
-  local _antes _depois
-  _antes="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" --emit-baseline 2>/dev/null | awk '{print $2}')"
+  local _before _after
+  _before="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" --emit-baseline 2>/dev/null | awk '{print $2}')"
   ( cd "${sbm}/work" && printf 'porta-x 0\n# nota nova\n' > .claude/validation/door-staleness-baseline.txt \
       && git add -A && git -c user.email=t@l -c user.name=t commit -qm "so o livro-caixa" \
       && git update-ref refs/remotes/origin/main HEAD ) >/dev/null 2>&1 || true
-  _depois="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" --emit-baseline 2>/dev/null | awk '{print $2}')"
-  if [ "${_antes}" = "${_depois}" ]; then
-    record_pass "door-cycle: (g) commit que só mexe no PRÓPRIO baseline não move a distância (${_antes}→${_depois})"
-  else record_fail "door-cycle: (g)" "o livro-caixa conta contra si mesmo (${_antes}→${_depois}) — a catraca virou esteira"; fi
+  _after="$(bash "${sbm}/work/.claude/validation/door-staleness-check.sh" "${sbm}/work" --emit-baseline 2>/dev/null | awk '{print $2}')"
+  if [ "${_before}" = "${_after}" ]; then
+    record_pass "door-cycle: (g) commit que só mexe no PRÓPRIO baseline não move a distância (${_before}→${_after})"
+  else record_fail "door-cycle: (g)" "o livro-caixa conta contra si mesmo (${_before}→${_after}) — a catraca virou esteira"; fi
 
   # (h) …e uma mudança REAL de framework no mesmo commit VOLTA a contar — a exclusão é cirúrgica,
   #     não um salvo-conduto para qualquer commit que também toque o baseline.
