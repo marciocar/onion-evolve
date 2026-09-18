@@ -1,11 +1,11 @@
 ---
-title: 'Resíduo — a doutrina prometia um gate que não existe, e o radar escondia o vencimento'
+title: 'Resíduo — quatro guardas que diziam menos do que pareciam, achadas por quem usa'
 date: 2026-09-18
 branch: fix/kg-doctrine-matches-engine
 reviewed_diff_sha256: PENDENTE
-findings_total: 3
-findings_real: 3
-findings_fixed: 3
+findings_total: 6
+findings_real: 6
+findings_fixed: 6
 tokens: 0
 duration_min: 0
 verdict: CORRIGIDO
@@ -80,3 +80,48 @@ A 1ª redação do caso (b) reprovou acusando *"o vencimento virou muro"*. Era *
 declarava `impact`, a INTEGRIDADE reprovava por isso, e o `rc=1` não tinha nada a ver com validade.
 SUT correto, harness incompleto — a mesma classe que esta casa já registrou em
 `[[bancada-espelha-o-runner]]`.
+
+
+---
+
+# Os dois do design: o gate dizia "passou" e queria dizer outra coisa
+
+Dois adotantes independentes mediram a mesma classe em superfícies diferentes. Os três fail-opens
+abaixo têm a **mesma forma** dos dois do KG acima — e é por isso que entram no mesmo PR.
+
+## Achado 4 — o gate aprovava em silêncio uma paleta ilegível no escuro
+
+`lint-design-tokens.sh` só calcula os pares que `governance/contrast-pairs.json` **declara**. Com a
+SSOT trazendo `color.dark.*` e a governança cobrindo só o claro, o gate passa — e *"passou no gate"*
+vira uma afirmação mais forte do que o gate mediu.
+
+**Custo medido pelo portal-gamificacao**, não hipótese: as quatro candidatas tinham `brand.500` entre
+**1,71 e 2,60** contra fundo escuro (alvo 3,0), e **nenhuma teria sido barrada**.
+
+Agora o gate **declara que não mediu o escuro**. Não reprova — a governança é do projeto e pode haver
+razão para não cobrir um modo. O que não se admite é o silêncio. O caso **(f)** da bancada guarda
+exatamente isso: se o aviso virar muro, ele cai.
+
+## Achado 5 — sem `jq`, "PULADA" com `exit 0`
+
+Medido pelo jogo-da-vida: sem `jq` o gate saía **0** dizendo PULADA, e **um tint a 1,38:1 virava tema
+aprovado**. O consumidor teve de tratar o "PULADA" como falha por conta própria — ou seja, **cada
+adotante reimplementava a desconfiança que o gate deveria ter**.
+
+A distinção que faltava: `design-context` **ausente** é legítimo (`exit 0`); **ferramenta** ausente
+com o contexto **presente** é *"não pude julgar"* — e guarda que não pode julgar **declara**, nunca
+aprova. Mesmo precedente da REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente), que sai
+HARD nomeando a ausência quando o manifesto não responde.
+
+O caso **(i)** existe para a cura não virar dano: sem `design-context`, o gate **segue gracioso**.
+Sem ele, eu teria punido todo adotante que não faz design ao curar quem faz.
+
+## Achado 6 — e eu inventei duas variáveis ao curar
+
+A 1ª redação do aviso do escuro lia `_ALL_TOKEN_KEYS` e `_HAS_DARK_BRANCH`. **Nenhuma das duas existe
+no script.** E o `set -u` não pegaria, porque eu havia escrito `${VAR:-}` — o efeito real seria a
+guarda **calar para sempre**: um fail-open dentro da cura de um fail-open.
+
+A fonte verdadeira estava a um `grep` de distância: o array `TOK`, que o parse já preenche.
+**Conferir a existência do que se lê é a metade barata de qualquer guarda** — e foi só porque rodei o
+`grep` que apareceu.
