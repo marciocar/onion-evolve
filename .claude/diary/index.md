@@ -1,17 +1,19 @@
-# Diário — plugin-lint-namespace
+# Diário — onion-evolve
 
 > Tier-0 pointer do diário de aprendizado desta instância Onion.
 > Leia este índice para se orientar — não releia o diário inteiro.
 > Entradas ⏰ têm `review_after` vencido. Entradas 📤 são compartilháveis via co-relay.
 
-**Total:** 125 entradas · **Stale:** 0 · **Compartilháveis:** 113 · **Com significância:** 51
+**Total:** 127 entradas · **Stale:** 1 · **Compartilháveis:** 115 · **Com significância:** 51
 
-Gerado em: 2026-09-04
+Gerado em: 2026-09-18
 
 ---
 
 | Data | Tipo | Classificação | Slug | Significância (por que ler) | Revisar em | Classe |
 |---|---|---|---|---|---|---|
+| 2026-09-18 | learning | public 📤 | o-refutador-reprovou-meu-proprio-pr-e-o-campo-novo-herda-a-superficie-nao-a-cura | — | 2026-12-18 | static |
+| 2026-09-05 | learning | public 📤 | meia-cura-tres-vezes-a-mesma-perna-e-o-mutante-ancorado-no-defeito | — | 2026-12-05 | static |
 | 2026-09-04 | learning | public 📤 | tres-bugs-de-campo-do-primeiro-adotante-greenfield-e-a-guarda-que-casava-o-comentario | — | 2026-12-03 | static |
 | 2026-09-04 | error | public 📤 | regra-n-sem-titulo-na-prosa-reincidi-duas-vezes-e-a-cura-e-um-hook-stop | — | 2026-12-03 | static |
 | 2026-09-04 | learning | public 📤 | readme-de-plugin-e-catalogo-gerado-nao-prosa-e-version-duplicada-esconde-update | — | 2026-12-03 | static |
@@ -88,7 +90,7 @@ Gerado em: 2026-09-04
 | 2026-07-19 | learning | collective 📤 | adopt-kg-life-g1-spike | Primeira vez que um spike do core concluiu NÃO CONSTRUIR — provou que o gap G1 não tem consumidor e economizou a fábrica inteira; é a Modernization Doctrine funcionando como freio, não como slogan. | 2026-10-19 | static |
 | 2026-07-18 | innovation | collective 📤 | write-kg-closing-step-bookend | — | 2026-10-15 | static |
 | 2026-07-18 | innovation | collective 📤 | self-reinforcing-radar-loop | — | 2026-10-15 | static |
-| 2026-07-18 | observation | collective 📤 | runtime-drained-safe-backlog | — | 2026-09-15 | static |
+| 2026-07-18 | observation | collective ⏰ 📤 | runtime-drained-safe-backlog | — | 2026-09-15 | static |
 | 2026-07-18 | decision | collective 📤 | perception-instruments-doctrine | — | 2026-10-15 | static |
 | 2026-07-18 | learning | public 📤 | method-adopter-has-no-doc-bridge | — | 2026-10-15 | static |
 | 2026-07-18 | reflection | collective 📤 | marathon-close-resume-trail | — | 2026-11-17 | static |
