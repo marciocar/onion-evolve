@@ -136,7 +136,9 @@ fi
     '             --freshness-tsv|--open-tsv|--weights-tsv|--status-tsv|--schema|--triples' >&2
   exit 2; }
 
-awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" "${STATUS_FACTOR}"'
+# `hoje` entra como VARIÁVEL e não por `systime()`: o `mawk` não tem `systime`/`strftime`, e uma data
+# vinda de fora torna o veredito REPRODUTÍVEL — dá para fixá-la num teste em vez de esperar o relógio.
+awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" -v hoje="$(date -u +%Y-%m-%d)" "${STATUS_FACTOR}"'
 # ── DENYLIST, NÃO ALLOWLIST — a lição de 2026-08-07 ─────────────────────────────────────────
 # Quando `drifted`/`unverifiable` entraram (2026-08-06), os predicados escritos como ALLOWLIST
 # (`== "confirmed"`, `confirmed || open`) os deixaram de fora EM SILÊNCIO, enquanto os escritos
@@ -298,6 +300,14 @@ section == "edges" && /^[[:space:]]*on:/ { v = $0; sub(/^[[:space:]]*on:/, "", v
 # meta: campos de governança de frescor/schema (proposta #1/#2 — ADR kg-freshness-gate)
 section == "meta" && /^[[:space:]]*schema_version:/ { v = $0; sub(/^[[:space:]]*schema_version:/, "", v); metaSchema = trim(v); next }
 section == "meta" && /^[[:space:]]*baseline:/       { v = $0; sub(/^[[:space:]]*baseline:/, "", v);       metaBaseline = trim(v); next }
+# ⚠️ `review_after` É LIDO AQUI DESDE 2026-09-18, e a razão veio de dois sinais de campo do mesmo
+# adotante (2026-09-10 e 2026-09-11). O campo existe na gramática e em 16 grafos; quem o cobrava era
+# só a REGRA 67 — SOFT, e no LINT. Então **quem rodava o radar nunca sabia que o grafo tinha vencido**,
+# e o radar saía VERDE sobre conhecimento caduco. Nas palavras do sinal: *"não é feature nova, é parar
+# de esconder"*. Não reprova (a doutrina do sinal é explícita: nada disso nasce bloqueando — gate que
+# impede trabalho é contornado com --no-verify na primeira sexta-feira, e aí se perde o mecanismo E a
+# informação). Avisa, onde todos olham.
+section == "meta" && /^[[:space:]]*review_after:/    { v = $0; sub(/^[[:space:]]*review_after:/, "", v); sub(/[[:space:]]+#.*$/, "", v); metaReviewAfter = trim(v); next }
 # `target:` é o que faz de um arquivo uma PROPOSTA: ele declara o grafo vivo onde o conteúdo vai
 # aterrissar. Ver a GUARDA DE MODO PROPOSTA na INTEGRIDADE para o que isso muda — e o que não muda.
 # ── O GATILHO DA PROPOSTA, e ele é ESTREITO DE PROPÓSITO ──────────────────────────────────────
@@ -682,6 +692,36 @@ END {
         }
       }
       if (warns == 0) print "  ✅ camada domain completa (sem lacunas nas 5 checagens)"
+      print ""
+    }
+  }
+
+  # ══ VALIDADE — o conhecimento deste grafo ainda vale? (⚠ atenção, NÃO reprova) ═════════════════
+  # Nasceu de DOIS sinais do mesmo adotante (2026-09-10 §7 e 2026-09-11 §2), e a frase deles é o
+  # desenho inteiro: *"não é feature nova, é parar de esconder"*. O campo `meta.review_after` está na
+  # gramática e em 16 grafos; quem o cobrava era só a REGRA 67 — SOFT, e no LINT. Quem rodava o radar
+  # via VERDE sobre conhecimento caduco, o que é pior que não ter o campo: é um painel que afirma
+  # saúde sem ter olhado para a validade.
+  # NÃO REPROVA, por doutrina explícita do sinal: *"nada disso nasce bloqueando — um gate que impede
+  # trabalho é contornado com --no-verify na primeira sexta-feira, e aí se perde o mecanismo E a
+  # informação"*. A métrica de saúde é o número diminuindo, como em toda catraca desta casa.
+  if (mode == "--all" || mode == "--validade") {
+    if (metaReviewAfter == "") {
+      if (mode == "--validade") {
+        print "══ VALIDADE — o conhecimento ainda vale? ══"
+        print "  ⚠ este grafo não declara meta.review_after — a validade NÃO FOI MEDIDA aqui."
+        print "    (a guarda declara que não sabe, em vez de passar em silêncio)"
+      }
+    } else {
+      print "══ VALIDADE — o conhecimento ainda vale? (⚠ atenção, não reprova) ══"
+      if (metaReviewAfter < hoje) {
+        print "  ⚠ REVISITA VENCIDA: meta.review_after " metaReviewAfter " < hoje " hoje
+        print "    O grafo inteiro pode estar caduco. Re-meça os nós plane:PROD (/meta:kg-freshness)"
+        print "    e o externo (/onion-research --revisit); depois carimbe review_after de novo."
+        print "    ⚠ RE-TESTAR, nunca RE-CARIMBAR: carimbo sem medição é reflexão falsa persistida."
+      } else {
+        print "  ✅ dentro da validade (review_after " metaReviewAfter " ≥ hoje " hoje ")"
+      }
       print ""
     }
   }
