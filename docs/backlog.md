@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**204 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 46 grupo(s), agrupados por `owner:` (9 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**205 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 46 grupo(s), agrupados por `owner:` (9 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 3 item(ns)
 
@@ -311,6 +311,13 @@
 | 7.7 | `Q_MAP_LEG_GATED` | librechat-kg-runtime-2026-08 | BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_cola |
 | 5.4 | `Q_KG_INBOX_FORA_DO_PLUGIN` | librechat-kg-runtime-2026-08 | LACUNA DECLARADA (achado do Elenxo de 2026-09-05, medida): o /meta:kg-inbox NAO esta em plugins/onion/commands/ — o diretorio te |
 
+## federation-health-2026-07 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 9.6 | `Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA` | federation-health-2026-07 | AS DUAS OPCOES PARA O `onion-standalone`, agora com custo MEDIDO em vez de suposto. (A) RE-MATERIALIZAR — ~1 min de maquina no t |
+| 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETE |
+
 ## core — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -352,12 +359,6 @@
 | 7.5 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
-
-## federation-health-2026-07 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETE |
 
 ## graduated-automation-elenxo-2026-07 — 2 item(ns)
 

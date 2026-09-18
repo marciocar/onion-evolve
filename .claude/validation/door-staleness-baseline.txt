@@ -56,5 +56,16 @@
 # VERIFICADO NO REMOTO, não no disco: o arquivo baixado de `repos/marciocar/onion-core` traz 0 dos
 # quatro termos declarados em `client-terms.txt`, com controle positivo (9 ocorrências de `PoC` no
 # mesmo arquivo, provando que ele veio inteiro). Isto remove do HEAD — NÃO da história.
-onion-standalone 384
+#
+# 2026-09-18 (6ª materialização, pós-#847): `onion-core` volta a ZERO pela segunda vez no mesmo dia,
+# e desta vez sem worktree — a árvore estava em `main` limpa, então `git archive HEAD` já era a main
+# mergeada. O ciclo materializar→avançar-o-pin funcionou como desenhado.
+#
+# ⚠️ E O `onion-standalone` MERECE SER DITO EM VOZ ALTA: 384 → 388. Ele só SOBE, e sobe desde
+#   2026-07-19. Uma catraca cujo único movimento é para cima não é catraca — é CONTADOR, e um
+#   contador não cria pressão nenhuma: ele registra a dívida e se acomoda a ela. A guarda está
+#   correta (o número é honesto); o que falta é a DECISÃO sobre aquela porta, que é do maestro e não
+#   desta guarda. Enquanto ela não vem, este número é a medida exata de quanto o `onion-standalone`
+#   deixou de espelhar — hoje 388 commits da superfície que viaja.
+onion-standalone 388
 onion-core 0
