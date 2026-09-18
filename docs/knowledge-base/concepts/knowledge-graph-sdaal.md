@@ -229,6 +229,19 @@ sem erro visível**. Evite:
    `meta.baseline`) · **UNANCHORED** (`node_type: claim` com `verified_at:` sem `verified_against:` — carimbo sem alvo declarado). Ver §[Frescor e versão de schema](#frescor-e-versão-de-schema--o-radar-recusaavisa-quando-a-ssot-driftou).
 6. **SCHEMA** (`--schema`, ✗ **reprova**) — `meta.schema_version` bate com a versão que o radar entende?
    Divergência = recusa (o radar não sabe ler o arquivo); ausência = ⚠ retrocompat.
+7. **VALIDADE** (`--validade`, e também em `--all`, ⚠ atenção, **não reprova**) — o conhecimento ainda
+   vale? Lê `meta.review_after` e imprime **quatro** estados, nunca um silêncio: **VENCIDA**
+   (`review_after` < hoje) · **em dia** · **NÃO MEDIDA** (o grafo não declara o campo) · **ILEGÍVEL**
+   (declara, mas fora de `AAAA-MM-DD` — comparar string crua aprovaria `em breve` e `2026-9-8`).
+   Não muda o exit code por desenho: *"nada disso nasce bloqueando — um gate que impede trabalho é
+   contornado com `--no-verify` na primeira sexta-feira, e aí se perde o mecanismo E a informação"*.
+
+   > ⚠️ **Esta entrada existe porque a lista acima estava errada na direção OPOSTA à do resto desta
+   > seção.** A seção nasceu (2026-09-18) corrigindo a KB que prometia reprovações que o motor não
+   > faz; na mesma leva eu acrescentei ao motor uma saída que a KB não listava. **Doutrina que promete
+   > mais do que a máquina faz e máquina que faz mais do que a doutrina diz são o mesmo defeito** —
+   > o leitor não consegue prever o comportamento a partir do texto. Achado da passada adversarial
+   > do próprio PR.
 
 Saída extra `--triples` (`from EDGE to [on evento]`) para consumo por LLM.
 

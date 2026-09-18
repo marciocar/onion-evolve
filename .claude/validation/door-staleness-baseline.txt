@@ -42,11 +42,19 @@
 # 2026-09-18 (pós-#846): 384 e 4. A `main` andou com o merge do #846 — a cura que tirou os nomes
 # de cliente das FIXTURES que viajam. Os dois sobem porque é mudança REAL de framework, medida
 # contra o `merge-base`, então trabalho em voo NÃO inflou estes números.
-# ⚠️ A RE-MATERIALIZAÇÃO SEGUE DEVIDA, e agora ela carrega um item de SEGURANÇA: é ela que tira os
-#   nomes de cliente do HEAD PÚBLICO do `onion-core`. Não foi feita aqui por SEQUÊNCIA, não por
-#   esquecimento: `materialize-door.sh` monta com `git archive HEAD`, e o HEAD desta branch tem
-#   trabalho NÃO-MERGEADO — materializar daqui publicaria o que ainda não passou pelo gate. A
-#   ordem correta é merge primeiro, materialização depois, e ela cobre #846 e esta leva de uma vez,
-#   levando `onion-core` de volta a ZERO. O push continua sendo do maestro (I3).
+#
+# 2026-09-18 (5ª materialização, no mesmo dia): `onion-core` volta a ZERO — e o caminho que a
+# tornou possível é o registro que interessa. A dificuldade era real: `materialize-door.sh` monta
+# com `git archive HEAD`, e o HEAD da branch em curso tem trabalho NÃO-MERGEADO, então materializar
+# de lá publicaria o que ainda não passou pelo gate. A saída NÃO foi esperar o merge: foi uma
+# WORKTREE DESTACADA em `origin/main`, de onde o `git archive HEAD` é exatamente a main mergeada.
+# Sequência deixa de ser motivo para adiar item de segurança.
+# ⚠️ E O PIN É METADE DA CURA. Materializar sem avançar `onion_version` no `members.yaml` deixa a
+#   catraca medindo contra a materialização ANTERIOR: medido aqui, a porta já estava publicada e o
+#   número seguia em 4/4. O pin é a única coisa que esta guarda lê; porta nova com pin velho é
+#   trabalho feito que o gate não enxerga.
+# VERIFICADO NO REMOTO, não no disco: o arquivo baixado de `repos/marciocar/onion-core` traz 0 dos
+# quatro termos declarados em `client-terms.txt`, com controle positivo (9 ocorrências de `PoC` no
+# mesmo arquivo, provando que ele veio inteiro). Isto remove do HEAD — NÃO da história.
 onion-standalone 384
-onion-core 4
+onion-core 0

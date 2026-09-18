@@ -10274,6 +10274,50 @@ run_design_tokens_selftests() {
   if [ "${rc}" -eq 0 ]; then record_pass "design-tokens: (i) sem design-context segue gracioso (exit 0)"
   else record_fail "design-tokens: (i)" "a cura puniu adotante sem design (rc=${rc})"; fi
   rm -rf "${d}" "${e}"
+
+  # ── Os casos abaixo nasceram da PASSADA ADVERSARIAL do PR que criou os anteriores ─────────────
+
+  # (j) contrast-pairs.json que EXISTE e NÃO PARSEIA ≠ governança ausente. Era fail-open com mensagem
+  #     mentirosa ("sem governance/contrast-pairs.json", sobre arquivo que está lá) — e, por viver o
+  #     aviso do escuro dentro do mesmo ramo `then`, um JSON quebrado silenciava DUAS curas de uma vez.
+  d="$(mktemp -d)"; mkdc "${d}"
+  printf '%s' '{"color":{"dark":{"$type":"color","brand":{"$value":"#4A4A4A"},"paper":{"$value":"#101010"}}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  printf '%s' '{ isto nao e json' > "${d}/docs/design-context/governance/contrast-pairs.json"
+  rc=0; local out_bad; out_bad="$(bash "${gate}" "${d}" 2>&1)" || rc=$?
+  if [ "${rc}" -ne 0 ] && ! grep -q 'sem governance/contrast-pairs.json' <<< "${out_bad}"; then
+    record_pass "design-tokens: (j) pairs.json ILEGÍVEL → falha (rc=${rc}) e NÃO se diz 'ausente'"
+  else record_fail "design-tokens: (j)" "ilegível tratado como ausente (rc=${rc}): ${out_bad:0:200}"; fi
+  rm -rf "${d}"
+
+  # (k) A TOPOLOGIA QUE A SSOT DESTA CASA PRESCREVE. `docs/design-context/README.md` manda usar
+  #     `modes/<light|dark|hc>.tokens.json` — override cujos paths são os MESMOS semânticos, sem
+  #     prefixo `color.dark.`. O detector por chave era CEGO para ela: na forma canônica, um brand a
+  #     2,15:1 no escuro passava com OK ✓ e exit 0. Detectar por chave só acha o que se imaginou.
+  d="$(mktemp -d)"; mkdc "${d}"; mkdir -p "${d}/docs/design-context/modes"
+  printf '%s' '{"color":{"$type":"color","surface":{"base":{"$value":"#FFFFFF"}},"text":{"body":{"$value":"#111111"}}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  printf '%s' '{"color":{"$type":"color","surface":{"base":{"$value":"#101010"}},"text":{"body":{"$value":"#4A4A4A"}}}}' \
+    > "${d}/docs/design-context/modes/dark.tokens.json"
+  printf '%s' '{"pairs":[{"fg":"color.text.body","bg":"color.surface.base","min":4.5,"note":"corpo"}]}' \
+    > "${d}/docs/design-context/governance/contrast-pairs.json"
+  local out_modes; out_modes="$(bash "${gate}" "${d}" 2>&1 || true)"
+  if grep -q 'ARQUIVO de modo escuro' <<< "${out_modes}" && grep -q 'NÃO declara nenhum par' <<< "${out_modes}"; then
+    record_pass "design-tokens: (k) modes/dark.tokens.json (forma canônica) dispara o aviso do escuro"
+  else record_fail "design-tokens: (k)" "cego para a topologia que a SSOT prescreve: ${out_modes:0:200}"; fi
+  rm -rf "${d}"
+
+  # (l) `test("dark")` é SUBSTRING: um par do CLARO chamado `color.darkblue` bastava para silenciar
+  #     o aviso do escuro. A âncora exige `dark` como SEGMENTO do path.
+  d="$(mktemp -d)"; mkdc "${d}"
+  printf '%s' '{"color":{"$type":"color","dark":{"brand":{"$value":"#4A4A4A"},"paper":{"$value":"#101010"}},"darkblue":{"$value":"#111111"},"paper":{"$value":"#FFFFFF"}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  printf '%s' '{"pairs":[{"fg":"color.darkblue","bg":"color.paper","min":4.5,"note":"par do CLARO"}]}' \
+    > "${d}/docs/design-context/governance/contrast-pairs.json"
+  local out_sub; out_sub="$(bash "${gate}" "${d}" 2>&1 || true)"
+  if grep -q 'NÃO declara nenhum par' <<< "${out_sub}"; then
+    record_pass "design-tokens: (l) par do CLARO com 'dark' no nome NÃO silencia o aviso do escuro"
+  else record_fail "design-tokens: (l)" "substring silenciou a guarda: ${out_sub:0:200}"; fi
   rm -rf "${d}"
 
   # (b) alias órfão → HARD (exit 1)
@@ -17113,6 +17157,72 @@ edges:
   if grep -q 'NÃO FOI MEDIDA' <<< "${out}"; then
     record_pass "radar-validade: (d) sem review_after → declara que NÃO mediu (nunca silêncio)"
   else record_fail "radar-validade: (d)" "passou calado sem o campo: ${out:0:160}"; fi
+
+  # ── Os casos abaixo nasceram da PASSADA ADVERSARIAL do PR que criou esta família ───────────────
+  # Todos eram FAIL-OPEN: o grafo vencido saía VERDE. Sem eles a catraca não existe.
+
+  # (e) O "não medi" tem de valer no modo que TODOS usam. A 1ª redação só declarava a ausência em
+  #     `--validade` — um modo com ZERO chamadores no repo — enquanto `--all` (o default, e o dos 97
+  #     sítios) ficava mudo. A guarda declarava que não sabe só onde ninguém olhava.
+  out="$(bash "${radar}" "${d}/sem.kg.yaml" --all 2>&1 || true)"
+  if grep -q 'NÃO FOI MEDIDA' <<< "${out}"; then
+    record_pass "radar-validade: (e) sem review_after em --all (o modo real) também DECLARA"
+  else record_fail "radar-validade: (e)" "--all seguiu mudo sem o campo: ${out:0:160}"; fi
+
+  # (f,g,h) AS TRÊS PORTAS DE FAIL-OPEN que o `target:` já fechara em 2026-09-11 e que o campo novo
+  #     reabriu por não herdar `metaClosed`/`metaFieldIndent`. Em last-wins, um `review_after` FUTURO
+  #     escondido sobrescreve o vencido. A lição: campo novo herda a superfície de ataque do parser,
+  #     nunca as curas dele.
+  printf '%s  review_after: 2020-01-01
+  migracao:
+    review_after: 2099-01-01
+%s' "${head}" "${body}" > "${d}/aninhado.kg.yaml"
+  out="$(bash "${radar}" "${d}/aninhado.kg.yaml" --validade 2>&1 || true)"
+  if grep -q 'REVISITA VENCIDA' <<< "${out}"; then
+    record_pass "radar-validade: (f) review_after em SUBMAPA não sobrescreve o de meta (fail-open fechado)"
+  else record_fail "radar-validade: (f)" "submapa mascarou o vencimento: ${out:0:200}"; fi
+
+  printf '%s  review_after: 2020-01-01
+  nota: |
+    exemplo
+    review_after: 2099-01-01
+%s' "${head}" "${body}" > "${d}/literal.kg.yaml"
+  out="$(bash "${radar}" "${d}/literal.kg.yaml" --validade 2>&1 || true)"
+  if grep -q 'REVISITA VENCIDA' <<< "${out}"; then
+    record_pass "radar-validade: (g) review_after dentro de BLOCO LITERAL não conta (fail-open fechado)"
+  else record_fail "radar-validade: (g)" "bloco literal mascarou o vencimento: ${out:0:200}"; fi
+
+  printf '%s  review_after: 2020-01-01
+%smeta:
+  review_after: 2099-01-01
+' "${head}" "${body}" > "${d}/reabre.kg.yaml"
+  out="$(bash "${radar}" "${d}/reabre.kg.yaml" --validade 2>&1 || true)"
+  if grep -q 'REVISITA VENCIDA' <<< "${out}"; then
+    record_pass "radar-validade: (h) meta REABERTO após nodes: não sobrescreve (fail-open fechado)"
+  else record_fail "radar-validade: (h)" "meta reaberto mascarou o vencimento: ${out:0:200}"; fi
+
+  # (i,j) FORMATO NÃO VALIDADO: a comparação era de STRING CRUA. `em breve` e `2026-9-8` (vencido,
+  #     sem zero à esquerda) saíam AMBOS como "dentro da validade". A cura já existia no repo — a
+  #     REGRA 67 exige AAAA-MM-DD no lint; o radar é que comparava sem olhar a forma.
+  printf '%s  review_after: em breve
+%s' "${head}" "${body}" > "${d}/lixo.kg.yaml"
+  out="$(bash "${radar}" "${d}/lixo.kg.yaml" --validade 2>&1 || true)"
+  if grep -q 'ILEGÍVEL' <<< "${out}" && ! grep -q 'dentro da validade' <<< "${out}"; then
+    record_pass "radar-validade: (i) review_after com lixo → ILEGÍVEL, nunca 'em dia'"
+  else record_fail "radar-validade: (i)" "lixo passou por data válida: ${out:0:200}"; fi
+
+  printf '%s  review_after: 2026-9-8
+%s' "${head}" "${body}" > "${d}/naopad.kg.yaml"
+  out="$(bash "${radar}" "${d}/naopad.kg.yaml" --validade 2>&1 || true)"
+  if grep -q 'ILEGÍVEL' <<< "${out}" && ! grep -q 'dentro da validade' <<< "${out}"; then
+    record_pass "radar-validade: (j) data sem zero à esquerda → ILEGÍVEL (comparação de texto mente)"
+  else record_fail "radar-validade: (j)" "data não-padded passou como em dia: ${out:0:200}"; fi
+
+  # (k) `--validade` é modo REAL: tem de ser aceito na forma COMPOSTA, como todo modo desta casa.
+  rc=0; bash "${radar}" "${d}/fresco.kg.yaml" --validade --schema >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "radar-validade: (k) --validade compõe com outros modos (allowlist o conhece)"
+  else record_fail "radar-validade: (k)" "forma composta rejeitada (rc=${rc}) — modo fantasma"; fi
   rm -rf "${d}"
 }
 
