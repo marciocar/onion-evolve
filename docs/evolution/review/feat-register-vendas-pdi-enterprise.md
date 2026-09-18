@@ -2,7 +2,7 @@
 title: 'Resíduo — o adotante nasce verde, e o slug neutro se prova em produção'
 date: 2026-09-17
 branch: feat/register-vendas-pdi-enterprise
-reviewed_diff_sha256: fb6e6ad1552d5fc9986eb42a7bda656eb4aae3f77eeae5f500b906b039d9766c
+reviewed_diff_sha256: 8df1c243422148bdc79e6538e04bfd5be91d79d6962b3e9346498755de09482b
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
