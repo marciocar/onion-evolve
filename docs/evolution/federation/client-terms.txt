@@ -1,0 +1,26 @@
+# TERMOS COMERCIAIS A VARRER — nomes que NÃO PODEM aparecer na superfície que viaja.
+#
+# ⚠️ ESTE ARQUIVO NÃO VIAJA, E ISSO É O DESENHO INTEIRO. Ele mora em `docs/evolution/`, que o
+# `vendor-manifest.sh` exclui do transporte. Uma lista de nomes de cliente que VIAJASSE seria,
+# ela mesma, o vazamento — a armadilha mais óbvia desta cura, e a razão de não estar em
+# `.claude/validation/` junto do resto das guardas.
+#
+# ⚠️ POR QUE ELE PRECISOU EXISTIR (medido 2026-09-18, exposição PÚBLICA E ATIVA):
+# a REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) deriva os termos do
+# `members.yaml`. Quem NÃO está registrado, ela não conhece. E as fixtures da guarda-irmã
+# `vendor-scrub-form-check.sh` usavam nomes REAIS de clientes/adotantes como exemplo — em
+# `.claude/validation/`, que viaja, e portanto no repo PÚBLICO `onion-core`. A guarda que impede
+# nome de cliente de viajar continha nomes de cliente. Ninguém a acusou porque ninguém a conhecia.
+#
+# ⚠️ POR QUE NÃO BASTA REGISTRAR NO members.yaml: o `name:` de um membro é PROJETADO para o
+# `federation-console.html` e o `federation-map.md`. Registrar um cliente sob NDA ali o publicaria —
+# trocaria um vazamento por outro. Aqui o nome é só REGRA DE VARREDURA: entra para ser procurado,
+# nunca para ser exibido.
+#
+# Formato: um termo por linha, `#` comenta. Casado de forma caixa-insensível.
+# Regra de higiene: só nome COMERCIAL real. Nome fictício de fixture não entra — ele é o que
+# deve SOBRAR na superfície depois da cura.
+HPE
+Prodfiel
+Itau
+Itaú
