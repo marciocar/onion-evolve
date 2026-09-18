@@ -16737,6 +16737,52 @@ run_door_selftests() {
       else record_pass "door: (e) materialização AUTORITATIVA (o que sai do manifesto sai da porta)"; fi
     else record_fail "door: (e)" "2ª materialização abortou"; fi
   else record_fail "door: (e)" "1ª materialização abortou"; fi
+
+  # (f) O PAPEL QUE **NÃO** RECEBE O REGENERADOR AINDA ASSIM SAI COM AS PROJEÇÕES FEITAS.
+  #     Achado da passada adversarial do PR #848: o script procurava `regen-ssot-projections.sh`
+  #     SÓ dentro do destino. O manifesto do papel `standalone` o EXCLUI (é ferramenta core-only, e
+  #     a exclusão está certa) — então o `if` falhava, o `|| true` engolia, o script saía rc=0
+  #     dizendo "Porta materializada", e a porta nascia PUBLICADA com 8 HARD em vez de 4. O papel
+  #     `hub` escapava POR ACIDENTE DE MANIFESTO: lá o arquivo viaja. Gate que funciona num caminho
+  #     só, por coincidência, é o que este caso existe para impedir de voltar.
+  local d5; d5="$(mktemp -d)"; rm -rf "${d5}"
+  if bash "${REPO_ROOT}/ops/materialize-door.sh" "${d5}" --role standalone >/dev/null 2>&1; then
+    # as 5 projeções SSOT que o regenerador produz; basta UMA ausente para o defeito ter voltado
+    local _faltam=0 _p
+    for _p in docs/onion/inventory.md docs/onion/graph.md docs/onion/kg-read-index.tsv \
+              docs/onion/testing-inventory.md docs/onion/testing-state.md; do
+      [ -s "${d5}/${_p}" ] || _faltam=$((_faltam + 1))
+    done
+    if [ "${_faltam}" -eq 0 ]; then
+      record_pass "door: (f) papel SEM o regenerador ainda sai com as 5 projeções (rodado do core)"
+    else record_fail "door: (f)" "${_faltam} projeção(ões) ausente(s) no papel standalone — o fail-open de :238 voltou"; fi
+  else record_fail "door: (f)" "materialização standalone abortou"; fi
+  rm -rf "${d5}"
+
+  # (g) E SE NÃO HOUVER REGENERADOR EM LUGAR NENHUM, a guarda DECLARA em vez de passar calada.
+  #     É a metade que faltava: o `|| true` antigo tornava "não regenerei" indistinguível de
+  #     "regenerei". O core mutilado é cópia da ÁRVORE DE TRABALHO, não de `HEAD` — e a diferença
+  #     não é detalhe: com `git archive HEAD` este caso media o script COMMITADO, não o que está sob
+  #     teste, e reprovava a cura que já estava no disco. É a mesma lição que a casa já pagou: a
+  #     bancada copia o artefato que o runner executa, nunca uma versão vizinha dele.
+  #     ⚠️ E O CORE FALSO PRECISA SER UM REPO GIT: sem `.git` o `vendor-manifest.sh` devolve vazio e
+  #     o script ABORTA na pré-condição fail-closed (rc=3, "manifesto VAZIO") — o caso morria antes
+  #     de chegar ao passo medido. Clone raso dá o `.git`; a cópia da árvore por cima dá o artefato
+  #     REAL sob teste, que `HEAD` sozinho não daria.
+  local d6 fake; d6="$(mktemp -d)"; rm -rf "${d6}"
+  fake="$(mktemp -d)"; rm -rf "${fake}"
+  if git clone --quiet --depth 1 --no-hardlinks "file://${REPO_ROOT}" "${fake}" 2>/dev/null \
+     && git -C "${REPO_ROOT}" ls-files -z \
+          | tar -C "${REPO_ROOT}" --null -T - -cf - 2>/dev/null | tar -x -C "${fake}" 2>/dev/null; then
+    rm -f "${fake}/.claude/utils/adopt/regen-ssot-projections.sh"
+    local _out_g
+    _out_g="$(bash "${fake}/ops/materialize-door.sh" "${d6}" --role standalone 2>&1 || true)"
+    if grep -q 'regen-ssot-projections.sh AUSENTE' <<< "${_out_g}"; then
+      record_pass "door: (g) sem regenerador em lugar nenhum → a guarda DECLARA (nunca calada)"
+    else record_fail "door: (g)" "seguiu calada sem o regenerador: $(_emit "${_out_g}" | tail -3 | head -c 200)"; fi
+  else record_fail "door: (g)" "o core falso não pôde ser montado (clone raso + cópia da árvore)"; fi
+  rm -rf "${d6}" "${fake}"
+
   rm -rf "${d4}" "${d3}" "${sb2}"
 }
 

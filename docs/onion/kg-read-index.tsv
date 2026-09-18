@@ -232,7 +232,6 @@
 .claude/validation/consumed-mode-check.sh	Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .claude/validation/diary-index.sh	D_GUARDA_DO_MARCADOR_NA_FONTE	docs/onion/graph/residuos-2026-08-18.kg.yaml
 .claude/validation/door-staleness-baseline.txt	E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR	docs/onion/graph/federation-health-2026-07.kg.yaml
-.claude/validation/door-staleness-baseline.txt	E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/validation/door-staleness-baseline.txt	Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/validation/door-staleness-check.sh	E_A_CATRACA_DA_PORTA_ERA_ESTEIRA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/federation-console.sh	C_not_backstage	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
@@ -1839,6 +1838,8 @@ ops/bridge-auth/logto-provision.sh	E_org_membership_grows_2026_08	docs/onion/gra
 ops/bridge-auth/logto-provision.sh	E_p1p3_provisioned	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/bridge-auth/logto-provision.sh	E_slice1_revocation_isolated	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/bridge-auth/logto-provision.sh	I_PROVISION_FICOU_PARA_TRAS_NO_RENAME	docs/evolution/research/vaultwarden-logto-2026-08/vaultwarden-logto-2026-08.kg.yaml
+ops/materialize-door.sh	E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE	docs/onion/graph/federation-health-2026-07.kg.yaml
+ops/materialize-door.sh	E_MATERIALIZE_DOOR_FAIL_OPEN_NO_REGEN	docs/onion/graph/federation-health-2026-07.kg.yaml
 ops/mcp-onion-exec/server.py	E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_2_ZERO_ANNOTATIONS_EXPOR_E_REESCREVER	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml

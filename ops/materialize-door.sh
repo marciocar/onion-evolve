@@ -235,13 +235,32 @@ if [ ! -f "${DEST}/.claude/settings.json" ] && [ -f "${REPO_ROOT}/.claude/settin
   echo "  (6) settings.json copiado (3 docs que viajam o citam; sem ele a REGRA 48 reprova ponteiro morto)"
 fi
 
-if [ -f "${DEST}/.claude/utils/adopt/regen-ssot-projections.sh" ]; then
-  bash "${DEST}/.claude/utils/adopt/regen-ssot-projections.sh" "${DEST}" 2>&1 | sed 's/^/  (6) /' || true
-fi
-if [ -f "${DEST}/.claude/utils/adopt/regen-baselines.sh" ]; then
-  # As catracas do core foram esvaziadas no passo (2); aqui elas renascem do corpus DA PORTA.
-  bash "${DEST}/.claude/utils/adopt/regen-baselines.sh" "${DEST}" 2>&1 | tail -2 | sed 's/^/  (6) /' || true
-fi
+# ⚠️ O REGENERADOR PODE NAO TER VIAJADO — e procura-lo SO no destino era FAIL-OPEN SILENCIOSO.
+# Medido em 2026-09-18 pela passada adversarial do PR #848: o manifesto do papel `standalone`
+# EXCLUI `regen-ssot-projections.sh` e `regen-baselines.sh` (sao ferramenta core-only, e a exclusao
+# esta CERTA — elas nao devem viajar). Mas o teste era `[ -f "${DEST}/..." ]`: no papel `standalone`
+# o arquivo nunca esta la, o `if` falha, o `|| true` cala, o script sai rc=0 dizendo materializado —
+# e a porta nasce PUBLICADA com 8 HARD em vez de 4. O papel `hub` escapava por acidente de manifesto
+# (la o arquivo viaja), que e a pior forma de um gate funcionar: por coincidencia, num caminho so.
+# A CURA NAO E FAZER A FERRAMENTA VIAJAR — e roda-la do CORE contra o DESTINO, que e o que ela
+# sempre soube fazer (ela recebe o alvo como argumento). E se nao houver nenhuma das duas, a guarda
+# DECLARA em vez de seguir calada: materializacao que nao regenerou projecao entrega porta que
+# reprova no proprio lint, e quem publica precisa saber disso ANTES do push.
+_regen() {                                        # _regen <nome-do-script> <como-cortar-a-saida>
+  local _n="$1" _cut="${2:-cat}" _src=""
+  if   [ -f "${DEST}/.claude/utils/adopt/${_n}" ];      then _src="${DEST}/.claude/utils/adopt/${_n}"
+  elif [ -f "${REPO_ROOT}/.claude/utils/adopt/${_n}" ]; then _src="${REPO_ROOT}/.claude/utils/adopt/${_n}"
+  else
+    echo "  (6) ⚠️ ${_n} AUSENTE no destino E no core — projecoes NAO regeneradas." >&2
+    echo "  (6)    A porta vai nascer reprovando no proprio lint. Isto NAO e 'pulado': e nao-medido." >&2
+    return 1
+  fi
+  bash "${_src}" "${DEST}" 2>&1 | ${_cut} | sed 's/^/  (6) /'
+  return 0
+}
+_regen regen-ssot-projections.sh || true
+# As catracas do core foram esvaziadas no passo (2); aqui elas renascem do corpus DA PORTA.
+_regen regen-baselines.sh 'tail -2' || true
 
 _pin="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD)"
 cat <<FIM
