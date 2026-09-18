@@ -2,7 +2,7 @@
 title: 'Resíduo — quatro guardas que diziam menos do que pareciam, achadas por quem usa'
 date: 2026-09-18
 branch: fix/kg-doctrine-matches-engine
-reviewed_diff_sha256: cec0cea36d78983379aab7dbc6f3274a26b972a4a3976af6153617b5c2359561
+reviewed_diff_sha256: dc02b7173d2fa11f91f81b4f3878fc46a53e02a476812dd8f83ec7c0cd3dca5c
 findings_total: 16
 findings_real: 16
 findings_fixed: 16
@@ -10,6 +10,10 @@ tokens: 198591
 duration_min: 28
 verdict: CORRIGIDO
 elenxo: sim
+cobertura_declarada: >-
+  O refutador leu o diff EXECUTAVEL (kg-radar.sh, lint-design-tokens.sh). A entrada de diario
+  acrescentada depois NAO passou por ele: e prosa, sem superficie de execucao. Declarado para o
+  hash nao dar a entender uma cobertura que nao houve.
 nota: >-
   Dois sinais de campo do mesmo adotante, medidos com arquivo:linha dos dois lados, confirmados
   no vivo antes de curar. E um deles já estava curado sem que o remetente soubesse — medir o que
