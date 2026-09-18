@@ -387,6 +387,7 @@
 .github/workflows/onion-review.yml	A_CURAR_O_REVISOR_DO_CI_COM_MECANISMO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .github/workflows/onion-review.yml	E_HOST_SEM_PROTECAO_CI_E_AVISO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .github/workflows/onion-review.yml	E_O_REVISOR_DO_CI_NAO_REVISA_HA_DUAS_OCORRENCIAS	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.github/workflows/onion-review.yml	E_REVISOR_SEMANTICO_VOLTOU_A_RODAR_COM_CREDITO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .github/workflows/onion-review.yml	Q_MUDEZ_DA_GUARDA_NAO_SE_IDENTIFICA	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .github/workflows/onion-review.yml	Q_POR_QUE_O_REVISOR_SEMANTICO_MORRE	docs/onion/graph/fios-abertos.kg.yaml
 docs/INDEX.md	C_D7_18	docs/onion/graph/onion-evolution-2026-07.kg.yaml
