@@ -116,7 +116,7 @@ if [ ! -f "${TARGET}/.claude/.onion-version" ]; then
   echo "  Se o alvo certo é outro checkout, resolva pelo 'local_path' do members.yaml." >&2
   exit 2
 fi
-if ! grep -qE '^[[:space:]]*role:[[:space:]]*(adopted|hub)[[:space:]]*(#.*)?$' "${TARGET}/.claude/.onion-version"; then
+if ! grep -qE '^[[:space:]]*role:[[:space:]]*(adopted|hub|standalone)[[:space:]]*(#.*)?$' "${TARGET}/.claude/.onion-version"; then
   echo "ERRO: '${TARGET}' tem stamp, mas o 'role:' não é adopted nem hub." >&2
   echo "  Downstream vai para CONSUMIDOR. Entregar noutro papel põe o anúncio onde ninguém o lê." >&2
   exit 2

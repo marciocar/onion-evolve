@@ -21,7 +21,20 @@
 #   · não dispara IA nenhuma. Uma rodada custa ~1,9 M tokens; um medidor que roda o medido é
 #     mais caro que o defeito que mede.
 set -uo pipefail
-DIR="docs/evolution/review"; MODE="--resumo"
+# ⚠️ O DIRETORIO PADRAO E RESOLVIDO PELA LOCALIZACAO DO SCRIPT, NUNCA PELO CWD — e a diferenca foi
+# MEDIDA em 2026-09-18, publicada numa porta publica. O default era o caminho RELATIVO
+# `docs/evolution/review`, entao quem invocasse este medidor de OUTRO diretorio media o repo de
+# ONDE ESTAVA, nao o repo que pediu a medida. Foi o que aconteceu: `regen-ssot-projections.sh` roda
+# do CORE contra o DESTINO, o `testing-state.sh` do destino chamou este produtor, e o painel da
+# porta `onion-standalone` saiu com a historia de revisao DO CORE — 294 residuos e 1.586 achados que
+# nao sao dela. Dois danos de uma vez: dado FALSO sobre a porta, e biografia do core viajando para
+# superficie publica que o corte por papel existia para limpar.
+# A prova e de uma linha, e vale guardar: o MESMO arquivo, invocado de fora e de dentro do destino,
+# devolvia numeros diferentes. Script cujo veredito depende do CWD nao mede o que diz medir.
+# `--dir` explicito continua respeitado como veio (o chamador sabe o que quer); so o DEFAULT deixa
+# de depender de onde se estava.
+_RL_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)/docs/evolution/review"
+DIR="${_RL_DIR}"; MODE="--resumo"
 while [ $# -gt 0 ]; do
   case "$1" in
     --tsv|--resumo|--json|--env) MODE="$1" ;;

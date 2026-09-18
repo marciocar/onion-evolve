@@ -50,7 +50,13 @@ check_ladder() {
   local rel=".claude/validation/automation-ladder-registry.txt"
   local registry="${root}/${rel}"
   local hard=0 classes=0
-  local adopted=""; grep -qE '^(role: (adopted|hub)|decoupled_from:)' "${root}/.claude/.onion-version" 2>/dev/null && adopted=1
+  # ⚠️ `standalone` FALTAVA AQUI, e a guarda ficou cega para o papel que ela mais precisava isentar.
+  # Medido 2026-09-18: a porta `onion-standalone` recem-materializada carimba `role: standalone`, este
+  # predicado so conhecia `adopted|hub`, entao a isencao de evidencia core-privada NUNCA disparava e
+  # o `members.yaml` (que legitimamente nao viaja) saia HARD. A classe e conhecida nesta casa: em
+  # guarda de lista, o defeito dominante e o VOCABULARIO, nao a logica. O papel nasceu no manifesto e
+  # ninguem voltou nos predicados que o julgam.
+  local adopted=""; grep -qE '^(role: (adopted|hub|standalone)|decoupled_from:)' "${root}/.claude/.onion-version" 2>/dev/null && adopted=1
   if [ ! -f "${registry}" ]; then
     [ "${FORMAT}" = "tsv" ] || echo "  (sem registry — escada não declarada; nasce silencioso)"
     return 0

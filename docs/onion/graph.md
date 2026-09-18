@@ -582,7 +582,7 @@ onion-compliance	requires	template:compliance_pmbok_template.md
 onion-compliance	requires	template:compliance_soc2_template.md	
 onion-core	adopts	onion-evolve	
 onion-core	mode	greenfield	
-onion-core	pin	9f625086d80f	
+onion-core	pin	24118c5d7a97	
 onion-core	specialization	deterministic-guards	
 onion-core	specialization	full-machinery	
 onion-core	specialization	hub-role	

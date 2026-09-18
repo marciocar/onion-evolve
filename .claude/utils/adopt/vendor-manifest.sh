@@ -115,6 +115,20 @@ _base=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/vali
 #                outra granularidade, outro SSOT. Declarar isso aqui é o que impede a próxima
 #                leitura de concluir "ainda é decorativo": para dois dos três papéis, não cortar É
 #                a resposta medida.
+# ⚠️ O CONDUTOR VIAJA COM O MOTOR, OU NENHUM DOS DOIS VIAJA — e esta lista nao tinha os condutores.
+# Medido em 2026-09-18, materializando o `onion-standalone` para decidir se valia re-materializa-lo:
+# a lista cortava os MOTORES da meta-fabrica (`utils/marketplace/`, `utils/wizard/`, e o
+# `commands/meta/adopt.md` pelo corte do `roles.yaml`) e deixava viajar as SKILLS QUE OS CONDUZEM.
+# Resultado: `onion-publish/SKILL.md:71` apontava para `utils/marketplace/materialize-marketplace-repo.sh`
+# e `onion-wizard/SKILL.md:50` para `commands/meta/adopt.md` — os dois caminhos EXPLICITAMENTE
+# cortados por esta mesma funcao. O comando nasce MORTO no consumidor: a skill esta la, o motor nao.
+# E `onion-publish` e declarada core-only na propria doutrina do repo (CLAUDE.md), o que torna a
+# omissao ainda mais clara — nao era duvida de desenho, era item que ninguem lembrou de acrescentar.
+# A LICAO DE FORMA: lista de exclusao escrita A MAO envelhece pelo que se ACRESCENTA depois dela.
+# Os motores foram cortados quando existiam; as skills nasceram depois e ninguem voltou aqui. Uma
+# derivacao (cortar a skill cujo `trace`/allowed-tools aponta para caminho cortado) seria imune a
+# isso — fica NOMEADO como o proximo passo, nao feito aqui, porque exige extrair o grafo de
+# dependencia skill→motor que hoje so existe em prosa dentro de cada SKILL.md.
 _role_cut() {  # $1=papel → subcaminhos a cortar, um por linha (vazio = nada a cortar)
   case "$1" in
     standalone)
@@ -126,7 +140,10 @@ _role_cut() {  # $1=papel → subcaminhos a cortar, um por linha (vazio = nada a
         .claude/utils/wizard/ \
         .claude/utils/vertical/ \
         .claude/utils/federation-transport/ \
-        .claude/validation/federation-
+        .claude/validation/federation- \
+        .claude/skills/onion-publish/ \
+        .claude/skills/onion-wizard/ \
+        .claude/skills/onion-onboarding/
       ;;
     *) : ;;
   esac

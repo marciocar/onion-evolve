@@ -67,5 +67,15 @@
 #   correta (o número é honesto); o que falta é a DECISÃO sobre aquela porta, que é do maestro e não
 #   desta guarda. Enquanto ela não vem, este número é a medida exata de quanto o `onion-standalone`
 #   deixou de espelhar — hoje 388 commits da superfície que viaja.
-onion-standalone 388
+#
+# 2026-09-18 (7a materializacao): `onion-core` volta a ZERO pela terceira vez no dia — o ciclo
+# materializar → avancar o pin ja e mecanismo, e desta vez dispensou ate a worktree (a arvore estava
+# em `main` limpa). `onion-standalone` sobe a 389.
+# ⚠️ E A DECISAO (A) — RE-MATERIALIZAR o standalone — REVELOU UM BLOQUEIO QUE NENHUMA MEDICAO DE
+#   CUSTO TINHA VISTO: a porta VIVA carimba `role: adopted` (corte manual de 2026-07-19), mas uma
+#   materializacao NOVA carimba `role: standalone` — e CINCO predicados que decidem "este repo e
+#   derivado?" so conheciam `adopted|hub`. Re-materializar trocaria a identidade da porta por uma que
+#   as guardas leem como FONTE. Curado nos cinco sitios, com caso de bancada que DERIVA os papeis
+#   validos do `write-stamp.sh` e reprova se algum predicado nao os conhecer todos (mutante provado).
+onion-standalone 389
 onion-core 0

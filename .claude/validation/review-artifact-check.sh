@@ -102,7 +102,7 @@ fi
 # ADOTANTE FICA DE FORA — e isto é correção do episódio de HOJE, não precaução: uma REGRA HARD
 # validada só no core acusou 11 falsos no 1º adotante que a recebeu. Esta regra cobra um RITUAL DO
 # CORE (a passada adversarial sobre o framework); o adotante tem o dele. `role: adopted|hub`.
-if grep -qE '^(role:[[:space:]]*(adopted|hub)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; then
+if grep -qE '^(role:[[:space:]]*(adopted|hub|standalone)|decoupled_from:)' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; then
   _skip "repo-derivado(role-adopted/hub)"
   [ "${FORMAT}" = tsv ] || printf '  ⊘ fora de escopo: %s\n' "${SKIPS}"
   exit 0
