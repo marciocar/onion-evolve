@@ -17208,6 +17208,54 @@ run_regen_completude_selftests() {
   else record_fail "regen-completude: (MUT)" "o oráculo não reage à remoção — o caso é decorativo"; fi
 }
 
+# ── AS PROJEÇÕES CORE-ONLY TÊM DONO (2026-09-17) ─────────────────────────────────────────────
+# Quatro vezes no mesmo dia eu descobri, uma a uma e PELO GATE VERMELHO, qual projeção da federação
+# tinha envelhecido depois de tocar o `members.yaml`. A cobertura estava partida em duas e só uma
+# metade tinha dono: o `regen-ssot-projections.sh` isenta esses geradores COM razão escrita, e a
+# razão vale para o ALVO — no core, a mesma isenção virava buraco.
+run_regen_core_projections_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/regen-core-projections.sh"
+  [ -f "${sut}" ] || { record_skip "regen-core: script ausente"; return; }
+  local out rc
+
+  # (a) IDEMPOTENTE no repo real: rodar duas vezes seguidas não muda nada na segunda
+  out="$(bash "${sut}" "${REPO_ROOT}" 2>&1)"; rc=$?
+  out="$(bash "${sut}" "${REPO_ROOT}" 2>&1)" || true
+  if grep -q '0 projeção' <<< "${out}"; then
+    record_pass "regen-core: (a) idempotente — 2ª passada não reescreve nada"
+  else record_fail "regen-core: (a)" "não convergiu: ${out:0:160}"; fi
+
+  # (b) O CASO QUE JUSTIFICA O SCRIPT: gerador que FALHA não pode destruir a projeção boa. É a
+  #     REGRA 62 aplicada a si mesma — e eu truncei um índice para ZERO linhas assim em 2026-09-17,
+  #     com um gerador rc=2 e um redirect direto. Aqui o sandbox tem um gerador que sai 1 e vazio.
+  local sb; sb="$(mktemp -d)"
+  mkdir -p "${sb}/.claude/validation" "${sb}/docs/onion"
+  cp "${sut}" "${sb}/.claude/validation/"
+  printf 'exit 1\n' > "${sb}/.claude/validation/graph.sh"
+  printf 'CONTEUDO BOM QUE NAO PODE SUMIR\n' > "${sb}/docs/onion/federation-map.md"
+  out="$(bash "${sb}/.claude/validation/regen-core-projections.sh" "${sb}" 2>&1)" || true
+  if grep -q 'CONTEUDO BOM QUE NAO PODE SUMIR' "${sb}/docs/onion/federation-map.md" \
+     && grep -q 'NÃO sobrescrevi' <<< "${out}"; then
+    record_pass "regen-core: (b) gerador que FALHA não destrói a projeção boa (e diz que não escreveu)"
+  else record_fail "regen-core: (b)" "projeção boa perdida ou silêncio: ${out:0:160}"; fi
+
+  # (c) SAÍDA VAZIA TAMBÉM É RECUSA — rc=0 com conteúdo abaixo do piso é o vazio-que-parece-conteúdo
+  printf 'exit 0\n' > "${sb}/.claude/validation/graph.sh"
+  out="$(bash "${sb}/.claude/validation/regen-core-projections.sh" "${sb}" 2>&1)" || true
+  if grep -q 'CONTEUDO BOM QUE NAO PODE SUMIR' "${sb}/docs/onion/federation-map.md"; then
+    record_pass "regen-core: (c) rc=0 com saída abaixo do piso também é recusado"
+  else record_fail "regen-core: (c)" "aceitou saída vazia com rc=0 — o [ -s ] que não basta"; fi
+
+  # (d) gerador AUSENTE não é falha: declara que não julgou, e não inventa arquivo
+  rm -f "${sb}/.claude/validation/graph.sh"
+  out="$(bash "${sb}/.claude/validation/regen-core-projections.sh" "${sb}" 2>&1)" || true
+  if grep -q 'NÃO julgado' <<< "${out}"; then
+    record_pass "regen-core: (d) gerador ausente → declara que não julgou (nunca inventa)"
+  else record_fail "regen-core: (d)" "não declarou o gerador ausente: ${out:0:160}"; fi
+  rm -rf "${sb}"
+}
+
+_family run_regen_core_projections_selftests
 _family run_regen_completude_selftests
 _family run_merge_dispensa_selftests
 _family run_workflow_parse_selftests

@@ -3,9 +3,9 @@ title: 'Resíduo — o adotante nasce verde, e o slug neutro se prova em produç
 date: 2026-09-17
 branch: feat/register-vendas-pdi-enterprise
 reviewed_diff_sha256: c2760d05f5cda07c81956802ffdd28fff6b9ea6661984be9d862dc540dceac22
-findings_total: 3
-findings_real: 3
-findings_fixed: 3
+findings_total: 4
+findings_real: 4
+findings_fixed: 4
 tokens: 0
 duration_min: 0
 verdict: CORRIGIDO
@@ -66,3 +66,32 @@ console, e o lint não pegou porque a guarda reconhece por **lista** e não conh
 `material/` está no `.gitignore` desde o **primeiro** commit do adotante — antes de existir qualquer
 material. Repo privado protege contra terceiros; não protege contra o repo ser clonado, espelhado ou
 aberto por engano depois.
+
+
+---
+
+# Achado 4 — a cobertura das projeções estava partida, e só uma metade tinha dono
+
+Tocar o `members.yaml` envelheceu `federation-map.md`, `federation-console.html` e `lint-rules.md`.
+Foi a **quarta vez no mesmo dia** que descobri isso **pelo gate vermelho**, uma projeção por vez.
+
+A causa não é distração. O `regen-ssot-projections.sh` **isenta** esses geradores, e a isenção está
+**certa**: eles derivam do `members.yaml`, que é core-only — sem registro não há mapa, console nem
+agent-card a gerar num adotante. Eu mesmo escrevi essa razão hoje, no caso `regen_completude`.
+
+O que faltava era o outro lado. **No core** essas quatro projeções têm catraca no lint (REGRAS 24,
+38, 39 e a do agent-card) e **ninguém as regenerava em bloco**. A isenção legítima para o alvo virava
+buraco na fonte — cobertura partida em duas com dono só numa metade.
+
+Curado com `regen-core-projections.sh`, e o contrato de escrita é o ponto:
+
+> nenhuma projeção é sobrescrita sem que o gerador tenha saído **0** *e* produzido **tamanho
+> plausível**.
+
+Isso não é zelo: hoje eu truncei o `kg-read-index.tsv` para **zero linhas** com um gerador que saiu
+`rc=2` e um redirect direto. O `[ -s ]` sozinho não protege — um byte já passa. O gerador escreve num
+temporário e só é promovido se convencer.
+
+Bancada, 4 casos, e o (b) é o que justifica o script existir: **gerador que falha não destrói a
+projeção boa, e diz que não escreveu**. Mais: `rc=0` com saída abaixo do piso também é recusado (o
+vazio-que-parece-conteúdo), e gerador ausente **declara que não julgou** em vez de inventar arquivo.
