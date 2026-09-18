@@ -2,7 +2,7 @@
 title: 'Resíduo — a guarda contra nome de cliente continha nomes de cliente, e estava pública'
 date: 2026-09-18
 branch: fix/client-names-in-traveling-fixtures
-reviewed_diff_sha256: 9a3d6b934061ab5a587196960dbf2484640efad4119f52186afc1bdfac675e4a
+reviewed_diff_sha256: 6bfc098f868ccb8fd5d15b76bff2d1823a6e964fd176a8e38eb02acc8705515b
 findings_total: 3
 findings_real: 3
 findings_fixed: 3
