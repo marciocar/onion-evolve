@@ -93,7 +93,7 @@ CLAUDE_DIR="${REPO_ROOT}/.claude"
 # `grep` dentro do predicado por-arquivo, tira ~1.461 execuções de grep por varredura.
 _stamp_has() { grep -qE "$1" "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; }
 _ROLE_TAIL='[[:space:]]*(#.*)?$'
-IS_DERIVED=0; _stamp_has "^([[:space:]]*role:[[:space:]]*(adopted|hub)${_ROLE_TAIL}|[[:space:]]*decoupled_from:)" && IS_DERIVED=1
+IS_DERIVED=0; _stamp_has "^([[:space:]]*role:[[:space:]]*(adopted|hub|standalone)${_ROLE_TAIL}|[[:space:]]*decoupled_from:)" && IS_DERIVED=1
 IS_LEAF=0;    _stamp_has "^[[:space:]]*role:[[:space:]]*adopted${_ROLE_TAIL}" && IS_LEAF=1
 
 # ---------------------------------------------------------------------------
@@ -3836,7 +3836,7 @@ check_kg_narration_valid() {
 check_onion_version_tracked() {
   local stamp="${REPO_ROOT}/.claude/.onion-version"
   [ -f "${stamp}" ] || return 0
-  grep -qE '^(role:[[:space:]]*(adopted|hub)|decoupled_from:)' "${stamp}" 2>/dev/null || return 0   # adotante, hub OU fonte-desacoplada (todos carregam stamp que o clone precisa trackear)
+  grep -qE '^(role:[[:space:]]*(adopted|hub|standalone)|decoupled_from:)' "${stamp}" 2>/dev/null || return 0   # adotante, hub OU fonte-desacoplada (todos carregam stamp que o clone precisa trackear)
   git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1 || return 0     # precisa ser repo git
   if [ -n "${ONLY_PATH}" ]; then
     case "${ONLY_PATH}" in "${stamp}") : ;; *) return 0 ;; esac

@@ -16786,6 +16786,60 @@ run_door_selftests() {
   rm -rf "${d4}" "${d3}" "${sb2}"
 }
 
+# ── VOCABULÁRIO DE PAPEL: os predicados que julgam "este repo é DERIVADO?" conhecem TODOS ────
+# Esta família não testa comportamento — testa CONSISTÊNCIA DE VOCABULÁRIO, e existe porque a classe
+# custou caro em 2026-09-18: o papel `standalone` existia no manifesto e no `write-stamp.sh` desde
+# 2026-09-15, e CINCO predicados que decidem se um repo é derivado só conheciam `adopted|hub`. Efeito
+# medido: a porta `onion-standalone` recém-materializada carimbava `role: standalone` e era julgada
+# como FONTE — o `IS_DERIVED` do lint saía 0, a isenção de evidência core-privada da escada nunca
+# disparava, e o `co-deliver` recusaria entregar nela.
+# O CASO DERIVA A LISTA, NUNCA A DIGITA: a SSOT dos papéis válidos é o `write-stamp.sh`, e se alguém
+# acrescentar um quarto papel lá sem visitar os predicados, ESTE caso cai. É a diferença entre curar
+# o item e curar a classe — em guarda de lista, o defeito dominante é o vocabulário, não a lógica.
+run_role_vocabulary_selftests() {
+  local ws="${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh"
+  [ -f "${ws}" ] || { record_skip "papel-vocab: write-stamp.sh ausente (sem SSOT de papéis)"; return; }
+  # a SSOT: a allowlist do `case` que valida --role
+  local _roles
+  _roles="$(grep -oE 'case "\$\{ROLE\}" in [a-z|]+\)' "${ws}" | head -1 | grep -oE '(^| )[a-z]+(\|[a-z]+)+\)' | tr -d ' )')"
+  if [ -z "${_roles}" ]; then
+    record_fail "papel-vocab: SSOT" "não consegui derivar a lista de papéis de write-stamp.sh — o caso não pode julgar"
+    return
+  fi
+  record_pass "papel-vocab: SSOT dos papéis derivada de write-stamp.sh (${_roles})"
+
+  # os predicados que julgam "derivado?" — arquivo:âncora. Cada um TEM de conter todos os papéis
+  # não-fonte. `source` nunca entra: é a fonte, e o predicado existe para distingui-la.
+  local _sites="\
+.claude/validation/lint-artifacts.sh|IS_DERIVED=0;
+.claude/validation/ladder-integrity-check.sh|local adopted=\"\"; grep -qE
+.claude/validation/review-artifact-check.sh|^if grep -qE .\^.role:
+.claude/utils/co-evolution/co-deliver.sh|^if ! grep -qE"
+  local _r _f _anchor _line _fails=0 _checked=0
+  while IFS='|' read -r _f _anchor; do
+    [ -n "${_f}" ] || continue
+    [ -f "${REPO_ROOT}/${_f}" ] || { record_fail "papel-vocab: ${_f}" "sítio de julgamento AUSENTE — o caso aponta para arquivo que não existe"; _fails=1; continue; }
+    _line="$(grep -nE "${_anchor}" "${REPO_ROOT}/${_f}" | grep -E 'role:' | head -1)"
+    if [ -z "${_line}" ]; then
+      record_fail "papel-vocab: ${_f}" "não achei o predicado de papel pela âncora — ele mudou de forma e este caso ficou cego"
+      _fails=1; continue
+    fi
+    _checked=$((_checked + 1))
+    for _r in $(tr '|' ' ' <<< "${_roles}"); do
+      [ "${_r}" = "source" ] && continue
+      grep -q "${_r}" <<< "${_line}" || {
+        record_fail "papel-vocab: ${_f}" "o predicado de papel NÃO conhece '${_r}' (papel válido em write-stamp.sh) — repo com esse papel seria julgado como FONTE"
+        _fails=1
+      }
+    done
+  done <<< "${_sites}"
+  if [ "${_fails}" -eq 0 ] && [ "${_checked}" -ge 4 ]; then
+    record_pass "papel-vocab: os ${_checked} predicados de 'derivado?' conhecem TODOS os papéis da SSOT"
+  elif [ "${_fails}" -eq 0 ]; then
+    record_fail "papel-vocab: cobertura" "só ${_checked} sítio(s) julgados — o caso deveria cobrir 4; sítio some em silêncio"
+  fi
+}
+
 # ── A PERNA DE LEITURA (hook kg-read-leg.sh + REGRA 84) ───────────────────────────────────────
 # O hook nasce de um sinal de campo com preço medido: uma sessão publicou QUATRO teses erradas
 # num corpus que tinha a resposta em quatro nós de um grafo que ela mesma citou. A bancada aqui
@@ -17612,6 +17666,7 @@ _family run_merge_dispensa_selftests
 _family run_workflow_parse_selftests
 _family run_role_scope_selftests
 _family run_model_ssot_selftests
+_family run_role_vocabulary_selftests
 _family run_kg_read_leg_selftests
 _family run_sandbox_gc_selftests
 _family run_family_topology_selftests
