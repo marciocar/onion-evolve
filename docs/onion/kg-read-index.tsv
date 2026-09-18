@@ -1147,6 +1147,8 @@ docs/evolution/federation/outbox/metagamify/_processed/2026-06-27-s1-toolbox-res
 docs/evolution/federation/outbox/metagamify/_processed/2026-07-18-ingestor-doutrina-granaai.md	C_ANNOUNCE_BACKLOG	docs/onion/graph/federation-health-2026-07.kg.yaml
 docs/evolution/federation/outbox/metagamify/_processed/2026-07-27-resposta-base-cruzada-vendor.md	C_test_is_ancestry	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
 docs/evolution/inbox/	E_DEZ_SINAIS_TRIADOS_COM_MEDICAO	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
+docs/evolution/inbox/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
+docs/evolution/inbox/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-06-18-adopt-gitflow-develop-branch-config.md	C_D7_14	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/evolution/inbox/_processed/2026-07-02-sinal-sdaal-knowledge-graph.md	C_D7_12	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/evolution/inbox/_processed/2026-07-10-metodologia-branches-gitflow-main-produto-vs-rhilo.md	C_SIGNAL_DISJOINT	docs/onion/graph/onion-identity-2026-07.kg.yaml
@@ -1203,6 +1205,7 @@ docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md	E_PRICING_PISO_20_SE
 docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md	E_PROGRESSO_VISIVEL_3X_RETENCAO	docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml
 docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md	E_QUOTA_GAP_FECHADO_ABRIL_2026	docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml
 docs/evolution/research/bridge-produto-2026-08/SYNTHESIS.md	E_TETOS_DA_PESQUISA	docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml
+docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/	D_R3_F1_F2_SELADAS	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/SYNTHESIS.md	D_R2_EMENDAS_A_C_SELADAS	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	C_OPCAO_A_BIDIRECTIONAL_INSEPARABLE_SHARING	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	C_OPCAO_B_EMPLOYEE_ONLY_AS_AUTHOR	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml

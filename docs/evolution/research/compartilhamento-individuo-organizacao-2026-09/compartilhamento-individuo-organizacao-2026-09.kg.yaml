@@ -12,7 +12,7 @@ meta:
                              # ANPD ou do TST sobre monitoramento de empregado, ou mudança do piso de grupo
                              # em Viva/Glean.
   # kg-backlog-guard: on
-  # ═══ TETO: 116 NÓS (era 115: +1 pelo selo das quatro emendas a C, 2026-09-14) (era 89, era 25). A RODADA 3 — primárias nomeadas sobre os QUATRO alvos que o
+  # ═══ TETO: 119 NOS (era 116: +3 pelo selo de F1+F2 em 2026-09-18 — a medicao que faltava chegou de PRODUTO VIVO, pelo banco de provas de um adotante, e com ela a base probatoria virou TRIPLA: teoria + primaria de fornecedor + produto. O terceiro no abre a FRONTEIRA que a E2 nao cobre e que nenhuma das duas emendas resolve) (era 115: +1 pelo selo das quatro emendas a C, 2026-09-14) (era 89, era 25). A RODADA 3 — primárias nomeadas sobre os QUATRO alvos que o
   #     Elenxo da rodada 2 deixou abertos — FOI EXECUTADA em 2026-09-13 e apendou 25 nós: os 4 claims
   #     do acórdão do TST sobre e-mail corporativo (ancorados SEM quote e SEM locator, tier rebaixado
   #     a 5 — a lacuna "TST por notícia" NÃO fechou, só se deslocou), a ausência medida de sanção da
@@ -1598,13 +1598,45 @@ nodes:
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml'
 
   # ── O QUE ESTA RODADA PROPÕE (propõe, NÃO sela — o selo é do maestro) ───────────────────
+  - id: E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-18'
+    verified_against: 'banco de provas executavel do adotante jogo-da-vida contra API e Postgres REAIS, em times de 3, 4 e 5 (a faixa do criterio de falseamento que este grafo aceitou): 8 testes, suite 139/139, no arquivo apps/api/src/routes/team.company-brain-bench.test.ts DO REPO DO ADOTANTE (nao existe aqui — por isso o trace aponta o sinal recebido, que e o que este repo pode abrir), COM CONTROLE NEGATIVO — quatro assercoes-chave mutadas (nome deduzido, karma_total esperado, delta do agregado, chaves da visao do admin) e as quatro reprovaram'
+    label: 'A MEDICAO QUE FALTAVA, E ELA VEM DE PRODUTO VIVO. O ataque de reidentificacao por composicao VENCE com n = 3 — ABAIXO do piso de grupo e SEM TOCAR no agregado que o piso protege. A mecanica: com `karma_total` ainda nulo pelo piso, o CONTADOR DE OFERTAS de um pedido de ajuda entrega QUEM ofereceu — o numero sobe, `offered_by_me` e falso, e quem pediu nao pode ofertar no proprio pedido (409). Sobra UM nome, por DUAS leituras. A cinco, com participacao completa, o contador satura os elegiveis e o Karma individual de TODOS se reconstroi (`karma_total - o meu`). E NAO HA ORCAMENTO DE CONSULTAS: o limite por IP existente (120/min) e guarda de abuso — limita TAXA, nunca INFORMACAO LIBERADA. CONSEQUENCIA PARA O DESENHO: confirma E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS (testemunho) por EXECUCAO, e confirma E_R3_VIVA_PISO_APLICA_AO_FILTRO_NAO_AO_BIN (primaria de fornecedor) por produto proprio. O que caiu nao estava nas emendas: caiu a HIPOTESE IMPLICITA de que um piso de agregacao e salvaguarda. HONESTIDADE DE METODO, nas palavras do adotante: "os oito testes passaram de primeira, o que e motivo de desconfiança e nao de comemoracao" — por isso o controle negativo. E o ataque 4 (excecao virando caminho normal) PERDEU: a visao de quem cuida do time e a do jogador comum sao iguais chave por chave, provado por ENUMERACAO da resposta, nao por declaracao de intencao.'
+    trace: 'docs/evolution/inbox/2026-09-15-banco-de-provas-quatro-ataques-resultado.md'
+
+  - id: D_R3_F1_F2_SELADAS
+    node_type: decision
+    plane: PROD
+    status: done
+    impact: 5
+    confidence: 0.9
+    verified_at: '2026-09-18'
+    verified_against: 'selado pelo maestro 2026-09-18 apos avaliacao que confrontou as tres familias de evidencia (teoria Dinur-Nissim/Denning; primaria de fornecedor Viva/Copilot; produto vivo do adotante) e recomendou selar F1 e F2 JUNTAS e NAO selar F3'
+    label: 'F1 E F2 ENTRAM NO DESENHO DE C; F3 NAO FOI SELADA. (F1) O PISO DE GRUPO SAI COMO SALVAGUARDA e entra LEDGER DE CONSULTAS COM BUDGET DE COMPOSICAO. A pergunta "piso 5 ou piso 10" fica IRRELEVANTE: o piso responde "o grupo e grande o bastante?", e o ataque nao precisa do grupo — precisa de DUAS LEITURAS E UMA SUBTRACAO. A base probatoria e TRIPLA e independente: teoria (Dinur & Nissim 2003; Denning 1979 — restringir o query set nao garante), primaria de FORNECEDOR (o minimum group size protege o FILTER GROUP e nao o BIN; um bin pode exibir UM individuo) e PRODUTO VIVO (o banco de provas vence com n=3, abaixo do piso). (F2) SELADA JUNTO, E NAO POR SIMETRIA: "privacidade diferencial" so se invoca com EPSILON DECLARADO e ledger; sem parametro, F1 trocaria um mecanismo decorativo por outro de nome novo — e a casa ja tem nome para isso (behavior-over-declaration). Sem F2, o selo de F1 seria meia-cura. O QUE ESTE SELO NAO RESOLVE, declarado para nao virar promessa: (a) custo real — ledger MONOTONICO por leitor E por alvo e estado novo e persistente, com politica embutida (quanto custa cada leitura, se reseta, quando), nao e uma flag; (b) o budget ataca a REIDENTIFICACAO, e nao decide se o produto deve mostrar QUEM ajudou — ver Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL; (c) E_R3_EPM_RAVID_SEM_GANHO_DE_DESEMPENHO_COM_ESTRESSE segue pesando contra qualquer monitoramento, independente de piso ou budget. (F3) NAO SELADA de proposito: e afirmacao JURIDICA com tensao ABERTA declarada no proprio no (o piso do TST mais permissivo que C x o Exemplo 7 da ANPD) — selar mecanismo maduro junto com direito em contradicao misturaria duas certezas de grau diferente. Q_R3 SEGUE `open` por causa dela.'
+    trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/'
+
+  - id: Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    verified_against: 'pergunta devolvida pelo adotante jogo-da-vida em 2026-09-15, ao fim do banco de provas; o corpus responde EM PARTE (E_CORPUS_SILENCIOSO_SOBRE_CONTRAPODER ja nomeava o ponto cego pelo lado da literatura) mas NAO cobre o caso em que o canal que vaza e um BEM'
+    label: 'A FRONTEIRA QUE A E2 NAO COBRE, E ELA E NOVA. A E2 diz que a alavanca que mede e o CONTROLE DO ALVO. O adotante devolveu: num desenho onde o canal que vaza e A PROPRIA COOPERACAO NOMEADA, o controle do alvo e o valor do produto apontam em SENTIDOS OPOSTOS — porque "reconhecimento sem autor nao e reconhecimento". POR QUE ISTO NAO E O MESMO CONFLITO QUE A PESQUISA JA TINHA: toda a evidencia de E2 vem de contexto de MONITORAMENTO, onde o alvo NAO QUER ser visto e o controle e alinhado ao interesse dele. Aqui o alvo QUER ser visto; a exposicao e efeito colateral de um BEM que o proprio individuo busca. Dar-lhe o botao de veto sobre o canal e dar-lhe o botao de desligar o reconhecimento — o controle e o valor sao a MESMA alavanca, em sentidos opostos. O corpus tangencia por outro caminho (E_CORPUS_SILENCIOSO_SOBRE_CONTRAPODER: o corpus do autor sobre gamificar a propria empresa e SILENCIOSO sobre contrapoder do trabalhador — zero opt-out, sindicato, recusa), e ha precedente medido de que duas opcoes de desenho ja cairam num time de 5 (E_AGREGADO_COM_OPTIN_VAZA_POR_DIFERENCA). O QUE ESTE NO NAO AFIRMA: nao diz que E2 esta errada — diz que E2 foi medida onde o controle e gratuito para o alvo, e que existe uma classe de desenho onde ele NAO E. As tres saidas que o adotante mediu e nao quis decidir sozinho: orcamento de consultas (ataca a causa, e o que F1 sela), truncar o carimbo de hora para o DIA (minimizacao barata, sem perda de funcao), e ruido/faixa no contador ("alguem se ofereceu" em vez de "1") — a terceira e a que mexe no reconhecimento, e e a que ele devolveu.'
+    trace: 'docs/evolution/inbox/2026-09-15-banco-de-provas-quatro-ataques-resultado.md'
+
   - id: Q_R3_EMENDAS_DE_MECANISMO_AO_DESENHO_DE_C
     node_type: question
     plane: DEV
     status: open
     impact: 5
     confidence: 0.5
-    label: 'TRES EMENDAS DE MECANISMO PROPOSTAS AO DESENHO DA OPCAO C, com evidencia ancorada nesta rodada — o maestro decide; D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION NAO foi tocada e NADA aqui reabre o selo. Somam-se as quatro emendas ja em Q_R2_REVISAO_DO_SELO_C, nao as substituem. (F1) PISO DE GRUPO SAI DO DESENHO COMO SALVAGUARDA. O produto de referencia do mercado documenta que o minimum group size protege o FILTER GROUP e nao o BIN, e que um bin PODE exibir um unico individuo (E_R3_VIVA_PISO_APLICA_AO_FILTRO_NAO_AO_BIN, E_R3_VIVA_BIN_UNITARIO_PERMITIDO). Isso confirma por primario de fornecedor o testemunho do adotante (E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS) e torna a pergunta "piso 5 ou piso 10" irrelevante. Proposta: C substitui piso de grupo por LEDGER DE CONSULTAS com budget de composicao — a defesa que E_R2_TRACKER_* e E_R2_DINUR_NISSIM_* ja indicavam e que o corpus do Onion ja tem em classification-por-vertical/PO_BUDGET. (F2) "PRIVACIDADE DIFERENCIAL" SO SE INVOCA COM EPSILON DECLARADO. A pagina oficial da Microsoft nao publica epsilon, orcamento nem garantia formal, e a garantia que declara e qualitativa ("nenhuma atividade individual pode ser discernida COM CERTEZA") — E_R3_VIVA_SEM_EPSILON_DOCUMENTADO, E_R3_VIVA_GARANTIA_QUALITATIVA_NAO_FORMAL. Proposta: no Onion, o termo so entra no desenho acompanhado de parametro e ledger; caso contrario usa-se "ruido", que e o que de fato se entrega (behavior-over-declaration). (F3) O EIXO BR NAO DA PORTA NEGOCIAL — E ISSO E GANHO, NAO PERDA. A resposta a pergunta (d) e NAO: o art. 611-A da CLT tem rol FECHADO e monitoramento/dados do trabalhador nao esta nele (E_R3_CLT_611A_LISTA_FECHADA_SEM_MONITORAMENTO), logo nao existe analogo brasileiro do art. 88 do GDPR e acordo coletivo NAO legitima o que a lei sozinha nao legitima; o acordao de cameras lido inteiro funda a licitude SO no art. 2o da CLT e na ponderacao constitucional, sem mencionar convencao coletiva. Proposta: C declara explicitamente que sua assimetria NAO e negociavel para baixo por instrumento coletivo no BR. TENSAO QUE A RODADA DEIXA ABERTA AO MAESTRO (nao resolvida aqui): E_R3_TST_MONITORAR_FORMA_E_CONTEUDO_EMAIL_CORPORATIVO indica um piso judicial trabalhista MAIS PERMISSIVO que C, enquanto o Exemplo 7 do Guia da ANPD REPROVA rastreio de atividade sob legitimo interesse — a reconciliacao proposta e a fronteira ARTEFATO DE TRABALHO x ATIVIDADE DA PESSOA (acessar o artefato e licito; rastrear a pessoa nao), que ja aparece como LIMITE DURO BR em Q_R2_REVISAO_DO_SELO_C. E o achado que mais pesa contra o custo-beneficio de qualquer monitoramento: a meta-analise de K=94 e N=23.461 nao acha evidencia de ganho de desempenho e acha associacao com estresse INDEPENDENTE das caracteristicas do monitoramento (E_R3_EPM_RAVID_SEM_GANHO_DE_DESEMPENHO_COM_ESTRESSE) — o que torna o teste de NECESSIDADE do art. 10 par. 1o da LGPD mais dificil de passar, nao menos. Esta rodada PARA AQUI: propoe, nao sela.'
+    label: 'TRES EMENDAS DE MECANISMO PROPOSTAS AO DESENHO DA OPCAO C, com evidencia ancorada nesta rodada — o maestro decide; D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION NAO foi tocada e NADA aqui reabre o selo. Somam-se as quatro emendas ja em Q_R2_REVISAO_DO_SELO_C, nao as substituem. (F1) PISO DE GRUPO SAI DO DESENHO COMO SALVAGUARDA. O produto de referencia do mercado documenta que o minimum group size protege o FILTER GROUP e nao o BIN, e que um bin PODE exibir um unico individuo (E_R3_VIVA_PISO_APLICA_AO_FILTRO_NAO_AO_BIN, E_R3_VIVA_BIN_UNITARIO_PERMITIDO). Isso confirma por primario de fornecedor o testemunho do adotante (E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS) e torna a pergunta "piso 5 ou piso 10" irrelevante. Proposta: C substitui piso de grupo por LEDGER DE CONSULTAS com budget de composicao — a defesa que E_R2_TRACKER_* e E_R2_DINUR_NISSIM_* ja indicavam e que o corpus do Onion ja tem em classification-por-vertical/PO_BUDGET. (F2) "PRIVACIDADE DIFERENCIAL" SO SE INVOCA COM EPSILON DECLARADO. A pagina oficial da Microsoft nao publica epsilon, orcamento nem garantia formal, e a garantia que declara e qualitativa ("nenhuma atividade individual pode ser discernida COM CERTEZA") — E_R3_VIVA_SEM_EPSILON_DOCUMENTADO, E_R3_VIVA_GARANTIA_QUALITATIVA_NAO_FORMAL. Proposta: no Onion, o termo so entra no desenho acompanhado de parametro e ledger; caso contrario usa-se "ruido", que e o que de fato se entrega (behavior-over-declaration). (F3) O EIXO BR NAO DA PORTA NEGOCIAL — E ISSO E GANHO, NAO PERDA. A resposta a pergunta (d) e NAO: o art. 611-A da CLT tem rol FECHADO e monitoramento/dados do trabalhador nao esta nele (E_R3_CLT_611A_LISTA_FECHADA_SEM_MONITORAMENTO), logo nao existe analogo brasileiro do art. 88 do GDPR e acordo coletivo NAO legitima o que a lei sozinha nao legitima; o acordao de cameras lido inteiro funda a licitude SO no art. 2o da CLT e na ponderacao constitucional, sem mencionar convencao coletiva. Proposta: C declara explicitamente que sua assimetria NAO e negociavel para baixo por instrumento coletivo no BR. TENSAO QUE A RODADA DEIXA ABERTA AO MAESTRO (nao resolvida aqui): E_R3_TST_MONITORAR_FORMA_E_CONTEUDO_EMAIL_CORPORATIVO indica um piso judicial trabalhista MAIS PERMISSIVO que C, enquanto o Exemplo 7 do Guia da ANPD REPROVA rastreio de atividade sob legitimo interesse — a reconciliacao proposta e a fronteira ARTEFATO DE TRABALHO x ATIVIDADE DA PESSOA (acessar o artefato e licito; rastrear a pessoa nao), que ja aparece como LIMITE DURO BR em Q_R2_REVISAO_DO_SELO_C. E o achado que mais pesa contra o custo-beneficio de qualquer monitoramento: a meta-analise de K=94 e N=23.461 nao acha evidencia de ganho de desempenho e acha associacao com estresse INDEPENDENTE das caracteristicas do monitoramento (E_R3_EPM_RAVID_SEM_GANHO_DE_DESEMPENHO_COM_ESTRESSE) — o que torna o teste de NECESSIDADE do art. 10 par. 1o da LGPD mais dificil de passar, nao menos. Esta rodada PARA AQUI: propoe, nao sela. ⚠️ APENDADO 2026-09-18 (o texto acima NAO foi reescrito — e o que se propunha entao): F1 e F2 FORAM SELADAS pelo maestro em D_R3_F1_F2_SELADAS, depois que a evidencia que faltava chegou de PRODUTO VIVO (E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR). ESTE NO SEGUE `open` POR CAUSA DA F3, e a razao e de grau de certeza, nao de importancia: F3 e afirmacao JURIDICA com uma tensao que ela mesma declara aberta (o piso do TST mais permissivo que C x o Exemplo 7 da ANPD), e selar mecanismo maduro junto com direito em contradicao misturaria duas certezas diferentes. Quem fechar F3 fecha este no.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml'
 
 
@@ -1634,6 +1666,24 @@ nodes:
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/SYNTHESIS.md'
 
 edges:
+  - from: E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR
+    to: D_R3_F1_F2_SELADAS
+    edge_type: SUPPORTS
+  - from: E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR
+    to: E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS
+    edge_type: SUPPORTS
+  - from: E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR
+    to: E_R3_VIVA_PISO_APLICA_AO_FILTRO_NAO_AO_BIN
+    edge_type: SUPPORTS
+  - from: D_R3_F1_F2_SELADAS
+    to: C_OPCAO_C_PURPOSE_BOUND_ASYMMETRIC_FLOW
+    edge_type: CONSTRAINS
+  - from: D_R3_F1_F2_SELADAS
+    to: Q_R3_EMENDAS_DE_MECANISMO_AO_DESENHO_DE_C
+    edge_type: SUPPORTS
+  - from: Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL
+    to: C_OPCAO_C_PURPOSE_BOUND_ASYMMETRIC_FLOW
+    edge_type: CONSTRAINS
   # ── evidências sustentam a pergunta ──
   - from: E_CJEU_C65_23_COLLECTIVE_AGREEMENT_NOT_ENOUGH
     to: Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE

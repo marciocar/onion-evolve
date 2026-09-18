@@ -38,5 +38,15 @@
 # cliente. Os dois sobem porque são mudança REAL de framework; o livro-caixa já não conta contra
 # si mesmo (ver acima). `onion-core` volta a ZERO na próxima materialização, que é obrigatória:
 # é ela que tira os nomes de cliente do HEAD público.
-onion-standalone 383
-onion-core 3
+#
+# 2026-09-18 (pós-#846): 384 e 4. A `main` andou com o merge do #846 — a cura que tirou os nomes
+# de cliente das FIXTURES que viajam. Os dois sobem porque é mudança REAL de framework, medida
+# contra o `merge-base`, então trabalho em voo NÃO inflou estes números.
+# ⚠️ A RE-MATERIALIZAÇÃO SEGUE DEVIDA, e agora ela carrega um item de SEGURANÇA: é ela que tira os
+#   nomes de cliente do HEAD PÚBLICO do `onion-core`. Não foi feita aqui por SEQUÊNCIA, não por
+#   esquecimento: `materialize-door.sh` monta com `git archive HEAD`, e o HEAD desta branch tem
+#   trabalho NÃO-MERGEADO — materializar daqui publicaria o que ainda não passou pelo gate. A
+#   ordem correta é merge primeiro, materialização depois, e ela cobre #846 e esta leva de uma vez,
+#   levando `onion-core` de volta a ZERO. O push continua sendo do maestro (I3).
+onion-standalone 384
+onion-core 4

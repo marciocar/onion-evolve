@@ -9,6 +9,55 @@
 ---
 
 
+## 2026-09-18 · Quatro guardas que diziam menos do que pareciam — curadas pelos sinais de vocês · COMPATÍVEL · alvo: jogo-da-vida, portal-gamificacao
+
+Quatro sinais de campo viraram cura no core. Nenhum pediu feature nova: os quatro apontaram a **mesma
+classe** — uma guarda afirmando mais do que mediu.
+
+**Do KG (jogo-da-vida, 09-10 e 09-11):**
+
+- **A KB prometia um gate que não existe.** `knowledge-graph-sdaal.md:195-196` listava cinco
+  reprovações de INTEGRIDADE; o motor faz cinco **outras**. Vocês mediram com `arquivo:linha` dos dois
+  lados e o placar era: **uma implementada, três ausentes, uma rebaixada a aviso**. Confirmamos no vivo
+  e corrigimos o **texto**, não o código — o cabeçalho do `kg-radar.sh:27-29` já trazia a lista certa.
+  O placar **fica registrado** na KB em vez de apagado, pela razão que vocês mesmos citaram: *"apagá-lo
+  transformaria a vitrine em propaganda"*. Junto: "PageRank ponderado" saiu — o motor usa **grau
+  não-direcionado**, e a diferença que vocês apontaram (conectado a coisas importantes × conectado a
+  muitas coisas) está escrita lá agora.
+- **O radar saía verde sobre grafo vencido.** `grep -c review_after kg-radar.sh` era **0**, como vocês
+  mediram. Agora há uma seção **VALIDADE** com três estados — vencido, em dia, e **não-medido** (grafo
+  sem o campo declara que não mediu, em vez de silêncio). **Não reprova**, exatamente pela doutrina que
+  vocês escreveram: *"nada disso nasce bloqueando — um gate que impede trabalho é contornado com
+  `--no-verify` na primeira sexta-feira, e aí se perde o mecanismo E a informação"*. Há um caso de
+  bancada cuja única função é cair se alguém transformar isso em muro.
+- **⚠️ O item 1 da sua ordem por retorno JÁ ESTAVA CURADO, e vocês não foram avisados.** O hook de
+  leitura (`kg-read-leg.sh`) existe e está registrado no `settings.json`. Vocês pagaram um dia de
+  trabalho e quatro teses derrubadas para medir o custo daquela lacuna, e ela fechou sem retorno. A
+  falha de aviso é nossa — e a lição que fica para este canal é que **medir o que mudou desde a chegada
+  do sinal faz parte de triar**.
+
+**Do design-sink (portal-gamificacao e jogo-da-vida, 09-07):**
+
+- **O gate aprovava em silêncio no escuro.** Com `color.dark.*` na SSOT e a governança declarando só o
+  claro, `lint-design-tokens.sh` passava. O custo que vocês mediram — *4 candidatas com `brand.500`
+  entre 1,71 e 2,60 contra fundo escuro, nenhuma barrada* — é o que justificou a cura. Agora o gate
+  **declara que não mediu o escuro**, e segue sem reprovar: a governança é do projeto.
+- **Sem `jq`, "PULADA" com `exit 0`.** Vocês tiveram de tratar o PULADA como FALHA por conta própria —
+  ou seja, cada adotante reimplementava a desconfiança que o gate deveria ter. Agora: `design-context`
+  **ausente** segue gracioso (`exit 0`), mas **ferramenta** ausente com o contexto **presente** sai
+  `rc=2` nomeando o custo. Um caso de bancada guarda o caminho gracioso, para a cura não punir quem não
+  faz design.
+
+**O que NÃO foi feito, e por quê.** Dos onze achados do sinal do KG, estes dois eram os que vocês
+ordenaram como maior retorno sobre custo. Ficam abertos, com gatilho e sem data: **exigir o par
+desvio↔redesenho** (a sua leitura de que *"carimbar é barato e não entrega nada"* é o argumento mais
+forte do sinal) e o **gatilho por contradição**, que vocês mesmos marcaram como o único que precisa de
+desenho de verdade. A lacuna do **adapter de tema** do design-sink e o **agente Expo/RN** seguem
+abertos — o segundo precisa de decisão de escopo do maestro, não de execução.
+
+**Ação para os alvos:** nenhuma obrigatória. `/meta:adopt --update` traz as quatro curas; o aviso do
+escuro pode revelar pares não declarados na governança de vocês — é informação, não regressão.
+
 ## 2026-08-31 · metagamify: adopt --update ao pin cd7de56e + gate husky religado · COMPATÍVEL · alvo: metagamify
 
 - Branch-proposta `chore/onion-update-cd7de56e` pushed (base: HEAD de `chore/onion-framework`; árvore em-voo intocada). Pin `21213cc6c3d6`→`cd7de56e81c8`; dogfood 44→1 HARD (local, nomeado no inbound); gate de pre-commit estava INERTE sob husky e foi encadeado + provado por sonda.

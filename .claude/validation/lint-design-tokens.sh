@@ -37,21 +37,21 @@ if [ ! -d "${DC}" ]; then
   echo "design-context ausente — nada a validar (ok p/ adotante sem design)."; exit 0
 fi
 # ⚠️ FERRAMENTA AUSENTE COM `design-context` PRESENTE É FALHA, NUNCA "PULADA" — sinal de campo de
-# 2026-09-07 (jogo-da-vida, item 6), com custo medido: sem `jq` o gate saía `exit 0` dizendo PULADA,
+# 2026-09-07 (um adotante, item 6), com custo medido: sem `jq` o gate saía `exit 0` dizendo PULADA,
 # e **um tint a 1,38:1 virava tema aprovado**. O consumidor teve de tratar o "PULADA" como FALHA por
 # conta própria — o que significa que cada adotante reimplementa a desconfiança que o gate deveria ter.
 # A diferença que importa: `design-context` AUSENTE é legítimo (adotante sem design, `exit 0` acima);
 # ferramenta ausente com o contexto PRESENTE é "não pude julgar", e guarda que não pode julgar
 # DECLARA que não sabe — nunca aprova. É o mesmo precedente da REGRA 36, que sai HARD nomeando a
 # ausência quando o manifesto de transporte não responde.
-_falta_ferramenta() {
+_missing_tool() {
   echo "  ✗ HARD: ${1} ausente — a validação NÃO PÔDE ser feita, e ${DC} EXISTE." >&2
   echo "    Isto não é 'pulada': sem medir, um contraste reprovado passaria por aprovado" >&2
   echo "    (medido em campo: 1,38:1 virou tema com exit 0). Instale ${1} ou declare o porquê." >&2
   exit 2
 }
-command -v jq  >/dev/null 2>&1 || _falta_ferramenta jq
-command -v awk >/dev/null 2>&1 || _falta_ferramenta awk
+command -v jq  >/dev/null 2>&1 || _missing_tool jq
+command -v awk >/dev/null 2>&1 || _missing_tool awk
 
 mapfile -t FILES < <(find "${DC}" -type f -name '*.tokens.json' | sort)
 if [ "${#FILES[@]}" -eq 0 ]; then
@@ -126,7 +126,7 @@ if [ -f "${PAIRS}" ] && jq -e . "${PAIRS}" >/dev/null 2>&1; then
   [ "${wcag_fail}" -eq 0 ] && ok "contraste WCAG dos pares declarados OK"
 
   # ⚠️ O GATE SÓ MEDE O QUE A GOVERNANÇA DECLARA — e esse é o ponto cego que um adotante mediu em
-  # 2026-09-07 (portal-gamificacao): com a SSOT trazendo `color.dark.*` e a governança declarando só
+  # 2026-09-07 (outro adotante): com a SSOT trazendo `color.dark.*` e a governança declarando só
   # o tema claro, o gate APROVA EM SILÊNCIO uma paleta ilegível no escuro. "Passou no gate" vira uma
   # afirmação mais forte do que o gate mediu — a classe que esta casa persegue em toda guarda.
   # CUSTO MEDIDO, não hipótese: as quatro candidatas daquele projeto tinham `brand.500` entre 1,71 e
@@ -137,9 +137,9 @@ if [ -f "${PAIRS}" ] && jq -e . "${PAIRS}" >/dev/null 2>&1; then
   # redação deste bloco citou duas que NÃO EXISTEM no script; `set -u` não pega porque eu havia
   # escrito `${VAR:-}`, e o efeito seria a guarda calar para sempre: fail-open dentro da cura de
   # um fail-open. Conferir a existência do que se lê é a metade barata de qualquer guarda.)
-  _tem_escuro=0
-  for _k in "${!TOK[@]}"; do case "${_k}" in color.dark.*) _tem_escuro=1; break ;; esac; done
-  if [ "${_tem_escuro}" -eq 1 ]; then
+  _has_dark_branch=0
+  for _k in "${!TOK[@]}"; do case "${_k}" in color.dark.*) _has_dark_branch=1; break ;; esac; done
+  if [ "${_has_dark_branch}" -eq 1 ]; then
     if ! jq -e '[.pairs[] | select((.fg|test("dark")) or (.bg|test("dark")))] | length > 0' "${PAIRS}" >/dev/null 2>&1; then
       echo "  ⚠ A SSOT tem ramo de modo ESCURO (color.dark.*) e a governança NÃO declara nenhum par"
       echo "    com ele — o contraste do tema escuro NÃO FOI MEDIDO. O gate está dizendo menos do que"
