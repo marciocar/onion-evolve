@@ -174,6 +174,38 @@ nodes:
     verified_at: 2026-07-24
     label: "federation-radar.sh EXISTE e roda (exit 0, 2026-07-24), consolidando os 4 checks antes espalhados num veredito de ATENCAO: ① pin declarado!=verificado ② anuncio staging-nao-transportado ③ hub sem sub-adotado ④ linhagem sem pin. Construido conforme a decisao D_FED_KG_AS_AUDIT_OVERLAY (overlay KG + radar proprio, sem forcar domain-layer). O 'FALTA' era stale — o radar nasceu depois do baseline 07-18."
     trace: ".claude/validation/federation-radar.sh"
+  - id: E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-09-18
+    trace: ".claude/validation/door-staleness-baseline.txt"
+    verified_against: 'materializacao EXECUTADA em destino descartavel a partir de main 9f625086 (ops/materialize-door.sh --role standalone), cronometrada com /usr/bin/time; diff -rq contra a porta viva /home/marcio/onion-standalone; duas rodadas de lint-artifacts.sh DENTRO do resultado, antes e depois de regen-ssot-projections.sh'
+    label: 'O CUSTO E MECANICO QUASE INTEIRO — e isso INVERTE a intuicao de que 388 commits atrasados significam 388 commits de trabalho. MEDIDO: materializar 1,26 s (620 arquivos) · regenerar as projecoes SSOT no alvo 3,21 s · cada rodada do lint dentro da porta 48,8 s. O lint da porta recem-materializada sai com 8 HARD, e o regenerador de projecoes (3,21 s, o MESMO passo que o fluxo de adocao ja roda) derruba para 4. DOS QUATRO, so DOIS sao trabalho de verdade: (a) `testing-state.md` defasado, que e mais uma regeneracao; (b) REGRA 42 (Gate de FRESCOR DOUTRINARIO) acusando 1 doc com linguagem sensivel-ao-tempo sem carimbo; (c+d) DOIS PONTEIROS MORTOS em skills que VIAJAM — onion-publish/SKILL.md:71 citando .claude/utils/marketplace/materialize-marketplace-repo.sh e onion-wizard/SKILL.md:50 citando .claude/commands/meta/adopt.md, ambos AUSENTES no papel `standalone`. Estes dois sao a MESMA CLASSE, e ela ja tem nome nesta casa: skill role-scoped apontando caminho que o papel nao recebe — o comando nasce MORTO no consumidor, familia da REGRA 74. SUPERFICIE DE REVISAO HUMANA, para dimensionar o olho: 268 caminhos divergem (126 arquivos mudaram, 132 chegam, 10 somem), 4.605 linhas de diff. O QUE ESTA MEDICAO NAO COBRE, declarado para nao virar promessa: se algum dos 126 arquivos mudados carrega mudanca de COMPORTAMENTO que quebre um consumidor do bundle standalone — isso exige LEITURA, e nenhum lint responde.'
+
+  - id: E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-09-18
+    trace: ".claude/validation/door-staleness-baseline.txt"
+    verified_against: 'historico do proprio baseline (372 → 373 → 374 → 381 → 383 → 384 → 388 entre 2026-09-17 e 2026-09-18) e door-staleness-check.sh medindo contra merge-base'
+    label: 'O teto do `onion-standalone` SO SOBE, e sobe desde 2026-07-19 — 384 para 388 numa unica sessao. Uma catraca cujo unico movimento e para cima deixou de ser catraca: e CONTADOR. Ela registra a divida com honestidade e se acomoda a ela, sem criar pressao nenhuma — enquanto a metrica de saude declarada em todo baseline desta casa e o numero DIMINUINDO. A guarda esta CORRETA; o defeito nao e dela. E o irmao `onion-core` prova que o mecanismo funciona quando ha decisao: voltou a ZERO duas vezes no mesmo dia, pelo ciclo materializar → avancar o pin.'
+
+  - id: Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA
+    node_type: question
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    trace: ".claude/validation/door-staleness-baseline.txt"
+    verified_against: 'custo medido em E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE, medido por execucao em 2026-09-18'
+    label: 'AS DUAS OPCOES PARA O `onion-standalone`, agora com custo MEDIDO em vez de suposto. (A) RE-MATERIALIZAR — ~1 min de maquina no total (1,26 s montar + 3,21 s projecoes + 48,8 s por rodada de lint), mais QUATRO defeitos a fechar, dos quais DOIS sao a mesma classe (skill que viaja apontando caminho que o papel `standalone` nao recebe). O custo real NAO e o mecanico: e a superficie de revisao humana, 268 caminhos e 4.605 linhas, e nenhum lint responde se alguma delas quebra um consumidor do bundle. (B) CONGELAR COM DATA — declarar a porta parada no pin 514dda85833a, escrever data e razao no `members.yaml`, e trocar a catraca por uma guarda que cobra a DECLARACAO em vez de contar commits; o numero para de crescer sem que ninguem finja que a porta espelha o core. O QUE NAO E OPCAO: deixar como esta — o unico efeito de um contador que so sobe e ensinar a ignorar o numero. ESTE NO NAO ENTROU NO `fios-abertos` DE PROPOSITO: aquele grafo tem TETO de 20 nos com a regra `onda nova exige onda COLHIDA`, e furar o teto (ou colher fio alheio) seria decisao que nao e minha. Mora aqui, que e onde o fato mora, e a projecao do backlog o alcanca igual. GATILHO DE REABERTURA: o maestro dizer (A) ou (B). ⚠️ `plane: DEV` E DELIBERADO E NAO E FUGA DA REGRA 49 (No plane:PROD de alto impacto carrega VERIFICACAO): este no nao AFIRMA sobre producao — ele pergunta o que FAZER, e isso e trabalho. As afirmacoes sobre o estado real da porta moram nos dois nos de evidencia que o apoiam, ambos medidos e carimbados (um deles `plane: PROD` com `verified_at`). Rebaixar o plane de uma AFIRMACAO para escapar da catraca seria a fuga-de-escopo que o proprio contrato do backlog nomeia; classificar uma PERGUNTA como trabalho e so classificar certo.'
+
 edges:
   - from: C_GRANAAI_PIN_UNTRUSTED
     to: EN_CORE
@@ -228,3 +260,12 @@ edges:
   - from: C_ADOPTER_PERSONALITY_SEEDS_PENDING
     to: C_PERSONALITY_SEEDS
     edge_type: SUPERSEDES
+  - from: E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR
+    to: E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE
+    edge_type: SUPPORTS
+  - from: E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE
+    to: Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA
+    edge_type: SUPPORTS
+  - from: E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR
+    to: Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA
+    edge_type: SUPPORTS
