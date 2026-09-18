@@ -16998,6 +16998,74 @@ _family run_realign_selftests
 _family run_harvest_residue_selftests
 _family run_compose_exposure_selftests
 _family run_backlog_projection_selftests
+# ── O RADAR PAROU DE ESCONDER O VENCIMENTO (2026-09-18) ──────────────────────────────────────
+# Dois sinais do mesmo adotante (09-10 §7 e 09-11 §2): `meta.review_after` está na gramática e em 16
+# grafos, e quem o cobrava era só a REGRA 67 — SOFT, e no LINT. Quem rodava o RADAR via verde sobre
+# conhecimento caduco. Pior que não ter o campo: um painel que afirma saúde sem olhar a validade.
+run_radar_validade_selftests() {
+  local radar="${REPO_ROOT}/.claude/validation/kg-radar.sh"
+  [ -f "${radar}" ] || { record_skip "radar-validade: kg-radar.sh ausente"; return; }
+  local d; d="$(mktemp -d)"
+  # fixtures SINTÉTICAS — zero dependência de arquivo vivo (a lição que a família irmã já pagou)
+  local head='meta:
+  id: x
+  schema_version: "1"
+'
+  # ⚠️ `impact`/`confidence` NÃO são decoração na fixture: sem eles a INTEGRIDADE reprova ("impact
+  # fora de 1-5") e o caso (b) acusaria o VENCIMENTO de ter virado muro — quando o defeito seria da
+  # fixture. Foi o que aconteceu na 1ª redação: SUT correto, harness incompleto.
+  local body='nodes:
+  - id: A
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+  - id: B
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+edges:
+  - from: B
+    to: A
+    edge_type: SUPPORTS
+'
+  local out rc
+
+  # (a) VENCIDO → avisa, nomeando as duas datas (sem elas o aviso não é acionável)
+  printf '%s  review_after: 2020-01-01\n%s' "${head}" "${body}" > "${d}/vencido.kg.yaml"
+  rc=0; out="$(bash "${radar}" "${d}/vencido.kg.yaml" 2>&1)" || rc=$?
+  if grep -q 'REVISITA VENCIDA' <<< "${out}"; then
+    record_pass "radar-validade: (a) grafo vencido → o RADAR avisa (antes, só a REGRA 67 SOFT no lint)"
+  else record_fail "radar-validade: (a)" "radar seguiu mudo sobre grafo vencido: ${out:0:160}"; fi
+
+  # (b) NÃO REPROVA — doutrina explícita do sinal: "nada disso nasce bloqueando; um gate que impede
+  #     trabalho é contornado com --no-verify na primeira sexta-feira, e aí se perde o mecanismo E a
+  #     informação". Se este caso cair, alguém transformou a catraca em muro.
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "radar-validade: (b) vencido NÃO reprova (catraca, nunca muro)"
+  else record_fail "radar-validade: (b)" "o vencimento passou a reprovar (rc=${rc}) — virou muro"; fi
+
+  # (c) DENTRO da validade → diz que está em dia, com a data (declarar o verde também é informação)
+  printf '%s  review_after: 2099-12-31\n%s' "${head}" "${body}" > "${d}/fresco.kg.yaml"
+  out="$(bash "${radar}" "${d}/fresco.kg.yaml" 2>&1 || true)"
+  if grep -q 'dentro da validade' <<< "${out}" && ! grep -q 'VENCIDA' <<< "${out}"; then
+    record_pass "radar-validade: (c) dentro da validade → declara em dia, não fica mudo"
+  else record_fail "radar-validade: (c)" "não declarou o estado fresco: ${out:0:160}"; fi
+
+  # (d) SEM o campo → o modo dedicado DECLARA que não mediu. É a diferença entre "está em dia" e
+  #     "não olhei", que é a mesma que esta sessão perseguiu o dia todo no [papel/SEM-OBJETO].
+  printf '%s%s' "${head}" "${body}" > "${d}/sem.kg.yaml"
+  out="$(bash "${radar}" "${d}/sem.kg.yaml" --validade 2>&1 || true)"
+  if grep -q 'NÃO FOI MEDIDA' <<< "${out}"; then
+    record_pass "radar-validade: (d) sem review_after → declara que NÃO mediu (nunca silêncio)"
+  else record_fail "radar-validade: (d)" "passou calado sem o campo: ${out:0:160}"; fi
+  rm -rf "${d}"
+}
+
+_family run_radar_validade_selftests
 _family run_radar_staleness_selftests
 _family run_members_registry_selftests
 _family run_census_extract_selftests
