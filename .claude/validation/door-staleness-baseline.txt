@@ -33,5 +33,10 @@
 # teto morava na superfície que ele julga, então reconciliar a porta defasava a porta e um teto 0
 # exigia um PR depois de todo PR. O `onion-core 1` que sobra é HONESTO: é o
 # `regen-core-projections.sh`, mudança real de framework que a porta ainda não recebeu.
-onion-standalone 381
-onion-core 1
+#
+# 2026-09-18 (pós-#845): 383 e 3 — a main andou com o merge do #845 e com a cura dos nomes de
+# cliente. Os dois sobem porque são mudança REAL de framework; o livro-caixa já não conta contra
+# si mesmo (ver acima). `onion-core` volta a ZERO na próxima materialização, que é obrigatória:
+# é ela que tira os nomes de cliente do HEAD público.
+onion-standalone 383
+onion-core 3
