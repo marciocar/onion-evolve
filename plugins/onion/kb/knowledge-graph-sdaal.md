@@ -189,11 +189,33 @@ sem erro visível**. Evite:
 
 ## As saídas do radar (o que a ferramenta `radar` computa)
 
-1. **RADAR** — perguntas/decisões abertas ranqueadas por **atenção = impacto × confiança ×
-   centralidade** (PageRank ponderado). Responde *o que fazer agora*.
+1. **RADAR** — perguntas/decisões abertas ranqueadas por **atenção = `impact × confidence ×
+   statusFactor × (1 + grau)`**. Responde *o que fazer agora*.
+
+   > ⚠️ **CORRIGIDO em 2026-09-18, por sinal de campo de um adotante.** Este item dizia
+   > *"centralidade (PageRank ponderado)"*, e o motor nunca fez PageRank: não há iteração, nem
+   > amortecimento, nem normalização, e **o grau é NÃO-DIRECIONADO** (`kg-radar.sh:398`, `:345-347`).
+   > A diferença não é cosmética — grau não distingue *"conectado a coisas importantes"* de
+   > *"conectado a muitas coisas"*, e ordenar atenção é a função central do radar. O registro fica:
+   > apagá-lo transformaria a vitrine em propaganda.
 2. **RECONCILIAÇÃO** — todas as arestas `REFUTES`/`SUPERSEDES`: verdades confrontadas, explícitas.
-3. **INTEGRIDADE** — o grafo se contradiz? Reprova: nó `refuted` ainda recebendo `SUPPORTS`; `decision`
-   `done` fora do plane PROD; órfãos; migalhas pendentes; ciclos `DEPENDS_ON`.
+3. **INTEGRIDADE** — o grafo se contradiz? **Reprova (a lista REAL, lida do motor):** ids duplicados ·
+   aresta apontando para nó inexistente · nó órfão (grau 0) · contradição (`REFUTES` entrando em nó que
+   segue `confirmed`/`open`) · enum inválido (`node_type`/`edge_type`/`plane`/`status`/`layer`).
+
+   > ⚠️ **CORRIGIDO em 2026-09-18, e o placar anterior merece ficar registrado.** Este item prometia
+   > cinco reprovações — `refuted` recebendo `SUPPORTS`, `decision` `done` fora do plane PROD, órfãos,
+   > migalhas pendentes, ciclos `DEPENDS_ON` — e o adotante mediu, com `arquivo:linha` dos dois lados:
+   > **uma implementada** (órfãos), **três ausentes**, **uma rebaixada a aviso** (migalhas pendentes são
+   > ⚠ na seção PROVENIÊNCIA, que não reprova — o radar sai `0` com 7 avisos). Não há detecção de ciclo
+   > (`grep 'ciclo'` no motor = **0**; `A→B→A` passa com exit 0), e `SUPPORTS` aparece uma única vez no
+   > motor, dentro da string do enum.
+   >
+   > **A correção é o texto alcançar o código, nunca o contrário** — o cabeçalho do `kg-radar.sh:27-29`
+   > já trazia a lista certa, e era a KB que estava para trás. A razão de isto importar está nas
+   > palavras do próprio sinal: *"hoje a KB promete um gate que não existe, e um adotante que confie
+   > nela constrói sobre areia"*. Implementar as três ausentes é decisão em aberto, não dívida
+   > escondida — o que não se admite é a doutrina afirmar o que a máquina não faz.
 4. **RADAR-DE-DOMÍNIO** — completude da camada `domain` (⚠ atenção, **não reprova** — um
    estado-absorvente pode ser terminal legítimo; o juízo é humano). As 5 checagens (promovidas do
    dogfood de campo 2026-07-08 + ADR design):

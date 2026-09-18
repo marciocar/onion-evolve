@@ -10229,7 +10229,7 @@ run_design_tokens_selftests() {
   # afirmação mais forte do que o gate mediu.
 
   # (e) SSOT com ramo ESCURO + governança só do CLARO → o gate DECLARA que não mediu o escuro.
-  #     Custo medido pelo portal-gamificacao: 4 candidatas com brand.500 entre 1,71 e 2,60 contra
+  #     Custo medido por um adotante: 4 candidatas com brand.500 entre 1,71 e 2,60 contra
   #     fundo escuro (alvo 3,0) e NENHUMA seria barrada — "aprovou em silêncio uma paleta ilegível".
   d="$(mktemp -d)"; mkdc "${d}"
   printf '%s' '{"color":{"$type":"color","ink":{"$value":"#1A1714"},"paper":{"$value":"#FFFFFF"},"text":{"$value":"{color.ink}"},"dark":{"paper":{"$value":"#101010"}}}}' \
@@ -10256,7 +10256,7 @@ run_design_tokens_selftests() {
   rm -rf "${d}"
 
   # (h) FERRAMENTA AUSENTE com design-context PRESENTE → FALHA, nunca exit 0. Custo medido pelo
-  #     jogo-da-vida: sem jq o gate saía 0 dizendo PULADA e um tint a 1,38:1 virava tema aprovado.
+  #     outro adotante: sem jq o gate saía 0 dizendo PULADA e um tint a 1,38:1 virava tema aprovado.
   d="$(mktemp -d)"; mkdc "${d}"; mkdir -p "${d}/bin"
   printf '%s' '{"color":{"a":{"$value":"#000000"}}}' > "${d}/docs/design-context/semantic/c.tokens.json"
   local _b _p

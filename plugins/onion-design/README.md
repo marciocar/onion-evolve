@@ -2,7 +2,7 @@
 
 Vertical de design do Onion: identidade visual como spec-as-code (tokens W3C/DTCG), gate WCAG e materializacao via design-sink. Auto-adapta ao design-context do consumidor.
 
-**Versão** `0.1.48` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `gold`
+**Versão** `0.1.49` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `gold`
 
 ## Instalar
 
@@ -57,7 +57,7 @@ Invocação: `/onion-design:<comando>` (namespace do plugin).
 | Campo | Valor |
 |---|---|
 | Origem | `marciocar/onion-evolve` (repositório privado) |
-| tree_sha (hash do conteúdo das fontes) | `5977813e32f6` |
+| tree_sha (hash do conteúdo das fontes) | `dd5cb149c0af` |
 
 A origem identifica DE ONDE este artefato foi gerado; o canal público de instalação, issues e suporte é https://github.com/marciocar/onion-plugins. Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 
