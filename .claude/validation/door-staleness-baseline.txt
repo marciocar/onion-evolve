@@ -22,5 +22,10 @@
 # mergeado (pin 79456b1e21de) e espelha o core exatamente. É a catraca funcionando no sentido
 # que interessa: o número DIMINUINDO. O `onion-standalone` sobe para 374 porque a leva do #842
 # entrou em main e aquela porta segue parada desde 2026-07-19 — passivo real, não ruído.
-onion-standalone 374
+#
+# 2026-09-17 (4ª materialização): `onion-core` segue em ZERO — re-materializado do pin f5ec0dcf2dfb,
+# que é a 1ª versão da porta a passar no PRÓPRIO lint (0 HARD), depois de a dívida da REGRA 45
+# chegar a zero. `onion-standalone` sobe a 381: a main andou 7 commits e aquela porta segue parada
+# desde 2026-07-19 — passivo real, e o único número desta catraca que ainda cresce.
+onion-standalone 381
 onion-core 0
