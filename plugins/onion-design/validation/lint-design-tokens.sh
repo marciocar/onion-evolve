@@ -11,8 +11,12 @@
 #
 # Uso     : lint-design-tokens.sh [<dir-do-projeto>]   (default: raiz deste repo)
 # Saída   : sumário estilo lint-artifacts.sh; exit 1 se houver violação HARD.
-# Gracioso: design-context ausente → exit 0 (adotante pode não ter). jq/awk
-#           ausente → aviso + exit 0 (mesma doutrina dos worklog-*.sh / merge-hooks).
+# Gracioso: design-context ausente → exit 0 (adotante pode não ter) — e SÓ isso.
+#           jq/awk ausente COM design-context presente → exit 2 (não pude julgar ≠ passou), idem
+#           contrast-pairs.json presente e ilegível. A graciosidade é sobre AUSÊNCIA legítima de
+#           objeto, nunca sobre incapacidade de medir. (Esta linha dizia "aviso + exit 0" e ficou
+#           falsa no mesmo PR que mudou o comportamento — cabeçalho é doutrina, e doutrina que não
+#           acompanha o código é a classe que este arquivo inteiro persegue.)
 #
 # Consumido por: CI (.github/workflows/onion-validate.yml — bloqueia em HARD
 #                quando muda .claude/**, docs/meta-specs/** ou docs/design-context/**),
@@ -109,7 +113,23 @@ contrast() {  # contrast <hex_fg> <hex_bg> → razão (float) via awk
     BEGIN{la=lum(a)+0.05; lb=lum(b)+0.05; r=(la>lb)?la/lb:lb/la; printf "%.2f", r}'
 }
 PAIRS="${DC}/governance/contrast-pairs.json"
-if [ -f "${PAIRS}" ] && jq -e . "${PAIRS}" >/dev/null 2>&1; then
+# ⚠️ ARQUIVO QUE EXISTE E NAO RESPONDE NAO E ARQUIVO AUSENTE — e confundir os dois era fail-open com
+# mensagem MENTIROSA. A 1a redacao desta cura usava `[ -f ] && jq -e .` numa condicao so: JSON
+# corrompido ou sem permissao de leitura caia no `else` e o gate imprimia "sem
+# governance/contrast-pairs.json", sobre um arquivo que ESTA la. Pior: o aviso do modo escuro vive
+# dentro do ramo `then`, entao um pairs.json quebrado SILENCIAVA as duas curas de uma vez, com
+# `exit 0` e "design tokens validos".
+# A doutrina ja estava escrita sessenta linhas acima, em `_missing_tool`: guarda que nao pode julgar
+# DECLARA que nao sabe, nunca aprova. Ela nao alcancava este ramo porque ninguem a levou ate ele —
+# que e a forma mais comum de uma cura ficar pela metade.
+if [ -e "${PAIRS}" ] && ! jq -e . "${PAIRS}" >/dev/null 2>&1; then
+  echo "  ✗ HARD: ${PAIRS#"${PROJECT}/"} EXISTE mas não pôde ser lido/parseado." >&2
+  echo "    Isto NÃO é 'sem governança': o arquivo está lá e a validação NÃO PÔDE ser feita." >&2
+  echo "    Tratar arquivo ilegível como arquivo ausente aprovaria em silêncio exatamente o que a" >&2
+  echo "    governança existe para barrar. Corrija o JSON (ou a permissão) ou remova o arquivo." >&2
+  exit 2
+fi
+if [ -f "${PAIRS}" ]; then
   wcag_fail=0
   while IFS=$'\t' read -r fg bg min note; do
     [ -n "${fg}" ] || continue
@@ -137,11 +157,37 @@ if [ -f "${PAIRS}" ] && jq -e . "${PAIRS}" >/dev/null 2>&1; then
   # redação deste bloco citou duas que NÃO EXISTEM no script; `set -u` não pega porque eu havia
   # escrito `${VAR:-}`, e o efeito seria a guarda calar para sempre: fail-open dentro da cura de
   # um fail-open. Conferir a existência do que se lê é a metade barata de qualquer guarda.)
+  # ⚠️ DETECTAR POR CHAVE SO ACHA A TOPOLOGIA QUE EU IMAGINEI — e a que a SSOT desta casa PRESCREVE
+  # e outra. `docs/design-context/README.md:34` e `index.md:16` mandam usar
+  # `modes/<light|dark|hc>.tokens.json`: arquivos de OVERRIDE cujos paths sao os MESMOS semanticos
+  # (`color.surface.base`), sem prefixo `color.dark.` nenhum. Medido na passada adversarial deste
+  # PR: com a estrutura canonica, um `brand` a 2,15:1 no escuro passava com `OK ✓` e exit 0 — o
+  # defeito que esta cura existe para fechar, intacto, dentro da forma que o proprio framework manda
+  # usar. Por isso a deteccao e por DOIS sinais, e basta um: a chave (`color.dark.*`, forma de quem
+  # achata tudo num arquivo) OU o ARQUIVO de modo escuro (forma canonica).
+  # ⚠️ E O SEGUNDO SINAL CARREGA UM ACHADO QUE O GATE NAO TEM COMO CURAR SOZINHO: `TOK` e chaveado
+  # so pelo path, entao um override de modo SOBRESCREVE o valor base em silencio — dois arquivos,
+  # dois tokens, e o escuro simplesmente some do que foi medido. Declarar isso e o que esta ao
+  # alcance aqui; medir os dois modos de verdade exige TOK por (modo, path), que e mudanca de
+  # contrato do parser e nao cabe nesta correcao.
   _has_dark_branch=0
   for _k in "${!TOK[@]}"; do case "${_k}" in color.dark.*) _has_dark_branch=1; break ;; esac; done
+  _dark_mode_file=""
+  if [ "${_has_dark_branch}" -eq 0 ]; then
+    for _f in "${FILES[@]}"; do
+      case "${_f#"${DC}/"}" in modes/dark*.tokens.json) _dark_mode_file="${_f#"${PROJECT}/"}"; _has_dark_branch=1; break ;; esac
+    done
+  fi
   if [ "${_has_dark_branch}" -eq 1 ]; then
-    if ! jq -e '[.pairs[] | select((.fg|test("dark")) or (.bg|test("dark")))] | length > 0' "${PAIRS}" >/dev/null 2>&1; then
-      echo "  ⚠ A SSOT tem ramo de modo ESCURO (color.dark.*) e a governança NÃO declara nenhum par"
+    if [ -n "${_dark_mode_file}" ]; then
+      echo "  ⚠ Há ARQUIVO de modo escuro (${_dark_mode_file}) e o parser indexa os tokens só pelo"
+      echo "    path — o override do escuro SOBRESCREVE o valor claro no mesmo endereço, então o que"
+      echo "    foi medido acima é UM tema, não dois. O gate não sabe qual. Declarado, não medido."
+    fi
+    # ⚠️ `test("dark")` e SUBSTRING: um par do CLARO chamado `color.darkblue` bastava para silenciar
+    # o aviso do escuro. A ancora exige `dark` como SEGMENTO do path (inicio, fim ou entre pontos).
+    if ! jq -e '[.pairs[] | select((.fg|test("(^|\\.)dark($|\\.)")) or (.bg|test("(^|\\.)dark($|\\.)")))] | length > 0' "${PAIRS}" >/dev/null 2>&1; then
+      echo "  ⚠ A SSOT tem ramo de modo ESCURO e a governança NÃO declara nenhum par"
       echo "    com ele — o contraste do tema escuro NÃO FOI MEDIDO. O gate está dizendo menos do que"
       echo "    parece: 'passou' aqui significa 'passou no claro'. Declare os pares do escuro em"
       echo "    ${PAIRS#"${DC}/"} (medido em campo: 4 paletas com brand.500 a 1,71-2,60 contra fundo"
