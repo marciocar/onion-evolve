@@ -85,7 +85,19 @@ while IFS=$'\t' read -r _id _pin; do
   # sim a re-materialização é possível, que é exatamente o gatilho que esta guarda existe para dar.
   # FALLBACK declarado: sem `origin/<default>` local (clone raso, repo sem remote) cai em HEAD, o
   # comportamento antigo — mais estrito, nunca mais frouxo.
-  _n="$(git -C "${REPO}" log --oneline "${_pin}..${_TIP}" -- "${_roots[@]}" | grep -c . || true)"
+  # ⚠️ A CATRACA NÃO CONTA O PRÓPRIO LIVRO-CAIXA — e sem isto ela é ESTEIRA, uma volta acima da que
+  # foi curada em 2026-09-17. Medido no mesmo dia: o commit que reconcilia o pin depois de uma
+  # materialização toca QUATRO arquivos, e só UM está na superfície que viaja — o
+  # `door-staleness-baseline.txt`, isto é, o próprio teto. Resultado: reconciliar a porta defasava
+  # a porta, e um teto 0 exigia um PR depois de todo PR. Regresso infinito.
+  # POR QUE EXCLUIR É LEGÍTIMO, e não afrouxamento: a guarda JÁ exclui biografia, com o argumento
+  # de que a porta não a receberia. Aqui a porta RECEBE o arquivo, mas a REGRA 85 nela é
+  # `[papel/SEM-OBJETO]` — sem `members.yaml` não há porta a julgar —, então o conteúdo é INERTE no
+  # alvo. Um commit que só mexe neste baseline não muda NADA que a porta possa exercer, e portanto
+  # não a faz mentir sobre o core, que é a única coisa que esta catraca existe para medir.
+  # O que continua contando: toda mudança real de framework. A cura é cirúrgica, não geral.
+  _n="$(git -C "${REPO}" log --oneline "${_pin}..${_TIP}" -- "${_roots[@]}" \
+          ':(exclude).claude/validation/door-staleness-baseline.txt' | grep -c . || true)"
   _lim=""
   [ -f "${BASELINE}" ] && _lim="$(awk -v id="${_id}" '$1==id {print $2; exit}' "${BASELINE}")"
   if [ "${EMIT}" -eq 1 ]; then _out="${_out}${_id} ${_n}\n"; continue; fi
