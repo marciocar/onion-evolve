@@ -3553,6 +3553,21 @@ check_vendored_surface_clean() {
   local terms term f
   # (1) nomes COMERCIAIS marcados (derivados, menos os marcadores que são vocabulário das guardas)
   terms="$(bash "${helper}" --emit-terms 2>/dev/null | grep -vE '^(CONFIDENCIAL|PRIVADO)$' || true)"
+  # (1b) TERMOS DECLARADOS que o registro NÃO conhece — a rede que faltava debaixo de (1) e (2).
+  # MEDIDO 2026-09-18, exposição PÚBLICA e ATIVA: as fixtures da guarda-irmã usavam nomes REAIS de
+  # cliente como exemplo, em `.claude/validation/` — que viaja —, logo no repo público `onion-core`.
+  # A guarda que impede nome de cliente de viajar CONTINHA nomes de cliente, e nada acusou: (1) e (2)
+  # derivam do `members.yaml`, e nenhum daqueles clientes está registrado. É [[vendor-scrub-blind-spot]]
+  # com dano consumado em vez de hipótese.
+  # POR QUE UM ARQUIVO À PARTE, e não registrar no members.yaml: o `name:` de um membro é PROJETADO
+  # para o console e o mapa públicos — registrar um cliente sob NDA ali trocaria um vazamento por
+  # outro. Aqui o nome entra para ser PROCURADO, nunca exibido. E o arquivo vive em
+  # `docs/evolution/`, que NÃO viaja: uma lista de nomes de cliente que viajasse seria o vazamento.
+  local _ct="${REPO_ROOT}/docs/evolution/federation/client-terms.txt"
+  if [ -f "${_ct}" ]; then
+    terms="${terms}
+$(grep -vE '^[[:space:]]*(#|$)' "${_ct}" || true)"
+  fi
   # (2) IDS de ADOTANTE — o id também identifica o cliente (um id pode ser nome de pessoa, ou mapear direto na marca).
   #     Derivados do members.yaml, EXCLUINDO os nomes do PRÓPRIO framework (onion-*) e do maestro (marcio*).
   #     Decisão do maestro 2026-07-22: a superfície portável não nomeia parceiros; o crédito nominal fica no

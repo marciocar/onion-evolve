@@ -51,7 +51,7 @@ _PAT_AMP='[A-Za-z0-9]{2,}&[A-Za-z0-9]+|[A-Za-z0-9]+&[A-Za-z0-9]{2,}'
 # NÃO pegava a segunda, na mesma frase e no mesmo identificador, porque o padrão exigia
 # `[A-Z][a-z]` e a sigla é toda maiúscula. Se o cliente se chamasse só pela segunda metade, a
 # guarda nasceria cega para o próprio caso que a criou. Junto caíam: `cliente da Xyz` (preposição
-# entre âncora e nome), `adotante: Xyz` (dois-pontos), e `PoC Itaú` — onde o acento truncava a
+# entre âncora e nome), `adotante: Xyz` (dois-pontos), e `PoC Banví` — onde o acento truncava a
 # chave em `Ita` sob LC_ALL=C, e tolerar `Ita` passa a tolerar `Itamar` no mesmo arquivo.
 # Fixture de 8 linhas: 1 pega.
 # (o identificador do cliente NÃO se repete aqui — este arquivo VIAJA, e a guarda cobra isto de
@@ -59,15 +59,15 @@ _PAT_AMP='[A-Za-z0-9]{2,}&[A-Za-z0-9]+|[A-Za-z0-9]+&[A-Za-z0-9]{2,}'
 #
 # O que mudou, e o preço de cada mudança:
 #   · CONECTOR OPCIONAL (`da|de|do|:|-`) entre a âncora e o nome — cobre `cliente da Acme`.
-#   · CAIXA ALTA só com SEGUNDO TOKEN em forma de nome (`HPE Autos`, `IBM Brasil`). A 1ª tentativa
+#   · CAIXA ALTA só com SEGUNDO TOKEN em forma de nome (`KVX Motores`, `IBM Brasil`). A 1ª tentativa
 #     de cura aceitou caixa alta SOZINHA e o repo saltou de 9 para 36 candidatos — 27 deles ênfase
 #     de prosa desta casa (`adotante NÃO registrado`, `cliente NUNCA`, `empresa SEM`).
 #     Baseline inchado é catraca sem sinal, então o segundo token é o que separa sigla comercial
-#     de grito de prosa: `HPE Autos` passa, `NÃO REGISTRADO` não (o 2º token também é caixa alta).
-#   · SEGUNDO TOKEN opcional depois de um nome normal (`Prodfiel Sistemas`), para não cortar o
+#     de grito de prosa: `KVX Motores` passa, `NÃO REGISTRADO` não (o 2º token também é caixa alta).
+#   · SEGUNDO TOKEN opcional depois de um nome normal (`Vantiro Sistemas`), para não cortar o
 #     sobrenome comercial ao meio.
 #   · `[[:alpha:]]` em vez de `[A-Za-z]` no corpo do nome; com `LC_ALL=C` isso não resolve acento
-#     sozinho, então o scan roda em UTF-8 (ver `_scan`) e `Itaú` chega inteiro.
+#     sozinho, então o scan roda em UTF-8 (ver `_scan`) e `Banví` chega inteiro.
 # TETO QUE PERMANECE, e agora está medido em vez de suposto:
 #   · nome comercial SEM ampersand e SEM âncora nenhuma continua invisível;
 #   · SIGLA SOZINHA depois da âncora (`cliente IBM`) NÃO é vista — ela é
@@ -80,7 +80,7 @@ _PAT_CTX="(PoC|POC|[Cc]liente|[Aa]dotante|[Ee]mpresa)[[:space:]]*(:|-)?[[:space:
 
 _scan() {
   # ⚠️ LOCALE UTF-8, E ISTO É DELIBERADO — a casa roda tudo em LC_ALL=C, esta guarda é a exceção.
-  # Medido 2026-09-14: sob C, `[[:alnum:]]` casa BYTE, então `PoC Itaú` virava o candidato `Ita` —
+  # Medido 2026-09-14: sob C, `[[:alnum:]]` casa BYTE, então `PoC Banví` virava o candidato `Ita` —
   # e tolerar `Ita` no baseline passa a tolerar `Itamar`/`Itaipu` no mesmo arquivo, que é catraca
   # furada. Nome comercial brasileiro tem acento; a guarda tem de ler caractere, não byte.
   local _LC=C.UTF-8; locale -a 2>/dev/null | grep -qix 'C.utf-\?8' || _LC=en_US.UTF-8
@@ -125,11 +125,11 @@ if [ "${MODE}" = "--selftest" ]; then
   printf 'nada aqui\nM&A e Q&A sao siglas\nQ&A e V&V tambem\n' > "${d}/x/ok.md"
   printf 'a PoC Acme&Co foi medida\n' > "${d}/x/leak.md"
   # o caso que a 1ª redação PERDIA: caixa alta, segundo token, conector e acento
-  printf 'MEDIDO na PoC HPE Autos em campo\ncliente da Zelda\nadotante: Prodfiel Sistemas\nPoC Itau Digital\nadotante NAO registrado\ncliente NUNCA visto\n' > "${d}/x/hard.md"
+  printf 'MEDIDO na PoC KVX Motores em campo\ncliente da Lumora\nadotante: Vantiro Sistemas\nPoC Banvi Digital\nadotante NAO registrado\ncliente NUNCA visto\n' > "${d}/x/hard.md"
   ROOT="${d}"; _targets=("${d}/x")
   out="$(_scan)"
   _miss=""
-  for _w in 'Acme&Co' 'HPE Autos' 'Zelda' 'Prodfiel Sistemas' 'Itau Digital'; do
+  for _w in 'Acme&Co' 'KVX Motores' 'Lumora' 'Vantiro Sistemas' 'Banvi Digital'; do
     grep -qF "|${_w}" <<< "${out}" || _miss="${_miss} ${_w}"
   done
   _false=""; grep -q 'ok\.md' <<< "${out}" && _false="ok.md (sigla do ofício virou candidato)"

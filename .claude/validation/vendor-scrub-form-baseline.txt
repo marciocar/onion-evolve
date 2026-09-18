@@ -1,8 +1,3 @@
-# Baseline de CANDIDATOS por forma na superfície vendorizada — PASSIVO TOLERADO.
-# Gerado por: bash .claude/validation/vendor-scrub-form-check.sh --emit-baseline > .claude/validation/vendor-scrub-form-baseline.txt
-# formato: <rel>|<termo>. SÓ PODE ENCOLHER. Candidato NOVO = HARD.
-# Legítimos aqui: sigla do ofício (M&A, Q&A, V&V), nome FICTÍCIO de exemplo, citação acadêmica.
-# Nome de cliente REAL não se tolera: remove-se do texto.
 .claude/agents/product/extract-meeting-specialist.md|Firebase
 .claude/agents/product/pain-price-specialist.md|Específico
 .claude/agents/product/pain-price-specialist.md|StartupXYZ
@@ -12,8 +7,8 @@
 .claude/validation/vendor-scrub-form-check.sh|Acme
 .claude/validation/vendor-scrub-form-check.sh|Acme&Co
 .claude/validation/vendor-scrub-form-check.sh|Baker&Sons
+.claude/validation/vendor-scrub-form-check.sh|Banví
 .claude/validation/vendor-scrub-form-check.sh|IBM Brasil
-.claude/validation/vendor-scrub-form-check.sh|Itaú
 .claude/validation/vendor-scrub-form-check.sh|XY&Z
 .claude/validation/vendor-scrub-form-check.sh|Xyz
 docs/knowledge-base/concepts/identificar-precificar-dor-cliente.md|Startup
