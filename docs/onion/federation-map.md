@@ -59,8 +59,8 @@ flowchart TD
 | gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `c9eb2c40bc3b` |
 | onion-mini | standalone | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
 | onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `514dda85833a` |
-| vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `f5ec0dcf2dfb` |
-| onion-core | standalone | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `24118c5d7a97` |
+| vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `24118c5d7a97` |
+| onion-core | standalone | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `adbd6e91b8e0` |
 | onion-codex | standalone | distilled | substrate-port, openai-codex, portability-proof, deterministic-guards | `n/a` |
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |
 | onion-pedro | standalone | greenfield | field-dogfood, greenfield-adoption, compliance | `165e1e13b11f` |

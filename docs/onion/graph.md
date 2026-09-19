@@ -582,7 +582,7 @@ onion-compliance	requires	template:compliance_pmbok_template.md
 onion-compliance	requires	template:compliance_soc2_template.md	
 onion-core	adopts	onion-evolve	
 onion-core	mode	greenfield	
-onion-core	pin	24118c5d7a97	
+onion-core	pin	adbd6e91b8e0	
 onion-core	specialization	deterministic-guards	
 onion-core	specialization	full-machinery	
 onion-core	specialization	hub-role	
@@ -793,7 +793,7 @@ test-planner	related	branch-test-planner
 test-planner	related	test-engineer	
 vendas-pdi-enterprise	adopts	onion-evolve	
 vendas-pdi-enterprise	mode	greenfield	
-vendas-pdi-enterprise	pin	f5ec0dcf2dfb	
+vendas-pdi-enterprise	pin	24118c5d7a97	
 vendas-pdi-enterprise	specialization	rag-bridge	
 vendas-pdi-enterprise	specialization	spec-as-code	
 vendas-pdi-enterprise	specialization	vendas	

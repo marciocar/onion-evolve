@@ -77,5 +77,14 @@
 #   derivado?" so conheciam `adopted|hub`. Re-materializar trocaria a identidade da porta por uma que
 #   as guardas leem como FONTE. Curado nos cinco sitios, com caso de bancada que DERIVA os papeis
 #   validos do `write-stamp.sh` e reprova se algum predicado nao os conhecer todos (mutante provado).
-onion-standalone 389
+#
+# 2026-09-19 (8a materializacao): `onion-core` volta a ZERO pela quarta vez em dois dias; o ciclo
+# materializar → avancar o pin roda sem pensar. `onion-standalone` sobe a 391.
+# ⚠️ A DECISAO (A) DO MAESTRO — re-materializar o standalone — esta DESBLOQUEADA desde o #849, e o
+#   que a destravava nao era custo: era o papel `standalone` ser invisivel para seis predicados que
+#   julgam "este repo e derivado?". Materializar antes disso trocaria a identidade da porta viva
+#   (que carimba `role: adopted`, do corte manual de 2026-07-19) por uma que as guardas leiam como
+#   FONTE. Hoje a porta materializa em 0 HARD medidos SEM isencao — provado trocando o carimbo e
+#   vendo o veredito NAO mudar de forma que compre verde.
+onion-standalone 391
 onion-core 0
