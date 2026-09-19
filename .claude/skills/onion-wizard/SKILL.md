@@ -47,9 +47,19 @@ Never-clobber é a doutrina; o preview é a confirmação.
 
 ### 5. Executar (rotear ao procedimento — o SCAFFOLD)
 Após confirmação explícita, **execute o `trace` da transição**, não uma cópia dele:
-- `trace` = `.claude/commands/meta/adopt.md` → invoque `/meta:adopt` (via Skill) com os args colhidos
+- `trace` = o comando `meta:adopt` → invoque `/meta:adopt` (via Skill) com os args colhidos
   (create/adopt/update), ou o bloco `--promote-hub` para a promoção.
 - O comando faz as fases (cópia/config/stamp/commit durável). Você é o intake guiado, ele é o motor.
+
+> ⚠️ **A transição `adopt` só existe onde a META-FÁBRICA existe.** Num alvo de papel `standalone` ela
+> é selada por desenho, e o comando **não está lá** — esta skill segue útil para as outras transições
+> e para o intake, mas não invente o motor ausente: se `/meta:adopt` não resolver, diga que o papel
+> não o recebe, em vez de tentar reproduzir as fases à mão.
+> (A 1ª redação citava o caminho do arquivo do comando em backtick — grafado aqui sem crase de
+> propósito, para esta nota não recriar o ponteiro que ela explica. Ele é EXCLUÍDO do
+> papel `standalone` pelo mesmo manifesto que distribui esta skill, então virava ponteiro morto lá —
+> e a 1ª tentativa de cura foi cortar a skill inteira do papel, o que trocava capacidade por verde.
+> Citar o COMANDO, e declarar onde ele não existe, resolve sem amputar.)
 
 ## Resumível (STATE.md)
 Movimentos longos (adopt faseado) são retomáveis — o próprio `/meta:adopt` já checkpointa em

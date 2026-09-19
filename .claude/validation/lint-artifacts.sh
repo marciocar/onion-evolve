@@ -93,7 +93,20 @@ CLAUDE_DIR="${REPO_ROOT}/.claude"
 # `grep` dentro do predicado por-arquivo, tira ~1.461 execuções de grep por varredura.
 _stamp_has() { grep -qE "$1" "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null; }
 _ROLE_TAIL='[[:space:]]*(#.*)?$'
-IS_DERIVED=0; _stamp_has "^([[:space:]]*role:[[:space:]]*(adopted|hub|standalone)${_ROLE_TAIL}|[[:space:]]*decoupled_from:)" && IS_DERIVED=1
+# ⚠️ `standalone` NAO ENTRA AQUI, E A TENTATIVA FOI MEDIDA E REVERTIDA NO MESMO PR (2026-09-18).
+# `IS_DERIVED` nao e "que papel e este" — e um PORTEIRO: dezenove sitios o consomem, dezessete deles
+# como `[ "${IS_DERIVED}" -eq 1 ] && return 0`. Acrescentar um papel aqui DESLIGA dezessete guardas
+# de uma vez. Medido: a mesma arvore, trocando SO o carimbo `standalone`→`source`, vai de 0 HARD
+# para 3 HARD — o verde era comprado por isencao, nao conquistado.
+# E o dano concreto que isso abriria, provado pela passada adversarial: com `standalone` derivado, a
+# REGRA 80 e a REGRA 81 calam, e uma porta PUBLICA carregando o painel com a biografia do core
+# (294 residuos, 1.586 achados que nao sao dela) passaria em 0 HARD. Seria curar a instancia do
+# defeito e apagar o DETECTOR DA CLASSE no mesmo commit.
+# ONDE `standalone` ENTRA, e por que la e diferente: nos predicados que perguntam "a evidencia
+# core-privada esta legitimamente ausente neste papel?" (escada, residuo de revisao, carteiro). La a
+# ausencia e de OBJETO e a isencao e correta. Aqui a pergunta e outra — "devo julgar este repo?" —
+# e a porta DEVE ser julgada: ela distribui a maquinaria completa.
+IS_DERIVED=0; _stamp_has "^([[:space:]]*role:[[:space:]]*(adopted|hub)${_ROLE_TAIL}|[[:space:]]*decoupled_from:)" && IS_DERIVED=1
 IS_LEAF=0;    _stamp_has "^[[:space:]]*role:[[:space:]]*adopted${_ROLE_TAIL}" && IS_LEAF=1
 
 # ---------------------------------------------------------------------------
@@ -3836,7 +3849,12 @@ check_kg_narration_valid() {
 check_onion_version_tracked() {
   local stamp="${REPO_ROOT}/.claude/.onion-version"
   [ -f "${stamp}" ] || return 0
-  grep -qE '^(role:[[:space:]]*(adopted|hub|standalone)|decoupled_from:)' "${stamp}" 2>/dev/null || return 0   # adotante, hub OU fonte-desacoplada (todos carregam stamp que o clone precisa trackear)
+  # ⚠️ LE O PORTEIRO, NAO RE-DERIVA: esta linha era a SEGUNDA FORMA do mesmo predicado, sem o
+  # `_ROLE_TAIL` — exatamente o rombo que o comentario de :84-92 declara ter fechado ("um predicado,
+  # um lugar"). Com `role: standaloneX` num stamp editado a mao, ela casava por prefixo e o
+  # `IS_DERIVED` nao. Reusar a variavel mata a divergencia e faz a bancada de vocabulario cobrir os
+  # dois de uma vez. Achado da passada adversarial deste PR.
+  [ "${IS_DERIVED}" -eq 1 ] || return 0   # adotante, hub OU fonte-desacoplada (todos carregam stamp que o clone precisa trackear)
   git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1 || return 0     # precisa ser repo git
   if [ -n "${ONLY_PATH}" ]; then
     case "${ONLY_PATH}" in "${stamp}") : ;; *) return 0 ;; esac
