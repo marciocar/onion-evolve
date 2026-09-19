@@ -5,17 +5,16 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**206 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 46 grupo(s), agrupados por `owner:` (8 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**206 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 47 grupo(s), agrupados por `owner:` (8 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
-## compartilhamento-individuo-organizacao-2026-09 — 5 item(ns)
+## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 135.0 | `Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE` | compartilhamento-individuo-organizacao-2026-09 | No contexto de EMPREGO (relacao de poder assimetrica), qual e o criterio operacional que separa o compartilhamento LEGITIMO e indi |
 | 27.5 | `Q_R3_EMENDAS_DE_MECANISMO_AO_DESENHO_DE_C` | compartilhamento-individuo-organizacao-2026-09 | TRES EMENDAS DE MECANISMO PROPOSTAS AO DESENHO DA OPCAO C, com evidencia ancorada nesta rodada — o maestro decide; D_INDIVIDUAL_ |
-| 16.0 | `D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA` | compartilhamento-individuo-organizacao-2026-09 | A PREMISSA DO DILEMA NAO SE SUSTENTA, E E AI QUE ELE SE DISSOLVE. Q_FRONTEIRA afirma que controle e valor sao A MESMA ALAVANCA em  |
+| 12.8 | `D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR` | compartilhamento-individuo-organizacao-2026-09 | SUPERA D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA, e a saida vem do mesmo corpus que a derrubou. O corpus nao deixou so a refuta |
 | 12.8 | `Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL` | compartilhamento-individuo-organizacao-2026-09 | A FRONTEIRA QUE A E2 NAO COBRE, E ELA E NOVA. A E2 diz que a alavanca que mede e o CONTROLE DO ALVO. O adotante devolveu: num dese |
-| 5.6 | `C_OBJECAO_ESTADO_PODE_NAO_BASTAR_EM_TIME_MINIMO` | compartilhamento-individuo-organizacao-2026-09 | OBJECAO SOBREVIVENTE A PROPRIA PROPOSTA, preservada em vez de descartada. Trocar o contador por ESTADO mata a subtracao pelo NUMER |
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -328,6 +327,12 @@
 | 7.6 | `A_ANUNCIO_DERIVA_O_NUMERO_DA_MEDICAO` | fios-abertos | A METADE VIVA DE UM SINAL CUJA OUTRA METADE JA FOI CURADA — registrada aqui para o arquivamento do sinal nao apagar o achado. O  |
 | 6.0 | `A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR` | passada-adversarial-2026-09 | ABERTO: o detector por forma varre as 11 raizes do bundle de ADOCAO (que vai para repos privados) e NAO varre `plugins/` — que e |
 | 4.2 | `A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN` | passada-adversarial-2026-09 | ABERTO: numa rodada da bancada em faixas, a familia session-beacon caiu de 25 para 22 casos com apenas 1 contabilizado como pulado |
+
+## passada-adversarial-2026-09 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 9.0 | `Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE` | passada-adversarial-2026-09 | COMO FAZER A PERNA DE LEITURA ALCANCAR A SESSAO QUE ESCREVE NO GRAFO, sem virar ruido? Tres desenhos candidatos, nenhum medido: (a |
 
 ## audit-textual-gates-2026-09 — 4 item(ns)
 
