@@ -270,7 +270,7 @@ check_scan_sanity() {
     dir="${CLAUDE_DIR}/${root}"
     [ -d "${dir}" ] || continue     # superfície ausente tem regra própria; aqui não é o assunto
     if ! real="$(count_files "${dir}" '*.md')"; then
-      violation "HARD" "${dir}" "[varredura-sa] o chão de verdade quebrou em ${root}/ — count_files falhou, e um erro engolido aqui viraria 'zero files_hit' silencioso"
+      violation "HARD" "${dir}" "[varredura-sa] o chão de verdade quebrou em ${root}/ — count_files falhou, e um erro engolido aqui viraria 'zero arquivos' silencioso"
       continue
     fi
     [ "${real}" -gt 0 ] || continue  # vazio DE VERDADE: nada a exigir da varredura
@@ -278,7 +278,7 @@ check_scan_sanity() {
     # Por isso aqui não há 2>/dev/null: falha tem de aparecer, não virar número.
     seen="$(_find "${dir}" -name '*.md' -print | wc -l | tr -d ' ')"
     if [ "${seen}" -eq 0 ]; then
-      violation "HARD" "${dir}" "[varredura-sa] a varredura enxergou 0 files_hit em ${root}/, mas existem ${real} — o gate está CEGO nesta superfície e reportaria OK sem ter olhado (causas conhecidas: poda que casa a própria árvore varrida, raiz errada, ou predicado do find vazando para as raízes em _find)"
+      violation "HARD" "${dir}" "[varredura-sa] a varredura enxergou 0 arquivos em ${root}/, mas existem ${real} — o gate está CEGO nesta superfície e reportaria OK sem ter olhado (causas conhecidas: poda que casa a própria árvore varrida, raiz errada, ou predicado do find vazando para as raízes em _find)"
     fi
   done
 }
@@ -439,7 +439,7 @@ check_agent_frontmatter() {
 # ===========================================================================
 # REGRA 2 — Frontmatter de comando: description: obrigatório [HARD]
 # previne: comando sem description — invisível/ambíguo no menu
-#           (exceto files_hit em common/ e files_hit README.md)
+#           (exceto arquivos em common/ e arquivos README.md)
 # ===========================================================================
 check_command_description() {
   while IFS= read -r -d '' cmd; do
@@ -460,7 +460,7 @@ check_command_description() {
 #           Era denylist de 1 item (gpt-4) para um campo que na prática é
 #           allowlist fechada de 3-4 valores — 'model: gpt-5', 'o3' ou
 #           'claude-3-opus' passariam hoje, sem barrar nada além do literal
-#           'gpt-4'. Allowlist medida contra o uso real (153 files_hit com
+#           'gpt-4'. Allowlist medida contra o uso real (153 arquivos com
 #           frontmatter): sonnet/opus/haiku; 'fable' é o 4o valor documentado
 #           pela SSOT dos templates (command-template.md e agent-template.md).
 #           Checa SÓ o `model:` do FRONTMATTER real (entre o par de '---' no
@@ -1018,7 +1018,7 @@ check_branch_agent_distinction() {
 _glob_literal_prefix() { # $1=glob → maior prefixo SEM curinga ('' se o glob já começa com um)
   local g="$1" acc="" seg
   # `set -f` NÃO é zelo: a expansão sem aspas abaixo sofre PATHNAME EXPANSION, e o argumento é
-  # literalmente um glob — sem isto, `docs/evolution/research/**` viraria a lista de files_hit do cwd.
+  # literalmente um glob — sem isto, `docs/evolution/research/**` viraria a lista de arquivos do cwd.
   local _noglob=1; case "$-" in *f*) _noglob=0 ;; esac
   set -f
   local IFS=/
@@ -1073,7 +1073,7 @@ _rule_glob_matches() { # $1=glob
     # a forma anterior era `git ls-files -- "$g" | grep -q .`. Sob `set -euo pipefail` (l.74) isso
     # é uma CORRIDA: `grep -q` sai no PRIMEIRO casamento, e o `git ls-files` que ainda tem bytes a
     # escrever leva EPIPE e sai 141 — o `pipefail` propaga o 141, o `&&` não dispara, e a regra
-    # viva é acusada de morta. `docs/evolution/research/**` casa 139 files_hit (10 KB, várias
+    # viva é acusada de morta. `docs/evolution/research/**` casa 139 arquivos (10 KB, várias
     # chamadas de `write`), então a janela existe; numa máquina ociosa o git termina antes de o
     # grep sequer rodar (medido: 0 falhas em 200 tentativas locais) e num runner de 2 núcleos sob
     # carga, não. É a classe [[pipefail-epipe-early-closer-class]], e o modo de falha é o pior
@@ -2228,42 +2228,47 @@ check_model_version_fora_da_ssot() {
 check_kg_edit_saw_confirmed() {
   local base; base="$(git -C "${REPO_ROOT}" merge-base HEAD origin/main 2>/dev/null || true)"
   [ -n "${base}" ] || return 0            # sem base comparável: não há o que julgar
-  local tocados
-  tocados="$(git -C "${REPO_ROOT}" diff --name-only "${base}" HEAD -- '*.kg.yaml' 2>/dev/null \
+  local _r87_graphs
+  _r87_graphs="$(git -C "${REPO_ROOT}" diff --name-only "${base}" HEAD -- '*.kg.yaml' 2>/dev/null \
              | grep -v '/fixtures/' || true)"
-  [ -n "${tocados}" ] || return 0         # PR não toca grafo: SEM-OBJETO, e silêncio é correto
+  [ -n "${_r87_graphs}" ] || return 0     # PR não toca grafo: SEM-OBJETO, e silêncio é correto
 
-  local slug art
-  slug="$(git -C "${REPO_ROOT}" branch --show-current 2>/dev/null | tr '/' '-' || true)"
-  art="${REPO_ROOT}/docs/evolution/review/${slug}.md"
-  [ -f "${art}" ] || return 0             # sem resíduo: quem cobra é a REGRA 56, não esta
+  local _r87_slug _r87_art
+  _r87_slug="$(git -C "${REPO_ROOT}" branch --show-current 2>/dev/null | tr '/' '-' || true)"
+  _r87_art="${REPO_ROOT}/docs/evolution/review/${_r87_slug}.md"
+  [ -f "${_r87_art}" ] || return 0        # sem resíduo: quem cobra é a REGRA 56, não esta
 
-  # ⚠️ `files_hit` acumula separado de `g`: usar a variavel do LACO na mensagem final a imprime
-  # VAZIA, porque o `while` ja terminou. Medido na 1a fixture desta regra — a mensagem saiu
-  # "o PR edita  e o residuo...". Guarda que nomeia o alvo errado (ou nenhum) nao e acionavel.
-  local g ids missing=0 sample="" files_hit=""
-  while IFS= read -r g; do
-    [ -n "${g}" ] || continue
-    # os `confirmed` de MAIOR impacto do arquivo tocado — são os que mais custam contrariar
-    ids="$(LC_ALL=C awk -F': ' '
+  # ⚠️ "CITOU ALGUM DOS DE MAIOR IMPACTO", NUNCA "CITOU TODOS" — e a 1ª redação exigia TODOS, o que
+  # a tornava INSATISFAZÍVEL. Medido em 2026-09-19 sobre os 98 grafos versionados (sem fixtures):
+  # mediana 9 nós `confirmed` de impacto>=4 por grafo, 43 grafos com MAIS DE 10, e o pior com 236.
+  # Ela reprovava até o PR que a introduziu (38 nós). Um SOFT permanentemente vermelho não é sinal —
+  # é fundo, e é exatamente a patologia que este PR alega estar curando no hook.
+  # A pergunta satisfazível é outra: *você olhou ALGUM dos de maior impacto?* Citar zero dos três
+  # mais pesados de um grafo que você acabou de editar é o sinal real — foi o caso do incidente.
+  local _r87_g _r87_top _r87_i _r87_hit _r87_silent="" _r87_files=""
+  while IFS= read -r _r87_g; do
+    [ -n "${_r87_g}" ] || continue
+    _r87_top="$(LC_ALL=C awk -F': ' '
         /^  - id:/         { id=$2; imp=0; conf=0 }
         /^    impact:/     { imp=$2+0 }
         /^    status: confirmed/ { conf=1 }
-        (conf==1 && imp>=4 && id!="") { print id; id="" }
-      ' "${REPO_ROOT}/${g}" 2>/dev/null | LC_ALL=C sort -u || true)"
-    local i
-    while IFS= read -r i; do
-      [ -n "${i}" ] || continue
-      LC_ALL=C grep -qF "${i}" "${art}" 2>/dev/null && continue
-      missing=$((missing + 1))
-      [ -z "${sample}" ] && sample="${i}"
-      case " ${files_hit} " in *" ${g} "*) : ;; *) files_hit="${files_hit}${g} " ;; esac
-    done <<< "${ids}"
-  done <<< "${tocados}"
+        (conf==1 && imp>=4 && id!="") { print imp"\t"id; id="" }
+      ' "${REPO_ROOT}/${_r87_g}" 2>/dev/null | LC_ALL=C sort -rn -k1,1 | cut -f2 | sed -n '1,3p' || true)"
+    [ -n "${_r87_top}" ] || continue      # grafo sem `confirmed` de peso: nada a cobrar
+    _r87_hit=0
+    while IFS= read -r _r87_i; do
+      [ -n "${_r87_i}" ] || continue
+      LC_ALL=C grep -qF "${_r87_i}" "${_r87_art}" 2>/dev/null && { _r87_hit=1; break; }
+    done <<< "${_r87_top}"
+    if [ "${_r87_hit}" -eq 0 ]; then
+      _r87_files="${_r87_files}${_r87_g} "
+      [ -z "${_r87_silent}" ] && _r87_silent="$(printf '%s' "${_r87_top}" | tr '\n' ' ')"
+    fi
+  done <<< "${_r87_graphs}"
 
-  if [ "${missing}" -gt 0 ]; then
-    violation "SOFT" "docs/evolution/review/${slug}.md" \
-      "[kg-edit-confirmed] o PR edita ${files_hit% } e o resíduo NÃO cita ${missing} nó(s) \`confirmed\` de impacto>=4 desse arquivo (ex.: ${sample}) — não é erro por si, mas foi EXATAMENTE assim que uma proposta selada caiu em 2026-09-19: ela contrariava dois \`confirmed\` do arquivo que estava editando. Confira se algum deles já responde (ou já refuta) o que você está propondo."
+  if [ -n "${_r87_files}" ]; then
+    violation "SOFT" "docs/evolution/review/${_r87_slug}.md" \
+      "[kg-edit-confirmed] o PR edita ${_r87_files% } e o resíduo não cita NENHUM dos \`confirmed\` de maior impacto desse(s) arquivo(s) (os 3 do topo: ${_r87_silent% }) — não é erro por si, mas foi EXATAMENTE assim que uma proposta selada caiu em 2026-09-19: ela contrariava dois \`confirmed\` do arquivo que estava editando. Basta conferir se algum deles já responde (ou já refuta) o que você propõe."
   fi
 }
 
@@ -2398,8 +2403,8 @@ PYWF
 #   linha — sem âncora, 'skills' é ruído de prosa comum demais para o SOFT confiar);
 #   forma INVERTIDA rótulo→número em TABELA ('| Skills | 5 |', '| Comandos invocáveis |
 #   99 |' — os 4 rótulos canônicos, valor = 1º inteiro da célula); parentética invertida
-#   'Knowledge Bases (N documentos...)' (âncora 'documentos' — não 'files_hit', que tem
-#   semântica DIFERENTE em sítios reais, ex. '(N files_hit, incl. index)').
+#   'Knowledge Bases (N documentos...)' (âncora 'documentos' — não 'arquivos', que tem
+#   semântica DIFERENTE em sítios reais, ex. '(N arquivos, incl. index)').
 #   SOFT: heurística sobre linguagem natural — surfaca drift sem bloquear CI por FP.
 #   ISENTA: docs/analysis/ (datado), .claude/sessions/ (gitignored), docs/materials/
 #   (derivado — deferido), docs/onion/inventory.md (SSOT), e frontmatter
@@ -2602,10 +2607,10 @@ check_inventory_total_drift() {
 
     # 'Knowledge Bases (N documentos...)' — forma PARENTÉTICA INVERTIDA (substantivo
     # ANTES do número; achado PR #517, a 2ª classe que escapou). Âncora 'documentos'
-    # logo após o número — não 'files_hit': esse termo tem semântica DIFERENTE em
-    # sítios reais (.claude/commands/warm-up.md, docs/INDEX.md usam '(N files_hit,
+    # logo após o número — não 'arquivos': esse termo tem semântica DIFERENTE em
+    # sítios reais (.claude/commands/warm-up.md, docs/INDEX.md usam '(N arquivos,
     # incl. index)' = contagem de ARQUIVO físico, +1 pelo próprio index.md — não o
-    # total de KBs do inventário). Casar 'files_hit' também flagaria essa forma
+    # total de KBs do inventário). Casar 'arquivos' também flagaria essa forma
     # legítima como falso-positivo.
     while IFS= read -r line; do
       [ -z "${line}" ] && continue
@@ -2713,7 +2718,7 @@ check_inventory_total_drift() {
     #     Quem for "harmonizar o case entre pré-filtro e feeder" — movimento natural, já que o
     #     cabeçalho declara o pré-filtro SUPERSET — dispara os dois. Harmonize só junto com uma
     #     âncora de célula puramente numérica.
-    #     ⚠️ CORREÇÃO DE UMA MEDIÇÃO MINHA: a 1ª redação dizia "só 3 files_hit têm '| Total |' no
+    #     ⚠️ CORREÇÃO DE UMA MEDIÇÃO MINHA: a 1ª redação dizia "só 3 arquivos têm '| Total |' no
     #     repo inteiro". FALSO — o grep original era case-sensitive e não viu os dois acima. A
     #     frase justificava a regra com uma medição feita pela mesma régua enviesada que a regra
     #     usa, dentro de um commit que abria com "medição antes da regra". O Elenxo pegou.
@@ -2727,7 +2732,7 @@ check_inventory_total_drift() {
       esac
     done < <(grep -E '^\|[[:space:]]*\*{0,2}Total\*{0,2}[[:space:]]*\|' "${f}" 2>/dev/null)
   # PRÉ-FILTRO (perf, 2026-07-13): só varre .md que CONTÊM uma frase-de-contagem candidata.
-  #   Antes: 750 files_hit × ~8 greps/arquivo (esta é ~50% do tempo total do lint); ~90% dos .md
+  #   Antes: 750 arquivos × ~8 greps/arquivo (esta é ~50% do tempo total do lint); ~90% dos .md
   #   não têm número+substantivo-de-inventário → puro overhead. O pattern abaixo é SUPERSET de
   #   TODAS as 8 patterns internas (comandos|agentes|knowledge bases|categorias|skills; '\+?' cobre
   #   a forma aproximada 'N+ comandos'; '(N total' cobre a parentética) → nenhum arquivo candidato
@@ -2764,7 +2769,7 @@ check_inventory_total_drift() {
 # ===========================================================================
 check_frontmatter_scalar_colon() {
   while IFS= read -r -d '' f; do
-    head -1 "${f}" | grep -q '^---$' || continue   # só files_hit com bloco de frontmatter
+    head -1 "${f}" | grep -q '^---$' || continue   # só arquivos com bloco de frontmatter
     awk '
       NR==1 && $0=="---" { infm=1; next }
       infm && $0=="---"  { exit }
@@ -2938,7 +2943,7 @@ _scan_relative_links() {
   # Extensão porta-de-framework (ADR onion-adr-family-repo-topology-2026-07 D4 + roles.yaml): um door
   # role-scoped (bundle 'standalone') SELA a meta-factory (commands/meta + agents/meta) e os verticais
   # não-base (design/development/quick commands; compliance/research agents; lint-selftest e demais
-  # validações meta). KBs de doutrina embarcados citam esses files_hit por link — ausentes-por-desenho no
+  # validações meta). KBs de doutrina embarcados citam esses arquivos por link — ausentes-por-desenho no
   # door, exatamente como os docs core-only. Só ATIVA quando o alvo está ausente ([ ! -e ] abaixo): num
   # adotante-cheio o alvo existe (nunca entra); no core (role: source) o guard nem roda. Backward-safe.
   local adopted=""; [ "${IS_DERIVED}" -eq 1 ] && adopted=1
@@ -3494,7 +3499,7 @@ check_migalhas_sync() {
   fi
   # here-string, NÃO pipe: `printf | head` movia o SIGPIPE do git p/ o printf e o
   # statement simples sob set -e MATAVA o lint inteiro com dist grande (rc=141 mudo,
-  # 10 regras silenciadas — medido pela re-revisão com 1500 files_hit). O here-string
+  # 10 regras silenciadas — medido pela re-revisão com 1500 arquivos). O here-string
   # não tem processo escritor para levar SIGPIPE.
   tracked="$(head -5 <<< "${tracked}")"
   if [ -n "${tracked}" ]; then
@@ -3683,7 +3688,7 @@ $(grep -vE '^[[:space:]]*(#|$)' "${_ct}" || true)"
 #
 # A derivação do `members.yaml` está certa (nome hardcoded num script é o próprio vazamento), mas
 # cliente NÃO REGISTRADO é invisível para ela. Medido 2026-09-14: o nome de um cliente de PoC
-# viajava em DOIS files_hit e a guarda nunca cobrou. Classe [[guarda-por-lista-falha-pelo-vocabulario]].
+# viajava em DOIS arquivos e a guarda nunca cobrou. Classe [[guarda-por-lista-falha-pelo-vocabulario]].
 #
 # ⚠️ POR QUE ESTA METADE É FUNÇÃO SEPARADA, e não um bloco no fim da irmã (defeito MEDIDO na
 # passada adversarial de 2026-09-14, e é a ironia exata da tese): escrita DENTRO de
@@ -4009,7 +4014,7 @@ PY
 #   Role-guard (espelha REGRA 22): num door role-scoped a meta-factory + verticais não-base são selados
 #   (ausentes-por-desenho) — pular SÓ o alvo-ausente nesses prefixos quando adopted/hub. Sem jq. [[fix-must-become-mechanism]]
 # ===========================================================================
-# Lista de files_hit da superfície de framework (honra --only via _find; CLAUDE.md tratado à parte
+# Lista de arquivos da superfície de framework (honra --only via _find; CLAUDE.md tratado à parte
 # por viver na raiz, fora das raízes de _find). Poda de worktrees vem de graça no _find.
 _backtick_ref_files() {
   if [ -z "${ONLY_PATH}" ] || [ "${ONLY_PATH}" = "${REPO_ROOT}/CLAUDE.md" ]; then

@@ -17029,16 +17029,16 @@ run_kg_read_leg_selftests() {
   local ob
   ob="$(printf '{"tool_name":"Bash","tool_input":{"command":"sed -n 1,40p docs/onion/graph/g.kg.yaml"}}' | bash "${hb}" 2>&1 || true)"
   if grep -q 'C_NO_DO_GRAFO' <<< "${ob}"; then
-    record_pass "kg-read-leg: (f) .kg.yaml DENTRO de comando bash → avisa (95,3% da superfície real)"
-  else record_fail "kg-read-leg: (f)" "mudo para quem trabalha por bash — a cura de 2026-09-19 regrediu: ${ob:0:200}"; fi
+    record_pass "kg-read-leg: (f2) .kg.yaml DENTRO de comando bash → avisa (95,3% da superfície real)"
+  else record_fail "kg-read-leg: (f2)" "mudo para quem trabalha por bash — a cura de 2026-09-19 regrediu: ${ob:0:200}"; fi
 
   # (g) E CALA NO BASH COMUM. Sem este caso a cura vira ruído: `Bash` é 86% de TODAS as chamadas
   #     desta base (16.338 de 19.084). Um hook que fala em toda chamada de shell é um hook que
   #     ninguém lê — e aí se perde o mecanismo E a informação.
   ob="$(printf '{"tool_name":"Bash","tool_input":{"command":"git status --porcelain"}}' | bash "${hb}" 2>&1 || true)"
   if [ -z "${ob}" ]; then
-    record_pass "kg-read-leg: (g) bash SEM .kg.yaml → mudo (a cura não vira ruído em 86% das chamadas)"
-  else record_fail "kg-read-leg: (g)" "falou num bash comum — vira ruído e o aviso perde valor: ${ob:0:200}"; fi
+    record_pass "kg-read-leg: (g2) bash SEM .kg.yaml → mudo (a cura não vira ruído em 86% das chamadas)"
+  else record_fail "kg-read-leg: (g2)" "falou num bash comum — vira ruído e o aviso perde valor: ${ob:0:200}"; fi
 
   # (h) RETROCOMPATIBILIDADE: o caminho antigo (`Read` com file_path) não pode ter sido quebrado
   #     pela cura. Meia-renomeação já matou este hook uma vez, com `unbound variable` no caso novo.
@@ -17046,6 +17046,44 @@ run_kg_read_leg_selftests() {
   if grep -q 'C_NO_DO_GRAFO' <<< "${ob}" && ! grep -qi 'unbound\|error' <<< "${ob}"; then
     record_pass "kg-read-leg: (h) o caminho Read segue funcionando (sem meia-renomeação)"
   else record_fail "kg-read-leg: (h)" "a cura quebrou o caminho original: ${ob:0:200}"; fi
+
+  # (j) O PREFILTRO EXISTE, E NENHUM TESTE O PRENDIA — mutante `M1` da passada adversarial de
+  #     2026-09-19: apagar o `case` inteiro deixava a bancada em 14/14 verde, e custava 8,7 ms →
+  #     36,3 ms por execução mais um `python3` por chamada. Vezes 16.338 chamadas Bash da base, ~7,5
+  #     min de latência pura — e o prefiltro é A ÚNICA justificativa para o hook rodar em 86% das
+  #     chamadas. Teste DETERMINÍSTICO, não por tempo: um `python3` falso que deixa MARCA. Se o
+  #     prefiltro funciona, a marca nunca nasce no caminho mudo.
+  local fakebin; fakebin="$(mktemp -d)"
+  printf '#!/bin/sh\ntouch "%s/CHAMOU"\nexit 0\n' "${fakebin}" > "${fakebin}/python3"
+  chmod +x "${fakebin}/python3"
+  PATH="${fakebin}:${PATH}" bash "${hb}" >/dev/null 2>&1 <<< '{"tool_name":"Bash","tool_input":{"command":"git status --porcelain"}}' || true
+  if [ ! -e "${fakebin}/CHAMOU" ]; then
+    record_pass "kg-read-leg: (j) caminho MUDO não chama python (o prefiltro que sustenta rodar em 86%)"
+  else record_fail "kg-read-leg: (j)" "o prefiltro sumiu — python é invocado em TODA chamada de shell (medido: 8,7ms → 36,3ms)"; fi
+  rm -f "${fakebin}/CHAMOU"
+  # e o contraprova: COM `.kg.yaml` no comando, o python TEM de ser chamado (senão o (j) passaria
+  # por um hook morto)
+  PATH="${fakebin}:${PATH}" bash "${hb}" >/dev/null 2>&1 <<< '{"tool_name":"Bash","tool_input":{"command":"sed -n 1,5p docs/onion/graph/g.kg.yaml"}}' || true
+  if [ -e "${fakebin}/CHAMOU" ]; then
+    record_pass "kg-read-leg: (j2) com .kg.yaml o parse ACONTECE (o (j) não passa por hook morto)"
+  else record_fail "kg-read-leg: (j2)" "o hook não parseia nem com .kg.yaml — está morto, e o (j) passaria vacuamente"; fi
+  rm -rf "${fakebin}"
+
+  # (k) A DEFESA DE PREFIXO, NA DIREÇÃO QUE IMPORTA — mutantes `M2`/`M2b`/`M2c`. O caso (d) testava
+  #     alvo MAIS LONGO que a entrada do índice, direção que nenhuma defesa precisa cobrir; os três
+  #     mutantes que afrouxam o casamento sobreviviam. A direção real é a inversa: o índice tem
+  #     `src/alvo.ts.bak` e lê-se `src/alvo.ts` — sem as duas âncoras (TAB no `grep -F` e `$1 == a`
+  #     no `awk`) o hook aponta nós DO ARQUIVO ERRADO.
+  local sbk; sbk="$(mktemp -d)"
+  mkdir -p "${sbk}/.claude/hooks" "${sbk}/docs/onion"
+  cp "${REPO_ROOT}/.claude/hooks/kg-read-leg.sh" "${sbk}/.claude/hooks/"
+  printf 'src/alvo.ts.bak\tC_NO_DO_BAK\tdocs/onion/graph/g.kg.yaml\n' > "${sbk}/docs/onion/kg-read-index.tsv"
+  local ok
+  ok="$(printf '{"tool_name":"Read","tool_input":{"file_path":"%s/src/alvo.ts"}}' "${sbk}" | bash "${sbk}/.claude/hooks/kg-read-leg.sh" 2>&1 || true)"
+  if [ -z "${ok}" ]; then
+    record_pass "kg-read-leg: (k) índice com .bak NÃO casa o arquivo curto (âncora de campo viva)"
+  else record_fail "kg-read-leg: (k)" "apontou nó de OUTRO arquivo por prefixo frouxo: ${ok:0:200}"; fi
+  rm -rf "${sbk}"
 
   # (i) MÚLTIPLOS caminhos num só comando (`diff a.kg.yaml b.kg.yaml`). A 1ª redação tratava o
   #     alvo como string única: com dois caminhos ela casaria ZERO e o hook voltaria a ser mudo —
