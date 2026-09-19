@@ -54,12 +54,12 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **295** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **296** | `bash .claude/validation/review-ledger.sh --env` |
 | Achados totais | **1596** | `bash .claude/validation/review-ledger.sh --env` |
 | Achados REAIS | **1359** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **85%** | `bash .claude/validation/review-ledger.sh --env` |
 | Tokens por achado REAL | **94183** | `bash .claude/validation/review-ledger.sh --env` |
-| Vereditos no vocabulário | **205** | `bash .claude/validation/review-ledger.sh --env` |
+| Vereditos no vocabulário | **206** | `bash .claude/validation/review-ledger.sh --env` |
 | — legado (texto livre) | **90** | `bash .claude/validation/review-ledger.sh --env` |
 
 A média de tokens cobre os **183** resíduos com custo > 0; os demais declaram `tokens: 0`
