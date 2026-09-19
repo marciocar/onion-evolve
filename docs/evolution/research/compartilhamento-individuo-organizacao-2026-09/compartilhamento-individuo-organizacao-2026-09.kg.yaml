@@ -12,7 +12,8 @@ meta:
                              # ANPD ou do TST sobre monitoramento de empregado, ou mudança do piso de grupo
                              # em Viva/Glean.
   # kg-backlog-guard: on
-  # ═══ TETO: 119 NOS (era 116: +3 pelo selo de F1+F2 em 2026-09-18 — a medicao que faltava chegou de PRODUTO VIVO, pelo banco de provas de um adotante, e com ela a base probatoria virou TRIPLA: teoria + primaria de fornecedor + produto. O terceiro no abre a FRONTEIRA que a E2 nao cobre e que nenhuma das duas emendas resolve) (era 115: +1 pelo selo das quatro emendas a C, 2026-09-14) (era 89, era 25). A RODADA 3 — primárias nomeadas sobre os QUATRO alvos que o
+  # ═══ TETO: 121 NOS (era 119: +2 pela PROPOSTA de saida para Q_FRONTEIRA — o no de decisao e a objecao
+  #     sobrevivente a ela, que por doutrina se preserva em vez de descartar) (era 116: +3 pelo selo de F1+F2 em 2026-09-18 — a medicao que faltava chegou de PRODUTO VIVO, pelo banco de provas de um adotante, e com ela a base probatoria virou TRIPLA: teoria + primaria de fornecedor + produto. O terceiro no abre a FRONTEIRA que a E2 nao cobre e que nenhuma das duas emendas resolve) (era 115: +1 pelo selo das quatro emendas a C, 2026-09-14) (era 89, era 25). A RODADA 3 — primárias nomeadas sobre os QUATRO alvos que o
   #     Elenxo da rodada 2 deixou abertos — FOI EXECUTADA em 2026-09-13 e apendou 25 nós: os 4 claims
   #     do acórdão do TST sobre e-mail corporativo (ancorados SEM quote e SEM locator, tier rebaixado
   #     a 5 — a lacuna "TST por notícia" NÃO fechou, só se deslocou), a ausência medida de sanção da
@@ -1665,6 +1666,24 @@ nodes:
     label: 'AS QUATRO EMENDAS A C, AGORA PARTE DELA. (E1) A FINALIDADE DECLARADA NAO E PROTECAO: C50 mede que finalidade comunicada quase nao move atitude, desempenho nem estresse, e o TJUE (C-34/21 §61/§71/§81) diz que regra que so reitera finalidade e necessidade nao tem conteudo normativo proprio — C carrega conteudo CONCRETO (limiar, budget de consultas, denylist de predicados, masking) ou e decorativa pelos dois padroes. (E2) A ALAVANCA QUE MEDE E O CONTROLE DO ALVO: C48 mostra que constraints/controle e a UNICA caracteristica com efeito positivo medido (mais justica e autonomia percebidas, menos invasao) — C ganha botao sobre COMO e QUANDO (escopo, janela, inspecao, veto), nao so finalidade e egresso por predicado. (E3) NOTIFICACAO PREVIA CAI DE PORTAO A SALVAGUARDA obrigatoria porem insuficiente (C7 da ANPD: politica previa nao cura o excesso; C20 Lopez Ribalda II: notificacao e um criterio entre outros) — o portao passa a ser NECESSIDADE + MINIMIZACAO. (E4) REGIME DE EXCECAO INVESTIGATIVA: a Grande Camara admite vigilancia OCULTA sob suspeita razoavel de falta grave (C21); C cria modo investigativo GATED, LOGADO e REVISAVEL ex post — mecanismo sem porta de excecao e contornado no primeiro incidente, com cobertura jurisprudencial. Vale junto o LIMITE DURO BR ja selado: o Exemplo 7 do guia da ANPD reprova rastreio de atividade/produtividade de empregado sob legitimo interesse, logo o canal individuo->organizacao nao carrega telemetria de atividade em NENHUM grau de agregacao — `so predicado provado` le-se como predicado sobre ARTEFATO DE TRABALHO E DECISAO.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/SYNTHESIS.md'
 
+  - id: D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    trace: 'docs/evolution/inbox/2026-09-15-banco-de-provas-quatro-ataques-resultado.md'
+    verified_against: 'PROPOSTA, nao selada — derivada do proprio Q_FRONTEIRA e do corpus (PO_INFERENCIA / Contextual Integrity, E_CORPUS_SILENCIOSO_SOBRE_CONTRAPODER, E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR). Nenhuma medicao NOVA foi feita para ela: o que existe e o banco de provas do adotante, que mede o ATAQUE, nao o desenho proposto'
+    label: 'A PREMISSA DO DILEMA NAO SE SUSTENTA, E E AI QUE ELE SE DISSOLVE. Q_FRONTEIRA afirma que controle e valor sao A MESMA ALAVANCA em sentidos opostos. Mas no ataque MEDIDO quem fica exposto e QUEM SE OFERECEU PARA AJUDAR — deduzido por eliminacao num time de 3 — e essa pessoa QUER ser reconhecida: o controle DELA sobre o proprio nome e gratuito, exatamente como a E2 pressupoe. Quem paga o controle e QUEM PEDIU AJUDA, que nem e o beneficiario do reconhecimento. A contradicao nasce de o desenho FUNDIR duas coisas que o corpus ja separa em PO_INFERENCIA (Contextual Integrity): RECONHECIMENTO e direcionado (quem foi ajudado sabe quem ajudou); IDENTIFICACAO POR TERCEIRO e o que vaza. O contador nunca foi o reconhecimento — e artefato de UI mostrando contagem VIVA num pedido ABERTO; o reconhecimento acontece na ACEITACAO. PROPOSTA EM QUATRO CAMADAS: (1) o contador vira ESTADO, nao numero (`aberto` / `alguem ja se ofereceu` / `atendido`) — nao e ruido, e a maquina de estados honesta, e mata a subtracao na ORIGEM sem custar reconhecimento nenhum, porque a contagem nunca foi o valor: o valor e o agradecimento; (2) o reconhecimento e NOMINAL E DIRECIONADO — ao aceitar, quem ajudou e nomeado PARA QUEM PEDIU e no registro do proprio autor, consensual, sem terceiro deduzindo; (3) o controle vira RAIO, NAO VETO — quem ajudou escolhe se o reconhecimento sai do par para um circulo ou para o time, default estreito, expansivel SO pelo individuo e NUNCA pela organizacao; (4) o ledger de budget (F1) fica como defesa em profundidade, porque ataca COMPOSICAO, que sobrevive a qualquer escolha de UI — mais o item de graca que o adotante ja identificou: truncar o carimbo de hora para o DIA, sem perda de funcao. POR QUE A CAMADA 3 E A QUE IMPORTA PARA A DOUTRINA: ela fecha o ponto cego que o proprio corpus nomeia em E_CORPUS_SILENCIOSO_SOBRE_CONTRAPODER (zero opt-out, zero recusa) — dar o raio ao INDIVIDUO e nega-lo a ORGANIZACAO e o contrapoder concreto que faltava, coerente com a assimetria que a opcao C declara nao-negociavel para baixo no BR. POR QUE NAO A OPCAO 3 DO ADOTANTE (ruido/faixa no contador): por duas razoes independentes — por ruido num contador que NAO DEVERIA resolver para identidade e tratar o sintoma no lugar errado; e ruido sem EPSILON declarado e exatamente o que F2 acabou de barrar. O QUE ESTA PROPOSTA NAO RESOLVE, declarado para nao virar promessa: um time de 3 com participacao COMPLETA ainda permite inferencia SOCIAL fora do produto ("so nos tres estamos aqui") — nenhuma escolha de UI cobre isso; e o teto que o ledger MEDE E LIMITA, nao elimina. SELO: do maestro. Este no nasce `open` e e PROPOSTA; nenhuma medicao nova o apoia.'
+
+  - id: C_OBJECAO_ESTADO_PODE_NAO_BASTAR_EM_TIME_MINIMO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: 'OBJECAO SOBREVIVENTE A PROPRIA PROPOSTA, preservada em vez de descartada. Trocar o contador por ESTADO mata a subtracao pelo NUMERO, mas num time de 3 o estado `alguem ja se ofereceu` somado a `offered_by_me = false` e a regra de que quem pede nao oferta no proprio pedido AINDA DEIXA UM NOME — o conjunto elegivel tem tamanho 1. A camada (1) reduz a banda do vazamento (de contagem exata para binario), nao a zera. Quem fecha isso e a camada (4), o ledger de budget, porque o ataque precisa de DUAS LEITURAS: e por isso que a proposta as lista JUNTAS e nao como alternativas. SE o maestro selar so a (1), a proposta entrega menos do que parece — e esta objecao existe para que isso nao passe despercebido no selo.'
+
 edges:
   - from: E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR
     to: D_R3_F1_F2_SELADAS
@@ -2311,4 +2330,13 @@ edges:
     edge_type: SUPERSEDES
   - from: D_R2_EMENDAS_A_C_SELADAS
     to: C_OPCAO_C_PURPOSE_BOUND_ASYMMETRIC_FLOW
+    edge_type: CONSTRAINS
+  - from: Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL
+    to: D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA
+    edge_type: DEPENDS_ON
+  - from: E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR
+    to: D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA
+    edge_type: SUPPORTS
+  - from: C_OBJECAO_ESTADO_PODE_NAO_BASTAR_EM_TIME_MINIMO
+    to: D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA
     edge_type: CONSTRAINS

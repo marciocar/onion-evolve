@@ -5,15 +5,17 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**204 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 46 grupo(s), agrupados por `owner:` (8 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**206 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 46 grupo(s), agrupados por `owner:` (8 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
-## compartilhamento-individuo-organizacao-2026-09 — 3 item(ns)
+## compartilhamento-individuo-organizacao-2026-09 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 135.0 | `Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE` | compartilhamento-individuo-organizacao-2026-09 | No contexto de EMPREGO (relacao de poder assimetrica), qual e o criterio operacional que separa o compartilhamento LEGITIMO e indi |
 | 27.5 | `Q_R3_EMENDAS_DE_MECANISMO_AO_DESENHO_DE_C` | compartilhamento-individuo-organizacao-2026-09 | TRES EMENDAS DE MECANISMO PROPOSTAS AO DESENHO DA OPCAO C, com evidencia ancorada nesta rodada — o maestro decide; D_INDIVIDUAL_ |
-| 8.5 | `Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL` | compartilhamento-individuo-organizacao-2026-09 | A FRONTEIRA QUE A E2 NAO COBRE, E ELA E NOVA. A E2 diz que a alavanca que mede e o CONTROLE DO ALVO. O adotante devolveu: num dese |
+| 16.0 | `D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA` | compartilhamento-individuo-organizacao-2026-09 | A PREMISSA DO DILEMA NAO SE SUSTENTA, E E AI QUE ELE SE DISSOLVE. Q_FRONTEIRA afirma que controle e valor sao A MESMA ALAVANCA em  |
+| 12.8 | `Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL` | compartilhamento-individuo-organizacao-2026-09 | A FRONTEIRA QUE A E2 NAO COBRE, E ELA E NOVA. A E2 diz que a alavanca que mede e o CONTROLE DO ALVO. O adotante devolveu: num dese |
+| 5.6 | `C_OBJECAO_ESTADO_PODE_NAO_BASTAR_EM_TIME_MINIMO` | compartilhamento-individuo-organizacao-2026-09 | OBJECAO SOBREVIVENTE A PROPRIA PROPOSTA, preservada em vez de descartada. Trocar o contador por ESTADO mata a subtracao pelo NUMER |
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
