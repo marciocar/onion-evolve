@@ -291,7 +291,7 @@ members:
     parent: onion-evolve
     remote: n/a                 # repo LOCAL; o remoto privado é ato do maestro (outward-facing)
     local_path: "/home/marcio/vendas-pdi-enterprise"
-    onion_version: f5ec0dcf2dfb # pin da adoção 2026-09-17, commit MERGEADO em main
+    onion_version: 24118c5d7a97 # ATUALIZADO 2026-09-18 (commit cf20e30 no alvo, empurrado): o registro seguia no pin da adoção enquanto o alvo já rodava o framework novo — atualizar sem avançar o registro deixa a federação medindo contra o passado
     adopted_at: 2026-09-17
     mode: greenfield            # repo novo; gate PROVADO por execução: lint 0 HARD / 8 SOFT
     # ⚠️ CONFIDENCIALIDADE — material do cliente sob NDA vive em `material/`, IGNORADO pelo git
@@ -323,7 +323,7 @@ members:
     #    orfao unico + force-push, e nao ha nada a preservar nisso. LIMITE DECLARADO: o objeto antigo
     #    segue acessivel por SHA ate o GC do GitHub, e quem clonou tem copia — o force-push torna
     #    INALCANCAVEL, nunca inexistente.
-    onion_version: 24118c5d7a97   # pin da 7a materializacao (2026-09-18) — leva do #848 (cura do fail-open do proprio script de publicacao); porta verificada em 0 HARD, 0 termo de cliente e 5 projecoes regeneradas
+    onion_version: adbd6e91b8e0   # pin da 8a materializacao (2026-09-19) — leva do #849 (porteiro IS_DERIVED volta a julgar o papel standalone); porta verificada em 0 HARD e 0 termo de cliente no remoto
     adopted_at: 2026-09-17
     mode: greenfield            # repo vazio -> materializacao pelo manifesto (nunca copia de disco)
     # ⚠️ A PORTA NASCE COM 22 HARD DA REGRA 45, E ISSO E O ESTADO VERDADEIRO, NAO REGRESSAO. A
