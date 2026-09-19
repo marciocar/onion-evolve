@@ -100,6 +100,8 @@
 .claude/hooks/bash-empty-result-guard.sh	E_POSTTOOLUSE_E_SINAL_POS_FATO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_session_hook_pulls	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_timeout_is_load_bearing	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+.claude/hooks/kg-read-leg.sh	E_PERNA_DE_LEITURA_E_CEGA_A_BASH	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/hooks/kg-read-leg.sh	Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_BURACO_INVOLUCROS_NOS_DOIS_VETOS	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_CURA_LIB_INVOCACAO_PARTILHADA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_ESCADA_DE_MODELOS_IMPLEMENTADA_0903	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
@@ -1150,6 +1152,7 @@ docs/evolution/federation/outbox/metagamify/_processed/2026-06-27-s1-toolbox-res
 docs/evolution/federation/outbox/metagamify/_processed/2026-07-18-ingestor-doutrina-granaai.md	C_ANNOUNCE_BACKLOG	docs/onion/graph/federation-health-2026-07.kg.yaml
 docs/evolution/federation/outbox/metagamify/_processed/2026-07-27-resposta-base-cruzada-vendor.md	C_test_is_ancestry	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
 docs/evolution/inbox/	E_DEZ_SINAIS_TRIADOS_COM_MEDICAO	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
+docs/evolution/inbox/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/inbox/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/inbox/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/inbox/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
@@ -1220,6 +1223,7 @@ docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartil
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	E_OBJECTION_MANDATORY_AXES_UNCOVERED	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	E_R2_LACUNAS_RODADA_COMPLEMENTAR_0913	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	E_R3_LACUNAS_RODADA_PRIMARIAS_0913	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
+docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	E_REFUTACAO_DA_PROPOSTA_DE_RAIO	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	Q_R2_REVISAO_DO_SELO_C	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	Q_R3_EMENDAS_DE_MECANISMO_AO_DESENHO_DE_C	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
