@@ -30,7 +30,7 @@ field() { grep -m1 "^$1:" "${STAMP}" 2>/dev/null | sed "s/^$1:[[:space:]]*//" ||
 ROLE="$(field role)"; OLD_FROM="$(field adopted_from)"; FW="$(field framework)"
 case "${ROLE}" in
   source)      echo "Já é fonte (role: source) — nada a desacoplar." >&2; exit 1 ;;
-  adopted|hub) : ;;
+  adopted|hub|standalone) : ;;   # `standalone` faltava: papel EMITIDO pelo write-stamp.sh:79 era tratado como 'inesperado' (6o sitio, achado 2026-09-18)
   *)           echo "ERRO: role inesperado no stamp: '${ROLE}'." >&2; exit 2 ;;
 esac
 

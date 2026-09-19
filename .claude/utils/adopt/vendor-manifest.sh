@@ -124,6 +124,16 @@ _base=(.claude/agents .claude/commands .claude/skills .claude/utils .claude/vali
 # cortados por esta mesma funcao. O comando nasce MORTO no consumidor: a skill esta la, o motor nao.
 # E `onion-publish` e declarada core-only na propria doutrina do repo (CLAUDE.md), o que torna a
 # omissao ainda mais clara — nao era duvida de desenho, era item que ninguem lembrou de acrescentar.
+# ⚠️ SO `onion-publish` SAI — E A 1a REDACAO CORTAVA TRES. A passada adversarial derrubou o corte de
+# `onion-wizard` e `onion-onboarding`, e o argumento e melhor que o meu: elas sao o CONDUTOR e o
+# ENSINO do papel, e cortá-las para calar um lint e trocar capacidade por verde. Provas que ela
+# trouxe: (1) QUATRO arquivos que viajam continuam citando as duas em PROSA — entre eles
+# `onion-guided-lifecycle.md`, que descreve a vertical de conducao inteira em termos delas —, entao
+# a porta ganharia uma KB ensinando um caminho de entrada que ela nao tem; (2) o lint NAO pega isso
+# (nao sao caminhos em backtick), logo "0 HARD" ali NAO era evidencia de ausencia; (3) ao contrario
+# de `onion-publish`, `onion-onboarding` NAO e declarada core-only em doutrina nenhuma.
+# O ponteiro morto de `onion-wizard/SKILL.md:50` volta, e a cura dele e ROLE-AWARE no texto da skill
+# (dizer que a transicao `adopt` so existe onde a meta-fabrica existe), nao deletar a skill.
 # A LICAO DE FORMA: lista de exclusao escrita A MAO envelhece pelo que se ACRESCENTA depois dela.
 # Os motores foram cortados quando existiam; as skills nasceram depois e ninguem voltou aqui. Uma
 # derivacao (cortar a skill cujo `trace`/allowed-tools aponta para caminho cortado) seria imune a
@@ -141,9 +151,7 @@ _role_cut() {  # $1=papel → subcaminhos a cortar, um por linha (vazio = nada a
         .claude/utils/vertical/ \
         .claude/utils/federation-transport/ \
         .claude/validation/federation- \
-        .claude/skills/onion-publish/ \
-        .claude/skills/onion-wizard/ \
-        .claude/skills/onion-onboarding/
+        .claude/skills/onion-publish/
       ;;
     *) : ;;
   esac

@@ -16810,31 +16810,74 @@ run_role_vocabulary_selftests() {
 
   # os predicados que julgam "derivado?" — arquivo:âncora. Cada um TEM de conter todos os papéis
   # não-fonte. `source` nunca entra: é a fonte, e o predicado existe para distingui-la.
+  # ⚠️ A ALTERNACAO, NUNCA A LINHA INTEIRA — e a 1a redacao casava a linha, o que a cegava no papel
+  # que mais importa. O predicado da escada e `local adopted=""; grep -qE '^(role: (adopted|hub...`:
+  # procurar `adopted` na LINHA casava o NOME DA VARIAVEL, entao tirar `adopted` da alternacao
+  # passava despercebido — justamente o papel de todos os adotantes reais. Agora o caso extrai a
+  # ALTERNACAO `(a|b|c)` de dentro do predicado e julga so ela. Achado da passada adversarial.
   local _sites="\
-.claude/validation/lint-artifacts.sh|IS_DERIVED=0;
 .claude/validation/ladder-integrity-check.sh|local adopted=\"\"; grep -qE
 .claude/validation/review-artifact-check.sh|^if grep -qE .\^.role:
-.claude/utils/co-evolution/co-deliver.sh|^if ! grep -qE"
+.claude/utils/co-evolution/co-deliver.sh|^if ! grep -qE
+.claude/utils/adopt/decouple-source.sh|^  adopted[|]"
   local _r _f _anchor _line _fails=0 _checked=0
   while IFS='|' read -r _f _anchor; do
     [ -n "${_f}" ] || continue
     [ -f "${REPO_ROOT}/${_f}" ] || { record_fail "papel-vocab: ${_f}" "sítio de julgamento AUSENTE — o caso aponta para arquivo que não existe"; _fails=1; continue; }
-    _line="$(grep -nE "${_anchor}" "${REPO_ROOT}/${_f}" | grep -E 'role:' | head -1)"
+    # ⚠️ SEM o filtro `grep role:` (o `decouple-source.sh` julga por `case` no VALOR do papel, e a
+    # linha nao contem a string `role:` — o filtro o descartava) e COM `|| true` (atribuicao que
+    # recebe rc=1 mata a suite sob `set -e`, e os casos seguintes nunca rodam). Os dois defeitos
+    # sairam na mesma linha, e o segundo escondia o primeiro: a bancada abortava antes de dizer qual
+    # sitio ela nao achou.
+    _line="$(grep -nE "${_anchor}" "${REPO_ROOT}/${_f}" | head -1 || true)"
     if [ -z "${_line}" ]; then
       record_fail "papel-vocab: ${_f}" "não achei o predicado de papel pela âncora — ele mudou de forma e este caso ficou cego"
       _fails=1; continue
     fi
     _checked=$((_checked + 1))
+    # extrai a ALTERNACAO do predicado — `(a|b|c)` — e ignora o resto da linha (nomes de variavel,
+    # prosa, o proprio `grep -qE`). Sem isto o caso casa `adopted` na variavel `local adopted=""`.
+    # `|| true`: sob `set -e`, um `grep` que nao casa (rc=1) numa atribuicao MATA A SUITE inteira, e
+    # os casos seguintes nunca rodam — a saida fica verde por omissao. Classe ja paga nesta casa.
+    # DUAS FORMAS legitimas de alternacao de papel nesta casa, e o caso conhece as duas: a do regex
+    # (`(a|b|c)`, nos `grep -qE` do stamp) e a do `case` (`a|b|c)`, sem parentese de abertura). A 1a
+    # redacao so conhecia a primeira e acusava o `decouple-source.sh` de ter "mudado de forma" —
+    # quando quem nao conhecia a forma era o caso.
+    local _alt; _alt="$(grep -oE '\(?[a-z]+(\|[a-z]+)+\)' <<< "${_line}" | head -1 || true)"
+    if [ -z "${_alt}" ]; then
+      record_fail "papel-vocab: ${_f}" "não achei a ALTERNAÇÃO de papéis no predicado — a forma mudou e o caso ficaria cego casando a linha inteira"
+      _fails=1; continue
+    fi
     for _r in $(tr '|' ' ' <<< "${_roles}"); do
       [ "${_r}" = "source" ] && continue
-      grep -q "${_r}" <<< "${_line}" || {
+      grep -q "${_r}" <<< "${_alt}" || {
         record_fail "papel-vocab: ${_f}" "o predicado de papel NÃO conhece '${_r}' (papel válido em write-stamp.sh) — repo com esse papel seria julgado como FONTE"
         _fails=1
       }
     done
   done <<< "${_sites}"
+  # ⚠️ E O PORTEIRO E O CASO INVERSO — a EXCLUSAO tambem e decisao, e decisao ganha catraca.
+  # `IS_DERIVED` (lint-artifacts.sh) NAO e "que papel e este": dezenove sitios o consomem, dezessete
+  # como `[ "${IS_DERIVED}" -eq 1 ] && return 0`. Acrescentar `standalone` ali DESLIGA dezessete
+  # guardas — medido em 2026-09-18: a mesma arvore, so trocando o carimbo `standalone`→`source`, ia
+  # de 0 HARD para 3. Uma porta publica com a biografia do core no painel passaria em 0 HARD.
+  # Este caso PRENDE a exclusao: quem "consertar" o porteiro acrescentando o papel cai aqui e le o
+  # porque. Sem ele, a cura de hoje seria desfeita amanha por alguem seguindo a regra geral.
+  local _gk _gk_line
+  _gk="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  _gk_line="$(grep -E '^IS_DERIVED=0;' "${_gk}" | head -1 || true)"
+  if [ -z "${_gk_line}" ]; then
+    record_fail "papel-vocab: porteiro" "não achei a linha `IS_DERIVED=0;` — o porteiro mudou de forma e este caso ficou cego"
+    _fails=1
+  elif grep -q 'standalone' <<< "${_gk_line}"; then
+    record_fail "papel-vocab: porteiro" "IS_DERIVED voltou a incluir 'standalone' — isso DESLIGA ~17 guardas num repo standalone (medido: 3 HARD viram 0). A isenção por papel vale nos predicados de EVIDÊNCIA core-privada, não no porteiro."
+    _fails=1
+  else
+    record_pass "papel-vocab: o porteiro IS_DERIVED segue SEM 'standalone' (a porta é julgada, não isenta)"
+  fi
+
   if [ "${_fails}" -eq 0 ] && [ "${_checked}" -ge 4 ]; then
-    record_pass "papel-vocab: os ${_checked} predicados de 'derivado?' conhecem TODOS os papéis da SSOT"
+    record_pass "papel-vocab: os ${_checked} predicados de papel conhecem TODOS os papéis da SSOT (alternação, não a linha)"
   elif [ "${_fails}" -eq 0 ]; then
     record_fail "papel-vocab: cobertura" "só ${_checked} sítio(s) julgados — o caso deveria cobrir 4; sítio some em silêncio"
   fi
