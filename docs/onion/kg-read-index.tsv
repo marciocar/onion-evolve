@@ -100,6 +100,7 @@
 .claude/hooks/bash-empty-result-guard.sh	E_POSTTOOLUSE_E_SINAL_POS_FATO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_session_hook_pulls	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_timeout_is_load_bearing	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+.claude/hooks/kg-read-leg.sh	E_MEDICAO_READ_VS_BASH_NO_CORPUS_DE_TRANSCRICOES	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_PERNA_DE_LEITURA_E_CEGA_A_BASH	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/kg-read-leg.sh	Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_BURACO_INVOLUCROS_NOS_DOIS_VETOS	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml

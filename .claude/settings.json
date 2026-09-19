@@ -138,7 +138,7 @@
         ]
       },
       {
-        "matcher": "Read",
+        "matcher": "Read|Edit|Write|Bash",
         "hooks": [
           {
             "type": "command",
