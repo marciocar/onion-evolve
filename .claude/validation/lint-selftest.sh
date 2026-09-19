@@ -16888,6 +16888,60 @@ run_role_vocabulary_selftests() {
 # num corpus que tinha a resposta em quatro nós de um grafo que ela mesma citou. A bancada aqui
 # prova as três coisas que o hook promete: FALA quando há nó, CALA quando não há, e não quebra
 # quando o índice some. O caso (d) é o que impede a fraude mais barata — um hook que fala sempre.
+# ── REGRA 87 — PR que edita `.kg.yaml` enxergou os `confirmed` dele ────────────────────────────
+# Nasceu do incidente de 2026-09-19: uma proposta SELADA caiu contra dois nós `confirmed` do arquivo
+# que estava sendo editado. É a segunda camada do hook da perna de leitura — o hook avisa no meio de
+# 16 mil chamadas de shell; esta avisa no PR, onde ainda dá tempo de voltar.
+run_kg_edit_confirmed_selftests() {
+  local fn; fn="$(mktemp)"
+  sed -n "/^check_kg_edit_saw_confirmed() {/,/^}/p" "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" > "${fn}"
+  if [ ! -s "${fn}" ]; then record_fail "r87" "não consegui extrair check_kg_edit_saw_confirmed — a guarda sumiu ou mudou de nome"; rm -f "${fn}"; return; fi
+
+  local d; d="$(mktemp -d)"
+  git init -q "${d}"; git -C "${d}" config user.email t@t; git -C "${d}" config user.name t
+  mkdir -p "${d}/docs/onion/graph" "${d}/docs/evolution/review"
+  printf 'meta:\n  id: g\nnodes:\n  - id: C_JA_RESPONDIDO\n    node_type: claim\n    status: confirmed\n    impact: 5\n    confidence: 0.9\n    label: x\nedges: []\n' \
+    > "${d}/docs/onion/graph/g.kg.yaml"
+  git -C "${d}" add -A >/dev/null 2>&1; git -C "${d}" commit -qm base >/dev/null 2>&1
+  git -C "${d}" branch -M main >/dev/null 2>&1; git -C "${d}" checkout -qb feat/x >/dev/null 2>&1
+  git -C "${d}" update-ref refs/remotes/origin/main refs/heads/main
+  printf '\n  # mudanca\n' >> "${d}/docs/onion/graph/g.kg.yaml"
+
+  local runner; runner="$(mktemp)"
+  printf '%s\n' 'set -uo pipefail' "REPO_ROOT=\"${d}\"" \
+    'violation() { printf "VIOLATION[%s] %s: %s\n" "$1" "$2" "$3"; }' \
+    "source ${fn}" 'check_kg_edit_saw_confirmed' > "${runner}"
+
+  # (a) resíduo que NÃO cita o `confirmed` → avisa, e NOMEIA o arquivo e o nó
+  printf -- '---\ntitle: r\n---\nsem citar nada\n' > "${d}/docs/evolution/review/feat-x.md"
+  git -C "${d}" add -A >/dev/null 2>&1; git -C "${d}" commit -qm edita >/dev/null 2>&1
+  local out; out="$(bash "${runner}" 2>&1 || true)"
+  if grep -q 'C_JA_RESPONDIDO' <<< "${out}" && grep -q 'g.kg.yaml' <<< "${out}"; then
+    record_pass "r87: (a) resíduo sem citar o confirmed → avisa NOMEANDO arquivo e nó"
+  else record_fail "r87: (a)" "não nomeou arquivo+nó (a 1ª redação imprimia o arquivo VAZIO): ${out:0:200}"; fi
+
+  # (b) CONTROLE NEGATIVO — resíduo que CITA o nó → cala. Sem este caso a guarda "sempre fala",
+  #     que é a fraude mais barata de um aviso.
+  printf -- '---\ntitle: r\n---\nConsultei C_JA_RESPONDIDO antes de propor.\n' > "${d}/docs/evolution/review/feat-x.md"
+  git -C "${d}" add -A >/dev/null 2>&1; git -C "${d}" commit -qm cita >/dev/null 2>&1
+  out="$(bash "${runner}" 2>&1 || true)"
+  if [ -z "${out}" ]; then
+    record_pass "r87: (b) resíduo que CITA o nó → cala (não é guarda que fala sempre)"
+  else record_fail "r87: (b)" "falou mesmo com o nó citado: ${out:0:200}"; fi
+
+  # (c) SEM-OBJETO — PR que não toca `.kg.yaml` não é julgado
+  git -C "${d}" checkout -q feat/x
+  git -C "${d}" checkout -q main -- docs/onion/graph/g.kg.yaml 2>/dev/null || true
+  printf 'nada\n' > "${d}/outro.txt"; git -C "${d}" add -A >/dev/null 2>&1
+  git -C "${d}" commit -qm 'sem grafo' >/dev/null 2>&1
+  out="$(bash "${runner}" 2>&1 || true)"
+  if [ -z "${out}" ]; then
+    record_pass "r87: (c) PR que não toca grafo → SEM-OBJETO, silêncio correto"
+  else record_fail "r87: (c)" "julgou PR sem grafo: ${out:0:200}"; fi
+
+  rm -rf "${d}"; rm -f "${fn}" "${runner}"
+}
+
 run_kg_read_leg_selftests() {
   local sb2 out h idx
   sb2="$(mktemp -d)"
@@ -16955,6 +17009,53 @@ run_kg_read_leg_selftests() {
   if [ -z "${out}" ]; then record_pass "kg-read-leg: (e) sem índice degrada calado (quem cobra é a REGRA 84)"
   else record_fail "kg-read-leg: (e)" "sem índice produziu saída: ${out:0:120}"; fi
   rm -rf "${sb2}"
+
+  # ── (f..i) A PERNA ALCANÇA QUEM TRABALHA POR BASH — medido, não suposto ─────────────────────
+  # Em 2026-09-19, sobre 29 transcrições desta base (19.084 chamadas de ferramenta): das 2.457
+  # interações que TOCAM um `.kg.yaml`, **2.341 são Bash (95,3%)**, 83 Edit, 16 Write e **17 Read
+  # (0,7%)**. O hook vigiava zero-vírgula-sete por cento da superfície — e calava justamente para
+  # quem ESCREVE no grafo, que trabalha por sed/grep/heredoc. O preço: uma proposta selada pelo
+  # maestro caiu contra dois nós `confirmed` do arquivo que estava sendo editado.
+  local sbb; sbb="$(mktemp -d)"
+  mkdir -p "${sbb}/.claude/hooks" "${sbb}/docs/onion"
+  cp "${REPO_ROOT}/.claude/hooks/kg-read-leg.sh" "${sbb}/.claude/hooks/"
+  local hb="${sbb}/.claude/hooks/kg-read-leg.sh"
+  printf 'docs/onion/graph/g.kg.yaml\tC_NO_DO_GRAFO\tdocs/onion/graph/g.kg.yaml\n' \
+    > "${sbb}/docs/onion/kg-read-index.tsv"
+  printf 'outro/arq.kg.yaml\tC_NO_DO_OUTRO\tdocs/onion/graph/g.kg.yaml\n' \
+    >> "${sbb}/docs/onion/kg-read-index.tsv"
+
+  # (f) O CASO QUE A CURA EXISTE PARA COBRIR: `.kg.yaml` DENTRO de um comando bash.
+  local ob
+  ob="$(printf '{"tool_name":"Bash","tool_input":{"command":"sed -n 1,40p docs/onion/graph/g.kg.yaml"}}' | bash "${hb}" 2>&1 || true)"
+  if grep -q 'C_NO_DO_GRAFO' <<< "${ob}"; then
+    record_pass "kg-read-leg: (f) .kg.yaml DENTRO de comando bash → avisa (95,3% da superfície real)"
+  else record_fail "kg-read-leg: (f)" "mudo para quem trabalha por bash — a cura de 2026-09-19 regrediu: ${ob:0:200}"; fi
+
+  # (g) E CALA NO BASH COMUM. Sem este caso a cura vira ruído: `Bash` é 86% de TODAS as chamadas
+  #     desta base (16.338 de 19.084). Um hook que fala em toda chamada de shell é um hook que
+  #     ninguém lê — e aí se perde o mecanismo E a informação.
+  ob="$(printf '{"tool_name":"Bash","tool_input":{"command":"git status --porcelain"}}' | bash "${hb}" 2>&1 || true)"
+  if [ -z "${ob}" ]; then
+    record_pass "kg-read-leg: (g) bash SEM .kg.yaml → mudo (a cura não vira ruído em 86% das chamadas)"
+  else record_fail "kg-read-leg: (g)" "falou num bash comum — vira ruído e o aviso perde valor: ${ob:0:200}"; fi
+
+  # (h) RETROCOMPATIBILIDADE: o caminho antigo (`Read` com file_path) não pode ter sido quebrado
+  #     pela cura. Meia-renomeação já matou este hook uma vez, com `unbound variable` no caso novo.
+  ob="$(printf '{"tool_name":"Read","tool_input":{"file_path":"%s/docs/onion/graph/g.kg.yaml"}}' "${sbb}" | bash "${hb}" 2>&1 || true)"
+  if grep -q 'C_NO_DO_GRAFO' <<< "${ob}" && ! grep -qi 'unbound\|error' <<< "${ob}"; then
+    record_pass "kg-read-leg: (h) o caminho Read segue funcionando (sem meia-renomeação)"
+  else record_fail "kg-read-leg: (h)" "a cura quebrou o caminho original: ${ob:0:200}"; fi
+
+  # (i) MÚLTIPLOS caminhos num só comando (`diff a.kg.yaml b.kg.yaml`). A 1ª redação tratava o
+  #     alvo como string única: com dois caminhos ela casaria ZERO e o hook voltaria a ser mudo —
+  #     a cura teria trocado um silêncio por outro.
+  ob="$(printf '{"tool_name":"Bash","tool_input":{"command":"diff docs/onion/graph/g.kg.yaml outro/arq.kg.yaml"}}' | bash "${hb}" 2>&1 || true)"
+  if grep -q 'C_NO_DO_GRAFO' <<< "${ob}" && grep -q 'C_NO_DO_OUTRO' <<< "${ob}"; then
+    record_pass "kg-read-leg: (i) dois .kg.yaml no mesmo comando → casa os DOIS"
+  else record_fail "kg-read-leg: (i)" "casou menos que os dois alvos: ${ob:0:200}"; fi
+  rm -rf "${sbb}"
+
 }
 
 
@@ -17710,6 +17811,7 @@ _family run_workflow_parse_selftests
 _family run_role_scope_selftests
 _family run_model_ssot_selftests
 _family run_role_vocabulary_selftests
+_family run_kg_edit_confirmed_selftests
 _family run_kg_read_leg_selftests
 _family run_sandbox_gc_selftests
 _family run_family_topology_selftests

@@ -4,7 +4,8 @@ meta:
   baseline: 2026-09-14
   review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 49 NOS (era 47: +2 pela descoberta de que a PERNA DE LEITURA do KG e cega a quem trabalha
+  # ═══ TETO: 50 NOS (era 49: +1 pela MEDICAO que decidiu entre os tres desenhos — 95,3% das
+  #     interacoes com grafo passam por bash, e o hook vigiava 0,7%) (era 47: +2 pela descoberta de que a PERNA DE LEITURA do KG e cega a quem trabalha
   #     o grafo por bash — o hook que existe para impedir o erro nao disparou no erro que ele previa) (era 46: +1 pela RESPOSTA da pergunta que abriu esta linha — o revisor semantico voltou a rodar com credito reposto, e o fato precisava morar aqui para o compromisso poder FECHAR no fios-abertos; fechar sem escrever o fato seria fechar por cansaco) (era 45: +1 pela EXPOSICAO PUBLICA E ATIVA de nomes de cliente dentro da propria guarda que impede nome de cliente de viajar — achada pela adocao de um repo novo, nao por leitura) (era 44: +1 pelo FECHAMENTO do acoplamento porta-verde x divida da REGRA 45, que so foi NOMEADO quando a porta re-materializada nasceu com 22 HARD e o baseline vazado apareceu por tras) (era 43: +1 pelo DIAGNOSTICO MORTO: o workflow que a doutrina manda rodar antes de escrever causa sobre o revisor nao parseava ha um dia, e o harness CONTAVA os workflows sem nunca os LER) (era 42: +1 pela CLASSE que a bancada expos ao medir esta pilha contra o merge-base: uma linha de SEGURANCA (o pathspec `:(exclude)` da chave privada) desligou DUAS guardas de outra familia, e as duas falharam para o lado inseguro em silencio) (era 41: +1 pela ESTEIRA da catraca da porta, descoberta DIRIGINDO o proprio mecanismo: a guarda media pin..HEAD da branch, entao o commit que sobe o teto invalidava o teto) (era 39: +2 pelo SINAL DA PORTA de 2026-09-17, que REFUTOU um "0 HARD" declarado por mim — a guarda de rule path-scoped dava vereditos OPOSTOS em git e nao-git, e a allowlist do transporte separa uma regra do objeto dela por desenho) (era 36: +3 pela PASSADA ADVERSARIAL da cura do A_DOUTRINA — duas lacunas de COBERTURA (plugins/ fora da varredura; predicado de privacidade por nome completo) e a fronteira medida entre caminho-de-máquina NARRATIVO (curado) e FUNCIONAL (parametrização, gated)) (era 35: +1 pela varredura disco×registro, que transformou o caso único do sinal numa classe medida — 9 de 19) (era 34: +1 pelo veredito que confundia EXECUTAR com BARRAR — chegou por sinal de campo de um adotante) (era 33: +1 pelo verificador do gate que decidia por string e abortou uma adoção real — achado pelo dogfood da própria entrega) (era 32: +1 pela SSOT do escopo que estava DEFASADA — consumir uma SSOT torna a defasagem dela consequente) (era 28: +4 pela PASSADA ADVERSARIAL do PR #833, que REPROVOU o corte em três lentes — corte invertido vs o precedente, SSOT do escopo que já existia, manifesto que falhava copiando o repo inteiro, e papel que não podia ser carimbado) (era 25: +3 pela CURA EXECUTADA do nó do papel decorativo — a evidência do corte medido, o resíduo declarado com gatilho, e o fail-open do manifesto vazio que a própria bancada do corte achou) (era 24: +1 pela metade VERDADEIRA do nó do greenfield, que a 5ª medição achou) (era 23: +1 pela medição completa que REFUTOU o nó do greenfield, 2026-09-15). Auditoria FECHADA: cresce só por recorrência medida da mesma classe ou cura executada. ═══
   # O CI nao revisou o PR #827 (o revisor morreu com permission_denials_count: 9 e caiu em soft-pass);
   # o maestro mandou rodar a passada propria. DUAS rodadas, 5 refutadores com LENTES distintas
@@ -605,6 +606,17 @@ nodes:
     trace: '.claude/hooks/kg-read-leg.sh'
     label: 'COMO FAZER A PERNA DE LEITURA ALCANCAR A SESSAO QUE ESCREVE NO GRAFO, sem virar ruido? Tres desenhos candidatos, nenhum medido: (a) acrescentar `Bash` ao matcher e o hook inspecionar `tool_input.command` procurando `.kg.yaml` — alcanca o caso real, mas roda em toda chamada de shell e precisa ser barato; (b) mover a guarda para `PreToolUse(Edit|Write)` sobre `.kg.yaml` — pega a ESCRITA, que e o momento mais tardio possivel, e nao pega quem le por bash para decidir; (c) trocar a natureza: em vez de hook por ferramenta, um gate no `lint` que exija, de todo PR que TOCA um `.kg.yaml`, que o residuo declare quais nos `confirmed` do mesmo arquivo foram consultados — mais lento para avisar, mas imune a qual ferramenta se usou. O QUE DECIDE ENTRE ELAS e uma medicao que ninguem fez: quantas das edicoes de grafo desta casa passam por `Read` e quantas por `bash`? GATILHO: o maestro escolher, ou a proxima proposta cair pelo mesmo motivo.'
 
+  - id: E_MEDICAO_READ_VS_BASH_NO_CORPUS_DE_TRANSCRICOES
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: '2026-09-19'
+    verified_against: 'extracao por jq sobre 29 transcricoes de ~/.claude/projects/-home-marcio-onion-evolve (841 MB): 19.084 chamadas de ferramenta com nome e alvo; recorte por ocorrencia de `.kg.yaml` em file_path/command/pattern/path'
+    trace: '.claude/hooks/kg-read-leg.sh'
+    label: 'A MEDICAO QUE DECIDIA ENTRE OS TRES DESENHOS, e ela e mais extrema do que a hipotese. Das 2.457 chamadas que TOCAM um `.kg.yaml`: Bash 2.341 (95,3%) · Edit 83 (3,4%) · Read 17 (0,7%) · Write 16 (0,7%). O hook vigiava `Read` — ZERO-VIRGULA-SETE POR CENTO da superficie que existe para vigiar. Isso REPROVA o desenho (b) (mover para Edit|Write cobriria 4,1%) e escolhe o (a). CUSTO DO (a), tambem medido: `Bash` e 16.338 das 19.084 chamadas da base (86%), entao o hook passa a rodar em quase tudo — por isso a saida muda vem ANTES de qualquer parse, num `case` de shell sobre a string crua. TETO DA MEDICAO, declarado: ela conta CHAMADAS, nao sessoes-que-deviam-ter-lido. Um `bash` que roda o radar conta igual a um que edita o grafo. O numero diz ONDE o hook precisa estar; nao diz quantas vezes ele teria mudado um resultado. E POR ISSO O (c) ENTROU JUNTO, nao no lugar: um aviso perdido entre 16 mil chamadas de shell tem chance real de passar despercebido, e o (c) fala no PR, onde a proposta ja esta escrita e ainda da tempo de voltar.'
+
 edges:
   - from: E_A_GUARDA_CONTRA_NOME_DE_CLIENTE_CONTINHA_NOMES_DE_CLIENTE
     to: E_PADRAO_PRIVADO_FIXAVA_UM_NOME_E_O_IRMAO_PASSAVA
@@ -755,5 +767,8 @@ edges:
     to: E_O_DIAGNOSTICO_QUE_A_DOUTRINA_MANDA_RODAR_ESTAVA_MORTO
     edge_type: SUPPORTS
   - from: E_PERNA_DE_LEITURA_E_CEGA_A_BASH
+    to: Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE
+    edge_type: SUPPORTS
+  - from: E_MEDICAO_READ_VS_BASH_NO_CORPUS_DE_TRANSCRICOES
     to: Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE
     edge_type: SUPPORTS

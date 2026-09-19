@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**85 regras** no total — **76 HARD**, **22 SOFT**.
+**86 regras** no total — **76 HARD**, **23 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -135,6 +135,7 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (po
 | 69 | Roster de fontes com revisita vencida (docs/onion/radar-sources.yaml) | SOFT | fonte de rotina (semanal/mensal/trimestral/anual) esquecida — o roster nasceu na F2 como DADO da |
 | 78 | `.kg.yaml` versionado é YAML VÁLIDO, com catraca | HARD + SOFT | grafo que o kg-radar aceita (parser awk sobre TEXTO) e que qualquer consumidor com lib YAML rejeita |
 | 82 | Os dois leitores do corpus CONCORDAM sobre quem é nó | HARD + SOFT | grafo válido em que o radar (awk sobre texto) e o PyYAML veem populações DIFERENTES |
+| 87 | PR que EDITA um `.kg.yaml` enxergou os `confirmed` dele | SOFT | propor contra o próprio corpus — o defeito medido em 2026-09-19 |
 
 ## Automação Graduada
 
