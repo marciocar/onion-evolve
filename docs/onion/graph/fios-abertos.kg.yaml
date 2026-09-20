@@ -36,7 +36,16 @@ meta:
   # Onda 8 aberta 2026-09-01 (etapa 3 da ordem vai-na-ordem: os REAIS executaveis da revisao-total); Onda 7 COLHIDA no mesmo commit (4/4 pagos, PRs #743-#749).
   # Onda 7 aberta 2026-09-01 (gatilhos DISPARADOS da Onda 6); Onda 6 COLHIDA no mesmo commit (5/5 pagos, PRs #734-#742).
   # Onda 6 aberta 2026-08-31 (carteira do programa MAESTRO-VIVO); ondas 1-5 COLHIDAS no mesmo commit — historia no git (blame deste arquivo) e nos residuos de revisao.
-  # ═══ TETO: 20 NÓS. Onda nova exige onda COLHIDA. ═══
+  # ═══ TETO: 19 NÓS. Onda nova exige onda COLHIDA. ═══
+  # 2026-09-20 — COLHIDO `A_PERNA_DE_LEITURA_DO_KG_E_CONSELHO` (era o topo da fila, atenção 9.5), e o
+  #   teto ENCOLHE com ele: 20 → 19. Colheita é a única coisa que faz este número baixar.
+  #   O compromisso foi CUMPRIDO e MEDIDO contra o vivo em 2026-09-19, e as três afirmações do nó
+  #   viraram falsas: hooks citando `.kg.yaml` 0 → 1 (o `kg-read-leg.sh`, ligado); `review_after` no
+  #   radar 0 → 12 (seção VALIDADE, PR #847); matcher `Read` → `Read|Edit|Write|Bash` (PR #852).
+  #   O FATO não morre com o nó — ele mora onde nasceu, em `passada-adversarial-2026-09`
+  #   (`E_PERNA_DE_LEITURA_E_CEGA_A_BASH`, `E_MEDICAO_READ_VS_BASH_NO_CORPUS_DE_TRANSCRICOES`), mais
+  #   os resíduos dos PRs #847/#852 e o `git blame` deste arquivo. Aqui morava o COMPROMISSO, e
+  #   compromisso cumprido sai — é o que impede este grafo de virar museu.
   # Colher = onda e itens saem no MESMO commit; a história fica no git e no artefato de revisão.
   # O radar impede meia-colheita: item sem onda → aresta órfã (HARD); onda sem item → grau 0 (HARD).
   # Rotina (branches, higiene) NÃO entra aqui — vai para checklist. O grafo é para RISCO.
@@ -245,22 +254,8 @@ nodes:
     label: "O GATE SEMANTICO ESTA CEGO E NINGUEM SABE POR QUE — e o que ele cobre nao tem outra camada. Compromisso, nao fato: os achados vivem em `passada-adversarial-2026-09` (`E_O_DIAGNOSTICO_QUE_A_DOUTRINA_MANDA_RODAR_ESTAVA_MORTO`). O QUE JA ESTA DESCARTADO POR MEDICAO, para ninguem repetir: (a) credencial/credito — o pre-voo da HTTP 200 contra o MESMO modelo; (b) versao da action — testada nas duas pontas em 2026-08-03, falham identico; (c) tamanho do diff no prompt — o prompt NAO embute o diff, manda o revisor rodar `git diff`. O sintoma restante e especifico: morre ANTES de gerar, sem cobrar, nas duas tentativas. POR QUE ISTO E RISCO E NAO ROTINA: enquanto durar, todo merge passa so pelo gate DETERMINISTICO, e foi preciso criar um escape de dispensa NOMEADA E REGISTRADA no `pr-merge-verified.sh` para que a decisao de mergear sem revisao semantica fosse consciente em vez de virar merge por fora do gate. Escape existe; o buraco que ele contorna, nao foi fechado. GATILHO (mecanico, nao relogio): o proximo PR que tocar `.claude/` roda o revisor de novo — se morrer igual, rodar `.github/workflows/onion-review-diagnose.yml`, que so agora VOLTOU a ser executavel (estava com `env:` duplicado e nao parseava; a REGRA 86 nasceu disso). E o aviso epistemico do proprio `onion-review.yml` vale aqui: aquele bloco ja mentiu DUAS vezes sobre a causa — nao escreva a terceira sem rodar o diagnostico."
     trace: '.github/workflows/onion-review.yml'
 
-  - id: A_PERNA_DE_LEITURA_DO_KG_E_CONSELHO
-    node_type: decision
-    plane: PROD
-    status: open
-    impact: 5
-    confidence: 0.95
-    owner: core
-    verified_at: '2026-09-16'
-    verified_against: 'medido no core: `grep -l "\.kg\.yaml" .claude/hooks/*.sh` = ZERO hooks; `grep -c review_after .claude/validation/kg-radar.sh` = 0'
-    label: "O GRAFO QUE NAO E LIDO E INDISTINGUIVEL DO GRAFO QUE NAO FOI ESCRITO — a frase e de um adotante, e ele a comprou com um dia de trabalho. Caso medido (sinal de 2026-09-11): a sessao leu 8.585 linhas de fonte em quatro frentes e publicou QUATRO teses erradas em sequencia, todas derrubadas por correcao do autor e nenhuma pelo metodo, num corpus que tinha a resposta em QUATRO NOS de um `.kg.yaml` que ele mesmo CITOU no proprio prompt — como checklist de conferencia, nunca como fonte. Nao foi falta de acesso nem de contexto: foi falta de MECANISMO. A doutrina anuncia a perna de leitura como mecanismo e ela e conselho (o proprio core ja se corrigiu no texto em 2026-08-16 e manteve o registro); o que faltava era alguem medir o preco, e agora esta medido. DUAS MEDICOES do core confirmam o diagnostico maior: `drifted` = 0 em 3.715 nos (o laco de reconciliacao esta construido e PARADO) e, das 20 arestas SUPERSEDES do corpus, 18 sao decisao->pergunta — ou seja o sistema quase so CONCLUI, quase nunca REVISA. ORDEM por retorno sobre custo, proposta pelo adotante e aceita: (1) ligar o hook de leitura — a classe ja existe e roda a todo commit, falta a fiacao; (2) o radar PARAR DE SAIR VERDE com grafo vencido (nao e feature, e parar de esconder: hoje so a REGRA 67 SOFT menciona, e quem roda o radar acha que esta em dia); (3) exigir o par desvio<->redesenho para o carimbo `drifted` valer algo; (4) gatilho por contradicao, o unico que precisa de desenho. E o que NAO fazer, tambem dele: nada nasce BLOQUEANDO (gate que impede trabalho e contornado com --no-verify na primeira sexta-feira, e ai se perde o mecanismo E a informacao) e nada por RELOGIO (review_after ja e um temporizador, esta em 16 grafos, e nao fez ninguem revisitar nada)."
-    trace: '.claude/hooks/'
 
 edges:
-  - from: A_PERNA_DE_LEITURA_DO_KG_E_CONSELHO
-    to: D_COMO_FECHAR_O_BURACO_78_82
-    edge_type: CONSTRAINS
   - from: A_ANUNCIO_DERIVA_O_NUMERO_DA_MEDICAO
     to: D_COMO_FECHAR_O_BURACO_78_82
     edge_type: CONSTRAINS
