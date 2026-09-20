@@ -96,7 +96,6 @@
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_AVISO_CARREGA_O_QUE_VALE	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_MEDIR_O_DONO_NAO_O_CARIMBO	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_ORFAO_EXIGE_TRES_PROVAS	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
-.claude/hooks/	A_PERNA_DE_LEITURA_DO_KG_E_CONSELHO	docs/onion/graph/fios-abertos.kg.yaml
 .claude/hooks/bash-empty-result-guard.sh	E_POSTTOOLUSE_E_SINAL_POS_FATO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_session_hook_pulls	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_timeout_is_load_bearing	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml

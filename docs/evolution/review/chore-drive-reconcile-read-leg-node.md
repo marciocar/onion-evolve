@@ -2,10 +2,11 @@
 title: 'Resíduo — a armadilha inversa do pin, e o teto que me barrou com razão'
 date: 2026-09-20
 branch: chore/drive-reconcile-read-leg-node
-reviewed_diff_sha256: 91d628c830f52e736dd1a25c1fc9df9a07228ab6c941b450524ac93e4912ab6a
+reviewed_diff_sha256: 0c4c013865146abe0bcf7f0933b86689b059f51f4739ce38614d36cb4f5ed6e1
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
+selo_do_maestro: '2026-09-20 — colher o nó'
 tokens: 0
 duration_min: 8
 verdict: CORRIGIDO
@@ -33,8 +34,15 @@ contrato diz, textualmente, que ali mora **compromisso, não fato**. O fato já 
 
 > A guarda que eu li como obstáculo estava me impedindo de violar o contrato que eu mesmo cito.
 
-**Proposta ao maestro (não executada):** COLHER o nó. É compromisso cumprido, e colher é remoção —
-mais que um flip de status, que a tabela de selagem reserva a ele.
+**SELADO E EXECUTADO em 2026-09-20** (*"colhe o nó e segue"*): o nó e sua aresta saíram, e **o teto
+encolheu com eles — 20 → 19**. Colheita é a única coisa que faz esse número baixar; tudo o mais só o
+empurra para cima.
+
+**O fato não morreu com o nó.** Ele mora onde nasceu (`passada-adversarial-2026-09`), nos resíduos
+dos PRs #847/#852 e no `git blame` deste arquivo. Aqui morava o **compromisso** — e compromisso
+cumprido sai. É o que impede este grafo de virar museu.
+
+Censo depois da colheita: fila-pronta **5 → 4**, realign **ALINHADO** `(c)=0 (b)=0 (a)=0`.
 
 ## 2. A ARMADILHA INVERSA DO PIN — e ela é nova
 
