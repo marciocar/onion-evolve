@@ -8518,14 +8518,22 @@ run_kg_backlog_selftests() {
   awk -v n="${_fillers_needed}" '/^edges:/ && !done { for (k=0;k<n;k++) printf "    - id: N_ENCHENDO_%d\n      node_type: question\n      plane: DEV\n      status: open\n      impact: 1\n      confidence: 1.0\n      label: \"enchendo %d\"\n\n", k, k; done=1 } {print}' \
     "${bg}" > "$d/teto.yaml"
   rc=0; out="$(bash "${helper}" "$d/teto.yaml" 2>&1)" || rc=$?
-  if [ "${rc}" -ne 0 ] && grep -q 'TETO' <<< "${out}"&& grep -q 'teto declarado 20' <<< "${out}"; then
+  # ⚠️ O NUMERO ESPERADO SAI DO ARQUIVO, e a 1a redacao o FIXOU em `20` — no mesmo caso cujo
+  # comentario manda o numero vir do `meta:` "nunca de constante no script". Medido em 2026-09-20: a
+  # colheita baixou o teto de 20 para 19 e ESTES DOIS CASOS cairam, nao por defeito da guarda, mas
+  # porque a bancada tinha a constante do artefato que ela mede. Teste que fixa valor do alvo reprova
+  # toda vez que o alvo anda com razao — e ensina a ignorar o vermelho.
+  if [ "${rc}" -ne 0 ] && grep -q 'TETO' <<< "${out}" && grep -q "teto declarado ${_declared_cap}" <<< "${out}"; then
     record_pass "kg-backlog: (c) passar do TETO reprova, citando o numero que esta no \`meta:\`"
   else record_fail "kg-backlog: (c)" "teto nao mordeu ou nao citou o numero do arquivo (rc=${rc}): ${out}"; fi
 
   # (d) FAIL-LOUD: `meta:` sem TETO declarado e HARD, nunca silencio. Guarda que nao sabe o que
   #     cobrar jamais afirma conformidade (P0 da REGRA 30) — e "sem teto" e indistinguivel de
   #     "teto zero" para quem so olha o exit code.
-  grep -v 'TETO: 20' "${bg}" > "$d/semteto.yaml"
+  # idem: tirar a linha do teto por PADRAO, nunca pelo valor. `grep -v 'TETO: 20'` deixou de remover
+  # qualquer coisa quando o teto virou 19 — e o caso passou a medir um arquivo COM teto, afirmando
+  # que testava um SEM.
+  grep -vE 'TETO:[[:space:]]*[0-9]+' "${bg}" > "$d/semteto.yaml"
   rc=0; out="$(bash "${helper}" "$d/semteto.yaml" 2>&1)" || rc=$?
   if [ "${rc}" -ne 0 ] && grep -q 'SEM-TETO' <<< "${out}"; then
     record_pass "kg-backlog: (d) \`meta:\` sem TETO e HARD SEM-TETO (fail-loud, nunca conformidade por ausencia)"

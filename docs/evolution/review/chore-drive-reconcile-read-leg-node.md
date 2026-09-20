@@ -2,10 +2,10 @@
 title: 'Resíduo — a armadilha inversa do pin, e o teto que me barrou com razão'
 date: 2026-09-20
 branch: chore/drive-reconcile-read-leg-node
-reviewed_diff_sha256: 0c4c013865146abe0bcf7f0933b86689b059f51f4739ce38614d36cb4f5ed6e1
-findings_total: 2
-findings_real: 2
-findings_fixed: 2
+reviewed_diff_sha256: 56ed7a44a9ef8a5d9103f014a17bcd56c353c714c4a2aee44e2915261e772a9d
+findings_total: 4
+findings_real: 4
+findings_fixed: 4
 selo_do_maestro: '2026-09-20 — colher o nó'
 tokens: 0
 duration_min: 8
@@ -77,3 +77,45 @@ esta casa nomeia. **Gatilho: o próximo anúncio sair com número que o artefato
 
 `.claude/sessions/drive-2026-09-19/STATE.md` — **pendente do selo do maestro** (a colheita do topo).
 Realign: **ALINHADO** `(c)=0 (b)=0 (a)=0`.
+
+
+---
+
+# O CI reprovou, e achou dois defeitos que o commit local declarara verdes
+
+`selftest: fail` aos 30m13s, em `kg-backlog` casos **(c)** e **(d)**. Reproduzido local: **5/2**.
+
+## F3 — a bancada fixava a constante do artefato que ela mede
+
+Os dois casos hardcodavam **`20`**:
+
+- **(c)** afirmava `grep -q 'teto declarado 20'` — a colheita baixou para **19**;
+- **(d)** removia a linha com `grep -v 'TETO: 20'` — deixou de remover qualquer coisa, e o caso
+  passou a **medir um arquivo COM teto afirmando que testava um SEM**.
+
+A ironia está no comentário do próprio caso (c): *"o numero da mensagem vem do `meta:`, **nunca de
+constante no script** — um numero aqui e outro la seria o mesmo `declarado != verificado` que esta
+regra existe para fechar"*. E então o assert fixava 20.
+
+> **A bancada falhou CERTO (pegou a mudança) e pelo motivo ERRADO (é frágil).** Teste que fixa valor
+> do alvo reprova toda vez que o alvo anda **com razão** — e ensina a ignorar o vermelho.
+
+Curado: `(c)` usa `${_declared_cap}`, já calculado três linhas acima; `(d)` remove por **padrão**
+(`TETO:[[:space:]]*[0-9]+`), nunca pelo valor. **5/2 → 7/0.**
+
+## F4 — dois mecanismos sabiam coisas diferentes, e o mais pobre decidia
+
+**Por que só o CI pegou:** o pre-commit **nem rodou a bancada** na colheita. O gatilho era uma lista
+de prefixos (`.claude/validation|hooks|utils`, `ops/`, `.githooks/`, `.github/workflows/`) e a
+colheita mexeu só em `docs/`.
+
+Mas o `lint-selftest.sh --map` **sabia**: ele liga `docs/onion/graph/fios-abertos.kg.yaml` à família
+`kg_backlog`. Duas fontes, e a mais pobre gateava.
+
+Curado: o gatilho agora **pergunta ao mapa**, que é a SSOT da relação arquivo→família; a lista de
+prefixos fica como **failsafe** (o mapa pode faltar num adotante, e infraestrutura da bancada tem de
+disparar mesmo sem ele). Provado nos três casos: grafo do backlog **dispara**, infra **dispara**,
+arquivo sem família fica **mudo** — a cura não vira ruído.
+
+> Esta é a mesma classe do dia inteiro, numa camada acima: **não é a guarda que estava errada, é
+> quem decide se a guarda roda.**
