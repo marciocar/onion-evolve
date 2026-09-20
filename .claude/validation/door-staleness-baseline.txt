@@ -94,5 +94,9 @@
 #   catraca dizer 0/0 sobre uma porta que ninguem podia abrir — a armadilha INVERSA da de 2026-09-18,
 #   quando o pin velho escondia porta nova. As duas mentem; a diferenca e a direcao. O pin so anda
 #   depois do push VERIFICADO no remoto (`gh api .../commits/main`), nunca depois do commit local.
-onion-standalone 393
+#
+# 2026-09-20 (10a materializacao): `onion-core` volta a ZERO de novo; `onion-standalone` sobe a 395.
+# O ciclo materializar → push verificado no remoto → avancar o pin rodou sem atrito desta vez, com a
+# ordem que a entrada anterior fixou: o pin so anda DEPOIS do `gh api .../commits/main` confirmar.
+onion-standalone 395
 onion-core 0
