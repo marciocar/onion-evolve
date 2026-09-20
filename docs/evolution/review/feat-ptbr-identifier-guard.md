@@ -2,7 +2,7 @@
 title: 'Resíduo — a guarda da REGRA 60 tinha o mecanismo completo e o vocabulário vazio'
 date: 2026-09-20
 branch: feat/ptbr-identifier-guard
-reviewed_diff_sha256: 62add134a6b71287be53c43a72636e7f50152c26865852003c207919cc638359
+reviewed_diff_sha256: 254ce8d5535da553cab2eb70e8f1ff0e4131991736a463e626aa67a4d5a81468
 findings_total: 8
 findings_real: 8
 findings_fixed: 8

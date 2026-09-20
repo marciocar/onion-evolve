@@ -323,7 +323,7 @@ members:
     #    orfao unico + force-push, e nao ha nada a preservar nisso. LIMITE DECLARADO: o objeto antigo
     #    segue acessivel por SHA ate o GC do GitHub, e quem clonou tem copia — o force-push torna
     #    INALCANCAVEL, nunca inexistente.
-    onion_version: e3f25693ea66   # pin da 11a materializacao (2026-09-20) — leva do #854 (limpeza do --map + reversao do afrouxamento do failsafe); porta verificada em 0 HARD, 0 termo de cliente e fail-closed vivo
+    onion_version: cb582c0e088b   # pin da 12a materializacao (2026-09-20) — leva do #855 (trap por CONDICAO); materializada de worktree DESTACADA em origin/main, nao da branch: `git archive HEAD` da branch publicaria trabalho em voo numa porta PUBLICA. Push verificado no remoto: 477c48bc7295, 2026-09-20T20:44:53Z
     adopted_at: 2026-09-17
     mode: greenfield            # repo vazio -> materializacao pelo manifesto (nunca copia de disco)
     # ⚠️ A PORTA NASCE COM 22 HARD DA REGRA 45, E ISSO E O ESTADO VERDADEIRO, NAO REGRESSAO. A
