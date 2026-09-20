@@ -45,12 +45,12 @@ DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ram
 #   de mergear sem revisão semântica é humana e deve ser consciente". O escape é a forma
 #   CONSCIENTE dessa decisão; sem ele, o caminho real vira mergear por fora do gate.
 _DISPENSAVEIS=(onion-review-verdict)
-DISPENSA=(); MOTIVO=""
+DISPENSA=(); REASON=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
     --dispensa) DISPENSA+=("${2:?--dispensa exige o NOME do check}"); shift 2 ;;
-    --motivo) MOTIVO="${2:?--motivo exige texto}"; shift 2 ;;
+    --motivo) REASON="${2:?--motivo exige texto}"; shift 2 ;;
     # BASE DE STACK: apagar a branch da base FECHA o PR filho (não re-aponta) — está
     # registrado como mecânica de stack desde 2026-07. Ao mergear uma base com PR
     # empilhado em cima, use --keep-branch; o GitHub re-aponta o filho, e a branch se
@@ -71,7 +71,7 @@ _em() { # $1=agulha, resto=palheiro → 0 se presente
 _dispensado() { [ "${#DISPENSA[@]}" -eq 0 ] && return 1; _em "$1" "${DISPENSA[@]}"; }
 
 if [ "${#DISPENSA[@]}" -gt 0 ]; then
-  [ -n "$MOTIVO" ] || die "--dispensa exige --motivo: dispensa sem razão escrita é override, e override não se audita"
+  [ -n "$REASON" ] || die "--dispensa exige --motivo: dispensa sem razão escrita é override, e override não se audita"
   for _d in "${DISPENSA[@]}"; do
     _em "$_d" "${_DISPENSAVEIS[@]}" \
       || die "check '${_d}' NÃO é dispensável — a lista é [${_DISPENSAVEIS[*]}], e só entra nela check que se declara informativo. Ampliar é ato deliberado: edite _DISPENSAVEIS com o porquê."
@@ -116,13 +116,13 @@ printf '%s\n' "$head_runs" | awk -F'\t' '$2!="completed"{exit 1}' \
   || die "check-run do head ${HEAD_SHA:0:8} ainda não-completo — merge recusado (esperar não é opcional)"
 # Falhos do head, um por linha — e a dispensa é aplicada NOME A NOME, nunca em bloco.
 _falhos="$(printf '%s\n' "$head_runs" | awk -F'\t' '$3=="failure"||$3=="cancelled"||$3=="timed_out"{print $1}')"
-_nao_dispensados=""
+_not_waived=""
 while IFS= read -r _f; do
   [ -n "$_f" ] || continue
-  _dispensado "$_f" || _nao_dispensados="${_nao_dispensados}${_f} "
+  _dispensado "$_f" || _not_waived="${_not_waived}${_f} "
 done <<< "$_falhos"
-[ -n "${_nao_dispensados// /}" ] \
-  && die "check-run do head ${HEAD_SHA:0:8} concluiu em falha e NÃO foi dispensado: ${_nao_dispensados}— merge recusado"
+[ -n "${_not_waived// /}" ] \
+  && die "check-run do head ${HEAD_SHA:0:8} concluiu em falha e NÃO foi dispensado: ${_not_waived}— merge recusado"
 # Dispensa PREVENTIVA é recusada: só se dispensa o que de fato está falhando agora.
 for _d in "${DISPENSA[@]:-}"; do
   [ -n "$_d" ] || continue
@@ -131,7 +131,7 @@ for _d in "${DISPENSA[@]:-}"; do
 done
 if [ "${#DISPENSA[@]}" -gt 0 ]; then
   say "⚠️  check(s) DISPENSADO(S) por decisão humana: ${DISPENSA[*]}"
-  say "    motivo: ${MOTIVO}"
+  say "    motivo: ${REASON}"
 else
   say "✓ check-runs ancorados no head ${HEAD_SHA:0:8}: todos completos, nenhum falho"
 fi
@@ -190,7 +190,7 @@ if [ "${#DISPENSA[@]}" -gt 0 ]; then
     "| | |" \
     "|---|---|" \
     "| check(s) dispensado(s) | \`${DISPENSA[*]}\` |" \
-    "| motivo | ${MOTIVO} |" \
+    "| motivo | ${REASON} |" \
     "| head | \`${HEAD_SHA}\` |" \
     "" \
     "Os demais checks do head passaram — a dispensa é **nome a nome**, e qualquer outro check falho teria recusado o merge. O que este check mediria **não foi medido**." )"

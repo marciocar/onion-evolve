@@ -162,7 +162,7 @@ awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" -v hoje="$(dat
 #
 # O QUE O CORPUS PROVA, E O QUE NÃO PROVA (medido 2026-08-07, e a 1ª versão exagerou):
 #   · a mudança é INERTE no corpus — 0 avisos novos. Mas o corpus NÃO distingue esta fronteira
-#     de quase nenhuma outra: mesmo `supersederConta(s){return 1}` dá 0 avisos, porque os 137
+#     de quase nenhuma outra: mesmo `supersederCount(s){return 1}` dá 0 avisos, porque os 137
 #     alvos de SUPERSEDES já estão todos reconciliados (113 superseded · 13 refuted · 11 done) e
 #     os 116 de REFUTES também. A prova de COMPORTAMENTO é a fixture, não o corpus.
 #   · a única alavanca que o corpus expõe é `done` no lado do alvo: 11 acusações — e as 11 são
@@ -178,7 +178,7 @@ awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" -v hoje="$(dat
 # `drifted` é o caso que motivou isto: statusFactor lhe dá 1.3 dizendo "nó VIVO, mais urgente que
 # confirmed", e a allowlist antiga dizia "não é confirmed, logo não conta" — duas doutrinas no
 # mesmo arquivo. O efeito era fail-open: a aresta sumia e a seção imprimia ✅ sem ter avaliado.
-function supersederConta(s) { return (s != "open" && s != "refuted" && s != "superseded") }
+function supersederCount(s) { return (s != "open" && s != "refuted" && s != "superseded") }
 
 # O ALVO ainda precisa reconciliar? Fora: `superseded`/`refuted` (já reconciliados) e a
 # `question` fechada como `done` — que é o remédio que ESTA MESMA seção prescreve ("pergunta
@@ -412,13 +412,13 @@ END {
   for (i = 1; i <= ne; i++) {
     deg[efrom[i]]++; deg[eto[i]]++
     if (etype[i] == "REFUTES")     refutedBy[eto[i]]++
-    # SUPERSEDES só ACUSA se o superseder está VIVO — ver supersederConta(). Superseder `open`
+    # SUPERSEDES só ACUSA se o superseder está VIVO — ver supersederCount(). Superseder `open`
     # significa relação ainda não assentada, e o alvo legitimamente segue confirmado até que ela
     # assente (medido 2026-08-05: dos 15 alvos não-reconciliados do corpus, 1 — E_engine_measured —
     # tinha superseder `open`; acusá-lo seria cobrar reconciliação de superação que ninguém fechou).
     # Era ALLOWLIST de um valor até 2026-08-07, e por isso engolia superseder `drifted` — defeito
     # LATENTE (0 ocorrências no corpus), demonstrado na fixture supersedes-mixed, não em campo.
-    if (etype[i] == "SUPERSEDES" && supersederConta(nstatus[efrom[i]])) supersededByLive[eto[i]]++
+    if (etype[i] == "SUPERSEDES" && supersederCount(nstatus[efrom[i]])) supersededByLive[eto[i]]++
     if (etype[i] == "TRANSITIONS") { transOut[efrom[i]]++; transIn[eto[i]]++ }
     if (etype[i] == "HAS_STATE")   ownedState[eto[i]]++
     if (etype[i] == "TRACES_TO")   traceOut[efrom[i]]++
@@ -553,7 +553,7 @@ END {
   # --status-tsv — `id<TAB>status` de TODOS os nós, inclusive os de atenção ZERO.
   # POR QUE EXISTE (2026-09-06): o `--freshness-tsv` OMITE o nó de atenção 0 (todo `refuted`), e o
   # `kg-realign-project.sh` precisava justamente do status do SUPERADOR para aplicar o mesmo critério
-  # que este arquivo já aplica na reconciliação (`supersederConta`: superador morto não conta). Sem um
+  # que este arquivo já aplica na reconciliação (`supersederCount`: superador morto não conta). Sem um
   # feed completo, o realign acusava drift tipo-(c) PERMANENTE num grafo que este radar dava ✅ — duas
   # doutrinas na mesma casa, sobre o mesmo grafo. Feed novo e aditivo; nenhum consumidor existente muda.
   if (mode == "--status-tsv") {

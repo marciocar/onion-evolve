@@ -31,7 +31,7 @@ printf '%s' "${MAN}" | jq -e '.items' >/dev/null 2>&1 || {
   echo "ERRO do core: $(printf '%s' "${MAN}" | jq -r '.error // .' | head -c 200)" >&2; exit 5; }
 
 mkdir -p "${DEST}/_processed"
-novos=0; ja=0
+new_items=0; ja=0
 while IFS=$'\t' read -r name sha; do
   [ -n "${name}" ] || continue
   # Já tenho? Conta o _processed/ também — senão o puxador re-entrega o que já foi lido.
@@ -47,8 +47,8 @@ while IFS=$'\t' read -r name sha; do
   else
     say "  [DRY-RUN] baixaria ${name}"
   fi
-  novos=$((novos+1))
+  new_items=$((new_items+1))
 done < <(printf '%s' "${MAN}" | jq -r '.items[] | "\(.name)\t\(.sha256)"')
 
 say ""
-say "📥 ${MEMBER}: ${novos} novo(s), ${ja} já tinha$([ "${DRY}" = "1" ] && echo '  [DRY-RUN — use --apply]')"
+say "📥 ${MEMBER}: ${new_items} novo(s), ${ja} já tinha$([ "${DRY}" = "1" ] && echo '  [DRY-RUN — use --apply]')"

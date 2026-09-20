@@ -42,7 +42,7 @@ done
 
 [ -n "${REPORT}" ] || { echo "selftest-summary: --report <ABS.tsv> é obrigatório" >&2; exit 2; }
 
-_nao_medido() {   # $1 = a suspeita, nomeada
+_not_measured() {   # $1 = a suspeita, nomeada
   printf '## ⊘ %s — NÃO MEDIDO\n\n' "${TITULO}"
   printf '**Não há relatório para somar.** Isto NÃO é "zero falhas": é ausência de medição.\n\n'
   printf -- '- causa provável: %s\n' "$1"
@@ -53,11 +53,11 @@ _nao_medido() {   # $1 = a suspeita, nomeada
 }
 
 if [ ! -f "${REPORT}" ]; then
-  _nao_medido "o arquivo de relatório não existe — a bancada não chegou a escrevê-lo"
+  _not_measured "o arquivo de relatório não existe — a bancada não chegou a escrevê-lo"
   exit 0
 fi
 if ! grep -qP '^TOTAL\t' "${REPORT}"; then
-  _nao_medido "o relatório existe mas NÃO tem linha \`TOTAL\` — a bancada abortou antes da soma"
+  _not_measured "o relatório existe mas NÃO tem linha \`TOTAL\` — a bancada abortou antes da soma"
   exit 0
 fi
 
@@ -108,9 +108,9 @@ awk -F'\t' -v titulo="${TITULO}" -v runurl="${RUN_URL}" '
 ' "${REPORT}"
 
 # A SOMA FECHA? Verificação FORA do awk, para poder falar alto sem poluir o markdown.
-_soma="$(awk -F'\t' '$1!="familia" && $1!="TOTAL" && NF>=5 {s+=$2} END{print s+0}' "${REPORT}")"
+_sum="$(awk -F'\t' '$1!="familia" && $1!="TOTAL" && NF>=5 {s+=$2} END{print s+0}' "${REPORT}")"
 _total="$(awk -F'\t' '$1=="TOTAL"{print $2+0}' "${REPORT}")"
-if [ "${_soma}" != "${_total}" ]; then
-  printf '\n> ⚠️ **A SOMA NÃO FECHA**: as famílias somam %s e o TOTAL diz %s. O relatório está\n' "${_soma}" "${_total}"
+if [ "${_sum}" != "${_total}" ]; then
+  printf '\n> ⚠️ **A SOMA NÃO FECHA**: as famílias somam %s e o TOTAL diz %s. O relatório está\n' "${_sum}" "${_total}"
   printf '> truncado ou o agregador da bancada regrediu — trate o número acima como suspeito.\n'
 fi

@@ -178,16 +178,16 @@ _role_cut() {  # $1=papel → subcaminhos a cortar, um por linha (vazio = nada a
 # (Mapa role→bundle (roles.yaml) consistente com os verticais) já guarda esse arquivo contra drift,
 # então o corte herda uma guarda que existe em vez de pedir uma nova.
 _emit_command_excludes() {  # $1=REPO $2=papel → :(exclude) dos comandos de meta/ fora do escopo do papel
-  local _repo="$1" _papel="$2" _f _base_nome _tools _resolver
-  [ -n "$(_role_cut "${_papel}")" ] || return 0   # papel que não corta nada também não corta comando
+  local _repo="$1" _role="$2" _f _base_name _tools _resolver
+  [ -n "$(_role_cut "${_role}")" ] || return 0   # papel que não corta nada também não corta comando
   _resolver="${_repo}/.claude/utils/marketplace/resolve-role-bundle.sh"
   [ -f "${_resolver}" ] || return 0               # sem a SSOT não se adivinha: o corte de comando não acontece
-  _tools="$(bash "${_resolver}" "${_papel}" --tools 2>/dev/null)" || return 0
+  _tools="$(bash "${_resolver}" "${_role}" --tools 2>/dev/null)" || return 0
   [ -n "${_tools}" ] || return 0                  # papel sem work_tools declarados → não corta comando
   while IFS= read -r -d '' _f; do
     [ -n "${_f}" ] || continue
-    _base_nome="$(basename "${_f}" .md)"
-    grep -qxF "${_base_nome}" <<< "${_tools}" || printf ':(exclude)%s\n' "${_f}"
+    _base_name="$(basename "${_f}" .md)"
+    grep -qxF "${_base_name}" <<< "${_tools}" || printf ':(exclude)%s\n' "${_f}"
   done < <(git -C "${_repo}" -c core.quotePath=false ls-tree -r -z --name-only HEAD -- .claude/commands/meta)
 }
 
@@ -224,8 +224,8 @@ _is_contract() {  # $1=path → 0 se o arquivo é contrato (viaja apesar do cort
 # (separador NUL), e `read -r -d ''` o consome. Hoje o repo tem 0 caminhos assim; a guarda é para o
 # dia em que tiver, e esse dia não avisa.
 _emit_role_excludes() {  # $1=REPO $2=papel
-  local _repo="$1" _papel="$2" _f _pre _cuts
-  _cuts="$(_role_cut "${_papel}")"
+  local _repo="$1" _role="$2" _f _pre _cuts
+  _cuts="$(_role_cut "${_role}")"
   [ -n "${_cuts}" ] || return 0
   while IFS= read -r -d '' _f; do
     [ -n "${_f}" ] || continue
@@ -319,8 +319,8 @@ if [ "${MODE}" = "manifest" ]; then
 
   # `git ls-tree` recusa magia de pathspec; `git diff-tree` (comando de diff) a aceita — contra a
   # ÁRVORE VAZIA ele lista exatamente os arquivos que o `git archive` copiaria.
-  _ARVORE_VAZIA=4b825dc642cb6eb9a060e54bf8d69288fbee4904
-  _sobrou="$(git -C "${REPO}" diff-tree -r --name-only --no-commit-id "${_ARVORE_VAZIA}" HEAD -- "${_spec[@]}")"
+  _EMPTY_TREE=4b825dc642cb6eb9a060e54bf8d69288fbee4904
+  _sobrou="$(git -C "${REPO}" diff-tree -r --name-only --no-commit-id "${_EMPTY_TREE}" HEAD -- "${_spec[@]}")"
   _n_sobrou="$(printf '%s' "${_sobrou}" | grep -c . || true)"
   if [ "${_n_sobrou}" -eq 0 ]; then
     echo "ERRO: o manifesto do papel '${ROLE}' não casa arquivo NENHUM em HEAD — o bundle nasceria vazio e o 'git archive' sairia 0 (silencioso). Confira _role_cut/_ROLE_CONTRACT." >&2

@@ -327,9 +327,9 @@ _rule_label() {   # $1 = mensagem · $2 = função chamadora → mensagem com "R
 # ⚠️ E NÃO VIRA SILÊNCIO — seria trocar um fail-closed por um fail-open. Vira SOFT com classe
 # PRÓPRIA (`[papel/SEM-OBJETO]`), que aparece no sumário, é contável, e diz o papel e a classe. A
 # distinção que importa: no repo-FONTE a mesma ausência continua HARD, porque ali ela É defeito.
-_PAPEL_DESTE_REPO=""
-_papel() {
-  [ -n "${_PAPEL_DESTE_REPO}" ] && { printf '%s' "${_PAPEL_DESTE_REPO}"; return; }
+_ROLE_OF_THIS_REPO=""
+_role() {
+  [ -n "${_ROLE_OF_THIS_REPO}" ] && { printf '%s' "${_ROLE_OF_THIS_REPO}"; return; }
   # ⚠️ LÊ O STAMP DIRETO, não invoca o `onion-version.sh`. Duas razões, e a segunda é a que me
   # custou uma depuração: (1) `violation()` roda centenas de vezes e cada chamada abriria um bash;
   # (2) o predicado é consultado de DENTRO de `$( )`, e ali o cache nunca persiste — o custo vira
@@ -337,16 +337,16 @@ _papel() {
   # barato e mais previsível que perguntar ao script que o lê.
   local stamp="${REPO_ROOT}/.claude/.onion-version"
   if [ -f "${stamp}" ]; then
-    _PAPEL_DESTE_REPO="$(awk '/^role:/{print $2; exit}' "${stamp}" 2>/dev/null)"
+    _ROLE_OF_THIS_REPO="$(awk '/^role:/{print $2; exit}' "${stamp}" 2>/dev/null)"
   fi
-  [ -n "${_PAPEL_DESTE_REPO}" ] || _PAPEL_DESTE_REPO="source"
-  printf '%s' "${_PAPEL_DESTE_REPO}"
+  [ -n "${_ROLE_OF_THIS_REPO}" ] || _ROLE_OF_THIS_REPO="source"
+  printf '%s' "${_ROLE_OF_THIS_REPO}"
 }
 # A ausência só é LEGÍTIMA se o objeto de fato não existe E o papel não é a fonte. Existir-e-estar-
 # quebrado continua HARD em qualquer papel: o recorte é sobre NÃO RECEBER, nunca sobre "está ruim".
-_sem_objeto_no_papel() {
+_without_object_for_role() {
   local msg="$1"
-  [ "$(_papel)" = "source" ] && return 1
+  [ "$(_role)" = "source" ] && return 1
   case "${msg}" in
     *kg-selo/ISENCAO*|*kg-parity/NAO-MEDIDO*|*kg-yaml/NAO-VERIFICADO*|*kg-verificacao/*)
       [ -z "$(git -C "${REPO_ROOT}" ls-files '*.kg.yaml' 2>/dev/null | head -1)" ] && return 0 ;;
@@ -365,9 +365,9 @@ violation() {
   local file="$2"
   local rule="$3"
 
-  if [ "${severity}" = "HARD" ] && _sem_objeto_no_papel "${rule}"; then
+  if [ "${severity}" = "HARD" ] && _without_object_for_role "${rule}"; then
     severity="SOFT"
-    rule="[papel/SEM-OBJETO] papel '$(_papel)' não recebe o objeto desta guarda — ${rule}"
+    rule="[papel/SEM-OBJETO] papel '$(_role)' não recebe o objeto desta guarda — ${rule}"
   fi
 
   # Caminho relativo à raiz do repo para mensagens mais legíveis
@@ -1034,24 +1034,24 @@ _glob_literal_prefix() { # $1=glob → maior prefixo SEM curinga ('' se o glob j
 # As raízes que o TRANSPORTE declara viajar — SSOT única (`vendor-manifest.sh --emit-scrub-roots`),
 # nunca uma lista repetida aqui. FAIL-CLOSED: manifesto ausente/vazio devolve vazio, e quem consulta
 # trata isso como "não sei" — ou seja, NÃO concede isenção nenhuma.
-_superficie_que_viaja() {
-  [ -n "${_SURF_VIAJA_CACHE:-}" ] && { printf '%s' "${_SURF_VIAJA_CACHE}"; return 0; }
+_traveling_surface() {
+  [ -n "${_SURF_TRAVELS_CACHE:-}" ] && { printf '%s' "${_SURF_TRAVELS_CACHE}"; return 0; }
   local mf="${CLAUDE_DIR}/utils/adopt/vendor-manifest.sh"
   if [ -f "${mf}" ]; then
-    _SURF_VIAJA_CACHE="$(bash "${mf}" --emit-scrub-roots 2>/dev/null)" || _SURF_VIAJA_CACHE=""
+    _SURF_TRAVELS_CACHE="$(bash "${mf}" --emit-scrub-roots 2>/dev/null)" || _SURF_TRAVELS_CACHE=""
   else
-    _SURF_VIAJA_CACHE=""
+    _SURF_TRAVELS_CACHE=""
   fi
-  printf '%s' "${_SURF_VIAJA_CACHE}"
+  printf '%s' "${_SURF_TRAVELS_CACHE}"
 }
 
 # Verdadeiro quando NENHUM glob desta regra aponta para superfície que viaja — isto é, o objeto da
 # regra é core-only e, num alvo, ela é estruturalmente incapaz de casar. No papel `source` a árvore é
 # completa: ali a mesma ausência continua HARD (é regra morta de verdade, não falta de objeto).
-_regra_sem_objeto_no_papel() { # $1=globs (um por linha)
-  [ "$(_papel)" = "source" ] && return 1
-  local surf g prefix r dentro=0
-  surf="$(_superficie_que_viaja)"
+_rule_without_object_for_role() { # $1=globs (um por linha)
+  [ "$(_role)" = "source" ] && return 1
+  local surf g prefix r inside=0
+  surf="$(_traveling_surface)"
   [ -n "${surf}" ] || return 1          # fail-closed: sem SSOT do transporte, não se concede isenção
   while IFS= read -r g; do
     [ -n "${g}" ] || continue
@@ -1059,9 +1059,9 @@ _regra_sem_objeto_no_papel() { # $1=globs (um por linha)
     [ -n "${prefix}" ] || return 1      # glob que começa em curinga varre o repo todo: tem objeto aqui
     while IFS= read -r r; do
       [ -n "${r}" ] || continue
-      case "${prefix}/" in "${r}/"*) dentro=1; break ;; esac
+      case "${prefix}/" in "${r}/"*) inside=1; break ;; esac
     done <<< "${surf}"
-    [ "${dentro}" -eq 1 ] && return 1   # ao menos um glob mira superfície que viaja → cobrança válida
+    [ "${inside}" -eq 1 ] && return 1   # ao menos um glob mira superfície que viaja → cobrança válida
   done <<< "$1"
   return 0
 }
@@ -1137,8 +1137,8 @@ check_rules_pathscoped() {
       # `docs/evolution/` não (é infra LOCAL do alvo, por desenho do vendor-manifest). As duas
       # decisões estão certas isoladas; juntas produzem uma regra que SÓ PODE reprovar no alvo.
       # A guarda declara a isenção — nunca passa calada — e mantém a cobrança viva no `source`.
-      if _regra_sem_objeto_no_papel "${globs}"; then
-        violation "SOFT" "${rule}" "[papel/SEM-OBJETO] papel '$(_papel)' não recebe o objeto desta regra: nenhum glob de 'paths:' ($(printf '%s' "${globs}" | tr '\n' ' ')) aponta para superfície que VIAJA (vendor-manifest.sh --emit-scrub-roots) — a regra chegou com o framework, o objeto dela é core-only; ela dorme aqui, e a cobrança segue HARD na fonte"
+      if _rule_without_object_for_role "${globs}"; then
+        violation "SOFT" "${rule}" "[papel/SEM-OBJETO] papel '$(_role)' não recebe o objeto desta regra: nenhum glob de 'paths:' ($(printf '%s' "${globs}" | tr '\n' ' ')) aponta para superfície que VIAJA (vendor-manifest.sh --emit-scrub-roots) — a regra chegou com o framework, o objeto dela é core-only; ela dorme aqui, e a cobrança segue HARD na fonte"
       else
         violation "HARD" "${rule}" "nenhum glob de 'paths:' casa arquivo rastreado ($(printf '%s' "${globs}" | tr '\n' ' ')) — a regra existe no disco e NUNCA carrega — corrija o glob para casar um arquivo real rastreado (git ls-files), ou remova a regra se obsoleta"
       fi
@@ -2290,12 +2290,12 @@ check_kg_read_index_sync() {
     violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice AUSENTE — o hook da perna de leitura fica calado para o corpus inteiro. Gere: bash .claude/validation/kg-trace-resolve.sh . --emit-index > docs/onion/kg-read-index.tsv"
     return
   fi
-  local novo; novo="$(bash "${gen}" "${REPO_ROOT}" --emit-index 2>/dev/null || true)"
-  if [ -z "${novo}" ]; then
+  local new_index; new_index="$(bash "${gen}" "${REPO_ROOT}" --emit-index 2>/dev/null || true)"
+  if [ -z "${new_index}" ]; then
     violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): o GERADOR devolveu vazio — não regenere por cima (sobrescreveria o índice bom). Falha de ambiente ou parser: rode o gerador à mão e leia o stderr."
     return
   fi
-  if ! printf '%s\n' "${novo}" | LC_ALL=C diff -q - "${idx}" >/dev/null 2>&1; then
+  if ! printf '%s\n' "${new_index}" | LC_ALL=C diff -q - "${idx}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice DEFASADO vs os \`trace:\` do corpus — o hook de leitura está cego para os nós que faltam. Regenere: bash .claude/validation/kg-trace-resolve.sh . --emit-index > docs/onion/kg-read-index.tsv"
   fi
 }
