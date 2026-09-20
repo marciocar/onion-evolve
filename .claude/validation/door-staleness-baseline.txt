@@ -98,5 +98,14 @@
 # 2026-09-20 (10a materializacao): `onion-core` volta a ZERO de novo; `onion-standalone` sobe a 395.
 # O ciclo materializar → push verificado no remoto → avancar o pin rodou sem atrito desta vez, com a
 # ordem que a entrada anterior fixou: o pin so anda DEPOIS do `gh api .../commits/main` confirmar.
-onion-standalone 395
+#
+# 2026-09-20 (pos-#854): `onion-standalone` sobe a 397 (passivo real da porta parada). O
+# `onion-core` FICA EM ZERO de proposito, e o gate fica VERMELHO ate o push — a porta esta
+# materializada e commitada (pin e3f25693ea66) mas nao publicada.
+# ⚠️ POR QUE NAO SUBI O TETO DO `onion-core` PARA 2, que destravaria o gate: seria catraca subindo
+# por estado TRANSITORIO. O 2 some no push; tolera-lo no baseline e gravar como divida o que e so
+# uma espera. Catraca so encolhe, e a unica coisa que legitimamente a faz subir e trabalho MERGEADO
+# que a porta ainda nao recebeu — nao trabalho ja materializado esperando `git push`.
+# O vermelho aqui nao e defeito: e a guarda dizendo a verdade sobre o mundo.
+onion-standalone 397
 onion-core 0

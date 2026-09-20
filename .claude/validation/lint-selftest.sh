@@ -75,7 +75,15 @@ _bench_abort_guard() {
   # saem antes de rodar guarda nenhuma. Medido em 2026-09-20: `--map` devolvia 337 linhas, SETE
   # delas lixo do proprio aviso, no STDOUT que outras ferramentas parseiam — inclusive o gatilho do
   # pre-commit que acabei de ligar ao mapa. Guarda que suja a saida que ela deveria proteger.
-  { [ "${SELFTEST_LIST:-0}" -eq 1 ] || [ "${SELFTEST_MAP:-0}" -eq 1 ] || [ "${SELFTEST_DRY:-0}" -eq 1 ]; } && return 0
+  # ⚠️ CONDICAO, NUNCA LISTA DE FLAGS — e a 1a redacao desta cura enumerou TRES modos
+  # (`--list`/`--map`/`--dry-run`), reincidindo na classe que ela mesma vinha curar. Medido pela
+  # passada adversarial: `--help` (rc=0), `--report <relativo>` (rc=2, uso invalido) e
+  # `--report <absoluto>` continuavam gritando "BANCADA ABORTOU" sobre saidas PROJETADAS. E o lado
+  # inverso e pior: a lista silenciava o MODO INTEIRO, entao um abort REAL dentro de `--map` (sem
+  # `python3`) saia com ZERO bytes em stdout E stderr — a guarda calava justamente onde deveria falar.
+  # A condicao certa e uma so: "o script chegou a uma saida PROJETADA?". Quem sai de proposito
+  # marca; o resto e abort. Nao ha lista para envelhecer.
+  [ "${SELFTEST_EXPECTED_EXIT:-0}" -eq 1 ] && return 0
   # ⚠️ E O DIAGNOSTICO VAI PARA STDERR: stdout desta ferramenta e consumido por maquina (o mapa, a
   # lista), e diagnostico em stdout e indistinguivel de dado. Quem le por pipe nao tem como separar.
   exec >&2
@@ -163,6 +171,7 @@ STRICT="${ONION_SELFTEST_STRICT:-0}"
 #                              TOTAL; quem consome AGRUPA por nome. Emitir uma linha só
 #                              exigiria o pai somar shards e esconderia a distribuição real
 #                              do trabalho, que é justamente o que se quer ver.
+SELFTEST_EXPECTED_EXIT=0   # 1 = o script chegou a uma saida PROJETADA (ajuda, listagem, uso invalido)
 SELFTEST_LIST=0; SELFTEST_MAP=0; SELFTEST_TIMING="${ONION_SELFTEST_TIMING:-0}"
 SELFTEST_JOBS="${ONION_SELFTEST_JOBS:-1}"; SELFTEST_FAMILIES="${ONION_SELFTEST_FAMILIES:-}"
 SELFTEST_CHILD="${ONION_SELFTEST_CHILD:-0}"; SELFTEST_AFFECTED=(); SELFTEST_AFFECTED_STAGED=0; SELFTEST_DRY=0
@@ -189,8 +198,8 @@ while [ $# -gt 0 ]; do
     --families=*) SELFTEST_FAMILIES="${1#--families=}" ;;
     --affected-staged) SELFTEST_AFFECTED_STAGED=1 ;;
     --affected) shift; while [ $# -gt 0 ]; do case "$1" in --*) break ;; esac; SELFTEST_AFFECTED+=("$1"); shift; done; continue ;;
-    -h|--help) sed -n '/^# Uso:/,/^SELFTEST_LIST=/p' "${BASH_SOURCE[0]}" | grep -v '^SELFTEST_LIST='; exit 0 ;;
-    *) echo "lint-selftest: argumento desconhecido '$1' (veja --help)" >&2; exit 2 ;;
+    -h|--help) SELFTEST_EXPECTED_EXIT=1; sed -n '/^# Uso:/,/^SELFTEST_LIST=/p' "${BASH_SOURCE[0]}" | grep -v '^SELFTEST_LIST='; exit 0 ;;
+    *) SELFTEST_EXPECTED_EXIT=1; echo "lint-selftest: argumento desconhecido '$1' (veja --help)" >&2; exit 2 ;;
   esac
   shift
 done
@@ -215,7 +224,7 @@ REPORT_ROWS=()
 if [ -n "${SELFTEST_REPORT}" ]; then
   case "${SELFTEST_REPORT}" in
     /*) ;;
-    *) echo "lint-selftest: --report exige caminho ABSOLUTO (recebi '${SELFTEST_REPORT}')" >&2; exit 2 ;;
+    *) SELFTEST_EXPECTED_EXIT=1; echo "lint-selftest: --report exige caminho ABSOLUTO (recebi '${SELFTEST_REPORT}')" >&2; exit 2 ;;
   esac
   # ⚠️ `--list`/`--map`/`--dry-run` saem ANTES de rodar guarda nenhuma. Aceitar `--report` junto
   #    deles produziria silêncio — nenhum arquivo, nenhum aviso — e quem lesse a ausência do TSV
@@ -342,7 +351,7 @@ _selftest_affected_families() {
   printf '%s\n' "${sel}" | tr ',' '\n' | grep -v '^$' | sort -u | paste -sd, -
 }
 
-if [ "${SELFTEST_MAP}" = "1" ]; then _selftest_family_map; exit "$?"; fi
+if [ "${SELFTEST_MAP}" = "1" ]; then SELFTEST_EXPECTED_EXIT=1; _selftest_family_map; exit "$?"; fi
 
 if [ "${SELFTEST_AFFECTED_STAGED}" = "1" ]; then
   while IFS= read -r p; do [ -n "${p}" ] && SELFTEST_AFFECTED+=("${p}"); done \
@@ -13465,6 +13474,38 @@ run_selftest_lanes_selftests() {
   if grep -q 'famílias=<todas>' <<< "${out}"&& grep -q 'failsafe' <<< "${out}"; then
     record_pass "selftest-lanes: (f) failsafe: lint-artifacts.sh ⇒ todas"
   else record_fail "selftest-lanes: (f) failsafe infra" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
+  # (r) A TRAP DE ABORT SILENCIA POR CONDIÇÃO, NUNCA POR LISTA DE FLAGS. Medido em 2026-09-20: a 1ª
+  #     cura enumerou três modos (`--list`/`--map`/`--dry-run`) e deixou `--help` (rc=0) e
+  #     `--report <inválido>` (rc=2) gritando "BANCADA ABORTOU" sobre saídas PROJETADAS — reincidindo
+  #     na classe `guarda-por-lista-falha-pelo-vocabulário` ao curar outra coisa. E o lado inverso era
+  #     pior: a lista calava o MODO INTEIRO, então um abort REAL dentro de `--map` (sem `python3`)
+  #     saía com ZERO bytes em stdout E stderr.
+  local _inv _fa
+  for _inv in --help --zzz-desconhecido "--report rel.tsv"; do
+    # shellcheck disable=SC2086
+    _fa="$(timeout 60 bash "${sut}" ${_inv} 2>&1 | grep -c 'BANCADA ABORTOU' || true)"
+    if [ "${_fa}" -eq 0 ]; then
+      record_pass "selftest-lanes: (r) saída projetada '${_inv}' NÃO dispara o aviso de abort"
+    else record_fail "selftest-lanes: (r)" "'${_inv}' é saída projetada e gritou BANCADA ABORTOU — a lista de flags voltou"; fi
+  done
+
+  # (s) ...e a trap CONTINUA gritando num abort de verdade. Sem este caso, (r) teria a cura trivial
+  #     de desligar a guarda — trocar falso alarme por silêncio total é o pior dos dois.
+  local _d; _d="$(mktemp -d)"; cp "${sut}" "${_d}/sut.sh"
+  python3 - "${_d}/sut.sh" <<'PYABORT'
+import sys
+p = sys.argv[1]; s = open(p).read()
+m = 'trap _bench_abort_guard EXIT'
+i = s.index(m)
+s = s[:i] + m + '\nfalse   # aborto FORCADO pela bancada\n' + s[i+len(m):]
+open(p, "w").write(s)
+PYABORT
+  _fa="$(timeout 60 bash "${_d}/sut.sh" --help 2>&1 | grep -c 'BANCADA ABORTOU' || true)"
+  if [ "${_fa}" -ge 1 ]; then
+    record_pass "selftest-lanes: (s) abort REAL ainda grita (a cura de (r) não virou silêncio)"
+  else record_fail "selftest-lanes: (s)" "a trap ficou muda num abort de verdade — silêncio é pior que falso alarme"; fi
+  rm -rf "${_d}"
+
   # (g) failsafe: arquivo do domínio citado por ninguém ⇒ TUDO (recusa no incerto)
   #     ⚠️ Em 2026-09-20 este contrato quase mudou: a ideia era DECLARAR a lacuna em vez de comprar
   #     ~30 min quando a bancada não alcança o arquivo. A doutrina é boa e a tentativa foi REPROVADA
