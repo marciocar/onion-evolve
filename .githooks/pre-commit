@@ -165,8 +165,32 @@ fi
 # AFETADAS pelos arquivos staged (mapa derivado + failsafe: infra da bancada ou arquivo desconhecido
 # ⇒ tudo) e roda em paralelo (`--jobs auto`). A faixa completa continua no CI (STRICT) e no cron.
 SELFTEST="${REPO_ROOT}/.claude/validation/lint-selftest.sh"
-if [ -f "${SELFTEST}" ] \
-   && git diff --cached --name-only --diff-filter=ACMR | grep -qE '^(\.claude/(validation|hooks|utils)/|ops/|\.githooks/|\.github/workflows/)'; then
+# ⚠️ DOIS MECANISMOS SABIAM COISAS DIFERENTES, E O MAIS POBRE DECIDIA. Este gatilho era SÓ a lista de
+# prefixos abaixo. O `lint-selftest.sh --map` conhece uma relação MAIS RICA — ele liga
+# `docs/onion/graph/fios-abertos.kg.yaml` à família `kg_backlog` —, e o gatilho ignorava isso.
+# Medido em 2026-09-20: a colheita de um nó mexeu SÓ em `docs/`, o gatilho não disparou, a bancada
+# NÃO RODOU no pre-commit, e o CI reprovou 30 minutos depois em dois casos de `kg_backlog` que o
+# commit local declarara verdes. O custo é o de sempre: descobrir por gate vermelho é caro e é tarde.
+# A cura NÃO é esticar a lista de prefixos — é PERGUNTAR AO MAPA, que é a SSOT da relação
+# arquivo→família. A lista fica como failsafe: o mapa pode não existir (adotante sem a projeção) ou
+# ser incompleto, e infraestrutura da bancada tem de disparar mesmo sem ele.
+_bench_touched() {
+  local _staged; _staged="$(git diff --cached --name-only --diff-filter=ACMR)"
+  [ -n "${_staged}" ] || return 1
+  # (1) failsafe por prefixo — infraestrutura da bancada dispara sempre
+  grep -qE '^(\.claude/(validation|hooks|utils)/|ops/|\.githooks/|\.github/workflows/)' <<< "${_staged}" && return 0
+  # (2) o MAPA: algum arquivo staged é citado por alguma família?
+  [ -f "${SELFTEST}" ] || return 1
+  local _map; _map="$(bash "${SELFTEST}" --map 2>/dev/null || true)"
+  [ -n "${_map}" ] || return 1
+  local _f
+  while IFS= read -r _f; do
+    [ -n "${_f}" ] || continue
+    LC_ALL=C awk -F'\t' -v a="${_f}" '$2 == a { found=1 } END { exit !found }' <<< "${_map}" && return 0
+  done <<< "${_staged}"
+  return 1
+}
+if [ -f "${SELFTEST}" ] && _bench_touched; then
   echo "🧪 Onion pre-commit — mudança no domínio da bancada → self-test das guardas AFETADAS (paralelo)…"
   if ! bash "${SELFTEST}" --affected-staged --jobs auto; then
     echo ""
