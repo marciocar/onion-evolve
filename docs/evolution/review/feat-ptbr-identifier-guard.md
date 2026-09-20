@@ -2,10 +2,12 @@
 title: 'Resíduo — a guarda da REGRA 60 tinha o mecanismo completo e o vocabulário vazio'
 date: 2026-09-20
 branch: feat/ptbr-identifier-guard
-reviewed_diff_sha256: 4ba3ccc854b342177b4384b65066418a2a756acfa60d0b2363af83f111368a95
+reviewed_diff_sha256: 62add134a6b71287be53c43a72636e7f50152c26865852003c207919cc638359
 findings_total: 8
 findings_real: 8
 findings_fixed: 8
+tokens: 30453888
+duration_min: 47
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >-
@@ -101,6 +103,26 @@ de **código** deste arquivo e exige que o símbolo exista em algum `.sh` de `.c
   `O comentário nomeia O CHECK, o REASON e o HEAD`). Varredura de comentários alterados virou passo fixo.
 - Primeiro extrator de identificadores era **cego nos dois casos conhecidos** (`_viaja`,
   `_PAPEL_DESTE_REPO`): só via `local X=` e `foo()`. Guarda cega justamente no que motivou construí-la.
+
+## Os `confirmed` do grafo que este PR leu antes de escrever (REGRA 87)
+
+O nó novo entra numa linha que já existe, e ele só faz sentido contra ela:
+
+- **`C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO`** (atenção 33,2 — o topo do grafo): *"em guarda que
+  enumera VOCABULÁRIO, o defeito dominante é a lista estar incompleta, nunca a lógica errada"*, com
+  N=3 num dia. Este PR é a **ocorrência 4**, e a mais severa da série porque a guarda cega era a da
+  própria regra de idioma, com o mecanismo completo.
+- **`E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA`**: *"guarda que varre menos do que o transporte emite é
+  fail-open com cara de cobertura"*. É literalmente o caso de `ops/` aqui — e foi esse nó que me fez
+  tratar o universo como defeito, não como escopo legítimo.
+- **`E_LISTA_1_REGRA36_NAO_VE_CLIENTE_NAO_REGISTRADO`** e **`E_LISTA_3_CATRACA_DO_EPIPE_SEM_GIT_E_SEM_BASH`**:
+  as ocorrências 1 e 3 da mesma série, que fixam a numeração deste nó e a forma da cura — a 3 é
+  especialmente próxima, porque lá também *já existia catraca com baseline e selftest* e ela não via
+  nada, pelo mesmo motivo.
+- **`E_PADRAO_PRIVADO_FIXAVA_UM_NOME_E_O_IRMAO_PASSAVA`**: o precedente de que predicado escrito por
+  enumeração envelhece — e a cura por **prefixo de família**. Foi a lente com que classifiquei as 3
+  ocorrências pré-existentes do vertical pessoal na porta pública (relatadas ao maestro, não curadas
+  aqui: já estão no HEAD publicado, então a decisão é dele).
 
 ## Declarado, não absorvido
 
