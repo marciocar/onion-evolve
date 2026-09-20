@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**205 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 47 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**206 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 47 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -289,11 +289,12 @@
 | 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
 | 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
 
-## passada-adversarial-2026-09 — 1 item(ns)
+## passada-adversarial-2026-09 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 13.5 | `Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE` | passada-adversarial-2026-09 | COMO FAZER A PERNA DE LEITURA ALCANCAR A SESSAO QUE ESCREVE NO GRAFO, sem virar ruido? Tres desenhos candidatos, nenhum medido: (a |
+| 6.8 | `Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER` | passada-adversarial-2026-09 | COMO FAZER O MAPA ENXERGAR O QUE A BANCADA EXERCITA POR FUNCAO-HELPER? Hoje ele le so o corpo de `run_*_selftests()`, e helpers de |
 
 ## inbox-sinais-2026-09 — 10 item(ns)
 

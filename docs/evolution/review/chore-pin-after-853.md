@@ -1,61 +1,105 @@
 ---
-title: 'Resíduo — o ciclo da porta rodou sem atrito, e isso é o registro'
+title: 'Resíduo — tentei afrouxar um failsafe e a medição me derrubou por 6,6×'
 date: 2026-09-20
 branch: chore/pin-after-853
-reviewed_diff_sha256: 084667dc5a5518ef36314a177ae9208d2c0cc11a8968f3c33e8d4abfc0c03119
-findings_total: 0
-findings_real: 0
-findings_fixed: 0
-tokens: 0
-duration_min: 2
-verdict: SEM_ACHADOS
-elenxo: nao
+reviewed_diff_sha256: f77d1019acdedcf1e850fd026d55d967a2578e395a322626983a021807b12504
+findings_total: 9
+findings_real: 8
+findings_fixed: 8
+tokens: 165200
+duration_min: 29
+verdict: REPROVADO_E_CURADO
+elenxo: sim
 nota: >-
-  Dois números e um pin. A passada é a conferência contra a fonte viva — o carimbo publicado do repo
-  da porta, lido do remoto. `elenxo: nao` declarado: não há superfície de execução a refutar.
+  A passada adversarial reprovou o afrouxamento do failsafe por dois motivos independentes — falso
+  negativo sobre arquivo que a bancada EXECUTA, e população errada por 6,6×. Revertido. O que
+  sobrevive: a limpeza do --map (confirmada pelo próprio refutador) e a reconciliação do pin.
 ---
 
-# O que havia para conferir
+# O que este PR queria, e por que a parte grande foi revertida
 
-**1. O pin bate com o publicado?**
+## A doutrina continua boa
+
+Rodar as 183 famílias por um arquivo que **nenhuma delas cobre** compra **zero**. O failsafe dizia
+*"recusa no incerto → roda tudo"*, e a premissa é que rodar tudo **cobre**. Para arquivos de `ops/`
+sem guarda nenhuma, não cobre — são ~30 min comprando nada.
+
+## Mas a implementação caiu, por dois motivos independentes
+
+**(a) Falso-negativo perigoso — o pior dos dois.** O mapa só enxerga referências dentro do corpo de
+`run_*_selftests()`. Chamadas feitas em **funções-helper** são invisíveis. E
+`.claude/validation/members-validate.sh` é **executado na l.3924** por um helper despachado pela
+família `fixtures`, com **5 fixtures** asseverando seu exit code.
+
+> Meu predicado dizia *"não coberto por guarda nenhuma"* e **tirava dele o failsafe que hoje o
+> protege.**
+
+Mesma classe, medida, em `federation-contract-validate.sh`, `scaffold-diagnose-store.sh` e — o mais
+caro — `lib/pt-br-words.txt`, que é **o dado que dirige a guarda de idioma**: editá-lo é exatamente
+quando se quer aquela família.
+
+**(b) A população que justificou a mudança estava errada por 6,6×.** Publiquei *"dos 253 arquivos do
+domínio, 13 não são citados por família nenhuma — todos em `ops/`"* no **código**, em **4 casos de
+bancada**, no **commit** e no **PR**.
+
+Rodando o **seletor real**, arquivo a arquivo, sobre os mesmos 253:
 
 ```
-$ gh api repos/marciocar/onion-core/commits/main --jq '.sha[0:7]'   → dc5d9e7
-$ grep 86062a9141a7 docs/evolution/federation/members.yaml          → pin da 10a materializacao
+SELECIONA famílias: 134 · roda TUDO: 33 · DECLARA não-coberto: 86
 ```
 
-O commit `dc5d9e7` é a materialização **do pin** `86062a9141a7` — o SHA do core que a porta espelha,
-não o SHA do commit da porta. Os dois são diferentes por construção, e confundi-los seria o erro que
-a REGRA 85 existe para pegar.
+> Eu medi **o meu modelo do código** — um script Python que aproximava o predicado — **e não o
+> código**. E o agravante: "corrigi" para baixo um número que estava **aproximadamente certo**
+> (116 ≈ 114 reais) **restringindo a população a `ops/` sem dizer**.
 
-**2. A catraca fecha sozinha?**
+**(c) E as guardas que deveriam ter pego isso eram tautologias.** Dois dos quatro casos novos faziam
+`grep -qF` no próprio script por uma string que **a linha do teste continha**:
 
 ```
-$ bash .claude/validation/door-staleness-check.sh
-onion-standalone  ok  395/395
-onion-core        ok  0/0
+325:    case "${_c}" in */lint-selftest.sh) continue ;; esac      ← o SUT
+13629:  if LC_ALL=C grep -qF 'case "${_c}" in */lint-selftest.sh) continue ;; esac' ...  ← o teste
 ```
 
-**3. A porta estava limpa antes de subir?** Verificado no passo anterior: lint da porta **0 HARD**,
-**0** termos de cliente com controle positivo de 293 arquivos casando `Onion`.
+Apagar o predicado inteiro deixava as 21 guardas **verdes**. É reincidência direta do defeito que eu
+curei **no commit anterior desta mesma branch** (`86062a91` — *"o teste fixava a constante do alvo"*).
+E um terceiro caso media o **ramo errado**: `vendor-manifest.sh` é citado por 8 famílias, então o
+predicado **nunca era chamado**.
 
-## A ordem que hoje virou rotina
+## Dois falsos positivos meus no predicado, antes disso
 
-O ciclo **materializar → push verificado no remoto → avançar o pin** rodou sem atrito desta vez, e é
-a primeira em que isso acontece. A regra que o tornou possível nasceu ontem e anteontem, das duas
-armadilhas opostas:
+1. A 1ª versão varria `.claude/`, `ops/` e `.github/` inteiros — **um arquivo de `ops/` citar outro
+   não diz nada sobre a bancada alcançá-lo**.
+2. A 2ª contava **a própria bancada**: o `lint-selftest.sh` é citado por dezenas de famílias, então um
+   caminho que **eu mesmo escrevera num comentário** documentando a medição passava por
+   "referenciado". **Mencionar não é exercitar.**
 
-- **pin velho** esconde porta nova (2026-09-18);
-- **pin novo** inventa porta publicada (2026-09-19/20).
+## O que SOBREVIVE, e foi confirmado pelo refutador
 
-> **As duas mentem; a diferença é a direção.** O pin só anda depois do `gh api .../commits/main`
-> confirmar — nunca depois do commit local.
+**A limpeza do `--map`.** A guarda de abort dispara no `exit`, e os modos de listagem não têm sumário
+por desenho — então ela gritava *"BANCADA ABORTOU"* em toda invocação de `--list`/`--map`/`--dry-run`,
+**sujando o stdout que máquina parseia**, inclusive o gatilho do pre-commit ligado ao mapa. Medido:
+**337 → 330 linhas**, as 7 removidas são exatamente o aviso. O diagnóstico foi para **stderr**.
 
-## Uma verificação que quase virou falso alarme
+E a **reconciliação do pin** da 10ª materialização (`86062a9141a7`, push verificado em `dc5d9e7`),
+com a catraca em `onion-core 0/0` e `onion-standalone 395/395`.
 
-Ao conferir se as curas de hoje viajaram, o `grep` acusou `.githooks/pre-commit: No such file` na
-porta. Ia registrar como *"cura que não viajou"*. Medi o outro lado antes: o template que o adotante
-recebe (`githook-pre-commit-onion.tpl`) tem **46 linhas e não roda bancada nenhuma** — o gatilho que
-curei é do hook **do core**, e é core-only por desenho.
+## O que o refutador atacou e NÃO derrubou
 
-> **Ausência esperada não é ausência defeituosa** — mas isso só se sabe medindo o outro lado.
+- **`exec >&2` na trap não vaza** — é `EXIT`, subshells não a herdam, workers são processos separados.
+- **`SELFTEST_LIST/MAP/DRY` não ficam unbound** sob `set -u` (os três usam `${…:-0}`), provado com um
+  erro de uso que sai antes do parse.
+- **O parsing do `--map` no pre-commit não quebrou** — o `awk -F'\t' '$2 == a'` exige casamento exato.
+- **A tese central está certa para `ops/`**: aqueles 9 realmente não têm guarda nenhuma.
+
+## A lição, e ela é sobre mim
+
+Seis passadas adversariais nesta sessão, **seis reprovações**. O padrão não é azar:
+
+> **Eu erro na direção de acreditar na minha própria medição** — sobretudo quando ela confirma o que
+> eu queria. Hoje isso apareceu cinco vezes: medir por `basename`; medir meu modelo em vez do código;
+> ler `exit 0` como verdade; fixar a constante do alvo no teste; e "corrigir" um número certo para
+> baixo restringindo a população em silêncio.
+
+O fio fica aberto com a medição correta em `Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER`, e o
+único candidato que mede **comportamento** em vez de texto é instrumentar a execução real. Esta casa
+pagou **três vezes hoje** por medir texto.
