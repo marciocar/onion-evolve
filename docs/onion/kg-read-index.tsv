@@ -349,12 +349,14 @@
 .claude/validation/lint-selftest.sh	E_CURE_REPRODUCED_AND_FIXED	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_EPIPE_ACUSOU_O_TRANSPORTE_DE_NAO_CARREGAR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_F6_DETACHED_MORRE_NO_STOP	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
+.claude/validation/lint-selftest.sh	E_FAILSAFE_AFROUXADO_REPROVOU_POR_MEDICAO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_FIXTURE_NA_ARVORE_VIVA_CORRE_COM_AS_FAIXAS	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_SELFTEST	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_minha_guarda_deu_fail_open	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_reproduction_3_tries	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_skeleton_vazio_reprova	docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml
+.claude/validation/lint-selftest.sh	Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/members-validate.sh	Q_members_ci_gate	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/pin-integrity-check.sh	E_pin_integrity_check	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/pipe-verdict-check.sh	E_LISTA_3_CATRACA_DO_EPIPE_SEM_GIT_E_SEM_BASH	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml

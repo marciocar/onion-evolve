@@ -296,37 +296,6 @@ PYMAP
 }
 
 # Seleciona famílias pelos arquivos tocados. Imprime a lista (vírgulas) ou ALL; o motivo vai ao stderr.
-# Derivado, nunca lista: o arquivo e REFERENCIADO por alguma peca da maquinaria (guardas, hooks,
-# utils, ops, comandos, workflows)? Se e, a bancada PODE alcanca-lo por caminho indireto e o
-# failsafe de rodar tudo se justifica. Se ninguem o referencia, rodar tudo nao o cobre — e mentir
-# que cobre e pior que declarar a lacuna.
-# ⚠️ CASAMENTO POR CAMINHO COMPLETO, nunca por basename: `README.md` casaria 31 arquivos e
-# `Caddyfile` casaria qualquer mencao. Medido no proprio dia em que esta funcao nasceu — o autor
-# errou a mesma medicao DUAS vezes em dez minutos antes de escrever isto.
-_selftest_referenced_anywhere() {   # $1=caminho · $2=mapa (familia<TAB>arquivo)
-  local _p="$1" _map="$2" _c
-  # ⚠️ O ESCOPO E "O QUE A BANCADA EXERCITA", NAO "O REPO INTEIRO". A 1a redacao varria `.claude`,
-  # `ops` e `.github` — e um arquivo de `ops/` citar outro de `ops/` nao diz NADA sobre a bancada
-  # alcanca-lo. Medido na 1a execucao: um script de cron do GTM saiu "referenciado" e caiu no failsafe
-  # de rodar tudo, que e exatamente o caso que esta cura existe para distinguir. Predicado largo
-  # demais nao erra para o lado seguro — erra para o lado que NAO MUDA NADA.
-  # Escopo correto: os arquivos que o MAPA cita, que sao os que alguma familia de fato exercita.
-  while IFS=$'\t' read -r _ _c; do
-    [ -n "${_c}" ] && [ "${_c}" != "*" ] || continue
-    case "${_c}" in */) continue ;; esac            # diretorio nao se le como arquivo
-    [ -f "${REPO_ROOT}/${_c}" ] || continue
-    [ "${_c}" = "${_p}" ] && continue               # ele mesmo nao conta
-    # ⚠️ A PROPRIA BANCADA NAO CONTA, e este foi o 2o falso positivo da mesma funcao: o
-    # `lint-selftest.sh` e citado por DEZENAS de familias, entao qualquer caminho mencionado nele —
-    # inclusive num COMENTARIO explicando a medicao — passava por "referenciado". Medido ao vivo:
-    # o caminho que eu havia escrito na prosa desta funcao fez o predicado dizer que a bancada o
-    # alcancava. MENCIONAR NAO E EXERCITAR, e um arquivo que so aparece em comentario nao e coberto
-    # por nada. (Por isso a prosa acima tambem deixou de citar caminhos reais.)
-    case "${_c}" in */lint-selftest.sh) continue ;; esac
-    LC_ALL=C grep -qF -- "${_p}" "${REPO_ROOT}/${_c}" 2>/dev/null && return 0
-  done <<< "${_map}"
-  return 1
-}
 
 _selftest_affected_families() {
   local map p hit known sel="" always
@@ -346,35 +315,28 @@ _selftest_affected_families() {
     else
       case "${p}" in
         .claude/validation/*|.claude/hooks/*|.claude/utils/*|ops/*)
-          # ⚠️ DOIS CASOS DIFERENTES MORAVAM AQUI, E O FAILSAFE TRATAVA OS DOIS IGUAL.
-          # "recusa no incerto → roda tudo" pressupõe que rodar tudo COBRE o arquivo. Medido em
-          # 2026-09-20 sobre os 253 arquivos do domínio: 13 não são citados por família nenhuma —
-          # todos em `ops/` (bridge, caddy, gtm, gpg, servidores MCP) — e NENHUM é referenciado por
-          # arquivo que a bancada exercita. Para eles, rodar as 183 famílias cobre ZERO: são ~30 min
-          # comprando nada. Isso não é fail-closed, é teatro com preço.
-          # O PADRÃO DESTA CASA para guarda que não pode julgar é DECLARAR, nunca fingir — e fingir
-          # aqui é apresentar "rodei tudo" como se fosse cobertura.
-          # O CRITÉRIO É DERIVADO, NUNCA LISTA À MÃO (a lista é a forma que envelhece, e esta casa
-          # pagou por ela duas vezes só hoje): "alguém na maquinaria referencia este caminho?".
-          # Acrescentar uma guarda amanhã faz o arquivo passar a ser referenciado, e o predicado se
-          # atualiza sozinho — sem ninguém voltar aqui.
-          if _selftest_referenced_anywhere "${p}" "${map}"; then
-            echo "ALL"; echo "  failsafe: ${p} não é citado por nenhuma família, mas a maquinaria o referencia → tudo (recusa no incerto)" >&2; return 0
-          fi
-          _UNCOVERED="${_UNCOVERED:+${_UNCOVERED} }${p}"
-          ;;
+          # ⚠️ TENTEI AFROUXAR ISTO EM 2026-09-20 E A PASSADA ADVERSARIAL REPROVOU — com razao, e o
+          # registro fica porque a tentativa foi bem-intencionada e ESTAVA ERRADA por MEDICAO.
+          # A ideia: arquivo que a bancada nao alcanca nao ganha cobertura por rodar tudo, entao o
+          # failsafe deveria DECLARAR a lacuna em vez de comprar ~30 min. A doutrina e boa; o que
+          # falhou foi o predicado e o numero.
+          # (a) FALSO-NEGATIVO PERIGOSO, medido: o mapa so enxerga referencias dentro do corpo de
+          #     `run_*_selftests()`. Chamadas em FUNCOES-HELPER sao invisiveis — e `members-validate.sh`
+          #     e EXECUTADO na l.3924 por um helper da familia `fixtures`, com 5 fixtures asseverando
+          #     seu exit code. Meu predicado dizia "nao coberto" e tirava dele o failsafe que o
+          #     protege. Mesma classe em `federation-contract-validate.sh`, `lib/pt-br-words.txt`
+          #     (o DADO que dirige a guarda de idioma) e `scaffold-diagnose-store.sh`.
+          # (b) A POPULACAO QUE JUSTIFICOU A MUDANCA ESTAVA ERRADA POR 6,6x: publiquei "13, todos em
+          #     ops/". Rodando o SELETOR REAL sobre os 253 arquivos do dominio: 86 seriam declarados
+          #     nao-cobertos, 33 rodariam tudo, 134 selecionariam familias. Eu havia medido O MEU
+          #     MODELO do codigo, nao o codigo — e "corrigi" para baixo um numero que estava
+          #     aproximadamente certo, restringindo a populacao a `ops/` sem dizer.
+          # FICA fail-closed. Reabrir exige: predicado que enxergue invocacao por helper, e a
+          # medicao refeita com o seletor real.
+          echo "ALL"; echo "  failsafe: ${p} não é citado por nenhuma família → tudo (recusa no incerto)" >&2; return 0 ;;
       esac
     fi
   done
-  # A LACUNA SAI NOMEADA, sempre — e em stderr, porque stdout aqui é a lista de famílias que o
-  # chamador consome. Silêncio sobre arquivo não-coberto seria a mesma mentira por omissão que o
-  # `record_skip` conserta uma camada abaixo.
-  if [ -n "${_UNCOVERED:-}" ]; then
-    echo "  ⚠️ NÃO COBERTO POR GUARDA NENHUMA (a bancada não os testa, nem rodando inteira):" >&2
-    printf '       %s\n' ${_UNCOVERED} >&2
-    echo "     Rodar as 183 famílias por causa deles compraria ZERO cobertura. Se algum DEVE ser" >&2
-    echo "     testado, o conserto é escrever a guarda — não alargar o failsafe." >&2
-  fi
   always="$(printf '%s\n' "${map}" | awk -F'\t' '$2=="*"{print $1}' | paste -sd, -)"
   sel="${sel:+${sel},}${always}"
   printf '%s\n' "${sel}" | tr ',' '\n' | grep -v '^$' | sort -u | paste -sd, -
@@ -13503,18 +13465,16 @@ run_selftest_lanes_selftests() {
   if grep -q 'famílias=<todas>' <<< "${out}"&& grep -q 'failsafe' <<< "${out}"; then
     record_pass "selftest-lanes: (f) failsafe: lint-artifacts.sh ⇒ todas"
   else record_fail "selftest-lanes: (f) failsafe infra" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
-  # (g) ⚠️ CONTRATO MUDADO EM 2026-09-20, e este caso guarda a razão. Antes: arquivo do domínio
-  #     citado por ninguém ⇒ TUDO ("recusa no incerto"). A premissa era que rodar tudo COBRE o
-  #     arquivo — e a medição a derrubou: dos 253 arquivos do domínio, 13 não são citados por
-  #     família nenhuma e NENHUM é referenciado por arquivo que a bancada exercita. Rodar as 183
-  #     famílias por causa deles compra ZERO cobertura: não é fail-closed, é teatro com preço.
-  #     Agora: quando a bancada ALCANÇA o arquivo por referência indireta, segue TUDO (caso (n));
-  #     quando não alcança, DECLARA a lacuna nomeando o arquivo. Guarda que não pode julgar declara,
-  #     nunca finge.
+  # (g) failsafe: arquivo do domínio citado por ninguém ⇒ TUDO (recusa no incerto)
+  #     ⚠️ Em 2026-09-20 este contrato quase mudou: a ideia era DECLARAR a lacuna em vez de comprar
+  #     ~30 min quando a bancada não alcança o arquivo. A doutrina é boa e a tentativa foi REPROVADA
+  #     pela medição — o predicado não via invocação por função-helper e declarava "não coberto"
+  #     arquivos que a bancada EXECUTA (`members-validate.sh` entre eles), e a população que
+  #     justificava a mudança estava errada por 6,6×. Fica fail-closed até haver predicado honesto.
   out="$(bash "${sut}" --affected .claude/validation/zz-nao-existe.sh --dry-run 2>&1 || true)"
-  if grep -q 'NÃO COBERTO POR GUARDA NENHUMA' <<< "${out}" && grep -q 'zz-nao-existe.sh' <<< "${out}"; then
+  if grep -q 'famílias=<todas>' <<< "${out}"&& grep -q 'nenhuma família' <<< "${out}"; then
     record_pass "selftest-lanes: (g) failsafe: arquivo desconhecido no domínio ⇒ todas"
-  else record_fail "selftest-lanes: (g) contrato do failsafe" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
+  else record_fail "selftest-lanes: (g) failsafe desconhecido" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
   # (h)(i)(j) cópia hermética com famílias sintéticas (REPO_ROOT da cópia = sandbox)
   # o top-level da bancada copia .claude/docs/CLAUDE.md p/ o sandbox e lê inventory.sh --env (grep vazio sob
   # pipefail aborta): a cópia leva .claude/ e docs/ inteiros (33 MB) — REPO_ROOT da cópia = este sandbox
@@ -13597,45 +13557,6 @@ PYI
 
   rm -rf "${d}"
 
-  # ── (m..p) O FAILSAFE DISTINGUE "NÃO CITADO MAS ALCANÇÁVEL" DE "NÃO COBERTO POR NADA" ─────────
-  # Medido em 2026-09-20 nos 253 arquivos do domínio: 13 não são citados por família nenhuma — todos
-  # em `ops/` (bridge, caddy, gtm, gpg, servidores MCP) — e NENHUM é referenciado por arquivo que a
-  # bancada exercita. Para eles, rodar as 183 famílias cobre ZERO: ~30 min comprando nada. Isso não
-  # é fail-closed, é teatro com preço — e o padrão desta casa para guarda que não pode julgar é
-  # DECLARAR, nunca fingir cobertura.
-  local _ls="${REPO_ROOT}/.claude/validation/lint-selftest.sh" _o
-
-  # (m) arquivo do domínio que NINGUÉM referencia → declara a lacuna, NOMEIA, e NÃO roda tudo
-  _o="$(bash "${_ls}" --affected ops/gtm/gtm-cron.sh --dry-run 2>&1 || true)"
-  if grep -q 'NÃO COBERTO POR GUARDA NENHUMA' <<< "${_o}" \
-     && grep -q 'ops/gtm/gtm-cron.sh' <<< "${_o}" \
-     && ! grep -q 'TODAS as famílias' <<< "${_o}"; then
-    record_pass "lanes: (m) arquivo sem cobertura → DECLARA nomeando, em vez de comprar 183 famílias"
-  else record_fail "lanes: (m)" "voltou a rodar tudo (ou calou) num arquivo que a bancada não cobre: $(_emit "${_o}" | head -c 250)"; fi
-
-  # (n) ...e o que a bancada ALCANÇA por referência indireta segue em fail-closed. Sem este caso a
-  #     cura de (m) viraria afrouxamento geral: "não citado" passaria a significar "ignore".
-  _o="$(bash "${_ls}" --affected .claude/utils/adopt/vendor-manifest.sh --dry-run 2>&1 || true)"
-  if ! grep -q 'NÃO COBERTO POR GUARDA NENHUMA' <<< "${_o}"; then
-    record_pass "lanes: (n) arquivo que a bancada alcança NÃO é declarado sem cobertura (fail-closed vivo)"
-  else record_fail "lanes: (n)" "declarou sem cobertura um arquivo que famílias exercitam: $(_emit "${_o}" | head -c 250)"; fi
-
-  # (o) A PRÓPRIA BANCADA NÃO CONTA COMO REFERÊNCIA — 2º falso positivo medido no dia: o
-  #     `lint-selftest.sh` é citado por dezenas de famílias, então QUALQUER caminho mencionado nele,
-  #     inclusive num comentário, passava por "referenciado". Mencionar não é exercitar.
-  local _sb; _sb="$(mktemp -d)"
-  mkdir -p "${_sb}/.claude/validation" "${_sb}/ops/zz"
-  printf '#!/bin/sh\n:\n' > "${_sb}/ops/zz/alvo.sh"
-  if LC_ALL=C grep -qF 'case "${_c}" in */lint-selftest.sh) continue ;; esac' "${_ls}"; then
-    record_pass "lanes: (o) o predicado EXCLUI a própria bancada do escopo de referência"
-  else record_fail "lanes: (o)" "a bancada voltou a contar como referência — menção em comentário vira 'coberto'"; fi
-  rm -rf "${_sb}"
-
-  # (p) O CASAMENTO É POR CAMINHO COMPLETO, nunca por basename. O autor errou ESTA medição duas
-  #     vezes em dez minutos: `README.md` casa 31 arquivos e `Caddyfile` casa qualquer menção.
-  if LC_ALL=C grep -qF 'grep -qF -- "${_p}"' "${_ls}"; then
-    record_pass "lanes: (q) referência casada por caminho COMPLETO (não por basename)"
-  else record_fail "lanes: (q)" "o predicado deixou de casar por caminho completo — basename traz falso positivo"; fi
 
 }
 _family run_selftest_lanes_selftests
