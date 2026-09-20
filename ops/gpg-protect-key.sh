@@ -111,9 +111,9 @@ gpgconf --kill gpg-agent 2>/dev/null || true
 sleep 1
 
 # ── VERIFICAÇÃO POR COMPORTAMENTO — duas provas independentes ───────────────────────────
-_falhou=0
-key_is_protected || { echo "✗ a chave AINDA assina sem senha"; _falhou=1; }
+_failed=0
+key_is_protected || { echo "✗ a chave AINDA assina sem senha"; _failed=1; }
 prot="$(files_protected_count)"; total="$(key_files_total)"
-[ "$prot" -eq "$total" ] && [ "$total" -gt 0 ] || { echo "✗ arquivos marcados protected: ${prot}/${total}"; _falhou=1; }
-[ "$_falhou" -eq 0 ] || exit 1
+[ "$prot" -eq "$total" ] && [ "$total" -gt 0 ] || { echo "✗ arquivos marcados protected: ${prot}/${total}"; _failed=1; }
+[ "$_failed" -eq 0 ] || exit 1
 echo "✓ chave protegida — arquivo E comportamento conferem (${prot}/${total})"

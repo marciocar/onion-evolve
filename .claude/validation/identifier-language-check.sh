@@ -89,9 +89,25 @@ WORDLIST="$(grep -v '^[[:space:]]*\(#\|$\)' "${WORDS}" | tr '\n' '|' | sed 's/|$
 #     o adotante recem-adotado: `/meta:adopt` instala `.claude/` SEM commitar, entao 51 scripts no
 #     disco, 0 rastreados, e a guarda nascia MUDA no dia 1 EXIBINDO APROVACAO. E a mesma classe que
 #     a linha da lista ausente ja trata certo (exit 2) e que aqui foi esquecida.
+# ── `ops/` ENTRA NO UNIVERSO SO NA FONTE (core-only) ──────────────────────────────────────────
+# POR QUE ROLE-AWARE, e nao simplesmente `+ ops/`: este checker VIAJA para adotantes (a familia
+# `idioma` da bancada copia-o para um sandbox, e o bundle de adocao o leva). `ops/` num adotante e
+# o diretorio DELE, no idioma DELE — policia-lo seria a guarda cobrando fora da superficie Onion.
+# Mas deixar `ops/` fora NO CORE e fail-open com cara de cobertura, e o numero existe: medido em
+# 2026-09-20, 10 identificadores pt-BR vivos ali, um deles (`MOTIVO`, em `ops/pr-merge-verified.sh`)
+# com o segmento JA na lista — a guarda tinha a palavra e nao olhava o arquivo. E a mesma classe que
+# `E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA` registra: varrer menos do que existe e fail-open.
+# O DISCRIMINANTE e o invariante do stamp: o CORE nao tem `.claude/.onion-version` (ele computa o
+# proprio papel), o ADOTANTE tem. Mesmo criterio que o carteiro upstream usa para decidir papel.
+_is_source() { [ ! -f "${REPO_ROOT}/.claude/.onion-version" ]; }
+
 _universe() {
   { git ls-files '.claude/**/*.sh' '.claude/*.sh' 2>/dev/null || true
     find .claude -name '*.sh' -type f 2>/dev/null || true
+    if _is_source; then
+      git ls-files 'ops/**/*.sh' 'ops/*.sh' 2>/dev/null || true
+      find ops -name '*.sh' -type f 2>/dev/null || true
+    fi
     # ⚠️ FILTRO PRÓPRIO, por decisão declarada (2026-09-05): o predicado único de isenção de fixture
     #    (em `.claude/validation/`, o que os consumidores de grafo usam) NÃO é usado aqui — e esta nota
     #    evita citar o nome dele de propósito, porque a guarda deriva os consumidores por menção.

@@ -74,9 +74,9 @@ _PAT_AMP='[A-Za-z0-9]{2,}&[A-Za-z0-9]+|[A-Za-z0-9]+&[A-Za-z0-9]{2,}'
 #     indistinguível de ênfase de prosa, e admiti-la custou 27 falsos-positivos numa medição real.
 #     Quem escrever `cliente IBM` num arquivo que viaja passa; quem escrever `cliente IBM Brasil`
 #     não. É um furo consciente, e o preço de fechá-lo era matar a guarda de ruído.
-_PAT_NOME='[A-Z][[:lower:]][[:alnum:]]*([[:space:]]+[A-Z][[:lower:]][[:alnum:]]*)?'
+_PAT_NAME='[A-Z][[:lower:]][[:alnum:]]*([[:space:]]+[A-Z][[:lower:]][[:alnum:]]*)?'
 _PAT_SIGLA='[A-Z][A-Z0-9]+[[:space:]]+[A-Z][[:lower:]][[:alnum:]]*'
-_PAT_CTX="(PoC|POC|[Cc]liente|[Aa]dotante|[Ee]mpresa)[[:space:]]*(:|-)?[[:space:]]*(da|de|do|das|dos)?[[:space:]]*(${_PAT_SIGLA}|${_PAT_NOME})"
+_PAT_CTX="(PoC|POC|[Cc]liente|[Aa]dotante|[Ee]mpresa)[[:space:]]*(:|-)?[[:space:]]*(da|de|do|das|dos)?[[:space:]]*(${_PAT_SIGLA}|${_PAT_NAME})"
 
 _scan() {
   # ⚠️ LOCALE UTF-8, E ISTO É DELIBERADO — a casa roda tudo em LC_ALL=C, esta guarda é a exceção.

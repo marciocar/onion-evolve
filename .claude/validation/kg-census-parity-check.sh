@@ -204,10 +204,10 @@ if git -C "${ROOT}" rev-parse --verify --quiet origin/main >/dev/null 2>&1; then
   else
     _prev_set="$(printf '%s\n' "${_prev_raw}" | grep -vE '^[[:space:]]*(#|$)' | LC_ALL=C sort -u || true)"
     # CONJUNTO, não contagem: o que INTEROU é o que importa (troca 5→5 escondia arquivo novo).
-    _novos="$(comm -13 <(printf '%s\n' "${_prev_set}") <(printf '%s\n' "${_cur_set}") | grep -v '^$' | tr '\n' ' ' || true)"
-    if [ -n "${_novos// }" ]; then
+    _new_ones="$(comm -13 <(printf '%s\n' "${_prev_set}") <(printf '%s\n' "${_cur_set}") | grep -v '^$' | tr '\n' ' ' || true)"
+    if [ -n "${_new_ones// }" ]; then
       rc=1
-      _out HARD CATRACA-VIOLADA "${BASELINE_REL}" "o baseline GANHOU entrada(s) vs origin/main — o passivo só encolhe. Novo(s): ${_novos% }"
+      _out HARD CATRACA-VIOLADA "${BASELINE_REL}" "o baseline GANHOU entrada(s) vs origin/main — o passivo só encolhe. Novo(s): ${_new_ones% }"
     fi
   fi
 else

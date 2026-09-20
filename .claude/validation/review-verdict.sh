@@ -71,7 +71,7 @@ emit() { # $1=revisou $2=motivo $3=turnos $4=custo $5=chars-do-texto (opcional)
 # motivo: `error_max_turns` após 9 turnos e US$ 0,34 — trabalho REAL interrompido por
 # orçamento. Classificar isso como `is-error` genérico, igual a "morreu sem fazer nada",
 # apaga a diferença que decide o conserto (subir `--max-turns` × investigar a origem).
-motivo_do_subtipo() { # $1=subtype
+reason_for_subtype() { # $1=subtype
   case "${1}" in
     # Os QUATRO subtypes de erro que o SDK declara (sdk.d.ts:4269-4271, v0.3.220 — a mesma do pin
     # be7b93b). Nomear so dois deixava dois cairem no balde generico `is-error:<subtype>`, apagando
@@ -137,15 +137,15 @@ verdict() {
   # `type: "assistant"` do array carregam o mesmo em `.message.content[].text`. Nenhum parser do
   # repo jamais leu qualquer um dos dois: o arquivo e gerado, consumido por 4 campos, descartado.
   # Aqui so se MEDE o tamanho — imprimir e trabalho do modo --texto.
-  local texto chars
-  texto="$(printf '%s' "${res}" | jq -r '.result // empty' 2>/dev/null || true)"
-  chars="${#texto}"
+  local text chars
+  text="$(printf '%s' "${res}" | jq -r '.result // empty' 2>/dev/null || true)"
+  chars="${#text}"
 
   if [ "${is_err}" = "true" ]; then
-    local motivo; motivo="$(motivo_do_subtipo "${subtype}")"
+    local reason; reason="$(reason_for_subtype "${subtype}")"
     printf 'review-verdict: is_error=true subtype=%s (turnos=%s, custo=%s) — NÃO houve revisão\n' \
       "${subtype:-—}" "${turns}" "${cost}" >&2
-    emit false "${motivo}" "${turns}" "${cost}" "${chars}"
+    emit false "${reason}" "${turns}" "${cost}" "${chars}"
     return 0
   fi
 
@@ -269,7 +269,7 @@ JSON
   else printf '  ✗ review-verdict: texto_chars=%s com .result presente — a chave do texto esta errada\n' "${chars:-empty}"; rc=1; fi
 
   # --texto imprime o parecer, e e a fonte que NAO depende do posting funcionar.
-  local t; t="$(texto_do_revisor "${d}/comtexto.json")"
+  local t; t="$(reviewer_text "${d}/comtexto.json")"
   if printf '%s' "${t}" | grep -q 'O diff esta conforme'; then
     printf '  ✓ review-verdict: --texto imprime o parecer integro (fonte independente do github_token)\n'
   else printf '  ✗ review-verdict: --texto nao trouxe o parecer: %s\n' "${t}"; rc=1; fi
@@ -288,7 +288,7 @@ JSON
     "total_cost_usd": 3.1, "errors": ["max turns (60) reached"] }
 ]
 JSON
-  t="$(texto_do_revisor "${d}/comerros.json")"
+  t="$(reviewer_text "${d}/comerros.json")"
   if printf '%s' "${t}" | grep -q 'max turns (60) reached'; then
     printf '  ✓ review-verdict: erro com errors[] → imprime o DIAGNOSTICO do SDK (nao manda cacar mudanca de schema)\n'
   else printf '  ✗ review-verdict: errors[] nao chegou a saida: %s\n' "${t}"; rc=1; fi
@@ -302,7 +302,7 @@ JSON
     "total_cost_usd": 0.3 }
 ]
 JSON
-  t="$(texto_do_revisor "${d}/parcial.json")"
+  t="$(reviewer_text "${d}/parcial.json")"
   if printf '%s' "${t}" | grep -q 'VEREDITO: 2 violacoes'; then
     printf '  ✓ review-verdict: erro sem errors[] → salva o texto PARCIAL do assistant (o veredito sobrevive)\n'
   else printf '  ✗ review-verdict: texto parcial perdido: %s\n' "${t}"; rc=1; fi
@@ -311,7 +311,7 @@ JSON
   cat > "${d}/mudo.json" <<'JSON'
 [ { "type": "result", "subtype": "error_during_execution", "is_error": true, "num_turns": 0, "total_cost_usd": 0 } ]
 JSON
-  t="$(texto_do_revisor "${d}/mudo.json")"
+  t="$(reviewer_text "${d}/mudo.json")"
   if printf '%s' "${t}" | grep -q 'nao chegou a falar'; then
     printf '  ✓ review-verdict: sem NENHUMA das tres fontes → diz que o revisor nao falou (ausencia real, nomeada)\n'
   else printf '  ✗ review-verdict: piso de degradacao errado: %s\n' "${t}"; rc=1; fi
@@ -334,20 +334,20 @@ JSON
   # ── O CORPO DO COMENTARIO (--corpo) ──────────────────────────────────────────────────────────
   # O revisor DEVOLVE; quem posta e o Onion. Estes casos guardam a ponte.
   local c
-  c="$(corpo_do_comentario '<!-- m -->' '{"veredito":"1 violacao","achados":[{"arquivo":"a.sh","linha":7,"regra":"commands.md:88","evidencia":"orq em agente"}]}' '')"
+  c="$(comment_body '<!-- m -->' '{"veredito":"1 violacao","achados":[{"arquivo":"a.sh","linha":7,"regra":"commands.md:88","evidencia":"orq em agente"}]}' '')"
   if printf '%s' "${c}" | grep -q '| `a.sh:7` | commands.md:88 |' \
      && printf '%s' "${c}" | grep -q '<!-- m -->'; then
     printf '  ✓ review-verdict: --corpo renderiza a tabela com arquivo:linha e carrega a marca sticky\n'
   else printf '  ✗ review-verdict: --corpo nao renderizou: %s\n' "${c}"; rc=1; fi
 
   # achado SEM linha — o schema torna `linha` opcional, e a tabela nao pode imprimir "a.sh:"
-  c="$(corpo_do_comentario '<!-- m -->' '{"veredito":"x","achados":[{"arquivo":"b.md","regra":"r","evidencia":"e"}]}' '')"
+  c="$(comment_body '<!-- m -->' '{"veredito":"x","achados":[{"arquivo":"b.md","regra":"r","evidencia":"e"}]}' '')"
   if printf '%s' "${c}" | grep -q '| `b.md` |'; then
     printf '  ✓ review-verdict: --corpo omite o `:linha` quando o achado nao tem linha\n'
   else printf '  ✗ review-verdict: --corpo com linha ausente saiu errado: %s\n' "${c}"; rc=1; fi
 
   # `achados: []` e CONFORME, nao "sem parecer" — a distincao que o array empty existe para fazer
-  c="$(corpo_do_comentario '<!-- m -->' '{"veredito":"conforme","achados":[]}' '')"
+  c="$(comment_body '<!-- m -->' '{"veredito":"conforme","achados":[]}' '')"
   if printf '%s' "${c}" | grep -q 'nenhum achado'; then
     printf '  ✓ review-verdict: --corpo com achados vazios diz CONFORME (array empty != ausencia)\n'
   else printf '  ✗ review-verdict: --corpo nao distinguiu conforme de empty: %s\n' "${c}"; rc=1; fi
@@ -356,7 +356,7 @@ JSON
   # outro; o que nao pode e sumir — que era o estado ate 2026-08-07.
   local empty=0
   for so in '' 'lixo-nao-json' '{"sem":"achados"}'; do
-    c="$(corpo_do_comentario '<!-- m -->' "${so}" "${d}/comtexto.json")"
+    c="$(comment_body '<!-- m -->' "${so}" "${d}/comtexto.json")"
     printf '%s' "${c}" | grep -q 'O diff esta conforme' || empty=$((empty + 1))
   done
   if [ "${empty}" -eq 0 ]; then
@@ -366,7 +366,7 @@ JSON
   # (MUT) sem o ramo de fallback, structured_output empty produz corpo SEM parecer — prova que o
   # fallback e load-bearing e nao decorativo.
   local mut5; mut5="$(mktemp -d)"; cp "$0" "${mut5}/m.sh"
-  sed -i 's|    texto_do_revisor "${f}"|    :|' "${mut5}/m.sh"
+  sed -i 's|    reviewer_text "${f}"|    :|' "${mut5}/m.sh"
   if ! cmp -s "$0" "${mut5}/m.sh"; then
     c="$(bash "${mut5}/m.sh" --corpo '<!-- m -->' '' "${d}/comtexto.json")"
     if ! printf '%s' "${c}" | grep -q 'O diff esta conforme'; then
@@ -387,7 +387,7 @@ JSON
 # que e por isso que ela nao e redundante com o `github_token` ligado no mesmo commit.
 # O parsing fica AQUI e nao no YAML de proposito: um 2o parser do execution_file seria a divida
 # que kg-view.sh ja escreveu em letra grande ("DOIS PARSERS, DUAS VERDADES").
-texto_do_revisor() { # $1=execution_file
+reviewer_text() { # $1=execution_file
   local f="${1:-}"
   [ -n "${f}" ] && [ -f "${f}" ] || { printf '_(sem execution_file — o revisor nao chegou a produzir saida)_\n'; return 0; }
   command -v jq >/dev/null 2>&1 || { printf '_(jq ausente — texto nao extraivel)_\n'; return 0; }
@@ -447,7 +447,7 @@ texto_do_revisor() { # $1=execution_file
 # `if (import.meta.main)` (index.ts:84) e a action roda `src/entrypoints/run.ts` (action.yml:276).
 # Conclusao certa, fonte errada; e fonte errada num comentario e o que faz a proxima sessao
 # re-medir ou, pior, confiar.
-corpo_do_comentario() { # $1=marca $2=structured_output(json, pode ser vazio) $3=execution_file
+comment_body() { # $1=marca $2=structured_output(json, pode ser vazio) $3=execution_file
   local marca="${1:-}" so="${2:-}" f="${3:-}"
   printf '%s\n\n' "${marca}"
   printf '## 🧅 Revisão Onion\n\n'
@@ -477,7 +477,7 @@ corpo_do_comentario() { # $1=marca $2=structured_output(json, pode ser vazio) $3
     # neste pin — ver o bloco acima), entao a frase NAO pode sugerir falha do revisor: ele nunca
     # foi pedido a devolver estruturado. Dizer "nao devolveu" seria acusar quem obedeceu.
     printf '_(parecer em prosa — o formato que este pin da action entrega)_\n\n'
-    texto_do_revisor "${f}"
+    reviewer_text "${f}"
     printf '\n'
   fi
 
@@ -487,8 +487,8 @@ corpo_do_comentario() { # $1=marca $2=structured_output(json, pode ser vazio) $3
 
 case "${1:-}" in
   --selftest) run_selftest ;;
-  --corpo)    corpo_do_comentario "${2:-}" "${3:-}" "${4:-}" ;;
-  --texto)    texto_do_revisor "${2:-}" ;;
+  --corpo)    comment_body "${2:-}" "${3:-}" "${4:-}" ;;
+  --texto)    reviewer_text "${2:-}" ;;
   -h|--help)  sed -n '2,40p' "$0"; exit 0 ;;
   *)          verdict "${1:-}" ;;
 esac

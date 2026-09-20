@@ -297,6 +297,7 @@
 .claude/validation/kg-verification-coverage.sh	E_MEMOIZACAO_MORTA_EM_SUBSHELL	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/kg-verification-coverage.sh	E_SHA1SUM_POR_NO_2486_SPAWNS	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .claude/validation/kg-yaml-validity-baseline.txt	E_OS_QUATRO_ERAM_QUATRO_CLASSES_DE_ESCAPE	docs/onion/graph/fios-abertos.kg.yaml
+.claude/validation/lib/pt-br-words.txt	E_LISTA_4_A_REGRA60_ERA_CEGA_PELO_PROPRIO_VOCABULARIO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-artifacts.sh	C_CAPABILITY_NAO_PODE_LEVAR_BLANKET_SKIP	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .claude/validation/lint-artifacts.sh	C_CUSTO_NAO_E_DAS_700_CONFERENCIAS_E_DO_ESCOPO_IGNORADO	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .claude/validation/lint-artifacts.sh	C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml

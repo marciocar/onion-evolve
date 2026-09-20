@@ -20,18 +20,18 @@
 # ser adotado e receber o relatório. Nenhum gate havia acusado.
 set -uo pipefail
 
-RAIZ="${1:-${HOME}}"
+ROOT="${1:-${HOME}}"
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CORE="$(cd "${HERE}/.." && pwd)"
 MEMBERS="${2:-${CORE}/docs/evolution/federation/members.yaml}"
 CHECK="${CORE}/.claude/utils/adopt/check-member-registered.sh"
 
-[ -d "${RAIZ}" ]    || { echo "ERRO: raiz inexistente: '${RAIZ}'" >&2; exit 2; }
+[ -d "${ROOT}" ]    || { echo "ERRO: raiz inexistente: '${ROOT}'" >&2; exit 2; }
 [ -f "${MEMBERS}" ] || { echo "ERRO: registro não encontrado: '${MEMBERS}'" >&2; exit 2; }
 [ -f "${CHECK}" ]   || { echo "ERRO: helper ausente: '${CHECK}'" >&2; exit 2; }
 
 echo "══ ADOTANTES NO DISCO × REGISTRO DA FEDERAÇÃO ══"
-echo "   raiz: ${RAIZ}   registro: ${MEMBERS#"${CORE}/"}"
+echo "   raiz: ${ROOT}   registro: ${MEMBERS#"${CORE}/"}"
 echo
 
 _n=0 _unregistered=0
@@ -43,16 +43,16 @@ while IFS= read -r _stamp; do
   [ "${_role}" = "source" ] && continue          # o core não se registra como membro de si
   _n=$(( _n + 1 ))
   if bash "${CHECK}" "${_repo}" "${MEMBERS}" >/dev/null 2>&1; then
-    printf '  ✓ %-46s [%s]\n' "${_repo#"${RAIZ}"/}" "${_role:-?}"
+    printf '  ✓ %-46s [%s]\n' "${_repo#"${ROOT}"/}" "${_role:-?}"
   else
-    printf '  ✗ %-46s [%s]  FORA DO REGISTRO\n' "${_repo#"${RAIZ}"/}" "${_role:-?}"
+    printf '  ✗ %-46s [%s]  FORA DO REGISTRO\n' "${_repo#"${ROOT}"/}" "${_role:-?}"
     _unregistered=$(( _unregistered + 1 ))
   fi
-done < <(find "${RAIZ}" -maxdepth 3 -name '.onion-version' -path '*/.claude/*' 2>/dev/null | sort)
+done < <(find "${ROOT}" -maxdepth 3 -name '.onion-version' -path '*/.claude/*' 2>/dev/null | sort)
 
 echo
 if [ "${_n}" -eq 0 ]; then
-  echo "⚠️  NENHUM adotante encontrado sob '${RAIZ}' — raiz errada, ou profundidade insuficiente?" >&2
+  echo "⚠️  NENHUM adotante encontrado sob '${ROOT}' — raiz errada, ou profundidade insuficiente?" >&2
   echo "    (vazio NÃO é o mesmo que 'todos registrados': confira a raiz antes de concluir.)" >&2
   exit 3
 fi

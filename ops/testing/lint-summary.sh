@@ -43,7 +43,7 @@ done
 
 [ -n "${LOG}" ] || { echo "lint-summary: --log <ABS.log> é obrigatório" >&2; exit 2; }
 
-_nao_medido() {   # $1 = a suspeita, nomeada
+_not_measured() {   # $1 = a suspeita, nomeada
   printf '## ⊘ %s — NÃO MEDIDO\n\n' "${TITULO}"
   printf '**Não há execução completa para somar.** Isto NÃO é "zero violações": é ausência de medição.\n\n'
   printf -- '- causa provável: %s\n' "$1"
@@ -54,14 +54,14 @@ _nao_medido() {   # $1 = a suspeita, nomeada
 }
 
 if [ ! -f "${LOG}" ]; then
-  _nao_medido "o arquivo de log não existe — o passo do lint não chegou a rodar"
+  _not_measured "o arquivo de log não existe — o passo do lint não chegou a rodar"
   exit 0
 fi
 
 # A PROVA POSITIVA DE TÉRMINO. O lint só escreve este bloco no fim; sem ele o processo morreu
 # antes de somar, e nenhuma contagem sobre o log parcial significa alguma coisa.
 if ! grep -q '^=== Sumário ===' "${LOG}"; then
-  _nao_medido "o log existe mas NÃO tem o bloco \`=== Sumário ===\` — o lint abortou antes de somar"
+  _not_measured "o log existe mas NÃO tem o bloco \`=== Sumário ===\` — o lint abortou antes de somar"
   exit 0
 fi
 
@@ -71,7 +71,7 @@ SOFT="$(sed -n 's/^  Violações SOFT *: *\([0-9]\{1,\}\).*/\1/p' "${LOG}" | hea
 # O bloco existe mas o campo não parseia: também é NÃO MEDIDO, não zero. A forma do sumário
 # mudou, e inventar um número a partir de um formato que não se reconhece é o defeito de novo.
 if [ -z "${HARD}" ]; then
-  _nao_medido "o bloco \`=== Sumário ===\` existe mas \`Violações HARD\` não parseia — o formato mudou"
+  _not_measured "o bloco \`=== Sumário ===\` existe mas \`Violações HARD\` não parseia — o formato mudou"
   exit 0
 fi
 

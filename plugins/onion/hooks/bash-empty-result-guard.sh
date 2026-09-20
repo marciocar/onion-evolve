@@ -121,7 +121,7 @@ case "$cmd" in *pipefail*) : ;; *)
           if (q != "") return s        # aspas ABERTAS no fim da linha: indeterminado -> crua
           return o
         }
-      function ultimoQ(s,   pos, off, ult) {
+      function lastQ(s,   pos, off, ult) {
         off = 0; ult = 0
         while ((pos = index(substr(s, off + 1), "$?")) > 0) { ult = off + pos; off = ult + 1 }
         return ult
@@ -142,7 +142,7 @@ case "$cmd" in *pipefail*) : ;; *)
         # de verdade. Lendo os dois em `nu`, `ls | wc -l; echo "rc=$?"` ficava sem `$?` nenhum e a
         # guarda CALAVA — o modo-de-falha nº2 que a FUNDOU, cegado pela cura de ordem. Achado por
         # passada adversarial, com main DISPARANDO e HEAD calado no mesmo comando.
-        p_ord = index(nu, "|"); q_ord = ultimoQ(cur)
+        p_ord = index(nu, "|"); q_ord = lastQ(cur)
         mesmaLinha = (p_ord > 0 && q_ord > 0 && p_ord < q_ord)
         if (cur ~ /\$\?/ && (mesmaLinha || prevNu ~ /\|/)) { found = 1; exit }
         if (cur ~ /[^ \t]/) { prev = cur; prevNu = nu }       # linha em branco não quebra a vizinhança

@@ -41,7 +41,7 @@ cd "$REPO" || exit 2
 ok() { printf '  ✓ %s\n' "$*"; }
 no() { printf '  ✗ %s\n' "$*"; }
 info() { printf '  · %s\n' "$*"; }
-FALHOU=0
+FAILED=0
 
 echo "── gate do Onion em ${REPO}"
 
@@ -52,15 +52,15 @@ case "$DIR" in /*) ABS="$DIR" ;; *) ABS="${REPO}/${DIR}" ;; esac
 info "core.hooksPath = ${HP:-<não definido, usa .git/hooks>}"
 if [ ! -f "${ABS}/pre-commit" ]; then
   no "não há pre-commit em '${DIR}' — o git não tem o que executar"
-  FALHOU=1
+  FAILED=1
 else
   if grep -q "Onion pre-commit" "${ABS}/pre-commit" 2>/dev/null; then
     ok "pre-commit em '${DIR}' é o do Onion"
   else
     no "pre-commit em '${DIR}' NÃO é o do Onion (outro gestor ocupou o caminho — ex.: husky)"
-    FALHOU=1
+    FAILED=1
   fi
-  [ -x "${ABS}/pre-commit" ] || { no "pre-commit existe mas NÃO é executável"; FALHOU=1; }
+  [ -x "${ABS}/pre-commit" ] || { no "pre-commit existe mas NÃO é executável"; FAILED=1; }
 fi
 # o caso metagamify: hook do Onion existe noutro diretório, mas o git não olha para lá.
 #
@@ -75,7 +75,7 @@ fi
 _ONION_HOOKS="${REPO}/.githooks"
 if [ -f "${_ONION_HOOKS}/pre-commit" ] && ! [ "${ABS}" -ef "${_ONION_HOOKS}" ]; then
   no "há hook do Onion em .githooks/ que o git IGNORA (hooksPath aponta para '${DIR}')"
-  FALHOU=1
+  FAILED=1
 fi
 
 # ── 2. EXECUÇÃO (commit-sonda descartável) ──────────────────────────────────────────────
@@ -102,17 +102,17 @@ git add "$PROBE" >/dev/null 2>&1
 # BLOQUEIO ineludível: ele nunca é alcançado, e o caso da bancada que o exercita PULA — o que, em
 # modo STRICT, reprova (e reprova certo: guarda que não roda no CI é guarda que não existe).
 # A identidade é do SONDA e morre com ele (`-c`, não `config`): não toca a configuração do alvo.
-SAIDA="$(git -c commit.gpgsign=false -c user.email=onion-gate-probe@local -c user.name='Onion Gate Probe' commit -m "chore: onion gate probe (descartável)" 2>&1)"
+OUTPUT="$(git -c commit.gpgsign=false -c user.email=onion-gate-probe@local -c user.name='Onion Gate Probe' commit -m "chore: onion gate probe (descartável)" 2>&1)"
 RC=$?
 [ "$RC" -eq 0 ] && CRIOU_COMMIT=1
 
 EXECUTOU=0
-if printf '%s' "$SAIDA" | grep -q "Onion pre-commit"; then
+if printf '%s' "$OUTPUT" | grep -q "Onion pre-commit"; then
   ok "o hook EXECUTOU no commit (assinatura observada)"
   EXECUTOU=1
 else
   no "o hook NÃO executou — gate INERTE (nenhum sinal do lint no commit)"
-  FALHOU=1
+  FAILED=1
 fi
 
 # ── 3. BLOQUEIO (só afirma o que der para provar) ───────────────────────────────────────
@@ -131,7 +131,7 @@ else
     info "bloqueio NÃO avaliado: o hook do Onion não executou (o que barrou, se barrou, foi outro)"
   elif [ "$LRC" -ne 0 ] && [ "$RC" -eq 0 ]; then
     no "FAIL-OPEN: o lint reprova (rc=${LRC}) e o commit PASSOU mesmo assim"
-    FALHOU=1
+    FAILED=1
   elif [ "$LRC" -ne 0 ] && [ "$RC" -ne 0 ]; then
     ok "o commit foi BARRADO pelo gate do Onion com o lint reprovando — bloqueio provado"
     BLOQUEIO_PROVADO=1
@@ -156,11 +156,11 @@ echo
 # avaliado" (o hook nem executou, comum em ambiente sem identidade git configurada) caía no veredito
 # de PROVADO, porque eu só zerava a flag no ramo do lint-limpo. Prova é o que se OBSERVA: o default
 # de "provei" nunca pode ser sim. Só o ramo que VÊ o commit ser barrado carimba 1.
-if [ "$FALHOU" -eq 0 ] && [ "${BLOQUEIO_PROVADO:-0}" -eq 1 ]; then
+if [ "$FAILED" -eq 0 ] && [ "${BLOQUEIO_PROVADO:-0}" -eq 1 ]; then
   echo "✓ GATE VIVO — bloqueio PROVADO por execução, não por existência de arquivo"
   exit 0
 fi
-if [ "$FALHOU" -eq 0 ]; then
+if [ "$FAILED" -eq 0 ]; then
   echo "⚠️ GATE INSTALADO E EXECUTANDO — mas o BLOQUEIO não foi exercido (o lint do alvo está limpo)."
   echo "   Isto é DECLARAÇÃO, não prova: rode de novo com uma violação HARD plantada, ou aguarde o"
   echo "   primeiro commit que reprove. O grafo do alvo deve registrar isto como 'open', não 'confirmed'."

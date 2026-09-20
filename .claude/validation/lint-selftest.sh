@@ -1136,8 +1136,8 @@ PY
   local _st; _st="$(bash "${_pvc}" --selftest 2>&1 || true)"
   grep -q '^pipe-verdict-check selftest: OK' <<< "${_st}" \
     || record_fail "shell-pipefail: o emissor da classe não passa no próprio selftest" "$(grep '✗' <<< "${_st}" | head -2 | tr '\n' ' ')"
-  local _atual _novos="" _passivo=0 _f _n _tol
-  _atual="$(bash "${_pvc}" "${REPO_ROOT}" 2>/dev/null || true)"
+  local _current _new_ones="" _passivo=0 _f _n _tol
+  _current="$(bash "${_pvc}" "${REPO_ROOT}" 2>/dev/null || true)"
   if [ ! -f "${_pvb}" ]; then
     record_fail "shell-pipefail: baseline da classe ausente" "regenere com: bash ${_pvc} --emit-baseline > ${_pvb}"
     return 0
@@ -1145,19 +1145,19 @@ PY
   while IFS=$'\t' read -r _f _n; do
     [ -n "${_f}" ] || continue
     _tol="$(grep -F "${_f}"$'\t' "${_pvb}" 2>/dev/null | head -1 | cut -f2 || true)"; _tol="${_tol:-0}"
-    if [ "${_n}" -gt "${_tol}" ]; then _novos="${_novos} ${_f}(${_n}>${_tol})"
+    if [ "${_n}" -gt "${_tol}" ]; then _new_ones="${_new_ones} ${_f}(${_n}>${_tol})"
     else _passivo=$(( _passivo + _n )); fi
-  done <<< "${_atual}"
-  if [ -n "${_novos}" ]; then
+  done <<< "${_current}"
+  if [ -n "${_new_ones}" ]; then
     record_fail "shell-pipefail: VEREDITO por <produtor>|grep -q ACIMA da catraca" \
-      "sítio NOVO da classe (o leitor fecha cedo, o escritor toma EPIPE, pipefail reprova com o padrão PRESENTE) — cure com here-string \`grep -q PAD <<< \"\$var\"\`:${_novos}"
+      "sítio NOVO da classe (o leitor fecha cedo, o escritor toma EPIPE, pipefail reprova com o padrão PRESENTE) — cure com here-string \`grep -q PAD <<< \"\$var\"\`:${_new_ones}"
   else
     record_pass "shell-pipefail: catraca da classe <produtor>|grep -q — ${_passivo} sítio(s) no passivo tolerado, ZERO novo (emissor com selftest; a métrica de saúde é o passivo DIMINUINDO)"
   fi
   return 0
 }
 
-_shell_pipefail_resto_desativado() {
+_shell_pipefail_rest_disabled() {
   if [ -z "${vhits}" ]; then
     record_pass "shell-pipefail: nenhum veredito por <produtor>|grep -q (o leitor fecha cedo, o escritor toma EPIPE e pipefail reprova; use here-string)"
   else
@@ -3579,8 +3579,8 @@ run_kg_reconcile_selftests() {
   # FALHA em vez de passar por omissão.
   local mut; mut="$(mktemp -d)"; trap 'rm -rf "'"${mut}"'"' RETURN
   cp "${radar}" "${mut}/mutado.sh"; _lib_beside "${mut}"
-  sed -i 's/ \&\& supersederConta(nstatus\[efrom\[i\]\])//' "${mut}/mutado.sh"
-  if ! grep -q 'etype\[i\] == "SUPERSEDES" && supersederConta' "${mut}/mutado.sh"; then
+  sed -i 's/ \&\& supersederCount(nstatus\[efrom\[i\]\])//' "${mut}/mutado.sh"
+  if ! grep -q 'etype\[i\] == "SUPERSEDES" && supersederCount' "${mut}/mutado.sh"; then
     local mout; mout="$(bash "${mut}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
     if grep -q '⚠ C_SUPERSEDER_ABERTO' <<< "${mout}"; then
       record_pass "kg-reconcile: (d) (MUT) sem o filtro o superseder-aberto volta a acusar — o filtro é load-bearing"
@@ -3613,9 +3613,9 @@ run_kg_reconcile_selftests() {
   # ⚠️ Os dois `sed` casam a ASSINATURA das funções. Se ela mudar (como mudou quando `pendingTarget`
   # ganhou o parâmetro de tipo), eles param de casar — e é por isso que o `if` abaixo verifica o
   # resultado: mutação que não pega dá record_fail explícito, nunca silêncio.
-  sed -i 's/^function supersederConta(s) .*/function supersederConta(s) { return (s == "confirmed") }/' "${mut3}/mutado.sh"
+  sed -i 's/^function supersederCount(s) .*/function supersederCount(s) { return (s == "confirmed") }/' "${mut3}/mutado.sh"
   sed -i 's/^function pendingTarget(s, t) .*/function pendingTarget(s, t) { return (s == "confirmed" || s == "open") }/' "${mut3}/mutado.sh"
-  if grep -q 'supersederConta(s) { return (s == "confirmed") }' "${mut3}/mutado.sh" \
+  if grep -q 'supersederCount(s) { return (s == "confirmed") }' "${mut3}/mutado.sh" \
      && grep -q 'pendingTarget(s, t) { return (s == "confirmed" || s == "open") }' "${mut3}/mutado.sh"; then
     local mout3; mout3="$(bash "${mut3}/mutado.sh" "${rx}/supersedes-mixed.kg.yaml" --reconcile 2>&1 || true)"
     if ! grep -q '⚠ C_ALVO_DE_DRIFTED' <<< "${mout3}" \
@@ -4342,11 +4342,11 @@ run_vendor_scrub_form_selftests() {
   else record_fail "vendor-scrub-form: (a)" "rc=${rc}: ${out:0:200}"; fi
   # (b) o modo de SCAN que a produção consome responde e o repo está LIMPO contra o baseline
   rc=0; out="$(bash "${sc}" "${REPO_ROOT}" 2>&1)" || rc=$?
-  local novos; novos="$(comm -23 <(printf '%s\n' "${out}" | grep -v '^[[:space:]]*$' | sort -u) \
+  local new_ones; new_ones="$(comm -23 <(printf '%s\n' "${out}" | grep -v '^[[:space:]]*$' | sort -u) \
                                 <(grep -v '^#' "${bl}" 2>/dev/null | grep -v '^[[:space:]]*$' | sort -u) | tr '\n' ' ')"
-  if [ "${rc}" = "0" ] && [ -z "${novos// /}" ]; then
+  if [ "${rc}" = "0" ] && [ -z "${new_ones// /}" ]; then
     record_pass "vendor-scrub-form: (b) modo scan responde e nenhum candidato NOVO fora do baseline"
-  else record_fail "vendor-scrub-form: (b)" "rc=${rc} candidatos novos: ${novos:0:200}"; fi
+  else record_fail "vendor-scrub-form: (b)" "rc=${rc} candidatos novos: ${new_ones:0:200}"; fi
   # (c) --emit-baseline é o modo que a catraca consome: tem cabeçalho e o mesmo conteúdo do scan
   rc=0; out="$(bash "${sc}" --emit-baseline 2>&1)" || rc=$?
   if [ "${rc}" = "0" ] && grep -q '^# Baseline de CANDIDATOS' <<< "${out}" && grep -q 'SÓ PODE ENCOLHER' <<< "${out}"; then
@@ -8264,13 +8264,82 @@ local $(printf 'contagem')=1"
   #     `local` ou `final`, a REGRA 60 passa a acusar ingles legitimo em massa — falso-positivo em
   #     regra HARD e a corrente que o Elenxo do #566 reconstruiu.
   local homografo
+  # ⚠️ `nome` SAIU desta exclusao em 2026-09-20, e a razao e medida, nao estetica: ele nao e
+  #    palavra inglesa — entrou por ARRASTO junto dos homografos reais (base/total/local/final),
+  #    e a prova e que `nomes` nunca foi excluido. Se `nome` fosse homografo, o plural tambem
+  #    seria. O custo da exclusao nao-medida foi concreto: `_base_nome`, `_nome`, `_PAT_NOME` e
+  #    `nome` viveram em main, e o revisor semantico do CI os acusou a US$ 0,80 por PR enquanto a
+  #    guarda gratuita dizia 0 HARD. Criterio de reentrada: so volta a excluir quem ACUSAR ingles
+  #    legitimo no corpus — medido, nao suposto.
+  # ⚠️ `todos` ENTROU nesta exclusao em 2026-09-20, e aqui esta a razao que falta ao resto da
+  #    lista: em ingles `todos` e a fila de coisas-a-fazer, e isso esta MEDIDO fora deste repo —
+  #    `effect@3.18.4`, `src/internal/fiberRuntime.ts:2186`: `let todos = Array.from(self).reverse()`,
+  #    com 12 declaracoes inglesas (`let/const todos =`) num node_modules real. TETO DECLARADO: o
+  #    falso-positivo NAO e alcancavel hoje, porque a REGRA 60 so le `.sh` e nao ha um unico `todos`
+  #    ingles em 449 scripts de sistema desta maquina. Excluido mesmo assim porque o criterio do
+  #    cabecalho e sobre a PALAVRA, nao sobre o corpus do dia — e o preco e nomeado: sobra
+  #    `lint-selftest.sh:5175`, pt-BR de verdade, como DIVIDA NOMEADA que a guarda nao cobra.
   # ⚠️ `|| true` OBRIGATORIO: aqui NAO ACHAR e o resultado DESEJADO, e `grep` que nao acha sai 1 —
   #    `x="$(cmd)"` sob `set -e` ABORTA a suite inteira. E a 4a vez que esta armadilha morde nesta
   #    sessao, e as quatro foram em casos onde o silencio do comando E a conformidade.
-  homografo="$(grep -xE '(base|total|local|global|final|normal|real|original|nota|via|data|error|nome)' "${words}" 2>/dev/null | tr '\n' ' ' || true)"
+  homografo="$(grep -xE '(base|total|local|global|final|normal|real|original|nota|via|data|error|todos)' "${words}" 2>/dev/null | tr '\n' ' ' || true)"
   if [ -z "${homografo}" ]; then
     record_pass "idioma: (g) a lista NAO contem homografo com ingles (o criterio que impede falso-positivo em massa)"
   else record_fail "idioma: (g) homografo na lista" "estas palavras tambem sao inglesas e acusariam codigo legitimo: ${homografo}"; fi
+
+  # (h) A LISTA TEM DE COBRIR O QUE O REVISOR CARO JA ACHOU — simetrico do (g), e a metade que
+  #     faltava. Em 2026-09-20 medi 33 pareceres do `onion-review`: 10 acusaram violacao e SEIS
+  #     eram identificador em pt-BR. A guarda gratuita, rodando no mesmo diff, dizia `0 HARD` — a
+  #     lista tinha 102 termos e NENHUM cobria os segmentos reais deste repo (`viaja`, `papel`,
+  #     `nome`, `texto`, `motivo`, `atual`, `resto`, `cheio`, `objeto`, `regra`, `falta`). Resultado:
+  #     20 identificadores pt-BR vivos em main, pagos a US$ 0,80 o PR para um parecer que ninguem
+  #     recolhia. Este caso testa COMPORTAMENTO, nao pertinencia: a fixture usa os segmentos que o
+  #     revisor de fato acusou, entao encolher a lista quebra aqui antes de chegar ao CI.
+  #     ⚠️ ANCORA OS 13, nao 10: a passada adversarial mediu que `resto`, `desativado` e `superficie`
+  #     entraram na lista e NAO estavam no laco — tirar qualquer um deles nao quebrava nada, e um
+  #     anti-encolhimento que nao cobre o que entrou e anti-encolhimento so no nome.
+  # ⚠️ A FIXTURE MONTA AS PALAVRAS EM RUNTIME (`printf`), como o caso (f). Escrever os
+  #    identificadores pt-BR LITERAIS aqui os torna violacao REAL deste arquivo — a guarda varre
+  #    `lint-selftest.sh` e o caso (a) reprovaria o repo inteiro. Medido ao escrever este caso.
+  d="$(mktemp -d)"; _lang_repo "$d" "#!/usr/bin/env bash
+local _$(printf 'viaja')=1 _base_$(printf 'nome')=2 $(printf 'texto')_do_rev=3 $(printf 'motivo')_x=4
+local _$(printf 'papel')_y=5 _$(printf 'atual')=6 _$(printf 'falta')=7 o_$(printf 'cheio')=8
+local _$(printf 'objeto')=9 _$(printf 'regra')=10 _$(printf 'resto')=11
+local _$(printf 'desativado')=12 _$(printf 'superficie')=13 _$(printf 'arvore')=14
+local _$(printf 'campos')=15 _$(printf 'conta')=16 _$(printf 'corpo')=17 _$(printf 'dentro')=18
+local _$(printf 'esperado')=19 _$(printf 'novos')=20 _$(printf 'ultimo')=21 _$(printf 'verde')=22"
+  rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+  local _seg _uncovered=""
+  for _seg in $(printf 'viaja nome texto motivo papel atual falta cheio objeto regra resto desativado superficie arvore campos conta corpo dentro esperado novos ultimo verde'); do
+    grep -qF "pt-BR \`${_seg}\`" <<< "${out}" || _uncovered="${_uncovered}${_seg} "
+  done
+  if [ "${rc}" -eq 1 ] && [ -z "${_uncovered}" ]; then
+    record_pass "idioma: (h) a lista COBRE os 22 segmentos que os renames reais exercitaram (anti-encolhimento)"
+  else record_fail "idioma: (h) cobertura do vocabulario" "rc=${rc}; segmentos NAO acusados: ${_uncovered:-nenhum}; saida: $(_emit "${out}" | head -c 250)"; fi
+  rm -rf "$d"
+
+  # (i) `ops/` ENTRA NO UNIVERSO SO NA FONTE — as duas metades, porque so a de cima e fail-open e
+  #     so a de baixo e cobranca indevida. Medido em 2026-09-20: `ops/` estava FORA do universo e
+  #     tinha 10 identificadores pt-BR vivos, um deles com o segmento JA na lista — a guarda tinha
+  #     a palavra e nao olhava o arquivo. Mas ela VIAJA: num adotante `ops/` e o diretorio dele, no
+  #     idioma dele, e policia-lo seria cobrar fora da superficie Onion. O discriminante e o stamp.
+  d="$(mktemp -d)"; _lang_repo "$d" '#!/usr/bin/env bash
+local ok=1'
+  mkdir -p "$d/ops"
+  printf '#!/usr/bin/env bash\nlocal _%s=1\n' "$(printf 'papel')" > "$d/ops/x.sh"
+  ( cd "$d" && git add -A ) >/dev/null 2>&1
+  # (i.1) SEM stamp = FONTE → ops/ e varrido
+  rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -qF 'ops/x.sh' <<< "${out}"; then
+    record_pass "idioma: (i.1) na FONTE (sem stamp) o universo inclui ops/ — a superficie core-only deixa de ser fail-open"
+  else record_fail "idioma: (i.1) ops/ nao varrido na fonte" "rc=${rc}: $(_emit "${out}" | head -c 250)"; fi
+  # (i.2) COM stamp de adotante = ops/ fica FORA (e o `.claude/` continua cobrado)
+  printf 'role: adopted\n' > "$d/.claude/.onion-version"
+  rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -qF 'ops/x.sh' <<< "${out}"; then
+    record_pass "idioma: (i.2) no ADOTANTE (com stamp) ops/ fica FORA — a guarda que viaja nao cobra fora da superficie Onion"
+  else record_fail "idioma: (i.2) ops/ cobrado no adotante" "rc=${rc}: $(_emit "${out}" | head -c 250)"; fi
+  rm -rf "$d"
 }
 
 run_consumed_modes_selftests() {
@@ -11013,7 +11082,7 @@ KGEOF
     cp -a "${REPO_ROOT}/docs"      "${sb}/docs"
     cp -a "${REPO_ROOT}/CLAUDE.md" "${sb}/CLAUDE.md"
     rm -rf "${sb}/plugins" "${sb}/.claude-plugin"
-    local probe_novo="docs/analysis/selftest-prov-novo.md"
+    local probe_new="docs/analysis/selftest-prov-novo.md"
     local probe_pass="docs/analysis/selftest-prov-passivo.md"
     local sbl="${sb}/.claude/validation/kg-coverage-baseline.txt"
 
@@ -11023,19 +11092,19 @@ KGEOF
     s0="$(printf '%s' "${o0}" | awk -F': *' '/SOFT[[:space:]]*:/{print $2; exit}')"
 
     # (1) documento NOVO sem nó e fora do baseline ⇒ soma exatamente 1 HARD.
-    mkdir -p "$(dirname "${sb}/${probe_novo}")"   # adotante sem docs/analysis/: o printf abortava a suíte (medido na cópia da Sacola, 2026-09-03)
-    printf '# sonda nova\n' > "${sb}/${probe_novo}"
-    o1="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe_novo}" 2>&1 || true)"
+    mkdir -p "$(dirname "${sb}/${probe_new}")"   # adotante sem docs/analysis/: o printf abortava a suíte (medido na cópia da Sacola, 2026-09-03)
+    printf '# sonda nova\n' > "${sb}/${probe_new}"
+    o1="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe_new}" 2>&1 || true)"
     h1="$(printf '%s' "${o1}" | awk -F': *' '/HARD[[:space:]]*:/{print $2; exit}')"
-    if [ "${h1}" = "$((h0 + 1))" ] && grep -qF "${probe_novo}" <<< "${o1}"; then
+    if [ "${h1}" = "$((h0 + 1))" ] && grep -qF "${probe_new}" <<< "${o1}"; then
       record_pass "kg-provenance: (P1) SEVERIDADE por DELTA — documento novo sem nó soma HARD (${h0}→${h1})"
     else
-      record_fail "kg-provenance: (P1) delta HARD" "esperava HARD ${h0}→$((h0 + 1)) citando ${probe_novo}; veio ${h1}"
+      record_fail "kg-provenance: (P1) delta HARD" "esperava HARD ${h0}→$((h0 + 1)) citando ${probe_new}; veio ${h1}"
     fi
 
     # (2) MESMO documento, agora listado no baseline ⇒ HARD volta ao valor-base
     #     (é tolerado) e o passivo só engorda a contagem SOFT.
-    rm -f "${sb}/${probe_novo}"
+    rm -f "${sb}/${probe_new}"
     printf '# sonda passivo\n' > "${sb}/${probe_pass}"
     printf '%s\n' "${probe_pass}" >> "${sbl}"
     o2="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/${probe_pass}" 2>&1 || true)"
@@ -12776,13 +12845,13 @@ run_license_travels_selftests() {
   #     de `LICENSE.onion`, então remover a grafia nua passava verde. Aqui o casamento é de linha
   #     inteira sobre os tokens do array.
   local _tok; _tok="$(grep -A4 '^ONION_PATHS=(' "${durable}" | tr ' ' '\n' | tr -d '()\\' || true)"
-  local _falta=""
+  local _missing=""
   local _t; for _t in LICENSE-ONION LICENSE-ONION-DOCS; do
-    grep -qxF "${_t}" <<< "${_tok}" || _falta="${_falta} ${_t}"
+    grep -qxF "${_t}" <<< "${_tok}" || _missing="${_missing} ${_t}"
   done
-  if [ -z "${_falta}" ]; then
+  if [ -z "${_missing}" ]; then
     record_pass "license-travels: (d) o durable-commit staja as duas (token exato, não substring)"
-  else record_fail "license-travels: (d) staging incompleto" "sem estas o arquivo fica untracked:${_falta}"; fi
+  else record_fail "license-travels: (d) staging incompleto" "sem estas o arquivo fica untracked:${_missing}"; fi
   rm -rf "${d}"
 }
 
@@ -12936,15 +13005,15 @@ run_role_cut_selftests() {
   local _resolver="${REPO_ROOT}/.claude/utils/marketplace/resolve-role-bundle.sh"
   if [ -f "${_resolver}" ]; then
     local _tools; _tools="$(bash "${_resolver}" standalone --tools 2>/dev/null)"
-    local _faltou="" _vazou="" _c _nome
+    local _faltou="" _vazou="" _c _name
     while IFS= read -r _c; do
       [ -n "${_c}" ] || continue
       grep -qx ".claude/commands/meta/${_c}.md" "${_lst}" || _faltou="${_faltou} ${_c}"
     done <<< "${_tools}"
     while IFS= read -r _c; do
       case "${_c}" in .claude/commands/meta/*) : ;; *) continue ;; esac
-      _nome="$(basename "${_c}" .md)"
-      grep -qxF "${_nome}" <<< "${_tools}" || _vazou="${_vazou} ${_nome}"
+      _name="$(basename "${_c}" .md)"
+      grep -qxF "${_name}" <<< "${_tools}" || _vazou="${_vazou} ${_name}"
     done < "${_lst}"
     if [ -z "${_faltou}" ] && [ -z "${_vazou}" ]; then
       record_pass "role-cut: (b2) os comandos do bundle batem EXATAMENTE com roles.yaml (oráculo independente do corte)"
@@ -12960,9 +13029,9 @@ run_role_cut_selftests() {
   #      como o core viraria um core mutilado em silêncio, que é a classe deste PR inteiro.
   # A lista de exceções sai da SSOT (o próprio manifesto), nunca redigida aqui — senão o caso
   # aprova o que o código disser, que é o contrário de um oráculo.
-  local _IDENTITY_EXCLUDES_ESPERADOS=()
-  mapfile -t _IDENTITY_EXCLUDES_ESPERADOS < <(sed -n "s/^_IDENTITY_EXCLUDES=(\\('\\)\\(.*\\)'.*)$/\\2/p" "${vm}")
-  [ "${#_IDENTITY_EXCLUDES_ESPERADOS[@]}" -gt 0 ] || record_fail "role-cut: (b3) setup" "não consegui ler _IDENTITY_EXCLUDES do manifesto — o oráculo do caso virou opinião"
+  local _IDENTITY_EXCLUDES_EXPECTED=()
+  mapfile -t _IDENTITY_EXCLUDES_EXPECTED < <(sed -n "s/^_IDENTITY_EXCLUDES=(\\('\\)\\(.*\\)'.*)$/\\2/p" "${vm}")
+  [ "${#_IDENTITY_EXCLUDES_EXPECTED[@]}" -gt 0 ] || record_fail "role-cut: (b3) setup" "não consegui ler _IDENTITY_EXCLUDES do manifesto — o oráculo do caso virou opinião"
   local _hub _hub_lst="${d}/hub.lst" _hub_tar="${d}/hub.tar"
   _hub="$(bash "${vm}" --role hub --repo "${REPO_ROOT}" 2>/dev/null)"
   local _hub_spec=(); mapfile -t _hub_spec <<< "${_hub}"
@@ -12986,7 +13055,7 @@ run_role_cut_selftests() {
   # "aproveitar que já está cortando" — continua reprovando, que é o ponto do caso.
   local _exc_hub _exc_esp
   _exc_hub="$(grep '^:(' <<< "${_hub}" | sort || true)"
-  _exc_esp="$(printf '%s\n' "${_IDENTITY_EXCLUDES_ESPERADOS[@]}" | sort)"
+  _exc_esp="$(printf '%s\n' "${_IDENTITY_EXCLUDES_EXPECTED[@]}" | sort)"
   # a divergência de ARQUIVOS tem de ser exatamente o que aqueles excludes removem, nem um a mais
   local _div; _div="$(diff "${_hub_lst}" "${_core_lst}" | grep '^[<>]' | sed 's/^[<>] //' || true)"
   local _div_fora; _div_fora="$(grep -v '/jwks/.*\.pem$' <<< "${_div}" | grep -c . || true)"
@@ -13016,8 +13085,8 @@ run_role_cut_selftests() {
   git -C "${r}" init -q >/dev/null 2>&1
   git -C "${r}" add -A >/dev/null 2>&1
   git -C "${r}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
-  local _novo; _novo="$(bash "${vm}" --role standalone --repo "${r}" 2>/dev/null)"
-  if grep -q ':(exclude).claude/utils/adopt/helper-novissimo.sh' <<< "${_novo}"; then
+  local _new_one; _new_one="$(bash "${vm}" --role standalone --repo "${r}" 2>/dev/null)"
+  if grep -q ':(exclude).claude/utils/adopt/helper-novissimo.sh' <<< "${_new_one}"; then
     record_pass "role-cut: (d) helper NOVO sob prefixo cortado nasce cortado (o corte sai de HEAD, não de lista)"
   else record_fail "role-cut: (d)" "o helper novo NÃO foi cortado — o corte voltou a ser lista, e lista drifta"; fi
 
@@ -13438,6 +13507,40 @@ _family run_kb_vendored_link_selftests
 # que teria pego a família-fantasma `vendor_pin` (invocação dentro do próprio corpo por 44 dias): toda família
 # DEFINIDA tem de aparecer no --list.
 run_selftest_lanes_selftests() {
+  # (0) TODA ANCORA `sed -n '/^SIMBOLO/'` DESTE ARQUIVO RESOLVE NUM SIMBOLO QUE EXISTE.
+  #     POR QUE EXISTE (medido 2026-09-20, TRES vezes no MESMO PR): a bancada extrai predicados do
+  #     runner por `sed` ancorado no NOME da funcao. Um rename em `lint-artifacts.sh` matou 4 ancoras
+  #     de `role_scope` e um em `kg-radar.sh` matou 2 de `kg_reconcile`. O dano nao e a quebra, e o
+  #     SILENCIO: em `role_scope` os casos esperavam `NAO` e funcao ausente tambem produz `NAO` — so
+  #     reprovaram porque o `command not found` sujou o stderr. Nenhum mecanismo conferia ancora.
+  #     Esta guarda e a forma generica: nao resolve o caminho do arquivo (isso exigiria expandir
+  #     `${VAR}`), so exige que o simbolo exista em ALGUM `.sh` de `.claude/validation/` — que e o
+  #     pote de onde a bancada extrai. Cobre exatamente o modo de falha (renomeou no runner, esqueceu
+  #     no harness) sem prometer mais do que mede.
+  local _anchor _dead="" _n=0 _found _cand
+  while IFS= read -r _anchor; do
+    [ -n "${_anchor}" ] || continue
+    case "${_anchor}" in ''|X|*[!_A-Za-z0-9]*) continue ;; esac
+    _n=$((_n+1))
+    # ⚠️ EXCLUI ESTE ARQUIVO DO POTE, e a razao e que a 1a versao era TAUTOLOGICA: a propria linha
+    #    da ancora contem o simbolo, entao procura-lo em `*.sh` (que inclui `lint-selftest.sh`)
+    #    sempre acha — o mutante aplicou e a guarda passou. Achado pelo mutante, nao por leitura.
+    _found=0
+    for _cand in "${SCRIPT_DIR}"/*.sh; do
+      case "${_cand##*/}" in lint-selftest.sh) continue ;; esac
+      if LC_ALL=C grep -qw -- "${_anchor}" "${_cand}" 2>/dev/null; then _found=1; break; fi
+    done
+    [ "${_found}" -eq 1 ] || _dead="${_dead} ${_anchor}"
+    # ⚠️ SO LINHA DE CODIGO: o `grep -v '^[[:space:]]*#'` tira os exemplos da PROSA. Sem ele, o
+    #    placeholder `/^SIMBOLO/` deste proprio comentario entrava como ancora e a guarda reprovava
+    #    a si mesma — falso-positivo achado na 2a rodada do mutante.
+  done <<< "$(LC_ALL=C grep -v '^[[:space:]]*#' "${REPO_ROOT}/.claude/validation/lint-selftest.sh" | LC_ALL=C grep -oE "sed -n '/\^[_a-zA-Z][_a-zA-Z0-9]*" | sed -E "s|.*/\^||" | sort -u)"
+  if [ "${_n}" -eq 0 ]; then
+    record_fail "selftest-lanes: (0) ancoras" "ZERO ancoras extraidas — o proprio extrator quebrou (nao ha como isto ser conformidade)"
+  elif [ -z "${_dead}" ]; then
+    record_pass "selftest-lanes: (0) as ${_n} ancoras de sed do harness resolvem em simbolo VIVO do runner"
+  else record_fail "selftest-lanes: (0) ancora morta" "simbolo(s) citado(s) por \`sed -n '/^X/'\` que nao existem em .claude/validation/*.sh:${_dead} — renomeou no runner e esqueceu no harness"; fi
+
   local sut="${REPO_ROOT}/.claude/validation/lint-selftest.sh"
   if [ ! -f "${sut}" ]; then record_fail "selftest-lanes" "bancada ausente: ${sut}"; return; fi
   local out rc n defs
@@ -13782,14 +13885,14 @@ run_ci_evidence_selftests() {
     printf 'VIOLATION: x: REGRA 1 algo\n=== Sumário ===\n  Violações HARD : 2\n  Violações SOFT : 5\n' > "${dl}/cheio.log"
     printf 'VIOLATION: x: REGRA 1 algo\n' > "${dl}/truncado.log"
     printf '=== Sumário ===\n  Violações HARD : 0\n  Violações SOFT : 3\n' > "${dl}/verde.log"
-    local o_cheio o_trunc o_verde
-    o_cheio="$(bash "${sutl}" --log "${dl}/cheio.log" 2>&1)"
+    local full_output o_trunc green_output
+    full_output="$(bash "${sutl}" --log "${dl}/cheio.log" 2>&1)"
     o_trunc="$(bash "${sutl}" --log "${dl}/truncado.log" 2>&1)"
-    o_verde="$(bash "${sutl}" --log "${dl}/verde.log" 2>&1)"
-    if grep -q '❌' <<< "${o_cheio}" && grep -q '| \*\*2\*\* |' <<< "${o_cheio}" \
+    green_output="$(bash "${sutl}" --log "${dl}/verde.log" 2>&1)"
+    if grep -q '❌' <<< "${full_output}" && grep -q '| \*\*2\*\* |' <<< "${full_output}" \
        && grep -q '⊘' <<< "${o_trunc}" && grep -q 'abortou antes de somar' <<< "${o_trunc}" \
        && ! grep -q '^## ✅' <<< "${o_trunc}" \
-       && grep -q '✅' <<< "${o_verde}"; then
+       && grep -q '✅' <<< "${green_output}"; then
       record_pass "ci-evidence: (g2) log truncado → ⊘ NÃO MEDIDO (nunca ✅); log com bloco de término → veredito real"
     else record_fail "ci-evidence: (g2) prova de término" "truncado devia dar ⊘ e nunca ✅ — se deu verde, voltou a contar zero de log abortado como zero de violação"; fi
     # (g3) formato mudou: bloco existe mas o campo não parseia ⇒ também é ⊘, não zero.
@@ -15023,13 +15126,13 @@ run_kg_fixture_paths_selftests() {
   # estava aqui passou a reprovar o estado CORRETO quando o 7º sítio foi revertido — e só apareceu na
   # suíte completa, porque isolada eu a rodara antes). O seed é o crítico: ali a isenção incompleta
   # CANCELA a semente do KG, em vez de afrouxar um gate.
-  local _obrig _falta=""
+  local _obrig _missing=""
   for _obrig in .claude/utils/adopt/seed-adoption-graph.sh .claude/validation/kg-radar-integrity.sh \
                 .claude/validation/kg-trace-resolve.sh .claude/validation/kg-backlog-project.sh \
                 .claude/validation/kg-corpus-grep.sh .claude/validation/kg-verification-coverage.sh; do
-    (cd "${_root2}" && grep -q 'kg-fixture-paths\.sh' "${_obrig}" 2>/dev/null) || _falta="${_falta} ${_obrig}"
+    (cd "${_root2}" && grep -q 'kg-fixture-paths\.sh' "${_obrig}" 2>/dev/null) || _missing="${_missing} ${_obrig}"
   done
-  [ -z "${_falta}" ] || cmiss="${cmiss} sítio-obrigatório-sem-o-predicado:${_falta}"
+  [ -z "${_missing}" ] || cmiss="${cmiss} sítio-obrigatório-sem-o-predicado:${_missing}"
   if [ -z "${cmiss}" ]; then
     record_pass "kg-fixture-paths: (c) os ${_n_cons} consumidores DERIVADOS (6 obrigatórios conferidos por nome) invocam o predicado e nenhum guardou o grep próprio"
   else
@@ -15438,7 +15541,7 @@ run_realign_selftests() {
     "drift-northstar|commit=1 bind=1|0"
     "bind-fp-supported-decision|bind=0|0"
     # PAR que fixa o critério do SUPERADOR MORTO (2026-09-06). O radar já ignora superador
-    # `refuted`/`superseded` (`supersederConta`); a camada 1 daqui contava qualquer aresta, e um alvo
+    # `refuted`/`superseded` (`supersederCount`); a camada 1 daqui contava qualquer aresta, e um alvo
     # legitimamente reaberto sob superador que CAIU virava (c) PERMANENTE — o radar dizia ✅ e o
     # realign dizia REALINHAR sobre o MESMO grafo. O controle `superseder-vivo` existe porque a cura
     # podia ter silenciado a camada inteira: sem ele, apagar a camada 1 passaria verde.
@@ -16238,14 +16341,14 @@ EOF_A2
 
   local rc out
   _se() { rc=0; out="$( cd "${sb}" && bash "${SE}" "$@" 2>&1 )" || rc=$?; }
-  # nome | args… || esperado-rc | substring esperada
+  # nome-do-caso | args… || esperado-rc | substring esperada
   _caso() { # $1=rótulo $2=rc-esperado $3=substring $4…=args
-    local nome="$1" wantrc="$2" want="$3"; shift 3
+    local case_name="$1" wantrc="$2" want="$3"; shift 3
     _se "$@"
     if [ "${rc}" = "${wantrc}" ] && grep -qF "${want}" <<< "${out}"; then
-      record_pass "seal-exception: ${nome}"
+      record_pass "seal-exception: ${case_name}"
     else
-      record_fail "seal-exception: ${nome}" "esperava rc=${wantrc} + '${want}'; veio rc=${rc}: ${out}"
+      record_fail "seal-exception: ${case_name}" "esperava rc=${wantrc} + '${want}'; veio rc=${rc}: ${out}"
     fi
   }
 
@@ -16531,10 +16634,10 @@ run_kg_yaml_validity_selftests() {
   printf 'meta: { schema_version: 1 }\nnodes:\n  - id: W\n    label: "quebra \$ tsv"\nedges: []\n' > "${d}/r/g/tsv.kg.yaml"
   ( cd "${d}/r" && git add -A ) >/dev/null 2>&1 || true
   rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
-  local _campos; _campos="$(grep -F 'INVALIDO' <<< "${out}" | head -1 | awk -F'\t' '{print NF}')"
-  if [ "${_campos}" = "4" ]; then
+  local _fields; _fields="$(grep -F 'INVALIDO' <<< "${out}" | head -1 | awk -F'\t' '{print NF}')"
+  if [ "${_fields}" = "4" ]; then
     record_pass "kg-yaml-validity: (h) --format tsv emite 4 campos por TAB (o lint corta por TAB)"
-  else record_fail "kg-yaml-validity: (h)" "esperava 4 campos TSV, veio '${_campos}' — o lint leria a linha inteira como severidade: ${out}"; fi
+  else record_fail "kg-yaml-validity: (h)" "esperava 4 campos TSV, veio '${_fields}' — o lint leria a linha inteira como severidade: ${out}"; fi
   # (i) NOME COM ESPAÇO e NÃO-ASCII: `split()` estilhaçava o primeiro e recebia o segundo CITADO
   #     (core.quotePath), produzindo HARD falso E cobertura ZERO no arquivo real.
   rm -f "${d}/r/g/tsv.kg.yaml"
@@ -16628,11 +16731,11 @@ run_plugin_runtime_selftests() {
       morto="${morto} $(basename "${f}")"
     fi
   done <<< "${scripts}"
-  local esperado; esperado="$(printf '%s\n' "${scripts}" | grep -c . || true)"
-  if [ "${total}" != "${esperado}" ]; then
-    record_fail "plugin-runtime: (a) cobertura" "varri ${esperado} script(s) e executei ${total} — laço perdendo itens (stdin engolido?); a contagem é a guarda contra vacuidade"
+  local expected; expected="$(printf '%s\n' "${scripts}" | grep -c . || true)"
+  if [ "${total}" != "${expected}" ]; then
+    record_fail "plugin-runtime: (a) cobertura" "varri ${expected} script(s) e executei ${total} — laço perdendo itens (stdin engolido?); a contagem é a guarda contra vacuidade"
   elif [ -z "${morto}" ]; then
-    record_pass "plugin-runtime: (a) ${total}/${esperado} script(s) empacotado(s) sobrevivem SEM CLAUDE_PLUGIN_ROOT no ambiente"
+    record_pass "plugin-runtime: (a) ${total}/${expected} script(s) empacotado(s) sobrevivem SEM CLAUDE_PLUGIN_ROOT no ambiente"
   else
     record_fail "plugin-runtime: (a)" "NASCIDO MORTO sem a variável (REGRA 73/74):${morto} — o ambiente do shell não a exporta; resolva a raiz por BASH_SOURCE no assembler"
   fi
@@ -17354,14 +17457,47 @@ run_role_scope_selftests() {
   mkdir -p "${sb2}/.claude/validation" "${sb2}/docs"
   cp "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" "${sb2}/.claude/validation/"
   # extrai só o predicado — testar a unidade, não a suíte de 4 minutos
-  sed -n '/^_PAPEL_DESTE_REPO=""/,/^}/p' "${sb2}/.claude/validation/lint-artifacts.sh" > "${sb2}/pred.sh"
-  sed -n '/^_sem_objeto_no_papel()/,/^}/p' "${sb2}/.claude/validation/lint-artifacts.sh" >> "${sb2}/pred.sh"
+  sed -n '/^_ROLE_OF_THIS_REPO=""/,/^}/p' "${sb2}/.claude/validation/lint-artifacts.sh" > "${sb2}/pred.sh"
+  sed -n '/^_without_object_for_role()/,/^}/p' "${sb2}/.claude/validation/lint-artifacts.sh" >> "${sb2}/pred.sh"
+
+  # ⚠️ AS ANCORAS DE `sed` SAO ACOPLAMENTO harness↔runner, E ELE JA QUEBROU. Em 2026-09-20 um rename
+  #    em `lint-artifacts.sh` deixou as 4 ancoras citando o nome VELHO: o `sed` extraiu VAZIO e o
+  #    `bash -c` caiu em `command not found`. PIOR QUE A QUEBRA: (b),(c),(e),(f),(g) ESPERAM `NAO`, e
+  #    funcao inexistente TAMBEM produz `NAO` — a unica razao de reprovarem foi o stderr sujar
+  #    `${out}`. Com `2>/dev/null` seriam CINCO PASSES VACUOS sobre um predicado que nao existe.
+  #    Duas camadas agora: a montagem FALA (abaixo) e o runner tem um TERCEIRO desfecho
+  #    (`SEM-FUNCAO:<nome>`), que nunca colide com `RECORTA`/`NAO`. "Nao sei" nunca vira "ok" — a
+  #    mesma doutrina do `lib AUSENTE → exit 2` da guarda de idioma.
+  _rs_syms_ok() { # $1=arquivo de predicado  $2..=simbolos exigidos
+    local _pf="$1"; shift
+    local _miss="" _s
+    if [ ! -s "${_pf}" ]; then
+      record_fail "role-scope: montagem" "predicado extraido VAZIO (${_pf##*/}) — alguma ancora \`sed -n '/^X/'\` nao casou em lint-artifacts.sh"
+      return 1
+    fi
+    for _s in "$@"; do
+      bash -c 'source "'"${_pf}"'" >/dev/null 2>&1; declare -F '"${_s}"' >/dev/null 2>&1' || _miss="${_miss} ${_s}"
+    done
+    if [ -n "${_miss}" ]; then
+      record_fail "role-scope: montagem" "simbolo(s) NAO definido(s) apos o sed:${_miss} — a ancora do harness cita nome que nao existe mais no runner"
+      return 1
+    fi
+    record_pass "role-scope: (0) as ancoras de sed casaram e os simbolos existem (o acoplamento harness↔runner esta vivo)"
+    return 0
+  }
+  if ! _rs_syms_ok "${sb2}/pred.sh" _without_object_for_role; then
+    # ⚠️ SKIP NOMEADO, nunca sumico: ausencia silenciosa de caso e tratada como aprovacao por quem
+    #    le a soma (o no A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN registra a classe). Os dependentes
+    #    NAO foram exercidos, e a suite precisa dizer isso com todas as letras.
+    record_skip "role-scope: (a)(b)(c) NAO exercidos — o predicado nao montou"
+    rm -rf "${sb2}"; return 0
+  fi
 
   # (a) papel HUB sem corpus → a ausência é legítima, a guarda recorta
   printf 'role: hub\n' > "${sb2}/.claude/.onion-version"
   out="$(REPO_ROOT="${sb2}" SCRIPT_DIR="${sb2}/.claude/validation" bash -c '
     source "'"${sb2}"'/pred.sh"
-    _sem_objeto_no_papel "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
+    _without_object_for_role "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
   if [ "${out}" = "RECORTA" ]; then record_pass "role-scope: (a) papel hub sem corpus → recorta (ausência legítima)"
   else record_fail "role-scope: (a)" "não recortou no papel hub: ${out}"; fi
 
@@ -17369,7 +17505,7 @@ run_role_scope_selftests() {
   rm -f "${sb2}/.claude/.onion-version"
   out="$(REPO_ROOT="${sb2}" SCRIPT_DIR="${sb2}/.claude/validation" bash -c '
     source "'"${sb2}"'/pred.sh"
-    _sem_objeto_no_papel "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
+    _without_object_for_role "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
   if [ "${out}" = "NAO" ]; then record_pass "role-scope: (b) na FONTE a mesma ausência NÃO é recortada (lá é defeito)"
   else record_fail "role-scope: (b)" "recortou na fonte — o recorte virou fail-open universal"; fi
 
@@ -17379,7 +17515,7 @@ run_role_scope_selftests() {
   ( cd "${sb2}" && git init -q . && printf 'meta:\n  id: x\n' > x.kg.yaml && git add -A ) >/dev/null 2>&1
   out="$(REPO_ROOT="${sb2}" SCRIPT_DIR="${sb2}/.claude/validation" bash -c '
     source "'"${sb2}"'/pred.sh"
-    _sem_objeto_no_papel "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
+    _without_object_for_role "[kg-selo/ISENCAO] x" && echo RECORTA || echo NAO' 2>&1)"
   if [ "${out}" = "NAO" ]; then record_pass "role-scope: (c) com corpus PRESENTE não recorta (o corte é sobre não receber)"
   else record_fail "role-scope: (c)" "recortou com .kg.yaml presente — esconderia corpus quebrado"; fi
   rm -rf "${sb2}"
@@ -17393,39 +17529,46 @@ run_role_scope_selftests() {
   vm="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
   cp "${vm}" "${sb3}/.claude/utils/adopt/" 2>/dev/null || true
   {
-    sed -n '/^_PAPEL_DESTE_REPO=""/,/^}/p'      "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    sed -n '/^_ROLE_OF_THIS_REPO=""/,/^}/p'      "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
     sed -n '/^_glob_literal_prefix()/,/^}/p'    "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
-    sed -n '/^_superficie_que_viaja()/,/^}/p'   "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
-    sed -n '/^_regra_sem_objeto_no_papel()/,/^}/p' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    sed -n '/^_traveling_surface()/,/^}/p'   "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    sed -n '/^_rule_without_object_for_role()/,/^}/p' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
     sed -n '/^_rule_glob_matches()/,/^}/p'      "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
   } > "${sb3}/pred2.sh"
+  if ! _rs_syms_ok "${sb3}/pred2.sh" _rule_without_object_for_role _traveling_surface _glob_literal_prefix _rule_glob_matches; then
+    record_skip "role-scope: (d)(e)(f)(g) NAO exercidos — o predicado nao montou"
+    rm -rf "${sb3}"; return 0
+  fi
   _rs_run() { # $1=role ('' = fonte) $2=expr a avaliar
     local _r="$1"
     if [ -n "${_r}" ]; then printf 'role: %s\n' "${_r}" > "${sb3}/.claude/.onion-version"
     else rm -f "${sb3}/.claude/.onion-version"; fi
     REPO_ROOT="${sb3}" CLAUDE_DIR="${sb3}/.claude" bash -c '
       source "'"${sb3}"'/pred2.sh"
+      for _fn in _rule_without_object_for_role _traveling_surface _glob_literal_prefix _rule_glob_matches; do
+        declare -F "${_fn}" >/dev/null 2>&1 || { echo "SEM-FUNCAO:${_fn}"; exit 0; }
+      done
       '"$2"'' 2>&1
   }
 
   # (d) papel HUB + glob sob superfície core-only → RECORTA (SOFT declarado, nunca HARD cego)
-  out="$(_rs_run hub '_regra_sem_objeto_no_papel "docs/evolution/research/**" && echo RECORTA || echo NAO')"
+  out="$(_rs_run hub '_rule_without_object_for_role "docs/evolution/research/**" && echo RECORTA || echo NAO')"
   if [ "${out}" = "RECORTA" ]; then record_pass "role-scope: (d) hub + glob em superfície que NÃO viaja → recorta"
   else record_fail "role-scope: (d)" "não recortou: ${out} — a porta reprova numa regra que não pode carregar"; fi
 
   # (e) a MESMA regra na FONTE segue HARD: lá a árvore é completa, glob morto é defeito de verdade
-  out="$(_rs_run '' '_regra_sem_objeto_no_papel "docs/evolution/research/**" && echo RECORTA || echo NAO')"
+  out="$(_rs_run '' '_rule_without_object_for_role "docs/evolution/research/**" && echo RECORTA || echo NAO')"
   if [ "${out}" = "NAO" ]; then record_pass "role-scope: (e) na FONTE o mesmo glob NÃO é recortado"
   else record_fail "role-scope: (e)" "recortou na fonte — regra morta passaria a dormir no core"; fi
 
   # (f) glob que MIRA superfície que viaja não ganha isenção nenhuma, mesmo no hub
-  out="$(_rs_run hub '_regra_sem_objeto_no_papel ".claude/commands/**" && echo RECORTA || echo NAO')"
+  out="$(_rs_run hub '_rule_without_object_for_role ".claude/commands/**" && echo RECORTA || echo NAO')"
   if [ "${out}" = "NAO" ]; then record_pass "role-scope: (f) glob sobre superfície que VIAJA continua cobrado no hub"
   else record_fail "role-scope: (f)" "recortou glob que viaja — a isenção virou fail-open"; fi
 
   # (g) FAIL-CLOSED: sem a SSOT do transporte não se concede isenção (nunca 'não sei' virar 'passa')
   mv "${sb3}/.claude/utils/adopt/vendor-manifest.sh" "${sb3}/vm.bak" 2>/dev/null || true
-  out="$(_rs_run hub '_regra_sem_objeto_no_papel "docs/evolution/research/**" && echo RECORTA || echo NAO')"
+  out="$(_rs_run hub '_rule_without_object_for_role "docs/evolution/research/**" && echo RECORTA || echo NAO')"
   if [ "${out}" = "NAO" ]; then record_pass "role-scope: (g) sem vendor-manifest a isenção NÃO é concedida (fail-closed)"
   else record_fail "role-scope: (g)" "isentou sem SSOT do transporte — fail-open"; fi
   mv "${sb3}/vm.bak" "${sb3}/.claude/utils/adopt/vendor-manifest.sh" 2>/dev/null || true
@@ -17800,35 +17943,35 @@ run_regen_completude_selftests() {
     # conferir por quem lembrou.
     "a2a-agent-card.sh"         # deriva de docs/evolution/federation/members.yaml — CORE-ONLY: sem o registro, não há card a emitir no alvo
   )
-  local _falta="" _g _x _ok
+  local _missing="" _g _x _ok
   while IFS= read -r _g; do
     [ -n "${_g}" ] || continue
     _ok=0
     grep -q "${_g}" "${regen}" && _ok=1
     for _x in "${_isentos[@]}"; do [ "${_x}" = "${_g}" ] && _ok=1; done
-    [ "${_ok}" -eq 1 ] || _falta="${_falta}${_g} "
+    [ "${_ok}" -eq 1 ] || _missing="${_missing}${_g} "
   done <<< "${_geradores}"
 
-  if [ -z "${_falta// /}" ]; then
+  if [ -z "${_missing// /}" ]; then
     record_pass "regen-completude: toda projeção que o lint manda regenerar está no regen-ssot (ou isenta COM razão)"
   else
-    record_fail "regen-completude" "gerador(es) que o lint manda rodar e que o regen-ssot NÃO cobre nem isenta: ${_falta}— o adotante vai nascer com a catraca vermelha, terceira vez que isso acontece"
+    record_fail "regen-completude" "gerador(es) que o lint manda rodar e que o regen-ssot NÃO cobre nem isenta: ${_missing}— o adotante vai nascer com a catraca vermelha, terceira vez que isso acontece"
   fi
 
   # E o caso-mutante: se `rules-registry.sh` sair da lista, este oráculo TEM de reprovar. Sem ele o
   # caso passa a ser um `grep` que sempre acha algo, e guarda que não sabe reprovar não guarda nada.
   local _mut; _mut="$(mktemp)"
   grep -v 'rules-registry.sh' "${regen}" > "${_mut}"
-  _falta=""
+  _missing=""
   while IFS= read -r _g; do
     [ -n "${_g}" ] || continue
     _ok=0
     grep -q "${_g}" "${_mut}" && _ok=1
     for _x in "${_isentos[@]}"; do [ "${_x}" = "${_g}" ] && _ok=1; done
-    [ "${_ok}" -eq 1 ] || _falta="${_falta}${_g} "
+    [ "${_ok}" -eq 1 ] || _missing="${_missing}${_g} "
   done <<< "${_geradores}"
   rm -f "${_mut}"
-  if grep -q 'rules-registry' <<< "${_falta}"; then
+  if grep -q 'rules-registry' <<< "${_missing}"; then
     record_pass "regen-completude: (MUT) tirar rules-registry da lista faz o oráculo reprovar"
   else record_fail "regen-completude: (MUT)" "o oráculo não reage à remoção — o caso é decorativo"; fi
 }
@@ -17893,9 +18036,9 @@ run_client_terms_selftests() {
   # (a) O ARQUIVO NÃO PODE VIAJAR — é a invariante que torna a cura possível em vez de ser o
   #     vazamento. Se alguém o mover para `.claude/`, a lista de clientes vai junto no bundle.
   if [ -f "${ct}" ]; then
-    local _viaja; _viaja="$(bash "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" --repo "${REPO_ROOT}" --emit-scrub-roots 2>/dev/null \
+    local _travels; _travels="$(bash "${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh" --repo "${REPO_ROOT}" --emit-scrub-roots 2>/dev/null \
       | while IFS= read -r _r; do case "docs/evolution/federation/client-terms.txt" in "${_r}"/*) echo HIT ;; esac; done)"
-    if [ -z "${_viaja}" ]; then
+    if [ -z "${_travels}" ]; then
       record_pass "client-terms: (a) a lista de nomes NÃO está na superfície que viaja"
     else record_fail "client-terms: (a)" "a lista de clientes ENTROU no transporte — ela virou o vazamento"; fi
   else record_skip "client-terms: (a) arquivo ausente neste repo"; fi

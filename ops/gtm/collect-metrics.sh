@@ -28,8 +28,8 @@ for s in federation-engagement session-velocity context-freshness-metric cycle-c
   if [ -f "$led" ] && grep -q "\"dia\":\"${HOJE}\"" "$led"; then
     echo "collect: ${s} já coletado hoje (idempotente)"; continue
   fi
-  linhas=$(bash "${ROOT}/.claude/validation/${s}.sh" --jsonl 2>/dev/null | grep -c "^{") || linhas=0
+  lines=$(bash "${ROOT}/.claude/validation/${s}.sh" --jsonl 2>/dev/null | grep -c "^{") || lines=0
   payload=$(bash "${ROOT}/.claude/validation/${s}.sh" --jsonl 2>/dev/null | python3 -c 'import sys,json; print(json.dumps([json.loads(l) for l in sys.stdin if l.strip().startswith("{")]))')
-  printf '{"dia":"%s","medidor":"%s","registros":%s,"dados":%s}\n' "$HOJE" "$s" "$linhas" "$payload" >> "$led"
-  echo "collect: ${s} → ${linhas} registro(s)"
+  printf '{"dia":"%s","medidor":"%s","registros":%s,"dados":%s}\n' "$HOJE" "$s" "$lines" "$payload" >> "$led"
+  echo "collect: ${s} → ${lines} registro(s)"
 done
