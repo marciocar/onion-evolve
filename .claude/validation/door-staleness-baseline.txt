@@ -107,5 +107,12 @@
 # uma espera. Catraca so encolhe, e a unica coisa que legitimamente a faz subir e trabalho MERGEADO
 # que a porta ainda nao recebeu — nao trabalho ja materializado esperando `git push`.
 # O vermelho aqui nao e defeito: e a guarda dizendo a verdade sobre o mundo.
-onion-standalone 397
+#
+# 2026-09-20 (pos-#855): `onion-standalone` sobe a 398 — mesmo criterio de sempre: e trabalho
+# MERGEADO que a porta parada nao recebeu (o #855 entrou em main), nao espera de push. O
+# `onion-core` segue em ZERO: a 12a materializacao esta commitada no clone (pin cb582c0e088b, o
+# HEAD de main MERGEADA — materializei de uma worktree destacada, porque `git archive HEAD` da
+# branch publicaria trabalho em voo numa porta PUBLICA, armadilha que ja me pegou 3 vezes).
+# O gate fica VERMELHO ate o push do maestro, e isso e a guarda dizendo a verdade sobre o mundo.
+onion-standalone 398
 onion-core 0
