@@ -117,6 +117,31 @@ existir no `members.yaml` → **avisar** (registro ausente) e seguir só com os 
 
 ## Passo 4 — Escrever o rascunho na staging (outbox do core)
 
+> ### ⚠️ NÚMERO SOBRE O ESTADO DO ALVO SAI DA MEDIÇÃO, NUNCA DA PROSA
+>
+> **O anúncio é o único documento que chega ANTES do merge** — o adotante que lê só ele decide com
+> base nele. Sinal de campo (2026-08-31, re-medido em 2026-09-16): um anúncio afirmou *"as portas
+> estão OK: nenhuma sem prefixo de bind"* enquanto **a catraca da mesma leva tinha contado 38
+> exposições**, e o relatório dentro da própria branch dizia o número certo. Dois artefatos da mesma
+> leva discordando — um dizia **0**, o outro **38**. Quem leu o anúncio concluiu que não havia o que
+> fazer, e a dívida tolerada ficou tolerada **para sempre, porque ninguém foi avisado**.
+>
+> O mesmo anúncio citava *"3 fallbacks de senha"* onde o padrão produzia **19 em 10 variáveis**: quem
+> aplicasse "o fix de 3 linhas" curaria **16% da classe** achando ter curado a classe.
+>
+> **Regra, e ela é de derivação, não de cuidado:**
+> 1. Ao descrever estado **verificável** do alvo, **rode a medição e cole o número dela** — baseline
+>    da catraca, saída do gate, contagem do próprio script. Nunca reafirme em prosa o que um artefato
+>    mede.
+> 2. Se o número **não estiver disponível** na geração, escreva **"não medido"** — nunca afirme o
+>    estado. `[papel/SEM-OBJETO]` é a forma canônica desta casa para ausência legítima.
+> 3. **Anúncio e relatório da mesma leva não podem discordar** sobre uma contagem que ambos citam.
+>    Se discordarem, o errado é o anúncio (o relatório nasce junto do artefato).
+>
+> Classe: **declarado ≠ medido**, no único artefato que viaja sozinho.
+> Fio: `A_ANUNCIO_DERIVA_O_NUMERO_DA_MEDICAO` em `docs/onion/graph/fios-abertos.kg.yaml`.
+
+
 Para cada destinatário, escrever `docs/evolution/federation/outbox/<id>/<data-da-entrada>-<slug>.md`
 (`mkdir -p` do dir + `_processed/`). Envelope **simétrico** ao `inbound/` que o adotante já entende
 (ver `/meta:adopt` § Procedimento de Relatório Downstream):

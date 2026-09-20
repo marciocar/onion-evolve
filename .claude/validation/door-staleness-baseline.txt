@@ -86,5 +86,13 @@
 #   (que carimba `role: adopted`, do corte manual de 2026-07-19) por uma que as guardas leiam como
 #   FONTE. Hoje a porta materializa em 0 HARD medidos SEM isencao — provado trocando o carimbo e
 #   vendo o veredito NAO mudar de forma que compre verde.
-onion-standalone 391
+#
+# 2026-09-19/20 (9a materializacao): `onion-core` volta a ZERO pela quinta vez em tres dias — o ciclo
+# materializar → avancar o pin ja nao exige pensar. `onion-standalone` sobe a 393.
+# ⚠️ REGISTRO DE UMA ESPERA, porque ela e a metade que nao e minha: entre a materializacao e o push
+#   houve ~1h de gate VERMELHO no core, e eu NAO avancei o pin nesse intervalo. Avancar teria feito a
+#   catraca dizer 0/0 sobre uma porta que ninguem podia abrir — a armadilha INVERSA da de 2026-09-18,
+#   quando o pin velho escondia porta nova. As duas mentem; a diferenca e a direcao. O pin so anda
+#   depois do push VERIFICADO no remoto (`gh api .../commits/main`), nunca depois do commit local.
+onion-standalone 393
 onion-core 0
