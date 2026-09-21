@@ -1,0 +1,348 @@
+# KG SDAAL — estrela "interface no estado da arte" (discuss/interface-state-of-art).
+# Insumo do radar cross-study da Constelacao: nos = premissas do estudo; arestas = SUPPORTS/REFUTES/
+# CAUSES/DEPENDS_ON/TRACES_TO. O no-chave pro radar e C_TELEMETRY_VIABLE — a base compartilhada que
+# behavior-mapping-kg e onion-pessoal-marcio tambem pisam (DEPENDS_ON) e que ainda esta open (base fragil).
+# Camada audit (epistemico). Design-only, isolado — nada foi pro core.
+meta:
+  id: interface-state-of-art
+  date: 2026-07-12
+nodes:
+  # ---- a tese ----
+  - id: C_INTERFACE_IS_LINE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.7
+    status: open
+    label: "a interface no estado da arte e a linha intake x execucao tornada visivel e observavel"
+
+  # ---- o colapso da instancia unica (mesmo fato, valencia oposta) ----
+  - id: C_COLLAPSE_ROOT
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    label: "instancia unica: observado = beneficiario = proponente = aprovador = o maestro"
+  - id: C_COLLAPSE_DISSOLVES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "o colapso DISSOLVE o risco de vigilancia (observado=beneficiario) -> intake seguro (N01)"
+  - id: C_COLLAPSE_CREATES
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "o MESMO colapso CRIA apofenia institucionalizada (propoe=aprova) -> exige refutador (N02)"
+
+  # ---- a premissa compartilhada (o no-chave do radar cross-study) ----
+  - id: C_TELEMETRY_VIABLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.55
+    status: open
+    label: "telemetria estruturada de sessao e intake viavel: estrutura gratis, conteudo gated (BASE COMPARTILHADA, ainda open)"
+  - id: C_TELEMETRY_CLEAN
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.2
+    status: refuted
+    label: "instrumentar a sessao ja da sinal limpo (prior otimista)"
+  - id: C_FRICTION_SIGNALS
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: confirmed
+    label: "os sinais uteis sao de atrito/retrabalho (tool_decision reject, blocked_on_user, loops), nao de produtividade"
+
+  # ---- gate como superficie central ----
+  - id: C_FATIGUE_IS_SECURITY
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: confirmed
+    label: "fadiga de aprovacao e falha de SEGURANCA, nao de UX (rubber-stamping = supervisao performatica)"
+  - id: C_GRAPH_CEILING
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    label: "grafo node-link tem teto ~50 nos -> kg-console e modo de inspecao, nao workspace continuo"
+
+  # ---- evidencia do dogfood real (N05) ----
+  - id: E_DOGFOOD_STRUCTURE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "N05: telemetria real capturada — estrutura (tokens/tool_decision/spans) sim, conteudo fora por construcao, custo ~0"
+  - id: E_NOISY_SUBSTRATE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    label: "N05: stream entrelacado com telemetria do app (prisma/bullmq/eventloop) — filtro de prefixo e passo-0"
+  - id: E_INTERACTIVE_ONLY
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    label: "N05: blocked_on_user flatlina em headless — fadiga de gate so e mensuravel com humano no loop (interativo)"
+  - id: E_AUTOMODE_GATE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "N05: o gate de auto-mode barrou bypassPermissions no meio do experimento — exemplo vivo da tese"
+
+  # ---- a fronteira honesta ----
+  - id: Q_PATTERN_UNPROVEN
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.3
+    status: open
+    label: "nenhum padrao provado — exige N>=3 sessoes INTERATIVAS instrumentadas (Rule of Three)"
+
+  # ---- decisoes ----
+  - id: D_NEED_REFUTADOR
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.7
+    status: open
+    label: "promocao candidato->doutrina exige refutador adversarial + N>=3 + descoberta != confirmacao (anti-HARKing)"
+  - id: D_HARVEST_INVARIANTS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.45
+    status: open
+    label: "colher os 3 invariantes para o core (authorization-layers §7) — GATED: candidatos contestados pelo refutador, aprovacao e nossa"
+  - id: D_KGCONSOLE_INSPECTION
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 2
+    confidence: 0.7
+    status: open
+    label: "kg-console fica como modo de inspecao; esforco vai pro gate visual + estado calm"
+
+  # ---- os 3 invariantes candidatos (rules) ----
+  - id: R_EXIBIR_SKIP_GATEAR_VETO
+    node_type: rule
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.5
+    status: refuted
+    label: "exibir degrada skip; gatear degrada veto (gerador vs gate — a metade certa por elemento)"
+  - id: R_FORMATIVO
+    node_type: rule
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.4
+    status: refuted
+    label: "formativo, nao performatico — nada de metrica rankeavel/comparavel no tempo"
+  - id: R_GATE_CAMADAS
+    node_type: rule
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.55
+    status: refuted
+    label: "gate em camadas por risco = materializacao visual da linha: intake auto / reversivel soft / irreversivel hard"
+
+  # ---- refutacoes do refutador (contestaveis — hipoteses, nao veredito; cada uma com sua confianca) ----
+  - id: REF_1_DISPLAY_FEEDS_GATE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.65
+    status: open
+    label: "refutador: display que ALIMENTA um gate (evidence-pack) degradando pra skip enfraquece o gate — falta recorte 'input-de-gate degrada veto'"
+  - id: REF_2_LOOP_NEEDS_TREND
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.75
+    status: open
+    label: "refutador: o loop NS1 (N01->N03) exige re-medir blocked_on_user no tempo; 'nada comparavel no tempo' proibe o proprio loop (auto-contradicao)"
+  - id: REF_3_EXTERNAL_IS_IRREVERSIBLE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: open
+    label: "refutador: 'reversivel=soft' abre buraco — enviar pra externo ja expoe; core ja trata externo=publicar=irreversivel (co-deliver/a2a), precisa herdar"
+
+  # ---- ancoras cross-study (entidades — o que o radar cruza entre estrelas) ----
+  - id: ENT_AUTH_LAYERS
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    label: "estudo camadas de liberacao (authorization-layers) — a espinha intake x execucao, ja no core"
+  - id: ENT_BEHAVIOR_STAR
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "estrela discuss/behavior-mapping-kg (o sensor que coleta comportamento -> KG)"
+  - id: ENT_PESSOAL_STAR
+    node_type: entity
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "estrela discuss/onion-pessoal-marcio (o proposito: cerebro pessoal reconciliado)"
+
+  # ---- pré-registro N≥3 (NOTE-06): a distincao leg-1/leg-2 + a trava anti-HARKing ----
+  - id: C_LEG1_NOT_LEG2
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: confirmed
+    label: "N≥3 prova o LOOP observa recorrencia (leg-1); validar os invariantes exige INTERVIR+re-medir (leg-2, estudo maior) — nao confundir; leg-1 OK nao promove os R_*"
+  - id: E_PREREGISTRO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    label: "pré-registro N≥3 declarado (NOTE-06): sinais fixados, descoberta!=confirmacao (N>=4), filtro-de-prefixo passo-0, vies intra-orbita declarado — anti-HARKing"
+edges:
+  # a tese e seus apoios
+  - from: E_AUTOMODE_GATE
+    to: C_INTERFACE_IS_LINE
+    edge_type: SUPPORTS
+  - from: C_INTERFACE_IS_LINE
+    to: D_HARVEST_INVARIANTS
+    edge_type: SUPPORTS
+
+  # mesmo colapso, valencia oposta (a raiz CAUSA os dois sinais)
+  - from: C_COLLAPSE_ROOT
+    to: C_COLLAPSE_DISSOLVES
+    edge_type: CAUSES
+  - from: C_COLLAPSE_ROOT
+    to: C_COLLAPSE_CREATES
+    edge_type: CAUSES
+  - from: C_COLLAPSE_DISSOLVES
+    to: C_TELEMETRY_VIABLE
+    edge_type: SUPPORTS
+  - from: C_COLLAPSE_CREATES
+    to: D_NEED_REFUTADOR
+    edge_type: SUPPORTS
+
+  # a premissa compartilhada: apoiada pelo dogfood, mas o prior "limpo" foi refutado -> segue open
+  - from: E_DOGFOOD_STRUCTURE
+    to: C_TELEMETRY_VIABLE
+    edge_type: SUPPORTS
+  - from: C_FRICTION_SIGNALS
+    to: C_TELEMETRY_VIABLE
+    edge_type: SUPPORTS
+  - from: E_NOISY_SUBSTRATE
+    to: C_TELEMETRY_CLEAN
+    edge_type: REFUTES
+  - from: E_INTERACTIVE_ONLY
+    to: Q_PATTERN_UNPROVEN
+    edge_type: SUPPORTS
+  - from: Q_PATTERN_UNPROVEN
+    to: C_TELEMETRY_VIABLE
+    edge_type: DEPENDS_ON
+
+  # gate como superficie central
+  - from: C_FATIGUE_IS_SECURITY
+    to: R_GATE_CAMADAS
+    edge_type: SUPPORTS
+  - from: C_GRAPH_CEILING
+    to: D_KGCONSOLE_INSPECTION
+    edge_type: SUPPORTS
+
+  # os invariantes tracam pro core (authorization-layers §7)
+  - from: R_EXIBIR_SKIP_GATEAR_VETO
+    to: ENT_AUTH_LAYERS
+    edge_type: TRACES_TO
+  - from: R_FORMATIVO
+    to: ENT_AUTH_LAYERS
+    edge_type: TRACES_TO
+  - from: R_GATE_CAMADAS
+    to: ENT_AUTH_LAYERS
+    edge_type: TRACES_TO
+  - from: R_EXIBIR_SKIP_GATEAR_VETO
+    to: D_HARVEST_INVARIANTS
+    edge_type: SUPPORTS
+  - from: R_FORMATIVO
+    to: D_HARVEST_INVARIANTS
+    edge_type: SUPPORTS
+  - from: R_GATE_CAMADAS
+    to: D_HARVEST_INVARIANTS
+    edge_type: SUPPORTS
+
+  # >>> o cruzamento cross-study: as estrelas-irmas DEPENDEM da mesma premissa ainda-open <<<
+  - from: ENT_BEHAVIOR_STAR
+    to: C_TELEMETRY_VIABLE
+    edge_type: DEPENDS_ON
+  - from: ENT_PESSOAL_STAR
+    to: C_TELEMETRY_VIABLE
+    edge_type: DEPENDS_ON
+
+  # >>> refutador dobrado de volta: REFUTES entrando em rule OPEN acende o flag de contradicao nao-reconciliada <<<
+  - from: REF_1_DISPLAY_FEEDS_GATE
+    to: R_EXIBIR_SKIP_GATEAR_VETO
+    edge_type: REFUTES
+  - from: REF_2_LOOP_NEEDS_TREND
+    to: R_FORMATIVO
+    edge_type: REFUTES
+  - from: REF_3_EXTERNAL_IS_IRREVERSIBLE
+    to: R_GATE_CAMADAS
+    edge_type: REFUTES
+
+  # pré-registro: a distincao leg-1/leg-2 CONSTRANGE a colheita dos invariantes
+  - from: E_PREREGISTRO
+    to: C_LEG1_NOT_LEG2
+    edge_type: SUPPORTS
+  - from: C_LEG1_NOT_LEG2
+    to: D_HARVEST_INVARIANTS
+    edge_type: CONSTRAINS
