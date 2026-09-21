@@ -2,7 +2,7 @@
 title: 'Resíduo — a 14ª porta é, de propósito, a cobaia que prova o gate no vivo'
 date: 2026-09-21
 branch: chore/door-14-and-gate-canary
-reviewed_diff_sha256: 42293279de9b9eb5724ec7879b715dc2b9565192564773ca77810cc0f2dc408d
+reviewed_diff_sha256: 204a41ee84e1e2bdc3faeee8ad319b43b990056083b6deecd9f2c71aab43f3c7
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
