@@ -2,7 +2,7 @@
 title: 'Resíduo — o gate que eu criei negava defeito real, e a cura dele criou outro'
 date: 2026-09-21
 branch: feat/reviewer-findings-block
-reviewed_diff_sha256: 5c18a5e39e303d7ee5e59e33379b975bbca41e83e054bf115ae4b742e8bec386
+reviewed_diff_sha256: 494764e4942ed4a798ba220bdbcad900f0b1fcc3e546be05892f7c6a10f10a23
 findings_total: 10
 findings_real: 10
 findings_fixed: 10
