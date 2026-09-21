@@ -99,6 +99,7 @@
 .claude/hooks/bash-empty-result-guard.sh	E_POSTTOOLUSE_E_SINAL_POS_FATO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_session_hook_pulls	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_timeout_is_load_bearing	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+.claude/hooks/kg-read-leg.sh	D_POSTTOOLBATCH_TROCA_N_INJECOES_POR_UMA	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_MEDICAO_READ_VS_BASH_NO_CORPUS_DE_TRANSCRICOES	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/kg-read-leg.sh	E_PERNA_DE_LEITURA_E_CEGA_A_BASH	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/kg-read-leg.sh	Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
@@ -112,13 +113,18 @@
 .claude/hooks/premodelswitch-guard.sh	E_R3_F2_TROCA_DE_MODELO_RECHECA_E_NOMEIA	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	E_CURA_MERGE_GATE_2O_VETO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.claude/hooks/pretooluse-protect-main.sh	E_O_VETO_DA_CASA_FALHA_ABERTO_SE_O_PYTHON_SUMIR	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
+.claude/hooks/rule-title-in-prose.sh	E_CORE_ADOTOU_STOP_BLOQUEANTE_NO_F8_DERIVOU	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
+.claude/hooks/session-version-drift.sh	D_CONFIGCHANGE_CONVERTE_AVISO_EM_MECANISMO	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
 .claude/hooks/session-version-drift.sh	D_REGRA65_MEDE_O_PROCESSO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/hooks/task-manager-provider-hook.sh	D_FIX_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
+.claude/hooks/worklog-precompact-breadcrumb.sh	D_PRECOMPACT_DIRIGE_O_QUE_SOBREVIVE	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
 .claude/settings.json	C_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/settings.json	E_D2_SRC	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/settings.json	E_F5_DENY_READ_COBERTURA_E_O_ALLOW_DO_ENV	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/settings.json	E_F8_STOP_HOOK_NAO_SE_APLICA	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/settings.json	E_HOOK_SUBSTRATE	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
+.claude/settings.json	E_MOAT_AGORA_LASTREADO_CORRECAO_EXECUTADA	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
 .claude/settings.json	E_R3_F11_REGRAS_DE_PERMISSAO	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .claude/settings.json	E_VETO_UNICO_ANTES_DA_RODADA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/skills/	E_sem_retro_skill	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
@@ -334,6 +340,7 @@
 .claude/validation/lint-artifacts.sh	Q_REVERSE_JOIN_SCOPE	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/validation/lint-artifacts.sh	SY6_ev_drift_guard_r19	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/validation/lint-artifacts.sh	SY6_ev_lint_regra5_por_tipo	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
+.claude/validation/lint-rules.md	E_AS_63_HARD_SAO_POST_HOC_E_PULAVEIS	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
 .claude/validation/lint-rules.md	E_INDEX_LIVE_LENS	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	C_BANCADA_ACHA_O_QUE_LEITURA_NAO_ACHA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
@@ -1185,6 +1192,7 @@ docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.propos
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	Q_vps_declared	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 docs/evolution/outbox/diary/2026-07-09-security-gate-degrades-to-veto.md	C_a2a_gate_narrow	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml	D_SETUP_FECHA_O_NO_ABERTO_DO_CLONE_FRESCO	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_artifact_adr_thread_runtime	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_claim_onion_stricter	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_claim_transfer_onion	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -1407,6 +1415,12 @@ docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS.md_SINGLE_SOURCE_
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS.md_TARGETING_SCHEMA_OPEN	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS.md_TOOL_POISONING_STAT_DOWNGRADED	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS.md_VPS_SUFFICES	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
+docs/evolution/research/hooks-state-of-art-2026-09/SYNTHESIS.md	Q_HOOKS_ESTADO_E_APROVEITAMENTO_0921	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
+docs/evolution/research/hooks-state-of-art-2026-09/data/event-catalog-2.1.278.verbatim.txt	D_SUBAGENTSTART_INJETA_DOUTRINA_NO_WORKER	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
+docs/evolution/research/hooks-state-of-art-2026-09/data/event-catalog-2.1.278.verbatim.txt	E_33_EVENTOS_NA_2_1_278	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
+docs/evolution/research/hooks-state-of-art-2026-09/data/event-catalog-2.1.278.verbatim.txt	E_EXIT2_TEM_SEMANTICA_DIFERENTE_POR_EVENTO	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
+docs/evolution/research/hooks-state-of-art-2026-09/data/event-catalog-2.1.278.verbatim.txt	E_HANDLERS_PROMPT_E_AGENT_RESTRITOS_A_3_EVENTOS	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
+docs/evolution/research/hooks-state-of-art-2026-09/data/output-caps-2.1.278.verbatim.txt	E_TETOS_DE_SAIDA_POR_CAMPO	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
 docs/evolution/research/kg-freshness-dogfood-2026-08/calibration-gold-standard-2026-08-29.md	Q_EXP_JUIZ_FABLE_CALIBRACAO	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
 docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml	Q_EXP_WORKER_FABLE_NOS_COMPOSTOS	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
 docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml	E_LACUNAS_KG_MULTI_GRAPH_0904	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
@@ -1865,4 +1879,5 @@ ops/verify-adopter-gate.sh	E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING	docs/evolu
 plugins/onion/commands/	E_DRIVE_NAO_E_MOAT_MAS_DEPS_NAO_VIAJAM	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 plugins/onion/commands/	Q_KG_INBOX_FORA_DO_PLUGIN	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 plugins/onion/commands/	Q_PLUGIN_SEM_DRIVE_NEM_ADOPT	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
+plugins/onion/hooks/hooks.json	E_MOAT_NAO_VIAJA_PELO_CANAL_DE_INSTALACAO	docs/evolution/research/hooks-state-of-art-2026-09/hooks-state-of-art-2026-09.kg.yaml
 site/src/pages	Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml

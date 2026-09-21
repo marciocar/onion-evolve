@@ -1,0 +1,431 @@
+meta:
+  id: hooks-state-of-art-2026-09
+  schema_version: "1"
+  baseline: 2026-09-21
+  review_after: 2026-10-21   # cadência FERRAMENTA/PLATAFORMA = 30d. O tipo dominante desta rodada é
+                             # CONTRATO DE PLATAFORMA medido no binário instalado — muda a cada
+                             # release semanal do Claude Code. Gatilho de revisita antecipada:
+                             # qualquer update do Claude Code que toque hooks.
+  # kg-backlog-guard: on
+  # ═══ TETO: 27 NÓS (onda 1 interna = 18; onda 2 externa +5 — mercado, fail-open, latencia,
+  #     headless/Windows e o defeito no veto da casa; onda 3 de CORRECAO +4 — a licao de metodo,
+  #     a adocao medida, o fail-open confirmado em doc oficial e a correcao do PreCompact, todos
+  #     nascidos do confronto com a referencia publica que DERRUBOU 4 afirmacoes desta rodada).
+  #     Cresce so com fonte primaria nova sobre o CONTRATO de hooks ou medicao propria no repo. ═══
+  # Pergunta do maestro (2026-09-21): estado atual do uso de hooks (interno e externo) e como o
+  # Onion pode se aproveitar disso.
+  #
+  # ⚠️ MÉTODO: a fonte primária desta rodada é o ELF instalado (2.1.278), que carrega a própria
+  #    documentação de hooks embutida. Verbatim em data/. Controles NEGATIVOS inventados
+  #    (PreToolUseXyzzy, FooBarHookEvent, PreBananaSwitch, OnionGateEvent) = 0 ocorrências;
+  #    positivos (PreToolUse 116, SessionStart 84) altos. Sem os negativos a contagem não valeria.
+  #
+  # ⚠️ LIMITE DECLARADO: nenhum dos 23 eventos ociosos foi EXERCITADO. As oportunidades abaixo são
+  #    LEITURA DE CONTRATO, não dogfood. O teto de 8.000 foi lido da tabela de constantes, não
+  #    provocado com uma saída de 8.001 chars.
+
+nodes:
+  - id: Q_HOOKS_ESTADO_E_APROVEITAMENTO_0921
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: 'Qual o estado atual da superficie de hooks do Claude Code (2.1.278) e quais dela o Onion deveria passar a usar? Segue open: a rodada mediu o CONTRATO (catalogo de eventos, exit 2 por evento, tetos de saida, handlers) mas NAO exercitou nenhum dos 23 eventos ociosos — e a doutrina da casa diz que contrato lido nao e dogfood. Decidivel so depois de um exercicio real de pelo menos os dois de maior impacto (Setup e SubagentStart).'
+    trace: 'docs/evolution/research/hooks-state-of-art-2026-09/SYNTHESIS.md'
+
+  - id: E_33_EVENTOS_NA_2_1_278
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'strings -a no ELF 2.1.278 instalado, com controles negativos inventados = 0 e positivos (PreToolUse 116, SessionStart 84) altos; catalogo verbatim em data/event-catalog-2.1.278.verbatim.txt'
+    valid_from: '2026-09'
+    source_tier: 10
+    source_kind: primary
+    label: 'A superficie tem 33 eventos na 2.1.278, e o binario carrega a PROPRIA documentacao de hooks embutida (tabela de eventos, contrato de entrada e saida, exit code por evento). Confirma e atualiza E_CONTRATO_DE_HOOKS_EXPLODIU (que media cerca de 30 na 2.1.233, em 2026-08-16): a superficie nao encolheu em 36 dias e 45 releases. O core do Onion configura 10 desses 33 — 23 OCIOSOS (70%).'
+    trace: 'docs/evolution/research/hooks-state-of-art-2026-09/data/event-catalog-2.1.278.verbatim.txt'
+
+  - id: E_TETOS_DE_SAIDA_POR_CAMPO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'tabela de constantes extraida do ELF 2.1.278: vdr (chars) e Tdr (linhas), com Xvt=200; verbatim em data/output-caps-2.1.278.verbatim.txt'
+    valid_from: '2026-09'
+    source_tier: 10
+    source_kind: primary
+    label: 'DISPUTADO — a afirmacao inicial (teto real de 8.000 refutando os 10.000 do corpus) NAO se sustenta e fica RETIRADA. A doc publica afirma 10.000 caracteres para additionalContext, systemMessage, initialUserMessage e stdout puro, medidos campo a campo, com o excedente gravado em arquivo na pasta da sessao e substituido por path mais preview de 2.000 chars, sem setting para levantar. O ELF 2.1.278 carrega, separadamente, uma tabela de constantes por campo (vdr: additionalContext 8000, systemMessage 4000, reason e stopReason e permissionDecisionReason 2000; Tdr: 200 linhas para additionalContext, 20 para o resto) consumida por kB() via u3n(), que em truncamento faz e.report.truncated.push(n) — o destino `report` sugere ESTAGIO DIFERENTE (relatorio ou telemetria) do da ENTREGA ao modelo. As duas leituras podem coexistir e EU NAO DETERMINEI qual governa o contexto que chega. Cai junto o corolario de que a forma de 8.092 bytes de E_plataforma_desqualifica estaria 92 bytes acima do teto. EXPERIMENTO QUE DECIDE, e e barato: hook descartavel emitindo additionalContext de 8.001 e de 10.001 chars, observando o que chega.'
+    trace: 'docs/evolution/research/hooks-state-of-art-2026-09/data/output-caps-2.1.278.verbatim.txt'
+
+  - id: E_HANDLERS_PROMPT_E_AGENT_RESTRITOS_A_3_EVENTOS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-21
+    verified_against: 'doc embutida no ELF 2.1.278, verbatim: "Only available for tool events: PreToolUse, PostToolUse, PermissionRequest." repetido para os dois handlers'
+    valid_from: '2026-09'
+    source_tier: 10
+    source_kind: primary
+    label: 'CORRIGIDO por confronto com a doc publica — a medicao inicial estava ERRADA. Existem CINCO tipos de handler, nao quatro: command, http, mcp_tool, prompt e agent; so `agent` e declarado experimental. Os handlers prompt e agent sao suportados em 13 eventos (PreToolUse, PostToolUse, PostToolUseFailure, PostToolBatch, PermissionRequest, PermissionDenied, Stop, SubagentStop, TaskCreated, TaskCompleted, TeammateIdle, UserPromptSubmit, UserPromptExpansion) e os exemplos canonicos da doc sao Stop com type prompt e Stop com type agent. A restricao a 3 eventos que eu media veio da DOC DE AJUDA RESUMIDA embutida no binario, nao do contrato — ver E_ERREI_RESUMO_EMBUTIDO_POR_CONTRATO. O que SOBREVIVE da medicao: prompt e agent NAO retornam additionalContext (schema so ok, reason, impossible), logo sao decisores puros — e a doc confirma. E o handler http existe com guarda de destino, verbatim do ELF: "HTTP hook blocked: (private/link-local address). Loopback (127.0.0.1, ::1) is allowed for local dev" — CONSISTENTE com o exemplo oficial de allowedHttpHookUrls que inclui http://localhost:*, nao contraditorio com ele.'
+    trace: 'docs/evolution/research/hooks-state-of-art-2026-09/data/event-catalog-2.1.278.verbatim.txt'
+
+  - id: E_UPDATEDINPUT_PERMITE_CORRIGIR_NAO_SO_VETAR
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-21
+    verified_against: 'doc embutida no ELF 2.1.278 ("updatedInput - Modified tool input (PreToolUse only)") mais mensagens de runtime: "returned updatedInput that failed schema validation" e "updatedInput is missing or empty, falling back to original tool input"'
+    valid_from: '2026-09'
+    source_tier: 10
+    source_kind: primary
+    label: 'A capacidade e REAL e mais ampla do que eu media: reescrita de conteudo existe em PreToolUse (hookSpecificOutput.updatedInput), em PermissionRequest (dentro de decision.updatedInput — nivel diferente, por isso escapou do grep literal) e em PostToolUse (updatedToolOutput). Ha validacao de schema e fallback para o input original quando falha ("returned updatedInput that failed schema validation", "updatedInput is missing or empty, falling back to original tool input"). E uma classe que o Onion NAO exerce: os 6 hooks com exit 2 do core so sabem dizer NAO. Caso concreto medido nesta sessao: o bash-empty-result-guard.sh barrou um 2>/dev/null DEPOIS do comando rodar (PostToolUse); em PreToolUse poderia remover o silenciamento ANTES. DOIS RISCOS A DECLARAR: (1) reescrever comando em silencio e o oposto da doutrina da casa — so com systemMessage casado; (2) a doc avisa que hooks rodam em PARALELO e nao-deterministicamente, e com dois hooks mexendo no mesmo input o ULTIMO A TERMINAR VENCE.'
+
+  - id: E_EXIT2_TEM_SEMANTICA_DIFERENTE_POR_EVENTO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'catalogo verbatim do ELF 2.1.278, evento a evento, em data/event-catalog-2.1.278.verbatim.txt'
+    valid_from: '2026-09'
+    source_tier: 10
+    source_kind: primary
+    label: 'exit 2 NAO significa a mesma coisa em todo evento, e tratar como se significasse e modo de falha. PreToolUse: bloqueia a chamada e mostra stderr ao modelo. PostToolBatch: PARA O LOOP AGENTICO. UserPromptSubmit: bloqueia E APAGA o prompt original. ConfigChange: bloqueia a mudanca de config na sessao. TaskCreated e TaskCompleted: impede criar ou concluir a task. TeammateIdle: impede o idle. PreCompact: bloqueia a compactacao. Stop: mostra stderr ao modelo e CONTINUA a conversa. SubagentStop: mostra ao subagente e o mantem rodando. SessionStart, SessionEnd e Setup: exit 2 so mostra stderr ao usuario, NAO bloqueia nada.'
+    trace: 'docs/evolution/research/hooks-state-of-art-2026-09/data/event-catalog-2.1.278.verbatim.txt'
+
+  - id: E_MOAT_AGORA_LASTREADO_CORRECAO_EXECUTADA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-21
+    verified_against: '.claude/settings.json (3 entradas PreToolUse) mais grep -rl "exit 2" .claude/hooks/ = 6 de 15 scripts'
+    label: 'A correcao de 2026-08-31 FOI EXECUTADA. maestro-vivo-2026-08/C_ERRA_O_EXIT_2_DETERMINISTICO_DE_HOOK_COMO_A_C mediu que a capacidade declarada no CLAUDE.md como compradora do acoplamento era declaracao vazia: ZERO PreToolUse e 1 unico hook com exit 2 de 7. HOJE: 3 entradas PreToolUse (protect-main, merge-gate, kg-read-leg), 6 de 15 hooks com exit 2, e um Stop bloqueante. O CLAUDE.md agora descreve maquinaria que existe. Aquele no merece carimbo de resolvido.'
+    trace: '.claude/settings.json'
+
+  - id: E_CORE_ADOTOU_STOP_BLOQUEANTE_NO_F8_DERIVOU
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: '.claude/settings.json linha 184 (Stop) mais .claude/hooks/rule-title-in-prose.sh linha 94 (exit 2); mtime do script = 2026-09-04, UM DIA depois do no que afirmava a ausencia'
+    label: 'DERIVA. radar-E3-2026-09-03/E_F8_STOP_HOOK_NAO_SE_APLICA (tier 9, CHANGELOG oficial) declarou "o core NAO tem hook Stop" e ressalvou "vale so se o core vier a adotar um Stop bloqueante". O core ADOTOU um dia depois: rule-title-in-prose.sh sai com exit 2 em Stop. A premissa do no e falsa hoje e a ressalva esta viva. Agravante de desenho: o hook usa VETO BLOQUEANTE para impor FORMATACAO DE PROSA (titulo de REGRA sem parenteses) — o evento MessageDisplay, que devolve displayContent substituindo o delta na tela e nao bloqueia, e a ferramenta do tamanho do problema.'
+    trace: '.claude/hooks/rule-title-in-prose.sh'
+
+  - id: E_MOAT_NAO_VIAJA_PELO_CANAL_DE_INSTALACAO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-21
+    verified_against: 'contagem direta: .claude/hooks/*.sh=15 contra plugins/onion/hooks/*.sh=2; eventos em settings.json=10 contra plugins/onion/hooks/hooks.json=2; .claude/validation/*.sh=72 contra plugins/onion/validation/*.sh=19; nenhum lint-*.sh em plugins/onion/validation/'
+    label: 'C_INEF_DISTRIBUICAO_DO_MOAT (2026-08-31) PERSISTE, agora com numero. O canal de instalacao leva 2 de 15 hooks, 2 de 10 eventos, 19 de 72 scripts de validacao e ZERO das 87 REGRAs de lint (63 HARD). Quem instala o Onion pelo plugin recebe a metade que ACONSELHA e nada da metade que REPROVA — que e justamente a metade AGNOSTICA (E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO), a mais barata de distribuir. CONSEQUENCIA DE PRIORIDADE: adicionar evento de hook novo antes de consertar isto e construir fosso que nao embarca.'
+    trace: 'plugins/onion/hooks/hooks.json'
+
+  - id: E_AS_63_HARD_SAO_POST_HOC_E_PULAVEIS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-21
+    verified_against: '.claude/validation/lint-rules.md: 87 linhas de regra, 63 HARD e 10 SOFT; as guardas rodam no .githooks/pre-commit (core.hooksPath local) e no CI'
+    label: 'A ALAVANCA. As 87 REGRAs (63 HARD) do lint rodam no pre-commit e no CI — post-hoc, e pulaveis com --no-verify (o proprio corpus registra o autor pulando 3 vezes numa sessao, em D_CURAR_O_GATE_INERTE_DO_ADOTANTE). A superficie de hooks nao pede logica nova: pede GATILHO novo para logica que ja existe. Mover um subconjunto das HARD de "pego no commit" para "impedido no ato" custa quase nada de acoplamento, porque a logica continua agnostica e so o gatilho e do Claude Code — exatamente a postura declarada no CLAUDE.md (acoplar so onde a capacidade nao existe fora).'
+    trace: '.claude/validation/lint-rules.md'
+
+  - id: E_SESSIONSTART_CACHE_MISS_CURADO_NA_PLATAFORMA
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-09-21
+    verified_against: 'CHANGELOG local em ~/.claude/cache/changelog.md, delta 2.1.262 a 2.1.278, linha 32'
+    valid_from: '2026-09'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'BOA NOTICIA DE PLATAFORMA que o Onion pagava sem saber: sessoes continuadas apos /clear (restart, --continue, --resume) perdiam parte da primeira mensagem quando um hook SessionStart imprimia saida, causando PERDA TOTAL de prompt-cache. CORRIGIDO no delta 2.1.262 a 2.1.278. O core tem 4 hooks SessionStart que imprimem, logo pagava esse custo em toda retomada; a 2.1.278 instalada ja cura. Tambem corrigidos no mesmo delta: crash ao retomar sessao cujo transcript tem sumario de stop hook malformado (l.49) e SubagentStop com matcher disparando para todo subagente de tipo vazio (l.133).'
+
+  - id: D_SETUP_FECHA_O_NO_ABERTO_DO_CLONE_FRESCO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-09-21
+    verified_against: 'contrato do evento Setup no ELF 2.1.278 (Repo setup hooks for init and maintenance, trigger init ou maintenance, exit 0 devolve additionalContext, campo runsOnce) cruzado com o no aberto audit-textual-gates-2026-09/Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO'
+    label: 'A plataforma cresceu a janela que um no ABERTO estava esperando. Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO pergunta como armar o gate num clone fresco (core.hooksPath e config LOCAL; clone novo nasce sem os 5 vetos e nada acusa) e propoe como cura um SessionStart que mede e AVISA. O evento Setup e estritamente melhor: dispara no momento CERTO (init ou maintenance), tem runsOnce, e nao gera ruido em toda sessao — que e o que produz fadiga de guarda. DECISAO DO MAESTRO: adotar Setup como o armador do gate, e rebaixar a cura por SessionStart a fallback.'
+    trace: 'docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml'
+
+  - id: D_PRECOMPACT_DIRIGE_O_QUE_SOBREVIVE
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-09-21
+    verified_against: 'contrato do PreCompact no ELF 2.1.278: Exit code 0 - stdout appended as custom compact instructions'
+    label: 'O Onion ja usa PreCompact, mas pela METADE. O contrato diz que o stdout do hook e ANEXADO COMO INSTRUCAO DE COMPACTACAO — ou seja, da para DIRIGIR o que sobrevive ao resumo. Hoje worklog-precompact-breadcrumb.sh so grava migalha. O mesmo hook pode emitir instrucoes preservando ids de no do KG, decisoes abertas e fase da sessao, servindo direto a doutrina de retomada (/onion:catch-up e breadcrumbs). Custo: uma dezena de linhas num hook que JA EXISTE — o melhor retorno por linha da rodada.'
+    trace: '.claude/hooks/worklog-precompact-breadcrumb.sh'
+
+  - id: D_SUBAGENTSTART_INJETA_DOUTRINA_NO_WORKER
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-09-21
+    verified_against: 'contrato do SubagentStart no ELF 2.1.278: Exit code 0 - JSON additionalContext shown to subagent; input traz agent_id e agent_type'
+    label: 'SubagentStart e a UNICA janela documentada para injetar contexto em subagente. O Onion orquestra pesado (uma rodada medida da onion-research usou 105 agentes) e hoje a doutrina so chega ao worker se for COLADA no prompt — o que e declaracao, nao mecanismo. Um hook aqui injeta corpus ou doutrina em TODO worker, mecanicamente, e o input traz agent_type (da para variar a injecao por papel). Restricao dura: 8.000 chars de additionalContext (E_TETOS_DE_SAIDA_POR_CAMPO), o que exclui despejar corpus e obriga a projecao curta — a mesma disciplina que o kg-read-leg.sh ja pratica.'
+    trace: 'docs/evolution/research/hooks-state-of-art-2026-09/data/event-catalog-2.1.278.verbatim.txt'
+
+  - id: D_POSTTOOLBATCH_TROCA_N_INJECOES_POR_UMA
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.75
+    verified_at: 2026-09-21
+    verified_against: 'contrato do PostToolBatch no ELF 2.1.278: Fires once after every tool call in a batch has resolved, before the next model request. Return additionalContext via hookSpecificOutput to inject context once for the whole batch.'
+    label: 'O kg-read-leg.sh hoje e PreToolUse com matcher Read Edit Write Bash — dispara POR CHAMADA. PostToolBatch existe exatamente para injetar UMA VEZ POR LOTE, e o contrato diz isso com todas as letras. Mesma informacao, menos repeticao, menos custo de contexto. Contrapartida a pesar antes de migrar: em PostToolBatch o aviso chega DEPOIS da leitura do arquivo, enquanto em PreToolUse chega ANTES — e o valor do kg-read-leg e justamente avisar ANTES de concluir da fonte. Provavel desenho certo: manter PreToolUse para o aviso e usar PostToolBatch para consolidacao, nao trocar um pelo outro.'
+    trace: '.claude/hooks/kg-read-leg.sh'
+
+  - id: D_CONFIGCHANGE_CONVERTE_AVISO_EM_MECANISMO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-09-21
+    verified_against: 'contrato do ConfigChange no ELF 2.1.278: fontes user_settings, project_settings, local_settings, policy_settings e skills; Exit code 2 - block the change from being applied to the session'
+    label: 'ConfigChange e a porta para transformar drift de configuracao de AVISO em MECANISMO: exit 2 bloqueia a mudanca de ser aplicada a sessao, e as fontes incluem skills e policy_settings. Hoje session-version-drift.sh SEMPRE sai 0 POR DESENHO (o comentario diz que reiniciar e ato do maestro). ATENCAO ao selar: nem todo aviso deve virar veto — a razao veto para confianca da casa e cerca de 1 para 10 (C_CONTAGEM_POS_RODADA) e move-la por comodidade e o acoplamento por conveniencia que a postura de 2026-05-18 proibe. Este no existe para NOMEAR a porta, nao para recomendar atravessa-la.'
+    trace: '.claude/hooks/session-version-drift.sh'
+
+  - id: Q_POLITICA_DE_ORG_PODE_DESLIGAR_O_GATE
+    node_type: question
+    plane: PROD
+    status: open
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-09-21
+    verified_against: 'strings do ELF 2.1.278: allowManagedHooksOnly (26 ocorrencias), disabledByPolicy, managedOnly, pluginOnly, policyHookCount, managedHooksStillApply, allDisabled — presentes, mas o CONTRATO nao foi lido'
+    label: 'RESPONDIDA, e a resposta e SIM — o risco e real e esta documentado. Duas chaves publicas de settings: disableAllHooks, que em escopo MANAGED desliga TUDO inclusive os proprios hooks managed (preservando so os do Agent SDK) e, fora de managed, desliga user, project, local e plugin; e allowManagedHooksOnly, escopo Managed, que deixa rodar so hooks managed mais Agent SDK mais plugins force-enabled por enabledPlugins, bloqueando user, project, local, demais plugins e hooks de frontmatter de agente. Ha ainda allowedHttpHookUrls, httpHookAllowedEnvVars e o --safe-mode que estreita para managed. CONSEQUENCIA PARA O ONION: o gate deterministico PODE ser desligado por politica de organizacao no adotante enterprise, e o Onion nao tem como perceber isso de dentro. NAO se deve vender o exit 2 como garantia em contexto corporativo sem checar a politica do cliente. NOTA DE METODO: os identificadores que eu achei no binario (disabledByPolicy, policyHookCount, managedHooksStillApply) NAO sao chaves publicas de configuracao — sao internos, e nao se constroi config sobre eles.'
+
+  - id: E_LACUNAS_HOOKS_0921
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'autodeclaracao da rodada'
+    label: 'LACUNAS DECLARADAS. (1) NENHUM dos 23 eventos ociosos foi EXERCITADO — tudo sobre eles e leitura de contrato, nao dogfood; a casa trata contrato lido como hipotese. (2) O teto de 8.000 foi LIDO da tabela de constantes, nao provocado com uma saida de 8.001 chars — o experimento decisivo custa um hook descartavel e nao foi feito. (3) O tipo de handler mcp_tool aparece so como rotulo de UI, sem string de tipo propria: nao confirmado. (4) O estado do gate nos adotantes foi medido por PRESENCA DE ARQUIVO (12 de 25 repos com arquivo no hooksPath resolvido), que e exatamente o erro que D_CURAR_O_GATE_INERTE_DO_ADOTANTE condena; o verificador comportamental ops/verify-adopter-gate.sh EXISTE e NAO foi rodado, porque ele faz commit-sonda e havia outras sessoes ativas nos mesmos checkouts. A metrica de quantos adotantes tem gate PROVADO vivo segue sem medicao valida.'
+
+  # ── PERNA EXTERNA: o que o mercado faz com hooks ─────────────────────────────────────
+  - id: E_MERCADO_HOOKS_2026
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-09-21
+    verified_against: 'busca web 2026-09-21; repos e contagens de estrela conforme listagem do GitHub no momento da busca — NAO reaberti cada repo, logo os numeros sao do indice, nao verificados na pagina'
+    valid_from: '2026'
+    source_tier: 6
+    source_kind: community
+    label: 'MERCADO (secao obrigatoria da doutrina de pesquisa). O ecossistema de hooks em 2026 se organiza em DUAS camadas, e nenhuma e a do Onion. (1) ENCANAMENTO: SDKs para escrever hook em linguagem tipada em vez de shell cru — cchooks Python (~123 estrelas), cchooks Go, cc-hooks-ts e claude-hook TypeScript, claude-hooks-sdk PHP (~62). (2) COLECOES pequenas e utilitarias — karanb192/claude-code-hooks (~298 estrelas, 10 hooks: cost-tracker, rate-limiter, branch-guard) distribuida COMO MARKETPLACE INSTALAVEL; disler/claude-code-hooks-mastery; awesome-claude-code-hooks. LEITURA PARA O ONION: ninguem publica METODO com hooks como braco de execucao — as 87 REGRAs do Onion sao outra categoria. Mas o concorrente de 10 hooks JA DISTRIBUI pelo canal que o Onion subaproveita (E_MOAT_NAO_VIAJA_PELO_CANAL_DE_INSTALACAO). Ha tambem sinal ACADEMICO de que a fronteira pode descer do harness para o SO (arXiv ActPlane, policy enforcement em nivel de SO para harnesses de agente) — nao lido nesta rodada, LACUNA.'
+    trace: 'https://github.com/karanb192/claude-code-hooks'
+
+  - id: E_FAIL_OPEN_E_O_MODO_DE_FALHA_DOMINANTE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-09-21
+    verified_against: 'busca web 2026-09-21, multiplos relatos independentes (DEV Community e issues de terceiros) convergindo no mesmo mecanismo; o contrato de exit code foi cruzado com o catalogo verbatim do ELF 2.1.278'
+    valid_from: '2026'
+    source_tier: 5
+    source_kind: community
+    label: 'O MODO DE FALHA DOMINANTE dos hooks no campo e FAIL-OPEN, e ele e SILENCIOSO: hook que estoura por bug ou entrada ruim nao imprime nada e sai 0, o que o Claude Code le como "sem objecao" e deixa a acao passar. E exit 1 NAO bloqueia — e tratado como erro nao-bloqueante e a acao prossegue; so exit 2 barra. Relatos convergentes acrescentam: PermissionRequest NAO dispara em modo nao-interativo (-p headless); no Windows um PreToolUse pode nunca ser spawnado e o Claude Code reporta como erro nao-bloqueante que quase ninguem nota. Corrobora, de fora, o que o corpus ja tinha por dentro (E_FRAGILIDADE_HERDADA_DA_PLATAFORMA, issue 87145).'
+
+  - id: E_O_VETO_DA_CASA_FALHA_ABERTO_SE_O_PYTHON_SUMIR
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: '.claude/hooks/pretooluse-protect-main.sh linhas 6 e 9, lidas apos o achado externo; e varredura dos 6 hooks com exit 2 — nenhum tem trap de erro, todos tem entre 4 e 5 portas de exit 0'
+    label: 'O DEFEITO ACIONAVEL desta rodada, achado so pelo CRUZAMENTO externo->interno. pretooluse-protect-main.sh e o unico veto incondicional da casa (nega force-push para main, E_VETO_UNICO_ANTES_DA_RODADA). Ele extrai o comando via python3 na linha 6; se o python3 sumir, ou se o formato do JSON de entrada mudar, cmd vem VAZIO e a linha 9 ([ -z "$cmd" ] && exit 0) deixa o force-push PASSAR. Nenhum dos 6 hooks com exit 2 tem trap de erro, e cada um tem de 4 a 5 portas de exit 0 — portanto nao ha como distinguir "deliberadamente nao se aplica" de "a guarda quebrou". Isto NAO diz que exit 0 esta errado (a maioria das portas e legitima); diz que falta a guarda-da-guarda. CURA CANDIDATA: trap ERR que emite systemMessage e sai 2 nos hooks de VETO, e uma sonda de auto-teste que quebre o python de proposito e exija o bloqueio.'
+    trace: '.claude/hooks/pretooluse-protect-main.sh'
+
+  - id: E_EXTERNO_CONFIRMA_O_EXIT2_SOB_BYPASS
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-09-21
+    verified_against: 'busca web 2026-09-21; afirmacao de terceiro (nao da Anthropic) — NAO exercitada nesta maquina'
+    valid_from: '2026'
+    source_tier: 5
+    source_kind: community
+    label: 'CORROBORACAO EXTERNA da tese do CLAUDE.md: hooks PreToolUse disparam ANTES de qualquer checagem de modo de permissao, de modo que um hook devolvendo permissionDecision deny barra a ferramenta inclusive em bypassPermissions e sob --dangerously-skip-permissions. E a capacidade que o CLAUDE.md nomeia como compradora do acoplamento, agora vista de fora e nao so declarada por dentro. CONTRAPESO da mesma fonte, que a casa deve absorver em vez de descartar: a recomendacao de campo e que hooks sejam automacao LOCAL rapida, com CI, protecao de branch e controles de infraestrutura permanecendo a camada AUTORITATIVA de enforcement — o que apoia a leitura de que o fosso do Onion e o shell agnostico (que roda em CI), nao o gatilho.'
+
+  - id: E_CUSTO_DE_LATENCIA_DE_HOOK
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-09-21
+    verified_against: 'busca web 2026-09-21, relato unico de terceiro em issue de projeto alheio — numero NAO reproduzido aqui, tratar como ordem de grandeza e nao como medida'
+    valid_from: '2026'
+    source_tier: 4
+    source_kind: community
+    label: 'CUSTO A MEDIR, nao a assumir: um relato de campo mede 18,2s por interacao com hooks ligados contra 4,8s sem, e outro registra timeouts duros de 30s. O core do Onion dispara 4 hooks em SessionStart e 4 em UserPromptSubmit, todos com timeout 5. NUNCA foi cronometrado o custo agregado por turno — e a casa ja tem precedente de declaracao de tempo errada por ordem de grandeza (onion-refinaria-2026-08/E_gate_declara_1min_e_leva_15: o pre-commit declarava ~1min e levou 921s). GATILHO: cronometrar a soma dos hooks por turno antes de adicionar qualquer evento novo.'
+
+  - id: E_ERREI_RESUMO_EMBUTIDO_POR_CONTRATO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'confronto do que eu li em ~525k do strings dump contra a referencia publica baixada por uma perna independente; a regiao lida tem cabecalho "## Hooks Configuration" e uma tabela "### Hook Events" com apenas 10 eventos'
+    label: 'LICAO DE METODO desta rodada, registrada porque o erro e reincidivel. O binario carrega DUAS coisas diferentes e eu as tratei como uma so: (a) uma DOC DE AJUDA RESUMIDA (secao "Hooks Configuration", tabela com 10 eventos, exemplos simplificados) e (b) o eventCatalog interno (~557k), com descricao e semantica de exit code evento a evento para os 33. Li (a) e carimbei tier 10 primary — dai sairam as duas afirmacoes ERRADAS desta rodada: prompt e agent restritos a 3 eventos, e updatedInput so em PreToolUse. O catalogo (b) resistiu ao confronto: a lista de quem bloqueia no exit 2 bateu com a doc publica quase item a item. REGRA PRATICA: resumo embutido no binario e UI, nao contrato; so o eventCatalog e a referencia publica servem de fonte de contrato. E o corolario que mais importa: fonte primaria LOCAL nao vence fonte primaria PUBLICA por ser local — vence por ser a fonte CERTA.'
+
+  - id: E_HOOKS_E_O_FEATURE_MENOS_ADOTADO
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: 2026-09-21
+    verified_against: 'State of Claude Code 2026 (buildthisnow.com), amostra de 2.500 repos publicos sorteados de 8.298 com config Claude Code via GitHub code search API, snapshot de junho/2026; e ClaudePluginHub 2026-06-08 para o lado marketplace — terceiros com metodologia declarada, paginas NAO reabertas por mim'
+    valid_from: '2026-06'
+    source_tier: 6
+    source_kind: community
+    label: 'O NUMERO DE MERCADO QUE MAIS IMPORTA, e ele corta contra o entusiasmo: hooks e o feature MENOS adotado do Claude Code. Em 2.500 repos publicos — CLAUDE.md 84,9 por cento; diretorio .claude/ 62,1; qualquer power feature 53,9; Skills 28,1; slash commands 25,6; subagentes 24,6; .mcp.json 17,0; HOOKS 13,3 (sobe a cerca de 21 entre repos com .claude/ estruturado). No marketplace, 358.699 componentes indexados: skills 222.015 contra hooks 7.776 — hooks sao 2,2 por cento dos componentes e skills os superam cerca de 28 para 1 (caveat forte: conta ENTRADAS de hook, nao plugins-que-embarcam-hook). LEITURA DUPLA, e as duas pontas valem: (a) o Onion aposta no eixo mais RARO, o que e fosso de verdade se a aposta estiver certa, porque quase ninguem concorre ali; (b) e tambem o eixo de menor DEMANDA comprovada, entao vender hooks como diferencial para quem nao adota hooks e vender contra a corrente. Quem usa, usa muito (colecoes de 10, 26, 30, 95 hooks): publico pequeno e concentrado.'
+    trace: 'https://www.buildthisnow.com/blog/real-examples/state-of-claude-code-2026'
+
+  - id: E_FAIL_OPEN_CONFIRMADO_PELA_DOC_OFICIAL
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'referencia publica de hooks baixada em 2026-09-21 por perna independente; converge com os relatos de campo de E_FAIL_OPEN_E_O_MODO_DE_FALHA_DOMINANTE'
+    valid_from: '2026-09'
+    source_tier: 10
+    source_kind: primary
+    label: 'O fail-open deixa de ser folclore de comunidade e vira CONTRATO DECLARADO: script inexistente ou sem bit de execucao produz exit 127, que e erro NAO bloqueante, e a acao prossegue — um path errado no settings.json deixa o gate silenciosamente desligado. Timeout em PreToolUse tambem e fail-open (saida descartada, a call segue pelo fluxo normal de permissao): hook travado NAO e gate. JSON no nivel errado (permissionDecision ou additionalContext no topo, em vez de dentro de hookSpecificOutput) parseia, e IGNORADO e nao gera erro visivel — so aparece com --debug. E exit 1 NAO bloqueia. O UNICO ponto fail-CLOSED por default e subagente em background nao-interativo, onde a call e NEGADA se nenhum hook devolver decisao (mais PreModelSwitch e os eventos de worktree, que falham fechado em timeout). Isso CONFIRMA, de fonte primaria, o defeito medido em E_O_VETO_DA_CASA_FALHA_ABERTO_SE_O_PYTHON_SUMIR.'
+
+  - id: E_REINJECAO_POS_COMPACTACAO_E_SESSIONSTART
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-09-21
+    verified_against: 'referencia publica de hooks baixada em 2026-09-21 por perna independente'
+    valid_from: '2026-09'
+    source_tier: 10
+    source_kind: primary
+    label: 'CORRIGE PARCIALMENTE D_PRECOMPACT_DIRIGE_O_QUE_SOBREVIVE. A sobrevivencia de additionalContext a compactacao NAO e documentada, e o padrao OFICIAL de re-injecao e SessionStart com matcher `compact` (que dispara DEPOIS da compactacao) — nao PreCompact nem PostCompact, que nao injetam contexto. O que SOBREVIVE da oportunidade: PreCompact com exit 0 anexa o stdout como INSTRUCAO DE COMPACTACAO, o que dirige o que o resumo preserva, e isso e coisa diferente de injetar contexto depois. Desenho certo para o Onion, entao, sao as DUAS pernas: PreCompact emite a instrucao (o que preservar) e SessionStart com matcher compact re-injeta (o que recolocar). O core hoje nao faz nenhuma das duas — o worklog-precompact-breadcrumb.sh so grava migalha.'
+
+edges:
+  - from: E_TETOS_DE_SAIDA_POR_CAMPO
+    to: E_33_EVENTOS_NA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_HANDLERS_PROMPT_E_AGENT_RESTRITOS_A_3_EVENTOS
+    to: E_33_EVENTOS_NA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_EXIT2_TEM_SEMANTICA_DIFERENTE_POR_EVENTO
+    to: E_33_EVENTOS_NA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_MOAT_NAO_VIAJA_PELO_CANAL_DE_INSTALACAO
+    to: D_SETUP_FECHA_O_NO_ABERTO_DO_CLONE_FRESCO
+    edge_type: CONSTRAINS
+  - from: E_MOAT_NAO_VIAJA_PELO_CANAL_DE_INSTALACAO
+    to: D_SUBAGENTSTART_INJETA_DOUTRINA_NO_WORKER
+    edge_type: CONSTRAINS
+  - from: E_TETOS_DE_SAIDA_POR_CAMPO
+    to: D_SUBAGENTSTART_INJETA_DOUTRINA_NO_WORKER
+    edge_type: CONSTRAINS
+  - from: E_AS_63_HARD_SAO_POST_HOC_E_PULAVEIS
+    to: Q_HOOKS_ESTADO_E_APROVEITAMENTO_0921
+    edge_type: SUPPORTS
+  - from: E_UPDATEDINPUT_PERMITE_CORRIGIR_NAO_SO_VETAR
+    to: Q_HOOKS_ESTADO_E_APROVEITAMENTO_0921
+    edge_type: SUPPORTS
+  - from: E_CORE_ADOTOU_STOP_BLOQUEANTE_NO_F8_DERIVOU
+    to: E_MOAT_AGORA_LASTREADO_CORRECAO_EXECUTADA
+    edge_type: SUPPORTS
+  - from: Q_POLITICA_DE_ORG_PODE_DESLIGAR_O_GATE
+    to: E_AS_63_HARD_SAO_POST_HOC_E_PULAVEIS
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_HOOKS_0921
+    to: Q_HOOKS_ESTADO_E_APROVEITAMENTO_0921
+    edge_type: CONSTRAINS
+  - from: E_SESSIONSTART_CACHE_MISS_CURADO_NA_PLATAFORMA
+    to: E_33_EVENTOS_NA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_EXIT2_TEM_SEMANTICA_DIFERENTE_POR_EVENTO
+    to: D_PRECOMPACT_DIRIGE_O_QUE_SOBREVIVE
+    edge_type: SUPPORTS
+  - from: E_EXIT2_TEM_SEMANTICA_DIFERENTE_POR_EVENTO
+    to: D_POSTTOOLBATCH_TROCA_N_INJECOES_POR_UMA
+    edge_type: SUPPORTS
+  - from: E_EXIT2_TEM_SEMANTICA_DIFERENTE_POR_EVENTO
+    to: D_CONFIGCHANGE_CONVERTE_AVISO_EM_MECANISMO
+    edge_type: SUPPORTS
+  - from: E_FAIL_OPEN_E_O_MODO_DE_FALHA_DOMINANTE
+    to: E_O_VETO_DA_CASA_FALHA_ABERTO_SE_O_PYTHON_SUMIR
+    edge_type: CAUSES
+  - from: E_O_VETO_DA_CASA_FALHA_ABERTO_SE_O_PYTHON_SUMIR
+    to: E_MOAT_AGORA_LASTREADO_CORRECAO_EXECUTADA
+    edge_type: CONSTRAINS
+  - from: E_EXTERNO_CONFIRMA_O_EXIT2_SOB_BYPASS
+    to: E_AS_63_HARD_SAO_POST_HOC_E_PULAVEIS
+    edge_type: SUPPORTS
+  - from: E_MERCADO_HOOKS_2026
+    to: E_MOAT_NAO_VIAJA_PELO_CANAL_DE_INSTALACAO
+    edge_type: SUPPORTS
+  - from: E_CUSTO_DE_LATENCIA_DE_HOOK
+    to: Q_HOOKS_ESTADO_E_APROVEITAMENTO_0921
+    edge_type: CONSTRAINS
+  - from: E_ERREI_RESUMO_EMBUTIDO_POR_CONTRATO
+    to: E_TETOS_DE_SAIDA_POR_CAMPO
+    edge_type: CONSTRAINS
+  - from: E_ERREI_RESUMO_EMBUTIDO_POR_CONTRATO
+    to: E_33_EVENTOS_NA_2_1_278
+    edge_type: CONSTRAINS
+  - from: E_HOOKS_E_O_FEATURE_MENOS_ADOTADO
+    to: E_MERCADO_HOOKS_2026
+    edge_type: SUPPORTS
+  - from: E_HOOKS_E_O_FEATURE_MENOS_ADOTADO
+    to: Q_HOOKS_ESTADO_E_APROVEITAMENTO_0921
+    edge_type: CONSTRAINS
+  - from: E_FAIL_OPEN_CONFIRMADO_PELA_DOC_OFICIAL
+    to: E_O_VETO_DA_CASA_FALHA_ABERTO_SE_O_PYTHON_SUMIR
+    edge_type: SUPPORTS
+  - from: E_REINJECAO_POS_COMPACTACAO_E_SESSIONSTART
+    to: D_PRECOMPACT_DIRIGE_O_QUE_SOBREVIVE
+    edge_type: CONSTRAINS

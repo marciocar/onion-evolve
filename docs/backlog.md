@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**206 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 47 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**213 itens abertos** em 47 grafo(s) com aberto (de 69 no escopo) · 48 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -228,6 +228,18 @@
 | 8.1 | `Q_INDICE_DO_DIARIO_SEM_CATRACA` | guardas-revisao-2026-08 | LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do |
 | 8.0 | `Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO` | guardas-revisao-2026-08 | DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML  |
 | 5.4 | `C_SEM_GATE_REGRA_SEM_TESTE` | guardas-revisao-2026-08 | nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca |
+
+## hooks-state-of-art-2026-09 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 21.0 | `Q_HOOKS_ESTADO_E_APROVEITAMENTO_0921` | hooks-state-of-art-2026-09 | Qual o estado atual da superficie de hooks do Claude Code (2.1.278) e quais dela o Onion deveria passar a usar? Segue open: a roda |
+| 9.0 | `D_PRECOMPACT_DIRIGE_O_QUE_SOBREVIVE` | hooks-state-of-art-2026-09 | O Onion ja usa PreCompact, mas pela METADE. O contrato diz que o stdout do hook e ANEXADO COMO INSTRUCAO DE COMPACTACAO — ou sej |
+| 8.4 | `D_SUBAGENTSTART_INJETA_DOUTRINA_NO_WORKER` | hooks-state-of-art-2026-09 | SubagentStart e a UNICA janela documentada para injetar contexto em subagente. O Onion orquestra pesado (uma rodada medida da onio |
+| 8.0 | `D_SETUP_FECHA_O_NO_ABERTO_DO_CLONE_FRESCO` | hooks-state-of-art-2026-09 | A plataforma cresceu a janela que um no ABERTO estava esperando. Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO pergunta como armar o gate num |
+| 6.0 | `Q_POLITICA_DE_ORG_PODE_DESLIGAR_O_GATE` | hooks-state-of-art-2026-09 | RESPONDIDA, e a resposta e SIM — o risco e real e esta documentado. Duas chaves publicas de settings: disableAllHooks, que em es |
+| 4.5 | `D_POSTTOOLBATCH_TROCA_N_INJECOES_POR_UMA` | hooks-state-of-art-2026-09 | O kg-read-leg.sh hoje e PreToolUse com matcher Read Edit Write Bash — dispara POR CHAMADA. PostToolBatch existe exatamente para  |
+| 4.2 | `D_CONFIGCHANGE_CONVERTE_AVISO_EM_MECANISMO` | hooks-state-of-art-2026-09 | ConfigChange e a porta para transformar drift de configuracao de AVISO em MECANISMO: exit 2 bloqueia a mudanca de ser aplicada a s |
 
 ## fable-5-1-superacao-2026-09 — 9 item(ns)
 

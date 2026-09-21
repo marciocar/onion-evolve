@@ -1,0 +1,3 @@
+vdr={reason:2000,stopReason:2000,systemMessage:4000,additionalContext:8000,permissionDecisionReason:2000}
+Tdr={reason:20,stopReason:20,systemMessage:20,additionalContext:Xvt,permissionDecisionReason:20}
+Xvt=200
