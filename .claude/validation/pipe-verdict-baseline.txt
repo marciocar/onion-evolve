@@ -29,7 +29,7 @@
 .claude/validation/kg-seal-check.sh	1
 .claude/validation/kg-verification-coverage.sh	4
 .claude/validation/lint-artifacts.sh	4
-.claude/validation/lint-selftest.sh	41
+.claude/validation/lint-selftest.sh	34
 .claude/validation/marketplace-root-check.sh	1
 .claude/validation/pipe-verdict-check.sh	2
 .claude/validation/plugin-deps-check.sh	4
@@ -38,4 +38,4 @@
 .claude/validation/review-artifact-check.sh	1
 .claude/validation/review-verdict.sh	10
 .claude/validation/vendor-scrub-form-check.sh	1
-.githooks/pre-commit	2
+.githooks/pre-commit	1

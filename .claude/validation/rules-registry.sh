@@ -192,8 +192,10 @@ CATEGORIES = [
      "worktree de harness e varreu 0 dos 51 agentes sem emitir uma linha de aviso. "
      "A REGRA 86 entrou aqui em 2026-09-17 pelo mesmo motivo, um andar acima: um workflow "
      "que não PARSEIA não é um gate que falhou, é um gate que nunca rodou — e o repo o "
-     "contava como existente.",
-     [54, 86]),
+     "contava como existente. A REGRA 88 entrou em 2026-09-20 pela versão mais perversa da "
+     "classe: o gate rodava, mas sem árvore — `bash <script do repo>` saía 127, o job reprovava "
+     "TODO PR e a mensagem culpava o código revisado. Gate que nunca olhou, acusando.",
+     [54, 86, 88]),
 ]
 
 seen = {}

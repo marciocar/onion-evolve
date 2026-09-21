@@ -16,10 +16,10 @@
 | Linhas do manifesto de fixtures | **94** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
 | Arquivos de fixture rastreados | **136** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
-| Regras do lint | **86** | `bash .claude/validation/rules-registry.sh --counts` |
-| — das quais HARD | **76** | idem |
-| — das quais SOFT | **23** | idem |
-| — HARD **e** SOFT (contadas nas duas) | **13** | idem |
+| Regras do lint | **87** | `bash .claude/validation/rules-registry.sh --counts` |
+| — das quais HARD | **77** | idem |
+| — das quais SOFT | **24** | idem |
+| — HARD **e** SOFT (contadas nas duas) | **14** | idem |
 | Pares de modo consumido (REGRA 59) | **49** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | idem |
 | Scripts de validação | **77** | `git ls-files '.claude/validation/*.sh'` |

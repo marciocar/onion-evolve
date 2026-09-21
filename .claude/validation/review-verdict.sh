@@ -35,17 +35,91 @@
 #
 # USO
 #   bash review-verdict.sh <execution_file>      # key=value p/ $GITHUB_OUTPUT (stdout)
+#   bash review-verdict.sh --gate <achados> [pr] # DECIDE bloquear; corpo em stdout, veredito no rc
+#   bash review-verdict.sh --texto <exec_file>   # imprime só o parecer do revisor
+#   bash review-verdict.sh --corpo <marca> <json> <exec_file>   # corpo do comentário do PR
 #   bash review-verdict.sh --selftest            # roda os casos e sai 0/1
 #
 # CONTRATO
-#   stdout: SÓ as linhas `chave=valor` (revisou, motivo, turnos, custo) — colável em
-#           $GITHUB_OUTPUT sem filtro. Diagnóstico humano vai para stderr.
+#   stdout: SÓ as linhas `chave=valor` (revisou, motivo, turnos, custo, texto_chars, achados) —
+#           colável em $GITHUB_OUTPUT sem filtro. Diagnóstico humano vai para stderr.
 #   exit  : 0 sempre que classificou (inclusive `revisou=false`). Este script CLASSIFICA;
 #           quem decide bloquear/avisar é o workflow. Exit != 0 só em erro de uso.
+#           EXCEÇÃO DECLARADA: o modo `--gate` DECIDE, e é o único cujo rc significa veredito
+#           (1 = bloqueia). Ele existe aqui, e não no YAML, porque o YAML não tem bancada.
+#
+# `achados` (desde 2026-09-20): quantos a linha `VEREDITO:` do parecer declara. `-1` significa
+#           NÃO CONSEGUI CONTAR e nunca bloqueia — "não revisou" já é o campo `revisou`, e
+#           transformar ignorância em bloqueio é a classe que esta casa mais persegue.
 set -uo pipefail
 
-emit() { # $1=revisou $2=motivo $3=turnos $4=custo $5=chars-do-texto (opcional)
-  printf 'revisou=%s\nmotivo=%s\nturnos=%s\ncusto=%s\ntexto_chars=%s\n' "$1" "$2" "$3" "$4" "${5:-0}"
+emit() { # $1=revisou $2=motivo $3=turnos $4=custo $5=chars-do-texto (opcional) $6=achados (opcional)
+  printf 'revisou=%s\nmotivo=%s\nturnos=%s\ncusto=%s\ntexto_chars=%s\nachados=%s\n' "$1" "$2" "$3" "$4" "${5:-0}" "${6:--1}"
+}
+
+# ── CONTAGEM DE ACHADOS — o que transforma parecer ADVISORY em gate ───────────────────────────
+# POR QUE EXISTE (medido 2026-09-20, ordem do maestro): em 33 pareceres do `onion-review`, DEZ
+# apontaram violacao — e o parecer nao bloqueia, entao o defeito era apontado, mergeado, e FICAVA.
+# Conferi tres deles no vivo: `_viaja`, `_PAPEL_DESTE_REPO` e `_base_nome` seguiam em main depois
+# de acusados. Pagava-se ~US$ 0,80 por PR pela descoberta e nao se recolhia a entrega.
+#
+# A FONTE E A LINHA `VEREDITO:`, que o prompt do revisor CONTRATA ("TERMINE a resposta com o
+# parecer no formato abaixo"). Le-se a ULTIMA ocorrencia, porque o contrato e sobre o FIM da
+# resposta e o corpo pode citar o formato ao explicar um achado.
+#
+# ⚠️ TRES DESFECHOS, e o terceiro e o que impede a guarda de virar fail-open OU fail-closed cego:
+#   · N >= 0  → contagem confiavel (0 = conforme; N>0 = bloqueia)
+#   · -1      → NAO PUDE CONTAR (texto ausente, ou `VEREDITO:` em forma que nao reconheco).
+#               NUNCA bloqueia: "nao revisou" ja e coberto pelo campo `revisou`, e inventar
+#               bloqueio a partir de ignorancia e a classe que esta casa mais persegue.
+# `LC_ALL=C` no grep: o numero e ASCII, e casar acento (`violações`) depende de locale — o do
+# runner nao e o meu ([[bancada-mede-no-locale-do-hook]]). Por isso so o NUMERO e lido.
+count_findings() { # $1=texto do parecer
+  local t="$1" defenced anchored line v num vals="" distinct
+  [ -n "${t}" ] || { printf '%s' -1; return 0; }
+  # (1) FORA OS BLOCOS CERCADOS. Fence remove a indentacao, entao uma citacao de
+  #     `VEREDITO: conforme` dentro de ``` chega na COLUNA 0 e discorda do veredito real — medido:
+  #     parecer com 2 violacoes citando o formato em fence virava `-1` e deixava de bloquear.
+  #     Descartar o conteudo cercado e o que devolve a indentacao como defesa.
+  # (2) FORA O BOM UTF-8, que antecede `VEREDITO` e quebra a ancora de coluna 0 em silencio.
+  defenced="$(printf '%s\n' "${t}" | tr -d '\r' | sed '1s/^\xEF\xBB\xBF//' \
+    | awk '/^[[:space:]]*```/ { fence = !fence; next } !fence { print }')"
+  # (3) ANCORA NA COLUNA 0, tolerando decoracao markdown (`**`, `#`, `>`, `- `) mas NUNCA
+  #     indentacao: a lista de evidencias vem DEPOIS do veredito no formato contratado, e uma
+  #     evidencia que cite a palavra e sempre indentada. Coluna 0 e o discriminante.
+  #    `>` FICA FORA: `**`/`#`/`- ` sao como um modelo formata o PROPRIO veredito; `>` e como
+  #    ele CITA o de outro. Aceitar `>` deixava um eco citado discordar do veredito real e
+  #    derrubar tudo para -1 — sequestro por citacao. Preco declarado: veredito UNICO em
+  #    blockquote sai -1. Achado por refutador adversarial.
+  anchored="$(printf '%s\n' "${defenced}" | LC_ALL=C grep -iE '^(\*\*|#{1,6}[[:space:]]*|-[[:space:]]+)*VEREDITO:' || true)"
+  [ -n "${anchored}" ] || { printf '%s' -1; return 0; }
+  while IFS= read -r line; do
+    [ -n "${line}" ] || continue
+    v=-1
+    # `conforme` e LINHA INTEIRA, nunca prefixo: "conforme, exceto por 2 violacoes" saia ZERO.
+    # ⚠️ PRECEDENCIA: CONTAGEM primeiro, `conforme` depois, -1 por ultimo. Resolve os tres de
+    #    uma vez: `conforme, exceto por 2 violacoes`→2 · `conforme, mas veja 3 pontos`→0 ·
+    #    `conforme (REGRA 36)`→0 · `NAO CONFORME — 4 violacoes`→4. O numero SO e contagem com
+    #    `viola…` colado: antes pegava qualquer digito e `conforme (REGRA 36)` saia 36 — o gate
+    #    REPROVAVA anunciando '36 violacoes', falso-positivo que bloqueia com numero fabricado.
+    num="$(LC_ALL=C grep -oiE '[0-9]+[[:space:]]*viola' <<< "${line}" | LC_ALL=C grep -oE '[0-9]+' | head -1)"
+    if [ -n "${num}" ] && [ "${#num}" -le 4 ]; then
+      v="${num}"
+    elif [ -z "${num}" ] && LC_ALL=C grep -qiE 'VEREDITO:\*{0,2}[[:space:]]*conforme' <<< "${line}"; then
+      v=0
+    fi
+    # ⚠️ TETO DE SANEAMENTO (4 digitos): numero absurdo e texto corrompido/truncado, nao contagem.
+    #    Sem ele, parecer corrompido viraria bloqueio com contagem sem sentido; `-1` e a resposta
+    #    honesta para entrada que nao se parece com a do contrato.
+    vals="${vals}${v}
+"
+  done <<< "${anchored}"
+  # (4) ANCORAS QUE DISCORDAM ⇒ -1. Escolher em silencio entre vereditos contraditorios e inventar
+  #     um; `-1` nao bloqueia, entao o pior caso e verde-com-aviso, nunca verde que AFIRMA
+  #     conformidade falsa nem vermelho com contagem inventada.
+  distinct="$(printf '%s' "${vals}" | LC_ALL=C grep -v '^$' | LC_ALL=C sort -u)"
+  if [ "$(printf '%s\n' "${distinct}" | LC_ALL=C grep -c .)" -ne 1 ]; then printf '%s' -1; return 0; fi
+  printf '%s' "${distinct}"
 }
 
 # ── POR QUE `texto_chars` NASCE COMO MEDICAO, E NAO COMO EXIGENCIA ────────────────────────────
@@ -145,12 +219,13 @@ verdict() {
     local reason; reason="$(reason_for_subtype "${subtype}")"
     printf 'review-verdict: is_error=true subtype=%s (turnos=%s, custo=%s) — NÃO houve revisão\n' \
       "${subtype:-—}" "${turns}" "${cost}" >&2
-    emit false "${reason}" "${turns}" "${cost}" "${chars}"
+    emit false "${reason}" "${turns}" "${cost}" "${chars}" -1
     return 0
   fi
 
   printf 'review-verdict: revisão real (turnos=%s, custo=%s)\n' "${turns}" "${cost}" >&2
-  emit true ok "${turns}" "${cost}" "${chars}"
+  local findings; findings="$(count_findings "${text}")"
+  emit true ok "${turns}" "${cost}" "${chars}" "${findings}"
   return 0
 }
 
@@ -375,6 +450,127 @@ JSON
   else printf '  ✗ review-verdict: (MUT) mutacao do fallback NAO aplicada — o teste nao prova nada\n'; rc=1; fi
   rm -rf "${mut5}"
 
+  # ── CONTAGEM DE ACHADOS + GATE (2026-09-20) ────────────────────────────────────────────────
+  # O parecer deixou de ser advisory, entao erro de CONTAGEM agora bloqueia merge — ou, pior,
+  # DEIXA passar defeito. Os dois lados precisam de caso, e os casos precisam poder FALHAR.
+  _mkres() { # $1=arquivo  $2=texto do parecer
+    printf '{"type":"result","subtype":"success","is_error":false,"num_turns":5,"total_cost_usd":0.5,"result":%s}\n' \
+      "$(printf '%s' "$2" | jq -Rs .)" > "${d}/$1.json"
+  }
+  _ach() { bash "$0" "${d}/$1.json" 2>/dev/null | awk -F= '/^achados=/{print $2}'; }
+  _chk() { # $1=arquivo $2=esperado $3=rotulo
+    local got; got="$(_ach "$1")"
+    [ "${got}" = "$2" ] && return 0
+    printf '  ✗ review-verdict: (ACH) %s — veio %s, esperado %s\n' "$3" "${got}" "$2"; rc=1
+  }
+
+  _mkres conf 'VEREDITO: conforme';                              _chk conf 0   'conforme puro conta ZERO'
+  _mkres tres 'VEREDITO: 3 violacoes';                           _chk tres 3   'N violacoes conta N'
+  _mkres zero 'VEREDITO: 0 violacoes';                           _chk zero 0   'zero explicito e zero'
+  _mkres neg  '**VEREDITO: 5 violacoes**';                       _chk neg  5   'negrito/decoracao nao cega a ancora'
+  _mkres head '## VEREDITO: 5 violacoes';                        _chk head 5   'heading nao cega a ancora'
+  _mkres minu 'Veredito: 3 violacoes';                           _chk minu 3   'minuscula nao cega a ancora'
+  printf '  ✓ review-verdict: (ACH-1) conta conforme/N/zero, e decoracao e caixa nao cegam a ancora\n'
+
+  # ⚠️ O HIJACK QUE EXISTIA: parecer que lista 3 achados e TERMINA com um bloco de codigo contendo
+  #    `VEREDITO: conforme` contava ZERO — a ultima ocorrencia mandava, e ela estava no exemplo.
+  _mkres fence 'achei
+VEREDITO: 3 violacoes
+```
+VEREDITO: conforme
+```'; _chk fence 3 'eco em FENCE nao sequestra o veredito'
+  # ⚠️ E A PODA SO VALE COM FENCE BALANCEADA: aberta-e-nunca-fechada engoliria o veredito REAL.
+  _mkres aberta 'VEREDITO: 3 violacoes
+```
+fence aberta e nunca fechada'; _chk aberta 3 'fence DESBALANCEADA nao engole o veredito'
+  _mkres quote 'VEREDITO: 3 violacoes
+> VEREDITO: conforme';                                           _chk quote 3 'eco em QUOTE nao sequestra (por isso `>` fica FORA da ancora)'
+  _mkres ultima 'cito VEREDITO: 9 violacoes no meio
+VEREDITO: conforme';                                             _chk ultima 0 'ultima ocorrencia manda'
+  printf '  ✓ review-verdict: (ACH-2) fence/quote/citacao nao sequestram — e a poda exige fence par\n'
+
+  _mkres ncf 'VEREDITO: NAO CONFORME — 4 violacoes';             _chk ncf 4  'NAO CONFORME com numero conta o NUMERO'
+  _mkres pts 'VEREDITO: conforme, mas veja 3 pontos';            _chk pts 0  'numero que nao e de achado nao vira contagem'
+  _mkres big 'VEREDITO: 99999999999999999999 violacoes';         _chk big -1 'numero absurdo nao estoura para "nao sei" calado'
+  printf '  ✓ review-verdict: (ACH-3) o numero se reconhece pelo SUBSTANTIVO que o segue, com saneamento estrito\n'
+
+  # ⚠️ CASO DISCRIMINANTE (a 1a versao deste caso NAO era). Afirmar `-1` sozinho fica VERDE com o
+  #    contador MORTO, porque -1 e o default de `emit` — a passada adversarial provou apagando
+  #    `count_findings` inteira e vendo este caso sobreviver. Agora ele exige as DUAS metades: o
+  #    texto sem veredito da -1 E um controle com veredito da um numero. Contador morto quebra.
+  _mkres mudo 'revisei tudo e nao uso o formato contratado'
+  local _m _c; _m="$(_ach mudo)"; _c="$(_ach tres)"
+  if [ "${_m}" = "-1" ] && [ "${_c}" = "3" ]; then
+    printf '  ✓ review-verdict: (ACH-4) sem VEREDITO da -1 E o controle ainda conta 3 — o caso morre se o contador morrer\n'
+  else printf '  ✗ review-verdict: (ACH-4) mudo=%s controle=%s (esperado -1 e 3)\n' "${_m}" "${_c}"; rc=1; fi
+
+  # ⚠️ OS DOIS ABAIXO SAO DEFEITOS QUE A PRIMEIRA CURA INTRODUZIU — casos existem justamente
+  #    porque "curei e piorei" e so o refutador viu. Cura sem caso de regressao e cura por sorte.
+  #
+  # (ACH-h) O NUMERO VINHA DE QUALQUER LUGAR DA LINHA: `VEREDITO: conforme (REGRA 36)` saia 36 e
+  #    o gate REPROVAVA anunciando "36 violacoes". Falso-positivo que bloqueia, com numero
+  #    fabricado — pior que o fail-open que a cura veio resolver, porque tem cara de diligencia.
+  #    Agora o numero exige a palavra `viola…` ao lado, e sem ela o veredito e -1 (nao sei).
+  _mkres regra 'VEREDITO: conforme (REGRA 36)'
+  [ "$(_ach regra)" = "0" ] \
+    && printf '  ✓ review-verdict: (ACH-h) numero SEM `viola…` ao lado nao vira contagem — `conforme (REGRA 36)` conta ZERO, nao 36\n' \
+    || { printf '  ✗ review-verdict: (ACH-h) contagem fabricada: deu %s, esperado 0\n' "$(_ach regra)"; rc=1; }
+
+  # (ACH-i) FENCE REMOVE A INDENTACAO, que era a unica defesa da ancora de coluna 0: uma citacao
+  #    dentro de ``` chegava na coluna 0, discordava do veredito real e derrubava tudo para -1.
+  #    Exposicao maxima nos PRs DESTA maquinaria, cujo diff carrega a string em fence.
+  _mkres fence '```
+VEREDITO: conforme
+```
+VEREDITO: 2 violacoes
+- a.sh:1 — r — e'
+  [ "$(_ach fence)" = "2" ] \
+    && printf '  ✓ review-verdict: (ACH-i) citacao dentro de ``` e descartada — o veredito real sobrevive\n' \
+    || { printf '  ✗ review-verdict: (ACH-i) fence anulou o veredito: deu %s, esperado 2\n' "$(_ach fence)"; rc=1; }
+
+  # (ACH-j) DECORACAO E BOM nao podem apagar o gate em silencio: todos caiam em -1, e `-1` pinta
+  #    o check de VERDE com um aviso. Deriva de fraseado do revisor viraria gate inerte.
+  local _dec _dec_ok=1
+  # ⚠️ `>` NAO ENTRA nesta lista: blockquote e CITACAO do veredito de outro, e aceita-lo deixava
+  #    um eco sequestrar o veredito real. O caso (ACH-2) cobre esse lado.
+  for _dec in '- VEREDITO: 3 violacoes' '## VEREDITO: 3 violacoes' '**VEREDITO: 3 violacoes**'; do
+    _mkres dec "${_dec}"
+    [ "$(_ach dec)" = "3" ] || { printf '  ✗ review-verdict: (ACH-j) `%s` deu %s, esperado 3\n' "${_dec}" "$(_ach dec)"; rc=1; _dec_ok=0; }
+  done
+  _mkres bom "$(printf '\xEF\xBB\xBFVEREDITO: 3 violacoes')"
+  [ "$(_ach bom)" = "3" ] || { printf '  ✗ review-verdict: (ACH-j) BOM UTF-8 deu %s, esperado 3\n' "$(_ach bom)"; rc=1; _dec_ok=0; }
+  [ "${_dec_ok}" = "1" ] \
+    && printf '  ✓ review-verdict: (ACH-j) decoracao markdown (- > ##) e BOM nao apagam o gate\n'
+
+  # GATE: o exit code e o que o CI consome.
+  # ⚠️ O ✓ SO SAI SE TODAS PASSARAM. A 1a versao imprimia esta linha FORA do laco: mutando o gate
+  #    para `if false`, a bancada emitia dois ✗ e, logo abaixo, o ✓ AFIRMANDO como provado o que
+  #    acabara de medir falso. Num repo cujo lema e `exit-code-nao-e-a-verificacao`, ✓ fora da
+  #    condicao e a mesma classe — o rc global segurava, a PROSA mentia. Achado por refutador.
+  local g _gate_ok=1
+  for g in "3:1" "1:1" "0:0" "-1:0" ":0" "lixo:0"; do
+    local _in="${g%%:*}" _want="${g##*:}" _got=0
+    bash "$0" --gate "${_in}" 99 >/dev/null 2>&1 || _got=$?
+    [ "${_got}" = "${_want}" ] \
+      || { printf '  ✗ review-verdict: (GATE) achados=%s deu rc=%s, esperado %s\n' "${_in:-vazio}" "${_got}" "${_want}"; rc=1; _gate_ok=0; }
+  done
+  [ "${_gate_ok}" = "1" ] \
+    && printf '  ✓ review-verdict: (GATE) 6 entradas — >=1 bloqueia; 0, -1, vazio e lixo NAO bloqueiam\n'
+
+  # (MUT) A PROPRIEDADE DE SEGURANCA E "`-1` NAO BLOQUEIA" — entao o mutante tem de fazer `-1`
+  # BLOQUEAR, e o caso so vale se o rc MUDAR. A 1a versao mutava apenas a MENSAGEM (⚠️ virava ✅):
+  # rc=0 no original E no mutante, e a etiqueta dizia "load-bearing" sobre algo que nao mudava
+  # comportamento nenhum. Vacuo como rotulado — achado por refutador, nao por leitura minha.
+  local mut6; mut6="$(mktemp -d)"; cp "$0" "${mut6}/m.sh"
+  sed -i 's/^  if \[ "${n}" -ge 1 \] 2>\/dev\/null; then$/  if [ "${n}" -ge 1 ] 2>\/dev\/null || [ "${n}" = "-1" ]; then/' "${mut6}/m.sh"
+  if ! cmp -s "$0" "${mut6}/m.sh"; then
+    local _mrc=0; bash "${mut6}/m.sh" --gate -1 99 >/dev/null 2>&1 || _mrc=$?
+    [ "${_mrc}" = "1" ] \
+      && printf '  ✓ review-verdict: (MUT) fazendo `-1` bloquear, o rc MUDA (0→1) — "nao sei nao bloqueia" e load-bearing\n' \
+      || { printf '  ✗ review-verdict: (MUT) mutante fez `-1` bloquear e o rc ficou %s — o caso nao prova a propriedade\n' "${_mrc}"; rc=1; }
+  else printf '  ✗ review-verdict: (MUT) mutacao do ramo -1 NAO aplicada — o teste nao prova nada\n'; rc=1; fi
+  rm -rf "${mut6}"
+
   rm -rf "${d}"
   return "${rc}"
 }
@@ -387,6 +583,38 @@ JSON
 # que e por isso que ela nao e redundante com o `github_token` ligado no mesmo commit.
 # O parsing fica AQUI e nao no YAML de proposito: um 2o parser do execution_file seria a divida
 # que kg-view.sh ja escreveu em letra grande ("DOIS PARSERS, DUAS VERDADES").
+# ── MODO --gate: a DECISAO de bloquear, em script TESTAVEL ────────────────────────────────────
+# POR QUE NAO NO YAML: o proprio `onion-review.yml` adverte que "o YAML nao tem selftest — foi
+# assim que a maquina quebrada sobreviveu meses parecendo sa". Ligar um gate NOVO dentro dele
+# repetiria exatamente o defeito que aquele comentario registra. Aqui a decisao tem bancada.
+#
+# Contrato: imprime o CORPO do resumo em stdout e decide pelo exit code.
+#   exit 1 = bloqueia (achados >= 1)   ·   exit 0 = passa (0 achados, ou contagem indisponivel)
+# `-1`/vazio/lixo NUNCA bloqueiam: "nao consegui contar" nao e "achei defeito", e a guarda diz
+# isso em voz alta em vez de inventar veredito.
+gate_findings() { # $1=achados  $2=numero do PR (opcional, so para a mensagem)
+  local n="${1:--1}" pr="${2:-<pr>}"
+  case "${n}" in ''|*[!0-9-]*|-*[!0-9]*) n=-1 ;; esac
+  [ "${n}" = "-" ] && n=-1
+  if [ "${n}" -ge 1 ] 2>/dev/null; then
+    printf '## ❌ O revisor apontou %s violação(ões)\n\n' "${n}"
+    printf 'O parecer está no comentário do PR, com `arquivo:linha — regra — evidência`.\n\n'
+    printf '**Corrija, ou dispense de forma registrada:**\n\n'
+    printf '```\nops/pr-merge-verified.sh %s --dispensa onion-review-verdict --motivo "<por quê o achado não procede>"\n```\n\n' "${pr}"
+    printf 'Até 2026-09-20 este parecer era advisory. Medimos o custo: em 33 pareceres, 10 acharam\n'
+    printf 'violação real e três delas ainda estavam em `main` depois — apontadas, mergeadas, esquecidas.\n'
+    return 1
+  fi
+  if [ "${n}" = "0" ]; then
+    printf '✅ revisão semântica CONFIRMADA neste PR — veredito CONFORME (0 achados).\n'
+    return 0
+  fi
+  printf '⚠️ **Revisado, achados NÃO contabilizáveis**\n\n'
+  printf 'A linha `VEREDITO:` não veio na forma contratada (achados=%s). Leia o parecer no\n' "${n}"
+  printf 'comentário do PR — este check não bloqueia sobre o que não conseguiu medir.\n'
+  return 0
+}
+
 reviewer_text() { # $1=execution_file
   local f="${1:-}"
   [ -n "${f}" ] && [ -f "${f}" ] || { printf '_(sem execution_file — o revisor nao chegou a produzir saida)_\n'; return 0; }
@@ -482,13 +710,17 @@ comment_body() { # $1=marca $2=structured_output(json, pode ser vazio) $3=execut
   fi
 
   printf -- '---\n'
-  printf '<sub>Revisão advisory: não bloqueia merge. O gate duro é o `onion-validate`.</sub>\n'
+  # ⚠️ ESTE RODAPE DIZIA "advisory: nao bloqueia merge" — e virou MENTIRA em 2026-09-20, quando o
+  # parecer passou a bloquear. Declaracao contradizendo comportamento no artefato MAIS VISIVEL da
+  # mudanca: e o que o humano le em cada PR. Achado pela passada adversarial.
+  printf '<sub>Esta revisão **bloqueia o merge** quando aponta violação. Falso-positivo se resolve com dispensa registrada (`--dispensa onion-review-verdict --motivo …`), nunca em silêncio. O gate determinístico é o `onion-validate`.</sub>\n'
 }
 
 case "${1:-}" in
   --selftest) run_selftest ;;
   --corpo)    comment_body "${2:-}" "${3:-}" "${4:-}" ;;
   --texto)    reviewer_text "${2:-}" ;;
+  --gate)     gate_findings "${2:-}" "${3:-}" ;;
   -h|--help)  sed -n '2,40p' "$0"; exit 0 ;;
   *)          verdict "${1:-}" ;;
 esac
