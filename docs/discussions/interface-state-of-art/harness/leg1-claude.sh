@@ -15,7 +15,16 @@ export OTEL_EXPORTER_OTLP_PROTOCOL=http/json
 export OTEL_EXPORTER_OTLP_METRICS_PROTOCOL=http/json
 export OTEL_EXPORTER_OTLP_LOGS_PROTOCOL=http/json
 export OTEL_EXPORTER_OTLP_TRACES_PROTOCOL=http/json
-export OTEL_METRIC_EXPORT_INTERVAL=5000 OTEL_LOGS_EXPORT_INTERVAL=5000 OTEL_BSP_SCHEDULE_DELAY=3000
+# ⚠️ INTERVALOS CURTOS DE PROPOSITO, e a razao e MEDIDA (2026-09-21, 1a rodada interativa real):
+# 5 sessoes do maestro produziram APENAS `claude_code.session.count` — zero traces, zero
+# `blocked_on_user`, zero `tool_decision`. As minhas sessoes headless, no mesmo dia e com o mesmo
+# sink, trouxeram os tres sinais nos arquivos certos (`tool_decision` em logs, `blocked_on_user` em
+# traces). A diferenca nao e o binario (o 2.1.278 tem TracerProvider, startSpan, BatchSpanProcessor
+# e os nomes dos sinais — medido com `strings`): e o ENCERRAMENTO. Processo headless TERMINA e o SDK
+# descarrega o buffer; sessao interativa FECHADA pode morrer antes do flush periodico.
+# 3000/5000 ms era janela grande demais para sessao curta. 500/1000 reduz a perda; nao a elimina —
+# fechar o terminal (SIGKILL) ainda mata o buffer, e por isso o README pede `/exit`.
+export OTEL_METRIC_EXPORT_INTERVAL=1000 OTEL_LOGS_EXPORT_INTERVAL=1000 OTEL_BSP_SCHEDULE_DELAY=500
 export OTEL_SERVICE_NAME=claude-code-leg1
 
 # checa o sink antes de abrir
