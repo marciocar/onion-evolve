@@ -49,9 +49,34 @@ estrutura, conteúdo fica fora.
 > ELF de 234 MB não acha as strings. Quarta vez neste dia que *zero de comando que falhou* quase virou
 > *zero de fato*.
 
-**(2) O harness NUNCA foi executado desde 12/07.** Trazê-lo para `main` **não** é o mesmo que tê-lo
-provado — é código não-exercitado, e o resíduo diz isso em vez de deixar o verde do lint sugerir o
-contrário. Não há bancada cobrindo-o, e não invento uma: seria cobrir com teste o que ninguém rodou.
+**(2) ~~O harness NUNCA foi executado desde 12/07.~~ — SUPERADA em 2026-09-21, no MESMO dia.**
+
+Era verdade quando escrevi. Deixou de ser cerca de dez minutos depois, quando o maestro mandou rodar
+o dogfood e eu executei o instrumento ponta a ponta. Isso tornou a frase acima um **artefato que mente
+sobre si** — a classe que este repo mais persegue —, introduzida por mim e já mergeada em `main`,
+orientando quem lesse. Por isso a correção vive aqui, com a frase antiga preservada: Aufhebung, não
+reescrita de história.
+
+O que foi medido (sink → sessão instrumentada → analisador, tudo `rc=0`):
+
+| etapa | resultado |
+|---|---|
+| `otlp_sink.py` | LISTEN em `127.0.0.1:4318` |
+| sessão headless instrumentada | os 3 sinais chegaram: `logs` 119 KB · `metrics` 8,6 KB · `traces` 11,9 KB |
+| `leg1_analyze.py` | `rc=0`; 1 sessão, `reject-rate=0%`, `blocked_on_user` max=18 ms, 6 spans |
+
+E o analisador **recusou-se a minerar**: com 1 sessão declarou *"nenhum span-pattern de atrito em ≥3
+sessões"* e *"sem candidatos a confirmar"* em vez de inventar padrão — a trava anti-HARKing do
+pré-registro funcionando no primeiro contato com dado real.
+
+**O estado verdadeiro é outro:** o **instrumento está provado**; o **dado confirmatório da Leg-1 não
+existe** e não pode ser gerado por mim. O critério exige ≥4 sessões **interativas** independentes, e o
+sinal central (`blocked_on_user`) só nasce quando um humano espera num gate — os 18 ms medidos são o
+flatline que a NOTE-05 previu para headless, não espera real. O README já dizia: *"`-p` headless serve
+só para validar o instrumento, não conta como sessão Leg-1"*.
+
+Segue valendo que **não há bancada** cobrindo o harness, e segue valendo a razão: é aparato de estudo,
+que roda por invocação humana e não no gate.
 
 **(3) O pré-registro N≥3 descreve um dogfood que NÃO aconteceu.** Entra como **plano aberto**, não
 como método vigente. E não foi superado em outro lugar: `grep` por `OTEL_`/`CLAUDE_CODE_ENABLE_TELEMETRY`
