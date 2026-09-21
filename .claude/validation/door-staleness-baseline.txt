@@ -118,5 +118,9 @@
 # 2026-09-20 (pos-#856): `onion-standalone` sobe a 399 — trabalho MERGEADO que a porta parada
 # nao recebeu. O `onion-core` segue em ZERO com a 13a materializacao commitada no clone
 # (pin 4299290b73d4, de worktree destacada em origin/main), aguardando o push.
-onion-standalone 399
+#
+# 2026-09-21 (pos-#857): `onion-standalone` sobe a 400 — trabalho MERGEADO que a porta parada nao
+# recebeu (os #856 e #857 entraram em main). O `onion-core` volta a ZERO com a 14a materializacao
+# ja PUBLICADA (pin 7260feacbfe0, push verificado no remoto em 36592d9ba145).
+onion-standalone 400
 onion-core 0
