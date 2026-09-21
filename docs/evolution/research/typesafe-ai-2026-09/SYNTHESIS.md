@@ -396,19 +396,77 @@ usar o agente de código para **escrever código que chama o Jev**.
 
 ---
 
+## 7.9 O experimento — medimos a distribuição **sem o vendor**, e ela corrigiu o §7.4
+
+Antes de pagar por "veredito com distribuição", medimos se a capacidade vale — usando o que já temos.
+**25 julgamentos reais**: 5 nós do próprio corpus × 5 repetições independentes, um subagente read-only
+por julgamento, cada um recebendo **só o enunciado** (sem ver o `status:` selado, para não copiar
+gabarito). É *self-consistency* como proxy da distribuição do Jev.
+
+| nó | distribuição empírica | confidence | moda | gabarito | bate |
+|---|---|---:|---|---|---|
+| N1 "contexts vazios" | `REFUTED 1.0` | 1.00 | REFUTED | superseded | ✅ |
+| N2 "5 adotantes, zero frio" | `DRIFTED 1.0` | 1.00 | DRIFTED | superseded | ✅ |
+| **N3 "branch two-tier"** | `CONFIRMED 0.6 · DRIFTED 0.4` | **0.51** | CONFIRMED | confirmed | ✅ |
+| N4 "AUTOMATE pronto" | `REFUTED 1.0` | 1.00 | REFUTED | refuted | ✅ |
+| N5 "maestro único relay" | `REFUTED 0.8 · DRIFTED 0.2` | 0.64 | REFUTED | refuted | ✅ |
+
+*(confidence = 1 − H/ln 4, a mesma forma que o Jev usa: colapsar a distribuição num número.)*
+
+**A moda acertou 5 de 5. A distribuição não corrigiu veredito nenhum.** Esse é o resultado honesto, e
+ele desinfla a versão ingênua da tese. O que a distribuição entregou foi outra coisa — duas, na verdade:
+
+**(a) Em N3, o empate não disse "o modelo é fraco", disse "o enunciado é ambíguo".** Metade dos workers
+mediu o **core** (onde não existe branch `vendor`/`adopt`/`work`, e release é `main`); metade mediu um
+**adotante** (`gustavo-pulga`, onde `master`, `onion/adopt`, `onion/vendor`, `work/gustavo`,
+`work/marcio` existem todas). **Os dois lados mediram certo.** A afirmação simplesmente não diz onde
+vale — descreve a topologia do adotante, e o core não é adotante. Um worker só teria selado um dos dois
+com confiança total e o nó seguiria ambíguo para sempre. A ação correta não é recarimbar: **é reescrever
+o label com o escopo.**
+
+**(b) Em N2, o veredito foi unânime e a contagem por baixo dele não foi.** Três workers contaram **14**
+adotantes, dois contaram **13** — no mesmo `members.yaml`, no mesmo instante, variando só o `grep`
+(`"kind: adopter"` vs `"^    kind: adopter"` vs um `awk … | sort -u`). Dispersão **no fato**, invisível
+no veredito. É `guarda-por-lista-falha-pelo-vocabulário` aparecendo na aritmética.
+
+### E aqui o experimento corrige o §7.4
+
+Custo medido: **956.102 tokens** de subagente, **~38.244 por julgamento**. E ao olhar *onde* esse custo
+foi gasto — o campo `COMANDO` dos 25 — a conclusão vira do avesso:
+
+> **O caro não é julgar. É medir.** Os 38k tokens foram gastos saindo e explorando: `git branch -a`,
+> `grep` no `members.yaml`, `ls` no `automation-ladder-registry`, abrir o repositório de um adotante.
+> Escolher o enum **depois** disso é a fração barata.
+
+E **Jev, por construção, não mede** — ele avalia um `state` que *você já montou*. Logo ele substituiria
+exatamente o passo que já sai de graça, e **não** substituiria a exploração, que é o que custa.
+
+O candidato #1 do §7.4 não está morto, mas está **rebaixado**, e o desenho que sobreviveria é o inverso
+do que escrevi: *um worker Transformer mede e monta o `state`; o Jev julga **N** perguntas sobre esse
+mesmo `state` de uma vez, com distribuição.* O ganho aí é **amortizar muitas perguntas sobre uma
+medição** — que é precisamente o **speculative fan-out** deles (§4), e não o `kg-freshness` como ele
+existe hoje.
+
+---
+
 ## 8. Decisão desta rodada
 
 **Documentar e NÃO adotar.** Não escrever adapter (reprovado pelo Teste do Eixo, §7.2), não alterar
 motor nenhum, não abrir superfície nova. O que a rodada entrega é **o mapa**.
 
-**O gatilho nomeado para reabrir** — único e mecânico:
+**O gatilho foi reescrito pela medição do §7.9.** O original era *"medir o veredito do
+`/meta:kg-freshness` como Choice de 4 contra nós já julgados"* — e o experimento mostrou que esse teste
+**não decidiria nada**: a moda já acerta 5/5 sem vendor nenhum, e o custo mora na medição, que o Jev não
+faz.
 
-> O maestro querer medir, **com chave de API própria**, o veredito do `/meta:kg-freshness` como
-> **Choice de 4 opções** contra um lote de nós **já julgados por worker Transformer**.
+O gatilho válido agora é outro, e mais estreito:
 
-A razão de ser *esse* alvo e não outro: é o único em que o Onion **já tem gabarito** para comparar.
-**Sem gabarito não há dogfood — há impressão.** Até esse gatilho disparar, este grafo é leitura, não
-backlog.
+> Uma superfície do Onion onde **uma medição já feita alimente muitas perguntas independentes** — o
+> *speculative fan-out*. O candidato honesto é a **triagem do inbox de co-evolução**: o arquivo já está
+> lido, e sobram N classificações sobre o mesmo texto.
+
+Só aí a chave de API responde a uma pergunta que o Transformer sozinho não responde de graça. Até esse
+gatilho disparar, este grafo é leitura, não backlog.
 
 ## 9. NÃO-VERIFICADOS — o que esta rodada não fez
 

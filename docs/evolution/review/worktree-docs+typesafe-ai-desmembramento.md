@@ -1,12 +1,12 @@
 ---
 branch: worktree-docs+typesafe-ai-desmembramento
 date: 2026-09-21
-reviewed_diff_sha256: f0c859e7cfe4bde2c8d780a63e3d19d27e2b729125dc21c457e06e3d0fc30c7a
-findings_total: 3
-findings_real: 3
-findings_fixed: 3
-tokens: 0
-duration_min: 8
+reviewed_diff_sha256: c9efba1467eb831bf518518cc0d523e37596a219b0cf55cde32e9ad3866bdf07
+findings_total: 4
+findings_real: 4
+findings_fixed: 4
+tokens: 956102
+duration_min: 25
 verdict: REPROVADO_E_CURADO
 reviewer: passada própria sobre o próprio artefato (sem subagente) — gate mecânico: kg-radar + lint-artifacts
 ---
@@ -71,7 +71,57 @@ cobriu **fidelidade à fonte** (o documento diz o que a fonte diz?) e **conformi
 grafo é legível? o lint passa?). Não cobriu, porque não podia, **se o produto faz o que declara**. O
 `§9 NÃO-VERIFICADOS` do SYNTHESIS carrega essa lista como item de primeira classe.
 
+## Adendo (2º commit) — o dogfood refutou uma recomendação minha, e ela foi rebaixada
+
+Depois de selar a versão acima, rodei o experimento que eu mesmo havia proposto: **25 julgamentos
+reais** (5 nós do corpus × 5 repetições, um subagente read-only cada, sem ver o `status:` selado) para
+medir *self-consistency* como proxy da distribuição do Jev — **sem vendor, sem chave de API**.
+
+O resultado **refutou parcialmente o §7.4 do próprio SYNTHESIS**, que eu havia escrito como leitura:
+
+- **A moda acertou 5/5.** A distribuição não corrigiu veredito nenhum. A versão ingênua da tese
+  ("preciso de distribuição para não errar") não se sustenta nesse recorte.
+- **O custo mora na MEDIÇÃO, não no julgamento.** 956.102 tokens, ~38.244/julgamento, gastos rodando
+  `git branch -a`, `grep` no `members.yaml`, `ls` no registry, abrindo o repo de um adotante. Escolher o
+  enum depois disso é a fração barata — e **Jev não mede**, ele avalia um `state` que você já montou.
+  Logo ele substituiria só o passo que já é de graça.
+- O candidato #1 foi **rebaixado** e o **gatilho do nó de decisão foi reescrito**: deixa de ser o
+  `kg-freshness` e passa a ser uma superfície onde *uma* medição alimente *N* perguntas (o
+  *speculative fan-out*).
+
+Dois achados colaterais que só a repetição expôs, e que valem por si:
+
+1. **N3 ("branch two-tier") empatou 3×2 porque o ENUNCIADO é ambíguo, não porque o modelo é fraco** —
+   metade mediu o core (sem essas branches), metade mediu um adotante (com todas). Os dois lados
+   mediram certo. `confidence` baixo virou um sinal útil de *"conserte o label"*, não de *"recarimbe"*.
+2. **N2 teve veredito unânime e contagem divergente por baixo** — 3 workers contaram 14 adotantes, 2
+   contaram 13, no mesmo arquivo, variando só o `grep`. Dispersão no **fato**, invisível no veredito.
+   É a classe `guarda-por-lista-falha-pelo-vocabulário` aparecendo na aritmética.
+
+Isto é a Doutrina de Dogfooding fazendo o que promete: **rodar o artefato refutou a recomendação que a
+leitura tinha produzido**, no mesmo loop, antes de custar uma assinatura.
+
+## Conferência da REGRA 87 — e ela pegou algo, não foi formalidade
+
+O 2º commit edita `typesafe-ai-2026-09.kg.yaml`, então conferi os três `confirmed` de maior impacto
+desse arquivo contra o que estou propondo:
+
+- **`E_TRES_PRIMITIVAS_TIPADAS`** — compatível. O experimento usou exatamente a forma `Choice` de 4
+  opções que esse nó descreve; nada aqui o contraria.
+- **`E_SKILL_E_PLUGIN_NO_MARKETPLACE_CLAUDE_CODE`** — ortogonal ao achado. Nada a reconciliar.
+- **`E_SYSTEM_ONE_CLASSE_DE_MODELO`** — ⚠️ **este já respondia, e eu não vi.** Ele diz, em texto que eu
+  mesmo escrevi horas antes: *"avalia um `state` e devolve respostas TIPADAS"*. A palavra **avalia** já
+  carregava a fronteira inteira — Jev recebe um `state` pronto, **não sai medindo**. A refutação do meu
+  candidato #1 estava dentro do meu próprio grafo, num `confirmed`, e eu precisei de 25 subagentes e
+  956k tokens para reencontrá-la.
+
+Não mudo o achado — o dogfood continua valendo, e ele quantificou o que o nó só insinuava (que a
+medição custa ~38k por julgamento e o julgamento custa quase nada). Mas a lição de processo é a que a
+regra existe para cobrar: **o grafo já sabia, e eu li a fonte externa antes de reler o que eu tinha
+acabado de carimbar.** É a mesma classe do hook de corpus que avisa "o corpus já fala deste arquivo" —
+com a diferença de que aqui o arquivo era meu, e de hoje.
+
 ## Gate mecânico no SHA final
 
-- `bash .claude/validation/kg-radar.sh docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml` → **exit 0** (25 nós, 28 arestas, sem contradição estrutural)
+- `bash .claude/validation/kg-radar.sh docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml` → **exit 0** (27 nós, 33 arestas, sem contradição estrutural)
 - `bash .claude/validation/lint-artifacts.sh` → **exit 0** (0 HARD; as 12 SOFT restantes são pré-existentes e alheias a este diff)
