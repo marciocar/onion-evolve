@@ -142,6 +142,33 @@ if [ -n "${_RES_STAGED}" ]; then
   fi
 fi
 
+# ── E O HASH DA REGRA 56 RE-CARIMBADO, senao a cura acima cria outro defeito ─────────────────
+# O autor carimba o `reviewed_diff_sha256` ANTES do commit; o auto-fix do painel acrescenta arquivo
+# DEPOIS — o diff muda e o hash fica caduco. Medido no PRIMEIRO uso real (PR #860): o CI acusou
+# ARTEFATO-CADUCO num commit cujo unico "culpado" era o proprio hook que eu acabara de escrever.
+#
+# ⚠️ A CONDICAO E "HA RESIDUO STAGED", nao "o painel mudou". Na 1a tentativa pus isto dentro do ramo
+#    do `cmp`, e ele nao rodava justamente no caso que importa: painel ja atualizado por um commit
+#    ANTERIOR, cujo hash ficou caduco la. Condicao errada = guarda que existe e nao alcanca.
+#
+# A formula e a MESMA de review-artifact-check.sh (flags canonicos + exclusao de
+# `docs/evolution/review/`), senao hook e gate discordariam sobre o mesmo numero. Converge porque o
+# hash exclui o diretorio de review: re-adicionar o residuo nao altera o valor.
+if [ -n "${_RES_STAGED:-}" ]; then
+  _r56_base="$(git merge-base origin/main HEAD 2>/dev/null || true)"
+  if [ -n "${_r56_base}" ]; then
+    _r56_sha="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
+      --cached "${_r56_base}" -- . ':(exclude)docs/evolution/review' 2>/dev/null | sha256sum | cut -c1-64)"
+    for _r56_f in $(git diff --cached --name-only --diff-filter=ACMR -- 'docs/evolution/review/*.md' 2>/dev/null); do
+      [ -f "${REPO_ROOT}/${_r56_f}" ] || continue
+      LC_ALL=C grep -q '^reviewed_diff_sha256:' "${REPO_ROOT}/${_r56_f}" || continue
+      LC_ALL=C grep -q "^reviewed_diff_sha256: ${_r56_sha}$" "${REPO_ROOT}/${_r56_f}" && continue
+      LC_ALL=C sed -i "s|^reviewed_diff_sha256: .*|reviewed_diff_sha256: ${_r56_sha}|" "${REPO_ROOT}/${_r56_f}"
+      git add "${REPO_ROOT}/${_r56_f}" && echo "🔁 hash da REGRA 56 re-carimbado em ${_r56_f} (o auto-fix mexeu no diff depois do carimbo)"
+    done
+  fi
+fi
+
 # ── GATILHO DIRETO DO SUT (Q_GATILHO_DO_WIREIN, 3ª via — nem REGRA às pressas, nem esperar o
 # incidente): a guarda kg-reverify-schema-check vigia commands/meta/kg-freshness.md, que NÃO mora
 # em validation/ — sem esta chamada, editar o SUT sozinho passava local e o vermelho apareceria

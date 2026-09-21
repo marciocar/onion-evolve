@@ -2,7 +2,7 @@
 title: 'Resíduo — eu falsifiquei minha própria declaração dez minutos depois de mergeá-la'
 date: 2026-09-21
 branch: fix/harness-declaration-now-false
-reviewed_diff_sha256: dbdd8f13dde5ee0772b82301aafa1a88d675cd748b11cc6d82e2fa92b15bb64e
+reviewed_diff_sha256: eef24bc1ed3a61425ce29700fd74b6bce7e6176e1ea54b88221247a0d55f3497
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
@@ -63,6 +63,23 @@ saída destrutiva é plausível ([[generated-projection-needs-ratchet]]).
 **Provado nas duas pontas:**
 - com resíduo staged e painel adulterado por isca → regenera, a isca some, o rastro sai na tela;
 - sem resíduo staged → **0 disparos**. Mecanismo que dispara sempre é ruído, não guarda.
+
+# A cura criou um defeito, e o CI o pegou no primeiro uso real
+
+O auto-fix acima roda **depois** de eu carimbar o `reviewed_diff_sha256`: ele acrescenta o painel ao
+commit, o diff muda, e o hash fica caduco. O CI do PR #860 acusou `ARTEFATO-CADUCO` num commit cujo
+único "culpado" era **o próprio hook que eu acabara de escrever**.
+
+É a mesma forma do defeito que este PR cura no #859 — mecanismo que produz um artefato desalinhado
+com o que ele mesmo declara —, agora cometida por mim no ato de mecanizar. Curado no próprio hook:
+depois de regenerar o painel, ele **re-carimba o hash** usando a **mesma fórmula** de
+`review-artifact-check.sh` (flags canônicos + exclusão de `docs/evolution/review/`), senão o hook e o
+gate discordariam sobre o mesmo número. Converge porque o hash exclui o diretório de review: re-adicionar
+o resíduo não altera o valor.
+
+**A lição, que é a do dia inteiro:** o mecanismo só se prova no uso real. A isca eu construí e ela
+passou; o caso verdadeiro apareceu no CI, três minutos depois, com um modo de falha que eu não tinha
+imaginado.
 
 # Declarado
 
