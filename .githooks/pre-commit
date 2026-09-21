@@ -114,6 +114,34 @@ if [ "${_autofix_on}" -eq 1 ] && [ -f "${ASM}" ] && [ -d "${VDIR}" ]; then
   fi
 fi
 
+# ── RESÍDUO NO COMMIT ⇒ PAINEL REGENERADO JUNTO (REGRA 81) ────────────────────────────────────
+# POR QUE EXISTE, medido em 2026-09-21: a REGRA 81 (Painel de estado é GERADO dos produtores, nunca
+# redigido) me barrou TRÊS vezes no mesmo dia, sempre pelo mesmo motivo — `testing-state.sh` lê
+# `review-ledger.sh --env`, que CONTA resíduos e achados; logo, escrever um resíduo defasa o painel
+# por construção. Não é descuido a corrigir com atenção: é dependência de dados, e a cura de
+# disciplina ("lembrar de regenerar") é cura nula nesta casa.
+# MESMO IDIOMA do bloco de plugins acima: auto-fix COM RASTRO no commit, e a regra segue HARD no CI —
+# quem contorna o hook (`--no-verify`, que aqui é checkpoint e não validação) ainda é pego lá.
+_RES_STAGED="$(git diff --cached --name-only --diff-filter=ACMR -- 'docs/evolution/review/*.md' 2>/dev/null | head -1)"
+if [ -n "${_RES_STAGED}" ]; then
+  TS="${REPO_ROOT}/.claude/validation/testing-state.sh"
+  if [ -f "${TS}" ]; then
+    _ts_tmp="$(mktemp)"
+    # temp+mv: redirecionar direto no alvo TRUNCA o arquivo antes de o gerador falhar, e aí o painel
+    # some em vez de ficar defasado — a saída destrutiva é plausível ([[generated-projection-needs-ratchet]]).
+    if bash "${TS}" --markdown > "${_ts_tmp}" 2>/dev/null && [ -s "${_ts_tmp}" ]; then
+      if ! cmp -s "${_ts_tmp}" "${REPO_ROOT}/docs/onion/testing-state.md"; then
+        mv "${_ts_tmp}" "${REPO_ROOT}/docs/onion/testing-state.md"
+        echo "🔁 resíduo no commit → painel de estado regenerado (REGRA 81; auto-fix com rastro, a regra segue HARD no CI)"
+        git add "${REPO_ROOT}/docs/onion/testing-state.md" || echo "⚠️  git add de docs/onion/testing-state.md FALHOU — stagee à mão."
+      else rm -f "${_ts_tmp}"; fi
+    else
+      rm -f "${_ts_tmp}"
+      echo "⚠️  painel NÃO regenerado (testing-state.sh falhou ou saiu vazio) — a REGRA 81 vai acusar no CI."
+    fi
+  fi
+fi
+
 # ── GATILHO DIRETO DO SUT (Q_GATILHO_DO_WIREIN, 3ª via — nem REGRA às pressas, nem esperar o
 # incidente): a guarda kg-reverify-schema-check vigia commands/meta/kg-freshness.md, que NÃO mora
 # em validation/ — sem esta chamada, editar o SUT sozinho passava local e o vermelho apareceria
