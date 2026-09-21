@@ -1,0 +1,68 @@
+# PROPOSTA de escrita no grafo — fila kg-inbox (write-leg F4b).
+# origem: sessao do core 2026-09-21 (dogfood de /onion:warm-up — pergunta do maestro sobre treinar modelo)
+# recebida: 20260921-212605 · NAO E FONTE ate o core selar (I3).
+# Metodo: Elenxo. A 1a redacao deste achado tinha DOIS itens; a etapa de refutacao
+# adversarial DERRUBOU o segundo (ver nota no fim) e AFIOU o primeiro. Labels sem
+# acento por convencao do grafo de destino (e pela fragilidade de locale ja medida
+# em fios-abertos/E_LOCALE_FRAGIL_EM_TRES_SITIOS_PRE_EXISTENTES).
+meta:
+  id: placar-9a1-sem-referente-2026-09-21
+  schema_version: "1"
+  baseline: "2026-09-21"
+  target: docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml
+
+nodes:
+  - id: E_PLACAR_9A1_SEM_REFERENTE_0921
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-21
+    verified_against: 'grep exaustivo por placar e sensor-de-ausencia em docs/ (todos os .kg.yaml e .md versionados, worktrees excluidas) + leitura dos nos citados'
+    label: 'O numero 9 a 1 citado em C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED NAO TEM REFERENTE no corpus. Existem exatamente dois placares medidos, e nenhum le 9 a 1 em direcao alguma. (1) kg-read-leg-2026-08/E_replay_scoreboard (verified_against elenxo-14-workers-wf_38afb1f2-ee7): cura A (secao no CLAUDE.md) = 1/9 · cura B (hook UserPromptSubmit sensor-de-ausencia) = 1/9 · cura C (kg-radar --grep) = 0/9; a uniao das tres = 1/9 porque as duas primeiras pegam O MESMO caso C7; na perna de leitura, 1/7 e 1/7 e 0/7. (2) onion-market-kg-2026-08/E_placar_relitigio: D = 1/7 · E = 3/7 · F = 1/7. A cura NOMEADA no no defeituoso — sensor de ausencia — e a cura B, que EMPATOU com o markdown em 1/9; e o veredito que fechou aquela rodada foi kg-read-leg-2026-08/D_build_none_of_three, NAO CONSTRUIR NENHUMA DAS TRES, o hook inclusive. Localizacao do defeito: os nos IRMAOS do mesmo grafo leem certo (E_LACUNAS_DECLARADAS_PODA_0903 diz cura A = 1/9; C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH diz reprovou por 1 a 9) — a leitura errada esta isolada DENTRO do no que sustenta a opcao recomendada, onde ela infla o argumento pro-hook. Classe: declarado != verificado aplicado ao nosso proprio corpus.'
+    trace: 'docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml:88-97'
+
+  - id: E_STEELMAN_HOOK_3_DE_7_REFUTADO_0921
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'onion-market-kg-2026-08.kg.yaml nos C_sub_hook_injeta (l.217-226, status refuted) e E_plataforma_desqualifica (l.111)'
+    label: 'DISSENT PRESERVADO CONTRA A CONCLUSAO ACIMA — a tentativa mais forte de salvar o 9 a 1, e por que ela nao salva. O steelman e real e sobrevive em parte: existe SIM um hook que bateu a prosa. onion-market-kg-2026-08/C_sub_hook_injeta (substancia E, hook que RODA o radar e INJETA o veredito) mediu 3/7 contra 1/9 da cura B, e o proprio no registra que a distincao entre rodar-e-injetar-o-RESULTADO e injetar-prosa-pedindo-que-o-modelo-rode e REAL E MENSURAVEL, nao era a mesma cura. Logo mecanismo acima de prosa E direcionalmente sustentado pelo corpus, e o no defeituoso nao e mentira gratuita: e leitura desleixada de algo verdadeiro. O que NAO sobrevive, e por isso a correcao continua devida: (a) a razao nunca foi 9 a 1 — foi 3/7 contra 1/7 na mesma perna de leitura; (b) a cura nomeada no no (sensor de ausencia) e a cura B, que empatou com o markdown, nao a substancia E; (c) a substancia E esta status refuted, NAO E CONSTRUTIVEL COMO DESCRITA — hooks prompt e agent nao retornam additionalContext (sao decisores sim/nao, nao injetores) e ha teto de 10.000 chars contra os 138.433 bytes da forma completa. CONSEQUENCIA PARA A OPCAO C, que tambem e hook-dependente: o precedente do corpus e CAUTELA, nao apoio — a plataforma ja desqualificou um hook por fato externo que nenhuma introspeccao acharia.'
+    trace: 'docs/evolution/research/onion-market-kg-2026-08/onion-market-kg-2026-08.kg.yaml'
+
+  - id: E_CLAUSULA_DEPENDENCIA_MORTA_SEM_ARESTA_0921
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'kg-radar.sh no proprio grafo da poda (secao RADAR por atencao) + leitura das arestas l.387-389 + git show a0541b66'
+    label: 'Dentro de D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS ha uma clausula MORTA desde 2026-09-03 e nada a marca. A clausula: pre-requisito declarado, hoje aberto, a spec do payload do hook InstructionsLoaded, nao sabemos se distingue carregou de influenciou, por isso esta decisao nasce com dependencia e nao com data. O que a matou, no MESMO grafo: E_INSTRUCTIONSLOADED_PAYLOAD_MEDIDO_0903 leu o payload no binario 2.1.259 (tier 10 — file_path, memory_type, load_reason, globs, trigger_file_path, parent_file_path) e conclui que a decisao DEIXA de ter dependencia e passa a ter ORDEM: L1 agora, L2 quando o censo tiver 20 sessoes ou 14 dias. O grafo fez a coisa CERTA ao apendar em vez de editar (Aufhebung, supersessao e operacao nomeada) — o defeito nao e esse. O defeito e o TIPO da aresta: l.387-389 emite SUPPORTS, e SUPPORTS nao sinaliza que uma premissa do alvo morreu. Medido no instrumento que a doutrina KG-first manda rodar primeiro: o no que carrega a clausula morta esta em 2o lugar da secao RADAR por atencao (31,5) e o no que a corrige NAO APARECE no top-10. Quem chega pelo radar le o bloqueio e nao le a liberacao — a versao vencida afunda a versao viva.'
+    trace: 'docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml:387-389'
+
+  - id: Q_ARESTA_PARA_CLAUSULA_PARCIALMENTE_MORTA_0921
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    label: 'Que aresta marca um no cuja PREMISSA morreu enquanto o no SEGUE VIGENTE? O vocabulario audit de hoje nao tem o degrau do meio: SUPPORTS e fraco demais (nao sinaliza morte de nada) e SUPERSEDES e forte demais (o alvo aqui segue open e valido — e emitir SUPERSEDES para alvo com trabalho pendente e exatamente o defeito que o census-seal ja cometeu em 13 alvos, registrado em fios-abertos/E_W8_FECHAMENTO_FONTES, cuja cura virou regra: aresta pela realidade, MORTO ou FORA implica SUPERSEDES, senao CONSTRAINS). Candidatas, sem escolher pelo maestro: (a) trocar a aresta de E_INSTRUCTIONSLOADED_PAYLOAD_MEDIDO_0903 para D_PODA de SUPPORTS para CONSTRAINS, que e o que o proprio radar prescreve quando o superador apenas REFINA (kg-radar.sh:657-658 e 671); (b) re-emitir a decisao sem a clausula e SUPERSEDES a antiga, pagando o custo de um no novo; (c) aceitar como residuo conhecido e registrar. GENERALIZACAO GATED EM N=1: ha UM caso medido, e regra de um caso e catedral — o gatilho nomeado para isto virar mecanismo (guarda no radar) e um SEGUNDO no com clausula morta sob SUPPORTS.'
+
+edges:
+  - from: E_PLACAR_9A1_SEM_REFERENTE_0921
+    to: C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED
+    edge_type: CONSTRAINS
+  - from: E_STEELMAN_HOOK_3_DE_7_REFUTADO_0921
+    to: E_PLACAR_9A1_SEM_REFERENTE_0921
+    edge_type: CONSTRAINS
+  - from: E_CLAUSULA_DEPENDENCIA_MORTA_SEM_ARESTA_0921
+    to: D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS
+    edge_type: CONSTRAINS
+  - from: E_CLAUSULA_DEPENDENCIA_MORTA_SEM_ARESTA_0921
+    to: Q_ARESTA_PARA_CLAUSULA_PARCIALMENTE_MORTA_0921
+    edge_type: SUPPORTS
