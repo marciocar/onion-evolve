@@ -37,6 +37,21 @@ python3 "$H/leg1_analyze.py" "$H/capture"
 ```
 Depois: **refutador obrigatório** (NOTE-06 §4) sobre qualquer candidato — só sobrevive o que resiste a "é o atrito do Marcio, não um padrão".
 
+## ⚠️ O flush, e por que `/exit` importa (medido 2026-09-21)
+
+Na **1ª rodada interativa real**, 5 sessões produziram **apenas** `claude_code.session.count` — zero
+traces, zero `blocked_on_user`, zero `tool_decision`. No mesmo dia e mesmo sink, 5 sessões **headless**
+trouxeram os três sinais.
+
+A diferença **não é o binário**: o 2.1.278 tem `TracerProvider`, `startSpan`, `BatchSpanProcessor` e os
+nomes dos sinais (medido com `strings`). É o **encerramento** — processo headless *termina* e o SDK
+descarrega o buffer; sessão interativa *fechada* pode morrer antes do flush periódico.
+
+- os intervalos caíram de **5000/3000 ms → 1000/500 ms** para encurtar a janela de perda;
+- **saia com `/exit`**, não fechando o terminal: `SIGKILL` mata o buffer e o dado da sessão **se perde**;
+- e o analisador agora **sai com `rc=2`** se ler 0 sessões, em vez de imprimir "nenhum atrito". Captura
+  perdida e loop-sem-atrito **não podem sair iguais** — o segundo é a conclusão que este estudo testa.
+
 ## Limites (declarados)
 
 - **Interativo-only**: `-p` headless serve só pra validar o instrumento, **não** conta como sessão Leg-1.

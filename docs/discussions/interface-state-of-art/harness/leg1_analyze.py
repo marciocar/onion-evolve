@@ -5,7 +5,7 @@
   passo-2: recorrência SÓ sobre os 3 sinais declarados, em ≥3 sessões independentes acima do baseline
   passo-3: held-out — ≥1 sessão onde o padrão reaparece SEM ter formulado o candidato
 Nada fora dos 3 sinais entra. Nenhum critério muda aqui (mudar = exploratório, marcar como tal)."""
-import json, sys, os, glob
+import sys, json, sys, os, glob
 from collections import defaultdict, Counter
 
 CAP = sys.argv[1]
@@ -109,6 +109,21 @@ n = len(sess)
 if "?" in sess and n == 1:
     print("⚠️  NENHUM session.id encontrado — 1 bucket anônimo. Recorrência cross-sessão IMPOSSÍVEL de aferir.")
 print(f"sessões distintas (por session.id): {n}\n")
+
+# ⚠️ ZERO SESSÃO NÃO É RESULTADO — é "não li nada", e sai por erro.
+# POR QUE EXISTE (medido 2026-09-21, na 1ª rodada interativa real): a captura trouxe só
+# `claude_code.session.count`; o analisador leu 0 sessões e ainda assim imprimiu "nenhum
+# span-pattern de atrito em ≥3 sessões" e saiu rc=0. Uma captura PERDIDA ficava indistinguível de
+# "o loop não tem atrito" — e o segundo é justamente a conclusão que este estudo existe para testar.
+# Varredura vazia devolvendo veredito é fail-open com cara de cobertura; aqui custa a tese inteira.
+if n == 0:
+    print("✗ NENHUMA sessão analisável na captura.")
+    print("  Isto NÃO é 'sem atrito' — é ausência de dado, e os dois não podem sair iguais.")
+    print("  Sinais esperados: `tool_decision` em logs.ndjson · `blocked_on_user` e spans em traces.ndjson.")
+    print("  Causa mais provável (medida em 2026-09-21): a sessão foi fechada antes do flush do")
+    print("  buffer OTLP. Use `/exit` (não feche o terminal), e prefira sessões com trabalho real —")
+    print("  o sinal nasce quando um gate PARA e espera por você.")
+    sys.exit(2)
 
 friction_by_session = {}   # sid -> set de span-patterns de atrito acima do baseline
 for sid, d in sess.items():
