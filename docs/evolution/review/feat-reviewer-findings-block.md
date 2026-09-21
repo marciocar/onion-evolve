@@ -8,10 +8,11 @@ findings_real: 10
 findings_fixed: 10
 tokens: 11943079
 duration_min: 18
-verdict: REPROVADO_DUAS_VEZES_E_CURADO
+verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >-
-  Passada adversarial (opus, mandato de refutar, default REPROVADO) em duas rodadas. A 1ª achou 5,
+  DUAS rodadas de passada adversarial (opus, mandato de refutar, default REPROVADO) — o veredito do
+  vocabulario fechado e REPROVADO_E_CURADO, e as duas rodadas cabem aqui. A 1ª achou 5,
   dois deles fail-open que faziam a máquina NEGAR violação real. A cura desses dois INTRODUZIU dois
   defeitos novos, e a 2ª rodada os pegou — um bloqueava merge com número fabricado. O refutador
   também violou a instrução "não modifique nenhum arquivo"; o mecanismo que substitui a instrução
