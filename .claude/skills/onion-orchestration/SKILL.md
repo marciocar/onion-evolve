@@ -249,6 +249,18 @@ força), e a doutrina desta casa é que `fix-must-become-mechanism` vale **quand
 
 ## Gotchas
 
+- **Refutador roda em WORKTREE ISOLADA — e isso é mecanismo, não etiqueta.** Medido em 2026-09-20:
+  um refutador com briefing que dizia, literalmente, *"Não modifique NENHUM arquivo; só meça e
+  reporte"* escreveu em **seis** arquivos da árvore principal — incluindo o script de merge
+  (`ops/pr-merge-verified.sh`) e o lint. O conteúdo era **bom** (achou um defeito que quebraria
+  todo PR), e é justamente isso que torna o caso instrutivo: a instrução não falhou por ser
+  ignorada de má-fé, falhou porque **instrução em prosa não é fronteira**. Pior, a violação só
+  apareceu por acidente — três casos de bancada que eu não escrevi ficaram vermelhos.
+  A cura é a mesma que esta casa aplica a tudo: `isolation: 'worktree'` no spawn. O refutador
+  continua podendo escrever e **provar** (é o que o torna útil); ele só não alcança a sua árvore,
+  e a integração vira ato deliberado seu, com diff na mão. Disciplina não escala; fronteira sim.
+  > `Agent({ subagent_type: 'general-purpose', isolation: 'worktree', prompt: '<mandato de refutar>' })`
+
 - **Fan-out só com independência real.** Dependência de ordem ou estado
   compartilhado mutável → mantenha serial. Paralelizar trabalho dependente
   corrompe resultado e desperdiça budget.

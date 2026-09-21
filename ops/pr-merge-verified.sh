@@ -41,9 +41,16 @@ DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ram
 #     se o registro falhar, o merge não acontece. Registro é precondição, não cortesia:
 #     dispensa que só existe no terminal de quem mergeou é dispensa que ninguém audita.
 # A lista é curta DE PROPÓSITO. Ampliá-la é ato deliberado, com o porquê escrito aqui.
-#   onion-review-verdict → ele próprio diz de si: "não bloqueia o merge — informa. A decisão
-#   de mergear sem revisão semântica é humana e deve ser consciente". O escape é a forma
-#   CONSCIENTE dessa decisão; sem ele, o caminho real vira mergear por fora do gate.
+#   onion-review-verdict → o critério de entrada MUDOU em 2026-09-20 e a justificativa antiga
+#   caiu junto. Ele dizia de si "não bloqueia o merge — informa", e a dispensa se apoiava nessa
+#   auto-declaração. Agora ele BLOQUEIA em dois casos distintos, e o escape cobre os dois por
+#   razões diferentes:
+#     (1) NÃO revisou (revisor morreu/sem saldo) — mergear sem revisão semântica é decisão
+#         humana e deve ser consciente; o escape é a forma consciente dela.
+#     (2) revisou e APONTOU violação — o revisor é LLM e erra. A saída para o falso-positivo
+#         tem de ser dispensa NOMEADA E REGISTRADA, nunca gate mudo nem merge por fora.
+#   Ou seja: a lista continua com um membro só, mas agora por um critério declarado aqui em vez
+#   de herdado de uma frase que o próprio check deixou de dizer.
 _DISPENSAVEIS=(onion-review-verdict)
 DISPENSA=(); REASON=""
 while [ $# -gt 0 ]; do
@@ -182,7 +189,22 @@ fi
 # evitar. O comentário nomeia O CHECK, o MOTIVO e o HEAD, porque "dispensei um check" sem dizer
 # qual é a mesma classe de declaração vazia que este script inteiro combate.
 if [ "${#DISPENSA[@]}" -gt 0 ]; then
-  _reg="$(printf '%s\n' \
+  # A NOTA DE AUDITORIA NAO PODE AFIRMAR O QUE NAO MEDIU. Ate 2026-09-20 ela dizia, fixa, "o que
+  # este check mediria NAO foi medido" — verdade enquanto o `onion-review-verdict` so reprovava
+  # por ausencia de revisao. Com o gate de achados, existe o caso oposto: ele MEDIU e ACHOU, e
+  # ali a frase antiga registraria mentira no rastro de auditoria. Achado por passada adversarial.
+  # Deriva-se do `output` do proprio check; se nao der para ler, DECLARA que nao deu — nunca
+  # escolhe um dos dois lados por conveniencia.
+  _out_check="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
+    --jq '.check_runs[] | select(.name=="onion-review-verdict") | ((.output.title // "") + " " + (.output.summary // ""))' 2>/dev/null || true)"
+  if LC_ALL=C grep -qiE 'apontou[^0-9]*[0-9]+|violaç|violac' <<< "${_out_check}"; then
+    _NOTA_DISPENSA="Este check **mediu e apontou** — a dispensa afirma que o achado **não procede**, e o parecer está no comentário do PR para quem quiser conferir."
+  elif [ -n "${_out_check}" ]; then
+    _NOTA_DISPENSA="O que este check mediria **não foi medido**."
+  else
+    _NOTA_DISPENSA="Não consegui ler o \`output\` do check para dizer se ele mediu ou não — **a nota não afirma nenhum dos dois**; leia o check no PR."
+  fi
+  _reg="$(printf '%s\n' \\
     "## ⚠️ Merge com check DISPENSADO" \
     "" \
     "Este PR foi mergeado por \`ops/pr-merge-verified.sh\` com dispensa **nomeada** de check." \
@@ -193,7 +215,7 @@ if [ "${#DISPENSA[@]}" -gt 0 ]; then
     "| motivo | ${REASON} |" \
     "| head | \`${HEAD_SHA}\` |" \
     "" \
-    "Os demais checks do head passaram — a dispensa é **nome a nome**, e qualquer outro check falho teria recusado o merge. O que este check mediria **não foi medido**." )"
+    "Os demais checks do head passaram — a dispensa é **nome a nome**, e qualquer outro check falho teria recusado o merge. ${_NOTA_DISPENSA}" )"
   gh pr comment "$PR" "${REPO_ARG[@]}" --body "$_reg" >/dev/null 2>&1 \
     || die "não consegui REGISTRAR a dispensa no PR #${PR} — merge abortado. O registro é precondição: dispensa que só existe no meu terminal não se audita."
   say "✓ dispensa registrada no PR #${PR} (comentário), antes do merge"

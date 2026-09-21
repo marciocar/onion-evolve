@@ -7512,6 +7512,25 @@ run_review_verdict_selftests() {
   if [ "${rc}" -ne 0 ]; then
     record_fail "review-verdict" "o selftest do helper saiu ${rc}"
   fi
+
+  # ── TELEMETRIA DO GATE: `ops/review-gate-health.sh` (2026-09-21) ──────────────────────────────
+  # O gate de achados escolheu, de proposito, que `achados=-1` (nao pude contar) NAO bloqueia. O
+  # preco declarado dessa escolha e um modo de morte silenciosa: se a fiacao quebrar ou o revisor
+  # derivar de fraseado, todo PR cai em -1, o check fica VERDE, e ninguem nota que o gate parou.
+  # Aquele script e a catraca que grita nesse caso — e ele so vale se a CLASSIFICACAO for correta,
+  # que e o que se exercita aqui (a parte de rede fica de fora por desenho).
+  local _gh="${REPO_ROOT}/ops/review-gate-health.sh"
+  if [ ! -f "${_gh}" ]; then record_skip "review-gate-health: script ausente (telemetria do gate NAO exercida)"; else
+    local _go _grc=0
+    _go="$(bash "${_gh}" --selftest 2>&1)" || _grc=$?
+    while IFS= read -r line; do
+      case "${line}" in
+        *"  ✓ "*) record_pass "${line#*✓ }" ;;
+        *"  ✗ "*) record_fail "review-gate-health" "${line#*✗ }" ;;
+      esac
+    done <<< "${_go}"
+    [ "${_grc}" -eq 0 ] || record_fail "review-gate-health" "o selftest da telemetria saiu ${_grc}"
+  fi
 }
 
 run_kg_radar_integrity_selftests() {

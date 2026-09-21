@@ -114,5 +114,9 @@
 # HEAD de main MERGEADA — materializei de uma worktree destacada, porque `git archive HEAD` da
 # branch publicaria trabalho em voo numa porta PUBLICA, armadilha que ja me pegou 3 vezes).
 # O gate fica VERMELHO ate o push do maestro, e isso e a guarda dizendo a verdade sobre o mundo.
-onion-standalone 398
+#
+# 2026-09-20 (pos-#856): `onion-standalone` sobe a 399 — trabalho MERGEADO que a porta parada
+# nao recebeu. O `onion-core` segue em ZERO com a 13a materializacao commitada no clone
+# (pin 4299290b73d4, de worktree destacada em origin/main), aguardando o push.
+onion-standalone 399
 onion-core 0

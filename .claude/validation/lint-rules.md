@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**86 regras** no total — **76 HARD**, **23 SOFT**.
+**87 regras** no total — **77 HARD**, **24 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -185,9 +185,10 @@ O trabalho PROPOSTO carrega rastro material de ter sido revisado — o gate cria
 
 ## Integridade do próprio gate
 
-As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a olhar?' — porque varredura cega devolve zero violações, que é indistinguível de conformidade. Categoria nova em 2026-08-04, quando o lint rodou de dentro de um worktree de harness e varreu 0 dos 51 agentes sem emitir uma linha de aviso. A REGRA 86 entrou aqui em 2026-09-17 pelo mesmo motivo, um andar acima: um workflow que não PARSEIA não é um gate que falhou, é um gate que nunca rodou — e o repo o contava como existente.
+As demais categorias perguntam 'achei violação?'. Esta pergunta 'eu cheguei a olhar?' — porque varredura cega devolve zero violações, que é indistinguível de conformidade. Categoria nova em 2026-08-04, quando o lint rodou de dentro de um worktree de harness e varreu 0 dos 51 agentes sem emitir uma linha de aviso. A REGRA 86 entrou aqui em 2026-09-17 pelo mesmo motivo, um andar acima: um workflow que não PARSEIA não é um gate que falhou, é um gate que nunca rodou — e o repo o contava como existente. A REGRA 88 entrou em 2026-09-20 pela versão mais perversa da classe: o gate rodava, mas sem árvore — `bash <script do repo>` saía 127, o job reprovava TODO PR e a mensagem culpava o código revisado. Gate que nunca olhou, acusando.
 
 | Nº | Regra | Severidade | O que previne |
 |---:|-------|:----------:|---------------|
 | 54 | A varredura ENXERGA o que existe (guarda-das-guardas) | HARD | gate que varre ZERO arquivo e mesmo assim reporta OK — verde sem ter olhado |
 | 86 | Workflow de CI PARSEIA como YAML | HARD | workflow inexecutável passando por existente, e guarda morta por sintaxe |
+| 88 | Job de workflow que EXECUTA arquivo do repo faz checkout | HARD + SOFT | job sem `actions/checkout` invocando script versionado; o bash sai 127 e o `rc != 0` |

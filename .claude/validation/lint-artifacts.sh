@@ -2350,6 +2350,89 @@ check_door_staleness() {
 #   que conta artefato quebrado conta um número que parece saúde.
 #   Guarda que só se exercita quando invocada à mão envelhece calada.
 # ===========================================================================
+# REGRA 88 — Job de workflow que EXECUTA arquivo do repo faz checkout [HARD]
+# previne: job sem `actions/checkout` invocando script versionado; o bash sai 127 e o `rc != 0`
+#          vira reprovacao de TODO PR, com mensagem que acusa o codigo revisado em vez do gate.
+#
+# POR QUE EXISTE (medido 2026-09-20, achado por passada adversarial, NAO por leitura): o job
+# `onion-review-verdict` viveu meses sem arvore — e com razao, so lia `needs.*.outputs`. Ao mover
+# a decisao do gate para um script do repo, introduzi a PRIMEIRA dependencia de arquivo naquele
+# job e nao percebi. Sem checkout: `bash .claude/validation/review-verdict.sh` -> 127 -> exit 1 em
+# TODO PR revisado, inclusive os `conforme` (44 dos ultimos 56), com a mensagem FALSA "apontou 0
+# violação(ões)". E o PR que introduzia o defeito NAO podia mede-lo: editar `onion-review.yml`
+# faz a action se auto-pular, entao o caminho so acenderia no PR SEGUINTE, ja em main.
+#
+# TETO DECLARADO: olha `run:` de steps do MESMO job e procura invocacao de caminho versionado por
+# prefixo conhecido. Nao resolve variavel (`${{ env.X }}/s.sh`), nao segue `uses:` de action
+# composta, e nao sabe de `working-directory`. Cobre a forma que produziu o incidente; o que nao
+# alcanca, nao finge alcancar.
+check_workflow_job_needs_checkout() {
+  command -v python3 >/dev/null 2>&1 || return 0   # sem parser nao se opina (skip gracioso)
+  local out
+  out="$(python3 - "${REPO_ROOT}" <<'PYCK'
+import sys, os, glob, yaml
+root = sys.argv[1]
+PREF = ('.claude/', 'ops/', '.githooks/', 'scripts/', './.claude/', './ops/')
+bad = []
+for wf in sorted(glob.glob(os.path.join(root, '.github', 'workflows', '*.yml'))
+                 + glob.glob(os.path.join(root, '.github', 'workflows', '*.yaml'))):
+    try:
+        doc = yaml.safe_load(open(wf, encoding='utf-8'))
+    except Exception:
+        continue                      # YAML quebrado e assunto de check_workflows_parse
+    if not isinstance(doc, dict):
+        continue
+    for jname, job in (doc.get('jobs') or {}).items():
+        if not isinstance(job, dict):
+            continue
+        steps = job.get('steps') or []
+        if not isinstance(steps, list):
+            continue
+        tem_checkout = any(
+            isinstance(st, dict) and str(st.get('uses') or '').startswith('actions/checkout')
+            for st in steps)
+        if tem_checkout:
+            continue
+        for st in steps:
+            if not isinstance(st, dict):
+                continue
+            run = st.get('run')
+            if not isinstance(run, str):
+                continue
+            for linha in run.splitlines():
+                t = linha.strip()
+                for tok in t.split():
+                    if tok.startswith(PREF) and (tok.endswith('.sh') or tok.endswith('.py')):
+                        bad.append((os.path.relpath(wf, root), jname, tok))
+                        break
+                else:
+                    continue
+                break
+for w, j, tok in bad:
+    print('%s\t%s\t%s' % (w, j, tok))
+PYCK
+)" || return 0
+  [ -n "${out}" ] || return 0
+  # ⚠️ CATRACA, NAO HARD NU — e a razao esta escrita no cabecalho da guarda de idioma desta casa:
+  #    "dividas existente e SOFT e ocorrencia NOVA e HARD; nascer HARD sobre divida velha e como se
+  #    ensina a desligar um gate". Esta regra VIAJA no `lint-artifacts.sh`, entao todo adotante a
+  #    recebe — e um adotante com 3 jobs nessa forma teria 3 HARD no dia 1, sobre workflows que o
+  #    Onion nao escreveu. Baseline vazio AQUI (0 violacoes medidas); o adotante gera o dele com
+  #    `--emit-baseline`. Mesmo padrao da REGRA 45 e da REGRA 49.
+  local _r88_base="${SCRIPT_DIR}/workflow-checkout-baseline.txt" _r88_tol=0
+  local wf job tok _r88_key _r88_sev
+  while IFS=$'\t' read -r wf job tok; do
+    [ -n "${wf}" ] || continue
+    _r88_key="${wf}	${job}"
+    if [ -f "${_r88_base}" ] && LC_ALL=C grep -qxF "${_r88_key}" "${_r88_base}"; then
+      _r88_tol=$((_r88_tol+1)); continue
+    fi
+    violation "HARD" "${wf}" "REGRA 88 (Job de workflow que EXECUTA arquivo do repo faz checkout): job \`${job}\` roda \`${tok}\` e NAO tem step \`actions/checkout\` — sem arvore o bash sai 127 e o job reprova TODO PR, culpando o codigo revisado em vez do proprio gate"
+  done <<< "${out}"
+  [ "${_r88_tol}" -gt 0 ] && violation "SOFT" "${_r88_base#"${REPO_ROOT}/"}" "REGRA 88 (Job de workflow que EXECUTA arquivo do repo faz checkout): [workflow-checkout/PASSIVO] ${_r88_tol} job(s) tolerado(s) pelo baseline — a metrica de saude e este numero DIMINUINDO"
+  return 0
+}
+
 check_workflows_parse() {
   command -v python3 >/dev/null 2>&1 || return 0   # sem parser não se opina (skip gracioso)
   local wf
@@ -4180,6 +4263,7 @@ check_kg_read_index_sync
 check_kg_edit_saw_confirmed
 check_door_staleness
 check_workflows_parse
+check_workflow_job_needs_checkout
 check_frontmatter_scalar_colon
 check_no_claude_docs
 check_evolution_links

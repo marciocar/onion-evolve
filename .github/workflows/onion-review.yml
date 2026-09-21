@@ -47,6 +47,11 @@ jobs:
       REVIEW_MODEL: claude-sonnet-5
     outputs:
       revisou: ${{ steps.v1.outputs.revisou == 'true' && 'true' || steps.v2.outputs.revisou }}
+      # ACHADOS — segue a MESMA tentativa que revisou, nunca a outra. Se a 1a revisou, a contagem
+      # e dela; senao e a da 2a. Ler a contagem de uma tentativa que NAO revisou seria julgar o PR
+      # por um run que nao aconteceu — e `-1` (nao pude contar) e o default de `emit`, entao o
+      # descuido falharia para o lado silencioso.
+      achados: ${{ steps.ach.outputs.achados }}
       motivo1: ${{ steps.v1.outputs.motivo }}
       motivo2: ${{ steps.v2.outputs.motivo }}
       benigno: ${{ steps.aviso.outputs.benigno }}
@@ -145,7 +150,9 @@ jobs:
       # o revisor não consegue rodar — nunca quando acha violações (essas viram comentários
       # inline e o job sai verde). Logo, reprovar por is_error bloqueia o PR pelo crash do
       # bot, carregando ZERO informação sobre o código. O gate de qualidade duro é o
-      # determinístico (onion-validate.yml); a revisão semântica é advisory-quando-roda.
+      # determinístico (onion-validate.yml). A revisão semântica DEIXOU de ser advisory em
+      # 2026-09-20: quando ela roda e aponta violação, o `onion-review-verdict` reprova. O que
+      # segue soft é a DISPONIBILIDADE do revisor (dependência externa), não o veredito dele.
       # ORÇAMENTO (2026-08-03): era `--max-turns 8` e o revisor batia no teto. Medido no PR #533,
       # a PRIMEIRA run após a credencial ser consertada: `subtype: error_max_turns`, 9 turnos,
       # US$ 0,34, 35s — trabalho REAL interrompido por orçamento, não crash. O prompt manda
@@ -360,6 +367,27 @@ jobs:
         env:
           EXEC_FILE: ${{ steps.review2.outputs.execution_file }}
         run: bash .claude/validation/review-verdict.sh "${EXEC_FILE}" >> "${GITHUB_OUTPUT}"
+
+      # ESCOLHA DA CONTAGEM EM BASH, e NAO na expressao `${{ … && … || … }}` do Actions. A forma
+      # ternaria seria `v1.revisou == 'true' && v1.achados || v2.achados` — e ela depende de a
+      # string "0" ser TRUTHY na coerção do Actions. A passada adversarial nao conseguiu cravar
+      # isso na documentacao (a lista de falsy mistura-se com a tabela String->Number, que e a
+      # conversao de `==`, nao a de `&&`/`||`), e o dano seria o caso MAIS COMUM — `conforme`
+      # com 0 achados — cair para a 2a tentativa vazia e virar "nao contabilizavel".
+      # Em vez de apostar em semantica que ninguem confirmou, a escolha vira shell, que eu testo.
+      # ⚠️ SEGUE A TENTATIVA QUE REVISOU, nunca a outra: ler a contagem de um run que nao
+      # aconteceu e julgar o PR por nada.
+      - name: Qual contagem de achados vale (a da tentativa que revisou)
+        id: ach
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
+        env:
+          R1: ${{ steps.v1.outputs.revisou }}
+          A1: ${{ steps.v1.outputs.achados }}
+          A2: ${{ steps.v2.outputs.achados }}
+        run: |
+          if [ "${R1}" = "true" ]; then val="${A1}"; else val="${A2}"; fi
+          case "${val}" in ''|*[!0-9-]*) val=-1 ;; esac
+          echo "achados=${val:--1}" >> "${GITHUB_OUTPUT}"
 
       # RASTRO SEMPRE (2026-08-03) — o pedido que originou esta correção: "verde revisado" e
       # "verde sem revisar" eram INDISTINGUÍVEIS de fora. Este step roda nos dois desfechos e
@@ -584,11 +612,23 @@ jobs:
   # casa — a cura é mecânica: um check PRÓPRIO, que fica VERMELHO quando não houve
   # revisão semântica.
   #
-  # E NÃO BLOQUEIA POR CONSTRUÇÃO, não por gentileza: este repo não tem branch
-  # protection (privado sem Pro — `gh api .../branches/main/protection` devolve 403),
-  # logo nenhum check é obrigatório. Vermelho aqui INFORMA; merge segue possível. Se um
-  # dia houver protection, este check NÃO deve entrar nos obrigatórios sem decisão
-  # explícita do maestro — senão o soft-pass morre por acidente de configuração.
+  # ⚠️ ESTE BLOCO MUDOU EM 2026-09-20 (ordem do maestro), e a versão anterior dizia o
+  # OPOSTO: "não bloqueia por construção… vermelho aqui INFORMA; merge segue possível".
+  # Isso deixou de ser verdade em duas frentes, e deixar o cabeçalho velho seria a classe
+  # que este arquivo mais persegue — doutrina que descreve uma máquina que não existe mais.
+  #
+  # (1) O CHECK AGORA REPROVA quando o revisor aponta violação (`exit 1` no ramo de
+  #     achados >= 1). Antes ele só reprovava quando NÃO HOUVE revisão.
+  # (2) O MERGE JÁ MORRIA AQUI ANTES DESTA MUDANÇA, e eu não tinha notado:
+  #     `ops/pr-merge-verified.sh` exige `onion-review-verdict = SUCCESS` e é o único
+  #     caminho de merge permitido neste repo. Ou seja, "merge segue possível" descrevia
+  #     o GitHub (sem branch protection — 403 em `.../branches/main/protection`), não a
+  #     máquina real desta casa. Achado por refutador adversarial, não por leitura minha.
+  #
+  # O ESCAPE, que é o que torna o bloqueio aceitável: `ops/pr-merge-verified.sh <pr>
+  # --dispensa onion-review-verdict --motivo "<por quê>"`, que REGISTRA o que foi
+  # dispensado. Revisor é LLM e erra; a saída para o falso-positivo é dispensa NOMEADA,
+  # nunca gate mudo. E `achados = -1` (não pude contar) jamais bloqueia.
   #
   # A MEDIÇÃO QUE ACOMPANHA: das 40 runs de 2026-08-03 a 08-06, 15 não revisaram — 12
   # são o próprio incidente de credencial de 08-03/04 (branches `diagnose-*`,
@@ -607,9 +647,31 @@ jobs:
     # o vermelho é CERTO — timeout do job dá `failure`, e ali não houve revisão mesmo).
     if: ${{ !cancelled() && github.event.pull_request.head.repo.fork == false }}
     steps:
+      # ⚠️ CHECKOUT — e ele NASCEU de um defeito FATAL achado pela passada adversarial, nao por
+      # leitura minha. Este job viveu ate 2026-09-20 sem arvore, e com razao: so lia
+      # `needs.*.outputs`, que nao precisam de arquivo. O gate de achados introduziu a PRIMEIRA
+      # dependencia de arquivo do repo (`review-verdict.sh --gate`) — e sem checkout o bash sai
+      # `127: No such file or directory`, o `rc != 0` vira `exit 1`, e TODO PR revisado ficaria
+      # vermelho, inclusive os `conforme`, com a mensagem FALSA "apontou 0 violação(ões)".
+      # Medido no parecer: dos ultimos 56 PRs, 44 sairam CONFORME — os 44 teriam sido barrados.
+      # E o agravante que quase deixou isso passar: este PR edita o proprio `onion-review.yml`,
+      # entao a action se auto-pula e o caminho `REVISOU=true` NAO e exercido aqui. O defeito so
+      # apareceria no PR SEGUINTE ao merge, ja em main. [[onion-review-ci-semantics]]
+      # CHECKOUT SIMPLES, nao `sparse-checkout`: o sparse em modo nao-cone com um caminho de
+      # ARQUIVO e mecanismo que eu NAO consigo exercitar localmente — e este achado nasceu
+      # exatamente de introduzir dependencia nova sem medir. Trocar um modo-de-falha conhecido
+      # por um que so o CI revelaria seria repetir o defeito enquanto o curo. O job dura
+      # segundos; `fetch-depth: 1` basta porque o gate so le UM arquivo da arvore.
+      - name: Checkout (o gate lê um script do repo)
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 1
+
       - name: O PR foi revisado semanticamente?
         env:
           REVISOU: ${{ needs.onion-review.outputs.revisou }}
+          ACHADOS: ${{ needs.onion-review.outputs.achados }}
+          PR_NUM: ${{ github.event.pull_request.number }}
           M1: ${{ needs.onion-review.outputs.motivo1 }}
           M2: ${{ needs.onion-review.outputs.motivo2 }}
           RESULT: ${{ needs.onion-review.result }}
@@ -634,7 +696,25 @@ jobs:
             exit 0
           fi
           if [ "${REVISOU}" = "true" ]; then
-            echo "✅ revisão semântica CONFIRMADA neste PR." >> "${GITHUB_STEP_SUMMARY}"
+            # ═══ O ACHADO PASSA A BLOQUEAR (ordem do maestro, 2026-09-20) ═══
+            # MEDIDO antes de ligar: em 33 pareceres, 10 apontaram violação e o parecer era
+            # advisory — o defeito era apontado, mergeado, e FICAVA. Conferi três no vivo
+            # (`_viaja`, `_PAPEL_DESTE_REPO`, `_base_nome`): seguiam em main depois de acusados.
+            #
+            # ⚠️ A DECISÃO VIVE EM SCRIPT, não aqui. Este mesmo arquivo adverte que "o YAML não
+            # tem selftest — foi assim que a máquina quebrada sobreviveu meses parecendo sã".
+            # Ligar um gate novo embutido repetiria o defeito que aquele comentário registra.
+            # `review-verdict.sh --gate` tem bancada (família `review_verdict`); aqui só se encadeia.
+            #
+            # `-1`/vazio (NÃO PUDE CONTAR) não bloqueia: "não revisou" já é o campo `revisou`, e
+            # transformar ignorância em bloqueio é a classe que esta casa mais persegue.
+            rc=0
+            bash .claude/validation/review-verdict.sh --gate "${ACHADOS:--1}" "${PR_NUM:-<pr>}" \
+              >> "${GITHUB_STEP_SUMMARY}" || rc=$?
+            if [ "${rc}" -ne 0 ]; then
+              echo "::error::onion-review apontou ${ACHADOS} violação(ões) — corrija, ou dispense com motivo registrado (ops/pr-merge-verified.sh --dispensa onion-review-verdict --motivo …)."
+              exit 1
+            fi
             exit 0
           fi
           # CASO BENIGNO — e ele existe porque este check ERROU no seu primeiro run real.
