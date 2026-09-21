@@ -1,0 +1,431 @@
+meta:
+  id: typesafe-ai-2026-09
+  schema_version: "1"
+  baseline: 2026-09-21
+  review_after: 2026-10-21   # 30d: o tipo DOMINANTE aqui e FERRAMENTA/PLATAFORMA (modelo em early access,
+                             # precos e rate limits que a propria doc declara mutaveis "without notice").
+                             # A metade capital/mercado pediria 90d, mas o vendor tem 6 DIAS de vida publica
+                             # (launch 2026-09-15) — tudo aqui e cedo por construcao.
+  # kg-backlog-guard: on
+  # ═══ TETO: 25 NÓS. Rodada fechada: cresce só se uma re-medição do mesmo delta emendar um achado. ═══
+  # Desmembramento de https://typesafe.ai/ — o vendor, o modelo (Jev), a superficie tecnica e a RELACAO
+  # com o Onion. Fonte primaria dominante: docs.typesafe.ai/llms-full.txt (903 KB, baixado integral
+  # 2026-09-21) + typesafe.ai (home, manifesto, team, blog de lancamento). Imprensa so para capital.
+  #
+  # ⚠️ FRONTEIRA DE VERIFICACAO DESTA RODADA (declarada, nao escondida): NAO houve chamada a API.
+  # Nao ha TYPESAFE_API_KEY nesta maquina e a rodada nao pediu uma. Portanto TODO numero de
+  # performance/custo/alucinacao aqui e AUTODECLARADO PELO VENDOR — ver E_BENCH_AUTODECLARADO, que
+  # carrega as ressalvas que a propria TypeSafe publica. Nenhum no desta rodada tem plane: PROD.
+  #
+  # Corpus conferido antes de buscar fora (clausula 0), pelo caminho canonico e NAO por grep improvisado:
+  #   bash .claude/validation/kg-corpus-grep.sh typesafe              → 99 grafos · 0 nó(s)
+  #   bash .claude/validation/kg-corpus-grep.sh "decisao calibrada" "System One" RLCD "confidence calibrado"
+  #                                                                   → 99 grafos · 0 nó(s)
+  # (um `grep -rin` no repo inteiro por typesafe|System One Model|RLCD tambem devolveu ZERO.)
+  # Este grafo e a PRIMEIRA entrada do vendor no corpus do Onion — nao ha no previo a corroborar nem a
+  # contradizer, e por isso nao ha SUPERSEDES cross-grafo. Ausencia MEDIDA, nao esquecida.
+  # O radar so enxerga arestas DENTRO de um arquivo: o vinculo com o corpus vai por trace:.
+nodes:
+  - id: Q_TYPESAFE_AI_2026_09
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: 'O que e a TypeSafe AI, o que o Jev faz de fato, e qual a relacao (convergencia, atrito e rivalidade) com o Onion? ABERTA no que a rodada NAO fechou: nenhuma medicao propria da API, nenhuma reproducao de benchmark, nenhum dogfood — ver E_LACUNAS_TYPESAFE_0921.'
+    verified_at: 2026-09-21
+    verified_against: 'rodada de 2026-09-21: docs.typesafe.ai/llms-full.txt integral + 4 paginas de typesafe.ai + 1 busca de capital'
+    trace: 'https://typesafe.ai/'
+
+  # ═══════════════════ O VENDOR E A TESE ═══════════════════
+
+  - id: E_MANIFESTO_GARGALO_E_COMPONIBILIDADE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'https://typesafe.ai/manifesto — lido 2026-09-21'
+    source_tier: 10
+    source_kind: primary
+    label: 'A tese do manifesto NAO e "modelo mais inteligente": e que a inteligencia de hoje e dificil de construir em cima ("the bottleneck isn''t raw intelligence"). A analogia e a "horseless carriage" — a IA atual replica o formato humano (assistente articulado e agradavel) porque assume um humano no loop. A meta declarada e economica e falsificavel: TFP global em 3% ao ano em cinco anos, sustentada por dez.'
+    trace: 'https://typesafe.ai/manifesto'
+
+  - id: E_MACHINE_NATIVE_INTELLIGENCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/introduction/machine-learning-primer — citacao literal do bloco destacado'
+    source_tier: 10
+    source_kind: primary
+    label: 'A aposta nomeada e "Machine Native Intelligence": IA com propriedades DE SOFTWARE — estrutura, confiabilidade, observabilidade, testabilidade, velocidade, consistencia e baixo custo. A projecao que a justifica: automacao em larga escala sera ~99% maquina-para-maquina e ~1% humana. O lema interno: "Building prod, not God".'
+    trace: 'https://docs.typesafe.ai/introduction/machine-learning-primer'
+
+  - id: E_CAPITAL_40M_DCVC
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-09-21
+    valid_from: 2026-09
+    verified_against: 'imprensa concordante em >=4 veiculos (finsmes, theaiinsider, stackfutures, runtimewire) — NAO confirmado em fonte primaria do vendor; typesafe.ai/team diz apenas "top-tier investors" sem nomear'
+    source_tier: 4
+    source_kind: press
+    label: 'Seed de US$ 40M liderado pela DCVC, saindo de ~2 anos de stealth; lancamento publico em 2026-09-15 com avaliacao reportada de US$ 200M (Forbes, fonte nao nomeada). Fundadores: Diogo Almeida (CEO, co-inventor de RLHF/InstructGPT, ex-OpenAI e Google Brain), Sasha Sheng (COO, ex-Meta/FAIR), Erik Gafni (CTO, fundador da Ravel). O time e descrito como vindo de OpenAI, Google Brain, Meta/FAIR, Stripe, Airbnb, Plaid e Docker.'
+    trace: 'https://typesafe.ai/team'
+
+  # ═══════════════════ O MODELO ═══════════════════
+
+  - id: E_SYSTEM_ONE_CLASSE_DE_MODELO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/concepts/system-one — lido integral'
+    source_tier: 10
+    source_kind: primary
+    label: 'System One Model e uma CLASSE de modelo (nome vindo do System 1 de Kahneman: rapido e intuitivo), nao um modelo. Jev e o primeiro e unico exemplar. Ele entende linguagem natural como um LLM, mas NAO escreve texto, NAO produz codigo e NAO explica o proprio raciocinio: avalia um `state` e devolve respostas TIPADAS com distribuicao de probabilidade. O espaco de respostas e definido por quem chama, nao pelo modelo.'
+    trace: 'https://docs.typesafe.ai/concepts/system-one'
+
+  - id: E_RLCD_TERCEIRA_VIA_DE_POS_TREINO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/introduction/machine-learning-primer — as tres cartas RLHF/RLVR/RLCD'
+    source_tier: 10
+    source_kind: primary
+    label: 'RLCD (Reinforcement Learning for Calibrated Decisions) e apresentado como a TERCEIRA via de pos-treino, ao lado de RLHF (que fez chatbots) e RLVR (que fez modelos de raciocinio). O contrato de saida do RLCD: nao gerar texto, devolver decisoes + probabilidades, e probabilidade maior deve corresponder a chance maior de acerto. A critica ao RLHF e especifica: sicofancia, alucinacao com tom confiante, e MODE DROPPING (a preferencia estreita a distribuicao). O argumento tem peso incomum de proveniencia: Diogo Almeida CO-INVENTOU o RLHF que ele agora aponta como inadequado para automacao.'
+    trace: 'https://docs.typesafe.ai/introduction/machine-learning-primer'
+
+  - id: E_CALIBRACAO_E_DE_GRUPO_NAO_DE_RESPOSTA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/introduction/machine-learning-primer e https://docs.typesafe.ai/concepts/system-one — a ressalva aparece nas DUAS paginas'
+    source_tier: 10
+    source_kind: primary
+    label: 'A propria doc declara o limite da calibracao, e ele e o ponto mais importante de ler direito: calibracao e medida SOBRE GRUPOS de previsoes, nao garante nada sobre UMA resposta. "Outcomes assigned a probability of 0.2 should occur about 20% of the time." Ou seja: confidence alto NAO significa resposta certa — significa que, na media de muitas respostas com aquele confidence, a taxa de acerto bate. Quem ler confidence como "certeza desta resposta" esta usando o produto errado.'
+    trace: 'https://docs.typesafe.ai/concepts/system-one'
+
+  - id: E_TRES_PRIMITIVAS_TIPADAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/api e https://docs.typesafe.ai/primitives — request/response literais lidos'
+    source_tier: 10
+    source_kind: primary
+    label: 'A superficie inteira sao TRES primitivas de pergunta, avaliadas em PARALELO contra um mesmo `state`, num unico POST /v1/systemone: (1) NOUL — sim/nao, devolve so um float 0..1, SEM confidence; (2) CHOICE — uma opcao de um conjunto (ate 255), devolve a escolhida + probabilidade de CADA opcao + confidence; (3) SCORE — nota contra niveis ordenados (2 a 10), devolve valor ponderado por probabilidade (pode cair ENTRE niveis, ex. 1.05) + legend + probabilidades + confidence. Cada pergunta e independente: o resultado de uma nao vira contexto oculto de outra.'
+    trace: 'https://docs.typesafe.ai/api'
+
+  - id: E_CONFIDENCE_E_DERIVADO_DA_DISTRIBUICAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/confidence — lido integral, incl. o exemplo de limiar por risco'
+    source_tier: 10
+    source_kind: primary
+    label: 'Confidence nao e um campo a parte que o modelo "acha": e uma estatistica DERIVADA da forma da distribuicao de probabilidades que a resposta ja carrega (concentrada = confiante, espalhada = incerta), colapsada em 0..1 por conveniencia. A doc diz explicitamente que voce nao esta preso a definicao deles — as probabilidades cruas vem na resposta. A doutrina que acompanha: "if an intelligent system, whether human or machine, cannot express honest uncertainty, the system cannot be trusted", e o limiar NAO e um numero unico — escala com a consequencia (ler saldo aceita 0.5; aprovar transferencia exige 0.9).'
+    trace: 'https://docs.typesafe.ai/confidence'
+
+  # ═══════════════════ O QUE O PRODUTO DECLARA DE SI, COM AS RESSALVAS ═══════════════════
+
+  - id: E_PRECO_E_LIMITES_OPERACIONAIS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-21
+    valid_from: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/models — tabela do jev-1.13.0'
+    source_tier: 10
+    source_kind: primary
+    label: 'jev-1.13.0: US$ 42 por bilhao de tokens de ENTRADA (US$ 0,042/Mtok); tokens de SAIDA gratis. Rate limit 250.000 tok/s e 1.200 req/min. Contexto 64k por request (state + TODAS as perguntas) e 32k para state + a pergunta mais longa. Texto apenas — sem imagem, audio ou video. Ingles e a lingua primaria; outras, inclusive CJK, "handled but not equally well" — o que importa para um core que escreve em pt-BR. Sem fine-tune nem LoRA por cliente: os mesmos pesos servem todo mundo, e a customizacao vive no `state` e no `criteria`. A propria doc AVISA que os rate limits mudam sem aviso enquanto absorvem demanda.'
+    trace: 'https://docs.typesafe.ai/models'
+
+  - id: E_BENCH_AUTODECLARADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: 2026-09-21
+    verified_against: 'https://typesafe.ai/ (home) e o blog de lancamento — numeros LIDOS, nao reproduzidos; nenhuma chamada a API nesta rodada'
+    source_tier: 10
+    source_kind: primary
+    label: 'Os numeros de vitrine (193,6x mais RAPIDO · 444,6x mais BARATO — conferidos no HTML cru da home, "193.6x Faster,<br>444.6x Cheaper.", DEPOIS de um resumo automatico ter trocado os dois rotulos · 238x mais barato que Claude Fable 5.1 na entrada · 70-500ms contra 3-329s · "zero alucinacoes") sao AUTODECLARADOS, e o merito do vendor e que ele mesmo publica as ressalvas que os desarmam: os evals de workflow foram criados "por individuos no time de capacidades do modelo"; os ganhos sao "no higher end" do mundo real; as medicoes de latencia saem de laptops na Costa Oeste, onde o servico mora; a demo lado-a-lado usa entrada "curta, densa e detalhada" que "pinta nosso modelo de forma vantajosa"; e o "zero alucinacoes" e declaradamente NAO-EMPIRICO — e conformidade de schema garantida por construcao, o que NAO impede a resposta tipada de estar errada. Tratar como claim de marketing com proveniencia honesta, nunca como medicao independente.'
+    trace: 'https://typesafe.ai/'
+
+  - id: E_LIMITES_DECLARADOS_PELO_VENDOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/models, /concepts/state, /primitives — ressalvas coletadas de 3 paginas'
+    source_tier: 10
+    source_kind: primary
+    label: 'O que Jev declaradamente NAO faz: nao gera string arbitraria, nao escreve codigo, nao conversa, nao aceita imagem/audio/video, nao e determinista (a doc mantem uma FAQ "Is Jev deterministic?"), e a acuracia varia com o tamanho do state — existe uma pagina inteira chamada "Jev 1.13 jaggedness" so para isso. Teto de 255 opcoes por Choice e 10 niveis por Score. Existe um endpoint /v1/models e classes de erro HTTP convencionais (401/422/429/529), com SDKs Python e JavaScript que ja fazem backoff.'
+    trace: 'https://docs.typesafe.ai/models'
+
+  - id: E_QUATRO_PADROES_ARQUITETURAIS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/patterns — tabela dos 4 + as paginas de cada um'
+    source_tier: 10
+    source_kind: primary
+    label: 'A doc canoniza QUATRO padroes, e os nomes merecem atencao porque sao o vocabulario que o vendor esta tentando fixar: (1) SPECULATIVE FAN-OUT — mandar muitas perguntas num request, inclusive especulativas, e o codigo decide o que era relevante (barato porque o state e ingerido UMA vez); (2) CONFIDENCE-GATED ROUTING — confidence como SEGUNDO eixo: a resposta diz o que, o confidence diz SE agir; (3) COMPOSITE SCORING — quebrar um juizo complexo em notas atomicas e combinar com pesos que vivem no SEU codigo; (4) INTENT ROUTING — classificar e rotear para logica deterministica, LLM especialista ou humano.'
+    trace: 'https://docs.typesafe.ai/patterns'
+
+  - id: E_AI_POWERED_SOFTWARE_CONTRA_AGENTES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/concepts/how-to-build-with-system-one — as tres abas de arquitetura'
+    source_tier: 10
+    source_kind: primary
+    label: 'A doc opoe TRES arquiteturas e escolhe a terceira EXPLICITAMENTE contra a segunda: software tradicional (arvore de decisao de primitivas confiaveis) · AGENTES LLM ("every loop introduces another opportunity to go off the rails" — funciona quando ha humano monitorando) · AI-POWERED SOFTWARE (o codigo e dono do fluxo de controle; o modelo aparece SO onde o sistema precisa de senso comum programavel). A instrucao de projeto e literal: "Avoid agent while loops when a software workflow can express the same behavior." Isto NAO e detalhe de doc: e a tese de produto, e ela e adversaria da tese agentica.'
+    trace: 'https://docs.typesafe.ai/concepts/how-to-build-with-system-one'
+
+  - id: E_JEV_NAO_SUBSTITUI_LLM_DE_AGENTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/introduction/coding-agents — pagina dedicada a desfazer exatamente esta confusao'
+    source_tier: 10
+    source_kind: primary
+    label: 'O vendor mantem uma pagina so para BARRAR a leitura errada: Jev NAO e substituto do LLM por tras do Claude Code, Cursor, Codex ou Copilot. Nao existe `model: "jev-latest"` que transforme um agente de codigo em agente Jev — "the two systems solve different problems". O caminho correto e o inverso: use o agente de codigo normalmente para ESCREVER codigo que chama o Jev. Esta evidencia sozinha desarma a pergunta "o Onion trocaria de modelo?" — a resposta e nao, e quem responde e o proprio vendor.'
+    trace: 'https://docs.typesafe.ai/introduction/coding-agents'
+
+  - id: E_SKILL_E_PLUGIN_NO_MARKETPLACE_CLAUDE_CODE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-09-21
+    verified_against: 'https://docs.typesafe.ai/agent-skill — comandos de instalacao literais'
+    source_tier: 10
+    source_kind: primary
+    label: 'A TypeSafe distribui uma AGENT SKILL por marketplace de plugin do Claude Code: `claude plugin marketplace add typesafe-ai/skills` + `claude plugin install typesafe@typesafe-ai`, invocavel como `/typesafe:typesafe-ai`, com auto-update via /plugin e uma via cross-agent por `npx skills add`. A skill existe para dar ao agente de codigo contexto sobre a API, as primitivas e os padroes. Isto e EXATAMENTE a superficie de distribuicao que o Onion usa — e a doc deles ate lista o modo de falha que o Onion ja conhece: "A stale skill can cause this" (o agente inventa campos de request/response).'
+    trace: 'https://docs.typesafe.ai/agent-skill'
+
+  # ═══════════════════ A RELACAO COM O ONION — ANALISE (claims minhas, nao do vendor) ═══════════════════
+
+  - id: C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-09-21
+    verified_against: 'leitura cruzada de docs/knowledge-base/concepts/onion-engine-economy.md §1 e §3 contra E_SYSTEM_ONE_CLASSE_DE_MODELO + E_JEV_NAO_SUBSTITUI_LLM_DE_AGENTE'
+    label: 'Jev NAO e um quarto motor do Onion: ele e a Economia de Motores encontrando um fornecedor para o MOTOR 2 que ate agora so existia como plano (o "SLM-ferramenta via SDAAL", cujo unico caso era o adapter `local-slm` do de-identification, GATED, esperando um adotante regulado com runtime). Encaixa nos tres criterios do motor 2 — tarefa estreita e esquematizada, nunca orquestra, entra atras de adapter. Com DOIS refinamentos que a KB nao previa: (a) nao e SLM local, e API remota, o que inverte o argumento de privacidade que motivava o motor 2; (b) traz uma saida que o Onion nao tinha em motor nenhum — decisao tipada COM incerteza calibrada. O shell devolve exit code (declaracao binaria) e o Transformer devolve prosa; nenhum dos dois devolve "nao sei" mensuravel.'
+    trace: 'docs/knowledge-base/concepts/onion-engine-economy.md'
+
+  - id: C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-21
+    verified_against: 'docs/knowledge-base/concepts/onion-abstraction-doctrine.md §Teste do Eixo e §Teste do Gatilho, aplicados a E_SYSTEM_ONE_CLASSE_DE_MODELO'
+    label: 'Aplicando a Abstraction Doctrine ao proprio achado: decisao-calibrada-como-servico tem HOJE um unico provider real (Jev e declaradamente o primeiro e unico System One Model). Pelo Teste do Eixo, um provider so reprova — o caminho correto e script/uso direto, NAO uma abstracao SDAAL nova. O Teste do Gatilho manda nomear a condicao em vez de pre-cozinhar a costura, e ela e nomeavel: um SEGUNDO fornecedor de decisao tipada com probabilidade calibrada (ou o Jev virar um caminho com consumidor real dentro do core). Enquanto isso nao acontece, escrever um adapter seria o anti-padrao que a propria doutrina cataloga.'
+    trace: 'docs/knowledge-base/concepts/onion-abstraction-doctrine.md'
+
+  - id: C_CONVERGENCIA_A_PIOR_VERDADE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-21
+    verified_against: 'E_CONFIDENCE_E_DERIVADO_DA_DISTRIBUICAO + E_CALIBRACAO_E_DE_GRUPO_NAO_DE_RESPOSTA lidos contra a doutrina Onion de certeza-como-campo'
+    label: 'A convergencia doutrinaria e forte o bastante para ser desconfortavel: o Onion chegou por dor propria a "a pior verdade e aquela que nao temos certeza" e a certeza COMO CAMPO (verified_at, verified_against, source_tier, confidence no proprio .kg.yaml) — e a TypeSafe construiu um MODELO cujo contrato de treino e justamente devolver incerteza honesta como numero. As duas casas usam ate a mesma palavra: `confidence`. A diferenca material e de origem: no Onion o confidence e CARIMBADO por quem escreve o no (declaracao); no Jev ele e DERIVADO da distribuicao que o modelo produziu (medicao). Isso nao torna o do Onion invalido — torna-o de outra especie, e a distincao precisa ficar dita antes que alguem misture os dois numeros numa conta.'
+    trace: 'docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md'
+
+  - id: C_ALVOS_CANDIDATOS_NO_ONION
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-09-21
+    verified_against: 'mapeamento das 3 primitivas (E_TRES_PRIMITIVAS_TIPADAS) contra superficies do core lidas nesta rodada; NENHUM dogfood rodado'
+    label: 'Onde no Onion o formato encaixaria, se encaixar — e o encaixe mais limpo ja existe com o nome pronto: o veredito do /meta:kg-freshness e literalmente um Choice de quatro opcoes (CONFIRMED/DRIFTED/REFUTED/UNVERIFIABLE) hoje produzido por um worker Transformer inteiro por no. Outros candidatos, em ordem decrescente de aderencia: triagem do inbox de co-evolucao (Choice de rota); o aside-router de marcadores tipados, hoje casamento de prefixo por lista — e a classe "guarda por lista falha pelo VOCABULARIO, nao pela logica" e exatamente o modo de falha que um Choice com criteria descritivo ataca; e o censo do backlog. ⚠️ CONTRA-FRONTEIRA INEGOCIAVEL: o kg-radar NAO entra nesta lista. Ele e deterministico e sem-LLM POR PROJETO — e o que REPROVA. Trocar o que reprova por um juizo probabilistico de terceiro destruiria a propriedade que o torna util, e nenhum ganho de custo compra isso.'
+    trace: 'docs/knowledge-base/concepts/onion-engine-economy.md'
+
+  - id: C_ATRITO_O_DADO_SAI_DA_MAQUINA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: 'E_PRECO_E_LIMITES_OPERACIONAIS (API remota, sem fine-tune, ZDR so em enterprise) contra a doutrina de de-identification e o INVARIANTE 0 do Onion pessoal'
+    label: 'O atrito e estrutural, nao de configuracao: usar Jev significa mandar o `state` — que num core de KG E o conteudo dos nos — para um terceiro. Isso colide de frente com a linha que o Onion ja traçou e pagou: no de-identification o provider `none` RECUSA em vez de redigir-e-passar, e no Onion pessoal o INVARIANTE 0 diz que o KG cru nunca sai do device. Zero data retention existe, mas so em plano enterprise. Some-se a isso o ingles como lingua primaria (E_PRECO_E_LIMITES_OPERACIONAIS) contra um core cuja doutrina inteira e escrita em pt-BR, e o custo de adocao deixa de ser o preco por token.'
+    trace: 'docs/knowledge-base/concepts/onion-engine-economy.md'
+
+  - id: C_RIVALIDADE_DE_TESE_NAO_DE_PRODUTO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.75
+    verified_at: 2026-09-21
+    verified_against: 'E_AI_POWERED_SOFTWARE_CONTRA_AGENTES + E_MACHINE_NATIVE_INTELLIGENCE lidos contra a identidade canonica do Onion (orquestracao agentica em .claude/)'
+    label: 'A relacao mais interessante nao e de integracao, e de TESE, e ela e adversaria: a TypeSafe diz "evite loops de agente quando um workflow de software expressa o mesmo comportamento" e projeta 99% maquina-para-maquina. O Onion e um framework de ORQUESTRACAO AGENTICA — sua aposta e que o juizo do Transformer conduzido por spec-as-code vale o custo. As duas teses nao podem estar ambas certas no mesmo territorio. O que DESARMA parcialmente o conflito e que o territorio nao e o mesmo: a TypeSafe mira o caminho de request de PRODUTO (rotear ticket, pontuar risco, classificar em 100ms), e o Onion mira o ciclo de DESENVOLVIMENTO, onde o humano esta no loop por desenho. Mas a fronteira e porosa justamente onde o Onion automatiza juizo sem humano — e e la que a tese rival merece ser medida, nao rebatida.'
+    trace: 'docs/knowledge-base/meta/onion-framework-identity.md'
+
+  - id: C_ESPELHO_DE_DISTRIBUICAO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-21
+    verified_against: 'E_SKILL_E_PLUGIN_NO_MARKETPLACE_CLAUDE_CODE contra o estado publicado do marketplace do Onion'
+    label: 'Um lab de US$ 40M com fundador co-inventor do RLHF escolheu, para alcancar desenvolvedores, EXATAMENTE a superficie que o Onion escolheu: skill + plugin no marketplace do Claude Code, com auto-update e namespace /<plugin>:<skill>. Isso e sinal de mercado sobre a aposta de distribuicao do Onion — e vale como corroboracao externa, nao como novidade. O detalhe util e operacional: eles publicam a skill em repo PROPRIO (typesafe-ai/skills) e oferecem instalacao manual copiando o diretorio inteiro "including its reference files" — o mesmo problema de materializacao que o ciclo de publicacao do Onion resolve por clone e push.'
+    trace: 'docs/knowledge-base/meta/onion-framework-identity.md'
+
+  # ═══════════════════ DECISAO E LACUNAS ═══════════════════
+
+  - id: D_NAO_ADOTAR_AGORA_DOGFOOD_GATED
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-09-21
+    label: 'DECISAO desta rodada: documentar e NAO adotar. Nao escrever adapter (reprovado por C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO), nao alterar motor nenhum, nao abrir superficie. O que a rodada entrega e o mapa. O GATILHO nomeado para reabrir, e ele e unico e mecanico: o maestro querer medir, com chave de API propria, o veredito do /meta:kg-freshness como Choice de 4 opcoes contra um lote de nos ja julgados por worker Transformer — porque esse e o unico alvo em que o Onion JA TEM gabarito para comparar. Sem gabarito nao ha dogfood, so impressao. Ate esse gatilho disparar, este grafo e leitura, nao backlog.'
+    trace: 'docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md'
+
+  - id: E_LACUNAS_TYPESAFE_0921
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-09-21
+    verified_against: 'inventario do que esta rodada NAO fez — ausencia medida, nao esquecida'
+    source_tier: 10
+    source_kind: primary
+    label: 'O que esta rodada NAO verificou, dito antes que alguem assuma que verificou: (1) nenhuma chamada a API — sem chave, sem latencia medida, sem custo real, sem acuracia observada; (2) nenhum benchmark reproduzido — os numeros de E_BENCH_AUTODECLARADO seguem sendo do vendor; (3) a skill typesafe-ai NAO foi instalada nem lida no GitHub, so a pagina que a descreve; (4) o capital (E_CAPITAL_40M_DCVC) vem de imprensa concordante, nao de anuncio primario do vendor nem de registro; (5) o comportamento em pt-BR nao foi testado, e a doc ja avisa que nao-ingles tem acuracia menor — para um core inteiro em pt-BR esta e a lacuna mais cara.'
+    trace: 'https://docs.typesafe.ai/'
+
+edges:
+  - from: E_MANIFESTO_GARGALO_E_COMPONIBILIDADE
+    to: Q_TYPESAFE_AI_2026_09
+    edge_type: SUPPORTS
+  - from: E_MACHINE_NATIVE_INTELLIGENCE
+    to: Q_TYPESAFE_AI_2026_09
+    edge_type: SUPPORTS
+  - from: E_CAPITAL_40M_DCVC
+    to: Q_TYPESAFE_AI_2026_09
+    edge_type: SUPPORTS
+  - from: E_SYSTEM_ONE_CLASSE_DE_MODELO
+    to: Q_TYPESAFE_AI_2026_09
+    edge_type: SUPPORTS
+  - from: E_RLCD_TERCEIRA_VIA_DE_POS_TREINO
+    to: E_SYSTEM_ONE_CLASSE_DE_MODELO
+    edge_type: SUPPORTS
+  - from: E_CALIBRACAO_E_DE_GRUPO_NAO_DE_RESPOSTA
+    to: E_RLCD_TERCEIRA_VIA_DE_POS_TREINO
+    edge_type: CONSTRAINS
+  - from: E_TRES_PRIMITIVAS_TIPADAS
+    to: E_SYSTEM_ONE_CLASSE_DE_MODELO
+    edge_type: SUPPORTS
+  - from: E_CONFIDENCE_E_DERIVADO_DA_DISTRIBUICAO
+    to: E_TRES_PRIMITIVAS_TIPADAS
+    edge_type: SUPPORTS
+  - from: E_QUATRO_PADROES_ARQUITETURAIS
+    to: E_TRES_PRIMITIVAS_TIPADAS
+    edge_type: DEPENDS_ON
+  - from: E_LIMITES_DECLARADOS_PELO_VENDOR
+    to: E_BENCH_AUTODECLARADO
+    edge_type: CONSTRAINS
+  - from: E_BENCH_AUTODECLARADO
+    to: Q_TYPESAFE_AI_2026_09
+    edge_type: SUPPORTS
+  - from: E_PRECO_E_LIMITES_OPERACIONAIS
+    to: Q_TYPESAFE_AI_2026_09
+    edge_type: SUPPORTS
+  - from: E_AI_POWERED_SOFTWARE_CONTRA_AGENTES
+    to: C_RIVALIDADE_DE_TESE_NAO_DE_PRODUTO
+    edge_type: SUPPORTS
+  - from: E_MACHINE_NATIVE_INTELLIGENCE
+    to: C_RIVALIDADE_DE_TESE_NAO_DE_PRODUTO
+    edge_type: SUPPORTS
+  - from: E_JEV_NAO_SUBSTITUI_LLM_DE_AGENTE
+    to: C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL
+    edge_type: SUPPORTS
+  - from: E_SYSTEM_ONE_CLASSE_DE_MODELO
+    to: C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO
+    edge_type: SUPPORTS
+  - from: E_CONFIDENCE_E_DERIVADO_DA_DISTRIBUICAO
+    to: C_CONVERGENCIA_A_PIOR_VERDADE
+    edge_type: SUPPORTS
+  - from: E_CALIBRACAO_E_DE_GRUPO_NAO_DE_RESPOSTA
+    to: C_CONVERGENCIA_A_PIOR_VERDADE
+    edge_type: CONSTRAINS
+  - from: E_TRES_PRIMITIVAS_TIPADAS
+    to: C_ALVOS_CANDIDATOS_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_QUATRO_PADROES_ARQUITETURAIS
+    to: C_ALVOS_CANDIDATOS_NO_ONION
+    edge_type: SUPPORTS
+  - from: E_PRECO_E_LIMITES_OPERACIONAIS
+    to: C_ATRITO_O_DADO_SAI_DA_MAQUINA
+    edge_type: SUPPORTS
+  - from: E_SKILL_E_PLUGIN_NO_MARKETPLACE_CLAUDE_CODE
+    to: C_ESPELHO_DE_DISTRIBUICAO
+    edge_type: SUPPORTS
+  - from: C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO
+    to: D_NAO_ADOTAR_AGORA_DOGFOOD_GATED
+    edge_type: CAUSES
+  - from: C_ATRITO_O_DADO_SAI_DA_MAQUINA
+    to: D_NAO_ADOTAR_AGORA_DOGFOOD_GATED
+    edge_type: CAUSES
+  - from: C_ALVOS_CANDIDATOS_NO_ONION
+    to: D_NAO_ADOTAR_AGORA_DOGFOOD_GATED
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_TYPESAFE_0921
+    to: Q_TYPESAFE_AI_2026_09
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_TYPESAFE_0921
+    to: D_NAO_ADOTAR_AGORA_DOGFOOD_GATED
+    edge_type: CONSTRAINS
+  - from: Q_TYPESAFE_AI_2026_09
+    to: C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL
+    edge_type: TRACES_TO

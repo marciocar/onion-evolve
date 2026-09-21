@@ -1661,6 +1661,7 @@ docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md	C_nao_promover_doutr
 docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md	D_regra_5_portoes	docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml
 docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md	D_sintese_reprovada	docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml
 docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md	D_NAME_DECISION	docs/evolution/research/telescope-doctrine-2026-07/telescope-doctrine.kg.yaml
+docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md	D_NAO_ADOTAR_AGORA_DOGFOOD_GATED	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md	C_engine_decision_reopened	docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml
 docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md	C_engine_weight_hypothesis	docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml
 docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md	C_first_message_never_delivered	docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml
@@ -1721,6 +1722,7 @@ docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md	C_RFC5_SCOPE_NOT_B
 docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md	E_RFC5_TEXT	docs/onion/graph/onion-identity-2026-07.kg.yaml
 docs/evolution/rfc/rfc-0005-scope-inheritance-polymorphism.md	SY4_prod_rfc0005_ratificada	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/scope-convention-2026.md	SY4_prod_scope_convention	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
+docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md	C_CONVERGENCIA_A_PIOR_VERDADE	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md	C_EXIT2_REFORCA_NAO_SUPERA	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
 docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md	C_O_CAMPO_ACHA_DECLARADO_MAIOR_QUE_MEDIDO	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md	C_TESE	docs/onion/graph/doctrine-behavior-over-declaration-2026-07.kg.yaml
@@ -1755,6 +1757,7 @@ docs/knowledge-base/concepts/knowledge-graph-sdaal.md	E_A_PERNA_DE_LEITURA_TEM_P
 docs/knowledge-base/concepts/knowledge-graph-sdaal.md	E_onion_kg_dogfood	docs/onion/graph/company-brain-market-2026-07.kg.yaml
 docs/knowledge-base/concepts/knowledge-graph-sdaal.md	E_recurrence_is_the_data	docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml
 docs/knowledge-base/concepts/knowledge-graph-sdaal.md	Q_EXP_LEITURA_KG_1M	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
+docs/knowledge-base/concepts/onion-abstraction-doctrine.md	C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/knowledge-base/concepts/onion-abstraction-doctrine.md	C_retraction_criterion	docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml
 docs/knowledge-base/concepts/onion-abstraction-doctrine.md	D_NAO_PRE_DESENHAR_PROVIDER_SDAAL_DE_BACKLOG	docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml
 docs/knowledge-base/concepts/onion-abstraction-doctrine.md	D_email_is_script_not_sdaal	docs/evolution/research/email-logto-2026-08/email-logto-2026-08.kg.yaml
@@ -1765,6 +1768,9 @@ docs/knowledge-base/concepts/onion-elenxo-doctrine.md	D_GRADUATED_TO_VENDORED_KB
 docs/knowledge-base/concepts/onion-elenxo-doctrine.md	E_ADOPTER_DID_NOT_KNOW_ELENXO	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 docs/knowledge-base/concepts/onion-elenxo-doctrine.md	E_PATH_SCOPED_SKILL_INVISIBLE	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 docs/knowledge-base/concepts/onion-elenxo-doctrine.md	Q_EXP_ELENXO_3_VS_6_LENTES	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
+docs/knowledge-base/concepts/onion-engine-economy.md	C_ALVOS_CANDIDATOS_NO_ONION	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
+docs/knowledge-base/concepts/onion-engine-economy.md	C_ATRITO_O_DADO_SAI_DA_MAQUINA	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
+docs/knowledge-base/concepts/onion-engine-economy.md	C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/knowledge-base/concepts/onion-guardrails.md	C_ANTI_DRIFT_BY_CONSTRUCTION	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 docs/knowledge-base/concepts/onion-guardrails.md	C_STRUCTURAL_OVER_GATED	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 docs/knowledge-base/concepts/onion-guardrails.md	C_webhook_event_scope_is_guardrail	docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml
@@ -1786,7 +1792,9 @@ docs/knowledge-base/concepts/worklog-protocol.md	E_reusa_state_pointer	docs/onio
 docs/knowledge-base/education/applications/educational-design-guidelines.md	C_OPCAO_B_ARCO_DIATAXIS	docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml
 docs/knowledge-base/education/applications/educational-design-guidelines.md	E_OBJECAO_1_DIATAXIS_NAO_PRESCREVE_ORDEM	docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml
 docs/knowledge-base/meta/onion-framework-identity.md	C_C1	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
+docs/knowledge-base/meta/onion-framework-identity.md	C_ESPELHO_DE_DISTRIBUICAO	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/knowledge-base/meta/onion-framework-identity.md	C_IDENTITY_DRIFT	docs/onion/graph/session-2026-07-18-evolve-review-triage.kg.yaml
+docs/knowledge-base/meta/onion-framework-identity.md	C_RIVALIDADE_DE_TESE_NAO_DE_PRODUTO	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/knowledge-base/meta/onion-framework-identity.md	SY6_ev_identity_kb	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/knowledge-base/patterns/presentation-orchestration.md	D_SHED_CEREMONY	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/knowledge-base/patterns/sdaal-examples.md	C_D7_13	docs/onion/graph/onion-evolution-2026-07.kg.yaml
