@@ -7,7 +7,10 @@ meta:
                              # A metade capital/mercado pediria 90d, mas o vendor tem 6 DIAS de vida publica
                              # (launch 2026-09-15) — tudo aqui e cedo por construcao.
   # kg-backlog-guard: on
-  # ═══ TETO: 25 NÓS. Rodada fechada: cresce só se uma re-medição do mesmo delta emendar um achado. ═══
+  # ═══ TETO: 27 NÓS. Subiu de 25 para 27 em 2026-09-21 pela clausula do proprio teto: uma RE-MEDICAO
+  # do mesmo delta emendou um achado. O experimento de auto-consistencia (25 julgamentos reais, sem
+  # vendor) RESTRINGIU C_ALVOS_CANDIDATOS_NO_ONION — ver E_AUTOCONSISTENCIA_MEDIDA_0921 e
+  # C_JEV_NAO_COBRE_A_PARTE_CARA. Rodada fechada de novo. ═══
   # Desmembramento de https://typesafe.ai/ — o vendor, o modelo (Jev), a superficie tecnica e a RELACAO
   # com o Onion. Fonte primaria dominante: docs.typesafe.ai/llms-full.txt (903 KB, baixado integral
   # 2026-09-21) + typesafe.ai (home, manifesto, team, blog de lancamento). Imprensa so para capital.
@@ -328,8 +331,32 @@ nodes:
     impact: 5
     confidence: 0.8
     verified_at: 2026-09-21
-    label: 'DECISAO desta rodada: documentar e NAO adotar. Nao escrever adapter (reprovado por C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO), nao alterar motor nenhum, nao abrir superficie. O que a rodada entrega e o mapa. O GATILHO nomeado para reabrir, e ele e unico e mecanico: o maestro querer medir, com chave de API propria, o veredito do /meta:kg-freshness como Choice de 4 opcoes contra um lote de nos ja julgados por worker Transformer — porque esse e o unico alvo em que o Onion JA TEM gabarito para comparar. Sem gabarito nao ha dogfood, so impressao. Ate esse gatilho disparar, este grafo e leitura, nao backlog.'
+    label: 'DECISAO desta rodada: documentar e NAO adotar. Nao escrever adapter (reprovado por C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO), nao alterar motor nenhum, nao abrir superficie. GATILHO REESCRITO em 2026-09-21 pela medicao: o gatilho original era "medir o veredito do /meta:kg-freshness como Choice de 4 contra nos ja julgados", e o experimento de auto-consistencia (E_AUTOCONSISTENCIA_MEDIDA_0921) mostrou que esse teste nao decidiria nada — a moda ja acerta 5/5 sem vendor, e o custo mora na MEDICAO, que Jev nao faz (C_JEV_NAO_COBRE_A_PARTE_CARA). O gatilho valido agora e outro, e mais estreito: uma superficie do Onion onde UMA medicao ja feita alimente MUITAS perguntas independentes (o speculative fan-out deles) — o candidato honesto e a triagem do inbox de co-evolucao, onde o arquivo ja esta lido e sobram N classificacoes sobre o mesmo texto. So ai a chave de API responde a uma pergunta que o Transformer sozinho nao responde de graca. Ate esse gatilho disparar, este grafo e leitura, nao backlog.'
     trace: 'docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md'
+
+  - id: E_AUTOCONSISTENCIA_MEDIDA_0921
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-21
+    verified_against: '25 julgamentos REAIS rodados nesta maquina: 5 nos do proprio corpus x 5 repeticoes independentes, um subagente read-only por julgamento, cada um recebendo SO o enunciado (sem ver o status: selado, para nao copiar gabarito)'
+    source_tier: 10
+    source_kind: primary
+    label: 'MEDIDO (nao lido): a auto-consistencia do Transformer como proxy da distribuicao do Jev, sem vendor nenhum. Resultado por no (distribuicao empirica / confidence 1-H/ln4 / gabarito): N1 "contexts vazios" REFUTED 1.0 / 1.00 / superseded · N2 "5 adotantes, zero frio" DRIFTED 1.0 / 1.00 / superseded · N3 "branch two-tier" CONFIRMED 0.6 DRIFTED 0.4 / 0.51 / confirmed · N4 "AUTOMATE pronto" REFUTED 1.0 / 1.00 / refuted · N5 "maestro unico relay" REFUTED 0.8 DRIFTED 0.2 / 0.64 / refuted. A MODA ACERTOU 5 DE 5 — a distribuicao NAO corrigiu veredito nenhum. O que ela entregou foi outra coisa: (a) em N3 o empate expos que o ENUNCIADO e ambiguo, nao que o modelo e fraco — metade dos workers mediu o CORE (onde nao ha branch vendor/adopt/work) e metade mediu um ADOTANTE (gustavo-pulga, onde as 4 existem), e os dois lados mediram certo; (b) em N2 o veredito foi unanime mas a CONTAGEM por baixo dele divergiu (3 workers contaram 14 adotantes, 2 contaram 13, no mesmo members.yaml, por variacao do grep) — dispersao no FATO, invisivel no veredito. Custo: 956.102 tokens de subagente, ~38.244 por julgamento, ~191.220 por no com 5x repeticao.'
+    trace: 'docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md'
+
+  - id: C_JEV_NAO_COBRE_A_PARTE_CARA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-21
+    verified_against: 'inspecao dos 25 campos COMANDO devolvidos pelos workers em E_AUTOCONSISTENCIA_MEDIDA_0921, contra a fronteira que a doc do vendor declara em E_SYSTEM_ONE_CLASSE_DE_MODELO'
+    label: 'CORRECAO ao candidato #1 desta mesma rodada, vinda da medicao propria: no /meta:kg-freshness o custo NAO esta no julgamento, esta na MEDICAO. Os 38k tokens por worker foram gastos saindo e medindo — rodar git branch -a, grep no members.yaml, ls no automation-ladder-registry, abrir o repo de um adotante. Escolher o enum depois disso e a fracao barata. E Jev, por construcao, NAO mede: ele avalia um `state` que VOCE ja montou. Logo ele substituiria so o ultimo passo, que e justamente o que ja sai de graca — e NAO substituiria a exploracao, que e o que custa. O candidato #1 nao esta morto, mas esta REBAIXADO: o desenho que sobreviveria e o inverso do que escrevi (um worker Transformer MEDE e monta o state; Jev julga N perguntas sobre esse state de uma vez, com distribuicao), e ai o ganho e amortizar MUITAS perguntas sobre UMA medicao — que e o padrao speculative fan-out deles, nao o kg-freshness como ele existe hoje.'
+    trace: 'docs/knowledge-base/concepts/onion-engine-economy.md'
 
   - id: E_LACUNAS_TYPESAFE_0921
     node_type: evidence
@@ -341,7 +368,7 @@ nodes:
     verified_against: 'inventario do que esta rodada NAO fez — ausencia medida, nao esquecida'
     source_tier: 10
     source_kind: primary
-    label: 'O que esta rodada NAO verificou, dito antes que alguem assuma que verificou: (1) nenhuma chamada a API — sem chave, sem latencia medida, sem custo real, sem acuracia observada; (2) nenhum benchmark reproduzido — os numeros de E_BENCH_AUTODECLARADO seguem sendo do vendor; (3) a skill typesafe-ai NAO foi instalada nem lida no GitHub, so a pagina que a descreve; (4) o capital (E_CAPITAL_40M_DCVC) vem de imprensa concordante, nao de anuncio primario do vendor nem de registro; (5) o comportamento em pt-BR nao foi testado, e a doc ja avisa que nao-ingles tem acuracia menor — para um core inteiro em pt-BR esta e a lacuna mais cara.'
+    label: 'O que esta rodada NAO verificou, dito antes que alguem assuma que verificou. ⚠️ ATUALIZADO 2026-09-21: o item (1) segue valendo para o VENDOR, mas a rodada deixou de ser puramente de leitura — E_AUTOCONSISTENCIA_MEDIDA_0921 e medicao propria, com 25 julgamentos reais nesta maquina. O que continua nao verificado: (1) nenhuma chamada a API da TypeSafe — sem chave, sem latencia medida, sem custo real, sem acuracia observada do Jev; (2) nenhum benchmark reproduzido — os numeros de E_BENCH_AUTODECLARADO seguem sendo do vendor; (3) a skill typesafe-ai NAO foi instalada nem lida no GitHub, so a pagina que a descreve; (4) o capital (E_CAPITAL_40M_DCVC) vem de imprensa concordante, nao de anuncio primario do vendor nem de registro; (5) o comportamento em pt-BR nao foi testado, e a doc ja avisa que nao-ingles tem acuracia menor — para um core inteiro em pt-BR esta e a lacuna mais cara.'
     trace: 'https://docs.typesafe.ai/'
 
 edges:
@@ -419,6 +446,21 @@ edges:
     edge_type: CAUSES
   - from: C_ALVOS_CANDIDATOS_NO_ONION
     to: D_NAO_ADOTAR_AGORA_DOGFOOD_GATED
+    edge_type: SUPPORTS
+  - from: E_AUTOCONSISTENCIA_MEDIDA_0921
+    to: C_JEV_NAO_COBRE_A_PARTE_CARA
+    edge_type: SUPPORTS
+  - from: C_JEV_NAO_COBRE_A_PARTE_CARA
+    to: C_ALVOS_CANDIDATOS_NO_ONION
+    edge_type: CONSTRAINS
+  - from: E_SYSTEM_ONE_CLASSE_DE_MODELO
+    to: C_JEV_NAO_COBRE_A_PARTE_CARA
+    edge_type: SUPPORTS
+  - from: E_AUTOCONSISTENCIA_MEDIDA_0921
+    to: D_NAO_ADOTAR_AGORA_DOGFOOD_GATED
+    edge_type: SUPPORTS
+  - from: E_QUATRO_PADROES_ARQUITETURAIS
+    to: C_JEV_NAO_COBRE_A_PARTE_CARA
     edge_type: SUPPORTS
   - from: E_LACUNAS_TYPESAFE_0921
     to: Q_TYPESAFE_AI_2026_09

@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**224 itens abertos** em 49 grafo(s) com aberto (de 71 no escopo) · 50 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**225 itens abertos** em 49 grafo(s) com aberto (de 71 no escopo) · 50 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -136,18 +136,19 @@
 | 14.0 | `D_PODA_INSTRUCTION_BLOAT_MEDIDA` | meta-research-lens-2026-09 | DECISAO PROPOSTA (fio proprio, GATED): medir o que do CLAUDE.md/skills/rules carrega SEMPRE vs sob demanda (InstructionsLoaded hoo |
 | 6.3 | `D_BUSCA_COMO_SDAAL_GATED` | meta-research-lens-2026-09 | DECISAO PROPOSTA (GATED): adapter de busca em .claude/utils/search/ (irmao do task-manager: WebSearch nativo default; MCP Exa/Tavi |
 
-## typesafe-ai-2026-09 — 9 item(ns)
+## typesafe-ai-2026-09 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 25.2 | `Q_TYPESAFE_AI_2026_09` | typesafe-ai-2026-09 | O que e a TypeSafe AI, o que o Jev faz de fato, e qual a relacao (convergencia, atrito e rivalidade) com o Onion? ABERTA no que a  |
-| 20.0 | `D_NAO_ADOTAR_AGORA_DOGFOOD_GATED` | typesafe-ai-2026-09 | DECISAO desta rodada: documentar e NAO adotar. Nao escrever adapter (reprovado por C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO), nao  |
+| 24.0 | `D_NAO_ADOTAR_AGORA_DOGFOOD_GATED` | typesafe-ai-2026-09 | DECISAO desta rodada: documentar e NAO adotar. Nao escrever adapter (reprovado por C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO), nao  |
+| 21.2 | `C_JEV_NAO_COBRE_A_PARTE_CARA` | typesafe-ai-2026-09 | CORRECAO ao candidato #1 desta mesma rodada, vinda da medicao propria: no /meta:kg-freshness o custo NAO esta no julgamento, esta  |
 | 13.5 | `C_ATRITO_O_DADO_SAI_DA_MAQUINA` | typesafe-ai-2026-09 | O atrito e estrutural, nao de configuracao: usar Jev significa mandar o `state` — que num core de KG E o conteudo dos nos — pa |
 | 12.8 | `C_CONVERGENCIA_A_PIOR_VERDADE` | typesafe-ai-2026-09 | A convergencia doutrinaria e forte o bastante para ser desconfortavel: o Onion chegou por dor propria a "a pior verdade e aquela q |
+| 12.0 | `C_ALVOS_CANDIDATOS_NO_ONION` | typesafe-ai-2026-09 | Onde no Onion o formato encaixaria, se encaixar — e o encaixe mais limpo ja existe com o nome pronto: o veredito do /meta:kg-fre |
 | 12.0 | `C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL` | typesafe-ai-2026-09 | Jev NAO e um quarto motor do Onion: ele e a Economia de Motores encontrando um fornecedor para o MOTOR 2 que ate agora so existia  |
 | 11.2 | `C_RIVALIDADE_DE_TESE_NAO_DE_PRODUTO` | typesafe-ai-2026-09 | A relacao mais interessante nao e de integracao, e de TESE, e ela e adversaria: a TypeSafe diz "evite loops de agente quando um wo |
 | 10.2 | `C_NAO_VIRA_SDAAL_HOJE_PELO_TESTE_DO_EIXO` | typesafe-ai-2026-09 | Aplicando a Abstraction Doctrine ao proprio achado: decisao-calibrada-como-servico tem HOJE um unico provider real (Jev e declarad |
-| 9.6 | `C_ALVOS_CANDIDATOS_NO_ONION` | typesafe-ai-2026-09 | Onde no Onion o formato encaixaria, se encaixar — e o encaixe mais limpo ja existe com o nome pronto: o veredito do /meta:kg-fre |
 | 6.8 | `C_ESPELHO_DE_DISTRIBUICAO` | typesafe-ai-2026-09 | Um lab de US$ 40M com fundador co-inventor do RLHF escolheu, para alcancar desenvolvedores, EXATAMENTE a superficie que o Onion es |
 
 ## whatsapp-api-2026-07 — 19 item(ns)

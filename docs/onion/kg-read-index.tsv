@@ -1662,6 +1662,7 @@ docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md	D_regra_5_portoes	do
 docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md	D_sintese_reprovada	docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml
 docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md	D_NAME_DECISION	docs/evolution/research/telescope-doctrine-2026-07/telescope-doctrine.kg.yaml
 docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md	D_NAO_ADOTAR_AGORA_DOGFOOD_GATED	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
+docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md	E_AUTOCONSISTENCIA_MEDIDA_0921	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md	C_engine_decision_reopened	docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml
 docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md	C_engine_weight_hypothesis	docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml
 docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md	C_first_message_never_delivered	docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml
@@ -1771,6 +1772,7 @@ docs/knowledge-base/concepts/onion-elenxo-doctrine.md	Q_EXP_ELENXO_3_VS_6_LENTES
 docs/knowledge-base/concepts/onion-engine-economy.md	C_ALVOS_CANDIDATOS_NO_ONION	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/knowledge-base/concepts/onion-engine-economy.md	C_ATRITO_O_DADO_SAI_DA_MAQUINA	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/knowledge-base/concepts/onion-engine-economy.md	C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
+docs/knowledge-base/concepts/onion-engine-economy.md	C_JEV_NAO_COBRE_A_PARTE_CARA	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/knowledge-base/concepts/onion-guardrails.md	C_ANTI_DRIFT_BY_CONSTRUCTION	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 docs/knowledge-base/concepts/onion-guardrails.md	C_STRUCTURAL_OVER_GATED	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 docs/knowledge-base/concepts/onion-guardrails.md	C_webhook_event_scope_is_guardrail	docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml
