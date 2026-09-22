@@ -1,0 +1,103 @@
+meta:
+  id: triagem-inbox-2026-09
+  schema_version: "1"
+  baseline: 2026-09-22
+  review_after: 2026-12-22
+  # Este grafo NÃO é o backlog. O backlog é `docs/onion/graph/fios-abertos.kg.yaml`, que tem
+  # catraca de TETO (19 nós, "onda nova exige onda COLHIDA"). Na triagem de 2026-09-22 o teto já
+  # estava EXATAMENTE em 19 antes de eu chegar — ou seja, o backlog estava cheio e a triagem de
+  # sinal novo não tinha onde pousar. Subir o teto seria furar a catraca por conveniência, que é o
+  # oposto do que ela existe para impedir. Então os fios moram aqui, como CONHECIMENTO datado e
+  # medido, e o maestro promove ao backlog o que escolher quando colher uma onda.
+  # Sem marcador de opt-in da REGRA 62 — de propósito: este grafo não projeta em docs/backlog.md.
+
+nodes:
+  - id: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-09-22'
+    verified_against: 'contagem no fios-abertos.kg.yaml em 2026-09-22: 19 nós no arquivo contra teto declarado de 19; 10 deles open, e nenhum colhível (2 são GATED com gatilho nomeado, 1 tem a metade viva do sinal, 1 é questão aberta)'
+    label: 'A catraca do backlog estava EXATAMENTE no teto (19/19) quando a triagem de 3 sinais chegou. Isso não é acidente desta triagem: é o estado em que o backlog vinha operando, e significa que QUALQUER sinal novo triado nao tinha onde ser registrado sem furar a catraca ou colher uma onda. A catraca funcionou — ela recusou a adicao e forcou esta decisao de onde por o conhecimento — mas o fato de ela estar saturada e informacao de gestao, nao ruido de lint.'
+
+  - id: I_AGENTE_EXPO_RN
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: open
+    verified_at: '2026-09-22'
+    verified_against: 'grep com fronteira de palavra em .claude/agents/ (2026-09-22): ZERO agentes com cobertura Expo/React Native; react-developer com 10 mencoes a shadcn, 2 a Next.js e 0 a RN/Expo/Reanimated/React Compiler, ultima edicao 2026-06-14 (o sinal dizia 07-08 — e ainda mais velho que o declarado); os 2 agentes que casam a busca so citam RN de passagem, como exemplo de stack e item de lista de deteccao'
+    label: 'LACUNA MEDIDA (sinal do jogo-da-vida, 2026-09-08): nao existe agente com competencia Expo/React Native num conjunto de 51. O adotante rodou 4 lotes de app Expo SDK 57 universal e funcionou SO porque o prompt do condutor carregava a doutrina inteira — o conhecimento veio do modelo, nao do agente. Pedido: variante `expo-developer` ou secao RN no react-developer, cobrindo `npx expo install`/expo-doctor, expo-router com fallback no export estatico, react-native-web (aria-* no lugar de accessibilityState), Reanimated 4 (.get()/.set(), so transform/opacity), React Compiler (sem memo manual), Platform.OS confinado a src/platform/, tree shaking do Metro (38% de JS a menos no caso real) e o par Vitest+Playwright. DECISAO DO MAESTRO: variante nova (mais 1 agente no conjunto) ou secao no existente (mantem a contagem, mas mistura duas plataformas num agente ja grande).'
+    trace: 'docs/evolution/inbox/_processed/2026-09-08-agente-expo-react-native.md'
+
+  - id: I_SINK_TOKENS_TO_TS_GENERICO
+    node_type: decision
+    plane: DEV
+    impact: 2
+    confidence: 0.6
+    status: open
+    verified_at: '2026-09-22'
+    verified_against: 'medido no lint-design-tokens.sh em 2026-09-22: os itens 3 (composites), 5 (_candidates/) e 6 (fail-open sem jq) do mesmo sinal ja estao curados, com o sinal citado no proprio codigo; o item 1 nao tem nenhum artefato no core'
+    label: 'ITEM 1 DO SINAL DE 2026-09-07 — o unico dos seis ainda aberto (3, 5 e 6 ja estavam curados quando triei; 2 e 4 foram curados no mesmo dia). O README do design-sink declara "adapter reutilizavel pendente" e agora ha DOIS casos reais: o css duplo do portal e o tokens-to-theme.mjs do app Expo. O adotante forjou a versao completa em Node puro: resolve {alias} dentro de composites, separa foundation de papel por literal-vs-alias, exige paridade claro/escuro e emite `const dark: typeof light` (paridade NO TIPO), com modo --check no lint. POR QUE NAO AGORA: N=2 e o limiar minimo, mas os dois sinks tem alvos diferentes (css-vars vs objeto TS) e generalizar antes do terceiro e catedral — pull-not-push aplicado a minha propria recomendacao. GATILHO NOMEADO: um TERCEIRO sink real, ou o maestro mandar.'
+    trace: 'docs/evolution/inbox/_processed/2026-09-07-design-sink-react-native-segundo-sink.md'
+
+  - id: D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: open
+    verified_at: '2026-09-22'
+    verified_against: 'medicao no kg-radar.sh em 2026-09-22: pagerank/amortecimento = 0 ocorrencias; ciclo|cycle = 0; condicao composta done+PROD = 0; SUPPORTS = 1 (so a string do enum); migalha aparece so em ⚠; validFrom/sourceTier = 11 (CURADO pelo #865); review_after = 12 (lido pela secao VALIDADE); corpus vivo: 4.021 status, 0 fora do enum, 0 drifted'
+    label: 'SINAL DE 2026-09-10 (jogo-da-vida): um adotante foi LER a doutrina do KG para construir um produto em cima dela e conferiu, com arquivo:linha dos dois lados, se ela e verdade no codigo. Nao e, em onze pontos. Re-medido hoje, TRES ja cairam: #6 (bi-temporal) curado pelo PR #865 — o motor le valid_from/source_tier e mede 110 de 110 nos; #7 (review_after) e lido pela secao VALIDADE; e #8 era o INVERSO (a doutrina afirmava que status fora do enum passava sem gate, "11 circulando hoje"; o codigo REPROVA e o corpus tem 4.021 status com ZERO fora) — curado nesta triagem, riscando a linha em vez de apaga-la. RESTAM OITO, e o placar que doi e este: knowledge-graph-sdaal.md:195-196 promete CINCO reprovacoes de integridade e o motor implementa UMA (nos orfaos) — tres ausentes (#2 ciclo DEPENDS_ON, #3 decision done fora de PROD, #4 refuted recebendo SUPPORTS) e uma rebaixada a aviso (#5 migalha pendente). Mais #1 (a atencao e impact x conf x sf x (1+grau) nao-direcionado, nao PageRank ponderado) e #10 (a perna de LEITURA e conselho, nao mecanismo). DECISAO DO MAESTRO, e e de PRODUTO: implementar as quatro reprovacoes que faltam, ou corrigir a KB para dizer o que o motor faz — a lista correta ja esta no cabecalho do proprio motor, kg-radar.sh:27-29.'
+    trace: 'docs/evolution/inbox/_processed/2026-09-10-doutrina-versus-codigo-no-motor-do-kg.md'
+
+  - id: D_LACO_DE_RECONCILIACAO_CONSTRUIDO_E_PARADO
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: open
+    verified_at: '2026-09-22'
+    verified_against: 'varredura do corpus em 2026-09-22: 0 ocorrencias de `status: drifted` em 4.021 campos status de 100 grafos (eram 0 em 3.715 quando o sinal chegou — o corpus cresceu 306 nos e o contador nao saiu do lugar)'
+    label: 'O ACHADO #9 DO SINAL DE 2026-09-10, separado porque nao e bug e sim DESENHO parado: `drifted` e o unico fator de status que SOBE a atencao (1.3 em lib/status-factor.awk) e existe desde 2026-08-06 como saida do /meta:kg-freshness — e o corpus tem ZERO nos com ele. Sem `drifted`, selar um drift so da para RECUSAR (exit 1) ou MENTIR de `refuted`, que zera a atencao justamente do no que acabou de provar que a realidade andou. A auto-avaliacao do proprio core confirma o buraco por outro angulo (company-brain-market-2026-07.kg.yaml, C_three_verbs_selfcheck): /meta:kg-freshness com 0 runs em 34 dias. DECISAO DO MAESTRO: o laco esta parado por falta de GATILHO (ninguem roda o freshness), por falta de CAMINHO (o comando nao se encaixa no fluxo), ou porque `drifted` nao serve e o desenho deve mudar? As tres tem cura diferente, e medir mais nao distingue entre elas — e chamada de produto.'
+
+  - id: D_O_RADAR_NUNCA_EMITIU_SUPERSEDES
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_at: '2026-09-22'
+    verified_against: 'grep -c SUPERSEDES no grafo da rodada 5 = 0; versoes citadas no corpus claude-code-2.1-onion-2026-08 = 2.1.211 a 2.1.233; cc_version da baseline E3 = 2.1.278; kg-radar --freshness nos dois grafos com revisita vencida = 0 nos STALE'
+    label: 'DIVIDA DE AUFHEBUNG MEDIDA (2026-09-22): o comando /meta:radar declara como invariante "write(KG) por rodada: grafo proprio com SUPERSEDES sobre os nos da baseline anterior que a rodada derrubar (Aufhebung)". O grafo da rodada 5, selado em 2026-09-21, tem ZERO arestas SUPERSEDES. A consequencia e visivel no lint: o corpus claude-code-2.1-onion-2026-08 cobre 2.1.211 a 2.1.233 e a baseline E3 hoje e 2.1.278 — 45 versoes a frente —, e a REGRA 67 (Grafo de pesquisa com REVISITA carimbada) acusa revisita vencida que vai VENCER DE NOVO faca-se o que se fizer, porque nenhuma rodada jamais reconciliou o corpus que superou. Os 35 nos daquele grafo tem 0 STALE pelo --freshness: o que venceu foi a DATA do review_after, nao a verdade medida dos nos — o que torna a reconciliacao um ato de MODELAGEM (quais nos a rodada nova derruba), nao de re-medicao. DECISAO DO MAESTRO: reconciliar os 35 nos agora, ou mecanizar o SUPERSEDES na propria rodada do radar para a divida parar de crescer, ou as duas.'
+
+  - id: E_BANCADA_EM_FAIXA_NAO_REPLICA_A_FALHA
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: open
+    verified_at: '2026-09-22'
+    verified_against: 'rodada de 2026-09-22 com --affected-staged --jobs auto (183 familias / 8 workers em 1117s): 1409 passaram, 1 falhou, e a busca no arquivo de saida devolveu a linha do NOME e nada mais; a mesma familia rodada isolada deu 3 passes'
+    label: 'MEDIDO AO VIVO: a bancada em faixa paralela (--jobs auto) imprime, no rodape, apenas o NOME do caso que falhou — sem a saida que o record_fail capturou. O flaky `kg-reverify-schema: selftest` caiu numa rodada de 1409 casos e a unica informacao foi a string do nome. Isto contradiz a licao ja registrada na casa de que "a falha agora carrega a saida": a cura de diagnosticabilidade existe, mas NAO alcanca o caminho da faixa paralela — que e justamente o caminho que o CI e o pre-commit usam. Flaky sem saida capturada e flaky para sempre.'
+
+edges:
+  - from: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM
+    to: I_AGENTE_EXPO_RN
+    edge_type: CONSTRAINS
+  - from: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM
+    to: I_SINK_TOKENS_TO_TS_GENERICO
+    edge_type: CONSTRAINS
+  - from: D_LACO_DE_RECONCILIACAO_CONSTRUIDO_E_PARADO
+    to: D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA
+    edge_type: DEPENDS_ON
+  - from: D_O_RADAR_NUNCA_EMITIU_SUPERSEDES
+    to: D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA
+    edge_type: DEPENDS_ON
+  - from: E_BANCADA_EM_FAIXA_NAO_REPLICA_A_FALHA
+    to: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM
+    edge_type: SUPPORTS

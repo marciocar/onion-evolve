@@ -57,12 +57,16 @@ SSOT** do projeto, não por você (ver contrato em `/design:generate`). Isso man
 candidatas e evita reprovação por descasamento de nomenclatura.
 
 - **Foundations por matiz, com os nomes que o `semantic` da SSOT espera — DERIVE-OS, não os copie
-  daqui**: abra a camada `semantic/` do projeto e liste os alvos de `{alias}`; esses paths SÃO os
-  nomes de foundation que você deve emitir. Num projeto de referência eles eram `brand.orange`/
-  `brand.purple`, `neutral.0/50/100/700/900`, `green|blue|red|amber.500`; noutro (sinal de campo
-  2026-09-07) eram `spark.*`, `area.<n>.*` e `brand.900`, e quem copiou a lista gerou candidata que o
-  gate não conseguia casar. Cores em **`#rrggbb`** (6 dígitos — o gate só computa contraste nesse
-  formato).
+  daqui**: abra a camada `semantic/` do projeto, liste os alvos de `{alias}` e **tire o grupo raiz**.
+  Os alvos vêm como `{color.brand.orange}`; você emite **`brand.orange`**, sem o `color.`, porque o
+  adapter reinsere o grupo ao aninhar em DTCG — emitir o path inteiro gera
+  `color.color.brand.orange` e **todo alias vira órfão** (medido: 12 de 12 HARD). Num projeto de
+  referência os nomes eram `brand.orange`/`brand.purple`, `neutral.0/50/100/300/700/900`,
+  `green|blue|red|amber.500`; noutro (sinal de campo 2026-09-07) eram `spark.*`, `area.<n>.*` e
+  `brand.900`, e quem copiou a lista gerou candidata que o gate não conseguia casar. **A lista é
+  ilustrativa e já esteve errada** — ela omitia `neutral.300`, que o `semantic/` deste repo
+  referencia. Derive; não confie nela. Cores em **`#rrggbb`** (6 dígitos — o gate só computa
+  contraste nesse formato).
 - **Projete para passar os pares declarados** na `governance/contrast-pairs.json` da SSOT (cada par tem seu
   `min` próprio — tipicamente 4.5 para texto e **3.0** para CTA/UI, não um único alvo). Use sua estimativa
   de luminância como heurística; a verdade é do gate.

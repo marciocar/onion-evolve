@@ -36,7 +36,7 @@
 # deixa todo outro `export` intacto — e ele continua reprovando, que é o certo.
 # Comentário não é afetado: `//` e `#` não casam `^[ \t]*export`.
 #
-# Uso  : bash .claude/validation/workflow-syntax-check.sh <script.js|.mjs> [...]
+# Uso  : bash ${CLAUDE_PLUGIN_ROOT}/validation/workflow-syntax-check.sh <script.js|.mjs> [...]
 # Saída: uma linha por arquivo; exit 1 se algum reprovar, 2 se faltar ferramenta.
 # =============================================================================
 set -uo pipefail
