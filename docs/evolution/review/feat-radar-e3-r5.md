@@ -5,6 +5,9 @@ branch: feat/radar-e3-r5
 reviewed_diff_sha256: 9707fb096dc82e2f524cdd7dda110758907a6f8da0a8271c05b5efdd57e3c5f3
 tokens: 185507
 duration_min: 13
+findings_total: 11
+findings_real: 11
+findings_fixed: 11
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >-
