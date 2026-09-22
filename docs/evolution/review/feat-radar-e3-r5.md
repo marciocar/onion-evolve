@@ -2,7 +2,7 @@
 title: 'Resíduo — a rodada parou de fabricar citação e passou a fabricar medição'
 date: 2026-09-21
 branch: feat/radar-e3-r5
-reviewed_diff_sha256: 9707fb096dc82e2f524cdd7dda110758907a6f8da0a8271c05b5efdd57e3c5f3
+reviewed_diff_sha256: 59909f562c4213f882c82aaf080ca98829dbf01fd2c31ca5897a58a37e3b3a5d
 tokens: 185507
 duration_min: 13
 findings_total: 11
