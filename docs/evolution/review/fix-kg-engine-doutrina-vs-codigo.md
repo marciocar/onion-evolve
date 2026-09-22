@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: bc7c0f589605200e72a9f7e520609ecc516e6360ffc39753a12b5e28d265c56e
+reviewed_diff_sha256: "802d13317bd65e0fca3b030d5b00162f15c496d08f767ac2cf6dfdb996778c86"
 findings_total: 7
 findings_real: 7
 tokens: 384000
@@ -101,3 +101,25 @@ números, e só a passada adversarial pega.
 parada desde 2026-07-19. Passivo REAL — a catraca medindo trabalho mergeado que a porta não recebeu,
 não afrouxamento. `onion-core` segue em ZERO. Só cai por re-materialização, que exige o push do
 maestro.
+
+## Depois da revisão — o que os dois commits seguintes acrescentaram
+
+O CI reprovou o 1º commit com 3 HARD que o lint local dava por verdes. **Raiz única:** gerei as
+projeções (`graph.md`, `testing-state.md`) numa árvore que carregava edições NÃO-COMMITADAS de
+outra frente. O grafo leu um pin de `members.yaml` que só existia no meu disco; o painel leu um
+resíduo cuja versão em árvore apaga 10 achados do ledger. **Medir no caminho que eu uso quando o CI
+usa outro é não ter medido** — projeção se gera de worktree destacada no commit.
+
+O `onion-core ANDOU-PARA-TRAS 2 > 0` tinha outra causa e foi curado com verificação: a 15ª
+materialização estava publicada, só o avanço de pin não fora commitado. Conferido no remoto
+(`git ls-remote` → HEAD `28baded9aa5c`), não pela nota que eu mesmo escrevera.
+
+**Erro meu no meio disto, destrutivo:** silenciei o stderr de um `git worktree add` que falhou, e o
+`cp` seguinte copiou um arquivo temporário obsoleto por cima do `graph.md` — 805 linhas apagadas.
+Restaurado de `HEAD` no mesmo movimento. A guarda anti-fail-open do shell existe exatamente para
+isto, e eu a contornei ao redirecionar para `/dev/null`.
+
+**Fica aberto e é do maestro:** `docs/evolution/review/feat-reviewer-findings-block.md` tem na árvore
+uma versão estritamente MAIS VELHA sobrescrevendo a commitada. Não descartei — provei que aquele
+blob não está em nenhum commit da história, então `git checkout --` perderia conteúdo. Cópia
+preservada no scratchpad.
