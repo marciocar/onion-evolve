@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**206 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 47 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**207 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 47 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -109,14 +109,15 @@
 |--:|---|---|---|
 | 43.2 | `Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09` | plugin-directory-landscape-2026-09 | Quais plugins e marketplaces de Claude Code se destacam em 2026-09 e que padroes de desenvolvimento seguem (granularidade 1-grande |
 
-## poda-instruction-bloat-2026-09 — 6 item(ns)
+## poda-instruction-bloat-2026-09 — 7 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 41.6 | `Q_PODA_INSTRUCTION_BLOAT_CORE` | poda-instruction-bloat-2026-09 | O que podar do CLAUDE.md (246 linhas / 17.041 bytes) e das skills do core do Onion para curar o agent instruction bloat (Thoughtwo |
-| 31.5 | `D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS` | poda-instruction-bloat-2026-09 | DECISAO ABERTA (o maestro sela): o que podar do CLAUDE.md e das skills do core, entre (A) mover doutrina para skills/rules por pat |
-| 21.0 | `C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED` | poda-instruction-bloat-2026-09 | OPCAO C — medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento. A favor: e a unica op |
+| 35.0 | `D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS` | poda-instruction-bloat-2026-09 | DECISAO ABERTA (o maestro sela): o que podar do CLAUDE.md e das skills do core, entre (A) mover doutrina para skills/rules por pat |
+| 24.5 | `C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED` | poda-instruction-bloat-2026-09 | OPCAO C — medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento. A favor: e a unica op |
 | 12.0 | `C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH` | poda-instruction-bloat-2026-09 | OPCAO A — mover doutrina para skills/rules por path e deixar o CLAUDE.md so com identidade + roteamento. A favor: e a cura que o |
+| 4.2 | `Q_ARESTA_PARA_CLAUSULA_PARCIALMENTE_MORTA_0921` | poda-instruction-bloat-2026-09 | Que aresta marca um no cuja PREMISSA morreu enquanto o no SEGUE VIGENTE? O vocabulario audit de hoje nao tem o degrau do meio: SUP |
 | 2.8 | `C_OPCAO_D_NAO_PODAR` | poda-instruction-bloat-2026-09 | OPCAO D — nao podar. A favor, e mais forte do que a rodada admitiu: 17.041 bytes sao ~0,5% da janela de 1M, o custo de janela e  |
 | 2.4 | `C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR` | poda-instruction-bloat-2026-09 | OPCAO B — manter o CLAUDE.md e comprimir. A favor: custo zero de arquitetura, nada se move de lugar, nenhum risco de doutrina su |
 
