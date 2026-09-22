@@ -17869,6 +17869,86 @@ edges:
     record_pass "radar-validade: (k) --validade compõe com outros modos (allowlist o conhece)"
   else record_fail "radar-validade: (k)" "forma composta rejeitada (rc=${rc}) — modo fantasma"; fi
   rm -rf "${d}"
+
+  # ── BI-TEMPORAL: o motor passou a LER `valid_from`/`source_tier` (2026-09-22) ─────────────────
+  # POR QUE EXISTE: sinal de campo de um adotante (2026-09-10, item 6) mediu a gramatica prometendo
+  # bi-temporal contra um `grep` de ZERO no motor. A divida CRESCEU entre o sinal e a cura — de 9
+  # para 12 grafos com `valid_from` (116 ocorrencias) mais 349 de `source_tier` —, e eu mesmo
+  # acrescentei `source_tier` a um grafo HORAS antes de ler o sinal. Campo sem consumidor nao e
+  # gramatica, e cerimonia: quem preenche acredita informar o motor, e nao informa.
+  # O CRITERIO so existe porque as duas datas sao DISTINTAS: verificar um fato ANTES de ele passar
+  # a valer e impossivel, e denuncia carimbo copiado ou data trocada. Corpus vivo na cura: 15
+  # grafos com campo bi-temporal, ZERO verificacoes impossiveis.
+  local _bt; _bt="$(mktemp -d)"
+  printf '%s\n' 'meta:
+  id: bt
+  schema_version: "1"
+  baseline: 2026-09-22
+  review_after: 2026-12-01
+nodes:
+  - id: E_SANO
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    valid_from: "2026-01-10"
+    source_tier: 8
+    verified_at: "2026-09-22"
+    label: "fato antigo verificado hoje"
+  - id: E_IMPOSSIVEL
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    valid_from: "2026-09-22"
+    source_tier: 8
+    verified_at: "2026-01-10"
+    label: "verificado ANTES do fato"
+edges:
+  - from: E_IMPOSSIVEL
+    to: E_SANO
+    edge_type: SUPPORTS' > "${_bt}/bt.kg.yaml"
+  local _o; _o="$(bash "${radar}" "${_bt}/bt.kg.yaml" 2>&1 || true)"
+  if LC_ALL=C grep -q 'VERIFICAÇÃO ANTES DO FATO' <<< "${_o}" && LC_ALL=C grep -q 'E_IMPOSSIVEL' <<< "${_o}"; then
+    record_pass "radar-validade: (bt1) verificacao ANTERIOR ao fato e acusada, nomeando o no"
+  else record_fail "radar-validade: (bt1)" "o impossivel passou: $(_emit "${_o}" | head -c 200)"; fi
+  # e o motor tem de DIZER que le os campos — sem isso a cura vira silenciosa outra vez
+  if LC_ALL=C grep -q 'com valid_from' <<< "${_o}" && LC_ALL=C grep -q 'com source_tier' <<< "${_o}"; then
+    record_pass "radar-validade: (bt2) o radar DECLARA quantos nos trazem valid_from/source_tier"
+  else record_fail "radar-validade: (bt2)" "o motor le mas nao declara — campo segue parecendo sem consumidor"; fi
+  # CONTROLE: grafo SEM os campos nao ganha secao (o painel nao vira muro de texto)
+  printf '%s\n' 'meta:
+  id: bt2
+  schema_version: "1"
+  baseline: 2026-09-22
+  review_after: 2026-12-01
+nodes:
+  - id: E_A
+    node_type: evidence
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "sem campo bi-temporal"
+  - id: E_B
+    node_type: evidence
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "idem"
+edges:
+  - from: E_A
+    to: E_B
+    edge_type: SUPPORTS' > "${_bt}/sem.kg.yaml"
+  _o="$(bash "${radar}" "${_bt}/sem.kg.yaml" 2>&1 || true)"
+  if ! LC_ALL=C grep -q 'BI-TEMPORAL' <<< "${_o}"; then
+    record_pass "radar-validade: (bt3) grafo sem os campos nao ganha a secao (painel nao vira muro)"
+  else record_fail "radar-validade: (bt3)" "secao apareceu sem ter o que medir"; fi
+  rm -rf "${_bt}"
+
 }
 
 _family run_radar_validade_selftests
