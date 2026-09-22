@@ -10488,6 +10488,58 @@ run_design_tokens_selftests() {
   if [ "${rc}" -eq 0 ]; then record_pass "design-tokens: contexto ausente → gracioso"
   else record_fail "design-tokens: ausente" "esperava exit 0, veio ${rc}"; fi
   rm -rf "${d}"
+
+  # ── (g) e (h): OS DOIS FUROS QUE SOBRARAM DO SINAL DE 2026-09-07, curados em 2026-09-22 ────────
+  # O adotante mandou SEIS itens; quatro ja tinham sido curados e anunciados em 09-18. Estes dois
+  # ficaram, e ambos sao da classe que esta casa mais persegue: a guarda dizendo OK sobre o que nao
+  # olhou. Os dois foram REPRODUZIDOS antes de curar — sem reproduzir, "curei" e declaracao.
+
+  # (g) `_candidates/` e STAGING (`/design:generate` escreve ali ate o maestro promover), e o gate
+  #     o varria. Dois danos: rascunho quebrado derrubava o projeto, e candidata com o MESMO path
+  #     da foundation so nao vencia porque `_` ordena antes de letra no locale C — acidente, nao
+  #     desenho. Este caso guarda os dois lados: o rascunho nao derruba, E a SSOT continua julgada.
+  d="$(mktemp -d)"; mkdc "${d}"; mkdir -p "${d}/docs/design-context/_candidates"
+  printf '%s' '{"color":{"$type":"color","ink":{"$value":"#1A1714"},"paper":{"$value":"#FFFFFF"},"text":{"$value":"{color.ink}"}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  printf '%s' '{"pairs":[{"fg":"color.text","bg":"color.paper","min":4.5,"note":"ok"}]}' \
+    > "${d}/docs/design-context/governance/contrast-pairs.json"
+  printf '%s' '{ ISTO NAO E JSON' > "${d}/docs/design-context/_candidates/quebrada.tokens.json"
+  printf '%s' '{"color":{"$type":"color","ink":{"$value":"#FEFEFE"}}}' \
+    > "${d}/docs/design-context/_candidates/tentadora.tokens.json"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "design-tokens: (g) rascunho em _candidates/ (quebrado E ilegivel) NAO derruba o gate do projeto"
+  else record_fail "design-tokens: (g) _candidates" "o staging derrubou a SSOT sa (rc=${rc})"; fi
+  # controle positivo NO MESMO caso: o mesmo lixo FORA de _candidates tem de reprovar. Sem ele,
+  # um gate que parasse de olhar QUALQUER coisa passaria aqui como se estivesse curado.
+  printf '%s' '{ ISTO NAO E JSON' > "${d}/docs/design-context/semantic/ruim.tokens.json"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -ne 0 ]; then
+    record_pass "design-tokens: (g2) o MESMO lixo fora de _candidates/ segue reprovando (a exclusao nao cegou o gate)"
+  else record_fail "design-tokens: (g2) controle positivo" "JSON quebrado na SSOT passou — a exclusao cegou o gate"; fi
+  rm -rf "${d}"
+
+  # (h) COMPOSITE (`typography`, `shadow`, `spring`): o `$value` e um OBJETO, entao `paths(scalars)`
+  #     filtrado por `$p[-1]=="$value"` nao casava e o token era PULADO INTEIRO — com ele, os alias
+  #     de dentro. Medido antes da cura: composite com DOIS alias orfaos dava `0 HARD` e exit 0.
+  d="$(mktemp -d)"; mkdc "${d}"
+  printf '%s' '{"color":{"$type":"color","ink":{"$value":"#1A1714"},"paper":{"$value":"#FFFFFF"},"text":{"$value":"{color.ink}"}},"typography":{"heading":{"$type":"typography","$value":{"fontSize":"{size.NAO_EXISTE}"}}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  printf '%s' '{"pairs":[{"fg":"color.text","bg":"color.paper","min":4.5,"note":"ok"}]}' \
+    > "${d}/docs/design-context/governance/contrast-pairs.json"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -ne 0 ]; then
+    record_pass "design-tokens: (h) alias ORFAO dentro de composite REPROVA (antes passava com 0 HARD)"
+  else record_fail "design-tokens: (h) composite" "orfao dentro de composite passou — o furo segue aberto"; fi
+  # e o alias VALIDO dentro de composite nao pode virar falso-positivo
+  printf '%s' '{"color":{"$type":"color","ink":{"$value":"#1A1714"},"paper":{"$value":"#FFFFFF"},"text":{"$value":"{color.ink}"}},"size":{"lg":{"$value":"24"}},"typography":{"heading":{"$type":"typography","$value":{"fontSize":"{size.lg}"}}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "design-tokens: (h2) alias VALIDO dentro de composite nao vira falso-positivo"
+  else record_fail "design-tokens: (h2) falso-positivo" "composite com alias resolvivel reprovou (rc=${rc})"; fi
+  rm -rf "${d}"
+
 }
 
 # ---------------------------------------------------------------------------
