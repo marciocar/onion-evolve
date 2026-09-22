@@ -18434,6 +18434,65 @@ _family run_kg_scope_selftests
 _family run_projection_safety_selftests
 _family run_federation_projection_selftests
 
+# ── workflow-syntax-check: o harness da skill reprovava TODO script valido ─────────────────────
+# POR QUE EXISTE (medido 2026-09-22): a skill `onion-orchestration` mandava rodar
+# `node --input-type=module --check` antes de invocar o Workflow. Esse comando reprovava **2 de 2**
+# scripts validos do corpus com `Illegal return statement` — o corpo de um script Workflow roda
+# DENTRO de uma funcao async, onde `return` no topo e legal, e o `--check` como modulo nao sabe.
+# Guarda cujo vermelho e certo em 100% dos casos ensina a ignorar a guarda, e o preco e o dia em que
+# o vermelho for de verdade. O wrapper espelha o runtime antes de chamar o node.
+run_workflow_syntax_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/workflow-syntax-check.sh"
+  if [ ! -f "${chk}" ]; then record_skip "workflow-syntax: o SUT nao existe (${chk})"; return; fi
+  local d; d="$(mktemp -d)"
+
+  # (a) o CORPUS REAL passa — o caso que o harness antigo reprovava
+  local real rc_real
+  real="$(cd "${REPO_ROOT}" && git ls-files '.claude/workflows/*.js' '.claude/utils/census/*.mjs' 2>/dev/null)"
+  if [ -z "${real}" ]; then
+    record_skip "workflow-syntax: (a) nenhum script Workflow no corpus — NAO VERIFICADO"
+  else
+    # shellcheck disable=SC2086
+    ( cd "${REPO_ROOT}" && bash "${chk}" ${real} ) >/dev/null 2>&1; rc_real=$?
+    if [ "${rc_real}" -eq 0 ]; then
+      record_pass "workflow-syntax: (a) os $(printf '%s\n' ${real} | wc -l) script(s) REAIS do corpus passam"
+    else record_fail "workflow-syntax: (a)" "o corpus valido foi reprovado (rc=${rc_real}) — o falso-negativo voltou"; fi
+  fi
+
+  # (b) `return` no topo (a forma que o runtime EXECUTA) e valido
+  printf '%s\n' 'export const meta = { name: "a", description: "b" }' \
+    'const v = await agent("x")' 'if (!v) return { error: "vazio" }' 'return { ok: 1 }' > "${d}/topo.mjs"
+  if bash "${chk}" "${d}/topo.mjs" >/dev/null 2>&1; then
+    record_pass "workflow-syntax: (b) return no topo do corpo e ACEITO (o runtime o executa)"
+  else record_fail "workflow-syntax: (b)" "reprovou a forma canonica do Workflow"; fi
+
+  # (c) MODO-DE-FALHA: crase perdida em template literal (o defeito que a skill nomeia)
+  printf '%s\n' 'export const meta = { name: "a", description: "b" }' \
+    'const s = `template sem fechar' 'return { ok: 1 }' > "${d}/crase.mjs"
+  # `_o="$(cmd)"` com cmd saindo !=0 MATA a suite sob `set -e` — e o aviso da propria bancada
+  # nomeia este idioma. Capture dentro de `if`, nunca com `; rc=$?`.
+  local _o _rc
+  if _o="$(bash "${chk}" "${d}/crase.mjs" 2>&1)"; then _rc=0; else _rc=1; fi
+  if [ "${_rc}" -ne 0 ] && LC_ALL=C grep -qi 'SyntaxError' <<< "${_o}"; then
+    record_pass "workflow-syntax: (c) crase perdida e ACUSADA, com o erro na saida"
+  else record_fail "workflow-syntax: (c)" "sintaxe quebrada passou: $(_emit "${_o}" | head -c 160)"; fi
+
+  # (d) arquivo AUSENTE e falha declarada, nunca zero silencioso
+  if ! bash "${chk}" "${d}/nao-existe.mjs" >/dev/null 2>&1; then
+    record_pass "workflow-syntax: (d) arquivo ausente REPROVA (nao pude julgar != passou)"
+  else record_fail "workflow-syntax: (d)" "alvo inexistente saiu verde — fail-open"; fi
+
+  # (e) script SEM bloco meta ainda e checado (nao pula calado)
+  printf '%s\n' 'const s = `sem fechar' 'return 1' > "${d}/semmeta.mjs"
+  if ! bash "${chk}" "${d}/semmeta.mjs" >/dev/null 2>&1; then
+    record_pass "workflow-syntax: (e) script sem meta com erro real REPROVA (nao vira no-op)"
+  else record_fail "workflow-syntax: (e)" "sem meta virou passe livre"; fi
+
+  rm -rf "${d}"
+}
+_family run_workflow_syntax_selftests
+
+
 # ---------------------------------------------------------------------------
 # Sumário
 # ---------------------------------------------------------------------------
