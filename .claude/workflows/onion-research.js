@@ -101,8 +101,26 @@ const ELENXO_SCHEMA = { type: 'object', required: ['objections', 'recommendation
   objections: { type: 'array', items: { type: 'object', required: ['target', 'kind', 'survives', 'evidence'], properties: {
     target: { type: 'string' }, kind: { enum: ['finding', 'discarded-by-evidence', 'discarded-by-comodismo'] }, survives: { type: 'boolean' }, evidence: { type: 'string' } } } },
   recommendation: { type: 'string' }, options: { type: 'array', items: { type: 'string' } } } }
+
+// ── a metade que MEDE (a 1a versao desta cura nao media nada) ────────────────────────────────
+// A passada adversarial de 2026-09-22 derrubou o `KG_ANCHOR` como "100% prosa": o comentario
+// afirmava "declaracao nao basta; o retorno e o que prova" e nao havia UMA assercao sobre o
+// caminho devolvido — `kgPath` era `{ type: 'string' }` puro, e o codigo so LOGAVA o que o agente
+// dissesse. O mecanismo estava a mao no mesmo arquivo: `decisionNodeId` ja usa `pattern: '^D_'`.
+// Agora o schema exige `^/` (absoluto) e esta funcao exige que o absoluto TERMINE no relativo
+// pedido — um grafo escrito na worktree errada devolve outro sufixo e o run FALHA, em vez de sair
+// verde sobre o arquivo errado. Teto declarado: o caminho ainda e AUTO-RELATADO pelo agente; isto
+// pega o erro honesto (cwd trocado), nao um agente que minta sobre onde escreveu.
+function kgPathOk(devolvido) {
+  const d = String(devolvido || '')
+  if (!d.startsWith('/')) return 'nao e absoluto: ' + d
+  const alvo = KG_PATH.replace(/^\.\//, '')
+  if (!d.endsWith(alvo)) return 'o absoluto devolvido (' + d + ') NAO termina no caminho pedido (' + alvo + ') — o grafo pode ter nascido noutra worktree'
+  return ''
+}
+
 const KG_SCHEMA = { type: 'object', required: ['kgPath', 'radarExit', 'nodes', 'edges', 'summary'], properties: {
-  kgPath: { type: 'string' }, radarExit: { type: 'integer' }, nodes: { type: 'integer' }, edges: { type: 'integer' }, summary: { type: 'string' },
+  kgPath: { type: 'string', pattern: '^/' }, radarExit: { type: 'integer' }, nodes: { type: 'integer' }, edges: { type: 'integer' }, summary: { type: 'string' },
   decisionNodeId: { type: 'string' }, optionNodeIds: { type: 'array', items: { type: 'string' } }, constrainsEdges: { type: 'integer' } } }
 // modo decisão: o schema EXIGE o nó D_ e as arestas CONSTRAINS — a camada de tool força o agente a produzi-los.
 // (1º dogfood do F3: o patch mirou uma âncora inexistente e o agente NUNCA recebeu o bloco de decisão — 5 nós, 0 D_)
@@ -271,6 +289,7 @@ if (MODE === 'primaries') {
     'Somente saída estruturada.',
     { label: 'write-kg-primarias', phase: 'write(KG)', schema: KG_SCHEMA_PRIMARIES, model: TIER.judge.model, effort: TIER.judge.effort })
   if (!pKg) return { error: 'write(KG) não devolveu resultado — o grafo não foi escrito. Nada selado.', question: QUESTION, anchoredCount: anchored.length, elenxo: pElenxo }
+  { const _e = kgPathOk(pKg.kgPath); if (_e) return { error: 'write(KG): ' + _e, question: QUESTION, kgPath: pKg.kgPath } }
   if (pKg.radarExit !== 0) return { error: 'radar exit ' + pKg.radarExit + ' em ' + pKg.kgPath + ' — grafo escrito mas ILEGÍVEL pelo motor; não conte a rodada como feita.', question: QUESTION, kgPath: pKg.kgPath, radarExit: pKg.radarExit }
   log('write(KG): ' + pKg.kgPath + ' — +' + pKg.nodes + ' nós / +' + pKg.edges + ' arestas, total ' + pKg.nodesTotal + ', radar exit ' + pKg.radarExit)
 
@@ -454,6 +473,7 @@ const kg = await agent(
   { label: 'write-kg', phase: 'write(KG)', schema: (MODE === 'decision' && elenxo) ? KG_SCHEMA_DECISION : KG_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
 if (!kg) return { error: 'write(KG) não devolveu resultado — o grafo não foi escrito. Nada selado.', question: QUESTION, findings: report ? report.findings : [] }
 if (MODE === 'decision' && elenxo && (!kg.decisionNodeId || !(kg.constrainsEdges >= 1))) return { error: 'modo decisão sem nó D_/CONSTRAINS no grafo — o write(KG) não cumpriu o contrato de decisão; nada selado.', question: QUESTION, kgPath: kg.kgPath, radarExit: kg.radarExit }
+{ const _e = kgPathOk(kg.kgPath); if (_e) return { error: 'write(KG): ' + _e, question: QUESTION, kgPath: kg.kgPath } }
 if (kg.radarExit !== 0) return { error: 'radar exit ' + kg.radarExit + ' em ' + kg.kgPath + ' — grafo escrito mas ILEGÍVEL pelo motor; não conte a pesquisa como feita.', question: QUESTION, kgPath: kg.kgPath, radarExit: kg.radarExit }
 log('write(KG): ' + kg.kgPath + ' — ' + kg.nodes + ' nós / ' + kg.edges + ' arestas, radar exit ' + kg.radarExit)
 

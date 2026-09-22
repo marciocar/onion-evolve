@@ -63,7 +63,12 @@ generativo). Independência real: nenhum lê a saída do outro.
 > **path de token**, ex. `color.on-surface.strong`/`color.surface.base`) vêm do projeto. Cada worker varia
 > **só as `foundations`** (a paleta crua), com os **nomes de foundation que o `semantic` DESTE projeto
 > espera** — e esses nomes se **DERIVAM**, nunca se copiam: leia os alvos de `{alias}` na camada
-> `semantic/` da SSOT e use exatamente os paths que aparecem ali. Um adotante seguiu a lista que este
+> `semantic/` da SSOT e **tire o grupo raiz** antes de emitir. Os alvos vêm como
+> `{color.brand.orange}`; o que você emite é **`brand.orange`**, sem o `color.`, porque o adapter
+> (`file-to-tokens.sh`) reinsere o grupo ao aninhar em DTCG. Emitir o path inteiro produz
+> `color.color.brand.orange` e **todo alias vira órfão** — medido em 2026-09-22: 12 de 12 HARD no
+> gate. Esta frase existe porque a primeira versão da cura deste item mandava emitir o path completo
+> e reproduzia, com o prefixo trocado, exatamente o defeito que o sinal relatou. Um adotante seguiu a lista que este
 > texto trazia (`brand.*`/`neutral.*`/`green|blue|red|amber.500`) num projeto cujos foundations eram
 > `spark.*`, `area.<n>.*` e `brand.900` — sinal de campo 2026-09-07, item 2. Exemplo ILUSTRATIVO de UM
 > projeto não é contrato. Derivados os nomes certos, a comparação é justa (mesmos pares para todas)

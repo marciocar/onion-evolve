@@ -84,6 +84,13 @@ UTILS=(
   ".claude/utils/census"
 )
 VALIDATION=(
+  # ⚠️ EMPACOTAR o script que a skill CITA, senão a guarda nasce MORTA no consumidor. Medido em
+  # 2026-09-22: a skill onion-orchestration passou a mandar rodar `workflow-syntax-check.sh` e o
+  # assembler reescreveu o caminho para `${CLAUDE_PLUGIN_ROOT}/validation/…` — mas o arquivo não
+  # estava nesta lista, então o plugin publicava uma instrução para um arquivo inexistente. Nenhum
+  # gate pegava: a REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core) cobre caminho
+  # NU, e este fora reescrito; e o plugin-dead-link-check.sh exclui `${…}` por desenho.
+  ".claude/validation/workflow-syntax-check.sh"
   ".claude/validation/kg-radar.sh"
   ".claude/validation/kg-backlog-project.sh"
   ".claude/validation/kg-fixture-paths.sh"

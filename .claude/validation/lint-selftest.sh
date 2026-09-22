@@ -18452,8 +18452,11 @@ run_workflow_syntax_selftests() {
   if [ -z "${real}" ]; then
     record_skip "workflow-syntax: (a) nenhum script Workflow no corpus — NAO VERIFICADO"
   else
+    # `cmd; rc=$?` sob `set -euo pipefail` MATA a suite — o caso (c) abaixo evita isto e este aqui
+    # nao evitava: um mutante que quebrasse o corpus fazia a bancada ABORTAR antes da soma, e o
+    # `record_fail` logo abaixo virava codigo morto. Achado da passada adversarial de 2026-09-22.
     # shellcheck disable=SC2086
-    ( cd "${REPO_ROOT}" && bash "${chk}" ${real} ) >/dev/null 2>&1; rc_real=$?
+    if ( cd "${REPO_ROOT}" && bash "${chk}" ${real} ) >/dev/null 2>&1; then rc_real=0; else rc_real=1; fi
     if [ "${rc_real}" -eq 0 ]; then
       record_pass "workflow-syntax: (a) os $(printf '%s\n' ${real} | wc -l) script(s) REAIS do corpus passam"
     else record_fail "workflow-syntax: (a)" "o corpus valido foi reprovado (rc=${rc_real}) — o falso-negativo voltou"; fi
@@ -18477,10 +18480,49 @@ run_workflow_syntax_selftests() {
     record_pass "workflow-syntax: (c) crase perdida e ACUSADA, com o erro na saida"
   else record_fail "workflow-syntax: (c)" "sintaxe quebrada passou: $(_emit "${_o}" | head -c 160)"; fi
 
-  # (d) arquivo AUSENTE e falha declarada, nunca zero silencioso
-  if ! bash "${chk}" "${d}/nao-existe.mjs" >/dev/null 2>&1; then
-    record_pass "workflow-syntax: (d) arquivo ausente REPROVA (nao pude julgar != passou)"
-  else record_fail "workflow-syntax: (d)" "alvo inexistente saiu verde — fail-open"; fi
+  # (d) arquivo AUSENTE e falha declarada, nunca zero silencioso — e a MENSAGEM tem de dizer isso.
+  # A 1a versao so exigia rc!=0, e o mutante que apagava a checagem `[ ! -f ]` SOBREVIVIA: o python
+  # falhava ao abrir e o veredito se mantinha por acidente, com mensagem enganosa. Achado da passada
+  # adversarial de 2026-09-22 (A6): guarda cuja linha e deletavel sem a bancada reagir nao esta fixada.
+  local _od _rd
+  if _od="$(bash "${chk}" "${d}/nao-existe.mjs" 2>&1)"; then _rd=0; else _rd=1; fi
+  if [ "${_rd}" -ne 0 ] && LC_ALL=C grep -q 'arquivo ausente' <<< "${_od}"; then
+    record_pass "workflow-syntax: (d) arquivo ausente REPROVA NOMEANDO a causa"
+  else record_fail "workflow-syntax: (d)" "alvo inexistente: rc=${_rd}, saida: $(_emit "${_od}" | head -c 140)"; fi
+
+  # (f) REGRESSAO QUE EU ABRI E O REFUTADOR ACHOU: a 1a cura do contador de chaves tirava `export`
+  # de QUALQUER declaracao de topo, e com isso um `export const z = 1` perdido no corpo — que E
+  # SyntaxError no runtime — passava a valer. A ancora tem de ser estreita (so `export const meta`).
+  printf '%s\n' 'export const meta = { name: "a", description: "b" }' \
+    'export const z = 1' 'return { ok: 1 }' > "${d}/export-no-corpo.mjs"
+  if ! bash "${chk}" "${d}/export-no-corpo.mjs" >/dev/null 2>&1; then
+    record_pass "workflow-syntax: (f) export perdido no CORPO ainda reprova (ancora estreita)"
+  else record_fail "workflow-syntax: (f)" "o strip largo voltou — export ilegal no corpo virou legal"; fi
+
+  # (g) chave desbalanceada em STRING do meta nao degrada o wrapper (o falso negativo do A3)
+  printf '%s\n' 'export const meta = { name: "a", description: "tem { chave solta" }' \
+    'const s = `crase sem fechar' 'return 1' > "${d}/chave-string.mjs"
+  if ! bash "${chk}" "${d}/chave-string.mjs" >/dev/null 2>&1; then
+    record_pass "workflow-syntax: (g) chave em string do meta nao cega o check (erro real pego)"
+  else record_fail "workflow-syntax: (g)" "voltou a contar chaves — corpo vazio, check cego"; fi
+
+  # (h) `export const meta` dentro de COMENTARIO nao reprova script valido (o falso positivo do A3;
+  # nao e hipotetico — o onion-research.js tem 12 linhas de comentario acima do meta)
+  printf '%s\n' '// contrato: escreva `export const meta = {...}` no topo' \
+    'export const meta = { name: "a", description: "b" }' 'return { ok: 1 }' > "${d}/meta-comentario.mjs"
+  if bash "${chk}" "${d}/meta-comentario.mjs" >/dev/null 2>&1; then
+    record_pass 'workflow-syntax: (h) export-const-meta em COMENTARIO nao reprova script valido'
+  else record_fail "workflow-syntax: (h)" "comentario citando o meta derrubou script valido"; fi
+
+  # (i) FERRAMENTA AUSENTE => exit 2 (nao pude julgar), nunca 0 nem 1
+  local _fakebin; _fakebin="$(mktemp -d)"
+  printf '#!/bin/sh\nexit 127\n' > "${_fakebin}/node"; chmod +x "${_fakebin}/node"
+  local _oi _ri
+  if _oi="$(PATH="${_fakebin}:/usr/bin:/bin" bash "${chk}" "${d}/topo.mjs" 2>&1)"; then _ri=0; else _ri=$?; fi
+  rm -rf "${_fakebin}"
+  if [ "${_ri}" -eq 2 ] || LC_ALL=C grep -qi 'NAO PUDE JULGAR\|não pude julgar' <<< "${_oi}"; then
+    record_pass "workflow-syntax: (i) ferramenta quebrada => nao pude julgar (!= passou)"
+  else record_fail "workflow-syntax: (i)" "node quebrado deu rc=${_ri}: $(_emit "${_oi}" | head -c 140)"; fi
 
   # (e) script SEM bloco meta ainda e checado (nao pula calado)
   printf '%s\n' 'const s = `sem fechar' 'return 1' > "${d}/semmeta.mjs"
