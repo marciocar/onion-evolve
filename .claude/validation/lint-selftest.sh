@@ -10519,6 +10519,71 @@ run_design_tokens_selftests() {
   else record_fail "design-tokens: (g2) controle positivo" "JSON quebrado na SSOT passou — a exclusao cegou o gate"; fi
   rm -rf "${d}"
 
+  # (g3) O SHADOWING, que o caso (g) AFIRMAVA e NAO exercitava — achado da passada adversarial.
+  #      A fixture do (g) usa `semantic/`, e no locale C `_candidates` vem ANTES dele: a candidata
+  #      perdia, e a metade "dano (2)" do comentario era inerte. Aqui a foundation mora em `Base/`,
+  #      que ordena ANTES de `_candidates` — entao a candidata VENCE e o contraste despenca para
+  #      1,01:1. Medido: sem a exclusao, rc=1 com `contraste 1.01:1`; com ela, rc=0.
+  #      ⚠️ E isto corrige o proprio comentario da cura: `_candidates` NAO ordena antes de tudo.
+  #      Ordem real no locale C: `00-core/` < `Base/` < `_candidates/` < `atoms/`.
+  d="$(mktemp -d)"; mkdir -p "${d}/docs/design-context/Base" "${d}/docs/design-context/_candidates" "${d}/docs/design-context/governance"
+  printf '%s' '{"color":{"$type":"color","ink":{"$value":"#1A1714"},"paper":{"$value":"#FFFFFF"},"text":{"$value":"{color.ink}"}}}' \
+    > "${d}/docs/design-context/Base/f.tokens.json"
+  printf '%s' '{"pairs":[{"fg":"color.text","bg":"color.paper","min":4.5,"note":"ok"}]}' \
+    > "${d}/docs/design-context/governance/contrast-pairs.json"
+  printf '%s' '{"color":{"$type":"color","ink":{"$value":"#FEFEFE"}}}' \
+    > "${d}/docs/design-context/_candidates/cand.tokens.json"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "design-tokens: (g3) candidata que SOBRESCREVERIA a foundation (Base/ < _candidates/) nao e medida"
+  else record_fail "design-tokens: (g3) shadowing" "a candidata venceu a foundation promovida (rc=${rc})"; fi
+  rm -rf "${d}"
+
+  # (i) A CURA DO COMPOSITE ABRIU UMA REGRESSAO, e a passada adversarial a pegou: a 1a redacao
+  #     escrevia direto em `TOK`, e a sub-chave derivada APAGAVA um token escalar de path igual —
+  #     um orfao que o gate JA PEGAVA passou a passar. Este caso guarda a precedencia: DECLARADO
+  #     vence DERIVADO. Sem ele, a cura de um fail-open volta a abrir outro em silencio.
+  d="$(mktemp -d)"; mkdc "${d}"
+  printf '%s' '{"color":{"$type":"color","ink":{"$value":"#1A1714"},"paper":{"$value":"#FFFFFF"},"text":{"$value":"{color.ink}"}},"typography":{"heading":{"$type":"typography","$value":{"fontSize":"16px"},"fontSize":{"$value":"{size.ORFAO}"}}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  printf '%s' '{"pairs":[{"fg":"color.text","bg":"color.paper","min":4.5,"note":"ok"}]}' \
+    > "${d}/docs/design-context/governance/contrast-pairs.json"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -ne 0 ]; then
+    record_pass "design-tokens: (i) sub-chave de composite NAO apaga token escalar de mesmo path (regressao fechada)"
+  else record_fail "design-tokens: (i) regressao" "o orfao escalar sumiu sob o composite irmao — a cura reabriu o fail-open"; fi
+  rm -rf "${d}"
+
+  # (j) `shadow` com `$value` ARRAY e a forma DTCG do multi-shadow, e `type` de array NAO e
+  #     "object" — entao o filtro so-objeto deixava passar cego justamente o tipo que o comentario
+  #     da cura NOMEIA. Medido: dois orfaos, zero HARD.
+  d="$(mktemp -d)"; mkdc "${d}"
+  printf '%s' '{"color":{"$type":"color","ink":{"$value":"#1A1714"},"paper":{"$value":"#FFFFFF"},"text":{"$value":"{color.ink}"}},"shadow":{"card":{"$type":"shadow","$value":[{"color":"{color.NAO_EXISTE_1}"},{"color":"{color.NAO_EXISTE_2}"}]}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  printf '%s' '{"pairs":[{"fg":"color.text","bg":"color.paper","min":4.5,"note":"ok"}]}' \
+    > "${d}/docs/design-context/governance/contrast-pairs.json"
+  rc=0; bash "${gate}" "${d}" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -ne 0 ]; then
+    record_pass "design-tokens: (j) alias orfao dentro de composite ARRAY (shadow) REPROVA"
+  else record_fail "design-tokens: (j) array" "orfao em \$value array passou — o filtro so-objeto segue cego"; fi
+  rm -rf "${d}"
+
+  # (k) A EXCLUSAO DE `_candidates/` DECLARA o que nao mediu. Guarda que deixa de olhar em silencio
+  #     e a classe que o cabecalho deste gate persegue: uma SSOT inteira mal-colocada ali dava
+  #     `OK ✓` sobre UM arquivo, sem uma palavra.
+  d="$(mktemp -d)"; mkdc "${d}"; mkdir -p "${d}/docs/design-context/_candidates"
+  printf '%s' '{"color":{"$type":"color","ink":{"$value":"#1A1714"},"paper":{"$value":"#FFFFFF"},"text":{"$value":"{color.ink}"}}}' \
+    > "${d}/docs/design-context/semantic/c.tokens.json"
+  printf '%s' '{"pairs":[{"fg":"color.text","bg":"color.paper","min":4.5,"note":"ok"}]}' \
+    > "${d}/docs/design-context/governance/contrast-pairs.json"
+  printf '%s' '{"color":{"$type":"color","x":{"$value":"{NAO.EXISTE}"}}}' \
+    > "${d}/docs/design-context/_candidates/cand.tokens.json"
+  local _out; _out="$(bash "${gate}" "${d}" 2>&1 || true)"
+  if LC_ALL=C grep -q '_candidates/ NÃO medidos' <<< "${_out}"; then
+    record_pass "design-tokens: (k) o gate DECLARA os arquivos de _candidates/ que nao mediu"
+  else record_fail "design-tokens: (k) exclusao muda" "pulou em silencio: $(_emit "${_out}" | head -c 160)"; fi
+  rm -rf "${d}"
+
   # (h) COMPOSITE (`typography`, `shadow`, `spring`): o `$value` e um OBJETO, entao `paths(scalars)`
   #     filtrado por `$p[-1]=="$value"` nao casava e o token era PULADO INTEIRO — com ele, os alias
   #     de dentro. Medido antes da cura: composite com DOIS alias orfaos dava `0 HARD` e exit 0.

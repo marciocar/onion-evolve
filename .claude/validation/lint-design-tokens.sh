@@ -59,13 +59,27 @@ command -v awk >/dev/null 2>&1 || _missing_tool awk
 
 # ⚠️ `_candidates/` FICA FORA, e o motivo tem custo medido por um adotante (sinal de campo
 # 2026-09-07, item 5). Aquele diretorio e STAGING por desenho — `/design:generate` escreve ali as
-# candidatas "ate o maestro escolher e promover" (commands/design/generate.md:43). Varre-lo produz
+# candidatas "ate o maestro escolher e promover" (ver o comando `/design:generate`). Varre-lo produz
 # DOIS danos: (1) um JSON quebrado numa candidata que nem entrou no build derruba o gate do projeto
 # inteiro; (2) TOK e um dicionario chaveado so pelo path, e as candidatas usam os MESMOS paths da
-# foundation (`color.brand.500`) — entao elas so nao vencem a versao promovida porque `_` ordena
-# antes de letra no locale C. Depender da ordem do `sort` para nao medir o rascunho e acidente, nao
-# desenho: bastaria renomear o diretorio para o gate passar a julgar a candidata como se fosse SSOT.
-mapfile -t FILES < <(find "${DC}" -type f -name '*.tokens.json' -not -path '*/_candidates/*' | sort)
+# foundation (`color.brand.500`), e o ULTIMO arquivo vence. A 1a redacao deste comentario dizia que
+# elas "so nao vencem porque `_` ordena antes de letra" — ERRADO, e a passada adversarial mediu: no
+# locale C a ordem e `00-core/` < `Base/` < `_candidates/` < `atoms/`, entao a candidata VENCE
+# qualquer diretorio de inicial maiuscula. Provado com fixture: foundation em `Base/` sobrescrita
+# por candidata derrubava o contraste para 1,01:1 (caso (g3) da bancada). Nao era risco teorico.
+# ⚠️ `LC_ALL=C` NO SORT: sem ele o gate NÃO É DETERMINÍSTICO, apesar de o cabeçalho prometer que
+# é. `TOK` é chaveado por path e o ÚLTIMO arquivo vence, então a ordem decide o valor medido —
+# medido pela passada adversarial: a MESMA árvore dava `rc=0` sob `LC_ALL=C` e `rc=1` sob
+# `en_US.UTF-8`, porque o locale muda a colação de maiúscula/underscore.
+mapfile -t FILES < <(find "${DC}" -type f -name '*.tokens.json' -not -path '*/_candidates/*' | LC_ALL=C sort)
+# ⚠️ E O QUE FICOU DE FORA SE DECLARA. Excluir em SILÊNCIO é a classe que o cabeçalho deste arquivo
+# persegue (`_missing_tool`): guarda que deixou de olhar e não disse. Sem esta linha, uma SSOT
+# inteira mal-colocada sob `_candidates/` produzia `OK ✓` sobre UM arquivo, sem uma palavra.
+mapfile -t SKIPPED < <(find "${DC}" -type f -name '*.tokens.json' -path '*/_candidates/*' | LC_ALL=C sort)
+if [ "${#SKIPPED[@]}" -gt 0 ]; then
+  printf '  ⊘ %s arquivo(s) em _candidates/ NÃO medidos (staging do /design:generate, não SSOT):\n' "${#SKIPPED[@]}"
+  for _s in "${SKIPPED[@]}"; do printf '      %s\n' "${_s#"${PROJECT}/"}"; done
+fi
 if [ "${#FILES[@]}" -eq 0 ]; then
   echo "Nenhum *.tokens.json em ${DC} — nada a validar."; exit 0
 fi
@@ -90,10 +104,22 @@ for f in "${FILES[@]}"; do
   # DUAS coisas de uma vez: torna o alias de dentro visivel para a resolucao da etapa (2), e deixa
   # o composite referenciavel por parte. TETO: nao valida a FORMA do composite (se `typography`
   # tem os campos que a spec DTCG pede) — so a integridade das referencias, que e o que vazava.
+  # ⚠️ NUNCA SOBRESCREVE CHAVE EXISTENTE — e esta linha nasceu de uma REGRESSÃO que eu introduzi
+  # e a passada adversarial pegou. A 1ª redação escrevia direto em `TOK`, e como o laço roda DEPOIS
+  # do escalar, uma sub-chave de composite APAGAVA um token escalar de path idêntico. Medido: um
+  # `typography.heading.fontSize` escalar com alias ORFAO, tendo um composite `typography.heading`
+  # irmão, passava de `HARD: alias órfão` para `exit 0`. Ou seja: a cura de um fail-open ABRIA
+  # outro, da mesma classe, apagando deteccao que ja funcionava. O token DECLARADO vence a
+  # sub-chave DERIVADA, sempre.
+  # ⚠️ `type=="object"` NÃO BASTA: `$value` ARRAY é a forma DTCG do multi-shadow (e de font stacks),
+  # e `type` de array é "array". Sem isto, `shadow` — que o comentário acima NOMEIA — seguia
+  # passando cego: dois órfãos, zero HARD. `paths(scalars)` funciona nos dois, com índice numérico.
   while IFS=$'\t' read -r path val; do
     [ -n "${path}" ] || continue
+    [ -z "${TOK[${path}]+x}" ] || continue
     TOK["${path}"]="${val}"
-  done < <(jq -r 'paths as $p | select($p[-1]=="$value") | select(getpath($p)|type=="object")
+  done < <(jq -r 'paths as $p | select($p[-1]=="$value")
+                  | select((getpath($p)|type) as $t | $t=="object" or $t=="array")
                   | getpath($p) as $o | $o | paths(scalars) as $q
                   | [(($p[:-1] + $q)|join(".")), ($o|getpath($q)|tostring)] | @tsv' "${f}" 2>/dev/null)
 done
