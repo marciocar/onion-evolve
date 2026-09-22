@@ -1,0 +1,274 @@
+meta:
+  id: radar-E3-2026-09-21-r5
+  schema_version: "1"
+  baseline: 2026-09-21
+  review_after: 2026-11-05   # radar de mundo: cadencia 45d (REGRA 65/67)
+  # kg-backlog-guard: on
+  # ═══ TETO: 15 NOS (era 14: +1 pela CURA EXECUTADA apos a passada adversarial — o no-manchete
+  #     estava errado em versao, magnitude e conclusao, e o no que o substitui e acompanhado do
+  #     no de METODO que explica a causa: pular o `kg-corpus-grep` que a research-lens exige) ═══
+  # Rodada 5 do eixo E3 (delta 2.1.261 -> 2.1.278, 15 versoes).
+  # Cresce so por recorrencia medida da mesma classe ou cura executada.
+  #
+  # O QUE DISTINGUE ESTA RODADA DAS ANTERIORES: o processo da sessao E 2.1.278, a versao medida.
+  # A rodada 4 declarou como lacuna "NENHUM comportamento de 2.1.261 foi OBSERVADO" (processo era
+  # 2.1.260). Aqui houve OBSERVACAO no binario vivo — e foi ela, nao o changelog, que produziu o
+  # achado de maior consequencia (E_PULEI_O_CORPUS_E_ISSO_PRODUZIU_O_ACHADO_FALSO).
+  #
+  # METODO E CUSTO: 47 agentes, 3.581.478 tokens, 12 min, 0 erros. 6 eixos em scan (sonnet/medium)
+  # -> juiz adversarial por achado (opus/high, mandato REFUTAR, default REPROVADO).
+  # DESCARTE: 2/41 — contra 18/25 da rodada 4. A queda NAO e sinal de juiz frouxo: e de METODO.
+  # Os scans leram um CHANGELOG LOCAL conferivel verbatim em vez de citar web, e os DOIS achados
+  # reprovados foram justamente os que dependiam de fonte externa. Fonte local verificavel muda a
+  # taxa de fabricacao — isto e aprendizado sobre COMO medir, nao sobre o que mudou.
+  #
+  # BI-TEMPORAL, E A METADE QUE FALTA ESTA DECLARADA: os nos trazem `verified_at` (quando EU
+  # verifiquei) e `source_tier`/`source_kind` (autoridade da fonte), mas NAO trazem `valid_from`
+  # (quando o fato passou a valer). A razao e do artefato, nao do metodo: o changelog local NAO
+  # TRAZ DATA POR VERSAO — so a ordem das versoes. Datar por inferencia seria inventar o campo
+  # que existe para nao inventar. Fica como lacuna nomeada; fechar exige fonte com data (release
+  # notes publicadas ou tag do pacote), que esta rodada nao abriu.
+  #
+  # PASSO DE CORPUS NAO EXECUTADO COMO A LENTE PEDE: a `research-lens` manda rodar
+  # `kg-corpus-grep.sh <tema>` antes de qualquer busca. Eu li o grafo da rodada 4 DIRETAMENTE
+  # (radar-E3-2026-09-04-r4) em vez de grepar o corpus inteiro. Cobriu o eixo E3, mas pode ter
+  # perdido cruzamento com grafos de outros eixos — declarado, nao escondido.
+
+nodes:
+  - id: Q_E3_DELTA_2_1_278
+    node_type: question
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: done
+    owner: core
+    verified_at: '2026-09-21'
+    verified_against: 'Rodada 5 executada em 2026-09-21 com o processo da sessao em 2.1.278 (medido: `claude --version`). Delta de 15 versoes (2.1.263..2.1.278, 799 linhas) extraido do changelog local; 6 eixos em fan-out + juiz adversarial por achado; 39 aprovados / 2 reprovados / 27 lacunas declaradas. Dados em data/f1-scan-juizo.json.'
+    trace: 'docs/onion/radar-baselines.yaml · projeção: docs/evolution/research/radar-E3-2026-09-21-r5/SYNTHESIS.md'
+    label: 'O QUE MUDOU NO CLAUDE CODE ENTRE 2.1.261 E 2.1.278 QUE ALTERA A ADEQUACAO DA ESTRATEGIA DO ONION. RESPOSTA CURTA: dos 39 achados aprovados, 24 sao NADA MUDA e 15 mexem em alguma coisa — mas o de maior consequencia nao veio do changelog lido, e sim de OBSERVAR o binario, que e exatamente o que a rodada anterior nao pode fazer. O eixo que mais rendeu foi PERMISSOES (9), seguido de HOOKS (8) e PLUGINS (7). O `exit 2` deterministico — a capacidade que a doutrina desta casa diz COMPRAR o acoplamento ao Claude Code — segue INALTERADO nesta janela: nenhuma entrada do delta toca o contrato de exit code de hook. Isso e um resultado, nao um nao-achado: a tese do acoplamento continua de pe por medicao, nao por fe.'
+
+  - id: E_TASK_TOOLS_A_FORMA_DO_GATE_MUDOU_O_DESLIGAMENTO_NAO
+    node_type: evidence
+    plane: PROD
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    source_tier: 8
+    source_kind: changelog-local+corpus
+    verified_at: '2026-09-21'
+    verified_against: 'Duas linhas do MESMO changelog local, e a segunda e a que importa: l.646 (2.1.268) "Changed the task-tracking tools ... to be offered only on Claude 3.x, Opus 4.0-4.7, Sonnet 4.0-4.6, Haiku 4.5" e l.1645 (2.1.233) "Todo/task-tracking tools ... are no longer available on Opus 4.8, Sonnet 5, Fable 5, Mythos 5, and newer models; set CLAUDE_CODE_ENABLE_TODO_TOOLS=1". Contagem REAL no repo, excluindo `.claude/worktrees/` (copias transitorias de outros agentes) e com palavra inteira: TodoWrite 83 ocorrencias em 56 arquivos; TaskCreate, TaskUpdate e TaskList ZERO. Medicao de comportamento pelo refutador, em worktree isolada: com `CLAUDE_CODE_ENABLE_TODO_TOOLS=0` e `--model opus`, `TodoWrite` some da lista, e um agente que o declara em `tools:` (`@mermaid-specialist`) RODA SEM ERRO (36.654 tokens, 8,9s).'
+    trace: '.claude/settings.json'
+    label: 'O DELTA AQUI E A FORMA DO GATE, NAO O DESLIGAMENTO — e a versao anterior deste no afirmava o contrário, com numeros inventados. O desligamento das task tools para o lineup desta casa e de 2.1.233, TRINTA E CINCO versoes antes desta janela, e o corpus ja o media por DOGFOOD em 2026-08-16 (`claude-code-2.1-onion-2026-08`, sessao headless com opus-5 respondendo `TASK_TOOLS_AUSENTES`). A 2.1.268 so trocou "off acima de 4.8" por uma allowlist fechada por faixa. CONSEQUENCIA REAL: pequena. O framework nao depende dessas ferramentas — `TaskCreate`/`TaskUpdate`/`TaskList` dao ZERO em `.claude/`, e `TodoWrite` aparece em 83 ocorrencias que sao sobretudo campo `tools:` de agente. Com a variavel desligada a ferramenta some e o artefato NAO quebra: medido. O que fica, e nao e nada: o escape vive no `~/.claude/settings.json` PESSOAL do maestro, entao o comportamento desta maquina difere do de um adotante — diferenca real, consequencia pequena.'
+
+  - id: E_PULEI_O_CORPUS_E_ISSO_PRODUZIU_O_ACHADO_FALSO
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    source_tier: 10
+    source_kind: run-measured
+    verified_at: '2026-09-21'
+    verified_against: 'A `research-lens` (.claude/rules/research-lens.md) manda: "Corpus primeiro: bash .claude/validation/kg-corpus-grep.sh <tema> antes de qualquer busca externa". Nao rodei — li o grafo da rodada 4 direto. O no que virou manchete desta rodada errou a VERSAO (2.1.268 em vez de 2.1.233), errou a MAGNITUDE (551 "ocorrencias" que eram `grep -rl | wc -l`, isto e ARQUIVOS, somando `.claude/worktrees/` de outros agentes, com `TaskList` casando `getTaskList` por substring; o real e 83/0/0/0) e chegou a CONCLUSAO OPOSTA a do corpus, que diz "o FRAMEWORK Onion NAO depende disso". A decisao que eu propus ao maestro — declarar a variavel no repo — e literalmente o que aquele no desaconselha: "religar por reflexo pode PIORAR".'
+    trace: '.claude/rules/research-lens.md'
+    label: 'O PASSO PULADO NAO FOI BUROCRACIA: FOI O QUE CUSTOU O ACHADO-MANCHETE. Tres erros encadeados, todos evitaveis pelo mesmo `kg-corpus-grep` de um comando. E o mais grave nao e nenhum deles isolado, e a DIRECAO: eu propus ao maestro exatamente a acao que o corpus, medindo por dogfood 36 dias antes, havia desaconselhado. Pior ainda, o JUIZ ADVERSARIAL DESTA RODADA ACERTOU — o campo `correcao` do achado em data/f1-scan-juizo.json diz, verbatim, que "o delta face a baseline nao e o desligamento em si (isso o corpus ja mediu em 2.1.233)" — e eu escrevi o no DEPOIS dele, descartando a correcao. Juiz cujo veredito o escritor pode ignorar nao e gate; e opiniao. CLASSE: [[read-full-content-before-triage]] e a metade que falta de [[radar-is-runtime-investigations-born-as-graph]] — o corpus e RUNTIME, nao consulta opcional.'
+
+  - id: E_ULTRAREVIEW_JA_EXISTIA_A_COLISAO_E_DE_CALENDARIO
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    source_tier: 10
+    source_kind: binary-observed+changelog-local
+    verified_at: '2026-09-21'
+    verified_against: 'PROVENIENCIA: `/ultrareview` em 2.1.111 (l.4082), subcomando em l.3853 — FORA da janela. `claude ultrareview --help` no binario 2.1.278, verbatim: "Run a cloud-hosted multi-agent code review of the current branch (or a PR number / base branch) and print the findings", com `--json`, `--post` (posta no PR) e `--no-post` (default). Saida completa em data/claude-help-2.1.278.txt.'
+    trace: 'ops/review-gate-health.sh'
+    label: 'A CAPACIDADE NAO E NOVA, E ISSO DESARMA A NARRATIVA DE COLISAO: `/ultrareview` nasceu na 2.1.111 (changelog l.4082) e o subcomando `claude ultrareview` na l.3853, ambos ANTES da baseline r4. No delta ha so polimento. Logo nao houve movimento do vendor contra o gate desta casa — houve coincidencia de calendario: o gate que torna o parecer do `onion-review` BLOQUEANTE foi mergeado em 2026-09-21 (PR #857) no mesmo dia em que EU descobri o subcomando, que ja estava la havia versoes. `claude ultrareview` faz review multi-agente HOSPEDADO da branch ou de um PR e sabe postar o resultado. A pergunta de adequacao nao e "qual e melhor" — e QUAL DIMENSAO CADA UM COBRE: o `onion-review` revisa contra a CONSTITUICAO deste repo (meta-specs, REGRAS numeradas, doutrina), que nenhum revisor generico conhece; o `ultrareview` traz paralelismo e custo que nao saem do bolso do CI daqui. NAO DECIDO ISSO: fica como decisao aberta para o maestro, com o dado na mao.'
+
+  - id: E_AUTO_MODE_E_UMA_CAMADA_DE_PERMISSAO_QUE_O_ONION_NAO_USA
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    source_tier: 10
+    source_kind: binary-observed
+    verified_at: '2026-09-21'
+    verified_against: '`claude auto-mode defaults` no binario 2.1.278 devolve JSON com 17 regras `allow`, 70 `soft_deny`, 1 `hard_deny` e um bloco `environment` (copia em data/automode-defaults-2.1.278.json). O subcomando expoe ainda `config` (config efetiva) e `critique` (feedback de IA sobre regras proprias). No repo, medido: 18 ENTRADAS de hook em .claude/settings.json / 15 SCRIPTS distintos (session-beacon-hook.sh aparece 3x) / 6 que vetam por `exit 2`. Os tres numeros descrevem populacoes diferentes e o grafo passa a dizer qual.'
+    trace: '.claude/hooks'
+    label: 'O CLAUDE CODE EMBUTE HOJE UMA CAMADA DE PERMISSAO DECLARATIVA COM 88 REGRAS, e o Onion nao a exercita (tem 6 vetos `exit 2` entre 18 entradas de hook / 15 scripts). A sobreposicao e real mas NAO e substituicao, e a diferenca importa: as regras de auto-mode classificam ACOES POR RISCO GENERICO (git destrutivo, deploy em producao, weaken de TLS); os 6 vetos do Onion cobram DOUTRINA DESTA CASA (merge so pelo caminho verificado, commit em main, citacao de REGRA com titulo, forma de veredito no shell) — coisas que nenhuma lista generica conhece. O achado util nao e "migrar", e que existe um `critique` que aceita REGRAS PROPRIAS: ha uma superficie oficial para expressar politica que hoje so existe como shell. Fio aberto, nao decisao.'
+
+  - id: E_RESPAWN_JA_EXISTIA_E_A_CASA_NAO_SABIA
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    source_tier: 10
+    source_kind: binary-observed+changelog-local
+    verified_at: '2026-09-21'
+    verified_against: '`claude respawn --help` no binario 2.1.278, verbatim: "Restart a background session (or all of them) so it picks up the current Claude binary." Aceita `<id>` ou `--all` e NENHUMA opcao. PROVENIENCIA medida no changelog: introduzido em 2.1.251 (l.1106), corrigido em 2.1.145 (l.3344) — FORA desta janela. Teto confirmado por refutador: nem o `--help`, nem `claude --help` l.285, nem o changelog abrem caminho para sessao em PRIMEIRO PLANO.'
+    trace: 'docs/onion/radar-baselines.yaml'
+    label: 'O COMANDO JA EXISTIA — O QUE ERA NOVO ERA A MINHA IGNORANCIA, e isso muda o que este no vale. `respawn` entrou no `claude --help` na 2.1.251 (changelog l.1106) e ja tinha correcao em 2.1.145 (l.3344): estava disponivel DURANTE a rodada 4 e DURANTE a sessao de 2026-09-20 que tratou a deriva de versao como se nao tivesse saida. No delta de 799 linhas a palavra aparece UMA vez, sobre outro assunto. Registro como achado de USO, nao de delta: a casa gastou uma decisao do maestro (quando encerrar a sessao) num problema que tinha comando. A REGRA 65 acusou a sessao inteira que o processo rodava 2.1.276 com 2.1.278 no disco, e a unica saida conhecida era encerrar e reabrir — o que custou contexto e obrigou o maestro a decidir QUANDO fechar. `claude respawn` reinicia sessao de BACKGROUND para pegar o binario atual. TETO DECLARADO, e ele e o que impede isto de virar promessa: o texto fala em sessao de background; NAO medi se alcanca a sessao interativa em primeiro plano, que era o caso real. Gatilho para fechar a lacuna: a proxima deriva de versao — tentar `respawn` antes de propor `/exit`.'
+
+  - id: E_PLUGIN_DIR_ACEITA_ARVORE_DE_VARIOS_PLUGINS
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    source_tier: 8
+    source_kind: changelog-local
+    verified_at: '2026-09-21'
+    verified_against: 'CHANGELOG-LOCAL 2.1.265 (aprovado pelo juiz com a fonte aberta). O repo publica 5 plugins na mesma arvore: plugins/onion, onion-engineering, onion-product, onion-compliance, onion-design.'
+    trace: 'plugins'
+    label: '`--plugin-dir` passou a aceitar uma PASTA COM VARIOS PLUGINS (cada subpasta com seu manifesto), que e exatamente a topologia que o `onion-plugins` ja publica. Ganho concreto e pequeno: testar os 5 plugins de uma vez, sem apontar um a um. Nao muda desenho — reduz atrito de dogfood.'
+
+  - id: E_PLUGIN_EVAL_E_CANDIDATO_A_GATE_DE_PUBLICACAO
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    source_tier: 8
+    source_kind: changelog-local
+    verified_at: '2026-09-21'
+    verified_against: 'CHANGELOG-LOCAL 2.1.269 (aprovado pelo juiz). O `claude --help` de 2.1.278 lista `plugin` como subcomando.'
+    trace: 'plugins'
+    label: '`claude plugin eval` traz suite de avaliacao de plugin com resultado PONTUADO e REPRODUZIVEL. Esta casa publica 5 plugins num marketplace publico e hoje o gate de publicacao e o lint + a bancada do CORE — nada mede o plugin COMO PLUGIN, do lado de quem instala. Candidato a gate pre-publish. GATILHO NOMEADO (nao pre-cozinhar): a proxima publicacao no marketplace; ali se roda `plugin eval` antes e se decide pela medicao, nao por esta nota.'
+
+  - id: E_WORKFLOW_GANHOU_RETOMADA_E_FALHA_EXPLICITA
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    source_tier: 8
+    source_kind: changelog-local
+    verified_at: '2026-09-21'
+    verified_against: 'CHANGELOG-LOCAL 2.1.265 (resume com run journal ausente passa a FALHAR explicito em vez de re-executar todos os agentes em silencio) e 2.1.271 (dynamic workflow que bate o limite de uso PAUSA e retoma, em vez de descartar os agentes afetados). Os dois aprovados pelo juiz com a fonte aberta.'
+    trace: '.claude/skills/onion-orchestration/SKILL.md'
+    label: 'DUAS CURAS NO SUBSTRATO QUE A ORQUESTRACAO DESTA CASA USA EM TODA PESQUISA — e ambas sao da classe que o Onion mais persegue: FALHA SILENCIOSA VIRANDO FALHA QUE FALA. (1) Resume com journal ausente re-executava TODOS os agentes sem dizer; agora falha explicito. A skill `onion-orchestration` vende retomada como o ganho MAIOR de escrever o script em arquivo — essa promessa ficou honesta. (2) Fan-out que batia limite de uso DESCARTAVA agentes; agora pausa e continua. Esta rodada gastou 47 agentes e 3,58M tokens num unico run: sem essa cura, um teto batido no meio teria perdido trabalho ja pago.'
+
+  - id: E_EXIT_2_INALTERADO_NA_JANELA
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    source_tier: 8
+    source_kind: changelog-local-absence
+    verified_at: '2026-09-21'
+    verified_against: 'Lacuna declarada pelo worker do eixo HOOKS, verbatim: "Nao encontrei nenhuma entrada no delta 2.1.263->2.1.278 que mude o contrato de exit code de hooks (0/2/outro)". Os 8 achados aprovados do eixo tocam tipo `prompt` de Stop hook, timeout de SessionEnd, PermissionRequest em --print e matcher de SubagentStop — nenhum toca o veto por exit 2.'
+    trace: 'docs/onion/graph/onion-identity-2026-07.kg.yaml'
+    label: 'AUSENCIA MEDIDA E RESULTADO, NAO SILENCIO. A doutrina de identidade deste repo diz que o `exit 2` deterministico de hook — que barra a acao inclusive sob `bypassPermissions` — e A CAPACIDADE QUE COMPRA o acoplamento ao Claude Code. Em 15 versoes, NADA no delta toca esse contrato. Vale dizer o que isto cobre e o que nao: cobre a JANELA medida, por leitura de changelog; nao e prova de estabilidade futura nem substitui observar o veto ao vivo (que esta sessao nao re-mediu — o ultimo veto observado foi em 2026-09-02).'
+
+  - id: E_TIMEOUT_AUSENTE_EM_7_HOOKS_INCLUINDO_VETOS
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    source_tier: 10
+    source_kind: repo-measured
+    verified_at: '2026-09-21'
+    verified_against: 'Medicao do JUIZ ao refutar um achado do scan: 11 de 18 ENTRADAS de hook em `.claude/settings.json` declaram `timeout`; 7 nao — session-degraded-notice, bash-empty-result-guard, pretooluse-protect-main, pretooluse-merge-gate, kg-read-leg, instructions-loaded-log, rule-title-in-prose. Contexto: a 2.1.268 corrigiu `CLAUDE_CODE_SESSIONEND_HOOKS_TIMEOUT_MS` nao estender hooks sem `timeout` proprio.'
+    trace: '.claude/settings.json'
+    label: 'O JUIZ ADVERSARIAL ACHOU UM DEFEITO DO REPO AO DERRUBAR UM ACHADO SOBRE O VENDOR — e o caminho importa. O scan alegou que existe um "padrao do Onion de timeout explicito por hook" e que a correcao do vendor o VALIDAVA. O juiz mediu: o padrao NAO EXISTE. O SessionEnd escapou por acaso, nao por doutrina. E dos 7 sem `timeout`, DOIS sao os vetos `exit 2` de PreToolUse (protect-main, merge-gate) — as guardas mais consequentes da casa herdam um default do vendor que ninguem escolheu, e que esta janela mostrou ser terreno instavel (mudou num patch). Sem incidente ate hoje; candidato a guarda de lint que exija `timeout` explicito em hook de VETO.'
+
+  - id: E_CONTENCAO_DE_CUSTO_E_TEMA_DO_VENDOR_NA_JANELA
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    source_tier: 8
+    source_kind: changelog-local
+    verified_at: '2026-09-21'
+    verified_against: 'Tres mecanismos no delta, aprovados pelo juiz com uma correcao de versao: default de dynamic workflow menor (2.1.271, small em Pro; medium 15->10 agentes, ORIENTACAO e nao limite), prazo maximo em Monitor (2.1.271, max 10 min em runs -p de prompt unico) e chargeback com `multiplier` ate 10 em `modelPricing` (2.1.271).'
+    trace: 'docs/knowledge-base/concepts/agent-orchestration.md'
+    label: 'O VENDOR PASSOU A CONTER CUSTO DE FAN-OUT EM TRES FRENTES NA MESMA JANELA. Para esta casa isso e sinal de direcao, nao regra a obedecer: a regua declarada aqui e [[efficiency-over-economy]] — "nao queremos economia, queremos eficiencia e eficacia" —, e o default menor de workflow e ORIENTACAO, nao teto (um script que pede 15 agentes continua pedindo 15; esta rodada pediu 47 e rodou). O que MUDA de fato e o prazo maximo de Monitor em runs `-p`: a ferramenta que as instrucoes de ambiente recomendam para esperar condicao passou a ter teto, e quem espera algo mais longo precisa re-armar.'
+
+  - id: E_MERCADO_E3_R5_SINAL_FRACO
+    node_type: evidence
+    plane: DEV
+    impact: 2
+    confidence: 0.6
+    status: confirmed
+    source_tier: 4
+    source_kind: web-secondary
+    verified_at: '2026-09-21'
+    verified_against: 'Eixo mercado/capital: 3 achados aprovados e 1 dos 2 REPROVADOS da rodada inteira caiu aqui (bonus de credito de concorrente, fonte externa que o juiz abriu e nao sustentou). Nenhuma rodada de investimento, M&A ou down round no periodo.'
+    trace: 'docs/onion/radar-sources.yaml'
+    label: 'MERCADO SEGUE SEM SINAL FORTE, e o eixo concentrou metade dos descartes da rodada. Isso repete E_MERCADO_E3_R4_SEM_SINAL e sugere algo sobre o METODO, nao sobre o mundo: o eixo mercado e o unico que nao tem fonte LOCAL conferivel, entao e onde a fabricacao ainda cabe. O invariante da casa ([[follow-the-money-e-eixo-de-pesquisa]]) manda manter o worker de mercado no fan-out; a leitura honesta e que ele precisa de roster de fonte melhor, nao de mais rodadas.'
+
+  - id: E_A_FABRICACAO_MUDOU_DE_PORTA_NAO_CAIU
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    source_tier: 10
+    source_kind: run-measured
+    verified_at: '2026-09-21'
+    verified_against: 'Descarte desta rodada: 2/41; rodada 4: 18/25. Mas a leitura simples NAO sobrevive a medicao: dos dois reprovados, APENAS UM era de fonte externa. O outro (EIXO 2, plugins) teve a citacao CONFERIDA E APROVADA no changelog local — o juiz o reprovou, verbatim, porque a consequencia carregava "uma verificacao-ao-vivo FABRICADA". E a passada adversarial achou MAIS DUAS fabricacoes da mesma especie que passaram pelo juiz (as contagens do no-manchete; a atribuicao de tipo ao Stop hook do repo).'
+    trace: 'docs/evolution/research/radar-E3-2026-09-21-r5/data/f1-scan-juizo.json'
+    label: 'A FABRICACAO NAO CAIU — ELA MUDOU DE PORTA, e a versao anterior deste no celebrava a queda sem ver isso. Com fonte local a CITACAO fica conferivel por `grep`, e de fato nenhum achado desta rodada inventou changelog. So que a mesma pressao reapareceu na MEDICAO DO REPO: contar `grep -rl | wc -l` (arquivos) e publicar como "ocorrencias", somar `.claude/worktrees/` de outros agentes, casar `TaskList` dentro de `getTaskList`. Tres fabricacoes desta especie nesta rodada; o juiz pegou UMA (plugins, reprovada) e deixou DUAS passarem — porque o no-manchete foi escrito DEPOIS dele. CONSEQUENCIA PARA O RADAR, e ela e o oposto do que eu tinha escrito: o artefato local conserta a citacao e NAO conserta a medicao. O juiz precisa ser duro onde o achado afirma algo sobre ESTE REPO — que e justamente onde ele nao rodou. E o escritor do grafo nao pode ser o ultimo a falar depois do juiz.'
+
+  - id: D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    owner: maestro
+    trace: 'docs/onion/radar-baselines.yaml'
+    label: 'TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config PESSOAL do maestro. Opcoes — (a) declarar `CLAUDE_CODE_ENABLE_TODO_TOOLS=1` no `.claude/settings.json` do repo, que o adopt leva junto; (b) tirar a dependencia da superficie; (c) deixar como esta e declarar o teto. A (a) e barata e fecha o buraco do adotante, mas fixa no repo uma variavel do VENDOR que pode sumir. (2) ULTRAREVIEW: manter o revisor proprio (que conhece as REGRAS numeradas), adotar o do vendor (paralelo e fora do custo do CI daqui), ou os dois com papeis separados. A decisao tem data porque o gate proprio virou bloqueante HOJE. (3) TIMEOUT NOS VETOS: os dois PreToolUse que barram merge/commit nao declaram `timeout`; virar guarda de lint ou aceitar o default do vendor. GATILHO: nenhum e urgente; o (1) fica urgente no proximo `/meta:adopt`.'
+
+edges:
+  - from: E_TASK_TOOLS_A_FORMA_DO_GATE_MUDOU_O_DESLIGAMENTO_NAO
+    to: Q_E3_DELTA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_PULEI_O_CORPUS_E_ISSO_PRODUZIU_O_ACHADO_FALSO
+    to: Q_E3_DELTA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_ULTRAREVIEW_JA_EXISTIA_A_COLISAO_E_DE_CALENDARIO
+    to: Q_E3_DELTA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_AUTO_MODE_E_UMA_CAMADA_DE_PERMISSAO_QUE_O_ONION_NAO_USA
+    to: Q_E3_DELTA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_RESPAWN_JA_EXISTIA_E_A_CASA_NAO_SABIA
+    to: Q_E3_DELTA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_PLUGIN_DIR_ACEITA_ARVORE_DE_VARIOS_PLUGINS
+    to: Q_E3_DELTA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_PLUGIN_EVAL_E_CANDIDATO_A_GATE_DE_PUBLICACAO
+    to: Q_E3_DELTA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_WORKFLOW_GANHOU_RETOMADA_E_FALHA_EXPLICITA
+    to: Q_E3_DELTA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_EXIT_2_INALTERADO_NA_JANELA
+    to: Q_E3_DELTA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_CONTENCAO_DE_CUSTO_E_TEMA_DO_VENDOR_NA_JANELA
+    to: Q_E3_DELTA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_MERCADO_E3_R5_SINAL_FRACO
+    to: Q_E3_DELTA_2_1_278
+    edge_type: SUPPORTS
+  - from: E_TIMEOUT_AUSENTE_EM_7_HOOKS_INCLUINDO_VETOS
+    to: E_A_FABRICACAO_MUDOU_DE_PORTA_NAO_CAIU
+    edge_type: SUPPORTS
+  - from: E_PULEI_O_CORPUS_E_ISSO_PRODUZIU_O_ACHADO_FALSO
+    to: D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO
+    edge_type: SUPPORTS
+  - from: E_ULTRAREVIEW_JA_EXISTIA_A_COLISAO_E_DE_CALENDARIO
+    to: D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO
+    edge_type: SUPPORTS
+  - from: E_TIMEOUT_AUSENTE_EM_7_HOOKS_INCLUINDO_VETOS
+    to: D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO
+    edge_type: SUPPORTS

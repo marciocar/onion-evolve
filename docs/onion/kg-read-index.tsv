@@ -96,6 +96,7 @@
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_AVISO_CARREGA_O_QUE_VALE	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_MEDIR_O_DONO_NAO_O_CARIMBO	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_ORFAO_EXIGE_TRES_PROVAS	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
+.claude/hooks	E_AUTO_MODE_E_UMA_CAMADA_DE_PERMISSAO_QUE_O_ONION_NAO_USA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 .claude/hooks/bash-empty-result-guard.sh	E_POSTTOOLUSE_E_SINAL_POS_FATO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_session_hook_pulls	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_timeout_is_load_bearing	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
@@ -114,12 +115,15 @@
 .claude/hooks/pretooluse-protect-main.sh	E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/session-version-drift.sh	D_REGRA65_MEDE_O_PROCESSO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/hooks/task-manager-provider-hook.sh	D_FIX_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
+.claude/rules/research-lens.md	E_PULEI_O_CORPUS_E_ISSO_PRODUZIU_O_ACHADO_FALSO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 .claude/settings.json	C_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/settings.json	E_D2_SRC	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/settings.json	E_F5_DENY_READ_COBERTURA_E_O_ALLOW_DO_ENV	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/settings.json	E_F8_STOP_HOOK_NAO_SE_APLICA	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/settings.json	E_HOOK_SUBSTRATE	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/settings.json	E_R3_F11_REGRAS_DE_PERMISSAO	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
+.claude/settings.json	E_TASK_TOOLS_A_FORMA_DO_GATE_MUDOU_O_DESLIGAMENTO_NAO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
+.claude/settings.json	E_TIMEOUT_AUSENTE_EM_7_HOOKS_INCLUINDO_VETOS	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 .claude/settings.json	E_VETO_UNICO_ANTES_DA_RODADA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/skills/	E_sem_retro_skill	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
 .claude/skills/onion-engineering-context/SKILL.md	C_D1	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
@@ -129,6 +133,7 @@
 .claude/skills/onion-orchestration/SKILL.md	D_TIERING_CHECA_ENV_FORCE	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/skills/onion-orchestration/SKILL.md	E_F2_SUBAGENT_MODEL_FORCE	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/skills/onion-orchestration/SKILL.md	E_TEMPLATE_WRITE_KG_CHAMA_PRIMITIVA_INEXISTENTE	docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml
+.claude/skills/onion-orchestration/SKILL.md	E_WORKFLOW_GANHOU_RETOMADA_E_FALHA_EXPLICITA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 .claude/skills/onion-orchestration/SKILL.md	SY4_open_agent_teams_capability_detection	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/skills/onion-patterns/SKILL.md	SY4_prod_rfc0002_catalogo_playbooks	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/skills/onion-patterns/SKILL.md	SY5_playbooks_materialization_open	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -1566,6 +1571,7 @@ docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml	E_R3_F1_
 docs/evolution/research/radar-E3-2026-09-04/SYNTHESIS.md	E_R3_F5_CACHE_FABLE	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md	E_R3_OMISSOES_JUIZ_0904	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 docs/evolution/research/radar-E3-2026-09-04/data/f1-findings-pre-juiz.md	Q_E3_DELTA_2_1_260	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
+docs/evolution/research/radar-E3-2026-09-21-r5/data/f1-scan-juizo.json	E_A_FABRICACAO_MUDOU_DE_PORTA_NAO_CAIU	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md	B4_1_artifact_tabela_regulated_member	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md	B4_1_claim_branches_antipadrao	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/scope-inheritance-2026/H1-config-cascade-override.md	B4_1_claim_cascata_nativa_claude_code	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -1706,6 +1712,7 @@ docs/knowledge-base/architectures/c4-adr-patterns.md	C_D7_16	docs/onion/graph/on
 docs/knowledge-base/concepts/adopter-onboarding.md	E_sem_perfil_visitante	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
 docs/knowledge-base/concepts/agent-orchestration.md	C_TIERING_COMPRA_ECONOMIA_ORQUESTRACAO_COMPRA_TETO	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
 docs/knowledge-base/concepts/agent-orchestration.md	D_EMENDAS_DOC_SEGURAS_AGORA	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
+docs/knowledge-base/concepts/agent-orchestration.md	E_CONTENCAO_DE_CUSTO_E_TEMA_DO_VENDOR_NA_JANELA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 docs/knowledge-base/concepts/agent-orchestration.md	E_F1_FABLE_5_1_DEFAULT	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 docs/knowledge-base/concepts/agent-orchestration.md	E_F2_AUTO_MODE_MANTEM_SESSAO	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 docs/knowledge-base/concepts/agent-orchestration.md	E_R3_F4_AGENTES_FABLE_1M	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
@@ -1796,6 +1803,7 @@ docs/onion/graph/onion-evolution-2026-07-30.kg.yaml	E_verificacao_principal	docs
 docs/onion/graph/onion-family-topology-2026-07.kg.yaml	D_p4_visitor_authority	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
 docs/onion/graph/onion-identity-2026-07.kg.yaml	C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
 docs/onion/graph/onion-identity-2026-07.kg.yaml	D_NORTHSTAR_NS1_KG	docs/onion/graph/onion-identity-2026-07.kg.yaml
+docs/onion/graph/onion-identity-2026-07.kg.yaml	E_EXIT_2_INALTERADO_NA_JANELA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml	D_SELO_DO_MAESTRO_REVERTEU_O_FLIP	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 docs/onion/graph/pr-decision-history-2026-08.kg.yaml	E_PR_DECISION_LOG	docs/onion/graph/pr-decision-history-2026-08.kg.yaml
 docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml	C_p6_wrapper_fino	docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml
@@ -1805,10 +1813,13 @@ docs/onion/inventory.md	E_BRANCH_MAESTRO_ASIDE_ERA_MORTA_DE_FATO	docs/onion/grap
 docs/onion/inventory.md	E_C1_SSOT	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 docs/onion/inventory.md	SY5_count_drift_ssot_closed	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/onion/radar-baselines.yaml	D_COMANDOS_SEM_MODEL_OU_NO_LINEUP	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
+docs/onion/radar-baselines.yaml	D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 docs/onion/radar-baselines.yaml	E_FALLBACK_NATIVO_MEDIDO_0903	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 docs/onion/radar-baselines.yaml	E_LACUNAS_E3_R4_0904	docs/evolution/research/radar-E3-2026-09-04-r4/radar-E3-2026-09-04-r4.kg.yaml
 docs/onion/radar-baselines.yaml	E_R3_F3_PICKER_MOSTRA_FABLE	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 docs/onion/radar-baselines.yaml	E_R3_F6_AUTOCOMPACT_1M	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
+docs/onion/radar-baselines.yaml	E_RESPAWN_JA_EXISTIA_E_A_CASA_NAO_SABIA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
+docs/onion/radar-sources.yaml	E_MERCADO_E3_R5_SINAL_FRACO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 docs/onion/testing-inventory.md	E_EXISTE_NAO_E_RODOU	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 docs/onion/testing-validation-system.md	E_A_DISCIPLINA_VIROU_MECANISMO_DE_PAINEL	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 docs/technical-context/01-core/	L1_CORE	docs/onion/graph/technical-context-core-2026-07.kg.yaml
@@ -1858,6 +1869,7 @@ ops/pr-merge-verified.sh	D_SYNC_GATED_IN_MERGE_PROOF	docs/onion/graph/sync-gate-
 ops/pr-merge-verified.sh	E_CURE_PROVEN_BY_BEHAVIOR	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
 ops/pr-merge-verified.sh	E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
+ops/review-gate-health.sh	E_ULTRAREVIEW_JA_EXISTIA_A_COLISAO_E_DE_CALENDARIO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 ops/testing/selftest-summary.sh	E_O_SUMARIO_REPORTA_NAO_JULGA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 ops/update-bridge.sh	E_W9_BRIDGE_DEPLOY_0902	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/verify-adopter-gate.sh	E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
