@@ -57,7 +57,15 @@ _missing_tool() {
 command -v jq  >/dev/null 2>&1 || _missing_tool jq
 command -v awk >/dev/null 2>&1 || _missing_tool awk
 
-mapfile -t FILES < <(find "${DC}" -type f -name '*.tokens.json' | sort)
+# ⚠️ `_candidates/` FICA FORA, e o motivo tem custo medido por um adotante (sinal de campo
+# 2026-09-07, item 5). Aquele diretorio e STAGING por desenho — `/onion-design:generate` escreve ali as
+# candidatas "ate o maestro escolher e promover" (commands/design/generate.md:43). Varre-lo produz
+# DOIS danos: (1) um JSON quebrado numa candidata que nem entrou no build derruba o gate do projeto
+# inteiro; (2) TOK e um dicionario chaveado so pelo path, e as candidatas usam os MESMOS paths da
+# foundation (`color.brand.500`) — entao elas so nao vencem a versao promovida porque `_` ordena
+# antes de letra no locale C. Depender da ordem do `sort` para nao medir o rascunho e acidente, nao
+# desenho: bastaria renomear o diretorio para o gate passar a julgar a candidata como se fosse SSOT.
+mapfile -t FILES < <(find "${DC}" -type f -name '*.tokens.json' -not -path '*/_candidates/*' | sort)
 if [ "${#FILES[@]}" -eq 0 ]; then
   echo "Nenhum *.tokens.json em ${DC} — nada a validar."; exit 0
 fi
@@ -74,6 +82,20 @@ for f in "${FILES[@]}"; do
     TOK["${path}"]="${val}"
   done < <(jq -r 'paths(scalars) as $p | select($p[-1]=="$value")
                   | [($p[:-1]|join(".")), (getpath($p)|tostring)] | @tsv' "${f}" 2>/dev/null)
+  # ⚠️ COMPOSITE (`typography`, `shadow`, `spring`): o `$value` e um OBJETO, entao NENHUM path
+  # termina em `$value` e o filtro acima PULA o token inteiro — com ele, os aliases de dentro.
+  # Furo medido (sinal de campo 2026-09-07, item 3; reproduzido aqui antes de curar): um composite
+  # com DOIS aliases orfaos dava `0 HARD` e `exit 0`. O adotante pegava no sink dele; o gate, nao.
+  # A cura indexa cada sub-chave como token proprio (`typography.heading.fontSize`), o que faz
+  # DUAS coisas de uma vez: torna o alias de dentro visivel para a resolucao da etapa (2), e deixa
+  # o composite referenciavel por parte. TETO: nao valida a FORMA do composite (se `typography`
+  # tem os campos que a spec DTCG pede) — so a integridade das referencias, que e o que vazava.
+  while IFS=$'\t' read -r path val; do
+    [ -n "${path}" ] || continue
+    TOK["${path}"]="${val}"
+  done < <(jq -r 'paths as $p | select($p[-1]=="$value") | select(getpath($p)|type=="object")
+                  | getpath($p) as $o | $o | paths(scalars) as $q
+                  | [(($p[:-1] + $q)|join(".")), ($o|getpath($q)|tostring)] | @tsv' "${f}" 2>/dev/null)
 done
 [ "${HARD}" -eq 0 ] && ok "DTCG bem-formado (${#FILES[@]} arquivo(s), ${#TOK[@]} token(s))"
 
