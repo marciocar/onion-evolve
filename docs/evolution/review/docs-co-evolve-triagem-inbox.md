@@ -2,7 +2,7 @@
 title: 'Resíduo — curei um fail-open abrindo outro da mesma classe'
 date: 2026-09-22
 branch: docs/co-evolve-triagem-inbox
-reviewed_diff_sha256: fa7b1564d102baba2286934d7f7a8b9ef67d8b5e7967b60e72552e83704cab32
+reviewed_diff_sha256: 65ab6834c25a542e76c934a4c230c876d7276c877f327f5d297fa63e33992f1e
 tokens: 20161153
 duration_min: 15
 findings_total: 8
