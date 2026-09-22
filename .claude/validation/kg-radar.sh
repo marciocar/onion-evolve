@@ -271,6 +271,19 @@ section == "nodes" && nid != "" {
     if (nid in verifiedAt && verifiedAt[nid] != trim(v)) dupKey[nid "|verified_at"] = verifiedAt[nid] " -> " trim(v)
     verifiedAt[nid] = trim(v)
   }
+  # BI-TEMPORAL: `valid_from` (quando o FATO passou a valer) e `source_tier` (autoridade da fonte).
+  # ⚠️ ATE 2026-09-22 O MOTOR NAO LIA NENHUM DOS DOIS — sinal de campo de um adotante (2026-09-10,
+  # item 6), que mediu a gramatica prometendo bi-temporal contra um `grep` de ZERO no motor. A
+  # divida CRESCEU desde o sinal: eram 9 grafos preenchendo `valid_from`, hoje sao 12 (116
+  # ocorrencias) mais 349 de `source_tier` — e eu mesmo acrescentei source_tier a um grafo HORAS
+  # antes de ler o sinal. Campo que ninguem le nao e gramatica, e cerimonia: quem preenche acredita
+  # estar informando o motor, e nao esta.
+  else if (line ~ /^[[:space:]]*valid_from:/) {
+    v = line; sub(/^[[:space:]]*valid_from:/, "", v); validFrom[nid] = trim(v)
+  }
+  else if (line ~ /^[[:space:]]*source_tier:/) {
+    v = line; sub(/^[[:space:]]*source_tier:/, "", v); sourceTier[nid] = trim(v)
+  }
   # Proveniência inline: a MIGALHA `arquivo:linha` (suporte de campo 2026-07-17). Âncora
   # em ^…trace: — um match solto casaria com label que cita "trace:"/"TRACES_TO" (este repo fala
   # de rastreabilidade sobre si mesmo), false-positivando a origem. Foi o PROTÓTIPO da defesa acima.
@@ -767,6 +780,37 @@ END {
   }
 
   if (mode == "--all" || mode == "--provenance") {
+    # ══ BI-TEMPORAL — o fato e a verificação são datas DIFERENTES (⚠ atenção, não reprova) ══
+    # A gramática promete `valid_from` (quando o fato passou a valer) ≠ `verified_at` (quando EU o
+    # verifiquei), mais `source_tier` (autoridade). O motor não lia nenhum até 2026-09-22 — 465
+    # ocorrências no corpus sem consumidor. Esta seção é o mínimo que torna o campo LOAD-BEARING,
+    # e o critério dela só existe porque as duas datas são distintas: verificar um fato ANTES de
+    # ele passar a valer é impossível, e denuncia carimbo copiado ou data trocada.
+    if (mode == "--all") {
+      _bt_cov = 0; _bt_bad = ""; _bt_tier = 0
+      for (i in validFrom) {
+        if (validFrom[i] == "") continue
+        _bt_cov++
+        if (i in verifiedAt && verifiedAt[i] != "" \
+            && validFrom[i] ~ /^[0-9]{4}-[0-9][0-9]-[0-9][0-9]$/ \
+            && verifiedAt[i] ~ /^[0-9]{4}-[0-9][0-9]-[0-9][0-9]$/ \
+            && verifiedAt[i] < validFrom[i]) {
+          _bt_bad = _bt_bad "\n    ✗ " i ": verified_at " verifiedAt[i] " ANTES de valid_from " validFrom[i]
+        }
+      }
+      for (i in sourceTier) if (sourceTier[i] != "") _bt_tier++
+      if (_bt_cov > 0 || _bt_tier > 0) {
+        print "══ BI-TEMPORAL — o fato ≠ a verificação (⚠ atenção, não reprova) ══"
+        printf "  %d nó(s) com valid_from · %d com source_tier — e o motor agora LÊ os dois\n", _bt_cov, _bt_tier
+        if (_bt_bad != "") {
+          print "  ⚠ VERIFICAÇÃO ANTES DO FATO — impossível, e denuncia carimbo copiado:" _bt_bad
+        } else if (_bt_cov > 0) {
+          print "  ✅ nenhuma verificação anterior ao fato que ela verifica"
+        }
+        print ""
+      }
+    }
+
     print "══ PROVENIÊNCIA — decisão ancorada em origem (⚠ atenção, não reprova) ══"
     # Completude da camada AUDIT: uma decisão deveria apontar PARA a sua origem — a aresta
     # TRACES_TO (ADR/artefato) ou a migalha `trace: arquivo:linha` inline. Sem NENHUMA das
