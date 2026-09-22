@@ -55,6 +55,22 @@ Mover 3 sinais do inbox para `_processed/` **quebrou 4 `trace:`** do grafo
 disso. Curado, e a varredura do refutador confirma: **zero** `trace:` para `inbox/` sem
 `_processed/`, **zero** apontando para `_processed/` arquivo que ainda está no inbox.
 
+## Os `confirmed` do grafo que editei (REGRA 87)
+
+Toquei `compartilhamento-individuo-organizacao-2026-09` só para curar 4 `trace:` que a minha
+triagem quebrou — mas a regra é justa em cobrar: quem edita um grafo tem de ter olhado o que ele
+afirma. Os três de maior atenção, e o que eles dizem:
+
+- **`E_REFUTACAO_DA_PROPOSTA_DE_RAIO`** — a proposta que o core selou em 2026-09-19 **caiu** contra
+  o próprio corpus, e o anúncio ao adotante mandou a queda junto. É o precedente que esta regra
+  existe para evitar: proposta selada contrariando evidência já registrada no mesmo grafo.
+- **`E_R3_VIVA_SEM_EPSILON_DOCUMENTADO`** e **`E_R3_VIVA_PISO_APLICA_AO_FILTRO_NAO_AO_BIN`** — as
+  duas medições que sustentam a tese de que **piso de agregação não é salvaguarda**, que é
+  exatamente o que o banco de provas do adotante confirmou em campo com `n=3`.
+
+Nada do que fiz aqui toca essas afirmações: o diff no grafo é só o caminho de 4 `trace:`, de
+`inbox/` para `inbox/_processed/`. Mas registro que li, porque a regra nasceu de alguém que não leu.
+
 ## Declarado
 
 Não reproduzi o achado 4 com fixture própria — montei mal (os pares não referenciavam os tokens
