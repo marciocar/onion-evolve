@@ -48,12 +48,20 @@ Nativas" (fonte única).
    `Workflow({scriptPath})`. **Três ganhos de uma vez, e só o primeiro é óbvio:**
 
    ```bash
-   node --input-type=module --check < <script>   # exit 1 = sintaxe quebrada
+   bash .claude/validation/workflow-syntax-check.sh <script>   # exit 1 = sintaxe quebrada
    ```
 
    ⚠️ **`node --check` sozinho MENTE** — trata `.js` como CommonJS e deixa passar erro de módulo
    (medido 2026-08-02: backtick perdido dentro de template literal → `--check` exit 0, `import()`
-   exit 1). Use `--input-type=module`, ou extensão `.mjs`.
+   exit 1).
+   ⚠️ **E `node --input-type=module --check` sozinho MENTE AO CONTRÁRIO** — reprova script
+   VÁLIDO. Medido 2026-09-22: **2 de 2** scripts do corpus (`onion-research.js`,
+   `census-workflow.mjs`) saem `Illegal return statement`, porque o corpo roda dentro de uma função
+   async e `return` no topo é legal no runtime — o `--check` como módulo não sabe disso. Esta linha
+   mandou, por semanas, rodar um comando cujo vermelho era certo em 100% dos casos: guarda que pune
+   quem obedece ensina a ignorar a guarda, e o preço é o dia em que o vermelho for de verdade.
+   Por isso o comando acima é o **wrapper do repo**, que espelha o runtime (meta no topo, corpo
+   dentro de `async function`) antes de chamar o `node`.
 
    - **(a) Sintaxe pega antes de gastar worker.** O modo-de-falha recorrente: o script é um
      template literal gigante, e **backtick em prosa** (hábito de markdown) o parte ao meio.

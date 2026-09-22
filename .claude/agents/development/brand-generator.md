@@ -56,9 +56,13 @@ papéis (`semantic`) e **quais pares o gate verifica** (`governance/contrast-pai
 SSOT** do projeto, não por você (ver contrato em `/design:generate`). Isso mantém a comparação justa entre
 candidatas e evita reprovação por descasamento de nomenclatura.
 
-- **Foundations por matiz, com os nomes que o `semantic` da SSOT espera**: `brand.orange`/`brand.purple`,
-  `neutral.0/50/100/700/900`, `green.500`/`blue.500`/`red.500`/`amber.500`. Cores em **`#rrggbb`** (6
-  dígitos — o gate só computa contraste nesse formato).
+- **Foundations por matiz, com os nomes que o `semantic` da SSOT espera — DERIVE-OS, não os copie
+  daqui**: abra a camada `semantic/` do projeto e liste os alvos de `{alias}`; esses paths SÃO os
+  nomes de foundation que você deve emitir. Num projeto de referência eles eram `brand.orange`/
+  `brand.purple`, `neutral.0/50/100/700/900`, `green|blue|red|amber.500`; noutro (sinal de campo
+  2026-09-07) eram `spark.*`, `area.<n>.*` e `brand.900`, e quem copiou a lista gerou candidata que o
+  gate não conseguia casar. Cores em **`#rrggbb`** (6 dígitos — o gate só computa contraste nesse
+  formato).
 - **Projete para passar os pares declarados** na `governance/contrast-pairs.json` da SSOT (cada par tem seu
   `min` próprio — tipicamente 4.5 para texto e **3.0** para CTA/UI, não um único alvo). Use sua estimativa
   de luminância como heurística; a verdade é do gate.
