@@ -13,10 +13,21 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-09-04
-    cc_version: "2.1.261"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "18/25"      # rodada 4 (2.1.260->2.1.261): 7 confirmados, 18 REFUTADOS — o delta e de sessao/auto-approve, nada muda a adequacao; LACUNA: nenhum comportamento de 2.1.261 observado (processo 2.1.260). Rodada 3: 13 achados (3 aprovados, 9 emendados, 1 REPROVADO) + 8 omissões; 0 erros de citação. Rodada 2 (09-03): 2/11; rodada 1 (09-02): 0/11
-    kg: docs/evolution/research/radar-E3-2026-09-04-r4/radar-E3-2026-09-04-r4.kg.yaml
+    last_run: 2026-09-21
+    cc_version: "2.1.278"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "2/41 no juiz + 11 na passada adversarial"   # rodada 5 (2.1.261->2.1.278, 15 versoes): 39 aprovados, 2 REPROVADOS, 27 lacunas.
+                            # A QUEDA DE 18/25 PARA 2/41 E DE METODO, nao de juiz frouxo: os scans leram um
+                            # CHANGELOG LOCAL conferivel verbatim, e os DOIS reprovados foram os unicos que
+                            # dependiam de fonte externa. Eixo sem artefato local (mercado) segue sendo onde
+                            # a fabricacao cabe. PRIMEIRA rodada com OBSERVACAO: o processo ERA a versao
+                            # medida, o que fechou a lacuna declarada pela rodada 4. MAS a passada
+                            # adversarial REPROVOU com 11 achados: o no-manchete errava versao
+                            # (2.1.233, nao 2.1.268), magnitude (83, nao 551) e CONCLUSAO — o corpus
+                            # ja media o oposto por dogfood em 2026-08-16. Causa: pulei o
+                            # `kg-corpus-grep` que a research-lens exige. A licao que fica e de
+                            # METODO: fonte local conserta a CITACAO e nao conserta a MEDICAO DO REPO
+                            # — e foi para la que a fabricacao migrou (3 casos; o juiz pegou 1).
+    kg: docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml

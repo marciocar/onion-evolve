@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**206 itens abertos** em 46 grafo(s) com aberto (de 68 no escopo) · 47 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**207 itens abertos** em 47 grafo(s) com aberto (de 69 no escopo) · 47 grupo(s), agrupados por `owner:` (8 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -249,11 +249,12 @@
 |--:|---|---|---|
 | 19.2 | `Q_WEBSEARCH_CAP_2_1_258` | websearch-cap-2026-09 | Qual e o teto de chamadas WebSearch por sessao no Claude Code 2.1.258 — a env var CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION, seu  |
 
-## maestro — 4 item(ns)
+## maestro — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 19.0 | `Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN` | distribuicao-metodo-vivo-2026-09 | PERGUNTA DO MAESTRO (2026-09-15), com o CRITERIO DELE dado em seguida: liberar a meta-fabrica ao plugin PUBLICO, "sem nada pessoal |
+| 18.0 | `D_E3_R5_O_QUE_FICA_PARA_O_MAESTRO` | radar-E3-2026-09-21-r5 | TRES DECISOES QUE A RODADA COLOCOU NA MESA E QUE NAO SAO MINHAS. (1) TASK TOOLS: o repo depende de uma variavel que vive na config |
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
