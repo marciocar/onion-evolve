@@ -17872,13 +17872,15 @@ edges:
 
   # ── BI-TEMPORAL: o motor passou a LER `valid_from`/`source_tier` (2026-09-22) ─────────────────
   # POR QUE EXISTE: sinal de campo de um adotante (2026-09-10, item 6) mediu a gramatica prometendo
-  # bi-temporal contra um `grep` de ZERO no motor. A divida CRESCEU entre o sinal e a cura — de 9
-  # para 12 grafos com `valid_from` (116 ocorrencias) mais 349 de `source_tier` —, e eu mesmo
-  # acrescentei `source_tier` a um grafo HORAS antes de ler o sinal. Campo sem consumidor nao e
-  # gramatica, e cerimonia: quem preenche acredita informar o motor, e nao informa.
+  # bi-temporal contra um `grep` de ZERO no motor. Massa medida com ANCORA de campo sobre
+  # `git ls-files '*.kg.yaml'`: 110 ocorrencias de `valid_from` em 9 grafos + 343 de `source_tier`
+  # = 453 campos sem consumidor. (O numero que este comentario trazia antes — 116 em 12 grafos +
+  # 349 — saiu de um grep SEM ancora, que conta prosa/label/trace citando o nome do campo; a
+  # passada adversarial o derrubou.) Campo sem consumidor nao e gramatica, e cerimonia.
   # O CRITERIO so existe porque as duas datas sao DISTINTAS: verificar um fato ANTES de ele passar
-  # a valer e impossivel, e denuncia carimbo copiado ou data trocada. Corpus vivo na cura: 15
-  # grafos com campo bi-temporal, ZERO verificacoes impossiveis.
+  # a valer e impossivel, e denuncia carimbo copiado ou data trocada. Corpus vivo apos a cura:
+  # 110 de 110 nos MEDIDOS (a 1a versao media 45 — o gate AAAA-MM-DD descartava em silencio a
+  # precisao reduzida do ISO-8601), ZERO verificacoes impossiveis.
   local _bt; _bt="$(mktemp -d)"
   printf '%s\n' 'meta:
   id: bt
@@ -17911,13 +17913,132 @@ edges:
     to: E_SANO
     edge_type: SUPPORTS' > "${_bt}/bt.kg.yaml"
   local _o; _o="$(bash "${radar}" "${_bt}/bt.kg.yaml" 2>&1 || true)"
-  if LC_ALL=C grep -q 'VERIFICAÇÃO ANTES DO FATO' <<< "${_o}" && LC_ALL=C grep -q 'E_IMPOSSIVEL' <<< "${_o}"; then
-    record_pass "radar-validade: (bt1) verificacao ANTERIOR ao fato e acusada, nomeando o no"
-  else record_fail "radar-validade: (bt1)" "o impossivel passou: $(_emit "${_o}" | head -c 200)"; fi
-  # e o motor tem de DIZER que le os campos — sem isso a cura vira silenciosa outra vez
-  if LC_ALL=C grep -q 'com valid_from' <<< "${_o}" && LC_ALL=C grep -q 'com source_tier' <<< "${_o}"; then
-    record_pass "radar-validade: (bt2) o radar DECLARA quantos nos trazem valid_from/source_tier"
-  else record_fail "radar-validade: (bt2)" "o motor le mas nao declara — campo segue parecendo sem consumidor"; fi
+  # (bt1) A ACUSACAO tem de nomear o no CERTO. A 1a versao grepava E_IMPOSSIVEL na saida INTEIRA,
+  # onde o id ja aparece 3x (lista de nos, arestas) — o mutante `<`→`>` faz o radar acusar E_SANO
+  # e o caso passava do mesmo jeito. Extraia a LINHA da acusacao e exija o par certo nela.
+  local _acc; _acc="$(LC_ALL=C grep -A2 'VERIFICAÇÃO ANTES DO FATO' <<< "${_o}" | LC_ALL=C grep '✗' || true)"
+  if LC_ALL=C grep -q 'E_IMPOSSIVEL' <<< "${_acc}" && ! LC_ALL=C grep -q 'E_SANO' <<< "${_acc}"; then
+    record_pass "radar-validade: (bt1) a acusacao nomeia o no IMPOSSIVEL, e nao o sao"
+  else record_fail "radar-validade: (bt1)" "acusacao errada ou ausente: $(_emit "${_acc:-<vazia>}" | head -c 200)"; fi
+  # (bt2) CONTAGEM, nunca o literal. A 1a versao grepava 'com source_tier' — texto que o printf
+  # emite mesmo com o contador ZERADO: apagar a captura de source_tier deixava bt1/bt2/bt3 verdes.
+  if LC_ALL=C grep -qE '2 nó\(s\) com valid_from \(2 compar' <<< "${_o}" \
+     && LC_ALL=C grep -qE '· 2 com source_tier' <<< "${_o}"; then
+    record_pass "radar-validade: (bt2) as contagens batem com o grafo (2 valid_from / 2 comparaveis / 2 tier)"
+  else record_fail "radar-validade: (bt2)" "contagem errada: $(_emit "$(LC_ALL=C grep 'com valid_from' <<< "${_o}")" | head -c 200)"; fi
+  # (bt4) GRANULARIDADE: `valid_from` em precisao reduzida do ISO-8601 (`2026`, `2026-09`) e dado
+  # legitimo — 65 dos 110 nos do corpus real usam. O gate AAAA-MM-DD os deixava de fora EM SILENCIO.
+  printf '%s\n' 'meta:
+  id: bt4
+  schema_version: "1"
+  baseline: 2026-09-22
+  review_after: 2026-12-01
+nodes:
+  - id: E_ANO_OK
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    valid_from: "2026"
+    verified_at: "2026-09-22"
+    label: "fato datado pelo ANO, verificado depois"
+  - id: E_ANO_IMPOSSIVEL
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    valid_from: "2026-09"
+    verified_at: "2026-08-01"
+    source_tier: 47
+    label: "verificado no mes ANTERIOR ao fato"
+edges:
+  - from: E_ANO_IMPOSSIVEL
+    to: E_ANO_OK
+    edge_type: SUPPORTS' > "${_bt}/bt4.kg.yaml"
+  local _o4; _o4="$(bash "${radar}" "${_bt}/bt4.kg.yaml" 2>&1 || true)"
+  local _acc4; _acc4="$(LC_ALL=C grep -A2 'VERIFICAÇÃO ANTES DO FATO' <<< "${_o4}" | LC_ALL=C grep '✗' || true)"
+  if LC_ALL=C grep -qE '2 nó\(s\) com valid_from \(2 compar' <<< "${_o4}" \
+     && LC_ALL=C grep -q 'E_ANO_IMPOSSIVEL' <<< "${_acc4}" && ! LC_ALL=C grep -q 'E_ANO_OK' <<< "${_acc4}"; then
+    record_pass "radar-validade: (bt4) precisao reduzida do ISO-8601 e MEDIDA, nao descartada"
+  else record_fail "radar-validade: (bt4)" "ano/mes nao comparado: $(_emit "${_o4}" | head -c 200)"; fi
+  # (bt5) source_tier FORA da escala 1–10 e acusado — o campo deixa de ser so contado
+  if LC_ALL=C grep -q 'source_tier FORA DA ESCALA' <<< "${_o4}" \
+     && LC_ALL=C grep -qE 'E_ANO_IMPOSSIVEL: source_tier 47' <<< "${_o4}"; then
+    record_pass "radar-validade: (bt5) source_tier fora de 1-10 e acusado, nomeando o no"
+  else record_fail "radar-validade: (bt5)" "tier 47 passou: $(_emit "${_o4}" | head -c 200)"; fi
+  # (bt6) ILEGIVEL DE VERDADE e DECLARADO, e o ✅ NUNCA sai sobre zero comparacao — o defeito que
+  # a passada adversarial achou: 3 grafos reais imprimiam '✅ nenhuma verificacao anterior' tendo
+  # comparado NENHUM par.
+  printf '%s\n' 'meta:
+  id: bt6
+  schema_version: "1"
+  baseline: 2026-09-22
+  review_after: 2026-12-01
+nodes:
+  - id: E_LIXO
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    valid_from: "ontem de manha"
+    verified_at: "2026-09-22"
+    label: "data que nao e data"
+  - id: E_OUTRO
+    node_type: evidence
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "sem campo"
+edges:
+  - from: E_LIXO
+    to: E_OUTRO
+    edge_type: SUPPORTS' > "${_bt}/bt6.kg.yaml"
+  local _o6; _o6="$(bash "${radar}" "${_bt}/bt6.kg.yaml" 2>&1 || true)"
+  if LC_ALL=C grep -q 'ILEGÍVEL' <<< "${_o6}" && LC_ALL=C grep -qE '1 nó\(s\) com valid_from \(0 compar' <<< "${_o6}" \
+     && ! LC_ALL=C grep -q '✅ nenhuma verifica' <<< "${_o6}"; then
+    record_pass "radar-validade: (bt6) ilegivel e DECLARADO e o verde nao sai sobre zero comparacao"
+  else record_fail "radar-validade: (bt6)" "verde sobre o vazio, ou ilegivel nao declarado: $(_emit "${_o6}" | head -c 250)"; fi
+  # (bt7) CHAVE REPETIDA nos campos novos. O motor ja detectava `verified_at` duplicado desde
+  # 2026-08-12 (5 nos deste repo afirmavam DUAS datas); as clausulas novas nasceram 5 linhas abaixo
+  # SEM herdar a deteccao — e agora um `valid_from` last-wins silencioso ALIMENTA UM VEREDITO.
+  printf '%s\n' 'meta:
+  id: bt7
+  schema_version: "1"
+  baseline: 2026-09-22
+  review_after: 2026-12-01
+nodes:
+  - id: E_DOIS
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    valid_from: "2026-01-10"
+    valid_from: "2026-09-30"
+    source_tier: 8
+    source_tier: 2
+    verified_at: "2026-09-22"
+    label: "duas verdades por campo"
+  - id: E_B
+    node_type: evidence
+    plane: DEV
+    impact: 2
+    confidence: 1.0
+    status: confirmed
+    label: "outro"
+edges:
+  - from: E_DOIS
+    to: E_B
+    edge_type: SUPPORTS' > "${_bt}/bt7.kg.yaml"
+  local _o7; _o7="$(bash "${radar}" "${_bt}/bt7.kg.yaml" --all 2>&1 || true)"
+  if LC_ALL=C grep -qE 'valid_from repetido em E_DOIS' <<< "${_o7}" \
+     && LC_ALL=C grep -qE 'source_tier repetido em E_DOIS' <<< "${_o7}"; then
+    record_pass "radar-validade: (bt7) chave repetida nos campos novos nao vence em silencio"
+  else record_fail "radar-validade: (bt7)" "last-wins silencioso alimentando veredito: $(_emit "${_o7}" | head -c 250)"; fi
   # CONTROLE: grafo SEM os campos nao ganha secao (o painel nao vira muro de texto)
   printf '%s\n' 'meta:
   id: bt2

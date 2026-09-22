@@ -119,8 +119,15 @@
 # nao recebeu. O `onion-core` segue em ZERO com a 13a materializacao commitada no clone
 # (pin 4299290b73d4, de worktree destacada em origin/main), aguardando o push.
 #
+# 2026-09-22: `onion-standalone` sobe 400→402 — a `main` andou 2 commits na superfície que viaja
+#   (o bloqueio de achados do revisor e a leva bi-temporal do motor de grafo), e aquela porta segue
+#   parada desde 2026-07-19. Passivo REAL, do mesmo tipo das subidas de 09-17: não é afrouxamento
+#   de catraca, é a catraca medindo trabalho MERGEADO que a porta não recebeu. `onion-core` segue
+#   em ZERO. Este número só cai por re-materialização daquela porta — decisão do maestro, porque
+#   publicar exige o push dele.
+#
 # 2026-09-21 (pos-#857): `onion-standalone` sobe a 400 — trabalho MERGEADO que a porta parada nao
 # recebeu (os #856 e #857 entraram em main). O `onion-core` volta a ZERO com a 14a materializacao
 # ja PUBLICADA (pin 7260feacbfe0, push verificado no remoto em 36592d9ba145).
-onion-standalone 400
+onion-standalone 402
 onion-core 0
