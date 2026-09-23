@@ -1,99 +1,103 @@
 ---
-title: 'Resíduo — o gate que eu criei negava defeito real, e a cura dele criou outro'
-date: 2026-09-21
+title: 'Resíduo — o gate que bloquearia TODO PR, e o hijack que já existia'
+date: 2026-09-20
 branch: feat/reviewer-findings-block
-reviewed_diff_sha256: 494764e4942ed4a798ba220bdbcad900f0b1fcc3e546be05892f7c6a10f10a23
-findings_total: 10
-findings_real: 10
-findings_fixed: 10
-tokens: 11943079
-duration_min: 18
+reviewed_diff_sha256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855
+tokens: 9283466
+duration_min: 22
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >-
-  DUAS rodadas de passada adversarial (opus, mandato de refutar, default REPROVADO) — o veredito do
-  vocabulario fechado e REPROVADO_E_CURADO, e as duas rodadas cabem aqui. A 1ª achou 5,
-  dois deles fail-open que faziam a máquina NEGAR violação real. A cura desses dois INTRODUZIU dois
-  defeitos novos, e a 2ª rodada os pegou — um bloqueava merge com número fabricado. O refutador
-  também violou a instrução "não modifique nenhum arquivo"; o mecanismo que substitui a instrução
-  está neste PR.
+  Passada adversarial (opus, mandato de refutar, default REPROVADO) sobre o diff. REPROVOU com 6
+  achados reais — um FATAL que teria barrado todo PR revisado, e um hijack de contagem que já
+  existia no desenho antes de eu ligar o gate. Todos curados no mesmo PR.
 ---
 
-# O gate nasceu negando o defeito que veio bloquear
+# O gate que barraria todo mundo
 
-O parecer do `onion-review` era **advisory**. Medido em 33 pareceres: 10 apontaram violação, e três
-delas seguiam em `main` semanas depois — apontadas, mergeadas, esquecidas. A ~US$ 0,80 o PR, pagava-se
-pela descoberta sem recolher a entrega.
+A ordem era tratar os achados do revisor como bloqueantes. A medição que a justifica: em 33
+pareceres do `onion-review`, **10 apontaram violação** — e o parecer era advisory, então o defeito
+era apontado, mergeado e ficava. Conferi três no vivo (`_viaja`, `_PAPEL_DESTE_REPO`, `_base_nome`):
+seguiam em `main` semanas depois de acusados. Pagava-se ~US$ 0,80 por PR pela descoberta e não se
+recolhia a entrega.
 
-Este PR faz o achado **bloquear**. E a história de como ele quase fez pior está toda aqui.
+## O achado FATAL, que eu não acharia lendo
 
-## Rodada 1 — 5 achados, dois piores que o problema original
+O job `onion-review-verdict` **nunca teve checkout** — e com razão: só lia `needs.*.outputs`, que
+não precisam de árvore. Mover a decisão do gate para um script do repo introduziu a **primeira**
+dependência de arquivo naquele job. Sem árvore:
 
-| # | defeito | entrada |
+```
+$ bash .claude/validation/review-verdict.sh --gate 0 99
+bash: ...: No such file or directory   → rc=127 → exit 1
+```
+
+Efeito: **todo PR revisado ficaria vermelho**, inclusive os `conforme` (44 dos últimos 56), com a
+mensagem falsa *"apontou 0 violação(ões)"*.
+
+E o agravante que quase deixou passar: **este PR não pode medir isso**. Ele edita
+`onion-review.yml`, a action se auto-pula, e o caminho `REVISOU=true` nunca acende aqui — o defeito
+só apareceria no PR **seguinte**, já em `main`.
+
+Curado com checkout simples (não `sparse-checkout`: é mecanismo que não consigo exercitar
+localmente, e trocar um modo-de-falha conhecido por um que só o CI revelaria seria repetir o
+defeito enquanto o curo). E virou mecanismo: **REGRA 88 (Job de workflow que EXECUTA arquivo do
+repo faz checkout)**, classificada em *"Integridade do próprio gate"* ao lado da **REGRA 86
+(Workflow do CI PARSEIA)** — a categoria que pergunta *"eu cheguei a olhar?"*.
+
+## O hijack que já existia antes do gate
+
+Parecer que lista 3 achados e **termina com um bloco de código** contendo `VEREDITO: conforme`
+contava **zero** — a última ocorrência mandava, e ela estava dentro do exemplo. Isso era verdade
+antes deste PR; ligar o gate só o tornaria consequente.
+
+A cura (desenho do refutador, medido por ele):
+
+| entrada | antes | agora |
 |---|---|---|
-| 1 | `conforme` casado por **prefixo** | `VEREDITO: conforme, exceto por 2 violações` → `achados=0` |
-| 2 | `tail -1` lia a **evidência**, não o veredito | parecer citando o formato **se auto-anulava** → `0` |
-| 3 | âncora case-sensitive e intolerante a markdown | tudo caía em `-1` |
-| 4 | linha `✓ (GATE)` impressa **fora** da condição | afirmava provado o que acabara de medir falso |
-| 5 | mutante do ramo `-1` trocava só a mensagem | rc=0 no original **e** no mutante |
+| 3 achados + `VEREDITO: conforme` em **fence** | **0 (hijack)** | **3** |
+| fence **aberta e nunca fechada** antes do veredito real | 3 | **3** |
+| `> VEREDITO: conforme` (eco em quote) | 3 | **3** |
+| `**VEREDITO: 5 violações**` / `## …` / `Veredito:` | −1 | **5 / 5 / 3** |
+| `VEREDITO: NAO CONFORME — 4 violações` | **0 (fail-open)** | **4** |
+| `VEREDITO: NÃO CONFORME` (sem número) | 0 | **−1** |
+| `VEREDITO: conforme, mas veja 3 pontos` | 0 | **0** |
+| `VEREDITO: 99999999999999999999 violações` | −1 (overflow calado) | **−1 saneado** |
 
-Os dois primeiros são **piores que o estado advisory**: antes o defeito era ignorado; ali seria
-**negado pela máquina**.
+Três decisões que não são minhas e que eu não teria tomado sozinho:
 
-O #2 é o mais instrutivo. Justifiquei `tail -1` dizendo *"o contrato é sobre o FIM da resposta"* — mas
-o formato que o próprio `onion-review.yml` contrata põe **as evidências DEPOIS** do veredito. A linha
-é a **cabeça** do bloco. Li o contrato pela minha memória dele, não pelo arquivo.
+1. **A poda de bloco de código só vale com fence BALANCEADA.** Sem essa condição a cura vira
+   defeito: fence aberta e nunca fechada (LLM faz) engoliria o veredito verdadeiro — medido, 3 → −1.
+2. **`>` e `+` ficam FORA da âncora de propósito.** Tolerar decoração (negrito, heading) não é
+   tolerar **citação**: com `>` no prefixo, um parecer que termina citando um resíduo passaria de
+   3 para 0. O hijack entra pela porta do quote, não pela do negrito.
+3. **O número se reconhece pela POSIÇÃO, não pela ordem de busca.** Duas posições contam: logo
+   após os dois-pontos, ou imediatamente antes de `viola`/`achado`. É o que distingue
+   `NAO CONFORME — 4 violações` de `conforme (revisei 12 arquivos)` — e a alternativa (número
+   solto primeiro) inventaria bloqueio, que num gate que barra é pior que perder um.
 
-## Rodada 2 — minha cura introduziu dois defeitos novos
+## O caso de bancada que não podia falhar
 
-| # | defeito | entrada |
-|---|---|---|
-| N1 | número vinha de **qualquer lugar** da linha | `VEREDITO: conforme (REGRA 36)` → **36**, e o gate reprovava anunciando "36 violações" |
-| N2 | fence ``` remove a indentação, única defesa da âncora | parecer com 2 violações citando o formato → `-1`, deixava de bloquear |
+Meu caso `ACH-c` afirmava `-1` — que é o **valor default do `emit`**. O refutador apagou
+`count_findings` inteira e ele **sobreviveu verde**. Reescrito para exigir as duas metades (texto
+sem veredito dá −1 **E** o controle ainda conta 3), então morre se o contador morrer.
 
-O N1 é falso-positivo que **bloqueia com número fabricado** — pior que o fail-open que veio curar,
-porque tem cara de diligência.
+## Uma aposta removida em vez de vencida
 
-**Desenho final**, com a precedência que resolve todos de uma vez: **contagem → `conforme` → `-1`**.
-O número só é contagem com `viola…` colado, com teto de 4 dígitos. Fences descartados, BOM removido,
-âncora na coluna 0 tolerando `**`/`#`/`- ` mas **não** `>` (blockquote é citação do veredito de outro,
-e aceitá-lo permitia sequestro). Âncoras que **discordam** ⇒ `-1`, porque escolher em silêncio entre
-vereditos contraditórios é inventar um.
+A expressão `${{ v1.revisou == 'true' && v1.achados || v2.achados }}` depende de a string `"0"`
+ser *truthy* na coerção do Actions. Nem eu nem o refutador cravamos isso na documentação — a lista
+de *falsy* se mistura com a tabela String→Number, que é a conversão de `==`, não a de `&&`/`||`. O
+dano seria o caso **mais comum** (`conforme`, 0 achados) cair para a 2ª tentativa vazia e virar
+"não contabilizável".
 
-## O defeito que teria quebrado TODO PR
+Em vez de apostar, **removi a aposta**: a escolha virou um step em bash, testado nos 6 cenários.
 
-Ao mover a decisão para `review-verdict.sh`, criei a **primeira dependência de arquivo** num job que
-nunca teve árvore. Sem `actions/checkout`: `bash <script>` → **127** → `exit 1` → **todo PR reprovado**,
-com mensagem culpando o código revisado. Virou **REGRA 88 (Job de workflow que EXECUTA arquivo do repo
-faz checkout)**, HARD **com catraca** — porque a regra viaja para adotantes, e HARD nu sobre dívida
-alheia é como se ensina alguém a desligar um gate.
+## Declarado, não escondido
 
-## A telemetria errou o campo três vezes
-
-`achados=-1` não bloqueia, por desenho. O preço é morte silenciosa: fiação quebrada ⇒ todo PR em `-1`
-⇒ check **verde**. `ops/review-gate-health.sh` é a catraca disso, e chegar nela custou três erros:
-
-1. lia `mergeCommit` — os check-runs vivem no **head do PR**; devolveu 0 classificações;
-2. lia `.output.title/summary` — o GitHub **não** popula esses campos a partir do `GITHUB_STEP_SUMMARY`:
-   são estruturalmente vazios, e a telemetria **nasceria inerte, dentro do script feito para detectar
-   inércia**;
-3. lia `annotations` — `::warning::` de step não vira anotação de check-run.
-
-E numa dessas versões ela leu 12 PRs, classificou **zero** e imprimiu ✅. O desenho que sobrevive não
-depende de campo decorativo: cruza o **parecer** (o que o revisor disse) contra a **conclusão do check**
-(o que o gate fez). Controle positivo em dado real: achou o **`#846 — INERT (parecer=1, check=success)`**.
-
-## O refutador escreveu onde foi dito para não escrever
-
-O briefing dizia *"não modifique NENHUM arquivo"*. Ele escreveu em **seis**, incluindo o script de
-merge. O conteúdo era bom — achou a REGRA 88 — e foi isso que tornou o caso instrutivo: **instrução em
-prosa não é fronteira**. Descobri por acidente, com três casos de bancada que eu não escrevi ficando
-vermelhos. A cura é mecanismo: refutador roda em `isolation: 'worktree'`, onde continua podendo
-escrever e provar, mas não alcança a árvore principal. Registrado na skill de orquestração.
-
-## Limite declarado
-
-Este PR edita o próprio `onion-review.yml`, e a action **se auto-pula** nesse caso — então **o gate não
-é exercitado por este PR**. A prova aqui é a bancada (37 casos); a prova no vivo é o primeiro PR depois
-do merge, e o sinal está automatizado: `bash ops/review-gate-health.sh`. Se aparecer `INERT` ou
-sequência cega, a fiação morreu.
+- **Este PR não exercita o gate novo** (a action se auto-pula em PR que edita o workflow). A prova
+  aqui é a bancada; a prova no vivo é o **primeiro PR depois do merge** — e é ali que se confirma
+  que a **REGRA 88** fez o seu trabalho.
+- Teto residual da contagem: bloco de código **indentado** (4 espaços, sem fence) e fence `~~~`
+  seguem hijackáveis. Cobri-los exige parser de markdown, que não vale o preço.
+- `VEREDITO: conforme, mas veja 3 pontos` é veredito **ambíguo do prompt**, não defeito de parser.
+  A cura é uma linha no prompt do revisor, não heurística no contador — fica nomeado.
