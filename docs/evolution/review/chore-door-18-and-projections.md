@@ -2,9 +2,9 @@
 branch: chore/door-18-and-projections
 pr: 869
 date: '2026-09-23'
-reviewed_diff_sha256: b54f69cf80e2f35cbaceb70ef068a1effe02bba0936a90080c15b592bf2518f5
-findings_total: 6
-findings_real: 5
+reviewed_diff_sha256: bd8c60de18987ad91f2cc3edd5da966d209508decd959eba32b7fa55c580ebd6
+findings_total: 8
+findings_real: 7
 tokens: 0
 duration_min: 0
 verdict: CORRIGIDO
@@ -36,7 +36,9 @@ para satisfazer um campo é exatamente a classe que esta leva cura.
 | 3 | *o dano é só da porta?* | **ACHADO REAL, pior que o diagnóstico inicial**: `--stub-baselines` esvazia os 26 baselines quando o framework viaja, então o lint morria em **todo adotante**, não num caso de borda. |
 | 4 | *a cura `\|\| true` virou fail-open?* | **NÃO** — provado por dois casos de bancada: entrada no baseline segue tolerada, entrada fora segue HARD. |
 | 5 | *o trap rotula como morte alguma saída LEGÍTIMA (ajuda, repo-não-Onion, subshell)?* | **NÃO** — varredura de `exit` de topo antes do sumário devolve só o `exit 2` do próprio trap; o lint não tem `--help`; e a varredura completa produziu **zero** `MORREU` espúrio (medido em `/tmp/lint-final.out`). |
-| 6 | *as 2 falhas da bancada são minhas?* | **UMA É, UMA NÃO** — medido em worktree destacada em `origin/main`: `rules-registry (f)` já falhava lá (pré-existente); `backlog-projection: em-dia` só falha na minha árvore, e a causa é o grafo **não-commitado** da pesquisa Zoho/GLPI (9 nós `open`) — frente alheia, declarada abaixo. |
+| 6 | *o CI vê a REGRA 85?* | **REFUTOU UM NÓ MEU** — eu havia escrito que a guarda "emite zero no CI", derivado de UM run. O artefato do CI deste PR traz 3 HARD, dois deles REGRA 85. O run anterior precede o merge do #868: não havia o que acusar. Nó corrigido no rascunho. |
+| 7 | *a projeção que regenerei bate no CI?* | **NÃO** — `testing-state.md` conta os resíduos de revisão, e eu o gerei ANTES de escrever o meu (313 quando já eram 314). Terceira vez nesta sessão que gerar de árvore suja custa um gate. Regenerado de worktree limpa. |
+| 8 | *as 2 falhas da bancada são minhas?* | **UMA É, UMA NÃO** — medido em worktree destacada em `origin/main`: `rules-registry (f)` já falhava lá (pré-existente); `backlog-projection: em-dia` só falha na minha árvore, e a causa é o grafo **não-commitado** da pesquisa Zoho/GLPI (9 nós `open`) — frente alheia, declarada abaixo. |
 
 ## Achados e destino
 
