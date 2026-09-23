@@ -2,7 +2,7 @@
 branch: chore/door-18-and-projections
 pr: 869
 date: '2026-09-23'
-reviewed_diff_sha256: bd8c60de18987ad91f2cc3edd5da966d209508decd959eba32b7fa55c580ebd6
+reviewed_diff_sha256: 19816e0b6cbca8a4a0ca0cfdf7e30a0079679d96c7528f863f70e1cf591ab723
 findings_total: 8
 findings_real: 7
 tokens: 0
@@ -61,3 +61,18 @@ para satisfazer um campo é exatamente a classe que esta leva cura.
   misturaria duas levas — o erro de `git add -u` que já custou duas varreduras nesta sessão.
 - **Os 2 HARD da REGRA 85** não se curam antes do merge: a porta só se re-materializa de `main`
   mergeada. É a razão dos `--no-verify` de checkpoint, e a validação final é o CI **neste** SHA.
+
+## Os `confirmed` do grafo que este PR edita (REGRA 87)
+
+O PR edita `docs/evolution/research/triagem-inbox-2026-09/triagem-inbox-2026-09.kg.yaml`. O
+`confirmed` de maior impacto ali é **`E_REGRA_85_E_INSATISFAZIVEL_ANTES_DO_MERGE`** (impact 4,
+confidence 1.0, `verified_at: 2026-09-23`), e ele foi **lido, não herdado**: é o nó que este PR
+corrigiu depois de o artefato do CI refutar a versão anterior que eu havia escrito. A evidência dele
+é o `lint-evidence-35929817914` baixado, e a conclusão dele é o que governa a ordem de merge desta
+leva — publicar a porta antes, mergear depois.
+
+Os outros dois `confirmed` de topo do mesmo arquivo —
+`E_A_KB_JA_FOI_CORRIGIDA_EM_09_18_SO_A_IMPLEMENTACAO_FALTA` e
+`E_A_FAIXA_CARREGA_O_DETALHE_EU_E_QUE_TRUNQUEI` — **não** são tocados aqui e seguem válidos. Vale
+dizer do segundo que ele descreve exatamente a reincidência registrada no achado 6 acima: a faixa da
+bancada carrega o detalhe da falha, e o truncamento foi meu.
