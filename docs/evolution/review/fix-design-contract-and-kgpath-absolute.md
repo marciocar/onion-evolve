@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: "653e283d31b9f394154beffbd5409b6adbc21f0ef794102dd8defd646c38027b"
+reviewed_diff_sha256: "5c74f2479782cdf18aaea7c9cd711c821b833ece44194e1d2ae2b9797c1cd4fc"
 findings_total: 9
 findings_real: 9
 tokens: 186000
@@ -73,3 +73,35 @@ cheio, e triagem nova não tinha onde pousar. Não havia colheita legítima (2 n
 nomeado, 1 com a metade viva de um sinal, 1 questão aberta). Em vez de subir o teto, os fios foram
 para um **grafo de pesquisa** (`triagem-inbox-2026-09`), sem opt-in de projeção — o backlog segue em
 19, e a promoção é do maestro quando colher. O fato de a catraca estar saturada virou nó próprio.
+
+## O que o CI achou DEPOIS da passada adversarial
+
+O `onion-review-verdict` — o gate semântico que virou bloqueante nesta sessão — reprovou o PR por
+**identificadores em pt-BR numa função que eu tinha acabado de escrever** (`kgPathOk(devolvido)`,
+local `alvo`). Estava certo.
+
+O achado importa menos que a lacuna que ele expõe: **o universo da guarda determinística de idioma
+era só `*.sh`**. Metade da linguagem do repo era invisível a ela, e por isso a violação viajou até
+o CI. Três camadas de cura, na ordem em que a medição pediu:
+
+1. os identificadores viraram inglês (e nos dois `.mjs`: `teto`→`budgetCap`, `vereditos`→`verdicts`,
+   `nao_medidos_por_teto`→`unmeasuredByCap`, mantendo as **chaves de contrato** que o
+   `census-seal.py` lê);
+2. o universo passou a ver `.js`/`.mjs`, com extração própria — inclusive **parâmetros**, porque foi
+   um parâmetro que escapou. Passivo medido antes de ligar: **2 em 396**, curados no mesmo commit,
+   então nasce ZERO. Ao ligar, 37 "HARD" apareceram e **todos vinham de `.claude/worktrees/`** —
+   worktree de outro agente, que a guarda não deve medir;
+3. e a causa raiz não era a lógica, era o **vocabulário** — a classe dominante em guarda de lista.
+   O extrator via `devolvido` perfeitamente; a lista é que não o tinha. Medido: de 15 particípios
+   comuns, **14 faltavam**. 153 → 167 termos, todos sem homógrafo em inglês, repo em 0 HARD.
+
+Bancada: +3 casos, inclusive o controle que impede a guarda de gritar por gritar. **22/22** nas duas
+famílias.
+
+## Teto declarado
+
+O painel `testing-state.md` segue acusando HARD **no lint local** e não no CI. A causa foi provada,
+não suposta: a árvore de trabalho carrega uma versão não-commitada e **mais velha** de outro resíduo,
+que apaga 10 achados do ledger; o CI lê o commitado. Provei por geração em worktree destacada que o
+painel deste commit é o que a árvore limpa produz. Não descartei o arquivo alheio — aquele blob não
+está em commit nenhum, e `git checkout --` perderia texto.
