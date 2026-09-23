@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: "6a9d669c1085077b08d625b9cb4ad7778297d8ee785db5190c3584c858566370"
+reviewed_diff_sha256: "78e6d6a41ad428e631c77092fcea680ab3a102b11478fa8a833d6b5579fc07d1"
 findings_total: 9
 findings_real: 9
 tokens: 186000
@@ -105,3 +105,24 @@ não suposta: a árvore de trabalho carrega uma versão não-commitada e **mais 
 que apaga 10 achados do ledger; o CI lê o commitado. Provei por geração em worktree destacada que o
 painel deste commit é o que a árvore limpa produz. Não descartei o arquivo alheio — aquele blob não
 está em commit nenhum, e `git checkout --` perderia texto.
+
+## E o CI não aguentou a própria bancada
+
+Enquanto este PR rodava, o job do selftest estourou o teto de 40 min **duas vezes** — 41m29s e
+40m18s, ambas canceladas, com uma passagem de 32m20s no meio. Na primeira eu tratei como variância
+e re-disparei, o que estava certo: 32m20s provou que era. Na segunda, não era mais.
+
+A resposta não precisou ser inventada: **o próprio arquivo já a tinha escrito**, em 2026-09-13 —
+*"se encostar de novo, o sinal é a suíte ter crescido, e a resposta é PARALELIZAR NO RUNNER, não
+subir o teto outra vez"*. Seria a terceira vez tratando o sintoma. A suíte foi de 689 asserções
+(quando o teto foi calibrado) para mais de 1400, e `--jobs auto` não salva — o runner tem 2 núcleos
+contra os 8 daqui.
+
+Agora são **4 faixas de matriz**, 184 famílias → 4 × 46, round-robin (bloco contíguo concentraria o
+caro numa faixa só). O teto **caiu** de 40 para 25, e vale por faixa.
+
+O divisor virou script versionado com bancada de 5 casos, e a razão é o modo-de-falha, não a
+elegância: **qualquer família que o plano perca deixa de ser exercida e o job sai VERDE**, porque as
+faixas que rodaram passaram. Perder família é pior que reprovar — não aparece. O caso (a) afirma
+cobertura exata contra o `--list`, e o mutante que remove uma família o mata; (d) e (e) fecham o
+fail-open de matriz vazia.
