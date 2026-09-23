@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: "a3391d524f116c62efbe76182a77443deeb92d53a4d5a94801b3c139fced20d1"
+reviewed_diff_sha256: "3b603ee87f0c629b3712f9f68fc170f3ab92118b512fc7edc22622c78b7c22f6"
 findings_total: 12
 findings_real: 12
 tokens: 277000
@@ -89,3 +89,14 @@ esta casa já pagou: o SUT estava certo, o teste é que mentia.
 A bancada foi de 5 para **17 casos**. A 1ª versão dela rodava o lint **inteiro 4 vezes** — 12+ min
 numa família só, que cairia numa faixa do CI. Guarda extraída para script próprio e exercitada
 direto: **~0,1 s** o check, **~3 s** a família. Bancada cara não é rigor, é imposto.
+
+## O 2º sítio do pipefail, achado pela própria guarda no CI
+
+Depois da 1ª cura, a faixa 4 do CI reprovou em `shell-pipefail: VEREDITO por <produtor>|grep -q ACIMA
+da catraca` — e apontou **`lint-artifacts.sh`**, não o script novo. A função da regra filtrava o
+baseline com `printf … | grep` em **dois** lugares. Curados com here-string, que é exatamente o que a
+mensagem da própria guarda ensina: `grep PAD <<< "$var"`.
+
+**Os dois sítios eram meus, e nenhum foi pego por mim.** O primeiro (no script) veio da faixa 4; o
+segundo, de rodar a família `shell_pipefail_robustness` isolada depois. É a terceira vez nesta leva
+que uma guarda da casa me barra antes do maestro — e as três eram defeito real.
