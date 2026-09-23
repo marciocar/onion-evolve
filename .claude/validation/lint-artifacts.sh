@@ -4418,6 +4418,43 @@ check_kg_source_tier_confidence() {
 }
 
 
+# REGRA 89 — Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca [SOFT]
+# previne: a UNICA divida deste corpus que piora sozinha — rodada de radar selada como baseline sem
+#   escrever o que DERRUBOU. Sem a reconciliacao, o corpus superado segue vencendo a revisita da
+#   REGRA 67 para sempre, e cada rodada nova adiciona mais um orfao. Medido 2026-09-23: 2 de 6.
+# A guarda vive em `radar-aufhebung-check.sh` (o POR QUE inteiro esta la, inclusive a razao de ela
+# aceitar `supersedes_none`/`supersedes_external`). Extraida em vez de inline por dois motivos: e o
+# molde da casa (door-staleness, identifier-language), e a bancada consegue exercita-la em segundos
+# em vez de rodar o lint INTEIRO quatro vezes — a 1a versao inline custava 12+ min numa familia so.
+_R89_BASE="${REPO_ROOT}/.claude/validation/radar-aufhebung-baseline.txt"
+check_radar_aufhebung() {
+  local sc="${SCRIPT_DIR}/radar-aufhebung-check.sh"
+  [ -f "${sc}" ] || return 0
+  local out rc=0
+  out="$(bash "${sc}" "${REPO_ROOT}" 2>&1)" || rc=$?
+  if [ "${rc}" -ne 0 ]; then
+    violation "HARD" ".claude/validation/radar-aufhebung-check.sh" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): a guarda nao pode julgar — $(printf '%s' "${out}" | head -1)"
+    return 0
+  fi
+  local tol=0 sem=0 line
+  [ -f "${_R89_BASE}" ] && tol="$(grep -vE '^[[:space:]]*(#|$)' "${_R89_BASE}" | head -1 | tr -dc '0-9')"
+  [ -n "${tol}" ] || tol=0
+  while IFS=$'\t' read -r tag val; do
+    case "${tag}" in
+      SEM-AUFHEBUNG)
+        violation "SOFT" "${val}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): rodada selada como baseline com ZERO aresta SUPERSEDES — o que ela DERRUBOU nao foi escrito, e o corpus superado segue vencendo a revisita para sempre. Reconcilie, ou declare 'meta.supersedes_none: <razao>' se nao derrubou nada. A aresta SUPERSEDES do motor e INTRA-arquivo: rodada em grafo PROPRIO registra a Aufhebung cross-file com 'meta.supersedes_external: <grafo>#<no>', que esta regra aceita"
+        ;;
+      TOTAL) sem="${val}" ;;
+    esac
+  done <<< "${out}"
+  if [ "${sem:-0}" -gt "${tol}" ]; then
+    violation "HARD" "${_R89_BASE#"${REPO_ROOT}/"}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): ${sem} rodada(s) sem Aufhebung contra teto ${tol} — a catraca SO ENCOLHE. Reconcilie a rodada nova em vez de subir o teto"
+  elif [ "${sem:-0}" -gt 0 ]; then
+    violation "SOFT" "${_R89_BASE#"${REPO_ROOT}/"}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): [radar-aufhebung/PASSIVO] ${sem} rodada(s) sem SUPERSEDES toleradas pelo baseline — a metrica de saude e este numero DIMINUINDO"
+  fi
+}
+
+
 # REGRA 69 — Roster de fontes com revisita vencida (docs/onion/radar-sources.yaml) [SOFT]
 # previne: fonte de rotina (semanal/mensal/trimestral/anual) esquecida — o roster nasceu na F2 como DADO da
 # doutrina de fontes; sem cobrança de idade vira lista decorativa. Cobra só fonte que DECLARA last_checked
@@ -4442,6 +4479,7 @@ check_radar_sources_freshness() {
     done
 }
 
+check_radar_aufhebung
 check_radar_sources_freshness
 
 # REGRA 70 — fallbackModel do settings.json é PROJEÇÃO da escada de modelos (eixo E6) [HARD]

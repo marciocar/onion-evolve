@@ -1,0 +1,13 @@
+# Catraca de AUFHEBUNG DE RODADA DE RADAR — quantas rodadas seladas como baseline toleram
+# estar SEM nenhuma aresta SUPERSEDES. SO ENCOLHE: a metrica de saude e o numero DIMINUINDO.
+#
+# 2026-09-23, medicao inicial: 2 — `radar-E3-2026-09-21-r5` (que eu mesmo selei em 09-21) e
+#   `fable-5-1-superacao-2026-09`. As outras 4 baselines apontam todas para `maestro-vivo-2026-08`,
+#   que TEM 2 SUPERSEDES. O teto nasce no passivo medido e nao se sobe: reconcilie a rodada.
+#
+# 2026-09-23, mesma sessao: 2 -> 1. A `radar-E3-2026-09-21-r5` (que eu selei em 09-21) declarou
+#   `meta.supersedes_none:` com a razao REAL — ela mediu um delta novo e nao re-mediu o corpus
+#   antigo, entao nao derrubou nada. Nao foi carimbo para calar a guarda: declarar Aufhebung que
+#   nao houve seria pior que a divida, e a propria regra diz isso. Resta a `fable-5-1`.
+#
+1

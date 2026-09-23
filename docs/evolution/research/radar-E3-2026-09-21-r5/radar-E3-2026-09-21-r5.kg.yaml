@@ -3,6 +3,18 @@ meta:
   schema_version: "1"
   baseline: 2026-09-21
   review_after: 2026-11-05   # radar de mundo: cadencia 45d (REGRA 65/67)
+
+  supersedes_none: >
+    Esta rodada NAO derrubou no nenhum do corpus anterior, e a razao importa mais que o campo.
+    Ela mediu o DELTA de 2.1.261 a 2.1.278; o corpus `claude-code-2.1-onion-2026-08` cobre
+    2.1.211 a 2.1.233 e NAO foi re-medido aqui. Nada foi derrubado porque nada foi re-testado —
+    isso e LACUNA, nao Aufhebung, e declarar `supersedes_external` seria inventar uma
+    reconciliacao que nao ocorreu (a propria REGRA 89 diz que SUPERSEDES forcado e pior que a
+    divida). CONSEQUENCIA QUE FICA NOMEADA: e por isto que a REGRA 67 acusa revisita vencida
+    naquele corpus e vai acusar de novo — o que falta ali nao e a ARESTA, e a MEDICAO. A cura e
+    revisitar (`/onion-research --revisit`), nao carimbar. Registrado em 2026-09-23, conduzindo
+    o /meta:drive, depois de medir que a aresta SUPERSEDES do motor e intra-arquivo e que este
+    grafo, por ser proprio da rodada, nao teria como alcancar os nos daquele corpus.
   # kg-backlog-guard: on
   # ═══ TETO: 15 NOS (era 14: +1 pela CURA EXECUTADA apos a passada adversarial — o no-manchete
   #     estava errado em versao, magnitude e conclusao, e o no que o substitui e acompanhado do
