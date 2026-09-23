@@ -1792,10 +1792,15 @@ run_rules_registry_selftests() {
   # (f) GUARD verde no estado real (--only escopa ao doc)
   # (2026-09-03) era `bash lint | grep -q 'OK ✓'`: o grep -q fecha o pipe no 1º match, o lint leva SIGPIPE e,
   # sob pipefail, o `if` vê falha — corrida que só aparecia com a bancada em paralelo (2 runs de 8 workers, 2×).
+  # (2026-09-23) era `grep -q 'OK ✓'`, e isso media o REPO INTEIRO, nao a REGRA 39: o `--only` nao e
+  # honrado por toda guarda (door-staleness, por exemplo, julga sempre), entao qualquer HARD alheio
+  # derrubava este caso com a mensagem "REGRA 39 acusou o estado real" — acusacao FALSA, e foi
+  # exatamente o que aconteceu: reprovou por a porta publica estar 4 commits defasada. Guarda que
+  # declara menos do que mede e a classe que esta casa persegue; o caso agora mede o que nomeia.
   local f_out; f_out="$(bash "${lint}" --only="${doc}" 2>&1 || true)"
-  if grep -q 'OK ✓' <<< "${f_out}"; then
+  if ! grep -qE 'VIOLATION: .*lint-rules\.md: .*(registro desatualizado|registro ausente|gerador do registro)' <<< "${f_out}"; then
     record_pass "rules-registry: (f) REGRA 39 verde no estado real (--only lint-rules.md)"
-  else record_fail "rules-registry: (f)" "REGRA 39 acusou o estado real (deveria estar em paridade)"; fi
+  else record_fail "rules-registry: (f)" "REGRA 39 acusou o estado real (deveria estar em paridade): $(grep -m1 'lint-rules.md' <<< "${f_out}")"; fi
 }
 
 # Modo onion-version-tracked — REGRA 40. Um adotante (role: adopted) TEM que trackear o .onion-version;
@@ -18782,6 +18787,87 @@ run_radar_aufhebung_selftests() {
   rm -rf "$d"
 }
 _family run_radar_aufhebung_selftests
+
+# ---------------------------------------------------------------------------
+# O LINT NAO MORRE CALADO — o lado CONSUMIDOR da REGRA 89 e o rotulo de morte
+# ---------------------------------------------------------------------------
+# POR QUE EXISTE (medido 2026-09-23, na porta publica): a familia acima exercita o SUT
+# (`radar-aufhebung-check.sh`) e passava verde enquanto o CONSUMIDOR dele, dentro do
+# `lint-artifacts.sh`, MORRIA. Com o baseline VAZIO — o caso da porta, e o caso de qualquer
+# adotante que nunca reconciliou nada — o `grep -v` nao casa nada, devolve 1, a lista `&&` termina
+# em falha e o `set -e` mata o lint DENTRO da funcao: rc=1, zero sumario, e o CI lendo aquele rc=1
+# como "achou violacao HARD". Foram DUAS hipoteses erradas antes de medir, porque a morte era
+# silenciosa. Bancada que testa so o produtor nao ve isto — o defeito vive na juncao.
+run_lint_silent_death_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_skip "lint-morte: o SUT nao existe (${lint})"; return; fi
+  local d; d="$(mktemp -d)"
+
+  # stub do produtor: o consumidor o invoca como `bash "${SCRIPT_DIR}/radar-aufhebung-check.sh"`
+  _lm_stub() { printf '#!/usr/bin/env bash\n%s\nexit 0\n' "$1" > "$d/radar-aufhebung-check.sh"; }
+  # roda SO a funcao consumidora, com as MESMAS opcoes de shell do runner (`set -euo pipefail`) —
+  # sem elas o caso nao reproduz nada, que e o erro que esta bancada ja cometeu antes
+  _lm_run() { # $1=conteudo do baseline (vazio = arquivo de 0 bytes)
+    printf '%s' "$1" > "$d/base.txt"
+    bash -c '
+      set -euo pipefail
+      SCRIPT_DIR="'"$d"'"; REPO_ROOT="'"$d"'"; _R89_BASE="'"$d"'/base.txt"
+      violation() { echo "V[$1] $2 :: $3"; }
+      source <(sed -n "/^check_radar_aufhebung()/,/^}$/p" "'"${lint}"'")
+      check_radar_aufhebung
+      echo "SOBREVIVEU"
+    ' 2>&1
+  }
+
+  _lm_stub ''                                                   # produtor sem acusacao
+  local o; o="$(_lm_run '' || true)"
+  if grep -q 'SOBREVIVEU' <<< "${o}"; then
+    record_pass "lint-morte: (a) baseline VAZIO nao mata o consumidor da REGRA 89"
+  else record_fail "lint-morte: (a)" "o consumidor morreu com baseline vazio (a morte da porta publica): ${o}"; fi
+
+  o="$(_lm_run '# so comentario
+# e linha em branco
+
+' || true)"
+  if grep -q 'SOBREVIVEU' <<< "${o}"; then
+    record_pass "lint-morte: (b) baseline SO com comentarios tambem nao mata"
+  else record_fail "lint-morte: (b)" "comentario-puro mata igual (mesma classe, grep -v devolve 1): ${o}"; fi
+
+  # (c) o caminho de TOLERANCIA continua funcionando — a cura nao pode virar fail-open
+  _lm_stub "printf 'SEM-AUFHEBUNG\\tdocs/x/r.kg.yaml\\n'; printf 'TOTAL\\t1\\n'"
+  o="$(_lm_run 'docs/x/r.kg.yaml
+' || true)"
+  if grep -q 'SOBREVIVEU' <<< "${o}" && ! grep -q 'V\[HARD\]' <<< "${o}"; then
+    record_pass "lint-morte: (c) entrada NO baseline segue tolerada (a cura nao virou fail-open)"
+  else record_fail "lint-morte: (c)" "tolerancia quebrada: ${o}"; fi
+
+  # (d) entrada FORA do baseline segue HARD — a catraca continua morde
+  o="$(_lm_run '' || true)"
+  if grep -q 'V\[HARD\]' <<< "${o}"; then
+    record_pass "lint-morte: (d) entrada FORA do baseline segue HARD (catraca intacta)"
+  else record_fail "lint-morte: (d)" "a catraca deixou de morder: ${o}"; fi
+
+  # (e) O ROTULO: morte antes do sumario e `NAO PUDE JULGAR` (2), nunca veredito (0|1)
+  o="$(bash -c '
+    set -euo pipefail
+    _LINT_SUMMARY_REACHED=0
+    source <(sed -n "/^_lint_on_exit()/,/^}$/p" "'"${lint}"'")
+    # o rc E o objeto do caso: sem colher com `|| _rc=$?` o `set -e` mata o pai ANTES do echo e o
+    # caso reprova com o mecanismo funcionando (foi o que aconteceu na 1a redacao deste caso)
+    _rc=0; ( _lint_on_exit 1 ) || _rc=$?; echo "rc=${_rc}"
+  ' 2>&1 || true)"
+  if grep -q 'rc=2' <<< "${o}" && grep -q 'MORREU' <<< "${o}"; then
+    record_pass "lint-morte: (e) morte antes do sumario sai 2 e se ANUNCIA"
+  else record_fail "lint-morte: (e)" "morte calada ou rotulada como veredito: ${o}"; fi
+
+  # (f) e o flag existe E e ligado antes do sumario — sem isso o trap acusaria todo run saudavel
+  if grep -qE '^_LINT_SUMMARY_REACHED=1' "${lint}" && grep -qE "^trap '_lint_on_exit" "${lint}"; then
+    record_pass "lint-morte: (f) o lint arma o trap e marca o sumario alcancado"
+  else record_fail "lint-morte: (f)" "trap ausente ou flag nunca ligado — todo run saudavel sairia 2"; fi
+
+  rm -rf "$d"
+}
+_family run_lint_silent_death_selftests
 
 
 
