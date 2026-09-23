@@ -2,57 +2,136 @@
 # =============================================================================
 # radar-aufhebung-check.sh — rodada de radar selada reconcilia o corpus que superou
 #
-# POR QUE EXISTE (medido 2026-09-23): é a ÚNICA dívida deste ciclo que PIORA
-# SOZINHA. O `/meta:radar` declara como invariante *"write(KG) por rodada: grafo
-# próprio com SUPERSEDES sobre os nós da baseline anterior que a rodada derrubar
-# (Aufhebung)"*. Das 6 baselines com `kg:`, DUAS apontavam para rodada com ZERO
-# SUPERSEDES — e a consequência não é estética: o corpus
-# `claude-code-2.1-onion-2026-08` cobre 2.1.211–2.1.233 enquanto a baseline E3 já
-# media 2.1.278, e a REGRA 67 acusa revisita vencida que vai VENCER DE NOVO
-# faça-se o que se fizer, porque nenhuma rodada jamais reconciliou o que superou.
+# POR QUE EXISTE (medido 2026-09-23): o `/meta:radar` declara como invariante
+# *"write(KG) por rodada: grafo próprio com SUPERSEDES sobre os nós da baseline
+# anterior que a rodada derrubar (Aufhebung)"* — e as rodadas não o cumprem. O
+# corpus superado segue vencendo a revisita da REGRA 67 para sempre, porque
+# ninguém escreveu o que caiu.
 #
-# ⚠️ ESTA GUARDA QUASE NASCEU PUNINDO QUEM OBEDECE, e isso merece ficar escrito.
-# A aresta `SUPERSEDES` do motor é INTRA-ARQUIVO — medido nos 2 SUPERSEDES da
-# rodada-mãe, ambos com alvo no próprio grafo. Mas o `/meta:radar` manda, na mesma
-# página, (i) escrever *grafo próprio por rodada* E (ii) superseder *a baseline
-# anterior*. As duas são incompatíveis com o modelo de aresta: quem obedece (i)
-# não alcança (ii). A rodada-mãe só consegue porque APENDA no próprio grafo.
-# Enquanto o motor não aprender aresta cross-file, `meta.supersedes_external:` é a
-# única forma honesta de registrar a Aufhebung que de fato ocorreu.
+# ── O UNIVERSO É O QUE A 1ª VERSÃO ERROU, E O ERRO INVERTIA A TESE ───────────
+# A 1ª versão varria só os `kg:` de `radar-baselines.yaml` — ou seja, a rodada
+# ATUAL de cada eixo. Uma passada adversarial mediu: **6 de 7 rodadas seladas têm
+# zero SUPERSEDES, e a guarda contava 1**. O ponteiro do eixo E3 já passou por
+# CINCO rodadas (`maestro-vivo → 09-02 → 09-03 → 09-04 → 09-04-r4 → r5`), e cada
+# troca REMOVEU a dívida anterior da contagem sem reconciliar nada. O cabeçalho
+# anterior dizia "cada rodada nova adiciona mais um órfão"; o mecanismo fazia o
+# oposto — cada rodada nova DESPEJAVA o órfão anterior, e a catraca "encolhia"
+# sozinha. Denominador errado: eram eixos, não rodadas seladas.
+# Agora o universo é a UNIÃO de (a) todo grafo sob `docs/evolution/research/radar-*/`
+# — a convenção que o próprio `/meta:radar` manda usar — com (b) os `kg:` das
+# baselines, que pega as rodadas fora daquela convenção (`maestro-vivo`,
+# `fable-5-1-superacao`).
 #
-# DOIS DESFECHOS LEGÍTIMOS, e a razão de existirem é a mesma: forçar SUPERSEDES
-# inventado seria PIOR que a dívida.
-#   · `meta.supersedes_none: <razão>`     — a rodada genuinamente não derrubou nada
-#   · `meta.supersedes_external: <ref>`   — a Aufhebung é cross-file (ver acima)
+# ── A ARESTA NÃO CRUZA ARQUIVO, e isto quase fez a guarda punir quem obedece ──
+# Medido: `kg-radar.sh:91` é `FILE="${1:-}"` — um arquivo por invocação, zero
+# suporte cross-file. Mas o `/meta:radar` manda, na mesma página, (i) grafo
+# PRÓPRIO por rodada E (ii) superseder a baseline ANTERIOR. Incompatíveis: quem
+# obedece (i) não alcança (ii). A rodada-mãe só consegue porque APENDA no próprio
+# grafo. Enquanto o motor não aprender aresta cross-file, `supersedes_external` é
+# a única forma honesta de registrar a Aufhebung que ocorreu.
 #
-# Uso  : bash .claude/validation/radar-aufhebung-check.sh [REPO_ROOT]
-# Saída: uma linha `SEM-AUFHEBUNG<TAB><grafo>` por rodada acusada, e ao fim
-#        `TOTAL<TAB><n>`. Exit 0 sempre que pôde julgar; 2 quando NÃO pôde.
+# DOIS DESFECHOS DECLARADOS, ambos de 1ª classe — forçar SUPERSEDES inventado
+# seria PIOR que a dívida. Ambos exigem VALOR e vivem no bloco `meta:`:
+#   · `meta.supersedes_none: <razão>`   — a rodada genuinamente não derrubou nada
+#   · `meta.supersedes_external: <ref>` — a Aufhebung é cross-file
+# ⚠️ O VALOR É OBRIGATÓRIO, e não é preciosismo: na 1ª versão um
+# `supersedes_none:` VAZIO calava a guarda, provado no grafo real. Bastava a
+# palavra — o fail-open exato que a regra existe para impedir.
+#
+# Uso  : bash radar-aufhebung-check.sh [REPO_ROOT] [--emit-baseline]
+# Saída: `SEM-AUFHEBUNG<TAB><grafo>` por rodada acusada · `PONTEIRO-QUEBRADO<TAB><g>`
+#        por `kg:` pendurado · `TOTAL<TAB><n>` ao fim.
+#        `--emit-baseline` escreve o baseline CHAVEADO (uma linha por rodada
+#        tolerada) — os 11 baselines irmãos são chaveados e auditáveis por diff;
+#        um inteiro nu não diz QUAL rodada está tolerada, e `tr -dc '0-9'` sobre
+#        ele transformava "1 (era 2)" em teto 12.
+# Exit : 0 pôde julgar · 2 NÃO pôde (≠ zero).
 # =============================================================================
 set -uo pipefail
 
-ROOT="${1:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
+# O emissor NOMEIA o seu baseline: o resolvedor da bancada (regen-ensure-from (g)) casa
+# `--emit-baseline` + o nome do arquivo para provar que cada baseline resolve EXATAMENTE um
+# emissor. Sem esta linha o baseline resolvia ZERO emissores e a bancada completa reprovava — foi
+# assim que a passada adversarial pegou a 1a versao.
+BASELINE_NAME="radar-aufhebung-baseline.txt"
+
+ROOT=""; EMIT=0
+for a in "$@"; do
+  case "${a}" in
+    --emit-baseline) EMIT=1 ;;
+    -*) echo "ERRO	flag desconhecida: ${a}" >&2; exit 2 ;;
+    *) [ -z "${ROOT}" ] && ROOT="${a}" ;;
+  esac
+done
+[ -n "${ROOT}" ] || ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 BL="${ROOT}/docs/onion/radar-baselines.yaml"
 
-# Baseline AUSENTE é silêncio legítimo (adotante sem radar); ILEGÍVEL não é.
-[ -e "${BL}" ] || { echo "TOTAL	0"; exit 0; }
+# ── universo: convenção de diretório UNIÃO ponteiros de baseline ─────────────
+_universe() {
+  find "${ROOT}/docs/evolution/research" -mindepth 2 -maxdepth 2 \
+       -path '*/radar-*/*.kg.yaml' -type f 2>/dev/null \
+    | sed "s#^${ROOT}/##"
+  if [ -r "${BL}" ]; then
+    # corta comentário de fim de linha ANTES de tudo: o estilo `kg: x  # nota` já
+    # existe neste arquivo, e sem o corte o caminho saía com o comentário colado,
+    # o `[ -f ]` falhava e a rodada sumia em silêncio
+    sed -nE 's/^[[:space:]]+kg:[[:space:]]*//p' "${BL}" \
+      | sed -E 's/[[:space:]]+#.*$//; s/^["'"'"']//; s/["'"'"']$//; s/[[:space:]]+$//'
+  fi
+}
+
+# `meta:` termina na primeira chave de topo seguinte (`nodes:`/`edges:`). Fora
+# dele, um `supersedes_none:` dentro de um NÓ — ou dentro de um block scalar de
+# prosa, forma nativa deste corpus — não é declaração, é texto.
+_declares() { # $1=arquivo  → 0 se declarou COM VALOR NÃO-VAZIO no meta
+  # ⚠️ o valor é tirado das ASPAS antes de julgar: `supersedes_none: "   "` tem
+  # caractere não-espaço depois dos dois-pontos (a aspa) e passava por um teste
+  # ingênuo — mesma família do campo vazio, só que disfarçada.
+  awk '
+    /^[a-zA-Z_]/ && !/^meta:/ { exit 1 }
+    /^[[:space:]]+supersedes_(none|external):/ {
+      v = $0
+      sub(/^[[:space:]]+supersedes_(none|external):[[:space:]]*/, "", v)
+      gsub(/^["'"'"']|["'"'"']$/, "", v)
+      gsub(/[[:space:]]/, "", v)
+      if (v != "") { found = 1; exit 0 }
+    }
+    END { exit (found ? 0 : 1) }
+  ' "$1"
+}
+
+# aresta REAL: valor EXATO no fim da linha. Prefixo (`SUPERSEDESX_INVENTADO`) e
+# menção em prosa não contam — ambos passavam na 1ª versão.
+_has_edge() { grep -qE '^[[:space:]]+edge_type:[[:space:]]*SUPERSEDES[[:space:]]*(#.*)?$' "$1"; }
+
+[ -e "${BL}" ] || { [ "${EMIT}" -eq 1 ] || echo "TOTAL	0"; exit 0; }
 [ -r "${BL}" ] || { echo "ERRO	${BL} existe e não é legível — não pude julgar (≠ zero)"; exit 2; }
 
-n=0
-vistos=""
+accused=(); dangling=(); seen=""
 while read -r g; do
   [ -n "${g}" ] || continue
-  # a MESMA rodada costuma servir vários eixos; contar duas vezes inflaria a catraca
-  case " ${vistos} " in *" ${g} "*) continue ;; esac
-  vistos="${vistos} ${g}"
-  [ -f "${ROOT}/${g}" ] || continue
-  # desfechos declarados — ver o cabeçalho
-  grep -qE '^[[:space:]]*supersedes_(none|external):' "${ROOT}/${g}" && continue
-  if ! grep -qE '^[[:space:]]+edge_type:[[:space:]]*SUPERSEDES' "${ROOT}/${g}"; then
-    printf 'SEM-AUFHEBUNG\t%s\n' "${g}"
-    n=$((n + 1))
+  case " ${seen} " in *" ${g} "*) continue ;; esac   # a mesma rodada serve N eixos
+  seen="${seen} ${g}"
+  if [ ! -f "${ROOT}/${g}" ]; then
+    # ponteiro pendurado NÃO é silêncio: some da conta sem ninguém saber
+    dangling+=("${g}"); continue
   fi
-done < <(grep -E '^[[:space:]]+kg:' "${BL}" | sed -E "s/.*kg:[[:space:]]*//; s/^[\"']//; s/[\"']$//")
+  _declares "${ROOT}/${g}" && continue
+  _has_edge "${ROOT}/${g}" || accused+=("${g}")
+done < <(_universe | sort -u)
 
-printf 'TOTAL\t%d\n' "${n}"
+if [ "${EMIT}" -eq 1 ]; then
+  echo "# Catraca de AUFHEBUNG DE RODADA DE RADAR — rodadas seladas toleradas SEM nenhuma"
+  echo "# aresta SUPERSEDES e sem \`meta.supersedes_none\`/\`supersedes_external\` declarado."
+  echo "# CHAVEADO (uma linha por rodada), como os 11 baselines irmãos: inteiro nu não diz QUAL"
+  echo "# rodada está tolerada, e some no diff quando uma sai e outra entra."
+  echo "# Regenere: bash .claude/validation/radar-aufhebung-check.sh . --emit-baseline"
+  echo "#"
+  printf '%s\n' "${accused[@]:-}" | grep -v '^$' || true
+  exit 0
+fi
+
+printf 'SEM-AUFHEBUNG\t%s\n' "${accused[@]:-}" | grep -v $'\t$' || true
+printf 'PONTEIRO-QUEBRADO\t%s\n' "${dangling[@]:-}" | grep -v $'\t$' || true
+printf 'TOTAL\t%d\n' "${#accused[@]}"
 exit 0

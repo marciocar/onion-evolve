@@ -5,46 +5,24 @@ meta:
   review_after: 2026-11-05   # radar de mundo: cadencia 45d (REGRA 65/67)
 
   supersedes_none: >
-    Esta rodada NAO derrubou no nenhum do corpus anterior, e a razao importa mais que o campo.
-    Ela mediu o DELTA de 2.1.261 a 2.1.278; o corpus `claude-code-2.1-onion-2026-08` cobre
-    2.1.211 a 2.1.233 e NAO foi re-medido aqui. Nada foi derrubado porque nada foi re-testado —
-    isso e LACUNA, nao Aufhebung, e declarar `supersedes_external` seria inventar uma
-    reconciliacao que nao ocorreu (a propria REGRA 89 diz que SUPERSEDES forcado e pior que a
-    divida). CONSEQUENCIA QUE FICA NOMEADA: e por isto que a REGRA 67 acusa revisita vencida
-    naquele corpus e vai acusar de novo — o que falta ali nao e a ARESTA, e a MEDICAO. A cura e
-    revisitar (`/onion-research --revisit`), nao carimbar. Registrado em 2026-09-23, conduzindo
-    o /meta:drive, depois de medir que a aresta SUPERSEDES do motor e intra-arquivo e que este
-    grafo, por ser proprio da rodada, nao teria como alcancar os nos daquele corpus.
-  # kg-backlog-guard: on
-  # ═══ TETO: 15 NOS (era 14: +1 pela CURA EXECUTADA apos a passada adversarial — o no-manchete
-  #     estava errado em versao, magnitude e conclusao, e o no que o substitui e acompanhado do
-  #     no de METODO que explica a causa: pular o `kg-corpus-grep` que a research-lens exige) ═══
-  # Rodada 5 do eixo E3 (delta 2.1.261 -> 2.1.278, 15 versoes).
-  # Cresce so por recorrencia medida da mesma classe ou cura executada.
-  #
-  # O QUE DISTINGUE ESTA RODADA DAS ANTERIORES: o processo da sessao E 2.1.278, a versao medida.
-  # A rodada 4 declarou como lacuna "NENHUM comportamento de 2.1.261 foi OBSERVADO" (processo era
-  # 2.1.260). Aqui houve OBSERVACAO no binario vivo — e foi ela, nao o changelog, que produziu o
-  # achado de maior consequencia (E_PULEI_O_CORPUS_E_ISSO_PRODUZIU_O_ACHADO_FALSO).
-  #
-  # METODO E CUSTO: 47 agentes, 3.581.478 tokens, 12 min, 0 erros. 6 eixos em scan (sonnet/medium)
-  # -> juiz adversarial por achado (opus/high, mandato REFUTAR, default REPROVADO).
-  # DESCARTE: 2/41 — contra 18/25 da rodada 4. A queda NAO e sinal de juiz frouxo: e de METODO.
-  # Os scans leram um CHANGELOG LOCAL conferivel verbatim em vez de citar web, e os DOIS achados
-  # reprovados foram justamente os que dependiam de fonte externa. Fonte local verificavel muda a
-  # taxa de fabricacao — isto e aprendizado sobre COMO medir, nao sobre o que mudou.
-  #
-  # BI-TEMPORAL, E A METADE QUE FALTA ESTA DECLARADA: os nos trazem `verified_at` (quando EU
-  # verifiquei) e `source_tier`/`source_kind` (autoridade da fonte), mas NAO trazem `valid_from`
-  # (quando o fato passou a valer). A razao e do artefato, nao do metodo: o changelog local NAO
-  # TRAZ DATA POR VERSAO — so a ordem das versoes. Datar por inferencia seria inventar o campo
-  # que existe para nao inventar. Fica como lacuna nomeada; fechar exige fonte com data (release
-  # notes publicadas ou tag do pacote), que esta rodada nao abriu.
-  #
-  # PASSO DE CORPUS NAO EXECUTADO COMO A LENTE PEDE: a `research-lens` manda rodar
-  # `kg-corpus-grep.sh <tema>` antes de qualquer busca. Eu li o grafo da rodada 4 DIRETAMENTE
-  # (radar-E3-2026-09-04-r4) em vez de grepar o corpus inteiro. Cobriu o eixo E3, mas pode ter
-  # perdido cruzamento com grafos de outros eixos — declarado, nao escondido.
+    Esta rodada nao derrubou no nenhum da BASELINE ANTERIOR do eixo E3, que e a
+    `radar-E3-2026-09-04-r4` — e nomear o grafo certo importa, porque a 1a versao desta
+    declaracao mirava o `claude-code-2.1-onion-2026-08`, que NUNCA foi baseline do E3 (o
+    ponteiro do eixo passou por maestro-vivo -> 09-02 -> 09-03 -> 09-04 -> r4 -> r5). Contra a
+    r4 a r5 CORRIGE uma atribuicao sem derrubar a claim: a r4 atribuiu a ausencia de sinal de
+    mercado a "o fan-out nao teve worker de mercado"; a r5 rodou worker de mercado e ainda achou
+    sinal fraco, deslocando a causa para o roster de fontes. Isso e refinamento de CAUSA, nao
+    Aufhebung de conclusao — nenhum no da r4 fica falso.
+    Sobre o corpus `claude-code-2.1-onion-2026-08` (2.1.211-233), que nao e baseline mas e o que
+    a REGRA 67 acusa como vencido: a r5 tampouco o derruba. Ela CONCORDA com ele onde toca — o no
+    E_TASK_TOOLS_A_FORMA_DO_GATE_MUDOU_O_DESLIGAMENTO_NAO re-mede no repo o que aquele corpus
+    afirmara (Task* = ZERO) e o cita como autoridade. A 1a versao desta declaracao dizia que o
+    corpus "NAO foi re-medido aqui", e isso era exagero: um no o re-mede em parte. O correto e
+    mais estreito: a r5 nao re-mediu o corpus INTEIRO e nao contradisse nada dele.
+    CONSEQUENCIA QUE FICA NOMEADA: por isso a REGRA 67 acusa revisita vencida naquele corpus e
+    vai acusar de novo — o que falta ali nao e a ARESTA, e a MEDICAO. A cura e revisitar
+    (`/onion-research --revisit`), nao carimbar. Registrado em 2026-09-23 conduzindo o
+    /meta:drive; corrigido no mesmo dia depois que a passada adversarial mostrou os dois furos.
 
 nodes:
   - id: Q_E3_DELTA_2_1_278

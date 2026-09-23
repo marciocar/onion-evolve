@@ -34,7 +34,19 @@ introspecção e **zero percepção externa recorrente** (S9 parada desde 07-06)
 - **Juiz-fixo por eixo** (`opus/high`, mandato REFUTAR, ABRE as fontes): calibrado no programa
   (13/47 findings reprovados por fonte fabricada — sem juiz, entrariam na síntese).
 - **write(KG) por rodada**: grafo próprio `docs/evolution/research/radar-<eixo|all>-<data>/`,
-  com `SUPERSEDES` sobre os nós da baseline anterior que a rodada derrubar (Aufhebung).
+  reconciliando o que a rodada derrubar da **baseline anterior do eixo** (Aufhebung) — e são
+  **três** desfechos, não um. Cobrado pela **REGRA 89 (Rodada de radar selada reconcilia o corpus
+  que superou (Aufhebung), com catraca)**:
+  1. `SUPERSEDES` no próprio grafo, quando o nó derrubado vive nele;
+  2. `meta.supersedes_external: <grafo>#<nó>`, quando ele vive na rodada ANTERIOR — e este caso é
+     a regra, não a exceção. ⚠️ **A aresta do motor é INTRA-ARQUIVO** (`kg-radar.sh` recebe um
+     arquivo por invocação): obedecer ao "grafo próprio por rodada" torna `SUPERSEDES` sobre a
+     baseline anterior *inalcançável*. Esta linha mandou o impossível por semanas, e a guarda
+     nasceu quase punindo quem a obedecia;
+  3. `meta.supersedes_none: <razão>`, quando a rodada genuinamente não derrubou nada — desfecho de
+     1ª classe. **Forçar `SUPERSEDES` inventado é pior que a dívida**, e a razão tem de dizer
+     contra QUAL baseline se mediu (a do eixo, não um corpus qualquer).
+  Os dois `meta.*` exigem **valor**: campo vazio não conta.
 - **Lacuna declarada é desfecho de 1ª classe** (molde `E_REDDIT_INALCANCAVEL`): fonte
   inalcançável vira `lacunas_declaradas`, nunca finding.
 

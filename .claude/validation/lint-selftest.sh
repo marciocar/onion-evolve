@@ -18312,6 +18312,12 @@ run_regen_completude_selftests() {
     "federation-console.sh"     # deriva de docs/evolution/federation/members.yaml — CORE-ONLY: sem registro, não há mapa nem console a gerar
     "marketplace-root-check.sh" # marketplace é CORE-ONLY (só a fonte publica plugin)
     "vendor-scrub-form-check.sh" # emite BASELINE, não projeção: baseline é LEDGER DO ALVO e o do core nunca viaja
+    # Mesma natureza do acima, e a forma CHAVEADA é o que torna a isenção segura: as linhas são
+    # caminhos de rodada do CORE (`docs/evolution/research/radar-*/…`), e o `regen-baselines.sh`
+    # filtra entrada com forma de caminho — o adotante nasce com a lista VAZIA, que é o certo.
+    # Na 1ª versão o baseline era um inteiro nu (`1`), que não tem barra, não era filtrado, e o
+    # adotante herdava um teto do core que ele nunca mereceu (achado da passada adversarial).
+    "radar-aufhebung-check.sh"  # emite BASELINE chaveado por rodada do core — não é projeção, e não viaja
     "kg-view.sh"                # visualizador POR-GRAFO (exige argumento), não gerador de projeção
     # ⚠️ ACHADO PELO PRÓPRIO CASO, na 1ª execução dele (2026-09-17): eu tinha varrido à mão e
     # perdido este, porque a frase da mensagem dele difere um pouco das outras. O oráculo derivado
@@ -18656,80 +18662,122 @@ print("OK" if f1 and f2 and f1[0] != f2[0] else "CONTIGUO")
 }
 _family run_shard_plan_selftests
 
-# ── REGRA 89: a divida de Aufhebung que CRESCE SOZINHA ────────────────────────────────────────
-# POR QUE EXISTE (2026-09-23): das 6 baselines com `kg:`, DUAS apontavam para rodada com ZERO
-# SUPERSEDES. E a unica divida deste ciclo que piora sozinha — o corpus superado segue vencendo a
-# revisita da REGRA 67 para sempre, porque ninguem escreveu o que caiu.
-# ⚠️ A 1a VERSAO DESTA FAMILIA RODAVA O LINT INTEIRO 4 VEZES: 12+ min numa familia so, que cairia
-#    numa faixa do CI. Guarda extraida para script proprio (o molde da casa) e exercitada direto:
-#    27 ms. Bancada cara nao e rigor, e imposto.
+# ── REGRA 89: a divida de Aufhebung, e as SEIS evasoes que uma passada adversarial provou ─────
+# POR QUE EXISTE (2026-09-23): a 1a versao desta guarda varria so os `kg:` das baselines — a
+# rodada ATUAL de cada eixo — e por isso contava 1 de uma divida de 6. Cada rodada nova DESPEJAVA
+# a anterior da conta sem reconciliar nada, e "a metrica de saude e este numero diminuindo" era
+# falso: o denominador eram EIXOS, nao rodadas seladas. Alem disso, oito fixtures onde a guarda
+# DEVERIA acusar passaram com TOTAL 0. Cada caso abaixo fixa uma dessas evasoes.
+# ⚠️ E a 1a versao DESTA FAMILIA rodava o lint INTEIRO 4 vezes (12+ min, numa faixa do CI).
+#    Guarda extraida para script proprio e exercitada direto: ~0,1 s o check, ~3 s a familia.
 run_radar_aufhebung_selftests() {
   local sut="${SCRIPT_DIR}/radar-aufhebung-check.sh"
   if [ ! -f "${sut}" ]; then record_skip "radar-aufhebung: o SUT nao existe (${sut})"; return; fi
   local d; d="$(mktemp -d)"
 
-  _r89() { # $1=subdir  $2=linha extra no meta  $3=edge_type
-    mkdir -p "$d/$1/docs/onion" "$d/$1/docs/evolution/research/rodada-x"
-    printf 'eixos:\n  E9:\n    last_run: 2026-09-23\n    kg: docs/evolution/research/rodada-x/rodada-x.kg.yaml\n' \
-      > "$d/$1/docs/onion/radar-baselines.yaml"
-    { printf 'meta:\n  id: rodada-x\n  schema_version: "1"\n'
-      [ -n "$2" ] && printf '  %s\n' "$2"
-      printf 'nodes:\n  - id: E_UM\n    node_type: evidence\n  - id: E_DOIS\n    node_type: evidence\n'
-      printf 'edges:\n  - from: E_UM\n    to: E_DOIS\n    edge_type: %s\n' "${3:-SUPPORTS}"
-    } > "$d/$1/docs/evolution/research/rodada-x/rodada-x.kg.yaml"
+  # monta um repo-fixture: $1=subdir · $2=linhas extras no meta · $3=edge_type · $4=linha do kg
+  _r89() {
+    local sub="$1" meta="$2" et="${3:-SUPPORTS}" kgl="${4:-docs/evolution/research/radar-x/rx.kg.yaml}"
+    mkdir -p "$d/$sub/docs/onion" "$d/$sub/docs/evolution/research/radar-x"
+    { echo 'eixos:'; echo '  E9:'; echo "    kg: ${kgl}"; } > "$d/$sub/docs/onion/radar-baselines.yaml"
+    { echo 'meta:'; echo '  id: rx'
+      [ -n "${meta}" ] && printf '%s\n' "${meta}"
+      echo 'nodes:'; echo '  - id: E_UM'
+      echo 'edges:'; echo '  - from: E_UM'; echo '    to: E_UM'; echo "    edge_type: ${et}"
+    } > "$d/$sub/docs/evolution/research/radar-x/rx.kg.yaml"
   }
-  _n() { bash "${sut}" "$d/$1" 2>&1 | awk -F'\t' '$1=="TOTAL"{print $2}'; }
+  _n() { bash "${sut}" "$d/$1" 2>/dev/null | awk -F'\t' '$1=="TOTAL"{print $2}'; }
+  _esp() { # $1=subdir $2=esperado $3=rotulo
+    local got; got="$(_n "$1")"
+    if [ "${got}" = "$2" ]; then record_pass "radar-aufhebung: $3"
+    else record_fail "radar-aufhebung: ${3%% *}" "${3#* } — TOTAL=${got:-<vazio>}, esperado $2"; fi
+  }
 
-  # (a) sem SUPERSEDES e sem declaracao => acusada
-  _r89 a "" ""
-  if [ "$(_n a)" = "1" ]; then
-    record_pass "radar-aufhebung: (a) rodada sem Aufhebung nem declaracao e ACUSADA"
-  else record_fail "radar-aufhebung: (a)" "divida silenciosa (TOTAL=$(_n a), esperado 1)"; fi
+  _r89 a  ""                                   ""            ; _esp a 1 "(a) rodada sem Aufhebung nem declaracao e ACUSADA"
+  _r89 b  ""                                   "SUPERSEDES"  ; _esp b 0 "(b) rodada que reconciliou nao e acusada"
+  _r89 c  '  supersedes_none: a razao real'    ""            ; _esp c 0 "(c) supersedes_none COM VALOR e desfecho legitimo"
 
-  # (b) COM SUPERSEDES intra-arquivo => nao acusa
-  _r89 b "" "SUPERSEDES"
-  if [ "$(_n b)" = "0" ]; then
-    record_pass "radar-aufhebung: (b) rodada que reconciliou nao e acusada"
-  else record_fail "radar-aufhebung: (b)" "falso positivo sobre quem reconciliou (TOTAL=$(_n b))"; fi
+  # (d) a UNICA forma expressavel de Aufhebung cross-file — a aresta do motor e INTRA-arquivo, e o
+  #     /meta:radar manda grafo PROPRIO por rodada. Sem este caso a guarda pune quem obedece.
+  _r89 e  '  supersedes_external: "outro.kg.yaml#E_VELHO"' ""; _esp e 0 "(d) supersedes_external conta (a aresta nao cruza arquivo)"
 
-  # (c) `supersedes_none` => desfecho de 1a classe (forcar SUPERSEDES inventado seria pior)
-  _r89 c 'supersedes_none: "nao derrubou nada, e a razao e esta"' ""
-  if [ "$(_n c)" = "0" ]; then
-    record_pass "radar-aufhebung: (c) supersedes_none e desfecho legitimo, nao divida"
-  else record_fail "radar-aufhebung: (c)" "a declaracao honesta foi punida (TOTAL=$(_n c))"; fi
+  # (e) FAIL-OPEN provado no grafo REAL: bastava a PALAVRA para calar a guarda. Tres formas vazias.
+  _r89 f1 '  supersedes_none:'                 ""            ; _esp f1 1 "(e1) supersedes_none VAZIO NAO cala a guarda"
+  _r89 f2 '  supersedes_none: "   "'           ""            ; _esp f2 1 "(e2) supersedes_none com aspas de ESPACO nao cala"
+  _r89 f3 "  supersedes_none: ''"              ""            ; _esp f3 1 "(e3) supersedes_none com aspas vazias nao cala"
 
-  # (d) `supersedes_external` => a UNICA forma expressavel de Aufhebung cross-file. SEM este caso a
-  #     guarda puniria quem obedece ao /meta:radar, que manda grafo PROPRIO por rodada enquanto a
-  #     aresta do motor e INTRA-arquivo. Foi o achado que quase me fez publicar a guarda errada.
-  _r89 e 'supersedes_external: "outro-grafo.kg.yaml#E_VELHO"' ""
-  if [ "$(_n e)" = "0" ]; then
-    record_pass "radar-aufhebung: (d) supersedes_external conta (a aresta nao cruza arquivo)"
-  else record_fail "radar-aufhebung: (d)" "pune quem obedece ao grafo-proprio-por-rodada (TOTAL=$(_n e))"; fi
+  # (f) a declaracao vale so no bloco `meta:`. Dentro de um NO nao e declaracao, e texto — e este
+  #     corpus usa block scalar de prosa, entao a palavra aparece naturalmente em label.
+  mkdir -p "$d/g/docs/onion" "$d/g/docs/evolution/research/radar-x"
+  { echo 'eixos:'; echo '  E9:'; echo '    kg: docs/evolution/research/radar-x/rx.kg.yaml'; } > "$d/g/docs/onion/radar-baselines.yaml"
+  { echo 'meta:'; echo '  id: rx'; echo 'nodes:'; echo '  - id: E_UM'
+    echo '    supersedes_none: dentro do no, nao vale'
+    echo 'edges:'; echo '  - from: E_UM'; echo '    to: E_UM'; echo '    edge_type: SUPPORTS'
+  } > "$d/g/docs/evolution/research/radar-x/rx.kg.yaml"
+  _esp g 1 "(f) declaracao FORA do meta (dentro de um no) nao conta"
 
-  # (e) A MESMA rodada servindo N eixos conta UMA vez — contar N inflaria a catraca e faria o teto
-  #     subir sem divida nova. Hoje 4 das 6 baselines apontam para o MESMO grafo.
-  mkdir -p "$d/f/docs/onion" "$d/f/docs/evolution/research/rodada-x"
-  printf 'eixos:\n  E1:\n    kg: docs/evolution/research/rodada-x/rodada-x.kg.yaml\n  E2:\n    kg: docs/evolution/research/rodada-x/rodada-x.kg.yaml\n  E3:\n    kg: docs/evolution/research/rodada-x/rodada-x.kg.yaml\n' \
-    > "$d/f/docs/onion/radar-baselines.yaml"
-  printf 'meta:\n  id: rodada-x\nnodes:\n  - id: E_UM\nedges:\n  - from: E_UM\n    to: E_UM\n    edge_type: SUPPORTS\n' \
-    > "$d/f/docs/evolution/research/rodada-x/rodada-x.kg.yaml"
-  if [ "$(_n f)" = "1" ]; then
-    record_pass "radar-aufhebung: (e) a mesma rodada em 3 eixos conta UMA vez (nao infla a catraca)"
-  else record_fail "radar-aufhebung: (e)" "contou por EIXO e nao por rodada (TOTAL=$(_n f), esperado 1)"; fi
+  # (g) `edge_type: SUPERSEDES` citado em PROSA nao e reconciliacao; e o casamento e EXATO, entao
+  #     `SUPERSEDESX_INVENTADO` tambem nao passa. Ambos passavam na 1a versao.
+  mkdir -p "$d/h/docs/onion" "$d/h/docs/evolution/research/radar-x"
+  { echo 'eixos:'; echo '  E9:'; echo '    kg: docs/evolution/research/radar-x/rx.kg.yaml'; } > "$d/h/docs/onion/radar-baselines.yaml"
+  { echo 'meta:'; echo '  id: rx'; echo 'nodes:'; echo '  - id: E_UM'
+    echo '    label: "o texto diz edge_type: SUPERSEDES mas e prosa"'
+    echo 'edges:'; echo '  - from: E_UM'; echo '    to: E_UM'; echo '    edge_type: SUPPORTS'
+  } > "$d/h/docs/evolution/research/radar-x/rx.kg.yaml"
+  _esp h 1 "(g) SUPERSEDES em PROSA nao conta como reconciliacao"
+  _r89 i "" "SUPERSEDESX_INVENTADO"            ; _esp i 1 "(g2) casamento e EXATO (prefixo inventado nao passa)"
 
-  # (f) baseline ILEGIVEL => nao pude julgar (exit 2), nunca zero silencioso
-  mkdir -p "$d/g/docs/onion"; : > "$d/g/docs/onion/radar-baselines.yaml"; chmod 000 "$d/g/docs/onion/radar-baselines.yaml"
-  local rcg; if bash "${sut}" "$d/g" >/dev/null 2>&1; then rcg=0; else rcg=$?; fi
-  chmod 644 "$d/g/docs/onion/radar-baselines.yaml"
-  if [ "${rcg}" -eq 2 ] || [ "$(id -u)" = "0" ]; then
-    record_pass "radar-aufhebung: (f) baseline ilegivel => NAO PUDE JULGAR (!= zero)"
-  else record_fail "radar-aufhebung: (f)" "ilegivel virou zero silencioso (rc=${rcg})"; fi
+  # (h) comentario no fim da linha do `kg:` — estilo que o arquivo real ja usa. Sem cortar, o
+  #     caminho saia com o comentario colado e a rodada sumia em silencio.
+  _r89 j "" "" 'docs/evolution/research/radar-x/rx.kg.yaml   # a rodada 5'
+  _esp j 1 "(h) kg: com comentario no fim nao fica invisivel"
 
-  # (g) baseline AUSENTE e silencio LEGITIMO (adotante sem radar) — o par de (f)
-  mkdir -p "$d/h"
-  if [ "$(_n h)" = "0" ]; then
-    record_pass "radar-aufhebung: (g) sem baseline, silencio legitimo (adotante sem radar)"
-  else record_fail "radar-aufhebung: (g)" "gritou sem ter o que medir (TOTAL=$(_n h))"; fi
+  # (i) ponteiro PENDURADO e REPORTADO, nao engolido — nenhum caso cobria esta linha antes.
+  _r89 k "" "" 'docs/nao/existe.kg.yaml'
+  # `sut | grep -q` fecha o pipe cedo: o SUT leva SIGPIPE e, sob `set -o pipefail`, o `if` le 141
+  # como FALSO — a familia `pipefail-epipe-early-closer` que esta casa ja pagou caro. Capture e
+  # depois filtre; nunca deixe um leitor que sai cedo decidir o veredito.
+  local _ok; _ok="$(bash "${sut}" "$d/k" 2>/dev/null)"
+  if LC_ALL=C grep -q '^PONTEIRO-QUEBRADO' <<< "${_ok}"; then
+    record_pass "radar-aufhebung: (i) kg: pendurado e REPORTADO (nao some da conta calado)"
+  else record_fail "radar-aufhebung: (i)" "ponteiro quebrado sumiu em silencio"; fi
+
+  # (j) O UNIVERSO E O ERRO QUE INVERTIA A TESE: rodada selada que o ponteiro JA ABANDONOU segue
+  #     na conta. Antes, trocar o `kg:` DESPEJAVA a divida em vez de reconcilia-la.
+  mkdir -p "$d/l/docs/onion" "$d/l/docs/evolution/research/radar-velha" "$d/l/docs/evolution/research/radar-nova"
+  { echo 'eixos:'; echo '  E9:'; echo '    kg: docs/evolution/research/radar-nova/rn.kg.yaml'; } > "$d/l/docs/onion/radar-baselines.yaml"
+  for r in velha:rv nova:rn; do
+    { echo 'meta:'; echo "  id: ${r#*:}"; echo 'nodes:'; echo '  - id: E_UM'
+      echo 'edges:'; echo '  - from: E_UM'; echo '    to: E_UM'; echo '    edge_type: SUPPORTS'
+    } > "$d/l/docs/evolution/research/radar-${r%%:*}/${r#*:}.kg.yaml"
+  done
+  _esp l 2 "(j) rodada ABANDONADA pelo ponteiro segue na conta (o despejo era a inversao)"
+
+  # (k) a mesma rodada em N eixos conta UMA vez — contar N inflaria a catraca sem divida nova
+  mkdir -p "$d/m/docs/onion" "$d/m/docs/evolution/research/radar-x"
+  { echo 'eixos:'; for e in E1 E2 E3; do echo "  ${e}:"; echo '    kg: docs/evolution/research/radar-x/rx.kg.yaml'; done; } > "$d/m/docs/onion/radar-baselines.yaml"
+  { echo 'meta:'; echo '  id: rx'; echo 'nodes:'; echo '  - id: E_UM'
+    echo 'edges:'; echo '  - from: E_UM'; echo '    to: E_UM'; echo '    edge_type: SUPPORTS'; } > "$d/m/docs/evolution/research/radar-x/rx.kg.yaml"
+  _esp m 1 "(k) a mesma rodada em 3 eixos conta UMA vez"
+
+  # (l) baseline ILEGIVEL => nao pude julgar (exit 2), nunca zero silencioso
+  mkdir -p "$d/n/docs/onion"; : > "$d/n/docs/onion/radar-baselines.yaml"; chmod 000 "$d/n/docs/onion/radar-baselines.yaml"
+  local rcn; if bash "${sut}" "$d/n" >/dev/null 2>&1; then rcn=0; else rcn=$?; fi
+  chmod 644 "$d/n/docs/onion/radar-baselines.yaml"
+  if [ "${rcn}" -eq 2 ] || [ "$(id -u)" = "0" ]; then
+    record_pass "radar-aufhebung: (l) baseline ilegivel => NAO PUDE JULGAR (!= zero)"
+  else record_fail "radar-aufhebung: (l)" "ilegivel virou zero silencioso (rc=${rcn})"; fi
+
+  # (m) baseline AUSENTE e silencio legitimo (adotante sem radar) — o par de (l)
+  mkdir -p "$d/o"; _esp o 0 "(m) sem baseline, silencio legitimo (adotante sem radar)"
+
+  # (n) `--emit-baseline` existe e emite CHAVEADO. A REGRA 62 cobra emissor para todo baseline, e
+  #     a bancada completa REPROVOU a 1a versao exatamente aqui (regen-ensure-from, caso (g)).
+  _r89 p "" ""
+  local emt; emt="$(bash "${sut}" "$d/p" --emit-baseline 2>/dev/null)"
+  if LC_ALL=C grep -qx 'docs/evolution/research/radar-x/rx.kg.yaml' <<< "${emt}"; then
+    record_pass "radar-aufhebung: (n) --emit-baseline emite o baseline CHAVEADO"
+  else record_fail "radar-aufhebung: (n)" "emissor ausente ou nao-chaveado: $(_emit "${emt}" | head -c 140)"; fi
 
   rm -rf "$d"
 }

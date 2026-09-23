@@ -4436,21 +4436,30 @@ check_radar_aufhebung() {
     violation "HARD" ".claude/validation/radar-aufhebung-check.sh" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): a guarda nao pode julgar — $(printf '%s' "${out}" | head -1)"
     return 0
   fi
-  local tol=0 sem=0 line
-  [ -f "${_R89_BASE}" ] && tol="$(grep -vE '^[[:space:]]*(#|$)' "${_R89_BASE}" | head -1 | tr -dc '0-9')"
-  [ -n "${tol}" ] || tol=0
+  # CHAVEADO, nao contagem: com teto numerico, uma rodada NOVA sem Aufhebung entrando junto com
+  # uma velha reconciliada mantinha o total igual e passava despercebida. A catraca compara
+  # CONJUNTOS — entrada nao-tolerada e HARD mesmo com o numero parado.
+  local tolerated=""
+  [ -f "${_R89_BASE}" ] && tolerated="$(grep -vE '^[[:space:]]*(#|$)' "${_R89_BASE}")"
+  local fresh=0 line tag val
   while IFS=$'\t' read -r tag val; do
     case "${tag}" in
-      SEM-AUFHEBUNG)
-        violation "SOFT" "${val}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): rodada selada como baseline com ZERO aresta SUPERSEDES — o que ela DERRUBOU nao foi escrito, e o corpus superado segue vencendo a revisita para sempre. Reconcilie, ou declare 'meta.supersedes_none: <razao>' se nao derrubou nada. A aresta SUPERSEDES do motor e INTRA-arquivo: rodada em grafo PROPRIO registra a Aufhebung cross-file com 'meta.supersedes_external: <grafo>#<no>', que esta regra aceita"
+      PONTEIRO-QUEBRADO)
+        violation "HARD" "docs/onion/radar-baselines.yaml" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): a baseline aponta 'kg: ${val}', que NAO EXISTE — a rodada sai da conta sem ninguem saber. Corrija o ponteiro ou remova o eixo"
         ;;
-      TOTAL) sem="${val}" ;;
+      SEM-AUFHEBUNG)
+        if printf '%s\n' "${tolerated}" | grep -qxF "${val}"; then
+          : # passivo conhecido, contabilizado no resumo abaixo
+        else
+          fresh=$((fresh + 1))
+          violation "HARD" "${val}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): rodada selada SEM Aufhebung e FORA do baseline — a catraca SO ENCOLHE. Reconcilie (no novo + SUPERSEDES datado), ou declare no bloco meta 'supersedes_none: <razao>' se nao derrubou nada, ou 'supersedes_external: <grafo>#<no>' (a aresta do motor e INTRA-arquivo, entao rodada em grafo proprio registra a Aufhebung cross-file assim). Declaracao SEM VALOR nao conta"
+        fi
+        ;;
     esac
   done <<< "${out}"
-  if [ "${sem:-0}" -gt "${tol}" ]; then
-    violation "HARD" "${_R89_BASE#"${REPO_ROOT}/"}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): ${sem} rodada(s) sem Aufhebung contra teto ${tol} — a catraca SO ENCOLHE. Reconcilie a rodada nova em vez de subir o teto"
-  elif [ "${sem:-0}" -gt 0 ]; then
-    violation "SOFT" "${_R89_BASE#"${REPO_ROOT}/"}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): [radar-aufhebung/PASSIVO] ${sem} rodada(s) sem SUPERSEDES toleradas pelo baseline — a metrica de saude e este numero DIMINUINDO"
+  local n_tol; n_tol="$(printf '%s\n' "${tolerated}" | grep -c . || true)"
+  if [ "${fresh}" -eq 0 ] && [ "${n_tol:-0}" -gt 0 ]; then
+    violation "SOFT" "${_R89_BASE#"${REPO_ROOT}/"}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): [radar-aufhebung/PASSIVO] ${n_tol} rodada(s) selada(s) sem Aufhebung toleradas pelo baseline — a metrica de saude e esta LISTA encolhendo (reconcilie uma e regenere: bash .claude/validation/radar-aufhebung-check.sh . --emit-baseline)"
   fi
 }
 
