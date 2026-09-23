@@ -80,10 +80,46 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 1.0
-    status: open
+    # ⚠️ FLIP AGUARDANDO SELO DO MAESTRO (nomeado no STATE.md, 2026-09-23). O predicado
+    # kg-seal-exception.sh disse PARA (o no ja esta em origin/main, entao o flip e dele) e a
+    # doutrina manda DESFAZER o flip nesse caso — mas desfazer deixa o no recebendo REFUTES com
+    # status open, e o radar REPROVA isso (exit 1: "contradicao estrutural"). Os dois mecanismos
+    # se contradizem para esta forma exata, e o P0 do drive proibe conduzir grafo ilegivel. Mantive
+    # o flip para o motor ler, e o carreguei ao checkpoint em vez de selar calado.
+    status: refuted
     verified_at: '2026-09-22'
     verified_against: 'rodada de 2026-09-22 com --affected-staged --jobs auto (183 familias / 8 workers em 1117s): 1409 passaram, 1 falhou, e a busca no arquivo de saida devolveu a linha do NOME e nada mais; a mesma familia rodada isolada deu 3 passes'
     label: 'MEDIDO AO VIVO: a bancada em faixa paralela (--jobs auto) imprime, no rodape, apenas o NOME do caso que falhou — sem a saida que o record_fail capturou. O flaky `kg-reverify-schema: selftest` caiu numa rodada de 1409 casos e a unica informacao foi a string do nome. Isto contradiz a licao ja registrada na casa de que "a falha agora carrega a saida": a cura de diagnosticabilidade existe, mas NAO alcanca o caminho da faixa paralela — que e justamente o caminho que o CI e o pre-commit usam. Flaky sem saida capturada e flaky para sempre.'
+
+  - id: E_A_FAIXA_CARREGA_O_DETALHE_EU_E_QUE_TRUNQUEI
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-09-23'
+    verified_against: 'reproducao executada em 2026-09-23: mutante que faz o workflow-syntax-check.sh sair sempre 0, rodado com `--families workflow_syntax,shard_plan,identifier_language --jobs auto`, saida COMPLETA capturada em arquivo. Linhas 17-23 trazem `✗ <caso> — <motivo>` para os 6 casos que reprovaram; o rodape nas linhas 40-45 traz so os nomes, como sempre foi. Alem disso, `lint-selftest.sh:401` mostra o pai replicando a saida do filho (`grep -vE ^#ONION_SELFTEST_`), e `record_fail` (l.495) imprime nome E motivo.'
+    label: 'REFUTA `E_BANCADA_EM_FAIXA_NAO_REPLICA_A_FALHA`: a faixa paralela CARREGA o detalhe da falha, sim. O que eu medi em 2026-09-22 foi um arquivo TRUNCADO — rodei a bancada com `| tail -14`, o harness guardou so a cauda, e depois eu grepei aquele arquivo e conclui que o detalhe nao existia. O rodape lista nomes porque e rodape; o detalhe vive inline, onde o caso falhou, e estava la o tempo todo. Classe do erro: medir o proprio artefato de captura em vez do artefato medido — a mesma familia de `exit-code-nao-e-a-verificacao`, so que aplicada a uma saida de terminal. E a licao que fica e mais estreita e mais util que o nó falso: PIPE QUE TRUNCA ANTES DE UM BACKGROUND TASK DESTROI A EVIDENCIA, e o arquivo resultante parece completo.'
+
+  - id: D_PREDICADO_E_RADAR_SE_CONTRADIZEM_NO_REFUTES_DE_NO_JA_SELADO
+    node_type: decision
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: open
+    verified_at: '2026-09-23'
+    verified_against: 'medido em 2026-09-23 neste grafo: com status=refuted o radar sai 0 e o kg-seal-exception.sh sai PARA; com status=open (o flip desfeito, como a doutrina manda) o radar sai 1 com "CONTRADICAO: recebe REFUTES mas segue status=open"'
+    label: 'BURACO DE DOUTRINA ACHADO CONDUZINDO: quando um no JA EM origin/main e refutado por medicao posterior, os dois mecanismos do drive mandam coisas opostas. O `kg-seal-exception.sh` diz PARA (correto — o flip de verdade e do maestro) e a doutrina §4.1 conclui "desfaca o flip e leve ao maestro"; mas o grafo com o flip desfeito tem um no recebendo REFUTES e ainda `open`, que o radar reprova como contradicao estrutural — e o P0 do proprio drive proibe conduzir grafo que o motor nao le. Nao ha estado que satisfaca os dois. OPCOES PARA O MAESTRO: (a) a doutrina passa a dizer "mantenha o flip e NOMEIE no checkpoint" quando desfazer quebraria a integridade — o que e o que eu fiz aqui, por necessidade; (b) nasce um status intermediario tipo `refuted-pending-seal` que o radar aceite e que o checkpoint liste; (c) o radar passa a tolerar `open` recebendo REFUTES quando houver um marcador de flip-pendente. A (a) e a mais barata e nao muda motor nenhum; a (b) e a mais honesta porque o estado "medido mas nao selado" passa a EXISTIR na gramatica em vez de se disfarcar de selado.'
+
+  - id: E_A_KB_JA_FOI_CORRIGIDA_EM_09_18_SO_A_IMPLEMENTACAO_FALTA
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-09-23'
+    verified_against: 'lido em 2026-09-23 em knowledge-graph-sdaal.md:203-218: o item lista as CINCO reprovacoes que o motor de fato faz (ids duplicados, aresta para no inexistente, orfao, contradicao REFUTES, enum invalido) e traz um bloco CORRIGIDO em 2026-09-18 que registra o placar antigo em vez de apaga-lo; o cabecalho kg-radar.sh:25-32 traz a mesma lista'
+    label: 'ESTREITA `D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA`: a metade DOUTRINARIA ja estava curada quando escrevi aquele no. A KB foi corrigida em 2026-09-18 pelo mesmo sinal, e hoje ela diz exatamente o que o motor faz — com o placar antigo REGISTRADO, nao apagado, e com a frase que importa: "a correcao e o texto alcancar o codigo, nunca o contrario". Eu repeti a afirmacao do sinal sem medir a KB, um dia depois de ela ja ter sido corrigida: e a mesma classe que este ciclo persegue, so que do meu lado. O QUE RESTA do no e so a decisao de IMPLEMENTAR as quatro reprovacoes ausentes (ciclo DEPENDS_ON, decision done fora de PROD, refuted recebendo SUPPORTS, migalha pendente que hoje e ⚠) — e essa segue legitimamente aberta, porque a KB ja a declara como "decisao em aberto, nao divida escondida".'
 
 edges:
   - from: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM
@@ -107,3 +143,12 @@ edges:
   - from: E_BANCADA_EM_FAIXA_NAO_REPLICA_A_FALHA
     to: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM
     edge_type: SUPPORTS
+  - from: E_A_FAIXA_CARREGA_O_DETALHE_EU_E_QUE_TRUNQUEI
+    to: E_BANCADA_EM_FAIXA_NAO_REPLICA_A_FALHA
+    edge_type: REFUTES
+  - from: D_PREDICADO_E_RADAR_SE_CONTRADIZEM_NO_REFUTES_DE_NO_JA_SELADO
+    to: E_A_FAIXA_CARREGA_O_DETALHE_EU_E_QUE_TRUNQUEI
+    edge_type: DEPENDS_ON
+  - from: E_A_KB_JA_FOI_CORRIGIDA_EM_09_18_SO_A_IMPLEMENTACAO_FALTA
+    to: D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA
+    edge_type: CONSTRAINS
