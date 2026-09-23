@@ -74,6 +74,31 @@
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
+# A MORTE DO LINT NAO PODE PASSAR POR VEREDITO (medido 2026-09-23, na porta publica)
+# ---------------------------------------------------------------------------
+# O `set -e` acima + um `grep` que LEGITIMAMENTE nao casa mataram este lint DENTRO de uma funcao
+# (`check_radar_aufhebung`, baseline vazio): rc=1, ZERO sumario, e o CI leu esse rc=1 como "achou
+# violacao HARD". Gate morto disfarcado de julgamento e pior que crash — manda alguem cacar uma
+# violacao que nao existe, e o defeito real segue de pe. Foram DUAS hipoteses erradas antes de
+# medir, porque a morte era silenciosa: nada na saida dizia que a varredura nao completou.
+# O flag prova que o sumario FOI alcancado. Qualquer saida antes dele e `NAO PUDE JULGAR` e sai 2 —
+# a mesma convencao dos scripts-irmaos (0 pode julgar · 1 veredito · 2 nao pude).
+_LINT_SUMMARY_REACHED=0
+_lint_on_exit() {
+  local rc="$1"
+  trap - EXIT                                     # sem recursao
+  if [ "${_LINT_SUMMARY_REACHED}" -eq 1 ]; then exit "${rc}"; fi
+  echo ""
+  echo "MORREU  O lint terminou ANTES do sumario (rc=${rc}) — NAO PUDE JULGAR (nao e 'zero HARD',"
+  echo "        nem veredito). As violacoes acima sao PARCIAIS: a varredura nao completou."
+  echo "        Diagnostico: rode \`bash -x\` e leia a ULTIMA linha rastreada. O modo-de-falha"
+  echo "        conhecido e \`set -e\` sobre comando que legitimamente nao casa (grep sem"
+  echo "        resultado, array vazio) fora de uma guarda \`|| true\`."
+  exit 2
+}
+trap '_lint_on_exit "$?"' EXIT
+
+# ---------------------------------------------------------------------------
 # Resolução de caminhos: suporte a execução de qualquer diretório
 # ---------------------------------------------------------------------------
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -4440,7 +4465,11 @@ check_radar_aufhebung() {
   # uma velha reconciliada mantinha o total igual e passava despercebida. A catraca compara
   # CONJUNTOS — entrada nao-tolerada e HARD mesmo com o numero parado.
   local tolerated=""
-  [ -f "${_R89_BASE}" ] && tolerated="$(grep -vE '^[[:space:]]*(#|$)' "${_R89_BASE}")"
+  # `|| true` NAO e decoracao: com o baseline VAZIO (o caso da porta publica, medido 2026-09-23) o
+  # `grep -v` nao casa nada, devolve 1, a lista `&&` termina em falha e o `set -e` da linha 74 MATA
+  # o lint aqui — sem imprimir nada. O rc virava 1 e o CI o lia como "achou HARD": o gate morto
+  # disfarcado de veredito. Baseline vazio e MISSING agora sao o mesmo caminho (tolerated="").
+  [ -f "${_R89_BASE}" ] && tolerated="$(grep -vE '^[[:space:]]*(#|$)' "${_R89_BASE}" || true)"
   local fresh=0 line tag val
   while IFS=$'\t' read -r tag val; do
     case "${tag}" in
@@ -4904,6 +4933,7 @@ check_plugin_deps_contract
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================
+_LINT_SUMMARY_REACHED=1   # daqui para baixo, a saida E veredito (ver o trap no topo)
 echo ""
 echo "=== Sumário ==="
 echo "  Violações HARD : ${HARD_COUNT}"

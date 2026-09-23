@@ -24,6 +24,15 @@ logs/
 
 # Arquivos de ambiente (caso existam)
 .env
+# backup de .env NAO era coberto: medido 2026-09-23, um `.env.bak-<hora>` (feito por
+# /meta:setup-integration antes de tocar o arquivo) estava RASTREAVEL com os tokens dentro, a um
+# `git add -A` de virar incidente. A classe e a do `temporario-evapora-vira-incidente`: arquivo
+# sensivel marcado "temporario" volta como incidente. O glob cobre .bak/.backup/.orig/~ e datados.
+.env.bak*
+.env.backup*
+.env.orig
+.env.save
+.env~
 .env.local
 .env.development.local
 .env.test.local
