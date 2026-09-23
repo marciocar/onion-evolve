@@ -127,11 +127,15 @@ if [ "${EMIT}" -eq 1 ]; then
   echo "# rodada está tolerada, e some no diff quando uma sai e outra entra."
   echo "# Regenere: bash .claude/validation/radar-aufhebung-check.sh . --emit-baseline"
   echo "#"
-  printf '%s\n' "${accused[@]:-}" | grep -v '^$' || true
+  # ⚠️ SEM PIPE. A 1a versao filtrava o array vazio com `printf … | grep -v`, e a guarda
+  # `shell-pipefail` da casa reprovou no CI: `<produtor> | grep -q|grep -v` sob `pipefail` e uma
+  # corrida — o leitor que sai cedo manda SIGPIPE ao escritor e o rc do pipeline vira o dele.
+  # Itere o array e teste o elemento; nao ha filtro a fazer se nao ha elemento.
+  for g in ${accused[@]+"${accused[@]}"}; do [ -n "${g}" ] && printf '%s\n' "${g}"; done
   exit 0
 fi
 
-printf 'SEM-AUFHEBUNG\t%s\n' "${accused[@]:-}" | grep -v $'\t$' || true
-printf 'PONTEIRO-QUEBRADO\t%s\n' "${dangling[@]:-}" | grep -v $'\t$' || true
+for g in ${accused[@]+"${accused[@]}"};  do [ -n "${g}" ] && printf 'SEM-AUFHEBUNG\t%s\n' "${g}"; done
+for g in ${dangling[@]+"${dangling[@]}"}; do [ -n "${g}" ] && printf 'PONTEIRO-QUEBRADO\t%s\n' "${g}"; done
 printf 'TOTAL\t%d\n' "${#accused[@]}"
 exit 0
