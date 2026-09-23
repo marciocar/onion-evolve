@@ -19,13 +19,14 @@ export const meta = {
 //   Recalibre price_per_node a cada rodada com o usage da notificação (seção valeu-a-pena).
 // ============================================================================
 const targets = args.targets
-const teto = args.teto || 2000000
+const budgetCap = args.teto || 2000000   // `args.teto` e chave de CONTRATO (o /meta:census a passa); a variavel local segue o padrao de idioma
 const price = args.price_per_node || 74000
 if (!Array.isArray(targets) || targets.length === 0) throw new Error('census: args.targets vazio — extraia com kg-census-extract.sh primeiro')
-const maxNodes = Math.max(1, Math.floor(teto / price))
+const maxNodes = Math.max(1, Math.floor(budgetCap / price))
 const ordenados = [...targets].sort((a, b) => b.atencao - a.atencao)
 const selecionados = ordenados.slice(0, maxNodes)
-const nao_medidos_por_teto = ordenados.slice(maxNodes).map(t => t.id)
+// a CHAVE `nao_medidos_por_teto` e contrato (census-seal.py a le); a variavel segue o idioma do codigo
+const unmeasuredByCap = ordenados.slice(maxNodes).map(t => t.id)
 const WSchema = {
   type: 'object',
   required: ['node_id','kg_file','method','observed','verdict','divergence','blocked_by','claims_total','claims_measured','coverage','realidade','proximo_passo','gatilho','gatilho_disparou'],
@@ -88,7 +89,7 @@ for (const r of vivos) {
 const auditaveis = vivos.filter(r => r.verdict==='CONFIRMED' || (r.realidade==='GATED' && r.gatilho_disparou==='NAO'))
 const lotes = []
 for (let i=0;i<auditaveis.length;i+=15) lotes.push(auditaveis.slice(i,i+15))
-const vereditos = await parallel(lotes.map((lote,ix) => () => agent(
+const verdicts = await parallel(lotes.map((lote,ix) => () => agent(
 `JUIZ FIXO do censo (mandato REFUTAR, default REPROVADO na dúvida; calibração 2026-08-29: FP 20%, subserviência 0/7). READ-ONLY no repo.
 Audite os desfechos PREGUIÇOSOS (CONFIRMED e GATED-não-disparado): method foi EXECUTADO (re-rode o barato)? mediu no arquivo que o trace aponta? contagem de claims honesta contra o label? CONFIRMED procurou a morte? gatilho MEDIDO ou só declarado?
 Devolva aprovados (node_ids) e reprovados (node_id+motivo específico).
@@ -99,9 +100,9 @@ ${JSON.stringify(lote.map(r=>({node_id:r.node_id,kg_file:r.kg_file,method:r.meth
 )))
 return {
   selecionados: selecionados.length,
-  nao_medidos_por_teto,
+  nao_medidos_por_teto: unmeasuredByCap,
   descartados_medicao: descartados,
   medidos: vivos,
-  juizo: vereditos.filter(Boolean),
-  parametros: { teto, price_per_node: price, max_nos: maxNodes },
+  juizo: verdicts.filter(Boolean),
+  parametros: { teto: budgetCap, price_per_node: price, max_nos: maxNodes },
 }

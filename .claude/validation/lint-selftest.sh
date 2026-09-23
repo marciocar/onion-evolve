@@ -8231,6 +8231,45 @@ local $(printf 'contagem')_de_erros=0"
   else record_fail "idioma: (b)" "nao acusou ou nao nomeou o segmento (rc=${rc}): $(_emit "${out}" | head -c 200)"; fi
   rm -rf "$d"
 
+  # ── JS/MJS: o universo era SO `*.sh`, e por isso um parametro em pt-BR passou pelo gate
+  #    deterministico e so o REVISOR SEMANTICO pegou, no CI, depois do PR aberto (2026-09-22).
+  _lang_repo_js() { # $1=dir  $2=conteudo do .mjs
+    mkdir -p "$1/.claude/validation/lib" "$1/.claude/workflows"
+    cp "${helper}" "$1/.claude/validation/"; cp "${words}" "$1/.claude/validation/lib/"
+    cp "${REPO_ROOT}/.claude/validation/identifier-language-baseline.txt" "$1/.claude/validation/" 2>/dev/null || :
+    printf '%s\n' "$2" > "$1/.claude/workflows/novo.mjs"
+    ( cd "$1" && git init -q . && git add -A ) >/dev/null 2>&1
+  }
+
+  # (j) `const` em pt-BR num .mjs e HARD — antes o arquivo era INVISIVEL a guarda
+  d="$(mktemp -d)"; _lang_repo_js "$d" "export const meta = { name: 'x', description: 'y' }
+const $(printf 'contagem')Total = 1"
+  rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'contagem' <<< "${out}"; then
+    record_pass "idioma: (j) const em pt-BR num .mjs e HARD (o universo ve JS)"
+  else record_fail "idioma: (j)" "o .mjs seguiu invisivel (rc=${rc}): $(_emit "${out}" | head -c 200)"; fi
+  rm -rf "$d"
+
+  # (k) PARAMETRO de funcao em pt-BR — a forma EXATA que escapou. Sem este caso, a extensao do
+  #     universo cobriria declaracoes e continuaria cega ao que motivou a extensao.
+  d="$(mktemp -d)"; _lang_repo_js "$d" "export const meta = { name: 'x', description: 'y' }
+function check(de$(printf 'volvido')) { return de$(printf 'volvido') }"
+  rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'volvido' <<< "${out}"; then
+    record_pass "idioma: (k) PARAMETRO em pt-BR e acusado (a forma que escapou ao gate)"
+  else record_fail "idioma: (k)" "parametro passou (rc=${rc}): $(_emit "${out}" | head -c 200)"; fi
+  rm -rf "$d"
+
+  # (l) CONTROLE: .mjs todo em ingles passa — sem isto (j)/(k) provariam so que a guarda grita
+  d="$(mktemp -d)"; _lang_repo_js "$d" "export const meta = { name: 'x', description: 'y' }
+const budgetCap = 1
+function check(reported) { return reported }"
+  rc=0; out="$(bash "$d/.claude/validation/identifier-language-check.sh" "$d" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ]; then
+    record_pass "idioma: (l) .mjs em ingles PASSA (a guarda nao grita por gritar)"
+  else record_fail "idioma: (l)" "falso positivo em JS valido (rc=${rc}): $(_emit "${out}" | head -c 200)"; fi
+  rm -rf "$d"
+
   # (c) CAMELCASE — o par de (b). Casando so por `_`, `semAspas` escaparia; e era EXATAMENTE a forma
   #     dos achados reais. A medicao do #568 mostrou 3 de 636 por palavra inteira contra 10 de 12
   #     por segmento — este caso amarra essa decisao.
