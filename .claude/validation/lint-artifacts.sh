@@ -4448,7 +4448,9 @@ check_radar_aufhebung() {
         violation "HARD" "docs/onion/radar-baselines.yaml" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): a baseline aponta 'kg: ${val}', que NAO EXISTE — a rodada sai da conta sem ninguem saber. Corrija o ponteiro ou remova o eixo"
         ;;
       SEM-AUFHEBUNG)
-        if printf '%s\n' "${tolerated}" | grep -qxF "${val}"; then
+        # here-string, nao pipe: `<produtor> | grep -q` sob pipefail e corrida (o leitor fecha
+        # cedo, o escritor toma EPIPE). A guarda shell-pipefail da casa pegou este sitio no CI.
+        if grep -qxF "${val}" <<< "${tolerated}"; then
           : # passivo conhecido, contabilizado no resumo abaixo
         else
           fresh=$((fresh + 1))
@@ -4457,7 +4459,7 @@ check_radar_aufhebung() {
         ;;
     esac
   done <<< "${out}"
-  local n_tol; n_tol="$(printf '%s\n' "${tolerated}" | grep -c . || true)"
+  local n_tol; n_tol="$(grep -c . <<< "${tolerated}" || true)"
   if [ "${fresh}" -eq 0 ] && [ "${n_tol:-0}" -gt 0 ]; then
     violation "SOFT" "${_R89_BASE#"${REPO_ROOT}/"}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): [radar-aufhebung/PASSIVO] ${n_tol} rodada(s) selada(s) sem Aufhebung toleradas pelo baseline — a metrica de saude e esta LISTA encolhendo (reconcilie uma e regenere: bash .claude/validation/radar-aufhebung-check.sh . --emit-baseline)"
   fi
