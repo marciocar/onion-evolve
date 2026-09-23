@@ -136,5 +136,18 @@
 # 2026-09-21 (pos-#857): `onion-standalone` sobe a 400 — trabalho MERGEADO que a porta parada nao
 # recebeu (os #856 e #857 entraram em main). O `onion-core` volta a ZERO com a 14a materializacao
 # ja PUBLICADA (pin 7260feacbfe0, push verificado no remoto em 36592d9ba145).
-onion-standalone 408
+#
+# 2026-09-23 (PR #869): `onion-standalone` 408→412 — o #868 entrou em main (4 commits na superficie
+#   que viaja). Passivo REAL da porta parada desde 2026-07-19, do mesmo tipo de todas as subidas
+#   anteriores: nao e afrouxamento, e a catraca medindo trabalho MERGEADO que aquela porta nao
+#   recebeu. `onion-core` NAO sobe: o teto dele fica em ZERO, e o gate fica VERMELHO ate a 18a
+#   materializacao ser publicada — tolerar 4 seria gravar como divida uma ESPERA de push.
+# ⚠️ E ESTE PR EXPOS O DEADLOCK, que virou no de decisao: a cura que a REGRA 85 cobra (re-materializar)
+#   so existe DEPOIS do merge, porque materializar do HEAD da branch publicaria trabalho nao-mergeado
+#   numa porta PUBLICA. Resultado: o `lint-onion-artifacts` fica vermelho por 2 HARD que nenhuma acao
+#   dentro do PR limpa, e ele NAO e dispensavel no `ops/pr-merge-verified.sh` — por desenho. A saida
+#   usada aqui e a do ritual (publicar a porta do `origin/main`, avancar o pin, e so entao mergear),
+#   ao custo de DUAS materializacoes quando a leva muda o proprio lint. Onde cobrar isso passa a ser
+#   decisao do maestro: `D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA` em triagem-inbox-2026-09.kg.yaml.
+onion-standalone 412
 onion-core 0
