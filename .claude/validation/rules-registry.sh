@@ -168,7 +168,7 @@ CATEGORIES = [
      "Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca "
      "(por citação e por marcador autodeclarado); e frescor doutrinário — afirmação "
      "sensível-ao-tempo carimbada e dentro do TTL.",
-     [26, 29, 31, 32, 42, 43, 47, 49, 52, 55, 57, 58, 67, 68, 69, 78, 82, 87]),
+     [26, 29, 31, 32, 42, 43, 47, 49, 52, 55, 57, 58, 67, 68, 69, 78, 82, 87, 89]),
     ("Automação Graduada",
      "Classes de ação (HUMAN→MONITORED→DYNAMIC→AUTO) sobem de degrau com gate de promoção alcançável — nenhum rung-jump forjado.",
      [44, 65]),
