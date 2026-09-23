@@ -92,12 +92,18 @@ edges:
   - from: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM
     to: I_SINK_TOKENS_TO_TS_GENERICO
     edge_type: CONSTRAINS
+  # ⚠️ ERAM `DEPENDS_ON` ATE 2026-09-23, E ERA ERRO MEU DE MODELAGEM. Escrevi as duas arestas para
+  # nao deixar os nos orfaos (o radar reprova grau 0), nao porque a dependencia existisse — e
+  # `DEPENDS_ON` e GUARDA no censo: ele BLOQUEOU os dois, invertendo a ordem que eu mesmo havia
+  # recomendado ao maestro em prosa. O grafo e SSOT acima da prosa, entao quem estava errado era o
+  # grafo, e o censo foi quem contou. Os tres sao IRMAOS da mesma classe (capacidade declarada e
+  # nao exercida no motor do KG), nao predecessor e sucessores: `SUPPORTS` diz isso sem travar fila.
   - from: D_LACO_DE_RECONCILIACAO_CONSTRUIDO_E_PARADO
     to: D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA
-    edge_type: DEPENDS_ON
+    edge_type: SUPPORTS
   - from: D_O_RADAR_NUNCA_EMITIU_SUPERSEDES
     to: D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA
-    edge_type: DEPENDS_ON
+    edge_type: SUPPORTS
   - from: E_BANCADA_EM_FAIXA_NAO_REPLICA_A_FALHA
     to: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM
     edge_type: SUPPORTS
