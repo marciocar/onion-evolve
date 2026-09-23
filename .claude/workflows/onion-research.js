@@ -111,11 +111,11 @@ const ELENXO_SCHEMA = { type: 'object', required: ['objections', 'recommendation
 // pedido — um grafo escrito na worktree errada devolve outro sufixo e o run FALHA, em vez de sair
 // verde sobre o arquivo errado. Teto declarado: o caminho ainda e AUTO-RELATADO pelo agente; isto
 // pega o erro honesto (cwd trocado), nao um agente que minta sobre onde escreveu.
-function kgPathOk(devolvido) {
-  const d = String(devolvido || '')
-  if (!d.startsWith('/')) return 'nao e absoluto: ' + d
-  const alvo = KG_PATH.replace(/^\.\//, '')
-  if (!d.endsWith(alvo)) return 'o absoluto devolvido (' + d + ') NAO termina no caminho pedido (' + alvo + ') — o grafo pode ter nascido noutra worktree'
+function kgPathOk(reported) {
+  const abs = String(reported || '')
+  if (!abs.startsWith('/')) return 'nao e absoluto: ' + abs
+  const wanted = KG_PATH.replace(/^\.\//, '')
+  if (!abs.endsWith(wanted)) return 'o absoluto devolvido (' + abs + ') NAO termina no caminho pedido (' + wanted + ') — o grafo pode ter nascido noutra worktree'
   return ''
 }
 

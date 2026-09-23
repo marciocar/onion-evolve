@@ -160,3 +160,23 @@ vereditos
 viagem
 viaja
 vivo
+
+# ── PARTICÍPIOS (acrescentados 2026-09-22) ───────────────────────────────────────────────────
+# POR QUE ESTA LEVA: um parâmetro `devolvido` num .js passou pelo gate determinístico e só o
+# revisor semântico o pegou. Ao conferir, o extrator estava CERTO — quem falhou foi o vocabulário,
+# que é a classe dominante de defeito em guarda de lista. Medido: de 15 particípios comuns, 14
+# faltavam (só `esperado` estava). Todos abaixo conferidos SEM homógrafo em inglês.
+devolvido
+devolvida
+recebido
+enviado
+encontrado
+gerado
+medido
+lido
+escrito
+aplicado
+chamado
+criado
+apagado
+guardado

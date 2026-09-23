@@ -69,12 +69,41 @@ _elide() {
   sed -E 's/"[^"]*"/""/g; s/'"'"'[^'"'"']*'"'"'/'"'"''"'"'/g' "$1" 2>/dev/null \
     | sed -E 's/(^|[[:space:]])#.*$/\1/'
 }
-_ids() {
+_ids_sh() {
   local f="$1"
   _elide "$f" | grep -oE '(^|[[:space:]])(local[[:space:]]+)?[a-zA-Z_][a-zA-Z0-9_]*=' \
     | sed 's/^[[:space:]]*//; s/^local[[:space:]]*//; s/=$//'
   _elide "$f" | grep -oE '(^|[[:space:]])function[[:space:]]+[a-zA-Z_][a-zA-Z0-9_]*' | sed 's/.*function[[:space:]]*//'
   _elide "$f" | grep -oE '^[a-zA-Z_][a-zA-Z0-9_]*\(\)' | sed 's/()$//'
+}
+
+# ── JS/MJS ────────────────────────────────────────────────────────────────────────────────────
+# POR QUE EXISTE (medido 2026-09-22): o universo desta guarda era SO `*.sh`, e por isso uma funcao
+# nova em `.claude/workflows/onion-research.js` com parametro `devolvido` e local `alvo` passou
+# limpa pelo gate deterministico — quem pegou foi o REVISOR SEMANTICO, no CI, depois do PR aberto.
+# Guarda que nao ve metade da linguagem do repo declara mais do que mede.
+# Massa medida antes de ligar: 2 identificadores em pt-BR (`teto`, `vereditos`) em 396 declarados,
+# nos 2 scripts nao-vendorizados — curados no mesmo commit, entao o passivo nasce ZERO.
+# Os PARAMETROS entram de proposito: foi um parametro que escapou.
+_ids_js() {
+  local f="$1"
+  # declaracoes
+  _elide "$f" | grep -oE '(^|[^a-zA-Z0-9_$.])(const|let|var)[[:space:]]+[a-zA-Z_$][a-zA-Z0-9_$]*' \
+    | sed -E 's/.*(const|let|var)[[:space:]]+//'
+  # funcoes nomeadas
+  _elide "$f" | grep -oE '(^|[^a-zA-Z0-9_$.])function[[:space:]]+[a-zA-Z_$][a-zA-Z0-9_$]*' \
+    | sed -E 's/.*function[[:space:]]+//'
+  # parametros de `function nome(a, b)` — o caso que escapou
+  _elide "$f" | grep -oE 'function[[:space:]]+[a-zA-Z_$][a-zA-Z0-9_$]*[[:space:]]*\([^)]*\)' \
+    | sed -E 's/.*\(//; s/\)//' | tr ',' '\n' \
+    | sed -E 's/[[:space:]]//g; s/=.*//' | grep -E '^[a-zA-Z_$][a-zA-Z0-9_$]*$' || true
+}
+
+_ids() {
+  case "$1" in
+    *.js|*.mjs|*.cjs) _ids_js "$1" ;;
+    *)                _ids_sh "$1" ;;
+  esac
 }
 
 WORDLIST="$(grep -v '^[[:space:]]*\(#\|$\)' "${WORDS}" | tr '\n' '|' | sed 's/|$//')"
@@ -104,6 +133,8 @@ _is_source() { [ ! -f "${REPO_ROOT}/.claude/.onion-version" ]; }
 _universe() {
   { git ls-files '.claude/**/*.sh' '.claude/*.sh' 2>/dev/null || true
     find .claude -name '*.sh' -type f 2>/dev/null || true
+    git ls-files '.claude/**/*.js' '.claude/**/*.mjs' 2>/dev/null || true
+    find .claude \( -name '*.js' -o -name '*.mjs' \) -type f 2>/dev/null || true
     if _is_source; then
       git ls-files 'ops/**/*.sh' 'ops/*.sh' 2>/dev/null || true
       find ops -name '*.sh' -type f 2>/dev/null || true
@@ -116,13 +147,17 @@ _universe() {
     #    predicado quebrou 4 casos da família `idioma`, cujo sandbox copia este checker sem ele.
     #    Dívida registrada com gatilho: se aparecer fixture de shell em convenção não-canônica
     #    (`__fixtures__/`, `testdata/`) sob `.claude/`, ligue o predicado E espelhe-o no sandbox.
-  } | sed 's#^\./##' | grep -v '/fixtures/' | sort -u
+  # `.claude/worktrees/` sao COPIAS de trabalho de outros agentes, nao codigo deste repo: incluir
+  # faz a guarda medir o alheio e o numero oscilar com quem estiver rodando. Medido ao ligar o
+  # universo JS: 37 "HARD" e TODOS vinham de la. Mesma classe de erro que ja produziu contagem
+  # inflada nesta casa por varrer worktree de agente.
+  } | sed 's#^\./##' | grep -v '/fixtures/' | grep -v '/vendor/' | grep -v '^\.claude/worktrees/' | sort -u
 }
 
 TMP="$(mktemp)"; trap 'rm -f "${TMP}"' EXIT
 _UNI="$(_universe | grep -c . || true)"
 if [ "${_UNI:-0}" -eq 0 ]; then
-  printf 'identifier-language: universo VAZIO — nenhum .sh sob .claude/. Repo sem git, fora do checkout, ou .claude/ ainda nao instalado. "Nao sei" NUNCA vira "ok".\n' >&2
+  printf 'identifier-language: universo VAZIO — nenhum .sh/.js/.mjs sob .claude/. Repo sem git, fora do checkout, ou .claude/ ainda nao instalado. "Nao sei" NUNCA vira "ok".\n' >&2
   exit 2
 fi
 while IFS= read -r f; do
