@@ -121,6 +121,26 @@ nodes:
     verified_against: 'lido em 2026-09-23 em knowledge-graph-sdaal.md:203-218: o item lista as CINCO reprovacoes que o motor de fato faz (ids duplicados, aresta para no inexistente, orfao, contradicao REFUTES, enum invalido) e traz um bloco CORRIGIDO em 2026-09-18 que registra o placar antigo em vez de apaga-lo; o cabecalho kg-radar.sh:25-32 traz a mesma lista'
     label: 'ESTREITA `D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA`: a metade DOUTRINARIA ja estava curada quando escrevi aquele no. A KB foi corrigida em 2026-09-18 pelo mesmo sinal, e hoje ela diz exatamente o que o motor faz — com o placar antigo REGISTRADO, nao apagado, e com a frase que importa: "a correcao e o texto alcancar o codigo, nunca o contrario". Eu repeti a afirmacao do sinal sem medir a KB, um dia depois de ela ja ter sido corrigida: e a mesma classe que este ciclo persegue, so que do meu lado. O QUE RESTA do no e so a decisao de IMPLEMENTAR as quatro reprovacoes ausentes (ciclo DEPENDS_ON, decision done fora de PROD, refuted recebendo SUPPORTS, migalha pendente que hoje e ⚠) — e essa segue legitimamente aberta, porque a KB ja a declara como "decisao em aberto, nao divida escondida".'
 
+  - id: E_REGRA_85_EMITE_ZERO_NO_CI_E_2_HARD_NO_DISCO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-09-23'
+    verified_against: 'log integral do run 35903248855 (Onion Artifact Linter, branch identica a origin/main, fetch-depth 0) baixado com `gh run view --log`: 243 linhas, 11 VIOLATION, `Violacoes HARD : 0`, e ZERO ocorrencia de `REGRA 85|staleness|ANDOU-PARA` — nem a linha "nenhuma porta com pin, nada a julgar" que a guarda emitiria se nao tivesse porta a julgar. No MESMO estado de arvore, `bash .claude/validation/lint-artifacts.sh` local devolve 2 HARD da REGRA 85 (onion-core 4>0, onion-standalone 412>408)'
+    label: 'A REGRA 85 (Porta publica espelha o core, com catraca) e HARD que NAO DISPARA no unico gate autoritativo. Medido: no CI ela produz saida VAZIA e o lint fecha com 0 HARD; no disco, mesma arvore, 2 HARD. O `check_door_staleness` retorna cedo quando o script sai 0 (`[ rc -eq 0 ] && return 0`), entao a diferenca esta DENTRO do `door-staleness-check.sh` — e eu NAO a isolei: descartei clone raso (fetch-depth 0 no workflow, l.82), descartei ausencia de `origin/main` (o fallback declarado e HEAD, mais ESTRITO), e descartei pin desconhecido (emitiria PIN-DESCONHECIDO, que e HARD). Fica como lacuna NOMEADA, nao como explicacao inventada — duas hipoteses minhas erradas neste mesmo dia sobre a morte do lint custaram duas rodadas, e a licao foi medir antes de narrar. CONSEQUENCIA PRATICA que ja se realizou: a porta ficou 4 commits atras e nenhum PR ficou vermelho por isso; o unico aviso e local, na maquina de quem por acaso rodar o lint.'
+
+  - id: D_GUARDA_QUE_SO_MORDE_NO_DISCO_VALE_COMO_GATE
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.8
+    status: open
+    verified_at: '2026-09-23'
+    verified_against: 'derivado de E_REGRA_85_EMITE_ZERO_NO_CI_E_2_HARD_NO_DISCO, medido no mesmo dia'
+    label: 'DECISAO DO MAESTRO: o que fazer com um HARD que so existe na maquina local. Tres opcoes nomeadas. (1) FAZER DISPARAR NO CI — isola-se primeiro por que ele cala la (o passo que falta), e a porta passa a barrar merge de verdade; custo: todo PR fica vermelho entre o merge e o push da porta, que e uma espera legitima mas recorrente (~3 pushes seus por dia de trabalho). (2) REBAIXAR A SOFT E DIZER ISSO — a guarda para de prometer bloqueio que nao entrega; honesta, mas a porta volta a depender de alguem lembrar, que e o modo de falha que ela nasceu para curar. (3) TROCAR O GATILHO DE LUGAR — a cobranca sai do lint de PR e vira passo pos-merge (um job no push para main que abre issue ou avisa), casando o gatilho com o unico momento em que a cura E possivel: depois do merge. A (3) e a que respeita a nota ja escrita no proprio `door-staleness-check.sh` — "uma guarda que so pode ser satisfeita depois do merge nao e gate de pre-merge". Eu recomendo a (3), e a recomendacao passa pelo teste do gatilho: ela nao pede catedral, so muda o momento da cobranca.'
+
 edges:
   - from: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM
     to: I_AGENTE_EXPO_RN
@@ -152,3 +172,12 @@ edges:
   - from: E_A_KB_JA_FOI_CORRIGIDA_EM_09_18_SO_A_IMPLEMENTACAO_FALTA
     to: D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA
     edge_type: CONSTRAINS
+  - from: E_REGRA_85_EMITE_ZERO_NO_CI_E_2_HARD_NO_DISCO
+    to: D_GUARDA_QUE_SO_MORDE_NO_DISCO_VALE_COMO_GATE
+    edge_type: SUPPORTS
+  # IRMAOS da mesma classe (capacidade DECLARADA e nao exercida), nao predecessor: `SUPPORTS`, nunca
+  # `DEPENDS_ON` — a licao que este mesmo grafo registra duas arestas acima, quando o censo mostrou
+  # que `DEPENDS_ON` escrito so para evitar orfao BLOQUEIA a fila e inverte a ordem recomendada.
+  - from: D_GUARDA_QUE_SO_MORDE_NO_DISCO_VALE_COMO_GATE
+    to: D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA
+    edge_type: SUPPORTS
