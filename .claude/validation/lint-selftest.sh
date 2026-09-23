@@ -18573,6 +18573,90 @@ run_workflow_syntax_selftests() {
 }
 _family run_workflow_syntax_selftests
 
+# ── selftest-shard-plan: a matriz do CI nasce daqui, e matriz torta e gate cego ────────────────
+# POR QUE EXISTE (2026-09-23): o job do selftest encostou DUAS VEZES no teto de 40 min e a cura
+# foi shardar em 4 faixas de matriz. Dai em diante, QUALQUER familia que o plano perca deixa de
+# ser exercida no CI — e o job sai VERDE, porque as faixas que rodaram passaram. O plano virou
+# superficie critica: perder familia e pior que reprovar, porque nao aparece.
+run_shard_plan_selftests() {
+  local sut="${REPO_ROOT}/ops/testing/selftest-shard-plan.sh"
+  if [ ! -f "${sut}" ]; then record_skip "shard-plan: o SUT nao existe (${sut})"; return; fi
+
+  # (a) COBERTURA EXATA: toda familia do --list aparece em UMA faixa, nenhuma some, nenhuma repete.
+  local plano rc
+  if plano="$(bash "${sut}" 4 2>&1)"; then rc=0; else rc=1; fi
+  if [ "${rc}" -ne 0 ]; then
+    record_fail "shard-plan: (a)" "o plano falhou (rc=${rc}): $(_emit "${plano}" | head -c 160)"
+  else
+    local ver
+    ver="$(printf '%s' "${plano}" | ONION_ROOT="${REPO_ROOT}" python3 -c '
+import json, os, subprocess, sys
+sh = json.load(sys.stdin)
+got = [f for s in sh for f in s["familias"].split(",")]
+want = [l.strip() for l in subprocess.run(
+    ["bash", os.environ["ONION_ROOT"] + "/.claude/validation/lint-selftest.sh", "--list"],
+    capture_output=True, text=True).stdout.splitlines() if l.strip()]
+if not want:
+    print("SEM-LISTA"); raise SystemExit(0)
+if sorted(got) == sorted(want) and len(got) == len(set(got)):
+    print("OK")
+else:
+    print("DIVERGE perdidas=%d duplicadas=%d" % (len(set(want) - set(got)), len(got) - len(set(got))))
+' 2>&1)"
+    if [ "${ver}" = "OK" ]; then
+      record_pass "shard-plan: (a) cobertura EXATA — nenhuma familia perdida nem duplicada"
+    else record_fail "shard-plan: (a)" "cobertura quebrada: ${ver}"; fi
+  fi
+
+  # (b) ROUND-ROBIN e nao bloco contiguo: familias vizinhas caem em faixas DIFERENTES. Bloco
+  #     contiguo concentraria o caro numa faixa so, e o gargalo que a cura resolve voltaria.
+  local rr
+  rr="$(printf '%s' "${plano}" | python3 -c '
+import json, sys
+sh = json.load(sys.stdin)
+f1 = sh[0]["familias"].split(",")
+f2 = sh[1]["familias"].split(",") if len(sh) > 1 else []
+print("OK" if f1 and f2 and f1[0] != f2[0] else "CONTIGUO")
+' 2>&1)"
+  if [ "${rr}" = "OK" ]; then
+    record_pass "shard-plan: (b) distribuicao e round-robin (faixas nao sao blocos contiguos)"
+  else record_fail "shard-plan: (b)" "voltou a bloco contiguo: ${rr}"; fi
+
+  # (c) N INVALIDO nao vira plano silencioso
+  local bad=0
+  bash "${sut}" 0   >/dev/null 2>&1 || bad=$((bad+1))
+  bash "${sut}" abc >/dev/null 2>&1 || bad=$((bad+1))
+  if [ "${bad}" -eq 2 ]; then
+    record_pass "shard-plan: (c) N invalido (0, nao-numerico) REPROVA"
+  else record_fail "shard-plan: (c)" "N invalido produziu plano (so ${bad} de 2 reprovaram)"; fi
+
+  # (d) SUT AUSENTE: o plano DECLARA que nao pode planejar, nunca devolve matriz vazia — matriz
+  #     vazia faz a suite inteira nao rodar e o job sair VERDE.
+  local d; d="$(mktemp -d)"; mkdir -p "$d/ops/testing" "$d/.claude/validation"
+  cp "${sut}" "$d/ops/testing/"
+  local rcd
+  if ( cd "$d" && bash ops/testing/selftest-shard-plan.sh 4 ) >/dev/null 2>&1; then rcd=0; else rcd=$?; fi
+  if [ "${rcd}" -eq 2 ]; then
+    record_pass "shard-plan: (d) sem o SUT da bancada, DECLARA (exit 2) em vez de plano vazio"
+  else record_fail "shard-plan: (d)" "sem SUT saiu rc=${rcd} (esperado 2 — nao pude planejar != plano vazio)"; fi
+  rm -rf "$d"
+
+  # (e) LISTA VAZIA => exit 1. E o fail-open mais caro num gate de gate: matriz vazia = job verde
+  #     que nao exerceu NADA. Fixture: um --list que devolve zero linhas com rc 0.
+  local e; e="$(mktemp -d)"; mkdir -p "$e/ops/testing" "$e/.claude/validation"
+  cp "${sut}" "$e/ops/testing/"
+  printf '#!/usr/bin/env bash\nexit 0\n' > "$e/.claude/validation/lint-selftest.sh"
+  chmod +x "$e/.claude/validation/lint-selftest.sh"
+  local rce
+  if ( cd "$e" && bash ops/testing/selftest-shard-plan.sh 4 ) >/dev/null 2>&1; then rce=0; else rce=$?; fi
+  if [ "${rce}" -eq 1 ]; then
+    record_pass "shard-plan: (e) lista VAZIA reprova (exit 1) — matriz vazia nunca vira verde"
+  else record_fail "shard-plan: (e)" "lista vazia saiu rc=${rce} (esperado 1)"; fi
+  rm -rf "$e"
+}
+_family run_shard_plan_selftests
+
+
 
 # ---------------------------------------------------------------------------
 # Sumário
