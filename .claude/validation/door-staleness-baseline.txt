@@ -129,8 +129,12 @@
 # 2026-09-22 (2ª do dia): `onion-standalone` 402→404 — o #865 entrou em main (2 commits na
 #   superfície que viaja). Mesmo passivo real da nota acima; a porta segue parada desde 2026-07-19.
 #
+# 2026-09-23: `onion-standalone` 404→408 — o #866 entrou em main (4 commits na superficie que
+#   viaja). Mesmo passivo real: aquela porta segue parada desde 2026-07-19. `onion-core` volta a
+#   ZERO com a 17a materializacao, publicada (remoto 5d83730797ab).
+#
 # 2026-09-21 (pos-#857): `onion-standalone` sobe a 400 — trabalho MERGEADO que a porta parada nao
 # recebeu (os #856 e #857 entraram em main). O `onion-core` volta a ZERO com a 14a materializacao
 # ja PUBLICADA (pin 7260feacbfe0, push verificado no remoto em 36592d9ba145).
-onion-standalone 404
+onion-standalone 408
 onion-core 0
