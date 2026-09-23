@@ -55,7 +55,37 @@ permissions:
   contents: read
 
 jobs:
+  # ── PLANO DE FAIXAS: a resposta que este arquivo JA TINHA ESCRITO ────────────────────────────
+  # A nota de 2026-09-13 (abaixo, no job `selftest`) dizia, literalmente: "se encostar de novo, o
+  # sinal e a suite ter crescido, e a resposta e PARALELIZAR NO RUNNER, nao subir o teto outra
+  # vez". Encostou DUAS VEZES em 2026-09-22/23 — 41m29s e 40m18s, ambas CANCELADAS pelo teto de
+  # 40 min, com uma passagem de 32m20s no meio. Subir o teto seria a terceira vez tratando o
+  # sintoma. A divisao vive em `ops/testing/selftest-shard-plan.sh` (script versionado, com
+  # bancada) e nao inline aqui: YAML inline nao tem teste, e a primeira tentativa inline quebrou
+  # o bloco escalar.
+  plano:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      faixas: ${{ steps.p.outputs.faixas }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+      - id: p
+        name: Distribuir as familias em faixas (round-robin)
+        run: |
+          set -euo pipefail
+          plano="$(bash ops/testing/selftest-shard-plan.sh 4)"
+          echo "plano: ${plano}"
+          echo "faixas=${plano}" >> "${GITHUB_OUTPUT}"
+
   selftest:
+    needs: plano
+    strategy:
+      fail-fast: false               # uma faixa vermelha nao esconde o resultado das outras
+      matrix:
+        faixa: ${{ fromJson(needs.plano.outputs.faixas) }}
     runs-on: ubuntu-latest
     # 25 min: medido 908s (15,1 min) local na KVM 8 com 646 guardas; o runner é mais rápido
     # (686s com 689). Os dois números são de 2026-08 e NÃO se reescrevem — snapshot histórico
@@ -67,7 +97,9 @@ jobs:
     # CANCELADO aos 25m03s (PR #822, run 34772891707): verde inteiro, marcado cancelado por 3 s. As rodadas
     # de 09-12/13 já iam de 18 a 23 min. 40 min dá ~60% de folga sobre o medido; se encostar de novo, o
     # sinal é a suíte ter crescido, e a resposta é paralelizar no runner, não subir o teto outra vez.
-    timeout-minutes: 40
+    # 2026-09-23: ENCOSTOU DUAS VEZES e a resposta acima FOI APLICADA — a suíte roda em 4 faixas de
+    # matriz. O teto passa a valer POR FAIXA, e ele NÃO subiu: caiu de 40 para 25.
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
         with:
@@ -104,6 +136,7 @@ jobs:
         run: |
           set -o pipefail
           bash .claude/validation/lint-selftest.sh --jobs auto \
+            --families "${{ matrix.faixa.familias }}" \
             --report "${GITHUB_WORKSPACE}/selftest-report.tsv" 2>&1 | tee selftest.log
 
       # `if: always()` NOS DOIS PASSOS ABAIXO É O PONTO INTEIRO: a evidência que importa é a do
@@ -114,7 +147,7 @@ jobs:
         run: |
           bash ops/testing/selftest-summary.sh \
             --report "${GITHUB_WORKSPACE}/selftest-report.tsv" \
-            --titulo "Auto-teste das guardas" \
+            --titulo "Auto-teste das guardas — faixa ${{ matrix.faixa.n }}" \
             --run-url "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}" \
             >> "${GITHUB_STEP_SUMMARY}"
 
@@ -122,7 +155,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: selftest-evidence-${{ github.run_id }}
+          name: selftest-evidence-${{ github.run_id }}-faixa${{ matrix.faixa.n }}
           path: |
             selftest.log
             selftest-report.tsv
