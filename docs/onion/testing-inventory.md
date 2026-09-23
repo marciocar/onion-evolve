@@ -11,21 +11,21 @@
 
 | Dimensão | Nº | Produtor |
 |----------|---:|----------|
-| Famílias na bancada | **185** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
-| Sítios de asserção (**não** asserções executadas) | **1179** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
+| Famílias na bancada | **186** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
+| Sítios de asserção (**não** asserções executadas) | **1182** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
 | Linhas do manifesto de fixtures | **94** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
 | Arquivos de fixture rastreados | **136** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
-| Regras do lint | **87** | `bash .claude/validation/rules-registry.sh --counts` |
-| — das quais HARD | **77** | idem |
-| — das quais SOFT | **24** | idem |
-| — HARD **e** SOFT (contadas nas duas) | **14** | idem |
-| Pares de modo consumido (REGRA 59) | **49** | `bash .claude/validation/consumed-mode-check.sh .` |
+| Regras do lint | **88** | `bash .claude/validation/rules-registry.sh --counts` |
+| — das quais HARD | **78** | idem |
+| — das quais SOFT | **25** | idem |
+| — HARD **e** SOFT (contadas nas duas) | **15** | idem |
+| Pares de modo consumido (REGRA 59) | **50** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | idem |
-| Scripts de validação | **78** | `git ls-files '.claude/validation/*.sh'` |
+| Scripts de validação | **79** | `git ls-files '.claude/validation/*.sh'` |
 | Hooks | **16** | `git ls-files '.claude/hooks/*.sh'` |
 | Workflows de CI | **4** | `git ls-files '.github/workflows/*.yml'` |
-| Baselines de catraca | **11** | `git ls-files '.claude/validation/*-baseline.txt'` |
+| Baselines de catraca | **12** | `git ls-files '.claude/validation/*-baseline.txt'` |
 
 ## O que RODOU
 
@@ -33,7 +33,7 @@ Este arquivo conta o que **existe**. Quantas asserções de fato **passaram** é
 execução, vive em `docs/onion/metrics/selftest-runs.jsonl` (**2** envelope(s)
 coletado(s)) e é projetado em [`testing-state.md`](testing-state.md).
 
-A distinção não é formalismo. Há **1179** sítios estáticos de asserção e a última
+A distinção não é formalismo. Há **1182** sítios estáticos de asserção e a última
 execução completa contou **mais** que isso, porque sítio dentro de laço dispara N vezes.
 Publicar o número estático como "tamanho da bancada" trocaria uma defasagem por um erro de
 categoria — e foi por confundir os dois que `689 asserções` sobreviveu em três comentários

@@ -1,13 +1,19 @@
-# Catraca de AUFHEBUNG DE RODADA DE RADAR — quantas rodadas seladas como baseline toleram
-# estar SEM nenhuma aresta SUPERSEDES. SO ENCOLHE: a metrica de saude e o numero DIMINUINDO.
+# Catraca de AUFHEBUNG DE RODADA DE RADAR — rodadas seladas toleradas SEM nenhuma
+# aresta SUPERSEDES e sem `meta.supersedes_none`/`supersedes_external` declarado.
+# CHAVEADO (uma linha por rodada), como os 11 baselines irmãos: inteiro nu não diz QUAL
+# rodada está tolerada, e some no diff quando uma sai e outra entra.
+# Regenere: bash .claude/validation/radar-aufhebung-check.sh . --emit-baseline
 #
-# 2026-09-23, medicao inicial: 2 — `radar-E3-2026-09-21-r5` (que eu mesmo selei em 09-21) e
-#   `fable-5-1-superacao-2026-09`. As outras 4 baselines apontam todas para `maestro-vivo-2026-08`,
-#   que TEM 2 SUPERSEDES. O teto nasce no passivo medido e nao se sobe: reconcilie a rodada.
+# 2026-09-23 — a 1a versao deste arquivo era o inteiro `2`, depois `1`, e a passada adversarial
+#   mostrou que aquele numero media 1/6 da divida: a guarda varria so os `kg:` das baselines, ou
+#   seja a rodada ATUAL de cada eixo, e cada rodada nova DESPEJAVA a anterior da conta sem
+#   reconciliar nada. "A metrica de saude e este numero diminuindo" era falso — o denominador era o
+#   numero de eixos. Com o universo corrigido (convenção `radar-*/` UNIAO os ponteiros), o passivo
+#   REAL aparece: 5. O numero subiu porque a medicao ficou honesta, nao porque a divida cresceu.
+#   A `radar-E3-2026-09-21-r5` NAO esta aqui: ela declarou `meta.supersedes_none:` com a razao.
 #
-# 2026-09-23, mesma sessao: 2 -> 1. A `radar-E3-2026-09-21-r5` (que eu selei em 09-21) declarou
-#   `meta.supersedes_none:` com a razao REAL — ela mediu um delta novo e nao re-mediu o corpus
-#   antigo, entao nao derrubou nada. Nao foi carimbo para calar a guarda: declarar Aufhebung que
-#   nao houve seria pior que a divida, e a propria regra diz isso. Resta a `fable-5-1`.
-#
-1
+docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
+docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
+docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
+docs/evolution/research/radar-E3-2026-09-04-r4/radar-E3-2026-09-04-r4.kg.yaml
+docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
