@@ -1,6 +1,6 @@
 ---
 branch: chore/door-20-pin
-pr: 0
+pr: 873
 date: '2026-09-24'
 reviewed_diff_sha256: 
 findings_total: 1
