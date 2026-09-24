@@ -2,9 +2,9 @@
 branch: chore/door-19-pin
 pr: 870
 date: '2026-09-24'
-reviewed_diff_sha256: c81387b7a2cb401e5ac158252e50b855706ad7b1e0c2f4ed1dc6318b60a9b680
-findings_total: 2
-findings_real: 2
+reviewed_diff_sha256: ed333eec9e500c9f279c9d0da06169611483e683f8ad45a8805abc7f2efbf1cf
+findings_total: 3
+findings_real: 3
 tokens: 0
 duration_min: 0
 verdict: SEM_ACHADOS
@@ -49,3 +49,22 @@ dizendo que está tudo bem: é o artefato publicado sendo invocado onde ele vive
 **`D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA`** — esta leva custou DUAS materializações porque a REGRA 85
 (Porta pública espelha o core, com catraca) cobra uma cura que só existe depois do merge. Decisão do
 maestro, três opções nomeadas, recomendação registrada.
+\n
+## Achado 3 — a armadilha de ordem já é CLASSE, não caso
+
+**Quarta ocorrência nesta sessão**, sempre igual: `docs/onion/testing-state.md` e
+`docs/onion/testing-inventory.md` são projeções que contam, entre outras coisas, **os resíduos de
+revisão e seus vereditos** — então gerá-las antes de escrever o resíduo do próprio PR as deixa
+defasadas, e o gate reprova. Ocorrências medidas hoje: (1) 313→314 resíduos no #869, (2) veredito
+`CORRIGIDO`→`REPROVADO_E_CURADO` no mesmo PR, (3) 136→137 fixtures rastreadas (gerador rodado antes
+do `git add`), (4) este PR, ao criar `chore-door-19-pin.md`.
+
+Não é descuido de uma vez: é **ordem estrutural**. A projeção depende de artefatos que nascem no
+fim da leva, então gerá-la no meio é sempre errado.
+
+**Cura proposta, e deliberadamente NÃO implementada aqui:** um `ops/regen-generated-projections.sh`
+que regenere as cinco projeções com `rc` e tamanho conferidos — hoje eu repito um laço à mão a cada
+vez, e repetir laço à mão é o que produz a 5ª ocorrência. **Gatilho nomeado:** a 5ª ocorrência, ou o
+maestro mandar. Não implemento agora porque este PR é um carimbo, e enfiar script novo + família de
+bancada aqui é a catedral que a doutrina desta casa manda evitar — `pull-not-push` aplicado à minha
+própria recomendação.
