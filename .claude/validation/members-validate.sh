@@ -87,7 +87,14 @@ if isinstance(doc, dict):
         err("top-level 'members:' ausente ou não é lista")
         members = []
 
-    ROLES = {"source", "hub", "standalone", "consumer"}
+    # ⚠️ VOCABULARIO UNIFICADO com o STAMP em 2026-09-24, e a medicao foi o que tornou isto barato:
+    #    o stamp (.claude/.onion-version, escrito por write-stamp.sh) carimba `adopted`, e este
+    #    validador exigia `consumer` — dois nomes para o MESMO papel, em dois SSOTs. O desempate
+    #    e por QUEM LE: `adopted` e lido em 22 sitios do lint-artifacts.sh; `consumer` vivia AQUI e
+    #    em mais nenhum lugar, e aparecia em UMA entrada do registro (20 membros). Unificar em
+    #    `adopted` nao migra ninguem. `consumer` fica aceito como SINONIMO LEGADO: derrubar valor de
+    #    SSOT vivo sem necessidade e quebrar por simetria.
+    ROLES = {"source", "hub", "standalone", "adopted", "consumer"}
     # `port` entrou em 2026-09-16 com o registro do onion-codex. Ele NÃO é `distillation`:
     # destilação é reescrita curada da MESMA doutrina no MESMO substrato; porte é TRADUÇÃO para
     # OUTRO substrato (aqui, `.codex/` + `.agents/skills/` no lugar de `.claude/`). Chamar porte

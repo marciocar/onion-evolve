@@ -754,6 +754,16 @@ security-information-master	related	iso-22301-specialist
 security-information-master	related	iso-27001-specialist	
 security-information-master	related	pmbok-specialist	
 security-information-master	related	soc2-specialist	
+sge	adopts	onion-evolve	
+sge	mode	regulated	
+sge	pin	ba0d2d423c17	
+sge	specialization	analise-tecnica	
+sge	specialization	checklist-qualidade	
+sge	specialization	lei-14133	
+sge	specialization	licitacao-publica	
+sge	specialization	regulated-greenfield	
+sge	tier	adopted	
+sge	trust-advises	onion-evolve	
 soc2-specialist	related	/docs/build-compliance-docs	
 soc2-specialist	related	iso-27001-specialist	
 soc2-specialist	related	security-information-master	
