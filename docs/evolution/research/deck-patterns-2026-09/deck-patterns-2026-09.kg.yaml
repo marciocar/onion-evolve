@@ -158,7 +158,7 @@ nodes:
     impact: 5
     confidence: 0.7
     label: 'OPCAO (A): arco em ATOS problem-first, derivado do deck de campo — usar docs/evolution/decks/iftl-frameworks-agentes-2026-08.html (branch docs/deck-iftl-rebased) como espinha MEDIDA e re-instrumenta-lo para o publico duplo (aluno-adotante + equipe de cliente). Confianca 0.7, a mais alta das sete, e o motivo e medicao e nao gosto: medi nesta sessao — 52 slides (`grep -c "^{act:"`), 9 atos distintos (Ato 0 O gancho -> Ato 1 A evolucao do ecossistema -> Ato 2 De onde o Onion veio -> Ato 3 Declarado != verificado -> Ato 4 A maquinaria -> Ato 5 Federacao e A2A -> Ato 6 Infraestrutura -> Ato 7 O mesmo metodo N=1 -> Ato 8 O que isso muda / Sua vez), 18 slides `short:1`, navegacao com mapa e caminho curto. E o unico arco do conjunto que existe como ARTEFATO e que ja rodou em treino real. Note o que a ordem dele faz e que nenhuma fonte externa desta rodada soube recomendar: abre por GANCHO e por EVOLUCAO DO PROBLEMA ("o gargalo mudou de lugar") e chega a maquinaria so no ATO 4 — problem-first, com a tese-nucleo (declarado != verificado) no ato 3, ANTES do mecanismo que a sustenta. Ressalva que impede confianca maior: 9 atos e mais que 2 camadas se os atos forem lidos como niveis de disclosure, e o deck NAO esta em main (so em docs/deck-iftl-frameworks-agentes e docs/deck-iftl-rebased) — adotar (A) implica decidir onde esse artefato passa a viver.'
-    trace: 'docs/evolution/decks/iftl-frameworks-agentes-2026-08.html'
+    trace: 'deck de campo medido nesta rodada (52 slides, 9 atos, 18 short:1) — vive SO nas branches docs-deck-iftl-rebased e docs-deck-iftl-frameworks-agentes, NUNCA em main; onde ele passa a viver e fio aberto declarado em docs/onion/deck/SPEC.md'
 
   - id: C_OPCAO_B_ARCO_DIATAXIS
     node_type: claim
@@ -242,7 +242,7 @@ nodes:
     source_tier: 10
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 2 — TRANSFERENCIA DE DOMINIO SEM LICENCA + REFUTADO PELO ARTEFATO DA CASA. (i) O artigo da NN/g trata de OPCOES DE INTERFACE (quantos controles mostrar numa tela), nao de sequenciamento pedagogico de slides; 9 secoes de deck nao sao "9 camadas de disclosure". Sem essa ponte de dominio o achado nao morde a pergunta — e ele e o unico com consenso fragil (2-1). (ii) MEDIDO: o deck versionado JA implementa exatamente 2 camadas — 52 slides, 18 marcados `short:1`, com o rotulo "caminho curto" e "essenciais" no mapa. O teto que o achado recomenda ja e pratica de campo aqui, e ninguem mediu isso antes de recomenda-lo. Consequencia para o desenho: a pergunta util nao e "quantas camadas" e sim "os 18 essenciais sao os certos para CADA um dos dois publicos" — e essa ninguem fez.'
-    trace: 'docs/evolution/decks/iftl-frameworks-agentes-2026-08.html'
+    trace: 'deck de campo medido nesta rodada (52 slides, 9 atos, 18 short:1) — vive SO nas branches docs-deck-iftl-rebased e docs-deck-iftl-frameworks-agentes, NUNCA em main; onde ele passa a viver e fio aberto declarado em docs/onion/deck/SPEC.md'
 
   - id: E_OBJECAO_3_QUATRO_ACHADOS_SAO_DUAS_FONTES
     node_type: evidence
@@ -268,7 +268,7 @@ nodes:
     source_tier: 10
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 4 — NAO DISCRIMINA NADA E JA ESTA ENTREGUE. (i) A claim e quase tautologica ("diga ao usuario o que cada nivel contem") — nao decide NENHUMA questao de ordem, que e o que foi perguntado; serve para qualquer ordem, logo nao e critério. (ii) MEDIDO: o artefato da casa ja faz — contador, rodape de navegacao, mapa clicavel ("Clique para saltar") e a expectativa explicita do caminho curto. Delta acionavel = zero. E somado a objecao 2, e a mesma fonte contada duas vezes.'
-    trace: 'docs/evolution/decks/iftl-frameworks-agentes-2026-08.html'
+    trace: 'deck de campo medido nesta rodada (52 slides, 9 atos, 18 short:1) — vive SO nas branches docs-deck-iftl-rebased e docs-deck-iftl-frameworks-agentes, NUNCA em main; onde ele passa a viver e fio aberto declarado em docs/onion/deck/SPEC.md'
 
   - id: E_OBJECAO_5_CORPUS_VAZIO_E_FALSO_NEGATIVO
     node_type: evidence
@@ -294,7 +294,7 @@ nodes:
     source_tier: 10
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 6 — ARTEFATO NAO VERIFICADO (behavior-over-declaration, doutrina da casa). A premissa do Scope afirmava "o deck atual tem 65 slides em 9 secoes, nesta ordem: identidade/arquitetura Bulbo -> inventario -> 17 slides de KG -> maquinaria -> ...". REPRODUZI a medicao: nao existe deck de 65 slides em nenhuma branch; ha UM unico deck Onion na historia — docs/evolution/decks/iftl-frameworks-agentes-2026-08.html — que NAO esta em main (so em docs/deck-iftl-frameworks-agentes e docs/deck-iftl-rebased). E o arco dele CONTRADIZ a premissa: 9 ATOS, 52 slides, abrindo por "Ato 0 O gancho" -> "Ato 1 A evolucao do ecossistema" -> "Ato 2 De onde o Onion veio" -> "Ato 3 Declarado != verificado" -> "Ato 4 A maquinaria" -> "Ato 5 Federacao e A2A" -> "Ato 6 Infraestrutura" -> "Ato 7 O mesmo metodo N=1" -> "Ato 8 O que isso muda / Sua vez". Isto e, o deck real JA E problem-first e JA coloca a maquinaria depois da tese — o oposto da ordem que a premissa descrevia como defeito a corrigir. Reorganizar a partir da premissa seria mover slides de um artefato que nao existe e desfazer a ordem certa de um que existe.'
-    trace: 'docs/evolution/decks/iftl-frameworks-agentes-2026-08.html'
+    trace: 'deck de campo medido nesta rodada (52 slides, 9 atos, 18 short:1) — vive SO nas branches docs-deck-iftl-rebased e docs-deck-iftl-frameworks-agentes, NUNCA em main; onde ele passa a viver e fio aberto declarado em docs/onion/deck/SPEC.md'
 
 edges:
   # ── evidência -> pergunta (SUPPORTS) ─────────────────────────────────────────────────
