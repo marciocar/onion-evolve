@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**215 itens abertos** em 47 grafo(s) com aberto (de 69 no escopo) · 48 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**224 itens abertos** em 48 grafo(s) com aberto (de 70 no escopo) · 49 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -73,6 +73,20 @@
 | 2.7 | `C_OPCAO_PADDLEOCR_VL_CPU` | ocr-local-sei-2026-09 | OPCAO (2): PaddleOCR / PaddleOCR-VL 0.9B em CPU, venv isolado. Confianca 0.3: TODAS as claims a favor foram refutadas nesta rodada |
 | 2.4 | `C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA` | ocr-local-sei-2026-09 | OPCAO (4): Surya (datalab-to) — NAO RECOMENDAVEL A PARTIR DESTE DOSSIE, e a razao nao e desempenho: e que o corpo de evidencia s |
 | 1.2 | `C_OPCAO_MINERU_OLMOCR` | ocr-local-sei-2026-09 | OPCAO (6): MinerU 2.5 / olmOCR. Praticamente NAO PESQUISADOS nesta rodada — aparecem so como termo de comparacao dentro de claim |
+
+## zoho-glpi-adapters-2026-09 — 9 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 48.0 | `Q_ZOHO_GLPI_ADAPTERS_0923` | zoho-glpi-adapters-2026-09 | Como integrar Zoho Projects (como task manager) e GLPI (como FONTE DE ATIVIDADE para apuracao/relatorios/apresentacoes) ao Onion v |
+| 35.0 | `D_ZOHO_GLPI_ADAPTERS_0923` | zoho-glpi-adapters-2026-09 | DECISAO ABERTA (o maestro sela — nenhuma sessao sela por ele). Duas perguntas acopladas: DESENHO (onde o GLPI entra) e ORDEM DE  |
+| 21.0 | `C_OPCAO_A_ACTIVITY_SOURCE_IRMA_READONLY` | zoho-glpi-adapters-2026-09 | OPCAO A — GLPI FORA do task-manager: nasce familia SDAAL irma read-only `.claude/utils/activity-source/` com 4-6 metodos proprio |
+| 9.6 | `C_OPCAO_D3_PILOTO_ONLINE_DATADO` | zoho-glpi-adapters-2026-09 | OPCAO D3 — online como PILOTO de leitura com corte datado e gatilho nomeado, condicionado a sonda de cobertura de dados passar.  |
+| 9.0 | `C_SONDA_ANTES_DE_QUALQUER_ADAPTER` | zoho-glpi-adapters-2026-09 | CLAIM DE METODO — NENHUM adapter (nem activity-source, nem Zoho) se escreve antes de uma sonda de 3 medidas na instancia REAL, p |
+| 5.0 | `C_OPCAO_D1_ONLINE_PRIMEIRO_VPS_DEPOIS` | zoho-glpi-adapters-2026-09 | OPCAO D1 (ORDEM DE HOSPEDAGEM — a proposta explicita do maestro): usar o GLPI online agora e trazer para a VPS depois. Confianca |
+| 4.8 | `C_OPCAO_C_SEM_ADAPTER_INGESTAO_KG` | zoho-glpi-adapters-2026-09 | OPCAO C — sem adapter algum: ingestao periodica GLPI->KG (plugin Advanced Dashboard + export CSV, ou SQL direto no banco) e a ap |
+| 4.8 | `C_OPCAO_D2_VPS_PRIMEIRO` | zoho-glpi-adapters-2026-09 | OPCAO D2 — self-hosted na VPS PRIMEIRO (Docker, prefixo onion-vps- conforme a convencao da casa), online nunca ou so como espelh |
+| 0.6 | `C_OPCAO_B_GLPI_DENTRO_TASK_MANAGER` | zoho-glpi-adapters-2026-09 | OPCAO B — GLPI DENTRO do task-manager, com ~10 metodos stub (createTask/deleteTask/createSubtask/updateStatus/...): e a classe d |
 
 ## plugins-en-compliance-2026-09 — 24 item(ns)
 
