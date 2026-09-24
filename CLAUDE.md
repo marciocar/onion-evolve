@@ -32,6 +32,19 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
     portabilidade, **não** linha de manutenção ativa.
   - **LINHA VIVA** (`onion-codex`, decisão do maestro em **2026-09-16**): mantido, com gate
     determinístico próprio (`.codex/validation/` + `Onion Validate (Codex)` no CI).
+  - **PORTA** (`onion-core`, pública desde **2026-09-17**): a **face pública do core** — mesma
+    plataforma, mesma maquinaria, **sem biografia**. Não é porte multi-IDE nem repo congelado: é
+    **projeção gerada** de `origin/main` por `ops/materialize-door.sh`, re-materializada a cada leva
+    (18 vezes até 2026-09-23) e cobrada pela REGRA 85 (Porta pública espelha o core, com catraca).
+    Por ser projeção, **a história dela não tem valor autoral** — já foi reescrita com force-push
+    uma vez, por vazamento medido de caminhos core-privados num baseline que viajou populado.
+
+  > ⚠️ **`onion-core` faltava nesta lista até 2026-09-23**, e a causa é de datas: a decisão dos dois
+  > regimes foi selada em **16/09** e a porta nasceu pública em **17/09** — um dia depois, sem
+  > ninguém emendar a lista. É a repetição EXATA do caso `onion-codex` descrito abaixo: repo
+  > público, prefixo `onion-`, invisível à REGRA 36 (Superfície VENDORIZADA sem nome comercial de
+  > cliente). A diferença é que este **está** no `members.yaml` (`kind: door`), então o registro
+  > protege; o que faltava era a doutrina. Apontado pelo maestro.
   Sem esta distinção, quem lê conclui que os repos públicos violam a doutrina — **conclusão
   errada, já cometida em 2026-08-02**. SSOT:
   `docs/onion/graph/onion-identity-2026-07.kg.yaml` (`C_CORE_NAO_E_FAMILIA`, `C_POSTURA_ACOPLAMENTO`)

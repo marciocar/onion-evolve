@@ -1,0 +1,32 @@
+# FIXTURE `bad` da REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung),
+# com catraca). Rodada de radar que NAO reconciliou nada e NAO declara desfecho: nenhuma aresta
+# SUPERSEDES, nenhum `meta.supersedes_none`, nenhum `meta.supersedes_external`. A guarda DEVE
+# acusar, e o caminho dela e o da convencao de diretorio (`*/radar-*/*.kg.yaml`) — razao de esta
+# fixture precisar da 6a coluna `inject` do manifesto: o nome fixo `.md` nunca a alcancaria.
+meta:
+  id: radar-selftest-fixture
+  schema_version: "1"
+  baseline: 2026-01-01
+nodes:
+  - id: E_ALGO_MEDIDO
+    node_type: evidence
+    plane: DEV
+    impact: 1
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-01-01'
+    verified_against: 'fixture de auto-teste — nao e medicao do mundo'
+    label: 'no de fixture: existe so para dar grau 1 ao grafo e deixar o radar julgar'
+  - id: E_OUTRO_MEDIDO
+    node_type: evidence
+    plane: DEV
+    impact: 1
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-01-01'
+    verified_against: 'fixture de auto-teste — nao e medicao do mundo'
+    label: 'segundo no de fixture, alvo da aresta'
+edges:
+  - from: E_ALGO_MEDIDO
+    to: E_OUTRO_MEDIDO
+    edge_type: SUPPORTS
