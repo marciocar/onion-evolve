@@ -21,8 +21,12 @@
    Nunca "para Claude Code" como se fosse a categoria (soaria plugin/extensão).
 3. **Prova de universalidade sempre citada:** "nasceu no Claude Code e foi portado para 6 ferramentas de IA
    para provar exatamente isso" — é **fato verificável** que sustenta a autoridade transcendente, não slogan.
-4. **Hierarquia de portas (quartos da mesma casa):** core (privado) → mini (teaser) → standalone (porta pública)
-   → hub (empresa) → família de 6 ferramentas. Nenhuma porta tem identidade que compita com o Onion.
+4. **Hierarquia de portas (quartos da mesma casa):** core (privado) → mini (teaser) → **`onion-core` (a porta
+   pública viva)** → hub (empresa) → família de 6 ferramentas. Nenhuma porta tem identidade que compita com o Onion.
+   ⚠️ **Corrigido em 2026-09-24:** esta linha dizia `standalone (porta pública)`, e isso deixou de ser verdade em
+   2026-09-17, quando `onion-core` foi publicada. O `onion-standalone` é **congelado** desde 2026-07-19 — medido,
+   412 commits da superfície que viaja atrás do core. Apontar para ele como porta viva manda o público a uma
+   versão defasada do framework.
 
 > **Padrão-ouro já em produção:** o README de `onion-standalone` (badge cinza `base-Claude_Code-lightgrey` +
 > `<sub>` + tese antes da tabela). Replicar em toda superfície nova.

@@ -26,7 +26,7 @@ Este é o **Sistema Onion** — um **framework template em `.claude/`** projetad
   isso for mais vantajoso e o acoplamento não for necessidade***. Acople só quando a capacidade
   ganha não existe fora — nunca por conveniência nem por simetria.
 - **CORE ≠ FAMÍLIA** — estas linhas descrevem **este repo** (o core). Existe uma **família
-  multi-IDE pública**, e ela tem **dois regimes**, não um:
+  multi-IDE pública**, e ela tem **três regimes**, não um:
   - **CONGELADOS** (`onion`, `onion-cursor`, `onion-antigravity`, `onion-copilot`,
     `onion-architect`, `onion-mini`, `onion-standalone`): material de curso e prova de
     portabilidade, **não** linha de manutenção ativa.
