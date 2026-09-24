@@ -1803,7 +1803,14 @@ run_rules_registry_selftests() {
   # exatamente o que aconteceu: reprovou por a porta publica estar 4 commits defasada. Guarda que
   # declara menos do que mede e a classe que esta casa persegue; o caso agora mede o que nomeia.
   local f_out; f_out="$(bash "${lint}" --only="${doc}" 2>&1 || true)"
-  if ! grep -qE 'VIOLATION: .*lint-rules\.md: .*(registro desatualizado|registro ausente|gerador do registro)' <<< "${f_out}"; then
+  # PROVA POSITIVA DE TERMINO ANTES da asserção negativa (refutador independente, 2026-09-24): minha
+  # 1a cura trocou `grep -q 'OK ✓'` por uma asserção só NEGATIVA, e lint MORTO nao imprime VIOLATION
+  # nenhuma — logo a morte era lida como "REGRA 39 verde". Ironia medida: foi esta mesma leva que
+  # criou o rotulo MORREU para que morte silenciosa deixasse de passar por veredito. O sinal estava
+  # DENTRO da variavel que o caso captura; faltava olhar.
+  if ! grep -q '=== Sumário ===' <<< "${f_out}" || grep -q '^MORREU' <<< "${f_out}"; then
+    record_skip "rules-registry: (f) o lint nao chegou ao sumario (morreu antes) — NAO PUDE julgar a REGRA 39"
+  elif ! grep -qE 'VIOLATION: .*lint-rules\.md: .*(registro desatualizado|registro ausente|gerador do registro)' <<< "${f_out}"; then
     record_pass "rules-registry: (f) REGRA 39 verde no estado real (--only lint-rules.md)"
   else record_fail "rules-registry: (f)" "REGRA 39 acusou o estado real (deveria estar em paridade): $(grep -m1 'lint-rules.md' <<< "${f_out}")"; fi
 }
@@ -12234,7 +12241,7 @@ run_session_beacon_selftests() {
     # 18:33 e reprovou as 23:45 sem nenhuma mudanca no SUT — assinatura de corrida, nao de host.
     # Teto de 2s (40 x 50ms) e o comm OBSERVADO entra na mensagem: skip sem dizer o que viu e flaky
     # para sempre.
-    _fake_comm=""
+    local _fake_comm=""
     for _ in $(seq 40); do
       _fake_comm="$(cat "/proc/${fake_pid}/comm" 2>/dev/null || true)"
       [ "${_fake_comm}" = "claude" ] && break
@@ -12719,6 +12726,15 @@ if [ -f "${MANIFEST}" ]; then
     [ -z "${kind}" ] && continue
     [ "${kind#\#}" != "${kind}" ] && continue   # linha de comentário
     [ "${kind}" = "kind" ] && continue           # header
+    # SENTINELA `-` PARA CAMPO VAZIO (refutador independente, 2026-09-24): `IFS=$'\t'` trata TAB como
+    # IFS-whitespace, entao TABs consecutivos COLAPSAM num delimitador so. Consequencia medida: numa
+    # linha de 5o campo vazio (`good`/`exempt`/`pass`/`fail` — 22 delas ja terminam em TAB hoje), dar
+    # nome de injecao fazia o valor cair em `keyword` e `inject` ficar vazio, EM SILENCIO: a fixture
+    # voltava a ser injetada como `.md`. A coluna nova era inalcancavel justamente para as linhas que
+    # mais precisariam dela (o caso `good`/`exempt` que o §11.1 pede). `-` e o idioma que este
+    # manifesto ja usa na coluna `target` das linhas `members`.
+    [ "${keyword:-}" = "-" ] && keyword=""
+    [ "${inject:-}" = "-" ] && inject=""
     _shard_k=$(( _shard_k + 1 ))
     [ $(( (_shard_k - 1) % _shard_n )) -eq "${_shard_i}" ] || continue
     # CORE-ONLY no adotante (Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE, cura (a), 2026-09-03): em repo
@@ -18884,14 +18900,70 @@ run_lint_silent_death_selftests() {
     record_pass "lint-morte: (e) morte antes do sumario sai 2 e se ANUNCIA"
   else record_fail "lint-morte: (e)" "morte calada ou rotulada como veredito: ${o}"; fi
 
-  # (f) e o flag existe E e ligado antes do sumario — sem isso o trap acusaria todo run saudavel
-  if grep -qE '^_LINT_SUMMARY_REACHED=1' "${lint}" && grep -qE "^trap '_lint_on_exit" "${lint}"; then
-    record_pass "lint-morte: (f) o lint arma o trap e marca o sumario alcancado"
-  else record_fail "lint-morte: (f)" "trap ausente ou flag nunca ligado — todo run saudavel sairia 2"; fi
+  # (f) O MECANISMO, MEDIDO NO COMPORTAMENTO — nao pela presenca das linhas.
+  # A 1a redacao deste caso asseria `grep -q '^_LINT_SUMMARY_REACHED=1'` + `grep -q "^trap"`, e um
+  # refutador independente derrubou em 2026-09-24: MOVER o flag para o topo do arquivo continua
+  # casando a ancora, o trap vira no-op, toda morte precoce volta a sair com rc cru e sem anuncio — e
+  # os 6 casos desta familia ficavam VERDES. Cobertura declarada sem cobertura real e pior que a
+  # ausencia do caso, e era exatamente a tese do cabecalho do lint sendo violada pelo teste dela.
+  # Agora: copia o lint para um sandbox, injeta uma morte ANTES do sumario e exige rc=2 + anuncio.
+  # Se o controle nao chega ao sumario, o caso NAO conclui (⊘), nunca aprova.
+  local lsb; lsb="$(mktemp -d)"
+  mkdir -p "${lsb}/.claude/validation"
+  cp "${lint}" "${lsb}/.claude/validation/lint-artifacts.sh"
+  local ctl; ctl="$(bash "${lsb}/.claude/validation/lint-artifacts.sh" 2>&1 || true)"
+  if ! grep -q '=== Sumário ===' <<< "${ctl}"; then
+    record_skip "lint-morte: (f) o controle no sandbox nao chegou ao sumario — NAO PUDE medir o mecanismo"
+  else
+    # morte sintetica imediatamente ANTES da linha que arma o flag: se o flag estiver no lugar certo,
+    # o trap precisa anunciar; se alguem o mover para o topo, esta morte sai calada e o caso reprova.
+    sed -i '/^_LINT_SUMMARY_REACHED=1/i grep -q ZZZ_MORTE_SINTETICA_DA_BANCADA /dev/null' \
+      "${lsb}/.claude/validation/lint-artifacts.sh"
+    local mrc=0 mout
+    mout="$(bash "${lsb}/.claude/validation/lint-artifacts.sh" 2>&1)" || mrc=$?
+    if [ "${mrc}" -eq 2 ] && grep -q 'MORREU' <<< "${mout}"; then
+      record_pass "lint-morte: (f) morte ANTES do sumario sai 2 e se anuncia — medido no comportamento"
+    else
+      record_fail "lint-morte: (f)" "o mecanismo nao mordeu: rc=${mrc} (esperado 2), MORREU=$(grep -c 'MORREU' <<< "${mout}") (esperado >=1) — se o flag foi movido para o topo, o trap virou no-op"
+    fi
+  fi
+  rm -rf "${lsb}"
 
   rm -rf "$d"
 }
 _family run_lint_silent_death_selftests
+
+# ---------------------------------------------------------------------------
+# FORMA do manifest.tsv — o leitor de bash ve o que o awk ve?
+# ---------------------------------------------------------------------------
+# POR QUE EXISTE (refutador independente, 2026-09-24): a 6a coluna `inject` nasceu inalcancavel para
+# linhas de campo vazio, porque `IFS=$'\t'` COLAPSA TABs consecutivos e `awk -F'\t'` nao. Nenhum
+# script conferia a forma do manifesto — `harness-inventory.sh` conta LINHAS, nao colunas. Esta
+# familia compara, linha por linha, o que o leitor de producao le contra o que o awk le: qualquer
+# divergencia e campo caindo na coluna errada, que e sempre silencioso.
+run_manifest_shape_selftests() {
+  local mf="${REPO_ROOT}/.claude/validation/fixtures/manifest.tsv"
+  if [ ! -f "${mf}" ]; then record_skip "manifest-shape: manifesto ausente (SUT nao exercido)"; return; fi
+  local mismatches=0 rows=0 nf_bad=0
+  while IFS=$'\t' read -r kind fixture target verdict keyword inject; do
+    case "${kind:-}" in ''|'#'*|kind) continue ;; esac
+    rows=$(( rows + 1 ))
+    # o que o awk ve na MESMA linha (sem colapso), casando pela fixture
+    local awk_inject awk_nf
+    awk_inject="$(awk -F'\t' -v f="${fixture}" '$2==f {print ($6=="-"?"":$6); exit}' "${mf}")"
+    awk_nf="$(awk -F'\t' -v f="${fixture}" '$2==f {print NF; exit}' "${mf}")"
+    [ "${inject:-}" = "${awk_inject}" ] || { mismatches=$(( mismatches + 1 )); \
+      record_fail "manifest-shape: ${fixture}" "o leitor de producao le inject='${inject:-}' e o awk le '${awk_inject}' — campo caiu na coluna errada (colapso de TAB)"; }
+    case "${awk_nf}" in 4|5|6) ;; *) nf_bad=$(( nf_bad + 1 ));
+      record_fail "manifest-shape: ${fixture}" "NF=${awk_nf} fora de 4..6 — coluna a mais ou a menos" ;; esac
+  done < "${mf}"
+  if [ "${rows}" -eq 0 ]; then
+    record_fail "manifest-shape" "ZERO rows lidas do manifesto — o leitor nao enxergou nada (nao e 'tudo ok')"
+  elif [ "${mismatches}" -eq 0 ] && [ "${nf_bad}" -eq 0 ]; then
+    record_pass "manifest-shape: ${rows} linha(s) — leitor de producao e awk concordam em TODA coluna"
+  fi
+}
+_family run_manifest_shape_selftests
 
 
 

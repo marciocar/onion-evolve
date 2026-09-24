@@ -1,5 +1,10 @@
 # Manifesto de fixtures do auto-teste de guardas (lint-selftest.sh)
-# Colunas TAB-separadas: kind	fixture	target	verdict	keyword
+# Colunas TAB-separadas: kind	fixture	target	verdict	keyword	inject
+#   inject  : (opcional) NOME do arquivo injetado; vazio = selftest-fixture-probe.md. Guarda cujo
+#             universo nao e `.md` (ex.: REGRA 89, que varre */radar-*/*.kg.yaml) SO e alcancavel por
+#             aqui. ⚠️ CAMPO VAZIO NO MEIO EXIGE `-`: IFS=$'\t' COLAPSA TABs consecutivos, entao
+#             `…<TAB>good<TAB><TAB>probe.kg.yaml` faz o nome cair em `keyword`. Escreva `-` no
+#             keyword — mesmo idioma do `target` das linhas `members`.
 #   kind    : lint | fix | contract | members | merge | kg
 #             members: roda members-validate.sh <fixture> e assere o exit contra
 #                    o veredito (pass=exit 0 | fail=exit 1); target/keyword = '-'.
