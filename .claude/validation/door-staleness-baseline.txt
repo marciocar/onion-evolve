@@ -149,5 +149,17 @@
 #   usada aqui e a do ritual (publicar a porta do `origin/main`, avancar o pin, e so entao mergear),
 #   ao custo de DUAS materializacoes quando a leva muda o proprio lint. Onde cobrar isso passa a ser
 #   decisao do maestro: `D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA` em triagem-inbox-2026-09.kg.yaml.
-onion-standalone 412
+#
+# 2026-09-24 (PR do pin da 19a): `onion-standalone` 412→415 — o #869 entrou em main (3 commits na
+#   superficie que viaja). Passivo REAL da porta parada desde 2026-07-19; nao e afrouxamento, e a
+#   catraca medindo trabalho MERGEADO que aquela porta nao recebeu. `onion-core` volta a ZERO com a
+#   19a materializacao PUBLICADA (remoto f03726abc45d, verificado por `gh api`, nao pela nota do
+#   script nem pelo disco).
+# ⚠️ ESTA LEVA CUSTOU DUAS MATERIALIZACOES, e o registro importa mais que o numero: a 18a publicou o
+#   lint que morria calado, so para destravar o merge do #869 (a REGRA 85 nao se satisfaz sem a porta
+#   espelhando main, e `lint-onion-artifacts` nao e dispensavel no `pr-merge-verified.sh`); a 19a e a
+#   que levou a cura. O deadlock virou nó de decisao: `D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA` em
+#   docs/evolution/research/triagem-inbox-2026-09/. Recomendacao registrada: mover a cobranca para
+#   DEPOIS do merge, que e o unico momento em que a cura existe.
+onion-standalone 415
 onion-core 0
