@@ -19013,6 +19013,64 @@ run_kg_read_index_empty_selftests() {
 }
 _family run_kg_read_index_empty_selftests
 
+# ---------------------------------------------------------------------------
+# REGRA 85 — a defasagem sai do gate de PR, o registro quebrado FICA
+# ---------------------------------------------------------------------------
+# POR QUE EXISTE (decisao do maestro, 2026-09-24): `ANDOU-PARA-TRAS` virou SOFT porque a cura que ele
+# cobra so existe DEPOIS do merge — cobrar antes fazia todo PR nascer com HARD que nenhuma acao dentro
+# dele podia limpar, e uma leva pagou DUAS materializacoes por isso. A cobranca mudou de LUGAR (o
+# workflow onion-door-staleness, no push para main), nao de forca.
+# O RISCO DA MUDANCA e afrouxar demais: se `SEM-BASELINE` ou `PIN-DESCONHECIDO` cairem junto, a guarda
+# passa a tolerar REGISTRO QUEBRADO — pin que nao existe na historia, porta sem teto — que nao e
+# questao de momento nenhum. Esta familia existe para provar a fronteira nos dois lados.
+run_door_staleness_severity_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_skip "porta-severidade: SUT ausente"; return; fi
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/.claude/validation"
+
+  _ds() { # $1=linha que o stub emite  → devolve as violacoes que a funcao gerou
+    printf '#!/usr/bin/env bash\nprintf "%%s\\n" "%s"\nexit 1\n' "$1" > "${d}/.claude/validation/door-staleness-check.sh"
+    bash -c '
+      set -euo pipefail
+      SCRIPT_DIR="'"${d}"'/.claude/validation"; REPO_ROOT="'"${d}"'"
+      violation() { echo "V[$1] $3"; }
+      source <(sed -n "/^check_door_staleness()/,/^}$/p" "'"${lint}"'")
+      check_door_staleness
+    ' 2>&1
+  }
+
+  local o
+  o="$(_ds 'onion-core	ANDOU-PARA-TRAS	4 > 0 tolerado' || true)"
+  if grep -q 'V\[SOFT\]' <<< "${o}" && grep -q 'DEFASADA-COBRADA-POS-MERGE' <<< "${o}"; then
+    record_pass "porta-severidade: (a) ANDOU-PARA-TRAS e SOFT e diz ONDE a cobranca mora"
+  else record_fail "porta-severidade: (a)" "defasagem nao virou SOFT rotulado: ${o}"; fi
+
+  o="$(_ds 'onion-core	SEM-BASELINE	7 commit(s) atras' || true)"
+  if grep -q 'V\[HARD\]' <<< "${o}"; then
+    record_pass "porta-severidade: (b) SEM-BASELINE segue HARD (porta sem teto declarado)"
+  else record_fail "porta-severidade: (b)" "registro quebrado deixou de bloquear — a cura afrouxou demais: ${o}"; fi
+
+  o="$(_ds 'onion-core	PIN-DESCONHECIDO	vnextpin' || true)"
+  if grep -q 'V\[HARD\]' <<< "${o}"; then
+    record_pass "porta-severidade: (c) PIN-DESCONHECIDO segue HARD (pin fora da historia)"
+  else record_fail "porta-severidade: (c)" "pin forjado deixou de bloquear: ${o}"; fi
+
+  o="$(_ds 'ERRO door-staleness: members.yaml ausente' || true)"
+  if grep -q 'V\[HARD\]' <<< "${o}"; then
+    record_pass "porta-severidade: (d) ERRO (nao pude julgar) segue HARD"
+  else record_fail "porta-severidade: (d)" "guarda que nao pode julgar passou em silencio: ${o}"; fi
+
+  # (e) a cobranca pos-merge EXISTE — senao a defasagem saiu do PR e nao chegou a lugar nenhum
+  local wf="${REPO_ROOT}/.github/workflows/onion-door-staleness.yml"
+  if [ -f "${wf}" ] && grep -q 'branches: \[main\]' "${wf}" && grep -qE 'door-staleness-check\.sh' "${wf}"; then
+    record_pass "porta-severidade: (e) a cobranca pos-merge existe e roda a guarda no push para main"
+  else record_fail "porta-severidade: (e)" "o workflow pos-merge nao existe ou nao invoca a guarda — a defasagem sairia do PR sem chegar a lugar nenhum"; fi
+
+  rm -rf "${d}"
+}
+_family run_door_staleness_severity_selftests
+
 
 
 

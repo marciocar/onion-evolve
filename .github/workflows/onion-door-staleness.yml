@@ -1,0 +1,90 @@
+# ═══════════════════════════════════════════════════════════════════════════════
+# Onion Door Staleness — a cobrança da porta ONDE a cura existe
+#
+# POR QUE ESTE WORKFLOW EXISTE (decisão do maestro, 2026-09-24 —
+# `D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA` em docs/evolution/research/triagem-inbox-2026-09/):
+#
+# A REGRA 85 (Porta pública espelha o core, com catraca) era HARD no lint de PR, e isso a tornava
+# ESTRUTURALMENTE INSATISFAZÍVEL: a cura que ela cobra — re-materializar a porta — só existe DEPOIS
+# do merge, porque materializar do HEAD da branch publicaria trabalho não-mergeado num repo PÚBLICO.
+# O registro do `door-staleness-baseline.txt` mostra o padrão repetido 5+ vezes ("o gate fica VERMELHO
+# até o push"), e uma leva chegou a pagar DUAS materializações: a 18ª publicou um lint defeituoso só
+# para destravar o merge, e a 19ª levou a cura.
+#
+# A frase que fecha o argumento já estava escrita dentro do próprio `door-staleness-check.sh`:
+#   "uma guarda que só pode ser satisfeita depois do merge não é gate de pré-merge".
+# Faltava tirar a conclusão sobre o MOMENTO. É o que este workflow faz.
+#
+# O QUE MUDOU, E O QUE NÃO: a cobrança mudou de LUGAR, não de força. Aqui ela FALHA — alto, com a
+# porta nomeada e o comando da cura — no único instante em que re-materializar é possível. No lint de
+# PR o mesmo sinal virou SOFT, e `SEM-BASELINE`/`PIN-DESCONHECIDO` seguem HARD lá, porque registro
+# quebrado não é questão de momento.
+# ═══════════════════════════════════════════════════════════════════════════════
+name: Onion Door Staleness
+
+on:
+  push:
+    branches: [main]
+    # Só quando a superfície que VIAJA muda. Commit de biografia não defasa porta nenhuma —
+    # a própria guarda já exclui isso da contagem, e cobrar aqui seria ruído.
+    paths:
+      - '.claude/**'
+      - 'docs/meta-specs/**'
+      - 'docs/knowledge-base/**'
+      - 'docs/sdaal/**'
+      - 'docs/evolution/federation/members.yaml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  door-staleness:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          # fetch-depth 0 é OBRIGATÓRIO: a guarda resolve `pin..merge-base` na história real.
+          # Com clone raso o pin não existe e ela sairia PIN-DESCONHECIDO — falso positivo de
+          # ambiente, que é exatamente a classe de defeito que esta casa persegue.
+          fetch-depth: 0
+
+      - name: A porta ainda espelha o core?
+        id: door
+        run: |
+          set -uo pipefail
+          out=""; rc=0
+          out="$(bash .claude/validation/door-staleness-check.sh . 2>&1)" || rc=$?
+          printf '%s\n' "${out}"
+          {
+            echo "## 🚪 Defasagem das portas públicas"
+            echo ""
+            echo '```'
+            printf '%s\n' "${out}"
+            echo '```'
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+          # rc 3 = a guarda NÃO PUDE julgar (registro/manifesto ausente). Não é "tudo bem".
+          if [ "${rc}" -eq 3 ]; then
+            echo "❌ A guarda não pôde julgar (rc=3) — leia o erro acima. Isto não é 'nenhuma porta defasada'." >&2
+            exit 1
+          fi
+
+          if [ "${rc}" -ne 0 ]; then
+            echo "" >&2
+            echo "❌ PORTA DEFASADA — e agora É o momento de consertar: o trabalho está em main, então" >&2
+            echo "   re-materializar finalmente é possível (era isto que o gate de PR não podia cobrar)." >&2
+            echo "" >&2
+            echo "   1. bash ops/materialize-door.sh <clone-da-porta>" >&2
+            echo "   2. commite no clone e PUBLIQUE (o push é do maestro — ato outward-facing)" >&2
+            echo "   3. VERIFIQUE no remoto: gh api repos/<owner>/<porta>/commits/main" >&2
+            echo "   4. só então avance o pin em docs/evolution/federation/members.yaml" >&2
+            echo "" >&2
+            echo "   A ordem 3→4 não é estilo: pin que anda antes do push verificado esconde porta que" >&2
+            echo "   ninguém pode abrir, e pin velho sobre porta nova esconde trabalho feito. As duas" >&2
+            echo "   mentem; a diferença é a direção. Está registrado no door-staleness-baseline.txt." >&2
+            exit "${rc}"
+          fi
+          echo "✅ Todas as portas dentro do teto declarado."
