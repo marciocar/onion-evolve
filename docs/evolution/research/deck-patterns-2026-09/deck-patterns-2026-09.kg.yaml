@@ -144,13 +144,34 @@ nodes:
   - id: D_DECK_ARCO_PREMIUM_0924
     node_type: decision
     plane: DEV
-    status: open
+    status: done
+    verified_at: '2026-09-24'
+    verified_against: 'decisao do maestro em 2026-09-24 ("tem que seguir a ordem do que veio da pesquisa"), IMPLEMENTADA e verificada no mesmo dia: Artifact do deck na versao 23 com 75 slides em 9 atos e 3 fases (ordem conferida no project/deck.json), estrutura versionada em docs/onion/deck/SPEC.md, e 71 slides com chip de fase — contados pelo transformador, nao estimados'
     impact: 5
     confidence: 0.5
     label: 'DECISAO ABERTA (o maestro sela): qual ARCO organiza o deck premium do Onion de setembro de 2026, para o publico duplo (aluno-adotante + equipe de engenharia de cliente)? Opcoes nomeadas — (A) Arco em ATOS problem-first, derivado do deck de campo: usar docs/evolution/decks/iftl-frameworks-agentes-2026-08.html (branch docs/deck-iftl-rebased, 52 slides, 9 atos, 18 marcados short:1) como espinha MEDIDA e re-instrumenta-lo para o publico duplo. (B) Arco Diataxis: reorganizar nas 4 categorias (tutorials -> how-to -> reference -> explanation) mantendo-as estruturalmente separadas. (C) Arco da doc do Claude Code: instalar/rodar -> o que da para fazer -> escada de customizacao (memoria -> skills -> hooks -> agentes/SDK) -> aprofundamento. (D) Arco SRL/PLEA da casa: Orient -> Activate -> Reinforce com planificar->executar->avaliar por ato, sobre o chassi self-contained do /design:deck (diretrizes vinculantes 1-3, 8 e 9). (E) Aplicar literalmente os 4 achados sobreviventes: Diataxis + teto de 2 camadas de progressive disclosure sobre o deck de 65 slides descrito. (F) PARAR antes de reorganizar: medir qual deck e o alvo real (o de 65 slides NAO existe neste repo) e rodar uma 2a rodada curta com os 6 comparadores que o proprio plano nomeou e nao leu. (G) Fusao A+D+C. RECOMENDACAO DO ELENXO: **(G) — fusao A+D+C — com (F) como gate de 30 minutos ANTES de qualquer slide ser movido.** O raciocinio, e ele e negativo antes de ser positivo: (E) esta REPROVADA em duas frentes independentes e suficientes — aplica a um artefato que ninguem verificou existir (E_OBJECAO_6) e importa como "ordem" uma doutrina que so fala de SEPARACAO (E_OBJECAO_1). (B) esta reprovada por MEIO: um deck e artefato linear de fluxo unico e por construcao mistura tutorial+explanation no mesmo stream, que e precisamente o que o Diataxis proibe; e a doutrina ja estava assinada na casa desde 2026-07-05 como fronteira de ARQUIVO (theories/ vs applications/), nao de slide. (C) nao esta reprovada, mas perdeu a autoridade que a sustentava: as 3 claims tier 9 que a fundamentavam foram refutadas nesta rodada — ela entra na fusao como HIPOTESE a re-verificar na fonte primaria, nao como padrao confirmado. O que sobra com sustentacao real e (A) — porque e o unico arco MEDIDO e ja rodado em campo, com 2 camadas de disclosure e navegacao explicita ja implementadas — casado com (D), que e a unica coisa nesta rodada que responde a pergunta do maestro sobre ORDEM com autoridade citavel: a casa TEM lei de ordem escrita (skill onion-onboarding: "comece pelo papel DELE, depois a cadeia source->hub->consumer... nao despeje os 6 papeis de uma vez"), TEM as 3 fases (Orient -> Activate -> Reinforce, onion-guided-lifecycle.md) e TEM 9 diretrizes vinculantes de desenho educacional com RCT peer-reviewed por tras (Fan et al. 2025, "metacognitive laziness"). E (F) e gate e nao opcao porque reorganizar 65 slides que nao existem e trabalho sobre ficcao. CONDICAO DE SELO NOMEADA: o maestro sela depois que (i) o deck-alvo real estiver identificado por caminho+branch+contagem, e (ii) ao menos 3 dos 6 comparadores de onboarding tiverem sido lidos — antes disso qualquer selo e selo sobre 2 fontes.'
     trace: 'docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml'
 
   # ── AS OPÇÕES (uma claim por opção; quem sela é o maestro) ───────────────────────────
+    sealed_by: maestro
+    sealed_at: '2026-09-24'
+    resolution: >-
+      SELADA PELO MAESTRO em 2026-09-24, com a frase "tem que seguir a ordem do que veio da pesquisa,
+      ela foi feita para isso tambem": escolhida a OPCAO (G) — fusao A+D+C, que era a recomendacao do
+      Elenxo (confianca 0.75). IMPLEMENTADA no mesmo dia no Artifact do deck: 9 atos problem-first da
+      espinha medida (A), as 3 fases Orient/Activate/Reinforce como arcos (D), e a escada
+      memoria->skills->hooks->agentes governando o Ato 4 (C). Dois slides nasceram porque a espinha os
+      exige e o deck nao os tinha: `ato0-gancho` e `ato8-sua-vez`. Colorimetria por FASE em 71 dos 75
+      slides. A estrutura virou artefato versionado em docs/onion/deck/SPEC.md — o deck vivia so como
+      Artifact, fora do alcance de lint, catraca e residuo, o que era contradicao num framework cuja
+      tese e mecanismo verificavel.
+      ⚠️ REGISTRO DO MEU ERRO, porque a classe importa: a primeira versao implementou a OPCAO (E),
+      que este mesmo grafo graduou REPROVADA com confianca 0.1 — eu agi pelo `summary` do run em vez
+      de abrir este no. O maestro apontou. E a classe reincidiu no mesmo dia, na sintese da rodada
+      Zoho/GLPI, onde a REGRA 87 (PR que EDITA um `.kg.yaml` enxergou os `confirmed` dele) pegou.
+      A perna (C) segue HIPOTESE: as 3 claims tier 9 que a sustentavam foram refutadas sem
+      contra-evidencia. Gatilho de re-verificacao nomeado na SPEC.
+
   - id: C_OPCAO_A_ARCO_ATOS_DECK_DE_CAMPO
     node_type: claim
     plane: DEV
