@@ -2319,11 +2319,32 @@ check_kg_read_index_sync() {
     violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice AUSENTE — o hook da perna de leitura fica calado para o corpus inteiro. Gere: bash .claude/validation/kg-trace-resolve.sh . --emit-index > docs/onion/kg-read-index.tsv"
     return
   fi
-  local new_index; new_index="$(bash "${gen}" "${REPO_ROOT}" --emit-index 2>/dev/null || true)"
+  # ⚠️ O `2>/dev/null || true` DA 1a VERSAO COLAPSAVA DOIS MUNDOS, e o preco foi medido em 2026-09-24
+  # adotando um repo novo: o gate do adotante BARROU O PRIMEIRO COMMIT dele por este HARD. A causa nao
+  # era defeito nenhum do adotante — o corpus dele tem UM grafo (a semente da adocao) cujo `trace:` e
+  # PROSA, e prosa e LEGITIMA pelo contrato do proprio resolvedor (kg-trace-resolve.sh:33-34: "nao
+  # parece caminho → nome solto, chave de config, comando, prosa. `trace:` aceita mais que arquivo").
+  # Indice vazio ali e o estado NORMAL do dia 1, nao falha de ambiente.
+  # E o gerador JA DISTINGUE os dois casos: sai 3 com "indice VAZIO (parser leu 0 nos com trace
+  # resolvivel)" quando o corpus legitimamente nao tem trace de arquivo, e outro rc quando quebra.
+  # Quem nao lia era esta guarda — ela jogava fora o rc E o stderr e chamava tudo de gerador quebrado.
+  # E o modo-de-falha que a propria doutrina de adocao nomeia: gate que nasce reprovando o adotante no
+  # dia 1 acaba DESLIGADO, e ai nenhuma regra vale.
+  local new_index gen_err gen_rc=0
+  gen_err="$(mktemp)"
+  new_index="$(bash "${gen}" "${REPO_ROOT}" --emit-index 2>"${gen_err}")" || gen_rc=$?
   if [ -z "${new_index}" ]; then
-    violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): o GERADOR devolveu vazio — não regenere por cima (sobrescreveria o índice bom). Falha de ambiente ou parser: rode o gerador à mão e leia o stderr."
+    # `grep -F` com termo ASCII: o hook roda em locale C e acento nao casa classe multibyte (licao
+    # `bancada-mede-no-locale-do-hook`). "VAZIO" e "resolv" bastam e sao ASCII.
+    if [ "${gen_rc}" -eq 3 ] && grep -qF 'VAZIO' "${gen_err}" && grep -qF 'resolv' "${gen_err}"; then
+      violation "SOFT" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): [kg-read-index/CORPUS-SEM-TRACE-DE-ARQUIVO] o corpus nao tem NENHUM nó cujo \`trace:\` resolva para arquivo — índice vazio LEGÍTIMO (é o dia 1 de todo adotante: a semente da adoção tem trace em prosa, e prosa é válida). A perna de leitura nada tem a indexar ainda; ela liga sozinha quando o primeiro nó com trace de ARQUIVO nascer. Nada a corrigir."
+    else
+      violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): o gerador devolveu vazio SEM declarar corpus-sem-trace (rc=${gen_rc}) — isto é falha de ambiente ou parser, não estado legítimo. NÃO regenere por cima (sobrescreveria o índice bom). stderr: $(head -c 200 "${gen_err}" | tr '\n' ' ')"
+    fi
+    rm -f "${gen_err}"
     return
   fi
+  rm -f "${gen_err}"
   if ! printf '%s\n' "${new_index}" | LC_ALL=C diff -q - "${idx}" >/dev/null 2>&1; then
     violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice DEFASADO vs os \`trace:\` do corpus — o hook de leitura está cego para os nós que faltam. Regenere: bash .claude/validation/kg-trace-resolve.sh . --emit-index > docs/onion/kg-read-index.tsv"
   fi
