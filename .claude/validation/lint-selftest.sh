@@ -18965,6 +18965,54 @@ run_manifest_shape_selftests() {
 }
 _family run_manifest_shape_selftests
 
+# ---------------------------------------------------------------------------
+# REGRA 84 — indice vazio LEGITIMO nao e gerador quebrado
+# ---------------------------------------------------------------------------
+# POR QUE EXISTE (medido 2026-09-24, adotando um repo novo): o gate do adotante BARROU o primeiro
+# commit dele por este HARD, e o adotante nao tinha defeito nenhum — o corpus do dia 1 tem a semente
+# da adocao, cujo `trace:` e PROSA, e prosa e legitima pelo contrato do resolvedor. O gerador ja
+# distinguia (rc=3 + "indice VAZIO ... trace resolvivel"); a guarda descartava rc e stderr com
+# `2>/dev/null || true` e chamava tudo de gerador quebrado. Gate que nasce reprovando acaba desligado.
+run_kg_read_index_empty_selftests() {
+  local lint="${SCRIPT_DIR}/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_skip "r84-vazio: SUT ausente"; return; fi
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/.claude/validation" "${d}/docs/onion"
+  printf 'placeholder\n' > "${d}/docs/onion/kg-read-index.tsv"
+
+  # roda SO a funcao, com as opcoes de shell do runner e um GERADOR-STUB no lugar do real
+  _r84() { # $1=rc do stub  $2=stderr do stub
+    printf '#!/usr/bin/env bash\nprintf "%%s\\n" "%s" >&2\nexit %s\n' "$2" "$1" > "${d}/.claude/validation/kg-trace-resolve.sh"
+    bash -c '
+      set -euo pipefail
+      SCRIPT_DIR="'"${d}"'/.claude/validation"; REPO_ROOT="'"${d}"'"; ONLY_PATH=""
+      violation() { echo "V[$1] $3"; }
+      source <(sed -n "/^check_kg_read_index_sync()/,/^}$/p" "'"${lint}"'")
+      check_kg_read_index_sync
+    ' 2>&1
+  }
+
+  local o
+  o="$(_r84 3 'ERRO kg-trace-resolve --emit-index: indice VAZIO (parser leu 0 nos com trace resolvivel)' || true)"
+  if grep -q 'V\[SOFT\]' <<< "${o}" && grep -q 'CORPUS-SEM-TRACE-DE-ARQUIVO' <<< "${o}"; then
+    record_pass "r84-vazio: (a) corpus sem trace de ARQUIVO => SOFT legitimo (o dia 1 do adotante)"
+  else record_fail "r84-vazio: (a)" "vazio legitimo nao virou SOFT: ${o}"; fi
+
+  o="$(_r84 2 'ERRO kg-trace-resolve: python3 ausente' || true)"
+  if grep -q 'V\[HARD\]' <<< "${o}" && grep -q 'rc=2' <<< "${o}"; then
+    record_pass "r84-vazio: (b) gerador QUEBRADO segue HARD, com o rc e o stderr na mensagem"
+  else record_fail "r84-vazio: (b)" "falha real de ferramenta deixou de ser HARD (fail-open): ${o}"; fi
+
+  # (c) rc=3 SEM o marcador nao compra o SOFT — senao bastaria sair 3 para calar a guarda
+  o="$(_r84 3 'qualquer outra coisa' || true)"
+  if grep -q 'V\[HARD\]' <<< "${o}"; then
+    record_pass "r84-vazio: (c) rc=3 SEM o marcador do gerador NAO compra o SOFT"
+  else record_fail "r84-vazio: (c)" "rc=3 sozinho calou a guarda — o marcador deixou de ser exigido: ${o}"; fi
+
+  rm -rf "${d}"
+}
+_family run_kg_read_index_empty_selftests
+
 
 
 
