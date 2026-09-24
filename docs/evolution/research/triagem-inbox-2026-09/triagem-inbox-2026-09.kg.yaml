@@ -137,10 +137,25 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.8
-    status: open
-    verified_at: '2026-09-23'
+    status: done
+    verified_at: '2026-09-24'
     verified_against: 'derivado de E_REGRA_85_E_INSATISFAZIVEL_ANTES_DO_MERGE, medido no PR #869'
     label: 'DECISAO DO MAESTRO: em que MOMENTO cobrar a defasagem da porta. Hoje a cobranca e no lint de PR, e a cura so existe depois do merge — entao todo PR nasce com 2 HARD que ele nao pode limpar, e o registro do `door-staleness-baseline.txt` mostra que isto ja se repetiu ao menos quatro vezes ("O gate fica VERMELHO ate o push"). Tres opcoes. (1) MANTER e tratar o vermelho como espera legitima — honesto, mas normaliza merge com gate vermelho, que e o unico habito capaz de corroer todos os outros gates. (2) MOVER A COBRANCA PARA DEPOIS DO MERGE: um passo no push para `main` que abre issue/avisa, casando o gatilho com o unico momento em que a cura E possivel. (3) TOLERAR UMA JANELA EXPLICITA no baseline (ex.: teto 0 vira "0 desde o ultimo push verificado"), o que exige a guarda saber ler o remoto. RECOMENDO A (2): nao pede catedral, so muda o momento, e passa no teste do gatilho — a dor ja ocorreu 4+ vezes e esta registrada no proprio baseline.'
+    sealed_by: maestro
+    sealed_at: '2026-09-24'
+    resolution: >-
+      SELADA PELO MAESTRO em 2026-09-24, com a palavra "aceito a recomendacao": escolhida a OPCAO (2) —
+      MOVER A COBRANCA PARA DEPOIS DO MERGE. Implementado no mesmo movimento, e a fronteira foi
+      desenhada em vez de afrouxada em bloco: no lint de PR o `ANDOU-PARA-TRAS` virou SOFT com rotulo
+      proprio (`porta/DEFASADA-COBRADA-POS-MERGE`) dizendo ONDE a cobranca mora, enquanto
+      `SEM-BASELINE`, `PIN-DESCONHECIDO` e `ERRO` seguem HARD — registro quebrado nao e questao de
+      momento. A cobranca bloqueante nasceu no workflow `onion-door-staleness`, que roda no push para
+      `main` com `fetch-depth: 0` (clone raso daria PIN-DESCONHECIDO falso) e falha nomeando a porta,
+      o comando da cura e a ordem push-verificado-ANTES-do-pin. Bancada: familia
+      `door_staleness_severity`, 5 casos, provando os dois lados da fronteira — inclusive o caso (e),
+      que verifica que a cobranca pos-merge EXISTE, para a defasagem nao sair do PR e nao chegar a
+      lugar nenhum. O custo que motivou a decisao esta medido no proprio door-staleness-baseline.txt:
+      5+ ocorrencias de "o gate fica VERMELHO ate o push", e uma leva que pagou DUAS materializacoes.
 
 edges:
   - from: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM

@@ -2377,8 +2377,24 @@ check_door_staleness() {
   local line
   while IFS= read -r line; do
     case "${line}" in
-      *ANDOU-PARA-TRAS*|*SEM-BASELINE*|*PIN-DESCONHECIDO*)
-        violation "HARD" "docs/evolution/federation/members.yaml" "REGRA 85 (Porta pública espelha o core, com catraca): ${line} — re-materialize (bash ops/materialize-door.sh <clone>) e atualize o pin no registro, ou baixe o teto em door-staleness-baseline.txt se a porta foi publicada. Porta defasada MENTE sobre o core."
+      # ⚠️ ANDOU-PARA-TRAS DEIXOU DE SER HARD EM 2026-09-24, POR DECISÃO DO MAESTRO, e a razão está
+      # medida no próprio `door-staleness-baseline.txt`: a cura que esta linha cobra — re-materializar
+      # a porta — SÓ EXISTE DEPOIS DO MERGE, porque materializar do HEAD da branch publicaria trabalho
+      # não-mergeado num repo PÚBLICO. Resultado, repetido 5+ vezes no registro deste arquivo: todo PR
+      # nascia com HARD que NENHUMA ação dentro dele podia limpar, e `lint-onion-artifacts` não é
+      # dispensável no `pr-merge-verified.sh` — por desenho. Uma leva chegou a pagar DUAS
+      # materializações (a 18a publicou lint defeituoso só para destravar o merge; a 19a levou a cura).
+      # A frase que fecha o argumento já estava escrita DENTRO do `door-staleness-check.sh`: "uma guarda
+      # que só pode ser satisfeita depois do merge não é gate de pré-merge". Faltava tirar a conclusão
+      # sobre o MOMENTO da cobrança, e é o que a decisão fez (nó D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA).
+      # A cobrança mudou de LUGAR, não desapareceu: `onion-door-staleness.yml` roda no push para main
+      # — o único instante em que re-materializar é possível — e falha lá, alto, com a porta nomeada.
+      # SEM-BASELINE e PIN-DESCONHECIDO seguem HARD: não são questão de momento, são registro quebrado.
+      *ANDOU-PARA-TRAS*)
+        violation "SOFT" "docs/evolution/federation/members.yaml" "REGRA 85 (Porta pública espelha o core, com catraca): [porta/DEFASADA-COBRADA-POS-MERGE] ${line} — re-materialize (bash ops/materialize-door.sh <clone>), publique e avance o pin. NÃO bloqueia este PR de propósito: a cura só existe depois do merge, e a cobrança bloqueante mora no workflow \`onion-door-staleness\` (push para main). Porta defasada MENTE sobre o core — mas o PR não é o lugar de consertar."
+        ;;
+      *SEM-BASELINE*|*PIN-DESCONHECIDO*)
+        violation "HARD" "docs/evolution/federation/members.yaml" "REGRA 85 (Porta pública espelha o core, com catraca): ${line} — isto NÃO é questão de momento: é registro quebrado (pin que não existe na história, ou porta sem teto declarado). Corrija no members.yaml / door-staleness-baseline.txt antes do merge."
         ;;
       ERRO*) violation "HARD" ".claude/validation/door-staleness-check.sh" "REGRA 85 (Porta pública espelha o core, com catraca): a guarda não pôde julgar — ${line}" ;;
     esac
