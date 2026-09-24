@@ -36,7 +36,14 @@ permissions:
 jobs:
   onion-review:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    # ⚠️ 15 → 26, e a razão e MEDIDA (PR #871, 2026-09-24): o teto era do JOB e cobria AS DUAS
+    # tentativas. A 1a consumiu ~14 min, o retry recebeu 55 SEGUNDOS e foi cancelado — retry sem
+    # orcamento e decorativo. Pior: o passo "aviso se nenhuma tentativa revisou (soft-pass, nao
+    # bloqueia)" ficava INALCANCAVEL, porque o cancelamento do job mata os passos seguintes. O
+    # caminho gracioso que o workflow DECLARA so existia enquanto o timeout nao disparasse.
+    # Agora cada tentativa tem teto PROPRIO (11 min, abaixo) e o job tem folga para os passos de
+    # veredito e para o soft-pass rodarem de fato. Classe: guarda que declara caminho que nao existe.
+    timeout-minutes: 26
     # Forks não têm acesso a secrets — pular para evitar check falho.
     if: ${{ github.event.pull_request.head.repo.fork == false }}
     env:
@@ -161,6 +168,9 @@ jobs:
       # loop, não para racionar leitura), e o custo medido por turno torna o pior caso barato.
       - name: Revisor Onion (gate-keeper + code review)
         id: review
+        # teto PROPRIO da tentativa: sem ele, a 1a consome o job inteiro e o retry nao roda (medido
+        # no PR #871). 11 min x2 + folga cabem nos 26 do job.
+        timeout-minutes: 11
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.preflight.outputs.ok == 'true' }}
         continue-on-error: true
         # PINADO em v1.0.183 (2026-07-25). A VERSÃO NUNCA FOI A CAUSA — o pin anterior
@@ -272,6 +282,9 @@ jobs:
       # de soft-passar sem revisar. Só roda se a 1ª NÃO revisou. Mesma config do step acima.
       - name: Revisor Onion (retry — só se a 1ª tentativa não revisou)
         id: review2
+        # teto PROPRIO da tentativa: sem ele, a 1a consome o job inteiro e o retry nao roda (medido
+        # no PR #871). 11 min x2 + folga cabem nos 26 do job.
+        timeout-minutes: 11
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' && steps.preflight.outputs.ok == 'true' && steps.v1.outputs.revisou != 'true' }}
         continue-on-error: true
         # PINADO em v1.0.183 (2026-07-25). A VERSÃO NUNCA FOI A CAUSA — o pin anterior

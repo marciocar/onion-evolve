@@ -2,9 +2,9 @@
 branch: fix/r84-empty-index-and-sge-registry
 pr: 871
 date: '2026-09-24'
-reviewed_diff_sha256: f6e8bb9a37879fef5ea80886ddfb4c262f6b28d7e7a4c63daf828d6af4507cac
-findings_total: 8
-findings_real: 8
+reviewed_diff_sha256: f64274a49908b89368721cc8e3b305ea54445a9790a85329eb17ab9bd705980d
+findings_total: 9
+findings_real: 9
 tokens: 0
 duration_min: 0
 verdict: REPROVADO_E_CURADO
@@ -83,3 +83,25 @@ reprovou a minha primeira tentativa:
 |---|---|---|
 | 7 | **4 traces pendurados** no grafo da pesquisa (REGRA 55 — O `trace:` de um nó APONTA para alvo que EXISTE): todos apontavam para o deck de campo, que vive **só em duas branches de `docs/`**, nunca em main. A própria rodada mediu isso e o agente escreveu o caminho como se resolvesse | CURADO: viraram **prosa** nomeando as branches — forma que o resolvedor declara legítima — em vez de caminho que não resolve. O fio "onde o deck de campo passa a viver" fica aberto na spec |
 | 8 | Índice de leitura e `docs/backlog.md` **defasados** pela entrada do grafo novo (REGRAS 84 e 62) | regenerados: índice 1.894 linhas · backlog 215 abertos em 47 grafos |
+
+## Achado 9 — o CI achou, e é a mesma classe
+
+O `onion-review` reprovou com **`The operation was canceled`** aos 15m18s: ele **não julgou**, foi
+**cancelado por timeout**. Falha de ferramenta, não veredito — e o diff é pequeno (15 arquivos,
+844 inserções), então não é volume.
+
+Medido no log: o `timeout-minutes: 15` era **do JOB** e cobria **as duas tentativas**. A 1ª consumiu
+~14 min; o retry recebeu **55 segundos** e foi cancelado. Retry sem orçamento é decorativo.
+
+E o pior está uma linha adiante: o workflow **declara** um caminho gracioso — *"aviso se nenhuma
+tentativa revisou (soft-pass, não bloqueia)"* — que fica **inalcançável** quando o timeout cancela o
+job, porque o cancelamento mata os passos seguintes. O caminho existia só enquanto o timeout não
+disparasse.
+
+**É a terceira vez nesta mesma leva** que o defeito tem esta forma: um caminho declarado que não
+existe quando importa (a REGRA 84 lendo índice vazio como gerador quebrado; o `exit 2` sem
+consumidor; agora o soft-pass do revisor). A cura é sempre a mesma — dar ao caminho declarado um
+orçamento próprio, em vez de deixá-lo herdar o que já foi gasto.
+
+**Cura:** teto **por tentativa** (11 min cada) e job em 26, com folga para os passos de veredito e
+para o soft-pass rodarem de fato.
