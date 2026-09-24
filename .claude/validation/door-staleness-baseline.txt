@@ -161,5 +161,14 @@
 #   que levou a cura. O deadlock virou nó de decisao: `D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA` em
 #   docs/evolution/research/triagem-inbox-2026-09/. Recomendacao registrada: mover a cobranca para
 #   DEPOIS do merge, que e o unico momento em que a cura existe.
-onion-standalone 415
+#
+# 2026-09-24 (20a materializacao — a PRIMEIRA do regime novo): `onion-standalone` 415→418 (passivo real
+#   da porta parada desde 2026-07-19) e `onion-core` volta a ZERO, publicada e VERIFICADA no remoto
+#   (c70421eee91f, por `gh api`).
+# ⚠️ E ESTE E O REGISTRO QUE INTERESSA: a decisao de mover a cobranca para pos-merge (selada pelo
+#   maestro em 2026-09-24, no `D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA`) FUNCIONOU no primeiro uso real. O
+#   workflow `onion-door-staleness` disparou 4 SEGUNDOS apos o merge do #872, nomeou as duas portas com
+#   os numeros e entregou os 4 passos da cura — e o #872 mergeou SEM a porta o bloquear. Pela primeira
+#   vez em 20 materializacoes, este arquivo nao registra "o gate fica VERMELHO ate o push".
+onion-standalone 418
 onion-core 0
