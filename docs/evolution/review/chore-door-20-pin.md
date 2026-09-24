@@ -2,7 +2,7 @@
 branch: chore/door-20-pin
 pr: 873
 date: '2026-09-24'
-reviewed_diff_sha256: 
+reviewed_diff_sha256: 2df78b533d5270c54c79126931cf4fb26ede0fca06662bce39c1695cff661d98
 findings_total: 1
 findings_real: 1
 tokens: 0

@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**224 itens abertos** em 48 grafo(s) com aberto (de 70 no escopo) · 49 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**223 itens abertos** em 48 grafo(s) com aberto (de 70 no escopo) · 49 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -123,20 +123,6 @@
 |--:|---|---|---|
 | 43.2 | `Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09` | plugin-directory-landscape-2026-09 | Quais plugins e marketplaces de Claude Code se destacam em 2026-09 e que padroes de desenvolvimento seguem (granularidade 1-grande |
 
-## deck-patterns-2026-09 — 9 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 42.5 | `D_DECK_ARCO_PREMIUM_0924` | deck-patterns-2026-09 | DECISAO ABERTA (o maestro sela): qual ARCO organiza o deck premium do Onion de setembro de 2026, para o publico duplo (aluno-adota |
-| 33.0 | `Q_DECK_PATTERNS_ORDER_0924` | deck-patterns-2026-09 | Quais sao os padroes CONSAGRADOS de apresentar um framework/maquinaria de desenvolvimento (documentacao e deck), e qual e a ORDEM  |
-| 26.2 | `C_OPCAO_G_FUSAO_A_D_C_COM_GATE_F` | deck-patterns-2026-09 | OPCAO (G) — RECOMENDADA PELO ELENXO: fusao A+D+C, com F como gate de 30 minutos antes. A divisao de trabalho entre as tres, que  |
-| 24.5 | `C_OPCAO_A_ARCO_ATOS_DECK_DE_CAMPO` | deck-patterns-2026-09 | OPCAO (A): arco em ATOS problem-first, derivado do deck de campo — usar docs/evolution/decks/iftl-frameworks-agentes-2026-08.htm |
-| 24.0 | `C_OPCAO_F_PARAR_E_MEDIR_O_ALVO` | deck-patterns-2026-09 | OPCAO (F): PARAR antes de reorganizar — medir qual deck e o alvo real (o de 65 slides nao existe neste repo) e rodar uma 2a roda |
-| 14.0 | `C_OPCAO_D_ARCO_SRL_PLEA_DA_CASA` | deck-patterns-2026-09 | OPCAO (D): arco SRL/PLEA da casa — Orient -> Activate -> Reinforce com planificar->executar->avaliar por ato, sobre o chassi sel |
-| 7.2 | `C_OPCAO_C_ARCO_DOC_CLAUDE_CODE` | deck-patterns-2026-09 | OPCAO (C): arco da doc do Claude Code — instalar/rodar -> o que da para fazer -> escada de customizacao (memoria -> skills -> ho |
-| 4.5 | `C_OPCAO_B_ARCO_DIATAXIS` | deck-patterns-2026-09 | OPCAO (B): arco Diataxis — reorganizar o deck nas 4 categorias (tutorials -> how-to -> reference -> explanation) mantendo-as est |
-| 1.6 | `C_OPCAO_E_APLICAR_OS_QUATRO_ACHADOS` | deck-patterns-2026-09 | OPCAO (E): aplicar literalmente os 4 achados sobreviventes — Diataxis + teto de 2 camadas de progressive disclosure sobre o deck |
-
 ## poda-instruction-bloat-2026-09 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -174,6 +160,19 @@
 | 12.6 | `C_OPCAO_I_SUPERFICIES_EN_CORPOS_PTBR` | plugin-language-policy-2026-09 | OPCAO (i) — superficies GERADAS em ingles (description do plugin.json, README do plugin e do marketplace, argument-hint, marketp |
 | 6.3 | `C_OPCAO_II_BILINGUE_POR_CAMPOS` | plugin-language-policy-2026-09 | OPCAO (ii) — bilingue por campos: `description` + `description_en` no plugin.json, README com EN em cima e pt-BR abaixo, ambos c |
 | 3.8 | `C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS` | plugin-language-policy-2026-09 | OPCAO (iii) — ingles integral nas superficies e corpos traduzidos progressivamente. A favor: e a unica que casa 100% com o norte |
+
+## deck-patterns-2026-09 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 33.0 | `Q_DECK_PATTERNS_ORDER_0924` | deck-patterns-2026-09 | Quais sao os padroes CONSAGRADOS de apresentar um framework/maquinaria de desenvolvimento (documentacao e deck), e qual e a ORDEM  |
+| 26.2 | `C_OPCAO_G_FUSAO_A_D_C_COM_GATE_F` | deck-patterns-2026-09 | OPCAO (G) — RECOMENDADA PELO ELENXO: fusao A+D+C, com F como gate de 30 minutos antes. A divisao de trabalho entre as tres, que  |
+| 24.5 | `C_OPCAO_A_ARCO_ATOS_DECK_DE_CAMPO` | deck-patterns-2026-09 | OPCAO (A): arco em ATOS problem-first, derivado do deck de campo — usar docs/evolution/decks/iftl-frameworks-agentes-2026-08.htm |
+| 24.0 | `C_OPCAO_F_PARAR_E_MEDIR_O_ALVO` | deck-patterns-2026-09 | OPCAO (F): PARAR antes de reorganizar — medir qual deck e o alvo real (o de 65 slides nao existe neste repo) e rodar uma 2a roda |
+| 14.0 | `C_OPCAO_D_ARCO_SRL_PLEA_DA_CASA` | deck-patterns-2026-09 | OPCAO (D): arco SRL/PLEA da casa — Orient -> Activate -> Reinforce com planificar->executar->avaliar por ato, sobre o chassi sel |
+| 7.2 | `C_OPCAO_C_ARCO_DOC_CLAUDE_CODE` | deck-patterns-2026-09 | OPCAO (C): arco da doc do Claude Code — instalar/rodar -> o que da para fazer -> escada de customizacao (memoria -> skills -> ho |
+| 4.5 | `C_OPCAO_B_ARCO_DIATAXIS` | deck-patterns-2026-09 | OPCAO (B): arco Diataxis — reorganizar o deck nas 4 categorias (tutorials -> how-to -> reference -> explanation) mantendo-as est |
+| 1.6 | `C_OPCAO_E_APLICAR_OS_QUATRO_ACHADOS` | deck-patterns-2026-09 | OPCAO (E): aplicar literalmente os 4 achados sobreviventes — Diataxis + teto de 2 camadas de progressive disclosure sobre o deck |
 
 ## radar-E3-2026-09-03 — 1 item(ns)
 
