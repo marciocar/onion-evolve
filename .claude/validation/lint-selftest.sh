@@ -616,10 +616,15 @@ _emit() { printf '%s\n' "$1" 2>/dev/null || true; }
 # Modo lint — injeta a fixture no sandbox e assere por path
 # ---------------------------------------------------------------------------
 run_lint_fixture() {
-  local fixture="$1" target="$2" verdict="$3" keyword="$4"
+  local fixture="$1" target="$2" verdict="$3" keyword="$4" inject="${5:-}"
   local src="${FIX_DIR}/${fixture}"
   local dst_dir="${SANDBOX}/${target}"
-  local dst="${dst_dir}/${INJECT_NAME}"
+  # nome de injecao POR LINHA (6a coluna); vazio = o nome historico `.md`. A ancora de citacao
+  # acompanha: com nome custom ela e o nome INTEIRO (o lint imprime o path), senao segue o
+  # `INJECT_BASE` sem extensao, que e como as 110 linhas antigas casam.
+  local iname="${inject:-${INJECT_NAME}}"
+  local ianchor="${INJECT_BASE}"; [ -n "${inject}" ] && ianchor="${inject}"
+  local dst="${dst_dir}/${iname}"
 
   if [ ! -f "${src}" ]; then
     record_fail "${fixture}" "fixture inexistente: ${src}"
@@ -648,7 +653,7 @@ run_lint_fixture() {
 
   # Linhas de violação que citam o arquivo injetado (âncora-por-path)
   local cited
-  cited="$(printf '%s\n' "${out}" | grep -F "${INJECT_BASE}" || true)"
+  cited="$(printf '%s\n' "${out}" | grep -F "${ianchor}" || true)"
 
   case "${verdict}" in
     bad)
@@ -12223,7 +12228,19 @@ run_session_beacon_selftests() {
   fake_dir="$(mktemp -d)"
   if cp "$(command -v sleep)" "${fake_dir}/claude" 2>/dev/null; then
     "${fake_dir}/claude" 30 & fake_pid=$!
-    if [ "$(cat "/proc/${fake_pid}/comm" 2>/dev/null || true)" = "claude" ]; then
+    # ESPERA O `exec`, com teto. A 1a forma lia `/proc/<pid>/comm` NA HORA, e isso e corrida: entre o
+    # `&` e o exec do filho o comm ainda e o do shell, o caso caia no `record_skip` e sob
+    # ONION_SELFTEST_STRICT=1 o ⊘ PINTA O CI DE VERMELHO. Medido 2026-09-23: a mesma faixa passou as
+    # 18:33 e reprovou as 23:45 sem nenhuma mudanca no SUT — assinatura de corrida, nao de host.
+    # Teto de 2s (40 x 50ms) e o comm OBSERVADO entra na mensagem: skip sem dizer o que viu e flaky
+    # para sempre.
+    _fake_comm=""
+    for _ in $(seq 40); do
+      _fake_comm="$(cat "/proc/${fake_pid}/comm" 2>/dev/null || true)"
+      [ "${_fake_comm}" = "claude" ] && break
+      sleep 0.05
+    done
+    if [ "${_fake_comm}" = "claude" ]; then
       ONION_BEACON_OWNER_PID="${fake_pid}" bash "${sb}" up "${d}" "sess-eleito"
       out="$(awk -F': ' '/^owner_pid:/{print $2; exit}' "${d}/.claude/beacons/sess-eleito.beacon" 2>/dev/null || true)"
       if [ "${out}" = "${fake_pid}" ] \
@@ -12247,7 +12264,7 @@ run_session_beacon_selftests() {
       else record_fail "session-beacon: sweep preserva" "sweep apagou beacon de sessão viva"; fi
       bash "${sb}" down "${d}" "sess-eleito"
     else
-      record_skip "session-beacon: sonda elege/preserva/sweep-vivo — comm não observável neste host"
+      record_skip "session-beacon: sonda elege/preserva/sweep-vivo — comm não observável neste host após 2s de espera (último comm visto: '${_fake_comm:-<vazio>}')"
     fi
     kill "${fake_pid}" 2>/dev/null || true; wait "${fake_pid}" 2>/dev/null || true
   else
@@ -12690,7 +12707,14 @@ run_fixtures_selftests() {
 local _shard_i=0 _shard_n=1 _shard_k=0
 case "${SELFTEST_SHARD:-}" in */*) _shard_i="${SELFTEST_SHARD%/*}"; _shard_n="${SELFTEST_SHARD#*/}" ;; esac
 if [ -f "${MANIFEST}" ]; then
-  while IFS=$'\t' read -r kind fixture target verdict keyword || [ -n "${kind:-}" ]; do
+  # 6a coluna OPCIONAL `inject` (2026-09-23): o nome do arquivo injetado era FIXO em
+  # `selftest-fixture-probe.md`, e isso tornava o §11.1 de commands.md INSATISFAZIVEL para toda guarda
+  # cujo universo nao seja `.md` — a REGRA 89 (Rodada de radar selada reconcilia o corpus que superou
+  # (Aufhebung), com catraca) varre `*/radar-*/*.kg.yaml`, entao nenhuma fixture do manifesto jamais a
+  # alcancaria. A norma exige fixture para toda guarda alterada; sem esta coluna, obedecer era
+  # impossivel e a unica saida era dispensa. Coluna vazia = o nome antigo, entao as 110 linhas
+  # existentes seguem intactas.
+  while IFS=$'\t' read -r kind fixture target verdict keyword inject || [ -n "${kind:-}" ]; do
     kind="${kind:-}"
     [ -z "${kind}" ] && continue
     [ "${kind#\#}" != "${kind}" ] && continue   # linha de comentário
@@ -12707,7 +12731,7 @@ if [ -f "${MANIFEST}" ]; then
       esac
     fi
     case "${kind}" in
-      lint)     run_lint_fixture "${fixture}" "${target}" "${verdict}" "${keyword:-}" ;;
+      lint)     run_lint_fixture "${fixture}" "${target}" "${verdict}" "${keyword:-}" "${inject:-}" ;;
       fix)      run_fix_fixture "${fixture}" "${target}" "${verdict}" ;;
       contract) run_contract_fixture "${fixture}" "${verdict}" ;;
       members)  run_members_fixture "${fixture}" "${verdict}" ;;
