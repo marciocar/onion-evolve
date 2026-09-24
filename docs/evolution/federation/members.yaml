@@ -539,6 +539,31 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  - id: sge
+    name: sge (Sistema de Gestão de Editais — licitação pública brasileira, Lei 14.133/2021)
+    role: adopted               # TIER 3 — consumidor puro; nao re-adota. MESMA palavra do stamp
+                                # (.claude/.onion-version): os dois vocabularios foram unificados em
+                                # 2026-09-24, ao custo de duas linhas — `consumer` vivia em UM sitio
+                                # do validador e em UMA entrada do registro, contra 22 sitios que
+                                # leem `adopted` no lint. Sinonimo legado segue aceito.
+    kind: adopter
+    parent: onion-evolve
+    remote: n/a                 # SÓ LOCAL por ora: criar repo remoto é ato outward-facing, e o maestro não autorizou
+    local_path: "/home/marcio/sge"
+    onion_version: ba0d2d423c17   # pin da adoção (2026-09-24); VERIFICAR com pin-integrity-check.sh após o 1º push
+    adopted_at: 2026-09-24
+    mode: regulated             # licitação PÚBLICA: trilha de auditoria desde o dia 1, não camada opcional
+    personality_summary: "Mapeia editais de licitação pública brasileira em três etapas encadeadas: mapeamento do objeto (lotes/itens/subitens), ficha de análise técnica (exigência × oferta) e checklist de qualidade da saída. Recorte inicial: veículos. BASE LEGAL: Lei 14.133/2021 por decisão do maestro — a 8.666/93 é regime histórico. Foi o adotante que ACHOU o defeito da REGRA 84 (Índice de leitura do KG em sincronia com os traces): o gate barrava o primeiro commit de TODO adotante porque a guarda lia índice vazio como gerador quebrado, quando no dia 1 isso é o estado normal. Curado na fonte no mesmo dia."
+    specializations: [licitacao-publica, lei-14133, regulated-greenfield, analise-tecnica, checklist-qualidade]
+    personality_last_sync: 2026-09-24   # seed manual
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
   - id: sacola-de-ideias
     name: Sacola de Ideias (site institucional — Astro)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
