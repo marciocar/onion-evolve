@@ -12,8 +12,8 @@
 
 | Dimensão | Nº | Produtor |
 |---|---:|---|
-| Famílias na bancada | **187** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **1188** | `bash .claude/validation/harness-inventory.sh --env` |
+| Famílias na bancada | **188** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **1195** | `bash .claude/validation/harness-inventory.sh --env` |
 | Regras do lint | **88** | `bash .claude/validation/rules-registry.sh --counts` |
 | — HARD | **78** | `bash .claude/validation/rules-registry.sh --counts` |
 | Pares de modo consumido | **50** | `bash .claude/validation/consumed-mode-check.sh .` |
@@ -55,14 +55,14 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 | Medida | Valor | Produtor |
 |---|---:|---|
 | Resíduos de revisão | **314** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados totais | **1692** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados REAIS | **1449** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados totais | **1713** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados REAIS | **1469** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **86%** | `bash .claude/validation/review-ledger.sh --env` |
-| Tokens por achado REAL | **132672** | `bash .claude/validation/review-ledger.sh --env` |
+| Tokens por achado REAL | **131009** | `bash .claude/validation/review-ledger.sh --env` |
 | Vereditos no vocabulário | **224** | `bash .claude/validation/review-ledger.sh --env` |
 | — legado (texto livre) | **90** | `bash .claude/validation/review-ledger.sh --env` |
 
-A média de tokens cobre os **194** resíduos com custo > 0; os demais declaram `tokens: 0`
+A média de tokens cobre os **195** resíduos com custo > 0; os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero
 não é média — mas seus achados continuam contados no total.
 

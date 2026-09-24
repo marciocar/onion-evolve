@@ -192,9 +192,22 @@ if [ -f "${KGCHK}" ] \
 fi
 
 echo "🧅 Onion pre-commit — rodando lint determinístico…"
-if ! bash "${LINT}"; then
+# O RC DO LINT TEM TRES SIGNIFICADOS, e rotular os tres igual era acoplamento declarado e nao
+# exercido (refutador independente, 2026-09-24): o `exit 2` nasceu nesta leva para dizer NAO PUDE
+# JULGAR, e este — o unico consumidor local — imprimia "violação(ões) HARD acima" tambem nele,
+# exatamente o rotulo errado que o mecanismo existe para eliminar. O idioma certo ja estava DOZE
+# LINHAS acima, no check irmao do kg-reverify-schema. Agora fala a mesma lingua.
+_lintrc=0
+bash "${LINT}" || _lintrc=$?
+if [ "${_lintrc}" -eq 1 ]; then
   echo ""
   echo "❌ Commit bloqueado: violação(ões) HARD acima. Corrija ou use 'git commit --no-verify' para pular."
+  exit 1
+elif [ "${_lintrc}" -ge 2 ]; then
+  echo ""
+  echo "❌ Commit bloqueado: o lint NÃO PÔDE JULGAR (rc=${_lintrc}) — ele morreu antes do sumário, então as"
+  echo "   violações acima são PARCIAIS e o verde NÃO foi medido. Isto não é 'zero HARD': leia o bloco"
+  echo "   MORREU acima e conserte a causa. Pular com --no-verify aqui é commitar sem gate nenhum."
   exit 1
 fi
 

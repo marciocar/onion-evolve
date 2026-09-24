@@ -161,7 +161,11 @@ if [ -n "${ONLY_PATH}" ]; then
     /*) ;;
     *) ONLY_PATH="$(cd "$(dirname "${ONLY_PATH}")" 2>/dev/null && pwd)/$(basename "${ONLY_PATH}")" ;;
   esac
-  [ -f "${ONLY_PATH}" ] || { echo "ERRO: --only: arquivo inexistente: ${ONLY_PATH}" >&2; exit 2; }
+  # A6 (revisor independente, 2026-09-24): esta e a UNICA saida legitima antes do sumario, e sem o
+  # flag ela herdava o banner `MORREU` dizendo "as violacoes acima sao PARCIAIS" e "rode bash -x" —
+  # diagnostico enganoso num caso onde nada foi varrido e a causa e o ARGUMENTO. O rc 2 esta certo
+  # (nao pude julgar); errado era o texto. Ligar o flag aqui deixa o trap calado e preserva o rc.
+  [ -f "${ONLY_PATH}" ] || { _LINT_SUMMARY_REACHED=1; echo "ERRO: --only: arquivo inexistente: ${ONLY_PATH}" >&2; exit 2; }
 fi
 FIXED_FILES=0
 declare -a FIX_LOG=()
@@ -4469,6 +4473,16 @@ check_radar_aufhebung() {
   # `grep -v` nao casa nada, devolve 1, a lista `&&` termina em falha e o `set -e` da linha 74 MATA
   # o lint aqui — sem imprimir nada. O rc virava 1 e o CI o lia como "achou HARD": o gate morto
   # disfarcado de veredito. Baseline vazio e MISSING agora sao o mesmo caminho (tolerated="").
+  # A7 (revisor independente, 2026-09-24): o `|| true` engolia tambem "existe e NAO e legivel", e o
+  # PRODUTOR irmao (radar-aufhebung-check.sh:108) trata esse caso como classe propria: `[ -r ] ||
+  # exit 2` com "nao pude julgar (≠ zero)". O efeito do `|| true` e fail-CLOSED (tolerated="" faz
+  # tudo virar HARD), entao nao havia falso-verde — mas o operador recebia enxurrada de HARD espurios
+  # em vez do rotulo certo, e a unica pista era um `Permission denied` no stderr que o
+  # `lint-summary.sh` nem le. Agora o consumidor fala a mesma lingua do produtor.
+  if [ -e "${_R89_BASE}" ] && [ ! -r "${_R89_BASE}" ]; then
+    violation "HARD" "${_R89_BASE#"${REPO_ROOT}/"}" "REGRA 89 (Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca): o baseline da catraca EXISTE e NAO e legivel — NAO PUDE JULGAR (≠ zero tolerado). Conserte a permissao; sem ler o baseline nao se sabe o que esta tolerado."
+    return 0
+  fi
   [ -f "${_R89_BASE}" ] && tolerated="$(grep -vE '^[[:space:]]*(#|$)' "${_R89_BASE}" || true)"
   local fresh=0 line tag val
   while IFS=$'\t' read -r tag val; do
