@@ -2,7 +2,7 @@
 branch: fix/review-evidence-preserved
 pr: 874
 date: '2026-09-25'
-reviewed_diff_sha256: 7d3e97ec2d985f69469c3dad5efbc6d37475a3923c1dbf1c20c2c93fc8c76301
+reviewed_diff_sha256: 75a6ce79e4ce52ac1fe2ca3bb2f6f8ff4c897665f6cc8c62df6c74d713358072
 findings_total: 3
 findings_real: 3
 tokens: 0
