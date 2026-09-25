@@ -31,10 +31,12 @@
 set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DEST=""; ROLE="hub"
+DEST=""; ROLE="hub"; SRC_REF=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --role) ROLE="${2:-hub}"; shift 2 ;;
+    --from) SRC_REF="${2:?--from exige uma ref}"; shift 2 ;;
+    --from=*) SRC_REF="${1#--from=}"; shift ;;
     --role=*) ROLE="${1#--role=}"; shift ;;
     -h|--help) sed -n '1,40p' "${BASH_SOURCE[0]}"; exit 0 ;;
     *) DEST="$1"; shift ;;
@@ -45,7 +47,37 @@ done
 VM="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
 [ -f "${VM}" ] || { echo "ERRO: SSOT do transporte ausente (${VM})" >&2; exit 3; }
 
+# ── A FONTE É `origin/<integração>`, NUNCA O `HEAD` LOCAL ────────────────────
+# Defeito medido 2026-09-25, e o raio é PÚBLICO. O script usava `git archive HEAD`
+# e `rev-parse HEAD`; rodado a partir de uma branch de trabalho — que é o estado
+# normal de quem acabou de abrir um PR — ele montava a porta com o conteúdo NÃO
+# MERGEADO dessa branch e carimbava o pin com o SHA dela. Observado ao vivo: pin
+# `5b3d30d0a9d3` (topo de um PR aberto) onde `main` estava em `06bc547c268c`.
+# A doutrina do CLAUDE.md sempre disse que a porta é "projeção gerada de
+# `origin/main`". Declarado ≠ implementado — a classe que esta casa mais persegue,
+# aqui com a consequência mais cara: publicar código não revisado num repo público.
+# O que impediu o dano foi a OUTRA fronteira, a de que o push é do maestro. Fronteira
+# não é desculpa para a guarda faltante; é a razão de esta cura ser barata hoje.
+# FAIL-CLOSED: sem conseguir resolver a ref remota, NÃO materializa. Uma porta que
+# não sabe de onde nasce não deve nascer. `--from <ref>` existe para o caso
+# deliberado (ensaio, bisect), e ele ANUNCIA que não é `origin/<integração>`.
+_INTEG="$(bash "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" "${REPO_ROOT}" 2>/dev/null || true)"
+: "${_INTEG:=main}"
+if [ -z "${SRC_REF}" ]; then
+  git -C "${REPO_ROOT}" fetch -q origin "${_INTEG}" 2>/dev/null || true
+  SRC_REF="origin/${_INTEG}"
+  git -C "${REPO_ROOT}" rev-parse --verify --quiet "${SRC_REF}^{commit}" >/dev/null || {
+    echo "ERRO: não consegui resolver '${SRC_REF}' — a porta é projeção da INTEGRAÇÃO mergeada, e eu não materializo do HEAD local por conveniência (ele pode ser uma branch de PR aberto, e isso publicaria código não mergeado num repo PÚBLICO). Rode \`git fetch origin ${_INTEG}\`, ou passe --from <ref> deliberadamente." >&2
+    exit 3
+  }
+else
+  git -C "${REPO_ROOT}" rev-parse --verify --quiet "${SRC_REF}^{commit}" >/dev/null || {
+    echo "ERRO: --from '${SRC_REF}' não resolve para um commit." >&2; exit 3; }
+  echo "  ⚠️  --from '${SRC_REF}': NÃO é origin/${_INTEG}. Materialização deliberada fora da integração — não publique sem saber por quê."
+fi
+
 echo "══ materialize-door — papel '${ROLE}' → ${DEST}"
+echo "  fonte: ${SRC_REF} ($(git -C "${REPO_ROOT}" rev-parse --short=12 "${SRC_REF}"))"
 
 # ── (1) MONTAR pelo manifesto ────────────────────────────────────────────────
 # `git archive HEAD`, nunca cópia do disco: untracked e ignored NUNCA viajam,
@@ -76,7 +108,7 @@ if [ -n "$(ls -A "${DEST}" 2>/dev/null | grep -v '^\.git$' || true)" ]; then
     echo "ERRO: falha ao limpar a superfície anterior de ${DEST}" >&2; exit 3; }
   echo "  (0) superfície anterior removida — a materialização é AUTORITATIVA (o que saiu do manifesto sai da porta)"
 fi
-git -C "${REPO_ROOT}" archive --format=tar HEAD -- "${SPEC[@]}" | tar -x -C "${DEST}" || {
+git -C "${REPO_ROOT}" archive --format=tar "${SRC_REF}" -- "${SPEC[@]}" | tar -x -C "${DEST}" || {
   echo "ERRO: falha ao extrair o bundle" >&2; exit 3; }
 _n="$(find "${DEST}" -type f -not -path '*/.git/*' | wc -l)"
 [ "${_n}" -gt 0 ] || { echo "ERRO: bundle extraído com ZERO arquivos" >&2; exit 3; }
@@ -129,7 +161,7 @@ echo "  (4) varredura independente: nenhum ponteiro a documento privado nomeado"
 # escrever: por isso o `emit-licenses.sh` entrega `LICENSE-ONION` lá. Na PORTA, o repositório É o
 # Onion; um `LICENSE-ONION` ali seria a evasiva, não a proteção.
 _slug="$(basename "${DEST}")"
-_pin_ph="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD)"
+_pin_ph="$(git -C "${REPO_ROOT}" rev-parse --short=12 "${SRC_REF}")"
 cp "${REPO_ROOT}/LICENSE" "${DEST}/LICENSE" 2>/dev/null || echo "  (5) AVISO: LICENSE do core não encontrada" >&2
 cp "${REPO_ROOT}/LICENSE-DOCS" "${DEST}/LICENSE-DOCS" 2>/dev/null || true
 cat > "${DEST}/README.md" <<README
@@ -262,7 +294,7 @@ _regen regen-ssot-projections.sh || true
 # As catracas do core foram esvaziadas no passo (2); aqui elas renascem do corpus DA PORTA.
 _regen regen-baselines.sh 'tail -2' || true
 
-_pin="$(git -C "${REPO_ROOT}" rev-parse --short=12 HEAD)"
+_pin="$(git -C "${REPO_ROOT}" rev-parse --short=12 "${SRC_REF}")"
 cat <<FIM
 
 ✅ Porta materializada em ${DEST} (papel '${ROLE}', pin ${_pin})
