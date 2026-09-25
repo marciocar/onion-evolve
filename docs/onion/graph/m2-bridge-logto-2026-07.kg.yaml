@@ -267,10 +267,10 @@ nodes:
     plane: DEV
     impact: 4
     confidence: 0.8
-    status: open
-    verified_at: 2026-08-30
-    verified_against: "censo lote 1: worker CONFIRMED e juiz opus/high APROVOU a medicao (run wf_113a587e-715)"
-    label: "FIX D+A fecho — elevar Logto+Postgres ao MESMO patamar, agora em 3 CAMADAS (a v2 tinha 2 e a de baixo era decorativa): (1) /etc/systemd/system/onion.slice EXPLÍCITO com MemoryMin=512M/MemoryLow=768M — o slice PAI, sem o qual a camada 2 é decorativa (teto de ancestral); (2) /etc/systemd/system/onion-auth.slice com os mesmos floors; (3) compose: mem_reservation (memory.low) + oom_score_adj -500 (este funciona, medido) + cgroup_parent: onion-auth.slice. VERIFICAÇÃO no path REAL: systemctl show -p Slice, cat /sys/fs/cgroup/onion.slice/onion-auth.slice/memory.min, systemd-cgls e check_floor() percorrendo a cadeia. Se os containers não entrarem no slice, fica só o oom_score_adj e o gap é DECLARADO E ABERTO"
+    status: done
+    verified_at: '2026-09-25'
+    verified_against: "SELADO PELO MAESTRO em 2026-09-25, por escolha explicita num formulario de decisao que apresentou as opcoes NOMEADAS e a recomendacao de cada uma; o texto da escolha esta no `label` deste no. A verificacao aqui e o ATO DE DECIDIR, nao uma medicao contra o vivo: decisao nao se mede, se toma — e o que se registra e QUEM decidiu, QUANDO, e com quais opcoes na mesa. ══ REGISTRO ANTERIOR, preservado: censo lote 1: worker CONFIRMED e juiz opus/high APROVOU a medicao (run wf_113a587e-715)"
+    label: "FIX D+A fecho — elevar Logto+Postgres ao MESMO patamar, agora em 3 CAMADAS (a v2 tinha 2 e a de baixo era decorativa): (1) /etc/systemd/system/onion.slice EXPLÍCITO com MemoryMin=512M/MemoryLow=768M — o slice PAI, sem o qual a camada 2 é decorativa (teto de ancestral); (2) /etc/systemd/system/onion-auth.slice com os mesmos floors; (3) compose: mem_reservation (memory.low) + oom_score_adj -500 (este funciona, medido) + cgroup_parent: onion-auth.slice. VERIFICAÇÃO no path REAL: systemctl show -p Slice, cat /sys/fs/cgroup/onion.slice/onion-auth.slice/memory.min, systemd-cgls e check_floor() percorrendo a cadeia. Se os containers não entrarem no slice, fica só o oom_score_adj e o gap é DECLARADO E ABERTO ══ SELADO pelo maestro 2026-09-25 — EXECUTAR o FIX D+A em 3 camadas, e por ÚLTIMO da leva. A ordem não é detalhe: isto toca a VPS viva, e a verificação tem de percorrer a cadeia REAL de cgroup (systemctl show -p Slice, cat /sys/fs/cgroup/onion.slice/onion-auth.slice/memory.min, systemd-cgls, check_floor() subindo a cadeia) — declarar aplicado sem percorrer é o mesmo declarado≠verificado que a v2 cometeu ao ter uma camada de baixo DECORATIVA por falta do slice pai. Se os containers não entrarem no slice, o que fica é só o oom_score_adj, e isso tem de ser DITO, não silenciado."
 
   - id: Q_docker_cgroup_driver
     node_type: question

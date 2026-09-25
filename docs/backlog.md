@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**223 itens abertos** em 48 grafo(s) com aberto (de 70 no escopo) · 49 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**215 itens abertos** em 48 grafo(s) com aberto (de 70 no escopo) · 49 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -26,12 +26,11 @@
 | 5.6 | `C_OPCAO_C_NADA_AGORA_SDAAL` | plugin-mcp-posture-2026-09 | OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem |
 | 1.8 | `C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA` | plugin-mcp-posture-2026-09 | OPCAO (d) — NAO CONSIDERADA NA DECISAO, CORTADA POR ORCAMENTO NESTA RODADA: skill-bundle — skills locais via git-subdir (stric |
 
-## kg-multi-graph-view-2026-09 — 10 item(ns)
+## kg-multi-graph-view-2026-09 — 9 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 84.0 | `Q_KG_MULTI_GRAPH_VIEW_0904` | kg-multi-graph-view-2026-09 | Qual e o mecanismo certo para "N grafos .kg.yaml PEER, 1 visao" no Knowledge Graph SDAAL do Onion, quando um adotante tem 4 vertic |
-| 52.5 | `D_KG_MULTI_GRAPH_VIEW_0904` | kg-multi-graph-view-2026-09 | DECISAO ABERTA (o maestro sela): qual o mecanismo para "N grafos peer, 1 visao" no KG SDAAL do Onion? OPCOES — O1 kg-radar.sh ga |
 | 15.0 | `C_OPCAO_O5_PONTEIRO_XREF_COM_RESOLVER` | kg-multi-graph-view-2026-09 | OPCAO O5: referencia cross-arquivo como PONTEIRO tipado (proxy-node / campo `xref:` no padrao do `trace:`) + resolver-irmao HARD q |
 | 12.0 | `C_OPCAO_O2_CONSUMIDOR_IRMAO_LACO` | kg-multi-graph-view-2026-09 | OPCAO O2: o radar permanece de ARQUIVO UNICO e awk-puro; a agregacao vive num CONSUMIDOR-IRMAO que faz o laco por grafo — padrao |
 | 9.6 | `C_OPCAO_O7_BACKLOG_PARAMETRIZA_RAIZ` | kg-multi-graph-view-2026-09 | OPCAO O7: kg-backlog-project.sh parametriza a RAIZ canonica (hoje `docs/onion/graph` hardcoded em l.55/l.89/l.155/l.160) alem do m |
@@ -41,29 +40,11 @@
 | 1.8 | `C_OPCAO_O8_CONSOLE_MULTI_GRAFO` | kg-multi-graph-view-2026-09 | OPCAO O8: kg-console.sh/kg-view.sh aceitam N arquivos e renderizam painel comparativo multi-grafo. Confianca 0.2: o Elenxo REPROVA |
 | 1.4 | `C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS` | kg-multi-graph-view-2026-09 | OPCAO O6: grafo de nivel 0 que IMPORTA nos de outros arquivos (owl:imports), formando um grafo composto. Confianca 0.15 (a mais ba |
 
-## m3-federation-admin-2026-07 — 12 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 68.0 | `D_spec_now_build_gated` | m3-federation-admin-2026-07 | SPEC-agora / BUILD-gated — especificar o command-side (mutação de members.yaml) + modelo de auth (Logto Organizations) SEM con |
-| 15.6 | `C_auth_logto_sdaal` | m3-federation-admin-2026-07 | AUTH = fronteira gated (o BUILD não se pré-cozinha, gated-work-derives-fresh). Comprometido: só a fronteira §4.3 + a invariân |
-| 11.2 | `C_op_update` | m3-federation-admin-2026-07 | OP-3 ATUALIZAR (pin/trust/specializations/personality_summary): escrever onion_version novo (pós pin-integrity-check) e editar a  |
-| 8.4 | `C_op_promote` | m3-federation-admin-2026-07 | OP-2 PROMOVER (role: standalone→hub / consumer→T2): atualizar o campo role: no members.yaml do core. Hoje --promote-hub só re |
-| 7.0 | `Q_gatilho` | m3-federation-admin-2026-07 | GATILHO objetivo do build: o 1º membro role:consumer (T2) REAL em members.yaml (introduz hub-owner que precisa de visão/ação e |
-| 5.8 | `C_op_revoke` | m3-federation-admin-2026-07 | OP-4 REVOGAR/DESATIVAR (status: retired / remover linhagem obsoleta): nenhum script/comando existe; o padrão observado é anotar  |
-| 5.4 | `C_p3_agg_view` | m3-federation-admin-2026-07 | REQ P3 (SHOULD condicional): visão agregada de adoção/consistência entre N repos/times DA MESMA empresa (multi-tenant no senti |
-| 5.4 | `C_p4_gate_visibility` | m3-federation-admin-2026-07 | REQ P4 (SHOULD): relatório/export do histórico de decisões (decisions.md-like) por projeto/tenant — P4 valoriza 'evidência e |
-| 5.2 | `C_p3_self_service` | m3-federation-admin-2026-07 | REQ P3 (SHOULD condicional): self-service de onboarding multi-squad (mata a dor 'cada dev usa IA de um jeito; nenhuma trilha'). O  |
-| 5.2 | `C_p4_audit_trail` | m3-federation-admin-2026-07 | REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivad |
-| 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
-| 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
-
-## ocr-local-sei-2026-09 — 11 item(ns)
+## ocr-local-sei-2026-09 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 54.0 | `Q_OCR_LOCAL_SEI_0908` | ocr-local-sei-2026-09 | Qual motor de OCR LOCAL escolher para ler PDF-imagem de documento administrativo brasileiro do SEI (fonte serifada, tabelas, carim |
-| 45.0 | `D_OCR_LOCAL_SEI_0908` | ocr-local-sei-2026-09 | DECISAO ABERTA (o maestro sela): qual motor de OCR local adotar para as 26 paginas do SEI sob NDA, sendo 3 vinculantes? Opcoes nom |
 | 14.0 | `C_OPCAO_PROCEDIMENTO_CONSENSO_DOIS_MOTORES` | ocr-local-sei-2026-09 | OPCAO (9) — O PROCEDIMENTO, que o Elenxo recomenda decidir ANTES do motor: consenso entre 2 motores ARQUITETURALMENTE INDEPENDEN |
 | 9.0 | `C_OPCAO_BASELINE_SEM_OCR_PDFTOTEXT` | ocr-local-sei-2026-09 | OPCAO (8) — O PASSO 0, e a de maior confianca do grafo (0.9): antes de instalar QUALQUER motor, rodar `pdftotext -layout` e `pdf |
 | 6.0 | `C_OPCAO_TESSERACT5_TESSDATA_BEST` | ocr-local-sei-2026-09 | OPCAO (1): Tesseract 5 instalado por apt com por.traineddata do tessdata_best — saida TSV com confidence e bounding box POR PALA |
@@ -74,12 +55,11 @@
 | 2.4 | `C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA` | ocr-local-sei-2026-09 | OPCAO (4): Surya (datalab-to) — NAO RECOMENDAVEL A PARTIR DESTE DOSSIE, e a razao nao e desempenho: e que o corpo de evidencia s |
 | 1.2 | `C_OPCAO_MINERU_OLMOCR` | ocr-local-sei-2026-09 | OPCAO (6): MinerU 2.5 / olmOCR. Praticamente NAO PESQUISADOS nesta rodada — aparecem so como termo de comparacao dentro de claim |
 
-## zoho-glpi-adapters-2026-09 — 9 item(ns)
+## zoho-glpi-adapters-2026-09 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 48.0 | `Q_ZOHO_GLPI_ADAPTERS_0923` | zoho-glpi-adapters-2026-09 | Como integrar Zoho Projects (como task manager) e GLPI (como FONTE DE ATIVIDADE para apuracao/relatorios/apresentacoes) ao Onion v |
-| 35.0 | `D_ZOHO_GLPI_ADAPTERS_0923` | zoho-glpi-adapters-2026-09 | DECISAO ABERTA (o maestro sela — nenhuma sessao sela por ele). Duas perguntas acopladas: DESENHO (onde o GLPI entra) e ORDEM DE  |
 | 21.0 | `C_OPCAO_A_ACTIVITY_SOURCE_IRMA_READONLY` | zoho-glpi-adapters-2026-09 | OPCAO A — GLPI FORA do task-manager: nasce familia SDAAL irma read-only `.claude/utils/activity-source/` com 4-6 metodos proprio |
 | 9.6 | `C_OPCAO_D3_PILOTO_ONLINE_DATADO` | zoho-glpi-adapters-2026-09 | OPCAO D3 — online como PILOTO de leitura com corte datado e gatilho nomeado, condicionado a sonda de cobertura de dados passar.  |
 | 9.0 | `C_SONDA_ANTES_DE_QUALQUER_ADAPTER` | zoho-glpi-adapters-2026-09 | CLAIM DE METODO — NENHUM adapter (nem activity-source, nem Zoho) se escreve antes de uma sonda de 3 medidas na instancia REAL, p |
@@ -88,47 +68,17 @@
 | 4.8 | `C_OPCAO_D2_VPS_PRIMEIRO` | zoho-glpi-adapters-2026-09 | OPCAO D2 — self-hosted na VPS PRIMEIRO (Docker, prefixo onion-vps- conforme a convencao da casa), online nunca ou so como espelh |
 | 0.6 | `C_OPCAO_B_GLPI_DENTRO_TASK_MANAGER` | zoho-glpi-adapters-2026-09 | OPCAO B — GLPI DENTRO do task-manager, com ~10 metodos stub (createTask/deleteTask/createSubtask/updateStatus/...): e a classe d |
 
-## plugins-en-compliance-2026-09 — 24 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 47.5 | `D_PR10_LEGAL_E_SUPORTE` | plugins-en-compliance-2026-09 | PR 10 — os requisitos 3.A, 3.B, 3.C e 3.F. SSOT em .claude/utils/marketplace/legal/ (PRIVACY, SUPPORT, SECURITY, CODE_OF_CONDUCT |
-| 19.0 | `D_PR02_VERDADE_NO_ARTEFATO_PUBLICO` | plugins-en-compliance-2026-09 | PR 2 — parar de mentir no artefato publico. TRES correcoes: (a) plugin-readme.sh:92 e marketplace-readme.sh:57 passam a descreve |
-| 13.5 | `D_PR04_EMENDA_L0` | plugins-en-compliance-2026-09 | PR 4 — a CONSTRAIN 1: emendar a L0 ANTES de qualquer linha de gerador. Quadro §1 (:41-42) passa a tratar description:/argument- |
-| 13.5 | `D_PR06_FLIP_PARA_EN` | plugins-en-compliance-2026-09 | PR 6 — o flip da superficie. surface_lang: en; en.json completo; as 5 PLUGIN_DESC dos manifestos em EN; materialize-marketplace- |
-| 10.8 | `D_PR05_ASSENTO_DE_IDIOMA` | plugins-en-compliance-2026-09 | PR 5 — o assento unico, com saida BYTE-IDENTICA. Cria lang.conf (versionado), lang.local.conf (never-clobber do adotante; sobrev |
-| 10.8 | `D_PR07_REGRA_FRONTMATTER_EN` | plugins-en-compliance-2026-09 | PR 7 — a catraca ANTES da migracao. REGRA nova + plugin-language-check.sh + lib/lang-classify.py (promove o classify() de resear |
-| 10.8 | `D_PR09_DESCRICOES_DESCRITIVAS` | plugins-en-compliance-2026-09 | PR 9 — parar de dizer ao Claude COMO SE COMPORTAR. O criterio literal de rejeicao e 'Describe what the tool does. Do not tell Cl |
-| 10.2 | `D_FASE_A_SKILLS_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE A — as 8 skills de onion.manifest.sh:54-63 em EN, frontmatter E corpo. Primeira por ser o menor conjunto com a MAIOR |
-| 10.2 | `D_FASE_C_ONION_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE C — o resto do plugin onion (24 artefatos), incluindo /onion:onion e /onion:kg. Aqui o dogfood importa mais: sao os  |
-| 9.0 | `D_PR08_FRONTEIRA_DO_BUNDLE` | plugins-en-compliance-2026-09 | PR 8 — fechar a superficie da secao 2 (anti-injecao). TIRAR do bundle: co-evolve e co-relay (relacao core<->adotante, nao capaci |
-| 9.0 | `D_PR11_EXEMPLOS_EXECUTAVEIS` | plugins-en-compliance-2026-09 | PR 11 — o requisito 3.E, em duas camadas com UMA fonte. Array EXAMPLES=() em cada manifesto, formato slug·prompt do usuario·su |
-| 8.1 | `D_PR12_DOC_E_HIGIENE` | plugins-en-compliance-2026-09 | PR 12 — 3.C e higiene competitiva. Secoes GERADAS no README: ## Como funciona (o que carrega sempre versus sob invocacao, com o  |
-| 7.7 | `D_FASE_B_DESIGN_COMPLIANCE_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE B — onion-design e onion-compliance em EN (13 artefatos). Menor superficie e sem skill, entao e a fase que valida o  |
-| 7.7 | `D_FASE_D_ENGINEERING_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE D — onion-engineering (41 artefatos) em EN. Massa media. Mesmo protocolo; baseline encolhe. |
-| 7.7 | `D_FASE_E_PRODUCT_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE E — onion-product (49 artefatos) em EN. Maior massa do bundle. Mesmo protocolo; baseline encolhe. |
-| 7.2 | `D_PR03_GATE_VALIDATE_NA_CASA` | plugins-en-compliance-2026-09 | PR 3 — o gate da Anthropic vira gate da casa. Helper .claude/validation/plugin-cli-validate.sh no contrato TSV de plugin-bare-pa |
-| 5.7 | `Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO` | plugins-en-compliance-2026-09 | O caminho verificado de merge tem a falha INVERSA da que ele cura: da FALSO NEGATIVO. Ele existe para nunca declarar sucesso falso |
-| 5.7 | `Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO` | plugins-en-compliance-2026-09 | A casa para onde o desacoplamento manda o publico nao tem porta nem balcao. `homepage` passa a apontar para onionevolve.com, mas / |
-| 5.4 | `Q_SEMVER_DA_L0` | plugins-en-compliance-2026-09 | DECISAO DO @metaspec-gate-keeper — 2.0.0 ou 1.1.0. Revogar uma linha da qual 176 artefatos dependem tem cara de major; se o gate |
-| 5.4 | `Q_SUBMISSAO_AO_PORTAL` | plugins-en-compliance-2026-09 | ATO DO MAESTRO — apertar o botao. O submissivel e o marketplace COMUNITARIO; o oficial e curadoria discricionaria da Anthropic e |
-| 5.1 | `D_FASE_F_META_FABRICA_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE F — os 38 artefatos NAO embarcados (meta-fabrica). Por que existem nesta onda: deixar 38 description: em pt-BR na me |
-| 5.1 | `Q_TREE_SHA_ENDERECA_ENTRADA_NAO_SAIDA` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — `tree_sha` deve endereccar a SAIDA (o conteudo do plugin montado, excluindo o proprio provenance.json) em v |
-| 3.6 | `Q_CATEGORY_DO_COMPLIANCE` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — em que categoria oficial entra o onion-compliance. Nenhuma categoria do vocabulario diz compliance ou gover |
-| 3.6 | `Q_TETO_DE_CONTEXTO` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — qual teto de contexto a catraca cobra. A UI mostra Context cost ANTES do install e agrupa plugins nao usado |
-
 ## plugin-directory-landscape-2026-09 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 43.2 | `Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09` | plugin-directory-landscape-2026-09 | Quais plugins e marketplaces de Claude Code se destacam em 2026-09 e que padroes de desenvolvimento seguem (granularidade 1-grande |
 
-## poda-instruction-bloat-2026-09 — 6 item(ns)
+## poda-instruction-bloat-2026-09 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 41.6 | `Q_PODA_INSTRUCTION_BLOAT_CORE` | poda-instruction-bloat-2026-09 | O que podar do CLAUDE.md (246 linhas / 17.041 bytes) e das skills do core do Onion para curar o agent instruction bloat (Thoughtwo |
-| 31.5 | `D_PODA_INSTRUCTION_BLOAT_CLAUDE_MD_E_SKILLS` | poda-instruction-bloat-2026-09 | DECISAO ABERTA (o maestro sela): o que podar do CLAUDE.md e das skills do core, entre (A) mover doutrina para skills/rules por pat |
 | 21.0 | `C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED` | poda-instruction-bloat-2026-09 | OPCAO C — medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento. A favor: e a unica op |
 | 12.0 | `C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH` | poda-instruction-bloat-2026-09 | OPCAO A — mover doutrina para skills/rules por path e deixar o CLAUDE.md so com identidade + roteamento. A favor: e a cura que o |
 | 2.8 | `C_OPCAO_D_NAO_PODAR` | poda-instruction-bloat-2026-09 | OPCAO D — nao podar. A favor, e mais forte do que a rodada admitiu: 17.041 bytes sao ~0,5% da janela de 1M, o custo de janela e  |
@@ -139,17 +89,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 36.0 | `Q_E3_DELTA_2_1_260` | radar-E3-2026-09-04 | O que mudou no Claude Code entre 2.1.259 e 2.1.260 que altera a ADEQUACAO da estrategia do Onion (escada de modelos, hooks/guardas |
-
-## d5-pricing-2026-07 — 6 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 35.8 | `D_D5` | d5-pricing-2026-07 | D5 — preço por camada (escada treino→certificação→compliance-pack→SOTA). Blend A+B: degraus 1-2 vendíveis-já (compar |
-| 19.2 | `C_compliance_pack` | d5-pricing-2026-07 | DEGRAU 3 Compliance-pack (cunha P4): faixa $15k-40k/ano CITÁVEL não-fechado. Terço inferior do mercado compliance-automation (a |
-| 10.8 | `C_sota_subscription` | d5-pricing-2026-07 | DEGRAU 4 Assinatura SOTA: $150-400/mês indiv. · $250-600 base + $60-120/seat empresa. Acima das ferramentas de codificação gen |
-| 7.5 | `Q_d2_l1l6_activation` | d5-pricing-2026-07 | GATE D2: a assinatura SOTA vende o mecanismo L1-L6 (classificação-por-inferência + gate-por-propósito + ε-ledger) que segue G |
-| 6.6 | `Q_p4_interviews` | d5-pricing-2026-07 | Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entre |
-| 4.9 | `Q_train_cert_chaining` | d5-pricing-2026-07 | Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento  |
 
 ## plugin-language-policy-2026-09 — 5 item(ns)
 
@@ -234,19 +173,6 @@
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
 
-## m2-bridge-logto-2026-07 — 8 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 22.4 | `D_logto_same_protection_tier` | m2-bridge-logto-2026-07 | FIX D+A fecho — elevar Logto+Postgres ao MESMO patamar, agora em 3 CAMADAS (a v2 tinha 2 e a de baixo era decorativa): (1) /etc/ |
-| 18.0 | `D_middleware_order_first` | m2-bridge-logto-2026-07 | FIX C fecho — EXIGÊNCIA no P5: app.use('*', requireIdentity) é o PRIMEIRO handler registrado, antes de TODA rota, de TODO app. |
-| 14.2 | `Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA` | m2-bridge-logto-2026-07 | PRE-EXISTENTE, mas o P11 ELEVOU O RAIO — e essa mudanca de risco precisa morar aqui: antes, numa queda do Logto, o caminho legad |
-| 10.8 | `C_docker_floor_gap` | m2-bridge-logto-2026-07 | GAP (impacto ELEVADO na v2+, porque o Logto virou caminho crítico): Logto+Postgres (docker) só têm teto duro. MEDIDO no cgroup: |
-| 10.2 | `D_logto_not_ssot` | m2-bridge-logto-2026-07 | INVARIANTE herdada do M3: Logto = emissor/validador de identidade (commodity-BUY), NUNCA SSOT de autorização fina. A autorizaç |
-| 6.0 | `Q_route_inventory` | m2-bridge-logto-2026-07 | VPS-DECLARADO: o inventário EXATO das rotas do app Hono só existe no host. A tabela do §3.4 é CONTRATO, não fato. P0.2 enumer |
-| 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2 — PROVA NOVA no P0.6: a semântica de cgroup_parent DEPENDE do cgroup driver do docker. MEDIDO hoje: driver = systemd (h |
-| 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
-
 ## guardas-revisao-2026-08 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -270,6 +196,16 @@
 | 4.0 | `Q_EXP_LEITURA_KG_1M` | fable-5-1-superacao-2026-09 | EXPERIMENTO (pre-condicao: definir a metrica, que hoje NAO existe): numa sessao 5.1, contar quantas decisoes da sessao citam no do |
 | 3.3 | `Q_EXP_ELENXO_3_VS_6_LENTES` | fable-5-1-superacao-2026-09 | EXPERIMENTO: refutador Elenxo opus/high → fable permite 3 lentes independentes em vez de 4-6 sem perder cobertura adversarial? M |
 
+## d5-pricing-2026-07 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.2 | `C_compliance_pack` | d5-pricing-2026-07 | DEGRAU 3 Compliance-pack (cunha P4): faixa $15k-40k/ano CITÁVEL não-fechado. Terço inferior do mercado compliance-automation (a |
+| 10.8 | `C_sota_subscription` | d5-pricing-2026-07 | DEGRAU 4 Assinatura SOTA: $150-400/mês indiv. · $250-600 base + $60-120/seat empresa. Acima das ferramentas de codificação gen |
+| 7.5 | `Q_d2_l1l6_activation` | d5-pricing-2026-07 | GATE D2: a assinatura SOTA vende o mecanismo L1-L6 (classificação-por-inferência + gate-por-propósito + ε-ledger) que segue G |
+| 6.6 | `Q_p4_interviews` | d5-pricing-2026-07 | Zero comprador P4 (regulado) entrevistado — o compliance-pack $15-40k é willingness-to-pay não-validado. D6 registra 1-2 entre |
+| 4.9 | `Q_train_cert_chaining` | d5-pricing-2026-07 | Encadeamento treino→certificação a validar: a cert pressupõe treino prévio (D4 sequencial) ou é standalone? + espaçamento  |
+
 ## websearch-cap-2026-09 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -284,6 +220,62 @@
 | 8.1 | `A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO` | passada-adversarial-2026-09 | ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles te |
 | 7.2 | `A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO` | distribuicao-metodo-vivo-2026-09 | O QUE FALTA PARA O MAESTRO SELAR, e e uma so peca. Os tercos [A][B][C] estao executados e medidos; a limpeza narrativa foi ate ond |
 | 4.2 | `A_MARCA_LER_ESPECIFICACAO_DO_933007990` | distribuicao-metodo-vivo-2026-09 | ABERTO, barato e refina a decisao: ler a ESPECIFICACAO do processo 933007990 no pePI (Marcas -> pesquisa por numero). A classe 42  |
+
+## plugins-en-compliance-2026-09 — 23 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.0 | `D_PR02_VERDADE_NO_ARTEFATO_PUBLICO` | plugins-en-compliance-2026-09 | PR 2 — parar de mentir no artefato publico. TRES correcoes: (a) plugin-readme.sh:92 e marketplace-readme.sh:57 passam a descreve |
+| 13.5 | `D_PR04_EMENDA_L0` | plugins-en-compliance-2026-09 | PR 4 — a CONSTRAIN 1: emendar a L0 ANTES de qualquer linha de gerador. Quadro §1 (:41-42) passa a tratar description:/argument- |
+| 13.5 | `D_PR06_FLIP_PARA_EN` | plugins-en-compliance-2026-09 | PR 6 — o flip da superficie. surface_lang: en; en.json completo; as 5 PLUGIN_DESC dos manifestos em EN; materialize-marketplace- |
+| 10.8 | `D_PR05_ASSENTO_DE_IDIOMA` | plugins-en-compliance-2026-09 | PR 5 — o assento unico, com saida BYTE-IDENTICA. Cria lang.conf (versionado), lang.local.conf (never-clobber do adotante; sobrev |
+| 10.8 | `D_PR07_REGRA_FRONTMATTER_EN` | plugins-en-compliance-2026-09 | PR 7 — a catraca ANTES da migracao. REGRA nova + plugin-language-check.sh + lib/lang-classify.py (promove o classify() de resear |
+| 10.8 | `D_PR09_DESCRICOES_DESCRITIVAS` | plugins-en-compliance-2026-09 | PR 9 — parar de dizer ao Claude COMO SE COMPORTAR. O criterio literal de rejeicao e 'Describe what the tool does. Do not tell Cl |
+| 10.2 | `D_FASE_A_SKILLS_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE A — as 8 skills de onion.manifest.sh:54-63 em EN, frontmatter E corpo. Primeira por ser o menor conjunto com a MAIOR |
+| 10.2 | `D_FASE_C_ONION_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE C — o resto do plugin onion (24 artefatos), incluindo /onion:onion e /onion:kg. Aqui o dogfood importa mais: sao os  |
+| 9.0 | `D_PR08_FRONTEIRA_DO_BUNDLE` | plugins-en-compliance-2026-09 | PR 8 — fechar a superficie da secao 2 (anti-injecao). TIRAR do bundle: co-evolve e co-relay (relacao core<->adotante, nao capaci |
+| 9.0 | `D_PR11_EXEMPLOS_EXECUTAVEIS` | plugins-en-compliance-2026-09 | PR 11 — o requisito 3.E, em duas camadas com UMA fonte. Array EXAMPLES=() em cada manifesto, formato slug·prompt do usuario·su |
+| 8.1 | `D_PR12_DOC_E_HIGIENE` | plugins-en-compliance-2026-09 | PR 12 — 3.C e higiene competitiva. Secoes GERADAS no README: ## Como funciona (o que carrega sempre versus sob invocacao, com o  |
+| 7.7 | `D_FASE_B_DESIGN_COMPLIANCE_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE B — onion-design e onion-compliance em EN (13 artefatos). Menor superficie e sem skill, entao e a fase que valida o  |
+| 7.7 | `D_FASE_D_ENGINEERING_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE D — onion-engineering (41 artefatos) em EN. Massa media. Mesmo protocolo; baseline encolhe. |
+| 7.7 | `D_FASE_E_PRODUCT_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE E — onion-product (49 artefatos) em EN. Maior massa do bundle. Mesmo protocolo; baseline encolhe. |
+| 7.2 | `D_PR03_GATE_VALIDATE_NA_CASA` | plugins-en-compliance-2026-09 | PR 3 — o gate da Anthropic vira gate da casa. Helper .claude/validation/plugin-cli-validate.sh no contrato TSV de plugin-bare-pa |
+| 5.7 | `Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO` | plugins-en-compliance-2026-09 | O caminho verificado de merge tem a falha INVERSA da que ele cura: da FALSO NEGATIVO. Ele existe para nunca declarar sucesso falso |
+| 5.7 | `Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO` | plugins-en-compliance-2026-09 | A casa para onde o desacoplamento manda o publico nao tem porta nem balcao. `homepage` passa a apontar para onionevolve.com, mas / |
+| 5.4 | `Q_SEMVER_DA_L0` | plugins-en-compliance-2026-09 | DECISAO DO @metaspec-gate-keeper — 2.0.0 ou 1.1.0. Revogar uma linha da qual 176 artefatos dependem tem cara de major; se o gate |
+| 5.4 | `Q_SUBMISSAO_AO_PORTAL` | plugins-en-compliance-2026-09 | ATO DO MAESTRO — apertar o botao. O submissivel e o marketplace COMUNITARIO; o oficial e curadoria discricionaria da Anthropic e |
+| 5.1 | `D_FASE_F_META_FABRICA_EN` | plugins-en-compliance-2026-09 | ONDA 4 FASE F — os 38 artefatos NAO embarcados (meta-fabrica). Por que existem nesta onda: deixar 38 description: em pt-BR na me |
+| 5.1 | `Q_TREE_SHA_ENDERECA_ENTRADA_NAO_SAIDA` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — `tree_sha` deve endereccar a SAIDA (o conteudo do plugin montado, excluindo o proprio provenance.json) em v |
+| 3.6 | `Q_CATEGORY_DO_COMPLIANCE` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — em que categoria oficial entra o onion-compliance. Nenhuma categoria do vocabulario diz compliance ou gover |
+| 3.6 | `Q_TETO_DE_CONTEXTO` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — qual teto de contexto a catraca cobra. A UI mostra Context cost ANTES do install e agrupa plugins nao usado |
+
+## m2-bridge-logto-2026-07 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 18.0 | `D_middleware_order_first` | m2-bridge-logto-2026-07 | FIX C fecho — EXIGÊNCIA no P5: app.use('*', requireIdentity) é o PRIMEIRO handler registrado, antes de TODA rota, de TODO app. |
+| 14.2 | `Q_JWKS_REFETCH_STORM_SEM_PISO_NA_FALHA` | m2-bridge-logto-2026-07 | PRE-EXISTENTE, mas o P11 ELEVOU O RAIO — e essa mudanca de risco precisa morar aqui: antes, numa queda do Logto, o caminho legad |
+| 10.8 | `C_docker_floor_gap` | m2-bridge-logto-2026-07 | GAP (impacto ELEVADO na v2+, porque o Logto virou caminho crítico): Logto+Postgres (docker) só têm teto duro. MEDIDO no cgroup: |
+| 10.2 | `D_logto_not_ssot` | m2-bridge-logto-2026-07 | INVARIANTE herdada do M3: Logto = emissor/validador de identidade (commodity-BUY), NUNCA SSOT de autorização fina. A autorizaç |
+| 6.0 | `Q_route_inventory` | m2-bridge-logto-2026-07 | VPS-DECLARADO: o inventário EXATO das rotas do app Hono só existe no host. A tabela do §3.4 é CONTRATO, não fato. P0.2 enumer |
+| 5.1 | `Q_docker_cgroup_driver` | m2-bridge-logto-2026-07 | FIX L2 — PROVA NOVA no P0.6: a semântica de cgroup_parent DEPENDE do cgroup driver do docker. MEDIDO hoje: driver = systemd (h |
+| 4.8 | `Q_signup_close_not_via_api` | m2-bridge-logto-2026-07 | DIVIDA NOMEADA: o fechamento do registro do tenant `admin` (sign_up identifiers -> []) foi feito por SQL direto, nao pela API nem  |
+
+## m3-federation-admin-2026-07 — 11 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 15.6 | `C_auth_logto_sdaal` | m3-federation-admin-2026-07 | AUTH = fronteira gated (o BUILD não se pré-cozinha, gated-work-derives-fresh). Comprometido: só a fronteira §4.3 + a invariân |
+| 11.2 | `C_op_update` | m3-federation-admin-2026-07 | OP-3 ATUALIZAR (pin/trust/specializations/personality_summary): escrever onion_version novo (pós pin-integrity-check) e editar a  |
+| 8.4 | `C_op_promote` | m3-federation-admin-2026-07 | OP-2 PROMOVER (role: standalone→hub / consumer→T2): atualizar o campo role: no members.yaml do core. Hoje --promote-hub só re |
+| 7.0 | `Q_gatilho` | m3-federation-admin-2026-07 | GATILHO objetivo do build: o 1º membro role:consumer (T2) REAL em members.yaml (introduz hub-owner que precisa de visão/ação e |
+| 5.8 | `C_op_revoke` | m3-federation-admin-2026-07 | OP-4 REVOGAR/DESATIVAR (status: retired / remover linhagem obsoleta): nenhum script/comando existe; o padrão observado é anotar  |
+| 5.4 | `C_p3_agg_view` | m3-federation-admin-2026-07 | REQ P3 (SHOULD condicional): visão agregada de adoção/consistência entre N repos/times DA MESMA empresa (multi-tenant no senti |
+| 5.4 | `C_p4_gate_visibility` | m3-federation-admin-2026-07 | REQ P4 (SHOULD): relatório/export do histórico de decisões (decisions.md-like) por projeto/tenant — P4 valoriza 'evidência e |
+| 5.2 | `C_p3_self_service` | m3-federation-admin-2026-07 | REQ P3 (SHOULD condicional): self-service de onboarding multi-squad (mata a dor 'cada dev usa IA de um jeito; nenhuma trilha'). O  |
+| 5.2 | `C_p4_audit_trail` | m3-federation-admin-2026-07 | REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivad |
+| 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
+| 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
 
 ## identidade-onion-vps-2026-08 — 5 item(ns)
 

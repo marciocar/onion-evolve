@@ -17,10 +17,10 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.8
-    status: open
-    verified_at: 2026-09-02
-    verified_against: 'reconciliacao 2026-09-02 (regra do radar): E_CENSO0901 REFINA (CONSTRAINS) — o MECANISMO de gate mudou (ADR hosted-service-identity 2026-08: >=1 federado no Logto consumindo recurso hospedado), o conteudo segue pendente sob o gate novo; gatilho medido = 0 hoje'
-    label: "SPEC-agora / BUILD-gated — especificar o command-side (mutação de members.yaml) + modelo de auth (Logto Organizations) SEM construir; o build só liga no gatilho objetivo. Read-model já existe e basta ao operador-único de hoje"
+    status: done
+    verified_at: '2026-09-25'
+    verified_against: 'SELADO PELO MAESTRO em 2026-09-25, por escolha explicita num formulario de decisao que apresentou as opcoes NOMEADAS e a recomendacao de cada uma; o texto da escolha esta no `label` deste no. A verificacao aqui e o ATO DE DECIDIR, nao uma medicao contra o vivo: decisao nao se mede, se toma — e o que se registra e QUEM decidiu, QUANDO, e com quais opcoes na mesa. ══ REGISTRO ANTERIOR, preservado: reconciliacao 2026-09-02 (regra do radar): E_CENSO0901 REFINA (CONSTRAINS) — o MECANISMO de gate mudou (ADR hosted-service-identity 2026-08: >=1 federado no Logto consumindo recurso hospedado), o conteudo segue pendente sob o gate novo; gatilho medido = 0 hoje'
+    label: "SPEC-agora / BUILD-gated — especificar o command-side (mutação de members.yaml) + modelo de auth (Logto Organizations) SEM construir; o build só liga no gatilho objetivo. Read-model já existe e basta ao operador-único de hoje ══ SELADO pelo maestro 2026-09-25 — SPEC-agora / BUILD-gated, COMO ESTAVA POSTO. Nada a mudar na proposta: especificar o command-side (mutação de members.yaml) + o modelo de auth (Logto Organizations) SEM construir, e o build liga só no gatilho objetivo já nomeado. A razão do selo, dita para quem reabrir isto: é a forma mais barata de estar CERTO — a spec custa horas e o read-model existente já atende o operador-único de hoje, então construir agora seria pagar por uma capacidade sem consumidor. Era o topo da fila de atenção (68,0), e o que o destravava não era informação nova, era a decisão."
 
   # ---- GATILHO + TENSÕES (question) ----
   - id: Q_gatilho
