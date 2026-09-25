@@ -2,15 +2,15 @@
 title: 'Passada adversarial — o registro da dispensa era um contra-barra'
 date: 2026-09-25
 branch: fix/dispensation-record-was-a-backslash
-reviewed_diff_sha256: c19aff1b94f210ff783c3587fa9c66d5f1318fc46dc2ef6aa66a4c511913f789
+reviewed_diff_sha256: 8083773858ded514629edcd4879b9804f5fb51eed44eabb1f88ca0d8b012de40
 elenxo: sim
-findings_total: 13
-findings_real: 13
+findings_total: 14
+findings_real: 14
 verdict: REPROVADO_E_CURADO
 tokens: 219001
 duration_min: 59
 agents: 1
-nota: 'Refutador opus/high em worktree isolada, mandato REFUTAR, default REPROVADO. Voltou REPROVADO com 13 achados reais e 1 não-medido declarado. Quatro eram medições anteriores a correções que eu já havia feito (verificadas uma a uma antes de descartar, não descartadas por conveniência); nove viraram cura com caso de bancada e mutante. Três derrubaram trabalho meu do mesmo PR, inclusive uma afirmação FALSA que eu havia escrito dentro do código. Depois do parecer, um reforço do maestro rendeu dois furos que nem eu nem o refutador achamos.'
+nota: 'ACRESCENTADO APÓS O PARECER: a cura da porta pública (o 14º achado) NÃO passou pelo refutador — foi achada por mim DIRIGINDO o mecanismo, depois que ele encerrou, e está declarada na seção própria abaixo. O SHA deste resíduo cobre o diff INTEIRO, incluindo-a. Refutador opre_PLACEHOLDER em worktree isolada, mandato REFUTAR, default REPROVADO. Voltou REPROVADO com 13 achados reais e 1 não-medido declarado. Quatro eram medições anteriores a correções que eu já havia feito (verificadas uma a uma antes de descartar, não descartadas por conveniência); nove viraram cura com caso de bancada e mutante. Três derrubaram trabalho meu do mesmo PR, inclusive uma afirmação FALSA que eu havia escrito dentro do código. Depois do parecer, um reforço do maestro rendeu dois furos que nem eu nem o refutador achamos.'
 ---
 
 # Resíduo — `fix/dispensation-record-was-a-backslash`
@@ -101,6 +101,41 @@ E **duas armadilhas minhas na própria cura**, ambas achadas por caso de bancada
 `parent:` ausente → o registro não expressa hierarquia, e o papel é o único sinal. `hub` e `standalone`
 passam (são T1/T3 por definição). **`adopted` sem `parent` é recusado pedindo o campo** — `adopted` é
 exatamente a palavra ambígua, e escolher um lado por conveniência seria decidir o que não se sabe.
+
+## O 14º achado, este meu e fora do parecer: a porta materializava do `HEAD` local
+
+Achado **dirigindo** o mecanismo, não lendo — e depois de o refutador encerrar, então **ele não
+julgou isto**. Rodei `ops/materialize-door.sh` a partir desta branch e ele carimbou a porta com o pin
+`5b3d30d0a9d3`, o topo de um **PR aberto**, com `main` em `06bc547c268c`. `git archive HEAD` +
+`rev-parse HEAD`: rodado do estado **normal** de quem acabou de abrir um PR, montaria a porta
+**pública** com código não mergeado.
+
+O `CLAUDE.md` sempre disse *"projeção gerada de `origin/main`"*. Declarado ≠ implementado, com o raio
+mais caro desta sessão. O dano não ocorreu porque a **outra** fronteira segurou — o push é do maestro,
+o script prepara e para. Fronteira não desculpa guarda faltante.
+
+**Alcance medido antes de afirmar:** os 8 pins históricos da porta estão todos em `main`
+(`git merge-base --is-ancestor`). Latente até hoje, porque dependia de alguém estar numa branch limpa
+— exatamente o tipo de proteção que esta casa não aceita como mecanismo.
+
+Cura: fonte = `origin/<integração>` com fetch, **fail-closed** se a ref não resolver, `--from <ref>`
+para o caso deliberado (e que anuncia que não é a integração). Bancada: o padrão `HEAD` não volta, e
+ref irresolúvel aborta.
+
+## REGRA 87 (PR que EDITA um `.kg.yaml` enxergou os `confirmed` dele)
+
+O lint pediu para eu conferir os três `confirmed` de maior impacto de
+`passada-adversarial-2026-09` antes de escrever nele. Conferidos, e **nenhum contraria** o que este PR
+faz — dois deles o **reforçam**:
+
+- `E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA` — lacuna de cobertura por raiz não varrida. Mesma forma do
+  que achei hoje: a REGRA 90 nasceu cobrindo 2 pares e `co-evolve.md`, o arquivo que originou a
+  regra, ficou fora até eu acrescentá-lo. Reforça.
+- `E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING` — verificador decidindo por string e abortando adoção
+  real. É literalmente o defeito da 1ª versão da REGRA 90 (`grep -qiF "hub"` casando em `GitHub`).
+  Reforça, e sugere que a classe merece uma varredura própria.
+- `E_PERNA_DE_LEITURA_E_CEGA_A_BASH` — sobre o alcance do hook de leitura do KG; **sem relação** com
+  este diff, nem a favor nem contra.
 
 ## Gate
 
