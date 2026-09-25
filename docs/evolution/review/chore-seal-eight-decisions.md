@@ -2,10 +2,10 @@
 title: 'Selagem das oito decisões — sem passada adversarial, e por quê'
 date: 2026-09-25
 branch: chore/seal-eight-decisions
-reviewed_diff_sha256: ecc94057db8a1624755c129e5361e19f10ca7d67f7a54af2b29ea2af35d90c3f
+reviewed_diff_sha256: 02807702cf025015fbd2c67cf6f3f98074fb7fe0df928bda4f7c7472adb3f50a
 elenxo: nao
-findings_total: 3
-findings_real: 3
+findings_total: 4
+findings_real: 4
 verdict: CORRIGIDO
 tokens: 0
 duration_min: 0
@@ -55,6 +55,33 @@ conferido algo no mundo, e fingir o contrário seria carimbo-sem-medição — e
 Uma decisão sela **parcialmente** e isso está dito no nó: **D_D5** sela a ESTRUTURA (quais degraus são
 vendíveis-já) e deixa os NÚMEROS abertos, porque os valores são chamada do maestro e nenhuma sessão os
 preenche por ele.
+
+## O 4º achado: o registro mentia sobre a porta, e nada confere isso
+
+Entrou depois de a porta ser publicada, e é da mesma família do resto: o
+`members.yaml` dizia que `onion-core` estava em `d425501b14bc` enquanto a porta já estava publicada em
+outro commit. Avancei o pin — **e o que interessa não é o número, é o que a medição mostrou sobre a
+rede**: rodei o `pin-integrity-check.sh` esperando que ele fosse o guardião deste campo, e ele devolve
+`pin-untrusted unknown`. Ele **não** confere `onion_version` contra o que a porta de fato publicou.
+
+Logo este número é mantido **à mão**, e número mantido à mão apodrece — foi assim que ele ficou um pin
+atrás. Declarei isso no próprio `members.yaml`, em vez de deixar a próxima sessão supor que havia rede:
+**candidato a mecanismo, não mecanismo**. O gatilho natural é o próprio ciclo da porta, que já roda
+`gh api` para verificar o push; quem verifica o remoto pode carimbar o registro no mesmo movimento.
+
+E fica registrado de graça o que a publicação provou: esta foi a **1ª materialização cuja fonte é
+comprovadamente `origin/main`**, e os 8 pins anteriores foram medidos (`merge-base --is-ancestor`) e
+estão todos em main — o defeito do `HEAD` era latente, não histórico.
+
+## Nota de rebase (2026-09-26)
+
+Esta branch foi **rebaseada** sobre o `main` já com o #875 mergeado, e os dois conflitos foram em
+**projeções GERADAS** (`docs/onion/testing-state.md` e `docs/onion/federation-console.html`). Resolvidos
+do jeito único que não deixa dívida: **regenerando dos produtores**, nunca escolhendo um lado — aceitar
+um lado num arquivo derivado produz um artefato que casa com o git e mente sobre a fonte, que é
+exatamente o modo-de-falha que a REGRA 19 (Plugins de vertical (plugins/*) sincronizados com as fontes)
+pega em outro contexto. Depois do rebase, TODAS as projeções foram regeneradas e o resultado foi
+byte-idêntico — o que confirma que a resolução estava certa e não só plausível.
 
 ## Gate
 
