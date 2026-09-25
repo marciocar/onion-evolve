@@ -390,6 +390,53 @@ jobs:
       # Em vez de apostar em semantica que ninguem confirmou, a escolha vira shell, que eu testo.
       # ⚠️ SEGUE A TENTATIVA QUE REVISOU, nunca a outra: ler a contagem de um run que nao
       # aconteceu e julgar o PR por nada.
+      # ═══ PRESERVAR A EVIDÊNCIA DO RUN — a cura que nasceu de um diagnóstico impossível ═══
+      # POR QUE EXISTE (investigado no PR #873, 2026-09-25, por ordem do maestro):
+      # o revisor falhou UMA vez com `subtype: success` + `is_error: true` — 10 turnos de 60, US$ 0,55,
+      # 51s — e o retry morreu em 1 turno com custo ZERO. A investigação MEDIU os runs vizinhos e
+      # DERRUBOU as duas leituras que eu havia oferecido:
+      #   · NÃO é teto/rate-limit: 22:49 → 27 turnos US$ 1,30 · 23:01 → 9 turnos US$ 0,53 · 00:43 →
+      #     10 turnos US$ 0,55. Custo por turno estável em ~US$ 0,055 nos três; nenhuma assinatura de
+      #     throttling, e um SUCESSO entre duas falhas (teto não desliga e religa).
+      #   · NÃO são dois modos de falha: o run de 22:49 tem `onion-review → success` e só o VEREDITO
+      #     falhou, porque o revisor ACHOU violações — comportamento desenhado. Eu havia lido a
+      #     conclusão do WORKFLOW, que agrega os dois jobs, em vez do job do revisor.
+      # Ou seja: é anomalia ÚNICA e intermitente, não regime novo. E é exatamente por isso que a
+      # evidência tem de sobreviver: a próxima ocorrência pode levar meses, e sem o arquivo ela chega
+      # tão muda quanto esta. A MENSAGEM vive em `claude-execution-output.json`, que era DESCARTADO no
+      # fim do run — o log imprime o sumário do `result` (turnos, custo, flags) e nunca o texto.
+      # Lição literal da bancada desta casa: saída não capturada é flaky para sempre.
+      # `if: always()` porque é justamente quando o revisor FALHA que o arquivo importa; `|| true`
+      # porque perder a evidência não pode derrubar o job que ela existe para explicar.
+      - name: Evidência do run do revisor (é o que torna is_error diagnosticável)
+        if: ${{ always() && env.HAS_ANTHROPIC_KEY == 'true' }}
+        continue-on-error: true
+        run: |
+          set -uo pipefail
+          dest="${RUNNER_TEMP}/review-evidence"; mkdir -p "${dest}"
+          # a action grava em ${RUNNER_TEMP}; o nome é fixo e as duas tentativas o SOBRESCREVEM,
+          # então copiar o que existir já é mais do que se tinha — e o sumário abaixo diz qual é.
+          for f in "${RUNNER_TEMP}"/claude-execution-output*.json; do
+            [ -e "${f}" ] || continue
+            cp "${f}" "${dest}/" || true
+          done
+          n="$(find "${dest}" -type f | grep -c . || true)"
+          if [ "${n}" -eq 0 ]; then
+            echo "⊘ nenhum claude-execution-output.json encontrado em ${RUNNER_TEMP} — a action pode ter mudado o caminho; isto NÃO é 'o revisor foi bem'." | tee -a "${GITHUB_STEP_SUMMARY}"
+          else
+            echo "✓ ${n} arquivo(s) de evidência preservado(s) — baixe o artefato \`review-evidence\` para ler a causa do is_error." | tee -a "${GITHUB_STEP_SUMMARY}"
+          fi
+
+      - name: Sobe a evidência como artefato
+        if: ${{ always() && env.HAS_ANTHROPIC_KEY == 'true' }}
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: review-evidence-${{ github.run_id }}
+          path: ${{ runner.temp }}/review-evidence
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Qual contagem de achados vale (a da tentativa que revisou)
         id: ach
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
