@@ -17462,6 +17462,37 @@ run_door_selftests() {
   local sb2 out rc
   sb2="$(mktemp -d)"
 
+  # ── (0) A FONTE DA PORTA É `origin/<integração>`, NUNCA O `HEAD` LOCAL ──────────────────────
+  # Defeito medido 2026-09-25, com raio PÚBLICO: `materialize-door.sh` usava `git archive HEAD` e
+  # `rev-parse HEAD`. Rodado de uma branch de trabalho — o estado NORMAL de quem acabou de abrir um
+  # PR — montava a porta com conteúdo NÃO MERGEADO e carimbava o pin com o SHA da branch. Observado
+  # ao vivo: pin do topo de um PR aberto, com `main` dois commits atrás. A doutrina do CLAUDE.md
+  # sempre disse "projeção gerada de origin/main": declarado ≠ implementado.
+  # O dano não aconteceu porque a OUTRA fronteira (o push é do maestro) segurou. Os 8 pins históricos
+  # foram medidos e TODOS estão em main — latente até hoje. Este caso existe para que a próxima vez
+  # não dependa de alguém estar numa branch limpa.
+  if [ -f "${REPO_ROOT}/ops/materialize-door.sh" ]; then
+    if grep -qE 'archive --format=tar[[:space:]]+HEAD|rev-parse --short=12 HEAD' "${REPO_ROOT}/ops/materialize-door.sh"; then
+      record_fail "door: (0) a porta materializa do HEAD LOCAL" \
+        "ops/materialize-door.sh voltou a usar HEAD — rodado de uma branch de PR aberto, isso publica código NÃO MERGEADO num repo público"
+    else
+      record_pass "door: (0) a porta não materializa do HEAD local (fonte é a ref de integração)"
+    fi
+    # E o fail-closed: sem ref resolvível, NÃO materializa. Repo sem `origin` é o sandbox natural.
+    local _dsb _dout _drc
+    _dsb="$(mktemp -d)"; git -C "${_dsb}" init -q 2>/dev/null
+    git -C "${_dsb}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m init 2>/dev/null
+    if _dout="$(cd "${_dsb}" && bash "${REPO_ROOT}/ops/materialize-door.sh" "${_dsb}/porta" --from naoexiste 2>&1)"; then _drc=0; else _drc=$?; fi
+    if [ "${_drc}" -ne 0 ] && grep -qiE 'não resolve|nao resolve' <<< "${_dout}"; then
+      record_pass "door: (0b) ref de origem irresolúvel ⇒ ABORTA (porta que não sabe de onde nasce não nasce)"
+    else
+      record_fail "door: (0b) fail-open na fonte" "rc=${_drc} out=${_dout:0:250}"
+    fi
+    rm -rf "${_dsb}"
+  else
+    record_skip "door: (0) ops/materialize-door.sh ausente (adotante) → pulado"
+  fi
+
   # (a) chave nomeada por membro NÃO viaja, em NENHUM papel
   local r pem_total=0
   for r in adopted hub standalone; do
