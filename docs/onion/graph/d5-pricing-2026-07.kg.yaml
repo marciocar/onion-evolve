@@ -16,10 +16,10 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.65
-    status: open
-    verified_at: 2026-09-01
-    verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): 4/4 claims; juiz APROVADO. Lido o nó D_D5 inteiro (label + 4 edges SUPPORTS de claims + edge SUPPORTS de A_ => decisions.md §D5 segue rotulado `parcialmente ratificado (2026-07-29)` — idêntico ao status:open do …'
-    label: "D5 — preço por camada (escada treino→certificação→compliance-pack→SOTA). Blend A+B: degraus 1-2 vendíveis-já (comparável direto); degraus 3-4 sob-consulta (gated D6/D2). Diretriz: ticket premium ($129+) > pipoca ($5-10); vender selo/curadoria, não o texto; preço-por-outcome só após instrumentar. Quem decide os números = maestro"
+    status: done
+    verified_at: '2026-09-25'
+    verified_against: 'SELADO PELO MAESTRO em 2026-09-25, por escolha explicita num formulario de decisao que apresentou as opcoes NOMEADAS e a recomendacao de cada uma; o texto da escolha esta no `label` deste no. A verificacao aqui e o ATO DE DECIDIR, nao uma medicao contra o vivo: decisao nao se mede, se toma — e o que se registra e QUEM decidiu, QUANDO, e com quais opcoes na mesa. ══ REGISTRO ANTERIOR, preservado: /meta:census 2026-09-01 (wf_90dd73fe-cd2): 4/4 claims; juiz APROVADO. Lido o nó D_D5 inteiro (label + 4 edges SUPPORTS de claims + edge SUPPORTS de A_ => decisions.md §D5 segue rotulado `parcialmente ratificado (2026-07-29)` — idêntico ao status:open do …'
+    label: "D5 — preço por camada (escada treino→certificação→compliance-pack→SOTA). Blend A+B: degraus 1-2 vendíveis-já (comparável direto); degraus 3-4 sob-consulta (gated D6/D2). Diretriz: ticket premium ($129+) > pipoca ($5-10); vender selo/curadoria, não o texto; preço-por-outcome só após instrumentar. Quem decide os números = maestro ══ PARCIALMENTE SELADO pelo maestro 2026-09-25 — a ESTRUTURA sela, os NÚMEROS ficam abertos, e a divisão é deliberada. SELADO: o blend A+B (degraus 1-2 vendíveis-já e comparáveis direto; 3-4 sob-consulta, gated em D6/D2) e a diretriz (ticket premium a partir de ~$129 em vez de pipoca $5-10; vender selo/curadoria, não o texto; preço-por-outcome só APÓS instrumentar). ABERTO: os valores por degrau, que são chamada do maestro e que nenhuma sessão preenche por ele — o label original já dizia isso e o selo respeita. POR QUE dividir em vez de adiar tudo: a estrutura não depende dos números, e mantê-la aberta era o que prendia os degraus 1-2, que são os vendíveis-já."
 
   # ---- CLAIMS DE PREÇO POR CAMADA (SUPPORTS D_D5) ----
   - id: C_treino_daterate

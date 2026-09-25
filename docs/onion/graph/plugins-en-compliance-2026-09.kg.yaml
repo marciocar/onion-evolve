@@ -115,13 +115,14 @@ nodes:
   - id: D_PR10_LEGAL_E_SUPORTE
     node_type: decision
     plane: DEV
-    status: open
+    status: done
+    verified_at: '2026-09-25'
     impact: 5
     confidence: 0.95
     drive_kind: execution
-    verified_against: "medido 2026-09-07: nao existe PRIVACY*, TERMS*, SUPPORT*, SECURITY* nem CODE_OF_CONDUCT* em lugar nenhum — nem no core, nem nos plugins, nem no site/; grep -ci privac nos 6 READMEs = 0"
+    verified_against: "SELADO PELO MAESTRO em 2026-09-25, por escolha explicita num formulario de decisao que apresentou as opcoes NOMEADAS e a recomendacao de cada uma; o texto da escolha esta no `label` deste no. A verificacao aqui e o ATO DE DECIDIR, nao uma medicao contra o vivo: decisao nao se mede, se toma — e o que se registra e QUEM decidiu, QUANDO, e com quais opcoes na mesa. ══ REGISTRO ANTERIOR, preservado: medido 2026-09-07: nao existe PRIVACY*, TERMS*, SUPPORT*, SECURITY* nem CODE_OF_CONDUCT* em lugar nenhum — nem no core, nem nos plugins, nem no site/; grep -ci privac nos 6 READMEs = 0"
     trace: .claude/utils/marketplace/assemble-plugin.sh
-    label: "PR 10 — os requisitos 3.A, 3.B, 3.C e 3.F. SSOT em .claude/utils/marketplace/legal/ (PRIVACY, SUPPORT, SECURITY, CODE_OF_CONDUCT) copiada para a raiz de CADA plugin no mesmo ponto onde o LICENSE ja e copiado (assemble-plugin.sh:364-368), mais a raiz do marketplace, mais site/src/pages/legal/*, mais site/public/.well-known/security.txt (prova de controle de dominio, 3.F). O PRIVACY carrega uma TABELA GERADA varrendo o bundle: provedor · qual comando pode originar · qual credencial · de onde vem · que dado sai · e a afirmacao que importa: nao ha proxy, nao ha chave nossa, nao recebemos copia. Secao ## Privacidade, dados e suporte gerada no README entre Requisitos e Proveniencia. ACEITE: os 4 arquivos existem nos 5 plugins e a tabela lista os fluxos que o grep encontra, nao os que eu lembro."
+    label: "PR 10 — os requisitos 3.A, 3.B, 3.C e 3.F. SSOT em .claude/utils/marketplace/legal/ (PRIVACY, SUPPORT, SECURITY, CODE_OF_CONDUCT) copiada para a raiz de CADA plugin no mesmo ponto onde o LICENSE ja e copiado (assemble-plugin.sh:364-368), mais a raiz do marketplace, mais site/src/pages/legal/*, mais site/public/.well-known/security.txt (prova de controle de dominio, 3.F). O PRIVACY carrega uma TABELA GERADA varrendo o bundle: provedor · qual comando pode originar · qual credencial · de onde vem · que dado sai · e a afirmacao que importa: nao ha proxy, nao ha chave nossa, nao recebemos copia. Secao ## Privacidade, dados e suporte gerada no README entre Requisitos e Proveniencia. ACEITE: os 4 arquivos existem nos 5 plugins e a tabela lista os fluxos que o grep encontra, nao os que eu lembro. ══ SELADO pelo maestro 2026-09-25 — EXECUTAR como proposto. A SSOT legal em .claude/utils/marketplace/legal/ (PRIVACY, SUPPORT, SECURITY, CODE_OF_CONDUCT) copiada para a raiz de CADA plugin no MESMO ponto onde o LICENSE já é copiado (assemble-plugin.sh), mais a raiz do marketplace, mais site/src/pages/legal/*, mais o security.txt como prova de controle de domínio. O que fez o selo ser barato: o mecanismo de cópia JÁ EXISTE e a tabela de privacidade é GERADA varrendo o bundle — logo a afirmação que importa (não há proxy, não há chave nossa, não recebemos cópia) fica derivada do bundle real, não redigida à mão."
 
   - id: D_PR11_EXEMPLOS_EXECUTAVEIS
     node_type: decision
