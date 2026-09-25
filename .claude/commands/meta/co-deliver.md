@@ -43,7 +43,15 @@ ele hardcoda `role: source` (é a identidade da FONTE) e, vendorizado num adotan
 ## Passo 2 — Resolver alvo e rascunho(s)
 
 `$ARGUMENTS` = `<member-id> [<outbox-file>] --target <path> [--dry-run]`.
-- `<member-id>` deve existir em `members.yaml` com **role: hub ou standalone** (T1/T3, adotam o core direto — RFC-0003 §2.1; o helper valida). role=consumer (T2, via-hub) fica fora deste carteiro-local.
+- `<member-id>` deve existir em `members.yaml` e **adotar o CORE direto** (T1/T3 — RFC-0003 §2.1; o
+  helper valida). Isso vale para `role: hub`, `role: standalone` **e** `role: adopted`: desde a
+  unificação de vocabulário de 2026-09-24, `adopted` nomeia também o adotante direto do core, e ele
+  recebe aqui como qualquer outro.
+  > ⚠️ **O critério é a tripla `adopts` do registro, não a lista de papéis** — curado em 2026-09-25,
+  > depois de medir o dano: enquanto o helper enumerava `hub|standalone`, um membro `role: adopted`
+  > ficava de fora de TODO anúncio e o `resolve-target todos` nem o listava. Silencioso nas duas
+  > pontas, nenhum gate acusando. Quem adota **um hub** (T2) continua fora deste carteiro por desenho:
+  > recebe pelo hub, e o helper diz isso nomeando o hub em questão.
 - `<outbox-file>` opcional: basename ou path de UM rascunho. Omitido = **todos** os `.md` de 1º nível de
   `outbox/<member-id>/` (cuidado: pode reentregar rascunhos antigos não-arquivados).
 - `--target <path>` é o **path local do repo adotante** — obrigatório quando o `members.yaml` não traz um

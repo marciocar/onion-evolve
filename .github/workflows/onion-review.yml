@@ -63,6 +63,15 @@ jobs:
       motivo2: ${{ steps.v2.outputs.motivo }}
       benigno: ${{ steps.aviso.outputs.benigno }}
       sem_chave: ${{ steps.sem_chave.outputs.sem_chave }}
+      # ── A CAUSA VIAJA ATÉ QUEM DÁ O VEREDITO (defeito medido 2026-09-25) ────────────────
+      # O pré-voo já capturava a causa e a imprimia num `::warning::` — que morre no log deste
+      # job. Quem lê `gh pr checks` na hora de mergear vê o veredito, e o veredito dizia só
+      # `1ª tentativa: sem-arquivo`: verdadeiro e inútil. A causa real do run que descobriu isto
+      # era `HTTP 400 — Your credit balance is too low to access the Anthropic API`, ou seja um
+      # problema com AÇÃO ÓBVIA (repor saldo) que ficou três dias parecendo credencial quebrada.
+      # Sinal de máquina que não nomeia a própria causa obriga quem lê a adivinhar.
+      preflight_http: ${{ steps.preflight.outputs.http }}
+      preflight_causa: ${{ steps.preflight.outputs.causa }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -737,6 +746,8 @@ jobs:
           RESULT: ${{ needs.onion-review.result }}
           BENIGNO: ${{ needs.onion-review.outputs.benigno }}
           SEM_CHAVE: ${{ needs.onion-review.outputs.sem_chave }}
+          PF_HTTP: ${{ needs.onion-review.outputs.preflight_http }}
+          PF_CAUSA: ${{ needs.onion-review.outputs.preflight_causa }}
         run: |
           if [ "${RESULT}" = "skipped" ]; then
             # Só FORK chega aqui (o job de veredito exige fork == false, então na prática este
@@ -797,17 +808,59 @@ jobs:
             } >> "${GITHUB_STEP_SUMMARY}"
             exit 0
           fi
+          # ── A CAUSA, quando o pré-voo a capturou, vem ANTES do sintoma ─────────────────────
+          # `sem-arquivo` é o SINTOMA (a action não expôs o execution_file). A causa vive no
+          # pré-voo, e sem ela o leitor deste check não tem o que fazer com a informação.
+          # ⚠️ O RÓTULO NÃO PODE DIZER "CREDENCIAL" PARA QUALQUER NÃO-200 — achado de passada
+          # adversarial, e o mais irônico deste diff: a tese dele é que "saldo e credencial revogada
+          # são problemas DIFERENTES com ações diferentes", e a 1ª redação chamava de "falha da
+          # credencial" um `HTTP 000` (timeout/DNS, o default do próprio pré-voo quando o curl não
+          # responde) e um `529` (capacidade da Anthropic). Cometia o mesmo pecado um degrau acima.
+          # Cada faixa tem AÇÃO diferente, e é a ação que quem lê precisa: repor saldo · trocar chave ·
+          # esperar · investigar rede. Fora dessas, o rótulo diz que NÃO classifica.
+          _causa_txt=""
+          if [ -n "${PF_CAUSA}" ] || { [ -n "${PF_HTTP}" ] && [ "${PF_HTTP}" != "200" ]; }; then
+            case "${PF_HTTP}" in
+              000) _causa_txt="O pré-voo NÃO OBTEVE RESPOSTA (rede/DNS/timeout, não credencial): \`${PF_CAUSA:-sem corpo}\`" ;;
+              401|403) _causa_txt="A CREDENCIAL foi recusada (HTTP \`${PF_HTTP}\`) — chave inválida ou revogada: \`${PF_CAUSA:-sem corpo}\`" ;;
+              429) _causa_txt="LIMITE DE TAXA (HTTP 429) — não é credencial nem saldo, é cadência: \`${PF_CAUSA:-sem corpo}\`" ;;
+              5*)  _causa_txt="CAPACIDADE/ERRO DO LADO DA API (HTTP \`${PF_HTTP}\`) — nada a consertar aqui: \`${PF_CAUSA:-sem corpo}\`" ;;
+              400) if printf '%s' "${PF_CAUSA}" | grep -qiF 'credit balance'; then
+                     _causa_txt="SALDO da conta de API insuficiente (HTTP 400) — reponha crédito; a chave está VÁLIDA: \`${PF_CAUSA}\`"
+                   else
+                     _causa_txt="Requisição RECUSADA com HTTP 400 (modelo inexistente? corpo malformado?): \`${PF_CAUSA:-sem corpo}\`"
+                   fi ;;
+              *)   _causa_txt="O pré-voo falhou com HTTP \`${PF_HTTP:-?}\` e eu NÃO classifico esta faixa: \`${PF_CAUSA:-sem corpo}\`" ;;
+            esac
+          fi
           {
             echo "## ❌ Este PR NÃO foi revisado semanticamente"
             echo ""
+            if [ -n "${_causa_txt}" ]; then
+              echo "**Causa medida:** ${_causa_txt}"
+              echo ""
+              echo "Isto é diagnóstico, não adivinhação: o corpo acima é a resposta da própria API."
+              echo "Saldo/cota e credencial revogada são problemas DIFERENTES com ações diferentes —"
+              echo "e a mensagem só ajuda quem mergeia se disser qual dos dois é."
+              echo ""
+            fi
             echo "1ª tentativa: \`${M1:-nao-rodou}\` · 2ª tentativa: \`${M2:-nao-rodou}\`"
             echo ""
             echo "O job \`onion-review\` saiu **verde por desenho** (soft-pass: revisor é dependência"
             echo "externa e não bloqueia merge). Este check existe para que o verde de lá **não seja"
             echo "confundido com revisão** por quem lê \`gh pr checks\` na hora de mergear."
             echo ""
-            echo "**Não bloqueia o merge** — informa. A decisão de mergear sem revisão é humana e"
-            echo "deve ser consciente, que é exatamente o que faltava."
+            # ⚠️ ESTE TEXTO DIZIA "Não bloqueia o merge — informa", e era FALSO desde 2026-09-20: o
+            # step faz `exit 1` e o `ops/pr-merge-verified.sh` RECUSA o merge com este check em falha,
+            # salvo dispensa nomeada. Medido por passada adversarial. Um bloco escrito para ser honesto
+            # com quem mergeia não pode errar justamente sobre o que ele próprio faz.
+            echo "**Isto BLOQUEIA o merge** pelo caminho verificado (\`ops/pr-merge-verified.sh\`)."
+            echo "Mergear sem revisão semântica exige dispensa NOMEADA E REGISTRADA:"
+            echo ""
+            echo "    bash ops/pr-merge-verified.sh <pr> --dispensa onion-review-verdict --motivo \"<por quê>\""
+            echo ""
+            echo "O motivo vai para um comentário no PR **antes** do merge — a decisão segue humana, e"
+            echo "agora fica auditável em vez de morrer no terminal de quem mergeou."
           } >> "${GITHUB_STEP_SUMMARY}"
-          echo "::error::onion-review NÃO revisou (1ª: ${M1:-nao-rodou} · 2ª: ${M2:-nao-rodou}) — mergear sem revisão semântica é decisão humana, tome-a de olhos abertos."
+          echo "::error::onion-review NÃO revisou (1ª: ${M1:-nao-rodou} · 2ª: ${M2:-nao-rodou})${_causa_txt:+ — ${_causa_txt}} — mergear sem revisão semântica é decisão humana, tome-a de olhos abertos."
           exit 1

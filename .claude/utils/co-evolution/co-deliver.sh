@@ -76,10 +76,48 @@ member_field() {  # $1 = id desejado ; $2 = nome do campo
   ' "${MEMBERS}"
 }
 
+# ── ID DO CORE NO REGISTRO: CONSTANTE DECLARADA, não estatística ────────────────────────────────
+# A 1ª versão derivava isto como "o `parent:` mais frequente do members.yaml", com o raciocínio de que
+# o core é, por construção, quem a maioria adota. Um caso de bancada matou o raciocínio: num registro
+# com UM membro cujo `parent` é um hub, o mais-frequente É esse hub — então o helper elegia o hub como
+# core e ENTREGAVA a um T2 exatamente o anúncio que a RFC-0003 §2.1 manda o hub propagar. A heurística
+# se auto-satisfazia no caso que mais importa barrar, e só apareceu porque escrevi o caso.
+# Constante, com override por ambiente para bancada e para o dia em que o repo for renomeado. Se o id
+# mudar e ninguém tocar aqui, a falha é ALTA e imediata (ninguém recebe), não silenciosa.
+CORE_MEMBER_ID="${ONION_CORE_MEMBER_ID:-onion-evolve}"
 ROLE="$(member_field "${MEMBER}" role)"
 NAME="$(member_field "${MEMBER}" name)"
 [ -n "${ROLE}" ] || { echo "ERRO: member-id '${MEMBER}' não existe em members.yaml." >&2; exit 2; }
-[ "${ROLE}" = "hub" ] || [ "${ROLE}" = "standalone" ] || { echo "ERRO: '${MEMBER}' tem role='${ROLE}' — carteiro-local só entrega a hub/standalone (T1/T3, adotam o core direto; RFC-0003 §2.1). role=consumer é T2 (via-hub), fora deste escopo." >&2; exit 2; }
+# ── QUEM RECEBE É QUEM ADOTA O CORE DIRETO — pergunta estrutural, com degradação declarada ─────
+# A condição anterior era `role = hub OU standalone`, e a mensagem de erro dizia "role=consumer é T2".
+# As duas envelheceram juntas: a unificação de vocabulário de 2026-09-24 trocou `consumer` por
+# `adopted` no registro, e `adopted` passou a nomear TAMBÉM o adotante DIRETO do core (T3) — quem mais
+# precisa receber anúncio. Medido em 2026-09-25: `sge`, único membro `role: adopted`, era recusado com
+# uma mensagem sobre outro conceito, e o `resolve-target todos` nem o listava. Silencioso nas duas
+# pontas ([[guarda-por-lista-falha-pelo-vocabulario]]).
+#
+# O critério da RFC-0003 §2.1 nunca foi o NOME do papel: é "adota o core direto" (recebe aqui) versus
+# "adota um hub" (recebe PELO hub). No registro isso é o campo `parent:`.
+#
+# ⚠️ DEGRADAÇÃO DECLARADA quando `parent:` não existe. Registro sem `parent:` não expressa hierarquia,
+# e aí o papel é o único sinal que há — `hub` e `standalone` são T1/T3 por definição e passam. O único
+# caso que NÃO se resolve é `adopted` sem `parent`, porque `adopted` é exatamente a palavra ambígua: ela
+# nomeia tanto o adotante direto (recebe) quanto o adotado-por-hub (não recebe). Ali o helper recusa e
+# PEDE o campo, em vez de escolher um lado — a informação que falta é nomeável.
+# (A 1ª versão desta cura lia a hierarquia por `graph.sh --triples`, criando uma SEGUNDA fonte para a
+#  mesma pergunta; a bancada monta um `members.yaml` de sandbox e o passa pelo acessor, então o helper
+#  passou a julgar por um registro diferente do que recebia e quatro casos caíram de uma vez, dois
+#  deles sem relação com papel. Um dado, um acessor.)
+PARENT="$(member_field "${MEMBER}" parent)"
+if [ -n "${PARENT}" ]; then
+  if [ "${PARENT}" != "${CORE_MEMBER_ID}" ]; then
+    echo "ERRO: '${MEMBER}' adota '${PARENT}', não o core — é T2 (via-hub) e recebe PELO hub, não pelo carteiro do core (RFC-0003 §2.1). Entregue a '${PARENT}' e deixe o hub propagar." >&2; exit 2
+  fi
+elif [ "${ROLE}" = "adopted" ]; then
+  echo "ERRO: '${MEMBER}' tem role='adopted' e NENHUM campo \`parent:\` no registro — e sem ele eu não sei se ele adota o core direto (recebe aqui) ou um hub (recebe pelo hub). Declare \`parent:\` na entrada de '${MEMBER}' em members.yaml. Não escolho um lado por conveniência." >&2; exit 2
+elif [ "${ROLE}" != "hub" ] && [ "${ROLE}" != "standalone" ]; then
+  echo "ERRO: '${MEMBER}' tem role='${ROLE}' e nenhum \`parent:\` — papel desconhecido para o carteiro-local (esperado hub, standalone, ou adopted com parent)." >&2; exit 2
+fi
 
 # --- Resolve o path local do alvo: --target > members.yaml local_path: (path: fallback) ---
 # Sinal 2026-07-10-co-deliver-local-path-gap: o campo real do members.yaml é 'local_path:'; o

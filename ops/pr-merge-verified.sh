@@ -204,7 +204,7 @@ if [ "${#DISPENSA[@]}" -gt 0 ]; then
   else
     _NOTA_DISPENSA="Não consegui ler o \`output\` do check para dizer se ele mediu ou não — **a nota não afirma nenhum dos dois**; leia o check no PR."
   fi
-  _reg="$(printf '%s\n' \\
+  _reg="$(printf '%s\n' \
     "## ⚠️ Merge com check DISPENSADO" \
     "" \
     "Este PR foi mergeado por \`ops/pr-merge-verified.sh\` com dispensa **nomeada** de check." \
@@ -216,6 +216,36 @@ if [ "${#DISPENSA[@]}" -gt 0 ]; then
     "| head | \`${HEAD_SHA}\` |" \
     "" \
     "Os demais checks do head passaram — a dispensa é **nome a nome**, e qualquer outro check falho teria recusado o merge. ${_NOTA_DISPENSA}" )"
+  # ── O CORPO É CONTADO, NUNCA PRESUMIDO (defeito medido 2026-09-25, PR #874) ────────────
+  # A v1 montava o corpo com `printf '%s\n' \\` — dois contra-barras. O primeiro escapava o
+  # segundo, então o `printf` recebia UM argumento (o contra-barra literal) e a linha TERMINAVA
+  # ali; as linhas seguintes viraram um comando novo, que o bash tentou EXECUTAR
+  # (`## ⚠️ Merge com check DISPENSADO: command not found`). Resultado: o `gh pr comment`
+  # postou `\` e saiu 0 — o `die` nunca disparou, o script disse "✓ dispensa registrada", e o
+  # registro que ele mesmo chama de *precondição de auditoria* não registrou NADA.
+  # É a classe que mais mordeu esta casa: o rc do comando é DECLARAÇÃO sobre si; verificar é
+  # CONTAR o que ele produziu. Então: o corpo tem de conter o cabeçalho, o nome de cada check
+  # dispensado e o motivo — senão não se posta, e não se mergeia.
+  # ⚠️ DUAS CORREÇÕES DE UMA PASSADA ADVERSARIAL, ambas medidas (2026-09-25):
+  #
+  # (i) NADA DE `printf | grep -q` AQUI. Sob `pipefail`, `grep -q` casa no começo e SAI; o `printf`
+  #     morre com SIGPIPE e o pipeline devolve 141, que esta guarda leria como "corpo INCOMPLETO" —
+  #     recusando um corpo que CONTÉM o termo. Medido com um `--motivo` de 70 KB: 10 de 12 execuções
+  #     falharam espuriamente (`rc=141`, `contem=SIM`). É a classe já curada em 489 sítios desta casa
+  #     ([[pipefail-epipe-early-closer-class]]), reintroduzida por mim no gate de MERGE — e eu não
+  #     tinha caso de bancada nesse tamanho. `<<<` não tem escritor para morrer.
+  #
+  # (ii) O MOTIVO TEM DE TER CONTEÚDO. `--motivo ""` já era barrado no parse, mas `--motivo " "`
+  #      passava, e aí `grep -qF -- " "` casa com qualquer corpo: o elemento que existe para garantir
+  #      que a dispensa diga POR QUÊ media zero. Registro cuja justificativa é um espaço não se audita
+  #      melhor do que registro nenhum.
+  if [ -z "$(printf '%s' "${REASON}" | tr -d '[:space:]')" ]; then
+    die "--motivo está em branco (só espaços) — merge abortado. A dispensa precisa dizer POR QUÊ; um motivo vazio faz a própria verificação do registro passar a medir nada."
+  fi
+  for _exigido in "## ⚠️ Merge com check DISPENSADO" "${DISPENSA[*]}" "${REASON}"; do
+    grep -qF -- "$_exigido" <<< "$_reg" \
+      || die "o corpo do registro de dispensa saiu INCOMPLETO (falta: ${_exigido}) — merge abortado antes de postar. Registro que não carrega o motivo não se audita, e um \`gh pr comment\` bem-sucedido com corpo vazio é o modo-de-falha que este check existe para barrar."
+  done
   gh pr comment "$PR" "${REPO_ARG[@]}" --body "$_reg" >/dev/null 2>&1 \
     || die "não consegui REGISTRAR a dispensa no PR #${PR} — merge abortado. O registro é precondição: dispensa que só existe no meu terminal não se audita."
   say "✓ dispensa registrada no PR #${PR} (comentário), antes do merge"

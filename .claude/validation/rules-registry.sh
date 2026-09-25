@@ -163,7 +163,7 @@ CATEGORIES = [
      [10, 11]),
     ("SSOT anti-drift",
      "Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, mapas, plugins, topologia.",
-     [8, 9, 16, 19, 21, 27, 37, 39, 41, 50, 59, 62, 63, 70, 76, 80, 81, 83, 84, 85]),
+     [8, 9, 16, 19, 21, 27, 37, 39, 41, 50, 59, 62, 63, 70, 76, 80, 81, 83, 84, 85, 90]),
     ("KG & proveniência",
      "Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca "
      "(por citação e por marcador autodeclarado); e frescor doutrinário — afirmação "

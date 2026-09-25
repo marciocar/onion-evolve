@@ -33,7 +33,10 @@ S2 ("commit cross-repo na branch errada") é **estruturalmente impossível**.
 
 **Ler o STAMP `.claude/.onion-version` (campo `role:`) — NÃO rode `onion-version.sh`** (aquele hardcoda
 `role: source` por ser a identidade da FONTE; cópia byte-idêntica no adotante mentiria 'source').
-- `role: adopted` → **ADOTANTE** → segue.
+- `role: adopted` **, `hub` ou `standalone`** → **ALVO** → segue. (O `case` do helper aceita
+  exatamente estes três; a prosa dizia só `adopted` até 2026-09-25 e, lida ao pé da letra, **mandava
+  um hub parar** — sinal de campo de um adotante `hub`. Um hub relaya upstream como qualquer
+  consumidor; o que ele tem A MAIS é adoção para baixo, que não passa por aqui.)
 - `role: source` / stamp ausente → **CORE/pré-adoção** → **parar**: o core não relaya upstream; ele anuncia
   downstream via [`/meta:co-announce`](co-announce.md). (O helper aplica a mesma guarda e sai com exit 2.)
 
