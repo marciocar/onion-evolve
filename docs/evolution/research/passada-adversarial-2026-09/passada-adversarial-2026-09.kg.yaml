@@ -4,7 +4,13 @@ meta:
   baseline: 2026-09-14
   review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 53 NOS (era 52: +1 pela OCORRENCIA 4 da classe guarda-de-lista-falha-pelo-vocabulario,
+  # ═══ TETO: 54 NOS (era 53: +1 pela RECORRENCIA MEDIDA da causa do revisor semantico — a MESMA
+  #     causa (saldo da conta de API) matou o revisor pela 2a vez em 2026-09-25, e desta vez com o
+  #     corpo da API na mao, porque a cura de PRESERVAR A EVIDENCIA do run entrou no dia anterior.
+  #     Cresce por recorrencia medida da mesma classe, que e exatamente o criterio declarado
+  #     abaixo — e o no carrega as duas curas de mecanismo do mesmo PR: a causa passa a VIAJAR ate
+  #     quem da o veredito, e o registro de dispensa passa a ser CONTADO antes de postar.)
+  #     (era 52: +1 pela OCORRENCIA 4 da classe guarda-de-lista-falha-pelo-vocabulario,
   #     medida e curada no mesmo PR — a guarda da REGRA 60 tinha o mecanismo COMPLETO (baseline com
   #     catraca no chao, fail-loud, 7 casos, guarda-da-guarda contra homografo) e dizia `0 HARD` por
   #     42 dias porque os 102 termos da lista nao cobriam NENHUM identificador deste repo; 20 viviam
@@ -591,6 +597,18 @@ nodes:
     trace: '.github/workflows/onion-review.yml'
     label: 'A CAUSA ERA SALDO, E A PROVA E COMPORTAMENTAL: reposto o credito, o revisor semantico voltou a rodar de verdade — 8m1s no #846 e 5m3s no #847, com turnos reais e veredito lido da FONTE (nao inferido), enquanto no #842 ele saia `is_error:true` com turnos=1 e custo=0. O QUE ISSO ENSINA ALEM DO CASO: o modo de falha por CREDENCIAL/SALDO se disfarca de defeito de runner — `is_error` sem mensagem util, custo zero, e um pre-voo HTTP 200 que so prova que a chave EXISTE, nao que ela pode gastar. Diagnosticar pela saude do transporte (o POST de 1 token respondeu) e concluir sobre a capacidade de EXECUTAR foi o erro de leitura que custou as rodadas anteriores. O sinal honesto e o custo: run com `custo=0` e turnos=1 nao e run curto, e run que NAO ACONTECEU.'
 
+  - id: E_A_MESMA_CAUSA_VOLTOU_E_AGORA_COM_O_CORPO_DA_API
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    valid_from: '2026-09-25'
+    verified_at: '2026-09-25'
+    verified_against: 'Log do job onion-review do PR #874 (run 36131799171, 2026-09-25T11:52:55Z): pre-voo POST /v1/messages com claude-sonnet-5 devolveu HTTP 400 e corpo {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API"}}. Nas duas ocorrencias (2026-09-18 e 2026-09-25) a causa foi a MESMA. O maestro reps o credito no mesmo dia.'
+    trace: '.github/workflows/onion-review.yml'
+    label: 'A CAUSA VOLTOU, E DESTA VEZ COM O CORPO DA API NA MAO — e a diferenca entre as duas ocorrencias e o que vale registrar. Em 2026-09-18 o diagnostico foi COMPORTAMENTAL (reposto o credito, voltou a rodar): certo, mas indireto, e por isso tres hipoteses erradas sobreviveram tres dias a cada rodada. Em 2026-09-25 o pre-voo IMPRIMIU a mensagem da propria API, e o diagnostico saiu em uma leitura. O que mudou nao foi o sintoma, foi a EVIDENCIA PRESERVADA: a cura do PR #874 existe exatamente para isso. DUAS LICOES DE MECANISMO, ambas curadas no mesmo PR: (1) o pre-voo JA capturava a causa e a jogava num `::warning::` que morre no log do job — quem le `gh pr checks` na hora de mergear via so `1a tentativa: sem-arquivo`, verdadeiro e inutil; agora a causa VIAJA para o `onion-review-verdict` pelos outputs `preflight_http`/`preflight_causa` e sai nomeada no erro e no sumario. (2) o `ops/pr-merge-verified.sh` registrava a dispensa com um corpo que saia VAZIO (um contra-barra) e ainda dizia `dispensa registrada`, porque o rc do `gh pr comment` era a unica prova — o registro que o proprio bloco chama de PRECONDICAO DE AUDITORIA nao registrava nada; agora o corpo e CONTADO antes de postar, com mutante na bancada. E a licao epistemica que generaliza: sonda verde mede O MOMENTO DELA. Quando um pre-voo passa e o trabalho real falha, o que foi refutado e `estava quebrado antes de comecar`, nunca `a causa nao e X` — descarte de causa vai ao registro com o ESCOPO DA MEDICAO junto, nao como veredito atemporal.'
+
   - id: E_PERNA_DE_LEITURA_E_CEGA_A_BASH
     node_type: evidence
     plane: PROD
@@ -801,6 +819,9 @@ edges:
     edge_type: SUPPORTS
   - from: E_REVISOR_SEMANTICO_VOLTOU_A_RODAR_COM_CREDITO
     to: E_O_DIAGNOSTICO_QUE_A_DOUTRINA_MANDA_RODAR_ESTAVA_MORTO
+    edge_type: SUPPORTS
+  - from: E_A_MESMA_CAUSA_VOLTOU_E_AGORA_COM_O_CORPO_DA_API
+    to: E_REVISOR_SEMANTICO_VOLTOU_A_RODAR_COM_CREDITO
     edge_type: SUPPORTS
   - from: E_PERNA_DE_LEITURA_E_CEGA_A_BASH
     to: Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE

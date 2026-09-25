@@ -27,8 +27,21 @@ O `role` pode vir de dois lugares (o core **não** tem `.onion-version` estátic
    e ler `role:` (a fonte/core retorna `role: source`).
 3. Se nenhum dos dois → repo ainda não é Onion (ou pré-adoção) — avisar e parar.
 
-Mapear: **`role: source` → CORE** (`onion-evolve`, dono do framework + protocolo) ·
-**`role: adopted` → CONSUMIDOR** (projeto que adotou o Onion, ex. vendorizado/standalone).
+Mapear:
+
+| `role:` no stamp | papel na co-evolução | o que faz aqui |
+|---|---|---|
+| **`source`** | **CORE** (`onion-evolve`) | dono do framework + do protocolo; lê `inbox/`, anuncia downstream |
+| **`adopted`** | **CONSUMIDOR** | lê `inbound/`, relaya sinal upstream via `/meta:co-relay` |
+| **`hub`** | **CONSUMIDOR para cima, AUTORIDADE para baixo** | perante o core age como consumidor (lê `inbound/`, relaya upstream). Para baixo é autoridade de adoção (Camada 2): roda `/meta:adopt` e `--update` nos **projetos dele**. ⚠️ O hub **não** anuncia downstream com `/meta:co-announce` nem mantém `members.yaml` de topologia — federação cross-empresa é Camada 3, autoridade do core. O que chega aos projetos dele chega pelo `--update`, que já emite o relatório em `inbound/` do projeto. |
+| **`standalone`** | **CONSUMIDOR** (T3, adota o core direto, sem sub-adotados) | idêntico a `adopted` na co-evolução |
+
+> ⚠️ **Esta tabela nasceu de um sinal de campo** (um adotante `hub`, 2026-09-25): a prosa só conhecia
+> `source` e `adopted`, então a primeira sessão de um hub tinha de **inferir** onde se encaixava,
+> enquanto os scripts (`co-relay.sh`, `co-deliver.sh`) já aceitavam `adopted|hub|standalone` desde
+> 2026-09-17 — quando a omissão **inversa** custou um sinal entregue à mão. Mecanismo evoluiu, prosa
+> não; e é a prosa que a sessão lê primeiro. A REGRA 90 (Prosa de comando conhece os papéis que o
+> script aceita) existe para que o par não desencontre de novo.
 
 ## Passo 2 — Ler os canais (mensagens pendentes)
 
@@ -70,7 +83,7 @@ Para cada, resumir `title`/`date`/`type` do frontmatter. Canal vazio/ausente →
 
 ## Passo 3 — Orientar conforme o papel
 
-**Se CONSUMIDOR (projeto):**
+**Se CONSUMIDOR (`adopted` / `standalone` / `hub` olhando para cima):**
 - **Pedir ajuda / reportar bug / dar feedback ao core (upstream):** escrever um markdown datado
   (`AAAA-MM-DD-<assunto>.md`) no **próprio** `inbox/` (`docs/evolution/inbox/` — é o que "a relayar ao core")
   e **transportar com [`/meta:co-relay`](co-relay.md)** (`/meta:co-relay <sinal> --target <path-do-core>`):

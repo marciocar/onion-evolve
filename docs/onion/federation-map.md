@@ -22,6 +22,7 @@ flowchart TD
   arandek["arandek<br/>standalone · legacy"]:::standalone
   onion_dist["onion-dist<br/>standalone · greenfield"]:::standalone
   sge["sge<br/>adopted · regulated"]:::adopted
+  hub_formacao_enterprise["hub-formacao-enterprise<br/>hub · greenfield"]:::hub
   sacola_de_ideias["sacola-de-ideias<br/>standalone · greenfield"]:::standalone
   portal_gamificacao["portal-gamificacao<br/>standalone · greenfield"]:::standalone
   jogo_da_vida["jogo-da-vida<br/>standalone · greenfield"]:::standalone
@@ -42,6 +43,7 @@ flowchart TD
   arandek -->|adopts| onion_evolve
   onion_dist -->|adopts| onion_evolve
   sge -->|adopts| onion_evolve
+  hub_formacao_enterprise -->|adopts| onion_evolve
   sacola_de_ideias -->|adopts| onion_evolve
   portal_gamificacao -->|adopts| onion_evolve
   jogo_da_vida -->|adopts| onion_evolve
@@ -71,6 +73,7 @@ flowchart TD
 | arandek | standalone | legacy | field-dogfood, legacy-adoption, monorepo, upstream-signal | `65d8a7501a03` |
 | onion-dist | standalone | greenfield | distribution-algorithms, kg-sdaal-method, research-arm, benchmarking | `e88c1e11e051` |
 | sge | adopted | regulated | licitacao-publica, lei-14133, regulated-greenfield, analise-tecnica, checklist-qualidade | `ba0d2d423c17` |
+| hub-formacao-enterprise | hub | greenfield | hub-de-adocao, formacao-hands-on, company-brain, spec-as-code | `f32e2f931c73` |
 | sacola-de-ideias | standalone | greenfield | astro-site, institutional, greenfield-dogfood | `8e2517724c0a` |
 | portal-gamificacao | standalone | greenfield | gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers | `2e3f3a6f88ce` |
 | jogo-da-vida | standalone | greenfield | gamification, maagica, expo-universal, turborepo, kg-radar-js-port, pre-adoption-dogfood | `2e3f3a6f88ce` |

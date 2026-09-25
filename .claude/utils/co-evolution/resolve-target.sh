@@ -10,7 +10,10 @@
 # Uso:  resolve-target.sh <seletor>   → IDs de membro (um por linha) que casam (vazio = ninguém)
 #   <seletor>:
 #     nenhum | futuros [adotantes]      → vazio (entrada informativa / futuros — sem destinatário atual)
-#     todos | adotantes                 → todos os membros tier hub|standalone (retrocompat)
+#     todos | adotantes                 → todos os membros que adotam o CORE direto (T1/T3).
+#                                       Critério ESTRUTURAL (tripla `adopts`), não lista de papéis:
+#                                       papel novo no registro entra por construção. T2 (adota um hub)
+#                                       fica fora por desenho — recebe pelo hub (RFC-0003 §2.1).
 #     <id>                              → esse membro, se existir
 #     <key>:<value>[,<key>:<value>...]  → AND (interseção) sobre atributos:
 #         key ∈ { mode | tier (alias role) | specialization (alias spec) }
@@ -30,6 +33,15 @@ GRAPH="${ROOT}/.claude/validation/graph.sh"
 SEL="$(printf '%s' "${SEL}" | sed -E 's/\(.*//; s/[{}]//g; s/^[[:space:]]+//; s/[[:space:]]+$//')"
 
 TRIPLES="$(bash "${GRAPH}" --triples 2>/dev/null || true)"
+# ── ID DO CORE NO REGISTRO: CONSTANTE DECLARADA, não estatística ────────────────────────────────
+# A 1ª versão derivava isto como "o `parent:` mais frequente do members.yaml", com o raciocínio de que
+# o core é, por construção, quem a maioria adota. Um caso de bancada matou o raciocínio: num registro
+# com UM membro cujo `parent` é um hub, o mais-frequente É esse hub — então o helper elegia o hub como
+# core e ENTREGAVA a um T2 exatamente o anúncio que a RFC-0003 §2.1 manda o hub propagar. A heurística
+# se auto-satisfazia no caso que mais importa barrar, e só apareceu porque escrevi o caso.
+# Constante, com override por ambiente para bancada e para o dia em que o repo for renomeado. Se o id
+# mudar e ninguém tocar aqui, a falha é ALTA e imediata (ninguém recebe), não silenciosa.
+CORE_ID="${ONION_CORE_MEMBER_ID:-onion-evolve}"
 _by_pred() { printf '%s\n' "${TRIPLES}" | awk -F'\t' -v p="$1" -v v="$2" '$2==p && $3==v{print $1}' | LC_ALL=C sort -u; }
 
 _match_one() {  # <key> <value> → ids com o atributo
@@ -46,7 +58,18 @@ _match_one() {  # <key> <value> → ids com o atributo
 case "${SEL}" in
   nenhum|futuros|"futuros adotantes") exit 0 ;;                      # sem destinatário
   todos|adotantes)
-    { _by_pred tier hub; _by_pred tier standalone; } | LC_ALL=C sort -u ;;
+    # ── A PERGUNTA ESTRUTURAL, NÃO A LISTA DE PAPÉIS (curado 2026-09-25, medido) ──────────────
+    # Até aqui isto era `tier hub` ∪ `tier standalone` — uma LISTA de papéis. A unificação de
+    # vocabulário de 2026-09-24 (`consumer` → `adopted` no registro) criou um papel novo que a lista
+    # não conhecia, e o efeito foi SILENCIOSO: `sge`, único membro `role: adopted`, saía de fora dos
+    # destinatários de todo anúncio, e nenhum gate acusava. Ninguém teria notado até alguém perguntar
+    # por que aquele adotante nunca recebeu nada.
+    # A cura não é acrescentar `adopted` à lista — é parar de enumerar. O critério da RFC-0003 §2.1 é
+    # "adota o CORE direto" (T1/T3) versus "adota um hub" (T2, recebe pelo hub), e essa é exatamente a
+    # tripla `adopts`, que o `members.yaml` já carrega. Papel novo passa a entrar por construção.
+    # ([[guarda-por-lista-falha-pelo-vocabulario]] — em guarda de lista o defeito dominante é o
+    #  VOCABULÁRIO, não a lógica.)
+    _by_pred adopts "${CORE_ID}" ;;
   *:*)
     # seletor key:value[,key:value] → AND (interseção)
     local_init=""; result=""

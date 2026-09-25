@@ -4570,8 +4570,41 @@ check_radar_sources_freshness() {
     done
 }
 
+# REGRA 90 — Prosa de comando conhece os papéis que o script aceita [SOFT]
+# previne: o par script×prosa dos comandos de co-evolução desencontrar — e ele JÁ desencontrou duas
+#   vezes, em sentidos OPOSTOS: 2026-09-17 o script era estreito e a prosa larga (o core entregava
+#   anúncio a uma porta que não podia responder; custou um sinal entregue à mão); 2026-09-25 o script
+#   era largo e a prosa estreita (`co-relay.md` lido ao pé da letra mandava um `hub` PARAR, e a 1ª
+#   sessão do adotante `hub` teve de inferir onde se encaixava — foi ELE quem reportou).
+#   A assimetria é o ponto: a sessão lê a PROSA primeiro e o script nunca. Script certo com prosa
+#   errada produz um agente que recusa o que a máquina permite, e isso não acende gate nenhum.
+# A guarda vive em `command-role-parity-check.sh` (o POR QUE inteiro está lá, inclusive a fronteira
+# declarada: ela mata o SILÊNCIO da prosa, não julga se a prosa descreve o papel corretamente).
+# ⚠️ NASCE SOFT DE PROPÓSITO, e o gatilho de promoção está escrito: a classe já reincidiu duas vezes,
+#    o que por doutrina desta casa bastaria para HARD — mas uma guarda que NUNCA rodou no CI nascer
+#    bloqueante é o erro de 2026-09-20 (dependência nova introduzida sem medir quase reprovou todo PR).
+#    PROMOVER A HARD quando ela tiver passado verde em ao menos uma leva de CI, ou na primeira vez que
+#    alguém reincidir na classe COM a guarda no lugar — o que vier primeiro.
+check_command_role_parity() {
+  local sc="${SCRIPT_DIR}/command-role-parity-check.sh"
+  [ -f "${sc}" ] || return 0
+  local out rc=0
+  out="$(bash "${sc}" "${REPO_ROOT}" 2>&1)" || rc=$?
+  # rc 3 = a guarda declara que NÃO PUDE JULGAR; isso é informação, não silêncio.
+  if [ "${rc}" -eq 3 ]; then
+    violation "SOFT" ".claude/validation/command-role-parity-check.sh" "REGRA 90 (Prosa de comando conhece os papéis que o script aceita): a guarda não pôde julgar — ${out}"
+    return 0
+  fi
+  [ "${rc}" -eq 0 ] && return 0
+  while IFS= read -r l; do
+    [ -n "${l}" ] || continue
+    violation "SOFT" ".claude/commands/meta/" "REGRA 90 (Prosa de comando conhece os papéis que o script aceita): ${l#REGRA 90: }"
+  done <<< "${out}"
+}
+
 check_radar_aufhebung
 check_radar_sources_freshness
+check_command_role_parity
 
 # REGRA 70 — fallbackModel do settings.json é PROJEÇÃO da escada de modelos (eixo E6) [HARD]
 # previne: a escada (session_models + session_floor em docs/onion/radar-baselines.yaml) e o fallback nativo do

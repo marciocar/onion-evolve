@@ -46,6 +46,25 @@ for f in files:
             node={"grafo":g,"id":m.group(1),"status":"","verified_at":"","source_tier":"","label":"","_hit":False}
             if any(t in node["id"].lower() for t in terms): node["_hit"]=True
             continue
+        # ── CHAVE DE TOPO ENCERRA O NÓ (bug reportado pelo adotante `sge`, 2026-09-24) ──────
+        # O loop abria um nó em `- id:` e engolia todo `label:` seguinte — inclusive os da seção
+        # `edges:`, que também tem `- from:`/`label:`. Consequência medida: o ÚLTIMO nó de `nodes:`
+        # herdava o label de CADA aresta e terminava com o da última, e qualquer termo presente no
+        # label de qualquer aresta marcava `_hit` nele. Isso não é cosmético: o corpus é o PASSO 1
+        # da skill `onion-research` ("corpus primeiro"), então um label trocado ali entra no Scope,
+        # no Elenxo e no write(KG). A REGRA 82 (Os dois leitores do corpus CONCORDAM sobre quem é
+        # nó) não pegou porque ela compara IDS — quem é nó — e não os CAMPOS de cada nó.
+        # Qualquer chave sem indentação (`edges:`, `meta:`) fecha o nó corrente.
+        # A 1ª cura fechava o nó em QUALQUER chave sem indentação. Funciona no schema real (todo
+        # `.kg.yaml` desta casa tem `nodes:`/`edges:` no topo), mas trata INDENTAÇÃO e não SEÇÃO — com
+        # `graph: / nodes: / edges:` aninhados o bug sobrevive idêntico. Achado por passada
+        # adversarial, e o reparo é fechar em qualquer chave `edges:`/`meta:` QUALQUER QUE SEJA a
+        # indentação dela, mais a regra antiga para as chaves de topo. Assim a guarda cobre o que ela
+        # diz cobrir em vez de depender de o corpus nunca aninhar.
+        if re.match(r'^\s*(edges|meta):\s*$',line) or re.match(r'^\S',line):
+            if node and node.get("_hit"): hits.append(node)
+            node=None
+            continue
         if node is None: continue
         km=re.match(r'^\s*(status|verified_at|source_tier|label):\s*(.*)$',line)
         if km:

@@ -398,6 +398,7 @@
 .githooks/pre-commit	E_gate_declara_1min_e_leva_15	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 .githooks/pre-commit	Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .github/workflows/onion-review.yml	A_CURAR_O_REVISOR_DO_CI_COM_MECANISMO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.github/workflows/onion-review.yml	E_A_MESMA_CAUSA_VOLTOU_E_AGORA_COM_O_CORPO_DA_API	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .github/workflows/onion-review.yml	E_HOST_SEM_PROTECAO_CI_E_AVISO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .github/workflows/onion-review.yml	E_O_REVISOR_DO_CI_NAO_REVISA_HA_DUAS_OCORRENCIAS	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .github/workflows/onion-review.yml	E_REVISOR_SEMANTICO_VOLTOU_A_RODAR_COM_CREDITO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml

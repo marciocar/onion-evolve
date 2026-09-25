@@ -565,6 +565,41 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  - id: hub-formacao-enterprise
+    # ⚠️ SLUG NEUTRO, pelo precedente de `vendas-pdi-enterprise` (maestro, 2026-09-17): o
+    #    identificador é o que vai para as superfícies PROJETADAS (federation-console.html,
+    #    federation-map.md), e nome comercial de cliente não entra ali. Quem é o cliente vive no
+    #    CLAUDE.md do adotante. O `local_path` abaixo NÃO é neutro, e a assimetria é deliberada e
+    #    medida: nenhuma projeção imprime `local_path` (ele serve só a transporte e validação),
+    #    e renomear o diretório que o maestro criou é ato fora do que foi pedido.
+    #    ⚠️ E vale o alerta da própria casa: a REGRA 36 (Superfície VENDORIZADA sem nome comercial
+    #    de cliente) deriva termos DESTE arquivo — logo ela só protege o que está registrado aqui.
+    #    Registrar é ato de segurança, não burocracia.
+    name: hub-formacao-enterprise (hub de formação — empresa cliente, autoridade de adoção dos próprios projetos)
+    role: hub                   # TIER 2 — autoridade de adoção LOCAL: adota e atualiza os projetos dela
+                                # (Camada 2). NÃO recebe autoria do framework (create-*/evolve/graph/
+                                # inventory, core-only) nem federação cross-empresa (Camada 3).
+    kind: adopter
+    parent: onion-evolve
+    remote: n/a                 # repo LOCAL; criar remoto é ato outward-facing e não foi autorizado
+    local_path: "/home/marcio/avansat"
+    onion_version: f32e2f931c73 # pin da adoção (2026-09-25); VERIFICAR com pin-integrity-check.sh após o 1º push
+    adopted_at: 2026-09-25
+    mode: greenfield            # repo novo; gate PROVADO por execução (commit-sonda barrado), lint 0 HARD / 9 SOFT
+    # ⚠️ CONFIDENCIALIDADE — este repo carrega o MÉTODO e os padrões que a própria equipe do cliente
+    #    escrever. Material do cliente NÃO entra, nem em repo privado: exemplo, quando necessário,
+    #    com dado fictício DECLARADO como fictício.
+    personality_summary: "Hub de formação: a empresa cliente recebe o framework para conduzir o ciclo Onion nos próprios projetos, com a equipe de engenharia construindo os artefatos durante o treinamento (hands-on, não documentação) e o mesmo método adaptado depois aos times de negócio/produto. Foi o PRIMEIRO adotante a nascer com lint VERDE (0 HARD) — possível só porque a cura da REGRA 84 (Índice de leitura do KG em sincronia com os traces) entrou no core no dia anterior; até então todo adotante nascia com 1 HARD por defeito da fonte."
+    specializations: [hub-de-adocao, formacao-hands-on, company-brain, spec-as-code]
+    personality_last_sync: 2026-09-25   # seed manual
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
   - id: sacola-de-ideias
     name: Sacola de Ideias (site institucional — Astro)
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados

@@ -363,6 +363,15 @@ gustavo-pulga	specialization	field-dogfood
 gustavo-pulga	specialization	greenfield-adoption	
 gustavo-pulga	tier	standalone	
 gustavo-pulga	trust-advises	onion-evolve	
+hub-formacao-enterprise	adopts	onion-evolve	
+hub-formacao-enterprise	mode	greenfield	
+hub-formacao-enterprise	pin	f32e2f931c73	
+hub-formacao-enterprise	specialization	company-brain	
+hub-formacao-enterprise	specialization	formacao-hands-on	
+hub-formacao-enterprise	specialization	hub-de-adocao	
+hub-formacao-enterprise	specialization	spec-as-code	
+hub-formacao-enterprise	tier	hub	
+hub-formacao-enterprise	trust-advises	onion-evolve	
 iso-22301-specialist	related	/docs/build-compliance-docs	
 iso-22301-specialist	related	iso-27001-specialist	
 iso-22301-specialist	related	security-information-master	

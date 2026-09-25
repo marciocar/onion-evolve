@@ -5017,6 +5017,44 @@ run_research_lens_selftests() {
   rc=0; ONION_KG_CORPUS_FILES= ONION_KG_CORPUS_ROOT="${d}/vazio" bash "${cg}" x >/dev/null 2>&1 || rc=$?
   [ "${rc}" = 2 ] && record_pass "research-lens: (h) corpus vazio ⇒ exit 2 (fail-loud, nunca '0 achados')" \
     || record_fail "research-lens: (h)" "esperava exit 2, veio ${rc}"
+
+  # ── (h2)(h3) A SEÇÃO `edges:` NÃO PERTENCE A NENHUM NÓ ────────────────────────────────────
+  # Bug reportado pelo adotante `sge` em 2026-09-24 e reproduzido aqui: o parser abria um nó em
+  # `- id:` e engolia todo `label:` seguinte — inclusive os das ARESTAS, que também têm
+  # `- from:`/`label:`. O ÚLTIMO nó de `nodes:` herdava o label de cada aresta e ficava com o da
+  # última; e qualquer termo presente no label de QUALQUER aresta marcava `_hit` nele.
+  # ⚠️ O BUG ESTAVA ATIVO NO CORPUS DO CORE — e a frase que estava aqui antes dizia o contrário.
+  # Eu escrevi "o corpus vivo não expõe isso: antes e depois dão saída IDÊNTICA" depois de sondar
+  # com 3 termos, e mantive a frase depois de sondar com 10. Uma passada adversarial derrubou as duas
+  # medições: `claude-code-2.1-onion-2026-08.kg.yaml` tem 4 arestas ROTULADAS, e o último nó dele
+  # (`D_REGENERAR_BASELINE_POR_DESCOBERTA_NAO_POR_LISTA`) exibia o label da última aresta em vez do
+  # próprio. Os meus termos não diferenciavam os dois labels — sondar no caminho errado é NÃO ter
+  # medido, e eu transformei isso numa afirmação escrita no código, que é como uma medição ruim vira
+  # doutrina. O caso de fixture abaixo continua sendo o jeito certo de PRENDER a regressão (não
+  # depende de o corpus ter ou não uma aresta rotulada hoje); o que mudou é só a verdade sobre o
+  # alcance. E quem apontou o defeito primeiro foi o adotante, num substrato diferente.
+  mkdir -p "${d}/g5"
+  printf 'meta:\n  id: g5\n  schema_version: "1"\n  baseline: 2026-09-24\n  review_after: %s\nnodes:\n  - id: N_PRIMEIRO\n    node_type: claim\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.5\n    label: "o primeiro no, com rotulo proprio"\n  - id: N_ULTIMO\n    node_type: claim\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.5\n    label: "o ultimo no, com rotulo proprio"\nedges:\n  - from: N_PRIMEIRO\n    to: N_ULTIMO\n    edge_type: SUPPORTS\n    label: "palavradearesta que nao pertence a nenhum no"\n' "${future}" > "${d}/g5/g5.kg.yaml"
+  out="$(ONION_KG_CORPUS_FILES="${d}/g5/g5.kg.yaml" bash "${cg}" palavradearesta 2>&1)"; rc=$?
+  if [ "${rc}" = 0 ] && ! grep -q "N_ULTIMO" <<< "${out}"; then
+    record_pass "research-lens: (h2) termo só em label de ARESTA ⇒ nenhum nó casa (sem falso positivo)"
+  else record_fail "research-lens: (h2) o último nó absorveu o label da aresta" "rc=${rc}: ${out:0:300}"; fi
+  out="$(ONION_KG_CORPUS_FILES="${d}/g5/g5.kg.yaml" bash "${cg}" ultimo 2>&1)"; rc=$?
+  if [ "${rc}" = 0 ] && grep -qF "o ultimo no, com rotulo proprio" <<< "${out}"&& ! grep -qF "palavradearesta" <<< "${out}"; then
+    record_pass "research-lens: (h3) o último nó exibe o label PRÓPRIO, não o da última aresta"
+  else record_fail "research-lens: (h3) label do último nó contaminado" "rc=${rc}: ${out:0:300}"; fi
+
+  # (h4) `edges:` ANINHADO — a 1ª cura fechava o nó em qualquer chave SEM indentação, o que trata
+  # indentação e não SEÇÃO: com `graph: / nodes: / edges:` aninhados o bug sobrevivia idêntico.
+  # Achado por passada adversarial. Fora do schema de hoje, mas a guarda não dizia que só valia ali —
+  # e promessa mais larga que a medição é a classe que esta leva inteira persegue.
+  mkdir -p "${d}/g6"
+  printf 'meta:\n  id: g6\n  schema_version: "1"\n  baseline: 2026-09-25\n  review_after: %s\ngraph:\n  nodes:\n    - id: N_UM\n      node_type: claim\n      plane: DEV\n      status: confirmed\n      impact: 2\n      confidence: 0.5\n      label: "rotulo do no um"\n    - id: N_DOIS\n      node_type: claim\n      plane: DEV\n      status: confirmed\n      impact: 2\n      confidence: 0.5\n      label: "rotulo do no dois"\n  edges:\n    - from: N_UM\n      to: N_DOIS\n      edge_type: SUPPORTS\n      label: "gamaaresta aninhada"\n' "${future}" > "${d}/g6/g6.kg.yaml"
+  out="$(ONION_KG_CORPUS_FILES="${d}/g6/g6.kg.yaml" bash "${cg}" gamaaresta 2>&1)"; rc=$?
+  local out2; out2="$(ONION_KG_CORPUS_FILES="${d}/g6/g6.kg.yaml" bash "${cg}" dois 2>&1)"
+  if [ "${rc}" = 0 ] && ! grep -q "N_DOIS" <<< "${out}"&& grep -qF "rotulo do no dois" <<< "${out2}"; then
+    record_pass "research-lens: (h4) \`edges:\` ANINHADO também não contamina o último nó"
+  else record_fail "research-lens: (h4) aninhamento escapa da cura" "rc=${rc} aresta=${out:0:200} proprio=${out2:0:200}"; fi
   # REGRA 69 — roster de fontes: last_checked vencido pela cadência ⇒ SOFT; fresco/sem last_checked ⇒ silêncio
   printf 'axes:\n  - id: ax1\n    cadence: weekly\n    sources:\n      - { url: "https://a.example/x", kind: primary, tier: 9, last_checked: "2026-01-01" }\n      - { url: "https://b.example/y", kind: primary, tier: 9, last_checked: "%s" }\n      - { url: "https://c.example/z", kind: forum, tier: 4 }\n' "$(date +%F)" > "${d}/roster.yaml"
   rc=0; out="$(ONION_RADAR_SOURCES="${d}/roster.yaml" ONION_RESEARCH_KG_DIR="${d}/nao-existe" bash "${lint}" --only=docs/onion/radar-baselines.yaml 2>&1)" || rc=$?
@@ -5203,6 +5241,35 @@ run_resolve_target_selftests() {
   if [ "$(bash "${helper}" todos 2>/dev/null | sha256sum)" = "$(bash "${helper}" todos 2>/dev/null | sha256sum)" ]; then
     record_pass "resolve-target: determinístico"
   else record_fail "resolve-target: determinismo" "varia entre execuções"; fi
+
+  # ── `todos` NÃO ENUMERA PAPÉIS: quem adota o core direto entra, qualquer que seja o papel ──
+  # Defeito medido 2026-09-25: o ramo `todos` era `tier hub` ∪ `tier standalone`, uma LISTA. A
+  # unificação de vocabulário de 2026-09-24 (`consumer`→`adopted`) criou um papel que a lista não
+  # conhecia, e `sge` — único membro `role: adopted` — saía de FORA de todo anúncio, sem gate nenhum
+  # acusar. A cura foi parar de enumerar e perguntar a tripla `adopts`.
+  # O caso prende a PROPRIEDADE, não o roster: todo membro que adota o core tem de estar em `todos`,
+  # e nenhum que adota outro pode estar. Assim ele sobrevive a membro novo e a papel novo.
+  local _tr _diretos _via_hub _fora
+  _tr="$(bash "${REPO_ROOT}/.claude/validation/graph.sh" --triples 2>/dev/null || true)"
+  local _core; _core="$(printf '%s\n' "${_tr}" | awk -F'\t' '$2=="adopts"{c[$3]++} END{m=0;for(k in c) if(c[k]>m){m=c[k];b=k}; if(b!="") print b}')"
+  if [ -z "${_core}" ]; then
+    record_skip "resolve-target: sem tripla \`adopts\` legível → paridade de papéis não medida"
+  else
+    _diretos="$(printf '%s\n' "${_tr}" | awk -F'\t' -v c="${_core}" '$2=="adopts" && $3==c{print $1}' | LC_ALL=C sort -u)"
+    _via_hub="$(printf '%s\n' "${_tr}" | awk -F'\t' -v c="${_core}" '$2=="adopts" && $3!=c{print $1}' | LC_ALL=C sort -u)"
+    _fora="$(comm -23 <(printf '%s\n' "${_diretos}") <(printf '%s\n' "${todos}"))"
+    if [ -z "${_fora// /}" ]; then
+      record_pass "resolve-target: todo adotante DIRETO do core está em \`todos\` (papel novo entra por construção)"
+    else
+      record_fail "resolve-target: adotante direto FORA de \`todos\`" "papel não enumerado ficou invisível ao anúncio: $(printf '%s' "${_fora}" | tr '\n' ' ')"
+    fi
+    local _intruso; _intruso="$(comm -12 <(printf '%s\n' "${_via_hub}") <(printf '%s\n' "${todos}"))"
+    if [ -z "${_intruso// /}" ]; then
+      record_pass "resolve-target: quem adota um HUB fica fora de \`todos\` (RFC-0003 §2.1 intacta)"
+    else
+      record_fail "resolve-target: T2 entrou em \`todos\`" "recebe do core em vez de pelo hub: $(printf '%s' "${_intruso}" | tr '\n' ' ')"
+    fi
+  fi
 }
 
 # ---------------------------------------------------------------------------
@@ -9608,13 +9675,30 @@ case "$args" in
   *"pr view"*headRefOid*)          echo "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"; exit 0 ;;
   *"pr view"*headRepositoryOwner*) echo "owner/repo"; exit 0 ;;
   *"pr view"*headRefName*)         echo "feat/alguma-coisa"; exit 0 ;;
-  *"pr view"*statusCheckRollup*)   echo "SUCCESS"; exit 0 ;;
+  *"pr view"*statusCheckRollup*)
+      if [ -n "${GH_VERDICT_FAIL:-}" ]; then echo "FAILURE"; else echo "SUCCESS"; fi; exit 0 ;;
   *"pr view"*state,mergedAt*)
       n=$(cat "${STUB_N}" 2>/dev/null || echo 0); n=$((n+1)); echo "$n" > "${STUB_N}"
       if [ "$n" -eq 1 ]; then v="${GH_STATE_BEFORE}"; else v="${GH_STATE_AFTER}"; fi
       [ -n "$v" ] && echo "$v"; exit 0 ;;
-  *"api "*check-runs*)             printf 'selftest\tcompleted\tsuccess\n'; exit 0 ;;
-  *"pr checks"*)                   printf 'selftest\tpass\t1s\turl\n'; exit 0 ;;
+  *"pr comment"*)
+      # grava o CORPO do comentário — o esboço tem de ver o que o SUT de fato POSTA.
+      # Sem isto, "gh saiu 0" seria a única prova, e foi exatamente esse rc que mentiu no #874.
+      printf '%s' "${2-}" > /dev/null
+      body=""; prev=""
+      for a in "$@"; do [ "$prev" = "--body" ] && body="$a"; prev="$a"; done
+      printf '%s' "$body" > "${STUB_COMMENT}"
+      exit "${GH_COMMENT_RC:-0}" ;;
+  *"api "*check-runs*)
+      if [ -n "${GH_VERDICT_FAIL:-}" ]; then
+        printf 'onion-review-verdict\tcompleted\tfailure\n'
+      fi
+      printf 'selftest\tcompleted\tsuccess\n'; exit 0 ;;
+  *"pr checks"*)
+      if [ -n "${GH_VERDICT_FAIL:-}" ]; then
+        printf 'onion-review-verdict\tfail\t7s\turl\n'
+      fi
+      printf 'selftest\tpass\t1s\turl\n'; exit 0 ;;
   *"pr merge"*)                    printf '%s\n' "${GH_MERGE_OUT}"; exit "${GH_MERGE_RC}" ;;
 esac
 exit 0
@@ -9697,7 +9781,263 @@ STUB
   if [ "${_mv_rc}" -ne 0 ] && grep -q "NÃO CONSEGUI LER o estado do PR" <<< "${_mv_out}"; then
     record_pass "pr-merge-verified: (k) rc=0 com estado ilegível ⇒ die que DIZ que não leu"
   else record_fail "pr-merge-verified: (k)" "rc=${_mv_rc} out=${_mv_out}"; fi
-  unset -f _mv
+
+  # ── (l)(m)(n) O REGISTRO DA DISPENSA É CONTADO, NÃO PRESUMIDO ─────────────────────────
+  # Defeito medido no merge do PR #874 (2026-09-25): o corpo era montado com
+  # `printf '%s\n' \\` — DOIS contra-barras. O primeiro escapava o segundo, o `printf` recebia
+  # um contra-barra literal e a linha ACABAVA ali; as linhas seguintes viraram comando e o
+  # bash tentou executá-las (`## ⚠️ Merge com check DISPENSADO: command not found`).
+  # O `gh pr comment` postou `\`, saiu 0, o `die` não disparou, e o script imprimiu
+  # "✓ dispensa registrada" — para um registro que não registrava NADA. O próprio bloco se
+  # descreve como "PRECONDIÇÃO do merge, não cortesia"; ele declarava mais do que media.
+  # A bancada ATRAVESSA o `gh`: lê o corpo que o SUT postou, e não o rc de quem postou.
+  _mvd() { # $1=before $2=after $3=merge_rc $4=merge_out ; resto = flags do SUT
+    local b="$1" a="$2" mr="$3" mo="$4"; shift 4
+    echo 0 > "${d}/n"; : > "${d}/comment"
+    _mv_out="$(PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_COMMENT="${d}/comment" \
+               GH_STATE_BEFORE="$b" GH_STATE_AFTER="$a" GH_VERDICT_FAIL=1 \
+               GH_MERGE_RC="$mr" GH_MERGE_OUT="$mo" bash "${sut}" 999 "$@" 2>&1)"
+    _mv_rc=$?
+  }
+  local _reason="saldo da conta de API zerado — HTTP 400 no pré-voo"
+  M="MERGED|$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+  # (l) o corpo postado carrega o cabeçalho, o NOME do check e o MOTIVO — os três.
+  _mvd "OPEN|null" "${M}" 0 "merged" --dispensa onion-review-verdict --motivo "${_reason}"
+  if [ "${_mv_rc}" -eq 0 ] \
+     && grep -qF "Merge com check DISPENSADO" "${d}/comment" \
+     && grep -qF "onion-review-verdict" "${d}/comment" \
+     && grep -qF "${_reason}" "${d}/comment"; then
+    record_pass "pr-merge-verified: (l) dispensa ⇒ o corpo POSTADO traz cabeçalho+check+motivo"
+  else
+    record_fail "pr-merge-verified: (l) registro vazio (o defeito do #874)" \
+      "rc=${_mv_rc} corpo=[$(cat "${d}/comment")] out=${_mv_out}"
+  fi
+
+  # (m) MUTANTE: com o corpo mutilado (o bug exato), o SUT tem de MORRER antes de postar.
+  #     Sem este caso, (l) sozinho não prova que a guarda existe — provaria só que o printf
+  #     voltou a funcionar, e o printf já "funcionava" (saía 0) enquanto postava `\`.
+  local _mut="${d}/sut-mutante.sh"
+  # O mutante RE-INTRODUZ o bug exato: acrescenta UM contra-barra à linha do `printf`, virando
+  # `\` em `\\`. Ancorado por `index()` (string literal, ZERO escape de regex) — a 1ª versão
+  # usava `sed` com cinco níveis de escape e não casava nada, e mutante que não muta declara
+  # verde sem medir: a própria classe de defeito que esta família persegue.
+  awk 'index($0,"_reg=\"$(printf")>0 { print $0 "\\"; next } { print }' "${sut}" > "${_mut}"
+  if ! cmp -s "${sut}" "${_mut}"; then
+    echo 0 > "${d}/n"; : > "${d}/comment"
+    _mv_out="$(PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_COMMENT="${d}/comment" \
+               GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" GH_VERDICT_FAIL=1 \
+               GH_MERGE_RC=0 GH_MERGE_OUT=merged bash "${_mut}" 999 \
+               --dispensa onion-review-verdict --motivo "${_reason}" 2>&1)"; _mv_rc=$?
+    if [ "${_mv_rc}" -ne 0 ] && grep -q "INCOMPLETO" <<< "${_mv_out}"; then
+      record_pass "pr-merge-verified: (m) mutante (corpo mutilado) ⇒ die ANTES de postar"
+    else
+      record_fail "pr-merge-verified: (m) o mutante SOBREVIVEU — a guarda não conta o corpo" \
+        "rc=${_mv_rc} corpo=[$(cat "${d}/comment")] out=${_mv_out}"
+    fi
+  else
+    record_fail "pr-merge-verified: (m) âncora do mutante não casou" \
+      "o sed não alterou o SUT — a linha do printf mudou de forma; reancore o mutante"
+  fi
+
+  # (n) a guarda NÃO é fail-open pelo rc do gh: corpo bom, mas o POST falhando ⇒ die.
+  #     (a direção que já existia; o caso a fixa para que a cura de (m) não a apague)
+  echo 0 > "${d}/n"; : > "${d}/comment"
+  _mv_out="$(PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_COMMENT="${d}/comment" \
+             GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" GH_VERDICT_FAIL=1 GH_COMMENT_RC=1 \
+             GH_MERGE_RC=0 GH_MERGE_OUT=merged bash "${sut}" 999 \
+             --dispensa onion-review-verdict --motivo "${_reason}" 2>&1)"; _mv_rc=$?
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "não consegui REGISTRAR a dispensa" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (n) post do registro falhando ⇒ die (precondição intacta)"
+  else record_fail "pr-merge-verified: (n)" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  unset -f _mv _mvd
+}
+
+# ═══ REGRA 90 — paridade papel: o SCRIPT aceita, a PROSA menciona ═════════════════════════
+# POR QUE EXISTE: a classe desencontrou DUAS vezes em sentidos opostos (2026-09-17 script estreito +
+# prosa larga; 2026-09-25 script largo + prosa estreita, reportado por um adotante `hub`). O POR QUE
+# completo vive no `command-role-parity-check.sh`.
+# ⚠️ A INVOCAÇÃO AQUI ESPELHA A DA PRODUÇÃO — `bash "${sc}" "<root>"` — porque é isso que a REGRA 59
+# (Modo que a produção consome é exercitado pela bancada) cobra, e porque um harness que chama o SUT
+# de um jeito que ninguém usa mede um programa diferente ([[bancada-espelha-o-runner]]).
+# ═══ onion-review.yml — a CAUSA do pré-voo classificada por faixa (frente sem bancada) ════
+# POR QUE EXISTE: a passada adversarial de 2026-09-25 mediu `grep -c "preflight_causa\|PF_CAUSA" = 0`
+# — a frente que carrega a atribuição de causa e a anotação do check era a ÚNICA do diff sem o
+# "contar, não presumir" que ele aplica às irmãs. E o defeito estava lá: o rótulo dizia "falha da
+# CREDENCIAL" para `HTTP 000` (timeout/DNS) e `529` (capacidade), num diff cuja tese é que saldo e
+# credencial são problemas diferentes com ações diferentes.
+# ⚠️ O SUT é shell EMBUTIDO em YAML. O caso EXTRAI o bloco do próprio workflow (não uma cópia
+# reescrita aqui) e o executa — cópia paralela é o modo-de-falha clássico: ela continua passando
+# depois de o workflow mudar ([[bancada-espelha-o-runner]]).
+run_review_cause_bands_selftests() {
+  local wf="${REPO_ROOT}/.github/workflows/onion-review.yml"
+  if [ ! -f "${wf}" ]; then record_skip "review-cause-bands: workflow ausente (adotante) → pulado"; return; fi
+  if ! grep -q '_causa_txt=""' "${wf}"; then
+    record_fail "review-cause-bands" "bloco \`_causa_txt\` não encontrado em ${wf} — a frente perdeu a classificação de causa, ou o âncora mudou"
+    return
+  fi
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  # Extrai do `_causa_txt=""` até o `fi` que fecha o bloco, tirando a indentação do YAML.
+  awk '/_causa_txt=""/{f=1} f{print} f&&/^          fi$/{exit}' "${wf}" \
+    | sed 's/^          //' > "${d}/bands.sh"
+  if ! bash -n "${d}/bands.sh" 2>/dev/null; then
+    record_fail "review-cause-bands" "o bloco extraído não é shell válido — a extração ou o bloco quebrou"
+    return
+  fi
+  _band() { # $1=http $2=corpo ; devolve _band_txt
+    _band_txt="$(PF_HTTP="$1" PF_CAUSA="$2" bash -c 'set -u; source "$0"; printf "%s" "${_causa_txt}"' "${d}/bands.sh" 2>&1)"
+  }
+  local _band_txt
+  _band 400 '{"error":{"message":"Your credit balance is too low to access the Anthropic API"}}'
+  if grep -qF "SALDO" <<< "${_band_txt}"&& ! grep -qiF "credencial foi recusada" <<< "${_band_txt}"; then
+    record_pass "review-cause-bands: 400 + 'credit balance' ⇒ SALDO (ação: repor crédito)"
+  else record_fail "review-cause-bands: saldo" "txt=${_band_txt}"; fi
+
+  _band 000 ''
+  if grep -qF "NÃO OBTEVE RESPOSTA" <<< "${_band_txt}"&& grep -qF "não credencial" <<< "${_band_txt}"; then
+    record_pass "review-cause-bands: 000 ⇒ rede/DNS/timeout, e DIZ que não é credencial"
+  else record_fail "review-cause-bands: 000 rotulado como credencial" "txt=${_band_txt}"; fi
+
+  _band 529 '{"type":"overloaded_error"}'
+  if grep -qF "CAPACIDADE" <<< "${_band_txt}"; then
+    record_pass "review-cause-bands: 529 ⇒ capacidade da API (nada a consertar aqui)"
+  else record_fail "review-cause-bands: 529 rotulado errado" "txt=${_band_txt}"; fi
+
+  _band 401 '{"type":"authentication_error"}'
+  if grep -qF "CREDENCIAL" <<< "${_band_txt}"; then
+    record_pass "review-cause-bands: 401 ⇒ credencial recusada (esta SIM é credencial)"
+  else record_fail "review-cause-bands: 401" "txt=${_band_txt}"; fi
+
+  _band 418 'algo exotico'
+  if grep -qF "NÃO classifico" <<< "${_band_txt}"; then
+    record_pass "review-cause-bands: faixa desconhecida ⇒ declara que NÃO classifica (nunca chuta)"
+  else record_fail "review-cause-bands: chutou uma faixa" "txt=${_band_txt}"; fi
+
+  _band 200 ''
+  if [ -z "${_band_txt}" ]; then
+    record_pass "review-cause-bands: 200 ⇒ silêncio (sem causa para narrar)"
+  else record_fail "review-cause-bands: 200 gerou causa" "txt=${_band_txt}"; fi
+
+  # A CAUSA PRECISA VIAJAR: sem os outputs, o verdict volta a dizer só `sem-arquivo`.
+  if grep -q 'preflight_causa: ${{ steps.preflight.outputs.causa }}' "${wf}" \
+     && grep -q 'PF_CAUSA: ${{ needs.onion-review.outputs.preflight_causa }}' "${wf}"; then
+    record_pass "review-cause-bands: a causa VIAJA do pré-voo ao verdict (output do job + env do step)"
+  else record_fail "review-cause-bands: a causa não viaja" "output ou env ausente — o verdict volta a ser mudo"; fi
+  unset -f _band
+}
+
+run_command_role_parity_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/command-role-parity-check.sh"
+  if [ ! -f "${sut}" ]; then record_fail "command-role-parity" "SUT ausente: ${sut}"; return; fi
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  local H="${d}/.claude/utils/co-evolution" C="${d}/.claude/commands/meta"
+  mkdir -p "${H}" "${C}"
+  _crp() { # $1=conteudo do helper ; $2=conteudo da prosa ; devolve saida+rc em _crp_out/_crp_rc
+    printf '%s\n' "$1" > "${H}/co-relay.sh"
+    printf '%s\n' "$2" > "${C}/co-relay.md"
+    # ⚠️ `cmd; rc=$?` MATA a suíte sob `set -e` — o próprio harness avisa isso, e eu levei a pancada
+    # aqui na 1ª volta. `if` é o único jeito de capturar rc sem abortar ([[bancada-espelha-o-runner]]).
+    if _crp_out="$(bash "${sut}" "${d}" 2>&1)"; then _crp_rc=0; else _crp_rc=$?; fi
+  }
+  local HELPER_LARGO='case "${ROLE}" in
+  adopted|hub|standalone) : ;;
+  *) exit 2 ;;
+esac'
+  local HELPER_ESTREITO='case "${ROLE}" in
+  adopted) : ;;
+  *) exit 2 ;;
+esac'
+
+  # (a) prosa ESTREITA vs helper LARGO ⇒ acusa, e NOMEIA os papéis que faltam (o caso de 2026-09-25)
+  _crp "${HELPER_LARGO}" '- `role: adopted` -> ADOTANTE -> segue.'
+  if [ "${_crp_rc}" -eq 1 ] && grep -q "hub" <<< "${_crp_out}"&& grep -q "standalone" <<< "${_crp_out}"; then
+    record_pass "command-role-parity: (a) prosa estreita ⇒ acusa e NOMEIA hub+standalone"
+  else record_fail "command-role-parity: (a)" "rc=${_crp_rc} out=${_crp_out}"; fi
+
+  # (b) prosa COMPLETA ⇒ silêncio (a cura não vira ruído permanente)
+  _crp "${HELPER_LARGO}" '- `role: adopted`, `hub` ou `standalone` -> ALVO -> segue.'
+  if [ "${_crp_rc}" -eq 0 ] && [ -z "${_crp_out}" ]; then
+    record_pass "command-role-parity: (b) prosa completa ⇒ silêncio"
+  else record_fail "command-role-parity: (b) falso positivo" "rc=${_crp_rc} out=${_crp_out}"; fi
+
+  # (c) helper ESTREITO + prosa larga ⇒ silêncio DESTA regra. Direção deliberada e declarada: a
+  #     assimetria de 2026-09-17 é bug do SCRIPT, não da prosa, e esta guarda cobra a prosa. Fingir
+  #     que ela cobre os dois sentidos seria declarar mais do que mede.
+  _crp "${HELPER_ESTREITO}" '- `role: adopted`, `hub` ou `standalone` -> ALVO -> segue.'
+  if [ "${_crp_rc}" -eq 0 ]; then
+    record_pass "command-role-parity: (c) helper estreito + prosa larga ⇒ silêncio (fronteira declarada)"
+  else record_fail "command-role-parity: (c) cobrou fora do escopo" "rc=${_crp_rc} out=${_crp_out}"; fi
+
+  # (d) FORMATO DO `case` MUDOU ⇒ a guarda diz que NÃO PUDE JULGAR, em vez de passar em silêncio.
+  #     É o caso que separa esta guarda de uma que declara verde por não reconhecer nada.
+  _crp 'if [ "${ROLE}" = "$(cat /dev/null)" ]; then :; fi' '- `role: adopted` -> ADOTANTE'
+  # rc EXATAMENTE 3, não "≠0": a 1ª versão da guarda DECLARAVA rc 3 no cabeçalho e emitia rc 1, e o
+  # caso aceitava qualquer não-zero — logo passava verde sobre a inconsistência que devia pegar.
+  if grep -q "NAO PUDE JULGAR" <<< "${_crp_out}"&& [ "${_crp_rc}" -eq 3 ]; then
+    record_pass "command-role-parity: (d) case irreconhecível ⇒ rc=3 (NÃO PUDE JULGAR, não divergência)"
+  else record_fail "command-role-parity: (d) rc errado ou silêncio" "rc=${_crp_rc} (esperado 3) out=${_crp_out}"; fi
+
+  # (e) SEM par presente (adotante sem co-evolução) ⇒ SEM OBJETO, exit 0 — não nasce vermelho.
+  local e; e="$(mktemp -d)"
+  local _e_out _e_rc
+  if _e_out="$(bash "${sut}" "${e}" 2>&1)"; then _e_rc=0; else _e_rc=$?; fi
+  rm -rf "${e}"
+  if [ "${_e_rc}" -eq 0 ] && grep -q "SEM OBJETO" <<< "${_e_out}"; then
+    record_pass "command-role-parity: (e) sem par helper/comando ⇒ SEM OBJETO (adotante não nasce vermelho)"
+  else record_fail "command-role-parity: (e)" "rc=${_e_rc} out=${_e_out}"; fi
+
+  # (f) O COMENTÁRIO DA PRÓPRIA GUARDA não pode contar como aceitação de papel. Ela cita
+  #     `adopted|hub|standalone` em prosa no topo; se o parser lesse comentário, ela se auto-satisfaria.
+  _crp '# prosa de comentario citando adopted|hub|standalone sem decidir nada
+ROLE_CHECK=nada' '- `role: adopted` -> ADOTANTE'
+  if grep -q "NAO PUDE JULGAR" <<< "${_crp_out}"&& [ "${_crp_rc}" -eq 3 ]; then
+    record_pass "command-role-parity: (f) papel citado só em COMENTÁRIO não conta como aceito"
+  else record_fail "command-role-parity: (f) comentário virou aceitação" "rc=${_crp_rc} out=${_crp_out}"; fi
+
+  # (g) PRECEDÊNCIA: um par DIVERGENTE e outro ILEGÍVEL no mesmo run ⇒ rc=1, não 3. Esconder o que se
+  #     sabe atrás do que não se sabe é o modo-de-falha que esta ordem existe para impedir.
+  printf '%s\n' 'case "${ROLE}" in
+  adopted|hub|standalone) : ;;
+esac' > "${H}/co-relay.sh"
+  printf '%s\n' '- `role: adopted` -> ADOTANTE' > "${C}/co-relay.md"
+  printf '%s\n' 'ROLE_CHECK=nada' > "${H}/co-deliver.sh"
+  printf '%s\n' '- prosa qualquer' > "${C}/co-deliver.md"
+  local _g_out _g_rc
+  if _g_out="$(bash "${sut}" "${d}" 2>&1)"; then _g_rc=0; else _g_rc=$?; fi
+  rm -f "${H}/co-deliver.sh" "${C}/co-deliver.md"
+  if [ "${_g_rc}" -eq 1 ] && grep -q "nao menciona papel" <<< "${_g_out}"&& grep -q "NAO PUDE JULGAR" <<< "${_g_out}"; then
+    record_pass "command-role-parity: (g) divergência + ilegível no mesmo run ⇒ rc=1 (o sabido tem precedência)"
+  else record_fail "command-role-parity: (g) precedência errada" "rc=${_g_rc} (esperado 1) out=${_g_out}"; fi
+
+  # ── (h)(i) OS DOIS ACHADOS DA PASSADA ADVERSARIAL DE 2026-09-25 ──────────────────────────
+  # (h) FRONTEIRA DE PALAVRA: a 1ª versão usava `grep -qiF "hub"`, que casa dentro de `GitHub`.
+  #     Uma prosa SEM o papel `hub` mas com "Abra o PR no GitHub" satisfazia a guarda — a regra
+  #     criada para matar o silêncio sobre `hub` ficava silenciosa pela palavra mais provável de
+  #     aparecer num comando de co-evolução. Estava viva por sorte.
+  #     ⚠️ O helper do caso inclui `source` DE PROPÓSITO: a 1ª redação exigia que a saída cobrasse
+  #     `source` sem que o `case` o aceitasse, e o caso reprovou uma guarda CORRETA. A asserção
+  #     passa pelo mesmo escrutínio do SUT ([[mutant-anchor-is-a-defect-candidate]]).
+  _crp 'case "${ROLE}" in
+  adopted|hub|standalone|source) : ;;
+esac' '- `role: adopted` -> segue. Abra o PR no GitHub. Projeto open source.'
+  if [ "${_crp_rc}" -eq 1 ] && grep -q "hub" <<< "${_crp_out}"&& grep -q "source" <<< "${_crp_out}"; then
+    record_pass "command-role-parity: (h) 'GitHub'/'open source' NÃO satisfazem os papéis hub/source"
+  else record_fail "command-role-parity: (h) substring virou papel" "rc=${_crp_rc} out=${_crp_out}"; fi
+
+  # (i) COMENTÁRIO NO HELPER não sustenta aceitação — e o caso usa a forma REAL que passava:
+  #     uma linha `# ... role: (adopted|hub|standalone) ...` em comentário. O `co-relay.sh` de
+  #     produção TEM essa linha; medido, ela sozinha mantinha a guarda exigindo `hub` da prosa
+  #     mesmo com o `case` estreitado para `adopted)`. Era prosa comparada contra prosa, com o
+  #     cabeçalho da guarda afirmando o oposto.
+  _crp '# o espelho downstream valida role: (adopted|hub|standalone) e entrega a hub/standalone
+case "${ROLE}" in
+  adopted) : ;;
+esac' '- `role: adopted` -> ADOTANTE -> segue.'
+  if [ "${_crp_rc}" -eq 0 ] && [ -z "${_crp_out}" ]; then
+    record_pass "command-role-parity: (i) papel só em COMENTÁRIO do helper ⇒ não é aceito (silêncio)"
+  else record_fail "command-role-parity: (i) comentário sustentou a exigência" "rc=${_crp_rc} out=${_crp_out}"; fi
+  unset -f _crp
 }
 
 run_assemble_plugin_selftests() {
@@ -10816,7 +11156,11 @@ run_codeliver_selftests() {
     printf '# anúncio de teste\n' > "$1/docs/evolution/federation/outbox/alvo/2026-01-01-anuncio.md"
     {
       printf 'members:\n'
-      printf '  - id: alvo\n    role: standalone\n    name: "Alvo Teste"\n'
+      # $3 = role (default standalone, o comportamento histórico) · $4 = parent (vazio = sem campo).
+      # Os dois entraram em 2026-09-25 para exercitar o papel `adopted`, que NENHUM caso cobria — e era
+      # justamente o papel que o carteiro recusava por engano depois da unificação de vocabulário.
+      printf '  - id: alvo\n    role: %s\n    name: "Alvo Teste"\n' "${3:-standalone}"
+      if [ -n "${4:-}" ]; then printf '    parent: %s\n' "$4"; fi
       if [ -n "$2" ]; then printf '    local_path: "%s"   # comentário inline (caso real do members.yaml)\n' "$2"; fi
     } > "$1/docs/evolution/federation/members.yaml"
   }
@@ -10872,6 +11216,37 @@ run_codeliver_selftests() {
     record_pass "co-deliver: (e) stamp com role: source → recusa (downstream é para consumidor)"
   else record_fail "co-deliver: (e) papel do alvo" "rc=${rc} out=${out}"; fi
   rm -rf "${core}" "${other}"
+
+  # ── (f)(g)(h) O PAPEL `adopted` — o que a unificação de vocabulário de 2026-09-24 criou ─────────
+  # Nenhum caso exercitava `role: adopted`, e era exatamente o papel que o carteiro recusava por
+  # engano: `sge` (único membro `adopted` do registro real) ficava fora de TODO anúncio, e o
+  # `resolve-target todos` nem o listava. Silencioso nas duas pontas, nenhum gate acusando.
+  local c2 t2 rc2
+  # (f) adopted + parent = core ⇒ ENTREGA (é T3, adota o core direto)
+  c2="$(mktemp -d)"; t2="$(mktemp -d)"; mk_deliver_adopter "${t2}"; mk_deliver_core "${c2}" "${t2}" adopted onion-evolve
+  rc2=0; ( cd "${c2}" && bash "${helper}" alvo ) >/dev/null 2>&1 || rc2=$?
+  if [ "${rc2}" -eq 0 ] && ls "${t2}/docs/evolution/inbound/"*.md >/dev/null 2>&1; then
+    record_pass "co-deliver: (f) role adopted + parent=core ⇒ ENTREGA (T3 adota o core direto)"
+  else record_fail "co-deliver: (f) adotante direto recusado" "rc=${rc2} — o furo de 2026-09-25 voltou"; fi
+  rm -rf "${c2}" "${t2}"
+
+  # (g) adopted + parent = um HUB ⇒ RECUSA, e a mensagem NOMEIA o hub (RFC-0003 §2.1 intacta)
+  c2="$(mktemp -d)"; t2="$(mktemp -d)"; mk_deliver_adopter "${t2}"; mk_deliver_core "${c2}" "${t2}" adopted algum-hub
+  local out2
+  if out2="$( ( cd "${c2}" && bash "${helper}" alvo ) 2>&1 )"; then rc2=0; else rc2=$?; fi
+  if [ "${rc2}" -ne 0 ] && grep -qF "algum-hub" <<< "${out2}"; then
+    record_pass "co-deliver: (g) role adopted + parent=hub ⇒ recusa NOMEANDO o hub (T2 recebe pelo hub)"
+  else record_fail "co-deliver: (g) T2 recebeu do core" "rc=${rc2} out=${out2:0:200}"; fi
+  rm -rf "${c2}" "${t2}"
+
+  # (h) adopted SEM parent ⇒ recusa PEDINDO o campo. `adopted` é a palavra ambígua (nomeia o direto e
+  #     o adotado-por-hub); escolher um lado por conveniência seria decidir o que não se sabe.
+  c2="$(mktemp -d)"; t2="$(mktemp -d)"; mk_deliver_adopter "${t2}"; mk_deliver_core "${c2}" "${t2}" adopted ""
+  if out2="$( ( cd "${c2}" && bash "${helper}" alvo ) 2>&1 )"; then rc2=0; else rc2=$?; fi
+  if [ "${rc2}" -ne 0 ] && grep -qF "parent:" <<< "${out2}"; then
+    record_pass "co-deliver: (h) adopted SEM parent ⇒ recusa PEDINDO o campo (não escolhe um lado)"
+  else record_fail "co-deliver: (h) decidiu sem saber" "rc=${rc2} out=${out2:0:200}"; fi
+  rm -rf "${c2}" "${t2}"
 }
 
 # ---------------------------------------------------------------------------
@@ -18515,6 +18890,8 @@ _family run_pretooluse_veto_selftests
 _family run_version_drift_selftests
 _family run_premodelswitch_guard_selftests
 _family run_research_lens_selftests
+_family run_command_role_parity_selftests
+_family run_review_cause_bands_selftests
 _family run_research_workflow_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
