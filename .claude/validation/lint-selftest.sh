@@ -17589,7 +17589,15 @@ run_door_selftests() {
           | tar -C "${REPO_ROOT}" --null -T - -cf - 2>/dev/null | tar -x -C "${fake}" 2>/dev/null; then
     rm -f "${fake}/.claude/utils/adopt/regen-ssot-projections.sh"
     local _out_g
-    _out_g="$(bash "${fake}/ops/materialize-door.sh" "${d6}" --role standalone 2>&1 || true)"
+    # ⚠️ `--from HEAD` DELIBERADO, e o porquê importa: desde 2026-09-25 o script resolve a fonte em
+    #    `origin/<integração>` e ABORTA fail-closed se ela não resolver (a porta não nasce sem saber de
+    #    onde vem). O core falso deste caso é um CLONE RASO, e no CI — onde o próprio checkout é raso —
+    #    `origin/main` não existe nele; o abort disparava ANTES do passo que este caso mede, e a
+    #    família caía por um motivo que nada tem a ver com o regenerador. Medido: passou local (a ref
+    #    existe aqui) e falhou no CI, que é a assinatura de bancada medindo ambiente em vez de artefato.
+    #    Este caso é sobre o REGENERADOR ausente; a fonte é satisfeita explicitamente para ele chegar lá.
+    #    Quem cobre a resolução de fonte são os casos (0)/(0b), que existem justamente para isso.
+    _out_g="$(bash "${fake}/ops/materialize-door.sh" "${d6}" --role standalone --from HEAD 2>&1 || true)"
     if grep -q 'regen-ssot-projections.sh AUSENTE' <<< "${_out_g}"; then
       record_pass "door: (g) sem regenerador em lugar nenhum → a guarda DECLARA (nunca calada)"
     else record_fail "door: (g)" "seguiu calada sem o regenerador: $(_emit "${_out_g}" | tail -3 | head -c 200)"; fi
