@@ -1,7 +1,7 @@
 ---
 branch: worktree-docs+typesafe-ai-desmembramento
 date: 2026-09-21
-reviewed_diff_sha256: 9597645bdbdd50fc79df27d64cc17999dfc3b3638e9310a37887c4936cc75109
+reviewed_diff_sha256: 2cee849641d452f9968c51275414078de61f1b7510318b3160a9256bb2d62421
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
@@ -153,3 +153,12 @@ leva vizinha. `meta.review_after` do grafo é **2026-10-21** — a pesquisa não
 passou de `MERGEABLE` a `CONFLICTING`. Rebase limpo desta vez; as projeções foram regeneradas contra
 o main novo e as duas SOFT das portas **desapareceram sozinhas** — elas eram defasagem de baseline,
 não defeito deste PR. Lint: **0 HARD / 14 SOFT**, o mesmo número da main.
+
+⚠️ **E o CI pegou um erro meu de ORDEM, que o lint local não podia pegar.** Computei o SHA com o
+`testing-state.md` ainda **não commitado** e depois commitei conteúdo e resíduo **juntos** — então o diff
+real ficou diferente do carimbado, e a REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)
+reprovou no CI com **1 HARD** enquanto o lint local dava 0. O local não tinha como ver: ele rodou
+**antes** do commit, sobre um estado que deixou de existir.
+A ordem correta é a que esta casa já escreveu e eu já errei quatro vezes nesta sessão: **conteúdo
+primeiro, TODO ele → computa o SHA → resíduo em commit PRÓPRIO.** Commitar os dois juntos torna o
+carimbo velho no instante em que ele nasce.
