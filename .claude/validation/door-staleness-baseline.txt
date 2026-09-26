@@ -170,5 +170,15 @@
 #   workflow `onion-door-staleness` disparou 4 SEGUNDOS apos o merge do #872, nomeou as duas portas com
 #   os numeros e entregou os 4 passos da cura — e o #872 mergeou SEM a porta o bloquear. Pela primeira
 #   vez em 20 materializacoes, este arquivo nao registra "o gate fica VERMELHO ate o push".
-onion-standalone 418
+#
+# 2026-09-26 (22a materializacao): `onion-core` volta a ZERO — publicada em 232bba50ccc8 e VERIFICADA
+#   no remoto (5063e81b2d8d, por `gh api`), cobrindo as duas levas mergeadas no dia (#875 e #876).
+#   `onion-standalone` 418->421: passivo REAL da porta parada desde 2026-07-19, nao trabalho novo —
+#   a subida e a catraca fazendo o que deve, registrando que aquela porta segue sem re-materializacao.
+# ⚠️ E O QUE ESTA LEVA ENSINOU SOBRE ESTE ARQUIVO: o `--emit-baseline` devolve SO as duas linhas de
+#   dado. Redirecionar a saida dele por cima deste arquivo apagaria ~170 linhas de historico — e essa
+#   saida destrutiva e PLAUSIVEL, porque o gerador sai 0 e o arquivo fica nao-vazio. Por isso a
+#   atualizacao aqui e CIRURGICA nas duas linhas de dado. Quem automatizar isto um dia tem de
+#   preservar o historico, que e o unico lugar onde o PORQUE de cada numero mora.
+onion-standalone 421
 onion-core 0
