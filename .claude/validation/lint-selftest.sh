@@ -17489,7 +17489,10 @@ run_door_seal_pin_selftests() {
   _doorway_stamp() {  # $1 = pin declarado
     printf 'role: hub\nadopted_from: onion-fakecore\nonion_version: %s\nmaterialized_at: 2026-09-26\n' "$1" > "${doorway}/.claude/.onion-version"
     git -C "${doorway}" add -A >/dev/null 2>&1
-    git -C "${doorway}" -c user.email=t@t -c user.name=t commit -q -m "stamp $1" 2>/dev/null
+    # `|| true`: chamar o helper duas vezes com o MESMO pin não tem o que commitar, e `git commit`
+    # sai não-zero aí — que sob `set -e` mata a suíte inteira, sem registrar nenhum ✗. Terceira vez
+    # nesta leva que essa armadilha aparece; o helper passa a tolerá-la em vez de cada caso lembrar.
+    git -C "${doorway}" -c user.email=t@t -c user.name=t commit -q -m "stamp $1" 2>/dev/null || true
   }
   _registry() {  # $1 = kind ; $2 = pin no registro
     { printf 'members:\n'
@@ -17569,7 +17572,35 @@ STUB
   else record_fail "door-seal-pin: (h) dry-run escreveu" "rc=${_r} out=${_o:0:200}"; fi
 
   # (i) stamp com pin ILEGÍVEL ⇒ rc=2. Não se carimba o que não se consegue ler.
+  # ── (j)(k) O DEFEITO QUE O PRÓPRIO DOGFOOD ACHOU, na 1ª execução real (2026-09-26) ──────────
+  # A v1 lia o pin do stamp da ÁRVORE DE TRABALHO. Rodado depois de materializar e ANTES de commitar,
+  # ele lia o pin NOVO (só no disco) e comparava `HEAD` do clone com o remoto — e `HEAD` ainda era o
+  # commit antigo, IGUAL ao remoto. As duas conferências passavam, e ele carimbou como PUBLICADO um pin
+  # que não existia além do disco: exatamente o que este script existe para impedir.
+  # ⚠️ E o caso (c) NÃO pegava isso: ele esboça um remoto DIFERENTE, cenário que o fluxo real não
+  # produz. Caso que testa um mundo que não acontece não é cobertura.
+  _doorway_stamp "${PIN_OK}"; _registry door "ffffffffffff"
+  printf 'materializado, nao commitado\n' > "${doorway}/sujeira.txt"
+  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
+  rm -f "${doorway}/sujeira.txt"
+  if [ "${_r}" -eq 1 ] && grep -qiE 'nao-commitado|não-commitado' <<< "${_o}" \
+     && grep -qF "ffffffffffff" "${fakecore}/docs/evolution/federation/members.yaml"; then
+    record_pass "door-seal-pin: (j) árvore da porta SUJA ⇒ recusa e registro INTACTO (disco ≠ publicação)"
+  else record_fail "door-seal-pin: (j) carimbou materialização não-commitada" "rc=${_r} out=${_o:0:250}"; fi
+
+  # (k) o pin vem do stamp COMMITADO (`git show HEAD:`), não do disco — a fonte da leitura É a defesa.
+  _doorway_stamp "${PIN_OK}"; _registry door "ffffffffffff"
+  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
+  if [ "${_r}" -eq 0 ] && grep -qF "onion_version: ${PIN_OK}" "${fakecore}/docs/evolution/federation/members.yaml"; then
+    record_pass "door-seal-pin: (k) pin lido do stamp COMMITADO, não da árvore"
+  else record_fail "door-seal-pin: (k)" "rc=${_r} out=${_o:0:200}"; fi
+
+  # ⚠️ COMMITADO de propósito: desde a cura de 2026-09-26 o pin é lido de `git show HEAD:`, e árvore
+  #    suja recusa ANTES. Escrever só no disco faria este caso medir a guarda ERRADA — foi o que
+  #    aconteceu na 1ª volta, e o ✗ apontou para a guarda nova em vez do defeito que (i) persegue.
   printf 'role: hub\nonion_version: nao-e-um-sha\n' > "${doorway}/.claude/.onion-version"
+  git -C "${doorway}" add -A >/dev/null 2>&1
+  git -C "${doorway}" -c user.email=t@t -c user.name=t commit -q -m 'stamp ilegivel' 2>/dev/null || true
   GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
   if [ "${_r}" -eq 2 ] && grep -qiE 'ilegivel|ilegível' <<< "${_o}"; then
     record_pass "door-seal-pin: (i) pin ilegível no stamp ⇒ rc=2"
