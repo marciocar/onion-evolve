@@ -306,6 +306,15 @@ cat <<FIM
      git commit -m "chore(door): materializa do core no pin ${_pin}"
      git push
 
+   E DEPOIS DO PUSH, carimbe o registro — é o passo que faltava até 2026-09-26:
+
+     bash ops/door-seal-pin.sh ${_slug}
+
+   Ele confere o REMOTO pelo forge e só carimba se bater; sem isso o
+   \`onion_version\` do members.yaml fica atrás, e a REGRA 85 passa a medir a
+   MEMÓRIA em vez da porta (aconteceu duas vezes num dia). O baseline de
+   defasagem segue manual, por decisão do maestro.
+
    E lembre do ciclo: porta sem re-materialização envelhece. O gatilho é toda
    leva mergeada em main que toque a superfície que viaja.
 FIM

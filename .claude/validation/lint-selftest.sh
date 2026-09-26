@@ -17458,6 +17458,125 @@ run_model_ssot_selftests() {
 # As duas curas desta família nasceram da PRIMEIRA materialização real (2026-09-17), e as duas são
 # do tipo que só aparece publicando: o bundle levava chave nomeada por cliente (salva de subir por
 # um `.gitignore` do destino — acidente, não desenho) e a porta subiu sem README/LICENSE/CLAUDE.md.
+# ═══ ops/door-seal-pin.sh — o registro só é carimbado com o REMOTO conferido ══════════════
+# POR QUE EXISTE: o `onion_version` de um membro `kind: door` é LIDO pela REGRA 85 (Porta publica
+# espelha o core, com catraca) para decidir defasagem, e era mantido A MAO. Apodreceu DUAS VEZES em
+# 2026-09-25/26 — a segunda em duas horas, depois de eu escrever no proprio members.yaml que
+# "numero mantido a mao apodrece". O script fecha isso, e esta familia prende as SEIS portas de
+# saida fail-closed dele, porque um carimbo que erra afirma PUBLICO o que pode nao ser.
+# ⚠️ O `gh` e esbocado: o SUT fala com a rede, e o esboco ESPELHA a consulta real
+# (`gh api repos/<owner>/<repo>/commits/<branch> --jq .sha`).
+run_door_seal_pin_selftests() {
+  local sut="${REPO_ROOT}/ops/door-seal-pin.sh"
+  if [ ! -f "${sut}" ]; then record_skip "door-seal-pin: ops/ ausente (adotante) → pulado"; return; fi
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+
+  # ── fakecore falso: repo git com origin/main de verdade (clone local), ops/ e o resolver ────────
+  local upstream="${d}/upstream" fakecore="${d}/fakecore" doorway="${d}/doorway"
+  mkdir -p "${upstream}"; git -C "${upstream}" init -q -b main
+  git -C "${upstream}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m base
+  local PIN_OK; PIN_OK="$(git -C "${upstream}" rev-parse --short=12 HEAD)"
+  git clone -q "${upstream}" "${fakecore}" 2>/dev/null
+  mkdir -p "${fakecore}/ops" "${fakecore}/.claude/validation" "${fakecore}/docs/evolution/federation"
+  cp "${sut}" "${fakecore}/ops/"
+  cp "${REPO_ROOT}/.claude/validation/resolve-integration-branch.sh" "${fakecore}/.claude/validation/" 2>/dev/null || true
+  # commit SÓ no core falso (não empurrado) → serve de "pin fora da integração"
+  git -C "${fakecore}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m "fora da integracao"
+  local PIN_FORA; PIN_FORA="$(git -C "${fakecore}" rev-parse --short=12 HEAD)"
+
+  # ── doorway falsa: clone git com stamp declarando um pin ────────────────────────────────────
+  mkdir -p "${doorway}/.claude"; git -C "${doorway}" init -q -b main
+  _doorway_stamp() {  # $1 = pin declarado
+    printf 'role: hub\nadopted_from: onion-fakecore\nonion_version: %s\nmaterialized_at: 2026-09-26\n' "$1" > "${doorway}/.claude/.onion-version"
+    git -C "${doorway}" add -A >/dev/null 2>&1
+    git -C "${doorway}" -c user.email=t@t -c user.name=t commit -q -m "stamp $1" 2>/dev/null
+  }
+  _registry() {  # $1 = kind ; $2 = pin no registro
+    { printf 'members:\n'
+      printf '  - id: doorway-teste\n    kind: %s\n    remote: github.com/dono/doorway-teste\n' "$1"
+      printf '    local_path: "%s"\n    onion_version: %s   # comentário inline preservado?\n' "${doorway}" "$2"
+      printf '  - id: outro\n    kind: adopter\n    onion_version: aaaaaaaaaaaa\n'
+    } > "${fakecore}/docs/evolution/federation/members.yaml"
+  }
+  # esboço do `gh`: devolve o sha que GH_REMOTE_SHA mandar (vazio = remoto ilegível)
+  cat > "${d}/gh" <<'STUB'
+#!/usr/bin/env bash
+case "$*" in
+  *"api repos/"*commits*) [ -n "${GH_REMOTE_SHA:-}" ] && echo "${GH_REMOTE_SHA}"; exit 0 ;;
+esac
+exit 0
+STUB
+  chmod +x "${d}/gh"
+  local _o _r
+  _seal() {  # $@ = flags extra ; usa GH_REMOTE_SHA do ambiente
+    if _o="$(PATH="${d}:${PATH}" bash "${fakecore}/ops/door-seal-pin.sh" doorway-teste "$@" 2>&1)"; then _r=0; else _r=$?; fi
+  }
+
+  # (a) tudo conferido + registro DEFASADO ⇒ carimba, e o comentário do resto do arquivo sobrevive
+  _doorway_stamp "${PIN_OK}"; _registry door "ffffffffffff"
+  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
+  if [ "${_r}" -eq 0 ] && grep -qF "onion_version: ${PIN_OK}" "${fakecore}/docs/evolution/federation/members.yaml" \
+     && grep -qF "onion_version: aaaaaaaaaaaa" "${fakecore}/docs/evolution/federation/members.yaml"; then
+    record_pass "door-seal-pin: (a) remoto conferido + registro defasado ⇒ carimba SÓ o membro certo"
+  else record_fail "door-seal-pin: (a)" "rc=${_r} out=${_o:0:250}"; fi
+
+  # (b) registro JÁ em dia ⇒ no-op explícito (não reescreve, não mente que carimbou)
+  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
+  if [ "${_r}" -eq 0 ] && grep -qF "já em dia" <<< "${_o}"; then
+    record_pass "door-seal-pin: (b) registro em dia ⇒ no-op declarado"
+  else record_fail "door-seal-pin: (b)" "rc=${_r} out=${_o:0:200}"; fi
+
+  # (c) PUSH NÃO ACONTECEU (clone ≠ remoto) ⇒ recusa. É a doorway que mais imdoorway: carimbar aqui
+  #     afirmaria PÚBLICO um commit que só existe no disco.
+  _registry door "ffffffffffff"
+  GH_REMOTE_SHA="0000000000000000000000000000000000000000" _seal
+  if [ "${_r}" -eq 1 ] && grep -qiE 'nao bate|NÃO bate' <<< "${_o}"; then
+    record_pass "door-seal-pin: (c) clone ≠ remoto ⇒ recusa (não afirma público o que é local)"
+  else record_fail "door-seal-pin: (c) carimbou sem push" "rc=${_r} out=${_o:0:200}"; fi
+
+  # (d) REMOTO ILEGÍVEL ⇒ rc=2 e NÃO carimba. "Não pude conferir" nunca vira "está certo".
+  GH_REMOTE_SHA="" _seal
+  if [ "${_r}" -eq 2 ] && grep -qF "ffffffffffff" "${fakecore}/docs/evolution/federation/members.yaml"; then
+    record_pass "door-seal-pin: (d) remoto ilegível ⇒ rc=2 e registro INTACTO"
+  else record_fail "door-seal-pin: (d)" "rc=${_r} out=${_o:0:200}"; fi
+
+  # (e) pin FORA da integração (doorway materializada de branch — o defeito de 2026-09-25) ⇒ recusa
+  _doorway_stamp "${PIN_FORA}"; _registry door "ffffffffffff"
+  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
+  if [ "${_r}" -eq 1 ] && grep -qiE 'nao esta em origin|NÃO está em origin' <<< "${_o}"; then
+    record_pass "door-seal-pin: (e) pin fora de origin/main ⇒ recusa (não legitima doorway de branch)"
+  else record_fail "door-seal-pin: (e)" "rc=${_r} out=${_o:0:250}"; fi
+
+  # (f) pin que NÃO é commit deste core (forjado/truncado) ⇒ recusa
+  _doorway_stamp "deadbeefcafe"; _registry door "ffffffffffff"
+  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
+  if [ "${_r}" -eq 1 ] && grep -qiE 'nao e commit|NÃO é commit' <<< "${_o}"; then
+    record_pass "door-seal-pin: (f) pin forjado ⇒ recusa"
+  else record_fail "door-seal-pin: (f)" "rc=${_r} out=${_o:0:200}"; fi
+
+  # (g) kind ≠ door ⇒ rc=2. O objeto desta guarda é PORTA; adotante comum não é espelho do core falso.
+  _doorway_stamp "${PIN_OK}"; _registry adopter "ffffffffffff"
+  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
+  if [ "${_r}" -eq 2 ] && grep -qiE "nao 'door'|não 'door'" <<< "${_o}"; then
+    record_pass "door-seal-pin: (g) kind ≠ door ⇒ rc=2 (fora do objeto da guarda)"
+  else record_fail "door-seal-pin: (g)" "rc=${_r} out=${_o:0:200}"; fi
+
+  # (h) --dry-run NÃO escreve — a diferença entre ver e fazer é medida, não prometida
+  _registry door "ffffffffffff"
+  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal --dry-run
+  if [ "${_r}" -eq 0 ] && grep -qF "ffffffffffff" "${fakecore}/docs/evolution/federation/members.yaml"; then
+    record_pass "door-seal-pin: (h) --dry-run mostra e NÃO escreve"
+  else record_fail "door-seal-pin: (h) dry-run escreveu" "rc=${_r} out=${_o:0:200}"; fi
+
+  # (i) stamp com pin ILEGÍVEL ⇒ rc=2. Não se carimba o que não se consegue ler.
+  printf 'role: hub\nonion_version: nao-e-um-sha\n' > "${doorway}/.claude/.onion-version"
+  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
+  if [ "${_r}" -eq 2 ] && grep -qiE 'ilegivel|ilegível' <<< "${_o}"; then
+    record_pass "door-seal-pin: (i) pin ilegível no stamp ⇒ rc=2"
+  else record_fail "door-seal-pin: (i)" "rc=${_r} out=${_o:0:200}"; fi
+  unset -f _seal _doorway_stamp _registry
+}
+
 run_door_selftests() {
   local sb2 out rc
   sb2="$(mktemp -d)"
@@ -18587,6 +18706,7 @@ _family run_onion_version_tracked_selftests
 _family run_hub_role_guard_selftests
 _family run_inventory_adopter_scope_selftests
 _family run_door_selftests
+_family run_door_seal_pin_selftests
 _family run_door_cycle_selftests
 # ── REGRA 86: workflow que não parseia é workflow MORTO, e o repo não sabe ────────────────────
 # Nasceu de um `env:` duplicado que deixou o `onion-review-diagnose.yml` inexecutável por um dia
