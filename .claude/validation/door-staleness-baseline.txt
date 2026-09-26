@@ -194,5 +194,16 @@
 #   E `onion-standalone` 421->422: passivo REAL daquela porta, parada desde 2026-07-19 — a catraca
 #   registrando o que o merge da leva acrescentou, nao trabalho novo. Ela segue sem dono para
 #   re-materializar, e o numero e a memoria disso.
-onion-standalone 422
+#
+# 2026-09-26 (24a materializacao): `onion-core` publicada em cff28d36626a a partir do pin b7f24eb27a79,
+#   e o registro carimbado PELO MECANISMO — 2o uso real do `ops/door-seal-pin.sh`, agora curado. Ele
+#   provou os DOIS lados no mesmo ciclo: RECUSOU antes do commit (arvore suja = materializacao no disco
+#   nao e publicacao) e carimbou depois do push conferido no remoto. Na vespera, a v1 teria carimbado na
+#   primeira dessas duas situacoes.
+#   `onion-standalone` 422->423 — TERCEIRA subida dela HOJE, sempre pelo mesmo motivo: cada leva
+#   mergeada afasta uma porta que ninguem re-materializa. Isso NAO e trabalho novo, e a catraca
+#   registrando que aquela porta esta parada desde 2026-07-19, e o numero vai crescer para sempre
+#   enquanto ninguem decidir entre RE-MATERIALIZA-LA ou declara-la congelada. A decisao e do maestro;
+#   o que a catraca pode fazer, ela ja faz — nao deixar o passivo virar silencio.
+onion-standalone 423
 onion-core 0
