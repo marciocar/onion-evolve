@@ -1,11 +1,11 @@
 ---
-title: 'Fecho dos sinais tratados e re-teste da migalha vencida'
+title: 'Fecho dos sinais, re-teste da migalha, e o carimbo do pin construído'
 date: 2026-09-26
 branch: chore/close-inbox-and-sge-state
-reviewed_diff_sha256: c92550fbdc6940b2355b0c5aae6e15afeddcf5a5632b52d5ef3011c902e7c303
+reviewed_diff_sha256: 239a0d6fd2230f535decb67276ebae51b31580b2254899022e5050e30c8cba37
 elenxo: nao
-findings_total: 3
-findings_real: 3
+findings_total: 5
+findings_real: 5
 verdict: CORRIGIDO
 tokens: 0
 duration_min: 0
@@ -53,8 +53,43 @@ confiante e falsa.
 "cito o caminho para dizer que não existe" — e está **certa** em não distinguir, porque a segunda
 intenção não é verificável. A cura é escrever a ausência em prosa, não em crase.
 
+## O que entrou DEPOIS, por decisão do maestro: `ops/door-seal-pin.sh`
+
+O nó `Q_QUEM_CARIMBA_O_PIN_DA_PORTA` foi **selado e construído** na mesma sessão. O desenho saiu de um
+formulário com as opções nomeadas, e as quatro escolhas foram: irmão novo em `ops/` · verifica o remoto
+**e** carimba · invocado pelo maestro após o push · construir agora.
+
+**Por que `ops/` e não regra de lint** — o mesmo motivo do `ops/audit-adopters-registry.sh`, e o motivo
+é mais forte que o arquivo: precisa do **clone da porta no disco** e do **remoto pela rede**, e nenhum
+dos dois existe no CI. Guarda que só passa na máquina de uma pessoa é armadilha para as outras. E
+**não** é extensão do `pin-integrity-check.sh`: aquele valida o pin do **stamp** do alvo e o histórico do
+`onion/vendor` — pergunta diferente, nome parecido, e juntá-las por semelhança de nome seria o erro.
+
+**A cadeia é toda de recusas:** pin legível → commit real deste core → ancestral de
+`origin/<integração>` → **push provado pelo remoto** (clone == remoto) → carimbo cirúrgico, que ainda
+recusa gravar se a contagem de linhas do arquivo mudar. Carimbar sem o passo do remoto afirmaria
+**público** um commit que só existe no disco — e é a porta que mais importa das seis.
+
+**Fica manual, por decisão:** as duas linhas de dado do `door-staleness-baseline.txt`. A razão medida
+ficou escrita para quem automatizar.
+
+## Os dois defeitos que o carimbo rendeu
+
+| # | o quê | quem pegou |
+|---|---|---|
+| 4 | `onion_version` em **backtick dentro de heredoc não-citado** virou substituição de comando e saiu **vazio** na instrução nova | **executar** o materializador, não reler |
+| 5 | identificadores `porta`/`origem`/`registro` na bancada | **REGRA 60 (Identificador de código em INGLÊS)** |
+
+**(4) é a terceira ocorrência da mesma família em dois dias** — backtick em prosa dentro de contexto que
+o interpreta. Ontem partiu o registro de dispensa ao meio (`printf '%s\n' \\`); hoje apagou uma palavra
+de uma instrução. Nas duas vezes o artefato **saiu 0** e parecia certo; nas duas, o que revelou foi
+rodar e **olhar a saída**. Não há guarda para isso ainda, e isso está dito em vez de suposto.
+
 ## Gate
 
 - `lint-artifacts.sh` → **rc=0 · 0 HARD · 14 SOFT**
 - `lint-selftest.sh --affected-staged --jobs auto` → **45 casos · 0 falhas**
 - `inbox/` de 1º nível → **0 arquivos** (o hook para de contar, e o registro é durável por commit)
+- `lint-selftest.sh --affected-staged --jobs auto` (leva completa) → **1498 casos · 0 falhas**
+- `ops/door-seal-pin.sh onion-core --dry-run` no estado vivo → **rc=0, `registro já em dia`**
+- `kg-radar.sh --integrity --schema` → **exit 0** no grafo do nó selado
