@@ -1,7 +1,7 @@
 ---
 branch: worktree-docs+typesafe-ai-desmembramento
 date: 2026-09-21
-reviewed_diff_sha256: 648278c6d723656bd8572eaa80741edab4300c23f513b1a1b69d9ca9aaaa2a52
+reviewed_diff_sha256: 9597645bdbdd50fc79df27d64cc17999dfc3b3638e9310a37887c4936cc75109
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
@@ -148,3 +148,8 @@ existia era run **para o head**.
 **Gate rodado agora, no conteúdo rebaseado:** `kg-radar --integrity --schema` **exit 0** ·
 `lint-artifacts` **rc=0, 0 HARD**. As SOFT extras são as baselines das portas, que resolvem no merge da
 leva vizinha. `meta.review_after` do grafo é **2026-10-21** — a pesquisa não venceu.
+
+**2º rebase, no mesmo dia:** o merge da leva vizinha moveu as MESMAS projeções geradas, e o forge
+passou de `MERGEABLE` a `CONFLICTING`. Rebase limpo desta vez; as projeções foram regeneradas contra
+o main novo e as duas SOFT das portas **desapareceram sozinhas** — elas eram defasagem de baseline,
+não defeito deste PR. Lint: **0 HARD / 14 SOFT**, o mesmo número da main.
