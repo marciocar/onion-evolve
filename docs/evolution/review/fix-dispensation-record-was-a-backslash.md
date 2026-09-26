@@ -2,10 +2,10 @@
 title: 'Passada adversarial — o registro da dispensa era um contra-barra'
 date: 2026-09-25
 branch: fix/dispensation-record-was-a-backslash
-reviewed_diff_sha256: 8083773858ded514629edcd4879b9804f5fb51eed44eabb1f88ca0d8b012de40
+reviewed_diff_sha256: f44417790a7729873c960f061ddabad98d0822b216e91c6eeb22e56bab9a1c1e
 elenxo: sim
-findings_total: 14
-findings_real: 14
+findings_total: 15
+findings_real: 15
 verdict: REPROVADO_E_CURADO
 tokens: 219001
 duration_min: 59
@@ -121,6 +121,22 @@ o script prepara e para. Fronteira não desculpa guarda faltante.
 Cura: fonte = `origin/<integração>` com fetch, **fail-closed** se a ref não resolver, `--from <ref>`
 para o caso deliberado (e que anuncia que não é a integração). Bancada: o padrão `HEAD` não volta, e
 ref irresolúvel aborta.
+
+## O 15º achado: minha própria cura fez um caso de bancada medir AMBIENTE
+
+Só o CI mostrou, e a lição é sobre o harness, não sobre a porta. A cura da fonte (fail-closed em
+`origin/<integração>`) fez o caso `door: (g)` — **que já existia** — abortar antes do passo que ele
+mede. Ele monta um core falso por **clone raso**; no CI, onde o próprio checkout é raso, `origin/main`
+não existe nesse clone. Resultado: **passou local, falhou no CI**, e a faixa 2 caiu por um motivo sem
+relação com o regenerador.
+
+Isso é a bancada espelhando **a minha máquina** em vez do runner. O caso agora declara `--from HEAD`,
+porque é sobre o **regenerador ausente**; a resolução de fonte é coberta por `(0)`/`(0b)`, criados no
+mesmo PR para exatamente isso. **Afrouxar o fail-closed para o caso passar seria curar a bancada
+apagando a guarda** — e essa tentação é o que torna este achado digno de registro.
+
+Medido na condição do CI, num repo **sem `origin` algum**: sem `--from`, aborta nomeando a fonte; com
+`--from HEAD`, anuncia o desvio e alcança a declaração que o caso espera.
 
 ## REGRA 87 (PR que EDITA um `.kg.yaml` enxergou os `confirmed` dele)
 
