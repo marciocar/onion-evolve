@@ -4,7 +4,11 @@ meta:
   baseline: 2026-09-14
   review_after: 2027-01-12   # revisita (mecanismo/gates 120d) — REGRA 67
   # kg-backlog-guard: on
-  # ═══ TETO: 54 NOS (era 53: +1 pela RECORRENCIA MEDIDA da causa do revisor semantico — a MESMA
+  # ═══ TETO: 55 NOS (era 54: +1 pela CLASSE backtick-em-prosa-dentro-de-contexto-que-interpreta,
+  #     TRES ocorrencias medidas em DOIS dias, todas com o artefato saindo 0 e parecendo certo. Cresce
+  #     por recorrencia medida da mesma classe, que e o criterio declarado abaixo — e aqui a
+  #     recorrencia e o proprio conteudo do no, nao a justificativa dele.)
+  #     (era 53: +1 pela RECORRENCIA MEDIDA da causa do revisor semantico — a MESMA
   #     causa (saldo da conta de API) matou o revisor pela 2a vez em 2026-09-25, e desta vez com o
   #     corpo da API na mao, porque a cura de PRESERVAR A EVIDENCIA do run entrou no dia anterior.
   #     Cresce por recorrencia medida da mesma classe, que e exatamente o criterio declarado
@@ -671,7 +675,22 @@ nodes:
     trace: '.claude/validation/lib/pt-br-words.txt'
     label: 'OCORRENCIA 4, E A PIOR DA SERIE: a guarda cega era a da REGRA 60 — justamente a regra sobre IDIOMA DE IDENTIFICADOR — e ela tinha o mecanismo COMPLETO que as outras tres nao tinham: baseline com catraca no chao (zero entradas toleradas), fail-loud se a lista sumir, 7 casos de bancada, guarda-da-guarda contra homografo, e estava LIGADA no lint desde 2026-08-09. Nada disso importou: a lista tinha 102 termos e NENHUM era palavra que aparece nos identificadores deste repo. Mecanismo completo mais vocabulario vazio = `0 HARD` por 42 dias, sobre 46 violacoes reais. DUAS LICOES ALEM DA CLASSE. (1) A EXCLUSAO tambem e vocabulario: o caso (g) proibia `nome` na lista SEM RAZAO DECLARADA — nao e palavra inglesa, entrou por arrasto junto de `base`/`total`/`local`/`final` que sao —, e a prova do arrasto e que `nomes` nunca foi excluido. Guarda de lista falha pelo vocabulario nos DOIS sentidos, e o lado da exclusao e mais silencioso porque parece prudencia. (2) O CUSTO TEM NOME: enquanto a guarda gratuita dizia 0, o revisor semantico do CI achava esta classe a ~US$ 0,80 o PR — e os achados dele sao ADVISORY, entao o defeito era apontado, mergeado e ficava. Pagava-se pela descoberta e nao se recolhia a entrega. A CURA que fecha a classe: o LLM caro descobre o termo novo UMA VEZ e ele vira check deterministico permanente (caso (h) da bancada ancora os 22 segmentos reais, com mutante provando que encolher a lista quebra antes do CI; caso (i) prova as DUAS metades do universo consciente de papel — `ops/` e varrido na FONTE e fica FORA no adotante, porque a guarda viaja). O criterio de reentrada na exclusao deixou de ser opiniao: so volta a excluir quem ACUSAR ingles legitimo no corpus, medido.'
 
+  - id: C_BACKTICK_EM_PROSA_DENTRO_DE_CONTEXTO_QUE_INTERPRETA
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    valid_from: '2026-09-26'
+    verified_at: '2026-09-26'
+    verified_against: 'TRES ocorrencias medidas em dois dias, cada uma com o artefato saindo 0: (1) 2026-09-25, `ops/pr-merge-verified.sh` — o corpo do registro de dispensa era montado com `printf %s\\n` seguido de DOIS contra-barras; o primeiro escapava o segundo, a linha terminava ali e as seguintes viraram comando que o bash tentou EXECUTAR (`## Merge com check DISPENSADO: command not found`). O `gh pr comment` postou um contra-barra, saiu 0, e o script disse `dispensa registrada`. (2) 2026-09-26, `ops/materialize-door.sh` — `onion_version` em crase dentro de heredoc NAO-CITADO virou substituicao de comando e a palavra saiu VAZIA da instrucao nova; so apareceu porque eu EXECUTEI a instrucao em vez de reler. (3) a mesma familia no `.claude/diary/` — caminho em crase citado para dizer que NAO existe, barrado pela guarda de ponteiro morto, que esta certa em nao distinguir a intencao.'
+    label: "CLASSE: crase em PROSA dentro de um contexto que a INTERPRETA — heredoc nao-citado, argumento de shell, corpo montado por `printf`. O padrao de falha e sempre o mesmo e e o pior formato possivel: o artefato sai 0, o arquivo fica nao-vazio, e o conteudo esta mutilado. Nenhuma das tres verificacoes baratas pega (rc, `[ -s ]`, `bash -n`), e nas tres vezes o que revelou foi RODAR e OLHAR A SAIDA. POR QUE ISTO E CARO NESTA CASA especificamente: a doutrina daqui manda escrever o PORQUE dentro do artefato, em prosa densa, e essa prosa cita caminhos, campos e comandos em crase — logo a superficie exposta a esta classe cresce com a propria pratica que da qualidade ao resto. GATILHO PARA MECANIZAR, e ele JA DISPAROU pelo criterio da casa (recorrencia medida >= 3): o desenho candidato e uma guarda de bancada que extraia todo heredoc NAO-CITADO de `ops/**` e `.claude/**/*.sh` e reprove crase nao-escapada dentro dele — `<<'EOF'` (citado) e isento por construcao, e a cura no sitio e escolher o heredoc citado ou escapar a crase. FICA GATED na decisao do maestro sobre construir: o diagnostico esta fechado, a superficie e enumeravel, e a distincao citado-vs-nao-citado e mecanica."
+    trace: 'ops/pr-merge-verified.sh · ops/materialize-door.sh'
+
 edges:
+  - from: C_BACKTICK_EM_PROSA_DENTRO_DE_CONTEXTO_QUE_INTERPRETA
+    to: E_A_MESMA_CAUSA_VOLTOU_E_AGORA_COM_O_CORPO_DA_API
+    edge_type: SUPPORTS
   - from: E_A_GUARDA_CONTRA_NOME_DE_CLIENTE_CONTINHA_NOMES_DE_CLIENTE
     to: E_PADRAO_PRIVADO_FIXAVA_UM_NOME_E_O_IRMAO_PASSAVA
     edge_type: SUPPORTS
