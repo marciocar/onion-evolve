@@ -180,5 +180,19 @@
 #   saida destrutiva e PLAUSIVEL, porque o gerador sai 0 e o arquivo fica nao-vazio. Por isso a
 #   atualizacao aqui e CIRURGICA nas duas linhas de dado. Quem automatizar isto um dia tem de
 #   preservar o historico, que e o unico lugar onde o PORQUE de cada numero mora.
-onion-standalone 421
+#
+# 2026-09-26 (23a materializacao): `onion-core` publicada em 526c00800359 (remoto b18e40d09f49) e o
+#   registro carimbado pelo MECANISMO NOVO — `ops/door-seal-pin.sh`, 1o uso real. Ele provou as quatro
+#   coisas antes de escrever: pin legivel, commit deste core, ancestral de origin/main, e push
+#   conferido no remoto. Fim da era do numero a mao neste campo.
+# ⚠️ E O DEFEITO QUE O DOGFOOD ACHOU, na 1a execucao: a v1 lia o pin da ARVORE DE TRABALHO, entao
+#   rodada depois de materializar e ANTES de commitar ela carimbava como PUBLICADO um pin que so
+#   existia no disco (HEAD do clone ainda era o antigo, igual ao remoto — as duas confereencias
+#   passavam). Curado: arvore suja RECUSA, e o pin vem de `git show HEAD:`. Dois casos de bancada,
+#   com mutante que morre. O caso que existia para isso testava um remoto DIFERENTE — cenario que o
+#   fluxo real nao produz, logo nao era cobertura.
+#   E `onion-standalone` 421->422: passivo REAL daquela porta, parada desde 2026-07-19 — a catraca
+#   registrando o que o merge da leva acrescentou, nao trabalho novo. Ela segue sem dono para
+#   re-materializar, e o numero e a memoria disso.
+onion-standalone 422
 onion-core 0

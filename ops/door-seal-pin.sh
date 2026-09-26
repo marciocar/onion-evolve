@@ -64,10 +64,24 @@ KIND="$(_field kind)"; LOCAL="$(_field local_path)"; REMOTE="$(_field remote)"; 
 [ "${KIND}" = "door" ] || { echo "ERRO: '${MEMBER}' tem kind='${KIND:-vazio}', não 'door' — este carimbo é só para PORTA (espelho materializado do core)." >&2; exit 2; }
 [ -d "${LOCAL}/.git" ] || { echo "ERRO: clone da porta ausente em '${LOCAL}' — sem ele não sei o que foi publicado." >&2; exit 2; }
 
-# ── (1) O pin que a porta DECLARA (escrito pelo materializador no stamp dela) ────────────────
-STAMP="${LOCAL}/.claude/.onion-version"
-[ -f "${STAMP}" ] || { echo "ERRO: stamp ausente em ${STAMP} — a porta não declara pin." >&2; exit 2; }
-DOORPIN="$(grep -m1 '^onion_version:' "${STAMP}" | sed 's/^onion_version:[[:space:]]*//; s/[[:space:]]*#.*$//')"
+# ── (1) O pin que a porta declara — LIDO DO QUE ESTÁ COMMITADO, nunca da árvore ─────────────
+# ⚠️ DEFEITO ACHADO PELO PRÓPRIO DOGFOOD, na 1ª vez que rodei isto de verdade (2026-09-26): a v1 lia
+# o stamp da ÁRVORE DE TRABALHO. Logo, rodado depois de materializar e ANTES de commitar/empurrar, ele
+# lia o pin NOVO (que só existe no disco) e comparava `HEAD` do clone com o remoto — e `HEAD` ainda era
+# o commit antigo, igual ao remoto. As duas conferências passavam e ele carimbava como PUBLICADO um pin
+# que não estava em lugar nenhum além do disco. Exatamente o que este script existe para impedir.
+# A causa é de LEITURA, não de lógica: o pin tem de vir do MESMO objeto git que o remoto pode conter.
+# Duas guardas, porque uma sozinha não fecha:
+#   (i) a árvore da porta tem de estar LIMPA — materialização não-commitada não é publicação;
+#   (ii) o pin vem de `git show HEAD:`, então um stamp editado à mão no disco não engana.
+# E a bancada tinha um caso "clone ≠ remoto"... que esboçava um remoto DIFERENTE, cenário que não é o
+# do fluxo real. Caso que testa um mundo que não acontece não é cobertura ([[mutant-anchor-is-a-defect-candidate]]).
+_DIRTY="$(git -C "${LOCAL}" status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
+[ "${_DIRTY}" = "0" ] || { echo "ERRO: a árvore da porta tem ${_DIRTY} arquivo(s) não-commitado(s) — materialização no disco NÃO é publicação. Commite e empurre primeiro; carimbar agora afirmaria público o que ninguém pode ver." >&2; exit 1; }
+STAMP_TREE="${LOCAL}/.claude/.onion-version"
+[ -f "${STAMP_TREE}" ] || { echo "ERRO: stamp ausente em ${STAMP_TREE} — a porta não declara pin." >&2; exit 2; }
+DOORPIN="$(git -C "${LOCAL}" show HEAD:.claude/.onion-version 2>/dev/null | grep -m1 '^onion_version:' | sed 's/^onion_version:[[:space:]]*//; s/[[:space:]]*#.*$//')"
+[ -n "${DOORPIN}" ] || { echo "ERRO: não li \`onion_version\` do stamp COMMITADO da porta (HEAD:.claude/.onion-version) — e eu não leio da árvore, porque árvore não é o que o remoto contém." >&2; exit 2; }
 printf '%s' "${DOORPIN}" | grep -qE '^[0-9a-f]{7,40}$' \
   || { echo "ERRO: pin ilegível no stamp da porta: '${DOORPIN}' — não carimbo o que não consigo ler." >&2; exit 2; }
 
