@@ -1,7 +1,7 @@
 ---
 branch: worktree-docs+typesafe-ai-desmembramento
 date: 2026-09-21
-reviewed_diff_sha256: c9efba1467eb831bf518518cc0d523e37596a219b0cf55cde32e9ad3866bdf07
+reviewed_diff_sha256: 648278c6d723656bd8572eaa80741edab4300c23f513b1a1b69d9ca9aaaa2a52
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
@@ -125,3 +125,26 @@ com a diferença de que aqui o arquivo era meu, e de hoje.
 
 - `bash .claude/validation/kg-radar.sh docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml` → **exit 0** (27 nós, 33 arestas, sem contradição estrutural)
 - `bash .claude/validation/lint-artifacts.sh` → **exit 0** (0 HARD; as 12 SOFT restantes são pré-existentes e alheias a este diff)
+
+## Nota de rebase e de validação — 2026-09-26
+
+Este PR ficou **5 dias aberto** e `main` andou **87 commits**. Rebaseado sobre `b7f24eb2`; os dois
+conflitos foram em **projeções geradas** (`docs/backlog.md` e `docs/onion/testing-state.md`), resolvidos
+**regenerando dos produtores** — aceitar um lado num arquivo derivado produz artefato que casa com o git
+e mente sobre a fonte.
+
+**E o achado que justifica esta nota existir:** o head deste PR **nunca tinha sido validado por nada**.
+Medido no forge — os dois runs verdes (`Onion Artifact Linter`, `Onion Code Review`) são do SHA
+`f6d734e54b7f`, de 21/09 às 21:17; o head era `adbbd1247d5b`, empurrado às **22:37 do mesmo dia**, e a
+listagem de check-runs dele volta **vazia**. O commit não medido é justamente
+*"rodei o experimento que eu propus, e ele refutou a minha própria recomendação"* — o trabalho mais
+consequente do PR.
+
+O `gh pr checks` diz *"no checks reported"*, que é honesto e **fácil de ler como "nada a ver aqui"** em
+vez de "isto não foi medido". A primeira hipótese que levantei — ponto cego de filtro de path — foi
+**refutada por medição**: `docs/**` está no filtro do `onion-validate`, e os runs existiram; o que não
+existia era run **para o head**.
+
+**Gate rodado agora, no conteúdo rebaseado:** `kg-radar --integrity --schema` **exit 0** ·
+`lint-artifacts` **rc=0, 0 HARD**. As SOFT extras são as baselines das portas, que resolvem no merge da
+leva vizinha. `meta.review_after` do grafo é **2026-10-21** — a pesquisa não venceu.
