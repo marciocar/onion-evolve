@@ -323,7 +323,15 @@ members:
     #    orfao unico + force-push, e nao ha nada a preservar nisso. LIMITE DECLARADO: o objeto antigo
     #    segue acessivel por SHA ate o GC do GitHub, e quem clonou tem copia — o force-push torna
     #    INALCANCAVEL, nunca inexistente.
-    onion_version: 06bc547c268c   # pin da 21a materializacao (2026-09-25). Push VERIFICADO NO REMOTO via
+    onion_version: 232bba50ccc8   # pin da 22a materializacao (2026-09-26). Push VERIFICADO NO REMOTO
+                                  # via `gh api repos/marciocar/onion-core/commits/main` -> 5063e81b2d8d.
+                                  # ⚠️ SEGUNDA vez EM UM DIA que este numero e avancado A MAO, e a 1a vez
+                                  # eu escrevi aqui que 'numero mantido a mao apodrece'. Apodreceu em duas
+                                  # horas: a porta foi publicada, este campo ficou atras, e a REGRA 85
+                                  # (Porta publica espelha o core, com catraca) seguiu acusando 3 commits
+                                  # de defasagem porque ela le o REGISTRO, nao a porta. O gatilho para
+                                  # mecanizar disparou DUAS vezes; a proposta esta no no
+                                  # Q_QUEM_CARIMBA_O_PIN_DA_PORTA do grafo de fios abertos.
                                   # `gh api repos/marciocar/onion-core/commits/main` → 07c81b974880.
                                   # ⚠️ ESTA foi a 1a materializacao cuja FONTE e comprovadamente
                                   # `origin/main`: ate hoje o `materialize-door.sh` usava `git archive

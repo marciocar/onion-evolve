@@ -157,7 +157,22 @@ nodes:
       lugar nenhum. O custo que motivou a decisao esta medido no proprio door-staleness-baseline.txt:
       5+ ocorrencias de "o gate fica VERMELHO ate o push", e uma leva que pagou DUAS materializacoes.
 
+  - id: Q_QUEM_CARIMBA_O_PIN_DA_PORTA
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: open
+    valid_from: '2026-09-26'
+    verified_at: '2026-09-26'
+    verified_against: 'Medido no mesmo dia, DUAS vezes: (1) a porta foi publicada em 07c81b974880 e o `onion_version` do registro seguiu em d425501b14bc; avancei a mao e escrevi no proprio members.yaml que numero mantido a mao apodrece. (2) Duas horas depois, publicada em 5063e81b2d8d, o campo ficou atras OUTRA VEZ, e a REGRA 85 seguiu acusando 3 commits de defasagem porque ela le o REGISTRO, nao a porta. Tambem medido: `pin-integrity-check.sh . /home/marcio/onion-core` devolve `pin-untrusted unknown` — nenhuma guarda confere este campo contra o publicado.'
+    label: "QUEM CARIMBA O PIN DA PORTA DEPOIS DO PUSH? Hoje: ninguem — e o numero e mantido A MAO num campo que a REGRA 85 (Porta publica espelha o core, com catraca) LE para decidir defasagem. Logo a guarda pode acusar defasagem que nao existe (foi o que fez duas vezes hoje) ou, pior, calar sobre uma que existe. O gatilho de mecanizacao DISPAROU DUAS VEZES NUM DIA, que e o criterio desta casa para parar de aconselhar e construir. DESENHO CANDIDATO, com a costura ja pronta: o `ops/materialize-door.sh` PARA antes do push por desenho (I3 — publicar e ato do maestro), entao o carimbo nao cabe nele; cabe num irmao pos-push, algo como `ops/door-seal-pin.sh <membro>`, que (a) le o remoto pelo forge (`gh api repos/<owner>/<repo>/commits/<branch>`) — o MESMO comando que o ciclo ja roda a mao para verificar, (b) so carimba se o remoto de fato bater com o pin materializado, fail-closed se nao conseguir ler, e (c) atualiza o `onion_version` E as duas linhas de dado do `door-staleness-baseline.txt`. ⚠️ RESTRICAO MEDIDA que qualquer automacao tem de respeitar: o `--emit-baseline` devolve SO as duas linhas de dado, e redirecionar a saida dele por cima do arquivo apagaria ~170 linhas de historico — saida destrutiva PLAUSIVEL, porque o gerador sai 0 e o arquivo fica nao-vazio. A atualizacao tem de ser cirurgica. ESTE NO MORA AQUI, e nao no fios-abertos, porque o teto daquele arquivo e catraca que so ENCOLHE e porque o fato mora onde nasceu — a decisao de cobrar a defasagem pos-merge (`D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA`) e deste grafo. GATED na decisao do maestro sobre construir; o diagnostico esta fechado."
+    trace: '.claude/validation/door-staleness-baseline.txt · ops/materialize-door.sh'
+
 edges:
+  - from: Q_QUEM_CARIMBA_O_PIN_DA_PORTA
+    to: D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA
+    edge_type: CONSTRAINS
   - from: E_O_BACKLOG_ESTAVA_NO_TETO_ANTES_DA_TRIAGEM
     to: I_AGENTE_EXPO_RN
     edge_type: CONSTRAINS
