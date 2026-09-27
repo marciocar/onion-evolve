@@ -49,14 +49,33 @@ _die() { echo "harness-inventory: $*" >&2; exit 2; }
 # gitignorado e o inventário local ficaria verde enquanto o CI, num checkout limpo, reprova.
 # (Sinal de campo de um adotante, 2026-09-04, herdado do `inventory.sh`.)
 # ---------------------------------------------------------------------------
-_tracked() {   # $1 = pathspec
-  if git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
-    git -C "${REPO_ROOT}" ls-files -- "$1"
-  else
-    _die "sem índice git — a enumeração seria de outro conjunto que o do CI. Recusa."
-  fi
+# ⚠️ A PRÉ-CONDIÇÃO É VERIFICADA UMA VEZ, AQUI — e não dentro de `_tracked`. Medido 2026-09-27:
+# o `_die` vivia no ramo `else` do `_tracked`, que é chamado SEMPRE dentro de `$( )`. `_die` num
+# subshell mata o SUBSHELL, não o script: a mensagem "Recusa" era impressa CINCO vezes no stderr,
+# o `grep -c .` devolvia `0`, o `|| true` engolia o rc, e o inventário saía com CINCO contadores
+# zerados e **rc=0** — declarando, na própria tabela, o comando `git ls-files` que produziu o zero.
+# A guarda gritava cinco vezes e ninguém a ouvia. É a forma mais pura da classe que esta casa
+# persegue: guarda que declara recusar e não alcança o programa de onde é chamada.
+# Sinal de origem: um adotante greenfield (2026-09-08) commitou uma SSOT que declarava superfície
+# inexistente, pelo mesmo motivo no `inventory.sh`.
+if ! git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
+  _die "sem índice git em ${REPO_ROOT} — a enumeração seria de outro conjunto que o do CI, e zero NÃO é resultado. Recusa (antes de contar qualquer coisa)."
+fi
+_tracked() {   # $1 = pathspec ; a pré-condição já foi provada acima
+  git -C "${REPO_ROOT}" ls-files -- "$1"
 }
 _count_tracked() { _tracked "$1" | grep -c . || true; }
+
+# ── CONTRADIÇÃO: arquivo EM DISCO com contagem RASTREADA zero ────────────────────────────────
+# Com git presente, zero pode ser legítimo (nada rastreado ainda) ou sintoma (tudo untracked, o
+# caso do greenfield). O que separa os dois é o DISCO: se há arquivo casando o padrão e a contagem
+# rastreada é zero, a projeção afirmaria uma superfície que não existe. Isso sai não-zero.
+_assert_no_contradiction() {   # $1 = rótulo ; $2 = contagem rastreada ; $3 = diretório ; $4 = glob
+  [ "${2}" = "0" ] || return 0
+  local em_disco; em_disco="$(find "${REPO_ROOT}/${3}" -maxdepth 1 -name "${4}" -type f 2>/dev/null | grep -c . || true)"
+  [ "${em_disco}" = "0" ] && return 0
+  _die "CONTRADIÇÃO em '${1}': ${em_disco} arquivo(s) em disco casando '${3}/${4}' e contagem RASTREADA = 0. O inventário publicaria uma superfície que não existe (tudo untracked?). Commite os arquivos ou corrija o pathspec — zero aqui NÃO é resultado."
+}
 
 SELFTEST="${SCRIPT_DIR}/lint-selftest.sh"
 LINT="${SCRIPT_DIR}/lint-artifacts.sh"
@@ -105,6 +124,12 @@ VALIDATION_SCRIPTS="$(_count_tracked '.claude/validation/*.sh')"
 HOOKS="$(_count_tracked '.claude/hooks/*.sh')"
 WORKFLOWS="$(_count_tracked '.github/workflows/*.yml')"
 BASELINES="$(_count_tracked '.claude/validation/*-baseline.txt')"
+
+_assert_no_contradiction "Scripts de validação" "${VALIDATION_SCRIPTS}" ".claude/validation" '*.sh'
+_assert_no_contradiction "Hooks"                "${HOOKS}"              ".claude/hooks"      '*.sh'
+_assert_no_contradiction "Workflows de CI"      "${WORKFLOWS}"          ".github/workflows"  '*.yml'
+_assert_no_contradiction "Baselines de catraca" "${BASELINES}"          ".claude/validation" '*-baseline.txt'
+_assert_no_contradiction "Arquivos de fixture"  "${FIXTURE_FILES}"      ".claude/validation/fixtures" '*' 
 
 # ---------------------------------------------------------------------------
 # O ESTADO DA SÉRIE É MEDIDO, NÃO AFIRMADO.
