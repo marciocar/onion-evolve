@@ -379,7 +379,22 @@ nodes:
     confidence: 0.9
     label: "O PR da Onda 0 + R0: 9 commits, 35 arquivos, 3144 insercoes, SHA canonico 4ac84bdc. NAO ABRE enquanto o residuo do Elenxo e a cura de raiz da ausencia-lida-como-resultado nao fecharem — abrir agora seria pedir merge de um lote que a propria maquinaria reprovou em 14 pontos. O residuo da REGRA 56 (PR carrega residuo adversarial) ja tem os numeros REAIS para escrever (14 achados / 14 reais / 1,87M tokens / 16 min) e sai no vocabulario FECHADO que o maestro selou — sera o primeiro residuo da era nova. Merge e 100% do maestro."
 
+  - id: E_A_GUARDA_GRITAVA_CINCO_VEZES_E_NAO_PARAVA
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    valid_from: '2026-09-27'
+    verified_at: '2026-09-27'
+    verified_against: 'Medido em 2026-09-27 contra o `harness-inventory.sh` de origin/main, em tres sandboxes construidos com `git archive HEAD` (copia FIEL da arvore rastreada). (1) SEM .git: rc=0, a tabela sai com CINCO contadores zerados, e o stderr traz a mensagem `sem indice git ... Recusa.` CINCO VEZES — contadas com grep -c. (2) Com git e tudo UNTRACKED (o cenario do adotante greenfield): mesmo resultado, rc=0. (3) No repo real: 80 scripts, 16 hooks, correto. Depois da cura: (1) rc=2 recusando ANTES de contar; (2) rc=2 nomeando `CONTRADICAO ... 75 arquivo(s) em disco ... contagem RASTREADA = 0`; (3) inalterado. Mutante que devolve o `_die` para dentro do `_tracked` e remove a assertiva: os dois casos de bancada REPROVAM, com rc=0 e a mensagem Recusa impressa.'
+    label: "A GUARDA GRITAVA CINCO VEZES E NAO PARAVA NADA — e o mecanismo e mais estreito e mais nitido do que o no I_AUSENCIA_LIDA_COMO_RESULTADO registrava. O `_die` vivia no ramo `else` do `_tracked`, e `_tracked` e chamado SEMPRE dentro de `$( )`: `_die` num subshell mata o SUBSHELL, nao o script. Entao a recusa era IMPRESSA e nao PROPAGADA — `grep -c .` devolvia 0, `|| true` engolia o rc, e a SSOT publicava cinco contadores zerados com rc=0, declarando na PROPRIA TABELA o comando `git ls-files` que produziu o zero (visivel para quem le, invisivel para qualquer gate). DUAS CORRECOES AO NO: (a) sao CINCO contadores, nao quatro — exatamente os cinco que delegam ao `git ls-files` (fixtures rastreadas, scripts de validacao, hooks, workflows, baselines); os outros quatro usam `grep` no arquivo e saem CERTOS, o que torna a tabela parcialmente verdadeira e por isso mais convincente; (b) a causa nao e `o fallback para find nunca dispara` — e que a RECUSA NAO ALCANCA o programa de onde e chamada. CURA: pre-condicao verificada UMA VEZ fora de subshell (sem git => rc=2 antes de contar qualquer coisa) MAIS assertiva de contradicao (arquivo em disco + contagem rastreada zero => rc=2, porque zero ali NAO e resultado). Dois casos de bancada, mutante morto. A classe generaliza: `_die`/`exit` dentro de `$( )` e guarda decorativa, e a forma de descobrir foi CONTAR as ocorrencias da mensagem no stderr em vez de ler o codigo."
+    trace: '.claude/validation/harness-inventory.sh'
+
 edges:
+  - from: E_A_GUARDA_GRITAVA_CINCO_VEZES_E_NAO_PARAVA
+    to: I_AUSENCIA_LIDA_COMO_RESULTADO
+    edge_type: SUPPORTS
   - from: I_HARNESS_INVENTORY
     to: E_NUMEROS_DO_HARNESS_DIVERGEM_ENTRE_SI
     edge_type: DEPENDS_ON

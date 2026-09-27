@@ -264,6 +264,16 @@
 | 3.6 | `Q_CATEGORY_DO_COMPLIANCE` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — em que categoria oficial entra o onion-compliance. Nenhuma categoria do vocabulario diz compliance ou gover |
 | 3.6 | `Q_TETO_DE_CONTEXTO` | plugins-en-compliance-2026-09 | DECISAO DO MAESTRO — qual teto de contexto a catraca cobra. A UI mostra Context cost ANTES do install e agrupa plugins nao usado |
 
+## testes-evidencia-2026-09 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.0 | `I_AUSENCIA_LIDA_COMO_RESULTADO` | testes-evidencia-2026-09 | ENTRA NO MESMO PR, e a razao e que o defeito esta num arquivo que o PR INTRODUZ. Sinal do adotante (2026-09-08): `inventory.sh:38` |
+| 14.2 | `I_CURAR_O_RESIDUO_DO_ELENXO` | testes-evidencia-2026-09 | BLOQUEIA O PR DA ONDA 0. Restam DEZ dos 14 achados (quatro ja curados: o gerador que afirmava, os dois MUT que nao executavam, e o |
+| 13.5 | `D_PR_DA_ONDA_0` | testes-evidencia-2026-09 | O PR da Onda 0 + R0: 9 commits, 35 arquivos, 3144 insercoes, SHA canonico 4ac84bdc. NAO ABRE enquanto o residuo do Elenxo e a cura |
+| 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
+| 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
+
 ## m2-bridge-logto-2026-07 — 7 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -312,16 +322,6 @@
 | 5.7 | `Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA` | onion-plugin-publication-2026-08 | ACHADO LATERAL, medido 2026-09-06 ao trocar o predicado de selo para leitura YAML de verdade: QUATRO .kg.yaml versionados sao ACEI |
 | 5.4 | `Q_BEACON_NAO_LIBERA_NO_STOP` | onion-plugin-publication-2026-08 | ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o  |
 | 5.4 | `Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA` | onion-plugin-publication-2026-08 | CANDIDATO A GUARDA, com o dado que EU NAO TINHA quando decidi nao mecanizar (2026-09-06). Eu recusei mecanizar a classe 'no supera |
-
-## testes-evidencia-2026-09 — 5 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 14.2 | `I_AUSENCIA_LIDA_COMO_RESULTADO` | testes-evidencia-2026-09 | ENTRA NO MESMO PR, e a razao e que o defeito esta num arquivo que o PR INTRODUZ. Sinal do adotante (2026-09-08): `inventory.sh:38` |
-| 14.2 | `I_CURAR_O_RESIDUO_DO_ELENXO` | testes-evidencia-2026-09 | BLOQUEIA O PR DA ONDA 0. Restam DEZ dos 14 achados (quatro ja curados: o gerador que afirmava, os dois MUT que nao executavam, e o |
-| 13.5 | `D_PR_DA_ONDA_0` | testes-evidencia-2026-09 | O PR da Onda 0 + R0: 9 commits, 35 arquivos, 3144 insercoes, SHA canonico 4ac84bdc. NAO ABRE enquanto o residuo do Elenxo e a cura |
-| 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
-| 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
 
 ## passada-adversarial-2026-09 — 2 item(ns)
 

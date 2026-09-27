@@ -1737,6 +1737,42 @@ run_harness_inventory_selftests() {
     record_pass "harness-inventory: (f) (MUT) o lint ORIGINAL acusa o drift e o MUTADO CALA — a comparação de diff é o dente (mutante EXECUTADO, ${n_mut} sítios mutados)"
   else record_fail "harness-inventory: (f) (MUT)" "sítios mutados=${n_mut} (esperava >=2); original acusou=${hit_orig} (esperava >=1); mutante acusou=${hit_mut} (esperava 0) — a guarda não é load-bearing OU a âncora caducou"; fi
   rm -rf "${mut}" "${sb2}"
+
+  # ── (z1)(z2) A GUARDA QUE GRITAVA CINCO VEZES E NÃO PARAVA NADA ────────────────────────────
+  # Medido 2026-09-27: o `_die` do `_tracked` vivia no ramo `else`, e `_tracked` é chamado SEMPRE
+  # dentro de `$( )`. `_die` num subshell mata o SUBSHELL, não o script — a mensagem "Recusa" saía
+  # CINCO vezes no stderr, o `grep -c .` devolvia 0, o `|| true` engolia o rc, e o inventário
+  # publicava CINCO contadores zerados com **rc=0**, declarando na própria tabela o `git ls-files`
+  # que produziu o zero. Guarda que declara recusar e não alcança o programa de onde é chamada.
+  # Origem: sinal de um adotante greenfield (2026-09-08) que commitou SSOT de superfície inexistente.
+  local _hi_sb _hi_out _hi_rc
+  # (z1) SEM índice git ⇒ recusa ANTES de contar
+  _hi_sb="$(mktemp -d)"; git -C "${REPO_ROOT}" archive HEAD | tar -x -C "${_hi_sb}" 2>/dev/null
+  cp "${gen}" "${_hi_sb}/.claude/validation/" 2>/dev/null
+  if _hi_out="$( cd "${_hi_sb}" && bash .claude/validation/harness-inventory.sh 2>&1 )"; then _hi_rc=0; else _hi_rc=$?; fi
+  # ⚠️ A asserção passa pelo mesmo escrutínio do SUT: a 1ª redação tinha uma 3ª condição
+  #    ("nenhuma linha de tabela com **0**") que é REDUNDANTE — ele aborta antes de imprimir
+  #    tabela alguma — e ela reprovou um SUT correto. Asserção errada parece defeito ([[mutant-anchor-is-a-defect-candidate]]).
+  #    E o padrão é À PROVA DE LOCALE: a bancada roda sob `LC_ALL=C`, onde `í` são DOIS bytes e
+  #    `sem .ndice` (um curinga) NÃO casa. Casar só o trecho ASCII é o que sobrevive aos dois
+  #    locales ([[bancada-mede-no-locale-do-hook]]).
+  if [ "${_hi_rc}" -ne 0 ] && grep -qiE 'ndice git' <<< "${_hi_out}"; then
+    record_pass "harness-inventory: (z1) sem índice git ⇒ recusa ANTES de contar (nenhuma tabela zerada)"
+  else record_fail "harness-inventory: (z1) zero virou resultado" "rc=${_hi_rc} out=${_hi_out:0:220}"; fi
+  rm -rf "${_hi_sb}"
+
+  # (z2) git PRESENTE mas tudo UNTRACKED ⇒ CONTRADIÇÃO nomeada. É o cenário exato do adotante:
+  #      arquivo em disco + contagem rastreada zero = projeção afirmaria superfície que não existe.
+  _hi_sb="$(mktemp -d)"; git -C "${REPO_ROOT}" archive HEAD | tar -x -C "${_hi_sb}" 2>/dev/null
+  cp "${gen}" "${_hi_sb}/.claude/validation/" 2>/dev/null
+  git -C "${_hi_sb}" init -q 2>/dev/null
+  git -C "${_hi_sb}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m vazio 2>/dev/null || true
+  if _hi_out="$( cd "${_hi_sb}" && bash .claude/validation/harness-inventory.sh 2>&1 )"; then _hi_rc=0; else _hi_rc=$?; fi
+  if [ "${_hi_rc}" -ne 0 ] && grep -qiE 'CONTRADI' <<< "${_hi_out}"; then
+    record_pass "harness-inventory: (z2) tudo untracked ⇒ CONTRADIÇÃO nomeada (o sinal do greenfield)"
+  else record_fail "harness-inventory: (z2) publicaria superfície inexistente" "rc=${_hi_rc} out=${_hi_out:0:220}"; fi
+  rm -rf "${_hi_sb}"
+
 }
 
 # Modo rules-registry — REGRA 39. O gerador projeta os docstrings '# REGRA N — …' de
