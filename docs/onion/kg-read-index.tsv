@@ -1169,6 +1169,7 @@ docs/evolution/inbox/	E_DEZ_SINAIS_TRIADOS_COM_MEDICAO	docs/onion/graph/inbox-si
 docs/evolution/inbox/_processed/2026-06-18-adopt-gitflow-develop-branch-config.md	C_D7_14	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/evolution/inbox/_processed/2026-07-02-sinal-sdaal-knowledge-graph.md	C_D7_12	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/evolution/inbox/_processed/2026-07-10-metodologia-branches-gitflow-main-produto-vs-rhilo.md	C_SIGNAL_DISJOINT	docs/onion/graph/onion-identity-2026-07.kg.yaml
+docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md	C_CONVENCAO_NO_DESTINO_MORRE	docs/onion/graph/forge-comando-framework-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md	E_PENDING_SIGNAL	docs/evolution/research/doctrine-sync-ingestor-2026-07/doctrine-sync-ingestor.kg.yaml
 docs/evolution/inbox/_processed/2026-07-25-correcao-o-sinal-do-entrypoint-estava-errado.md	Q_source_correction	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 docs/evolution/inbox/_processed/2026-07-25-logto-core-e-licao-do-pin-herdado.md	C_pin_verifier_done	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
@@ -1204,6 +1205,7 @@ docs/evolution/research/agent-command-composition-2026-09/agent-command-composit
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_MERCADO_AGENT_COMMAND_COMPOSITION_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_CONDUCTOR_VETO_ANCHORING_PENDING	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
+docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_DESTINO_DIFERENCIAL_OU_LACUNA	docs/onion/graph/forge-comando-framework-2026-09.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_artifact_adr_thread_runtime	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_claim_onion_stricter	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_claim_transfer_onion	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
