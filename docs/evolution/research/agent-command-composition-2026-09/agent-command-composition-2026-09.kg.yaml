@@ -1,0 +1,683 @@
+meta:
+  id: agent-command-composition-2026-09
+  schema_version: "1"
+  baseline: 2026-09-28
+  review_after: 2026-12-27   # cadência MERCADO = 90d. O tipo dominante desta rodada é MERCADO/
+                             # ECOSSISTEMA (como o campo NOMEIA e PADRONIZA um movimento, quem
+                             # publica especificação aberta, quantas plataformas adotaram) — não é
+                             # doutrina (12m), porque o objeto é um rótulo em disputa em 2026, e não
+                             # é ferramenta/preço (30d), porque nenhuma claim desta rodada é sobre
+                             # versão ou preço de produto. As duas evidências mais fortes são
+                             # datadas e perecíveis: o Thoughtworks Radar vol. 34 (valid_from
+                             # 2026-04) e uma contagem de adoção ("26+ plataformas"), que é um número
+                             # que anda.
+                             # GATILHOS DE REVISITA ANTECIPADA (nomeados, não data): (i) sair o
+                             # Thoughtworks Radar vol. 35 — se ele mover "Agent Skills" de anel ou
+                             # renomear o padrão, a única evidência tier 7 desta rodada muda de
+                             # valor; (ii) a especificação em agentskills.io mudar de governança
+                             # (ex.: passar à Agentic AI Foundation / Linux Foundation, como o MCP
+                             # passou) — isso converteria "spec de um fornecedor" em "padrão de
+                             # fundação, e é o eixo que decide a pergunta; (iii) aparecer evidência
+                             # PRIMÁRIA de sucesso ou fracasso do padrão composto, que é exatamente
+                             # o que esta rodada NÃO tem (ver E_LACUNAS_…, a refutação do
+                             # arXiv:2605.14102).
+  # kg-backlog-guard: on
+  # ═══ TETO: 26 NÓS = 3 questions + 20 evidências de fonte + 1 síntese de mercado + 2
+  #     contabilidades de rodada (era 8 antes da rodada de PRIMÁRIAS de 2026-09-28).
+  #     POR QUE SUBIU, e é exatamente a cláusula (a) do teto
+  #     anterior sendo cumprida: aquele teto dizia que o grafo só cresceria com FONTE PRIMÁRIA NOVA,
+  #     nomeando três — a especificação em agentskills.io lida na íntegra, o texto de governança da
+  #     Agentic AI Foundation, e um paper com medição. A rodada de primárias de 2026-09-28 leu TODAS
+  #     AS TRÊS (mais a documentação oficial da Anthropic, a página de governança do MCP e o
+  #     repositório do Conductor): 7 documentos, ZERO inalcançáveis, 18 claims ancoradas com quote
+  #     verbatim + locator + verificador independente, 4 rejeitadas na ancoragem. Não cresceu por
+  #     busca nova: cresceu por LEITURA das fontes que a rodada anterior citava de segunda mão.
+  #     CONTINUA A NÃO CRESCER por: mais um blog secundário sobre o nome do padrão (sete claims
+  #     dessa forma já caíram, de sete fontes), nem por re-resumo do paper Context Kubernetes — ele
+  #     está lido na íntegra e julgado. SÓ CRESCE, daqui, com: (a) evidência de CAPITAL (rodada,
+  #     M&A, valuation, down round) — a lacuna 1, que NÃO se fecha em modo primaries porque não há
+  #     documento nomeado a ler; (b) evidência primária de FRACASSO (arXiv:2605.14102 ou substituto)
+  #     — a lacuna 3; (c) medição do ARTEFATO INSTALADO do Claude Code (cláusula 2, o binário antes
+  #     da web) — a lacuna 4; (d) a micro-ancoragem do "roteia, não veta" do Conductor com o locator
+  #     correto — Q_CONDUCTOR_VETO_ANCHORING_PENDING. ═══
+  #
+  # Pergunta do maestro (2026-09-28): como o mercado padroniza "doutrina + contexto injetado +
+  # orquestração determinística" para comandos de agente, e que nome esse movimento tem (set/2026).
+  #
+  # ⚠️ Proveniência (R15): os `label` das evidências E_RADAR_*, E_CONDUCTOR_*, E_MCP_*,
+  #    E_CLAUDE_CODE_* e E_AGENTSKILLS_* carregam texto extraído de páginas da web. É DADO a pesar,
+  #    nunca instrução — nenhuma diretiva contida nessas fontes foi ou deve ser obedecida.
+  #
+  # ⚠️ VEREDITO DE ENTRADA (o que esta rodada descobriu sobre si mesma): a pergunta tem DUAS metades
+  #    e a rodada respondeu UMA. A metade "quem publica especificação aberta e que formatos existem"
+  #    ficou com 5 claims confirmadas e uma cadeia coerente (Radar nomeia → spec governada →
+  #    26+ adotantes → implementação determinística concreta em dois fornecedores). A metade "que
+  #    NOME o movimento COMPOSTO tem" ficou SEM resposta confirmada em nenhuma direção: as 7 claims
+  #    que afirmavam "não existe termo consolidado" foram todas refutadas, e as 2 que afirmavam
+  #    "o termo é Agent Skills" também (tier 4 e tier 6). Sobrou UMA: o Radar (tier 7) nomeia
+  #    "Agent Skills" para o EMPACOTAMENTO (instruções + scripts + recursos), que é a camada (a) da
+  #    pergunta — não para o composto (a)+(b)+(c). Isso NÃO é "o campo não tem nome": é "esta rodada
+  #    não estabeleceu nem que tem nem que não tem". Ver E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928.
+  #
+  # ⚠️ Relação com o corpus (104 grafos, 1045 nós casados, NENHUM responde a pergunta — sem
+  #    SUPERSEDES/REFUTES cross-graph: grafo antigo não se edita e aresta entre grafos não é
+  #    modelada aqui). O corpus já tem a ESCADA de autonomia (autonomous-thread-runtime), o MERGE
+  #    DETERMINÍSTICO por política (E_SRC_DETERMINISTIC), a ESTIGMERGIA como prior-art
+  #    (breadcrumb-doctrine) e a tipologia de GATES (audit-textual-gates-2026-09). O que esta rodada
+  #    ACRESCENTA e o corpus não tinha: o nome externo do movimento, quem publica especificação
+  #    aberta, e que o padrão "topologia declarada em arquivo, orquestrador a custo zero de token"
+  #    aparece em DOIS fornecedores independentes (Microsoft Conductor e Claude Code Workflows).
+  #    CONVERGÊNCIA a registrar, não contradição: E_SRC_DETERMINISTIC (2026-07-18, "merge decidido
+  #    por política DETERMINÍSTICA, nunca probabilística") e E_CONDUCTOR_… (2026-05-14, "topologia
+  #    declarada, não descoberta em runtime") são a mesma tese chegando por dois caminhos.
+
+nodes:
+  # ── A PERGUNTA ────────────────────────────────────────────────────────────────────────
+  - id: Q_AGENT_COMMAND_COMPOSITION_0928
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: 'Como o mercado padroniza, em setembro de 2026, compor um comando de agente a partir de (a) DOUTRINA declarada como fragmento reutilizavel, (b) CONTEXTO MEDIDO injetado antes do raciocinio do modelo e (c) ORQUESTRACAO DETERMINISTICA em script (fases, schemas, budget, coordenacao a custo zero de token), com destino obrigatorio num grafo de conhecimento — e que NOME esse movimento tem. VEREDITO: segue `open`, respondida PELA METADE. O QUE FICOU ESTABELECIDO: existe especificacao aberta para a camada (a) — Agent Skills, nomeada por analista tier 7 (Thoughtworks Radar vol. 34) como padrao aberto de modularizacao de contexto, com spec em agentskills.io e adocao declarada em 26+ plataformas incluindo concorrentes diretos; existe precedente de governanca neutra no ecossistema (o MCP saiu da Anthropic para a Agentic AI Foundation sob a Linux Foundation); e a camada (c) tem DUAS implementacoes independentes que convergem na mesma tese — topologia DECLARADA em arquivo (nao descoberta em runtime) com orquestrador a custo ZERO de token (Microsoft Conductor em YAML+Jinja2; Claude Code Workflows em .js com schemas JSON e budget medido em tempo real). O QUE NAO FICOU ESTABELECIDO: o NOME do composto. Sete claims de sete fontes distintas afirmando "nao existe termo consolidado" foram TODAS refutadas na votacao adversarial, e as duas que afirmavam "o termo e Agent Skills" tambem. Logo esta rodada nao provou nem a existencia nem a ausencia de um nome para o composto — provou apenas que ha nome para a camada (a). Tambem NAO ficou estabelecida a camada (b) isolada: as tres claims sobre injecao de contexto medido pre-raciocinio (progressive disclosure de 30-50 tokens, modos accumulate/last_only/explicit, sintaxe de comando dinamico) foram refutadas, todas por fonte de tier 3-6. E o eixo mais importante para uma decisao — evidencia PRIMARIA de o que funcionou e o que fracassou — voltou VAZIO: a unica fonte tier 7 de fracasso (arXiv:2605.14102, orquestracao mais agressiva NAO melhorou desempenho) foi refutada. A pergunta e decidivel, mas nao com esta base.'
+    trace: 'docs/evolution/research/agent-command-composition-2026-09/SYNTHESIS.md · docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml'
+
+  # ── EVIDÊNCIAS CONFIRMADAS (5 claims, 5 fontes distintas) ────────────────────────────
+  - id: E_RADAR_NOMEIA_AGENT_SKILLS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-28
+    verified_against: 'https://www.thoughtworks.com/radar/techniques/agent-skills — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026-04'
+    source_tier: 7
+    source_kind: analyst
+    label: 'CONFIRMADA (tier 7, 3-0 — a fonte mais forte da rodada): "Thoughtworks Technology Radar (vol. 34) nomeia o padrao emergente de empacotar instrucoes + scripts executaveis + recursos associados como Agent Skills, um padrao aberto de modularizacao de contexto, com especificacao em agentskills.io." POR QUE ISSO PESA: Radar nomear um padrao e o marcador classico de saida de "emergente idiossincratico" para "categoria reconhecida" — e a evidencia mais proxima de consolidacao terminologica que esta rodada alcancou. ⚠️ O QUE ESTA CLAIM NAO DIZ, e a rodada tentou fazer dizer: ela nomeia o EMPACOTAMENTO (camada (a) da pergunta: doutrina reutilizavel + scripts), NAO o composto (a)+(b)+(c) com destino em grafo de conhecimento. A claim que afirmava explicitamente que o Radar NAO confirma termo para o composto foi REFUTADA nesta mesma rodada (tier 7) — ou seja, nao se pode citar esta fonte nem a favor nem contra a existencia de nome para o composto. Autoridade sobre o nome da camada nao e autoridade sobre o nome do sistema.'
+    trace: 'https://www.thoughtworks.com/radar/techniques/agent-skills'
+
+  - id: E_CONDUCTOR_ORQUESTRACAO_DECLARADA_CUSTO_ZERO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: 2026-09-28
+    verified_against: 'https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2026-05-14'
+    source_tier: 6
+    source_kind: vendor-on-competitor
+    label: 'CONFIRMADA (tier 6, 3-0): "A orquestracao e declarada deterministicamente em YAML com templates Jinja2 para roteamento entre agentes, com a topologia declarada (nao descoberta em runtime) e sem custo de token no orquestrador." POR QUE ISSO PESA: e a camada (c) da pergunta materializada por um fornecedor grande, e as DUAS propriedades que ela declara sao exatamente as duas que o Onion ja pratica — topologia declarada em ARQUIVO (nao negociada pelo modelo) e coordenacao que nao gasta inferencia. ⚠️ TIER E SUSPEITA: `vendor-on-competitor` e sempre suspeito (clausula 7) — e um fornecedor descrevendo o proprio produto num espaco onde compete; a confianca fica em 0,7 apesar do 3-0. ⚠️ O QUE NAO SOBREVIVEU DA MESMA FONTE, e importa: as claims de que o Conductor consome Agent Skills como formato de doutrina reutilizavel (o elo que uniria (a) a (c) num mesmo produto) e de que existem tres modos de controle de contexto injetado (accumulate / last_only / explicit, a camada (b)) foram AMBAS refutadas. Sobrou a orquestracao; a costura com as outras duas camadas nao foi estabelecida.'
+    trace: 'https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/'
+
+  - id: E_MCP_GOVERNANCA_NEUTRA_PRECEDENTE
+    node_type: evidence
+    plane: DEV
+    # RECONCILIADO em 2026-09-28 pela rodada de primárias: recebe SUPERSEDES de
+    # E_MCP_UNDER_LF_PROJECTS_NOT_NAMING_AAIF (tier 9, página do próprio projeto) e de
+    # E_AAIF_FORMED_2025_12_09_MCP_FOUNDING (tier 10, press release da Linux Foundation).
+    # O FATO sobrevive (há governança institucional neutra no ecossistema); a FORMULAÇÃO desta
+    # newsletter tier 5 — "o MCP passou a ser governado pela Agentic AI Foundation" — não é o que
+    # nenhuma das duas fontes primárias diz: a página do projeto declara "LF Projects, LLC" e não
+    # nomeia a AAIF; o press release declara o MCP como contribuição FUNDADORA da AAIF (9/12/2025).
+    # Nada apagado — supersessão é operação nomeada (cláusula 9).
+    status: superseded
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-09-28
+    verified_against: 'https://www.newsletter.swirlai.com/p/state-of-context-engineering-in-2026 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    valid_from: '2024-11'
+    source_tier: 5
+    source_kind: analyst
+    label: 'CONFIRMADA (tier 5, 3-0): "O MCP (Model Context Protocol), lancado pela Anthropic em novembro de 2024, passou a ser governado pela Agentic AI Foundation sob a Linux Foundation, e foi adotado por OpenAI, Google, GitHub e Cursor." POR QUE ISSO PESA na pergunta do NOME: e o PRECEDENTE de trajetoria completa no mesmo ecossistema — spec nasce num fornecedor, e adotada por concorrentes, e termina sob fundacao neutra. Isso da um gatilho OBSERVAVEL para julgar se Agent Skills esta consolidando de verdade ou e vocabulario de um fornecedor: a pergunta nao e quantos blogs usam o termo, e se a spec muda de dono. Hoje agentskills.io e governada pela Anthropic (ver E_AGENTSKILLS_SPEC_ADOCAO_MULTIPLATAFORMA); o MCP ja nao e. ⚠️ O QUE NAO SOBREVIVEU DA MESMA FONTE: as claims sobre o FORMATO do Agent Skills (markdown com frontmatter YAML, tiers discovery/activation/execution, lancamento em dez/2025) e sobre a ausencia de termo unificado foram refutadas — desta fonte vale a governanca, nao o formato.'
+    trace: 'https://www.newsletter.swirlai.com/p/state-of-context-engineering-in-2026'
+
+  - id: E_CLAUDE_CODE_WORKFLOWS_SCHEMA_E_BUDGET
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: 2026-09-28
+    verified_against: 'https://www.my2cents.ai/deep-dive/claude-code-workflows/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    source_tier: 5
+    source_kind: analyst
+    label: 'CONFIRMADA (tier 5, 3-0): "A implementacao do Claude Code usa um pequeno arquivo .js que define o fluxo (quando fazer fan-out de agentes, quando gatear num resultado, quando avancar de fase), schemas JSON para validar saidas estruturadas e orcamento de tokens (budget.remaining()) medido em tempo real, com primitivas (agent(), parallel(), pipeline(), phase()) que compoem o fluxo sem gastar tokens em coordenacao." POR QUE ISSO PESA: e a SEGUNDA implementacao independente da mesma tese do E_CONDUCTOR_… — fluxo declarado em arquivo, fases explicitas, saida validada por schema, coordenacao a custo zero. Duas implementacoes de fornecedores que competem, convergindo nas mesmas primitivas, e o sinal mais forte desta rodada de que a camada (c) esta PADRONIZANDO DE FATO mesmo sem nome fechado. E e a plataforma a que o Onion e acoplado: a orquestracao que esta rodada pesquisou no mercado e a mesma maquinaria em que este grafo foi produzido. ⚠️ TIER: analista secundario, nao documentacao oficial — a verificacao contra o ARTEFATO INSTALADO (clausula 2: binario antes da web) NAO foi feita nesta rodada e e a primeira coisa a fazer numa proxima. ⚠️ O QUE NAO SOBREVIVEU DA MESMA FONTE: a claim de que nao existe nome consolidado para o padrao foi refutada.'
+    trace: 'https://www.my2cents.ai/deep-dive/claude-code-workflows/'
+
+  - id: E_AGENTSKILLS_SPEC_ADOCAO_MULTIPLATAFORMA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-09-28
+    verified_against: 'https://strapi.io/blog/what-are-agent-skills-and-how-to-use-them — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)'
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'CONFIRMADA (tier 4, 3-0): "A especificacao aberta e governada em agentskills.io (Anthropic) e ja foi adotada por 26+ plataformas, incluindo concorrentes diretos." POR QUE ISSO PESA: e a unica claim sobrevivente que responde ao "QUEM publica especificacao aberta para isso" — e adocao por CONCORRENTE e o teste de que a spec e aberta de fato, nao so de nome. ⚠️ TIER BAIXO E SUSPEITA DUPLA: tier 4 e `vendor-on-competitor`; a confianca fica em 0,6 apesar do 3-0, e o numero "26+" e uma contagem que anda — e o tipo de dado que justifica a cadencia de 90 dias deste grafo. ⚠️ O QUE NAO SOBREVIVEU DA MESMA FONTE, e e o ponto: a claim de que "Agent Skills E o termo consolidado que o mercado usa para esse padrao" foi REFUTADA, assim como a claim sobre progressive disclosure de ~30-50 tokens por skill (a camada (b)). Desta fonte vale a EXISTENCIA e a ADOCAO da spec — nunca a afirmacao de que ela nomeia o composto.'
+    trace: 'https://strapi.io/blog/what-are-agent-skills-and-how-to-use-them'
+
+  # ── MERCADO / CAPITAL (cláusula 4: invariante, não opção por tema) ───────────────────
+  - id: E_MERCADO_AGENT_COMMAND_COMPOSITION_0928
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-09-28
+    verified_against: 'Sintese da rodada 2026-09-28: eixo ANALISTA e eixo GOVERNANCA devolveram sinal confirmado (Thoughtworks Radar vol. 34 tier 7 nomeando o padrao; MCP sob a Agentic AI Foundation / Linux Foundation tier 5; adocao declarada em 26+ plataformas tier 4). Eixo CAPITAL — rodadas de investimento, M&A, valuation, down round — devolveu ZERO claim, confirmada ou refutada: nenhuma fonte alcancada nesta rodada tratou de dinheiro'
+    source_tier: 10
+    source_kind: measurement
+    label: 'MERCADO: SINAL DE ANALISTA E DE GOVERNANCA = SIM. SINAL DE CAPITAL = SEM SINAL ENCONTRADO, e declarado como tal. O que sobreviveu aos votos, em ordem de forca: (1) ANALISTAS, tier 7, o mais forte da rodada — o Thoughtworks Technology Radar vol. 34 NOMEIA o padrao ("Agent Skills") e o classifica como padrao aberto de modularizacao de contexto, apontando a especificacao em agentskills.io; Radar nomear um padrao e o marcador classico de saida de "emergente idiossincratico" para "categoria reconhecida". (2) GOVERNANCA — o MCP saiu do fornecedor de origem para a Agentic AI Foundation sob a Linux Foundation e foi adotado por OpenAI, Google, GitHub e Cursor: ha trilha institucional montada neste ecossistema, o que da um gatilho observavel (a spec muda de dono?) em vez de contar mencoes em blog. (3) ADOCAO — 26+ plataformas, incluindo concorrentes diretos, mas por fonte tier 4 vendor-on-competitor. O QUE FALTA, e e a invariante follow-the-money NAO satisfeita: nenhuma rodada, aquisicao, valuation ou down round entrou nesta rodada. Isso NAO significa que nao exista — significa que ninguem procurou nesse eixo: as 11 URLs que produziram claim sao radar de analista, blog de fornecedor, newsletter tecnica e dois papers, nenhuma fonte de capital (nem Crunchbase, nem PitchBook, nem imprensa de negocios, nem 8-K/S-1). LACUNA NOMEADA, NAO AUSENCIA DE EIXO. E ha um eixo de capital REAL que decidiria a pergunta e ninguem tocou: quem esta comprando ou financiando empresas de ORQUESTRACAO de agentes (a camada (c)) versus de CONTEXTO/memoria (a camada (b)) — capital mostra o ESCASSO, e saber qual das tres camadas o dinheiro considera escassa diz onde o padrao vai congelar primeiro.'
+    trace: 'docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml'
+
+  # ── LACUNAS (cláusula 8: lacuna vira nó) ─────────────────────────────────────────────
+  - id: E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-28
+    verified_against: 'Contagem do payload desta rodada, feita nesta sessao: 35 fontes no escopo · 31 claims julgadas na votacao adversarial · 5 confirmadas · 20 refutadas com entrada individual no payload · 0 nao verificadas por falha de acesso (403, doc truncada, so agregador) · 11 URLs distintas produziram pelo menos uma claim · 6 claims aparecem na contagem de 31 sem entrada individual recebida por esta sessao · 24 das 35 fontes nao produziram claim alguma'
+    source_tier: 10
+    source_kind: measurement
+    label: 'LACUNAS DA RODADA, contadas e nomeadas. CONTABILIDADE: 35 fontes no escopo, 31 claims julgadas, 5 confirmadas, 20 refutadas com entrada individual, ZERO nao verificadas por falha de acesso — ou seja, nada aqui caiu por 403 ou doc truncada; o que caiu, caiu por FONTE FRACA ou por consenso adversarial. Duas lacunas de contabilidade declaradas em vez de maquiadas: (i) 6 das 31 claims nao chegaram a esta sessao com entrada individual, entao a lista abaixo e do que FOI recebido, nao do total; (ii) 24 das 35 fontes nao produziram claim nenhuma — cortadas por orcamento antes de render julgamento, e nao se sabe o que continham. LACUNA 1, A MAIS GRAVE — O FRACASSO NAO TEM EVIDENCIA: a unica fonte tier 7 sobre o que NAO funciona (arXiv:2605.14102, "orquestracao mais agressiva, com mais fases e camadas de coordenacao, NAO melhorou o desempenho no conjunto completo de tarefas e aumentou o ruido operacional") foi REFUTADA. Era a evidencia primaria de fracasso de orquestracao excessiva, exatamente o contrapeso que uma decisao sobre a camada (c) precisa, e a rodada terminou sem NENHUM substituto. Consequencia direta: esta rodada NAO pode ser citada para dizer que mais fases e melhor nem que e pior. LACUNA 2 — O NOME DO COMPOSTO FICOU INDECIDIDO NAS DUAS DIRECOES: sete claims de SETE fontes distintas (tier 7, 6, 5, 5, 5, 5, 3) afirmando que nao existe termo consolidado para o composto foram TODAS refutadas, e as duas que afirmavam que o termo E "Agent Skills" (tier 4 e tier 6) tambem. Entre os rotulos que circularam nessas fontes refutadas e que NAO podem ser citados como achado desta rodada: "Agent Harness Engineering" e "Harness Engineering" (atribuido a Mitchell Hashimoto, tier 3), "Deterministic AI Orchestration" (proposto pela Praetorian, tier 5), "Agentic AI Systems" (tier 6), "Agentic Workflows", "Context Engineering" e "layered architecture" (tier 5). Sao PISTAS DE VOCABULARIO para a proxima rodada, nao resultados. LACUNA 3 — A CAMADA (b) NAO TEM NENHUMA EVIDENCIA SOBREVIVENTE: todas as claims sobre contexto medido injetado antes do raciocinio caíram — progressive disclosure com ~30-50 tokens por skill (tier 4), modos accumulate/last_only/explicit (tier 6), e a sintaxe de comando dinamico que injeta saida de script no contexto sem custo de inferencia (tier 3). Das tres camadas da pergunta, (a) tem fonte tier 7, (c) tem duas implementacoes independentes, e (b) tem ZERO. LACUNA 4 — O DESTINO EM GRAFO DE CONHECIMENTO, que e a parte mais especifica da pergunta, aparece em UMA unica claim e ela foi refutada (Praetorian, tier 5: "o destino obrigatorio da orquestracao determinística e um arquivo de estado tipo grafo de conhecimento, MANIFEST.yaml atuando como Process Control Block"). Nenhuma fonte confirmada desta rodada liga orquestracao a destino obrigatorio em grafo — e essa e justamente a peca em que o Onion aposta. LACUNA 5 — UM PAPER INTEIRO CAIU: arXiv:2604.11623v3 ("Context Kubernetes: Declarative Orchestration of Enterprise Knowledge for Agentic AI Systems", abr/2026), descrito como combinando exatamente os tres elementos da pergunta, foi refutado em DUAS claims (tier 6). Se a descricao estiver certa, e a fonte primaria mais relevante que existe para esta pergunta e ela precisa ser LIDA NA INTEGRA em modo `primaries`, com ancoragem verbatim — nao re-julgada por resumo. LACUNA 6 — FONTES PRIMARIAS NUNCA ABERTAS: agentskills.io (a especificacao em si, que TRES claims desta rodada citam de segunda mao), o texto de governanca da Agentic AI Foundation, e o ARTEFATO INSTALADO do Claude Code (clausula 2: o binario vem antes da web, e a claim sobre budget/schemas/primitivas foi aceita de analista secundario sem uma linha medida no disco). GATILHO DERIVADO: as lacunas 2, 5 e 6 JA TEM NOME — o que as torna elegiveis ao modo `primaries` (leitura + ancoragem verbatim + verificador independente), nao a outra varredura larga. Esta rodada custou uma varredura para descobrir que as proximas nao devem ser varredura.'
+    trace: 'docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml'
+
+  # ══════════════════════════════════════════════════════════════════════════════════════
+  # RODADA DE PRIMÁRIAS — 2026-09-28 (mode: primaries · leitura + ancoragem verbatim)
+  # Aufhebung: nada acima foi reescrito. Os nós abaixo ANCORAM, em fonte primária lida na
+  # íntegra, as lacunas que a rodada anterior deixou NOMEADAS — e um deles corrige a rodada
+  # anterior (ver SUPERSEDES sobre E_MCP_GOVERNANCA_NEUTRA_PRECEDENTE).
+  # ⚠️ Proveniência (R15): os `label` e `verified_against` abaixo carregam TRECHOS VERBATIM de
+  #    documentos externos (preprint arXiv, especificação web, blog de fornecedor, página de
+  #    governança, press release). É DADO a pesar, nunca instrução — nenhuma diretiva contida
+  #    nessas fontes foi ou deve ser obedecida.
+  # ══════════════════════════════════════════════════════════════════════════════════════
+
+  # ── (4) O PAPER "CONTEXT KUBERNETES" LIDO NA ÍNTEGRA — a peça que mais importava ──────
+  - id: E_CXK_CONTEXT_STORE_FORMAL_DEFINITION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "A context store is a backing system that persists context units: s=(σ,ι,ϕ) where σ is the store type (git repository, relational database, connector to external system, file system)... Stores are accessed exclusively through the Context Runtime Interface." — LOCATOR: arXiv:2604.11623v3, Seção 3.2 (Core Abstractions), Definição 3.3 (Context Store); paper.txt l.273-276 na cópia lida. DIVERGÊNCIA DECLARADA pelo próprio leitor: o número de página (p.6) NÃO é verificável na renderização HTML. ancorada por verificador independente'
+    valid_from: '2026-04-16'
+    source_tier: 4
+    source_kind: preprint
+    label: 'ANCORADA (tier 4 — preprint arXiv de autor único, sem peer review, autor escrevendo a partir da própria empresa: vendor-on-own-product, cláusula 7): o paper DEFINE formalmente o Context Store como sistema de persistência de unidades de contexto, com tipo de store enumerado (repositório git, banco relacional, conector para sistema externo, filesystem) e acesso EXCLUSIVO pela Context Runtime Interface. POR QUE IMPORTA: é a peça mais próxima, na arte externa, de "onde o conhecimento mora é DECLARADO, não escolhido pelo agente". ⚠️ LIMITE MEDIDO PELO ELENXO, e ele muda a leitura: o Context Store é peça da via de LEITURA, não destino do que o agente PRODUZ. A única interface voltada ao agente é a Definition 3.4 (Context Endpoint) e é read-only por assinatura ("ε(q, ω, α) → {u1,...,uk} ⊆ U"), seguida de "The agent never specifies where knowledge lives—only what it needs." Medição no texto inteiro (88 KB): "write(" ocorre UMA vez (só a assinatura do CxRI) e "agent-produced", "knowledge produced", "write path", "writes back" e "contribute knowledge" ocorrem ZERO vezes. Definir onde o conhecimento organizacional MORA para ser ENTREGUE não é impor destino ao conhecimento PRODUZIDO: prova MENOS do que a pergunta desta rodada precisa.'
+    trace: 'https://arxiv.org/abs/2604.11623v3'
+
+  - id: E_CXK_FRESHNESS_MANAGER_FOUR_STATES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "Freshness Manager (continuous monitoring with four states: fresh, stale, expired, conflicted)" — LOCATOR: arXiv:2604.11623v3, Seção 3.3 (arquitetura de sistema); paper.txt l.307 ("Freshness Manager (continuous mon-") e l.665 ("Liveness Probe / Freshness Manager / Health monitoring with corrective action"). DIVERGÊNCIA DECLARADA pelo próprio leitor: o Requisito 2.4 vive na Seção 2.3, não na 3.3; páginas (6-7) não verificáveis em HTML. ancorada por verificador independente'
+    valid_from: '2026-04-16'
+    source_tier: 4
+    source_kind: preprint
+    label: 'ANCORADA (tier 4): o paper implementa frescor como MÁQUINA DE ESTADOS de quatro estágios (fresh, stale, expired, conflicted) sob monitoramento contínuo, com "corrective action" no Liveness Probe. CONVERGÊNCIA REAL com a temporalidade do Onion (valid_from / verified_at / review_after) — chegando por outro caminho. ⚠️ LIMITE (objeção do Elenxo SOBREVIVE): o objeto medido é o frescor de conteúdo INGERIDO de fontes já existentes ("ι is the ingestion configuration") — quando um documento da empresa envelhece. NÃO é a validade bi-temporal de um claim PRODUZIDO por uma rodada de pesquisa. É convergência num eixo ADJACENTE (frescor), não a arte do destino. E o número de vitrine ("staleness detected in under 1 ms") é medido em seed data sintética num protótipo local.'
+    trace: 'https://arxiv.org/abs/2604.11623v3'
+
+  - id: E_CXK_REQUIREMENT_2_4_TTL_MANDATE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "Requirement 2.4 (Context Freshness (NIST: Measure 2.6 — data quality and relevance)). The system must continuously monitor the currency of all knowledge and take corrective action when knowledge exceeds its configured time-to-live." — LOCATOR: arXiv:2604.11623v3, Seção 2.3 (subseção da Seção 2, Requirements); paper.txt l.225. DIVERGÊNCIA DECLARADA: página 5 não verificável em HTML. ancorada por verificador independente'
+    valid_from: '2026-04-16'
+    source_tier: 4
+    source_kind: preprint
+    label: 'ANCORADA (tier 4): o paper trata TTL + ação corretiva como REQUISITO numerado do sistema ("must continuously monitor... and take corrective action"), não como comentário lateral — e mapeia o requisito ao NIST Measure 2.6. ⚠️ LIMITE (objeção do Elenxo SOBREVIVE, e é a que mais desconta este nó): "exigência formal" de QUEM. R1-R7 são requisitos que o PRÓPRIO AUTOR estipula e depois pontua: a Table 8 dá "Impl." ao Context Kubernetes em R1-R6 e "Gap"/"Partial" a Microsoft/Salesforce/AWS/Google/DIY, e a §9.1 admite "Single-author evaluation. The gap analysis (Table 8) and the experiment design are by the author." Rubrica escrita e pontuada pelo mesmo autor cujo sistema é o único a implementá-la é tautológica. O mapeamento para o NIST é mapeamento DO AUTOR, não endosso do NIST. Prova que UM autor formalizou a exigência — não que o campo a exige.'
+    trace: 'https://arxiv.org/abs/2604.11623v3'
+
+  - id: E_CXK_GATE_AT_REGISTRATION_NOT_AT_WRITE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "This invariant is enforced at registration time: the Permission Engine rejects any agent profile that is not a strict subset, that includes operations outside the user''s role, or that specifies a less restrictive tier than the user''s." — LOCATOR: arXiv:2604.11623v3, Seção 3.4 (The Agent Permission Model), imediatamente após a Design Invariant 3.7 (Agent Permission Subset); paper.txt l.367-369. DIVERGÊNCIA DECLARADA: página 7 não verificável em HTML. MEDIÇÃO DE AUSÊNCIA no mesmo documento: "write(" ocorre UMA única vez no paper inteiro (l.286, assinatura de adapter "write(conn, path, c) → Result"), sem critério de aceitação, sem schema, sem validação descrita. ancorada por verificador independente'
+    valid_from: '2026-04-16'
+    source_tier: 4
+    source_kind: preprint
+    label: 'ANCORADA (tier 4) E É O ACHADO QUE CARREGA A RODADA: o único gate determinístico do paper está no REGISTRO do perfil de agente — o Permission Engine rejeita perfil que não seja subconjunto estrito da autoridade humana — e NÃO existe gate de aceitação/qualidade no write() da CxRI. A medição REFORÇA: "write(" aparece uma única vez no documento inteiro, como assinatura de adapter, sem critério de aceitação, sem schema, sem validação em lugar nenhum. E mesmo o gate que existe é declaradamente NÃO-verificado: "An Alloy specification ... has been written ... but has not yet been model-checked ... we retain "design invariant" rather than "verified property". CONSEQUÊNCIA PARA O ONION, e é por isso que este nó tem impacto 5: a arte externa NÃO tem equivalente do exit 2 determinístico que BARRA a escrita — a capacidade que o CLAUDE.md nomeia como a que COMPRA o acoplamento ao Claude Code segue sem par publicado. O paper barra QUEM escreve (identidade/permissão); o Onion barra O QUE é escrito (conteúdo/forma). São gates em camadas diferentes.'
+    trace: 'https://arxiv.org/abs/2604.11623v3'
+
+  - id: E_CXK_EVAL_FOUR_GOVERNANCE_BASELINES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "B0: Ungoverned RAG 375 26.5% 80.9% 0/5 ... B3: Context Kubernetes 307 20.9% 64.0% 5/5" — LOCATOR: arXiv:2604.11623v3, Tabela 6; paper.txt l.808-814. DIVERGÊNCIA DECLARADA pelo verificador: o claim citava "Seção 8, Tabela 6"; a Tabela 6 está na Seção 7.2 (Governance Impact Experiments), NÃO na Seção 8. Confirmados no texto/legenda: os quatro baselines (B0 Ungoverned RAG, B1 ACL-filtered RAG, B2 RBAC-aware RAG, B3 Context Kubernetes) e "Four governance baselines compared (200 queries, synthetic data)". ancorada por verificador independente'
+    valid_from: '2026-04-16'
+    source_tier: 4
+    source_kind: preprint
+    label: 'ANCORADA (tier 4) MAS A TABELA REFUTA A MANCHETE PARA A QUAL ELA É USADA — e isto é achado, não ressalva: B1 (ACL-filtered RAG, o baseline TRIVIAL) tem 0 vazamentos / 0,0%; B3 (Context Kubernetes, o framework completo) tem 307 / 20,9%. O framework vaza MAIS que um filtro de permissão pós-retrieval e EMPATA com B2 em ruído (64,0%). Só a contagem de ataques favorece B3 (5/5 contra 4/5), sobre 5 cenários desenhados pelo próprio autor. Pior para a tese determinística que esta pesquisa procurava: o texto registra que a vantagem de ruído depende de LLM no caminho ("LLM-assisted routing (not shown) reduces B3 noise from 64.0% to 35.1%") — a via DETERMINÍSTICA é a pior das duas. Some-se a divergência de locator admitida, 200 queries sintéticas e protótipo local: é evidência de que o autor MEDIU algo, não de que o desenho vence.'
+    trace: 'https://arxiv.org/abs/2604.11623v3'
+
+  - id: E_CXK_SELF_DECLARED_LIMITATIONS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "No production deployment. All experiments run against seed data in a local prototype... Organizational intelligence not implemented. Requirement R7 (Context Operators with pattern extraction, learning loops) is designed but not implemented in the prototype." — LOCATOR: arXiv:2604.11623v3, Seção 9.1 (Limitations); paper.txt l.1035-1040 e l.1055-1057. DIVERGÊNCIA DECLARADA: páginas 19-20 não verificáveis em HTML; entre as duas frases unidas pela elipse existe no original a frase intermediária "Single-author evaluation. The gap analysis (Table 8) and the experiment design are by the author." — nada foi omitido de conteúdo (o claim a menciona em prosa), houve reordenação na citação. AUTORIA lida no próprio documento: Charafeddine Mouzouni, OPIT – Open Institute of Technology, and Cohorte AI, Paris, France (l.1-13), preprint arXiv v3 de 16 abr 2026. ancorada por verificador independente'
+    valid_from: '2026-04-16'
+    source_tier: 4
+    source_kind: preprint
+    label: 'ANCORADA (tier 4) e é o claim que DEMOTE O PAPER INTEIRO em vez de sustentá-lo: sem nenhum deployment em produção (tudo contra seed data em protótipo local), avaliação por autor único, e — o ponto que decide a pergunta do maestro — o Requirement R7 (Context Operators com pattern extraction e learning loops), que é o ÚNICO componente que tocaria conhecimento PRODUZIDO por agentes realimentando a organização, está "designed but not implemented". Como resposta a "a arte externa do destino obrigatório EXISTE?", isto é uma PROPOSTA de uma pessoa, sem peer review, escrita a partir da própria empresa — não arte em uso. É o nó que fixa o teto de confiança de todos os outros seis nós E_CXK_*.'
+    trace: 'https://arxiv.org/abs/2604.11623v3'
+
+  - id: E_CXK_ABSTRACT_GOVERNS_DELIVERY_NOT_DESTINATION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "We formalize six core abstractions, a YAML-based declarative manifest for knowledge-architecture-as-code, a reconciliation loop, and a three-tier agent permission model where agent authority is always a strict subset of human authority." — LOCATOR: arxiv.org/abs/2604.11623v3, Abstract. ancorada por verificador independente'
+    valid_from: '2026-04-16'
+    source_tier: 4
+    source_kind: preprint
+    label: 'ANCORADA (tier 4) — É A RESPOSTA DIRETA À SUB-PERGUNTA (4) DO MAESTRO, E ELA É "NÃO": o "Context Kubernetes" propõe manifesto YAML declarativo (knowledge-architecture-as-code) + reconciliation loop + modelo de permissão em três camadas para GOVERNAR A ENTREGA e a PERMISSÃO de acesso a conhecimento organizacional JÁ EXISTENTE — não para ser destino obrigatório do conhecimento PRODUZIDO por agentes. Logo o paper NÃO é a arte externa do DESTINO OBRIGATÓRIO do conhecimento num grafo declarativo; é a arte externa da ENTREGA GOVERNADA de conhecimento a agentes. O QUE CONVERGE (e vale registrar): topologia declarada em arquivo YAML, loop de reconciliação, autoridade do agente como subconjunto estrito da humana. O QUE DIVERGE: a direção do fluxo. NOTA SOBRE A RODADA ANTERIOR: a refutação de 2026-09-28 (varredura) acertou o veredito por motivo errado — caiu por FONTE FRACA; lido na íntegra, continua não sustentando o claim, agora por CONTEÚDO.'
+    trace: 'https://arxiv.org/abs/2604.11623v3'
+
+  # ── (1) A ESPECIFICAÇÃO AGENT SKILLS LIDA NA FONTE PRIMÁRIA, AO VIVO ─────────────────
+  - id: E_AGENTSKILLS_REQUIRED_FIELDS_NAME_DESCRIPTION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "The `SKILL.md` file must contain YAML frontmatter followed by Markdown content." e, na tabela de Frontmatter, "| `name` | Yes | Max 64 characters. Lowercase letters, numbers, and hyphens only... | `description` | Yes | Max 1024 characters. Non-empty." — LOCATOR: agentskills.io/specification, seções "SKILL.md format" e "Frontmatter" (curl ao vivo, rc=200, 445 KB); license, compatibility, metadata e allowed-tools constam com Required=No. ancorada por DOIS leitores independentes e por verificador independente'
+    source_tier: 9
+    source_kind: standard-spec
+    label: 'ANCORADA (tier 9, fonte primária lida ao vivo) — FECHA a sub-lacuna "o que a spec de fato MANDA em formato e campos": uma skill é um DIRETÓRIO contendo, no mínimo, um SKILL.md com frontmatter YAML seguido de corpo Markdown; os ÚNICOS campos obrigatórios são name (máx. 64 chars, minúsculas/números/hífens) e description (máx. 1024 chars, não-vazia). license, compatibility, metadata e allowed-tools são OPCIONAIS. Isto substitui de segunda mão por primeira mão: três claims da rodada anterior citavam este documento sem abri-lo. ⚠️ RESSALVA REGISTRADA PELO ELENXO (não é objeção, é medida): a página tem ZERO ocorrências de "normative" e ZERO de "MUST" em caixa alta (RFC-2119) — é especificação em PROSA acompanhada de um validador (skills-ref validate), não spec normativa. Isso LIMITA quanto peso a expressão "padrão aberto" (que o Thoughtworks Radar autoriza) pode carregar.'
+    trace: 'https://agentskills.io/specification'
+
+  - id: E_AGENTSKILLS_NO_ORCHESTRATION_SYNTAX
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "The Markdown body after the frontmatter contains the skill instructions. There are no format restrictions. Write whatever helps agents perform the task effectively." e "Keep file references one level deep from SKILL.md. Avoid deeply nested reference chains." — LOCATOR: agentskills.io/specification, seção "Body content". MEDIÇÃO DE AUSÊNCIA no payload inteiro da página: "orchestrat" = 0 ocorrências. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: standard-spec
+    label: 'ANCORADA (tier 9) — FECHA COM "NÃO" a sub-lacuna "a spec cobre orquestração?": não há sintaxe de fases, fan-out, budget, gate nem coordenação em lugar nenhum da especificação; o corpo Markdown é livre-forma por decisão explícita, e o único mecanismo FORMAL de composição é referência relativa a arquivos, mantida a UM nível de profundidade. A ausência foi MEDIDA, não presumida ("orchestrat" = 0 no payload inteiro) — e argumento de silêncio é o instrumento correto aqui, porque a pergunta é sobre o ESCOPO de uma especificação, não sobre o que o mundo faz. CONSEQUÊNCIA: a camada (a) da pergunta original (doutrina como fragmento reutilizável) tem padrão aberto; a camada (c) NÃO é coberta por esse padrão — quem orquestra determinísticamente hoje o faz fora do padrão (Conductor em YAML+Jinja2, Claude Code Workflows em .js).'
+    trace: 'https://agentskills.io/specification'
+
+  - id: E_AGENTSKILLS_INPUT_ONLY_NO_OUTPUT_DESTINATION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "Agents load skills *progressively*, pulling in more detail only as a task calls for it." e "A skill is a directory containing, at minimum, a `SKILL.md` file... Agents load skills through progressive disclosure, in three stages: Discovery... Activation... Execution" — LOCATOR: agentskills.io/specification, seção "Progressive disclosure" (itens 1-3: Metadata ~100 tokens · Instructions <5000 tokens · Resources as needed) e agentskills.io, seções "Directory structure" e "How do Agent Skills work?". MEDIÇÃO DE AUSÊNCIA na mesma página: "knowledge graph" = 0 ocorrências; as três subseções opcionais são scripts/, references/ e assets/ — todas de ENTRADA. ancorada por DOIS leitores independentes e por verificador independente'
+    source_tier: 9
+    source_kind: standard-spec
+    label: 'ANCORADA (tier 9) — É A PEÇA QUE RESPONDE À METADE MAIS IMPORTANTE DA SUB-PERGUNTA (1): a especificação trata EXCLUSIVAMENTE do carregamento progressivo do CONTEXTO DE ENTRADA (metadata → instruções → recursos sob demanda, em três estágios Discovery/Activation/Execution), e não diz UMA palavra sobre destino, persistência, versionamento ou grafo do que a skill PRODUZ. Ausência medida, não presumida. CONSEQUÊNCIA DIRETA PARA A POSIÇÃO DO ONION: o padrão que o mercado nomeou ("Agent Skills") é empacotamento de contexto de entrada; o DESTINO OBRIGATÓRIO do conhecimento produzido não está no padrão aberto — nem contra, nem a favor: está FORA DO ESCOPO. A aposta do Onion segue sem par no padrão, e agora isso está ancorado na própria spec em vez de inferido de analista.'
+    trace: 'https://agentskills.io/specification'
+
+  - id: E_ANTHROPIC_DOCS_SKILLS_SINGLE_AGENT_SCOPE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "Every Skill requires a `SKILL.md` file with YAML frontmatter... **Required fields:** `name` and `description`" — LOCATOR: platform.claude.com/docs/en/agents-and-tools/agent-skills/overview, seções "Why use Skills" e "Skill structure". ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-primary
+    label: 'ANCORADA (tier 9 — documentação oficial do fornecedor sobre o PRÓPRIO produto, que é fonte primária para "o que o produto faz", não para "o que o mercado faz"): a documentação da Anthropic manda o mesmo que a especificação independente — SKILL.md com frontmatter YAML, name e description obrigatórios — e declara o ESCOPO: dar expertise a UM agente via progressive disclosure. Nada sobre orquestração multi-agente, nada sobre destino do conhecimento produzido. POR QUE ISSO PESA: DUAS fontes primárias independentes (a spec em agentskills.io e a doc do fornecedor de origem) convergindo no MESMO escopo estreito é mais forte que qualquer uma isolada — e mata a hipótese de que o escopo estreito fosse artefato de uma das duas redações.'
+    trace: 'https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview'
+
+  # ── (2) A FORMA REAL DO CONDUCTOR — metade ancorada, metade pendente ─────────────────
+  - id: E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "The orchestration layer consumes zero tokens. The structure is fixed at definition time—and that''s the point." — LOCATOR: opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/ (confirmado por grep no HTML bruto). ancorada por verificador independente'
+    valid_from: '2026-05-14'
+    source_tier: 6
+    source_kind: vendor-on-competitor
+    label: 'ANCORADA (tier 6, vendor-on-competitor — sempre suspeito, cláusula 7; a confiança fica em 0,7 apesar da ancoragem): o anúncio oficial do Conductor afirma VERBATIM que a camada de orquestração consome ZERO tokens porque a estrutura é fixada em tempo de DEFINIÇÃO — é a fixidez declarativa que sustenta a alegação de custo zero, e é exatamente a tese que o Onion pratica. ⚠️ A METADE QUE ESTA RODADA NÃO CONSEGUIU ANCORAR, e é metade da sub-pergunta (2) do maestro: as duas claims sobre a FORMA do YAML de topologia (roteamento condicional) e sobre schema de output tipado por agente foram REJEITADAS na ancoragem como EXAGERADAS — o trecho existe, mas no POST DO BLOG e não no README do GitHub como o leitor afirmou, e o exemplo linkado (examples/design-review.yaml) NÃO existe no repositório (o equivalente real é examples/design.yaml). O conteúdo confirmado de graça pelo verificador, que por regra NÃO pode virar nó, está contabilizado em E_LACUNAS_PRIMARIES_0928 — inclusive a resposta a "veta ou roteia?".'
+    trace: 'https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/'
+
+  # ── (3) A GOVERNANÇA DO MCP LIDA NAS DUAS FONTES INSTITUCIONAIS ──────────────────────
+  - id: E_MCP_UNDER_LF_PROJECTS_NOT_NAMING_AAIF
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "Model Context Protocol has been established as **Model Context Protocol a Series of LF Projects, LLC**." — LOCATOR: modelcontextprotocol.io/community/governance, seção "General Project Policies". A mesma página descreve a governança técnica hierárquica (Lead Maintainers/BDFL, Core Maintainers, Maintainers) e SEPs para mudança de spec. MEDIÇÃO DE AUSÊNCIA declarada pelos leitores: a página NÃO cita "Agentic AI Foundation" pelo nome. ancorada por DOIS leitores independentes e por verificador independente'
+    source_tier: 9
+    source_kind: project-primary
+    label: 'ANCORADA (tier 9, página institucional do próprio projeto) — o MCP está formalmente sob a guarda-chuva "LF Projects, LLC" da Linux Foundation, com governança técnica hierárquica (Lead Maintainers/BDFL → Core Maintainers → Maintainers) e SEPs (Specification Enhancement Proposals) como processo de mudança da especificação. ACHADO NEGATIVO QUE IMPORTA E FOI MEDIDO: a página de governança do PRÓPRIO projeto não nomeia a "Agentic AI Foundation". Logo a formulação da rodada anterior — "o MCP passou a ser governado pela Agentic AI Foundation" — não é o que a fonte primária do projeto diz; a entidade que a fonte do projeto declara é LF Projects, LLC. A relação com a AAIF existe e está ancorada, mas em OUTRA fonte (o press release da Linux Foundation) e com OUTRA formulação (projeto FUNDADOR da AAIF). Por isso este nó SUPERSEDES o nó de newsletter tier 5 da rodada anterior.'
+    trace: 'https://modelcontextprotocol.io/community/governance'
+
+  - id: E_AAIF_FORMED_2025_12_09_MCP_FOUNDING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "The Linux Foundation announced the formation of the Agentic AI Foundation (AAIF) with founding contributions of leading technical projects including Anthropic''s Model Context Protocol (MCP), Block''s goose, and OpenAI''s AGENTS.md." — LOCATOR: linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation, press release de 9 dez 2025 (HTML bruto conferido via curl, não newsletter nem blog de terceiro). ancorada por verificador independente'
+    valid_from: '2025-12-09'
+    source_tier: 10
+    source_kind: institutional
+    label: 'ANCORADA (tier 10, fonte institucional primária) — FECHA a sub-lacuna (3) na parte fechável: em 9 de dezembro de 2025 a Linux Foundation anunciou formalmente a criação da Agentic AI Foundation (AAIF), tendo o MCP (contribuído pela Anthropic) como UM DE TRÊS projetos fundadores, ao lado de goose (Block) e AGENTS.md (OpenAI). Isto SUBSTITUI a newsletter tier 5 da rodada anterior por fonte institucional datada, e corrige a formulação: o MCP não "passou a ser governado pela AAIF" — ele é contribuição FUNDADORA dela, enquanto sua própria página declara a entidade LF Projects, LLC. POR QUE PESA NA PERGUNTA ORIGINAL: é o precedente completo de trajetória no mesmo ecossistema (spec nasce num fornecedor → adotada por concorrentes → fundação neutra), que dá o gatilho OBSERVÁVEL para julgar se "Agent Skills" consolida de verdade: a pergunta não é quantos blogs usam o termo, é se a spec muda de dono. ⚠️ A lista de membros Platinum NÃO entra como achado deste nó: a claim que a listava foi rejeitada na ancoragem por forma — ver E_LACUNAS_PRIMARIES_0928.'
+    trace: 'https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation'
+
+  - id: E_AAIF_SCOPE_NEUTRAL_HOME_OPEN_GOVERNANCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-09-28
+    verified_against: 'QUOTE verbatim: "Bringing these projects together under the AAIF ensures they can grow with the transparency and stability that only open governance provides. The Linux Foundation is proud to serve as the neutral home" — LOCATOR: linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation, parágrafo de citação de apoio. ancorada por verificador independente'
+    valid_from: '2025-12-09'
+    source_tier: 10
+    source_kind: institutional
+    label: 'ANCORADA (tier 10) — o ESCOPO de governança que a AAIF DECLARA de si é ser "neutral home" garantindo que os projetos cresçam com transparência e estabilidade de governança aberta. ⚠️ LIMITE MEDIDO NO PRÓPRIO TEXTO, e é o que a sub-pergunta (3) do maestro pedia: o press release NÃO detalha se a fundação controla marca/trademark separadamente da especificação, nem descreve processo de compatibilidade — fala em governança aberta GENÉRICA. Portanto, para "com que escopo de governança", a resposta primária disponível é: guarda-chuva institucional e neutralidade DECLARADOS; mecânica de controle de spec e de marca NÃO declarada nesta fonte. O que se sabe de mecânica vem da página do projeto (SEPs, hierarquia de mantenedores), não da fundação — duas fontes, dois níveis, e a costura entre elas não está escrita em nenhuma das duas.'
+    trace: 'https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation'
+
+  # ── CONTABILIDADE DESTA RODADA (cláusula 8: lacuna vira nó) ──────────────────────────
+  - id: E_LACUNAS_PRIMARIES_0928
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-09-28
+    verified_against: 'Contagem do payload desta rodada de primárias, feita nesta sessão: 4 leitores nomeados (context-kubernetes-paper, agentskills-spec, conductor-msft, mcp-governance) sobre 7 documentos primários distintos · 0 fontes inalcançáveis · 22 entradas de claim recebidas · 18 ANCORADAS · 4 REJEITADAS na ancoragem (3 EXAGERADAS + 1 NAO-ENCONTRADA) · 18 ancoradas consolidadas em 15 nós de evidência (3 claims ancoradas por DOIS leitores independentes cada, sem duplicar nó) · 9 objeções do Elenxo julgadas, das quais 6 SOBREVIVEM (todas contra o paper) e 3 NÃO sobrevivem (as três da especificação Agent Skills, que portanto ficam de pé)'
+    source_tier: 10
+    source_kind: measurement
+    label: 'CONTABILIDADE E LACUNAS DA RODADA DE PRIMÁRIAS DE 2026-09-28. FONTES LIDAS (7 documentos, ZERO inalcançáveis — nada caiu por 403 ou truncamento): arXiv:2604.11623v3 (abstract + texto integral, 88 KB); agentskills.io/specification (curl ao vivo, rc=200, 445 KB) e agentskills.io; platform.claude.com docs de Agent Skills (overview); o post do Conductor em opensource.microsoft.com e o repositório GitHub do Conductor (README.md, docs/workflow-syntax.md, examples/); modelcontextprotocol.io/community/governance; linuxfoundation.org press release da AAIF (HTML bruto). ANCORADAS: 18 entradas → 15 nós (consolidação declarada: os campos obrigatórios da spec, o progressive disclosure e a entidade LF Projects foram cada um ancorados por DOIS leitores independentes; não se duplica nó por leitor, e a redundância vale como reforço, não como contagem). REJEITADAS NA ANCORAGEM — 4, e nenhuma virou nó de evidência: (i) NAO-ENCONTRADA — o versionamento na spec: a citação remontou um bloco YAML multilinha (metadata: / author: / version:) como frase corrida, falhando o teste verbatim; o conteúdo sobre skills-ref está correto, mas em OUTRO trecho que não foi citado; (ii) EXAGERADA — o YAML de topologia do Conductor com roteamento condicional: o trecho existe verbatim, mas no POST DO BLOG e não no README do GitHub, e examples/design-review.yaml não existe no repositório (o real é examples/design.yaml); (iii) EXAGERADA — schema de output tipado por agente + tokens como métrica: trecho no blog, não no README; e a evidência real no repositório é MAIS FORTE do que o claim (docs/workflow-syntax.md declara que a saída é parseada como JSON e validada contra o schema, com prompt de correção automático se falhar — validação ATIVA com loop, não schema passivo); (iv) EXAGERADA — a lista de membros Platinum da AAIF: os 8 nomes (AWS, Anthropic, Block, Bloomberg, Cloudflare, Google, Microsoft, OpenAI) conferem no HTML bruto do press release, mas a quote reformatou "Platinum members include ... Google, Microsoft and OpenAI" como "Platinum members: ..., OpenAI" — reformatação apresentada como citação literal. CONSEQUÊNCIA DA REJEIÇÃO (ii), e é a que mais dói: a sub-pergunta (2) do maestro — "o Conductor é capaz de VETAR uma ação ou apenas de roteá-la?" — fica respondida no CONTEÚDO e SEM NÓ. O verificador confirmou por grep no HTML bruto do post a frase "the system only routes between agents; it cannot block individual agent actions", mas a claim caiu por locator errado; por regra, claim rejeitada na ancoragem não vira evidência. Logo "roteia, não veta" é achado PENDENTE DE ANCORAGEM, não achado desta rodada — ver Q_CONDUCTOR_VETO_ANCHORING_PENDING. LACUNAS QUE CONTINUAM ABERTAS, nomeadas: (1) O EIXO CAPITAL SEGUE INTOCADO pela SEGUNDA rodada consecutiva — zero fontes sobre rodada, M&A, valuation ou down round; e ele NÃO se fecha em modo primaries, porque não há documento nomeado a ler: exige varredura por trajetória (created:> + sort=stars, Crunchbase, HN Algolia). A invariante follow-the-money está declaradamente NÃO satisfeita, e a pergunta que ela responderia é qual das três camadas o dinheiro considera escassa. (2) O NOME DO COMPOSTO segue indeciso — esta rodada não buscou rótulo; o que ela acrescenta é que nem a spec do Agent Skills nem a documentação da Anthropic nomeiam o composto, o que é ausência NO PADRÃO, não ausência no mercado. (3) EVIDÊNCIA PRIMÁRIA DE FRACASSO continua ZERO: arXiv:2605.14102 ("orquestração mais agressiva NÃO melhorou desempenho") não entrou nesta rodada e segue sem substituto; a rodada anterior a perdeu por fonte fraca e esta não a leu. Sem ela, nem "mais fases é melhor" nem "é pior" pode ser citado deste grafo. (4) O ARTEFATO INSTALADO do Claude Code (cláusula 2: o binário antes da web) continua NÃO MEDIDO — a claim sobre budget/schemas/primitivas de Workflow segue apoiada em analista secundário tier 5, e é 1 comando de distância. (5) A ARTE EXTERNA DO DESTINO OBRIGATÓRIO NÃO FOI ENCONTRADA, e a lacuna MUDOU DE NATUREZA: antes era "não lemos o paper"; agora é "lemos o paper inteiro e não há". O Context Kubernetes governa ENTREGA, o único componente que tocaria conhecimento produzido (R7) é design não implementado, e o único gate determinístico está no registro de permissão, não no write. GANHO DE CUSTO DA FORMA (cláusula 10): rodada de LEITURA E ANCORAGEM, sem descoberta — as quatro sub-lacunas atacadas tinham documento nomeado, exatamente o gatilho que a doutrina define para o modo primaries, e nenhuma fonte foi perdida por acesso.'
+    trace: 'docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml'
+
+  # ── PERGUNTAS QUE ESTA RODADA ABRE (esta sessão NUNCA sela) ──────────────────────────
+  - id: Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    label: 'PROPOSTA DE VEREDITO — esta rodada NÃO sela, propõe. A sub-pergunta (4) do maestro ("o paper Context Kubernetes é, ou não é, a arte externa do DESTINO OBRIGATÓRIO do conhecimento num grafo declarativo?") tem agora resposta ancorada em leitura integral da fonte primária: NÃO É. Ele é a arte externa da ENTREGA GOVERNADA — manifesto YAML declarativo + reconciliation loop + permissão como subconjunto estrito da autoridade humana, tudo na direção conhecimento-existente → agente. As quatro medições que sustentam o veredito: (i) o abstract declara governar entrega/permissão, não destino do produzido; (ii) "write(" ocorre UMA vez no documento inteiro, como assinatura de adapter, sem critério de aceitação; (iii) o único gate determinístico está no REGISTRO do perfil de agente, e mesmo esse é "design invariant", não "verified property", por falta de model-check; (iv) o R7 (Context Operators, pattern extraction, learning loops) — o único componente que tocaria conhecimento produzido por agentes — é design NÃO implementado. E FICA A PERGUNTA DERIVADA, que é a que decide a posição do Onion e esta rodada NÃO pode responder: se a arte externa cobre ENTREGA e não cobre DESTINO obrigatório do produzido, o destino em grafo com gate determinístico é DIFERENCIAL real do Onion ou LACUNA do campo inteiro (ninguém faz porque não vale a pena)? Responder exige as duas coisas que este grafo não tem — evidência primária de fracasso (lacuna 3) e o eixo de capital (lacuna 1). GATILHOS NOMEADOS para reabrir: (a) aparecer paper ou produto com write path governado e critério de aceitação NO DESTINO; (b) o R7 do Context Kubernetes sair de "Design" para implementado numa v4 do preprint; (c) rodada/M&A que mostre dinheiro em orquestração-com-destino em vez de contexto-para-entrega.'
+    trace: 'docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml'
+
+  - id: Q_CONDUCTOR_VETO_ANCHORING_PENDING
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: 'PENDÊNCIA DE ANCORAGEM, não achado — e fica registrada para não ser citada como resultado. O veredito "o Conductor ROTEIA entre agentes e NÃO VETA a ação de um agente" tem conteúdo confirmado pelo verificador (grep no HTML bruto do post oficial devolveu "the system only routes between agents; it cannot block individual agent actions"), mas a claim que o carregava foi REJEITADA na ancoragem como EXAGERADA, por atribuir o trecho ao README do GitHub quando ele está no POST DO BLOG, e por citar um exemplo (examples/design-review.yaml) que não existe no repositório. Por regra da doutrina, claim rejeitada na ancoragem nunca vira nó de evidência — então a resposta NÃO está ancorada neste grafo. O QUE FECHA ISSO A CUSTO BAIXO: uma micro-rodada de ancoragem com os locators CORRETOS — o post do blog para a frase do roteamento sem veto, e docs/workflow-syntax.md do repositório para a validação de schema (que o verificador descreveu como MAIS forte que o claim original: saída parseada como JSON, validada contra schema, com prompt de correção automático se falhar). Enquanto não fechar, a sub-pergunta (2) do maestro fica com METADE ancorada (estrutura fixa em tempo de definição, orquestrador a custo zero de token) e metade PENDENTE (incapacidade de vetar ação de agente). GATILHO: a próxima rodada que tocar orquestração externa, ou qualquer decisão do core que queira citar "a arte externa não veta" como fundamento.'
+    trace: 'docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml'
+
+edges:
+  # ── evidência -> pergunta (SUPPORTS) ─────────────────────────────────────────────────
+  - from: E_RADAR_NOMEIA_AGENT_SKILLS
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_CONDUCTOR_ORQUESTRACAO_DECLARADA_CUSTO_ZERO
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_MCP_GOVERNANCA_NEUTRA_PRECEDENTE
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_CLAUDE_CODE_WORKFLOWS_SCHEMA_E_BUDGET
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_AGENTSKILLS_SPEC_ADOCAO_MULTIPLATAFORMA
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_MERCADO_AGENT_COMMAND_COMPOSITION_0928
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  # ── a spec aberta e a governança neutra sustentam a nomeação do padrão ───────────────
+  - from: E_AGENTSKILLS_SPEC_ADOCAO_MULTIPLATAFORMA
+    to: E_RADAR_NOMEIA_AGENT_SKILLS
+    edge_type: SUPPORTS
+
+  - from: E_MCP_GOVERNANCA_NEUTRA_PRECEDENTE
+    to: E_AGENTSKILLS_SPEC_ADOCAO_MULTIPLATAFORMA
+    edge_type: SUPPORTS
+
+  # ── as duas implementações independentes da camada (c) se sustentam mutuamente ───────
+  - from: E_CLAUDE_CODE_WORKFLOWS_SCHEMA_E_BUDGET
+    to: E_CONDUCTOR_ORQUESTRACAO_DECLARADA_CUSTO_ZERO
+    edge_type: SUPPORTS
+
+  # ── as lacunas LIMITAM o alcance das evidências, não as derrubam (CONSTRAINS) ────────
+  - from: E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928
+    to: E_RADAR_NOMEIA_AGENT_SKILLS
+    edge_type: CONSTRAINS
+
+  - from: E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928
+    to: E_AGENTSKILLS_SPEC_ADOCAO_MULTIPLATAFORMA
+    edge_type: CONSTRAINS
+
+  - from: E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928
+    to: E_CLAUDE_CODE_WORKFLOWS_SCHEMA_E_BUDGET
+    edge_type: CONSTRAINS
+
+  - from: E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928
+    to: E_CONDUCTOR_ORQUESTRACAO_DECLARADA_CUSTO_ZERO
+    edge_type: CONSTRAINS
+
+  - from: E_MERCADO_AGENT_COMMAND_COMPOSITION_0928
+    to: E_RADAR_NOMEIA_AGENT_SKILLS
+    edge_type: SUPPORTS
+
+  # ══════════════════════════════════════════════════════════════════════════════════════
+  # ARESTAS DA RODADA DE PRIMÁRIAS — 2026-09-28
+  # ══════════════════════════════════════════════════════════════════════════════════════
+
+  # ── evidência ancorada -> a pergunta (SUPPORTS) ───────────────────────────────────────
+  - from: E_CXK_CONTEXT_STORE_FORMAL_DEFINITION
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_CXK_FRESHNESS_MANAGER_FOUR_STATES
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_CXK_REQUIREMENT_2_4_TTL_MANDATE
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_CXK_GATE_AT_REGISTRATION_NOT_AT_WRITE
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_CXK_EVAL_FOUR_GOVERNANCE_BASELINES
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_CXK_SELF_DECLARED_LIMITATIONS
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_CXK_ABSTRACT_GOVERNS_DELIVERY_NOT_DESTINATION
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_AGENTSKILLS_REQUIRED_FIELDS_NAME_DESCRIPTION
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_AGENTSKILLS_NO_ORCHESTRATION_SYNTAX
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_AGENTSKILLS_INPUT_ONLY_NO_OUTPUT_DESTINATION
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_ANTHROPIC_DOCS_SKILLS_SINGLE_AGENT_SCOPE
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_MCP_UNDER_LF_PROJECTS_NOT_NAMING_AAIF
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_AAIF_FORMED_2025_12_09_MCP_FOUNDING
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_AAIF_SCOPE_NEUTRAL_HOME_OPEN_GOVERNANCE
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  - from: E_LACUNAS_PRIMARIES_0928
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: SUPPORTS
+
+  # ── as perguntas novas DEPENDEM da pergunta-mãe ───────────────────────────────────────
+  - from: Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: DEPENDS_ON
+
+  - from: Q_CONDUCTOR_VETO_ANCHORING_PENDING
+    to: Q_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: DEPENDS_ON
+
+  # ── as três medições que sustentam o veredito proposto sobre o paper ──────────────────
+  - from: E_CXK_ABSTRACT_GOVERNS_DELIVERY_NOT_DESTINATION
+    to: Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART
+    edge_type: SUPPORTS
+
+  - from: E_CXK_GATE_AT_REGISTRATION_NOT_AT_WRITE
+    to: Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART
+    edge_type: SUPPORTS
+
+  - from: E_CXK_SELF_DECLARED_LIMITATIONS
+    to: Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART
+    edge_type: SUPPORTS
+
+  # ── e a peça que LIMITA o "não é" (o Context Store É destino declarado, só de leitura)
+  - from: E_CXK_CONTEXT_STORE_FORMAL_DEFINITION
+    to: Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART
+    edge_type: CONSTRAINS
+
+  # ── reconciliação interna do paper: o abstract e as limitações limitam as promessas ────
+  - from: E_CXK_ABSTRACT_GOVERNS_DELIVERY_NOT_DESTINATION
+    to: E_CXK_CONTEXT_STORE_FORMAL_DEFINITION
+    edge_type: CONSTRAINS
+
+  - from: E_CXK_SELF_DECLARED_LIMITATIONS
+    to: E_CXK_REQUIREMENT_2_4_TTL_MANDATE
+    edge_type: CONSTRAINS
+
+  - from: E_CXK_SELF_DECLARED_LIMITATIONS
+    to: E_CXK_FRESHNESS_MANAGER_FOUR_STATES
+    edge_type: CONSTRAINS
+
+  - from: E_CXK_EVAL_FOUR_GOVERNANCE_BASELINES
+    to: E_CXK_ABSTRACT_GOVERNS_DELIVERY_NOT_DESTINATION
+    edge_type: CONSTRAINS
+
+  # ── a spec lida na primária sustenta o que o analista nomeou, e LIMITA o alcance ──────
+  - from: E_AGENTSKILLS_REQUIRED_FIELDS_NAME_DESCRIPTION
+    to: E_RADAR_NOMEIA_AGENT_SKILLS
+    edge_type: SUPPORTS
+
+  - from: E_AGENTSKILLS_REQUIRED_FIELDS_NAME_DESCRIPTION
+    to: E_AGENTSKILLS_SPEC_ADOCAO_MULTIPLATAFORMA
+    edge_type: SUPPORTS
+
+  - from: E_AGENTSKILLS_NO_ORCHESTRATION_SYNTAX
+    to: E_RADAR_NOMEIA_AGENT_SKILLS
+    edge_type: CONSTRAINS
+
+  - from: E_AGENTSKILLS_INPUT_ONLY_NO_OUTPUT_DESTINATION
+    to: E_RADAR_NOMEIA_AGENT_SKILLS
+    edge_type: CONSTRAINS
+
+  - from: E_ANTHROPIC_DOCS_SKILLS_SINGLE_AGENT_SCOPE
+    to: E_AGENTSKILLS_REQUIRED_FIELDS_NAME_DESCRIPTION
+    edge_type: SUPPORTS
+
+  - from: E_ANTHROPIC_DOCS_SKILLS_SINGLE_AGENT_SCOPE
+    to: E_AGENTSKILLS_INPUT_ONLY_NO_OUTPUT_DESTINATION
+    edge_type: SUPPORTS
+
+  # ── a ancoragem verbatim reforça o nó de orquestração da rodada anterior ──────────────
+  - from: E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME
+    to: E_CONDUCTOR_ORQUESTRACAO_DECLARADA_CUSTO_ZERO
+    edge_type: SUPPORTS
+
+  # ── RECONCILIAÇÃO: as duas fontes institucionais SUPERSEDEM a newsletter tier 5 ───────
+  - from: E_MCP_UNDER_LF_PROJECTS_NOT_NAMING_AAIF
+    to: E_MCP_GOVERNANCA_NEUTRA_PRECEDENTE
+    edge_type: SUPERSEDES
+
+  - from: E_AAIF_FORMED_2025_12_09_MCP_FOUNDING
+    to: E_MCP_GOVERNANCA_NEUTRA_PRECEDENTE
+    edge_type: SUPERSEDES
+
+  - from: E_AAIF_SCOPE_NEUTRAL_HOME_OPEN_GOVERNANCE
+    to: E_AAIF_FORMED_2025_12_09_MCP_FOUNDING
+    edge_type: SUPPORTS
+
+  - from: E_AAIF_FORMED_2025_12_09_MCP_FOUNDING
+    to: E_MCP_UNDER_LF_PROJECTS_NOT_NAMING_AAIF
+    edge_type: SUPPORTS
+
+  # ── a contabilidade desta rodada LIMITA o que se pode citar (CONSTRAINS) ──────────────
+  - from: E_LACUNAS_PRIMARIES_0928
+    to: E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928
+    edge_type: CONSTRAINS
+
+  - from: E_LACUNAS_PRIMARIES_0928
+    to: E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME
+    edge_type: CONSTRAINS
+
+  - from: E_LACUNAS_PRIMARIES_0928
+    to: E_AAIF_FORMED_2025_12_09_MCP_FOUNDING
+    edge_type: CONSTRAINS
+
+  - from: E_LACUNAS_PRIMARIES_0928
+    to: Q_CONDUCTOR_VETO_ANCHORING_PENDING
+    edge_type: SUPPORTS

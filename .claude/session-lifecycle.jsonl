@@ -71,3 +71,4 @@
 {"session_id":"4ac7b783-276e-462b-848a-4c7910c4a9c1","branch":"fix/drive-open-threads","started_at":1790185163,"ended_at":1790195586,"duration_s":10423}
 {"session_id":"4ac7b783-276e-462b-848a-4c7910c4a9c1","branch":"fix/drive-open-threads","started_at":1790195604,"ended_at":1790195733,"duration_s":129}
 {"session_id":"4ac7b783-276e-462b-848a-4c7910c4a9c1","branch":"fix/dispensation-record-was-a-backslash","started_at":1790195747,"ended_at":1790357266,"duration_s":161519}
+{"session_id":"4ac7b783-276e-462b-848a-4c7910c4a9c1","branch":"fix/harness-inventory-die-in-subshell","started_at":1790357274,"ended_at":1790565885,"duration_s":208611}
