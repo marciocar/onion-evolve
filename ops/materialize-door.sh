@@ -87,6 +87,28 @@ if [ "${#SPEC[@]}" -eq 0 ]; then
   echo "ERRO: manifesto VAZIO para o papel '${ROLE}' — pathspec ausente significa TODOS para o git; abortando antes de copiar o repositório inteiro." >&2
   exit 3
 fi
+# ⚠️ DESTINO ANINHADO EM OUTRO REPO ⇒ RECUSA, **antes** de criar diretório ou extrair bundle.
+# O passo (6-pre) staja o destino (`git add -A`) para que os geradores de projeção enxerguem a árvore
+# materializada. Num destino DENTRO de outro repo o `rev-parse` resolve para o índice de FORA, e esse
+# staging levaria a porta inteira para o índice do hospedeiro — efeito silencioso e caro. A recusa
+# vem aqui, e não junto do staging, por uma razão medida em 2026-09-28: abortar depois do `mkdir`
+# deixava um diretório untracked no hospedeiro, ou seja, a recusa já tinha sujado o que protegia.
+# Porta legítima é clone PRÓPRIO — destino dentro de outro repo nunca é uma delas.
+# ⚠️ A COMPARAÇÃO É CONTRA O CAMINHO ABSOLUTO DE **DEST**, nunca contra o do probe — e a 1ª versão
+# errou exatamente isto: com DEST inexistente o probe cai no PAI, e comparar o toplevel do pai com o
+# próprio pai dá igual SEMPRE, então a guarda nunca disparava no caso mais comum (destino novo dentro
+# de um repo). Medido pelo mutante num hospedeiro SEM exclude de `.claude/worktrees/`: 630 arquivos
+# da porta stajados no índice dele, com a guarda calada. O ambiente importa e está dito de propósito —
+# a 1ª versão do caso de bancada citava este número medido num ambiente que ele não habitava.
+_dest_parent="$(dirname "${DEST}")"
+[ -d "${_dest_parent}" ] || { echo "ERRO: o diretório pai de ${DEST} não existe." >&2; exit 3; }
+_dest_abs="$(cd "${_dest_parent}" && pwd -P)/$(basename "${DEST}")"
+_dest_probe="${DEST}"; [ -d "${_dest_probe}" ] || _dest_probe="${_dest_parent}"
+_host_top="$(git -C "${_dest_probe}" rev-parse --show-toplevel 2>/dev/null || true)"
+if [ -n "${_host_top}" ] && [ "${_host_top}" != "${_dest_abs}" ]; then
+  echo "ERRO: ${DEST} está DENTRO do repo ${_host_top} — a porta compartilharia o índice dele e o staging do passo (6) iria para o repo errado. Materialize a porta num clone próprio." >&2
+  exit 3
+fi
 mkdir -p "${DEST}" || { echo "ERRO: não consegui criar ${DEST}" >&2; exit 3; }
 
 # ── (0) LIMPAR A SUPERFÍCIE ANTES DE EXTRAIR — `tar -x` não remove o que saiu do manifesto ───
@@ -290,9 +312,71 @@ _regen() {                                        # _regen <nome-do-script> <com
   bash "${_src}" "${DEST}" 2>&1 | ${_cut} | sed 's/^/  (6) /'
   return 0
 }
+# ⚠️ (6-pre) O ÍNDICE DO DESTINO TEM DE REFLETIR A ÁRVORE MATERIALIZADA — **antes** de regenerar.
+# Dois dos geradores de projeção SSOT (`harness-inventory.sh` → testing-inventory.md, e
+# `testing-state.sh`, que depende dele) enumeram o conjunto RASTREADO (`git ls-files`), não o disco.
+# Isso é deliberado e é a cura de um defeito anterior: contar o disco enumeraria um conjunto
+# diferente do que o CI vê. Mas o corolário nunca foi cumprido aqui — eles precisam de um índice
+# que já contenha o que acabou de ser materializado, e o único `git add -A` deste script era uma
+# INSTRUÇÃO impressa ao humano, executada DEPOIS.
+# Duas quebras, ambas medidas em 2026-09-28:
+#   · num clone real (o caminho de produção) eles contavam a versão ANTERIOR da porta — projeção
+#     nasce defasada e CALADA, porque não-vazia;
+#   · num destino que ainda não é repo eles RECUSAM (corretamente: "zero NÃO é resultado"), e o
+#     regenerador segue e sai 0 com 3 de 5, apenas IMPRIMINDO "saída VAZIA" — a porta sai com 2
+#     projeções faltando e rc=0 dizendo
+#     "Porta materializada". `onion-standalone` está publicada assim, sem testing-inventory.md nem
+#     testing-state.md, e o caso de bancada `door: (f)` ficou vermelho ao expor isto.
+# A cura é de ORDEM, não de tolerância: stajar aqui, e o `git add -A` do humano segue existindo
+# (idempotente) para capturar as projeções que ESTE passo acabou de escrever.
+# O aninhamento já foi recusado lá atrás, antes de existir diretório — aqui só resta o caso legítimo:
+# destino que é (ou passa a ser) repo próprio. `init -b main` porque o remoto da porta é `main` e o
+# `init.defaultBranch` desta máquina não está setado: sem `-b`, o caminho greenfield — justamente o
+# que este `init` existe para cobrir — nasceria em `master`.
+# ⚠️ FAIL-CLOSED nos dois: `set -e` não está ligado neste script, então um `add -A` que falha (índice
+# travado, permissão, disco) deixaria os geradores contarem o índice DEFASADO e o script declararia
+# "Porta materializada" com rc=0. Medido pela passada adversarial de 2026-09-28 com um `index.lock`
+# plantado: `testing-inventory.md` saiu dizendo 75 scripts com 74 no disco, e rc=0. É
+# `exit-code-nao-e-a-verificacao` aplicado à própria cura — por isso a recusa é explícita.
+if ! git -C "${DEST}" rev-parse --git-dir >/dev/null 2>&1; then
+  git -C "${DEST}" init -q -b main \
+    || { echo "ERRO: 'git init' no destino FALHOU — sem índice, as projeções SSOT não podem ser geradas." >&2; exit 3; }
+fi
+# ÍNDICE DO DONO: o passo (0) já apaga do disco, mas o índice do destino era a última rede de um
+# trabalho stajado-e-não-commitado de quem publica a porta. Avisar é o mínimo honesto.
+_dono_stajado="$(git -C "${DEST}" diff --cached --name-only 2>/dev/null | grep -c . || true)"
+if [ "${_dono_stajado}" -gt 0 ]; then
+  echo "  (6) ⚠️ o índice do destino já tinha ${_dono_stajado} caminho(s) stajado(s) vs HEAD — a materialização vai reescrevê-lo." >&2
+fi
+git -C "${DEST}" add -A \
+  || { echo "ERRO: 'git add -A' no destino FALHOU — as projeções contariam o índice DEFASADO. Recusa antes de gerar." >&2; exit 3; }
+
 _regen regen-ssot-projections.sh || true
 # As catracas do core foram esvaziadas no passo (2); aqui elas renascem do corpus DA PORTA.
 _regen regen-baselines.sh 'tail -2' || true
+
+# ── (6-pos) RE-STAJAR, e CONFERIR O EFEITO — as duas metades que faltavam ────────────────────────
+# (i) O `add -A` de cima roda logo depois de o passo (0) apagar `docs/onion/` (que não viaja no
+#     manifesto), então ele staja a REMOÇÃO das 5 projeções; os geradores as reescrevem DEPOIS, como
+#     untracked. Quem publica com `git add -A; git commit` (o caminho impresso abaixo) não sente. Quem
+#     usa `git commit -am` — plausível em 18 re-materializações — publicaria a porta com ZERO
+#     projeções. Medido em 2026-09-28: de "2 faltando" para "5 faltando", e MUDO, porque os arquivos
+#     estão no disco. Estritamente pior que o defeito curado, e introduzido pela cura.
+# (ii) `exit 0` do regenerador é declaração dele sobre si: ele sai 0 com 3 de 5 projeções e apenas
+#      IMPRIME "saída VAZIA". Não há `|| true` engolindo nada — o defeito original foi um aviso
+#      IGNORADO, não engolido. Verificar é CONTAR o que ele produziu.
+git -C "${DEST}" add -A \
+  || { echo "ERRO: 'git add -A' final FALHOU — as projeções regeneradas ficariam FORA do commit da porta." >&2; exit 3; }
+_faltam=""
+for _proj in docs/onion/inventory.md docs/onion/graph.md docs/onion/kg-read-index.tsv \
+             docs/onion/testing-inventory.md docs/onion/testing-state.md; do
+  [ -s "${DEST}/${_proj}" ] || _faltam="${_faltam} ${_proj}"
+done
+if [ -n "${_faltam}" ]; then
+  echo "ERRO: a porta ficaria SEM projeção SSOT:${_faltam}" >&2
+  echo "       Publicá-la assim entrega porta que reprova no próprio lint (REGRAS 8/21/39/80/81)." >&2
+  exit 3
+fi
 
 _pin="$(git -C "${REPO_ROOT}" rev-parse --short=12 "${SRC_REF}")"
 cat <<FIM

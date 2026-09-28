@@ -17790,6 +17790,36 @@ run_door_selftests() {
   else record_fail "door: (g)" "o core falso não pôde ser montado (clone raso + cópia da árvore)"; fi
   rm -rf "${d6}" "${fake}"
 
+  # (h) DESTINO ANINHADO EM OUTRO REPO ⇒ ABORTA, e sem tocar o índice do hospedeiro.
+  #     Irmão obrigatório da cura de (f): para que as projeções nasçam certas, o materializador
+  #     passou a stajar o destino (`git add -A`) antes de regenerar. Num destino DENTRO de outro repo
+  #     o `rev-parse` resolve para o índice de FORA, e aquele staging levaria a porta inteira para o
+  #     índice do hospedeiro — efeito silencioso e caro. O caso mede as duas metades: rc≠0 com a
+  #     causa NOMEADA, e o índice do core inalterado depois da tentativa.
+  local d7 _out_h _st_before _st_after
+  # ⚠️ O DESTINO NÃO PODE MORAR EM `.claude/worktrees/`, e a passada adversarial de 2026-09-28 mediu
+  #     por quê: aquele diretório não é RASTREADO e não existe num checkout fresco. Sem o pai, a
+  #     pré-condição nova do materializador (`o diretório pai não existe`) dispara PRIMEIRO, com outra
+  #     mensagem — o grep abaixo não casa e o caso acusa a guarda de não ter recusado quando ela
+  #     recusou. Verde aqui, vermelho no CI, que é a assinatura de bancada medindo AMBIENTE. Pior: o
+  #     mesmo diretório está ignorado via `.git/info/exclude` (arquivo não versionado), então a 2ª
+  #     metade — "o índice do hospedeiro fica intacto" — era VÁCUA aqui e inalcançável lá. O pai tem
+  #     de existir SEMPRE e não ser ignorado: a raiz do repo serve, e é o que os outros casos da
+  #     família já fazem com `mktemp`.
+  d7="${REPO_ROOT}/__bancada-porta-aninhada-$$"
+  rm -rf "${d7}"
+  _st_before="$(git -C "${REPO_ROOT}" status --porcelain 2>/dev/null | sort)"
+  _out_h="$(bash "${REPO_ROOT}/ops/materialize-door.sh" "${d7}" --role standalone --from HEAD 2>&1 || true)"
+  _st_after="$(git -C "${REPO_ROOT}" status --porcelain 2>/dev/null | sort)"
+  if ! grep -q 'está DENTRO do repo' <<< "${_out_h}"; then
+    record_fail "door: (h)" "destino aninhado NÃO foi recusado — o staging iria para o índice do hospedeiro: $(_emit "${_out_h}" | tail -3 | head -c 200)"
+  elif [ "${_st_before}" != "${_st_after}" ]; then
+    record_fail "door: (h)" "recusou, mas o índice/árvore do core MUDOU na tentativa (a recusa veio tarde demais)"
+  else
+    record_pass "door: (h) destino aninhado em outro repo ⇒ ABORTA, e o índice do hospedeiro fica intacto"
+  fi
+  rm -rf "${d7}"
+
   rm -rf "${d4}" "${d3}" "${sb2}"
 }
 
