@@ -52,11 +52,12 @@ DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ram
 #   Ou seja: a lista continua com um membro só, mas agora por um critério declarado aqui em vez
 #   de herdado de uma frase que o próprio check deixou de dizer.
 _DISPENSAVEIS=(onion-review-verdict)
-DISPENSA=(); REASON=""
+DISPENSA=(); REASON=""; CI_INOPERANTE=0; CI_INOPERANTE_PROVADO=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
     --dispensa) DISPENSA+=("${2:?--dispensa exige o NOME do check}"); shift 2 ;;
+    --ci-inoperante) CI_INOPERANTE=1; shift ;;
     --motivo) REASON="${2:?--motivo exige texto}"; shift 2 ;;
     # BASE DE STACK: apagar a branch da base FECHA o PR filho (não re-aponta) — está
     # registrado como mecânica de stack desde 2026-07. Ao mergear uma base com PR
@@ -76,6 +77,8 @@ _em() { # $1=agulha, resto=palheiro → 0 se presente
   local x; for x in "$@"; do [ "$x" = "$a" ] && return 0; done; return 1
 }
 _dispensado() { [ "${#DISPENSA[@]}" -eq 0 ] && return 1; _em "$1" "${DISPENSA[@]}"; }
+
+
 
 if [ "${#DISPENSA[@]}" -gt 0 ]; then
   [ -n "$REASON" ] || die "--dispensa exige --motivo: dispensa sem razão escrita é override, e override não se audita"
@@ -118,9 +121,74 @@ OWNER_REPO="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRepository,headReposi
 HEAD_REF="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefName --jq '.headRefName' 2>/dev/null)"
 head_runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
   --jq '.check_runs[] | .name + "\t" + .status + "\t" + (.conclusion // "-")' 2>/dev/null)"
-[ -z "$head_runs" ] && die "ZERO check-runs registrados para o head ${HEAD_SHA:0:8} — provável janela pós-push; espere os checks nascerem (a corrida do #634)"
+# ══ ZERO CHECK-RUNS: janela pós-push, ou CI MORTO? ═══════════════════════════════════════════
+# A v1 tratava os dois casos como um só e mandava esperar. Em 2026-09-28 o segundo aconteceu: o CI
+# do repositório entrou em `startup_failure` em TODAS as branches (inclusive main), com zero jobs
+# criados e runs não re-executáveis. Os checks NUNCA iam nascer, e a mensagem "espere" virou uma
+# instrução impossível de cumprir — o gate deixou de ser guarda e passou a ser impasse.
+# O escape `--ci-inoperante` existe para esse caso e SÓ para ele. Ele não acredita em quem o invoca:
+#   (1) PROVA a inoperância lendo o FORGE — os runs recentes do repo têm de ser `startup_failure`.
+#       Se houver run bem-sucedido recente, é janela pós-push e o escape RECUSA (espere, como antes).
+#       Se existirem check-runs para o head, o caso é `--dispensa` nome-a-nome, não este.
+#   (2) RODA o gate determinístico local AQUI DENTRO — lint (0 HARD) e bancada (0 falhas). Não aceita
+#       número que eu diga: mede. É a diferença entre cobertura declarada e cobertura exercida, e é
+#       a razão de este escape não ser um `--force` com nome bonito.
+#   (3) Exige `--motivo` e REGISTRA no PR antes do merge, dizendo que a cobertura é LOCAL e que a
+#       semântica e o CI não foram medidos.
+if [ -z "$head_runs" ]; then
+  if [ "${CI_INOPERANTE:-0}" -ne 1 ]; then
+    die "ZERO check-runs registrados para o head ${HEAD_SHA:0:8} — provável janela pós-push; espere os checks nascerem (a corrida do #634). Se o CI do repositório estiver MORTO (startup_failure repo-wide, checks que nunca nascem), use --ci-inoperante --motivo \"…\": ele PROVA a inoperância no forge e RODA o gate local antes de deixar passar."
+  fi
+  say "⚠️  ZERO check-runs no head — avaliando o escape --ci-inoperante (que PROVA antes de permitir)"
+
+  # (1) PROVA DE INOPERÂNCIA, lida do forge — nunca da minha afirmação.
+  # ⚠️ O PREDICADO LÊ A SEQUÊNCIA NO TOPO, NÃO A JANELA — e a 1ª versão errava justamente isso.
+  # Ela contava `success` em qualquer lugar dos últimos 12 runs e recusava se houvesse algum. Medido
+  # em 2026-09-28: havia 2, de 26/09 23:32 e 23:46 — os ÚLTIMOS VERDES ANTES da quebra, com os 7
+  # `startup_failure` todos DEPOIS. Ou seja, a guarda leu história antiga como prova de CI vivo e
+  # recusou pelo motivo errado. (Errou para o lado seguro, e ainda assim errou — que é exatamente o
+  # que a casa diz sobre falso negativo: mais seguro que o inverso, e ainda engana.)
+  # A pergunta certa é "a sequência MAIS RECENTE é de falha?". `gh run list` devolve do mais novo para
+  # o mais velho, então a resposta é o comprimento da RAJADA inicial de `startup_failure`.
+  _recentes="$(gh run list "${REPO_ARG[@]}" --limit 12 --json conclusion --jq '.[].conclusion' 2>/dev/null || true)"
+  [ -n "${_recentes}" ] || die "--ci-inoperante: não consegui LER os runs recentes no forge — sem essa leitura eu não afirmo que o CI está morto. Recusa (fail-closed)."
+  _streak="$(printf '%s\n' "${_recentes}" | awk '$0!="startup_failure"{exit} {n++} END{print n+0}')"
+  _topo="$(printf '%s\n' "${_recentes}" | head -1)"
+  say "    forge: rajada inicial de ${_streak} startup_failure (run mais recente: ${_topo})"
+  [ "${_topo}" = "startup_failure" ] \
+    || die "--ci-inoperante: o run MAIS RECENTE é '${_topo}', não startup_failure — o CI está respondendo. Se os checks deste head só estão atrasados, espere; o escape não cobre impaciência."
+  [ "${_streak}" -ge 3 ] \
+    || die "--ci-inoperante: rajada de apenas ${_streak} startup_failure no topo (esperado >= 3). Uma ou duas falhas de startup podem ser transitórias — o escape exige padrão, não episódio."
+
+  # (2) O GATE LOCAL É EXERCIDO AQUI, não citado. Sem isto o escape seria um --force com nome bonito.
+  say "    rodando o gate determinístico LOCAL (é ele que substitui o CI; não aceito número citado)"
+  _lint_out="$(LC_ALL=C bash "${REPO_ROOT:-$(git rev-parse --show-toplevel)}/.claude/validation/lint-artifacts.sh" 2>&1)"; _lint_rc=$?
+  printf '%s\n' "${_lint_out}" | grep -qF 'MORREU' \
+    && die "--ci-inoperante: o lint MORREU antes do sumário — não pude julgar, logo não libero."
+  [ "${_lint_rc}" -eq 0 ] \
+    || die "--ci-inoperante: lint local rc=${_lint_rc} (há HARD). A cobertura que substituiria o CI está VERMELHA — recusa. $(printf '%s\n' "${_lint_out}" | grep -m1 'Violações HARD')"
+  _bench_out="$(LC_ALL=C bash "${REPO_ROOT:-$(git rev-parse --show-toplevel)}/.claude/validation/lint-selftest.sh" --jobs auto 2>&1)"; _bench_rc=$?
+  printf '%s\n' "${_bench_out}" | grep -qF 'ABORTOU' \
+    && die "--ci-inoperante: a bancada ABORTOU antes da soma — o verde parcial não vale. Recusa."
+  [ "${_bench_rc}" -eq 0 ] \
+    || die "--ci-inoperante: bancada local rc=${_bench_rc}. $(printf '%s\n' "${_bench_out}" | grep -m1 'Falharam')"
+  # ⚠️ ÂNCORA NO SUMÁRIO, NÃO NA PRIMEIRA OCORRÊNCIA DA PALAVRA. A 1ª versão era
+  # `awk '/Passaram/{print $3; exit}'` e casou o NOME DE UM CASO — existe um caso chamado
+  # `selftest-lanes: (h) --jobs 2 agrega 2 workers ⇒ Passaram 2, exit 0`, que aparece na linha 61 de
+  # uma corrida de 1516 linhas. O `exit` garantiu que o sumário real (linha 1516) nunca fosse lido, e
+  # o registro do PR #881 saiu com `bancada (h) casos`. O VEREDITO estava certo (veio do rc), o
+  # NÚMERO do rastro de auditoria estava errado — e rastro com número errado é a classe que este
+  # script existe para combater. Ancorado na FORMA do sumário (`Passaram : <n>` no início da linha,
+  # com dois-pontos) e tomando a ÚLTIMA ocorrência, que é a agregada.
+  _bench_pass="$(printf '%s\n' "${_bench_out}" | awk '/^[[:space:]]*Passaram[[:space:]]*:[[:space:]]*[0-9]+[[:space:]]*$/{v=$3} END{print v}')"
+  printf '%s' "${_bench_pass}" | grep -qE '^[0-9]+$' \
+    || die "--ci-inoperante: não consegui LER a contagem da bancada do sumário (li '${_bench_pass}'). O veredito seria correto pelo rc, mas eu não registro no PR um número que não sei — e registro sem número não audita. Recusa."
+  say "    ✓ gate local EXERCIDO: lint 0 HARD · bancada ${_bench_pass:-?} casos, 0 falhas"
+  CI_INOPERANTE_PROVADO="rajada de ${_streak} startup_failure no topo do forge · lint 0 HARD · bancada ${_bench_pass:-?} casos/0 falhas"
+else
 printf '%s\n' "$head_runs" | awk -F'\t' '$2!="completed"{exit 1}' \
   || die "check-run do head ${HEAD_SHA:0:8} ainda não-completo — merge recusado (esperar não é opcional)"
+fi
 # Falhos do head, um por linha — e a dispensa é aplicada NOME A NOME, nunca em bloco.
 _falhos="$(printf '%s\n' "$head_runs" | awk -F'\t' '$3=="failure"||$3=="cancelled"||$3=="timed_out"{print $1}')"
 _not_waived=""
@@ -188,6 +256,38 @@ fi
 # indistinguível de um merge por fora do gate — que é exatamente o que este escape existe para
 # evitar. O comentário nomeia O CHECK, o MOTIVO e o HEAD, porque "dispensei um check" sem dizer
 # qual é a mesma classe de declaração vazia que este script inteiro combate.
+# ── REGISTRO DO ESCAPE DE CI MORTO — mesma precondição do --dispensa, e pelo mesmo motivo ───────
+# Um merge sem CI que não deixe rastro no PR é indistinguível de um merge por fora do gate. Aqui o
+# registro carrega o que foi PROVADO (a leitura do forge) e o que foi EXERCIDO (o gate local), mais o
+# que continua NÃO MEDIDO — o CI e a semântica. O corpo é CONTADO antes de postar, como no --dispensa:
+# um `gh pr comment` bem-sucedido com corpo vazio é o modo-de-falha que custou o registro do #874.
+if [ "${CI_INOPERANTE:-0}" -eq 1 ]; then
+  [ -n "$(printf '%s' "${REASON}" | tr -d '[:space:]')" ] \
+    || die "--ci-inoperante exige --motivo com conteúdo — merge sem CI e sem justificativa escrita não se audita."
+  _reg_ci="$(printf '%s\n' \
+    "## ⚠️ Merge SEM CI — escape \`--ci-inoperante\`" \
+    "" \
+    "O CI do repositório está inoperante e este merge passou por um escape **nomeado**, que" \
+    "**provou** a inoperância e **exerceu** a cobertura local antes de permitir." \
+    "" \
+    "| | |" \
+    "|---|---|" \
+    "| head | \`${HEAD_SHA}\`" \
+    "| provado no forge + exercido localmente | ${CI_INOPERANTE_PROVADO:-<não registrado>} |" \
+    "| motivo | ${REASON} |" \
+    "" \
+    "**O que NÃO foi medido:** o CI (está morto) e a revisão semântica. A cobertura deste merge é o" \
+    "gate determinístico rodado nesta máquina — lint sem HARD e bancada sem falhas, ambos executados" \
+    "pelo próprio script, não citados por quem mergeou." )"
+  for _ex in "Merge SEM CI" "${REASON}"; do
+    grep -qF -- "${_ex}" <<< "${_reg_ci}" \
+      || die "o corpo do registro de CI-inoperante saiu INCOMPLETO (falta: ${_ex}) — merge abortado antes de postar."
+  done
+  gh pr comment "$PR" "${REPO_ARG[@]}" --body "$_reg_ci" >/dev/null 2>&1 \
+    || die "não consegui REGISTRAR o escape de CI-inoperante no PR #${PR} — merge abortado. O registro é precondição."
+  say "✓ escape de CI-inoperante registrado no PR #${PR}, antes do merge"
+fi
+
 if [ "${#DISPENSA[@]}" -gt 0 ]; then
   # A NOTA DE AUDITORIA NAO PODE AFIRMAR O QUE NAO MEDIU. Ate 2026-09-20 ela dizia, fixa, "o que
   # este check mediria NAO foi medido" — verdade enquanto o `onion-review-verdict` so reprovava

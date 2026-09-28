@@ -2,7 +2,7 @@
 title: 'A porta regenerava antes de saber o que tinha, e a minha cura piorou o silêncio'
 date: 2026-09-28
 branch: fix/door-projections-staged-index
-reviewed_diff_sha256: 5ac2eb83aaf3c7ab9a5ea0c7c17112a8962aa893b0956e71cb4a1ac6982e67ac
+reviewed_diff_sha256: a1cba2c416f2d76dc9b1c0ba1585018ada56702ab080f93d6595b1376c55ca88
 elenxo: sim
 findings_total: 11
 findings_real: 11
@@ -101,6 +101,18 @@ escrita no próprio script: gerador que falha por ambiente do ALVO não deve der
 lint de lá cobra depois. Quem passa a **verificar o efeito** é o materializador, no caminho da porta,
 onde publicar vermelho é o dano real. Tornar o regenerador fail-closed contrariaria uma decisão
 datada sem medir o custo no adotante.
+
+## O escape `--ci-inoperante` veio para cá, e isso é correção de escopo
+
+Ao tentar mergear este PR o gate recusou por um motivo que não é defeito dele: o escape nomeado
+`--ci-inoperante` do `ops/pr-merge-verified.sh` **só existia na branch da pesquisa** (`deaa9e68`,
+PR #882) — maquinaria de merge commitada dentro de um PR de pesquisa, mistura de escopo minha.
+O resultado foi uma dependência circular: este PR precisa do escape para entrar (o CI está morto), e
+o #882 precisa deste PR para a bancada ficar verde.
+
+O arquivo foi trazido para cá porque é onde ele pertence: este é o PR da maquinaria. Quando o #882
+entrar, o conteúdo será idêntico e não haverá conflito. Registrado aqui em vez de resolvido em
+silêncio — merge que "simplesmente funcionou" depois de duas recusas merece dizer o que mudou.
 
 ## NÃO-VERIFICADO (declarado, não resolvido)
 
