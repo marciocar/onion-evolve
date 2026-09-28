@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**228 itens abertos** em 50 grafo(s) com aberto (de 72 no escopo) · 51 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**228 itens abertos** em 50 grafo(s) com aberto (de 73 no escopo) · 51 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -39,14 +39,6 @@
 | 2.4 | `C_OPCAO_O4_ARESTA_CROSS_ARQUIVO_PRIMEIRA_CLASSE` | kg-multi-graph-view-2026-09 | OPCAO O4: referencia cross-arquivo vira ARESTA de 1a classe no schema (edge com file:id, resolvida pelo motor). Confianca 0.2: o E |
 | 1.8 | `C_OPCAO_O8_CONSOLE_MULTI_GRAFO` | kg-multi-graph-view-2026-09 | OPCAO O8: kg-console.sh/kg-view.sh aceitam N arquivos e renderizam painel comparativo multi-grafo. Confianca 0.2: o Elenxo REPROVA |
 | 1.4 | `C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS` | kg-multi-graph-view-2026-09 | OPCAO O6: grafo de nivel 0 que IMPORTA nos de outros arquivos (owl:imports), formando um grafo composto. Confianca 0.15 (a mais ba |
-
-## agent-command-composition-2026-09 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 71.5 | `Q_AGENT_COMMAND_COMPOSITION_0928` | agent-command-composition-2026-09 | Como o mercado padroniza, em setembro de 2026, compor um comando de agente a partir de (a) DOUTRINA declarada como fragmento reuti |
-| 24.0 | `Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART` | agent-command-composition-2026-09 | PROPOSTA DE VEREDITO — esta rodada NÃO sela, propõe. A sub-pergunta (4) do maestro ("o paper Context Kubernetes é, ou não é |
-| 5.4 | `Q_CONDUCTOR_VETO_ANCHORING_PENDING` | agent-command-composition-2026-09 | PENDÊNCIA DE ANCORAGEM, não achado — e fica registrada para não ser citada como resultado. O veredito "o Conductor ROTEIA ent |
 
 ## ocr-local-sei-2026-09 — 10 item(ns)
 
@@ -204,6 +196,14 @@
 | 8.1 | `Q_INDICE_DO_DIARIO_SEM_CATRACA` | guardas-revisao-2026-08 | LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do |
 | 8.0 | `Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO` | guardas-revisao-2026-08 | DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML  |
 | 5.4 | `C_SEM_GATE_REGRA_SEM_TESTE` | guardas-revisao-2026-08 | nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca |
+
+## forge-comando-framework-2026-09 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 21.0 | `D_FORGE_META_COMANDO` | forge-comando-framework-2026-09 | `/meta:forge` — gerador do CONJUNTO COMPLETO de um comando-com-framework (7 peças), com duas faces: wizard no core (entrevista  |
+| 12.8 | `O_N1_NAO_E_PADRAO` | forge-comando-framework-2026-09 | OBJEÇÃO SOBREVIVENTE (a ser absorvida no desenho, não removida): N=1 — uma instância não é padrão. Uma forja derivada só |
+| 7.5 | `Q_DESTINO_DIFERENCIAL_OU_LACUNA` | forge-comando-framework-2026-09 | HERDADA de Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART (grafo agent-command-composition-2026-09), cujo VEREDITO foi selado em  |
 
 ## fable-5-1-superacao-2026-09 — 9 item(ns)
 
