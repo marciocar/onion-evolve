@@ -1199,6 +1199,11 @@ docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.propos
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	Q_vps_declared	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 docs/evolution/outbox/diary/2026-07-09-security-gate-degrades-to-veto.md	C_a2a_gate_narrow	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
+docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_LACUNAS_AGENT_COMMAND_COMPOSITION_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
+docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_LACUNAS_PRIMARIES_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
+docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	E_MERCADO_AGENT_COMMAND_COMPOSITION_0928	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
+docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_CONDUCTOR_VETO_ANCHORING_PENDING	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
+docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml	Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART	docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_artifact_adr_thread_runtime	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_claim_onion_stricter	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/autonomous-thread-runtime-2026-07/SYNTHESIS.md	B5_14_claim_transfer_onion	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
