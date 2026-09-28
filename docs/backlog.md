@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**225 itens abertos** em 49 grafo(s) com aberto (de 71 no escopo) · 50 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**228 itens abertos** em 50 grafo(s) com aberto (de 72 no escopo) · 51 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -39,6 +39,14 @@
 | 2.4 | `C_OPCAO_O4_ARESTA_CROSS_ARQUIVO_PRIMEIRA_CLASSE` | kg-multi-graph-view-2026-09 | OPCAO O4: referencia cross-arquivo vira ARESTA de 1a classe no schema (edge com file:id, resolvida pelo motor). Confianca 0.2: o E |
 | 1.8 | `C_OPCAO_O8_CONSOLE_MULTI_GRAFO` | kg-multi-graph-view-2026-09 | OPCAO O8: kg-console.sh/kg-view.sh aceitam N arquivos e renderizam painel comparativo multi-grafo. Confianca 0.2: o Elenxo REPROVA |
 | 1.4 | `C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS` | kg-multi-graph-view-2026-09 | OPCAO O6: grafo de nivel 0 que IMPORTA nos de outros arquivos (owl:imports), formando um grafo composto. Confianca 0.15 (a mais ba |
+
+## agent-command-composition-2026-09 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 71.5 | `Q_AGENT_COMMAND_COMPOSITION_0928` | agent-command-composition-2026-09 | Como o mercado padroniza, em setembro de 2026, compor um comando de agente a partir de (a) DOUTRINA declarada como fragmento reuti |
+| 24.0 | `Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART` | agent-command-composition-2026-09 | PROPOSTA DE VEREDITO — esta rodada NÃO sela, propõe. A sub-pergunta (4) do maestro ("o paper Context Kubernetes é, ou não é |
+| 5.4 | `Q_CONDUCTOR_VETO_ANCHORING_PENDING` | agent-command-composition-2026-09 | PENDÊNCIA DE ANCORAGEM, não achado — e fica registrada para não ser citada como resultado. O veredito "o Conductor ROTEIA ent |
 
 ## ocr-local-sei-2026-09 — 10 item(ns)
 
