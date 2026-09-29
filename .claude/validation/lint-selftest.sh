@@ -13763,8 +13763,11 @@ run_role_cut_selftests() {
   #     citado 32x nas mensagens, `/meta:kg-freshness` 27x).
   #
   #     EXCEÇÕES, e cada uma tem razão nomeada: são comandos citados por guardas que NÃO rodam num
-  #     alvo — autoria do framework (`adopt`, `create-*`, `evolve`) e federação cross-empresa
+  #     alvo — autoria do framework (`adopt`, `create-*`, `evolve`, `forge`) e federação cross-empresa
   #     (`federation-*`, `co-announce`, `co-deliver`, este último já no conjunto `downstream`).
+  #     `forge` entrou em 2026-09-29: é Camada 1 (autoria do framework), declarado core-only no
+  #     próprio `forge.md`, e o `forge-census.sh` o cita numa linha de comentário. O caso pegou na
+  #     primeira corrida depois de o comando nascer — mecanismo funcionando, não burocracia.
   if [ -f "${_resolver}" ]; then
     local _full; _full="$(bash "${_resolver}" standalone --tools 2>/dev/null)"
     local _citados _c _orfaos=""
@@ -13772,7 +13775,7 @@ run_role_cut_selftests() {
     while IFS= read -r _c; do
       [ -n "${_c}" ] || continue
       case "${_c}" in
-        adopt|evolve|create-*|federation-*|co-announce|co-deliver) continue ;;  # fábrica/federação
+        adopt|evolve|forge|create-*|federation-*|co-announce|co-deliver) continue ;;  # fábrica/federação
         nao|federation-) continue ;;                                            # falsos positivos do grep
       esac
       [ -f "${REPO_ROOT}/.claude/commands/meta/${_c}.md" ] || continue          # comando que não existe
@@ -19147,6 +19150,156 @@ _family run_version_drift_selftests
 _family run_premodelswitch_guard_selftests
 _family run_research_lens_selftests
 _family run_command_role_parity_selftests
+# ── FORJA: o censo das 7 peças mede por REFERÊNCIA, e recusa quando não pode medir ───────────
+# Os casos (b)(c)(d) são os MUTANTES dos três erros que eu cometi levantando este censo à mão em
+# 2026-09-28 — prefixo duplicado, radical vs nome cheio, e padrão que não cobre a redação real.
+# Todos tinham a mesma forma: CONSTRUIR o caminho da peça a partir do nome do candidato. Se algum
+# deles voltar, o censo devolve número errado com cara de medição, que é o pior formato possível.
+run_forge_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/forge-census.sh"
+  if [ ! -f "${sut}" ]; then record_fail "forge" "SUT ausente: ${sut}"; return; fi
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  git -C "${d}" init -q -b main 2>/dev/null || { record_fail "forge" "git init falhou na sandbox"; return; }
+  mkdir -p "${d}/.claude/skills/onion-exemplo" "${d}/.claude/commands/common/prompts" \
+           "${d}/.claude/commands/meta" "${d}/.claude/rules" "${d}/.claude/workflows"
+  mkdir -p "${d}/.claude/validation"
+  # ⚠️ A SANDBOX PRECISA DO ARQUIVO QUE O SUT LÊ. O predicado da peça 7 confere que a família
+  #    CITADA existe de fato no runner do alvo (citação sem existência era o furo do fantasma), então
+  #    sem um `lint-selftest.sh` aqui a peça 7 seria sempre ausente — e eu perderia meia hora
+  #    achando defeito na guarda. bancada-espelha-o-runner: o harness entrega o que o motor lê.
+  printf 'run_exemplo_selftests() {\n  :\n}\n' > "${d}/.claude/validation/lint-selftest.sh"
+
+  _fg() { git -C "${d}" add -A >/dev/null 2>&1
+          if _fg_out="$(bash "${sut}" "${d}" --tsv 2>&1)"; then _fg_rc=0; else _fg_rc=$?; fi }
+  _fg_pecas() { printf '%s\n' "${_fg_out}" | awk -F'\t' -v c="$1" '$2==c{print $1; exit}'; }
+
+  # (a) superfície que CITA as 6 peças ⇒ 7/7. O nome do diretório (`onion-exemplo`) não bate com o
+  #     radical dos arquivos (`exemplo-*`), que é exatamente o 2o erro de 2026-09-28: se o censo
+  #     construísse o nome, daria menos que 7.
+  printf 'doutrina\n' > "${d}/.claude/commands/common/prompts/exemplo-doctrine.md"
+  printf 'lente\n'    > "${d}/.claude/rules/exemplo-lens.md"
+  printf 'wf\n'       > "${d}/.claude/workflows/exemplo.js"
+  cat > "${d}/.claude/skills/onion-exemplo/SKILL.md" <<'SK'
+# exemplo
+**Hoje:** 2026-09-28 — contexto medido injetado
+Doutrina: .claude/commands/common/prompts/exemplo-doctrine.md
+Workflow: .claude/workflows/exemplo.js
+Destino: write(KG) + kg-radar exit 0
+Lente: .claude/rules/exemplo-lens.md
+Bancada: run_exemplo_selftests
+SK
+  _fg
+  if [ "$(_fg_pecas onion-exemplo)" = "7" ]; then
+    record_pass "forge: (a) superfície que cita as 6 peças ⇒ 7/7, mesmo com nome do dir ≠ radical dos arquivos"
+  else
+    # ⚠️ ASSERÇÃO QUE NOMEIA A PEÇA, não só o total — achado 11 da passada adversarial: seis mutantes
+    #    distintos colapsavam no mesmo "esperado 7/7, veio 6" e o vermelho não dizia qual predicado
+    #    quebrou. Diagnóstico é parte do caso, não luxo.
+    local _l _faltou=""
+    _l="$(printf '%s\n' "${_fg_out}" | awk -F'\t' '$2=="onion-exemplo"{print}')"
+    local _i=0
+    for _nome in doutrina contexto workflow destino lente bancada; do
+      _i=$((_i + 1))
+      [ "$(printf '%s' "${_l}" | cut -f$((_i + 2)))" = "1" ] || _faltou="${_faltou} ${_nome}"
+    done
+    record_fail "forge: (a)" "esperado 7/7, veio $(_fg_pecas onion-exemplo) — peça(s) não detectada(s):${_faltou:- nenhuma (o total é que está errado)}"
+  fi
+
+  # (b) MUTANTE DO ERRO 1 — peça que EXISTE mas o artefato NÃO CITA conta como ausente.
+  #     É a cláusula 1 da doutrina, e é verdade operacional: a sessão também não a acharia.
+  mkdir -p "${d}/.claude/skills/onion-muda"
+  printf 'lente orfa\n' > "${d}/.claude/rules/muda-lens.md"
+  printf '# muda\nsó a superfície, não cita nada\n' > "${d}/.claude/skills/onion-muda/SKILL.md"
+  _fg
+  if [ "$(_fg_pecas onion-muda)" = "1" ]; then
+    record_pass "forge: (b) peça que existe e NÃO é citada conta como ausente (1/7) — cláusula 1"
+  else record_fail "forge: (b)" "esperado 1/7 p/ superfície muda, veio $(_fg_pecas onion-muda)"; fi
+
+  # (c) MUTANTE DO ERRO 3 — redação alternativa do destino ('radar exit 0' sem a palavra kg-radar),
+  #     que foi exatamente o que me fez contar a peça 5 do census como ausente.
+  mkdir -p "${d}/.claude/skills/onion-redacao"
+  printf '# redacao\nsela com radar exit 0 em todo grafo tocado\n' > "${d}/.claude/skills/onion-redacao/SKILL.md"
+  _fg
+  if [ "$(_fg_pecas onion-redacao)" = "2" ]; then
+    record_pass "forge: (c) 'radar exit 0' conta a peça 5 (a redação real do census, que meu grep perdeu)"
+  else record_fail "forge: (c)" "esperado 2/7, veio $(_fg_pecas onion-redacao)"; fi
+
+  # (d) sem índice git ⇒ rc=3 DECLARANDO. Censo é do conjunto RASTREADO; zero não é resultado.
+  local ng; ng="$(mktemp -d)"; mkdir -p "${ng}/.claude/commands/meta"
+  printf 'x\n' > "${ng}/.claude/commands/meta/x.md"
+  local og orc=0
+  if og="$(bash "${sut}" "${ng}" --tsv 2>&1)"; then orc=0; else orc=$?; fi
+  if [ "${orc}" = "3" ] && grep -q 'sem índice git' <<< "${og}"; then
+    record_pass "forge: (d) sem índice git ⇒ rc=3 DECLARANDO (nunca censo vazio)"
+  else record_fail "forge: (d)" "sem git não recusou (rc=${orc}): $(_emit "${og}" | head -c 200)"; fi
+  rm -rf "${ng}"
+
+  # (e) repo COM git mas ZERO candidato rastreado ⇒ rc=3, não censo de zero linhas.
+  local empty_repo; empty_repo="$(mktemp -d)"; git -C "${empty_repo}" init -q -b main 2>/dev/null
+  local ov vrc=0
+  if ov="$(bash "${sut}" "${empty_repo}" --tsv 2>&1)"; then vrc=0; else vrc=$?; fi
+  if [ "${vrc}" = "3" ] && grep -q 'nenhum candidato RASTREADO' <<< "${ov}"; then
+    record_pass "forge: (e) zero candidato rastreado ⇒ rc=3 DECLARANDO (censo vazio nunca passa por medição)"
+  else record_fail "forge: (e)" "repo sem candidato não recusou (rc=${vrc}): $(_emit "${ov}" | head -c 200)"; fi
+  rm -rf "${empty_repo}"
+
+  # (g) O CAMINHO DE PRODUÇÃO — `--markdown` é o que o forge.md manda rodar, e estava 100%
+  #     NÃO-TESTADO: a passada adversarial mostrou um mutante que fazia o cabeçalho MENTIR
+  #     (total e "N com 6+") com a família 6/6 verde. Classe testar-no-caminho-errado-e-nao-testar.
+  git -C "${d}" add -A >/dev/null 2>&1
+  local md; md="$(bash "${sut}" "${d}" --markdown 2>&1)"
+  local md_total md_ref tsv_total
+  md_total="$(printf '%s\n' "${md}" | sed -n 's/^# censo das 7 peças · \([0-9]\+\) candidato.*/\1/p')"
+  md_ref="$(printf '%s\n' "${md}" | sed -n 's/^# censo.*· \([0-9]\+\) com 6+.*/\1/p')"
+  tsv_total="$(bash "${sut}" "${d}" --tsv 2>/dev/null | tail -n +2 | grep -c . || true)"
+  # ⚠️ O "N com 6+" TAMBÉM é recomputado do TSV, não só checado como não-vazio: a 1a versão deste
+  #    caso fazia `[ -n "${md_ref}" ]` e o mutante que punha 99 ali passava VERDE — e é exatamente o
+  #    número que a doutrina e o nó do grafo citam. Guarda que aceita qualquer valor não guarda nada.
+  local tsv_ref
+  tsv_ref="$(bash "${sut}" "${d}" --tsv 2>/dev/null | tail -n +2 | awk -F'\t' '$1>=6' | grep -c . || true)"
+  if [ "${md_total}" = "${tsv_total}" ] && [ "${md_ref}" = "${tsv_ref}" ] \
+     && [ "$(printf '%s\n' "${md}" | grep -cE '^[0-9]/7 \| ')" -ge 1 ]; then
+    record_pass "forge: (g) --markdown (o caminho de produção) tem cabeçalho FIEL ao --tsv e tabela não-vazia"
+  else
+    record_fail "forge: (g)" "cabeçalho do markdown divergiu do tsv (total md=${md_total:-?} tsv=${tsv_total:-?} · 6+ md=${md_ref:-?} tsv=${tsv_ref:-?}) ou tabela vazia"
+  fi
+
+  # (h) A DESCOBERTA POR `commands/meta/` — metade do censo, e também não-testada: matar essa
+  #     varredura derrubava 44 de 57 candidatos no repo real sem a bancada mudar de cor.
+  mkdir -p "${d}/.claude/commands/meta"
+  printf '# so-comando\nnada citado\n' > "${d}/.claude/commands/meta/so-comando.md"
+  _fg
+  if [ "$(_fg_pecas so-comando)" = "1" ]; then
+    record_pass "forge: (h) candidato SÓ em commands/meta/ é descoberto (a outra metade da varredura)"
+  else record_fail "forge: (h)" "candidato de commands/meta/ não apareceu no censo"; fi
+
+  # (i) CITADO MAS INEXISTENTE ⇒ ausente. O furo que a passada adversarial abriu: um .md que só
+  #     citava caminhos fantasma pontuava 7/7, enquanto o docstring prometia medir PRESENÇA.
+  mkdir -p "${d}/.claude/skills/onion-fantasma"
+  cat > "${d}/.claude/skills/onion-fantasma/SKILL.md" <<'SKF'
+# fantasma
+Doutrina: .claude/commands/common/prompts/fantasma-doctrine.md
+Workflow: .claude/workflows/fantasma.js
+Lente: .claude/rules/fantasma-lens.md
+Bancada: run_fantasma_selftests
+SKF
+  _fg
+  if [ "$(_fg_pecas onion-fantasma)" = "1" ]; then
+    record_pass "forge: (i) peça CITADA mas inexistente no índice ⇒ ausente (o fantasma 7/7 morreu)"
+  else record_fail "forge: (i)" "fantasma pontuou $(_fg_pecas onion-fantasma)/7 — citação sem existência voltou a contar"; fi
+
+  # (f) a superfície NÃO-rastreada não entra no censo (o censo é do que viaja e do que o CI vê).
+  mkdir -p "${d}/.claude/skills/onion-untracked"
+  printf '# untracked\n' > "${d}/.claude/skills/onion-untracked/SKILL.md"
+  git -C "${d}" add -A >/dev/null 2>&1
+  git -C "${d}" rm --cached -q -- .claude/skills/onion-untracked/SKILL.md >/dev/null 2>&1
+  if _fg_out="$(bash "${sut}" "${d}" --tsv 2>&1)"; then :; fi
+  if ! grep -q 'onion-untracked' <<< "${_fg_out}"; then
+    record_pass "forge: (f) superfície untracked fica FORA do censo (mede o que viaja)"
+  else record_fail "forge: (f)" "candidato untracked entrou no censo"; fi
+}
+
+_family run_forge_selftests
 _family run_review_cause_bands_selftests
 _family run_research_workflow_selftests
 

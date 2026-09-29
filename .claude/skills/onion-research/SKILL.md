@@ -103,6 +103,11 @@ A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 c
 - Só a sessão principal roda o workflow (opt-in por comando); subagente não orquestra.
 - Sem WebSearch disponível o workflow degrada: use `WebFetch` sobre fontes do roster e declare.
 - Não há cota de busca entre sessões (a plataforma zera em `/clear`): o orçamento é seu, por rodada.
+- **Lente e bancada desta skill** (as peças 6 e 7 do conjunto — citadas aqui porque o censo da forja
+  mede por REFERÊNCIA, e em 2026-09-28 ele mostrou que esta skill TINHA as duas e não nomeava nenhuma:
+  quem lê a superfície não as achava): a lente é `.claude/rules/research-lens.md` (carrega ao tocar
+  `docs/evolution/research/**`), e as famílias de bancada são `run_research_workflow_selftests` e
+  `run_research_lens_selftests`.
 - **Revisita** (F4): a REGRA 67 (grafo vencido) e a REGRA 69 (fonte do roster vencida) avisam no lint; você roda
   `Workflow({scriptPath: '.claude/workflows/onion-research.js', args: { question: '<a pergunta original>', revisit: '<caminho do .kg.yaml>', today, budget, cadenceDays: <opcional: força a cadência — "revisite agora"> }})`
   — só os nós de evidência vencidos (verified_at anterior a hoje − cadência) são re-medidos pela mesma votação;

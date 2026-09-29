@@ -1141,6 +1141,25 @@ check_rules_pathscoped() {
   [ -d "${rules_dir}" ] || return 0          # sem rules/ → nada a checar (adotante)
   local rule globs g matched
   while IFS= read -r -d '' rule; do
+    # ⚠️ O PREDICADO "A LENTE ESTÁ RASTREADA?" FOI TENTADO AQUI E RETIRADO, em 2026-09-29, e o
+    #    porquê fica escrito para ninguém o reintroduzir no escuro. Ele era o 1o dos dois
+    #    sobreviventes da regra duplicada fundida nesta; parecia barato e reprovou as CINCO fixtures
+    #    desta própria regra. A causa: o harness de fixtures copia cada caso para
+    #    `.claude/rules/selftest-fixture-probe.md`, que é UNTRACKED por construção — a guarda nova
+    #    disparava primeiro e o predicado sob teste nunca rodava. E não há sinal que distinga a sonda
+    #    do harness de uma lente que existe só na máquina do autor: as duas são `??` no git.
+    #    Curar isso exigiria código de produção CIENTE DE TESTE (isentar um nome de arquivo do
+    #    harness), o que é pior que o risco coberto — e o risco é pequeno, porque lente untracked
+    #    não sobrevive ao `git add -A` que qualquer commit faz.
+    #    GAP DECLARADO, com gatilho: se uma lente untracked de fato causar dano (adotante sem a
+    #    doutrina, ou perda por `git clean`), o caminho é a guarda de RASTREAMENTO genérica do repo,
+    #    não um predicado especial aqui.
+    # (a1) CORPO não-vazio — o outro sobrevivente da REGRA 91 fundida: lente que só tem frontmatter
+    #      é carregada pelo harness e não diz nada, que é gasto de contexto sem doutrina.
+    if [ -z "$(awk 'NR>1 && /^---[[:space:]]*$/{f=1;next} f' "${rule}" | tr -d '[:space:]')" ]; then
+      violation "HARD" "${rule}" "regra path-scoped com CORPO VAZIO — o harness a carregaria e ela não diria nada — escreva a doutrina abaixo do frontmatter, ou remova a regra"
+      continue
+    fi
     # (a) frontmatter com `paths:` — sem isso a regra nunca é elegível a carregar
     if ! grep -qE '^paths:' "${rule}"; then
       violation "HARD" "${rule}" "regra path-scoped sem 'paths:' no frontmatter — nunca carrega (regra que não chega ao modelo é indistinguível de regra ausente) — adicione 'paths:' com ao menos um glob no frontmatter da regra"
@@ -4601,6 +4620,7 @@ check_command_role_parity() {
     violation "SOFT" ".claude/commands/meta/" "REGRA 90 (Prosa de comando conhece os papéis que o script aceita): ${l#REGRA 90: }"
   done <<< "${out}"
 }
+
 
 check_radar_aufhebung
 check_radar_sources_freshness
