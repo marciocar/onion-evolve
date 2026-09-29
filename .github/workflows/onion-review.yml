@@ -446,6 +446,41 @@ jobs:
           if-no-files-found: ignore
           retention-days: 14
 
+      # ── ÁRVORE SUJA DECIDE ANTES DA CONTAGEM (2026-09-29) ──────────────────────────────────
+      # A detecção existia, mas rodava DEPOIS do step que decide `achados` — e só CARIMBAVA o
+      # comentário. Efeito medido no PR #886: o parecer saiu "VEREDITO: conforme", o check saiu
+      # `pass`, e a guarda avisou na MESMA hora que trechos do parecer podiam ser de conteúdo que
+      # não é do PR. Quem olha o check verde não vê a ressalva, que vive no corpo do comentário.
+      # A cura usa o TERCEIRO desfecho que o contrato já tem: `achados = -1` = NÃO PUDE CONTAR, que
+      # nunca bloqueia. Árvore suja É isso — a contagem não é confiável, e chamar isso de "0
+      # achados" é transformar incerteza em absolvição. O simétrico (transformar em bloqueio) seria
+      # o erro oposto e igualmente proibido aqui.
+      # POR QUE O REVISOR CONSEGUE SUJAR: `--allowedTools ... Bash` está na allowlist, e a proibição
+      # de escrever é PROSA no prompt. Instrução em prosa não é fronteira — a casa já mediu isto em
+      # 2026-09-20, quando um refutador com "não modifique nada" escreveu em seis arquivos. Fechar
+      # o `Bash` por lista de comandos foi considerado e REJEITADO: `sed -i`, `python3` e `tee`
+      # escapam de qualquer lista, e apertar demais ressuscita a morte por negação de permissão que
+      # o `--allowedTools` explícito curou. Detectar e desqualificar é a fronteira que funciona.
+      - name: A árvore foi suja durante a revisão? (decide ANTES da contagem)
+        id: sujo
+        if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
+        env:
+          HEAD_ANTES: ${{ steps.arvore.outputs.head }}
+          STASH_ANTES: ${{ steps.arvore.outputs.stashes }}
+        run: |
+          sujas_total="$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
+          suja="$(git status --porcelain 2>/dev/null | head -10)"
+          head_agora="$(git rev-parse HEAD 2>/dev/null || echo desconhecido)"
+          stash_agora="$(git stash list 2>/dev/null | wc -l | tr -d ' ')"
+          motivos=""
+          [ -n "${suja}" ]                         && motivos="árvore modificada (${sujas_total} arquivo(s))"
+          [ "${head_agora}" != "${HEAD_ANTES}" ]   && motivos="${motivos:+${motivos}; }HEAD movido (${HEAD_ANTES:0:8} → ${head_agora:0:8})"
+          [ "${stash_agora}" != "${STASH_ANTES}" ] && motivos="${motivos:+${motivos}; }stash criado (${STASH_ANTES} → ${stash_agora})"
+          { echo "sujo=$([ -n "${motivos}" ] && echo true || echo false)"
+            echo "motivos=${motivos}"
+            echo "total=${sujas_total}"; } >> "${GITHUB_OUTPUT}"
+          { echo "porcelain<<PORCELAIN_EOF"; printf '%s\n' "${suja}"; echo "PORCELAIN_EOF"; } >> "${GITHUB_OUTPUT}"
+
       - name: Qual contagem de achados vale (a da tentativa que revisou)
         id: ach
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
@@ -453,9 +488,17 @@ jobs:
           R1: ${{ steps.v1.outputs.revisou }}
           A1: ${{ steps.v1.outputs.achados }}
           A2: ${{ steps.v2.outputs.achados }}
+          SUJO: ${{ steps.sujo.outputs.sujo }}
+          MOTIVOS: ${{ steps.sujo.outputs.motivos }}
         run: |
           if [ "${R1}" = "true" ]; then val="${A1}"; else val="${A2}"; fi
           case "${val}" in ''|*[!0-9-]*) val=-1 ;; esac
+          # ÁRVORE SUJA ⇒ -1 (NÃO PUDE CONTAR). Não é bloqueio nem absolvição: é a recusa a
+          # afirmar sobre um parecer que pode descrever conteúdo alheio ao PR.
+          if [ "${SUJO}" = "true" ] && [ "${val}" != "-1" ]; then
+            echo "::warning::contagem de achados DESQUALIFICADA (${MOTIVOS}) — era ${val}, vira -1 (não pude contar)"
+            val=-1
+          fi
           echo "achados=${val:--1}" >> "${GITHUB_OUTPUT}"
 
       # RASTRO SEMPRE (2026-08-03) — o pedido que originou esta correção: "verde revisado" e
@@ -464,6 +507,9 @@ jobs:
       - name: Rastro do veredito (o verde diz QUAL verde é)
         if: ${{ env.HAS_ANTHROPIC_KEY == 'true' }}
         env:
+          SUJO_TOTAL: ${{ steps.sujo.outputs.total }}
+          SUJO_MOTIVOS: ${{ steps.sujo.outputs.motivos }}
+          SUJO_PORCELAIN: ${{ steps.sujo.outputs.porcelain }}
           R1: ${{ steps.v1.outputs.revisou }}
           M1: ${{ steps.v1.outputs.motivo }}
           T1: ${{ steps.v1.outputs.turnos }}
@@ -476,8 +522,6 @@ jobs:
           EXEC2: ${{ steps.review2.outputs.execution_file }}
           PR: ${{ github.event.pull_request.number }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HEAD_ANTES: ${{ steps.arvore.outputs.head }}
-          STASH_ANTES: ${{ steps.arvore.outputs.stashes }}
         run: |
           MARCA='<!-- onion-review-parecer -->'
           if [ "${R1}" = "true" ] || [ "${R2}" = "true" ]; then
@@ -499,14 +543,12 @@ jobs:
             # ambos o deixam VAZIO) — por isso o marco HEAD/stash capturado ANTES da revisão.
             # TETO declarado: sujar-e-limpar (checkout+restore) passa invisível; e a guarda só
             # roda no ramo "revisou" — crash do revisor cai no else sem carimbo.
-            sujas_total="$(git status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
-            suja="$(git status --porcelain 2>/dev/null | head -10)"
-            head_agora="$(git rev-parse HEAD 2>/dev/null || echo desconhecido)"
-            stash_agora="$(git stash list 2>/dev/null | wc -l | tr -d ' ')"
-            motivos=""
-            [ -n "${suja}" ]                         && motivos="árvore modificada (${sujas_total} arquivo(s))"
-            [ "${head_agora}" != "${HEAD_ANTES}" ]   && motivos="${motivos:+${motivos}; }HEAD movido (${HEAD_ANTES:0:8} → ${head_agora:0:8})"
-            [ "${stash_agora}" != "${STASH_ANTES}" ] && motivos="${motivos:+${motivos}; }stash criado (${STASH_ANTES} → ${stash_agora})"
+            # ⚠️ REUSA a medição do step `sujo`, que roda ANTES da contagem — não remede. Duas
+            #    medições do mesmo fato em pontos diferentes do job divergem em silêncio, e a que
+            #    o leitor vê no comentário não seria a que desqualificou a contagem.
+            sujas_total="${SUJO_TOTAL}"
+            suja="${SUJO_PORCELAIN}"
+            motivos="${SUJO_MOTIVOS}"
             if [ -n "${motivos}" ]; then
               echo "::warning::árvore do runner alterada durante a revisão (${motivos}) — o parecer pode refletir conteúdo que não é do PR"
               aviso="$(mktemp)"

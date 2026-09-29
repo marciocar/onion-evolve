@@ -1169,7 +1169,33 @@ check_rules_pathscoped() {
     # O `---` de fechamento do frontmatter TAMBÉM casa "^[[:space:]]*-", e sem o guard abaixo
     # ele entrava como o item de lista "--" — o ramo `paths:` VAZIO nunca disparava e caía no
     # ramo errado. Achado no dogfood da própria regra, 2026-08-03.
-    globs="$(awk '/^---[[:space:]]*$/{f=0;next} /^paths:/{f=1;next} /^[a-zA-Z_-]+:/{f=0} f&&/^[[:space:]]*-[[:space:]]+/{gsub(/^[[:space:]]*-[[:space:]]+/,""); gsub(/^["'"'"']|["'"'"']$/,""); print}' "${rule}")"
+    # ⚠️ TRÊS FORMAS DE `paths:`, e o parser só lia UMA — medido contra o BINÁRIO em 2026-09-29, com
+    #    lentes-sonda e o log `instructions-loaded.jsonl` (que registra `path_glob_match` com o arquivo
+    #    que disparou). O harness ACEITA e CARREGA as três; este parser só via a lista em bloco, então
+    #    acusava "paths: VAZIO" em lente VIVA:
+    #      · bloco   `paths:\n  - "x/**"`      → já lido
+    #      · escalar `paths: "x/**"`            → sonda CARREGOU; o parser devolvia vazio
+    #      · flow    `paths: ["x/**", "y/**"]`  → sonda CARREGOU; o parser devolvia vazio
+    #    Ler as três é ampliar o que a guarda ENXERGA, não afrouxar o que ela cobra: o predicado de
+    #    casamento (linha abaixo) segue o mesmo, e as formas novas passam a ser julgadas por ele.
+    globs="$(awk '
+      /^---[[:space:]]*$/{f=0;next}
+      /^paths:[[:space:]]*\[/ {                                    # flow-list numa linha
+        line=$0; sub(/^paths:[[:space:]]*\[/,"",line); sub(/\].*$/,"",line)
+        nglobs=split(line, parts, /[[:space:]]*,[[:space:]]*/)
+        for (i=1;i<=nglobs;i++){ g=parts[i]
+          gsub(/^[[:space:]]+|[[:space:]]+$/,"",g); gsub(/^["'"'"']|["'"'"']$/,"",g)
+          if (g!="") print g }
+        next }
+      /^paths:[[:space:]]*[^[:space:]]/ {                           # escalar na mesma linha
+        g=$0; sub(/^paths:[[:space:]]*/,"",g)
+        gsub(/^[[:space:]]+|[[:space:]]+$/,"",g); gsub(/^["'"'"']|["'"'"']$/,"",g)
+        if (g!="") print g
+        next }
+      /^paths:/{f=1;next}                                           # bloco: a lista vem abaixo
+      /^[a-zA-Z_-]+:/{f=0}
+      f&&/^[[:space:]]*-[[:space:]]+/{gsub(/^[[:space:]]*-[[:space:]]+/,""); gsub(/^["'"'"']|["'"'"']$/,""); print}
+    ' "${rule}")"
     if [ -z "${globs}" ]; then
       violation "HARD" "${rule}" "'paths:' declarado mas VAZIO — nenhum glob, a regra nunca carrega — adicione ao menos um glob sob 'paths:' (ex.: '  - \"**/*.sh\"')"
       continue
