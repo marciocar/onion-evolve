@@ -115,3 +115,6 @@ lint	r16-count-drift/bad-table-total.md	docs	bad	não bate com nenhuma contagem
 lint	r16-count-drift/good-table-total.md	docs	good
 lint	r89-aufhebung/bad-sem-aufhebung.kg.yaml	docs/evolution/research/radar-selftest-fixture	bad	REGRA 89	probe.kg.yaml
 lint	r53-rules-pathscoped/bad-empty-body.md	.claude/rules	bad	CORPO VAZIO
+lint	r53-rules-pathscoped/good-scalar-paths.md	.claude/rules	good	
+lint	r53-rules-pathscoped/good-flow-paths.md	.claude/rules	good	
+lint	r53-rules-pathscoped/bad-scalar-dead.md	.claude/rules	bad	NUNCA carrega
