@@ -19181,7 +19181,7 @@ run_forge_selftests() {
   printf 'wf\n'       > "${d}/.claude/workflows/exemplo.js"
   cat > "${d}/.claude/skills/onion-exemplo/SKILL.md" <<'SK'
 # exemplo
-**Hoje:** 2026-09-28 — contexto medido injetado
+**Hoje:** !`date +%F`   <- diretiva de injecao, o que o harness EXECUTA na carga
 Doutrina: .claude/commands/common/prompts/exemplo-doctrine.md
 Workflow: .claude/workflows/exemplo.js
 Destino: write(KG) + kg-radar exit 0

@@ -108,14 +108,17 @@ _cites_bench() {
 #    Sobram as âncoras que denotam ESCRITA: write(KG), o radar como gate, ou o par kg-radar.
 _cites_destination() { grep -qiE 'write\(KG\)|kg-radar|radar exit 0' "$1"; }
 
-# ⚠️ CONTEXTO INJETADO é o BLOCO MEDIDO presente no arquivo, não a instrução de medir. Duas voltas
-#    até acertar, e as duas erraram para o lado largo: (1) a 1a versão casava o TÍTULO da seção, e o
-#    próprio `forge.md` pontuava por ter um `## Contexto medido injetado` — auto-elogio; (2) a 2a
-#    aceitava `bash .claude/validation/<x>.sh` em qualquer lugar, e deu 32 de 57 — mas mandar a
-#    sessão RODAR um medidor é passo de procedimento, não contexto que ela lê antes de pensar.
-#    O marcador honesto é o conteúdo MEDIDO estar no arquivo: é o que a `onion-research` faz, com o
-#    bloco de corpus gravado na própria SKILL. Peça 3 é o que já está lá, não o que se manda buscar.
-_has_context() { grep -qE '^\*\*Hoje:|^# corpus:|^\*\*Claude Code \(disco' "$1"; }
+# ⚠️ CONTEXTO INJETADO é a DIRETIVA DE INJEÇÃO, não a saída dela — e descobrir isso custou QUATRO
+#    versões erradas deste predicado, todas do mesmo formato: eu procurava o BLOCO MEDIDO no arquivo.
+#    Ele nunca está lá. A superfície carrega `!`comando`` e o HARNESS executa na carga, injetando o
+#    resultado no contexto. O bloco de corpus que eu "via" era o RENDERIZADO na minha janela, não o
+#    conteúdo do `.md` — confundir a projeção com a fonte é exatamente o que este censo existe para
+#    não fazer. As quatro tentativas anteriores: (1) o TÍTULO da seção; (2) `bash <script>` em
+#    qualquer lugar, que é passo de procedimento; (3) `**Hoje:` sozinho, uma linha digitável, e a 2a
+#    passada adversarial provou o fantasma forjando-a; (4) data + versão juntas, que reprovou a
+#    própria instância de referência.
+#    O marcador honesto é a diretiva com comando de MEDIÇÃO: ela não se digita, ela roda.
+_has_context() { grep -qE '!`[^`]*(date|bash |claude |git )' "$1"; }
 
 _label_of() {  # o nome do candidato SAI do caminho, nunca de uma lista paralela que drifta
   case "$1" in

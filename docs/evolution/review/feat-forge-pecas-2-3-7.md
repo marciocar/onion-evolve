@@ -2,7 +2,7 @@
 title: 'A forja nasceu sobre uma lacuna que eu inventei, e duas passadas adversariais a consertaram'
 date: 2026-09-29
 branch: feat/forge-pecas-2-3-7
-reviewed_diff_sha256: a7a4488c428fe3a18662e70fa3479a2b4ea840906c9f63a5a87bf9f7cd1b4aa2
+reviewed_diff_sha256: 053b31a541e1de795ae98fa7c45201b845fbf5013d39860578dc3248ec23fd73
 elenxo: sim
 findings_total: 32
 findings_real: 32
@@ -88,7 +88,15 @@ causa dessa edição, feita na mesma leva.
 - `lint-selftest.sh --jobs auto` → **1513 ✓ / 0 ✗ / 0 abortos** (a 2ª passada mediu 1507✓/6✗ antes das curas)
 - mutantes provados: (g) vermelho com o cabeçalho mentindo · (h) vermelho sem a varredura de
   `commands/meta/` · (a) nomeia a peça certa nos 6 predicados · (i) mata o fantasma 7/7
-- ⚠️ **CI do repositório morto** desde 2026-09-26 (cota de Actions). Merge pelo `--ci-inoperante`.
+- ⚠️ **CI do repositório morto** desde 2026-09-26. ~~(cota de Actions)~~ **CAUSA CORRIGIDA em
+  2026-09-29 — a atribuição original era HIPÓTESE MINHA NÃO MEDIDA**: o budget de Actions da conta tem
+  `stop usage: No` e $50,19 de $65, logo não bloqueia (e sem "stop usage" o GitHub só notificaria). O
+  `startup_failure` com ZERO jobs é **incidente de plataforma do GitHub**: relatos independentes de
+  repositórios sem relação, publicados em 26–27/09/2026, com padrão idêntico (community #201113 e
+  #208832). Consistente com o local: nenhuma mudança em `.github/workflows/` desde 25/09 16:06, os 5
+  YAML parseiam sob loader ESTRITO (o `safe_load` anterior aceitava chave duplicada em silêncio),
+  permissões `enabled`. A cobertura do merge não muda — era e segue o gate local. Merge pelo
+  `--ci-inoperante`.
 
 ## Declarado aberto, com gatilho — NÃO silenciado
 

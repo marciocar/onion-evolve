@@ -51,7 +51,11 @@ adversarial expôs: a peça 5 contava a menção solta a `.kg.yaml`, e a peça 2
 quando a convenção deste repo é relativa, escondendo três casos — inclusive a doutrina da própria
 forja. Registrado porque a lição é a mesma da cláusula 1: número de medidor errado tem cara de
 medição.) O que de fato falha nela é o **contrato de custo**
-(`run_id` · `tokens` · `agents` · `duration_min`), registrado em 4,8% dos runs. Logo a peça 5 é
+(`run_id` · `tokens` · `agents` · `duration_min`) — **e aqui a doutrina se corrige com medição**:
+o número de 4,8% (2 de 42 runs) é de 2026-08-06; re-medido em 2026-09-29 pela mesma métrica (arquivos
+que citam um run `wf_`), são **22 de 111 = 19,8%**, quatro vezes mais. O contrato PEGOU. Logo a peça 5
+não é invariante por ser a que mais falha — é invariante porque destino sem contrato não deixa série
+histórica, e essa é razão de desenho, não de defeito. Logo a peça 5 é
 invariante pela sua metade *contrato*, não pela metade *destino* — e quem escrever a forja deve
 emitir o contrato, não só o `kg-radar`.
 
