@@ -103,3 +103,36 @@ divisor do apêndice trazem o seu próprio por desenho).
   em `main`. Adotar (A) implica decidir isso.
 - **Nenhuma guarda lê esta spec ainda.** Gatilho: quando ela e o Artifact divergirem a primeira vez,
   nasce a guarda de paridade — e não antes, porque catraca sem drift medido é cerimônia.
+
+## O que o Artifact CARREGA, e ninguém tinha escrito (medido 2026-09-29)
+
+Publicar este deck não publica só slides: o Artifact herda capabilities do **tipo `Slides`**, e duas
+têm consequência fora dele. Ficam aqui porque a spec é a superfície que alguém lê antes de mexer no
+deck — e porque descobrir isso pelo painel de background, no meio de outra coisa, é o caminho ruim.
+
+- **`comments` habilitado.** Quem abre o deck comenta nele. Comentário enviado ao Claude **acorda a
+  sessão** e pode ser respondido automaticamente — resposta que sai *"Claude · via o usuário"*, isto é,
+  em nome do dono. Desarmar: `ArtifactComments` com `action: "watch"`, `on: false` e a URL; conferir
+  com `action: "watch"` sem URL, que lista os watches da sessão.
+- **`mcp` com Google Drive (`create_file`, `gdrive_upload`).** A página tem declarado o poder de
+  **criar arquivo no Drive do dono**. Herdado do tipo, não escolhido aqui, e sem uso observado — mas
+  declarado é declarado.
+- Também herdados: `db` (duas regras; a chave `notes` só admin lê/escreve), `room`, `downloads`,
+  `assets`, `user` (escopo `profile`), `artifact`, `flags`.
+
+**O `--resume` RE-ARMA o watch, e isso surpreendeu.** Medido em 2026-09-29: um watch armado em
+2026-09-28T19:34:41Z voltou sozinho depois de duas compactações e uma retomada, **com auto-reply**, e
+a única superfície que o mostrava era o painel de background (`3 agents · 4 active shells · Monitors
+(1)`). O comportamento é documentado pelo harness — um `--resume` interativo traz de volta todo watch
+que estava respondendo comentários — mas ninguém tinha escrito isso onde se procura por ele.
+
+⚠️ **Por que NÃO nasce guarda aqui, e o teto é declarado:** o estado do watch **não existe no disco**.
+As 107 ocorrências da URL no transcript são MENÇÃO, não estado — um hook que as grepasse dispararia
+por qualquer citação, inclusive a que registrou este parágrafo. Os `~/.claude/*.json` legíveis são
+cache de PR, settings e stats; nenhum guarda watches. O estado vive no PROCESSO do harness, e guarda
+determinística sobre fonte que não existe é a classe que esta casa persegue — mecanismo inventado
+sobre lacuna não medida. Fica conhecimento escrito, não catraca.
+
+**E a lição de método, que é a mais barata de todas:** a pergunta *"o que é esse artifact?"* tinha
+resposta em `grep -rn Ceu8n8e7 docs/` — a linha 5 desta própria spec. Eu fui ler o Artifact remoto.
+O repo respondia antes.
