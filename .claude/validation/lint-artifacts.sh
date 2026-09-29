@@ -1095,6 +1095,43 @@ _rule_without_object_for_role() { # $1=globs (um por linha)
   return 0
 }
 
+# ── EXPANSOR DE BRACES, recursivo, usado pelos DOIS ramos de `_rule_glob_matches` ───────────
+# ⚠️ A 1a versão expandia UM nível e deixava de fora braces aninhadas e com `/` dentro, "para não
+#    virar fail-open". A sonda contra o binário (2026-09-29) REFUTOU a fronteira: o harness carrega
+#    `docs/x/{a,{b,d}}/**` E `docs/x/{a/f.md,b/c/g.md}` — as duas formas são legítimas, e reprová-las
+#    era FALSO POSITIVO em lente viva, o mesmo defeito que esta leva veio curar. Eu havia declarado um
+#    teto sem medir se havia algo atrás dele.
+#    E o fail-open que eu temia NÃO vem da recursão: vem de tratar "tem braces" como "casa". A fixture
+#    `bad-brace-dead` (alternativas em que NENHUMA casa ⇒ ACUSA) é o mutante que prova a diferença.
+# Imprime uma alternativa por linha; sem braces, imprime o próprio glob.
+_expand_braces() { # $1=glob
+  local g="$1" pre mid post depth i ch out rest
+  case "${g}" in *'{'*'}'*) : ;; *) printf '%s\n' "${g}"; return 0 ;; esac
+  # acha o PRIMEIRO `{` e o `}` que o FECHA, contando profundidade — é o que torna o aninhamento certo
+  pre="${g%%\{*}"; rest="${g#*\{}"; depth=1; mid=""; post=""
+  for (( i=0; i<${#rest}; i++ )); do
+    ch="${rest:i:1}"
+    case "${ch}" in
+      '{') depth=$((depth+1)) ;;
+      '}') depth=$((depth-1)); [ "${depth}" -eq 0 ] && { post="${rest:i+1}"; break; } ;;
+    esac
+    mid="${mid}${ch}"
+  done
+  [ "${depth}" -eq 0 ] || { printf '%s\n' "${g}"; return 0; }   # brace não fechada: literal, não chuta
+  # divide `mid` nas vírgulas de NÍVEL ZERO (vírgula dentro de brace aninhada pertence a ela)
+  depth=0; out=""
+  for (( i=0; i<${#mid}; i++ )); do
+    ch="${mid:i:1}"
+    case "${ch}" in
+      '{') depth=$((depth+1)); out="${out}${ch}" ;;
+      '}') depth=$((depth-1)); out="${out}${ch}" ;;
+      ',') if [ "${depth}" -eq 0 ]; then _expand_braces "${pre}${out}${post}"; out=""; else out="${out}${ch}"; fi ;;
+      *)   out="${out}${ch}" ;;
+    esac
+  done
+  _expand_braces "${pre}${out}${post}"
+}
+
 _rule_glob_matches() { # $1=glob
   local g="$1" pat _ls _depth
   if git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
@@ -1123,14 +1160,7 @@ _rule_glob_matches() { # $1=glob
     #    aninhadas ou com barra ficam de fora e seguem pelo caminho literal — inflar o casamento
     #    seria trocar um falso positivo por um fail-open, e o teto fica declarado em vez de chutado.
     local _alts _a
-    if case "${g}" in *'{'*'}'*) true ;; *) false ;; esac && case "${g}" in *'{'*'/'*'}'*) false ;; *) true ;; esac; then
-      _alts="$(printf '%s' "${g}" | awk '{
-        pre=$0; sub(/\{.*/,"",pre); post=$0; sub(/^[^}]*\}/,"",post)
-        mid=$0; sub(/^[^{]*\{/,"",mid); sub(/\}.*/,"",mid)
-        n=split(mid, parts, /,/); for (i=1;i<=n;i++) print pre parts[i] post }')"
-    else
-      _alts="${g}"
-    fi
+    _alts="$(_expand_braces "${g}")"
     while IFS= read -r _a; do
       [ -n "${_a}" ] || continue
       # SEM PIPE (ver a nota de EPIPE acima): capturar em variável não tem leitor que feche cedo.
@@ -1160,14 +1190,7 @@ _rule_glob_matches() { # $1=glob
   #      · braces EXPANDEM no harness: a expansão é de um nível, igual à do ramo git, e o casamento
   #        é por QUALQUER alternativa. Braces aninhadas ou com `/` dentro ficam de fora, de propósito.
   local _alts_ng _ang
-  if case "${g}" in *'{'*'}'*) true ;; *) false ;; esac && case "${g}" in *'{'*'/'*'}'*) false ;; *) true ;; esac; then
-    _alts_ng="$(printf '%s' "${g}" | awk '{
-      pre=$0; sub(/\{.*/,"",pre); post=$0; sub(/^[^}]*\}/,"",post)
-      mid=$0; sub(/^[^{]*\{/,"",mid); sub(/\}.*/,"",mid)
-      n=split(mid, parts, /,/); for (i=1;i<=n;i++) print pre parts[i] post }')"
-  else
-    _alts_ng="${g}"
-  fi
+  _alts_ng="$(_expand_braces "${g}")"
   while IFS= read -r _ang; do
     [ -n "${_ang}" ] || continue
     prefix="$(_glob_literal_prefix "${_ang}")"
