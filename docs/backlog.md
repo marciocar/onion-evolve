@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**228 itens abertos** em 50 grafo(s) com aberto (de 73 no escopo) · 51 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**227 itens abertos** em 50 grafo(s) com aberto (de 73 no escopo) · 51 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -197,14 +197,6 @@
 | 8.0 | `Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO` | guardas-revisao-2026-08 | DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML  |
 | 5.4 | `C_SEM_GATE_REGRA_SEM_TESTE` | guardas-revisao-2026-08 | nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca |
 
-## forge-comando-framework-2026-09 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 21.0 | `D_FORGE_META_COMANDO` | forge-comando-framework-2026-09 | `/meta:forge` — gerador do CONJUNTO COMPLETO de um comando-com-framework (7 peças), com duas faces: wizard no core (entrevista  |
-| 12.8 | `O_N1_NAO_E_PADRAO` | forge-comando-framework-2026-09 | OBJEÇÃO SOBREVIVENTE (a ser absorvida no desenho, não removida): N=1 — uma instância não é padrão. Uma forja derivada só |
-| 7.5 | `Q_DESTINO_DIFERENCIAL_OU_LACUNA` | forge-comando-framework-2026-09 | HERDADA de Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART (grafo agent-command-composition-2026-09), cujo VEREDITO foi selado em  |
-
 ## fable-5-1-superacao-2026-09 — 9 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -337,6 +329,13 @@
 |--:|---|---|---|
 | 13.5 | `Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE` | passada-adversarial-2026-09 | COMO FAZER A PERNA DE LEITURA ALCANCAR A SESSAO QUE ESCREVE NO GRAFO, sem virar ruido? Tres desenhos candidatos, nenhum medido: (a |
 | 6.8 | `Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER` | passada-adversarial-2026-09 | COMO FAZER O MAPA ENXERGAR O QUE A BANCADA EXERCITA POR FUNCAO-HELPER? Hoje ele le so o corpo de `run_*_selftests()`, e helpers de |
+
+## forge-comando-framework-2026-09 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 12.8 | `O_N1_NAO_E_PADRAO` | forge-comando-framework-2026-09 | OBJEÇÃO SOBREVIVENTE (a ser absorvida no desenho, não removida): N=1 — uma instância não é padrão. Uma forja derivada só |
+| 7.5 | `Q_DESTINO_DIFERENCIAL_OU_LACUNA` | forge-comando-framework-2026-09 | HERDADA de Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART (grafo agent-command-composition-2026-09), cujo VEREDITO foi selado em  |
 
 ## inbox-sinais-2026-09 — 10 item(ns)
 

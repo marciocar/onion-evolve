@@ -114,3 +114,4 @@ lint	r16-count-drift/good-conjuntiva.md	docs	good
 lint	r16-count-drift/bad-table-total.md	docs	bad	não bate com nenhuma contagem
 lint	r16-count-drift/good-table-total.md	docs	good
 lint	r89-aufhebung/bad-sem-aufhebung.kg.yaml	docs/evolution/research/radar-selftest-fixture	bad	REGRA 89	probe.kg.yaml
+lint	r53-rules-pathscoped/bad-empty-body.md	.claude/rules	bad	CORPO VAZIO
