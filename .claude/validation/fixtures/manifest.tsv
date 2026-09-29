@@ -118,3 +118,6 @@ lint	r53-rules-pathscoped/bad-empty-body.md	.claude/rules	bad	CORPO VAZIO
 lint	r53-rules-pathscoped/good-scalar-paths.md	.claude/rules	good	
 lint	r53-rules-pathscoped/good-flow-paths.md	.claude/rules	good	
 lint	r53-rules-pathscoped/bad-scalar-dead.md	.claude/rules	bad	NUNCA carrega
+lint	r53-rules-pathscoped/bad-star-only-deep.md	.claude/rules	bad	NUNCA carrega
+lint	r53-rules-pathscoped/good-brace-live.md	.claude/rules	good	
+lint	r53-rules-pathscoped/bad-brace-dead.md	.claude/rules	bad	NUNCA carrega
