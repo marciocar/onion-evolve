@@ -1096,7 +1096,7 @@ _rule_without_object_for_role() { # $1=globs (um por linha)
 }
 
 _rule_glob_matches() { # $1=glob
-  local g="$1" pat _ls
+  local g="$1" pat _ls _depth
   if git -C "${REPO_ROOT}" rev-parse --git-dir >/dev/null 2>&1; then
     # ⚠️ SEM PIPE, e a razão é um HARD ESPÚRIO que só o CI produziu (2026-09-14, PR #827):
     # a forma anterior era `git ls-files -- "$g" | grep -q .`. Sob `set -euo pipefail` (l.74) isso
@@ -1108,11 +1108,38 @@ _rule_glob_matches() { # $1=glob
     # carga, não. É a classe [[pipefail-epipe-early-closer-class]], e o modo de falha é o pior
     # possível: verde no dev, vermelho no CI, sobre um arquivo que ninguém tocou.
     # Capturar em variável não tem leitor que feche cedo — 10 KB de caminho é barato.
-    _ls="$(git -C "${REPO_ROOT}" ls-files -- "${g}")" || _ls=""
-    [ -n "${_ls}" ] && return 0
-    # o harness escreve '**/x'; o pathspec do git resolve o mesmo com o sufixo puro
-    _ls="$(git -C "${REPO_ROOT}" ls-files -- "${g#\*\*/}")" || _ls=""
-    [ -n "${_ls}" ] && return 0
+    # ⚠️ `:(glob)` É A SEMÂNTICA DO HARNESS, e o pathspec NU não era — medido contra o binário em
+    #    2026-09-29 com lentes-sonda e o log `instructions-loaded.jsonl`:
+    #      · no harness o `*` NÃO cruza `/` (sonda carregou em `raso.kg.yaml`, NÃO em `nivel/fundo`)
+    #      · no pathspec NU do git ele CRUZA: `docs/*.md` devolve 1074 hits, 1072 deles PROFUNDOS
+    #    Efeito do que havia antes: lente MORTA (um `*` que só casaria em subdiretório) era
+    #    ABSOLVIDA — fail-open silencioso, o pior formato. `:(glob)` corrige exato: o mesmo
+    #    `docs/*.md` cai para 2 hits, zero profundos, e `**` segue cruzando nos dois. Sem
+    #    dependência nova, sem lista de casos, e o fallback de sufixo abaixo continua valendo.
+    # ⚠️ BRACES: o harness EXPANDE `{a,b}` e o git NÃO reconhece, nem com `:(glob)` (medido: 0 hits
+    #    nas duas formas). Efeito: lente VIVA acusada de morta — falso positivo HARD. Por isso a
+    #    expansão acontece AQUI, antes de consultar o git, e o casamento é por QUALQUER alternativa,
+    #    que é o que o harness faz. A expansão é de UM nível e só de `{…}` sem `/` dentro: braces
+    #    aninhadas ou com barra ficam de fora e seguem pelo caminho literal — inflar o casamento
+    #    seria trocar um falso positivo por um fail-open, e o teto fica declarado em vez de chutado.
+    local _alts _a
+    if case "${g}" in *'{'*'}'*) true ;; *) false ;; esac && case "${g}" in *'{'*'/'*'}'*) false ;; *) true ;; esac; then
+      _alts="$(printf '%s' "${g}" | awk '{
+        pre=$0; sub(/\{.*/,"",pre); post=$0; sub(/^[^}]*\}/,"",post)
+        mid=$0; sub(/^[^{]*\{/,"",mid); sub(/\}.*/,"",mid)
+        n=split(mid, parts, /,/); for (i=1;i<=n;i++) print pre parts[i] post }')"
+    else
+      _alts="${g}"
+    fi
+    while IFS= read -r _a; do
+      [ -n "${_a}" ] || continue
+      # SEM PIPE (ver a nota de EPIPE acima): capturar em variável não tem leitor que feche cedo.
+      _ls="$(git -C "${REPO_ROOT}" ls-files -- ":(glob)${_a}")" || _ls=""
+      [ -n "${_ls}" ] && return 0
+      # o harness escreve '**/x'; o pathspec do git resolve o mesmo com o sufixo puro
+      _ls="$(git -C "${REPO_ROOT}" ls-files -- ":(glob)${_a#\*\*/}")" || _ls=""
+      [ -n "${_ls}" ] && return 0
+    done <<< "${_alts}"
     return 1
   fi
   # ⚠️ RAMO NÃO-GIT — e ele MENTIU (2026-09-17, medido). A forma anterior era
@@ -1123,17 +1150,43 @@ _rule_glob_matches() { # $1=glob
   # substratos, e o barato era o que eu media. Classe [[testar-no-caminho-errado-e-nao-testar]].
   # Agora o ramo não-git respeita o PREFIXO literal do glob, como o pathspec do git faz.
   local prefix root _hit
-  prefix="$(_glob_literal_prefix "${g}")"
-  root="${REPO_ROOT}${prefix:+/${prefix}}"
-  [ -e "${root}" ] || return 1
-  pat="${g##*/}"
-  case "${pat}" in
-    ''|'*'|'**')                                   # sufixo puro-curinga: basta haver arquivo sob o prefixo
-      _hit="$(find "${root}" -type f -not -path '*/.git/*' -print -quit 2>/dev/null)" ;;
-    *)                                             # '**/*.kg.yaml' → '*.kg.yaml', procurado SOB o prefixo
-      _hit="$(find "${root}" -name "${pat}" -not -path '*/.git/*' -print -quit 2>/dev/null)" ;;
-  esac
-  [ -n "${_hit}" ]                                 # sem pipe: `find | grep -q` é a corrida EPIPE de sempre
+  # ⚠️ AS MESMAS DUAS DIVERGÊNCIAS DO RAMO GIT VALEM AQUI, e a bancada foi quem me mostrou: a
+  #    sandbox de fixtures é montada com `tar` (sem `.git`), então é ESTE o ramo que a cobertura
+  #    ponta-a-ponta exercita. Eu havia curado só o ramo git, e as três fixtures novas reprovaram —
+  #    não por estarem erradas, mas por medirem o caminho que eu não tinha tocado. Classe
+  #    [[testar-no-caminho-errado-e-nao-testar]], invertida: curei o caminho que eu media.
+  #      · `*` NÃO cruza `/` no harness (medido por sonda): logo um sufixo com `*` procura em UM
+  #        nível (`-maxdepth 1`), e só `**` é que desce a árvore;
+  #      · braces EXPANDEM no harness: a expansão é de um nível, igual à do ramo git, e o casamento
+  #        é por QUALQUER alternativa. Braces aninhadas ou com `/` dentro ficam de fora, de propósito.
+  local _alts_ng _ang
+  if case "${g}" in *'{'*'}'*) true ;; *) false ;; esac && case "${g}" in *'{'*'/'*'}'*) false ;; *) true ;; esac; then
+    _alts_ng="$(printf '%s' "${g}" | awk '{
+      pre=$0; sub(/\{.*/,"",pre); post=$0; sub(/^[^}]*\}/,"",post)
+      mid=$0; sub(/^[^{]*\{/,"",mid); sub(/\}.*/,"",mid)
+      n=split(mid, parts, /,/); for (i=1;i<=n;i++) print pre parts[i] post }')"
+  else
+    _alts_ng="${g}"
+  fi
+  while IFS= read -r _ang; do
+    [ -n "${_ang}" ] || continue
+    prefix="$(_glob_literal_prefix "${_ang}")"
+    root="${REPO_ROOT}${prefix:+/${prefix}}"
+    [ -e "${root}" ] || continue
+    pat="${_ang##*/}"
+    case "${_ang}" in
+      *'**'*) _depth="" ;;                         # `**` desce a árvore
+      *)      _depth="-maxdepth 1" ;;              # `*` sozinho fica NUM nível, como o harness
+    esac
+    case "${pat}" in
+      ''|'*'|'**')                                 # sufixo puro-curinga: basta haver arquivo sob o prefixo
+        _hit="$(find "${root}" ${_depth} -type f -not -path '*/.git/*' -print -quit 2>/dev/null)" ;;
+      *)                                           # '**/*.kg.yaml' → '*.kg.yaml', procurado SOB o prefixo
+        _hit="$(find "${root}" ${_depth} -name "${pat}" -not -path '*/.git/*' -print -quit 2>/dev/null)" ;;
+    esac
+    [ -n "${_hit}" ] && return 0                   # sem pipe: `find | grep -q` é a corrida EPIPE de sempre
+  done <<< "${_alts_ng}"
+  return 1
 }
 
 check_rules_pathscoped() {
