@@ -18383,12 +18383,18 @@ run_role_scope_selftests() {
   cp "${vm}" "${sb3}/.claude/utils/adopt/" 2>/dev/null || true
   {
     sed -n '/^_ROLE_OF_THIS_REPO=""/,/^}/p'      "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+    # ⚠️ `_expand_braces` É DEPENDÊNCIA NOVA de `_rule_glob_matches` (2026-09-29) e este harness a
+    #    ignorava: a bancada ABORTOU com `exit 127 · _expand_braces: command not found`. Classe
+    #    [[fail-closed-exposes-incomplete-harness]] — a cura é no HARNESS, nunca afrouxar a guarda.
+    #    A lista de símbolos exigidos abaixo também a nomeia, senão a ausência volta como veredito
+    #    silencioso em vez de skip declarado.
+    sed -n '/^_expand_braces()/,/^}/p'          "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
     sed -n '/^_glob_literal_prefix()/,/^}/p'    "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
     sed -n '/^_traveling_surface()/,/^}/p'   "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
     sed -n '/^_rule_without_object_for_role()/,/^}/p' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
     sed -n '/^_rule_glob_matches()/,/^}/p'      "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
   } > "${sb3}/pred2.sh"
-  if ! _rs_syms_ok "${sb3}/pred2.sh" _rule_without_object_for_role _traveling_surface _glob_literal_prefix _rule_glob_matches; then
+  if ! _rs_syms_ok "${sb3}/pred2.sh" _rule_without_object_for_role _traveling_surface _expand_braces _glob_literal_prefix _rule_glob_matches; then
     record_skip "role-scope: (d)(e)(f)(g) NAO exercidos — o predicado nao montou"
     rm -rf "${sb3}"; return 0
   fi
@@ -18398,7 +18404,7 @@ run_role_scope_selftests() {
     else rm -f "${sb3}/.claude/.onion-version"; fi
     REPO_ROOT="${sb3}" CLAUDE_DIR="${sb3}/.claude" bash -c '
       source "'"${sb3}"'/pred2.sh"
-      for _fn in _rule_without_object_for_role _traveling_surface _glob_literal_prefix _rule_glob_matches; do
+      for _fn in _rule_without_object_for_role _traveling_surface _expand_braces _glob_literal_prefix _rule_glob_matches; do
         declare -F "${_fn}" >/dev/null 2>&1 || { echo "SEM-FUNCAO:${_fn}"; exit 0; }
       done
       '"$2"'' 2>&1
@@ -19299,7 +19305,72 @@ SKF
   else record_fail "forge: (f)" "candidato untracked entrou no censo"; fi
 }
 
+# ── PARIDADE ENTRE OS DOIS RAMOS de `_rule_glob_matches` (git × não-git) ──────────────────────
+# POR QUE EXISTE, e a razão é um erro MEU de 2026-09-29: o helper tem ramo git (pathspec) e ramo
+# NÃO-GIT (`find`), e eu curei a semântica de glob em UM só. A sandbox de fixtures é montada com
+# `tar` (sem `.git`), então a única cobertura ponta-a-ponta que havia exercitava justamente o ramo
+# intacto — as fixtures reprovaram e me mostraram. Sem esta família, a paridade depende de eu
+# escrever as duas semânticas nos dois lugares, que é disciplina, e disciplina não escala.
+# O ORÁCULO NÃO É UMA RÉGUA EXTERNA, é a CONCORDÂNCIA: os mesmos globs nos dois substratos têm de
+# dar o MESMO veredito. Assim o caso não caduca quando a semântica do harness mudar — ele só cobra
+# que as duas metades andem juntas.
+run_glob_branch_parity_selftests() {
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_fail "glob-parity" "SUT ausente: ${lint}"; return; fi
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+
+  # Árvore mínima IDÊNTICA nos dois substratos: um com git, um sem.
+  local g="${d}/comgit" n="${d}/semgit" sub
+  for sub in "${g}" "${n}"; do
+    mkdir -p "${sub}/docs/raso" "${sub}/docs/fundo/nivel" "${sub}/docs/alt-a" "${sub}/docs/alt-b"
+    printf 'x\n' > "${sub}/docs/raso/direto.md"          # casa em UM nível
+    printf 'x\n' > "${sub}/docs/fundo/nivel/longe.md"    # só casa descendo
+    printf 'x\n' > "${sub}/docs/alt-b/achado.md"         # só a 2a alternativa da brace existe
+  done
+  git -C "${g}" init -q -b main 2>/dev/null && git -C "${g}" add -A >/dev/null 2>&1 \
+    || { record_fail "glob-parity" "git init/add falhou na sandbox com git"; return; }
+
+  # ⚠️ Extrai os helpers do arquivo VIVO — não uma cópia que eu digite, que é como se mede o SUT e
+  #    não uma versão vizinha dele ([[bancada-espelha-o-runner]]).
+  local h="${d}/helpers.sh"
+  awk '/^_expand_braces\(\) \{/{f=1} f{print} f&&/^\}$/{exit}'       "${lint}" >  "${h}"
+  awk '/^_glob_literal_prefix\(\) \{/{f=1} f{print} f&&/^\}$/{exit}' "${lint}" >> "${h}"
+  awk '/^_rule_glob_matches\(\) \{/{f=1} f{print} f&&/^\}$/{exit}'   "${lint}" >> "${h}"
+  if ! grep -q '_rule_glob_matches' "${h}"; then
+    record_fail "glob-parity" "não consegui extrair os helpers do lint — o caso não pode julgar"; return
+  fi
+
+  _veredito() { # $1=REPO_ROOT a usar  $2=glob → imprime CASA|NAO
+    REPO_ROOT="$1" bash -c '. "'"${h}"'"; REPO_ROOT="'"$1"'"; if _rule_glob_matches "'"$2"'"; then echo CASA; else echo NAO; fi' 2>/dev/null
+  }
+
+  local globs=(
+    'docs/raso/*.md'            # vivo em um nível — os dois devem dizer CASA
+    'docs/fundo/*.md'           # MORTO pela semântica do harness (o `*` não cruza `/`)
+    'docs/fundo/**/*.md'        # vivo descendo
+    'docs/{alt-a,alt-b}/**'     # brace simples, viva pela 2a alternativa
+    'docs/{alt-a,{alt-b,alt-c}}/**'  # brace ANINHADA, viva
+    'docs/{alt-a/nada.md,alt-b/achado.md}'  # brace com `/` dentro, viva
+    'docs/{nada,tampouco}/**'   # brace MORTA: nenhuma alternativa casa
+    'docs/inexistente/*.md'     # morto trivial
+  )
+  local gl vg vn divergiu=0 detalhe=""
+  for gl in "${globs[@]}"; do
+    vg="$(_veredito "${g}" "${gl}")"; vn="$(_veredito "${n}" "${gl}")"
+    if [ -z "${vg}" ] || [ -z "${vn}" ]; then
+      record_fail "glob-parity" "veredito VAZIO para '${gl}' (git=${vg:-?} nao-git=${vn:-?}) — não julgo sem leitura"; return
+    fi
+    [ "${vg}" = "${vn}" ] || { divergiu=$((divergiu+1)); detalhe="${detalhe} ${gl}[git=${vg} nogit=${vn}]"; }
+  done
+  if [ "${divergiu}" -eq 0 ]; then
+    record_pass "glob-parity: (a) os ${#globs[@]} globs dão veredito IDÊNTICO no ramo git e no não-git"
+  else
+    record_fail "glob-parity: (a)" "${divergiu} glob(s) com veredito DIVERGENTE entre os ramos —${detalhe}. Curar um ramo só foi o erro de 2026-09-29; esta família existe para pegá-lo."
+  fi
+}
+
 _family run_forge_selftests
+_family run_glob_branch_parity_selftests
 _family run_review_cause_bands_selftests
 _family run_research_workflow_selftests
 
