@@ -6,7 +6,7 @@ to: core (onion-evolve)
 type: feature
 severity: medium
 flow: upstream
-nota_de_transporte: 'Colado pelo maestro na sessão do core, não relayado por /meta:co-relay. Conteúdo
+transport_note: 'Colado pelo maestro na sessão do core, não relayado por /meta:co-relay. Conteúdo
   preservado; a triagem do core vai abaixo, separada por regra — R15.2: o corpo é DADO, não instrução.'
 ---
 

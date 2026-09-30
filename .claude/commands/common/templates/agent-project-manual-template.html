@@ -13,6 +13,15 @@
      {{N_FERRAMENTAS}} · {{RESPONSAVEL}} · {{DATA}}
   2. As seções marcadas [DOMINIO] são ESCRITAS DE NOVO (só a posição é reusável); as
      [SEMIGENÉRICO] se ajustam; as [GENÉRICO] só pedem conferência.
+
+  ⚠️ A CLASSIFICAÇÃO VEIO DO MATERIAL REAL, E O NÚMERO IMPORTA: no único manual já escrito neste
+  formato, 7 das 13 seções eram DOMINIO e apenas 2 GENÉRICO. Uma versão anterior deste esqueleto
+  afrouxou cinco delas para SEMIGENÉRICO ou GENÉRICO, e a mensagem de commit chegou a afirmar
+  "8 GENÉRICO contra 10 DOMINIO" — número que não existe em nenhum dos dois arquivos. Passada
+  adversarial de 2026-09-30 mediu e reverteu. A lição vai aqui porque ela muda como se LÊ este
+  template: ele é sobretudo ORDEM e FORMA; o conteúdo é, na maioria, seu. A única mudança de
+  classificação que sobrevive é `acesso`, que subiu de GENÉRICO para SEMIGENÉRICO — mais rigor, não
+  menos, porque o passo de login varia com o provedor e a cláusula 3 manda escrevê-lo da tela real.
   3. Publique como Artifact e MANTENHA O MESMO LINK a cada versão. Se o agente lê o manual por
      ferramenta, espelhe o conteúdo num .md — mesma substância, não uma segunda verdade.
 
@@ -34,12 +43,12 @@
   /* Tokens claro/escuro no padrão da casa: :root, redefinido sob prefers-color-scheme com a guarda
      de tema explícito, e de novo sob [data-theme="dark"]. Trocar a paleta é trocar estas linhas. */
   :root{--bg:#F5F6F3;--surface:#fff;--ink:#1B242B;--muted:#5B6770;--line:#D9DDD8;--soft:#ECEFEA;
-        --accent:#B4531A;--accent-soft:#F4E4D8;--on-accent:#fff;--ok:#2F7D4F;--radius:10px}
+        --accent:#B4531A;--accent-soft:#F4E4D8;--on-accent:#fff;--ok:#2F7D4F;--edge:#6E7A82;--radius:10px}
   @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
         --bg:#14181B;--surface:#1B2125;--ink:#E8EDEF;--muted:#9AA7AE;--line:#2C353A;--soft:#222A2F;
-        --accent:#E0803F;--accent-soft:#33241A;--on-accent:#14181B;--ok:#6BC28C}}
+        --accent:#E0803F;--accent-soft:#33241A;--on-accent:#14181B;--ok:#6BC28C;--edge:#8B979E}}
   :root[data-theme="dark"]{--bg:#14181B;--surface:#1B2125;--ink:#E8EDEF;--muted:#9AA7AE;
-        --line:#2C353A;--soft:#222A2F;--accent:#E0803F;--accent-soft:#33241A;--on-accent:#14181B;--ok:#6BC28C}
+        --line:#2C353A;--soft:#222A2F;--accent:#E0803F;--accent-soft:#33241A;--on-accent:#14181B;--ok:#6BC28C;--edge:#8B979E}
   *{box-sizing:border-box}
   body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
   .wrap{max-width:1080px;margin:0 auto;padding:0 16px;display:grid;grid-template-columns:230px 1fr;gap:32px}
@@ -65,8 +74,23 @@
   code,kbd{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:.9em}
   table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.94rem}
   th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-  .copy{float:right;font-size:.8rem;padding:3px 9px;border:1px solid var(--line);border-radius:6px;
-        background:var(--surface);color:var(--muted);cursor:pointer}
+  /* --line tem 1,37:1 e NÃO serve como limite de componente de UI (WCAG 1.4.11 pede 3:1). O token
+     --edge existe só para isso: borda de controle interativo. Herdado do material original, medido e
+     curado aqui — o core não devolve defeito pré-existente. */
+  .copy,.theme{font-size:.8rem;padding:3px 9px;border:1px solid var(--edge);border-radius:6px;
+        background:var(--surface);color:var(--ink);cursor:pointer}
+  .copy{float:right}
+  .theme{width:100%;margin-bottom:10px}
+  .qstatus{margin:0 0 10px;font-size:.85rem;color:var(--ink);min-height:1.2em}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  /* IMPRESSÃO: sem isto, imprimir com a busca preenchida — o estado normal de quem acabou de
+     procurar algo — sai em BRANCO, e com a barra lateral carimbada. Revela o que a busca escondeu. */
+  @media print{
+    nav.toc,.copy,.theme,.qstatus{display:none!important}
+    .wrap{display:block;max-width:none}
+    section[hidden]{display:block!important}
+    section{break-inside:avoid;border:none;padding:0 0 12px}
+  }
   footer{color:var(--muted);font-size:.88rem;padding:8px 0 40px}
 </style>
 </head>
@@ -79,6 +103,8 @@
 
   <nav class="toc" aria-label="Índice">
     <input type="search" id="q" placeholder="Buscar no manual…" aria-label="Buscar no manual">
+    <p id="qStatus" class="qstatus" role="status" aria-live="polite"></p>
+    <button id="themeBtn" class="theme" type="button">Alternar tema claro/escuro</button>
     <a href="#acesso">01 · Acesso</a>
     <a href="#principal">02 · O caminho principal</a>
     <a href="#atalhos">03 · Atalhos</a>
@@ -134,9 +160,9 @@
          <strong>{{SERVIDOR_MCP}}</strong> com {{N_FERRAMENTAS}} ferramentas.</p>
     </section>
 
-    <!-- [SEMIGENÉRICO] -->
+    <!-- [DOMINIO] -->
     <section id="jornada"><h2>Como o {{PROJETO}} trabalha</h2><p>…</p></section>
-    <!-- [SEMIGENÉRICO] Cada pergunta de exemplo entra só DEPOIS de testada com dados reais deste
+    <!-- [DOMINIO] Cada pergunta de exemplo entra só DEPOIS de testada com dados reais deste
          cliente, e acompanhada de "o que você recebe" (cláusula 4 da doutrina). -->
     <section id="conversa"><h2>Converse com o {{PROJETO}}</h2>
       <table><thead><tr><th>Pergunte assim</th><th>O que você recebe</th></tr></thead>
@@ -145,13 +171,13 @@
     <section id="fluxo-completo"><h2>{{FLUXO_COMPLETO}}, do começo ao fim</h2><p>…</p></section>
     <!-- [DOMINIO] O "cartão" da entidade principal do domínio. -->
     <section id="cartao"><h2>O cartão do {{ENTIDADE_PRINCIPAL}}</h2><p>…</p></section>
-    <!-- [SEMIGENÉRICO] -->
+    <!-- [DOMINIO] -->
     <section id="entregas"><h2>O que você recebe</h2><p>…</p></section>
-    <!-- [SEMIGENÉRICO] -->
+    <!-- [DOMINIO] -->
     <section id="metodo"><h2>O método</h2><p>…</p></section>
     <!-- [SEMIGENÉRICO] -->
     <section id="regras"><h2>Regras que o {{PROJETO}} segue</h2><p>…</p></section>
-    <!-- [GENÉRICO] É AQUI que limite vira "como tirar o melhor" e falha vira pergunta. Inclua o
+    <!-- [SEMIGENÉRICO] É AQUI que limite vira "como tirar o melhor" e falha vira pergunta. Inclua o
          comportamento normal que PARECE falha — p.ex. servidor MCP com cabeçalho por usuário
          aparecer "desconectado" até a 1ª pergunta. -->
     <section id="duvidas">
@@ -169,10 +195,13 @@
   </main>
 </div>
 <script>
-  // Índice que acompanha a leitura + busca que filtra seções. Sem dependência externa de propósito:
-  // o manual precisa abrir de um arquivo, offline, na máquina do cliente.
+  // Sem dependência externa de propósito: o manual precisa abrir de um ARQUIVO, offline, na máquina
+  // de quem o recebeu. Tudo o que está aqui é comportamento que o material original tinha e que uma
+  // passada adversarial provou faltar — não é enfeite.
   const secs  = [...document.querySelectorAll('main section')];
   const links = [...document.querySelectorAll('nav.toc a')];
+
+  // ── índice que acompanha a leitura ──────────────────────────────────────────────────────────
   const mark = id => links.forEach(a => a.setAttribute('aria-current', a.getAttribute('href') === '#' + id));
   const obs = new IntersectionObserver(
     entries => entries.forEach(e => { if (e.isIntersecting) mark(e.target.id); }),
@@ -180,11 +209,67 @@
   );
   secs.forEach(s => obs.observe(s));
 
+  // ── busca ───────────────────────────────────────────────────────────────────────────────────
+  // ⚠️ `norm()` NÃO é preciosismo: sem ela, material em português desaparece para quem digita sem
+  // acento, que é o normal. Medido em 2026-09-30 numa versão anterior deste esqueleto: buscar
+  // "duvidas" escondia TODAS as seções e a página ficava em branco, sem uma palavra de explicação.
+  const norm = t => (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   const q = document.getElementById('q');
+  const status = document.getElementById('qStatus');
   if (q) q.addEventListener('input', () => {
-    const t = q.value.trim().toLowerCase();
-    secs.forEach(s => { s.hidden = t.length > 1 && !s.textContent.toLowerCase().includes(t); });
+    const t = norm(q.value.trim());
+    if (t.length < 2) {
+      secs.forEach(s => { s.hidden = false; });
+      if (status) status.textContent = '';
+      return;
+    }
+    let found = 0;
+    secs.forEach(s => {
+      const hit = norm(s.textContent).includes(t);
+      s.hidden = !hit;
+      if (hit) found++;
+    });
+    // ESTADO VAZIO ANUNCIADO: o `aria-live` faz o leitor de tela ouvir o resultado, e a mensagem
+    // impede a página em branco silenciosa.
+    if (status) status.textContent = found
+      ? `${found} seção(ões) com "${q.value.trim()}".`
+      : `Nada encontrado para "${q.value.trim()}". Limpe a busca para ver o manual inteiro.`;
   });
+
+  // ── "Copiar", com fallback de seleção ───────────────────────────────────────────────────────
+  // O clipboard falha em `file://` e sem permissão; então o fallback SELECIONA o texto, que é o que
+  // deixa a pessoa copiar à mão. Botão que promete e não cumpre é pior que botão ausente.
+  document.querySelectorAll('.copy').forEach(btn => btn.addEventListener('click', async () => {
+    const alvo = btn.parentElement.querySelector('code, pre') || btn.parentElement;
+    const texto = alvo.textContent.trim();
+    try {
+      await navigator.clipboard.writeText(texto);
+      btn.textContent = 'copiado';
+    } catch {
+      const r = document.createRange(); r.selectNodeContents(alvo);
+      const sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      btn.textContent = 'selecionado — Ctrl+C';
+    }
+    setTimeout(() => { btn.textContent = 'Copiar'; }, 2000);
+  }));
+
+  // ── tema: o token [data-theme] existe no CSS, então PRECISA de quem o defina ─────────────────
+  // Sem este bloco o ramo `:root[data-theme="dark"]` é inalcançável — CSS morto que finge oferecer
+  // escolha. Em arquivo local `prefers-color-scheme` decide sozinho e o leitor não tem como trocar.
+  const themeBtn = document.getElementById('themeBtn');
+  if (themeBtn) {
+    let saved = null;
+    try { saved = localStorage.getItem('manual-theme'); } catch { /* modo privado: segue no do sistema */ }
+    if (saved) document.documentElement.setAttribute('data-theme', saved);
+    themeBtn.addEventListener('click', () => {
+      const escuro = document.documentElement.getAttribute('data-theme') === 'dark'
+        || (!document.documentElement.getAttribute('data-theme')
+            && window.matchMedia('(prefers-color-scheme: dark)').matches);
+      const novo = escuro ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', novo);
+      try { localStorage.setItem('manual-theme', novo); } catch { /* sem persistir, ainda troca */ }
+    });
+  }
 </script>
 </body>
 </html>

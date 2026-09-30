@@ -68,6 +68,57 @@ do agente se ninguém os mapear: medido no primeiro teste pelo chat. A cura não
 "escreva bem" — é dar-lhe a **tabela código → rótulo em português** e cobrar o rótulo. Instrução em
 prosa não é fronteira; tabela é.
 
+### 6. O material PREENCHIDO é do cliente, e onde ele mora é decisão, não descuido
+
+Esta doutrina manda escrever o nome do cliente, o domínio dele, a URL de login dele e os textos exatos
+das telas dele. Isso produz um artefato **com dado de terceiro**, e a cláusula existe porque a versão
+anterior não dizia uma palavra sobre isso — apontado por passada adversarial em 2026-09-30 como a
+lacuna mais séria da doutrina.
+
+- **O esqueleto viaja; o preenchido, não.** O template é genérico e vive na superfície do framework.
+  O manual **com o nome do cliente** é entregável, e o lugar dele é a árvore do projeto que o entrega.
+- **Sob NDA, ele não entra no git.** Esta casa tem precedente direto: material de cliente mantido
+  fora do versionamento por cláusula contratual. Quando há NDA, o preenchido fica fora, e o que se
+  versiona é o que não identifica ninguém.
+- **Publicar não é só gerar link.** Uma página publicada pode ser cacheada e indexada, e apagá-la
+  depois não desfaz isso. Antes de publicar, a pergunta é *"este link pode circular além de quem eu
+  mandei?"* — e a resposta é do dono do dado, não sua.
+- **A guarda de nome comercial não alcança tudo.** As varreduras do framework derivam nomes do
+  registro de membros, então **cliente não registrado é invisível a elas**. Num material que nomeia o
+  cliente de propósito, a conferência é humana por construção.
+
+### 7. Quando o limite é material, avisar é parte do material
+
+A cláusula 2 tira do documento os percentuais de acerto e a lista de falhas. Isso **não** autoriza
+omitir que existe risco. Quando o cliente vai **decidir** com base no que o sistema entrega, o material
+diz, em linguagem dele, que o resultado é apoio e não veredito — *"confira antes de enviar"* é frase
+de cliente; *"precisão de 87% no conjunto de validação"* não é.
+
+A distinção é: o **número** interno fica fora, o **dever de conferir** fica dentro. Omitir os dois é o
+que transforma tom de cliente em promessa que o produto não sustenta — e aí a cláusula 2 vira o
+enquadramento calibrado por interesse do produtor que a KB `evidence-source-interest` ensina a
+descontar. Doutrina que proíbe expor o número sem mandar avisar do risco fecha o lado errado.
+
+### 8. Quando o cliente pede o que a doutrina proíbe
+
+Ele vai pedir: o percentual, a lista de bugs, o jargão técnico porque a equipe dele é técnica. A rota
+é **apontar, não ceder nem recusar**: o que ele pede existe, num documento interno, e você oferece
+**aquele** documento em vez de reescrever este. Material de decisão e material de uso são artefatos
+diferentes com leitores diferentes; a resposta certa é entregar o segundo, não desfigurar o primeiro.
+Sem esta rota escrita, a doutrina viraria contorno silencioso no primeiro pedido — e contorno
+silencioso é pior que exceção declarada.
+
+## A tensão com o corpus, declarada
+
+A cláusula 2 instrui a produzir, para o cliente, um documento **calibrado pelo interesse de quem o
+produz** — e a KB [`evidence-source-interest`](../../../docs/knowledge-base/concepts/evidence-source-interest.md)
+desta casa ensina o contrário para quem LÊ: pergunte *"quem produziu isto ganha o quê com o que
+diz?"* e desconte o enquadramento. As duas coisas convivem, mas só com as cláusulas 7 e 8 no lugar:
+o achado continua existindo num documento interno, o dever de conferir vai para o material do
+cliente, e quem pede o número recebe o documento que o tem. Sem isso, a doutrina seria o próprio
+viés que a casa ensina a descontar. A tensão fica escrita porque tensão não-declarada num fragmento
+canônico faz o próximo leitor concluir que a casa se contradiz.
+
 ## O que esta doutrina NÃO promete
 
 Ela cobre **tom, ordem e critério de exemplo**. Não diz se o material está correto, nem se o produto

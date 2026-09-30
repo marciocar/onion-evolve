@@ -1,7 +1,7 @@
 ---
 name: build-project-manual
 description: Montar o manual de UM PROJETO — a página que o usuário final dele abre — quando esse projeto é servido por agente + servidor MCP + atalhos.
-allowed-tools: Read Write Bash(git *) Bash(ls *) Bash(find *) Bash(grep *)
+allowed-tools: Read Write WebFetch Bash(ls *) Bash(find *) Bash(grep *) Bash(node *) Bash(npx *) Bash(chromium*)
 
 parameters:
   - name: projeto
@@ -18,6 +18,10 @@ version: "1.0.0"
 updated: "2026-09-30"
 
 output_path: docs/business-context/site/
+# `site/` é a subárvore do material PUBLICADO para fora; o pai `docs/business-context/` é do
+# /docs:build-business-docs, que gera contexto DERIVADO de fonte. A fronteira é essa: aqui mora o
+# que vai para o cliente, lá mora o que é gerado do projeto. Sem esta linha, dois comandos escrevem
+# na mesma árvore sem dono — apontado por passada adversarial.
 
 related_commands:
   - /docs:build-business-docs

@@ -1,10 +1,14 @@
-# LibreChat — agente + servidor MCP + atalhos — Knowledge Base
-
+---
 versao: 1.0.0
 data: 2026-09-30
 categoria: tools
 verified_at: 2026-09-30
 verified_against: "v0.8.8-rc4 medido no container em execução (ghcr.io/danny-avila/librechat-api:v0.8.8-rc4), não na versão citada pelo sinal de campo"
+applies_to: "LibreChat v0.8.8-rc4 (linha 0.8.8)"
+---
+
+# LibreChat — agente + servidor MCP + atalhos — Knowledge Base
+
 
 Fatos **medidos em produção** ao servir um projeto a cliente por um agente do LibreChat ligado a um
 servidor MCP próprio. Todos decaem por versão — é por isso que o `verified_at` e a versão exata estão
@@ -46,7 +50,8 @@ saber antes de investigar um incidente que não existe.
 
 ## 3. Sem Redis, o agendador não sobe até declarar réplica única
 
-**Medido em v0.8.8.** Numa implantação **sem Redis**, o agendador do LibreChat não inicia — o log diz
+**Medido em v0.8.8-rc4**, e o fato vale para a linha 0.8.8 porque depende da ausência de
+Redis e não do patch. Numa implantação **sem Redis**, o agendador do LibreChat não inicia — o log diz
 `scheduler NOT started` — enquanto o deploy não declarar explicitamente que roda em processo único:
 
 ```yaml
@@ -67,11 +72,17 @@ em prosa não é fronteira, tabela é.
 
 ## 5. A página do manual, conferida renderizada
 
-O manual do cliente é **um HTML único** (tokens de cor claro/escuro, índice fixo com a seção atual,
-busca que filtra seções/atalhos/ferramentas/glossário, "Copiar" com fallback) e foi conferido
-**renderizado** a 1440 e 390 px — com Chromium headless no servidor, porque o Claude in Chrome não
-alcança o frame de um Artifact publicado. Fronteira de ferramenta, declarada: quem precisa conferir
-render de Artifact usa navegador headless próprio.
+O manual do cliente é **um HTML único** e foi conferido **renderizado** a 1440 e 390 px — com Chromium
+headless no servidor, porque o Claude in Chrome não alcança o frame de um Artifact publicado. Fronteira
+de ferramenta, declarada: quem precisa conferir render de Artifact usa navegador headless próprio.
+
+O que o **esqueleto do framework** entrega (`common/templates/agent-project-manual-template.html`),
+medido e não prometido: tokens claro/escuro com alternador que persiste, índice que acompanha a
+leitura, busca **com normalização de acento** e estado-vazio anunciado a leitor de tela, botão Copiar
+com fallback de seleção (o clipboard falha em `file://`), e folha de impressão que **revela** o que a
+busca escondeu. Duas diferenças declaradas em relação ao manual original: o índice é fixo no desktop e
+**estático abaixo de 860 px** (no telefone ele não acompanha), e a busca filtra **seções inteiras** —
+o material original também filtrava linha a linha em glossário, atalhos e tabelas de ferramenta.
 
 ## 🔗 Referências
 
