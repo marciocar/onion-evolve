@@ -1,6 +1,6 @@
 ---
 branch: fix/members-role-drift-doors
-reviewed_diff_sha256: 6c74f4f9a0adf80e5e291e6702b76e52db955ecb21827babd2db1aaa2641209a
+reviewed_diff_sha256: 93d3ad3872cca3151e131ca124193c0d1ae7733af09f7820db1e6bb773409f11
 elenxo: sim
 verdict: REPROVADO_E_CURADO
 findings_total: 19
