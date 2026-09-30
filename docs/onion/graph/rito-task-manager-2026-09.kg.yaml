@@ -143,6 +143,55 @@ nodes:
     confidence: 0.8
     status: open
     label: "o COMPROMISSO de implementar este rito ainda NAO entrou em fios-abertos.kg.yaml, e a razao e o contrato daquele arquivo: teto de 19 nos, e ele ja tem 19 — 'onda nova exige onda COLHIDA'. GATILHO: a proxima colheita de fio cumprido abre a vaga; ate la o compromisso vive aqui e no plano aprovado"
+  # ── O QUE O UPDATE DO ADOTANTE REVELOU (2026-09-30, tarde) ─────────────────────────────────
+  - id: E_ADOTANTE_CORRIGIU_O_CORE
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "KB do adotante (platforms/zoho-projects-api.md v1.2, mais nova que a absorvida) contra sonda no portal real: POST /tasks com {\"parental_info\":{\"parent_task_id\":X}} devolve 201 e a filha nasce depth 1 com parental_info preenchido, e o PAI passa a association_info.has_subtasks true. Conferido no CORPO. Projeto descartavel removido por POST /trash, portal de volta a 1 projeto."
+    source_kind: repo
+    source_tier: 10
+    label: "a absorcao de KB de adotante se pagou NO MESMO DIA: o core absorveu a v1.1 dele de manha e a v1.2 dele corrigiu o core a tarde"
+
+  - id: E_IMPOSSIBILIDADE_ERA_FORMA_NAO_TESTADA
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "historico do proprio arquivo num unico dia: 1a redacao afirmou que a V2 entregava subtask (201 sem abrir o corpo, task rasa); 2a afirmou que NAO havia caminho, apos testar parent_task/parent/parent_task_id no TOPO (3x 400); a 3a mediu a forma ANINHADA e funciona. A secao 1 do mesmo arquivo declara em caixa alta que todo vinculo e objeto aninhado."
+    source_kind: repo
+    source_tier: 10
+    label: "declarei impossibilidade a partir de tres formas PLANAS, num arquivo que diz que todo vinculo e ANINHADO — nao faltou medicao, faltou aplicar a mim a regra que eu acabara de descobrir"
+
+  - id: Q_GMILL_MAIN_DIVERGIU
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_at: 2026-09-30
+    verified_against: "git rev-list --left-right --count origin/main...main no clone do adotante: 3 x 3. O remoto tem o PR #2 da equipe (ADR SAC-59, 219 linhas) que este clone nunca puxou; o local tem 3 updates do Onion nunca pushados. Seis arquivos se sobrepoem, inclusive as 3 KBs absorvidas."
+    source_kind: repo
+    source_tier: 10
+    label: "o main do clone do adotante DIVERGIU do remoto (3x3): push apagaria o ADR da equipe, pull cego reescreveria os updates do Onion — reconciliacao e sobre CONTEUDO deles, nao minha de decidir"
+    gatilho: "o maestro dizer qual lado ganha em cada um dos 6 arquivos sobrepostos, OU a equipe do adotante reconciliar no repo dela. Ate la o Onion entrega em branch dedicada a partir do origin/main REAL, sem tocar o main."
+
+  - id: D_NAO_SOBRESCREVER_KB_DE_ADOTANTE
+    node_type: decision
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "medido: a KB do adotante estava em v1.2 (com /api/v3.1/, global-statuses, escopo custom_fields.READ) contra a v1.1 que o core absorveu. Aplicar o bundle por cima seria REGRESSAO para ele."
+    label: "o update NAO sobrescreve KB de terceiro que o adotante evoluiu: o manifesto transporta docs/knowledge-base, mas never-clobber tem de valer ali tambem — o core absorve o que falta, nunca o contrario"
+    gatilho: "mecanizar: hoje a exclusao das 3 KBs e MANUAL na entrega. Vira guarda quando um segundo adotante tiver KB propria mais nova que a do core."
+
 edges:
   # o diagnóstico sustenta as decisões
   - from: E_RITO_COMPLETO_CHAVE_QUEBRADA
@@ -173,4 +222,13 @@ edges:
     edge_type: SUPPORTS
   - from: Q_COMPROMISSO_ESPERA_COLHEITA
     to: D_UMA_TASK_POR_FIO
+    edge_type: CONSTRAINS
+  - from: E_ADOTANTE_CORRIGIU_O_CORE
+    to: D_NAO_SOBRESCREVER_KB_DE_ADOTANTE
+    edge_type: SUPPORTS
+  - from: E_IMPOSSIBILIDADE_ERA_FORMA_NAO_TESTADA
+    to: E_ADOTANTE_CORRIGIU_O_CORE
+    edge_type: SUPPORTS
+  - from: Q_GMILL_MAIN_DIVERGIU
+    to: D_NAO_SOBRESCREVER_KB_DE_ADOTANTE
     edge_type: CONSTRAINS
