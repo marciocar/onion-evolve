@@ -591,12 +591,12 @@ onion-compliance	requires	template:compliance_pmbok_template.md
 onion-compliance	requires	template:compliance_soc2_template.md	
 onion-core	adopts	onion-evolve	
 onion-core	mode	greenfield	
-onion-core	pin	7e977cd2f395	
+onion-core	pin	cfbeec5bf946	
 onion-core	specialization	deterministic-guards	
 onion-core	specialization	full-machinery	
 onion-core	specialization	hub-role	
 onion-core	specialization	public-door	
-onion-core	tier	standalone	
+onion-core	tier	hub	
 onion-core	trust-advises	onion-evolve	
 onion-design	loads	when:brief -> kb-or-context:business-context	
 onion-design	loads	when:material -> reuse:presentation/canva	
@@ -692,7 +692,7 @@ onion-product	requires	agent:task-specialist
 onion-product	requires	skill:onion-product-context	
 onion-standalone	adopts	onion-evolve	
 onion-standalone	mode	greenfield	
-onion-standalone	pin	514dda85833a	
+onion-standalone	pin	cfbeec5bf946	
 onion-standalone	specialization	claude-code	
 onion-standalone	specialization	framework-door	
 onion-standalone	specialization	public-distribution	

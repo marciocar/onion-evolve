@@ -253,7 +253,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/onion-standalone   # PÚBLICO desde 2026-07-19 (flip feito, verificado ao vivo). Resta gated: reapontar o redirect onion-claude→onion-standalone (onion-claude segue privado)
     local_path: "/home/marcio/onion-standalone"
-    onion_version: 514dda85833a   # VERIFICADO por pin-integrity-check.sh (pin-ok 2026-07-19) — vendoriza .claude/ role-scoped (dif. do onion-mini, destilação sem stamp)
+    onion_version: cfbeec5bf946   # carimbado por ops/door-seal-pin.sh (remoto conferido)
     adopted_at: 2026-07-19
     mode: greenfield            # pasta vazia → adopt role-scoped; SÓ o bundle standalone (eng/product/testing/docs), meta-factory selada
     personality_summary: "A porta pública Claude do Onion: instância adotada role-scoped (bundle standalone: eng/product/testing/docs), SEM meta-factory nem memória privada de evolução. Derivação que cita o core (pin verificado). Desfaz o colapso porta≡core; nasce privada, flip público gated."
@@ -310,7 +310,13 @@ members:
 
   - id: onion-core
     name: onion-core (porta pública do core — maquinaria completa, papel hub, sem biografia)
-    role: standalone            # T3 — recebe o bundle, não adota um projeto
+    role: hub                   # CORRIGIDO 2026-09-30: dizia `standalone` e o CARIMBO da porta diz `hub`
+                                #   — 11 materializações seguidas (22/09→27/09) carimbaram hub, e o CLAUDE.md
+                                #   declara esta porta como "mesma plataforma, mesma MAQUINARIA, sem biografia".
+                                #   A anotação errada CUSTOU: em 2026-09-30 eu li o registro em vez do carimbo,
+                                #   materializei com --role standalone e a porta PÚBLICA perdeu 85 arquivos de
+                                #   meta-fábrica (adopt/create-*/federation-*/marketplace/wizard/onion-publish).
+                                #   Restaurado em 4eb55ac. O carimbo é o que a porta É; o registro é anotação.
     kind: door          # DISTRIBUI a maquinaria; o proposito e ser a face publica do core
     parent: onion-evolve
     remote: github.com/marciocar/onion-core   # PÚBLICO desde 2026-09-17
@@ -323,7 +329,7 @@ members:
     #    orfao unico + force-push, e nao ha nada a preservar nisso. LIMITE DECLARADO: o objeto antigo
     #    segue acessivel por SHA ate o GC do GitHub, e quem clonou tem copia — o force-push torna
     #    INALCANCAVEL, nunca inexistente.
-    onion_version: 7e977cd2f395   # carimbado por ops/door-seal-pin.sh (remoto conferido)
+    onion_version: cfbeec5bf946   # carimbado por ops/door-seal-pin.sh (remoto conferido)
                                   # via `gh api repos/marciocar/onion-core/commits/main` -> 5063e81b2d8d.
                                   # ⚠️ SEGUNDA vez EM UM DIA que este numero e avancado A MAO, e a 1a vez
                                   # eu escrevi aqui que 'numero mantido a mao apodrece'. Apodreceu em duas
