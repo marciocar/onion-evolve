@@ -288,44 +288,6 @@ nodes:
     trace: '.claude/validation/review-artifact-check.sh'
     label: "R0 2026-09-09 — a TESE CENTRAL do no continua VERDADEIRA: so `reviewed_diff_sha256` e verificado contra algo que o modelo nao controla. O que mudou e a formulacao literal sobre UM dos tres campos: em 2026-09-08 (selado pelo maestro) o `verdict` ganhou vocabulario FECHADO de 5 valores (APROVADO | CORRIGIDO | REPROVADO | REPROVADO_E_CURADO | SEM_ACHADOS), tolerando caixa e separador mas nao a palavra. Isso NAO e verificacao cruzada — o modelo ainda escolhe livremente qual dos cinco declarar, sem prova de que e verdade —, mas ja nao e 'passa sempre que estiver presente'. `findings_total` e `findings_real` permanecem exatamente como descritos: so numericos. O `trace` do no cita l.205-211 e o script cresceu de 211 para 254 linhas, entao a citacao por linha caducou."
 
-  # ── O GATE SEMÂNTICO TEM UM PONTO ÚNICO DE FALHA EXTERNO (medido 2026-09-30) ────────────────
-  - id: E_REVISOR_CAI_POR_SALDO_DE_API
-    node_type: evidence
-    plane: PROD
-    impact: 5
-    confidence: 1.0
-    status: confirmed
-    verified_at: 2026-09-30
-    verified_against: "artefato review-evidence-36782105288 do PR #895, lido do proprio run: {\"is_error\":true,\"api_error_status\":400,\"terminal_reason\":\"api_error\",\"result\":\"Credit balance is too low\",\"total_cost_usd\":0,\"num_turns\":1}. A run anterior (36781367066, 21:44Z) revisou com sucesso; a seguinte (21:51Z) ja falhou — o credito acabou entre as duas."
-    source_kind: repo
-    source_tier: 10
-    label: "o revisor semantico do CI cai por SALDO DE API, e o pre-voo nao pega: ele devolve HTTP 200 porque testa CREDENCIAL, nao saldo"
-
-  - id: C_PREVOO_MEDE_CREDENCIAL_NAO_SALDO
-    node_type: claim
-    plane: PROD
-    impact: 4
-    confidence: 1.0
-    status: confirmed
-    verified_at: 2026-09-30
-    verified_against: "no mesmo run: PREFLIGHT_HTTP=200 e HAS_ANTHROPIC_KEY=true, com o revisor morrendo em api_error_status 400 'Credit balance is too low'. O pre-voo existe para dizer a CAUSA e disse 200 — verde que nao cobre o modo de falha que de fato ocorreu."
-    source_kind: repo
-    source_tier: 10
-    label: "o pre-voo do revisor da verde para credencial valida com saldo zero — o verde nao cobre o modo de falha real"
-
-  - id: Q_REVISOR_SEM_SALDO_DERRUBA_TODO_PR
-    node_type: question
-    plane: PROD
-    impact: 5
-    confidence: 1.0
-    status: open
-    verified_at: 2026-09-30
-    verified_against: "consequencia medida no PR #895: onion-review-verdict reprova com REVISOU=false e ACHADOS=-1, e o merge so passa por dispensa NOMEADA. Enquanto o saldo nao voltar, todo PR deste repo mergeia sem revisao semantica."
-    source_kind: repo
-    source_tier: 10
-    label: "enquanto a conta de API do CI estiver sem saldo, TODO PR deste repo mergeia por dispensa em vez de aprovacao — o gate semantico fica inerte por causa externa"
-    gatilho: "o maestro repor o saldo. Ao repor: rodar o onion-review de novo num PR aberto e conferir REVISOU=true no verdict ANTES de voltar a confiar no verde. A cura de MECANISMO (pre-voo que meça saldo, nao so credencial) fica gated neste mesmo gatilho — hoje nao ha como medir saldo sem gastar."
-
 edges:
   - from: E_VETO_UNICO_ANTES_DA_RODADA
     to: Q_GATES_TEXTUAIS
@@ -420,9 +382,3 @@ edges:
   - from: E_O_VERDICT_GANHOU_VOCABULARIO_MAS_NAO_VERIFICACAO
     to: E_REGRA56_VERIFICA_PRESENCA_NAO_VERDADE
     edge_type: SUPERSEDES
-  - from: C_PREVOO_MEDE_CREDENCIAL_NAO_SALDO
-    to: E_REVISOR_CAI_POR_SALDO_DE_API
-    edge_type: SUPPORTS
-  - from: E_REVISOR_CAI_POR_SALDO_DE_API
-    to: Q_REVISOR_SEM_SALDO_DERRUBA_TODO_PR
-    edge_type: CAUSES
