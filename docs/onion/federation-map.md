@@ -13,7 +13,7 @@ flowchart TD
   onion_mini["onion-mini<br/>standalone · distilled"]:::standalone
   onion_standalone["onion-standalone<br/>standalone · greenfield"]:::standalone
   vendas_pdi_enterprise["vendas-pdi-enterprise<br/>standalone · greenfield"]:::standalone
-  onion_core["onion-core<br/>standalone · greenfield"]:::standalone
+  onion_core["onion-core<br/>hub · greenfield"]:::hub
   onion_codex["onion-codex<br/>standalone · distilled"]:::standalone
   marcio_pessoal["marcio-pessoal<br/>standalone · regulated"]:::standalone
   onion_pedro["onion-pedro<br/>standalone · greenfield"]:::standalone
@@ -62,9 +62,9 @@ flowchart TD
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `6cc162f32d1c` |
 | gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `c9eb2c40bc3b` |
 | onion-mini | standalone | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
-| onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `514dda85833a` |
+| onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `cfbeec5bf946` |
 | vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `24118c5d7a97` |
-| onion-core | standalone | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `7e977cd2f395` |
+| onion-core | hub | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `cfbeec5bf946` |
 | onion-codex | standalone | distilled | substrate-port, openai-codex, portability-proof, deterministic-guards | `n/a` |
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |
 | onion-pedro | standalone | greenfield | field-dogfood, greenfield-adoption, compliance | `165e1e13b11f` |
