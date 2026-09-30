@@ -1,3 +1,8 @@
+---
+applies_to: "formato Agent Skills (spec agentskills.io) + extensões do Claude Code 2.1.285 (binário medido em 2026-09-30)"
+verified_at: 2026-09-30
+---
+
 # Agent Skills - Knowledge Base
 
 ---

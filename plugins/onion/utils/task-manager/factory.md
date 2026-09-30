@@ -101,6 +101,18 @@ function getTaskManager(options?: FactoryOptions): ITaskManager {
         teamId: process.env.LINEAR_TEAM_ID
       });
 
+    case 'zoho':
+      // Transporte ÚNICO: REST API V3. Não há MCP nativo da Zoho para Projects
+      // (medido 2026-09-30) — por isso, diferente do Linear, não há `transport` aqui.
+      // O adapter é HÍBRIDO por necessidade: `createSubtask` só existe na V2, que
+      // sai de linha em 2026-12-31 (fio com data, declarado em adapters/zoho.md).
+      return new ZohoProjectsAdapter({
+        clientId: process.env.ZOHO_CLIENT_ID!,
+        clientSecret: process.env.ZOHO_CLIENT_SECRET!,
+        portalId: process.env.ZOHO_PORTAL_ID!,        // o id da V3 — ≠ login_id da V2
+        accountsHost: process.env.ZOHO_ACCOUNTS_HOST || 'https://accounts.zoho.com'
+      });
+
     case 'none':
     default:
       return new NoProviderAdapter();

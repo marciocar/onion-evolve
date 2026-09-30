@@ -180,24 +180,33 @@ interface ITaskManager {
 
 ### Status
 
-| Interface | ClickUp | Asana | Jira | Linear |
-|-----------|---------|-------|------|--------|
-| `backlog` | "backlog" | - | "Backlog" | "Backlog" |
-| `todo` | "to do" | - | "To Do" | "Todo" |
-| `in_progress` | "in progress" | - | "In Progress" | "In Progress" |
-| `review` | "review" | - | "In Review" | "In Review" |
-| `done` | "done" | completed: true | "Done" | "Done" |
-| `closed` | "closed" | completed: true | "Closed" | "Canceled" |
-| `canceled` | "closed" | completed: true | "Cancelled" | "Canceled" |
+| Interface | ClickUp | Asana | Jira | Linear | Zoho Projects |
+|-----------|---------|-------|------|--------|---------------|
+| `backlog` | "backlog" | - | "Backlog" | "Backlog" | "Open" |
+| `todo` | "to do" | - | "To Do" | "Todo" | "Open" |
+| `in_progress` | "in progress" | - | "In Progress" | "In Progress" | "In Progress" |
+| `review` | "review" | - | "In Review" | "In Review" | ⚠️ sem nativo — status customizado do projeto (NÃO MEDIDO) |
+| `done` | "done" | completed: true | "Done" | "Done" | o status com `is_closed_type: true` |
+| `closed` | "closed" | completed: true | "Closed" | "Canceled" | idem (`is_closed_type: true`) |
+| `canceled` | "closed" | completed: true | "Cancelled" | "Canceled" | idem (`is_closed_type: true`) |
+
+⚠️ **Zoho resolve status por NOME, não por id fixo.** Os ids são por projeto e **não existe endpoint que
+os liste** (medido 2026-09-30: seis caminhos candidatos devolvem 400). O adapter lê uma task do projeto
+para descobrir o mapa `{id, name, is_closed_type}`, e usa `is_closed_type` para saber qual é o terminal.
+A escrita é `{"status":{"id":"…"}}` — objeto, não nome, e **não** `custom_status`.
 
 ### Prioridade
 
-| Interface | ClickUp | Asana | Jira | Linear |
-|-----------|---------|-------|------|--------|
-| `urgent` | 1 | - | Highest | 1 |
-| `high` | 2 | - | High | 2 |
-| `normal` | 3 | - | Medium | 3 |
-| `low` | 4 | - | Low | 4 |
+| Interface | ClickUp | Asana | Jira | Linear | Zoho Projects |
+|-----------|---------|-------|------|--------|---------------|
+| `urgent` | 1 | - | Highest | 1 | "High" ⚠️ |
+| `high` | 2 | - | High | 2 | "High" ⚠️ |
+| `normal` | 3 | - | Medium | 3 | "Medium" ⚠️ |
+| `low` | 4 | - | Low | 4 | "Low" ⚠️ |
+
+⚠️ O Zoho tem **quatro** níveis (`None`/`Low`/`Medium`/`High`), então `urgent` e `high` **colapsam** no
+mesmo valor — perda de informação declarada, não escondida. E este mapeamento vem da UI: **não foi
+medido contra a API**.
 
 ---
 

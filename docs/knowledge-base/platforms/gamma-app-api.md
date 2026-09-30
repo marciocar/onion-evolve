@@ -1,3 +1,8 @@
+---
+applies_to: "Gamma.App API v3.0.0 (declarada no corpo da KB; NÃO medida contra a API)"
+verified_at: 2026-09-30
+---
+
 # Gamma.App API — especificação, padrões de integração e exemplos
 
 > **Versão**: 1.0.0 | **Última atualização**: 2026-07-04 | **Categoria**: Platforms

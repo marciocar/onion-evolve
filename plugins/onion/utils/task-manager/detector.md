@@ -113,6 +113,17 @@ function detectProvider(): ProviderConfig {
         : undefined
     },
 
+    zoho: {
+      provider: 'zoho',
+      transport: 'api',  // sem MCP nativo para Projects (medido 2026-09-30)
+      isConfigured: !!(process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET && process.env.ZOHO_PORTAL_ID),
+      requiredEnvVars: ['ZOHO_CLIENT_ID', 'ZOHO_CLIENT_SECRET', 'ZOHO_PORTAL_ID'],
+      optionalEnvVars: ['ZOHO_ACCOUNTS_HOST'],
+      errorMessage: !(process.env.ZOHO_CLIENT_ID && process.env.ZOHO_CLIENT_SECRET && process.env.ZOHO_PORTAL_ID)
+        ? '❌ Zoho Projects não configurado. Faltam ZOHO_CLIENT_ID / ZOHO_CLIENT_SECRET / ZOHO_PORTAL_ID. Execute /onion:setup-integration'
+        : undefined
+    },
+
     none: {
       provider: 'none',
       transport: 'api',  // Modo offline; sem transporte real

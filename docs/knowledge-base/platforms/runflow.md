@@ -19,6 +19,7 @@ sources:
     url: https://www.npmjs.com/package/@runflow-ai/sdk
     consulted_at: 2026-07-23
     description: Pacote npm oficial
+applies_to: "@runflow-ai/sdk 1.6.2 — ⚠️ DRIFT INTERNO: o corpo ainda cita SDK 1.3 em dois lugares; não resolvido, declarado. O campo `version:` desta KB já significava a versão do ALVO, que é a ambiguidade que o `applies_to` desfaz"
 ---
 
 # Runflow

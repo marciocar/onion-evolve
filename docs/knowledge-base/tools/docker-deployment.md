@@ -1,9 +1,14 @@
-# Docker Deployment — Knowledge Base
-
+---
 versao: 1.0.0
 data: 2026-06-14
 categoria: tools
 source-agent: docker-specialist
+applies_to: "Docker 29.1.3 · Docker Compose 2.40.3 (medido nesta máquina em 2026-09-30; a KB não declarava versão alguma)"
+verified_at: 2026-09-30
+---
+
+# Docker Deployment — Knowledge Base
+
 
 Referência técnica detalhada para containerização com Docker, Docker Compose e integração com PostgreSQL em projetos Node.js/Next.js/NX Monorepo.
 

@@ -12,7 +12,7 @@ Define os tipos TypeScript compartilhados entre todos os adapters, garantindo co
 /**
  * Provedores de gerenciamento de tarefas suportados.
  */
-type TaskManagerProvider = 'clickup' | 'asana' | 'jira' | 'linear' | 'none';
+type TaskManagerProvider = 'clickup' | 'asana' | 'jira' | 'linear' | 'zoho' | 'none';
 
 /**
  * Transporte usado pelo adapter para se comunicar com o provider.

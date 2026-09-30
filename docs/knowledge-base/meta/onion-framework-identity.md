@@ -137,7 +137,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 │    Forge (GitHub; GitLab/Bitbucket = costura, não capability)  │
 ├─────────────────────────────────────────────────────────────┤
 │  DOCUMENTAÇÃO CONSTITUCIONAL (docs/)                           │
-│    Meta-specs L0 · Knowledge Bases (108) · Spec as Code         │
+│    Meta-specs L0 · Knowledge Bases (111) · Spec as Code         │
 │    Sessions (.claude/sessions/) — gitignored, retomáveis       │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -148,7 +148,7 @@ canônica citável. Nome sem casa é órfão — entra na tabela só quando a ca
 2. **Agentes** (`.claude/agents/`) — especialistas por categoria (development, product, git, meta, compliance, testing, review, research, deployment). Sabem **fazer**: `@jira-specialist` opera JQL+ADF, `@metaspec-gate-keeper` valida arquitetura, `@react-developer` escreve componentes.
 3. **Skills** (`.claude/skills/`) — programas de orquestração de alto nível. `onion-orchestration` é o mais poderoso: autora scripts `Workflow` nativos do Claude Code para fan-out paralelo de agentes, com tiering de modelos por tier (haiku para scan/classificação, sonnet para raciocínio, opus para julgamento adversarial — sem fixar versão exata).
 4. **Abstrações** (`.claude/utils/`) — padrão SDAAL em dois eixos: **Task Manager** (Jira/ClickUp/Asana/Linear, API-first com MCP opcional) e **Forge** (GitHub hoje, GitLab/Bitbucket com costura pronta). Comandos nunca chamam a API do provider direto — sempre via adapter, que resolve transporte, formatação e fallback.
-5. **Documentação constitucional** (`docs/`) — Meta-specs L0 (constituição), Knowledge Bases (108 documentos estruturados para consumo por IA), Business/Technical/Compliance Contexts (Spec as Code gerados por `/docs:build-*-docs`).
+5. **Documentação constitucional** (`docs/`) — Meta-specs L0 (constituição), Knowledge Bases (111 documentos estruturados para consumo por IA), Business/Technical/Compliance Contexts (Spec as Code gerados por `/docs:build-*-docs`).
 
 ### Fluxo de uma feature típica
 

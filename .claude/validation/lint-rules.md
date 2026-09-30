@@ -27,7 +27,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**90 regras** no total — **79 HARD**, **29 SOFT**.
+**91 regras** no total — **80 HARD**, **29 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -110,7 +110,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 81 | Painel de estado é GERADO dos produtores, nunca redigido | HARD | painel de testes com número sem produtor — metas redesenhadas como medição, que foi o defeito real deste repo |
 | 83 | Id de modelo VERSIONADO só na SSOT declarada | HARD | versão literal de modelo espalhada por config, que caduca sem aviso |
 | 84 | Índice de leitura do KG em sincronia com os traces | HARD + SOFT | o hook da perna de leitura mentir POR OMISSÃO |
-| 85 | Porta pública espelha o core, com catraca | HARD + SOFT | a porta MENTIR sobre o que o core é, por falta de re-materialização |
+| 85 | Porta pública espelha o core, com catraca | HARD | a porta MENTIR sobre o que o core é, por falta de re-materialização |
 | 90 | Prosa de comando conhece os papéis que o script aceita | SOFT | o par script×prosa dos comandos de co-evolução desencontrar — e ele JÁ desencontrou duas |
 | 92 | Papel da porta no registro concorda com o CARIMBO dela | HARD + SOFT | o materializador ler o papel ERRADO e cortar maquinaria da porta pública |
 
@@ -139,6 +139,7 @@ Conhecimento nasce no grafo e não morre em prosa; proveniência com catraca (po
 | 82 | Os dois leitores do corpus CONCORDAM sobre quem é nó | HARD + SOFT | grafo válido em que o radar (awk sobre texto) e o PyYAML veem populações DIFERENTES |
 | 87 | PR que EDITA um `.kg.yaml` enxergou os `confirmed` dele | SOFT | propor contra o próprio corpus — o defeito medido em 2026-09-19 |
 | 89 | Rodada de radar selada reconcilia o corpus que superou (Aufhebung), com catraca | HARD + SOFT | a UNICA divida deste corpus que piora sozinha — rodada de radar selada como baseline sem |
+| 93 | KB de terceiro declara a QUE VERSÃO se aplica | HARD + SOFT | documentação que caduca sem dizer para qual versão ela valia |
 
 ## Automação Graduada
 

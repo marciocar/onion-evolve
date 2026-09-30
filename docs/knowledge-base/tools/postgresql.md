@@ -1,3 +1,8 @@
+---
+applies_to: "PostgreSQL 17 (declarado no próprio título da KB; NÃO medido contra instância)"
+verified_at: 2026-09-30
+---
+
 # PostgreSQL 17 — triggers, functions, migrations e performance (com Prisma)
 
 > **Versão**: 1.0.0 | **Última atualização**: 2026-07-10 | **Categoria**: Tools

@@ -280,6 +280,39 @@ members:
   # porta. O `onion_version` abaixo é o pin de onde ela foi materializada, e é o que a guarda de
   # ciclo compara contra a superfície que viaja — porta sem re-materialização envelhece, e o
   # `onion-standalone` (372 commits atrás, medido 2026-09-17) é a prova de que isso acontece.
+  # ⚠️ REGISTRADO EM 2026-09-30, E O ATRASO CUSTOU: este hub estava FORA do members.yaml desde a
+  #    adoção (2026-09-16). A REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) deriva
+  #    os termos que varre DESTE arquivo — logo um membro não registrado é INVISÍVEL à guarda, e o
+  #    nome dele podia vazar para superfície vendorizada sem nada acusar. É a segunda vez que a casa
+  #    paga por isso (a primeira foi um repo de prefixo `onion-`, que a guarda também não enxergava).
+  #    Registrar é ato de segurança, não burocracia.
+  # ⚠️ SLUG NEUTRO POR DECISÃO DO MAESTRO (2026-09-30): ele confirmou que o nome é COMERCIAL, e o `id`
+  #    é justamente o que vai para as superfícies PROJETADAS — medido no mesmo dia: o nome comercial já
+  #    havia entrado em `federation-map.md`, `federation-console.html` E `graph.md` nas horas em que
+  #    ficou registrado nominalmente. Trocado por slug de função, no padrão de `hub-formacao-enterprise`.
+  #    Quem é a empresa vive no CLAUDE.md dela, nunca aqui. O `local_path` NÃO viaja para projeção
+  #    (medido: zero ocorrências de local_path nas três), então o caminho local pode manter o nome real.
+  - id: hub-operacoes-enterprise
+    name: hub-operacoes-enterprise (hub de operações — empresa com projetos próprios, nome comercial sob reserva)
+    role: hub                   # TIER 1 — pode ter sub-adotados; carimbo do clone diz `role: hub`
+    kind: adopter               # vendoriza o framework, logo pin real é obrigatório
+    parent: onion-evolve
+    remote: github.com/marciocar/gmill   # PRIVADO — o remote É o nome real do repo; não há como neutralizá-lo sem renomear o repo, e ele não entra nas projeções
+    local_path: "/home/marcio/gmill"     # clonado em 2026-09-30 para validar as KBs do sinal
+    onion_version: cff9214c3b9a          # do carimbo do clone; commit VERIFICADO na história do core
+    adopted_at: 2026-09-16               # do carimbo (`adopted_at`), não de suposição
+    mode: greenfield                     # do carimbo (`mode`)
+    personality_summary: "Hub de operações que adota os próprios projetos. Fonte do sinal upstream de 2026-09-30 com três KBs (Zoho Projects API V3, GLPI API V1×V2 e o padrão chamado→tarefa), absorvidas no core com scrub e carimbo de versão."
+    specializations: [hub, task-manager-integration, itsm]
+    personality_last_sync: 2026-09-30   # do sinal upstream; nenhuma sincronização automática
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
   - id: vendas-pdi-enterprise
     # ⚠️ SLUG NEUTRO POR DECISÃO, não por acaso (maestro, 2026-09-17). O pedido original nomeava o
     #    cliente no identificador, e o identificador é justamente o que vai para as superfícies

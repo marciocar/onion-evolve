@@ -87,7 +87,7 @@ Liste especificamente:
 # 🔍 VERIFICAÇÃO DE IMPLEMENTAÇÃO - [NOME DA TASK]
 
 **Task ID**: [TASK_ID]  
-**Provedor**: [jira/clickup/asana/linear/local]  
+**Provedor**: [jira/clickup/asana/linear/zoho/local]  
 **Data da Verificação**: [DATA_ATUAL]  
 **Status Verificado**: [IMPLEMENTADA/PARCIAL/NÃO_IMPLEMENTADA/PRONTA_PARA_PRÓXIMA_FASE]
 

@@ -6,7 +6,7 @@ description: |
 allowed-tools: Read Bash(test -f *) Bash(grep *) Bash(git ls-files*)
 parameters:
   - name: integration
-    description: Nome da integração (task-manager, clickup, asana, linear, gamma, postgres)
+    description: Nome da integração (task-manager, clickup, asana, linear, zoho, gamma, postgres)
     required: false
 category: meta
 tags:
@@ -39,10 +39,11 @@ SE `{{integration}}` foi fornecido:
 - Use diretamente
 SENÃO:
 - Pergunte qual integração configurar:
-  - **task-manager** - Configurar gerenciador de tarefas (ClickUp, Asana, Linear) - **RECOMENDADO PRIMEIRO**
+  - **task-manager** - Configurar gerenciador de tarefas (ClickUp, Asana, Linear, Zoho Projects) - **RECOMENDADO PRIMEIRO**
   - **clickup** - ClickUp (API-first; MCP opcional) para gestão de tarefas
   - **asana** - Asana (API-first; MCP opcional) para gestão de tarefas
   - **linear** - Linear (API-first) para gestão de tarefas
+  - **zoho** - Zoho Projects (API V3; OAuth Self client)
   - **gamma** - Gamma.App API para apresentações
   - **postgres** - PostgreSQL para banco de dados
 
@@ -77,7 +78,7 @@ Read .env
 # ═══════════════════════════════════════
 # GERENCIADOR DE TAREFAS (escolha um)
 # ═══════════════════════════════════════
-TASK_MANAGER_PROVIDER=clickup  # clickup | asana | linear | none
+TASK_MANAGER_PROVIDER=clickup  # clickup | asana | jira | linear | zoho | none
 ```
 
 **2. Configurar ClickUp (se escolhido):**
@@ -117,7 +118,24 @@ LINEAR_TEAM_ID=abc123  # Opcional
 - **API Key**: Settings > API no Linear
 - **Team ID**: URL do time ou via API
 
-**5. Modo Offline (sem gerenciador):**
+**5. Configurar Zoho Projects (alternativa):**
+```env
+# Zoho Projects (API V3 — NÃO há MCP nativo da Zoho para Projects)
+ZOHO_CLIENT_ID=1000.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ZOHO_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ZOHO_PORTAL_ID=xxxxxxxxx           # o id da V3 — NÃO é o login_id da V2
+ZOHO_ACCOUNTS_HOST=https://accounts.zoho.com   # opcional: troque por .eu / .in / .com.au
+```
+
+**Como obter (o caminho que dispensa grant code):**
+- Acesse `api-console.zoho.com` → **GET STARTED** → **Self client** → `CREATE NOW` → `CREATE` → `OK`
+- Copie **Client ID** (começa com `1000.`) e **Client Secret** na aba *Client Secret*
+- **Não gere grant code**: o fluxo `client_credentials` não precisa dele e não devolve `refresh_token`
+- `portal_id`: `GET https://projects.zoho.com/api/v3/portal` com o token — e **atenção**, ele difere do
+  `login_id` que a V2 devolve; trocá-los dá erro que parece de permissão
+- ⚠️ **O datacenter importa**: token de `.com` não vale em `.eu`/`.in`/`.com.au`
+
+**5.1. Modo Offline (sem gerenciador):**
 ```env
 TASK_MANAGER_PROVIDER=none
 # Sistema funcionará em modo local sem sincronização
