@@ -2523,6 +2523,78 @@ check_door_staleness() {
 }
 
 # ===========================================================================
+# REGRA 92 — Papel da porta no registro concorda com o CARIMBO dela [HARD + SOFT]
+# previne: o materializador ler o papel ERRADO e cortar maquinaria da porta pública
+#   Duas fontes para o mesmo fato — `role:` no `members.yaml` (anotado à mão) e
+#   `role:` no `.claude/.onion-version` do clone (carimbado pela materialização) —
+#   e nada cobrava que concordassem. Medido em 2026-09-30: o registro dizia
+#   `standalone` para a `onion-core` enquanto o CARIMBO dela dizia `hub`. (A 1ª versão desta nota
+#   dizia "as ONZE materializações anteriores carimbaram hub" — número DECLARADO, não verificável:
+#   o `door-staleness-baseline.txt` guarda pins, não o `--role` de cada rodada. Corrigido por
+#   passada adversarial: o que sustenta a escolha de `hub` é o carimbo vivo + a doutrina, não a
+#   contagem.) Eu li o REGISTRO, materializei com `--role standalone`, e a
+#   face PÚBLICA do core perdeu 85 arquivos de meta-fábrica — contra o que o
+#   CLAUDE.md declara dela ("mesma plataforma, mesma maquinaria, sem biografia").
+#   O predicado é PARIDADE, e isso é deliberado: embutir aqui a tabela "que papel
+#   cada porta deve ter" criaria uma TERCEIRA fonte, que caduca junto. Quem decide
+#   QUAL é o certo é a doutrina (public-door-vs-private-core.md) — a guarda só
+#   impede que as duas fontes contem histórias diferentes.
+#   Fronteira DECLARADA: julga só o que pode LER. Sem o clone (o caso do CI) ela
+#   declara NÃO-MEDIDO, nunca passa em silêncio.
+# ===========================================================================
+check_door_role_parity() {
+  local sc="${SCRIPT_DIR}/door-role-parity-check.sh"
+  [ -f "${sc}" ] || return 0
+  local out rc=0
+  # 2>&1 NÃO é descuido: a DECLARAÇÃO de não-medido sai no stderr, e descartá-la aqui tornaria a
+  # guarda MUDA exatamente no ambiente onde ela não mede (o CI não tem os clones das portas) — o
+  # fail-open silencioso que o próprio SUT existe para evitar. Ele sai 0 nesse caso, então sem
+  # capturar o stderr o lint voltaria "sem violação" de um lugar onde nada foi medido.
+  out="$(bash "${sc}" "${REPO_ROOT}" 2>&1)" || rc=$?
+  # rc=3 é RECUSA de julgar (sem registro, sem python3) — e recusa NÃO é aprovação.
+  if [ "${rc}" -eq 3 ]; then
+    violation "SOFT" ".claude/validation/door-role-parity-check.sh" "REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela): a guarda não pôde julgar (rc=3) — sem members.yaml legível ou sem python3, a paridade não foi medida. Não é 'sem divergência'."
+    return 0
+  fi
+  # rc=0 pode significar DUAS coisas — "medi e concordam" ou "não pude medir" — e a diferença tem de
+  # aparecer. Quando há porta não-medida, o lint diz isso em voz alta (SOFT), como a REGRA 82 já faz
+  # com "paridade NÃO MEDIDA aqui": informa sem bloquear, porque o CI não tem clone e não deveria.
+  if grep -q 'NÃO MEDIDA' <<< "${out}"; then
+    violation "SOFT" ".claude/validation/door-role-parity-check.sh" "REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela): [porta/PARIDADE-NAO-MEDIDA] $(grep -m1 'NÃO MEDIDA' <<< "${out}") A cobrança acontece onde os clones existem (máquina do maestro); aqui a guarda declara que não sabe, em vez de passar em silêncio."
+  fi
+  [ "${rc}" -eq 0 ] && return 0
+  local line
+  while IFS= read -r line; do
+    case "${line}" in
+      # ⚠️ POR QUE ISTO É HARD, quando a REGRA 85 vizinha teve de virar SOFT: lá a cura é
+      # RE-MATERIALIZAR a porta, o que só é possível DEPOIS do merge (materializar do HEAD da branch
+      # publicaria trabalho não-mergeado num repo público) — HARD que nenhuma ação dentro do PR limpa.
+      # Aqui a cura cabe no PR: o carimbo diz o que a porta É (behavior-over-declaration), e alinhar o
+      # `members.yaml` a ele é uma edição neste repo — foi exatamente a cura de 2026-09-30 (7758a85a).
+      # O cenário que NÃO cabe no PR é a troca INTENCIONAL de papel, e a passada adversarial estava
+      # certa em cobrar o caminho: editar o registro deixaria HARD até re-materializar, e materializar
+      # do HEAD de uma branch publicaria trabalho não-mergeado (o que a decisão de 2026-09-24 proíbe).
+      # A saída NÃO é `--no-verify`: a troca deliberada se faz em DUAS levas — (1) depois do merge,
+      # `ops/materialize-door.sh <clone> --role <novo> --force-role-change` move o carimbo; (2) o PR
+      # seguinte alinha o `role:` do registro, e aí a paridade fecha verde. A ordem é essa porque o
+      # carimbo é o que a porta É; o registro o segue.
+      *PAPEL-DIVERGE*)
+        violation "HARD" "docs/evolution/federation/members.yaml" "REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela): ${line}"
+        ;;
+      # Registro quebrado, não questão de momento — mesma classe do SEM-BASELINE da 85.
+      *SEM-ROLE*)
+        violation "HARD" "docs/evolution/federation/members.yaml" "REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela): ${line}"
+        ;;
+      # O carimbo vive no CLONE, fora deste repo: a cura é re-materializar, logo pós-merge ⇒ SOFT.
+      *CARIMBO-AUSENTE*|*CARIMBO-INCOMPLETO*)
+        violation "SOFT" "docs/evolution/federation/members.yaml" "REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela): ${line} — re-materialize a porta (bash ops/materialize-door.sh <clone>) para o carimbo voltar a declarar o papel. SOFT porque a cura mora no clone, não neste PR."
+        ;;
+    esac
+  done <<< "${out}"
+}
+
+
+# ===========================================================================
 # REGRA 86 — Workflow de CI PARSEIA como YAML [HARD]
 # previne: workflow inexecutável passando por existente, e guarda morta por sintaxe
 #   Medido 2026-09-17: `onion-review-diagnose.yml` tinha DOIS blocos `env:` no mesmo
@@ -4449,6 +4521,7 @@ check_model_version_fora_da_ssot
 check_kg_read_index_sync
 check_kg_edit_saw_confirmed
 check_door_staleness
+check_door_role_parity
 check_workflows_parse
 check_workflow_job_needs_checkout
 check_frontmatter_scalar_colon

@@ -12,11 +12,11 @@
 
 | Dimensão | Nº | Produtor |
 |---|---:|---|
-| Famílias na bancada | **195** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **1274** | `bash .claude/validation/harness-inventory.sh --env` |
-| Regras do lint | **89** | `bash .claude/validation/rules-registry.sh --counts` |
-| — HARD | **78** | `bash .claude/validation/rules-registry.sh --counts` |
-| Pares de modo consumido | **51** | `bash .claude/validation/consumed-mode-check.sh .` |
+| Famílias na bancada | **197** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **1289** | `bash .claude/validation/harness-inventory.sh --env` |
+| Regras do lint | **90** | `bash .claude/validation/rules-registry.sh --counts` |
+| — HARD | **79** | `bash .claude/validation/rules-registry.sh --counts` |
+| Pares de modo consumido | **52** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | `bash .claude/validation/consumed-mode-check.sh .` |
 | Baselines de catraca | **12** | `git ls-files '.claude/validation/*-baseline.txt'` |
 

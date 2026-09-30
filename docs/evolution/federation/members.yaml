@@ -248,6 +248,13 @@ members:
   # Segue gated APENAS o re-apontar do redirect onion-claude (MOAT-lock-4).
   - id: onion-standalone
     name: onion-standalone (porta pública Claude — instância adotada role-scoped, bundle standalone)
+    # ⚠️ ESTE PAPEL ESTÁ DECIDIDO, e a decisão é da DOUTRINA — não é questão aberta. Em 2026-09-30 eu
+    #    escrevi que ele "ficava aberto, com evidência nos dois sentidos"; era falso, e o custo de
+    #    afirmar isso é conhecido: foi lendo o registro em vez de medir que a `onion-core` foi
+    #    re-materializada com o papel errado e a face pública perdeu 85 arquivos de meta-fábrica.
+    #    `public-door-vs-private-core.md` classifica `onion-standalone` como **Porta de framework** e
+    #    diz, textualmente, "**Nunca**: meta-factory" — o que É o corte do papel `standalone`. Registro
+    #    e carimbo concordam (medido). A REGRA 92 agora cobra essa concordância a cada lint.
     role: standalone            # TIER 3 — mas é PORTA DE FRAMEWORK (distribui o bundle standalone), não projeto-adotante
     kind: door          # vendoriza, mas o proposito e DISTRIBUIR o bundle, nao usar num projeto
     parent: onion-evolve

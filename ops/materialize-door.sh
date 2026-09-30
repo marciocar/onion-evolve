@@ -23,7 +23,7 @@
 # NÃO faz `git push`. Publicar é ato outward-facing e é do maestro (I3 — um
 # escritor por repo). O script prepara, verifica e PARA, dizendo o comando.
 #
-# Uso : ops/materialize-door.sh <dir-destino> [--role hub|standalone|adopted]
+# Uso : ops/materialize-door.sh <dir-destino> [--role hub|standalone|adopted] [--force-role-change]
 #       --role default: hub (a porta leva a maquinaria COMPLETA, meta-fábrica
 #       inclusa — decisão do maestro em 2026-09-16, coerente com a liberação da
 #       meta-fábrica selada no mesmo dia).
@@ -31,18 +31,47 @@
 set -uo pipefail
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-DEST=""; ROLE="hub"; SRC_REF=""
+DEST=""; ROLE="hub"; SRC_REF=""; FORCE_ROLE_CHANGE=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --role) ROLE="${2:-hub}"; shift 2 ;;
     --from) SRC_REF="${2:?--from exige uma ref}"; shift 2 ;;
     --from=*) SRC_REF="${1#--from=}"; shift ;;
     --role=*) ROLE="${1#--role=}"; shift ;;
+    --force-role-change) FORCE_ROLE_CHANGE=1; shift ;;
     -h|--help) sed -n '1,40p' "${BASH_SOURCE[0]}"; exit 0 ;;
     *) DEST="$1"; shift ;;
   esac
 done
 [ -n "${DEST}" ] || { echo "ERRO: destino obrigatório. Uso: ops/materialize-door.sh <dir> [--role hub]" >&2; exit 2; }
+
+# ── RECUSA: `--role` que CONTRADIZ o carimbo que a porta já tem ──────────────
+# ⚠️ Esta é a PRIMEIRA linha de defesa do dano de 2026-09-30, e ela mora aqui porque foi aqui que o
+# dano passou. O `members.yaml` dizia `role: standalone` para a `onion-core` enquanto o carimbo dela
+# dizia `hub`; o operador leu a ANOTAÇÃO, rodou `--role standalone`, e a face PÚBLICA do core perdeu
+# 85 arquivos de meta-fábrica (`adopt`, `create-*`, `federation-*`, `marketplace/`, `wizard/`,
+# `skills/onion-publish/`) — publicados mutilados antes de alguém notar.
+# A passada adversarial que forjou esta guarda mediu o ponto exato: o `ROLE` deste script é argumento
+# com default `hub` e o script NUNCA lê o registro — logo nenhum lint de PR no core fica entre o
+# operador e este comando. Só o próprio script pode recusar.
+# É RECUSA, não correção automática: trocar o papel de uma porta é ato deliberado (muda o que ela
+# distribui), então quem quiser trocar diz isso em voz alta com `--force-role-change`. O default
+# protege o caso comum — re-materializar a porta como ela já é.
+STAMP_NOW="${DEST}/.claude/.onion-version"
+if [ -f "${STAMP_NOW}" ]; then
+  ROLE_NOW="$(grep -m1 -E '^[[:space:]]*role:' "${STAMP_NOW}" \
+              | sed 's/^[[:space:]]*role:[[:space:]]*//; s/[[:space:]]*#.*$//; s/[[:space:]]*$//' || true)"
+  if [ -n "${ROLE_NOW}" ] && [ "${ROLE_NOW}" != "${ROLE}" ] && [ "${FORCE_ROLE_CHANGE}" != "1" ]; then
+    echo "ERRO: --role '${ROLE}' CONTRADIZ o carimbo desta porta, que diz '${ROLE_NOW}' (${STAMP_NOW})." >&2
+    echo "      Materializar assim MUDA o que a porta distribui: em 2026-09-30 exatamente isto cortou 85" >&2
+    echo "      arquivos de meta-fábrica da face PÚBLICA do core, porque o operador leu o members.yaml" >&2
+    echo "      (anotado à mão) em vez do carimbo (escrito pela materialização anterior)." >&2
+    echo "      · Para re-materializar como ela É:      ops/materialize-door.sh '${DEST}' --role ${ROLE_NOW}" >&2
+    echo "      · Para TROCAR o papel de propósito:     ops/materialize-door.sh '${DEST}' --role ${ROLE} --force-role-change" >&2
+    echo "      (e então alinhe o \`role:\` da porta no members.yaml, que a REGRA 92 confere)" >&2
+    exit 2
+  fi
+fi
 
 VM="${REPO_ROOT}/.claude/utils/adopt/vendor-manifest.sh"
 [ -f "${VM}" ] || { echo "ERRO: SSOT do transporte ausente (${VM})" >&2; exit 3; }
