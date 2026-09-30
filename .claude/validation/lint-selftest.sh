@@ -258,9 +258,16 @@ _family() {
   if [ -n "${SELFTEST_QUEUE:-}" ] && [ "${name}" != "fixtures" ]; then
     mkdir "${SELFTEST_QUEUE}/claimed/${name}" 2>/dev/null || return 0
   fi
-  if [ "${SELFTEST_ROLE}" = "adopted" ]; then
+  # PREDICADO: "não é o core", não "é adopted". A forma antiga era CEGA para `hub` e `standalone`,
+  # que também CONSOMEM o framework sem autorá-lo. Medido por dogfood em 2026-09-30, atualizando um
+  # hub real: ele rodou as 19 famílias core-only e a `radar_staleness` reprovou 7 casos com
+  # "arquivo inexistente: docs/onion/radar-baselines.yaml" — SSOT que só o core tem, cobrada de quem
+  # nunca a teve. É a mesma classe do passivo de baseline que o `regen-baselines.sh` filtra: papel
+  # lido por igualdade a UM valor envelhece no primeiro papel novo (guarda de lista falha pelo
+  # VOCABULÁRIO). Papéis hoje: source (autor) · adopted · hub · standalone (consumidores).
+  if [ "${SELFTEST_ROLE:-source}" != "source" ]; then
     case ",${SELFTEST_CORE_ONLY_FAMILIES}," in *",${name},"*)
-      record_skip "${name}: core-only (role: adopted — testa SSOT/maquinaria que só o core tem)"
+      record_skip "${name}: core-only (role: ${SELFTEST_ROLE} — testa SSOT/maquinaria que só o core tem)"
       if [ -n "${SELFTEST_QUEUE:-}" ] && [ "${name}" != "fixtures" ]; then : > "${SELFTEST_QUEUE}/done/${name}"; fi
       return 0 ;;
     esac
@@ -19797,6 +19804,17 @@ run_zoho_adapter_selftests() {
   # existentes — a assinatura de enumeração, não a palavra solta) tem de citar os novos. Fora:
   # diary/ (snapshot histórico, não se reescreve), vendor/ (código de terceiro), *baseline.txt.
   # Isenção vai para zoho-parity-exceptions.txt COM razão; o baseline SÓ ENCOLHE.
+  # ⊘ NO ADOTANTE: este caso e o (k) cobram a AUTORIA do framework — que todo sítio do core que
+  # enumera providers cite os novos. No adotante eles leriam o `CLAUDE.md` e o `.env.example` DELE,
+  # que são legitimamente dele: o `.env.example` do core nem chega lá (never-clobber manda para
+  # `.env.example.onion`). Cobrar isso é passivo alheio, a mesma classe que o `regen-baselines.sh`
+  # cura filtrando chave estrangeira. Medido por dogfood em 2026-09-30, num hub real: 13 dos 15
+  # casos passaram e SÓ estes dois reprovaram. O escopo é por CASO, não por família, porque os
+  # outros 13 valem no adotante — o adapter viaja.
+  if [ "${SELFTEST_ROLE:-source}" != "source" ]; then
+    record_skip "zoho-adapter: (j) core-only (role: ${SELFTEST_ROLE} — paridade de AUTORIA; no consumidor leria o CLAUDE.md dele)"
+    record_skip "zoho-adapter: (k) core-only (role: ${SELFTEST_ROLE} — o .env.example do consumidor é dele; o do core vai para .env.example.onion)"
+  else
   local _sem="" _f _n _p
   while IFS= read -r _f; do
     [ -n "${_f}" ] || continue
@@ -19822,6 +19840,7 @@ run_zoho_adapter_selftests() {
   if grep -qF "'zoho'" "${types}" && grep -qF 'ZOHO_PORTAL_ID' "${envex}"; then
     record_pass "zoho-adapter: (k) o tipo TaskManagerProvider inclui 'zoho' e o .env.example documenta as variáveis"
   else record_fail "zoho-adapter: (k)" "types.md sem 'zoho' na união, ou .env.example sem ZOHO_PORTAL_ID — foi exatamente o buraco que a releitura da lista achou"; fi
+  fi
 }
 
 _family run_kb_applies_to_selftests
