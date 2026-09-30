@@ -17750,14 +17750,14 @@ run_door_selftests() {
   local d5; d5="$(mktemp -d)"; rm -rf "${d5}"
   if bash "${REPO_ROOT}/ops/materialize-door.sh" "${d5}" --role standalone >/dev/null 2>&1; then
     # as 5 projeções SSOT que o regenerador produz; basta UMA ausente para o defeito ter voltado
-    local _faltam=0 _p
+    local _absent_n=0 _p
     for _p in docs/onion/inventory.md docs/onion/graph.md docs/onion/kg-read-index.tsv \
               docs/onion/testing-inventory.md docs/onion/testing-state.md; do
-      [ -s "${d5}/${_p}" ] || _faltam=$((_faltam + 1))
+      [ -s "${d5}/${_p}" ] || _absent_n=$((_absent_n + 1))
     done
-    if [ "${_faltam}" -eq 0 ]; then
+    if [ "${_absent_n}" -eq 0 ]; then
       record_pass "door: (f) papel SEM o regenerador ainda sai com as 5 projeções (rodado do core)"
-    else record_fail "door: (f)" "${_faltam} projeção(ões) ausente(s) no papel standalone — o fail-open de :238 voltou"; fi
+    else record_fail "door: (f)" "${_absent_n} projeção(ões) ausente(s) no papel standalone — o fail-open de :238 voltou"; fi
   else record_fail "door: (f)" "materialização standalone abortou"; fi
   rm -rf "${d5}"
 
@@ -19088,6 +19088,31 @@ run_regen_core_projections_selftests() {
     record_pass "regen-core: (d) gerador ausente → declara que não julgou (nunca inventa)"
   else record_fail "regen-core: (d)" "não declarou o gerador ausente: ${out:0:160}"; fi
   rm -rf "${sb}"
+  # (PARIDADE) O core não pode fechar MENOS projeções que o adotante — o achado de fundo de
+  # 2026-09-30. Medido naquele dia: o `regen-ssot-projections.sh`, que VIAJA, fechava seis
+  # projeções (graph, inventory, testing-inventory, testing-state, lint-rules, kg-read-index) e
+  # este, do core, fechava quatro — faltavam `testing-state`, `testing-inventory`, `graph` e
+  # `inventory`. Consequência medida: TRÊS rodadas de CI seguidas reprovadas no mesmo dia, cada uma
+  # por uma projeção que eu tinha de lembrar de regenerar à mão. O predicado é PARIDADE e não lista
+  # digitada de propósito: lista nova é terceira fonte que caduca; paridade se conserta sozinha
+  # quando o regen do adotante cresce.
+  local _ssot="${REPO_ROOT}/.claude/utils/adopt/regen-ssot-projections.sh"
+  local _core="${REPO_ROOT}/.claude/validation/regen-core-projections.sh"
+  if [ -f "${_ssot}" ] && [ -f "${_core}" ]; then
+    local _absent="" _d
+    while IFS= read -r _d; do
+      [ -n "${_d}" ] || continue
+      grep -qF "${_d}" "${_core}" || _absent="${_absent}${_d} "
+    done < <(grep -ohE 'docs/onion/[a-z0-9-]+\.(md|json|html)' "${_ssot}" | sort -u)
+    if [ -z "${_absent}" ]; then
+      record_pass "regen-core: (PARIDADE) toda projeção docs/onion que o regen do ADOTANTE fecha também está no regen do CORE"
+    else
+      record_fail "regen-core: (PARIDADE)" "o core fecha MENOS que o adotante — fora do regen-core: ${_absent}— foi exatamente esta lacuna que reprovou 3 CI em 2026-09-30"
+    fi
+  else
+    record_skip "regen-core: (PARIDADE) um dos dois regens ausente — não medida"
+  fi
+
 }
 
 # ── A REDE DEBAIXO DA REGRA 36 (2026-09-18) ──────────────────────────────────────────────────
