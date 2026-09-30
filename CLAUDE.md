@@ -113,8 +113,9 @@ O Sistema Onion é **provider-agnóstico** para gerenciamento de tarefas — uma
 > `client_credentials` do Self client, que **dispensa grant code e refresh token**. Três armadilhas
 > medidas contra o portal real, todas devolvendo HTTP 200: parâmetro de filtro **aceito e ignorado**
 > (`?search=` devolve a lista inteira), vínculo por **objeto aninhado** (`{"milestone":{"id":…}}` — o
-> `*_id` é ignorado em silêncio) e a **forma da resposta muda por versão E por método**. E `createSubtask`
-> **só existe na V2**, que sai de linha em **2026-12-31** — fio com data, declarado no adapter.
+> `*_id` é ignorado em silêncio) e a **forma da resposta muda por versão E por método**. O aninhamento é a
+> **convenção, não a exceção**: `createSubtask` só funciona por `{"parental_info":{"parent_task_id":…}}` —
+> duas redações anteriores erraram por testar apenas formas planas e declarar impossibilidade.
 
 > **Por que só jira/clickup têm especialista dedicado (decisão de design, não viés):** Jira e ClickUp têm APIs/regras ricas o bastante para justificar um especialista (ADF + JQL + transitions no Jira; formatação Unicode + custom fields + hierarquia/checklists no ClickUp). **Asana e Linear** são integralmente cobertos pelo `@task-specialist` genérico + seu adapter (API-first) — criar especialistas dedicados seria inchar o conjunto de especialistas sem ganho. Em todos os casos, **o consumidor chama a abstração agnóstica** (`taskManager.*`); o adapter resolve transporte (REST API default, MCP opcional), formato e quando acionar o especialista. **Nunca** se chama o MCP/SDK de um provider direto no comando/agente.
 

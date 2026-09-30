@@ -19777,14 +19777,19 @@ run_zoho_adapter_selftests() {
     record_pass "zoho-adapter: (e) o adapter avisa que ?search= NÃO filtra"
   else record_fail "zoho-adapter: (e)" "falta o aviso de que ?search= é aceito e ignorado — searchTasks devolveria a lista inteira como resultado"; fi
 
-  # (f) createSubtask NÃO É IMPLEMENTÁVEL — e a guarda cobra a RECUSA, não a promessa.
-  # A versão anterior deste caso canonizava o defeito: cobrava "V2 + 2026-12-31", que era a
-  # promessa falsa. Medido em duas rodadas: a V2 devolve 201 e a task nasce RASA (`/subtasks/`
-  # responde 204 vazio, o pai segue `depth: 0`), e as três formas V3 dão 400. Aceitar o 201 como
-  # prova é a armadilha da §1 do próprio arquivo, cometida no único ponto onde ele prometia algo.
-  if grep -qF 'ZOHO_SUBTASK_WRITE_NOT_EXPOSED' "${ad}" && grep -qF '204' "${ad}" && grep -qiE 'rasa|SEM CAMINHO' "${ad}"; then
-    record_pass "zoho-adapter: (f) createSubtask declara a RECUSA nomeada e a evidência (201 com task rasa)"
-  else record_fail "zoho-adapter: (f)" "createSubtask precisa recusar com ZOHO_SUBTASK_WRITE_NOT_EXPOSED e mostrar a evidência (V2 → 201 e task RASA, /subtasks/ → 204 vazio) — sem isso o adapter volta a prometer hierarquia que a API não faz"; fi
+  # (f) createSubtask usa o vínculo ANINHADO. A guarda cobra a FORMA, e a razão é a história deste
+  # caso: em 2026-09-30 ele mudou DUAS vezes num dia. Primeiro cobrava "V2 + 2026-12-31", canonizando
+  # a promessa falsa de que a V2 entregava subtask (aceitei um 201 sem abrir o corpo). Depois cobrava
+  # a RECUSA — e canonizava uma impossibilidade que também era falsa: eu havia testado só as formas
+  # PLANAS (`parent_task`, `parent`, `parent_task_id` no topo, os três 400) e concluído que não havia
+  # caminho. A KB de um adotante, mais nova, trazia `parental_info.parent_task_id`, e a sonda
+  # confirmou na hora: filha `depth: 1`, pai `has_subtasks: true`.
+  # Por isso o caso agora cobra o ANINHAMENTO — a convenção que a §1 do adapter já declarava e que
+  # eu não apliquei a mim. Guarda que canoniza a conclusão da semana passada é pior que guarda nenhuma.
+  local _sec_sub; _sec_sub="$(_zoho_sec 'createSubtask')"
+  if grep -qF '"parental_info":{"parent_task_id"' <<< "$(printf '%s' "${_sec_sub}")" && grep -qF 'depth' <<< "${_sec_sub}"; then
+    record_pass "zoho-adapter: (f) createSubtask usa o vínculo ANINHADO parental_info, com a evidência (depth 1 / has_subtasks)"
+  else record_fail "zoho-adapter: (f)" "a seção do createSubtask não mostra \`{\"parental_info\":{\"parent_task_id\":…}}\` nem a evidência medida (filha depth 1, pai has_subtasks true) — as formas PLANAS dão 400 e já produziram DUAS conclusões erradas neste arquivo"; fi
 
   # (g)(h) o roteamento existe e o detector conhece as variáveis
   if grep -qF "case 'zoho':" "${fac}"; then

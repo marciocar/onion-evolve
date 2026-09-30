@@ -537,8 +537,8 @@ verificada. O adapter é [`adapters/zoho.md`](../../../.claude/utils/task-manage
 | `getTask` | `GET …/tasks/{id}` | o `status` vem como objeto com `is_closed_type` |
 | `updateTask` | **`PATCH`** …/tasks/{id}` | `PUT`/`POST` → `INVALID_METHOD` |
 | `deleteTask` | **`DELETE`** …/tasks/{id}` → 204 | ⚠️ **assimétrico**: projeto exige `POST …/trash` |
-| `createSubtask` | 🚫 **sem caminho nenhum** — o adapter recusa | a V2 devolve **201 e task RASA** (`isparent: False`, `/subtasks/` → 204 vazio, pai segue `depth: 0`); na V3 `parent_task`/`parent`/`parent_task_id` → 400; sub-recursos → `URL_RULE_NOT_CONFIGURED`. A 1ª redação aceitou o `201` como prova — a armadilha que esta própria KB documenta |
-| `getSubtasks` | ⚠️ **sem caminho confiável** | `?parent_task=` devolve a lista inteira, com a própria task pai — e como não há escrita de subtask, não há hierarquia a listar |
+| `createSubtask` | `POST …/tasks` com `{"parental_info":{"parent_task_id":…}}` | vínculo **aninhado**; filha nasce `depth: 1` e o pai vira `has_subtasks: true` (conferido no corpo). As formas PLANAS (`parent_task`, `parent`, `parent_task_id` no topo) dão 400, e a V2 devolve 201 com task RASA — duas redações anteriores erraram, uma em cada direção |
+| `getSubtasks` | filtrar no CLIENTE por `parental_info.parent_task_id` | `?parent_task=` é aceito e ignorado (lista inteira). O filtro por `criteria` que um adotante documenta NÃO foi localizado: `POST …/tasks/search` devolve `URL_RULE_NOT_CONFIGURED` — lacuna declarada, não inexistência |
 | `addComment` | `POST …/tasks/{id}/comments`, campo **`comment`** | resposta é **array**; `content`/`text`/`body` dão `LESS_THAN_MIN_OCCURANCE` |
 | `getComments` | `GET …/tasks/{id}/comments` | resposta é **objeto** `{comments, page_info}` — forma diferente do POST |
 | `updateStatus` | `PATCH …/tasks/{id}` com `{"status":{"id":…}}` | `custom_status` recusa **nome e id** |
