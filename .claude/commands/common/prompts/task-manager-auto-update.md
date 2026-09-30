@@ -46,6 +46,7 @@ O comando passa o **conteúdo** agnóstico para `taskManager.addComment(...)`; *
 | `clickup` | Unicode (`━━━`, `∟`, `▶`) | `adapters/clickup.md` · `common:prompts:clickup-patterns` |
 | `jira` | ADF (Atlassian Document Format) | `adapters/jira.md` |
 | `asana` | HTML/Markdown (story) | `adapters/asana.md` |
+| `zoho` | Markdown simples (campo `comment`; POST devolve array, GET devolve objeto) | `adapters/zoho.md` |
 | `linear` | Markdown | `adapters/linear.md` |
 | `none` | — (local, sem persistir) | — |
 

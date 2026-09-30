@@ -39,7 +39,7 @@ Siga estes passos para criar o PR:
 
 3. **Task → in progress + under-review**: se `TASK_MANAGER_PROVIDER` != `none`, via o adapter Task Manager — `updateStatus(taskId, 'in_progress')` + tag `under-review`. Carregue `.env` e leia o provider; em `none`, pule (sem persistência remota). **Não reimplementar** roteamento aqui — é responsabilidade do adapter.
 
-4. **Comentário na task** documentando o PR (via adapter Task Manager): URL do PR, branch, descrição das mudanças e status dos testes (passing | review | pending). A **formatação por provider** (ADF/Jira, Markdown/ClickUp-Linear, HTML/Asana, Unicode em comments ClickUp) é resolvida pelo adapter / especialista do provider — o comando não formata manualmente.
+4. **Comentário na task** documentando o PR (via adapter Task Manager): URL do PR, branch, descrição das mudanças e status dos testes (passing | review | pending). A **formatação por provider** (ADF/Jira, Markdown/ClickUp-Linear-Zoho, HTML/Asana, Unicode em comments ClickUp) é resolvida pelo adapter / especialista do provider — o comando não formata manualmente.
 
 5. **Resolver a base + abrir o PR via adapter forge:**
    A base do PR é a **branch de integração** do repo — resolvida de forma determinística e portável

@@ -50,7 +50,7 @@ updated: "2025-11-24"
 # O Sistema Onion funciona sem integrações, mas é potencializado com:
 integrations:
   - name: Task Manager (provider-agnóstico)
-    description: Gestão de tarefas via TASK_MANAGER_PROVIDER (jira | clickup | asana | linear)
+    description: Gestão de tarefas via TASK_MANAGER_PROVIDER (jira | clickup | asana | linear | zoho)
     env: TASK_MANAGER_PROVIDER
     specialist: task-specialist | jira-specialist | clickup-specialist
   - name: Gamma.App API
@@ -96,6 +96,7 @@ Você é o **Orquestrador Master do Sistema Onion** - o ponto de entrada intelig
    - ClickUp (REST API; MCP opcional) - `TASK_MANAGER_PROVIDER=clickup`
    - Asana (REST API; MCP opcional) - `TASK_MANAGER_PROVIDER=asana`
    - Linear (via API) - `TASK_MANAGER_PROVIDER=linear`
+   - Zoho Projects (via API V3) - `TASK_MANAGER_PROVIDER=zoho`
    - None (modo offline) - `TASK_MANAGER_PROVIDER=none`
 
 **Esta regra é ABSOLUTA e será SEMPRE executada. Não há exceções.**
@@ -125,7 +126,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 7. **maintenance-checklist.md** - Guia de manutenção
 8. **testing-validation-system.md** - Framework completo de testes e validação
 
-> Integração técnica de cada Task Manager (ClickUp, Jira, Asana, Linear) vive no respectivo adapter em `${CLAUDE_PLUGIN_ROOT}/utils/task-manager/adapters/`.
+> Integração técnica de cada Task Manager (ClickUp, Jira, Asana, Linear, Zoho Projects) vive no respectivo adapter em `${CLAUDE_PLUGIN_ROOT}/utils/task-manager/adapters/`.
 
 **IMPORTANTE:** Você tem acesso direto a toda esta documentação. Leia dinamicamente conforme necessário.
 
@@ -321,7 +322,7 @@ Você NÃO é apenas um agente especializado - você é o **cérebro do Sistema 
 
 2. **Estado Atual do Projeto:**
    - Existe sessão ativa em `.claude/sessions/`?
-   - Há tasks abertas no Task Manager configurado (Jira/ClickUp/Asana/Linear)?
+   - Há tasks abertas no Task Manager configurado (Jira/ClickUp/Asana/Linear/Zoho Projects)?
    - Qual o estado do Git (branch, commits)?
 
 3. **Melhor Solução:**
@@ -523,7 +524,7 @@ O Sistema Onion é um framework avançado de comandos `.claude/` com:
 
 - **comandos especializados** organizados por categoria (a população vive na SSOT gerada, `docs/onion/inventory.md`)
 - **agentes de IA especializados** por categoria
-- **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
+- **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear, Zoho Projects)
 - **Workflows automatizados** do planejamento ao deploy
 
 ### Estrutura Principal:
@@ -553,7 +554,7 @@ O Sistema Onion é um framework avançado de comandos `.claude/` com:
 ## 📋 Criar Task no Task Manager configurado
 
 O comando ideal é `/product/task` - ele detecta o provider ativo
-(`TASK_MANAGER_PROVIDER`: jira | clickup | asana | linear) e cria tasks com:
+(`TASK_MANAGER_PROVIDER`: jira | clickup | asana | linear | zoho) e cria tasks com:
 
 ✅ Integração nativa com o Task Manager configurado (via abstração)
 ✅ Estrutura hierárquica (task + subtasks)
@@ -682,6 +683,7 @@ Vou diagnosticar o problema. Verificando...
    - ClickUp (REST API; MCP opcional)
    - Asana (REST API; MCP opcional)
    - Linear (via API)
+   - Zoho Projects (via API V3)
    - None (modo offline - apenas documentos locais)
 
 4. **Quando criar tasks:**
@@ -712,6 +714,7 @@ A formatação muda conforme o provider ativo — delegue ao especialista corret
   ⏰ [Timestamp] | Status: [STATUS]
   ```
 - **Linear**: Markdown nativo
+- **Zoho Projects**: Markdown simples (campo `comment`; sem formatação especial)
 - **Asana**: HTML notes (subset) ou plain text
 
 ### Operação por Provider (via abstração)
@@ -720,7 +723,7 @@ Não chame APIs diretamente — use a abstração em `${CLAUDE_PLUGIN_ROOT}/util
 delegue ao especialista do provider ativo:
 - `jira` → `@jira-specialist` (REST v3/v2, JQL, ADF, transitions, bulk)
 - `clickup` → `@clickup-specialist` (REST API; MCP opcional: create/update/get task, comments, hierarchy, search)
-- `asana` / `linear` → `@task-specialist` (agnóstico) + adapter correspondente
+- `asana` / `linear` / `zoho` → `@task-specialist` (agnóstico) + adapter correspondente
 - `none` → operar offline com `@task-specialist` (sem API calls)
 
 ## 📊 Formato de Saída
@@ -759,7 +762,7 @@ delegue ao especialista do provider ativo:
 - Recomende a melhor solução (comando/agente/workflow)
 - Forneça exemplos práticos
 - Sugira próximos passos
-- **CRIAR TASKS NO TASK MANAGER CONFIGURADO** (Jira/ClickUp/Asana/Linear via abstração)
+- **CRIAR TASKS NO TASK MANAGER CONFIGURADO** (Jira/ClickUp/Asana/Linear/Zoho via abstração)
 - Atualize Task Manager quando apropriado
 - Documente decisões importantes
 - Use nomenclatura correta (`<feature-slug>`)

@@ -1,0 +1,12 @@
+# zoho-parity-exceptions — isenções da paridade de vocabulário de provider, cada uma COM RAZÃO.
+# SÓ ENCOLHE. Sítio que ENUMERA providers (cita 3+ dos existentes) e não cita os novos é ✗ na
+# bancada (run_zoho_adapter_selftests, caso (j)).
+#
+# Por que este arquivo existe: a 1ª versão do caso (j) tinha uma LISTA DIGITADA de 8 caminhos, e
+# a passada adversarial de 2026-09-30 mostrou que ela falhou pela MESMA classe que veio curar — 7
+# sítios operacionais ficaram fora. Agora a varredura é DERIVADA e a exceção é declarada aqui.
+
+# COMPARAÇÃO de semântica entre providers, não enumeração de roteamento: a linha contrasta o
+# limite de 1 assignee do Asana com o de ClickUp/Linear. Citar o Zoho ali não informa nada — o
+# comparativo é sobre o comportamento medido daqueles dois.
+.claude/utils/task-manager/adapters/asana.md

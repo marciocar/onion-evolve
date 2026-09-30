@@ -7,7 +7,7 @@ Agentes da **dimensão de produto** do Onion: cobrem a descoberta (dor, reuniõe
 | Agente | Especialidade | Quando usar |
 |--------|---------------|-------------|
 | [`@product-agent`](product-agent.md) | Gestão estratégica de produto AI e coordenação de iniciativas | Roadmap, priorização e especificação de funcionalidades em qualquer task manager. |
-| [`@task-specialist`](task-specialist.md) | Decomposição agnóstica em tasks/subtasks/action items | Quebrar requisitos em estrutura hierárquica (ClickUp, Jira, Asana, Linear). |
+| [`@task-specialist`](task-specialist.md) | Decomposição agnóstica em tasks/subtasks/action items | Quebrar requisitos em estrutura hierárquica (ClickUp, Jira, Asana, Linear, Zoho Projects). |
 | [`@story-points-framework-specialist`](story-points-framework-specialist.md) | Estimativas ágeis via Framework de Story Points | Estimar tarefas, quebrar épicos e calibrar velocity do time. |
 | [`@pain-price-specialist`](pain-price-specialist.md) | Análise de dor do cliente e precificação por outcome | Identificar dores, oportunidades de valor e precificação (JTBD, Value Proposition Canvas). |
 | [`@branding-positioning-specialist`](branding-positioning-specialist.md) | Branding e posicionamento estratégico de marca | Brand positioning, identidade, guidelines e análise competitiva. |

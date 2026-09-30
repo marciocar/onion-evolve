@@ -252,18 +252,22 @@ curl -s -X POST 'https://accounts.zoho.com/oauth/v2/token' \
 **Um refresh_token a menos é um segredo a menos para guardar e rotacionar** — para um job de servidor
 que é dono dos próprios dados, `client_credentials` é o caminho mais simples E o mais seguro.
 
-### ⚠️ O identificador de portal NÃO é o mesmo nas duas versões
+### ⚠️ O `login_id` do envelope V2 é o USUÁRIO, não um portal id
 
-Medido em 2026-09-30, no mesmo portal e com o mesmo token:
+Corrigido em 2026-09-30 **por medição**, contra o que esta seção afirmava antes. As duas versões usam
+o **mesmo** id de portal no caminho:
 
 ```
-V3  GET /api/v3/portals    → id = 940471693
-V2  GET /restapi/portals/  → login_id = 2971200
+V3  GET /api/v3/portals                       → [ { "id": <PORTAL>, "owner": { "id": <USUARIO> } } ]
+V2  GET /restapi/portals/                     → { "login_id": <USUARIO>, "portals": [ { "id": <PORTAL> } ] }
+V2  GET /restapi/portal/<PORTAL>/projects/    → 200
+V2  GET /restapi/portal/<USUARIO>/projects/   → 404  6504 Domain Not Available
 ```
 
-São **campos diferentes de versões diferentes**, e não são intercambiáveis. Como quase toda chamada
-leva o identificador do portal no caminho, trocá-los produz erro que parece de permissão. O adapter
-resolve o identificador **na mesma versão** em que vai chamar — e o teste de fumaça de qualquer
+`login_id` está **no topo** do envelope, ao lado de `portals[]`, e bate com `owner.id` da V3 — é o dono,
+não uma variante de portal id. O erro de trocá-los **não** parece de permissão: é `6504 Domain Not
+Available`, um 404. A lição de classe: **nome de campo é declaração**; o que ele é só a chamada diz. E o
+teste de fumaça de qualquer
 integração nova é pedir o portal e conferir de qual campo veio.
 
 ### A forma da resposta MUDA entre as versões, e isso é decisão de parsing
@@ -478,7 +482,7 @@ nenhuma busca** deram, e cada um é decisão de adapter:
 | 4 | status se muda por **`status`**, objeto com `id` | `{"status":{"id":"…"}}` → 200 · `{"custom_status": <nome ou id>}` → `INVALID_PARAMETER_VALUE` nas duas formas |
 | 5 | **não achei endpoint que LISTE os status** | `taskstatuses`, `statuses`, `customstatus`, `custom_status`, `settings/statuses` e o equivalente V2: todos 400. O id do status vem **de dentro da própria task** |
 | 6 | o erro de validação **nomeia o campo** | `EXTRA_KEY_FOUND_IN_JSON` + `details[].field_name: "owner"` — dá para tratar com precisão |
-| 7 | `portal_id` (V3) ≠ `login_id` (V2) | medido no mesmo portal: `940471693` × `2971200` |
+| 7 | o `login_id` da V2 é o **usuário**, não um portal id | as duas versões usam o mesmo id de portal no caminho; o `login_id` bate com `owner.id` da V3, e usá-lo na URL dá **404 `6504 Domain Not Available`** (achado corrigido por medição; a 1ª redação estava invertida) |
 | 8 | **remover projeto é `POST …/trash`**, não `DELETE` | `DELETE /projects/{id}` → 404 (e o erro cita `method: POST`) · `DELETE /projects/{id}/` → 400 · **`POST /projects/{id}/trash` → 204** · e o `PATCH` seguinte devolve **410 Gone**, que é a confirmação por comportamento |
 
 **O achado nº 2 é o mais perigoso**, e por isso está aqui em primeiro lugar entre iguais: `milestone_id`
@@ -533,8 +537,8 @@ verificada. O adapter é [`adapters/zoho.md`](../../../.claude/utils/task-manage
 | `getTask` | `GET …/tasks/{id}` | o `status` vem como objeto com `is_closed_type` |
 | `updateTask` | **`PATCH`** …/tasks/{id}` | `PUT`/`POST` → `INVALID_METHOD` |
 | `deleteTask` | **`DELETE`** …/tasks/{id}` → 204 | ⚠️ **assimétrico**: projeto exige `POST …/trash` |
-| `createSubtask` | ⚠️ **só na V2**: `POST /restapi/…/tasks/` com `parent_task_id` → 201 | na V3 `parent_task` recusa objeto, string e `depth`; sub-recursos dão `URL_RULE_NOT_CONFIGURED` |
-| `getSubtasks` | ⚠️ **sem caminho confiável** | `?parent_task=` devolve a lista inteira, com a própria task pai; a subtask da V2 vem com `depth: 0` |
+| `createSubtask` | 🚫 **sem caminho nenhum** — o adapter recusa | a V2 devolve **201 e task RASA** (`isparent: False`, `/subtasks/` → 204 vazio, pai segue `depth: 0`); na V3 `parent_task`/`parent`/`parent_task_id` → 400; sub-recursos → `URL_RULE_NOT_CONFIGURED`. A 1ª redação aceitou o `201` como prova — a armadilha que esta própria KB documenta |
+| `getSubtasks` | ⚠️ **sem caminho confiável** | `?parent_task=` devolve a lista inteira, com a própria task pai — e como não há escrita de subtask, não há hierarquia a listar |
 | `addComment` | `POST …/tasks/{id}/comments`, campo **`comment`** | resposta é **array**; `content`/`text`/`body` dão `LESS_THAN_MIN_OCCURANCE` |
 | `getComments` | `GET …/tasks/{id}/comments` | resposta é **objeto** `{comments, page_info}` — forma diferente do POST |
 | `updateStatus` | `PATCH …/tasks/{id}` com `{"status":{"id":…}}` | `custom_status` recusa **nome e id** |

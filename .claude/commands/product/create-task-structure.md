@@ -3,7 +3,7 @@ name: create-task-structure
 description: |
   Decomposição de tarefas complexas em estrutura hierárquica.
   Use para criar estrutura organizada de subtarefas.
-  Diferença vs /product:task: este é decomposição LOCAL read-only (saída textual); o /product:task PERSISTE no task manager ativo (Jira/ClickUp/Asana/Linear).
+  Diferença vs /product:task: este é decomposição LOCAL read-only (saída textual); o /product:task PERSISTE no task manager ativo (Jira/ClickUp/Asana/Linear/Zoho Projects).
 allowed-tools: Read
 
 parameters:

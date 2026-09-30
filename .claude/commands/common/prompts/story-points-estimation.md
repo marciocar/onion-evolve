@@ -58,7 +58,7 @@ e **recomendações**. Referência visual:
 
 > A formatação do comentário no provider ativo é resolvida pelo adapter — Unicode
 > no ClickUp (via `common:prompts:clickup-patterns`), ADF no Jira, Markdown no
-> Linear. Não re-soletrar o template por provider aqui.
+> Linear e no Zoho Projects. Não re-soletrar o template por provider aqui.
 
 ## Validação de consistência (obrigatória)
 

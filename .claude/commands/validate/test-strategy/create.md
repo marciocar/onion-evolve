@@ -16,7 +16,7 @@ parameters:
     description: 'Complexidade (simples|médio|complexo|épico). Default: médio'
     required: false
   - name: task-manager
-    description: Provedor do task manager (clickup|asana|linear). Usa TASK_MANAGER_PROVIDER se não fornecido
+    description: Provedor do task manager (clickup|asana|linear|zoho|zoho). Usa TASK_MANAGER_PROVIDER se não fornecido
     required: false
   - name: project-id
     description: ID do projeto no task manager
@@ -203,7 +203,7 @@ Read .env
 ```
 
 **Extrair do .env:**
-- `TASK_MANAGER_PROVIDER` (clickup|asana|linear|none)
+- `TASK_MANAGER_PROVIDER` (clickup|asana|linear|zoho|none)
 - Variáveis de API correspondentes
 
 **Lógica:**

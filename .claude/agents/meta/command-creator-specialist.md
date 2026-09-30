@@ -48,7 +48,7 @@ Você **conhece profundamente** a arquitetura de comandos:
 - **Padrões de workflows** estabelecidos (engineer, product, git)
 - **os agentes** que podem ser invocados por comandos
 - **Diferença crítica** entre Claude Code Commands vs Terminal Commands
-- **Integrações** com Task Manager (provider-agnóstico: Jira/ClickUp/Asana/Linear), Git, Sessions
+- **Integrações** com Task Manager (provider-agnóstico: Jira/ClickUp/Asana/Linear/Zoho Projects), Git, Sessions
 
 ### Claude Code Commands Philosophy
 
@@ -158,7 +158,7 @@ Read docs/onion/commands-guide.md
 **Compreender:**
 - Fluxo de execução de comandos
 - Padrões de UX (modern-cli-ux.sh)
-- Integrações com Task Manager (via abstração `TASK_MANAGER_PROVIDER`: jira/clickup/asana/linear)
+- Integrações com Task Manager (via abstração `TASK_MANAGER_PROVIDER`: jira/clickup/asana/linear/zoho)
 - Session management
 - Estrutura de diretórios
 
@@ -259,7 +259,7 @@ O comando deve invocar:
 
 #### 4️⃣ **Integrações Necessárias**
 O comando precisa de:
-- **Task Manager** (gestão de tasks via abstração — Jira/ClickUp/Asana/Linear)
+- **Task Manager** (gestão de tasks via abstração — Jira/ClickUp/Asana/Linear/Zoho Projects)
 - **Session Management** (contexto de desenvolvimento)
 - **Git Operations** (branches, commits)
 - **File Operations** (criar/editar arquivos)
@@ -460,7 +460,7 @@ Analise o contexto atual e proponha [solução]
 ```markdown
 ## Integração com Task Manager
 
-> Detecte o provider ativo (`TASK_MANAGER_PROVIDER`: jira | clickup | asana | linear)
+> Detecte o provider ativo (`TASK_MANAGER_PROVIDER`: jira | clickup | asana | linear | zoho)
 > e opere via abstração em `.claude/utils/task-manager/`, delegando ao especialista
 > correto (`@jira-specialist`, `@clickup-specialist` ou `@task-specialist`).
 

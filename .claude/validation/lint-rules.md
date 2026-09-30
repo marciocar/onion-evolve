@@ -11,12 +11,16 @@
 >
 > A coluna **O que previne** vem do campo `# previne:` no docstring de cada regra (o
 > modo-de-falha que ela evita). A REGRA 39 mantém este arquivo em paridade com as guardas,
-> e o gerador **falha (exit 2)** nas **5 catracas de clareza** — número duplicado · regra
+> e o gerador **falha (exit 2)** nas **6 catracas de clareza** — número duplicado · regra
 > sem categoria · regra sem `# previne:` · regra sem o tag `[SEV]` · severidade que não
-> resolve. Regra nova sem essas quatro declarações não entra: é anti-drift por construção.
+> resolve · **regra órfã** (header sem função própria). Regra nova sem essas declarações
+> não entra: é anti-drift por construção.
 >
-> **Limite conhecido da derivação** (medido 2026-08-03, `gated-until-trigger`: sem dano
-> observado, não vale reescrever o parser): o scan associa a cada regra o **primeiro**
+> **Limite conhecido da derivação** — e ele JÁ CAUSOU DANO (2026-09-30, duas vezes no
+> mesmo dia: a REGRA 85 saiu HARD em vez de HARD + SOFT porque um bloco novo entrou entre
+> o header dela e a sua função, e a projeção byte-a-byte aprovou o valor errado). Desde
+> então a **catraca nº6** reprova regra órfã, com isenções declaradas. O scan segue
+> associando a cada regra o **primeiro**
 > `nome() {` após o header, então em regras cujo header antecede um *helper* — ou que
 > **delegam** a um script externo com `violation "${sev}"` dinâmico — a severidade vem do
 > tag `[SEV]`, não do corpo. Hoje as duas fontes concordam em **todas** as regras (nenhuma
@@ -27,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**91 regras** no total — **80 HARD**, **29 SOFT**.
+**91 regras** no total — **80 HARD**, **30 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -110,7 +114,7 @@ Toda superfície DERIVADA fica em sincronia com a fonte única — contagens, ma
 | 81 | Painel de estado é GERADO dos produtores, nunca redigido | HARD | painel de testes com número sem produtor — metas redesenhadas como medição, que foi o defeito real deste repo |
 | 83 | Id de modelo VERSIONADO só na SSOT declarada | HARD | versão literal de modelo espalhada por config, que caduca sem aviso |
 | 84 | Índice de leitura do KG em sincronia com os traces | HARD + SOFT | o hook da perna de leitura mentir POR OMISSÃO |
-| 85 | Porta pública espelha o core, com catraca | HARD | a porta MENTIR sobre o que o core é, por falta de re-materialização |
+| 85 | Porta pública espelha o core, com catraca | HARD + SOFT | a porta MENTIR sobre o que o core é, por falta de re-materialização |
 | 90 | Prosa de comando conhece os papéis que o script aceita | SOFT | o par script×prosa dos comandos de co-evolução desencontrar — e ele JÁ desencontrou duas |
 | 92 | Papel da porta no registro concorda com o CARIMBO dela | HARD + SOFT | o materializador ler o papel ERRADO e cortar maquinaria da porta pública |
 

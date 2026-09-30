@@ -48,7 +48,7 @@ Atualizar um Pull Request existente com mudanças adicionais. Este comando autom
 
 ## 🤝 Integração com o Task Manager
 
-Antes de operar com a task, carregue o `.env` e leia `TASK_MANAGER_PROVIDER` (`jira` | `clickup` | `asana` | `linear` | `none`) para rotear ao provider e adapter corretos. Se `none`, pule a atualização remota (apenas commit + push).
+Antes de operar com a task, carregue o `.env` e leia `TASK_MANAGER_PROVIDER` (`jira` | `clickup` | `asana` | `linear` | `zoho` | `none`) para rotear ao provider e adapter corretos. Se `none`, pule a atualização remota (apenas commit + push).
 
 ### Detecção de Task Ativa
 - Lê task ID do arquivo `.claude/sessions/[slug]/context.md`

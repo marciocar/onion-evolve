@@ -11,7 +11,7 @@ Define o contrato que todos os adapters de gerenciadores de tarefas devem implem
 ```typescript
 /**
  * Interface abstrata para gerenciadores de tarefas.
- * Todos os adapters (ClickUp, Asana, Linear) devem implementar esta interface.
+ * Todos os adapters (ClickUp, Asana, Jira, Linear, Zoho Projects) devem implementar esta interface.
  */
 interface ITaskManager {
   // ═══════════════════════════════════════════════════════════════════════════
@@ -19,7 +19,7 @@ interface ITaskManager {
   // ═══════════════════════════════════════════════════════════════════════════
   
   /**
-   * Nome do provedor: 'clickup' | 'asana' | 'jira' | 'linear' | 'none'
+   * Nome do provedor: 'clickup' | 'asana' | 'jira' | 'linear' | 'zoho' | 'none'
    */
   readonly provider: TaskManagerProvider;
   

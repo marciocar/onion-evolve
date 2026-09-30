@@ -96,10 +96,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: 2026-09-30
-    verified_against: "docs/backlog.md e PROJECAO GERADA (kg-backlog-project.sh) dos nos status:open — 229 itens abertos em 51 grafos, ordenados por atencao, e traz escrito 'nao editar a mao: feche o item no grafo e ele sai daqui'."
+    verified_against: "docs/backlog.md e PROJECAO GERADA (kg-backlog-project.sh) dos nos status:open, ordenados por atencao, com 'nao editar a mao: feche o item no grafo e ele sai daqui' escrito no topo. O NUMERO nao entra neste no de proposito: a 1a versao cravou '229 em 51' e a projecao do MESMO commit ja dizia 230 em 52 — o no invalidava o proprio numero ao nascer, pela 4a vez nesta classe. O FATO e que o backlog e projecao do grafo; a populacao vive na projecao, que se regenera."
     source_kind: repo
     source_tier: 10
-    label: "o backlog do core JA EXISTE e JA e projecao do grafo: 229 itens abertos em 51 grafos, com regua de atencao e proibicao de edicao manual"
+    label: "o backlog do core JA EXISTE e JA e projecao do grafo, com regua de atencao e proibicao de edicao manual (a populacao vive na projecao, nunca carimbada aqui)"
 
   # ── AS DUAS DECISÕES SELADAS ────────────────────────────────────────────────────────────────
   - id: D_SLUG_DA_SESSION_E_A_BRANCH

@@ -61,7 +61,7 @@ related_agents:               ✅ Agentes relacionados corretos
 **Task Manager:**
 - ✅ Referência correta a `.claude/utils/task-manager/`
 - ✅ Detecção de provedor documentada
-- ✅ Suporte a ClickUp, Asana, Linear, None
+- ✅ Suporte a ClickUp, Asana, Jira, Linear, Zoho Projects, None
 - ✅ Modo offline funcional
 
 **Agentes:**
@@ -193,7 +193,7 @@ related_commands:                          ✅ Comandos relacionados corretos
 
 **Detecção de Provedor:**
 - ✅ `detectProvider()` implementado
-- ✅ Suporte a ClickUp, Asana, Linear, None
+- ✅ Suporte a ClickUp, Asana, Jira, Linear, Zoho Projects, None
 - ✅ Validação de variáveis de ambiente
 - ✅ Mensagens de erro claras
 

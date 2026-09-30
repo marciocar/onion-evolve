@@ -1,3 +1,12 @@
+---
+versao: 1.0.0
+data: 2026-09-30
+categoria: patterns
+applies_to: "GLPI 11.0.x (API V1 + API V2) · Zoho Projects API V3 — o fluxo é desenho sobre as duas APIs, NADA foi executado contra instância real"
+verified_at: 2026-09-30
+verified_against: "absorvida de um adotante hub em 2026-09-30, com scrub. As duas KBs de origem foram medidas (GLPI na fonte primária; Zoho contra portal real); ESTE documento é o desenho que as combina e não foi executado."
+---
+
 # GLPI → Zoho Projects: chamado vira tarefa de projeto — Estudo e Fluxo
 
 > **Versão**: 1.0.0 | **Última atualização**: 2026-09-30 | **Categoria**: Patterns

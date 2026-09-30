@@ -293,6 +293,12 @@ for ln in L:
     if cur and ln.startswith("}"): cur = None; continue
     if not cur: continue
     for p in re.findall(r"(?:\$\{?REPO_ROOT\}?|\$\{?SCRIPT_DIR\}?)/((?:\.claude|ops|docs|plugins|\.githooks|\.github)/[A-Za-z0-9_./-]+)", ln): fams[cur].add(p)
+    # ARQUIVO DE RAIZ (2026-09-30): a lista de prefixos acima não alcança `CLAUDE.md`, `.env.example`
+    # nem `README.md`, e isso NÃO cai no failsafe: o failsafe só vale quando o conjunto da família
+    # fica VAZIO (imprime `*`). Uma família com SUT na raiz + qualquer SUT sob .claude/ tem conjunto
+    # não-vazio e, por isso, deixaria de rodar num commit que toca SÓ o arquivo de raiz — fail-open.
+    # Achado por passada adversarial na família do adapter Zoho, cujo SUT inclui `.env.example`.
+    for p in re.findall(r"(?:\$\{?REPO_ROOT\}?)/(CLAUDE\.md|\.env\.example|README\.md)", ln): fams[cur].add(p)
     for p in re.findall(r"\$\{?SCRIPT_DIR\}?/([A-Za-z0-9_.-]+\.sh)", ln): fams[cur].add(".claude/validation/" + p)
     if re.search(r"\brun_(lint|fix)_fixture\b|\$\{?LINT\}?\b", ln): fams[cur].add(".claude/validation/lint-artifacts.sh")
     if re.search(r"\brun_kg_fixture\b", ln): fams[cur].add(".claude/validation/kg-radar.sh")
@@ -19658,45 +19664,122 @@ run_zoho_adapter_selftests() {
   local iface="${REPO_ROOT}/.claude/utils/task-manager/interface.md"
   local fac="${REPO_ROOT}/.claude/utils/task-manager/factory.md"
   local det="${REPO_ROOT}/.claude/utils/task-manager/detector.md"
+  local types="${REPO_ROOT}/.claude/utils/task-manager/types.md"
+  local envex="${REPO_ROOT}/.env.example"
+  local base_j="${REPO_ROOT}/.claude/validation/zoho-parity-exceptions.txt"; : "${base_j}"
   if [ ! -f "${ad}" ]; then record_fail "zoho-adapter" "SUT ausente: ${ad}"; return; fi
 
-  # (a) PARIDADE com a interface — a lista de membros sai de interface.md, não é digitada aqui.
-  # Predicado de paridade porque lista digitada é terceira fonte que caduca.
+  # `_zoho_sec <regex-do-header>` devolve a seção `### …` do adapter, SEM espaços. Existe porque a
+  # bancada anterior grepava o arquivo INTEIRO: a regra em prosa da §1 cita as formas corretas, então
+  # um mutante que corrompia só o EXEMPLO da seção sobrevivia — o documento passava a se contradizer
+  # e a guarda não via. Medido por mutação em 2026-09-30 (M6 e M9 sobreviveram assim).
+  _zoho_sec() { awk -v re="$1" '$0 ~ "^### " && $0 ~ re {f=1; next} f && /^### / {exit} f {print}' "${ad}" | tr -d ' \t'; }
+
+  # A FORMA COMPACTA do documento: as asserções de JSON comparam SEM espaço, senão `{ "a": { "b"` e
+  # `{"a":{"b"` seriam achados diferentes e a guarda dependeria de como alguém formatou a linha.
+  local _flat; _flat="$(tr -d ' \t' < "${ad}")"
+
+  # (a) PARIDADE com a interface — a lista sai de interface.md, nunca digitada aqui.
+  # DUAS correções de 2026-09-30, as duas achadas por mutação:
+  #   · o regex antigo `^  [a-zA-Z]+\(` pegava 14 de 16 — `provider` e `isConfigured` são `readonly`
+  #     (sem parênteses) e escapavam; remover `isConfigured` do adapter passava no gate.
+  #   · o match era `grep -qF "<membro>"`, e `getProject` casa DENTRO de `getProjectList` — remover
+  #     a seção inteira de `getProject` também passava. O `(` no padrão desfaz a colisão.
   local _absent="" _m
   while IFS= read -r _m; do
     [ -n "${_m}" ] || continue
-    grep -qF "${_m}" "${ad}" || _absent="${_absent}${_m} "
+    grep -qF "${_m}(" "${ad}" || _absent="${_absent}${_m} "
   done < <(grep -oE '^  [a-zA-Z]+\(' "${iface}" | tr -d ' (' | sort -u)
+  while IFS= read -r _m; do
+    [ -n "${_m}" ] || continue
+    grep -qF "${_m}" "${ad}" || _absent="${_absent}${_m}(readonly) "
+  done < <(grep -oE '^  readonly [a-zA-Z]+' "${iface}" | awk '{print $2}' | sort -u)
   if [ -z "${_absent}" ]; then
-    record_pass "zoho-adapter: (a) PARIDADE — todo membro de interface.md aparece no adapter"
+    record_pass "zoho-adapter: (a) PARIDADE — os 16 membros de interface.md (14 métodos + 2 readonly) aparecem no adapter"
   else record_fail "zoho-adapter: (a)" "membros da interface ausentes no adapter: ${_absent}"; fi
 
+  # (a2) `isConfigured` não é só um NOME na paridade: é o membro que decide o fallback gracioso.
+  # Medido por mutação: corromper a DEFINIÇÃO dele (mantendo o header) passava pela paridade, porque
+  # paridade vê nome, não semântica. Este caso cobra que a definição nomeie as três variáveis
+  # obrigatórias — sem elas o fallback avisa a variável errada, ou não avisa.
+  local _sec_cfg; _sec_cfg="$(_zoho_sec 'isConfigured')"
+  local _cfg_missing="" _var
+  for _var in ZOHO_CLIENT_ID ZOHO_CLIENT_SECRET ZOHO_PORTAL_ID; do
+    grep -qF "${_var}" <<< "${_sec_cfg}" || _cfg_missing="${_cfg_missing}${_var} "
+  done
+  if [ -z "${_cfg_missing}" ]; then
+    record_pass "zoho-adapter: (a2) isConfigured nomeia as três variáveis obrigatórias (o fallback gracioso depende disso)"
+  else record_fail "zoho-adapter: (a2)" "a definição de isConfigured não cita: ${_cfg_missing}— o fallback avisaria a variável errada"; fi
+
+  # ── TETO DECLARADO desta família (2026-09-30, ao fim da rodada de mutação) ───────────────
+  # 8 dos 9 mutantes do refutador morrem; o que sobrevive corrompe um EXEMPLO DE RESPOSTA fora da
+  # seção que decide (trocar `"status": {"id"` por `custom_status` dentro do exemplo do `getTask`).
+  # NÃO vou estender a lista por exemplo: a partir daqui cada caso novo cobre um trecho a mais do
+  # mesmo documento, que é força-de-guarda, não achado de produto. GATILHO para voltar: alguém
+  # implementar contra um exemplo de resposta e errar em uso real. A guarda de verdade contra isso
+  # já existe e é outra — a §2 do adapter, que manda não confiar na forma de um único exemplo.
+
   # (b) o achado mais perigoso: vínculo por objeto aninhado, e o *_id é ignorado em SILÊNCIO
-  if grep -qF '{"milestone":{"id"' "${ad}" && grep -qiE 'ignorad' "${ad}"; then
+  if grep -qF '{"milestone":{"id"' <<< "${_flat}" && grep -qiE 'ignorad' "${ad}"; then
     record_pass "zoho-adapter: (b) o vínculo por objeto aninhado e o silêncio do *_id estão escritos"
   else record_fail "zoho-adapter: (b)" "o adapter não diz que o vínculo é objeto aninhado e que *_id é aceito e IGNORADO — é o achado que passa em teste de HTTP 200"; fi
 
-  # (c) PATCH é o único verbo de update
-  if grep -qF 'PATCH' "${ad}" && grep -qF 'INVALID_METHOD' "${ad}"; then
-    record_pass "zoho-adapter: (c) PATCH declarado, com o erro que prova que PUT/POST não servem"
-  else record_fail "zoho-adapter: (c)" "falta PATCH ou falta INVALID_METHOD (a evidência de que é o único verbo)"; fi
+  # ── (c)…(c4) AS FORMAS CERTAS, não a palavra solta ──────────────────────────────────────
+  # POR QUE MUDOU (medido 2026-09-30, passada adversarial): a versão anterior desta família era
+  # 10 `grep` de PALAVRA, e 8 de 9 mutantes sobreviveram — inclusive o controle (remover um membro
+  # inteiro). Um adapter com o texto certo e o ENDPOINT errado passava. A cura é cobrar a forma
+  # exata que a sonda mediu funcionar: mutar o verbo, a URL, o campo ou o aninhamento agora reprova.
+  # ESCOPADO À SEÇÃO, e a razão é de mutação: a 1ª versão procurava `PATCH` no arquivo INTEIRO, e
+  # um mutante que trocava só o verbo do `updateTask` sobrevivia porque o `updateStatus` também diz
+  # PATCH. Guarda de documento longo tem de olhar o TRECHO que decide, não a presença da palavra.
+  local _sec_upd; _sec_upd="$(_zoho_sec 'updateTask')"
+  if grep -qF 'PATCH/projects/{projectId}/tasks/{taskId}' <<< "${_sec_upd}" \
+     && ! grep -qE '^(PUT|POST)/projects/\{projectId\}/tasks/' <<< "${_sec_upd}" \
+     && grep -qF 'INVALID_METHOD' "${ad}"; then
+    record_pass "zoho-adapter: (c) a SEÇÃO do updateTask usa PATCH (e nenhum PUT/POST no recurso), com o erro que prova"
+  else record_fail "zoho-adapter: (c)" "na seção do updateTask o endpoint não é \`PATCH /projects/{projectId}/tasks/{taskId}\`, ou há PUT/POST no recurso — mutar o verbo aqui é o defeito nº1 medido"; fi
 
-  # (d) `portal` SINGULAR — `portals` devolve 400
-  if grep -qE 'portal.*SINGULAR|`portal` singular|portal\` SINGULAR' "${ad}"; then
-    record_pass "zoho-adapter: (d) o segmento `portal` singular está declarado"
-  else record_fail "zoho-adapter: (d)" "o adapter não avisa que o segmento é `portal` singular (portals → 400)"; fi
+  if grep -qF 'api/v3/portal/${ZOHO_PORTAL_ID}' <<< "${_flat}"; then
+    record_pass "zoho-adapter: (c2) a base declara o segmento \`portal\` SINGULAR"
+  else record_fail "zoho-adapter: (c2)" "a base não é \`/api/v3/portal/\${ZOHO_PORTAL_ID}\` — o plural devolve 400 URL_RULE_NOT_CONFIGURED"; fi
+
+  local _sec_cmt; _sec_cmt="$(_zoho_sec 'addComment')"
+  if grep -qF '{"comment":' <<< "${_sec_cmt}"; then
+    record_pass "zoho-adapter: (c3) a seção do addComment usa o campo \`comment\`"
+  else record_fail "zoho-adapter: (c3)" "na seção do addComment o campo não é \`comment\` — \`content\`/\`text\`/\`body\` dão LESS_THAN_MIN_OCCURANCE"; fi
+
+  # As três escritas aninhadas, cada uma cobrada NA SEÇÃO que a decide. A variante plana de cada
+  # uma foi medida: `tasklist_id` → 400 · `custom_status` → 400 (nome E id) · `owners` → 2xx e IGNORA.
+  local _forms_missing=""
+  local _s1 _s2 _s3
+  _s1="$(_zoho_sec 'createTask')"; _s2="$(_zoho_sec 'updateStatus')"; _s3="$(_zoho_sec 'owners_and_work')"
+  grep -qF '"tasklist":{"id"'  <<< "${_s1}" || _forms_missing="${_forms_missing}tasklist-aninhada(createTask) "
+  grep -qF '"status":{"id"'    <<< "${_s2}" || _forms_missing="${_forms_missing}status-aninhado(updateStatus) "
+  grep -qF '"owners_and_work"' <<< "${_s3}" || _forms_missing="${_forms_missing}owners_and_work(atribuicao) "
+  if [ -z "${_forms_missing}" ]; then
+    record_pass "zoho-adapter: (c4) as três escritas aninhadas estão na SEÇÃO que decide cada uma (tasklist · status · owners_and_work)"
+  else record_fail "zoho-adapter: (c4)" "forma(s) de escrita ausente(s) na própria seção: ${_forms_missing}— a regra em prosa da §1 não substitui o exemplo da seção; foi assim que dois mutantes sobreviveram"; fi
+
+  # (d) `portal` SINGULAR declarado em prosa (o aviso que o leitor lê antes do código)
+  if grep -qE 'portal.*SINGULAR|`portal` singular' "${ad}"; then
+    record_pass 'zoho-adapter: (d) o segmento `portal` singular está avisado em prosa'
+  else record_fail "zoho-adapter: (d)" 'o adapter não avisa que o segmento é `portal` singular (o plural devolve 400)'; fi
 
   # (e) o filtro que NÃO filtra — sem isto, searchTasks devolve tudo achando que buscou
-  if grep -qE 'search=.*não filtra|não filtra' "${ad}"; then
+  if grep -qE 'não filtra' "${ad}"; then
     record_pass "zoho-adapter: (e) o adapter avisa que ?search= NÃO filtra"
   else record_fail "zoho-adapter: (e)" "falta o aviso de que ?search= é aceito e ignorado — searchTasks devolveria a lista inteira como resultado"; fi
 
-  # (f) createSubtask só na V2, e a V2 tem DATA de morte
-  if grep -qF 'V2' "${ad}" && grep -qF '2026-12-31' "${ad}"; then
-    record_pass "zoho-adapter: (f) a dependência da V2 e o prazo dela (2026-12-31) estão declarados"
-  else record_fail "zoho-adapter: (f)" "createSubtask depende da V2 e isso tem PRAZO — o adapter precisa dizer os dois"; fi
+  # (f) createSubtask NÃO É IMPLEMENTÁVEL — e a guarda cobra a RECUSA, não a promessa.
+  # A versão anterior deste caso canonizava o defeito: cobrava "V2 + 2026-12-31", que era a
+  # promessa falsa. Medido em duas rodadas: a V2 devolve 201 e a task nasce RASA (`/subtasks/`
+  # responde 204 vazio, o pai segue `depth: 0`), e as três formas V3 dão 400. Aceitar o 201 como
+  # prova é a armadilha da §1 do próprio arquivo, cometida no único ponto onde ele prometia algo.
+  if grep -qF 'ZOHO_SUBTASK_WRITE_NOT_EXPOSED' "${ad}" && grep -qF '204' "${ad}" && grep -qiE 'rasa|SEM CAMINHO' "${ad}"; then
+    record_pass "zoho-adapter: (f) createSubtask declara a RECUSA nomeada e a evidência (201 com task rasa)"
+  else record_fail "zoho-adapter: (f)" "createSubtask precisa recusar com ZOHO_SUBTASK_WRITE_NOT_EXPOSED e mostrar a evidência (V2 → 201 e task RASA, /subtasks/ → 204 vazio) — sem isso o adapter volta a prometer hierarquia que a API não faz"; fi
 
-  # (g) MUTANTE-ALVO: o factory roteia zoho, e o detector conhece as variáveis
+  # (g)(h) o roteamento existe e o detector conhece as variáveis
   if grep -qF "case 'zoho':" "${fac}"; then
     record_pass "zoho-adapter: (g) factory.md roteia 'zoho'"
   else record_fail "zoho-adapter: (g)" "factory.md não roteia 'zoho' — o adapter existe e ninguém o alcança"; fi
@@ -19704,38 +19787,41 @@ run_zoho_adapter_selftests() {
     record_pass "zoho-adapter: (h) detector.md declara as variáveis obrigatórias do zoho"
   else record_fail "zoho-adapter: (h)" "detector.md não conhece zoho — o fallback gracioso não avisa o que falta"; fi
 
-  # (j) PARIDADE DE VOCABULÁRIO — o achado que custou caro nesta sessão.
-  # Eu declarei "9 pontos ligados" conferindo por MENÇÃO, e o tipo `TaskManagerProvider` em types.md
-  # NÃO tinha 'zoho' — o adapter era inválido contra a própria abstração. O predicado certo é
-  # paridade: todo sítio OPERACIONAL que enumera um provider existente tem de enumerar os novos.
-  # Aqui cobramos os sítios que roteiam de fato; KB e guia de adoção são doutrina, não roteamento.
-  local _op=(
-    "${REPO_ROOT}/.claude/utils/task-manager/types.md"
-    "${REPO_ROOT}/.claude/utils/task-manager/factory.md"
-    "${REPO_ROOT}/.claude/utils/task-manager/detector.md"
-    "${REPO_ROOT}/.claude/utils/task-manager/README.md"
-    "${REPO_ROOT}/.claude/commands/common/prompts/task-manager-provider-detection.md"
-    "${REPO_ROOT}/.claude/commands/meta/setup-integration.md"
-    "${REPO_ROOT}/.claude/skills/onion/SKILL.md"
-    "${REPO_ROOT}/.env.example"
-  )
-  local _sem="" _f
-  for _f in "${_op[@]}"; do
-    [ -f "${_f}" ] || continue
-    # o sítio é operacional se cita um provider JÁ existente; então tem de citar os novos também
-    if grep -qi 'linear' "${_f}" && ! grep -qi 'zoho' "${_f}"; then
-      _sem="${_sem}$(basename "${_f}") "
-    fi
-  done
+  # (j) PARIDADE DE VOCABULÁRIO — DERIVADA, com baseline. O achado que custou caro nesta sessão:
+  # declarei "9 pontos ligados" conferindo por MENÇÃO, e o tipo `TaskManagerProvider` não tinha
+  # 'zoho' — o adapter era inválido contra a própria abstração. A 1ª cura trocou a menção por uma
+  # LISTA DIGITADA de 8 caminhos, e a passada adversarial mostrou que ela caiu pela MESMA classe:
+  # 7 sítios operacionais ficaram fora da lista (o `@task-specialist`, o `description:` do
+  # /product:task, os dois `onion`, a 2ª união em interface.md…). Lista digitada é terceira fonte.
+  # PREDICADO: arquivo rastreado de .claude/ + CLAUDE.md que ENUMERA providers (cita 3 ou mais dos
+  # existentes — a assinatura de enumeração, não a palavra solta) tem de citar os novos. Fora:
+  # diary/ (snapshot histórico, não se reescreve), vendor/ (código de terceiro), *baseline.txt.
+  # Isenção vai para zoho-parity-exceptions.txt COM razão; o baseline SÓ ENCOLHE.
+  local _sem="" _f _n _p
+  while IFS= read -r _f; do
+    [ -n "${_f}" ] || continue
+    case "${_f}" in .claude/diary/*|*/vendor/*|*baseline.txt) continue ;; esac
+    _n=0
+    for _p in clickup asana jira linear; do grep -qi "${_p}" "${REPO_ROOT}/${_f}" && _n=$((_n+1)); done
+    [ "${_n}" -ge 3 ] || continue
+    grep -qi zoho "${REPO_ROOT}/${_f}" && continue
+    if [ -f "${base_j}" ] && grep -qxF "${_f}" <(grep -v '^[[:space:]]*#' "${base_j}" | sed 's/[[:space:]]*#.*//; s/[[:space:]]*$//'); then continue; fi
+    _sem="${_sem}${_f} "
+  done < <(cd "${REPO_ROOT}" && git grep -ril 'linear' -- '.claude' 'CLAUDE.md' 2>/dev/null | sort)
   if [ -z "${_sem}" ]; then
-    record_pass "zoho-adapter: (j) PARIDADE de vocabulário — todo sítio operacional que lista provider lista zoho"
-  else record_fail "zoho-adapter: (j)" "sítio operacional lista 'linear' e NÃO lista 'zoho': ${_sem}— foi assim que o TIPO ficou sem o provider e o adapter nasceu inválido"; fi
+    record_pass "zoho-adapter: (j) PARIDADE de vocabulário — todo sítio que ENUMERA providers (>=3) cita zoho, ou está isento com razão"
+  else record_fail "zoho-adapter: (j)" "sítio que enumera providers e NÃO cita zoho: ${_sem}— foi assim que o TIPO ficou sem o provider e o adapter nasceu inválido. Cure o sítio, ou isente em zoho-parity-exceptions.txt COM a razão"; fi
 
   # (i) a coluna Zoho nas DUAS tabelas de mapeamento canônico
   local _n_tab; _n_tab="$(grep -c 'Zoho Projects |' "${iface}")"
   if [ "${_n_tab}" -ge 2 ]; then
     record_pass "zoho-adapter: (i) interface.md tem a coluna Zoho nas duas tabelas (status e prioridade)"
   else record_fail "zoho-adapter: (i)" "interface.md tem ${_n_tab} tabela(s) com coluna Zoho, esperado 2 — o mapeamento canônico mora lá"; fi
+
+  # (k) a UNIÃO do tipo e o .env.example — os dois sítios onde 'zoho' é vocabulário de máquina
+  if grep -qF "'zoho'" "${types}" && grep -qF 'ZOHO_PORTAL_ID' "${envex}"; then
+    record_pass "zoho-adapter: (k) o tipo TaskManagerProvider inclui 'zoho' e o .env.example documenta as variáveis"
+  else record_fail "zoho-adapter: (k)" "types.md sem 'zoho' na união, ou .env.example sem ZOHO_PORTAL_ID — foi exatamente o buraco que a releitura da lista achou"; fi
 }
 
 _family run_kb_applies_to_selftests

@@ -28,10 +28,10 @@ flowchart TD
 ## 🛠️ **Comandos Disponíveis**
 
 ### 1. **`/product/task <description>`** 🚀
-**Objetivo**: Criar task no Task Manager configurado (ClickUp/Jira/Asana/Linear) + Setup completo para desenvolvimento
+**Objetivo**: Criar task no Task Manager configurado (ClickUp/Jira/Asana/Linear/Zoho/Zoho Projects) + Setup completo para desenvolvimento
 
 **O que faz**:
-- ✅ Cria task estruturada no Task Manager configurado (conforme `TASK_MANAGER_PROVIDER`: ClickUp/Jira/Asana/Linear)
+- ✅ Cria task estruturada no Task Manager configurado (conforme `TASK_MANAGER_PROVIDER`: ClickUp/Jira/Asana/Linear/Zoho/Zoho Projects)
 - ✅ Cria feature branch `feature/<slug>`
 - ✅ Inicializa o worklog em `.claude/sessions/<slug>/` (estrutura na [SSOT](../../../docs/knowledge-base/frameworks/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento): `STATE.md`, `context.md`, `plan.md`, `notes.md`)
 
@@ -41,7 +41,7 @@ flowchart TD
 **Objetivo**: Verificar se task foi realmente implementada
 
 **O que faz**:
-- ✅ Carrega task do Task Manager configurado (ClickUp/Jira/Asana/Linear)
+- ✅ Carrega task do Task Manager configurado (ClickUp/Jira/Asana/Linear/Zoho/Zoho Projects)
 - ✅ Audita projeto atual buscando implementação
 - ✅ Compara requisitos vs código real
 - ✅ Determina se pode avançar para próxima fase
@@ -78,7 +78,7 @@ flowchart TD
 
 ## 🔄 **Sistema de Auto-Update do Task Manager**
 
-Todos os comandos seguem uma **estratégia consistente de atualização automática** do **Task Manager configurado** (ClickUp/Jira/Asana/Linear, conforme `TASK_MANAGER_PROVIDER`):
+Todos os comandos seguem uma **estratégia consistente de atualização automática** do **Task Manager configurado** (ClickUp/Jira/Asana/Linear/Zoho, conforme `TASK_MANAGER_PROVIDER`):
 
 ### **✅ Updates Automáticos (Sem Confirmação)**
 - **Comments informativos** com progresso e resultados
