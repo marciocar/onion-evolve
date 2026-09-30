@@ -1,0 +1,130 @@
+# KG SDAAL — o incidente do papel da porta pública, e as duas guardas que nasceram dele.
+# Camada audit (epistêmico). Nasceu no MESMO PR das guardas, e não depois: a passada adversarial
+# apontou que a narrativa vivia só em comentário de shell, e comentário não é consultável pelo radar.
+meta:
+  id: door-role-parity-2026-09
+  schema_version: "1"
+  date: 2026-09-30
+  baseline: 2026-09-30
+  review_after: 2026-12-29
+nodes:
+  # ---- o dano ----
+  - id: E_DANO_85_ARQUIVOS
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "medido na árvore da porta: a face pública perdeu 85 arquivos de meta-fábrica (adopt, create-*, federation-*, marketplace/, wizard/, skills/onion-publish/); restaurada em 4eb55ac"
+    source_kind: repo
+    source_tier: 10
+    label: "a porta PÚBLICA onion-core foi materializada com --role standalone e perdeu 85 arquivos de meta-fábrica"
+    trace: ".claude/validation/door-role-parity-check.sh · ops/materialize-door.sh"
+
+  - id: C_DUAS_FONTES_SEM_COBRANCA
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "medido: nenhuma REGRA do lint comparava o role: do members.yaml com o role: do carimbo da porta; as regras que tocam members.yaml eram 24/28/30/37/38/85"
+    label: "o papel da porta tinha DUAS fontes (registro anotado à mão + carimbo da materialização) e nada cobrava que concordassem"
+
+  # ---- o que a passada adversarial derrubou ----
+  - id: C_MATERIALIZADOR_LE_O_REGISTRO
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: refuted
+    verified_at: 2026-09-30
+    verified_against: "grep -n members.yaml ops/materialize-door.sh devolve só uma nota de prosa sobre o pin; ROLE é argumento com default hub (l.34, l.37)"
+    label: "REFUTADA: 'quem materializa lê o registro, e o corte de papel vem dele' — o script nunca lê o members.yaml; quem leu a anotação foi um humano"
+
+  - id: E_LINT_NAO_FICA_NO_CAMINHO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "o dano não passou por PR nenhum: passou por um operador rodando ops/materialize-door.sh <clone> --role standalone"
+    source_kind: repo
+    source_tier: 10
+    label: "lint de PR no core não fica entre o operador e um comando de shell — a 1ª linha de defesa tem de morar no próprio materializador"
+
+  - id: C_TIER_HUB_E_CAPACIDADE
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "members.yaml:73 anota hub como 'central; PODE ter sub-adotados'; medido: parent: metagamify → 0 sub-adotados, e metagamify é hub"
+    label: "o vocabulário de tier é de CAPACIDADE, não de uso — logo onion-core carimbada hub não é tier falso, e a objeção de que role: colide com tier nas portas cai"
+
+  # ---- as duas guardas ----
+  - id: D_GUARDA_EM_DUAS_LINHAS
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "as duas implantadas e exercitadas: 11 casos em run_door_role_parity_selftests + 4 em run_door_role_change_refusal_selftests, todos verdes; mutante -d→-f morto pelo caso (k)"
+    label: "a cura é em DUAS linhas: recusa dentro de ops/materialize-door.sh (--role que contradiz o carimbo aborta, rc=2, escape --force-role-change) + REGRA 92 no lint cobrando a paridade registro×carimbo"
+    trace: ".claude/validation/door-role-parity-check.sh · ops/materialize-door.sh · .claude/validation/lint-selftest.sh"
+
+  - id: Q_PREDICADO_SUCESSOR
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.6
+    status: open
+    label: "a paridade é cega a 'ambas as fontes erradas do mesmo modo'; o sucessor mede o CONTEÚDO da porta contra o corte (vendor-manifest.sh --role) — GATILHO: uma porta aparecer mutilada com a paridade verde"
+
+  - id: Q_ROLE_DUPLA_LEITURA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: open
+    label: "o campo role: do members.yaml é projetado como tier (graph.sh:81) E lido como corte de papel; nas portas convergem por capacidade, mas o nome único para dois usos segue sendo dívida — GATILHO: um terceiro consumidor do campo discordar dos dois"
+
+edges:
+  # o dano é a evidência de que a lacuna existia
+  - from: E_DANO_85_ARQUIVOS
+    to: C_DUAS_FONTES_SEM_COBRANCA
+    edge_type: SUPPORTS
+  # a medição derrubou a explicação que eu havia escrito
+  - from: E_LINT_NAO_FICA_NO_CAMINHO
+    to: C_MATERIALIZADOR_LE_O_REGISTRO
+    edge_type: REFUTES
+  - from: C_DUAS_FONTES_SEM_COBRANCA
+    to: D_GUARDA_EM_DUAS_LINHAS
+    edge_type: SUPPORTS
+  # é o que obriga a 1ª linha a morar no materializador
+  - from: E_LINT_NAO_FICA_NO_CAMINHO
+    to: D_GUARDA_EM_DUAS_LINHAS
+    edge_type: SUPPORTS
+  # sustenta que comparar os dois campos é legítimo nas portas
+  - from: C_TIER_HUB_E_CAPACIDADE
+    to: D_GUARDA_EM_DUAS_LINHAS
+    edge_type: SUPPORTS
+  # o teto declarado da paridade
+  - from: Q_PREDICADO_SUCESSOR
+    to: D_GUARDA_EM_DUAS_LINHAS
+    edge_type: CONSTRAINS
+  - from: Q_ROLE_DUPLA_LEITURA
+    to: C_TIER_HUB_E_CAPACIDADE
+    edge_type: DEPENDS_ON

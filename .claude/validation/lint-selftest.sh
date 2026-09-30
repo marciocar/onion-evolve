@@ -19370,7 +19370,173 @@ run_glob_branch_parity_selftests() {
 }
 
 _family run_forge_selftests
+# ── PARIDADE registro × CARIMBO das portas (REGRA 92) ────────────────────────────────────────
+# POR QUE EXISTE: em 2026-09-30 o `members.yaml` dizia `role: standalone` para a `onion-core`
+# enquanto o carimbo dela dizia `hub` (11 materializações seguidas). Eu li o registro, materializei
+# com o papel errado, e a porta PÚBLICA perdeu 85 arquivos de meta-fábrica. Nada cobrava que as duas
+# fontes concordassem. Esta família cobra — e o caso (b) é o defeito daquele dia, reconstituído.
+run_door_role_parity_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/door-role-parity-check.sh"
+  if [ ! -f "${sut}" ]; then record_fail "door-role-parity" "SUT ausente: ${sut}"; return; fi
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  mkdir -p "${d}/docs/evolution/federation" "${d}/porta/.claude"
+
+  _drp() { # $1=role no registro  $2=role no carimbo ('' = sem campo)  $3=path ('' = ausente)
+    printf 'role: %s\n' "$2" > "${d}/porta/.claude/.onion-version"
+    [ -n "$2" ] || printf 'framework: x\n' > "${d}/porta/.claude/.onion-version"
+    { echo 'members:'; echo '  - id: porta-de-teste'; echo '    kind: door'
+      [ -n "$1" ] && echo "    role: $1"
+      [ -n "$3" ] && echo "    local_path: \"$3\"" ; } > "${d}/docs/evolution/federation/members.yaml"
+    if _drp_out="$(bash "${sut}" "${d}" 2>&1)"; then _drp_rc=0; else _drp_rc=$?; fi
+  }
+
+  # (a) registro e carimbo CONCORDAM ⇒ rc=0, sem achado
+  _drp standalone standalone "${d}/porta"
+  if [ "${_drp_rc}" = "0" ] && ! grep -q 'DIVERGE' <<< "${_drp_out}"; then
+    record_pass "door-role-parity: (a) registro == carimbo ⇒ rc=0"
+  else record_fail "door-role-parity: (a)" "acusou porta consistente (rc=${_drp_rc}): $(_emit "${_drp_out}" | head -c 200)"; fi
+
+  # (b) O DEFEITO DE 2026-09-30: registro `standalone`, carimbo `hub` ⇒ ACUSA nomeando os dois
+  _drp standalone hub "${d}/porta"
+  if [ "${_drp_rc}" = "1" ] && grep -q 'registro diz `standalone`, carimbo diz `hub`' <<< "${_drp_out}"; then
+    record_pass "door-role-parity: (b) registro standalone × carimbo hub ⇒ ACUSA nomeando os dois (o defeito de 2026-09-30)"
+  else record_fail "door-role-parity: (b)" "a divergência que custou 85 arquivos passou (rc=${_drp_rc}): $(_emit "${_drp_out}" | head -c 200)"; fi
+
+  # (c) porta SEM `role:` no registro ⇒ lacuna acusada (o materializador aceitaria qualquer --role)
+  _drp '' hub "${d}/porta"
+  if [ "${_drp_rc}" = "1" ] && grep -q 'não declara' <<< "${_drp_out}"; then
+    record_pass "door-role-parity: (c) porta sem role: no registro ⇒ ACUSA a lacuna"
+  else record_fail "door-role-parity: (c)" "porta sem role passou (rc=${_drp_rc})"; fi
+
+  # (d) carimbo SEM campo `role:` ⇒ acusa carimbo incompleto
+  _drp standalone '' "${d}/porta"
+  if [ "${_drp_rc}" = "1" ] && grep -q 'carimbo incompleto' <<< "${_drp_out}"; then
+    record_pass "door-role-parity: (d) carimbo sem campo role ⇒ ACUSA carimbo incompleto"
+  else record_fail "door-role-parity: (d)" "carimbo incompleto passou (rc=${_drp_rc})"; fi
+
+  # (e) clone INALCANÇÁVEL (o caso do CI) ⇒ rc=0 e DECLARA não-medido; silêncio aqui seria fail-open
+  _drp standalone hub "${d}/nao-existe"
+  if [ "${_drp_rc}" = "0" ] && grep -q 'NÃO MEDIDA' <<< "${_drp_out}"; then
+    record_pass "door-role-parity: (e) clone inalcançável ⇒ rc=0 DECLARANDO não-medido (o caso do CI)"
+  else record_fail "door-role-parity: (e)" "clone ausente não declarou (rc=${_drp_rc}): $(_emit "${_drp_out}" | head -c 200)"; fi
+
+  # (f) members.yaml AUSENTE ⇒ rc=3, recusa julgar
+  local empty_repo; empty_repo="$(mktemp -d)"
+  local ov orc=0
+  if ov="$(bash "${sut}" "${empty_repo}" 2>&1)"; then orc=0; else orc=$?; fi
+  if [ "${orc}" = "3" ] && grep -q 'members.yaml ausente' <<< "${ov}"; then
+    record_pass "door-role-parity: (f) members.yaml ausente ⇒ rc=3 (recusa, não 'sem divergência')"
+  else record_fail "door-role-parity: (f)" "sem registro não recusou (rc=${orc})"; fi
+  rm -rf "${empty_repo}"
+
+  # (g) FRONTEIRA: `kind: adopter` com registro `standalone` e carimbo `adopted` NÃO é divergência —
+  # no adotante os dois campos respondem perguntas diferentes (tier na rede × relação com o framework),
+  # como uma entrada `kind: adopter` do members.yaml explica no próprio comentário. Sem este caso, a guarda
+  # poderia ser "melhorada" para varrer todo membro e passaria a acusar em massa o que é correto.
+  printf 'role: adopted\n' > "${d}/porta/.claude/.onion-version"
+  { echo 'members:'; echo '  - id: adotante-de-teste'; echo '    kind: adopter'
+    echo '    role: standalone'; echo "    local_path: \"${d}/porta\"" ; } > "${d}/docs/evolution/federation/members.yaml"
+  local arc=0 aout
+  if aout="$(bash "${sut}" "${d}" 2>&1)"; then arc=0; else arc=$?; fi
+  if [ "${arc}" = "0" ] && ! grep -q 'DIVERGE' <<< "${aout}"; then
+    record_pass "door-role-parity: (g) kind adopter standalone×adopted NÃO é divergência (fronteira semântica)"
+  else record_fail "door-role-parity: (g)" "acusou adotante, onde os dois campos respondem perguntas diferentes (rc=${arc}): $(_emit "${aout}" | head -c 200)"; fi
+
+  # (h) YAML LEGAL com ASPAS não pode cegar a guarda. A 1ª versão lia por regex: `kind: "door"` fazia a
+  # porta DESAPARECER — e a guarda então AFIRMAVA "nenhuma porta no registro", que é pior que um erro,
+  # é uma afirmação falsa. Achado de passada adversarial, 2026-09-30.
+  printf 'role: hub\n' > "${d}/porta/.claude/.onion-version"
+  { echo 'members:'; echo '  - id: porta-de-teste'; echo '    kind: "door"'; echo '    role: "standalone"'
+    echo "    local_path: \"${d}/porta\"" ; } > "${d}/docs/evolution/federation/members.yaml"
+  local qrc=0 qout
+  if qout="$(bash "${sut}" "${d}" 2>&1)"; then qrc=0; else qrc=$?; fi
+  if [ "${qrc}" = "1" ] && grep -q 'PAPEL-DIVERGE' <<< "${qout}"; then
+    record_pass "door-role-parity: (h) kind/role com ASPAS continua sendo lido (não 'nenhuma porta')"
+  else record_fail "door-role-parity: (h)" "aspas cegaram a guarda (rc=${qrc}): $(_emit "${qout}" | head -c 200)"; fi
+
+  # (i) `role:` ANINHADO em `trust:` não é o papel da porta. `\s` casa `\n`, então a regex antiga
+  # atravessava linhas e comparava o campo errado. Todo membro real tem bloco `trust:`.
+  printf 'role: hub\n' > "${d}/porta/.claude/.onion-version"
+  { echo 'members:'; echo '  - id: porta-de-teste'; echo '    kind: door'; echo '    role: hub'
+    echo "    local_path: \"${d}/porta\""; echo '    trust:'; echo '      role: consumer' ; } > "${d}/docs/evolution/federation/members.yaml"
+  local nrc=0 nout
+  if nout="$(bash "${sut}" "${d}" 2>&1)"; then nrc=0; else nrc=$?; fi
+  if [ "${nrc}" = "0" ] && ! grep -q 'DIVERGE' <<< "${nout}"; then
+    record_pass "door-role-parity: (i) role aninhado em trust: não é lido como o papel da porta"
+  else record_fail "door-role-parity: (i)" "leu o role de dentro do trust (rc=${nrc}): $(_emit "${nout}" | head -c 200)"; fi
+
+  # (j) COMENTÁRIO INLINE no carimbo (`role: hub   # carimbado por ...`) não é parte do valor.
+  printf 'role: hub   # carimbado por ops/materialize-door.sh\n' > "${d}/porta/.claude/.onion-version"
+  { echo 'members:'; echo '  - id: porta-de-teste'; echo '    kind: door'; echo '    role: hub'
+    echo "    local_path: \"${d}/porta\"" ; } > "${d}/docs/evolution/federation/members.yaml"
+  local crc=0 cout
+  if cout="$(bash "${sut}" "${d}" 2>&1)"; then crc=0; else crc=$?; fi
+  if [ "${crc}" = "0" ] && ! grep -q 'DIVERGE' <<< "${cout}"; then
+    record_pass "door-role-parity: (j) comentário inline no carimbo não entra no valor"
+  else record_fail "door-role-parity: (j)" "comentário inline virou falso DIVERGE (rc=${crc}): $(_emit "${cout}" | head -c 200)"; fi
+
+  # (k) CLONE presente e CARIMBO ausente é estado PRÓPRIO, não "o caso do CI": sem carimbo a porta se
+  # declara a FONTE e todo guard de adotante desliga. Sem este caso o mutante `-f`→`-d` SOBREVIVIA,
+  # porque nenhum caso variava a FORMA do local_path — buraco apontado pela passada adversarial.
+  rm -f "${d}/porta/.claude/.onion-version"
+  { echo 'members:'; echo '  - id: porta-de-teste'; echo '    kind: door'; echo '    role: hub'
+    echo "    local_path: \"${d}/porta\"" ; } > "${d}/docs/evolution/federation/members.yaml"
+  local krc=0 kout
+  if kout="$(bash "${sut}" "${d}" 2>&1)"; then krc=0; else krc=$?; fi
+  if [ "${krc}" = "1" ] && grep -q 'CARIMBO-AUSENTE' <<< "${kout}"; then
+    record_pass "door-role-parity: (k) clone SEM carimbo ⇒ ACUSA (porta quebrada), não 'não-medido do CI'"
+  else record_fail "door-role-parity: (k)" "clone sem carimbo tratado como caso de CI (rc=${krc}): $(_emit "${kout}" | head -c 200)"; fi
+}
+
+# ── A RECUSA de troca de papel DENTRO do materializador (a 1ª linha de defesa) ────────────────
+# POR QUE EXISTE: a REGRA 92 é lint de PR no core, e o dano de 2026-09-30 não passou por PR nenhum —
+# passou por um operador rodando `ops/materialize-door.sh <clone> --role standalone` com o registro
+# errado na mão. A passada adversarial mediu que este script NUNCA lê o members.yaml e que `ROLE` é
+# argumento com default `hub`: nenhum lint fica entre o operador e o comando. Só o próprio script
+# pode recusar, e é isso que estes casos cobram.
+run_door_role_change_refusal_selftests() {
+  local sut="${REPO_ROOT}/ops/materialize-door.sh"
+  if [ ! -f "${sut}" ]; then record_fail "door-role-change" "SUT ausente: ${sut}"; return; fi
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  mkdir -p "${d}/porta/.claude"
+
+  # (a) O DEFEITO DE 2026-09-30: --role contradiz o carimbo ⇒ RECUSA (rc=2) nomeando os dois papéis
+  printf 'framework: x\nrole: hub\n' > "${d}/porta/.claude/.onion-version"
+  local rrc=0 rout
+  if rout="$(bash "${sut}" "${d}/porta" --role standalone 2>&1)"; then rrc=0; else rrc=$?; fi
+  if [ "${rrc}" = "2" ] && grep -q "CONTRADIZ o carimbo" <<< "${rout}" \
+     && grep -q "force-role-change" <<< "${rout}"; then
+    record_pass "door-role-change: (a) --role contra o carimbo ⇒ RECUSA rc=2 ensinando as duas saídas"
+  else record_fail "door-role-change: (a)" "materializou por cima do carimbo divergente (rc=${rrc}): $(_emit "${rout}" | head -c 200)"; fi
+
+  # (b) A recusa não pode virar MURO: com --force-role-change a troca deliberada passa da guarda.
+  local frc=0 fout
+  if fout="$(bash "${sut}" "${d}/porta" --role standalone --force-role-change 2>&1)"; then frc=0; else frc=$?; fi
+  if ! grep -q "CONTRADIZ o carimbo" <<< "${fout}"; then
+    record_pass "door-role-change: (b) --force-role-change libera a troca DELIBERADA (recusa não é muro)"
+  else record_fail "door-role-change: (b)" "a flag explícita não liberou — guarda virou muro"; fi
+
+  # (c) Carimbo AUSENTE (porta nova) não pode ser barrado: não há papel anterior a contradizer.
+  local d2; d2="$(mktemp -d)"
+  local nrc=0 nout
+  if nout="$(bash "${sut}" "${d2}/nova" --role standalone 2>&1)"; then nrc=0; else nrc=$?; fi
+  if ! grep -q "CONTRADIZ o carimbo" <<< "${nout}"; then
+    record_pass "door-role-change: (c) porta NOVA (sem carimbo) não é barrada pela recusa"
+  else record_fail "door-role-change: (c)" "barrou porta nova, que não tem papel anterior"; fi
+  rm -rf "${d2}"
+
+  # (d) Carimbo CONCORDANDO com o --role passa reto (o caso comum: re-materializar como ela é)
+  printf 'framework: x\nrole: hub\n' > "${d}/porta/.claude/.onion-version"
+  local src=0 sout
+  if sout="$(bash "${sut}" "${d}/porta" --role hub 2>&1)"; then src=0; else src=$?; fi
+  if ! grep -q "CONTRADIZ o carimbo" <<< "${sout}"; then
+    record_pass "door-role-change: (d) --role igual ao carimbo passa reto (re-materializar como ela é)"
+  else record_fail "door-role-change: (d)" "barrou o caso comum, onde os dois concordam"; fi
+}
+
 _family run_glob_branch_parity_selftests
+_family run_door_role_parity_selftests
+_family run_door_role_change_refusal_selftests
 _family run_review_cause_bands_selftests
 _family run_research_workflow_selftests
 
