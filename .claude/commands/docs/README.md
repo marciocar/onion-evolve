@@ -7,6 +7,7 @@ Comandos da **documentação estruturada** do Onion: geram, validam e mantêm os
 | Comando | Finalidade |
 |---------|-----------|
 | [`/docs:build-business-docs`](build-business-docs.md) | Gera a arquitetura de contexto de negócio em `docs/business-context/`. Delega a `@product-agent`, `@research-agent`, `@storytelling-business-specialist`, `@branding-positioning-specialist`. |
+| [`/docs:build-project-manual`](build-project-manual.md) | Monta o manual de UM PROJETO — a página que o usuário final dele abre — quando o projeto é servido por agente + servidor MCP + atalhos. Lente em `common/prompts/client-material-doctrine.md`; esqueleto em `common/templates/`. |
 | [`/docs:build-tech-docs`](build-tech-docs.md) | Gera a arquitetura de contexto técnico em `docs/technical-context/`. Delega a `@c4-architecture-specialist`, `@c4-documentation-specialist`, `@docs-reverse-engineer`, `@system-documentation-orchestrator`, `@mermaid-specialist`. |
 | [`/docs:build-compliance-docs`](build-compliance-docs.md) | Gera a arquitetura de compliance em `docs/compliance-context/` (ISO 27001, SOC 2, ISO 22301, PMBOK). Delega a `@security-information-master`, `@iso-27001-specialist`, `@soc2-specialist`. |
 | [`/docs:build-index`](build-index.md) | Gera e atualiza os índices de `docs/` a partir da estrutura real (contagens escaneadas, nunca hardcoded). |

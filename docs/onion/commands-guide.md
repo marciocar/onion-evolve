@@ -326,6 +326,20 @@ $ ./engineer/start             # Não é executável
 
 ## 📚 Comandos de Documentação
 
+### `/docs/build-project-manual`
+**Sintaxe:** `/docs/build-project-manual <projeto>`  
+Monta o manual de **um projeto** — a página que o usuário final dele abre — quando esse projeto é
+servido por agente + servidor MCP + atalhos. **Não** é o manual do framework.
+
+```
+/docs/build-project-manual "<sigla e nome, o cliente, onde vivem o agente e os atalhos>"
+```
+
+A lente (tom, ordem das seções, critério de exemplo, confidencialidade do preenchido) vive em
+`.claude/commands/common/prompts/client-material-doctrine.md`; o esqueleto em
+`.claude/commands/common/templates/agent-project-manual-template.html`. Duas coisas são humanas por
+desenho: conferir as seções de domínio e testar cada pergunta de exemplo com dados reais.
+
 ### `/docs/build-tech-docs`
 **Sintaxe:** `/docs/build-tech-docs`  
 **Propósito**: Gerar documentação técnica abrangente
