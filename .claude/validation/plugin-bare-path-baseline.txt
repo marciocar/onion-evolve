@@ -34,9 +34,6 @@ plugins/onion-product/commands/build-tech-docs.md|.claude/commands/common/templa
 plugins/onion-product/commands/estimate.md|.claude/utils/task-manager/adapters
 plugins/onion-product/commands/reverse-consolidate.md|.claude/validation/guardrails/onion-effect-gate.sh
 plugins/onion-product/commands/task.md|.claude/utils/task-manager/adapters
-plugins/onion-product/commands/task.md|.claude/utils/task-manager/adapters/asana.md
-plugins/onion-product/commands/task.md|.claude/utils/task-manager/adapters/clickup.md
-plugins/onion-product/commands/task.md|.claude/utils/task-manager/adapters/linear.md
 plugins/onion-product/commands/task.md|.claude/utils/task-manager/adapters/{clickup
 plugins/onion-product/commands/task.md|.claude/utils/task-manager/adapters/{provedor}.md
 plugins/onion-product/commands/task.md|.claude/utils/task-manager/detector.md
@@ -80,7 +77,6 @@ plugins/onion/skills/onion-patterns/SKILL.md|.claude/skills
 plugins/onion/skills/onion-validation/SKILL.md|.claude/agents
 plugins/onion/skills/onion-validation/SKILL.md|.claude/commands
 plugins/onion/skills/onion-validation/SKILL.md|.claude/skills
-plugins/onion/skills/onion-wizard/SKILL.md|.claude/commands/meta/adopt.md
 plugins/onion/skills/onion-wizard/SKILL.md|.claude/utils/wizard/*
 plugins/onion/skills/onion-wizard/SKILL.md|.claude/utils/wizard/topology-projection.sh
 plugins/onion/skills/onion/SKILL.md|.claude/agents

@@ -3,7 +3,7 @@ name: task
 description: |
   Criação de tasks com decomposição hierárquica inteligente.
   Use para criar tasks estruturadas com subtasks e action items.
-  Suporta: Jira, ClickUp, Asana, Linear (via TASK_MANAGER_PROVIDER).
+  Suporta: Jira, ClickUp, Asana, Linear, Zoho Projects (via TASK_MANAGER_PROVIDER).
   Diferença vs /product:create-task-structure: este PERSISTE no task manager ativo; o create-task-structure é decomposição LOCAL read-only (saída textual, não grava).
 allowed-tools: Bash(cat .env*) Read Write Grep Glob
 parameters:
@@ -184,9 +184,10 @@ adapter resolve o transporte (REST default; MCP opcional via `TASK_MANAGER_TRANS
 mapeamentos exatos de campos, nomes de ferramentas, conversão de markdown e construção de URL
 estão nos adapters — NÃO duplicar aqui:**
 
-- ClickUp → `.claude/utils/task-manager/adapters/clickup.md`
-- Asana → `.claude/utils/task-manager/adapters/asana.md`
-- Linear → `.claude/utils/task-manager/adapters/linear.md`
+- Jira · ClickUp · Asana · Linear · Zoho Projects → `.claude/utils/task-manager/adapters/{provedor}.md`
+  (a enumeração de um caminho por provedor foi colapsada em 2026-09-30: cada linha era um caminho
+  `.claude/` NU que não resolve no consumidor do plugin — REGRA 74 — e a forma `{provedor}.md`, que a
+  l.67 já usava, diz o mesmo sem criar passivo novo a cada provider que entra)
 
 Sequência (idêntica em todos os provedores, variando só o adapter):
 1. **Criar task principal** → extrair `id`/`gid` e `url`.
@@ -242,7 +243,7 @@ Se houve execução no Passo 7:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 📋 Task: {{description}}
 🔗 URL: [url do provedor]
-📊 Provedor: [clickup/asana/linear/local]
+📊 Provedor: [clickup/asana/jira/linear/zoho/local]
 
 🎲 STORY POINTS:
 ∟ Task Principal: [X] pontos

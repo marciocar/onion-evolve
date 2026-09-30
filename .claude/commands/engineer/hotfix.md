@@ -35,7 +35,7 @@ related_agents:
 
 # 🔥 Engineer Hotfix
 
-Emergency workflow completo: Task + Branch + Desenvolvimento, em um comando. **Provider-agnóstico** (Jira, ClickUp, Asana, Linear ou none).
+Emergency workflow completo: Task + Branch + Desenvolvimento, em um comando. **Provider-agnóstico** (Jira, ClickUp, Asana, Linear, Zoho Projects ou none).
 
 ## 🎯 Objetivo
 

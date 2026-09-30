@@ -235,7 +235,7 @@ Você concorda ou prefere outra estrutura?
 Ferramentas MCP detectadas que podem ser úteis:
 - [listar ferramentas MCP relevantes baseadas no propósito]
 
-> ⚠️ **SDAAL / API-first (regra dura):** providers de **task** (ClickUp/Jira/Asana/Linear) e **forge**
+> ⚠️ **SDAAL / API-first (regra dura):** providers de **task** (ClickUp/Jira/Asana/Linear/Zoho/Zoho Projects) e **forge**
 > (GitHub) **NÃO** entram como `mcp__<provider>__*` direto num agente novo — são alcançados pela
 > abstração (`taskManager.*` / `forge.*`), que resolve o transporte: **task-manager** = API default
 > (MCP opcional); **forge** = CLI/API — **nunca MCP** (`integrations.md` §forge / CLAUDE.md §Forge).
@@ -369,7 +369,7 @@ discovery: WebSearch
 ```yaml
 # Gestão de Projetos (provider-agnóstico via adapter)
 # Exemplo ClickUp: 50+ ferramentas MCP disponíveis quando TASK_MANAGER_TRANSPORT=mcp
-# Ver adapters/ em .claude/utils/task-manager/ para Jira/Asana/Linear
+# Ver adapters/ em .claude/utils/task-manager/ para Jira/Asana/Linear/Zoho
 
 # Versionamento
 github: ~30 ferramentas REST API (transporte padrão: cli/gh)
@@ -386,7 +386,7 @@ code-understanding: ~10 ferramentas MCP para análise
 sequential-thinking: 1 ferramenta MCP para CoT
 
 # Issues (exemplo; múltiplos providers)
-# Linear, Jira, ClickUp via adapter (TASK_MANAGER_PROVIDER + transporte)
+# Linear, Jira, ClickUp, Zoho Projects via adapter (TASK_MANAGER_PROVIDER + transporte)
 ```
 
 **Princípio: Minimalismo Inteligente**

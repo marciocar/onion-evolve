@@ -185,7 +185,7 @@ Se validação falhar:
 ## Integração com .env
 
 ### Variáveis críticas
-- `TASK_MANAGER_PROVIDER` — obrigatório (`clickup`|`jira`|`asana`|`linear`|`none`)
+- `TASK_MANAGER_PROVIDER` — obrigatório (`clickup`|`jira`|`asana`|`linear`|`zoho`|`none`)
 - Variáveis específicas do provider (ex: `JIRA_HOST`, `JIRA_API_TOKEN`)
 
 ### Verificação de configuração

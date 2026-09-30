@@ -39,7 +39,7 @@ Analise as tasks, pais e filhos se necessário, e construa um entendimento inici
 **IMPORTANTE**: Use a abstração para ler tasks independente do provedor:
 
 ```typescript
-// Via abstração - funciona para qualquer provedor (ClickUp, Asana, Linear)
+// Via abstração - funciona para qualquer provedor (ClickUp, Asana, Linear, Zoho Projects)
 const task = await taskManager.getTask(taskId);
 const subtasks = await taskManager.getSubtasks(taskId);
 

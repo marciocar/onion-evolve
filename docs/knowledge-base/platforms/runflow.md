@@ -3,7 +3,8 @@ title: Runflow
 category: platforms
 verified_at: 2026-07-23
 source: docs.runflow.ai
-version: "@runflow-ai/sdk 1.6.2"
+# `version:` REMOVIDO em 2026-09-30: significava a versão do ALVO (não da KB), que é exatamente a
+# ambiguidade que `applies_to:` existe para desfazer. Manter os dois gravaria a ambiguidade em dobro.
 created: 2025-11-18T21:19:48Z
 updated: 2026-07-23
 sources:

@@ -40,7 +40,7 @@ Estabelecer contexto completo do projeto incluindo:
 - ✅ Revisar `README.md` na raiz do projeto
 - ✅ Entender estrutura do Sistema Onion v3.0
 - ✅ Identificar comandos e agentes principais
-- ✅ Mapear integrações disponíveis (ClickUp, Asana, Linear)
+- ✅ Mapear integrações disponíveis (ClickUp, Asana, Linear, Zoho Projects)
 
 ### 2. Estrutura de Documentação
 - ✅ Listar arquivos em `docs/` e manter no contexto
@@ -66,7 +66,7 @@ Estabelecer contexto completo do projeto incluindo:
 ### 4. Recursos Principais
 - ✅ Comando `/onion` - ponto de entrada inteligente
 - ✅ Agente `@onion` - orquestrador master
-- ✅ Task Manager Abstraction (ClickUp, Asana, Linear)
+- ✅ Task Manager Abstraction (ClickUp, Asana, Linear, Zoho Projects)
 - ✅ Framework EXTRACT para reuniões
 
 ### 4.5 Identidade e Ecossistema (quem o Onion É — não só o que tem)

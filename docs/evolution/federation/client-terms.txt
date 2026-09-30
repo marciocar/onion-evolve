@@ -24,3 +24,12 @@ HPE
 Prodfiel
 Itau
 Itaú
+
+# Registrado em 2026-09-30, por achado de passada adversarial. É o adotante hub cujo `members.yaml`
+# declara `name:` SOB RESERVA e cujo `id:` é o slug neutro `hub-operacoes-enterprise`. O achado é
+# de MECANISMO, não de descuido: o slug neutro fecha a PROJEÇÃO (console e mapa não publicam o nome)
+# e, no mesmo movimento, DESLIGA A BUSCA — a REGRA 36 deriva os termos do `members.yaml` e passa a
+# procurar o slug, nunca o nome real. Registrar aqui é a outra metade do ato: o `members.yaml`
+# protege a vitrine, este arquivo protege a varredura. Feito no mesmo commit que absorve três KBs
+# vindas deste adotante para dentro de `docs/knowledge-base/`, que VIAJA.
+Gmill

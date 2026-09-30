@@ -10,7 +10,7 @@ parameters:
     description: 'ID da story no task manager (ex: STORY-123, TASK-456)'
     required: true
   - name: task_manager
-    description: 'Task manager usado (clickup|jira|linear|asana). Default: TASK_MANAGER_PROVIDER do .env'
+    description: 'Task manager usado (clickup|jira|linear|asana|zoho). Default: TASK_MANAGER_PROVIDER do .env'
     required: false
     default: auto
   - name: generate_agenda
@@ -79,7 +79,7 @@ Os **protocolos de colaboração**, **agendas detalhadas**, **templates** e **ch
 
 ### Passo 2: Buscar Contexto da Story
 
-- Buscar via **adapter** do Task Manager (`taskManager.getTask(taskId)` — REST API default; MCP opcional): detalhes/descrição da task, critérios de aceitação, subtasks/itens e comentários anteriores. O adapter resolve o provider ativo (ClickUp/Jira/Asana/Linear) e o formato.
+- Buscar via **adapter** do Task Manager (`taskManager.getTask(taskId)` — REST API default; MCP opcional): detalhes/descrição da task, critérios de aceitação, subtasks/itens e comentários anteriores. O adapter resolve o provider ativo (ClickUp/Jira/Asana/Linear/Zoho/Zoho Projects) e o formato.
 - Provider `none` / indisponível → solicitar as informações manualmente ao usuário.
 
 ### Passo 3: Gerar Template de Ata

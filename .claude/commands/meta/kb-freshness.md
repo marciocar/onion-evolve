@@ -68,7 +68,7 @@ eles sozinhos — uma KB que só falha em item menor permanece **CURRENT**.
 | 2 | **Ferramenta Workflow (!)** | Se a KB trata de orquestração de agentes, orquestração de subagentes ou paralelismo: deve referenciar a ferramenta nativa `Workflow` (research preview mai/2026). Ausência = STALE. |
 | 3 | **Itens formalmente abandonados (!)** | Não contém referências positivas a `.onion/`, CLI standalone, plano v4.0 FASES 5-9, multi-IDE — itens abandonados em 2026-05-18. |
 | 4 | **Plataforma única** | Afirma Claude Code como plataforma única (não "qualquer IDE"). |
-| 5 | **Task Manager Abstraction (!)** | Se menciona task manager: cita a camada plugável (Jira/ClickUp/Asana/Linear) via `TASK_MANAGER_PROVIDER`. Referência a provider único hardcoded = STALE. |
+| 5 | **Task Manager Abstraction (!)** | Se menciona task manager: cita a camada plugável (Jira/ClickUp/Asana/Linear/Zoho Projects) via `TASK_MANAGER_PROVIDER`. Referência a provider único hardcoded = STALE. |
 | 6 | **Data de atualização (!)** | Campo `Última Atualização` presente e ≤ 18 meses atrás (relativo a 2026-06-13). Ausente ou > 18 meses = STALE. |
 | 7 | **Fontes rastreáveis** _(ponto menor — não gate)_ | Exige fonte (URL ou `[INFERÊNCIA]`) **apenas para afirmações factuais EXTERNAS verificáveis** (claim de mercado, dado quantitativo, citação de terceiro, "tendência 20XX"). Convenções, templates, exemplos e processos **internos do Onion NÃO exigem URL**. FALHA só se houver afirmação externa **sem nenhuma** fonte — e mesmo assim é ponto menor (não eleva a STALE sozinho). |
 | 8 | **Workflows canônicos (!)** | Se descreve workflows `engineer/*` ou `product/*`: não os funde — são faseados retomáveis. Fusão = STALE. |

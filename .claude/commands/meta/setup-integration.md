@@ -123,7 +123,7 @@ LINEAR_TEAM_ID=abc123  # Opcional
 # Zoho Projects (API V3 — NÃO há MCP nativo da Zoho para Projects)
 ZOHO_CLIENT_ID=1000.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ZOHO_CLIENT_SECRET=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-ZOHO_PORTAL_ID=xxxxxxxxx           # o id da V3 — NÃO é o login_id da V2
+ZOHO_PORTAL_ID=xxxxxxxxx           # o id do PORTAL (serve na V3 e na V2)
 ZOHO_ACCOUNTS_HOST=https://accounts.zoho.com   # opcional: troque por .eu / .in / .com.au
 ```
 
@@ -131,8 +131,9 @@ ZOHO_ACCOUNTS_HOST=https://accounts.zoho.com   # opcional: troque por .eu / .in 
 - Acesse `api-console.zoho.com` → **GET STARTED** → **Self client** → `CREATE NOW` → `CREATE` → `OK`
 - Copie **Client ID** (começa com `1000.`) e **Client Secret** na aba *Client Secret*
 - **Não gere grant code**: o fluxo `client_credentials` não precisa dele e não devolve `refresh_token`
-- `portal_id`: `GET https://projects.zoho.com/api/v3/portal` com o token — e **atenção**, ele difere do
-  `login_id` que a V2 devolve; trocá-los dá erro que parece de permissão
+- `portal_id`: `GET https://projects.zoho.com/api/v3/portals` com o token → `[{"id": …}]`. Ele serve nas
+  **duas** versões da API; o `login_id` que a V2 devolve no topo do envelope é o **usuário** e na URL dá
+  `404 6504 Domain Not Available` (medido 2026-09-30 — a 1ª redação dizia o contrário)
 - ⚠️ **O datacenter importa**: token de `.com` não vale em `.eu`/`.in`/`.com.au`
 
 **5.1. Modo Offline (sem gerenciador):**

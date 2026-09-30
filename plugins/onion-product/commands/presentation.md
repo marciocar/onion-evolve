@@ -48,7 +48,7 @@ Analisar `{{topic}}` para determinar fonte:
 
 | Pattern | Tipo | Ação |
 |---------|------|------|
-| `86adf...` | Task ID (ClickUp/Jira/Asana/Linear) | Buscar dados via Task Manager |
+| `86adf...` | Task ID (ClickUp/Jira/Asana/Linear/Zoho/Zoho Projects) | Buscar dados via Task Manager |
 | `docs/...` | Documento | Ler arquivo |
 | Texto livre | Tema | Pesquisar codebase |
 

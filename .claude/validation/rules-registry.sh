@@ -7,8 +7,9 @@
 # / "SOFT"). Assim o registro reflete o comportamento, não uma promessa que pode ter driftado.
 #
 # Imprime markdown em stdout; o arquivo .claude/validation/lint-rules.md é a PROJEÇÃO (a guarda
-# REGRA 39 regenera e compara). FALHA (exit 2) se houver número de REGRA duplicado ou uma regra
-# sem categoria — a catraca de clareza (a colisão 22/23 nunca mais volta silenciosa).
+# REGRA 39 regenera e compara). FALHA (exit 2) nas 6 catracas de clareza: número duplicado ·
+# regra sem categoria · sem `# previne:` · sem tag [SEV] · severidade indefinida · regra ÓRFÃ
+# (header sem função própria — rouba a função da seguinte e publica severidade falsa).
 #
 # Uso:  bash .claude/validation/rules-registry.sh > .claude/validation/lint-rules.md
 # ===========================================================================
@@ -147,6 +148,36 @@ if sem_sev:
         "  final da linha `# REGRA N — Titulo` em lint-artifacts.sh.\n" % sem_sev)
     sys.exit(2)
 
+# Catraca de CLAREZA nº6 — regra ÓRFÃ: header sem NENHUMA função entre ele e o próximo header.
+#
+# NASCEU DE DANO MEDIDO, DUAS VEZES NO MESMO DIA (2026-09-30). O bloco de uma regra nova foi
+# inserido ENTRE o header da REGRA 85 e a `check_door_staleness()` que a implementa. O parser
+# associa o PRIMEIRO `nome() {` após o header — que passou a ser a função da regra nova. Efeito:
+# a 85 saiu com `fn=None`, perdeu os literais do corpo e o registro publicou **HARD** onde ela é
+# **HARD + SOFT**. O pior não é o erro: é que a projeção byte-a-byte APROVOU, porque o gerador
+# era a fonte do valor errado — e a aritmética do rodapé fechou (80/29 em vez de 80/30).
+#
+# Até hoje isto era "limite conhecido da derivação, gated-until-trigger, sem dano observado"
+# (2026-08-03, quando a cura foi CONSELHO: "mova o docstring para junto da sua função"). O
+# gatilho disparou. Conselho não impede inserção; catraca impede.
+#
+# ISENÇÕES DECLARADAS, com a razão — regra implementada DENTRO da função de uma irmã:
+#   40 → o stamp do adotante é verificado dentro de `_scan_relative_links`/guards de plugin
+#   86 → o parse de YAML do workflow roda dentro da guarda de workflow vizinha
+# Órfã NOVA é erro: ou a regra tem função própria, ou a isenção entra aqui COM a razão escrita.
+ORPHAN_ALLOWED = {40: "verificada dentro dos guards de adotante/plugin",
+                  86: "parse de YAML roda na guarda de workflow vizinha"}
+orphans = sorted(x for x in rules if not rules[x].get('fn') and x not in ORPHAN_ALLOWED)
+if orphans:
+    sys.stderr.write(
+        "ERRO rules-registry: REGRA(S) ORFA(S) — header sem funcao propria: %s\n"
+        "  O parser associa o 1o `nome() {` apos o header. Header sem funcao ANTES do proximo\n"
+        "  header rouba a funcao da regra seguinte e publica severidade FALSA (medido 2026-09-30\n"
+        "  na REGRA 85: HARD + SOFT saiu como HARD, e a projecao byte-a-byte aprovou).\n"
+        "  Cure movendo o bloco para DEPOIS da funcao da regra anterior, ou declare a isencao\n"
+        "  em ORPHAN_ALLOWED (rules-registry.sh) com a razao escrita.\n" % orphans)
+    sys.exit(2)
+
 # --- classificação (SSOT da categoria; a cobertura é guardada abaixo) --------
 CATEGORIES = [
     ("Frontmatter & conformidade de artefato",
@@ -236,12 +267,16 @@ out.append("> ```")
 out.append(">")
 out.append("> A coluna **O que previne** vem do campo `# previne:` no docstring de cada regra (o")
 out.append("> modo-de-falha que ela evita). A REGRA 39 mantém este arquivo em paridade com as guardas,")
-out.append("> e o gerador **falha (exit 2)** nas **5 catracas de clareza** — número duplicado · regra")
+out.append("> e o gerador **falha (exit 2)** nas **6 catracas de clareza** — número duplicado · regra")
 out.append("> sem categoria · regra sem `# previne:` · regra sem o tag `[SEV]` · severidade que não")
-out.append("> resolve. Regra nova sem essas quatro declarações não entra: é anti-drift por construção.")
+out.append("> resolve · **regra órfã** (header sem função própria). Regra nova sem essas declarações")
+out.append("> não entra: é anti-drift por construção.")
 out.append(">")
-out.append("> **Limite conhecido da derivação** (medido 2026-08-03, `gated-until-trigger`: sem dano")
-out.append("> observado, não vale reescrever o parser): o scan associa a cada regra o **primeiro**")
+out.append("> **Limite conhecido da derivação** — e ele JÁ CAUSOU DANO (2026-09-30, duas vezes no")
+out.append("> mesmo dia: a REGRA 85 saiu HARD em vez de HARD + SOFT porque um bloco novo entrou entre")
+out.append("> o header dela e a sua função, e a projeção byte-a-byte aprovou o valor errado). Desde")
+out.append("> então a **catraca nº6** reprova regra órfã, com isenções declaradas. O scan segue")
+out.append("> associando a cada regra o **primeiro**")
 out.append("> `nome() {` após o header, então em regras cujo header antecede um *helper* — ou que")
 out.append("> **delegam** a um script externo com `violation \"${sev}\"` dinâmico — a severidade vem do")
 out.append("> tag `[SEV]`, não do corpo. Hoje as duas fontes concordam em **todas** as regras (nenhuma")

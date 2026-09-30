@@ -166,7 +166,7 @@ Com base no diagnóstico, coletar o que não foi auto-detectado:
 
 Ler `.env` do repo: `TASK_MANAGER_PROVIDER` e `TASK_MANAGER_TRANSPORT`. Se ausente, perguntar:
 
-- Qual o provider? (`jira` / `clickup` / `asana` / `linear` / `none`)
+- Qual o provider? (`jira` / `clickup` / `asana` / `linear` / `zoho` / `none`)
 - Transport: `api` (padrão) ou `mcp`
 
 ### Integration branch

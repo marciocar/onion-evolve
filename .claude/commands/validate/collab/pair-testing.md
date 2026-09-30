@@ -16,7 +16,7 @@ parameters:
     description: Criar evento no calendário para a sessão
     required: false
   - name: task-manager
-    description: 'Task manager usado (clickup|jira|linear|asana). Default: TASK_MANAGER_PROVIDER do .env'
+    description: 'Task manager usado (clickup|jira|linear|asana|zoho). Default: TASK_MANAGER_PROVIDER do .env'
     required: false
     default: auto
   - name: feature-id

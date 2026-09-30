@@ -85,7 +85,7 @@ Estabelecer contexto focado em:
 
 ### 6. Task Manager Integration
 - ✅ Verificar `TASK_MANAGER_PROVIDER` no `.env`
-- ✅ Entender abstração de Task Manager (ClickUp, Asana, Linear)
+- ✅ Entender abstração de Task Manager (ClickUp, Asana, Linear, Zoho Projects)
 - ✅ Revisar `docs/knowledge-base/concepts/task-manager-abstraction.md`
 
 ### 7. Especificações de Features
