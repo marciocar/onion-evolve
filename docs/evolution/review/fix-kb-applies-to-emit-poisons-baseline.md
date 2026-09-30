@@ -1,6 +1,6 @@
 ---
 branch: fix/kb-applies-to-emit-poisons-baseline
-reviewed_diff_sha256: ba79b5a22307ee5ff52a0c0092a6561f0a64ad011ad9b9dd90090c26d05c1d24
+reviewed_diff_sha256: 24ff36bdca3a0345fd72b0c4145a0212a69a75631a01b65d78426943397fa534
 elenxo: nao
 verdict: CORRIGIDO
 findings_total: 2
