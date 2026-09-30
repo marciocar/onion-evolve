@@ -8,10 +8,10 @@ Bem-vindo ao sistema Onion v3.0! Este guia vai te ajudar a começar rapidamente 
 
 | Componente | Quantidade | Descrição |
 |------------|------------|-----------|
-| Comandos | 110 | Organizados em 10 categorias + root |
+| Comandos | 111 | Organizados em 10 categorias + root |
 | Agentes | 51 | 9 categorias especializadas |
 | Skills | 13 | Orquestração, validação, pesquisa e resolvers de contexto |
-| Knowledge Bases | 107 | Documentação estruturada |
+| Knowledge Bases | 108 | Documentação estruturada |
 
 ## 📋 Checklist de Setup
 
@@ -44,7 +44,7 @@ Após instalar o Sistema Onion no projeto, você deve ver a seguinte estrutura:
 ```
 seu-projeto/
 ├── .claude/
-│   ├── commands/           # 110 comandos em 10 categorias
+│   ├── commands/           # 111 comandos em 10 categorias
 │   ├── agents/             # 51 agentes especializados
 │   ├── skills/             # 13 skills de orquestração
 │   ├── sessions/           # Sessões de desenvolvimento
@@ -52,7 +52,7 @@ seu-projeto/
 ├── docs/
 │   ├── onion/              # Documentação do framework
 │   ├── meta-specs/         # Constituição do sistema (L0)
-│   └── knowledge-base/     # 107 Knowledge Bases estruturadas
+│   └── knowledge-base/     # 108 Knowledge Bases estruturadas
 ├── .env                    # Variáveis de ambiente (NÃO commitar)
 ├── .env.example            # Template de variáveis
 ├── .claudeignore           # Otimização do context window
