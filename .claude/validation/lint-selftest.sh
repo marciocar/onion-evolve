@@ -19650,6 +19650,30 @@ corpo'
   else record_fail "kb-applies-to: (e)" "cobrou fora do escopo (rc=${_kb_rc}) — 55 de 109 KBs citam versão de passagem"; fi
 
   # (f) docs/knowledge-base AUSENTE ⇒ rc=3 (recusa, nunca 'conforme')
+  # (g) O STDOUT DO MODO --emit-baseline É O ARQUIVO — e por isso não pode carregar achado.
+  # Medido em 2026-09-30 num hub real: este emissor escrevia o baseline por conta própria enquanto o
+  # `regen-baselines.sh` (mecanismo GENÉRICO, que varre todos) faz `bash <emissor> --emit-baseline >
+  # <baseline>`. As duas escritas colidiram, a do regen ganhou, e o baseline do adotante nasceu com as
+  # MENSAGENS DE ACHADO em vez de caminhos. Baseline que não casa com nada não tolera nada: as KBs
+  # legítimas e pré-existentes dele viraram HARD e o gate recém-instalado bloqueou o repo por dívida
+  # que não era dele. O emissor saiu `exit 0` e produziu lixo — a classe `exit 0 é declaração`.
+  local _eb; _eb="$(mktemp -d)"; mkdir -p "${_eb}/docs/knowledge-base/tools" "${_eb}/.claude/validation"
+  printf '# sem frontmatter\n' > "${_eb}/docs/knowledge-base/tools/a.md"
+  local _out _err _n_path _n_prosa
+  _out="$(bash "${sut}" "${_eb}" --emit-baseline 2>/dev/null)"
+  _n_prosa="$(grep -c 'REGRA 93:' <<< "${_out}" || true)"
+  _n_path="$(grep -c '^docs/knowledge-base/' <<< "${_out}" || true)"
+  if [ "${_n_prosa}" = "0" ] && [ "${_n_path}" -ge 1 ]; then
+    record_pass "kb-applies-to: (g) --emit-baseline põe CAMINHOS no stdout e nenhum achado (o stdout É o baseline)"
+  else record_fail "kb-applies-to: (g)" "o stdout do --emit-baseline traz ${_n_prosa} linha(s) de achado e ${_n_path} caminho(s) — o regen-baselines.sh redireciona este stdout PARA o baseline, então achado ali vira baseline que não casa com nada"; fi
+  # (h) e o baseline emitido tem de TOLERAR na varredura seguinte — senão ele é decorativo
+  printf '%s\n' "${_out}" > "${_eb}/.claude/validation/kb-applies-to-baseline.txt"
+  local _rc2=0; bash "${sut}" "${_eb}" >/dev/null 2>&1 || _rc2=$?
+  if [ "${_rc2}" = "0" ]; then
+    record_pass "kb-applies-to: (h) o baseline emitido TOLERA na varredura seguinte (rc=0)"
+  else record_fail "kb-applies-to: (h)" "emitiu o baseline e a varredura seguinte ainda acusa (rc=${_rc2}) — emissor e leitor discordam sobre a forma da chave"; fi
+  rm -rf "${_eb}"
+
   local empty_repo; empty_repo="$(mktemp -d)"
   local erc=0
   if bash "${sut}" "${empty_repo}" >/dev/null 2>&1; then erc=0; else erc=$?; fi
