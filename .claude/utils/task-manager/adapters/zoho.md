@@ -172,44 +172,45 @@ DELETE /projects/{projectId}/tasks/{taskId}     → 204
 ⚠️ **Assimetria medida:** para **task** o verbo é `DELETE`; para **projeto** é `POST /projects/{id}/trash`
 (o `DELETE` de projeto falha de duas formas diferentes). Não generalize de um para o outro.
 
-### `createSubtask(parentId, input)` — **SEM CAMINHO CONHECIDO (não implementável hoje)**
+### `createSubtask(parentId, input)` — **o vínculo é `parental_info`, objeto ANINHADO**
 
-⚠️ **Este é o único membro da interface que o adapter NÃO entrega**, e a honestidade custou uma
-retratação: até 2026-09-30 esta seção afirmava *"na V2 funciona"* com base num **`201`**. A passada
-adversarial mediu o corpo, e o `201` é vazio de vínculo — exatamente a armadilha da §1 deste arquivo,
-cometida por mim no único ponto onde o arquivo faz uma promessa positiva.
+```
+POST /projects/{projectId}/tasks
+{ "name": "...", "parental_info": { "parent_task_id": "<parentId>" } }     → 201
+```
 
-O que foi medido, em duas rodadas independentes:
+Medido em 2026-09-30, e **conferido no corpo** como manda a §1: a filha nasce com `depth: 1` e
+`parental_info.parent_task_id` preenchido, e **o pai passa a `association_info.has_subtasks: true``.
 
-| tentativa | resultado |
-|---|---|
-| V2 `POST …/tasks/` com `name=…&parent_task_id=<pai>` | **201**, e a task nasce **rasa**: `isparent: False`, `subtasks: False`, nenhuma chave de pai |
-| V3 `GET /tasks` depois disso | pai e filha **ambas** com `depth: 0`; o pai **não** ganhou filho |
-| V2 `GET /tasks/{pai}/subtasks/` | **204**, corpo **vazio** |
-| V3 `{"parent_task":{"id":…}}` · `{"parent":{"id":…}}` · `{"parent_task_id":…}` | **400** `Enter a valid custom field` nos três |
-| `depth: 1` no POST | **2xx**, e a task nasce com `depth: 0` |
-| `association_info.parent_task` | **2xx**, e nada vincula |
-| `/tasks/{id}/subtasks`, `/subtasks`, `/tasks/subtasks`, `/tasks/{id}/tasks` | `URL_RULE_NOT_CONFIGURED` |
-| **e no entanto** | toda task traz `association_info.has_subtasks` — o modelo tem subtask, a **escrita** não está exposta |
+⚠️ **RETRATAÇÃO, e ela ensina mais que o endpoint.** Entre a manhã e a tarde deste mesmo dia esta
+seção afirmou duas coisas erradas, em direções opostas:
 
-**O que o adapter faz:** recusa, com a razão. `createSubtask` devolve erro nomeado
-(`ZOHO_SUBTASK_WRITE_NOT_EXPOSED`) e o consumidor decompõe **em tasks irmãs** com o pai citado no nome
-ou na descrição — a decomposição não para, ela muda de forma. **Nunca** devolva sucesso sobre o `201`:
-quem confiar nele acha que tem hierarquia e não tem.
+1. primeiro que a **V2** entregava subtask — com base num `201` que eu não abri. A task nascia RASA;
+2. depois que **não havia caminho nenhum** — porque sondei `parent_task`, `parent` e `parent_task_id`
+   **no topo do objeto**, os três 400, e concluí impossibilidade a partir de três formas PLANAS.
 
-> **Fio com data, não detalhe:** a V2 sai de linha em **2026-12-31**. Como ela também não entrega
-> subtask, o prazo aqui não é perda de caminho — é uma porta que se fecha sem nunca ter aberto. Se a
-> Zoho expuser a escrita na V3, o gatilho para reabrir este membro é **medir o vínculo no corpo**, nunca
-> um código 2xx.
+A segunda conclusão caiu quando a KB de um adotante, mais nova que a nossa, documentou a forma
+aninhada — e a sonda confirmou na hora. **O arquivo já continha a resposta**: a §1 diz, em letra
+maiúscula, que *todo vínculo é objeto aninhado* e que o `*_id` plano é ignorado. Declarei uma
+impossibilidade tendo escrito, acima, a regra que a desfaz. Não foi falta de medição — foi não aplicar
+a si a regra que se acabou de descobrir.
 
-### `getSubtasks(parentId)` — **não há caminho confiável**
+**O que fica de mecanismo:** antes de declarar que uma escrita não existe nesta API, **teste a forma
+aninhada** — ela é a convenção da casa, não a exceção. Ausência de caminho só se declara depois de
+tentar o aninhamento que a §1 prevê.
 
-`GET /tasks?parent_task=<id>` devolve **200** e **a listagem completa**, incluindo a própria task pai.
-Provado: sem filtro 2 tasks, com filtro 2 tasks. E como `createSubtask` não tem caminho (acima), **não
-há hierarquia a listar** — este membro devolve lista vazia com a razão, nunca um palpite.
+### `getSubtasks(parentId)` — filtre no CLIENTE pelo `parental_info`
 
-**O adapter lista e filtra no cliente**, ou declara que não sabe. O que ele **não** faz é confiar no
-parâmetro.
+`GET /tasks?parent_task=<id>` devolve **200** e **a listagem completa**, incluindo a própria task pai:
+sem filtro 2 tasks, com filtro 2 tasks. O parâmetro é aceito e ignorado, como a §1 descreve.
+
+**O caminho que funciona** é ler `parental_info.parent_task_id` de cada task da listagem e filtrar no
+cliente — o campo é confiável (nasce preenchido no POST aninhado e o pai reflete em `has_subtasks`).
+
+**NÃO MEDIDO:** a KB de um adotante documenta um filtro por `criteria`
+(`{"criteria":[{"field_name":"parent_task",…}],"pattern":"1"}`). Tentei-o em `POST …/tasks/search` e o
+endpoint **não existe** (`URL_RULE_NOT_CONFIGURED`); onde esse corpo é aceito, eu não descobri. Fica
+declarado como lacuna, não como inexistência — a distinção que este arquivo pagou caro para aprender.
 
 ### `addComment(taskId, comment)` · `getComments(taskId)`
 

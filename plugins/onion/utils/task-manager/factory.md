@@ -104,9 +104,9 @@ function getTaskManager(options?: FactoryOptions): ITaskManager {
     case 'zoho':
       // Transporte ÚNICO: REST API V3. Não há MCP nativo da Zoho para Projects
       // (medido 2026-09-30) — por isso, diferente do Linear, não há `transport` aqui.
-      // `createSubtask` NÃO é implementável: medido, nenhum caminho (V3 nem V2)
-      // cria vínculo de pai — a V2 devolve 201 e a task nasce rasa. O membro
-      // recusa com ZOHO_SUBTASK_WRITE_NOT_EXPOSED (ver adapters/zoho.md).
+      // `createSubtask` usa o vínculo ANINHADO `parental_info.parent_task_id`
+      // (medido: filha nasce depth 1 e o pai vira has_subtasks true). As formas
+      // PLANAS dão 400 — a convenção da casa é objeto aninhado, sempre.
       return new ZohoProjectsAdapter({
         clientId: process.env.ZOHO_CLIENT_ID!,
         clientSecret: process.env.ZOHO_CLIENT_SECRET!,
