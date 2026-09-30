@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**229 itens abertos** em 51 grafo(s) com aberto (de 74 no escopo) · 52 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**230 itens abertos** em 52 grafo(s) com aberto (de 75 no escopo) · 53 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -445,6 +445,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.8 | `C_S4` | granaai-doctrine-absorption-2026-07 | FEATURE: /meta:kg map projeto (canonicalizacao de monorepo) — hoje map area existe, projeto/monorepo aberto |
+
+## rito-task-manager-2026-09 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 4.8 | `Q_COMPROMISSO_ESPERA_COLHEITA` | rito-task-manager-2026-09 | o COMPROMISSO de implementar este rito ainda NAO entrou em fios-abertos.kg.yaml, e a razao e o contrato daquele arquivo: teto de 1 |
 
 ## fios-abertos — 3 item(ns)
 

@@ -86,7 +86,7 @@ Após a análise, apresente um relatório estruturado no seguinte formato:
 # 📊 RELATÓRIO DE VALIDAÇÃO - [NOME DA TASK]
 
 **Task ID**: [TASK_ID]  
-**Provedor**: [jira/clickup/asana/linear/local]  
+**Provedor**: [jira/clickup/asana/linear/zoho/local]  
 **Tipo**: [Task/Subtask/Task com Subtasks]  
 **Prioridade**: [PRIORIDADE_ATUAL]  
 **Status**: [STATUS_ATUAL]

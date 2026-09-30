@@ -372,6 +372,14 @@ hub-formacao-enterprise	specialization	hub-de-adocao
 hub-formacao-enterprise	specialization	spec-as-code	
 hub-formacao-enterprise	tier	hub	
 hub-formacao-enterprise	trust-advises	onion-evolve	
+hub-operacoes-enterprise	adopts	onion-evolve	
+hub-operacoes-enterprise	mode	greenfield	
+hub-operacoes-enterprise	pin	cff9214c3b9a	
+hub-operacoes-enterprise	specialization	hub	
+hub-operacoes-enterprise	specialization	itsm	
+hub-operacoes-enterprise	specialization	task-manager-integration	
+hub-operacoes-enterprise	tier	hub	
+hub-operacoes-enterprise	trust-advises	onion-evolve	
 iso-22301-specialist	related	/docs/build-compliance-docs	
 iso-22301-specialist	related	iso-27001-specialist	
 iso-22301-specialist	related	security-information-master	

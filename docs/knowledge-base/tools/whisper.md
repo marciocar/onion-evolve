@@ -1,3 +1,8 @@
+---
+applies_to: "Whisper (OpenAI) — versão NÃO MEDIDA: a biblioteca não está instalada nesta máquina e a KB não declara versão"
+verified_at: 2026-09-30
+---
+
 # Whisper - Knowledge Base
 
 ## 📋 Metadados

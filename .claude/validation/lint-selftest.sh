@@ -19560,7 +19560,186 @@ run_door_role_change_refusal_selftests() {
 }
 
 _family run_glob_branch_parity_selftests
+
+# ── REGRA 93: KB de terceiro declara a QUE VERSÃO se aplica ───────────────────────────────────
+# POR QUE EXISTE: "documentações devem seguir versões" (maestro, 2026-09-30, campo e escopo selados
+# por ele). O caso (c) é o coração da guarda e nasceu de um defeito REAL: uma passada adversarial
+# provou que carimbo escrito FORA do bloco `---` é prosa — o extrator do gate devolve vazio e o
+# carimbo fica invisível. Uma guarda que exigisse só o campo passaria esse caso, que é fail-open.
+run_kb_applies_to_selftests() {
+  # Os dois artefatos que esta família cobre, NOMEADOS para que o mapa `--affected-staged` os
+  # reivindique. Sem esta linha o harness não sabe de quem é o baseline e RECUSA NO INCERTO — roda as
+  # 198 famílias inteiras (medido em 2026-09-30, na estreia desta família). Recusar no incerto é o
+  # comportamento certo dele; nomear é a obrigação de quem escreve a família.
+  local sut="${REPO_ROOT}/.claude/validation/kb-applies-to-check.sh"
+  # ⚠️ O baseline é referenciado AQUI, em CÓDIGO e com ${REPO_ROOT}, porque é assim que o
+  # `_selftest_family_map` o reivindica — ele deriva o mapa do corpo da família por esse padrão, e
+  # NÃO lê comentários. Na 1ª versão desta família eu o declarei em comentário e o harness recusou no
+  # incerto, rodando as 198 famílias. A variável não precisa ser usada: a menção é o contrato do mapa.
+  local _covers_baseline="${REPO_ROOT}/.claude/validation/kb-applies-to-baseline.txt"; : "${_covers_baseline}"
+  if [ ! -f "${sut}" ]; then record_fail "kb-applies-to" "SUT ausente: ${sut}"; return; fi
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  mkdir -p "${d}/docs/knowledge-base/tools" "${d}/docs/knowledge-base/platforms" "${d}/.claude/validation"
+
+  _kb() { printf '%s\n' "$2" > "${d}/docs/knowledge-base/tools/$1"; }
+  _run() { if _kb_out="$(bash "${sut}" "${d}" 2>&1)"; then _kb_rc=0; else _kb_rc=$?; fi; }
+
+  # (a) frontmatter com applies_to ⇒ silêncio
+  _kb ok.md '---
+versao: 1.0.0
+applies_to: "Produto 3.2.1"
+---
+
+# KB de exemplo'
+  _run
+  if [ "${_kb_rc}" = "0" ] && ! grep -q 'SEM-' <<< "${_kb_out}"; then
+    record_pass "kb-applies-to: (a) frontmatter com applies_to ⇒ silêncio"
+  else record_fail "kb-applies-to: (a)" "acusou KB conforme (rc=${_kb_rc}): $(_emit "${_kb_out}" | head -c 180)"; fi
+
+  # (b) frontmatter SEM o campo ⇒ ACUSA
+  _kb ok.md '---
+versao: 1.0.0
+---
+
+# KB sem o campo'
+  _run
+  if [ "${_kb_rc}" = "1" ] && grep -q 'SEM-CAMPO' <<< "${_kb_out}"; then
+    record_pass "kb-applies-to: (b) frontmatter sem applies_to ⇒ ACUSA"
+  else record_fail "kb-applies-to: (b)" "KB sem o campo passou (rc=${_kb_rc})"; fi
+
+  # (c) O CORAÇÃO: campo presente mas FORA do bloco `---` ⇒ ACUSA, porque o gate não o lê.
+  # Este é o defeito que a passada adversarial de 2026-09-30 achou numa KB real.
+  _kb ok.md '# KB com metadado solto
+
+applies_to: "Produto 3.2.1"
+verified_at: 2026-09-30
+
+corpo'
+  _run
+  if [ "${_kb_rc}" = "1" ] && grep -q 'SEM-FRONTMATTER' <<< "${_kb_out}"; then
+    record_pass "kb-applies-to: (c) campo FORA do bloco --- ⇒ ACUSA (carimbo invisível ao gate é fail-open)"
+  else record_fail "kb-applies-to: (c)" "campo solto passou como cumprido (rc=${_kb_rc}) — a guarda virou fail-open: $(_emit "${_kb_out}" | head -c 180)"; fi
+
+  # (d) baseline ISENTA, e o passivo é DECLARADO em voz alta (silêncio seria a catraca mentindo)
+  printf '# isenções\ndocs/knowledge-base/tools/ok.md   # razão escrita\n' > "${d}/.claude/validation/kb-applies-to-baseline.txt"
+  _run
+  if [ "${_kb_rc}" = "0" ] && grep -q 'PASSIVO' <<< "${_kb_out}" && ! grep -q 'SEM-' <<< "${_kb_out}"; then
+    record_pass "kb-applies-to: (d) baseline isenta E declara o passivo (catraca não fica muda)"
+  else record_fail "kb-applies-to: (d)" "baseline não isentou ou não declarou (rc=${_kb_rc}): $(_emit "${_kb_out}" | head -c 180)"; fi
+
+  # (e) FRONTEIRA: KB fora de tools/platforms NÃO é cobrada (escopo selado; por-forma foi rejeitado)
+  rm -f "${d}/docs/knowledge-base/tools/ok.md" "${d}/.claude/validation/kb-applies-to-baseline.txt"
+  mkdir -p "${d}/docs/knowledge-base/concepts"
+  printf '# conceito sem versão\n\ncorpo citando v1.2.3 de passagem\n' > "${d}/docs/knowledge-base/concepts/x.md"
+  _run
+  if [ "${_kb_rc}" = "0" ] && ! grep -q 'SEM-' <<< "${_kb_out}"; then
+    record_pass "kb-applies-to: (e) KB fora de tools/platforms não é cobrada (escopo selado)"
+  else record_fail "kb-applies-to: (e)" "cobrou fora do escopo (rc=${_kb_rc}) — 55 de 109 KBs citam versão de passagem"; fi
+
+  # (f) docs/knowledge-base AUSENTE ⇒ rc=3 (recusa, nunca 'conforme')
+  local empty_repo; empty_repo="$(mktemp -d)"
+  local erc=0
+  if bash "${sut}" "${empty_repo}" >/dev/null 2>&1; then erc=0; else erc=$?; fi
+  if [ "${erc}" = "3" ]; then
+    record_pass "kb-applies-to: (f) sem docs/knowledge-base ⇒ rc=3 (recusa, não conformidade por ausência)"
+  else record_fail "kb-applies-to: (f)" "sem corpus não recusou (rc=${erc})"; fi
+  rm -rf "${empty_repo}"
+}
+
 _family run_door_role_parity_selftests
+
+# ── ADAPTER ZOHO PROJECTS: os achados medidos não podem se perder na prosa ────────────────────
+# POR QUE EXISTE: o adapter foi escrito a partir de DUAS sondas de escrita em portal real
+# (2026-09-30), e três dos achados são da classe "a API devolve 200 e não faz o que você pediu".
+# Se o documento perder essas linhas, o próximo a implementar repete o erro — e o erro passa em
+# teste de status HTTP. Esta família cobra que os achados continuem escritos.
+run_zoho_adapter_selftests() {
+  local ad="${REPO_ROOT}/.claude/utils/task-manager/adapters/zoho.md"
+  local iface="${REPO_ROOT}/.claude/utils/task-manager/interface.md"
+  local fac="${REPO_ROOT}/.claude/utils/task-manager/factory.md"
+  local det="${REPO_ROOT}/.claude/utils/task-manager/detector.md"
+  if [ ! -f "${ad}" ]; then record_fail "zoho-adapter" "SUT ausente: ${ad}"; return; fi
+
+  # (a) PARIDADE com a interface — a lista de membros sai de interface.md, não é digitada aqui.
+  # Predicado de paridade porque lista digitada é terceira fonte que caduca.
+  local _absent="" _m
+  while IFS= read -r _m; do
+    [ -n "${_m}" ] || continue
+    grep -qF "${_m}" "${ad}" || _absent="${_absent}${_m} "
+  done < <(grep -oE '^  [a-zA-Z]+\(' "${iface}" | tr -d ' (' | sort -u)
+  if [ -z "${_absent}" ]; then
+    record_pass "zoho-adapter: (a) PARIDADE — todo membro de interface.md aparece no adapter"
+  else record_fail "zoho-adapter: (a)" "membros da interface ausentes no adapter: ${_absent}"; fi
+
+  # (b) o achado mais perigoso: vínculo por objeto aninhado, e o *_id é ignorado em SILÊNCIO
+  if grep -qF '{"milestone":{"id"' "${ad}" && grep -qiE 'ignorad' "${ad}"; then
+    record_pass "zoho-adapter: (b) o vínculo por objeto aninhado e o silêncio do *_id estão escritos"
+  else record_fail "zoho-adapter: (b)" "o adapter não diz que o vínculo é objeto aninhado e que *_id é aceito e IGNORADO — é o achado que passa em teste de HTTP 200"; fi
+
+  # (c) PATCH é o único verbo de update
+  if grep -qF 'PATCH' "${ad}" && grep -qF 'INVALID_METHOD' "${ad}"; then
+    record_pass "zoho-adapter: (c) PATCH declarado, com o erro que prova que PUT/POST não servem"
+  else record_fail "zoho-adapter: (c)" "falta PATCH ou falta INVALID_METHOD (a evidência de que é o único verbo)"; fi
+
+  # (d) `portal` SINGULAR — `portals` devolve 400
+  if grep -qE 'portal.*SINGULAR|`portal` singular|portal\` SINGULAR' "${ad}"; then
+    record_pass "zoho-adapter: (d) o segmento `portal` singular está declarado"
+  else record_fail "zoho-adapter: (d)" "o adapter não avisa que o segmento é `portal` singular (portals → 400)"; fi
+
+  # (e) o filtro que NÃO filtra — sem isto, searchTasks devolve tudo achando que buscou
+  if grep -qE 'search=.*não filtra|não filtra' "${ad}"; then
+    record_pass "zoho-adapter: (e) o adapter avisa que ?search= NÃO filtra"
+  else record_fail "zoho-adapter: (e)" "falta o aviso de que ?search= é aceito e ignorado — searchTasks devolveria a lista inteira como resultado"; fi
+
+  # (f) createSubtask só na V2, e a V2 tem DATA de morte
+  if grep -qF 'V2' "${ad}" && grep -qF '2026-12-31' "${ad}"; then
+    record_pass "zoho-adapter: (f) a dependência da V2 e o prazo dela (2026-12-31) estão declarados"
+  else record_fail "zoho-adapter: (f)" "createSubtask depende da V2 e isso tem PRAZO — o adapter precisa dizer os dois"; fi
+
+  # (g) MUTANTE-ALVO: o factory roteia zoho, e o detector conhece as variáveis
+  if grep -qF "case 'zoho':" "${fac}"; then
+    record_pass "zoho-adapter: (g) factory.md roteia 'zoho'"
+  else record_fail "zoho-adapter: (g)" "factory.md não roteia 'zoho' — o adapter existe e ninguém o alcança"; fi
+  if grep -qF 'ZOHO_CLIENT_SECRET' "${det}"; then
+    record_pass "zoho-adapter: (h) detector.md declara as variáveis obrigatórias do zoho"
+  else record_fail "zoho-adapter: (h)" "detector.md não conhece zoho — o fallback gracioso não avisa o que falta"; fi
+
+  # (j) PARIDADE DE VOCABULÁRIO — o achado que custou caro nesta sessão.
+  # Eu declarei "9 pontos ligados" conferindo por MENÇÃO, e o tipo `TaskManagerProvider` em types.md
+  # NÃO tinha 'zoho' — o adapter era inválido contra a própria abstração. O predicado certo é
+  # paridade: todo sítio OPERACIONAL que enumera um provider existente tem de enumerar os novos.
+  # Aqui cobramos os sítios que roteiam de fato; KB e guia de adoção são doutrina, não roteamento.
+  local _op=(
+    "${REPO_ROOT}/.claude/utils/task-manager/types.md"
+    "${REPO_ROOT}/.claude/utils/task-manager/factory.md"
+    "${REPO_ROOT}/.claude/utils/task-manager/detector.md"
+    "${REPO_ROOT}/.claude/utils/task-manager/README.md"
+    "${REPO_ROOT}/.claude/commands/common/prompts/task-manager-provider-detection.md"
+    "${REPO_ROOT}/.claude/commands/meta/setup-integration.md"
+    "${REPO_ROOT}/.claude/skills/onion/SKILL.md"
+    "${REPO_ROOT}/.env.example"
+  )
+  local _sem="" _f
+  for _f in "${_op[@]}"; do
+    [ -f "${_f}" ] || continue
+    # o sítio é operacional se cita um provider JÁ existente; então tem de citar os novos também
+    if grep -qi 'linear' "${_f}" && ! grep -qi 'zoho' "${_f}"; then
+      _sem="${_sem}$(basename "${_f}") "
+    fi
+  done
+  if [ -z "${_sem}" ]; then
+    record_pass "zoho-adapter: (j) PARIDADE de vocabulário — todo sítio operacional que lista provider lista zoho"
+  else record_fail "zoho-adapter: (j)" "sítio operacional lista 'linear' e NÃO lista 'zoho': ${_sem}— foi assim que o TIPO ficou sem o provider e o adapter nasceu inválido"; fi
+
+  # (i) a coluna Zoho nas DUAS tabelas de mapeamento canônico
+  local _n_tab; _n_tab="$(grep -c 'Zoho Projects |' "${iface}")"
+  if [ "${_n_tab}" -ge 2 ]; then
+    record_pass "zoho-adapter: (i) interface.md tem a coluna Zoho nas duas tabelas (status e prioridade)"
+  else record_fail "zoho-adapter: (i)" "interface.md tem ${_n_tab} tabela(s) com coluna Zoho, esperado 2 — o mapeamento canônico mora lá"; fi
+}
+
+_family run_kb_applies_to_selftests
+_family run_zoho_adapter_selftests
 _family run_door_role_change_refusal_selftests
 _family run_review_cause_bands_selftests
 _family run_research_workflow_selftests

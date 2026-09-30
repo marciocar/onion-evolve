@@ -1,6 +1,7 @@
 ---
 verified_at: 2026-07-23
 source: "https://docs.claude.com/en/release-notes/claude-code"
+applies_to: "Claude Code 2.1.285 (binário medido em 2026-09-30); a KB foi escrita contra a doc de release de 2026-06-15 e verificada em 2026-07-23"
 ---
 
 # Claude Code Commands Best Practices (atualizado em 2026-06-15)

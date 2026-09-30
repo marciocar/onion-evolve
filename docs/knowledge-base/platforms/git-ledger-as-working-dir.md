@@ -7,6 +7,7 @@ related:
   - ../../analysis/onion-federation-design-v2-2026-06.md
   - ../../analysis/onion-federation-design-review-2026-06.md
   - ../concepts/multi-repo-federation.md   # (a criar na Fase 1 do backlog)
+applies_to: "Claude Code 2.1.285 (binário medido em 2026-09-30) — o recurso é o additional working directory nativo"
 ---
 
 # Git ledger como *additional working directory*

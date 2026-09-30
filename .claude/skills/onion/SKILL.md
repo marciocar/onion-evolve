@@ -200,7 +200,7 @@ Branch atual:
 ## Gotchas Críticos
 
 **Task Manager Provider obrigatório**
-Antes de qualquer operação com tasks: ler `TASK_MANAGER_PROVIDER` no `.env`. Providers válidos: `clickup`, `jira`, `asana`, `linear`, `none`. Se ausente ou inválido: avisar o usuário e sugerir `/meta:setup-integration`. Nunca inventar valores nem assumir outro provider.
+Antes de qualquer operação com tasks: ler `TASK_MANAGER_PROVIDER` no `.env`. Providers válidos: `clickup`, `jira`, `asana`, `linear`, `zoho`, `none`. Se ausente ou inválido: avisar o usuário e sugerir `/meta:setup-integration`. Nunca inventar valores nem assumir outro provider.
 
 **Feature slug: sempre kebab-case**
 Correto: `user-authentication`. Errado: `user_authentication`, `UserAuth`, `userAuth`. O slug é usado tanto no nome da branch Git quanto na pasta de sessão `.claude/sessions/<feature-slug>/`.

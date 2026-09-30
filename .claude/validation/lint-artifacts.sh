@@ -2489,6 +2489,51 @@ check_kg_read_index_sync() {
 #   Conta só commit que tocou as raízes de `--emit-scrub-roots`: commit de
 #   biografia não defasa a porta — ela não o receberia de qualquer forma.
 # ===========================================================================
+# ===========================================================================
+# REGRA 93 — KB de terceiro declara a QUE VERSÃO se aplica [HARD + SOFT]
+# previne: documentação que caduca sem dizer para qual versão ela valia
+#   Reforço do maestro em 2026-09-30, com campo e escopo selados por ele:
+#   "documentações devem seguir versões". A casa tinha `verified_at` — QUANDO
+#   alguém olhou — e nada que dissesse A QUE o documento se aplica. As duas
+#   dimensões são independentes: data sem versão não responde "isto vale para a
+#   MINHA instalação?", que é a pergunta de quem abre uma KB de plataforma.
+#   Medido no dia: ZERO das 10 KBs de tools/+platforms declarava a versão do
+#   que documentava, e o par bi-temporal (`valid_from` × `verified_at`) já
+#   existia no corpus de pesquisa com 132 usos, sem nunca chegar às KBs.
+#   NÃO reusa `version:` porque esse campo JÁ significa duas coisas: na maioria
+#   é a versão da própria KB, mas a KB do Runflow usava-o para a versão do ALVO.
+#   COBRA AS DUAS COISAS — bloco `---` presente E o campo dentro dele — porque
+#   uma passada adversarial provou que carimbo escrito sem o bloco é PROSA: o
+#   extrator do gate devolve vazio e o carimbo fica invisível. Exigir só o campo
+#   seria fail-open.
+#   ESCOPO `tools/` + `platforms/`: as pastas cujo propósito é documentar
+#   artefato de terceiro. O escopo por FORMA foi medido e rejeitado — 55 de 109
+#   KBs citam versão no corpo, a maioria de passagem.
+#   CATRACA: isenção legítima (KB de padrão DA CASA) vai ao baseline com razão
+#   escrita; o baseline só encolhe; KB nova sem o campo é HARD.
+# ===========================================================================
+check_kb_applies_to() {
+  local sc="${SCRIPT_DIR}/kb-applies-to-check.sh"
+  [ -f "${sc}" ] || return 0
+  local out rc=0
+  out="$(bash "${sc}" "${REPO_ROOT}" 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 3 ]; then
+    violation "SOFT" ".claude/validation/kb-applies-to-check.sh" "REGRA 93 (KB de terceiro declara a QUE VERSÃO se aplica): a guarda não pôde julgar (rc=3) — docs/knowledge-base ausente. Recusa não é aprovação."
+    return 0
+  fi
+  local line
+  while IFS= read -r line; do
+    case "${line}" in
+      *PASSIVO*)
+        violation "SOFT" ".claude/validation/kb-applies-to-baseline.txt" "REGRA 93 (KB de terceiro declara a QUE VERSÃO se aplica): ${line}"
+        ;;
+      *SEM-FRONTMATTER*|*SEM-CAMPO*)
+        violation "HARD" "docs/knowledge-base" "REGRA 93 (KB de terceiro declara a QUE VERSÃO se aplica): ${line}"
+        ;;
+    esac
+  done <<< "${out}"
+}
+
 check_door_staleness() {
   local sc="${SCRIPT_DIR}/door-staleness-check.sh"
   [ -f "${sc}" ] || return 0
@@ -4522,6 +4567,7 @@ check_kg_read_index_sync
 check_kg_edit_saw_confirmed
 check_door_staleness
 check_door_role_parity
+check_kb_applies_to
 check_workflows_parse
 check_workflow_job_needs_checkout
 check_frontmatter_scalar_colon

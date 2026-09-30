@@ -1,0 +1,176 @@
+# KG SDAAL — o RITO do task manager: por que ele nunca dispara, e as duas decisões que o maestro selou.
+#
+# ⚠️ ESTE ARQUIVO NASCEU DE UM DEFEITO MEU, e a correção é o motivo dele existir. Em 2026-09-30 eu
+# escrevi estes oito nós dentro de `fios-abertos.kg.yaml`. O `meta:` daquele arquivo declara duas
+# fronteiras que eu violei: (1) "NENHUM FATO NASCE AQUI… Achado mora onde nasceu; aqui mora o
+# COMPROMISSO, citando o id alheio" — e cinco dos meus nós são FATOS medidos; (2) "TETO: 19 NÓS. Onda
+# nova exige onda COLHIDA" — e o arquivo já tinha 19, então qualquer nó novo estoura. A REGRA 58 (O
+# backlog cumpre as promessas do próprio `meta:`) acusou: "24 nós, teto declarado 19".
+# O fato mora aqui. O compromisso entra no `fios-abertos` quando houver colheita — gatilho nomeado no
+# nó Q_COMPROMISSO_ESPERA_COLHEITA.
+#
+# Camada audit (epistêmico).
+meta:
+  id: rito-task-manager-2026-09
+  schema_version: "1"
+  date: 2026-09-30
+  baseline: 2026-09-30
+  review_after: 2026-12-29
+nodes:
+  # ── O DIAGNÓSTICO ────────────────────────────────────────────────────────────────────────────
+  - id: E_RITO_COMPLETO_CHAVE_QUEBRADA
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "medido no repo: 22 comandos em product/ + 13 em engineer/ cobrem o ciclo; story points tem 25 sitios COM gate proprio (common/prompts/story-points-gate.md); 4 validadores de task; e engineer/validate-phase-sync JA faz o mapeamento fase<->subtask do provider. O que quebra e a CHAVE: sessions/<slug> em 8 sitios, sessions/<feature-slug> em 6, mais 5 diretorios fixos, e NENHUM deriva da branch."
+    source_kind: repo
+    source_tier: 10
+    label: "o rito esta COMPLETO em fases e gates; falta a chave unica que o auto-localiza — o slug da session tem DUAS variaveis na propria maquinaria e nao deriva da branch"
+  - id: E_DIA_INTEIRO_FORA_DO_PROVIDER
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "a sessao de 2026-09-30 mergeou tres PRs, criou duas REGRAS, absorveu tres KBs e registrou um membro. Nenhuma linha foi ao provider (TASK_MANAGER_PROVIDER=linear no .env). Causa: engineer/start nunca foi invocado, logo nao houve session, logo validate-phase-sync nao tinha o que sincronizar."
+    source_kind: repo
+    source_tier: 10
+    label: "a cadeia nao se ROMPEU, nunca foi INICIADA: sem session nao ha o que sincronizar, e a session so nasce por invocacao explicita"
+  - id: E_WORKLOG_E_MECANISMO_MORTO
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "medido nos 12 STATE.md reais: `resume_command:` aparece em ZERO. A causa e estrutural — o hook worklog-capture-session.sh resolve slug pela branch, e 12 de 12 sessions NAO TEM branch correspondente (num universo de 112 branches). Logo o hook nunca achou nenhuma session. E os dois hooks de worklog DIVERGEM entre si: capture-session:27-31 aceita qualquer prefixo (corrigido em 2026-08-02, quando se mediu que o filtro antigo era no-op em 56 de 58 branches), e precompact-breadcrumb:10-14 ficou com o filtro antigo."
+    source_kind: repo
+    source_tier: 10
+    label: "o worklog e MECANISMO MORTO medido: resume_command em 0 de 12, porque o hook resolve por branch e nenhuma das 12 sessions tem branch — e um dos dois hooks ainda carrega o filtro que ja foi provado no-op em 96% das branches"
+  - id: E_ESQUEMA_DIVERGIU_DA_PRATICA
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "medido nos 12: `## Objective`, `## Constraints` e `## Map` existem em ZERO; os campos tipados (phase/status/next_action/last_checkpoint) em ZERO; `resume_command:` em ZERO. O esquema canonico vive em worklog-protocol.md:52-90 e nenhum arquivo o segue. Tamanhos: mediana ~34 linhas, maximo 152 (16x o alvo de 1KB)."
+    source_kind: repo
+    source_tier: 10
+    label: "o esquema canonico do STATE.md divergiu 100% da pratica — tres secoes e todos os campos tipados existem em ZERO dos 12 arquivos reais"
+  - id: C_PRECEDENTE_DERIVAR_DA_BRANCH_FUNCIONA
+    node_type: claim
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "a REGRA 56 (PR aberto carrega RESIDUO da passada adversarial) deriva o nome do residuo de `git branch --show-current | tr / -` ha meses; e na sessao de 2026-09-30 DOIS gates foram perdidos exatamente quando o nome foi digitado em vez de derivado. Ressalva medida: os hooks usam `${branch#*/}`, que NAO e equivalente — em branch de tres niveis ele deixa barra dentro do slug."
+    label: "derivar da branch e padrao PROVADO nesta casa; mas ha DUAS derivacoes incompativeis convivendo (`tr / -` no residuo, `${branch#*/}` nos hooks) e so uma serve"
+  - id: E_LEVA_NAO_SERVE_COMO_UNIDADE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "tres problemas medidos na propria sessao: (1) 'leva' e conceito INTERNO e nao significa nada para quem le o task manager; (2) o escopo da leva so existe DEPOIS de decidir o que entra no PR; (3) uma leva rendeu DOIS PRs (#890 e #891) e outra teve 24 achados."
+    source_kind: repo
+    source_tier: 10
+    label: "a LEVA nao serve como unidade de task: conceito interno, escopo que so existe depois, e ja rendeu 2 PRs numa ocorrencia"
+  - id: E_BACKLOG_DO_GRAFO_JA_EXISTE
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "docs/backlog.md e PROJECAO GERADA (kg-backlog-project.sh) dos nos status:open — 229 itens abertos em 51 grafos, ordenados por atencao, e traz escrito 'nao editar a mao: feche o item no grafo e ele sai daqui'."
+    source_kind: repo
+    source_tier: 10
+    label: "o backlog do core JA EXISTE e JA e projecao do grafo: 229 itens abertos em 51 grafos, com regua de atencao e proibicao de edicao manual"
+
+  # ── AS DUAS DECISÕES SELADAS ────────────────────────────────────────────────────────────────
+  - id: D_SLUG_DA_SESSION_E_A_BRANCH
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "SELADA pelo maestro em 2026-09-30, opcao A. A verificacao e o ATO DE DECIDIR. Medicao posterior ao selo MELHOROU o custo: as 12 sessions sao 3 adopt- + 9 drive-, ou seja NENHUMA e session de tarefa — a regra nasce SEM PASSIVO, governando uma classe que ainda nao existe no disco."
+    label: "SELADO (maestro, 2026-09-30) — OPCAO A: o slug de .claude/sessions/<slug> e DERIVADO da branch (`git branch --show-current | tr / -`, igual ao residuo da REGRA 56), unificando as duas variaveis atuais. Sessions que nao sao de tarefa (drive-, adopt-) sao CLASSE DISTINTA declarada. Sem baseline e sem regra nova: medido que nao ha passivo a cobrar."
+  - id: D_UMA_TASK_POR_FIO
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "SELADO pelo maestro em 2026-09-30, REVISANDO o selo da mesma tarde ('uma task por leva'). A revisao veio de ele pedir que eu repensasse e EU MEDIR que o backlog do core ja e projecao do grafo."
+    label: "SELADO (maestro, 2026-09-30): UMA TASK POR FIO — a unidade e o NO do grafo, nao a leva nem o PR. O fio existe ANTES do trabalho, tem nome que significa algo, aceita 1..N PRs como COMENTARIOS, e o status dele mapeia direto para o estado da task. Consequencia de arquitetura: o task manager vira PROJECAO do grafo, nunca segunda fonte — igual ao docs/backlog.md."
+    trace: "docs/backlog.md · .claude/validation/kg-backlog-project.sh"
+  - id: D_MAPA_NO_MAP_CANONICO
+    node_type: decision
+    layer: audit
+    plane: PROD
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: 2026-09-30
+    verified_against: "SELADO pelo maestro em 2026-09-30, escolhendo entre ressuscitar o esquema e seguir a pratica. O slot ja existe em worklog-protocol.md:71 (`task-manager -> main: <id> · provider:`) e em ZERO dos 12 arquivos."
+    label: "SELADO (maestro, 2026-09-30): o par fio<->task_id mora no `## Map` CANONICO do STATE.md, ressuscitando o esquema em vez de criar uma segunda gramatica. Honestidade impressa: `## Map` sem `task-manager` faz o comando DIZER que nao ha sincronia, no molde de kg-backlog-project.sh:178-182 (o eixo de agrupamento e IMPRESSO, nunca prometido)."
+
+  # ── O QUE FICA ABERTO ───────────────────────────────────────────────────────────────────────
+  - id: Q_COMPROMISSO_ESPERA_COLHEITA
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: open
+    label: "o COMPROMISSO de implementar este rito ainda NAO entrou em fios-abertos.kg.yaml, e a razao e o contrato daquele arquivo: teto de 19 nos, e ele ja tem 19 — 'onda nova exige onda COLHIDA'. GATILHO: a proxima colheita de fio cumprido abre a vaga; ate la o compromisso vive aqui e no plano aprovado"
+edges:
+  # o diagnóstico sustenta as decisões
+  - from: E_RITO_COMPLETO_CHAVE_QUEBRADA
+    to: D_SLUG_DA_SESSION_E_A_BRANCH
+    edge_type: SUPPORTS
+  - from: E_DIA_INTEIRO_FORA_DO_PROVIDER
+    to: E_RITO_COMPLETO_CHAVE_QUEBRADA
+    edge_type: SUPPORTS
+  - from: C_PRECEDENTE_DERIVAR_DA_BRANCH_FUNCIONA
+    to: D_SLUG_DA_SESSION_E_A_BRANCH
+    edge_type: SUPPORTS
+  # o mecanismo morto é o que obriga a ressurreição vir ANTES do desenho
+  - from: E_WORKLOG_E_MECANISMO_MORTO
+    to: D_SLUG_DA_SESSION_E_A_BRANCH
+    edge_type: CONSTRAINS
+  - from: E_ESQUEMA_DIVERGIU_DA_PRATICA
+    to: D_MAPA_NO_MAP_CANONICO
+    edge_type: CONSTRAINS
+  # a unidade
+  - from: E_BACKLOG_DO_GRAFO_JA_EXISTE
+    to: D_UMA_TASK_POR_FIO
+    edge_type: SUPPORTS
+  - from: E_LEVA_NAO_SERVE_COMO_UNIDADE
+    to: D_UMA_TASK_POR_FIO
+    edge_type: SUPPORTS
+  - from: D_UMA_TASK_POR_FIO
+    to: D_MAPA_NO_MAP_CANONICO
+    edge_type: SUPPORTS
+  - from: Q_COMPROMISSO_ESPERA_COLHEITA
+    to: D_UMA_TASK_POR_FIO
+    edge_type: CONSTRAINS

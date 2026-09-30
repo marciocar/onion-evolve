@@ -1,0 +1,4 @@
+# kb-applies-to-baseline — isenções da REGRA 93, cada uma COM RAZÃO ESCRITA.
+# SÓ ENCOLHE. KB nova em tools/ ou platforms/ sem `applies_to:` no frontmatter é HARD.
+# Gerado por: bash .claude/validation/kb-applies-to-check.sh --emit-baseline
+docs/knowledge-base/tools/vps-tool-repo-skeleton.md   # documenta o PADRÃO DA CASA de repo-por-ferramenta na VPS, não software de terceiro: não há versão de outrem a declarar. Isenção aprovada pelo maestro em 2026-09-30, no mesmo selo do campo e do escopo.

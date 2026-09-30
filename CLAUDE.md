@@ -96,6 +96,7 @@ O Sistema Onion é **provider-agnóstico** para gerenciamento de tarefas — uma
 | **`clickup`** | `CLICKUP_API_TOKEN` | `CLICKUP_WORKSPACE_ID`, `CLICKUP_DEFAULT_LIST_ID` | `@clickup-specialist` | `.claude/utils/task-manager/adapters/clickup.md` |
 | **`asana`** | `ASANA_ACCESS_TOKEN` | `ASANA_WORKSPACE_ID`, `ASANA_DEFAULT_PROJECT_ID` | _(agnóstico via `@task-specialist`)_ | `.claude/utils/task-manager/adapters/asana.md` |
 | **`linear`** | `LINEAR_API_KEY` | `LINEAR_TEAM_ID` | _(agnóstico via `@task-specialist`)_ | `.claude/utils/task-manager/adapters/linear.md` |
+| **`zoho`** | `ZOHO_CLIENT_ID`, `ZOHO_CLIENT_SECRET`, `ZOHO_PORTAL_ID` | `ZOHO_ACCOUNTS_HOST` (datacenter: `.com`/`.eu`/`.in`/`.com.au`) | _(agnóstico via `@task-specialist`)_ | `.claude/utils/task-manager/adapters/zoho.md` |
 | **`none`** | — | — | `@task-specialist` (decompõe localmente, sem persistir) | — |
 
 ### Regras de delegação
@@ -106,6 +107,14 @@ O Sistema Onion é **provider-agnóstico** para gerenciamento de tarefas — uma
   - `jira` → `@jira-specialist` (JQL, ADF, transitions, bulk, sprints/boards)
   - `clickup` → `@clickup-specialist` (API-first; MCP opcional, listas, custom fields, comentários Unicode)
 - **Sem provider configurado** (`none`) → operar offline com `@task-specialist`; **não** tentar API calls
+
+> **Zoho Projects (desde 2026-09-30):** transporte **só API** — **não há MCP nativo** da Zoho para
+> Projects (medido; só terceiros, e o da CData é read-only com JDBC licenciado). Auth por
+> `client_credentials` do Self client, que **dispensa grant code e refresh token**. Três armadilhas
+> medidas contra o portal real, todas devolvendo HTTP 200: parâmetro de filtro **aceito e ignorado**
+> (`?search=` devolve a lista inteira), vínculo por **objeto aninhado** (`{"milestone":{"id":…}}` — o
+> `*_id` é ignorado em silêncio) e a **forma da resposta muda por versão E por método**. E `createSubtask`
+> **só existe na V2**, que sai de linha em **2026-12-31** — fio com data, declarado no adapter.
 
 > **Por que só jira/clickup têm especialista dedicado (decisão de design, não viés):** Jira e ClickUp têm APIs/regras ricas o bastante para justificar um especialista (ADF + JQL + transitions no Jira; formatação Unicode + custom fields + hierarquia/checklists no ClickUp). **Asana e Linear** são integralmente cobertos pelo `@task-specialist` genérico + seu adapter (API-first) — criar especialistas dedicados seria inchar o conjunto de especialistas sem ganho. Em todos os casos, **o consumidor chama a abstração agnóstica** (`taskManager.*`); o adapter resolve transporte (REST API default, MCP opcional), formato e quando acionar o especialista. **Nunca** se chama o MCP/SDK de um provider direto no comando/agente.
 
