@@ -1,0 +1,190 @@
+<!doctype html>
+<!--
+  ════════════════════════════════════════════════════════════════════════════════════════════════
+  ESQUELETO — manual de um projeto servido ao cliente por AGENTE + SERVIDOR MCP + ATALHOS.
+  Template do framework Onion. Derivado do 1º manual real deste formato (2026-09-29), com o conteúdo
+  de domínio REMOVIDO: aqui está a FORMA, e a forma é o que se reusa.
+
+  COMO PREENCHER
+  1. Copie para o projeto e troque os marcadores:
+     {{PROJETO}} sigla · {{PROJETO_NOME}} nome por extenso · {{CLIENTE}} / {{CLIENTE_CURTO}}
+     {{DOMINIO_CLIENTE}} · {{URL_CHAT}} · {{URL_LOGIN}} · {{AGENTE}} nome completo do agente
+     {{AGENTE_CURTO}} · {{SERVIDOR_MCP}} nome no librechat.yaml · {{PREFIXO}} prefixo dos atalhos
+     {{N_FERRAMENTAS}} · {{RESPONSAVEL}} · {{DATA}}
+  2. As seções marcadas [DOMINIO] são ESCRITAS DE NOVO (só a posição é reusável); as
+     [SEMIGENÉRICO] se ajustam; as [GENÉRICO] só pedem conferência.
+  3. Publique como Artifact e MANTENHA O MESMO LINK a cada versão. Se o agente lê o manual por
+     ferramenta, espelhe o conteúdo num .md — mesma substância, não uma segunda verdade.
+
+  ⚠️ A ORDEM DAS SEÇÕES NÃO É PREFERÊNCIA — é o achado que mais custou no 1º manual, corrigido três
+  vezes contra leitor real: acesso → caminho principal → atalhos → maquinaria → referência. Quem abre
+  o manual está travado na porta ou quer o resultado; referência primeiro serve a quem escreveu.
+
+  ⚠️ TOM, EXEMPLOS E RÓTULOS seguem a doutrina, que NÃO é repetida aqui:
+     .claude/commands/common/prompts/client-material-doctrine.md
+  Fatos da plataforma (decaem por versão): docs/knowledge-base/tools/librechat-agent-mcp.md
+  ════════════════════════════════════════════════════════════════════════════════════════════════
+-->
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manual do {{PROJETO}}</title>
+<style>
+  /* Tokens claro/escuro no padrão da casa: :root, redefinido sob prefers-color-scheme com a guarda
+     de tema explícito, e de novo sob [data-theme="dark"]. Trocar a paleta é trocar estas linhas. */
+  :root{--bg:#F5F6F3;--surface:#fff;--ink:#1B242B;--muted:#5B6770;--line:#D9DDD8;--soft:#ECEFEA;
+        --accent:#B4531A;--accent-soft:#F4E4D8;--on-accent:#fff;--ok:#2F7D4F;--radius:10px}
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+        --bg:#14181B;--surface:#1B2125;--ink:#E8EDEF;--muted:#9AA7AE;--line:#2C353A;--soft:#222A2F;
+        --accent:#E0803F;--accent-soft:#33241A;--on-accent:#14181B;--ok:#6BC28C}}
+  :root[data-theme="dark"]{--bg:#14181B;--surface:#1B2125;--ink:#E8EDEF;--muted:#9AA7AE;
+        --line:#2C353A;--soft:#222A2F;--accent:#E0803F;--accent-soft:#33241A;--on-accent:#14181B;--ok:#6BC28C}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 16px;display:grid;grid-template-columns:230px 1fr;gap:32px}
+  @media (max-width:860px){.wrap{grid-template-columns:1fr;gap:0}nav.toc{position:static;max-height:none}}
+  header.top{padding:32px 0 8px}
+  h1{font-size:1.7rem;margin:0 0 4px}
+  .sub{color:var(--muted)}
+  nav.toc{position:sticky;top:16px;align-self:start;max-height:90vh;overflow:auto;font-size:.92rem}
+  nav.toc a{display:block;padding:5px 8px;border-radius:6px;color:var(--muted);text-decoration:none}
+  nav.toc a:hover{background:var(--soft);color:var(--ink)}
+  nav.toc a[aria-current="true"]{background:var(--accent-soft);color:var(--ink);font-weight:600}
+  input[type="search"]{width:100%;padding:8px 10px;margin-bottom:10px;border:1px solid var(--line);
+        border-radius:8px;background:var(--surface);color:var(--ink)}
+  section{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+        padding:20px 22px;margin:0 0 20px}
+  section[hidden]{display:none}
+  h2{font-size:1.25rem;margin:0 0 10px}
+  h3{font-size:1rem;margin:18px 0 6px}
+  .step{display:flex;gap:12px;margin:12px 0}
+  .step b{flex:0 0 26px;height:26px;border-radius:50%;background:var(--accent);color:var(--on-accent);
+        display:grid;place-items:center;font-size:.85rem}
+  .trilha{border-left:3px solid var(--accent);padding-left:12px;margin:12px 0}
+  code,kbd{background:var(--soft);padding:1px 5px;border-radius:4px;font-size:.9em}
+  table{width:100%;border-collapse:collapse;margin:12px 0;font-size:.94rem}
+  th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+  .copy{float:right;font-size:.8rem;padding:3px 9px;border:1px solid var(--line);border-radius:6px;
+        background:var(--surface);color:var(--muted);cursor:pointer}
+  footer{color:var(--muted);font-size:.88rem;padding:8px 0 40px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top" style="grid-column:1/-1">
+    <h1>Manual do {{PROJETO}}</h1>
+    <p class="sub">{{PROJETO_NOME}} — {{CLIENTE}} · atualizado em {{DATA}} · {{RESPONSAVEL}}</p>
+  </header>
+
+  <nav class="toc" aria-label="Índice">
+    <input type="search" id="q" placeholder="Buscar no manual…" aria-label="Buscar no manual">
+    <a href="#acesso">01 · Acesso</a>
+    <a href="#principal">02 · O caminho principal</a>
+    <a href="#atalhos">03 · Atalhos</a>
+    <a href="#chat">04 · Chat, agente e ferramentas</a>
+    <a href="#jornada">Como o {{PROJETO}} trabalha</a>
+    <a href="#conversa">Converse com o {{PROJETO}}</a>
+    <a href="#fluxo-completo">O fluxo completo</a>
+    <a href="#cartao">O cartão</a>
+    <a href="#entregas">O que você recebe</a>
+    <a href="#metodo">O método</a>
+    <a href="#regras">Regras que ele segue</a>
+    <a href="#duvidas">Dúvidas frequentes</a>
+    <a href="#glossario">Glossário</a>
+  </nav>
+
+  <main>
+    <!-- 01 ─ [SEMIGENÉRICO] Primeiro por decisão: quem abre o manual costuma estar travado aqui.
+              Escreva a partir das TELAS REAIS do provedor de login, nos textos pt-BR exatos, e da
+              política de MFA lida na configuração — nunca de memória (cláusula 3 da doutrina). -->
+    <section id="acesso">
+      <h2>Acesso passo a passo</h2>
+      <div class="step"><b>1</b><div>Abra <a href="{{URL_CHAT}}">{{URL_CHAT}}</a>.</div></div>
+      <div class="step"><b>2</b><div>Entre com <!-- o método real, no texto exato da tela --> …</div></div>
+      <div class="step"><b>3</b><div>Na primeira vez, <!-- senha/código/MFA como a config diz --> …</div></div>
+      <div class="step"><b>4</b><div>Escolha o agente <strong>{{AGENTE}}</strong> na lista.</div></div>
+      <p class="sub">Esqueceu a senha? <!-- reproduza o texto EXATO do link da tela --></p>
+    </section>
+
+    <!-- 02 ─ [DOMINIO] Reescreva inteira. É o fluxo que gera o valor, em TRILHAS ("já tem → conferir"
+              / "não tem → gerar"), e vem em segundo por decisão. Um atalho de destaque deve fazer
+              este caminho num pedido só. -->
+    <section id="principal">
+      <h2>O caminho principal: {{CAMINHO_PRINCIPAL}}</h2>
+      <div class="trilha"><h3>Você já tem {{ARTEFATO_DE_ENTRADA}}</h3><p>…</p></div>
+      <div class="trilha"><h3>Você ainda não tem</h3><p>…</p></div>
+      <p><strong>Num pedido só:</strong> <code>/{{PREFIXO}}-{{ATALHO_DESTAQUE}}</code></p>
+    </section>
+
+    <!-- 03 ─ [SEMIGENÉRICO] Ensine o COMANDO COMPLETO, sem acento. O seletor "/" casa pelo NOME do
+              prompt, não pelo campo command — então o seed deve compor o nome começando pelo
+              comando. Detalhe medido na KB de plataforma. -->
+    <section id="atalhos">
+      <h2>Atalhos: digite <kbd>/</kbd> e o comando</h2>
+      <p>Digite <code>/{{PREFIXO}}</code> para ver todos.</p>
+      <table><thead><tr><th>Comando</th><th>O que faz</th><th>O que você recebe</th></tr></thead>
+      <tbody><tr><td><code>/{{PREFIXO}}-…</code></td><td>…</td><td>…</td></tr></tbody></table>
+    </section>
+
+    <!-- 04 ─ [GENÉRICO] A maquinaria vem DEPOIS do valor. Sem jargão interno. -->
+    <section id="chat">
+      <h2>O chat, o agente e o {{PROJETO}}</h2>
+      <p>O {{AGENTE_CURTO}} é um agente em <a href="{{URL_CHAT}}">{{URL_CHAT}}</a>, ligado ao
+         <strong>{{SERVIDOR_MCP}}</strong> com {{N_FERRAMENTAS}} ferramentas.</p>
+    </section>
+
+    <!-- [SEMIGENÉRICO] -->
+    <section id="jornada"><h2>Como o {{PROJETO}} trabalha</h2><p>…</p></section>
+    <!-- [SEMIGENÉRICO] Cada pergunta de exemplo entra só DEPOIS de testada com dados reais deste
+         cliente, e acompanhada de "o que você recebe" (cláusula 4 da doutrina). -->
+    <section id="conversa"><h2>Converse com o {{PROJETO}}</h2>
+      <table><thead><tr><th>Pergunte assim</th><th>O que você recebe</th></tr></thead>
+      <tbody><tr><td>…</td><td>…</td></tr></tbody></table></section>
+    <!-- [DOMINIO] -->
+    <section id="fluxo-completo"><h2>{{FLUXO_COMPLETO}}, do começo ao fim</h2><p>…</p></section>
+    <!-- [DOMINIO] O "cartão" da entidade principal do domínio. -->
+    <section id="cartao"><h2>O cartão do {{ENTIDADE_PRINCIPAL}}</h2><p>…</p></section>
+    <!-- [SEMIGENÉRICO] -->
+    <section id="entregas"><h2>O que você recebe</h2><p>…</p></section>
+    <!-- [SEMIGENÉRICO] -->
+    <section id="metodo"><h2>O método</h2><p>…</p></section>
+    <!-- [SEMIGENÉRICO] -->
+    <section id="regras"><h2>Regras que o {{PROJETO}} segue</h2><p>…</p></section>
+    <!-- [GENÉRICO] É AQUI que limite vira "como tirar o melhor" e falha vira pergunta. Inclua o
+         comportamento normal que PARECE falha — p.ex. servidor MCP com cabeçalho por usuário
+         aparecer "desconectado" até a 1ª pergunta. -->
+    <section id="duvidas">
+      <h2>Dúvidas frequentes</h2>
+      <h3>O painel mostra o servidor desconectado</h3>
+      <p>É o esperado depois de uma reinicialização: a conexão se estabelece na primeira pergunta.</p>
+      <h3>…</h3><p>…</p>
+    </section>
+    <!-- [SEMIGENÉRICO] Termos do domínio na língua do cliente, nunca códigos internos. -->
+    <section id="glossario"><h2>Glossário</h2>
+      <table><thead><tr><th>Termo</th><th>O que é</th></tr></thead>
+      <tbody><tr><td>…</td><td>…</td></tr></tbody></table></section>
+
+    <footer>{{PROJETO_NOME}} · {{CLIENTE}} · {{DATA}}</footer>
+  </main>
+</div>
+<script>
+  // Índice que acompanha a leitura + busca que filtra seções. Sem dependência externa de propósito:
+  // o manual precisa abrir de um arquivo, offline, na máquina do cliente.
+  const secs  = [...document.querySelectorAll('main section')];
+  const links = [...document.querySelectorAll('nav.toc a')];
+  const mark = id => links.forEach(a => a.setAttribute('aria-current', a.getAttribute('href') === '#' + id));
+  const obs = new IntersectionObserver(
+    entries => entries.forEach(e => { if (e.isIntersecting) mark(e.target.id); }),
+    { rootMargin: '-20% 0px -70% 0px' }
+  );
+  secs.forEach(s => obs.observe(s));
+
+  const q = document.getElementById('q');
+  if (q) q.addEventListener('input', () => {
+    const t = q.value.trim().toLowerCase();
+    secs.forEach(s => { s.hidden = t.length > 1 && !s.textContent.toLowerCase().includes(t); });
+  });
+</script>
+</body>
+</html>

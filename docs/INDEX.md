@@ -10,10 +10,10 @@ Bem-vindo ao índice central de documentação do projeto. Este documento serve 
 
 Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para uso interno com:
 
-- 🤖 **110 comandos invocáveis** Claude Code em 10 categorias + root (+ 26 fragmentos compartilhados em `common/` e 11 READMEs de categoria)
+- 🤖 **111 comandos invocáveis** Claude Code em 10 categorias + root (+ 30 fragmentos compartilhados em `common/` e 11 READMEs de categoria)
 - 🎯 **51 agentes de IA especializados** em 9 categorias
 - 🧩 **13 skills** em `.claude/skills/` (`onion` — cérebro do sistema; `onion-patterns`; `onion-validation`; `language-standards`; `onion-orchestration` — orquestração de subagentes; `onion-{engineering,product,compliance}-context` — resolvers de SSOT por vertical; `onion-wizard` / `onion-onboarding` — a Condução (FAZER × CONHECER); `onion-retro` — retro/feedback como spec-as-code)
-- 📚 **107 Knowledge Bases** estruturadas para consumo por IA (+ KB viva `agentic-patterns/` + vertical `education/`)
+- 📚 **108 Knowledge Bases** estruturadas para consumo por IA (+ KB viva `agentic-patterns/` + vertical `education/`)
 - 🧅 **Skill + Comando `/onion`** — ponto de entrada inteligente com ativação automática
 - 🔗 **Task Manager Abstraction** plugável (Jira, ClickUp, Asana, Linear)
 - 🏗️ **Spec as Code Multi-Context** — business, technical, compliance (peer) + design (provisório, gated). Neste repo, `business-context/` **e** `technical-context/` estão **populados como dogfood** (seed real do Onion); `compliance-context/` segue template.
@@ -44,7 +44,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 - **Contextos spec-as-code peer**: `docs/business-context/` (15 arquivos — 13 de conteúdo + README + index) e `docs/technical-context/` (9 arquivos — 6 de conteúdo + README/index) estão **populados como dogfood** (seed real do Onion); `docs/compliance-context/` segue **template** (só `README.md`), populado no projeto-alvo por `/docs:build-compliance-docs`
 
 ### Sistema Onion (`.claude/`)
-- **110 comandos invocáveis** Claude Code distribuídos em:
+- **111 comandos invocáveis** Claude Code distribuídos em:
   - 35 em `meta/` (meta-comandos, criadores, validação, orquestração de subagentes, frescor de KB e de contexto, federação, adoção e co-evolução)
   - 21 em `product/` (gestão de produto e descoberta)
   - 12 em `engineer/` (engenharia e desenvolvimento)
@@ -54,7 +54,7 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
   - 3 em `test/` (unit, integration, e2e)
   - 3 em `design/`, 1 em `development/`, 1 em `quick/`
   - 3 no root: `onion.md`, `warm-up.md`, `catch-up.md`
-  - **não-invocáveis**: 26 fragmentos em `common/` (11 templates + 15 prompts, incl. READMEs) e 11 READMEs de categoria
+  - **não-invocáveis**: 30 fragmentos em `common/` (12 templates + 18 prompts, incl. READMEs) e 11 READMEs de categoria
 - **13 skills** em `.claude/skills/` (`onion`, `onion-patterns`, `onion-validation`, `language-standards`, `onion-orchestration`, `onion-engineering-context`, `onion-product-context`, `onion-compliance-context`, `onion-wizard`, `onion-onboarding`, `onion-retro`)
 - **51 agentes** IA distribuídos em:
   - 20 em `development/` (frontend, backend, infra, integrações)
@@ -67,9 +67,9 @@ Este projeto é o **Sistema Onion** — um framework de comandos `.claude/` para
 
 ### Total
 - **642 arquivos** de documentação markdown em `docs/`
-- **110 comandos invocáveis** em 10 categorias + root (+ 26 fragmentos `common/` + 11 READMEs de categoria)
+- **111 comandos invocáveis** em 10 categorias + root (+ 30 fragmentos `common/` + 11 READMEs de categoria)
 - **51 agentes** especializados em 9 categorias
-- **13 skills** (`.claude/skills/`) · **107 Knowledge Bases**
+- **13 skills** (`.claude/skills/`) · **108 Knowledge Bases**
 
 ---
 
