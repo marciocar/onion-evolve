@@ -87,22 +87,33 @@ _value_is_substantive() {
 
 _baseline_has() { [ -f "${BASELINE}" ] && grep -qxF "$1" <(grep -v '^[[:space:]]*#' "${BASELINE}" | sed 's/[[:space:]]*#.*//; s/[[:space:]]*$//') ; }
 
+# ⚠️ O STDOUT DO MODO --emit-baseline É O ARQUIVO. Medido em 2026-09-30, num hub real: o
+# `regen-baselines.sh` invoca `bash <emissor> --emit-baseline > <baseline>` e captura TODO o stdout —
+# então os `echo` de achado da varredura caíam DENTRO do baseline, que nasceu com 3 linhas de PROSA
+# em vez de caminhos. Baseline que não casa com nada não tolera nada: as KBs legítimas e
+# pré-existentes do adotante viraram HARD, e o gate que eu acabara de instalar bloqueou o repo dele
+# por dívida que não é dele. É a classe `exit 0 é declaração`: o emissor saiu zero e produziu lixo.
+# CURA: em modo emissão, achado vai para o STDERR (continua visível a quem roda à mão) e o stdout
+# carrega SÓ o que é baseline.
+_emit_mode=0; [ "${MODE}" = "--emit-baseline" ] && _emit_mode=1
+_say() { if [ "${_emit_mode}" = "1" ]; then printf '%s\n' "$1" >&2; else printf '%s\n' "$1"; fi; }
+
 found=0; missing=()
 while IFS= read -r f; do
   rel="${f#"${REPO}/"}"
   # frontmatter presente?
   if [ "$(head -1 "${f}")" != "---" ]; then
     missing+=("${rel}")
-    _baseline_has "${rel}" || { echo "REGRA 93: [kb-applies-to/SEM-FRONTMATTER] ${rel} não abre com bloco \`---\`, então NENHUM carimbo dele é legível pelo gate (verified_at escrito assim é prosa — medido em 2026-09-30). Crie o bloco e declare \`applies_to:\` dentro"; found=1; }
+    _baseline_has "${rel}" || { _say "REGRA 93: [kb-applies-to/SEM-FRONTMATTER] ${rel} não abre com bloco \`---\`, então NENHUM carimbo dele é legível pelo gate (verified_at escrito assim é prosa — medido em 2026-09-30). Crie o bloco e declare \`applies_to:\` dentro"; found=1; }
     continue
   fi
   _v="$(_field_in_fm "${f}" applies_to)"
   if [ -z "${_v}" ]; then
     missing+=("${rel}")
-    _baseline_has "${rel}" || { echo "REGRA 93: [kb-applies-to/SEM-CAMPO] ${rel} não declara \`applies_to:\` no frontmatter — sem ele o leitor não sabe se a KB vale para a versão que ele tem. Se for KB de padrão DA CASA e não de software de terceiro, isente no baseline COM a razão escrita"; found=1; }
+    _baseline_has "${rel}" || { _say "REGRA 93: [kb-applies-to/SEM-CAMPO] ${rel} não declara \`applies_to:\` no frontmatter — sem ele o leitor não sabe se a KB vale para a versão que ele tem. Se for KB de padrão DA CASA e não de software de terceiro, isente no baseline COM a razão escrita"; found=1; }
   elif ! _value_is_substantive "${_v}"; then
     missing+=("${rel}")
-    _baseline_has "${rel}" || { echo "REGRA 93: [kb-applies-to/VALOR-VAZIO] ${rel} tem \`applies_to:\` sem conteúdo útil (\`${_v}\`) — campo presente e vazio cumpre a letra e nega o propósito. Declare a versão (com dígito) ou diga em voz alta que ela NÃO FOI MEDIDA"; found=1; }
+    _baseline_has "${rel}" || { _say "REGRA 93: [kb-applies-to/VALOR-VAZIO] ${rel} tem \`applies_to:\` sem conteúdo útil (\`${_v}\`) — campo presente e vazio cumpre a letra e nega o propósito. Declare a versão (com dígito) ou diga em voz alta que ela NÃO FOI MEDIDA"; found=1; }
   fi
 # SEM -maxdepth: uma subpasta futura (`tools/vendor/…`) escaparia da varredura e a regra ficaria
 # cega exatamente onde alguém organizou melhor. Hoje não existe subpasta nenhuma nas duas — então
@@ -110,17 +121,23 @@ while IFS= read -r f; do
 done < <(find "${KBDIR}/tools" "${KBDIR}/platforms" -name '*.md' -type f 2>/dev/null | sort)
 
 if [ "${MODE}" = "--emit-baseline" ]; then
+  # ⚠️ O BASELINE SAI NO STDOUT, e isso é CONVENÇÃO DA CASA, não gosto. Medido em 2026-09-30, num
+  # hub real: este emissor escrevia o arquivo por conta própria, enquanto o `regen-baselines.sh`
+  # (que trata TODOS os baselines por varredura) faz `bash <emissor> --emit-baseline > <baseline>`.
+  # As duas escritas colidiram e a do regen ganhou — o baseline do adotante ficou com o STDOUT que
+  # havia sobrado, que eram as mensagens de achado. Emissor que inventa convenção própria quebra o
+  # mecanismo genérico que existe justamente para não ter lista de emissores para envelhecer.
   {
     echo "# kb-applies-to-baseline — isenções da REGRA 93, cada uma COM RAZÃO ESCRITA."
     echo "# SÓ ENCOLHE. KB nova em tools/ ou platforms/ sem \`applies_to:\` no frontmatter é HARD."
-    echo "# Gerado por: bash .claude/validation/kb-applies-to-check.sh --emit-baseline"
+    echo "# Gerado por: bash .claude/validation/kb-applies-to-check.sh . --emit-baseline > .claude/validation/kb-applies-to-baseline.txt"
     # `printf '%s\n' "${array[@]}"` com array VAZIO imprime UMA LINHA VAZIA — e o contador
     # abaixo (`grep -cv '^#'`) a conta como isenção. Sem esta guarda o passivo nunca chegaria a
     # zero e a "métrica de saúde é esta lista ENCOLHENDO" seria mentira no último passo dela.
     # Medido por passada adversarial em 2026-09-30.
     [ "${#missing[@]}" -gt 0 ] && printf '%s\n' "${missing[@]}"
-  } > "${BASELINE}"
-  echo "kb-applies-to: baseline com ${#missing[@]} isenção(ões) em ${BASELINE}" >&2
+  }
+  echo "kb-applies-to: baseline com ${#missing[@]} isenção(ões) — redirecione o STDOUT para ${BASELINE}" >&2
   exit 0
 fi
 
