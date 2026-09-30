@@ -1,6 +1,6 @@
 ---
 branch: feat/client-manual-doctrine
-reviewed_diff_sha256: 33328ed06270777d7a48627edb481f410439414a2e9d279809cb0e96ee3908fd
+reviewed_diff_sha256: 233e658dd6966d46c6ac28003ddeacc89742abf1a6bfa67687f37499f78b96f7
 elenxo: sim
 verdict: REPROVADO_E_CURADO
 findings_total: 24
@@ -90,3 +90,8 @@ não dependia daquele número. O defeito foi eu apoiá-la em medição que não 
 - O refutador declarou que a árvore principal **mudou sob ele** durante a revisão (eu regenerei o
   plugin enquanto ele media) e que só percebeu por reconferir a fonte autoritativa em vez do próprio
   snapshot. É o custo de revisar trabalho em curso, e ele o tratou certo.
+- **Re-carimbei o SHA deste resíduo DUAS vezes**, porque nas duas eu o carimbei antes de commitar uma
+  projeção que entra no diff (o painel de estado). A fórmula do gate exclui `docs/evolution/review/`,
+  então o resíduo não invalida a si mesmo — mas qualquer outra coisa commitada depois do carimbo o
+  torna caduco. A ordem correta é a última: **regenerar projeções → stagear tudo → carimbar → commitar
+  de uma vez.**
