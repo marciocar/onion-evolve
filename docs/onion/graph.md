@@ -591,7 +591,7 @@ onion-compliance	requires	template:compliance_pmbok_template.md
 onion-compliance	requires	template:compliance_soc2_template.md	
 onion-core	adopts	onion-evolve	
 onion-core	mode	greenfield	
-onion-core	pin	cfbeec5bf946	
+onion-core	pin	685140eadd7d	
 onion-core	specialization	deterministic-guards	
 onion-core	specialization	full-machinery	
 onion-core	specialization	hub-role	
@@ -692,7 +692,7 @@ onion-product	requires	agent:task-specialist
 onion-product	requires	skill:onion-product-context	
 onion-standalone	adopts	onion-evolve	
 onion-standalone	mode	greenfield	
-onion-standalone	pin	cfbeec5bf946	
+onion-standalone	pin	685140eadd7d	
 onion-standalone	specialization	claude-code	
 onion-standalone	specialization	framework-door	
 onion-standalone	specialization	public-distribution	

@@ -44,6 +44,30 @@ _PROJ=(
   "federation-console.sh|docs/onion/federation-console.html|500|bytes"
   "rules-registry.sh|.claude/validation/lint-rules.md|50|linhas"
   "a2a-agent-card.sh|docs/onion/agent-card.json|100|bytes"
+  # ⚠️ ESTES DOIS ENTRARAM EM 2026-09-30 PORQUE A FALTA DELES ME CUSTOU DOIS CI SEGUIDOS.
+  # A REGRA 80 (Números do harness saem de SSOT gerada, nunca de comentário) e a REGRA 81 (Painel de
+  # estado é GERADO dos produtores, nunca redigido) cobram duas projeções que este script NÃO
+  # regenerava — então fechá-las dependia de eu LEMBRAR de rodar os dois geradores à mão. Esqueci
+  # duas vezes na mesma sessão, e o modo de falha é sutil: o painel CONTA o resíduo de revisão e os
+  # achados da leva, logo gerá-lo antes de escrever o resíduo o deixa defasado POR CONSTRUÇÃO. O lint
+  # local passava (rodei antes do resíduo existir) e o CI reprovava. Estando aqui, um comando fecha
+  # todas as projeções, e a ordem certa — depois do resíduo — vira consequência de rodar o regen por
+  # último, em vez de disciplina de lembrar.
+  # E `graph.md` entrou na MESMA leva, pelo mesmo motivo, uma rodada de CI depois: `graph.sh --map`
+  # já estava aqui (para o federation-map), mas a OUTRA saída do mesmo gerador — `--markdown`, que
+  # produz a lente sócio-técnica cobrada pela REGRA 21 — não estava, e a bancada reprovou com
+  # `graph: em-sync`. A lição é a lista, não o arquivo: um gerador com duas saídas precisa das duas
+  # declaradas, senão fechar a segunda volta a depender de alguém lembrar.
+  "graph.sh --markdown|docs/onion/graph.md|20|linhas"
+  # E `inventory.md` fechou a PARIDADE, que é o achado de fundo desta leva: medido em 2026-09-30, o
+  # `regen-ssot-projections.sh` — o que VIAJA e o adotante roda — já fechava SEIS projeções
+  # (graph, inventory, testing-inventory, testing-state, lint-rules, kg-read-index) enquanto este,
+  # do core, fechava QUATRO. O core estava pior servido que quem o adota, e foi por isso que eu
+  # esqueci três projeções em três rodadas de CI seguidas no mesmo dia. Não é descuido: é o core
+  # sem a ferramenta que ele mesmo entrega.
+  "inventory.sh --markdown|docs/onion/inventory.md|20|linhas"
+  "harness-inventory.sh --markdown|docs/onion/testing-inventory.md|20|linhas"
+  "testing-state.sh --markdown|docs/onion/testing-state.md|20|linhas"
 )
 
 _fail=0 _n=0
