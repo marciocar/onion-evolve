@@ -1,0 +1,737 @@
+meta:
+  id: jev-type-safe-ai-2026-10
+  schema_version: "1"
+  baseline: 2026-10-01
+  review_after: 2026-10-31   # 30d: o tipo DOMINANTE desta rodada e FERRAMENTA/PRECO (modelo hospedado,
+                             # tabela de preco por token, regime de acesso, lista de gateways) — cadencia de
+                             # 30d da clausula 8. A metade "mercado/capital" pediria 90d, mas ela NAO foi
+                             # coberta nesta rodada (ver E_LACUNAS); e o preco e justamente o campo que o
+                             # Elenxo mediu errado por uma ordem de grandeza, logo 30d e o teto, nao o piso.
+  # kg-backlog-guard: on
+  # ═══ TETO: 42 NÓS. Rodada de PRIMARIAS executada em 2026-10-01: cresce só se uma re-medição do mesmo delta emendar um achado. ═══
+  #
+  # Pesquisa /onion-research (modo primarias nomeadas) sobre o JEV / TypeSafe AI. 6 fontes lidas, TODAS
+  # inalcançadas como primarias do fabricante (ver abaixo), 0 inalcançaveis por rede; 22 claims ancoradas,
+  # 13 REJEITADAS na ancoragem (12 EXAGERADAS por inferencia do leitor, 1 por frase inexistente). O Elenxo
+  # acrescentou 2 fontes que a rodada nao tinha aberto (typesafe.ai e eesel.ai) e elas MUDARAM o resultado.
+  #
+  # ⚠️ A PREMISSA DA RODADA FOI REFUTADA PELO PROPRIO MATERIAL. O mandato dizia "fecha SO o que as fontes
+  # primarias do PROPRIO PRODUTO dizem". As 6 URLs lidas sao todas do MESMO dominio (jevtypesafeai.com), que
+  # declara em letra miuda ser operado por CODEFASHION TECH LTD, "not affiliated with or endorsed by TypeSafe
+  # AI". Logo a rodada nao leu uma unica fonte primaria do produto: o fabricante (typesafe.ai) e o console
+  # (console.typesafe.ai) nunca foram abertos. Procedencia indireta nao e nota de rodape — e o `source_tier`
+  # de 22 claims, e e a razao pela qual os tiers 9 que o leitor declarou estao REBAIXADOS neste grafo
+  # (E_SOURCE_TIER_INFLATED). Isto e CORRECAO, nao desconfianca: duas das claims mais load-bearing da rodada
+  # (preco e "0 hallucinations") sao do REVENDEDOR e CONTRADIZEM o fabricante.
+  #
+  # Corpus previo (clausula 0): 109 grafos, 3.793 nos, NENHUM mencionando JEV nem type-safe AI. O corpus
+  # devolveu interface-state-of-art e classification-por-vertical por COLISAO de termos genericos
+  # (arquitetura, estado da arte, concorrentes, futuro), nao por relacao. Tratado como AUSENCIA de corpus:
+  # nada a transferir, tudo a descobrir — por isso nao ha SUPERSEDES/REFUTES cross-grafo nesta rodada
+  # (ausencia MEDIDA, nao esquecimento). O radar so enxerga arestas DENTRO de um arquivo: os vizinhos que
+  # PODEM se relacionar na rodada de decisao vao por trace: em Q_ONION_COULD_BECOME_THIS
+  # (C_INTERFACE_IS_LINE, C_COLLAPSE_CREATES, E_AUTOMODE_GATE).
+  #
+  # ESTA RODADA NAO SELA NADA. Estado da arte, concorrentes e a decisao sobre o Onion ficam para a rodada
+  # seguinte, e o que esta rodada aprendeu sobre elas esta nos nos Q_ (proposta), nunca em decision.
+nodes:
+  - id: Q_JEV_PRIMARIES_2026_10
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.55
+    label: 'O que e o JEV (jevtypesafeai.com): onde se enquadra na taxonomia de ferramentas de IA para desenvolvimento, que funcionalidades expoe, qual e a arquitetura, COMO sustenta a afirmacao de que nao alucina, como se integra (skill de agente, integracoes, tools) e qual e o modelo de distribuicao/licenca? FECHADO nesta rodada: forma da API, as tres primitivas, superficie de integracao e o fato de ser modelo FECHADO e HOSPEDADO. ABERTO: a ARQUITETURA (nenhuma fonte diz como o modelo e feito nem treinado), o MECANISMO do "nao alucina" (que o Elenxo mostrou ser slogan do revendedor, contradito pelo fabricante), o PRECO real conciliado, o regime de acesso e a licenca (ausencia de informacao, nao afirmacao).'
+    trace: docs/evolution/research/jev-type-safe-ai-2026-10/SYNTHESIS.md
+    verified_against: 'rodada de primarias de 2026-10-01: 6 URLs lidas (todas do mesmo dominio de terceiro), 22 claims ancoradas, 13 rejeitadas na ancoragem; +2 fontes abertas pelo Elenxo (typesafe.ai, eesel.ai) que corrigiram preco, mecanismo e regime de acesso'
+    trace: 'https://jevtypesafeai.com/'
+
+  # ───────────────── jev-home (fonte: revendedor) ─────────────────
+  - id: E_JEV_TYPED_DECISIONS_NOT_TEXT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "The AI model that returns typed decisions, not text." — Home, hero (h1; a quebra de linha fica entre "returns" e "typed decisions"); ancorada por verificador independente. CORROBORADA FORA do site lido pelo proprio fabricante (ver E_VENDOR_SYSTEM_ONE_CATEGORY), por isso a objecao do Elenxo caiu.'
+    source_tier: 5
+    source_kind: vendor-reseller
+    label: 'O JEV se autodescreve como um MODELO de IA que devolve decisoes TIPADAS em vez de texto — ou seja, um modelo hospedado de decisao tipada, nao um LLM gerador de texto. E o enquadramento central, e e o unico grupo de claims da rodada que resistiu ao Elenxo com corroboracao do fabricante.'
+    trace: 'https://jevtypesafeai.com/'
+  - id: E_JEV_LATENCY_AND_THREE_FORMATS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Jev = fast, typed decisions for AI agents and software — choice, score, or yes/no probability, in 70–500ms." — Home, linha logo abaixo do hero; ancorada por verificador independente. Latencia CORROBORADA por terceiro independente (eesel.ai, 2026-09-21: "70ms to 500ms" end-to-end e "40x to 200x faster").'
+    source_tier: 5
+    source_kind: vendor-reseller
+    label: 'Proposta de valor declarada: decisoes rapidas e tipadas para AGENTES de IA e SOFTWARE, em 70-500 ms, em tres formatos (escolha, nota, probabilidade sim/nao). O publico-alvo e maquina, nao humano lendo texto. A latencia foi o unico numero do site que um terceiro independente copiou CORRETAMENTE do fabricante — guarde o contraste com o preco.'
+    trace: 'https://jevtypesafeai.com/'
+  - id: E_ZERO_HALLUCINATION_SLOGAN
+    node_type: evidence
+    plane: DEV
+    status: refuted
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "0 hallucinations by construction" — Home, faixa de estatisticas do hero (ao lado de "40–200x faster than an LLM" e "Free live playground"; "Type errors, guaranteed" aparece na secao de numeros); ancorada por verificador independente. A busca por "closed set"/"constrained" na pagina NAO achou nada: a home nao nomeia mecanismo nenhum.'
+    source_tier: 5
+    source_kind: vendor-reseller
+    label: 'REFUTADA COMO PROPOSICAO (a citacao e verbatim; o que cai e o que ela afirma). A frase "0 hallucinations by construction" e slogan do OPERADOR DO SITE (CODEFASHION), nao claim do fabricante — e CONTRADIZ o fabricante, que fala em estimativa de confianca e ESCALAR quando a confianca e baixa (escalar pressupoe erro). A rodada ancorou um slogan de terceiro como se fosse a posicao do JEV, e era justamente a pergunta central do mandato. Nenhuma fonte, em nenhum tier, nomeia um mecanismo de nao-alucinacao.'
+    trace: 'https://jevtypesafeai.com/'
+  - id: E_JEV_THREE_PRIMITIVES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Pick one of up to 255 labelled options" — Home, secao "The three primitives" (choice, score, noul); ancorada por verificador independente. Taxonomia CORROBORADA por eesel.ai ("three primitives: Noul (probability), Choice (select from list), and Score (numeric rating)").'
+    source_tier: 5
+    source_kind: vendor-reseller
+    label: 'As saidas sao tres primitivas tipadas: Choice (ate 255 opcoes rotuladas), Score (espectro ordenado de 2-10 niveis) e noul (sim/nao expresso como probabilidade). A taxonomia resiste; duas bordas NAO resistem e estao nos nos que a restringem: o numero 255 nao aparece em nenhuma fonte do fabricante nem na cobertura independente, e chamar o noul de "calibrado" e adjetivo, nao medida.'
+    trace: 'https://jevtypesafeai.com/'
+  - id: E_PRICE_ON_RESELLER_SITE
+    node_type: evidence
+    plane: DEV
+    status: superseded
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "$0.25–$0.42/M Input tokens (output free)" — Home, faixa de numeros ("70–500 ms", "$0.25–$0.42 /M", "255", "0"), com "Jev is live — try it free, no signup" no topo e "real API · free · no signup" no playground; ancorada por verificador independente.'
+    source_tier: 5
+    source_kind: vendor-reseller
+    label: 'SUPERSEDIDO COMO RESPOSTA A "modelo de negocio do JEV" (o numero e real, mas e de OUTRA entidade). O site cobra US$ 0,25-0,42 por milhao de tokens de entrada, saida gratis, com playground sem cadastro. O fabricante cobra US$ 0,042/M (US$ 42 por BILHAO) — 6x a 10x menos. A rodada nao documentou o preco do JEV; documentou o MARKUP de um revendedor. Qualquer calculo de custo-beneficio para o Onion feito sobre este numero esta errado por uma ordem de grandeza.'
+    trace: 'https://jevtypesafeai.com/'
+  - id: E_JEV_CLOSED_HOSTED_MODEL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "No — Jev is a hosted model from TypeSafe AI, called over an API." — Home, FAQ "Is Jev open source?" (secao Getting started); ancorada por verificador independente. Sustentado por fonte do fabricante (console de sign-in, zero mencao a pesos abertos) e por eesel.ai ("hosted/closed", acesso via Cloudflare Workers AI e lista de early-access).'
+    source_tier: 5
+    source_kind: vendor-reseller
+    label: 'Licenca e distribuicao: modelo FECHADO, HOSPEDADO, acessado por API. O que e aberto e so o ferramental em volta (awesome-jev, jev-mcp, integracao LangChain) — nao o modelo. Fato FECHADO, sem dissenso em nenhuma fonte. Nenhuma pagina lida, porem, chega a declarar LICENCA: a ausencia de open-source e dita, a licenca do servico nao.'
+    trace: 'https://jevtypesafeai.com/'
+
+  # ───────────────── jev-docs ─────────────────
+  - id: E_DECIDE_API_SHAPE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "One call: a state plus typed questions, calibrated answers back." — /docs, "Core API — /v1/decide"; ancorada por verificador independente. CORROBORADA por eesel.ai, que descreve multiplas perguntas avaliadas contra o mesmo state "in a single parallel pass".'
+    source_tier: 5
+    source_kind: vendor-reseller
+    label: 'A forma da API: entra um `state` mais perguntas TIPADAS, saem respostas no formato fixado pelo pedido. E classificacao/pontuacao sobre um estado, nao geracao livre — varias perguntas contra o mesmo contexto numa passada. ⚠️ FORMA DE API NAO E ARQUITETURA: a rodada apresentou esta claim como se respondesse "qual e a arquitetura", e ela nao responde (ver Q_JEV_ARCHITECTURE_UNKNOWN).'
+    trace: 'https://jevtypesafeai.com/docs'
+  - id: E_TYPE_FIXED_BY_REQUEST_NO_PARSING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Because every answer''s type is fixed by your request, you branch on it in plain code — no parsing, no regex." — /docs, "Response"; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia, ver E_SOURCE_TIER_INFLATED). CORROBORADA por eesel.ai: "cannot make a type error and cannot return an option that was not in your list".'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'A UNICA garantia real do produto, e ela e ESTRUTURAL: o tipo da resposta e fixado pelo pedido, logo o cliente ramifica em codigo comum, sem parsing nem regex. E a unica frase da doc que aproxima "garantia" de saida — e trata de ESTRUTURA (conjunto fechado de rotulos + tipo), nunca de VERDADE. Um rotulo errado DENTRO do conjunto e saida perfeitamente valida.'
+    trace: 'https://jevtypesafeai.com/docs'
+  - id: E_LIMITS_AND_PIN_MODEL_VERSION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Pin a model version in production so thresholds don''t shift." — /docs, "Best practice"; ancorada por verificador independente. Limites declarados na mesma secao: 64k tokens de state+perguntas, 32k para state+maior pergunta, ate 255 opcoes em choice, 2-10 niveis em score.'
+    source_tier: 5
+    source_kind: vendor-reseller
+    label: 'Limites operacionais (64k state+perguntas, 32k state+maior pergunta, 255 opcoes, 2-10 niveis) E a recomendacao de FIXAR a versao do modelo em producao "para os thresholds nao deslocarem". Esta ultima frase e o achado mais consequente da rodada e prova o CONTRARIO de garantia: se os limiares deslocam entre versoes, a fronteira de decisao e NAO-DETERMINISTICA NO TEMPO. E exatamente isso que mata o "0 hallucinations by construction" e o que desqualifica o JEV num gate determinístico do Onion.'
+    trace: 'https://jevtypesafeai.com/docs'
+
+  # ───────────────── jev-get ─────────────────
+  - id: E_FREE_PLAYGROUND_NO_SIGNUP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Run real Jev calls in your browser, no key and no signup." — /get-jev, item 1 "Try it now — free playground"; ancorada por verificador independente.'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'Ha playground gratuito no navegador, sem chave e sem cadastro — a via de teste de menor atrito. RESTRINGIDO: o playground e do OPERADOR TERCEIRO, rodando sobre uma chave dele e com o markup dele; testar ali nao mede o JEV em condicao de producao, nem o preco, nem a quota.'
+    trace: 'https://jevtypesafeai.com/get-jev'
+  - id: E_DISTRIBUTION_GATEWAYS
+    node_type: evidence
+    plane: DEV
+    status: unverifiable
+    impact: 3
+    confidence: 0.4
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Vercel AI Gateway (typesafe-ai/jev), OpenRouter (typesafe/jev via its decisions endpoint) and Cloudflare AI Gateway" — /get-jev, item 3 "Through a gateway / provider"; item 4 cita o endpoint oficial /v1/systemone em console.typesafe.ai. Ancorada por verificador independente NO TEXTO, mas NAO CONFIRMADA em nenhum catalogo de ORIGEM.'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'NAO CONFIRMADA (a pagina diz; nenhum registro de origem confirma). A lista de distribuicao por gateways de terceiros (Vercel AI Gateway, OpenRouter, Cloudflare AI Gateway) e o endpoint oficial /v1/systemone foram repassados da pagina do REVENDEDOR sem bater em OpenRouter, Vercel, npm, PyPI ou Hugging Face. O unico gateway que uma fonte independente confirma e OUTRO: eesel.ai cita Cloudflare Workers AI.'
+    trace: 'https://jevtypesafeai.com/get-jev'
+  - id: E_OPERATOR_NOT_AFFILIATED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Jev is developed by TypeSafe AI. This platform is independently operated by CODEFASHION TECH LTD and is not affiliated with or endorsed by TypeSafe AI." — /get-jev, aviso ao fim do corpo da pagina, repetido no rodape ("© 2026 CODEFASHION TECH LTD.", "Not affiliated with or endorsed by TypeSafe AI."); ancorada por verificador independente.'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'A CLAIM QUE REFUTA A PREMISSA DA RODADA. Quem desenvolve e a TypeSafe AI; o site lido e operado por empresa INDEPENDENTE, sem afiliacao nem endosso. Logo as 6 URLs desta rodada nao sao fontes primarias do produto — sao fonte primaria de um INTERMEDIARIO sobre o produto. Procedencia indireta e o tier de 22 claims, e e por isso que preco e "0 hallucinations" sairam errados.'
+    trace: 'https://jevtypesafeai.com/get-jev'
+
+  # ───────────────── jev-agent-skill ─────────────────
+  - id: E_SKILL_TEACHES_FUZZY_IF
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Give any AI coding agent a fast, typed "fuzzy if": one skill teaches it to call the Jev Decision API for routing, guardrails, scoring and gating" — /agent-skill, subtitulo de abertura sob "Add the Jev skill to your agent"; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia).'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'O enquadramento de uso para agentes: a skill ensina o agente a chamar a Decision API como um "fuzzy if" TIPADO — roteamento, guardrails, scoring e gating. E a primitiva que mais interessa a um framework de orquestracao: um `if` cuja condicao e difusa mas cujo RESULTADO e um rotulo de conjunto fechado.'
+    trace: 'https://jevtypesafeai.com/agent-skill'
+  - id: E_SKILL_INSTALL_PROMPT_AND_CURL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "curl -o ~/.claude/skills/jev/SKILL.md --create-dirs https://jevtypesafeai.com/skill/SKILL.md" — /agent-skill, "Copy to your agent" ("Any agent — paste this prompt" e "Any agent — install the file manually"); ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia).'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'Distribuicao da skill por DOIS caminhos sem pacote: um prompt de colar que manda o agente buscar a URL do SKILL.md, e um curl para ~/.claude/skills/jev/. O caminho ~/.claude/ e o layout do Claude Code, mas a pagina NAO declara o formato da skill nem cita a Agent Skills spec — e o SKILL.md nao foi conferido nesta rodada.'
+    trace: 'https://jevtypesafeai.com/agent-skill'
+  - id: E_SKILL_TEACHES_API_CONTRACT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "The exact request / response shape, so the agent branches on typed values with no parsing" — /agent-skill, "What the skill teaches your agent", itens 1 e 3; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia).'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'O conteudo da skill, metade contrato: endpoint, auth Bearer e os tipos choice/score/noul, mais a forma exata de request/response, para o agente ramificar por valores tipados sem parsing. E uma skill que carrega um CONTRATO DE API — o mesmo padrao que o Onion chama de adapter, so que entregue como instrucao ao agente.'
+    trace: 'https://jevtypesafeai.com/agent-skill'
+  - id: E_SKILL_TEACHES_WHEN_AND_COST
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "When to call Jev instead of another LLM — routing, tool-call guardrails, context compaction, classification" — /agent-skill, "What the skill teaches your agent", itens 2 e 4; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia).'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'A outra metade da skill e DOUTRINA DE ROTEAMENTO: quando chamar o JEV em vez de outro LLM (roteamento, guardrail de tool-call, compactacao de contexto, classificacao) e as regras de custo e seguranca. Uma skill que ensina o agente QUANDO NAO usar o proprio produto e o padrao mais proximo do que o Onion faz com seus fragmentos canonicos.'
+    trace: 'https://jevtypesafeai.com/agent-skill'
+
+  # ───────────────── jev-integrations ─────────────────
+  - id: E_TYPESCRIPT_SDK
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Call Jev from TypeScript/Node: install the SDK, set your key, and get a typed, calibrated choice / score / noul with a 30-line working example." — /integrations, card "SDK / TypeScript"; ancorada por verificador independente.'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'Ha SDK TypeScript/Node: instalar, configurar a chave e obter choice/score/noul tipado, com exemplo de 30 linhas. A superficie de integracao e uma GRADE DE CARDS (SDK, MCP, LangChain, Claude Code, Cursor, OpenCode, Hermes, OpenRouter, Bedrock, Hugging Face), nao uma arquitetura declarada — a propria pagina resume tudo a "one HTTP call".'
+    trace: 'https://jevtypesafeai.com/integrations'
+
+  # ───────────────── jev-tools ─────────────────
+  - id: E_TOOLS_AGENTS_DEV_DEMOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Paste an agent''s shell commands — Jev gates each one ALLOW / CONFIRM / BLOCK with a risk score." — /tools l.42-153, Featured demos; ancorada por verificador independente.'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'As demos da categoria Agents & Dev sao, uma a uma, o vocabulario de guarda de agente: gate de shell ALLOW/CONFIRM/BLOCK com risk score, detector de prompt injection/jailbreak, detector de loop, compactacao de contexto KEEP/TRUNCATE/DROP, skill router e model router. E a superficie onde o JEV encosta DIRETAMENTE no que o Onion faz com hooks e gates.'
+    trace: 'https://jevtypesafeai.com/tools'
+  - id: E_ROUTERS_SKILL_AND_MODEL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Route each task to the one tool an agent should call — web search, code, DB, email — with confidence." — /tools l.97-100 (Skill Router) e l.150-153 (Model Router); ancorada por verificador independente.'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'Dois roteadores como produto: o Skill Router escolhe UMA unica tool por tarefa, com confianca; o Model Router escolhe o modelo mais barato CAPAZ e mostra a economia contra um modelo de fronteira. E a tese de "decisao barata antes da geracao cara" — o mesmo problema que a escada de modelos do Onion resolve por regra declarada em vez de por classificador.'
+    trace: 'https://jevtypesafeai.com/tools'
+  - id: E_PR_JUDGE_VERDICT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Paste a GitHub PR — Jev returns SAFE / REVIEW / BLOCK with structured checks, in one call." — /tools l.188-191, PR Judge; ancorada por verificador independente.'
+    source_tier: 5
+    source_kind: vendor-reseller
+    label: 'PR Judge: um veredito estruturado SAFE/REVIEW/BLOCK por chamada, com checks estruturados e custo por chamada declarado. E o analogo mais direto do parecer de revisor do Onion — e a comparacao a fazer na rodada seguinte nao e de qualidade do veredito, e de ONDE ele pode sentar: parecer que BLOQUEIA exige fronteira estavel no tempo, que E_LIMITS_AND_PIN_MODEL_VERSION mostra nao existir.'
+    trace: 'https://jevtypesafeai.com/tools'
+  - id: E_TOOLS_TAXONOMY_AND_BATCH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-01
+    verified_against: 'citacao verbatim "Upload a CSV or paste rows, ask 1–8 questions, and get a typed answer for every row — filter, sort, export." — /tools l.269-308; ancorada por verificador independente.'
+    source_tier: 6
+    source_kind: vendor-reseller
+    label: 'A taxonomia de aplicacao declarada pelo site: Data, Agents & Dev, Sales & Support, Marketing e Just for fun. Em Data, o Batch Analyzer tipa cada LINHA de um CSV com 1-8 perguntas; em Agents & Dev, Agent Risk Checker, Context Cleaner e Prompt Guardrail. O enquadramento comercial e horizontal (classificacao em massa), com a vertical de agentes como carro-chefe.'
+    trace: 'https://jevtypesafeai.com/tools'
+
+  # ───────────────── Evidencia trazida pelo ELENXO (fontes que a rodada NAO abriu) ─────────────────
+  - id: E_VENDOR_SYSTEM_ONE_CATEGORY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'typesafe.ai (fonte do FABRICANTE, lida no Elenxo desta rodada): "Jev is TypeSafe''s first public System One Model, optimized for automation. Send Jev structured questions and get typed decisions with probabilities and confidence that your software can act on" e "System One Models are a new class of AI model built for decisions inside software".'
+    source_tier: 10
+    source_kind: primary
+    label: 'O NOME DA CATEGORIA, que a rodada tinha perdido: o fabricante cunha "System One Model" — uma classe nova de modelo de IA para DECISOES DENTRO DE SOFTWARE (alusao ao Sistema 1 de Kahneman; "Jev" alude a W. S. Jevons). O JEV e o primeiro System One Model publico da TypeSafe. Era exatamente o que "onde ele se enquadra" pedia, e estava a 1 chamada de distancia do dominio que a rodada leu 6 vezes.'
+    trace: 'https://typesafe.ai/'
+  - id: E_VENDOR_CONFIDENCE_ESCALATES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'typesafe.ai (fabricante): "Every Jev decision comes with a confidence estimate, so your software can act when confidence is high and escalate when it is not."'
+    source_tier: 10
+    source_kind: primary
+    label: 'O FABRICANTE FORMULA O OPOSTO DO SLOGAN. Cada decisao vem com estimativa de confianca justamente para o software AGIR quando a confianca e alta e ESCALAR quando nao e — e escalar pressupoe erro. Quem vende o modelo nao promete zero alucinacao; promete um numero para o chamador decidir quando nao confiar. A frase "0 hallucinations by construction" nao e do fabricante.'
+    trace: 'https://typesafe.ai/'
+  - id: E_TYPED_WRONG_ANSWER_POSSIBLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-10-01
+    verified_against: 'eesel.ai (cobertura independente, 2026-09-21): "a confidently wrong typed answer is still possible"; o teto da garantia e "cannot produce a type error" / "cannot make a type error and cannot return an option that was not in your list".'
+    source_tier: 7
+    source_kind: independent-coverage
+    label: 'A COBERTURA INDEPENDENTE E EXPLICITA: uma resposta tipada CONFIANTEMENTE ERRADA continua possivel. O teto do que o JEV garante e "nao produzir erro de tipo" e "nao devolver opcao fora da sua lista". Ou seja: a garantia e de FORMA (tipo + conjunto fechado), nunca de VERDADE. Esta e a resposta real a pergunta "por que ele diz nao alucinar": ele nao diz — o revendedor diz.'
+    trace: 'https://www.eesel.ai/'
+  - id: E_VENDOR_PRICE_42_PER_BILLION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'typesafe.ai (fabricante): "$42 Per Billion input tokens" = US$ 0,042 por milhao; CORROBORADO por eesel.ai: "$0.042 / MTok" e "238x lower than Claude Fable 5.1".'
+    source_tier: 10
+    source_kind: primary
+    label: 'O PRECO DO PRODUTO E OUTRO: US$ 42 por BILHAO de tokens de entrada, isto e US$ 0,042/M — confirmado por terceiro independente, que ainda situa a ordem de grandeza (238x menor que um modelo de fronteira). O site lido cobra 6x a 10x isso. Esta aresta e a licao de procedencia da rodada em forma de aritmetica.'
+    trace: 'https://typesafe.ai/'
+  - id: E_NOUL_IS_BARE_NUMBER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-01
+    verified_against: 'medicao do verificador independente sobre /docs ao rejeitar a claim "os tres tipos devolvem probabilidades e confianca calibradas": so choice e score devolvem `confidence` e `probabilities`; o noul devolve UM numero nu — exemplo da propria doc: {"type":"noul","noul":0.94}. A doc nao cita metodologia de calibracao nem garantia alguma; "calibrated" aparece so como adjetivo.'
+    source_tier: 6
+    source_kind: measurement
+    label: 'O "calibrado" do noul nao tem medida por tras. Choice e Score devolvem confianca e distribuicao; o noul devolve um unico float, sem confianca nem distribuicao. E a doc em nenhum lugar descreve metodologia de calibracao. Logo a primitiva que mais serve a um GUARDRAIL (sim/nao) e justamente a que menos informacao da ao chamador para decidir quando nao confiar.'
+    trace: 'https://jevtypesafeai.com/docs'
+  - id: E_CONTEXT_WINDOW_CONFLICT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-10-01
+    verified_against: 'conflito MEDIDO entre fontes: /docs (revendedor) declara 64k tokens para state+perguntas e 32k para state+maior pergunta; eesel.ai (independente) reporta "32,000 tokens" como a JANELA de jev-1.13.0. Nenhuma fonte reconcilia os dois numeros.'
+    source_tier: 7
+    source_kind: independent-coverage
+    label: 'A janela de contexto e um limite LOAD-BEARING com DUAS versoes e nenhuma reconciliacao: 64k no site do revendedor, 32k na cobertura independente para jev-1.13.0. Projetar uso real (compactacao de contexto, PR inteiro, CSV) sobre o numero maior e apostar na fonte mais fraca.'
+    trace: 'https://www.eesel.ai/'
+  - id: E_ACCESS_REGIME_WAITLIST_VS_OPEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-10-01
+    verified_against: 'eesel.ai (independente): acesso ao JEV via "Cloudflare Workers AI" e por "early-access waitlist"; typesafe.ai expoe console de sign-in. O site do revendedor, por contraste, anuncia "live — try it free, no signup".'
+    source_tier: 7
+    source_kind: independent-coverage
+    label: 'DOIS REGIMES DE ACESSO, e nao sao o mesmo produto de compra: o FABRICANTE opera por lista de early-access e console; o REVENDEDOR anuncia acesso ao vivo, gratis e sem cadastro. "Hosted" do fabricante e "live, gratis, sem cadastro" do terceiro nao descrevem o mesmo regime — logo a facilidade de testar que a rodada registrou e propriedade do intermediario, nao do JEV.'
+    trace: 'https://www.eesel.ai/'
+  - id: E_OPENROUTER_SLUG_NOT_CONFIRMED
+    node_type: evidence
+    plane: DEV
+    status: unverifiable
+    impact: 2
+    confidence: 0.5
+    verified_at: 2026-10-01
+    verified_against: 'medicao propria no Elenxo: https://openrouter.ai/typesafe/jev devolveu HTTP 404. O slug foi ADIVINHADO a partir do texto do revendedor, logo isto e AUSENCIA DE CONFIRMACAO, nao prova de inexistencia.'
+    source_tier: 10
+    source_kind: measurement
+    label: 'A unica tentativa de bater a lista de gateways num catalogo de ORIGEM falhou: o slug de OpenRouter citado pelo revendedor devolveu 404. Registrado como NAO CONFIRMADO, nunca como refutado — o slug era adivinhado. O que isto estabelece e o METODO que faltou a rodada: lista de distribuicao escrita pelo vendedor se confere no catalogo de quem distribui.'
+    trace: 'https://openrouter.ai/typesafe/jev'
+  - id: E_ROUND_READ_ZERO_VENDOR_PRIMARIES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-10-01
+    verified_against: 'auditoria da propria rodada: as 6 URLs do mandato (/, /get-jev, /docs, /agent-skill, /integrations, /tools) pertencem TODAS ao dominio jevtypesafeai.com, que declara nao ter afiliacao com a TypeSafe AI. typesafe.ai e console.typesafe.ai nao foram abertos na fase de leitura; abri-los no Elenxo custou 2 chamadas e devolveu categoria, mecanismo e preco real.'
+    source_tier: 10
+    source_kind: measurement
+    label: 'ZERO FONTES PRIMARIAS DO PRODUTO FORAM LIDAS na fase de leitura, apesar de o mandato dizer que a rodada fecharia "so o que as fontes primarias do proprio produto dizem". A licao e de MECANISMO, nao de zelo: o modo primarias nomeadas confere a CITACAO contra o DOCUMENTO, e nao confere se o DOCUMENTO e de quem o mandato supoe. Duas chamadas ao dominio do fabricante corrigiram tres respostas centrais.'
+    trace: 'https://typesafe.ai/'
+  - id: E_SOURCE_TIER_INFLATED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'auditoria dos tiers declarados: o leitor declarou tier 9 para 5 claims (/docs Response e as 4 de /agent-skill) e tier 6 para 9 claims, todas do MESMO dominio de terceiro nao afiliado. Pela clausula 7, fonte que fala de produto alheio sem afiliacao nao recebe tier de fonte definitiva. Rebaixadas a 6 (as de tier 9) e 5 (as sem tier declarado, onde o conteudo e numero de marketing).'
+    source_tier: 10
+    source_kind: measurement
+    label: 'OS TIERS DA RODADA ESTAVAM INFLADOS e este grafo os rebaixou. Ancoragem verifica se a CITACAO existe no documento; ela nao julga a AUTORIDADE do documento. Sem o rebaixamento, 5 claims de um intermediario entrariam no corpus com peso de fonte definitiva — e o radar ordena atencao por peso. Classe a mecanizar: tier declarado por quem LE nao e tier da FONTE.'
+    trace: 'https://jevtypesafeai.com/get-jev'
+
+  # ───────────────── Claims (o que a rodada estabelece, sem selar) ─────────────────
+  - id: C_JEV_CATEGORY_IS_SYSTEM_ONE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.8
+    label: 'ONDE O JEV SE ENQUADRA: nao e LLM de chat, nem roteador, nem biblioteca de validacao de schema — e um "System One Model" (categoria cunhada pelo proprio fabricante), um modelo hospedado cuja saida e uma DECISAO TIPADA de conjunto fechado, feito para ser chamado DENTRO de software em 70-500 ms. O vizinho conceitual mais proximo nao e o GPT; e um classificador/scorer hospedado com contrato de tipo — a diferenca e que ele aceita o problema expresso em linguagem e devolve rotulo, nota ou probabilidade sem passo de parsing.'
+    verified_against: 'sustentado por fonte do fabricante (E_VENDOR_SYSTEM_ONE_CATEGORY) e pela forma da API (E_DECIDE_API_SHAPE); a categoria e declaracao de marketing do fabricante, ainda sem analista independente que a trate como categoria de mercado — ver Q_ no fio de estado da arte'
+    trace: 'https://typesafe.ai/'
+  - id: C_GUARANTEE_IS_STRUCTURAL_NEVER_FACTUAL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.85
+    label: 'A RESPOSTA A "por que ele diz nao alucinar": ele NAO diz. A garantia que o produto sustenta e ESTRUTURAL — tipo fixado pelo pedido, rotulo sempre dentro do conjunto fechado, nenhum erro de tipo, nenhum parsing. Isso elimina uma CLASSE de falha (saida malformada, campo inventado, JSON quebrado), e nao a falha de CONTEUDO: um rotulo errado dentro do conjunto e saida valida, e o fabricante ate instrumenta isso com confianca para o chamador ESCALAR. "0 hallucinations by construction" e slogan de revendedor sobre o formato, lido como se fosse sobre a verdade.'
+    verified_against: 'sustentado por E_TYPE_FIXED_BY_REQUEST_NO_PARSING e E_TYPED_WRONG_ANSWER_POSSIBLE; restringido por E_VENDOR_CONFIDENCE_ESCALATES, E_NOUL_IS_BARE_NUMBER e E_LIMITS_AND_PIN_MODEL_VERSION (limiar que desloca entre versoes)'
+    trace: 'https://www.eesel.ai/'
+  - id: C_ARCHITECTURE_NOT_DISCLOSED
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    label: 'A ARQUITETURA DO JEV NAO ESTA DECLARADA EM NENHUMA FONTE LIDA. Nenhuma pagina do revendedor, nenhuma frase do fabricante e nenhuma cobertura independente desta rodada diz como o modelo e construido ou treinado: se e LLM com decodificacao restrita a um conjunto de rotulos, se e encoder classificador, se e destilacao de um modelo maior, nem qual e o modelo-base. O que a rodada tem e FORMA DE API (state + perguntas tipadas, uma passada paralela), versionamento (jev-latest, jev-1.13.0) e um erro 502 descrito como "upstream Jev error". Confundir forma de API com arquitetura foi o defeito de leitura desta rodada.'
+    verified_against: 'ausencia MEDIDA: grep por halluc/compil/constrained/closed-set nas paginas lidas devolveu zero; a rejeicao da claim sobre "upstream model" na ancoragem mostrou que a doc nao nomeia provider nem LLM-base'
+    trace: 'https://jevtypesafeai.com/docs'
+  - id: C_INTEGRATION_SURFACE_IS_ONE_HTTP_CALL
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    label: 'COMO ELE SE INTEGRA, em uma frase: tudo e UMA chamada HTTP, e as "integracoes" sao embalagens dela. SDK TypeScript, servidor jev-mcp (npx, com setup de key/JEV_BASE_URL/JEV_MODEL e uma pegadinha de gateway hospedado que devolve 401), LangChain (langchain-typesafe / TypeSafeClassifier), skill de agente para Claude Code / Cursor / Codex / OpenCode / Hermes, action group Lambda com schema OpenAPI no Bedrock e gateways. Nao ha pesos no Hugging Face — o que se acha la sao modelos de decisao "Jev-like" abertos (Laya, OpenJev), que a rodada NAO investigou.'
+    verified_against: 'sustentado por E_TYPESCRIPT_SDK e E_SKILL_* ; a maior parte dos itens desta lista veio de claims REJEITADAS na ancoragem por inferencia editorial do leitor, e por isso entram aqui como claim a verificar, nao como evidencia (ver E_LACUNAS)'
+    trace: 'https://jevtypesafeai.com/integrations'
+
+  # ───────────────── Contabilidade da rodada ─────────────────
+  - id: E_LACUNAS_JEV_PRIMARIES_2026_10
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-10-01
+    verified_against: 'contabilidade fechada da rodada de primarias de 2026-10-01, conferida contra o retorno do verificador de ancoragem e contra o Elenxo'
+    source_tier: 10
+    source_kind: measurement
+    label: 'CONTABILIDADE. FONTES: 6 pedidas, 6 lidas, 0 inalcançaveis por rede — MAS 0 primarias do produto (todas do dominio do revendedor); +2 abertas pelo Elenxo (typesafe.ai, eesel.ai). CLAIMS: 22 ancoradas, 13 REJEITADAS. Motivo das rejeicoes: 12 EXAGERADAS e 1 por frase inexistente, e o padrao e UM SO — inferencia do leitor vendida como afirmacao do documento: negativas que o texto nao traz ("nada roda localmente", "nao e binario/pacote local", "sem licenca aberta", "so o cliente MCP e npm", "o motor continua remoto"), rotulos que o texto nao usa ("revendedor", "servidor MCP", "cliente", "protocolo aberto central", "Direct Integrations", "Protocol & Infrastructure"), atribuicao de causa que o texto nao faz (ligar "nao alucina" ao formato de saida em 2 paginas que NUNCA mencionam alucinacao) e garantia a partir de marketing ("sem chamadas extras de modelo" onde o texto diz "instead of a slow second model call"; "~70-500ms" do proprio site como se fosse medicao). LACUNAS QUE CONTINUAM ABERTAS: (1) arquitetura e treino do modelo — nenhuma fonte; (2) mecanismo do "nao alucina" — nao existe como claim do fabricante; (3) preco e regime de acesso conciliados entre fabricante e revendedor; (4) LICENCA do servico — ausencia de informacao, nao afirmacao; (5) janela de contexto (32k x 64k) sem reconciliacao; (6) lista de gateways nao confirmada em catalogo de origem (OpenRouter 404 em slug adivinhado; npm, PyPI e HF nao batidos); (7) o SKILL.md nao foi baixado nem lido; (8) MERCADO/CAPITAL — invariante da clausula 4 NAO COBERTO: zero sobre rodadas, investidores, M&A ou tracao da TypeSafe AI; (9) estado da arte e concorrentes (Laya, OpenJev e classificadores hospedados) fora de escopo por mandato; (10) nenhuma medicao INDEPENDENTE de latencia, acuracia ou calibracao — todos os numeros de desempenho sao do proprio vendedor.'
+    trace: 'https://jevtypesafeai.com/'
+
+  # ───────────────── Fios abertos (proposta; esta rodada NAO sela) ─────────────────
+  - id: Q_JEV_ARCHITECTURE_UNKNOWN
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: 'Como o JEV e CONSTRUIDO e TREINADO? Hipoteses a testar na rodada seguinte: LLM com decodificacao restrita ao conjunto de rotulos; encoder classificador multi-tarefa; destilacao de modelo maior; ou arquitetura propria. Gatilho: ler typesafe.ai/docs e o console, procurar paper/model card/post de engenharia e bater `jev-1.13.0` contra qualquer registro de modelo. Enquanto isto estiver aberto, nenhuma afirmacao do Onion sobre "como ele evita alucinar" tem base — e e a pergunta que o maestro fez.'
+    verified_against: 'aberto por C_ARCHITECTURE_NOT_DISCLOSED; ausencia medida em 6 paginas + 2 fontes do Elenxo'
+    trace: 'https://typesafe.ai/'
+  - id: Q_JEV_PRICE_AND_ACCESS_RECONCILE
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: 'Qual e o preco e o regime de acesso REAIS do JEV, conciliados? A rodada tem tres numeros incompativeis (US$ 0,042/M do fabricante, US$ 0,25-0,42/M do revendedor, "from $5" de credito) e dois regimes (early-access/console x live sem cadastro). Gatilho: abrir console.typesafe.ai e a pagina de preco do FABRICANTE antes de qualquer calculo de custo-beneficio para o Onion. Enquanto estiver aberto, todo numero de custo citado desta rodada precisa vir com a fonte nomeada — e o do revendedor esta 6-10x acima.'
+    verified_against: 'aberto por E_VENDOR_PRICE_42_PER_BILLION (SUPERSEDES E_PRICE_ON_RESELLER_SITE) e E_ACCESS_REGIME_WAITLIST_VS_OPEN'
+    trace: 'https://typesafe.ai/'
+  - id: Q_JEV_IN_ONION_GATE_DISQUALIFIED
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: 'PROPOSTA a julgar na rodada de decisao (nao selada aqui): o JEV NAO deve sentar em gate DETERMINISTICO do Onion — nada que termine em `exit 2`, catraca de lint ou veto de hook — porque a doc do proprio produto recomenda fixar versao "para os thresholds nao deslocarem" (fronteira de decisao nao-deterministica no tempo), porque uma resposta tipada confiantemente errada e possivel, e porque o noul, a primitiva de guardrail, devolve numero nu sem confianca. Onde ele PODERIA sentar: camadas ACONSELHADORAS (triagem, roteamento de modelo/skill, priorizacao de atencao, pre-filtro de parecer) — exatamente a metade do Onion que ACONSELHA, nao a que REPROVA. Gatilho de reabertura: o fabricante publicar garantia de estabilidade de limiar entre versoes, ou medicao propria de estabilidade.'
+    verified_against: 'aberto por E_LIMITS_AND_PIN_MODEL_VERSION + E_TYPED_WRONG_ANSWER_POSSIBLE + E_NOUL_IS_BARE_NUMBER; a fronteira "o que REPROVA x o que ACONSELHA" e a mesma do CLAUDE.md do core (26.596 linhas de shell que reprovam x 52.655 de markdown que aconselham)'
+    trace: 'https://jevtypesafeai.com/docs'
+  - id: Q_ONION_COULD_BECOME_THIS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.4
+    label: 'O Onion poderia virar algo assim? DEFERIDA POR MANDATO para a rodada de decisao, e esta rodada entrega so o que ela precisa saber: o JEV e produto de MODELO (hospedado, fechado, cobrado por token), nao de metodo — e o Onion e o inverso (framework template, gate deterministico, grafo de conhecimento). O que de fato se compara nao e o produto, e a PRIMITIVA: "decisao tipada de conjunto fechado como chamada barata antes da geracao cara". Vizinhos do corpus a trazer para a mesa: C_INTERFACE_IS_LINE (a linha intake x execucao tornada visivel), C_COLLAPSE_CREATES (propoe=aprova exige refutador) e E_AUTOMODE_GATE (gate de auto-mode barrou bypassPermissions). Gatilho: a rodada de estado da arte, concorrentes e mercado — sem ela, responder isto e opinar.'
+    verified_against: 'corpus de 109 grafos / 3.793 nos nao tem nenhum no sobre JEV nem type-safe AI; os 3 vizinhos citados vieram por colisao de termos genericos e entram por trace:, nao por aresta (o radar so le arestas intra-arquivo)'
+    trace: 'docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml'
+  - id: Q_ANCHORING_DOES_NOT_CHECK_PROVENANCE
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.75
+    label: 'PROPOSTA DE MECANISMO (classe nova, achada por esta rodada): o modo `primarias nomeadas` confere a CITACAO contra o DOCUMENTO e NAO confere se o documento e de quem o mandato supoe. Dano medido aqui: 6 URLs tratadas como "fontes primarias do proprio produto" eram de um terceiro nao afiliado, e isso produziu preco 6-10x errado, um slogan de revendedor ancorado como posicao do produto e 5 claims declaradas tier 9. Cura candidata: na fase de ancoragem, uma checagem de PROCEDENCIA por fonte — quem opera o dominio x quem fabrica o produto, com rebaixamento automatico de tier quando divergem — e, no prompt do modo, exigir que ao menos UMA fonte seja do dominio do fabricante. Gatilho de execucao: o maestro decidir; esta rodada so nomeia a classe.'
+    verified_against: 'sustentado por E_ROUND_READ_ZERO_VENDOR_PRIMARIES e E_SOURCE_TIER_INFLATED; a classe e parente de `behavior-over-declaration` (confie no que o artefato E, nao no que declara) aplicada a FONTE'
+    trace: '.claude/commands/common/prompts/research-doctrine.md'
+edges:
+  # sustentacao da pergunta da rodada
+  - from: E_JEV_TYPED_DECISIONS_NOT_TEXT
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_JEV_LATENCY_AND_THREE_FORMATS
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_JEV_THREE_PRIMITIVES
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_JEV_CLOSED_HOSTED_MODEL
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_DECIDE_API_SHAPE
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_TYPE_FIXED_BY_REQUEST_NO_PARSING
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_LIMITS_AND_PIN_MODEL_VERSION
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_FREE_PLAYGROUND_NO_SIGNUP
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_OPERATOR_NOT_AFFILIATED
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_SKILL_TEACHES_FUZZY_IF
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_SKILL_INSTALL_PROMPT_AND_CURL
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_SKILL_TEACHES_API_CONTRACT
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_SKILL_TEACHES_WHEN_AND_COST
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_TYPESCRIPT_SDK
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_TOOLS_AGENTS_DEV_DEMOS
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_ROUTERS_SKILL_AND_MODEL
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_PR_JUDGE_VERDICT
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_TOOLS_TAXONOMY_AND_BATCH
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_JEV_PRIMARIES_2026_10
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: CONSTRAINS
+  - from: E_ROUND_READ_ZERO_VENDOR_PRIMARIES
+    to: Q_JEV_PRIMARIES_2026_10
+    edge_type: CONSTRAINS
+  # reconciliacao: o que o Elenxo derrubou e o que ele substituiu
+  - from: E_VENDOR_CONFIDENCE_ESCALATES
+    to: E_ZERO_HALLUCINATION_SLOGAN
+    edge_type: REFUTES
+  - from: E_TYPED_WRONG_ANSWER_POSSIBLE
+    to: E_ZERO_HALLUCINATION_SLOGAN
+    edge_type: REFUTES
+  - from: E_VENDOR_PRICE_42_PER_BILLION
+    to: E_PRICE_ON_RESELLER_SITE
+    edge_type: SUPERSEDES
+  - from: E_OPERATOR_NOT_AFFILIATED
+    to: E_PRICE_ON_RESELLER_SITE
+    edge_type: CAUSES
+  # o que o Elenxo corroborou
+  - from: E_VENDOR_SYSTEM_ONE_CATEGORY
+    to: E_JEV_TYPED_DECISIONS_NOT_TEXT
+    edge_type: SUPPORTS
+  - from: E_TYPED_WRONG_ANSWER_POSSIBLE
+    to: E_TYPE_FIXED_BY_REQUEST_NO_PARSING
+    edge_type: SUPPORTS
+  # o que o Elenxo limitou
+  - from: E_NOUL_IS_BARE_NUMBER
+    to: E_JEV_THREE_PRIMITIVES
+    edge_type: CONSTRAINS
+  - from: E_CONTEXT_WINDOW_CONFLICT
+    to: E_LIMITS_AND_PIN_MODEL_VERSION
+    edge_type: CONSTRAINS
+  - from: E_ACCESS_REGIME_WAITLIST_VS_OPEN
+    to: E_FREE_PLAYGROUND_NO_SIGNUP
+    edge_type: CONSTRAINS
+  - from: E_OPENROUTER_SLUG_NOT_CONFIRMED
+    to: E_DISTRIBUTION_GATEWAYS
+    edge_type: CONSTRAINS
+  - from: E_OPERATOR_NOT_AFFILIATED
+    to: E_DISTRIBUTION_GATEWAYS
+    edge_type: CONSTRAINS
+  - from: E_SOURCE_TIER_INFLATED
+    to: E_TYPE_FIXED_BY_REQUEST_NO_PARSING
+    edge_type: CONSTRAINS
+  - from: E_SOURCE_TIER_INFLATED
+    to: E_SKILL_TEACHES_FUZZY_IF
+    edge_type: CONSTRAINS
+  - from: E_SOURCE_TIER_INFLATED
+    to: E_SKILL_TEACHES_API_CONTRACT
+    edge_type: CONSTRAINS
+  - from: E_SOURCE_TIER_INFLATED
+    to: E_SKILL_INSTALL_PROMPT_AND_CURL
+    edge_type: CONSTRAINS
+  - from: E_SOURCE_TIER_INFLATED
+    to: E_SKILL_TEACHES_WHEN_AND_COST
+    edge_type: CONSTRAINS
+  - from: E_OPERATOR_NOT_AFFILIATED
+    to: E_SOURCE_TIER_INFLATED
+    edge_type: CAUSES
+  - from: E_ROUND_READ_ZERO_VENDOR_PRIMARIES
+    to: E_SOURCE_TIER_INFLATED
+    edge_type: CAUSES
+  # claims
+  - from: E_VENDOR_SYSTEM_ONE_CATEGORY
+    to: C_JEV_CATEGORY_IS_SYSTEM_ONE
+    edge_type: SUPPORTS
+  - from: E_DECIDE_API_SHAPE
+    to: C_JEV_CATEGORY_IS_SYSTEM_ONE
+    edge_type: SUPPORTS
+  - from: E_JEV_THREE_PRIMITIVES
+    to: C_JEV_CATEGORY_IS_SYSTEM_ONE
+    edge_type: SUPPORTS
+  - from: E_TYPE_FIXED_BY_REQUEST_NO_PARSING
+    to: C_GUARANTEE_IS_STRUCTURAL_NEVER_FACTUAL
+    edge_type: SUPPORTS
+  - from: E_TYPED_WRONG_ANSWER_POSSIBLE
+    to: C_GUARANTEE_IS_STRUCTURAL_NEVER_FACTUAL
+    edge_type: SUPPORTS
+  - from: E_VENDOR_CONFIDENCE_ESCALATES
+    to: C_GUARANTEE_IS_STRUCTURAL_NEVER_FACTUAL
+    edge_type: SUPPORTS
+  - from: E_NOUL_IS_BARE_NUMBER
+    to: C_GUARANTEE_IS_STRUCTURAL_NEVER_FACTUAL
+    edge_type: CONSTRAINS
+  - from: E_LIMITS_AND_PIN_MODEL_VERSION
+    to: C_GUARANTEE_IS_STRUCTURAL_NEVER_FACTUAL
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_JEV_PRIMARIES_2026_10
+    to: C_ARCHITECTURE_NOT_DISCLOSED
+    edge_type: SUPPORTS
+  - from: E_DECIDE_API_SHAPE
+    to: C_ARCHITECTURE_NOT_DISCLOSED
+    edge_type: CONSTRAINS
+  - from: E_TYPESCRIPT_SDK
+    to: C_INTEGRATION_SURFACE_IS_ONE_HTTP_CALL
+    edge_type: SUPPORTS
+  - from: E_SKILL_TEACHES_API_CONTRACT
+    to: C_INTEGRATION_SURFACE_IS_ONE_HTTP_CALL
+    edge_type: SUPPORTS
+  - from: E_SKILL_INSTALL_PROMPT_AND_CURL
+    to: C_INTEGRATION_SURFACE_IS_ONE_HTTP_CALL
+    edge_type: SUPPORTS
+  - from: E_DISTRIBUTION_GATEWAYS
+    to: C_INTEGRATION_SURFACE_IS_ONE_HTTP_CALL
+    edge_type: CONSTRAINS
+  # fios abertos
+  - from: C_ARCHITECTURE_NOT_DISCLOSED
+    to: Q_JEV_ARCHITECTURE_UNKNOWN
+    edge_type: CAUSES
+  - from: E_VENDOR_PRICE_42_PER_BILLION
+    to: Q_JEV_PRICE_AND_ACCESS_RECONCILE
+    edge_type: CAUSES
+  - from: E_ACCESS_REGIME_WAITLIST_VS_OPEN
+    to: Q_JEV_PRICE_AND_ACCESS_RECONCILE
+    edge_type: CAUSES
+  - from: E_LIMITS_AND_PIN_MODEL_VERSION
+    to: Q_JEV_IN_ONION_GATE_DISQUALIFIED
+    edge_type: CAUSES
+  - from: E_TYPED_WRONG_ANSWER_POSSIBLE
+    to: Q_JEV_IN_ONION_GATE_DISQUALIFIED
+    edge_type: SUPPORTS
+  - from: E_NOUL_IS_BARE_NUMBER
+    to: Q_JEV_IN_ONION_GATE_DISQUALIFIED
+    edge_type: SUPPORTS
+  - from: E_TOOLS_AGENTS_DEV_DEMOS
+    to: Q_JEV_IN_ONION_GATE_DISQUALIFIED
+    edge_type: SUPPORTS
+  - from: E_ROUTERS_SKILL_AND_MODEL
+    to: Q_ONION_COULD_BECOME_THIS
+    edge_type: SUPPORTS
+  - from: E_PR_JUDGE_VERDICT
+    to: Q_ONION_COULD_BECOME_THIS
+    edge_type: SUPPORTS
+  - from: C_JEV_CATEGORY_IS_SYSTEM_ONE
+    to: Q_ONION_COULD_BECOME_THIS
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_JEV_PRIMARIES_2026_10
+    to: Q_ONION_COULD_BECOME_THIS
+    edge_type: CONSTRAINS
+  - from: Q_JEV_IN_ONION_GATE_DISQUALIFIED
+    to: Q_ONION_COULD_BECOME_THIS
+    edge_type: DEPENDS_ON
+  - from: E_ROUND_READ_ZERO_VENDOR_PRIMARIES
+    to: Q_ANCHORING_DOES_NOT_CHECK_PROVENANCE
+    edge_type: CAUSES
+  - from: E_SOURCE_TIER_INFLATED
+    to: Q_ANCHORING_DOES_NOT_CHECK_PROVENANCE
+    edge_type: SUPPORTS

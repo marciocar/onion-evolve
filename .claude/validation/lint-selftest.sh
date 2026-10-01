@@ -4918,6 +4918,109 @@ _research_workflow_run_body() {
   printf '%s\n' "${out}"
 }
 
+# ── CORPUS-GREP: o script que alimenta TODA invocação de pesquisa, e que estava sem bancada ──────
+# POR QUE EXISTE: a skill onion-research injeta o bloco de corpus por `!`backtick``, que o shell
+# AVALIA. Em 2026-10-01 uma pergunta com PARÊNTESES devolveu `syntax error near unexpected token '('`
+# e ABORTOU a invocação da skill inteira — não degradou, matou. O script tinha ZERO cobertura, e é
+# dele que depende a 1ª cláusula da doutrina ("corpus primeiro"). Guarda de entrada sem bancada é
+# onde o defeito mora de graça.
+# ── ORDEM DA CADEIA DE AUTO-FIX DO HOOK: a dependência que era PROSA vira invariante ─────────────
+# POR QUE EXISTE (custo medido em 2026-10-01, num único dia): erro de ORDEM entre guardas custou pelo
+# menos QUATRO ciclos de CI — o painel da REGRA 81 contando um resíduo que nasceu DEPOIS dele (o commit
+# se chama "3ª vez"), o SHA da REGRA 56 carimbado antes de regenerar projeções (ARTEFATO-CADUCO, 2x), e
+# projeções julgadas antes de regeneradas. A cura foi sempre PROSA — "regenerar → stagear → carimbar →
+# commitar de uma vez" —, e prosa é a forma de cura que esta casa já declarou insuficiente.
+#
+# O hook JÁ resolve a ordem, e até a declara num comentário ("E O HASH DA REGRA 56 RE-CARIMBADO, senao a
+# cura acima cria outro defeito"). O que faltava: a ordem é POSIÇÃO DE LINHA, não invariante. Nada
+# impede um auto-fix NOVO entrar DEPOIS do carimbo — e esse é precisamente o defeito, porque qualquer
+# mutação do índice após o carimbo torna o hash caduco de novo.
+#
+# O INVARIANTE, derivado do que já existe (não declarado à mão): **depois do re-carimbo do SHA da
+# REGRA 56, nenhuma linha do hook pode mutar o índice nem reescrever arquivo rastreado.** Medido em
+# 2026-10-01: vale hoje (zero `git add`, zero `sed -i`, zero redirecionamento para ${REPO_ROOT} após a
+# linha do carimbo). Cobrar o estado que EXISTE é o que torna isto guarda e não desejo.
+# TETO DECLARADO: isto é DETECÇÃO de uma ordem, não prova de ordem correta em geral — o corpus de 93
+# guardas segue sem grafo de dependência, e isso é fio aberto no grafo, não resolvido aqui.
+run_hook_chain_order_selftests() {
+  local hook="${REPO_ROOT}/.githooks/pre-commit"
+  if [ ! -f "${hook}" ]; then record_skip "hook-chain-order: .githooks/pre-commit ausente"; return; fi
+
+  # a âncora é o EFEITO (a mensagem que o hook imprime ao re-carimbar), não um número de linha
+  local _stamp_line
+  _stamp_line="$(grep -n 'hash da REGRA 56 re-carimbado em' "${hook}" | head -1 | cut -d: -f1)"
+  if [ -z "${_stamp_line}" ]; then
+    record_fail "hook-chain-order: (a)" "não achei o re-carimbo do SHA da REGRA 56 no hook — ou ele saiu, ou a mensagem mudou; nos dois casos a ordem deixou de ser verificável"
+    return
+  fi
+  record_pass "hook-chain-order: (a) o re-carimbo do SHA da REGRA 56 existe no hook (l.${_stamp_line})"
+
+  # (b) O INVARIANTE: nada muta o índice nem reescreve arquivo DEPOIS do carimbo
+  local _after
+  _after="$(awk -v L="${_stamp_line}" 'NR>L && (/git add/ || /sed -i/ || /> *"\$\{REPO_ROOT\}/) {printf "l.%s ", NR}' "${hook}")"
+  if [ -z "${_after}" ]; then
+    record_pass "hook-chain-order: (b) nada muta o índice depois do carimbo — o SHA da REGRA 56 não caduca por auto-fix posterior"
+  else record_fail "hook-chain-order: (b)" "há mutação de índice/arquivo DEPOIS do re-carimbo do SHA (${_after}) — isso torna o hash caduco de novo, que é o defeito ARTEFATO-CADUCO medido 2x em 2026-10-01. Mova o auto-fix novo para ANTES do bloco do carimbo"; fi
+
+  # (c) PARIDADE DE FÓRMULA: o hook e o gate têm de concordar sobre o MESMO número, senão discordam
+  # sobre o mesmo PR. Os dois usam os flags canônicos e excluem docs/evolution/review/.
+  local chk="${REPO_ROOT}/.claude/validation/review-artifact-check.sh"
+  if [ -f "${chk}" ]; then
+    local _h_ok=0 _c_ok=0
+    grep -qF "core.abbrev=40 -c diff.noprefix=false" "${hook}" && grep -qF "':(exclude)docs/evolution/review'" "${hook}" && _h_ok=1
+    grep -qF "core.abbrev=40 -c diff.noprefix=false" "${chk}"  && grep -qF '":(exclude)${REVIEW_DIR}"' "${chk}" && _c_ok=1
+    if [ "${_h_ok}" = "1" ] && [ "${_c_ok}" = "1" ]; then
+      record_pass "hook-chain-order: (c) hook e gate calculam o SHA com os MESMOS flags canônicos e a mesma exclusão"
+    else record_fail "hook-chain-order: (c)" "hook(${_h_ok}) e gate(${_c_ok}) divergem na fórmula do SHA — um carimba um número que o outro não reconhece, e o PR fica preso sem causa visível"; fi
+  else record_skip "hook-chain-order: (c) review-artifact-check.sh ausente"; fi
+}
+
+run_corpus_grep_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/kg-corpus-grep.sh"
+  local skill="${REPO_ROOT}/.claude/skills/onion-research/SKILL.md"
+  if [ ! -f "${sut}" ]; then record_fail "corpus-grep" "SUT ausente: ${sut}"; return; fi
+
+  # (a) o caso MEDIDO: metacaractere de shell na frase não pode quebrar nem virar termo-frase
+  local _o _rc=0
+  _o="$(bash "${sut}" --query 'JEV (jevtypesafeai.com): type-safe & tudo | x; y' 2>&1)" || _rc=$?
+  if [ "${_rc}" = "0" ] && grep -q '^# corpus:' <<< "${_o}" \
+     && grep -q 'termos:.*jev' <<< "${_o}" \
+     && ! grep -qF 'type-safe & tudo | x; y' <<< "${_o}"; then
+    record_pass "corpus-grep: (a) --query com (), &, | e ; roda e separa em TERMOS (sem termo-frase)"
+  else record_fail "corpus-grep: (a)" "rc=${_rc} — metacaractere na frase quebrou, ou a frase inteira entrou como um termo (foi o bug da própria cura: shift dentro de 'for a in \"\$@\"' não move a iteração)"; fi
+
+  # (b) a forma POSICIONAL continua valendo — a cura não pode trocar um contrato por outro
+  _rc=0; _o="$(bash "${sut}" adopt federacao 2>&1)" || _rc=$?
+  if [ "${_rc}" = "0" ] && grep -q 'termos: adopt, federacao' <<< "${_o}"; then
+    record_pass "corpus-grep: (b) a forma posicional <termo> [termo...] segue funcionando"
+  else record_fail "corpus-grep: (b)" "a forma antiga quebrou (rc=${_rc}) — adicionar --query não pode revogar o contrato existente"; fi
+
+  # (c) sem termo RECUSA (rc=2), nunca varre o corpus inteiro em silêncio
+  _rc=0; bash "${sut}" >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" = "2" ]; then
+    record_pass "corpus-grep: (c) sem termo ⇒ rc=2 (recusa, não varredura silenciosa)"
+  else record_fail "corpus-grep: (c)" "sem termo devolveu rc=${_rc}; esperado 2 — varrer tudo por omissão é fail-open"; fi
+
+  # (d) `--query ""` é o MESMO caso de (c): frase vazia não é licença para varrer tudo
+  _rc=0; bash "${sut}" --query '' >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" = "2" ]; then
+    record_pass "corpus-grep: (d) --query vazio ⇒ rc=2 (a frase vazia não vira varredura total)"
+  else record_fail "corpus-grep: (d)" "--query '' devolveu rc=${_rc}; esperado 2"; fi
+
+  # (e) --query conversa com --json (as flags não se excluem)
+  _rc=0; _o="$(bash "${sut}" --query 'adopt' --json 2>&1)" || _rc=$?
+  if [ "${_rc}" = "0" ] && python3 -c 'import json,sys; json.load(sys.stdin)' <<< "${_o}" 2>/dev/null; then
+    record_pass "corpus-grep: (e) --query + --json devolve JSON válido"
+  else record_fail "corpus-grep: (e)" "--query com --json não devolveu JSON parseável (rc=${_rc})"; fi
+
+  # (f) PARIDADE com a skill: ela tem de usar a forma SEGURA. Mutante: voltar ao $ARGUMENTS nu reprova.
+  if [ -f "${skill}" ]; then
+    if grep -qF 'kg-corpus-grep.sh --query "$ARGUMENTS"' "${skill}"; then
+      record_pass "corpus-grep: (f) a skill injeta por --query \"\$ARGUMENTS\" (forma que torna (), &, ; e | inertes)"
+    else record_fail "corpus-grep: (f)" "a skill onion-research não usa \`--query \"\$ARGUMENTS\"\` — com \$ARGUMENTS NU, uma pergunta com parêntese mata a invocação inteira da skill (medido 2026-10-01)"; fi
+  else record_skip "corpus-grep: (f) skill onion-research ausente"; fi
+}
+
 run_research_workflow_selftests() {
   local wf="${REPO_ROOT}/.claude/workflows/onion-research.js" sk="${REPO_ROOT}/.claude/skills/onion-research/SKILL.md" rs="${REPO_ROOT}/docs/onion/radar-sources.yaml"
   local rd="${REPO_ROOT}/.claude/commands/common/prompts/research-doctrine.md"
@@ -19876,6 +19979,8 @@ _family run_kb_applies_to_selftests
 _family run_zoho_adapter_selftests
 _family run_door_role_change_refusal_selftests
 _family run_review_cause_bands_selftests
+_family run_hook_chain_order_selftests
+_family run_corpus_grep_selftests
 _family run_research_workflow_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.

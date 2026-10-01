@@ -43,7 +43,7 @@ dono.
 se prova no Passo 4 é que **o grafo-alvo escolhido resolve DENTRO deste repo** (`git ls-files` o vê);
 alvo absoluto, com `../`, ou fora do `git ls-files` → **pare e reporte**: quem sela é a sessão do
 repo-alvo. Medido em 2026-09-05: **nenhum produtor emite `meta.target` hoje** — as duas propostas
-reais do corpus (`_sealed/gap-web-search-capability-*`, `_rejected/grana-ai-mapeamento-*`) trazem
+reais do corpus (`_sealed/gap-web-search-capability-*`, `_rejected/<proposta-de-adotante>-*`) trazem
 `meta:` sem ele, e o `ops/mcp-onion-exec/server.py` só valida `nodes:`. Uma invariante ancorada nesse
 campo seria **prosa inexequível** (a 1ª redação desta seção era). Logo: `meta.target`, **quando
 presente**, é lido e obedecido; a guarda que decide é o caminho do alvo, que existe sempre.
