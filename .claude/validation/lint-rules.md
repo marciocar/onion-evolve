@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**91 regras** no total — **80 HARD**, **30 SOFT**.
+**92 regras** no total — **81 HARD**, **31 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -66,6 +66,7 @@ Tamanho saudável, nomes kebab-case, dialeto puro e links que resolvem.
 | 73 | Hook empacotado resolve no plugin instalado | HARD | hook morto e silencioso no plugin (script ausente, motor não embarcado, caminho $REPO/${CLAUDE_PLUGIN_ROOT}, matcher perdido) |
 | 74 | Caminho .claude/ NU dentro de plugin só resolve no core, com catraca | HARD + SOFT | comando/agente empacotado apontando .claude/{utils,commands,templates,…} que não viajou — ponteiro morto no consumidor |
 | 75 | Link markdown relativo dentro de plugin resolve no plugin | HARD | `[irmã](../kb/x.md)` num plugin apontando para arquivo que não viajou — 404 no consumidor |
+| 94 | MUTANTE esquecido na árvore | HARD + SOFT | teste de mutação que morre no meio e deixa o repo PIOR que antes |
 
 ## Fronteiras & contratos de arquitetura
 

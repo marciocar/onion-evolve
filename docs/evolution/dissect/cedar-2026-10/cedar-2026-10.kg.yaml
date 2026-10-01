@@ -1,0 +1,186 @@
+meta:
+  id: cedar-2026-10
+  schema_version: "1"
+  dissect_tool: cedar
+  baseline: 2026-10-01
+  review_after: 2026-10-31   # 30d: FERRAMENTA/LICENCA e o tipo dominante (a cadencia da doutrina)
+  # kg-backlog-guard: on
+  # ═══ TETO: 10 NÓS ═══
+  #
+  # PRIMEIRA dissecacao do /meta:dissect — e ela e DOGFOOD do proprio comando que a emitiu.
+  # ENTROU NO N3 DIRETO, que e o corte que o censo existe para fazer: os niveis N0-N2 do Cedar
+  # ja estavam PAGOS pelo corpus, em engenharia-de-corpus-de-regras-2026-10 (quatro nos com
+  # tier 7-8 e votos 2-1/3-0). Re-derivar nivel pago seria o desperdicio que a doutrina nomeia.
+  # O radar so enxerga arestas DENTRO de um arquivo: o vinculo com o grafo irmao vai por label
+  # e trace, nunca por aresta pendurada.
+  #
+  # ⚠️ TETO DO N2 DECLARADO: o mecanismo foi lido em blog de engenharia do fornecedor (tier 8),
+  # NAO executado aqui. Por isso E_N2_LACUNA_EXECUCAO nasce `open` — a doutrina proibe
+  # `confirmed` de mecanismo por folheto, e o fornecedor falando do proprio motor e folheto
+  # qualificado, nao comportamento observado.
+
+nodes:
+
+  - id: Q_CEDAR_ABSORVER_OU_NAO_1001
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    dissect_level: 0
+    label: 'O Onion absorve, costura, parqueia ou rejeita o Cedar — e, mais precisamente, a capacidade que o torna interessante: ANALISE ESTATICA DE CONFLITO sobre um corpus de regras (permit sombreado, condicao impossivel, negacao total)? O corpus do Onion sao 92 regras em shell com severidade, catraca e baseline; o do Cedar sao politicas numa linguagem restrita.'
+    trace: 'docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml'
+
+  - id: E_N0_IDENTIDADE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    dissect_level: 0
+    verified_at: 2026-10-01
+    verified_against: 'nivel PAGO pelo corpus: engenharia-de-corpus-de-regras-2026-10 traz o repo cedar-policy/cedar-spec sob Apache 2.0, mantido pela AWS, com Cedar Analysis anunciado no blog de open source do fornecedor'
+    source_tier: 8
+    source_kind: primary
+    label: 'N0 IDENTIDADE — Cedar: linguagem e motor de autorizacao da AWS, repo cedar-policy/cedar-spec, Apache 2.0, vivo e com material de 2026. Licenca compativel, mantenedor corporativo com sucessao obvia. PASSA o N0. ⚠️ Ressalva herdada do no de origem: o anuncio do Cedar Analysis tem valid_from 2025-06-16, anterior a outubro de 2026 — a ATUALIDADE da capacidade nao foi reverificada nesta dissecacao, e por isso o frescor deste grafo vence em 30 dias.'
+    trace: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/'
+
+  - id: E_N1_CAPACIDADE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    dissect_level: 1
+    verified_at: 2026-10-01
+    verified_against: 'nivel PAGO pelo corpus (tier 8, votos 2-1): o Cedar Analysis detecta por analise estatica permits sombreados, condicoes impossiveis, forbid que anula permits e negacao total de acoes; ha CLI que COMPARA dois corpus de politicas'
+    source_tier: 8
+    source_kind: primary
+    label: 'N1 CAPACIDADE — os VERBOS que o Onion nao tem: (1) detectar regra SOMBREADA por outra; (2) detectar condicao IMPOSSIVEL (guarda que nunca dispara); (3) detectar regra que ANULA outra; (4) COMPARAR dois corpus e dizer o que mudou em comportamento, nao em texto. O Onion tem catraca, severidade e baseline — e nao tem NENHUM dos quatro. O delta e real e tem consumidor nomeado aqui: a pergunta "quais das 92 regras estao vivas, e quais se sobrepoem" e dor medida desta casa. PASSA o N1.'
+    trace: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/'
+
+  - id: E_N2_MECANISMO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    dissect_level: 2
+    verified_at: 2026-10-01
+    verified_against: 'nivel PAGO pelo corpus (tier 8, votos 3-0): a analise e correta e completa, com prova formalizada em Lean, usando SMT solver (CVC5) sobre formulas que representam TODAS as requisicoes possiveis'
+    source_tier: 8
+    source_kind: primary
+    label: 'N2 MECANISMO — e aqui a dissecacao vira: correcao e completude vem de a LINGUAGEM ser RESTRITA e DECIDIVEL, com codificacao SMT do espaco inteiro de requisicoes. O determinismo nao mora na ferramenta nem na pratica de engenharia: mora na restricao da linguagem. Shell arbitrario nao tem codificacao SMT nenhuma — nao existe formula que represente "todas as entradas possiveis" de um script que le o filesystem, roda git e chama grep.'
+    trace: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/'
+
+  - id: E_N2_LACUNA_EXECUCAO
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    dissect_level: 2
+    label: 'LACUNA NOMEADA do N2, e ela nasce `open` por doutrina: o mecanismo foi lido em BLOG DE ENGENHARIA DO FORNECEDOR, nao executado nem lido no codigo-fonte por esta dissecacao. Fornecedor falando do proprio motor e folheto qualificado, nao comportamento observado — e a casa ja mediu o custo de aceitar declaracao como mecanismo. O que falta para fechar o N2: rodar o `cedar analyze` sobre um corpus de brinquedo, em worktree isolada, e observar os quatro verbos. GATILHO: se o veredito desta dissecacao algum dia for revisto para `absorver`, este no fecha ANTES.'
+    trace: 'docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml'
+
+  - id: E_N3_NAO_TRANSFERE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    dissect_level: 3
+    verified_at: 2026-10-01
+    verified_against: 'regua de transferencia aplicada contra E_N2_MECANISMO, com a objecao do refutador do grafo irmao (E_OBJECAO_5_CEDAR_NAO_E_PORTAVEL) sobrevivendo'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'N3 VEREDITO — DIFERENTE, logo NAO TRANSFERE: adotar o Cedar como ferramenta de analise do corpus do Onion e FALSA ANALOGIA. A capacidade e propriedade da linguagem restrita, e o corpus do Onion e shell arbitrario por desenho — o mesmo shell AGNOSTICO que roda em qualquer CI, que e metade do fosso desta casa. Trocar shell por DSL restrita para ganhar analise seria pagar com a capacidade que compra o fosso. E o custo de descobrir isto TARDE e alto: seria uma reescrita de 26.596 linhas apostando numa propriedade formal que o Onion nunca precisou provar.'
+    trace: 'docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml'
+
+  - id: E_N3_O_QUE_TRANSFERE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    dissect_level: 3
+    verified_at: 2026-10-01
+    verified_against: 'nivel PAGO pelo corpus (tier 7, votos 3-0): AutoCedar (arXiv 2607.03656, jul/2026) usa laco agentico de LLM com verificador formal SMT como GATE para autoria de politica — a politica gerada e verificada antes de ser aceita'
+    source_tier: 7
+    source_kind: primary
+    label: 'N3 — O QUE TRANSFERE, e nao e a ferramenta: o PADRAO "a IA AUTORA, o verificador DETERMINISTICO admite". Esta casa ja o pratica com outro nome em tres lugares: a bancada admite a guarda, o lint admite o artefato, o radar admite o grafo. Logo o Cedar entra como CONFIRMACAO EXTERNA de um desenho que ja existe aqui — valor real e barato, porque nao exige absorver nada. IGUAL, logo transfere: e o unico pedaco do Cedar que transfere.'
+    trace: 'https://arxiv.org/pdf/2607.03656'
+
+  - id: E_N3_ORDEM_NINGUEM_DERIVA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    dissect_level: 3
+    verified_at: 2026-10-01
+    verified_against: 'nivel PAGO pelo corpus (tier 7, votos 3-0): o Cedar autorizando agentes em cadeia multi-agente avalia em 3 camadas L1 a L3 com halt no primeiro deny, e a ordem e FIXA POR CAMADA, sem derivacao de dependencia entre politicas'
+    source_tier: 7
+    source_kind: primary
+    label: 'N3 — a resposta que ALIVIA uma pressao interna: nem o motor mais analisavel do mercado DERIVA ordem entre regras. O Cedar resolve ordenacao por CAMADA FIXA declarada. Lido contra a pergunta aberta desta casa sobre sequenciamento e dependencia entre as 92 regras, isto diz que ordem declarada por camada e o estado da arte, nao um atalho preguicoso — e que a fronteira real de ordenacao do Onion sao os 13 pontos que ESCREVEM, nao as 92 que so leem.'
+    trace: 'https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/'
+
+  - id: E_CORPUS_PAGOU_N0_A_N2
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    dissect_level: 0
+    verified_at: 2026-10-01
+    verified_against: 'medido nesta sessao: bash .claude/validation/dissect-census.sh devolveu 148 grafos rastreados e ZERO dissecacao declarada, enquanto o grafo engenharia-de-corpus-de-regras-2026-10 ja continha quatro nos de Cedar com tier 7-8 e votos registrados'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'PROVA DO PROPRIO CENSO, e e o dogfood do /meta:dissect: no dia 1 o censo disse "148 grafos, ZERO dissecacao declarada" — correto e inutil ao mesmo tempo, porque o conhecimento do Cedar ESTAVA no corpus, apenas sem os marcadores que o censo le. E exatamente o teto que o medidor declara ("nao sabe de ferramenta que ninguem anotou COMO DISSECACAO"). Esta dissecacao e a primeira a carimbar os marcadores, e a partir dela o censo passa a responder "Cedar: N3, parquear, vence em 31/10".'
+    trace: 'docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml'
+
+  - id: D_CEDAR_1001
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    dissect_level: 3
+    dissect_verdict: parquear
+    verified_at: 2026-10-01
+    verified_against: 'NAO SELADA. O /meta:dissect nunca sela: status open, aguardando o maestro.'
+    label: 'VEREDITO PROPOSTO — PARQUEAR, com gatilho nomeado (o maestro sela). Nao e `absorver`: a capacidade e propriedade da linguagem restrita e o corpus do Onion e shell agnostico por desenho. Nao e `costurar`: nao existe adapter possivel — o Cedar nao analisa shell. Nao e `rejeitar`: um PEDACO transfere ja (o padrao "IA autora, verificador determinístico admite", E_N3_O_QUE_TRANSFERE) e uma PERGUNTA fica viva, que e o que se parqueia. ═══ A PERGUNTA PARQUEADA ═══ "vale restringir a LINGUAGEM de um SUBCONJUNTO das guardas — as puramente declarativas, que so casam padrao em texto — para ganhar analise de sombreamento e condicao impossivel?" ═══ O GATILHO, nomeado e verificavel (parque sem gatilho e cemiterio) ═══ reabrir quando QUALQUER um ocorrer: (1) duas regras do corpo de guardas forem medidas como MUTUAMENTE SOMBREADAS em uso real (uma nunca dispara porque outra sempre dispara antes); (2) o corpus passar de 120 regras, onde o custo de nao saber da sobreposicao cresce mais rapido que o de uma DSL parcial; (3) sair ferramenta de analise estatica que aceite SHELL como entrada, o que derrubaria E_N3_NAO_TRANSFERE por completo. ═══ O QUE FAZER AGORA, e e barato ═══ nada de absorcao; so registrar E_N3_ORDEM_NINGUEM_DERIVA como resposta externa a pressao interna de ordenacao.'
+    trace: 'docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml'
+
+edges:
+
+  - from: E_N0_IDENTIDADE
+    to: Q_CEDAR_ABSORVER_OU_NAO_1001
+    edge_type: SUPPORTS
+  - from: E_N1_CAPACIDADE
+    to: Q_CEDAR_ABSORVER_OU_NAO_1001
+    edge_type: SUPPORTS
+  - from: E_N2_MECANISMO
+    to: Q_CEDAR_ABSORVER_OU_NAO_1001
+    edge_type: SUPPORTS
+  - from: E_N2_MECANISMO
+    to: E_N3_NAO_TRANSFERE
+    edge_type: SUPPORTS
+  - from: E_N2_LACUNA_EXECUCAO
+    to: E_N2_MECANISMO
+    edge_type: CONSTRAINS
+  - from: E_N3_NAO_TRANSFERE
+    to: D_CEDAR_1001
+    edge_type: CONSTRAINS
+  - from: E_N3_O_QUE_TRANSFERE
+    to: D_CEDAR_1001
+    edge_type: SUPPORTS
+  - from: E_N3_ORDEM_NINGUEM_DERIVA
+    to: D_CEDAR_1001
+    edge_type: SUPPORTS
+  - from: E_CORPUS_PAGOU_N0_A_N2
+    to: Q_CEDAR_ABSORVER_OU_NAO_1001
+    edge_type: SUPPORTS
+  - from: D_CEDAR_1001
+    to: Q_CEDAR_ABSORVER_OU_NAO_1001
+    edge_type: SUPPORTS

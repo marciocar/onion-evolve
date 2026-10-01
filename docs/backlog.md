@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**279 itens abertos** em 58 grafo(s) com aberto (de 81 no escopo) · 59 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**297 itens abertos** em 61 grafo(s) com aberto (de 84 no escopo) · 62 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -53,6 +53,17 @@
 | 1.8 | `C_OPCAO_O8_CONSOLE_MULTI_GRAFO` | kg-multi-graph-view-2026-09 | OPCAO O8: kg-console.sh/kg-view.sh aceitam N arquivos e renderizam painel comparativo multi-grafo. Confianca 0.2: o Elenxo REPROVA |
 | 1.4 | `C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS` | kg-multi-graph-view-2026-09 | OPCAO O6: grafo de nivel 0 que IMPORTA nos de outros arquivos (owl:imports), formando um grafo composto. Confianca 0.15 (a mais ba |
 
+## company-brain-e-conducao-como-servico-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 80.0 | `Q_COMPANY_BRAIN_E_CONDUCAO_COMO_SERVICO_2026` | company-brain-e-conducao-como-servico-2026-10 | Das duas candidatas que a rodada anterior NAO atacou e que sao as mais proximas da identidade do Onion — (b) o GRAFO/Company Bra |
+| 27.5 | `D_COMPANY_BRAIN_OU_CONDUCAO_COMO_SERVICO` | company-brain-e-conducao-como-servico-2026-10 | DECISAO ABERTA (o maestro sela; esta sessao NUNCA sela): entre as duas candidatas mais proximas da identidade do Onion, qual tem u |
+| 19.2 | `C_OPCAO_B_COMPANY_BRAIN_ANCORADO_COMO_SERVICO` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (b) — COMPANY BRAIN / GRAFO ANCORADO COMO SERVICO: cobrar pelo conhecimento organizacional com proveniencia verificavel. A |
+| 17.5 | `C_OPCAO_NENHUMA_COMPLETAR_OS_EIXOS` | company-brain-e-conducao-como-servico-2026-10 | OPCAO NENHUMA AGORA — rodada de COMPLETUDE dos eixos 1 pelo lado da suite, 3 cemiterio, 6 ICP e 7 capital antes de qualquer selo |
+| 13.8 | `C_OPCAO_BD_PACOTE_NO_FORMATO_GURU` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (b mais d) — O PACOTE NA FORMA QUE O MERCADO JA VALIDOU: software de conhecimento VERIFICADO com conducao humana EMBUTIDA, |
+| 13.8 | `C_OPCAO_D_CONDUCAO_COMO_SERVICO` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (d) — CONDUCAO / ADOCAO COMO SERVICO: cobrar pelo metodo (/meta:adopt, gate instalado, federacao) de forma recorrente. A F |
+
 ## jev-decision-round2-2026-10 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -82,6 +93,20 @@
 | 2.7 | `C_OPCAO_PADDLEOCR_VL_CPU` | ocr-local-sei-2026-09 | OPCAO (2): PaddleOCR / PaddleOCR-VL 0.9B em CPU, venv isolado. Confianca 0.3: TODAS as claims a favor foram refutadas nesta rodada |
 | 2.4 | `C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA` | ocr-local-sei-2026-09 | OPCAO (4): Surya (datalab-to) — NAO RECOMENDAVEL A PARTIR DESTE DOSSIE, e a razao nao e desempenho: e que o corpo de evidencia s |
 | 1.2 | `C_OPCAO_MINERU_OLMOCR` | ocr-local-sei-2026-09 | OPCAO (6): MinerU 2.5 / olmOCR. Praticamente NAO PESQUISADOS nesta rodada — aparecem so como termo de comparacao dentro de claim |
+
+## onda-derivada-e-o-lugar-do-onion-2026-10 — 9 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 51.8 | `Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026` | onda-derivada-e-o-lugar-do-onion-2026-10 | Que PEÇA o Onion é na cadeia de valor de outra pessoa (PRÉ-geração, DURANTE, PÓS, META), onde ele pode ser BASE ou ACOPLADO  |
+| 42.0 | `D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION` | onda-derivada-e-o-lugar-do-onion-2026-10 | DECISÃO ABERTA (o maestro sela; esta sessão NUNCA sela). Em qual gargalo DERIVADO o Onion é a peça mais próxima de pronto, qu |
+| 15.8 | `C_OPCAO_A_ACOPLAR_AO_QUE_JA_SE_PAGA` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO A — ACOPLAR AO QUE JÁ SE PAGA: vender condução + gate INSTALADO como camada sobre o contrato de Claude Code/Copilot q |
+| 12.0 | `C_OPCAO_G_RE_MEDIR_ANTES_DE_ESCOLHER` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO G — RE-MEDIR ANTES DE ESCOLHER: abrir as 4 fontes que decidem (permit.io/mcp-gateway, toolbooth, Brain0, github.blog def |
+| 9.8 | `C_OPCAO_B_POS_PROVA_E_ATESTACAO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO B — PÓS, PROVA/ATESTAÇÃO: vender o registro verificável do que o agente fez e com base em quê (tier de fonte, verif |
+| 8.0 | `C_OPCAO_E_B_MAIS_D_NO_FORMATO_GURU` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO E — (B+D) NO FORMATO GURU: conhecimento verificado com condução humana embutida, preço fechado por contrato, sem asse |
+| 5.6 | `C_OPCAO_D_META_COMPANY_BRAIN_COMO_SERVICO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO D — META, Company Brain / grafo ancorado como serviço. A FAVOR: é o norte declarado da casa (NS1, conhecimento) e o mo |
+| 3.6 | `C_OPCAO_C_DURANTE_GATE_E_POLITICA` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO C — DURANTE, GATE/POLÍTICA: vender o veredito reprovador determinístico (exit 2 de hook, 91 regras, catracas por basel |
+| 1.8 | `C_OPCAO_F_NENHUMA_AGORA_COM_GATILHO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO F — NENHUMA AGORA, e só vale com GATILHO, DATA e ORÇAMENTO nomeados (sem os três é adiamento com outro nome). A FAVO |
 
 ## motores-de-regras-deterministicos-2026-10 — 7 item(ns)
 
@@ -371,6 +396,14 @@
 | 5.2 | `C_p4_audit_trail` | m3-federation-admin-2026-07 | REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivad |
 | 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
+
+## cedar-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 15.0 | `D_CEDAR_1001` | cedar-2026-10 | VEREDITO PROPOSTO — PARQUEAR, com gatilho nomeado (o maestro sela). Nao e `absorver`: a capacidade e propriedade da linguagem re |
+| 12.0 | `Q_CEDAR_ABSORVER_OU_NAO_1001` | cedar-2026-10 | O Onion absorve, costura, parqueia ou rejeita o Cedar — e, mais precisamente, a capacidade que o torna interessante: ANALISE EST |
+| 2.4 | `E_N2_LACUNA_EXECUCAO` | cedar-2026-10 | LACUNA NOMEADA do N2, e ela nasce `open` por doutrina: o mecanismo foi lido em BLOG DE ENGENHARIA DO FORNECEDOR, nao executado nem |
 
 ## review-gate-saldo-2026-09 — 1 item(ns)
 

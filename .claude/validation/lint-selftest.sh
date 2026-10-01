@@ -4942,6 +4942,90 @@ _research_workflow_run_body() {
 # linha do carimbo). Cobrar o estado que EXISTE é o que torna isto guarda e não desejo.
 # TETO DECLARADO: isto é DETECÇÃO de uma ordem, não prova de ordem correta em geral — o corpus de 93
 # guardas segue sem grafo de dependência, e isso é fio aberto no grafo, não resolvido aqui.
+# ── MUTANTE ESQUECIDO: a camada que NÃO depende do processo sobreviver ───────────────────────────
+# POR QUE EXISTE (dano consumado em 2026-10-01): um `exit 137` (SIGKILL do OOM killer) matou a sessão no
+# meio de um teste de mutação e deixou um `git add` plantado no `.githooks/pre-commit` — justamente o
+# defeito que a guarda recém-escrita existia para pegar. O repo ficou PIOR que antes do teste.
+# ⚠️ E A CURA ÓBVIA É FALSA: `trap` NÃO intercepta SIGKILL. Por isso a defesa tem duas camadas, e esta
+# família cobra a SEGUNDA — marcador no mutante + guarda que o reprova —, que funciona mesmo quando o
+# processo evapora. Testar só o `trap` seria testar a camada que já se sabe insuficiente.
+run_mutant_leftover_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/mutant-leftover-check.sh"
+  local helper="${REPO_ROOT}/ops/mutate-and-restore.sh"
+  if [ ! -x "${sut}" ]; then record_fail "mutant-leftover" "SUT ausente ou não-executável: ${sut}"; return; fi
+
+  # o marcador é partido para esta FAMÍLIA não se acusar (mesmo cuidado do SUT)
+  local _M="ONION""_MUTANTE"
+
+  # (a) árvore LIMPA ⇒ silêncio e rc=0
+  local _rc=0 _out
+  _out="$(bash "${sut}" "${REPO_ROOT}" 2>&1)" || _rc=$?
+  if [ "${_rc}" = "0" ] && [ -z "${_out}" ]; then
+    record_pass "mutant-leftover: (a) árvore limpa ⇒ rc=0 e silêncio"
+  else record_fail "mutant-leftover: (a)" "árvore limpa devolveu rc=${_rc} e saída '${_out}' — a guarda está acusando o que não existe, ou se acusando a si mesma"; fi
+
+  # (b) MUTANTE PLANTADO num sandbox git ⇒ ACUSA com rc=1 e NOMEIA o arquivo
+  local sb; sb="$(mktemp -d)"
+  ( cd "${sb}" && git init -q . && printf 'ok\n' > alvo.txt && git add alvo.txt \
+    && git -c user.email=t@t -c user.name=t commit -qm init ) >/dev/null 2>&1
+  printf 'linha com %s plantado\n' "${_M}" >> "${sb}/alvo.txt"
+  ( cd "${sb}" && git add alvo.txt ) >/dev/null 2>&1
+  _rc=0; _out="$(bash "${sut}" "${sb}" 2>&1)" || _rc=$?
+  if [ "${_rc}" = "1" ] && grep -qF 'alvo.txt' <<< "${_out}"; then
+    record_pass "mutant-leftover: (b) mutante rastreado ⇒ rc=1 e a mensagem NOMEIA o arquivo"
+  else record_fail "mutant-leftover: (b)" "mutante plantado devolveu rc=${_rc} sem nomear alvo.txt — saída: ${_out}"; fi
+
+  # (c) o marcador em arquivo NÃO-RASTREADO é legítimo (é onde a bancada trabalha) ⇒ silêncio
+  # restaura do COMMIT, não do índice: em (b) o mutante foi staged, então `git checkout -- <f>` o
+  # traria DE VOLTA do índice. Defeito desta própria fixture, achado ao rodar (2026-10-01).
+  ( cd "${sb}" && git reset -q && git checkout -q HEAD -- alvo.txt ) >/dev/null 2>&1
+  printf 'rascunho com %s\n' "${_M}" > "${sb}/scratch.txt"
+  _rc=0; _out="$(bash "${sut}" "${sb}" 2>&1)" || _rc=$?
+  if [ "${_rc}" = "0" ]; then
+    record_pass "mutant-leftover: (c) marcador em arquivo NÃO-rastreado não acusa (a bancada trabalha em untracked)"
+  else record_fail "mutant-leftover: (c)" "acusou marcador em untracked (rc=${_rc}) — isso reprovaria todo scratchpad: ${_out}"; fi
+  rm -rf "${sb}"
+
+  # (d) alvo que NÃO é repo git ⇒ rc=3 (recusa), nunca 0 fingindo limpeza
+  local nr; nr="$(mktemp -d)"; _rc=0
+  bash "${sut}" "${nr}" >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" = "3" ]; then
+    record_pass "mutant-leftover: (d) alvo sem git ⇒ rc=3 (recusa declarada, não conformidade por ausência)"
+  else record_fail "mutant-leftover: (d)" "alvo sem git devolveu rc=${_rc}; esperado 3 — `exit 0` ali seria declarar limpo o que não foi medido"; fi
+  rm -rf "${nr}"
+
+  # (e) o HELPER é fail-closed: RECUSA plantar mutante SEM marcador — senão ele some sem rastro
+  if [ -x "${helper}" ]; then
+    _rc=0; _out="$(bash "${helper}" "${REPO_ROOT}/.githooks/pre-commit" 'git add|||git añd' true 2>&1)" || _rc=$?
+    if [ "${_rc}" = "2" ] && grep -qiF 'RECUSADO' <<< "${_out}"; then
+      record_pass "mutant-leftover: (e) o helper RECUSA mutante sem marcador (fail-closed)"
+    else record_fail "mutant-leftover: (e)" "o helper aceitou mutante SEM marcador (rc=${_rc}) — mutante sem marcador é exatamente o que desapareceu sem rastro em 2026-10-01"; fi
+  else record_skip "mutant-leftover: (e) ops/mutate-and-restore.sh ausente"; fi
+  # (f) ACHADO DO PRÓPRIO GATE, 2026-10-01: a 1ª versão acusou o RESÍDUO DE REVISÃO deste PR, porque
+  #     documento que ENSINA a regra escreve o marcador. A allowlist é por PREFIXO porque o nome do
+  #     resíduo deriva da branch e não se pode enumerar.
+  # sandbox PRÓPRIA desta cura; a família já declara `_M` no topo — redeclarar foi defeito meu
+  local al; al="$(mktemp -d)"; git -C "${al}" init -q -b main 2>/dev/null || true
+  mkdir -p "${al}/docs/evolution/review" "${al}/docs/knowledge-base"
+  printf 'a REGRA 94 procura o marcador %s na arvore\n' "${_M}" > "${al}/docs/evolution/review/alguma-branch.md"
+  printf 'doutrina citando %s\n' "${_M}" > "${al}/docs/knowledge-base/doutrina.md"
+  git -C "${al}" add -A >/dev/null 2>&1
+  local rc_al=0; bash "${sut}" "${al}" >/dev/null 2>&1 || rc_al=$?
+  if [ "${rc_al}" = "0" ]; then
+    record_pass "mutant-leftover: (f) prosa que ENSINA a regra (resíduo, KB) NÃO é acusada — allowlist por prefixo"
+  else record_fail "mutant-leftover: (f)" "a guarda acusou doutrina/resíduo que só CITAM o marcador (rc=${rc_al}) — é o falso positivo que o gate achou em 2026-10-01"; fi
+
+  # (g) O TETO DA ALLOWLIST É POR CAMINHO, NUNCA POR EXTENSÃO: um `.md` FORA dela segue julgado.
+  #     Sem este caso, alguém "simplificaria" a cura excluindo `*.md` e abriria o buraco calado.
+  printf 'linha mutada %s\n' "${_M}" > "${al}/docs/outro-lugar.md"
+  git -C "${al}" add -A >/dev/null 2>&1
+  local rc_md=0; bash "${sut}" "${al}" >/dev/null 2>&1 || rc_md=$?
+  if [ "${rc_md}" = "1" ]; then
+    record_pass "mutant-leftover: (g) \`.md\` FORA da allowlist segue acusado — a exceção é por CAMINHO, não por extensão"
+  else record_fail "mutant-leftover: (g)" "um .md fora da allowlist passou (rc=${rc_md}) — a cura virou buraco por extensão"; fi
+
+}
+
 run_hook_chain_order_selftests() {
   local hook="${REPO_ROOT}/.githooks/pre-commit"
   if [ ! -f "${hook}" ]; then record_skip "hook-chain-order: .githooks/pre-commit ausente"; return; fi
@@ -13884,6 +13968,12 @@ run_role_cut_selftests() {
   #     `forge` entrou em 2026-09-29: é Camada 1 (autoria do framework), declarado core-only no
   #     próprio `forge.md`, e o `forge-census.sh` o cita numa linha de comentário. O caso pegou na
   #     primeira corrida depois de o comando nascer — mecanismo funcionando, não burocracia.
+  #     `dissect` entrou em 2026-10-01 pelo MESMO critério e com a MESMA prova: ele decide o que o
+  #     ONION absorve de ferramenta de terceiro (Camada 1), declara `Core-only` na própria
+  #     `description:`, e o `dissect-census.sh` o cita no docstring. E repetiu o padrão do `forge`:
+  #     pegou na primeira corrida depois de o comando nascer, no mesmo dia. Dois comandos seguidos
+  #     achados por este caso é o sinal de que ele não é burocracia — é o único lugar que liga
+  #     "guarda cita comando" a "o alvo recebe o comando".
   if [ -f "${_resolver}" ]; then
     local _full; _full="$(bash "${_resolver}" standalone --tools 2>/dev/null)"
     local _citados _c _orfaos=""
@@ -13891,7 +13981,7 @@ run_role_cut_selftests() {
     while IFS= read -r _c; do
       [ -n "${_c}" ] || continue
       case "${_c}" in
-        adopt|evolve|forge|create-*|federation-*|co-announce|co-deliver) continue ;;  # fábrica/federação
+        adopt|evolve|forge|dissect|create-*|federation-*|co-announce|co-deliver) continue ;;  # fábrica/federação
         nao|federation-) continue ;;                                            # falsos positivos do grep
       esac
       [ -f "${REPO_ROOT}/.claude/commands/meta/${_c}.md" ] || continue          # comando que não existe
@@ -19511,6 +19601,203 @@ run_glob_branch_parity_selftests() {
 }
 
 _family run_forge_selftests
+
+# ── CENSO DE DISSECAÇÕES (peça 3 do /meta:dissect) ───────────────────────────────────────────
+# POR QUE EXISTE: o medidor responde "já dissecamos esta ferramenta, até que nível, quando?" — e a
+# resposta de memória erra. Em 2026-10-01 uma rodada re-abriu Zep/Port/Roadie sem ler o corpus e
+# registrou "a Onyx não entrega grafo" quando a doc do fornecedor diz o contrário. Os casos abaixo
+# cobram as três polaridades que importam: nível é o MAIOR (não o último), ausência de carimbo
+# NUNCA vira "fresco", e "medi e deu zero" é resposta ENQUANTO "não pude medir" é recusa rc=3.
+# Âncoras de grep são ASCII de propósito: a bancada roda em LC_ALL=C e acento não casa lá.
+run_dissect_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/dissect-census.sh"
+  if [ ! -f "${sut}" ]; then record_fail "dissect" "SUT ausente: ${sut}"; return; fi
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  git -C "${d}" init -q -b main 2>/dev/null || { record_fail "dissect" "git init falhou na sandbox"; return; }
+  mkdir -p "${d}/docs/evolution/dissect"
+
+  local _dc_out _dc_rc
+  _dc() { git -C "${d}" add -A >/dev/null 2>&1
+          if _dc_out="$(bash "${sut}" "${d}" "${1:---tsv}" 2>&1)"; then _dc_rc=0; else _dc_rc=$?; fi }
+  _col() { printf '%s\n' "${_dc_out}" | awk -F'\t' -v t="$1" -v c="$2" '$1==t{print $c; exit}'; }
+
+  # (f) CORPUS PRESENTE e ZERO dissecação ⇒ rc=0 com a frase que DISTINGUE de "não pude medir".
+  #     É o par-polaridade do caso (e): confundir os dois é o que faz um censo vazio passar por
+  #     medição. [[exit-code-nao-e-a-verificacao]]
+  printf 'meta:\n  id: outro\nnodes: []\n' > "${d}/docs/evolution/dissect/naoeh.kg.yaml"
+  _dc --markdown
+  if [ "${_dc_rc}" = "0" ] && grep -q 'Nenhum grafo do corpus se declara' <<< "${_dc_out}"; then
+    record_pass "dissect: (f) corpus presente com ZERO dissecacao ⇒ rc=0 DECLARANDO zero (≠ recusa)"
+  else record_fail "dissect: (f)" "esperado rc=0 + frase de zero, veio rc=${_dc_rc}: $(_emit "${_dc_out}" | head -c 200)"; fi
+
+  # (b) CLÁUSULA 1 — grafo SEM `dissect_tool:` nao é dissecacao, mesmo falando da ferramenta.
+  #     Mutante: predicado que contasse qualquer grafo sob docs/evolution/dissect/ daria 1 aqui.
+  _dc --tsv
+  if [ "$(printf '%s\n' "${_dc_out}" | tail -n +2 | grep -c .)" = "0" ]; then
+    record_pass "dissect: (b) grafo sem marcador dissect_tool NAO conta como dissecacao (clausula 1)"
+  else record_fail "dissect: (b)" "grafo sem dissect_tool entrou no censo: $(_emit "${_dc_out}" | head -c 200)"; fi
+
+  # (a) NÍVEL = O MAIOR declarado, nunca o último do arquivo. MUTANTE: `| tail -1` em vez do laço
+  #     de máximo devolveria 1 (a ordem do arquivo não é a ordem da escada) — e ler a ordem do
+  #     arquivo como ordem da escada é ler a projeção como fonte.
+  mkdir -p "${d}/docs/evolution/dissect/alpha-2026-10"
+  cat > "${d}/docs/evolution/dissect/alpha-2026-10/alpha-2026-10.kg.yaml" <<'KG'
+meta:
+  id: alpha-2026-10
+  dissect_tool: alpha
+  baseline: 2026-10-01
+  review_after: 2099-01-01
+nodes:
+  - id: E_N2
+    dissect_level: 2
+  - id: E_N1
+    dissect_level: 1
+KG
+  _dc --tsv
+  if [ "$(_col alpha 2)" = "2" ]; then
+    record_pass "dissect: (a) nivel = o MAIOR declarado (2), nao o ultimo do arquivo (1)"
+  else record_fail "dissect: (a)" "esperado nivel 2 p/ alpha, veio '$(_col alpha 2)'"; fi
+
+  # (c1) review_after no FUTURO ⇒ fresco.
+  if [ "$(_col alpha 6)" = "fresco" ]; then
+    record_pass "dissect: (c1) review_after no futuro ⇒ fresco"
+  else record_fail "dissect: (c1)" "esperado fresco, veio '$(_col alpha 6)'"; fi
+
+  # (c2) review_after no PASSADO ⇒ VENCIDO (dissecacao vencida nao se cita como de hoje).
+  mkdir -p "${d}/docs/evolution/dissect/beta-2026-01"
+  cat > "${d}/docs/evolution/dissect/beta-2026-01/beta-2026-01.kg.yaml" <<'KG'
+meta:
+  id: beta-2026-01
+  dissect_tool: beta
+  baseline: 2026-01-01
+  review_after: 2026-01-31
+nodes:
+  - id: E_N4
+    dissect_level: 4
+  - id: D_BETA
+    dissect_verdict: parquear
+KG
+  _dc --tsv
+  if [ "$(_col beta 6)" = "VENCIDO" ]; then
+    record_pass "dissect: (c2) review_after no passado ⇒ VENCIDO"
+  else record_fail "dissect: (c2)" "esperado VENCIDO, veio '$(_col beta 6)'"; fi
+
+  # (c3) MUTANTE DA POLARIDADE — SEM review_after ⇒ NAO-DECLARADO, JAMAIS "fresco" por omissao.
+  #      Guarda que nao sabe nunca afirma conformidade (P0 da REGRA 30).
+  mkdir -p "${d}/docs/evolution/dissect/gama-2026-10"
+  printf 'meta:\n  id: gama\n  dissect_tool: gama\nnodes:\n  - id: E_N0\n    dissect_level: 0\n' \
+    > "${d}/docs/evolution/dissect/gama-2026-10/gama-2026-10.kg.yaml"
+  _dc --tsv
+  if [ "$(_col gama 6)" = "NAO-DECLARADO" ]; then
+    record_pass "dissect: (c3) sem review_after ⇒ NAO-DECLARADO (nunca 'fresco' por omissao)"
+  else record_fail "dissect: (c3)" "esperado NAO-DECLARADO, veio '$(_col gama 6)'"; fi
+
+  # (h) CAMINHO DE PRODUÇÃO — `--markdown` é o que a superfície manda rodar, e é onde a secao de
+  #     PARQUEADAS existe. Testar so o --tsv deixaria a projecao 100% nao-testada
+  #     [[testar-no-caminho-errado-e-nao-testar]].
+  _dc --markdown
+  if grep -q 'parqueadas' <<< "${_dc_out}" && grep -q 'beta' <<< "${_dc_out}"; then
+    record_pass "dissect: (h) --markdown lista a secao de parqueadas com a ferramenta de veredito parquear"
+  else record_fail "dissect: (h)" "secao de parqueadas ausente no caminho de producao: $(_emit "${_dc_out}" | head -c 300)"; fi
+
+  # (h2) o cabecalho do caminho de producao NAO MENTE: conta de dissecacoes = linhas do --tsv.
+  local md_n tsv_n
+  md_n="$(printf '%s\n' "${_dc_out}" | sed -n 's/^# censo de disseca.* \([0-9]\+\) disseca.*/\1/p')"
+  _dc --tsv
+  tsv_n="$(printf '%s\n' "${_dc_out}" | tail -n +2 | grep -c .)"
+  if [ -n "${md_n}" ] && [ "${md_n}" = "${tsv_n}" ]; then
+    record_pass "dissect: (h2) cabecalho do --markdown concorda com as linhas do --tsv (${tsv_n})"
+  else record_fail "dissect: (h2)" "cabecalho diz '${md_n}' e o tsv tem ${tsv_n} linha(s) — a projecao mente"; fi
+
+  # (d) sem indice git ⇒ rc=3 DECLARANDO. Censo e do conjunto RASTREADO; zero nao e resultado
+  #     quando a causa e nao ter podido olhar.
+  local ng ong orc=0; ng="$(mktemp -d)"
+  mkdir -p "${ng}/docs"; printf 'meta:\n  dissect_tool: x\n' > "${ng}/docs/x.kg.yaml"
+  if ong="$(bash "${sut}" "${ng}" --tsv 2>&1)"; then orc=0; else orc=$?; fi
+  if [ "${orc}" = "3" ] && grep -q 'o censo seria de outro conjunto' <<< "${ong}"; then
+    record_pass "dissect: (d) sem indice git ⇒ rc=3 DECLARANDO (nunca censo vazio)"
+  else record_fail "dissect: (d)" "sem git nao recusou (rc=${orc}): $(_emit "${ong}" | head -c 200)"; fi
+  rm -rf "${ng}"
+
+  # (e) git presente e ZERO .kg.yaml rastreado ⇒ rc=3. Par-polaridade do (f): aqui nao HA corpus.
+  local er oev vrc=0; er="$(mktemp -d)"; git -C "${er}" init -q -b main 2>/dev/null
+  if oev="$(bash "${sut}" "${er}" --tsv 2>&1)"; then vrc=0; else vrc=$?; fi
+  if [ "${vrc}" = "3" ] && grep -q 'sem corpus' <<< "${oev}"; then
+    record_pass "dissect: (e) zero .kg.yaml rastreado ⇒ rc=3 DECLARANDO (≠ o zero medido do caso f)"
+  else record_fail "dissect: (e)" "repo sem corpus nao recusou (rc=${vrc}): $(_emit "${oev}" | head -c 200)"; fi
+  rm -rf "${er}"
+}
+
+_family run_dissect_selftests
+
+# ── CLASSIFICAÇÃO I/O DO GATE (passo 1 da Capacidade 1) ──────────────────────────────────────
+# POR QUE EXISTE: o SUT nasceu SEM bancada, e o custo apareceu no mesmo dia — o seletor
+# `--affected-staged` não achou família que o citasse e RECUSOU estreitar ("tudo, no incerto"),
+# levando o pre-commit a rodar as 203 famílias. SUT sem família é um furo que se paga em minutos de
+# gate. Os três casos de mutante abaixo são os defeitos que o PRÓPRIO script registra ter cometido:
+# comentário contado como escrita, `echo` citando o verbo, e a correção-da-correção (filtrar por
+# "contém echo" derrubou 4 escritores reais — o teste é a POSIÇÃO, não a presença).
+run_guard_io_classify_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/guard-io-classify.sh"
+  if [ ! -f "${sut}" ]; then record_fail "guard-io" "SUT ausente: ${sut}"; return; fi
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  mkdir -p "${d}/.claude/validation" "${d}/.githooks"
+  printf 'echo "regenere com byte-a-byte"\n' > "${d}/.claude/validation/lint-artifacts.sh"
+
+  local _g_out _g_rc
+  _g() { if _g_out="$(bash "${sut}" "${d}" --tsv 2>&1)"; then _g_rc=0; else _g_rc=$?; fi }
+  # classe da linha N do pre-commit, lida do TSV (campo 1 = classe, 3 = linha)
+  _cls() { printf '%s\n' "${_g_out}" | awk -F'\t' -v l="$1" '$2=="pre-commit" && $3==l {print $1; exit}'; }
+
+  # (a) `git add` no inicio da linha ⇒ ESCRITOR (o caminho feliz).
+  printf 'git add "${f}"\n' > "${d}/.githooks/pre-commit"
+  _g
+  if [ "$(_cls 1)" = "ESCRITOR" ]; then
+    record_pass "guard-io: (a) \`git add\` no inicio da linha ⇒ ESCRITOR"
+  else record_fail "guard-io: (a)" "esperado ESCRITOR na l.1, veio '$(_cls 1)' — saida: $(_emit "${_g_out}" | head -c 200)"; fi
+
+  # (b) MUTANTE DO 1o DEFEITO — comentario CITA `git add` e nao executa: 3 de 8 linhas da heuristica
+  #     crua eram falso positivo. Classificar com confianca onde se devia hesitar e o defeito.
+  printf '# explica o git add que vem abaixo\ngit add "${f}"\n' > "${d}/.githooks/pre-commit"
+  _g
+  if [ "$(_cls 1)" = "NÃO-MEDIDO" ] && [ "$(_cls 2)" = "ESCRITOR" ]; then
+    record_pass "guard-io: (b) comentario que CITA git add ⇒ NÃO-MEDIDO, e o git add real segue ESCRITOR"
+  else record_fail "guard-io: (b)" "l.1 esperada NÃO-MEDIDO e l.2 ESCRITOR; veio '$(_cls 1)' e '$(_cls 2)'"; fi
+
+  # (c) MUTANTE DO 2o DEFEITO — a linha E uma mensagem: `echo` ANTES do verbo e mencao.
+  printf 'echo "rode git add para estagiar"\n' > "${d}/.githooks/pre-commit"
+  _g
+  if [ "$(_cls 1)" = "NÃO-MEDIDO" ]; then
+    record_pass "guard-io: (c) linha que COMECA com echo ⇒ NÃO-MEDIDO (cita, nao executa)"
+  else record_fail "guard-io: (c)" "esperado NÃO-MEDIDO, veio '$(_cls 1)'"; fi
+
+  # (d) A CORRECAO DA CORRECAO, e e o caso que mais importa: `git add X || echo "aviso"` EXECUTA a
+  #     escrita E tem echo. Filtrar por "contem echo" derrubou 4 escritores REAIS — a polaridade
+  #     certa e a POSICAO (echo DEPOIS do verbo e aviso de falha, nao mencao).
+  printf 'git add "${f}" || echo "aviso: falhou"\n' > "${d}/.githooks/pre-commit"
+  _g
+  if [ "$(_cls 1)" = "ESCRITOR" ]; then
+    record_pass "guard-io: (d) \`git add X || echo aviso\` ⇒ ESCRITOR (echo DEPOIS do verbo e aviso)"
+  else record_fail "guard-io: (d)" "esperado ESCRITOR, veio '$(_cls 1)' — a regressao do filtro 'contem echo' voltou"; fi
+
+  # (e) FAIL-CLOSED: hook ilegivel ⇒ rc=3 DECLARANDO, nunca conformidade por ausencia (P0 da REGRA 30).
+  rm -f "${d}/.githooks/pre-commit"
+  _g
+  if [ "${_g_rc}" = "3" ] && grep -q 'NAO PUDE JULGAR' <<< "${_g_out}" 2>/dev/null \
+     || { [ "${_g_rc}" = "3" ] && grep -q 'PUDE JULGAR' <<< "${_g_out}"; }; then
+    record_pass "guard-io: (e) hook ilegivel ⇒ rc=3 DECLARANDO (nao conformidade por ausencia)"
+  else record_fail "guard-io: (e)" "esperado rc=3 declarando, veio rc=${_g_rc}: $(_emit "${_g_out}" | head -c 200)"; fi
+
+  # (f) FAIL-CLOSED do outro lado: lint ilegivel ⇒ rc=3 (o par precisa dos DOIS arquivos).
+  printf 'git add x\n' > "${d}/.githooks/pre-commit"
+  rm -f "${d}/.claude/validation/lint-artifacts.sh"
+  _g
+  if [ "${_g_rc}" = "3" ]; then
+    record_pass "guard-io: (f) lint ilegivel ⇒ rc=3 (classifica o PAR, nao metade dele)"
+  else record_fail "guard-io: (f)" "esperado rc=3, veio rc=${_g_rc}"; fi
+}
+
+_family run_guard_io_classify_selftests
 # ── PARIDADE registro × CARIMBO das portas (REGRA 92) ────────────────────────────────────────
 # POR QUE EXISTE: em 2026-09-30 o `members.yaml` dizia `role: standalone` para a `onion-core`
 # enquanto o carimbo dela dizia `hub` (11 materializações seguidas). Eu li o registro, materializei
@@ -19979,6 +20266,7 @@ _family run_kb_applies_to_selftests
 _family run_zoho_adapter_selftests
 _family run_door_role_change_refusal_selftests
 _family run_review_cause_bands_selftests
+_family run_mutant_leftover_selftests
 _family run_hook_chain_order_selftests
 _family run_corpus_grep_selftests
 _family run_research_workflow_selftests
