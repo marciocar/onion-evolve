@@ -3,8 +3,9 @@
 # guard-io-classify.sh — classifica cada ponto do gate em ESCRITOR / LEITOR / NÃO-MEDIDO.
 #
 # ── POR QUE EXISTE, e por que NÃO JULGA NADA ───────────────────────────────────────────────
-# Passo 1 (e só o passo 1) da Capacidade 1 do plano em
-# `docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md`, selado pelo maestro em 2026-10-01:
+# Passo 1 (e só o passo 1) da Capacidade 1 do plano de absorção de capacidades de motor (o doc vive
+# no repo-fonte, que é PRIVADO — citado pelo NOME, sem caminho, porque este script viaja pela porta
+# pública e quem a ler não pode abrir caminho core-privado), selado pelo maestro em 2026-10-01:
 # *"primeiro tem que analisar a proposta e suas consequências e o que pode quebrar"*. Este script
 # ENTREGA A LISTA e nada mais. Não emite violação, não entra no lint, não reprova commit.
 #
