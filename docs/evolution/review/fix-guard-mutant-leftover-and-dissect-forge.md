@@ -2,10 +2,10 @@
 title: 'Resíduo — a REGRA 94 nasce de um SIGKILL, o chupa-cabra nasce medido, e o gate me cobrou três vezes'
 date: 2026-10-01
 branch: fix/guard-mutant-leftover-and-dissect-forge
-reviewed_diff_sha256: 2ea79aa1bdca70e5dee75d69b4ca02492ad35376025ca5e92ad5d229ddd1a5d8
-findings_total: 17
-findings_real: 17
-findings_fixed: 16
+reviewed_diff_sha256: a3ef60c2edf5a0aea3bfa1e85a3b0a2d5cae061ad82c27769aa586b142b117f4
+findings_total: 18
+findings_real: 18
+findings_fixed: 17
 tokens: 20200000
 duration_min: 180
 verdict: REPROVADO_E_CURADO
@@ -179,6 +179,35 @@ a faixa fechou **204 famílias / 1593 asserções / 0 falhas em 1039s**.
 
 Teoria sobre shell e sobre harness vale zero contra uma execução. Foi a terceira e a quarta vez nesta
 leva.
+
+## 18. O CI achou o que o gate local não achou: caminho PRIVADO num arquivo que VIAJA
+
+`guard-io-classify.sh` vive em `.claude/validation/` e portanto **atravessa a porta pública**, mas
+citava `docs/analysis/<plano>.md` — caminho **core-privado** que quem lê a porta não pode abrir. É a
+**classe C**, já curada em 2026-09-16, **reintroduzida por mim num arquivo novo**.
+
+O diagnóstico foi melhor que o sintoma, e vale registrar como elogio ao mecanismo: o caso `door: (g)`
+esperava a mensagem do *regenerador ausente* e recebeu outra, porque o `materialize-door.sh`
+**aborta antes**, no vazamento, nomeando `arquivo:linha`. Guarda que falha cedo e aponta o sítio
+transforma isto num conserto de **uma linha**.
+
+**Por que o gate local não pegou:** o lint local saiu 0 HARD porque a guarda que cobra isto é do
+**materializador da porta**, exercitada pela família `door` — e ela é uma das que a faixa local não
+chegou a reprovar. O CI, que roda os 4 shards sempre, pegou. É argumento concreto a favor de o CI ser
+o gate final, não o pre-commit.
+
+### E a lição de medição que eu levei no meio do conserto
+
+Curei o arquivo, rodei o materializador de novo, e o vazamento **continuava apontando a mesma linha
+7**. Porque `--from HEAD` lê o **COMMIT**, não a árvore. **Cura na árvore não é cura para quem lê
+`HEAD`** — e eu quase declarei a cura ineficaz por medir no lugar errado, que é a classe
+`testar-no-caminho-errado-e-nao-testar` outra vez.
+
+### A REGRA 56 cobrou a si mesma, e corretamente
+
+Ao commitar a cura **depois** de carimbar o resíduo, o `reviewed_diff_sha256` ficou caduco e o lint
+acusou `ARTEFATO-CADUCO` com o par declarado/atual. É exatamente o amarre que a regra existe para
+fazer: revisão que não cobre o código entregue não vale. Re-carimbado.
 
 ## O que fica aberto, com gatilho
 
