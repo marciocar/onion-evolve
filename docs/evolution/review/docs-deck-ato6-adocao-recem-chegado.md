@@ -2,10 +2,10 @@
 title: 'Resíduo — o deck prometia 4 slides novos e a projeção publicada disse 2'
 date: 2026-10-01
 branch: docs/deck-ato6-adocao-recem-chegado
-reviewed_diff_sha256: 52a791ff6df14c36e82c241efe694eb1ac457fcd4d7fa36285cfaaeb948e656d
-findings_total: 3
-findings_real: 3
-findings_fixed: 3
+reviewed_diff_sha256: 5cb65e938c819e2f17b96ad31444dcce98d23252ab3dcf3f54936c9dc5074421
+findings_total: 4
+findings_real: 4
+findings_fixed: 4
 tokens: 180000
 duration_min: 25
 verdict: REPROVADO_E_CURADO
@@ -51,3 +51,29 @@ em `docs/`) e o carimbo `.onion-version` nas 9 linhas literais.
 - `onion/vendor` existe de fato (`vendor-branch.sh`, e o adotante tem a branch).
 - A pegadinha do husky é real: `hooksPath` apontando para `.githooks` com `.husky/pre-commit`
   presente faz o hook do husky parar de rodar em silêncio.
+
+## 4. O painel de estado CONTA os resíduos — então todo PR que adiciona um deve regenerá-lo
+
+Achado pelo CI, e só reproduzível na árvore de merge do PR: a **REGRA 81 (Painel de estado é GERADO
+dos produtores, nunca redigido)** reprovou com o painel **em sync no `main` e em sync num clone raso**
+— o que me fez procurar no lugar errado por duas rodadas. A divergência só aparece na árvore
+`refs/pull/899/merge`, e é de **duas linhas**:
+
+```
+| Resíduos de revisão     | 345 → 346 |
+| — legado (texto livre)  |  91 →  92 |
+```
+
+O painel é alimentado por `review-ledger.sh --env`, que **conta os resíduos**. Logo existe um
+acoplamento que ninguém tinha nomeado: **a REGRA 56 (PR aberto carrega RESÍDUO da passada
+adversarial) exige um resíduo, e esse resíduo muda um número que a REGRA 81 cobra.** Todo PR que
+adiciona resíduo tem de regenerar o painel no mesmo commit — e o `--only` do lint não dispara essa
+guarda (ela é regra de repo), então o pre-commit local nunca a vê num PR de um arquivo.
+
+**Nota colateral, pré-existente e não curada aqui:** meu resíduo entrou como *legado (texto livre)*
+embora o `verdict:` esteja no enum, porque o ledger extrai a forma de maneira frouxa e pegou a
+primeira palavra da prosa do `nota:` ("**Três** achados…"). A lista de legado tem 68 formas
+distintas e a maioria são palavras de prosa (`TRES`, `UMA`, `DUAS`, `SEIS`, `OS`, `FICA`) — é a mesma
+evidência que o próprio script cita para ter fechado o vocabulário. Fica **declarado, não curado**:
+gatilho é alguém querer usar o ledger para decidir algo, momento em que a extração frouxa deixa de
+ser cosmética.
