@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**278 itens abertos** em 58 grafo(s) com aberto (de 81 no escopo) · 59 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**279 itens abertos** em 58 grafo(s) com aberto (de 81 no escopo) · 59 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -483,10 +483,11 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
-## rito-task-manager-2026-09 — 3 item(ns)
+## rito-task-manager-2026-09 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
+| 7.2 | `Q_CLAUSULA_11_ONDA_DERIVADA` | rito-task-manager-2026-09 | candidata a CLAUSULA 11 da doutrina de pesquisa: ONDA PRINCIPAL -> GARGALO DERIVADO. Capital mostra o escasso de HOJE; a onda deri |
 | 7.2 | `Q_GMILL_MAIN_DIVERGIU` | rito-task-manager-2026-09 | o main do clone do adotante DIVERGIU do remoto (3x3): push apagaria o ADR da equipe, pull cego reescreveria os updates do Onion  |
 | 6.0 | `Q_LADO_CLASSICO_DO_ZEN_NAO_MEDIDO` | rito-task-manager-2026-09 | nao ha resposta sobre SUBSTITUTO do ZEN Engine: o lado classico voltou vazio, e o maestro selou 'nao agora' em 2026-10-01 |
 | 4.8 | `Q_COMPROMISSO_ESPERA_COLHEITA` | rito-task-manager-2026-09 | o COMPROMISSO de implementar este rito ainda NAO entrou em fios-abertos.kg.yaml, e a razao e o contrato daquele arquivo: teto de 1 |
