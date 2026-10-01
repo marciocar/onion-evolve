@@ -192,6 +192,52 @@ nodes:
     label: "o update NAO sobrescreve KB de terceiro que o adotante evoluiu: o manifesto transporta docs/knowledge-base, mas never-clobber tem de valer ali tambem — o core absorve o que falta, nunca o contrario"
     gatilho: "mecanizar: hoje a exclusao das 3 KBs e MANUAL na entrega. Vira guarda quando um segundo adotante tiver KB propria mais nova que a do core."
 
+  # ── SELOS DO MAESTRO EM 2026-10-01 (pesquisa de motores e corpus de regras) ─────────────────
+  - id: D_NAO_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO
+    node_type: decision
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: 2026-10-01
+    verified_against: "rodada motores-de-regras-deterministicos-2026-10 (132 agentes, 9,18M tokens): o estado da arte confirmado e de motores de AUTORIZACAO — permit/forbid, decisao pura, ordem-independente POR PROJETO. Medido no proprio repo: o lint SO LE (93 check_* em sequencia, zero geracao no corpo) e quem ESCREVE e o pre-commit (7 git add)."
+    label: "o gate do Onion NAO migra para motor declarativo: as guardas produzem artefato, dependem de ordem e precisam do exit 2 de hook — o que transfere e a CAPACIDADE, nunca o substrato"
+
+  - id: D_CAPACIDADES_ANALISADAS_ANTES_DE_ABSORVER
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-10-01
+    verified_against: "selado pelo maestro: 'nenhuma agora, PRIMEIRO tem que analisar a proposta de cada uma e suas consequencias e o que pode quebrar para ter um plano de implementacao sem falhas'. Plano escrito em docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md"
+    label: "nenhuma das tres capacidades (ordem leitor/escritor, diferencial spec-impl, SMT de conflito) se absorve sem plano que diga o que QUEBRA — o plano existe e a execucao e decisao do maestro"
+    trace: docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md
+    gatilho: "o maestro mandar executar. O passo 1 da Capacidade 1 (classificar as 91 por le-arquivo / escreve / depende-de-ordem, IMPRIMINDO sem julgar) e o unico trabalho que paga duas contas: serve a ordem E ao gatilho da Capacidade 3."
+
+  - id: Q_LADO_CLASSICO_DO_ZEN_NAO_MEDIDO
+    node_type: question
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: open
+    verified_at: 2026-10-01
+    verified_against: "a rodada atacou Drools, Camunda/DMN, OpenL, json-rules-engine, Easy Rules, NRules, Clara e GoRules BRMS e NENHUMA claim sobreviveu aos votos adversariais — licenca, cadencia e sinal de vida seguem nao medidos. A unica alegacao de versao 2026 foi REFUTADA."
+    label: "nao ha resposta sobre SUBSTITUTO do ZEN Engine: o lado classico voltou vazio, e o maestro selou 'nao agora' em 2026-10-01"
+    gatilho: "o projeto ADOTANTE de gamificacao sinalizar dor real com o ZEN. A urgencia e dele, nao do core — nao ha motor ZEN no core, so o agente @zen-engine-specialist. Modo recomendado quando reabrir: primarias nomeadas (~42k/no) e nao varredura (~291k/no), porque os motores ja tem nome."
+
+  - id: E_O_LINT_SO_LE_E_O_HOOK_ESCREVE
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: 2026-10-01
+    verified_against: "medido em 2026-10-01 antes de escrever o plano: lint-artifacts.sh tem 93 chamadas check_* em sequencia literal e ZERO geracao de artefato; .githooks/pre-commit tem 7 git add e a cadeia de auto-fix. E check_scan_sanity ja e PRIMEIRA por desenho, com a razao escrita ('se a varredura esta cega, o veredito de qualquer regra abaixo e vacuidade')."
+    source_kind: repo
+    source_tier: 10
+    label: "a fronteira de ORDEM nao esta entre as 93 guardas — esta entre o hook que ESCREVE e o lint que LE, e dentro da cadeia do hook; isso reduz o escopo das tres propostas"
+
 edges:
   # o diagnóstico sustenta as decisões
   - from: E_RITO_COMPLETO_CHAVE_QUEBRADA
@@ -231,4 +277,13 @@ edges:
     edge_type: SUPPORTS
   - from: Q_GMILL_MAIN_DIVERGIU
     to: D_NAO_SOBRESCREVER_KB_DE_ADOTANTE
+    edge_type: CONSTRAINS
+  - from: E_O_LINT_SO_LE_E_O_HOOK_ESCREVE
+    to: D_NAO_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO
+    edge_type: SUPPORTS
+  - from: D_CAPACIDADES_ANALISADAS_ANTES_DE_ABSORVER
+    to: D_NAO_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO
+    edge_type: DEPENDS_ON
+  - from: Q_LADO_CLASSICO_DO_ZEN_NAO_MEDIDO
+    to: D_NAO_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO
     edge_type: CONSTRAINS

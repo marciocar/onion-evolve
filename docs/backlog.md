@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**232 itens abertos** em 53 grafo(s) com aberto (de 76 no escopo) · 54 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**278 itens abertos** em 58 grafo(s) com aberto (de 81 no escopo) · 59 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -26,6 +26,19 @@
 | 5.6 | `C_OPCAO_C_NADA_AGORA_SDAAL` | plugin-mcp-posture-2026-09 | OPCAO (c): nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; MCP embarcado so aumenta superficie na triagem |
 | 1.8 | `C_OPCAO_D_SKILL_BUNDLE_NAO_CONSIDERADA` | plugin-mcp-posture-2026-09 | OPCAO (d) — NAO CONSIDERADA NA DECISAO, CORTADA POR ORCAMENTO NESTA RODADA: skill-bundle — skills locais via git-subdir (stric |
 
+## engenharia-de-corpus-de-regras-2026-10 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 87.0 | `Q_RULE_CORPUS_ENGINEERING_1001` | engenharia-de-corpus-de-regras-2026-10 | Como a comunidade GERENCIA, MEDE e APOSENTA um corpus grande de regras escritas à mão, e o que o Onion ABSORVE, ADOTA ou RECUSA  |
+| 45.0 | `D_RULE_CORPUS_STRATEGY_1001` | engenharia-de-corpus-de-regras-2026-10 | DECISÃO ABERTA — o que o Onion faz com a engenharia do seu corpus de 93 guardas. OPÇÕES NOMEADAS: A — ABSORVER cobertura de |
+| 33.8 | `C_OPCAO_B_ABSORVER_ORDEM_DERIVADA` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO B — ABSORVER ordem DERIVADA: inferir os conjuntos escreve/lê de cada etapa EXECUTANDO o pipeline que já existe (diff d |
+| 17.5 | `C_OPCAO_E_RECUSAR_AGORA_E_RE_RODAR_ESTREITO` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO E — RECUSAR decidir agora e RE-RODAR a pesquisa, ESTREITA, nas 5 fontes não lidas do eixo 3/2 (nx inferred-tasks, ruff, |
+| 9.8 | `C_OPCAO_A_ABSORVER_COBERTURA_DE_REGRA` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO A — ABSORVER cobertura de regra: contador por regra dentro do motor de lint que já existe, mais baseline de regras-que- |
+| 6.6 | `C_OPCAO_F_ABSORVER_TESTE_DE_MUTACAO_DE_REGRA` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO F — ABSORVER teste de mutação de regra: automatizar na bancada o que hoje esta casa faz À MÃO (mutar o sujeito e exi |
+| 4.2 | `C_OPCAO_C_ADOTAR_SARIF_E_INTERCAMBIO` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO C — ADOTAR intercâmbio: emitir SARIF do lint e usar ferramenta externa (reviewdog para anotar PR, baseline por commit)  |
+| 3.0 | `C_OPCAO_D_ADOTAR_MOTOR_DE_POLITICA_ANALISAVEL` | engenharia-de-corpus-de-regras-2026-10 | OPÇÃO D — ADOTAR motor de política analisável (Cedar/OPA) para expressar o corpus de guardas e ganhar análise de sobreposi |
+
 ## kg-multi-graph-view-2026-09 — 9 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -39,6 +52,21 @@
 | 2.4 | `C_OPCAO_O4_ARESTA_CROSS_ARQUIVO_PRIMEIRA_CLASSE` | kg-multi-graph-view-2026-09 | OPCAO O4: referencia cross-arquivo vira ARESTA de 1a classe no schema (edge com file:id, resolvida pelo motor). Confianca 0.2: o E |
 | 1.8 | `C_OPCAO_O8_CONSOLE_MULTI_GRAFO` | kg-multi-graph-view-2026-09 | OPCAO O8: kg-console.sh/kg-view.sh aceitam N arquivos e renderizam painel comparativo multi-grafo. Confianca 0.2: o Elenxo REPROVA |
 | 1.4 | `C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS` | kg-multi-graph-view-2026-09 | OPCAO O6: grafo de nivel 0 que IMPORTA nos de outros arquivos (owl:imports), formando um grafo composto. Confianca 0.15 (a mais ba |
+
+## jev-decision-round2-2026-10 — 10 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 69.0 | `Q_TYPED_DECISION_IN_ONION_2026_10` | jev-decision-round2-2026-10 | O Onion deve adotar uma primitiva de decisao TIPADA e barata nas camadas que ACONSELHAM (triagem, roteamento de modelo/skill, prio |
+| 42.0 | `D_TYPED_DECISION_PRIMITIVE_ONION_2026_10` | jev-decision-round2-2026-10 | DECISAO A SELAR PELO MAESTRO (eu nunca selo): o Onion adota uma primitiva de decisao tipada barata nas camadas que ACONSELHAM? Opc |
+| 27.0 | `C_OPCAO_B_PRIMITIVE_IN_HOUSE` | jev-decision-round2-2026-10 | OPCAO B — ADOTAR A PRIMITIVA EM CASA: decisao tipada de conjunto fechado implementada localmente (1 token sob gramatica restrita |
+| 24.5 | `C_OPCAO_D_CLOSE_GAPS_FIRST` | jev-decision-round2-2026-10 | OPCAO D — FECHAR AS LACUNAS PRIMEIRO pelo corpus local, pelas fontes nao lidas e por uma medicao propria em pt-BR, e so depois d |
+| 19.8 | `C_OPCAO_C_HOSTED_JEV_SHADOW` | jev-decision-round2-2026-10 | OPCAO C — ADOTAR O JEV HOSPEDADO nas camadas que aconselham, em modo SHADOW primeiro, por uso direto (nao SDAAL), com `state` re |
+| 18.0 | `C_GATE_BOUNDARY_IS_INVIOLABLE` | jev-decision-round2-2026-10 | A fronteira nao e negociavel e ja estava desenhada antes desta rodada: a primitiva tipada NUNCA entra no que REPROVA. O kg-radar e |
+| 15.0 | `C_UNTRUSTED_INPUT_IS_THE_REAL_BLOCKER` | jev-decision-round2-2026-10 | O bloqueio real das camadas que ACONSELHAM nao e calibracao, e PROVENIENCIA DA ENTRADA — e e o achado que esta rodada acrescenta |
+| 12.0 | `C_CALIBRATION_IS_STILL_UNVERIFIED` | jev-decision-round2-2026-10 | A unica propriedade que justifica comprar a primitiva — confidence CALIBRADO, derivado da distribuicao e nao carimbado por quem  |
+| 9.6 | `C_OPCAO_A_STATUS_QUO` | jev-decision-round2-2026-10 | OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de m |
+| 5.6 | `C_OPTION_B_BASIS_IS_WEAK_SOURCED` | jev-decision-round2-2026-10 | ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao |
 
 ## ocr-local-sei-2026-09 — 10 item(ns)
 
@@ -55,6 +83,18 @@
 | 2.4 | `C_OPCAO_SURYA_EVIDENCIA_CONTRADITORIA` | ocr-local-sei-2026-09 | OPCAO (4): Surya (datalab-to) — NAO RECOMENDAVEL A PARTIR DESTE DOSSIE, e a razao nao e desempenho: e que o corpo de evidencia s |
 | 1.2 | `C_OPCAO_MINERU_OLMOCR` | ocr-local-sei-2026-09 | OPCAO (6): MinerU 2.5 / olmOCR. Praticamente NAO PESQUISADOS nesta rodada — aparecem so como termo de comparacao dentro de claim |
 
+## motores-de-regras-deterministicos-2026-10 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 48.0 | `Q_MOTORES_DE_REGRAS_DETERMINISTICOS_2026` | motores-de-regras-deterministicos-2026-10 | Quais sao os motores de decisao DETERMINISTICOS vivos em 2026 (substitutos do ZEN Engine e os de politica), para onde vai a supera |
+| 33.0 | `D_MOTOR_DE_REGRAS_DO_GATE_ONION` | motores-de-regras-deterministicos-2026-10 | DECISAO ABERTA (o maestro sela): o gate determinístico do Onion — motor de regras escrito a mao em bash, 5.282 linhas, 203 cham |
+| 18.0 | `C_OPCAO_A_MANTER_SHELL_E_IMPORTAR_O_METODO_VGD` | motores-de-regras-deterministicos-2026-10 | OPCAO A — manter o gate em shell a mao e importar o METODO do Cedar (verification-guided development), nao o motor: escrever um  |
+| 13.2 | `C_OPCAO_E_ALVO_CIRURGICO_AUTORIZACAO_DE_AGENTE` | motores-de-regras-deterministicos-2026-10 | OPCAO E — alvo cirurgico: nao migrar o gate, e adotar motor declarativo SO onde o dominio e autorizacao de AGENTE (permissao de  |
+| 10.5 | `C_OPCAO_D_NAO_DECIDIR_E_REABRIR_AS_FAIXAS_NAO_LIDAS` | motores-de-regras-deterministicos-2026-10 | OPCAO D — nao decidir agora: reabrir a pesquisa nas faixas nao lidas (Drools, Camunda/DMN e o status ISO/OMG, OpenL Tablets, Eas |
+| 9.6 | `C_OPCAO_C_HIBRIDO_SHELL_EXTRAI_MOTOR_DECIDE` | motores-de-regras-deterministicos-2026-10 | OPCAO C — hibrido: o shell continua EXTRAINDO fatos e devolvendo exit 2, e um motor declarativo decide atras de um handler de ho |
+| 7.5 | `C_OPCAO_B_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO` | motores-de-regras-deterministicos-2026-10 | OPCAO B — migrar o gate determinístico para um motor declarativo (Cedar, OPA/Rego, DMN ou JDM) e expressar as 93 regras como po |
+
 ## zoho-glpi-adapters-2026-09 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -67,6 +107,36 @@
 | 4.8 | `C_OPCAO_C_SEM_ADAPTER_INGESTAO_KG` | zoho-glpi-adapters-2026-09 | OPCAO C — sem adapter algum: ingestao periodica GLPI->KG (plugin Advanced Dashboard + export CSV, ou SQL direto no banco) e a ap |
 | 4.8 | `C_OPCAO_D2_VPS_PRIMEIRO` | zoho-glpi-adapters-2026-09 | OPCAO D2 — self-hosted na VPS PRIMEIRO (Docker, prefixo onion-vps- conforme a convencao da casa), online nunca ou so como espelh |
 | 0.6 | `C_OPCAO_B_GLPI_DENTRO_TASK_MANAGER` | zoho-glpi-adapters-2026-09 | OPCAO B — GLPI DENTRO do task-manager, com ~10 metodos stub (createTask/deleteTask/createSubtask/updateStatus/...): e a classe d |
+
+## jev-type-safe-ai-2026-10 — 12 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 46.2 | `Q_JEV_PRIMARIES_2026_10` | jev-type-safe-ai-2026-10 | O que e o JEV (jevtypesafeai.com): onde se enquadra na taxonomia de ferramentas de IA para desenvolvimento, que funcionalidades ex |
+| 25.5 | `C_GUARANTEE_IS_STRUCTURAL_NEVER_FACTUAL` | jev-type-safe-ai-2026-10 | A RESPOSTA A "por que ele diz nao alucinar": ele NAO diz. A garantia que o produto sustenta e ESTRUTURAL — tipo fixado pelo pedi |
+| 21.0 | `Q_JEV_IN_ONION_GATE_DISQUALIFIED` | jev-type-safe-ai-2026-10 | PROPOSTA a julgar na rodada de decisao (nao selada aqui): o JEV NAO deve sentar em gate DETERMINISTICO do Onion — nada que termi |
+| 20.0 | `C_JEV_CATEGORY_IS_SYSTEM_ONE` | jev-type-safe-ai-2026-10 | ONDE O JEV SE ENQUADRA: nao e LLM de chat, nem roteador, nem biblioteca de validacao de schema — e um "System One Model" (catego |
+| 12.8 | `C_ARCHITECTURE_NOT_DISCLOSED` | jev-type-safe-ai-2026-10 | A ARQUITETURA DO JEV NAO ESTA DECLARADA EM NENHUMA FONTE LIDA. Nenhuma pagina do revendedor, nenhuma frase do fabricante e nenhuma |
+| 12.0 | `C_INTEGRATION_SURFACE_IS_ONE_HTTP_CALL` | jev-type-safe-ai-2026-10 | COMO ELE SE INTEGRA, em uma frase: tudo e UMA chamada HTTP, e as "integracoes" sao embalagens dela. SDK TypeScript, servidor jev-m |
+| 12.0 | `Q_ONION_COULD_BECOME_THIS` | jev-type-safe-ai-2026-10 | O Onion poderia virar algo assim? DEFERIDA POR MANDATO para a rodada de decisao, e esta rodada entrega so o que ela precisa saber: |
+| 11.2 | `Q_ANCHORING_DOES_NOT_CHECK_PROVENANCE` | jev-type-safe-ai-2026-10 | PROPOSTA DE MECANISMO (classe nova, achada por esta rodada): o modo `primarias nomeadas` confere a CITACAO contra o DOCUMENTO e NA |
+| 9.0 | `Q_JEV_PRICE_AND_ACCESS_RECONCILE` | jev-type-safe-ai-2026-10 | Qual e o preco e o regime de acesso REAIS do JEV, conciliados? A rodada tem tres numeros incompativeis (US$ 0,042/M do fabricante, |
+| 4.8 | `E_DISTRIBUTION_GATEWAYS` | jev-type-safe-ai-2026-10 | NAO CONFIRMADA (a pagina diz; nenhum registro de origem confirma). A lista de distribuicao por gateways de terceiros (Vercel AI Ga |
+| 4.0 | `Q_JEV_ARCHITECTURE_UNKNOWN` | jev-type-safe-ai-2026-10 | Como o JEV e CONSTRUIDO e TREINADO? Hipoteses a testar na rodada seguinte: LLM com decodificacao restrita ao conjunto de rotulos;  |
+| 2.0 | `E_OPENROUTER_SLUG_NOT_CONFIRMED` | jev-type-safe-ai-2026-10 | A unica tentativa de bater a lista de gateways num catalogo de ORIGEM falhou: o slug de OpenRouter citado pelo revendedor devolveu |
+
+## unidade-bilhetavel-do-onion-2026-10 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 45.0 | `D_UNIDADE_BILHETAVEL_DO_ONION` | unidade-bilhetavel-do-onion-2026-10 | DECISAO ABERTA (o maestro sela; esta sessao NUNCA sela): qual e a unidade bilhetavel do Onion que NAO contradiz a identidade canon |
+| 37.5 | `Q_UNIDADE_BILHETAVEL_DO_ONION_2026` | unidade-bilhetavel-do-onion-2026-10 | Qual e a UNIDADE BILHETAVEL de um framework de orquestracao com gate deterministico, em outubro de 2026, dado que a identidade can |
+| 14.0 | `C_OPCAO_A_VEREDITO_DE_GATE_POR_EXECUCAO` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (a) — VEREDITO DE GATE POR EXECUCAO: cobrar pelo rodou, reprovou, aqui esta a prova. A FAVOR: e a forma mais fiel ao que o |
+| 13.0 | `C_OPCAO_F_NAO_SELAR_NESTA_RODADA` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (f) — NAO SELAR NESTA RODADA: segunda passada obrigatoria sobre as fontes nao lidas e os cortes por orcamento ANTES de qua |
+| 10.0 | `C_OPCAO_B_GRAFO_COMPANY_BRAIN_ANCORADO` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (b) — GRAFO/Company Brain ancorado como servico (KG mais chat-RAG mais radar deterministico sem-LLM). A FAVOR: e o norte d |
+| 9.6 | `C_OPCAO_C_GOVERNANCA_DE_AGENTE_EM_HOOK` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (c) — GOVERNANCA DE AGENTE EM HOOK: vender a coleira onde o dinheiro do campo esta. A FAVOR: e a unica vizinhanca desta ro |
+| 7.2 | `C_OPCAO_D_CONDUCAO_E_ADOCAO_COMO_SERVICO` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (d) — CONDUCAO/ADOCAO como servico (wizard mais onboarding mais manutencao do corpus de regras). A FAVOR: e a UNICA opcao  |
+| 4.8 | `C_OPCAO_E_NADA_O_VALOR_E_INTERNO` | unidade-bilhetavel-do-onion-2026-10 | OPCAO (e) — NADA: o valor e interno e o produto bilhetavel e outro (o Onion e o meio de producao, nao a mercadoria). A FAVOR: e  |
 
 ## plugin-directory-landscape-2026-09 — 1 item(ns)
 
@@ -413,11 +483,12 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
-## rito-task-manager-2026-09 — 2 item(ns)
+## rito-task-manager-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.2 | `Q_GMILL_MAIN_DIVERGIU` | rito-task-manager-2026-09 | o main do clone do adotante DIVERGIU do remoto (3x3): push apagaria o ADR da equipe, pull cego reescreveria os updates do Onion  |
+| 6.0 | `Q_LADO_CLASSICO_DO_ZEN_NAO_MEDIDO` | rito-task-manager-2026-09 | nao ha resposta sobre SUBSTITUTO do ZEN Engine: o lado classico voltou vazio, e o maestro selou 'nao agora' em 2026-10-01 |
 | 4.8 | `Q_COMPROMISSO_ESPERA_COLHEITA` | rito-task-manager-2026-09 | o COMPROMISSO de implementar este rito ainda NAO entrou em fios-abertos.kg.yaml, e a razao e o contrato daquele arquivo: teto de 1 |
 
 ## graduated-automation-elenxo-2026-07 — 2 item(ns)

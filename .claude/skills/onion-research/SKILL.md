@@ -20,7 +20,7 @@ A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 c
 **Hoje:** !`date +%F`
 **Claude Code (disco / processo):** !`claude --version 2>/dev/null | head -1` / !`basename "${CLAUDE_CODE_EXECPATH:-?}"`
 **O que os grafos JÁ sabem sobre `$ARGUMENTS`:**
-!`bash .claude/validation/kg-corpus-grep.sh $ARGUMENTS 2>&1 | head -40`
+!`bash .claude/validation/kg-corpus-grep.sh --query "$ARGUMENTS" 2>&1 | head -40`
 
 **Roster de fontes por eixo:** `docs/onion/radar-sources.yaml` (tier default por fonte; `vendor-on-competitor` sempre suspeito).
 
@@ -99,6 +99,14 @@ A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 c
    verificador **reabre o documento**.
 
 ## Fronteiras declaradas
+
+- **O bloco de corpus acima pode falhar, e aí a skill NÃO ABRE.** Ele é injetado por `!`backtick``, que
+  é avaliado pelo shell: em 2026-10-01 uma pergunta com **parênteses** devolveu `syntax error near
+  unexpected token '('` e **abortou a invocação inteira** — não degradou, matou. Curado passando
+  `--query "$ARGUMENTS"`, que torna inertes `(`, `)`, `&`, `;`, `|` e `*`. **Teto que resta**: `"`,
+  `` ` `` e `$` no texto da pergunta ainda quebram, porque erro de SINTAXE no eval não é capturável por
+  `|| true`. Se acontecer, reinvoque sem esses caracteres — a pergunta inteira vai no `question:` do
+  workflow de qualquer forma, então nada de informação se perde.
 
 - Só a sessão principal roda o workflow (opt-in por comando); subagente não orquestra.
 - Sem WebSearch disponível o workflow degrada: use `WebFetch` sobre fontes do roster e declare.

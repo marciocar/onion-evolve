@@ -18,8 +18,26 @@ _KFP="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/kg-fixture-paths.sh"
 [ -f "${_KFP}" ] || { echo "ERRO: predicado de fixture ausente (${_KFP}) — sem ele a varredura de grafos ficaria VAZIA e verde por vacuidade." >&2; exit 2; }
 ROOT="${ONION_KG_CORPUS_ROOT:-$(git rev-parse --show-toplevel 2>/dev/null || pwd)}"
 JSON=0; ALL=0; TERMS=()
-for a in "$@"; do case "$a" in --json) JSON=1;; --all-status) ALL=1;; -h|--help) sed -n '2,10p' "$0"; exit 0;; *) TERMS+=("$a");; esac; done
-[ "${#TERMS[@]}" -gt 0 ] || { echo "uso: kg-corpus-grep.sh <termo> [termo...] [--json] [--all-status]" >&2; exit 2; }
+# `--query "<frase inteira>"` existe porque o CHAMADOR não consegue passar uma pergunta livre em
+# segurança: a skill onion-research injeta `$ARGUMENTS` por `!`backtick`` e precisa dele SEM quotes,
+# para que cada palavra vire um termo. Medido em 2026-10-01: uma pergunta com PARÊNTESES
+# ("JEV (jevtypesafeai.com): ...") produziu `syntax error near unexpected token '('` e **abortou a
+# invocação da skill inteira** — não degradou, matou. Com `--query` o chamador quota a frase e QUEM
+# separa em termos é este script, onde o texto já é dado e não código.
+# TETO DECLARADO: `"`, `` ` `` e `$` no texto do chamador ainda podem quebrar a injeção, porque um erro
+# de SINTAXE no eval não é capturável por `|| true`. Resolver isso exige o substrato passar argumento
+# fora da linha de comando; até lá, está escrito na skill.
+# `while`+`shift`, NÃO `for a in "$@"`: num `for` a lista é expandida ANTES da 1ª volta, então o
+# `shift` do `--query` não move a iteração e a frase entrava DUAS vezes — como termos e como termo
+# inteiro (medido na própria cura, em 2026-10-01).
+while [ "$#" -gt 0 ]; do case "$1" in
+  --json) JSON=1;;
+  --all-status) ALL=1;;
+  --query) shift; read -r -a _q <<< "${1:-}"; [ "${#_q[@]}" -gt 0 ] && TERMS+=("${_q[@]}");;
+  -h|--help) sed -n '2,10p' "$0"; exit 0;;
+  *) TERMS+=("$1");;
+esac; shift; done
+[ "${#TERMS[@]}" -gt 0 ] || { echo "uso: kg-corpus-grep.sh <termo> [termo...] | --query \"<frase>\" [--json] [--all-status]" >&2; exit 2; }
 if [ -n "${ONION_KG_CORPUS_FILES:-}" ]; then files="${ONION_KG_CORPUS_FILES}"
 # ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
 #    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos

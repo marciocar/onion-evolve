@@ -33,3 +33,16 @@ Itaú
 # protege a vitrine, este arquivo protege a varredura. Feito no mesmo commit que absorve três KBs
 # vindas deste adotante para dentro de `docs/knowledge-base/`, que VIAJA.
 Gmill
+
+# Grafias de UM MESMO cliente, e cada uma precisa de linha PRÓPRIA — medido em 2026-10-01: a guarda
+# usa `grep -rilF` (string LITERAL), então `Grana.Ai` NUNCA encontraria `grana-ai`. O `.` não é curinga
+# ali. Eu mesmo afirmei que casava, testando sem o `-F`, e a medição me corrigiu. É a classe
+# `guarda-por-lista-falha-pelo-vocabulario` no eixo da GRAFIA: a lógica está certa, o vocabulário é que
+# falta. Dano medido: `_rejected/grana-ai-mapeamento-*` viajava em `.claude/commands/meta/kg-inbox.md`
+# e na cópia dele dentro do plugin — para TODO adotante.
+# Ao registrar um cliente novo, escreva TODAS as grafias plausíveis: com ponto, com hífen, junta,
+# com espaço, e a forma do slug de repo.
+grana-ai
+granaai
+GranaAi
+Grana AI
