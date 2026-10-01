@@ -238,6 +238,17 @@ nodes:
     source_tier: 10
     label: "a fronteira de ORDEM nao esta entre as 93 guardas — esta entre o hook que ESCREVE e o lint que LE, e dentro da cadeia do hook; isso reduz o escopo das tres propostas"
 
+  - id: Q_CLAUSULA_11_ONDA_DERIVADA
+    node_type: question
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_at: 2026-10-01
+    verified_against: "reforco do maestro em 2026-10-01: 'toda onda principal gera oportunidades derivadas, o que e a automacao de hoje gera novos gargalos e necessidades'. Medido contra a doutrina vigente (common/prompts/research-doctrine.md, 10 clausulas): a clausula 4 (Caminho do dinheiro) pergunta ONDE O CAPITAL ESTA HOJE; esta pergunta e outra — o que a onda CRIA como gargalo derivado, e quem JA PAGA pela onda e por isso tem orcamento para o passo seguinte."
+    label: "candidata a CLAUSULA 11 da doutrina de pesquisa: ONDA PRINCIPAL -> GARGALO DERIVADO. Capital mostra o escasso de HOJE; a onda derivada mostra o que fica escasso DEPOIS, como consequencia do que esta sendo automatizado agora"
+    gatilho: "a rodada que o maestro pediu (Onion como ponto de partida / gargalos derivados da automacao) PROVAR que o eixo rende achado que os outros 10 nao renderiam. Se render, vira clausula com mecanismo (worker proprio no fan-out, como o de mercado). Se nao render, fica como pergunta refutada — e isso tambem e resultado."
+
 edges:
   # o diagnóstico sustenta as decisões
   - from: E_RITO_COMPLETO_CHAVE_QUEBRADA
@@ -286,4 +297,7 @@ edges:
     edge_type: DEPENDS_ON
   - from: Q_LADO_CLASSICO_DO_ZEN_NAO_MEDIDO
     to: D_NAO_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO
+    edge_type: CONSTRAINS
+  - from: Q_CLAUSULA_11_ONDA_DERIVADA
+    to: D_CAPACIDADES_ANALISADAS_ANTES_DE_ABSORVER
     edge_type: CONSTRAINS

@@ -1,6 +1,6 @@
 ---
 branch: fix/scrub-term-granaai-hyphen
-reviewed_diff_sha256: 61858775d116a837b8707d884bd1c070e981d323dfc6965741c688ab44ff7522
+reviewed_diff_sha256: 973e36861236e1aa7f8f3652f0a1d9c56c1ff0802cf31ad17466381694cc5ce9
 elenxo: sim
 verdict: CORRIGIDO
 findings_total: 9
