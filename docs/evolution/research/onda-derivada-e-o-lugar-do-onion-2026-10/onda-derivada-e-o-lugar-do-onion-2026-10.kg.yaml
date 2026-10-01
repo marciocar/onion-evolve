@@ -1,0 +1,873 @@
+meta:
+  id: onda-derivada-e-o-lugar-do-onion-2026-10
+  schema_version: "1"
+  baseline: 2026-10-01
+  review_after: 2026-10-31   # 30d: FERRAMENTA/PRECO e o tipo DOMINANTE, e a escolha e medida, nao
+                             # por gosto. O grafo tem TRES tipos de dado: analista (Radar Vol 34,
+                             # abril/2026 — pediria 90d), preco publicado (Stage US$30/usuario/mes,
+                             # Agensi 30% — pede 30d) e changelog de plataforma (2.1.281 e 2.1.284,
+                             # 23 e 28/09 — o mais volatil de todos). A DECISAO pende exatamente do
+                             # par curto: se a plataforma absorve ou nao a posicao, e se alguem
+                             # publica preco pelo veredito. Logo manda a cadencia curta.
+                             # GATILHOS EXTRA de revisita, antes da data: (1) qualquer release do
+                             # Claude Code que toque gate, auditoria de sessao ou atribuicao de
+                             # custo por time/repo; (2) publicacao de preco por plugin/skill no canal
+                             # OFICIAL (anthropics/claude-plugins-community hoje nao tem trilho);
+                             # (3) primeira receita medida em marketplace de terceiro (Agensi).
+  # kg-backlog-guard: on
+  # ═══ TETO: 42 NÓS ═══
+  #   (era 41; +1 pelo no de artefato da sintese, que a REGRA 29 cobra — markdown de analise sem
+  #   no que o cite em trace: e proveniencia INVERTIDA, a vista nascendo antes da fonte.)
+  #
+  # MODO DECISÃO. D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION nasce OPEN — o maestro sela, esta sessão NUNCA.
+  #
+  # ┌───────────────────────────────────────────────────────────────────────────────────────────┐
+  # │ FORMULÁRIO DE ESCOLHA — uma marcação por linha. É o pedido literal do maestro nesta        │
+  # │ rodada: "coloque sugestões e recomendações em um formulário para eu escolher".             │
+  # │ As CONSTRAINS listadas em cada linha são as objeções SOBREVIVENTES do Elenxo e VIAJAM      │
+  # │ com a opção escolhida — escolher a linha é aceitar a restrição, não apagá-la.              │
+  # └───────────────────────────────────────────────────────────────────────────────────────────┘
+  #
+  # ░░ BLOCO 1 — O MOVIMENTO (marque UMA) ░░
+  #
+  #   [ ] A) ACOPLAR AO QUE JÁ SE PAGA — condução + gate instalado como camada sobre o contrato de
+  #           Claude Code/Copilot que o cliente já assina, cobrado por engajamento/entrega.
+  #           ⚠ CONSTRAIN: F3 + F9 + medição local — o canal JÁ ESTÁ CONSTRUÍDO nesta casa e rendeu
+  #           ZERO pagamento; o gargalo nunca foi o canal, é o comprador. Correção de número desta
+  #           sessão: o `.claude-plugin/marketplace.json` tem **5** entradas em `plugins[]`, não 12.
+  #
+  #   [ ] B) PÓS — PROVA/ATESTAÇÃO (registro verificável do que o agente fez e com base em quê).
+  #           ⚠ CONSTRAIN: F10 — TRACE é spec sem comprador, e spec sem comprador COMMODITIZA a
+  #           posição (precedente no mesmo lote: agent-sign já entrega Sigstore/in-toto de graça).
+  #
+  #   [ ] C) DURANTE — GATE/POLÍTICA (veredito reprovador determinístico, 91 regras, catracas).
+  #           🚫 VETO DURO DO REFUTADOR. ⚠ CONSTRAIN: F2 + F4 — a "validação de analista" é o
+  #           resultado NEGATIVO (Trial = construa com o que já tem), os dois achados são a MESMA
+  #           URL contada 2×, e os concorrentes medidos são grátis (Vectimus Apache-2.0, Watchflow
+  #           MIT, agentplane MIT, Optio MIT).
+  #
+  #   [ ] D) META — COMPANY BRAIN / GRAFO ancorado como serviço.
+  #           ⚠ CONSTRAIN: F6 — bloat de instrução está em CAUTION e o core é o caso-exemplo
+  #           (71.676 linhas de markdown contra 48.944 de shell, medido hoje).
+  #
+  #   [ ] E) (B+D) NO FORMATO GURU — conhecimento verificado com condução humana embutida, preço
+  #           fechado por contrato, sem assento e sem byte.
+  #           ⚠ CONSTRAIN: F7 — todo preço publicado no campo cobra ASSENTO num RECEPTOR HOSPEDADO.
+  #
+  #   [ ] F) NENHUMA AGORA — só vale com GATILHO + DATA + ORÇAMENTO nomeados nas três linhas abaixo.
+  #           Gatilho: ______________________  Data: __________  Orçamento: __________
+  #           ⚠ Sem os três, é adiamento com outro nome.
+  #
+  #   [✓] G) RE-MEDIR ANTES DE ESCOLHER  ← ★ RECOMENDAÇÃO DO REFUTADOR, como PRIMEIRO movimento,
+  #           com teto de UMA rodada curta. Abrir as 4 fontes que decidem e reabrir as 3 refutações
+  #           tier 9. ⚠ CONSTRAIN: E_OBJECAO_G_QUATRO_FONTES_SEM_LEITURA.
+  #
+  # ░░ BLOCO 2 — A ORDEM RECOMENDADA (marque se aceita) ░░
+  #
+  #   [ ] aceito a sequência  **G agora → A depois**, com veto em C mantido até refutação medida
+  #   [ ] recuso a sequência e sigo direto para a linha marcada no BLOCO 1
+  #
+  # ░░ BLOCO 3 — AS 4 FONTES DO G (marque as que autoriza abrir; o custo é 1 rodada curta) ░░
+  #
+  #   [ ] permit.io/mcp-gateway          — única endereçada a TRILHO DE COBRANÇA
+  #   [ ] toolbooth                      — única endereçada a TRILHO DE COBRANÇA
+  #   [ ] Brain0                         — o concorrente mais próximo da tese INTEIRA (grafo de
+  #                                        decisão commit↔intenção + gate pré-commit)
+  #   [ ] github.blog default model enablement — a taxa de absorção pela plataforma
+  #
+  # ░░ BLOCO 4 — AS 3 REFUTAÇÕES TIER 9 A REABRIR (marque as que autoriza reabrir) ░░
+  #   Todas as três foram DESCARTADAS nesta rodada, e são as fontes MAIS AUTORITATIVAS que ela tocou.
+  #
+  #   [ ] Copilot AI Controls (política corporativa de agente)      → mata/limita a opção C
+  #   [ ] Copilot audit log de agente (sessões, streaming)          → mata/limita a opção B
+  #   [ ] allowedProviders + disableBypassPermissionsMode (CC)      → mata/limita a opção C
+  #
+  # ░░ BLOCO 5 — DE QUAL POSIÇÃO FICAR LONGE (marque para selar o veto) ░░
+  #
+  #   [ ] selo o veto em C (DURANTE/gate como SKU) — a plataforma já absorve e os pares são grátis
+  #   [ ] não selo; quero ver as 3 refutações tier 9 primeiro
+  #
+  # ─────────────────────────────────────────────────────────────────────────────────────────────
+  #
+  # ⚠️ FRONTEIRA DE VERIFICAÇÃO DESTA RODADA (declarada, não escondida):
+  #   · 19 claims chegaram CONFIRMADAS, 17 REFUTADAS por fonte fraca, 0 não-verificadas.
+  #   · As 19 confirmadas viraram 15 nós: QUATRO pares foram FUNDIDOS porque eram o mesmo fato
+  #     (Radar/sensores F2+F4 — a própria objeção F4 denuncia a dupla contagem; Stage preço+
+  #     formulação; TRACE posição+limite; agent-sign ação+bundle). Fundir é correção, não perda.
+  #   · O eixo 6 da pergunta (ANTI-PADRÃO: ferramentas que acertaram o gargalo e morreram) tem
+  #     ZERO evidência confirmada: as DUAS claims do Flowise caíram no lado refutado (tier 8).
+  #   · O eixo 3 (quem já paga e precisa do passo seguinte) tem UM nó, e ele responde ABSORÇÃO,
+  #     não UPSELL: as três claims tier 9 sobre Copilot/Claude Code foram refutadas.
+  #   · O eixo 4 (acoplamento que gera receita AGORA) tem o negativo decisivo (canal oficial sem
+  #     trilho de cobrança) e UMA taxa de canal de terceiro (Agensi 30%, tier 4, sem volume).
+  #   Ver E_LACUNAS_ONDA_DERIVADA_1001 — e ele NÃO arredonda para baixo.
+  #
+  # Relação com as rodadas IRMÃS do mesmo dia (unidade-bilhetavel-do-onion-2026-10 e
+  # motores-de-regras-deterministicos-2026-10): este grafo NÃO as contradiz e por isso NÃO escreve
+  # SUPERSEDES. Ele acrescenta o eixo que elas não tinham — o gargalo DERIVADO (cláusula 11
+  # candidata) — e CONVERGE com elas no mesmo veredito negativo sobre vender o gate. O radar só vê
+  # arestas DENTRO de um arquivo; o vínculo com o corpus vai por `trace:` e pelo nó de corpus.
+
+nodes:
+
+  # ═══════════════════ A PERGUNTA ═══════════════════
+
+  - id: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.45
+    label: 'Que PEÇA o Onion é na cadeia de valor de outra pessoa (PRÉ-geração, DURANTE, PÓS, META), onde ele pode ser BASE ou ACOPLADO para gerar receita AGORA, e qual é o gargalo DERIVADO que a automação de hoje está criando? Seis eixos pedidos: (1) que peça ele é e qual posição o mercado remunera, (2) os gargalos que a onda de código-escrito-por-agente cria, (3) quem já paga e qual é o upsell natural do contrato dele, (4) acoplamento que gera receita agora sem receptor hospedado, (5) o precedente histórico (CI/CD→proveniência, cloud→FinOps, microsserviço→observabilidade), (6) o anti-padrão de quem acertou o gargalo e morreu. PERMANECE ABERTA, e por razão medida: o eixo 6 não tem UMA evidência confirmada, o eixo 3 tem um nó que responde outra pergunta, e as três fontes tier 9 da rodada (as mais autoritativas que ela tocou) foram todas refutadas.'
+    verified_at: 2026-10-01
+    verified_against: 'rodada de 2026-10-01: 19 claims confirmadas (fundidas em 15 nós), 17 refutadas por fonte fraca, 0 não-verificadas por 403 ou truncagem; 11 objeções sobreviventes do Elenxo entregues, a 11a TRUNCADA no repasse; 16 fontes e 64 claims cortadas por orçamento; duas medições locais tier 10 acrescentadas nesta sessão (canal de plugin e massa do corpus)'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  # ═══════════════════ MEDIÇÃO LOCAL (tier 10 — o artefato antes da web) ═══════════════════
+
+  - id: E_MEDIDO_CANAL_DE_PLUGIN_JA_CONSTRUIDO_1001
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.98
+    verified_at: 2026-10-01
+    verified_against: 'medição nesta máquina em 2026-10-01, na raiz do repo: `ls plugins/` devolve 5 diretórios (onion, onion-compliance, onion-design, onion-engineering, onion-product); `python3 -c json.load` sobre `.claude-plugin/marketplace.json` devolve `len(plugins) == 5`. O `grep -c ''"name"''` no mesmo arquivo devolve 12 — e é ESSE o número que circulava: 12 é a contagem de chaves `name` incluindo `owner` e `metadata` aninhados, não de entradas de plugin.'
+    valid_from: 2026-10-01
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'MEDIDO AQUI: o canal de distribuição do Onion JÁ ESTÁ CONSTRUÍDO — 5 plugins materializados em `plugins/` e 5 entradas em `plugins[]` do marketplace.json — e rendeu ZERO pagamento registrado. CORREÇÃO DE NÚMERO que a própria pergunta desta rodada carregava: são 5 entradas de plugin, NÃO 12; o 12 vem de contar chaves `name` aninhadas. O que o fato prova é o inverso do que o eixo 4 esperava: distribuição validada por analista não encurta caminho até o primeiro pagamento, porque o canal nunca foi o gargalo — o comprador é.'
+    trace: '.claude-plugin/marketplace.json'
+
+  - id: E_MEDIDO_BLOAT_DO_PROPRIO_CORE_1001
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-10-01
+    verified_against: 'medição nesta máquina em 2026-10-01 sobre arquivos RASTREADOS (git ls-files, fixtures excluídos): 71.676 linhas de markdown em 408 arquivos `.md` dentro de `.claude/` contra 48.944 linhas de `.sh`. O Elenxo declarou 73.904 e 49.148 — números que NÃO reproduzem aqui com este filtro (provável diferença: arquivos não rastreados). A direção não muda: a metade que ACONSELHA é ~1,46× a que REPROVA. Soma-se o aviso de teto da própria carga desta sessão: MEMORY.md 27,6KB contra limite 24,4KB, 19 de 142 linhas cortadas.'
+    valid_from: 2026-10-01
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'MEDIDO AQUI: o core é o caso-exemplo do CAUTION que ele queria citar como aliado. 71.676 linhas de markdown rastreado em `.claude/` contra 48.944 de shell, e o índice de memória desta própria sessão estourou o teto e teve 19 linhas CORTADAS na carga. Se bloat de instrução degrada comportamento de agente, vender "o corpus que decide" vende o item que o anel manda vigiar. Isto limita a opção META/Company Brain por dentro, não por fora.'
+    trace: '.claude/'
+
+  - id: E_CORPUS_O_QUE_AS_RODADAS_DE_HOJE_JA_MEDIRAM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'corpus das rodadas irmãs do mesmo dia (unidade-bilhetavel-do-onion-2026-10 e motores-de-regras-deterministicos-2026-10), injetado nesta rodada pela cláusula 0 e NÃO repago aqui'
+    valid_from: 2026-10-01
+    source_tier: 9
+    source_kind: internal-audit
+    label: 'O QUE O CORPUS JÁ FECHOU e esta rodada não repaga: (a) a única unidade bilhetável com preço publicado na vizinhança é o EVENTO (AWS Bedrock AgentCore Policy a US$0,000025/requisição de autorização; agent-custody a US$50/mês por 1M de appends); (b) NINGUÉM cobra pelo veredito reprovador com prova; (c) todo preço publicado cobra num RECEPTOR HOSPEDADO, que um template em `.claude/` não tem; (d) o `exit 2` de hook é NATIVO e GRÁTIS — o veto é substrato, não produto; (e) ANTI-PADRÃO medido: acquihire da Styra SEM compra da empresa e doação dos produtos comerciais (EOPA, OPA Control Plane) à CNCF; (f) capital real na vizinhança de governança de agente: Neo US$100M, Geordie US$30M, Hush US$30M; (g) gestão de corpus de regras NÃO é categoria que capital persegue. Esta rodada CONVERGE com (b), (c) e (d) por caminho independente — e é essa convergência, não um achado novo, que sustenta o veto em C.'
+    trace: 'docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/unidade-bilhetavel-do-onion-2026-10.kg.yaml'
+
+  # ═══════════════════ EVIDÊNCIAS CONFIRMADAS (15 nós / 19 claims) ═══════════════════
+
+  - id: E_PLATAFORMA_ABSORVE_CUSTO_E_ROTEAMENTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-10-01
+    verified_against: 'https://code.claude.com/docs/en/changelog — votos 2-1 (não unânime); duas entradas em CINCO dias de calendário na MESMA linha de release: 2.1.281 em 2026-09-23 (assume_role em upstreams Bedrock) e 2.1.284 em 2026-09-28 (limite de gasto em dólares visível em /usage)'
+    valid_from: 2026-09-28
+    source_tier: 9
+    source_kind: primary
+    label: 'A plataforma Claude Code absorve controle de custo e roteamento: gateway de apps com limite de gasto em dólares visível em /usage (2.1.284, 2026-09-28) e assume_role em upstreams Bedrock (2.1.281, 2026-09-23). LEITURA QUE O ELENXO IMPÔS E ESTE NÓ ACEITA: isto não é fato pontual, é TAXA — duas absorções em cinco dias na mesma linha de release. Lida como taxa, atinge qualquer posição adjacente à CLI, inclusive gate e auditoria. LIMITE DO PRÓPRIO ACHADO, também declarado: o limite em /usage é por máquina/usuário, não atribuição por time/repo — não cobre chargeback organizacional, logo não mata a posição INTEIRA.'
+    trace: 'https://code.claude.com/docs/en/changelog'
+
+  - id: E_RADAR_SENSORES_DETERMINISTICOS_EM_TRIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-10-01
+    verified_against: 'https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents e https://www.thoughtworks.com/radar — votos 3-0 em ambas as entregas. FUSÃO DECLARADA: a rodada entregou este fato DUAS VEZES (um achado da página do Radar, outro da página da técnica) e a objeção F4 denunciou a dupla contagem; os dois viraram UM nó, e o peso da posição DURANTE cai na mesma medida.'
+    valid_from: 2026-04-15
+    source_tier: 8
+    source_kind: analyst
+    label: 'Radar Vol 34 (abril/2026) coloca "Feedback sensors for coding agents" em TRIAL — gates determinísticos (compiladores, linters, testes, suítes) ligados ao fluxo agêntico, atuando DURANTE a sessão e não pós-commit; Mutation testing também em Trial. Nenhum fornecedor pago é citado. CONTRA-LEITURA QUE ESTE NÓ CARREGA: Trial num radar de TÉCNICA recomenda que o cliente CONSTRUA com o que já tem — é resultado NEGATIVO para monetizar a posição, não meio-caminho para receita. E os sensores nomeados (compilador, linter, teste) são ferramentas que o cliente já possui: o que o Onion acrescenta é a COSTURA, que se vende por engajamento, não como SKU.'
+    trace: 'https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents'
+
+  - id: E_RADAR_PLUGIN_E_SKILLS_EM_TRIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-10-01
+    verified_against: 'https://www.thoughtworks.com/radar — votos 3-0; o próprio achado admite ZERO dado de monetização, taxa ou receita'
+    valid_from: 2026-04
+    source_tier: 8
+    source_kind: analyst
+    label: 'O Claude Code plugin marketplace e as Agent Skills estão em TRIAL no Radar Vol 34: distribuição por plugin/skill é canal validado por analista. A página NÃO traz taxa, preço nem receita. Lido junto com a medição local (canal já construído aqui, zero pagamento), o achado diz que o canal existe e não cobra — validação de DISTRIBUIÇÃO não é validação de COBRANÇA.'
+    trace: 'https://www.thoughtworks.com/radar'
+
+  - id: E_REVISAO_HUMANA_E_O_GARGALO_DECLARADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: 2026-10-01
+    verified_against: 'https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents — votos 3-0; a frase citada diz que AGENTES precisam de loops de feedback diretamente acessíveis, e NÃO que humanos pagam para reduzir carga de revisão'
+    valid_from: 2026-04-15
+    source_tier: 7
+    source_kind: analyst
+    label: 'A Thoughtworks identifica a CARGA DE REVISÃO HUMANA como o gargalo que os sensores de feedback atacam — é o gargalo derivado da onda de código escrito por agente, nomeado por analista e datado. RESSALVA QUE VIAJA COM O NÓ: a fonte fala do que o AGENTE precisa, não do que o humano COMPRA; e o único fornecedor pago medido nesse gargalo (Stage) vende COMPREENSÃO de PR, superfície que o core não tem (não lê PR, não comenta PR, não tem receptor hospedado). O achado nomeia gargalo real e, no mesmo movimento, mostra que a peça que o atende não é a do Onion.'
+    trace: 'https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents'
+
+  - id: E_INSTRUCTION_BLOAT_EM_CAUTION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-10-01
+    verified_against: 'https://www.thoughtworks.com/radar/techniques/agent-instruction-bloat — votos 3-0. ⚠️ A SEGUNDA claim desta mesma URL (a que concluía "logo o gate determinístico vale mais que prosa que aconselha, como no Onion") foi REFUTADA por fonte fraca na própria rodada: a inferência pró-Onion caiu, o fato ficou.'
+    valid_from: 2026-04
+    source_tier: 7
+    source_kind: analyst
+    label: 'Radar Vol 34 coloca "Agent instruction bloat" em CAUTION: arquivos de contexto (AGENTS.md, CLAUDE.md) acumulam instrução com o tempo e isso DEGRADA o comportamento do agente. Este achado é AUTO-INCRIMINAÇÃO, não aliado: medido hoje, o core tem 71.676 linhas de markdown rastreado em `.claude/` contra 48.944 de shell, e o índice de memória desta sessão estourou o teto com 19 linhas cortadas. Pesa CONTRA a tese que ele foi recrutado para sustentar.'
+    trace: 'https://www.thoughtworks.com/radar/techniques/agent-instruction-bloat'
+
+  - id: E_STAGE_PRECO_POR_ASSENTO_E_FORMULACAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'https://stagereview.app/ — votos 3-0 no preço, 2-1 na formulação do gargalo. FUSÃO DECLARADA: duas claims da mesma página (o preço e a formulação) viraram UM nó. A linha que dizia "~57 mil PRs revisados, sem receita nem clientes" foi CORTADA POR ORÇAMENTO nesta rodada — ou seja, o dado que separaria preço de tabela de receita real não foi pago.'
+    valid_from: 2026-04
+    source_tier: 6
+    source_kind: primary
+    label: 'Existe fornecedor pago no gargalo de revisão de PR de agente: o Stage cobra US$30/usuário/mês no plano Team (repos privados), Enterprise sob consulta (SSO, RBAC, auditoria), grátis em repo público — e formula o gargalo exatamente como a tese: a IA escreve mais rápido do que as equipes revisam. A SOLUÇÃO PAGA, PORÉM, É NARRATIVA (capítulos temáticos com intenção, dependências e diffs relevantes) — o inverso do ativo do Onion, que é reprovação determinística sem LLM. Duas ressalvas estruturais: preço de tabela não é receita, e a unidade é ASSENTO num RECEPTOR HOSPEDADO que lê PRs, indisponível a um template em `.claude/`. Valida o GARGALO; refuta a PEÇA.'
+    trace: 'https://stagereview.app/'
+
+  - id: E_CANAL_OFICIAL_SEM_TRILHO_DE_COBRANCA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.75
+    verified_at: 2026-10-01
+    verified_against: 'https://github.com/anthropics/claude-plugins-community — votos 3-0; declaração de AUSÊNCIA verificada na página (nenhum mecanismo de cobrança, preço, taxa, canal de pagamento, receita ou adoção por plugin)'
+    source_tier: 6
+    source_kind: primary
+    label: 'O canal OFICIAL de distribuição de plugins não documenta mecanismo de cobrança, preço, taxa, canal de pagamento, receita nem adoção por plugin. Este é o NEGATIVO DECISIVO do eixo 4 e foi sub-usado na síntese: sem trilho de pagamento no canal oficial, "acoplamento que gera receita AGORA via plugin/marketplace" não tem rail em outubro de 2026. Listá-lo ao lado da taxa de 30% de um marketplace de terceiro produz a leitura falsa de que existe caminho de cobrança por plugin — não existe no canal oficial.'
+    trace: 'https://github.com/anthropics/claude-plugins-community'
+
+  - id: E_TRACE_OCUPA_POS_SEM_PRECO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: 2026-10-01
+    verified_against: 'https://github.com/agentrust-io/trace-spec — votos 2-1 em ambas as claims. FUSÃO DECLARADA: a ocupação da posição e o limite técnico vieram como dois achados da mesma fonte e viraram UM nó.'
+    source_tier: 6
+    source_kind: primary
+    label: 'TRACE (agentrust-io/trace-spec) ocupa a posição PÓS (atestação/auditoria/evidência) com registro de evidência assinado sobre execuções de agente — e prova AUTORIA e INTEGRIDADE do registro por assinatura criptográfica, mas NÃO o "com base em quê" o agente decidiu (proveniência de hardware só na v0.3). É SPEC em GitHub, sem preço, sem adoção declarada e sem comprador. Spec sem comprador não é concorrente de receita, é candidata a PADRÃO — e padrão nessa camada COMMODITIZA a posição. Nos dois ramos o nó deixa de sustentar "posição remunerada": se TRACE vence, PÓS vira plumbing grátis; se perde, não é sinal de mercado nenhum. A lacuna que ele deixa aberta ("com base em quê") é exatamente onde o grafo bi-temporal do Onion tem superfície.'
+    trace: 'https://github.com/agentrust-io/trace-spec'
+
+  - id: E_AGENT_SIGN_PROVENIENCIA_GRATIS_SIGSTORE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: 2026-10-01
+    verified_against: 'https://github.com/nolabs-ai/agent-sign — votos 2-1 em ambas as claims, fundidas num nó: a GitHub Action e o formato do bundle são a mesma observação'
+    source_tier: 5
+    source_kind: primary
+    label: 'agent-sign é GitHub Action GRATUITA (Apache-2.0) que assina arquivos de instrução de agente (SKILLS.md, CLAUDE.md) com atestação keyless Sigstore, produzindo bundle com envelope DSSE, statement in-toto e certificado Fulcio — ou seja, REAPROVEITA o padrão de proveniência da onda CI/CD para artefatos de agente. É o ACHADO MAIS FORTE do eixo 5 (precedente histórico) e, ao mesmo tempo, a notícia pior para a opção PÓS: a camada que o precedente diz que fica escassa está nascendo GRÁTIS e sobre padrão aberto, exatamente como SLSA/SBOM nasceram. Quem chegou primeiro aqui foi o padrão, não um fornecedor.'
+    trace: 'https://github.com/nolabs-ai/agent-sign'
+
+  - id: E_WATCHFLOW_GATE_NO_MERGE_OSS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'https://github.com/warestack/watchflow — votos 3-0 na posição. ⚠️ A claim IRMÃ, sobre o modelo de receita (open-core MIT com upsell enterprise via Warestack, 87 stars e 26 forks, sem receita nem clientes), caiu no lado REFUTADO por fonte fraca na mesma rodada.'
+    source_tier: 5
+    source_kind: primary
+    label: 'Watchflow é camada de governança no merge gate do GitHub (posição DURANTE): avalia PRs contra regras YAML (CODEOWNERS, aprovações, padrões de diff, commits assinados) e publica violações como check runs e comentários de PR. É concorrente direto da posição DURANTE, em open source — terceiro par grátis a ocupar a posição que a opção C quer vender.'
+    trace: 'https://github.com/warestack/watchflow'
+
+  - id: E_AGENTPLANE_DURANTE_E_POS_SEM_RECEITA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: 2026-10-01
+    verified_against: 'https://github.com/agentplane/agentplane — votos 3-0; a URL agentplane/agentplane dá 404 e o projeto vive hoje em basilisk-labs/agentplane. ⚠️ A claim irmã (ausência de monetização, MIT, sem preço na página) caiu no lado REFUTADO por fonte fraca.'
+    valid_from: 2026-01-27
+    source_tier: 5
+    source_kind: primary
+    label: 'agentplane (hoje em basilisk-labs/agentplane) ocupa DURANTE e PÓS ao mesmo tempo: impõe política e autoridade e mantém evidência revisável do que o agente fez. É o concorrente mais próximo das opções B e C juntas — e existe só como CLI open source, sem receita. Mais um par que ocupa a posição de graça; e a mudança de owner com 404 na URL antiga é sinal de projeto em movimento, não de categoria estabelecida.'
+    trace: 'https://github.com/agentplane/agentplane'
+
+  - id: E_PLUGIN_SEM_METRICA_DE_MONETIZACAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: 2026-10-01
+    verified_against: 'https://github.com/wshobson/agents — votos 3-0; declaração de AUSÊNCIA (nenhuma métrica de instalação, receita, preço ou taxa divulgada)'
+    source_tier: 4
+    source_kind: primary
+    label: 'O repositório de agentes com maior adoção aparente por stars/forks não divulga NENHUMA métrica de instalação, receita, preço ou taxa de marketplace. Tração social não prova monetização de plugin/skill: é o segundo negativo do eixo 4, do lado da comunidade (o primeiro é o canal oficial sem trilho).'
+    trace: 'https://github.com/wshobson/agents'
+
+  - id: E_BERNSTEIN_GOVERNANCA_OSS_SEM_RECEITA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: 2026-10-01
+    verified_against: 'https://github.com/sipyourdrink-ltd/bernstein — votos 3-0. ⚠️ A claim irmã, que descrevia a MAQUINARIA (replay journal, log encadeado por HMAC, recibos Ed25519 — o análogo mais próximo do ativo do Onion), caiu no lado REFUTADO por fonte fraca: ficou a ausência de receita e perdeu-se a descrição técnica do par.'
+    source_tier: 4
+    source_kind: primary
+    label: 'Sem monetização evidente: Apache-2.0, apenas GitHub Sponsors, nenhum SKU premium, API hospedada marcada como ainda indisponível. A camada de governança/atestação open source NÃO tem receita demonstrada nesta fonte — quarto par grátis nas posições DURANTE/PÓS. O padrão que se repete em QUATRO fontes independentes (Vectimus, Watchflow, agentplane, Bernstein) é mais forte que qualquer uma delas: as posições DURANTE e PÓS estão sendo preenchidas por open source sem receita.'
+    trace: 'https://github.com/sipyourdrink-ltd/bernstein'
+
+  - id: E_HALOFY_OCUPA_POSICAO_META
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: 2026-10-01
+    verified_against: 'https://github.com/halofyai/halofy — votos 2-1; ⚠️ source_kind vendor-on-competitor, SEMPRE SUSPEITO pela cláusula 7: é o próprio projeto descrevendo a categoria que ele quer ocupar. A claim irmã (dual-track AGPL-3.0 com serviço gerenciado pago) caiu no lado REFUTADO.'
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'Halofy se posiciona como camada ABERTA de acesso e governança entre conhecimento organizacional e agentes de IA (identidade, política, proveniência, auditoria) — posição META/transversal, a mesma da opção D, com o argumento de evitar que cada agente vire silo próprio de identidade, política e auditoria. Confiança baixa por desenho: fonte é o próprio interessado. O que o nó estabelece é que a posição META JÁ TEM pretendente aberto, não que ela remunere.'
+    trace: 'https://github.com/halofyai/halofy'
+
+  - id: E_AGENSI_TAXA_DE_CANAL_30_PORCENTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.45
+    verified_at: 2026-10-01
+    verified_against: 'https://agensi.io — votos 2-1. ⚠️ A claim irmã, com os números de catálogo (7.500+ skills, 550+ criadores, 7.500+ usuários, distribuição em Claude Code/Cursor/Codex/Copilot e endpoint MCP), caiu no lado REFUTADO por fonte fraca — então a taxa sobrevive SEM o volume que diria se ela move dinheiro.'
+    source_tier: 4
+    source_kind: primary
+    label: 'Marketplace de TERCEIRO (Agensi) cobra taxa fixa de 30% por venda de skill, repassando 70% ao criador, sem taxa por transação. É a ÚNICA taxa e canal de pagamento encontrados no eixo 4 em toda a rodada — e vem em tier 4, sem volume de vendas nem receita divulgada, num marketplace que não é o oficial. Resposta honesta ao eixo 4: existe UM rail, de terceiro, com taxa conhecida e tração desconhecida.'
+    trace: 'https://agensi.io'
+
+  # ═══════════════════ MERCADO / CAPITAL (eixo invariante) ═══════════════════
+
+  - id: E_MERCADO_ONDA_DERIVADA_1001
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'síntese do eixo mercado/capital desta rodada contra o corpus das rodadas irmãs do mesmo dia; sem rodada de investimento NOVA encontrada nesta passada'
+    valid_from: 2026-04
+    source_tier: 7
+    source_kind: analyst
+    label: 'MERCADO/CAPITAL desta rodada, com o negativo na frente. SINAL DE ANALISTA — forte e datado: Radar Vol 34 (abril/2026) com três posições relevantes, "feedback sensors for coding agents" em Trial, "Claude Code plugin marketplace" e "Agent Skills" em Trial, "agent instruction bloat" em Caution; em NENHUMA das três o Radar cita fornecedor pago. SINAL DE PREÇO — um só: Stage, US$30/usuário/mês no Team, Enterprise sob consulta, grátis em repo público; mais a taxa de canal de 30% do Agensi (tier 4, sem volume). SINAL DE CAPITAL — ZERO NOVO nesta passada: nenhuma rodada, M&A, parceria ou down round foi medida aqui; o único capital do tema vem do corpus (Neo US$100M, Geordie US$30M, Hush US$30M — governança de agente, categoria ADJACENTE, não o gargalo derivado). CONCLUSÃO: o gargalo derivado tem validação de ANALISTA e um preço de ASSENTO; não tem capital próprio medido. Analista sem capital é categoria em formação, e é exatamente aí que o anti-padrão do eixo 6 mora — eixo que esta rodada não conseguiu pagar.'
+    trace: 'https://www.thoughtworks.com/radar'
+
+  # ═══════════════════ LACUNAS (cláusula 8: lacuna vira nó, e não arredonda) ═══════════════════
+
+  - id: E_LACUNAS_ONDA_DERIVADA_1001
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-01
+    verified_against: 'contabilidade EXATA do retorno desta rodada, conferida item a item contra a lista entregue — nenhum número arredondado para baixo'
+    valid_from: 2026-10-01
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'LACUNAS, com os números EXATOS. (1) CONFIRMADAS: 19 claims, fundidas em 15 nós por quatro pares redundantes (Radar/sensores, Stage, TRACE, agent-sign) — a fusão é correção da dupla contagem denunciada pela objeção F4. (2) REFUTADAS POR FONTE FRACA: 17, e a composição é o achado — TRÊS delas são tier 9, as fontes MAIS AUTORITATIVAS que a rodada tocou (Copilot AI Controls; audit log de agente do Copilot; allowedProviders + disableBypassPermissionsMode do Claude Code), e são precisamente as que diriam se a plataforma já ocupou DURANTE e PÓS. Uma rodada que descarta seus tier 9 e sela com tier 4-6 decidiu pela fonte fraca. (3) NÃO VERIFICADAS: 0 — nenhum 403, nenhuma doc truncada. (4) CORTADAS POR ORÇAMENTO: 16 fontes e 64 claims, e duas dessas perdas são decisivas — os ~57 mil PRs do Stage (o dado que separaria preço de tabela de receita) e o packaging de quem levantou capital. (5) EIXO 6 (ANTI-PADRÃO) TEM ZERO EVIDÊNCIA CONFIRMADA: as duas claims do Flowise (sunset 2026-07-29, arquivamento 2026-08-10, EOL 2026-08-31, causa declarada = deslocamento por agentes de código) caíram no lado refutado em tier 8. (6) EIXO 3 (quem já paga e o upsell) tem UM nó, e ele responde ABSORÇÃO, não upsell. (7) EIXO 1 não tem resposta para a posição PRÉ-geração: nenhuma fonte desta rodada mediu triagem/planejamento/roteamento. (8) QUATRO FONTES QUE DECIDEM FICARAM SEM LEITURA: permit.io/mcp-gateway, toolbooth, Brain0 e github.blog default model enablement. (9) OBJEÇÕES DO ELENXO: 11 entregues, 11 modeladas — a 11a chegou TRUNCADA no repasse e está modelada COMO TRUNCADA, não como objeção completa.'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  # ═══════════════════ A DECISÃO (OPEN — o maestro sela; esta sessão NUNCA) ═══════════════════
+
+  - id: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.4
+    label: 'DECISÃO ABERTA (o maestro sela; esta sessão NUNCA sela). Em qual gargalo DERIVADO o Onion é a peça mais próxima de pronto, qual acoplamento gera receita com o MENOR caminho até o primeiro pagamento, e de qual posição ele deve FICAR LONGE porque a plataforma vai absorver? ═══ FORMULÁRIO DE ESCOLHA — UMA MARCAÇÃO POR LINHA (o pedido literal do maestro nesta rodada foi "coloque sugestões e recomendações em um formulário para eu escolher"; o formulário completo e imprimível está no bloco de comentários do `meta:` deste arquivo) ═══ BLOCO 1, O MOVIMENTO: [ ] A) ACOPLAR AO QUE JÁ SE PAGA — condução + gate instalado como camada sobre o contrato de Claude Code/Copilot que o cliente já assina, cobrado por engajamento/entrega · [ ] B) PÓS, PROVA/ATESTAÇÃO — o registro verificável do que o agente fez e com base em quê · [🚫] C) DURANTE, GATE/POLÍTICA — veredito reprovador determinístico (VETO DURO DO REFUTADOR) · [ ] D) META, Company Brain / grafo ancorado como serviço · [ ] E) B+D NO FORMATO GURU — conhecimento verificado com condução humana embutida, preço fechado, sem assento e sem byte · [ ] F) NENHUMA AGORA, só válida com gatilho, data e orçamento NOMEADOS nas três lacunas · [★] G) RE-MEDIR ANTES DE ESCOLHER. BLOCO 2, A ORDEM: [ ] aceito G agora → A depois, veto em C mantido · [ ] recuso e sigo direto para a linha do bloco 1. BLOCO 3, AS 4 FONTES DO G: [ ] permit.io/mcp-gateway · [ ] toolbooth · [ ] Brain0 · [ ] github.blog default model enablement. BLOCO 4, AS 3 REFUTAÇÕES TIER 9 A REABRIR: [ ] Copilot AI Controls · [ ] Copilot audit log de agente · [ ] allowedProviders + disableBypassPermissionsMode. BLOCO 5, O VETO: [ ] selo o veto em C · [ ] não selo antes de ver os tier 9. ═══ RECOMENDAÇÃO DO REFUTADOR: G ANTES, DEPOIS A — com veto duro em C ═══ TRÊS RAZÕES MEDIDAS: (1) a rodada REFUTOU seus três tier 9 e selou com tier 4-6; as três refutadas são exatamente as que diriam se a plataforma já ocupou DURANTE e PÓS, e duas das quatro fontes não lidas (permit.io/mcp-gateway e toolbooth) são as ÚNICAS endereçadas a TRILHO DE COBRANÇA, enquanto o eixo 4 foi concluído sem abrir nenhuma delas; (2) o veto em C não é opinião, é contagem — QUATRO pares independentes ocupam a posição DURANTE de graça (Vectimus Apache-2.0, Watchflow MIT, agentplane MIT, Optio MIT), o Radar põe a técnica em Trial (que manda CONSTRUIR, não comprar) e a plataforma absorveu custo/roteamento DUAS VEZES em cinco dias; (3) A é o menor caminho porque o canal já está construído e PAGO (5 plugins materializados, 5 entradas no marketplace, /meta:adopt provado por execução em 8+ adotantes) — mas A só é honesta se o maestro aceitar que o gargalo nunca foi o canal e sim o COMPRADOR, porque esse mesmo canal já rendeu zero pagamento. ⚠️ A recomendação é afirmação de UM agente sem votação: confiança rebaixada. E ela NÃO autoriza selo — nenhuma linha deste formulário está marcada por esta sessão.'
+    verified_at: 2026-10-01
+    verified_against: 'NÃO SELADA. Esta sessão nunca sela: status open, aguardando o maestro marcar as linhas do formulário. A recomendação do Elenxo é afirmação de UM agente sem votação adversarial — confiança rebaixada pela cláusula de dissent; as marcas [🚫] e [★] são a recomendação, não a escolha.'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  # ═══════════════════ AS OPÇÕES (uma claim por linha do formulário) ═══════════════════
+
+  - id: C_OPCAO_A_ACOPLAR_AO_QUE_JA_SE_PAGA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.45
+    label: 'OPÇÃO A — ACOPLAR AO QUE JÁ SE PAGA: vender condução + gate INSTALADO como camada sobre o contrato de Claude Code/Copilot que o cliente já assina (plugin materializado + /meta:adopt executado + relatório downstream), cobrado por engajamento/entrega. A FAVOR, e é o argumento mais forte do grafo: o orçamento JÁ EXISTE e já tem dono, logo não há categoria a criar; o movimento é upsell de contrato vivo, não venda nova; o canal está construído e provado (5 plugins materializados, 5 entradas no marketplace.json, /meta:adopt faseado com never-clobber e gate PROVADO POR EXECUÇÃO em 8+ adotantes reais); e nada aqui exige receptor hospedado, o que a identidade de framework template em `.claude/` proíbe. CONTRA: (a) a receita é de SERVIÇO, cobrada por engajamento — não escala e não é unidade bilhetável, é bootstrap; (b) o canal já rendeu ZERO pagamento, medido hoje, então "canal pronto" não é "caminho curto": o gargalo é o COMPRADOR; (c) o canal oficial não tem trilho de cobrança e o único rail achado é de terceiro (Agensi, 30%, sem volume); (d) a taxa de absorção da plataforma (duas em cinco dias) atinge qualquer coisa adjacente à CLI, inclusive a camada que A instala. Restringida por E_OBJECAO_F3_CANAL_NAO_E_TRILHO, E_OBJECAO_F9_NEGATIVO_DECISIVO_REBAIXADO e E_OBJECAO_F1_ABSORCAO_E_UMA_TAXA.'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  - id: C_OPCAO_B_POS_PROVA_E_ATESTACAO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.35
+    label: 'OPÇÃO B — PÓS, PROVA/ATESTAÇÃO: vender o registro verificável do que o agente fez e com base em quê (tier de fonte, verified_at, radar determinístico sem LLM). A FAVOR: é a posição que o PRECEDENTE HISTÓRICO indica — na onda do CI/CD o que ficou escasso depois foi artefato e proveniência (SLSA, assinatura, SBOM) — e o Onion tem a metade que ninguém mais tem, o "com base em quê" (grafo bi-temporal com valid_from × verified_at, tier 1-10 e Aufhebung por SUPERSEDES/REFUTES), exatamente a lacuna que o TRACE declara não cobrir antes da v0.3. CONTRA, e é o mesmo precedente virado do avesso: proveniência na onda anterior virou INFRAESTRUTURA GRÁTIS sobre padrão aberto, e está acontecendo de novo na frente do grafo — agent-sign já entrega bundle Sigstore/DSSE/in-toto de graça para arquivos de instrução de agente, e TRACE é spec sem comprador, que se vencer commoditiza a posição. Nenhum fornecedor PAGO foi medido nesta posição em toda a rodada. Restringida por E_OBJECAO_F10_SPEC_SEM_COMPRADOR_COMMODITIZA e pela refutação tier 9 do audit log de agente do Copilot, que caiu sem ser pesada.'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  - id: C_OPCAO_C_DURANTE_GATE_E_POLITICA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.15
+    label: 'OPÇÃO C — DURANTE, GATE/POLÍTICA: vender o veredito reprovador determinístico (exit 2 de hook, 91 regras, catracas por baseline). 🚫 VETO DURO DO REFUTADOR, e o veto é por CONTAGEM, não por gosto. A FAVOR, honestamente: é o ativo mais fiel do que o Onion já faz e o único que REPROVA; e o Radar Vol 34 valida a técnica. CONTRA, em quatro paredes: (1) Trial num radar de TÉCNICA recomenda CONSTRUIR com o que já se tem — é resultado negativo para comprar, e o próprio achado não cita UM fornecedor pago; (2) QUATRO pares independentes já ocupam a posição DE GRAÇA (Vectimus Apache-2.0, Watchflow MIT, agentplane MIT, Optio MIT) e nenhum tem receita; (3) o `exit 2` é primitivo NATIVO e gratuito da plataforma, e a plataforma absorveu custo/roteamento duas vezes em cinco dias — a taxa aponta para cá; (4) o corpus já mediu que ninguém cobra pelo veredito reprovador com prova, e que os produtos comerciais de motor de política do precedente mais próximo (Styra) foram DOADOS à CNCF. Restringida por E_OBJECAO_F2_TRIAL_SEM_FORNECEDOR_E_NEGATIVO, E_OBJECAO_F4_DUPLA_CONTAGEM_DOS_SENSORES e E_OBJECAO_F1_ABSORCAO_E_UMA_TAXA. NÃO está `refuted`: as três refutações tier 9 que a decidiriam foram descartadas sem leitura, e matar a opção com tier 4-6 repetiria o erro da rodada.'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  - id: C_OPCAO_D_META_COMPANY_BRAIN_COMO_SERVICO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.35
+    label: 'OPÇÃO D — META, Company Brain / grafo ancorado como serviço. A FAVOR: é o norte declarado da casa (NS1, conhecimento) e o moat declarado (mecanismo verificável, não memória); é a única posição que a plataforma NÃO absorveu em nenhum release medido; e o gargalo "conhecimento que não evapora entre sessões" é um dos seis que a pergunta nomeia. CONTRA, e dói: (a) a posição META já tem pretendente ABERTO (Halofy, identidade+política+proveniência+auditoria sobre conhecimento organizacional) e a fonte é vendor-on-competitor, logo suspeita mas não descartável; (b) o corpus já mediu que gestão de corpus de regras NÃO é categoria que capital persegue — "ninguém vende saber quais das suas 91 regras estão vivas"; (c) o CAUTION de instruction bloat incrimina o próprio ativo: 71.676 linhas de markdown contra 48.944 de shell, medido hoje, e o índice de memória desta sessão estourou o teto com 19 linhas cortadas — vender "o corpus que decide" é vender o item que o anel manda vigiar. Restringida por E_OBJECAO_F6_BLOAT_E_AUTO_INCRIMINACAO.'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  - id: C_OPCAO_E_B_MAIS_D_NO_FORMATO_GURU
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.4
+    label: 'OPÇÃO E — (B+D) NO FORMATO GURU: conhecimento verificado com condução humana embutida, preço fechado por contrato, sem assento e sem byte. A FAVOR, e é o argumento estrutural mais limpo do grafo: TODO preço publicado medido nesta rodada e nas irmãs cobra ASSENTO ou EVENTO num RECEPTOR HOSPEDADO — Stage por usuário/mês, AgentCore por requisição, agent-custody por append — e um template em `.claude/` não tem receptor; preço fechado por contrato é a única forma de cobrar que NÃO exige o receptor que a identidade proíbe, e carrega a condução, que é onde o Onion tem provas de execução (8+ adotantes, /meta:adopt provado). CONTRA: (a) é serviço com teto humano, não unidade que escala; (b) contrato fechado esconde a unidade em vez de resolvê-la, e a pergunta volta no segundo cliente; (c) não há UM comparável medido nesta rodada — zero evidência externa de alguém vendendo conhecimento verificado com condução embutida a preço fechado; a opção está no formulário por COERÊNCIA estrutural, não por evidência, e isso precisa ficar dito. Restringida por E_OBJECAO_F7_PRECO_DE_TABELA_NAO_E_RECEITA.'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  - id: C_OPCAO_F_NENHUMA_AGORA_COM_GATILHO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: 'OPÇÃO F — NENHUMA AGORA, e só vale com GATILHO, DATA e ORÇAMENTO nomeados (sem os três é adiamento com outro nome). A FAVOR: o grafo tem dois eixos sem evidência confirmada (6, anti-padrão; e 1 na posição PRÉ-geração) e um eixo respondendo outra pergunta (3); escolher com esse buraco é selar por ausência de dado. CONTRA: F não precisa existir como opção separada, porque G JÁ É a forma honesta dela — G é "nenhuma agora" COM o gatilho, a data e o escopo já nomeados (4 fontes + 3 refutações tier 9, teto de uma rodada curta). F sem os três campos preenchidos é a opção que o próprio enunciado proíbe; F com os três campos preenchidos é G com outro nome. Se o maestro marcar F, as três lacunas do formulário (gatilho, data, orçamento) são obrigatórias.'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  - id: C_OPCAO_G_RE_MEDIR_ANTES_DE_ESCOLHER
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: 'OPÇÃO G — RE-MEDIR ANTES DE ESCOLHER: abrir as 4 fontes que decidem (permit.io/mcp-gateway, toolbooth, Brain0, github.blog default model enablement) e reabrir as 3 refutações tier 9 (Copilot AI Controls, audit log de agente do Copilot, allowedProviders + disableBypassPermissionsMode), e só então selar entre A-F. ★ RECOMENDADA COMO PRIMEIRO MOVIMENTO, com teto de UMA rodada curta. A FAVOR, e é aritmética, não prudência: a rodada descartou seus TRÊS tier 9 e selou com tier 4-6; permit.io/mcp-gateway e toolbooth são as ÚNICAS fontes endereçadas a TRILHO DE COBRANÇA e o eixo 4 foi concluído sem abrir nenhuma; e Brain0 é o concorrente mais próximo da tese INTEIRA (grafo de decisão commit↔intenção + gate pré-commit) — se Brain0 já existe e vende, a conversa muda de opção, não de argumento. CONTRA, e é o risco real: G é a opção que SEMPRE parece certa, e re-medir sem teto é a forma educada de nunca escolher. Por isso o teto de uma rodada e a data no formulário são parte da opção, não enfeite. Restringida por E_OBJECAO_G_QUATRO_FONTES_SEM_LEITURA.'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  # ═══════════════════ OBJEÇÕES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ═══════
+  # 11 sobreviventes entregues, 11 modeladas — a 11a chegou TRUNCADA no repasse e está modelada
+  # COMO TRUNCADA. Confiança <= 0.6 em TODAS: afirmação de UM agente, sem votação adversarial.
+  # Fonte primária que o Elenxo CITA sem ter sido lida nesta rodada entra no label como
+  # "primário citado, não lido" — nunca como tier alto confirmado.
+
+  - id: E_OBJECAO_F1_ABSORCAO_E_UMA_TAXA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'achado F1 (changelog 2.1.284 de 2026-09-28 e 2.1.281 de 2026-09-23, tier 9) relido como SÉRIE e não como ponto: duas absorções em cinco dias de calendário na mesma linha de release'
+    source_tier: 9
+    source_kind: internal-audit
+    label: 'OBJEÇÃO F1 (Elenxo, 1 agente sem votação) — o achado foi arquivado como FATO PONTUAL quando é uma TAXA. Duas absorções em cinco dias na mesma linha de release; lida como taxa, não refuta só "custo/roteamento": refuta qualquer posição ADJACENTE À CLI, inclusive as que a recomendação quer ocupar (gate, auditoria). E mede o erro de escopo OPOSTO, que a objeção também declara: limite de gasto em /usage é por máquina/usuário, não atribuição por time/repo, logo o achado NÃO cobre chargeback organizacional e não serve para declarar a posição INTEIRA morta. Fica de pé nas duas pontas: generaliza de menos onde importa e de mais onde conforta.'
+    trace: 'https://code.claude.com/docs/en/changelog'
+
+  - id: E_OBJECAO_F2_TRIAL_SEM_FORNECEDOR_E_NEGATIVO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'achado F2 (Radar Vol 34, Trial, tier 8) contra a natureza do anel Trial num radar de TÉCNICA, e contra a confirmação já medida no corpus (Vectimus Apache-2.0 grátis, Sondera sem preço publicado)'
+    source_tier: 8
+    source_kind: internal-audit
+    label: 'OBJEÇÃO F2 (Elenxo, 1 agente sem votação) — "validação de analista sem fornecedor pago" NÃO é meio-caminho para receita: é o RESULTADO NEGATIVO. O Radar é radar de TÉCNICA; pôr em Trial recomenda que o cliente CONSTRUA com o que já tem (compilador, linter, suíte), não que compre. O corpus já mediu a confirmação: Vectimus é Apache-2.0 grátis e Sondera não publica preço. Logo F2, lido corretamente, é evidência CONTRA monetizar o gate — e foi arquivado como se fosse evidência A FAVOR da posição DURANTE.'
+    trace: 'https://www.thoughtworks.com/radar'
+
+  - id: E_OBJECAO_F3_CANAL_NAO_E_TRILHO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'achado F3 (plugin marketplace e Agent Skills em Trial, tier 8, com zero dado de monetização) contra a medição local de 2026-10-01: `plugins/` com 5 plugins materializados e `plugins[]` do marketplace.json com 5 entradas, e zero pagamento registrado'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OBJEÇÃO F3 (Elenxo, 1 agente sem votação) — o próprio achado admite ZERO taxa, preço ou receita: canal NÃO é trilho de cobrança. E a medição local derruba o valor prático: o canal JÁ ESTÁ CONSTRUÍDO nesta casa e rendeu zero pagamento. Portanto "distribuição validada por analista" não encurta nenhum caminho até o primeiro pagamento — o gargalo nunca foi o canal, é o COMPRADOR. CORREÇÃO DE NÚMERO desta sessão, porque refutador também se re-mede: a objeção (e o enunciado da rodada) falam de "12 entradas" no `.claude-plugin/marketplace.json`; medido aqui, `plugins[]` tem CINCO — 12 é a contagem de chaves `name` incluindo `owner` e `metadata` aninhados. A direção da objeção não muda, e fica mais forte: o canal é menor do que se declarava.'
+    trace: '.claude-plugin/marketplace.json'
+
+  - id: E_OBJECAO_F4_DUPLA_CONTAGEM_DOS_SENSORES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'achados F2 e F4 comparados: a MESMA URL do Radar e o MESMO anel (Trial) entregues como dois achados independentes — e a fusão foi APLICADA nesta sessão (E_RADAR_SENSORES_DETERMINISTICOS_EM_TRIAL é um nó, não dois)'
+    source_tier: 8
+    source_kind: internal-audit
+    label: 'OBJEÇÃO F4 (Elenxo, 1 agente sem votação) — é a MESMA URL e o MESMO anel do F2 contados DUAS VEZES, e dois achados "independentes" no mesmo eixo inflam artificialmente o peso da posição DURANTE na síntese. A objeção foi ACATADA neste grafo: os dois achados viraram um nó só. Além disso os sensores nomeados (compilador, linter, testes) são ferramentas que o cliente JÁ POSSUI — a contribuição do Onion é a COSTURA, que se vende por engajamento/hora e não como SKU. De pé nas duas metades: dupla contagem, e a parte vendável não é o sensor.'
+    trace: 'https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents'
+
+  - id: E_OBJECAO_F5_GARGALO_REAL_PECA_ERRADA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'achado F5 (carga de revisão humana, tier 7) lido literalmente contra o achado F7/F8 da MESMA rodada (Stage): o único fornecedor pago medido no gargalo vende COMPREENSÃO de PR, superfície que o core não tem'
+    source_tier: 7
+    source_kind: internal-audit
+    label: 'OBJEÇÃO F5 (Elenxo, 1 agente sem votação) — a frase citada diz que AGENTES precisam de loops de feedback acessíveis, NÃO que HUMANOS pagam para reduzir carga de revisão. E o único fornecedor pago medido nesse gargalo (Stage) vende COMPREENSÃO de PR — capítulos temáticos, intenção, dependências — superfície que o Onion não tem: o core não lê PR, não comenta PR e não tem receptor hospedado. O achado nomeia um gargalo real e, no mesmo movimento, mostra que a peça que o atende não é a do Onion.'
+    trace: 'https://www.thoughtworks.com/radar/techniques/feedback-sensors-for-coding-agents'
+
+  - id: E_OBJECAO_F6_BLOAT_E_AUTO_INCRIMINACAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'achado F6 (agent instruction bloat em Caution, tier 7) contra a medição local de 2026-10-01: 71.676 linhas de markdown rastreado em `.claude/` contra 48.944 de shell, e o aviso de teto da carga desta sessão (MEMORY.md 27,6KB contra limite 24,4KB, 19 de 142 linhas cortadas). O Elenxo declarou 73.904 e 49.148 — números que não reproduzem com o filtro de arquivos rastreados; a direção não muda.'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OBJEÇÃO F6 (Elenxo, 1 agente sem votação) — este achado é AUTO-INCRIMINAÇÃO, não aliado. Se bloat de instrução degrada comportamento de agente, o Onion é o caso-exemplo do Caution, e vender "o corpus que decide" contraria o anel. A prova é desta casa e desta sessão: a metade que ACONSELHA é ~1,46× a que REPROVA, e o índice de memória estourou o teto com 19 linhas CORTADAS na carga — o defeito não é hipótese, aconteceu aqui hoje. De pé: o achado pesa contra a tese que ele foi recrutado para sustentar.'
+    trace: '.claude/'
+
+  - id: E_OBJECAO_F7_PRECO_DE_TABELA_NAO_E_RECEITA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'achado F7 (Stage US$30/usuário/mês, tier 6) contra a própria contabilidade da rodada: a linha dos ~57 mil PRs revisados, sem receita nem clientes, foi CORTADA POR ORÇAMENTO — e é exatamente o dado que separaria preço de tabela de receita'
+    source_tier: 6
+    source_kind: internal-audit
+    label: 'OBJEÇÃO F7 (Elenxo, 1 agente sem votação) — preço de tabela NÃO é receita, e a própria rodada cortou por orçamento a linha que diria a diferença. Pior para a tese: a unidade é ASSENTO num RECEPTOR HOSPEDADO que lê PRs, estruturalmente indisponível a um template em `.claude/` — conclusão já selada na rodada irmã (todo preço publicado cobra num receptor hospedado). O achado prova que a VIZINHANÇA paga por compreensão de PR, não que alguém pague por veredito reprovador com prova.'
+    trace: 'https://stagereview.app/'
+
+  - id: E_OBJECAO_F8_NARRATIVA_E_O_INVERSO_DO_ATIVO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'achado F8 (Stage estrutura o PR em capítulos temáticos, tier 6) comparado ao ativo declarado do Onion (reprovação determinística sem LLM, 5.282 linhas de shell com severidade derivada do corpo da guarda)'
+    source_tier: 6
+    source_kind: internal-audit
+    label: 'OBJEÇÃO F8 (Elenxo, 1 agente sem votação) — a solução paga é NARRATIVA (capítulos, intenção, dependências): o inverso exato do ativo do Onion, que é reprovação determinística SEM LLM. O único fornecedor com preço no gargalo derivado valida uma capacidade que o Onion não tem, e cuja curva de custo (LLM por PR) é oposta à do gate (shell em CI). Usar F8 como validação da tese é trocar o sujeito: valida o GARGALO, refuta a PEÇA.'
+    trace: 'https://stagereview.app/'
+
+  - id: E_OBJECAO_F9_NEGATIVO_DECISIVO_REBAIXADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'achado F9 (canal oficial sem cobrança, preço, taxa ou canal de pagamento, tier 6) contra o lugar que a síntese lhe deu: nota de rodapé ao lado da taxa de 30% de um marketplace de TERCEIRO (Agensi, tier 4, sem volume de vendas)'
+    source_tier: 6
+    source_kind: internal-audit
+    label: 'OBJEÇÃO F9 (Elenxo, 1 agente sem votação) — achado verdadeiro e SUB-USADO: sem trilho de pagamento no canal OFICIAL, o eixo 4 ("acoplamento que gera receita AGORA via plugin/marketplace") não tem rail em outubro de 2026. Deveria ter MATADO o eixo, não convivido com a taxa da Agensi. Listá-los lado a lado produz a leitura falsa de que existe caminho de cobrança por plugin. De pé: o negativo decisivo foi rebaixado a nota de rodapé.'
+    trace: 'https://github.com/anthropics/claude-plugins-community'
+
+  - id: E_OBJECAO_F10_SPEC_SEM_COMPRADOR_COMMODITIZA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'achado F10 (TRACE ocupa a posição PÓS, tier 6) contra o precedente do MESMO lote: agent-sign entrega atestação Sigstore/in-toto de graça, isto é, proveniência como infraestrutura gratuita — o padrão que a objeção prevê'
+    source_tier: 6
+    source_kind: internal-audit
+    label: 'OBJEÇÃO F10 (Elenxo, 1 agente sem votação) — é SPEC em GitHub sem preço, sem adoção declarada e sem comprador, e spec sem comprador não é concorrente de receita: é candidata a PADRÃO. Padrão nessa camada COMMODITIZA a posição, e o precedente está no mesmo lote (Sigstore/in-toto tornaram proveniência infraestrutura grátis). Logo o argumento é de dois ramos e nenhum serve: se TRACE vence, PÓS vira plumbing gratuito; se perde, não é sinal de mercado nenhum. Em nenhum dos dois sustenta "posição remunerada".'
+    trace: 'https://github.com/agentrust-io/trace-spec'
+
+  - id: E_OBJECAO_F11_TRUNCADA_NO_REPASSE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.3
+    verified_at: 2026-10-01
+    verified_against: 'o repasse desta sessão: a 11a objeção chega com o alvo "F11 — TRACE prova autoria" e o CORPO cortado no meio, emendado sem separador ao bloco de recomendação do refutador. O texto da objeção não existe aqui; declará-la completa seria inventar conteúdo.'
+    source_tier: 1
+    source_kind: internal-audit
+    label: 'OBJEÇÃO F11 (Elenxo, 1 agente sem votação) — CHEGOU TRUNCADA e está modelada COMO TRUNCADA. O alvo é legível ("TRACE prova autoria e integridade do registro, mas não o com-base-em-quê; proveniência de hardware só na v0.3"), o CORPO não: o repasse emendou o fim da objeção ao bloco de recomendação sem separador. O que se pode afirmar com o alvo é que ele converge com F10 e aponta a MESMA lacuna — e é justamente ali que o grafo bi-temporal do Onion tem superfície. Confiança 0,3 e tier 1 por desenho: afirmação de um agente, entregue incompleta. AÇÃO NOMEADA para a rodada G: recuperar o texto íntegro de F11 antes de pesar a opção B.'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  - id: E_OBJECAO_G_QUATRO_FONTES_SEM_LEITURA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-01
+    verified_against: 'o bloco de recomendação do refutador nesta rodada, lido contra a lista de fontes efetivamente abertas: permit.io/mcp-gateway, toolbooth, Brain0 e github.blog default model enablement NÃO aparecem em nenhuma claim, confirmada ou refutada. Todas são PRIMÁRIO CITADO, NÃO LIDO nesta rodada.'
+    source_tier: 6
+    source_kind: internal-audit
+    label: 'OBJEÇÃO QUE RESTRINGE A PRÓPRIA RECOMENDAÇÃO G (Elenxo, 1 agente sem votação) — quatro fontes que DECIDEM ficaram sem leitura, e duas delas (permit.io/mcp-gateway e toolbooth) são as ÚNICAS endereçadas a TRILHO DE COBRANÇA, com o eixo 4 concluído sem abrir nenhuma. Brain0 é o concorrente mais próximo da tese INTEIRA (grafo de decisão commit↔intenção + gate pré-commit) e github.blog default model enablement é a medida da taxa de absorção. ⚠️ Todas são PRIMÁRIO CITADO, NÃO LIDO — nenhuma entra aqui como tier alto confirmado, e o que Brain0 faz é descrição do refutador, não medição. Isto LIMITA G em duas direções: G é necessária porque as quatro faltam, e G é insuficiente se a rodada curta não abrir as quatro E reabrir as três refutações tier 9.'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+
+  - id: AR_SYNTHESIS_ONDA_DERIVADA_1001
+    node_type: artifact
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    verified_at: 2026-10-01
+    verified_against: 'arquivo conferido no disco; frontmatter com o contrato de custo (run_id wf_fcacd012-07e, 10.173.983 tokens, 148 agentes, 99 min) apontando kg: para este grafo'
+    label: 'SYNTHESIS.md desta rodada — PROJECAO deste grafo, nunca fonte paralela. Carrega o que o grafo nao formata: a RECONCILIACAO da pilha refutada (duas claims que, se confirmadas, teriam absorvido a posicao PO S e por isso sao as mais importantes da rodada), os NAO-VERIFICADOS (64 claims fora do repasse por teto de maxVerify, 16 URLs descartadas por orcamento) e valeu-a-pena (248 mil tokens por no contra 68-74 mil do historico: regressao de 3,4x declarada como ACHADO).'
+    trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/SYNTHESIS.md'
+
+
+edges:
+
+  # ── evidências sustentam a pergunta (20) ──
+  - from: E_MEDIDO_CANAL_DE_PLUGIN_JA_CONSTRUIDO_1001
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_BLOAT_DO_PROPRIO_CORE_1001
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_CORPUS_O_QUE_AS_RODADAS_DE_HOJE_JA_MEDIRAM
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_PLATAFORMA_ABSORVE_CUSTO_E_ROTEAMENTO
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_RADAR_SENSORES_DETERMINISTICOS_EM_TRIAL
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_RADAR_PLUGIN_E_SKILLS_EM_TRIAL
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_REVISAO_HUMANA_E_O_GARGALO_DECLARADO
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_INSTRUCTION_BLOAT_EM_CAUTION
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_STAGE_PRECO_POR_ASSENTO_E_FORMULACAO
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_CANAL_OFICIAL_SEM_TRILHO_DE_COBRANCA
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_TRACE_OCUPA_POS_SEM_PRECO
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_AGENT_SIGN_PROVENIENCIA_GRATIS_SIGSTORE
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_WATCHFLOW_GATE_NO_MERGE_OSS
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_AGENTPLANE_DURANTE_E_POS_SEM_RECEITA
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_PLUGIN_SEM_METRICA_DE_MONETIZACAO
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_BERNSTEIN_GOVERNANCA_OSS_SEM_RECEITA
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_HALOFY_OCUPA_POSICAO_META
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_AGENSI_TAXA_DE_CANAL_30_PORCENTO
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_MERCADO_ONDA_DERIVADA_1001
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_ONDA_DERIVADA_1001
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+
+  # ── a decisão responde a pergunta, e as 7 opções do formulário a compõem (8) ──
+  - from: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS
+  - from: C_OPCAO_A_ACOPLAR_AO_QUE_JA_SE_PAGA
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: SUPPORTS
+  - from: C_OPCAO_B_POS_PROVA_E_ATESTACAO
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: SUPPORTS
+  - from: C_OPCAO_C_DURANTE_GATE_E_POLITICA
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: SUPPORTS
+  - from: C_OPCAO_D_META_COMPANY_BRAIN_COMO_SERVICO
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: SUPPORTS
+  - from: C_OPCAO_E_B_MAIS_D_NO_FORMATO_GURU
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: SUPPORTS
+  - from: C_OPCAO_F_NENHUMA_AGORA_COM_GATILHO
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: SUPPORTS
+  - from: C_OPCAO_G_RE_MEDIR_ANTES_DE_ESCOLHER
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: SUPPORTS
+
+  # ── evidência que sustenta opções específicas (8) ──
+  - from: E_MEDIDO_CANAL_DE_PLUGIN_JA_CONSTRUIDO_1001
+    to: C_OPCAO_A_ACOPLAR_AO_QUE_JA_SE_PAGA
+    edge_type: SUPPORTS
+  - from: E_RADAR_PLUGIN_E_SKILLS_EM_TRIAL
+    to: C_OPCAO_A_ACOPLAR_AO_QUE_JA_SE_PAGA
+    edge_type: SUPPORTS
+  - from: E_TRACE_OCUPA_POS_SEM_PRECO
+    to: C_OPCAO_B_POS_PROVA_E_ATESTACAO
+    edge_type: SUPPORTS
+  - from: E_AGENT_SIGN_PROVENIENCIA_GRATIS_SIGSTORE
+    to: C_OPCAO_B_POS_PROVA_E_ATESTACAO
+    edge_type: SUPPORTS
+  - from: E_RADAR_SENSORES_DETERMINISTICOS_EM_TRIAL
+    to: C_OPCAO_C_DURANTE_GATE_E_POLITICA
+    edge_type: SUPPORTS
+  - from: E_HALOFY_OCUPA_POSICAO_META
+    to: C_OPCAO_D_META_COMPANY_BRAIN_COMO_SERVICO
+    edge_type: SUPPORTS
+  - from: E_STAGE_PRECO_POR_ASSENTO_E_FORMULACAO
+    to: C_OPCAO_E_B_MAIS_D_NO_FORMATO_GURU
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_ONDA_DERIVADA_1001
+    to: C_OPCAO_G_RE_MEDIR_ANTES_DE_ESCOLHER
+    edge_type: SUPPORTS
+
+  # ── dissent que LIMITA = CONSTRAINS (31) ──
+  # Nenhuma objeção vira REFUTES: todas as opções seguem OPEN, e as três fontes tier 9 que
+  # poderiam matar B e C foram descartadas sem leitura — matar opção com tier 4-6 repetiria o
+  # erro que estas mesmas objeções denunciam.
+  - from: E_OBJECAO_F1_ABSORCAO_E_UMA_TAXA
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F1_ABSORCAO_E_UMA_TAXA
+    to: C_OPCAO_C_DURANTE_GATE_E_POLITICA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F1_ABSORCAO_E_UMA_TAXA
+    to: C_OPCAO_B_POS_PROVA_E_ATESTACAO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F1_ABSORCAO_E_UMA_TAXA
+    to: C_OPCAO_A_ACOPLAR_AO_QUE_JA_SE_PAGA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F2_TRIAL_SEM_FORNECEDOR_E_NEGATIVO
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F2_TRIAL_SEM_FORNECEDOR_E_NEGATIVO
+    to: C_OPCAO_C_DURANTE_GATE_E_POLITICA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F3_CANAL_NAO_E_TRILHO
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F3_CANAL_NAO_E_TRILHO
+    to: C_OPCAO_A_ACOPLAR_AO_QUE_JA_SE_PAGA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F4_DUPLA_CONTAGEM_DOS_SENSORES
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F4_DUPLA_CONTAGEM_DOS_SENSORES
+    to: C_OPCAO_C_DURANTE_GATE_E_POLITICA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F4_DUPLA_CONTAGEM_DOS_SENSORES
+    to: E_RADAR_SENSORES_DETERMINISTICOS_EM_TRIAL
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F5_GARGALO_REAL_PECA_ERRADA
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F5_GARGALO_REAL_PECA_ERRADA
+    to: C_OPCAO_C_DURANTE_GATE_E_POLITICA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F5_GARGALO_REAL_PECA_ERRADA
+    to: E_REVISAO_HUMANA_E_O_GARGALO_DECLARADO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F6_BLOAT_E_AUTO_INCRIMINACAO
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F6_BLOAT_E_AUTO_INCRIMINACAO
+    to: C_OPCAO_D_META_COMPANY_BRAIN_COMO_SERVICO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F6_BLOAT_E_AUTO_INCRIMINACAO
+    to: C_OPCAO_E_B_MAIS_D_NO_FORMATO_GURU
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F7_PRECO_DE_TABELA_NAO_E_RECEITA
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F7_PRECO_DE_TABELA_NAO_E_RECEITA
+    to: C_OPCAO_E_B_MAIS_D_NO_FORMATO_GURU
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F7_PRECO_DE_TABELA_NAO_E_RECEITA
+    to: E_STAGE_PRECO_POR_ASSENTO_E_FORMULACAO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F8_NARRATIVA_E_O_INVERSO_DO_ATIVO
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F8_NARRATIVA_E_O_INVERSO_DO_ATIVO
+    to: C_OPCAO_C_DURANTE_GATE_E_POLITICA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F9_NEGATIVO_DECISIVO_REBAIXADO
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F9_NEGATIVO_DECISIVO_REBAIXADO
+    to: C_OPCAO_A_ACOPLAR_AO_QUE_JA_SE_PAGA
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F9_NEGATIVO_DECISIVO_REBAIXADO
+    to: E_AGENSI_TAXA_DE_CANAL_30_PORCENTO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F10_SPEC_SEM_COMPRADOR_COMMODITIZA
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F10_SPEC_SEM_COMPRADOR_COMMODITIZA
+    to: C_OPCAO_B_POS_PROVA_E_ATESTACAO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F11_TRUNCADA_NO_REPASSE
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_F11_TRUNCADA_NO_REPASSE
+    to: C_OPCAO_B_POS_PROVA_E_ATESTACAO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_G_QUATRO_FONTES_SEM_LEITURA
+    to: D_ONDA_DERIVADA_E_O_LUGAR_DO_ONION
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_G_QUATRO_FONTES_SEM_LEITURA
+    to: C_OPCAO_G_RE_MEDIR_ANTES_DE_ESCOLHER
+    edge_type: CONSTRAINS
+  - from: AR_SYNTHESIS_ONDA_DERIVADA_1001
+    to: Q_ONDA_DERIVADA_E_O_LUGAR_DO_ONION_2026
+    edge_type: SUPPORTS

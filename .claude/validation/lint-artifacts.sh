@@ -2572,6 +2572,38 @@ check_kb_applies_to() {
 }
 
 # ===========================================================================
+# REGRA 94 — MUTANTE esquecido na árvore [HARD]
+# previne: teste de mutação que morre no meio e deixa o repo PIOR que antes
+#   DANO CONSUMADO em 2026-10-01: um `exit 137` (SIGKILL do OOM killer) matou a sessão no meio
+#   de um teste de mutação e deixou um `git add` plantado dentro do `.githooks/pre-commit` — que
+#   era PRECISAMENTE o defeito que a guarda recém-escrita existia para pegar. A restauração era
+#   um `cp` DEPOIS do laço, e `cp` depois do laço só roda se o processo sobreviver.
+#   ⚠️ E `trap` NÃO RESOLVE: trap não intercepta SIGKILL. Um helper que confie só nele é cura
+#   falsa para o caso que de fato ocorreu. Por isso a defesa é em DUAS camadas, e esta é a que
+#   NÃO depende do processo sobreviver: todo mutante plantado por `ops/mutate-and-restore.sh`
+#   carrega um marcador (o helper RECUSA plantar sem ele), e o marcador na árvore significa uma
+#   coisa só — alguém mutou e não restaurou.
+#   SEM CATRACA e SEM BASELINE, de propósito: mutante esquecido não é passivo a tolerar com o
+#   tempo, é contaminação a remover agora. É a única classe desta casa que nasce HARD puro.
+# ===========================================================================
+check_mutant_leftover() {
+  local sut="${SCRIPT_DIR}/mutant-leftover-check.sh"
+  [ -x "${sut}" ] || return 0
+  local out rc=0
+  out="$(bash "${sut}" "${REPO_ROOT}" 2>&1)" || rc=$?
+  if [ "${rc}" = "3" ]; then
+    violation "SOFT" ".claude/validation/mutant-leftover-check.sh" "REGRA 94 (MUTANTE esquecido na árvore): a guarda não pôde julgar (rc=3) — sem git ou alvo ilegível. Recusa NÃO é aprovação: ${out}"
+    return 0
+  fi
+  [ -n "${out}" ] || return 0
+  while IFS= read -r line; do
+    [ -n "${line}" ] || continue
+    violation "HARD" "${line#REGRA 94: }" "REGRA 94 (MUTANTE esquecido na árvore): ${line#REGRA 94: }"
+  done <<< "${out}"
+}
+
+
+# ===========================================================================
 # REGRA 92 — Papel da porta no registro concorda com o CARIMBO dela [HARD + SOFT]
 # previne: o materializador ler o papel ERRADO e cortar maquinaria da porta pública
 #   Duas fontes para o mesmo fato — `role:` no `members.yaml` (anotado à mão) e
@@ -4572,6 +4604,7 @@ check_kg_edit_saw_confirmed
 check_door_staleness
 check_door_role_parity
 check_kb_applies_to
+check_mutant_leftover
 check_workflows_parse
 check_workflow_job_needs_checkout
 check_frontmatter_scalar_colon

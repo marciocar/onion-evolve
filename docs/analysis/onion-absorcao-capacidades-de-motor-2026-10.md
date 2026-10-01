@@ -136,3 +136,50 @@ Capacidade 1**.
 **E o passo 1 da Capacidade 1 é o mesmo insumo do gatilho da Capacidade 3** — classificar as 91 por
 leitura/escrita/ordem serve às duas. É o único trabalho que paga duas contas, e por isso é por onde
 começar se você mandar executar.
+
+---
+
+# EXECUÇÃO DO PASSO 1 (2026-10-01) — e o que ele descobriu contra mim
+
+O maestro autorizou **o passo 1 e só ele**: `guard-io-classify.sh`, que **imprime e não julga**.
+Resultado, e ele muda a recomendação da Capacidade 1.
+
+## O que a lista entregou
+
+| pergunta | resposta medida |
+|---|---|
+| quantos pontos de ESCRITA no hook | **6 reais** (l.104 plugin · l.112 marketplace · l.136 painel · l.166–167 re-carimbo do SHA) |
+| quantos pontos de LEITURA no lint | **7** (comparam projeção contra fonte) |
+| as 93 guardas escrevem? | **não** — zero escrita no corpo. O motor **só lê** |
+| existe subconjunto de DECISÃO PURA (gatilho da Cap. 3)? | **NÃO-MEDIDO, com número: 61 sítios do lint tocam o sistema de arquivos.** 61 é grande demais para supor que o subconjunto exista |
+
+**Escopo real da Cap. 1: 13 pontos**, não 91 regras. Isso confirma a análise.
+
+## O ACHADO QUE VALE MAIS QUE A LISTA: a heurística errou TRÊS VEZES, e sempre a mão a corrigiu
+
+| tentativa | o que a heurística disse | o que a conferência achou |
+|---|---|---|
+| 1ª | 8 escritores | **3 eram falso positivo** — um comentário e duas mensagens de erro que apenas CITAM `git add` |
+| 2ª (filtro "contém echo") | 1 escritor | **quebrou 4 certos** — `git add X \|\| echo "aviso"` executa a escrita E tem echo |
+| 3ª (posição, não presença) | 7 escritores | **1 falso positivo** restante (um `*)` de `case` que só imprime) |
+
+**Consequência direta para o plano, e ela é uma revisão da minha própria recomendação:** eu havia escrito
+que a classe seria "derivável do corpo, como a severidade já é". **A severidade é derivável porque o
+sinal é um literal inequívoco** (`violation "HARD"`); **a classe de I/O não é** — ela depende de
+distinguir execução de menção, e isso é análise sintática, não casamento de texto.
+
+**Portanto o passo 2 (guarda SOFT com baseline) NÃO deve ser executado como eu o descrevi.** Antes dele,
+uma de duas:
+
+- **(i)** a classificação sai de **análise sintática de shell** (um parser, não `grep`) — e aí o custo
+  deixa de ser baixo, que era a premissa de a Cap. 1 valer a pena; ou
+- **(ii)** a classe fica **declarada à mão numa lista de 13 pontos**, conferida uma vez — o que contraria
+  o critério *"não pode complicar / tem de ser derivável"*, mas é honesto por ser **pequeno e fechado**:
+  13 pontos cabem numa lista que um humano revisa, ao contrário de 91 regras.
+
+**Recomendo (ii), com a razão invertida:** a lista à mão envelhece quando é grande; **com 13 entradas e
+uma guarda que acusa quando o CONJUNTO muda de tamanho**, o envelhecimento fica detectável. Isso troca
+"derivar a classe" (que falhou 3×) por "detectar que a lista mudou" (que é trivialmente derivável).
+
+**A decisão é do maestro.** O passo 1 está feito e entregou o que prometia: a lista — e a prova de que o
+passo 2, como eu o desenhei, estava errado.

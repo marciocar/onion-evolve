@@ -12,11 +12,11 @@
 
 | Dimensão | Nº | Produtor |
 |---|---:|---|
-| Famílias na bancada | **201** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **1327** | `bash .claude/validation/harness-inventory.sh --env` |
-| Regras do lint | **91** | `bash .claude/validation/rules-registry.sh --counts` |
-| — HARD | **80** | `bash .claude/validation/rules-registry.sh --counts` |
-| Pares de modo consumido | **53** | `bash .claude/validation/consumed-mode-check.sh .` |
+| Famílias na bancada | **204** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **1350** | `bash .claude/validation/harness-inventory.sh --env` |
+| Regras do lint | **92** | `bash .claude/validation/rules-registry.sh --counts` |
+| — HARD | **81** | `bash .claude/validation/rules-registry.sh --counts` |
+| Pares de modo consumido | **54** | `bash .claude/validation/consumed-mode-check.sh .` |
 | — sem teste | **0** | `bash .claude/validation/consumed-mode-check.sh .` |
 | Baselines de catraca | **13** | `git ls-files '.claude/validation/*-baseline.txt'` |
 
@@ -54,13 +54,13 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **344** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **345** | `bash .claude/validation/review-ledger.sh --env` |
 | Achados totais | **1859** | `bash .claude/validation/review-ledger.sh --env` |
 | Achados REAIS | **1612** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **87%** | `bash .claude/validation/review-ledger.sh --env` |
 | Tokens por achado REAL | **145055** | `bash .claude/validation/review-ledger.sh --env` |
 | Vereditos no vocabulário | **254** | `bash .claude/validation/review-ledger.sh --env` |
-| — legado (texto livre) | **90** | `bash .claude/validation/review-ledger.sh --env` |
+| — legado (texto livre) | **91** | `bash .claude/validation/review-ledger.sh --env` |
 
 A média de tokens cobre os **205** resíduos com custo > 0; os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero
