@@ -62,7 +62,7 @@ contra-evidência**. A opção pode estar certa e a rodada não provou nada a fa
 | **ACTIVATE** | 3 · Declarado ≠ verificado | 4 | **a tese-núcleo, ANTES do mecanismo que a sustenta** |
 | **ACTIVATE** | 4 · A maquinaria | 11 | escada (C): onde manda → skills/agentes → hooks → Elenxo |
 | **ACTIVATE** | 5 · Rodar o ciclo | 11 | a 1ª ação de valor: comandos, sessões, task manager, 3 ciclos |
-| **ACTIVATE** | 6 · Adoção e federação | 5 | core → porta → adotante, branches, MCPs |
+| **ACTIVATE** | 6 · Adoção e federação | 7 | core → porta → adotante, branches, MCPs — **+2 slides do caminho do RECÉM-CHEGADO** (ver abaixo) |
 | **REINFORCE** | 7 · O conhecimento como estado | 22 | KB × KG, grafo por dentro, radar, orquestração, drive |
 | **REINFORCE** | 8 · O que muda · Sua vez | 3 | fecha o laço do Ato 0, com 3 passos **por perfil** |
 | **APÊNDICE** | Referência | 12 | consulta — **não se apresenta ao vivo** |
@@ -70,8 +70,40 @@ contra-evidência**. A opção pode estar certa e a rodada não provou nada a fa
 **Colorimetria por fase**, e ela é o contrato de navegação virando sinal visual (achado 3-0 da NN/g):
 ORIENT âmbar `#D97706`/`#B45309` · ACTIVATE ciano `#22D3EE`/`#0E7490` · REINFORCE verde
 `#34D399`/`#047857` · APÊNDICE violeta `#A78BFA`/`#7C3AED`. O chip no topo de cada slide carrega
-`FASE · Ato N · assunto` na cor da fase — 71 dos 75 slides o têm (a capa, o gancho, o fecho e o
-divisor do apêndice trazem o seu próprio por desenho).
+`FASE · Ato N · assunto` na cor da fase — **73 dos 77** slides o têm (a capa, o gancho, o fecho e o
+divisor do apêndice trazem o seu próprio por desenho). O número subiu de 71/75 em 2026-10-01, com os
+2 slides do recém-chegado no Ato 6: **a soma da tabela é a fonte**, e esta frase a acompanha — era
+exatamente o tipo de contagem que envelhece calada enquanto a estrutura cresce.
+
+## Ato 6 — o caminho do RECÉM-CHEGADO (2026-10-01): 2 slides novos e 1 completado
+
+> ⚠️ **Esta seção foi escrita ERRADA primeiro, e a correção é o ponto.** Eu declarei **4 slides novos**
+> (Ato 6 de 5 → 9) **antes de ler o Artifact**. Ao ler, medi que **dois já existiam**: `ciclo-adocao`
+> cobre o passo a passo no nível do usuário, e `branches-onion` cobre as branches. Então o certo é
+> **2 novos + 1 completado**, e o Ato 6 vai de **5 para 7**. Escrever a spec sem ler a renderização é
+> a classe `declarado ≠ verificado` aplicada ao próprio material que a ensina.
+
+**Por que entraram, e a pergunta que os originou:** o maestro perguntou *"como uma pessoa que não
+soubesse disso poderá baixar este repo e usar o Onion para trabalhar nele?"* — e o deck respondia
+`core → porta → adotante` sem responder **isso**. A lacuna é de audiência: os 5 slides existentes falam
+de **topologia da federação**; estes 4 falam do **caminho de quem clona**, que é quem o adotante precisa
+atender depois de adotar.
+
+| slide | estado | o que entrega |
+|---|---|---|
+| **`onion-no-clone`** | **NOVO** | `tutorial`: clona → **abre o Claude Code na pasta** → o `CLAUDE.md` é lido e os **4 hooks de `SessionStart`** avisam provider, inbox e migalhas. **O comando que falta por clone**, porque `core.hooksPath` é config local e não viaja: `git config core.hooksPath .githooks`. Portas: `/onion`, `@onion`, `/catch-up`. **Duas pegadinhas medidas**: husky disputa o `hooksPath` (um `husky install` mata o gate) e o `.env` não viaja |
+| **`o-que-fica-no-repo`** | **NOVO** | `reference`: a superfície que o commit durável staja — `.claude/` inteiro, 5 blocos de `docs/`, `CLAUDE.md`, `.githooks`, `LICENSE-ONION*` (**nome próprio**, porque `LICENSE` na raiz regeria o repo do cliente). E o **`.onion-version`**, 9 linhas, que decide tudo. **A armadilha que muda o resultado**: repo que **ignora `.claude/`** entrega **nada** a quem clona |
+| **`branches-onion`** | **completado** | já descrevia `onion/adopt` + `onion/vendor` (a topologia do 3-way merge) e **omitia** a `chore/onion-update-<pin>`, que é o que toda atualização cria — **medido: 4 delas no gmill em 2026-10-01**. É a branch que o dono de fato vê chegar |
+
+**O slide `onion-no-clone` fecha um laço que o deck já abria e não fechava:** o slide `comecar` termina
+com *"alguma guarda já te barrou? Se ainda não, a maquinaria está no disco mas não no caminho"* — que é
+exatamente o **sintoma** de `core.hooksPath` não configurado, e o deck **nomeava o sintoma sem dar a
+cura**. Agora dá.
+
+**O que estes slides NÃO resolvem, dito em vez de escondido:** o recém-chegado recebe a maquinaria,
+mas **não** recebe o `.env` nem as credenciais de task manager — e o `core.hooksPath` depende de ele
+rodar um comando. Automatizar isso exigiria `postinstall`, que o Onion não tem por desenho (não é
+produto npm). Logo o `onion-no-clone` **ensina o comando** em vez de prometer que não precisa dele.
 
 ## Contrato por slide
 
