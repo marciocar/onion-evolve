@@ -9881,6 +9881,38 @@ run_githook_selftests() {
   rc=0; bash "${helper}" "/nao/existe/$$" >/dev/null 2>&1 || rc=$?
   if [ "${rc}" -eq 2 ]; then record_pass "githook: dest inválido → exit 2"
   else record_fail "githook: dest inválido" "esperava exit 2, veio ${rc}"; fi
+
+  # (g) MODO-DE-FALHA MEDIDO (adotante, 2026-10-02): repo com "lint-staged" no package.json, SEM
+  #     node_modules e SEM o campo `packageManager` → o hook tem de CHEGAR AO FIM com o skip
+  #     gracioso. A versão anterior morria na ATRIBUIÇÃO do pm (pipeline de `grep` cujo 1º elo não
+  #     casa; `pipefail` propaga, `set -e` mata) — `git commit` saía 1 sem UMA palavra, logo depois
+  #     de o lint Onion imprimir OK. Este caso roda o TEMPLATE, não o instalador: é no corpo do
+  #     hook que o defeito vive, e o instalador saía 0 por cima dele.
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  printf '{\n  "name": "alvo",\n  "lint-staged": { "*.js": "eslint" }\n}\n' > "${d}/package.json"
+  local g_out g_rc=0
+  g_out="$( cd "${d}" && bash "${tpl}" 2>&1 )" || g_rc=$?
+  if [ "${g_rc}" -eq 0 ] && grep -q 'node_modules ausente' <<< "${g_out}"; then
+    record_pass "githook: (g) sem packageManager → skip gracioso (rc=0), não morte silenciosa"
+  else
+    record_fail "githook: (g) morte silenciosa do hook" \
+      "rc=${g_rc} e saída=[${g_out}] — esperava rc=0 com o aviso de skip; fechador precoce voltou"
+  fi
+  rm -rf "${d}"
+
+  # (h) A CURA NÃO PODE SER 'DELETAR A FEATURE'. Com `packageManager` presente, a dica tem de
+  #     NOMEAR o gerenciador do alvo (sinal de campo 2026-07-25: o hook mandava 'pnpm install' num
+  #     repo bun-only). Sem este caso, (g) passaria com a detecção inteira arrancada.
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  printf '{\n  "name": "alvo",\n  "packageManager": "bun@1.1.0",\n  "lint-staged": { "*.js": "eslint" }\n}\n' > "${d}/package.json"
+  g_rc=0; g_out="$( cd "${d}" && bash "${tpl}" 2>&1 )" || g_rc=$?
+  if [ "${g_rc}" -eq 0 ] && grep -q "rode 'bun install'" <<< "${g_out}"; then
+    record_pass "githook: (h) packageManager presente → dica nomeia o gerenciador do alvo"
+  else
+    record_fail "githook: (h) detecção de packageManager perdida" \
+      "rc=${g_rc} e saída=[${g_out}] — esperava a dica com 'bun install'; a cura virou deleção"
+  fi
+  rm -rf "${d}"
 }
 
 # ---------------------------------------------------------------------------
@@ -20378,12 +20410,15 @@ run_hook_regen_table_selftests() {
     'docs/onion/testing-inventory.md|80' \
     'docs/onion/inventory.md|16' \
     'docs/onion/kg-read-index.tsv|84' \
-    'docs/backlog.md|62'; do
+    'docs/backlog.md|62' \
+    'docs/onion/federation-console.html|24' \
+    'docs/onion/federation-map.md|38' \
+    'docs/onion/graph.md|21'; do
     local target="${pair%%|*}" rule="${pair##*|}"
     grep -qF "onion_regen ${target} ${rule}" "${hook}" || missing="${missing} ${target}(R${rule})"
   done
   if [ -z "${missing}" ]; then
-    record_pass "hook-regen: (a) as 6 projeções com guarda HARD estão na tabela do hook"
+    record_pass "hook-regen: (a) as 9 projeções com guarda HARD estão na tabela do hook"
   else record_fail "hook-regen: (a)" "projeção com guarda e SEM linha na tabela:${missing} — a classe volta calada"; fi
 
   # (b) ORDEM — a tabela roda ANTES do re-carimbo da REGRA 56; auto-fix depois do carimbo torna o

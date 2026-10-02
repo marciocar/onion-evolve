@@ -217,7 +217,21 @@ A formatação de descrições e comentários **muda conforme o provider ativo**
 ### ClickUp (`TASK_MANAGER_PROVIDER=clickup`)
 **Estratégia dual:**
 
-- **📋 Task Descriptions (`markdown_description`)**: Markdown nativo
+- **📋 Task Descriptions (`markdown_content`)**: Markdown nativo
+  - ⚠️ **Prefira `markdown_content`** — `markdown_description` é o campo da **RESPOSTA** e foi
+    exatamente a origem do erro que esta casa carregou até 2026-10-02 (sinal de campo de um
+    adotante, verificado na primária `developer.clickup.com/reference/createtask`): a doc diz
+    *"If both markdown_content and description are provided, markdown_content will be used"*.
+    **Medido ao vivo (2026-10-02, adotante, 24 chamadas REST):** no **update** o
+    `markdown_description` **também aplica** (alias aceito) — mas `markdown_content` é o
+    canônico e o único documentado no create. Use o canônico.
+  - **Datas são Unix MILISSEGUNDOS (integer)**, nunca ISO: `due_date`, `start_date`.
+  - **`priority` é INTEGER (1 urgent … 4 low)**, nunca string — medido: `"high"` devolve
+    **`400 Priority invalid`**, logo HOJE toda escrita com prioridade FALHA.
+  - **`tags` NÃO vão no body do PUT** (devolvem 200 sem efeito): só
+    `POST`/`DELETE /task/{id}/tag/{name}` mudam tags.
+  - **Subtasks: `include_subtasks=true`**, nunca o legado `subtasks=true` (este devolve a
+    task SEM o campo).
   - Use: `## Headers`, `| Tabelas |`, `**Bold**`, `- Listas`
   - Quando: `create_task`, `update_task` descriptions
   - Templates: `.claude/commands/common/prompts/clickup-patterns.md` — §"Task Descriptions"
