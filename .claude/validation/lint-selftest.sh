@@ -20267,6 +20267,179 @@ _family run_zoho_adapter_selftests
 _family run_door_role_change_refusal_selftests
 _family run_review_cause_bands_selftests
 _family run_mutant_leftover_selftests
+
+# ── ANÚNCIO QUE AFIRMA ZERO SEM MEDIÇÃO (REGRA 95) ───────────────────────────────────────────
+# POR QUE EXISTE: o anúncio é o ÚNICO documento que chega ANTES do merge, e em 2026-08-31 um zero
+# em prosa ("As portas estão OK (nenhuma sem prefixo de bind)") congelou 38 exposições como
+# toleradas — o número certo estava doze linhas acima, no MESMO documento, e não ajudou.
+# O caso (a) é o dano REAL reproduzido verbatim, e o (b) é o mutante que a 1ª versão da guarda
+# sofreu: casando LINHA a LINHA, o wrap do markdown parte a afirmação e a guarda passa verde no
+# caso que a motivou. Guarda que não pega o próprio dano é teatro.
+run_announce_zero_claim_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/announce-zero-claim-check.sh"
+  if [ ! -x "${sut}" ]; then record_fail "anuncio-zero" "SUT ausente: ${sut}"; return; fi
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  git -C "${d}" init -q -b main 2>/dev/null || { record_fail "anuncio-zero" "git init falhou"; return; }
+  local ob="${d}/docs/evolution/federation/outbox"
+  mkdir -p "${ob}/alvo" "${ob}/alvo/_processed"
+
+  local _az_out _az_rc
+  _az() { git -C "${d}" add -A >/dev/null 2>&1
+          if _az_out="$(bash "${sut}" "${d}" 2>&1)"; then _az_rc=0; else _az_rc=$?; fi }
+
+  # (a) O DANO REAL, verbatim e com o WRAP preservado — ZERO numa linha, CLASSE na anterior.
+  printf 'em qualquer ambiente, incluindo a produção na AWS (security group não cobre isso). As portas\nestão OK (nenhuma sem prefixo de bind).\n' > "${ob}/alvo/2026-08-31-caso.md"
+  _az
+  if [ "${_az_rc}" = "1" ] && grep -q 'SEM-MEDICAO' <<< "${_az_out}"; then
+    record_pass "anuncio-zero: (a) o dano REAL de 2026-08-31 é acusado, com a afirmação PARTIDA por wrap de markdown"
+  else record_fail "anuncio-zero: (a)" "o dano real NAO foi acusado (rc=${_az_rc}) — a guarda nao pega o caso que a motivou: $(_emit "${_az_out}" | head -c 200)"; fi
+
+  # (b) a mensagem aponta o SÍTIO (arquivo:linha do parágrafo) e CITA a frase — diagnóstico é parte
+  #     do contrato: quem lê tem de saber onde consertar.
+  if grep -q '2026-08-31-caso.md:1' <<< "${_az_out}" && grep -q 'nenhuma sem prefixo' <<< "${_az_out}"; then
+    record_pass "anuncio-zero: (b) a acusacao aponta arquivo:linha do paragrafo e CITA a frase"
+  else record_fail "anuncio-zero: (b)" "acusacao sem sitio ou sem a frase: $(_emit "${_az_out}" | head -c 200)"; fi
+
+  # (c) PROVENIÊNCIA no MESMO parágrafo CALA — é a cura que a doutrina manda ("cole o número").
+  printf 'As portas estão OK (nenhuma sem prefixo de bind), medido por `bash ops/x.sh`.\n' > "${ob}/alvo/2026-08-31-caso.md"
+  _az
+  if [ "${_az_rc}" = "0" ]; then
+    record_pass "anuncio-zero: (c) medicao colada no MESMO paragrafo cala a guarda"
+  else record_fail "anuncio-zero: (c)" "proveniencia colada nao calou (rc=${_az_rc}): $(_emit "${_az_out}" | head -c 200)"; fi
+
+  # (d) 'não medido' declarado CALA — ausência legítima é desfecho de 1ª classe nesta casa.
+  printf 'Portas: nenhuma exposição conhecida — porém **não medido** nesta leva.\n' > "${ob}/alvo/2026-08-31-caso.md"
+  _az
+  if [ "${_az_rc}" = "0" ]; then
+    record_pass "anuncio-zero: (d) 'nao medido' declarado cala (ausencia legitima e desfecho, nao falha)"
+  else record_fail "anuncio-zero: (d)" "'nao medido' nao calou (rc=${_az_rc})"; fi
+
+  # (e) O INCIDENTE EXATO: o número CERTO em OUTRO parágrafo NÃO cala. É o que de fato aconteceu —
+  #     o "38" estava doze linhas acima e o leitor ainda concluiu que não havia o que fazer.
+  printf 'Os 38 casos legados entraram na baseline tolerada, medido por `bash ops/x.sh`.\n\nAs portas estão OK (nenhuma sem prefixo de bind).\n' > "${ob}/alvo/2026-08-31-caso.md"
+  _az
+  if [ "${_az_rc}" = "1" ]; then
+    record_pass "anuncio-zero: (e) numero certo em OUTRO paragrafo NAO cala — a proveniencia tem de estar ONDE a afirmacao esta"
+  else record_fail "anuncio-zero: (e)" "o incidente real passou (rc=${_az_rc}) — a guarda aceitou proveniencia distante"; fi
+
+  # (f) ZERO sem CLASSE VERIFICÁVEL não acusa — prosa comum não é afirmação de estado medível.
+  printf 'Nenhuma novidade de agenda nesta leva.\n' > "${ob}/alvo/2026-08-31-caso.md"
+  _az
+  if [ "${_az_rc}" = "0" ]; then
+    record_pass "anuncio-zero: (f) ZERO sem classe verificavel nao acusa (prosa comum)"
+  else record_fail "anuncio-zero: (f)" "falso positivo em prosa comum (rc=${_az_rc}): $(_emit "${_az_out}" | head -c 200)"; fi
+
+  # (g) ESCOPO: o mesmo texto em `_processed/` NÃO é julgado — já viajou, história não se reescreve.
+  rm -f "${ob}/alvo/2026-08-31-caso.md"
+  printf 'As portas\nestão OK (nenhuma sem prefixo de bind).\n' > "${ob}/alvo/_processed/2026-08-31-antigo.md"
+  _az
+  if [ "${_az_rc}" = "0" ] && grep -q 'SEM-OBJETO' <<< "${_az_out}"; then
+    record_pass "anuncio-zero: (g) anuncio em _processed/ fica FORA do escopo, e a guarda DECLARA SEM-OBJETO"
+  else record_fail "anuncio-zero: (g)" "escopo errado ou sem-objeto nao declarado (rc=${_az_rc}): $(_emit "${_az_out}" | head -c 200)"; fi
+
+  # (h) SEM-OBJETO é DECLARAÇÃO, não silêncio: zero anúncio ⇒ a guarda FALA que não julgou.
+  rm -f "${ob}/alvo/_processed/2026-08-31-antigo.md"
+  _az
+  if [ "${_az_rc}" = "0" ] && grep -q 'SEM-OBJETO' <<< "${_az_out}"; then
+    record_pass "anuncio-zero: (h) zero anuncio ⇒ SEM-OBJETO DECLARADO (guarda que nao sabe nunca afirma conformidade)"
+  else record_fail "anuncio-zero: (h)" "zero anuncio passou em silencio (rc=${_az_rc}): $(_emit "${_az_out}" | head -c 200)"; fi
+
+  # (i) sem git ⇒ rc=3 DECLARANDO, nunca conformidade por ausencia.
+  local ng ong orc=0; ng="$(mktemp -d)"
+  if ong="$(bash "${sut}" "${ng}" 2>&1)"; then orc=0; else orc=$?; fi
+  if [ "${orc}" = "3" ]; then
+    record_pass "anuncio-zero: (i) alvo sem git ⇒ rc=3 DECLARANDO"
+  else record_fail "anuncio-zero: (i)" "sem git nao recusou (rc=${orc}): $(_emit "${ong}" | head -c 200)"; fi
+  rm -rf "${ng}"
+}
+
+_family run_announce_zero_claim_selftests
+
+# ── A TABELA DE PROJEÇÕES REGENERADAS PELO HOOK ──────────────────────────────────────────────
+# POR QUE EXISTE: a classe "projeção gerada defasada no commit" barrou esta casa 3x num dia pelo
+# painel (R81) e QUATRO vezes em 2026-10-01 por projeções DIFERENTES (R39 lint-rules.md editado à
+# mão, R16 inventory.md, R80 testing-inventory.md, R62/R84 projeções de KG regeneradas ANTES de
+# estagiar). O maestro nomeou: lição que se repete é problema de MECANISMO. O bloco virou TABELA, e
+# esta família existe para que a tabela não PARE de cobrir em silêncio — cobertura sem teste é
+# promessa. Estrutura por asserção; comportamento do motor por EXECUÇÃO.
+run_hook_regen_table_selftests() {
+  local hook="${REPO_ROOT}/.githooks/pre-commit"
+  if [ ! -f "${hook}" ]; then record_fail "hook-regen" "hook ausente: ${hook}"; return; fi
+  if ! grep -q 'onion_regen ' "${hook}"; then
+    record_skip "hook-regen: tabela ausente do hook (bloco não encontrado)"; return
+  fi
+
+  # (a) ESTRUTURA — cada projeção que o lint cobra tem de ter linha na tabela. Se alguém acrescentar
+  #     uma guarda de projeção e esquecer a linha, a classe volta, e volta CALADA.
+  local missing="" pair
+  for pair in \
+    'docs/onion/testing-state.md|81' \
+    '.claude/validation/lint-rules.md|39' \
+    'docs/onion/testing-inventory.md|80' \
+    'docs/onion/inventory.md|16' \
+    'docs/onion/kg-read-index.tsv|84' \
+    'docs/backlog.md|62'; do
+    local target="${pair%%|*}" rule="${pair##*|}"
+    grep -qF "onion_regen ${target} ${rule}" "${hook}" || missing="${missing} ${target}(R${rule})"
+  done
+  if [ -z "${missing}" ]; then
+    record_pass "hook-regen: (a) as 6 projeções com guarda HARD estão na tabela do hook"
+  else record_fail "hook-regen: (a)" "projeção com guarda e SEM linha na tabela:${missing} — a classe volta calada"; fi
+
+  # (b) ORDEM — a tabela roda ANTES do re-carimbo da REGRA 56; auto-fix depois do carimbo torna o
+  #     hash caduco (ARTEFATO-CADUCO, medido 2x em 2026-10-01). O caso (b) de hook_chain_order cobra
+  #     o geral; aqui ancoramos a tabela especificamente.
+  local l_tab l_sha
+  l_tab="$(grep -n 'onion_regen ' "${hook}" | head -1 | cut -d: -f1)"
+  l_sha="$(grep -n 'reviewed_diff_sha256: .*_r56_sha' "${hook}" | head -1 | cut -d: -f1)"
+  if [ -n "${l_tab}" ] && [ -n "${l_sha}" ] && [ "${l_tab}" -lt "${l_sha}" ]; then
+    record_pass "hook-regen: (b) a tabela roda ANTES do re-carimbo do SHA da REGRA 56 (l.${l_tab} < l.${l_sha})"
+  else record_fail "hook-regen: (b)" "tabela (l.${l_tab:-?}) não precede o carimbo (l.${l_sha:-?}) — o hash nasceria caduco"; fi
+
+  # ── COMPORTAMENTO do motor, por EXECUÇÃO: extrai `_onion_regen` e exercita as 3 polaridades.
+  #    A bancada copia as OPÇÕES DE SHELL do runner ([[bancada-espelha-o-runner]]).
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  git -C "${d}" init -q -b main 2>/dev/null || { record_fail "hook-regen" "git init falhou"; return; }
+  # SOURÇA A LIB REAL — recortar por âncora de `sed` foi reprovado pela guarda de âncora morta, e
+  # ela estava certa: a bancada exercita o artefato que o runner executa, nunca uma cópia recortada.
+  local lib="${REPO_ROOT}/.claude/validation/onion-regen-lib.sh"
+  if [ ! -r "${lib}" ]; then record_fail "hook-regen" "lib ausente: ${lib}"; return; fi
+  local fn="${d}/fn.sh"
+  # aspas SIMPLES dentro de DUPLAS: sem acrobacia de escape, que foi onde a 1ª forma quebrou
+  { printf '%s\n' 'set -uo pipefail' "REPO_ROOT='${d}'" "source '${lib}'"; } > "${fn}"
+  printf 'conteudo ANTIGO\n' > "${d}/target.txt"
+  git -C "${d}" add -A >/dev/null 2>&1
+
+  # (c) conteúdo DIFERENTE ⇒ regenera, anuncia e ESTAGIA (auto-fix com rastro)
+  local out _staged_list
+  out="$(cd "${d}" && bash -c 'source ./fn.sh; onion_regen target.txt 99 printf "conteudo NOVO\n"' 2>&1 || true)"
+  if grep -q 'NOVO' "${d}/target.txt" && grep -q '🔁' <<< "${out}" \
+     && { _staged_list="$(git -C "${d}" diff --cached --name-only)"; grep -qx 'target.txt' <<< "${_staged_list}"; }; then
+    record_pass "hook-regen: (c) conteúdo divergente ⇒ regenera, anuncia e ESTAGIA (rastro no commit)"
+  else record_fail "hook-regen: (c)" "não regenerou/anunciou/estagiou: $(_emit "${out}" | head -c 200)"; fi
+
+  # (d) MUTANTE DA SAÍDA DESTRUTIVA — gerador que FALHA não pode TRUNCAR o alvo. Redirecionar direto
+  #     no arquivo apagaria a projeção em vez de deixá-la defasada, e isso é PIOR.
+  out="$(cd "${d}" && bash -c 'source ./fn.sh; onion_regen target.txt 99 bash -c "exit 7"' 2>&1 || true)"
+  if [ -s "${d}/target.txt" ] && grep -q 'NÃO regenerado' <<< "${out}"; then
+    record_pass "hook-regen: (d) gerador que FALHA não trunca o alvo, e AVISA (temp+mv, rc lido)"
+  else record_fail "hook-regen: (d)" "alvo truncado ou falha silenciosa: tam=$(wc -c < "${d}/target.txt") out=$(_emit "${out}" | head -c 160)"; fi
+
+  # (e) gerador que sai VAZIO com rc=0 também não trunca — `[ -s ]` é a 2ª metade da guarda, porque
+  #     `exit 0` é declaração do script sobre si ([[exit-code-nao-e-a-verificacao]]).
+  out="$(cd "${d}" && bash -c 'source ./fn.sh; onion_regen target.txt 99 true' 2>&1 || true)"
+  if [ -s "${d}/target.txt" ] && grep -q 'NÃO regenerado' <<< "${out}"; then
+    record_pass "hook-regen: (e) gerador com rc=0 e saída VAZIA não trunca (o [ -s ] é load-bearing)"
+  else record_fail "hook-regen: (e)" "saída vazia com rc=0 truncou ou passou calada: $(_emit "${out}" | head -c 160)"; fi
+
+  # (f) conteúdo IDÊNTICO ⇒ silêncio total (nem anúncio, nem git add espúrio no commit)
+  out="$(cd "${d}" && bash -c 'source ./fn.sh; onion_regen target.txt 99 printf "conteudo NOVO\n"' 2>&1 || true)"
+  if [ -z "${out}" ]; then
+    record_pass "hook-regen: (f) conteúdo idêntico ⇒ silêncio (sem ruído nem estágio espúrio)"
+  else record_fail "hook-regen: (f)" "falou com conteúdo idêntico: $(_emit "${out}" | head -c 160)"; fi
+}
+
+_family run_hook_regen_table_selftests
 _family run_hook_chain_order_selftests
 _family run_corpus_grep_selftests
 _family run_research_workflow_selftests

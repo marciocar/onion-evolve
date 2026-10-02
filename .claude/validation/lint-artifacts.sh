@@ -2604,6 +2604,51 @@ check_mutant_leftover() {
 
 
 # ===========================================================================
+# REGRA 95 — Anúncio que afirma ZERO sobre classe verificável sem medição [HARD + SOFT]
+# previne: o ÚNICO documento que chega ANTES do merge desligar a ação do adotante com um zero em prosa
+#   DANO CONSUMADO (2026-08-31, re-medido em 2026-09-16): um anúncio do core escreveu "As portas
+#   estão OK (nenhuma sem prefixo de bind)" enquanto a catraca da MESMA leva contava 38 exposições,
+#   o relatório dentro da branch dizia o número certo, e o PRÓPRIO anúncio citava "os 38 casos
+#   legados" doze linhas antes. Quem leu só o anúncio concluiu que não havia o que fazer, e a
+#   dívida tolerada ficou tolerada PARA SEMPRE porque ninguém foi avisado.
+#   POR QUE SÓ O ZERO: o mesmo anúncio errou um não-zero ("3 fallbacks" onde o padrão produzia 19
+#   em 10 variáveis) — e ISSO é indetectável por grep, que não sabe a contagem verdadeira. A
+#   assimetria que sobra é a que paga: um não-zero errado ainda PROVOCA ação; um zero desliga a
+#   ação inteira. A guarda cobra o zero e DECLARA que não cobre o resto.
+#   ESCOPO PROSPECTIVO: só anúncios de 1º nível em outbox/<id>/ — onde a cura ainda existe.
+#   `_processed/` já viajou e história não se reescreve. Medido 2026-10-01: 0 em 1º nível, logo
+#   nasce SEM-OBJETO (que é DECLARAÇÃO, não conformidade) e morde o próximo anúncio.
+#   A UNIDADE É A FRASE: a 1ª versão casava linha a linha e NÃO pegou o próprio dano que a
+#   motivou, porque o wrap do markdown parte a afirmação em duas linhas. Toda a lógica vive em
+#   announce-zero-claim-check.sh + .py.
+# ===========================================================================
+check_announce_zero_claim() {
+  local sut="${SCRIPT_DIR}/announce-zero-claim-check.sh"
+  [ -x "${sut}" ] || return 0
+  # CORE-ONLY: o outbox da federação é deste repo; exigi-lo do adotante o faria nascer vermelho
+  # num diretório que não é dele (mesma razão das REGRAS 80/81).
+  [ "${IS_DERIVED}" -eq 1 ] && return 0
+  local out rc=0
+  out="$(bash "${sut}" "${REPO_ROOT}" 2>&1)" || rc=$?
+  if [ "${rc}" = "3" ]; then
+    violation "SOFT" ".claude/validation/announce-zero-claim-check.sh" "REGRA 95 (Anúncio que afirma ZERO sobre classe verificável sem medição): a guarda não pôde julgar (rc=3) — sem git ou sem python3. Recusa NÃO é aprovação: ${out}"
+    return 0
+  fi
+  [ -n "${out}" ] || return 0
+  while IFS= read -r line; do
+    [ -n "${line}" ] || continue
+    case "${line}" in
+      *'[anuncio-zero/SEM-OBJETO]'*)
+        violation "SOFT" "docs/evolution/federation/outbox" "REGRA 95 (Anúncio que afirma ZERO sobre classe verificável sem medição): ${line#REGRA 95: }"
+        ;;
+      *)
+        violation "HARD" "${line#REGRA 95: }" "REGRA 95 (Anúncio que afirma ZERO sobre classe verificável sem medição): ${line#REGRA 95: }"
+        ;;
+    esac
+  done <<< "${out}"
+}
+
+# ===========================================================================
 # REGRA 92 — Papel da porta no registro concorda com o CARIMBO dela [HARD + SOFT]
 # previne: o materializador ler o papel ERRADO e cortar maquinaria da porta pública
 #   Duas fontes para o mesmo fato — `role:` no `members.yaml` (anotado à mão) e
@@ -4605,6 +4650,7 @@ check_door_staleness
 check_door_role_parity
 check_kb_applies_to
 check_mutant_leftover
+check_announce_zero_claim
 check_workflows_parse
 check_workflow_job_needs_checkout
 check_frontmatter_scalar_colon
