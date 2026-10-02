@@ -31,7 +31,7 @@ São as regras que o gate mecânico do Onion aplica a **todo repo da rede**: o m
 lint roda no core e em cada adotante. **HARD** bloqueia o merge; **SOFT** avisa, mas não
 bloqueia o CI.
 
-**92 regras** no total — **81 HARD**, **31 SOFT**.
+**93 regras** no total — **82 HARD**, **32 SOFT**.
 
 ## Frontmatter & conformidade de artefato
 
@@ -167,6 +167,7 @@ Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.
 | 38 | Mapa da federação (docs/onion/federation-map.md) sincronizado com members.yaml | HARD | mapa da federação driftando de members.yaml |
 | 46 | Canal da federação: diretório de outbox tem membro correspondente | SOFT | anúncio órfão — diretório de outbox cujo nome não é id de membro nunca é servido pelo pull, e some em silêncio |
 | 66 | Registro da federação validado no gate (members.yaml) | HARD | membro quebrado entrando calado no ledger — o M2 da spec m3-federation-admin |
+| 95 | Anúncio que afirma ZERO sobre classe verificável sem medição | HARD + SOFT | o ÚNICO documento que chega ANTES do merge desligar a ação do adotante com um zero em prosa |
 
 ## Projeção & privacidade
 

@@ -205,7 +205,7 @@ CATEGORIES = [
      [44, 65]),
     ("Federação",
      "Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.",
-     [24, 25, 28, 38, 46, 66]),
+     [24, 25, 28, 38, 46, 66, 95]),
     ("Projeção & privacidade",
      "O que pode sair para superfícies públicas ou vendorizadas — nome de cliente e "
      "deep-link privado nunca vazam (nem a HOME crua do source privado, num artefato de "

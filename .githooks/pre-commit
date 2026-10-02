@@ -114,32 +114,47 @@ if [ "${_autofix_on}" -eq 1 ] && [ -f "${ASM}" ] && [ -d "${VDIR}" ]; then
   fi
 fi
 
-# ── RESÍDUO NO COMMIT ⇒ PAINEL REGENERADO JUNTO (REGRA 81) ────────────────────────────────────
-# POR QUE EXISTE, medido em 2026-09-21: a REGRA 81 (Painel de estado é GERADO dos produtores, nunca
-# redigido) me barrou TRÊS vezes no mesmo dia, sempre pelo mesmo motivo — `testing-state.sh` lê
-# `review-ledger.sh --env`, que CONTA resíduos e achados; logo, escrever um resíduo defasa o painel
-# por construção. Não é descuido a corrigir com atenção: é dependência de dados, e a cura de
-# disciplina ("lembrar de regenerar") é cura nula nesta casa.
-# MESMO IDIOMA do bloco de plugins acima: auto-fix COM RASTRO no commit, e a regra segue HARD no CI —
-# quem contorna o hook (`--no-verify`, que aqui é checkpoint e não validação) ainda é pego lá.
-_RES_STAGED="$(git diff --cached --name-only --diff-filter=ACMR -- 'docs/evolution/review/*.md' 2>/dev/null | head -1)"
-if [ -n "${_RES_STAGED}" ]; then
-  TS="${REPO_ROOT}/.claude/validation/testing-state.sh"
-  if [ -f "${TS}" ]; then
-    _ts_tmp="$(mktemp)"
-    # temp+mv: redirecionar direto no alvo TRUNCA o arquivo antes de o gerador falhar, e aí o painel
-    # some em vez de ficar defasado — a saída destrutiva é plausível ([[generated-projection-needs-ratchet]]).
-    if bash "${TS}" --markdown > "${_ts_tmp}" 2>/dev/null && [ -s "${_ts_tmp}" ]; then
-      if ! cmp -s "${_ts_tmp}" "${REPO_ROOT}/docs/onion/testing-state.md"; then
-        mv "${_ts_tmp}" "${REPO_ROOT}/docs/onion/testing-state.md"
-        echo "🔁 resíduo no commit → painel de estado regenerado (REGRA 81; auto-fix com rastro, a regra segue HARD no CI)"
-        git add "${REPO_ROOT}/docs/onion/testing-state.md" || echo "⚠️  git add de docs/onion/testing-state.md FALHOU — stagee à mão."
-      else rm -f "${_ts_tmp}"; fi
-    else
-      rm -f "${_ts_tmp}"
-      echo "⚠️  painel NÃO regenerado (testing-state.sh falhou ou saiu vazio) — a REGRA 81 vai acusar no CI."
-    fi
-  fi
+# ── PROJEÇÃO GERADA REGENERADA JUNTO, POR TABELA (REGRAS 8/16, 39, 62, 80, 81, 84) ───────────
+# POR QUE EXISTE, e a história é de reincidência medida: a primeira versão deste bloco cobria UMA
+# projeção (o painel da REGRA 81) porque ela me barrou TRÊS vezes num dia. Em 2026-10-01 a MESMA
+# classe me barrou QUATRO vezes com projeções DIFERENTES — `lint-rules.md` (R39, editado à mão num
+# PR cujo tema era "o número sai da medição, nunca da prosa"), `inventory.md` (R16, contagem
+# propagada por UMA redação quando o lint conhece três), `testing-inventory.md` (R80) e as
+# projeções de KG (R62/R84, regeneradas ANTES de estagiar e por isso nascidas obsoletas).
+#
+# O maestro nomeou o ponto: se a lição se repete, o problema é de MECANISMO. Então o bloco deixa de
+# ser um caso e vira TABELA — cada linha é (gatilho staged · gerador · alvo · regra), e cobrir uma
+# projeção nova passa a ser acrescentar uma linha, não escrever outro bloco. A cura de disciplina
+# ("lembrar de regenerar") é cura nula nesta casa; esta é a estrutural.
+#
+# ⚠️ ORDEM: este bloco roda ANTES do re-carimbo da REGRA 56 logo abaixo, e o caso (b) da família
+# `hook_chain_order` COBRA isso — auto-fix depois do carimbo torna o hash caduco, que foi o defeito
+# ARTEFATO-CADUCO medido 2x em 2026-10-01.
+#
+# ⚠️ TETO: auto-fix COM RASTRO no commit, e toda regra segue HARD no CI — quem contorna o hook
+# (`--no-verify`, que aqui é checkpoint e não validação) ainda é pego lá.
+# O MOTOR vive em lib (sourçada), não aqui: a guarda de âncora morta cobra que símbolo citado por
+# âncora de `sed` exista em `.claude/validation/*.sh`, e a bancada passa a sourçar o artefato REAL.
+_REGEN_LIB="${REPO_ROOT}/.claude/validation/onion-regen-lib.sh"
+if [ -r "${_REGEN_LIB}" ]; then
+  # shellcheck source=/dev/null
+  . "${_REGEN_LIB}"
+else
+  echo "⚠️  onion-regen-lib.sh AUSENTE — projeções NÃO serão regeneradas; as REGRAS 16/39/62/80/81/84 vão acusar."
+  onion_regen() { :; }; onion_staged() { :; }
+fi
+
+_V="${REPO_ROOT}/.claude/validation"
+# O painel lê review-ledger (CONTA resíduos) E harness-inventory (CONTA famílias): os dois gatilhos.
+[ -n "$(onion_staged 'docs/evolution/review/*.md' '.claude/validation/lint-selftest.sh')" ]   && [ -f "${_V}/testing-state.sh" ]   && onion_regen docs/onion/testing-state.md 81 bash "${_V}/testing-state.sh" --markdown
+# A tabela de doutrina é PROJEÇÃO do registro, que deriva dos docstrings do lint.
+[ -n "$(onion_staged '.claude/validation/rules-registry.sh' '.claude/validation/lint-artifacts.sh')" ]   && [ -f "${_V}/rules-registry.sh" ]   && onion_regen .claude/validation/lint-rules.md 39 bash "${_V}/rules-registry.sh"
+[ -n "$(onion_staged '.claude/validation/lint-selftest.sh')" ]   && [ -f "${_V}/harness-inventory.sh" ]   && onion_regen docs/onion/testing-inventory.md 80 bash "${_V}/harness-inventory.sh" --markdown
+[ -n "$(onion_staged '.claude/commands' '.claude/agents' '.claude/skills' 'docs/knowledge-base')" ]   && [ -f "${_V}/inventory.sh" ]   && onion_regen docs/onion/inventory.md 16 bash "${_V}/inventory.sh" --markdown
+if [ -n "$(onion_staged '*.kg.yaml')" ]; then
+  [ -f "${_V}/kg-trace-resolve.sh" ]     && onion_regen docs/onion/kg-read-index.tsv 84 bash "${_V}/kg-trace-resolve.sh" . --emit-index
+  # o projetor de backlog custa ~14s por invocação (medido) — por isso só com .kg.yaml staged
+  [ -f "${_V}/kg-backlog-project.sh" ]     && onion_regen docs/backlog.md 62 bash "${_V}/kg-backlog-project.sh" --markdown
 fi
 
 # ── E O HASH DA REGRA 56 RE-CARIMBADO, senao a cura acima cria outro defeito ─────────────────
@@ -174,8 +189,10 @@ fi
 # em validation/ — sem esta chamada, editar o SUT sozinho passava local e o vermelho apareceria
 # num commit futuro que tocasse validation/, culpando a mudança errada. Custa ~0,2s. ──
 KGCHK="${REPO_ROOT}/.claude/validation/kg-reverify-schema-check.sh"
-if [ -f "${KGCHK}" ] \
-   && git diff --cached --name-only --diff-filter=ACMR | grep -q '^\.claude/commands/meta/kg-freshness\.md$'; then
+# ⚠️ sem `| grep -q`: o leitor fecha cedo, o `git` leva EPIPE e sob `pipefail` o veredito INVERTE
+# com o caminho PRESENTE ([[pipefail-epipe-early-closer-class]]). Captura + here-string drena.
+_kg_staged="$(onion_staged '.claude/commands/meta/kg-freshness.md' || true)"
+if [ -f "${KGCHK}" ] && [ "${_kg_staged}" = ".claude/commands/meta/kg-freshness.md" ]; then
   echo "🧪 kg-freshness.md no commit → validando a estrutura do KgReverifySchema…"
   # TETO DECLARADO (4º Elenxo/A7): o check lê a ÁRVORE, não o índice — com staging parcial do
   # kg-freshness.md ele valida a versão da árvore. Aceito: o CI valida o commit real.
