@@ -1,0 +1,786 @@
+meta:
+  id: slm-evolucao-e-frota-de-modelos-2026-10
+  schema_version: "1"
+  baseline: 2026-10-02
+  review_after: 2026-11-16   # 45d = LINEUP DE MODELOS, o tipo DOMINANTE desta rodada. O objeto e a
+                             # evolucao das familias (Phi, Gemma, Qwen, Llama, DeepSeek, SmolLM) e o
+                             # que a proxima geracao faz com a tese da frota — lineup azeda em
+                             # semanas, e metade do dossie ja chega com numero de 2024/2025 declarado
+                             # como provavelmente superado. As outras cadencias foram consideradas e
+                             # perderam: BENCHMARK (120d) cobriria AIME/MATH/MMLU/olmOCR mas eles sao
+                             # consequencia do lineup, nao causa; MERCADO (90d) cobriria o unico sinal
+                             # de analista (o blip do Thoughtworks Radar, que se move 2x por ano);
+                             # DOUTRINA (12m) cobriria a parte que toca a casa (escada de modelos,
+                             # SLM-como-ferramenta) e e justamente a que NAO pode esperar 12m porque
+                             # depende do lineup. GATILHOS EXTRA de revisita, nomeados: (1) anuncio
+                             # de Gemma 5 ou Phi-5; (2) qualquer publicacao com tokens/s MEDIDOS em
+                             # CPU x86 de 8 vCPU sem GPU (a lacuna central do eixo 6); (3) instalacao
+                             # de llama.cpp ou Ollama NESTA maquina — hoje nao ha runtime nenhum, e
+                             # no dia em que houver a rodada para de citar e passa a medir.
+  # kg-backlog-guard: on
+  # ═══ TETO: 41 NÓS ═══
+  #   (era 40. +1 pelo no de artefato da sintese, que a REGRA 29 cobra: markdown de analise
+  #   sem no que o cite em trace: e proveniencia INVERTIDA — a vista nascendo antes da fonte.
+  #   Rascunho desta rodada, nao commitado: subir o teto aqui e corrigir o rascunho, nao furar selo.)
+  #
+  # ⚠️ NATUREZA DO INSUMO, declarada antes de qualquer veredito: o maestro colou uma SINTESE DE OUTRO
+  # ASSISTENTE sobre a evolucao dos SLMs e pediu "quero algo como isso". Esse texto e DADO a verificar
+  # e MOLDE de forma a entregar — NUNCA evidencia. Duas marcas dele: (1) todas as fontes citadas eram
+  # o blog do PROPRIO Google (familia Gemma em cada item), o que e vendor-on-self num campo
+  # multi-fornecedor; (2) os links carregavam utm_source=chatgpt.com. As claims (a)-(h) entraram com
+  # tier REBAIXADO ate corroboracao independente, e a tabela de claims abaixo registra onde a
+  # corroboracao chegou (Phi pela Microsoft, roteamento por survey de terceiro, cronologia pelo
+  # Thoughtworks) e onde NAO chegou (Gemma 3 128k/140 idiomas, Gemma 3n, Gemma 3 270M, INT4 2,5-4x).
+  #
+  # ⚠️ A PREMISSA DA RODADA CAIU NA PRIMEIRA MEDICAO, e isso esta modelado, nao escondido: o briefing
+  # afirmava "CORPUS VAZIO NESTE OBJETO — nenhum no sobre SLM, modelo pequeno, destilacao, quantizacao,
+  # MoE ou inferencia local". Medido aqui em 2026-10-02 sobre 118 grafos: FALSO. Ver
+  # C_ROUND_PREMISE_EMPTY_CORPUS (refutado) e E_LOCAL_CORPUS_HAS_PRIOR_SLM_NODES_1002. O corpus nao so
+  # fala do tema: ele ja ABSORVEU o arXiv 2506.02153 em 2026-06 e ja REJEITOU DUAS VEZES, por nome,
+  # a ideia de SLM orquestrador. Uma rodada que se anuncia como abertura de eixo sobre corpus zero
+  # estava a ponto de repagar trabalho selado.
+  #
+  # ⚠️ APOFENIA DECLARADA (risco, nao achado): a tese "o modelo deixa de SER o sistema e passa a ser
+  # componente cognitivo DENTRO do sistema" e quase palavra-por-palavra o moat declarado desta casa.
+  # Convergencia independente FORTALECE; mas o colapso observado=proponente=aprovador desta instancia
+  # exige a pergunta de quem le o campo e quem se le no campo. O grafo responde da unica forma
+  # honesta: a tese da frota entra NAO MEDIDA, nao sustentada.
+  #
+  # ⚠️ FRONTEIRA COM A RODADA IRMA EM VOO (wf_24ac2f5e-fbf, modelo-local-e-custo-de-inferencia): aquela
+  # e a DECISAO DE CUSTO (onde o token aparece por camada, preco de Together/Groq/Fireworks, ordem de
+  # movimentos). ESTA e o OBJETO E A EVOLUCAO. O cruzamento legitimo e so o eixo 6 (CPU-only).
+  #
+  # ⚠️ ARESTAS CROSS-GRAFO: o radar le arestas so DENTRO de um arquivo. Os vinculos com
+  # S2_evidence_arxiv_slm_agentic (docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml) e
+  # C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL
+  # (docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml) vao por label e trace,
+  # citando id e grafo. Ausencia por LIMITE DO MOTOR, declarada.
+
+nodes:
+
+  # ═══════════════════ A PERGUNTA ═══════════════════
+
+  - id: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.45
+    label: 'Qual foi a EVOLUCAO DOS SLMs ate outubro de 2026 e para onde ela aponta, em seis eixos: (1) a linha do tempo por FASE (2023 LLM comprimido, 2024 eficiencia e qualidade de dado, 2025 reasoning/multimodal/edge, 2026 agente local), testada fora do ecossistema de UM fornecedor; (2) as claims (a)-(h) do insumo, uma a uma; (3) o deslocamento ARQUITETURAL de um 70B generalista para escada de especialistas por etapa; (4) parametro ATIVO vs TOTAL; (5) a tese da FROTA DE MODELOS; (6) SLM em CPU-only de 8 vCPU sem GPU disputando o mesmo CPU do gate. PERMANECE ABERTA, e a razao e contavel: a linha do tempo SOBREVIVE multi-fornecedor (Microsoft/Phi em fonte primaria, Thoughtworks multi-fornecedor desde out/2024, destilacao DeepSeek para Qwen e Llama), mas as fases 2025 e 2026 se apoiam em UM fornecedor cada vez que se pede detalhe; das oito claims apenas (a), (d), (f) e (h) resolveram, e (b), (c), (e) e (g) ficam NAO VERIFICADAS por nenhuma fonte ter sido aberta sobre Gemma 3, Gemma 3n, Gemma 3 270M e INT4; o eixo 3 nao tem UMA medicao de producao com acerto, latencia e custo da escada de sete tamanhos; o eixo 5 (frota) nao tem UM time nomeado operando assim com numero; e o eixo 6 nao tem UM tokens/s medido em CPU x86 de 8 vCPU — todo numero de CPU neste grafo vem de ARM (Raspberry Pi 5), de i7 de 6 cores, de i5 velho, ou de GPU H100.'
+    verified_at: 2026-10-02
+    verified_against: 'rodada de 2026-10-02: 27 fontes e 26 claims declaradas pelo sintetizador, 32 proposicoes confirmadas modeladas, 16 refutadas por fonte fraca ou por inconsistencia de atribuicao, 0 nao verificadas por rede; mais tres medicoes locais tier 10 feitas nesta sessao (118 grafos no corpus, 8 vCPU / 31 GB sem GPU, nenhum runtime de inferencia local instalado)'
+    trace: 'docs/evolution/research/slm-evolucao-e-frota-de-modelos-2026-10/slm-evolucao-e-frota-de-modelos-2026-10.kg.yaml'
+
+  # ═══════════════════ MEDICAO LOCAL (tier 10 — o artefato antes da web) ═══════════════════
+
+  - id: E_LOCAL_CORPUS_HAS_PRIOR_SLM_NODES_1002
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.98
+    verified_at: 2026-10-02
+    verified_against: 'medido nesta maquina em 2026-10-02: `git ls-files "*.kg.yaml" | grep -v /fixtures/ | wc -l` = 118 grafos; `xargs grep -n -e SLM -e "small language" -e llama.cpp -e Ollama -e Gemma -e Qwen -e "Phi-"` devolve 19 linhas em 6 grafos, com nos NOMEADOS: S2_evidence_arxiv_slm_agentic, S2_question_slm_federation, S2_decision_deep_research_trigger (docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml), C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL (typesafe-ai-2026-09), C_OPTION_B_BASIS_IS_WEAK_SOURCED e E_LACUNAS_ROUND2_2026_10 (jev-decision-round2-2026-10), mais a linhagem Qwen-VL em ocr-local-sei-2026-09'
+    valid_from: 2026-10-02
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O CORPUS NAO ESTA VAZIO NESTE OBJETO — medido, nao suposto, e e o achado que mais muda o valor desta rodada. Em 118 grafos existem nos sobre SLM com veredito ja selado, e tres deles sao diretamente desta pergunta: (1) S2_evidence_arxiv_slm_agentic, em docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml, ja ABSORVEU o arXiv 2506.02153 em 2026-06 e o leu como "SLM-como-ferramenta-eficiente, nao federacao-de-orquestradores" — a MESMA fonte que esta rodada tratou como novidade de 2026, e a mesma leitura; (2) o corpus registra que orquestrar SLMs ja foi REJEITADO DUAS VEZES POR NOME (onion-engine-economy secao 5 + ADR slm-as-tool: "SLM e ferramenta via adapter, nunca orquestrador"), com gatilho de reabertura nomeado e revisao humana explicita; (3) C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL, em typesafe-ai-2026-09, ja descreve o MOTOR 2 da Economia de Motores como "SLM-ferramenta via SDAAL" cujo unico caso era o adapter local-slm do de-identification, GATED. Consequencia: esta rodada NAO abre o eixo, ela o REVISITA — e o que ela traz de novo e datado (2026) e verificacao de claim, nao a tese.'
+    trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml · docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml · docs/knowledge-base/concepts/onion-engine-economy.md'
+
+  - id: E_LOCAL_CPU_ONLY_HARDWARE_1002
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.98
+    verified_at: 2026-10-02
+    verified_against: 'medido nesta maquina em 2026-10-02: `nproc` = 8; `free -g` = 31 GB total, 8 usados, 22 disponiveis; `ls /dev/nvidia*` = ausente; `command -v nvidia-smi` = rc 1; `lspci` nao instalado (declarado, nao contornado)'
+    valid_from: 2026-10-02
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O CONSTRAINT DESTA CASA, re-medido nesta sessao e nao herdado do briefing: 8 vCPU, 31 GB de RAM com 22 disponiveis, ZERO GPU (nenhum /dev/nvidia*, nenhum nvidia-smi). Isto define a faixa em que qualquer numero deste grafo precisaria ter sido medido para servir de decisao — e NENHUM foi: os tokens/s que a rodada conseguiu vem de ARM (Raspberry Pi 5), de um i7-8700 de 6 cores com DDR4-2400, de um i5 velho de laptop, ou de GPU H100. Faixa de 8 vCPU x86 sem GPU: ZERO medicao. Soma-se o fato nao negociavel de que a bancada deterministica SATURA os 8 cores por aproximadamente 17 minutos e o lint leva aproximadamente 4 — um SLM local disputaria o MESMO recurso do gate, o que converte a pergunta de desempenho em pergunta de CONTENCAO, que ninguem na literatura desta rodada mediu.'
+    trace: '.claude/validation/'
+
+  - id: E_LOCAL_NO_INFERENCE_RUNTIME_INSTALLED_1002
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-10-02
+    verified_against: 'medido nesta maquina em 2026-10-02 com rc exibido: `command -v ollama` rc 1, `command -v llama-cli llama-server` rc 1, `command -v nvidia-smi` rc 1'
+    valid_from: 2026-10-02
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'NAO HA RUNTIME DE INFERENCIA LOCAL NESTA MAQUINA — nem Ollama, nem llama.cpp, nem nada. A consequencia metodologica e dura e vale mais que qualquer claim de fornecedor neste grafo: a casa discute adotar SLM local sem jamais ter executado um, e portanto TODO numero do eixo 6 e emprestado. Isto nao e objecao a adotar; e o nome do proximo movimento mais barato do campo inteiro: instalar llama.cpp, rodar um modelo de 1B a 4B em Q4 nesta maquina, e medir tokens/s com e sem a bancada concorrendo. Custo aproximado de uma hora, e substitui quatro fontes de terceiro por uma medicao propria tier 10. Enquanto isso nao acontecer, a recomendacao honesta sobre SLM em caminho quente e NAO MEDIDO, nao viavel nem inviavel.'
+    trace: '.claude/validation/kg-radar.sh'
+
+  # ═══════════════════ A PREMISSA QUE CAIU ═══════════════════
+
+  - id: C_ROUND_PREMISE_EMPTY_CORPUS
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 4
+    confidence: 0.1
+    verified_at: 2026-10-02
+    verified_against: 'refutada pela medicao de E_LOCAL_CORPUS_HAS_PRIOR_SLM_NODES_1002 sobre 118 grafos'
+    label: 'PREMISSA DO BRIEFING, REFUTADA: "CORPUS VAZIO NESTE OBJETO — medido em 2026-10-02 (kg-corpus-grep, 117 grafos): nenhum no sobre SLM, modelo pequeno, destilacao, quantizacao, MoE ou inferencia local. Esta rodada ABRE o eixo." Nao abre. O grep direto sobre os 118 grafos devolve nos com veredito selado, incluindo a absorcao do MESMO arXiv 2506.02153 em 2026-06 e duas rejeicoes nomeadas de SLM orquestrador. O no fica REGISTRADO em vez de corrigido em silencio porque a classe do erro importa mais que o caso: uma varredura por tema que devolve ZERO onde o grep devolve 19 linhas e falso-negativo de FERRAMENTA, e a cura nao e lembrar — e conferir o grep cru ao lado do kg-corpus-grep antes de declarar corpus vazio. Candidato a fio: se a divergencia for do kg-corpus-grep e nao do briefing, e defeito de guarda, e guarda que devolve verde-vazio e a classe que esta casa persegue.'
+    trace: '.claude/validation/kg-corpus-grep.sh'
+
+  # ═══════════════════ A TENSAO COM A DOUTRINA DA CASA ═══════════════════
+
+  - id: C_ROUTER_ROLE_TENSIONS_ENGINE_ECONOMY
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'confronto entre o desenho SLM-first com LLM-fallback (arXiv 2506.02153, via alphaxiv) e a doutrina citada no corpus (onion-engine-economy secao 5 + ADR slm-as-tool, via S2_evidence_arxiv_slm_agentic)'
+    label: 'TENSAO NOMEADA, e ela nao e resolvida por esta rodada: a doutrina desta casa diz "SLM e ferramenta via adapter, NUNCA orquestrador", e o padrao de melhor retorno que o campo de 2026 descreve e exatamente SLM NA PORTA — porteiro, roteador, decisor de escalada. Roteador e papel de DECISAO sobre o fluxo, nao de ferramenta chamada pelo fluxo, e por isso o padrao do campo roca na proibicao. A reconciliacao possivel, e que o corpus desta casa ja aponta sem ter fechado, e que roteamento DECIDIVEL nao e tarefa de modelo nenhum: onde a regra de roteamento se escreve como padrao fixo, o certo e regex, parser ou tabela — codigo deterministico, custo zero, veredito auditavel — e o SLM so compete onde ha julgamento e a tarefa NAO e decidivel. Isso PODA a escada de sete tamanhos pelo pe: o router de 0,3B e o classificador de 0,5B sao justamente as duas etapas com maior chance de serem codigo, nao modelo. PERMANECE ABERTA porque ninguem mediu, nesta casa nem na literatura desta rodada, que fracao do roteamento real e decidivel.'
+    trace: 'docs/knowledge-base/concepts/onion-engine-economy.md · docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
+
+  # ═══════════════════ EIXO 1 — A LINHA DO TEMPO, FASE 2024 (qualidade de dado) ═══════════════════
+
+  - id: E_PHI3_MINI_RIVALS_MIXTRAL_ON_PHONE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/pdf/2404.14219 · votos 3-0 · paper submetido 2024-04-22'
+    valid_from: 2024-04-22
+    source_tier: 7
+    source_kind: paper
+    label: 'FASE 2024 SUSTENTADA, com data e fornecedor: Phi-3-mini (3,8B parametros, 3,3T tokens) atinge 69% de MMLU e 8,38 de MT-bench, rivalizando com Mixtral 8x7B e GPT-3.5, e cabe num celular. Submetido por Microsoft em 2024-04-22. Este e o PRIMEIRO SINAL datado da fase "eficiencia + qualidade do dado de treino" com fonte primaria de paper — e e tambem o teto da fase: numero de abril de 2024, duplamente superado em outubro de 2026, guardado aqui como marco historico e nao como recomendacao de modelo.'
+    trace: 'https://arxiv.org/pdf/2404.14219'
+
+  - id: E_PHI3_FAMILY_SCALES_SMALL_AND_MEDIUM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/pdf/2404.14219 · votos 3-0'
+    valid_from: 2024-04-22
+    source_tier: 7
+    source_kind: paper
+    label: 'A familia Phi-3 escala para small (7B, 4,8T tokens, 75% de MMLU) e medium (14B, 78% de MMLU). Sustenta a fase 2024 (qualidade de dado), MAS com a ressalva que o proprio dossie obriga: e narrativa de UM fornecedor (Microsoft) sobre a PROPRIA familia. Como historia do campo isto vale pouco sozinho; vale porque o Thoughtworks Radar, analista independente, cobre a mesma virada com outros fornecedores no mesmo periodo.'
+    trace: 'https://arxiv.org/pdf/2404.14219'
+
+  - id: E_PHI35_MOE_AND_VISION_IN_2024
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/pdf/2404.14219 versao v4 · votos 3-0'
+    valid_from: 2024-08-30
+    source_tier: 7
+    source_kind: paper
+    label: 'A FASE 2025 E RETROSPECTIVA PARCIALMENTE INVENTADA, e este e o no que mostra: a versao v4 do paper do Phi-3, de 2024-08-30, JA acrescenta Phi-3.5-MoE (16x3,8B com 6,6B ativos) e Phi-3.5-Vision (4,2B). Ou seja, parametro ATIVO vs TOTAL e multimodalidade em SLM sao sinais de AGOSTO DE 2024, nao de 2025. A linha do tempo limpa do insumo (2024 = dado, 2025 = multimodal + MoE) nao sobrevive a data: as duas coisas se sobrepoem por pelo menos cinco meses dentro da MESMA familia e do MESMO paper.'
+    trace: 'https://arxiv.org/pdf/2404.14219'
+
+  # ═══════════════════ EIXO 1 e 2 — FASE 2025 (reasoning) e CLAIM (a) ═══════════════════
+
+  - id: E_PHI4_MINI_REASONING_EXISTS_3B8
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'https://huggingface.co/microsoft/Phi-4-mini-reasoning · votos 3-0 · model card do fornecedor'
+    valid_from: 2025-04-30
+    source_tier: 8
+    source_kind: primary
+    label: 'CLAIM (a) CONFIRMADA por fonte primaria, e a confirmacao DERRUBA a atribuicao do insumo: existe variante pequena de reasoning da familia Phi — Phi-4-mini-reasoning, 3,8B parametros, lancada em abril de 2025, com contexto de 128K. O fornecedor e a MICROSOFT, nao o Google. O insumo apontava o blog do Google para uma claim sobre a familia Phi, o que e o sintoma exato de concentracao de fornecedor num campo multi-fornecedor. valid_from registrado como 2025-04-30 por precisao de MES na fonte (o dia nao foi medido) — a data lida foi abril de 2025.'
+    trace: 'https://huggingface.co/microsoft/Phi-4-mini-reasoning'
+
+  - id: E_PHI4_MINI_REASONING_TRAINED_BY_DISTILL_DEEPSEEK
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'https://huggingface.co/microsoft/Phi-4-mini-reasoning · votos 3-0'
+    valid_from: 2025-04-30
+    source_tier: 8
+    source_kind: primary
+    label: 'O MECANISMO da fase, e ele cruza fornecedores: o treino do Phi-4-mini-reasoning combina destilacao e dados sinteticos de matematica GERADOS PELO DeepSeek-R1 (aproximadamente 30B tokens, mais de 1M de problemas). Isto sustenta a fase 2024-25 (qualidade de dado e destilacao) com a prova mais forte possivel contra a leitura de fornecedor unico: a Microsoft depende de um modelo DA DEEPSEEK para treinar o proprio SLM. A linha do tempo do campo nao e a linha do tempo de uma familia — e um grafo de dependencias entre familias rivais.'
+    trace: 'https://huggingface.co/microsoft/Phi-4-mini-reasoning'
+
+  - id: E_PHI4_MINI_REASONING_BEATS_7B_8B_ON_MATH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: 2026-10-02
+    verified_against: 'https://huggingface.co/microsoft/Phi-4-mini-reasoning · votos 3-0 · numeros do proprio card (vendor-on-self)'
+    valid_from: 2025-04-30
+    source_tier: 8
+    source_kind: primary
+    label: 'Segundo o PROPRIO card (vendor-on-self, e por isso a confianca cai a 0,75 apesar do tier 8 e do 3-0), o 3,8B supera destilacoes de reasoning de 7B e 8B em AIME (57,5 contra 53,3 e 43,3), MATH-500 (94,6 contra 91,4 e 86,9) e GPQA Diamond (52,0 contra 49,5 e 47,3). Benchmarks de ABRIL DE 2025, declarados como provavelmente superados em outubro de 2026. O que sobrevive da claim nao e o numero: e a FORMA — modelo menor vencendo maior em tarefa ESTREITA, que e a unica forma em que a tese da frota tem base empirica neste grafo.'
+    trace: 'https://huggingface.co/microsoft/Phi-4-mini-reasoning'
+
+  - id: E_PHI4_MINI_REASONING_IS_NARROW_NOT_AGENT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'https://huggingface.co/microsoft/Phi-4-mini-reasoning · votos 3-0 · secao de uso pretendido e limitacoes do card'
+    valid_from: 2025-04-30
+    source_tier: 8
+    source_kind: primary
+    label: 'O CONTRA-SINAL DENTRO DA PROPRIA FONTE QUE CONFIRMA A CLAIM, e e o achado mais util do eixo 1: o card diz que o modelo e ESPECIALIZADO e RESTRITO a raciocinio matematico, com capacidade factual limitada, destinado a ambientes com restricao de memoria e computacao. Nao e agente, nao e generalista, nao faz ferramenta. Logo a existencia de reasoning pequeno NAO sustenta, por si, a fase "SLM agente local 2026" — sustenta a fase "especialista estreito", que e outra coisa e e justamente o que a tese da frota precisa. Quem le a fase 2026 como consequencia natural da fase 2025 esta somando capacidades que a fonte separa.'
+    trace: 'https://huggingface.co/microsoft/Phi-4-mini-reasoning'
+
+  # ═══════════════════ EIXO 2 — CLAIM (h): A FONTE E MAIS ANTIGA QUE A NARRATIVA ═══════════════════
+
+  - id: E_ARXIV_2506_02153_IS_JUNE_2025
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/abs/2506.02153v3 · votos 3-0 · historico de versoes da propria pagina do arXiv'
+    valid_from: 2025-06-02
+    source_tier: 7
+    source_kind: paper
+    label: 'CLAIM (h), metade da DATA: CONFIRMADA e a fonte e MAIS ANTIGA que a narrativa. O ID arXiv 2506.02153 e de junho de 2025 (v1 em 2025-06-02); v2 em 2025-09-15 e v3 em 2026-09-22 sao apenas revisoes. O formato 25MM nao deixa duvida. A survey de sistemas agentic que o insumo apresentava como material de 2026 e, na verdade, um documento de ha dezesseis meses — e o corpus desta casa ja a tinha absorvido em 2026-06. Consequencia direta para a forma pedida: a fase 2026 nao pode ser fundamentada nela.'
+    trace: 'https://arxiv.org/abs/2506.02153v3'
+
+  - id: E_ARXIV_2506_02153_IS_POSITION_PAPER_NVIDIA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/abs/2506.02153v3 · votos 3-0 · a afiliacao NVIDIA Research nao foi confirmada na pagina fetchada, declarado'
+    valid_from: 2025-06-02
+    source_tier: 7
+    source_kind: paper
+    label: 'A NATUREZA da fonte, que muda o peso de tudo que se apoia nela: "Small Language Models are the Future of Agentic AI" e um POSITION PAPER, nao medicao, de Belcak et al., autores da NVIDIA Research (afiliacao NAO confirmada na pagina fetchada — declarado, nao arredondado). Defende que SLMs sao suficientemente poderosos, mais adequados e mais economicos para muitas invocacoes em sistemas agentic. Posicao de parte interessada: a NVIDIA vende o silicio que roda inferencia em qualquer tamanho e tem interesse declarado em multiplicar invocacoes. Um position paper de fornecedor de infraestrutura nao e evidencia de pratica; e a hipotese a testar.'
+    trace: 'https://arxiv.org/abs/2506.02153v3'
+
+  - id: E_ARXIV_2506_02153_PROPOSES_CONVERSION_ALGORITHM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/abs/2506.02153v3 · votos 3-0'
+    valid_from: 2025-06-02
+    source_tier: 7
+    source_kind: paper
+    label: 'O paper propoe um ALGORITMO GERAL de conversao de agentes LLM para SLM. E proposta CONCEITUAL do paper, nao evidencia de pratica medida em producao — e a distincao e o cerne do eixo 3: existe receita publicada para montar a escada de especialistas, e nao existe, neste grafo, UM caso de alguem que a rodou e publicou acerto, latencia e custo. Receita sem execucao e desenho, exatamente o que a pergunta mandava distinguir.'
+    trace: 'https://arxiv.org/abs/2506.02153v3'
+
+  - id: E_ALPHAXIV_CLAIM_H_ATTRIBUTION_REFUTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.7
+    verified_at: 2026-10-02
+    verified_against: 'https://www.alphaxiv.org/audio/2506.02153 · votos 3-0 · agregador, nao o arXiv'
+    valid_from: 2025-06-02
+    source_tier: 6
+    source_kind: paper
+    label: 'CLAIM (h), VEREDITO COMPLETO e ele e misto: CONFIRMA o conteudo, REFUTA a atribuicao. A survey de sistemas agentic com SLM-first e LLM-fallback tem ID 2506.02153 (formato 25MM, junho de 2025) e autoria NVIDIA mais Georgia Tech — NAO Google, como o insumo afirmava. A data de 22/09/2026 exibida pelo alphaXiv e provavelmente de revisao ou de pagina e NAO bate com o ID. Tres coisas caem de uma vez: a recencia, o fornecedor e a ideia de que o blog do Google e fonte dessa tese. Confianca 0,7 porque a propria fonte que corrige e um AGREGADOR, e um agregador que exibe data inconsistente nao e autoridade sobre datas.'
+    trace: 'https://www.alphaxiv.org/audio/2506.02153'
+
+  - id: E_ALPHAXIV_HETEROGENEOUS_SLM_FIRST_LLM_FALLBACK
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-10-02
+    verified_against: 'https://www.alphaxiv.org/audio/2506.02153 · votos 3-0'
+    valid_from: 2025-06-02
+    source_tier: 6
+    source_kind: paper
+    label: 'O DESENHO que o campo propoe, na forma mais precisa que esta rodada conseguiu: agentes HETEROGENEOS, em que SLMs tratam invocacoes rotineiras e especializadas e um LLM e chamado SELETIVAMENTE quando generalidade e necessaria — SLM-first com fallback. Note-se o que isto NAO e: nao e a escada de sete tamanhos por etapa, e nao e frota. E uma arquitetura de DOIS NIVEIS com criterio de escalada. A escada fina (0,3B router, 0,5B classificador, 1B extractor, 3B RAG, 4B tool-calling, 7B coding, 12B reasoning) nao aparece em fonte nenhuma deste grafo: ela e granularidade acrescentada pelo insumo sobre um desenho de dois niveis.'
+    trace: 'https://www.alphaxiv.org/audio/2506.02153'
+
+  # ═══════════════════ EIXO 3 — O DESLOCAMENTO ARQUITETURAL (roteamento) ═══════════════════
+
+  - id: E_ROUTING_SURVEY_ROUTERS_CAN_BEAT_BEST_SINGLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/pdf/2603.04445 · votos 3-0 · survey em TMLR 08/2026, arXiv 2603.04445v3 de 30 Ago 2026, ID de 2026-03'
+    valid_from: 2026-08-30
+    source_tier: 7
+    source_kind: paper
+    label: 'A FONTE MAIS ATUAL do eixo 3, e e de 2026: survey de roteamento e cascata multi-LLM (Moslem e Kelleher, TMLR 08/2026) afirma que roteadores bem desenhados podem SUPERAR ate o modelo individual mais poderoso. Isto e mais forte que "economizam": sugere que a composicao tem ganho de QUALIDADE, nao so de custo — o que, se verdadeiro, dissolve a objecao de que frota degrada veredito. MAS o teto esta na propria natureza da fonte: e survey de METODOS DE TERCEIROS, nao medicao propria de frota em producao. Nenhum time nomeado, nenhum sistema em operacao, nenhum numero de producao.'
+    trace: 'https://arxiv.org/pdf/2603.04445'
+
+  - id: E_ROUTING_SURVEY_OVERHEAD_QUALIFIED_NOT_QUANTIFIED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/pdf/2603.04445 · votos 3-0'
+    valid_from: 2026-08-30
+    source_tier: 7
+    source_kind: paper
+    label: 'O CUSTO ESCONDIDO DO PADRAO, e a resposta do campo e uma admissao sem numero: o survey declara que o roteamento introduz OVERHEAD DE SISTEMA que precisa ser controlado e que o custo do proprio roteador deve ser DESPREZIVEL. Isto QUALIFICA o custo oculto e nao o quantifica — nao ha linha sobre scaffolding, validacao ou observabilidade a mais, nem sobre o ponto em que o overhead come a economia, que era exatamente a pergunta do eixo 3. A fonte mais atual e mais pertinente do campo, perguntada diretamente sobre o custo da frota, responde "existe e precisa ser pequeno". Isso e lacuna, nao resposta.'
+    trace: 'https://arxiv.org/pdf/2603.04445'
+
+  - id: E_ROUTING_SURVEY_UNCERTAINTY_PROBES_BEAT_VERBALIZATION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/pdf/2603.04445 · votos 3-0 · Chuang et al. 2025b citado no survey'
+    valid_from: 2025-01-01
+    source_tier: 7
+    source_kind: paper
+    label: 'O MECANISMO DE ESCALADA que tem numero, e vale precisamente onde a casa precisa: Chuang et al. (2025b), citado no survey, compara 8 metodos de incerteza para rotear SLM para LLM em dispositivos de borda — PROBES e PERPLEXIDADE vencem a VERBALIZACAO, e os SLMs IGUALAM o LLM nas 20% de consultas de maior confianca. Duas leituras. A util: existe sinal mensuravel para decidir escalada, e ele nao e pedir ao modelo que diga sua confianca. A limitante: 20% e a fracao, ou seja o porteiro cobre um quinto do trafego e o grande continua pagando quatro quintos. Evidencia de BENCHMARK de 2025 via survey, nao de producao. valid_from em 2025-01-01 e aproximacao do ANO (o mes nao foi medido), declarada.'
+    trace: 'https://arxiv.org/pdf/2603.04445'
+
+  - id: E_ROUTING_SURVEY_BEST_ROUTE_60PCT_COST_CUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/pdf/2603.04445 · votos 3-0 · numero de benchmark academico citado dentro do survey'
+    valid_from: 2026-08-30
+    source_tier: 7
+    source_kind: paper
+    label: 'O UNICO NUMERO DE CUSTO de frota que esta rodada alcancou, e ele e academico: o survey cita BEST-Route com perda de qualidade de 1,59% a 60% de reducao de custo num pool de 8 LLMs, e o framing "qualidade de GPT-4 a 24% do custo". Confianca 0,75 e nao 0,85 porque e numero citado DENTRO de survey (duas camadas de distancia da medicao), usa GPT-4o como juiz, e nao trata de CPU-only, nem de MoE ativo vs total, nem de cemiterio de frotas. Para a pergunta do maestro — "alguem publicando numero de acerto, latencia e custo em producao" — a resposta medida e: nao; ha numero de BENCHMARK, de um pool de modelos HOSPEDADOS, sem operacao real.'
+    trace: 'https://arxiv.org/pdf/2603.04445'
+
+  - id: E_NER_CASCADE_EVIDENCE_IS_SINGLE_LOAD_GPU_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/html/2605.18796 · votos 3-0 · o proprio autor admite que a generalizacao exige mais tarefas e familias'
+    valid_from: 2026-05-11
+    source_tier: 5
+    source_kind: paper
+    label: 'O TETO DA MELHOR EVIDENCIA DE CASCATA desta rodada, declarado em vez de arredondado: a fonte cobre UMA UNICA carga (NER de fotografia), dois modelos SEM FAMILIA NOMEADA (4B e 12B), em GPU H100 com vLLM 0.4.2. Nao ha avaliacao CPU-only, nem comparacao de custo OPERACIONAL de frota (scaffolding, observabilidade), e o proprio autor admite que a generalizacao exige mais tarefas e familias. O numero que o dossie carregava (F1 0,91 a custo 2,08 contra 3,02 do grande, reducao de 31%) ficou do lado REFUTADO por fonte fraca — ou seja, a unica medicao de cascata com numero de producao que a rodada achou nao passou o Verify, e o que sobrou confirmado foi so a declaracao do seu proprio limite.'
+    trace: 'https://arxiv.org/html/2605.18796'
+
+  # ═══════════════════ EIXO 1 e 5 — O ANALISTA INDEPENDENTE (multi-fornecedor) ═══════════════════
+
+  - id: E_RADAR_BLIP_SINCE_2024_MULTI_VENDOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://www.thoughtworks.com/en-br/radar/techniques/small-language-models · votos 3-0 · quatro edicoes datadas na propria pagina'
+    valid_from: 2024-10-01
+    source_tier: 7
+    source_kind: analyst
+    label: 'A LINHA DO TEMPO SOBREVIVE FORA DE UM FORNECEDOR, e e esta a evidencia que decide o eixo 1: o Thoughtworks Technology Radar (analista independente, multi-fornecedor) acompanha o blip "small language models" desde OUT/2024 (Trial), com revisoes em abr/2025 (Trial), nov/2025 (Assess) e abr/2026 (Assess), citando Phi, Llama, Gemma, Qwen, Ministral, SmolLM2 e DeepSeek. Sete familias de seis fornecedores diferentes, numa fonte que nao vende modelo nenhum. A narrativa do insumo — toda apoiada no blog do Google — era vendor-on-self; a HISTORIA, essa sim, e multi-fornecedor e esta datada por um terceiro. valid_from em 2024-10-01 e aproximacao do MES da edicao, declarada.'
+    trace: 'https://www.thoughtworks.com/en-br/radar/techniques/small-language-models'
+
+  - id: E_RADAR_DISTILLATION_CROSSED_VENDORS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://www.thoughtworks.com/en-br/radar/techniques/small-language-models · votos 3-0'
+    valid_from: 2025-01-01
+    source_tier: 7
+    source_kind: analyst
+    label: 'A DESTILACAO CRUZOU FORNECEDORES, atestado por terceiro: DeepSeek foi destilado em Qwen e Llama, modelos menores de pesos abertos. Sustenta o papel da destilacao na fase 2025 sem depender de ninguem falando da propria familia, e fecha o par com o Phi-4-mini-reasoning treinado em dados do DeepSeek-R1: a tecnica que define a fase e justamente a que atravessa as fronteiras comerciais. valid_from em 2025-01-01 e aproximacao do ANO, declarada — a edicao que registra e de 2025 e o mes nao foi medido.'
+    trace: 'https://www.thoughtworks.com/en-br/radar/techniques/small-language-models'
+
+  - id: E_RADAR_RECOMMENDS_SLM_FOR_NARROW_AGENTIC
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-02
+    verified_against: 'https://www.thoughtworks.com/en-br/radar/techniques/small-language-models · votos 3-0 · anel Assess, nao Adopt'
+    valid_from: 2025-11-01
+    source_tier: 7
+    source_kind: analyst
+    label: 'ONDE O ANALISTA INDEPENDENTE RECOMENDA SLM, e o recorte e exatamente o da aposta pre-registrada: para sistemas agentic com tarefas ESTREITAS E REPETITIVAS, o Radar recomenda SLMs como alternativa de menor custo e latencia. Mas a recomendacao e de ANEL ASSESS, nao Adopt — avalie, nao adote —, sem medicao e sem cobrir CPU-only alem da expressao "dispositivos de borda". Isto confirma a direcao (estreito e repetitivo) e NAO confirma a frota: um analista que recomendasse reorganizar o sistema em frota de especialistas teria posto a tecnica em Trial ou Adopt, nao em Assess.'
+    trace: 'https://www.thoughtworks.com/en-br/radar/techniques/small-language-models'
+
+  - id: E_RADAR_2026_04_INTELLIGENCE_PER_DOLLAR_QUALITATIVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-02
+    verified_against: 'https://www.thoughtworks.com/en-br/radar/techniques/small-language-models · votos 3-0'
+    valid_from: 2026-04-01
+    source_tier: 7
+    source_kind: analyst
+    label: 'A AFIRMACAO MAIS RECENTE do analista, e ela e QUALITATIVA: em abr/2026 o Radar diz que SLMs "comecam a oferecer melhor inteligencia por dolar que LLMs em certos casos de uso". Sem acerto, sem latencia, sem custo. Logo NAO confirma a escada de especialistas nem a tese da frota — confirma apenas que a direcao segue viva na leitura de um terceiro. "Comecam" e "certos casos de uso" sao as duas qualificacoes que o insumo removeu ao transformar isto em fase consumada. valid_from em 2026-04-01 e aproximacao do MES da edicao, declarada.'
+    trace: 'https://www.thoughtworks.com/en-br/radar/techniques/small-language-models'
+
+  # ═══════════════════ EIXO 1 e 2 — FASE 2026 (agente local) e CLAIM (d) ═══════════════════
+
+  - id: E_GEMMA4_ANNOUNCED_AGENTIC_AT_EDGE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: 2026-10-02
+    verified_against: 'https://developers.googleblog.com/bring-state-of-the-art-agentic-skills-to-the-edge-with-gemma-4/ · votos 3-0 · blog do proprio fornecedor (vendor-on-self)'
+    valid_from: 2026-04-02
+    source_tier: 6
+    source_kind: primary
+    label: 'CLAIM (d) CONFIRMADA EM PARTE, e a parte que cai importa: o Google apresenta o Gemma 4 como agentic no edge — planejamento multi-etapa, acao autonoma, GERACAO de codigo offline, processamento audiovisual — em post de 2026-04-02. Confirma a existencia e a data. MAS a EXECUCAO LOCAL de codigo, que o insumo afirmava, NAO e afirmada pela fonte: so geracao offline. Gerar codigo e produzir texto; executar codigo e ter sandbox, e a diferenca e a fronteira entre "modelo que escreve" e "agente que age". Confianca 0,65 apesar do 3-0 porque isto e declaracao de fornecedor sobre a propria familia, numa claim que e exatamente a tese de marketing da fase 2026.'
+    trace: 'https://developers.googleblog.com/bring-state-of-the-art-agentic-skills-to-the-edge-with-gemma-4/'
+
+  - id: E_NVIDIA_BLOG_GEMMA4_NATIVE_TOOL_USE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: 2026-10-02
+    verified_against: 'https://developer.nvidia.com/blog/bringing-ai-closer-to-the-edge-and-on-device-with-gemma-4/ · votos 3-0 · blog de fornecedor de silicio sobre modelo de terceiro, mesma data do post do Google'
+    valid_from: 2026-04-02
+    source_tier: 6
+    source_kind: primary
+    label: 'A SEGUNDA FONTE da fase 2026, e ela e menos independente do que parece: a NVIDIA publicou em 2026-04-02 — o MESMO DIA do post do Google — um blog sobre o Gemma 4 no edge, descrevendo a familia com suporte NATIVO a tool use (function calling) e capacidades de audio, visao e raciocinio. Tool use nativo e o ingrediente que a fase 2026 exige, e aqui ele esta atestado por quem nao fabricou o modelo. Mas coordenacao de lancamento no mesmo dia nao e corroboracao independente: e co-marketing. Confianca 0,65. O que se ganha de verdade e o cruzamento com o outro no do mesmo blog, do lado refutado, que descreve o Gemma 4 como MoE de 128 experts 26B-A4B.'
+    trace: 'https://developer.nvidia.com/blog/bringing-ai-closer-to-the-edge-and-on-device-with-gemma-4/'
+
+  - id: E_GEMMA4_140_LANGUAGES_128K
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'https://developers.googleblog.com/bring-state-of-the-art-agentic-skills-to-the-edge-with-gemma-4/ · votos 2-1 · vendor-on-self'
+    valid_from: 2026-04-02
+    source_tier: 6
+    source_kind: primary
+    label: 'O NUMERO QUE CHEGA UMA GERACAO DEPOIS DA CLAIM: o Gemma 4 suporta 140+ idiomas e janela de contexto de 128K. Isto NAO e a claim (b), que falava de GEMMA 3 com 128k, multimodalidade, function calling, structured output e 140+ idiomas — a claim (b) segue NAO VERIFICADA, porque nenhuma fonte sobre o Gemma 3 foi aberta nesta rodada. O que este no entrega e continuidade de ESPECIFICACAO na familia, o que torna (b) plausivel e nao a torna verificada. Votos 2-1 e vendor-on-self: confianca 0,6. Registrar plausibilidade como confirmacao seria exatamente o arredondamento que a pergunta proibia.'
+    trace: 'https://developers.googleblog.com/bring-state-of-the-art-agentic-skills-to-the-edge-with-gemma-4/'
+
+  # ═══════════════════ EIXO 6 — CPU-ONLY ═══════════════════
+
+  - id: E_GEMMA4_E2B_RASPBERRY_PI_TOKENS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'https://developers.googleblog.com/bring-state-of-the-art-agentic-skills-to-the-edge-with-gemma-4/ · votos 2-1 · medicao do proprio fornecedor, metodo nao declarado'
+    valid_from: 2026-04-02
+    source_tier: 6
+    source_kind: primary
+    label: 'O UNICO tokens/s de CPU de 2026 que a rodada alcancou, e ele e de ARM e do fornecedor: Gemma 4 E2B roda com menos de 1,5 GB de memoria em alguns dispositivos; num Raspberry Pi 5 entrega 133 tok/s de PREFILL e 7,6 tok/s de DECODE. A assimetria prefill/decode e o dado util e o que mais se omite ao citar: 133 e a leitura do prompt, 7,6 e a escrita da resposta — a dezessete vezes menos. Uma resposta de 500 tokens leva mais de um minuto. Para o eixo 6 isto responde "lote assincrono, nunca caminho quente" ja no hardware MAIS FAVORAVEL do dossie, e nada diz sobre 8 vCPU x86 disputando com a bancada. Votos 2-1, metodo nao declarado: confianca 0,6.'
+    trace: 'https://developers.googleblog.com/bring-state-of-the-art-agentic-skills-to-the-edge-with-gemma-4/'
+
+  - id: E_BITNET_CPP_SPEEDUP_X86_ARM
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/abs/2410.16144 · votos 3-0 · baselines do proprio autor (ecossistema Microsoft)'
+    valid_from: 2024-10-21
+    source_tier: 7
+    source_kind: paper
+    label: 'A TRILHA 1-BIT em CPU, com o numero e com a data que o desqualifica como atual: bitnet.cpp (Microsoft) reporta speedups de 2,37x a 6,17x em CPUs x86 e de 1,37x a 5,07x em CPUs ARM para inferencia de BitNet b1.58, em varios tamanhos de modelo. Dado de OUT/2024, provavelmente superado, e medido contra baselines do PROPRIO autor. E a unica evidencia do grafo que fala de x86, que e a arquitetura desta casa — e fala dela em relativo (speedup contra o proprio baseline), nunca em absoluto (tokens/s), o que a torna inutil para decidir se serve ao caminho quente.'
+    trace: 'https://arxiv.org/abs/2410.16144'
+
+  - id: E_BITNET_CPP_LOSSLESS_BUT_NO_TOKENS_PER_SEC
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/abs/2410.16144 · votos 2-1'
+    valid_from: 2024-10-21
+    source_tier: 7
+    source_kind: paper
+    label: 'A ressalva que esvazia a trilha 1-bit como opcao desta casa: a inferencia de BitNet b1.58 em CPU via bitnet.cpp e apresentada como LOSSLESS, isto e, sem perda frente ao modelo ternario de referencia — mas "sem perda frente ao ternario" nao e "sem perda frente ao modelo que eu usaria". E nao ha tokens/s para a faixa de 8 vCPU e 31 GB, nem comparacao com quantizacoes convencionais (Q4) de SLMs comuns. Soma-se o requisito estrutural, do lado refutado do dossie: a abordagem EXIGE modelos treinados NATIVAMENTE em 1,58 bit, e nao quantiza SLMs existentes — ou seja, o catalogo disponivel e minusculo. Votos 2-1: confianca 0,55.'
+    trace: 'https://arxiv.org/abs/2410.16144'
+
+  # ═══════════════════ EIXO 4 — PARAMETRO ATIVO vs TOTAL ═══════════════════
+
+  - id: E_MOE_ON_CPU_MEMORY_FOLLOWS_TOTAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'https://inventivehq.com/blog/moe-on-cpu-benchmark · votos 2-1 · blog de engenheiro, medicao propria, metodo parcialmente declarado'
+    valid_from: 2026-06-26
+    source_tier: 6
+    source_kind: engineer
+    label: 'A RESPOSTA DIRETA DO EIXO 4, e ela e um SPLIT que a conta de FLOPs esconde: a memoria exigida segue o parametro TOTAL, porque todos os experts precisam estar residentes em RAM (aproximadamente 18 GB em Q4 para o 30B-A3B; 32 GB confortavel, 16 GB insuficiente). Para CPU-only, o ATIVO ajuda a LATENCIA e o TOTAL dita a RAM. Aplicado a esta casa: 22 GB disponiveis cabem um 30B-A3B em Q4 com folga de 4 GB — e essa folga desaparece quando a bancada roda, o que faz a pergunta virar swap, nao throughput. Votos 2-1 e tier 6 (blog de engenheiro): confianca 0,6. E a medicao mais pertinente do grafo e vem da fonte menos autoritativa, o que e um fato sobre o campo, nao sobre a busca.'
+    trace: 'https://inventivehq.com/blog/moe-on-cpu-benchmark'
+
+  - id: E_DIFFUSIONGEMMA_26B_TOTAL_3B8_ACTIVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: 2026-10-02
+    verified_against: 'https://the-decoder.com/googles-new-open-model-diffusiongemma-generates-text-from-noise-instead-of-word-by-word/ · votos 3-0 · imprensa tecnica; fonte primaria Google ou HF NAO consultada'
+    valid_from: 2026-06-01
+    source_tier: 5
+    source_kind: analyst
+    label: 'CLAIM (f) CONFIRMADA por imprensa tecnica, com a fonte primaria NAO consultada: DiffusionGemma existe como modelo aberto MoE com aproximadamente 26B parametros totais e aproximadamente 3,8B ativos por passo. Confianca 0,55 — tier 5 e numero de arquitetura, que e o tipo de dado que imprensa transcreve errado com mais frequencia. E ha uma confusao de nomes a declarar, porque ela esta no dossie: do lado refutado, o blog da NVIDIA descreve um GEMMA 4 em MoE de 128 experts 26B-A4B, com os MESMOS 26B totais e aproximadamente 3,8B efetivos. Dois modelos distintos com a mesma aritmetica, ou a mesma coisa contada por duas fontes? A rodada NAO resolveu, e arredondar isso para "confirma (f)" sem a ressalva seria falso.'
+    trace: 'https://the-decoder.com/googles-new-open-model-diffusiongemma-generates-text-from-noise-instead-of-word-by-word/'
+
+  - id: E_DIFFUSIONGEMMA_18GB_VRAM_EVEN_QUANTIZED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.55
+    verified_at: 2026-10-02
+    verified_against: 'https://the-decoder.com/googles-new-open-model-diffusiongemma-generates-text-from-noise-instead-of-word-by-word/ · votos 3-0'
+    valid_from: 2026-06-01
+    source_tier: 5
+    source_kind: analyst
+    label: 'A CORROBORACAO INDEPENDENTE do eixo 4, vinda de outra familia e outra fonte: mesmo QUANTIZADO, o DiffusionGemma exige aproximadamente 18 GB de VRAM em GPU consumer high-end. O parametro ativo baixo NAO reduz a memoria do modelo total — a mesma conclusao do benchmark de MoE em CPU, obtida por caminho independente. Duas fontes, duas familias, dois substratos, mesmo veredito: para quem decide por MEMORIA, e o TOTAL que manda; o ativo e uma promessa sobre latencia. Para esta casa, que tem 22 GB de RAM compartilhada com o gate e zero VRAM, isto significa que MoE grande nao e a porta de entrada, por mais atraente que a conta de parametro ativo pareca.'
+    trace: 'https://the-decoder.com/googles-new-open-model-diffusiongemma-generates-text-from-noise-instead-of-word-by-word/'
+
+  # ═══════════════════ ONDE O SLM ENTRA NESTA CASA (escada e degradacao visivel) ═══════════════════
+
+  - id: E_CLAUDE_CODE_FALLBACKMODEL_IS_THE_LADDER
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-10-02
+    verified_against: 'https://code.claude.com/docs/en/whats-new.md · votos 3-0 · changelog oficial, Claude Code 2.1 semana 24'
+    valid_from: 2026-06-08
+    source_tier: 9
+    source_kind: primary
+    label: 'A ESCADA JA EXISTE NATIVA, e e por aqui que a doutrina da casa e a tese do campo se encontram sem briga: o Claude Code 2.1 (semana 24, jun/2026) introduziu o setting fallbackModel, que configura ate TRES modelos de fallback tentados em ordem. Isto e a base nativa da escada com degradacao, e e o mecanismo que torna "sempre o latest/maximo com degradacao VISIVEL" uma configuracao em vez de uma intencao. Consequencia para a pergunta do maestro: a escada que a casa precisa nao e a escada de SETE SLMs por etapa — e a escada de FALLBACK entre modelos de fronteira, que o substrato ja entrega e que nao degrada veredito por escolha, so por indisponibilidade.'
+    trace: 'https://code.claude.com/docs/en/whats-new.md'
+
+  - id: E_CLAUDE_CODE_WHATSNEW_IS_OUT_OF_SCOPE
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'https://code.claude.com/docs/en/whats-new.md · votos 3-0 · leitura do digest semanal inteiro'
+    valid_from: 2026-10-02
+    source_tier: 9
+    source_kind: primary
+    label: 'AUSENCIA MEDIDA NA FONTE DE TIER MAIS ALTO DO GRAFO, e ela e a evidencia mais dura contra a fase 2026 como fase do CAMPO INTEIRO: o changelog do Claude Code e um digest semanal de features e NAO TRATA de SLMs — nem Phi, nem Gemma, nem Qwen, nem MoE, nem CPU-only, nem frota de modelos. Serve so de contexto de escolha de modelo DENTRO do Claude Code. O substrato em que esta casa roda, documentado semana a semana por quem o constroi, nao menciona o tema em nenhuma linha. Nao e prova de que o campo nao se move; e prova de que ele nao se move AQUI, e portanto qualquer adocao de SLM nesta casa sera costura propria, sem caminho nativo.'
+    trace: 'https://code.claude.com/docs/en/whats-new.md'
+
+  # ═══════════════════ MERCADO E CAPITAL (eixo invariante) ═══════════════════
+
+  - id: E_MERCADO_ANALYST_DOWNGRADED_WHILE_VENDOR_HYPE_ROSE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.75
+    verified_at: 2026-10-02
+    verified_against: 'https://www.thoughtworks.com/en-br/radar/techniques/small-language-models · trajetoria datada de quatro edicoes (out/2024 Trial, abr/2025 Trial, nov/2025 Assess, abr/2026 Assess); busca de capital desta rodada: ZERO rodada, M&A ou down round de fornecedor de SLM alcancado'
+    valid_from: 2026-04-01
+    source_tier: 7
+    source_kind: analyst
+    label: 'MERCADO E CAPITAL, com o sinal que mais contraria a narrativa: SINAL DE ANALISTA SIM, e a direcao e CONTRARIA. O Thoughtworks Radar carrega o blip desde out/2024 e o MOVEU DE TRIAL PARA ASSESS entre abr/2025 e nov/2025, mantendo Assess em abr/2026 — o analista independente REBAIXOU a recomendacao no MESMO periodo em que o discurso de fornecedor subia para "agente local". Trial significa experimente em projeto real; Assess significa olhe de longe. Ninguem rebaixa uma tecnica que esta se provando. SINAL DE CUSTO EM NUMERO: so academico (BEST-Route, 60% de reducao em benchmark). SINAL DE CAPITAL: ZERO — esta rodada nao alcancou UMA rodada de investimento, aquisicao ou down round de fornecedor de SLM, e isso e declarado como AUSENCIA DE BUSCA ALCANCADA, nao como ausencia no mundo. A leitura honesta: ha discurso de fornecedor em alta, ha literatura em alta, e o unico terceiro que precifica reputacao em publico andou para TRAS.'
+    trace: 'https://www.thoughtworks.com/en-br/radar/techniques/small-language-models'
+
+  # ═══════════════════ LACUNAS (clausula 8 — lacuna vira no) ═══════════════════
+
+  - id: E_LACUNAS_SLM_FLEET_1002
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'contagem do repasse desta rodada: 32 proposicoes confirmadas modeladas, 16 refutadas por fonte fraca ou inconsistencia de atribuicao, 0 nao verificadas por rede, 27 fontes e 26 claims declaradas pelo sintetizador'
+    valid_from: 2026-10-02
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O QUE ESTA RODADA NAO VERIFICOU, contado antes que alguem assuma cobertura. (1) NAO VERIFICADAS POR REDE: ZERO — nenhum 403, nenhuma doc truncada. (2) CLAIMS DO EIXO 2 QUE NAO RESOLVERAM, quatro de oito, todas por nenhuma fonte ter sido ABERTA sobre elas: (b) Gemma 3 com 128k, multimodalidade, function calling, structured output e 140+ idiomas; (c) Gemma 3n mobile-first com texto/imagem/audio/video e footprint de 2-3 GB; (e) Gemma 3 270M para fine-tuning de tarefa estreita; (g) INT4 reduzindo tamanho 2,5-4x vs bf16 no stack de AI Edge. As quatro ficam NAO VERIFICADAS, nunca arredondadas para provaveis — e note-se o padrao: as quatro sao exatamente as claims sobre GEMMA 3, a geracao que o insumo mais citava e que esta rodada nao tocou, tendo ido direto ao Gemma 4. (3) REFUTADAS POR FONTE FRACA OU ATRIBUICAO, 16, e a CONCENTRACAO importa: cai TODO o numero de cascata em producao (F1 0,91 a custo 2,08 com reducao de 31% em 75k queries de NER, a unica medicao com acerto E custo E volume do grafo inteiro), cai o tokens/s de CPU x86 de laptop (Qwen3 0.6B a 34-36 tok/s, Gemma 3 1B a 18,6, Phi 4 Mini 3.8B a 6,9, Ministral 3 8B a 3,16 — a serie mais pertinente ao eixo 6, perdida por tier 4), cai a velocidade de decode do MoE seguindo o ativo (Qwen3-30B-A3B a 10,6 tok/s num i7-8700), e cai a composicao de tamanhos do Gemma 4 (E2B, E4B, 26B MoE, 31B denso). Perdeu-se, por tier, justamente a metade NUMERICA dos eixos 3, 4 e 6. (4) CORTADAS POR ORCAMENTO: 27 fontes e 26 claims declaradas pelo sintetizador nao foram todas abertas. (5) EIXOS SEM UMA MEDICAO DE PRODUCAO: o 3 (nenhum time nomeado publicando acerto, latencia e custo da escada), o 5 (nenhum time organizado em frota com numero, E nenhum ANTI-PADRAO com caso e data — o cemiterio pedido pelo maestro voltou VAZIO, e vazio por ausencia de busca alcancada, nao por inexistencia), o 6 (zero tokens/s em x86 de 8 vCPU sem GPU). (6) NAO MEDIDO NESTA CASA, e e a lacuna mais barata de fechar: nao ha runtime de inferencia instalado — nem Ollama nem llama.cpp —, logo a casa nunca executou um SLM e todo numero do eixo 6 e emprestado. (7) FALSO-NEGATIVO DE FERRAMENTA: o briefing declarava corpus vazio sobre 117 grafos e o grep cru sobre 118 devolve 19 linhas em 6 grafos. (8) ARESTAS CROSS-GRAFO ausentes por LIMITE DO MOTOR: o radar le arestas so dentro de um arquivo, e os vinculos com S2_evidence_arxiv_slm_agentic e C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL vao por label e trace.'
+    trace: 'docs/evolution/research/slm-evolucao-e-frota-de-modelos-2026-10/slm-evolucao-e-frota-de-modelos-2026-10.kg.yaml'
+
+  - id: AR_SYNTHESIS_SLM_FROTA_1002
+    node_type: artifact
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    verified_at: 2026-10-02
+    verified_against: 'arquivo conferido no disco; frontmatter com o contrato de custo (run_id wf_c91aa717-878, 12.213.737 tokens, 175 agentes, 91 min) apontando kg: para este grafo'
+    label: 'SYNTHESIS.md desta rodada — PROJECAO deste grafo. Carrega a FORMA que o maestro pediu e que o grafo nao formata: linha do tempo 2023-2026 fase por fase com o que SOBREVIVEU e o que caiu, a tabela de claims (a)-(h) com veredito e fonte, e o veredito da FROTA. Carrega tambem um defeito do MEU desenho, medido: custo por no de 305k contra 246k da rodada irma, com 13 claims DUPLICADAS contra 3 — eu declarei a fronteira entre as duas rodadas em PROSA no corpus, e prosa nao e fronteira. Cura candidata (passar lista de kgPath irmaos ao workflow e descartar claim repetida) fica com gatilho, nao implementada.'
+    trace: 'docs/evolution/research/slm-evolucao-e-frota-de-modelos-2026-10/SYNTHESIS.md'
+
+
+edges:
+
+  # ── as evidencias sustentam a pergunta (37) ──
+  - from: E_LOCAL_CORPUS_HAS_PRIOR_SLM_NODES_1002
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_LOCAL_CPU_ONLY_HARDWARE_1002
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_LOCAL_NO_INFERENCE_RUNTIME_INSTALLED_1002
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_PHI3_MINI_RIVALS_MIXTRAL_ON_PHONE
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_PHI3_FAMILY_SCALES_SMALL_AND_MEDIUM
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_PHI35_MOE_AND_VISION_IN_2024
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_PHI4_MINI_REASONING_EXISTS_3B8
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_PHI4_MINI_REASONING_TRAINED_BY_DISTILL_DEEPSEEK
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_PHI4_MINI_REASONING_BEATS_7B_8B_ON_MATH
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_PHI4_MINI_REASONING_IS_NARROW_NOT_AGENT
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_ARXIV_2506_02153_IS_JUNE_2025
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_ARXIV_2506_02153_IS_POSITION_PAPER_NVIDIA
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_ARXIV_2506_02153_PROPOSES_CONVERSION_ALGORITHM
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_ALPHAXIV_CLAIM_H_ATTRIBUTION_REFUTED
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_ALPHAXIV_HETEROGENEOUS_SLM_FIRST_LLM_FALLBACK
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_ROUTING_SURVEY_ROUTERS_CAN_BEAT_BEST_SINGLE
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_ROUTING_SURVEY_OVERHEAD_QUALIFIED_NOT_QUANTIFIED
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_ROUTING_SURVEY_UNCERTAINTY_PROBES_BEAT_VERBALIZATION
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_ROUTING_SURVEY_BEST_ROUTE_60PCT_COST_CUT
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_NER_CASCADE_EVIDENCE_IS_SINGLE_LOAD_GPU_ONLY
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_RADAR_BLIP_SINCE_2024_MULTI_VENDOR
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_RADAR_DISTILLATION_CROSSED_VENDORS
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_RADAR_RECOMMENDS_SLM_FOR_NARROW_AGENTIC
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_RADAR_2026_04_INTELLIGENCE_PER_DOLLAR_QUALITATIVE
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_GEMMA4_ANNOUNCED_AGENTIC_AT_EDGE
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_NVIDIA_BLOG_GEMMA4_NATIVE_TOOL_USE
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_GEMMA4_140_LANGUAGES_128K
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_GEMMA4_E2B_RASPBERRY_PI_TOKENS
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_BITNET_CPP_SPEEDUP_X86_ARM
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_BITNET_CPP_LOSSLESS_BUT_NO_TOKENS_PER_SEC
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_MOE_ON_CPU_MEMORY_FOLLOWS_TOTAL
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_DIFFUSIONGEMMA_26B_TOTAL_3B8_ACTIVE
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_DIFFUSIONGEMMA_18GB_VRAM_EVEN_QUANTIZED
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_CODE_FALLBACKMODEL_IS_THE_LADDER
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_CODE_WHATSNEW_IS_OUT_OF_SCOPE
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_MERCADO_ANALYST_DOWNGRADED_WHILE_VENDOR_HYPE_ROSE
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_SLM_FLEET_1002
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS
+
+  # ── a premissa do briefing cai pela medicao do corpus (1) ──
+  - from: E_LOCAL_CORPUS_HAS_PRIOR_SLM_NODES_1002
+    to: C_ROUND_PREMISE_EMPTY_CORPUS
+    edge_type: REFUTES
+
+  # ── a tensao LIMITA a resposta, nao a derruba (1 CONSTRAINS + 2 SUPPORTS) ──
+  - from: C_ROUTER_ROLE_TENSIONS_ENGINE_ECONOMY
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: CONSTRAINS
+  - from: E_ALPHAXIV_HETEROGENEOUS_SLM_FIRST_LLM_FALLBACK
+    to: C_ROUTER_ROLE_TENSIONS_ENGINE_ECONOMY
+    edge_type: SUPPORTS
+  - from: E_RADAR_RECOMMENDS_SLM_FOR_NARROW_AGENTIC
+    to: C_ROUTER_ROLE_TENSIONS_ENGINE_ECONOMY
+    edge_type: SUPPORTS
+  - from: AR_SYNTHESIS_SLM_FROTA_1002
+    to: Q_SLM_EVOLUTION_AND_MODEL_FLEET_2026
+    edge_type: SUPPORTS

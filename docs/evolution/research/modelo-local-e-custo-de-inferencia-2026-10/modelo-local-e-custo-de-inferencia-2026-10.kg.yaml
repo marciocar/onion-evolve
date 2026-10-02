@@ -1,0 +1,1200 @@
+meta:
+  id: modelo-local-e-custo-de-inferencia-2026-10
+  schema_version: "1"
+  baseline: 2026-10-02
+  review_after: 2026-11-01   # 30d: o tipo DOMINANTE desta rodada e PRECO. Das 33 claims confirmadas,
+                             # 19 sao tabela de preco publicada (Anthropic, Together, Fireworks) e a
+                             # decisao PENDE delas. As outras cadencias seriam mais longas — lineup de
+                             # modelos 45d, mercado/capital 90d, benchmark 120d (CodeJudgeBench,
+                             # FrugalGPT), doutrina 12m (substituir LLM por codigo deterministico) —
+                             # mas preco e o dado que azeda primeiro, e esta rodada JA mediu uma
+                             # inversao de geracao (o aumento de Sonnet para 3/15 previsto para
+                             # 1/set/2026 NAO ocorreu). Manda a cadencia curta.
+                             # GATILHOS EXTRA de revisita, antes dos 30d: (1) mudanca de REGIME de
+                             # cobranca desta casa (plano pago -> chave de API, ou o contrario), que e
+                             # a variavel que torna a pergunta decidivel; (2) publicacao de preco novo
+                             # por Together ou Fireworks; (3) qualquer medicao de tok/s em CPU-only
+                             # com 8 nucleos, que e a lacuna central do eixo 2.
+  # kg-backlog-guard: on
+  # ═══ TETO: 63 NÓS ═══
+  #   (era 62. +1 pelo no de artefato da sintese, que a REGRA 29 cobra: markdown de analise
+  #   sem no que o cite em trace: e proveniencia INVERTIDA — a vista nascendo antes da fonte.
+  #   Rascunho desta rodada, nao commitado: subir o teto aqui e corrigir o rascunho, nao furar selo.)
+  #
+  # MODO DECISAO. D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO nasce OPEN — o maestro sela, esta
+  # sessao NUNCA sela. Oito opcoes nomeadas (M0..M7), cada uma com no proprio C_OPCAO_*.
+  #
+  # ⚠️ A PERGUNTA FOI REPROVADA COMO POSTA, e a reprovacao e MEDIDA, nao retorica. O dossie parte da
+  # premissa "o CI ja e gratis porque o gate e LLM-free". Medido nesta sessao em 2026-10-02:
+  # `gh repo view --json visibility` = PRIVATE, os workflows rodam em `ubuntu-latest` HOSPEDADO, e
+  # `gh run list --limit 60` devolve 315,0 min de wall-clock em 60 runs na janela de 2026-09-30T14:03Z
+  # a 2026-10-02T00:37Z (~34,5 h), dos quais 201,5 min no Onion Guard Selftest — que roda em MATRIZ DE
+  # 4 FAIXAS, logo ~800 min FATURADOS so nele. O gate nao e gratis: ele e a maior conta METERED desta
+  # casa. Ver E_MEDIDO_CI_MINUTOS_SAO_A_CONTA_REAL_1002, e o nó da decisao, que carrega a reprovacao.
+  #
+  # ⚠️ FRONTEIRA DE VERIFICACAO DESTA RODADA (declarada, nao escondida):
+  #   · 33 claims confirmadas, 19 refutadas por fonte fraca, 0 nao-verificadas por 403/truncagem.
+  #   · 27 fontes foram CORTADAS POR ORCAMENTO, com 31 claims dentro delas — e as duas mais
+  #     decisivas para a pergunta cairam ai: a medicao de F1 de revisao por LLM em PR REAL (0,066
+  #     contra 0,847 no sintetico) e a fronteira de Pareto que diz Sonnet DOMINADO para revisao.
+  #   · EIXO 7 (mercado e capital) praticamente VAZIO: a unica claim de capital (valuations de
+  #     Baseten, Fireworks, Modal; ARR da Together) e tier 4 e foi REFUTADA. NENHUMA fonte respondeu
+  #     "qual provedor de inferencia barata FECHOU ou foi absorvido, e por que".
+  #   · EIXO 2 (modelo local em CPU) sustentado por UMA medicao de forum tier 5, em maquina DIFERENTE
+  #     e MELHOR que a VPS. Nao existe neste grafo uma medicao de tok/s em CPU-only com 8 nucleos.
+  #   · EIXO 1 (quantificar o token por camada) NAO foi respondido por fonte externa nenhuma: o que
+  #     ha e medicao local desta casa. Ver E_LACUNAS_CUSTO_DE_INFERENCIA_1002.
+  #   · As 10 objecoes sobreviventes do Elenxo sao afirmacao de UM agente sem votacao — TODAS com
+  #     confidence <= 0.6. A decima chegou TRUNCADA no repasse, e o no diz isso.
+  #
+  # Corpus conferido antes de buscar fora (clausula 0): kg-corpus-grep sobre 117 grafos devolveu
+  # casamento apenas por termos genericos (local, custo) e ZERO no sobre modelo local, Together.ai,
+  # preco de inferencia ou estrategia de economia. Esta rodada ABRE o eixo; nao ha nivel pago a
+  # reusar, e por isso NAO existe SUPERSEDES/REFUTES cross-grafo neste arquivo.
+  # Ver E_CORPUS_VAZIO_NESTE_EIXO_1002.
+
+nodes:
+
+  # ═══════════════════ A PERGUNTA ═══════════════════
+
+  - id: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.45
+    label: 'Como baixar o custo de inferencia do ciclo de desenvolvimento com agente, de forma VIAVEL para uma casa SMB/solo, em outubro de 2026 — modelo local, Together.ai, ou outra estrategia? Sete eixos pedidos: (1) o que e inferencia e o que nao e, quantificado por camada; (2) modelo local em hardware real de SMB (VPS 8 vCPU, 31 GB, SEM GPU); (3) Together.ai e os barebones de inferencia, com preco datado; (4) as estrategias que NAO sao trocar de modelo; (5) algoritmos e tecnicas no nivel de mecanismo; (6) como a comunidade enfrenta isso; (7) mercado e capital, incluindo o anti-padrao do provedor que morreu. PERMANECE ABERTA, e a razao e medida: a propria premissa do eixo 1 caiu (o gate deterministico nao e gratis — ele e a maior conta METERED desta casa, ~800 min faturados de Guard Selftest em 34,5 h), o eixo 7 nao tem UMA evidencia confirmada, o eixo 2 tem UMA medicao tier 5 em maquina diferente, e as duas fontes que mediam qualidade de revisao por LLM barato em PR real foram cortadas por orcamento.'
+    verified_at: 2026-10-02
+    verified_against: 'rodada de 2026-10-02: 33 claims confirmadas, 19 refutadas por fonte fraca, 0 nao-verificadas; 27 fontes e 31 claims cortadas por orcamento; 10 objecoes sobreviventes do Elenxo (a decima truncada no repasse); 7 medicoes locais tier 10 acrescentadas nesta sessao (visibilidade do repo, minutos de runner, lineup de modelos dos agentes, REVIEW_MODEL do workflow, hardware da VPS, massa do gate, corpus de 117 grafos)'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  # ═══════════════════ MEDICAO LOCAL (tier 10 — o artefato antes da web) ═══════════════════
+
+  - id: E_MEDIDO_CI_MINUTOS_SAO_A_CONTA_REAL_1002
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.97
+    verified_at: 2026-10-02
+    verified_against: 'medicao nesta maquina em 2026-10-02 — `gh repo view --json visibility` devolve PRIVATE; `grep -n runs-on .github/workflows/*.yml` devolve 6 jobs em ubuntu-latest HOSPEDADO; `gh run list --limit 60 --json name,createdAt,updatedAt` somado por nome devolve 315,0 min de wall-clock em 60 runs na janela 2026-09-30T14:03:11Z a 2026-10-02T00:37:02Z, assim distribuidos: Onion Guard Selftest 201,5 · Onion Artifact Linter 70,2 · Onion Code Review (Claude) 41,7 · Onion Door Staleness 1,7; `.github/workflows/onion-selftest.yml` l.85-89 declara `strategy.matrix.faixa` com 4 faixas, logo o wall-clock do selftest multiplica por 4 na fatura'
+    valid_from: 2026-10-02
+    source_tier: 10
+    source_kind: primary
+    label: 'A PREMISSA DO DOSSIE CAIU, E A MEDICAO E DESTA MAQUINA: o gate deterministico NAO e gratis. O repo e PRIVADO, os jobs rodam em runner HOSPEDADO, e em 34,5 h houve 315,0 min de wall-clock em 60 runs — 201,5 deles no Guard Selftest, que roda em MATRIZ DE 4 FAIXAS, o que da da ordem de 800 min FATURADOS so nele, ou seja ~550 min/dia e ~16.500 min/mes de ordem de grandeza. Conclusao que inverte a pergunta: o que o dossie chamou de gratis e a maior conta METERED desta casa, e ela esta na mesma ordem de grandeza do gasto de token. Logo existe um movimento de economia que o dossie nem listou — cortar MINUTO antes de token.'
+    trace: '.github/workflows/onion-selftest.yml'
+
+  - id: E_MEDIDO_GATE_E_LLM_FREE_1002
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-10-02
+    verified_against: 'medicao nesta maquina em 2026-10-02 — `git ls-files .claude/**/*.sh | xargs wc -l` devolve 49.896 linhas de shell versionado em .claude/ (das quais 26.441 no perimetro do gate contado pela baseline da casa); o radar `.claude/validation/kg-radar.sh` e awk/shell puro, sem chamada de modelo; a bancada de guardas roda com assercoes deterministicas e 4 faixas no CI'
+    valid_from: 2026-10-02
+    source_tier: 10
+    source_kind: primary
+    label: 'O QUE E VERDADE NA PREMISSA: o gate desta casa de fato nao consome token nenhum — e shell e awk agnostico, roda em qualquer CI, e o radar de grafo decide sem LLM. O que e falso e a conclusao tirada disso (que portanto ele e gratis): ele e LLM-FREE e METERED ao mesmo tempo. A distincao que a pergunta precisa e entre UNIDADE DE COBRANCA (token versus minuto de runner), nao entre pago e gratis.'
+    trace: '.claude/validation/kg-radar.sh'
+
+  - id: E_MEDIDO_HARDWARE_VPS_SEM_GPU_1002
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.98
+    verified_at: 2026-10-02
+    verified_against: 'medicao nesta maquina em 2026-10-02 — `nproc` = 8; `free -g` devolve 31 GB total, 8 usados, 22 GB available; nenhum dispositivo NVIDIA/AMD de computo presente (VPS Hostinger KVM 8, sem GPU); a bancada deterministica satura os 8 nucleos por ~17 min numa passada local'
+    valid_from: 2026-10-02
+    source_tier: 10
+    source_kind: primary
+    label: 'O CONSTRAINT QUE REPROVA O MODELO LOCAL NESTA CASA, e ele e de CONTENCAO, nao de capacidade: a maquina tem 8 vCPU, 31 GB de RAM com 22 GB livres e NENHUMA GPU — e a bancada deterministica ja satura os 8 nucleos por ~17 min. Um modelo local disputaria o MESMO recurso que o gate, isto e, economizar token custaria minuto de gate, que e exatamente a outra conta medida. Qualquer uso local so cabe em JANELA EXCLUSIVA, por lote, nunca concorrente.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  - id: E_MEDIDO_FANOUT_E_O_GASTO_DOMINANTE_1002
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'medicao desta casa — duas rodadas de pesquisa em mode:decision consumiram 20,2M tokens somados, com 148 agentes no fan-out, a ~212k e ~242k tokens por no de grafo produzido, contra 68-74k por no do historico; ~64% das claims ficaram FORA do repasse adversarial por teto de orcamento'
+    valid_from: 2026-10-02
+    source_tier: 10
+    source_kind: primary
+    label: 'ONDE O TOKEN DE FATO APARECE NESTA CASA, medido: o FAN-OUT de pesquisa, nao o gate nem a geracao de codigo. Duas rodadas gastaram 20,2M tokens com 148 agentes, e o custo por no de grafo TRIPLICOU contra o historico (212-242k contra 68-74k). Isso faz do fan-out o alvo numero um — e e exatamente a camada em que a doc do fornecedor diz que times de agentes usam ~7x mais token e recomenda Haiku para subagente simples.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  - id: E_MEDIDO_HAIKU_NAO_DECLARADO_EM_NENHUM_AGENTE_1002
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.97
+    verified_at: 2026-10-02
+    verified_against: 'medicao nesta maquina em 2026-10-02 — `grep -rln "^model: *haiku" .claude/agents/` devolve 0 arquivos; `grep -rh "^model:" .claude/agents/ | sort | uniq -c` devolve 47 sonnet, 8 opus e 2 do placeholder de template `[sonnet|opus]`; `ls .claude/agents/*/*.md | wc -l` = 60. A objecao do Elenxo citou 49 sonnet e 9 opus — a divergencia e declarada e a contagem que vale e a desta medicao, pelo comando acima'
+    valid_from: 2026-10-02
+    source_tier: 10
+    source_kind: primary
+    label: 'O DEGRAU MAIS BARATO DESTA CASA ESTA DISPONIVEL E NAO DECLARADO EM NENHUM LUGAR: dos 60 agentes, ZERO declaram `model: haiku` — a distribuicao e 47 sonnet, 8 opus e 2 placeholders de template. A allowlist da REGRA 3 JA admite haiku, logo nao falta mecanismo, falta declaracao. Combinado com o fan-out de ~7x, isso faz do tiering do leque o movimento de MENOR esforco e MAIOR retorno do grafo inteiro: zero fornecedor novo, zero substrato novo, zero risco a capacidade que compra o acoplamento (o exit 2 deterministico de hook).'
+    trace: '.claude/agents/'
+
+  - id: E_MEDIDO_REVISOR_SEM_CREDITO_E_SONNET5_1002
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-10-02
+    verified_against: 'medicao nesta maquina em 2026-10-02 — `.github/workflows/onion-review.yml` l.54 declara `REVIEW_MODEL: claude-sonnet-5`, consumido em l.135 (MODELO), l.268 e l.382 (--model); o parecer esta sem saldo de API por DECISAO do maestro desde 2026-10-01, falha em ~8s sem emitir achado, e os PRs seguem sendo mergeados por dispensa registrada enquanto os gates deterministicos permanecem verdes'
+    valid_from: 2026-10-01
+    source_tier: 10
+    source_kind: primary
+    label: 'ESTA CASA JA VIVE O CENARIO QUE O EIXO 6 PERGUNTA — revisao por IA desligada por custo — e o detalhe importa: ela esta DESLIGADA, nao rebaixada. O workflow pede `claude-sonnet-5` e nada mais; sem saldo o parecer morre em ~8s sem produzir achado. Ou seja, o desenho nao tem degrau: ou o modelo mais caro, ou nada. Isso nomeia um movimento que nao estava na pergunta — rebaixar o revisor em vez de desliga-lo, com teto de gasto por workspace, degradando VISIVELMENTE em vez de parar por falta de credito.'
+    trace: '.github/workflows/onion-review.yml'
+
+  - id: E_CORPUS_VAZIO_NESTE_EIXO_1002
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'kg-corpus-grep sobre 117 grafos em 2026-10-02: casamento apenas por termos genericos (local, custo) e ZERO no sobre modelo local, Together.ai, preco de inferencia ou estrategia de economia de token'
+    valid_from: 2026-10-02
+    source_tier: 10
+    source_kind: primary
+    label: 'O CORPUS DESTA CASA NAO TINHA NADA SOBRE O TEMA — 117 grafos, zero no sobre modelo local, preco de inferencia ou estrategia de economia. Duas consequencias: (1) esta rodada ABRE o eixo, nao refina, logo nao ha nivel pago a reusar e nao existe SUPERSEDES cross-grafo aqui; (2) uma primeira passada num eixo virgem e exatamente o lugar onde o teto de orcamento mais machuca, e machucou: 27 fontes cortadas, incluindo as duas que mediam qualidade de revisao por LLM barato em PR real.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  # ═══════════════ EIXO 4 — ESTRATEGIAS QUE NAO SAO TROCAR DE MODELO: CACHE E BATCH ═══════════════
+
+  - id: E_CACHE_MULTIPLICADORES_DE_ESCRITA_E_LEITURA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'https://platform.claude.com/docs/en/build-with-claude/prompt-caching — votos 3-0, kind=primary, tier=10'
+    source_tier: 10
+    source_kind: primary
+    label: 'PRECO DO PROMPT CACHING na doc oficial: escrita de cache a 1,25x o preco base de entrada com TTL de 5 min e a 2x com TTL de 1 h; leitura de cache a 0,1x da entrada base, com leitura mais barata em modelos novos (0,025x em Fable 5.1 e Mythos 5.1, 0,05x em Opus 5.5). Observacao de leitura que o grafo carrega junto: isto e PRECO, nao economia — o sinal depende de quantas LEITURAS cada escrita recebe, e em leque de subagentes one-shot a escrita a 1,25x pode virar SOBRETAXA. Ver E_OBJECAO_CACHE_INVERTE_EM_FANOUT.'
+    trace: 'https://platform.claude.com/docs/en/build-with-claude/prompt-caching'
+
+  - id: E_CACHE_BREAK_EVEN_UMA_OU_DUAS_LEITURAS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'https://platform.claude.com/docs/en/about-claude/pricing — votos 3-0, kind=primary, tier=10'
+    source_tier: 10
+    source_kind: primary
+    label: 'O BREAK-EVEN DO CACHE ESTA PUBLICADO E E CURTO: paga-se a si mesmo apos 1 leitura no TTL de 5 min e 2 leituras no TTL de 1 h (escrita 1,25x e 2x respectivamente, leitura a 0,1x, 0,05x no Opus 5.5 e 0,025x em Fable 5.1/Mythos 5.1). Logo o cache e lever para PREFIXO ESTAVEL RELIDO, e nao para leque de prompts distintos.'
+    trace: 'https://platform.claude.com/docs/en/about-claude/pricing'
+
+  - id: E_MINIMO_CACHEAVEL_CAIU_PARA_512_MAS_HAIKU_4096
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'https://platform.claude.com/docs/en/build-with-claude/prompt-caching — votos 3-0, kind=primary, tier=10'
+    source_tier: 10
+    source_kind: primary
+    label: 'O MINIMO CACHEAVEL CAIU PARA 512 TOKENS nos modelos mais recentes (Fable 5.1, Mythos 5.1, Opus 5.5, Opus 5, Sonnet 5.5, Fable 5), o que torna prompt CURTO de agente elegivel a cache — MAS os modelos mais antigos exigem de 1.024 a 4.096, e Haiku 4.5 e Opus 4.5/4.6 estao no teto de 4.096. Consequencia de desenho que nenhuma outra claim notou: o modelo que a doc manda usar em subagente simples (Haiku) e o MENOS elegivel a cache em prompt curto, ou seja as duas alavancas nao compoem. Ver E_OBJECAO_HAIKU_NAO_COMPOE_COM_CACHE.'
+    trace: 'https://platform.claude.com/docs/en/build-with-claude/prompt-caching'
+
+  - id: E_TTL_PADRAO_5MIN_E_UMA_HORA_CUSTA_2X
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'https://platform.claude.com/docs/en/build-with-claude/prompt-caching — votos 3-0, kind=primary, tier=10'
+    source_tier: 10
+    source_kind: primary
+    label: 'O TTL PADRAO E DE 5 MINUTOS, sem custo extra de refresh a cada reuso; agente com intervalo maior que 5 min entre chamadas precisa pedir TTL de 1 h (`ttl: 1h` em `cache_control`), que custa 2x na escrita. Isto e o parametro que decide se uma sessao de agente intermitente paga cache ou reprocessa contexto.'
+    trace: 'https://platform.claude.com/docs/en/build-with-claude/prompt-caching'
+
+  - id: E_BATCH_API_CINQUENTA_PORCENTO_E_EMPILHA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-02
+    verified_against: 'https://platform.claude.com/docs/en/about-claude/pricing — votos 3-0, kind=primary, tier=10. Confianca rebaixada de proposito: a metade EMPILHA desta claim perdeu sustentacao na propria rodada, porque a claim derivada (leitura de cache em batch = 0,05x) foi REFUTADA'
+    source_tier: 10
+    source_kind: primary
+    label: 'O BATCH API DA 50% DE DESCONTO em tokens de entrada e de saida (Sonnet 5.5 em batch sai a 1/5 por MTok contra 2/10 standard; Haiku 4.5 a 0,50/2,50). A doc tambem afirma que o desconto EMPILHA com prompt caching, mas esta metade esta sem sustentacao nesta rodada: a claim que a operacionalizava (leitura de cache em batch a 0,05x) foi refutada, logo empilhamento aqui e inferencia, nao medicao. E o pre-requisito do batch e ASSINCRONIA, que os dois gastos reais desta casa nao toleram. Ver E_OBJECAO_BATCH_EXIGE_ASSINCRONIA.'
+    trace: 'https://platform.claude.com/docs/en/about-claude/pricing'
+
+  - id: E_CLAUDE_COM_BATCH_CINQUENTA_PORCENTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: 2026-10-02
+    verified_against: 'https://claude.com/pricing — votos 3-0, kind=primary, tier=9. Confianca rebaixada por DUPLICIDADE DE EMISSOR: e o mesmo fornecedor da claim anterior em outra URL, nao confirmacao independente'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'A pagina comercial do fornecedor repete que o Batch API da 50% de desconto em processamento assincrono. Vale como confirmacao de PUBLICACAO, nao como segunda fonte: e o MESMO emissor em outra URL. E 50% incide sobre LISTA — num regime de PLANO PAGO, onde o Claude Code divide os limites do plano, nao existe linha de fatura por token para o desconto incidir. Ver E_OBJECAO_DESCONTO_SEM_ONDE_INCIDIR.'
+    trace: 'https://claude.com/pricing'
+
+  - id: E_FIREWORKS_BATCH_CINQUENTA_PORCENTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://docs.fireworks.ai/serverless/pricing — votos 3-0, kind=primary, tier=9'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'A Fireworks tambem cobra batch serverless a 50% do preco serverless, em entrada E saida. Achado util por ser CONVERGENCIA DE MERCADO e nao diferencial: o desconto de 50% por assincronia e padrao da industria em outubro de 2026, logo nao e razao para trocar de fornecedor — e razao para ter carga tolerante a fila, que e o que falta.'
+    trace: 'https://docs.fireworks.ai/serverless/pricing'
+
+  - id: E_OFFLOAD_PARA_CODIGO_DETERMINISTICO_E_OFICIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://code.claude.com/docs/en/costs — votos 3-0, kind=primary, tier=9'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'A ESTRATEGIA QUE ESTA CASA JA PRATICA E A RECOMENDADA PELO PROPRIO FORNECEDOR: offload para codigo deterministico — hooks que FILTRAM a saida antes de o modelo ver — reduz contexto de dezenas de milhares de tokens para centenas. Leitura para esta casa: o movimento mais rentavel do dossie nao e comprar inferencia mais barata, e nao gastar inferencia; e ele JA esta implementado aqui, o que significa que a economia facil nesta camada esta COLHIDA, nao disponivel.'
+    trace: 'https://code.claude.com/docs/en/costs'
+
+  - id: E_ROTEAR_MECANICO_PARA_ANALISE_ESTATICA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: 2026-10-02
+    verified_against: 'https://blog.codacy.com/ai-code-review-cost-per-pull-request-what-engineering-teams-actually-pay-in-2026 — votos 2-1, kind=vendor-on-competitor, tier=4. Confianca baixa por desenho: o emissor VENDE analise estatica, logo tem interesse direto na conclusao'
+    valid_from: 2026-08
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'A pratica recomendada e rotear checagem MECANICA para analise estatica deterministica e reservar token para JULGAMENTO, porque nem toda checagem precisa de LLM. A claim e correta e inutil como novidade aqui — e exatamente a arquitetura desta casa desde a origem. O valor dela e outro: ela nomeia a fronteira que o corpus desta casa ja estabeleceu pelo caminho duro (dissecacao do Cedar, 2026-10-01) — substituir LLM por codigo so funciona onde a tarefa e DECIDIVEL, e decidibilidade e propriedade da LINGUAGEM, nao da ferramenta.'
+    trace: 'https://blog.codacy.com/ai-code-review-cost-per-pull-request-what-engineering-teams-actually-pay-in-2026'
+
+  # ═══════════════ EIXO 3 — PRECO DE FRONTEIRA E DOS BAREBONES, DATADO ═══════════════
+
+  - id: E_PRECO_LISTA_OUT2026_SONNET_FICOU_MAIS_BARATO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'https://platform.claude.com/docs/en/about-claude/pricing — votos 3-0, kind=primary, tier=10'
+    valid_from: 2026-09
+    source_tier: 10
+    source_kind: primary
+    label: 'PRECO DE LISTA EM OUTUBRO DE 2026: Sonnet 5.5 a 2/10 por MTok, Haiku 4.5 a 1/5, Opus 5.5 a 4/20, Fable 5.1 a 10/50. O achado que mais muda a pergunta: o aumento de Sonnet para 3/15 previsto para 1/set/2026 NAO ocorreu, de modo que o modelo medio de fronteira ficou MAIS BARATO que o Sonnet 4.6 (3/15). A premissa de 2024 — fronteira e caro, aberto e barato — esta mais fraca em 2026. RESSALVA DE METODO carregada no no: isto compara preco POR TOKEN entre geracoes, e tokens-por-tarefa nao e constante entre geracoes. Ver E_OBJECAO_PRECO_POR_TAREFA_NAO_POR_TOKEN.'
+    trace: 'https://platform.claude.com/docs/en/about-claude/pricing'
+
+  - id: E_CLAUDE_COM_PRECO_PRIMARIO_CONFIRMA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.65
+    verified_at: 2026-10-02
+    verified_against: 'https://claude.com/pricing — votos 3-0, kind=primary, tier=9. Confianca rebaixada por DUPLICIDADE DE EMISSOR: mesma empresa da claim anterior em outra URL; dois tiers altos sobre um unico emissor sao UMA fonte'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'A pagina comercial lista os mesmos precos de out/2026 (Sonnet 5.5 a 2/10, Opus 5.5 a 4/20, Haiku 4.5 a 1/5, Fable 5.1 a 10/50). Registrado como CONSISTENCIA INTERNA do fornecedor, nao como confirmacao independente — e o ponto em que esta rodada mais inflou confianca: contou duas URLs do mesmo emissor como dois achados 3-0. Ver E_OBJECAO_DUAS_URLS_UM_EMISSOR.'
+    trace: 'https://claude.com/pricing'
+
+  - id: E_CACHE_TTL_5MIN_E_LEITURA_HAIKU_90PC
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'https://claude.com/pricing — votos 3-0, kind=primary, tier=9. Confianca rebaixada porque a claim COLIDE com duas outras do mesmo conjunto (o TTL muda por regime, e o Haiku 4.5 exige 4.096 cacheaveis)'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'A pagina comercial diz TTL de 5 minutos e leitura em cache do Haiku a 0,10 por MTok contra 1,00 de entrada padrao (~90% de desconto). Meia verdade em DOIS pontos medidos nesta mesma rodada: o TTL e de 1 h em assinatura e 5 min em chave de API, e o Haiku 4.5 exige minimo de 4.096 tokens cacheaveis, o que o torna o modelo menos elegivel a cache justamente em prompt curto de agente.'
+    trace: 'https://claude.com/pricing'
+
+  - id: E_CONTEXTO_1M_SEM_SOBRETAXA_E_ESCADA_OFICIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'https://platform.claude.com/docs/en/about-claude/pricing — votos 3-0, kind=primary, tier=10'
+    valid_from: 2026-10
+    source_tier: 10
+    source_kind: primary
+    label: 'A ESCADA DE MODELOS E RECOMENDACAO OFICIAL DE CUSTO, nao invencao desta casa: Haiku para tarefa simples, Sonnet para a maioria, Opus para raciocinio complexo, mais caching e Batch. Contexto longo de 1M tokens e cobrado SEM sobretaxa nos modelos 4.6+, o que remove um incentivo a poda agressiva de contexto. E uma linha de fatura a nao esquecer: sessao de Managed Agents NAO tem desconto de batch e cobra 0,08 por hora de sessao.'
+    trace: 'https://platform.claude.com/docs/en/about-claude/pricing'
+
+  - id: E_PENSAMENTO_ESTENDIDO_E_SAIDA_E_NAO_DESLIGA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://code.claude.com/docs/en/costs — votos 3-0, kind=primary, tier=9'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'PENSAMENTO ESTENDIDO E COBRADO COMO TOKEN DE SAIDA e NAO PODE SER DESLIGADO em Opus 5.5, Sonnet 5.5 e modelos Fable — o unico controle e o NIVEL DE ESFORCO. Duas consequencias praticas: (1) o botao de economia nos modelos novos e `effort`, nao um flag de desligar, o que casa com a regua desta casa (tiering de model mais effort por fase); (2) existe limite de gasto por WORKSPACE no Console, que e o mecanismo de teto que um revisor de CI rebaixado precisaria para degradar sem estourar.'
+    trace: 'https://code.claude.com/docs/en/costs'
+
+  - id: E_TOGETHER_DEEPSEEK_V41_FLASH_PRECO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://www.together.ai/pricing — votos 3-0, kind=primary, tier=9'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'TOGETHER AI SERVERLESS, preco publicado: DeepSeek V4.1 Flash a 0,30 de entrada e 1,20 de saida por milhao de tokens, com entrada em cache a 0,006. E a faixa mais barata relevante da rodada — e tambem a prova de que Together nao tem vantagem propria: o MESMO modelo ao MESMO preco aparece na pagina da Fireworks. Ver E_OBJECAO_MESMO_PRECO_EM_DOIS_FORNECEDORES.'
+    trace: 'https://www.together.ai/pricing'
+
+  - id: E_TOGETHER_FAIXA_FLASH_NOVE_CENTAVOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://www.together.ai/pricing — votos 3-0, kind=primary, tier=9'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'A FAIXA FLASH DA TOGETHER E O PISO REAL DE PRECO PARA TRIAGEM: Qwen3.8 Flash a 0,09/0,28, GLM-5.3-Flash a 0,15/0,50 e Llama 3 8B Lite a 0,14/0,14 por milhao de tokens. Contra 1/5 do Haiku, isso e cerca de 11x mais barato na entrada no caso extremo — a unica diferenca de ORDEM DE GRANDEZA do grafo todo. Lacuna que impede usa-la: NENHUMA medicao de qualidade desses modelos na TAREFA (triagem, classificacao, lint semantico) sobreviveu nesta rodada.'
+    trace: 'https://www.together.ai/pricing'
+
+  - id: E_TOGETHER_FAIXA_MEDIA_ABERTOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://www.together.ai/pricing — votos 3-0, kind=primary, tier=9'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'A FAIXA MEDIA DE ABERTOS REFUTA A TESE QUE DEVERIA SUSTENTAR: na Together, GLM-5.3 a 1,40/4,40, DeepSeek V4 Pro 0813 a 1,32/3,96 e Kimi K3 a 3,00/15,00 por milhao. Kimi K3 e MAIS CARO que Sonnet 5.5 (2/10), e GLM-5.3 contra Sonnet e ~1,4x na entrada e ~2,3x na saida, isto e, nao e ordem de grandeza. Logo modelo aberto de fronteira NAO e barato em 2026; so a faixa flash e. Ver E_OBJECAO_ABERTO_NAO_E_MAIS_BARATO.'
+    trace: 'https://www.together.ai/pricing'
+
+  - id: E_FIREWORKS_DEEPSEEK_FLASH_MESMO_PRECO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://docs.fireworks.ai/serverless/pricing — votos 3-0, kind=primary, tier=9'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'A FIREWORKS COBRA EXATAMENTE O MESMO que a Together pelo DeepSeek V4.1 Flash — 0,30 de entrada, 0,006 em cache, 1,20 de saida por milhao — e a variante hospedada nos EUA sai a 0,45/0,009/1,80. Paridade de preco significa ZERO arbitragem entre os dois barebones: a escolha de fornecedor se reduz a risco de SOBREVIVENCIA do fornecedor, que e justamente o eixo que esta rodada deixou vazio.'
+    trace: 'https://docs.fireworks.ai/serverless/pricing'
+
+  - id: E_FIREWORKS_GLM_FLASH_E_GLM_PRECO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://docs.fireworks.ai/serverless/pricing — votos 3-0, kind=primary, tier=9'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'Na Fireworks, GLM 5.3 Flash sai a 0,15 de entrada, 0,03 em cache e 0,50 de saida por milhao, e GLM 5.3 a 1,40/0,26/4,40 — mais uma paridade exata com a Together na faixa flash e na media. Dado novo e util so num ponto: a Fireworks publica o preco de CACHE separado em toda a tabela, o que permite calcular o break-even do cache no barebone, coisa que a tabela da Together so expoe em parte dos modelos.'
+    trace: 'https://docs.fireworks.ai/serverless/pricing'
+
+  - id: E_FIREWORKS_PRECO_POR_TAMANHO_ABAIXO_DE_4B
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://docs.fireworks.ai/serverless/pricing — votos 3-0, kind=primary, tier=9'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'A FIREWORKS COBRA POR TAMANHO DE MODELO em modelos gerais: 0,10 por milhao de tokens abaixo de 4B parametros e 0,20 na faixa de 4B a 16B — e no topo, Kimi K3 a 3,00/0,30/15,00 e Qwen 3.8 Max a 2,00/0,25/6,00. Isto da a regra de bolso que o eixo 3 pedia: um classificador de 4B hospedado custa ~0,10 por milhao, ou seja a ordem de 1/10 do Haiku e 1/20 do Sonnet na entrada. E o preco de um PORTEIRO, nao de um revisor.'
+    trace: 'https://docs.fireworks.ai/serverless/pricing'
+
+  # ═══════════════ EIXO 1 — ONDE O TOKEN APARECE, SEGUNDO O FORNECEDOR ═══════════════
+
+  - id: E_CUSTO_MEDIO_13_DOLARES_POR_DEV_DIA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-10-02
+    verified_against: 'https://code.claude.com/docs/en/costs — votos 3-0, kind=primary, tier=9. Confianca rebaixada por ser AUTO-RELATO de quem fatura'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'A ORDEM DE GRANDEZA DA CONTA, pela doc do proprio fornecedor: ~13 dolares por desenvolvedor por dia ativo, 150 a 250 por desenvolvedor por mes, com 90% dos usuarios abaixo de 30 por dia ativo. O numero DESARMA parte da pergunta: as duas rodadas de pesquisa desta casa (20,2M tokens) custam da ordem de 40 a 120 dolares, isto e, de um a tres dias da banda mensal — enquanto qualquer projeto de modelo local, roteador ou fornecedor novo custa MAIS de um dia de engenharia. Ver C_OPCAO_M7_NAO_FAZER_NADA.'
+    trace: 'https://code.claude.com/docs/en/costs'
+
+  - id: E_FANOUT_MULTIPLICA_SETE_VEZES_E_HAIKU_EM_SUBAGENTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://code.claude.com/docs/en/costs — votos 3-0, kind=primary, tier=9'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'O MULTIPLICADOR DO FAN-OUT ESTA DOCUMENTADO PELO FORNECEDOR: time de agentes usa cerca de 7x mais token que sessao padrao em plan mode, e a recomendacao explicita e Sonnet para teammates e HAIKU para subagente simples. Casado com a medicao local (20,2M tokens em duas rodadas, 148 agentes, zero agentes declarando haiku), este e o achado de maior alavanca do grafo: a recomendacao oficial existe, o degrau existe na allowlist da casa, e ninguem o declarou.'
+    trace: 'https://code.claude.com/docs/en/costs'
+
+  - id: E_CLAUDE_CODE_DIVIDE_OS_LIMITES_DO_PLANO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'https://claude.com/pricing — votos 2-1, kind=primary, tier=9. Confianca rebaixada: foi a claim mais contestada do conjunto na votacao adversarial'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'O ACHADO QUE TORNA A PERGUNTA INDECIDIVEL SEM UMA RESPOSTA DO MAESTRO: o Claude Code esta incluido em TODOS os planos pagos e DIVIDE OS LIMITES DE USO DO PLANO (o plano gratuito nao tem acesso). Em regime de PLANO, o token marginal ja esta pago e economizar nao significa gastar menos dolar, significa comprar QUOTA — logo metade das alavancas do dossie (batch 50%, faixa flash de terceiro, teto de gasto por workspace) muda de sentido ou desaparece. Por isso M0 vem antes de tudo: declarar o REGIME e pre-condicao de decisao.'
+    trace: 'https://claude.com/pricing'
+
+  - id: E_TTL_MUDA_POR_REGIME_ASSINATURA_OU_CHAVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-02
+    verified_against: 'https://code.claude.com/docs/en/costs — votos 3-0, kind=primary, tier=9'
+    valid_from: 2026-09
+    source_tier: 9
+    source_kind: primary
+    label: 'ATE O TTL DO CACHE MUDA COM O REGIME: 1 hora em assinatura e 5 minutos em chave de API (ou com usage credits), e cache miss depois de pausa maior reprocessa o contexto INTEIRO, o que encarece sessao longa. Reforca o ponto de M0 — sem saber em que regime a casa opera, nenhum numero de cache desta rodada se aplica, e quem escolhe o que entra em cache dentro do Claude Code e o CLIENTE, nao o usuario. Ver E_OBJECAO_CACHE_NAO_E_BOTAO_DESTA_CASA.'
+    trace: 'https://code.claude.com/docs/en/costs'
+
+  # ═══════════════ EIXO 6 — COMO A COMUNIDADE ENFRENTA (E QUEM DESLIGOU) ═══════════════
+
+  - id: E_BUGBOT_MIL_DOLARES_POR_SEMANA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: 2026-10-02
+    verified_against: 'https://daily.dev/posts/stop-burning-tokens-on-code-review-kxrtlop02 — votos 2-1, kind=engineer, tier=5'
+    valid_from: 2026-08
+    source_tier: 5
+    source_kind: engineer
+    label: 'O RELATO DE CAMPO QUE CONFIRMA O CENARIO DESTA CASA: um lider de engenharia relatou que revisao de PR por IA ficou proibitiva — BugBot da Cursor a cerca de 1000 dolares por SEMANA para um time com ~2900 PRs por trimestre. Normalizando, da da ordem de 4 a 5 dolares por PR. Para uma casa de uma pessoa isso e ruido; o que transfere e o MODO DE FALHA (revisao por IA e a linha que estoura primeiro) e a resposta que ele deu, que foi virar linter deterministico.'
+    trace: 'https://daily.dev/posts/stop-burning-tokens-on-code-review-kxrtlop02'
+
+  - id: E_CUSTO_POR_REVISAO_DE_PR_FAIXA_2026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: 2026-10-02
+    verified_against: 'https://blog.codacy.com/ai-code-review-cost-per-pull-request-what-engineering-teams-actually-pay-in-2026 — votos 3-0, kind=vendor-on-competitor, tier=4. Confianca baixa por desenho: o emissor concorre com as duas ferramentas cujo preco cita'
+    valid_from: 2026-08
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'A FAIXA PUBLICADA DE CUSTO POR REVISAO DE PR em ago/2026 vai de ~1 a 1,50 dolar por execucao (Cursor Bugbot) a 15 a 25 dolares por revisao (Claude Code Review), variando com tamanho do PR e profundidade. Fonte suspeita (vendor-on-competitor), mas util por uma razao: a faixa de 15 a 25 por revisao e a ordem de grandeza do que ESTA CASA deixou de gastar ao desligar o parecer — e tambem o tamanho do premio de rebaixar o revisor em vez de desliga-lo.'
+    trace: 'https://blog.codacy.com/ai-code-review-cost-per-pull-request-what-engineering-teams-actually-pay-in-2026'
+
+  - id: E_COPILOT_REVIEW_VIROU_AI_CREDITS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.4
+    verified_at: 2026-10-02
+    verified_against: 'https://blog.codacy.com/github-copilot-code-review-used-to-be-included-from-june-1st-you-pay-twice — votos 2-1, kind=vendor-on-competitor, tier=3. Tier baixo: concorrente comentando mudanca de preco de outro, nao a nota de release primaria'
+    valid_from: 2026-06-01
+    source_tier: 3
+    source_kind: vendor-on-competitor
+    label: 'TENDENCIA DE MERCADO A FAVOR DE QUEM NAO DEPENDE DE REVISOR PAGO: desde 1/jun/2026 o Copilot Code Review passou a ser cobrado em AI Credits (1 credito = 0,01 dolar), com 3.000 creditos por usuario/mes ate 1/set/2026 e 1.900 depois. Isto e, a franquia ENCOLHEU 37% em tres meses. Fonte tier 3 e concorrente — serve de sinal de direcao, nunca de numero para planejar.'
+    trace: 'https://blog.codacy.com/github-copilot-code-review-used-to-be-included-from-june-1st-you-pay-twice'
+
+  - id: E_COPILOT_COBRA_CREDITO_E_MINUTO_SEPARADOS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.45
+    verified_at: 2026-10-02
+    verified_against: 'https://blog.codacy.com/github-copilot-code-review-used-to-be-included-from-june-1st-you-pay-twice — votos 3-0, kind=vendor-on-competitor, tier=3'
+    valid_from: 2026-06-01
+    source_tier: 3
+    source_kind: vendor-on-competitor
+    label: 'A CLAIM DE TIER MAIS BAIXO DO GRAFO E A QUE MAIS CASA COM A MEDICAO LOCAL: revisao por IA no Copilot consome AI Credits E minutos de GitHub Actions como itens SEPARADOS, e o custo por revisao e imprevisivel de antemao. E exatamente a estrutura de duas contas que esta casa mediu em si mesma hoje (token do parecer mais ~800 min faturados de selftest). Conclusao transferivel: em CI hospedado, quem olha so token planeja metade da fatura.'
+    trace: 'https://blog.codacy.com/github-copilot-code-review-used-to-be-included-from-june-1st-you-pay-twice'
+
+  # ═══════════════ EIXOS 2 E 5 — MODELO LOCAL EM CPU, CASCATA, JUIZ BARATO, ROTEADOR ═══════════════
+
+  - id: E_CPU_DENSO_32B_TRES_VIRGULA_CINCO_TOKS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.55
+    verified_at: 2026-10-02
+    verified_against: 'https://github.com/ggml-org/llama.cpp/issues/19480 — votos 3-0, kind=forum, tier=5. Confianca limitada: UMA medicao, em maquina DIFERENTE e MELHOR que a VPS desta casa (12c/24t, 96 GB DDR5 a ~65 GB/s contra 8 vCPU e 22 GB livres)'
+    valid_from: 2026-02
+    source_tier: 5
+    source_kind: forum
+    label: 'A UNICA MEDICAO REAL DE CPU-ONLY DA RODADA, E ELA REPROVA O USO INTERATIVO: Qwen2.5-Coder 32B denso Q4_K_M (19 GB) gera ~3,54 tok/s num Ryzen AI 9 HX PRO 370 (12c/24t, 96 GB DDR5-5600, ~65 GB/s) — inutilizavel para agente interativo. E o argumento e PIOR na VPS desta casa, que e MENOR: 8 vCPU, 22 GB livres (contra 19 GB de modelo) e banda de RAM inferior. O gargalo e LARGURA DE BANDA DE MEMORIA, nao nucleo, logo adicionar vCPU nao resolve.'
+    trace: 'https://github.com/ggml-org/llama.cpp/issues/19480'
+
+  - id: E_QWEN_BENCHMARK_NAO_TEM_CPU_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-10-02
+    verified_against: 'https://qwen.readthedocs.io/en/stable/getting_started/speed_benchmark.html — votos 3-0, kind=primary, tier=6'
+    valid_from: 2026-10
+    source_tier: 6
+    source_kind: primary
+    label: 'DECLARACAO DE AUSENCIA, e ela e o achado: a pagina oficial de speed benchmark do Qwen NAO traz NENHUMA medicao CPU-only (llama.cpp, GGUF, 8 nucleos) — tudo e GPU NVIDIA H20 de 96 GB. Ou seja, o fabricante do modelo aberto mais citado para uso local nao publica o numero que um SMB sem GPU precisaria para decidir. O eixo 2 fica sustentado por forum, nao por primaria, e isso e limite de EVIDENCIA, nao conclusao sobre o modelo.'
+    trace: 'https://qwen.readthedocs.io/en/stable/getting_started/speed_benchmark.html'
+
+  - id: E_FRUGALGPT_CASCATA_APRENDE_O_ROTEAMENTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/pdf/2305.05176 — votos 3-0, kind=paper, tier=8. Tecnica confirmada; a MAGNITUDE de economia do paper foi refutada nesta rodada por ser de 2023 (modelos e precos superados)'
+    valid_from: 2023-05-09
+    source_tier: 8
+    source_kind: paper
+    label: 'A ARTE ESTABELECIDA DE ROTEAR POR DIFICULDADE TEM PAPER: a cascata APRENDE qual combinacao de modelos usar para quais consultas — modelo barato primeiro, grande so no escalonamento. O MECANISMO esta confirmado e e a base teorica de M4 (duas passadas) e de M1 (tiering). A MAGNITUDE nao transfere: o numero de economia do paper e de 2023, sobre modelos e precos que nao existem mais, e por isso foi refutado nesta rodada. Use o desenho, nao a porcentagem.'
+    trace: 'https://arxiv.org/pdf/2305.05176'
+
+  - id: E_CODEJUDGEBENCH_THINKING_VENCE_TAMANHO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-10-02
+    verified_against: 'https://arxiv.org/pdf/2507.10535 — votos 3-0, kind=paper, tier=7'
+    valid_from: 2025-07
+    source_tier: 7
+    source_kind: paper
+    label: 'JUIZ BARATO TEM EVIDENCIA, E ELA APONTA PARA THINKING, NAO PARA TAMANHO: em CodeJudgeBench (26 modelos juiz, tarefas de geracao, reparo e teste de codigo), modelos COM thinking superam significativamente os sem thinking, e um modelo pequeno com thinking (Qwen3-8B) supera juizes treinados especificamente de ate 70B. Leitura para esta casa: num juiz de PR, pagar por RACIOCINIO num modelo pequeno rende mais que pagar por parametro — o que casa com o controle de `effort` ser o unico botao nos modelos novos. Ressalva: o paper e de jul/2025, e o lado que dizia que todo juiz tem aleatoriedade significativa caiu no lado refutado desta rodada.'
+    trace: 'https://arxiv.org/pdf/2507.10535'
+
+  - id: E_NEMO_SWITCHYARD_ROTEADOR_APACHE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: 2026-10-02
+    verified_against: 'https://github.com/NVIDIA-NeMo/Switchyard — votos 3-0, kind=primary, tier=6'
+    valid_from: 2026-05-19
+    source_tier: 6
+    source_kind: primary
+    label: 'O ROTEADOR EXISTE COMO SOFTWARE LIVRE DE FORNECEDOR GRANDE: NVIDIA NeMo Switchyard e biblioteca open-source (Apache 2.0) que roteia cada requisicao entre modelos eficientes e mais capazes, PRESERVANDO compatibilidade de API OpenAI e Anthropic, para equilibrar sucesso de tarefa, custo e latencia. A compatibilidade de API Anthropic e o detalhe que importa aqui: um roteador assim pode entrar como transporte sem reescrever consumidor. O que NAO existe nesta rodada e qualquer medicao dele na tarefa, nem numero de economia proprio — logo e candidato a experimento, nao a caminho critico.'
+    trace: 'https://github.com/NVIDIA-NeMo/Switchyard'
+
+  # ═══════════════ EIXO 7 — MERCADO E CAPITAL (invariante, mesmo quando sem sinal) ═══════════════
+
+  - id: E_MERCADO_INFERENCIA_BARATA_2026_1002
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.55
+    verified_at: 2026-10-02
+    verified_against: 'sintese do eixo de mercado desta rodada em 2026-10-02: ha sinal COMERCIAL e de PRECO (tier 9-10, paginas primarias de Anthropic, Together e Fireworks) e NAO ha sinal de CAPITAL — a unica claim de capital (Baseten ~11 bi, Fireworks ~15 bi, Modal ~4,5 bi em mai/2026, Together com mais de 1 bi de ARR) e tier 4 e foi REFUTADA, e NENHUMA fonte respondeu a pergunta do anti-padrao'
+    valid_from: 2026-10
+    source_tier: 9
+    source_kind: primary
+    label: 'MERCADO: SINAL PARCIAL — ha PRECO, nao ha CAPITAL. (1) PRECO DE FRONTEIRA CAINDO, nao subindo: o aumento de Sonnet para 3/15 previsto para 1/set/2026 NAO ocorreu, e Sonnet 5.5 segue a 2/10, mais barato que o Sonnet 4.6; contexto de 1M sem sobretaxa nos 4.6+. Para um SMB isso enfraquece a premissa de 2024 de que fronteira e caro e aberto e barato. (2) OS BAREBONES CONVERGIRAM NO PRECO: Together e Fireworks cobram o MESMO pelo DeepSeek V4.1 Flash (0,30/0,006/1,20) e pelo GLM 5.3 Flash (0,15/0,50), o que e assinatura de COMMODITIZACAO — sem arbitragem a explorar, a escolha vira risco de fornecedor. (3) O DESCONTO DE BATCH DE 50% e padrao em ambos, logo tambem nao e diferencial. (4) MODELO ABERTO DE FRONTEIRA NAO E BARATO: Kimi K3 a 3/15 e mais caro que Sonnet 5.5 a 2/10 — a economia de ordem de grandeza existe SO na faixa flash (0,09 a 0,20 por MTok de entrada). (5) LACUNA GRAVE E DECLARADA: zero evidencia confirmada de rodada, M&A, down round OU de provedor de inferencia barata que FECHOU ou foi absorvido, e a causa declarada. Um SMB que apostar num provedor que morre paga duas vezes, e esta rodada NAO sabe quem esta em risco.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  # ═══════════════ LACUNAS (o que esta rodada NAO sabe, com a contagem EXATA) ═══════════════
+
+  - id: E_LACUNAS_CUSTO_DE_INFERENCIA_1002
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-02
+    verified_against: 'contabilidade desta rodada em 2026-10-02: 33 claims confirmadas, 19 refutadas por fonte fraca, 0 nao-verificadas por 403 ou truncagem, 27 fontes CORTADAS por orcamento contendo 31 claims, 10 objecoes sobreviventes do Elenxo das quais 10 modeladas como no proprio'
+    valid_from: 2026-10-02
+    source_tier: 10
+    source_kind: primary
+    label: 'A FRONTEIRA DESTA RODADA, EM NUMERO EXATO: 33 confirmadas, 19 refutadas por fonte fraca, 0 nao-verificadas, 27 FONTES e 31 CLAIMS cortadas por orcamento, 10 objecoes sobreviventes com 10 modeladas (nenhuma ficou de fora). AS SETE LACUNAS NOMEADAS: (L1) EIXO 7 VAZIO — nenhuma evidencia confirmada de capital, e ZERO resposta sobre provedor de inferencia barata que fechou ou foi absorvido; a unica claim de valuation (Baseten, Fireworks, Modal, ARR da Together) e tier 4 e caiu. (L2) QUALIDADE EM PR REAL FOI CORTADA, e era a claim mais decisiva do dossie: a medicao de F1 por tamanho de diff (0,657 em menos de 10 linhas contra 0,043 acima de 150) e a queda de 0,847 sintetico para 0,066 em PR real ficaram no lado refutado/cortado — logo NAO existe neste grafo numero confiavel de qualidade de revisor LLM barato. (L3) PARETO DO REVISOR CORTADO: a afirmacao de que Sonnet e DOMINADO na fronteira para revisao, e que Haiku 4.5 bate Sonnet 4.6 em F1 a ~3,2x menos custo, ficou fora — M3 depende dela e portanto e hipotese, nao plano. (L4) CPU-ONLY COM 8 NUCLEOS NAO MEDIDO por ninguem: a unica medicao e de forum tier 5 em maquina melhor, e a primaria do Qwen nao publica CPU. (L5) MoE EM CPU ficou no lado refutado (7,74 tok/s em 80B-A3B, 16 tok/s em 30B-A3B em ARM), logo a UNICA janela possivel de local — MoE pequeno, saida curta, lote em janela exclusiva — esta sem numero NENHUM. (L6) NUMERO DE ECONOMIA REAL por tecnica NAO sobreviveu: FrugalGPT, RouteLLM e UncommonRoute todos cairam por data ou por fonte, so o MECANISMO ficou. (L7) EIXO 1 SEM FONTE EXTERNA: nenhuma fonte quantificou token por camada do ciclo; o que ha e medicao desta casa.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  # ═══════════════════ AS OITO OPCOES (M0..M7) ═══════════════════
+
+  - id: C_OPCAO_M0_MEDIR_ANTES_DE_MOVER
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.75
+    label: 'OPCAO M0 — MEDIR ANTES DE MOVER (dois comandos, hoje): (a) `gh auth refresh -h github.com -s user && gh api /users/marciocar/settings/billing/actions` para saber os minutos FATURADOS do repo privado; (b) DECLARAR em que REGIME a casa opera — plano pago versus chave de API. A FAVOR, e e o unico item com argumento de NECESSIDADE: sem (b) a pergunta e literalmente indecidivel, porque em regime de plano o token marginal JA esta pago e economizar significa comprar QUOTA, nao dolar, e porque ate o TTL do cache muda por regime (1 h em assinatura, 5 min em chave). (a) fecha a outra metade: a medicao indireta desta sessao estima ~800 min faturados de selftest em 34,5 h, mas estimativa nao e fatura. Custo: minutos. Risco: nenhum. CONTRA: nao economiza nada por si — e pre-condicao, nao movimento. Nao tem como ser reprovada; a unica forma de erra-la e nao fazer.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  - id: C_OPCAO_M1_TIERING_REAL_NO_FANOUT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: 'OPCAO M1 — TIERING REAL NO FAN-OUT (haiku nos subagentes): usar o degrau que a allowlist da REGRA 3 JA admite e que ZERO dos 60 agentes declara (medido hoje: `grep -rln "^model: *haiku" .claude/agents/` = 0; lineup 47 sonnet, 8 opus, 2 placeholders). A FAVOR, e e a opcao com melhor retorno por esforco do grafo: ataca o multiplicador de ~7x do fan-out, que e o gasto dominante MEDIDO desta casa (20,2M tokens em duas rodadas, 148 agentes, 212-242k por no contra 68-74k historicos); e exatamente o que a doc do fornecedor recomenda (Haiku para subagente simples, Sonnet para teammate); e custa zero fornecedor novo, zero substrato novo e zero risco a capacidade que compra o acoplamento (o exit 2 deterministico de hook). CONTRA, e sao tres limites reais: (1) Haiku 4.5 exige MINIMO de 4.096 tokens cacheaveis contra 512 dos modelos novos, logo tiering e cache NAO COMPOEM em prompt curto de agente; (2) em regime de PLANO o ganho e quota, nao dolar; (3) a casa nao tem medicao propria de QUALIDADE de worker em haiku, e a doutrina proibe degradar o veredito para economizar — logo a forma correta e por FASE (busca e extracao em haiku, julgamento e sintese em sonnet ou opus), com dogfood, nunca rebaixamento em bloco.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  - id: C_OPCAO_M2_CORTAR_MINUTO_ANTES_DE_TOKEN
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.65
+    label: 'OPCAO M2 — CORTAR MINUTO ANTES DE TOKEN: reduzir a bancada no CI (afetados-por-diff em PR, suite completa so no merge) e/ou mover o selftest para RUNNER SELF-HOSTED na VPS ja paga, convertendo custo METERED em capacidade PROPRIA. A FAVOR, com a medicao desta sessao: o repo e PRIVADO em runner HOSPEDADO, e o Guard Selftest sozinho deu 201,5 min de wall-clock em 34,5 h numa MATRIZ DE 4 FAIXAS, da ordem de 800 min FATURADOS — a maior conta metered da casa, e ela nao estava na pergunta. A casa JA tem `--affected-staged` no pre-commit, logo o mecanismo de recorte existe. CONTRA, e e a ARMADILHA SIMETRICA ao modelo local: na VPS o selftest satura os 8 nucleos por ~17 min, logo runner self-hosted exige JANELA EXCLUSIVA e concorre com a propria sessao de trabalho; e recortar a suite em PR enfraquece o gate exatamente onde ele e barato de rodar — o que contradiz a doutrina (eficacia antes de economia) se o recorte deixar passar regressao. Forma segura: recorte por AFETADOS com suite completa obrigatoria no merge, nunca recorte por amostragem.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  - id: C_OPCAO_M3_REVISOR_REBAIXADO_NAO_DESLIGADO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.45
+    label: 'OPCAO M3 — RELIGAR O REVISOR SEMANTICO REBAIXADO, NAO DESLIGADO: trocar `REVIEW_MODEL: claude-sonnet-5` (medido em .github/workflows/onion-review.yml l.54) por haiku, com teto de gasto por workspace e orcamento protegido, mais split de diff grande. A FAVOR: hoje o desenho nao tem degrau — ou o modelo caro ou NADA, e sem saldo o parecer morre em ~8s sem emitir achado; a faixa publicada de 15 a 25 dolares por revisao mostra o tamanho do premio; e limite de gasto por workspace existe no Console, logo o teto e mecanizavel. CONTRA, e e a opcao MAIS DANIFICADA pelo orcamento desta rodada: as DUAS claims que a sustentavam foram cortadas — a que media F1 por tamanho de diff (0,657 em menos de 10 linhas contra 0,043 acima de 150) e a que dizia Sonnet DOMINADO na fronteira de Pareto. Sem elas, M3 e hipotese plausivel sem numero: nao existe neste grafo medicao de qualidade de revisor LLM barato em PR real. Alem disso, uma claim cortada relatava F1 de 0,066 em PR REAL contra 0,847 sintetico, isto e, revisao semantica por LLM barato pode ser proxima de inutil no caso real — o que, se verdadeiro, transforma M3 em gasto sem veredito.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  - id: C_OPCAO_M4_DUAS_PASSADAS_GATE_PRIMEIRO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: 'OPCAO M4 — DUAS PASSADAS COM O GATE COMO PRIMEIRO JUIZ: o deterministico resolve o decidivel a custo de token ZERO e o LLM adjudica SO o residuo ambiguo. A FAVOR: e a cascata que o paper de 2023 confirma como MECANISMO (modelo barato primeiro, grande no escalonamento), e a que o proprio fornecedor recomenda em forma de offload para codigo deterministico, que reduz contexto de dezenas de milhares para centenas de tokens; e usa o que a casa JA tem — 93 regras, radar sem LLM, bancada deterministica. Um item cortado por orcamento reportava ~70% dos casos resolvidos sem LLM, numero que fica como hipotese. CONTRA, e o limite e de LINGUAGEM, nao de ferramenta: a dissecacao do Cedar nesta casa (2026-10-01) concluiu que analise correta e completa vem da linguagem RESTRITA e decidivel com codificacao SMT, e shell arbitrario nao tem codificacao SMT — logo a passada deterministica so cobre o que e DECIDIVEL, e a regua que separa decidivel de ambiguo e justamente o que falta escrever. Sem essa regua, M4 vira roteamento por palpite, com o pior dos dois mundos (gasta token E perde veredito).'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  - id: C_OPCAO_M5_INFERENCIA_BARATA_DE_TERCEIRO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.3
+    label: 'OPCAO M5 — INFERENCIA BARATA DE TERCEIRO (Together ou Fireworks, faixa flash) para triagem e classificacao. A FAVOR: preco real, datado e primario — 0,09 a 0,30 por MTok de entrada na faixa flash (Qwen3.8 Flash 0,09/0,28, GLM-5.3-Flash 0,15/0,50, DeepSeek V4.1 Flash 0,30/1,20, Llama 3 8B Lite 0,14/0,14), mais a regra por tamanho da Fireworks (0,10 abaixo de 4B, 0,20 de 4B a 16B); e a UNICA diferenca de ORDEM DE GRANDEZA do grafo, de ~10x contra o Haiku na entrada. CONTRA, e sao tres paredes: (1) QUALIDADE NAO MEDIDA na tarefa — nenhuma claim sobrevivente mede flash fazendo triagem, classificacao ou lint semantico; (2) PARIDADE DE PRECO entre Together e Fireworks (mesmo numero nas duas paginas primarias) significa ZERO arbitragem, logo a escolha e so risco de fornecedor; (3) o eixo de SOBREVIVENCIA do fornecedor esta VAZIO neste grafo — nenhuma evidencia de rodada, M&A ou de quem fechou e por que. Veredito do desenho: candidato a EXPERIMENTO DELIMITADO (uma tarefa estreita, com veredito comparado ao deterministico), NUNCA caminho critico, e nunca em nada que o exit 2 de hook precise vetar.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  - id: C_OPCAO_M6_MODELO_LOCAL_EM_CPU_NA_VPS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.15
+    label: 'OPCAO M6 — MODELO LOCAL EM CPU NA VPS: medida como ARMADILHA para uso interativo, e a aritmetica e simples. Um denso de 32B Q4_K_M ocupa 19 GB contra 22 GB livres e rende 3,54 tok/s numa maquina MELHOR que esta (12c/24t, 96 GB DDR5 a ~65 GB/s); aqui sao 8 vCPU com banda menor, e a bancada deterministica satura os 8 nucleos por ~17 min, logo o modelo competiria pelo MESMO recurso que o gate — economizar token custaria minuto de gate, que e a outra conta medida hoje. O gargalo e LARGURA DE BANDA DE MEMORIA, nao nucleo, portanto mais vCPU nao resolve, e nao existe GPU. SOBRA UMA JANELA NAO TESTADA, e ela e honesta: MoE pequeno ou 4B, saida CURTA, em LOTE, em janela EXCLUSIVA (fora da bancada), para tarefa fechada de classificacao — custaria ~30 min de medicao que ninguem fez, nem esta rodada nem as fontes (a primaria do Qwen nao publica CPU-only; as duas medicoes de MoE em CPU cairam no lado refutado). Fora dessa janela, M6 e reprovada por medicao, nao por gosto.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  - id: C_OPCAO_M7_NAO_FAZER_NADA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: 'OPCAO M7 — NAO FAZER NADA E GASTAR O ESFORCO NOUTRO LUGAR, que e a linha de base contra a qual todo movimento tem de provar retorno. A FAVOR, pelo numero do proprio fornecedor: 13 dolares por dev por dia ativo e 150 a 250 por mes significam que duas rodadas de pesquisa de 20,2M tokens custam da ordem de 40 a 120 dolares, isto e, de UM A TRES DIAS da banda mensal — enquanto qualquer projeto de local, roteador ou fornecedor novo custa MAIS de um dia de engenharia, e a doutrina desta casa diz expressamente que a regua e eficiencia e eficacia, nunca economia pelo custo. CONTRA, e e o que impede selar M7 agora: a medicao desta sessao mostra que a maior conta nao e token e sim MINUTO (~800 min faturados de selftest em 34,5 h), e M7 nao enderecaria isso; e M1 custa quase nada (declarar `model: haiku` em workers de fase estreita), logo "nao fazer nada" seria deixar na mesa o unico movimento barato, documentado pelo fornecedor e sem risco ao acoplamento.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  # ═══════════════════ A DECISAO (nasce OPEN — o maestro sela, esta sessao NUNCA) ═══════════════════
+
+  - id: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.45
+    label: 'DECISAO ABERTA (o maestro sela; esta sessao NUNCA sela): qual e a ORDEM DE MOVIMENTOS com melhor retorno por esforco para baixar o custo do ciclo numa casa de UMA pessoa com VPS de 8 vCPU sem GPU, cujo gate ja e LLM-free e cujo gasto de token esta em revisao semantica e fan-out de pesquisa? OPCOES NOMEADAS: M0 medir antes de mover (minutos faturados mais o REGIME de cobranca); M1 tiering real no fan-out com haiku nos subagentes; M2 cortar MINUTO antes de token (bancada por afetados e/ou runner self-hosted); M3 religar o revisor REBAIXADO, nao desligado; M4 duas passadas com o gate como primeiro juiz; M5 inferencia barata de terceiro na faixa flash; M6 modelo local em CPU na VPS; M7 nao fazer nada. ═══ RECOMENDACAO DO ELENXO (afirmacao de UM agente, sem votacao) ═══ REPROVO A PERGUNTA COMO POSTA antes de recomendar qualquer opcao, e a reprovacao e MEDIDA: o dossie parte de que "o CI ja e gratis porque o gate e LLM-free", e a medicao desta sessao diz PRIVATE em runner HOSPEDADO, 315,0 min de wall-clock em 60 runs em 34,5 h, 201,5 deles no Guard Selftest, que roda em MATRIZ DE 4 FAIXAS — da ordem de 800 min FATURADOS so nele, ~550/dia, ~16.500/mes. O gate nao e gratis: e a maior conta METERED da casa, na mesma ordem de grandeza do token. ORDEM RECOMENDADA: (1) M0 primeiro e sem discussao, porque em regime de PLANO o token marginal ja esta pago e a pergunta vira comprar QUOTA, nao dolar — e porque so a fatura diz o tamanho do minuto; (2) M1 em seguida, por ser o unico movimento barato, recomendado pela doc do fornecedor, que ataca o gasto dominante medido (fan-out de ~7x, 20,2M tokens, zero dos 60 agentes declarando haiku) sem tocar fornecedor nem substrato — logo sem risco a capacidade que compra o acoplamento, o exit 2 deterministico de hook; (3) M2 junto de M1, porque e a conta que o dossie nao viu, com a forma segura sendo recorte por AFETADOS em PR mais suite completa no merge; (4) M4 como desenho de medio prazo, mas SO depois de escrita a regua que separa o decidivel do ambiguo (limite do Cedar: decidibilidade e da LINGUAGEM, nao da ferramenta); (5) M3 como experimento com teto, nunca como plano, porque as duas claims que o sustentavam foram cortadas por orcamento; (6) M5 como experimento delimitado em UMA tarefa estreita, fora do caminho critico, enquanto o eixo de sobrevivencia de fornecedor estiver vazio; (7) M6 REPROVADA para uso interativo por medicao (19 GB de modelo contra 22 livres, 3,54 tok/s em maquina melhor, disputa dos 8 nucleos com a bancada), sobrando so a janela de MoE pequeno em lote exclusivo, que vale ~30 min de medicao e nada mais; (8) M7 nao se sela, mas sua tese se ACEITA PARCIALMENTE — o token nao e a emergencia que o dossie supos. O QUE DEVE FICAR COMO ESTA, explicitamente: o gate deterministico (93 regras, radar sem LLM, bancada) nao vira LLM em ponto nenhum, e o offload para codigo deterministico ja esta COLHIDO aqui, logo nao e economia disponivel; e a doutrina de que a regua e eficiencia e eficacia, nunca custo, veta rebaixar veredito para economizar — tiering por FASE sim, rebaixamento em bloco nao. ═══ PERGUNTAS DE SELAGEM ═══ P1. Em que REGIME a casa opera (plano pago ou chave de API)? Sem isto nenhuma opcao e avaliavel. P2. Qual o teto aceitavel de minuto de Actions por mes, agora que ~16.500 e a ordem de grandeza estimada? P3. O revisor semantico volta rebaixado com teto, ou fica desligado por decisao? P4. M1 pode ser dogfoodado por FASE em quais agentes, e qual e o criterio de reprovacao que faria voltar atras? P5. Os ~30 min de medicao de MoE em lote na VPS valem ser gastos, ou M6 fica selada como reprovada?'
+    verified_at: 2026-10-02
+    verified_against: 'NAO SELADA. Esta sessao nunca sela: status open, aguardando o maestro. A recomendacao acima e afirmacao de UM agente sem votacao adversarial — confianca rebaixada pela clausula de dissent. As medicoes citadas nela (visibilidade do repo, minutos de runner, lineup de agentes, REVIEW_MODEL, hardware) foram feitas nesta maquina em 2026-10-02 e estao nos nos E_MEDIDO_*'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/modelo-local-e-custo-de-inferencia-2026-10.kg.yaml'
+
+  # ── OBJECOES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ──────────────────
+  # 10 sobreviventes entregues, 10 modeladas — nenhuma ficou de fora, e a contagem esta em
+  # E_LACUNAS_CUSTO_DE_INFERENCIA_1002. Confianca <= 0.6 em TODAS: afirmacao de UM agente, sem
+  # votacao adversarial. Fonte primaria que o Elenxo CITA sem ter sido lida nesta rodada entra no
+  # label como "primario citado, nao lido" — nunca como tier alto confirmado.
+
+  - id: E_OBJECAO_CACHE_INVERTE_EM_FANOUT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'objecao do Elenxo contra o achado 1 (multiplicadores de prompt caching), sustentada por dois dados DESTE grafo: a propria tabela de preco (escrita 1,25x em 5 min, leitura 0,1x, break-even em 1 leitura) e a medicao local de fan-out (148 agentes, 20,2M tokens em duas rodadas). Nenhum achado da rodada mede LEITURAS-POR-ESCRITA em fan-out, que e o unico numero que decidiria'
+    valid_from: 2026-10-02
+    source_tier: 5
+    source_kind: engineer
+    label: 'O NUMERO DO CACHE E PRECO, NAO ECONOMIA — E NO PADRAO DOMINANTE DESTA CASA ELE INVERTE DE SINAL. O gasto medido e fan-out, e um subagente one-shot tem prompt PROPRIO: escrita a 1,25x lida ZERO ou UMA vez e SOBRETAXA de 25%, nao desconto — o break-even publicado confirma (paga-se apos 1 leitura em 5 min, 2 em 1 h). Nenhum achado desta rodada mede leituras-por-escrita em leque, logo a alavanca "caching" esta sem a medicao que a tornaria decidivel. De pe: caching e lever para SESSAO LONGA com prefixo estavel, e esta casa gasta em LEQUE de prompts distintos.'
+    trace: 'https://platform.claude.com/docs/en/build-with-claude/prompt-caching'
+
+  - id: E_OBJECAO_BATCH_EXIGE_ASSINCRONIA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'objecao do Elenxo contra o achado 2 (Batch API 50% e empilha com cache), com DUAS pernas verificaveis: (a) a claim derivada "leitura de cache em batch = 0,05x" foi REFUTADA nesta rodada, logo "empilha" ficou sem sustentacao; (b) medicao em .github/workflows/onion-review.yml — `REVIEW_MODEL: claude-sonnet-5` via claude-code-action, com duas tentativas de 11 min e timeout de job de 26 min, sem caminho de submissao em batch nessa acao'
+    valid_from: 2026-10-02
+    source_tier: 5
+    source_kind: engineer
+    label: 'O DESCONTO DE 50% EXIGE TOLERANCIA ASSINCRONA, E OS DOIS GASTOS REAIS DESTA CASA NAO A TEM: sessao interativa e o revisor do CI, que roda por claude-code-action com tentativas de 11 min e timeout de job de 26 min — nao existe caminho de submissao em batch nessa acao. E a metade "empilha com caching" perdeu a perna que a operacionalizava, porque a claim de leitura de cache em batch a 0,05x foi refutada nesta mesma rodada. 50% de desconto numa fila que nao se pode usar e ZERO.'
+    trace: '.github/workflows/onion-review.yml'
+
+  - id: E_OBJECAO_CACHE_NAO_E_BOTAO_DESTA_CASA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'objecao do Elenxo contra o achado 3 (break-even do cache), cruzada com o achado de regime desta rodada: o TTL e 1 h em assinatura e 5 min em chave de API, e dentro do Claude Code quem escolhe TTL e o que entra em cache e o CLIENTE, nao o usuario'
+    valid_from: 2026-10-02
+    source_tier: 5
+    source_kind: engineer
+    label: 'O BREAK-EVEN DO CACHE E VERDADEIRO E SEM ALAVANCA AQUI: dentro do Claude Code quem decide TTL e o que entra em cache e o cliente, nao o usuario — e o TTL muda por REGIME (1 h em assinatura, 5 min em chave de API). Logo este fato so e acionavel para quem chama a API direto. Para uma casa cujo gasto esta em sessoes do Claude Code e no CI, ele serve de EXPLICACAO DO EXTRATO, nunca de movimento — foi coletado como se fosse botao e nao e.'
+    trace: 'https://code.claude.com/docs/en/costs'
+
+  - id: E_OBJECAO_PRECO_POR_TAREFA_NAO_POR_TOKEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'objecao do Elenxo contra o achado 4 (precos out/2026 e "Sonnet 5.5 ficou mais barato que o 4.6"). A claim que atacava exatamente a premissa — tokenizador novo nos 4.7+ gerando ~30% mais tokens, tier 10 — foi DESCARTADA nesta rodada sem evidencia contraria declarada (primario citado, nao lido na rodada). E a claim de Pareto que diria Sonnet DOMINADO para revisao ficou no lado cortado por orcamento'
+    valid_from: 2026-10-02
+    source_tier: 5
+    source_kind: engineer
+    label: '"FICOU MAIS BARATO" ASSUME TOKENS-POR-TAREFA CONSTANTE ENTRE GERACOES, e a unica claim que atacava essa premissa (tokenizador novo, ~30% mais tokens) foi descartada sem evidencia contraria declarada — primario citado, nao lido nesta rodada. Comparar 2/10 com 3/15 sem normalizar por tokens-por-tarefa e o erro que a propria pergunta proibia ("quem e mais barato POR TAREFA, nao por token"). E para a tarefa que importa aqui, revisao, o item cortado dizia Sonnet DOMINADO na fronteira de Pareto: "barato" e "certo para a tarefa" nao coincidem.'
+    trace: 'https://platform.claude.com/docs/en/about-claude/pricing'
+
+  - id: E_OBJECAO_MESMO_PRECO_EM_DOIS_FORNECEDORES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'objecao do Elenxo contra o achado 5 (Together DeepSeek V4.1 Flash), verificavel DENTRO deste grafo: a pagina primaria da Fireworks lista o MESMO 0,30/0,006/1,20 para o MESMO modelo; e a unica claim de capital da rodada (tier 4) foi descartada, de modo que nenhum achado responde "quem fechou e por que"'
+    valid_from: 2026-10-02
+    source_tier: 5
+    source_kind: engineer
+    label: 'O MESMO MODELO, AO MESMO PRECO, NA PAGINA PRIMARIA DO CONCORRENTE: 0,30/0,006/1,20 na Together e 0,30/0,006/1,20 na Fireworks. Preco identico significa que NAO existe vantagem Together a extrair — a escolha de fornecedor se reduz a risco de SOBREVIVENCIA, e esse eixo esta VAZIO nesta rodada. O achado foi coletado como diferencial e e commodity; o que de fato decidiria ficou sem resposta.'
+    trace: 'https://docs.fireworks.ai/serverless/pricing'
+
+  - id: E_OBJECAO_ABERTO_NAO_E_MAIS_BARATO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'objecao do Elenxo contra o achado 6 (faixa media da Together), aritmetica conferivel dentro do grafo: Kimi K3 a 3/15 contra Sonnet 5.5 a 2/10; GLM-5.3 a 1,40/4,40 contra 2/10 da ~1,4x na entrada e ~2,3x na saida; e o mesmo preco aparece na Fireworks'
+    valid_from: 2026-10-02
+    source_tier: 5
+    source_kind: engineer
+    label: 'A TABELA REFUTA A TESE QUE DEVERIA SUSTENTAR: Kimi K3 a 3/15 e MAIS CARO que Sonnet 5.5 a 2/10 — "modelo aberto e mais barato" e falso dentro do proprio achado. E GLM-5.3 a 1,40/4,40 contra 2/10 e ~1,4x na entrada e ~2,3x na saida, nao ordem de grandeza: para uma casa de 150 a 250 por mes, isso e economia de dezenas de dolares comprada com QUALIDADE NAO MEDIDA na tarefa. O mesmo preco esta na Fireworks, logo nem arbitragem ha.'
+    trace: 'https://www.together.ai/pricing'
+
+  - id: E_OBJECAO_DUAS_URLS_UM_EMISSOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'objecao do Elenxo contra o achado 7 (claude.com/pricing confirma os precos): platform.claude.com e claude.com sao o MESMO emissor, contados como duas fontes com votos 3-0 cada; e nenhuma das duas paginas foi extraida COM DATA no corpo'
+    valid_from: 2026-10-02
+    source_tier: 5
+    source_kind: engineer
+    label: 'NAO E CONFIRMACAO INDEPENDENTE — E O MESMO FORNECEDOR EM DUAS URLs, contado como dois achados 3-0. Dois tiers altos sobre um unico emissor sao UMA fonte, e trata-los como duas infla a confianca exatamente no eixo em que a pergunta exigia primaria DATADA. Agravante: nenhuma das duas paginas foi extraida com data no corpo. O conjunto tem muito menos independencia do que a contagem de achados sugere.'
+    trace: 'https://claude.com/pricing'
+
+  - id: E_OBJECAO_DESCONTO_SEM_ONDE_INCIDIR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'objecao do Elenxo contra o achado 8 (Batch 50% na segunda URL): duplicata do achado 2 no mesmo emissor, e herda a objecao de assincronia; alem disso 50% incide sobre LISTA, e o achado de regime (o Claude Code divide os limites do plano pago) foi o mais contestado do conjunto, com votos 2-1'
+    valid_from: 2026-10-02
+    source_tier: 5
+    source_kind: engineer
+    label: 'UM DESCONTO PODE NAO TER ONDE INCIDIR: 50% e sobre LISTA, e em regime de PLANO PAGO — onde o Claude Code divide os limites do plano — nao existe fatura por token para o desconto reduzir. Somado a duplicidade de emissor e a exigencia de assincronia, esta claim nao sobrevive como alavanca: vender 50% sem dizer EM QUE REGIME se aplica e vender desconto sem base de calculo. E a razao estrutural pela qual M0 (declarar o regime) precede qualquer movimento.'
+    trace: 'https://claude.com/pricing'
+
+  - id: E_OBJECAO_HAIKU_NAO_COMPOE_COM_CACHE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-02
+    verified_against: 'objecao do Elenxo contra o achado 9 (TTL de 5 min e leitura do Haiku a 90% de desconto), colidindo com dois achados do proprio conjunto: o TTL e 1 h em assinatura e 5 min em chave de API, e o Haiku 4.5 exige MINIMO de 4.096 tokens cacheaveis contra 512 dos modelos novos'
+    valid_from: 2026-10-02
+    source_tier: 5
+    source_kind: engineer
+    label: 'AS DUAS ALAVANCAS NAO COMPOEM, E NINGUEM NA RODADA NOTOU: (a) "TTL de 5 minutos" e meia verdade, porque e 1 h em assinatura e 5 min em chave de API; (b) o Haiku 4.5 exige MINIMO de 4.096 tokens cacheaveis, contra 512 dos modelos novos — isto e, o modelo que a doc manda usar em subagente simples e o MENOS elegivel a cache em prompt curto de agente. Logo "modelo barato" e "cache" nao se somam; escolher Haiku pode custar a elegibilidade do cache.'
+    trace: 'https://platform.claude.com/docs/en/build-with-claude/prompt-caching'
+
+  - id: E_OBJECAO_O_NUMERO_DESARMA_A_PERGUNTA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.55
+    verified_at: 2026-10-02
+    verified_against: 'objecao do Elenxo contra o achado 10 (13 dolares por dev/dia, 150-250 por mes, 90% abaixo de 30/dia). ⚠️ ESTA OBJECAO CHEGOU TRUNCADA NO REPASSE — o texto corta em "o numero DESARMA a pergu", e o que esta modelado aqui e a perna verificavel dela (auto-relato do fornecedor que fatura, medindo um dev num plano, e a aritmetica de que 20,2M tokens equivalem a 1-3 dias da banda). O que o Elenxo ia dizer depois do corte NAO esta neste no e nao deve ser inferido'
+    valid_from: 2026-10-02
+    source_tier: 5
+    source_kind: engineer
+    label: 'O NUMERO DE CUSTO E AUTO-RELATO DE QUEM FATURA, e mede "um dev num plano", nao o padrao desta casa (fan-out de 148 agentes). Mas a parte que mais importa e que o numero DESARMA a propria pergunta: a 150-250 por mes, as duas rodadas de 20,2M tokens valem de um a tres dias da banda, enquanto qualquer projeto de local, roteador ou fornecedor custa mais de um dia de engenharia — logo a urgencia suposta pelo dossie nao se sustenta. ⚠️ OBJECAO TRUNCADA NO REPASSE (corta em "o numero DESARMA a pergu"): modelada so na perna verificavel; o restante nao foi inferido.'
+    trace: 'https://code.claude.com/docs/en/costs'
+
+  - id: AR_SYNTHESIS_CUSTO_INFERENCIA_1002
+    node_type: artifact
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 1.0
+    verified_at: 2026-10-02
+    verified_against: 'arquivo conferido no disco; frontmatter com o contrato de custo (run_id wf_24ac2f5e-fbf, 15.281.705 tokens, 192 agentes, 97 min) apontando kg: para este grafo'
+    label: 'SYNTHESIS.md desta rodada — PROJECAO deste grafo, nunca fonte paralela. Carrega o que o grafo nao formata: a tabela de ordem-de-retorno com gatilho por movimento (prompt caching TTL 1h, Batch API, tiering, porteiro), os NAO-VERIFICADOS (31 de 83 claims fora do repasse por teto, 27 URLs descartadas, ZERO sinal de capital) e a secao valeu-a-pena com o achado sobre o PROPRIO mecanismo: subir maxVerify de 36 para 52 levou a fracao verificada de ~36% para 63% com custo por no praticamente igual (~246k contra 212-242k) — o gatilho que eu havia nomeado comprou COBERTURA, nao gastou mais por unidade.'
+    trace: 'docs/evolution/research/modelo-local-e-custo-de-inferencia-2026-10/SYNTHESIS.md'
+
+
+edges:
+
+  # ── as evidencias sustentam a pergunta (42: 7 medicoes locais + 33 claims confirmadas + mercado + lacunas) ──
+  - from: E_MEDIDO_CI_MINUTOS_SAO_A_CONTA_REAL_1002
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_GATE_E_LLM_FREE_1002
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_HARDWARE_VPS_SEM_GPU_1002
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_FANOUT_E_O_GASTO_DOMINANTE_1002
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_HAIKU_NAO_DECLARADO_EM_NENHUM_AGENTE_1002
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_REVISOR_SEM_CREDITO_E_SONNET5_1002
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CORPUS_VAZIO_NESTE_EIXO_1002
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CACHE_MULTIPLICADORES_DE_ESCRITA_E_LEITURA
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CACHE_BREAK_EVEN_UMA_OU_DUAS_LEITURAS
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_MINIMO_CACHEAVEL_CAIU_PARA_512_MAS_HAIKU_4096
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_TTL_PADRAO_5MIN_E_UMA_HORA_CUSTA_2X
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_BATCH_API_CINQUENTA_PORCENTO_E_EMPILHA
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_COM_BATCH_CINQUENTA_PORCENTO
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_FIREWORKS_BATCH_CINQUENTA_PORCENTO
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_OFFLOAD_PARA_CODIGO_DETERMINISTICO_E_OFICIAL
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_ROTEAR_MECANICO_PARA_ANALISE_ESTATICA
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_PRECO_LISTA_OUT2026_SONNET_FICOU_MAIS_BARATO
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_COM_PRECO_PRIMARIO_CONFIRMA
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CACHE_TTL_5MIN_E_LEITURA_HAIKU_90PC
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CONTEXTO_1M_SEM_SOBRETAXA_E_ESCADA_OFICIAL
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_PENSAMENTO_ESTENDIDO_E_SAIDA_E_NAO_DESLIGA
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_TOGETHER_DEEPSEEK_V41_FLASH_PRECO
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_TOGETHER_FAIXA_FLASH_NOVE_CENTAVOS
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_TOGETHER_FAIXA_MEDIA_ABERTOS
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_FIREWORKS_DEEPSEEK_FLASH_MESMO_PRECO
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_FIREWORKS_GLM_FLASH_E_GLM_PRECO
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_FIREWORKS_PRECO_POR_TAMANHO_ABAIXO_DE_4B
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CUSTO_MEDIO_13_DOLARES_POR_DEV_DIA
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_FANOUT_MULTIPLICA_SETE_VEZES_E_HAIKU_EM_SUBAGENTE
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CLAUDE_CODE_DIVIDE_OS_LIMITES_DO_PLANO
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_TTL_MUDA_POR_REGIME_ASSINATURA_OU_CHAVE
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_BUGBOT_MIL_DOLARES_POR_SEMANA
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CUSTO_POR_REVISAO_DE_PR_FAIXA_2026
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_COPILOT_REVIEW_VIROU_AI_CREDITS
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_COPILOT_COBRA_CREDITO_E_MINUTO_SEPARADOS
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CPU_DENSO_32B_TRES_VIRGULA_CINCO_TOKS
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_QWEN_BENCHMARK_NAO_TEM_CPU_ONLY
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_FRUGALGPT_CASCATA_APRENDE_O_ROTEAMENTO
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_CODEJUDGEBENCH_THINKING_VENCE_TAMANHO
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_NEMO_SWITCHYARD_ROTEADOR_APACHE
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_MERCADO_INFERENCIA_BARATA_2026_1002
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_CUSTO_DE_INFERENCIA_1002
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+
+  # ── as oito opcoes sao candidatas da decisao (8) ──
+  - from: C_OPCAO_M0_MEDIR_ANTES_DE_MOVER
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_M1_TIERING_REAL_NO_FANOUT
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_M2_CORTAR_MINUTO_ANTES_DE_TOKEN
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_M3_REVISOR_REBAIXADO_NAO_DESLIGADO
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_M4_DUAS_PASSADAS_GATE_PRIMEIRO
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_M5_INFERENCIA_BARATA_DE_TERCEIRO
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_M6_MODELO_LOCAL_EM_CPU_NA_VPS
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: SUPPORTS
+  - from: C_OPCAO_M7_NAO_FAZER_NADA
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: SUPPORTS
+
+  # ── a decisao responde a pergunta (1) ──
+  - from: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS
+
+  # ── evidencia sustenta a opcao que ela de fato favorece (22) ──
+  - from: E_CLAUDE_CODE_DIVIDE_OS_LIMITES_DO_PLANO
+    to: C_OPCAO_M0_MEDIR_ANTES_DE_MOVER
+    edge_type: SUPPORTS
+  - from: E_TTL_MUDA_POR_REGIME_ASSINATURA_OU_CHAVE
+    to: C_OPCAO_M0_MEDIR_ANTES_DE_MOVER
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_CUSTO_DE_INFERENCIA_1002
+    to: C_OPCAO_M0_MEDIR_ANTES_DE_MOVER
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_HAIKU_NAO_DECLARADO_EM_NENHUM_AGENTE_1002
+    to: C_OPCAO_M1_TIERING_REAL_NO_FANOUT
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_FANOUT_E_O_GASTO_DOMINANTE_1002
+    to: C_OPCAO_M1_TIERING_REAL_NO_FANOUT
+    edge_type: SUPPORTS
+  - from: E_FANOUT_MULTIPLICA_SETE_VEZES_E_HAIKU_EM_SUBAGENTE
+    to: C_OPCAO_M1_TIERING_REAL_NO_FANOUT
+    edge_type: SUPPORTS
+  - from: E_CONTEXTO_1M_SEM_SOBRETAXA_E_ESCADA_OFICIAL
+    to: C_OPCAO_M1_TIERING_REAL_NO_FANOUT
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_CI_MINUTOS_SAO_A_CONTA_REAL_1002
+    to: C_OPCAO_M2_CORTAR_MINUTO_ANTES_DE_TOKEN
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_GATE_E_LLM_FREE_1002
+    to: C_OPCAO_M2_CORTAR_MINUTO_ANTES_DE_TOKEN
+    edge_type: SUPPORTS
+  - from: E_COPILOT_COBRA_CREDITO_E_MINUTO_SEPARADOS
+    to: C_OPCAO_M2_CORTAR_MINUTO_ANTES_DE_TOKEN
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_REVISOR_SEM_CREDITO_E_SONNET5_1002
+    to: C_OPCAO_M3_REVISOR_REBAIXADO_NAO_DESLIGADO
+    edge_type: SUPPORTS
+  - from: E_CUSTO_POR_REVISAO_DE_PR_FAIXA_2026
+    to: C_OPCAO_M3_REVISOR_REBAIXADO_NAO_DESLIGADO
+    edge_type: SUPPORTS
+  - from: E_PENSAMENTO_ESTENDIDO_E_SAIDA_E_NAO_DESLIGA
+    to: C_OPCAO_M3_REVISOR_REBAIXADO_NAO_DESLIGADO
+    edge_type: SUPPORTS
+  - from: E_CODEJUDGEBENCH_THINKING_VENCE_TAMANHO
+    to: C_OPCAO_M3_REVISOR_REBAIXADO_NAO_DESLIGADO
+    edge_type: SUPPORTS
+  - from: E_OFFLOAD_PARA_CODIGO_DETERMINISTICO_E_OFICIAL
+    to: C_OPCAO_M4_DUAS_PASSADAS_GATE_PRIMEIRO
+    edge_type: SUPPORTS
+  - from: E_FRUGALGPT_CASCATA_APRENDE_O_ROTEAMENTO
+    to: C_OPCAO_M4_DUAS_PASSADAS_GATE_PRIMEIRO
+    edge_type: SUPPORTS
+  - from: E_ROTEAR_MECANICO_PARA_ANALISE_ESTATICA
+    to: C_OPCAO_M4_DUAS_PASSADAS_GATE_PRIMEIRO
+    edge_type: SUPPORTS
+  - from: E_NEMO_SWITCHYARD_ROTEADOR_APACHE
+    to: C_OPCAO_M4_DUAS_PASSADAS_GATE_PRIMEIRO
+    edge_type: SUPPORTS
+  - from: E_TOGETHER_FAIXA_FLASH_NOVE_CENTAVOS
+    to: C_OPCAO_M5_INFERENCIA_BARATA_DE_TERCEIRO
+    edge_type: SUPPORTS
+  - from: E_FIREWORKS_PRECO_POR_TAMANHO_ABAIXO_DE_4B
+    to: C_OPCAO_M5_INFERENCIA_BARATA_DE_TERCEIRO
+    edge_type: SUPPORTS
+  - from: E_QWEN_BENCHMARK_NAO_TEM_CPU_ONLY
+    to: C_OPCAO_M6_MODELO_LOCAL_EM_CPU_NA_VPS
+    edge_type: SUPPORTS
+  - from: E_CUSTO_MEDIO_13_DOLARES_POR_DEV_DIA
+    to: C_OPCAO_M7_NAO_FAZER_NADA
+    edge_type: SUPPORTS
+
+  # ── DISSENT QUE LIMITA = CONSTRAINS (17: 10 objecoes do Elenxo + 7 limites medidos ou declarados) ──
+  # REFUTES nao e usado neste grafo: nenhuma opcao morreu por evidencia. M6 e a que mais perto chegou,
+  # e ainda assim sobrou a janela de MoE em lote exclusivo — logo CONSTRAINS, nao REFUTES.
+  - from: E_OBJECAO_CACHE_INVERTE_EM_FANOUT
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CACHE_NAO_E_BOTAO_DESTA_CASA
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_PRECO_POR_TAREFA_NAO_POR_TOKEN
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DUAS_URLS_UM_EMISSOR
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DESCONTO_SEM_ONDE_INCIDIR
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: CONSTRAINS
+  - from: E_MEDIDO_CI_MINUTOS_SAO_A_CONTA_REAL_1002
+    to: D_COMO_BAIXAR_O_CUSTO_DE_INFERENCIA_DO_CICLO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HAIKU_NAO_COMPOE_COM_CACHE
+    to: C_OPCAO_M1_TIERING_REAL_NO_FANOUT
+    edge_type: CONSTRAINS
+  - from: E_MINIMO_CACHEAVEL_CAIU_PARA_512_MAS_HAIKU_4096
+    to: C_OPCAO_M1_TIERING_REAL_NO_FANOUT
+    edge_type: CONSTRAINS
+  - from: E_MEDIDO_HARDWARE_VPS_SEM_GPU_1002
+    to: C_OPCAO_M2_CORTAR_MINUTO_ANTES_DE_TOKEN
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_BATCH_EXIGE_ASSINCRONIA
+    to: C_OPCAO_M3_REVISOR_REBAIXADO_NAO_DESLIGADO
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_CUSTO_DE_INFERENCIA_1002
+    to: C_OPCAO_M3_REVISOR_REBAIXADO_NAO_DESLIGADO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_MESMO_PRECO_EM_DOIS_FORNECEDORES
+    to: C_OPCAO_M5_INFERENCIA_BARATA_DE_TERCEIRO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_ABERTO_NAO_E_MAIS_BARATO
+    to: C_OPCAO_M5_INFERENCIA_BARATA_DE_TERCEIRO
+    edge_type: CONSTRAINS
+  - from: E_MERCADO_INFERENCIA_BARATA_2026_1002
+    to: C_OPCAO_M5_INFERENCIA_BARATA_DE_TERCEIRO
+    edge_type: CONSTRAINS
+  - from: E_CPU_DENSO_32B_TRES_VIRGULA_CINCO_TOKS
+    to: C_OPCAO_M6_MODELO_LOCAL_EM_CPU_NA_VPS
+    edge_type: CONSTRAINS
+  - from: E_MEDIDO_HARDWARE_VPS_SEM_GPU_1002
+    to: C_OPCAO_M6_MODELO_LOCAL_EM_CPU_NA_VPS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_O_NUMERO_DESARMA_A_PERGUNTA
+    to: C_OPCAO_M7_NAO_FAZER_NADA
+    edge_type: CONSTRAINS
+  - from: AR_SYNTHESIS_CUSTO_INFERENCIA_1002
+    to: Q_CUT_AGENT_INFERENCE_COST_SMB_2026
+    edge_type: SUPPORTS

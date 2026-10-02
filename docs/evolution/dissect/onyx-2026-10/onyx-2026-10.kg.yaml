@@ -1,0 +1,211 @@
+meta:
+  id: onyx-2026-10
+  schema_version: "1"
+  dissect_tool: onyx
+  baseline: 2026-10-02
+  review_after: 2026-11-01   # 30d: FERRAMENTA/PRECO e o tipo dominante (cadencia da doutrina)
+  # kg-backlog-guard: on
+  # ═══ TETO: 11 NÓS ═══
+  #
+  # SEGUNDA dissecacao do /meta:dissect, e ela ENTROU NO N2 porque o corpus pagou N0/N1 e parte do
+  # N2 em 2026-10-01 (company-brain-e-conducao-como-servico: tres nos de Onyx, tier 9, votos 3-0).
+  # O que esta rodada acrescentou e o que decide: o MODELO DE DADOS do grafo e a PILHA de operacao,
+  # medidos hoje na fonte primaria.
+  #
+  # ⚠️ DESVIO DECLARADO DO PROCEDIMENTO: o comando manda orquestrar via onion-research mode:decision.
+  # NAO foi feito, por duas razoes medidas: (a) N0/N1 estavam pagos, logo o trabalho restante era
+  # N2 (ler codigo) + N3 (julgar) — alvo estreito; (b) ha DUAS rodadas de pesquisa em voo nesta
+  # sessao e um fan-out de 148 agentes para isto seria desproporcional. A regra da casa e eficiencia
+  # e eficacia, nao volume. As medicoes abaixo sao fetches dirigidos a primaria, declarados um a um.
+  #
+  # ⚠️ O TETO DO CENSO MORDEU DE NOVO, 2a vez em 2 dissecacoes: o censo disse "1 dissecacao
+  # declarada" e NAO viu a Onyx, embora o corpus tivesse tres nos dela com tier 9. E o teto que o
+  # medidor declara ("nao sabe de ferramenta que ninguem anotou COMO DISSECACAO"). Dois em dois e
+  # padrao, nao acidente — ver E_CENSO_NAO_VE_O_QUE_A_PESQUISA_PAGOU.
+
+nodes:
+
+  - id: Q_ONYX_ABSORVER_COSTURAR_OU_NAO_1002
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.5
+    dissect_level: 0
+    label: 'A Onyx (ex-Danswer) — busca/RAG corporativo open-source que JA ENTREGA grafo de conhecimento — e algo que o Onion absorve, costura como receptor do Company Brain, parqueia ou rejeita? A pergunta tem peso porque ela e a unica concorrente MEDIDA que entrega grafo, e porque a candidata (b) do Onion (Company Brain como servico) precisa de um receptor hospedado que o template em .claude/ nao tem.'
+    trace: 'docs/evolution/dissect/onyx-2026-10/onyx-2026-10.kg.yaml'
+
+  - id: E_N0_IDENTIDADE_PAGA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    dissect_level: 0
+    verified_at: 2026-10-01
+    verified_against: 'nivel PAGO pelo corpus em 2026-10-01 (E_ONYX_VINTE_DOLARES_POR_ASSENTO, tier 9, votos 3-0, https://www.onyx.app/pricing): open-source, ex-Danswer, preco publicado, repo onyx-dot-app/onyx vivo'
+    source_tier: 9
+    source_kind: primary
+    label: 'N0 IDENTIDADE — PASSA, e sem repagar: Onyx, ex-Danswer, open-source, repo onyx-dot-app/onyx, preco PUBLICADO (tier Business US$20 por usuario/mes no anual). Mantenedor corporativo com produto comercial em cima do open-source. E o agravante que o corpus ja registrou: o que ela cobra NAO e o conhecimento nem o motor — e o ASSENTO no receptor hospedado mais a governanca, o que fixa o TETO de preco do mercado para busca sobre documento da empresa em US$20 por assento COM O MOTOR GRATIS.'
+    trace: 'https://www.onyx.app/pricing'
+
+  - id: E_N1_CAPACIDADE_PAGA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    dissect_level: 1
+    verified_at: 2026-10-01
+    verified_against: 'nivel PAGO pelo corpus (E_ONYX_ENTREGA_GRAFO_1001, tier 9, tres refutadores independentes): doc do fornecedor diz verbatim "contextual retrieval, advanced RAG, hybrid search, and AI-generated knowledge graphs", e o modulo backend/onyx/kg esta vivo no codigo'
+    source_tier: 9
+    source_kind: primary
+    label: 'N1 CAPACIDADE — PASSA. Os VERBOS que a Onyx faz e o Onion nao: ingerir de 50+ conectores com permissao herdada da fonte; indexar em motor de busca hibrida; EXTRAIR grafo de conhecimento de documento automaticamente; servir chat com citacao permission-aware; hospedar e governar acesso. O delta e real e grande. Mas o CONSUMIDOR desse delta no Onion e a pergunta do N3 — e o corpus ja registrou o que isso derrubou: o diferencial do Onion NAO pode ser "temos grafo", porque a lider open-source entrega grafo dentro dos tiers pagos.'
+    trace: 'https://docs.onyx.app/'
+
+  - id: E_N2_MODELO_DE_DADOS_MEDIDO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    dissect_level: 2
+    verified_at: 2026-10-02
+    verified_against: 'fetch da primaria hoje: https://raw.githubusercontent.com/onyx-dot-app/onyx/main/backend/onyx/kg/models.py — leitura do MODELO DE DADOS, nao da pagina de produto'
+    source_tier: 9
+    source_kind: primary
+    label: 'N2 MECANISMO — E AQUI A DISSECACAO VIRA. O grafo da Onyx e extracao-como-verdade com JANELA DE INGESTAO. O que o modelo TEM: KGEntityTypeDefinition (description, grounding, grounded_source_name, active, attributes, entity_values), atributos de classificacao, KGAttributeImplicationProperty para relacao implicada, KG_COVERAGE_START / KG_COVERAGE_START_DATE / KG_MAX_COVERAGE_DAYS (janela de ingestao), grounded_source_name: DocumentSource (o documento de origem) e o enum KGStage com extracted / normalized / failed (estado de PIPELINE). O que esta AUSENTE, e sao exatamente os quatro campos que o Onion usa como diferencial: (1) valid_from / valid_to — NAO e bi-temporal; (2) verified_at — nao existe carimbo de re-verificacao; (3) confianca, trust ou TIER DE FONTE — nenhum; (4) distincao entre VERIFICADO e meramente EXTRAIDO — nenhuma. Nem indicador de metodo de extracao (LLM x regra).'
+    trace: 'https://raw.githubusercontent.com/onyx-dot-app/onyx/main/backend/onyx/kg/models.py'
+
+  - id: E_N2_PILHA_DE_OPERACAO_MEDIDA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    dissect_level: 2
+    verified_at: 2026-10-02
+    verified_against: 'fetch da primaria hoje: deployment/docker_compose/docker-compose.dev.yml do repo — contagem e nomes dos servicos, nao estimativa'
+    source_tier: 9
+    source_kind: primary
+    label: 'N2 — A PILHA, e ela decide a pergunta do receptor: 12 containers ATIVOS (13 definidos, mcp_server comentado). Nominalmente: api_server, background, web_server, relational_db (Postgres), opensearch (indice de busca/vetor), inference_model_server E indexing_model_server (DOIS servidores de modelo, que baixam modelo do HuggingFace), nginx, cache (Redis), object-store, minio, code-interpreter. Limite de recurso declarado so no api_server, por variavel de ambiente; nos demais AUSENTE. O quickstart NAO declara minimo de CPU/RAM/disco nem se GPU e necessaria — a doc tem modos "Lite" e "Standard" mas nao publica requisito, o que e lacuna do fornecedor e nao do medidor.'
+    trace: 'https://raw.githubusercontent.com/onyx-dot-app/onyx/main/deployment/docker_compose/docker-compose.dev.yml'
+
+  - id: E_N2_DRIFT_VESPA_PARA_OPENSEARCH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    dissect_level: 2
+    verified_at: 2026-10-02
+    verified_against: 'cruzamento de duas primarias: o no de 2026-10-01 lista `vespa/` entre os subdiretorios de backend/onyx/kg, e o compose de hoje traz `opensearch` como indice — nao ha servico vespa'
+    source_tier: 9
+    source_kind: primary
+    label: 'DRIFT PEQUENO MAS REAL, registrado para nao virar erro citado como fato: o no de ontem lista um subdiretorio `vespa/` dentro do modulo de grafo, e o compose de HOJE sobe `opensearch` como indice, sem servico Vespa. Leituras possiveis: migracao de indice com codigo legado ainda presente, ou suporte a dois backends. NAO MEDIDO qual — e por isso fica declarado em vez de resolvido. Importa porque "qual indice" muda o custo de operar, que e metade da pergunta do receptor.'
+    trace: 'https://raw.githubusercontent.com/onyx-dot-app/onyx/main/deployment/docker_compose/docker-compose.dev.yml'
+
+  - id: E_N3_CONFIRMA_O_DIFERENCIAL_POR_AUSENCIA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    dissect_level: 3
+    verified_at: 2026-10-02
+    verified_against: 'E_N2_MODELO_DE_DADOS_MEDIDO (schema lido na primaria) contra o diferencial declarado do Onion (grafo bi-temporal com source_tier 1-10, verified_at datado, verified_against, radar determinístico sem LLM)'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O ACHADO MAIS FORTE DA DISSECACAO, e ele e a favor do Onion — mas por AUSENCIA MEDIDA, nao por marketing. A rodada de 2026-10-01 concluiu que "o diferencial nao pode ser temos grafo; se existe, e a PROVENIENCIA VERIFICAVEL, e essa ninguem vende". Hoje o SCHEMA da lider open-source prova a segunda metade: o grafo dela NAO tem valid_from/valid_to, NAO tem verified_at, NAO tem tier de fonte e NAO distingue verificado de extraido. Isso e muito mais forte que ausencia em pagina de preco (que e ausencia de SALIENCIA): e ausencia de CAMPO — o dado nao existe para ser cobrado. Consequencia: o diferencial do Onion sobrevive, ESTREITADO e agora MEDIDO contra a lider, e o nome dele e "verdade com data e procedencia graduada", nao "grafo".'
+    trace: 'docs/evolution/dissect/onyx-2026-10/onyx-2026-10.kg.yaml'
+
+  - id: E_N3_NAO_TRANSFERE_COMO_ABSORCAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    dissect_level: 3
+    verified_at: 2026-10-02
+    verified_against: 'regua de transferencia aplicada contra E_N1_CAPACIDADE_PAGA e E_N2_PILHA_DE_OPERACAO_MEDIDA'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'N3 — DIFERENTE, logo NAO TRANSFERE como absorcao: a Onyx e um PRODUTO com receptor hospedado, 50+ conectores e 12 containers; o Onion e template em .claude/ sem receptor, sem npm e sem CLI. Nao ha tecnica a reescrever na gramatica da casa — ha um sistema a usar ou nao usar. E o unico pedaco citavel do mecanismo dela (o enum KGStage: extracted/normalized/failed) e estado de PIPELINE DE EXTRACAO, que o Onion nao tem porque o grafo dele e CURADO A MAO e nao extraido. Transferir KGStage seria importar vocabulario de um pipeline que aqui nao existe.'
+    trace: 'docs/evolution/dissect/onyx-2026-10/onyx-2026-10.kg.yaml'
+
+  - id: E_N3_RECEPTOR_BLOQUEADO_POR_HARDWARE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    dissect_level: 3
+    verified_at: 2026-10-02
+    verified_against: 'E_N2_PILHA_DE_OPERACAO_MEDIDA (12 containers, OpenSearch, dois servidores de modelo) contra o hardware medido desta casa: VPS de 8 vCPU, 31 GB RAM (22 livres), SEM GPU, com a bancada determinística SATURANDO os 8 cores por ~17 min por passada'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'A OPCAO QUE PARECIA BOA, FECHADA POR MEDICAO: "Onyx como receptor hospedado que a candidata (b) nao tem" e atraente no papel — open-source, auto-hospedavel, com conectores e governanca prontos. Mas 12 containers com OpenSearch e DOIS servidores de modelo nao coexistem com um gate que ja satura 8 vCPU por 17 minutos. Nao e questao de ajustar: o indice de busca e os model servers sao justamente os componentes que competem por CPU e RAM. Logo a opcao nao esta rejeitada por principio — esta bloqueada POR HARDWARE, e isso muda o gatilho: ela reabre em maquina que nao seja esta, nao em argumento.'
+    trace: 'docs/evolution/dissect/onyx-2026-10/onyx-2026-10.kg.yaml'
+
+  - id: E_CENSO_NAO_VE_O_QUE_A_PESQUISA_PAGOU
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    dissect_level: 0
+    verified_at: 2026-10-02
+    verified_against: 'medido nesta sessao: o censo (dissect-census.sh) devolveu "151 grafos, 1 dissecacao declarada" e NAO listou a Onyx, enquanto grep no corpus achou TRES nos de Onyx com tier 9 e votos 3-0 no grafo company-brain-e-conducao-como-servico-2026-10'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O TETO DO CENSO MORDEU PELA SEGUNDA VEZ EM DUAS DISSECACOES — e dois em dois e padrao, nao acidente. Ontem, com o Cedar: o censo disse ZERO dissecacoes enquanto o corpus tinha quatro nos de Cedar com tier 7-8. Hoje, com a Onyx: disse UMA enquanto o corpus tinha tres nos de Onyx com tier 9. O medidor esta CORRETO pelo contrato que declara (le marcador dissect_*, nao conhecimento sobre ferramenta), mas o efeito pratico e que o corte de custo que ele existe para dar depende de alguem ter rodado /meta:dissect antes — e a pesquisa normal paga nivel sem marcar. CURA CANDIDATA, nao implementada aqui: o censo tambem varrer `trace:` e label por NOME DE FERRAMENTA nos grafos de pesquisa e reportar como "nivel pago SEM marcador", que e sinal diferente de "nao dissecado". GATILHO: a terceira dissecacao em que o censo nao enxergar nivel ja pago.'
+    trace: 'docs/evolution/dissect/onyx-2026-10/onyx-2026-10.kg.yaml'
+
+  - id: D_ONYX_1002
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    dissect_level: 3
+    dissect_verdict: parquear
+    verified_at: 2026-10-02
+    verified_against: 'NAO SELADA. O /meta:dissect nunca sela: status open, aguardando o maestro.'
+    label: 'VEREDITO PROPOSTO — PARQUEAR, com dois gatilhos nomeados (o maestro sela). Por que nao os outros tres: NAO e `absorver` (nao ha tecnica a reescrever — e produto com receptor, conectores e 12 containers; e o unico pedaco citavel, o enum KGStage, e estado de pipeline de EXTRACAO, que nao existe num grafo curado a mao). NAO e `costurar` AGORA (a costura seria Onyx como receptor hospedado da candidata (b), e ela esta BLOQUEADA POR HARDWARE: 12 containers com OpenSearch e dois model servers contra 8 vCPU que a bancada ja satura — ver E_N3_RECEPTOR_BLOQUEADO_POR_HARDWARE). NAO e `rejeitar` (a opcao de receptor e tecnicamente boa e so esta bloqueada por maquina, e o achado de ausencia de schema e valioso e vivo). ═══ A PERGUNTA PARQUEADA ═══ "a Onyx, auto-hospedada, e o receptor que a candidata (b) do Company Brain nao tem — e o Onion entra como a CAMADA DE PROVENIENCIA que o schema dela nao tem?" Essa composicao e a leitura mais interessante que a dissecacao produziu: nao competir com a Onyx, e sim ser o que falta no grafo dela. ═══ OS GATILHOS, nomeados e verificaveis ═══ reabrir quando QUALQUER um ocorrer: (1) o maestro SELAR a decisao D_COMPANY_BRAIN_OU_CONDUCAO_COMO_SERVICO (hoje `open`) na direcao (b) ou (b+d) — sem isso, discutir receptor e discutir solucao de problema nao escolhido; (2) existir maquina que NAO seja esta VPS (ou o gate deixar de saturar 8 cores), porque hoje o bloqueio e de CPU e nao de desenho; (3) a Onyx acrescentar ao schema do grafo validade temporal por fato OU tier de fonte — o que derrubaria E_N3_CONFIRMA_O_DIFERENCIAL_POR_AUSENCIA e exigiria re-medir o diferencial inteiro. ═══ O QUE FAZER AGORA, e e barato ═══ nada de integracao; so registrar que o diferencial do Onion contra a lider open-source e "verdade com data e procedencia graduada", medido por ausencia de CAMPO no schema dela — e levar isso ao no do Company Brain, que esta aberto.'
+    trace: 'docs/evolution/dissect/onyx-2026-10/onyx-2026-10.kg.yaml'
+
+edges:
+
+  - from: E_N0_IDENTIDADE_PAGA
+    to: Q_ONYX_ABSORVER_COSTURAR_OU_NAO_1002
+    edge_type: SUPPORTS
+  - from: E_N1_CAPACIDADE_PAGA
+    to: Q_ONYX_ABSORVER_COSTURAR_OU_NAO_1002
+    edge_type: SUPPORTS
+  - from: E_N2_MODELO_DE_DADOS_MEDIDO
+    to: Q_ONYX_ABSORVER_COSTURAR_OU_NAO_1002
+    edge_type: SUPPORTS
+  - from: E_N2_MODELO_DE_DADOS_MEDIDO
+    to: E_N3_CONFIRMA_O_DIFERENCIAL_POR_AUSENCIA
+    edge_type: SUPPORTS
+  - from: E_N2_PILHA_DE_OPERACAO_MEDIDA
+    to: E_N3_RECEPTOR_BLOQUEADO_POR_HARDWARE
+    edge_type: SUPPORTS
+  - from: E_N2_DRIFT_VESPA_PARA_OPENSEARCH
+    to: E_N2_PILHA_DE_OPERACAO_MEDIDA
+    edge_type: CONSTRAINS
+  - from: E_N3_NAO_TRANSFERE_COMO_ABSORCAO
+    to: D_ONYX_1002
+    edge_type: CONSTRAINS
+  - from: E_N3_RECEPTOR_BLOQUEADO_POR_HARDWARE
+    to: D_ONYX_1002
+    edge_type: CONSTRAINS
+  - from: E_N3_CONFIRMA_O_DIFERENCIAL_POR_AUSENCIA
+    to: D_ONYX_1002
+    edge_type: SUPPORTS
+  - from: E_CENSO_NAO_VE_O_QUE_A_PESQUISA_PAGOU
+    to: Q_ONYX_ABSORVER_COSTURAR_OU_NAO_1002
+    edge_type: SUPPORTS
+  - from: D_ONYX_1002
+    to: Q_ONYX_ABSORVER_COSTURAR_OU_NAO_1002
+    edge_type: SUPPORTS
