@@ -3415,8 +3415,24 @@ _scan_relative_links() {
   # door, exatamente como os docs core-only. Só ATIVA quando o alvo está ausente ([ ! -e ] abaixo): num
   # adotante-cheio o alvo existe (nunca entra); no core (role: source) o guard nem roda. Backward-safe.
   local adopted=""; [ "${IS_DERIVED}" -eq 1 ] && adopted=1
-  local f dir lineno target clean rel
+  local f dir lineno target clean rel _rel_f
   while IFS= read -r -d '' f; do
+    # ⚠️ INTAKE NÃO-CONFIÁVEL NÃO É DOC DESTA CASA — e isto nasceu de dano medido em 2026-10-02.
+    # Um sinal de 2818 linhas chegou ao `inbox/` de um adotante trazendo um PATCH, com links
+    # relativos escritos da perspectiva do arquivo ALVO (`../interface.md`, `./types.md`). Eles não
+    # resolvem de `docs/evolution/inbox/` — e a regra, sendo HARD, deixou o gate do CORE vermelho
+    # por conteúdo que o core não escreveu e não deve editar.
+    # Consequência que torna isto buraco e não inconveniência: QUALQUER adotante passa a poder
+    # travar o gate do core só mandando um sinal. Guarda que terceiro consegue disparar à distância
+    # é superfície, não proteção.
+    # ESCOPO: pula o 1º nível de `inbox/` e `inbound/` (a chegada). `_processed/` CONTINUA julgado —
+    # ali o core já triou, o conteúdo virou registro desta casa, e link quebrado volta a ser dívida
+    # nossa. É a mesma fronteira que o R15.2 usa: o corpo do sinal é DADO até ser absorvido.
+    _rel_f="${f#"${REPO_ROOT}/"}"
+    case "${_rel_f}" in
+      docs/evolution/inbox/*/*|docs/evolution/inbound/*/*) : ;;   # subpasta (_processed/) → JULGA
+      docs/evolution/inbox/*|docs/evolution/inbound/*) continue ;; # chegada → intake, não julga
+    esac
     dir="$(dirname "${f}")"
     while IFS=$'\t' read -r lineno target; do
       [ -n "${target}" ] || continue

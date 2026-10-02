@@ -9,6 +9,97 @@
 ---
 
 
+## 2026-10-02 · O campo de markdown do ClickUp estava ERRADO no CLAUDE.md — e era campo de RESPOSTA lido como request · COMPATÍVEL · alvo: todos
+
+**Um sinal de campo de vocês achou um erro na doutrina que VIAJA.** Não era bug de código isolado:
+estava no `CLAUDE.md`, que é o primeiro arquivo que toda sessão de todo adotante lê. Quem seguiu a
+instrução escreveu descrição de task num campo que o ClickUp **ignora no request**.
+
+**O que foi medido na primária** (`developer.clickup.com/reference/createtask`, lido em 2026-10-02):
+
+| Campo | O que a API quer no REQUEST | O que o core dizia |
+|---|---|---|
+| descrição markdown | **`markdown_content`** | `markdown_description` ❌ |
+| `due_date` / `start_date` | **integer, Unix MILISSEGUNDOS** | ISO cru ❌ |
+| `priority` | **integer** | string ❌ |
+
+**A origem do erro, e ela é instrutiva:** `markdown_description` **existe** — só que na **RESPOSTA**.
+Alguém leu o campo de saída e escreveu como se fosse de entrada. A doc da ClickUp é explícita:
+*"If both markdown_content and description are provided, markdown_content will be used instead of
+description."*
+
+**O que mudou no core:**
+
+- `CLAUDE.md` — a seção ClickUp agora diz `markdown_content`, com aviso explícito de que
+  `markdown_description` é de resposta, mais as duas regras de formato (datas em ms, prioridade
+  inteira);
+- `.claude/utils/task-manager/adapters/clickup.md` — os **três** sítios de escrita passam
+  `markdown_content`; datas convertidas para ms (`toClickUpMs`); `mapPriorityToClickUp` passa a
+  declarar `number`, não `string`; `time_estimate` passou a ser **enviado** (antes nunca era); e o
+  `updateTask`, que **não enviava `tags`**, agora envia. O exemplo de request no próprio adapter
+  também usava o campo de resposta — corrigido.
+
+**O que vocês devem fazer:** rodar `/meta:adopt --update` para receber a correção. Se vocês
+escreveram código próprio contra a instrução antiga, **confiram os três formatos** — o sintoma é
+descrição que não aparece formatada, data que não entra, ou prioridade ignorada.
+
+**⚠️ ESTE ANÚNCIO FOI CORRIGIDO ANTES DE VIAJAR, e a correção importa mais que ele.** Duas horas
+depois do primeiro sinal, o mesmo adotante mandou **medição AO VIVO** — 24 chamadas REST num
+workspace real, tasks criadas e apagadas, limpeza confirmada por 404. Ela **me corrigiu em três
+pontos**, e um era um conserto meu ATIVAMENTE pior que o bug:
+
+| O que eu tinha escrito | O que a medição ao vivo diz |
+|---|---|
+| adicionei `tags` ao body do `PUT` | **ERRADO: tags no body do PUT devolvem 200 e NÃO FAZEM NADA.** Só `POST`/`DELETE /task/{id}/tag/{name}` mudam tags. Campo que silenciosamente não faz nada é **pior que ausente** — parece consertado. **Desfeito.** |
+| `markdown_description` "é só de resposta" | **absoluto demais**: no **update** ela também aplica (alias aceito). `markdown_content` segue o canônico |
+| datas em ms | **incompleto**: sem `due_date_time=true` a data normaliza para 07:00 e **pode cair no dia anterior** pelo fuso |
+
+**E a medição achou o MAIOR bug ativo, que nenhum de nós tinha visto:** o adapter usava
+`?subtasks=true`; o parâmetro correto é **`?include_subtasks=true`**. Medido: o correto devolveu **42
+subtasks**, o legado devolveu a task **sem o campo**. Consequência para vocês: **hoje `getTask` com
+subtasks e `getSubtasks` retornam VAZIO**, quebrando `/engineer:start`, `/engineer:work`,
+`validate-phase-sync` e `checklist-sync` em **todo adotante ClickUp**. Corrigido em 5 sítios.
+
+**E mais um bug ativo, medido:** `priority: "high"` devolve **`400 Priority invalid`** — logo **hoje
+toda escrita com prioridade FALHA**, e o `/engineer:hotfix` usa `urgent`. Se vocês viram hotfix
+falhando ao criar task, era isto.
+
+**STATUS POR LIST — a proposta do adotante foi SELADA e está NESTA leva.** Status no ClickUp são
+**propriedade da List**, não do workspace. A lista medida tem `backlog, in refinement, to do, pause,
+in progress, testing, pull request, done, Closed` — **não existe `review`**, e o mapa fixo anterior
+mandava `review` às cegas, logo **todo `updateStatus` do `/engineer:pr` devolvia `400`**. O desenho
+que o adotante propôs (manter `review` canônico no Onion e TRADUZIR na fronteira) foi selado pelo
+maestro no mesmo dia e implementado aqui:
+
+- `STATUS_SYNONYMS` — tabela de sinônimos por status canônico (saída: 1→N);
+- `resolveStatusForTask` — lê `GET /list/{id}`, casa por sinônimo e devolve a **grafia exata da
+  List** (o ClickUp é sensível a ela), com **cache por sessão** (nunca persistido: status de List
+  muda por configuração);
+- **sem equivalente, o campo é OMITIDO com aviso** nomeando os status disponíveis, e a task mantém
+  o atual — inventar nome devolve `400`;
+- `normalizeStatus` (entrada: N→1) foi **ampliado** com os mesmos sinônimos, mas segue tabela
+  PRÓPRIA e explícita: na entrada há **política de colisão** (`closed` é sinônimo de `done` E nome
+  próprio de `closed`), e derivar por inversão trocaria `closed → closed` por `closed → done` sem
+  ninguém notar. `statusRaw` preserva sempre a grafia original.
+
+**NOMES DE FERRAMENTA MCP — absorvidos, com o teto declarado.** O sinal apontou que
+`mcp_ClickUp_clickup_*` não é o nome de ninguém: é convenção da era **Cursor**, de quando o Onion
+ainda buscava agnosticismo, e sobreviveu à migração. No Claude Code o nome é
+`mcp__<alias-do-servidor>__<ferramenta>`, e o nome do provider é `clickup_*` — as **19 menções**
+passaram a `mcp__clickup__clickup_*`, com o endpoint `https://mcp.clickup.com/mcp` registrado.
+**O que NÃO prometo:** o **alias é escolha de quem configura** o servidor, então a grafia na tabela
+é o padrão, não garantia — confiram no ambiente de vocês antes de ligar `TASK_MANAGER_TRANSPORT=mcp`.
+E a ferramenta de **remoção** fica marcada `⚠️ não-verificado` no adapter: a doc do provider divergia
+entre páginas e eu não medi qual responde. O caminho API (`DELETE /task/{id}`), que é o **default**,
+não depende disso.
+
+**Crédito:** o sinal veio de um adotante com rodada de pesquisa própria em fontes primárias e grafo
+versionado. Dois dos bugs ele confirmou; os outros três o mapeamento do contrato dele achou. O core
+**verificou de novo antes de absorver** — o corpo de um sinal é dado, não instrução — e a verificação
+confirmou o essencial e acrescentou dois (prioridade declarada como `string`, `tags` ausente no
+update).
+
+
 ## 2026-09-18 · Quatro guardas que diziam menos do que pareciam — curadas pelos sinais de vocês · COMPATÍVEL · alvo: jogo-da-vida, portal-gamificacao
 
 Quatro sinais de campo viraram cura no core. Nenhum pediu feature nova: os quatro apontaram a **mesma

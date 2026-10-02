@@ -149,8 +149,32 @@ _V="${REPO_ROOT}/.claude/validation"
 [ -n "$(onion_staged 'docs/evolution/review/*.md' '.claude/validation/lint-selftest.sh')" ]   && [ -f "${_V}/testing-state.sh" ]   && onion_regen docs/onion/testing-state.md 81 bash "${_V}/testing-state.sh" --markdown
 # A tabela de doutrina é PROJEÇÃO do registro, que deriva dos docstrings do lint.
 [ -n "$(onion_staged '.claude/validation/rules-registry.sh' '.claude/validation/lint-artifacts.sh')" ]   && [ -f "${_V}/rules-registry.sh" ]   && onion_regen .claude/validation/lint-rules.md 39 bash "${_V}/rules-registry.sh"
-[ -n "$(onion_staged '.claude/validation/lint-selftest.sh')" ]   && [ -f "${_V}/harness-inventory.sh" ]   && onion_regen docs/onion/testing-inventory.md 80 bash "${_V}/harness-inventory.sh" --markdown
+# ⚠️ GATILHO AMPLIADO em 2026-10-02: o harness-inventory CONTA FIXTURES tambem, e a 1a versao da
+# tabela gatilhava so em lint-selftest.sh — mexer em fixture defasava o inventario SEM disparar a
+# regeneracao, e a REGRA 80 barrou o commit. Lacuna de VOCABULARIO do gatilho, nao da logica: a
+# classe que mais falha em guarda de lista, aplicada a propria tabela que cura a classe.
+[ -n "$(onion_staged '.claude/validation/lint-selftest.sh' '.claude/validation/fixtures')" ] \
+  && [ -f "${_V}/harness-inventory.sh" ] \
+  && onion_regen docs/onion/testing-inventory.md 80 bash "${_V}/harness-inventory.sh" --markdown
+# O console da federacao e projecao do members.yaml (REGRA 24) — registrar um adotante defasava o
+# console e barrava o commit seguinte. Mesma lacuna, descoberta na mesma passada.
+[ -n "$(onion_staged 'docs/evolution/federation/members.yaml')" ] \
+  && [ -f "${_V}/federation-console.sh" ] \
+  && onion_regen docs/onion/federation-console.html 24 bash "${_V}/federation-console.sh"
 [ -n "$(onion_staged '.claude/commands' '.claude/agents' '.claude/skills' 'docs/knowledge-base')" ]   && [ -f "${_V}/inventory.sh" ]   && onion_regen docs/onion/inventory.md 16 bash "${_V}/inventory.sh" --markdown
+# O MAPA e o GRAFO fecham a tabela, e as duas lacunas foram descobertas pelo gate neste mesmo PR:
+# · REGRA 38 (mapa da federação) deriva do members.yaml — registrar um adotante deixava o mapa
+#   defasado e o commit barrado, com a correção óbvia e manual.
+# · REGRA 21 (grafo) deriva, entre outras fontes, do `capability.json` dos plugins — que o AUTO-FIX
+#   acima regenera e stageia. Ou seja: o próprio hook produzia a defasagem que depois cobrava. Por
+#   isso o gatilho é 'plugins' (já staged quando a tabela roda, pois o auto-fix vem ANTES) além das
+#   fontes de spec-as-code.
+[ -n "$(onion_staged 'docs/evolution/federation/members.yaml')" ] \
+  && [ -f "${_V}/graph.sh" ] \
+  && onion_regen docs/onion/federation-map.md 38 bash "${_V}/graph.sh" --map
+[ -n "$(onion_staged 'plugins' '.claude/commands' '.claude/agents' '.claude/skills' 'docs/evolution/federation/members.yaml')" ] \
+  && [ -f "${_V}/graph.sh" ] \
+  && onion_regen docs/onion/graph.md 21 bash "${_V}/graph.sh" --markdown
 if [ -n "$(onion_staged '*.kg.yaml')" ]; then
   [ -f "${_V}/kg-trace-resolve.sh" ]     && onion_regen docs/onion/kg-read-index.tsv 84 bash "${_V}/kg-trace-resolve.sh" . --emit-index
   # o projetor de backlog custa ~14s por invocação (medido) — por isso só com .kg.yaml staged

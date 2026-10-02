@@ -313,6 +313,37 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  - id: brain-granaai
+    # ⚠️ REGISTRADO EM 2026-10-02, e o ATRASO custou: este adotante foi adotado em 2026-10-01 e, antes
+    #    de entrar aqui, já havia mandado TRÊS sinais de severidade `high` — um deles com medição AO
+    #    VIVO (24 chamadas REST num workspace real) que achou o maior bug ativo do adapter ClickUp.
+    #    Enquanto esteve fora do registro: (a) a REGRA 36 (Superfície VENDORIZADA sem nome comercial
+    #    de cliente) NÃO o protegia, porque ela deriva termos deste arquivo; (b) o /meta:co-announce
+    #    não conseguia resolvê-lo como alvo, logo NÃO HAVIA COMO responder ao sinal dele por doutrina
+    #    — o fechamento de laço estava mecanicamente impedido. Registrar é ato de SEGURANÇA e de
+    #    COMUNICAÇÃO, não burocracia; o maestro apontou a ausência da resposta e ela estava aqui.
+    name: brain-granaai (adotante de campo — base de conhecimento da Grana.Ai, a redocumentar como Company Brain)
+    # `adopted` no carimbo (relação com o framework) × `standalone` aqui (tier na rede) — perguntas
+    # diferentes, mesmo caso de vendas-pdi-enterprise acima.
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    kind: adopter
+    parent: onion-evolve
+    remote: n/a                 # repo LOCAL; expor é ato do maestro (outward-facing)
+    local_path: "/home/marcio/brain-granaai"
+    onion_version: 547e2e3edf3b # pin da adoção de 2026-10-01 (confere com o .claude/.onion-version do clone)
+    adopted_at: 2026-10-01
+    mode: brownfield            # repo que já existia (master), adotado como atualização
+    personality_summary: "O adotante que mais SINALIZOU em menos tempo, e com a evidência mais forte: três sinais `high` em 48h, um deles com medição ao vivo (24 chamadas REST, tasks criadas e apagadas, limpeza confirmada por 404) e grafo de pesquisa versionado. Achou o que o core não via — o parâmetro de subtasks que devolvia vazio e quebrava quatro comandos em TODO adotante ClickUp — e corrigiu uma correção errada do core antes de ela viajar. Precedente: adotante como refutador do core, não só consumidor."
+    specializations: [company-brain, clickup, pesquisa-primaria]
+    personality_last_sync: 2026-10-02
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: []
+      diary_classifications_shared: []
+      exposes_downstream: []
+
   - id: vendas-pdi-enterprise
     # ⚠️ SLUG NEUTRO POR DECISÃO, não por acaso (maestro, 2026-09-17). O pedido original nomeava o
     #    cliente no identificador, e o identificador é justamente o que vai para as superfícies

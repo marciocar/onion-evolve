@@ -278,6 +278,14 @@ assistant	executes	onion
 assistant	orchestrates-workers	subagent	orchestration
 assistant	proposes	maestro	conversa-plan-gate
 assistant	reports	maestro	conversa-plan-gate
+brain-granaai	adopts	onion-evolve	
+brain-granaai	mode	brownfield	
+brain-granaai	pin	547e2e3edf3b	
+brain-granaai	specialization	clickup	
+brain-granaai	specialization	company-brain	
+brain-granaai	specialization	pesquisa-primaria	
+brain-granaai	tier	standalone	
+brain-granaai	trust-advises	onion-evolve	
 branch-code-reviewer	related	/engineer/pre-pr	
 branch-code-reviewer	related	branch-test-planner	
 branch-code-reviewer	related	code-reviewer	

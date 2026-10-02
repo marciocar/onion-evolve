@@ -40,7 +40,22 @@ if [ -x "${REPO_ROOT}/node_modules/.bin/lint-staged" ]; then
 elif [ -f "${REPO_ROOT}/.lintstagedrc.js" ] || grep -q '"lint-staged"' "${REPO_ROOT}/package.json" 2>/dev/null; then
   # Package manager do ALVO, não chute (sinal de campo 2026-07-25): o hook instruía 'pnpm install' num
   # repo bun-only (packageManager: bun, engines pnpm >=999). Lê o campo packageManager; senão, agnóstico.
-  onion_pm="$(grep -oE '"packageManager"[[:space:]]*:[[:space:]]*"[a-z]+' "${REPO_ROOT}/package.json" 2>/dev/null | grep -oE '[a-z]+$' | tail -1)"
+  # ⚠️ DANO CONSUMADO, medido por um adotante em 2026-10-02: esta linha matava o commit EM SILÊNCIO.
+  # Sob `set -euo pipefail` (l.16), num repo com "lint-staged" no package.json, SEM node_modules e SEM
+  # o campo `packageManager`, o 1º `grep` não casa e sai 1 — `pipefail` propaga, `set -e` mata o hook
+  # NA ATRIBUIÇÃO, antes do `echo` do skip. Resultado: `git commit` sai 1 sem UMA palavra, logo depois
+  # de o lint Onion imprimir `OK ✓`. Quem viu isso achou que o lint tinha falhado.
+  #
+  # ⚠️ E O CORE DECLAROU, ERRADO, QUE NÃO REPRODUZIA. A busca cobriu `*.sh` e o instalador — e a linha
+  # vive NESTE `.tpl`. Procurar no caminho errado é não ter procurado, e o veredito errado já tinha
+  # sido ENTREGUE ao adotante. Ele mediu de novo e corrigiu o core: `.tpl:16` e `.tpl:43`, presentes em
+  # origin/main e no pin dele. Precedente: adotante como refutador do core.
+  #
+  # A cura é a da casa: captura, rc LIDO, e nenhum fechador precoce decidindo veredito.
+  onion_pm=""
+  if onion_pm_raw="$(grep -oE '"packageManager"[[:space:]]*:[[:space:]]*"[a-z]+' "${REPO_ROOT}/package.json" 2>/dev/null)"; then
+    onion_pm="${onion_pm_raw##*\"}"
+  fi
   if [ -n "${onion_pm}" ]; then onion_hint="rode '${onion_pm} install'"; else onion_hint="instale as dependências do projeto"; fi
   echo "⏭️  lint-staged configurado, mas node_modules ausente (worktree?) — pulando. ${onion_hint} p/ ativar."
 fi
