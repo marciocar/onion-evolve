@@ -1,0 +1,122 @@
+# kg-backlog-guard: on
+# ═══ TETO: 8 NÓS ═══
+meta:
+  id: guard-forge-2026-10
+  schema_version: "1"
+  baseline: 2026-10-02
+  review_after: 2026-12-02
+  # O DESTINO DA FORJA DE GUARDAS — o primeiro write(KG) que a peça 5 exige, aplicado a ela mesma.
+  #
+  # POR QUE ESTE ARQUIVO EXISTE: antes dele, o conhecimento de forjar uma guarda vivia só na
+  # mensagem de commit e no resíduo da REGRA 56 — ou seja, EVAPORAVA entre sessões. Quem forjasse a
+  # próxima guarda releria um molde escolhido de memória, que é exatamente o defeito que a forja
+  # nasceu para curar. O fato mora AQUI; no `fios-abertos` entra só o compromisso, citando estes ids
+  # (fronteira que o `meta:` daquele arquivo declara em letra grande, e que eu violei hoje antes de
+  # a REGRA 58 me pegar pelo teto).
+  #
+  # ⚠️ DOIS CONJUNTOS DE 7 PEÇAS COEXISTEM no vocabulário destes nós: o da GUARDA (defeito, molde,
+  # artefato, polaridades, mutante, registro, teto) e o do COMANDO-COM-FRAMEWORK (superfície,
+  # doutrina, contexto, workflow, destino, lente, bancada). Quando um nó diz "peça N", ele nomeia o
+  # conjunto.
+nodes:
+  - id: E_DEFEITO_QUE_FORJOU_A_GUARDA_STDOUT_VAZIO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-02'
+    label: 'O DEFEITO DATADO que originou a guarda `background-state-needs-evidence` (peça 1 do conjunto da GUARDA). Em 2026-10-02 um `git commit -q -F -` ficou TRAVADO 31 MINUTOS esperando stdin — a mensagem foi escrita com heredoc mal formado e acabou parseada como argumentos, de modo que o git bloqueou na entrada padrao. Eu reportei ao maestro "gate ainda rodando (saída vazia)" DUAS VEZES, e a frase era falsa. A RAIZ: saída vazia é INDISTINGUÍVEL de progresso — um processo travado, um que morreu antes de escrever e um que está trabalhando produzem o MESMO arquivo de 0 byte. Só um `ps` separou os três, e ele só aconteceu porque o maestro perguntou "tudo ok com os 2 shells?". Agravante do substrato: no timeout o harness notifica `completed`, que se lê como "terminou" quando significa "foi morto". Classe: `exit-code-nao-e-a-verificacao` — ausência de sinal não é sinal.'
+    verified_against: 'medido ao vivo: `ps -eo pid,etime,args` mostrou `git commit` com 31:02 de ELAPSED e o arquivo de saída com 0 byte; o processo foi morto por TaskStop e o índice sobreviveu intacto (6 renomeações)'
+
+  - id: E_ERA_A_UNICA_DAS_CINCO_SEM_MECANISMO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-02'
+    label: 'POR QUE ESTA CLASSE MERECIA GUARDA e as outras quatro do mesmo turno não: naquele turno o mecanismo me corrigiu CINCO vezes, e quatro dispararam SOZINHAS — nó órfão de grau 0 (`kg-radar --integrity` exit 1), REGRA 58 (teto do backlog), REGRA 46 (outbox sem membro correspondente) e REGRA 49 (nó PROD sem verified_at). A quinta — afirmar estado de shell de fundo sem observar — NÃO TINHA MECANISMO NENHUM, e eu escrevi a frase falsa duas vezes antes de alguém notar. Isto satisfaz a cláusula 1 da doutrina (defeito medido e datado) e distingue guarda de hipótese: o gatilho social é cura nula (medido em 2026-08-02), logo a classe sem mecanismo é a que pede guarda.'
+    verified_against: 'as quatro correções mecânicas estão nos logs do gate do mesmo turno; a quinta só aparece no transcript, disparada por pergunta humana'
+
+  - id: D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: '2026-10-02'
+    label: 'DECISÃO DE SUBSTRATO (peça 2 do conjunto da GUARDA): hook `Stop`, copiando `rule-title-in-prose.sh`. O que o censo respondeu e a memória não responderia: entre os moldes disponíveis, só `rule-title-in-prose.sh` veta a PROSA do assistente com `exit 2` lendo o transcript — e a classe a vigiar é precisamente uma AFIRMAÇÃO em prosa, não uma ação de ferramenta. Um `PreToolUse` não serve: o dano não está numa chamada, está no que eu escrevo DEPOIS de não ter chamado nada. Um check de lint também não: a prosa não está no repo. O censo foi o que tornou isto verificável em vez de preferência.'
+    verified_against: 'censo de guardas de 2026-10-02: 2 moldes de hook com --selftest próprio e 12 de check de lint; só um molde lê o transcript do assistente'
+
+  - id: E_BANCADA_VERDE_COM_ARTEFATO_INUTIL
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-02'
+    label: 'O ACHADO MAIS CARO DA FORJA, e ele é de MÉTODO DE BANCADA, não da guarda: a guarda nasceu vetando TODO TURNO HONESTO em produção com a bancada 6/6 VERDE. A causa estrutural: nenhum dos 6 casos exercitava o hook COMO O HARNESS O INVOCA (stdin JSON + transcript). Todos alimentavam `_assess`, uma função PURA, e QUATRO dos cinco bloqueadores viviam no HARVESTER — a metade que lê o transcript e que nenhum caso tocava (`grep -c transcript` no bloco --selftest = 0). O bloqueador: `type == "user"` NÃO é mensagem humana; no transcript real os `tool_result` TAMBÉM são rows `user` (medido: 1123 de 1327 = 85%), então a janela do turno começava no último tool_result, `calls` saía SEMPRE VAZIO, a metade "observação" era CÓDIGO MORTO e a guarda vetava INCONDICIONALMENTE. É `bancada-espelha-o-runner` violado no caso mais caro possível, e os 6 mutantes do refutador MATARAM os 6 casos — nenhum era decorativo e ainda assim a guarda era inútil, porque os casos mediam a metade errada.'
+    verified_against: 'refutador adversarial em worktree isolada mediu 212 vetos em 12.456 pontos de parada reais (1,7%), incluindo turnos em que a sessão estava ativamente polando o CI; cura verificada por 5 casos novos (g..k) que rodam o hook por stdin+transcript'
+
+  - id: E_A_GUARDA_VETAVA_A_REDACAO_CURADA
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-02'
+    label: 'A CLÁUSULA 4 INVERTIDA NA PRÓPRIA CRIA, e vale registrar porque é contraintuitivo: a guarda acusava a NEGAÇÃO. "O gate não está rodando mais — terminou com rc=0" era vetado, isto é, ela vetava EXATAMENTE a redação que ela quer que a sessão escreva depois de observar. Também acusava citação do usuário, pergunta, e o RELATO HISTÓRICO do próprio incidente — o que significa que a mensagem de commit desta leva e o próprio resíduo adversarial disparavam a guarda. Cura: exoneração por SENTENÇA (negação, desfecho declarado, linha de citação, pergunta), nunca por linha — markdown embrulha prosa. Lição transferível: guarda que veta a cura treina a sessão a ignorar o veto, e veto ignorado é pior que veto ausente.'
+    verified_against: '6 falsos positivos provados por execução pelo refutador (3 de negação, 3 de citação/pergunta/relato); mutante que remove a exoneração mata o caso (i)'
+
+  - id: E_SUPERFICIE_MORTA_NA_CARGA_PELO_PROPRIO_EXEMPLO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-02'
+    label: 'A FORJA NASCEU MORTA NA CARGA, e só a INVOCAÇÃO revelou — lint verde, bancada verde, comando inútil. Eu escrevi a forma literal da diretiva de injeção (bang + crase) DENTRO da nota que explica a diretiva, e o harness executa TODA diretiva do arquivo, inclusive a que era EXEMPLO em prosa: a carga morreu com `cmd: command not found`. REGRA GERAL que sai disto: toda diretiva de injeção num comando tem de ser um COMANDO EXECUTÁVEL de verdade — documentar o mecanismo dentro do arquivo que o mecanismo processa transforma o exemplo em invocação. É a prova mais limpa da doutrina de dogfood desta casa: nenhum gate mecânico pega isto, só invocar o artefato de verdade.'
+    verified_against: 'invocação real de /meta:forge-guard em 2026-10-02: 1ª tentativa falhou com `cmd: command not found`; após remover o exemplo literal, a carga injetou o censo (data, 14 moldes, 207 famílias, passivo) e o comando abriu'
+
+  - id: T_O_QUE_A_GUARDA_NAO_VE
+    node_type: claim
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    verified_at: '2026-10-02'
+    label: 'TETO DECLARADO da guarda (peça 7 do conjunto da GUARDA), e o teto que importa NÃO é o vocabulário: é O QUE ELA ASSUME SOBRE A FORMA DO TRANSCRIPT. Ela assume (a) que `tool_result` aparece em `message.content[].type`; (b) que o texto do assistente vem em `content[].text`; (c) que `tool_use` traz `name` e `input`. Se o harness mudar qualquer uma, ela degrada EM SILÊNCIO — e por isso a bancada a exercita por stdin+transcript, não só pela função pura. TETO SECUNDÁRIO, real mas menor: a afirmação é reconhecida por LISTA de formas (pt-BR e en), logo redação nova escapa; ela erra para o lado de CALAR. NÃO VERIFICADO e declarado: a interação entre os DOIS vetos `Stop` (este e o `rule-title-in-prose`) — um pode esconder o outro, e o refutador não conseguiu medir sem o runtime.'
+    verified_against: 'teto escrito no cabeçalho do próprio hook; a assunção (a) foi medida (1123 de 1327 rows `user` são tool_result); a interação entre vetos permanece NÃO MEDIDA'
+
+  - id: D_A_FORJA_E_REUSAVEL_PORQUE_O_PROCEDIMENTO_E_O_MAIS_REPETIDO
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    label: 'A DECISÃO QUE CRIOU A SUPERFÍCIE, e ela foi do maestro interrompendo uma forja à mão: "esta forja deveria ser reusável, ainda mais sendo uma forja que primeiro forjou o molde, testa o molde". Eu estava fazendo o one-off do procedimento que esta casa repete MAIS que qualquer outro — `fix-must-become-mechanism` cometido um nível acima. MEDIDO antes de criar superfície, porque a objeção `N=1` da forja de comandos se aplicaria: 206 famílias de bancada e 13 guardas com `--selftest` próprio (pré-leva). Não é N=1; é o procedimento mais repetido e o único que não tinha medidor, logo a sessão escolhia o substrato por LEMBRANÇA. FICA OPEN porque o selo é do maestro e porque a prova final é a próxima forja: usar o comando do passo 1 ao 10 para forjar a guarda da classe "artefato cujo teste não exercita o caminho real de invocação" (E_BANCADA_VERDE_COM_ARTEFATO_INUTIL), que é defeito medido e datado e portanto alvo legítimo. GATILHO: a próxima guarda a nascer nesta casa nasce PELO comando, ou a superfície é declaração.'
+    verified_against: 'censo: 206 famílias e 13 guardas pré-leva; forge-census mede esta superfície em 6/7 com a peça 4 declarada ausente por desenho'
+
+edges:
+  - from: E_DEFEITO_QUE_FORJOU_A_GUARDA_STDOUT_VAZIO
+    to: D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO
+    edge_type: SUPPORTS
+  - from: E_ERA_A_UNICA_DAS_CINCO_SEM_MECANISMO
+    to: D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO
+    edge_type: SUPPORTS
+  - from: E_BANCADA_VERDE_COM_ARTEFATO_INUTIL
+    to: T_O_QUE_A_GUARDA_NAO_VE
+    edge_type: SUPPORTS
+  - from: E_A_GUARDA_VETAVA_A_REDACAO_CURADA
+    to: T_O_QUE_A_GUARDA_NAO_VE
+    edge_type: SUPPORTS
+  - from: E_SUPERFICIE_MORTA_NA_CARGA_PELO_PROPRIO_EXEMPLO
+    to: D_A_FORJA_E_REUSAVEL_PORQUE_O_PROCEDIMENTO_E_O_MAIS_REPETIDO
+    edge_type: CONSTRAINS
+  - from: E_BANCADA_VERDE_COM_ARTEFATO_INUTIL
+    to: D_A_FORJA_E_REUSAVEL_PORQUE_O_PROCEDIMENTO_E_O_MAIS_REPETIDO
+    edge_type: CONSTRAINS
+  - from: D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO
+    to: D_A_FORJA_E_REUSAVEL_PORQUE_O_PROCEDIMENTO_E_O_MAIS_REPETIDO
+    edge_type: SUPPORTS

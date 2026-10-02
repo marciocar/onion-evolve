@@ -8,7 +8,7 @@ Bem-vindo ao sistema Onion v3.0! Este guia vai te ajudar a começar rapidamente 
 
 | Componente | Quantidade | Descrição |
 |------------|------------|-----------|
-| Comandos | 112 | Organizados em 10 categorias + root |
+| Comandos | 113 | Organizados em 10 categorias + root |
 | Agentes | 51 | 9 categorias especializadas |
 | Skills | 13 | Orquestração, validação, pesquisa e resolvers de contexto |
 | Knowledge Bases | 111 | Documentação estruturada |
@@ -44,7 +44,7 @@ Após instalar o Sistema Onion no projeto, você deve ver a seguinte estrutura:
 ```
 seu-projeto/
 ├── .claude/
-│   ├── commands/           # 112 comandos em 10 categorias
+│   ├── commands/           # 113 comandos em 10 categorias
 │   ├── agents/             # 51 agentes especializados
 │   ├── skills/             # 13 skills de orquestração
 │   ├── sessions/           # Sessões de desenvolvimento
