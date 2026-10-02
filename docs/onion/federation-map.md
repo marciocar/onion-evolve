@@ -13,7 +13,7 @@ flowchart TD
   onion_mini["onion-mini<br/>standalone · distilled"]:::standalone
   onion_standalone["onion-standalone<br/>standalone · greenfield"]:::standalone
   hub_operacoes_enterprise["hub-operacoes-enterprise<br/>hub · greenfield"]:::hub
-  brain_granaai["brain-granaai<br/>standalone · brownfield"]:::standalone
+  brain_granaai["brain-granaai<br/>hub · brownfield"]:::hub
   vendas_pdi_enterprise["vendas-pdi-enterprise<br/>standalone · greenfield"]:::standalone
   onion_core["onion-core<br/>hub · greenfield"]:::hub
   onion_codex["onion-codex<br/>standalone · distilled"]:::standalone
@@ -69,7 +69,7 @@ flowchart TD
 | onion-mini | standalone | distilled | distilled-methodology, entry-level, multi-platform, task-management-lite, plea-cycles | `n/a` |
 | onion-standalone | standalone | greenfield | framework-door, role-scoped-adopt, public-distribution, claude-code | `685140eadd7d` |
 | hub-operacoes-enterprise | hub | greenfield | hub, task-manager-integration, itsm | `cff9214c3b9a` |
-| brain-granaai | standalone | brownfield | company-brain, clickup, pesquisa-primaria | `547e2e3edf3b` |
+| brain-granaai | hub | brownfield | company-brain, clickup, pesquisa-primaria | `663fdbc5bdcc` |
 | vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `24118c5d7a97` |
 | onion-core | hub | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `685140eadd7d` |
 | onion-codex | standalone | distilled | substrate-port, openai-codex, portability-proof, deterministic-guards | `n/a` |

@@ -80,11 +80,10 @@ case "$ROLE_NOW" in
   adopted|"") : ;;  # o caso a promover
 esac
 # Re-carimba role: hub PRESERVANDO adopted_from/adopted_at/mode (write-stamp lê o stamp antigo).
-bash "$REPO/.claude/utils/adopt/write-stamp.sh" "$REPO" \
-  --framework "$(bash "$REPO/.claude/validation/onion-version.sh" | awk '/^framework:/{print $2}')" \
-  --commit "$(git -C "$REPO" rev-parse --short=12 HEAD)" \
-  --commit-date "$(git -C "$REPO" log -1 --format=%cd --date=short)" \
-  --role hub
+# SEM --framework/--commit/--commit-date de PROPÓSITO: identidade derivada de "$REPO" é do ALVO, não
+# do core — `--framework` carimbava o nome do repo do alvo e `--commit` um SHA fora da história do
+# core. Promover papel não muda versão: o write-stamp herda os três do stamp. Razão inteira lá.
+bash "$REPO/.claude/utils/adopt/write-stamp.sh" "$REPO" --role hub
 # REGRA 40: o stamp DEVE estar trackeado — commitar (force-add: é gitignored na herança da fonte).
 git -C "$REPO" add -f .claude/.onion-version
 git -C "$REPO" commit -q -m "chore(onion): promove a hub (role: hub) — autoridade de adoção local dos próprios projetos"

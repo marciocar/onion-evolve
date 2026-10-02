@@ -71,7 +71,21 @@ nodes:
     trace: 'docs/evolution/inbox/_processed/2026-09-30-gmill-kbs-zoho-glpi.md'
     verified_against: 'sinal lido integralmente em 2026-10-02 por refutador adversarial; nenhum dos tres relatos tem resposta nos outbox nem no CHANGELOG'
 
+  - id: Q_PARIDADE_PAPEL_SO_COBRE_A_PORTA_NAO_O_ADOTANTE
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: open
+    verified_at: '2026-10-02'
+    label: 'A REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela) declara fronteira `kind: door` — logo NENHUMA guarda compara `role:` do registro contra o `role:` do CARIMBO de um ADOTANTE. Medido em 2026-10-02: `door-role-parity-check.sh:42,87` filtra por `kind == door`, e rodado no repo devolve saida VAZIA com rc=0 (nao ha porta divergente). Consequencia real no mesmo dia: o maestro promoveu `brain-granaai` de `adopted` a `hub` do lado do adotante, e o `members.yaml` do core ficou com TRES derivas (role `standalone`, comentario explicando uma divergencia que deixou de existir, e `onion_version` no pin da adocao) — e nada acusou. A deriva so chegou porque O ADOTANTE MANDOU SINAL, e ele chegou supondo que a REGRA 92 fosse julga-lo: ela nunca julgaria. CLASSE: mesma familia do `vendor-scrub-blind-spot` — a guarda protege uma categoria e a outra fica nua, e quem le a doutrina conclui cobertura que nao existe. POR QUE IMPORTA MAIS NUM HUB: o papel decide o CONJUNTO que o `--update` entrega (o inverso ja custou 106 arquivos de meta-fabrica num alvo `standalone`, com a bancada verde). GATILHO: forjar a guarda pelo /meta:forge-guard — defeito medido e datado, e o primeiro uso real do comando do passo 1 ao 10. \u26a0\ufe0f MAS NAO COM O PREDICADO OBVIO, e isto e correcao de Elenxo sobre este proprio no: paridade CEGA em adotante JA FOI MEDIDA COMO ERRADA aqui. O `door-role-parity-check.sh` declara a fronteira `kind: adopter` como SEMANTICA, nao de escopo (l.87 e o predicado; o bloco explicativo vem antes): em adotante o `role:` do registro diz o TIER NA REDE e o do carimbo diz a RELACAO COM O FRAMEWORK, logo `standalone` + `adopted` e CORRETO. O refutador rodou o censo contra o vivo: 18 comparaveis, 12 DIVERGENTES — uma guarda de paridade cega nasceria com 12 falsos positivos, e existe caso de bancada (g) protegendo essa fronteira. O PREDICADO QUE CABE e UNIDIRECIONAL: `carimbo role: hub` IMPLICA `registro role: hub`, porque `hub` e o unico valor que existe nos DOIS vocabularios e neles CONVERGE (ser hub e o tier E a relacao). Medido: com esse predicado hoje haveria UM achado (metagamify, registro hub x carimbo adopted) — e e achado de verdade, o espelho exato da deriva que esta leva curou.'
+    trace: 'docs/evolution/inbox/_processed/2026-10-02-promocao-a-hub.md'
+    verified_against: 'door-role-parity-check.sh rodado em 2026-10-02: rc=0 com saida vazia; o PREDICADO filtra kind==door na l.87 (a l.42 e o comentario que declara a fronteira, nao codigo); members.yaml tinha role standalone enquanto o carimbo do adotante dizia hub'
+
 edges:
+  - from: Q_PARIDADE_PAPEL_SO_COBRE_A_PORTA_NAO_O_ADOTANTE
+    to: Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO
+    edge_type: CONSTRAINS
   - from: E_TRIAGEM_DECLAROU_ENDERECADO_SEM_LER_O_SINAL_INTEIRO
     to: Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO
     edge_type: SUPPORTS

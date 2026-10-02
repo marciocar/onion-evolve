@@ -77,3 +77,4 @@
 {"session_id":"800cd025-cb6e-490f-885e-582787e16612","branch":"fix/corpus-grep-query-flag","started_at":1790801090,"ended_at":1790818307,"duration_s":17217}
 {"session_id":"f1eae138-c795-4df5-8c57-55c5bcc36463","branch":"main","started_at":1790801038,"ended_at":1790802172,"duration_s":1134}
 {"session_id":"800cd025-cb6e-490f-885e-582787e16612","branch":"feat/guard-announce-zero-claim-unmeasured","started_at":1790818514,"ended_at":1790898284,"duration_s":79770}
+{"session_id":"800cd025-cb6e-490f-885e-582787e16612","branch":"fix/hub-promotion-2026-10","started_at":1790898294,"ended_at":1790975277,"duration_s":76983}

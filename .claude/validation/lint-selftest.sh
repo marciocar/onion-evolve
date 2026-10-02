@@ -7861,6 +7861,250 @@ run_review_verdict_selftests() {
 # nasceu junto. A peca que NAO se exercita aqui e o MUTANTE — nenhum script sabe
 # detecta-lo, e a doutrina assume isso em letra grande (clausula 2).
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# PROMOÇÃO DE PAPEL — o pin NÃO muda quando o papel muda, e isso veio de sinal de
+# campo (adotante hub, 2026-10-02). O snippet do `--promote-hub` carimbava
+# `git -C "$REPO" rev-parse --short=12 HEAD` — o HEAD DO ADOTANTE, que não existe na
+# história do core: o `pin-integrity-check` do `--update` seguinte acusaria pin
+# inválido e o carimbo MENTIRIA sobre a versão do framework. O adotante contornou à
+# mão e PEDIU o selftest; é este.
+# ⚠️ A 1ª tentativa de cura falhou por ORDEM — o fallback ficou DEPOIS da cobrança de
+# `--commit`, então `--role hub` sozinho seguia saindo rc=2 sem escrever. Só o dogfood
+# pegou (rc=2 antes e depois, stamp intacto). O caso (b) ancora a ordem por EXECUÇÃO.
+# ---------------------------------------------------------------------------
+run_role_promotion_selftests() {
+  local ws="${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh"
+  local ad="${REPO_ROOT}/.claude/commands/meta/adopt.md"
+  if [ ! -f "${ws}" ]; then record_fail "role-promotion" "write-stamp.sh ausente"; return; fi
+
+  # (a) O SNIPPET NÃO PASSA IDENTIDADE DERIVADA DO ALVO — nenhuma das três.
+  #     ⚠️ A 1a redacao cobrava uma FORMA (`--commit "$(git -C "$REPO" rev-parse`) e o Elenxo a
+  #     derrubou com DOIS mutantes: `--commit "$(cd "$REPO" && git rev-parse ...)"` — mesmo defeito,
+  #     outra sintaxe — passava VERDE; e a perna `--framework "$(... onion-version.sh ...)"`, que
+  #     estava VIVA e carimbava o NOME DO REPO DO ALVO sobre `onion-evolve`, nunca foi vista. Cobrar forma nao
+  #     cobre comportamento: agora o teste e sobre o CONJUNTO de flags de identidade no bloco.
+  if [ -f "${ad}" ]; then
+    local blk_ph flags_bad=""
+    # o bloco do --promote-hub: da linha do write-stamp.sh ate a linha do `git add -f` seguinte
+    blk_ph="$(awk '/write-stamp\.sh" "\$REPO"/{f=1} f{print} f && /git -C "\$REPO" add -f/{exit}' "${ad}")"
+    if [ -z "${blk_ph}" ]; then
+      record_fail "role-promotion: (a) bloco do --promote-hub nao localizado" "a ancora mudou — o caso ficou cego, conserte o caso antes de confiar nele"
+    else
+      for _f in '--framework' '--commit' '--commit-date'; do
+        LC_ALL=C grep -qF -- "${_f}" <<< "${blk_ph}" && flags_bad="${flags_bad} ${_f}"
+      done
+      if [ -z "${flags_bad}" ]; then
+        record_pass "role-promotion: (a) o snippet nao passa identidade derivada do ALVO (nenhuma das 3 flags)"
+      else
+        record_fail "role-promotion: (a) snippet carimba identidade do ALVO" \
+          "flag(s) de identidade no bloco do --promote-hub:${flags_bad} — promover papel nao muda versao nem framework, e tudo derivado de \$REPO e do ADOTANTE"
+      fi
+    fi
+  else record_skip "role-promotion: (a) adopt.md ausente (adotante) → pulado"; fi
+
+  # (a2) FLAG PRESENTE E VAZIA E ERRO, nao heranca silenciosa (F2 do Elenxo). Em origin/main isso
+  #      era rc=2; a 1a cura do fallback transformou em rc=0 com `updated_at` de HOJE e pin VELHO —
+  #      a propria mentira que a leva diz curar, com ruido trocado por silencio.
+  local dv; dv="$(mktemp -d)"; mkdir -p "${dv}/.claude"
+  printf 'framework: onion-evolve\nsource_commit: 547e2e3edf3b\nsource_commit_date: 2026-10-01\nrole: adopted\nadopted_at: 2026-10-01\n' > "${dv}/.claude/.onion-version"
+  git -C "${dv}" init -q 2>/dev/null
+  local rcv=0 outv
+  outv="$(bash "${ws}" "${dv}" --framework onion-evolve --commit "" --commit-date "" --role adopted 2>&1)" || rcv=$?
+  # ⚠️ O `rc=2` SOZINHO NAO DISTINGUE as duas implementacoes, e medi-lo mostrou isso: sem o laco de
+  #    `*_SET`, a cobranca FINAL tambem devolve 2 (o valor segue vazio e nao ha heranca). O que o
+  #    laco ADICIONA e NOMEAR a flag — e e isso que o operador precisa para achar o `awk` quebrado a
+  #    montante. Logo o caso cobra as DUAS coisas: o rc E a flag nomeada. Mutante que remove o laco
+  #    passaria pelo rc e reprova aqui, que e o comportamento certo de um caso nao-decorativo.
+  if [ "${rcv}" -eq 2 ] && LC_ALL=C grep -q -- '--commit' <<< "${outv}" \
+     && LC_ALL=C grep -qiE 'vazi' <<< "${outv}"; then
+    record_pass "role-promotion: (a2) flag PRESENTE e VAZIA e erro, e a mensagem NOMEIA a flag"
+  else
+    record_fail "role-promotion: (a2) arg vazio mal tratado" \
+      "rc=${rcv} (esperado 2) e a mensagem precisa nomear a flag vazia; veio=[${outv}]"
+  fi
+  rm -rf "${dv}"
+
+  # (a2b) O `--update` LEGITIMO AVANCA O PIN — e este caso nasceu de um mutante que NAO mordeu.
+  #       Medido depois de uma queda de sessao: o mutante que faz o fallback sobrescrever `--commit`
+  #       MESMO com valor passado deixava a bancada VERDE, porque (a2) so exercita o arg VAZIO. O
+  #       fail-open real e outro: um `--update` que passa o pin NOVO teria o pin revertido para o
+  #       VELHO do stamp, em silencio — exatamente o "preserva quando deveria avancar" que o Elenxo
+  #       levantou no F2 e que eu havia coberto so pela metade. "Mutante nao mordeu" tem DUAS causas
+  #       (caso decorativo, ou mutante que nao muda o que o caso afirma) e aqui era a primeira.
+  local du; du="$(mktemp -d)"; mkdir -p "${du}/.claude"
+  printf 'framework: onion-evolve\nsource_commit: 111111111111\nsource_commit_date: 2026-09-01\nrole: adopted\nadopted_at: 2026-09-01\n' > "${du}/.claude/.onion-version"
+  git -C "${du}" init -q 2>/dev/null
+  bash "${ws}" "${du}" --framework onion-evolve --commit 222222222222 --commit-date 2026-10-02 --role adopted >/dev/null 2>&1 || true
+  local pin_u; pin_u="$(LC_ALL=C grep -m1 '^source_commit:' "${du}/.claude/.onion-version" | awk '{print $2}')"
+  if [ "${pin_u}" = "222222222222" ]; then
+    record_pass "role-promotion: (a2b) update com --commit AVANCA o pin (o fallback nao sobrescreve arg valido)"
+  else
+    record_fail "role-promotion: (a2b) fallback reverteu um pin que deveria avancar" \
+      "pin=[${pin_u}] (esperado 222222222222) — um --update legitimo teria a versao revertida em silencio"
+  fi
+  rm -rf "${du}"
+
+  # (a3) COMENTARIO INLINE no stamp nao contamina o pin herdado (F9). Carimbo do mundo real tem
+  #      `source_commit: abc # pin da adocao`, e sem normalizar o comentario voltava ao stamp.
+  local dc; dc="$(mktemp -d)"; mkdir -p "${dc}/.claude"
+  printf 'framework: onion-evolve\nsource_commit: cafed00dcafe  # pin da adocao\nsource_commit_date: 2026-09-01\nrole: adopted\nadopted_at: 2026-09-01\n' > "${dc}/.claude/.onion-version"
+  git -C "${dc}" init -q 2>/dev/null
+  bash "${ws}" "${dc}" --role hub >/dev/null 2>&1 || true
+  local pin_c; pin_c="$(LC_ALL=C grep -m1 '^source_commit:' "${dc}/.claude/.onion-version" | awk '{print $2}')"
+  local extra_c; extra_c="$(LC_ALL=C grep -m1 '^source_commit:' "${dc}/.claude/.onion-version" | LC_ALL=C grep -c '#' || true)"
+  if [ "${pin_c}" = "cafed00dcafe" ] && [ "${extra_c:-0}" -eq 0 ]; then
+    record_pass "role-promotion: (a3) comentario inline no stamp nao contamina o pin herdado"
+  else record_fail "role-promotion: (a3) pin herdado contaminado" "pin=[${pin_c}] comentario-presente=[${extra_c}]"; fi
+  rm -rf "${dc}"
+
+  # (b) COM stamp: promover sem --commit PRESERVA o pin e aplica o papel. Este caso ancora a
+  #     ORDEM (fallback antes da cobranca) por EXECUCAO, nao por numero de linha.
+  local d; d="$(mktemp -d)"
+  mkdir -p "${d}/.claude"
+  printf 'framework: onion-evolve\nsource_commit: abc123def456\nsource_commit_date: 2026-09-01\nrole: adopted\nadopted_at: 2026-09-01\n' > "${d}/.claude/.onion-version"
+  git -C "${d}" init -q 2>/dev/null
+  local rc=0
+  bash "${ws}" "${d}" --role hub >/dev/null 2>&1 || rc=$?
+  local got_pin got_role
+  got_pin="$(LC_ALL=C grep -m1 '^source_commit:' "${d}/.claude/.onion-version" 2>/dev/null | awk '{print $2}')"
+  got_role="$(LC_ALL=C grep -m1 '^role:' "${d}/.claude/.onion-version" 2>/dev/null | awk '{print $2}')"
+  if [ "${rc}" -eq 0 ] && [ "${got_pin}" = "abc123def456" ] && [ "${got_role}" = "hub" ]; then
+    record_pass "role-promotion: (b) promover sem --commit preserva o pin e aplica o papel"
+  else
+    record_fail "role-promotion: (b) promocao perde ou troca o pin" \
+      "rc=${rc} pin=[${got_pin}] (esperado abc123def456) role=[${got_role}] (esperado hub)"
+  fi
+  rm -rf "${d}"
+
+  # (c) SEM stamp: a cobranca CONTINUA valendo. O fallback nao pode virar fail-open — herdar
+  #     de um stamp que nao existe seria inventar versao de framework.
+  local e; e="$(mktemp -d)"; mkdir -p "${e}/.claude"; git -C "${e}" init -q 2>/dev/null
+  rc=0; bash "${ws}" "${e}" --role hub >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ] && [ ! -f "${e}/.claude/.onion-version" ]; then
+    record_pass "role-promotion: (c) sem stamp a cobranca de --commit segue valendo (nao e fail-open)"
+  else
+    record_fail "role-promotion: (c) fallback virou fail-open" \
+      "rc=${rc} (esperado 2) e stamp $([ -f "${e}/.claude/.onion-version" ] && echo CRIADO || echo ausente)"
+  fi
+  rm -rf "${e}"
+
+  # (d) O PAPEL EXPLICITO VENCE, mas um update SEM --role nao REBAIXA um hub. Sao duas regras
+  #     opostas no mesmo campo, e so a execucao distingue.
+  local f; f="$(mktemp -d)"; mkdir -p "${f}/.claude"
+  printf 'framework: onion-evolve\nsource_commit: abc123def456\nsource_commit_date: 2026-09-01\nrole: hub\nadopted_at: 2026-09-01\n' > "${f}/.claude/.onion-version"
+  git -C "${f}" init -q 2>/dev/null
+  bash "${ws}" "${f}" --framework onion-evolve --commit deadbeef1234 --commit-date 2026-10-02 >/dev/null 2>&1 || true
+  got_role="$(LC_ALL=C grep -m1 '^role:' "${f}/.claude/.onion-version" 2>/dev/null | awk '{print $2}')"
+  if [ "${got_role}" = "hub" ]; then
+    record_pass "role-promotion: (d) update sem --role NAO rebaixa um hub para adopted"
+  else record_fail "role-promotion: (d) hub rebaixado por update" "role ficou [${got_role}], esperado hub"; fi
+  rm -rf "${f}"
+}
+
+# ---------------------------------------------------------------------------
+# REGRA 84 × COMMIT COM PATHSPEC — sinal de campo de um adotante hub (2026-10-02),
+# com causa VERIFICADA por ele: `git commit -- <pathspec>` monta indice TEMPORARIO so
+# com os caminhos do pathspec; o `kg-trace-resolve.sh --emit-index` enumera o corpus
+# por `git ls-files`, entao `.kg.yaml` novo FORA do pathspec desaparece e o indice
+# parece DEFASADO sem estar. Ele mediu 4 de 4 tentativas reprovando com pathspec e
+# passando num commit unico — e o lint a mao dava 0 HARD, isto e, a guarda contradizia
+# o lint sobre o MESMO repo, e mandava "regenere", que ENCURTARIA o indice bom.
+# A cura e a clausula 4 da guard-doctrine: quando nao pode julgar, DECLARA.
+# ---------------------------------------------------------------------------
+run_r84_pathspec_selftests() {
+  local lint="${REPO_ROOT}/.claude/validation/lint-artifacts.sh"
+  if [ ! -f "${lint}" ]; then record_fail "r84-pathspec" "lint ausente"; return; fi
+
+  # (a) O PREDICADO DE INDICE existe no caminho da REGRA 84 (nao so no auto-fix de plugins).
+  #     Cobrado por ancora no BLOCO da regra, nao no arquivo inteiro: o idioma ja existia em
+  #     outro lugar, e foi precisamente o nao-uso dele AQUI que causou o falso positivo.
+  local blk
+  blk="$(awk '/^check_kg_read_index_sync\(\)/,/^}/' "${lint}")"
+  # ⚠️ ANCORADO NO PREDICADO (`case "${GIT_INDEX_FILE...`), nao na MENCAO da variavel — e isto e
+  #    reincidencia registrada: a 1a redacao grepava so `GIT_INDEX_FILE`, e o mutante que cegou o
+  #    `case` (trocando-o por `case "nunca"`) passou VERDE, porque a variavel SOBREVIVE na mensagem
+  #    da violacao. Caso que cobra mencao em vez de comportamento e enfeite, e da licenca.
+  if printf '%s' "${blk}" | LC_ALL=C grep -qF 'case "${GIT_INDEX_FILE'; then
+    record_pass "r84-pathspec: (a) a REGRA 84 TESTA GIT_INDEX_FILE (predicado, nao mencao) antes de acusar"
+  else
+    record_fail "r84-pathspec: (a) guarda cega ao indice temporario" \
+      "check_kg_read_index_sync nao TESTA GIT_INDEX_FILE num case — commit com pathspec volta a reprovar em falso"
+  fi
+
+  # (b) A SEVERIDADE do caminho nao-julgavel e SOFT e a mensagem DECLARA, nao acusa.
+  if printf '%s' "${blk}" | LC_ALL=C grep -q 'PATHSPEC-NAO-JULGAVEL' \
+     && printf '%s' "${blk}" | LC_ALL=C grep -q 'violation "SOFT".*PATHSPEC-NAO-JULGAVEL'; then
+    record_pass "r84-pathspec: (b) indice temporario → SOFT que DECLARA (nao HARD que acusa)"
+  else
+    record_fail "r84-pathspec: (b) severidade errada no caminho nao-julgavel" \
+      "o ramo de indice temporario tem de ser SOFT com o marcador PATHSPEC-NAO-JULGAVEL"
+  fi
+
+  # (c) A MENSAGEM NAO PODE MANDAR REGENERAR nesse ramo — regenerar sob indice parcial ENCURTA
+  #     o indice bom, e foi a acao que a mensagem antiga sugeria. Este caso cobra o CONTRARIO.
+  local msg
+  msg="$(printf '%s' "${blk}" | LC_ALL=C grep 'PATHSPEC-NAO-JULGAVEL')"
+  if printf '%s' "${msg}" | LC_ALL=C grep -qi 'NAO regenere\|NÃO regenere'; then
+    record_pass "r84-pathspec: (c) a mensagem PROIBE regenerar sob indice parcial"
+  else
+    record_fail "r84-pathspec: (c) mensagem sugere a acao destrutiva" \
+      "o ramo nao-julgavel precisa dizer para NAO regenerar: sob indice parcial isso encurta o indice bom"
+  fi
+
+  # (d) AS 4 FORMAS DE INDICE, RODANDO O LINT DE VERDADE.
+  #     ⚠️ A 1a redacao deste caso era DECORATIVA e o Elenxo provou: ela COPIAVA o `case` para dentro
+  #     do proprio caso e testava a COPIA. Mutante que tirava `*/index.lock` da isencao do LINT —
+  #     isto e, fazer `git commit -a` cair na isencao, um fail-open REAL — deixava os 8 casos VERDES.
+  #     O rotulo dizia "por EXECUCAO" e a execucao era da copia. Quarta ocorrencia desta classe na
+  #     mesma sessao: caso que cobra uma copia do SUT nao cobra o SUT.
+  #     Agora: sandbox com `kg-read-index.tsv` genuinamente defasado, e o LINT rodado com cada forma
+  #     de GIT_INDEX_FILE. Formas de indice REAL tem de dar HARD; so a temporaria isenta.
+  local sb; sb="$(mktemp -d)"
+  if ! git -C "${REPO_ROOT}" archive HEAD 2>/dev/null | tar -x -C "${sb}" 2>/dev/null; then
+    record_skip "r84-pathspec: (d) git archive falhou — SUT nao exercido"; rm -rf "${sb}"; return
+  fi
+  # ⚠️ O SANDBOX NASCE DE `git archive HEAD`, LOGO TRAZ O LINT **COMMITADO** — e isso tornava este
+  #    caso incapaz de ver a mudanca que esta sendo feita. Medido: o mutante que tira `*/index.lock`
+  #    da isencao (fail-open real) foi aplicado na ARVORE e o caso passou VERDE, porque o sandbox
+  #    rodava a versao de HEAD. O proprio lint-selftest.sh ja avisa disto na l.514. Entao o SUT
+  #    (e as libs que ele sourceia) vem da ARVORE DE TRABALHO, por cima do archive.
+  #    Esta e a MESMA classe que o Elenxo acabou de me cobrar — testar uma copia em vez do SUT —
+  #    agora na outra ponta: copia do artefato CERTO, mas da REVISAO errada.
+  cp "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" "${sb}/.claude/validation/" 2>/dev/null || true
+  for _dep in "${REPO_ROOT}"/.claude/validation/*.sh; do
+    [ -f "${_dep}" ] && cp "${_dep}" "${sb}/.claude/validation/" 2>/dev/null || true
+  done
+  ( cd "${sb}" && git init -q && git add -A >/dev/null 2>&1 \
+    && git -c user.email=t@t -c user.name=t commit -qm seed >/dev/null 2>&1 ) || true
+  # defasa o indice DE VERDADE: tira linhas do tsv commitado
+  if [ -s "${sb}/docs/onion/kg-read-index.tsv" ]; then
+    LC_ALL=C sed -i '2,4d' "${sb}/docs/onion/kg-read-index.tsv"
+  else
+    record_skip "r84-pathspec: (d) kg-read-index.tsv ausente no sandbox — SUT nao exercido"; rm -rf "${sb}"; return
+  fi
+  _r84_verdict() {   # $1 = valor de GIT_INDEX_FILE ("" = desarmado) → imprime HARD|SOFT|NADA
+    local out
+    if [ -z "$1" ]; then
+      out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/docs/onion/kg-read-index.tsv" 2>&1 || true)"
+    else
+      out="$(cd "${sb}" && GIT_INDEX_FILE="$1" bash .claude/validation/lint-artifacts.sh --only="${sb}/docs/onion/kg-read-index.tsv" 2>&1 || true)"
+    fi
+    if LC_ALL=C grep -q 'PATHSPEC-NAO-JULGAVEL' <<< "${out}"; then printf 'SOFT'
+    elif LC_ALL=C grep -q 'DEFASADO' <<< "${out}"; then printf 'HARD'
+    else printf 'NADA'; fi
+  }
+  local bad="" v
+  v="$(_r84_verdict "")";                                  [ "${v}" = "HARD" ] || bad="${bad} desarmado=${v}"
+  v="$(_r84_verdict "${sb}/.git/index")";                  [ "${v}" = "HARD" ] || bad="${bad} .git/index=${v}"
+  v="$(_r84_verdict "${sb}/.git/index.lock")";             [ "${v}" = "HARD" ] || bad="${bad} .git/index.lock=${v}"
+  v="$(_r84_verdict "${sb}/.git/next-index-999.lock")";    [ "${v}" = "SOFT" ] || bad="${bad} next-index=${v}"
+  if [ -z "${bad}" ]; then
+    record_pass "r84-pathspec: (d) o LINT REAL julga as 3 formas de indice real e isenta so a temporaria"
+  else record_fail "r84-pathspec: (d) veredito errado do LINT por forma de indice" "divergencia(s):${bad}"; fi
+  unset -f _r84_verdict
+  rm -rf "${sb}"
+}
+
 run_guard_forge_selftests() {
   local cen="${REPO_ROOT}/.claude/validation/guard-census.sh"
   local doc="${REPO_ROOT}/.claude/commands/common/prompts/guard-doctrine.md"
@@ -21194,6 +21438,8 @@ run_door_staleness_severity_selftests() {
 }
 _family run_door_staleness_severity_selftests
 _family run_guard_forge_selftests
+_family run_role_promotion_selftests
+_family run_r84_pathspec_selftests
 
 
 
