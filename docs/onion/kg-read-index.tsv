@@ -38,6 +38,7 @@
 .claude/commands/meta/adopt.md	E_O_MANIFESTO_QUE_FALHA_COPIAVA_TUDO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/commands/meta/adopt.md	E_VERIFY_ADOPT	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/commands/meta/adopt.md	E_adopt_cmd	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
+.claude/commands/meta/adopt.md	I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
 .claude/commands/meta/adopt.md	SY4_prod_prettierignore_adopt	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/adopt.md	SY6_ev_integration_branch_helper	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/adopt.md	TX_adopt	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
@@ -1218,6 +1219,9 @@ docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-result
 docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	E_BENCH_ADOTANTE_PISO_NAO_PROTEGE_O_CONTADOR	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-resultado.md	Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
+docs/evolution/inbox/_processed/2026-09-30-gmill-kbs-zoho-glpi.md	Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md	Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md	Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
@@ -1794,6 +1798,7 @@ docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg
 docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg.yaml	E_LACUNAS_DECLARADAS_ZOHO_GLPI_0923	docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg.yaml
 docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg.yaml	E_MERCADO_ZOHO_GLPI_0923	docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg.yaml
 docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg.yaml	E_OBJECAO_5_ACHADO_VAZIO_COM_DEZ_NAO_LIDAS	docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg.yaml
+docs/evolution/review/chore-inbox-triage-2026-10.md	E_TRIAGEM_DECLAROU_ENDERECADO_SEM_LER_O_SINAL_INTEIRO	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
 docs/evolution/review/docs-elenxo-doctrine-to-vendored-kb.md	E_PLUGIN_DEAD_LINKS_15	docs/onion/graph/residuos-2026-08-18.kg.yaml
 docs/evolution/review/feat-backlog-projection-ratchet.md	D_ENTREGA_ANTECIPADA_REGRA62	docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml
 docs/evolution/review/feat-kg-seal-check.md	C_GUARDA_QUE_PUNE_CONFORMIDADE_E_PIOR_QUE_NENHUMA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
