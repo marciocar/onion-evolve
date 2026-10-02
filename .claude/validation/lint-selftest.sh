@@ -7853,6 +7853,131 @@ run_review_verdict_selftests() {
   fi
 }
 
+# ---------------------------------------------------------------------------
+# A FORJA DE GUARDAS — o procedimento MAIS REPETIDO desta casa (medido 2026-10-02:
+# 206 familias de bancada, 14 guardas com --selftest proprio) e o unico que estava
+# SEM SUPERFICIE. Esta familia exercita as pecas que podem ser exercitadas: o
+# MEDIDOR (censo), a presenca da doutrina, e a delegacao do selftest da guarda que
+# nasceu junto. A peca que NAO se exercita aqui e o MUTANTE — nenhum script sabe
+# detecta-lo, e a doutrina assume isso em letra grande (clausula 2).
+# ---------------------------------------------------------------------------
+run_guard_forge_selftests() {
+  local cen="${REPO_ROOT}/.claude/validation/guard-census.sh"
+  local doc="${REPO_ROOT}/.claude/commands/common/prompts/guard-doctrine.md"
+  local srf="${REPO_ROOT}/.claude/commands/meta/forge-guard.md"
+  local hok="${REPO_ROOT}/.claude/hooks/background-state-needs-evidence.sh"
+
+  # (a) o MEDIDOR roda e emite a secao de moldes. Censo que nao mede e contexto que caduca.
+  if [ ! -f "${cen}" ]; then record_fail "guard-forge" "medidor ausente: guard-census.sh"; else
+    local _co _crc=0
+    _co="$(cd "${REPO_ROOT}" && bash "${cen}" . --markdown 2>&1)" || _crc=$?
+    if [ "${_crc}" -eq 0 ] && grep -q 'moldes por SUBSTRATO' <<< "${_co}"; then
+      record_pass "guard-forge: (a) o censo roda e emite os moldes por substrato"
+    else record_fail "guard-forge: (a) censo" "rc=${_crc}; saida=[${_co}]"; fi
+
+    # (b) O CENSO DECLARA O QUE NAO SABE. Medidor que nao declara teto vira oraculo.
+    if grep -q 'TETO' <<< "${_co}" && grep -q -i 'mutante' <<< "${_co}"; then
+      record_pass "guard-forge: (b) o censo declara o TETO e que NAO ve mutante"
+    else record_fail "guard-forge: (b) teto" "o censo nao declara o que esta fora do seu alcance"; fi
+
+    # (c) ELE ACHA AS DUAS MORTES DE GUARDA — por EXECUCAO, num sandbox plantado.
+    #     Esta e a peca 6 (registro) virando verificavel: a 1a rodada do censo real
+    #     acusou a propria guarda que estava sendo forjada naquele instante.
+    local d; d="$(mktemp -d)"
+    mkdir -p "${d}/.claude/hooks" "${d}/.claude/validation"
+    printf '#!/usr/bin/env bash
+# sem selftest
+exit 0
+' > "${d}/.claude/hooks/zz-morta-registrada.sh"
+    printf '#!/usr/bin/env bash
+if [ "${1:-}" = "--selftest" ]; then echo "  ✅ (a) ok"; exit 0; fi
+exit 0
+' > "${d}/.claude/hooks/zz-viva-sem-registro.sh"
+    printf '{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"bash zz-morta-registrada.sh"}]}]}}
+' > "${d}/.claude/settings.json"
+    cp "${cen}" "${d}/.claude/validation/guard-census.sh"
+    local _so; _so="$(cd "${d}" && bash .claude/validation/guard-census.sh . --markdown 2>&1 || true)"
+    # o rotulo mudou quando o censo foi recalibrado (ver o comentario la): a morte real e NAO TER
+    # NENHUM dos dois (flag propria OU familia), nao apenas faltar a flag. A bancada cobrou a
+    # mudanca de contrato, que e exatamente o que ela existe para fazer.
+    if grep -q 'DISPARA e NAO E EXERCITADO' <<< "${_so}" && grep -q 'zz-morta-registrada.sh' <<< "${_so}" \
+       && grep -q 'NÃO REGISTRADO.*zz-viva-sem-registro.sh' <<< "${_so}"; then
+      record_pass "guard-forge: (c) o censo acha as DUAS mortes de guarda (sandbox plantado)"
+    else record_fail "guard-forge: (c) mortes" "o censo nao separou registrada-sem-selftest de viva-sem-registro: [${_so}]"; fi
+    rm -rf "${d}"
+  fi
+
+  # (c2) O CENSO NAO PODE MENTIR — dois sandboxes plantados por um Elenxo que provou as duas
+  #      mentiras: (F7) `_where` casava por SUBSTRING, entao `title-in-prose.sh` — NUNCA registrado
+  #      — aparecia como REGISTRADO porque o nome e substring de `rule-title-in-prose.sh`, e o
+  #      passivo que existe para acha-lo ficava SILENCIOSO; (F8) `--selftest` dentro de COMENTARIO
+  #      contava como molde a copiar. As duas sao graves porque a superficie manda "re-rodar o censo
+  #      para confirmar que saiu do passivo" — confirmacao falsificavel e pior que nenhuma.
+  if [ -f "${cen}" ]; then
+    local d2; d2="$(mktemp -d)"
+    mkdir -p "${d2}/.claude/hooks" "${d2}/.claude/validation"
+    printf '#!/usr/bin/env bash\nif [ "${1:-}" = "--selftest" ]; then echo "  ✅ (a) ok"; exit 0; fi\n' > "${d2}/.claude/hooks/rule-title-in-prose.sh"
+    printf '#!/usr/bin/env bash\nif [ "${1:-}" = "--selftest" ]; then echo "  ✅ (a) ok"; exit 0; fi\n' > "${d2}/.claude/hooks/title-in-prose.sh"
+    printf '#!/usr/bin/env bash\n# TODO: ainda nao tem --selftest\nexit 0\n' > "${d2}/.claude/hooks/zz-comment-only.sh"
+    printf '{"hooks":{"Stop":[{"hooks":[{"type":"command","command":"bash rule-title-in-prose.sh"}]}]}}\n' > "${d2}/.claude/settings.json"
+    cp "${cen}" "${d2}/.claude/validation/guard-census.sh"
+    local _s2; _s2="$(cd "${d2}" && bash .claude/validation/guard-census.sh . --markdown 2>&1 || true)"
+    local _bad=""
+    grep -qE '^hook \| title-in-prose\.sh \| [0-9]+ \| NENHUM' <<< "${_s2}" \
+      || _bad="${_bad} F7(substring-declarou-registrado)"
+    grep -q 'NÃO REGISTRADO.*title-in-prose.sh' <<< "${_s2}" \
+      || _bad="${_bad} F7(passivo-silencioso)"
+    grep -q 'zz-comment-only' <<< "${_s2}" \
+      && _bad="${_bad} F8(mencao-em-comentario-contou-como-molde)"
+    if [ -z "${_bad}" ]; then
+      record_pass "guard-forge: (c2) o censo nao mente por substring nem conta mencao como implementacao"
+    else record_fail "guard-forge: (c2) censo mentiroso" "regressao:${_bad} — saida=[${_s2}]"; fi
+    rm -rf "${d2}"
+  fi
+
+  # (d) a DOUTRINA existe e cobra as pecas que nenhum script cobra.
+  if [ ! -f "${doc}" ]; then record_fail "guard-forge" "doutrina ausente: guard-doctrine.md"; else
+    local _miss=""
+    for term in 'DEFEITO MEDIDO' 'MOLDE medido' 'POLARIDADES' 'MUTANTE' 'REGISTRO' 'TETO declarado'; do
+      grep -qF "${term}" "${doc}" || _miss="${_miss} ${term}"
+    done
+    if [ -z "${_miss}" ]; then record_pass "guard-forge: (d) a doutrina declara as 7 pecas da guarda"
+    else record_fail "guard-forge: (d) doutrina" "peca(s) sem mencao:${_miss}"; fi
+  fi
+
+  # (e) a SUPERFICIE referencia a doutrina em vez de copia-la (a peca 2 do conjunto-irmao).
+  if [ ! -f "${srf}" ]; then record_fail "guard-forge" "superficie ausente: forge-guard.md"; else
+    # ⚠️ SEM CARACTERE ACENTUADO NO PADRAO — defeito medido no 1o dogfood desta familia: a 1a
+    #    redacao usava `n[ãa]o`, e em locale C (o da bancada) o `ã` tem DOIS bytes enquanto `[ãa]`
+    #    casa UM — logo o padrao nunca casava e a guarda acusava uma superficie CORRETA. E a
+    #    clausula 3 da propria guard-doctrine, cometida na familia que a exercita.
+    #    E A LICAO DE METODO, que quase me fez REVERTER a cura certa: eu "refutei" este diagnostico
+    #    rodando `grep` na shell interativa, onde ele e uma FUNCAO que chama o ugrep e casa por
+    #    CARACTERE em qualquer locale. Com o binario que o script usa a conta fecha:
+    #      LC_ALL=C     /usr/bin/grep -qi 'referencie, n[ãa]o copie' <arquivo>  -> rc=1 (NAO casa)
+    #      LC_ALL=C.UTF-8 /usr/bin/grep -qi 'referencie, n[ãa]o copie' <arquivo> -> rc=0 (casa)
+    #    O corpus JA dizia isto no no E_LOCALE_FRAGIL_EM_TRES_SITIOS_PRE_EXISTENTES, e o hook de
+    #    leitura chegou a avisar que o corpus falava do arquivo. Medir comportamento de script exige
+    #    o BINARIO do script (`command grep`/`/usr/bin/grep`), nunca a ferramenta da shell.
+    if grep -q 'guard-doctrine' "${srf}" && grep -qi 'referencie' "${srf}" && grep -qi 'copie' "${srf}"; then
+      record_pass "guard-forge: (e) a superficie referencia a doutrina, nao a duplica"
+    else record_fail "guard-forge: (e) superficie" "a superficie nao aponta para a doutrina"; fi
+  fi
+
+  # (f) DELEGACAO: a guarda que nasceu desta forja tem de passar o proprio selftest.
+  if [ ! -f "${hok}" ]; then record_skip "guard-forge: hook background-state ausente (SUT nao exercido)"; else
+    local _ho _hrc=0
+    _ho="$(LC_ALL=C bash "${hok}" --selftest 2>&1)" || _hrc=$?
+    while IFS= read -r line; do
+      case "${line}" in
+        *"  ✅ "*) record_pass "background-state: ${line#*✅ }" ;;
+        *"  ✗ "*)  record_fail "background-state" "${line#*✗ }" ;;
+      esac
+    done <<< "${_ho}"
+    [ "${_hrc}" -eq 0 ] || record_fail "background-state" "o selftest da guarda saiu ${_hrc}"
+  fi
+}
+
 run_kg_radar_integrity_selftests() {
   local helper="${REPO_ROOT}/.claude/validation/kg-radar-integrity.sh"
   if [ ! -f "${helper}" ]; then record_fail "kg-integridade" "helper ausente"; return; fi
@@ -21068,6 +21193,7 @@ run_door_staleness_severity_selftests() {
   rm -rf "${d}"
 }
 _family run_door_staleness_severity_selftests
+_family run_guard_forge_selftests
 
 
 

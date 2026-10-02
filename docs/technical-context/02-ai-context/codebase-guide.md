@@ -25,7 +25,7 @@ date: 2026-08-13
 ```
 onion-evolve/
 ├── .claude/                    # o FRAMEWORK propriamente dito (o "produto")
-│   ├── commands/                # 112 comandos invocáveis, 10 categorias
+│   ├── commands/                # 113 comandos invocáveis, 10 categorias
 │   ├── agents/                  # 51 agentes especializados, 9 categorias
 │   ├── skills/                  # 13 skills (Claude Code-nativas)
 │   ├── utils/                   # abstrações SDAAL (task-manager, forge, ...)
@@ -51,7 +51,7 @@ onion-evolve/
 
 ---
 
-## 2. Comandos — 112 invocáveis em 10 categorias
+## 2. Comandos — 113 invocáveis em 10 categorias
 
 Contagem por categoria (SSOT [`docs/onion/inventory.md`](../../onion/inventory.md), regenerada por
 `.claude/validation/inventory.sh` — contrato: "comando invocável" = `.md` em
@@ -70,7 +70,7 @@ Contagem por categoria (SSOT [`docs/onion/inventory.md`](../../onion/inventory.m
 | `quick/` | `.claude/commands/quick/` | 1 |
 | `development/` | `.claude/commands/development/` | 1 |
 | _root_ | `onion.md`, `warm-up.md`, `catch-up.md` | 3 |
-| **Total** | | **112** |
+| **Total** | | **113** |
 
 `.claude/commands/common/` **não conta** como categoria — guarda fragmentos
 compartilhados (`common/templates/`, `common/prompts/`) reusados via referência
