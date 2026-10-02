@@ -1,0 +1,89 @@
+# kg-backlog-guard: on
+# ═══ TETO: 6 NÓS ═══
+meta:
+  id: inbox-triage-2026-10
+  schema_version: "1"
+  baseline: 2026-10-02
+  review_after: 2026-11-02
+  # O QUE A TRIAGEM DO INBOX DE 2026-10 MEDIU — e por que isto NÃO mora no fios-abertos.
+  #
+  # Eu nasci por violação de fronteira: os 5 nós abaixo foram escritos PRIMEIRO dentro de
+  # `fios-abertos.kg.yaml`, e o `meta:` daquele arquivo diz, em letra grande, "NENHUM FATO NASCE
+  # AQUI — nó só entra para ser ponta de aresta cross-grafo; achado mora onde nasceu, aqui mora o
+  # COMPROMISSO". Estes são FATOS (medições sobre o que o adopt faz e sobre o que a triagem
+  # declarou), logo duplicavam SSOT. O sintoma que me revelou foi a REGRA 58 (O backlog cumpre as
+  # promessas do próprio `meta:`) acusando TETO (24 nós contra 19 declarados) — mas o teto era o
+  # sintoma, não a doença: a doença era pôr fato no lugar do compromisso.
+  #
+  # FRONTEIRA DESTE ARQUIVO: medições da triagem de 2026-10 e os pedidos de adotante que ficaram
+  # abertos nela. Quando um deles for curado, a cura mora no grafo de quem a executou; aqui fica
+  # o SUPERSEDES datado (Aufhebung, nunca apagar).
+nodes:
+  - id: E_TRIAGEM_DECLAROU_ENDERECADO_SEM_LER_O_SINAL_INTEIRO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-02'
+    label: 'MEDIDO POR REFUTADOR ADVERSARIAL (2026-10-02, PR #903): eu arquivei os 6 sinais do inbox declarando "todos endereçados, com prova em origin/main" — e a prova que eu levantei cobria o PEDIDO PRINCIPAL de cada sinal, nao os pedidos INTERNOS. QUATRO pedidos ficaram abertos, sem resposta e sem teto declarado: o `index.md` da KB sobrescrito pelo update (pedido 3 de 3 do sinal do pre-commit), os dois itens do adendo do mesmo sinal (convergencia docs-only com gatilho JA disparado em adopt.md:685, e baseline explicito no stamp) e os tres falsos-positivos de gate relatados pelo hub gmill. A CLASSE: "endereçado" medido pelo titulo e pelo pedido de cabeça de lista, quando o sinal tem secoes com pedidos proprios — e exatamente a licao `read-full-content-before-triage` reincidindo, agora na direcao do ARQUIVAMENTO e nao da leitura. O gate mecanico saiu 0 HARD em todas as passadas: nenhuma guarda sabe ler o que um sinal PEDE. O refutador, lendo os sinais inteiros, achou os quatro em 23 minutos. CURA APLICADA: os quatro viraram nos com gatilho nomeado, e o arquivamento passou a declarar explicitamente o que ficou aberto em vez de dizer "endereçado".'
+    trace: 'docs/evolution/review/chore-inbox-triage-2026-10.md'
+    verified_against: 'passada adversarial em worktree isolada sobre o commit 63c25c3b; 5 achados reais, 5 provados; os 4 pedidos conferidos no codigo (grep por knowledge-base/index em .claude/utils/adopt = ZERO; adopt.md:685 declara o gate)'
+
+  - id: Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_at: '2026-10-02'
+    label: 'O `/meta:adopt --update` SOBRESCREVEU o `docs/knowledge-base/index.md` do adotante com a versao do core — ele perdeu frontmatter e entradas locais, e o `docs:check` dele passou a REPROVAR. Sinal de campo de brain-granaai (2026-10-01, pedido 3 de 3). Pedidos 1 e 2 do mesmo sinal foram curados no PR #902; ESTE ficou sem resposta e sem teto declarado, e so apareceu porque um refutador leu o sinal INTEIRO em vez do pedido principal. MEDIDO em 2026-10-02: `grep` por `knowledge-base/index` em `.claude/utils/adopt/` e em `adopt.md` devolve ZERO — nao existe tratamento desse arquivo como local do adotante. A classe e pior que um arquivo: `docs/knowledge-base/` e path VENDORIZADO no update, e um indice e exatamente o tipo de arquivo que o adotante PRECISA customizar (ele lista as KBs dele). Pergunta: o indice e projecao gerada (e entao o adotante deveria regenerar) ou arquivo de autoria mista (e entao precisa de never-clobber/merge)? GATILHO: antes do proximo `--update` em QUALQUER adotante com KB propria — ou o dano repete em silencio.'
+    trace: 'docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md'
+    verified_against: 'sinal lido integralmente em 2026-10-02; medido no core: zero tratamento de knowledge-base/index.md em .claude/utils/adopt/ e adopt.md'
+
+  - id: I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    label: 'O GATILHO DESTE ITEM GATED JA DISPAROU E NINGUEM REAVALIOU. O `adopt.md:685` diz, literalmente, "implementacao gated ate o 1o caso real" para a convergencia docs-only -> modelo duravel. O caso real chegou em 2026-10-01 (brain-granaai, adendo 1): o adotante estava na forma docs-only, o update anterior saiu como `chore/onion-update-<pin>` por COPY-OVER SILENCIOSO porque a vendor estava em base cruzada e o `.claude/` nao era versionado, e a convergencia foi feita A MAO por decisao do maestro. Pedido do adotante: o `--update` DETECTAR docs-only e OFERECER a convergencia (scope-gitignore + versionar + re-semear vendor) em vez de cair no copy-over calado. Por que isto e registro e nao implementacao imediata: a decisao de abrir o gate e do maestro, nao minha — mas um item gated cujo gatilho disparou e que ninguem reavaliou nao e gated, e ORFAO. GATILHO (agora explicito): a decisao do maestro, ou um SEGUNDO adotante em forma docs-only.'
+    trace: '.claude/commands/meta/adopt.md'
+    verified_against: 'medido em 2026-10-02: adopt.md:681-685 declara a forma docs-only e o gate; o sinal de 2026-10-01 descreve o 1o caso real com copy-over silencioso'
+
+  - id: Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: open
+    label: 'O `_clean_baseline` NUNCA acha base num adotante cujo `docs/knowledge-base` mistura KBs locais com as do core — relato de brain-granaai (2026-10-01, adendo 2), onde a base correta era o commit do copy-over, ANTES das customizacoes. Sugestao dele: registrar esse commit como baseline EXPLICITO no stamp `.onion-version`. Sem resposta e sem teto declarado ate 2026-10-02. Medido: `vendor-branch.sh` tem `_clean_baseline` e nao tem caminho de baseline declarado no stamp. A classe e a de sempre nesta casa: heuristica que procura por FORMA (arvore limpa) onde o dado deveria ser DECLARADO. GATILHO: o proximo adotante cuja vendor-branch nao resolva base — ou o fechamento do Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO, que toca o mesmo diretorio.'
+    trace: 'docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md'
+    verified_against: 'sinal lido integralmente em 2026-10-02; `_clean_baseline` existe em .claude/utils/adopt/vendor-branch.sh e nao le baseline do stamp'
+
+  - id: Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM
+    node_type: question
+    plane: DEV
+    impact: 2
+    confidence: 0.75
+    status: open
+    label: 'TRES relatos de FALSO POSITIVO de gate, do hub gmill (sinal de 2026-09-30), arquivados sem triagem registrada — o commit de arquivamento afirmou apenas que as 3 KBs do sinal estao em main, o que e verdade e NAO cobre esta secao. Os tres: (1) vendor-scrub FORMA acusando `contains&criteria` — provavelmente POR DESENHO (forma gera candidato, o baseline so encolhe), falta so DECLARAR isso ao remetente; (2) `bash-empty-result-guard` disparando em `$?` apos redirecionamento ou `git commit -F - <<EOF` — o guard tem tratamento de redirect, e o caso do heredoc NAO foi provado (o refutador nao conseguiu executar a sonda na worktree); ⚠️ eu mesmo tropecei numa variante disso em 2026-10-02, travando um `git commit -F -` por 31 minutos a espera de stdin, o que sugere que o caso do heredoc merece medicao e nao descarte; (3) REGRA 45 com ~40 BASELINE-OBSOLETA pos-update — o `--stub-baselines` provavelmente cobre, nao verificado. GATILHO: os tres sao BARATOS de medir e a divida e de COMUNICACAO (o remetente nao sabe o veredito) — fecha na proxima leva que tocar vendor-scrub, o guard de shell, ou o adopt.'
+    trace: 'docs/evolution/inbox/_processed/2026-09-30-gmill-kbs-zoho-glpi.md'
+    verified_against: 'sinal lido integralmente em 2026-10-02 por refutador adversarial; nenhum dos tres relatos tem resposta nos outbox nem no CHANGELOG'
+
+edges:
+  - from: E_TRIAGEM_DECLAROU_ENDERECADO_SEM_LER_O_SINAL_INTEIRO
+    to: Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO
+    edge_type: SUPPORTS
+  - from: E_TRIAGEM_DECLAROU_ENDERECADO_SEM_LER_O_SINAL_INTEIRO
+    to: I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU
+    edge_type: SUPPORTS
+  - from: E_TRIAGEM_DECLAROU_ENDERECADO_SEM_LER_O_SINAL_INTEIRO
+    to: Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP
+    edge_type: SUPPORTS
+  - from: E_TRIAGEM_DECLAROU_ENDERECADO_SEM_LER_O_SINAL_INTEIRO
+    to: Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM
+    edge_type: SUPPORTS
+  - from: Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP
+    to: Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO
+    edge_type: CONSTRAINS

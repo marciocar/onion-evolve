@@ -83,10 +83,17 @@ Subject: [PATCH] wip
 >
 > Três links do patch não resolviam **daqui**, e por um motivo legítimo: foram escritos da
 > perspectiva do arquivo de DESTINO (`.claude/utils/task-manager/adapters/clickup.md`), onde
-> `../interface.md` e `./types.md` resolvem corretamente. **Nenhuma palavra do sinal foi alterada** —
-> só a sintaxe de link dos três virou `code span`, preservando texto e caminho. Reescrever o
+> `../interface.md` e `./types.md` resolvem corretamente. **A sintaxe `[texto](alvo)` dos três virou
+> `code span`, e tanto o texto quanto o caminho ORIGINAIS continuam no arquivo** — nos dois casos em
+> que texto e caminho diferiam, ambos ficaram, na forma `` `texto` → `caminho` ``. Reescrever o
 > conteúdo de um sinal arquivado para agradar um verificador degradaria o registro; perder a
 > *link-ness* de três alvos que não existem a partir desta pasta, não.
+>
+> ⚠️ **A 1ª redação desta nota AFIRMAVA "nenhuma palavra do sinal foi alterada", e era FALSO** em dois
+> dos três: eu havia reescrito o caminho de um (relativo → a partir da raiz) e o texto do outro
+> (`types.md` → `./types.md`). Um refutador adversarial mediu pelo `diff` e me pegou. A cura não foi
+> enfraquecer a frase: foi **restaurar texto e caminho originais** e então a frase passou a ser
+> verdadeira. Declarado≠verificado dentro da própria nota que se propunha a ser honesta.
 >
 > Veredito dos sinais deste remetente: **endereçados pelo PR #902** (adapter ClickUp + cura do
 > `.tpl` do pre-commit + 19 curas de passada adversarial).
@@ -2197,7 +2204,7 @@ index 60cf19377..03999567f 100644
 -const sub1 = await create_task({ name: '🔧 Backend JWT Service', listId: '<list_id>', parent: mainTask.id, tags: ['subtask', 'backend'] });
 -const sub2 = await create_task({ name: '🔧 Frontend Integration', listId: '<list_id>', parent: mainTask.id, tags: ['subtask', 'frontend'] });
 +Independente do transporte. A convenção de status de PR e os templates estão no fragmento
-+`clickup-patterns` (`.claude/commands/common/prompts/clickup-patterns.md`).
++`clickup-patterns` → `../../../commands/common/prompts/clickup-patterns.md`.
  
 -// 3. Comentário de setup (formatação Unicode — ver seção de Formatação)
 -await create_task_comment({ task_id: mainTask.id, comment_text: '🚀 TASK SETUP COMPLETO\n━━━━━━━━━━━━\n▶ Subtasks: 2\n⏰ ' + new Date().toISOString() });
@@ -2481,7 +2488,7 @@ index 8f390bee9..eefc45e0d 100644
 +
 +**Campos novos de entrada** (`status`, `points`, `customFields`, `taskType` em `CreateTaskInput`/
 +`UpdateTaskInput`): adapter que não os mapeia **ignora com aviso**, nunca lança.
-+Ver `./types.md`.
++Ver `types.md` → `./types.md`.
 +
 +| Adapter | `capabilities` declaradas (2026-10-02) |
 +|---|---|

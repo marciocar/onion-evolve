@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**297 itens abertos** em 61 grafo(s) com aberto (de 84 no escopo) · 62 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**301 itens abertos** em 62 grafo(s) com aberto (de 85 no escopo) · 63 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -460,6 +460,15 @@
 | 7.2 | `I_O_RADAR_PARA_DE_ESCONDER_O_VENCIMENTO` | inbox-sinais-2026-09 | SEGUNDO, e nao e feature nova — e parar de esconder. Hoje o `kg-radar.sh` sai VERDE com grafo vencido; quem cobra `review_after` |
 | 6.8 | `I_FECHAR_O_LACO_COM_QUEM_REPORTOU` | inbox-sinais-2026-09 | O doc-bridge tem produtor (`co-announce`) e carteiro (`co-deliver`), e nao tem o ato de RESPONDER. Consequencia medida duas vezes: |
 | 5.4 | `Q_AGENTE_EXPO_REACT_NATIVE` | inbox-sinais-2026-09 | O `react-developer` e orientado a web: cita shadcn/ui dez vezes, Next.js 13, e nao menciona React Native, Expo, Reanimated nem Rea |
+
+## inbox-triage-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.8 | `Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO` | inbox-triage-2026-10 | O `/meta:adopt --update` SOBRESCREVEU o `docs/knowledge-base/index.md` do adotante com a versao do core — ele perdeu frontmatter |
+| 7.2 | `Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP` | inbox-triage-2026-10 | O `_clean_baseline` NUNCA acha base num adotante cujo `docs/knowledge-base` mistura KBs locais com as do core — relato de brain- |
+| 5.1 | `I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU` | inbox-triage-2026-10 | O GATILHO DESTE ITEM GATED JA DISPAROU E NINGUEM REAVALIOU. O `adopt.md:685` diz, literalmente, "implementacao gated ate o 1o caso |
+| 3.0 | `Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM` | inbox-triage-2026-10 | TRES relatos de FALSO POSITIVO de gate, do hub gmill (sinal de 2026-09-30), arquivados sem triagem registrada — o commit de arqu |
 
 ## librechat-kg-runtime-2026-08 — 3 item(ns)
 
