@@ -33,11 +33,19 @@
 set -euo pipefail
 
 TARGET=""; FRAMEWORK=""; COMMIT=""; COMMIT_DATE=""; ADOPTED_FROM=""; MODE=""; IBRANCH=""
+FRAMEWORK_SET=""; COMMIT_SET=""; COMMIT_DATE_SET=""   # flag AUSENTE herda; PRESENTE E VAZIA e erro (F2)
 MEMBERS=""; MEMBER_ID=""; ROLE=""
 while [ "$#" -gt 0 ]; do case "$1" in
-  --framework)          FRAMEWORK="${2:-}"; shift 2 ;;
-  --commit)             COMMIT="${2:-}"; shift 2 ;;
-  --commit-date)        COMMIT_DATE="${2:-}"; shift 2 ;;
+  # ⚠️ `*_SET` existe por um FAIL-OPEN que o Elenxo mediu (F2, 2026-10-02): o fallback da 1a versao
+  #    olhava so `[ -z "${COMMIT}" ]`, entao `--commit ""` — que e o que um `awk` de extracao
+  #    produz quando o nome do campo muda, e esta casa JA quebrou 2x nessa vizinhanca — deixava de
+  #    ser ERRO (rc=2 em origin/main) e passava a HERDAR em silencio: o stamp saia dizendo
+  #    `updated_at` de HOJE com o pin VELHO. Isto e exatamente "o carimbo que MENTIRIA sobre a
+  #    versao do framework", que esta leva diz curar — trocar ruido por silencio e a pior regressao.
+  #    Flag AUSENTE herda; flag PRESENTE E VAZIA e erro.
+  --framework)          FRAMEWORK="${2:-}"; FRAMEWORK_SET=1; shift 2 ;;
+  --commit)             COMMIT="${2:-}"; COMMIT_SET=1; shift 2 ;;
+  --commit-date)        COMMIT_DATE="${2:-}"; COMMIT_DATE_SET=1; shift 2 ;;
   --adopted-from)       ADOPTED_FROM="${2:-}"; shift 2 ;;
   --mode)               MODE="${2:-}"; shift 2 ;;
   --role)               ROLE="${2:-}"; shift 2 ;;
@@ -48,11 +56,47 @@ while [ "$#" -gt 0 ]; do case "$1" in
   *)  [ -z "${TARGET}" ] && TARGET="$1"; shift ;;
 esac; done
 [ -n "${TARGET}" ] && [ -d "${TARGET}" ] || { echo "ERRO: target_root inválido: '${TARGET}'" >&2; exit 2; }
-[ -n "${FRAMEWORK}" ] && [ -n "${COMMIT}" ] && [ -n "${COMMIT_DATE}" ] \
-  || { echo "ERRO: --framework/--commit/--commit-date são obrigatórios." >&2; exit 2; }
 
 STAMP="${TARGET}/.claude/.onion-version"
-field() { grep -m1 "^$1:" "${STAMP}" 2>/dev/null | sed "s/^$1:[[:space:]]*//" || true; }
+# ⚠️ NORMALIZA comentario inline e espaco final (F9 do Elenxo): o fallback abaixo e o 1o consumidor
+# que ESCREVE DE VOLTA o que `field()` le, e carimbo no mundo real tem `source_commit: abc # pin da
+# adocao`. Sem isto o pin voltava ao stamp COM o comentario dentro e o `pin-integrity-check` recusava.
+# Precedente da casa: `door-role-parity-check.sh` tem `_norm_role` existindo pela MESMA razao.
+field() { grep -m1 "^$1:" "${STAMP}" 2>/dev/null | sed "s/^$1:[[:space:]]*//; s/[[:space:]]*#.*\$//; s/[[:space:]]*\$//" || true; }
+
+# ⚠️ FALLBACK DE PIN, E ELE PRECISA RODAR **ANTES** DA COBRANÇA — sinal de campo de um adotante hub
+#    em 2026-10-02, e a 1ª tentativa de cura falhou por ORDEM: eu pus o fallback dentro do bloco do
+#    stamp, que roda DEPOIS desta validação, então `--role hub` sem `--commit` continuava saindo
+#    `rc=2` sem escrever nada. Medido: `rc=2` antes e depois, stamp intacto — o dogfood pegou.
+#    O DEFEITO DE ORIGEM: o snippet do `--promote-hub` em `adopt.md` carimbava
+#    `--commit "$(git -C "$REPO" rev-parse --short=12 HEAD)"`, isto é, o HEAD DO PRÓPRIO ADOTANTE,
+#    que NÃO EXISTE na história do core. O `pin-integrity-check` do `--update` seguinte acusaria pin
+#    inválido (delta e early-exit desligados) e o carimbo MENTIRIA sobre a versão do framework.
+#    POR QUE A CURA MORA AQUI e não no chamador: promover papel NÃO é mudar de versão. Quando não vem
+#    `--commit` e já existe stamp, o pin VIGENTE é a resposta certa para QUALQUER chamador — curar só
+#    o snippet deixaria a próxima chamada livre para repetir o erro.
+#    `--framework` entra no mesmo fallback QUANDO A FLAG E OMITIDA — e a 1a redacao desta nota
+#    afirmava que ele "entra no mesmo fallback" sem essa condicao, o que era FALSO: o snippet do
+#    `--promote-hub` passava `--framework` derivado do remote do PROPRIO ADOTANTE, o arg vencia o
+#    fallback, e o stamp virava `framework: <nome-do-repo-do-alvo>`. Medido por Elenxo (F1).
+# FLAG PRESENTE E VAZIA = ERRO, antes de qualquer heranca (F2). Um `awk` que falhou na extracao
+# produz string vazia, e herdar dali e carimbar "atualizado hoje" com o pin velho.
+for _pair in "FRAMEWORK_SET:FRAMEWORK:--framework" "COMMIT_SET:COMMIT:--commit" "COMMIT_DATE_SET:COMMIT_DATE:--commit-date"; do
+  _setv="${_pair%%:*}"; _rest="${_pair#*:}"; _valv="${_rest%%:*}"; _flag="${_rest##*:}"
+  if [ -n "${!_setv}" ] && [ -z "${!_valv}" ]; then
+    echo "ERRO: ${_flag} veio PRESENTE e VAZIO — extração falhou a montante. Omita a flag para herdar do stamp, ou passe o valor." >&2
+    exit 2
+  fi
+done
+if [ -f "${STAMP}" ]; then
+  [ -z "${FRAMEWORK_SET}" ]   && FRAMEWORK="$(field framework)"
+  [ -z "${COMMIT_SET}" ]      && COMMIT="$(field source_commit)"
+  [ -z "${COMMIT_DATE_SET}" ] && COMMIT_DATE="$(field source_commit_date)"
+fi
+# F8: a mensagem nomeia as DUAS causas. A 1a redacao dizia so "sem stamp existente para herdar", e
+# mandava o operador procurar um stamp que ESTAVA la (campo vazio ou campo ausente no stamp).
+[ -n "${FRAMEWORK}" ] && [ -n "${COMMIT}" ] && [ -n "${COMMIT_DATE}" ] \
+  || { echo "ERRO: framework/source_commit/source_commit_date indefinidos — stamp AUSENTE, ou PRESENTE sem o(s) campo(s). Passe --framework/--commit/--commit-date." >&2; exit 2; }
 
 OLD_EXISTS=""
 if [ -f "${STAMP}" ]; then

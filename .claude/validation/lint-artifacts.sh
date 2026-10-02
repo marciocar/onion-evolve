@@ -2470,6 +2470,33 @@ check_kg_read_index_sync() {
   fi
   rm -f "${gen_err}"
   if ! printf '%s\n' "${new_index}" | LC_ALL=C diff -q - "${idx}" >/dev/null 2>&1; then
+    # ⚠️ COMMIT COM PATHSPEC NÃO PODE SER JULGADO AQUI — sinal de campo de um adotante hub,
+    # 2026-10-02, com causa VERIFICADA por ele: `git commit -- <pathspec>` monta um índice
+    # TEMPORÁRIO só com os caminhos do pathspec. O hook roda o lint sob esse índice, e o
+    # `kg-trace-resolve.sh --emit-index` enumera o corpus por `git ls-files` — então todo `.kg.yaml`
+    # novo que ficou FORA do pathspec desaparece do corpus, o índice gerado fica menor que o
+    # commitado, e a regra acusa DEFASADO. Ele mediu 4 de 4 tentativas reprovando com pathspec e
+    # passando num commit único. O lint rodado à mão dava 0 HARD — ou seja, a guarda contradizia o
+    # lint sobre o MESMO repo, e a mensagem mandava "regenere", que é a ação ERRADA: regenerar sob
+    # índice parcial ENCURTARIA o índice bom.
+    # A cura é a cláusula 4 da doutrina de guardas: quando ela não pode julgar, DECLARA que não sabe
+    # — nunca acusa. E o idioma de detecção já existia neste repo, no auto-fix de plugins do
+    # `.githooks/pre-commit` ("commit por pathspec usa índice temporário"); o que faltava era este
+    # caminho usá-lo.
+    # ⚠️ TETO DECLARADO (F4 do Elenxo): esta isenção é mais LARGA que a causa medida. A causa é índice
+    # PARCIAL — o grafo novo desaparece, logo o índice gerado é SUBCONJUNTO do commitado. A isenção,
+    # porém, cobre QUALQUER divergência sob qualquer nome estranho de índice: o refutador provou, com
+    # índice temporário mas COMPLETO e um tsv genuinamente defasado, que o veredito muda só pelo NOME
+    # do arquivo de índice (HARD com índice real, isento com o temporário). Estreitar ao subconjunto
+    # estrito NÃO foi feito nesta leva — por isso a mensagem passou a DECLARAR que não verificou, em
+    # vez de afirmar que não há defeito. GATILHO: o próximo sinal de pathspec, ou a próxima leva que
+    # tocar esta regra.
+    case "${GIT_INDEX_FILE:-}" in
+      ""|*/index|*/index.lock) : ;;   # índice REAL do repo → o veredito vale
+      *)
+        violation "SOFT" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): [kg-read-index/PATHSPEC-NAO-JULGAVEL] commit com pathspec usa índice TEMPORÁRIO (GIT_INDEX_FILE=${GIT_INDEX_FILE}), e o gerador enumera o corpus por \`git ls-files\` — um \`.kg.yaml\` novo fora do pathspec desaparece e o índice PODE parecer defasado sem estar. ESTA GUARDA NÃO VERIFICOU se há defeito — ela declara que NÃO PODE JULGAR aqui, e isso NÃO é \"sem divergência\". NÃO regenere sob este índice (encurtaria o índice bom): faça um commit ÚNICO, sem pathspec, que é onde o veredito vale."
+        return ;;
+    esac
     violation "HARD" "docs/onion/kg-read-index.tsv" "REGRA 84 (Índice de leitura do KG em sincronia com os traces): índice DEFASADO vs os \`trace:\` do corpus — o hook de leitura está cego para os nós que faltam. Regenere: bash .claude/validation/kg-trace-resolve.sh . --emit-index > docs/onion/kg-read-index.tsv"
   fi
 }
