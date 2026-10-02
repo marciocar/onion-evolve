@@ -75,6 +75,21 @@ Date: Fri, 2 Oct 2026 01:26:25 +0000
 Subject: [PATCH] wip
 
 ---
+
+> 🗃️ **NOTA DE ARQUIVAMENTO (core, 2026-10-02).** Ao mover este sinal para `_processed/`, a REGRA 22
+> (Links relativos quebrados em docs/evolution/ e docs/knowledge-base/) passou a julgá-lo — e isso é
+> desenho, não acidente: em `inbox/` de 1º nível o conteúdo é **intake de terceiro** e a regra se
+> isenta; em `_processed/` o core já triou e o texto virou **registro desta casa**.
+>
+> Três links do patch não resolviam **daqui**, e por um motivo legítimo: foram escritos da
+> perspectiva do arquivo de DESTINO (`.claude/utils/task-manager/adapters/clickup.md`), onde
+> `../interface.md` e `./types.md` resolvem corretamente. **Nenhuma palavra do sinal foi alterada** —
+> só a sintaxe de link dos três virou `code span`, preservando texto e caminho. Reescrever o
+> conteúdo de um sinal arquivado para agradar um verificador degradaria o registro; perder a
+> *link-ness* de três alvos que não existem a partir desta pasta, não.
+>
+> Veredito dos sinais deste remetente: **endereçados pelo PR #902** (adapter ClickUp + cura do
+> `.tpl` do pre-commit + 19 curas de passada adversarial).
  .../agents/development/clickup-specialist.md  |  464 ++----
  .../common/prompts/clickup-patterns.md        |   48 +-
  .../prompts/task-manager-auto-update.md       |    4 +-
@@ -1068,7 +1083,7 @@ index 60cf19377..03999567f 100644
 -## 🔧 Implementação
 +## 🔧 Implementação da interface
 +
-+Os **16 membros** de [`../interface.md`](../interface.md) (`provider`, `isConfigured`, `createTask`,
++Os **16 membros** de `../interface.md` (`provider`, `isConfigured`, `createTask`,
 +`getTask`, `updateTask`, `deleteTask`, `createSubtask`, `getSubtasks`, `addComment`, `getComments`,
 +`updateStatus`, `searchTasks`, `getProjectList`, `getProject`, `validateTaskId`,
 +`getProviderFromTaskId`) mais as **capabilities opcionais**, todas declaradas:
@@ -2182,7 +2197,7 @@ index 60cf19377..03999567f 100644
 -const sub1 = await create_task({ name: '🔧 Backend JWT Service', listId: '<list_id>', parent: mainTask.id, tags: ['subtask', 'backend'] });
 -const sub2 = await create_task({ name: '🔧 Frontend Integration', listId: '<list_id>', parent: mainTask.id, tags: ['subtask', 'frontend'] });
 +Independente do transporte. A convenção de status de PR e os templates estão no fragmento
-+[`clickup-patterns`](../../../commands/common/prompts/clickup-patterns.md).
++`clickup-patterns` (`.claude/commands/common/prompts/clickup-patterns.md`).
  
 -// 3. Comentário de setup (formatação Unicode — ver seção de Formatação)
 -await create_task_comment({ task_id: mainTask.id, comment_text: '🚀 TASK SETUP COMPLETO\n━━━━━━━━━━━━\n▶ Subtasks: 2\n⏰ ' + new Date().toISOString() });
@@ -2466,7 +2481,7 @@ index 8f390bee9..eefc45e0d 100644
 +
 +**Campos novos de entrada** (`status`, `points`, `customFields`, `taskType` em `CreateTaskInput`/
 +`UpdateTaskInput`): adapter que não os mapeia **ignora com aviso**, nunca lança.
-+Ver [types.md](./types.md).
++Ver `./types.md`.
 +
 +| Adapter | `capabilities` declaradas (2026-10-02) |
 +|---|---|
