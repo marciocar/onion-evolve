@@ -20408,18 +20408,54 @@ run_hook_regen_table_selftests() {
     'docs/onion/testing-state.md|81' \
     '.claude/validation/lint-rules.md|39' \
     'docs/onion/testing-inventory.md|80' \
-    'docs/onion/inventory.md|16' \
+    'docs/onion/inventory.md|8' \
     'docs/onion/kg-read-index.tsv|84' \
     'docs/backlog.md|62' \
     'docs/onion/federation-console.html|24' \
     'docs/onion/federation-map.md|38' \
     'docs/onion/graph.md|21'; do
     local target="${pair%%|*}" rule="${pair##*|}"
-    grep -qF "onion_regen ${target} ${rule}" "${hook}" || missing="${missing} ${target}(R${rule})"
+    # ⚠️ MATCH ANCORADO, não substring. O `grep -qF "onion_regen ${target} ${rule}"` anterior era
+    # cego a NÚMERO ERRADO: um Elenxo provou que trocar `21` por `21x` deixava o caso VERDE, porque
+    # `onion_regen docs/onion/graph.md 21` é substring de `… 21x`. Só a DELEÇÃO da linha reprovava —
+    # ou seja, o caso cobria metade do que anunciava. A âncora exige o número seguido de espaço.
+    grep -qE "onion_regen[[:space:]]+${target//./\\.}[[:space:]]+${rule}[[:space:]]" "${hook}" \
+      || missing="${missing} ${target}(R${rule})"
   done
+  # A LENTE é a 10ª, e não cabe no laço de pares fixos: o alvo é VARIÁVEL (um `*-radar.md` por
+  # grafo), então a tabela a regenera num laço. Aqui se cobra a existência da chamada com a regra.
+  # ⚠️ ANCORADO no fim do número, como os pares acima — e isto é reincidência registrada: a 1ª
+  # versão desta linha, escrita no MESMO patch que curou o substring dos pares, era ela mesma
+  # substring (`31` casa em `31DISABLED`). O mutante M3 passou verde e me pegou. A classe do
+  # vocabulário de guarda não perdoa quem acha que já aprendeu.
+  grep -qE 'onion_regen "\$\{_lens\}" 31([[:space:]]|$)' "${hook}" || missing="${missing} docs/**/*-radar.md(R31)"
   if [ -z "${missing}" ]; then
-    record_pass "hook-regen: (a) as 9 projeções com guarda HARD estão na tabela do hook"
-  else record_fail "hook-regen: (a)" "projeção com guarda e SEM linha na tabela:${missing} — a classe volta calada"; fi
+    record_pass "hook-regen: (a) as 10 projeções com guarda estão na tabela, com o número de regra CERTO"
+  else record_fail "hook-regen: (a)" "projeção com guarda e SEM linha (ou com regra errada) na tabela:${missing} — a classe volta calada"; fi
+
+  # (a2) O RE-CARIMBO DA REGRA 56 TEM DE ESTAR VIVO, e este caso nasceu porque ele estava MORTO:
+  #      a atribuição de `_RES_STAGED` havia sido apagada e o consumidor usava `${_RES_STAGED:-}`,
+  #      que cala o `set -u`. O bloco nunca executava e nada acusava. Consumidor de variável sem
+  #      atribuição no mesmo arquivo é a classe; o `:-` é o que a torna invisível.
+  if grep -qE '^[[:space:]]*_RES_STAGED=' "${hook}"; then
+    record_pass "hook-regen: (a2) o re-carimbo da REGRA 56 tem atribuição (não é código morto)"
+  else
+    record_fail "hook-regen: (a2) re-carimbo MORTO" \
+      "o hook consome _RES_STAGED e NUNCA o atribui — o bloco do carimbo não executa e o gate não sabe"
+  fi
+  # Só CÓDIGO: a 1ª redação deste caso acusou o próprio COMENTÁRIO que explica o defeito (o texto
+  # cita a forma errada de propósito). Guarda que não distingue código de prosa sobre código
+  # acusa a documentação da cura — e foi o que aconteceu na primeira execução.
+  # `awk`, SEM PIPE — e esta é a 2a vez no mesmo patch que uma cura minha trouxe a classe seguinte:
+  # a 1a redação era `grep -v … | grep -q …`, exatamente o `<produtor> | grep -q` que a catraca de
+  # pipefail barra (o `-q` fecha cedo, o produtor toma EPIPE e o veredito INVERTE com o padrão
+  # PRESENTE). Curei o substring trazendo o fechador precoce. Um processo, nenhum pipe, rc explícito.
+  if awk '!/^[[:space:]]*#/ && /\$\{_RES_STAGED:-\}/ { found = 1 } END { exit !found }' "${hook}"; then
+    record_fail "hook-regen: (a3) set -u calado" \
+      "o consumidor usa \${_RES_STAGED:-}, que transforma variável ausente em string vazia plausível — foi assim que o bloco morreu calado"
+  else
+    record_pass "hook-regen: (a3) o consumidor não cala o set -u com :- (variável ausente GRITA)"
+  fi
 
   # (b) ORDEM — a tabela roda ANTES do re-carimbo da REGRA 56; auto-fix depois do carimbo torna o
   #     hash caduco (ARTEFATO-CADUCO, medido 2x em 2026-10-01). O caso (b) de hook_chain_order cobra

@@ -225,7 +225,9 @@ A formatação de descrições e comentários **muda conforme o provider ativo**
     **Medido ao vivo (2026-10-02, adotante, 24 chamadas REST):** no **update** o
     `markdown_description` **também aplica** (alias aceito) — mas `markdown_content` é o
     canônico e o único documentado no create. Use o canônico.
-  - **Datas são Unix MILISSEGUNDOS (integer)**, nunca ISO: `due_date`, `start_date`.
+  - **Datas são Unix MILISSEGUNDOS (integer)**, nunca ISO: `due_date`, `start_date` — **e o par
+    `due_date_time: true` / `start_date_time: true` é OBRIGATÓRIO**: sem ele o ClickUp normaliza
+    para 07:00 e a data **pode cair no dia anterior** pelo fuso (medido ao vivo em 2026-10-02).
   - **`priority` é INTEGER (1 urgent … 4 low)**, nunca string — medido: `"high"` devolve
     **`400 Priority invalid`**, logo HOJE toda escrita com prioridade FALHA.
   - **`tags` NÃO vão no body do PUT** (devolvem 200 sem efeito): só

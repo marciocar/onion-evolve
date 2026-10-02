@@ -286,6 +286,7 @@ brain-granaai	specialization	company-brain
 brain-granaai	specialization	pesquisa-primaria	
 brain-granaai	tier	standalone	
 brain-granaai	trust-advises	onion-evolve	
+brain-granaai	trust-corrects	onion-evolve	
 branch-code-reviewer	related	/engineer/pre-pr	
 branch-code-reviewer	related	branch-test-planner	
 branch-code-reviewer	related	code-reviewer	

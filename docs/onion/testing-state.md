@@ -13,7 +13,7 @@
 | Dimensão | Nº | Produtor |
 |---|---:|---|
 | Famílias na bancada | **206** | `bash .claude/validation/harness-inventory.sh --env` |
-| Sítios de asserção (estáticos) | **1370** | `bash .claude/validation/harness-inventory.sh --env` |
+| Sítios de asserção (estáticos) | **1374** | `bash .claude/validation/harness-inventory.sh --env` |
 | Regras do lint | **93** | `bash .claude/validation/rules-registry.sh --counts` |
 | — HARD | **82** | `bash .claude/validation/rules-registry.sh --counts` |
 | Pares de modo consumido | **55** | `bash .claude/validation/consumed-mode-check.sh .` |
@@ -54,15 +54,15 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **347** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados totais | **1859** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados REAIS | **1612** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **348** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados totais | **1878** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados REAIS | **1631** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **87%** | `bash .claude/validation/review-ledger.sh --env` |
-| Tokens por achado REAL | **145055** | `bash .claude/validation/review-ledger.sh --env` |
-| Vereditos no vocabulário | **254** | `bash .claude/validation/review-ledger.sh --env` |
+| Tokens por achado REAL | **143514** | `bash .claude/validation/review-ledger.sh --env` |
+| Vereditos no vocabulário | **255** | `bash .claude/validation/review-ledger.sh --env` |
 | — legado (texto livre) | **93** | `bash .claude/validation/review-ledger.sh --env` |
 
-A média de tokens cobre os **205** resíduos com custo > 0; os demais declaram `tokens: 0`
+A média de tokens cobre os **206** resíduos com custo > 0; os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero
 não é média — mas seus achados continuam contados no total.
 

@@ -63,7 +63,7 @@ Os eventos do ciclo de engenharia disparam o mecanismo via adapter (transporte d
 
 | Evento | Ação (agnóstica via adapter) |
 |--------|------------------------------|
-| `/engineer:start` | `getTask(id, {subtasks:true})` → `updateStatus(id,'in_progress')` → `addComment(id, '🚀 …')` → criar mapeamento fase→subtask no `context.md` |
+| `/engineer:start` | `getTask(id)` → `updateStatus(id,'in_progress')` → `addComment(id, '🚀 …')` → criar mapeamento fase→subtask no `context.md` |
 | `/engineer:work` (fim de fase) | `updateStatus(subtaskId,'done')` → `addComment(mainTaskId, '🔧 progresso …')` → atualizar `plan.md` |
 | `/engineer:pr` | `updateStatus(id,'in_progress')` + tag `under-review` → `addComment(id, '🚀 PR …')` |
 | `/git:sync` (pós-merge) | `updateStatus(id,'done')` → `addComment(id, '✅ concluída/merged …')` |

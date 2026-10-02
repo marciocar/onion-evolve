@@ -339,7 +339,18 @@ members:
     trust:
       can_receive_from: [onion-evolve]
       can_advise_to: [onion-evolve]
-      can_correct_to: []
+      # ⚠️ ELEVADO EM 2026-10-02, e a elevação é CORREÇÃO DE DECLARADO≠VERIFICADO, não cortesia.
+      #    Um Elenxo mediu: com `can_correct_to: []`, `trust-topology-check.sh --from brain-granaai
+      #    --to onion-evolve --action correct` devolvia `🚫 BLOQUEADO (rc=1)` — enquanto este mesmo
+      #    PR, a prosa acima e o CHANGELOG chamavam o membro de "refutador medido do core". A casa
+      #    estava registrando como impossível um ato que ele JÁ PRATICOU DUAS VEZES em 48h: a
+      #    medição ao vivo que derrubou o meu conserto errado de `tags`, e a re-medição que derrubou
+      #    o meu veredito "não reproduz no core" sobre o pre-commit (eu havia procurado no caminho
+      #    errado). Critério idêntico ao precedente desta casa em 2026-07-06 (rigor comprovado:
+      #    achou + corrigiu bug real), e é `trust` elevado — NUNCA `role` elevado.
+      #    MAESTRO: esta é a única linha deste PR que muda POSTURA e não conserta defeito. Vetar
+      #    aqui não desfaz nada do resto.
+      can_correct_to: [onion-evolve]   # elevado 2026-10-02: refutou o core 2x com medição executada
       diary_readable_by: []
       diary_classifications_shared: []
       exposes_downstream: []

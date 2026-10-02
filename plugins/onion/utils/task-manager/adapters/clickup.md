@@ -80,6 +80,12 @@ Ativado quando `TASK_MANAGER_TRANSPORT=mcp` **e** o servidor MCP do ClickUp esti
 > uma garantia. Confira o nome efetivo no seu ambiente antes de ligar o transporte MCP.
 >
 > - **Endpoint do servidor remoto:** `https://mcp.clickup.com/mcp`.
+> - **NADA IMPEDE A GRAFIA ANTIGA DE VOLTAR, e isto é teto declarado:** a REGRA 10 (Tool MCP de
+>   provider direto em comando/agente) conhece o padrão `mcp_ClickUp_` **mas allowlista o caminho
+>   `*/utils/task-manager/adapters/*`** — foi por essa porta que 19 menções sobreviveram desde a era
+>   Cursor sem ninguém notar. A correção de hoje é **one-off**; o mecanismo que a tornaria
+>   permanente (cobrar a FORMA `mcp__<alias>__` dentro do adapter) precisa de guarda e caso de
+>   bancada próprios. Gatilho nomeado: a próxima grafia antiga que aparecer num adapter.
 > - **Inconsistência DECLARADA, não resolvida:** a documentação do provider lista uma ferramenta de
 >   remoção cujo nome divergia entre páginas. Não medi qual responde, então `delete_task` fica
 >   marcado abaixo como **não-verificado** — e o caminho API (`DELETE /task/{id}`), que é o default,
@@ -179,9 +185,14 @@ class ClickUpAdapter implements ITaskManager {
       description: input.description,
       markdown_content: input.markdownDescription,   // REQUEST usa markdown_content
       priority: this.mapPriorityToClickUp(input.priority),
+      // As flags derivam do valor CONVERTIDO, nunca do input cru: um ISO inválido deixava
+      // `due_date_time: true` sem `due_date`. E `start_date` tinha a mesma exposição ao fuso que
+      // `due_date` e estava sem flag — o comentário de toClickUpMs chamava a flag de OBRIGATÓRIA
+      // e eu a aplicara a metade dos campos.
       due_date: this.toClickUpMs(input.dueDate),      // API quer Unix ms, não ISO
-      due_date_time: input.dueDate ? true : undefined,  // ver o porquê em toClickUpMs (fuso: 07:00 e dia anterior)
+      due_date_time: this.toClickUpMs(input.dueDate) !== undefined ? true : undefined,
       start_date: this.toClickUpMs(input.startDate),
+      start_date_time: this.toClickUpMs(input.startDate) !== undefined ? true : undefined,
       time_estimate: input.timeEstimate ? input.timeEstimate * 60000 : undefined,
       assignees: input.assignees,
       tags: input.tags
@@ -236,9 +247,14 @@ class ClickUpAdapter implements ITaskManager {
       status: resolvedStatus,
       priority: updates.priority ? this.mapPriorityToClickUp(updates.priority) : undefined,
       due_date: this.toClickUpMs(updates.dueDate),
-      due_date_time: updates.dueDate ? true : undefined,   // ver o porquê em toClickUpMs
+      due_date_time: this.toClickUpMs(updates.dueDate) !== undefined ? true : undefined,
       start_date: this.toClickUpMs(updates.startDate),
+      start_date_time: this.toClickUpMs(updates.startDate) !== undefined ? true : undefined,
       time_estimate: updates.timeEstimate ? updates.timeEstimate * 60000 : undefined,
+      // ⚠️ `assignees` vai como ARRAY SIMPLES, e isto é TETO DECLARADO, não medição: o adendo do
+      // adotante registra que `{add, rem}` FUNCIONA e que o array simples TAMBÉM devolve 200 — e
+      // "devolve 200" foi exatamente o critério que condenou as tags. Ninguém mediu o EFEITO do
+      // array simples aqui. Gatilho: a próxima medição ao vivo resolve, ou isto migra para {add,rem}.
       assignees: updates.assignees
       // ⚠️ TAGS NÃO VÃO NO BODY DO PUT — medido ao vivo por um adotante em 2026-10-02 (24 chamadas
       // REST, tasks criadas e apagadas, limpeza confirmada por 404): tags no corpo do PUT devolvem
@@ -247,6 +263,12 @@ class ClickUpAdapter implements ITaskManager {
       // não faz nada é PIOR que campo ausente, porque parece consertado. Quem precisa mexer em tag
       // chama o endpoint dedicado; a `under-review` do /onion-engineering:pr nunca seria aplicada por aqui.
     };
+
+    // `tags` CONTINUA no contrato de UpdateTaskInput mas NÃO é enviada (ver a nota no payload).
+    // Descartar em silêncio é o mesmo defeito que o PUT da API tem — só movido para cá. Avisa.
+    if (updates.tags && updates.tags.length > 0) {
+      console.warn(`⚠️  ClickUp: 'tags' NÃO é aplicada por updateTask (o body do PUT devolve 200 sem efeito). Use POST/DELETE /task/${taskId}/tag/{name}. Tags ignoradas: ${updates.tags.join(', ')}`);
+    }
 
     if (this.useMcp) {
       const result = await mcp__clickup__clickup_update_task({
@@ -568,13 +590,23 @@ class ClickUpAdapter implements ITaskManager {
       'open': 'todo',
       'not started': 'todo',
       'pending': 'todo',
+      'in refinement': 'backlog',
+      'refinement': 'backlog',
       'in progress': 'in_progress',
       'in-progress': 'in_progress',
+      // `pause` existe na List medida e não tem canônico próprio no Onion (não há `blocked`).
+      // `in_progress` é o menos errado — a task COMEÇOU — e `statusRaw` preserva `pause` para
+      // quem precisar distinguir. Teto declarado, não omissão.
+      'pause': 'in_progress',
+      'paused': 'in_progress',
+      'on hold': 'in_progress',
       'doing': 'in_progress',
       'wip': 'in_progress',
       'started': 'in_progress',
       'in review': 'review',
       'review': 'review',
+      'pull request': 'review',
+      'pr': 'review',
       'code review': 'review',
       'reviewing': 'review',
       'qa': 'review',
@@ -590,7 +622,15 @@ class ClickUpAdapter implements ITaskManager {
       'wont do': 'canceled',
       "won't do": 'canceled'
     };
-    return statusMap[clickupStatus?.toLowerCase() || ''] || 'todo';
+    const hit = statusMap[clickupStatus?.toLowerCase() || ''];
+    if (hit) return hit;
+    // FALLBACK QUE AVISA. O anterior devolvia `todo` em silêncio, então uma List com nomes próprios
+    // ('pull request', 'in refinement', 'pause') fazia `validate-phase-sync` e `checklist-sync`
+    // lerem `todo` para tasks em revisão — e nada apontava. A escrita já avisava; a leitura não.
+    if (clickupStatus) {
+      console.warn(`⚠️  ClickUp: status '${clickupStatus}' não tem canônico Onion — lido como 'todo'. statusRaw preserva o original; acrescente o sinônimo se este nome for comum na sua List.`);
+    }
+    return 'todo';
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -605,11 +645,16 @@ class ClickUpAdapter implements ITaskManager {
   //
   // O QUE FICA CANÔNICO: os `TaskStatus` do Onion (`review` inclusive) seguem a moeda interna. O
   // adapter TRADUZ na fronteira, por sinônimos, contra o que a List de fato oferece.
+  // ⚠️ A ORDEM É O VEREDITO, e um Elenxo me pegou nela: a primeira versão desta tabela punha
+  // `testing` em `review` e OMITIA `pull request` — logo, na List que o adotante mediu
+  // (`… testing, pull request, done, Closed`), `/onion-engineering:pr` moveria a task para **testing**.
+  // Trocar um `400` por um status ERRADO E SILENCIOSO é piorar: o 400 avisa, o status errado não.
+  // Os sinônimos vão do mais específico ao mais genérico, e os nomes da List medida vêm primeiro.
   private static readonly STATUS_SYNONYMS: Record<TaskStatus, string[]> = {
-    'backlog':     ['backlog', 'bakclog', 'ideas', 'icebox'],
+    'backlog':     ['backlog', 'bakclog', 'in refinement', 'refinement', 'ideas', 'icebox'],
     'todo':        ['to do', 'todo', 'open', 'not started', 'pending'],
     'in_progress': ['in progress', 'in-progress', 'doing', 'wip', 'started'],
-    'review':      ['review', 'in review', 'code review', 'reviewing', 'qa', 'testing'],
+    'review':      ['review', 'in review', 'pull request', 'code review', 'reviewing', 'qa', 'testing'],
     'done':        ['done', 'complete', 'completed', 'closed', 'resolved'],
     'closed':      ['closed', 'done', 'complete', 'completed', 'archived'],
     'canceled':    ['canceled', 'cancelled', 'wont do', "won't do", 'closed']
@@ -633,13 +678,14 @@ class ClickUpAdapter implements ITaskManager {
   // Resolve o status canônico para o nome REAL da List da task. `undefined` = não há sinônimo,
   // o chamador OMITE o campo (mantém o status atual) e o aviso diz o que a List oferece.
   private async resolveStatusForTask(taskId: string, status: TaskStatus): Promise<string | undefined> {
-    let listId: string | undefined;
-    try {
-      const raw = await this.api<any>('GET', `/task/${taskId}`);
-      listId = raw?.list?.id;
-    } catch {
-      listId = undefined;
-    }
+    // FAIL-CLOSED, e esta foi uma correção de Elenxo: a 1ª versão tinha `catch { listId = undefined }`,
+    // que transformava falha de REDE TRANSITÓRIA em "esta List não tem o status" — e a operação
+    // devolvia sucesso com o status silenciosamente não aplicado. Erro de transporte tem de subir;
+    // ausência de status é outra coisa e tem o seu próprio aviso abaixo.
+    // TETO: este caminho não ramifica para MCP (os irmãos ramificam). Com TASK_MANAGER_TRANSPORT=mcp
+    // a resolução de status usa a REST API. Declarado, não escondido.
+    const raw = await this.api<any>('GET', `/task/${taskId}`);
+    const listId: string | undefined = raw?.list?.id;
     if (!listId) {
       console.warn(`⚠️  ClickUp: não resolvi a List da task ${taskId} — status '${status}' NÃO aplicado (a task mantém o atual).`);
       return undefined;
@@ -790,130 +836,13 @@ Use formatação visual Unicode para legibilidade nos feeds do ClickUp:
 
 ---
 
-## 🧪 Exemplos de Uso
+## 🔧 Operação (exemplos, bulk, hierarquia, checklists, troubleshooting)
 
-```typescript
-// Via Factory (transporte definido pelo .env)
-const tm = getTaskManager(); // Retorna ClickUpAdapter se configurado
+Movidos para o irmão **[`clickup-operacao.md`](clickup-operacao.md)** em 2026-10-02, por
+*progressive disclosure* (`sdaal.md` §14.5): exemplos de uso, operações em lote, hierarquia de 3
+níveis, checklists nativos, troubleshooting e best practices. Este arquivo ficou com o **contrato e
+a implementação** — e com as **Notas Operacionais** abaixo, que são medição, não receita.
 
-// Criar task
-const task = await tm.createTask({
-  name: 'Nova Feature',
-  markdownDescription: '## Objetivo\nImplementar funcionalidade X',
-  priority: 'high',
-  tags: ['feature', 'v2']
-});
-
-// Criar subtask
-const subtask = await tm.createSubtask(task.id, {
-  name: 'Fase 1: Setup'
-});
-
-// Atualizar status
-await tm.updateStatus(subtask.id, 'in_progress');
-
-// Adicionar comentário com formatação Unicode
-await tm.addComment(task.id, [
-  '━━━━━━━━━━━━━━━━━━━━━━━',
-  '▶ Desenvolvimento iniciado',
-  `🕐 ${new Date().toISOString()}`
-].join('\n'));
-```
-
----
-
-## ⚡ Operações em Lote (Bulk)
-
-> Detalhe específico do ClickUp. Via abstração, o consumidor usa `createTask`/`createSubtask`; o adapter aplica internamente a regra abaixo.
-
-**Quando usar bulk:** criar múltiplas tasks **independentes no mesmo nível**; atualizar status de várias tasks.
-
-**Limitação crítica — bulk NÃO suporta hierarquia.** O endpoint de criação em lote **ignora** o `parent`. Para hierarquia (task → subtasks), use criação **sequencial** com `parent`:
-
-```javascript
-// ❌ ERRADO — parent ignorado no bulk
-await create_bulk_tasks({ tasks: [{ name: 'Sub 1', parent: mainId }, { name: 'Sub 2', parent: mainId }] });
-
-// ✅ CORRETO — sequencial preserva hierarquia
-const sub1 = await create_task({ name: 'Sub 1', parent: mainId });
-const sub2 = await create_task({ name: 'Sub 2', parent: mainId });
-```
-
-✅ bulk para: tasks independentes no mesmo nível · ❌ bulk para: hierarquia.
-
----
-
-## 🏗️ Hierarquia de Tasks (3 níveis)
-
-```
-📋 TASK (objetivo de alto nível)
-├── 🔧 Subtask 1 (componente)
-│   ├── ✅ Checklist item 1.1
-│   └── ✅ Checklist item 1.2
-└── 🔧 Subtask 2
-    └── ✅ Checklist item 2.1
-```
-
-**Implementação correta** — transporte default = **REST API** do adapter (`create_task` mapeia para `POST /list/{id}/task`); o `mcp__clickup__*` é apenas o transporte **opcional** via `TASK_MANAGER_TRANSPORT=mcp`:
-
-```javascript
-// 1. Task principal
-const mainTask = await create_task({
-  name: '🎯 Implementar Autenticação JWT',
-  listId: '<list_id>',
-  markdownDescription: '## 🎯 Objetivo\nImplementar JWT...\n\n## ✅ Critérios\n- [ ] Login retorna JWT\n- [ ] Refresh funciona',
-  tags: ['feature', 'security'], priority: 'high'   // domínio: o adapter traduz para markdown_content + priority INTEIRO
-});
-
-// 2. Subtasks com parent (← CRITICAL para hierarquia)
-const sub1 = await create_task({ name: '🔧 Backend JWT Service', listId: '<list_id>', parent: mainTask.id, tags: ['subtask', 'backend'] });
-const sub2 = await create_task({ name: '🔧 Frontend Integration', listId: '<list_id>', parent: mainTask.id, tags: ['subtask', 'frontend'] });
-
-// 3. Comentário de setup (formatação Unicode — ver seção de Formatação)
-await create_task_comment({ task_id: mainTask.id, comment_text: '🚀 TASK SETUP COMPLETO\n━━━━━━━━━━━━\n▶ Subtasks: 2\n⏰ ' + new Date().toISOString() });
-```
-
----
-
-## ✅ Checklists Nativos
-
-Checklists nativos do ClickUp (diferentes de checkboxes em markdown) oferecem tracking interativo (resolved/unresolved), progresso visual e leitura via API. O Sistema Onion suporta estrutura híbrida: checkboxes em markdown (documentação) + checklists nativos (tracking).
-
-**Leitura e cálculo de progresso** (incluir `include_subtasks: true` — o legado `subtasks: true` NÃO funciona):
-
-```javascript
-const task = await getTask({ task_id: '<id>', include_subtasks: true });
-
-function calculateProgress(task) {
-  let total = 0, resolved = 0;
-  (task.checklists || []).forEach(c => { total += c.unresolved + c.resolved; resolved += c.resolved; });
-  return total > 0 ? (resolved / total * 100).toFixed(1) : 0;
-}
-// Progresso: `${calculateProgress(task)}%`
-```
-
----
-
-## 🔧 Troubleshooting (ClickUp)
-
-| Problema | Causa | Solução |
-|---|---|---|
-| Subtasks aparecem como tasks independentes | uso de `create_bulk_tasks` com `parent` | criar sequencial com `create_task({ parent })` (ver Hierarquia) |
-| Formatação quebrada em comments | markdown em comentário | usar Unicode visual (`━━━`, `▶`, `∟`); markdown só na descrição (`markdown_content` no request) |
-| Auto-update não funciona | `context.md` sem task-id ou mapeamento fase→subtask ausente | validar com `/engineer/validate-phase-sync`; conferir `TASK_MANAGER_PROVIDER` e credenciais |
-| Checklists/subtasks não aparecem | `get_task` com o legado `subtasks: true` (devolve 200 sem o campo) | usar `include_subtasks: true` |
-
----
-
-## 💡 Best Practices (ClickUp)
-
-1. **Hierarquia na ordem certa**: task principal → subtasks com `parent` → comentário de setup.
-2. **Formatação por contexto**: descrição em Markdown (`markdown_content` no request); comentários em Unicode visual.
-3. **Sempre timestamp + status** em comentários de progresso.
-4. **Mapeamento fase→subtask** obrigatório no `context.md` da sessão.
-5. **Validar estrutura** após criação (`getTask({ include_subtasks: true })` → conferir `subtasks.length`).
-
----
 
 ## ⚠️ Notas Operacionais
 
@@ -926,7 +855,10 @@ function calculateProgress(task) {
   saída: `resolveStatusForTask` lê `GET /list/{id}`, casa por sinônimos (`STATUS_SYNONYMS`) e devolve a
   **grafia exata da List**. Sem equivalente, o campo é **omitido com aviso** e a task mantém o status
   atual — nunca se inventa nome. `statusRaw` sempre preserva o valor original do provider.
-- **Prioridade**: ClickUp aceita `urgent | high | normal | low` como string ou `1 | 2 | 3 | 4` como número.
+- **Prioridade**: **só INTEIRO `1 | 2 | 3 | 4`** (1 urgent … 4 low). String **NÃO** é aceita —
+  medido ao vivo em 2026-10-02: `priority: "high"` devolve **`400 Priority invalid`**. Esta linha
+  dizia o contrário até hoje, 245 linhas depois do comentário que registra a medição; era ela que
+  alguém lia para decidir.
 
 ---
 
@@ -940,5 +872,5 @@ function calculateProgress(task) {
 
 ---
 
-**Versão**: 2.0.0
-**Atualizado em**: 2026-06-13
+**Versão**: 2.1.0
+**Atualizado em**: 2026-10-02

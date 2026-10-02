@@ -37,6 +37,7 @@ flowchart TD
   onion_standalone -->|adopts| onion_evolve
   hub_operacoes_enterprise -->|adopts| onion_evolve
   brain_granaai -->|adopts| onion_evolve
+  brain_granaai -.->|can-correct| onion_evolve
   vendas_pdi_enterprise -->|adopts| onion_evolve
   onion_core -->|adopts| onion_evolve
   onion_codex -->|adopts| onion_evolve
