@@ -3428,10 +3428,22 @@ _scan_relative_links() {
     # ESCOPO: pula o 1º nível de `inbox/` e `inbound/` (a chegada). `_processed/` CONTINUA julgado —
     # ali o core já triou, o conteúdo virou registro desta casa, e link quebrado volta a ser dívida
     # nossa. É a mesma fronteira que o R15.2 usa: o corpo do sinal é DADO até ser absorvido.
+    # A ISENÇÃO É POR PROCEDÊNCIA, NÃO POR PASTA — correção de Elenxo, 2026-10-02. A 1ª versão
+    # isentava `inbox/` e `inbound/` em QUALQUER repo, e isso inverte o sentido no adotante:
+    # `/meta:co-relay` diz, literalmente, que `inbox/` é "um sinal que O ADOTANTE ESCREVEU". Logo no
+    # core `inbox/` é chegada de terceiro (isentar é certo) e no adotante é produção PRÓPRIA —
+    # isentá-la lá desliga a guarda nos docs dele. O espelho vale para `inbound/`: no adotante é
+    # chegada do core (isentar), no core nem existe.
+    # `_processed/` SEMPRE julga: ali o conteúdo já foi triado e virou registro da casa.
     _rel_f="${f#"${REPO_ROOT}/"}"
     case "${_rel_f}" in
       docs/evolution/inbox/*/*|docs/evolution/inbound/*/*) : ;;   # subpasta (_processed/) → JULGA
-      docs/evolution/inbox/*|docs/evolution/inbound/*) continue ;; # chegada → intake, não julga
+      docs/evolution/inbox/*)
+        # chegada de terceiro SÓ no core (IS_DERIVED=0); no adotante é autoria dele → julga
+        [ "${IS_DERIVED}" -eq 0 ] && continue ;;
+      docs/evolution/inbound/*)
+        # chegada do core SÓ no adotante (IS_DERIVED=1); o core não tem este canal
+        [ "${IS_DERIVED}" -eq 1 ] && continue ;;
     esac
     dir="$(dirname "${f}")"
     while IFS=$'\t' read -r lineno target; do

@@ -36,8 +36,10 @@ description."*
 - `.claude/utils/task-manager/adapters/clickup.md` — os **três** sítios de escrita passam
   `markdown_content`; datas convertidas para ms (`toClickUpMs`); `mapPriorityToClickUp` passa a
   declarar `number`, não `string`; `time_estimate` passou a ser **enviado** (antes nunca era); e o
-  `updateTask`, que **não enviava `tags`**, agora envia. O exemplo de request no próprio adapter
-  também usava o campo de resposta — corrigido.
+  `updateTask` **continua NÃO enviando `tags`** — e isto é deliberado, ver a ⚠️ abaixo: tags no
+  body do PUT devolvem 200 sem efeito. Ele passou a **AVISAR** quando o chamador manda `tags`, em
+  vez de descartar calado. O exemplo de request no próprio adapter também usava o campo de
+  resposta — corrigido.
 
 **O que vocês devem fazer:** rodar `/meta:adopt --update` para receber a correção. Se vocês
 escreveram código próprio contra a instrução antiga, **confiram os três formatos** — o sintoma é

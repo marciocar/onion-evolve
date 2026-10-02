@@ -375,16 +375,16 @@ interface ValidationResult {
 /**
  * Mapeamento de status normalizado → provedor.
  */
-const STATUS_MAPPING: Record<TaskManagerProvider, Record<TaskStatus, string>> = {
-  clickup: {
-    backlog: 'backlog',
-    todo: 'to do',
-    in_progress: 'in progress',
-    review: 'review',
-    done: 'done',
-    closed: 'closed',
-    canceled: 'closed'
-  },
+// `Partial` porque ClickUp foi REMOVIDO deste mapa (ver a nota abaixo) — o tipo total mentiria.
+const STATUS_MAPPING: Partial<Record<TaskManagerProvider, Record<TaskStatus, string>>> = {
+  // ⚠️ ClickUp NÃO TEM ENTRADA AQUI, e a ausência é deliberada — removida em 2026-10-02 por um
+  // Elenxo que a pegou. Status no ClickUp são propriedade da LIST, não do workspace: a List que um
+  // adotante mediu oferece `… testing, pull request, done, Closed` e NÃO TEM `review`. Um mapa fixo
+  // `review: 'review'` aqui devolve **`400 Status not found`** — e era exatamente esta tabela,
+  // byte-a-byte, que o adapter tinha e que o PR do dia aboliu. Mantê-la aqui reinstalava o bug pelo
+  // caminho pior: `types.md` é o contrato que a sessão lê ANTES do adapter, e viaja vendorizado.
+  // Para ClickUp use `ClickUpAdapter.resolveStatusForTask`, que resolve contra `GET /list/{id}`.
+  // Lição da classe: abolir um mapa no consumidor e deixá-lo na SSOT não aboliu nada.
   asana: {
     backlog: 'To Do',        // Mapeado para seção
     todo: 'To Do',

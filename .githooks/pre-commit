@@ -140,7 +140,7 @@ if [ -r "${_REGEN_LIB}" ]; then
   # shellcheck source=/dev/null
   . "${_REGEN_LIB}"
 else
-  echo "⚠️  onion-regen-lib.sh AUSENTE — projeções NÃO serão regeneradas; as REGRAS 16/39/62/80/81/84 vão acusar."
+  echo "⚠️  onion-regen-lib.sh AUSENTE — projeções NÃO serão regeneradas; as REGRAS 8/21/24/31/38/39/62/80/81/84 vão acusar."
   onion_regen() { :; }; onion_staged() { :; }
 fi
 
@@ -161,7 +161,7 @@ _V="${REPO_ROOT}/.claude/validation"
 [ -n "$(onion_staged 'docs/evolution/federation/members.yaml')" ] \
   && [ -f "${_V}/federation-console.sh" ] \
   && onion_regen docs/onion/federation-console.html 24 bash "${_V}/federation-console.sh"
-[ -n "$(onion_staged '.claude/commands' '.claude/agents' '.claude/skills' 'docs/knowledge-base')" ]   && [ -f "${_V}/inventory.sh" ]   && onion_regen docs/onion/inventory.md 16 bash "${_V}/inventory.sh" --markdown
+[ -n "$(onion_staged '.claude/commands' '.claude/agents' '.claude/skills' 'docs/knowledge-base')" ]   && [ -f "${_V}/inventory.sh" ]   && onion_regen docs/onion/inventory.md 8 bash "${_V}/inventory.sh" --markdown
 # O MAPA e o GRAFO fecham a tabela, e as duas lacunas foram descobertas pelo gate neste mesmo PR:
 # · REGRA 38 (mapa da federação) deriva do members.yaml — registrar um adotante deixava o mapa
 #   defasado e o commit barrado, com a correção óbvia e manual.
@@ -179,6 +179,16 @@ if [ -n "$(onion_staged '*.kg.yaml')" ]; then
   [ -f "${_V}/kg-trace-resolve.sh" ]     && onion_regen docs/onion/kg-read-index.tsv 84 bash "${_V}/kg-trace-resolve.sh" . --emit-index
   # o projetor de backlog custa ~14s por invocação (medido) — por isso só com .kg.yaml staged
   [ -f "${_V}/kg-backlog-project.sh" ]     && onion_regen docs/backlog.md 62 bash "${_V}/kg-backlog-project.sh" --markdown
+  # A LENTE (REGRA 31) estava fora, e o Elenxo a PROVOU: bastou tocar um `.kg.yaml` com lente para
+  # a HARD aparecer. O bloco de `*.kg.yaml` regenerava o índice e o backlog e não a lente — a classe
+  # exata que esta tabela existe para fechar, dentro do próprio bloco que a fecha para os irmãos.
+  if [ -f "${_V}/kg-view.sh" ]; then
+    for _lens in $(git ls-files 'docs/onion/graph/*-radar.md' 'docs/**/*-radar.md' 2>/dev/null); do
+      _lens_kg="${_lens%-radar.md}.kg.yaml"
+      [ -f "${REPO_ROOT}/${_lens_kg}" ] || continue
+      onion_regen "${_lens}" 31 bash "${_V}/kg-view.sh" "${_lens_kg}" --markdown
+    done
+  fi
 fi
 
 # ── E O HASH DA REGRA 56 RE-CARIMBADO, senao a cura acima cria outro defeito ─────────────────
@@ -193,7 +203,17 @@ fi
 # A formula e a MESMA de review-artifact-check.sh (flags canonicos + exclusao de
 # `docs/evolution/review/`), senao hook e gate discordariam sobre o mesmo numero. Converge porque o
 # hash exclui o diretorio de review: re-adicionar o residuo nao altera o valor.
-if [ -n "${_RES_STAGED:-}" ]; then
+# ⚠️ A ATRIBUIÇÃO FOI RESTAURADA em 2026-10-02, achado de Elenxo: ela havia sido apagada no commit
+# anterior e o consumidor virou `${_RES_STAGED:-}` — o `:-` calou o `set -u`, que era o ÚNICO
+# mecanismo capaz de gritar. Resultado: este bloco inteiro NUNCA executava, e o defeito
+# ARTEFATO-CADUCO que ele cura ficou descoberto. É a classe `exit-code-nao-e-a-verificacao`: o gate
+# saía verde porque não havia como ele saber. Nunca silencie `set -u` num consumidor sem conferir
+# que a atribuição existe — `:-` transforma variável-que-sumiu em string vazia plausível.
+# E a atribuição usa `onion_staged`, não um pipe próprio: a 1ª tentativa de restaurá-la reescreveu
+# `git diff … 2>/dev/null | head -1`, que é o fechador-precoce-sob-pipefail + erro-engolido que este
+# mesmo PR cura no `.tpl`. O helper já lê o rc e não tem pipe.
+_RES_STAGED="$(onion_staged 'docs/evolution/review/*.md')"
+if [ -n "${_RES_STAGED}" ]; then
   _r56_base="$(git merge-base origin/main HEAD 2>/dev/null || true)"
   if [ -n "${_r56_base}" ]; then
     _r56_sha="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color \
