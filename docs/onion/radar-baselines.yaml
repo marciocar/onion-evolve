@@ -48,9 +48,17 @@ axes:
     # (source != picker), nunca pelo /model — e a degradacao fica VISIVEL (log ladder=degraded + aviso a cada
     # prompt). settings.json:fallbackModel e PROJECAO desta escada (REGRA 70); comandos NAO declaram model:
     # (REGRA 71) — seguem a escada. Reorganizacao = rodada E6 (REGRA 65) + ops/model-lineup-probe.sh.
+    # ⚠️ SELO DIRETO DO MAESTRO (2026-10-03), e NAO uma rodada E6 — o `last_run` acima segue 2026-09-02
+    # de proposito: carimbar rodada que nao houve e o carimbo-sem-medicao. O gatilho foi a guarda
+    # VETANDO A TROCA DO PROPRIO MAESTRO para o Opus 5.5 default, 20 minutos depois de a rodada 6 do
+    # eixo E3 medir que `claude-opus-5-5` virou o Opus default na 2.1.280 e nao estava neste lineup.
+    # A guarda funcionou: barrou o que nao estava declarado, em vez de deixar passar em silencio.
     session_models:
       - claude-fable-5-1      # primario: sempre o maximo (doutrina)
-      - claude-opus-5         # fallback: sobrecarga/cota do primario
+      - claude-opus-5-5       # novo Opus DEFAULT da plataforma (2.1.280; 1M de contexto)
+      - claude-opus-5         # degrau anterior, MANTIDO: ordem = degradacao, e remover degrau fecha
+                              # fallback que hoje funciona (guarda-por-lista-falha-pelo-vocabulario:
+                              # conferir o diff pelo lado do que SAI)
     session_floor: claude-sonnet-5   # piso: so por fallback; degradacao visivel
     descartes: "4/25 estratégias reprovadas pelo juiz Elenxo (itens 1, 3, 18, 25) + 3 contagens corrigidas; preço do Fable 5.1 = catálogo, não medido"
     kg: docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
