@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**306 itens abertos** em 63 grafo(s) com aberto (de 86 no escopo) · 64 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**312 itens abertos** em 64 grafo(s) com aberto (de 87 no escopo) · 65 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -429,6 +429,17 @@
 | 7.2 | `Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP` | inbox-triage-2026-10 | O `_clean_baseline` NUNCA acha base num adotante cujo `docs/knowledge-base` mistura KBs locais com as do core — relato de brain- |
 | 5.1 | `I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU` | inbox-triage-2026-10 | O GATILHO DESTE ITEM GATED JA DISPAROU E NINGUEM REAVALIOU. O `adopt.md:685` diz, literalmente, "implementacao gated ate o 1o caso |
 | 3.0 | `Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM` | inbox-triage-2026-10 | TRES relatos de FALSO POSITIVO de gate, do hub gmill (sinal de 2026-09-30), arquivados sem triagem registrada — o commit de arqu |
+
+## radar-E3-2026-10-03-r6 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 14.4 | `Q_FLUXO_NAO_TEM_PASSO_DE_ABSORCAO` | radar-E3-2026-10-03-r6 | BURACO DE FLUXO 3 (de 3), apontado pelo maestro e o mais consequente: a etapa 5 do /meta:radar cobre veredito que DERRUBA decisao  |
+| 10.8 | `Q_FLUXO_NAO_CHECA_CONTIGUIDADE_DE_VERSAO` | radar-E3-2026-10-03-r6 | BURACO DE FLUXO 1 (de 3), apontado pelo maestro e medido: o eixo mede DELTA contra a baseline por desenho ("nunca re-deriva o que  |
+| 9.0 | `D_SESSION_MODELS_PRECISA_DO_OPUS_5_5` | radar-E3-2026-10-03-r6 | DECISAO PROPOSTA, o flip e do maestro (etapa 5 do /meta:radar: veredito que derruba decisao selada fica PROPOSTO). O `session_mode |
+| 6.4 | `Q_MOD_YOU_SHOULD_KNOW_E_UM_ELENXO_FRACO` | radar-E3-2026-10-03-r6 | A 2.1.287 (01/10) adiciona DUAS coisas que tocam a arquitetura desta casa: "Added Claude Mods: plugins may now modify deeper behav |
+| 5.1 | `Q_COMUNIDADE_E_EIXO_SEPARADO_E_NADA_CRUZA` | radar-E3-2026-10-03-r6 | BURACO DE FLUXO 2 (de 3), apontado pelo maestro: "visao da comunidade sobre a versao" NAO entra na rodada E3 por construcao. Medid |
+| 5.1 | `Q_SKILL_VERIFY_E_ABSORCAO_SEM_TROCAR_MECANISMO` | radar-E3-2026-10-03-r6 | A 2.1.286 (30/09) — e NAO a 2.1.287 como a 1a passada afirmou, e a versao errada era de DENTRO da janela que eu declarei selada  |
 
 ## identidade-onion-vps-2026-08 — 5 item(ns)
 
