@@ -84,7 +84,15 @@ for f in files:
             node=None
             continue
         if node is None: continue
-        km=re.match(r'^\s*(status|verified_at|source_tier|label):\s*(.*)$',line)
+        # ⚠️ `impact` e `confidence` ENTRAM por defeito medido (juiz do radar E3, rodada 6,
+        # 2026-10-03): a saída imprimia `tier=` e NÃO imprimia os dois, e eu tratei três nós tier 9
+        # — DOIS com impact 2 e um com confidence 0,4 e auto-rótulo "informação próxima de zero" —
+        # como COBERTURA SELADA de seis versões do Claude Code, isentando-me de medi-las. O juiz
+        # provou a falha colhendo um item de dentro da janela que eu declarei coberta.
+        # A LIÇÃO QUE A COLUNA CARREGA: tier alto é qualidade da FONTE, nunca extensão da COBERTURA.
+        # Quem usa o corpus para decidir o que NÃO medir precisa ler o quanto ele mediu — e esta cura
+        # faz essa leitura acontecer por DEFAULT, em vez de depender de eu abrir o grafo.
+        km=re.match(r'^\s*(status|verified_at|source_tier|impact|confidence|label):\s*(.*)$',line)
         if km:
             k,v=km.group(1),km.group(2).strip().strip("'\"")
             node[k]=v
@@ -95,5 +103,7 @@ for h in hits: h.pop("_hit",None)
 if json_out: print(json.dumps({"graphs":graphs,"terms":terms,"hits":hits},ensure_ascii=False,indent=1)); sys.exit(0)
 print(f"# corpus: {graphs} grafos · termos: {', '.join(terms)} · {len(hits)} nó(s)")
 for h in hits:
-    print(f"{h['grafo']}\t{h['id']}\t{h['status'] or '-'}\t{h['verified_at'] or '-'}\ttier={h['source_tier'] or '-'}\t{h['label'][:160]}")
+    print(f"{h['grafo']}\t{h['id']}\t{h['status'] or '-'}\t{h['verified_at'] or '-'}"
+          f"\ttier={h.get('source_tier') or '-'}\timp={h.get('impact') or '-'}"
+          f"\tconf={h.get('confidence') or '-'}\t{h['label'][:160]}")
 PY

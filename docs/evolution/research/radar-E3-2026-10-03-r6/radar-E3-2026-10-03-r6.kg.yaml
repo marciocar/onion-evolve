@@ -1,0 +1,246 @@
+# kg-backlog-guard: on
+# ═══ TETO: 14 NÓS ═══
+meta:
+  id: radar-E3-2026-10-03-r6
+  schema_version: "1"
+  baseline: 2026-10-03
+  review_after: 2026-11-17
+  supersedes_none: >
+    DESFECHO DE 1a CLASSE, e a 1a redacao desta linha era um DEFEITO DA MESMA ESPECIE que a
+    rodada inteira persegue: ela declarava `supersedes_external` apontando para
+    `radar-E3-2026-09-21-r5#E_CC_VERSION_DA_RODADA` — um no que NAO EXISTE. O r5 tem 15 nos e
+    nenhum se chama assim. Alvo de reconciliacao inventado e o mesmo erro que a atribuicao de
+    versao errada: forma impecavel sobre referente inexistente. Conferido por `grep '^  - id:'`
+    no grafo do r5, que e o unico jeito de saber.
+    MEDIDO CONTRA A BASELINE CERTA (a r5, e o ponteiro do eixo e `radar-baselines.yaml`, nao
+    memoria): NENHUM no da r5 fica falso por esta rodada. O no central dela —
+    `E_A_FABRICACAO_MUDOU_DE_PORTA_NAO_CAIU` — afirma que a fabricacao migrou da CITACAO para a
+    MEDICAO DO REPO, e isso segue verdadeiro; a r6 acrescenta uma TERCEIRA porta (a ATRIBUICAO
+    DE VERSAO) em vez de derrubar a segunda. Extensao de serie, nao Aufhebung.
+    O QUE A R6 CONSTRANGE SEM DERRUBAR, e fica nomeado aqui porque a aresta do motor e
+    intra-arquivo: a cura implicita do no `E_PULEI_O_CORPUS_E_ISSO_PRODUZIU_O_ACHADO_FALSO` da
+    r5 era "invocar o `kg-corpus-grep`". A r6 prova que invocar NAO BASTA — eu invoquei, e usei
+    a saida para me isentar de medir seis versoes. O fato da r5 permanece (pular o corpus
+    produziu achado falso); o que cai e a suficiencia da cura. Por isso a cura desta leva nao
+    e doutrinaria: o `kg-corpus-grep` passou a imprimir `imp=` e `conf=`.
+  # RODADA 6 do eixo E3 (Claude Code delta) — baseline anterior 2.1.278 (2026-09-21).
+  #
+  # ⚠️ ESTA RODADA FOI REPROVADA PELO JUIZ E REESCRITA: 1 aprovado, 5 reprovados, e a ISENÇÃO DE
+  # ESCOPO reprovada estruturalmente. O que está aqui é a versão PÓS-correção, medida por bloco de
+  # versão extraído do documento cru (`data/2.1.28*.txt`, 9 blocos, 990 itens) — não pela leitura
+  # resumida que produziu os 5 reprovados.
+  #
+  # ═══ A LIÇÃO DE MÉTODO DA RODADA, e é a 3ª morada da fabricação em 3 rodadas ═══
+  # rodada 5: a fabricação estava na MEDIÇÃO DO REPO (fonte local conserta a citação, não a medição).
+  # rodada 6: ela estava na ATRIBUIÇÃO DE VERSÃO — 4 dos 5 reprovados tinham o texto CERTO na versão
+  #           ERRADA. Citação verbatim impecável, ancorada em `<Update>` que não a contém. Conferir a
+  #           citação e conferir EM QUE VERSÃO ela mora são DOIS atos, e a 1ª passada fez só o 1º.
+  # rodada 6 (bis): e o CORPUS virou instrumento de ISENÇÃO. Na rodada 5 o erro foi PULAR o
+  #           `kg-corpus-grep`; nesta foi invocá-lo e ler o `id`+`tier` SEM ler `impact`, `confidence`
+  #           e o "no trecho lido". Três nós tier 9 — dois com impact 2, um com confidence 0,4 e
+  #           auto-rótulo "informação próxima de zero" — foram tratados como COBERTURA SELADA de 6
+  #           versões. TIER ALTO É QUALIDADE DA FONTE, NUNCA EXTENSÃO DA COBERTURA.
+  #           CURADO NESTA LEVA: o `kg-corpus-grep` passou a imprimir `imp=` e `conf=` junto de
+  #           `tier=`, para a isenção falhar na LEITURA em vez de falhar no juiz.
+  # rodada 6 (ter): o `WebFetch` sobre a página de 4 MB RESUME E TRUNCA, e inventou atribuição —
+  #           datou a 2.1.281 como "October 1" (é 23/09) e copiou a lista `Changed` dela para a
+  #           2.1.286. Instrumento errado para medir atribuição; o método certo é extrair por âncora
+  #           `id="2-1-NNN"` do documento cru, que é o que `data/` guarda.
+nodes:
+  - id: E_ESCOPO_REAL_NOVE_VERSOES
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'ESCOPO REAL da rodada: NOVE versões publicadas após a baseline 2.1.278 — 2.1.280 (22/09) a 2.1.288 (02/10) —, 990 itens somados. A 2.1.279 NAO EXISTE na fonte (lacuna genuína, desfecho de 1a classe). Datas monotônicas conferidas: 22, 23, 24, 25, 28, 29, 30/09 e 01, 02/10. A 1a passada mediu DUAS (287, 288) e declarou as outras cobertas pelo corpus — isenção REPROVADA pelo juiz, que provou colhendo um item da 2.1.286 de dentro da janela que eu dizia selada.'
+    trace: 'docs/evolution/research/radar-E3-2026-10-03-r6/data/ · projeção: docs/evolution/research/radar-E3-2026-10-03-r6/SYNTHESIS.md'
+    verified_against: 'extração por âncora id="2-1-NNN" do HTML cru (4.071.883 bytes, curl rc=0); os 9 blocos estão em data/2.1.28*.txt com bytes e contagem de itens por versão'
+
+  - id: E_OPUS_5_5_E_O_NOVO_DEFAULT_E_A_CASA_O_VETA
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'O ACHADO QUE A 1a PASSADA ENTERROU NUMA FRASE FALSA. A 2.1.280 (22/09) traz: "Added Claude Opus 5.5 (claude-opus-5-5), now the default Opus model — 1M context" e tambem "Changed the default model on Pro and Team Standard plans from Sonnet to Opus". A 2.1.284 (28/09) traz "Added Claude Sonnet 5.5 (claude-sonnet-5-5), now the default Sonnet model on the Anthropic API — 1M context". MEDIDO NO REPO: `session_models` do eixo E6 lista APENAS claude-fable-5-1 e claude-opus-5; `grep -rl opus-5-5` no repo devolve ZERO. A `premodelswitch-guard.sh` nega o que nao esta na lista (l.79) — logo A CASA VETA HOJE A TROCA PARA O OPUS DEFAULT DA PLATAFORMA, e nao sabe que o modelo existe. Eu havia declarado "2.1.279 e 2.1.280 nao aparecem no changelog": a metade sobre a 280 era FALSA, e era a metade que carregava o item de maior consequencia do delta inteiro.'
+    trace: 'docs/onion/radar-baselines.yaml'
+    verified_against: 'data/2.1.280.txt e data/2.1.284.txt (verbatim); grep em docs/onion/radar-baselines.yaml l.49-52 e grep -rl opus-5-5 = 0 sitios'
+
+  - id: D_SESSION_MODELS_PRECISA_DO_OPUS_5_5
+    node_type: decision
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: open
+    verified_at: '2026-10-03'
+    label: 'DECISAO PROPOSTA, o flip e do maestro (etapa 5 do /meta:radar: veredito que derruba decisao selada fica PROPOSTO). O `session_models` do E6 foi selado em 2026-09-03 com a ESCADA fable-5-1 (primario) -> opus-5 (fallback) e piso sonnet-5. A plataforma trocou os defaults de Opus E de Sonnet desde entao. As opcoes: (a) acrescentar claude-opus-5-5 ao lineup e claude-sonnet-5-5 ao piso, mantendo fable-5-1 primario — menor mudanca, respeita a doutrina "sempre o maximo"; (b) re-medir a escada inteira, porque "maximo" pode ter mudado de ocupante; (c) nao mexer e declarar que a casa fica no lineup antigo de proposito. ⚠️ O QUE NAO SE DEVE FAZER e o que eu quase fiz: editar o lineup sem rodar o eixo E6 — a baseline do E6 tem `last_run` proprio e o numero vem DELE, nao desta rodada. GATILHO: o selo do maestro, ou a rodada do E6.'
+    trace: 'docs/onion/radar-baselines.yaml'
+    verified_against: 'E_OPUS_5_5_E_O_NOVO_DEFAULT_E_A_CASA_O_VETA; o eixo E6 tem last_run proprio e nao foi rodado nesta leva. REFORCO COLHIDO NA CONFERENCIA DE ATRIBUICAO (data/2.1.280.txt l.80, verbatim): "Changed an effort level saved before /effort became per-model to no longer apply to newly released models such as Opus 5.5; they start at their default until you pick a level" — logo a ESCADA da casa (model+effort por fase) nao herda effort em modelo novo, o que torna a (b) "re-medir a escada inteira" mais forte do que parecia: nao e so o nome do modelo que muda, e o effort efetivo. Conferido tambem que o `Added` do opus-5-5 mora na 2.1.280 l.2 e que as mencoes na 2.1.287/288 sao `Fixed`/`Changed` — a checagem que a 1a passada nao fez.'
+
+  - id: E_DOCTOR_PROMPT_AUDIT_MEDE_A_METADE_QUE_NINGUEM_MEDE
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'A 2.1.283 (25/09) adiciona: "Added /doctor prompt-audit (also /checkup prompt-audit) to audit your CLAUDE.md files, skills, agents and commands for prompting patterns written for older models". POR QUE ISTO E ALTO IMPACTO AQUI: o CLAUDE.md desta casa declara que o fosso esta nas 52.655 linhas de markdown que ACONSELHAM contra 26.596 de shell que REPROVAM — e a casa mede se GUARDA DISPARA, nunca se DOUTRINA ATERRISSA. Este comando audita exatamente a populacao nao-medida (CLAUDE.md, skills, agentes, comandos) e por um eixo que a casa nao tem: padroes escritos para MODELOS ANTIGOS. E a lacuna central que o re-forjar do /meta:evolve persegue, com um medidor de graca ja na plataforma.'
+    trace: 'docs/evolution/research/radar-E3-2026-10-03-r6/data/2.1.283.txt'
+    verified_against: 'verbatim em data/2.1.283.txt; a tese do fosso esta em CLAUDE.md (26.596 shell x 52.655 markdown)'
+
+  - id: Q_MOD_YOU_SHOULD_KNOW_E_UM_ELENXO_FRACO
+    node_type: question
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'A 2.1.287 (01/10) adiciona DUAS coisas que tocam a arquitetura desta casa: "Added Claude Mods: plugins may now modify deeper behavior" e "Added You should know, a built-in mod where a side agent watches your back and flags things you or Claude might miss". A SEGUNDA e um AGENTE-LATERAL QUE SINALIZA O QUE O CLAUDE PODE TER PERDIDO — isto e, a plataforma embutiu uma versao FRACA do papel do Elenxo, que nesta casa custa um subagente opus/high por leva. PERGUNTA: absorver (ligar e medir o que ele pega que o Elenxo nao pega, e vice-versa), costurar (usar como 1a passada barata antes do refutador caro), ou rejeitar com razao escrita? E o "Claude Mods" e substrato NOVO para guarda: hoje toda a maquinaria determinista da casa vive em hooks, e "plugins may modify deeper behavior" pode mudar onde uma guarda DEVE morar. GATILHO: dissecacao pelo /meta:dissect — e o censo de dissecacao ja existe para nao repagar nivel.'
+    trace: 'docs/evolution/research/radar-E3-2026-10-03-r6/data/2.1.287.txt'
+    verified_against: 'verbatim em data/2.1.287.txt, confirmado pelo juiz (A5 foi o UNICO achado aprovado da 1a passada, com as 3 citacoes e as versoes corretas)'
+
+  - id: E_PRETOOLUSE_VIROU_FAIL_CLOSED_NA_288
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'A 2.1.288 (02/10) — e SO ela, nao "287 e 288" como a 1a passada afirmou — corrige: "Fixed PreToolUse and PermissionRequest hooks being skipped when matching them failed or the tool input could not be serialized to JSON; the call is now blocked". O Onion tem DUAS guardas em PreToolUse, ambas com matcher `Bash`: `pretooluse-protect-main.sh` (veta FORCE-PUSH para main) e `pretooluse-merge-gate.sh` (veta `gh pr merge`, `gh api .../pulls/N/merge` e push NAO-force com alvo main). ⚠️ CORRECAO DO JUIZ, e ela importa: o commit em main NAO e barrado por essas guardas — e barrado pelo `.githooks/pre-commit`, mecanismo DIFERENTE. A 1a passada inflou o escopo delas, e o corpus JA media isso (audit-textual-gates-2026-09 / E_CURA_MERGE_GATE_2O_VETO). TETO: ambas desserializam `tool_input`, logo pertencem a classe corrigida; mas o matcher literal `Bash` torna "matching failed" implausivel para elas — o candidato real e matcher REGEX (o do kg-read-leg.sh). A alcancabilidade da condicao NAO FOI MEDIDA: isto e inferencia declarada, nao medicao.'
+    trace: '.claude/settings.json'
+    verified_against: 'data/2.1.288.txt verbatim; juiz mediu os dois scripts (39 e 65 linhas) e o .githooks/pre-commit l.31; corpus: E_CURA_MERGE_GATE_2O_VETO e C_CONTAGEM_POS_RODADA'
+
+  - id: Q_SKILL_VERIFY_E_ABSORCAO_SEM_TROCAR_MECANISMO
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'A 2.1.286 (30/09) — e NAO a 2.1.287 como a 1a passada afirmou, e a versao errada era de DENTRO da janela que eu declarei selada — adiciona: "Improved commit guidance: when your project or user skills include one named verify, Claude is now told to run it right before committing, except for docs-only and tests-only commits". MEDIDO: o Onion tem 13 skills e NENHUMA chamada `verify`. ⚠️ CORRECAO DO JUIZ: dizer que "o gate do Onion e exatamente um verify" e ANALOGIA minha — o changelog descreve skill que O MODELO E INSTRUIDO A RODAR (conselho), enquanto o gate desta casa roda no `.githooks/pre-commit` (mecanico, independe do modelo), e a doutrina trata as duas como categorias distintas, com a do Onion sendo a mais forte. ABSORCAO CORRETA: expor o gate TAMBEM como skill `verify`, SEM trocar o mecanismo pelo conselho. GATILHO: a proxima leva que tocar o gate.'
+    trace: '.claude/skills/'
+    verified_against: 'data/2.1.286.txt verbatim; find .claude/skills -iname "*verify*" = vazio; 13 skills no inventario'
+
+  - id: E_NAMESPACE_E_ATTRIBUTION_TOCAM_A_CASA
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 0.8
+    status: confirmed
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'Delta de plataforma que toca configuracao desta casa, das versoes que a 1a passada nao mediu: (a) 2.1.281 adiciona `"attribution": false` no settings.json para esconder atribuicao de commit e PR — e AVISA que "older CLI versions skip a settings file that holds it", o que e armadilha de compatibilidade para adotante em versao antiga; (b) 2.1.282 fez os namespaces `anthropic-skills` e `claude-ai` DEIXAREM DE CARREGAR como pasta de skill, arquivo de comando ou workflow, e mudou o alcance das regras `Skill(...)`; (c) 2.1.283 adiciona `availableModelsMatch: "exact"` e `deniedModels` como managed settings, que sao os primeiros controles de modelo por POLITICA e nao por doutrina. NENHUM destes foi medido antes porque caiam na janela que eu declarei coberta.'
+    trace: 'docs/evolution/research/radar-E3-2026-10-03-r6/data/'
+    verified_against: 'verbatim em data/2.1.281.txt, data/2.1.282.txt e data/2.1.283.txt'
+
+  - id: Q_FLUXO_NAO_CHECA_CONTIGUIDADE_DE_VERSAO
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_at: '2026-10-03'
+    label: 'BURACO DE FLUXO 1 (de 3), apontado pelo maestro e medido: o eixo mede DELTA contra a baseline por desenho ("nunca re-deriva o que ja foi selado"), e NADA checa CONTIGUIDADE — nao existe verificacao de que toda versao foi lida por ALGUMA rodada. Prova desta rodada: eu declarei 6 versoes cobertas por tres nos de OUTROS grafos, e o juiz provou que nao estavam; sem o juiz, 7 versoes ficariam permanentemente nao-medidas e NENHUM mecanismo acusaria. CURA BARATA E DETERMINISTICA: a baseline ja guarda `cc_version` por eixo; comparar a cc_version da rodada anterior com a atual e DECLARAR as versoes do intervalo que nenhuma rodada leu e ARITMETICA, nao pesquisa. GATILHO: a proxima rodada de qualquer eixo com `cc_version`.'
+    trace: 'docs/onion/radar-baselines.yaml'
+    verified_against: 'grep por contiguidade em .claude/validation/*.sh devolve so casos de shard de bancada; a baseline do E3 guarda cc_version desde a rodada 5'
+
+  - id: Q_COMUNIDADE_E_EIXO_SEPARADO_E_NADA_CRUZA
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    verified_at: '2026-10-03'
+    label: 'BURACO DE FLUXO 2 (de 3), apontado pelo maestro: "visao da comunidade sobre a versao" NAO entra na rodada E3 por construcao. Medido: o E3 nao declara fonte nenhuma em radar-sources.yaml (vive da fonte local/changelog), e a comunidade e um eixo PROPRIO com HN (tier 4), r/ClaudeAI (tier 3, "frequentemente inalcancavel: lacuna declarada, nao finding") e o tracker oficial de issues (tier 6, "dor real de uso"). Os dois eixos tem `last_run` independentes e NADA os cruza. PERGUNTA DE DESENHO: o E3 deveria puxar as issues DA VERSAO (o que quebrou para quem usa), ou isso e do eixo comunidade? Hoje a resposta e "nenhum dos dois faz", porque o E3 nao olha e o eixo comunidade nao e por versao. GATILHO: a proxima rodada do eixo comunidade, ou um sinal de adotante sobre regressao de versao.'
+    trace: 'docs/onion/radar-sources.yaml'
+    verified_against: 'grep de E3 em radar-sources.yaml = sem bloco de fontes; o eixo `comunidade` existe com 3 fontes e last_run proprio'
+
+  - id: Q_FLUXO_NAO_TEM_PASSO_DE_ABSORCAO
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_at: '2026-10-03'
+    label: 'BURACO DE FLUXO 3 (de 3), apontado pelo maestro e o mais consequente: a etapa 5 do /meta:radar cobre veredito que DERRUBA decisao selada (fica PROPOSTO, flip e humano), mas NAO HA PASSO PARA ABSORVER CAPACIDADE NOVA. O fluxo sabe refutar diretiva e nao sabe adotar mecanismo. Provas vivas desta mesma rodada, todas mecanismo de graca sem lugar no fluxo: a skill `verify` invocada antes do commit (2.1.286), o `/doctor prompt-audit` que mede a metade nao-medida do fosso (2.1.283), e o mod "You should know" que e um Elenxo fraco embutido (2.1.287). Os tres viram no e esperam. PERGUNTA: o passo de absorcao e do radar (que descobre) ou do /meta:dissect (que ja tem a escada de 5 niveis e os 4 vereditos)? A resposta provavel e dissect, e entao o radar precisa de UMA linha: achado de capacidade nova SAI daqui com destino nomeado. GATILHO: o re-forjar do /meta:evolve, que e onde o laço inteiro se re-desenha.'
+    trace: '.claude/commands/meta/radar.md'
+    verified_against: 'etapa 5 de radar.md cobre apenas veredito que derruba decisao selada; os tres achados de capacidade desta rodada nao tem destino no fluxo'
+
+  - id: E_WEBFETCH_RESUME_E_INVENTA_ATRIBUICAO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'ACHADO DE INSTRUMENTO, medido duas vezes nesta rodada: o `WebFetch` sobre a pagina de changelog (4.071.883 bytes) RESUME e TRUNCA, e ao fazer isso INVENTA ATRIBUICAO. Provas: (1) datou a 2.1.281 como "October 1, 2026" quando a ancora do documento cru diz 23/09, ordem que seria impossivel porque a 2.1.286 e de 30/09; (2) copiou a lista `Changed` inteira da 2.1.281 para a 2.1.286, identica item a item; (3) declarou que "a 2.1.280 nao aparece completa no documento" quando ela tem 114 itens. CONSEQUENCIA DE METODO: para medir ATRIBUICAO de versao, o WebFetch e o instrumento ERRADO. O certo e extrair por ancora `id="2-1-NNN"` do HTML cru e guardar os blocos como DADO (data/), que torna cada citacao falsificavel sem re-buscar. E a mesma familia de `testar-no-caminho-errado-e-nao-testar`: o resumo e uma projecao, nao a fonte.'
+    trace: 'docs/evolution/research/radar-E3-2026-10-03-r6/data/'
+    verified_against: 'duas chamadas de WebFetch contra a mesma URL, com atribuicoes divergentes entre si e divergentes da extracao por ancora; os 9 blocos crus estao em data/'
+
+  - id: E_CORPUS_VIROU_INSTRUMENTO_DE_ISENCAO
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'A LICAO QUE VALE MAIS QUE OS ACHADOS, e ela e contra mim. Na rodada 5 o erro foi PULAR o `kg-corpus-grep`. Nesta rodada eu o invoquei — e usei o resultado para me ISENTAR DE MEDIR: li o `id` e o `tier=9` de tres nos e declarei 6 versoes cobertas. O que eu NAO li estava nos mesmos nos: dois com `impact: 2`, um com `confidence: 0.4` e auto-rotulo "informacao proxima de ZERO e nao deve inflar a cobertura", e um terceiro cujo proprio verified_against diz "leitura por trecho, nao medicao" e teve votacao 2-1. TIER ALTO E QUALIDADE DA FONTE, NUNCA EXTENSAO DA COBERTURA. CURA MECANICA APLICADA NESTA LEVA (proposta pelo proprio juiz): o `kg-corpus-grep` passou a imprimir `imp=` e `conf=` ao lado de `tier=`, de modo que a isenção falhe na LEITURA em vez de falhar no juiz. Provado: os tres nos agora saem como tier=9 imp=2 conf=0.4 / imp=2 conf=0.5 / imp=2 conf=0.6.'
+    trace: '.claude/validation/kg-corpus-grep.sh'
+    verified_against: 'kg-corpus-grep.sh rodado depois da cura imprime imp= e conf=; os tres nos foram lidos e seus campos conferidos um a um'
+
+  - id: E_JUIZ_REPROVOU_CINCO_DE_SEIS
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-03'
+    label: 'PLACAR DA RODADA, para a proxima nao herdar numero inflado: 1 APROVADO (A5, Claude Mods/You should know, as tres citacoes verbatim com versao correta), 5 REPROVADOS (A1 metade falsa sobre a 2.1.280; A2 versao errada; A3 inflacao do escopo das guardas + contradicao com no confirmed do corpus; A4 versao errada vinda de dentro da janela "selada" + analogia apresentada como medicao; A6 atribuicao errada), 1 LACUNA GENUINA (2.1.279 nao existe na fonte). Mais a ISENCAO DE ESCOPO reprovada estruturalmente, com prova auto-executavel: o juiz colheu um item da 2.1.286, de dentro da janela que eu declarei coberta. Custo do juiz: 122.349 tokens, 26 chamadas, 5,6 min.'
+    trace: 'docs/onion/radar-baselines.yaml'
+    verified_against: 'juiz opus/high em worktree isolada, mandato REFUTAR, abriu a fonte (HTTP 200, 4.071.840 bytes, 19.245 linhas, 154 cabecalhos de versao) e mediu o repo'
+
+edges:
+  - from: E_ESCOPO_REAL_NOVE_VERSOES
+    to: E_OPUS_5_5_E_O_NOVO_DEFAULT_E_A_CASA_O_VETA
+    edge_type: SUPPORTS
+  - from: E_OPUS_5_5_E_O_NOVO_DEFAULT_E_A_CASA_O_VETA
+    to: D_SESSION_MODELS_PRECISA_DO_OPUS_5_5
+    edge_type: SUPPORTS
+  - from: E_ESCOPO_REAL_NOVE_VERSOES
+    to: E_NAMESPACE_E_ATTRIBUTION_TOCAM_A_CASA
+    edge_type: SUPPORTS
+  - from: E_DOCTOR_PROMPT_AUDIT_MEDE_A_METADE_QUE_NINGUEM_MEDE
+    to: Q_FLUXO_NAO_TEM_PASSO_DE_ABSORCAO
+    edge_type: SUPPORTS
+  - from: Q_SKILL_VERIFY_E_ABSORCAO_SEM_TROCAR_MECANISMO
+    to: Q_FLUXO_NAO_TEM_PASSO_DE_ABSORCAO
+    edge_type: SUPPORTS
+  - from: Q_MOD_YOU_SHOULD_KNOW_E_UM_ELENXO_FRACO
+    to: Q_FLUXO_NAO_TEM_PASSO_DE_ABSORCAO
+    edge_type: SUPPORTS
+  - from: E_CORPUS_VIROU_INSTRUMENTO_DE_ISENCAO
+    to: Q_FLUXO_NAO_CHECA_CONTIGUIDADE_DE_VERSAO
+    edge_type: SUPPORTS
+  - from: E_WEBFETCH_RESUME_E_INVENTA_ATRIBUICAO
+    to: E_ESCOPO_REAL_NOVE_VERSOES
+    edge_type: CONSTRAINS
+  - from: E_JUIZ_REPROVOU_CINCO_DE_SEIS
+    to: E_CORPUS_VIROU_INSTRUMENTO_DE_ISENCAO
+    edge_type: SUPPORTS
+  - from: E_JUIZ_REPROVOU_CINCO_DE_SEIS
+    to: E_PRETOOLUSE_VIROU_FAIL_CLOSED_NA_288
+    edge_type: CONSTRAINS
+  - from: Q_COMUNIDADE_E_EIXO_SEPARADO_E_NADA_CRUZA
+    to: Q_FLUXO_NAO_CHECA_CONTIGUIDADE_DE_VERSAO
+    edge_type: CONSTRAINS
