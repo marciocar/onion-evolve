@@ -1,3 +1,22 @@
+---
+reviewed_diff_sha256: d0a05b8d698c4b245ecaad7f782bed49b99d2c0a0fde27690796f6850c86ffe4
+findings_total: 6
+findings_real: 6
+tokens: 122349
+duration_min: 6
+verdict: REPROVADO_E_CURADO
+elenxo: sim
+nota: >
+  Juiz opus/high em worktree isolada, mandato REFUTAR, abriu a fonte (HTTP 200, 4.071.840 bytes,
+  19.245 linhas, 154 cabeçalhos de versão) E mediu o repo. Reprovou 5 dos 6 achados da 1ª passada
+  e, além deles, reprovou a ISENÇÃO DE ESCOPO estruturalmente — provou colhendo um item da
+  2.1.286, de dentro da janela que eu declarava coberta pelo corpus. REPROVADO_E_CURADO porque os
+  seis achados foram re-medidos bloco a bloco contra `data/2.1.28*.txt` (atribuição conferida uma
+  por uma: o `Added` do opus-5-5 mora na 2.1.280 l.2, as menções na 287/288 são Fixed/Changed) e
+  porque a causa-raiz ganhou cura MECÂNICA nesta mesma leva — o `kg-corpus-grep` passou a imprimir
+  `imp=` e `conf=` junto de `tier=`, para a isenção falhar na LEITURA em vez de falhar no juiz.
+---
+
 # Resíduo adversarial — `docs/radar-e3-r6-2026-10`
 
 **Data:** 2026-10-03 · **Eixo:** E3-claude-code-delta (rodada 6) · **Juiz:** opus/high, mandato
