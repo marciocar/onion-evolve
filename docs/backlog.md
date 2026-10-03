@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**303 itens abertos** em 63 grafo(s) com aberto (de 86 no escopo) · 64 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**306 itens abertos** em 63 grafo(s) com aberto (de 86 no escopo) · 64 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -369,6 +369,15 @@
 | 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
 | 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
 
+## guard-forge-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 18.0 | `D_A_FORJA_E_REUSAVEL_PORQUE_O_PROCEDIMENTO_E_O_MAIS_REPETIDO` | guard-forge-2026-10 | A DECISÃO QUE CRIOU A SUPERFÍCIE, e ela foi do maestro interrompendo uma forja à mão: "esta forja deveria ser reusável, ainda |
+| 10.2 | `C_GUARDA_DOGFOOD_E_INVOCAR_NAO_IMITAR` | guard-forge-2026-10 | CANDIDATO 2 A GUARDA, selado pelo maestro em 2026-10-02. DEFEITO DATADO: eu descrevi os passos do /meta:forge-guard como se os est |
+| 9.0 | `C_GUARDA_CASO_TESTA_COPIA_NAO_O_SUT` | guard-forge-2026-10 | CANDIDATO 3 A GUARDA, selado pelo maestro em 2026-10-02, e o de MAIOR impacto porque e a classe mais caruna da sessao: QUATRO ocor |
+| 7.2 | `C_GUARDA_PARIDADE_CARIMBO_IMPLICA_REGISTRO` | guard-forge-2026-10 | CANDIDATO 1 A GUARDA, selado pelo maestro em 2026-10-02. Predicado: `carimbo role: hub` IMPLICA `registro role: hub`. DEFEITO DATA |
+
 ## m2-bridge-logto-2026-07 — 7 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -410,12 +419,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 15.0 | `Q_REVISOR_SEM_SALDO_DERRUBA_TODO_PR` | review-gate-saldo-2026-09 | enquanto a conta de API do CI estiver sem saldo, TODO PR deste repo mergeia por dispensa em vez de aprovacao — o gate semantico  |
-
-## guard-forge-2026-10 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 14.4 | `D_A_FORJA_E_REUSAVEL_PORQUE_O_PROCEDIMENTO_E_O_MAIS_REPETIDO` | guard-forge-2026-10 | A DECISÃO QUE CRIOU A SUPERFÍCIE, e ela foi do maestro interrompendo uma forja à mão: "esta forja deveria ser reusável, ainda |
 
 ## inbox-triage-2026-10 — 5 item(ns)
 

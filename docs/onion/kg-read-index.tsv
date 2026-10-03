@@ -104,6 +104,7 @@
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_MEDIR_O_DONO_NAO_O_CARIMBO	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_ORFAO_EXIGE_TRES_PROVAS	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/hooks	E_AUTO_MODE_E_UMA_CAMADA_DE_PERMISSAO_QUE_O_ONION_NAO_USA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
+.claude/hooks/background-state-needs-evidence.sh	C_GUARDA_DOGFOOD_E_INVOCAR_NAO_IMITAR	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 .claude/hooks/bash-empty-result-guard.sh	E_POSTTOOLUSE_E_SINAL_POS_FATO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_session_hook_pulls	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/hooks/co-evolution-inbox-check.sh	E_timeout_is_load_bearing	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
@@ -358,6 +359,7 @@
 .claude/validation/lint-rules.md	E_INDEX_LIVE_LENS	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	C_BANCADA_ACHA_O_QUE_LEITURA_NAO_ACHA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.claude/validation/lint-selftest.sh	C_GUARDA_CASO_TESTA_COPIA_NAO_O_SUT	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	C_OPCAO_F_ABSORVER_TESTE_DE_MUTACAO_DE_REGRA	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	C_TESTE_QUE_AFIRMA_AUSENCIA_PASSA_DE_GRACA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	C_offline_csp	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
@@ -1478,6 +1480,7 @@ docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS.md_SINGLE_SOURCE_
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS.md_TARGETING_SCHEMA_OPEN	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS.md_TOOL_POISONING_STAT_DOWNGRADED	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS.md_VPS_SUFFICES	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
+docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml	C_GUARDA_PARIDADE_CARIMBO_IMPLICA_REGISTRO	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml	D_TYPED_DECISION_PRIMITIVE_ONION_2026_10	docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml
 docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml	C_OPCAO_D_CLOSE_GAPS_FIRST	docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml
 docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml	Q_ONION_COULD_BECOME_THIS	docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml

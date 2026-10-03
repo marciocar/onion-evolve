@@ -1,5 +1,11 @@
 # kg-backlog-guard: on
-# ═══ TETO: 8 NÓS ═══
+# ═══ TETO: 11 NÓS ═══
+# ⚠️ SUBIDO DE 8 PARA 11 em 2026-10-02, e a razão importa porque ontem eu quase subi um teto pelo
+# motivo ERRADO: no `fios-abertos` o teto acusou uma violação de FRONTEIRA (fato no lugar do
+# compromisso) e subi-lo teria consertado o número mantendo a doença. AQUI é diferente e verificável:
+# os 3 nós novos são a CONTINUAÇÃO DA MESMA ONDA — os três candidatos a guarda que esta forja produziu,
+# cada um com defeito medido e datado hoje, selados pelo maestro. Não é onda nova sobre onda
+# não-colhida (o que a REGRA 58 existe para barrar): é a onda desta forja terminando de se declarar.
 meta:
   id: guard-forge-2026-10
   schema_version: "1"
@@ -98,7 +104,52 @@ nodes:
     label: 'A DECISÃO QUE CRIOU A SUPERFÍCIE, e ela foi do maestro interrompendo uma forja à mão: "esta forja deveria ser reusável, ainda mais sendo uma forja que primeiro forjou o molde, testa o molde". Eu estava fazendo o one-off do procedimento que esta casa repete MAIS que qualquer outro — `fix-must-become-mechanism` cometido um nível acima. MEDIDO antes de criar superfície, porque a objeção `N=1` da forja de comandos se aplicaria: 206 famílias de bancada e 13 guardas com `--selftest` próprio (pré-leva). Não é N=1; é o procedimento mais repetido e o único que não tinha medidor, logo a sessão escolhia o substrato por LEMBRANÇA. FICA OPEN porque o selo é do maestro e porque a prova final é a próxima forja: usar o comando do passo 1 ao 10 para forjar a guarda da classe "artefato cujo teste não exercita o caminho real de invocação" (E_BANCADA_VERDE_COM_ARTEFATO_INUTIL), que é defeito medido e datado e portanto alvo legítimo. GATILHO: a próxima guarda a nascer nesta casa nasce PELO comando, ou a superfície é declaração.'
     verified_against: 'censo: 206 famílias e 13 guardas pré-leva; forge-census mede esta superfície em 6/7 com a peça 4 declarada ausente por desenho'
 
+  - id: C_GUARDA_PARIDADE_CARIMBO_IMPLICA_REGISTRO
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_at: '2026-10-02'
+    label: 'CANDIDATO 1 A GUARDA, selado pelo maestro em 2026-10-02. Predicado: `carimbo role: hub` IMPLICA `registro role: hub`. DEFEITO DATADO: a promocao de um adotante a hub chegou ao core por SINAL DELE, nao por guarda — a REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela) declara fronteira `kind: door`, logo NENHUMA guarda compara registro x carimbo de ADOTANTE, e o registro ficou com TRES derivas sem nada acusar. ⚠️ NAO USE O PREDICADO OBVIO: paridade CEGA em adotante JA FOI MEDIDA COMO ERRADA aqui — o refutador rodou o censo contra o vivo e achou 18 comparaveis com 12 DIVERGENTES, porque em adotante o `role:` do registro diz TIER NA REDE e o do carimbo diz RELACAO COM O FRAMEWORK (`standalone`+`adopted` e CORRETO), e existe caso (g) de bancada protegendo essa fronteira semantica. O unidirecional funciona porque `hub` e o UNICO valor que existe nos dois vocabularios e neles CONVERGE (ser hub e o tier E a relacao). MEDIDO: com esse predicado hoje haveria UM achado — `metagamify`, registro `hub` x carimbo `adopted`, que e o espelho exato da deriva curada no PR #905. SUBSTRATO: check de lint (o fato vive em arquivos, nao em prosa de turno); molde = `door-role-parity-check.sh`, que ja faz a leitura cruzada com YAML de verdade. TETO a declarar na guarda: ela so julga o que pode LER (o carimbo vive no clone, resolvido por `local_path`; em CI declara NAO-MEDIDO).'
+    trace: 'docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml'
+    verified_against: 'door-role-parity-check.sh rodado em 2026-10-02 (rc=0, saida vazia, filtro kind==door na l.87); censo de divergencia do refutador: 18 comparaveis, 12 divergentes'
+
+  - id: C_GUARDA_DOGFOOD_E_INVOCAR_NAO_IMITAR
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: open
+    verified_at: '2026-10-02'
+    label: 'CANDIDATO 2 A GUARDA, selado pelo maestro em 2026-10-02. DEFEITO DATADO: eu descrevi os passos do /meta:forge-guard como se os estivesse seguindo — "Passo 1 (medir)", "seguindo o procedimento" — SEM INVOCAR o comando, e o maestro me pegou ("dogfood e usar, nao?"). O passo 1 manda consultar o censo para saber se a classe ja esta coberta, e foi exatamente isso que refutou a minha proposta — mas eu descobri LENDO O ARQUIVO, nao pelo mecanismo. Por sorte de rota o resultado ficou certo. ⚠️ O AGRAVANTE QUE JUSTIFICA GUARDA E NAO PROSA: a doutrina de dogfood ESTAVA CARREGADA no CLAUDE.md:290-292, dizendo literalmente "invoque o artefato e observe", quando eu errei vinte minutos depois. E a prova de que placement em CLAUDE.md NAO e mecanismo — e `gatilho social e cura nula` um nivel acima: doutrina carregada e cura fraca. SUBSTRATO: hook Stop, MESMO do `background-state-needs-evidence` — cruzar a prosa do turno com as chamadas do turno, trocando `ps` por `Skill`. A diferenca entre "estou seguindo o /meta:forge-guard" COM e SEM o Skill no turno e o que o harvester daquele hook ja sabe ler. TETO: a forma da afirmacao e lista (vocabulario), e ela erra para o lado de CALAR.'
+    trace: '.claude/hooks/background-state-needs-evidence.sh'
+    verified_against: 'medido na sessao de 2026-10-02: a doutrina esta em CLAUDE.md:290-292 e estava no contexto; o forge-census devolveu peca 3 AUSENTE porque o censo era instruido num bloco bash em vez de injetado'
+
+  - id: C_GUARDA_CASO_TESTA_COPIA_NAO_O_SUT
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    verified_at: '2026-10-02'
+    label: 'CANDIDATO 3 A GUARDA, selado pelo maestro em 2026-10-02, e o de MAIOR impacto porque e a classe mais caruna da sessao: QUATRO ocorrencias no mesmo dia de caso de bancada que exercita uma COPIA em vez do SUT. As duas formas medidas: (1) o caso COPIA o predicado para dentro de si — o `(d)` do r84_pathspec replicava o `case` do lint e testava a replica, e o mutante que tirava `*/index.lock` da isencao (fail-open REAL: `git commit -a` deixaria de ser julgado) passava 8/8 VERDE, com o rotulo dizendo "por EXECUCAO"; (2) o sandbox nasce de `git archive HEAD`, logo o caso testa o artefato COMMITADO e o mutante aplicado na ARVORE nunca chega la — cura do artefato CERTO, da REVISAO errada. O pior caso da classe: a guarda `background-state-needs-evidence` nasceu vetando TODO TURNO HONESTO em producao (212 vetos em 12.456 pontos de parada) com a bancada 6/6 VERDE, porque os 6 casos alimentavam uma funcao PURA e QUATRO dos cinco bloqueadores viviam no harvester. E o proprio `lint-selftest.sh` JA AVISA desta classe na l.514. CANDIDATO A PREDICADO (grepavel): familia que declara exercitar um SUT e nao o invoca pelo caminho do runner — nem por stdin/transcript quando o runner e hook, nem com o artefato da ARVORE quando monta sandbox de `git archive`. TETO declarado de antemao: ela vai pegar a FORMA (ausencia da invocacao), nao a semantica de "o caso mede o que diz medir".'
+    trace: '.claude/validation/lint-selftest.sh'
+    verified_against: 'quatro ocorrencias medidas em 2026-10-02 por mutante: (d) do r84_pathspec verde sobre fail-open; (a) do role_promotion verde com o defeito em outra sintaxe; sandbox de git archive cego a mutante da arvore; e os 6 casos puros do hook verdes sobre 212 vetos em producao'
+
 edges:
+  - from: E_BANCADA_VERDE_COM_ARTEFATO_INUTIL
+    to: C_GUARDA_CASO_TESTA_COPIA_NAO_O_SUT
+    edge_type: SUPPORTS
+  - from: E_SUPERFICIE_MORTA_NA_CARGA_PELO_PROPRIO_EXEMPLO
+    to: C_GUARDA_DOGFOOD_E_INVOCAR_NAO_IMITAR
+    edge_type: SUPPORTS
+  - from: D_A_FORJA_E_REUSAVEL_PORQUE_O_PROCEDIMENTO_E_O_MAIS_REPETIDO
+    to: C_GUARDA_PARIDADE_CARIMBO_IMPLICA_REGISTRO
+    edge_type: CONSTRAINS
+  - from: T_O_QUE_A_GUARDA_NAO_VE
+    to: C_GUARDA_DOGFOOD_E_INVOCAR_NAO_IMITAR
+    edge_type: CONSTRAINS
   - from: E_DEFEITO_QUE_FORJOU_A_GUARDA_STDOUT_VAZIO
     to: D_SUBSTRATO_HOOK_STOP_COPIANDO_O_MOLDE_MAIS_EXERCITADO
     edge_type: SUPPORTS
