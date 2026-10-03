@@ -114,6 +114,7 @@
 .claude/hooks/kg-read-leg.sh	Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_BURACO_INVOLUCROS_NOS_DOIS_VETOS	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/lib/invocation-lines.sh	E_CURA_LIB_INVOCACAO_PARTILHADA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.claude/hooks/premodelswitch-guard.sh	E_A_GUARDA_VETOU_O_PROPRIO_MAESTRO	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_ESCADA_DE_MODELOS_IMPLEMENTADA_0903	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_F11_MANAGED_SETTINGS_FAIL_LOUD	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_GUARDA_PREMODELSWITCH_APLICADA_0902	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml

@@ -1,5 +1,6 @@
 # kg-backlog-guard: on
-# ═══ TETO: 14 NÓS ═══
+# ═══ TETO: 15 NÓS ═══  (era 14; +1 porque a guarda VETOU A TROCA DO PROPRIO MAESTRO
+#     20 min depois de o grafo ser selado — evidencia que nao existia quando o teto foi posto)
 meta:
   id: radar-E3-2026-10-03-r6
   schema_version: "1"
@@ -75,10 +76,10 @@ nodes:
     node_type: decision
     plane: PROD
     impact: 5
-    confidence: 0.9
-    status: open
+    confidence: 0.95
+    status: done
     verified_at: '2026-10-03'
-    label: 'DECISAO PROPOSTA, o flip e do maestro (etapa 5 do /meta:radar: veredito que derruba decisao selada fica PROPOSTO). O `session_models` do E6 foi selado em 2026-09-03 com a ESCADA fable-5-1 (primario) -> opus-5 (fallback) e piso sonnet-5. A plataforma trocou os defaults de Opus E de Sonnet desde entao. As opcoes: (a) acrescentar claude-opus-5-5 ao lineup e claude-sonnet-5-5 ao piso, mantendo fable-5-1 primario — menor mudanca, respeita a doutrina "sempre o maximo"; (b) re-medir a escada inteira, porque "maximo" pode ter mudado de ocupante; (c) nao mexer e declarar que a casa fica no lineup antigo de proposito. ⚠️ O QUE NAO SE DEVE FAZER e o que eu quase fiz: editar o lineup sem rodar o eixo E6 — a baseline do E6 tem `last_run` proprio e o numero vem DELE, nao desta rodada. GATILHO: o selo do maestro, ou a rodada do E6.'
+    label: 'SELADA PELO MAESTRO EM 2026-10-03, no mesmo dia e pelo gatilho mais direto possivel: a guarda VETOU A TROCA DELE para o Opus 5.5 default, e ele liberou. Aplicado: `claude-opus-5-5` entra no lineup como degrau ACIMA do `claude-opus-5`, que FICA (ordem = degradacao; remover degrau fecharia fallback que hoje funciona). O `last_run` do eixo E6 NAO foi tocado — selo direto do maestro nao e rodada E6, e carimbar rodada que nao houve e o carimbo-sem-medicao. PROJECAO da REGRA 70 refeita pela formula do proprio lint (session_models[1:] + session_floor), nunca digitada. ⚠️ PARCIAL DECLARADA: o `session_floor` segue `claude-sonnet-5`, e a 2.1.284 traz `claude-sonnet-5-5` como novo Sonnet default — e o MESMO achado, nao autorizado nesta volta; o piso atual nao esta quebrado (o modelo existe), so nao e o maximo. GATILHO: o maestro dizer, ou a rodada do E6.\n--- redacao anterior (PROPOSTA), preservada: DECISAO PROPOSTA, o flip e do maestro (etapa 5 do /meta:radar: veredito que derruba decisao selada fica PROPOSTO). O `session_models` do E6 foi selado em 2026-09-03 com a ESCADA fable-5-1 (primario) -> opus-5 (fallback) e piso sonnet-5. A plataforma trocou os defaults de Opus E de Sonnet desde entao. As opcoes: (a) acrescentar claude-opus-5-5 ao lineup e claude-sonnet-5-5 ao piso, mantendo fable-5-1 primario — menor mudanca, respeita a doutrina "sempre o maximo"; (b) re-medir a escada inteira, porque "maximo" pode ter mudado de ocupante; (c) nao mexer e declarar que a casa fica no lineup antigo de proposito. ⚠️ O QUE NAO SE DEVE FAZER e o que eu quase fiz: editar o lineup sem rodar o eixo E6 — a baseline do E6 tem `last_run` proprio e o numero vem DELE, nao desta rodada. GATILHO: o selo do maestro, ou a rodada do E6.'
     trace: 'docs/onion/radar-baselines.yaml'
     verified_against: 'E_OPUS_5_5_E_O_NOVO_DEFAULT_E_A_CASA_O_VETA; o eixo E6 tem last_run proprio e nao foi rodado nesta leva. REFORCO COLHIDO NA CONFERENCIA DE ATRIBUICAO (data/2.1.280.txt l.80, verbatim): "Changed an effort level saved before /effort became per-model to no longer apply to newly released models such as Opus 5.5; they start at their default until you pick a level" — logo a ESCADA da casa (model+effort por fase) nao herda effort em modelo novo, o que torna a (b) "re-medir a escada inteira" mais forte do que parecia: nao e so o nome do modelo que muda, e o effort efetivo. Conferido tambem que o `Added` do opus-5-5 mora na 2.1.280 l.2 e que as mencoes na 2.1.287/288 sao `Fixed`/`Changed` — a checagem que a 1a passada nao fez.'
 
@@ -210,6 +211,18 @@ nodes:
     trace: 'docs/onion/radar-baselines.yaml'
     verified_against: 'juiz opus/high em worktree isolada, mandato REFUTAR, abriu a fonte (HTTP 200, 4.071.840 bytes, 19.245 linhas, 154 cabecalhos de versao) e mediu o repo'
 
+  - id: E_A_GUARDA_VETOU_O_PROPRIO_MAESTRO
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'O ACHADO SE PROVOU SOZINHO, 20 MINUTOS DEPOIS DE SER ESCRITO. O maestro trocou o modelo da sessao para o Opus 5.5 default pelo picker e a `premodelswitch-guard.sh` NEGOU, com a mensagem exata que o no E_OPUS_5_5 previa: "claude-opus-5-5 nao esta em session_models do eixo E6 (claude-fable-5-1 claude-opus-5)". Isto e o oposto de uma falha: a guarda barrou o que NAO ESTAVA DECLARADO em vez de deixar passar em silencio, e barrou o dono da casa — behavior-over-declaration exercido contra quem escreveu a doutrina. E e tambem a melhor medida de latencia que esta casa tem entre MEDIR um delta de plataforma e SENTIR o efeito dele: 20 minutos. DOGFOOD DA CURA (3 cargas reais no hook, log corroborando o rc): opus-5 -> opus-5-5 pelo picker = allow, ladder=restored; opus-5-5 -> haiku-3 = block (fora do lineup); opus-5-5 -> sonnet-5 pelo picker = block (piso so por fallback). As duas contraprovas importam porque liberar um modelo nao pode afrouxar a guarda — e nao afrouxou.'
+    trace: '.claude/hooks/premodelswitch-guard.sh'
+    verified_against: 'veto observado ao vivo na saida do /model do maestro (2026-10-03); depois 3 payloads reais no hook com rc 0/2/2 E o .claude/sessions/model-switch.jsonl registrando allow/block/block de forma independente do rc'
+
 edges:
   - from: E_ESCOPO_REAL_NOVE_VERSOES
     to: E_OPUS_5_5_E_O_NOVO_DEFAULT_E_A_CASA_O_VETA
@@ -244,3 +257,9 @@ edges:
   - from: Q_COMUNIDADE_E_EIXO_SEPARADO_E_NADA_CRUZA
     to: Q_FLUXO_NAO_CHECA_CONTIGUIDADE_DE_VERSAO
     edge_type: CONSTRAINS
+  - from: E_A_GUARDA_VETOU_O_PROPRIO_MAESTRO
+    to: D_SESSION_MODELS_PRECISA_DO_OPUS_5_5
+    edge_type: SUPPORTS
+  - from: E_A_GUARDA_VETOU_O_PROPRIO_MAESTRO
+    to: E_OPUS_5_5_E_O_NOVO_DEFAULT_E_A_CASA_O_VETA
+    edge_type: SUPPORTS
