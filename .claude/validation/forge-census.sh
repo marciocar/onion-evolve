@@ -127,10 +127,18 @@ _label_of() {  # o nome do candidato SAI do caminho, nunca de uma lista paralela
   esac
 }
 
-rows=""; ref_count=0
+rows=""; ref_count=0; dropped=""
 for rel in "${CANDS[@]}"; do
   f="${REPO}/${rel}"
-  [ -f "${f}" ] || continue
+  # ⚠️ RASTREADO-E-AUSENTE-DO-DISCO e um SEGUNDO corte, e ele era SILENCIOSO (achado do Elenxo do
+  #    PR #909, 2026-10-03). `total` conta o que `git ls-files` devolve; as LINHAS saem deste laco,
+  #    que pula quem nao esta no disco. Sao populacoes DIFERENTES — e a 1a versao da declaracao de
+  #    corte comparava `_shown` contra `total`, logo rotulava o ausente-do-disco como "cortado pelo
+  #    head": declarava corte onde nao houve (provado com FORGE_CENSUS_TOP=100000) e mandava usar
+  #    `--tsv`, que sofre o MESMO pulo. Um aviso contra corte silencioso que mentia sobre o corte
+  #    que nao viu. Agora o descarte tem NOME e contagem propria.
+  [ -f "${f}" ] || { dropped="${dropped}${rel}
+"; continue; }
   p2=0; p3=0; p4=0; p5=0; p6=0; p7=0
   _cites_doctrine "${f}" && p2=1
   _has_context  "${f}" && p3=1
@@ -164,15 +172,33 @@ printf 'peças | candidato | 2 doutrina | 3 contexto | 4 workflow | 5 destino | 
 #    A LICAO: projecao que corta sem dizer produz conclusao falsa sobre o que NAO esta na lista, e
 #    ausencia-por-corte e indistinguivel de ausencia-por-zero. Quem precisa do conjunto usa --tsv.
 MD_TOP="${FORGE_CENSUS_TOP:-12}"
+# ⚠️ TETO INVALIDO E RECUSA, nunca tabela vazia com rc=0 (achado do Elenxo do PR #909): com
+#    FORGE_CENSUS_TOP=abc o `head` erra duas vezes em stderr, a tabela sai VAZIA e o script sai 0 —
+#    e medidor cujo renderizador falhou nao pode declarar sucesso (exit-code-nao-e-a-verificacao).
+case "${MD_TOP}" in
+  ''|*[!0-9]*|0) printf 'forge-census: FORGE_CENSUS_TOP invalido (%s) — inteiro >= 1 ou vazio para o default 12. Recuso.\n' "${MD_TOP}" >&2; exit 3 ;;
+esac
 printf '%s\n' "${sorted_rows}" | awk -F'\t' 'NF>=8 && $2!=""{
   printf "%s/7 | %s | %s | %s | %s | %s | %s | %s\n", $1, $2, ($3?"sim":"—"), ($4?"sim":"—"),
          ($5?"sim":"—"), ($6?"sim":"—"), ($7?"sim":"—"), ($8?"sim":"—") }' | head -"${MD_TOP}"
+_rows_total=$(printf '%s\n' "${sorted_rows}" | awk -F'\t' 'NF>=8 && $2!=""' | wc -l)
 _shown=$(printf '%s\n' "${sorted_rows}" | awk -F'\t' 'NF>=8 && $2!=""' | head -"${MD_TOP}" | wc -l)
-if [ "${_shown}" -lt "${total}" ]; then
-  printf '\n⚠️ PROJECAO CORTADA: %s de %s candidatos acima (os de MAIS pecas). Os %s restantes NAO\n' \
-    "${_shown}" "${total}" "$((total - _shown))"
-  printf '   estao aqui e NAO sao zero — ausencia nesta lista nao e ausencia no censo. Para o\n'
+# O corte da PROJECAO compara contra o que foi MEDIDO (`_rows_total`), nunca contra `total` — os
+# dois so coincidem quando todo rastreado esta no disco, e foi essa coincidencia que escondeu o bug.
+if [ "${_shown}" -lt "${_rows_total}" ]; then
+  printf '\n⚠️ PROJECAO CORTADA: %s de %s candidatos MEDIDOS acima (os de MAIS pecas). Os %s restantes\n' \
+    "${_shown}" "${_rows_total}" "$((_rows_total - _shown))"
+  printf '   NAO estao aqui e NAO sao zero — ausencia nesta lista nao e ausencia no censo. Para o\n'
   printf '   conjunto: `bash .claude/validation/forge-census.sh . --tsv`.\n'
+fi
+# O descarte por AUSENCIA NO DISCO e outro corte, com outra cura: `--tsv` NAO o resolve, porque ele
+# acontece antes das linhas existirem. Por isso tem rotulo e lista proprios.
+_dropped_n=$(printf '%s' "${dropped}" | grep -c . || true)
+if [ "${_dropped_n}" -gt 0 ]; then
+  printf '\n⚠️ DESCARTADOS (rastreados pelo git, AUSENTES do disco): %s de %s. O `--tsv` NAO os traz —\n' \
+    "${_dropped_n}" "${total}"
+  printf '   eles caem antes da medicao. Indice e arvore divergiram; conserte o checkout:\n'
+  printf '%s' "${dropped}" | sed 's/^/     · /'
 fi
 printf '\n(peça 1 = a própria superfície, existe por construção; o censo mede PRESENÇA e REFERÊNCIA,\n'
 printf 'nunca qualidade. Fonte: forge-census.sh, descoberta por citação — o artefato nomeia as\n'

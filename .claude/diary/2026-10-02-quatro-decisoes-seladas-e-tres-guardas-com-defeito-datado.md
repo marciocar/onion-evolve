@@ -7,7 +7,7 @@ tags: [evolve, forge-guard, dogfood, elenxo, bancada, decisao-selada]
 affects: [meta, validation]
 breadcrumb_for: []
 share_with: []
-next_recommended: "RE-FORJAR O /meta:evolve pelo conjunto das 7 peças — selado pelo maestro em 2026-10-02. ⚠️ CORREÇÃO DE 2026-10-03, leia antes de usar o número: ele é 2/7 (tem a peça 5, destino), EMPATADO com 12 outros, e 37 candidatos estão ABAIXO dele em 1/7 — NÃO é 0/7 nem o menos estruturado. A causa do erro foi instrumento: a projeção markdown do forge-census cortava 12 de 59 EM SILÊNCIO (curado no mesmo dia; hoje ela declara o corte). E o enquadramento certo não vem da contagem, vem do corpus: C_TESE_AUTO_EVOLUCAO (maestro-vivo-2026-08, imp 5) mede que estamos à FRENTE no produto do laço e ATRÁS no GATILHO dele — o evolve não é fraco de estrutura, é sem gatilho. Derive FRESCO contra o vivo (não há plano pré-cozinhado aqui, de propósito): rode o forge-census, leia a cláusula-mãe abaixo, e trate os cinco órgãos (census/radar/drive/onion-research/forjas) como FASES do laço, não como substitutos dele. Os 3 candidatos a guarda também estão selados e cada um tem defeito datado — ordem recomendada: paridade, dogfood-invoke, caso-testa-cópia."
+next_recommended: "RE-FORJAR O /meta:evolve pelo conjunto das 7 peças — selado pelo maestro em 2026-10-02. ⚠️ CORREÇÃO DE 2026-10-03, leia antes de usar o número: ele é 2/7 (tem a peça 5, destino), EMPATADO com 12 outros, e 37 candidatos estão ABAIXO dele em 1/7 — NÃO é 0/7 nem o menos estruturado. A causa do erro foi instrumento: a projeção markdown do forge-census cortava 12 de 59 EM SILÊNCIO (curado no mesmo dia; hoje ela declara o corte). E o enquadramento certo não vem da contagem, vem do corpus: C_TESE_AUTO_EVOLUCAO (maestro-vivo-2026-08, imp 5) diz, VERBATIM, 'Não estamos atrás do eixo E2 — estamos à frente no PRODUTO do loop e atrás no GATILHO dele.' — o evolve não é fraco de estrutura, é sem gatilho, e são 65 dias sem rodar (não 32: aquele era o número de 2026-08-31). Relógio/cron NÃO está vedado a ele — o W7 escopa o driver, não o auditor read-only. Derive FRESCO contra o vivo (não há plano pré-cozinhado aqui, de propósito): rode o forge-census, leia a cláusula-mãe abaixo, e trate os cinco órgãos (census/radar/drive/onion-research/forjas) como FASES do laço, não como substitutos dele. Os 3 candidatos a guarda também estão selados e cada um tem defeito datado — ordem recomendada: paridade, dogfood-invoke, caso-testa-cópia."
 review_after: 2026-11-02
 conflict_class: static
 ---
@@ -59,11 +59,26 @@ transformaria a correção em propaganda, e porque o **modo de errar** é o que 
 
 **E o enquadramento certo não vem da contagem.** Vem do corpus, que já tinha a resposta com
 `impact: 5` e Elenxo sustentada-com-emendas — `C_TESE_AUTO_EVOLUCAO`
-(`docs/evolution/research/maestro-vivo-2026-08/`): *"não estamos atrás no eixo da auto-evolução —
-estamos à FRENTE no **produto** do laço e ATRÁS no **GATILHO** dele"*. O mesmo grafo guarda um Elenxo
-que derrubou 4 vereditos, um deles por **não-sequitur causal** ao explicar os 32 dias sem
-`/meta:evolve`. Ou seja: o evolve **não é fraco de estrutura, é sem gatilho** — e re-forjá-lo pelas 7
-peças sem lhe dar gatilho repetiria o erro com mais peças. `dissect` e `onion-research`, forjados nas últimas semanas, estão **7/7**. A casa
+(`docs/evolution/research/maestro-vivo-2026-08/`), **verbatim**: *"Não estamos atrás do eixo E2 —
+estamos à frente no PRODUTO do loop e atrás no GATILHO dele."* (gloss **fora** das aspas: o eixo E2 é
+o eixo self-improving do radar.) ⚠️ A 1ª redação desta correção deu como verbatim uma frase
+**adulterada** — "do eixo E2" virou "no eixo da auto-evolução", e "loop" virou "laço": substituição
+de conteúdo e tradução **dentro das aspas**. Reprovado pelo Elenxo do PR #909.
+
+O mesmo grafo guarda um Elenxo que derrubou 4 vereditos, um deles por **não-sequitur causal** ao
+explicar os dias sem `/meta:evolve`. ⚠️ E o número envelheceu: eram **32 dias em 2026-08-31**, são
+**65 em 2026-10-03** (medido contra `docs/analysis/onion-evolution-2026-07-30.md`, que segue sendo o
+último relatório). Carimbar o valor de agosto como presente é `verify-external-for-current` cometido
+dentro de casa.
+
+Ou seja: o evolve **não é fraco de estrutura, é sem gatilho** — e re-forjá-lo pelas 7 peças sem lhe
+dar gatilho repetiria o erro com mais peças. ⚠️ **E relógio/cron NÃO está vedado a ele**: a 1ª
+redação do nó `Q_GATILHO_DO_EVOLVE_QUAL_E` o proibia citando MOAT W7, e isso era invenção — o W7
+escopa o **driver** (que executa), o `automation-ladder-registry.txt` tem **duas** entradas MOAT
+(ambas de deploy), e o `evolve.md` não menciona cron em lugar nenhum. O Elenxo de 08-31 chamou
+`schedule`/`loop` sobre o evolve read-only de *"resposta proporcional"*. Quem decide é o maestro.
+
+A casa
 **cresceu órgãos e perdeu o coração**: cada vez que o evolve ficou caro, nasceu um comando específico
 para a parte urgente, e nenhum deles tem o dever de olhar o conjunto.
 

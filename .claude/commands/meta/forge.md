@@ -25,7 +25,11 @@ confirmado — achado ancorado em `docs/evolution/research/agent-command-composi
 ## Contexto medido injetado (peça 3 — o medidor roda ANTES de você pensar)
 
 ```bash
-bash .claude/validation/forge-census.sh . --markdown
+# FORGE_CENSUS_TOP alto DE PROPOSITO: a peca 3 existe para dar o CONJUNTO medido, e o default 12
+# da projecao cortava 47 de 59 — era o caminho de producao do dano que o PR #909 curou. A licao
+# tinha ido para a migalha e NAO para ca, e um aviso em prosa pedindo que a sessao rode `--tsv`
+# e exatamente o "leitor nao e mecanismo" que esta casa persegue (achado do Elenxo, 2026-10-03).
+FORGE_CENSUS_TOP=1000 bash .claude/validation/forge-census.sh . --markdown
 ```
 
 Rode-o **primeiro**, sempre. Ele responde por medição o que o modelo responderia de memória: quais
