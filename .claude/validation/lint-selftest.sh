@@ -17881,6 +17881,10 @@ run_drive_selftests() {
     "deadlock|DEADLOCK: pronto=0 bloqueado=2|1"
     "predecessor-closed|READY: pronto=1 bloqueado=0|0"
     "all-done|DONE: pronto=0 bloqueado=0 (aberto=0)|0"
+    # P0.5 no GRAFO (2026-10-04): o checkpoint pendente vence o READY e sai ≠0; o selado não
+    # muda nada; e a linha COMENTADA no meta da fixture pendente não pode ser a que dispara.
+    "checkpoint-pending|CHECKPOINT-PENDENTE: pronto=2 bloqueado=1|1"
+    "checkpoint-sealed|READY: pronto=2 bloqueado=1|0"
   )
   local c name want wantrc rc out f
   for c in "${cases[@]}"; do
@@ -17897,6 +17901,44 @@ run_drive_selftests() {
       record_fail "drive: ${name} (censo)" "esperava '${want}' em: ${out}"
     fi
   done
+  # valor desconhecido em meta.drive_checkpoint RECUSA (rc=2) — campo de controle que ninguém
+  # reconhece é o selo que ninguém vê; e a nota do lote chega à saída do --check.
+  local bad; bad="$(mktemp --suffix=.kg.yaml)"
+  sed 's/drive_checkpoint: pending/drive_checkpoint: talvez/' "${fx}/checkpoint-pending.kg.yaml" > "${bad}"
+  rc=0; out="$(bash "${ds}" "${bad}" --check 2>&1)" || rc=$?
+  if [ "${rc}" -eq 2 ] && grep -q "valor desconhecido: 'talvez'" <<< "${out}"; then
+    record_pass "drive: meta.drive_checkpoint com valor desconhecido RECUSA (rc=2)"
+  else record_fail "drive: checkpoint desconhecido" "rc=${rc}: ${out}"; fi
+  rm -f "${bad}"
+  out="$(bash "${ds}" "${fx}/checkpoint-pending.kg.yaml" --check 2>&1 || true)"
+  if grep -q 'NÃO selado: lote 3' <<< "${out}"; then record_pass "drive: o --check nomeia o lote pendente (drive_checkpoint_note)"
+  else record_fail "drive: nota do checkpoint" "${out}"; fi
+  # LEITURA POR YAML (Elenxo da leva 2: o awk errava em 7 formas válidas). Dois casos de polaridade
+  # oposta: a chave CITADA num texto do meta e num label de nó NÃO conta; aspas simples CONTA.
+  local d2; d2="$(mktemp -d)"; local body; body="$(sed -n '/^nodes:/,$p' "${fx}/ready-and-blocked.kg.yaml")"
+  printf 'meta:\n  schema_version: 1\n  description: "drive_checkpoint: pending"\n  drive_checkpoint: sealed\n%s\n' "${body/pergunta-raiz/drive_checkpoint: pending}" > "${d2}/citada.kg.yaml"
+  rc=0; out="$(bash "${ds}" "${d2}/citada.kg.yaml" --check 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'READY' <<< "${out}"; then record_pass "drive: a chave CITADA num texto do meta ou num label nao e o campo (le YAML, nao texto)"
+  else record_fail "drive: chave citada" "rc=${rc}: ${out}"; fi
+  printf "meta:\n  schema_version: 1\n  drive_checkpoint: 'pending'\n%s\n" "${body}" > "${d2}/simples.kg.yaml"
+  rc=0; out="$(bash "${ds}" "${d2}/simples.kg.yaml" --check 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'CHECKPOINT-PENDENTE' <<< "${out}"; then record_pass "drive: aspas simples tambem sao pending (o awk antigo dava READY)"
+  else record_fail "drive: aspas simples" "rc=${rc}: ${out}"; fi
+  # ESCRITA MECANICA: --close-lot escreve pending+nota e o censo PARA; --seal libera. E meta em
+  # flow-style RECUSA a escrita (rc=2) sem tocar o arquivo.
+  printf 'meta:\n  schema_version: 1\n%s\n' "${body}" > "${d2}/lote.kg.yaml"
+  local _w=0
+  bash "${ds}" "${d2}/lote.kg.yaml" --close-lot 'lote 9: PR #1' >/dev/null 2>&1 || _w=1
+  rc=0; bash "${ds}" "${d2}/lote.kg.yaml" --check >/dev/null 2>&1 || rc=$?; [ "${rc}" -eq 1 ] || _w=2
+  bash "${ds}" "${d2}/lote.kg.yaml" --seal >/dev/null 2>&1 || _w=3
+  rc=0; bash "${ds}" "${d2}/lote.kg.yaml" --check >/dev/null 2>&1 || rc=$?; [ "${rc}" -eq 0 ] || _w=4
+  if [ "${_w}" -eq 0 ]; then record_pass "drive: --close-lot faz o censo PARAR e --seal o libera (a escrita do P5 e mecanica)"
+  else record_fail "drive: escrita do checkpoint" "falhou no passo ${_w}"; fi
+  cp "${fx}/ready-and-blocked.kg.yaml" "${d2}/flow.kg.yaml"
+  rc=0; bash "${ds}" "${d2}/flow.kg.yaml" --close-lot x >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 2 ] && cmp -s "${fx}/ready-and-blocked.kg.yaml" "${d2}/flow.kg.yaml"; then record_pass "drive: meta flow-style RECUSA a escrita e nao toca o arquivo"
+  else record_fail "drive: flow-style" "rc=${rc}"; fi
+  rm -rf "${d2}"
 }
 
 # REGRA 34 pós-cutover (derivação commitada) — a regra HARD nova entrou sem rede
@@ -17945,7 +17987,7 @@ EOF_BASE
 
   # ── ÁRVORE: os nós nascidos DEPOIS da base ────────────────────────────────────────────────────
   cat > "${sb}/g/p.kg.yaml" <<'EOF_WORK'
-meta: { schema_version: 1, baseline: "2026-08-01" }
+meta: { schema_version: 1, baseline: "2026-08-01", drive_checkpoint: pending, drive_checkpoint_note: "lote 1 — auto-selado pela §4.1: Q_NOVO_E_CAIDO" }
 nodes:
   - id: Q_JA_SELADO
     node_type: question
@@ -18139,6 +18181,13 @@ EOF_A2
   }
 
   _caso "(a) nó nascido-e-caído no mesmo PR → AUTO"                  0 "AUTO" g/p.kg.yaml Q_NOVO_E_CAIDO --base HEAD
+  # (4) MECANIZADA (2026-10-04): o mesmo flip, com a nota do lote que NÃO o nomeia (id prefixo de
+  #     outro, para provar a fronteira) e sem checkpoint pendente — os dois PARAM.
+  sed 's/auto-selado pela §4.1: Q_NOVO_E_CAIDO/auto-selado: Q_NOVO_E_CAIDO_OUTRO/' "${sb}/g/p.kg.yaml" > "${sb}/g/p4.kg.yaml"
+  _caso "(a4) a nota do lote não NOMEIA o flip (só um id que o contém) → PARA" 1 "(4)" g/p4.kg.yaml Q_NOVO_E_CAIDO --base HEAD
+  sed 's/drive_checkpoint: pending, //' "${sb}/g/p.kg.yaml" > "${sb}/g/p5.kg.yaml"
+  _caso "(a5) sem checkpoint pendente no grafo → PARA"                   1 "(4)" g/p5.kg.yaml Q_NOVO_E_CAIDO --base HEAD
+  rm -f "${sb}/g/p4.kg.yaml" "${sb}/g/p5.kg.yaml"
   _caso "(a2) aresta em ordem alternada É lida (PARA por Aufhebung)" 1 "Aufhebung não foi aplicada" g/aberto.kg.yaml Q_NOVO_AINDA_ABERTO --base HEAD
   _caso "(b) nó já em <base> → PARA por (1)"                         1 "(1)" g/p.kg.yaml Q_JA_SELADO --base HEAD
   _caso "(c) flip sem aresta → PARA por (3)"                         1 "(3)" g/aberto.kg.yaml Q_NOVO_SEM_ARESTA --base HEAD

@@ -21,19 +21,32 @@
 # Uso       : bash .claude/validation/kg-drive-project.sh [<grafo.kg.yaml>] [--check]
 #             sem grafo → o plano de execução do core (fios-abertos.kg.yaml)
 #             --check   → só o veredito; exit 1 se há ABERTOS mas a FILA-PRONTA está
-#                         VAZIA (tudo bloqueado = anomalia de plano/deadlock)
+#                         VAZIA (tudo bloqueado = anomalia de plano/deadlock) OU se o grafo
+#                         carrega um CHECKPOINT PENDENTE (meta.drive_checkpoint: pending)
+#
+# P0.5 MECANIZADO (2026-10-04): o checkpoint do lote vive NO GRAFO, versionado, em
+#             `meta.drive_checkpoint: pending|sealed` (+ `meta.drive_checkpoint_note:`). Antes ele
+#             vivia só no `.claude/sessions/<slug>/STATE.md`, que é GITIGNORADO e que NENHUM script
+#             lia: o anti-thrashing existia só na máquina onde foi escrito e só como prosa — num
+#             clone ou worktree novo o P0.5 passava por AUSÊNCIA (rodada do /meta:evolve de
+#             2026-10-04, nó C_CHECKPOINT_DO_DRIVE_E_SO_PROSA_E_NAO_VIAJA). Pendente vence
+#             qualquer outro veredito: é o passo ANTERIOR ao censo.
 # =============================================================================
 set -uo pipefail
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"; cd "$ROOT"
 RADAR=".claude/validation/kg-radar.sh"
 
-GRAPH_DEFAULT="docs/onion/graph/fios-abertos.kg.yaml"; GRAPH="$GRAPH_DEFAULT"; MODE="project"
-for a in "$@"; do
-  case "$a" in
+GRAPH_DEFAULT="docs/onion/graph/fios-abertos.kg.yaml"; GRAPH="$GRAPH_DEFAULT"; MODE="project"; NOTE=""
+while [ $# -gt 0 ]; do
+  case "$1" in
     --check) MODE="check" ;;
-    *.kg.yaml) GRAPH="$a" ;;
-    *) echo "arg desconhecido: $a" >&2; exit 2 ;;
-  esac
+    # escrita do checkpoint — o P5 RODA isto, nunca edita à mão (Elenxo da leva 2: a leitura tinha
+    # sido mecanizada e a ESCRITA continuava dependendo de alguém lembrar)
+    --close-lot) MODE="close"; [ $# -ge 2 ] && [ -n "$2" ] || { echo "ERRO: --close-lot exige a nota do lote" >&2; exit 2; }; NOTE="$2"; shift ;;
+    --seal) MODE="seal" ;;
+    *.kg.yaml) GRAPH="$1" ;;
+    *) echo "arg desconhecido: $1" >&2; exit 2 ;;
+  esac; shift
 done
 # O DEFAULT é o plano-grafo DO CORE; num repo que só instalou o plugin ele não existe, e "grafo
 # ausente" sozinho não diz o que fazer. A mensagem passa a nomear o caminho: passe o seu grafo.
@@ -41,6 +54,57 @@ done
   [ "$GRAPH" = "$GRAPH_DEFAULT" ] && echo "       (esse é só o DEFAULT — o plano-grafo do CORE, que não existe num repo que apenas instalou o plugin)" >&2
   echo "       passe o grafo deste repo: $(basename "$0") <grafo.kg.yaml> [--check]   ·   ache com: git ls-files '*.kg.yaml'" >&2
   exit 2; }
+
+# ── O CHECKPOINT (P0.5/P5) é lido e escrito por YAML de verdade ──────────────────────────────
+# ⚠️ A 1a versão lia com awk e o Elenxo mediu 7 formas YAML válidas em que ela errava (aspas simples,
+#    a chave citada dentro de um label, `drive_checkpoint : x`, bloco `>-`, chave duplicada, meta
+#    depois de nodes, `xdrive_checkpoint`). Campo de controle se lê com o parser que o define.
+_ckpt() {   # $1 = read | close | seal ; lê/escreve meta.drive_checkpoint(+_note) de $GRAPH
+  python3 - "$1" "$GRAPH" "$NOTE" <<'CKPT_PY'
+import sys, re
+try:
+    import yaml
+except ImportError:
+    print("ERRO: PyYAML ausente — o checkpoint NAO pode ser lido (fail-loud, nunca 'selado')", file=sys.stderr); sys.exit(2)
+mode, path, note = sys.argv[1:4]
+txt = open(path, encoding='utf-8').read()
+try:
+    meta = (yaml.safe_load(txt) or {}).get('meta') or {}
+except Exception as e:
+    print("ERRO: YAML ilegivel em %s: %s" % (path, e), file=sys.stderr); sys.exit(2)
+if mode == 'read':
+    v = meta.get('drive_checkpoint')
+    v = '' if v is None else str(v)
+    n = meta.get('drive_checkpoint_note') or ''
+    print(v + '\t' + ' '.join(str(n).split())); sys.exit(0)
+# escrita: só no bloco `meta:` em forma de BLOCO (flow-style não se edita com segurança)
+lines = txt.split('\n')
+try:
+    i = next(k for k, l in enumerate(lines) if l.rstrip() == 'meta:')
+except StopIteration:
+    print("ERRO: %s nao tem `meta:` em forma de bloco no nivel 0 — escrita recusada (converta o meta)" % path, file=sys.stderr); sys.exit(2)
+j = i + 1
+while j < len(lines) and (lines[j].startswith(' ') or lines[j].strip() == '' or lines[j].lstrip().startswith('#')):
+    j += 1
+body = [l for l in lines[i+1:j] if not re.match(r'^\s+drive_checkpoint(_note)?\s*:', l)]
+new = ['  drive_checkpoint: ' + ('pending' if mode == 'close' else 'sealed')]
+if mode == 'close':
+    new.append('  drive_checkpoint_note: "%s"' % note.replace('\\', '\\\\').replace('"', '\\"'))
+out = '\n'.join(lines[:i+1] + new + body + lines[j:])
+chk = (yaml.safe_load(out) or {}).get('meta') or {}
+want = 'pending' if mode == 'close' else 'sealed'
+if chk.get('drive_checkpoint') != want or (mode == 'close' and chk.get('drive_checkpoint_note') != note):
+    print("ERRO: a escrita nao releu como escrita — nada gravado", file=sys.stderr); sys.exit(2)
+open(path, 'w', encoding='utf-8').write(out)
+print("checkpoint %s em %s" % (want, path))
+CKPT_PY
+}
+if [ "$MODE" = "close" ] || [ "$MODE" = "seal" ]; then
+  _ckpt "$MODE" || exit 2
+  bash "$RADAR" "$GRAPH" --integrity --schema >/dev/null 2>&1 \
+    || { echo "ERRO: depois de escrever o checkpoint, $GRAPH reprova no radar — revise" >&2; exit 2; }
+  exit 0
+fi
 
 # Passo 0 — LEGIBILIDADE antes de conduzir (não se dirige grafo que o motor não lê)
 bash "$RADAR" "$GRAPH" --integrity --schema >/dev/null 2>&1 \
@@ -98,10 +162,21 @@ verdict() {
 }
 V="$(verdict)"
 
+# P0.5 — checkpoint pendente NO GRAFO, lido por YAML. Valor fora de pending|sealed é RECUSADO: um
+# campo de controle com valor que ninguém reconhece é exatamente o selo que ninguém vê.
+_CK="$(_ckpt read)" || exit 2
+CKPT="${_CK%%$'\t'*}"; CKPT_NOTE="${_CK#*$'\t'}"
+case "$CKPT" in
+  ""|sealed) : ;;
+  pending) V="CHECKPOINT-PENDENTE" ;;
+  *) echo "ERRO: meta.drive_checkpoint com valor desconhecido: '$CKPT' (aceito: pending|sealed)" >&2; exit 2 ;;
+esac
+
 if [ "$MODE" = "check" ]; then
   printf 'drive %s — %s: pronto=%s bloqueado=%s (aberto=%s)\n' \
     "$(basename "$GRAPH" .kg.yaml)" "$V" "$n_ready" "$n_blocked" "$n_open"
-  [ "$V" = "DEADLOCK" ] && exit 1 || exit 0
+  [ "$V" = "CHECKPOINT-PENDENTE" ] && printf '  lote anterior NÃO selado: %s\n' "${CKPT_NOTE:-(sem drive_checkpoint_note)}"
+  case "$V" in DEADLOCK|CHECKPOINT-PENDENTE) exit 1 ;; *) exit 0 ;; esac
 fi
 
 # projeção legível — a FILA-PRONTA que o driver consome
@@ -125,6 +200,7 @@ else printf '  _nada bloqueado._\n'; fi
 
 printf '\n## Ação\n'
 case "$V" in
+  CHECKPOINT-PENDENTE) printf '  ⛔ P0.5: o lote anterior NÃO foi selado (meta.drive_checkpoint: pending) — %s. PARE: o maestro sela (troca para sealed) antes de nova passada. `--check` sai ≠0.\n' "${CKPT_NOTE:-sem nota}" ;;
   DONE)     printf '  ✅ plano sem trabalho aberto — nada a conduzir.\n' ;;
   DEADLOCK) printf '  ⛔ há aberto(s) mas a fila-pronta está VAZIA: um predecessor DEPENDS_ON está travado (predecessor UNVERIFIABLE, ciclo, ou onda mal-modelada). Resolva o bloqueador antes de seguir. `--check` sai ≠0.\n' ;;
   READY)    printf '  ▶ conduza o topo da fila-pronta (P2 do laço); os bloqueados voltam sozinhos quando o predecessor fechar.\n' ;;

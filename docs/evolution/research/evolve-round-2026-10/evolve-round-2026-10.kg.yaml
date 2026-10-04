@@ -52,7 +52,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.95
-    status: confirmed
+    status: superseded
     verified_at: '2026-10-04'
     label: 'BLOCKER (MAQ-1), confirmando o achado do maestro e AGRAVANDO-o: alem de o `STATE.md` ser gitignorado (o controle anti-thrashing so existe na maquina onde foi escrito; num clone ou worktree novo o P0.5 passa por AUSENCIA), o P0.5 e SO PROSA — nenhum script le o STATE.md (`kg-seal-exception.sh:32` declara essa precondicao NAO-MECANIZAVEL) e `<drive-slug>` nao tem derivacao definida. E ha um terceiro sitio: `cycle-completion.sh:83` promete medir a recencia "pelo ultimo commit git do STATE.md", que nunca e commitado — o script cai sempre no mtime. Ha 10 STATE.md de drive so no disco local. CURA: o checkpoint vira campo versionado num no do grafo do drive, e o `kg-drive-project.sh` emite CHECKPOINT-PENDENTE com exit != 0 — o P0.5 deixa de ser prosa.'
     trace: '.claude/commands/meta/drive.md'

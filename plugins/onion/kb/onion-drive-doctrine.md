@@ -38,13 +38,13 @@ aviso do `fios-abertos`). Ordena por atenção; a guarda só segura o bloqueado.
 
 ```
 P0   LEGIBILIDADE     kg-radar --integrity --schema → exit≠0 PARA
-P0.5 CHECKPOINT PEND. lote não-selado no STATE.md? → PARA (guarda 1-passada/checkpoint)
+P0.5 CHECKPOINT PEND. meta.drive_checkpoint: pending no grafo? → PARA (o censo emite CHECKPOINT-PENDENTE)
 P1   CENSO            kg-drive-project.sh → FILA-PRONTA + BLOQUEADOS
 P2   SELECIONAR LOTE  top --max-nodes (guardas max-nós/passada + budget)
 P3   POR NÓ           classificar drive_kind · session-beacon check (I3) · AVANÇAR (§3) ·
                       ELENXO se peso doutrinário · veredito-de-escrita (§4) · abort-on-anomaly
 P4   FECHAR O LOOP    dogfood RODOU o artefato + modo-de-falha? fix→re-dogfood no MESMO loop
-P5   CHECKPOINT LOTE  STATE.md: PRs p/ merge humano · DRIFTED/REFUTED p/ selo · kg-radar exit 0 ·
+P5   CHECKPOINT LOTE  meta.drive_checkpoint: pending no grafo: PRs p/ merge humano · DRIFTED/REFUTED p/ selo · kg-radar exit 0 ·
                       kg-realign --check (drift residual)
 P6   PARA             nenhuma passada nova enquanto o checkpoint pende (batch-confirm AUDIT)
 ```
@@ -66,7 +66,7 @@ P6   PARA             nenhuma passada nova enquanto o checkpoint pende (batch-co
 | verification **CONFIRMED** (mediu de fato) | carimba `verified_at` | **AUTO** (só porque houve medição executada) |
 | verification **DRIFTED** | apenda nó-medido + `SUPERSEDES`; alvo fica `confirmed` (radar exit 0) | **AUTO escreve / PARA o humano flipar** alvo→superseded (salvo §4.1, que vale para `SUPERSEDES` tanto quanto para `REFUTES`) |
 | verification **REFUTED** | propõe nó + `REFUTES` + flip atômico | **PARA** (apendar solto quebra `--integrity`; peso alto) |
-| **REFUTED/SUPERSEDED de nó NUNCA SELADO** (§4.1) | mesmo ato, mas o par nasce e cai no MESMO PR | **AUTO nas 3 precondições mecanizáveis** (`kg-seal-exception.sh`); a 4ª — declarar no `STATE.md` — é humana |
+| **REFUTED/SUPERSEDED de nó NUNCA SELADO** (§4.1) | mesmo ato, mas o par nasce e cai no MESMO PR | **AUTO nas 4 precondições** (`kg-seal-exception.sh`); a 4ª — o flip nomeado na `drive_checkpoint_note` do lote — mecanizada em 2026-10-04 |
 | verification **UNVERIFIABLE** | `blocked_by`, **não carimba** | **AUTO** (não-escrita; 1ª classe) |
 | execution → PR-verde | conduz em worktree | **AUTO até o PR** |
 | **merge no main** | — | **PARA** (100% humano, em lote) |
@@ -99,8 +99,9 @@ mais do que registrá-la.
    capturada), nunca de raciocínio novo sobre o mesmo fato.
 3. **AUFHEBUNG COMPLETA** — nó `evidence` novo + aresta `REFUTES`/`SUPERSEDES` + alvo reconciliado,
    com `kg-radar --integrity --schema` **exit 0**. A posição derrubada **fica** no grafo.
-4. **DECLARADA NO CHECKPOINT** — o `STATE.md` do lote **nomeia** o flip como auto-selado por esta
-   exceção. Flip silencioso não é exceção, é o carimbo-automático que o anti-padrão 1 do §6 proíbe.
+4. **DECLARADA NO CHECKPOINT** — a `drive_checkpoint_note` do lote (no `meta:` do grafo, escrita por
+   `kg-drive-project.sh --close-lot`) **nomeia** o flip como auto-selado por esta exceção. Até
+   2026-10-04 era o `STATE.md`, que é gitignorado e que o maestro nunca via. Flip silencioso não é exceção, é o carimbo-automático que o anti-padrão 1 do §6 proíbe.
 
 **O que é mecânico e o que não é — sem arredondar para cima.** O predicado
 [`kg-seal-exception.sh`](${CLAUDE_PLUGIN_ROOT}/validation/kg-seal-exception.sh) decide `AUTO`/`PARA` e sai
@@ -111,10 +112,10 @@ mais do que registrá-la.
 | (1) nunca selado | **o predicado** | lê YAML de verdade, varre TODOS os grafos da base (árvore + história), recusa repo raso e base defasada |
 | (2) medição executada | **parcial** | prova que `verified_at`/`verified_against` **existem e não são placeholder**; nenhum script sabe se o texto descreve algo que rodou |
 | (3) Aufhebung + integridade | **o predicado** | aresta e status lidos por YAML (não por texto), mais o radar |
-| (4) declarada no checkpoint | **o humano** | **não mecanizada e não mecanizável aqui** — `exit 0` NUNCA significa que a (4) foi cumprida |
+| (4) declarada no checkpoint | **o predicado** (desde 2026-10-04) | `drive_checkpoint: pending` e o id na `drive_checkpoint_note`, por fronteira de identificador; a nota viaja no diff do PR |
 
-**A metade que faz o maestro VER o flip é justamente a não-mecanizada.** Isso não é descuido, é o
-preço da exceção, e está escrito para que ninguém leia `exit 0` como "pode selar sozinho".
+**A metade que faz o maestro VER o flip deixou de ser não-mecanizada** quando o checkpoint saiu do
+`STATE.md` gitignorado para o grafo. O que segue humano é o selo: o merge.
 
 **Por que a exceção existe (medido, não suposto).** Na sessão de condução de 2026-09-05 o driver
 derrubou **duas** posições próprias criadas no mesmo dia, para o mesmo sintoma
@@ -145,7 +146,7 @@ já estava em `main`, era selo do maestro, e foi flipado sem parada. A exceção
 **E o selo que continua existindo.** A exceção dispensa um **selo separado**, não a supervisão: o
 flip viaja no PR, e o merge no `main` — que segue 100% humano, pelo caminho verificado — é onde o
 maestro o aceita. Note o que isso **não** é: o revisor automático do PR é adversarial, não é o
-maestro. É a linha do `STATE.md` que põe o flip diante dele.
+maestro. É a linha da `drive_checkpoint_note`, no diff, que põe o flip diante dele.
 
 ## 5. As 6 regras de doutrina que o driver encarna
 

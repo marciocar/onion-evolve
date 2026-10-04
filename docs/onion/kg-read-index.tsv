@@ -285,6 +285,7 @@
 .claude/validation/consumed-mode-check.sh	A_DOCUMENTACAO_LIDA_COMO_INVOCACAO_E_CLASSE_SISTEMICA	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
 .claude/validation/consumed-mode-check.sh	D_SUBSTRATO_CHECK_DE_LINT_MOLDE_CONSUMED_MODE	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/validation/consumed-mode-check.sh	Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
+.claude/validation/cycle-completion.sh	Q_CYCLE_COMPLETION_MEDE_RECENCIA_PELO_STATE	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/validation/diary-index.sh	D_GUARDA_DO_MARCADOR_NA_FONTE	docs/onion/graph/residuos-2026-08-18.kg.yaml
 .claude/validation/door-staleness-baseline.txt	E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/validation/door-staleness-baseline.txt	Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA	docs/onion/graph/federation-health-2026-07.kg.yaml
@@ -329,6 +330,7 @@
 .claude/validation/kg-corpus-grep.sh	E_CORPUS_VIROU_INSTRUMENTO_DE_ISENCAO	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
 .claude/validation/kg-coverage-baseline.txt	C_OPCAO_C_ADOTAR_SARIF_E_INTERCAMBIO	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .claude/validation/kg-coverage-baseline.txt	E_OBJECAO_6_CATRACA_JA_E_MENOS_PERMISSIVO	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
+.claude/validation/kg-drive-project.sh	E_LEVA2_CHECKPOINT_DO_DRIVE_NO_GRAFO	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/validation/kg-narrate-validate.sh	D_regra47_mechanism	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/kg-provenance-coverage.sh	SY_evid_provenance_coverage_gate	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/validation/kg-radar-integrity.sh	Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
