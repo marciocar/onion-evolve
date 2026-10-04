@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: fe6253d77ce337f01495db1cee5246beda522124b0c54e0ff484582fdaf98478
+reviewed_diff_sha256: 84a7232bed175b0ffb2d888618b7dce43b1cea650a0b0bca4f679c10c686b7e6
 findings_total: 13
 findings_real: 13
 tokens: 174581
@@ -96,6 +96,26 @@ próprio caso já descrevia essa armadilha para outro cenário.
 **E uma classe na minha verificação:** ao conferir a cura rodei o materializador com `--from HEAD`,
 que lê o conteúdo **commitado** — ele seguia acusando as linhas antigas enquanto a árvore já estava
 curada. **Testar o commitado em vez do da árvore, pela segunda vez hoje.**
+
+## Os `confirmed` do grafo que este PR edita, conferidos (REGRA 87)
+
+Os de maior impacto em `guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml`:
+
+- **`E_O_ELENXO_REPROVOU_O_GATILHO_E_A_TESE_CAIU`** — não é contrariado: foi **escrito por este PR**
+  e é a reprovação que motivou as curas. Ele **CONSTRAINS** a decisão de desenho, em vez de derrubá-la.
+- **`E_O_EVOLVE_ERA_O_UNICO_ORGAO_SEM_GATILHO`** — não é contrariado, e **segue de pé**: o defeito
+  datado (66 dias, único órgão sem gatilho) é o que justifica a guarda, e nada neste PR o reabre.
+- **`E_O_GATILHO_DISPAROU_NO_DIA_EM_QUE_NASCEU`** — **corrigido, não contrariado**: o número de
+  manchete era 289 e é **291** (`--since=<data nua>` é cego ao dia). A afirmação central — que ele
+  dispara pelas duas pernas no dia em que nasceu — permanece medida.
+- **`E_TETO_DECLARADO_DO_GATILHO`** — **reescrito por este PR**, e é o nó que mais mudou: o item que
+  vendia as duas pernas como redundância foi refutado por execução e agora **declara** que elas não
+  são peer.
+
+E o nó que este PR **corrigiu** em vez de contrariar: `D_DUAS_PERNAS_DERIVADAS_EM_VEZ_DE_LAST_RUN_DIGITADO`
+carrega agora o aviso de que **sua própria tese foi parcialmente refutada**, com o que caiu e o que
+ficou separados — porque apagar transformaria a correção em propaganda.
+
 
 ## O que fica declarado em vez de resolvido
 
