@@ -54,15 +54,15 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 
 | Medida | Valor | Produtor |
 |---|---:|---|
-| Resíduos de revisão | **356** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados totais | **1953** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados REAIS | **1706** | `bash .claude/validation/review-ledger.sh --env` |
+| Resíduos de revisão | **357** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados totais | **1967** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados REAIS | **1720** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **87%** | `bash .claude/validation/review-ledger.sh --env` |
-| Tokens por achado REAL | **137858** | `bash .claude/validation/review-ledger.sh --env` |
-| Vereditos no vocabulário | **263** | `bash .claude/validation/review-ledger.sh --env` |
+| Tokens por achado REAL | **136832** | `bash .claude/validation/review-ledger.sh --env` |
+| Vereditos no vocabulário | **264** | `bash .claude/validation/review-ledger.sh --env` |
 | — legado (texto livre) | **93** | `bash .claude/validation/review-ledger.sh --env` |
 
-A média de tokens cobre os **212** resíduos com custo > 0; os demais declaram `tokens: 0`
+A média de tokens cobre os **213** resíduos com custo > 0; os demais declaram `tokens: 0`
 (custo zero DECLARADO, que não é ausência) e ficam fora da média porque divisão por zero
 não é média — mas seus achados continuam contados no total.
 
