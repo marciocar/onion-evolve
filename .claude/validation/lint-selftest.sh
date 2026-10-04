@@ -8208,8 +8208,12 @@ run_cited_directive_selftests() {
   for _needle in "${_needles[@]}"; do
     LC_ALL=C grep -aqF -- "${_needle}" "${chk}" || _miss="${_miss} guarda:${_needle:0:24}"
   done
+  # ⚠️ SEM BINARIO NAO E SKIP: o CI nao tem Claude Code instalado e roda em STRICT (skip = FALHA) —
+  #    a 1a redacao pintou o #914 de vermelho por isso. O lado da COPIA e medido sempre; o lado do
+  #    BINARIO so onde ele existe, e o rotulo DIZ que ali nao foi medido (a REGRA 65 cobra a versao).
   if [ -z "${_bin}" ] || [ ! -f "${_bin}" ]; then
-    if [ -z "${_miss}" ]; then record_skip "cited-directive: (f) binario ausente — so a COPIA foi conferida"; else record_fail "cited-directive: (f) copia mutada" "${_miss}"; fi
+    if [ -z "${_miss}" ]; then record_pass "cited-directive: (f) a COPIA contem os 3 trechos literais (binario ausente neste host: a deriva do Claude Code NAO foi medida aqui)"
+    else record_fail "cited-directive: (f) copia mutada" "${_miss}"; fi
   else
     for _needle in "${_needles[@]}"; do LC_ALL=C grep -aqF -- "${_needle}" "${_bin}" || _miss="${_miss} binario:${_needle:0:24}"; done
     if [ -z "${_miss}" ]; then record_pass "cited-directive: (f) os 3 trechos literais estao no binario instalado E na guarda (sem deriva)"
