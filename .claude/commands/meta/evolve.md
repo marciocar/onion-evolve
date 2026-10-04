@@ -8,8 +8,8 @@ description: |
   mais a memória de sessão em D10, exceção declarada fora do repo.
 category: meta
 tags: [evolve, audit, orchestration, self-evolution, modernization]
-version: "1.4.0"
-updated: "2026-08-05"
+version: "2.0.0"
+updated: "2026-10-04"
 allowed-tools: Read Write Grep Glob Bash(bash .claude/validation/*) Bash(find *) Bash(wc *) Bash(ls *) Bash(git log*) Bash(git ls-files*)
 argument-hint: "[dimensão específica (D1..D10) | vazio = auditoria completa]"
 related_commands:
@@ -24,6 +24,32 @@ related_agents:
 ---
 
 # /meta:evolve — Auto-Auditoria e Backlog de Evolução
+
+## 🧬 O laço, e as peças que o compõem
+
+Re-forjado em 2026-10-04 pelo `/meta:forge` (estava em **2/7** peças; a doutrina dele vivia numa KB
+que nenhum outro comando conseguia citar). A doutrina inteira — a cláusula-mãe, as seis cláusulas e
+o que ela **não** promete — está em [`common:prompts:evolve-doctrine`](../common/prompts/evolve-doctrine.md).
+**Referencie, não copie.**
+
+| peça | onde |
+|---|---|
+| 2 doutrina | [`common/prompts/evolve-doctrine.md`](../common/prompts/evolve-doctrine.md) |
+| 3 contexto injetado | `.claude/validation/evolve-census.sh` — o raio-X, injetado abaixo |
+| gatilho | REGRA 97 (A auto-auditoria do framework tem GATILHO) — `.claude/validation/evolve-staleness-check.sh` |
+| 5 destino | o `.kg.yaml` de auditoria + `kg-radar` exit 0 + o contrato de custo (Passo 4) |
+| 6 lente | `.claude/rules/evolve-lens.md` |
+| 7 bancada | `run_evolve_census_selftests` |
+
+## Contexto medido injetado (peça 3 — o raio-X roda ANTES de você pensar)
+
+!`bash .claude/validation/evolve-census.sh . --markdown`
+
+Leia o raio-X **como ele se declara**: ele compõe seis medidores (peças, guardas, dissecações,
+doutrina que carrega, plano, idade desta própria auditoria) e mede o que eles **declaram** — não
+julga qualidade e não prioriza. O valor do evolve é o **confronto** entre as seções, que nenhum
+órgão isolado entrega. E a seção 4 mede se a doutrina **carregou**, nunca se **aterrissou**:
+achado sobre doutrina diz qual das duas coisas mediu.
 
 ## 🎯 Objetivo
 
@@ -89,6 +115,18 @@ existentes, **não** reimplementam (e não aninham orquestração dentro de orqu
 ### Passo 0 — Health-check do substrato Workflow
 Confirme a ferramenta nativa **Workflow**. Se ausente → **fallback serial**
 (Passo 5) com aviso em pt-BR. Determinístico, não inferido.
+
+### Passo 0.5 — Ler o raio-X e escolher onde gastar
+
+A **seção 7 do raio-X** (CONFRONTO) nomeia os alvos: a doutrina com `paths:` que nunca casou, os
+comandos só-superfície que uma guarda já vigia, e — nas seções 2 e 3 — o passivo de guardas e as
+dissecações vencidas. **O dogfood é por censo, não por varredura** (cláusula 2 da doutrina): com
+argumento vazio, comece pelos alvos nomeados ali; varrer `.claude/` inteiro (o Passo 1 abaixo) é a
+exceção declarada, não o padrão.
+
+> ⚠️ A 1ª redação deste passo prometia que o raio-X "aponta os alvos" quando ele só os CONTAVA —
+> prosa prometendo o que o código não fazia, apontado pelo Elenxo da re-forja. O raio-X ganhou a
+> seção 7 para a promessa virar verdade, em vez de a promessa ser apagada.
 
 ### Passo 1 — Escopo
 - `$ARGUMENTS` preenchido com `D1..D10` → roda só aquela dimensão.

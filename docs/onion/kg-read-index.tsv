@@ -61,9 +61,14 @@
 .claude/commands/meta/diary.md	SY6_ev_retestar_nunca_recarimbar	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/drive.md	D_DRIVE_MECANIZA_O_RUNTIME	docs/onion/graph/drive-superacao-2026-08.kg.yaml
 .claude/commands/meta/drive.md	E_CENSO_EM_VOO_LE_NOME_DE_BRANCH	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
+.claude/commands/meta/drive.md	E_CHECKPOINT_DO_DRIVE_VIVE_EM_ARQUIVO_QUE_NAO_VIAJA	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/commands/meta/drive.md	E_PROSA_29_GATES_1_COBERTO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.claude/commands/meta/evolve.md	E_A_SUPERFICIE_NASCEU_VIVA_NA_CARGA	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
+.claude/commands/meta/evolve.md	E_EVOLVE_DE_2_PARA_6_DE_7	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
+.claude/commands/meta/evolve.md	E_RUNCOMMAND_NUNCA_EXISTIU_E_SEGUE_NA_SUPERFICIE	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/commands/meta/evolve.md	Q_GATILHO_DO_EVOLVE_QUAL_E	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/commands/meta/evolve.md	Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
+.claude/commands/meta/evolve.md	Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/commands/meta/evolve.md	Q_saude_do_framework	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
 .claude/commands/meta/evolve.md	SY6_ev_evolve_tiering	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/federation-member.md	C_command_side_gap	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
@@ -152,6 +157,7 @@
 .claude/skills/onion-orchestration/SKILL.md	E_F2_SUBAGENT_MODEL_FORCE	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/skills/onion-orchestration/SKILL.md	E_TEMPLATE_WRITE_KG_CHAMA_PRIMITIVA_INEXISTENTE	docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml
 .claude/skills/onion-orchestration/SKILL.md	E_WORKFLOW_GANHOU_RETOMADA_E_FALHA_EXPLICITA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
+.claude/skills/onion-orchestration/SKILL.md	Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/skills/onion-orchestration/SKILL.md	SY4_open_agent_teams_capability_detection	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/skills/onion-patterns/SKILL.md	SY4_prod_rfc0002_catalogo_playbooks	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/skills/onion-patterns/SKILL.md	SY5_playbooks_materialization_open	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -263,6 +269,8 @@
 .claude/validation/door-staleness-baseline.txt	E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/validation/door-staleness-baseline.txt	Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/validation/door-staleness-check.sh	E_A_CATRACA_DA_PORTA_ERA_ESTEIRA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/validation/evolve-census.sh	D_O_RAIO_X_E_COMPOSICAO_DE_MEDIDORES	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
+.claude/validation/evolve-census.sh	E_O_ELENXO_REPROVOU_O_RAIO_X_POR_NUMERO_FALSO	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/validation/evolve-staleness-check.sh	E_DOIS_CASOS_NASCERAM_DE_MUTANTE	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/validation/evolve-staleness-check.sh	E_O_ELENXO_REPROVOU_O_GATILHO_E_A_TESE_CAIU	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/validation/evolve-staleness-check.sh	E_O_EVOLVE_ERA_O_UNICO_ORGAO_SEM_GATILHO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
@@ -279,6 +287,7 @@
 .claude/validation/guardrails/onion-effect-gate.sh	E_WIRE_IN_LIVE	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/validation/harness-inventory.sh	E_A_GUARDA_GRITAVA_CINCO_VEZES_E_NAO_PARAVA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/harness-inventory.sh	E_SSOT_DO_HARNESS_COM_CATRACA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
+.claude/validation/injected-cut-check.sh	C_DOCUMENTACAO_INDISTINGUIVEL_DE_INVOCACAO_VIVA	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/validation/injected-cut-check.sh	E_DEFEITO_DATADO_TRES_SITIOS	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/validation/injected-cut-check.sh	E_O_DOGFOOD_ACHOU_TRES_DEFEITOS_QUE_LEITURA_NAO_ACHA	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/validation/injected-cut-check.sh	E_TETO_DECLARADO_O_QUE_A_GUARDA_NAO_VE	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml

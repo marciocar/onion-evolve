@@ -68,7 +68,13 @@ _where() {  # $1 = basename → lista de consumidores, ou vazio
 # ── F8: `--selftest` em COMENTARIO contava como molde a copiar, e caia no passivo ERRADO.
 # Implementacao != mencao: tira comentario de linha antes de decidir.
 _has_selftest() {  # $1 = arquivo → rc 0 se IMPLEMENTA selftest (nao se apenas o menciona)
-  LC_ALL=C sed 's/#.*//' "$1" 2>/dev/null | LC_ALL=C grep -qE -- '--selftest'
+  # ⚠️ HERE-STRING, NAO PIPE (2026-10-04): `sed | grep -q` sob `set -uo pipefail` e a classe EPIPE do
+  #    early-closer — o grep fecha na 1a casada, o sed toma EPIPE escrevendo um arquivo de 27KB, e o
+  #    pipefail devolve FALHA com o padrao PRESENTE. Medido pelo Elenxo da re-forja do evolve: seis
+  #    execucoes seguidas deram 15,16,16,16,15,16 guardas, e o raio-X do evolve publicava o numero
+  #    que a corrida sorteasse. Ler TUDO antes de procurar elimina a corrida.
+  local _body; _body="$(LC_ALL=C sed 's/#.*//' "$1" 2>/dev/null)" || return 1
+  LC_ALL=C grep -qE -- '--selftest' <<< "${_body}"
 }
 
 echo "# censo de guardas · $(date +%Y-%m-%d)"
