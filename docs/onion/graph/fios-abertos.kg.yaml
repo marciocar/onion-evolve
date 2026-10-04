@@ -233,12 +233,12 @@ nodes:
   - id: A_ANUNCIO_DERIVA_O_NUMERO_DA_MEDICAO
     node_type: decision
     plane: PROD
-    status: open
+    status: done
     impact: 4
     confidence: 0.95
     owner: core
-    verified_at: '2026-09-16'
-    verified_against: 'sinal de campo de um adotante (2026-08-31), triado e re-medido em 2026-09-16: a metade do transporte JA FOI CURADA (co-deliver.sh:111 exige .claude/.onion-version com role adopted|hub); a metade do RELATO segue viva'
+    verified_at: '2026-10-04'
+    verified_against: 'SELADO PELO MAESTRO em 2026-10-04, e o selo foi conferido CONTRA O VIVO antes de aplicar, nao aceito por declaracao do STATE.md: a REGRA 95 (Anuncio que afirma ZERO sobre classe verificavel sem medicao) esta em `main` — `announce-zero-claim-check.sh` presente (5.496 bytes), registrada em 4 sitios do `lint-artifacts.sh`, e a familia `run_announce_zero_claim_selftests` passa 9/9. O driver conduziu este no ate PR-verde na passada de 2026-10-01 e PAROU no flip de status, que a tabela de selagem reserva ao maestro — mecanismo funcionando, nao atraso. ⚠️ O QUE A CURA NAO FECHA, e fica declarado: a guarda e PROSPECTIVA (so anuncios de 1o nivel em `outbox/<id>/`, onde a cura ainda existe; `_processed/` ja viajou e historia nao se reescreve), e nasceu `SEM-OBJETO` porque havia ZERO anuncios de 1o nivel na data — o que e DECLARACAO, nao conformidade. Ela morde o PROXIMO anuncio. Historico original do sinal: sinal de campo de um adotante (2026-08-31), triado e re-medido em 2026-09-16: a metade do transporte JA FOI CURADA (co-deliver.sh:111 exige .claude/.onion-version com role adopted|hub); a metade do RELATO segue viva'
     label: "A METADE VIVA DE UM SINAL CUJA OUTRA METADE JA FOI CURADA — registrada aqui para o arquivamento do sinal nao apagar o achado. O anuncio que viaja ao adotante AFIRMOU estado verificavel do repo dele ('as portas estao OK: nenhuma sem prefixo de bind') enquanto a catraca da MESMA leva tinha contado 38 exposicoes, e o relatorio DENTRO da propria branch dizia o numero certo. Dois artefatos da mesma leva, discordando: um dizia 0, o outro 38. O adotante que le so o anuncio — que e o unico documento que chega ANTES do merge — conclui que nao ha o que fazer, e a divida tolerada pela catraca fica tolerada para sempre porque ninguem foi avisado. O mesmo anuncio citava '3 fallbacks de senha' onde o padrao produzia 19 em 10 variaveis: quem aplicasse 'o fix de 3 linhas' curaria 16% da classe achando ter curado a classe. A CURA PROPOSTA pelo adotante, que e a certa: quando o /meta:co-announce descreve estado verificavel, DERIVAR o numero do artefato de medicao (baseline da catraca, saida do gate) em vez de reafirmar em prosa; e quando o numero nao estiver disponivel na geracao, dizer 'nao medido' em vez de afirmar o estado. Guarda barata que cabe junto: anuncio e relatorio da mesma leva nao podem discordar sobre uma contagem que ambos citam. Classe: declarado != medido, no unico artefato que viaja sozinho."
     trace: '.claude/commands/meta/co-announce.md'
 
