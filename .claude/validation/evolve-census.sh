@@ -120,8 +120,11 @@ if INSTR="$(_run doutrina 0 instructions-loaded-census.sh)"; then
   I_NEVER="$(grep -c . <<< "${I_NEVER_LIST}" || true)"
   # skill com paths: é NAO-MEDIVEL (o hook de carga não dispara para skills): vai para O QUE NÃO
   # FOI MEDIDO, nunca para a lista de alvos — a 1ª versão as publicava como "nunca casou".
-  I_BLIND="$(awk -F'\t' 'NR>1 && $1!~/worktrees/ && $NF=="NAO-MEDIVEL" {print $1}' <<< "${INSTR}" | grep -c . || true)"
-  [ "${I_BLIND:-0}" -gt 0 ] && _note doutrina "NAO-MEDIVEL: ${I_BLIND} skill(s) com paths: — o hook InstructionsLoaded não dispara para skills"
+  I_BLIND="$(awk -F'\t' 'NR>1 && $1!~/worktrees/ && $NF=="NAO-MEDIVEL" {print $1}' <<< "${INSTR}" \
+          | while IFS= read -r f; do [ -f "${REPO}/${f}" ] && printf '%s\n' "${f}"; done | grep -c . || true)"
+  if [ "${I_BLIND:-0}" -gt 0 ]; then
+    _note doutrina "NAO-MEDIVEL: ${I_BLIND} skill(s) com paths: — o hook InstructionsLoaded não dispara para skills"
+  fi
 fi
 
 # ── 5. PLANO ──────────────────────────────────────────────────────────────────────────────────

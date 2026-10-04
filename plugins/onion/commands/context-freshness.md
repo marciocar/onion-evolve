@@ -48,8 +48,8 @@ ao alvo `docs/*-context/`.
 
 ## Quando usar
 
-- Periodicamente, em projetos-alvo onde os contextos foram populados (não no
-  framework, onde são templates).
+- Periodicamente, em qualquer repo com contextos populados — **inclusive o core do Onion**, cujos
+  contextos NÃO são templates (medido 2026-10-04: business 15, technical 9, design 7 rastreados).
 - Após mudança grande no produto/código/regulação (pivot, refactor, novo
   framework de compliance) — para flagar o contexto que ficou para trás.
 - Antes de confiar num contexto para uma decisão importante (gate de confiança).
@@ -76,8 +76,9 @@ Cada worker lê **um** arquivo de contexto e avalia os itens. **Só itens (!) s�
 - **STALE** — falha em 1-2 GATES; conteúdo ainda útil mas desatualizado → refresh via `/docs:build-*-docs`.
 - **HISTORICAL** — falha em 3+ GATES ou descreve realidade **extinta** → candidato a **Remover/arquivar** (operação de maior valor: stale engana).
 
-> ⚠️ **Anti-ruído.** Os 3 contextos no **framework** são templates (só `README.md`):
-> não há o que auditar → reporte vazio, **não** erro. Placeholders de template
+> ⚠️ **Anti-ruído.** Repo que só instalou o framework tem os contextos como templates (só
+> `README.md`): não há o que auditar → reporte vazio, **não** erro. (O core do Onion NÃO é esse
+> caso — a premissa "no framework são templates" era falsa e foi medida em 2026-10-04.) Placeholders de template
 > (`[Persona Name]`, `__________`, `[TO BE COMPLETED]` ainda não preenchido em
 > projeto novo) **não** são "afirmação sem fonte" — são scaffolding. Convenções e
 > estrutura internas não exigem fonte (só afirmações factuais externas — item 2).
@@ -98,9 +99,9 @@ Argumento recebido: $ARGUMENTS
 - **Vazio**: `Glob` em `docs/business-context/**/*.md`, `docs/technical-context/**/*.md`,
   `docs/compliance-context/**/*.md`, **excluindo** `README.md` e `index.md`.
 
-Registre o conjunto como `CTX_FILES`. **Se vazio** (ex.: rodando no framework, onde
-os contextos são templates), informe o usuário e **encerre sem erro** — não há
-contexto populado para auditar.
+Registre o conjunto como `CTX_FILES`. **Se vazio** (repo que só instalou o framework, com os
+contextos ainda em template), informe o usuário e **encerre sem erro** — não há contexto populado
+para auditar. Vazio num repo que TEM contexto populado é glob errado, não conformidade.
 
 ### Passo 2 — Delegar padrão à skill `onion-orchestration`
 Acione **`onion-orchestration`**: tarefa = "auditar frescor de cada arquivo em CTX_FILES
@@ -204,8 +205,8 @@ CONTEXT FRESHNESS REPORT — AAAA-MM-DD
 ## Notas
 
 - **Nunca cria nem modifica** contextos — só audita e relata. Refresh = `/docs:build-*-docs`.
-- **No framework**, os 3 contextos são templates (só `README.md`) → `CTX_FILES` vazio
-  → encerra sem erro. O valor real é em **projetos-alvo** que populam os contextos.
+- **Contextos em template** (só `README.md`) → `CTX_FILES` vazio → encerra sem erro. Isto vale
+  para repo recém-instalado, **não** para o core, que tem contextos populados e é auditável.
 - **Orquestração opt-in**: alvo único → executa direto com `Agent` (sem overhead de Workflow).
 - Orquestre **sempre no nível principal** — nunca dentro de subagente; **não crie** um
   agente "context-freshness-worker".

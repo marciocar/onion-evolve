@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**315 itens abertos** em 67 grafo(s) com aberto (de 92 no escopo) · 68 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**316 itens abertos** em 68 grafo(s) com aberto (de 93 no escopo) · 69 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -289,6 +289,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
+
+## evolve-cures-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 22.5 | `Q_LEVA2_CURAS_M_RESTANTES` | evolve-cures-2026-10 | O QUE A LEVA 1 NAO FEZ, em ordem: (4) checkpoint do drive para o grafo + kg-drive-project emitindo CHECKPOINT-PENDENTE; (5) peca 4 |
 
 ## guardas-revisao-2026-08 — 4 item(ns)
 

@@ -72,7 +72,7 @@ docs/knowledge-base/tools/agent-skills.md
 Conhecimento crítico que esta KB cobre:
 - Paths oficiais por cliente (`.claude/skills/` vs `.agents/skills/`)
 - Frontmatter spec aberto + extensões Claude Code
-- Dynamic context injection (o caractere `!` colado a um comando entre crases)
+- Dynamic context injection (exclamação FORA e ANTES da primeira crase: exclamação, crase, comando, crase — forma literal em `docs/knowledge-base/tools/agent-skills.md:170`)
 - Substituições de string (`$ARGUMENTS`, `${CLAUDE_SKILL_DIR}`, etc.)
 - `context: fork` para subagent execution
 - Lifecycle de skill content
@@ -151,7 +151,7 @@ argument-hint: "[staging|production] [v1.2.3]"
 **Dynamic Context Injection** — quando o skill precisa de dados live:
 ````markdown
 ## Estado atual
-<!-- diretiva de injeção: ! colado ao comando entre crases, ex. git diff HEAD -->
+<!-- diretiva de injeção (exclamação, crase, git diff HEAD, crase — exclamação FORA e ANTES da 1ª crase; ver agent-skills.md:170) -->
 <!-- e outra para os comentários do PR, ex. gh pr view --comments -->
 
 ## Sua tarefa
