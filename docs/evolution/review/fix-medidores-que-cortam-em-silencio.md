@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: e43410aec0cf93bb439eec80e0c2fbbd8111f0fe97d68b2db168c019227d2b8a
+reviewed_diff_sha256: c95da2e854af6a715977377686cbe4f5afa30ff3ce463a58339bde0a4b9b1f64
 findings_total: 28
 findings_real: 28
 tokens: 349054
@@ -127,6 +127,26 @@ aponta para o lugar errado.
 **Pós-cura:** `--selftest` **18/18** · **10 mutantes, 10 mordendo** (o M4 agora ataca o **mecanismo**,
 porque os dois filtros são redundantes, e isso fica declarado) · produção **rc=0** · 44 casos nas 6
 famílias afetadas, 0 falhas.
+
+## Os `confirmed` do grafo que este PR edita, conferidos (REGRA 87)
+
+A guarda pede isto porque uma proposta selada caiu em 2026-09-19 contrariando dois `confirmed` do
+arquivo que estava editando. Os três de maior impacto em
+`guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml`:
+
+- **`E_O_ELENXO_REPROVOU_A_GUARDA_E_O_PIOR_ERA_FATAL`** — não contraria: foi **escrito por este PR**,
+  e é a reprovação que motivou as curas. Ele CONSTRANGE a decisão do substrato em vez de derrubá-la.
+- **`E_O_DOGFOOD_ACHOU_TRES_DEFEITOS_QUE_LEITURA_NAO_ACHA`** — não contraria, e **ficou maior**: os
+  três defeitos que ele narra (vacuidade inalcançável, sandbox sem diretiva, regex do `sed`) foram
+  somados aos do Elenxo. A tese dele — *"nenhum apareceria em revisão de código"* — é reforçada pelos
+  dois achados fatais, que também exigiram execução.
+- **`E_DEFEITO_DATADO_TRES_SITIOS`** — não contraria: o defeito datado segue o mesmo (três sítios em
+  2026-10-03, passivo zero após as curas). Nada neste PR o reabre.
+
+E o nó que este PR **corrigiu** em vez de contrariar: `C_MUTANTE_QUE_NAO_MORDE_TEM_QUATRO_CAUSAS`
+tinha `verified_against` afirmando *"6 mutantes … os 6 morderem"* — descrição de algo que não
+aconteceu. Reconciliado para 5/6 com a razão, e hoje 10/10.
+
 
 ## Teto declarado
 

@@ -55,10 +55,10 @@ exatamente o que o painel anterior fazia. Produtor: `bash ops/testing/collect-se
 | Medida | Valor | Produtor |
 |---|---:|---|
 | Resíduos de revisão | **355** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados totais | **1926** | `bash .claude/validation/review-ledger.sh --env` |
-| Achados REAIS | **1679** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados totais | **1940** | `bash .claude/validation/review-ledger.sh --env` |
+| Achados REAIS | **1693** | `bash .claude/validation/review-ledger.sh --env` |
 | Precisão (reais/totais) | **87%** | `bash .claude/validation/review-ledger.sh --env` |
-| Tokens por achado REAL | **139873** | `bash .claude/validation/review-ledger.sh --env` |
+| Tokens por achado REAL | **138813** | `bash .claude/validation/review-ledger.sh --env` |
 | Vereditos no vocabulário | **262** | `bash .claude/validation/review-ledger.sh --env` |
 | — legado (texto livre) | **93** | `bash .claude/validation/review-ledger.sh --env` |
 
