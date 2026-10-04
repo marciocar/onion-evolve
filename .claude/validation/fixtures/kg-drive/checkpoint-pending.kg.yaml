@@ -1,0 +1,41 @@
+# Fixture kg-drive: CHECKPOINT PENDENTE no meta — vence o READY (P0.5 antes do censo).
+meta:
+  schema_version: 1
+  baseline: "2026-08-01"
+  # drive_checkpoint: sealed  (comentario com o valor OPOSTO: se contasse, o caso viraria READY)
+  drive_checkpoint: pending
+  drive_checkpoint_note: "lote 3: PR #999 para merge humano"
+nodes:
+  - id: A_FUNDACAO
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 1.0
+    verified_against: plano
+    label: "pergunta-raiz, sem predecessor — pronta (research)"
+  - id: B_DEPENDE_DE_A
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 1.0
+    verified_against: plano
+    trace: b.sh
+    label: "decisao que depende de A — bloqueada enquanto A estiver open (execution)"
+  - id: C_SOLTA
+    node_type: claim
+    plane: PROD
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_against: plano
+    trace: c.sh
+    label: "afirmacao sem predecessor — pronta (verification)"
+edges:
+  - from: B_DEPENDE_DE_A
+    edge_type: DEPENDS_ON
+    to: A_FUNDACAO
+  - from: C_SOLTA
+    edge_type: SUPPORTS
+    to: A_FUNDACAO

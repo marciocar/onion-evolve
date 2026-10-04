@@ -29,9 +29,12 @@
 #   (2) MEDIÇÃO        PARCIAL    — exige `verified_at`+`verified_against` com valor real (YAML), mas
 #                                   NENHUM script sabe se o texto descreve uma medição que ocorreu
 #   (3) AUFHEBUNG      MECANIZADA — aresta REFUTES/SUPERSEDES real → alvo reconciliado
-#   (4) DECLARADO      **NÃO MECANIZADA, E NÃO MECANIZÁVEL AQUI** — nomear o flip no STATE.md é ato
-#                                   humano; exit 0 NUNCA significa que a (4) foi cumprida
-# Um exit 0 diz "(1) e (3) provadas, (2) no que dá para provar" — não "pode selar sozinho".
+#   (4) DECLARADO      MECANIZADA (2026-10-04) — o grafo tem `meta.drive_checkpoint: pending` e a
+#                                   `drive_checkpoint_note` NOMEIA o id. Antes era "nomear no STATE.md",
+#                                   que é gitignorado: o maestro nunca via, e o Elenxo da leva 2 mostrou
+#                                   que era o mesmo defeito que a cura do drive curava, deslocado para cá.
+#                                   A nota viaja no diff do PR, que é onde o maestro sela.
+# Um exit 0 diz "(1), (3) e (4) provadas, (2) no que dá para provar".
 #
 # Uso : bash .claude/validation/kg-seal-exception.sh <grafo.kg.yaml> <NODE_ID> [--base <ref>] [--quiet]
 # Exit: 0 = AUTO (dispensa selo) · 1 = PARA (precisa do maestro) · 2 = erro de uso.
@@ -181,10 +184,30 @@ if ! bash "${_RADAR}" "${FILE}" --integrity --schema >/dev/null 2>&1; then
   halt "kg-radar --integrity --schema REPROVA ${FILE}"
 fi
 
+# ── (4) DECLARADO — o flip está NOMEADO no checkpoint versionado do lote ──────────────────────────
+_CK4="$(python3 - "${FILE}" "${NODE}" <<'SEAL4_PY'
+import sys
+try:
+    import yaml
+except ImportError:
+    print("SEM-YAML"); sys.exit(0)
+m = (yaml.safe_load(open(sys.argv[1], encoding='utf-8')) or {}).get('meta') or {}
+ck = str(m.get('drive_checkpoint') or ''); note = str(m.get('drive_checkpoint_note') or '')
+import re
+named = re.search(r'(?<![A-Za-z0-9_])' + re.escape(sys.argv[2]) + r'(?![A-Za-z0-9_])', note)
+print('OK' if ck == 'pending' and named else 'FALTA:' + ck)
+SEAL4_PY
+)"
+case "${_CK4}" in
+  OK) : ;;
+  SEM-YAML) halt "(4) PyYAML ausente — não dá para ler o checkpoint do lote" ;;
+  *) halt "(4) o flip não está NOMEADO no checkpoint do lote: o grafo precisa de meta.drive_checkpoint: pending e de '${NODE}' na drive_checkpoint_note (rode kg-drive-project.sh <grafo> --close-lot \"... ${NODE} ...\")" ;;
+esac
+
 say "AUTO — flip de '${NODE}' dispensa selo SEPARADO (exceção nomeada §4.1)"
 say "  (1) não está em nenhum .kg.yaml de ${BASE}, nem na história dela (base provada fresca, repo completo)"
 [ -z "${_DEGRADED}" ] || say "      ⚠️ leitura DEGRADADA (texto, não YAML) em: ${_DEGRADED} — nenhum deles menciona o id"
 say "  (2) derrubado por '${SRC}' com verified_at + verified_against preenchidos — teto: o script não julga se a medição ocorreu"
 say "  (3) aresta ${KIND} → alvo '${TARGET_STATUS}' (Aufhebung aplicada) · kg-radar --integrity --schema exit 0"
-say "  ⚠️ A (4) DO §4.1 É HUMANA E ESTE EXIT 0 NÃO A CUMPRE: nomeie o flip no STATE.md do checkpoint."
+say "  (4) o flip está nomeado na drive_checkpoint_note do lote pendente — viaja no diff do PR, onde o maestro sela"
 exit 0

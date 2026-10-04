@@ -13,6 +13,7 @@ meta:
     - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#E_D9_NAO_E_NOOP_NO_CORE
     - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_FINDINGSCHEMA_DO_EVOLVE_NAO_E_JSON_SCHEMA
     - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_QUATRO_SIMBOLOS_FANTASMAS_NO_EVOLVE
+    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_CHECKPOINT_DO_DRIVE_E_SO_PROSA_E_NAO_VIAJA
 nodes:
   - id: E_LEVA1_DIRETIVAS_DESCRITAS_NAO_ESCRITAS
     node_type: evidence
@@ -76,6 +77,25 @@ nodes:
     verified_against: 'forge-census.sh: evolve 6/7 -> 7/7; familia evolve_workflow (a-g) verde com agent() simulado que imita o runtime (stage que lanca vira null); seis mutantes morderam, inclusive os dois com que o Elenxo provou a 1a bancada decorativa (survived=all; correlacao por indice)'
     trace: '.claude/workflows/evolve.js'
     label: 'CURA 5: o script que a rodada autorou inline virou a peca 4 em .claude/workflows/evolve.js, com JSON Schema real (FINDINGS, VERDICT) e a correlacao achado-veredito POR CONSTRUCAO. O Passo 3 da superficie perdeu o bloco de JS que nao rodava (runCommand x3, sweepSessionMemory) e ganhou o Passo 2.5: D4/D5/D9/D10 no contexto principal, antes do fan-out, sem orquestracao aninhada. Workflow e Agent entraram no allowed-tools. O script RECUSA D4 sem gastar agente e NAO roda a MAQ sem os alvos do raio-X — nunca inventa alvo. O evolve passou de 6/7 para 7/7 no censo da forja. O ELENXO REPROVOU A 1a VERSAO com tres blockers, todos fail-open: juiz que devolvia null deixava o achado em survived e ainda contava como verificado; dimensao cujo worker lancava sumia sem log; e o caso (d) da bancada era decorativo (passava com survived=all). Curados: unjudged e lost viraram campos de 1a classe, entrada ruim recusa, e todo achado que toque fusao de fase e julgado qualquer que seja a severidade.'
+  - id: E_LEVA2_CHECKPOINT_DO_DRIVE_NO_GRAFO
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    verified_against: 'familias drive e seal_exception verdes (33 casos); 5 mutantes pos-Elenxo morderam (leitura por texto; pending ignorado; close-lot nao grava; (4) sempre OK; (4) por substring) e, antes, 4 mutantes morderam (pending ignorado; comentario passa a contar; valor desconhecido aceito; pendente sai 0) — o do comentario so mordeu depois de a fixture trazer o valor OPOSTO no comentario'
+    trace: '.claude/validation/kg-drive-project.sh'
+    label: 'CURA 4: o checkpoint do lote do /meta:drive mora no GRAFO, versionado, em meta.drive_checkpoint (pending|sealed) com drive_checkpoint_note — e o censo o cobra: pendente vence qualquer veredito, sai CHECKPOINT-PENDENTE e o --check sai 1; valor desconhecido RECUSA (rc=2). O P0.5 deixou de ser prosa sobre um STATE.md gitignorado que nenhum script lia. O STATE.md segue como rascunho local, nunca o controle. O ELENXO REPROVOU A 1a VERSAO: a leitura era awk e errava em 7 formas YAML validas; ninguem ESCREVIA o pending (a ausencia conta como selado); e a doutrina passou a se contradizer — a 4a precondicao da excecao de selo mandava nomear o flip no STATE.md gitignorado. Curado: leitura e escrita por YAML, kg-drive-project --close-lot/--seal, e a 4a precondicao MECANIZADA no kg-seal-exception (o id na drive_checkpoint_note, por fronteira de identificador). Segue social: a sessao CHAMAR o --close-lot no P5, declarado na Honestidade do drive.'
+
+  - id: Q_CYCLE_COMPLETION_MEDE_RECENCIA_PELO_STATE
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.8
+    status: open
+    trace: '.claude/validation/cycle-completion.sh'
+    label: 'O TERCEIRO SITIO que o no C_CHECKPOINT_DO_DRIVE_E_SO_PROSA_E_NAO_VIAJA nomeava e a cura 4 NAO curou (achado R3 do Elenxo da leva 2): o cycle-completion.sh promete medir a recencia de sessao "pelo ultimo commit git do STATE.md", que e gitignorado e nunca e commitado — o script cai sempre no mtime. Recencia por mtime e local e reescrevivel. GATILHO: a proxima vez que a taxa de conclusao de ciclo for usada como evidencia de decisao.'
 
 edges:
   - from: E_LEVA1_DIRETIVAS_DESCRITAS_NAO_ESCRITAS
@@ -91,5 +111,11 @@ edges:
     to: Q_LEVA2_CURAS_M_RESTANTES
     edge_type: SUPPORTS
   - from: E_LEVA2_PECA4_DO_EVOLVE
+    to: Q_LEVA2_CURAS_M_RESTANTES
+    edge_type: SUPPORTS
+  - from: E_LEVA2_CHECKPOINT_DO_DRIVE_NO_GRAFO
+    to: Q_LEVA2_CURAS_M_RESTANTES
+    edge_type: SUPPORTS
+  - from: Q_CYCLE_COMPLETION_MEDE_RECENCIA_PELO_STATE
     to: Q_LEVA2_CURAS_M_RESTANTES
     edge_type: SUPPORTS

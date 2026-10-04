@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**316 itens abertos** em 68 grafo(s) com aberto (de 94 no escopo) · 69 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**317 itens abertos** em 68 grafo(s) com aberto (de 94 no escopo) · 69 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -186,6 +186,13 @@
 | 40.5 | `Q_CURAS_DOS_BLOCKERS_SAO_A_PROXIMA_LEVA` | evolve-round-2026-10 | O QUE A RODADA PROPOE, em ordem de dano e custo — o evolve PROPOE e nao muta, e a cura e o fluxo normal: (1) ESCAPAR os dois exe |
 | 10.8 | `Q_D4_E_D5_NAO_RODARAM_NESTA_RODADA` | evolve-round-2026-10 | LACUNA DECLARADA, nunca zero: D4 (KBs vencidas, por /meta:kb-freshness) e D5 (conformidade de metaspec, por /meta:metaspec-validat |
 
+## evolve-cures-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 36.0 | `Q_LEVA2_CURAS_M_RESTANTES` | evolve-cures-2026-10 | O QUE A LEVA 1 NAO FEZ, em ordem: (4) checkpoint do drive para o grafo + kg-drive-project emitindo CHECKPOINT-PENDENTE; (5) peca 4 |
+| 4.8 | `Q_CYCLE_COMPLETION_MEDE_RECENCIA_PELO_STATE` | evolve-cures-2026-10 | O TERCEIRO SITIO que o no C_CHECKPOINT_DO_DRIVE_E_SO_PROSA_E_NAO_VIAJA nomeava e a cura 4 NAO curou (achado R3 do Elenxo da leva 2 |
+
 ## radar-E3-2026-09-04 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -229,12 +236,6 @@
 | 10.8 | `Q_CUSTO_DO_PORTE_NUNCA_MEDIDO` | onion-identity-2026-07 | A LACUNA QUE O REPO CONFESSA E NAO RASTREIA (nomeada 2026-08-06 para PARAR DE SER REDESCOBERTA). O CLAUDE.md linhas 2-9 declara qu |
 | 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
 | 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
-
-## evolve-cures-2026-10 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 27.0 | `Q_LEVA2_CURAS_M_RESTANTES` | evolve-cures-2026-10 | O QUE A LEVA 1 NAO FEZ, em ordem: (4) checkpoint do drive para o grafo + kg-drive-project emitindo CHECKPOINT-PENDENTE; (5) peca 4 |
 
 ## meta-research-lens-2026-09 — 3 item(ns)
 
