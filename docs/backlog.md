@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**312 itens abertos** em 65 grafo(s) com aberto (de 89 no escopo) · 66 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**312 itens abertos** em 65 grafo(s) com aberto (de 90 no escopo) · 66 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -520,12 +520,6 @@
 |--:|---|---|---|
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
 
-## medidores-silenciosos-2026-10 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 8.0 | `Q_GATILHO_DO_EVOLVE_QUAL_E` | medidores-silenciosos-2026-10 | A PERGUNTA QUE O RE-FORJAR TEM DE RESPONDER ANTES DE ESCREVER SUPERFICIE: qual e o GATILHO do /meta:evolve? O radar tem a REGRA 65 |
-
 ## onion-doctrine-elenxo-bulbo-2026-07 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -559,6 +553,12 @@
 | 7.2 | `Q_GMILL_MAIN_DIVERGIU` | rito-task-manager-2026-09 | o main do clone do adotante DIVERGIU do remoto (3x3): push apagaria o ADR da equipe, pull cego reescreveria os updates do Onion  |
 | 6.0 | `Q_LADO_CLASSICO_DO_ZEN_NAO_MEDIDO` | rito-task-manager-2026-09 | nao ha resposta sobre SUBSTITUTO do ZEN Engine: o lado classico voltou vazio, e o maestro selou 'nao agora' em 2026-10-01 |
 | 4.8 | `Q_COMPROMISSO_ESPERA_COLHEITA` | rito-task-manager-2026-09 | o COMPROMISSO de implementar este rito ainda NAO entrou em fios-abertos.kg.yaml, e a razao e o contrato daquele arquivo: teto de 1 |
+
+## evolve-staleness-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
 
 ## graduated-automation-elenxo-2026-07 — 2 item(ns)
 

@@ -7891,6 +7891,80 @@ run_review_verdict_selftests() {
 # truncar e a isencao de valor unico) e acrescenta o que so daqui se ve: o MODO QUE A PRODUCAO
 # CONSOME. O molde avisa disso no comentario da l.6 dele — um caso vivia DEPOIS do `exit` do ramo
 # TSV, e TSV e exatamente o modo que o lint invoca: modo humano reprovava, modo TSV saia 0 e vazio.
+# ── REGRA 97: a auto-auditoria do framework tem GATILHO ──────────────────────────────────────
+# Delega ao `--selftest` do check (7 casos, incluindo as duas polaridades e o par pasta-ausente vs
+# pasta-vazia) e acrescenta o que só daqui se vê: o MODO QUE A PRODUÇÃO CONSOME (`--tsv`) e o
+# REGISTRO. ⚠️ Invoca pelo CAMINHO LITERAL, não por variável: a REGRA 59 (Modo que a produção
+# consome é exercitado pela bancada) extrai o par casando o NOME do arquivo, e `bash "${v}" --tsv`
+# a deixa cega — ela acusou MODO-SEM-TESTE com o caso existindo e passando, na forja da irmã desta.
+run_evolve_staleness_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/evolve-staleness-check.sh"
+  if [ ! -f "${chk}" ]; then record_fail "evolve-staleness" "guarda ausente: evolve-staleness-check.sh"; return; fi
+
+  local _o _rc=0
+  _o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${REPO_ROOT}/.claude/validation/evolve-staleness-check.sh" --selftest 2>&1)" || _rc=$?
+  if [ "${_rc}" -eq 0 ] && grep -qE '[0-9]+ passaram, 0 falharam' <<< "${_o}"; then
+    record_pass "evolve-staleness: (a) --selftest proprio verde (idade, delta, nunca-rodou, opt-in, data ilegivel, git ausente)"
+  else record_fail "evolve-staleness: (a) --selftest" "rc=${_rc}; saida=[${_o}]"; fi
+
+  # (b) o ramo que a producao consome EMITE no formato do dispatcher: 4 campos, SOFT primeiro.
+  # ⚠️ FIXTURE SINTETIZADA, nunca o repo vivo. A 1a versao afirmava `rc=1` sobre o REPO REAL, e o
+  #    Elenxo provou o estrago: bastava RODAR o /meta:evolve para este caso FALHAR — a bancada
+  #    PUNIA QUEM OBEDECIA a guarda. E como o runner sai 1 com qualquer FAIL, o "SOFT por desenho"
+  #    virava bloqueio. Caso que depende do estado do repo nao e caso, e aposta.
+  local _fx; _fx="$(mktemp -d)"
+  mkdir -p "${_fx}/docs/analysis"
+  printf '# r\n' > "${_fx}/docs/analysis/onion-evolution-2026-01-01.md"
+  local _t _trc=0
+  _t="$(cd "${REPO_ROOT}" && EVOLVE_ANALYSIS_DIR="${_fx}/docs/analysis" bash "${REPO_ROOT}/.claude/validation/evolve-staleness-check.sh" "${_fx}" --tsv 2>&1)" || _trc=$?
+  if [ "${_trc}" -eq 1 ] && [ "$(awk -F'\t' 'NR==1{print NF}' <<< "${_t}")" = "4" ] \
+     && grep -qE '^SOFT	EVOLVE-' <<< "${_t}"; then
+    record_pass "evolve-staleness: (b) modo --tsv emite 4 campos SOFT/EVOLVE-* sobre FIXTURE (o formato que o dispatcher le)"
+  else record_fail "evolve-staleness: (b) modo tsv" "rc=${_trc}; saida=[${_t}]"; fi
+
+  # (b2) O PAR DE (b), e e o caso que o Elenxo mostrou faltar: com relatorio de HOJE a guarda
+  #      CALA e sai 0. Sem este caso, nada impede a guarda de voltar a punir quem obedece.
+  # ⚠️ A FIXTURE TEM DE SER REPO GIT: sem isso a perna (2) declara `DELTA-NAO-MEDIDO` — comportamento
+  #    CERTO — e o caso confundiria "nao calou por defeito" com "nao calou por fixture incompleta".
+  #    Foi o proprio (b2) que pegou isto na 1a execucao dele, que e o que um caso novo deve fazer.
+  local _fx2; _fx2="$(mktemp -d)"; mkdir -p "${_fx2}/docs/analysis"
+  ( cd "${_fx2}" && git init -q . \
+    && git -c user.email=b@b -c user.name=b commit -q --allow-empty -m base ) >/dev/null 2>&1
+  printf '# r\n' > "${_fx2}/docs/analysis/onion-evolution-$(LC_ALL=C date +%Y-%m-%d).md"
+  ( cd "${_fx2}" && git add -A && git -c user.email=b@b -c user.name=b commit -q -m r ) >/dev/null 2>&1
+  local _t2 _t2rc=0
+  _t2="$(cd "${REPO_ROOT}" && EVOLVE_ANALYSIS_DIR="${_fx2}/docs/analysis" bash "${REPO_ROOT}/.claude/validation/evolve-staleness-check.sh" "${_fx2}" --tsv 2>&1)" || _t2rc=$?
+  if [ "${_t2rc}" -eq 0 ] && [ -z "${_t2}" ]; then
+    record_pass "evolve-staleness: (b2) com auditoria de HOJE a guarda CALA e sai 0 (nao pune quem obedece)"
+  else record_fail "evolve-staleness: (b2) pune a conformidade" "rc=${_t2rc}; saida=[${_t2}]"; fi
+  rm -rf "${_fx}" "${_fx2}"
+
+  # (c) REGISTRO (peca 6): guarda exercitada e nao registrada nunca dispara.
+  if grep -q 'check_evolve_staleness$' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" \
+     && grep -q 'REGRA 97' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"; then
+    record_pass "evolve-staleness: (c) registrada no dispatcher do lint-artifacts (peca 6)"
+  else record_fail "evolve-staleness: (c) registro" "a guarda nao esta no dispatcher — exercitada e muda"; fi
+
+  # (d) A REGRA 97 e SOFT por DESENHO. Se um dia virar HARD, auto-auditoria vencida passaria a
+  #     BLOQUEAR merge — e o laco de auto-evolucao travaria a propria entrega. O caso fixa isso.
+  # (d) SEVERIDADE SOFT, interrogando A SAIDA DA GUARDA.
+  # ⚠️ A 1a versao era TAUTOLOGICA: ela grepava uma CONSTANTE FABRICADA (`printf 'HARD\tx...'`),
+  #    verdadeira para qualquer estado da guarda — o Elenxo provou que o mutante SOFT->HARD
+  #    SOBREVIVIA a ela. Caso que interroga a propria fixture em vez do SUT e enfeite com
+  #    aparencia de rigor, e e a classe mais caruna desta casa.
+  local _fx3; _fx3="$(mktemp -d)"; mkdir -p "${_fx3}/docs/analysis"
+  printf '# r\n' > "${_fx3}/docs/analysis/onion-evolution-2026-01-01.md"
+  local _sev
+  # extracao em posicao PROTEGIDA: o runner roda sob `set -euo pipefail`, e um pipe que devolve
+  # nao-zero MATA A SUITE em vez de reprovar o caso (foi o que aconteceu na 1a execucao).
+  _sev=""
+  if ! _sev="$( (cd "${REPO_ROOT}" && EVOLVE_ANALYSIS_DIR="${_fx3}/docs/analysis" bash "${REPO_ROOT}/.claude/validation/evolve-staleness-check.sh" "${_fx3}" --tsv 2>&1 || true) | awk -F'\t' 'NR==1{print $1}' )"; then _sev=""; fi
+  rm -rf "${_fx3}"
+  if [ "${_sev}" = "SOFT" ]; then
+    record_pass "evolve-staleness: (d) a guarda EMITE SOFT (vencida AVISA; HARD travaria o laco de auto-evolucao)"
+  else record_fail "evolve-staleness: (d) severidade" "a guarda emitiu '${_sev}' em vez de SOFT — auto-auditoria vencida passaria a BLOQUEAR merge"; fi
+}
+
 run_injected_cut_selftests() {
   local chk="${REPO_ROOT}/.claude/validation/injected-cut-check.sh"
   if [ ! -f "${chk}" ]; then record_fail "injected-cut" "guarda ausente: injected-cut-check.sh"; return; fi
@@ -21652,6 +21726,7 @@ _family run_role_promotion_selftests
 _family run_r84_pathspec_selftests
 _family run_silent_measurer_selftests
 _family run_injected_cut_selftests
+_family run_evolve_staleness_selftests
 
 
 

@@ -1,0 +1,126 @@
+# kg-backlog-guard: on
+# ═══ TETO: 8 NÓS ═══  (era 7; +1 porque o Elenxo REPROVOU e a reprovacao e evidencia)
+meta:
+  id: guard-evolve-staleness-2026-10
+  schema_version: "1"
+  baseline: 2026-10-04
+  review_after: 2026-11-18
+  supersedes_external: "docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml#Q_GATILHO_DO_EVOLVE_QUAL_E"
+nodes:
+  - id: E_O_EVOLVE_ERA_O_UNICO_ORGAO_SEM_GATILHO
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    source_tier: 10
+    label: 'A PECA 1 — o defeito medido e datado. Em 2026-10-04 o `/meta:evolve` estava ha 66 DIAS sem rodar (medido contra `docs/analysis/onion-evolution-2026-07-30.md`, o ultimo relatorio), e a causa NAO era custo: ele era o UNICO dos orgaos de auto-evolucao SEM GATILHO NENHUM. O radar tem a REGRA 65 (Radar de mundo com baseline DATADA por eixo), SOFT por eixo vencido; o `/meta:dissect` tem censo de nivel VENCIDO, que re-mede em vez de citar; o `/meta:kg` tem a REGRA 67 (Grafo de pesquisa com REVISITA carimbada). O evolve, nada — num repo chamado Onion EVOLVE. E o corpus JA MEDIA A CAUSA com impact 5 e Elenxo sustentada-com-emendas (`C_TESE_AUTO_EVOLUCAO`, maestro-vivo-2026-08): "Nao estamos atras do eixo E2 — estamos a frente no PRODUTO do loop e atras no GATILHO dele." Uma rodada anterior atribuiu os dias parados a outra causa e o refutador a derrubou por NAO-SEQUITUR CAUSAL: o que faltava era o gatilho, nao o barateamento.'
+    trace: '.claude/validation/evolve-staleness-check.sh'
+    verified_against: 'último relatório medido por `ls -t docs/analysis | grep evolution`; 66 dias calculados de 2026-07-30 a 2026-10-04; ausência de gatilho confirmada por grep de census/rules/bancada em evolve.md = 0 ocorrências de cada'
+
+  - id: D_DUAS_PERNAS_DERIVADAS_EM_VEZ_DE_LAST_RUN_DIGITADO
+    node_type: decision
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: done
+    verified_at: '2026-10-04'
+    label: '⚠️ A TESE DESTA DECISAO FOI PARCIALMENTE REFUTADA EM 2026-10-04 — leia o no E_O_ELENXO_REPROVOU_O_GATILHO antes de confiar nela. O que CAIU: as duas pernas NAO sao peer (a 2 consome a saida da 1, logo UM ARQUIVO calava as duas) e "derivar e melhor que last_run digitado" nao se sustenta como afirmado. O que FICOU: o substrato, a severidade SOFT, e derivar do artefato ENTREGUE em vez de um campo — agora com glob ESTRITO, limiar, ancoragem de hora e a dependencia estrutural DECLARADA. Texto original: A DECISAO DE DESENHO, e ela DIVERGE do molde num ponto, de proposito. O molde natural e a REGRA 65, que le um `last_run:` que ALGUEM DIGITA no `radar-baselines.yaml` — funciona, e tem um modo-de-falha que esta casa conhece: carimbo sem medicao. Esta guarda NAO CRIA SSOT NOVA. Ela deriva de dois fatos que ninguem redige: (1) a DATA do relatorio que o proprio `/meta:evolve` PRODUZ (`docs/analysis/onion-evolution-*.md`, validada por regex, maximo por ordenacao e nao por corte); (2) o DELTA POPULACIONAL desde essa data, medido no GIT. E `behavior-over-declaration` aplicado ao GATILHO: confia no que o comando ENTREGOU, nao no que alguem declarou ter rodado — e corta o drift pela raiz, porque nao ha campo para ficar desatualizado. A SEGUNDA PERNA e a que a idade sozinha nao da: relatorio de ONTEM com 30 artefatos novos esta vencido na SUBSTANCIA, nao no calendario. Substrato: CHECK DE LINT (a classe vive em arquivo versionado, julgavel em varredura), SOFT por desenho — auto-auditoria vencida AVISA, nao bloqueia merge, senao o laco de auto-evolucao travaria a propria entrega.'
+    trace: '.claude/validation/lint-artifacts.sh'
+    verified_against: 'censo de guardas: classe NOVA ("nenhum arquivo de guarda menciona o termo"); molde da REGRA 65 lido em lint-artifacts.sh l.4718 (portabilidade de data GNU/BSD/awk copiada); registro confirmado nos DOIS lugares pelo censo'
+
+  - id: E_O_GATILHO_DISPAROU_NO_DIA_EM_QUE_NASCEU
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    source_tier: 10
+    label: 'O DOGFOOD QUE SEPARA GUARDA DE ENFEITE: rodada contra o repo real, a guarda DISPAROU PELAS DUAS PERNAS no mesmo dia em que foi forjada — `EVOLVE-VENCIDO` (66d > 45d desde 2026-07-30) e `EVOLVE-DELTA` (291 artefatos de — eu publiquei 289, e estava errado: `--since=<data nua>` significa "essa data NA HORA ATUAL", nao o inicio do dia; com `T00:00:00` sao 291 — `.claude/{commands,agents,skills,hooks,validation}` tocados depois do relatorio). O segundo numero e o que NAO EXISTIA antes: 289 diz que a auditoria esta vencida na SUBSTANCIA, e nenhum calendario diria isso. Um gatilho que nao dispara no dia em que foi forjado seria enfeite — por isso o caso (b) da bancada cobra o ACHADO no repo real, nao o silencio.'
+    trace: 'docs/analysis'
+    verified_against: 'bash .claude/validation/evolve-staleness-check.sh . devolve rc=1 com as duas linhas; 291 contado por git log --since=2026-07-30T00:00:00 (o 289 que eu publiquei vinha da data NUA, que e cega ao dia) --name-only nos cinco caminhos, filtrado por .md/.sh e `sort -u`'
+
+  - id: E_DOIS_CASOS_NASCERAM_DE_MUTANTE
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    label: 'O MUTANTE ACHOU O QUE O OLHO NAO ACHA, e e a segunda forja seguida em que isso acontece. O M6 (trocar `NAO-MEDIDO` por `0` quando o git e inalcancavel) NAO MORDEU — e a causa nao era caso decorativo: NAO HAVIA CASO cobrindo git ausente, porque o caso (f) roda no repo real onde o git existe. A perna existia e nao era exercitada, que e a definicao de guarda meio-morta, e o modo-de-falha e o pior desta casa: `erro-engolido-virando-numero` (um comando que FALHOU e um objeto que NAO EXISTE produzem o mesmo zero). Nasceu o caso (g). E o M6 ainda nao mordeu na 2a tentativa, por MUTANTE FRACO: ha DUAS saidas `NAO-MEDIDO` (git ausente; `rev-parse` falhando) e o `replace(...,1)` trocava so a primeira, enquanto o caminho do caso e a segunda. Terceira forja seguida em que a 4a causa aparece — o harness provar que mutou nao basta, ele tem de provar que mutou O CAMINHO QUE O CASO EXERCITA.'
+    trace: '.claude/validation/evolve-staleness-check.sh'
+    verified_against: '⚠️ CORRIGIDO 2026-10-04 apos reprovacao: eu declarei 6/6 e o Elenxo provou 5/6 — o M6 SOBREVIVIA, porque o caso (g) usava o caminho CANONICO do repo em vez de `$0`, logo exercitava o artefato instalado e nao o que estava em teste. Hoje, pos-cura: 11 casos, 10 mutantes, 10 mordendo, com `$0` resolvido em ABSOLUTO antes de qualquer `cd`'
+
+  - id: C_RELOGIO_NAO_E_VEDADO_AO_EVOLVE_E_A_GUARDA_NAO_DECIDE_ISSO
+    node_type: claim
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-04'
+    label: 'PRECISAO QUE CUSTOU UMA REPROVACAO, e fica escrita para nao se perder: relogio/cron NAO E VEDADO ao `/meta:evolve`. Em 2026-10-03 eu escrevi num no `open` de atencao maxima que "o que NAO pode ser: relogio/cron — isso e MOAT W7", e isso era INVENCAO — re-afirmava como doutrina o nao-sequitur que o Elenxo de 2026-08-31 ja havia derrubado POR MEDICAO, e usava a invencao para excluir justamente o candidato que aquela refutacao chamou de "resposta proporcional". Medido: ZERO mencoes a cron em `evolve.md`, e `automation-ladder-registry.txt` tem DUAS entradas MOAT, ambas de deploy. O W7 escopa o DRIVER, que EXECUTA; o evolve PROPOE e nao muta. ⚠️ ESTA GUARDA NAO DECIDE ISSO: ela avisa, no padrao da REGRA 62/65 (a maquina detecta, o humano dispara). A escolha entre AVISAR e AGENDAR segue sendo do maestro, e agora ele escolhe com o aviso na mao em vez de com o silencio.'
+    trace: '.claude/validation/automation-ladder-registry.txt'
+    verified_against: 'grep -ciE "cron|schedule|/loop|agend" em .claude/commands/meta/evolve.md = 0; duas entradas MOAT no registry (site-vps-deploy, bridge-deploy); o veredito do Elenxo re-verificado por mim na fonte antes de aceitar'
+
+  - id: E_TETO_DECLARADO_DO_GATILHO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-04'
+    source_tier: 10
+    label: 'A PECA 7 — o que a guarda NAO ve, escrito antes de alguem confiar nela. (1) A idade vem da DATA NO NOME do relatorio: um relatorio escrito A MAO, sem o comando ter rodado, engana a perna (1) — mas NAO engana a perna (2), que le o git; as duas juntas sao mais dificeis de simular que qualquer `last_run:`. (2) Ela nao sabe se o relatorio tem QUALIDADE nem se cobriu todas as dimensoes: mede que houve ENTREGA e que o mundo andou. (3) O delta conta artefato TOCADO, nao artefato que PRECISA de auditoria — um rename em massa infla o numero, e a mensagem diz isso, mandando olhar em vez de afirmar que todos importam. (4) Sem git alcancavel a perna (2) declara NAO MEDIDA, nunca zero. (5) E opt-in pela presenca de `docs/analysis/`: adotante sem a pasta nao recebe pelo gate, mas RECEBE a bancada, que sintetiza a propria fixture — e o PAR pasta-ausente (silencio) vs pasta-vazia (achado) tem caso proprio, porque sem distinguir a guarda gritaria em todo adotante.'
+    trace: '.claude/validation/evolve-staleness-check.sh'
+    verified_against: 'teto escrito no cabecalho do check (l.28-41) e exercitado pelos casos (c) nunca-rodou, (d) opt-in, (e) data ilegivel e (g) git inalcancavel'
+
+  - id: Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: open
+    verified_at: '2026-10-04'
+    label: 'A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` esta em 2/7 pecas (nao 0/7 — aquela medicao era falsa) e o re-forjar dele segue pendente. A ordem normal seria forjar o comando e depois o gatilho; aqui o maestro selou o gatilho primeiro, e ha razao: o comando nao rodava, logo re-forja-lo sem gatilho repetiria o erro com mais pecas. O RISCO DESTA ORDEM: se o re-forjar mudar o ARTEFATO que o evolve produz (outro caminho, outro nome, relatorio por DIMENSAO em vez de um so), a perna (1) desta guarda deixa de encontrar o que mede e cai em `EVOLVE-SEM-RODADA` — que e fail-safe (avisa, nao aprova), mas pelo motivo errado. GATILHO desta pergunta: a leva do re-forjar, que tem de decidir se o relatorio continua sendo `docs/analysis/onion-evolution-<data>.md` ou se a guarda passa a ler o novo destino.'
+    trace: '.claude/commands/meta/evolve.md'
+    verified_against: 'forge-census --tsv: evolve em 2/7; a perna (1) casa o glob onion-evolution-*.md, conferido no sandbox do caso (e) para nome que nao casa a regex'
+
+  - id: E_O_ELENXO_REPROVOU_O_GATILHO_E_A_TESE_CAIU
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-04'
+    source_tier: 10
+    label: 'O ELENXO REPROVOU: 5 falsos positivos (2 BLOQUEANTES), 7 falsos negativos, e CINCO das minhas SEIS afirmacoes caidas. O PIOR, e ele e de uma ironia exata: A GUARDA PUNIA QUEM OBEDECIA. Meu caso (f) e o caso (b) da bancada afirmavam sobre o REPO VIVO, entao bastava RODAR o /meta:evolve — o conselho que a propria guarda da — para a bancada FALHAR; e como o runner sai 1 com qualquer FAIL, o "SOFT por desenho" era FICCAO. Pior, ela nascia VERMELHA EM TODO ADOTANTE, refutando por execucao o item do meu teto que dizia "o adotante recebe a bancada, que sintetiza a fixture" — nao sintetizava. SEGUNDO FATAL: a TESE caiu. Eu afirmei que derivar era melhor que `last_run:` digitado porque "as duas pernas juntas sao mais dificeis de simular"; ele provou que as pernas NAO SAO PEER — `_population_delta "${_LAST}"` CONSOME a saida da perna 1 — e criou um arquivo de outro fluxo que calou AS DUAS ("auto-auditoria fresca, 0d"). Dois arquivos desse tipo JA EXISTIAM no repo, e sao triagem de inbox. Um `last_run:` digitado nao e forjavel assim. MAIS: a perna 2 disparava em 52 de 60 dias (limiar `>0`); `--since=<data nua>` e cego ao dia do relatorio e meu numero de manchete (289) estava errado (291); data FUTURA calava as duas pernas para sempre; o 3o fallback de data era CODIGO MORTO por aspa nao fechada, e a mensagem de degradacao MENTIA sobre a causa; o caso (d) da bancada era TAUTOLOGICO (interrogava uma constante fabricada, e o mutante SOFT->HARD sobrevivia); e o fail-open do dispatcher era clone byte-a-byte do defeito da guarda IRMA — copiei o defeito em vez de curar. TODOS CURADOS, e as curas vieram SEM CASO: 5 dos 10 mutantes sobreviviam a primeira passada pos-cura, o que gerou os casos (h) ao (k). As 3 provas que importam foram refeitas a mao: estado A (auditoria de hoje) bancada 5/5 e guarda calada; B (vencido) 5/5 e dispara; C (adotante sem docs/analysis) selftest 11/11 e guarda calada.'
+    trace: '.claude/validation/evolve-staleness-check.sh'
+    verified_against: 'refutador opus/high em worktree isolada, mandato CACAR FALSO POSITIVO; 174k tokens, 59 chamadas, ~15 min; pos-cura: --selftest 11/11, bancada 5/5, 10 mutantes mordendo, 3 estados do repo verificados a mao'
+
+edges:
+  - from: E_O_EVOLVE_ERA_O_UNICO_ORGAO_SEM_GATILHO
+    to: D_DUAS_PERNAS_DERIVADAS_EM_VEZ_DE_LAST_RUN_DIGITADO
+    edge_type: SUPPORTS
+  - from: E_O_GATILHO_DISPAROU_NO_DIA_EM_QUE_NASCEU
+    to: D_DUAS_PERNAS_DERIVADAS_EM_VEZ_DE_LAST_RUN_DIGITADO
+    edge_type: SUPPORTS
+  - from: E_DOIS_CASOS_NASCERAM_DE_MUTANTE
+    to: E_O_GATILHO_DISPAROU_NO_DIA_EM_QUE_NASCEU
+    edge_type: SUPPORTS
+  - from: C_RELOGIO_NAO_E_VEDADO_AO_EVOLVE_E_A_GUARDA_NAO_DECIDE_ISSO
+    to: D_DUAS_PERNAS_DERIVADAS_EM_VEZ_DE_LAST_RUN_DIGITADO
+    edge_type: CONSTRAINS
+  - from: E_TETO_DECLARADO_DO_GATILHO
+    to: D_DUAS_PERNAS_DERIVADAS_EM_VEZ_DE_LAST_RUN_DIGITADO
+    edge_type: CONSTRAINS
+  - from: Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO
+    to: E_TETO_DECLARADO_DO_GATILHO
+    edge_type: SUPPORTS
+  - from: E_O_ELENXO_REPROVOU_O_GATILHO_E_A_TESE_CAIU
+    to: D_DUAS_PERNAS_DERIVADAS_EM_VEZ_DE_LAST_RUN_DIGITADO
+    edge_type: CONSTRAINS
+  - from: E_O_ELENXO_REPROVOU_O_GATILHO_E_A_TESE_CAIU
+    to: E_TETO_DECLARADO_DO_GATILHO
+    edge_type: SUPPORTS

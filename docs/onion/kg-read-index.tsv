@@ -63,6 +63,7 @@
 .claude/commands/meta/drive.md	E_CENSO_EM_VOO_LE_NOME_DE_BRANCH	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 .claude/commands/meta/drive.md	E_PROSA_29_GATES_1_COBERTO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/commands/meta/evolve.md	Q_GATILHO_DO_EVOLVE_QUAL_E	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
+.claude/commands/meta/evolve.md	Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/commands/meta/evolve.md	Q_saude_do_framework	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
 .claude/commands/meta/evolve.md	SY6_ev_evolve_tiering	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/federation-member.md	C_command_side_gap	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
@@ -254,6 +255,7 @@
 .claude/utils/task-manager/factory.md	E_J_D7_19	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/validation/	E_sem_gate_client_safe	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
 .claude/validation/aside-router.sh	E_ASIDE_ROUTER_GATE_E_PROMPT	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.claude/validation/automation-ladder-registry.txt	C_RELOGIO_NAO_E_VEDADO_AO_EVOLVE_E_A_GUARDA_NAO_DECIDE_ISSO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/validation/automation-ladder-registry.txt	D_AGREGACAO_CROSS_REPO_E_MOAT	docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml
 .claude/validation/consumed-mode-check.sh	D_SUBSTRATO_CHECK_DE_LINT_MOLDE_CONSUMED_MODE	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/validation/consumed-mode-check.sh	Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
@@ -261,6 +263,10 @@
 .claude/validation/door-staleness-baseline.txt	E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/validation/door-staleness-baseline.txt	Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/validation/door-staleness-check.sh	E_A_CATRACA_DA_PORTA_ERA_ESTEIRA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/validation/evolve-staleness-check.sh	E_DOIS_CASOS_NASCERAM_DE_MUTANTE	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
+.claude/validation/evolve-staleness-check.sh	E_O_ELENXO_REPROVOU_O_GATILHO_E_A_TESE_CAIU	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
+.claude/validation/evolve-staleness-check.sh	E_O_EVOLVE_ERA_O_UNICO_ORGAO_SEM_GATILHO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
+.claude/validation/evolve-staleness-check.sh	E_TETO_DECLARADO_DO_GATILHO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/validation/federation-console.sh	C_not_backstage	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/federation-console.sh	E_GIT_DIR_QUEBRA_A_RAIZ_DENTRO_DE_WORKTREE	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/federation-console.sh	E_console	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
@@ -341,6 +347,7 @@
 .claude/validation/lint-artifacts.sh	C_refut_kebab_compliance	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
 .claude/validation/lint-artifacts.sh	C_vendor_scrub_caught_me_again	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 .claude/validation/lint-artifacts.sh	D_CORRIGIR_R47	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
+.claude/validation/lint-artifacts.sh	D_DUAS_PERNAS_DERIVADAS_EM_VEZ_DE_LAST_RUN_DIGITADO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 .claude/validation/lint-artifacts.sh	D_FASE_F_META_FABRICA_EN	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/validation/lint-artifacts.sh	D_LINT_FRONTMATTER_GUARD	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/validation/lint-artifacts.sh	D_LINT_LINKS_GUARD	docs/onion/graph/onion-evolution-2026-07.kg.yaml
@@ -447,6 +454,7 @@
 docs/INDEX.md	C_D7_18	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/INDEX.md	E_J_D7_18	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/INDEX.md	SY5_index_residual_drift	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
+docs/analysis	E_O_GATILHO_DISPAROU_NO_DIA_EM_QUE_NASCEU	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
 docs/analysis/README.md	SY_claim_bifurcado_cluster	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/analysis/README.md	SY_evid_seed_index_table	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/analysis/arandek-repo-exposure-2026-08.md	Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO	docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml

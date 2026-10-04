@@ -202,7 +202,7 @@ CATEGORIES = [
      [26, 29, 31, 32, 42, 43, 47, 49, 52, 55, 57, 58, 67, 68, 69, 78, 82, 87, 89, 93]),
     ("Automação Graduada",
      "Classes de ação (HUMAN→MONITORED→DYNAMIC→AUTO) sobem de degrau com gate de promoção alcançável — nenhum rung-jump forjado.",
-     [44, 65]),
+     [44, 65, 97]),
     ("Federação",
      "Mapa, console, agent-card e canais de membro em sincronia com o SSOT da rede.",
      [24, 25, 28, 38, 46, 66, 95]),
