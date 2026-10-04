@@ -7872,6 +7872,75 @@ run_review_verdict_selftests() {
 # `--commit`, então `--role hub` sozinho seguia saindo rc=2 sem escrever. Só o dogfood
 # pegou (rc=2 antes e depois, stamp intacto). O caso (b) ancora a ordem por EXECUÇÃO.
 # ---------------------------------------------------------------------------
+# ── MEDIDOR QUE CORTA OU ZERA EM SILENCIO ────────────────────────────────────────────────────
+# DEFEITO DATADO (2026-10-03, duas ocorrencias no mesmo dia, ambas contra mim):
+#  (1) `forge-census.sh --markdown` tinha `head -12` LITERAL e imprimia 12 de 59 candidatos sem
+#      dizer. Uma sessao leu a projecao, nao viu o /meta:evolve nela, e selou numa migalha que ele
+#      tinha "0 de 7 pecas, ausente do censo inteiro". O `--tsv` dizia 2/7, empatado com 12 outros,
+#      com 37 candidatos ABAIXO dele. Ausencia-por-CORTE e indistinguivel de ausencia-por-ZERO.
+#  (2) `kg-corpus-grep.sh "frase entre aspas"` casava a frase INTEIRA como UM termo e devolvia
+#      `0 no(s)` sobre 120 grafos — um zero que se le como "o corpus nao sabe nada disto".
+# A CLAUSULA COMUM, e ela ja estava escrita no proprio forge-census: *zero NAO e resultado*. Um
+# medidor que corta ou zera tem de dizer QUE cortou e o que o zero pode significar; quem le nao
+# pode ser obrigado a comparar 12 com 59 de cabeca, porque leitor nao e mecanismo.
+# ESTA FAMILIA TESTA OS ARTEFATOS DA ARVORE VIVA (sem `git archive`, sem copia do predicado para
+# dentro do caso): o (a)/(b) rodam o censo real no repo real variando so o teto por env, e o
+# (c)/(d) rodam o corpus-grep real com corpus plantado por ONION_KG_CORPUS_FILES.
+run_silent_measurer_selftests() {
+  local cen="${REPO_ROOT}/.claude/validation/forge-census.sh"
+  local cgr="${REPO_ROOT}/.claude/validation/kg-corpus-grep.sh"
+
+  # (a) CORTOU ⇒ DECLARA, com os dois numeros (mostrados e total). Teto 1 forca o corte no repo real.
+  if [ ! -f "${cen}" ]; then record_fail "silent-measurer" "medidor ausente: forge-census.sh"; else
+    local _o _rc=0
+    _o="$(cd "${REPO_ROOT}" && FORGE_CENSUS_TOP=1 bash "${cen}" . --markdown 2>&1)" || _rc=$?
+    local _tot; _tot="$(grep -oE '· [0-9]+ candidato\(s\) rastreado' <<< "${_o}" | grep -oE '[0-9]+' | head -1)"
+    if [ "${_rc}" -eq 0 ] && grep -q 'PROJECAO CORTADA' <<< "${_o}" \
+       && grep -qE "1 de ${_tot:-0} candidatos" <<< "${_o}" \
+       && grep -q 'NAO sao zero' <<< "${_o}"; then
+      record_pass "silent-measurer: (a) projecao cortada DECLARA o corte, os numeros e que ausencia != zero"
+    else
+      record_fail "silent-measurer: (a) corte calado" "rc=${_rc}; total=[${_tot}]; saida=[${_o}]"
+    fi
+
+    # (b) CONTRAPROVA — NAO cortou ⇒ NAO declara. Sem ela a cura passaria sendo aviso incondicional,
+    #     que e ruido e treina o leitor a ignorar o aviso que importa.
+    local _o2 _rc2=0
+    _o2="$(cd "${REPO_ROOT}" && FORGE_CENSUS_TOP=100000 bash "${cen}" . --markdown 2>&1)" || _rc2=$?
+    if [ "${_rc2}" -eq 0 ] && ! grep -q 'PROJECAO CORTADA' <<< "${_o2}"; then
+      record_pass "silent-measurer: (b) projecao COMPLETA nao emite aviso de corte (nao e ruido fixo)"
+    else
+      record_fail "silent-measurer: (b) aviso incondicional" "rc=${_rc2}; aviso presente sem corte"
+    fi
+  fi
+
+  # (c) termo POSICIONAL com espacos faz o que o --query faria, e AVISA que separou.
+  if [ ! -f "${cgr}" ]; then record_fail "silent-measurer" "medidor ausente: kg-corpus-grep.sh"; else
+    local d; d="$(mktemp -d)"
+    printf 'meta:\n  id: fixture-silent-measurer\nnodes:\n  - id: EN_ALVO\n    node_type: entity\n    status: confirmed\n    label: alvo plantado para a bancada\n' > "${d}/f.kg.yaml"
+    local _c _crc=0
+    _c="$(cd "${REPO_ROOT}" && ONION_KG_CORPUS_FILES="${d}/f.kg.yaml" bash "${cgr}" 'alvo plantado inexistentezz' 2>&1)" || _crc=$?
+    if [ "${_crc}" -eq 0 ] && grep -q 'separado em 3 termos' <<< "${_c}" \
+       && grep -qE 'termos: alvo, plantado, inexistentezz' <<< "${_c}"; then
+      record_pass "silent-measurer: (c) frase posicional separada em termos, com aviso"
+    else
+      record_fail "silent-measurer: (c) frase virou 1 termo" "rc=${_crc}; saida=[${_c}]"
+    fi
+
+    # (d) ZERO sobre corpus POPULADO se explica, em vez de ficar nu.
+    local _z _zrc=0
+    _z="$(cd "${REPO_ROOT}" && ONION_KG_CORPUS_FILES="${d}/f.kg.yaml" bash "${cgr}" zzqxnaoexiste 2>&1)" || _zrc=$?
+    if [ "${_zrc}" -eq 0 ] && grep -q '0 nó(s)' <<< "${_z}" \
+       && grep -q 'ZERO sobre 1 grafos POPULADOS' <<< "${_z}" \
+       && grep -q 'all-status' <<< "${_z}"; then
+      record_pass "silent-measurer: (d) zero sobre corpus populado se EXPLICA (substring/OR/status)"
+    else
+      record_fail "silent-measurer: (d) zero nu" "rc=${_zrc}; saida=[${_z}]"
+    fi
+    rm -rf "${d}"
+  fi
+}
+
 run_role_promotion_selftests() {
   local ws="${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh"
   local ad="${REPO_ROOT}/.claude/commands/meta/adopt.md"
@@ -21440,6 +21509,7 @@ _family run_door_staleness_severity_selftests
 _family run_guard_forge_selftests
 _family run_role_promotion_selftests
 _family run_r84_pathspec_selftests
+_family run_silent_measurer_selftests
 
 
 

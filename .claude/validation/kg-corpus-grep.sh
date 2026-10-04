@@ -35,7 +35,18 @@ while [ "$#" -gt 0 ]; do case "$1" in
   --all-status) ALL=1;;
   --query) shift; read -r -a _q <<< "${1:-}"; [ "${#_q[@]}" -gt 0 ] && TERMS+=("${_q[@]}");;
   -h|--help) sed -n '2,10p' "$0"; exit 0;;
-  *) TERMS+=("$1");;
+  # ⚠️ TERMO POSICIONAL COM ESPACOS e tratado como `--query`, e DECLARADO (dano medido 2026-10-03):
+  #    `kg-corpus-grep.sh "auto-evolucao evolve laco raio-X auditoria"` casava a frase INTEIRA como UM
+  #    termo, nenhum label a continha e a saida foi `0 no(s)` sobre 120 grafos — zero que parece
+  #    "o corpus nao sabe nada disto" e na verdade era invocacao errada. A forma certa (`--query`)
+  #    existia; ninguem e obrigado a adivinhar qual das duas. Separar aqui e seguro porque aqui a
+  #    frase JA e dado, nunca codigo (o teto do eval esta documentado acima e nao muda).
+  *) case "$1" in
+       *[[:space:]]*) read -r -a _p <<< "$1"
+                      [ "${#_p[@]}" -gt 0 ] && TERMS+=("${_p[@]}")
+                      printf 'kg-corpus-grep: termo posicional com espacos separado em %s termos (igual a --query)\n' "${#_p[@]}" >&2;;
+       *) TERMS+=("$1");;
+     esac;;
 esac; shift; done
 [ "${#TERMS[@]}" -gt 0 ] || { echo "uso: kg-corpus-grep.sh <termo> [termo...] | --query \"<frase>\" [--json] [--all-status]" >&2; exit 2; }
 if [ -n "${ONION_KG_CORPUS_FILES:-}" ]; then files="${ONION_KG_CORPUS_FILES}"
@@ -102,6 +113,16 @@ if not all_status: hits=[h for h in hits if h["status"] not in ("refuted","super
 for h in hits: h.pop("_hit",None)
 if json_out: print(json.dumps({"graphs":graphs,"terms":terms,"hits":hits},ensure_ascii=False,indent=1)); sys.exit(0)
 print(f"# corpus: {graphs} grafos · termos: {', '.join(terms)} · {len(hits)} nó(s)")
+# ⚠️ ZERO NAO E RESULTADO (a mesma clausula que o forge-census declara, 2026-10-03): um `0 no(s)`
+#    sobre corpus POPULADO quase nunca significa "o corpus nao sabe"; significa termo que nenhum
+#    `id` nem `label` contem. Deixar o zero nu convida a conclusao de que o tema e inedito — e foi
+#    exatamente o que aconteceu, com 120 grafos na mao.
+if not hits and graphs:
+    print(f"# ⚠️ ZERO sobre {graphs} grafos POPULADOS — zero NAO e resultado. O que checar, nesta ordem:")
+    print("#    1. termo casa `id` ou `label` por SUBSTRING (sem stemming): 'laco' casa 'relacoes'; 'raio-X' nao casa nada")
+    print("#    2. a busca e OR entre termos: um termo generico a mais AMPLIA, nunca restringe")
+    print("#    3. status `refuted`/`superseded` sao ocultos por default — repita com --all-status")
+    print("#    4. so entao conclua ausencia, e registre a LACUNA como no (nunca como silencio)")
 for h in hits:
     print(f"{h['grafo']}\t{h['id']}\t{h['status'] or '-'}\t{h['verified_at'] or '-'}"
           f"\ttier={h.get('source_tier') or '-'}\timp={h.get('impact') or '-'}"

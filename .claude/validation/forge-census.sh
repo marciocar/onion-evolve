@@ -156,9 +156,24 @@ fi
 total="${#CANDS[@]}"
 printf '# censo das 7 peças · %s candidato(s) rastreado(s) · %s com 6+ peças\n' "${total}" "${ref_count}"
 printf 'peças | candidato | 2 doutrina | 3 contexto | 4 workflow | 5 destino | 6 lente | 7 bancada\n'
+# ⚠️ O CORTE DA PROJECAO E DECLARADO, e isto nasceu de dano medido (2026-10-03): este `head`
+#    era um literal solto e a projecao imprimia 12 de 59 candidatos EM SILENCIO. Uma sessao leu a
+#    projecao, nao viu o `/meta:evolve` nela e selou numa migalha que ele tinha "0 de 7 pecas,
+#    ausente do censo inteiro" — o TSV dizia 2/7. O cabecalho ate imprimia "59 candidato(s)", mas
+#    comparar 12 com 59 e trabalho do leitor, e leitor nao e mecanismo.
+#    A LICAO: projecao que corta sem dizer produz conclusao falsa sobre o que NAO esta na lista, e
+#    ausencia-por-corte e indistinguivel de ausencia-por-zero. Quem precisa do conjunto usa --tsv.
+MD_TOP="${FORGE_CENSUS_TOP:-12}"
 printf '%s\n' "${sorted_rows}" | awk -F'\t' 'NF>=8 && $2!=""{
   printf "%s/7 | %s | %s | %s | %s | %s | %s | %s\n", $1, $2, ($3?"sim":"—"), ($4?"sim":"—"),
-         ($5?"sim":"—"), ($6?"sim":"—"), ($7?"sim":"—"), ($8?"sim":"—") }' | head -12
+         ($5?"sim":"—"), ($6?"sim":"—"), ($7?"sim":"—"), ($8?"sim":"—") }' | head -"${MD_TOP}"
+_shown=$(printf '%s\n' "${sorted_rows}" | awk -F'\t' 'NF>=8 && $2!=""' | head -"${MD_TOP}" | wc -l)
+if [ "${_shown}" -lt "${total}" ]; then
+  printf '\n⚠️ PROJECAO CORTADA: %s de %s candidatos acima (os de MAIS pecas). Os %s restantes NAO\n' \
+    "${_shown}" "${total}" "$((total - _shown))"
+  printf '   estao aqui e NAO sao zero — ausencia nesta lista nao e ausencia no censo. Para o\n'
+  printf '   conjunto: `bash .claude/validation/forge-census.sh . --tsv`.\n'
+fi
 printf '\n(peça 1 = a própria superfície, existe por construção; o censo mede PRESENÇA e REFERÊNCIA,\n'
 printf 'nunca qualidade. Fonte: forge-census.sh, descoberta por citação — o artefato nomeia as\n'
 printf 'suas partes e o censo lê. Construir o nome da peça a partir do nome do candidato errou\n'
