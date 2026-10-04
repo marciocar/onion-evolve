@@ -8155,6 +8155,68 @@ run_evolve_staleness_selftests() {
   else record_fail "evolve-staleness: (d) severidade" "a guarda emitiu '${_sev}' em vez de SOFT — auto-auditoria vencida passaria a BLOQUEAR merge"; fi
 }
 
+run_cited_directive_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/cited-directive-check.sh"
+  if [ ! -f "${chk}" ]; then record_fail "cited-directive" "guarda ausente: cited-directive-check.sh"; return; fi
+  if ! command -v node >/dev/null 2>&1; then record_skip "cited-directive: node ausente"; return; fi
+  # (a) o --selftest proprio (as duas polaridades, verbatim do dano de 2026-10-04). Delegacao.
+  local _o _rc=0
+  _o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${chk}" --selftest 2>&1)" || _rc=$?
+  if [ "${_rc}" -eq 0 ] && grep -qE '[0-9]+ passaram, 0 falharam' <<< "${_o}"; then
+    record_pass "cited-directive: (a) --selftest proprio verde (crase dupla e bloco cercado acusados; diretiva real calada)"
+  else record_fail "cited-directive: (a) --selftest" "rc=${_rc}; saida=[${_o}]"; fi
+  # (b) O MODO QUE A PRODUCAO CONSOME: --tsv no repo real sai 0 e silencioso (passivo zero).
+  #     CAMINHO LITERAL, nao variavel: a REGRA 59 casa o NOME do arquivo para achar o par.
+  local _t _trc=0
+  _t="$(cd "${REPO_ROOT}" && bash "${REPO_ROOT}/.claude/validation/cited-directive-check.sh" "${REPO_ROOT}" --tsv 2>&1)" || _trc=$?
+  if [ "${_trc}" -eq 0 ] && [ -z "${_t}" ]; then
+    record_pass "cited-directive: (b) modo --tsv sai 0 e silencioso no repo real"
+  else record_fail "cited-directive: (b) modo tsv" "rc=${_trc}; saida=[${_t}]"; fi
+  # (c) o ramo tsv EMITE 4 campos HARD/REGRA98 num repo com o defeito — sem isto, o silencio de (b)
+  #     poderia ser o ramo inteiro morto. A fixture e o create-skill de main, l.219, verbatim.
+  local sd; sd="$(mktemp -d)"; mkdir -p "${sd}/.claude/commands/meta"
+  printf '```markdown\n## Mudancas atuais\n\n!`git diff HEAD`\n```\n' > "${sd}/.claude/commands/meta/zz.md"
+  ( cd "${sd}" && git init -q . && git add -A ) >/dev/null 2>&1
+  local _e _erc=0
+  _e="$(cd "${REPO_ROOT}" && bash "${REPO_ROOT}/.claude/validation/cited-directive-check.sh" "${sd}" --tsv 2>&1)" || _erc=$?
+  if [ "${_erc}" -eq 1 ] && [ "$(awk -F'\t' 'NR==1{print NF}' <<< "${_e}")" = "4" ] && grep -q '^HARD	REGRA98	' <<< "${_e}"; then
+    record_pass "cited-directive: (c) ramo tsv emite 4 campos HARD/REGRA98 sobre o defeito verbatim"
+  else record_fail "cited-directive: (c) formato tsv" "rc=${_erc}; saida=[${_e}]"; fi
+  # (d) O CAMINHO DE PRODUCAO: o lint-artifacts real, num repo com o defeito, emite a REGRA 98. Sem
+  #     isto, comentar a chamada do dispatcher deixava a familia verde (F7 do Elenxo).
+  cp -a "${SANDBOX}/.claude" "${sd}/" 2>/dev/null; mkdir -p "${sd}/.claude/commands/meta"
+  printf '```markdown\n!`git diff HEAD`\n```\n' > "${sd}/.claude/commands/meta/zz.md"
+  ( cd "${sd}" && git init -q . 2>/dev/null; git add -A ) >/dev/null 2>&1
+  local _l; _l="$(cd "${sd}" && LC_ALL=C bash .claude/validation/lint-artifacts.sh --only="${sd}/.claude/commands/meta/zz.md" 2>&1 || true)"
+  if grep -q 'REGRA 98 (Diretiva de injeção escrita como CITAÇÃO não pode estar VIVA)' <<< "${_l}"; then
+    record_pass "cited-directive: (d) o lint de producao (dispatcher) emite a REGRA 98 sobre o defeito"
+  else record_fail "cited-directive: (d) dispatcher" "$(grep -E 'REGRA 98|MORREU|HARD' <<< "${_l}" | head -3 | tr '\n' '|')"; fi
+  # (e) motor que MORRE (node que sai 1) e HARD pelo dispatcher, nunca aprovacao calada (F6)
+  local _fb; _fb="$(mktemp -d)"; printf '#!/bin/sh\nexit 1\n' > "${_fb}/node"; chmod +x "${_fb}/node"
+  local _m _mrc=0; _m="$(PATH="${_fb}:${PATH}" bash "${REPO_ROOT}/.claude/validation/cited-directive-check.sh" "${sd}" --tsv 2>/dev/null)" || _mrc=$?
+  rm -rf "${_fb}"
+  if [ "${_mrc}" -eq 2 ] && grep -q '^HARD	SEM-MOTOR	' <<< "${_m}"; then record_pass "cited-directive: (e) motor que morre sai rc=2 com HARD SEM-MOTOR por stdout"
+  else record_fail "cited-directive: (e) motor morto" "rc=${_mrc}; [${_m}]"; fi
+  rm -rf "${sd}"
+  # (f) PARIDADE COM O BINARIO, nos DOIS lados: cada trecho literal tem de estar no binario INSTALADO
+  #     (deriva do Claude Code) E na guarda (deriva da copia). A 1a redacao so olhava o binario, e
+  #     mutar a copia — tirar a mascara, tirar o lookbehind — passava verde. Sem binario: nao verificado.
+  local _bin _needle _miss=""; _bin="$(readlink -f "$(command -v claude 2>/dev/null)" 2>/dev/null || true)"
+  local -a _needles=('function pTe(e){return e.replace(/`[^`\n]+`/g,(n,r)=>{let s=e[r-1];return s==="!"||s==="`"?n:"`"+'
+    'cDn=/```!\s*\n?([\s\S]*?)\n?```/g,uDn=/(?<=^|\s)!`([^`]+)`/gm'
+    'let n=e.matchAll(cDn),r=e.includes("!`")?pTe(e).matchAll(uDn):[],s=[];for(let g of[...n,...r]){let h=g[1]?.trim();if(h)s.push({raw:g[0],command:h,at:g.index})}return s')
+  for _needle in "${_needles[@]}"; do
+    LC_ALL=C grep -aqF -- "${_needle}" "${chk}" || _miss="${_miss} guarda:${_needle:0:24}"
+  done
+  if [ -z "${_bin}" ] || [ ! -f "${_bin}" ]; then
+    if [ -z "${_miss}" ]; then record_skip "cited-directive: (f) binario ausente — so a COPIA foi conferida"; else record_fail "cited-directive: (f) copia mutada" "${_miss}"; fi
+  else
+    for _needle in "${_needles[@]}"; do LC_ALL=C grep -aqF -- "${_needle}" "${_bin}" || _miss="${_miss} binario:${_needle:0:24}"; done
+    if [ -z "${_miss}" ]; then record_pass "cited-directive: (f) os 3 trechos literais estao no binario instalado E na guarda (sem deriva)"
+    else record_fail "cited-directive: (f) DERIVA" "ausente em:${_miss} — re-extraia o motor do binario ${_bin##*/} (TETO do cited-directive-check.sh)"; fi
+  fi
+}
+
 run_injected_cut_selftests() {
   local chk="${REPO_ROOT}/.claude/validation/injected-cut-check.sh"
   if [ ! -f "${chk}" ]; then record_fail "injected-cut" "guarda ausente: injected-cut-check.sh"; return; fi
@@ -21921,6 +21983,7 @@ _family run_role_promotion_selftests
 _family run_r84_pathspec_selftests
 _family run_silent_measurer_selftests
 _family run_injected_cut_selftests
+_family run_cited_directive_selftests
 _family run_evolve_staleness_selftests
 _family run_evolve_census_selftests
 _family run_evolve_workflow_selftests

@@ -95,8 +95,8 @@ _cuts_in() {   # $1 = o texto da diretiva; imprime o corte achado, ou nada
   #    `sed -n '1,40p'` — o caso (a) do sed passou a reprovar enquanto o padrao, sondado isolado,
   #    casava. Duas curas certas que se anulam e pior que uma errada, porque o sintoma aponta para
   #    o lugar errado. BURACO DECLARADO: um padrao-de-corte citado entre aspas SIMPLES dentro de
-  #    uma diretiva segue sendo acusado; a forma canonica de citar e crase dupla, que o varredor
-  #    ja isenta antes de chegar aqui.
+  #    uma diretiva segue sendo acusado. A crase dupla e isenta por ESTE varredor antes de chegar
+  #    aqui — mas o harness a EXECUTA, e a REGRA 98 acusa (nao e forma de citar).
   d="$(printf '%s' "${d}" | sed 's/"[^"]*"/""/g')"
   # ⚠️ `\|?` E NAO `\|`: o pipe deixou de ser OBRIGATORIO porque `!`head -40 censo.tsv`` — a forma
   #    mais curta e natural de uma diretiva — era INVISIVEL (FN-B do Elenxo, o pior do grupo), e
@@ -149,16 +149,24 @@ _scan() {   # emite uma linha TSV por achado: path<TAB>linha<TAB>corte
       #    podia conter o exemplo do anti-padrao da guarda que ele forja, e a unica saida era
       #    `--no-verify`. E a clausula 4 (falso positivo treina a sessao a ignorar o veto)
       #    realizada contra o proprio artefato — a pior falha possivel para uma guarda.
-      #    Tres formas de CITAR, todas legitimas e todas antes vetadas:
-      #      (i)  bloco cercado (```), onde o exemplo e evidentemente exemplo;
-      #      (ii) inline-code de crase DUPLA (`` !`cmd` ``), que e a forma canonica de citar uma
-      #           diretiva em prosa — e ja existe VIVA em 2 sitios do repo hoje;
+      #    Tres formas de CITAR do ponto de vista DESTA regra (o corte), e todas antes vetadas aqui.
+      #    ⚠️ Para o HARNESS nenhuma delas e citacao — ele EXECUTA as tres (medido 2026-10-04). Esta
+      #    regra as isenta porque a pergunta dela e o corte; a REGRA 98 (Diretiva de injeção escrita
+      #    como CITAÇÃO não pode estar VIVA) e quem as acusa por estarem vivas:
+      #      (i)  bloco cercado (```), que parece exemplo ao leitor e e EXECUTADO pelo harness;
+      #      (ii) inline-code de crase DUPLA, que esta redacao chamava de "a forma canonica de citar
+      #           uma diretiva em prosa" — ⚠️ FALSO PARA O HARNESS (medido 2026-10-04): ele NAO
+      #           mascara crase dupla nem pula bloco cercado, e EXECUTA o que esta guarda chama de
+      #           citado. Esta isencao segue certa para a pergunta DESTA regra (o corte), mas citar
+      #           assim roda o comando: a REGRA 98 (Diretiva de injeção escrita como CITAÇÃO não pode
+      #           estar VIVA) acusa. Descreva a forma, nunca a escreva;
       #      (iii) comentario DENTRO da diretiva (`# antes era | head -40, curado em …`), onde o
       #           corte nao corta nada: registrar a cura ficava vetado.
       case "${line}" in '```'*) _fence=$((1 - _fence)); continue ;; esac
       [ "${_fence}" -eq 0 ] || continue
       case "${line}" in *'!`'*) : ;; *) continue ;; esac
-      # crase DUPLA na linha = citacao inline; a diretiva viva nunca e escrita assim
+      # crase DUPLA na linha: esta regra nao julga o corte ali. NAO e verdade que "a diretiva viva
+      # nunca e escrita assim" (redacao anterior): o harness a executa, e a REGRA 98 acusa
       case "${line}" in *'``'*) continue ;; esac
       # pode haver mais de uma diretiva na linha; julga cada uma
       while IFS= read -r dir; do

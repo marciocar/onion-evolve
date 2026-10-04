@@ -1,0 +1,113 @@
+# kg-backlog-guard: on
+# ═══ TETO: 10 NÓS ═══
+meta:
+  id: cited-directive-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-10-04
+  review_after: 2026-11-18
+  supersedes_none: >
+    Guarda nova de classe ainda descoberta. Medida contra a REGRA 96, a guarda mais proxima: ela
+    cobra CORTE em diretiva viva e isenta como "citado" o que esta guarda acusa. Nada a derrubar
+    nela — a isencao segue certa para a pergunta dela; o comentario que chamava crase dupla de "forma
+    canonica de citar" foi corrigido no proprio arquivo.
+nodes:
+  - id: E_DEFEITO_CITACAO_EXECUTADA
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    verified_against: 'cited-directive-check.sh contra um worktree de origin/main: 2 achados HARD em create-skill.md l.86 (crase dupla) e l.219 (bloco cercado); 0 achados com a leva 1 aplicada (262 arquivos lidos)'
+    trace: '.claude/commands/meta/create-skill.md'
+    label: 'O DEFEITO, DATADO (peca 1 da guarda): em 2026-10-04 o /meta:create-skill executava git diff e git diff HEAD a cada invocacao — dois exemplos de documentacao que o autor escreveu como CITACAO (crase dupla; bloco cercado) e que o harness 2.1.289 le como diretiva de injecao viva. Segunda instancia no mesmo dia: o /meta:forge-guard nasceu morto na carga pelo mesmo mecanismo. A guarda, rodada contra main, acusa exatamente os dois sitios do dano e cala depois da cura.'
+
+  - id: D_SUBSTRATO_CHECK_DE_LINT_MOTOR_PYTHON
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: superseded
+    trace: '.claude/validation/cited-directive-check.sh'
+    verified_against: 'Elenxo da forja: fuzz diferencial de 20 mil textos, 184 divergencias entre a transcricao Python e o binario'
+    label: 'SUBSTRATO E MOLDE (1a versao, DERRUBADA): check de lint HARD copiado da REGRA 96, com as regex do harness TRANSCRITAS para Python. O Elenxo provou por fuzz diferencial 184 divergencias com o binario (o lookbehind do Python reinicia a varredura uma posicao depois; a mascara apagava as crases que o harness preserva) e um terco do motor (a regex de bloco) compilado e nunca usado.'
+
+  - id: D_MOTOR_E_COPIA_LITERAL_DO_BINARIO
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: done
+    verified_at: '2026-10-04'
+    trace: '.claude/validation/cited-directive-check.sh'
+    verified_against: 'familia cited_directive (f): os 3 trechos literais conferidos no binario instalado 2.1.289 E na guarda; 15 casos no --selftest'
+    label: 'SUBSTRATO FINAL: o motor roda em NODE com as funcoes que acham diretivas COPIADAS LITERALMENTE do binario 2.1.289 (pTe, cDn, uDn, bGn) — transcricao e traducao, e traducao erra; copia no motor original nao tem o que errar. O que e nosso e so o CONTEXTO de citacao: cerca de crase ou til com qualquer recuo e fechamento pelo mesmo caractere, diretiva-bloco em prosa ou dentro de cerca maior, span de crase dupla que CONTEM a diretiva, citacao (>) e comentario HTML. A bancada confere a paridade nos DOIS lados (binario instalado e guarda), entao deriva do Claude Code OU da copia reprova.'
+
+  - id: E_SEIS_MUTANTES_MORDERAM
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: superseded
+    verified_at: '2026-10-04'
+    verified_against: 'Elenxo da forja: remover a mascara inteira passava no --selftest; comentar a chamada do dispatcher deixava a familia verde'
+    trace: '.claude/validation/cited-directive-check.sh'
+    label: 'AFIRMACAO FALSA DA 1a VERSAO, preservada: este no dizia que seis mutantes morderam, inclusive "mascara-come-diretivas". O Elenxo provou que remover a mascara INTEIRA passava, e que a bancada nao exercitava o dispatcher. O mutante que eu rodei mudava a mascara de um jeito que o caso pegava; a mascara ausente, nao. Mutante escolhido por quem escreveu a cura mede o que ele imaginou, nao o que existe.'
+
+  - id: E_DOZE_MUTANTES_DEPOIS_DO_ELENXO
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    verified_against: 'doze mutantes contra a familia cited_directive, 12/12 mordem: sem mascara (M4), sem lookbehind (M6), bloco em prosa (M5), bloco em cerca (M9), cerca-bang nao alterna (fp1), cerca fecha por qualquer cerca, so crase sem recuo, crase dupla em qualquer ponto, sem blockquote, sem comentario HTML, motor morto calado, dispatcher desligado'
+    trace: '.claude/validation/lint-selftest.sh'
+    label: 'MUTANTES DEPOIS DAS CURAS: doze, incluindo os quatro do Elenxo que sobreviviam (M4, M5, M6, M9) e o dispatcher desligado. Dois deles (M4, M6) so morderam quando a paridade passou a olhar a GUARDA alem do binario; e o da cerca so mordeu quando o caso fp5 voltou a forma exata do achado (cerca interna nua). Tres casos decorativos achados pelo proprio mutante, de novo.'
+
+  - id: C_TETO_REGEX_TRANSCRITAS_DE_UMA_VERSAO
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    trace: '.claude/validation/cited-directive-check.sh'
+    verified_against: 'cabecalho do script, secao TETO'
+    label: 'TETO 1: as regex sao TRANSCRITAS do binario 2.1.289. Um Claude Code novo pode mudar o parser e a guarda nao percebe — ela simularia uma leitura que o harness ja nao faz. Quem acusa a versao nova e a REGRA 65 (radar E3); re-medir estas regex e parte da rodada do E3.'
+
+  - id: C_TETO_PROSA_NUA_E_AGENTES
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    trace: '.claude/validation/cited-directive-check.sh'
+    verified_against: 'cabecalho do script, secao TETO'
+    label: 'TETO 2: diretiva viva numa linha de prosa comum e tratada como INTENCIONAL (e a forma das diretivas de verdade, e intencao nao se mede) — um exemplo escrito em prosa nua passa. E o universo nao inclui .claude/agents, e isso e CERTO e medido: o Elenxo da leva 1 achou no binario que o harness nao injeta em corpo de agente. Os 4 sitios do agent-skills-specialist foram cura preventiva.'
+
+edges:
+  - from: E_DEFEITO_CITACAO_EXECUTADA
+    to: D_SUBSTRATO_CHECK_DE_LINT_MOTOR_PYTHON
+    edge_type: SUPPORTS
+  - from: E_SEIS_MUTANTES_MORDERAM
+    to: D_SUBSTRATO_CHECK_DE_LINT_MOTOR_PYTHON
+    edge_type: SUPPORTS
+  - from: C_TETO_REGEX_TRANSCRITAS_DE_UMA_VERSAO
+    to: D_MOTOR_E_COPIA_LITERAL_DO_BINARIO
+    edge_type: CONSTRAINS
+  - from: C_TETO_PROSA_NUA_E_AGENTES
+    to: D_MOTOR_E_COPIA_LITERAL_DO_BINARIO
+    edge_type: CONSTRAINS
+  - from: D_MOTOR_E_COPIA_LITERAL_DO_BINARIO
+    to: D_SUBSTRATO_CHECK_DE_LINT_MOTOR_PYTHON
+    edge_type: SUPERSEDES
+  - from: E_DOZE_MUTANTES_DEPOIS_DO_ELENXO
+    to: E_SEIS_MUTANTES_MORDERAM
+    edge_type: SUPERSEDES
+  - from: E_DOZE_MUTANTES_DEPOIS_DO_ELENXO
+    to: D_MOTOR_E_COPIA_LITERAL_DO_BINARIO
+    edge_type: SUPPORTS
+  - from: E_DEFEITO_CITACAO_EXECUTADA
+    to: D_MOTOR_E_COPIA_LITERAL_DO_BINARIO
+    edge_type: SUPPORTS
