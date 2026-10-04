@@ -1,9 +1,9 @@
 ---
 reviewed_diff_sha256: e43410aec0cf93bb439eec80e0c2fbbd8111f0fe97d68b2db168c019227d2b8a
-findings_total: 14
-findings_real: 14
-tokens: 184628
-duration_min: 17
+findings_total: 28
+findings_real: 28
+tokens: 349054
+duration_min: 33
 verdict: REPROVADO_E_CURADO
 elenxo: sim
 nota: >
@@ -96,8 +96,37 @@ Verificado: `--selftest` **14/14** · família `run_injected_cut_selftests` **4/
 mordendo com prova de mutação · produção **rc=0** · censo confirmando registro nos **dois** lugares ·
 `kg-radar` exit 0 nos dois grafos · as três projeções da catraca regeneradas.
 
-⚠️ **O Elenxo da guarda está EM VOO** com mandato diferente — caçar **falso positivo**, porque veto
-ignorado é pior que veto ausente (cláusula 4). Este resíduo será re-carimbado com o veredito dele.
+### O veredito do 2º Elenxo (mandato: caçar FALSO POSITIVO) — **REPROVADO**, e os dois piores eram fatais
+
+7 classes de falso positivo, 11 formas de truncar não declaradas, 5 achados de 1ª classe.
+
+| # | Achado | Estado |
+|---|---|---|
+| **FP-1** | A guarda **proibia documentar a própria regra**: ele acrescentou ao `/meta:forge-guard` a seção que qualquer autor de doutrina escreveria e o lint **real** foi a `HARD:1/FALHOU`. A saída era `--no-verify` — a cláusula 4 realizada contra o próprio artefato | **curado**: diretiva **viva** ≠ **citada** (cerca, crase dupla, comentário, padrão entre aspas). Re-verificado ponta-a-ponta: guarda cala **e** lint 0 HARD com a documentação presente |
+| **Achado A** | O dispatcher invoca `--tsv 2>/dev/null \|\| true`, então o fail-loud **nunca chegava ao lint**. Eu o escrevi, provei no CLI, mutei contra ele — e o consumidor o anulava. **Em produção a guarda já era fail-open ali** | **curado**: fail-loud em TSV por **stdout**. E ele não podia viver dentro de `$(_scan)`, onde `exit 2` encerra só o subshell: sentinela no varredor, decisão no chamador |
+| **FN-B** | O predicado exigia `\|` **literal**, então `head -40 arquivo` era invisível e `sed -n 1,40p arquivo` — a redação **usual** — passava | **curado**: pipe deixa de ser obrigatório; entram `-n40`, `--lines=`, `awk NR<=N`, `grep -m N`, `sed Nq` |
+| **FN-A** | A isenção `N<=2` é **sintática** e o teto afirmava o contrário: no mesmo cortador, `\| head -1` apaga **297 de 298** e passa calado | **declarado** em vez de disfarçado — fechar exige discriminante do **produtor**, e é leva própria |
+| **FP-6** | Corte que **é a pergunta** (top-N) era vetado | **curado** por marcador **explícito** `# top-N`, não por heurística: adivinhar pelo pipeline isentaria `forge-census \| sort \| head -12`, que é o dano original |
+
+**E a bancada achou o que o Elenxo não viu:** `printf \| grep -q` na guarda é a classe **EPIPE do
+early-closer** — sítio novo acima da catraca, curado com here-string. Mais `role-cut: (k)`, que cobra
+que todo comando citado por uma guarda **viaje para o adotante**, senão ele colhe a violação sem ter
+o comando da cura.
+
+**Duas afirmações minhas, corrigidas nos grafos:** os mutantes eram **5/6**, não 6/6 — o M4 era
+**no-op semântico**, e é instância da **4ª causa que o meu próprio nó havia acabado de nomear**, com
+o `verified_against` descrevendo uma medição que não aconteceu. E o gatilho do
+`Q_SEGUNDA_SUPERFICIE` **já havia disparado** no mesmo dia em que o declarei não-disparado:
+`plugins/onion/skills/onion/SKILL.md:21` tem diretiva **viva** com corte, no arquivo que os
+adotantes **instalam**.
+
+**E duas curas minhas se anularam no caminho:** a de *"padrão entre aspas é dado"* comia o argumento
+legítimo do `sed -n '1,40p'`. Duas curas certas que se anulam é pior que uma errada, porque o sintoma
+aponta para o lugar errado.
+
+**Pós-cura:** `--selftest` **18/18** · **10 mutantes, 10 mordendo** (o M4 agora ataca o **mecanismo**,
+porque os dois filtros são redundantes, e isso fica declarado) · produção **rc=0** · 44 casos nas 6
+famílias afetadas, 0 falhas.
 
 ## Teto declarado
 
