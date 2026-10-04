@@ -60,6 +60,7 @@
 .claude/commands/meta/drive.md	D_DRIVE_MECANIZA_O_RUNTIME	docs/onion/graph/drive-superacao-2026-08.kg.yaml
 .claude/commands/meta/drive.md	E_CENSO_EM_VOO_LE_NOME_DE_BRANCH	docs/onion/graph/sinais-de-campo-2026-09.kg.yaml
 .claude/commands/meta/drive.md	E_PROSA_29_GATES_1_COBERTO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.claude/commands/meta/evolve.md	Q_GATILHO_DO_EVOLVE_QUAL_E	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/commands/meta/evolve.md	Q_saude_do_framework	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
 .claude/commands/meta/evolve.md	SY6_ev_evolve_tiering	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/federation-member.md	C_command_side_gap	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
@@ -104,6 +105,7 @@
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_AVISO_CARREGA_O_QUE_VALE	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_MEDIR_O_DONO_NAO_O_CARIMBO	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md	D_ORFAO_EXIGE_TRES_PROVAS	docs/onion/graph/guardas-revisao-2026-08.kg.yaml
+.claude/diary/2026-10-02-quatro-decisoes-seladas-e-tres-guardas-com-defeito-datado.md	E_O_EVOLVE_E_2_DE_7_NAO_ZERO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/hooks	E_AUTO_MODE_E_UMA_CAMADA_DE_PERMISSAO_QUE_O_ONION_NAO_USA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 .claude/hooks/background-state-needs-evidence.sh	C_GUARDA_DOGFOOD_E_INVOCAR_NAO_IMITAR	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 .claude/hooks/bash-empty-result-guard.sh	E_POSTTOOLUSE_E_SINAL_POS_FATO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
@@ -261,6 +263,7 @@
 .claude/validation/federation-console.sh	E_console	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/validation/federation-radar.sh	E_FED_RADAR_BUILT	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/validation/fixtures/kg-reconcile/state-below-radar.kg.yaml	E_fixture_vacua_reprovou_no_mutante	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
+.claude/validation/forge-census.sh	C_MEDIDOR_QUE_CORTA_OU_ZERA_EM_SILENCIO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/graph.sh	C_FED_STRUCTURE_IS_TRIPLES	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/validation/guardrails/onion-effect-gate.sh	E_EFFECT_GATE_LIVE	docs/onion/graph/graduated-automation-elenxo-2026-07.kg.yaml
 .claude/validation/guardrails/onion-effect-gate.sh	E_WIRE_IN_LIVE	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
@@ -277,6 +280,7 @@
 .claude/validation/kg-console.sh	C_OPCAO_O8_CONSOLE_MULTI_GRAFO	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
 .claude/validation/kg-console.sh	C_single_artifact_ethos	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/kg-console.sh	E_scale_881	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
+.claude/validation/kg-corpus-grep.sh	E_AS_DUAS_CURAS_COM_CONTRAPROVA	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/kg-corpus-grep.sh	E_CORPUS_VIROU_INSTRUMENTO_DE_ISENCAO	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
 .claude/validation/kg-coverage-baseline.txt	C_OPCAO_C_ADOTAR_SARIF_E_INTERCAMBIO	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .claude/validation/kg-coverage-baseline.txt	E_OBJECAO_6_CATRACA_JA_E_MENOS_PERMISSIVO	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
@@ -366,6 +370,7 @@
 .claude/validation/lint-selftest.sh	C_BANCADA_ACHA_O_QUE_LEITURA_NAO_ACHA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	C_GUARDA_CASO_TESTA_COPIA_NAO_O_SUT	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	C_OPCAO_F_ABSORVER_TESTE_DE_MUTACAO_DE_REGRA	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
+.claude/validation/lint-selftest.sh	C_TERCEIRA_CAUSA_DE_MUTANTE_QUE_NAO_MORDE	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	C_TESTE_QUE_AFIRMA_AUSENCIA_PASSA_DE_GRACA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	C_offline_csp	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	D_PROVA_MUTACAO_COBRA_AS_TRES_CONDICOES	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
@@ -384,6 +389,7 @@
 .claude/validation/lint-selftest.sh	E_FIXTURE_NA_ARVORE_VIVA_CORRE_COM_AS_FAIXAS	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_OBJECAO_1_DOR_E_SCRIPT_SEQUENCIAL_NAO_HOOK	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
+.claude/validation/lint-selftest.sh	E_REPLACE_PRIMEIRO_ACERTOU_O_COMENTARIO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_SELFTEST	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_minha_guarda_deu_fail_open	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_reproduction_3_tries	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
@@ -1535,6 +1541,7 @@ docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md	E_F1_E3_CLAUDE_CODE_DE
 docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md	E_F1_E4_CAPITAL	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
 docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md	E_F1_E5_GATES_DETERMINISTICOS	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
 docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md	E_F1_E6_FRONTEIRA_MODELOS	docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
+docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml	C_O_EVOLVE_NAO_E_FRACO_E_SEM_GATILHO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml	Q_E3_DELTA_2_1_257	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md	C_BITEMPORAL_E_REVISITA_FECHAM_O_ENVELHECIMENTO	docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml
 docs/evolution/research/meta-research-lens-2026-09/SYNTHESIS.md	C_ESCOLHA_DE_FONTES_E_DADO_MAIS_GUARDA	docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml

@@ -7,7 +7,7 @@ tags: [evolve, forge-guard, dogfood, elenxo, bancada, decisao-selada]
 affects: [meta, validation]
 breadcrumb_for: []
 share_with: []
-next_recommended: "RE-FORJAR O /meta:evolve pelo conjunto das 7 peças — selado pelo maestro em 2026-10-02 e medido em 0/7, o MENOS estruturado dos 59 candidatos. Derive FRESCO contra o vivo (não há plano pré-cozinhado aqui, de propósito): rode o forge-census, leia a cláusula-mãe abaixo, e trate os cinco órgãos (census/radar/drive/onion-research/forjas) como FASES do laço, não como substitutos dele. Os 3 candidatos a guarda também estão selados e cada um tem defeito datado — ordem recomendada: paridade, dogfood-invoke, caso-testa-cópia."
+next_recommended: "RE-FORJAR O /meta:evolve pelo conjunto das 7 peças — selado pelo maestro em 2026-10-02. ⚠️ CORREÇÃO DE 2026-10-03, leia antes de usar o número: ele é 2/7 (tem a peça 5, destino), EMPATADO com 12 outros, e 37 candidatos estão ABAIXO dele em 1/7 — NÃO é 0/7 nem o menos estruturado. A causa do erro foi instrumento: a projeção markdown do forge-census cortava 12 de 59 EM SILÊNCIO (curado no mesmo dia; hoje ela declara o corte). E o enquadramento certo não vem da contagem, vem do corpus: C_TESE_AUTO_EVOLUCAO (maestro-vivo-2026-08, imp 5) mede que estamos à FRENTE no produto do laço e ATRÁS no GATILHO dele — o evolve não é fraco de estrutura, é sem gatilho. Derive FRESCO contra o vivo (não há plano pré-cozinhado aqui, de propósito): rode o forge-census, leia a cláusula-mãe abaixo, e trate os cinco órgãos (census/radar/drive/onion-research/forjas) como FASES do laço, não como substitutos dele. Os 3 candidatos a guarda também estão selados e cada um tem defeito datado — ordem recomendada: paridade, dogfood-invoke, caso-testa-cópia."
 review_after: 2026-11-02
 conflict_class: static
 ---
@@ -39,10 +39,31 @@ Isto não é cláusula *do comando* — é a **constituição do laço de auto-e
 > precipitado, **como guardião do Onion**. *Nem tudo que dizem e que você busca é a verdade — por
 > isso **informado é diferente de verificado**.* Sempre com **eficiência e eficácia**.
 
-**O achado que dá urgência:** o repo se chama Onion **Evolve** e o `evolve` dele **não roda**. Medido
-pelo `forge-census.sh`: **0 de 7 peças** — ausente do censo inteiro, porque descobre por CITAÇÃO e o
-comando cita `doctrine` 5× mas **zero** `census`, **zero** `write(KG)`, **zero** `rules/`, **zero**
-`selftests`. `dissect` e `onion-research`, forjados nas últimas semanas, estão **7/7**. A casa
+**O achado que dá urgência** — e ⚠️ **o número abaixo foi MEDIDO ERRADO; a correção está logo em
+seguida e é mais instrutiva que o achado**: ~~o repo se chama Onion **Evolve** e o `evolve` dele **não
+roda**. Medido pelo `forge-census.sh`: **0 de 7 peças** — ausente do censo inteiro, porque descobre por
+CITAÇÃO e o comando cita `doctrine` 5× mas **zero** `census`, **zero** `write(KG)`, **zero** `rules/`,
+**zero** `selftests`.~~
+
+**CORRIGIDO EM 2026-10-03, por medição no `--tsv`:** o evolve é **2/7** — ele **tem** a peça 5
+(destino: cita `kg-radar`), está **empatado com 12 outros** candidatos, e **37 dos 59 estão ABAIXO
+dele**, em 1/7. Nem "0/7", nem "o menos estruturado". A linha riscada fica porque apagá-la
+transformaria a correção em propaganda, e porque o **modo de errar** é o que vale guardar:
+
+> **A causa foi INSTRUMENTO, não descuido.** A projeção `--markdown` do `forge-census` tinha um
+> `head -12` literal e imprimia 12 de 59 candidatos **em silêncio**. Eu li a projeção, não vi o
+> evolve nela, e li a ausência como zero — mas **ausência-por-corte é indistinguível de
+> ausência-por-zero** quando o corte não se declara. O cabeçalho até dizia "59 candidato(s)";
+> comparar 12 com 59 era trabalho do leitor, e leitor não é mecanismo. **Curado no mesmo dia**: a
+> projeção agora imprime quantos ficaram de fora e manda usar `--tsv` para o conjunto.
+
+**E o enquadramento certo não vem da contagem.** Vem do corpus, que já tinha a resposta com
+`impact: 5` e Elenxo sustentada-com-emendas — `C_TESE_AUTO_EVOLUCAO`
+(`docs/evolution/research/maestro-vivo-2026-08/`): *"não estamos atrás no eixo da auto-evolução —
+estamos à FRENTE no **produto** do laço e ATRÁS no **GATILHO** dele"*. O mesmo grafo guarda um Elenxo
+que derrubou 4 vereditos, um deles por **não-sequitur causal** ao explicar os 32 dias sem
+`/meta:evolve`. Ou seja: o evolve **não é fraco de estrutura, é sem gatilho** — e re-forjá-lo pelas 7
+peças sem lhe dar gatilho repetiria o erro com mais peças. `dissect` e `onion-research`, forjados nas últimas semanas, estão **7/7**. A casa
 **cresceu órgãos e perdeu o coração**: cada vez que o evolve ficou caro, nasceu um comando específico
 para a parte urgente, e nenhum deles tem o dever de olhar o conjunto.
 
@@ -120,8 +141,9 @@ um caso que estava certo.
 
 ## Re-teste (como falsificar esta migalha)
 
-- `bash .claude/validation/forge-census.sh . --markdown | grep evolve` → se o evolve **não** aparecer
-  mais em 0/7, a leva começou (ou o censo mudou de critério — meça qual).
+- `bash .claude/validation/forge-census.sh . --tsv | grep -P '\tevolve\t'` → **use o `--tsv`, não o
+  `--markdown`**: foi exatamente a projeção cortada que produziu o número falso acima. Hoje o evolve
+  sai em 2/7; se subir, a leva começou (ou o censo mudou de critério — meça qual).
 - `bash .claude/validation/guard-census.sh . --markdown` → os 3 candidatos viraram guarda? Procure
   família nova em `lint-selftest.sh`.
 - `bash .claude/validation/trust-topology-check.sh --from metagamify --to onion-evolve --action correct`

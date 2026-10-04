@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**311 itens abertos** em 64 grafo(s) com aberto (de 87 no escopo) · 65 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**312 itens abertos** em 65 grafo(s) com aberto (de 88 no escopo) · 66 grupo(s), agrupados por `owner:` (7 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -519,6 +519,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 8.2 | `Q_ntenant_proof` | company-brain-market-2026-07 | Gap mais crítico p/ 'Company' (vs pessoal): a prova N=1 pessoal NÃO generaliza p/ multi-tenant (múltiplos leitores do mesmo gra |
+
+## medidores-silenciosos-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.0 | `Q_GATILHO_DO_EVOLVE_QUAL_E` | medidores-silenciosos-2026-10 | A PERGUNTA QUE O RE-FORJAR TEM DE RESPONDER ANTES DE ESCREVER SUPERFICIE: qual e o GATILHO do /meta:evolve? O radar tem a REGRA 65 |
 
 ## onion-doctrine-elenxo-bulbo-2026-07 — 3 item(ns)
 

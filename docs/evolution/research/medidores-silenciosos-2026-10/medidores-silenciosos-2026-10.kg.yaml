@@ -1,0 +1,111 @@
+# kg-backlog-guard: on
+# ═══ TETO: 7 NÓS ═══
+meta:
+  id: medidores-silenciosos-2026-10
+  schema_version: "1"
+  baseline: 2026-10-03
+  review_after: 2026-12-02
+  supersedes_none: >
+    Nada a derrubar numa baseline de eixo: esta leva nao e rodada de radar, e a FASE DE MEDICAO do
+    re-forjar do /meta:evolve — o raio-X que a clausula-mae manda rodar ANTES do raciocinio. O que
+    ela corrige nao e no de grafo, e uma MIGALHA de diario (2026-10-02), corrigida no lugar com a
+    linha falsa RISCADA em vez de apagada; apagar transformaria a correcao em propaganda.
+nodes:
+  - id: E_O_EVOLVE_E_2_DE_7_NAO_ZERO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'A MIGALHA DE ONTEM AFIRMAVA FALSO, e o erro era meu. Ela declarava que o /meta:evolve tinha "0 de 7 pecas — ausente do censo inteiro" e que era "o MENOS estruturado dos 59 candidatos". MEDIDO no `--tsv`: ele e 2/7 (TEM a peca 5, destino: cita `kg-radar` na l.193), esta EMPATADO com 12 outros candidatos, e 37 dos 59 estao ABAIXO dele em 1/7. Distribuicao conferida e somando 59: 37 em 1/7, 13 em 2/7, 3 em 3/7, 3 em 4/7, 1 em 6/7, 2 em 7/7. Logo as duas metades da afirmacao eram falsas: nem zero, nem o menor.'
+    trace: '.claude/diary/2026-10-02-quatro-decisoes-seladas-e-tres-guardas-com-defeito-datado.md'
+    verified_against: 'forge-census.sh --tsv | grep -P "\tevolve\t" devolve "2 evolve 0 0 0 1 0 0"; a distribuicao por awk soma 59, que e o total do cabecalho — consistencia interna que prova que as contagens nao vieram de comando falho'
+
+  - id: C_MEDIDOR_QUE_CORTA_OU_ZERA_EM_SILENCIO
+    node_type: claim
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-03'
+    label: 'A CLASSE, e ela ja estava escrita no proprio forge-census: *"zero NAO e resultado"*. Dois medidores a violavam no mesmo dia. (1) `forge-census --markdown` tinha `head -12` LITERAL e imprimia 12 de 59 candidatos SEM DIZER — o cabecalho ate imprimia "59 candidato(s)", mas comparar 12 com 59 e trabalho do LEITOR, e leitor nao e mecanismo. (2) `kg-corpus-grep "frase entre aspas"` casava a frase INTEIRA como UM termo e devolvia `0 no(s)` sobre 120 grafos. O DANO E O MESMO nos dois: AUSENCIA-POR-CORTE e AUSENCIA-POR-INVOCACAO sao indistinguiveis de AUSENCIA-POR-ZERO, e quem le conclui "o corpus nao sabe disto" / "o artefato nao tem nada". Foi exatamente o que produziu E_O_EVOLVE_E_2_DE_7_NAO_ZERO.'
+    trace: '.claude/validation/forge-census.sh'
+    verified_against: 'head -12 literal lido no forge-census.sh; invocacao do kg-corpus-grep com frase quotada devolvendo 0 sobre 120 grafos, e 294 nos com os mesmos termos separados'
+
+  - id: E_AS_DUAS_CURAS_COM_CONTRAPROVA
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'CURAS APLICADAS E DOGFOODADAS. (1) `forge-census`: o teto virou `FORGE_CENSUS_TOP` e a projecao passou a imprimir quantos candidatos ficaram de fora, que eles NAO sao zero, e a rota para o conjunto (`--tsv`). (2) `kg-corpus-grep`: termo posicional COM ESPACOS faz o que o `--query` faria (separa) e AVISA que separou; e um `0 no(s)` sobre corpus POPULADO passa a imprimir as quatro coisas a checar antes de concluir ausencia (substring sem stemming, OR que amplia, status ocultos por default, e so entao a lacuna como NO). ⚠️ A CONTRAPROVA E PARTE DA CURA: o caso (b) cobra que a projecao COMPLETA **nao** emita o aviso — aviso incondicional e ruido, e ruido treina o leitor a ignorar o aviso que importa.'
+    trace: '.claude/validation/kg-corpus-grep.sh'
+    verified_against: 'familia run_silent_measurer_selftests 4/4 verde; 4 mutantes MORDERAM (M1 sem a declaracao, M2 declaracao incondicional, M3 frase volta a 1 termo, M4 zero nu) e os dois artefatos voltaram byte-identicos por `cmp -s`'
+
+  - id: C_TERCEIRA_CAUSA_DE_MUTANTE_QUE_NAO_MORDE
+    node_type: claim
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-03'
+    label: 'A LICAO DE METODO DESTA LEVA, e ela ESTENDE uma doutrina existente. A casa conhecia DUAS causas para "o mutante nao mordeu": o caso e DECORATIVO, ou o mutante NAO MUDA o que o caso afirma. Hoje apareceu a TERCEIRA: o HARNESS OLHOU A STRING ERRADA. Os 4 mutantes morderam de verdade — o runner imprimia `✗` em todos — e o harness declarou "NAO MORDEU" nos quatro, porque eu grepei o rotulo de `record_pass` dentro da linha de `record_fail`, e os dois rotulos sao DIFERENTES por desenho ("(a) corte calado" vs "(a) projecao cortada DECLARA"). A cura e ancorar no PREFIXO do caso (`silent-measurer: (a)`), que e estavel nas duas saidas. CONSEQUENCIA: `bancada-espelha-o-runner` vale para o HARNESS DO MUTANTE tambem, nao so para o caso — e um harness que mente sobre o mutante e pior que nenhum, porque convida a "consertar" um caso que esta certo.'
+    trace: '.claude/validation/lint-selftest.sh'
+    verified_against: 'primeira rodada: 4x "NAO MORDEU" com os 4 ✗ visiveis na propria saida do diagnostico; apos ancorar no prefixo: 4x MORDEU'
+
+  - id: E_REPLACE_PRIMEIRO_ACERTOU_O_COMENTARIO
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-03'
+    label: 'SUB-CASO DA MESMA CLASSE, no MESMO conserto: ao corrigir o harness, meu `replace(old, new, 1)` acertou a PRIMEIRA ocorrencia da string — que era dentro do COMENTARIO que eu acabara de inserir (ele cita os dois rotulos como exemplo) — e deixou a chamada real do M1 intacta. Resultado: 3 mutantes passaram a morder e o M1 seguiu "nao mordendo", por um motivo inteiramente diferente do original. LICAO: comentario que CITA a string que se vai substituir e um alvo de substituicao; `replace(...,1)` nao sabe distinguir documentacao de codigo. Casar o FORMATO ou a chamada completa, nunca o fragmento que a prosa tambem contem — e a mesma familia de `guarda-por-lista-falha-pelo-vocabulario`.'
+    trace: '.claude/validation/lint-selftest.sh'
+    verified_against: 'o diff do proprio harness mostrou o comentario corrompido (l.18) com a chamada do M1 inalterada; corrigidas as duas pontas, 4/4 morderam'
+
+  - id: C_O_EVOLVE_NAO_E_FRACO_E_SEM_GATILHO
+    node_type: claim
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: confirmed
+    verified_at: '2026-10-03'
+    label: 'O ENQUADRAMENTO DO RE-FORJAR MUDA, e ele NAO vem da contagem de pecas — vem do corpus, que ja tinha a resposta com impact 5 e Elenxo sustentada-com-emendas. `C_TESE_AUTO_EVOLUCAO` (maestro-vivo-2026-08): *"nao estamos atras no eixo da auto-evolucao — estamos a FRENTE no PRODUTO do laco e ATRAS no GATILHO dele"*. O mesmo grafo guarda um Elenxo que derrubou 4 vereditos, um por NAO-SEQUITUR CAUSAL ao explicar os 32 dias sem /meta:evolve. CONSEQUENCIA DIRETA: re-forjar o evolve pelas 7 pecas sem lhe dar GATILHO repete o erro com mais pecas. E as pecas que faltam tem de ser lidas a essa luz — a doutrina dele EXISTE, mas numa KB (`onion-modernization-doctrine.md`), logo nao e um fragmento que `census`/`radar`/`drive`/forjas possam REFERENCIAR, que e exatamente o que a clausula-mae pede.'
+    trace: 'docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml'
+    verified_against: 'C_TESE_AUTO_EVOLUCAO e E_ELENXO_AUTO_EVOLUCAO lidos inteiros (impact 5 e 4, confirmed, verified_at 2026-08-31); o predicado _cites_doctrine do forge-census exige common/prompts/*-doctrine.md e o evolve cita apenas a KB'
+
+  - id: Q_GATILHO_DO_EVOLVE_QUAL_E
+    node_type: question
+    plane: PROD
+    impact: 5
+    confidence: 0.8
+    status: open
+    verified_at: '2026-10-03'   # a data da MEDICAO, nao a do commit: o `evolve.md` foi grepado neste dia
+    label: 'A PERGUNTA QUE O RE-FORJAR TEM DE RESPONDER ANTES DE ESCREVER SUPERFICIE: qual e o GATILHO do /meta:evolve? O radar tem a REGRA 65 (baseline vencida por eixo, SOFT no lint); o dissect tem censo de nivel vencido; o kg tem a REGRA 67 (revisita vencida). O evolve nao tem NENHUM — e e por isso que ficou 32 dias sem rodar, nao por ser caro. Candidatos a medir, nao a supor: (a) idade da ultima auditoria por DIMENSAO (o analogo da REGRA 65, barato e ja tem molde); (b) delta populacional (comando/agente/skill novo desde a ultima passada — o inventory ja mede); (c) gatilho por SINAL (achado de adotante, versao de plataforma, guarda nova sem bancada). ⚠️ O que NAO pode ser: relogio/cron — isso e MOAT W7, maestro-invocado por doutrina. GATILHO desta pergunta: a propria leva do re-forjar.'
+    trace: '.claude/commands/meta/evolve.md'
+    verified_against: 'REGRA 65 lida no lint-artifacts; o evolve.md nao cita census, rules/ nem familia de bancada (medido: 0 ocorrencias de cada)'
+
+edges:
+  - from: C_MEDIDOR_QUE_CORTA_OU_ZERA_EM_SILENCIO
+    to: E_O_EVOLVE_E_2_DE_7_NAO_ZERO
+    edge_type: CAUSES
+  - from: E_AS_DUAS_CURAS_COM_CONTRAPROVA
+    to: C_MEDIDOR_QUE_CORTA_OU_ZERA_EM_SILENCIO
+    edge_type: SUPPORTS
+  - from: C_TERCEIRA_CAUSA_DE_MUTANTE_QUE_NAO_MORDE
+    to: E_AS_DUAS_CURAS_COM_CONTRAPROVA
+    edge_type: CONSTRAINS
+  - from: E_REPLACE_PRIMEIRO_ACERTOU_O_COMENTARIO
+    to: C_TERCEIRA_CAUSA_DE_MUTANTE_QUE_NAO_MORDE
+    edge_type: SUPPORTS
+  - from: E_O_EVOLVE_E_2_DE_7_NAO_ZERO
+    to: C_O_EVOLVE_NAO_E_FRACO_E_SEM_GATILHO
+    edge_type: SUPPORTS
+  - from: C_O_EVOLVE_NAO_E_FRACO_E_SEM_GATILHO
+    to: Q_GATILHO_DO_EVOLVE_QUAL_E
+    edge_type: SUPPORTS
