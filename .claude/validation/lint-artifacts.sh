@@ -5393,6 +5393,36 @@ check_kg_census_parity
 check_marketplace_root_sync
 check_plugin_deps_contract
 
+# REGRA 96 — Diretiva de contexto INJETADO não corta listagem em silêncio [HARD]
+# previne: a projeção que o harness injeta é lida pela sessão COMO SE FOSSE o conjunto — não há
+#   rolagem nem "ver mais". Um `| head -N` ali não é formatação: é uma afirmação implícita de
+#   completude, e ela é falsa.
+#   DANO CONSUMADO (2026-10-03, três sítios, um pago em afirmação falsa SELADA): `meta/forge.md`
+#   injetava uma projeção que cortava 12 de 59 candidatos em silêncio; uma sessão leu a projeção,
+#   não viu o `/meta:evolve` nela, e selou numa migalha que ele tinha "0 de 7 peças, ausente do
+#   censo inteiro" — o `--tsv` dizia 2/7, com 37 candidatos ABAIXO dele. `onion-research/SKILL.md`
+#   injetava 40 de 298 achados do corpus. `meta/kg.md` prometia "FILA COMPLETA / CORPUS INTEIRO"
+#   antes de um `head -20` sobre ~312 abertos. Os três curados; o selo para guardar a CLASSE veio
+#   em 2026-10-04, depois do passivo ser MEDIDO EM ZERO — guarda que nasce em zero não tolera
+#   dívida: o próximo corte entra reprovando em vez de entrar num baseline.
+#   Toda a lógica (e o teto declarado) vive em injected-cut-check.sh.
+check_injected_cut_declares() {
+  local helper="${SCRIPT_DIR}/injected-cut-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      */lint-artifacts.sh|*/injected-cut-check.sh|*/.claude/commands/*|*/.claude/skills/*) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local line
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    violation "${_sev:-HARD}" "${_path}" "REGRA 96 (Diretiva de contexto INJETADO não corta listagem em silêncio): ${_msg}"
+  done < <(bash "${helper}" "${REPO_ROOT}" --tsv 2>/dev/null || true)
+}
+check_injected_cut_declares
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================

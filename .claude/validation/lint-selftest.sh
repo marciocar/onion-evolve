@@ -7886,6 +7886,57 @@ run_review_verdict_selftests() {
 # ESTA FAMILIA TESTA OS ARTEFATOS DA ARVORE VIVA (sem `git archive`, sem copia do predicado para
 # dentro do caso): o (a)/(b) rodam o censo real no repo real variando so o teto por env, e o
 # (c)/(d) rodam o corpus-grep real com corpus plantado por ONION_KG_CORPUS_FILES.
+# ── REGRA 96: diretiva injetada que corta listagem em silencio ───────────────────────────────
+# A familia DELEGA ao `--selftest` do proprio check (14 casos la, incluindo as seis formas de
+# truncar e a isencao de valor unico) e acrescenta o que so daqui se ve: o MODO QUE A PRODUCAO
+# CONSOME. O molde avisa disso no comentario da l.6 dele — um caso vivia DEPOIS do `exit` do ramo
+# TSV, e TSV e exatamente o modo que o lint invoca: modo humano reprovava, modo TSV saia 0 e vazio.
+run_injected_cut_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/injected-cut-check.sh"
+  if [ ! -f "${chk}" ]; then record_fail "injected-cut" "guarda ausente: injected-cut-check.sh"; return; fi
+
+  # (a) o --selftest proprio passa inteiro (14 casos). Delegacao, nao copia do predicado.
+  local _o _rc=0
+  _o="$(cd "${REPO_ROOT}" && LC_ALL=C bash "${chk}" --selftest 2>&1)" || _rc=$?
+  if [ "${_rc}" -eq 0 ] && grep -qE '[0-9]+ passaram, 0 falharam' <<< "${_o}"; then
+    record_pass "injected-cut: (a) --selftest proprio verde (as seis formas + a isencao de valor unico)"
+  else record_fail "injected-cut: (a) --selftest" "rc=${_rc}; saida=[${_o}]"; fi
+
+  # (b) O MODO QUE A PRODUCAO CONSOME: `--tsv` no repo real sai 0 e NAO emite linha de violacao.
+  #     Sem este caso, o ramo tsv poderia estar morto e o (a) nao veria.
+  local _t _trc=0
+  # ⚠️ CAMINHO LITERAL, nao a variavel: a REGRA 59 (Modo que a producao consome e exercitado pela
+  #    bancada) extrai o par (script, flags) casando o NOME do arquivo, e `bash "${chk}" … --tsv`
+  #    a deixa CEGA — ela acusou MODO-SEM-TESTE [--tsv] com este caso existindo e passando. O modo
+  #    estava coberto de fato e invisivel ao medidor, que para a regra e o mesmo que descoberto.
+  _t="$(cd "${REPO_ROOT}" && bash "${REPO_ROOT}/.claude/validation/injected-cut-check.sh" "${REPO_ROOT}" --tsv 2>&1)" || _trc=$?
+  if [ "${_trc}" -eq 0 ] && [ -z "${_t}" ]; then
+    record_pass "injected-cut: (b) modo --tsv (o que o lint consome) sai 0 e silencioso no repo real"
+  else record_fail "injected-cut: (b) modo tsv" "rc=${_trc}; saida=[${_t}]"; fi
+
+  # (c) o ramo tsv EMITE no formato que o dispatcher parseia (4 campos, HARD primeiro) quando ha
+  #     achado. O (b) prova o silencio; sem o (c), silencio poderia ser o ramo inteiro morto.
+  local sd; sd="$(mktemp -d)"
+  mkdir -p "${sd}/.claude/commands/meta"
+  printf '# doc\n\n**V:** !`echo ok`\n\n**X:** !`bash algo.sh | head -40`\n' > "${sd}/.claude/commands/meta/zz.md"
+  ( cd "${sd}" && git init -q . && git add -A ) >/dev/null 2>&1
+  local _e _erc=0
+  _e="$(cd "${REPO_ROOT}" && bash "${REPO_ROOT}/.claude/validation/injected-cut-check.sh" "${sd}" --tsv 2>&1)" || _erc=$?
+  if [ "${_erc}" -eq 1 ] && [ "$(awk -F'\t' 'NR==1{print NF}' <<< "${_e}")" = "4" ] \
+     && grep -q '^HARD	REGRA96	' <<< "${_e}"; then
+    record_pass "injected-cut: (c) ramo tsv emite 4 campos HARD/REGRA96 (o formato que o dispatcher le)"
+  else record_fail "injected-cut: (c) formato tsv" "rc=${_erc}; saida=[${_e}]"; fi
+  rm -rf "${sd}"
+
+  # (d) REGISTRO (peca 6): a guarda esta no dispatcher do lint. Guarda exercitada e nao registrada
+  #     nunca dispara — e foi assim que o `consumed-mode-check.sh` ficou DESLIGADO por dois meses.
+  if grep -q 'check_injected_cut_declares$' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh" \
+     && grep -q 'REGRA 96' "${REPO_ROOT}/.claude/validation/lint-artifacts.sh"; then
+    record_pass "injected-cut: (d) registrada no dispatcher do lint-artifacts (peca 6)"
+  else record_fail "injected-cut: (d) registro" "a guarda nao esta no dispatcher — exercitada e muda"
+  fi
+}
+
 run_silent_measurer_selftests() {
   local cen="${REPO_ROOT}/.claude/validation/forge-census.sh"
   local cgr="${REPO_ROOT}/.claude/validation/kg-corpus-grep.sh"
@@ -14531,7 +14582,17 @@ run_role_cut_selftests() {
     while IFS= read -r _c; do
       [ -n "${_c}" ] || continue
       case "${_c}" in
-        adopt|evolve|forge|dissect|create-*|federation-*|co-announce|co-deliver) continue ;;  # fábrica/federação
+        # `forge-guard` entrou em 2026-10-04 pelo MESMO critério e com a MESMA prova de `forge` e
+        #     `dissect`: é a forja de GUARDAS (Camada 1 = autoria do framework), declara `Core-only`
+        #     na própria superfície, e foi pega na PRIMEIRA corrida depois de o comando nascer —
+        #     três comandos seguidos achados por este caso, o que reforça que ele não é burocracia.
+        #     ⚠️ TETO QUE A ENTRADA DELE REVELA, e fica declarado em vez de escondido: a citação que
+        #     disparou o caso estava num COMENTÁRIO DE PROVENIÊNCIA do `injected-cut-check.sh`
+        #     ("forjada pela superfície /meta:forge-guard"), não numa instrução de cura. O caso casa
+        #     MENÇÃO, não "a guarda MANDA rodar" — é a mesma classe que esta casa já mediu duas
+        #     vezes (caso que cobra menção em vez de predicado). Separar os dois exige ler a
+        #     POSIÇÃO da citação (mensagem de violação vs comentário), e isso é leva própria.
+        adopt|evolve|forge|dissect|forge-guard|create-*|federation-*|co-announce|co-deliver) continue ;;  # fábrica/federação
         nao|federation-) continue ;;                                            # falsos positivos do grep
       esac
       [ -f "${REPO_ROOT}/.claude/commands/meta/${_c}.md" ] || continue          # comando que não existe
@@ -21590,6 +21651,7 @@ _family run_guard_forge_selftests
 _family run_role_promotion_selftests
 _family run_r84_pathspec_selftests
 _family run_silent_measurer_selftests
+_family run_injected_cut_selftests
 
 
 
