@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**313 itens abertos** em 66 grafo(s) com aberto (de 91 no escopo) · 67 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**315 itens abertos** em 67 grafo(s) com aberto (de 92 no escopo) · 68 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -178,6 +178,13 @@
 | 12.0 | `C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH` | poda-instruction-bloat-2026-09 | OPCAO A — mover doutrina para skills/rules por path e deixar o CLAUDE.md so com identidade + roteamento. A favor: e a cura que o |
 | 2.8 | `C_OPCAO_D_NAO_PODAR` | poda-instruction-bloat-2026-09 | OPCAO D — nao podar. A favor, e mais forte do que a rodada admitiu: 17.041 bytes sao ~0,5% da janela de 1M, o custo de janela e  |
 | 2.4 | `C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR` | poda-instruction-bloat-2026-09 | OPCAO B — manter o CLAUDE.md e comprimir. A favor: custo zero de arquitetura, nada se move de lugar, nenhum risco de doutrina su |
+
+## evolve-round-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 40.5 | `Q_CURAS_DOS_BLOCKERS_SAO_A_PROXIMA_LEVA` | evolve-round-2026-10 | O QUE A RODADA PROPOE, em ordem de dano e custo — o evolve PROPOE e nao muta, e a cura e o fluxo normal: (1) ESCAPAR os dois exe |
+| 10.8 | `Q_D4_E_D5_NAO_RODARAM_NESTA_RODADA` | evolve-round-2026-10 | LACUNA DECLARADA, nunca zero: D4 (KBs vencidas, por /meta:kb-freshness) e D5 (conformidade de metaspec, por /meta:metaspec-validat |
 
 ## radar-E3-2026-09-04 — 1 item(ns)
 
