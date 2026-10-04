@@ -14,6 +14,7 @@
 .claude/agents/product/presentation-orchestrator.md	D_MERMAID_CONTRACT_FIX	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/agents/testing/test-agent.md	C_d2_test_diff	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
 .claude/commands/common/	C_refut_frontmatter_skills	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
+.claude/commands/common/prompts/guard-doctrine.md	C_MUTANTE_QUE_NAO_MORDE_TEM_QUATRO_CAUSAS	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/commands/common/prompts/guard-doctrine.md	D_GUARDA_DA_CLASSE_CORTE_NAO_DECLARADO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/commands/common/prompts/inventory-sync-after-create.md	SY6_ev_inventory_sync_prompt	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/common/prompts/orchestration-fallback.md	E_FALLBACK_SERIAL_RODA	docs/evolution/research/m8-serial-2026-08/m8-serial-2026-08.kg.yaml
@@ -254,6 +255,7 @@
 .claude/validation/	E_sem_gate_client_safe	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
 .claude/validation/aside-router.sh	E_ASIDE_ROUTER_GATE_E_PROMPT	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/validation/automation-ladder-registry.txt	D_AGREGACAO_CROSS_REPO_E_MOAT	docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml
+.claude/validation/consumed-mode-check.sh	D_SUBSTRATO_CHECK_DE_LINT_MOLDE_CONSUMED_MODE	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/validation/consumed-mode-check.sh	Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .claude/validation/diary-index.sh	D_GUARDA_DO_MARCADOR_NA_FONTE	docs/onion/graph/residuos-2026-08-18.kg.yaml
 .claude/validation/door-staleness-baseline.txt	E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR	docs/onion/graph/federation-health-2026-07.kg.yaml
@@ -266,10 +268,15 @@
 .claude/validation/fixtures/kg-reconcile/state-below-radar.kg.yaml	E_fixture_vacua_reprovou_no_mutante	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 .claude/validation/forge-census.sh	C_MEDIDOR_QUE_CORTA_OU_ZERA_EM_SILENCIO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/graph.sh	C_FED_STRUCTURE_IS_TRIPLES	docs/onion/graph/federation-health-2026-07.kg.yaml
+.claude/validation/guard-census.sh	E_O_PROPRIO_CORTE_ME_CEGOU_NA_FORJA_CONTRA_CORTE	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/validation/guardrails/onion-effect-gate.sh	E_EFFECT_GATE_LIVE	docs/onion/graph/graduated-automation-elenxo-2026-07.kg.yaml
 .claude/validation/guardrails/onion-effect-gate.sh	E_WIRE_IN_LIVE	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 .claude/validation/harness-inventory.sh	E_A_GUARDA_GRITAVA_CINCO_VEZES_E_NAO_PARAVA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 .claude/validation/harness-inventory.sh	E_SSOT_DO_HARNESS_COM_CATRACA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
+.claude/validation/injected-cut-check.sh	E_DEFEITO_DATADO_TRES_SITIOS	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
+.claude/validation/injected-cut-check.sh	E_O_DOGFOOD_ACHOU_TRES_DEFEITOS_QUE_LEITURA_NAO_ACHA	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
+.claude/validation/injected-cut-check.sh	E_TETO_DECLARADO_O_QUE_A_GUARDA_NAO_VE	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
+.claude/validation/injected-cut-check.sh	Q_SEGUNDA_SUPERFICIE_INJETADA_FORA_DOS_DOIS_CAMINHOS	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/validation/inventory.sh	E_AUSENCIA_LIDA_COMO_RESULTADO_EM_TRES_SITIOS	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
 .claude/validation/kb-vendored-link-check.sh	E_A_DIVIDA_DA_REGRA_45_ERA_O_QUE_PRENDIA_A_PORTA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/kg-backlog-project.sh	C_OPCAO_O2_CONSUMIDOR_IRMAO_LACO	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
@@ -1833,6 +1840,7 @@ docs/evolution/review/fix-bench-emit-pipe-race.md	E_CURA_HERE_STRING_MEDIDA_0904
 docs/evolution/review/fix-catraca-regra49.md	C_MEDIR_NO_CHECKOUT_VELHO_E_MEDIR_O_PASSADO	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 docs/evolution/review/fix-catraca-regra49.md	C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 docs/evolution/review/fix-catraca-regra49.md	E_O_FECHO_ERA_FALSO_TRES_ROTAS_ABERTAS	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
+docs/evolution/review/fix-medidores-que-cortam-em-silencio.md	E_O_ELENXO_REPROVOU_A_GUARDA_E_O_PIOR_ERA_FATAL	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 docs/evolution/review/fix-medidores-que-cortam-em-silencio.md	E_O_ELENXO_REPROVOU_O_PR_QUE_DENUNCIAVA_CORTE	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 docs/evolution/review/fix-radar-allowlist-denylist.md	C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE	docs/onion/graph/elenxos-2026-08-07.kg.yaml
 docs/evolution/review/fix-radar-allowlist-denylist.md	D_DENYLIST_E_A_FORMA_CERTA	docs/onion/graph/elenxos-2026-08-07.kg.yaml

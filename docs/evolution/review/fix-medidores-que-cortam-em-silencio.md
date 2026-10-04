@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: 0facf1914a19a2576ed4d4529b3a1bdf76424ce45e20cf95150677f7b959e64a
+reviewed_diff_sha256: e43410aec0cf93bb439eec80e0c2fbbd8111f0fe97d68b2db168c019227d2b8a
 findings_total: 14
 findings_real: 14
 tokens: 184628
@@ -63,6 +63,41 @@ de cada um.
 2. **A cura do R7 falhou na 1ª tentativa por ordem de flag** — `'frase' --json` tem `JSON=0` na
    linha do parse. Decidir no parse amarra o comportamento à ordem; quem decide é o emissor, depois
    de todos os flags lidos.
+
+## 2ª leva nesta branch — a guarda da REGRA 96, forjada PELA SUPERFÍCIE
+
+O achado **R11** (a classe sem guarda) deixou de ser candidato: o maestro selou em 2026-10-04 e a
+guarda foi forjada invocando `/meta:forge-guard` — **não à mão**. E isso importa, porque eu estava
+escrevendo o predicado como função embutida no `lint-artifacts.sh`, que **não é o molde desta casa**;
+o maestro interrompeu com *"dogfood use a forja"*, e invocar devolveu a forma certa em uma leitura.
+
+**Três defeitos que só o dogfood acharia**, e o 1º é o mais grave: a guarda de **vacuidade era
+inalcançável exatamente na situação para a qual existe** — `xargs grep -l` devolve 123 sem casamento
+e, sob `set -euo pipefail`, isso matava o script antes de ela falar; pior, deixava o caso (c) **verde
+pelo motivo errado**. O 2º: o sandbox do caso (c) nascera sem diretiva nenhuma, então a vacuidade
+disparava antes do varredor e o caso era **incapaz de reprovar o que afirmava**. O 3º: o regex do
+`sed -n 1,Np` não capturava a aspa de fechamento.
+
+**E o gate achou um quarto que eu não vi:** a **REGRA 59 (Modo que a produção consome é exercitado
+pela bancada)** acusou `MODO-SEM-TESTE [--tsv]` **com o caso existindo e passando** — porque eu
+invocava por variável (`${chk}`) e o extrator casa pelo **nome do arquivo**. O modo estava coberto de
+fato e **invisível ao medidor**, que para a regra é o mesmo que descoberto.
+
+**Extensão de doutrina:** *"o mutante não mordeu"* tem **quatro** causas, não duas — além de caso
+decorativo e mutante que não muda o afirmado, apareceram **mutante inerte** (não alterou o arquivo) e
+**mutante fraco** (alterou o arquivo, não o comportamento: `printf '%s'` sem `\n` faz o `while read`
+nunca executar o corpo). O harness agora **prova que mutou** antes de interpretar.
+
+**E a classe se manifestou contra mim dentro da forja que a combate:** ao perguntar ao censo *"a
+classe já está coberta?"*, rodei `guard-census.sh --markdown | head -14` — e o bloco que responde
+isso mora na l.94. Meu próprio corte escondeu a resposta.
+
+Verificado: `--selftest` **14/14** · família `run_injected_cut_selftests` **4/4** · **6 mutantes**
+mordendo com prova de mutação · produção **rc=0** · censo confirmando registro nos **dois** lugares ·
+`kg-radar` exit 0 nos dois grafos · as três projeções da catraca regeneradas.
+
+⚠️ **O Elenxo da guarda está EM VOO** com mandato diferente — caçar **falso positivo**, porque veto
+ignorado é pior que veto ausente (cláusula 4). Este resíduo será re-carimbado com o veredito dele.
 
 ## Teto declarado
 
