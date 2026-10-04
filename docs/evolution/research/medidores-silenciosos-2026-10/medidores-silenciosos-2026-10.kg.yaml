@@ -1,5 +1,7 @@
 # kg-backlog-guard: on
-# ═══ TETO: 7 NÓS ═══
+# ═══ TETO: 9 NÓS ═══  (era 8; +1 porque a CLASSE ficou sem guarda e o Elenxo cobrou isso
+#     como achado proprio — tratar classe por instancia contraria a doutrina da casa)  (era 7; +1 porque o Elenxo REPROVOU 4 dos 7 itens deste PR e
+#     a reprovacao e evidencia, nao rodape — ela mede o que o gate determinístico nao ve)
 meta:
   id: medidores-silenciosos-2026-10
   schema_version: "1"
@@ -75,7 +77,7 @@ nodes:
     confidence: 0.85
     status: confirmed
     verified_at: '2026-10-03'
-    label: 'O ENQUADRAMENTO DO RE-FORJAR MUDA, e ele NAO vem da contagem de pecas — vem do corpus, que ja tinha a resposta com impact 5 e Elenxo sustentada-com-emendas. `C_TESE_AUTO_EVOLUCAO` (maestro-vivo-2026-08): *"nao estamos atras no eixo da auto-evolucao — estamos a FRENTE no PRODUTO do laco e ATRAS no GATILHO dele"*. O mesmo grafo guarda um Elenxo que derrubou 4 vereditos, um por NAO-SEQUITUR CAUSAL ao explicar os 32 dias sem /meta:evolve. CONSEQUENCIA DIRETA: re-forjar o evolve pelas 7 pecas sem lhe dar GATILHO repete o erro com mais pecas. E as pecas que faltam tem de ser lidas a essa luz — a doutrina dele EXISTE, mas numa KB (`onion-modernization-doctrine.md`), logo nao e um fragmento que `census`/`radar`/`drive`/forjas possam REFERENCIAR, que e exatamente o que a clausula-mae pede.'
+    label: 'O ENQUADRAMENTO DO RE-FORJAR MUDA, e ele NAO vem da contagem de pecas — vem do corpus, que ja tinha a resposta com impact 5 e Elenxo sustentada-com-emendas. `C_TESE_AUTO_EVOLUCAO` (maestro-vivo-2026-08), VERBATIM: "Nao estamos atras do eixo E2 — estamos a frente no PRODUTO do loop e atras no GATILHO dele." (gloss FORA das aspas: o eixo E2 e o eixo self-improving do radar.) ⚠️ A 1a redacao deste no deu como verbatim uma frase ADULTERADA — trocou "do eixo E2" por "no eixo da auto-evolucao" e "loop" por "laco", isto e, substituicao de CONTEUDO e traducao dentro de aspas, o que nem e o ASCII-folding convencional do arquivo. Reprovado pelo Elenxo do PR #909 e corrigido: na mesma semana em que esta casa nomeou "a terceira morada da fabricacao e a atribuicao", aspas que nao aguentam `diff` nao passam. O mesmo grafo guarda um Elenxo que derrubou 4 vereditos, um por NAO-SEQUITUR CAUSAL ao explicar os 32 dias sem /meta:evolve. CONSEQUENCIA DIRETA: re-forjar o evolve pelas 7 pecas sem lhe dar GATILHO repete o erro com mais pecas. E as pecas que faltam tem de ser lidas a essa luz — a doutrina dele EXISTE, mas numa KB (`onion-modernization-doctrine.md`), logo nao e um fragmento que `census`/`radar`/`drive`/forjas possam REFERENCIAR, que e exatamente o que a clausula-mae pede.'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml'
     verified_against: 'C_TESE_AUTO_EVOLUCAO e E_ELENXO_AUTO_EVOLUCAO lidos inteiros (impact 5 e 4, confirmed, verified_at 2026-08-31); o predicado _cites_doctrine do forge-census exige common/prompts/*-doctrine.md e o evolve cita apenas a KB'
 
@@ -86,9 +88,33 @@ nodes:
     confidence: 0.8
     status: open
     verified_at: '2026-10-03'   # a data da MEDICAO, nao a do commit: o `evolve.md` foi grepado neste dia
-    label: 'A PERGUNTA QUE O RE-FORJAR TEM DE RESPONDER ANTES DE ESCREVER SUPERFICIE: qual e o GATILHO do /meta:evolve? O radar tem a REGRA 65 (baseline vencida por eixo, SOFT no lint); o dissect tem censo de nivel vencido; o kg tem a REGRA 67 (revisita vencida). O evolve nao tem NENHUM — e e por isso que ficou 32 dias sem rodar, nao por ser caro. Candidatos a medir, nao a supor: (a) idade da ultima auditoria por DIMENSAO (o analogo da REGRA 65, barato e ja tem molde); (b) delta populacional (comando/agente/skill novo desde a ultima passada — o inventory ja mede); (c) gatilho por SINAL (achado de adotante, versao de plataforma, guarda nova sem bancada). ⚠️ O que NAO pode ser: relogio/cron — isso e MOAT W7, maestro-invocado por doutrina. GATILHO desta pergunta: a propria leva do re-forjar.'
+    label: 'A PERGUNTA QUE O RE-FORJAR TEM DE RESPONDER ANTES DE ESCREVER SUPERFICIE: qual e o GATILHO do /meta:evolve? O radar tem a REGRA 65 (Radar de mundo com baseline DATADA por eixo, SOFT no lint); o dissect tem censo de nivel vencido; o kg tem a REGRA 67 (Grafo de pesquisa com REVISITA carimbada). O evolve nao tem NENHUM — e e por isso que ficou 65 DIAS sem rodar, nao por ser caro (medido 2026-10-03 contra `docs/analysis/onion-evolution-2026-07-30.md`, o ultimo relatorio; a 1a redacao deste no dizia "32 dias", que era o numero de 2026-08-31 carimbado como se fosse de hoje — `verify-external-for-current` cometido dentro de casa, reprovado pelo Elenxo do PR #909). Candidatos a MEDIR, nao a supor: (a) idade da ultima auditoria por DIMENSAO (o analogo da REGRA 65, barato e ja tem molde); (b) delta populacional (comando/agente/skill novo desde a ultima passada — o inventory ja mede); (c) gatilho por SINAL (achado de adotante, versao de plataforma, guarda nova sem bancada); (d) RELOGIO/cron sobre o evolve read-only. ⚠️⚠️ A 1a redacao deste no EXCLUIA o (d) assim: "o que NAO pode ser: relogio/cron — isso e MOAT W7, maestro-invocado por doutrina". ISSO ERA FALSO, e falso de um modo especialmente ruim: re-afirmava como doutrina o NAO-SEQUITUR que o Elenxo de 2026-08-31 — citado como autoridade pelo no VIZINHO deste — ja havia derrubado POR MEDICAO, e usava a invencao para proibir justamente o candidato que aquela refutacao chamou de "resposta proporcional". Re-medido em 2026-10-03: `grep -ciE cron|schedule|/loop|agend` em `.claude/commands/meta/evolve.md` devolve ZERO, e `automation-ladder-registry.txt` tem DUAS entradas MOAT (`site-vps-deploy`, `bridge-deploy`) — nenhuma e "agendar por relogio". O W7 escopa o DRIVER (`/meta:drive`, que EXECUTA); o evolve PROPOE e nao muta. Logo o (d) esta na mesa como os outros tres, e quem decide e o maestro. GATILHO desta pergunta: a propria leva do re-forjar.'
     trace: '.claude/commands/meta/evolve.md'
-    verified_against: 'REGRA 65 lida no lint-artifacts; o evolve.md nao cita census, rules/ nem familia de bancada (medido: 0 ocorrencias de cada)'
+    verified_against: 'REGRA 65 lida no lint-artifacts; o evolve.md nao cita census, rules/ nem familia de bancada (medido: 0 ocorrencias de cada). ADICIONADO em 2026-10-03 apos reprovacao: 65 dias calculados contra o mtime/nome do ultimo relatorio em docs/analysis/ (onion-evolution-2026-07-30.md); ZERO ocorrencias de cron|schedule|/loop|agend em evolve.md; DUAS entradas MOAT no automation-ladder-registry.txt, ambas de deploy'
+
+  - id: E_O_ELENXO_REPROVOU_O_PR_QUE_DENUNCIAVA_CORTE
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-03'
+    source_tier: 10
+    label: 'O ELENXO REPROVOU 4 DOS 7 ITENS DESTE PR, com 14 achados (5 de 1a classe, 2 fora da minha lista), e a ironia e estrutural: um PR cujo TEMA e "medidor que corta em silencio produz afirmacao falsa" entregava (i) um aviso que DECLARAVA UM CORTE FALSO, (ii) um no que afirmava uma PROIBICAO FALSA, e (iii) o corte silencioso INTACTO exatamente onde o dano acontece. Os cinco piores: R1 — o `forge-census` tem DOIS cortes (head, e rastreado-ausente-do-disco); curei um e fiz o aviso novo mentir sobre o outro, inclusive mandando usar `--tsv`, que sofre o mesmo pulo (provado movendo um candidato do disco com TOP=100000: "CORTADA: 58 de 59" sem corte algum). R2 — o no `open` de maior atencao proibia cron citando MOAT W7, re-afirmando o nao-sequitur que o Elenxo citado no no vizinho derrubou por medicao. R3 — "32 dias" eram 65. R4+R5 — a licao foi para a migalha e NAO para `forge.md:28` (12 de 59) nem `onion-research/SKILL.md:23` (40 de 298), e neste a minha cura PIOROU a leitura: um zero falso e BARULHENTO virou um quarenta quieto e igualmente falso. R6 — a busca-frase morreu sem escotilha (`o maestro`: 396 nos precisos viraram 4114). LICAO QUE FICA: o gate mecanico estava VERDE (0 HARD) nas duas rodadas, e nenhum dos cinco e detectavel por lint — HARD 0 com afirmacao falsa no `label` e precisamente o caso que este PR se propunha a tratar.'
+    trace: 'docs/evolution/review/fix-medidores-que-cortam-em-silencio.md'
+    verified_against: 'refutador opus/high em worktree isolada, mandato REFUTAR, default REPROVADO; 184k tokens, 88 chamadas, ~17 min; rodou os artefatos, refez os 4 mutantes com harness PROPRIO (confirmando que mordem) e acrescentou 2 mutantes que eu nao tinha; os achados R2/R3/R8 foram RE-VERIFICADOS por mim na fonte antes de aceitar'
+
+  - id: D_GUARDA_DA_CLASSE_CORTE_NAO_DECLARADO
+    node_type: decision
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    owner: maestro
+    verified_at: '2026-10-03'
+    label: 'QUARTO CANDIDATO A GUARDA, com defeito DATADO (a clausula 1 da guard-doctrine exige isso) e com o numero medido. DEFEITO: 2026-10-03, tres sitios vivos cortando listagem em silencio — `forge.md:28` servia 12 de 59 ao /meta:forge, `onion-research/SKILL.md:23` injetava 40 de 298 achados do corpus, e `kg.md:325` prometia "FILA COMPLETA / CORPUS INTEIRO" antes de um `head -20` sobre ~312 abertos. Os tres curados nesta leva; a CLASSE segue sem guarda, e o Elenxo cobrou isso como achado proprio: tratar classe por instancia contraria `erro-recorrente-vira-registro-com-cura`. ⚠️ O QUE MUDA O CALCULO, e e a razao de registrar agora: medido DEPOIS das curas, o passivo na superficie de DIRETIVA INJETADA e ZERO — `grep` por `!`...| head -N`` com N>=5 em `.claude/commands/**` e `.claude/skills/**` devolve nada, sobrando dois `head -1` de extracao de valor unico, que NAO sao a classe. Guarda que nasce em ZERO nao precisa de baseline de catraca nem tolera passivo: e o melhor momento possivel para forja-la, e o pior para adia-la, porque o proximo `head -N` ja entra reprovando em vez de entrar no baseline. PREDICADO PROPOSTO (a medir, nao a supor): diretiva de injecao cujo pipeline termina em `head -N` com N>=5 sem uma linha que declare o total. VOCABULARIO E O RISCO conhecido desta casa — `tail`, `sed -n 1,Np`, `head -n N` e `| head` sem numero sao as formas que um predicado ingenuo perde. NAO SELO: candidato a guarda e selado pelo maestro (os tres de 2026-10-02 foram), e eu nao cunho REGRA numerada sozinho. GATILHO: o selo dele.'
+    trace: '.claude/commands/common/prompts/guard-doctrine.md'
+    verified_against: 'os tres sitios lidos e curados nesta leva; passivo re-medido apos as curas: zero diretivas injetadas com head -N (N>=5), dois head -1 legitimos'
 
 edges:
   - from: C_MEDIDOR_QUE_CORTA_OU_ZERA_EM_SILENCIO
@@ -108,4 +134,16 @@ edges:
     edge_type: SUPPORTS
   - from: C_O_EVOLVE_NAO_E_FRACO_E_SEM_GATILHO
     to: Q_GATILHO_DO_EVOLVE_QUAL_E
+    edge_type: SUPPORTS
+  - from: E_O_ELENXO_REPROVOU_O_PR_QUE_DENUNCIAVA_CORTE
+    to: C_MEDIDOR_QUE_CORTA_OU_ZERA_EM_SILENCIO
+    edge_type: SUPPORTS
+  - from: E_O_ELENXO_REPROVOU_O_PR_QUE_DENUNCIAVA_CORTE
+    to: E_AS_DUAS_CURAS_COM_CONTRAPROVA
+    edge_type: CONSTRAINS
+  - from: E_O_ELENXO_REPROVOU_O_PR_QUE_DENUNCIAVA_CORTE
+    to: D_GUARDA_DA_CLASSE_CORTE_NAO_DECLARADO
+    edge_type: SUPPORTS
+  - from: C_MEDIDOR_QUE_CORTA_OU_ZERA_EM_SILENCIO
+    to: D_GUARDA_DA_CLASSE_CORTE_NAO_DECLARADO
     edge_type: SUPPORTS

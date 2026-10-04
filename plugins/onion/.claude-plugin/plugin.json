@@ -1,6 +1,6 @@
 {
   "name": "onion",
-  "version": "0.1.297",
+  "version": "0.1.298",
   "description": "Núcleo operacional do Sistema Onion: o orquestrador mestre (skill onion), runtime de knowledge graph (kg + radar soberano + kg-freshness), sessões e diário, orquestração de subagentes, condução (wizard/onboarding/retro), validação de meta-specs, co-evolução upstream e os adapters SDAAL de task-manager e forge.",
   "author": { "name": "Onion - Marcio Carvalho" },
   "homepage": "https://onionevolve.com",

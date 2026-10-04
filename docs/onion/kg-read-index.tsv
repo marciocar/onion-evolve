@@ -14,6 +14,7 @@
 .claude/agents/product/presentation-orchestrator.md	D_MERMAID_CONTRACT_FIX	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/agents/testing/test-agent.md	C_d2_test_diff	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
 .claude/commands/common/	C_refut_frontmatter_skills	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
+.claude/commands/common/prompts/guard-doctrine.md	D_GUARDA_DA_CLASSE_CORTE_NAO_DECLARADO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/commands/common/prompts/inventory-sync-after-create.md	SY6_ev_inventory_sync_prompt	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/common/prompts/orchestration-fallback.md	E_FALLBACK_SERIAL_RODA	docs/evolution/research/m8-serial-2026-08/m8-serial-2026-08.kg.yaml
 .claude/commands/common/prompts/research-doctrine.md	E_MERCADO_E3_R4_SEM_SINAL	docs/evolution/research/radar-E3-2026-09-04-r4/radar-E3-2026-09-04-r4.kg.yaml
@@ -1832,6 +1833,7 @@ docs/evolution/review/fix-bench-emit-pipe-race.md	E_CURA_HERE_STRING_MEDIDA_0904
 docs/evolution/review/fix-catraca-regra49.md	C_MEDIR_NO_CHECKOUT_VELHO_E_MEDIR_O_PASSADO	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 docs/evolution/review/fix-catraca-regra49.md	C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 docs/evolution/review/fix-catraca-regra49.md	E_O_FECHO_ERA_FALSO_TRES_ROTAS_ABERTAS	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
+docs/evolution/review/fix-medidores-que-cortam-em-silencio.md	E_O_ELENXO_REPROVOU_O_PR_QUE_DENUNCIAVA_CORTE	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 docs/evolution/review/fix-radar-allowlist-denylist.md	C_ALLOWLIST_QUEBRA_COM_ENUM_QUE_CRESCE	docs/onion/graph/elenxos-2026-08-07.kg.yaml
 docs/evolution/review/fix-radar-allowlist-denylist.md	D_DENYLIST_E_A_FORMA_CERTA	docs/onion/graph/elenxos-2026-08-07.kg.yaml
 docs/evolution/review/fix-radar-allowlist-denylist.md	E_ALLOWLIST_NO_RADAR_LATENTE	docs/onion/graph/elenxos-2026-08-07.kg.yaml

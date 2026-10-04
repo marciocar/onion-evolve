@@ -319,10 +319,15 @@ bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --reconcile      # R
 bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --freshness-tsv  # STALE → passo "o que re-verificar"
 bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <arquivo> --open-tsv        # a FILA COMPLETA de trabalho aberto
 
-# a fila do CORPUS INTEIRO (o radar lê um grafo por vez; o laço é de quem chama):
+# a fila do corpus inteiro (o radar lê um grafo por vez; o laço é de quem chama).
+# ⚠️ O `head` CORTA e por isso o total vem JUNTO: a redação anterior dizia "FILA COMPLETA" /
+# "CORPUS INTEIRO" e cortava 20 de ~312 em silêncio — promessa de completude com corte literal
+# (achado do Elenxo do PR #909). Quem corta declara, mesmo em snippet de documentação.
 for f in $(git ls-files '*.kg.yaml' | grep -v /fixtures/); do
   bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh "$f" --open-tsv
-done | sort -t$'\t' -k8 -rn | head -20
+done | sort -t$'\t' -k8 -rn > /tmp/fila.tsv
+printf 'TOP 20 de %s itens abertos (o resto está em /tmp/fila.tsv)\n' "$(wc -l < /tmp/fila.tsv)"
+head -20 /tmp/fila.tsv
 bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-view.sh  <arquivo> --json           # os ids canônicos (paridade com o radar)
 ```
 

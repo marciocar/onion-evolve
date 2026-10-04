@@ -7894,9 +7894,14 @@ run_silent_measurer_selftests() {
   if [ ! -f "${cen}" ]; then record_fail "silent-measurer" "medidor ausente: forge-census.sh"; else
     local _o _rc=0
     _o="$(cd "${REPO_ROOT}" && FORGE_CENSUS_TOP=1 bash "${cen}" . --markdown 2>&1)" || _rc=$?
-    local _tot; _tot="$(grep -oE '· [0-9]+ candidato\(s\) rastreado' <<< "${_o}" | grep -oE '[0-9]+' | head -1)"
+    # ⚠️ EXTRACAO EM POSICAO PROTEGIDA: o runner roda sob `set -euo pipefail`, e um grep que nao casa
+    #    MATA A SUITE em vez de reprovar o caso. Medido pelo Elenxo do PR #909 com um mutante que
+    #    renomeou o rotulo do cabecalho: a bancada abortou antes da soma. O dano era nulo so porque
+    #    esta familia e a ULTIMA registrada — e deixaria de ser no dia que alguem registrar outra.
+    local _tot=""
+    if ! _tot="$(grep -oE '· [0-9]+ candidato\(s\) rastreado' <<< "${_o}" | grep -oE '[0-9]+' | head -1)"; then _tot=""; fi
     if [ "${_rc}" -eq 0 ] && grep -q 'PROJECAO CORTADA' <<< "${_o}" \
-       && grep -qE "1 de ${_tot:-0} candidatos" <<< "${_o}" \
+       && grep -qE "1 de [0-9]+ candidatos MEDIDOS" <<< "${_o}" \
        && grep -q 'NAO sao zero' <<< "${_o}"; then
       record_pass "silent-measurer: (a) projecao cortada DECLARA o corte, os numeros e que ausencia != zero"
     else
@@ -7920,9 +7925,14 @@ run_silent_measurer_selftests() {
     printf 'meta:\n  id: fixture-silent-measurer\nnodes:\n  - id: EN_ALVO\n    node_type: entity\n    status: confirmed\n    label: alvo plantado para a bancada\n' > "${d}/f.kg.yaml"
     local _c _crc=0
     _c="$(cd "${REPO_ROOT}" && ONION_KG_CORPUS_FILES="${d}/f.kg.yaml" bash "${cgr}" 'alvo plantado inexistentezz' 2>&1)" || _crc=$?
+    # ⚠️ A ASSERCAO `1 nó(s)` E O CORACAO DO CASO, e faltava (R14 do Elenxo do PR #909): cobrar
+    #    so "separou e avisou" deixava passar a classe "separou, avisou, e seguiu devolvendo zero" —
+    #    o caso afirmava menos do que a cura promete. O valor inteiro da cura e o zero VIRAR achado.
     if [ "${_crc}" -eq 0 ] && grep -q 'separado em 3 termos' <<< "${_c}" \
-       && grep -qE 'termos: alvo, plantado, inexistentezz' <<< "${_c}"; then
-      record_pass "silent-measurer: (c) frase posicional separada em termos, com aviso"
+       && grep -qE 'termos: alvo, plantado, inexistentezz' <<< "${_c}" \
+       && grep -q 'AMPLIA' <<< "${_c}" \
+       && grep -q '1 nó(s)' <<< "${_c}"; then
+      record_pass "silent-measurer: (c) frase posicional separada, com aviso, e o zero VIROU achado"
     else
       record_fail "silent-measurer: (c) frase virou 1 termo" "rc=${_crc}; saida=[${_c}]"
     fi
@@ -7937,7 +7947,77 @@ run_silent_measurer_selftests() {
     else
       record_fail "silent-measurer: (d) zero nu" "rc=${_zrc}; saida=[${_z}]"
     fi
+
+    # (e) MODO FRASE existe e RESTRINGE. A 1a cura separava TODO termo com espacos e matou a
+    #     busca-frase SEM escotilha — trocar consulta precisa por esguicho nao e cura.
+    printf 'meta:\n  id: fixture-frase\nnodes:\n  - id: EN_UM\n    node_type: entity\n    status: confirmed\n    label: o maestro decide\n  - id: EN_DOIS\n    node_type: entity\n    status: confirmed\n    label: decide o rumo sem maestro\n' > "${d}/g.kg.yaml"
+    local _ph _sp
+    _ph="$(cd "${REPO_ROOT}" && ONION_KG_CORPUS_FILES="${d}/g.kg.yaml" bash "${cgr}" --phrase 'o maestro' 2>/dev/null || true)"
+    _sp="$(cd "${REPO_ROOT}" && ONION_KG_CORPUS_FILES="${d}/g.kg.yaml" bash "${cgr}" 'o maestro' 2>/dev/null || true)"
+    if grep -q 'FRASE: o maestro · 1 nó(s)' <<< "${_ph}" && grep -q 'termos: o, maestro · 2 nó(s)' <<< "${_sp}"; then
+      record_pass "silent-measurer: (e) --phrase casa a frase (1) e separado AMPLIA (2) — a escotilha existe"
+    else
+      record_fail "silent-measurer: (e) busca-frase" "frase=[${_ph}] separado=[${_sp}]"
+    fi
+
+    # (f) `--json` sobrevive a `2>&1` nas DUAS ordens de flag. Decidir o aviso no PARSE amarrava o
+    #     comportamento a ordem, e foi assim que a 1a cura deste ponto falhou no proprio dogfood.
+    local _j1 _j2 _jok=1
+    _j1="$(cd "${REPO_ROOT}" && ONION_KG_CORPUS_FILES="${d}/g.kg.yaml" bash "${cgr}" 'o maestro' --json 2>&1 || true)"
+    _j2="$(cd "${REPO_ROOT}" && ONION_KG_CORPUS_FILES="${d}/g.kg.yaml" bash "${cgr}" --json 'o maestro' 2>&1 || true)"
+    printf '%s' "${_j1}" | python3 -c 'import json,sys; json.load(sys.stdin)' 2>/dev/null || _jok=0
+    printf '%s' "${_j2}" | python3 -c 'import json,sys; json.load(sys.stdin)' 2>/dev/null || _jok=0
+    if [ "${_jok}" -eq 1 ]; then
+      record_pass "silent-measurer: (f) --json valido sob 2>&1 nas duas ordens de flag"
+    else
+      record_fail "silent-measurer: (f) json contaminado" "o aviso em stderr quebrou o payload"
+    fi
+
+    # (g) `--top` DECLARA o corte, e nao declara quando nao corta. E a simetria que faltava: o
+    #     censo foi obrigado a declarar e os consumidores deste script cortavam com `head` calado.
+    local _t1 _t2
+    _t1="$(cd "${REPO_ROOT}" && ONION_KG_CORPUS_FILES="${d}/g.kg.yaml" bash "${cgr}" --top 1 maestro 2>/dev/null || true)"
+    _t2="$(cd "${REPO_ROOT}" && ONION_KG_CORPUS_FILES="${d}/g.kg.yaml" bash "${cgr}" --top 99 maestro 2>/dev/null || true)"
+    local _trc=0; (cd "${REPO_ROOT}" && ONION_KG_CORPUS_FILES="${d}/g.kg.yaml" bash "${cgr}" --top 0 maestro >/dev/null 2>&1) || _trc=$?
+    if grep -q 'LISTA CORTADA: 1 de 2' <<< "${_t1}" && ! grep -q 'LISTA CORTADA' <<< "${_t2}" && [ "${_trc}" -eq 2 ]; then
+      record_pass "silent-measurer: (g) --top declara o corte, cala quando nao corta, e RECUSA valor invalido"
+    else
+      record_fail "silent-measurer: (g) --top" "corte=[${_t1}] sem-corte=[${_t2}] rc_invalido=${_trc}"
+    fi
     rm -rf "${d}"
+  fi
+
+  # (h) RASTREADO-E-AUSENTE-DO-DISCO tem rotulo PROPRIO e nao e confundido com o corte do head.
+  #     Era o 2o corte silencioso do censo, e o aviso da 1a cura MENTIA sobre ele (declarava
+  #     "PROJECAO CORTADA" sem corte algum, e mandava usar `--tsv`, que sofre o mesmo pulo).
+  if [ -f "${cen}" ]; then
+    local sd; sd="$(mktemp -d)"
+    # ⚠️ O SANDBOX TIRA A POPULACAO DO HEAD, MAS O SUT VEM DA ARVORE VIVA. `git archive` traz o
+    #    forge-census COMMITADO — e testar a copia commitada em vez do artefato da arvore e a classe
+    #    mais caruna desta casa (4 ocorrencias num dia, e o proprio lint-selftest avisa na l.514).
+    #    Aqui a distincao e limpa: os candidatos sao DADO (serve o HEAD), o medidor e o SUT (arvore).
+    (cd "${REPO_ROOT}" && git archive HEAD .claude/commands/meta .claude/skills 2>/dev/null | tar -x -C "${sd}") || true
+    mkdir -p "${sd}/.claude/validation"
+    cp "${cen}" "${sd}/.claude/validation/forge-census.sh"
+    for _lib in kg-fixture-paths.sh; do
+      [ -f "${REPO_ROOT}/.claude/validation/${_lib}" ] && cp "${REPO_ROOT}/.claude/validation/${_lib}" "${sd}/.claude/validation/${_lib}"
+    done
+    if [ -d "${sd}/.claude/commands/meta" ]; then
+      (cd "${sd}" && git init -q . >/dev/null 2>&1 && git add -A >/dev/null 2>&1) || true
+      local _vict; _vict="$(cd "${sd}" && git ls-files '.claude/commands/meta/*.md' 2>/dev/null | head -1)"
+      if [ -n "${_vict}" ] && rm -f "${sd}/${_vict}"; then
+        local _do
+        _do="$(cd "${sd}" && FORGE_CENSUS_TOP=100000 bash .claude/validation/forge-census.sh . --markdown 2>&1 || true)"
+        if grep -q 'DESCARTADOS (rastreados pelo git, AUSENTES do disco): 1' <<< "${_do}" \
+           && grep -q "${_vict}" <<< "${_do}" \
+           && ! grep -q 'PROJECAO CORTADA' <<< "${_do}"; then
+          record_pass "silent-measurer: (h) ausente-do-disco tem rotulo proprio e NAO vira 'corte do head'"
+        else
+          record_fail "silent-measurer: (h) 2o corte silencioso" "vitima=[${_vict}]; saida=[${_do}]"
+        fi
+      else record_skip "silent-measurer: (h)" "nao houve candidato para remover no sandbox"; fi
+    else record_skip "silent-measurer: (h)" "git archive nao produziu o sandbox"; fi
+    rm -rf "${sd}"
   fi
 }
 

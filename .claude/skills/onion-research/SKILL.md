@@ -20,7 +20,7 @@ A doutrina inteira: `.claude/commands/common/prompts/research-doctrine.md` (10 c
 **Hoje:** !`date +%F`
 **Claude Code (disco / processo):** !`claude --version 2>/dev/null | head -1` / !`basename "${CLAUDE_CODE_EXECPATH:-?}"`
 **O que os grafos JÁ sabem sobre `$ARGUMENTS`:**
-!`bash .claude/validation/kg-corpus-grep.sh --query "$ARGUMENTS" 2>&1 | head -40`
+!`bash .claude/validation/kg-corpus-grep.sh --query "$ARGUMENTS" --top 40 2>&1`
 
 **Roster de fontes por eixo:** `docs/onion/radar-sources.yaml` (tier default por fonte; `vendor-on-competitor` sempre suspeito).
 
