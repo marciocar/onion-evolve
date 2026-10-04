@@ -7907,6 +7907,68 @@ _evc_sandbox() {   # cria um repo de medidores FALSOS; $1 = dir. Devolve via arq
   cp "${REPO_ROOT}/.claude/validation/evolve-census.sh" "${d}/.claude/validation/"
   ( cd "${d}" && git init -q . ) >/dev/null 2>&1
 }
+# PEÇA 4 DO /meta:evolve (2026-10-04) — o workflow da rodada, persistido. Roda o CORPO com agent()
+# simulado (0 tokens), no mesmo embrulho async do runtime. Os casos cobram o que a superfície
+# PROMETE do script: recusar D4/D5/D9/D10 (composição do contexto principal), não inventar alvos
+# da MAQ sem o raio-X, e tirar o refutado POR ID.
+run_evolve_workflow_selftests() {
+  local wf="${REPO_ROOT}/.claude/workflows/evolve.js"
+  if [ ! -f "${wf}" ]; then record_fail "evolve-workflow" "ausente: .claude/workflows/evolve.js"; return; fi
+  if ! command -v node >/dev/null 2>&1; then record_skip "evolve-workflow: node ausente"; return; fi
+  local _sc=0; bash "${REPO_ROOT}/.claude/validation/workflow-syntax-check.sh" "${wf}" >/dev/null 2>&1 || _sc=$?
+  if [ "${_sc}" -eq 0 ]; then record_pass "evolve-workflow: (a) sintaxe valida no embrulho do runtime"
+  else record_fail "evolve-workflow: (a) sintaxe" "workflow-syntax-check rc=${_sc}"; return; fi
+  local d; d="$(mktemp -d)"
+  # STUB: cada scan devolve 3 achados — dois blocker (indices 0 e 1) e um opportunistic (2). O juiz
+  # refuta SO o indice 1: assim correlacionar por indice em vez de id, ou nao filtrar nada, REPROVA
+  # (a 1a versao refutava o indice 0 e os dois mutantes passavam — o Elenxo provou o caso decorativo).
+  # MODE: '' normal · 'null-verdict' juiz devolve null · 'throw-D2' o scan de D2 lanca.
+  _evw_run() {   # $1 = args JSON, $2 = MODE; imprime {r, calls, logs, schemas_ok}
+    { printf 'const args=%s;const MODE=%s;const CALLS=[];const SCH=[];\n' "$1" "\"$2\""
+      printf '%s\n' 'const agent=async(p,o)=>{CALLS.push(o.label);if(o.schema)SCH.push(o.schema);if(o.label.startsWith("scan:")){if(MODE==="throw-D2"&&o.label==="scan:D2")throw new Error("boom");return{total_seen:3,findings:[0,1,2].map(i=>({severity:i<2?"blocker":"opportunistic",finding:"f"+i,evidence:"e",target_artifact:"t",effort:"S",exec_command:"x"}))}}if(MODE==="null-verdict")return null;return{refuted:/-1$/.test(o.label),vetoed_phase_merge:false,reasoning:"r"}};'
+      printf '%s\n' 'const pipeline=async(items,...st)=>Promise.all(items.map(async(i,ix)=>{try{let r=i;for(const f of st)r=await f(r,i,ix);return r}catch(e){return null}}));const parallel=async(th)=>Promise.all(th.map(async t=>{try{return await t()}catch(e){return null}}));const phase=()=>{};const LOGS=[];const log=(m)=>LOGS.push(m);'
+      printf '%s\n' 'const sub=(o)=>!o||typeof o!=="object"?true:((o.required||[]).every(k=>o.properties&&k in o.properties)&&Object.values(o.properties||{}).every(sub)&&sub(o.items));'
+      printf '(async()=>{\n'; awk 'f{print} /^}$/ && !f {f=1}' "${wf}"
+      printf '\n})().then(r=>console.log(JSON.stringify({r,calls:CALLS.length,logs:LOGS,schemas_ok:SCH.length>0&&SCH.every(sub)})));\n'; } > "${d}/run.mjs"
+    node "${d}/run.mjs" 2>&1
+  }
+  local _o
+  _o="$(_evw_run '{"dims":["D4"]}' '')"
+  if grep -q '"error":"dimensão D4 é composição' <<< "${_o}" && grep -q '"calls":0' <<< "${_o}"; then
+    record_pass "evolve-workflow: (b) D4 RECUSADO sem gastar agente (composicao e do contexto principal)"
+  else record_fail "evolve-workflow: (b) D4" "${_o:0:200}"; fi
+  _o="$(_evw_run '{}' '')"
+  if grep -q '"skipped":\["MAQ"\]' <<< "${_o}" && grep -q 'MAQ: sem maqTargets' <<< "${_o}" && ! grep -q '"d":"MAQ"' <<< "${_o}"; then
+    record_pass "evolve-workflow: (c) sem o raio-X a MAQ NAO roda e sai em skipped (nunca alvo inventado)"
+  else record_fail "evolve-workflow: (c) MAQ sem alvos" "${_o:0:240}"; fi
+  # (d) o refutado sai POR ID: D1-1 em refuted e AUSENTE de survived; D1-0 julgado e vivo
+  _o="$(_evw_run '{"dims":["D1"]}' '')"
+  local _surv; _surv="$(python3 -c 'import json,sys;d=json.load(sys.stdin)["r"];print(" ".join(f["id"] for f in d["survived"]),"|"," ".join(f["id"] for f in d["refuted"]))' <<< "${_o}" 2>&1)"
+  if [ "${_surv}" = "D1-0 D1-2 | D1-1" ]; then
+    record_pass "evolve-workflow: (d) refutado sai POR ID (D1-1 fora de survived; D1-0 julgado e vivo; D1-2 opportunistic sem juiz)"
+  else record_fail "evolve-workflow: (d) correlacao por id" "survived|refuted = [${_surv}]"; fi
+  # (e) juiz que devolve null NAO vira sobrevivente: cai em unjudged, e o log diz SEM JUIZ
+  _o="$(_evw_run '{"dims":["D1"]}' 'null-verdict')"
+  _surv="$(python3 -c 'import json,sys;d=json.load(sys.stdin)["r"];print(" ".join(f["id"] for f in d["survived"]),"|"," ".join(f["id"] for f in d["unjudged"]))' <<< "${_o}" 2>&1)"
+  if [ "${_surv}" = "D1-2 | D1-0 D1-1" ] && grep -q 'SEM JUIZ: 2' <<< "${_o}"; then
+    record_pass "evolve-workflow: (e) veredito null cai em unjudged (nunca sobrevivente silencioso)"
+  else record_fail "evolve-workflow: (e) juiz null" "survived|unjudged = [${_surv}]"; fi
+  # (f) scan que LANCA aparece em lost, com log — nunca some
+  _o="$(_evw_run '{"dims":["D1","D2"]}' 'throw-D2')"
+  if grep -q '"lost":\["D2"\]' <<< "${_o}" && grep -q 'D2: o worker LANÇOU' <<< "${_o}"; then
+    record_pass "evolve-workflow: (f) dimensao cujo worker lanca sai em lost, declarada"
+  else record_fail "evolve-workflow: (f) scan que lanca" "${_o:0:300}"; fi
+  # (g) entrada ruim RECUSA (args string valido e parseado; cap invalido recusa) e schemas tem required ⊆ properties
+  _o="$(_evw_run '"{\"dims\":[\"d1\"]}"' '')"
+  local _g=0
+  grep -q '"d":"D1"' <<< "${_o}" && grep -q '"schemas_ok":true' <<< "${_o}" && ! grep -q '"d":"D2"' <<< "${_o}" || _g=1
+  _o="$(_evw_run '{"cap":0}' '')"; grep -q '"error":"cap tem de ser inteiro' <<< "${_o}" || _g=1
+  grep -qE 'Date\.now|Math\.random|new Date\(\)' "${wf}" && _g=1
+  if [ "${_g}" -eq 0 ]; then record_pass "evolve-workflow: (g) args string parseado (d1 normalizado), cap invalido recusa, schemas consistentes, sem relogio"
+  else record_fail "evolve-workflow: (g) entrada/schema" "${_o:0:200}"; fi
+  rm -rf "${d}"
+}
+
 run_evolve_census_selftests() {
   local cen="${REPO_ROOT}/.claude/validation/evolve-census.sh"
   if [ ! -f "${cen}" ]; then record_fail "evolve-census" "medidor ausente: evolve-census.sh"; return; fi
@@ -21861,6 +21923,7 @@ _family run_silent_measurer_selftests
 _family run_injected_cut_selftests
 _family run_evolve_staleness_selftests
 _family run_evolve_census_selftests
+_family run_evolve_workflow_selftests
 
 
 

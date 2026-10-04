@@ -11,6 +11,8 @@ meta:
     - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_LINK_QUEBRADO_NA_DOUTRINA_DE_CLIENTE
     - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_RAIO_X_PUBLICA_ALVOS_FALSOS_DE_SKILLS
     - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#E_D9_NAO_E_NOOP_NO_CORE
+    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_FINDINGSCHEMA_DO_EVOLVE_NAO_E_JSON_SCHEMA
+    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_QUATRO_SIMBOLOS_FANTASMAS_NO_EVOLVE
 nodes:
   - id: E_LEVA1_DIRETIVAS_DESCRITAS_NAO_ESCRITAS
     node_type: evidence
@@ -64,6 +66,17 @@ nodes:
     status: open
     label: 'O QUE A LEVA 1 NAO FEZ, em ordem: (4) checkpoint do drive para o grafo + kg-drive-project emitindo CHECKPOINT-PENDENTE; (5) peca 4 do evolve em .claude/workflows/evolve.js com JSON Schema real e Workflow/Agent no allowed-tools, tirando os quatro simbolos fantasmas; (6) guarda de CLASSE para documentacao lida como invocacao, com o simulador das regex do harness. GATILHO: o merge desta leva (o maestro mandou seguir ate o final).'
 
+  - id: E_LEVA2_PECA4_DO_EVOLVE
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    verified_against: 'forge-census.sh: evolve 6/7 -> 7/7; familia evolve_workflow (a-g) verde com agent() simulado que imita o runtime (stage que lanca vira null); seis mutantes morderam, inclusive os dois com que o Elenxo provou a 1a bancada decorativa (survived=all; correlacao por indice)'
+    trace: '.claude/workflows/evolve.js'
+    label: 'CURA 5: o script que a rodada autorou inline virou a peca 4 em .claude/workflows/evolve.js, com JSON Schema real (FINDINGS, VERDICT) e a correlacao achado-veredito POR CONSTRUCAO. O Passo 3 da superficie perdeu o bloco de JS que nao rodava (runCommand x3, sweepSessionMemory) e ganhou o Passo 2.5: D4/D5/D9/D10 no contexto principal, antes do fan-out, sem orquestracao aninhada. Workflow e Agent entraram no allowed-tools. O script RECUSA D4 sem gastar agente e NAO roda a MAQ sem os alvos do raio-X — nunca inventa alvo. O evolve passou de 6/7 para 7/7 no censo da forja. O ELENXO REPROVOU A 1a VERSAO com tres blockers, todos fail-open: juiz que devolvia null deixava o achado em survived e ainda contava como verificado; dimensao cujo worker lancava sumia sem log; e o caso (d) da bancada era decorativo (passava com survived=all). Curados: unjudged e lost viraram campos de 1a classe, entrada ruim recusa, e todo achado que toque fusao de fase e julgado qualquer que seja a severidade.'
+
 edges:
   - from: E_LEVA1_DIRETIVAS_DESCRITAS_NAO_ESCRITAS
     to: Q_LEVA2_CURAS_M_RESTANTES
@@ -75,5 +88,8 @@ edges:
     to: Q_LEVA2_CURAS_M_RESTANTES
     edge_type: SUPPORTS
   - from: E_LEVA1_PREMISSA_DO_D9_CORRIGIDA
+    to: Q_LEVA2_CURAS_M_RESTANTES
+    edge_type: SUPPORTS
+  - from: E_LEVA2_PECA4_DO_EVOLVE
     to: Q_LEVA2_CURAS_M_RESTANTES
     edge_type: SUPPORTS

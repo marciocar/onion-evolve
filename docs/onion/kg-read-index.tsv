@@ -462,6 +462,7 @@
 .claude/validation/vendor/kg-console/cytoscape.min.js	E_headless_valid	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/vendor/kg-console/provenance.md	D_renderer_cytoscape_core	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/vps-exposure-check.sh	A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/workflows/evolve.js	E_LEVA2_PECA4_DO_EVOLVE	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/workflows/onion-research.js	E_F9_WORKTREE_E_WORKFLOW	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/workflows/onion-research.js	E_R3_F7_WORKFLOW_SCHEMA_E_STALL	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .githooks/pre-commit	C_OPCAO_B_ABSORVER_ORDEM_DERIVADA	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
