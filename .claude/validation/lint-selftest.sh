@@ -7891,6 +7891,117 @@ run_review_verdict_selftests() {
 # truncar e a isencao de valor unico) e acrescenta o que so daqui se ve: o MODO QUE A PRODUCAO
 # CONSOME. O molde avisa disso no comentario da l.6 dele — um caso vivia DEPOIS do `exit` do ramo
 # TSV, e TSV e exatamente o modo que o lint invoca: modo humano reprovava, modo TSV saia 0 e vazio.
+
+# ── /meta:evolve — o raio-X (peça 3) ──────────────────────────────────────────────────────────
+# ⚠️ OS CASOS AFIRMAM FORMA, NUNCA O ESTADO DO REPO VIVO. Foi o defeito FATAL da REGRA 97, forjada
+#    no mesmo dia: casos que afirmavam sobre o repo vivo faziam a bancada falhar quando alguém
+#    OBEDECIA à guarda, e o adotante nascia vermelho. Aqui o raio-X roda no repo real só para cobrar
+#    que as SEIS seções existem; tudo que depende de VALOR roda em sandbox com medidores falsos.
+# ⚠️ E A 1ª VERSÃO DESTA FAMÍLIA FOI REPROVADA (Elenxo, 2026-10-04): o raio-X publicava números
+#    FALSOS com cara de certos ("1 vencida" vindo da legenda; "✅ fresca" com o medidor quebrado;
+#    medidor rc=1/2 virando zero) e o caso (d) — que se chamava "nunca zero" — não afirmava zero
+#    nenhum, então o mutante que fazia NAO-MEDIDO emitir 0 SOBREVIVIA. Os casos (g)–(i) nasceram
+#    dessa reprovação, um por número falso.
+_evc_sandbox() {   # cria um repo de medidores FALSOS; $1 = dir. Devolve via arquivos.
+  local d="$1"; mkdir -p "${d}/.claude/validation" "${d}/docs/onion/graph"
+  cp "${REPO_ROOT}/.claude/validation/evolve-census.sh" "${d}/.claude/validation/"
+  ( cd "${d}" && git init -q . ) >/dev/null 2>&1
+}
+run_evolve_census_selftests() {
+  local cen="${REPO_ROOT}/.claude/validation/evolve-census.sh"
+  if [ ! -f "${cen}" ]; then record_fail "evolve-census" "medidor ausente: evolve-census.sh"; return; fi
+
+  # (a) o raio-X roda e emite as SETE seções (a 7ª, CONFRONTO, nasceu da reprovação: a 1ª versão
+  #     anunciava confronto e nenhuma linha cruzava dimensões).
+  local _o _rc=0
+  _o="$(cd "${REPO_ROOT}" && bash "${REPO_ROOT}/.claude/validation/evolve-census.sh" . --markdown 2>&1)" || _rc=$?
+  local _sec=0 _s
+  for _s in '## 1. PEÇAS' '## 2. GUARDAS' '## 3. DISSECAÇÕES' '## 4. DOUTRINA QUE CARREGA' '## 5. PLANO' '## 6. A IDADE' '## 7. CONFRONTO'; do
+    grep -qF "${_s}" <<< "${_o}" && _sec=$((_sec+1))
+  done
+  if [ "${_rc}" -eq 0 ] && [ "${_sec}" -eq 7 ]; then
+    record_pass "evolve-census: (a) o raio-X roda e emite as 7 secoes (com o CONFRONTO)"
+  else record_fail "evolve-census: (a) secoes" "rc=${_rc}; secoes=${_sec}/7"; fi
+
+  # (b) a distinção carregou≠aterrissou e a lista do não-medido estão na saída. ⚠️ Este caso grepa
+  #     texto que o próprio script imprime — o Elenxo o chamou de tautológico, e é: ele só prova que
+  #     a frase NÃO FOI APAGADA. Fica, com o nome dizendo isso; o rigor está em (d), (g), (h), (i).
+  if grep -q 'CARREGOU ≠ ATERRISSOU' <<< "${_o}" && grep -q 'O QUE NÃO FOI MEDIDO' <<< "${_o}"; then
+    record_pass "evolve-census: (b) a saida mantem a distincao carregou!=aterrissou e a lista do nao-medido (presenca de texto)"
+  else record_fail "evolve-census: (b) declaracao" "a distincao ou a lista do nao-medido sumiu da saida"; fi
+
+  # (c) FAIL-LOUD: sem os medidores, recusa (exit 3) — nunca um raio-X vazio que pareça limpo.
+  local d; d="$(mktemp -d)"
+  local _c _crc=0
+  _c="$(bash "${REPO_ROOT}/.claude/validation/evolve-census.sh" "${d}" --markdown 2>&1)" || _crc=$?
+  if [ "${_crc}" -eq 3 ] && grep -q 'Recuso' <<< "${_c}"; then
+    record_pass "evolve-census: (c) sem medidores RECUSA com exit 3 (varredor cego nunca vira quadro limpo)"
+  else record_fail "evolve-census: (c) fail-loud" "rc=${_crc}; saida=[${_c}]"; fi
+  rm -rf "${d}"
+
+  # (d) NUNCA ZERO: medidor que falha (rc=2, o meio-termo que a 1ª versão engolia) faz a dimensão
+  #     sair `?` — e o caso AFIRMA que o número da seção NÃO é 0, que é o que o nome promete.
+  d="$(mktemp -d)"; _evc_sandbox "${d}"
+  printf '#!/usr/bin/env bash\nexit 2\n' > "${d}/.claude/validation/guard-census.sh"
+  local _dd; _dd="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
+  if grep -qE '^  \? com selftest' <<< "${_dd}" && ! grep -qE '^  0 com selftest' <<< "${_dd}" \
+     && grep -q 'guardas — NAO-MEDIDO: guard-census.sh saiu rc=2' <<< "${_dd}"; then
+    record_pass "evolve-census: (d) medidor com rc=2 vira '?' na secao e NAO-MEDIDO na lista — nunca zero"
+  else record_fail "evolve-census: (d) nunca zero" "a secao de guardas virou numero ou o rc sumiu: [$(grep -A1 '2. GUARDAS' <<< "${_dd}")]"; fi
+
+  # (e) AUSENTE é nomeado e distinto de NAO-MEDIDO (no mesmo sandbox, forge-census nem existe).
+  if grep -q 'pecas — AUSENTE: forge-census.sh' <<< "${_dd}" && grep -qE '^  \? candidatos' <<< "${_dd}"; then
+    record_pass "evolve-census: (e) medidor AUSENTE e nomeado e a secao sai '?' (distinto de nao-mediu)"
+  else record_fail "evolve-census: (e) ausente" "[$(grep -E 'AUSENTE|candidatos' <<< "${_dd}" | head -3)]"; fi
+  rm -rf "${d}"
+
+  # (f) --tsv: cabeçalho fixo, 3 colunas em TODA linha, e a lista do não-medido EXISTE nele — a 1ª
+  #     versão não a tinha, e no tsv tudo que falhava virava 0.
+  d="$(mktemp -d)"; _evc_sandbox "${d}"
+  local _t; _t="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --tsv 2>&1 || true)"
+  if [ "$(head -1 <<< "${_t}")" = "$(printf 'dimensao\tmetrica\tvalor')" ] \
+     && [ "$(awk -F'\t' 'NF!=3' <<< "${_t}" | grep -c .)" = "0" ] \
+     && grep -q '^nao_medido	' <<< "${_t}" && ! grep -qE '^pecas	candidatos	0$' <<< "${_t}"; then
+    record_pass "evolve-census: (f) --tsv: 3 colunas, lista nao_medido presente, e dimensao nao-medida sai '?' (nunca 0)"
+  else record_fail "evolve-census: (f) tsv" "[$(head -4 <<< "${_t}")]"; fi
+  rm -rf "${d}"
+
+  # (g) VERDE FALSO: medidor de idade QUEBRADO (rc=2) nunca produz ✅. A 1ª versão imprimia
+  #     "✅ auto-auditoria fresca" porque a contagem de sinais dava zero sobre saída vazia.
+  d="$(mktemp -d)"; _evc_sandbox "${d}"
+  printf '#!/usr/bin/env bash\nexit 2\n' > "${d}/.claude/validation/evolve-staleness-check.sh"
+  local _g; _g="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
+  if ! grep -q '✅ auto-auditoria fresca' <<< "${_g}" && grep -q 'NÃO MEDIDA' <<< "${_g}"; then
+    record_pass "evolve-census: (g) medidor de idade quebrado NUNCA imprime ✅ (verde sem medicao e o pior verde)"
+  else record_fail "evolve-census: (g) verde falso" "[$(grep -A1 '## 6' <<< "${_g}")]"; fi
+
+  # (h) e o PAR de (g): rc=1 do medidor de idade é "achei sinal", NÃO falha — sem este par, a cura
+  #     de (g) poderia tratar todo rc≠0 como quebrado e esconder a auditoria vencida.
+  printf '#!/usr/bin/env bash\nprintf "SOFT\\tEVOLVE-VENCIDO\\tdocs/analysis\\tx\\n"; exit 1\n' > "${d}/.claude/validation/evolve-staleness-check.sh"
+  local _h; _h="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
+  if grep -q '1 sinal(is): EVOLVE-VENCIDO' <<< "${_h}" && ! grep -q 'idade — NAO-MEDIDO' <<< "${_h}"; then
+    record_pass "evolve-census: (h) rc=1 do medidor de idade e SINAL, nao falha (o par de (g))"
+  else record_fail "evolve-census: (h) rc semantico" "[$(grep -A1 '## 6' <<< "${_h}")]"; fi
+  rm -rf "${d}"
+
+  # (i) DISSECAÇÃO VENCIDA pela COLUNA, nunca pela legenda: um dissect-census falso com a palavra
+  #     VENCIDO na legenda e UMA linha `fresco` tem de dar 0 vencidas. Era o número falso que chegou
+  #     a um nó de grafo.
+  d="$(mktemp -d)"; _evc_sandbox "${d}"
+  cat > "${d}/.claude/validation/dissect-census.sh" <<'FAKE'
+#!/usr/bin/env bash
+echo "# censo de dissecações · 1 grafo(s) rastreado(s) · 1 dissecação(ões) declarada(s)"
+echo "ferramenta | nível | veredito | baseline | review_after | frescor"
+echo "cedar | N3 | parquear | 2026-10-01 | 2026-10-31 | fresco"
+echo "(VENCIDO não se cita como se fosse de hoje)"
+FAKE
+  local _i; _i="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
+  if grep -q '1 declarada(s) · 0 vencida(s)' <<< "${_i}"; then
+    record_pass "evolve-census: (i) vencida contada pela COLUNA frescor — a legenda com 'VENCIDO' nao conta"
+  else record_fail "evolve-census: (i) legenda" "[$(grep 'declarada' <<< "${_i}")]"; fi
+  rm -rf "${d}"
+}
+
 # ── REGRA 97: a auto-auditoria do framework tem GATILHO ──────────────────────────────────────
 # Delega ao `--selftest` do check (7 casos, incluindo as duas polaridades e o par pasta-ausente vs
 # pasta-vazia) e acrescenta o que só daqui se vê: o MODO QUE A PRODUÇÃO CONSOME (`--tsv`) e o
@@ -21727,6 +21838,7 @@ _family run_r84_pathspec_selftests
 _family run_silent_measurer_selftests
 _family run_injected_cut_selftests
 _family run_evolve_staleness_selftests
+_family run_evolve_census_selftests
 
 
 

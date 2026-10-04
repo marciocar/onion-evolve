@@ -1,0 +1,139 @@
+# kg-backlog-guard: on
+# ═══ TETO: 9 NÓS ═══  (era 8; +1 porque o Elenxo REPROVOU e a reprovação é evidência)
+meta:
+  id: forge-evolve-2026-10
+  schema_version: "1"
+  baseline: 2026-10-04
+  review_after: 2026-11-18
+  supersedes_none: >
+    Re-forja de superficie existente, nao rodada de eixo: nao ha baseline de radar a reconciliar.
+    O que esta leva CONSTRANGE vive em grafos de hoje e e reconciliado la (a aresta do motor e
+    intra-arquivo): o no C_O_EVOLVE_NAO_E_FRACO_E_SEM_GATILHO (medidores-silenciosos) teve o
+    gatilho entregue pela REGRA 97 (guard-evolve-staleness) e agora as pecas por esta forja.
+nodes:
+  - id: E_EVOLVE_DE_2_PARA_6_DE_7
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    source_tier: 10
+    label: 'O RE-FORJAR, MEDIDO PELO CENSO E NAO DECLARADO: o /meta:evolve foi de 2/7 para 6/7 pecas. Ganhou a DOUTRINA REUTILIZAVEL (antes ela vivia numa KB que o forge-census nao conta como peca, porque nenhum outro comando a citava como fragmento), o CONTEXTO INJETADO (o raio-X), a LENTE e a BANCADA. Falta a peca 4 (workflow em arquivo) — ver o no proprio. O censo NAO contou as pecas enquanto os arquivos estavam fora do indice git: ele exige caminho RASTREADO, e o comportamento estava certo — a sessao que le a superficie tambem nao acharia um arquivo nao versionado.'
+    trace: '.claude/commands/meta/evolve.md'
+    verified_against: 'forge-census.sh --tsv antes (2 evolve 0 0 0 1 0 0) e depois (6 evolve 1 1 0 1 1 1); o salto de 3 para 5 ocorreu so apos `git add`, medido'
+
+  - id: D_O_RAIO_X_E_COMPOSICAO_DE_MEDIDORES
+    node_type: decision
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: done
+    verified_at: '2026-10-04'
+    label: 'A DECISAO DE DESENHO DA PECA 3: o raio-X (`evolve-census.sh`) NAO MEDE NADA DE NOVO — ele COMPOE seis medidores que ja existiam (forge-census, guard-census, dissect-census, instructions-loaded-census, kg-drive-project, evolve-staleness). Medido antes de desenhar: cada um custa 1-2s, e o raio-X inteiro roda em ~6-9s MEDIDOS (a 1a redacao dizia ~5s e "1-2s cada"; o Elenxo mediu o forge-census a 5,4s sob carga). Contra o que antes era uma varredura de milhoes de tokens, e a clausula-mae pede eficiencia E eficacia. O valor do evolve sobre isso e o CONFRONTO entre as secoes, que nenhum orgao isolado entrega. ⚠️ A 1a redacao afirmava aqui que NAO-MEDIDO e AUSENTE eram "distintos de zero" — e o Elenxo provou que NAO ERAM: no markdown a secao mostrava 0 ao lado do NAO-MEDIDO, no --tsv nao existia lista do nao-medido, e medidor com rc 1 ou 2 era engolido. Hoje: cada dimensao carrega o proprio status, numero de dimensao nao-medida sai `?` nos DOIS modos, e a lista do nao-medido vive em ARQUIVO — porque em variavel ela morria no subshell do `$( )` e ficava vazia para cinco das sete dimensoes (a bancada pegou isso, nao eu).'
+    trace: '.claude/validation/evolve-census.sh'
+    verified_against: 'tempo medido de cada medidor (forge 2s, guard 1s, dissect 1s); `time` do raio-X: 4,98s numa medicao minha, 6,0-9,35s nas do Elenxo sob carga — o numero honesto e a faixa; bancada run_evolve_census_selftests 6/6 com 6 mutantes mordendo'
+
+  - id: E_A_SUPERFICIE_NASCEU_VIVA_NA_CARGA
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    source_tier: 10
+    label: 'O DOGFOOD QUE IMPORTAVA, e ele e de CARGA: invocado o /meta:evolve re-forjado, a diretiva de injecao EXECUTOU e o raio-X renderizou inteiro na superficie (data viva, seis secoes, e o proprio evolve aparecendo como 6/7 na lista — o raio-X mediu a si mesmo). Contraste medido: a primeira versao do /meta:forge-guard nasceu MORTA NA CARGA com lint e bancada verdes (`cmd: command not found`), e so a invocacao revelou. Bancada verde nao prova que a superficie carrega; INVOCAR prova.'
+    trace: '.claude/commands/meta/evolve.md'
+    verified_against: '/meta:evolve invocado pela Skill em 2026-10-04; a carga devolveu "**Hoje:** 2026-10-04" e o bloco "# raio-X do framework" com as 6 secoes'
+
+  - id: E_RUNCOMMAND_NUNCA_EXISTIU_E_SEGUE_NA_SUPERFICIE
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-04'
+    source_tier: 10
+    label: 'ACHADO DE MAQUINARIA LIDO NA PROPRIA CARGA: o Passo 3 do evolve chama `runCommand("/meta:kb-freshness")`, `runCommand("/meta:metaspec-validate")` e `runCommand("/meta:context-freshness")` para as dimensoes D4, D5 e D9 — e a propria superficie DECLARA, desde 2026-08-05, que `runCommand()` NAO EXISTE e que nenhum artefato declara a tool necessaria. Logo D4/D5/D9 NUNCA RODARAM por esse caminho; nao e regressao, e mecanismo que nunca nasceu. O codigo morto segue no lugar com um aviso em prosa ao lado, que e exatamente o padrao "prosa no lugar de mecanismo" que esta casa persegue. GATILHO: a proxima RODADA do evolve — que vai ter de executar D4/D5 no contexto principal e pode, entao, substituir o pseudocodigo pelo que realmente roda.'
+    trace: '.claude/commands/meta/evolve.md'
+    verified_against: 'texto do Passo 3 na superficie carregada; a nota de 2026-08-05 na propria superficie afirma o grep vazio por runCommand e SlashCommand'
+
+  - id: Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: open
+    verified_at: '2026-10-04'
+    label: 'A PECA QUE FALTA E UMA CONTRADICAO INTERNA, nao so uma lacuna: o evolve manda "Autore o script Workflow" INLINE, e a skill `onion-orchestration` — que o proprio evolve aciona no Passo 2 — manda autorar "EM ARQUIVO, nunca inline", com tres ganhos medidos: sintaxe pega antes de gastar worker, o script vira EDITAVEL, e vira RETOMAVEL por resumeFromRunId. O ultimo e o maior para o evolve, que e a orquestracao mais longa da casa e morre com a sessao. A forja declara a peca 4 fora desta versao (tem molde proprio); o que fica nomeado e que a cura nao e escrever um workflow novo do zero, e PERSISTIR em `.claude/workflows/evolve.js` o script que a proxima rodada autorar. GATILHO: a proxima rodada real do evolve.'
+    trace: '.claude/skills/onion-orchestration/SKILL.md'
+    verified_against: 'forge-census --tsv marca a coluna workflow do evolve como 0; o Passo 3 do evolve.md autora o script inline; a skill onion-orchestration, passo 3, exige arquivo'
+
+  - id: E_CHECKPOINT_DO_DRIVE_VIVE_EM_ARQUIVO_QUE_NAO_VIAJA
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-04'
+    source_tier: 10
+    label: 'ACHADO DO MAESTRO, MEDIDO NESTA LEVA, e e de controle e nao de estetica: o P0.5 do /meta:drive manda PARAR se houver checkpoint nao-selado — e esse gate le `.claude/sessions/<drive>/STATE.md`, que e GITIGNORADO. Numa outra maquina, ou depois de um `git clean`, o drive abre passada nova sobre trabalho ja conduzido e nada acusa: a ENTREGA e duravel (grafo, main), o CONTROLE dela nao. E o sintoma apareceu ao selar o no do anuncio: um fato exigiu DUAS escritas (o status no grafo e a narrativa no STATE), e so uma tem guarda. Medido o diretorio: 14 sessoes, 31 arquivos, 19 sao STATE.md (controle) e 12 NAO sao — mas desses 12, tres sao LOGS DE HOOK (instructions-loaded.jsonl, model-switch.jsonl, estado do a2a-verify), nao contexto de feature, correcao do Elenxo. ⚠️ A CURA NAO E VERSIONAR `.claude/sessions/` — isso criaria uma segunda SSOT sem guarda de paridade e colidiria com um-escritor-por-repo entre worktrees. A cura e a INVERSA: o checkpoint pendente pertence ao GRAFO, onde o P0.5 leria a SSOT; o STATE volta a ser o que honestamente e, projecao legivel da passada, e ai ser gitignorado esta certo em vez de ser buraco. GATILHO: a proxima passada do /meta:drive.'
+    trace: '.claude/commands/meta/drive.md'
+    verified_against: 'git add de .claude/sessions/ recusado por .gitignore em 2026-10-04; contagem por find; o P0.5 do drive.md le o STATE.md por caminho'
+
+  - id: C_DOCUMENTACAO_INDISTINGUIVEL_DE_INVOCACAO_VIVA
+    node_type: claim
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-04'
+    label: 'A CLASSE QUE APARECEU TRES VEZES NUM DIA, e e material de primeira linha para o evolve porque e de MAQUINARIA: um texto que DESCREVE uma invocacao e lido por um mecanismo como se FOSSE a invocacao. (1) A REGRA 96 proibia DOCUMENTAR a si mesma: o exemplo do anti-padrao, escrito como doutrina, levava o lint real a HARD. (2) O /meta:forge-guard nasceu morto na carga porque o harness EXECUTOU um exemplo de diretiva escrito em prosa. (3) A minha mensagem de violacao da REGRA 97, que escrevia o comando de cura, foi lida pela REGRA 59 como invocacao com as flags `[--tsv e]`. Tres mecanismos diferentes (lint, harness, extrator de pares), um so modo de falha. A pergunta que o evolve tem de fazer: existe um jeito UNICO e canonico de citar um comando sem ativa-lo, que todos os leitores respeitem? Hoje cada um tem sua convencao (crase dupla, cerca, descrever em vez de escrever), e o autor tem de adivinhar qual leitor vai passar pelo texto.'
+    trace: '.claude/validation/injected-cut-check.sh'
+    verified_against: 'os tres casos medidos e curados em 2026-10-04 (PRs #909 e #910): FP-1 do Elenxo da REGRA 96, a nota da carga morta no forge-guard.md, e o par fantasma da REGRA 59'
+
+  - id: Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA
+    node_type: question
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: open
+    verified_at: '2026-10-04'
+    label: 'O EVOLVE ESTA FORJADO E NAO FOI RODADO, e isso e deliberado: o dogfood desta forja era a CARGA (a superficie executa a injecao), nao a RODADA (o fan-out D1-D10, caro, que e o uso real). A rodada e a proxima leva, e ela chega com o terreno pronto: o raio-X diz ONDE gastar (37 comandos so com a superficie, 4 doutrinas com paths: que nunca casaram — nomeadas na secao 7 —, 0 dissecacao vencida, 291 artefatos tocados desde a ultima auditoria). ⚠️ A 1a redacao deste no dizia "1 dissecacao vencida": NUMERO FALSO, vindo de um `grep -ci vencido` que casava a LEGENDA do dissect-census; a unica dissecacao esta `fresco`. Corrigido apos o Elenxo, a REGRA 97 cobra a idade, e quatro achados ja medidos esperam ser confrontados (runCommand inexistente, workflow inline, checkpoint do drive em arquivo que nao viaja, documentacao indistinguivel de invocacao). Quando a rodada sair, a REGRA 97 cala — e e a primeira vez que o gatilho, a doutrina e o medidor existem juntos. GATILHO: o maestro disparar /meta:evolve.'
+    trace: '.claude/commands/meta/evolve.md'
+    verified_against: 'raio-X rodado em 2026-10-04 (as quatro contagens citadas sao da saida dele); a REGRA 97 segue emitindo EVOLVE-VENCIDO e EVOLVE-DELTA'
+
+  - id: E_O_ELENXO_REPROVOU_O_RAIO_X_POR_NUMERO_FALSO
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-04'
+    source_tier: 10
+    label: 'O ELENXO REPROVOU O RAIO-X PELO MOTIVO EXATO QUE O MANDATO ANTECIPAVA: ele publicava NUMEROS FALSOS COM CARA DE CERTOS, o pior modo de falha de um raio-X porque ele empresta AUTORIDADE ao numero. (1) "1 dissecacao vencida" vinha de `grep -ci vencido` casando a LEGENDA do dissect-census, e esse numero FALSO ja tinha chegado a um no deste grafo; (2) com o medidor de idade QUEBRADO, a secao 6 imprimia "✅ auto-auditoria fresca" — verde falso; (3) "14 doutrinas carregadas" eram 4. Mais: medidor com rc 1 ou 2 virava ZERO, o --tsv nao tinha lista do nao-medido, o passivo de guardas era FILTRADO PARA FORA, a injecao dependia de `date` fora do allowed-tools (so rodou porque a sessao estava em bypass), o Passo 0.5 prometia alvos que o raio-X nao nomeava, e o guard-census oscilava 15/16 por corrida de EPIPE. TODOS CURADOS. E o que nem eu nem ele vimos e a BANCADA viu: a lista do nao-medido vivia em variavel dentro de `$( )` e morria no subshell — vazia para cinco das sete dimensoes. Pos-cura: bancada 9/9, 9 mutantes mordendo (incluindo o M7, que sobreviveu ao Elenxo), guard-census estavel em 8 execucoes.'
+    trace: '.claude/validation/evolve-census.sh'
+    verified_against: 'refutador opus/high em worktree isolada; 166k tokens, 72 chamadas, ~20 min; pos-cura reverificado por mim: 0 vencida, 4 carregaram, guard-census 8x=16, 9 mutantes'
+
+edges:
+  - from: D_O_RAIO_X_E_COMPOSICAO_DE_MEDIDORES
+    to: E_EVOLVE_DE_2_PARA_6_DE_7
+    edge_type: SUPPORTS
+  - from: E_A_SUPERFICIE_NASCEU_VIVA_NA_CARGA
+    to: E_EVOLVE_DE_2_PARA_6_DE_7
+    edge_type: SUPPORTS
+  - from: E_RUNCOMMAND_NUNCA_EXISTIU_E_SEGUE_NA_SUPERFICIE
+    to: Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA
+    edge_type: SUPPORTS
+  - from: Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL
+    to: Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA
+    edge_type: SUPPORTS
+  - from: E_CHECKPOINT_DO_DRIVE_VIVE_EM_ARQUIVO_QUE_NAO_VIAJA
+    to: Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA
+    edge_type: SUPPORTS
+  - from: C_DOCUMENTACAO_INDISTINGUIVEL_DE_INVOCACAO_VIVA
+    to: Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA
+    edge_type: SUPPORTS
+  - from: E_O_ELENXO_REPROVOU_O_RAIO_X_POR_NUMERO_FALSO
+    to: D_O_RAIO_X_E_COMPOSICAO_DE_MEDIDORES
+    edge_type: CONSTRAINS
