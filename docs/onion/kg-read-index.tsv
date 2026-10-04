@@ -15,6 +15,7 @@
 .claude/agents/testing/test-agent.md	C_d2_test_diff	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
 .claude/commands/common/	C_refut_frontmatter_skills	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
 .claude/commands/common/prompts/client-material-doctrine.md	C_LINK_QUEBRADO_NA_DOUTRINA_DE_CLIENTE	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
+.claude/commands/common/prompts/client-material-doctrine.md	E_LEVA1_LINK_DA_DOUTRINA_DE_CLIENTE	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/commands/common/prompts/guard-doctrine.md	C_MUTANTE_QUE_NAO_MORDE_TEM_QUATRO_CAUSAS	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/commands/common/prompts/guard-doctrine.md	D_GUARDA_DA_CLASSE_CORTE_NAO_DECLARADO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/commands/common/prompts/inventory-sync-after-create.md	SY6_ev_inventory_sync_prompt	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -59,6 +60,7 @@
 .claude/commands/meta/create-command.md	E_TUNE_PAIRS	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/commands/meta/create-knowledge-base.md	D_ALINHAR_GERADOR_DE_KB	docs/onion/graph/residuos-2026-08-18.kg.yaml
 .claude/commands/meta/create-skill.md	C_CREATE_SKILL_EXECUTA_GIT_DIFF_A_CADA_INVOCACAO	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
+.claude/commands/meta/create-skill.md	E_LEVA1_DIRETIVAS_DESCRITAS_NAO_ESCRITAS	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/commands/meta/create-vertical.md	E_create_vertical_existe	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
 .claude/commands/meta/diary.md	SY6_ev_diary_conflict_class	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/diary.md	SY6_ev_retestar_nunca_recarimbar	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -71,6 +73,7 @@
 .claude/commands/meta/evolve.md	C_QUATRO_SIMBOLOS_FANTASMAS_NO_EVOLVE	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
 .claude/commands/meta/evolve.md	E_A_SUPERFICIE_NASCEU_VIVA_NA_CARGA	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/commands/meta/evolve.md	E_EVOLVE_DE_2_PARA_6_DE_7	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
+.claude/commands/meta/evolve.md	E_LEVA1_PREMISSA_DO_D9_CORRIGIDA	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/commands/meta/evolve.md	E_RUNCOMMAND_NUNCA_EXISTIU_E_SEGUE_NA_SUPERFICIE	docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml
 .claude/commands/meta/evolve.md	Q_GATILHO_DO_EVOLVE_QUAL_E	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/commands/meta/evolve.md	Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO	docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml
@@ -304,6 +307,7 @@
 .claude/validation/injected-cut-check.sh	E_TETO_DECLARADO_O_QUE_A_GUARDA_NAO_VE	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/validation/injected-cut-check.sh	Q_SEGUNDA_SUPERFICIE_INJETADA_FORA_DOS_DOIS_CAMINHOS	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
 .claude/validation/instructions-loaded-census.sh	C_RAIO_X_PUBLICA_ALVOS_FALSOS_DE_SKILLS	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
+.claude/validation/instructions-loaded-census.sh	E_LEVA1_SKILL_E_NAO_MEDIVEL	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/validation/inventory.sh	E_AUSENCIA_LIDA_COMO_RESULTADO_EM_TRES_SITIOS	docs/onion/graph/inbox-sinais-2026-09.kg.yaml
 .claude/validation/kb-vendored-link-check.sh	E_A_DIVIDA_DA_REGRA_45_ERA_O_QUE_PRENDIA_A_PORTA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/validation/kg-backlog-project.sh	C_OPCAO_O2_CONSUMIDOR_IRMAO_LACO	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
