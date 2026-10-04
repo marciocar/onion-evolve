@@ -83,7 +83,7 @@ Defaults inteligentes:
 3. **Artefatos de referência**: runbooks, schemas, histórico de PRs, API specs?
 4. **Scripts necessários?** Python/Bash/Deno?
 5. **Features Claude Code aplicáveis?**
-   - Dynamic injection (`` !`git diff` ``) para dados live?
+   - Dynamic injection (o caractere `!` colado a um comando entre crases — ex.: `git diff`) para dados live?
    - `disable-model-invocation` (skill destrutivo tipo deploy)?
    - `context: fork` (pesquisa que poluiria a conversa)?
    - `paths` glob (só ativar em certos arquivos)?
@@ -216,7 +216,7 @@ allowed-tools: Bash(git *)
 
 ## Mudanças atuais
 
-!`git diff HEAD`
+<!-- aqui vai a diretiva de injeção: o caractere ! colado ao comando entre crases, ex. git diff HEAD -->
 
 ## Instruções
 Resuma as mudanças em 2-3 bullets e liste riscos.

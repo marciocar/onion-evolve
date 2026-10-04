@@ -111,7 +111,7 @@ silencioso é pior que exceção declarada.
 ## A tensão com o corpus, declarada
 
 A cláusula 2 instrui a produzir, para o cliente, um documento **calibrado pelo interesse de quem o
-produz** — e a KB [`evidence-source-interest`](../../../docs/knowledge-base/concepts/evidence-source-interest.md)
+produz** — e a KB [`evidence-source-interest`](../../../../docs/knowledge-base/concepts/evidence-source-interest.md)
 desta casa ensina o contrário para quem LÊ: pergunte *"quem produziu isto ganha o quê com o que
 diz?"* e desconte o enquadramento. As duas coisas convivem, mas só com as cláusulas 7 e 8 no lugar:
 o achado continua existindo num documento interno, o dever de conferir vai para o material do

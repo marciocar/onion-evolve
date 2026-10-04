@@ -30,7 +30,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.9
-    status: confirmed
+    status: superseded
     verified_at: '2026-10-04'
     label: 'BLOCKER (MAQ-0), e e um defeito VIVO, nao um risco: o /meta:create-skill EXECUTA `git diff` e `git diff HEAD` toda vez que e invocado, porque o harness le como diretiva viva dois textos que sao so EXEMPLO de documentacao — l.86 (um exemplo dentro de uma pergunta, citado com crase dupla) e l.219 (dentro de um bloco cercado de exemplo). O worker reconstituiu as regex do binario 2.1.289 para provar: o harness NAO pula bloco cercado, e o mascaramento dele so neutraliza code-span sem `!` antes, entao a forma com crase dupla sobrevive. Efeito: o diff inteiro da arvore entra no contexto no meio das instrucoes de criar skill; fora de bypass, cai no fluxo de permissao (nao medido). O arquivo VIAJA para os adotantes. Mesmo padrao em `.claude/agents/meta/agent-skills-specialist.md` (l.75/154/155/249), sem medir se o harness injeta em corpo de agente. A REGRA 96 varre essas diretivas, mas so procura CORTE, nao EXEMPLO EXECUTADO.'
     trace: '.claude/commands/meta/create-skill.md'
@@ -41,7 +41,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.95
-    status: confirmed
+    status: superseded
     verified_at: '2026-10-04'
     label: 'BLOCKER (MAQ-2) CONTRA O MEU PROPRIO TRABALHO DO DIA: a secao 7 do raio-X publica `onion-patterns` e `onion-validation` como alvos ("doutrina com paths: que NUNCA casou"), e isso e FALSO POR CONSTRUCAO. O hook InstructionsLoaded dispara so para "CLAUDE.md or rule" — NUNCA para skill (texto do binario 2.1.289) —, mas o `instructions-loaded-census.sh:32` inclui `.claude/skills/*/SKILL.md` na lista do NUNCA. Os `paths:` das duas casam milhares de arquivos, e ambas estao ativas na lista de skills da sessao. Sao 2 dos 4 alvos falsos, exatamente a classe "numero falso com cara de certo" que o Elenxo da re-forja reprovou horas antes — reintroduzida por um medidor que eu COMPUS sem auditar. CURA: skill com paths: sai como NAO-MEDIVEL na census, e o raio-X a lista em "O QUE NAO FOI MEDIDO", nunca em CONFRONTO.'
     trace: '.claude/validation/instructions-loaded-census.sh'
@@ -63,7 +63,7 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.95
-    status: confirmed
+    status: superseded
     verified_at: '2026-10-04'
     label: 'BLOCKER (D7-0), de esforco S: `.claude/commands/common/prompts/client-material-doctrine.md:114` aponta `../../../docs/knowledge-base/concepts/evidence-source-interest.md`, e o arquivo existe com QUATRO niveis (`../../../../`). Link morto num fragmento de doutrina que VIAJA para material de cliente. Dos 49 links mortos que o D7 viu, os demais julgados eram scaffolding esperado de templates (o juiz derrubou 4 desses grupos), e 41 NAO foram julgados por corte declarado.'
     trace: '.claude/commands/common/prompts/client-material-doctrine.md'
@@ -140,7 +140,7 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 1.0
-    status: confirmed
+    status: superseded
     verified_at: '2026-10-04'
     source_tier: 10
     label: 'A SUPERFICIE DO EVOLVE AFIRMA UMA PREMISSA FALSA SOBRE O D9: "no framework = no-op (contextos sao templates, so README)". MEDIDO no contexto principal: `docs/business-context/` tem 15 arquivos (briefs de GTM e de pricing, decisao, glossario) e `docs/technical-context/` tem 9 (project-charter, business-logic, ai-development-guide) — POPULADOS. So `docs/compliance-context/` e template (1 README). O D9 DEVERIA rodar no core, e a superficie o dispensava. E a mesma forma do "vazio silencioso = falha" que o Passo 3.2 da propria superficie descreve. O D9 NAO foi rodado nesta rodada (composicao fantasma); fica declarado, e a premissa da superficie precisa ser corrigida.'
