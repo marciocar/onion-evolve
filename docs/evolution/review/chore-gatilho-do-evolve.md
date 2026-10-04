@@ -1,7 +1,7 @@
 ---
-reviewed_diff_sha256: da376230ab62f2e79a2b77dab3d7185bc592aa953c38ce9647d67257332cc894
-findings_total: 12
-findings_real: 12
+reviewed_diff_sha256: fe6253d77ce337f01495db1cee5246beda522124b0c54e0ff484582fdaf98478
+findings_total: 13
+findings_real: 13
 tokens: 174581
 duration_min: 15
 verdict: REPROVADO_E_CURADO
@@ -77,6 +77,25 @@ pós-cura. Daí `(h)` glob estrito, `(i)` limiar, `(j)` `--since` ancorado, `(k)
 E um quarto, de método: o script de cura **escrevia o arquivo na última linha**, então um `assert`
 que falhou no fim **descartou duas curas já aplicadas** — e eu li um `grep -c` como prova de que
 tinham entrado. Fail-closed correto, leitura minha errada.
+
+## O 13º achado veio do CI, não do Elenxo — e é de FRONTEIRA
+
+O shard 2 reprovou com o gate local **verde**: o `ops/materialize-door.sh` recusa a projeção pública
+quando um artefato cita um **documento nomeado** sob `docs/analysis/`. O diretório nu descreve a
+arquitetura e fica; `docs/analysis/<algo>.md` é **ponteiro para documento core-privado** — e esta
+guarda **viaja para a porta**. Minhas seis fixtures escreviam o nome literal (10 ocorrências).
+
+**Cura:** os nomes de fixture são **compostos em runtime** (helper `_rel`), nunca literais. São
+fixtures sintéticas, e compor diz isso ao leitor **e** ao detector. Medido: 10 literais → 0, e o
+materializador deixou de acusar.
+
+O caso `door: (g)` caía **por um motivo que nada tem a ver com o que ele mede** — o materializador
+abortava antes do passo medido. É a assinatura exata de bancada medindo ambiente, e o comentário do
+próprio caso já descrevia essa armadilha para outro cenário.
+
+**E uma classe na minha verificação:** ao conferir a cura rodei o materializador com `--from HEAD`,
+que lê o conteúdo **commitado** — ele seguia acusando as linhas antigas enquanto a árvore já estava
+curada. **Testar o commitado em vez do da árvore, pela segunda vez hoje.**
 
 ## O que fica declarado em vez de resolvido
 
