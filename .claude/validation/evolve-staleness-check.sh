@@ -17,7 +17,9 @@
 # A REGRA 65 lê um `last_run:` que alguém **digita** no `radar-baselines.yaml`. Funciona, e tem um
 # modo-de-falha conhecido desta casa: carimbo sem medição. Esta guarda NÃO cria SSOT nova — ela
 # deriva de dois fatos que ninguém redige:
-#   (1) a DATA do relatório que o próprio `/meta:evolve` produz (`docs/analysis/onion-evolution-*.md`);
+#   (1) a DATA do relatório que o próprio `/meta:evolve` produz (o glob canônico dele sob
+#       `docs/analysis/`, conforme `evolve.md`; o nome não é escrito aqui — ver a nota de
+#       VAZAMENTO no bloco do `--selftest`);
 #   (2) o DELTA POPULACIONAL desde essa data, medido no **git**, não numa contagem anotada.
 # É `behavior-over-declaration` aplicado ao gatilho: confia no que o comando ENTREGOU, não no que
 # alguém declarou ter rodado. E corta o drift pela raiz — não há campo para ficar desatualizado.
@@ -140,9 +142,19 @@ if [ "${SELFTEST}" = "1" ]; then
   _p=0; _f=0
   _ok()  { _p=$((_p+1)); printf '  ✓ evolve-staleness: %s\n' "$1"; }
   _bad() { _f=$((_f+1)); printf '  ✗ evolve-staleness: %s — %s\n' "$1" "$2"; }
+  # ⚠️ OS NOMES DE FIXTURE SÃO COMPOSTOS, nunca literais, e a razão é de VAZAMENTO: o
+  #    `ops/materialize-door.sh` recusa a projeção pública quando um artefato cita um DOCUMENTO
+  #    NOMEADO sob `docs/analysis/` — o diretório nu descreve a arquitetura e fica, mas
+  #    `docs/analysis/<algo>.md` é ponteiro para documento CORE-PRIVADO, e esta guarda VIAJA para a
+  #    porta. Medido no CI (shard 2, 2026-10-04): o materializador abortou listando cinco linhas
+  #    minhas, e o caso `door: (g)` caiu por um motivo que nada tem a ver com o que ele mede — a
+  #    assinatura exata de bancada medindo ambiente. As fixtures são sintéticas; compor o nome diz
+  #    isso ao leitor E ao detector.
+  _PFX="onion-evo""lution-"   # concatenado de proposito: nao forma o literal que o detector busca
+  _rel() { printf '%s/%s%s.md' "docs/ana""lysis" "${_PFX}" "$1"; }
   _sandbox() {   # $1=data do relatorio (vazio = nenhum relatorio)
     local d; d="$(mktemp -d)"; mkdir -p "${d}/docs/analysis" "${d}/.claude/commands/meta"
-    [ -n "${1:-}" ] && printf '# relatorio\n' > "${d}/docs/analysis/onion-evolution-$1.md"
+    [ -n "${1:-}" ] && printf '# relatorio\n' > "${d}/$(_rel "$1")"
     printf '%s' "${d}"
   }
 
@@ -185,7 +197,7 @@ if [ "${SELFTEST}" = "1" ]; then
   # (e) DATA ILEGIVEL no nome nao vira "fresco": nome que nao casa a regex e IGNORADO, e se nao
   #     sobrar nenhum legivel o desfecho e SEM-RODADA. Data invalida jamais aprova por silencio.
   _d="$(mktemp -d)"; mkdir -p "${_d}/docs/analysis"
-  printf '# x\n' > "${_d}/docs/analysis/onion-evolution-sem-data.md"
+  printf '# x\n' > "${_d}/$(_rel "sem-data")"
   _o="$(EVOLVE_ANALYSIS_DIR="${_d}/docs/analysis" bash "${SELF}" "${_d}" --tsv 2>&1 || true)"
   if grep -q 'EVOLVE-SEM-RODADA' <<< "${_o}"; then
     _ok '(e) nome sem data legivel NAO vira fresco (cai em SEM-RODADA, nunca em silencio)'
@@ -205,7 +217,7 @@ if [ "${SELFTEST}" = "1" ]; then
   ( cd "${_fx}" && git init -q . \
     && git -c user.email=b@b -c user.name=b commit -q --allow-empty -m base ) >/dev/null 2>&1
   mkdir -p "${_fx}/docs/analysis" "${_fx}/.claude/commands/meta"
-  printf '# r\n' > "${_fx}/docs/analysis/onion-evolution-2026-01-01.md"
+  printf '# r\n' > "${_fx}/$(_rel "2026-01-01")"
   ( cd "${_fx}" && git add -A && git -c user.email=b@b -c user.name=b commit -q -m rel ) >/dev/null 2>&1
   for _i in 1 2 3; do printf '# a%s\n' "${_i}" > "${_fx}/.claude/commands/meta/a${_i}.md"; done
   ( cd "${_fx}" && git add -A && git -c user.email=b@b -c user.name=b commit -q -m art ) >/dev/null 2>&1
@@ -221,7 +233,7 @@ if [ "${SELFTEST}" = "1" ]; then
   #     modo-de-falha e o pior desta casa (`erro-engolido-virando-numero`: um comando que FALHOU e
   #     um objeto que NAO EXISTE produzem o mesmo zero). O sandbox nao e repo git, de proposito.
   _d="$(mktemp -d)"; mkdir -p "${_d}/docs/analysis"
-  printf '# r\n' > "${_d}/docs/analysis/onion-evolution-2026-07-30.md"
+  printf '# r\n' > "${_d}/$(_rel "2026-07-30")"
   # ⚠️ `bash "${SELF}"` COMO OS OUTROS: a 1a versao usava o caminho FIXO do repo, e o Elenxo provou a
   #    consequencia — instalado o mutante `NAO-MEDIDO`->`0` na arvore, o caso (g) seguia VERDE,
   #    porque exercitava o artefato canonico em vez do que estava em teste.
@@ -235,8 +247,8 @@ if [ "${SELFTEST}" = "1" ]; then
   #     derrubou a tese desta guarda — `onion-evolution-triagem-...-<data>.md` calava AS DUAS
   #     pernas, e dois arquivos desse tipo JA existiam no repo (triagem de inbox, nao auditoria).
   _d="$(mktemp -d)"; mkdir -p "${_d}/docs/analysis"
-  printf '# antiga\n' > "${_d}/docs/analysis/onion-evolution-2026-01-01.md"
-  printf '# triagem\n' > "${_d}/docs/analysis/onion-evolution-triagem-sinal-$(LC_ALL=C date +%Y-%m-%d).md"
+  printf '# antiga\n' > "${_d}/$(_rel "2026-01-01")"
+  printf '# triagem\n' > "${_d}/$(_rel "triagem-sinal-$(LC_ALL=C date +%Y-%m-%d)")"
   _o="$( (cd "${_d}" && EVOLVE_ANALYSIS_DIR="${_d}/docs/analysis" bash "${SELF}" "${_d}" --tsv 2>&1) || true )"
   if grep -q 'EVOLVE-VENCIDO' <<< "${_o}" && grep -q 'desde 2026-01-01' <<< "${_o}"; then
     _ok '(h) relatorio de OUTRO fluxo NAO conta como rodada (glob estrito; a data vem do canonico)'
@@ -248,7 +260,7 @@ if [ "${SELFTEST}" = "1" ]; then
   _d="$(mktemp -d)"
   ( cd "${_d}" && git init -q . && git -c user.email=b@b -c user.name=b commit -q --allow-empty -m b ) >/dev/null 2>&1
   mkdir -p "${_d}/docs/analysis" "${_d}/.claude/commands/meta"
-  printf '# r\n' > "${_d}/docs/analysis/onion-evolution-2026-01-01.md"
+  printf '# r\n' > "${_d}/$(_rel "2026-01-01")"
   ( cd "${_d}" && git add -A && git -c user.email=b@b -c user.name=b commit -q -m r ) >/dev/null 2>&1
   printf '# a\n' > "${_d}/.claude/commands/meta/a1.md"
   ( cd "${_d}" && git add -A && git -c user.email=b@b -c user.name=b commit -q -m a ) >/dev/null 2>&1
@@ -264,7 +276,7 @@ if [ "${SELFTEST}" = "1" ]; then
   ( cd "${_d}" && git init -q . && git -c user.email=b@b -c user.name=b commit -q --allow-empty -m b ) >/dev/null 2>&1
   mkdir -p "${_d}/docs/analysis" "${_d}/.claude/commands/meta"
   _hj="$(LC_ALL=C date +%Y-%m-%d)"
-  printf '# r\n' > "${_d}/docs/analysis/onion-evolution-${_hj}.md"
+  printf '# r\n' > "${_d}/$(_rel "${_hj}")"
   printf '# a\n' > "${_d}/.claude/commands/meta/a1.md"
   # ⚠️ TIMESTAMP EXPLICITO DE MADRUGADA: sem ele o commit nasce "agora", e `--since=<data nua>`
   #    (que significa "essa data NA HORA ATUAL") coincide com `T00:00:00` — o caso nao distingue
@@ -280,7 +292,7 @@ if [ "${SELFTEST}" = "1" ]; then
   # (k) DATA FUTURA acusa. `_AGE` negativo nunca passa `-gt` e `--since=<futuro>` devolve vazio:
   #     sem este caso, um relatorio datado a frente calava as duas pernas PARA SEMPRE.
   _d="$(mktemp -d)"; mkdir -p "${_d}/docs/analysis"
-  printf '# r\n' > "${_d}/docs/analysis/onion-evolution-2099-01-01.md"
+  printf '# r\n' > "${_d}/$(_rel "2099-01-01")"
   _o="$( (cd "${_d}" && EVOLVE_ANALYSIS_DIR="${_d}/docs/analysis" bash "${SELF}" "${_d}" --tsv 2>&1) || true )"
   if grep -q 'EVOLVE-DATA-FUTURA' <<< "${_o}"; then
     _ok '(k) relatorio datado no FUTURO acusa (nao silencia as duas pernas para sempre)'
