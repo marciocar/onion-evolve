@@ -5484,6 +5484,40 @@ check_evolve_staleness() {
 }
 check_evolve_staleness
 
+# ─────────────────────────────────────────────────────────────────────────────
+# REGRA 98 (Diretiva de injeção escrita como CITAÇÃO não pode estar VIVA) — HARD
+#   DANO CONSUMADO (2026-10-04, rodada do /meta:evolve): o /meta:create-skill EXECUTAVA git diff
+#   a cada invocação, porque dois exemplos de documentação (crase dupla; bloco cercado) casam as
+#   regex do harness 2.1.289 — que NÃO pula bloco cercado e NÃO mascara crase dupla. Era a 2ª
+#   instância no dia (o /meta:forge-guard nasceu morto na carga pelo mesmo mecanismo). A REGRA 96
+#   chamava exatamente essas formas de "citadas"; esta regra simula a leitura do harness e acusa
+#   onde as duas leituras divergem. Passivo medido em ZERO após a leva 1: nasce sem catraca.
+#   Toda a lógica (e o teto declarado) vive em cited-directive-check.sh.
+check_cited_directive_live() {
+  local helper="${SCRIPT_DIR}/cited-directive-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      */lint-artifacts.sh|*/cited-directive-check.sh|*/.claude/commands/*|*/.claude/skills/*|*/plugins/*) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  local _out _hrc=0
+  _out="$(bash "${helper}" "${REPO_ROOT}" --tsv 2>/dev/null)" || _hrc=$?
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    violation "${_sev:-SOFT}" "${_path}" "REGRA 98 (Diretiva de injeção escrita como CITAÇÃO não pode estar VIVA): ${_msg}"
+  done <<< "${_out}"
+  # helper >=2 ⇒ declarou que NAO pode julgar; zero achados nao e conformidade. A mensagem
+  # DESCREVE o comando em vez de escreve-lo (REGRA 59 le string de mensagem como invocacao).
+  # ⚠️ rc!=0 SEM nenhuma linha TSV também é "não pude julgar" (F6 do Elenxo): o helper que morre sob
+  #    `set -e` sai 1 calado, e o rc=1 legítimo SEMPRE traz linha. Escalar só rc>=2 aprovava a queda.
+  if [ "${_hrc}" -ge 2 ] || { [ "${_hrc}" -ne 0 ] && [ -z "${_out}" ]; }; then
+    violation "HARD" ".claude/validation/cited-directive-check.sh" "o helper desta regra saiu ${_hrc} (fail-loud: nao pode julgar) — invoque o helper no modo que a producao usa e leia o stderr dele (o caminho e .claude/validation/cited-directive-check.sh)"
+  fi
+}
+check_cited_directive_live
+
 # ===========================================================================
 # SUMÁRIO FINAL
 # ===========================================================================
