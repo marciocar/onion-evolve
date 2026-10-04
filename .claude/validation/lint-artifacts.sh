@@ -5416,12 +5416,73 @@ check_injected_cut_declares() {
     esac
   fi
   local line
+  # ⚠️ UMA INVOCACAO SO, capturando saida E rc: a 1a versao do fail-loud rodava o helper DUAS
+  #    vezes, e o segundo par (`--tsv >/dev/null 2>&1`) virou um MODO-SEM-TESTE pela REGRA 59
+  #    (Modo que a producao consome e exercitado pela bancada) — o extrator leu `[--tsv e]`. Alem
+  #    de contornar a regra, invocar duas vezes era trabalho dobrado. O fail-loud le o rc DESTA
+  #    chamada, que e a mesma que a bancada exercita.
+  local _out _hrc=0
+  _out="$(bash "${helper}" "${REPO_ROOT}" --tsv 2>/dev/null)" || _hrc=$?
   while IFS=$'\t' read -r _sev _code _path _msg; do
     [ -n "${_path:-}" ] || continue
-    violation "${_sev:-HARD}" "${_path}" "REGRA 96 (Diretiva de contexto INJETADO não corta listagem em silêncio): ${_msg}"
-  done < <(bash "${helper}" "${REPO_ROOT}" --tsv 2>/dev/null || true)
+    violation "${_sev:-SOFT}" "${_path}" "REGRA 96 (Diretiva de contexto INJETADO não corta listagem em silêncio): ${_msg}"
+  done <<< "${_out}"
+  # o helper saiu >=2 ⇒ ele DECLAROU que nao pode julgar. Zero achados nao e conformidade.
+  # ⚠️ A MENSAGEM NAO ESCREVE `bash <caminho> --tsv`, e a razao e medida: a REGRA 59 extrai pares
+  #    (script, flags) de QUALQUER linha com `bash .../x.sh`, inclusive de dentro de uma STRING de
+  #    mensagem — ela leu `--tsv' e leia` como as flags `[--tsv e]` e acusou MODO-SEM-TESTE sobre
+  #    um par que nunca existiu. E a MESMA classe do falso positivo fatal da REGRA 96 descoberto
+  #    hoje: documentacao indistinguivel de invocacao viva. Aqui o lado curavel e meu: a mensagem
+  #    descreve o comando em vez de escreve-lo.
+  if [ "${_hrc}" -ge 2 ]; then
+    violation "HARD" ".claude/validation/injected-cut-check.sh" "o helper desta regra saiu ${_hrc} (fail-loud: nao pode julgar) e o dispatcher nao pode ler isso como conformidade — invoque o helper no modo que a producao usa e leia o stderr dele (o caminho e .claude/validation/injected-cut-check.sh)"
+  fi
 }
 check_injected_cut_declares
+
+# REGRA 97 — A auto-auditoria do framework tem GATILHO [SOFT]
+# previne: o órgão de auto-evolução ficar parado sem ninguém ser avisado. DANO MEDIDO (2026-10-04):
+#   o `/meta:evolve` estava há 66 dias sem rodar, e era o ÚNICO dos órgãos sem gatilho — o radar
+#   tem a REGRA 65, o `/meta:dissect` tem censo de nível vencido, o `/meta:kg` tem a REGRA 67, e o
+#   evolve nada, num repo chamado Onion Evolve. O corpus já media a causa com impact 5
+#   (`C_TESE_AUTO_EVOLUCAO`): "estamos à frente no PRODUTO do laço e atrás no GATILHO dele".
+#   Uma rodada anterior atribuiu os dias parados a outra causa e o refutador a derrubou por
+#   não-sequitur: faltava o gatilho, não o barateamento.
+# ⚠️ DUAS PERNAS, e a segunda é a que a idade sozinha não dá: (1) IDADE do relatório que o próprio
+#   evolve produz; (2) DELTA POPULACIONAL desde ele, medido no GIT. Relatório de ontem com 30
+#   artefatos novos está vencido na SUBSTÂNCIA, não no calendário. Nenhuma das duas lê um campo
+#   digitado — é `behavior-over-declaration` aplicado ao gatilho, e corta o carimbo-sem-medição
+#   pela raiz: não há `last_run:` para ficar desatualizado.
+# Padrão da REGRA 62/65: a máquina DETECTA, o humano DISPARA. SOFT por desenho — auto-auditoria
+#   vencida é aviso, não bloqueio de merge. Toda a lógica e o teto vivem em evolve-staleness-check.sh.
+check_evolve_staleness() {
+  local helper="${SCRIPT_DIR}/evolve-staleness-check.sh"
+  [ -f "${helper}" ] || return 0
+  if [ -n "${ONLY_PATH}" ]; then
+    case "${ONLY_PATH}" in
+      # as CINCO familias que a perna (2) vigia, nao tres: um PR que tocasse so .claude/hooks/ ou
+      # .claude/validation/ nao re-disparava a regra (achado do Elenxo, FN-7).
+      */lint-artifacts.sh|*/evolve-staleness-check.sh|*/docs/analysis/*|*/.claude/commands/*|*/.claude/agents/*|*/.claude/skills/*|*/.claude/hooks/*|*/.claude/validation/*) : ;;
+      *) return 0 ;;
+    esac
+  fi
+  # ⚠️ UMA INVOCACAO SO, capturando saida E rc: a 1a versao do fail-loud rodava o helper DUAS
+  #    vezes, e o segundo par (`--tsv >/dev/null 2>&1`) virou um MODO-SEM-TESTE pela REGRA 59
+  #    (Modo que a producao consome e exercitado pela bancada) — o extrator leu `[--tsv e]`. Alem
+  #    de contornar a regra, invocar duas vezes era trabalho dobrado. O fail-loud le o rc DESTA
+  #    chamada, que e a mesma que a bancada exercita.
+  local _out _hrc=0
+  _out="$(bash "${helper}" "${REPO_ROOT}" --tsv 2>/dev/null)" || _hrc=$?
+  while IFS=$'\t' read -r _sev _code _path _msg; do
+    [ -n "${_path:-}" ] || continue
+    violation "${_sev:-SOFT}" "${_path}" "REGRA 97 (A auto-auditoria do framework tem GATILHO): ${_msg}"
+  done <<< "${_out}"
+  # o helper saiu >=2 ⇒ ele DECLAROU que nao pode julgar. Zero achados nao e conformidade.
+  if [ "${_hrc}" -ge 2 ]; then
+    violation "HARD" ".claude/validation/evolve-staleness-check.sh" "o helper desta regra saiu ${_hrc} (fail-loud: nao pode julgar) e o dispatcher nao pode ler isso como conformidade — invoque o helper no modo que a producao usa e leia o stderr dele (o caminho e .claude/validation/evolve-staleness-check.sh)"
+  fi
+}
+check_evolve_staleness
 
 # ===========================================================================
 # SUMÁRIO FINAL
