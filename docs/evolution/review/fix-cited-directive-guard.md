@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: 4e425c77147cd28b77ef3aeeb09cbebf2333417ce6c60e75514b830b91e9885c
+reviewed_diff_sha256: bb8a5da0d2708e309b522ac10a1af25fdc047721f17c2fcd67c014692442a9b6
 findings_total: 10
 findings_real: 10
 tokens: 139447
@@ -39,3 +39,12 @@ a cada invocação).
 
 Bloco de código por recuo de 4 espaços (exige parser de markdown; um falso positivo ali vetaria toda
 lista com diretiva). Diretiva montada por `$ARGUMENTS`. CRLF não foi medido.
+
+## Os `confirmed` do grafo que este PR edita
+
+- `E_DEFEITO_CITACAO_EXECUTADA` (impacto 5) — o defeito datado; a guarda o acusa contra o estado
+  anterior à cura e cala depois dela. Revisto: continua verdadeiro.
+- `E_DOZE_MUTANTES_DEPOIS_DO_ELENXO` (impacto 5) — os doze mutantes que mordem; nasceu substituindo
+  `E_SEIS_MUTANTES_MORDERAM`, a afirmação falsa da 1ª versão, preservada como `superseded`.
+- `C_TETO_REGEX_TRANSCRITAS_DE_UMA_VERSAO` e `C_TETO_PROSA_NUA_E_AGENTES` — os tetos, agora sobre a
+  cópia literal; o 1º ganhou a paridade nos dois lados e, no CI sem binário, o lado da cópia.
