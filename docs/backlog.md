@@ -230,6 +230,12 @@
 | 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
 | 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
 
+## evolve-cures-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 27.0 | `Q_LEVA2_CURAS_M_RESTANTES` | evolve-cures-2026-10 | O QUE A LEVA 1 NAO FEZ, em ordem: (4) checkpoint do drive para o grafo + kg-drive-project emitindo CHECKPOINT-PENDENTE; (5) peca 4 |
+
 ## meta-research-lens-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -289,12 +295,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 24.0 | `Q_E3_DELTA_2_1_261` | radar-E3-2026-09-04-r4 | O que mudou no Claude Code entre 2.1.260 e 2.1.261 que altera a ADEQUACAO da estrategia do Onion, eixo a eixo contra a baseline: ( |
-
-## evolve-cures-2026-10 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 22.5 | `Q_LEVA2_CURAS_M_RESTANTES` | evolve-cures-2026-10 | O QUE A LEVA 1 NAO FEZ, em ordem: (4) checkpoint do drive para o grafo + kg-drive-project emitindo CHECKPOINT-PENDENTE; (5) peca 4 |
 
 ## guardas-revisao-2026-08 — 4 item(ns)
 

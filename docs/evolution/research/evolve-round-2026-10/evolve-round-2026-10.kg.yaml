@@ -74,7 +74,7 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.9
-    status: confirmed
+    status: superseded
     verified_at: '2026-10-04'
     label: 'RECOMMENDED (MAQ-4), e pior que "inline": o `FindingSchema` do Passo 3 do evolve NAO e JSON Schema (`{id:"string",...}` usado como `items:`) — e a forma ligada ao "schema bug" que produziu o "0 findings FALSO" da rodada de 2026-07-30, citado na propria nota. E o `allowed-tools` do evolve nao lista `Workflow` nem `Agent`, os dois substratos que ele usa. O comando-irmao `census.md` faz certo: script em `.claude/utils/census/census-workflow.mjs` por `scriptPath`, e Workflow no allowed-tools. ESTA RODADA NAO USOU o FindingSchema da superficie: o script foi autorado com JSON Schema real, e o persistido pela plataforma e o candidato natural a peca 4 (`.claude/workflows/evolve.js`).'
     trace: '.claude/commands/meta/evolve.md'
@@ -85,7 +85,7 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.95
-    status: confirmed
+    status: superseded
     verified_at: '2026-10-04'
     label: 'RECOMMENDED (MAQ-3): o Passo 3 chama `runCommand()` para D4, D5 e D9 — e TAMBEM `sweepSessionMemory()` para D10, um QUARTO simbolo fantasma que o achado original nao citava. Nenhum existe no repo. A nota de 2026-08-05 declara a composicao NAO IMPLEMENTADA, mas o codigo segue la: quem copiar o molde recebe ReferenceError. Falha alto e esta anotado, por isso nao e blocker. CURA: tirar D4/D5/D9/D10 do bloco JS e descreve-los como passos do contexto principal — que foi exatamente como esta rodada os executou.'
     trace: '.claude/commands/meta/evolve.md'
