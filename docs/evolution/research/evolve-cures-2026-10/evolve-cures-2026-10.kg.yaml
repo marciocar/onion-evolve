@@ -1,0 +1,79 @@
+# kg-backlog-guard: on
+# ═══ TETO: 12 NÓS ═══
+meta:
+  id: evolve-cures-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-10-04
+  review_after: 2026-11-18
+  supersedes_external:
+    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_CREATE_SKILL_EXECUTA_GIT_DIFF_A_CADA_INVOCACAO
+    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_LINK_QUEBRADO_NA_DOUTRINA_DE_CLIENTE
+    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_RAIO_X_PUBLICA_ALVOS_FALSOS_DE_SKILLS
+    - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#E_D9_NAO_E_NOOP_NO_CORE
+nodes:
+  - id: E_LEVA1_DIRETIVAS_DESCRITAS_NAO_ESCRITAS
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    verified_against: 'simulador das regex do harness 2.1.289 (pTe/uDn/cDn) sobre create-skill.md e agent-skills-specialist.md: 6 diretivas vivas ANTES, 0 DEPOIS'
+    trace: '.claude/commands/meta/create-skill.md'
+    label: 'CURA 1 da rodada: os seis sitios que o harness lia como diretiva viva (create-skill l.86 e l.219; agent-skills-specialist l.75, l.154, l.155, l.249) passaram a DESCREVER a forma ("o caractere ! colado a um comando entre crases") em vez de escreve-la — o precedente do /meta:forge-guard. Medido com um simulador das tres regex do binario: 6 antes, 0 depois. O /meta:create-skill deixou de rodar git diff a cada invocacao. Varrido o resto de commands/skills/agents/plugins: as unicas diretivas vivas que sobram sao as da skill onion, intencionais e executaveis.'
+
+  - id: E_LEVA1_LINK_DA_DOUTRINA_DE_CLIENTE
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    verified_against: 'ls do alvo resolvido a partir de .claude/commands/common/prompts/ com quatro niveis; demais links relativos do arquivo varridos, zero mortos'
+    trace: '.claude/commands/common/prompts/client-material-doctrine.md'
+    label: 'CURA 2: o link para evidence-source-interest no client-material-doctrine.md:114 tinha tres niveis onde sao quatro. Corrigido e conferido resolvendo o caminho a partir do diretorio do arquivo; os outros links relativos do mesmo arquivo foram varridos e nenhum esta morto.'
+
+  - id: E_LEVA1_SKILL_E_NAO_MEDIVEL
+    node_type: evidence
+    plane: DEV
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    verified_against: 'log local de carga com 141 linhas e ZERO de skill; familias instructions_loaded (c,e) e evolve_census (j) verdes; tres mutantes morderam (skill volta a NUNCA; rule vira NAO-MEDIVEL; evolve-census trata NAO-MEDIVEL como alvo)'
+    trace: '.claude/validation/instructions-loaded-census.sh'
+    label: 'CURA 3: skill com paths: sai NAO-MEDIVEL no instructions-loaded-census (o hook InstructionsLoaded e cego para skills: 141 cargas no log, nenhuma de skill), e o evolve-census a manda para O QUE NAO FOI MEDIDO, nunca para os ALVOS. O raio-X passou de 4 alvos de doutrina para 1 (dissect-lens, uma rule recem-nascida). Tres mutantes, tres mordidas — inclusive o que cegaria as rules, que e o modo de falha da propria cura.'
+
+  - id: E_LEVA1_PREMISSA_DO_D9_CORRIGIDA
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-04'
+    verified_against: 'git ls-files docs/business-context (15) e docs/technical-context (9)'
+    trace: '.claude/commands/meta/evolve.md'
+    label: 'CURA 7: a linha do D9 no evolve.md que afirmava "no framework = no-op" ficou riscada (nao apagada) com a medicao ao lado: 15 e 9 arquivos rastreados, populados. O D9 roda no core; vazio silencioso e falha.'
+
+  - id: Q_LEVA2_CURAS_M_RESTANTES
+    node_type: question
+    plane: DEV
+    impact: 5
+    confidence: 0.9
+    status: open
+    label: 'O QUE A LEVA 1 NAO FEZ, em ordem: (4) checkpoint do drive para o grafo + kg-drive-project emitindo CHECKPOINT-PENDENTE; (5) peca 4 do evolve em .claude/workflows/evolve.js com JSON Schema real e Workflow/Agent no allowed-tools, tirando os quatro simbolos fantasmas; (6) guarda de CLASSE para documentacao lida como invocacao, com o simulador das regex do harness. GATILHO: o merge desta leva (o maestro mandou seguir ate o final).'
+
+edges:
+  - from: E_LEVA1_DIRETIVAS_DESCRITAS_NAO_ESCRITAS
+    to: Q_LEVA2_CURAS_M_RESTANTES
+    edge_type: SUPPORTS
+  - from: E_LEVA1_SKILL_E_NAO_MEDIVEL
+    to: Q_LEVA2_CURAS_M_RESTANTES
+    edge_type: SUPPORTS
+  - from: E_LEVA1_LINK_DA_DOUTRINA_DE_CLIENTE
+    to: Q_LEVA2_CURAS_M_RESTANTES
+    edge_type: SUPPORTS
+  - from: E_LEVA1_PREMISSA_DO_D9_CORRIGIDA
+    to: Q_LEVA2_CURAS_M_RESTANTES
+    edge_type: SUPPORTS

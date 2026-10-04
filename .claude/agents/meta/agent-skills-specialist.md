@@ -72,7 +72,7 @@ docs/knowledge-base/tools/agent-skills.md
 Conhecimento crítico que esta KB cobre:
 - Paths oficiais por cliente (`.claude/skills/` vs `.agents/skills/`)
 - Frontmatter spec aberto + extensões Claude Code
-- Dynamic context injection (`` !`command` ``)
+- Dynamic context injection (o caractere `!` colado a um comando entre crases)
 - Substituições de string (`$ARGUMENTS`, `${CLAUDE_SKILL_DIR}`, etc.)
 - `context: fork` para subagent execution
 - Lifecycle de skill content
@@ -151,8 +151,8 @@ argument-hint: "[staging|production] [v1.2.3]"
 **Dynamic Context Injection** — quando o skill precisa de dados live:
 ````markdown
 ## Estado atual
-!`git diff HEAD`
-!`gh pr view --comments`
+<!-- diretiva de injeção: ! colado ao comando entre crases, ex. git diff HEAD -->
+<!-- e outra para os comentários do PR, ex. gh pr view --comments -->
 
 ## Sua tarefa
 Resuma as mudanças acima...
@@ -246,7 +246,7 @@ Quando um comando em `.claude/commands/X.md` se beneficiaria de virar skill:
 | Precisa de scripts bundled | ✅ sim — usar `scripts/` |
 | Precisa de reference docs | ✅ sim — usar `references/` |
 | Deveria ativar automaticamente em certos contextos | ✅ sim — remover `disable-model-invocation` |
-| Precisa de dynamic context (`` !`cmd` ``) | ✅ sim (também funciona em commands, mas é a forma idiomática em skills) |
+| Precisa de dynamic context (`!` + comando entre crases) | ✅ sim (também funciona em commands, mas é a forma idiomática em skills) |
 | Comando puramente explícito (sempre `/cmd`) | ⚠️ opcional — `.claude/commands/` continua funcionando |
 
 **Passos da migração:**

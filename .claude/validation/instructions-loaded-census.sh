@@ -4,7 +4,11 @@
 # Lê .claude/sessions/instructions-loaded.jsonl (escrito pelo hook instructions-loaded-log.sh) e imprime:
 #   file<TAB>sessions<TAB>session_start<TAB>path_glob_match<TAB>include<TAB>nested_traversal<TAB>compact<TAB>candidata
 # candidata = SO-SESSION-START (arquivo com paths:/doutrina de escopo que só entra por session_start) |
-#             NUNCA (arquivo com paths: que nunca casou) | - . A decisão de podar é humana e por comportamento (L2).
+#             NUNCA (arquivo com paths: que nunca casou) | NAO-MEDIVEL (skill: o hook NUNCA dispara para ela) | - .
+#             A decisão de podar é humana e por comportamento (L2).
+# ⚠️ SKILL É NAO-MEDIVEL, nunca NUNCA (medido 2026-10-04: 141 cargas no log, ZERO de skill — o evento
+#    InstructionsLoaded só cobre CLAUDE.md e rules). Contá-las como 'nunca casou' publicava 2 alvos
+#    falsos no raio-X do /meta:evolve: ausência de sinal num instrumento cego não é ausência de carga.
 # Uso: instructions-loaded-census.sh [--log <jsonl>] [--root <repo>] [--json]
 # =============================================================================
 set -euo pipefail
@@ -39,7 +43,7 @@ for f,v in sorted(per.items()):
     if f in scoped and v["path_glob_match"]==0 and v["session_start"]>0: cand="SO-SESSION-START"
     rows.append((f,len(v["sessions"]),*(v[r] for r in reasons),cand))
 for f in sorted(scoped - set(per)):
-    rows.append((f,0,0,0,0,0,0,"NUNCA"))
+    rows.append((f,0,0,0,0,0,0,"NAO-MEDIVEL" if "/skills/" in f else "NUNCA"))
 if asjson: print(json.dumps([dict(zip(["file","sessions",*reasons,"candidata"],r)) for r in rows],ensure_ascii=False,indent=1))
 else:
     print("file\tsessions\t"+"\t".join(reasons)+"\tcandidata")

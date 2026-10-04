@@ -8000,6 +8000,23 @@ FAKE
     record_pass "evolve-census: (i) vencida contada pela COLUNA frescor — a legenda com 'VENCIDO' nao conta"
   else record_fail "evolve-census: (i) legenda" "[$(grep 'declarada' <<< "${_i}")]"; fi
   rm -rf "${d}"
+
+  # (j) SKILL NAO-MEDIVEL vai para O QUE NÃO FOI MEDIDO, nunca para os ALVOS. O raio-X da rodada de
+  #     2026-10-04 publicou 2 skills como "nunca casou" — o hook de carga é cego para skills.
+  d="$(mktemp -d)"; _evc_sandbox "${d}"; mkdir -p "${d}/.claude/skills/s" "${d}/.claude/rules"
+  : > "${d}/.claude/skills/s/SKILL.md"; : > "${d}/.claude/rules/r.md"
+  cat > "${d}/.claude/validation/instructions-loaded-census.sh" <<'FAKE'
+#!/usr/bin/env bash
+printf 'file\tsessions\tsession_start\tpath_glob_match\tinclude\tnested_traversal\tcompact\tcandidata\n'
+printf '.claude/skills/s/SKILL.md\t0\t0\t0\t0\t0\t0\tNAO-MEDIVEL\n'
+printf '.claude/rules/r.md\t0\t0\t0\t0\t0\t0\tNUNCA\n'
+FAKE
+  local _j; _j="$(cd "${d}" && bash .claude/validation/evolve-census.sh . --markdown 2>&1 || true)"
+  local _targets; _targets="$(sed -n '/## 7. CONFRONTO/,/## O QUE/p' <<< "${_j}")"
+  if grep -q 'NAO-MEDIVEL: 1 skill' <<< "${_j}" && grep -q 'rules/r.md' <<< "${_targets}" && ! grep -q 'skills/s/SKILL.md' <<< "${_targets}"; then
+    record_pass "evolve-census: (j) skill NAO-MEDIVEL sai em 'nao medido', nunca como alvo; a rule NUNCA segue alvo"
+  else record_fail "evolve-census: (j) skill cega" "$(grep -E 'NAO-MEDIVEL|SKILL|r.md' <<< "${_j}" | tr '\n' '|' | cut -c1-300)"; fi
+  rm -rf "${d}"
 }
 
 # ── REGRA 97: a auto-auditoria do framework tem GATILHO ──────────────────────────────────────
@@ -15863,9 +15880,14 @@ run_instructions_loaded_selftests() {
   # (c) censo: r1 carregou por glob (candidata -), CLAUDE.md por session_start em 2 sessões, skill x com paths: nunca → NUNCA
   printf '%s\n' '{"ts":"t","session":"s1","file":"CLAUDE.md","memory_type":"Project","load_reason":"session_start","trigger":""}' '{"ts":"t","session":"s2","file":"CLAUDE.md","memory_type":"Project","load_reason":"session_start","trigger":""}' >> "${d}/log.jsonl"
   out="$(bash "${census}" --log "${d}/log.jsonl" --root "${d}" 2>&1 || true)"
-  if grep -qE $'^CLAUDE.md\t2\t2\t0' <<< "${out}"&& grep -qE $'^.claude/rules/r1.md\t1\t0\t1' <<< "${out}"&& grep -qE $'^.claude/skills/x/SKILL.md\t0\t.*\tNUNCA$' <<< "${out}"; then
-    record_pass "instructions-loaded: (c) censo por arquivo × motivo, sessões distintas contadas, paths: que nunca casou ⇒ NUNCA"
+  if grep -qE $'^CLAUDE.md\t2\t2\t0' <<< "${out}"&& grep -qE $'^.claude/rules/r1.md\t1\t0\t1' <<< "${out}"&& grep -qE $'^.claude/skills/x/SKILL.md\t0\t.*\tNAO-MEDIVEL$' <<< "${out}"; then
+    record_pass "instructions-loaded: (c) censo por arquivo × motivo, sessões distintas contadas, skill com paths: ⇒ NAO-MEDIVEL (o hook é cego para skills), nunca NUNCA"
   else record_fail "instructions-loaded: (c) censo" "$(_emit "${out}" | head -4 | tr '\n' '|' | cut -c1-300)"; fi
+  # (e) rule com paths: que nunca carregou continua NUNCA — a cura das skills não pode cegar as rules
+  printf -- '---\npaths: ["lib/**"]\n---\n# r2\n' > "${d}/.claude/rules/r2.md"
+  out="$(bash "${census}" --log "${d}/log.jsonl" --root "${d}" 2>&1 || true)"
+  if grep -qE $'^.claude/rules/r2.md\t0\t.*\tNUNCA$' <<< "${out}"; then record_pass "instructions-loaded: (e) rule com paths: que nunca casou segue NUNCA (só skill é NAO-MEDIVEL)"
+  else record_fail "instructions-loaded: (e) rule NUNCA" "$(grep r2 <<< "${out}" | head -1)"; fi
   # (d) censo sem log ⇒ exit 3 nomeando a causa (não é zero silencioso)
   rc=0; out="$(bash "${census}" --log "${d}/nao-existe.jsonl" --root "${d}" 2>&1)" || rc=$?
   if [ "${rc}" -eq 3 ] && grep -q "sem censo" <<< "${out}"; then record_pass "instructions-loaded: (d) sem log ⇒ exit 3 declarando (nunca 0 calado)"
