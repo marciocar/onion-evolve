@@ -1,0 +1,69 @@
+# kg-backlog-guard: on
+# ═══ TETO: 6 NÓS ═══
+meta:
+  id: gmill-update-547-2026-10
+  schema_version: "1"
+  baseline: 2026-10-05
+  review_after: 2026-11-05
+  # Triagem do sinal do hub gmill (hub-operacoes-enterprise) de 2026-10-05, resposta ao anúncio de
+  # 2026-10-02 sobre os três falsos positivos. Mora aqui, e não em inbox-triage-2026-10, porque aquele
+  # grafo está no teto (7/7). O nó que este sinal responde é
+  # inbox-triage-2026-10#Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM — a aresta é intra-arquivo, então a ligação
+  # vai por id no label.
+nodes:
+  - id: E_GMILL_VEREDITO_DOS_TRES_FALSOS_POSITIVOS
+    node_type: evidence
+    plane: PROD
+    impact: 2
+    confidence: 0.85
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'sinal docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md, medido pelo hub no pin 547e2e3edf3b com lint-artifacts.sh'
+    source_kind: adopter-signal
+    trace: 'docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md'
+    label: 'O HUB DEU O VEREDITO dos tres relatos de inbox-triage-2026-10#Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM, medido la: (1) REGRA 45 (Link vendorizado nao aponta caminho core-privado, com catraca) RESOLVIDA — 0 BASELINE-OBSOLETA apos o --update, so um ESCOPO-EXPANDIDO SOFT de uma rodada; (2) vendor-scrub `contains&criteria` ACEITO como por-desenho, o caso vai ao baseline deles; (3) bash-empty-result-guard com heredoc SEGUE SEM MEDICAO — nos dois disparos que eles viram nesta sessao o aviso era pertinente (diff vazio; $? apos pipe). Dois tercos do no fecham; o terco do heredoc fica aberto.'
+
+  - id: E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'sinal do hub (inventory.md dizia 109 comandos, filesystem 111; meta 42->43, docs 11->12; forge.md e build-project-manual.md entraram no proprio commit do update 3f84b84) + no core: adopt.md passo (8) chama regen-ssot-projections.sh, logo a regeneracao EXISTE e mesmo assim nao cobriu os dois arquivos'
+    source_kind: adopter-signal
+    trace: '.claude/utils/adopt/regen-ssot-projections.sh'
+    label: 'DECLARADO != VERIFICADO NO RELATORIO DE UPDATE: o relatorio 2026-09-30-update-547e2e3edf3b.md carimbou "0 HARD / 22 SOFT, rc=0", e o hub mediu 1 HARD — REGRA 8 (Inventario canonico sincronizado com o filesystem): inventory.md com 109 comandos contra 111 no disco. Os dois comandos novos (meta/forge.md, docs/build-project-manual.md) entraram no PROPRIO commit do update. O passo (8) do adopt.md regenera o inventario, entao a causa e de ORDEM ou de alvo (regenerar antes do merge do vendor, ou fora da arvore que o commit leva) — NAO medido aqui qual. Seja qual for, o carimbo "0 HARD" saiu sem re-medicao depois do merge: a classe exit-code-nao-e-a-verificacao.'
+
+  - id: Q_UPDATE_REMEDE_DEPOIS_DO_MERGE
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.7
+    status: open
+    verified_at: '2026-10-05'
+    verified_against: 'adopt.md passo (8) e Procedimento de Relatorio Downstream lidos em 2026-10-05; o relatorio carimba o lint sem re-rodar depois do merge do vendor'
+    trace: '.claude/commands/meta/adopt.md'
+    label: 'CURA PROPOSTA (o pedido do hub, conferido no core e coerente com exit-code-nao-e-a-verificacao): o --update regenera as projecoes SSOT DEPOIS do merge de onion/vendor e re-roda o lint antes de escrever o relatorio; o numero de HARD do relatorio passa a ser o MEDIDO nessa passada, nunca herdado. Antes da cura, medir a causa exata (ordem do passo 8 vs. merge, ou alvo do regen). GATILHO: antes do proximo --update de qualquer hub (gmill e brain-granaai estao em espera por ordem do maestro, 2026-10-05).'
+
+  - id: Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.85
+    status: open
+    verified_at: '2026-10-05'
+    verified_against: 'vendor-manifest.sh: _role_cut (l.142) so tem ramo para standalone (`*) : ;;` para o resto) e _emit_command_excludes retorna cedo quando o corte do papel e vazio; resolve-role-bundle.sh hub --tools lista 23 work_tools SEM forge; /home/marcio/gmill/.claude/commands/meta/ tem forge.md, evolve.md, create-*.md, co-announce.md, co-deliver.md, federation-publish.md'
+    trace: '.claude/utils/adopt/vendor-manifest.sh'
+    label: 'A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do vendor-manifest so existe para `standalone`; para `hub` e `adopted` o _role_cut e vazio e o corte de comandos de meta/ nem roda — mesmo o resolve-role-bundle declarando, para hub, 23 work_tools que NAO incluem forge. Resultado medido no gmill: a autoria do framework inteira viajou (forge, evolve, create-*, co-announce, co-deliver, federation-publish), contra o adopt.md:94 ("O que NAO ganha: a autoria do framework — Camada 1, so o core"). O forge-guard, mais novo que o pin dele, iria no proximo update. CURA: o corte de comandos de meta/ passa a valer para todo papel com work_tools declarados, com caso de bancada que reprova se um comando core-only aparecer no pacote de hub. GATILHO: antes do proximo --update de qualquer hub.'
+
+edges:
+  - from: E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1
+    to: Q_UPDATE_REMEDE_DEPOIS_DO_MERGE
+    edge_type: SUPPORTS
+  - from: E_GMILL_VEREDITO_DOS_TRES_FALSOS_POSITIVOS
+    to: E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1
+    edge_type: SUPPORTS
+  - from: Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE
+    to: Q_UPDATE_REMEDE_DEPOIS_DO_MERGE
+    edge_type: CONSTRAINS
