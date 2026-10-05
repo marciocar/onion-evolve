@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**322 itens abertos** em 72 grafo(s) com aberto (de 99 no escopo) · 73 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**340 itens abertos** em 75 grafo(s) com aberto (de 102 no escopo) · 76 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -79,6 +79,29 @@
 | 9.6 | `C_OPCAO_A_STATUS_QUO` | jev-decision-round2-2026-10 | OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de m |
 | 5.6 | `C_OPTION_B_BASIS_IS_WEAK_SOURCED` | jev-decision-round2-2026-10 | ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao |
 
+## infra-vps-2026-10 — 7 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 66.0 | `Q_INFRA_VPS_TREATMENT_2026` | infra-vps-2026-10 | Como o Onion deve tratar INFRA/VPS — sistema operacional, servicos, Docker, firewall, reboot e updates pendentes, sessoes orfas  |
+| 22.0 | `C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS` | infra-vps-2026-10 | OPCAO B linha (B enxuta) — RECOMENDADA pelo Elenxo: censo shell que COMPOE sinais nativos (needrestart -b, /var/run/reboot-requi |
+| 12.0 | `C_OPCAO_B_GRAFO_CENSO_COMANDO` | infra-vps-2026-10 | OPCAO B — grafo de dominio da VPS como SSOT viva + censo determinístico ops/vps-census.sh medindo o vivo contra o grafo + coman |
+| 5.4 | `Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA` | infra-vps-2026-10 | VAZAMENTO JA EXISTENTE, achado ao medir a pergunta do maestro: a guarda vps-exposure-check.sh mora em .claude/validation/ (raiz qu |
+| 4.0 | `C_OPCAO_A_NADA_NOVO` | infra-vps-2026-10 | OPCAO A — nada novo: manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh. A FA |
+| 0.9 | `C_OPCAO_C_VERTICAL_INFRA` | infra-vps-2026-10 | OPCAO C — vertical de engenharia infra que viaja para adotantes. Reprovada pela recomendacao do Elenxo: nenhum 2o adotante pediu |
+| 0.4 | `C_OPCAO_D_QUARTA_DIMENSAO` | infra-vps-2026-10 | OPCAO D — 4a dimensao peer. Reprovada pela recomendacao do Elenxo: as 3 dimensoes peer sao doutrina selada (nem design/ foi prom |
+
+## nanochat-onion-2026-10 — 6 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 63.0 | `Q_NANOCHAT_ONION_DOMAIN_MODEL_2026_10` | nanochat-onion-2026-10 | Como o Nanochat (karpathy/nanochat) e o Onion podem se relacionar no TREINO de um modelo de dominio — o dominio sendo a doutrina |
+| 30.6 | `C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL` | nanochat-onion-2026-10 | OPCAO C — SLM-FERRAMENTA DE DOMINIO ESTREITO via adapter SDAAL (Motor 2): tarefa tipada de CONJUNTO FECHADO e verificavel (class |
+| 16.5 | `C_OPCAO_B_NANOCHAT_STUDY_BENCH` | nanochat-onion-2026-10 | OPCAO B — NANOCHAT COMO BANCADA DE ESTUDO/DOGFOOD do ciclo de vida de modelo, sem produto (sentido b). A FAVOR: MIT, minimo e le |
+| 14.0 | `C_OPCAO_A_NO_TRAINING_LLM_AS_VM` | nanochat-onion-2026-10 | OPCAO A — NAO TREINAR; manter LLM-as-VM. O Onion continua doutrina em markdown + grafo interpretada por Transformer de terceiro, |
+| 7.2 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
+| 5.6 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
+
 ## ocr-local-sei-2026-09 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -149,6 +172,16 @@
 | 4.8 | `E_DISTRIBUTION_GATEWAYS` | jev-type-safe-ai-2026-10 | NAO CONFIRMADA (a pagina diz; nenhum registro de origem confirma). A lista de distribuicao por gateways de terceiros (Vercel AI Ga |
 | 4.0 | `Q_JEV_ARCHITECTURE_UNKNOWN` | jev-type-safe-ai-2026-10 | Como o JEV e CONSTRUIDO e TREINADO? Hipoteses a testar na rodada seguinte: LLM com decodificacao restrita ao conjunto de rotulos;  |
 | 2.0 | `E_OPENROUTER_SLUG_NOT_CONFIRMED` | jev-type-safe-ai-2026-10 | A unica tentativa de bater a lista de gateways num catalogo de ORIGEM falhou: o slug de OpenRouter citado pelo revendedor devolveu |
+
+## nanochat-eixo-d-2026-10 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 45.0 | `Q_EIXO_D_SYNTHETIC_IDENTITY_BUDGET_2026_10` | nanochat-eixo-d-2026-10 | EIXO D do estudo Nanochat x Onion — qual o orcamento de dados sinteticos e de identidade para (D) treinar/ajustar modelo com o c |
+| 42.2 | `C_EIXO_D_BUDGET_ORDER_OF_MAGNITUDE_ONLY` | nanochat-eixo-d-2026-10 | RESPOSTA A DUVIDA DO MAESTRO ("qual o orcamento de dados sinteticos e identidade?"): a rodada sustenta so uma ORDEM DE GRANDEZA DE |
+| 19.2 | `C_EIXO_D_OPTION_D_SECOND_GATE_EVAL` | nanochat-eixo-d-2026-10 | Projecao local de C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY (pai): a opcao D CONTINUA GATED e ganha um SEGUNDO gate alem da falta de co |
+| 11.0 | `C_EIXO_D_IDENTITY_IN_WEIGHTS_COSTS_STAGE_RETRAIN` | nanochat-eixo-d-2026-10 | Sentido (a) e S7_claim_analogy_breaks, na forma que a rodada consegue dar: identidade em pesos exige RETREINO DE ESTAGIOS por muda |
+| 7.2 | `Q_EIXO_D_RECONCILE_PARENT_GRAPH` | nanochat-eixo-d-2026-10 | PROPOSTA (o maestro decide; este grafo nao edita o pai nem toca o selo): (1) o selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10  |
 
 ## unidade-bilhetavel-do-onion-2026-10 — 8 item(ns)
 

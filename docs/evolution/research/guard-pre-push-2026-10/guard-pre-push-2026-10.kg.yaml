@@ -65,6 +65,17 @@ nodes:
     trace: 'ops/pr-finalize.sh'
     label: 'A 1a FORMA DO MOTOR LAVAVA RESIDUO, e era o defeito mais grave possivel para uma guarda da REGRA 56: com o codigo mudado DEPOIS da revisao, o motor extraia o hash novo, recarimbava e declarava "residuo casando" — codigo nao revisado com carimbo de revisado, e o pre-push MANDAVA rodar o motor. Cura: o residuo guarda reviewed_code_sha256 (o diff sem as projecoes geradas) e o recarimbo so acontece se ele nao mudou; residuo novo (pendente) e a declaracao de quem revisou. Junto, o Elenxo derrubou mais seis: lint-rules.md (REGRA 39) regenerado e fora do commit, com veredito lido da arvore e nao do commit (laco sem saida com o hook); gh falhando lido como "sem PR"; --force-with-lease vazio depois do fetch (apagou commit de colega no teste; cura --force-if-includes); --rebase declarando sucesso sem rebasear; resíduo isento antes do PR existir; e o custo real ~10x o declarado (~216 s por lint sob carga), que virou marcador para o hook nao relintar o commit que o motor ja julgou.'
 
+  - id: E_ELENXO_2_REABRIU_B1_PELA_FORMA_DO_HASH
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'Elenxo 2 (opus, worktree isolada, sandboxes git reais sobre 4a357b01): hash entre aspas e com espaco no fim lavados com rc=0; 4 de 372 residuos do acervo usam aspas; 19 mutantes rodados, 11 sobreviventes; cura medida: familia pre_push 32/32 e 23 de 24 mutantes mordem (o 24o, rcode vazio, e redundante por construcao: o hash de codigo e validado em 64 hex)'
+    trace: 'ops/pr-finalize.sh'
+    label: 'A 2a PASSADA REABRIU O B1 PELA FORMA, NAO PELA LOGICA: o motor tratava qualquer reviewed_diff_sha256 nao-hex como "pendente" e recarimbava, e a guarda tira aspas — hash entre aspas virava revisao nova sobre codigo nao revisado. Cura: o motor le o campo como a guarda (so o frontmatter, sem aspas, sem espaco) e SO o literal pendente declara revisao nova; o resto nao-hex recusa. Junto: sobra de edicao commitada (linhas 157-165, invisivel ao bash -n), die dentro de $(...) que nao abortava, falso positivo no rebase limpo (hash cru -> git patch-id --stable), marcador conferido DEPOIS do gh (o caminho canonico terminava pedindo --no-verify), remote julgado pelo nome e nao pela URL, stdin do laco vazando para o lint. E a licao de bancada: stubs de caminho absoluto deixavam sobreviver "lint na arvore em vez do commit" — os stubs agora LEEM a arvore em que rodam, e o marcador compartilhado entre worktrees e neutralizado no inicio da familia (sem isso, 7 casos passavam pelo motivo errado).'
+
 edges:
   - from: E_ELENXO_REPROVOU_O_MOTOR_QUE_LAVAVA_RESIDUO
     to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
@@ -78,3 +89,6 @@ edges:
   - from: C_TETO_O_QUE_O_PRE_PUSH_NAO_PEGA
     to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
     edge_type: CONSTRAINS
+  - from: E_ELENXO_2_REABRIU_B1_PELA_FORMA_DO_HASH
+    to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
+    edge_type: SUPPORTS

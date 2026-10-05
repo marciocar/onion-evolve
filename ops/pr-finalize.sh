@@ -68,11 +68,23 @@ RES="docs/evolution/review/$(printf '%s' "${BR}" | tr / -).md"
 # escopo" e o motor aceitava — maior M3 do Elenxo). Número real se houver; 0 se ainda não há PR.
 PRNUM="$(gh pr list --head "${BR}" --state open --json number --jq '.[0].number' 2>/dev/null || true)"
 _ci() { GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF="${BR}" GITHUB_REF_NAME="${PRNUM:-0}/merge" "$@"; }
-_codehash() {  # hash do diff do ÍNDICE contra a base, SEM o resíduo e SEM as projeções geradas
-  local base ex=(":(exclude)docs/evolution/review") g
-  base="$(git merge-base origin/main HEAD 2>/dev/null)" || die "sem merge-base com origin/main"
+_base() {  # a MESMA base da guarda do resíduo: origin/main, com fallback para main local
+  git merge-base origin/main HEAD 2>/dev/null || git merge-base main HEAD 2>/dev/null
+}
+_codehash() {  # identidade do CÓDIGO do índice contra a base, SEM o resíduo e SEM as projeções geradas.
+  # `git patch-id --stable` (maior 4 do Elenxo 2): a 1ª forma hasheava o diff cru, e a linha `index` e o
+  # contexto mudam num rebase LIMPO — o motor dizia "o código mudou" sem ninguém ter mudado nada, e o
+  # falso positivo ensinava a lavar à mão. O patch-id é estável sob rebase e muda quando o hunk muda.
+  # Exclui SÓ o resíduo deste PR (menor 8): outro arquivo em docs/evolution/review/ é código.
+  local base ex=(":(exclude)${RES}") g
+  base="$(_base)" || { echo "PR-FINALIZE: sem merge-base com origin/main nem main" >&2; return 1; }
   for g in ${GENERATED}; do ex+=(":(exclude)${g}"); done
-  git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color --cached "${base}" -- . "${ex[@]}" | sha256sum | cut -c1-64
+  git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color --cached "${base}" -- . "${ex[@]}" \
+    | git patch-id --stable | sort | sha256sum | cut -c1-64
+}
+_field() {  # lê o campo como a guarda lê (só o frontmatter, sem aspas), e sem espaço nas pontas
+  awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' "${RES}" \
+    | sed -n "s/^$1:[[:space:]]*//p" | head -1 | tr -d '"' | sed 's/[[:space:]]*$//'
 }
 
 if [ "${REBASE}" = 1 ]; then
@@ -133,8 +145,11 @@ _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo
   local out sha decl code rcode
   out="$(_ci bash .claude/validation/review-artifact-check.sh . 2>&1)"
   [ -f "${RES}" ] || die "resíduo ausente: ${RES} — escreva a passada adversarial (REGRA 56) e rode de novo"
-  code="$(_codehash)"
-  rcode="$(sed -n 's/^reviewed_code_sha256: *//p' "${RES}" | head -1)"
+  # `die` dentro de $(...) não aborta o script (maior 3 do Elenxo 2): o rc da substituição é lido aqui
+  code="$(_codehash)" || exit 1
+  grep -qE '^[0-9a-f]{64}$' <<< "${code}" || die "hash de código inválido ('${code}') — não carimbo nada"
+  rcode="$(_field reviewed_code_sha256)"
+  [ -z "${rcode}" ] || grep -qE '^[0-9a-f]{64}$' <<< "${rcode}" || die "reviewed_code_sha256 fora da forma canônica ('${rcode}') — corrija à mão"
   if grep -q '✅' <<< "${out}"; then
     # casando: só garante o hash de código (resíduos antigos não o tinham)
     [ -n "${rcode}" ] || { sed -i "/^reviewed_diff_sha256:/a reviewed_code_sha256: ${code}" "${RES}"; git add -- "${RES}"; }
@@ -142,9 +157,14 @@ _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo
   fi
   sha="$(grep -oE '(atual|diff é) [0-9a-f]{64}' <<< "${out}" | grep -oE '[0-9a-f]{64}' | tail -1)"
   [ -n "${sha}" ] || die "a guarda do resíduo não deu hash nem ✅ no contexto de PR: ${out##*$'\n'}"
-  decl="$(sed -n 's/^reviewed_diff_sha256: *//p' "${RES}" | head -1)"
-  if ! grep -qE '^[0-9a-f]{64}$' <<< "${decl}"; then
-    :   # resíduo NOVO (pendente): é a declaração de quem revisou — carimba os dois
+  # BLOQUEADOR do Elenxo 2: a forma anterior tratava QUALQUER valor não-hex como "pendente" — um hash
+  # entre aspas ou com espaço no fim (4 resíduos do acervo usam aspas) caía no ramo de resíduo novo e o
+  # motor recarimbava código não revisado. Só o literal `pendente` declara revisão nova.
+  decl="$(_field reviewed_diff_sha256)"
+  if [ "${decl}" = pendente ]; then
+    :   # resíduo NOVO: é a declaração de quem revisou — carimba os dois
+  elif ! grep -qE '^[0-9a-f]{64}$' <<< "${decl}"; then
+    die "reviewed_diff_sha256 fora da forma canônica ('${decl}') — escreva 'pendente' (revisão nova) ou o hash de 64 hex"
   elif [ -z "${rcode}" ]; then
     die "resíduo caduco e SEM reviewed_code_sha256 — não dá para provar que só as projeções mudaram; re-revise e ponha 'reviewed_diff_sha256: pendente'"
   elif [ "${rcode}" != "${code}" ]; then
@@ -154,14 +174,6 @@ _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo
   if grep -q '^reviewed_code_sha256:' "${RES}"; then sed -i "s/^reviewed_code_sha256: .*/reviewed_code_sha256: ${code}/" "${RES}"
   else sed -i "/^reviewed_diff_sha256:/a reviewed_code_sha256: ${code}" "${RES}"; fi
   git add -- "${RES}"
-}" | tr / -).md" out sha
-  out="$(bash .claude/validation/review-artifact-check.sh . 2>&1)"
-  grep -q '✅' <<< "${out}" && return 0
-  sha="$(grep -oE '(atual|diff é) [0-9a-f]{64}' <<< "${out}" | grep -oE '[0-9a-f]{64}' | tail -1)"
-  [ -n "${sha}" ] || { grep -q 'ISENCAO\|não julgou\|nao julgou\|fora de escopo' <<< "${out}" && return 0; die "a guarda do resíduo não deu hash nem ✅: ${out##*$'\n'}"; }
-  [ -f "${res}" ] || die "resíduo ausente: ${res} — escreva a passada adversarial (REGRA 56) e rode de novo"
-  sed -i "s/^reviewed_diff_sha256: .*/reviewed_diff_sha256: ${sha}/" "${res}"
-  git add -- "${res}"
 }
 
 # 1. conteúdo stageado + projeções + resíduo carimbado sobre esse mesmo índice → UM commit
