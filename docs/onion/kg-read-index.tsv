@@ -490,6 +490,8 @@
 .claude/validation/vendor/kg-console/cytoscape.min.js	E_headless_valid	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/vendor/kg-console/provenance.md	D_renderer_cytoscape_core	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/vps-exposure-check.sh	A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/validation/vps-exposure-check.sh	E_OBJECAO_BIND_LOOPBACK_JA_E_REGRA	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
+.claude/validation/vps-exposure-check.sh	Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
 .claude/workflows/evolve.js	E_LEVA2_PECA4_DO_EVOLVE	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/workflows/onion-research.js	E_F9_WORKTREE_E_WORKFLOW	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/workflows/onion-research.js	E_R3_F7_WORKFLOW_SCHEMA_E_STALL	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
@@ -1566,6 +1568,14 @@ docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS.md_TARGETING_SCHE
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS.md_TOOL_POISONING_STAT_DOWNGRADED	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/federation-2026/SYNTHESIS.md	SYNTHESIS.md_VPS_SUFFICES	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml	C_GUARDA_PARIDADE_CARIMBO_IMPLICA_REGISTRO	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
+docs/evolution/research/infra-vps-2026-10/SYNTHESIS.md	D_INFRA_VPS_TREATMENT	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
+docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml	C_OPCAO_A_NADA_NOVO	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
+docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml	C_OPCAO_B_GRAFO_CENSO_COMANDO	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
+docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml	C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
+docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml	C_OPCAO_C_VERTICAL_INFRA	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
+docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml	C_OPCAO_D_QUARTA_DIMENSAO	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
+docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml	E_LACUNAS_INFRA_VPS_1005	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
+docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml	Q_INFRA_VPS_TREATMENT_2026	docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml
 docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml	D_TYPED_DECISION_PRIMITIVE_ONION_2026_10	docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml
 docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml	C_OPCAO_D_CLOSE_GAPS_FIRST	docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml
 docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml	Q_ONION_COULD_BECOME_THIS	docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml
@@ -1656,6 +1666,8 @@ docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-reg
 docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml	E_OBJECAO_75MS_NAO_MEDE_HOOK	docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml
 docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml	E_OBJECAO_ZERO_DADO_DE_ATUALIDADE_2026	docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml
 docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml	Q_MOTORES_DE_REGRAS_DETERMINISTICOS_2026	docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/SYNTHESIS.md	D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	E_LACUNAS_NANOCHAT_2026_10	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_CORPUS_VAZIO_OCR_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_LACUNAS_DECLARADAS_OCR_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_MERCADO_OCR_LOCAL_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
@@ -1973,6 +1985,7 @@ docs/knowledge-base/concepts/onion-engine-economy.md	C_GATE_BOUNDARY_IS_INVIOLAB
 docs/knowledge-base/concepts/onion-engine-economy.md	C_JEV_E_O_MOTOR_2_COM_ENDERECO_COMERCIAL	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/knowledge-base/concepts/onion-engine-economy.md	C_JEV_NAO_COBRE_A_PARTE_CARA	docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml
 docs/knowledge-base/concepts/onion-engine-economy.md	C_OPCAO_B_PRIMITIVE_IN_HOUSE	docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml
+docs/knowledge-base/concepts/onion-engine-economy.md	C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/knowledge-base/concepts/onion-guardrails.md	C_ANTI_DRIFT_BY_CONSTRUCTION	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 docs/knowledge-base/concepts/onion-guardrails.md	C_STRUCTURAL_OVER_GATED	docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml
 docs/knowledge-base/concepts/onion-guardrails.md	C_webhook_event_scope_is_guardrail	docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml
@@ -2022,6 +2035,11 @@ docs/onion/graph/	Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA	docs/onion/graph/onion-p
 docs/onion/graph/../../knowledge-base/decisions/onion-adr-verticals-investigation-cartography-2026-07.md	D_NO_VENDOR_RADAR	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/onion/graph/catraca-regra49-2026-08.kg.yaml	E_DRIVE_CONDUZIU_FIO_REAL	docs/onion/graph/drive-superacao-2026-08.kg.yaml
 docs/onion/graph/elenxos-2026-08-07.kg.yaml	E_A_ARESTA_E_O_DISCRIMINADOR_MEDIDO	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
+docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	C_OPCAO_A_NO_TRAINING_LLM_AS_VM	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
+docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
+docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	C_OPCAO_E_ONION_AS_WEIGHTS	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
+docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	E_CORPUS_SCALE_MEASURED	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
+docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	E_OBJECAO_SYNTHETIC_DATA_AXIS_UNREAD	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/onion/graph/fios-abertos.kg.yaml	PO_ferramenta_da_vps_nao_se_encerra	docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml
 docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml	E_REFUTA_Q_LACUNA_DECISAO_MAIS_CODIGO	docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml
 docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml	D_p6_diagnose_delivered	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
