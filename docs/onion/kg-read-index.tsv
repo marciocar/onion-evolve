@@ -1666,8 +1666,13 @@ docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-reg
 docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml	E_OBJECAO_75MS_NAO_MEDE_HOOK	docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml
 docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml	E_OBJECAO_ZERO_DADO_DE_ATUALIDADE_2026	docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml
 docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml	Q_MOTORES_DE_REGRAS_DETERMINISTICOS_2026	docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml
+docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml	C_EIXO_D_BUDGET_ORDER_OF_MAGNITUDE_ONLY	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
+docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml	E_LACUNAS_EIXO_D_2026_10	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/SYNTHESIS.md	D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	C_EIXO_D_OPTION_D_SECOND_GATE_EVAL	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	E_LACUNAS_NANOCHAT_2026_10	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	Q_EIXO_D_RECONCILE_PARENT_GRAPH	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	Q_EIXO_D_SYNTHETIC_IDENTITY_BUDGET_2026_10	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_CORPUS_VAZIO_OCR_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_LACUNAS_DECLARADAS_OCR_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_MERCADO_OCR_LOCAL_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
@@ -2035,6 +2040,7 @@ docs/onion/graph/	Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA	docs/onion/graph/onion-p
 docs/onion/graph/../../knowledge-base/decisions/onion-adr-verticals-investigation-cartography-2026-07.md	D_NO_VENDOR_RADAR	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/onion/graph/catraca-regra49-2026-08.kg.yaml	E_DRIVE_CONDUZIU_FIO_REAL	docs/onion/graph/drive-superacao-2026-08.kg.yaml
 docs/onion/graph/elenxos-2026-08-07.kg.yaml	E_A_ARESTA_E_O_DISCRIMINADOR_MEDIDO	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
+docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	C_EIXO_D_IDENTITY_IN_WEIGHTS_COSTS_STAGE_RETRAIN	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
 docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	C_OPCAO_A_NO_TRAINING_LLM_AS_VM	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	C_OPCAO_E_ONION_AS_WEIGHTS	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
