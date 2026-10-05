@@ -14,7 +14,7 @@ meta:
 nodes:
   - id: E_UPDATE_PERDIA_ARQUIVO_NOVO_IGNORADO
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -30,9 +30,9 @@ nodes:
     confidence: 0.9
     status: done
     verified_at: '2026-10-05'
-    verified_against: 'familias durable_commit (g, g2, h) e vendor_branch (e2) verdes; cinco mutantes morderam, incluindo o que esqueceria de excluir os baselines de catraca da lista'
+    verified_against: 'familias durable_commit (g, g2, g3, h) e vendor_branch (e2, e3) verdes sob LC_ALL=C; mutantes mordem (sem a lista, sem -f, sem a pos-condicao, baselines na lista, os tres return 12 como no-op, sem literal-pathspecs, sem quotePath=false); o Elenxo rodou a cura em clones dos 21 adotantes com onion/vendor: zero rc=12, e num clone do onion-adopt-granaa-ai o main perdia 59 arquivos que a cura entrega'
     trace: '.claude/utils/adopt/vendor-branch.sh'
-    label: 'A CURA: o vendor-branch update monta a lista EXATA do que transportou (o proprio git archive | tar -t, que ja respeita os :(exclude)), menos os baselines de catraca que ele remove de proposito, e a passa ao durable-commit por ONION_REQUIRED_LIST. O durable-commit staja SO essa lista com -f e confere depois; faltou algum, exit 3 nomeando. O vendor-branch confere de novo na arvore COMMITADA e, faltando, devolve rc=12 SEM mergear. O -f nao vai no .claude inteiro porque ali ha o que e ignorado de proposito (sessions, worktrees, settings.local.json). A semeadura com o .gitignore convergido (3o pedido do hub) deixou de importar: a cura vale para qualquer .gitignore.'
+    label: 'A CURA: o vendor-branch update monta a lista EXATA do que transportou (o proprio git archive | tar -t, que ja respeita os :(exclude)), menos os baselines de catraca que ele remove de proposito, e a passa ao durable-commit por ONION_REQUIRED_LIST. O durable-commit staja SO essa lista com -f e confere depois; faltou algum, exit 3 nomeando. O vendor-branch confere de novo na arvore COMMITADA e, faltando, devolve rc=12 SEM mergear. O -f nao vai no .claude inteiro porque ali ha o que e ignorado de proposito (sessions, worktrees, settings.local.json). A semeadura com o .gitignore convergido (3o pedido do hub) deixou de importar: a cura vale para qualquer .gitignore. O ELENXO REPROVOU A 1a VERSAO: a lista saia do tar -t, que escapa nome acentuado sob LC_ALL=C — o 1o arquivo acentuado do core derrubaria o update de TODO adotante com rc=12 falso — e o rc=12 nao tinha caso. Curado: a lista sai de um indice temporario do mesmo sha (ls-files -z, que aplica o :(exclude)), staging por NUL com --literal-pathspecs, ausente nomeado antes do add; e um caso que faz o commit duravel falhar de verdade (filtro obrigatorio quebrado) e exige rc=12 com a integracao intacta. A mesma classe estava LATENTE na checagem de base cruzada (diff --name-only com quotePath) e foi curada junto.'
 
   - id: E_SO_O_HUB_FOI_AFETADO
     node_type: evidence
@@ -51,18 +51,9 @@ nodes:
     confidence: 0.8
     status: confirmed
     trace: '.claude/utils/adopt/durable-commit.sh'
+    verified_at: '2026-10-05'
     verified_against: 'grep dos chamadores do durable-commit: so o vendor-branch update passa ONION_REQUIRED_LIST'
-    label: 'TETO DECLARADO: a adocao inicial (Fase 5 do /meta:adopt) chama o durable-commit SEM a lista de exigidos, entao um alvo que ja ignore .claude/ no momento da adocao perderia os arquivos do mesmo jeito. Nao foi curado porque ali o efeito nao e silencioso (a adocao inteira falharia visivelmente: nada do framework entraria no commit). GATILHO: um alvo que ignore .claude/ ser adotado.'
-
-  - id: E_UPDATE_3WAY_PRESERVA_O_INDEX_DA_KB
-    node_type: evidence
-    plane: PROD
-    impact: 3
-    confidence: 0.85
-    status: confirmed
-    verified_at: '2026-10-04'
-    verified_against: 'medido PELO HUB (sinal de 2026-10-04): md5 do docs/knowledge-base/index.md antes = depois do update para 3a3c7cf280ac pelo merge de onion/vendor; nao re-medido no core'
-    label: 'EVIDENCIA PARA o Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO (grafo inbox-triage-2026-10): no caminho 3-way (onion/vendor) o index.md local da KB sobrevive byte a byte, porque e customizacao sobre a base e o core nao tocou no arquivo desde o pin. Se o core editar o arquivo, vira CONFLITO visivel, nao sobrescrita. O nó de la segue aberto para adotantes ainda em copy-over/docs-only.'
+    label: 'TETO DECLARADO: a adocao inicial (Fase 5 do /meta:adopt) chama o durable-commit SEM a lista de exigidos. O .claude/ inteiro ignorado e tratado na adocao pelo scope-claude-gitignore.sh, mas um ignore PARCIAL (ex.: .claude/hooks/) passaria calado ali — a 1a redacao deste no dizia que o efeito seria visivel, e o Elenxo mostrou que nao e. GATILHO: um alvo com ignore parcial de .claude/ ser adotado, ou a adocao inicial passar a montar a lista do transporte como o update ja faz.'
 
   - id: E_CLICKUP_STATUS_POR_LIST_MEDIDO_AO_VIVO
     node_type: evidence
@@ -75,6 +66,15 @@ nodes:
     trace: '.claude/utils/task-manager/adapters/clickup.md'
     label: 'O adapter ClickUp com STATUS_SYNONYMS resolve os canonicos para os status da List real (review vira pull request, canceled vira Closed) e updateStatus in_progress -> review -> done devolveu 200 nos tres, sem 400; createTask, createSubtask com include_subtasks e addTag/removeTag tambem 200. NAO medido: clickup_delete_task no MCP oficial.'
 
+  - id: Q_CLICKUP_DELETE_PELO_MCP_NAO_MEDIDO
+    node_type: question
+    plane: PROD
+    impact: 2
+    confidence: 0.7
+    status: open
+    trace: '.claude/utils/task-manager/adapters/clickup.md'
+    label: 'LACUNA que o proprio hub declarou: clickup_delete_task pelo MCP oficial nao foi medido (exige servidor MCP conectado). O transporte default e API, entao nao bloqueia ninguem hoje. GATILHO: um adotante ativar TASK_MANAGER_TRANSPORT=mcp com ClickUp.'
+
 edges:
   - from: E_UPDATE_PERDIA_ARQUIVO_NOVO_IGNORADO
     to: D_EXIGIDOS_ATRAVESSAM_O_GITIGNORE
@@ -85,9 +85,6 @@ edges:
   - from: C_TETO_ADOCAO_INICIAL_NAO_PASSA_A_LISTA
     to: D_EXIGIDOS_ATRAVESSAM_O_GITIGNORE
     edge_type: CONSTRAINS
-  - from: E_UPDATE_3WAY_PRESERVA_O_INDEX_DA_KB
-    to: E_UPDATE_PERDIA_ARQUIVO_NOVO_IGNORADO
-    edge_type: SUPPORTS
   - from: E_CLICKUP_STATUS_POR_LIST_MEDIDO_AO_VIVO
-    to: E_SO_O_HUB_FOI_AFETADO
-    edge_type: SUPPORTS
+    to: Q_CLICKUP_DELETE_PELO_MCP_NAO_MEDIDO
+    edge_type: CONSTRAINS

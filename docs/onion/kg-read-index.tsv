@@ -180,7 +180,9 @@
 .claude/skills/onion/SKILL.md	D_FASE_A_SKILLS_EN	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/skills/onion/SKILL.md	SY6_ev_regua_p0p3_skill	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/utils/adopt/decouple-source.sh	TX_decouple	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
+.claude/utils/adopt/durable-commit.sh	C_TETO_ADOCAO_INICIAL_NAO_PASSA_A_LISTA	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
 .claude/utils/adopt/durable-commit.sh	E_HAVIA_UMA_QUINTA_COPIA_DA_LISTA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/utils/adopt/durable-commit.sh	E_UPDATE_PERDIA_ARQUIVO_NOVO_IGNORADO	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
 .claude/utils/adopt/durable-commit.sh	SY5_adopt_durability_closed	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/utils/adopt/invite-collaborator.sh	TX_invite	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
 .claude/utils/adopt/regen-baselines.sh	D_ADOPT_MUST_EMIT_MISSING_BASELINES	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
@@ -192,6 +194,7 @@
 .claude/utils/adopt/vendor-branch.sh	C_PATHSPEC_DE_EXCLUSAO_DESLIGOU_DUAS_GUARDAS	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/vendor-branch.sh	C_trigger_is_fallback_seed	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
 .claude/utils/adopt/vendor-branch.sh	D_CURE_PRESERVE_ADOPTER_BASELINE	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
+.claude/utils/adopt/vendor-branch.sh	D_EXIGIDOS_ATRAVESSAM_O_GITIGNORE	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
 .claude/utils/adopt/vendor-branch.sh	D_SCRUB_FROZEN_POISON_IN_VENDORS	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/utils/adopt/vendor-branch.sh	E_VENDOR_PRODUTO_REFUTADO_EM_SANDBOX	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 .claude/utils/adopt/vendor-branch.sh	E_content_test_discriminates	docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml
@@ -270,7 +273,9 @@
 .claude/utils/marketplace/verticals/onion.manifest.sh	E_ONION_CORE_PLUGIN_BORN	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 .claude/utils/marketplace/verticals/onion.manifest.sh	Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/utils/scope/resolve-scope-layers.sh	SY4_prod_show_scope_provenancia	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
+.claude/utils/task-manager/adapters/clickup.md	E_CLICKUP_STATUS_POR_LIST_MEDIDO_AO_VIVO	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
 .claude/utils/task-manager/adapters/clickup.md	E_SDAAL_SEM_VAZAMENTO_DE_PROVIDER	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
+.claude/utils/task-manager/adapters/clickup.md	Q_CLICKUP_DELETE_PELO_MCP_NAO_MEDIDO	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
 .claude/utils/task-manager/factory.md	C_D7_19	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/utils/task-manager/factory.md	E_J_D7_19	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/validation/	E_sem_gate_client_safe	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml

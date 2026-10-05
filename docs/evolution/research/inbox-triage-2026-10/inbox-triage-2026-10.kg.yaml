@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 6 NÓS ═══
+# ═══ TETO: 7 NÓS ═══
 meta:
   id: inbox-triage-2026-10
   schema_version: "1"
@@ -18,6 +18,9 @@ meta:
   # FRONTEIRA DESTE ARQUIVO: medições da triagem de 2026-10 e os pedidos de adotante que ficaram
   # abertos nela. Quando um deles for curado, a cura mora no grafo de quem a executou; aqui fica
   # o SUPERSEDES datado (Aufhebung, nunca apagar).
+  # TETO 6 -> 7 (2026-10-05): entrou a evidencia do caminho 3-way que RESTRINGE o
+  # Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO — ela so tem alvo honesto aqui, e uma aresta para outro
+  # grafo nao existe (o motor e intra-arquivo).
 nodes:
   - id: E_TRIAGEM_DECLAROU_ENDERECADO_SEM_LER_O_SINAL_INTEIRO
     node_type: evidence
@@ -82,6 +85,16 @@ nodes:
     trace: 'docs/evolution/inbox/_processed/2026-10-02-promocao-a-hub.md'
     verified_against: 'door-role-parity-check.sh rodado em 2026-10-02: rc=0 com saida vazia; o PREDICADO filtra kind==door na l.87 (a l.42 e o comentario que declara a fronteira, nao codigo); members.yaml tinha role standalone enquanto o carimbo do adotante dizia hub'
 
+  - id: E_UPDATE_3WAY_PRESERVA_O_INDEX_DA_KB
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: '2026-10-04'
+    verified_against: 'medido PELO HUB (sinal de 2026-10-04): md5 do docs/knowledge-base/index.md antes = depois do update para 3a3c7cf280ac pelo merge de onion/vendor; nao re-medido no core'
+    label: 'EVIDENCIA PARA o Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO (grafo inbox-triage-2026-10): no caminho 3-way (onion/vendor) o index.md local da KB sobrevive byte a byte, porque e customizacao sobre a base e o core nao tocou no arquivo desde o pin. Se o core editar o arquivo, vira CONFLITO visivel, nao sobrescrita. O nó de la segue aberto para adotantes ainda em copy-over/docs-only.'
+
 edges:
   - from: Q_PARIDADE_PAPEL_SO_COBRE_A_PORTA_NAO_O_ADOTANTE
     to: Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO
@@ -99,5 +112,8 @@ edges:
     to: Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM
     edge_type: SUPPORTS
   - from: Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP
+    to: Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO
+    edge_type: CONSTRAINS
+  - from: E_UPDATE_3WAY_PRESERVA_O_INDEX_DA_KB
     to: Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO
     edge_type: CONSTRAINS
