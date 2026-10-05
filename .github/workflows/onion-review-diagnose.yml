@@ -43,7 +43,7 @@ jobs:
     env:
       # SSOT do modelo — a MESMA chave do onion-review.yml. Diagnosticar com modelo
       # DIFERENTE do que o revisor usa é diagnosticar outro sistema.
-      REVIEW_MODEL: claude-sonnet-5
+      REVIEW_MODEL: claude-sonnet-5-5
       HAS_KEY: ${{ secrets.ANTHROPIC_API_KEY != '' }}
     steps:
       - name: O secret existe?

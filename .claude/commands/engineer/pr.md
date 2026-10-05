@@ -56,13 +56,14 @@ Siga estes passos para criar o PR:
      title: '[título]', body: '[resumo + link da task + assinatura Onion]'
    });
    ```
-   **Assinatura da família (padrão, atualizado 2026-07-11):** todo corpo de PR termina com a linha
+   **Assinatura da família (padrão, atualizado 2026-10-05):** todo corpo de PR termina com a linha
 
    ```
-   🧅 Orquestrado com [Onion](https://onionevolve.com)
+   Orquestrado com 🧅 Onion Evolve
    ```
 
-   Substitui o default do harness ("🤖 Generated with Claude Code") — a autoria da superfície é do **Onion**
+   No core, a SSOT dessa linha é o `attribution` do `.claude/settings.json`, que o harness injeta em
+   commits e PRs. Substitui o default do harness ("🤖 Generated with Claude Code") — a autoria da superfície é do **Onion**
    (a ferramenta subjacente fica implícita). Fora a assinatura, não mencione IA/assistentes no conteúdo do PR.
    **Não** usar `gh pr create` em prosa — sempre pelo adapter.
 

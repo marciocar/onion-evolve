@@ -203,6 +203,10 @@
   "fallbackModel": [
     "claude-opus-5-5",
     "claude-opus-5",
-    "claude-sonnet-5"
-  ]
+    "claude-sonnet-5-5"
+  ],
+  "attribution": {
+    "commit": "Orquestrado com 🧅 Onion Evolve",
+    "pr": "Orquestrado com 🧅 Onion Evolve"
+  }
 }

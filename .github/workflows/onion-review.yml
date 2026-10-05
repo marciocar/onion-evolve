@@ -51,7 +51,7 @@ jobs:
       # SSOT do modelo do revisor. Estava escrito TRÊS vezes depois desta cura (as duas chamadas
       # e o pré-voo), e um pré-voo que exercita um modelo diferente do que o revisor usa é pior
       # que pré-voo nenhum: aprova o caminho errado. Uma cópia só, e o drift acaba por construção.
-      REVIEW_MODEL: claude-sonnet-5
+      REVIEW_MODEL: claude-sonnet-5-5
     outputs:
       revisou: ${{ steps.v1.outputs.revisou == 'true' && 'true' || steps.v2.outputs.revisou }}
       # ACHADOS — segue a MESMA tentativa que revisou, nunca a outra. Se a 1a revisou, a contagem

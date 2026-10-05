@@ -136,7 +136,7 @@ engenharia (`plan → start → work → pre-pr → pr → pr-update`)")
   paralelismo não estiver disponível (`common/prompts/orchestration-fallback.md`).
 - **`/engineer:pr`** — abre o PR via adapter forge (nunca `gh` em prosa), resolve a base pela
   cadeia de integration branch, e assina o corpo do PR com a assinatura da família:
-  `🧅 Orquestrado com [Onion](https://onionevolve.com)` (substitui o default do harness, "🤖
+  `Orquestrado com 🧅 Onion Evolve` (no core, injetado pelo `attribution` do `.claude/settings.json`) (substitui o default do harness, "🤖
   Generated with Claude Code") (`engineer/pr.md:52-59`).
 - Testes verdes são passo 1, obrigatório antes de qualquer commit (`engineer/pr.md:26`).
 - Task manager: em cada fase relevante, `updateStatus`/tags via adapter, condicionado a

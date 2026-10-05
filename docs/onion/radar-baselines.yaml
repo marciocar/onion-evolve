@@ -53,6 +53,9 @@ axes:
       - claude-opus-5         # degrau anterior, MANTIDO: ordem = degradacao, e remover degrau fecha
                               # fallback que hoje funciona (guarda-por-lista-falha-pelo-vocabulario:
                               # conferir o diff pelo lado do que SAI)
-    session_floor: claude-sonnet-5   # piso: so por fallback; degradacao visivel
+    # ⚠️ SELO DIRETO DO MAESTRO (2026-10-05), tambem NAO rodada E6: "o sonnet default e o 5.5". O piso
+    # sobe de claude-sonnet-5 para claude-sonnet-5-5 (Sonnet 5.5, o Sonnet atual da plataforma). A REGRA 70
+    # barrou o 1o commit, que mudava so o fallbackModel do settings.json: a projecao andou sem a fonte.
+    session_floor: claude-sonnet-5-5   # piso: so por fallback; degradacao visivel
     descartes: "4/25 estratégias reprovadas pelo juiz Elenxo (itens 1, 3, 18, 25) + 3 contagens corrigidas; preço do Fable 5.1 = catálogo, não medido"
     kg: docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
