@@ -45,6 +45,7 @@
 .claude/commands/meta/adopt.md	E_VERIFY_ADOPT	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/commands/meta/adopt.md	E_adopt_cmd	docs/onion/graph/m3-federation-admin-2026-07.kg.yaml
 .claude/commands/meta/adopt.md	I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
+.claude/commands/meta/adopt.md	Q_UPDATE_REMEDE_DEPOIS_DO_MERGE	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
 .claude/commands/meta/adopt.md	SY4_prod_prettierignore_adopt	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/adopt.md	SY6_ev_integration_branch_helper	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/commands/meta/adopt.md	TX_adopt	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
@@ -196,6 +197,7 @@
 .claude/utils/adopt/regen-baselines.sh	D_ADOPT_MUST_EMIT_MISSING_BASELINES	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/utils/adopt/regen-baselines.sh	E_LISTA_2_REGEN_BASELINES_TOMOU_O_LINT_POR_EMISSOR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/regen-ssot-projections.sh	A_ADOTANTE_GREENFIELD_NASCE_COM_HARD	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/utils/adopt/regen-ssot-projections.sh	E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
 .claude/utils/adopt/scope-claude-gitignore.sh	D_FIX_GAP2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/utils/adopt/starter-research-seed.sh	E_ADOCAO_COMPLETA_NASCE_VERDE_MEDIDA_0915	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/transfer-ownership.sh	TX_transfer	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
@@ -222,6 +224,7 @@
 .claude/utils/adopt/vendor-manifest.sh	E_PADRAO_PRIVADO_FIXAVA_UM_NOME_E_O_IRMAO_PASSAVA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	E_QUATRO_COPIAS_DA_MESMA_LISTA_DUAS_DRIFTADAS	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
+.claude/utils/adopt/vendor-manifest.sh	Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
 .claude/utils/adopt/write-stamp.sh	E_CORTE_QUE_NAO_SE_CARIMBA_NAO_ACONTECE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/write-stamp.sh	E_W9_PIN_GREP_MEDIDO	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/utils/census/census-workflow.mjs	Q_PROBE_WORKFLOW_ALIAS	docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml
@@ -1303,6 +1306,7 @@ docs/evolution/inbox/_processed/2026-09-30-gmill-kbs-zoho-glpi.md	Q_GMILL_FALSOS
 docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md	Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md	Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
 docs/evolution/inbox/_processed/2026-10-02-promocao-a-hub.md	Q_PARIDADE_PAPEL_SO_COBRE_A_PORTA_NAO_O_ADOTANTE	docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml
+docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md	E_GMILL_VEREDITO_DOS_TRES_FALSOS_POSITIVOS	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
 docs/evolution/kg-inbox/README.md	Q_SEALING_NO_MECHANISM	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml	D_ROUTE_TO_BRIDGE	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 docs/evolution/outbox/diary/2026-07-05-vps-lineage-odyssey.md	D_posture_anchored_correctly	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml

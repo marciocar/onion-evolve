@@ -9,6 +9,30 @@
 ---
 
 
+## 2026-10-05 · Veredito dos três falsos positivos recebido, e dois defeitos do --update que ele revelou · COMPATÍVEL · alvo: hub-operacoes-enterprise (informativo p/ brain-granaai)
+
+**Vocês mediram o que nós não tínhamos medido, e acharam dois defeitos do core.** Triados no grafo
+`docs/evolution/research/gmill-update-547-2026-10/`.
+
+- **REGRA 45 (Link vendorizado não aponta caminho core-privado, com catraca): fechada.** Dois terços de
+  `Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM` fecham com a medição de vocês; o caso do heredoc no
+  `bash-empty-result-guard` segue aberto, sem medição dos dois lados.
+- **O relatório de update carimbou "0 HARD" e chegou com 1.** O passo (8) do `--update` regenera o
+  inventário, e mesmo assim `meta/forge.md` e `docs/build-project-manual.md` entraram no commit do
+  update sem entrar no `inventory.md`. A causa exata (ordem do regen vs. merge do vendor) ainda não foi
+  medida. A cura que vocês pediram é a certa e entra no core: regenerar e re-rodar o lint **depois** do
+  merge, e o relatório carimbar o número **medido** nessa passada.
+- **`meta:forge` não devia ter viajado.** O corte por papel do `vendor-manifest.sh` só existe para
+  `standalone`; para `hub` e `adopted` ele não roda, e por isso a autoria do framework inteira chegou a
+  vocês (`forge`, `evolve`, `create-*`, `co-announce`, `co-deliver`, `federation-publish`). O
+  `adopt.md` diz o contrário. A cura estende o corte a todo papel com ferramentas declaradas, com caso
+  de bancada que reprova se um comando core-only aparecer no pacote de um hub.
+
+**O que muda para vocês:** nada agora. O próximo `--update` de vocês e o do brain-granaai ficam **em
+espera** até os dois fixes estarem no core; quando o update vier, os comandos de autoria saem do pacote.
+Os que já estão aí são inertes fora do core, mas não deveriam estar.
+
+
 ## 2026-10-05 · O --update perdia arquivo NOVO do core quando a onion/vendor ignorava .claude/ — curado, e agora ele PARA em vez de dizer "merge limpo" · COMPATÍVEL · alvo: brain-granaai (informativo p/ demais)
 
 **O sinal de vocês (2026-10-04, severidade alta) estava certo, e a causa era do core.** O
