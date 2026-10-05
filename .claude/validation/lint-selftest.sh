@@ -4341,9 +4341,20 @@ run_durable_commit_selftests() {
   # (h) arquivo EXIGIDO ausente da árvore → exit 3 NOMEANDO, nunca commit parcial calado
   _dc_ign; printf '.claude/hooks/new-hook.sh\n.claude/hooks/sumiu.sh\n' > "${_req}"
   local _o; _rc=0; _o="$(ONION_REQUIRED_LIST="${_req}" bash "${helper}" "${d}" update NEW222 2>&1)" || _rc=$?
-  if [ "${_rc}" -eq 3 ] && grep -q 'sumiu.sh' <<< "${_o}"; then
-    record_pass "durable-commit: (h) exigido ausente → exit 3 nomeando o arquivo"
+  if [ "${_rc}" -eq 3 ] && grep -q 'sumiu.sh' <<< "${_o}" && ! grep -q 'new-hook.sh' <<< "${_o}" && grep -q '^ERRO: 1 arquivo' <<< "${_o}"; then
+    record_pass "durable-commit: (h) exigido ausente → exit 3 nomeando SO ele (1 faltante nao vira N)"
   else record_fail "durable-commit: (h) exigido ausente" "rc=${_rc}; ${_o:0:200}"; fi
+  rm -rf "${d}"
+  # (g3) NOME DIFÍCIL na lista NUL (Elenxo): acento e espaço chegam; `x[1].md` é LITERAL e não vira o
+  #      glob que forçaria o `x1.md` que o .gitignore exclui de propósito.
+  _dc_ign; mkdir -p "${d}/.claude/kb"; printf 'a\n' > "${d}/.claude/kb/decisão teste.md"
+  printf 'b\n' > "${d}/.claude/kb/x[1].md"; printf 'c\n' > "${d}/.claude/kb/x1.md"
+  printf '%s\0%s\0' '.claude/kb/decisão teste.md' '.claude/kb/x[1].md' > "${_req}"
+  _rc=0; LC_ALL=C ONION_REQUIRED_LIST="${_req}" ONION_REQUIRED_NUL=1 bash "${helper}" "${d}" update NEW222 >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" -eq 0 ] && git -C "${d}" cat-file -e "HEAD:.claude/kb/decisão teste.md" 2>/dev/null \
+     && git -C "${d}" cat-file -e 'HEAD:.claude/kb/x[1].md' 2>/dev/null && ! git -C "${d}" cat-file -e HEAD:.claude/kb/x1.md 2>/dev/null; then
+    record_pass "durable-commit: (g3) acento e espaco chegam sob LC_ALL=C; nome com colchete e literal (nao forca o x1.md ignorado)"
+  else record_fail "durable-commit: (g3) nome dificil" "rc=${_rc}; $(git -C "${d}" ls-tree -r --name-only HEAD -- .claude/kb | tr '\n' ' ')"; fi
   rm -rf "${d}" "${_req}"
 
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
@@ -4677,12 +4688,30 @@ run_vendor_branch_selftests() {
   # baseline de catraca NOVO no core: o update o REMOVE de propósito (D_CURE) — a lista de exigidos
   # tem de excluí-lo, senão todo update de adotante real cairia em rc=12 (mutante que não mordia)
   printf 'x\n' > "$c4/.claude/validation/foo-baseline.txt"
+  printf 'y\n' > "$c4/.claude/hooks/decisão.md"   # nome acentuado: o tar -t o escapava e dava rc=12 falso
   git -C "$c4" add -A; git -C "$c4" commit -qm "core v2 + hook novo"
-  local rcg=0; bash "${helper}" update "$t4" "$c4" "$(git -C "$c4" rev-parse --short=12 HEAD)" "$ib4" >/dev/null 2>&1 || rcg=$?
+  local rcg=0; LC_ALL=C bash "${helper}" update "$t4" "$c4" "$(git -C "$c4" rev-parse --short=12 HEAD)" "$ib4" >/dev/null 2>&1 || rcg=$?
   if [ "$rcg" -eq 0 ] && git -C "$t4" cat-file -e "$ib4:.claude/hooks/new-hook.sh" 2>/dev/null \
+     && git -C "$t4" cat-file -e "$ib4:.claude/hooks/decisão.md" 2>/dev/null \
      && ! git -C "$t4" cat-file -e "$ib4:.claude/validation/foo-baseline.txt" 2>/dev/null; then
     record_pass "vendor-branch: (e2) arquivo NOVO do core chega mesmo com .gitignore cobrindo .claude/ na vendor (e o baseline de catraca segue fora)"
   else record_fail "vendor-branch: (e2) arquivo novo x .gitignore" "rc=$rcg; o hook novo $(git -C "$t4" cat-file -e "$ib4:.claude/hooks/new-hook.sh" 2>/dev/null && echo chegou || echo NAO chegou)"; fi
+
+  # (e3) O rc=12 É A CURA, e precisa de caso próprio (Elenxo: trocar os dois `return 12` por no-op
+  #      deixava as famílias verdes e o defeito voltava calado como "nada a mergear"). O commit
+  #      durável falha de verdade — filtro de git obrigatório e quebrado, o modo de um LFS mal
+  #      configurado — e o update tem de devolver 12 SEM mexer na integração.
+  local c5 t5 ib5 h5; c5="$(mktemp -d)/c5"; t5="$(mktemp -d)/a5"; _vb_core "$c5" 1; _vb_adopter "$t5" "$c5"
+  printf '.claude/hooks/novo.sh filter=quebrado\n' > "$t5/.gitattributes"; git -C "$t5" add .gitattributes; git -C "$t5" commit -qm attrs
+  ib5="$(git -C "$t5" rev-parse --abbrev-ref HEAD)"; bash "${helper}" seed "$t5" "$ib5" >/dev/null 2>&1
+  git -C "$t5" config filter.quebrado.clean false; git -C "$t5" config filter.quebrado.required true
+  _vb_core "$c5" 2; mkdir -p "$c5/.claude/hooks"; printf '#!/bin/sh\n' > "$c5/.claude/hooks/novo.sh"
+  git -C "$c5" add -A; git -C "$c5" commit -qm "core v2"
+  h5="$(git -C "$t5" rev-parse "$ib5")"
+  local rce=0; bash "${helper}" update "$t5" "$c5" "$(git -C "$c5" rev-parse --short=12 HEAD)" "$ib5" >/dev/null 2>&1 || rce=$?
+  if [ "$rce" -eq 12 ] && [ "$(git -C "$t5" rev-parse "$ib5")" = "$h5" ]; then
+    record_pass "vendor-branch: (e3) commit duravel que falha → rc=12 e a integracao INTACTA (nunca 'nada a mergear')"
+  else record_fail "vendor-branch: (e3) rc=12" "rc=$rce; integracao $( [ "$(git -C "$t5" rev-parse "$ib5")" = "$h5" ] && echo intacta || echo MEXIDA)"; fi
 
   # (f) legado REALISTA (spec §8): .onion-version pinado + customização COMMITADA + sem vendor → o bootstrap
   #     ramifica do BASELINE LIMPO (framework == core@pin), não do HEAD → CONFLITO, não clobra a customização

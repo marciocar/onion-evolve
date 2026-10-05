@@ -18,7 +18,7 @@
 # Never-clobber: staja SÓ a superfície Onion — código de produto uncommitted do maestro fica de fora.
 # commit --no-verify (worktree legacy sem node_modules: husky/lint-staged daria ENOENT e REVERTERIA).
 # Gracioso: DEST não-git → aviso + exit 0. Nada a commitar → exit 0 (idempotente).
-# ONION_REQUIRED_LIST=<arquivo> (opcional): um caminho por linha que TEM de estar no commit — staja com
+# ONION_REQUIRED_LIST=<arquivo> (opcional; ONION_REQUIRED_NUL=1 = separado por NUL): caminhos que TÊM de estar no commit — staja com
 #   `-f` (atravessa .gitignore) e confere depois; faltou algum → exit 3 nomeando. Ver o bloco abaixo.
 # Determinístico, sem jq. Exercitado por lint-selftest.sh (run_durable_commit_selftests).
 # =============================================================================
@@ -69,13 +69,27 @@ add=(); for p in "${ONION_PATHS[@]}"; do [ -e "${DEST}/${p}" ] && add+=("${p}");
 # pós-condição confere que cada um está no índice: o que faltar é NOMEADO e o exit é 3.
 if [ -n "${ONION_REQUIRED_LIST:-}" ]; then
   [ -r "${ONION_REQUIRED_LIST}" ] || { echo "ERRO: ONION_REQUIRED_LIST ilegível: ${ONION_REQUIRED_LIST}" >&2; exit 3; }
-  if [ -s "${ONION_REQUIRED_LIST}" ]; then
-    git -C "${DEST}" add -f --pathspec-from-file="${ONION_REQUIRED_LIST}" 2>&1 >/dev/null \
+  # ONION_REQUIRED_NUL=1 → lista separada por NUL (o vendor-branch a produz assim: nome acentuado ou com
+  # espaço nunca é escapado). Sem ele, um caminho por linha. Internamente tudo vira NUL.
+  _rq="$(mktemp)"; trap 'rm -f "${_rq}"' EXIT
+  if [ "${ONION_REQUIRED_NUL:-0}" = 1 ]; then LC_ALL=C sort -zu "${ONION_REQUIRED_LIST}" > "${_rq}"
+  else grep -v '^$' "${ONION_REQUIRED_LIST}" | tr '\n' '\0' | LC_ALL=C sort -zu > "${_rq}"; fi
+  if [ -s "${_rq}" ]; then
+    # AUSENTE da árvore é nomeado ANTES do add: um pathspec que não casa aborta o `git add` INTEIRO, e
+    # 1 faltante virava N "faltantes" no relatório (Elenxo, executado com 3 presentes + 1 ausente).
+    _absent="$(while IFS= read -r -d '' _f; do [ -e "${DEST}/${_f}" ] || printf '%s\n' "${_f}"; done < "${_rq}")"
+    if [ -n "${_absent}" ]; then
+      echo "ERRO: $(grep -c . <<< "${_absent}") arquivo(s) EXIGIDO(S) ausentes da árvore — nada foi forçado:" >&2
+      printf '%s\n' "${_absent}" | head -20 | sed 's/^/    /' >&2
+      exit 3
+    fi
+    # `--literal-pathspecs`: `x[1].md` é o arquivo `x[1].md`, nunca o glob que forçaria `x1.md` ignorado.
+    git --literal-pathspecs -C "${DEST}" add -f --pathspec-from-file="${_rq}" --pathspec-file-nul 2>&1 >/dev/null \
       | sed 's/^/  git add -f: /' >&2
-    _miss="$(git -C "${DEST}" ls-files --cached -z 2>/dev/null | tr '\0' '\n' | LC_ALL=C sort \
-             | LC_ALL=C comm -13 - <(LC_ALL=C sort -u "${ONION_REQUIRED_LIST}"))"
+    _miss="$(git -C "${DEST}" ls-files --cached -z 2>/dev/null | LC_ALL=C sort -zu \
+             | LC_ALL=C comm -z -13 - "${_rq}" | tr '\0' '\n')"
     if [ -n "${_miss}" ]; then
-      echo "ERRO: $(grep -c . <<< "${_miss}") arquivo(s) EXIGIDO(S) não entraram no commit durável (ausentes na árvore ou recusados):" >&2
+      echo "ERRO: $(grep -c . <<< "${_miss}") arquivo(s) EXIGIDO(S) presentes na árvore mas RECUSADOS pelo git add:" >&2
       printf '%s\n' "${_miss}" | head -20 | sed 's/^/    /' >&2
       exit 3
     fi

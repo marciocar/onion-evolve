@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**315 itens abertos** em 68 grafo(s) com aberto (de 94 no escopo) · 69 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**316 itens abertos** em 69 grafo(s) com aberto (de 95 no escopo) · 70 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -385,6 +385,16 @@
 | 9.0 | `C_GUARDA_CASO_TESTA_COPIA_NAO_O_SUT` | guard-forge-2026-10 | CANDIDATO 3 A GUARDA, selado pelo maestro em 2026-10-02, e o de MAIOR impacto porque e a classe mais caruna da sessao: QUATRO ocor |
 | 7.2 | `C_GUARDA_PARIDADE_CARIMBO_IMPLICA_REGISTRO` | guard-forge-2026-10 | CANDIDATO 1 A GUARDA, selado pelo maestro em 2026-10-02. Predicado: `carimbo role: hub` IMPLICA `registro role: hub`. DEFEITO DATA |
 
+## inbox-triage-2026-10 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 18.0 | `Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO` | inbox-triage-2026-10 | O `/meta:adopt --update` SOBRESCREVEU o `docs/knowledge-base/index.md` do adotante com a versao do core — ele perdeu frontmatter |
+| 7.6 | `Q_PARIDADE_PAPEL_SO_COBRE_A_PORTA_NAO_O_ADOTANTE` | inbox-triage-2026-10 | A REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela) declara fronteira `kind: door` — logo NENHUMA guarda compara |
+| 7.2 | `Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP` | inbox-triage-2026-10 | O `_clean_baseline` NUNCA acha base num adotante cujo `docs/knowledge-base` mistura KBs locais com as do core — relato de brain- |
+| 5.1 | `I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU` | inbox-triage-2026-10 | O GATILHO DESTE ITEM GATED JA DISPAROU E NINGUEM REAVALIOU. O `adopt.md:685` diz, literalmente, "implementacao gated ate o 1o caso |
+| 3.0 | `Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM` | inbox-triage-2026-10 | TRES relatos de FALSO POSITIVO de gate, do hub gmill (sinal de 2026-09-30), arquivados sem triagem registrada — o commit de arqu |
+
 ## m2-bridge-logto-2026-07 — 7 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -426,16 +436,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 15.0 | `Q_REVISOR_SEM_SALDO_DERRUBA_TODO_PR` | review-gate-saldo-2026-09 | enquanto a conta de API do CI estiver sem saldo, TODO PR deste repo mergeia por dispensa em vez de aprovacao — o gate semantico  |
-
-## inbox-triage-2026-10 — 5 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 14.4 | `Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO` | inbox-triage-2026-10 | O `/meta:adopt --update` SOBRESCREVEU o `docs/knowledge-base/index.md` do adotante com a versao do core — ele perdeu frontmatter |
-| 7.6 | `Q_PARIDADE_PAPEL_SO_COBRE_A_PORTA_NAO_O_ADOTANTE` | inbox-triage-2026-10 | A REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela) declara fronteira `kind: door` — logo NENHUMA guarda compara |
-| 7.2 | `Q_ADOPT_BASELINE_EXPLICITO_NO_STAMP` | inbox-triage-2026-10 | O `_clean_baseline` NUNCA acha base num adotante cujo `docs/knowledge-base` mistura KBs locais com as do core — relato de brain- |
-| 5.1 | `I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU` | inbox-triage-2026-10 | O GATILHO DESTE ITEM GATED JA DISPAROU E NINGUEM REAVALIOU. O `adopt.md:685` diz, literalmente, "implementacao gated ate o 1o caso |
-| 3.0 | `Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM` | inbox-triage-2026-10 | TRES relatos de FALSO POSITIVO de gate, do hub gmill (sinal de 2026-09-30), arquivados sem triagem registrada — o commit de arqu |
 
 ## radar-E3-2026-10-03-r6 — 5 item(ns)
 
@@ -636,6 +636,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
+
+## inbox-triage-2026-10-04 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 2.8 | `Q_CLICKUP_DELETE_PELO_MCP_NAO_MEDIDO` | inbox-triage-2026-10-04 | LACUNA que o proprio hub declarou: clickup_delete_task pelo MCP oficial nao foi medido (exige servidor MCP conectado). O transport |
 
 ## catraca-regra49-2026-08 — 1 item(ns)
 
