@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**340 itens abertos** em 75 grafo(s) com aberto (de 102 no escopo) · 76 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**354 itens abertos** em 76 grafo(s) com aberto (de 103 no escopo) · 77 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -201,6 +201,25 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 43.2 | `Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09` | plugin-directory-landscape-2026-09 | Quais plugins e marketplaces de Claude Code se destacam em 2026-09 e que padroes de desenvolvimento seguem (granularidade 1-grande |
+
+## onion-slm-2026-10 — 14 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 42.2 | `C_DEID_OFF_THE_SHELF_CANDIDATES` | onion-slm-2026-10 | LEITURA (1o caso de uso, de-id): existem dois especialistas PRONTOS, locais e Apache 2.0 para redacao de PII — OpenAI Privacy Fi |
+| 42.0 | `C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS` | onion-slm-2026-10 | LEITURA (desenho do eval de dominio): (i) F1 automatico de triplas e PISO, nao medida — gold incompleto e schema rigido punem ac |
+| 36.4 | `C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT` | onion-slm-2026-10 | LEITURA (quando SLM ajustado vence): vence em tarefa ESTREITA de conjunto fechado (NER 0,986 x 0,742; legal; classificacao), empat |
+| 33.6 | `Q_ONION_SLM_PRIMARIES_2026_10` | onion-slm-2026-10 | Do lado do core e contra PRIMARIAS: o que, das 45 afirmacoes do chat do maestro sobre SLMs, se sustenta — e o que isso habilita  |
+| 28.0 | `C_DISTILLATION_REAL_BUT_TEACHER_BOUND` | onion-slm-2026-10 | LEITURA (destilacao): destilacao on-policy e real e barata em raciocinio matematico (Qwen3 74,4 a 1/10 do custo do RL; receita Tin |
+| 24.2 | `C_TYPED_EXTRACTION_OFF_THE_SHELF` | onion-slm-2026-10 | LEITURA (extracao tipada de conjunto fechado): NuExtract3 (Qwen3.5-4B, templates JSON tipados, Apache 2.0) e GLiNER2.5 (74M-0.3B,  |
+| 16.8 | `Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF` | onion-slm-2026-10 | PROPOSTA AO MAESTRO (eu nunca selo; NAO revisa o selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10): quando o gatilho de C abrir, |
+| 14.4 | `C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION` | onion-slm-2026-10 | LEITURA (SLM em subtarefa agentica): o caminho LLM->SLM da NVIDIA e UMA via nao validada (position paper): exige log de todas as c |
+| 14.0 | `C_BASE_MODELS_MENU_2026_10` | onion-slm-2026-10 | LEITURA (menu de bases, SO se o eval falhar e o fine-tune abrir): Gemma 4 (Apache 2.0 padrao; E2B/E4B, 12B Unified desde 2026-06-0 |
+| 10.8 | `C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT` | onion-slm-2026-10 | LEITURA (capital): o dinheiro vai para o MODELO pequeno eficiente/customizavel — Liquid AI US$250M (edge/on-prem, 2024-12), Fast |
+| 9.9 | `X_CHAT_SOURCES_ONION_SLM` | onion-slm-2026-10 | FONTE DO CHAT do maestro (docs/discussions/onion-slm/fontes): 45 afirmacoes, estado nao-verificado, escrita SEM ler o repo (e por  |
+| 6.0 | `C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT` | onion-slm-2026-10 | LEITURA (embedders): EmbeddingGemma (308M, 100+ linguas) e Qwen3-Embedding (0.6B/8B) HABILITAM busca semantica local sobre o corpu |
+| 0.9 | `C_CHAT_BGE_M3_MTEB_63` | onion-slm-2026-10 | AFIRMACAO DO CHAT: bge-m3 = 63,0 no MTEB (via premai.io). NAO VERIFICAVEL como comparacao: a primaria (card Qwen3-Embedding-0.6B)  |
+| 0.6 | `C_CHAT_QWEN37_PROPRIETARY` | onion-slm-2026-10 | AFIRMACAO DO CHAT (8): o Qwen3.7 e proprietario. NAO VERIFICAVEL: nem a listagem HF visivel nem o agregador mostram o 3.7; sem pri |
 
 ## poda-instruction-bloat-2026-09 — 5 item(ns)
 
