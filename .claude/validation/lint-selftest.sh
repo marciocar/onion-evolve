@@ -5711,12 +5711,18 @@ run_pretooluse_veto_selftests() {
   git -C "${d}/outro-repo" remote add local "${d}" 2>/dev/null || true
   _case "protect-main: cd outro && push -f <remoto local = nós> main → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git push -f local main"
   # remoto com `/` no nome: o git desta máquina aceita, o do runner do CI RECUSA (medido 2026-10-05 — o
-  # `remote add` falhando sob set -e abortava o worker). O caso roda onde a forma existe e PULA com motivo
-  # onde não existe: onde o git a recusa, ela também não é vetor de escape.
+  # `remote add` falhando sob set -e abortava o worker). O caso roda onde a forma existe; onde o git
+  # a recusa, a própria recusa é a medição (e a forma deixa de ser vetor de escape).
   if git -C "${d}/outro-repo" remote add up/x https://github.com/x/adotante.git 2>/dev/null; then
     _case "protect-main: cd outro && remoto up/x estrangeiro → passa" 0 "${pm}" feat "cd ${d}/outro-repo && git push -f up/x main"
   else
-    record_skip "pretooluse-veto: remoto com / no nome — este git recusa a forma ($(git --version))"
+    # a recusa É a medição: onde o git não cria o remoto, `git push up/x` não tem para onde ir (o CI roda
+    # STRICT e um ⊘ aqui reprovaria a faixa — medido no git 2.55 do runner, 2026-10-05)
+    if ! git -C "${d}/outro-repo" remote get-url up/x >/dev/null 2>&1; then
+      record_pass "pretooluse-veto: remoto com / no nome — este git RECUSA criá-lo ($(git --version)), a forma não existe aqui"
+    else
+      record_fail "pretooluse-veto: remoto com / no nome" "remote add falhou mas o remoto existe — preparo inconsistente"
+    fi
   fi
   _case "protect-main: -c url.<nosso>.insteadOf=<URL alheia> → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git -c url.https://github.com/o/core.git.insteadOf=https://github.com/x/fake.git push -f https://github.com/x/fake.git main"
   _case "merge-gate: cd sem-remoto && gh pr merge → VETO (não se prova)" 2 "${mg}" feat "cd ${d}/sem-remoto && gh pr merge 1"
