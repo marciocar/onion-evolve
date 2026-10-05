@@ -1,0 +1,205 @@
+# kg-backlog-guard: on
+# ═══ TETO: 14 NÓS ═══
+meta:
+  id: vetos-por-tokens-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-10-05
+  review_after: 2026-11-19
+  supersedes_external:
+    - docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml#Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH
+  # Forja de CURA DE CLASSE (/meta:forge-guard) dos dois vetos PreToolUse existentes — não guarda
+  # nova. O maestro pediu que fosse BEM ESTUDADA antes de forjada: os nós E_ESTUDO_* são o estudo, e
+  # vieram ANTES do artefato. A 1ª forma desta lib (sed, 2026-09-02) mora no grafo
+  # audit-textual-gates-2026-09.
+nodes:
+  - id: E_DEFEITO_QUINZE_FORMAS_E_UM_FALSO_POSITIVO
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'payload JSON sintetico contra pretooluse-merge-gate.sh e pretooluse-protect-main.sh do main (2786f56c): +main, "main", TZ=… bash -c, timeout, gh -R, /usr/bin/gh, eval, xargs, $(echo gh), & simples, if/then, heredoc SEM aspas com $(…), {gh,} — rc=0 nos dois; branch protection do host: 403'
+    trace: '.claude/hooks/lib/invocation-lines.sh'
+    label: 'O DEFEITO, DATADO: em 2026-10-05 o juiz do radar E3 mediu 15 formas que escapavam dos dois vetos com rc=0, a pior o force-push git push origin +main — num repo cujo host NAO protege a main (403), logo o hook e a unica barreira. O estudo achou mais dois escapes que o juiz nao listou: heredoc SEM aspas com $(gh pr merge 1) no corpo (EXECUTA o merge; a lib descartava o corpo inteiro) e brace expansion no nome do comando. E no MESMO dia um FALSO POSITIVO: o sed partia texto ENTRE ASPAS no ; e vetou um comando cuja unica mencao a gh pr merge era uma string literal. A lista de formas barradas era menor que a lingua do shell — guarda-por-lista falhando pelo vocabulario pela 2a vez na mesma lib.'
+
+  - id: E_ESTUDO_O_CORPUS_NUNCA_CONSIDEROU_TOKENIZADOR
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'git grep -i "shlex|bashlex|tree-sitter|tokeniz" em *.kg.yaml, hooks e KBs: zero decisao; kg-corpus-grep veto/pretooluse/invocation: a auditoria audit-textual-gates-2026-09 escolheu sed sem registrar alternativa'
+    label: 'ESTUDO 1, o corpus: a forma anterior (sed, 2026-09-02) foi escolhida sem registrar alternativa — nenhum no do corpus considerou nem recusou um tokenizador. Nao havia decisao a derrubar, so a lacuna a preencher.'
+
+  - id: E_ESTUDO_O_CLAUDE_CODE_RECUSA_O_QUE_NAO_PROVA
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-05'
+    source_tier: 10
+    source_kind: primary
+    verified_against: 'binario 2.1.289 (/home/marcio/.local/share/claude/versions/2.1.289): parseCommand(e) devolve rootNode (tree-sitter); 145 strings reason: distintas extraidas por offset em torno de "tree-sitter mis-parse"'
+    label: 'ESTUDO 2, o binario: o Claude Code 2.1.289 analisa comando para as regras de permissao com TREE-SITTER e mantem ~145 motivos de RECUSA — o que ele nao consegue provar sobre o que o shell vai executar, ele nao supoe. Os que importam a estes vetos e viraram regra aqui: "Command name is runtime-determined", "Brace expansion", eval ("evaluates arguments as shell code" — RECUSADO, nao recursado), "timeout/stdbuf/nice … can''t be checked before it runs" para argumento runtime, "What xargs adds to X can''t be checked", e "Heredoc with unquoted delimiter undergoes shell expansion" — este ultimo revelou o escape do heredoc que ninguem tinha listado.'
+
+  - id: E_ESTUDO_SO_O_SHLEX_EXISTE_EM_TODO_LUGAR
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'python3 -c import bashlex / tree_sitter / tree_sitter_bash: ausentes nesta maquina; shellcheck/shfmt ausentes; o workflow de selftest do CI nao instala nenhum; shlex e stdlib (python 3.12.3)'
+    label: 'ESTUDO 3, o estado da arte disponivel: bashlex (pip 0.18) e tree-sitter-bash dariam AST de verdade, mas NAO estao instalados aqui nem no CI, e um hook que falha fechado sem a dependencia travaria a sessao onde ela faltasse ([[fail-closed-exposes-incomplete-harness]]). O shlex e da stdlib: o unico tokenizador REAL presente em todo lugar onde o hook roda. Por isso o motor e shlex + uma camada de gramatica propria + o catalogo de recusas do Claude Code — nao um parser completo.'
+
+  - id: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    node_type: decision
+    plane: DEV
+    impact: 5
+    confidence: 0.85
+    status: done
+    verified_at: '2026-10-05'
+    verified_against: 'DEPOIS DA 3a PASSADA: familia pretooluse_veto 186/186 (JSON pelo stdin; casos com cwd de worktree; um caso isolante para cada cura); 74 de 75 mutantes mordem — o que nao morde (git-common-dir) e redundante POR MEDICAO (ver C_TETO_MUTANTES_QUE_AS_CAMADAS_ESCONDEM); baterias das tres passadas do Elenxo: zero escape real aberto, os vetos restantes contra a origin/main sao fechamentos declarados no TETO 1; reexecucao dos 22.662 comandos reais: 35 divergencias = 31 artefatos de estado + 4 falsos positivos antigos curados, 0 falso positivo novo, hashes conferidos antes e depois; latencia ~125 ms por hook (mediana), p90 <= 162 ms'
+    trace: '.claude/hooks/lib/invocation-lines.sh'
+    label: 'A CURA: a lib partilhada dos dois vetos passa a reduzir a string com shlex (aspas respeitadas e removidas; ; & && | || ( ) e quebra de linha como separadores), extrair $(…) e crase com um scanner que entende aspas e aninhamento, tratar heredoc COM aspas como inerte e SEM aspas como expansivel, lembrar atribuicoes literais da propria string, tirar palavras-chave, atribuicoes e invólucros (com as opcoes de cada um), re-analisar sh -c, e canonizar gh (sem -R/--repo) e git push (+ref → --force; --mirror/--all → destino main). E `cd <literal>` passou a mudar o diretorio julgado, COM ESCOPO de subshell, substituicao e sh -c — isentando push em OUTRO repo como o -C ja isentava. O que nao se prova vira __ONION_UNANALYZABLE__, e cada hook decide FECHADO quando o texto tem a FORMA do que ele guarda. O merge-gate ganhou tambem o mergePullRequest pela GraphQL. Contrato de saida mantido: os hooks seguem lendo linhas gh/git canonicas.'
+
+  - id: E_REEXECUCAO_DOS_COMANDOS_REAIS
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'replay.py: 12.268 comandos Bash unicos de 17 transcripts deste repo, contra os hooks antigos e os novos num repo-sandbox armado, com sha256 dos hooks conferido ANTES e DEPOIS de cada rodada. v1: 5 FP novos; v2: CONTAMINADA (mutantes trocavam a lib no disco durante a rodada) e descartada; v3: 0 FP novo; v4: 1 FP novo (IndexError); v5 FINAL: 5 divergencias, todas FP ANTIGOS curados, 0 FP novo, 1 veto restante (cd $SBP dinamico, fechado por desenho)'
+    label: 'O TESTE DE FALSO POSITIVO MAIS FORTE DISPONIVEL: reexecutar contra o hook antigo e o novo todos os 12.268 comandos Bash reais que as sessoes deste repo ja rodaram. A 1a versao da lib divergiu em 6: curou 1 falso positivo antigo (o proprio comando que escrevia esta lib) e CRIOU 5 — tres por um scanner de $(…) que contava parenteses ignorando aspas (quebrava em "$(printf ''%s'' "$x" | grep ''y'')", que o bash aceita), dois por marcar como inanalisavel todo xargs diante de gh (inclusive leituras como xargs gh run view), e todos amplificados por um criterio de relevancia que aceitava a palavra merge/push solta. Os tres foram curados na raiz. A v3 mostrou que os 5 vetos restantes, que o hook ANTIGO tambem dava, eram falso positivo PRE-existente — todos cd /outro/repo && git push origin main — e a isencao por cd literal (com escopo) os curou. A v4 achou um IndexError: os ) de padroes de case em bash -c esvaziavam a pilha de escopo, e o fallback vetava a string inteira; curado com restauracao por tamanho e com toda excecao passando pelo mesmo criterio de relevancia. LICAO DE PROCEDIMENTO medida aqui: a v2 rodou ao mesmo tempo que os scripts de mutante e julgou parte dos comandos com a lib MUTADA — medicao concorrente com mutacao no mesmo arquivo nao vale; desde a v3 o hash dos hooks e conferido antes e depois.'
+
+  - id: C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE
+    node_type: claim
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'cabecalho da lib (FRONTEIRA DECLARADA)'
+    trace: '.claude/hooks/lib/invocation-lines.sh'
+    label: 'TETO 1, o que o hook NAO ve, por desenho: script em ARQUIVO (bash x.sh, source x, source <(sed … arquivo)), alias ou funcao definidos FORA da string (os definidos dentro dela sao vistos), variavel vinda de fora, git/gh chamado por outro programa, stdin vindo de ARQUIVO (cat lista | xargs git push origin {} sem force e fora da main passa). Refspec com variavel nao-literal SEM force e confiado (git push origin "$BR" — barra-lo vetaria o uso comum), MESMO sentado na main: a 1a reescrita fechava ai e reabria o 2o falso positivo de producao (2026-09-01), apontado pelo Elenxo na 2a passada; com force, ou calculando a branch PADRAO, ou com valor-padrao literal main (${B:-main}), fecha. Config de push que mora FORA da string e e lida: remote.<r>.push/mirror e push.default do repo vivo; NAO lida: url.<x>.pushInsteadOf (reescrita de URL) e config global/de sistema alem do que o git -C <dir> config devolve. gh repo sync SEM repo posicional sincroniza o clone LOCAL e passa (nao toca o host); ssh/tmux/screen como executores sao recusa por forma, nao analise. ALIAS DE REPO RENOMEADO: o GitHub redireciona o nome antigo, e o hook nao o conhece — por isso, do NOSSO diretorio, slug "estrangeiro" nunca isenta (gh repo sync <fork>, contents de outro repo vetam: fechado por desenho); de OUTRO projeto, um slug antigo do nosso repo passaria. Sem o campo cwd no JSON o hook julga pelo diretorio do processo. Heredoc sem terminador cujo corpo cita a forma guardada fecha. E o FECHADO POR DESENHO, que da veto em texto que talvez fosse honesto: outro repo SEM remoto comparavel (nao se prova que e outro projeto), cd $(mktemp -d), (cd /tmp && …), e codigo de merge embutido como texto num executor (python3 -c com os.system).'
+
+  - id: C_TETO_SHLEX_NAO_E_PARSER_DE_BASH
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'documentacao do shlex (posix=True, punctuation_chars); o catalogo de recusas do 2.1.289 cobre zsh, aritmetica, [[ ]], IFS, PS4 — nada disso modelado aqui'
+    label: 'TETO 2: shlex tokeniza, nao faz parse de bash. Nao modela: ANSI-C $''…'' (cai como nome dinamico, logo fechado), aritmetica $((…)), [[ ]], IFS alterado, case, process substitution como nome de comando, zsh. Onde ele erra para o lado do inanalisavel, o hook fecha; onde ele erraria para o lado do analisavel-errado, e a fronteira que a reexecucao dos comandos reais mede. Um parser de verdade (bashlex, tree-sitter) e o caminho se o gatilho disparar — GATILHO: um escape novo medido que o shlex nao consiga ver, ou a dependencia passar a existir no CI.'
+
+  - id: C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2
+    node_type: question
+    plane: PROD
+    impact: 4
+    confidence: 0.6
+    status: open
+    verified_at: '2026-10-05'
+    verified_against: 'estado vivo medido: nenhum mod instalado (~/.claude/mods e .claude/mods ausentes; settings.json sem chave mods) — hoje o desvio nao pode ocorrer nesta casa; a PERGUNTA (o mod passa por cima do exit 2?) segue sem medida'
+    label: 'TETO 3, herdado do radar: a 2.1.289 mostra que a aprovacao de um MOD instalado passava por cima de regras deny/ask. Nao medido se ela passa tambem por cima do EXIT 2 de um PreToolUse — e nesse exit 2 que estes dois vetos (e o CLAUDE.md, como razao do acoplamento) se apoiam. Sem mod instalado para testar. GATILHO: o primeiro mod instalado nesta casa, ou a doc do harness responder.'
+
+  - id: C_TETO_MUTANTES_QUE_AS_CAMADAS_ESCONDEM
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'mut11/mut12: cada metade da cura da pilha sozinha NAO corrompe nada; excecao-so-Unanalyzable sem efeito observavel com a pilha certa. CORRIGIDO pela 2a passada do Elenxo (e2/mutA|B|C, 2026-10-05): dos tres mutantes declarados redundantes, DOIS eram a unica protecao do seu caso — a isencao do caminho verificado chamado por $(…)/ops/ (falso positivo com --motivo citando gh pr merge) e o parentese que so fecha escopo que ele abriu (escape: bash -c com case e cd para outro repo). Os dois casos entraram na bancada e os mutantes agora mordem. O terceiro (git-common-dir) foi PROCURADO antes de declarado: o unico caso em que ele decidiria sozinho e uma worktree com config propria (extensions.worktreeConfig) e outro origin — e ai o push vai MESMO para o outro remoto, logo a isencao pelo destino ja esta certa sem ele. Redundante por medicao.'
+    label: 'TETO 4, sobre a propria bancada: as defesas sao em CAMADAS (excecao capturada com o mesmo criterio de relevancia; fallback em bash com o mesmo criterio) e isso torna bug interno do analisador INVISIVEL de ponta a ponta — o comando honesto passa mesmo com o Python quebrado. Por isso existe o modo de diagnostico ONION_INVOCATION_STRICT=1, que so a bancada liga. A 1a redacao deste no afirmava que tres mutantes nao mordiam POR REDUNDANCIA, e a afirmacao era falsa para dois deles: "nao morde" significava "falta caso", nao "camada repetida" — o Elenxo achou para cada um o comando em que ele era a UNICA defesa. A licao generaliza: mutante que nao morde so se declara redundante depois de se procurar o caso que ele protegeria sozinho. O cd que o analisador nao segue (cd $X, condicional, pushd) torna o diretorio DESCONHECIDO e nunca isenta — a 2a redacao dizia "cd $X segue vetando" e a 3a passada mostrou que era falso quando o cwd do JSON era outro projeto.'
+
+  - id: E_ELENXO_REPROVOU_A_1A_REESCRITA
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'Elenxo opus em worktree isolada, bateria propria de 442 casos (old x new) em sandbox com worktree e clones reais; reexecucao dele nos transcripts de subagentes; latencia medida'
+    label: 'O ELENXO REPROVOU A 1a VERSAO DESTA REESCRITA, e com escapes NOVOS — exatamente o que a forja de guarda manda procurar. Quatro que o hook antigo barrava: (B1) o shlex com commenters="#" lia x#; git push -f origin main como comentario e o push sumia; (B2) a isencao por cd/-C comparava so o toplevel, e uma worktree agent-* desta casa (mesmo projeto, mesma main) contava como outro repo; (B3) time -p fazia do -p o nome do comando; (B4) X="gh pr merge"; $X sem word-splitting. Mais escapes antigos reais (continuacao de linha, heads/main, glob e brace no refspec, branch padrao por symbolic-ref, $((1<<x)) lido como heredoc, shell lendo stdin, executores como watch/flock/su -c/find -exec, env -S, gh pr MERGE, alias definido na string, API com %6D e //, merges e git/refs pela REST, GraphQL alem do mergePullRequest, IFS) e falsos positivos novos (o caminho verificado chamado por $(…)/ops/, $PYTHON tools/merge.py, comando acima de 128 KiB que estourava argv). Todos curados na raiz; os que ficam sao fronteira declarada (C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE).'
+
+  - id: E_A_REEXECUCAO_MENTIA_POR_ESTADO
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'corpus completo (22.662 comandos de 2.964 transcripts): 81 divergencias na 1a passada; classify.py reanalisa cada uma com a "branch atual" fixada em feat — as que somem sao artefato de ESTADO; as que persistem eram 2 bugs (heredoc dentro de $( dentro de aspas; regra de substituicao de processo disparando com qualquer $(…)); depois das curas: 0 persistem, 31 artefatos de estado, 4 FP antigos curados'
+    label: 'LICAO DE MEDICAO, a 2a desta forja: a reexecucao dos comandos reais julga cada comando contra o DISCO DE HOJE. Uma regra que depende de estado (a branch atual, para resolver push sem refspec) da veto em comando que, quando rodou, estava numa branch de feature — e hoje, sentado na main, o veto estaria CERTO. Separar estado de bug exigiu reanalisar com a branch neutra. Foi assim que dois bugs reais apareceram escondidos entre 77 artefatos: o heredoc de TODO gh pr create desta casa (--body "$(cat <<EOF …") nao era reconhecido, e o corpo do PR virava comando.'
+
+  - id: E_ELENXO_2A_PASSADA_O_DIRETORIO_ERRADO
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'Elenxo opus, 2a passada, em worktree isolada: a1-a4.py, wt.py, wt2.py e mrun.py contra sandboxes sb3 (raiz na feat), sbm (raiz na main, worktree fix/x), sbf (raiz na feat, main noutra worktree) e other_proj; 14.958 comandos do corpus reexecutados; latencia em 50 comandos reais (mediana 90 ms nova x 98 ms antiga)'
+    trace: '.claude/hooks/lib/invocation-lines.sh'
+    label: 'A 2a PASSADA DO ELENXO REPROVOU DE NOVO, e o achado central nao era de vocabulario: era de DIRETORIO. A lib julgava a partir da raiz (CLAUDE_PROJECT_DIR), mas o comando roda no cwd do JSON do hook — numa worktree de agente, outra branch. Dai um falso positivo novo (git push -u origin HEAD de agente vetado com a raiz na main) e um escape (force-push nu de um checkout sentado na main com a raiz na feat). E a isencao de outro projeto decidia pelo origin do DIRETORIO, nao pelo DESTINO do push: cd <adotante> && git push -f <url-nossa> main passava, como GH_REPO=<nosso> e gh api repos/<nosso>/…. O resto: pflag colado (-XPUT, -fbase=main), ${B:-main} lido como refspec, heredoc lido por shell com -s/--//dev/stdin, apostrofo no corpo expansivel, delimitador com simbolo (E@F), refspec vindo de config (-c remote.*.push/mirror, push.default=upstream, git config && push), send-pack, subtree push, gh repo sync, merge-upstream, contents PUT, runuser, pipe para shell fechando sempre, e o caso de 140 KB da bancada que era VAZIO (argv). Todos curados; os que ficam estao no TETO 1. E o B2 se reproduziu AO VIVO no mesmo dia: o veto de producao (lib antiga) barrou o push de checkpoint DESTA branch, feito por cd para a worktree + git push nu, como "push nu sentado em MAIN" — porque a raiz da sessao estava na main.'
+
+  - id: E_ELENXO_3A_PASSADA_A_ISENCAO_E_A_FALHA_ABERTA
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'Elenxo opus, 3a passada, worktree isolada, sandboxes R/R2/O/RB/N/NH/bare (e3/t1-t10.py, h.py), push REAL confirmando insteadOf/pushInsteadOf e remoto com barra; 15.031 comandos do corpus reexecutados em duas configuracoes (raiz na feat; worktree com raiz na main); latencia e contagem de chamadas git medidas'
+    trace: '.claude/hooks/lib/invocation-lines.sh'
+    label: 'A 3a PASSADA REPROVOU, e TODOS os bloqueadores moravam no mesmo lugar: a ISENCAO de outro projeto — o unico ramo que faz um veto deixar de vetar. gh pr merge <URL nossa> a partir de outro diretorio (a URL escolhe o repo), remoto com / no nome lido como caminho local e caminho local que nao existe tido como estrangeiro, url.insteadOf reescrevendo o destino, projeto cujo origin e um bare em disco, e cd que o analisador nao segue caindo no cwd do JSON (que, sendo outro projeto, isentava). A licao estrutural: isencao exige PROVA de estrangeiro, nunca ausencia de prova de nosso. A cura inverteu o onus — so URL de rede com slug fora de TODOS os remotos da raiz isenta; caminho local nunca; insteadOf ou remoto por -c cancelam; diretorio nao seguido vira DESCONHECIDO; gh so isenta fora do nosso diretorio, e qualquer gh que nomeie o nosso repo (set-default, checkout <URL>) cancela as isencoes seguintes. E a cura da cura: isentar slug estrangeiro a partir do NOSSO diretorio foi tentado e desfeito no mesmo laco, porque o GitHub redireciona nome antigo de repo renomeado (onion-claude ≡ onion-evolve nesta casa). Maiores tambem curados: cd relativo resolvido pela raiz, shell entre aspas ou em comentario na linha do heredoc, marca de branch padrao GLOBAL contaminando todo destino dinamico (virou marca por variavel), config de push tainting refspec explicito, rota casada em texto de campo do gh api (agora o gate julga so o endpoint), git com cache de chamadas.'
+
+edges:
+  - from: E_ELENXO_3A_PASSADA_A_ISENCAO_E_A_FALHA_ABERTA
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: SUPPORTS
+  - from: E_ELENXO_2A_PASSADA_O_DIRETORIO_ERRADO
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: SUPPORTS
+  - from: E_ELENXO_2A_PASSADA_O_DIRETORIO_ERRADO
+    to: C_TETO_MUTANTES_QUE_AS_CAMADAS_ESCONDEM
+    edge_type: SUPPORTS
+  - from: E_DEFEITO_QUINZE_FORMAS_E_UM_FALSO_POSITIVO
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: SUPPORTS
+  - from: E_ESTUDO_O_CORPUS_NUNCA_CONSIDEROU_TOKENIZADOR
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: SUPPORTS
+  - from: E_ESTUDO_O_CLAUDE_CODE_RECUSA_O_QUE_NAO_PROVA
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: SUPPORTS
+  - from: E_ESTUDO_SO_O_SHLEX_EXISTE_EM_TODO_LUGAR
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: SUPPORTS
+  - from: E_REEXECUCAO_DOS_COMANDOS_REAIS
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: SUPPORTS
+  - from: C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: CONSTRAINS
+  - from: C_TETO_SHLEX_NAO_E_PARSER_DE_BASH
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: CONSTRAINS
+  - from: C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: CONSTRAINS
+  - from: C_TETO_MUTANTES_QUE_AS_CAMADAS_ESCONDEM
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_REPROVOU_A_1A_REESCRITA
+    to: D_TOKENIZADOR_SHLEX_COM_RECUSA
+    edge_type: SUPPORTS
+  - from: E_A_REEXECUCAO_MENTIA_POR_ESTADO
+    to: E_REEXECUCAO_DOS_COMANDOS_REAIS
+    edge_type: SUPPORTS
