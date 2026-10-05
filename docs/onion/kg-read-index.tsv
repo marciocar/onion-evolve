@@ -4,6 +4,7 @@
 .claude/	E_MEDIDO_BLOAT_DO_PROPRIO_CORE_1001	docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml
 .claude/	E_OBJECAO_F6_BLOAT_E_AUTO_INCRIMINACAO	docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml
 .claude/agents/development/brand-generator.md	C_D8_21	docs/onion/graph/onion-evolution-2026-07.kg.yaml
+.claude/agents/development/claude-code-specialist.md	E_BYPASS_DE_DENY_ASK_NAO_TOCA_A_CASA	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
 .claude/agents/development/gamma-api-specialist.md	C_D1_1	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/agents/development/mermaid-specialist.md	C_MERMAID_SVG_GAP	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/agents/development/postgres-specialist.md	C_D1_3	docs/onion/graph/onion-evolution-2026-07.kg.yaml
@@ -144,6 +145,8 @@
 .claude/hooks/premodelswitch-guard.sh	E_LACUNAS_E3_0904	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_R3_F2_TROCA_DE_MODELO_RECHECA_E_NOMEIA	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	E_CURA_MERGE_GATE_2O_VETO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.claude/hooks/pretooluse-merge-gate.sh	E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
+.claude/hooks/pretooluse-merge-gate.sh	Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/session-version-drift.sh	D_REGRA65_MEDE_O_PROCESSO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/hooks/task-manager-provider-hook.sh	D_FIX_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
@@ -2100,6 +2103,7 @@ ops/testing/selftest-summary.sh	E_O_SUMARIO_REPORTA_NAO_JULGA	docs/onion/graph/t
 ops/update-bridge.sh	E_W9_BRIDGE_DEPLOY_0902	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/verify-adopter-gate.sh	E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 ops/verify-adopter-gate.sh	E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+plugins/onion/.claude-plugin/plugin.json	E_PLUGIN_VALIDATE_FIX_NAO_TOCA_OS_PLUGINS	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
 plugins/onion/commands/	E_DRIVE_NAO_E_MOAT_MAS_DEPS_NAO_VIAJAM	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 plugins/onion/commands/	Q_KG_INBOX_FORA_DO_PLUGIN	docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml
 plugins/onion/commands/	Q_PLUGIN_SEM_DRIVE_NEM_ADOPT	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
