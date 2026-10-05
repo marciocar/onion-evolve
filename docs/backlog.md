@@ -96,7 +96,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 63.0 | `Q_NANOCHAT_ONION_DOMAIN_MODEL_2026_10` | nanochat-onion-2026-10 | Como o Nanochat (karpathy/nanochat) e o Onion podem se relacionar no TREINO de um modelo de dominio — o dominio sendo a doutrina |
-| 28.8 | `C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL` | nanochat-onion-2026-10 | OPCAO C — SLM-FERRAMENTA DE DOMINIO ESTREITO via adapter SDAAL (Motor 2): tarefa tipada de CONJUNTO FECHADO e verificavel (class |
+| 30.6 | `C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL` | nanochat-onion-2026-10 | OPCAO C — SLM-FERRAMENTA DE DOMINIO ESTREITO via adapter SDAAL (Motor 2): tarefa tipada de CONJUNTO FECHADO e verificavel (class |
 | 16.5 | `C_OPCAO_B_NANOCHAT_STUDY_BENCH` | nanochat-onion-2026-10 | OPCAO B — NANOCHAT COMO BANCADA DE ESTUDO/DOGFOOD do ciclo de vida de modelo, sem produto (sentido b). A FAVOR: MIT, minimo e le |
 | 14.0 | `C_OPCAO_A_NO_TRAINING_LLM_AS_VM` | nanochat-onion-2026-10 | OPCAO A — NAO TREINAR; manter LLM-as-VM. O Onion continua doutrina em markdown + grafo interpretada por Transformer de terceiro, |
 | 7.2 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
