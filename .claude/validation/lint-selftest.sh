@@ -5709,9 +5709,15 @@ run_pretooluse_veto_selftests() {
   _case "protect-main: cd outro && push -f <caminho local> main → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git push -f ${d}/bare.git main"
   # os casos que SÓ cada cura protege (mutantes que não mordiam sem eles)
   git -C "${d}/outro-repo" remote add local "${d}" 2>/dev/null || true
-  git -C "${d}/outro-repo" remote add up/x https://github.com/x/adotante.git 2>/dev/null || true
   _case "protect-main: cd outro && push -f <remoto local = nós> main → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git push -f local main"
-  _case "protect-main: cd outro && remoto up/x estrangeiro → passa" 0 "${pm}" feat "cd ${d}/outro-repo && git push -f up/x main"
+  # remoto com `/` no nome: o git desta máquina aceita, o do runner do CI RECUSA (medido 2026-10-05 — o
+  # `remote add` falhando sob set -e abortava o worker). O caso roda onde a forma existe e PULA com motivo
+  # onde não existe: onde o git a recusa, ela também não é vetor de escape.
+  if git -C "${d}/outro-repo" remote add up/x https://github.com/x/adotante.git 2>/dev/null; then
+    _case "protect-main: cd outro && remoto up/x estrangeiro → passa" 0 "${pm}" feat "cd ${d}/outro-repo && git push -f up/x main"
+  else
+    record_skip "pretooluse-veto: remoto com / no nome — este git recusa a forma ($(git --version))"
+  fi
   _case "protect-main: -c url.<nosso>.insteadOf=<URL alheia> → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git -c url.https://github.com/o/core.git.insteadOf=https://github.com/x/fake.git push -f https://github.com/x/fake.git main"
   _case "merge-gate: cd sem-remoto && gh pr merge → VETO (não se prova)" 2 "${mg}" feat "cd ${d}/sem-remoto && gh pr merge 1"
   _case "merge-gate: comentário citando pulls/N/merge → passa" 0 "${mg}" feat "gh api repos/o/r/issues/1/comments -f body='rota pulls/12/merge'"
