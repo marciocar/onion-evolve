@@ -28,7 +28,7 @@ nodes:
     confidence: 0.85
     status: done
     verified_at: '2026-10-05'
-    verified_against: 'familia pre_push 8/8; 6 de 6 mutantes mordem (inclusive "presenca da linha = sucesso", 3 casos); dogfood de ponta a ponta no PR #924 (--rebase --push: um commit, 0 HARD lido, residuo casando, push com lease) e no #925'
+    verified_against: 'DEPOIS DA 1a PASSADA DO ELENXO (REPROVADO, curado): familia pre_push com os casos que ele pediu (worktree positiva, gh falhando, marcador, ponto de teste so com TEST=1, e o B1 em sandbox git real); a 1a redacao dizia 6 de 6 mutantes, e o Elenxo achou um 7o que sobrevivia — verdade so para os 6 escolhidos; dogfood de ponta a ponta nos PRs #924, #925 e #926'
     trace: '.githooks/pre-push'
     label: 'A FORMA, revisada antes de construir: o MOTOR (ops/pr-finalize.sh, shell, falha fechado) faz a sequencia — regenera as projecoes, carimba o residuo NO MESMO INDICE e faz um commit so, regenera ate estabilizar, exige "Violacoes HARD : 0" LIDO e residuo casando, e so entao empurra. O GATILHO e o pre-push do GIT, nao um hook do Claude Code: vale para qualquer sessao e para o humano, e a postura da casa e acoplar ao Claude Code so onde a capacidade nao existe fora. Ele julga so branch com PR ABERTO (WIP de checkpoint e fluxo legitimo), o COMMIT EMPURRADO numa worktree limpa (nunca a arvore de trabalho) e com as variaveis do CI — espelha o runner, e o residuo da REGRA 56 entra porque e HARD dentro do lint.'
 
@@ -52,9 +52,23 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: 'cabecalho de .githooks/pre-push (FRONTEIRA DECLARADA)'
     trace: '.githooks/pre-push'
-    label: 'TETO: (1) sem `gh` o hook NAO SABE se ha PR — avisa e deixa passar; o CI e o gate final; (2) `git push --no-verify` pula o hook, como pula o pre-commit; (3) custa um lint (~15-30 s) por branch com PR aberto, por push; (4) so vale apos o merge e a sincronizacao do checkout principal, porque o core.hooksPath aponta para .githooks DO CHECKOUT PRINCIPAL — worktrees usam os hooks de la; (5) e core-only: o .githooks/pre-push nao entra no template que o --update instala nos adotantes, e o pr-finalize mora em ops/, que nao viaja. Gatilho para viajar: um adotante pedir, com REGRA 56 propria.'
+    label: 'TETO: (1) sem `gh` o hook NAO SABE se ha PR — avisa e deixa passar; o CI e o gate final; (2) `git push --no-verify` pula o hook, como pula o pre-commit; (3) custa um lint por branch com PR aberto, por push — MEDIDO ~216 s sob carga (a 1a redacao dizia 15-30 s, numero de lint ocioso); o commit que o pr-finalize acabou de julgar nao e relintado; (4) so vale apos o merge e a sincronizacao do checkout principal, porque o core.hooksPath aponta para .githooks DO CHECKOUT PRINCIPAL — worktrees usam os hooks de la; (5) e core-only: o .githooks/pre-push nao entra no template que o --update instala nos adotantes, e o pr-finalize mora em ops/, que nao viaja. Gatilho para viajar: um adotante pedir, com REGRA 56 propria.'
+
+  - id: E_ELENXO_REPROVOU_O_MOTOR_QUE_LAVAVA_RESIDUO
+    node_type: evidence
+    plane: PROD
+    impact: 5
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'Elenxo opus em worktree isolada, sandbox git real sobre o commit 376e04c2 (scratchpad/elx-pf: t-gh.sh, t-lease.sh, t-rebase.sh, t-mutant.sh, clone/ com o commit 370ecab6 do resíduo lavado); B1 re-provado pela bancada nova: a versao defeituosa sai rc=0 com o codigo mudado, a curada recusa'
+    trace: 'ops/pr-finalize.sh'
+    label: 'A 1a FORMA DO MOTOR LAVAVA RESIDUO, e era o defeito mais grave possivel para uma guarda da REGRA 56: com o codigo mudado DEPOIS da revisao, o motor extraia o hash novo, recarimbava e declarava "residuo casando" — codigo nao revisado com carimbo de revisado, e o pre-push MANDAVA rodar o motor. Cura: o residuo guarda reviewed_code_sha256 (o diff sem as projecoes geradas) e o recarimbo so acontece se ele nao mudou; residuo novo (pendente) e a declaracao de quem revisou. Junto, o Elenxo derrubou mais seis: lint-rules.md (REGRA 39) regenerado e fora do commit, com veredito lido da arvore e nao do commit (laco sem saida com o hook); gh falhando lido como "sem PR"; --force-with-lease vazio depois do fetch (apagou commit de colega no teste; cura --force-if-includes); --rebase declarando sucesso sem rebasear; resíduo isento antes do PR existir; e o custo real ~10x o declarado (~216 s por lint sob carga), que virou marcador para o hook nao relintar o commit que o motor ja julgou.'
 
 edges:
+  - from: E_ELENXO_REPROVOU_O_MOTOR_QUE_LAVAVA_RESIDUO
+    to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
+    edge_type: SUPPORTS
   - from: E_TRES_PRS_AO_CI_COM_LINT_VERMELHO
     to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
     edge_type: SUPPORTS

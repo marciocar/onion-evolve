@@ -20,18 +20,31 @@
 #   · o NÚMERO de HARD lido (e o rc), nunca a presença da linha.
 #
 # ── FRONTEIRA DECLARADA ─────────────────────────────────────────────────────────────────
-#   · sem `gh` ele NÃO SABE se há PR: avisa e deixa passar — o CI é o gate final, e barrar todo push
-#     offline seria pior que o defeito;
+#   · sem `gh` INSTALADO ele não sabe se há PR: avisa e deixa passar (o CI é o gate final). Com `gh` instalado
+#     mas FALHANDO (sem auth, sem rede) ele RECUSA e diz por quê — a 1ª versão lia o erro como "sem PR" e
+#     deixava passar calado (bloqueador B3 do Elenxo, medido com GH_CONFIG_DIR vazio e proxy inválido);
+#   · só julga push para o remote `origin` (é onde os PRs vivem); outro remote passa, com aviso;
+#   · o commit que o ops/pr-finalize.sh acabou de julgar (marcador no git-common-dir) não é relintado:
+#     a 1ª versão lintava o mesmo commit duas vezes, ~11 min por fechamento (maior M6);
 #   · `git push --no-verify` pula este hook, como pula o pre-commit; é escape de humano, declarado;
-#   · custa um lint (≈15-30 s) por branch com PR aberto, por push.
+#   · custa um lint por branch com PR aberto, por push: MEDIDO ~216 s sob carga (load 5-7 em 8 cores) —
+#     a 1ª redação dizia 15-30 s, número de lint ocioso.
 #
-# Pontos de teste (só a bancada usa): ONION_PREPUSH_PR (nº do PR, pula o gh), ONION_PREPUSH_LINT
-# (script de lint a rodar no lugar do real), ONION_PREPUSH_NO_WORKTREE=1 (julga o diretório atual).
+# Pontos de teste (só a bancada usa, e SÓ com ONION_PREPUSH_TEST=1 — sem isso, um `ONION_PREPUSH_PR=` vazio
+# esquecido no shell desligava o hook calado): ONION_PREPUSH_PR (nº do PR, pula o gh), ONION_PREPUSH_LINT
+# (lint no lugar do real), ONION_PREPUSH_NO_WORKTREE=1 (julga o diretório atual).
 set -uo pipefail
 
 ZERO=0000000000000000000000000000000000000000
 ROOT="$(git rev-parse --show-toplevel)" || exit 0
 fail=0
+REMOTE="${1:-origin}"
+if [ "${ONION_PREPUSH_TEST:-0}" != 1 ]; then unset ONION_PREPUSH_PR ONION_PREPUSH_LINT ONION_PREPUSH_NO_WORKTREE; fi
+if [ "${REMOTE}" != origin ]; then
+  echo "pre-push: remote '${REMOTE}' não é o origin — PRs vivem no origin; NÃO julguei." >&2
+  exit 0
+fi
+MARK="$(git rev-parse --git-common-dir 2>/dev/null)/onion-prefinalize-ok"
 
 while read -r _lref lsha rref _rsha; do
   [ -n "${lsha:-}" ] || continue
@@ -45,9 +58,19 @@ while read -r _lref lsha rref _rsha; do
       echo "pre-push: sem 'gh' não sei se '${br}' tem PR aberto — NÃO julguei; o CI julga." >&2
       continue
     fi
-    num="$(gh pr list --head "${br}" --state open --json number --jq '.[0].number' 2>/dev/null || true)"
+    gerr="$(mktemp)"
+    num="$(gh pr list --head "${br}" --state open --json number --jq '.[0].number' 2>"${gerr}")"; grc=$?
+    if [ "${grc}" != 0 ]; then
+      echo "pre-push: RECUSADO '${br}' — o gh falhou (rc=${grc}: $(head -c 160 "${gerr}")); sem ele não sei se há PR aberto. Autentique o gh ou, se for deliberado, 'git push --no-verify'." >&2
+      rm -f "${gerr}"; fail=1; continue
+    fi
+    rm -f "${gerr}"
   fi
   [ -n "${num}" ] || continue                                # sem PR aberto: trabalho em curso
+  if [ -f "${MARK}" ] && [ "$(cat "${MARK}" 2>/dev/null)" = "${lsha}" ]; then
+    echo "pre-push: '${br}' (PR #${num}) @ ${lsha:0:12} — este commit acabou de passar no pr-finalize (lint 0 HARD); não relinto." >&2
+    continue
+  fi
 
   lint="${ONION_PREPUSH_LINT:-.claude/validation/lint-artifacts.sh}"
   if [ "${ONION_PREPUSH_NO_WORKTREE:-0}" = 1 ]; then
@@ -69,7 +92,8 @@ while read -r _lref lsha rref _rsha; do
     continue
   fi
   echo "pre-push: RECUSADO '${br}' (PR #${num}) @ ${lsha:0:12} — lint rc=${rc}, HARD=${hard:-?}." >&2
-  printf '%s\n' "${out}" | grep -E '^VIOLATION' | grep -vE 'PASSIVO|ISENCAO|SEM-OBJETO|DEFASADA-COBRADA|PARIDADE-NAO-MEDIDA' | head -5 >&2
+  # sem filtro por palavra: o filtro anterior escondia o HARD real atrás de 5 SOFT (maior M4 do Elenxo)
+  printf '%s\n' "${out}" | grep -E '^VIOLATION' | head -40 >&2
   echo "pre-push: feche o PR com 'bash ops/pr-finalize.sh --push' (projeções, resíduo e lint na ordem certa)." >&2
   fail=1
 done
