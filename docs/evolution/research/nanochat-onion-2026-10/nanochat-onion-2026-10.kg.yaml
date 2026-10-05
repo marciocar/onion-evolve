@@ -10,7 +10,7 @@ meta:
                              # VEICULO sim: se o nanochat voltar a andar ou ganhar loader de dominio, a opcao C
                              # muda de ordem no mesmo dia.
   # kg-backlog-guard: on
-  # ═══ TETO: 46 NÓS ═══  (emenda 45->46 em 2026-10-05: o no do eval de dominio, pedido no selo do maestro)
+  # ═══ TETO: 47 NÓS ═══  (emendas em 2026-10-05: 45->46 o eval de dominio; 46->47 o reenquadramento das doutrinas)
   #
   # Pesquisa /onion-research --mode:decision sobre o Nanochat (Karpathy) e o Onion no treino de um modelo de
   # DOMINIO (Dogfood, KG-SSOT First, Runtime SDAAL, Elenxo). Varredura larga: 17 fontes, 32 claims, 14
@@ -555,6 +555,16 @@ nodes:
     verified_against: 'selo do maestro de 2026-10-05; estimativa NAO medida: o corpus tem 4181 nos com node_type/status/verified_at, que servem de gabarito'
     label: 'O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (classificar o tipo de um no, dizer se e declarado-nao-verificado, achar orfao, julgar um verified_against) + corretor deterministico. Custo estimado, nao medido: horas para montar, porque os rotulos ja existem; rodar custa tokens de inferencia por modelo avaliado. Valor que independe de treinar: medir se modelos mais baratos dao conta de subtarefas do Elenxo e do /meta:kg-freshness (eficiencia). GATILHO: a proxima rodada de Elenxo ou de kg-freshness cujo custo o maestro questione, ou a abertura de B/C/D.'
   # ── evidencias -> pergunta ──
+  - id: E_REENQUADRAMENTO_DAS_DOUTRINAS_PELO_MAESTRO
+    node_type: evidence
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'definicoes do maestro em 2026-10-05, registradas em onion-doctrine-elenxo-bulbo-2026-07#D_QUATRO_PILARES_DEFINIDOS_PELO_MAESTRO; o pedido deste estudo dizia "Runtime SDAAL (LLM=runtime, abstracoes por adapter), Elenxo (refutador adversarial)"'
+    label: 'O PEDIDO DESTE ESTUDO ESTREITOU DUAS DOUTRINAS, e o maestro corrigiu no mesmo dia. SDAAL nao e so "LLM=runtime": sao adapters de camadas de abstracao em IA usados em TODAS as fases — planejar, construir e, em runtime, validar, adaptar e superar obstaculos. Elenxo nao e so o refutador: e o movimento de superacao do Onion Evolve. A leitura muda a favor de C, sem mudar o selo A: um modelo pequeno como adapter SDAAL de validacao em runtime (integridade e frescor do grafo — a gestao da SSOT do KG-SSOT First + Runtime) e SDAAL na definicao do maestro, nao um desvio dela. E a tese LLM-como-VM, que S7 refutava, foi SUPERADA no grafo de doutrina: o bytecode tem testes, a maquinaria deterministica que verifica o que a VM executa.'
+
 
 edges:
   - from: E_NANOCHAT_COST_48_USD
@@ -745,3 +755,6 @@ edges:
   - from: Q_EVAL_DE_DOMINIO_DO_ONION
     to: D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10
     edge_type: CONSTRAINS
+  - from: E_REENQUADRAMENTO_DAS_DOUTRINAS_PELO_MAESTRO
+    to: C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL
+    edge_type: SUPPORTS
