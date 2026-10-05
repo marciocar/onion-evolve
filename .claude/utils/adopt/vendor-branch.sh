@@ -16,7 +16,7 @@
 #   vendor-branch.sh update <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
 #       Aplica o framework NOVO do core no onion/vendor (worktree) + durable-commit, depois mergeia na
 #       integração. Bootstrapa o vendor se ausente (legado). Exit: 0 merge limpo · 10 CONFLITO (humano
-#       resolve) · 2 erro de precondição.
+#       resolve) · 11 BASE CRUZADA · 12 arquivo do core não chegou à vendor (nada mergeado) · 2 precondição.
 #
 # Reusa: durable-commit.sh (commit no vendor) · o manifest L1+L2 (mesma superfície do adopt).
 # Determinístico, sem jq. Exercitado por lint-selftest.sh (run_vendor_branch_selftests).
@@ -223,8 +223,32 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
     fi
   done
   # <<< D_CURE-baseline-preserve <<<
-  bash "$HERE/durable-commit.sh" "$wt" update "$PIN" "$VENDOR" >/dev/null 2>&1
+  # ── O QUE VEIO DO CORE TEM DE CHEGAR À VENDOR (sinal de campo de um hub, 2026-10-04) ─────────────
+  # A lista é a do PRÓPRIO transporte (`git archive … | tar -t`, que já respeita os `:(exclude)`), menos
+  # os baselines de catraca que o bloco acima remove de propósito. Ela vai ao durable-commit, que a
+  # staja com `-f`: um .gitignore da vendor que cubra `.claude/` fazia o `git add` pular todo arquivo
+  # NOVO em silêncio, e o update dizia "merge limpo" (17 arquivos perdidos em dois updates no campo).
+  local req; req="$(mktemp)"
+  # shellcheck disable=SC2046
+  ( cd "$SRC" && git archive HEAD -- $(printf '%s ' $mf) ) | tar -t 2>/dev/null \
+    | grep -v '/$' | grep -vE '^\.claude/validation/[^/]*-baseline\.txt$' | LC_ALL=C sort -u > "$req"
+  local _dc=0
+  ONION_REQUIRED_LIST="$req" bash "$HERE/durable-commit.sh" "$wt" update "$PIN" "$VENDOR" >/dev/null 2>"$req.err" || _dc=$?
   git -C "$T" worktree remove --force "$wt" 2>/dev/null
+  if [ "$_dc" -ne 0 ]; then
+    echo "ERRO: o commit durável do $VENDOR NÃO levou o framework inteiro (durable-commit rc=$_dc) — NADA foi mergeado." >&2
+    sed 's/^/  /' "$req.err" >&2
+    rm -f "$req" "$req.err"; return 12
+  fi
+  # PÓS-CONDIÇÃO na árvore COMMITADA (não no rc): todo arquivo transportado existe no $VENDOR.
+  local _lost
+  _lost="$(git -C "$T" ls-tree -r --name-only "$VENDOR" 2>/dev/null | LC_ALL=C sort | LC_ALL=C comm -13 - "$req")"
+  rm -f "$req" "$req.err"
+  if [ -n "$_lost" ]; then
+    echo "ERRO: $(grep -c . <<< "$_lost") arquivo(s) do core@${PIN} ausentes do $VENDOR depois do commit — NADA foi mergeado:" >&2
+    printf '%s\n' "$_lost" | head -20 | sed 's/^/    /' >&2
+    return 12
+  fi
 
   # BASE CRUZADA — recusa ANTES de mergear. Um despejo de N conflitos contábeis não é veredito,
   # é o maestro descobrindo sozinho o que a ferramenta já podia ter dito.

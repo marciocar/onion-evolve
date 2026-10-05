@@ -746,7 +746,7 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   `onion/vendor` (fonte-de-merge, base comum) e faz `git merge` na integração → a customização local vira
   **conflito git real** (never-clobber estrutural), não diff clobável. **Exit 10 = CONFLITO** → o maestro
   resolve (`git mergetool`/marcadores + `git commit`) **antes** de seguir; **exit 0** = framework atualizado
-  limpo. (Adotante legado sem `onion/vendor` → o helper o **semeia** antes de mergear.) `.env.example` segue
+  limpo; **exit 12** = arquivo do core NÃO chegou à vendor (ex.: `.gitignore` cobrindo `.claude/`) — nada mergeado, PARE. (Adotante legado sem `onion/vendor` → o helper o **semeia** antes de mergear.) `.env.example` segue
   o never-clobber por-arquivo (grava `.env.example.onion` se o alvo já tem) — fora do merge, específico do alvo.
 - **Re-aplicar a configuração install-only** via o [⚙️ Procedimento de Configuração pós-cópia (idempotente)](#️-procedimento-de-configuração-pós-cópia-idempotente)
   (`DEST="$TARGET"`). **Crítico:** sem isto, um adotante com

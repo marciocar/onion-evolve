@@ -4313,6 +4313,39 @@ run_durable_commit_selftests() {
   else record_fail "durable-commit: gracioso" "esperava exit 0 em não-git"; fi
   rm -rf "${d}"
 
+  # (g) ARQUIVO EXIGIDO atravessa o .gitignore (sinal de campo de um hub, 2026-10-04): o alvo ignora
+  #     `.claude/` (só os já rastreados seguem rastreados). Um hook NOVO do core é EXIGIDO; um STATE.md
+  #     de sessão é ignorado DE PROPÓSITO e não é exigido. Com a lista: o hook entra, a sessão NÃO.
+  #     Sem a lista: o hook some em silêncio (rc=0) — a polaridade que mostra o defeito verbatim.
+  _dc_ign() {
+    d="$(mktemp -d)"; git -C "${d}" init -q; mkdir -p "${d}/.claude/commands"
+    printf '# existing\n' > "${d}/.claude/commands/existing.md"; git -C "${d}" add -A
+    printf '.claude/\n' > "${d}/.gitignore"; git -C "${d}" add .gitignore; git -C "${d}" commit -qm base
+    mkdir -p "${d}/.claude/hooks" "${d}/.claude/sessions/s"
+    printf '#!/bin/sh\n' > "${d}/.claude/hooks/new-hook.sh"; printf 'x\n' > "${d}/.claude/sessions/s/STATE.md"
+    printf '# changed\n' > "${d}/.claude/commands/existing.md"
+  }
+  local _req _rc
+  _dc_ign; _req="$(mktemp)"; printf '.claude/hooks/new-hook.sh\n.claude/commands/existing.md\n' > "${_req}"
+  _rc=0; ONION_REQUIRED_LIST="${_req}" bash "${helper}" "${d}" update NEW222 >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" -eq 0 ] && git -C "${d}" cat-file -e HEAD:.claude/hooks/new-hook.sh 2>/dev/null \
+     && ! git -C "${d}" cat-file -e HEAD:.claude/sessions/s/STATE.md 2>/dev/null; then
+    record_pass "durable-commit: (g) arquivo EXIGIDO atravessa o .gitignore; o ignorado de proposito (sessao) segue fora"
+  else record_fail "durable-commit: (g) exigido x .gitignore" "rc=${_rc}; $(git -C "${d}" ls-tree -r --name-only HEAD | tr '\n' ' ')"; fi
+  rm -rf "${d}"
+  _dc_ign; _rc=0; bash "${helper}" "${d}" update NEW222 >/dev/null 2>&1 || _rc=$?
+  if [ "${_rc}" -eq 0 ] && ! git -C "${d}" cat-file -e HEAD:.claude/hooks/new-hook.sh 2>/dev/null; then
+    record_pass "durable-commit: (g2) sem a lista o arquivo novo ignorado some calado — o defeito do campo, reproduzido"
+  else record_fail "durable-commit: (g2) reproducao do defeito" "rc=${_rc} — o git mudou o comportamento do add? reavalie a cura"; fi
+  rm -rf "${d}"
+  # (h) arquivo EXIGIDO ausente da árvore → exit 3 NOMEANDO, nunca commit parcial calado
+  _dc_ign; printf '.claude/hooks/new-hook.sh\n.claude/hooks/sumiu.sh\n' > "${_req}"
+  local _o; _rc=0; _o="$(ONION_REQUIRED_LIST="${_req}" bash "${helper}" "${d}" update NEW222 2>&1)" || _rc=$?
+  if [ "${_rc}" -eq 3 ] && grep -q 'sumiu.sh' <<< "${_o}"; then
+    record_pass "durable-commit: (h) exigido ausente → exit 3 nomeando o arquivo"
+  else record_fail "durable-commit: (h) exigido ausente" "rc=${_rc}; ${_o:0:200}"; fi
+  rm -rf "${d}" "${_req}"
+
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
 }
 
@@ -4633,6 +4666,23 @@ run_vendor_branch_selftests() {
   if [ "$rcl" -eq 0 ] && git -C "$t3" rev-parse --verify onion/vendor >/dev/null 2>&1; then
     record_pass "vendor-branch: legado sem vendor → bootstrap + merge"
   else record_fail "vendor-branch: legado" "exit=$rcl ou vendor não semeado"; fi
+
+  # (e2) .gitignore DA VENDOR cobrindo `.claude/` (sinal de campo de um hub, 2026-10-04): o core
+  #      ganha um arquivo NOVO; antes, o `git add` do commit durável o pulava calado e o update dizia
+  #      "merge limpo". Agora ele chega à integração — e o update NÃO é parcial.
+  local c4 t4 ib4; c4="$(mktemp -d)/c4"; t4="$(mktemp -d)/a4"; _vb_core "$c4" 1; _vb_adopter "$t4" "$c4"
+  printf '.claude/\n' > "$t4/.gitignore"; git -C "$t4" add .gitignore; git -C "$t4" commit -qm "ignora .claude"
+  ib4="$(git -C "$t4" rev-parse --abbrev-ref HEAD)"; bash "${helper}" seed "$t4" "$ib4" >/dev/null 2>&1
+  _vb_core "$c4" 2; mkdir -p "$c4/.claude/hooks" "$c4/.claude/validation"; printf '#!/bin/sh\n' > "$c4/.claude/hooks/new-hook.sh"
+  # baseline de catraca NOVO no core: o update o REMOVE de propósito (D_CURE) — a lista de exigidos
+  # tem de excluí-lo, senão todo update de adotante real cairia em rc=12 (mutante que não mordia)
+  printf 'x\n' > "$c4/.claude/validation/foo-baseline.txt"
+  git -C "$c4" add -A; git -C "$c4" commit -qm "core v2 + hook novo"
+  local rcg=0; bash "${helper}" update "$t4" "$c4" "$(git -C "$c4" rev-parse --short=12 HEAD)" "$ib4" >/dev/null 2>&1 || rcg=$?
+  if [ "$rcg" -eq 0 ] && git -C "$t4" cat-file -e "$ib4:.claude/hooks/new-hook.sh" 2>/dev/null \
+     && ! git -C "$t4" cat-file -e "$ib4:.claude/validation/foo-baseline.txt" 2>/dev/null; then
+    record_pass "vendor-branch: (e2) arquivo NOVO do core chega mesmo com .gitignore cobrindo .claude/ na vendor (e o baseline de catraca segue fora)"
+  else record_fail "vendor-branch: (e2) arquivo novo x .gitignore" "rc=$rcg; o hook novo $(git -C "$t4" cat-file -e "$ib4:.claude/hooks/new-hook.sh" 2>/dev/null && echo chegou || echo NAO chegou)"; fi
 
   # (f) legado REALISTA (spec §8): .onion-version pinado + customização COMMITADA + sem vendor → o bootstrap
   #     ramifica do BASELINE LIMPO (framework == core@pin), não do HEAD → CONFLITO, não clobra a customização
