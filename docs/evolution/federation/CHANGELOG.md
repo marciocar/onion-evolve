@@ -9,6 +9,16 @@
 ---
 
 
+## 2026-10-05 · Os dois hubs atualizados para ab08cde, a causa do defeito 1 medida, e o veto que só protege main · COMPATÍVEL · alvo: hub-operacoes-enterprise, brain-granaai
+
+Os updates de gmill e brain-granaai rodaram hoje, sem push, com a regeneração das projeções e o lint
+re-rodados **depois** do merge: 0 HARD medido nos dois. A regeneração pós-merge levou o inventário do gmill
+de 111 para 113 comandos, o que prova a causa do defeito 1 (`docs/onion/` não viaja na vendor). Dois achados
+novos ficam no grafo `gmill-update-547-2026-10`: os helpers do update commitam sem assinatura, e o veto de
+force-push protege só o literal `main` — no brain-granaai, cuja produção é `master`, ele não protege nada.
+O gmill também mandou três defeitos do `/meta:setup-integration`, confirmados no core e na fila.
+
+
 ## 2026-10-05 · Veredito dos três falsos positivos recebido, e dois defeitos do --update que ele revelou · COMPATÍVEL · alvo: hub-operacoes-enterprise (informativo p/ brain-granaai)
 
 **Vocês mediram o que nós não tínhamos medido, e acharam dois defeitos do core.** Triados no grafo
