@@ -13,23 +13,17 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-10-03
-    cc_version: "2.1.288"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "5/6 no juiz + a isenção de escopo reprovada"   # rodada 6 (2.1.278->2.1.288, NOVE versoes, 990 itens):
-                            # 1 aprovado, 5 REPROVADOS, 1 lacuna genuina (a 2.1.279 nao existe na fonte).
-                            # A 1a passada mediu DUAS versoes e declarou as outras SEIS cobertas pelo corpus; o juiz
-                            # reprovou a isencao ESTRUTURALMENTE, colhendo um item da 2.1.286 de dentro da janela
-                            # que eu dizia selada. A TERCEIRA MORADA DA FABRICACAO e a ATRIBUICAO DE VERSAO:
-                            # 4 dos 5 reprovados tinham o texto CERTO na versao ERRADA (r4=fonte externa,
-                            # r5=medicao do repo, r6=atribuicao). E o CORPUS virou instrumento de ISENCAO —
-                            # li `id`+`tier=9` de tres nos sem ler `impact: 2` / `confidence: 0.4`; CURADO na
-                            # leva: `kg-corpus-grep` agora imprime imp= e conf=. Instrumento REPROVADO para
-                            # medir atribuicao: `WebFetch` resume, trunca e INVENTA data (datou a 2.1.281 como
-                            # "October 1"). Metodo certo: ancora id="2-1-NNN" no HTML cru, blocos guardados em data/.
-                            # ACHADO DE MAIOR CONSEQUENCIA: a 2.1.280 traz `claude-opus-5-5` como Opus DEFAULT e
-                            # a 2.1.284 o `claude-sonnet-5-5` — NENHUM no `session_models`, logo a guarda VETA hoje
-                            # o default da plataforma. Flip PROPOSTO ao maestro (o numero vem do eixo E6, nao daqui).
-    kg: docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
+    last_run: 2026-10-05
+    cc_version: "2.1.289"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "2/5 no juiz + o supersedes_none reprovado"   # rodada 7 (2.1.288->2.1.289, UMA versao, 27 itens,
+                            # contigua em 3 fontes). Os 2 reprovados nao erraram FATO, generalizaram ALEM DO MEDIDO:
+                            # "a classe nao existe no veto proprio" (o juiz achou 15 formas que escapam do merge-gate,
+                            # entre elas o force-push `git push origin +main` — o host NAO protege a main, 403) e
+                            # "a contiguidade da r6 foi respondida" (a pergunta era sobre o MECANISMO). Contagens de
+                            # composicao tambem nao fechavam (6/2 contra 5/3). Achado de maior consequencia NAO E da
+                            # versao: e dos vetos proprios — no Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH, gatilho ja disparado.
+                            # Historico da r6 (9 versoes, 5/6 reprovados por atribuicao de versao) no proprio kg dela.
+    kg: docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
