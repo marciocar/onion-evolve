@@ -88,7 +88,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
+    status: done
+    verified_at: '2026-10-05'
+    verified_against: 'forjado em guard-vetos-por-tokens-2026-10 (D_TOKENIZADOR_SHLEX_COM_RECUSA): familia pretooluse_veto 74/74, 18 mutantes, reexecucao dos 12.268 comandos reais sem falso positivo novo'
     trace: '.claude/hooks/pretooluse-merge-gate.sh'
     label: 'O QUE FAZER com o E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE. Cura por instancia (acrescentar as formas a lista) repete a doenca; a cura de classe e o veto julgar a INTENCAO normalizada (refspec de destino resolvido, inclusive + e aspas; o binario e o subcomando apos desembrulhar prefixos, invólucros e opcoes globais do gh) e falhar FECHADO no que nao conseguir analisar quando o comando mencionar main/merge. Pergunta aberta ainda: a aprovacao de um MOD passa por cima do exit 2 de PreToolUse? (o item 1 da 2.1.289 mostra que passava por cima de deny/ask; e o exit 2 que o CLAUDE.md cita como a capacidade que justifica o acoplamento). GATILHO: JA DISPAROU — achado medido em 2026-10-05; a forja e a proxima leva, maestro-gated.'
 

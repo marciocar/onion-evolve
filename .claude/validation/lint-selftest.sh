@@ -5470,9 +5470,25 @@ run_pretooluse_veto_selftests() {
   _pv() {
     local hook="$1" br="$2" c="$3" rc=0
     git -C "${d}" checkout -q "${br}" 2>/dev/null || git -C "${d}" checkout -q -b "${br}"
-    printf '{"tool_input":{"command":%s}}' "$(python3 -c 'import json,sys;print(json.dumps(sys.argv[1]))' "${c}")" \
+    # o JSON nasce pelo STDIN: por argv, comando de 128 KiB+ estourava E2BIG e o hook recebia
+    # `{"command":}` — o caso de 140 KB passava VAZIO (Elenxo, 2ª passada, M1)
+    printf '%s' "${c}" | python3 -c 'import json,sys;print(json.dumps({"tool_input":{"command":sys.stdin.read()}}))' \
       | (cd "${d}" && CLAUDE_PROJECT_DIR="${d}" bash "${hook}" >/dev/null 2>&1) || rc=$?
     printf '%s' "${rc}"
+  }
+  # _pvw <hook> <branch-da-raiz> <cwd> <comando> → o JSON carrega `cwd`, como o do Claude Code; o
+  # processo do hook roda na RAIZ, então só o campo pode decidir (Elenxo, 2ª passada, B2)
+  _pvw() {
+    local hook="$1" br="$2" w="$3" c="$4" rc=0
+    git -C "${d}" checkout -q "${br}" 2>/dev/null || git -C "${d}" checkout -q -b "${br}"
+    printf '%s' "${c}" | W="${w}" python3 -c 'import json,os,sys;print(json.dumps({"cwd":os.environ["W"],"tool_input":{"command":sys.stdin.read()}}))' \
+      | (cd "${d}" && CLAUDE_PROJECT_DIR="${d}" bash "${hook}" >/dev/null 2>&1) || rc=$?
+    printf '%s' "${rc}"
+  }
+  _casew() {  # <nome> <esperado> <hook> <branch-da-raiz> <cwd> <comando>
+    local got; got="$(_pvw "$3" "$4" "$5" "$6")"
+    if [ "${got}" = "$2" ]; then record_pass "pretooluse-veto: $1 (rc=$2)"
+    else record_fail "pretooluse-veto: $1" "esperava rc=$2, veio rc=${got} — cmd: $6 (cwd ${5})"; fi
   }
   _case() {  # <nome> <esperado> <hook> <branch> <comando>
     local got; got="$(_pv "$3" "$4" "$5")"
@@ -5505,6 +5521,17 @@ run_pretooluse_veto_selftests() {
   _case "protect-main: command git push -f main → VETO"    2 "${pm}" feat 'command git push -f origin main'
   # escopo (2026-09-02): alvo em OUTRO repo não é assunto destes vetos; `-C .` e `-C <raiz>` continuam sendo
   mkdir -p "${d}/outro-repo"; git -C "${d}/outro-repo" init -q
+  # "outro PROJETO" só se prova com os dois remotos existindo e diferindo (2026-10-05): a fixture
+  # espelha o mundo real — o core e um adotante, cada um com o seu origin
+  git -C "${d}" remote add origin https://github.com/o/core.git 2>/dev/null
+  git -C "${d}/outro-repo" remote add origin https://github.com/x/adotante.git
+  mkdir -p "${d}/sem-remoto"; git -C "${d}/sem-remoto" init -q
+  _case "merge-gate: outro repo SEM remoto → VETO (não se prova)" 2 "${mg}" feat "git -C ${d}/sem-remoto push origin main"
+  # --work-tree NÃO muda o repositório: o push é do NOSSO (Elenxo, 2026-10-05)
+  _case "protect-main: --work-tree=outro → VETO"           2 "${pm}" feat "git --work-tree=${d}/outro-repo push -f origin main"
+  # `cd` CONDICIONAL não isenta: sob `if` pode não rodar; antes de `||` o autor prevê a falha
+  _case "protect-main: cd sob if → VETO"                   2 "${pm}" feat "if false; then cd ${d}/outro-repo; fi; git push -f origin main"
+  _case "protect-main: cd … || true; push → VETO"          2 "${pm}" feat "cd ${d}/outro-repo || true; git push -f origin main"
   _case "merge-gate: git -C /outro/repo push origin main → passa (não é nosso repo)"  0 "${mg}" feat "git -C ${d}/outro-repo push origin main"
   _case "protect-main: git -C /outro/repo push -f origin main → passa (não é nosso repo)" 0 "${pm}" feat "git -C ${d}/outro-repo push -f origin main"
   _case "merge-gate: git -C . push origin main → VETO"        2 "${mg}" feat 'git -C . push origin main'
@@ -5520,6 +5547,214 @@ run_pretooluse_veto_selftests() {
   _case "merge-gate: sudo git push origin main → VETO"     2 "${mg}" feat 'sudo -u x git push origin main'
   _case "merge-gate: \$(gh pr merge) subshell → VETO"      2 "${mg}" feat 'out=$(gh pr merge 1)'
   _case "merge-gate: bash -c push de feature → passa"      0 "${mg}" feat 'bash -c "git push origin feat"'
+  # ── TOKENIZADOR (2026-10-05): as formas que o juiz do radar E3 mediu escapando, VERBATIM, e as que o
+  #    estudo do binário 2.1.289 revelou. Todas passavam rc=0 nos dois vetos com a lib de sed.
+  _case "protect-main: +main (force pelo refspec) → VETO"  2 "${pm}" feat 'git push origin +main'
+  _case "protect-main: +HEAD:main → VETO"                  2 "${pm}" feat 'git push origin +HEAD:main'
+  _case "protect-main: --mirror → VETO"                    2 "${pm}" feat 'git push --mirror origin'
+  _case "protect-main: nice -n 5 git push -f main → VETO"  2 "${pm}" feat 'nice -n 5 git push -f origin main'
+  _case "merge-gate: main entre aspas → VETO"              2 "${mg}" feat 'git push origin "main"'
+  _case "merge-gate: push :main (apaga a main) → VETO"     2 "${mg}" feat 'git push origin :main'
+  _case "merge-gate: TZ= + bash -c → VETO"                 2 "${mg}" feat 'TZ="$HOME" bash -c "gh pr merge 1"'
+  _case "merge-gate: timeout 60 → VETO"                    2 "${mg}" feat 'timeout 60 gh pr merge 1'
+  _case "merge-gate: gh -R o/r → VETO"                     2 "${mg}" feat 'gh -R o/r pr merge 1'
+  _case "merge-gate: /usr/bin/gh → VETO"                   2 "${mg}" feat '/usr/bin/gh pr merge 1'
+  _case "merge-gate: nome entre aspas → VETO"              2 "${mg}" feat '"gh" pr merge 1'
+  _case "merge-gate: & simples → VETO"                     2 "${mg}" feat 'echo x & gh pr merge 1'
+  _case "merge-gate: if/then → VETO"                       2 "${mg}" feat 'if true; then gh pr merge 1; fi'
+  _case "merge-gate: eval → VETO (recusa, não recursa)"    2 "${mg}" feat 'eval "gh pr merge 1"'
+  _case "merge-gate: xargs gh → VETO"                      2 "${mg}" feat 'echo 1 | xargs gh pr merge'
+  _case "merge-gate: nome dinâmico \$(echo gh) → VETO"     2 "${mg}" feat '$(echo gh) pr merge 1'
+  _case "merge-gate: heredoc SEM aspas com \$(…) → VETO"  2 "${mg}" feat $'cat <<EOF\n$(gh pr merge 1)\nEOF'
+  _case "merge-gate: brace expansion no nome → VETO"       2 "${mg}" feat '{gh,} pr merge 1'
+  _case "merge-gate: atribuição literal B=main → VETO"     2 "${mg}" feat 'B=main; git push origin $B'
+  _case "merge-gate: graphql mergePullRequest → VETO"      2 "${mg}" feat 'gh api graphql -f query=mutation{mergePullRequest}'
+  # ── as polaridades HONESTAS do tokenizador: texto entre aspas é dado, não invocação ──
+  # a forma EXATA que o sed antigo quebrava: o `;` dentro das aspas ANTES do vocabulário fazia
+  # `gh pr merge 1'` começar uma linha e vetar uma string (falso positivo medido em 2026-10-05)
+  _case "merge-gate: ; DENTRO de aspas não parte → passa"  0 "${mg}" feat "echo 'x; gh pr merge 1'"
+  _case "merge-gate: heredoc COM aspas e \$(…) → passa"    0 "${mg}" feat $'cat <<\'EOF\'\n$(gh pr merge 1)\nEOF'
+  _case "protect-main: printf de '+main' → passa"         0 "${pm}" feat "printf '%s' 'git push origin +main'"
+  _case "merge-gate: B=feat; push \$B → passa"             0 "${mg}" feat 'B=feat; git push origin $B'
+  _case "protect-main: force de feature por +ref → passa"  0 "${pm}" feat 'git push origin +feat'
+  # ── os 5 falsos positivos que a REEXECUÇÃO dos 12.268 comandos reais pegou na 1ª versão desta lib ──
+  _case "merge-gate: \$( com aspas e parênteses dentro → passa" 0 "${mg}" feat $'f=x; echo "n: $(grep -c \'REGRA 65 (\' $f) m: $(printf \'%s\' "$o" | grep -c \'y\')"; git push origin feat'
+  _case "merge-gate: xargs gh run view (leitura) → passa"  0 "${mg}" feat "gh run list --json databaseId -q '.[0].databaseId' | xargs -I{} gh run view {} --log-failed"
+  _case "merge-gate: xargs gh api com caminho → passa"     0 "${mg}" feat "echo 1 | xargs -I{} gh api repos/o/r/actions/jobs/{} --jq .name"
+  _case "merge-gate: texto inanalisável SEM forma de merge → passa" 0 "${mg}" feat "echo 'push the button"
+  _case "merge-gate: xargs git push (refspec do stdin) → VETO" 2 "${mg}" feat 'echo main | xargs git push origin'
+  # ── `cd` para OUTRO repo (os 5 vetos restantes da reexecução: falso positivo PRÉ-existente) ──
+  _case "merge-gate: cd /outro/repo && push main → passa"  0 "${mg}" feat "cd ${d}/outro-repo && git push origin main"
+  _case "merge-gate: cd outro && cd \$X && push main → VETO" 2 "${mg}" feat "cd ${d}/outro-repo && cd \$X && git push origin main"
+  # os `)` dos padrões de `case` dentro de `bash -c` esvaziavam a pilha de escopo → IndexError →
+  # o fallback vetava a string inteira (reexecução v4 dos comandos reais, 2026-10-05)
+  #    reprodutor MÍNIMO obtido por minimização do comando real: são precisas DUAS linhas, cada uma
+  #    desempilha um nível a mais do que empilhou e a segunda esvazia a pilha
+  _case "merge-gate: dois case dentro de bash -c → passa"  0 "${mg}" feat $'X="/tmp/x/next-index-1.lock" bash -c \'case "${X:-}" in ""|*/index|*/index.lock) echo "J";; *) echo "I (ok)";; esac\'\nX="/r/.git/index.lock" bash -c \'case "${X:-}" in ""|*/index|*/index.lock) echo "J (ok)";; *) echo "I";; esac\''
+  # as três rotas pelas quais a isenção do cd viraria falha ABERTA — todas têm de seguir vetando
+  _case "merge-gate: (cd outro); push main → VETO (subshell)"   2 "${mg}" feat "(cd ${d}/outro-repo); git push origin main"
+  _case "merge-gate: \$(cd outro); push main → VETO (subst.)"  2 "${mg}" feat "x=\$(cd ${d}/outro-repo && pwd); git push origin main"
+  _case "merge-gate: bash -c 'cd outro'; push main → VETO"     2 "${mg}" feat "bash -c 'cd ${d}/outro-repo'; git push origin main"
+  # ── ELENXO DA FORJA (2026-10-05): os quatro escapes NOVOS que a 1ª versão da reescrita abriu ──
+  _case "protect-main: # no MEIO da palavra não é comentário → VETO" 2 "${pm}" feat 'echo x#; git push -f origin main'
+  mkdir -p "${d}/wt-parent"; git -C "${d}" worktree add -q "${d}/wt-parent/wt1" -b wtb 2>/dev/null
+  _case "protect-main: cd para WORKTREE do mesmo projeto → VETO" 2 "${pm}" feat "cd ${d}/wt-parent/wt1 && git push -f origin main"
+  _case "protect-main: git -C worktree do mesmo projeto → VETO"   2 "${pm}" feat "git -C ${d}/wt-parent/wt1 push -f origin main"
+  _case "protect-main: time -p → VETO"                     2 "${pm}" feat 'time -p git push -f origin main'
+  _case "merge-gate: \$X com espaço (word-splitting) → VETO" 2 "${mg}" feat 'X="gh pr merge"; $X 12'
+  # ── escapes ANTIGOS que eram reais (o hook de sed também os deixava passar) ──
+  _case "protect-main: continuação de linha junta (m\\<LF>ain) → VETO" 2 "${pm}" feat $'git push -f origin m\\\nain'
+  _case "protect-main: heads/main (DWIM) → VETO"           2 "${pm}" feat 'git push -f origin HEAD:heads/main'
+  _case "protect-main: glob refs/heads/* → VETO"           2 "${pm}" feat "git push -f origin 'refs/heads/*'"
+  _case "protect-main: brace {main,feat} → VETO"           2 "${pm}" feat 'git push -f origin {main,feat}'
+  _case "merge-gate: destino = branch PADRÃO (symbolic-ref) → VETO" 2 "${mg}" feat "git push origin \"\$(git symbolic-ref --short refs/remotes/origin/HEAD | sed 's@^origin/@@')\""
+  _case "merge-gate: \$((1<<x)) não é heredoc → VETO"      2 "${mg}" feat $'echo $((1<<EOF))\ngh pr merge 1\nEOF'
+  _case "merge-gate: echo literal | xargs git push origin → VETO" 2 "${mg}" feat 'echo main | xargs git push origin'
+  _case "merge-gate: shell lendo stdin de pipe → VETO"     2 "${mg}" feat "echo 'gh pr merge 12' | bash"
+  _case "merge-gate: bash < <(…) → VETO"                   2 "${mg}" feat "bash < <(echo 'gh pr merge 1')"
+  _case "merge-gate: env -S 'cmd' → VETO"                  2 "${mg}" feat "env -S 'gh pr merge 1'"
+  _case "merge-gate: watch (executor) → VETO"              2 "${mg}" feat 'watch -n1 gh pr merge 1'
+  _case "merge-gate: find -exec → VETO"                    2 "${mg}" feat 'find . -maxdepth 0 -exec gh pr merge 1 \;'
+  _case "merge-gate: su -c '…' → VETO"                     2 "${mg}" feat "su -c 'gh pr merge 1' marcio"
+  _case "merge-gate: function definida na string → VETO"   2 "${mg}" feat 'function f { gh pr merge 1; }; f'
+  _case "merge-gate: gh pr MERGE (caixa) → VETO"           2 "${mg}" feat 'gh pr MERGE 12'
+  _case "merge-gate: gh alias set … merge → VETO"          2 "${mg}" feat "gh alias set pm 'pr merge'; gh pm 12"
+  _case "merge-gate: git -c alias.p=push → VETO"           2 "${mg}" feat 'git -c alias.p=push p origin main'
+  _case "merge-gate: API com %6D e // → VETO"              2 "${mg}" feat 'gh api -X PUT repos/o/r/pulls/12//%6Derge'
+  _case "merge-gate: pulls/\$(…)/merge → VETO"             2 "${mg}" feat 'gh api -X PUT repos/o/r/pulls/$(echo 12)/merge'
+  _case "merge-gate: …/merges com base=main → VETO"        2 "${mg}" feat 'gh api repos/o/r/merges -f base=main -f head=feat'
+  _case "merge-gate: git/refs/heads/main PATCH → VETO"     2 "${mg}" feat 'gh api -X PATCH repos/o/r/git/refs/heads/main -F force=true'
+  _case "merge-gate: graphql enablePullRequestAutoMerge → VETO" 2 "${mg}" feat "gh api graphql -f query='mutation{enablePullRequestAutoMerge(input:{}){clientMutationId}}'"
+  _case "merge-gate: graphql com query de arquivo → VETO"  2 "${mg}" feat 'gh api graphql -F query=@m.graphql'
+  _case "merge-gate: IFS + \$x → VETO"                     2 "${mg}" feat 'IFS=,; x=gh,pr,merge,1; $x'
+  _case "merge-gate: export B=main; push \$B → VETO"       2 "${mg}" feat 'export B=main; git push origin $B'
+  # os dois mutantes que SOBREVIVIAM à bancada dele, agora com caso
+  _case "merge-gate: <<\\EOF é inerte (barra cita o delimitador) → passa" 0 "${mg}" feat $'cat <<\\EOF\n$(gh pr merge 1)\nEOF'
+  _case "merge-gate: ! gh pr merge → VETO"                 2 "${mg}" feat '! gh pr merge 1'
+  # ── os FALSOS POSITIVOS que ele achou, curados ──
+  _case "merge-gate: caminho verificado por \$(…)/ops/ → passa" 0 "${mg}" feat '"$(git rev-parse --show-toplevel)/ops/pr-merge-verified.sh" 12 --sync'
+  _case "merge-gate: \$PYTHON tools/merge.py → passa"      0 "${mg}" feat '$PYTHON tools/merge.py'
+  _case "merge-gate: \"\$f\" --merge → passa"              0 "${mg}" feat 'for f in a b; do "$f" --merge; done'
+  _case "merge-gate: gh pr merge --help → passa"           0 "${mg}" feat 'gh pr merge --help'
+  _case "merge-gate: git push --dry-run main → passa"      0 "${mg}" feat 'git push --dry-run origin main'
+  _case "merge-gate: cat lista | xargs push sem force → passa" 0 "${mg}" feat 'cat x | xargs -I{} git push origin {}'
+  _case "merge-gate: …/merges com base=feat → passa"       0 "${mg}" feat 'gh api repos/o/r/merges -f base=feat -f head=x'
+  _case "merge-gate: GET em pulls/N/merge → passa"         0 "${mg}" feat 'gh api repos/o/r/pulls/1/merge -X GET'
+  _case "merge-gate: \$(which git) push de feature → passa" 0 "${mg}" feat '$(which git) push origin feat'
+  # comando acima de 128 KiB: ia ao Python por argv, estourava E2BIG e o fallback vetava texto honesto
+  local _big; _big="$(head -c 140000 /dev/zero | tr '\0' 'a')"
+  _case "merge-gate: comando de 140 KB honesto → passa"    0 "${mg}" feat "echo '${_big}'; git push origin feat"
+  # e a polaridade que prova que o comando grande CHEGA inteiro ao hook (sem ela, o de cima era vazio)
+  _case "merge-gate: comando de 140 KB com merge no fim → VETO" 2 "${mg}" feat "echo '${_big}'; gh pr merge 1"
+  # ── ELENXO, 2ª PASSADA (2026-10-05) ──
+  # B1: a isenção de "outro projeto" decide pelo DESTINO, nunca pelo origin do diretório
+  git -C "${d}/outro-repo" remote add up https://github.com/o/core.git 2>/dev/null
+  _case "protect-main: cd outro && push -f <URL nossa> main → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git push -f https://github.com/o/core.git main"
+  _case "merge-gate: cd outro && push <remoto que aponta p/ nós> HEAD:main → VETO" 2 "${mg}" feat "cd ${d}/outro-repo && git push up HEAD:main"
+  _case "merge-gate: cd outro && GH_REPO=nosso gh pr merge → VETO" 2 "${mg}" feat "cd ${d}/outro-repo && GH_REPO=o/core gh pr merge 1"
+  _case "merge-gate: cd outro && gh api repos/<nosso>/…/merge → VETO" 2 "${mg}" feat "cd ${d}/outro-repo && gh api -X PUT repos/o/core/pulls/1/merge"
+  _case "merge-gate: cd outro && gh api repos/<dele>/…/merge → passa" 0 "${mg}" feat "cd ${d}/outro-repo && gh api -X PUT repos/x/adotante/pulls/1/merge"
+  # B3: pflag aceita a opção COLADA
+  _case "merge-gate: gh api -XPUT …/merge → VETO"          2 "${mg}" feat 'gh api -XPUT repos/o/r/pulls/1/merge'
+  _case "merge-gate: gh api -X=PUT …/merge → VETO"         2 "${mg}" feat 'gh api -X=PUT repos/o/r/pulls/1/merge'
+  _case "merge-gate: …/merges -fbase=main colado → VETO"   2 "${mg}" feat 'gh api repos/o/r/merges -fbase=main -fhead=feat'
+  # B4: o `:` de `${B:-main}` é da expansão, não do refspec
+  _case "protect-main: push -f \"\${B:-main}\" → VETO"     2 "${pm}" feat 'git push -f origin "${B:-main}"'
+  # B5/B6/B7: heredoc lido por shell, apóstrofo no corpo, delimitador com símbolo
+  _case "merge-gate: bash -s -- x <<EOF com merge → VETO"   2 "${mg}" feat $'bash -s -- x <<\'EOF\'\ngh pr merge 1\nEOF'
+  _case "protect-main: sh /dev/stdin <<EOF com push -f → VETO" 2 "${pm}" feat $'sh /dev/stdin <<\'EOF\'\ngit push -f origin main\nEOF'
+  _case "merge-gate: apóstrofo no corpo não esconde \$(…) → VETO" 2 "${mg}" feat $'cat <<EOF > /tmp/n\nit\'s $(gh pr merge 1)\nEOF'
+  _case "merge-gate: delimitador E@F → VETO"               2 "${mg}" feat $'cat <<E@F > /tmp/x\nx\nE@F\ngh pr merge 1'
+  # e a polaridade que SÓ o delimitador inteiro protege: `E` sozinho no corpo não termina `<<E@F`
+  _case "merge-gate: linha E no corpo de <<E@F não termina o heredoc → passa" 0 "${mg}" feat $'cat <<E@F > /tmp/x\nE\ngh pr merge 1\nE@F'
+  _case "merge-gate: heredoc SEM terminador engolindo merge → VETO (fechado)" 2 "${mg}" feat $'cat <<EOF > /tmp/x\nx\ngh pr merge 1'
+  # B8: refspec que vem da CONFIG, e verbos que empurram sem se chamar `push`
+  _case "merge-gate: -c remote.origin.push=…:main push → VETO" 2 "${mg}" feat 'git -c remote.origin.push=+HEAD:refs/heads/main push origin'
+  _case "protect-main: -c remote.origin.mirror=true push → VETO" 2 "${pm}" feat 'git -c remote.origin.mirror=true push origin'
+  _case "protect-main: git config remote.*.push && push -f → VETO" 2 "${pm}" feat 'git config remote.origin.push +HEAD:main && git push -f origin'
+  _case "merge-gate: -c push.default=upstream (upstream = main) → VETO" 2 "${mg}" feat 'git -c branch.feat.merge=refs/heads/main -c push.default=upstream push'
+  _case "protect-main: git send-pack --force … main → VETO" 2 "${pm}" feat 'git send-pack --force https://github.com/o/core.git HEAD:refs/heads/main'
+  _case "merge-gate: git subtree push … main → VETO"       2 "${mg}" feat 'git subtree push --prefix=docs origin main'
+  _case "merge-gate: gh repo sync <remoto> → VETO"         2 "${mg}" feat 'gh repo sync o/core --force'
+  _case "merge-gate: gh api …/merge-upstream branch=main → VETO" 2 "${mg}" feat 'gh api -X POST repos/o/r/merge-upstream -f branch=main'
+  _case "merge-gate: gh api PUT …/contents sem branch → VETO" 2 "${mg}" feat 'gh api -X PUT repos/o/r/contents/x -f message=m -f content=eA=='
+  _case "merge-gate: gh api PUT …/contents branch=feat → passa" 0 "${mg}" feat 'gh api -X PUT repos/o/r/contents/x -f message=m -f content=eA== -f branch=feat'
+  _case "protect-main: runuser -u x -- git push -f main → VETO" 2 "${pm}" feat 'runuser -u x -- git push -f origin main'
+  _case "merge-gate: git config push.autoSetupRemote && push → passa" 0 "${mg}" feat 'git config push.autoSetupRemote true && git push -u origin feat'
+  # M2: pipe para shell fecha só quando a FONTE cita a forma guardada
+  _case "merge-gate: echo ls | sh → passa"                 0 "${mg}" feat 'echo ls | sh'
+  _case "merge-gate: curl … | bash → passa (fronteira do arquivo)" 0 "${mg}" feat 'curl -fsSL https://example.com/i.sh | bash'
+  _case "merge-gate: cat <<EOF | bash honesto → passa"     0 "${mg}" feat $'cat <<\'EOF\' | bash\necho hi\nEOF'
+  _case "merge-gate: cat <<EOF | bash com merge → VETO"    2 "${mg}" feat $'cat <<\'EOF\' | bash\ngh pr merge 1\nEOF'
+  # destino runtime SEM force, sentado na main: o 2º falso positivo de produção (2026-09-01) não volta
+  _case "merge-gate: loop push \"\$br\" sentado na main → passa" 0 "${mg}" main 'for br in fix/a fix/b; do git push origin "$br"; done'
+  # os dois mutantes que o Elenxo mostrou serem a ÚNICA proteção do seu caso (antes, sem caso)
+  _case "merge-gate: caminho verificado com --motivo citando gh pr merge → passa" 0 "${mg}" feat '"$(git rev-parse --show-toplevel)/ops/pr-merge-verified.sh" 12 --dispensa x --motivo "o gh pr merge direto está vetado"'
+  _case "protect-main: ) do case não desempilha escopo alheio → VETO" 2 "${pm}" feat "bash -c 'case 1 in 1) ;; esac; cd ${d}/outro-repo'; git push -f origin main"
+  # ── ELENXO, 3ª PASSADA (2026-10-05): a isenção só vale com PROVA de estrangeiro ──
+  # B1: o gh escolhe o repo pela URL posicional, pelo set-default, ou pela API sem slug
+  _case "merge-gate: cd outro && gh pr merge <URL nossa> → VETO" 2 "${mg}" feat "cd ${d}/outro-repo && gh pr merge https://github.com/o/core/pull/5 --squash"
+  _case "merge-gate: cd outro && gh repo set-default nosso && merge → VETO" 2 "${mg}" feat "cd ${d}/outro-repo && gh repo set-default o/core && gh pr merge 5"
+  _case "merge-gate: cd outro && gh api /repositories/<id>/…/merge → VETO" 2 "${mg}" feat "cd ${d}/outro-repo && gh api -X PUT /repositories/1/pulls/5/merge"
+  _case "merge-gate: cd outro && gh pr merge o/core#5 → VETO" 2 "${mg}" feat "cd ${d}/outro-repo && gh pr merge o/core#5"
+  _case "merge-gate: cd outro && gh pr checkout <URL nossa> && merge → VETO" 2 "${mg}" feat "cd ${d}/outro-repo && gh pr checkout https://github.com/o/core/pull/1 && gh pr merge"
+  _case "protect-main: comentário citando bash no opener não faz código → passa" 0 "${pm}" feat $'cat > notes.md <<\'EOF\'  # sobre zsh e bash\ngit push -f origin main\nEOF'
+  _case "merge-gate: cd outro && gh pr merge 5 → passa (é do outro)" 0 "${mg}" feat "cd ${d}/outro-repo && gh pr merge 5"
+  # B2: nome de remoto com `/` é REMOTO, não caminho; insteadOf reescreve o destino
+  git -C "${d}" remote add a/b https://github.com/o/core.git 2>/dev/null
+  _case "protect-main: remoto chamado a/b apontando p/ nós → VETO" 2 "${pm}" feat 'git push -f a/b main'
+  _case "protect-main: -c url.<nosso>.insteadOf=x/y → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git -c url.https://github.com/o/core.git.insteadOf=x/y push -f x/y main"
+  _case "protect-main: -c remote.x/y.url=<nosso> → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git -c remote.x/y.url=https://github.com/o/core.git push -f x/y main"
+  # B3: caminho LOCAL nunca isenta (o origin de um adotante pode ser um bare em disco)
+  _case "protect-main: cd outro && push -f <caminho local> main → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git push -f ${d}/bare.git main"
+  # os casos que SÓ cada cura protege (mutantes que não mordiam sem eles)
+  git -C "${d}/outro-repo" remote add local "${d}" 2>/dev/null
+  git -C "${d}/outro-repo" remote add up/x https://github.com/x/adotante.git 2>/dev/null
+  _case "protect-main: cd outro && push -f <remoto local = nós> main → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git push -f local main"
+  _case "protect-main: cd outro && remoto up/x estrangeiro → passa" 0 "${pm}" feat "cd ${d}/outro-repo && git push -f up/x main"
+  _case "protect-main: -c url.<nosso>.insteadOf=<URL alheia> → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git -c url.https://github.com/o/core.git.insteadOf=https://github.com/x/fake.git push -f https://github.com/x/fake.git main"
+  _case "merge-gate: cd sem-remoto && gh pr merge → VETO (não se prova)" 2 "${mg}" feat "cd ${d}/sem-remoto && gh pr merge 1"
+  _case "merge-gate: comentário citando pulls/N/merge → passa" 0 "${mg}" feat "gh api repos/o/r/issues/1/comments -f body='rota pulls/12/merge'"
+  _case "merge-gate: …/merges base=\$(…) → VETO" 2 "${mg}" feat 'gh api repos/o/r/merges -f base=$(git branch --show-current) -f head=x'
+  # M2: `cd` que não se segue torna o diretório DESCONHECIDO — nunca cai no cwd do JSON
+  _casew "protect-main: cwd=outro, cd <nós> || exit; push -f main → VETO" 2 "${pm}" feat "${d}/outro-repo" "cd ${d} || exit 1; git push -f origin main"
+  # M3: shell citado entre aspas não faz do corpo do heredoc código
+  _case "merge-gate: 'bash' no --title não faz do --body código → passa" 0 "${mg}" feat $'gh pr create --title "compat com bash 5" --body "$(cat <<\'EOF\'\nnão use `gh pr merge`\nEOF\n)"'
+  # M4: marcas de config/branch padrão só valem onde decidem
+  _case "merge-gate: git config branch.*.remote && push com refspec → passa" 0 "${mg}" feat 'git config branch.feat.remote origin && git push -u origin feat'
+  _case "merge-gate: -c remote.origin.push=feat:feat (literal) → passa" 0 "${mg}" feat 'git -c remote.origin.push=refs/heads/feat:refs/heads/feat push'
+  _case "merge-gate: symbolic-ref noutro comando não marca \$br → passa" 0 "${mg}" feat 'git log $(git symbolic-ref refs/remotes/origin/HEAD)..HEAD; for br in fix/a; do git push origin "$br"; done'
+  _case "merge-gate: B=\$(symbolic-ref…); push \$B → VETO" 2 "${mg}" feat 'B=$(git symbolic-ref --short refs/remotes/origin/HEAD); git push origin "$B"'
+  # M5: rota em TEXTO de campo não é endpoint
+  _case "merge-gate: comentário citando /merges e /contents → passa" 0 "${mg}" feat "gh api repos/o/r/issues/1/comments -f body='veja /merges e /contents/x'"
+  # menor: variável atribuída na própria string chega ao shell do pipe
+  _case "merge-gate: X='gh pr merge 1'; echo \"\$X\" | sh → VETO" 2 "${mg}" feat $'X=\'gh pr merge 1\'; echo "$X" | sh'
+  # B2: o diretório julgado é o `cwd` do JSON. Agente em worktree publicando a branch com a raiz na main:
+  git -C "${d}" worktree add -q "${d}/wt-parent/agent" -b fix/x 2>/dev/null
+  _casew "merge-gate: worktree fix/x, raiz na main: push -u origin HEAD → passa" 0 "${mg}" main "${d}/wt-parent/agent" 'git push -u origin HEAD'
+  _casew "merge-gate: worktree fix/x, raiz na main: push nu → passa" 0 "${mg}" main "${d}/wt-parent/agent" 'git push'
+  # M1 (3ª passada): `cd` relativo resolve a partir do cwd do JSON, não da raiz
+  mkdir -p "${d}/wt-parent/agent/docs"
+  _casew "merge-gate: worktree fix/x: cd docs && push -u origin HEAD → passa" 0 "${mg}" main "${d}/wt-parent/agent" 'cd docs && git push -u origin HEAD'
+  _casew "protect-main: worktree fix/x: cd docs && push -f origin HEAD → passa" 0 "${pm}" main "${d}/wt-parent/agent" 'cd docs && git push -f origin HEAD'
+  # ── o ANALISADOR por dentro, em modo de diagnóstico: as defesas em camadas tornam um bug dele
+  #    invisível de ponta a ponta (o comando honesto passa mesmo com o Python quebrado), então a
+  #    integridade da pilha de escopo só se prova aqui. Nenhuma das entradas pode virar __ONION_BUG__.
+  local _lib="${REPO_ROOT}/.claude/hooks/lib/invocation-lines.sh" _bug=""
+  local _in
+  for _in in $'X=a bash -c \'case "$X" in a|b) echo "J";; *) echo "I (ok)";; esac\'\nX=b bash -c \'case "$X" in a) echo "J (ok)";; *) echo "I";; esac\'' \
+             "(cd ${d}/outro-repo; (cd /); echo x); git push origin feat" \
+             $'x=$(bash -c \'case 1 in 1) echo a;; esac\'); y=$( (cd /; echo b) ); git log -1'; do
+    _bug="${_bug}$(cd "${d}" && CLAUDE_PROJECT_DIR="${d}" ONION_INVOCATION_STRICT=1 bash -c '. "$1"; onion_invocation_lines "$2"' _ "${_lib}" "${_in}" | grep '^__ONION_BUG__' || true)"
+  done
+  if [ -z "${_bug}" ]; then record_pass "pretooluse-veto: analisador sem bug interno em case/subshell/substituição aninhados (modo estrito)"
+  else record_fail "pretooluse-veto: bug interno do analisador" "${_bug}"; fi
+  # B2, o escape: checkout SENTADO NA MAIN com a raiz noutra branch (por último — a worktree prende a main)
+  git -C "${d}" checkout -q feat 2>/dev/null
+  git -C "${d}" worktree add -q "${d}/wt-parent/na-main" main 2>/dev/null
+  _casew "protect-main: worktree NA MAIN, raiz na feat: push -f nu → VETO" 2 "${pm}" feat "${d}/wt-parent/na-main" 'git push -f'
+  _casew "merge-gate: worktree NA MAIN, raiz na feat: push origin HEAD → VETO" 2 "${mg}" feat "${d}/wt-parent/na-main" 'git push origin HEAD'
+  git -C "${d}" worktree remove --force "${d}/wt-parent/na-main" 2>/dev/null
   # desarme: sem ops/pr-merge-verified.sh (adotante) o gate NÃO veta o único caminho de merge
   rm -f "${d}/ops/pr-merge-verified.sh"
   _case "merge-gate: sem caminho verificado → DESARMA (passa)" 0 "${mg}" feat 'gh pr merge 1'
