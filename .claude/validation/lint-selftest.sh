@@ -5523,8 +5523,8 @@ run_pretooluse_veto_selftests() {
   mkdir -p "${d}/outro-repo"; git -C "${d}/outro-repo" init -q
   # "outro PROJETO" só se prova com os dois remotos existindo e diferindo (2026-10-05): a fixture
   # espelha o mundo real — o core e um adotante, cada um com o seu origin
-  git -C "${d}" remote add origin https://github.com/o/core.git 2>/dev/null
-  git -C "${d}/outro-repo" remote add origin https://github.com/x/adotante.git
+  git -C "${d}" remote add origin https://github.com/o/core.git 2>/dev/null || true
+  git -C "${d}/outro-repo" remote add origin https://github.com/x/adotante.git || true
   mkdir -p "${d}/sem-remoto"; git -C "${d}/sem-remoto" init -q
   _case "merge-gate: outro repo SEM remoto → VETO (não se prova)" 2 "${mg}" feat "git -C ${d}/sem-remoto push origin main"
   # --work-tree NÃO muda o repositório: o push é do NOSSO (Elenxo, 2026-10-05)
@@ -5597,7 +5597,7 @@ run_pretooluse_veto_selftests() {
   _case "merge-gate: bash -c 'cd outro'; push main → VETO"     2 "${mg}" feat "bash -c 'cd ${d}/outro-repo'; git push origin main"
   # ── ELENXO DA FORJA (2026-10-05): os quatro escapes NOVOS que a 1ª versão da reescrita abriu ──
   _case "protect-main: # no MEIO da palavra não é comentário → VETO" 2 "${pm}" feat 'echo x#; git push -f origin main'
-  mkdir -p "${d}/wt-parent"; git -C "${d}" worktree add -q "${d}/wt-parent/wt1" -b wtb 2>/dev/null
+  mkdir -p "${d}/wt-parent"; git -C "${d}" worktree add -q "${d}/wt-parent/wt1" -b wtb 2>/dev/null || true
   _case "protect-main: cd para WORKTREE do mesmo projeto → VETO" 2 "${pm}" feat "cd ${d}/wt-parent/wt1 && git push -f origin main"
   _case "protect-main: git -C worktree do mesmo projeto → VETO"   2 "${pm}" feat "git -C ${d}/wt-parent/wt1 push -f origin main"
   _case "protect-main: time -p → VETO"                     2 "${pm}" feat 'time -p git push -f origin main'
@@ -5648,7 +5648,7 @@ run_pretooluse_veto_selftests() {
   _case "merge-gate: comando de 140 KB com merge no fim → VETO" 2 "${mg}" feat "echo '${_big}'; gh pr merge 1"
   # ── ELENXO, 2ª PASSADA (2026-10-05) ──
   # B1: a isenção de "outro projeto" decide pelo DESTINO, nunca pelo origin do diretório
-  git -C "${d}/outro-repo" remote add up https://github.com/o/core.git 2>/dev/null
+  git -C "${d}/outro-repo" remote add up https://github.com/o/core.git 2>/dev/null || true
   _case "protect-main: cd outro && push -f <URL nossa> main → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git push -f https://github.com/o/core.git main"
   _case "merge-gate: cd outro && push <remoto que aponta p/ nós> HEAD:main → VETO" 2 "${mg}" feat "cd ${d}/outro-repo && git push up HEAD:main"
   _case "merge-gate: cd outro && GH_REPO=nosso gh pr merge → VETO" 2 "${mg}" feat "cd ${d}/outro-repo && GH_REPO=o/core gh pr merge 1"
@@ -5701,15 +5701,15 @@ run_pretooluse_veto_selftests() {
   _case "protect-main: comentário citando bash no opener não faz código → passa" 0 "${pm}" feat $'cat > notes.md <<\'EOF\'  # sobre zsh e bash\ngit push -f origin main\nEOF'
   _case "merge-gate: cd outro && gh pr merge 5 → passa (é do outro)" 0 "${mg}" feat "cd ${d}/outro-repo && gh pr merge 5"
   # B2: nome de remoto com `/` é REMOTO, não caminho; insteadOf reescreve o destino
-  git -C "${d}" remote add a/b https://github.com/o/core.git 2>/dev/null
+  git -C "${d}" remote add a/b https://github.com/o/core.git 2>/dev/null || true
   _case "protect-main: remoto chamado a/b apontando p/ nós → VETO" 2 "${pm}" feat 'git push -f a/b main'
   _case "protect-main: -c url.<nosso>.insteadOf=x/y → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git -c url.https://github.com/o/core.git.insteadOf=x/y push -f x/y main"
   _case "protect-main: -c remote.x/y.url=<nosso> → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git -c remote.x/y.url=https://github.com/o/core.git push -f x/y main"
   # B3: caminho LOCAL nunca isenta (o origin de um adotante pode ser um bare em disco)
   _case "protect-main: cd outro && push -f <caminho local> main → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git push -f ${d}/bare.git main"
   # os casos que SÓ cada cura protege (mutantes que não mordiam sem eles)
-  git -C "${d}/outro-repo" remote add local "${d}" 2>/dev/null
-  git -C "${d}/outro-repo" remote add up/x https://github.com/x/adotante.git 2>/dev/null
+  git -C "${d}/outro-repo" remote add local "${d}" 2>/dev/null || true
+  git -C "${d}/outro-repo" remote add up/x https://github.com/x/adotante.git 2>/dev/null || true
   _case "protect-main: cd outro && push -f <remoto local = nós> main → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git push -f local main"
   _case "protect-main: cd outro && remoto up/x estrangeiro → passa" 0 "${pm}" feat "cd ${d}/outro-repo && git push -f up/x main"
   _case "protect-main: -c url.<nosso>.insteadOf=<URL alheia> → VETO" 2 "${pm}" feat "cd ${d}/outro-repo && git -c url.https://github.com/o/core.git.insteadOf=https://github.com/x/fake.git push -f https://github.com/x/fake.git main"
@@ -5730,11 +5730,11 @@ run_pretooluse_veto_selftests() {
   # menor: variável atribuída na própria string chega ao shell do pipe
   _case "merge-gate: X='gh pr merge 1'; echo \"\$X\" | sh → VETO" 2 "${mg}" feat $'X=\'gh pr merge 1\'; echo "$X" | sh'
   # B2: o diretório julgado é o `cwd` do JSON. Agente em worktree publicando a branch com a raiz na main:
-  git -C "${d}" worktree add -q "${d}/wt-parent/agent" -b fix/x 2>/dev/null
+  git -C "${d}" worktree add -q "${d}/wt-parent/agent" -b fix/x 2>/dev/null || true
   _casew "merge-gate: worktree fix/x, raiz na main: push -u origin HEAD → passa" 0 "${mg}" main "${d}/wt-parent/agent" 'git push -u origin HEAD'
   _casew "merge-gate: worktree fix/x, raiz na main: push nu → passa" 0 "${mg}" main "${d}/wt-parent/agent" 'git push'
   # M1 (3ª passada): `cd` relativo resolve a partir do cwd do JSON, não da raiz
-  mkdir -p "${d}/wt-parent/agent/docs"
+  mkdir -p "${d}/wt-parent/agent/docs" || true
   _casew "merge-gate: worktree fix/x: cd docs && push -u origin HEAD → passa" 0 "${mg}" main "${d}/wt-parent/agent" 'cd docs && git push -u origin HEAD'
   _casew "protect-main: worktree fix/x: cd docs && push -f origin HEAD → passa" 0 "${pm}" main "${d}/wt-parent/agent" 'cd docs && git push -f origin HEAD'
   # ── o ANALISADOR por dentro, em modo de diagnóstico: as defesas em camadas tornam um bug dele
@@ -5750,11 +5750,11 @@ run_pretooluse_veto_selftests() {
   if [ -z "${_bug}" ]; then record_pass "pretooluse-veto: analisador sem bug interno em case/subshell/substituição aninhados (modo estrito)"
   else record_fail "pretooluse-veto: bug interno do analisador" "${_bug}"; fi
   # B2, o escape: checkout SENTADO NA MAIN com a raiz noutra branch (por último — a worktree prende a main)
-  git -C "${d}" checkout -q feat 2>/dev/null
-  git -C "${d}" worktree add -q "${d}/wt-parent/na-main" main 2>/dev/null
+  git -C "${d}" checkout -q feat 2>/dev/null || true
+  git -C "${d}" worktree add -q "${d}/wt-parent/na-main" main 2>/dev/null || true
   _casew "protect-main: worktree NA MAIN, raiz na feat: push -f nu → VETO" 2 "${pm}" feat "${d}/wt-parent/na-main" 'git push -f'
   _casew "merge-gate: worktree NA MAIN, raiz na feat: push origin HEAD → VETO" 2 "${mg}" feat "${d}/wt-parent/na-main" 'git push origin HEAD'
-  git -C "${d}" worktree remove --force "${d}/wt-parent/na-main" 2>/dev/null
+  git -C "${d}" worktree remove --force "${d}/wt-parent/na-main" 2>/dev/null || true
   # desarme: sem ops/pr-merge-verified.sh (adotante) o gate NÃO veta o único caminho de merge
   rm -f "${d}/ops/pr-merge-verified.sh"
   _case "merge-gate: sem caminho verificado → DESARMA (passa)" 0 "${mg}" feat 'gh pr merge 1'
