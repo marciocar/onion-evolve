@@ -5789,18 +5789,26 @@ run_pre_push_selftests() {
   printf '#!/usr/bin/env bash\necho "  Violações HARD : 0"; exit 0\n' > "${d}/ok.sh"
   printf '#!/usr/bin/env bash\necho "VIOLATION: x: REGRA 81 (Painel)"; echo "  Violações HARD : 1"; exit 1\n' > "${d}/bad.sh"
   printf '#!/usr/bin/env bash\necho "  Violações HARD : 2"; exit 0\n' > "${d}/liar.sh"
+  # lint que CONSOME o stdin e decide pela branch: prova que o laço do hook não entrega as refs ao lint
+  printf '#!/usr/bin/env bash\ncat >/dev/null\nif [ "${GITHUB_HEAD_REF}" = good ]; then echo "  Violações HARD : 0"; exit 0; fi\necho "  Violações HARD : 1"; exit 1\n' > "${d}/eater.sh"
   mkdir -p "${d}/ghfail" "${d}/ghpr"
   printf '#!/usr/bin/env bash\necho "gh: not authenticated" >&2; exit 4\n' > "${d}/ghfail/gh"
   printf '#!/usr/bin/env bash\necho 9\n' > "${d}/ghpr/gh"
   chmod +x "${d}/ghfail/gh" "${d}/ghpr/gh"
   local Z=0000000000000000000000000000000000000000 S; S="$(git -C "${REPO_ROOT}" rev-parse HEAD)"
-  _pp() {  # <env> <sha> [remote] → rc do hook
+  local OURL; OURL="$(git -C "${REPO_ROOT}" remote get-url --push origin 2>/dev/null || echo u)"
+  # o marcador do pr-finalize mora no git-common-dir, COMPARTILHADO por todas as worktrees: se ele já
+  # aponta para este HEAD (o motor acabou de rodar aqui), todo caso abaixo pularia o julgamento e
+  # passaria pelo motivo errado. Guardado e retirado antes; devolvido no fim dos casos de marcador.
+  local mk; mk="$(git -C "${REPO_ROOT}" rev-parse --git-common-dir)/onion-prefinalize-ok"
+  local had=""; [ -f "${mk}" ] && had="$(cat "${mk}")"; rm -f "${mk}"
+  _pp() {  # <env> <sha> [remote] [url] [ref] → rc do hook
     local rc=0
-    printf 'refs/heads/x %s refs/heads/x %s\n' "$2" "${Z}" | (cd "${REPO_ROOT}" && env ONION_PREPUSH_TEST=1 $1 bash "${hook}" "${3:-origin}" u >/dev/null 2>&1) || rc=$?
+    printf '%s %s %s %s\n' "${5:-refs/heads/x}" "$2" "${5:-refs/heads/x}" "${Z}" | (cd "${REPO_ROOT}" && env ONION_PREPUSH_TEST=1 $1 bash "${hook}" "${3:-origin}" "${4:-u}" >/dev/null 2>&1) || rc=$?
     printf '%s' "${rc}"
   }
-  _ppc() {  # <nome> <esperado> <env> <sha> [remote]
-    local got; got="$(_pp "$3" "$4" "${5:-origin}")"
+  _ppc() {  # <nome> <esperado> <env> <sha> [remote] [url] [ref]
+    local got; got="$(_pp "$3" "$4" "${5:-origin}" "${6:-u}" "${7:-}")"
     if [ "${got}" = "$2" ]; then record_pass "pre-push: $1 (rc=$2)"
     else record_fail "pre-push: $1" "esperava rc=$2, veio rc=${got}"; fi
   }
@@ -5810,22 +5818,30 @@ run_pre_push_selftests() {
   _ppc "PR aberto + 0 HARD → passa"                          0 "${W} ONION_PREPUSH_LINT=${d}/ok.sh" "${S}"
   _ppc "sem PR aberto (WIP) com lint ruim → passa"           0 "ONION_PREPUSH_PR= ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
   _ppc "deleção de ref → passa"                              0 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${Z}"
-  _ppc "worktree do commit empurrado + HARD → RECUSA"        1 "ONION_PREPUSH_PR=9 ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
+  _ppc "tag com lint ruim → fora de escopo (passa)"          0 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}" origin u refs/tags/v9
   _ppc "worktree do commit empurrado + 0 HARD → passa"       0 "ONION_PREPUSH_PR=9 ONION_PREPUSH_LINT=${d}/ok.sh" "${S}"
-  _ppc "outro remote → não julga"                            0 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}" "upstream"
+  _ppc "sha que não monta worktree → RECUSA (não sei o que vai)" 1 "ONION_PREPUSH_PR=9 ONION_PREPUSH_LINT=${d}/ok.sh" "1111111111111111111111111111111111111111"
+  _ppc "outro remote (outra URL) → não julga"                0 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}" "upstream" "u"
+  # julgado pelo DESTINO (menor 7 do Elenxo 2): nome diferente, URL do origin → julga
+  _ppc "remote com OUTRO NOME e a URL do origin → RECUSA"    1 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}" "mirror" "${OURL}"
   # gh FALHANDO (sem auth) não pode virar "sem PR" (B3); gh com PR + lint ruim recusa pelo caminho real do gh
   _ppc "gh falhando (rc=4) → RECUSA, não 'sem PR'"           1 "PATH=${d}/ghfail:${PATH} ONION_PREPUSH_NO_WORKTREE=1 ONION_PREPUSH_LINT=${d}/ok.sh" "${S}"
   _ppc "gh devolve PR + lint ruim → RECUSA"                  1 "PATH=${d}/ghpr:${PATH} ONION_PREPUSH_NO_WORKTREE=1 ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
-  # sem ONION_PREPUSH_TEST os pontos de teste NÃO valem: um ONION_PREPUSH_PR= vazio não desliga o hook
+  # o laço não entrega o stdin ao lint (menor 9 do Elenxo 2): com o vazamento a 2ª ref nem era julgada
   local rc=0
+  printf 'refs/heads/good %s refs/heads/good %s\nrefs/heads/bad %s refs/heads/bad %s\n' "${S}" "${Z}" "${S}" "${Z}" \
+    | (cd "${REPO_ROOT}" && env ONION_PREPUSH_TEST=1 ${W} ONION_PREPUSH_LINT="${d}/eater.sh" bash "${hook}" origin u >/dev/null 2>&1) || rc=$?
+  if [ "${rc}" = 1 ]; then record_pass "pre-push: lint que lê o stdin não engole a ref seguinte (rc=1)"
+  else record_fail "pre-push: stdin vazou para o lint" "a 2ª ref (com HARD) não foi julgada (rc=${rc})"; fi
+  # sem ONION_PREPUSH_TEST os pontos de teste NÃO valem: um ONION_PREPUSH_PR= vazio não desliga o hook
+  rc=0
   printf 'refs/heads/x %s refs/heads/x %s\n' "${S}" "${Z}" | (cd "${REPO_ROOT}" && env PATH="${d}/ghfail:${PATH}" ONION_PREPUSH_PR= bash "${hook}" origin u >/dev/null 2>&1) || rc=$?
   if [ "${rc}" = 1 ]; then record_pass "pre-push: ponto de teste sem ONION_PREPUSH_TEST é ignorado (rc=1)"
   else record_fail "pre-push: ponto de teste vazou" "ONION_PREPUSH_PR= sem TEST desligou o hook (rc=${rc})"; fi
-  # marcador do pr-finalize: o MESMO commit não é relintado; outro commit é
-  local mk; mk="$(git -C "${REPO_ROOT}" rev-parse --git-common-dir)/onion-prefinalize-ok"
-  local had=""; [ -f "${mk}" ] && had="$(cat "${mk}")"
+  # marcador do pr-finalize: o MESMO commit não é relintado, NEM depende do gh; outro commit é relintado
   printf '%s\n' "${S}" > "${mk}"
   _ppc "marcador = este commit → não relinta (passa)"        0 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
+  _ppc "marcador = este commit + gh falhando → passa"        0 "PATH=${d}/ghfail:${PATH} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
   printf '%s\n' "deadbeef" > "${mk}"
   _ppc "marcador de OUTRO commit → relinta (recusa)"         1 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
   if [ -n "${had}" ]; then printf '%s\n' "${had}" > "${mk}"; else rm -f "${mk}"; fi
@@ -5837,36 +5853,104 @@ run_pre_push_selftests() {
   rc=0; o="$(cd "${REPO_ROOT}" && bash "${pf}" --rebase --bogus 2>&1)" || rc=$?
   if [ "${rc}" = 1 ] && grep -q 'argumento desconhecido' <<< "${o}"; then record_pass "pr-finalize: argumento desconhecido → recusa"
   else record_fail "pr-finalize: argumento desconhecido" "rc=${rc}"; fi
-  # B1 do Elenxo — o motor NÃO LAVA resíduo: sandbox git real com stubs das guardas (a do resíduo é FIEL:
-  # mesmo diff, mesma regra árvore-suja → índice). Medido: a versão defeituosa dá rc=0 no caso do meio.
-  local sb="${d}/b1"
-  git init -q --bare -b main "${sb}/remote.git" && git clone -q "${sb}/remote.git" "${sb}/w" 2>/dev/null
-  if ( cd "${sb}/w" && git config user.email t@t && git config user.name t \
-       && mkdir -p .claude/utils/adopt .claude/validation docs/onion docs/evolution/review \
-       && printf '#!/bin/bash\nexit 0\n' > .claude/utils/adopt/regen-ssot-projections.sh \
-       && printf '#!/bin/bash\nexit 0\n' > .claude/validation/kg-backlog-project.sh \
-       && printf '#!/bin/bash\nprintf "a\\tb\\n"\n' > .claude/validation/kg-trace-resolve.sh \
-       && printf '#!/bin/bash\necho "  Violações HARD : 0"; exit 0\n' > .claude/validation/lint-artifacts.sh \
-       && printf '%s\n' '#!/bin/bash' 'BR="${GITHUB_HEAD_REF:-$(git branch --show-current)}"; R="docs/evolution/review/$(printf "%s" "$BR" | tr / -).md"' \
-            'BASE="$(git merge-base origin/main HEAD)"' \
-            'if git diff --quiet HEAD; then S="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color "$BASE" HEAD -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64)"' \
-            'else S="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color --cached "$BASE" -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64)"; fi' \
-            'D="$(sed -n "s/^reviewed_diff_sha256: *//p" "$R" 2>/dev/null)"' \
-            '[ "$D" = "$S" ] && echo "  ✅ casa" || echo "  ✗ ARTEFATO-CADUCO atual $S"' > .claude/validation/review-artifact-check.sh \
-       && chmod +x .claude/utils/adopt/*.sh .claude/validation/*.sh && echo base > docs/backlog.md \
-       && git add -A && git commit -qm base && git push -q origin main && git switch -q -c feat/x ) >/dev/null 2>&1; then
-    local R=docs/evolution/review/feat-x.md r1=0 r2=0 r3=0
-    ( cd "${sb}/w" && echo v1 > a.txt && printf -- '---\nreviewed_diff_sha256: pendente\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
-    (cd "${sb}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "${pf}" -m t1 >/dev/null 2>&1) || r1=$?
+
+  # ── sandbox git REAL. Os stubs LEEM A ÁRVORE em que rodam (o Elenxo 2 mediu que stubs de caminho absoluto
+  # deixavam sobreviver o mutante "lint na árvore em vez do commit"):
+  #   · lint: HARD 7 sem o env do CI; HARD 1 se lint-rules.md não acompanha a.txt (B2); senão o número em
+  #     `verdict` ('liar' = HARD 2 com rc 0);
+  #   · regen: reescreve lint-rules.md a partir de a.txt (a projeção GERADA que a 1ª forma deixava fora);
+  #   · guarda do resíduo: FIEL (mesmo diff, árvore-suja → índice, só o frontmatter, sem aspas, base
+  #     origin/main com fallback main).
+  _sbmk() {  # <dir> → repo em <dir>/w na branch feat/x, base em origin/main
+    local s="$1"
+    git init -q --bare -b main "${s}/remote.git" && git clone -q "${s}/remote.git" "${s}/w" 2>/dev/null || return 1
+    ( cd "${s}/w" && git config user.email t@t && git config user.name t \
+      && mkdir -p .claude/utils/adopt .claude/validation docs/onion docs/evolution/review \
+      && printf '%s\n' '#!/bin/bash' 'printf "v-%s\n" "$(cat a.txt 2>/dev/null)" > .claude/validation/lint-rules.md' > .claude/utils/adopt/regen-ssot-projections.sh \
+      && printf '#!/bin/bash\nexit 0\n' > .claude/validation/kg-backlog-project.sh \
+      && printf '#!/bin/bash\nprintf "a\\tb\\n"\n' > .claude/validation/kg-trace-resolve.sh \
+      && printf '%s\n' '#!/bin/bash' \
+           '[ "${GITHUB_EVENT_NAME:-}" = pull_request ] || { echo "  Violações HARD : 7"; exit 1; }' \
+           '[ "$(cat .claude/validation/lint-rules.md 2>/dev/null)" = "v-$(cat a.txt 2>/dev/null)" ] || { echo "VIOLATION: lint-rules defasado"; echo "  Violações HARD : 1"; exit 1; }' \
+           'v="$(cat verdict 2>/dev/null || echo 0)"' \
+           'if [ "$v" = liar ]; then echo "  Violações HARD : 2"; exit 0; fi' \
+           'echo "  Violações HARD : $v"; [ "$v" = 0 ]' > .claude/validation/lint-artifacts.sh \
+      && printf '%s\n' '#!/bin/bash' 'BR="${GITHUB_HEAD_REF:-$(git branch --show-current)}"; R="docs/evolution/review/$(printf "%s" "$BR" | tr / -).md"' \
+           'BASE="$(git merge-base origin/main HEAD 2>/dev/null || git merge-base main HEAD)"' \
+           'if git diff --quiet HEAD; then S="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color "$BASE" HEAD -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64)"' \
+           'else S="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color --cached "$BASE" -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64)"; fi' \
+           'D="$(awk '"'"'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1'"'"' "$R" 2>/dev/null | sed -n "s/^reviewed_diff_sha256:[[:space:]]*//p" | head -1 | tr -d "\"")"' \
+           '[ "$D" = "$S" ] && echo "  ✅ casa" || echo "  ✗ ARTEFATO-CADUCO atual $S"' > .claude/validation/review-artifact-check.sh \
+      && chmod +x .claude/utils/adopt/*.sh .claude/validation/*.sh \
+      && echo base > docs/backlog.md && echo v0 > a.txt && echo 0 > verdict && seq 1 60 > c.txt \
+      && printf 'v-v0\n' > .claude/validation/lint-rules.md \
+      && git add -A && git commit -qm base && git push -q origin main && git switch -q -c feat/x ) >/dev/null 2>&1
+  }
+  _pf() {  # <dir> [args...] → rc do motor no sandbox (stdout+stderr em <dir>/out)
+    local s="$1" r=0; shift
+    (cd "${s}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "${pf}" "$@" > "${s}/out" 2>&1) || r=$?
+    printf '%s' "${r}"
+  }
+  _pfc() {  # <nome> <esperado> <got> <dir>
+    if [ "$3" = "$2" ]; then record_pass "pr-finalize: $1 (rc=$2)"
+    else record_fail "pr-finalize: $1" "esperava rc=$2, veio rc=$3: $(tail -1 "$4/out" 2>/dev/null)"; fi
+  }
+  local R=docs/evolution/review/feat-x.md sb g
+  _new() {  # <nome> → sandbox com o PR stageado e resíduo pendente
+    sb="${d}/$1"; _sbmk "${sb}" || { record_fail "pr-finalize: sandbox $1" "não montou"; return 1; }
+    ( cd "${sb}/w" && echo v1 > a.txt && sed -i 50s/.*/PR/ c.txt && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
+  }
+  # B1 — o motor NÃO LAVA resíduo
+  if _new b1; then
+    g="$(_pf "${sb}" -m t1)"; _pfc "resíduo novo (pendente) → carimba" 0 "${g}" "${sb}"
+    if grep -q 'No such file\|line [0-9]*:' "${sb}/out"; then record_fail "pr-finalize: stderr do carimbo" "$(grep -m1 'No such file\|line [0-9]*:' "${sb}/out")"
+    else record_pass "pr-finalize: caminho de carimbo sem erro de shell no stderr"; fi
     ( cd "${sb}/w" && echo v2 > a.txt && git add a.txt ) >/dev/null 2>&1
-    (cd "${sb}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "${pf}" -m t2 >/dev/null 2>&1) || r2=$?
+    g="$(_pf "${sb}" -m t2)"; _pfc "CÓDIGO mudou depois da revisão → RECUSA" 1 "${g}" "${sb}"
     ( cd "${sb}/w" && git reset -q a.txt && git checkout -q a.txt && echo mudou >> docs/backlog.md && git add docs/backlog.md ) >/dev/null 2>&1
-    (cd "${sb}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "${pf}" -m t3 >/dev/null 2>&1) || r3=$?
-    if [ "${r1}" = 0 ]; then record_pass "pr-finalize: resíduo novo (pendente) → carimba"; else record_fail "pr-finalize: resíduo novo" "rc=${r1}"; fi
-    if [ "${r2}" = 1 ]; then record_pass "pr-finalize: CÓDIGO mudou depois da revisão → RECUSA (não lava o resíduo)"; else record_fail "pr-finalize: lavou o resíduo" "código mudou e o motor saiu rc=${r2}"; fi
-    if [ "${r3}" = 0 ]; then record_pass "pr-finalize: só projeção mudou → recarimba"; else record_fail "pr-finalize: projeção" "rc=${r3}"; fi
-  else
-    record_fail "pr-finalize: sandbox do B1" "não montou o repositório de teste"
+    g="$(_pf "${sb}" -m t3)"; _pfc "só projeção mudou → recarimba" 0 "${g}" "${sb}"
+  fi
+  # B1 reaberto pelo Elenxo 2: hash entre aspas / com espaço no fim NÃO é "pendente"
+  local form
+  # 'semcodigo' é REDUNDANTE por construção desde o Elenxo 2 (o hash de código é validado em 64 hex, logo
+  # rcode vazio cai na recusa seguinte) — o caso fica pelo DESFECHO; 'lixo' é o que morde o mutante
+  # "não-hex = pendente" (aspas e espaço o _field já normaliza para o hash canônico).
+  for form in aspas espaco semcodigo lixo; do
+    _new "b1-${form}" || continue
+    g="$(_pf "${sb}" -m t1)"
+    ( cd "${sb}/w" && case "${form}" in
+        aspas) sed -i 's/^reviewed_diff_sha256: \(.*\)/reviewed_diff_sha256: "\1"/' "${R}" ;;
+        espaco) sed -i 's/^reviewed_diff_sha256: \(.*\)/reviewed_diff_sha256: \1 /' "${R}" ;;
+        semcodigo) sed -i '/^reviewed_code_sha256:/d' "${R}" ;;
+        lixo) sed -i 's/^reviewed_diff_sha256: .*/reviewed_diff_sha256: revisado-por-mim/' "${R}" ;;
+      esac && echo NAO-REVISADO > a.txt && git add -A ) >/dev/null 2>&1
+    g="$(_pf "${sb}" -m t2)"; _pfc "resíduo carimbado (${form}) + código mudou → RECUSA" 1 "${g}" "${sb}"
+  done
+  # o veredito é do COMMIT, não da árvore (B2): commit com HARD, árvore limpa por cima
+  if _new arvore; then
+    ( cd "${sb}/w" && echo 1 > verdict && git add verdict && echo 0 > verdict ) >/dev/null 2>&1
+    g="$(_pf "${sb}" -m t1)"; _pfc "commit com HARD e árvore limpa → RECUSA (julga o commit)" 1 "${g}" "${sb}"
+  fi
+  # o número de HARD é LIDO: rc 0 com 'HARD : 2' não passa
+  if _new liar; then
+    ( cd "${sb}/w" && echo liar > verdict && git add verdict ) >/dev/null 2>&1
+    g="$(_pf "${sb}" -m t1)"; _pfc "lint rc 0 com 'HARD : 2' → RECUSA" 1 "${g}" "${sb}"
+  fi
+  # rebase LIMPO não é "o código mudou" (maior 4 do Elenxo 2): a main mexe noutra linha do mesmo arquivo
+  if _new rebase; then
+    g="$(_pf "${sb}" -m t1)"
+    git clone -q "${sb}/remote.git" "${sb}/o" 2>/dev/null
+    ( cd "${sb}/o" && git config user.email o@o && git config user.name o && sed -i 2s/.*/MAIN/ c.txt && git commit -qam main2 && git push -q origin main ) >/dev/null 2>&1
+    g="$(_pf "${sb}" --rebase)"; _pfc "rebase limpo sobre main que mexe noutra linha → passa" 0 "${g}" "${sb}"
+  fi
+  # o hook julga o COMMIT EMPURRADO, não a árvore: commit com HARD, árvore limpa por cima
+  if _new hookwt; then
+    ( cd "${sb}/w" && printf 'v-v1\n' > .claude/validation/lint-rules.md && echo 1 > verdict && git add -A && git commit -qm bad && echo 0 > verdict ) >/dev/null 2>&1
+    rc=0
+    printf 'refs/heads/feat/x %s refs/heads/feat/x %s\n' "$(git -C "${sb}/w" rev-parse HEAD)" "${Z}" \
+      | (cd "${sb}/w" && env ONION_PREPUSH_TEST=1 ONION_PREPUSH_PR=9 ONION_PREPUSH_LINT=.claude/validation/lint-artifacts.sh bash "${hook}" origin u >/dev/null 2>&1) || rc=$?
+    if [ "${rc}" = 1 ]; then record_pass "pre-push: commit com HARD e árvore limpa → RECUSA (julga o commit)"
+    else record_fail "pre-push: julgou a árvore" "rc=${rc}"; fi
   fi
 }
 
@@ -8625,9 +8709,9 @@ run_cited_directive_selftests() {
   #     (deriva do Claude Code) E na guarda (deriva da copia). A 1a redacao so olhava o binario, e
   #     mutar a copia — tirar a mascara, tirar o lookbehind — passava verde. Sem binario: nao verificado.
   local _bin _needle _miss=""; _bin="$(readlink -f "$(command -v claude 2>/dev/null)" 2>/dev/null || true)"
-  local -a _needles=('function pTe(e){return e.replace(/`[^`\n]+`/g,(n,r)=>{let s=e[r-1];return s==="!"||s==="`"?n:"`"+'
-    'cDn=/```!\s*\n?([\s\S]*?)\n?```/g,uDn=/(?<=^|\s)!`([^`]+)`/gm'
-    'let n=e.matchAll(cDn),r=e.includes("!`")?pTe(e).matchAll(uDn):[],s=[];for(let g of[...n,...r]){let h=g[1]?.trim();if(h)s.push({raw:g[0],command:h,at:g.index})}return s')
+  local -a _needles=('function PCe(e){return e.replace(/`[^`\n]+`/g,(n,r)=>{let s=e[r-1];return s==="!"||s==="`"?n:"`"+'
+    'lUn=/```!\s*\n?([\s\S]*?)\n?```/g,dUn=/(?<=^|\s)!`([^`]+)`/gm'
+    'let n=e.matchAll(lUn),r=e.includes("!`")?PCe(e).matchAll(dUn):[],s=[];for(let g of[...n,...r]){let h=aFr(g[1]??"");if(h)s.push({raw:g[0],command:h,at:g.index})}return s')
   for _needle in "${_needles[@]}"; do
     LC_ALL=C grep -aqF -- "${_needle}" "${chk}" || _miss="${_miss} guarda:${_needle:0:24}"
   done

@@ -5,7 +5,7 @@
 # 2026-10-04, rodada do /meta:evolve (nó C_CREATE_SKILL_EXECUTA_GIT_DIFF_A_CADA_INVOCACAO): o
 # `/meta:create-skill` EXECUTAVA `git diff` e `git diff HEAD` a CADA invocação, porque dois exemplos
 # de documentação — um em crase dupla dentro de uma pergunta, outro dentro de um bloco cercado — casam
-# as regex do harness do Claude Code 2.1.289. O autor escreveu CITAÇÃO; o harness leu INVOCAÇÃO. Mais
+# as regex do harness do Claude Code 2.1.289 (re-extraídas da 2.1.290). O autor escreveu CITAÇÃO; o harness leu INVOCAÇÃO. Mais
 # quatro sítios no `agent-skills-specialist`. Foi a 2ª instância no mesmo dia: o `/meta:forge-guard`
 # tinha nascido MORTO NA CARGA (`cmd: command not found`) pelo mesmo mecanismo. Curados por instância
 # na leva 1; esta guarda cobra a CLASSE.
@@ -19,14 +19,14 @@
 # citação": onde as duas discordam, a diretiva é viva por acidente.
 #
 # ── O MOTOR (cláusula 3: o motor do padrão decide a sintaxe) ────────────────────────────────────
-# As funções que ACHAM as diretivas são copiadas LITERALMENTE do binário 2.1.289 e rodam em node —
+# As funções que ACHAM as diretivas são copiadas LITERALMENTE do binário 2.1.290 (1ª cópia: 2.1.289) e rodam em node —
 # o mesmo motor de regex do harness. A 1ª versão as TRANSCREVIA para Python, e o Elenxo provou por
 # fuzz diferencial (20 mil textos) 184 divergências: o lookbehind do Python reinicia a varredura uma
 # posição depois e a máscara apagava as crases que o harness preserva. Transcrição é tradução, e
 # tradução erra; cópia literal no motor original não tem o que errar. O que é NOSSO é só o contexto.
-#   máscara (pTe) : code-span sem `!` nem crase antes perde o MIOLO, as crases ficam
-#   bloco   (cDn) : sobre o texto CRU — cerca de três crases seguida de `!`
-#   inline  (uDn) : sobre o texto MASCARADO — `!` + crase após início-de-linha ou espaço
+#   máscara (PCe) : code-span sem `!` nem crase antes perde o MIOLO, as crases ficam
+#   bloco   (lUn) : sobre o texto CRU — cerca de três crases seguida de `!`
+#   inline  (dUn) : sobre o texto MASCARADO — `!` + crase após início-de-linha ou espaço
 #
 # ── O CONTEXTO DE CITAÇÃO (o que é nosso) ───────────────────────────────────────────────────────
 # Uma diretiva que o harness executa é ACUSADA se estiver em:
@@ -38,7 +38,7 @@
 #   · span de crase dupla que CONTÉM a diretiva (não basta haver crase dupla na linha — F5);
 #   · linha de citação (`>`) ou comentário HTML.
 # ── TETO DECLARADO (cláusula 7) ─────────────────────────────────────────────────────────────────
-#  · As funções são COPIADAS do binário 2.1.289. Versão nova do Claude Code pode mudar o parser: a
+#  · As funções são COPIADAS do binário 2.1.290 (re-extração de 2026-10-05; a 1ª cópia era da 2.1.289). Versão nova do Claude Code pode mudar o parser: a
 #    bancada confere se o binário INSTALADO ainda contém o texto das regex (deriva vira reprovação), e
 #    a REGRA 65 (Radar de mundo com baseline DATADA por eixo) acusa a versão nova.
 #  · Diretiva viva numa linha de prosa comum é tratada como INTENCIONAL — é a forma das diretivas de
@@ -71,10 +71,13 @@ SELF="$(cd "$(dirname "$0")" && pwd)/$(basename "$0")"
 # _engine <arquivo>... — imprime path<TAB>linha<TAB>contexto<TAB>comando; `#ILEGIVEL<TAB>path` se não lê
 _engine() {
   node - "$@" <<'JS'
-// ── verbatim de Claude Code 2.1.289 (pTe, cDn, uDn, bGn); `vi(" ",k)` do binário = " ".repeat(k) ──
-function pTe(e){return e.replace(/`[^`\n]+`/g,(n,r)=>{let s=e[r-1];return s==="!"||s==="`"?n:"`"+" ".repeat(n.length-2)+"`"})}
-var cDn=/```!\s*\n?([\s\S]*?)\n?```/g,uDn=/(?<=^|\s)!`([^`]+)`/gm;
-function bGn(e){let n=e.matchAll(cDn),r=e.includes("!`")?pTe(e).matchAll(uDn):[],s=[];for(let g of[...n,...r]){let h=g[1]?.trim();if(h)s.push({raw:g[0],command:h,at:g.index})}return s}
+// ── verbatim de Claude Code 2.1.290 (PCe, lUn, dUn, aFr, D3n); `oi(" ",k)` do binário = " ".repeat(k).
+//    Re-extraído em 2026-10-05 (deriva medida pela bancada (f)): só os NOMES minificados mudaram e o
+//    `g[1]?.trim()` virou `aFr(g[1]??"")` = trim + CRLF→LF — o CONJUNTO de diretivas achadas é o mesmo.
+function PCe(e){return e.replace(/`[^`\n]+`/g,(n,r)=>{let s=e[r-1];return s==="!"||s==="`"?n:"`"+" ".repeat(n.length-2)+"`"})}
+var lUn=/```!\s*\n?([\s\S]*?)\n?```/g,dUn=/(?<=^|\s)!`([^`]+)`/gm;
+function aFr(e){return e.trim().replaceAll(`\r\n`,`\n`)}
+function D3n(e){let n=e.matchAll(lUn),r=e.includes("!`")?PCe(e).matchAll(dUn):[],s=[];for(let g of[...n,...r]){let h=aFr(g[1]??"");if(h)s.push({raw:g[0],command:h,at:g.index})}return s}
 // ── fim do verbatim ──
 const fs = require('fs')
 function fences(t) {   // [ini, fim) de cada bloco cercado, por offset
@@ -114,7 +117,7 @@ for (const p of process.argv.slice(2)) {
   let t
   try { t = fs.readFileSync(p, 'utf8') } catch (e) { console.log('#ILEGIVEL\t' + p); continue }
   const F = fences(t)
-  for (const d of bGn(t)) {
+  for (const d of D3n(t)) {
     const c = context(t, F, d)
     if (c) console.log([p, t.slice(0, d.at).split('\n').length, c, d.command.replace(/\s+/g, ' ').slice(0, 80)].join('\t'))
   }

@@ -38,10 +38,13 @@ set -uo pipefail
 ZERO=0000000000000000000000000000000000000000
 ROOT="$(git rev-parse --show-toplevel)" || exit 0
 fail=0
-REMOTE="${1:-origin}"
+REMOTE="${1:-origin}"; URL="${2:-}"
 if [ "${ONION_PREPUSH_TEST:-0}" != 1 ]; then unset ONION_PREPUSH_PR ONION_PREPUSH_LINT ONION_PREPUSH_NO_WORKTREE; fi
-if [ "${REMOTE}" != origin ]; then
-  echo "pre-push: remote '${REMOTE}' não é o origin — PRs vivem no origin; NÃO julguei." >&2
+# julga pelo DESTINO, não pelo nome (menor 7 do Elenxo 2): `git push <url-do-origin>` ou um remote
+# `mirror` com a mesma URL entregavam HARD no PR sem julgamento
+ORIGIN_URL="$(git remote get-url --push origin 2>/dev/null || true)"
+if [ "${REMOTE}" != origin ] && { [ -z "${ORIGIN_URL}" ] || [ "${URL}" != "${ORIGIN_URL}" ]; }; then
+  echo "pre-push: destino '${REMOTE}' não é o origin — PRs vivem no origin; NÃO julguei." >&2
   exit 0
 fi
 MARK="$(git rev-parse --git-common-dir 2>/dev/null)/onion-prefinalize-ok"
@@ -52,6 +55,12 @@ while read -r _lref lsha rref _rsha; do
   case "${rref}" in refs/heads/*) ;; *) continue ;; esac     # tags e afins: fora de escopo
   br="${rref#refs/heads/}"
 
+  # o commit que o pr-finalize ACABOU de julgar não depende do gh (maior 5 do Elenxo 2: com o gh
+  # falhando, o caminho canônico `pr-finalize --push` terminava pedindo --no-verify)
+  if [ -f "${MARK}" ] && [ "$(cat "${MARK}" 2>/dev/null)" = "${lsha}" ]; then
+    echo "pre-push: '${br}' @ ${lsha:0:12} — este commit acabou de passar no pr-finalize (lint 0 HARD); não relinto." >&2
+    continue
+  fi
   num="${ONION_PREPUSH_PR-}"
   if [ -z "${ONION_PREPUSH_PR+x}" ]; then
     if ! command -v gh >/dev/null 2>&1; then
@@ -59,7 +68,7 @@ while read -r _lref lsha rref _rsha; do
       continue
     fi
     gerr="$(mktemp)"
-    num="$(gh pr list --head "${br}" --state open --json number --jq '.[0].number' 2>"${gerr}")"; grc=$?
+    num="$(gh pr list --head "${br}" --state open --json number --jq '.[0].number' 2>"${gerr}" </dev/null)"; grc=$?
     if [ "${grc}" != 0 ]; then
       echo "pre-push: RECUSADO '${br}' — o gh falhou (rc=${grc}: $(head -c 160 "${gerr}")); sem ele não sei se há PR aberto. Autentique o gh ou, se for deliberado, 'git push --no-verify'." >&2
       rm -f "${gerr}"; fail=1; continue
@@ -67,23 +76,19 @@ while read -r _lref lsha rref _rsha; do
     rm -f "${gerr}"
   fi
   [ -n "${num}" ] || continue                                # sem PR aberto: trabalho em curso
-  if [ -f "${MARK}" ] && [ "$(cat "${MARK}" 2>/dev/null)" = "${lsha}" ]; then
-    echo "pre-push: '${br}' (PR #${num}) @ ${lsha:0:12} — este commit acabou de passar no pr-finalize (lint 0 HARD); não relinto." >&2
-    continue
-  fi
 
   lint="${ONION_PREPUSH_LINT:-.claude/validation/lint-artifacts.sh}"
   if [ "${ONION_PREPUSH_NO_WORKTREE:-0}" = 1 ]; then
     wt="${ROOT}"; tmp=""
   else
     tmp="$(mktemp -d)"; wt="${tmp}/wt"
-    if ! git -C "${ROOT}" worktree add -q --detach "${wt}" "${lsha}" 2>/dev/null; then
+    if ! git -C "${ROOT}" worktree add -q --detach "${wt}" "${lsha}" 2>/dev/null </dev/null; then
       echo "pre-push: não consegui montar ${lsha:0:12} para julgar — RECUSO (não sei o que vai)." >&2
       rm -rf "${tmp}"; fail=1; continue
     fi
   fi
   out="$(cd "${wt}" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME="${num}/merge" GITHUB_HEAD_REF="${br}" \
-         LC_ALL=C bash "${lint}" 2>&1)"; rc=$?
+         LC_ALL=C bash "${lint}" 2>&1 </dev/null)"; rc=$?
   if [ -n "${tmp}" ]; then git -C "${ROOT}" worktree remove --force "${wt}" >/dev/null 2>&1; rm -rf "${tmp}"; fi
 
   hard="$(printf '%s\n' "${out}" | grep -oE 'Violações HARD : [0-9]+' | grep -oE '[0-9]+$' | tail -1)"
