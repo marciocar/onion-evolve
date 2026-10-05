@@ -1,0 +1,86 @@
+# kg-backlog-guard: on
+# ═══ TETO: 8 NÓS ═══
+meta:
+  id: radar-E3-2026-10-05-r7
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-10-05
+  review_after: 2026-11-19
+  supersedes_none: >
+    Medido contra a baseline anterior do eixo E3 (radar-E3-2026-10-03-r6, cc 2.1.288): o delta e UMA
+    versao (2.1.289), contigua, e nenhum dos 15 nos da r6 e derrubado — os abertos de la (mods,
+    contiguidade de versao, absorcao) seguem abertos, e esta rodada so acrescenta medicao. O unico
+    item da 2.1.289 que reverte algo da 2.1.288 (o claude auth status do VSCode) nao estava em no
+    nenhum da r6.
+nodes:
+  - id: E_DELTA_E_UMA_VERSAO_CONTIGUA
+    node_type: evidence
+    plane: PROD
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-05'
+    valid_from: '2026-10-03'
+    source_tier: 10
+    source_kind: primary
+    verified_against: 'curl https://code.claude.com/docs/en/changelog (4.086.961 bytes); ancoras id="2-1-NNN": a 2.1.289 vem imediatamente antes da 2.1.288, sem lacuna; claude --version = 2.1.289'
+    trace: 'docs/evolution/research/radar-E3-2026-10-05-r7/data/2.1.289.txt'
+    label: 'O DELTA desde a baseline (2.1.288, 2026-10-03): UMA versao, a 2.1.289 (3 de outubro), com 27 itens — contigua, sem versao faltando (a pergunta da contiguidade que a r6 deixou aberta foi respondida por medicao aqui). Composicao: 15 itens de mods e paineis de plugin, 6 de regras deny/ask e permissoes, 2 do claude plugin validate, 1 de agent.spawn para teammates, 1 revert do VSCode, 2 de render (inclusive artifacts publicados). O bloco esta guardado em data/ para a citacao ser falsificavel sem re-buscar; o extrator desta rodada difere do da r6 so em espaco em volta de codigo inline (89 itens da 2.1.288 conferidos: mesmo texto).'
+
+  - id: E_BYPASS_DE_DENY_ASK_NAO_TOCA_A_CASA
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-05'
+    source_tier: 10
+    verified_against: '.claude/settings.json: permissions tem so allow (13), ZERO deny/ask; seis formas (gh pr merge e git push origin main, nuas e com TZ="$HOME", X=1, env FOO=1, GIT_TRACE=1) contra o pretooluse-merge-gate.sh: rc=2 nas seis'
+    trace: '.claude/hooks/pretooluse-merge-gate.sh'
+    label: 'A 2.1.289 corrige SEIS furos em regras deny/ask: comando atras de prefixo de variavel com valor expandido (o exemplo oficial e TZ="$HOME" rm -rf build) e atribuicao nua antes do comando, ambos sob sandbox auto-allow; parte aninhada de comando composto sobre aprovacao de mod; Read deny via symlink. NAO toca a casa, medido: o core nao usa deny/ask (so 13 allow) — o veto dele e HOOK com exit 2, e o pretooluse-merge-gate barrou as seis formas de prefixo. A classe que o harness acabou de curar nao existe no veto proprio. Fica registrado porque um adotante que use deny rule para isso estava exposto ate a 2.1.288.'
+
+  - id: E_PLUGIN_VALIDATE_FIX_NAO_TOCA_OS_PLUGINS
+    node_type: evidence
+    plane: PROD
+    impact: 2
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-05'
+    source_tier: 10
+    verified_against: 'ls plugins/*/.claude-plugin: capability.json plugin.json provenance.json, nenhum marketplace.json; o marketplace.json mora so na raiz; claude plugin validate plugins/onion --strict: Validation passed'
+    trace: 'plugins/onion/.claude-plugin/plugin.json'
+    label: 'A 2.1.289 corrige o claude plugin validate PULANDO o plugin quando a pasta tambem tinha um manifesto de marketplace — ou seja, ate a 2.1.288 um "validacao passou" ali podia ser validacao que nao rodou. Medido: nenhuma pasta de plugin desta casa tem os dois manifestos juntos (o marketplace.json mora so na raiz), logo os "Validation passed" anteriores eram validacao de verdade.'
+
+  - id: Q_AGENT_SPAWN_E_O_ACOPLAMENTO_DECLARADO_E_NAO_USADO
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: open
+    source_tier: 10
+    label: 'A 2.1.289 adiciona agent.spawn para teammates, um id de agente unico atraves dos eventos de hook de plugin, e estados idle/waiting em $.agent.list(). Isso cruza com a doutrina do CLAUDE.md, que mediu SendMessage em ZERO na maquinaria ("acoplamento declarado e nao usado e a pior categoria"). Nao medido aqui: se algum fluxo da casa (orquestracao, Elenxo, drive) ganharia com o id unico entre hooks — e o primeiro lugar onde ele pagaria e na correlacao de hook com subagente. GATILHO: a proxima forja que precise correlacionar evento de hook com o agente que o disparou.'
+
+  - id: E_REVERT_DO_AUTH_STATUS_NAO_TOCA
+    node_type: evidence
+    plane: PROD
+    impact: 1
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-05'
+    source_tier: 10
+    verified_against: 'git grep "auth status" .claude: 10 ocorrencias em 4 arquivos, TODAS gh auth status (forge, adopt); zero claude auth status'
+    label: 'O unico item que DESFAZ algo da 2.1.288: o [VSCode] reverte uma mudanca no claude auth status que podia aumentar os sign-outs. O core nao invoca claude auth status em script nenhum; registrado so porque e a unica regressao assumida pela fonte no delta.'
+
+edges:
+  - from: E_DELTA_E_UMA_VERSAO_CONTIGUA
+    to: E_BYPASS_DE_DENY_ASK_NAO_TOCA_A_CASA
+    edge_type: SUPPORTS
+  - from: E_DELTA_E_UMA_VERSAO_CONTIGUA
+    to: E_PLUGIN_VALIDATE_FIX_NAO_TOCA_OS_PLUGINS
+    edge_type: SUPPORTS
+  - from: E_DELTA_E_UMA_VERSAO_CONTIGUA
+    to: Q_AGENT_SPAWN_E_O_ACOPLAMENTO_DECLARADO_E_NAO_USADO
+    edge_type: SUPPORTS
+  - from: E_DELTA_E_UMA_VERSAO_CONTIGUA
+    to: E_REVERT_DO_AUTH_STATUS_NAO_TOCA
+    edge_type: SUPPORTS
