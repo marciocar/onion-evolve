@@ -1,0 +1,1459 @@
+meta:
+  id: onion-slm-2026-10
+  schema_version: "1"
+  baseline: 2026-10-05
+  review_after: 2026-11-19   # cadencia LINEUP DE MODELOS = 45d. Justificativa do tipo dominante: 26 das 58
+                             # evidencias ancoradas sao ficha de MODELO (tamanho, licenca, base, data de
+                             # release: GLiNER2.5, GLiNER2-PII, OpenAI Privacy Filter, NuExtract3, Qwen3.5/3.6/
+                             # 3.8, Gemma 4, ZAYA1, EmbeddingGemma, Qwen3-Embedding) e e essa ficha que muda o
+                             # MENU da opcao C. As metades ferramenta (TRL/Unsloth/Tinker, 30d) giram mais
+                             # rapido, mas so importam se o fine-tune abrir, e ele esta GATED; benchmark/paper
+                             # (LoRA Land, KaLLM, Wang 2020, NVIDIA, 120d) e mercado/capital (90d) sao mais
+                             # lentos. Gatilho extra de revisita antecipada: release de um Qwen3.8 <=9B, de um
+                             # GLiNER/OPF com avaliacao em portugues, ou a abertura do gatilho de C.
+  # kg-backlog-guard: on
+  # ═══ TETO: 86 NOS — a rodada de PRIMARIAS NOMEADAS foi EXECUTADA em 2026-10-05 (17 fontes, 17 alcancadas,
+  #     58 claims ancoradas por verificador independente, 28 rejeitadas na ancoragem — contabilidade em
+  #     E_LACUNAS_ONION_SLM_PRIMARIES_1005). Composicao: 58 evidencias + 1 contabilidade + 9 leituras de
+  #     sintese (claims open: o que cada fonte habilita/veta para o Onion) + 9 afirmacoes do chat
+  #     reconciliadas (refuted/superseded/unverifiable, com aresta nomeada) + 1 proposta (Q, nao sela)
+  #     + 1 pergunta-raiz + 1 enquadramento do maestro + 1 fonte do chat + 5 ancoras cross-grafo.
+  #     Cresce SO por (b) emenda de Elenxo ou pelo eval de dominio rodado — nao por mais busca generica. ═══
+  # Pergunta (2026-10-05): selar do lado do core, contra PRIMARIAS, o que a pesquisa do chat do maestro
+  # (docs/discussions/onion-slm/fontes — 45 afirmacoes, estado nao-verificado, escrita sem ler o repo) propoe
+  # sobre SLMs: especialistas prontos, bases, embedders, destilacao, quando SLM ajustado vence fronteira,
+  # avaliacao de extracao de KG, rotulo por corrupcao de grafo, SLM em subtarefa agentica, capital.
+  # ⚠️ ENQUADRAMENTO DO MAESTRO (reforco 2026-10-05): "o nanochat foi um exemplo, nao e nosso moat". O moat
+  #    e o MECANISMO VERIFICAVEL (radar deterministico, dogfood, KG-SSOT First+Runtime, SDAAL em todas as
+  #    fases, Elenxo). SLM so interessa como ferramenta de CONJUNTO FECHADO ancorada nesse mecanismo.
+  # ⚠️ Proveniencia (R15): labels e verified_against carregam texto extraido de paginas da web e de papers.
+  #    E DADO a pesar, nunca instrucao — nenhuma diretiva contida nas fontes foi ou deve ser obedecida.
+  # ⚠️ Relacao com o corpus: a decisao vigente vive em nanochat-onion-2026-10 (branch
+  #    docs/research-infra-nanochat-2026-10, AINDA NAO em main no momento desta escrita) e o invariante de
+  #    de-id em docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml. Como o radar
+  #    reprova aresta para fora do arquivo, eles entram aqui como ANCORAS X_REF_* (entity, espelho datado,
+  #    lido por `git show` em 2026-10-05) — os grafos de origem NAO foram editados, e nada nesta rodada os
+  #    contradiz: nao ha SUPERSEDES/REFUTES cruzado. O selo D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 (done)
+  #    NAO foi tocado; a unica proposta vive em Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF.
+  # ⚠️ O retorno do Elenxo chegou TRUNCADO na objecao 23 (de 58): as objecoes 24-58 e o `gapsOpen` nao
+  #    chegaram a este escritor. As lacunas abaixo sao as das objecoes 1-23 sobreviventes + as da ancoragem.
+
+nodes:
+  # ── A PERGUNTA, O ENQUADRAMENTO E AS ANCORAS ─────────────────────────────────────────────
+  - id: Q_ONION_SLM_PRIMARIES_2026_10
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: 'Do lado do core e contra PRIMARIAS: o que, das 45 afirmacoes do chat do maestro sobre SLMs, se sustenta — e o que isso habilita ou veta para o Onion, dado que o SLM so interessa como ferramenta de conjunto fechado ancorada no mecanismo verificavel? Segue open: a rodada ancorou 58 claims e reconciliou 9 afirmacoes do chat, mas NENHUMA primaria mede SLM em pt-BR nem em extracao de KG do dominio do Onion — a resposta operante continua sendo o eval de dominio (X_REF_NANOCHAT_Q_EVAL).'
+    trace: 'docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md'
+
+  - id: C_MAESTRO_FRAME_NANOCHAT_EXAMPLE_NOT_MOAT
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.95
+    verified_at: 2026-10-05
+    verified_against: 'pedido do maestro relayed verbatim pelo harness deste run: "reforço: o nanochat foi um exemplo, não é nosso moat" — coerente com a memoria quatro-pilares-definidos-pelo-maestro e onion-moat-verifiable-mechanism'
+    label: 'ENQUADRAMENTO DO MAESTRO: o Nanochat foi EXEMPLO de uma rodada anterior, nao o moat. O moat do Onion e o mecanismo verificavel (radar deterministico sem LLM, dogfood, KG-SSOT First+Runtime, SDAAL em todas as fases, Elenxo). Consequencia de leitura para esta rodada: modelo nenhum (pequeno ou grande) e diferencial — o SLM entra so como ferramenta de conjunto fechado plugada por SDAAL e julgada por gate deterministico.'
+    trace: 'harness do workflow onion-research (2026-10-05)'
+
+  - id: X_CHAT_SOURCES_ONION_SLM
+    node_type: entity
+    plane: DEV
+    status: unverifiable
+    impact: 3
+    confidence: 0.3
+    label: 'FONTE DO CHAT do maestro (docs/discussions/onion-slm/fontes): 45 afirmacoes, estado nao-verificado, escrita SEM ler o repo (e por isso propunha um schema de KG inferido, nao o real). Os docs do chat NAO sao verdade: so viram no as afirmacoes ancoradas em primaria; as esticadas estao reconciliadas abaixo como C_CHAT_*. O diretorio nao existe nesta worktree nem em main — so o retorno do run o descreve.'
+    trace: 'docs/discussions/onion-slm/fontes (ausente nesta arvore)'
+
+  - id: X_REF_NANOCHAT_DECISION
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'git show origin/docs/research-infra-nanochat-2026-10:docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml — no D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 com status: done'
+    label: 'ANCORA CROSS-GRAFO (espelho, nao editavel daqui): nanochat-onion-2026-10#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, SELADA done — A operante: nao treinar agora; B/C/D vivas em gatilho nomeado; C so com veiculo que NAO seja o Nanochat (primitiva tipada local sem treino), fine-tune so apos eval de dominio que falhe; E (o Onion como modelo) refutada.'
+    trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 (branch docs/research-infra-nanochat-2026-10)'
+
+  - id: X_REF_NANOCHAT_OPTION_C
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'git show origin/docs/research-infra-nanochat-2026-10 — no C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL com status: open'
+    label: 'ANCORA CROSS-GRAFO: nanochat-onion-2026-10#C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL (open) — SLM-ferramenta de dominio estreito via adapter SDAAL: tarefa tipada de CONJUNTO FECHADO e verificavel, nunca orquestrador; caminho de menor risco = decisao tipada local (llama.cpp + gramatica + n_probs) sobre SLM aberto PRE-TREINADO, sem treino; juiz do Elenxo destilado do Claude VETADO; gatilho = 2o caso de uso de SLM alem do de-id.'
+    trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL (branch docs/research-infra-nanochat-2026-10)'
+
+  - id: X_REF_NANOCHAT_Q_EVAL
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'git show origin/docs/research-infra-nanochat-2026-10 — no Q_EVAL_DE_DOMINIO_DO_ONION com status: open'
+    label: 'ANCORA CROSS-GRAFO: nanochat-onion-2026-10#Q_EVAL_DE_DOMINIO_DO_ONION (open) — o eval de dominio, pre-requisito de B, C e D, que hoje NAO EXISTE: tarefas estreitas com gabarito do proprio corpus (tipo do no, declarado-nao-verificado, orfao, julgar verified_against) + corretor deterministico.'
+    trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#Q_EVAL_DE_DOMINIO_DO_ONION (branch docs/research-infra-nanochat-2026-10)'
+
+  - id: X_REF_NANOCHAT_OBJ_CORRELATED_ERROR
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'git show origin/docs/research-infra-nanochat-2026-10 — no E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR com status: confirmed'
+    label: 'ANCORA CROSS-GRAFO: nanochat-onion-2026-10#E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR (confirmed) — destilar o juiz do Elenxo a partir do Claude produz ERRO CORRELACIONADO com o gerador das claims e destroi a independencia adversarial; juiz SLM so em decisao de conjunto fechado e verificavel.'
+    trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR (branch docs/research-infra-nanochat-2026-10)'
+
+  - id: X_REF_DEID_NONE_FAILSAFE
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml l.140-147 — IN_NONE_FAILSAFE, invariant, status: confirmed'
+    label: 'ANCORA CROSS-GRAFO: classification-por-vertical#IN_NONE_FAILSAFE — de-identification none fail-safe: recusa redigir-e-passar (nao degrada), override humano auditavel. E o 1o caso de uso de SLM no corpus (de-id), e o que torna o especialista de PII a peca mais proxima de uso.'
+    trace: 'docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml#IN_NONE_FAILSAFE'
+
+  # ── EVIDENCIAS ANCORADAS · especialistas prontos: GLiNER2.5 ─────────────────────────────
+  - id: E_GLINER25_SIZES_APACHE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "0.3B (multi), 0.2B (base), 74M (small)" — LOCATOR: fastino.ai/models/gliner2-5, tabela de comparacao, linha MODEL SIZE (PARAMETERS); linha OPEN-SOURCE LICENSE; README, tabela GLiNER2.5 (boundary) e badge/rodape de licenca. ancorada por verificador independente'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: GLiNER2.5 tem tres tamanhos (multi 0.3B, base 0.2B, small 74M) e licenca Apache 2.0; o README confirma Apache 2.0 e a faixa 74M-287M da linha boundary. Elenxo NAO sobreviveu: a diferenca 0.3B x 287M e arredondamento de rotulo. HABILITA: candidato local, licenca permissiva, para extracao tipada de conjunto fechado.'
+    trace: 'https://fastino.ai/models/gliner2-5'
+
+  - id: E_GLINER25_CPU_FIRST_DECLARED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "CPU first: fast local inference on standard hardware — no GPU required" — LOCATOR: github.com/fastino-ai/GLiNER2, README, secao Why GLiNER2? (linha 26). ancorada por verificador independente'
+    source_tier: 6
+    source_kind: repo
+    label: 'ANCORADA como DECLARACAO: o README diz que roda em CPU sem GPU, sem numero de latencia ou throughput. Elenxo SOBREVIVEU: para a VPS do core (compartilhada por 5 contas), roda-em-CPU sem medida e declarado-nao-verificado (behavior-over-declaration). O custo de inferencia NAO foi medido.'
+    trace: 'https://github.com/fastino-ai/GLiNER2'
+
+  # ── GLiNER2-PII ──────────────────────────────────────────────────────────────────────────
+  - id: E_GLINER2PII_NO_CPF_CNPJ_LABEL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Government / tax identifiers government_id, national_id_number, passport_number, drivers_license_number, license_number, tax_id, tax_number" — LOCATOR: arXiv 2605.09973v1, Table 1 (linha Government / tax identifiers). ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: os tipos governamentais do GLiNER2-PII sao genericos — NAO ha CPF nem CNPJ nominal; cobrir ID brasileiro depende de generalizacao do rotulo, que o paper NAO mede. VETA a leitura do chat de que o modelo cobre ID brasileiro.'
+    trace: 'https://arxiv.org/abs/2605.09973v1'
+
+  - id: E_GLINER2PII_PORTUGUESE_SYNTHETIC_CORPUS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "files, in English, French, Spanish, German, Italian, Portuguese, and Dutch, with occasional mixed-language passages." — LOCATOR: arXiv 2605.09973v1, Secao 3 (fim da descricao do corpus); Secao 6 Discussion and Limitations. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: portugues esta entre as 7 linguas do corpus de TREINO, que e inteiramente sintetico (gerado por LLM de fronteira) e sem validacao humana; cobertura multilingue ampla e trabalho futuro. Elenxo SOBREVIVEU: prova portugues no treino, NAO desempenho em pt-BR.'
+    trace: 'https://arxiv.org/abs/2605.09973v1'
+
+  - id: E_GLINER2PII_EVAL_SPY_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "The evaluation covers only legal and medical documents, and the training data are entirely synthetic and have not been validated by human annotators." — LOCATOR: arXiv 2605.09973v1, Secao 6 (Discussion and Limitations); Secao 4 (Benchmark). ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: a avaliacao e so no SPY (200 docs, 2 dominios legal/medical, 7 tipos, ingles provavel); o paper admite escopo limitado, sem benchmark de portugues. Elenxo SOBREVIVEU: o placar 0,471 x 0,373 contra o OPF foi REJEITADO na ancoragem (quote costurada) e, mesmo correto, seria benchmark escolhido pelo autor do modelo contra o concorrente — nao sustenta GLiNER2-PII > OPF para o de-id do Onion.'
+    trace: 'https://arxiv.org/abs/2605.09973v1'
+
+  # ── OpenAI Privacy Filter ────────────────────────────────────────────────────────────────
+  - id: E_OPF_SIZE_LICENSE_LOCAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Small size: Runs in a web browser or on a laptop – 1.5B parameters total and 50M active parameters." — LOCATOR: HF README, Highlights; front-matter license: apache-2.0; README e PDF: sparse mixture-of-experts blocks with 128 experts total and top-4 routing per token. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o OpenAI Privacy Filter tem 1,5B parametros totais / 50M ativos, roda no navegador ou laptop, Apache 2.0, e e pos-treino bidirecional de checkpoint tipo gpt-oss (MoE 128 experts, top-4). Elenxo NAO sobreviveu. HABILITA: candidato LOCAL ao de-id (X_REF_DEID_NONE_FAILSAFE) sem treino.'
+    trace: 'HF README do OpenAI Privacy Filter + Model Card PDF (2026-04-22)'
+
+  - id: E_OPF_F1_BASELINE_VS_CORRECTED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "PII-Masking-300k (baseline) All labels 0.940 0.980 0.960 0.926 PII-Masking-300k (corrected) All labels 0.968 0.981 0.974 0.942" — LOCATOR: Model Card PDF, Table 1 (§7.4.1); §7.2.1 descreve a correcao. ancorada por verificador independente'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o F1 0,974 e o numero CORRIGIDO em tokens, depois de o PROPRIO fornecedor re-rotular o gold (§7.2.1); o baseline e 0,960 em tokens e 0,926 em spans (0,942 corrigido). O chat omitiu baseline x corrigido e token x span. Elenxo SOBREVIVEU: para redacao a unidade relevante e o SPAN — o numero a usar e 0,926/0,942, nao 0,974.'
+    trace: 'Model Card PDF do OpenAI Privacy Filter, Table 1 §7.4.1'
+
+  - id: E_OPF_FINETUNE_SPY_CURVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "0% 0 0.414 0.795 0.545 1% 13 0.888 0.871 0.879 10% 39 0.963 0.960 0.962" — LOCATOR: Model Card PDF, §7.4.2, Table 2 (tambem 50%: 18 / 0.983 / 0.982 / 0.983). ancorada por verificador independente'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: no SPY, o F1 de tokens vai de 0,545 (0% de treino) a 0,879 (1%), 0,962 (10%) e 0,983 (50%). O SPY e sintetico e levemente fora de distribuicao, com politica de rotulo PROPRIA (so o autor da pergunta e PII). Elenxo SOBREVIVEU: parte do salto e adaptacao de POLITICA, nao de dominio — prova que a politica se ajusta com poucos exemplos, NAO que o 54%->96% transfere para pt-BR/CPF. Sustenta a ordem de C: avaliar, e so ajustar se falhar.'
+    trace: 'Model Card PDF do OpenAI Privacy Filter, Table 2 §7.4.2'
+
+  - id: E_OPF_NOT_ANONYMIZATION_GUARANTEE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Privacy Filter is a redaction and data minimization aid, not an anonymization, compliance, or a safety guarantee." — LOCATOR: HF README, Risk: Over-reliance e Recommendations; Model Card PDF capa April 22, 2026 e §4 (evaluate the model in-domain against local policy references). ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: 2026-04-22
+    label: 'ANCORADA: publicado em 22/04/2026; o proprio card recomenda eval NO DOMINIO LOCAL antes de producao e fine-tune quando a politica diverge, e diz que NAO e garantia de anonimizacao. Elenxo NAO sobreviveu. VETA usar o OPF como garantia de de-id sem eval local — e o fornecedor pedindo exatamente o X_REF_NANOCHAT_Q_EVAL.'
+    trace: 'HF README do OpenAI Privacy Filter (Risk: Over-reliance)'
+
+  # ── NuExtract3 ───────────────────────────────────────────────────────────────────────────
+  - id: E_NUEXTRACT3_BASE_LICENSE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "NuExtract3 is based on Qwen3.5-4B, and released under Apache 2.0 license." — LOCATOR: blog NuMind (data May 19, 2026); model card HF (Base Model: Qwen/Qwen3.5-4B-Base). ancorada por verificador independente'
+    source_tier: 8
+    source_kind: vendor-on-self
+    valid_from: 2026-05-19
+    label: 'ANCORADA: NuExtract3 e um VLM de 4B baseado em Qwen3.5-4B, Apache 2.0, lancado em 2026-05-19. Elenxo NAO sobreviveu. HABILITA: especialista pronto de extracao para JSON tipado — o candidato mais proximo da primitiva tipada SEM treino da opcao C.'
+    trace: 'blog NuMind NuExtract3 (2026-05-19) + model card HF'
+
+  - id: E_NUEXTRACT3_MARGIN_VENDOR_INTERNAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.4
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "NuExtract3 outperforms generalist models substantially, beating Gemma 4 by more than 10 points." — LOCATOR: blog NuMind (benchmark estruturado); model card HF, tabela do benchmark interno. ancorada por verificador independente'
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'ANCORADA como MEDICAO PROPRIA: a margem >10 pts sobre Gemma 4 e do benchmark INTERNO da NuMind (~600 docs, sem dataset publico): Gemma-4-E4B-it 0,538 x NuExtract3 0,651; Qwen3.5-9B 0,479 com 170 saidas falhas. Elenxo SOBREVIVEU: e o fornecedor medindo a si mesmo contra concorrente, e parte da distancia e falha de FORMATO dos generalistas — nao serve de evidencia de superioridade em extracao de KG pt-BR.'
+    trace: 'blog NuMind NuExtract3 + model card HF'
+
+  - id: E_NUEXTRACT3_FINETUNE_SCRIPTS_LINKED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.4
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "GitHub Repository](https://github.com/numindai/nuextract) — inference & fine-tuning scripts" — LOCATOR: blog NuMind, links rapidos (Quick Links / Availability). ancorada por verificador independente'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA como LINK: ha scripts de inferencia e fine-tuning apontados no GitHub oficial da NuMind. Elenxo SOBREVIVEU: link existir nao e script funcionando (exit-code-nao-e-a-verificacao); nenhum agente rodou o repo — fine-tune disponivel continua DECLARADO.'
+    trace: 'https://github.com/numindai/nuextract'
+
+  - id: E_NUEXTRACT3_TYPED_TEMPLATES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "supervised learning via next-token prediction" — LOCATOR: blog NuMind, secao de treino e tipos de campo; model card, lista de tipos de template. ancorada por verificador independente'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA PARCIAL: os templates sao JSON tipados (verbatim-string, string, integer, number, date-time, currency, email, country...), o blog fala em 21 tipos de campo e em treino de duas fases (SFT e RL). Elenxo SOBREVIVEU: a quote so sustenta a fase SFT; os 21 tipos e a fase RL nao estao no trecho citado. O formato template-tipado e o que casa com o schema do KG — mas o numero de tipos fica nao-verificado.'
+    trace: 'blog NuMind NuExtract3 + model card HF'
+
+  # ── Bases: Qwen ─────────────────────────────────────────────────────────────────────────
+  - id: E_QWEN35_9B_INDEX_LEAD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Qwen3.5 9B (32) scores roughly double the next closest models under 10B." — LOCATOR: artificialanalysis.ai/articles/qwen3-5-small-models, secao de comparacao. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: analyst
+    label: 'ANCORADA: no Intelligence Index da Artificial Analysis, o Qwen3.5-9B (32) e o mais inteligente abaixo de 10B, cerca do dobro do segundo. Elenxo SOBREVIVEU: e indice GERAL de raciocinio, nao de extracao ou classificacao tipada; e licenca/contexto 262K ficaram SEM citacao ancorada (rebaixamento procedural). Melhor-da-classe nao diz nada sobre aptidao para a primitiva de conjunto fechado.'
+    trace: 'https://artificialanalysis.ai/articles/qwen3-5-small-models'
+
+  - id: E_QWEN38_27B_DENSE_COMPACT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Qwen3.8-27B brings these advances to a compact, deployment-friendly dense model: a native vision-language model that understands images and videos" — LOCATOR: huggingface.co/Qwen/Qwen3.8-27B, model card, introducao. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o Qwen3.8-27B e um modelo DENSO compacto e VLM nativo — compacto aqui e 27B, nao variante <=9B. Elenxo SOBREVIVEU: Apache 2.0 e ago/2026 estao no claim, nao na quote — a existencia do 27B esta provada, a licenca NAO.'
+    trace: 'https://huggingface.co/Qwen/Qwen3.8-27B'
+
+  - id: E_QWEN38_NO_SMALL_VARIANT_AGGREGATOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "There is no Qwen 3.8 at 0.8B, 3B, 9B, 14B, 35B, 70B or 122B." — LOCATOR: codersera.com, secao Why do searches for Qwen 3.8 35B-A3B, 14B and 122B come up empty?. ancorada por verificador independente'
+    source_tier: 4
+    source_kind: aggregator
+    label: 'ANCORADA no AGREGADOR: nao ha Qwen3.8 <=9B; a listagem HF consultada mostra so 27B, Flash-Next 180B e 2.4T-A95B. Coerente, mas Elenxo SOBREVIVEU: ausencia nao provada por listagem completa do org Qwen — e ausencia de evidencia. Para o menu de bases pequenas, o Qwen vigente continua sendo o 3.5.'
+    trace: 'codersera.com (artigo sobre o lineup Qwen 3.8)'
+
+  - id: E_QWEN36_35B_A3B_OPEN_AGGREGATOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.45
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Qwen3.6-35B-A3B is real: 35B total, 3B activated, Apache 2.0, April 2026." — LOCATOR: codersera.com, secao Why do searches for Qwen 3.8 35B-A3B ... come up empty?. ancorada por verificador independente'
+    source_tier: 4
+    source_kind: aggregator
+    label: 'ANCORADA no AGREGADOR: Qwen3.6-35B-A3B aberto (35B total, 3B ativos, Apache 2.0, abr/2026). O Qwen3.7 NAO aparece nem na listagem HF visivel nem no agregador — o status proprietario do 3.7 que o chat afirma NAO foi confirmado por primaria.'
+    trace: 'codersera.com (artigo sobre o lineup Qwen 3.8)'
+
+  # ── Bases: Gemma 4 ──────────────────────────────────────────────────────────────────────
+  - id: E_GEMMA4_APACHE2_STANDARD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "By applying the industry-standard Apache 2.0 license terms, we are providing clarity about developers'' rights and responsibilities" — LOCATOR: Google Open Source Blog, corpo do post. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o Gemma 4 sai sob Apache 2.0 padrao, nao sob os Gemma Terms antigos. Elenxo NAO sobreviveu. VETA a leitura de licenca restritiva; HABILITA o Gemma 4 no menu de bases sem friccao de licenca.'
+    trace: 'Google Open Source Blog — post de lancamento do Gemma 4 (slug /2026/03/)'
+
+  - id: E_GEMMA4_SIZES_HF
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "2.3B effective, 5.1B with embeddings" — LOCATOR: Hugging Face blog gemma4, tabela de modelos. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: vendor-primary
+    label: 'ANCORADA: tamanhos do Gemma 4 na tabela da HF — E2B 2.3B efetivos (5.1B com embeddings), E4B 4.5B (8B), 26B-A4B MoE, 31B denso. Elenxo NAO sobreviveu (coerente com as release notes do Google).'
+    trace: 'https://huggingface.co/blog/gemma4'
+
+  - id: E_GEMMA4_12B_UNIFIED_0603
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Release of Gemma 4 12B Unified." — LOCATOR: ai.google.dev/gemma/docs/releases, entrada de 3 de junho de 2026. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: 2026-06-03
+    label: 'ANCORADA: o Gemma 4 12B Unified (11.95B denso, sem encoder) saiu em 2026-06-03 pelas notas oficiais. Elenxo NAO sobreviveu, com ressalva: a data de lancamento da FAMILIA nas release notes e 2026-03-31, nao 04-02 (data do post) — a afirmacao do chat sobre a data erra, mas o claim que a corrigiria foi rejeitado na ancoragem e por isso nao vira no.'
+    trace: 'https://ai.google.dev/gemma/docs/releases'
+
+  - id: E_GEMMA4_MTP_RELEASE_0416
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Release of Gemma 4 - MTP for E2B, E4B, 31B, and 26B A4B." — LOCATOR: ai.google.dev/gemma/docs/releases, entrada de 16 de abril de 2026. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: 2026-04-16
+    label: 'ANCORADA: em 2026-04-16 houve release de MTP incluindo E2B e E4B — logo E2B/E4B sem atualizacao (chat) esta esticado. Ambiguidade declarada pelo Elenxo: MTP sao cabecas de inferencia, nao re-treino dos pesos; mas o literal do chat cai.'
+    trace: 'https://ai.google.dev/gemma/docs/releases'
+
+  # ── Bases: ZAYA1 ────────────────────────────────────────────────────────────────────────
+  - id: E_ZAYA1_8B_MOE_760M_ACTIVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "a small mixture of experts language model with 760M active parameters and 8.4B total parameters trained end-to-end by Zyphra." — LOCATOR: Model card HF Zyphra/ZAYA1-8B, abertura. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'ANCORADA: ZAYA1-8B e MoE pequeno com 760M parametros ativos e 8.4B totais, treinado de ponta a ponta pela Zyphra. Confirma o <1B ativos do chat.'
+    trace: 'https://huggingface.co/Zyphra/ZAYA1-8B'
+
+  - id: E_ZAYA1_MATH_CODE_POSITIONING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "excels at detailed long-form reasoning especially for mathematical and coding task" — LOCATOR: Model card HF Zyphra/ZAYA1-8B, descricao de capacidade. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o card posiciona o ZAYA1 para raciocinio longo em matematica e codigo e uso on-device — nada de extracao estruturada ou KG. Para a primitiva de conjunto fechado do Onion, nao e o perfil procurado.'
+    trace: 'https://huggingface.co/Zyphra/ZAYA1-8B'
+
+  # ── Embedders ───────────────────────────────────────────────────────────────────────────
+  - id: E_EMBEDDINGGEMMA_308M_MTEB
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "the highest-ranking text-only multilingual embedding model under 500M on the Massive Text Embedding Benchmark (MTEB)" — LOCATOR: HF blog embeddinggemma, introducao. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-primary
+    valid_from: 2025-09-04
+    label: 'ANCORADA: EmbeddingGemma tem 308M parametros, 100+ linguas e era o melhor modelo multilingue so-texto abaixo de 500M no MTEB na publicacao (2025-09-04). HABILITA: embedder local barato para busca semantica sobre o corpus — leaderboard e de 2025, revisitar.'
+    trace: 'https://huggingface.co/blog/embeddinggemma'
+
+  - id: E_QWEN3_EMBEDDING_8B_MTEB_7058
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Alibaba''s `Qwen3-Embedding-8B` scored 70.58 on the MTEB Multilingual leaderboard as of mid-2025, ranking first." — LOCATOR: premai.io blog, narrativa; model card 8B. ancorada por verificador independente'
+    source_tier: 6
+    source_kind: aggregator
+    valid_from: 2025-06-05
+    label: 'ANCORADA: o Qwen3-Embedding-8B fez 70,58 no MTEB multilingual (1o lugar em 2025-06-05), numero coerente com o model card. 8B e grande para embedder local na VPS compartilhada; a familia tem o 0.6B como opcao pequena.'
+    trace: 'premai.io blog (embedders) + model card Qwen3-Embedding-8B'
+
+  - id: E_BGE_M3_AGGREGATOR_DIVERGES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "MTEB score is 63.0. It supports 100+ languages, 8,192 token context, and 1,024-dimensional outputs." — LOCATOR: premai.io blog, secao bge-m3; tabela do model card Qwen3-Embedding-0.6B. ancorada por verificador independente'
+    source_tier: 6
+    source_kind: aggregator
+    label: 'ANCORADA como DIVERGENCIA: o premai.io da bge-m3 = 63,0, mas o model card Qwen3-Embedding-0.6B lista BGE-M3 com Mean(Task) 59,56 contra 64,33 do Qwen3-0.6B. O 63,0 do agregador diverge da primaria e compara metricas possivelmente distintas — numero de embedder so vale com a metrica nomeada.'
+    trace: 'premai.io blog (bge-m3) + model card Qwen3-Embedding-0.6B'
+
+  # ── Destilacao on-policy (Thinking Machines / Tinker) ───────────────────────────────────
+  - id: E_OPD_QWEN3_744_TENTH_COST
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "reaching a higher score of 74.4 on AIME''24 at one-tenth the cost of RL with on-policy distillation" — LOCATOR: blog Thinking Machines (on-policy distillation), Distillation for reasoning, legenda From Qwen3 Technical Report, Table 21. ancorada por verificador independente'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o 67,6% e do relatorio Qwen3 (RL); a destilacao on-policy do Qwen chega a 74,4 no AIME''24 a um decimo do custo do RL. A afirmacao 11 do chat CRUZA duas medicoes distintas. Escopo: raciocinio matematico.'
+    trace: 'https://thinkingmachines.ai/blog/on-policy-distillation/'
+
+  - id: E_TINKER_GA_1212
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Everybody can use Tinker now. The waitlist is over" — LOCATOR: thinkingmachines.ai/news/tinker-general-availability, Dec 12, 2025, secao General availability. ancorada por verificador independente'
+    source_tier: 8
+    source_kind: vendor-on-self
+    valid_from: 2025-12-12
+    label: 'ANCORADA: o Tinker ficou disponivel para todos em 12/12/2025, com Kimi K2 Thinking, Qwen3-VL e scaffolding compativel com a API OpenAI. Escopo: fine-tuning (SFT e RL) como servico; a pagina NAO menciona destilacao.'
+    trace: 'https://thinkingmachines.ai/news/tinker-general-availability'
+
+  - id: E_TINKER_DISTILLATION_RECIPE_767
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "We observe an AIME''24 score of ~76.7% using a rank-128 LoRA after 200 steps with 16k-token rollouts." — LOCATOR: tinker-docs cookbook/recipes/distillation, Distillation for reasoning > On-policy distillation. ancorada por verificador independente'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: a receita de destilacao do Tinker usa aluno Qwen3.5-9B-Base e professor Qwen3.5-9B, single-turn em raciocinio (DeepMath), ~76,7% no AIME''24 com LoRA rank-128 apos 200 passos e rollouts de 16k tokens. E receita de matematica, nao de extracao.'
+    trace: 'tinker-docs cookbook/recipes/distillation'
+
+  - id: E_TINKER_DISTILLATION_KL_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "The only training signal is KL divergence against the teacher." — LOCATOR: tinker-docs cookbook/recipes/distillation, Distillation for multi-turn tool use > Architecture (e Additional details > Reward calculation). ancorada por verificador independente'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o UNICO sinal de treino da receita e KL contra o professor (ha variante multi-turn para tool use). Consequencia para o Onion: o aluno e treinado para IMITAR o professor — e o mecanismo exato do erro correlacionado que veta o juiz do Elenxo destilado do Claude.'
+    trace: 'tinker-docs cookbook/recipes/distillation'
+
+  # ── TRL GKD e Unsloth ───────────────────────────────────────────────────────────────────
+  - id: E_TRL_GKD_EXPERIMENTAL_V026
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Move GKDTrainer to experimental module by @behroozazarkhalili in https://github.com/huggingface/trl/pull/4474" — LOCATOR: huggingface/trl release v0.26.0, secao Experimental. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    valid_from: 2025-12-09
+    label: 'ANCORADA: GKD e Online DPO foram movidos para trl.experimental no TRL v0.26.0 (09/12/2025) — NAO na 0.29 nem em set/2026 como o chat afirma. Para o Onion: a destilacao generalizada esta no modulo experimental ha ~10 meses — API sem garantia de estabilidade.'
+    trace: 'https://github.com/huggingface/trl/releases/tag/v0.26.0'
+
+  - id: E_TRL_V029_SHIMS_REMOVED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Remove deprecated ORPO after moved to experimental by @albertvillanova in https://github.com/huggingface/trl/pull/5050" — LOCATOR: huggingface/trl release v0.29.0, secao Deprecations. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: primary
+    valid_from: 2026-02-25
+    label: 'ANCORADA: no TRL v0.29.0 (25/02/2026) foram REMOVIDOS os shims deprecados de ORPO, CPO, BCO, PPO, PRM, XPO e Judges, ja movidos antes — e remocao do alias antigo, nao o movimento. Explica de onde o chat (e o PR #12097 do Unsloth) tirou a data errada.'
+    trace: 'https://github.com/huggingface/trl/releases/tag/v0.29.0'
+
+  - id: E_UNSLOTH_GKD_CHUNKED_JSD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Neither the student nor the teacher materialises its `(batch, seq, vocab)` logits any more." — LOCATOR: unslothai/unsloth PR #12136, descricao; arquivos unsloth/models/rl_replacements.py e rl.py. ancorada por verificador independente'
+    source_tier: 6
+    source_kind: repo
+    valid_from: 2026-09-28
+    label: 'ANCORADA: o PR #12136 do Unsloth (mergeado 28/09/2026) NAO trata da mudanca de modulo: roteia a destilacao do GKDTrainer por JSD generalizada em chunks sem materializar logits — pico 65,5 GiB -> 7,6 GiB em gemma-3-270m-it, com fallback para a perda densa do TRL (UNSLOTH_GKD_CHUNKED=0). Para o Onion: destilacao cabe em GPU modesta, mas so importa se o fine-tune abrir.'
+    trace: 'https://github.com/unslothai/unsloth/pull/12136'
+
+  # ── LoRA Land: quando SLM ajustado vence fronteira ──────────────────────────────────────
+  - id: E_LORALAND_310_MODELS_AVERAGES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "across 10 base models and 31 tasks for a total of 310 models. We find that 4-bit LoRA fine-tuned models outperform base models by 34 points and GPT-4 by 10 points on average." — LOCATOR: LoRA Land, Abstract; Tabela 2; Secao 6 (LoRA Land). ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: 310 modelos = 10 bases x 31 tarefas, LoRA 4-bit; +34 pts sobre a base e +10 sobre GPT-4 EM MEDIA. Mistral-7B e uma das 10 bases; as 25 LoRAs sobre Mistral-7B sao so o app LoRA Land — o chat confundiu o app com o estudo.'
+    trace: 'https://arxiv.org/abs/2405.00732'
+
+  - id: E_LORALAND_224_OF_310_BEAT_GPT4
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "After fine-tuning, 301/310 models surpass their base model counterpart14 , while 224/310 fine-tuned LLMs surpass the benchmark set by GPT-4 (Table 4)." — LOCATOR: LoRA Land, Secao 4 Results (p.9), Tabelas 3 e 4. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: nem toda combinacao vence — 224/310 (72,3%) superam o GPT-4. O melhor FT por tarefa (0,756) e o MAXIMO entre 10 bases contra GPT-4 0,661, ou seja, selecao. Mistral-7b ajustado: media 0,732; Zephyr 0,742 (melhor media).'
+    trace: 'https://arxiv.org/abs/2405.00732'
+
+  - id: E_LORALAND_CODE_LOSSES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "magicoder humaneval 0.201 0.433 0.829 0.232 -0.396" — LOCATOR: LoRA Land, Secao 4, Tabela 3 (PDF p.10; o claim dizia p.8-9); Apendice C (Mistral-7b). ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: as perdas sao em tarefa AMPLA — codigo (HumanEval via Magicoder) e a pior, melhor FT 0,433 x GPT-4 0,829 (-0,396); MMLU -0,185. Em Mistral-7b, humaneval 0,335 x 0,829, mas gsm8k 0,520 x 0,373. VETA SLM ajustado para tarefa aberta/geradora (codigo, sintese, juizo).'
+    trace: 'https://arxiv.org/abs/2405.00732'
+
+  - id: E_LORALAND_NER_LEGAL_WIKISQL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "wikisql rouge 0.301 0.898 0.909 0.597 -0.011" — LOCATOR: LoRA Land, Secao 4, Tabela 3; Apendice C (colunas mistral-7b e zephyr-7b-beta); Tabela 1; Secao 3.5. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: onde vence e tarefa ESTREITA de conjunto fechado — NER conllpp Mistral-7b 0,986 x GPT-4 0,742; legal 0,602 x 0,305 (zephyr 0,683); customer_support empata em 1,000; wikisql (estruturado gerador) o melhor FT PERDE por -0,011 e o Mistral-7b fica em 0,669. Metrica majoritariamente ROUGE/accuracy. HABILITA a forma de C: classificar/rotular tipado.'
+    trace: 'https://arxiv.org/abs/2405.00732'
+
+  - id: E_LORALAND_DECLARED_LIMITATIONS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Our evaluations are limited to the first 1000 examples of datasets with larger evaluation splits to manage costs while maintaining rigor. This may introduce selection bias" — LOCATOR: LoRA Land, Secao 7 Limitations (p.18); tambem Secao 3.5. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: limitacoes declaradas pelos autores — eval nos primeiros 1000 exemplos (vies de selecao admitido), so prompts zero/one-shot sem CoT nem n-shot (baseline GPT-4 subotimizado), hiperparametros identicos, so 2B e 7B. O +10 sobre GPT-4 e contra um GPT-4 sem prompt engenheirado.'
+    trace: 'https://arxiv.org/abs/2405.00732'
+
+  # ── KaLLM 2026: avaliacao de extracao de KG ─────────────────────────────────────────────
+  - id: E_KALLM_F1_UNDERESTIMATES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Manual review reveals that automatic triple F1 systematically underestimates extraction quality, as a substantial portion of model-predicted triples are textually valid but absent from the incomplete gold annotations." — LOCATOR: KaLLM 2026, Abstract. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: tese central — o F1 automatico de triplas SUBESTIMA sistematicamente a extracao de KG, porque triplas previstas textualmente validas faltam no gold incompleto. Para o eval do Onion: gabarito incompleto pune acerto.'
+    trace: 'KaLLM 2026 (paper) — repo https://github.com/SukSev/kg_benchmarking'
+
+  - id: E_KALLM_615_PCT_ADDITIONAL_SMALL_SAMPLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "The model extracted 205 entities (151 matched, 54 additional) and 156 triples (60 matched, 96 additional). Additional triples account for 61.5% of model predictions" — LOCATOR: KaLLM 2026, Secao 5.2 Manual Evaluation, Aggregate comparison. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: 96 de 156 triplas do Gemini 3 Pro (61,5%) estavam fora do gold, em 10 documentos revisados por 3 avaliadores. Amostra pequena e UM modelo — nao e fator de correcao geral, e indicio de magnitude.'
+    trace: 'KaLLM 2026 (paper) — Secao 5.2'
+
+  - id: E_KALLM_F1_LOWER_BOUND
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Automatic triple F1 should therefore be interpreted as a lower bound on actual extraction quality." — LOCATOR: KaLLM 2026, Secao 5.2, Implications. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: o paper conclui que o F1 de triplas e PISO (lower bound) da qualidade real, nao medida absoluta. Regra de desenho para o eval do Onion: F1 automatico decide so para cima (passou -> passou); reprovacao exige revisao das triplas extras.'
+    trace: 'KaLLM 2026 (paper) — Secao 5.2'
+
+  - id: E_KALLM_THREE_CAUSES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Semantically equivalent relations expressed under different but valid property labels are counted as errors." — LOCATOR: KaLLM 2026, Secao 5.2, Systematic discrepancies, Schema rigidity. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: as tres causas do falso erro sao incompletude da anotacao (projetada da Wikidata), RIGIDEZ DE SCHEMA (rotulos equivalentes penalizados) e validade temporal. O schema do Onion e fechado (11 node_type, 12 edge_type) — a rigidez e controlavel, mas o eval precisa de tabela de equivalencia (ex.: SUPPORTS x CONSTRAINS em dissent que limita).'
+    trace: 'KaLLM 2026 (paper) — Secao 5.2'
+
+  - id: E_KALLM_REPRODUCIBLE_PUBLIC
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "The repository is publicly accessible via GitHub: https: //github.com/SukSev/kg_benchmarking" — LOCATOR: KaLLM 2026, Secao 7 (Availability / Reproducibility). ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: framework, prompts, schema e saidas estao publicos no GitHub; a reproducao depende so da API OpenRouter. HABILITA: molde reaproveitavel para o eval de extracao do Onion (nao rodado nesta rodada).'
+    trace: 'https://github.com/SukSev/kg_benchmarking'
+
+  # ── NVIDIA: SLM em subtarefas agenticas ─────────────────────────────────────────────────
+  - id: E_NVIDIA_LLM_SLM_ALGORITHM_ONE_WAY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "In the following steps, we outline an algorithm that describes one possible way to carry out the change of the underlying model painlessly." — LOCATOR: NVIDIA, Small Language Models are the Future of Agentic AI, Secao 6, paragrafo introdutorio. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: o algoritmo LLM->SLM tem 6 passos (S1-S6) e e apresentado como UMA via possivel, sem validacao empirica.'
+    trace: 'https://arxiv.org/abs/2506.02153'
+
+  - id: E_NVIDIA_S1_INSTRUMENT_CALLS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "The initial step involves deploying instrumentation to log all non-HCI agent calls, capturing input prompts, output responses, contents of individual tool calls, and optionally latency metrics" — LOCATOR: NVIDIA, Secao 6, passo S1. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: S1 exige instrumentar TODAS as chamadas nao-HCI do agente (prompts, respostas, tool calls); o algoritmo pressupoe log de uso real. O Onion tem jornal de workflow (wf_*.json) e sessoes, mas nao um log padronizado de entrada/saida por subtarefa — lacuna nomeada, nao medida.'
+    trace: 'https://arxiv.org/abs/2506.02153'
+
+  - id: E_NVIDIA_S2_10K_100K_EXAMPLES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "(10k-100k examples being sufficient for fine-tuning of small models as a rule of thumb [5, 22]), it is necessary to remove any PII, PHI, or any other application-specific sensitive data" — LOCATOR: NVIDIA, Secao 6, passo S2. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: regra de bolso de 10k-100k exemplos para fine-tuning de SLM, com remocao de PII/PHI antes. O corpus do Onion tem ~4.200 nos (130 grafos) — abaixo do piso da regra para fine-tune por tarefa; reforca A operante e coloca o de-id ANTES de qualquer dataset.'
+    trace: 'https://arxiv.org/abs/2506.02153'
+
+  - id: E_NVIDIA_NARROW_SUBSET_HETEROGENEOUS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Thus, we argue that a SLM appropriately fine-tuned for the selected prompts would suffice while having the above-mentioned benefits of increased efficiency and greater flexibility." — LOCATOR: NVIDIA, Secao 3.4 (A4); abstract. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: SLM basta quando o agente expoe so um subconjunto ESTREITO de capacidades e o SLM e ajustado ao prompt; onde ha conversa geral, os autores preconizam sistemas HETEROGENEOS, nao substituicao total. Casa com C: SLM como ferramenta plugada por SDAAL, LLM continua orquestrador.'
+    trace: 'https://arxiv.org/abs/2506.02153'
+
+  - id: E_NVIDIA_POSITION_PAPER_LIMITS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "We acknowledge that alternative view AV2 is a valid view, with the exact economical considerations being highly case-specific. We believe that the jury is still out on alternative view AV2" — LOCATOR: NVIDIA, Secao 4.2 (Acknowledgment); Apendice B. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: limitacoes proprias — o custo (AV2) depende do caso e o juri nao decidiu; a unica estimativa de substituivel e OPINIAO (MetaGPT 60%, Open Operator 40%, Cradle 70%), sem medicao; tarefas complexas continuam com LLM; e position paper. Nao serve de numero para o Onion.'
+    trace: 'https://arxiv.org/abs/2506.02153'
+
+  # ── Rotulo por corrupcao de grafo ───────────────────────────────────────────────────────
+  - id: E_TRANSE_SINGLE_CORRUPTED_NEGATIVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "For each such triplet, we then sample a single corrupted triplet. The parameters are then updated by taking a gradient step with constant learning rate." — LOCATOR: Bordes et al. 2013 (TransE), §2, paragrafo do algoritmo de otimizacao. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: no TransE ha UM negativo corrompido por tripla positiva por iteracao; a primaria NAO afirma validade dos negativos nem transferencia a erro real (o claim de gabarito-por-construcao foi rejeitado na ancoragem; o proprio paper admite negativos que saem validos). Corrupcao e gerador de TREINO, nao de gabarito.'
+    trace: 'Bordes et al. 2013, Translating Embeddings for Modeling Multi-relational Data (NeurIPS)'
+
+  - id: E_WANG2020_SYNTHETIC_REAL_GAP
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Regarding error detection by all the methods, there exists a big gap in the performance on synthetic and real datasets. This big gap demonstrates the signiﬁcant diﬀerence between synthetic and real errors." — LOCATOR: Wang, Ma, Gao 2020, Introducao (resultados (1)); construcao do dataset em §4.3.2. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: Wang et al. 2020 avaliam deteccao de erro em KG com erros SINTETICOS (corrupcao de cabeca/cauda) e com erros REAIS anotados por humanos (NELL), e medem uma lacuna grande entre os dois. VETA usar rotulo por mutacao como gabarito UNICO do eval de dominio.'
+    trace: 'Wang, Ma, Gao 2020 — deteccao de erro em KG (sintetico x real)'
+
+  - id: E_WANG2020_RECALL_DROP_30PCT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "the Recall of all the methods signiﬁcantly decreases around 30% compared with that on the synthetic dataset. The performance gap between two datasets demonstrates that the real errors are more diﬃcult to be detected than synthetic ones." — LOCATOR: Wang et al. 2020, §4.3.2 General Domain, Real Dataset (Table 3, NELL-314). ancorada por verificador independente'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: a lacuna e quantificada — o recall de todos os metodos cai cerca de 30% do sintetico para o real. O corpus do Onion TEM erros reais rotulados (nos refuted/superseded/drifted com aresta nomeada): sao eles, nao a mutacao, que devem compor o holdout de deteccao.'
+    trace: 'Wang, Ma, Gao 2020 — §4.3.2, Table 3'
+
+  # ── Quando fine-tunar (Hamel Husain) ────────────────────────────────────────────────────
+  - id: E_HAMEL_FINETUNE_WHEN_PROMPT_BALLOONS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "If your prompt is ballooning in an attempt to capture a growing list of rules or conditions...fine-tuning should be useful." — LOCATOR: workshop_1, secao When Should You Fine Tune?. ancorada por verificador independente'
+    source_tier: 7
+    source_kind: engineer
+    label: 'ANCORADA: fine-tunar vale quando o prompt INCHA tentando capturar regras e condicoes de um dominio. No Onion, a doutrina vive no grafo e em regras de lint (deterministicas) — o sintoma prompt-inchado e o gatilho observavel que falta nomear para C.'
+    trace: 'hamel.dev — notas do workshop 1 (fine-tuning)'
+
+  - id: E_HAMEL_DONT_START_WITH_FINETUNE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "don''t start with fine tuning. You can do a lot with prompt engineering. That is much quicker to iterate with." — LOCATOR: workshop_1, secao Philosophy of AI projects (o locator do claim, anti-casos, estava errado). ancorada por verificador independente'
+    source_tier: 7
+    source_kind: engineer
+    label: 'ANCORADA: nao comecar por fine-tuning; prompt engineering primeiro, por velocidade de iteracao. Sustenta A operante e a ordem interna de C.'
+    trace: 'hamel.dev — notas do workshop 1 (fine-tuning)'
+
+  - id: E_HAMEL_ANTICASES_CHANGING_REQUIREMENTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.65
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "requirements change often (requiring re-training)" — LOCATOR: workshop_1, secao When Shouldn''t You Fine Tune? (nao Inappropriate Task Scope). ancorada por verificador independente'
+    source_tier: 6
+    source_kind: engineer
+    label: 'ANCORADA: anti-casos — requisitos que mudam com frequencia (exigem re-treino), ampla gama de habilidades, e regressao com loss padrao. O schema e a doutrina do Onion mudam por PR (Aufhebung continua): pesa CONTRA fine-tune do proprio dominio e A FAVOR de primitiva sem treino com template versionado.'
+    trace: 'hamel.dev — notas do workshop 1 (fine-tuning)'
+
+  - id: E_HAMEL_HONEYCOMB_QUALITATIVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.55
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "faster, more compliant from a data privacy perspective and was higher quality versus gpt 3.5." — LOCATOR: workshop_1, secao Case Study: Honeycomb - NL to Query. ancorada por verificador independente'
+    source_tier: 6
+    source_kind: engineer
+    label: 'ANCORADA: no caso Honeycomb, o modelo ajustado foi mais rapido, mais conforme em privacidade e de maior qualidade que o gpt-3.5 — veredito QUALITATIVO, sem metricas numericas, contra baseline antigo.'
+    trace: 'hamel.dev — notas do workshop 1 (fine-tuning)'
+
+  # ── Mercado / capital ───────────────────────────────────────────────────────────────────
+  - id: E_LIQUID_SERIES_A_250M
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "In the next phase, we will use our Series A funding to scale our compute infrastructure, expedite our product readiness on the edge and on-premise, e.g. LFM inference and fine-tuning stacks" — LOCATOR: liquid.ai/blog/we-raised-250m-to-scale-capable-and-efficient-general-purpose-ai, paragrafo da proxima fase. ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: 2024-12-13
+    label: 'ANCORADA: a Liquid AI anunciou Series A de US$250M em 2024-12-13; tese = escalar computacao e levar inferencia/fine-tuning de LFM a edge/on-premise. A pagina nao nomeia o lider (so cita executivo da AMD).'
+    trace: 'https://www.liquid.ai/blog/we-raised-250m-to-scale-capable-and-efficient-general-purpose-ai'
+
+  - id: E_TML_NVIDIA_INVESTMENT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "NVIDIA has also made a significant investment in Thinking Machines Lab to support the company''s long-term growth." — LOCATOR: thinkingmachines.ai/news/nvidia-partnership, paragrafo de abertura (Mar 10, 2026). ancorada por verificador independente'
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: 2026-03-10
+    label: 'ANCORADA: a Thinking Machines (Tinker, destilacao on-policy) anunciou parceria de gigawatt com a NVIDIA, que fez investimento significativo de valor NAO divulgado, em 2026-03-10. A primaria nao traz valor de rodada.'
+    trace: 'https://thinkingmachines.ai/news/nvidia-partnership'
+
+  - id: E_FASTINO_SEED_175M_KHOSLA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Fastino has secured $17.5 million in seed funding led by Khosla Ventures" — LOCATOR: techcrunch.com/2025/05/07/fastino-trains-ai-models-on-cheap-gaming-gpus-and-just-raised-17-5m-led-by-khosla, lead. ancorada por verificador independente'
+    source_tier: 5
+    source_kind: aggregator
+    valid_from: 2025-05-07
+    label: 'ANCORADA em IMPRENSA (nao primaria): a Fastino (GLiNER2) levantou seed de US$17,5M liderado pela Khosla em 2025-05-07, total ~US$25M; tese de modelos pequenos especificos treinaveis em GPUs de jogo. O texto nao linka anuncio oficial.'
+    trace: 'https://techcrunch.com/2025/05/07/fastino-trains-ai-models-on-cheap-gaming-gpus-and-just-raised-17-5m-led-by-khosla'
+
+  # ── CONTABILIDADE DA RODADA ─────────────────────────────────────────────────────────────
+  - id: E_LACUNAS_ONION_SLM_PRIMARIES_1005
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'retorno do workflow onion-research mode primaries de 2026-10-05: listas de claims ANCORADAS (58), REJEITADAS na ancoragem (28), fontes inalcancaveis (nenhuma) e o Elenxo (TRUNCADO na objecao 23)'
+    source_kind: internal-audit
+    label: 'CONTABILIDADE DA RODADA DE PRIMARIAS (2026-10-05). FONTES: 17 lidas x 0 inalcancaveis (gliner25, gliner2-pii, openai-privacy-filter, nuextract3, qwen35-small, qwen-lineup-38, gemma4, zaya1, embedders, on-policy-distillation, trl-gkd-experimental, lora-land, kallm-2026, nvidia-slm-agentic, kg-corruption-labels, fine-tune-when, market-capital). CLAIMS: 58 ANCORADAS (viraram no) x 28 REJEITADAS na ancoragem (nao viram no): 24 EXAGERADAS, 3 AFIRMADAS-SEM-CITACAO (rebaixadas pelo motor: veredito sem quote/locator), 1 NAO-ENCONTRADA. Rejeitadas e motivo: [gliner25] quatro tarefas (a pagina lista CINCO); Few-NERD 52.37/55.14 (rotulo montado, ha 2o benchmark XNLI); [gliner2-pii] licenca CC BY 4.0 x Apache (CC BY e do DOCUMENTO arXiv, Apache do modelo; 205M reais); placar SPY 0,471 x 0,373 (quote costurada de linhas nao adjacentes, recall medical invertido); [OPF] experimento mede conjunto fechado (inferencia do leitor); linguas/limita pt-BR (o card AVALIA portugues, Tables 7-8); [nuextract3] nao replicado por terceiros (ausencia, nao texto); [qwen35-small] 4 modelos e indice 32/27/16/9, Apache/262K para os quatro, card do 9B Apache/262K->1.010.000 (os tres sem quote/locator); alucinacao 80-82% so no 4B/9B (silencio sobre 0.8B/2B nao e exclusao); [qwen-lineup-38] Flash-Next nao e preview (o card HF diz experimental preview; licenca qwen-community-1.0 tambem na HF); [gemma4] lancado 2026-04-02 (release notes: 2026-03-31); lista dia-zero (lista condensada pelo leitor); [zaya1] HMMT 89.6 (so com Markovian-RSA test-time compute); comparacao so com Qwen3-4B (sao 3 comparadores; Qwen3.5-4B supera o ZAYA1 em GPQA/MMLU-Pro/IFEval); [on-policy-distillation] 70% x 68% como medicoes distintas (o blog nao sustenta); 17.920 x 1.800 GPU-h e 9-30x (NAO-ENCONTRADA: sintese do leitor; numeros sao do relatorio Qwen3); [trl] PR #12097 perda byte a byte e 0.29 moveu (byte-identical so dos arquivos gerados; contradiz release notes); [lora-land] GPT-4 de 2024 obsoleto (juizo do leitor; snapshot 0613 e de fora do doc); [kallm] 4 de fronteira + Mistral e 7B nao sustenta SLM (sao 3+1; extrapolacao de um 7B zero-shot); [nvidia] tarefa-alvo de conjunto fechado e estruturado (o texto nao diz; exemplos incluem sumarizacao e codigo); [kg-corruption] gabarito por construcao (TransE §4.2 admite negativos validos); no real a pista nao existe (mais forte que o texto; secao 4.3.3); Liu 2023/24 ruido semantico (ruido similar tambem e sintetico); [fine-tune-when] consenso Ask HN (opiniao de UM comentarista); custo no dataset (e de outro comentarista); [market-capital] plataformas = Tinker (o corpo nao nomeia Tinker). LACUNAS QUE CONTINUAM ABERTAS: (1) NENHUM especialista (OPF, GLiNER2-PII, GLiNER2.5, NuExtract3) foi medido em pt-BR nem com CPF/CNPJ — o OPF avalia portugues nas Tables 7-8, que esta rodada NAO ancorou; (2) custo de inferencia em CPU na VPS compartilhada NAO medido (GLiNER2.5 CPU-first e declaracao); (3) scripts de fine-tune do NuExtract3 nao rodados; 21 tipos e fase RL sem quote; (4) licenca do Qwen3.8-27B e do Qwen3.5 small sem citacao ancorada; Qwen3.8 <=9B ausente so por agregador; Qwen3.7 proprietario sem primaria; (5) nenhuma primaria mede SLM em EXTRACAO DE KG do dominio do Onion — KaLLM so mede um 7B zero-shot; (6) nenhuma medicao de destilacao fora de raciocinio matematico; (7) o eval de dominio (X_REF_NANOCHAT_Q_EVAL) continua inexistente — e ele, nao esta rodada, que decide C; (8) o Elenxo chegou TRUNCADO na objecao 23: as objecoes 24-58 e o gapsOpen NAO foram lidos por este escritor — re-ler o journal do run antes de citar este no como completo; (9) o diretorio docs/discussions/onion-slm/fontes nao existe nesta arvore — a lista das 45 afirmacoes nao foi conferida uma a uma contra os C_CHAT_* daqui.'
+    trace: 'workflow onion-research (mode primaries), 2026-10-05'
+
+  # ── LEITURAS DE SINTESE: o que habilita / veta para o Onion ─────────────────────────────
+  - id: C_DEID_OFF_THE_SHELF_CANDIDATES
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.65
+    label: 'LEITURA (1o caso de uso, de-id): existem dois especialistas PRONTOS, locais e Apache 2.0 para redacao de PII — OpenAI Privacy Filter (1,5B/50M ativos) e GLiNER2-PII (~0,3B rotulo, 205M reais) — o que HABILITA a opcao C sem treino para o IN_NONE_FAILSAFE. VETA: tratar qualquer um como garantia (o proprio OPF diz que nao e), usar o F1 0,974 (o numero de redacao e span 0,926/0,942), e assumir CPF/CNPJ (nenhum rotulo nominal, nenhuma medida em pt-BR). Pre-requisito: eval in-domain de de-id em pt-BR — o mesmo que o fornecedor recomenda.'
+
+  - id: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.55
+    label: 'LEITURA (extracao tipada de conjunto fechado): NuExtract3 (Qwen3.5-4B, templates JSON tipados, Apache 2.0) e GLiNER2.5 (74M-0.3B, CPU-first declarado, Apache 2.0) sao candidatos ao VEICULO da opcao C SEM treino — template tipado e o formato que casa com o schema fechado do KG (11 node_type, 12 edge_type). VETA: usar a margem >10 pts da NuMind ou o CPU-first da Fastino como evidencia — ambos sao declaracao do fornecedor sobre si; nenhum foi medido em KG pt-BR nem na VPS.'
+
+  - id: C_BASE_MODELS_MENU_2026_10
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    label: 'LEITURA (menu de bases, SO se o eval falhar e o fine-tune abrir): Gemma 4 (Apache 2.0 padrao; E2B/E4B, 12B Unified desde 2026-06-03, 26B-A4B, 31B), Qwen3.5 small (9B lidera o indice GERAL <10B, que nao mede extracao), Qwen3.6-35B-A3B (agregador), ZAYA1-8B (MoE 760M ativos, foco matematica/codigo, sem extracao). Qwen3.8 nao tem variante <=9B (agregador). Nenhuma base e ranqueada por extracao de KG — a escolha seria do eval, nao do leaderboard. GATED: nao ha o que escolher enquanto A for operante.'
+
+  - id: C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    label: 'LEITURA (embedders): EmbeddingGemma (308M, 100+ linguas) e Qwen3-Embedding (0.6B/8B) HABILITAM busca semantica local sobre o corpus como COMPLEMENTO do kg-corpus-grep — nunca substituto do radar deterministico (o moat e o mecanismo verificavel, C_MAESTRO_FRAME_NANOCHAT_EXAMPLE_NOT_MOAT). VETA citar numero de MTEB de agregador sem a metrica nomeada (bge-m3 63,0 x 59,56 na primaria). Nao medido: ganho de recall sobre o grep lexical do corpus.'
+
+  - id: C_DISTILLATION_REAL_BUT_TEACHER_BOUND
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: 'LEITURA (destilacao): destilacao on-policy e real e barata em raciocinio matematico (Qwen3 74,4 a 1/10 do custo do RL; receita Tinker ~76,7% AIME com LoRA r128) e o ferramental existe (GKD em trl.experimental desde v0.26.0; Unsloth chunked JSD 65,5->7,6 GiB). Mas o UNICO sinal e KL contra o professor: o aluno herda o professor. REFORCA o veto ao juiz do Elenxo destilado do Claude (erro correlacionado) e nao diz nada sobre extracao de KG. HABILITA no maximo destilar uma primitiva de conjunto fechado cujo professor seja AUDITADO pelo gate deterministico.'
+
+  - id: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: 'LEITURA (quando SLM ajustado vence): vence em tarefa ESTREITA de conjunto fechado (NER 0,986 x 0,742; legal; classificacao), empata ou perde em estruturado gerador (wikisql -0,011) e perde feio em codigo/conhecimento amplo (humaneval -0,396; MMLU -0,185) — e a media +10 e contra GPT-4 zero-shot com selecao do melhor de 10 bases. Pratica: prompt primeiro; fine-tune so quando o prompt incha; anti-caso = requisitos que mudam (o schema/doutrina do Onion muda por PR). SUSTENTA a ordem de C: primitiva sem treino -> eval -> fine-tune so se falhar; SUSTENTA A operante.'
+
+  - id: C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: 'LEITURA (SLM em subtarefa agentica): o caminho LLM->SLM da NVIDIA e UMA via nao validada (position paper): exige log de todas as chamadas nao-HCI (S1) e 10k-100k exemplos limpos de PII (S2), e vale so onde o agente usa subconjunto estreito, em arquitetura heterogenea. O Onion nao tem o log padronizado por subtarefa nem o volume (corpus ~4.200 nos); a percentagem substituivel do paper e opiniao. HABILITA: nomear o log de entrada/saida da subtarefa como pre-requisito do eval; VETA usar 40-70% substituivel como numero.'
+
+  - id: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    label: 'LEITURA (desenho do eval de dominio): (i) F1 automatico de triplas e PISO, nao medida — gold incompleto e schema rigido punem acerto (KaLLM: 61,5% das triplas do Gemini fora do gold, amostra pequena); logo o gabarito vem de nos SELADOS e o corretor precisa de tabela de equivalencia de rotulo; (ii) rotulo por corrupcao de grafo (TransE: 1 negativo por positivo) serve a TREINO, mas deteccao medida em erro sintetico superestima o real (recall cai ~30%, Wang 2020) — o holdout de deteccao deve usar os ERROS REAIS que o corpus ja rotula (refuted/superseded/drifted com aresta nomeada). O molde do KaLLM e publico e reaproveitavel.'
+
+  - id: C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: 'LEITURA (capital): o dinheiro vai para o MODELO pequeno eficiente/customizavel — Liquid AI US$250M (edge/on-prem, 2024-12), Fastino seed US$17,5M liderado pela Khosla (2025-05, imprensa), NVIDIA em Thinking Machines (2026-03, valor nao divulgado, gigawatt). O escasso que o capital financia vira commodity que o Onion CONSOME via SDAAL; o Onion nao compete ai. Coerente com o enquadramento do maestro: o moat e o mecanismo verificavel, nao o modelo.'
+
+  # ── PROPOSTA (nao sela) ─────────────────────────────────────────────────────────────────
+  - id: Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: 'PROPOSTA AO MAESTRO (eu nunca selo; NAO revisa o selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10): quando o gatilho de C abrir, o eval de dominio comeca medindo ZERO-SHOT os especialistas PRONTOS — OPF e GLiNER2-PII para de-id em pt-BR com CPF/CNPJ; NuExtract3 e GLiNER2.5 para extracao tipada no schema real do KG — contra o baseline do LLM atual, com F1 como piso, holdout de ERROS REAIS do corpus e custo de inferencia MEDIDO na VPS; base para fine-tune so entra se TODOS falharem. Emenda proposta: anexar esta lista de candidatos a C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL e Q_EVAL_DE_DOMINIO_DO_ONION no grafo nanochat (outro branch). Quem decide e o maestro.'
+
+  # ── AFIRMACOES DO CHAT RECONCILIADAS ────────────────────────────────────────────────────
+  - id: C_CHAT_TRL_GKD_MOVED_IN_029
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.1
+    label: 'AFIRMACAO DO CHAT: o GKDTrainer foi movido para trl.experimental na v0.29 / em set/2026. REFUTADA pelas release notes: o movimento foi na v0.26.0 (09/12/2025); a v0.29.0 so removeu shims de outros trainers.'
+
+  - id: C_CHAT_GEMMA4_EDGE_NOT_UPDATED
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 1
+    confidence: 0.2
+    label: 'AFIRMACAO DO CHAT (7): E2B/E4B do Gemma 4 sem atualizacao. REFUTADA no literal: release de MTP para E2B/E4B em 2026-04-16 (cabecas de inferencia, nao re-treino — ambiguidade declarada).'
+
+  - id: C_CHAT_OPF_F1_9743
+    node_type: claim
+    plane: DEV
+    status: superseded
+    impact: 2
+    confidence: 0.3
+    label: 'AFIRMACAO DO CHAT: OpenAI Privacy Filter com F1 de 97,43%. SUPERADA pela leitura qualificada: 0,974 e o F1 de TOKENS no benchmark RE-ROTULADO pelo fornecedor; baseline 0,960 tokens e 0,926 spans.'
+
+  - id: C_CHAT_OPF_FINETUNE_54_TO_96_DOMAIN
+    node_type: claim
+    plane: DEV
+    status: superseded
+    impact: 2
+    confidence: 0.3
+    label: 'AFIRMACAO DO CHAT: o fine-tune leva o OPF de 54% a 96% num dominio novo. SUPERADA: a curva e 0,545 -> 0,879 (1%) -> 0,962 (10%) no SPY sintetico com politica de rotulo propria — parte do salto e adaptacao de POLITICA, nao de dominio.'
+
+  - id: C_CHAT_LORA_LAND_25_MISTRAL_BEAT_GPT4
+    node_type: claim
+    plane: DEV
+    status: superseded
+    impact: 2
+    confidence: 0.3
+    label: 'AFIRMACAO DO CHAT: LoRA Land = 25 LoRAs sobre Mistral-7B que batem o GPT-4. SUPERADA: o estudo sao 310 modelos (10 bases x 31 tarefas); as 25 sobre Mistral sao so o app; 224/310 batem GPT-4, com perdas grandes em codigo.'
+
+  - id: C_CHAT_AIME_676_DISTILLATION
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 2
+    confidence: 0.1
+    label: 'AFIRMACAO DO CHAT (11): a destilacao on-policy chega a 67,6% no AIME. REFUTADA: 67,6% e o RL do relatorio Qwen3; a destilacao on-policy chega a 74,4 a 1/10 do custo do RL — o chat cruzou duas medicoes.'
+
+  - id: C_CHAT_GLINER2PII_COVERS_BR_IDS
+    node_type: claim
+    plane: DEV
+    status: refuted
+    impact: 3
+    confidence: 0.1
+    label: 'AFIRMACAO DO CHAT (leitura): GLiNER2-PII cobre identificadores brasileiros (7 linguas incl. portugues). REFUTADA como afirmacao: nao ha rotulo CPF/CNPJ (so government_id/tax_id genericos), portugues so no corpus SINTETICO de treino e nenhuma avaliacao em portugues.'
+
+  - id: C_CHAT_BGE_M3_MTEB_63
+    node_type: claim
+    plane: DEV
+    status: unverifiable
+    impact: 1
+    confidence: 0.3
+    label: 'AFIRMACAO DO CHAT: bge-m3 = 63,0 no MTEB (via premai.io). NAO VERIFICAVEL como comparacao: a primaria (card Qwen3-Embedding-0.6B) da BGE-M3 = 59,56 Mean(Task); o 63,0 do agregador compara metrica possivelmente distinta.'
+
+  - id: C_CHAT_QWEN37_PROPRIETARY
+    node_type: claim
+    plane: DEV
+    status: unverifiable
+    impact: 1
+    confidence: 0.2
+    label: 'AFIRMACAO DO CHAT (8): o Qwen3.7 e proprietario. NAO VERIFICAVEL: nem a listagem HF visivel nem o agregador mostram o 3.7; sem primaria.'
+
+edges:
+  # ── enquadramento, fonte do chat e ancoras ───────────────────────────────────────────────
+  - from: C_MAESTRO_FRAME_NANOCHAT_EXAMPLE_NOT_MOAT
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: CONSTRAINS
+  - from: C_MAESTRO_FRAME_NANOCHAT_EXAMPLE_NOT_MOAT
+    to: X_REF_NANOCHAT_OPTION_C
+    edge_type: SUPPORTS
+  - from: Q_ONION_SLM_PRIMARIES_2026_10
+    to: X_CHAT_SOURCES_ONION_SLM
+    edge_type: TRACES_TO
+  - from: Q_ONION_SLM_PRIMARIES_2026_10
+    to: X_REF_NANOCHAT_DECISION
+    edge_type: TRACES_TO
+  - from: X_REF_NANOCHAT_DECISION
+    to: X_REF_NANOCHAT_OPTION_C
+    edge_type: CONSTRAINS
+  - from: X_REF_NANOCHAT_OPTION_C
+    to: X_REF_NANOCHAT_Q_EVAL
+    edge_type: DEPENDS_ON
+  - from: X_REF_NANOCHAT_OBJ_CORRELATED_ERROR
+    to: X_REF_NANOCHAT_OPTION_C
+    edge_type: CONSTRAINS
+  - from: X_REF_NANOCHAT_OPTION_C
+    to: X_REF_DEID_NONE_FAILSAFE
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_ONION_SLM_PRIMARIES_1005
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: CONSTRAINS
+  - from: E_LACUNAS_ONION_SLM_PRIMARIES_1005
+    to: Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF
+    edge_type: SUPPORTS
+
+  # ── leituras de sintese respondem a pergunta ─────────────────────────────────────────────
+  - from: C_DEID_OFF_THE_SHELF_CANDIDATES
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: TRACES_TO
+  - from: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: TRACES_TO
+  - from: C_BASE_MODELS_MENU_2026_10
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: TRACES_TO
+  - from: C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: TRACES_TO
+  - from: C_DISTILLATION_REAL_BUT_TEACHER_BOUND
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: TRACES_TO
+  - from: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: TRACES_TO
+  - from: C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: TRACES_TO
+  - from: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: TRACES_TO
+  - from: C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT
+    to: Q_ONION_SLM_PRIMARIES_2026_10
+    edge_type: TRACES_TO
+
+  # ── leituras de sintese x decisao vigente (ancoras) ──────────────────────────────────────
+  - from: C_DEID_OFF_THE_SHELF_CANDIDATES
+    to: X_REF_NANOCHAT_OPTION_C
+    edge_type: SUPPORTS
+  - from: C_DEID_OFF_THE_SHELF_CANDIDATES
+    to: X_REF_DEID_NONE_FAILSAFE
+    edge_type: TRACES_TO
+  - from: C_DEID_OFF_THE_SHELF_CANDIDATES
+    to: X_REF_NANOCHAT_Q_EVAL
+    edge_type: DEPENDS_ON
+  - from: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    to: X_REF_NANOCHAT_OPTION_C
+    edge_type: SUPPORTS
+  - from: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    to: X_REF_NANOCHAT_Q_EVAL
+    edge_type: DEPENDS_ON
+  - from: C_BASE_MODELS_MENU_2026_10
+    to: X_REF_NANOCHAT_Q_EVAL
+    edge_type: DEPENDS_ON
+  - from: X_REF_NANOCHAT_DECISION
+    to: C_BASE_MODELS_MENU_2026_10
+    edge_type: CONSTRAINS
+  - from: C_MAESTRO_FRAME_NANOCHAT_EXAMPLE_NOT_MOAT
+    to: C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT
+    edge_type: CONSTRAINS
+  - from: C_DISTILLATION_REAL_BUT_TEACHER_BOUND
+    to: X_REF_NANOCHAT_OBJ_CORRELATED_ERROR
+    edge_type: SUPPORTS
+  - from: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    to: X_REF_NANOCHAT_DECISION
+    edge_type: SUPPORTS
+  - from: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    to: X_REF_NANOCHAT_OPTION_C
+    edge_type: SUPPORTS
+  - from: C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION
+    to: X_REF_NANOCHAT_Q_EVAL
+    edge_type: DEPENDS_ON
+  - from: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    to: X_REF_NANOCHAT_Q_EVAL
+    edge_type: SUPPORTS
+  - from: C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT
+    to: C_MAESTRO_FRAME_NANOCHAT_EXAMPLE_NOT_MOAT
+    edge_type: SUPPORTS
+
+  # ── a proposta ───────────────────────────────────────────────────────────────────────────
+  - from: C_DEID_OFF_THE_SHELF_CANDIDATES
+    to: Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF
+    edge_type: SUPPORTS
+  - from: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    to: Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF
+    edge_type: SUPPORTS
+  - from: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    to: Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF
+    edge_type: SUPPORTS
+  - from: Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF
+    to: X_REF_NANOCHAT_Q_EVAL
+    edge_type: DEPENDS_ON
+  - from: Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF
+    to: X_REF_NANOCHAT_OPTION_C
+    edge_type: TRACES_TO
+
+  # ── evidencias -> de-id ──────────────────────────────────────────────────────────────────
+  - from: E_OPF_SIZE_LICENSE_LOCAL
+    to: C_DEID_OFF_THE_SHELF_CANDIDATES
+    edge_type: SUPPORTS
+  - from: E_OPF_F1_BASELINE_VS_CORRECTED
+    to: C_DEID_OFF_THE_SHELF_CANDIDATES
+    edge_type: CONSTRAINS
+  - from: E_OPF_FINETUNE_SPY_CURVE
+    to: C_DEID_OFF_THE_SHELF_CANDIDATES
+    edge_type: SUPPORTS
+  - from: E_OPF_NOT_ANONYMIZATION_GUARANTEE
+    to: C_DEID_OFF_THE_SHELF_CANDIDATES
+    edge_type: CONSTRAINS
+  - from: E_OPF_NOT_ANONYMIZATION_GUARANTEE
+    to: X_REF_NANOCHAT_Q_EVAL
+    edge_type: SUPPORTS
+  - from: E_GLINER2PII_NO_CPF_CNPJ_LABEL
+    to: C_DEID_OFF_THE_SHELF_CANDIDATES
+    edge_type: CONSTRAINS
+  - from: E_GLINER2PII_PORTUGUESE_SYNTHETIC_CORPUS
+    to: C_DEID_OFF_THE_SHELF_CANDIDATES
+    edge_type: SUPPORTS
+  - from: E_GLINER2PII_EVAL_SPY_ONLY
+    to: C_DEID_OFF_THE_SHELF_CANDIDATES
+    edge_type: CONSTRAINS
+
+  # ── evidencias -> extracao tipada ────────────────────────────────────────────────────────
+  - from: E_GLINER25_SIZES_APACHE
+    to: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    edge_type: SUPPORTS
+  - from: E_GLINER25_CPU_FIRST_DECLARED
+    to: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    edge_type: CONSTRAINS
+  - from: E_NUEXTRACT3_BASE_LICENSE
+    to: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    edge_type: SUPPORTS
+  - from: E_NUEXTRACT3_MARGIN_VENDOR_INTERNAL
+    to: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    edge_type: CONSTRAINS
+  - from: E_NUEXTRACT3_FINETUNE_SCRIPTS_LINKED
+    to: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    edge_type: SUPPORTS
+  - from: E_NUEXTRACT3_TYPED_TEMPLATES
+    to: C_TYPED_EXTRACTION_OFF_THE_SHELF
+    edge_type: SUPPORTS
+
+  # ── evidencias -> menu de bases ──────────────────────────────────────────────────────────
+  - from: E_QWEN35_9B_INDEX_LEAD
+    to: C_BASE_MODELS_MENU_2026_10
+    edge_type: SUPPORTS
+  - from: E_QWEN38_27B_DENSE_COMPACT
+    to: C_BASE_MODELS_MENU_2026_10
+    edge_type: SUPPORTS
+  - from: E_QWEN38_NO_SMALL_VARIANT_AGGREGATOR
+    to: C_BASE_MODELS_MENU_2026_10
+    edge_type: SUPPORTS
+  - from: E_QWEN36_35B_A3B_OPEN_AGGREGATOR
+    to: C_BASE_MODELS_MENU_2026_10
+    edge_type: SUPPORTS
+  - from: E_GEMMA4_APACHE2_STANDARD
+    to: C_BASE_MODELS_MENU_2026_10
+    edge_type: SUPPORTS
+  - from: E_GEMMA4_SIZES_HF
+    to: C_BASE_MODELS_MENU_2026_10
+    edge_type: SUPPORTS
+  - from: E_GEMMA4_12B_UNIFIED_0603
+    to: C_BASE_MODELS_MENU_2026_10
+    edge_type: SUPPORTS
+  - from: E_GEMMA4_MTP_RELEASE_0416
+    to: C_BASE_MODELS_MENU_2026_10
+    edge_type: SUPPORTS
+  - from: E_ZAYA1_8B_MOE_760M_ACTIVE
+    to: C_BASE_MODELS_MENU_2026_10
+    edge_type: SUPPORTS
+  - from: E_ZAYA1_MATH_CODE_POSITIONING
+    to: C_BASE_MODELS_MENU_2026_10
+    edge_type: CONSTRAINS
+
+  # ── evidencias -> embedders ──────────────────────────────────────────────────────────────
+  - from: E_EMBEDDINGGEMMA_308M_MTEB
+    to: C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT
+    edge_type: SUPPORTS
+  - from: E_QWEN3_EMBEDDING_8B_MTEB_7058
+    to: C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT
+    edge_type: SUPPORTS
+  - from: E_BGE_M3_AGGREGATOR_DIVERGES
+    to: C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT
+    edge_type: CONSTRAINS
+
+  # ── evidencias -> destilacao ─────────────────────────────────────────────────────────────
+  - from: E_OPD_QWEN3_744_TENTH_COST
+    to: C_DISTILLATION_REAL_BUT_TEACHER_BOUND
+    edge_type: SUPPORTS
+  - from: E_TINKER_GA_1212
+    to: C_DISTILLATION_REAL_BUT_TEACHER_BOUND
+    edge_type: SUPPORTS
+  - from: E_TINKER_DISTILLATION_RECIPE_767
+    to: C_DISTILLATION_REAL_BUT_TEACHER_BOUND
+    edge_type: SUPPORTS
+  - from: E_TINKER_DISTILLATION_KL_ONLY
+    to: C_DISTILLATION_REAL_BUT_TEACHER_BOUND
+    edge_type: SUPPORTS
+  - from: E_TINKER_DISTILLATION_KL_ONLY
+    to: X_REF_NANOCHAT_OBJ_CORRELATED_ERROR
+    edge_type: SUPPORTS
+  - from: E_TRL_GKD_EXPERIMENTAL_V026
+    to: C_DISTILLATION_REAL_BUT_TEACHER_BOUND
+    edge_type: SUPPORTS
+  - from: E_TRL_V029_SHIMS_REMOVED
+    to: C_DISTILLATION_REAL_BUT_TEACHER_BOUND
+    edge_type: SUPPORTS
+  - from: E_UNSLOTH_GKD_CHUNKED_JSD
+    to: C_DISTILLATION_REAL_BUT_TEACHER_BOUND
+    edge_type: SUPPORTS
+
+  # ── evidencias -> quando fine-tunar ──────────────────────────────────────────────────────
+  - from: E_LORALAND_310_MODELS_AVERAGES
+    to: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    edge_type: SUPPORTS
+  - from: E_LORALAND_224_OF_310_BEAT_GPT4
+    to: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    edge_type: CONSTRAINS
+  - from: E_LORALAND_CODE_LOSSES
+    to: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    edge_type: SUPPORTS
+  - from: E_LORALAND_NER_LEGAL_WIKISQL
+    to: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    edge_type: SUPPORTS
+  - from: E_LORALAND_DECLARED_LIMITATIONS
+    to: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    edge_type: CONSTRAINS
+  - from: E_HAMEL_FINETUNE_WHEN_PROMPT_BALLOONS
+    to: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    edge_type: SUPPORTS
+  - from: E_HAMEL_DONT_START_WITH_FINETUNE
+    to: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    edge_type: SUPPORTS
+  - from: E_HAMEL_ANTICASES_CHANGING_REQUIREMENTS
+    to: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    edge_type: SUPPORTS
+  - from: E_HAMEL_HONEYCOMB_QUALITATIVE
+    to: C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT
+    edge_type: SUPPORTS
+
+  # ── evidencias -> SLM agentico ───────────────────────────────────────────────────────────
+  - from: E_NVIDIA_LLM_SLM_ALGORITHM_ONE_WAY
+    to: C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION
+    edge_type: CONSTRAINS
+  - from: E_NVIDIA_S1_INSTRUMENT_CALLS
+    to: C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION
+    edge_type: SUPPORTS
+  - from: E_NVIDIA_S2_10K_100K_EXAMPLES
+    to: C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION
+    edge_type: SUPPORTS
+  - from: E_NVIDIA_S2_10K_100K_EXAMPLES
+    to: X_REF_NANOCHAT_DECISION
+    edge_type: SUPPORTS
+  - from: E_NVIDIA_NARROW_SUBSET_HETEROGENEOUS
+    to: C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION
+    edge_type: SUPPORTS
+  - from: E_NVIDIA_NARROW_SUBSET_HETEROGENEOUS
+    to: X_REF_NANOCHAT_OPTION_C
+    edge_type: SUPPORTS
+  - from: E_NVIDIA_POSITION_PAPER_LIMITS
+    to: C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION
+    edge_type: CONSTRAINS
+
+  # ── evidencias -> desenho do eval ────────────────────────────────────────────────────────
+  - from: E_KALLM_F1_UNDERESTIMATES
+    to: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    edge_type: SUPPORTS
+  - from: E_KALLM_615_PCT_ADDITIONAL_SMALL_SAMPLE
+    to: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    edge_type: SUPPORTS
+  - from: E_KALLM_F1_LOWER_BOUND
+    to: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    edge_type: SUPPORTS
+  - from: E_KALLM_THREE_CAUSES
+    to: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    edge_type: SUPPORTS
+  - from: E_KALLM_REPRODUCIBLE_PUBLIC
+    to: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    edge_type: SUPPORTS
+  - from: E_TRANSE_SINGLE_CORRUPTED_NEGATIVE
+    to: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    edge_type: SUPPORTS
+  - from: E_WANG2020_SYNTHETIC_REAL_GAP
+    to: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    edge_type: SUPPORTS
+  - from: E_WANG2020_RECALL_DROP_30PCT
+    to: C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS
+    edge_type: SUPPORTS
+
+  # ── evidencias -> capital ────────────────────────────────────────────────────────────────
+  - from: E_LIQUID_SERIES_A_250M
+    to: C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT
+    edge_type: SUPPORTS
+  - from: E_TML_NVIDIA_INVESTMENT
+    to: C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT
+    edge_type: SUPPORTS
+  - from: E_FASTINO_SEED_175M_KHOSLA
+    to: C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT
+    edge_type: SUPPORTS
+
+  # ── reconciliacao das afirmacoes do chat ─────────────────────────────────────────────────
+  - from: E_TRL_GKD_EXPERIMENTAL_V026
+    to: C_CHAT_TRL_GKD_MOVED_IN_029
+    edge_type: REFUTES
+  - from: E_GEMMA4_MTP_RELEASE_0416
+    to: C_CHAT_GEMMA4_EDGE_NOT_UPDATED
+    edge_type: REFUTES
+  - from: E_OPF_F1_BASELINE_VS_CORRECTED
+    to: C_CHAT_OPF_F1_9743
+    edge_type: SUPERSEDES
+  - from: E_OPF_FINETUNE_SPY_CURVE
+    to: C_CHAT_OPF_FINETUNE_54_TO_96_DOMAIN
+    edge_type: SUPERSEDES
+  - from: E_LORALAND_310_MODELS_AVERAGES
+    to: C_CHAT_LORA_LAND_25_MISTRAL_BEAT_GPT4
+    edge_type: SUPERSEDES
+  - from: E_OPD_QWEN3_744_TENTH_COST
+    to: C_CHAT_AIME_676_DISTILLATION
+    edge_type: REFUTES
+  - from: E_GLINER2PII_NO_CPF_CNPJ_LABEL
+    to: C_CHAT_GLINER2PII_COVERS_BR_IDS
+    edge_type: REFUTES
+  - from: E_BGE_M3_AGGREGATOR_DIVERGES
+    to: C_CHAT_BGE_M3_MTEB_63
+    edge_type: CONSTRAINS
+  - from: E_QWEN36_35B_A3B_OPEN_AGGREGATOR
+    to: C_CHAT_QWEN37_PROPRIETARY
+    edge_type: CONSTRAINS
+  - from: C_CHAT_TRL_GKD_MOVED_IN_029
+    to: X_CHAT_SOURCES_ONION_SLM
+    edge_type: TRACES_TO
+  - from: C_CHAT_GEMMA4_EDGE_NOT_UPDATED
+    to: X_CHAT_SOURCES_ONION_SLM
+    edge_type: TRACES_TO
+  - from: C_CHAT_OPF_F1_9743
+    to: X_CHAT_SOURCES_ONION_SLM
+    edge_type: TRACES_TO
+  - from: C_CHAT_OPF_FINETUNE_54_TO_96_DOMAIN
+    to: X_CHAT_SOURCES_ONION_SLM
+    edge_type: TRACES_TO
+  - from: C_CHAT_LORA_LAND_25_MISTRAL_BEAT_GPT4
+    to: X_CHAT_SOURCES_ONION_SLM
+    edge_type: TRACES_TO
+  - from: C_CHAT_AIME_676_DISTILLATION
+    to: X_CHAT_SOURCES_ONION_SLM
+    edge_type: TRACES_TO
+  - from: C_CHAT_GLINER2PII_COVERS_BR_IDS
+    to: X_CHAT_SOURCES_ONION_SLM
+    edge_type: TRACES_TO
+  - from: C_CHAT_BGE_M3_MTEB_63
+    to: X_CHAT_SOURCES_ONION_SLM
+    edge_type: TRACES_TO
+  - from: C_CHAT_QWEN37_PROPRIETARY
+    to: X_CHAT_SOURCES_ONION_SLM
+    edge_type: TRACES_TO
