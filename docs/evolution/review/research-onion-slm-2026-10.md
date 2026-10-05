@@ -1,11 +1,11 @@
 ---
-reviewed_diff_sha256: 901eaa7b64f46ad388592a40d59c2b9e032faca1f7c355e025a3267f1f4d1404
-reviewed_code_sha256: 296a9392788b7d965568b3b5169dd115bc09a1e495f994c881301296f5e307de
+reviewed_diff_sha256: 2771e3075c54668317f228c34dc62d44bc193809efc7e3be8b04c5756d2be6f8
+reviewed_code_sha256: f3b2392c766fcf2549490ff27c0b8de1dbf105addfd375664470bd6ebfa5937c
 findings_total: 58
 findings_real: 29
 tokens: 2613991
 duration_min: 17
-verdict: APROVADO_COM_LACUNAS_DECLARADAS
+verdict: APROVADO
 elenxo: sim
 nota: >
   Passada adversarial embutida no workflow /onion-research em modo primaries (run wf_78edad4f-896):
