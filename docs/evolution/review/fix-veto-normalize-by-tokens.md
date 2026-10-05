@@ -1,5 +1,5 @@
 ---
-reviewed_diff_sha256: 7c32f33fb3c323066c048b67226d7b0d9477b1ada95df9df8c2eeecea92a3e21
+reviewed_diff_sha256: 948ac3988d2fe1db4671d21347c3a0260ebd13e437ea92298c08cf5787c3de80
 findings_total: 37
 findings_real: 33
 tokens: 401388
@@ -46,3 +46,11 @@ de repo renomeado.
 
 Bancada 186/186; 74/75 mutantes mordem; 22.662 comandos reais reexecutados (0 FP novo, 4 antigos
 curados, 31 artefatos de estado); gate completo do pre-commit verde em `d3783143`.
+
+## Depois da revisão: só a bancada mudou
+
+Dois commits pós-resíduo, ambos na PREPARAÇÃO da família `pretooluse_veto`, nenhum em hook ou lib: o
+git do runner do CI recusa remoto com `/` no nome (`git remote add up/x`), e esse `remote add` sob
+`set -e` abortava o worker 1 antes da soma (exit 128). A preparação agora tolera a falha, e o caso do
+remoto com barra roda onde o git aceita a forma e PULA com motivo onde a recusa. O hash acima cobre
+esses commits.
