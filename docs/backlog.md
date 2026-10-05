@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**336 itens abertos** em 74 grafo(s) com aberto (de 100 no escopo) · 75 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**340 itens abertos** em 75 grafo(s) com aberto (de 101 no escopo) · 76 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -500,6 +500,15 @@
 | 5.7 | `Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA` | onion-plugin-publication-2026-08 | ACHADO LATERAL, medido 2026-09-06 ao trocar o predicado de selo para leitura YAML de verdade: QUATRO .kg.yaml versionados sao ACEI |
 | 5.4 | `Q_BEACON_NAO_LIBERA_NO_STOP` | onion-plugin-publication-2026-08 | ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o  |
 | 5.4 | `Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA` | onion-plugin-publication-2026-08 | CANDIDATO A GUARDA, com o dado que EU NAO TINHA quando decidi nao mecanizar (2026-09-06). Eu recusei mecanizar a classe 'no supera |
+
+## gmill-update-547-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 14.0 | `Q_UPDATE_REMEDE_DEPOIS_DO_MERGE` | gmill-update-547-2026-10 | CURA PROPOSTA (o pedido do hub, conferido no core e coerente com exit-code-nao-e-a-verificacao): o --update regenera as projecoes  |
+| 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | gmill-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
+| 8.5 | `Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN` | gmill-update-547-2026-10 | A CURA DE CLASSE DOS VETOS (PR #921) AINDA ASSUME QUE A PRODUCAO SE CHAMA main. Num adotante com GitFlow cuja producao e master  |
+| 5.1 | `Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA` | gmill-update-547-2026-10 | PEDIDO DE ADOTANTE, medido em dois alvos no mesmo dia: os commits feitos pelos helpers do update (vendor-branch.sh e durable-commi |
 
 ## passada-adversarial-2026-09 — 2 item(ns)
 
