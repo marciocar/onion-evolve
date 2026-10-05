@@ -1213,6 +1213,7 @@ docs/discussions/interface-state-of-art/NOTE-00-sintese.md	C_narrative_beats_cei
 docs/discussions/kg-visualization-dashboards/SEED.md	C_seed_gated	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 docs/discussions/onion-pessoal-app/SEED.md	Q_byok_courtesy_mode	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 docs/discussions/onion-pessoal-marcio/	C_d7_discussion_links	docs/onion/graph/onion-evolution-2026-07-30.kg.yaml
+docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml	X_REF_DEID_NONE_FAILSAFE	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
 docs/discussions/onion-pessoal-marcio/proto/theories/hegel-dialectics.md	SY_evid_hegel_catalog_layer1	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/discussions/onion-pessoal-marcio/research/SYNTHESIS-P2.md	AR_SYNTHESIS_P2	docs/discussions/onion-pessoal-marcio/proto/reconciliation-engine.kg.yaml
 docs/discussions/onion-pessoal-marcio/research/SYNTHESIS-P3.md	AR_SYNTH_P3	docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml
@@ -1673,6 +1674,10 @@ docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	C_
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	E_LACUNAS_NANOCHAT_2026_10	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	Q_EIXO_D_RECONCILE_PARENT_GRAPH	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	Q_EIXO_D_SYNTHETIC_IDENTITY_BUDGET_2026_10	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	X_REF_NANOCHAT_DECISION	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	X_REF_NANOCHAT_OBJ_CORRELATED_ERROR	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	X_REF_NANOCHAT_OPTION_C	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	X_REF_NANOCHAT_Q_EVAL	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_CORPUS_VAZIO_OCR_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_LACUNAS_DECLARADAS_OCR_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_MERCADO_OCR_LOCAL_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
@@ -1735,6 +1740,7 @@ docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md	E_m3_portabilidade_
 docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md	E_m7_ninguem_cita_id_em_pr	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md	E_triagem_virar_status_erraria_80pct	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md	Q_CUSTO_DO_PORTE_NUNCA_MEDIDO	docs/onion/graph/onion-identity-2026-07.kg.yaml
+docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md	Q_ONION_SLM_PRIMARIES_2026_10	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
 docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md	D_ADOPT_REFRAME	docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml
 docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml	Q_SUBMISSAO_AO_PORTAL	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 docs/evolution/research/plugin-language-policy-2026-09/data/venue-community-probe-2026-09-04.json	E_CENSO_VENUE_IDIOMA_0904	docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml
