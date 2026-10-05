@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**331 itens abertos** em 73 grafo(s) com aberto (de 99 no escopo) · 74 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**336 itens abertos** em 74 grafo(s) com aberto (de 100 no escopo) · 75 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -172,6 +172,16 @@
 | 4.8 | `E_DISTRIBUTION_GATEWAYS` | jev-type-safe-ai-2026-10 | NAO CONFIRMADA (a pagina diz; nenhum registro de origem confirma). A lista de distribuicao por gateways de terceiros (Vercel AI Ga |
 | 4.0 | `Q_JEV_ARCHITECTURE_UNKNOWN` | jev-type-safe-ai-2026-10 | Como o JEV e CONSTRUIDO e TREINADO? Hipoteses a testar na rodada seguinte: LLM com decodificacao restrita ao conjunto de rotulos;  |
 | 2.0 | `E_OPENROUTER_SLUG_NOT_CONFIRMED` | jev-type-safe-ai-2026-10 | A unica tentativa de bater a lista de gateways num catalogo de ORIGEM falhou: o slug de OpenRouter citado pelo revendedor devolveu |
+
+## nanochat-eixo-d-2026-10 — 5 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 45.0 | `Q_EIXO_D_SYNTHETIC_IDENTITY_BUDGET_2026_10` | nanochat-eixo-d-2026-10 | EIXO D do estudo Nanochat x Onion — qual o orcamento de dados sinteticos e de identidade para (D) treinar/ajustar modelo com o c |
+| 42.2 | `C_EIXO_D_BUDGET_ORDER_OF_MAGNITUDE_ONLY` | nanochat-eixo-d-2026-10 | RESPOSTA A DUVIDA DO MAESTRO ("qual o orcamento de dados sinteticos e identidade?"): a rodada sustenta so uma ORDEM DE GRANDEZA DE |
+| 19.2 | `C_EIXO_D_OPTION_D_SECOND_GATE_EVAL` | nanochat-eixo-d-2026-10 | Projecao local de C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY (pai): a opcao D CONTINUA GATED e ganha um SEGUNDO gate alem da falta de co |
+| 11.0 | `C_EIXO_D_IDENTITY_IN_WEIGHTS_COSTS_STAGE_RETRAIN` | nanochat-eixo-d-2026-10 | Sentido (a) e S7_claim_analogy_breaks, na forma que a rodada consegue dar: identidade em pesos exige RETREINO DE ESTAGIOS por muda |
+| 7.2 | `Q_EIXO_D_RECONCILE_PARENT_GRAPH` | nanochat-eixo-d-2026-10 | PROPOSTA (o maestro decide; este grafo nao edita o pai nem toca o selo): (1) o selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10  |
 
 ## unidade-bilhetavel-do-onion-2026-10 — 8 item(ns)
 
