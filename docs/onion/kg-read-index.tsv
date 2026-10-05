@@ -154,6 +154,7 @@
 .claude/hooks/pretooluse-merge-gate.sh	E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.claude/hooks/pretooluse-protect-main.sh	Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
 .claude/hooks/session-version-drift.sh	D_REGRA65_MEDE_O_PROCESSO	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/hooks/task-manager-provider-hook.sh	D_FIX_D2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/rules/dissect-lens.md	C_LENTES_CASAM_O_ARTEFATO_NAO_A_INVOCACAO	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
@@ -192,11 +193,13 @@
 .claude/utils/adopt/durable-commit.sh	C_TETO_ADOCAO_INICIAL_NAO_PASSA_A_LISTA	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
 .claude/utils/adopt/durable-commit.sh	E_HAVIA_UMA_QUINTA_COPIA_DA_LISTA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/durable-commit.sh	E_UPDATE_PERDIA_ARQUIVO_NOVO_IGNORADO	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
+.claude/utils/adopt/durable-commit.sh	Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
 .claude/utils/adopt/durable-commit.sh	SY5_adopt_durability_closed	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 .claude/utils/adopt/invite-collaborator.sh	TX_invite	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
 .claude/utils/adopt/regen-baselines.sh	D_ADOPT_MUST_EMIT_MISSING_BASELINES	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/utils/adopt/regen-baselines.sh	E_LISTA_2_REGEN_BASELINES_TOMOU_O_LINT_POR_EMISSOR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/regen-ssot-projections.sh	A_ADOTANTE_GREENFIELD_NASCE_COM_HARD	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
+.claude/utils/adopt/regen-ssot-projections.sh	E_REGEN_POS_MERGE_MUDOU_O_INVENTARIO	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
 .claude/utils/adopt/regen-ssot-projections.sh	E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
 .claude/utils/adopt/scope-claude-gitignore.sh	D_FIX_GAP2	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/utils/adopt/starter-research-seed.sh	E_ADOCAO_COMPLETA_NASCE_VERDE_MEDIDA_0915	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml

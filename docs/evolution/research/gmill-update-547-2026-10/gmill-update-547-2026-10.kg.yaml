@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 6 NÓS ═══
+# ═══ TETO: 7 NÓS ═══  (emenda 6->7 em 2026-10-05: os achados dos dois updates rodados no mesmo dia)
 meta:
   id: gmill-update-547-2026-10
   schema_version: "1"
@@ -57,6 +57,39 @@ nodes:
     trace: '.claude/utils/adopt/vendor-manifest.sh'
     label: 'A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do vendor-manifest so existe para `standalone`; para `hub` e `adopted` o _role_cut e vazio e o corte de comandos de meta/ nem roda — mesmo o resolve-role-bundle declarando, para hub, 23 work_tools que NAO incluem forge. Resultado medido no gmill: a autoria do framework inteira viajou (forge, evolve, create-*, co-announce, co-deliver, federation-publish), contra o adopt.md:94 ("O que NAO ganha: a autoria do framework — Camada 1, so o core"). O forge-guard, mais novo que o pin dele, iria no proximo update. CURA: o corte de comandos de meta/ passa a valer para todo papel com work_tools declarados, com caso de bancada que reprova se um comando core-only aparecer no pacote de hub. GATILHO: antes do proximo --update de qualquer hub.'
 
+  - id: E_REGEN_POS_MERGE_MUDOU_O_INVENTARIO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'update do gmill 547e2e3->ab08cde (branch chore/onion-update-ab08cde675fa, relatorio inbound/2026-10-05-update-ab08cde675fa.md): a regeneracao rodada DEPOIS do merge da onion/vendor levou o inventory.md de 111 para 113 comandos (meta 43->45); uma 2a regeneracao nao mudou nada; a oferta de CI rodada entre o merge e a regeneracao acusou o lint reprovando'
+    trace: '.claude/utils/adopt/regen-ssot-projections.sh'
+    label: 'A CAUSA DO DEFEITO 1 FOI MEDIDA, nao suposta: docs/onion/ NAO viaja na onion/vendor, entao o merge sozinho deixa as projecoes SSOT do alvo defasadas, e qualquer regeneracao feita ANTES do merge fica velha. No update de 2026-10-05 a mitigacao manual (regenerar e re-rodar o lint depois do merge) levou o gmill a 0 HARD medido, e o brain-granaai tambem (0 HARD). Isto vira a cura de Q_UPDATE_REMEDE_DEPOIS_DO_MERGE: o passo (8) do --update passa para depois do merge, e o relatorio carimba o numero dessa passada.'
+
+  - id: Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA
+    node_type: question
+    plane: PROD
+    impact: 3
+    confidence: 0.85
+    status: open
+    verified_at: '2026-10-05'
+    verified_against: 'sinal do brain-granaai 2026-10-05 (antes-do-update-do-core): reescreveram mensagens com filter-branch 3 vezes; nos dois updates de 2026-10-05 os 3 commits de vendor-branch.sh/durable-commit.sh sairam sem assinatura, nos dois alvos'
+    trace: '.claude/utils/adopt/durable-commit.sh'
+    label: 'PEDIDO DE ADOTANTE, medido em dois alvos no mesmo dia: os commits feitos pelos helpers do update (vendor-branch.sh e durable-commit.sh) saem sem a assinatura que o repo exige, e o adotante reescreve historia para corrigir (3 vezes no brain-granaai). CURA: os dois scripts aceitam um trailer por variavel de ambiente (ou leem o attribution do settings.json do alvo) e o anexam as mensagens. GATILHO: a proxima mudanca nos helpers do update — junto com as curas dos defeitos 1 e 2.'
+
+  - id: Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN
+    node_type: question
+    plane: PROD
+    impact: 5
+    confidence: 0.85
+    status: open
+    verified_at: '2026-10-05'
+    verified_against: 'teste do agente de update no brain-granaai (pin ab08cde): git push origin +main -> rc=2 (vetado); git push origin +master -> rc=0 (passa); a producao do alvo e master (GitFlow onion/develop -> develop -> master, estrategia CONFIRMADA pelo maestro em 2026-10-05); o merge-gate nao age no alvo porque depende de ops/pr-merge-verified.sh, que so existe no core'
+    trace: '.claude/hooks/pretooluse-protect-main.sh'
+    label: 'A CURA DE CLASSE DOS VETOS (PR #921) AINDA ASSUME QUE A PRODUCAO SE CHAMA main. Num adotante com GitFlow cuja producao e master — o brain-granaai, cuja estrategia onion/develop -> develop -> master o maestro confirmou em 2026-10-05 — o force-push na producao passa com rc=0: o veto nao protege nada la. Nao e regressao do update; e a fronteira do proprio veto, nao declarada no TETO dele. CURA: a branch protegida passa a ser a de producao RESOLVIDA do repo (gitflow.branch.master, ou a padrao do remoto), com caso de bancada num repo cuja producao e master; e o TETO do grafo vetos-por-tokens-2026-10 ganha esta fronteira. GATILHO: ja disparou — ha adotante desprotegido hoje.'
+
 edges:
   - from: E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1
     to: Q_UPDATE_REMEDE_DEPOIS_DO_MERGE
@@ -66,4 +99,13 @@ edges:
     edge_type: SUPPORTS
   - from: Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE
     to: Q_UPDATE_REMEDE_DEPOIS_DO_MERGE
+    edge_type: CONSTRAINS
+  - from: E_REGEN_POS_MERGE_MUDOU_O_INVENTARIO
+    to: Q_UPDATE_REMEDE_DEPOIS_DO_MERGE
+    edge_type: SUPPORTS
+  - from: Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA
+    to: Q_UPDATE_REMEDE_DEPOIS_DO_MERGE
+    edge_type: CONSTRAINS
+  - from: Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN
+    to: Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE
     edge_type: CONSTRAINS
