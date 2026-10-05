@@ -187,11 +187,11 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.9
-    status: open
-    verified_at: '2026-10-04'
+    status: done
+    verified_at: '2026-10-05'
+    verified_against: 'as sete curas mergeadas em main, cada uma com Elenxo e resido: (1)(2)(3)(7) PR #913; (5) PR #915; (6) PR #914 (REGRA 98); (4) PR #916. O 3o sitio do checkpoint (cycle-completion.sh) ficou como no proprio, open, no grafo evolve-cures-2026-10'
     label: 'O QUE A RODADA PROPOE, em ordem de dano e custo — o evolve PROPOE e nao muta, e a cura e o fluxo normal: (1) ESCAPAR os dois exemplos do create-skill que executam git diff (S, blocker, vivo, viaja para adotante); (2) consertar o link do client-material-doctrine (S, blocker); (3) a census marcar skill como NAO-MEDIVEL e o raio-X tira-las do CONFRONTO (S, blocker, corrige meu proprio trabalho); (4) o checkpoint do drive para o grafo, com o kg-drive-project emitindo CHECKPOINT-PENDENTE (M, blocker); (5) a peca 4 do evolve — o script desta rodada, ja persistido, em `.claude/workflows/evolve.js` com JSON Schema real e Workflow/Agent no allowed-tools (M); (6) forjar a guarda de CLASSE para documentacao lida como invocacao, com o simulador das regex do harness (M-L, o alerta sistemico); (7) corrigir a premissa do D9. GATILHO: o maestro dizer seguir.'
     trace: 'docs/backlog.md'
-    verified_against: 'os 4 blockers e 6 recommended sobreviventes da rodada, cada um com a cura minima proposta pelo worker e conferida pelo juiz'
 
 edges:
   - from: C_CREATE_SKILL_EXECUTA_GIT_DIFF_A_CADA_INVOCACAO

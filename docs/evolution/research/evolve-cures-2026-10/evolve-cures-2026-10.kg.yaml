@@ -64,7 +64,9 @@ nodes:
     plane: DEV
     impact: 5
     confidence: 0.9
-    status: open
+    status: done
+    verified_at: '2026-10-05'
+    verified_against: 'curas 4, 5 e 6 mergeadas: PR #916 (checkpoint do drive), PR #915 (peca 4 do evolve), PR #914 (REGRA 98). Resta aberto so Q_CYCLE_COMPLETION_MEDE_RECENCIA_PELO_STATE, com gatilho proprio'
     label: 'O QUE A LEVA 1 NAO FEZ, em ordem: (4) checkpoint do drive para o grafo + kg-drive-project emitindo CHECKPOINT-PENDENTE; (5) peca 4 do evolve em .claude/workflows/evolve.js com JSON Schema real e Workflow/Agent no allowed-tools, tirando os quatro simbolos fantasmas; (6) guarda de CLASSE para documentacao lida como invocacao, com o simulador das regex do harness. GATILHO: o merge desta leva (o maestro mandou seguir ate o final).'
 
   - id: E_LEVA2_PECA4_DO_EVOLVE
