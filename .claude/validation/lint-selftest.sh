@@ -5774,32 +5774,33 @@ run_pretooluse_veto_selftests() {
 }
 
 # ---------------------------------------------------------------------------
-# Modo resolve-target — exercita .claude/utils/co-evolution/resolve-target.sh (F1.2: targeting fino
-# por seletor no alvo:, reusando graph.sh --triples). Asserções ESTRUTURAIS (não fixam nomes de membro
-# → robusto a mudança de roster). Pula o que depende de membros sem python+yaml.
-# ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
 # Modo pre-push + pr-finalize (2026-10-05) — o fechamento de PR na ordem certa e o gatilho que o cobra.
 # Defeito datado: num dia, #923 e #925 foram ao CI com o painel defasado (REGRA 81) e #924 foi enviado com
-# "Violações HARD : 2" porque o encadeamento lia a PRESENÇA da linha, não o número. As polaridades abaixo
-# rodam o hook com lint STUB (ponto de teste ONION_PREPUSH_LINT) — o lint real é exercido pelo dogfood.
+# "Violações HARD : 2" porque o encadeamento lia a PRESENÇA da linha. O hook roda com lint STUB (ponto de
+# teste, só com ONION_PREPUSH_TEST=1); o lint real é exercido pelo dogfood. Casos do Elenxo (2ª forma):
+# worktree POSITIVA (o mutante que trocava o `worktree add` sobrevivia), gh FALHANDO (B3), marcador.
 # ---------------------------------------------------------------------------
 run_pre_push_selftests() {
   local hook="${REPO_ROOT}/.githooks/pre-push" pf="${REPO_ROOT}/ops/pr-finalize.sh"
   if [ ! -f "${hook}" ] || [ ! -f "${pf}" ]; then record_fail "pre-push" "ausente: ${hook} / ${pf}"; return; fi
   local d; d="$(mktemp -d)"
+  # limpeza mesmo se a família abortar no meio (worktree vazada medida pelo Elenxo)
+  trap 'git -C "${REPO_ROOT}" worktree list --porcelain | sed -n "s#^worktree ##p" | grep -F "'"${d}"'" | xargs -r -n1 git -C "${REPO_ROOT}" worktree remove --force >/dev/null 2>&1; rm -rf "'"${d}"'"' RETURN
   printf '#!/usr/bin/env bash\necho "  Violações HARD : 0"; exit 0\n' > "${d}/ok.sh"
   printf '#!/usr/bin/env bash\necho "VIOLATION: x: REGRA 81 (Painel)"; echo "  Violações HARD : 1"; exit 1\n' > "${d}/bad.sh"
-  # o caso EXATO do defeito: a linha existe, o rc é 0, e o número não é zero
   printf '#!/usr/bin/env bash\necho "  Violações HARD : 2"; exit 0\n' > "${d}/liar.sh"
+  mkdir -p "${d}/ghfail" "${d}/ghpr"
+  printf '#!/usr/bin/env bash\necho "gh: not authenticated" >&2; exit 4\n' > "${d}/ghfail/gh"
+  printf '#!/usr/bin/env bash\necho 9\n' > "${d}/ghpr/gh"
+  chmod +x "${d}/ghfail/gh" "${d}/ghpr/gh"
   local Z=0000000000000000000000000000000000000000 S; S="$(git -C "${REPO_ROOT}" rev-parse HEAD)"
-  _pp() {  # <env> <sha> → rc do hook
+  _pp() {  # <env> <sha> [remote] → rc do hook
     local rc=0
-    printf 'refs/heads/x %s refs/heads/x %s\n' "$2" "${Z}" | (cd "${REPO_ROOT}" && env $1 bash "${hook}" origin u >/dev/null 2>&1) || rc=$?
+    printf 'refs/heads/x %s refs/heads/x %s\n' "$2" "${Z}" | (cd "${REPO_ROOT}" && env ONION_PREPUSH_TEST=1 $1 bash "${hook}" "${3:-origin}" u >/dev/null 2>&1) || rc=$?
     printf '%s' "${rc}"
   }
-  _ppc() {  # <nome> <esperado> <env> <sha>
-    local got; got="$(_pp "$3" "$4")"
+  _ppc() {  # <nome> <esperado> <env> <sha> [remote]
+    local got; got="$(_pp "$3" "$4" "${5:-origin}")"
     if [ "${got}" = "$2" ]; then record_pass "pre-push: $1 (rc=$2)"
     else record_fail "pre-push: $1" "esperava rc=$2, veio rc=${got}"; fi
   }
@@ -5810,18 +5811,70 @@ run_pre_push_selftests() {
   _ppc "sem PR aberto (WIP) com lint ruim → passa"           0 "ONION_PREPUSH_PR= ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
   _ppc "deleção de ref → passa"                              0 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${Z}"
   _ppc "worktree do commit empurrado + HARD → RECUSA"        1 "ONION_PREPUSH_PR=9 ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
+  _ppc "worktree do commit empurrado + 0 HARD → passa"       0 "ONION_PREPUSH_PR=9 ONION_PREPUSH_LINT=${d}/ok.sh" "${S}"
+  _ppc "outro remote → não julga"                            0 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}" "upstream"
+  # gh FALHANDO (sem auth) não pode virar "sem PR" (B3); gh com PR + lint ruim recusa pelo caminho real do gh
+  _ppc "gh falhando (rc=4) → RECUSA, não 'sem PR'"           1 "PATH=${d}/ghfail:${PATH} ONION_PREPUSH_NO_WORKTREE=1 ONION_PREPUSH_LINT=${d}/ok.sh" "${S}"
+  _ppc "gh devolve PR + lint ruim → RECUSA"                  1 "PATH=${d}/ghpr:${PATH} ONION_PREPUSH_NO_WORKTREE=1 ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
+  # sem ONION_PREPUSH_TEST os pontos de teste NÃO valem: um ONION_PREPUSH_PR= vazio não desliga o hook
+  local rc=0
+  printf 'refs/heads/x %s refs/heads/x %s\n' "${S}" "${Z}" | (cd "${REPO_ROOT}" && env PATH="${d}/ghfail:${PATH}" ONION_PREPUSH_PR= bash "${hook}" origin u >/dev/null 2>&1) || rc=$?
+  if [ "${rc}" = 1 ]; then record_pass "pre-push: ponto de teste sem ONION_PREPUSH_TEST é ignorado (rc=1)"
+  else record_fail "pre-push: ponto de teste vazou" "ONION_PREPUSH_PR= sem TEST desligou o hook (rc=${rc})"; fi
+  # marcador do pr-finalize: o MESMO commit não é relintado; outro commit é
+  local mk; mk="$(git -C "${REPO_ROOT}" rev-parse --git-common-dir)/onion-prefinalize-ok"
+  local had=""; [ -f "${mk}" ] && had="$(cat "${mk}")"
+  printf '%s\n' "${S}" > "${mk}"
+  _ppc "marcador = este commit → não relinta (passa)"        0 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
+  printf '%s\n' "deadbeef" > "${mk}"
+  _ppc "marcador de OUTRO commit → relinta (recusa)"         1 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
+  if [ -n "${had}" ]; then printf '%s\n' "${had}" > "${mk}"; else rm -f "${mk}"; fi
   # pr-finalize: recusas que não dependem de lint
-  local o rc
-  rc=0; o="$(cd "${REPO_ROOT}" && git -c advice.detachedHead=false worktree add -q --detach "${d}/det" HEAD 2>&1 && cd "${d}/det" && bash "${pf}" 2>&1)" || rc=$?   # set -e da bancada: recusa esperada não pode abortar a suíte
+  local o
+  rc=0; o="$(cd "${REPO_ROOT}" && git -c advice.detachedHead=false worktree add -q --detach "${d}/det" HEAD 2>&1 && cd "${d}/det" && bash "${pf}" 2>&1)" || rc=$?   # set -e da bancada
   if [ "${rc}" = 1 ] && grep -q 'HEAD destacado' <<< "${o}"; then record_pass "pr-finalize: HEAD destacado → recusa"
   else record_fail "pr-finalize: HEAD destacado" "rc=${rc}: ${o:0:160}"; fi
-  git -C "${REPO_ROOT}" worktree remove --force "${d}/det" >/dev/null 2>&1
   rc=0; o="$(cd "${REPO_ROOT}" && bash "${pf}" --rebase --bogus 2>&1)" || rc=$?
   if [ "${rc}" = 1 ] && grep -q 'argumento desconhecido' <<< "${o}"; then record_pass "pr-finalize: argumento desconhecido → recusa"
   else record_fail "pr-finalize: argumento desconhecido" "rc=${rc}"; fi
-  rm -rf "${d}"
+  # B1 do Elenxo — o motor NÃO LAVA resíduo: sandbox git real com stubs das guardas (a do resíduo é FIEL:
+  # mesmo diff, mesma regra árvore-suja → índice). Medido: a versão defeituosa dá rc=0 no caso do meio.
+  local sb="${d}/b1"
+  git init -q --bare -b main "${sb}/remote.git" && git clone -q "${sb}/remote.git" "${sb}/w" 2>/dev/null
+  if ( cd "${sb}/w" && git config user.email t@t && git config user.name t \
+       && mkdir -p .claude/utils/adopt .claude/validation docs/onion docs/evolution/review \
+       && printf '#!/bin/bash\nexit 0\n' > .claude/utils/adopt/regen-ssot-projections.sh \
+       && printf '#!/bin/bash\nexit 0\n' > .claude/validation/kg-backlog-project.sh \
+       && printf '#!/bin/bash\nprintf "a\\tb\\n"\n' > .claude/validation/kg-trace-resolve.sh \
+       && printf '#!/bin/bash\necho "  Violações HARD : 0"; exit 0\n' > .claude/validation/lint-artifacts.sh \
+       && printf '%s\n' '#!/bin/bash' 'BR="${GITHUB_HEAD_REF:-$(git branch --show-current)}"; R="docs/evolution/review/$(printf "%s" "$BR" | tr / -).md"' \
+            'BASE="$(git merge-base origin/main HEAD)"' \
+            'if git diff --quiet HEAD; then S="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color "$BASE" HEAD -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64)"' \
+            'else S="$(git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color --cached "$BASE" -- . ":(exclude)docs/evolution/review" | sha256sum | cut -c1-64)"; fi' \
+            'D="$(sed -n "s/^reviewed_diff_sha256: *//p" "$R" 2>/dev/null)"' \
+            '[ "$D" = "$S" ] && echo "  ✅ casa" || echo "  ✗ ARTEFATO-CADUCO atual $S"' > .claude/validation/review-artifact-check.sh \
+       && chmod +x .claude/utils/adopt/*.sh .claude/validation/*.sh && echo base > docs/backlog.md \
+       && git add -A && git commit -qm base && git push -q origin main && git switch -q -c feat/x ) >/dev/null 2>&1; then
+    local R=docs/evolution/review/feat-x.md r1=0 r2=0 r3=0
+    ( cd "${sb}/w" && echo v1 > a.txt && printf -- '---\nreviewed_diff_sha256: pendente\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
+    (cd "${sb}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "${pf}" -m t1 >/dev/null 2>&1) || r1=$?
+    ( cd "${sb}/w" && echo v2 > a.txt && git add a.txt ) >/dev/null 2>&1
+    (cd "${sb}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "${pf}" -m t2 >/dev/null 2>&1) || r2=$?
+    ( cd "${sb}/w" && git reset -q a.txt && git checkout -q a.txt && echo mudou >> docs/backlog.md && git add docs/backlog.md ) >/dev/null 2>&1
+    (cd "${sb}/w" && ONION_FINALIZE_CHECKPOINT=1 bash "${pf}" -m t3 >/dev/null 2>&1) || r3=$?
+    if [ "${r1}" = 0 ]; then record_pass "pr-finalize: resíduo novo (pendente) → carimba"; else record_fail "pr-finalize: resíduo novo" "rc=${r1}"; fi
+    if [ "${r2}" = 1 ]; then record_pass "pr-finalize: CÓDIGO mudou depois da revisão → RECUSA (não lava o resíduo)"; else record_fail "pr-finalize: lavou o resíduo" "código mudou e o motor saiu rc=${r2}"; fi
+    if [ "${r3}" = 0 ]; then record_pass "pr-finalize: só projeção mudou → recarimba"; else record_fail "pr-finalize: projeção" "rc=${r3}"; fi
+  else
+    record_fail "pr-finalize: sandbox do B1" "não montou o repositório de teste"
+  fi
 }
 
+# ---------------------------------------------------------------------------
+# Modo resolve-target — exercita .claude/utils/co-evolution/resolve-target.sh (F1.2: targeting fino
+# por seletor no alvo:, reusando graph.sh --triples). Asserções ESTRUTURAIS (não fixam nomes de membro
+# → robusto a mudança de roster). Pula o que depende de membros sem python+yaml.
+# ---------------------------------------------------------------------------
 run_resolve_target_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/co-evolution/resolve-target.sh"
   if [ ! -f "${helper}" ]; then record_fail "resolve-target" "helper ausente: ${helper}"; return; fi

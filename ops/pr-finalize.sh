@@ -27,8 +27,14 @@
 #     acrescenta as projeções geradas e o carimbo do resíduo. Nunca faz `git add -A`.
 #   · os commits que ele cria respeitam os hooks (sem --no-verify), salvo ONION_FINALIZE_CHECKPOINT=1,
 #     que é checkpoint DECLARADO — nesse caso o gate final é o CI.
-#   · exit 0 só com: lint em "Violações HARD : 0" literal (rc lido), resíduo ✅ casando com o diff, painel
-#     estável em duas regenerações seguidas. Qualquer outra coisa = exit 1, nada enviado.
+#   · exit 0 só com: lint em "Violações HARD : 0" literal (rc lido) julgado sobre o COMMIT (worktree destacada
+#     do HEAD, com o env do CI — o mesmo que o pre-push e o runner veem), resíduo ✅, painel estável.
+#     Qualquer outra coisa = exit 1, nada enviado (commits locais já feitos FICAM, e a mensagem diz).
+#   · NÃO LAVA RESÍDUO (bloqueador B1 do Elenxo, 2026-10-05): a 1ª versão recarimbava o hash de um resíduo
+#     caduco mesmo quando o CÓDIGO tinha mudado depois da revisão — código não revisado saía com carimbo de
+#     revisado. Agora o resíduo guarda também `reviewed_code_sha256` (o diff SEM as projeções geradas), e o
+#     recarimbo só acontece se esse hash não mudou. Resíduo novo (`reviewed_diff_sha256: pendente`) é a
+#     declaração de quem revisou: carimba os dois. Código mudado depois da revisão = recusa, "re-revise".
 #   · --push envia a branch atual; nunca a main (o veto de push protege, e este script recusa antes).
 set -uo pipefail
 
@@ -54,7 +60,20 @@ try: print(json.load(open(".claude/settings.json",encoding="utf-8")).get("attrib
 except Exception: print("")' 2>/dev/null)}"
 VERIFY=(); [ "${ONION_FINALIZE_CHECKPOINT:-0}" = 1 ] && VERIFY=(--no-verify)
 
-GENERATED="docs/onion/inventory.md docs/onion/graph.md docs/onion/testing-state.md docs/onion/testing-inventory.md docs/onion/kg-read-index.tsv docs/onion/federation-console.html docs/backlog.md"
+# .claude/validation/lint-rules.md (REGRA 39) também é regenerado pelo regen-ssot-projections.sh: fora da
+# lista, ficava regenerado na árvore e defasado no commit (bloqueador B2 do Elenxo).
+GENERATED="docs/onion/inventory.md docs/onion/graph.md docs/onion/testing-state.md docs/onion/testing-inventory.md docs/onion/kg-read-index.tsv docs/onion/federation-console.html docs/backlog.md .claude/validation/lint-rules.md"
+RES="docs/evolution/review/$(printf '%s' "${BR}" | tr / -).md"
+# Julga SEMPRE no contexto de PR, como o runner (antes do `gh pr create` a guarda do resíduo dizia "fora de
+# escopo" e o motor aceitava — maior M3 do Elenxo). Número real se houver; 0 se ainda não há PR.
+PRNUM="$(gh pr list --head "${BR}" --state open --json number --jq '.[0].number' 2>/dev/null || true)"
+_ci() { GITHUB_EVENT_NAME=pull_request GITHUB_HEAD_REF="${BR}" GITHUB_REF_NAME="${PRNUM:-0}/merge" "$@"; }
+_codehash() {  # hash do diff do ÍNDICE contra a base, SEM o resíduo e SEM as projeções geradas
+  local base ex=(":(exclude)docs/evolution/review") g
+  base="$(git merge-base origin/main HEAD 2>/dev/null)" || die "sem merge-base com origin/main"
+  for g in ${GENERATED}; do ex+=(":(exclude)${g}"); done
+  git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color --cached "${base}" -- . "${ex[@]}" | sha256sum | cut -c1-64
+}
 
 if [ "${REBASE}" = 1 ]; then
   # o --autostash devolveria o conteúdo stageado FORA do índice, e ele sumiria do commit em silêncio
@@ -75,6 +94,9 @@ if [ "${REBASE}" = 1 ]; then
     [ -d "$(git rev-parse --git-path rebase-merge)" ] || [ -d "$(git rev-parse --git-path rebase-apply)" ] \
       && { git rebase --abort >/dev/null 2>&1; die "rebase não terminou — abortado, nada mudou"; }
   fi
+  # o rebase pode falhar SEM deixar estado (ex.: arquivo não rastreado que a main traz) — e a 1ª versão
+  # declarava "rebaseado" assim mesmo (maior M2 do Elenxo). A prova é a ancestralidade, não a mensagem.
+  git merge-base --is-ancestor origin/main HEAD || die "o rebase NÃO trouxe a origin/main para baixo do HEAD — nada a enviar"
   echo "PR-FINALIZE: rebaseado sobre origin/main @ $(git rev-parse --short origin/main)"
 fi
 
@@ -108,7 +130,31 @@ _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo
   # pre-commit já encontrar o resíduo casando. A 1ª versão commitava as projeções e SÓ DEPOIS carimbava:
   # depois de um --rebase o gate do commit de projeções reprovava pela REGRA 56 (PR aberto carrega
   # RESÍDUO da passada adversarial) antes de o carimbo chegar (dogfood no PR #924, 2026-10-05).
-  local res="docs/evolution/review/$(printf '%s' "${BR}" | tr / -).md" out sha
+  local out sha decl code rcode
+  out="$(_ci bash .claude/validation/review-artifact-check.sh . 2>&1)"
+  [ -f "${RES}" ] || die "resíduo ausente: ${RES} — escreva a passada adversarial (REGRA 56) e rode de novo"
+  code="$(_codehash)"
+  rcode="$(sed -n 's/^reviewed_code_sha256: *//p' "${RES}" | head -1)"
+  if grep -q '✅' <<< "${out}"; then
+    # casando: só garante o hash de código (resíduos antigos não o tinham)
+    [ -n "${rcode}" ] || { sed -i "/^reviewed_diff_sha256:/a reviewed_code_sha256: ${code}" "${RES}"; git add -- "${RES}"; }
+    return 0
+  fi
+  sha="$(grep -oE '(atual|diff é) [0-9a-f]{64}' <<< "${out}" | grep -oE '[0-9a-f]{64}' | tail -1)"
+  [ -n "${sha}" ] || die "a guarda do resíduo não deu hash nem ✅ no contexto de PR: ${out##*$'\n'}"
+  decl="$(sed -n 's/^reviewed_diff_sha256: *//p' "${RES}" | head -1)"
+  if ! grep -qE '^[0-9a-f]{64}$' <<< "${decl}"; then
+    :   # resíduo NOVO (pendente): é a declaração de quem revisou — carimba os dois
+  elif [ -z "${rcode}" ]; then
+    die "resíduo caduco e SEM reviewed_code_sha256 — não dá para provar que só as projeções mudaram; re-revise e ponha 'reviewed_diff_sha256: pendente'"
+  elif [ "${rcode}" != "${code}" ]; then
+    die "o CÓDIGO mudou depois da revisão (hash de código ${rcode:0:12} → ${code:0:12}) — re-revise e ponha 'reviewed_diff_sha256: pendente'; o motor não recarimba revisão que não houve"
+  fi
+  sed -i "s/^reviewed_diff_sha256: .*/reviewed_diff_sha256: ${sha}/" "${RES}"
+  if grep -q '^reviewed_code_sha256:' "${RES}"; then sed -i "s/^reviewed_code_sha256: .*/reviewed_code_sha256: ${code}/" "${RES}"
+  else sed -i "/^reviewed_diff_sha256:/a reviewed_code_sha256: ${code}" "${RES}"; fi
+  git add -- "${RES}"
+}" | tr / -).md" out sha
   out="$(bash .claude/validation/review-artifact-check.sh . 2>&1)"
   grep -q '✅' <<< "${out}" && return 0
   sha="$(grep -oE '(atual|diff é) [0-9a-f]{64}' <<< "${out}" | grep -oE '[0-9a-f]{64}' | tail -1)"
@@ -130,17 +176,22 @@ for _i in 1 2 3; do
   _commit "docs(testing): projeções regeneradas e resíduo recarimbado"
   [ "${_i}" = 3 ] && die "projeções não estabilizaram em 3 voltas — há gerador lendo o próprio resultado"
 done
-# 4. o veredito: número LIDO, nunca a presença da linha
-_lint="$(LC_ALL=C bash .claude/validation/lint-artifacts.sh 2>&1)"; _rc=$?
+# 3. o veredito sobre o COMMIT, não a árvore (bloqueador B2): worktree destacada do HEAD, env do CI
+git diff --cached --quiet || die "sobrou conteúdo stageado fora do commit — nada enviado"
+_tmp="$(mktemp -d)"; trap 'git worktree remove --force "${_tmp}/wt" >/dev/null 2>&1; rm -rf "${_tmp}"' EXIT
+git worktree add -q --detach "${_tmp}/wt" HEAD || die "não montei o HEAD para julgar"
+_lint="$(cd "${_tmp}/wt" && _ci env LC_ALL=C bash .claude/validation/lint-artifacts.sh 2>&1)"; _rc=$?
 _hard="$(grep -oE 'Violações HARD : [0-9]+' <<< "${_lint}" | grep -oE '[0-9]+$' | tail -1)"
-[ "${_rc}" = 0 ] && [ "${_hard}" = 0 ] || die "lint rc=${_rc}, HARD=${_hard:-?} — nada enviado. $(grep '^VIOLATION' <<< "${_lint}" | head -3)"
-_res="$(bash .claude/validation/review-artifact-check.sh . 2>&1)"
-grep -q '✅\|ISENCAO\|não julgou\|nao julgou\|fora de escopo' <<< "${_res}" || die "resíduo não casa com o diff — nada enviado"
+[ "${_rc}" = 0 ] && [ "${_hard}" = 0 ] || die "lint do COMMIT rc=${_rc}, HARD=${_hard:-?} — nada enviado (os commits locais ficam). Rode o lint para ver os HARD."
+# marcador para o pre-push não relintar o MESMO commit (maior M6: ~11 min por fechamento com lint duplicado)
+printf '%s\n' "$(git rev-parse HEAD)" > "$(git rev-parse --git-common-dir)/onion-prefinalize-ok"
 echo "PR-FINALIZE: ${BR} pronto — 0 HARD, resíduo casando, projeções estáveis."
 # 5. push só por pedido explícito
 if [ "${PUSH}" = 1 ]; then
   # --force-with-lease: depois de --rebase o push é reescrita da PRÓPRIA branch; o lease recusa se o
   # remoto andou por outra mão. Nunca é a main: a branch foi recusada lá em cima.
-  git push -q --force-with-lease origin "${BR}" || die "push recusado (o pre-push julga o commit; veja a mensagem dele)"
+  # --force-if-includes: depois do `git fetch` do --rebase o lease simples fica vazio e apagava commit de
+  # outra mão no remoto (maior M1 do Elenxo, reproduzido e curado com este par).
+  git push -q --force-with-lease --force-if-includes origin "${BR}" || die "push recusado (o pre-push julga o commit; veja a mensagem dele)"
   echo "PR-FINALIZE: enviado ${BR} @ $(git rev-parse --short HEAD)"
 fi
