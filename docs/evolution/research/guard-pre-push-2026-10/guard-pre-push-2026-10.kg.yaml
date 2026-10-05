@@ -1,0 +1,66 @@
+# kg-backlog-guard: on
+# ═══ TETO: 6 NÓS ═══
+meta:
+  id: guard-pre-push-2026-10
+  schema_version: "1"
+  baseline: 2026-10-05
+  review_after: 2026-11-19
+  # Forja (/meta:forge-guard) do fechamento de PR do core: o MOTOR ops/pr-finalize.sh (a sequência certa)
+  # e o GATILHO .githooks/pre-push (que a cobra sem depender de alguém lembrar). Pedido do maestro no
+  # mesmo dia do defeito: "e ajustar para não errar mais", e depois "revise sua sugestão e, se for a
+  # melhor opção, faça da maneira certa, com dogfood".
+nodes:
+  - id: E_TRES_PRS_AO_CI_COM_LINT_VERMELHO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'CI dos PRs #923 (run 37335747234) e #925 (run 37337285721): REGRA 81 (Painel de estado é GERADO dos produtores, nunca redigido) — testing-state.md defasado; #924 enviado com "Violações HARD : 2" porque o encadeamento `lint | grep "Violações HARD" && push` lia a PRESENÇA da linha'
+    trace: 'ops/pr-finalize.sh'
+    label: 'O DEFEITO, DATADO: num só dia, fechando 5 PRs a mão, a mesma sequência errou tres vezes — regenerar backlog/indice ANTES de stagear o grafo novo (os geradores leem o indice do git), regenerar o painel ANTES de recarimbar o residuo (o painel le produtores que o residuo muda), e encadear o veredito do lint pela presenca da linha. Dois PRs foram ao CI vermelhos e um saiu com HARD. Os commits tinham ido com --no-verify (checkpoint declarado) e nada entre o commit e o CI conferia o que ia no push.'
+
+  - id: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: done
+    verified_at: '2026-10-05'
+    verified_against: 'familia pre_push 8/8; 6 de 6 mutantes mordem (inclusive "presenca da linha = sucesso", 3 casos); dogfood de ponta a ponta no PR #924 (--rebase --push: um commit, 0 HARD lido, residuo casando, push com lease) e no #925'
+    trace: '.githooks/pre-push'
+    label: 'A FORMA, revisada antes de construir: o MOTOR (ops/pr-finalize.sh, shell, falha fechado) faz a sequencia — regenera as projecoes, carimba o residuo NO MESMO INDICE e faz um commit so, regenera ate estabilizar, exige "Violacoes HARD : 0" LIDO e residuo casando, e so entao empurra. O GATILHO e o pre-push do GIT, nao um hook do Claude Code: vale para qualquer sessao e para o humano, e a postura da casa e acoplar ao Claude Code so onde a capacidade nao existe fora. Ele julga so branch com PR ABERTO (WIP de checkpoint e fluxo legitimo), o COMMIT EMPURRADO numa worktree limpa (nunca a arvore de trabalho) e com as variaveis do CI — espelha o runner, e o residuo da REGRA 56 entra porque e HARD dentro do lint.'
+
+  - id: E_O_DOGFOOD_ACHOU_DOIS_DEFEITOS_NO_PROPRIO_MOTOR
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'pf-924.log (1a versao: commit de projecoes recusado pela REGRA 56 depois do --rebase); 1o teste negativo recusou pelo motivo ERRADO (regex de isencao nao conhecia "fora de escopo"); a familia de bancada abortou a suite por o="$(...)"; rc=$? sob set -e'
+    trace: 'ops/pr-finalize.sh'
+    label: 'O DOGFOOD PAGOU: rodar o motor de verdade achou dois defeitos dele mesmo, nenhum visivel no papel. (1) ORDEM: a 1a versao commitava as projecoes e SO DEPOIS carimbava o residuo — apos um rebase o gate do commit reprovava pela REGRA 56 antes de o carimbo chegar; cura: carimbar no proprio indice (a guarda hasheia o indice quando a arvore esta suja e exclui o residuo) e fazer um commit so. (2) O teste negativo inicial passou pelo MOTIVO ERRADO (recusou por nao reconhecer o texto "fora de escopo", nao pelo lint) — um caso que recusa pela razao errada e o mesmo que nao testar. E a bancada abortou com set -e no padrao `o=$(...); rc=$?`, curado com `|| rc=$?`.'
+
+  - id: C_TETO_O_QUE_O_PRE_PUSH_NAO_PEGA
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'cabecalho de .githooks/pre-push (FRONTEIRA DECLARADA)'
+    trace: '.githooks/pre-push'
+    label: 'TETO: (1) sem `gh` o hook NAO SABE se ha PR — avisa e deixa passar; o CI e o gate final; (2) `git push --no-verify` pula o hook, como pula o pre-commit; (3) custa um lint (~15-30 s) por branch com PR aberto, por push; (4) so vale apos o merge e a sincronizacao do checkout principal, porque o core.hooksPath aponta para .githooks DO CHECKOUT PRINCIPAL — worktrees usam os hooks de la; (5) e core-only: o .githooks/pre-push nao entra no template que o --update instala nos adotantes, e o pr-finalize mora em ops/, que nao viaja. Gatilho para viajar: um adotante pedir, com REGRA 56 propria.'
+
+edges:
+  - from: E_TRES_PRS_AO_CI_COM_LINT_VERMELHO
+    to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
+    edge_type: SUPPORTS
+  - from: E_O_DOGFOOD_ACHOU_DOIS_DEFEITOS_NO_PROPRIO_MOTOR
+    to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
+    edge_type: SUPPORTS
+  - from: C_TETO_O_QUE_O_PRE_PUSH_NAO_PEGA
+    to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
+    edge_type: CONSTRAINS

@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# pre-push do core — recusa empurrar para um PR ABERTO o commit que o CI vai reprovar.
+#
+# ── DEFEITO DATADO (2026-10-05) ─────────────────────────────────────────────────────────
+# Num só dia, três PRs foram ao CI com lint vermelho que o gate local teria pego: #923 e #925 com o
+# painel testing-state.md defasado (REGRA 81 (Painel de estado é GERADO dos produtores, nunca
+# redigido)), e #924 enviado com "Violações HARD : 2" — o encadeamento lia a PRESENÇA da linha, não o
+# número. Os commits tinham ido com --no-verify (checkpoint declarado), e nada entre o commit e o CI
+# conferia o que ia de fato no push. O ops/pr-finalize.sh faz a sequência certa, mas é PEDIDO; este
+# hook é o gatilho que não depende de alguém lembrar de pedir (gatilho social é cura nula).
+#
+# ── O QUE ELE JULGA ─────────────────────────────────────────────────────────────────────
+#   · só branch com PR ABERTO no forge: sem PR é trabalho em curso (o checkpoint WIP para um Elenxo
+#     ler é fluxo legítimo desta casa), e é o mesmo escopo da REGRA 56 (PR aberto carrega RESÍDUO da
+#     passada adversarial);
+#   · o COMMIT EMPURRADO, numa worktree destacada e limpa — nunca a árvore de trabalho, que pode ter
+#     coisa não commitada e mentir para os dois lados;
+#   · com as variáveis do CI (GITHUB_EVENT_NAME=pull_request, GITHUB_REF_NAME, GITHUB_HEAD_REF): o lint
+#     roda como o runner roda, e o resíduo da REGRA 56 entra no veredito porque é HARD dentro dele;
+#   · o NÚMERO de HARD lido (e o rc), nunca a presença da linha.
+#
+# ── FRONTEIRA DECLARADA ─────────────────────────────────────────────────────────────────
+#   · sem `gh` ele NÃO SABE se há PR: avisa e deixa passar — o CI é o gate final, e barrar todo push
+#     offline seria pior que o defeito;
+#   · `git push --no-verify` pula este hook, como pula o pre-commit; é escape de humano, declarado;
+#   · custa um lint (≈15-30 s) por branch com PR aberto, por push.
+#
+# Pontos de teste (só a bancada usa): ONION_PREPUSH_PR (nº do PR, pula o gh), ONION_PREPUSH_LINT
+# (script de lint a rodar no lugar do real), ONION_PREPUSH_NO_WORKTREE=1 (julga o diretório atual).
+set -uo pipefail
+
+ZERO=0000000000000000000000000000000000000000
+ROOT="$(git rev-parse --show-toplevel)" || exit 0
+fail=0
+
+while read -r _lref lsha rref _rsha; do
+  [ -n "${lsha:-}" ] || continue
+  [ "${lsha}" = "${ZERO}" ] && continue                     # deleção de ref: nada a julgar
+  case "${rref}" in refs/heads/*) ;; *) continue ;; esac     # tags e afins: fora de escopo
+  br="${rref#refs/heads/}"
+
+  num="${ONION_PREPUSH_PR-}"
+  if [ -z "${ONION_PREPUSH_PR+x}" ]; then
+    if ! command -v gh >/dev/null 2>&1; then
+      echo "pre-push: sem 'gh' não sei se '${br}' tem PR aberto — NÃO julguei; o CI julga." >&2
+      continue
+    fi
+    num="$(gh pr list --head "${br}" --state open --json number --jq '.[0].number' 2>/dev/null || true)"
+  fi
+  [ -n "${num}" ] || continue                                # sem PR aberto: trabalho em curso
+
+  lint="${ONION_PREPUSH_LINT:-.claude/validation/lint-artifacts.sh}"
+  if [ "${ONION_PREPUSH_NO_WORKTREE:-0}" = 1 ]; then
+    wt="${ROOT}"; tmp=""
+  else
+    tmp="$(mktemp -d)"; wt="${tmp}/wt"
+    if ! git -C "${ROOT}" worktree add -q --detach "${wt}" "${lsha}" 2>/dev/null; then
+      echo "pre-push: não consegui montar ${lsha:0:12} para julgar — RECUSO (não sei o que vai)." >&2
+      rm -rf "${tmp}"; fail=1; continue
+    fi
+  fi
+  out="$(cd "${wt}" && GITHUB_EVENT_NAME=pull_request GITHUB_REF_NAME="${num}/merge" GITHUB_HEAD_REF="${br}" \
+         LC_ALL=C bash "${lint}" 2>&1)"; rc=$?
+  if [ -n "${tmp}" ]; then git -C "${ROOT}" worktree remove --force "${wt}" >/dev/null 2>&1; rm -rf "${tmp}"; fi
+
+  hard="$(printf '%s\n' "${out}" | grep -oE 'Violações HARD : [0-9]+' | grep -oE '[0-9]+$' | tail -1)"
+  if [ "${rc}" = 0 ] && [ "${hard}" = 0 ]; then
+    echo "pre-push: '${br}' (PR #${num}) @ ${lsha:0:12} — lint 0 HARD, como o CI vai ver." >&2
+    continue
+  fi
+  echo "pre-push: RECUSADO '${br}' (PR #${num}) @ ${lsha:0:12} — lint rc=${rc}, HARD=${hard:-?}." >&2
+  printf '%s\n' "${out}" | grep -E '^VIOLATION' | grep -vE 'PASSIVO|ISENCAO|SEM-OBJETO|DEFASADA-COBRADA|PARIDADE-NAO-MEDIDA' | head -5 >&2
+  echo "pre-push: feche o PR com 'bash ops/pr-finalize.sh --push' (projeções, resíduo e lint na ordem certa)." >&2
+  fail=1
+done
+
+exit "${fail}"

@@ -5778,6 +5778,50 @@ run_pretooluse_veto_selftests() {
 # por seletor no alvo:, reusando graph.sh --triples). Asserções ESTRUTURAIS (não fixam nomes de membro
 # → robusto a mudança de roster). Pula o que depende de membros sem python+yaml.
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Modo pre-push + pr-finalize (2026-10-05) — o fechamento de PR na ordem certa e o gatilho que o cobra.
+# Defeito datado: num dia, #923 e #925 foram ao CI com o painel defasado (REGRA 81) e #924 foi enviado com
+# "Violações HARD : 2" porque o encadeamento lia a PRESENÇA da linha, não o número. As polaridades abaixo
+# rodam o hook com lint STUB (ponto de teste ONION_PREPUSH_LINT) — o lint real é exercido pelo dogfood.
+# ---------------------------------------------------------------------------
+run_pre_push_selftests() {
+  local hook="${REPO_ROOT}/.githooks/pre-push" pf="${REPO_ROOT}/ops/pr-finalize.sh"
+  if [ ! -f "${hook}" ] || [ ! -f "${pf}" ]; then record_fail "pre-push" "ausente: ${hook} / ${pf}"; return; fi
+  local d; d="$(mktemp -d)"
+  printf '#!/usr/bin/env bash\necho "  Violações HARD : 0"; exit 0\n' > "${d}/ok.sh"
+  printf '#!/usr/bin/env bash\necho "VIOLATION: x: REGRA 81 (Painel)"; echo "  Violações HARD : 1"; exit 1\n' > "${d}/bad.sh"
+  # o caso EXATO do defeito: a linha existe, o rc é 0, e o número não é zero
+  printf '#!/usr/bin/env bash\necho "  Violações HARD : 2"; exit 0\n' > "${d}/liar.sh"
+  local Z=0000000000000000000000000000000000000000 S; S="$(git -C "${REPO_ROOT}" rev-parse HEAD)"
+  _pp() {  # <env> <sha> → rc do hook
+    local rc=0
+    printf 'refs/heads/x %s refs/heads/x %s\n' "$2" "${Z}" | (cd "${REPO_ROOT}" && env $1 bash "${hook}" origin u >/dev/null 2>&1) || rc=$?
+    printf '%s' "${rc}"
+  }
+  _ppc() {  # <nome> <esperado> <env> <sha>
+    local got; got="$(_pp "$3" "$4")"
+    if [ "${got}" = "$2" ]; then record_pass "pre-push: $1 (rc=$2)"
+    else record_fail "pre-push: $1" "esperava rc=$2, veio rc=${got}"; fi
+  }
+  local W="ONION_PREPUSH_PR=9 ONION_PREPUSH_NO_WORKTREE=1"
+  _ppc "PR aberto + lint com HARD → RECUSA"                 1 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
+  _ppc "PR aberto + rc 0 mas HARD=2 → RECUSA (lê o número)"  1 "${W} ONION_PREPUSH_LINT=${d}/liar.sh" "${S}"
+  _ppc "PR aberto + 0 HARD → passa"                          0 "${W} ONION_PREPUSH_LINT=${d}/ok.sh" "${S}"
+  _ppc "sem PR aberto (WIP) com lint ruim → passa"           0 "ONION_PREPUSH_PR= ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
+  _ppc "deleção de ref → passa"                              0 "${W} ONION_PREPUSH_LINT=${d}/bad.sh" "${Z}"
+  _ppc "worktree do commit empurrado + HARD → RECUSA"        1 "ONION_PREPUSH_PR=9 ONION_PREPUSH_LINT=${d}/bad.sh" "${S}"
+  # pr-finalize: recusas que não dependem de lint
+  local o rc
+  rc=0; o="$(cd "${REPO_ROOT}" && git -c advice.detachedHead=false worktree add -q --detach "${d}/det" HEAD 2>&1 && cd "${d}/det" && bash "${pf}" 2>&1)" || rc=$?   # set -e da bancada: recusa esperada não pode abortar a suíte
+  if [ "${rc}" = 1 ] && grep -q 'HEAD destacado' <<< "${o}"; then record_pass "pr-finalize: HEAD destacado → recusa"
+  else record_fail "pr-finalize: HEAD destacado" "rc=${rc}: ${o:0:160}"; fi
+  git -C "${REPO_ROOT}" worktree remove --force "${d}/det" >/dev/null 2>&1
+  rc=0; o="$(cd "${REPO_ROOT}" && bash "${pf}" --rebase --bogus 2>&1)" || rc=$?
+  if [ "${rc}" = 1 ] && grep -q 'argumento desconhecido' <<< "${o}"; then record_pass "pr-finalize: argumento desconhecido → recusa"
+  else record_fail "pr-finalize: argumento desconhecido" "rc=${rc}"; fi
+  rm -rf "${d}"
+}
+
 run_resolve_target_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/co-evolution/resolve-target.sh"
   if [ ! -f "${helper}" ]; then record_fail "resolve-target" "helper ausente: ${helper}"; return; fi
@@ -14682,6 +14726,7 @@ _family run_resolve_scope_layers_selftests
 _family run_show_scope_selftests
 
 # Modo resolve-target — targeting fino por seletor no alvo: (F1.2 federação — mata o ruído).
+_family run_pre_push_selftests
 _family run_resolve_target_selftests
 
 # Modo reconcile-inputs — insumos determinísticos do /meta:co-announce --reconcile (conciliação de backlog).

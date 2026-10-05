@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**354 itens abertos** em 76 grafo(s) com aberto (de 102 no escopo) · 77 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**318 itens abertos** em 71 grafo(s) com aberto (de 98 no escopo) · 72 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -79,29 +79,6 @@
 | 9.6 | `C_OPCAO_A_STATUS_QUO` | jev-decision-round2-2026-10 | OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de m |
 | 5.6 | `C_OPTION_B_BASIS_IS_WEAK_SOURCED` | jev-decision-round2-2026-10 | ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao |
 
-## infra-vps-2026-10 — 7 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 66.0 | `Q_INFRA_VPS_TREATMENT_2026` | infra-vps-2026-10 | Como o Onion deve tratar INFRA/VPS — sistema operacional, servicos, Docker, firewall, reboot e updates pendentes, sessoes orfas  |
-| 22.0 | `C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS` | infra-vps-2026-10 | OPCAO B linha (B enxuta) — RECOMENDADA pelo Elenxo: censo shell que COMPOE sinais nativos (needrestart -b, /var/run/reboot-requi |
-| 12.0 | `C_OPCAO_B_GRAFO_CENSO_COMANDO` | infra-vps-2026-10 | OPCAO B — grafo de dominio da VPS como SSOT viva + censo determinístico ops/vps-census.sh medindo o vivo contra o grafo + coman |
-| 5.4 | `Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA` | infra-vps-2026-10 | VAZAMENTO JA EXISTENTE, achado ao medir a pergunta do maestro: a guarda vps-exposure-check.sh mora em .claude/validation/ (raiz qu |
-| 4.0 | `C_OPCAO_A_NADA_NOVO` | infra-vps-2026-10 | OPCAO A — nada novo: manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh. A FA |
-| 0.9 | `C_OPCAO_C_VERTICAL_INFRA` | infra-vps-2026-10 | OPCAO C — vertical de engenharia infra que viaja para adotantes. Reprovada pela recomendacao do Elenxo: nenhum 2o adotante pediu |
-| 0.4 | `C_OPCAO_D_QUARTA_DIMENSAO` | infra-vps-2026-10 | OPCAO D — 4a dimensao peer. Reprovada pela recomendacao do Elenxo: as 3 dimensoes peer sao doutrina selada (nem design/ foi prom |
-
-## nanochat-onion-2026-10 — 6 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 63.0 | `Q_NANOCHAT_ONION_DOMAIN_MODEL_2026_10` | nanochat-onion-2026-10 | Como o Nanochat (karpathy/nanochat) e o Onion podem se relacionar no TREINO de um modelo de dominio — o dominio sendo a doutrina |
-| 30.6 | `C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL` | nanochat-onion-2026-10 | OPCAO C — SLM-FERRAMENTA DE DOMINIO ESTREITO via adapter SDAAL (Motor 2): tarefa tipada de CONJUNTO FECHADO e verificavel (class |
-| 16.5 | `C_OPCAO_B_NANOCHAT_STUDY_BENCH` | nanochat-onion-2026-10 | OPCAO B — NANOCHAT COMO BANCADA DE ESTUDO/DOGFOOD do ciclo de vida de modelo, sem produto (sentido b). A FAVOR: MIT, minimo e le |
-| 14.0 | `C_OPCAO_A_NO_TRAINING_LLM_AS_VM` | nanochat-onion-2026-10 | OPCAO A — NAO TREINAR; manter LLM-as-VM. O Onion continua doutrina em markdown + grafo interpretada por Transformer de terceiro, |
-| 7.2 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
-| 5.6 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
-
 ## ocr-local-sei-2026-09 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -173,16 +150,6 @@
 | 4.0 | `Q_JEV_ARCHITECTURE_UNKNOWN` | jev-type-safe-ai-2026-10 | Como o JEV e CONSTRUIDO e TREINADO? Hipoteses a testar na rodada seguinte: LLM com decodificacao restrita ao conjunto de rotulos;  |
 | 2.0 | `E_OPENROUTER_SLUG_NOT_CONFIRMED` | jev-type-safe-ai-2026-10 | A unica tentativa de bater a lista de gateways num catalogo de ORIGEM falhou: o slug de OpenRouter citado pelo revendedor devolveu |
 
-## nanochat-eixo-d-2026-10 — 5 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 45.0 | `Q_EIXO_D_SYNTHETIC_IDENTITY_BUDGET_2026_10` | nanochat-eixo-d-2026-10 | EIXO D do estudo Nanochat x Onion — qual o orcamento de dados sinteticos e de identidade para (D) treinar/ajustar modelo com o c |
-| 42.2 | `C_EIXO_D_BUDGET_ORDER_OF_MAGNITUDE_ONLY` | nanochat-eixo-d-2026-10 | RESPOSTA A DUVIDA DO MAESTRO ("qual o orcamento de dados sinteticos e identidade?"): a rodada sustenta so uma ORDEM DE GRANDEZA DE |
-| 19.2 | `C_EIXO_D_OPTION_D_SECOND_GATE_EVAL` | nanochat-eixo-d-2026-10 | Projecao local de C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY (pai): a opcao D CONTINUA GATED e ganha um SEGUNDO gate alem da falta de co |
-| 11.0 | `C_EIXO_D_IDENTITY_IN_WEIGHTS_COSTS_STAGE_RETRAIN` | nanochat-eixo-d-2026-10 | Sentido (a) e S7_claim_analogy_breaks, na forma que a rodada consegue dar: identidade em pesos exige RETREINO DE ESTAGIOS por muda |
-| 7.2 | `Q_EIXO_D_RECONCILE_PARENT_GRAPH` | nanochat-eixo-d-2026-10 | PROPOSTA (o maestro decide; este grafo nao edita o pai nem toca o selo): (1) o selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10  |
-
 ## unidade-bilhetavel-do-onion-2026-10 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -201,25 +168,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 43.2 | `Q_PLUGIN_DIRECTORY_LANDSCAPE_2026_09` | plugin-directory-landscape-2026-09 | Quais plugins e marketplaces de Claude Code se destacam em 2026-09 e que padroes de desenvolvimento seguem (granularidade 1-grande |
-
-## onion-slm-2026-10 — 14 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 42.2 | `C_DEID_OFF_THE_SHELF_CANDIDATES` | onion-slm-2026-10 | LEITURA (1o caso de uso, de-id): existem dois especialistas PRONTOS, locais e Apache 2.0 para redacao de PII — OpenAI Privacy Fi |
-| 42.0 | `C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS` | onion-slm-2026-10 | LEITURA (desenho do eval de dominio): (i) F1 automatico de triplas e PISO, nao medida — gold incompleto e schema rigido punem ac |
-| 36.4 | `C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT` | onion-slm-2026-10 | LEITURA (quando SLM ajustado vence): vence em tarefa ESTREITA de conjunto fechado (NER 0,986 x 0,742; legal; classificacao), empat |
-| 33.6 | `Q_ONION_SLM_PRIMARIES_2026_10` | onion-slm-2026-10 | Do lado do core e contra PRIMARIAS: o que, das 45 afirmacoes do chat do maestro sobre SLMs, se sustenta — e o que isso habilita  |
-| 28.0 | `C_DISTILLATION_REAL_BUT_TEACHER_BOUND` | onion-slm-2026-10 | LEITURA (destilacao): destilacao on-policy e real e barata em raciocinio matematico (Qwen3 74,4 a 1/10 do custo do RL; receita Tin |
-| 24.2 | `C_TYPED_EXTRACTION_OFF_THE_SHELF` | onion-slm-2026-10 | LEITURA (extracao tipada de conjunto fechado): NuExtract3 (Qwen3.5-4B, templates JSON tipados, Apache 2.0) e GLiNER2.5 (74M-0.3B,  |
-| 16.8 | `Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF` | onion-slm-2026-10 | PROPOSTA AO MAESTRO (eu nunca selo; NAO revisa o selo A de D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10): quando o gatilho de C abrir, |
-| 14.4 | `C_SLM_AGENTIC_PATH_NEEDS_INSTRUMENTATION` | onion-slm-2026-10 | LEITURA (SLM em subtarefa agentica): o caminho LLM->SLM da NVIDIA e UMA via nao validada (position paper): exige log de todas as c |
-| 14.0 | `C_BASE_MODELS_MENU_2026_10` | onion-slm-2026-10 | LEITURA (menu de bases, SO se o eval falhar e o fine-tune abrir): Gemma 4 (Apache 2.0 padrao; E2B/E4B, 12B Unified desde 2026-06-0 |
-| 10.8 | `C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT` | onion-slm-2026-10 | LEITURA (capital): o dinheiro vai para o MODELO pequeno eficiente/customizavel — Liquid AI US$250M (edge/on-prem, 2024-12), Fast |
-| 9.9 | `X_CHAT_SOURCES_ONION_SLM` | onion-slm-2026-10 | FONTE DO CHAT do maestro (docs/discussions/onion-slm/fontes): 45 afirmacoes, estado nao-verificado, escrita SEM ler o repo (e por  |
-| 6.0 | `C_EMBEDDERS_LOCAL_RETRIEVAL_COMPLEMENT` | onion-slm-2026-10 | LEITURA (embedders): EmbeddingGemma (308M, 100+ linguas) e Qwen3-Embedding (0.6B/8B) HABILITAM busca semantica local sobre o corpu |
-| 0.9 | `C_CHAT_BGE_M3_MTEB_63` | onion-slm-2026-10 | AFIRMACAO DO CHAT: bge-m3 = 63,0 no MTEB (via premai.io). NAO VERIFICAVEL como comparacao: a primaria (card Qwen3-Embedding-0.6B)  |
-| 0.6 | `C_CHAT_QWEN37_PROPRIETARY` | onion-slm-2026-10 | AFIRMACAO DO CHAT (8): o Qwen3.7 e proprietario. NAO VERIFICAVEL: nem a listagem HF visivel nem o agregador mostram o 3.7; sem pri |
 
 ## poda-instruction-bloat-2026-09 — 5 item(ns)
 
@@ -519,15 +467,6 @@
 | 5.7 | `Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA` | onion-plugin-publication-2026-08 | ACHADO LATERAL, medido 2026-09-06 ao trocar o predicado de selo para leitura YAML de verdade: QUATRO .kg.yaml versionados sao ACEI |
 | 5.4 | `Q_BEACON_NAO_LIBERA_NO_STOP` | onion-plugin-publication-2026-08 | ACHADO (2026-09-05, medido ao vivo): o `session-beacon.sh check` seguiu reportando 'VIVA (dono verificado)' para uma sessao que o  |
 | 5.4 | `Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA` | onion-plugin-publication-2026-08 | CANDIDATO A GUARDA, com o dado que EU NAO TINHA quando decidi nao mecanizar (2026-09-06). Eu recusei mecanizar a classe 'no supera |
-
-## gmill-update-547-2026-10 — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 14.0 | `Q_UPDATE_REMEDE_DEPOIS_DO_MERGE` | gmill-update-547-2026-10 | CURA PROPOSTA (o pedido do hub, conferido no core e coerente com exit-code-nao-e-a-verificacao): o --update regenera as projecoes  |
-| 10.2 | `Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE` | gmill-update-547-2026-10 | A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do v |
-| 8.5 | `Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN` | gmill-update-547-2026-10 | A CURA DE CLASSE DOS VETOS (PR #921) AINDA ASSUME QUE A PRODUCAO SE CHAMA main. Num adotante com GitFlow cuja producao e master  |
-| 5.1 | `Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA` | gmill-update-547-2026-10 | PEDIDO DE ADOTANTE, medido em dois alvos no mesmo dia: os commits feitos pelos helpers do update (vendor-branch.sh e durable-commi |
 
 ## passada-adversarial-2026-09 — 2 item(ns)
 

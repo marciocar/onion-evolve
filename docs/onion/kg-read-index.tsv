@@ -500,6 +500,8 @@
 .githooks/pre-commit	E_PRECOMMIT_CONDICIONAL_A_CONFIG_LOCAL	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .githooks/pre-commit	E_gate_declara_1min_e_leva_15	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 .githooks/pre-commit	Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.githooks/pre-push	C_TETO_O_QUE_O_PRE_PUSH_NAO_PEGA	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
+.githooks/pre-push	D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 .github/workflows/onion-review.yml	A_CURAR_O_REVISOR_DO_CI_COM_MECANISMO	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .github/workflows/onion-review.yml	E_A_MESMA_CAUSA_VOLTOU_E_AGORA_COM_O_CORPO_DA_API	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .github/workflows/onion-review.yml	E_HOST_SEM_PROTECAO_CI_E_AVISO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
@@ -2135,6 +2137,8 @@ ops/mcp-onion-exec/server.py	E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA	
 ops/mcp-onion-kg/server.py	E_OBJECAO_2_ZERO_ANNOTATIONS_EXPOR_E_REESCREVER	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_4_NAMESPACE_NAO_ISOLA_CUSTO_NEM_MENTIRA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
+ops/pr-finalize.sh	E_O_DOGFOOD_ACHOU_DOIS_DEFEITOS_NO_PROPRIO_MOTOR	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
+ops/pr-finalize.sh	E_TRES_PRS_AO_CI_COM_LINT_VERMELHO	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/pr-merge-verified.sh	C_CHAINED_SYNC_IS_FLAWED	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
 ops/pr-merge-verified.sh	D_SYNC_GATED_IN_MERGE_PROOF	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
 ops/pr-merge-verified.sh	E_CURE_PROVEN_BY_BEHAVIOR	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
