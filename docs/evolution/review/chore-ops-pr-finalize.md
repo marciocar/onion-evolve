@@ -1,6 +1,6 @@
 ---
-reviewed_diff_sha256: 6b0c5a51069aec7147a8128abde661507c6b5f9d512389845d2ef1f7cf35adba
-reviewed_code_sha256: e8c3c948e8d0c9369126b4cde7cf1d582171ca8429d4853b3e7975998e58806b
+reviewed_diff_sha256: 19fd59e184762048402315ab4c282b1a1007d1df452cf7b1ed9bb730e02ad00b
+reviewed_code_sha256: cd79593a40183a4dbc955b889e6c916a57e9fec0daa6488591ee70e9e3f9b2d6
 findings_total: 20
 findings_real: 20
 tokens: 298815
@@ -17,6 +17,8 @@ nota: >
   FORA DO ESCOPO, CURADO AQUI (o core não devolve defeito pré-existente): o Claude Code subiu para
   2.1.290 no meio da sessão e a bancada (f) do cited-directive acusou DERIVA — re-extraídos PCe/lUn/dUn/
   aFr/D3n; semântica igual (aFr = trim + CRLF→LF); selftest 15/15.
+  E O CI: a faixa 4 da bancada estourou o teto de 25 min duas vezes (a família nova deslocou o
+  round-robin) — 5 faixas no onion-selftest.yml, teto mantido; mudança de CI, revisada à mão.
   1ª PASSADA:   1ª passada do Elenxo (opus, worktree isolada, sandbox git real sobre 376e04c2): REPROVADO com 3
   bloqueadores — B1 o motor LAVAVA resíduo (recarimbava com o código mudado), B2 lint-rules.md fora do
   commit e veredito lido da árvore, B3 gh falhando lido como "sem PR" — e 7 maiores (lease vazio depois
