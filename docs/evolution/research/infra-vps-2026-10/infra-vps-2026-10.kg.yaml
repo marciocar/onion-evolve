@@ -1,0 +1,769 @@
+meta:
+  id: infra-vps-2026-10
+  schema_version: "1"
+  baseline: 2026-10-05
+  review_after: 2026-11-04   # 30d: FERRAMENTA e o tipo DOMINANTE. De 17 claims confirmadas, 4 sao
+                             # comportamento de hook do Claude Code (exit 2, eventos, timeout, padrao
+                             # 600s), que muda a cada versao (REGRA 65, cc_version do processo), e 3
+                             # sao do instrumento checkrestart/Lynis. As 6 de Docker x UFW sao
+                             # estaveis (pediriam 120d+) e a doutrina de acoplamento pediria 12m, mas
+                             # a DECISAO pende do dado curto: qual sinal nativo o censo compoe e se
+                             # hook entra ou nao. Alem disso o ESTADO VIVO medido (reboot pendente
+                             # desde 2026-09-24, 45 pacotes) envelhece em dias. Manda a cadencia curta.
+                             # Gatilhos extras nomeados: (1) o maestro fizer o reboot pendente — o
+                             # E_MEDIDO_ESTADO_VIVO_1005 vira historico; (2) um 2o adotante pedir infra
+                             # (reabre C); (3) upgrade para 26.04 (muda needrestart/kernel).
+  # kg-backlog-guard: on
+  # ═══ TETO: 42 NÓS ═══
+  #
+  # MODO DECISAO. D_INFRA_VPS_TREATMENT nasce OPEN — o maestro sela, esta sessao NUNCA sela.
+  # 12 objecoes sobreviventes do Elenxo entregues, 12 modeladas (E_OBJECAO_*), todas com
+  # confianca <= 0.6 (UM agente, sem votacao). A recomendacao do Elenxo chegou TRUNCADA no
+  # payload do workflow (corta em "2. Compor o que ja esta instalado: needrestar") e a evidencia da
+  # 12a objecao tambem corta no meio ("Se houver qualquer integracao por"): o que se perdeu esta
+  # declarado em E_LACUNAS_INFRA_VPS_1005, nunca reconstruido por inferencia.
+  #
+  # Corpus conferido (clausula 0): 4 grafos de infra ja existem — identidade-onion-vps-2026-08,
+  # onion-vps-consolidation-2026-08, vps-shared-tools-2026-07, stack-harmonia-2026-08. Esta rodada
+  # NAO os contradiz: confirma que o achado Docker-fura-UFW ja e conhecido e coberto
+  # (CL_net_exposure_incident, D_containment_docker_user). O radar so ve arestas DENTRO de um
+  # arquivo: o vinculo cross-grafo vai por label + trace, nunca por aresta pendurada.
+
+nodes:
+
+  # ═══════════════════ A PERGUNTA ═══════════════════
+
+  - id: Q_INFRA_VPS_TREATMENT_2026
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: 'Como o Onion deve tratar INFRA/VPS — sistema operacional, servicos, Docker, firewall, reboot e updates pendentes, sessoes orfas — dado que todo projeto roda sobre infra? Opcoes: (A) nada novo; (B) grafo de dominio da VPS como SSOT viva + censo determinístico ops/vps-census.sh + comando /ops:vps forjado; (B linha) B enxuta, censo shell que compoe sinais nativos e estende vps-exposure-check.sh; (C) vertical de engenharia infra que viaja; (D) 4a dimensao peer. Restricoes duras: core-only primeiro, viaja so com 2o adotante pedindo; nunca encerrar nem propor encerrar ferramenta da VPS; reboot e upgrade sao decisao humana, a ferramenta so propoe; nenhum cron nem auto-start (MOAT W7); acoplar ao Claude Code so onde a capacidade nao existe fora. PERMANECE ABERTA ate o maestro selar D_INFRA_VPS_TREATMENT.'
+    verified_at: 2026-10-05
+    verified_against: 'rodada de 2026-10-05: 33 fontes, 26 claims, 17 confirmadas, 8 refutadas, 0 nao verificadas; 12 objecoes sobreviventes do Elenxo, 12 modeladas; estado vivo re-medido nesta sessao (uname, /boot, reboot-required.pkgs, which, systemctl, docker ps)'
+    trace: 'docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml'
+
+  # ═══════════════════ MEDICAO LOCAL (tier 10) ═══════════════════
+
+  - id: E_MEDIDO_ESTADO_VIVO_1005
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 're-medido nesta sessao em 2026-10-05: uname -r = 6.8.0-139-generic; /boot tem vmlinuz-6.8.0-139 e vmlinuz-6.8.0-142; /var/run/reboot-required existe desde 2026-09-24 com .pkgs = libc6, linux-image-6.8.0-142-generic, linux-base; systemctl is-enabled docker e onion-vps-docker-firewall = enabled; docker ps = 31 containers. NAO re-medidos aqui (vindos do worker de escopo): 45 pacotes atualizaveis, 31 unless-stopped, 16 mosh-server orfaos encerrados a mao, release 26.04.1 disponivel; kernel 146 disponivel NAO reproduzido'
+    valid_from: 2026-09-24
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O ESTADO VIVO e a razao da pergunta: reboot pendente desde 2026-09-24 (libc6 e kernel 6.8.0-142 em disco, rodando 139), 31 containers, docker e a contencao onion-vps-docker-firewall habilitados, e uma recorrencia de infra resolvida A MAO com N muito maior que 1 (16 mosh-server orfaos de 11h a 11 dias encerrados manualmente). Recorrencia resolvida a mao pede MECANISMO (fix-must-become-mechanism). A contagem kernel 146 disponivel nao foi reproduzida — so o 142 aparece instalado.'
+    trace: '/var/run/reboot-required.pkgs · /boot · systemctl · docker ps'
+
+  - id: E_CORPUS_INFRA_JA_COBRE_EXPOSICAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'leitura do corpus em 2026-10-05: docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml (CL_net_exposure_incident, D_containment_docker_user), docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml (E_CLASSE_DE_EXPOSICAO_VIROU_REGRA_64), .claude/validation/vps-exposure-check.sh presente, ops/ com 20 entradas'
+    valid_from: 2026-08-10
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'O CORPUS JA COBRE a parte de exposicao: Docker fura o UFW foi incidente medido em 2026-08-10, virou contencao viva (DOCKER-USER default-deny via servico systemd), virou REGRA 64 (compose rastreado com bind publico = HARD no lint) e guarda vps-exposure-check.sh. O que NAO tem mecanismo hoje e o resto da pergunta: reboot pendente, updates, restart policy e sessoes orfas — exatamente a recorrencia resolvida a mao. Esta rodada nao contradiz nenhum no daqueles grafos.'
+    trace: 'docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml · docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml · .claude/validation/vps-exposure-check.sh'
+
+  - id: E_DOUTRINA_PULL_NOT_PUSH_E_TRES_DIMENSOES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'CLAUDE.md (CORE diferente de FAMILIA; 3 dimensoes peer selada; design/ e categoria, nao 4a dimensao) + docs/evolution/research/stack-harmonia-2026-08 (D_regra_5_portoes, D_anti_catalogo) + docs/onion/graph/vps-shared-tools-2026-07 (D_framing_catalogo) — lidos no corpus desta rodada'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'A DOUTRINA SELADA limita C e D: as 3 dimensoes peer (produto, engenharia, compliance) sao doutrina selada e nem design/ foi promovida; viajar para adotante exige 2o adotante pedindo (pull-not-push) e hoje nenhum pediu; o substrato medido e ESPECIFICO desta VPS (Hostinger KVM8, containers onion-vps-*, regra DOCKER-USER -i eth0); e o corpus ja decidiu CATALOGO, nao plataforma (D_framing_catalogo) e o que NAO construir (D_anti_catalogo).'
+    trace: 'CLAUDE.md · docs/evolution/research/stack-harmonia-2026-08/ · docs/onion/graph/vps-shared-tools-2026-07.kg.yaml'
+
+  # ═══════════════════ CLAUDE CODE — HOOKS (tier 9) ═══════════════════
+
+  - id: E_HOOK_EXIT2_BLOQUEIA_DETERMINISTICO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'https://code.claude.com/docs/en/hooks — votos 3-0'
+    source_tier: 9
+    source_kind: primary
+    label: 'Em eventos que suportam bloqueio, hook command que sai com codigo 2 bloqueia a acao de forma determinística, e nem um JSON permissionDecision allow o sobrepoe. Verdadeiro, mas nao sustenta B: um censo e medicao LIDA, nao acao a vetar (ver E_OBJECAO_EXIT2_NAO_SERVE_A_CENSO).'
+    trace: 'https://code.claude.com/docs/en/hooks'
+
+  - id: E_HOOK_EVENTOS_SEM_AGENDADOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'https://code.claude.com/docs/en/hooks — votos 3-0'
+    source_tier: 9
+    source_kind: primary
+    label: 'Hooks do tipo command executam shell arbitrario e disparam por evento (SessionStart, SessionEnd, PreToolUse, Stop, FileChanged, CwdChanged), sem agendador. Isso permitiria censo acionado pela sessao sem cron — e e exatamente o que a objecao chama de auto-start com outro nome (E_OBJECAO_SESSIONSTART_E_AUTOSTART).'
+    trace: 'https://code.claude.com/docs/en/hooks'
+
+  - id: E_HOOK_TIMEOUT_FALHA_ABERTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'https://code.claude.com/docs/en/hooks — votos 3-0'
+    source_tier: 9
+    source_kind: primary
+    label: 'Hook command (ou http/mcp_tool) que estoura o timeout e cancelado e sua saida descartada; em PreToolUse ele NAO bloqueia a chamada. Guarda ou censo lento em hook falha ABERTO: ausencia de aviso vira lida como tudo limpo.'
+    trace: 'https://code.claude.com/docs/en/hooks'
+
+  - id: E_HOOK_TIMEOUT_PADRAO_600S
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'https://code.claude.com/docs/en/hooks — votos 3-0'
+    source_tier: 9
+    source_kind: primary
+    label: 'Timeout padrao de hook command e 600s, reduzido para 30s em UserPromptSubmit, PreModelSwitch e PostModelSwitch e para 10s em MessageDisplay. Censo em SessionStart caberia no padrao, mas nao em eventos de prompt.'
+    trace: 'https://code.claude.com/docs/en/hooks'
+
+  # ═══════════════════ CENSO QUE SO REPORTA (tier 6-8) ═══════════════════
+
+  - id: E_CHECKRESTART_SO_REPORTA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-10-05
+    verified_against: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 2-1'
+    source_tier: 8
+    source_kind: primary
+    label: 'checkrestart e censo determinístico que apenas REPORTA processos que precisam de reinicio apos upgrade, sem reiniciar nada — modelo que casa com a restricao reboot e upgrade sao decisao humana, a ferramenta so propoe. O modelo vale; o instrumento NAO esta instalado nesta VPS (E_OBJECAO_CHECKRESTART_AUSENTE).'
+    trace: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html'
+
+  - id: E_CHECKRESTART_VIA_LSOF_SEM_ESTADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 3-0'
+    source_tier: 8
+    source_kind: primary
+    label: 'checkrestart detecta processos desatualizados via lsof (arquivos deletados ainda abertos), sem consultar grafo nem estado declarado — mede o vivo direto.'
+    trace: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html'
+
+  - id: E_CHECKRESTART_SENSIVEL_AO_KERNEL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: 2026-10-05
+    verified_against: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 2-1'
+    source_tier: 8
+    source_kind: primary
+    label: 'checkrestart e sensivel a versao do kernel e pode falhar em versoes mais novas ou antigas — o instrumento do censo precisa ele proprio ser verificado.'
+    trace: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html'
+
+  - id: E_LIVEPATCH_SUPRIME_REBOOT_REQUIRED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-10-05
+    verified_against: 'https://lists.snapcraft.io/archives/foundations-bugs/2025-June/539876.html — votos 3-0'
+    valid_from: 2025-06
+    source_tier: 6
+    source_kind: primary
+    label: 'Com Livepatch habilitado, o postinst do kernel deliberadamente NAO cria /var/run/reboot-required: o sinal reboot pendente some mesmo com kernel novo em disco. Lição geral: sinal declarado pode ser suprimido; cruzar uname -r com /boot/vmlinuz-*.'
+    trace: 'https://lists.snapcraft.io/archives/foundations-bugs/2025-June/539876.html'
+
+  - id: E_LYNIS_AUDITORIA_SO_RELATO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-10-05
+    verified_against: 'https://manpages.org/lynis/8 — votos 3-0'
+    source_tier: 6
+    source_kind: primary
+    label: 'Lynis e auditor de host que verifica configuracoes de sistema e software e aponta melhorias em modo de relato, sem alterar. Existe auditor maduro de hardening generico — o que puxa CONTRA reinventar essa parte dentro de B.'
+    trace: 'https://manpages.org/lynis/8'
+
+  # ═══════════════════ DOCKER x UFW (tier 3-5) ═══════════════════
+
+  - id: E_DOCKER_FORWARD_CONTORNA_UFW
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.65
+    verified_at: 2026-10-05
+    verified_against: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps — votos 3-0'
+    source_tier: 5
+    source_kind: engineer
+    label: 'O Docker contorna o UFW porque o UFW gerencia so a cadeia INPUT, e o trafego para portas publicadas segue FORWARD apos DNAT, nunca passando pelas regras do UFW.'
+    trace: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps'
+
+  - id: E_DOCKER_USER_ROTEAR_PARA_UFW
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps — votos 3-0'
+    source_tier: 5
+    source_kind: engineer
+    label: 'A cadeia DOCKER-USER e avaliada antes do forwarding do Docker; rotea-la para ufw-user-forward via /etc/ufw/after.rules faz o UFW filtrar portas de containers (testado em Ubuntu 24.04 e Debian 12). E MUDANCA de firewall, nao medicao — fora do escopo de um censo.'
+    trace: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps'
+
+  - id: E_UFW_STATUS_SUBESTIMA_EXPOSICAO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: 2026-10-05
+    verified_against: 'https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown — votos 3-0; vendor-on-competitor, suspeito por clausula 7'
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'O Docker manipula o iptables diretamente para publicar portas e contorna o UFW; um censo que so leia ufw status subestima a exposicao real.'
+    trace: 'https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown'
+
+  - id: E_DOCKER_USER_PONTO_OFICIAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: 2026-10-05
+    verified_against: 'https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown — votos 3-0; vendor-on-competitor'
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'DOCKER-USER e o ponto oficial para regras do administrador, avaliada antes das regras do Docker; a verificacao de firewall deve inspecionar DOCKER-USER, nao so o UFW.'
+    trace: 'https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown'
+
+  - id: E_DOCKER_DNAT_PREROUTING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.55
+    verified_at: 2026-10-05
+    verified_against: 'https://www.ssdnodes.com/learn/lang/pt/docker-ports-bypass-ufw — votos 3-0; vendor-on-competitor'
+    source_tier: 4
+    source_kind: vendor-on-competitor
+    label: 'Docker publica portas via DNAT na cadeia PREROUTING enquanto o UFW filtra em INPUT, entao as regras do UFW nao cobrem portas publicadas por containers.'
+    trace: 'https://www.ssdnodes.com/learn/lang/pt/docker-ports-bypass-ufw'
+
+  - id: E_BIND_LOOPBACK_MITIGA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: 2026-10-05
+    verified_against: 'https://github.com/SDbyFrankChen/claude-code-server-security-audit — votos 3-0'
+    source_tier: 3
+    source_kind: engineer
+    label: 'O Docker pode contornar o UFW para portas mapeadas, e a mitigacao e bind em 127.0.0.1 em vez de 0.0.0.0. Ja e doutrina e guarda no core (REGRA 64 e vps-exposure-check.sh).'
+    trace: 'https://github.com/SDbyFrankChen/claude-code-server-security-audit'
+
+  # ═══════════════════ OPS AGENTICO (tier 4) ═══════════════════
+
+  - id: E_HOMELAB_HUMANO_DECIDE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    verified_at: 2026-10-05
+    verified_against: 'https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/ — votos 3-0'
+    valid_from: 2026-09
+    source_tier: 4
+    source_kind: engineer
+    label: 'Exclusao de dados, banco de producao e mudancas de acesso devem sempre voltar para um humano decidir. Repete restricao que ja e DURA no pedido — nao conta como sustentacao independente de B.'
+    trace: 'https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/'
+
+  - id: E_HEINZEL_MEMORIA_POR_SERVIDOR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.45
+    verified_at: 2026-10-05
+    verified_against: 'https://github.com/wintermeyer/heinzel — votos 2-1'
+    source_tier: 4
+    source_kind: engineer
+    label: 'O heinzel mantem memoria persistente por servidor (OS, servicos, notas) e roda checagens de housekeeping (disco, memoria, carga, updates pendentes, firewall, SSL, servicos falhos). Analogia frouxa com grafo medido contra o vivo: a memoria dele e nota escrita pelo agente, nao SSOT tipada reconciliada por radar.'
+    trace: 'https://github.com/wintermeyer/heinzel'
+
+  # ═══════════════════ MERCADO E LACUNAS ═══════════════════
+
+  - id: E_MERCADO_INFRA_VPS_1005
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'sintese do eixo mercado/capital da rodada de 2026-10-05; 3 claims de mercado (qovery.com, tier 3) refutadas no voto adversarial'
+    source_tier: 3
+    source_kind: internal-audit
+    label: 'SEM SINAL de mercado/capital. Nenhuma claim confirmada traz rodada, M&A ou leitura de analista sobre censo de VPS ou ops agentico de infra. As tres claims de custo de plataforma interna (2-4 engenheiros e 6-12 meses; manutencao perpetua como custo dominante; compre a camada de deploy, construa a camada fina) foram REFUTADAS — a terceira era recomendacao de fornecedor que vende a camada comprada. O eixo capital nao sustenta nem derruba C ou D: o argumento contra C e D vem da doutrina (pull-not-push, CORE diferente de FAMILIA), nao do mercado.'
+    trace: 'https://www.qovery.com/blog/platform-engineering-vs-devops-50-engineers-build-or-buy'
+
+  - id: E_LACUNAS_INFRA_VPS_1005
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'contabilidade da rodada de 2026-10-05: 33 fontes, 26 claims, 17 confirmadas, 8 refutadas, 0 nao verificadas; Elenxo 12 sobreviventes, 12 modeladas; payload do workflow truncado em dois pontos'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'LACUNAS DECLARADAS. (1) Orcamento: 33 fontes e 26 claims; 17 confirmadas, 8 refutadas por fonte fraca ou voto, 0 nao verificadas por 403/truncagem; 1 claim sem destino contabilizado (26 = 17 + 8 + 1). (2) Refutadas por fonte fraca: homelab listar-conferir-agir (tier 4); DOCKER-USER unica cadeia que o Docker honra (tier 4); heinzel todo SSH aprovado por humano (tier 4); tres claims qovery de custo de plataforma (tier 3); skill de audit nao cobre reboot/updates/sessoes (tier 3); checkrestart com falsos positivos (tier 8, refutada no voto). (3) Elenxo: 12 objecoes sobreviventes, 12 modeladas — nenhuma fora do grafo. (4) TRUNCAGEM no payload: a evidencia da objecao aos achados 15 e 16 corta em Se houver qualquer integracao por, e a recomendacao do Elenxo corta no constraint 2 (Compor o que ja esta instalado: needrestar); os constraints 2 em diante NAO chegaram e nao foram reconstruidos. (5) Nao medidos nesta sessao: 45 pacotes atualizaveis, restart policy dos 31 containers, 16 mosh orfaos, release 26.04.1; kernel 146 nao reproduzido. (6) Nao medido: comportamento de needrestart -b no kernel 6.8.0-139 em execucao.'
+    trace: 'docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml'
+
+  # ═══════════════════ OPCOES ═══════════════════
+
+  - id: C_OPCAO_A_NADA_NOVO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.25
+    label: 'OPCAO A — nada novo: manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh. A FAVOR: a exposicao Docker x UFW ja e coberta (REGRA 64, contencao DOCKER-USER, guarda). CONTRA: reboot pendente, updates, restart policy e sessoes orfas nao tem mecanismo, e a recorrencia foi resolvida a mao N muito maior que 1 — fix-must-become-mechanism reprova. Restringida por E_MEDIDO_ESTADO_VIVO_1005.'
+    trace: 'docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml'
+
+  - id: C_OPCAO_B_GRAFO_CENSO_COMANDO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.3
+    label: 'OPCAO B — grafo de dominio da VPS como SSOT viva + censo determinístico ops/vps-census.sh medindo o vivo contra o grafo + comando /ops:vps forjado por /meta:forge, core-only. Restringida em sete pontos pelo Elenxo: exit 2 nao serve a censo (acoplamento por conveniencia se /ops:vps for casca); hardening generico ja tem auditor maduro (Lynis); achados Docker x UFW nao diferenciam B de A e o censo de firewall exige sudo declarado; analogia heinzel nao prova o padrao grafo x vivo; bind loopback ja e guarda; SessionStart e auto-start com outro nome; hook com timeout falha aberto. Restringida por E_OBJECAO_EXIT2_NAO_SERVE_A_CENSO, E_OBJECAO_CHECKRESTART_AUSENTE, E_OBJECAO_LYNIS_NAO_REINVENTAR, E_OBJECAO_DOCKER_UFW_JA_COBERTO, E_OBJECAO_HEINZEL_ANALOGIA_FROUXA, E_OBJECAO_BIND_LOOPBACK_JA_E_REGRA, E_OBJECAO_SESSIONSTART_E_AUTOSTART, E_OBJECAO_TIMEOUT_FALHA_ABERTO.'
+    trace: 'docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml'
+
+  - id: C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.55
+    label: 'OPCAO B linha (B enxuta) — RECOMENDADA pelo Elenxo: censo shell que COMPOE sinais nativos (needrestart -b, /var/run/reboot-required.pkgs, uname -r x /boot/vmlinuz-*, apt list --upgradable, docker inspect restart policy, idade de sessoes) e estende vps-exposure-check.sh; SSOT = grafos de infra existentes; sem categoria /ops nova; sem hook; invocacao explicita e o lint so detecta a IDADE do ultimo censo (padrao REGRA 65). Restringida por E_OBJECAO_CHECKRESTART_AUSENTE (instrumento = needrestart -b), E_OBJECAO_INSTRUMENTO_NAO_VERIFICADO (certeza do restart e campo nao verificado ate medir) e E_OBJECAO_LIVEPATCH_CRUZAR_SINAIS (cruzar sinais e marcar qual sustentou o veredito).'
+    trace: 'docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml'
+
+  - id: C_OPCAO_C_VERTICAL_INFRA
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.1
+    label: 'OPCAO C — vertical de engenharia infra que viaja para adotantes. Reprovada pela recomendacao do Elenxo: nenhum 2o adotante pediu (pull-not-push) e o substrato e especifico desta VPS. Restringida por E_DOUTRINA_PULL_NOT_PUSH_E_TRES_DIMENSOES. Gatilho de reabertura: 2o adotante pedindo infra.'
+    trace: 'docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml'
+
+  - id: C_OPCAO_D_QUARTA_DIMENSAO
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.05
+    label: 'OPCAO D — 4a dimensao peer. Reprovada pela recomendacao do Elenxo: as 3 dimensoes peer sao doutrina selada (nem design/ foi promovida a peer) e nao ha evidencia de mercado nem de adotante que a sustente. Restringida por E_DOUTRINA_PULL_NOT_PUSH_E_TRES_DIMENSOES.'
+    trace: 'docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml'
+
+  # ═══════════════════ A DECISAO ═══════════════════
+
+  - id: D_INFRA_VPS_TREATMENT
+    node_type: decision
+    plane: DEV
+    status: done
+    impact: 5
+    confidence: 0.5
+    label: 'DECISAO ABERTA (o maestro sela; esta sessao NUNCA sela): como o Onion trata INFRA/VPS. OPCOES NOMEADAS: (A) nada novo, manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh; (B) grafo de dominio da VPS como SSOT viva + censo ops/vps-census.sh medindo o vivo contra o grafo + comando /ops:vps via /meta:forge, core-only; (B linha) B enxuta, censo shell que compoe sinais nativos (needrestart -b, reboot-required.pkgs, uname x /boot, apt upgradable, docker inspect restart policy, idade de sessoes) e estende vps-exposure-check.sh, SSOT nos grafos de infra existentes, sem categoria /ops nova, sem hook; (C) vertical de engenharia infra que viaja; (D) 4a dimensao peer. ═══ RECOMENDACAO DO ELENXO (UM agente, sem votacao — hipotese) ═══ B linha, core-only. C e D reprovadas: nenhum 2o adotante pediu, 3 dimensoes sao doutrina selada, substrato especifico desta VPS. A pura reprovada: recorrencia N muito maior que 1 resolvida a mao pede mecanismo. B integral reprovada em quatro pontos; constraint 1 = sem hook e sem SessionStart (MOAT W7, hook com timeout falha aberto), invocacao explicita e lint detecta a IDADE do ultimo censo (padrao REGRA 65); constraint 2 = compor o que ja esta instalado (needrestart...). A recomendacao chegou TRUNCADA a partir do constraint 2 — ver E_LACUNAS_INFRA_VPS_1005. Reboot e upgrade continuam decisao humana: o censo so propoe; nunca encerra nem propoe encerrar ferramenta da VPS.'
+    verified_at: '2026-10-05'
+    verified_against: 'SELADO PELO MAESTRO em 2026-10-05 (AskUserQuestion): opcao B INTEGRAL — grafo de dominio da VPS + censo deterministico + comando /ops:vps, core-only — e NAO a B linha que o Elenxo recomendava. Restricao do mesmo selo, pergunta do maestro: o dado da VPS nao viaja para adotante. Medido no vendor-manifest: docs/onion e docs/evolution nao viajam, ops/ nao viaja; .claude/commands e .claude/validation viajam — logo o censo mora em ops/ e o comando sai do pacote por corte, com caso de bancada que reprova se aparecer'
+    trace: 'docs/evolution/research/infra-vps-2026-10/SYNTHESIS.md'
+
+  # ── OBJECOES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ──
+  # 12 sobreviventes entregues, 12 modeladas. Confianca <= 0.6: UM agente, sem votacao.
+
+  - id: E_OBJECAO_EXIT2_NAO_SERVE_A_CENSO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'objecao do Elenxo ao achado 1 (https://code.claude.com/docs/en/hooks, tier 9) + postura de acoplamento do CLAUDE.md'
+    source_tier: 9
+    source_kind: primary
+    label: 'OBJECAO (Elenxo, 1 agente): o exit 2 e verdadeiro mas nao e argumento a favor de B — censo e medicao LIDA, nao acao a vetar. Pela postura de acoplamento o censo deve ser shell puro; /ops:vps como casca seria acoplamento por conveniencia. O exit 2 so entraria numa guarda PreToolUse contra apt full-upgrade, reboot ou do-release-upgrade sem decisao humana — que nao esta em B.'
+    trace: 'https://code.claude.com/docs/en/hooks'
+
+  - id: E_OBJECAO_CHECKRESTART_AUSENTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'medido nesta VPS em 2026-10-05: which checkrestart vazio; /usr/sbin/needrestart existe'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OBJECAO (Elenxo, 1 agente) aos achados 2 e 3: checkrestart NAO esta instalado aqui; needrestart esta (padrao do Ubuntu). O modelo relatar-sem-agir vale, mas o instrumento citado e ausente — evidencia emprestada. O censo chama needrestart -b (batch, parseavel).'
+    trace: '/usr/sbin/needrestart'
+
+  - id: E_OBJECAO_INSTRUMENTO_NAO_VERIFICADO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: 2026-10-05
+    verified_against: 'objecao do Elenxo ao achado 17 (checkrestart sensivel ao kernel, tier 8)'
+    source_tier: 8
+    source_kind: primary
+    label: 'OBJECAO (Elenxo, 1 agente) ao achado 17: vale como CLASSE — o instrumento precisa ser verificado — mas aponta a ferramenta errada. O mesmo risco precisa ser medido em needrestart no kernel 6.8.0-139 em execucao; ate la a certeza da saida de restart e CAMPO nao verificado, nao veredito.'
+    trace: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html'
+
+  - id: E_OBJECAO_LIVEPATCH_CRUZAR_SINAIS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'medido nesta VPS em 2026-10-05: canonical-livepatch ausente; /var/run/reboot-required existe com .pkgs libc6, linux-image-6.8.0-142-generic, linux-base; uname -r 139'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OBJECAO (Elenxo, 1 agente) ao achado 4: Livepatch nao se aplica a este host (ausente, e o reboot-required existe). A licao geral sobrevive: o censo cruza uname -r (139) com /boot/vmlinuz-* (142) e marca qual sinal sustentou o veredito. Premissa a corrigir: kernel 146 disponivel nao foi reproduzido.'
+    trace: '/var/run/reboot-required.pkgs · /boot'
+
+  - id: E_OBJECAO_LYNIS_NAO_REINVENTAR
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: 2026-10-05
+    verified_against: 'objecao do Elenxo ao achado 5 (https://manpages.org/lynis/8, tier 6); which lynis vazio medido; D_regra_5_portoes e D_anti_catalogo em stack-harmonia-2026-08'
+    source_tier: 6
+    source_kind: primary
+    label: 'OBJECAO (Elenxo, 1 agente) ao achado 5: Lynis nao esta instalado, e o achado puxa CONTRA B — se existe auditor maduro de hardening, construir checagem propria disso e reinventar a roda (D_regra_5_portoes, D_anti_catalogo). B so se sustenta restrito ao ESPECIFICO desta VPS (containers onion-vps-*, regra DOCKER-USER -i eth0, restart policy).'
+    trace: 'https://manpages.org/lynis/8 · docs/evolution/research/stack-harmonia-2026-08/'
+
+  - id: E_OBJECAO_DOCKER_UFW_JA_COBERTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'objecao do Elenxo aos achados 6, 8, 9 e 11; .claude/validation/vps-exposure-check.sh; D_containment_docker_user; iptables -S DOCKER-USER sem root = Permission denied (you must be root), medido pelo Elenxo'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OBJECAO (Elenxo, 1 agente) aos achados 6, 8, 9 e 11: Docker fura o UFW e CONHECIDO e COBERTO na opcao A (vps-exposure-check.sh, D_containment_docker_user) — nao favorece B sobre A. Pior: DOCKER-USER -i eth0 cobre SO a internet; container para host em 0.0.0.0 segue aberto, entao inspecionar DOCKER-USER nao basta. E iptables sem root nega: o censo precisa de sudo (o NOPASSWD da VPS), e isso precisa ser declarado.'
+    trace: '.claude/validation/vps-exposure-check.sh · docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml'
+
+  - id: E_OBJECAO_AFTER_RULES_E_MUDANCA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.55
+    verified_at: 2026-10-05
+    verified_against: 'objecao do Elenxo ao achado 7 (virtua.cloud, tier 5); systemctl is-enabled onion-vps-docker-firewall = enabled, medido'
+    source_tier: 5
+    source_kind: engineer
+    label: 'OBJECAO (Elenxo, 1 agente) ao achado 7: rotear DOCKER-USER para ufw-user-forward via after.rules e MUDANCA de firewall, nao medicao — cai em mudanca de acesso volta ao humano, e conflita com a contencao ja viva (onion-vps-docker-firewall enabled). Trocar a contencao e decisao separada, fora do escopo de qualquer opcao de censo.'
+    trace: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps'
+
+  - id: E_OBJECAO_HOMELAB_NAO_E_INDEPENDENTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.55
+    verified_at: 2026-10-05
+    verified_against: 'objecao do Elenxo ao achado 10 (mustafa.net, tier 4, blog de opiniao)'
+    source_tier: 4
+    source_kind: engineer
+    label: 'OBJECAO (Elenxo, 1 agente) ao achado 10: tier 4, blog de opiniao, repete restricao que ja e DURA no pedido — so confirma o que se queria ouvir (instrumento-responde-outra-pergunta). Nao conta como sustentacao independente de nenhuma opcao.'
+    trace: 'https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/'
+
+  - id: E_OBJECAO_HEINZEL_ANALOGIA_FROUXA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.5
+    verified_at: 2026-10-05
+    verified_against: 'objecao do Elenxo ao achado 12 (https://github.com/wintermeyer/heinzel, tier 4, votos 2-1)'
+    source_tier: 4
+    source_kind: engineer
+    label: 'OBJECAO (Elenxo, 1 agente) ao achado 12: a memoria do heinzel sao notas que o proprio agente escreve (declaracao), nao SSOT tipada reconciliada por radar determinístico. Prova so que alguem junta notas com checagens; nao prova o padrao grafo x vivo, e nao ha medida de falso positivo nem de custo de manter.'
+    trace: 'https://github.com/wintermeyer/heinzel'
+
+  - id: E_OBJECAO_BIND_LOOPBACK_JA_E_REGRA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'objecao do Elenxo ao achado 13 (tier 3); REGRA 64 e vps-exposure-check.sh no core'
+    source_tier: 10
+    source_kind: internal-audit
+    label: 'OBJECAO (Elenxo, 1 agente) ao achado 13: bind 127.0.0.1 ja e doutrina e guarda no core — REGRA 64 (compose rastreado com bind publico = HARD no lint) e vps-exposure-check.sh. Nao diferencia B de A.'
+    trace: '.claude/validation/vps-exposure-check.sh'
+
+  - id: E_OBJECAO_SESSIONSTART_E_AUTOSTART
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'objecao do Elenxo ao achado 14 (https://code.claude.com/docs/en/hooks, tier 9) + MOAT W7 (/meta:radar maestro-invocado, nunca agendado) + padrao REGRA 65'
+    source_tier: 9
+    source_kind: primary
+    label: 'OBJECAO (Elenxo, 1 agente) ao achado 14: censo em SessionStart e AUTO-START com outro nome — roda sem o maestro pedir em toda sessao, numa VPS com varias contas e sessoes (granaai, adotantes), contra o espirito do MOAT W7. O caminho conforme e invocacao explicita (script/comando) mais deteccao de IDADE no lint (padrao REGRA 65), nunca hook que dispara sozinho.'
+    trace: 'https://code.claude.com/docs/en/hooks'
+
+  - id: E_OBJECAO_TIMEOUT_FALHA_ABERTO
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'objecao do Elenxo aos achados 15 e 16 (https://code.claude.com/docs/en/hooks, tier 9); evidencia TRUNCADA no payload em Se houver qualquer integracao por'
+    source_tier: 9
+    source_kind: primary
+    label: 'OBJECAO (Elenxo, 1 agente) aos achados 15 e 16: e argumento CONTRA pôr o censo em hook. apt list --upgradable, needrestart e docker inspect de 31 containers podem ser lentos e, ao estourar o timeout, somem em silencio — ausencia de aviso lida como tudo limpo (classe exit-code-nao-e-a-verificacao, guarda anti-fail-open). O restante da objecao chegou truncado.'
+    trace: 'https://code.claude.com/docs/en/hooks'
+
+  - id: Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA
+    node_type: question
+    plane: PROD
+    impact: 3
+    confidence: 0.9
+    status: open
+    verified_at: '2026-10-05'
+    verified_against: 'grep em .claude/validation/vps-exposure-check.sh: 3 linhas com /home/marcio/onion-vps-*/backups, /home/marcio/backups/*, /home/onion/.claude/backups; o arquivo existe em brain-granaai, gmill, sacola-de-ideias e na porta publica onion-core'
+    trace: '.claude/validation/vps-exposure-check.sh'
+    label: 'VAZAMENTO JA EXISTENTE, achado ao medir a pergunta do maestro: a guarda vps-exposure-check.sh mora em .claude/validation/ (raiz que viaja) e carrega caminhos FIXOS desta VPS. Nao sao segredos, mas sao topologia da maquina do maestro, e chegaram a tres adotantes e a porta PUBLICA onion-core. CURA, junto da forja da opcao B: a guarda vira core-only (fora do pacote) ou o caminho passa a vir da configuracao, e a porta e re-materializada. GATILHO: a forja da opcao B.'
+
+  # ── evidencias sustentam a pergunta ──
+
+edges:
+  - from: E_MEDIDO_ESTADO_VIVO_1005
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_CORPUS_INFRA_JA_COBRE_EXPOSICAO
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_DOUTRINA_PULL_NOT_PUSH_E_TRES_DIMENSOES
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_HOOK_EXIT2_BLOQUEIA_DETERMINISTICO
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_HOOK_EVENTOS_SEM_AGENDADOR
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_HOOK_TIMEOUT_FALHA_ABERTO
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_HOOK_TIMEOUT_PADRAO_600S
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_CHECKRESTART_SO_REPORTA
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_CHECKRESTART_VIA_LSOF_SEM_ESTADO
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_CHECKRESTART_SENSIVEL_AO_KERNEL
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_LIVEPATCH_SUPRIME_REBOOT_REQUIRED
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_LYNIS_AUDITORIA_SO_RELATO
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_DOCKER_FORWARD_CONTORNA_UFW
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_DOCKER_USER_ROTEAR_PARA_UFW
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_UFW_STATUS_SUBESTIMA_EXPOSICAO
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_DOCKER_USER_PONTO_OFICIAL
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_DOCKER_DNAT_PREROUTING
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_BIND_LOOPBACK_MITIGA
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_HOMELAB_HUMANO_DECIDE
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_HEINZEL_MEMORIA_POR_SERVIDOR
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_MERCADO_INFRA_VPS_1005
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_INFRA_VPS_1005
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+
+  # ── a decisao responde a pergunta; as opcoes alimentam a decisao ──
+  - from: D_INFRA_VPS_TREATMENT
+    to: Q_INFRA_VPS_TREATMENT_2026
+    edge_type: SUPPORTS
+  - from: C_OPCAO_A_NADA_NOVO
+    to: D_INFRA_VPS_TREATMENT
+    edge_type: SUPPORTS
+  - from: C_OPCAO_B_GRAFO_CENSO_COMANDO
+    to: D_INFRA_VPS_TREATMENT
+    edge_type: SUPPORTS
+  - from: C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS
+    to: D_INFRA_VPS_TREATMENT
+    edge_type: SUPPORTS
+  - from: C_OPCAO_C_VERTICAL_INFRA
+    to: D_INFRA_VPS_TREATMENT
+    edge_type: SUPPORTS
+  - from: C_OPCAO_D_QUARTA_DIMENSAO
+    to: D_INFRA_VPS_TREATMENT
+    edge_type: SUPPORTS
+
+  # ── evidencia sustenta opcao ──
+  - from: E_CORPUS_INFRA_JA_COBRE_EXPOSICAO
+    to: C_OPCAO_A_NADA_NOVO
+    edge_type: SUPPORTS
+  - from: E_CHECKRESTART_SO_REPORTA
+    to: C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS
+    edge_type: SUPPORTS
+  - from: E_LIVEPATCH_SUPRIME_REBOOT_REQUIRED
+    to: C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS
+    edge_type: SUPPORTS
+  - from: E_MEDIDO_ESTADO_VIVO_1005
+    to: C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS
+    edge_type: SUPPORTS
+
+  # ── dissent que LIMITA (CONSTRAINS) ──
+  - from: E_MEDIDO_ESTADO_VIVO_1005
+    to: C_OPCAO_A_NADA_NOVO
+    edge_type: CONSTRAINS
+  - from: E_DOUTRINA_PULL_NOT_PUSH_E_TRES_DIMENSOES
+    to: C_OPCAO_C_VERTICAL_INFRA
+    edge_type: CONSTRAINS
+  - from: E_DOUTRINA_PULL_NOT_PUSH_E_TRES_DIMENSOES
+    to: C_OPCAO_D_QUARTA_DIMENSAO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_EXIT2_NAO_SERVE_A_CENSO
+    to: C_OPCAO_B_GRAFO_CENSO_COMANDO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CHECKRESTART_AUSENTE
+    to: C_OPCAO_B_GRAFO_CENSO_COMANDO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_CHECKRESTART_AUSENTE
+    to: C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_INSTRUMENTO_NAO_VERIFICADO
+    to: C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_LIVEPATCH_CRUZAR_SINAIS
+    to: C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_LYNIS_NAO_REINVENTAR
+    to: C_OPCAO_B_GRAFO_CENSO_COMANDO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_DOCKER_UFW_JA_COBERTO
+    to: C_OPCAO_B_GRAFO_CENSO_COMANDO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_AFTER_RULES_E_MUDANCA
+    to: D_INFRA_VPS_TREATMENT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HOMELAB_NAO_E_INDEPENDENTE
+    to: D_INFRA_VPS_TREATMENT
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_HEINZEL_ANALOGIA_FROUXA
+    to: C_OPCAO_B_GRAFO_CENSO_COMANDO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_BIND_LOOPBACK_JA_E_REGRA
+    to: C_OPCAO_B_GRAFO_CENSO_COMANDO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_SESSIONSTART_E_AUTOSTART
+    to: C_OPCAO_B_GRAFO_CENSO_COMANDO
+    edge_type: CONSTRAINS
+  - from: E_OBJECAO_TIMEOUT_FALHA_ABERTO
+    to: C_OPCAO_B_GRAFO_CENSO_COMANDO
+    edge_type: CONSTRAINS
+
+  # ── a objecao se apoia no achado que ela qualifica ──
+  - from: E_HOOK_EXIT2_BLOQUEIA_DETERMINISTICO
+    to: E_OBJECAO_EXIT2_NAO_SERVE_A_CENSO
+    edge_type: SUPPORTS
+  - from: E_HOOK_EVENTOS_SEM_AGENDADOR
+    to: E_OBJECAO_SESSIONSTART_E_AUTOSTART
+    edge_type: SUPPORTS
+  - from: E_HOOK_TIMEOUT_FALHA_ABERTO
+    to: E_OBJECAO_TIMEOUT_FALHA_ABERTO
+    edge_type: SUPPORTS
+  - from: E_HOOK_TIMEOUT_PADRAO_600S
+    to: E_OBJECAO_TIMEOUT_FALHA_ABERTO
+    edge_type: SUPPORTS
+  - from: E_CHECKRESTART_SENSIVEL_AO_KERNEL
+    to: E_OBJECAO_INSTRUMENTO_NAO_VERIFICADO
+    edge_type: SUPPORTS
+  - from: E_LYNIS_AUDITORIA_SO_RELATO
+    to: E_OBJECAO_LYNIS_NAO_REINVENTAR
+    edge_type: SUPPORTS
+  - from: E_CORPUS_INFRA_JA_COBRE_EXPOSICAO
+    to: E_OBJECAO_DOCKER_UFW_JA_COBERTO
+    edge_type: SUPPORTS
+  - from: E_DOCKER_USER_ROTEAR_PARA_UFW
+    to: E_OBJECAO_AFTER_RULES_E_MUDANCA
+    edge_type: SUPPORTS
+  - from: E_HOMELAB_HUMANO_DECIDE
+    to: E_OBJECAO_HOMELAB_NAO_E_INDEPENDENTE
+    edge_type: SUPPORTS
+  - from: E_HEINZEL_MEMORIA_POR_SERVIDOR
+    to: E_OBJECAO_HEINZEL_ANALOGIA_FROUXA
+    edge_type: SUPPORTS
+  - from: E_BIND_LOOPBACK_MITIGA
+    to: E_OBJECAO_BIND_LOOPBACK_JA_E_REGRA
+    edge_type: SUPPORTS
+  - from: Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA
+    to: D_INFRA_VPS_TREATMENT
+    edge_type: CONSTRAINS
