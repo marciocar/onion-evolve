@@ -2,8 +2,8 @@
 title: 'Resíduo — o onion-kg-ssot no registro, a semente que executava o próprio comentário e dois achados na fila'
 date: 2026-10-06
 branch: chore/register-onion-kg-ssot
-reviewed_diff_sha256: f7b0fda148f22df565b8762acaaab55e2b11e474ef81f71a2f116a86f57c76e8
-reviewed_code_sha256: ebe47a0f8a8844dc9146b96e24e29eb16548fb940d27181d3f8cd541792122db
+reviewed_diff_sha256: f49d42ed3bc33f026607a26c5a932f857e85538f7aaaa767ae590902d41dee2c
+reviewed_code_sha256: 7fe77cc15d50ddb0e57bac2511f854f578b2cfaadcce7d06cfcceef81bf0c75f
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
@@ -20,7 +20,9 @@ nota: >-
   (a0) exige o stderr sem "command not found". O caso pegou na 1ª rodada MAIS UMA crase, na própria nota que
   explicava o erro — o defeito real serviu de mutante: reprova com a crase, passa sem ela. Varredura: zero crase
   não escapada no corpo do heredoc. (3) A fila-2026-10-06 ganha dois achados da adoção: a trava de merge inerte
-  no adotante (sai 0 sem ops/) e a hipótese da skill core-only que viajou. Sem Elenxo, declarado.
+  no adotante (sai 0 sem ops/) e a hipótese da skill core-only que viajou. Os `confirmed` de maior impacto
+  do grafo editado seguem como estavam e foram relidos: E_PRECOMMIT_RECARIMBA_RESIDUO, E_ADOPT_SEM_GITIGNORE_DE_SEGREDOS
+  e E_DOIS_LEITORES_DIVERGIAM (impacto 4); o PR só ACRESCENTA nós, não muda nenhum deles. Sem Elenxo, declarado.
 ---
 
 # Resíduo — `chore/register-onion-kg-ssot`
