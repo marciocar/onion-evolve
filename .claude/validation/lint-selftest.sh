@@ -4033,7 +4033,8 @@ run_merge_fixture() {
     else (if $o.attribution == $t.attribution then "ok" else "attribution PROPRIO do alvo foi sobrescrito (clobber)" end) end')"
   if [ "${attr_ok}" != ok ]; then record_fail "${fixture}" "${attr_ok}"; return; fi
   case "${fixture}" in *own-attribution*)
-    bash "${helper}" "${src}" "${tgt}" 2>&1 >/dev/null | grep -q 'AVISO: o attribution do alvo difere' \
+    local _aviso; _aviso="$(bash "${helper}" "${src}" "${tgt}" 2>&1 >/dev/null || true)"   # here-string: nada de produtor|grep -q
+    grep -q 'AVISO: o attribution do alvo difere' <<< "${_aviso}" \
       || { record_fail "${fixture}" "attribution divergente sem o AVISO no stderr"; return; } ;;
   esac
 
