@@ -1,6 +1,6 @@
 ---
-reviewed_diff_sha256: cee2991d4c41a6a0b8c69a3b94d4354630712d4c97c7ca80d06a59e158db7f2b
-reviewed_code_sha256: 824a571a32a72de4292c2e594407765ce840db0e12cdf7313d070b087d09fa78
+reviewed_diff_sha256: 1ed2b6ee5d1c3ba317490e84a3ea13d28be84c711726a88639ce85efac5654ca
+reviewed_code_sha256: 858dce6f112024edef144ca6a4e90492c603ee6dd93ef1bafb50daf75e418745
 findings_total: 11
 findings_real: 11
 tokens: 229273
@@ -20,6 +20,9 @@ nota: >
   (clone single-branch). Bancada resolve_production 16/16 + 3 fixtures de merge; 10 mutantes mordem. Medido nos
   24 adotantes: só brain-granaai (develop→master) e rhilo-metagamify (develop→rhilo/main) mudam, ambos casando
   com o config gravado.
+  DEPOIS DO CI (2026-10-06): a faixa 1 reprovou na catraca da classe produtor|grep -q — o caso novo do AVISO de
+  attribution usava `bash helper … | grep -q`, sítio NOVO (35>34). Curado com here-string; a catraca volta a 34
+  (ZERO novo). Revisado à mão por quem escreveu, sem nova passada do Elenxo — declarado.
 ---
 
 # Resíduo — `fix/update-attribution-and-production`
