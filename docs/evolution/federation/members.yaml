@@ -792,6 +792,27 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
+  - id: onion-slm
+    name: onion-slm (espaço de execução do Onion SLM)
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+    remote: https://github.com/marciocar/onion-slm (privado)
+    local_path: /home/marcio/onion-slm
+    onion_version: 9e75a73d0401
+    adopted_at: 2026-10-06
+    mode: greenfield
+    personality_summary: "Nasceu do pedido do maestro por um espaço separado para o Onion SLM: o modelo como Dogfood + KG-SSOT First + Runtime SDAAL encarnado, num roteiro gradual porta 0 → spike → PoC → MVP → produto cujos limiares são decididos por formulário. O moat que ele carrega é o mecanismo (eval selado PRIVADO + corretor determinístico + radar), não o modelo."
+    specializations: [slm, eval-de-dominio, roteiro-gradual]
+    personality_last_sync: 2026-10-06
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: []
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>
