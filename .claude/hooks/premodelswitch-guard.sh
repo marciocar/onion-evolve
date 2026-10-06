@@ -74,7 +74,10 @@ if [ -n "${floor}" ] && [ "${to_base}" = "${floor}" ]; then
   echo "GUARDA-PREMODELSWITCH: sessão DEGRADADA ao piso '${floor}' por fallback (${src}). Volte ao primário com /model assim que houver capacidade; o aviso repete a cada prompt." >&2
   exit 0
 fi
-if printf '%s\n' "${allowed}" | grep -qxF "${to_base}"; then _log allow; exit 0; fi
+# here-string, nunca `printf | grep -q` (2026-10-06): sob `set -o pipefail` o grep -q fecha o pipe no 1º
+# match, o printf toma EPIPE e o pipeline sai NÃO-ZERO com o modelo PRESENTE — a guarda vetava uma troca
+# permitida. Medido: a bancada completa reprovou o caso `fable-5-1[1m]` com a máquina em carga 12/8 núcleos.
+if grep -qxF "${to_base}" <<< "${allowed}"; then _log allow; exit 0; fi
 _log block
 echo "GUARDA-PREMODELSWITCH: troca ${from} → ${to} NEGADA — '${to_base}' não está em session_models do eixo E6 de docs/onion/radar-baselines.yaml ($(printf '%s' "${allowed}" | tr '\n' ' ')). Diretriz da casa: sempre o latest/máximo do lineup; downgrade só por rodada do radar (/meta:radar E6-fronteira-modelos) que atualize o baseline — nunca por /model." >&2
 exit 2
