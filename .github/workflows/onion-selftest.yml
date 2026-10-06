@@ -76,7 +76,7 @@ jobs:
         name: Distribuir as familias em faixas (round-robin)
         run: |
           set -euo pipefail
-          plano="$(bash ops/testing/selftest-shard-plan.sh 5)"
+          plano="$(bash ops/testing/selftest-shard-plan.sh 4)"
           echo "plano: ${plano}"
           echo "faixas=${plano}" >> "${GITHUB_OUTPUT}"
 
@@ -100,9 +100,10 @@ jobs:
     # 2026-09-23: ENCOSTOU DUAS VEZES e a resposta acima FOI APLICADA — a suíte roda em 4 faixas de
     # matriz. O teto passa a valer POR FAIXA, e ele NÃO subiu: caiu de 40 para 25.
     # 2026-10-05: a faixa 4 ENCOSTOU DE NOVO — 25m20s em duas tentativas do PR #927 (run 37375759149),
-    # canceladas, depois de 20m25s na main pela manhã. A família nova do PR deslocou o round-robin e
-    # concentrou o caro numa faixa de 54 famílias. Mesma resposta, aplicada outra vez: 5 faixas, o teto
-    # FICA em 25. Se encostar de novo, o sinal é distribuir por CUSTO medido, não por contagem.
+    # canceladas, depois de 20m25s na main pela manhã. A 1ª hipótese (5 faixas) foi REFUTADA no 3º
+    # cancelamento: a evidência da main mostrou a família `fixtures` com 997 s + 936 s nos 2 workers de UMA
+    # faixa — ela inteira cai numa faixa só, qualquer que seja N. Cura: o plano reparte o manifest da
+    # `fixtures` entre TODAS as faixas (fixtures_lane i/n). Volta a 4 faixas, teto em 25.
     timeout-minutes: 25
     steps:
       - uses: actions/checkout@v5
@@ -132,6 +133,8 @@ jobs:
         # está bom" de "não verifiquei" — no CI só o primeiro vale verde.
         env:
           ONION_SELFTEST_STRICT: '1'
+          # a fatia desta faixa no manifest da família `fixtures` (o plano a reparte entre TODAS as faixas)
+          ONION_SELFTEST_FIXTURES_LANE: ${{ matrix.faixa.fixtures_lane }}
         # --jobs auto: faixa paralela (D_BANCADA_FAIXAS_E_MAPA, 2026-09-03) — cada worker é um
         # processo --child com o mesmo cabeçalho; worker sem trailer de soma = FALHA no pai.
         # --report: o resultado passa a existir FORA do log (ONDA 0.2). `tee` guarda a saída

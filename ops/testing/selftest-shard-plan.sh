@@ -44,8 +44,20 @@ printf '%s\n' "${FAMS[@]}" | N="${N}" python3 -c '
 import json, os, sys
 fams = [l.strip() for l in sys.stdin if l.strip()]
 n = max(1, int(os.environ["N"]))
+# `fixtures` NAO entra no round-robin: vai a TODA faixa com a sua fatia do manifest (fixtures_lane i/n).
+# Medido 2026-10-05: ~1600 s de CPU numa faixa so, teto de 25 min estourado 3x no PR #927 — somar
+# faixas nao ajudava enquanto ela inteira caisse numa so.
+fx = "fixtures" in fams
+rest = [f for f in fams if f != "fixtures"]
 shards = [[] for _ in range(n)]
-for i, f in enumerate(fams):
+for i, f in enumerate(rest):
     shards[i % n].append(f)
-print(json.dumps([{"n": i + 1, "familias": ",".join(s)} for i, s in enumerate(shards) if s]))
+out = []
+for i, s in enumerate(shards):
+    if fx: s = ["fixtures"] + s
+    if not s: continue
+    d = {"n": i + 1, "familias": ",".join(s)}
+    if fx: d["fixtures_lane"] = "%d/%d" % (i, n)
+    out.append(d)
+print(json.dumps(out))
 '

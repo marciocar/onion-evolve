@@ -176,13 +176,17 @@ SELFTEST_LIST=0; SELFTEST_MAP=0; SELFTEST_TIMING="${ONION_SELFTEST_TIMING:-0}"
 SELFTEST_JOBS="${ONION_SELFTEST_JOBS:-1}"; SELFTEST_FAMILIES="${ONION_SELFTEST_FAMILIES:-}"
 SELFTEST_CHILD="${ONION_SELFTEST_CHILD:-0}"; SELFTEST_AFFECTED=(); SELFTEST_AFFECTED_STAGED=0; SELFTEST_DRY=0
 SELFTEST_QUEUE="${ONION_SELFTEST_QUEUE:-}"; SELFTEST_SHARD="${ONION_SELFTEST_SHARD:-}"
+# FAIXA DA MATRIZ para a família `fixtures` (2026-10-05): ela é ~1600 s de CPU no runner de 2 núcleos e,
+# presa numa faixa só, estourou o teto de 25 min três vezes no PR #927. i/n = esta faixa roda as linhas
+# do manifest cujo índice % n == i; dentro dela, o SHARD dos workers fatia o que sobrou.
+SELFTEST_FIXTURES_LANE="${ONION_SELFTEST_FIXTURES_LANE:-}"
 # papel do repo (core | adopted): lido do stamp; ausente = core. Famílias/fixtures core-only pulam com ⊘ no adotante.
 SELFTEST_ROLE="$(awk -F': *' '/^role:/{print $2; exit}' "${REPO_ROOT}/.claude/.onion-version" 2>/dev/null || true)"
 SELFTEST_CORE_ONLY_FAMILIES="testing_state,ci_evidence,selftest_series,harness_inventory,resolve_target,kg_coverage,backlog_projection,radar_staleness,members_registry,research_lens,research_workflow,reconcile_inputs,regen_baselines,capability,role_bundle,outbox_channel,moat_boundary,materialize_repo,rules_registry"
 # HERMÉTICA POR CONSTRUÇÃO (mesma doutrina do unset de GIT_DIR acima): as variáveis de worker foram CONSUMIDAS;
 # se ficassem exportadas, uma família que invoca a bancada (selftest_lanes) herdaria fila/shard/child do pai e a
 # bancada aninhada viraria um worker mudo — foi o que matou o worker 4 no 3º dogfood (2026-09-03).
-unset ONION_SELFTEST_CHILD ONION_SELFTEST_QUEUE ONION_SELFTEST_SHARD ONION_SELFTEST_FAMILIES ONION_SELFTEST_TIMING ONION_SELFTEST_JOBS
+unset ONION_SELFTEST_CHILD ONION_SELFTEST_QUEUE ONION_SELFTEST_SHARD ONION_SELFTEST_FAMILIES ONION_SELFTEST_TIMING ONION_SELFTEST_JOBS ONION_SELFTEST_FIXTURES_LANE
 while [ $# -gt 0 ]; do
   case "$1" in
     --list) SELFTEST_LIST=1 ;;
@@ -406,6 +410,7 @@ if [ "${SELFTEST_JOBS}" -gt 1 ] && [ "${SELFTEST_CHILD}" = "0" ] && [ "${SELFTES
     for (( i=0; i<_j; i++ )); do
       ONION_SELFTEST_CHILD=1 ONION_SELFTEST_FAMILIES="${_all_csv}" ONION_SELFTEST_STRICT="${STRICT}" \
         ONION_SELFTEST_QUEUE="${_tdir}/q" ONION_SELFTEST_SHARD="${i}/${_j}" ONION_SELFTEST_TIMING="${SELFTEST_TIMING}" \
+        ONION_SELFTEST_FIXTURES_LANE="${SELFTEST_FIXTURES_LANE}" \
         bash "${BASH_SOURCE[0]}" --child > "${_tdir}/${i}.out" 2>&1 &
       _pids[i]=$!
     done
@@ -14760,8 +14765,9 @@ run_fixtures_selftests() {
 # SHARD (faixa paralela): ONION_SELFTEST_SHARD=i/n → este worker processa só as linhas do manifest
 # cujo índice % n == i. A família `fixtures` é ~97% do tempo serial (94 casos × ~10 s); sem fatiar,
 # paralelizar por família não ganha nada. Sem a variável = tudo (serial).
-local _shard_i=0 _shard_n=1 _shard_k=0
+local _shard_i=0 _shard_n=1 _shard_k=0 _lane_i=0 _lane_n=1 _lane_k=0
 case "${SELFTEST_SHARD:-}" in */*) _shard_i="${SELFTEST_SHARD%/*}"; _shard_n="${SELFTEST_SHARD#*/}" ;; esac
+case "${SELFTEST_FIXTURES_LANE:-}" in */*) _lane_i="${SELFTEST_FIXTURES_LANE%/*}"; _lane_n="${SELFTEST_FIXTURES_LANE#*/}" ;; esac
 if [ -f "${MANIFEST}" ]; then
   # 6a coluna OPCIONAL `inject` (2026-09-23): o nome do arquivo injetado era FIXO em
   # `selftest-fixture-probe.md`, e isso tornava o §11.1 de commands.md INSATISFAZIVEL para toda guarda
@@ -14784,6 +14790,8 @@ if [ -f "${MANIFEST}" ]; then
     # manifesto ja usa na coluna `target` das linhas `members`.
     [ "${keyword:-}" = "-" ] && keyword=""
     [ "${inject:-}" = "-" ] && inject=""
+    _lane_k=$(( _lane_k + 1 ))
+    [ $(( (_lane_k - 1) % _lane_n )) -eq "${_lane_i}" ] || continue   # faixa da matriz primeiro
     _shard_k=$(( _shard_k + 1 ))
     [ $(( (_shard_k - 1) % _shard_n )) -eq "${_shard_i}" ] || continue
     # CORE-ONLY no adotante (Q_SELFTEST_VENDORIZADO_INSATISFAZIVEL_NO_ADOTANTE, cura (a), 2026-09-03): em repo
@@ -15956,6 +15964,15 @@ PYI
   if grep -qx '#ONION_SELFTEST_COUNTS 2 0 0' <<< "${out}"; then
     record_pass "selftest-lanes: (n) ONION_SELFTEST_SHARD=1/2 ⇒ metade do manifest (2 de 4)"
   else record_fail "selftest-lanes: (n) shard child" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
+  # (n2)/(n3) FAIXA DA MATRIZ (2026-10-05): a faixa fatia o manifest ANTES dos workers
+  out="$(ONION_SELFTEST_FIXTURES_LANE=1/2 bash "${copy}" --families fixtures --child 2>&1 || true)"
+  if grep -qx '#ONION_SELFTEST_COUNTS 2 0 0' <<< "${out}"; then
+    record_pass "selftest-lanes: (n2) ONION_SELFTEST_FIXTURES_LANE=1/2 ⇒ metade do manifest (2 de 4)"
+  else record_fail "selftest-lanes: (n2) faixa da matriz" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
+  out="$(ONION_SELFTEST_FIXTURES_LANE=1/2 ONION_SELFTEST_SHARD=0/2 bash "${copy}" --families fixtures --child 2>&1 || true)"
+  if grep -qx '#ONION_SELFTEST_COUNTS 1 0 0' <<< "${out}"; then
+    record_pass "selftest-lanes: (n3) faixa 1/2 × worker 0/2 ⇒ um quarto do manifest (1 de 4)"
+  else record_fail "selftest-lanes: (n3) faixa × worker" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-100)"; fi
 
   # ── (o)-(q) --report: o relatório legível por máquina não pode custar a integridade da suíte ──
   #
@@ -22118,10 +22135,15 @@ want = [l.strip() for l in subprocess.run(
     capture_output=True, text=True).stdout.splitlines() if l.strip()]
 if not want:
     print("SEM-LISTA"); raise SystemExit(0)
-if sorted(got) == sorted(want) and len(got) == len(set(got)):
+# `fixtures` vai a TODA faixa, cada uma com a sua fatia (fixtures_lane i/n distinta, cobrindo 0..n-1)
+lanes = sorted(s.get("fixtures_lane", "") for s in sh if "fixtures" in s["familias"].split(","))
+n = len(sh)
+fx_ok = ("fixtures" not in want) or lanes == sorted("%d/%d" % (i, n) for i in range(n))
+rest = [f for f in got if f != "fixtures"]
+if fx_ok and sorted(set(got)) == sorted(want) and len(rest) == len(set(rest)):
     print("OK")
 else:
-    print("DIVERGE perdidas=%d duplicadas=%d" % (len(set(want) - set(got)), len(got) - len(set(got))))
+    print("DIVERGE perdidas=%d duplicadas=%d fixtures_lanes=%s" % (len(set(want) - set(got)), len(rest) - len(set(rest)), lanes))
 ' 2>&1)"
     if [ "${ver}" = "OK" ]; then
       record_pass "shard-plan: (a) cobertura EXATA — nenhuma familia perdida nem duplicada"
@@ -22134,8 +22156,9 @@ else:
   rr="$(printf '%s' "${plano}" | python3 -c '
 import json, sys
 sh = json.load(sys.stdin)
-f1 = sh[0]["familias"].split(",")
-f2 = sh[1]["familias"].split(",") if len(sh) > 1 else []
+# `fixtures` vai a toda faixa por desenho (fatia propria); o round-robin e o das DEMAIS
+f1 = [f for f in sh[0]["familias"].split(",") if f != "fixtures"]
+f2 = [f for f in sh[1]["familias"].split(",") if f != "fixtures"] if len(sh) > 1 else []
 print("OK" if f1 and f2 and f1[0] != f2[0] else "CONTIGUO")
 ' 2>&1)"
   if [ "${rr}" = "OK" ]; then
