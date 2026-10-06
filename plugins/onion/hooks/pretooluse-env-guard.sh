@@ -78,7 +78,7 @@ def is_env_token(tok):
     return False
 
 def cites_env(text):
-    return bool(re.search(r'(^|[\s/<"\'=:(])\.env(\.[A-Za-z0-9_.-]+)?($|[\s"\';|&)>])', text)) or \
+    return bool(re.search(r'(^|[\s/<"\'=:(`])\.env(\.[A-Za-z0-9_.-]+)?($|[\s"\';|&)>`])', text)) or \
            bool(re.search(r'[\w-]+\.env\b', text))
 
 # ── QUEM PODE RECEBER UM .env SEM LER O CONTEÚDO ─────────────────────────────────────────────
@@ -133,10 +133,101 @@ def segments(cmd):
         out.append(seg)
     return out
 
+# ── HEREDOC: o corpo só é DADO quando o PREFIXO INTEIRO prova que é (2026-10-06) ─────────────────
+# Medido ao abrir o PR #933: o veto lia cada linha do corpo de um heredoc como comando, e uma linha de
+# markdown começando com `**` (glob que casa `.env`) barrou um `cat > corpo.md <<'EOF'` — texto inerte.
+# DUAS passadas adversariais reprovaram curas anteriores: a 1ª tratava o corpo como dado por padrão
+# (26 escapes: `cat <<E | bash`, `sudo -u x bash`, `ssh h`, `<<END-X`…); a 2ª analisava LINHA A LINHA,
+# sem o estado do shell que vem antes (heredoc externo, aspas abertas, `\` de continuação, `<<-` mal
+# tokenizado, `>(sh)`, `git -c alias.x='!sh'`, script gravado sem extensão e executado — 9 escapes, todos
+# executados de verdade). Por isso a regra é a MAIS ESTREITA que serve ao caso legítimo: o prefixo do
+# comando até a linha do operador é analisado INTEIRO e tem de provar — um só `<<`, nenhuma aspa aberta,
+# nenhum `\` de continuação, nenhuma substituição (`$(`, `<(`, `>(`, crase), nenhum pipe adiante, o
+# consumidor numa lista FECHADA (cat, tee, gh sem alias, ou exatamente `git commit`), delimitador de
+# palavra simples e terminador presente. Qualquer dúvida → nada se separa e tudo é julgado como na main.
+# E um corpo que CITA .env e vai para ARQUIVO é sempre vetado: qualquer arquivo pode virar script depois.
+HEREDOC_ANY = re.compile(r'(?<!<)<<(?!<)')
+HEREDOC_WORD = re.compile(r'(?<!<)<<(-?)[ \t]*((?:[A-Za-z0-9_.-]|"[^"\n]*"|\'[^\'\n]*\'|\\.)+)(?=$|[\s;|&<>)])')
+REDIRS = {'>', '>>', '>|', '&>', '&>>', '1>', '1>>'}
+
+def _consumer_ok(seg):
+    args = [t for t in seg if not re.match(r'^[A-Za-z_][A-Za-z0-9_]*=', t)]
+    if not args:
+        return None
+    name = args[0]
+    if name in ('cat', 'tee'):
+        return name
+    if name == 'gh' and 'alias' not in args:
+        return name
+    if name == 'git' and len(args) > 1 and args[1] == 'commit':
+        return name
+    return None
+
+def split_heredocs(cmd):
+    """Devolve (comando sem o corpo PROVADO como dado, [(entre aspas?, gravado em arquivo?, corpo)])."""
+    lines = cmd.split('\n')
+    idx = next((i for i, l in enumerate(lines) if HEREDOC_ANY.search(l)), None)
+    if idx is None:
+        return cmd, []
+    prefix = '\n'.join(lines[:idx + 1])
+    line = lines[idx]
+    if (re.search(r'\$\(|<\(|>\(|`', prefix) or re.search(r'\\$', '\n'.join(lines[:idx]), re.M)
+            or line.rstrip().endswith('\\') or len(HEREDOC_ANY.findall(prefix)) != 1):
+        return cmd, []
+    m = HEREDOC_WORD.search(line)
+    if not m:
+        return cmd, []
+    word, dash = m.group(2), m.group(1) == '-'
+    delim = re.sub(r'["\'\\]', '', word)
+    if not re.match(r'^[A-Za-z0-9_.-]+$', delim):
+        return cmd, []
+    quoted = bool(re.search(r'["\'\\]', word))
+    try:
+        lex = shlex.shlex(strip_comments(prefix), posix=True, punctuation_chars=';&|()<>')
+        lex.whitespace_split = True
+        lex.commenters = ''
+        toks = list(lex)
+    except ValueError:
+        return cmd, []                                   # aspas abertas no prefixo
+    if toks.count('<<') != 1:
+        return cmd, []                                   # `<<` dentro de aspas, ou outro operador
+    k = toks.index('<<')
+    if any('|' in t for t in toks[k:]):
+        return cmd, []                                   # o corpo seguiria para outro comando
+    b = max([i for i, t in enumerate(toks[:k]) if t and set(t) <= set(';&|()\n')] or [-1]) + 1
+    seg = toks[b:]
+    name = _consumer_ok(seg[:seg.index('<<')])
+    if not name:
+        return cmd, []
+    _around = line[m.end():] + ' ' + line[:m.start()]
+    # gravado: tee, redirecionamento para arquivo, ou para um descritor >= 3 (que pode ser um arquivo aberto antes)
+    written = (name == 'tee' or any(t in REDIRS for t in seg) or bool(re.search(r'(^|\s)\d*>{1,2}\s*[^&\s]', _around))
+               or bool(re.search(r'>&\s*[3-9]', _around)))
+    j = idx + 1
+    while j < len(lines) and (lines[j].lstrip('\t') if dash else lines[j]) != delim:
+        j += 1
+    if j >= len(lines):
+        return cmd, []                                   # terminador ausente
+    body = '\n'.join(lines[idx + 1:j])
+    rest_cmd, rest_docs = split_heredocs('\n'.join(lines[j + 1:]))
+    return '\n'.join(lines[:idx + 1] + ([rest_cmd] if j + 1 < len(lines) else [])), [(quoted, written, body)] + rest_docs
+
+def judge_heredocs(docs, depth):
+    for quoted, written, body in docs:
+        if written and cites_env(body):
+            return 'heredoc que grava em ARQUIVO um texto citando um arquivo .env (pode virar script) — escreva com a ferramenta Write'
+        if not quoted and re.search(r'\$\(|`', body) and cites_env(body):
+            return 'heredoc sem aspas com substituição de comando que cita um arquivo .env'
+    return None
+
 def judge(cmd, depth=0):
     """None = passa; str = motivo do veto."""
     if depth > 4:
         return 'aninhamento de shell profundo demais para provar'
+    cmd, docs = split_heredocs(cmd)
+    r = judge_heredocs(docs, depth)
+    if r:
+        return r
     try:
         segs = segments(cmd)
     except ValueError:

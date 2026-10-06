@@ -5900,6 +5900,59 @@ SWEEP
       record_pass "env-exposure: (j) os ${sn} blocos bash do corpus que citam .env passam pelo veto (nenhum lê, nenhum é barrado à toa)"
     else record_fail "env-exposure: (j) varredura do corpus" "blocos=${sn:-?} barrados: ${sb:-(varredura não rodou)}"; fi
   fi
+  # (k) HEREDOC: o corpo é DADO ou CÓDIGO conforme o CONSUMIDOR (2026-10-06). Medido ao abrir o PR #933:
+  #     o veto lia cada linha do corpo como comando, e uma linha de markdown começando com `**` (glob que
+  #     casa `.env`) barrou um `cat > corpo.md <<'EOF'`. E o inverso, um ESCAPE: o heredoc SEM aspas com
+  #     crase (`cat .env` entre crases) passava. Casos em arquivo de dados (python), porque o próprio veto
+  #     barraria um heredoc com estes corpos escrito inline aqui.
+  if [ -f "${guard}" ]; then
+    local hd_out
+    hd_out="$(python3 - "${guard}" <<'HDPY'
+import json, subprocess, sys
+Q = "'"
+def t(cmd):
+    p = subprocess.run(['bash', sys.argv[1]], input=json.dumps({'tool_name': 'Bash', 'tool_input': {'command': cmd}}),
+                       capture_output=True, text=True)
+    return p.returncode
+C = [(0, "cat > x.md <<" + Q + "E" + Q + "\n- **Fora (o gate):**\n**\nE\ngh pr create --body-file x.md"),
+     (0, "git commit -F - <<" + Q + "M" + Q + "\nfix: x\n\nx:**\nM"),
+     (2, "cat > x <<" + Q + "E" + Q + "\ncat .env\nE"),          # texto citando .env gravado em ARQUIVO: pode virar script
+     (0, "cat <<" + Q + "E" + Q + "\n$(cat .env)\nE"),           # entre aspas, para a saída padrão: inerte
+     (0, "gh pr create --body-file - <<" + Q + "E" + Q + "\n- **x:**\nE"),
+     (2, "cat > x <<E\n$(cat .env)\nE"),
+     (2, "cat > x <<E\nvalor: `cat .env`\nE"),
+     (2, "bash <<" + Q + "E" + Q + "\ncat .env\nE"),
+     (2, "sh -s <<E\ncat .env\nE"),
+     (2, "python3 - <<" + Q + "P" + Q + "\nprint(open('.env').read())\nP"),
+     (2, "node <<" + Q + "J" + Q + "\nrequire('fs').readFileSync('.env')\nJ"),
+     (2, "cat > x <<" + Q + "E" + Q + "\nnada\nE\ncat .env"),
+     (2, "cat <<-E\n\tdado\n\tE\ncat .env"),
+     (0, "python3 - <<" + Q + "P" + Q + "\nprint(1)\nP"),
+     # escapes que a 1ª cura abria (passada adversarial, 2026-10-06) — um por classe
+     (2, "cat <<" + Q + "E" + Q + " | bash\ncat .env\nE"),
+     (2, "sudo -u root bash <<" + Q + "E" + Q + "\ncat .env\nE"),
+     (2, "ssh host <<" + Q + "E" + Q + "\ncat .env\nE"),
+     (2, "eval $(cat <<" + Q + "E" + Q + "\ncat .env\nE\n)"),
+     (2, "cat <<" + Q + "A" + Q + " ; bash <<" + Q + "B" + Q + "\nx\nA\ncat .env\nB"),
+     (2, "cat <<END-X\nhello\nEND-X\ncat .env"),
+     (2, "echo " + Q + "a <<E" + Q + "\ncat .env"),
+     (2, "cat <<E\n$( (cat .env) )\nE"),
+     # escapes que a 2ª cura abria (análise linha a linha, sem o estado do shell anterior)
+     (2, ": <<" + Q + "X" + Q + "\ncat <<" + Q + "E" + Q + "\nX\ncat .env\nE"),
+     (2, "echo \"\ncat <<" + Q + "E" + Q + "\n\"\ncat .env\nE"),
+     (2, "xargs \\\ncat <<" + Q + "E" + Q + "\n.env\nE"),
+     (2, "cat <<-E\nx\nE\ncat .env\n-E"),
+     (2, "cat <<" + Q + "E" + Q + " > >(sh)\ncat .env\nE"),
+     (2, "git -c alias.x=" + Q + "!sh" + Q + " x <<" + Q + "E" + Q + "\ncat .env\nE"),
+     (2, "cat <<" + Q + "E" + Q + " > run; sh run\ncat .env\nE"),
+     (2, "cat <<" + Q + "E" + Q + " >&3\ncat .env\nE")]
+print(' '.join('%d:%d>%d' % (i, e, g) for i, (e, c) in enumerate(C) for g in [t(c)] if g != e))
+HDPY
+)" || hd_out="o harness do caso (k) não rodou"
+    if [ -z "${hd_out}" ]; then
+      record_pass "env-exposure: (k) heredoc: corpo de texto entre aspas passa (markdown com **), corpo para shell/interpretador e expansão sem aspas são barrados; os 15 escapes das duas curas anteriores seguem barrados (30 casos)"
+    else record_fail "env-exposure: (k) heredoc julgado pelo consumidor" "casos divergentes (índice:esperado>veio): ${hd_out}"; fi
+  fi
   # (i) o veto está REGISTRADO no settings.json (guarda escrita e não ligada é guarda morta)
   if python3 -c 'import json,sys;d=json.load(open(sys.argv[1]));sys.exit(0 if any("pretooluse-env-guard.sh" in h.get("command","") for g in d["hooks"]["PreToolUse"] for h in g.get("hooks",[])) else 1)' "${REPO_ROOT}/.claude/settings.json"; then
     record_pass "env-exposure: (i) o veto está registrado no PreToolUse"
