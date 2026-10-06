@@ -1,0 +1,641 @@
+meta:
+  id: slm-capitalizacao-2026-10
+  schema_version: "1"
+  baseline: 2026-10-05
+  review_after: 2027-01-03   # cadencia MERCADO/CAPITAL = 90d. Justificativa do tipo dominante: a pergunta e de
+                             # CAPITALIZACAO e 13 das 25 evidencias ancoradas sao rodada/investidor/tracao/modelo
+                             # de negocio declarado (LMArena, Braintrust, Galileo, Arize, Scale, Patronus). As
+                             # paginas de PRECO (AA Pro US$417, Braintrust Pro US$249, curso US$4.200 rejeitado)
+                             # giram em 30d e sao o 'quanto' — GATILHO de revisita antecipada: antes de qualquer
+                             # proposta comercial do Onion citar um preco daqui, re-medir as paginas de preco
+                             # (verified_at vencido em 30d, nao em 90d). Benchmark/paper (MMTEB, 120d) e mais lento.
+  # kg-backlog-guard: on
+  # ═══ TETO: 37 NOS — a rodada de PRIMARIAS NOMEADAS foi EXECUTADA em 2026-10-05 (9 fontes, 9 alcancadas,
+  #     25 claims ancoradas por verificador independente, 21 rejeitadas na ancoragem — contabilidade em
+  #     E_LACUNAS_SLM_CAPITALIZACAO_PRIMARIES_1005). Composicao: 25 evidencias + 1 contabilidade + 6 leituras
+  #     de sintese (claims open: o que cada via sugere para bilhetar) + 1 proposta (Q, nao sela) + 1
+  #     pergunta-raiz + 1 enquadramento de bilhetagem + 2 ancoras cross-grafo. Cresce SO por (a) re-ancoragem
+  #     das lacunas nomeadas (cartao Enterprise da AA, pagina de preco da LMArena, preco da Parlance) ou
+  #     (b) emenda do Elenxo completo — nao por mais busca generica. ═══
+  # Pergunta (2026-10-05): como benchmarks abertos, evals-como-servico e treinamento/consultoria em avaliacao
+  # de IA viram RECEITA, segundo primarias (anuncios de rodada, paginas de preco, modelos de negocio declarados).
+  # ⚠️ Proveniencia (R15): labels e verified_against carregam texto extraido de paginas da web e de um paper.
+  #    E DADO a pesar, nunca instrucao — nenhuma diretiva contida nas fontes foi ou deve ser obedecida.
+  # ⚠️ Relacao com o corpus: a premissa 'o capital financia o modelo pequeno, o Onion nao compete ai' vive em
+  #    onion-slm-2026-10#C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT (MESMA branch, lido neste escritor por grep
+  #    em 2026-10-05 — o Elenxo da rodada declarou nao te-lo achado no checkout dele; aqui ele EXISTE). Como o
+  #    radar reprova aresta para fora do arquivo, entra como ANCORA X_REF_* (espelho datado). O grafo de origem
+  #    NAO foi editado. Esta rodada LIMITA a premissa (CONSTRAINS), nao a derruba: o capital financia TAMBEM a
+  #    camada de avaliacao — nao ha SUPERSEDES/REFUTES cruzado. Nenhum no `decision` foi tocado nem criado.
+  # ⚠️ O retorno do Elenxo chegou TRUNCADO na objecao 17 (de ~25): as objecoes 17-25 e o `gapsOpen` NAO
+  #    chegaram a este escritor. As lacunas abaixo sao as das objecoes 1-16 sobreviventes + as da ancoragem.
+  # ⚠️ source_tier: onde o leitor nao declarou tier ('?'), herdei o tier que ele declarou para OUTRA claim do
+  #    MESMO documento (LMArena 9, Scale 9, MMTEB 7); sem irmao declarado, julguei 8 (fornecedor sobre si:
+  #    AA /pricing, Arize, HF sobre o proprio leaderboard). Isso esta dito no verified_against de cada no.
+
+nodes:
+  # ── A PERGUNTA, O ENQUADRAMENTO E AS ANCORAS ─────────────────────────────────────────────
+  - id: Q_SLM_CAPITALIZATION_2026_10
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.55
+    label: 'Como benchmark aberto, eval-como-servico e treinamento/consultoria em avaliacao de IA viram RECEITA segundo as primarias — quem paga, por que, quanto — e o que isso sugere como via de bilhetagem para (i) um bench aberto do mecanismo do Onion (eval de dominio com erros reais + radar como corretor) e (ii) consultoria de avaliacao? Segue open: a rodada ancorou 25 claims, mas so DUAS dizem quanto se cobra (AA Pro US$417/assento; Braintrust Pro US$249 + excedente medido); nenhuma primaria fala de eval de DOMINIO como nicho, e a unica claim sobre quem PAGA a LMArena foi rejeitada na ancoragem.'
+    trace: 'docs/evolution/research/slm-capitalizacao-2026-10/SYNTHESIS.md'
+
+  - id: C_FRAME_ALWAYS_BILL
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'falas do maestro na sessao 800cd025 (2026-10-05), verbatim: "é preciso ter este pensamento de captalizar de alguma forma"; "a capitalização pode vir de treinamentos e consultorias, gestão de federação, consultor advisior do core/hub, membro externo de uma rede, .... mas sempre pensando em bilhetar, mesmo que para isso tenha que criar a estratégia mais adequada para cada momento"'
+    impact: 4
+    confidence: 0.6
+    label: 'ENQUADRAMENTO DE BILHETAGEM (o agente de escrita o deixou open por nao ver a fala do maestro; CONFERIDO depois pela sessao principal contra as falas verbatim — ver verified_against): "sempre pensando em bilhetar"; vias nomeadas = treinamentos, consultorias, gestao de federacao, advisor de core/hub, membro externo de rede; estrategia por momento. O Onion nao compete no modelo; o moat e o mecanismo verificavel. Coerente com as memorias follow-the-money (mercado e eixo invariante) e core-publico-para-fork-em-consultoria (consultoria = adotante frio que quer forkar o core).'
+
+  - id: X_REF_ONION_SLM_CAPITAL_NOT_MOAT
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'grep -n "id: C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT" docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml -> l.988, status open, nesta worktree (branch research/onion-slm-roadmap-2026-10)'
+    label: 'ANCORA CROSS-GRAFO (espelho, nao editavel daqui): onion-slm-2026-10#C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT (open) — o dinheiro vai para o MODELO pequeno (Liquid AI US$250M, Fastino seed US$17,5M via imprensa, NVIDIA em Thinking Machines); o escasso vira commodity que o Onion consome via SDAAL; o Onion nao compete ai.'
+    trace: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#C_CAPITAL_FUNDS_SMALL_MODELS_NOT_THE_MOAT'
+
+  - id: X_REF_IDENTITY_CANON_NS1
+    node_type: entity
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'sed -n 99,109p docs/onion/graph/onion-identity-2026-07.kg.yaml (C_IDENTITY_CANON confirmed: package.json AUSENTE, nao e npm) + D_NORTHSTAR_NS1_KG confirmed (l.929-932: adocao/curso/portabilidade sao VEICULO do KG, nao fim)'
+    label: 'ANCORA CROSS-GRAFO (espelho): onion-identity-2026-07#C_IDENTITY_CANON (framework template em .claude, nao e produto npm, sem CLI standalone, plataforma unica Claude Code) + #D_NORTHSTAR_NS1_KG (norte = KG/conhecimento; curso e adocao sao VEICULO do KG, nao fim). Toda via de bilhetagem desta rodada e medida contra essas duas restricoes.'
+    trace: 'docs/onion/graph/onion-identity-2026-07.kg.yaml#C_IDENTITY_CANON'
+
+  # ── EVIDENCIAS ANCORADAS: LMArena ────────────────────────────────────────────────────────
+  - id: E_LMARENA_SERIES_A_150M
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "We''ve raised $150M of Series A funding led by Felicis and UC Investments (University of California), with participation from Andreessen Horowitz, The House Fund, LDVP, Kleiner Perkins, Lightspeed Venture Partners, and Laude Ventures." — LOCATOR: post Series A da LMArena, paragrafo de abertura. ancorada por verificador independente. Tier: leitor nao declarou; herdado do mesmo post (9).'
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: 2026-01-06
+    label: 'ANCORADA: LMArena levantou Serie A de US$150M (2026-01-06), liderada por Felicis e UC Investments, com a16z, The House Fund, LDVP, Kleiner Perkins, Lightspeed e Laude. Elenxo SOBREVIVEU: e captacao, nao receita — quem investe nao e quem paga.'
+    trace: 'https://arena.ai/blog/series-a/'
+
+  - id: E_LMARENA_EVAL_PRODUCT_DEMAND
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "first evaluation product launched in September, which has resulted in a huge demand for: Real-world performance insights; Diverse, fresh, and expert-level data; Rigorous science; Testing environments" — LOCATOR: secao Momentum Driven by the Community, lista de itens. ancorada por verificador independente. Tier herdado do mesmo post (9).'
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: 2025-09-01
+    label: 'ANCORADA: o 1o produto de avaliacao da LMArena (set/2025) gerou demanda por insights de desempenho real, dados frescos de nivel especialista, ciencia rigorosa de julgamento humano e ambientes de teste. Elenxo SOBREVIVEU: e autodeclaracao de demanda, nao diz quem compra nem a que preco; nao ha pagina de preco da LMArena entre as fontes. SUGERE: o que se vende ao lado do placar e DADO FRESCO + RIGOR + AMBIENTE DE TESTE — vocabulario que casa com eval de dominio com erros reais.'
+    trace: 'https://arena.ai/blog/series-a/'
+
+  - id: E_LMARENA_REVENUE_GROWTH_NO_NUMBER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "This momentum has resulted in strong revenue growth, and we are using the opportunity to raise money so that we can move even faster to build new features and improve our product experience" — LOCATOR: secao Momentum Driven by the Community, ultimo paragrafo. ancorada por verificador independente.'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'ANCORADA: a LMArena afirma crescimento forte de receita SEM numero no post; a rodada e justificada para acelerar produto. Elenxo SOBREVIVEU: crescimento sem base nem valor absoluto e inverificavel — nao serve para estimar o quanto.'
+    trace: 'https://arena.ai/blog/series-a/'
+
+  - id: E_LMARENA_SEED_100M_VALUATION_PRESS_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Since announcing our $100M Seed round last year in May, LMArena has grown far faster than we imagined." — LOCATOR: secao Momentum Driven by the Community, abertura. ancorada por verificador independente.'
+    source_tier: 9
+    source_kind: vendor-on-self
+    valid_from: 2025-05-01
+    label: 'ANCORADA: seed anterior de US$100M em maio/2025. A valuation (~US$1,7B pos-money na Serie A; US$600M na seed) NAO esta no post oficial — so na imprensa (tier inferior), e por isso NAO entra aqui como fato.'
+    trace: 'https://arena.ai/blog/series-a/'
+
+  # ── EVIDENCIAS ANCORADAS: Artificial Analysis ────────────────────────────────────────────
+  - id: E_AA_PRO_417_PER_SEAT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: Targets: "individuals and small organizations" — LOCATOR: artificialanalysis.ai/pricing, plano Pro (US$417/mes, desconto no anual). ancorada por verificador independente. Tier: leitor nao declarou; julgado 8 (fornecedor sobre o proprio preco).'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: Artificial Analysis vende Pro como assinatura POR ASSENTO (US$417/mes, desconto no anual) para individuos e pequenas organizacoes. Elenxo SOBREVIVEU como objecao de TRANSFERENCIA: o ativo da AA e medicao INDEPENDENTE de terceiros (FAQ /pricing: "Providers cannot pay for results"); um bench do Onion que mede o PROPRIO mecanismo e autoavaliacao de fornecedor — o contrario. Assinatura de dados de bench nao se transfere sem terceiro independente.'
+    trace: 'https://artificialanalysis.ai/pricing'
+
+  - id: E_AA_ENTERPRISE_CUSTOM_150_PLUS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Pro is valid for single seats only" — LOCATOR: artificialanalysis.ai/pricing, FAQ + cartao Enterprise. ancorada por verificador independente. Tier julgado 8.'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: Enterprise tem preco customizado e mira 150+ funcionarios; Pro vale so para assento unico, entao times migram para Enterprise. Elenxo SOBREVIVEU: o quanto do tier que interessa a consultoria segue desconhecido.'
+    trace: 'https://artificialanalysis.ai/pricing'
+
+  - id: E_AA_ENTERPRISE_BUNDLES_ADVISORY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.5
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Compute market model access with forecasts" — LOCATOR: artificialanalysis.ai/pricing, cartao Enterprise. ancorada por verificador independente. Tier julgado 8. ⚠ A QUOTE so sustenta o modelo de mercado de compute; workshops/educacao e AI strategy advisory NAO estao nela.'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA COM RESSALVA: o Enterprise da AA soma modelo de mercado de compute com previsoes e (segundo o leitor) workshops/educacao e AI strategy advisory — treinamento e consultoria empacotados no tier do benchmark. Elenxo SOBREVIVEU e e decisivo: a quote ancorada so contem o modelo de compute; a metade treino/advisory, que e a que sustenta a via treinamento/consultoria, PRECISA SER REANCORADA com o texto literal do cartao. Ate la, confianca 0,5.'
+    trace: 'https://artificialanalysis.ai/pricing'
+
+  - id: E_AA_PRO_API_EXPORT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Export data for local analysis" — LOCATOR: artificialanalysis.ai/pricing, cartao Pro. ancorada por verificador independente. Tier julgado 8.'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o Pro da AA vende API, exportacao de dados, graficos/tabelas customizados e relatorios — acesso programatico e analitico ao DADO do benchmark, nao ao placar publico. Elenxo NAO sobreviveu como fato (a objecao de transferencia ja esta em E_AA_PRO_417_PER_SEAT).'
+    trace: 'https://artificialanalysis.ai/pricing'
+
+  # ── EVIDENCIAS ANCORADAS: Scale (SEAL) ───────────────────────────────────────────────────
+  - id: E_SCALE_PRIVATE_DATASETS_PROBATIVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Scale''s proprietary datasets will remain private and unpublished, ensuring they cannot be exploited or incorporated into model training data." — LOCATOR: scale.com/blog/leaderboard. ancorada por verificador independente. Tier herdado do mesmo par de paginas (9).'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'ANCORADA: a Scale mantem os datasets do leaderboard PRIVADOS para nao entrarem no treino — a privacidade preserva o valor probatorio. Elenxo SOBREVIVEU e atinge a via: um bench ABERTO do mecanismo com erros reais, uma vez publicado, vira dado de treino e perde valor de prova. A rodada nao resolve essa tensao.'
+    trace: 'https://scale.com/blog/leaderboard'
+
+  - id: E_SCALE_HYBRID_PRIVATE_OPEN
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "combining private datasets to prevent overfitting and open-source datasets for broad benchmarking and comparability" — LOCATOR: labs.scale.com/leaderboard, secao Robust Datasets for Reliable AI Benchmarks. ancorada por verificador independente.'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o leaderboard da Scale e HIBRIDO — conjuntos privados contra overfitting + abertos para comparabilidade. Elenxo SOBREVIVEU: e desenho, nao receita; a ligacao leaderboard -> venda foi rejeitada na ancoragem. SUGERE uma forma para o bench do Onion: parte aberta como vitrine/comparacao, held-out privado de erros reais como prova.'
+    trace: 'https://labs.scale.com/leaderboard'
+
+  - id: E_SCALE_EVALUATION_PLATFORM_SEGMENTS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "a platform to enable AI researchers, developers, enterprises, and public sector organizations to analyze, understand, and iterate on their AI models and production applications" — LOCATOR: scale.com/blog/leaderboard, descricao da Scale Evaluation. ancorada por verificador independente.'
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o produto vendido e a PLATAFORMA Scale Evaluation, para pesquisadores, desenvolvedores, empresas e setor publico. Elenxo SOBREVIVEU: nomeia segmentos, sem preco, contrato ou receita; a tese "prova de capacidade vendida a labs/governo" depende de ligacoes rejeitadas na ancoragem.'
+    trace: 'https://scale.com/blog/leaderboard'
+
+  # ── EVIDENCIAS ANCORADAS: Braintrust ─────────────────────────────────────────────────────
+  - id: E_BRAINTRUST_SERIES_B_80M
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Braintrust has raised $80M to become the observability layer for production AI." — LOCATOR: blog Braintrust, anuncio Series B, abertura (17 February 2026). ancorada por verificador independente.'
+    source_tier: 8
+    source_kind: vendor-on-self
+    valid_from: 2026-02-17
+    label: 'ANCORADA: Braintrust levantou US$80M em Series B liderada pela ICONIQ (2026-02-17), posicionando-se como camada de OBSERVABILIDADE para IA em producao. Elenxo SOBREVIVEU: prova menos do que parece para "eval como servico" — o capital paga eval EMBUTIDO numa camada de producao, nao eval avulso.'
+    trace: 'https://www.braintrust.dev/blog/announcing-series-b'
+
+  - id: E_BRAINTRUST_INVESTORS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "I''m also happy to welcome back prior investors Andreessen Horowitz, Greylock, Elad Gil, basecase capital, and others" — LOCATOR: blog Braintrust, anuncio Series B, paragrafo de investidores. ancorada por verificador independente.'
+    source_tier: 8
+    source_kind: vendor-on-self
+    valid_from: 2026-02-17
+    label: 'ANCORADA: investidores da Braintrust — ICONIQ lidera; retornam a16z, Greylock, Elad Gil e basecase capital. Elenxo SOBREVIVEU: irrelevante para quem paga e quanto; registra so que a16z esta em DOIS ativos de avaliacao desta rodada (LMArena e Braintrust).'
+    trace: 'https://www.braintrust.dev/blog/announcing-series-b'
+
+  - id: E_BRAINTRUST_PRO_249_METERED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Pro — $249/month - $100 model credits/month (+ token rates) - 5 GB processed data/month (+ $3/GB overage) - 50k scores/month (+ $1.50 per 1k overage)" — LOCATOR: braintrust.dev/pricing, plano Pro. ancorada por verificador independente.'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: Braintrust Pro = US$249/mes com franquia (5 GB de dados, 50k scores) e excedente MEDIDO (US$3/GB, US$1,50 por 1k scores); Starter gratis. Cobra-se por VOLUME de scores/dados. Elenxo SOBREVIVEU como objecao de transferencia: bilhetar por score exige plataforma hospedada que mede uso, e o Onion e framework template em .claude (nao e produto npm, sem CLI standalone) — a via contradiz a identidade canonica.'
+    trace: 'https://www.braintrust.dev/pricing'
+
+  # ── EVIDENCIAS ANCORADAS: Patronus / Galileo / Arize ─────────────────────────────────────
+  - id: E_PATRONUS_END_TO_END_EVAL_JUDGES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "a single AI powered platform that enables end-to-end evaluation of AI systems" — LOCATOR: patronus.ai/blog/announcing-our-17-million-series-a, paragrafo do produto. ancorada por verificador independente.'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: Patronus vende avaliacao ponta a ponta com modelos avaliadores (juizes), de alucinacao a vazamento de PII. Elenxo SOBREVIVEU: descreve produto, sem preco, pagante ou receita. CONTRASTE para o Onion: o corretor do Onion e o RADAR DETERMINISTICO sem LLM, nao um juiz-modelo — e diferenca de mecanismo, nao de preco.'
+    trace: 'https://patronus.ai/blog/announcing-our-17-million-series-a'
+
+  - id: E_GALILEO_SERIES_B_45M
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "$45 million Series B funding round" — LOCATOR: galileo.ai/blog/announcing-our-series-b, abertura (lead Scale VP; participacao Premji, Databricks, Amex, Citi, ServiceNow, SentinelOne). ancorada por verificador independente.'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: Galileo levantou Series B de US$45M liderada pela Scale Venture Partners, com participacao de Databricks, Amex, Citi, ServiceNow e SentinelOne. Elenxo SOBREVIVEU: e capital, nao receita; ler bancos como investidores-CLIENTES (sinal de comprador regulado) seria inferencia.'
+    trace: 'https://galileo.ai/blog/announcing-our-series-b'
+
+  - id: E_GALILEO_REVENUE_834_PCT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Since the beginning of 2024, we''ve grown revenue by 834%" — LOCATOR: galileo.ai/blog/announcing-our-series-b, secao de tracao (tambem: "quadrupled our number of enterprise customers, and brought on six Fortune 50 companies"). ancorada por verificador independente.'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: Galileo declara receita +834% desde o inicio de 2024, clientes enterprise x4 e seis Fortune 50, sob a tese de Evaluation Intelligence EMBUTIDA no fluxo de desenvolvimento. E crescimento relativo sem base absoluta (autodeclaracao). SUGERE: quem paga eval paga eval embutido no fluxo — o que o Onion ja faz como GATE no ciclo, mas dentro do repo do adotante, nao como SaaS.'
+    trace: 'https://galileo.ai/blog/announcing-our-series-b'
+
+  - id: E_ARIZE_PHOENIX_OSS_ADOPTION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Arize Phoenix OSS – The open-source AI observability and performance tracing tool launched in 2023, now with over two million monthly downloads and growing." — LOCATOR: anuncio Series C, secao sobre Phoenix OSS e uso dos recursos. ancorada por verificador independente. Tier: leitor nao declarou; julgado 8 (fornecedor sobre si).'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o Phoenix OSS (2023) e citado pela Arize como motor de adocao (2M+ downloads mensais) e esta no uso dos recursos da Series C, ao lado do AX enterprise. E o padrao aberto-ao-lado-do-pago declarado pelo proprio fornecedor; "porta de entrada" e "migracao sem atrito" foram REJEITADAS na ancoragem como interpretacao.'
+    trace: 'https://arize.com/blog/arize-ai-raises-70m-series-c/'
+
+  # ── EVIDENCIAS ANCORADAS: curso e consultoria (Hamel / Parlance) ─────────────────────────
+  - id: E_HAMEL_COURSE_LIFETIME_ASSETS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Lifetime Access: Recordings, Materials & Every Future Cohort" — LOCATOR: maven.com/parlance-labs/evals, secao O que esta incluido. ancorada por verificador independente.'
+    source_tier: 6
+    source_kind: vendor-on-self
+    label: 'ANCORADA: o curso de evals da Parlance (Maven) inclui ativos que continuam rendendo apos a coorte — acesso vitalicio a gravacoes e a TODAS as coortes futuras, reader de 200+ paginas, Discord. O preco por aluno (US$4.200) foi REJEITADO na ancoragem por quote costurada, embora o valor esteja no schema.org da pagina — fica como lacuna de re-ancoragem, nao como fato.'
+    trace: 'https://maven.com/parlance-labs/evals'
+
+  - id: E_PARLANCE_CONSULTING_EVAL_SYSTEMS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "Build evaluation systems that identify exactly what''s broken and what to fix next." — LOCATOR: parlance-labs.com, servicos de consultoria (sem preco na pagina). ancorada por verificador independente.'
+    source_tier: 6
+    source_kind: vendor-on-self
+    label: 'ANCORADA: a consultoria da Parlance vende a CONSTRUCAO de sistemas de avaliacao e processos repetiveis, com meta de autonomia do cliente; a pagina nao publica preco (CTA Work With Us). SUGERE para o Onion: o que se vende em consultoria de avaliacao e o SISTEMA instalado no cliente — exatamente a forma de um adotante (framework no repo dele), sem plataforma hospedada.'
+    trace: 'https://parlance-labs.com'
+
+  # ── EVIDENCIAS ANCORADAS: bench aberto sem receita (HF, MTEB) ────────────────────────────
+  - id: E_HF_OPEN_LLM_LB_RETIRED_OBSOLESCENCE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "as model capabilities change (hello reasoning and LM assistants), benchmarks need to follow!" — LOCATOR: discussao #1135, post fixado, secao Why? (conferido no texto cru da API e do HTML). ancorada por verificador independente. Tier: leitor nao declarou; julgado 8 (HF sobre o proprio leaderboard).'
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: 'ANCORADA: a Hugging Face aposentou o Open LLM Leaderboard por OBSOLESCENCIA (raciocinio e assistentes mudaram as capacidades; risco de hill-climbing irrelevante) — o motivo declarado NAO e custo. LICAO para um bench aberto do Onion: bench sem dono que o acompanhe morre por obsolescencia; precisa de mecanismo de revisita (review_after, kg-freshness), nao so de publicacao.'
+    trace: 'https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard/discussions/1135'
+
+  - id: E_MMTEB_COMMUNITY_EXPANSION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "a large-scale, community-driven expansion of MTEB, covering over 500 quality-controlled evaluation tasks across 250+ languages" — LOCATOR: arXiv 2502.13595, abstract. ancorada por verificador independente. Tier herdado do mesmo paper (7).'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: o MMTEB foi expansao COMUNITARIA do MTEB (500+ tarefas, 250+ idiomas) — colaboracao aberta, nao produto de empresa.'
+    trace: 'https://arxiv.org/abs/2502.13595'
+
+  - id: E_MMTEB_POINTS_TABLE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "2 points were awarded for implementing the task and 4 points for each new language introduced by the task." — LOCATOR: arXiv 2502.13595, Apendice A, item New dataset. ancorada por verificador independente.'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: o MMTEB tem tabela de pontos explicita — 2 por implementar tarefa, 4 por idioma novo, 2 por review de PR; coordenacao por esforco relativo. "Remunerado em credito, nao em dinheiro" foi REJEITADO (inferencia por silencio). SUGERE para "membro externo de rede": contribuicao a bench aberto e organizavel por credito declarado — mas isso nao e bilhetagem.'
+    trace: 'https://arxiv.org/abs/2502.13595'
+
+  - id: E_MMTEB_CREDIT_IMPERFECT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "The managing group believes the point system successfully defined contribution terms but acknowledges it isn’t perfect." — LOCATOR: arXiv 2502.13595, secao Limitations, Credit Assignment for Large-scale Collaborations. ancorada por verificador independente.'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: os mantenedores do MMTEB admitem que o sistema de credito e imperfeito — esforco desigual recebeu pontos iguais.'
+    trace: 'https://arxiv.org/abs/2502.13595'
+
+  - id: E_MMTEB_GITHUB_OPEN_PARTICIPATION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-10-05
+    verified_against: 'QUOTE verbatim: "We actively encouraged participation from industry professionals, low-resource language communities, and academic researchers." — LOCATOR: arXiv 2502.13595, secao 2.1. ancorada por verificador independente.'
+    source_tier: 7
+    source_kind: paper
+    label: 'ANCORADA: a coordenacao do MMTEB ocorre via GitHub, com transparencia declarada e participacao ativamente buscada de industria, comunidades de idiomas de poucos recursos e academia.'
+    trace: 'https://arxiv.org/abs/2502.13595'
+
+  # ── CONTABILIDADE DA RODADA ──────────────────────────────────────────────────────────────
+  - id: E_LACUNAS_SLM_CAPITALIZACAO_PRIMARIES_1005
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-05
+    verified_against: 'retorno do workflow onion-research mode primaries de 2026-10-05: listas de claims ANCORADAS (25), REJEITADAS na ancoragem (21), fontes inalcancaveis (nenhuma) e o Elenxo (TRUNCADO na objecao 17)'
+    source_kind: internal-audit
+    label: 'CONTABILIDADE DA RODADA DE PRIMARIAS (2026-10-05). FONTES: 9 lidas x 0 inalcancaveis (lmarena-funding, artificial-analysis-business, scale-seal, braintrust-funding, patronus-galileo, arize-phoenix, hamel-course-consulting, hf-open-llm-leaderboard, mteb-maintenance). CLAIMS: 25 ANCORADAS (viraram no) x 21 REJEITADAS na ancoragem (nao viram no): 18 EXAGERADAS, 3 NAO-ENCONTRADAS. Rejeitadas e motivo: [lmarena] dois pagantes labs+empresas (texto diz que PRECISAM de avaliacao, nao que pagam; locator errado — esta em Why We Raised Now); comunidade de votos gratuitos como ativo do produto (50M votos/400+ avaliacoes/145k pontos corretos, ligacao com receita e do leitor); [AA] sem trial => funcionalidades exigem assinatura paga (a pagina so nega trial; ha leaderboards publicos); independencia e o ativo vendido (autodefinicao fiel, "ativo vendido" e inferencia; a politica esta no FAQ: "Providers cannot pay for results"); [scale] leaderboard como vitrine comercial (so sustenta canal de contato para inclusao); terceiro independente para governos (vem de fala de pessoa, nao da Scale); red teaming sustentado por dados privados (transfere tese de outra pagina; proprietario != privado); [braintrust] Notion/Replit/Cloudflare/Ramp/Dropbox como PAGANTES (o texto diz "using"); [patronus] US$17M com Datadog como "investidor estrategico" (rotulo do leitor); capital financia o juiz e nao o generalista (frase de plano 2024+, contraste inventado); Fortune 500 + erros capturados como prova de pagamento (uso, nao pagamento); [arize] ELv2 + AX com mesma instrumentacao como porta de entrada (interpretacao; "nao OSI" e conhecimento externo); Series C US$70M Adams Street (NAO-ENCONTRADA: fato sustentado, quote reconstruida); escada AX Free/US$50/Enterprise com ilimitados em todos (Experiments/Human annotations ilimitados so no Enterprise; "por volume" e inferencia); [hamel] coorte Out-Nov 2026 US$4.200 e 28 sessoes/11 licoes (NAO-ENCONTRADA: emenda de dois trechos; o preco 4200 USD existe no schema.org); 4.500 alunos como porta de entrada para consultoria (numero correto, funil e inferencia); [hf] 13K modelos/2 anos e sem sucessor unico (NAO-ENCONTRADA: secoes parafraseadas pelo fetcher; parte vem de comentario de 2025-03-19); v1 reconstruida e nao so mantida, 2M visitantes/300k membros (numeros verbatim, "reconstruida" e inferencia); 8 H100 como custo de compute recorrente (a nota so descreve hardware de reprodutibilidade); [mteb] credito de autoria e nao dinheiro (inferencia por silencio); README Apache-2.0 + so aponta o guia (o README nao escreve Apache-2.0; linka, nao hospeda; Contributing tem 4 links). LACUNAS QUE CONTINUAM ABERTAS: (1) NAO HA PAGINA DE PRECO DA LMARENA entre as fontes — o maior ativo de bench aberto desta rodada nao tem quem-paga-quanto ancorado; (2) o cartao Enterprise da AA precisa ser REANCORADO com o texto literal de workshops/educacao e AI strategy advisory — e ele que sustentaria a via treinamento/consultoria empacotada no bench; (3) o preco do curso (US$4.200) e o preco da consultoria Parlance seguem sem quote ancorada; (4) valuations so na imprensa (LMArena ~US$1,7B / US$600M); (5) NENHUMA fonte trata de eval de DOMINIO com erros reais como nicho, nem de corretor deterministico — a via especifica do Onion nao tem precedente medido; (6) a tensao bench ABERTO x valor probatorio (Scale: privado preserva prova) nao foi resolvida por nenhuma fonte; (7) nenhuma fonte mede receita de treinamento/consultoria em avaliacao em reais ou no Brasil; (8) o Elenxo chegou TRUNCADO na objecao 17: as objecoes 17-25 (Galileo tracao, Arize, Hamel, HF, MTEB) e o gapsOpen NAO foram lidos por este escritor — re-ler o journal do run antes de citar este no como completo; (9) as vias "gestao de federacao", "advisor de core/hub" e "membro externo de rede" NAO tem nenhuma primaria nesta rodada.'
+    trace: 'workflow onion-research (mode primaries), 2026-10-05'
+
+  # ── LEITURAS DE SINTESE: o que sugere para bilhetar ─────────────────────────────────────
+  - id: C_CAPITAL_ALSO_FUNDS_EVAL_LAYER
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: 'LEITURA (capital): o capital NAO vai so para o modelo pequeno — vai tambem para a CAMADA DE AVALIACAO: LMArena US$100M seed + US$150M Serie A, Braintrust US$80M, Galileo US$45M (e Arize Series C, valor rejeitado na ancoragem por quote reconstruida). Consequencia: um bench/eval GENERICO do Onion entraria num mercado com rivais bem capitalizados; a premissa "o moat esta fora da disputa de capital" so vale para o modelo. O recorte que escapa e o de NICHO — eval de dominio com erros reais e corretor deterministico — e nenhuma fonte o mede.'
+
+  - id: C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.65
+    label: 'LEITURA (eval-como-servico): o que tem preco e tracao declarados e eval EMBUTIDO numa plataforma de producao (Braintrust observabilidade com cobranca por score/GB; Galileo Evaluation Intelligence no fluxo; Arize com OSS ao lado do pago). Para o Onion isso VETA bilhetar por volume/score (exige SaaS hospedado, contra a identidade canonica) e HABILITA o equivalente que ele ja tem: eval como GATE dentro do repo do adotante — o valor e instalado, nao hospedado.'
+
+  - id: C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.7
+    label: 'LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre o PROPRIO mecanismo e autoavaliacao de fornecedor e nao vira assinatura de dados. Para valer como bench, precisa medir OUTROS (ex.: LLMs/SLMs no eval de dominio com erros reais, com o radar como corretor deterministico) e declarar a independencia como politica — ou ser publicado como metodo reproduzivel, nao como placar vendavel.'
+
+  - id: C_OPEN_SHOWCASE_PRIVATE_HOLDOUT
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: 'LEITURA (forma do bench): a tensao aberto x prova (Scale: privado preserva valor probatorio) sugere o desenho HIBRIDO — fatia aberta de erros reais como vitrine/metodo reproduzivel + held-out privado de erros reais do corpus (nos refuted/superseded/drifted com aresta nomeada) como prova. E o bench sem dono morre por obsolescencia (HF aposentou o Open LLM Leaderboard): a revisita tem de ser mecanismo (review_after, kg-freshness), nao intencao.'
+
+  - id: C_TRAINING_CONSULTING_SELLS_INSTALLED_SYSTEM
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.6
+    label: 'LEITURA (via treinamento/consultoria): as primarias que vendem sem plataforma vendem (i) curso com ativos que continuam rendendo (gravacoes, coortes futuras, reader, comunidade — Parlance/Maven) e (ii) consultoria que CONSTROI o sistema de avaliacao no cliente rumo a autonomia (Parlance); a AA empacota educacao/advisory no Enterprise do bench, mas essa metade NAO esta ancorada (re-ancorar). E a via mais compativel com a identidade do Onion (framework instalado no repo do adotante) e com NS1 (curso = VEICULO do KG, nao fim). O quanto segue aberto: nenhum preco desta via foi ancorado.'
+
+  - id: C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    label: 'LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao — o MMTEB se sustenta por credito de autoria com tabela de pontos (imperfeita, admitida) e coordenacao via GitHub. Para a via "membro externo de rede", isso e modelo de CONTRIBUICAO, nao de bilhetagem: o bench aberto e custo de reputacao/funil, e a receita vem de outra camada (dado/API, plataforma, curso, consultoria).'
+
+  # ── PROPOSTA (nao sela) ─────────────────────────────────────────────────────────────────
+  - id: Q_BILLING_VIAS_ORDER_PROPOSAL
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: 'PROPOSTA AO MAESTRO (eu nunca selo; nenhum no decision foi criado ou tocado): ordem de vias sugerida por esta rodada — (1) consultoria de avaliacao que INSTALA o eval de dominio + gate no repo do cliente (forma Parlance; compativel com fork/adocao) e (2) treinamento com ativos que continuam rendendo, ambos sem plataforma hospedada; (3) bench aberto do mecanismo SO no desenho hibrido (fatia aberta como metodo/vitrine + held-out privado de erros reais) e medindo OUTROS modelos, como funil, nao como produto; (4) NAO bilhetar por score/volume (exige SaaS). Pre-requisitos antes de selar: re-ancorar o cartao Enterprise da AA e um preco de curso/consultoria; e o eval de dominio existir (hoje nao existe). As vias federacao/advisor/membro externo seguem sem primaria. Quem decide e o maestro.'
+
+edges:
+  # ── evidencias -> leituras ──────────────────────────────────────────────────────────────
+  - from: E_LMARENA_SERIES_A_150M
+    to: C_CAPITAL_ALSO_FUNDS_EVAL_LAYER
+    edge_type: SUPPORTS
+  - from: E_LMARENA_SEED_100M_VALUATION_PRESS_ONLY
+    to: C_CAPITAL_ALSO_FUNDS_EVAL_LAYER
+    edge_type: SUPPORTS
+  - from: E_BRAINTRUST_SERIES_B_80M
+    to: C_CAPITAL_ALSO_FUNDS_EVAL_LAYER
+    edge_type: SUPPORTS
+  - from: E_BRAINTRUST_INVESTORS
+    to: C_CAPITAL_ALSO_FUNDS_EVAL_LAYER
+    edge_type: SUPPORTS
+  - from: E_GALILEO_SERIES_B_45M
+    to: C_CAPITAL_ALSO_FUNDS_EVAL_LAYER
+    edge_type: SUPPORTS
+  - from: E_LMARENA_REVENUE_GROWTH_NO_NUMBER
+    to: C_CAPITAL_ALSO_FUNDS_EVAL_LAYER
+    edge_type: SUPPORTS
+  - from: E_LMARENA_EVAL_PRODUCT_DEMAND
+    to: C_OPEN_SHOWCASE_PRIVATE_HOLDOUT
+    edge_type: SUPPORTS
+
+  - from: E_BRAINTRUST_PRO_249_METERED
+    to: C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER
+    edge_type: SUPPORTS
+  - from: E_BRAINTRUST_SERIES_B_80M
+    to: C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER
+    edge_type: SUPPORTS
+  - from: E_GALILEO_REVENUE_834_PCT
+    to: C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER
+    edge_type: SUPPORTS
+  - from: E_ARIZE_PHOENIX_OSS_ADOPTION
+    to: C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER
+    edge_type: SUPPORTS
+  - from: E_PATRONUS_END_TO_END_EVAL_JUDGES
+    to: C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER
+    edge_type: SUPPORTS
+  - from: E_SCALE_EVALUATION_PLATFORM_SEGMENTS
+    to: C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER
+    edge_type: SUPPORTS
+
+  - from: E_AA_PRO_417_PER_SEAT
+    to: C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH
+    edge_type: SUPPORTS
+  - from: E_AA_PRO_API_EXPORT
+    to: C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH
+    edge_type: SUPPORTS
+  - from: E_AA_ENTERPRISE_CUSTOM_150_PLUS
+    to: C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH
+    edge_type: SUPPORTS
+
+  - from: E_SCALE_PRIVATE_DATASETS_PROBATIVE
+    to: C_OPEN_SHOWCASE_PRIVATE_HOLDOUT
+    edge_type: SUPPORTS
+  - from: E_SCALE_HYBRID_PRIVATE_OPEN
+    to: C_OPEN_SHOWCASE_PRIVATE_HOLDOUT
+    edge_type: SUPPORTS
+  - from: E_HF_OPEN_LLM_LB_RETIRED_OBSOLESCENCE
+    to: C_OPEN_SHOWCASE_PRIVATE_HOLDOUT
+    edge_type: SUPPORTS
+
+  - from: E_HAMEL_COURSE_LIFETIME_ASSETS
+    to: C_TRAINING_CONSULTING_SELLS_INSTALLED_SYSTEM
+    edge_type: SUPPORTS
+  - from: E_PARLANCE_CONSULTING_EVAL_SYSTEMS
+    to: C_TRAINING_CONSULTING_SELLS_INSTALLED_SYSTEM
+    edge_type: SUPPORTS
+  - from: E_AA_ENTERPRISE_BUNDLES_ADVISORY
+    to: C_TRAINING_CONSULTING_SELLS_INSTALLED_SYSTEM
+    edge_type: SUPPORTS
+
+  - from: E_HF_OPEN_LLM_LB_RETIRED_OBSOLESCENCE
+    to: C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE
+    edge_type: SUPPORTS
+  - from: E_MMTEB_COMMUNITY_EXPANSION
+    to: C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE
+    edge_type: SUPPORTS
+  - from: E_MMTEB_POINTS_TABLE
+    to: C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE
+    edge_type: SUPPORTS
+  - from: E_MMTEB_CREDIT_IMPERFECT
+    to: C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE
+    edge_type: SUPPORTS
+  - from: E_MMTEB_GITHUB_OPEN_PARTICIPATION
+    to: C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE
+    edge_type: SUPPORTS
+
+  # ── leituras x ancoras do corpus ─────────────────────────────────────────────────────────
+  - from: C_CAPITAL_ALSO_FUNDS_EVAL_LAYER
+    to: X_REF_ONION_SLM_CAPITAL_NOT_MOAT
+    edge_type: CONSTRAINS
+  - from: C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER
+    to: X_REF_IDENTITY_CANON_NS1
+    edge_type: DEPENDS_ON
+  - from: C_TRAINING_CONSULTING_SELLS_INSTALLED_SYSTEM
+    to: X_REF_IDENTITY_CANON_NS1
+    edge_type: DEPENDS_ON
+  - from: E_BRAINTRUST_PRO_249_METERED
+    to: Q_BILLING_VIAS_ORDER_PROPOSAL
+    edge_type: CONSTRAINS
+  - from: E_SCALE_PRIVATE_DATASETS_PROBATIVE
+    to: Q_BILLING_VIAS_ORDER_PROPOSAL
+    edge_type: CONSTRAINS
+
+  # ── leituras -> proposta e pergunta-raiz ─────────────────────────────────────────────────
+  - from: C_TRAINING_CONSULTING_SELLS_INSTALLED_SYSTEM
+    to: Q_BILLING_VIAS_ORDER_PROPOSAL
+    edge_type: SUPPORTS
+  - from: C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER
+    to: Q_BILLING_VIAS_ORDER_PROPOSAL
+    edge_type: SUPPORTS
+  - from: C_OPEN_SHOWCASE_PRIVATE_HOLDOUT
+    to: Q_BILLING_VIAS_ORDER_PROPOSAL
+    edge_type: SUPPORTS
+  - from: C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH
+    to: Q_BILLING_VIAS_ORDER_PROPOSAL
+    edge_type: CONSTRAINS
+  - from: C_CAPITAL_ALSO_FUNDS_EVAL_LAYER
+    to: Q_BILLING_VIAS_ORDER_PROPOSAL
+    edge_type: CONSTRAINS
+  - from: C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE
+    to: Q_BILLING_VIAS_ORDER_PROPOSAL
+    edge_type: SUPPORTS
+  - from: C_FRAME_ALWAYS_BILL
+    to: Q_SLM_CAPITALIZATION_2026_10
+    edge_type: TRACES_TO
+  - from: Q_BILLING_VIAS_ORDER_PROPOSAL
+    to: Q_SLM_CAPITALIZATION_2026_10
+    edge_type: TRACES_TO
+  - from: E_LACUNAS_SLM_CAPITALIZACAO_PRIMARIES_1005
+    to: Q_SLM_CAPITALIZATION_2026_10
+    edge_type: TRACES_TO
+  - from: C_CAPITAL_ALSO_FUNDS_EVAL_LAYER
+    to: Q_SLM_CAPITALIZATION_2026_10
+    edge_type: TRACES_TO
+  - from: C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER
+    to: Q_SLM_CAPITALIZATION_2026_10
+    edge_type: TRACES_TO
+  - from: C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH
+    to: Q_SLM_CAPITALIZATION_2026_10
+    edge_type: TRACES_TO
+  - from: C_OPEN_SHOWCASE_PRIVATE_HOLDOUT
+    to: Q_SLM_CAPITALIZATION_2026_10
+    edge_type: TRACES_TO
+  - from: C_TRAINING_CONSULTING_SELLS_INSTALLED_SYSTEM
+    to: Q_SLM_CAPITALIZATION_2026_10
+    edge_type: TRACES_TO
+  - from: C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE
+    to: Q_SLM_CAPITALIZATION_2026_10
+    edge_type: TRACES_TO
+  - from: C_FRAME_ALWAYS_BILL
+    to: Q_BILLING_VIAS_ORDER_PROPOSAL
+    edge_type: SUPPORTS

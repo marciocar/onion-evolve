@@ -1677,9 +1677,11 @@ docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	E_
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	Q_EIXO_D_RECONCILE_PARENT_GRAPH	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	Q_EIXO_D_SYNTHETIC_IDENTITY_BUDGET_2026_10	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	X_REF_NANOCHAT_DECISION	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	X_REF_NANOCHAT_DECISION	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	X_REF_NANOCHAT_OBJ_CORRELATED_ERROR	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	X_REF_NANOCHAT_OPTION_C	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	X_REF_NANOCHAT_Q_EVAL	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	X_REF_NANOCHAT_Q_EVAL	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_CORPUS_VAZIO_OCR_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_LACUNAS_DECLARADAS_OCR_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
 docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml	E_MERCADO_OCR_LOCAL_0908	docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml
@@ -1743,6 +1745,11 @@ docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md	E_m7_ninguem_cita_i
 docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md	E_triagem_virar_status_erraria_80pct	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md	Q_CUSTO_DO_PORTE_NUNCA_MEDIDO	docs/onion/graph/onion-identity-2026-07.kg.yaml
 docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md	Q_ONION_SLM_PRIMARIES_2026_10	docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml
+docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md	X_REF_SLM_SMOL_OMITTED	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
+docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_ONION_SLM_CAPITAL_NOT_MOAT	docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml
+docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_EVAL_DESIGN	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
+docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_FINETUNE_NARROW	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
+docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml	X_REF_SLM_Q_OPTION_C	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
 docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md	D_ADOPT_REFRAME	docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml
 docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml	Q_SUBMISSAO_AO_PORTAL	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 docs/evolution/research/plugin-language-policy-2026-09/data/venue-community-probe-2026-09-04.json	E_CENSO_VENUE_IDIOMA_0904	docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml
@@ -1843,6 +1850,8 @@ docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md	B4_5_decision_slice1
 docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md	B4_5_evidence_regulated_member_caso	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md	B4_5_question_heranca_escopo	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/scope-inheritance-2026/SYNTHESIS.md	B4_5_question_quarto_nivel_pessoa	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
+docs/evolution/research/slm-capitalizacao-2026-10/SYNTHESIS.md	Q_SLM_CAPITALIZATION_2026_10	docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml
+docs/evolution/research/slm-frameworks-2026-10/SYNTHESIS.md	Q_SLM_FRAMEWORKS_ROADMAP_2026_10	docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml
 docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md	B5_17_agentspec_modelspec_runtime	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md	B5_17_critica_codigo_continua_fonte	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
 docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md	B5_17_gap_discurso_pratica	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
@@ -2072,6 +2081,7 @@ docs/onion/graph/onion-family-topology-2026-07.kg.yaml	D_p4_visitor_authority	do
 docs/onion/graph/onion-identity-2026-07.kg.yaml	C_OPCAO_O6_GRAFO_NIVEL_ZERO_IMPORTS	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
 docs/onion/graph/onion-identity-2026-07.kg.yaml	D_NORTHSTAR_NS1_KG	docs/onion/graph/onion-identity-2026-07.kg.yaml
 docs/onion/graph/onion-identity-2026-07.kg.yaml	E_EXIT_2_INALTERADO_NA_JANELA	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
+docs/onion/graph/onion-identity-2026-07.kg.yaml	X_REF_IDENTITY_CANON_NS1	docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml
 docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml	D_SELO_DO_MAESTRO_REVERTEU_O_FLIP	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 docs/onion/graph/pr-decision-history-2026-08.kg.yaml	E_PR_DECISION_LOG	docs/onion/graph/pr-decision-history-2026-08.kg.yaml
 docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml	C_p6_wrapper_fino	docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml
