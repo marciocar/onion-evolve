@@ -674,6 +674,14 @@ onion-evolve	specialization	dogfooding
 onion-evolve	specialization	framework-template	
 onion-evolve	specialization	sdaal	
 onion-evolve	tier	source	
+onion-kg-ssot	adopts	onion-evolve	
+onion-kg-ssot	mode	greenfield	
+onion-kg-ssot	pin	fe8359e38b43	
+onion-kg-ssot	specialization	kg-ssot	
+onion-kg-ssot	specialization	produto	
+onion-kg-ssot	specialization	schema	
+onion-kg-ssot	tier	standalone	
+onion-kg-ssot	trust-advises	onion-evolve	
 onion-mini	adopts	onion-evolve	
 onion-mini	mode	distilled	
 onion-mini	pin	n/a	

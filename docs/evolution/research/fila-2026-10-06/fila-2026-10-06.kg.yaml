@@ -9,7 +9,7 @@ meta:
   baseline: 2026-10-06
   review_after: 2026-11-05   # 30d: fila de trabalho; cada item fecha ao virar PR ou ao ser descartado
   # ═══ TETO: 30 NÓS ═══
-  #   22 hoje (11 evidências + 11 compromissos). Fila que passa do teto pede triagem, não mais nós.
+  #   26 hoje (13 evidências + 13 compromissos). Fila que passa do teto pede triagem, não mais nós.
 nodes:
   # ── evidências medidas hoje ──────────────────────────────────────────────────────────────────
   - id: E_PRECOMMIT_RECARIMBA_RESIDUO
@@ -133,6 +133,27 @@ nodes:
     verified_against: "trocas SendMessage core↔onion-slm em 2026-10-06; uma mensagem não chegou; escrita em db de página alheia"
     trace: ".claude/commands/meta/co-evolve.md"
     label: "o diálogo entre sessões (SendMessage) foi usado de verdade, contra a doutrina 'sem IA-fala-IA', com perda e fronteira negociadas na hora"
+  - id: E_MERGE_GATE_INERTE_NO_ADOTANTE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-06
+    verified_against: "adoção do onion-kg-ssot: pretooluse-merge-gate.sh sai 0 sem ops/ no repo"
+    trace: ".claude/hooks/pretooluse-merge-gate.sh"
+    label: "a trava de merge sai 0 em silêncio no adotante (não há ops/pr-merge-verified.sh lá)"
+  - id: E_SKILL_CORE_ONLY_VIAJOU
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_against: "adoção do onion-kg-ssot (hipótese do agente, não verificada)"
+    trace: ".claude/utils/adopt/vendor-manifest.sh"
+    label: "a skill onion-publish, que é só do core, pode ter viajado para o adotante (hipótese)"
   # ── a fila: compromissos abertos, um por item aprovado ───────────────────────────────────────
   - id: Q_PRECOMMIT_NAO_LAVA_RESIDUO
     node_type: question
@@ -224,6 +245,24 @@ nodes:
     confidence: 0.5
     verified_against: "onion-slm eval/smoke"
     label: "como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor)"
+  - id: Q_MERGE_GATE_AVISA_NO_ADOTANTE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_against: ".claude/hooks/pretooluse-merge-gate.sh"
+    label: "a trava de merge deve avisar no adotante em vez de sair calada"
+  - id: Q_MANIFESTO_SEM_SKILL_CORE_ONLY
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    verified_against: ".claude/utils/adopt/vendor-manifest.sh"
+    label: "medir se a skill onion-publish viaja ao adotante e, se viajar, tirá-la do manifesto"
   - id: Q_CANAL_VIVO_ENTRE_SESSOES
     node_type: question
     layer: audit
@@ -275,4 +314,10 @@ edges:
     edge_type: SUPPORTS
   - from: E_CANAL_VIVO_ENTRE_SESSOES_USADO
     to: Q_CANAL_VIVO_ENTRE_SESSOES
+    edge_type: SUPPORTS
+  - from: E_MERGE_GATE_INERTE_NO_ADOTANTE
+    to: Q_MERGE_GATE_AVISA_NO_ADOTANTE
+    edge_type: SUPPORTS
+  - from: E_SKILL_CORE_ONLY_VIAJOU
+    to: Q_MANIFESTO_SEM_SKILL_CORE_ONLY
     edge_type: SUPPORTS

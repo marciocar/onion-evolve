@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**390 itens abertos** em 80 grafo(s) com aberto (de 106 no escopo) · 81 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**393 itens abertos** em 80 grafo(s) com aberto (de 106 no escopo) · 81 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -568,7 +568,7 @@
 | 13.5 | `Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE` | passada-adversarial-2026-09 | COMO FAZER A PERNA DE LEITURA ALCANCAR A SESSAO QUE ESCREVE NO GRAFO, sem virar ruido? Tres desenhos candidatos, nenhum medido: (a |
 | 6.8 | `Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER` | passada-adversarial-2026-09 | COMO FAZER O MAPA ENXERGAR O QUE A BANCADA EXERCITA POR FUNCAO-HELPER? Hoje ele le so o corpo de `run_*_selftests()`, e helpers de |
 
-## fila-2026-10-06 — 11 item(ns)
+## fila-2026-10-06 — 14 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -577,12 +577,15 @@
 | 7.0 | `Q_ONION_KG_SSOT_REPO` | fila-2026-10-06 | criar e adotar o onion-kg-ssot: produto independente, dogfood nos dois sentidos, contextos próprios, core lido por caminho ou git |
 | 6.4 | `Q_PRECOMMIT_NAO_LAVA_RESIDUO` | fila-2026-10-06 | fechar o recarimbo do pre-commit com a mesma proteção do motor (só recarimba se reviewed_code_sha256 casar) |
 | 5.4 | `Q_ROTULO_SEPARADO_DA_NARRATIVA` | fila-2026-10-06 | separar o rótulo factual da narrativa num campo próprio do nó |
+| 4.2 | `Q_MERGE_GATE_AVISA_NO_ADOTANTE` | fila-2026-10-06 | a trava de merge deve avisar no adotante em vez de sair calada |
 | 4.2 | `Q_PR_FINALIZE_MELHORIAS` | fila-2026-10-06 | pr-finalize: imprimir as violações ao reprovar, registrar etapa e rc com trap, catracas estáticas no checkpoint, rebase com ín |
 | 3.2 | `Q_HOOK_LER_RESIDUO_DA_BRANCH_DO_PR` | fila-2026-10-06 | o aviso de PR sem passada adversarial deve ler o resíduo da branch do PR, não do checkout principal |
 | 3.2 | `Q_MAPA_NOMEAR_MERGE_ONION_HOOKS` | fila-2026-10-06 | nomear merge-onion-hooks.sh no corpo da família que o exercita, para o mapa da bancada o reivindicar |
 | 3.0 | `Q_CANAL_VIVO_ENTRE_SESSOES` | fila-2026-10-06 | o canal vivo entre sessões vira 3ª via da co-evolução (envelope fixo, registro do envio, decisão descendo ao grafo)? aguarda  |
 | 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |
 | 3.0 | `Q_PODA_CLAUDE_MD_REVISITA` | fila-2026-10-06 | revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros |
+| 2.0 | `E_SKILL_CORE_ONLY_VIAJOU` | fila-2026-10-06 | a skill onion-publish, que é só do core, pode ter viajado para o adotante (hipótese) |
+| 2.0 | `Q_MANIFESTO_SEM_SKILL_CORE_ONLY` | fila-2026-10-06 | medir se a skill onion-publish viaja ao adotante e, se viajar, tirá-la do manifesto |
 
 ## forge-comando-framework-2026-09 — 2 item(ns)
 

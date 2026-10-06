@@ -119,9 +119,11 @@ como_usar: |
   Gramática antes de escrever: .claude/rules/kg-grammar.md (o campo é \`node_type:\`/\`edge_type:\`,
   nunca \`type:\`; nó PROD de alto impacto sem \`verified_at\` é acusado pela catraca).
 # DOCUMENTO ÚNICO de propósito (sinal de campo 2026-10-06, onion-slm): a 1ª redação abria e fechava
-# este cabeçalho com `---`, o que para um parser YAML são DOIS documentos. O radar (linha a linha)
+# este cabeçalho com linhas de três hífens, o que para um parser YAML são DOIS documentos. O radar (linha a linha)
 # aceitava; o kg-drive-project.sh e o kg-realign-project.sh recusavam com exit 2 — o 1º grafo de
-# todo adotante nascia fora do /meta:drive. Nenhum dos 138 grafos do core usa `---`.
+# todo adotante nascia fora do /meta:drive. Nenhum dos 138 grafos do core usa o separador.
+# (SEM CRASE neste bloco: ele vive num heredoc SEM aspas, e a 1ª redação desta nota pôs o separador
+# entre crases — o shell o EXECUTOU (erro de comando não encontrado), e o comentário saiu cortado.)
 
 # O SELO da gramática. Sem ele o radar avisa a cada leitura ("schema_version ausente"), e um aviso
 # na PRIMEIRA leitura de todo adotante é o pior lugar para um aviso: ensina, de saída, que a saída
