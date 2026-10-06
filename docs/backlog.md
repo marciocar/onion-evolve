@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**355 itens abertos** em 77 grafo(s) com aberto (de 103 no escopo) · 78 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**377 itens abertos** em 79 grafo(s) com aberto (de 105 no escopo) · 80 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -130,6 +130,25 @@
 | 5.6 | `C_OPCAO_D_META_COMPANY_BRAIN_COMO_SERVICO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO D — META, Company Brain / grafo ancorado como serviço. A FAVOR: é o norte declarado da casa (NS1, conhecimento) e o mo |
 | 3.6 | `C_OPCAO_C_DURANTE_GATE_E_POLITICA` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO C — DURANTE, GATE/POLÍTICA: vender o veredito reprovador determinístico (exit 2 de hook, 91 regras, catracas por basel |
 | 1.8 | `C_OPCAO_F_NENHUMA_AGORA_COM_GATILHO` | onda-derivada-e-o-lugar-do-onion-2026-10 | OPÇÃO F — NENHUMA AGORA, e só vale com GATILHO, DATA e ORÇAMENTO nomeados (sem os três é adiamento com outro nome). A FAVO |
+
+## slm-frameworks-2026-10 — 14 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 48.8 | `C_STAGE0_GATE_BEFORE_ANY_MODEL` | slm-frameworks-2026-10 | LEITURA — PORTA 0 (antes de qualquer modelo). ENTRA: a pergunta "precisa de ML?" e os erros REAIS que o corpus já rotula (refut |
+| 45.5 | `C_SPIKE_MEASURE_READY_SPECIALISTS` | slm-frameworks-2026-10 | LEITURA — SPIKE (dias, não semanas; Smol "a few days"). ENTRA: o eval selado da porta 0 + os 4 especialistas prontos (OpenAI Pr |
+| 42.5 | `C_NO_NUMERIC_PASS_CRITERIA_IN_SOURCES` | slm-frameworks-2026-10 | LEITURA (o achado transversal): NENHUMA das 9 fontes dá critério NUMÉRICO de passagem entre etapas — Smol deixa "your perform |
+| 42.0 | `Q_SLM_GRADUAL_ROADMAP_PROPOSAL` | slm-frameworks-2026-10 | PROPOSTA AO MAESTRO (eu nunca selo; NÃO revisa D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, que segue done): adotar o roteiro gradua |
+| 26.0 | `C_MVP_FINETUNE_ONLY_IF_EVAL_FAILS` | slm-frameworks-2026-10 | LEITURA — MVP / AJUSTE (só se o eval FALHAR no spike ou na PoC). ENTRA: pares entrada/saída DE TREINO separados do eval selado |
+| 20.0 | `C_EVAL_SET_PRIVATE_EXCLUDED_FROM_DOOR` | slm-frameworks-2026-10 | LEITURA (ação concreta, não opcional): o eval selado tem de ficar PRIVADO e EXCLUÍDO da projeção da porta pública onion-cor |
+| 18.9 | `C_LIGHTEVAL_IS_CANDIDATE_NOT_CHOICE` | slm-frameworks-2026-10 | LEITURA (instrumento): o lighteval é CANDIDATO a validar no spike, não o harness escolhido. A favor: tarefa e métrica customiz |
+| 15.6 | `C_POC_E2E_WITH_SIMPLE_MODEL` | slm-frameworks-2026-10 | LEITURA — PoC. ENTRA: o especialista que passou no spike (no papel do "modelo simples" da Fase I do Google). FAZ: plugá-lo por  |
+| 13.6 | `C_ROADMAP_VOCAB_IS_ONION_COINAGE` | slm-frameworks-2026-10 | LEITURA (declaração de autoria): o vocabulário spike → PoC → MVP → produto e o mapeamento das fontes nele são CUNHAGEM D |
+| 12.0 | `C_LLM_JUDGE_VETOED_SINGLE_ANNOTATOR` | slm-frameworks-2026-10 | LEITURA (veto): LLM-as-judge NÃO serve de gate em etapa nenhuma enquanto o Onion tiver um rotulador só. A calibração exige cor |
+| 12.0 | `Q_SLM_FRAMEWORKS_ROADMAP_2026_10` | slm-frameworks-2026-10 | Quais frameworks e guias PRIMÁRIOS dizem como avaliar e especializar modelos pequenos de forma progressiva — etapas, o que entr |
+| 11.6 | `C_PRODUCT_INSTRUMENT_AND_LOOP` | slm-frameworks-2026-10 | LEITURA — PRODUTO (resultado final POSSÍVEL, proposta do Onion — nenhuma fonte o fecha). ENTRA: o especialista que passou no  |
+| 11.2 | `C_COST_ARGUMENTS_NOT_THE_RULER` | slm-frameworks-2026-10 | LEITURA (o que NÃO sustenta o roteiro): os argumentos de CUSTO desta rodada não servem de critério. Os 161k GPU-h do Smol são  |
+| 11.2 | `C_NO_TRAIN_HOLDS_ONLY_WHILE_NO_EVAL` | slm-frameworks-2026-10 | LEITURA (temporalidade do "não treinar agora"): o Hamel mostra que, COM eval, o ajuste fica barato (99% do trabalho é montar dad |
 
 ## motores-de-regras-deterministicos-2026-10 — 7 item(ns)
 
@@ -274,6 +293,19 @@
 | 10.8 | `Q_CUSTO_DO_PORTE_NUNCA_MEDIDO` | onion-identity-2026-07 | A LACUNA QUE O REPO CONFESSA E NAO RASTREIA (nomeada 2026-08-06 para PARAR DE SER REDESCOBERTA). O CLAUDE.md linhas 2-9 declara qu |
 | 7.5 | `Q_COLD_ADOPTER` | onion-identity-2026-07 | existe QUALQUER pull dos diferenciais raros FORA da orbita de Marcio (1 adotante frio) |
 | 7.2 | `Q_FEDERACAO_VISIBILITY_GATE` | onion-identity-2026-07 | site/federacao/ e snapshot congelado (2026-07-10) por DECLARACAO, nao por mecanismo (achados R3+NOVO-4 da revisao do PR #671): nad |
+
+## slm-capitalizacao-2026-10 — 8 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 28.0 | `C_CAPITAL_ALSO_FUNDS_EVAL_LAYER` | slm-capitalizacao-2026-10 | LEITURA (capital): o capital NAO vai so para o modelo pequeno — vai tambem para a CAMADA DE AVALIACAO: LMArena US$100M seed + US |
+| 26.0 | `C_EVAL_REVENUE_EMBEDDED_IN_PRODUCTION_LAYER` | slm-capitalizacao-2026-10 | LEITURA (eval-como-servico): o que tem preco e tracao declarados e eval EMBUTIDO numa plataforma de producao (Braintrust observabi |
+| 22.0 | `Q_BILLING_VIAS_ORDER_PROPOSAL` | slm-capitalizacao-2026-10 | PROPOSTA AO MAESTRO (eu nunca selo; nenhum no decision foi criado ou tocado): ordem de vias sugerida por esta rodada — (1) consu |
+| 22.0 | `Q_SLM_CAPITALIZATION_2026_10` | slm-capitalizacao-2026-10 | Como benchmark aberto, eval-como-servico e treinamento/consultoria em avaliacao de IA viram RECEITA segundo as primarias — quem  |
+| 21.0 | `C_TRAINING_CONSULTING_SELLS_INSTALLED_SYSTEM` | slm-capitalizacao-2026-10 | LEITURA (via treinamento/consultoria): as primarias que vendem sem plataforma vendem (i) curso com ativos que continuam rendendo ( |
+| 16.8 | `C_OPEN_SHOWCASE_PRIVATE_HOLDOUT` | slm-capitalizacao-2026-10 | LEITURA (forma do bench): a tensao aberto x prova (Scale: privado preserva valor probatorio) sugere o desenho HIBRIDO — fatia ab |
+| 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
+| 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
 
 ## meta-research-lens-2026-09 — 3 item(ns)
 
