@@ -1,6 +1,6 @@
 ---
-reviewed_diff_sha256: 8c7da72690e9bdad13b1a17038e1897154d94421526216bfc9fa512b3651660d
-reviewed_code_sha256: 858dce6f112024edef144ca6a4e90492c603ee6dd93ef1bafb50daf75e418745
+reviewed_diff_sha256: f32bf8af77f8241562cf251b07dca7764c76d7244c7b7054fd43efb69d097031
+reviewed_code_sha256: 6b27932111d4ea4bb78fb183c7e97b78cc075ba7c624f38e8f5d4604cdd96b1d
 findings_total: 11
 findings_real: 11
 tokens: 229273
@@ -22,7 +22,7 @@ nota: >
   com o config gravado.
   DEPOIS DO CI (2026-10-06): a faixa 1 reprovou na catraca da classe produtor|grep -q — o caso novo do AVISO de
   attribution usava `bash helper … | grep -q`, sítio NOVO (35>34). Curado com here-string; a catraca volta a 34
-  (ZERO novo). Revisado à mão por quem escreveu, sem nova passada do Elenxo — declarado.
+  (ZERO novo); a variável do caso nasceu `_aviso` e a REGRA 60 (Identificador de código em INGLÊS) a barrou no lint do commit — virou `_warn_out`. Revisado à mão por quem escreveu, sem nova passada do Elenxo — declarado.
 ---
 
 # Resíduo — `fix/update-attribution-and-production`
