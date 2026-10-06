@@ -11512,6 +11512,22 @@ run_seed_adoption_graph_selftests() {
   if [ -f "${d}/docs/onion/graph/onion-adoption.kg.yaml" ] && [ "${rc}" -eq 0 ]; then
     record_pass "seed-graph: (a) semeia e o RADAR aprova o próprio artefato gerado"
   else record_fail "seed-graph: (a)" "não semeou, ou o radar reprovou o grafo gerado (rc=${rc})"; fi
+  # (a2) DOCUMENTO ÚNICO, e o /meta:drive o LÊ (sinal de campo onion-slm, 2026-10-06): a semente abria e
+  #      fechava o cabeçalho com `---`; o radar aceitava e o kg-drive-project.sh recusava com exit 2 — o 1º
+  #      grafo de todo adotante nascia fora do /meta:drive. A asserção é a do CONSUMIDOR que recusava.
+  local _seps _drc=0
+  _seps="$(grep -c '^---' "${d}/docs/onion/graph/onion-adoption.kg.yaml" 2>/dev/null || true)"
+  ( cd "${d}" && bash "${REPO_ROOT}/.claude/validation/kg-drive-project.sh" docs/onion/graph/onion-adoption.kg.yaml >/dev/null 2>&1 ) || _drc=$?
+  if [ "${_seps:-1}" = 0 ] && [ "${_drc}" = 0 ]; then
+    record_pass "seed-graph: (a2) a semente sai em documento único e o /meta:drive a lê (exit 0)"
+  else record_fail "seed-graph: (a2) semente multi-documento" "separadores=${_seps} drive rc=${_drc}"; fi
+  # (a3) o radar AVISA .kg.yaml multi-documento (SOFT — não reprova; nomeia quem recusa)
+  printf -- '---\ngraph: x\n---\nmeta:\n  id: x\n  schema_version: "1"\nnodes:\n  - id: A\n    node_type: claim\n    status: open\n    plane: DEV\n    impact: 1\n    confidence: 0.5\n    label: a\n' > "${d}/multi.kg.yaml"
+  local _mout _mrc=0
+  _mout="$(bash "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${d}/multi.kg.yaml" --schema 2>&1)" || _mrc=$?
+  if grep -q 'multi-documento' <<< "${_mout}" && [ "${_mrc}" = 0 ]; then
+    record_pass "seed-graph: (a3) o radar avisa .kg.yaml multi-documento, sem reprovar"
+  else record_fail "seed-graph: (a3) aviso multi-documento" "rc=${_mrc}, aviso ausente"; fi
   rm -rf "${d}"
 
   # (b) NEVER-CLOBBER pela pergunta certa — "o alvo TEM grafo?", não "este arquivo existe?": semear

@@ -142,6 +142,7 @@ fi
 # `asorti never defined`, rc=2, saída zero. A razão da portabilidade era verdadeira sobre o awk e
 # FALSA sobre este script; ficou só a que o artefato sustenta.)
 awk -v mode="$MODE" -v radarSchema="$RADAR_SCHEMA" -v arq="$FILE" -v hoje="$(date -u +%Y-%m-%d)" "${STATUS_FACTOR}"'
+/^---[ \t]*$/ { docSeps++ }
 # ── DENYLIST, NÃO ALLOWLIST — a lição de 2026-08-07 ─────────────────────────────────────────
 # Quando `drifted`/`unverifiable` entraram (2026-08-06), os predicados escritos como ALLOWLIST
 # (`== "confirmed"`, `confirmed || open`) os deixaram de fora EM SILÊNCIO, enquanto os escritos
@@ -878,6 +879,12 @@ END {
       problems++
     } else {
       print "  ✅ schema_version " metaSchema " (bate com o radar)"
+    }
+    # MULTI-DOCUMENTO (2026-10-06, sinal de campo onion-slm): este radar lê linha a linha e aceita
+    # `---` no meio do arquivo; o kg-drive-project.sh e o kg-realign-project.sh usam parser YAML de
+    # documento ÚNICO e recusam (exit 2). Aviso, não reprova: o arquivo é legível AQUI.
+    if (docSeps >= 2) {
+      print "  ⚠ multi-documento: " docSeps " separadores `---` — o /meta:drive e o kg-realign recusam este arquivo (parser de documento único); tire os `---` (os campos viram chaves de topo, nenhum dado muda)"
     }
     print ""
   }

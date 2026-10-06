@@ -77,7 +77,8 @@ if [ -n "${ONION_KG_CORPUS_FILES:-}" ]; then files="${ONION_KG_CORPUS_FILES}"
 # ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
 #    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos
 #    deliberadamente inválidos de um adotante viraram 5 HARD no dia 1 da adoção dele.
-else files="$(cd "${ROOT}" && git ls-files '*.kg.yaml' 2>/dev/null | bash "${_KFP}" --filter | sed "s|^|${ROOT}/|")"; fi
+# ⚠️ E o material DIDÁTICO (docs/materials/) também sai (2026-10-06): dado fictício não é conhecimento.
+else files="$(cd "${ROOT}" && git ls-files '*.kg.yaml' 2>/dev/null | bash "${_KFP}" --filter-knowledge | sed "s|^|${ROOT}/|")"; fi
 [ -n "${files}" ] || { echo "kg-corpus-grep: FAIL-LOUD — nenhum .kg.yaml no corpus (${ROOT}); não devolvo '0 achados' por corpus vazio" >&2; exit 2; }
 LIST="$(mktemp)"; trap 'rm -f "${LIST}"' EXIT; printf '%s\n' "${files}" > "${LIST}"
 # a lista vai por ARQUIVO, não por pipe: o heredoc do python abaixo É o stdin (bug medido no 1º dogfood: "0 grafos")
