@@ -573,7 +573,7 @@ Velocity por Fase:
 Story points são rastreados no **task manager ativo** — o Sistema Onion é agnóstico via `TASK_MANAGER_PROVIDER` (`jira` | `clickup` | `asana` | `linear` | `none`). **Não acople** a metodologia a um provider:
 
 - **Detecte** o provider lendo `TASK_MANAGER_PROVIDER` no `.env` antes de operar.
-- **Custom field "Story Points"**, dashboards de velocity e automações são **capacidades resolvidas pelo adapter** em `.claude/utils/task-manager/adapters/`: Jira (custom field + JQL), ClickUp (custom field + dashboards), Asana (custom field + Goals), Linear (estimate nativo).
+- **Custom field "Story Points"**, dashboards de velocity e automações são **capacidades resolvidas pelo adapter** em `${CLAUDE_PLUGIN_ROOT}/utils/task-manager/adapters/`: Jira (custom field + JQL), ClickUp (custom field + dashboards), Asana (custom field + Goals), Linear (estimate nativo).
 - **Delegue a operação técnica** ao especialista do provider ativo (`@jira-specialist`, `@clickup-specialist`) ou ao `@task-specialist` (agnóstico). Nunca chame a API/MCP do provider direto. Ver CLAUDE.md §Task Manager.
 
 #### Template de Sprint (conceitual, neutro de provider):

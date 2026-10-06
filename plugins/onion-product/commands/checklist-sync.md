@@ -1,7 +1,7 @@
 ---
 name: checklist-sync
 description: Sincronizar e monitorar checklists do Task Manager (checklist nativo é capacidade resolvida pelo adapter).
-allowed-tools: Read Bash(cat .env*)
+allowed-tools: Read Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh *)
 category: product
 tags: [checklist, sync, monitoring]
 version: "3.0.0"

@@ -1,7 +1,7 @@
 ---
 name: pre-pr
 description: Validação completa antes do PR. Verifica padrões e qualidade.
-allowed-tools: Read Bash(cat .env*) Bash(git *)
+allowed-tools: Read Bash(bash .claude/utils/task-manager/env-check.sh *) Bash(git *)
 category: engineer
 tags: [validation, pr, quality]
 version: "3.1.0"

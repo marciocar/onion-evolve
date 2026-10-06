@@ -3,7 +3,7 @@ name: three-amigos
 description: |
   Facilita sessão Three Amigos (PO + Developer + QA) para refinement de stories.
   Gera agenda estruturada, template de ata e checklist de outputs.
-allowed-tools: Read Write Bash(cat .env*)
+allowed-tools: Read Write Bash(bash .claude/utils/task-manager/env-check.sh *)
 
 parameters:
   - name: story_id

@@ -5785,6 +5785,130 @@ run_pretooluse_veto_selftests() {
 # teste, só com ONION_PREPUSH_TEST=1); o lint real é exercido pelo dogfood. Casos do Elenxo (2ª forma):
 # worktree POSITIVA (o mutante que trocava o `worktree add` sobrevivia), gh FALHANDO (B3), marcador.
 # ---------------------------------------------------------------------------
+# ═══════════════════════════════════════════════════════════════════════════════
+# env_exposure — o .env nunca chega ao modelo (sinal de campo de um hub, dogfood do Zoho, 2026-10-05)
+# O setup-integration mandava ler o .env com Read "sem expor valores" — e Read expõe tudo; 40 comandos/
+# projeções liberavam `Bash(cat .env*)`. A cura é o helper env-check.sh (devolve NOMES e o provider, nunca
+# valores) e esta família: ela reprova (a) o helper vazando um segredo-sentinela e (b) qualquer volta do
+# padrão no corpus de comandos, agentes, skills e plugins.
+# ═══════════════════════════════════════════════════════════════════════════════
+run_env_exposure_selftests() {
+  local h="${REPO_ROOT}/.claude/utils/task-manager/env-check.sh"
+  if [ ! -f "${h}" ]; then record_fail "env-exposure" "helper ausente: ${h}"; return; fi
+  local d; d="$(mktemp -d)"
+  printf 'TASK_MANAGER_PROVIDER=jira\nZOHO_CLIENT_ID=SENTINELA-S1\nZOHO_CLIENT_SECRET=SENTINELA-S2\nZOHO_PORTAL_ID=SENTINELA-S3\n' > "${d}/.env"
+  local out rc
+  rc=0; out="$( { bash "${h}" --env "${d}/.env" --provider; bash "${h}" --env "${d}/.env" --check zoho; } 2>&1)" || rc=$?
+  if grep -q SENTINELA <<< "${out}"; then record_fail "env-exposure: (a) helper vazou valor" "$(grep -m1 SENTINELA <<< "${out}")"
+  elif [ "${rc}" = 0 ] && grep -qx jira <<< "${out}" && grep -q '✅ ZOHO_PORTAL_ID' <<< "${out}"; then record_pass "env-exposure: (a) --provider e --check devolvem nomes e o provider, nunca o valor"
+  else record_fail "env-exposure: (a) --provider/--check" "rc=${rc}: ${out:0:160}"; fi
+  rc=0; out="$(bash "${h}" --env "${d}/.env" --set-provider zoho 2>&1)" || rc=$?
+  if [ "${rc}" = 0 ] && grep -qx 'TASK_MANAGER_PROVIDER=zoho' "${d}/.env" && grep -q 'jira → zoho' <<< "${out}" && grep -q 'SENTINELA-S1' "${d}/.env" && ! grep -q SENTINELA <<< "${out}"; then
+    record_pass "env-exposure: (b) --set-provider troca SÓ o provider, avisa a troca e preserva as outras chaves"
+  else record_fail "env-exposure: (b) --set-provider" "rc=${rc}: ${out:0:160}"; fi
+  rc=0; bash "${h}" --env "${d}/.env" --check clickup >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" = 1 ]; then record_pass "env-exposure: (c) chave obrigatória ausente → rc=1"; else record_fail "env-exposure: (c) ausência" "rc=${rc} (esperado 1)"; fi
+  rc=0; bash "${h}" --env "${d}/nao-existe" --check >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" = 3 ]; then record_pass "env-exposure: (d) .env ausente → rc=3 (declara, não finge vazio)"; else record_fail "env-exposure: (d) .env ausente" "rc=${rc} (esperado 3)"; fi
+  rm -rf "${d}"
+  # (e) o padrão não volta: Read .env no corpo ou `cat .env` liberado em comando/agente/skill/plugin
+  local hits
+  hits="$(cd "${REPO_ROOT}" && git ls-files -- '.claude/commands' '.claude/agents' '.claude/skills' 'plugins' 2>/dev/null \
+          | grep '\.md$' | xargs -r grep -lE 'Read \.env([^.]|$)|Read`? para ler `?\.env|Bash\((cat|grep|head|tail|less|source) [^)]*\.env' 2>/dev/null || true)"
+  grep -qE 'Bash\((cat|grep|head|tail|less)[^)]*\.env' "${REPO_ROOT}/.claude/settings.json" && hits="${hits} .claude/settings.json"
+  if [ -z "${hits}" ]; then record_pass "env-exposure: (e) nenhum comando/agente/skill/plugin manda ler o .env com Read ou libera cat .env"
+  else record_fail "env-exposure: (e) o padrão voltou" "$(printf '%s' "${hits}" | tr '\n' ' ' | cut -c1-200)"; fi
+  # (g) helper — achados do Elenxo: ambiente antes do arquivo, --get só para NÃO-segredo, provider inválido não ecoa
+  local e2; e2="$(mktemp -d)"
+  printf 'export TASK_MANAGER_PROVIDER=SENTINELA-PROV\nZOHO_CLIENT_SECRET=SENTINELA-SEC\nCLICKUP_DEFAULT_LIST_ID=901\nJIRA_HOST=https://bob:SENTINELA-URL@acme.atlassian.net\n' > "${e2}/.env"
+  local g1 g2 g3 g4 g5
+  g1="$(TASK_MANAGER_PROVIDER=linear bash "${h}" --env "${e2}/nada" --provider 2>&1)"
+  g2="$(bash "${h}" --env "${e2}/.env" --provider 2>&1)"
+  g3="$(bash "${h}" --env "${e2}/.env" --get CLICKUP_DEFAULT_LIST_ID 2>&1)"
+  local g6; g6="$(bash "${h}" --env "${e2}/.env" --get JIRA_HOST 2>&1)"
+  rc=0; g4="$(bash "${h}" --env "${e2}/.env" --get ZOHO_CLIENT_SECRET 2>&1)" || rc=$?
+  g5="$(bash "${h}" --env "${e2}/.env" --set-provider 'jira clickup' 2>&1)" || true
+  rm -rf "${e2}"
+  if [ "${g1}" = linear ] && [ "${g2}" = invalido ] && [ "${g3}" = 901 ] && [ "${rc}" = 2 ] && ! grep -q SENTINELA <<< "${g1}${g2}${g3}${g4}${g5}${g6}" && [ "${g6}" = "https://***@acme.atlassian.net" ] && grep -q desconhecido <<< "${g5}"; then
+    record_pass "env-exposure: (g) ambiente antes do arquivo; --get recusa segredo; provider inválido e injeção não ecoam"
+  else record_fail "env-exposure: (g) helper" "g1=${g1} g2=${g2} g3=${g3} rc_get=${rc} g5=${g5:0:60}"; fi
+  # (h) o VETO (pretooluse-env-guard.sh): as duas polaridades — o que lê o .env é barrado (exit 2), o caminho certo passa
+  local guard="${REPO_ROOT}/.claude/hooks/pretooluse-env-guard.sh"
+  if [ ! -f "${guard}" ]; then record_fail "env-exposure: (h) veto" "ausente: ${guard}"
+  else
+    _eg() { local rc=0; printf '%s' "$1" | bash "${guard}" >/dev/null 2>&1 || rc=$?; printf '%s' "${rc}"; }
+    local bad=0 c
+    for c in 'cat .env' 'head -3 ./.env' 'grep -q KEY .env' 'x=$(cat .env)' 'tail < .env' 'bash -c "less .env"' \
+             'sudo cat /srv/app/.env' 'cat .env.local' 'cp .env /tmp/x' 'eval "cat .env"' 'cat "aberto .env'; do
+      [ "$(_eg "$(python3 -c 'import json,sys;print(json.dumps({"tool_name":"Bash","tool_input":{"command":sys.argv[1]}}))' "$c")")" = 2 ] || { bad=1; record_fail "env-exposure: (h) veto deixou passar" "${c}"; }
+    done
+    for c in 'set -a; source .env; set +a' '. .env' 'bash .claude/utils/task-manager/env-check.sh --provider' 'test -f .env' \
+             'git ls-files --error-unmatch .env' 'cp .env.example .env' "printf 'X=1\\n' >> .env" 'cat .env.example' 'cat .envrc' \
+             'grep -q "^\.env$" .gitignore' 'echo "configure o .env"'; do
+      [ "$(_eg "$(python3 -c 'import json,sys;print(json.dumps({"tool_name":"Bash","tool_input":{"command":sys.argv[1]}}))' "$c")")" = 0 ] || { bad=1; record_fail "env-exposure: (h) veto barrou caminho honesto" "${c}"; }
+    done
+    [ "$(_eg '{"tool_name":"Read","tool_input":{"file_path":"/x/.env"}}')" = 2 ] || { bad=1; record_fail "env-exposure: (h) veto" "Read de .env passou"; }
+    [ "$(_eg '{"tool_name":"Grep","tool_input":{"pattern":"T","path":".env"}}')" = 2 ] || { bad=1; record_fail "env-exposure: (h) veto" "Grep em .env passou"; }
+    [ "$(_eg '{"tool_name":"Read","tool_input":{"file_path":"/x/.env.example"}}')" = 0 ] || { bad=1; record_fail "env-exposure: (h) veto" "Read de .env.example barrado"; }
+    [ "${bad}" = 0 ] && record_pass "env-exposure: (h) o veto barra 13 leituras do .env e deixa passar 14 caminhos honestos"
+  fi
+  # (h2) escapes e falsos positivos da 2ª passada do Elenxo (2026-10-06)
+  if [ -f "${guard}" ]; then
+    local bad2=0 c2 j
+    _ej() { python3 -c 'import json,sys;print(json.dumps({"tool_name":sys.argv[1],"tool_input":json.loads(sys.argv[2])}))' "$1" "$2"; }
+    for c2 in $'test -f .env\ncat .env' $'git status\ncat .env' $'source .env\nenv' 'git diff --no-index .env.example .env' \
+              'git show :.env' 'cat .e*' 'cat {.env,}' 'grep -rn T --include=*.env .' "python3 -c 'print(open(\".env\").read())'" \
+              "bash <<< 'cat .env'" '$(echo cat) .env' '. .env; printenv' 'cat prod.env' 'find . -name .env -exec cat {} \;' 'set -a; . .env; export -p' 'source .env; declare -p'; do
+      j="$(_ej Bash "$(python3 -c 'import json,sys;print(json.dumps({"command":sys.argv[1]}))' "$c2")")"
+      [ "$(_eg "${j}")" = 2 ] || { bad2=1; record_fail "env-exposure: (h2) escape passou" "$(printf '%q' "${c2}")"; }
+    done
+    [ "$(_eg "$(_ej Grep '{"pattern":"T","glob":"*.env"}')")" = 2 ] || { bad2=1; record_fail "env-exposure: (h2) escape passou" "Grep glob *.env"; }
+    for c2 in $'# sem ler o .env\nbash .claude/utils/task-manager/env-check.sh --provider' 'echo ".env" >> .gitignore' \
+              'if ! grep -q "^\.env$" .gitignore; then echo x; fi' 'find . -name .env' 'wc -l .env' 'docker compose --env-file .env up' \
+              'cp .env .env.bak' 'echo l | tee -a .env' 'grep -rn foo --exclude .env' 'sha256sum .env'; do
+      j="$(_ej Bash "$(python3 -c 'import json,sys;print(json.dumps({"command":sys.argv[1]}))' "$c2")")"
+      [ "$(_eg "${j}")" = 0 ] || { bad2=1; record_fail "env-exposure: (h2) falso positivo" "$(printf '%q' "${c2}")"; }
+    done
+    [ "${bad2}" = 0 ] && record_pass "env-exposure: (h2) quebra de linha separa comandos; git diff/show, glob, interpretador e despejo são barrados; metadados e comentário passam"
+  fi
+  # (j) a VARREDURA que achou os falsos positivos: todo bloco bash do corpus que cita .env passa pelo veto com rc 0
+  if [ -f "${guard}" ]; then
+    local sweep
+    sweep="$(cd "${REPO_ROOT}" && python3 - "${guard}" <<'SWEEP'
+import json, re, subprocess, sys
+files = subprocess.run(['git', 'ls-files', '.claude/commands', '.claude/skills', '.claude/agents', '.claude/utils', 'plugins'],
+                       capture_output=True, text=True).stdout.split()
+n, bad = 0, []
+for f in files:
+    if not f.endswith('.md'):
+        continue
+    s = open(f, encoding='utf-8', errors='replace').read()
+    for m in re.finditer(r'```(?:bash|sh|shell)\n(.*?)```', s, re.S):
+        if not re.search(r'\.env\b', m.group(1)):
+            continue
+        n += 1
+        p = subprocess.run(['bash', sys.argv[1]], input=json.dumps({'tool_name': 'Bash', 'tool_input': {'command': m.group(1)}}),
+                           capture_output=True, text=True)
+        if p.returncode != 0:
+            bad.append('%s:%d' % (f, s[:m.start()].count('\n') + 1))
+print('%d %s' % (n, ' '.join(bad)))
+SWEEP
+)" || true
+    local sn="${sweep%% *}" sb="${sweep#* }"
+    [ "${sb}" = "${sweep}" ] && sb=""
+    if [ -n "${sn}" ] && [ "${sn}" -gt 0 ] 2>/dev/null && [ -z "${sb}" ]; then
+      record_pass "env-exposure: (j) os ${sn} blocos bash do corpus que citam .env passam pelo veto (nenhum lê, nenhum é barrado à toa)"
+    else record_fail "env-exposure: (j) varredura do corpus" "blocos=${sn:-?} barrados: ${sb:-(varredura não rodou)}"; fi
+  fi
+  # (i) o veto está REGISTRADO no settings.json (guarda escrita e não ligada é guarda morta)
+  if python3 -c 'import json,sys;d=json.load(open(sys.argv[1]));sys.exit(0 if any("pretooluse-env-guard.sh" in h.get("command","") for g in d["hooks"]["PreToolUse"] for h in g.get("hooks",[])) else 1)' "${REPO_ROOT}/.claude/settings.json"; then
+    record_pass "env-exposure: (i) o veto está registrado no PreToolUse"
+  else record_fail "env-exposure: (i) registro" "pretooluse-env-guard.sh fora do settings.json"; fi
+  # (f) o exemplo não prende ninguém num provider que não escolheu
+  if grep -qE '^TASK_MANAGER_PROVIDER=none([[:space:]]|$)' "${REPO_ROOT}/.env.example"; then record_pass "env-exposure: (f) .env.example nasce com TASK_MANAGER_PROVIDER=none"
+  else record_fail "env-exposure: (f) .env.example" "o default não é none"; fi
+}
+
 run_pre_push_selftests() {
   local hook="${REPO_ROOT}/.githooks/pre-push" pf="${REPO_ROOT}/ops/pr-finalize.sh"
   if [ ! -f "${hook}" ] || [ ! -f "${pf}" ]; then record_fail "pre-push" "ausente: ${hook} / ${pf}"; return; fi
@@ -8713,23 +8837,43 @@ run_cited_directive_selftests() {
   # (f) PARIDADE COM O BINARIO, nos DOIS lados: cada trecho literal tem de estar no binario INSTALADO
   #     (deriva do Claude Code) E na guarda (deriva da copia). A 1a redacao so olhava o binario, e
   #     mutar a copia — tirar a mascara, tirar o lookbehind — passava verde. Sem binario: nao verificado.
-  local _bin _needle _miss=""; _bin="$(readlink -f "$(command -v claude 2>/dev/null)" 2>/dev/null || true)"
-  local -a _needles=('function PCe(e){return e.replace(/`[^`\n]+`/g,(n,r)=>{let s=e[r-1];return s==="!"||s==="`"?n:"`"+'
-    'lUn=/```!\s*\n?([\s\S]*?)\n?```/g,dUn=/(?<=^|\s)!`([^`]+)`/gm'
-    'let n=e.matchAll(lUn),r=e.includes("!`")?PCe(e).matchAll(dUn):[],s=[];for(let g of[...n,...r]){let h=aFr(g[1]??"");if(h)s.push({raw:g[0],command:h,at:g.index})}return s')
-  for _needle in "${_needles[@]}"; do
-    LC_ALL=C grep -aqF -- "${_needle}" "${chk}" || _miss="${_miss} guarda:${_needle:0:24}"
-  done
+  #     ESTRUTURAL, NÃO LITERAL (2026-10-06): os nomes minificados (`pTe`→`PCe`→`ECe`) mudam a cada build do
+  #     Claude Code — duas atualizações em dois dias pintaram de vermelho PRs sem relação com a guarda, e a
+  #     re-extração era à mão. Agora os identificadores entram como curinga (`⟨F⟩`, consistente dentro do
+  #     trecho) e só a ESTRUTURA é comparada: renomear não é deriva; mudar o comportamento é.
+  local _bin _miss; _bin="$(readlink -f "$(command -v claude 2>/dev/null)" 2>/dev/null || true)"
+  _cd_struct() {  # <arquivo> → imprime os trechos AUSENTES (vazio = os 3 presentes)
+    python3 - "$1" <<'CDPY'
+import re, sys
+data = open(sys.argv[1], 'rb').read().decode('latin-1')
+T = [r'function ⟨F⟩(e){return e.replace(/`[^`\n]+`/g,(n,r)=>{let s=e[r-1];return s==="!"||s==="`"?n:"`"+',
+     r'⟨B⟩=/```!\s*\n?([\s\S]*?)\n?```/g,⟨I⟩=/(?<=^|\s)!`([^`]+)`/gm',
+     r'let n=e.matchAll(⟨B⟩),r=e.includes("!`")?⟨F⟩(e).matchAll(⟨I⟩):[],s=[];for(let g of[...n,...r]){let h=⟨T⟩(g[1]??"");if(h)s.push({raw:g[0],command:h,at:g.index})}return s']
+for t in T:
+    rx, seen = '', set()
+    for part in re.split(r'(⟨[A-Z]⟩)', t):
+        m = re.fullmatch(r'⟨([A-Z])⟩', part)
+        if m:
+            k = m.group(1)
+            rx += ('(?P=%s)' % k) if k in seen else ('(?P<%s>[A-Za-z0-9_$]{1,6})' % k)
+            seen.add(k)
+        else:
+            rx += re.escape(part)
+    if not re.search(rx, data):
+        print(t[:28])
+CDPY
+  }
+  _miss="$(_cd_struct "${chk}" | sed 's/^/ guarda:/' | tr '\n' ' ')"
   # ⚠️ SEM BINARIO NAO E SKIP: o CI nao tem Claude Code instalado e roda em STRICT (skip = FALHA) —
   #    a 1a redacao pintou o #914 de vermelho por isso. O lado da COPIA e medido sempre; o lado do
   #    BINARIO so onde ele existe, e o rotulo DIZ que ali nao foi medido (a REGRA 65 cobra a versao).
   if [ -z "${_bin}" ] || [ ! -f "${_bin}" ]; then
-    if [ -z "${_miss}" ]; then record_pass "cited-directive: (f) a COPIA contem os 3 trechos literais (binario ausente neste host: a deriva do Claude Code NAO foi medida aqui)"
+    if [ -z "${_miss}" ]; then record_pass "cited-directive: (f) a COPIA contem a estrutura dos 3 trechos (binario ausente neste host: a deriva do Claude Code NAO foi medida aqui)"
     else record_fail "cited-directive: (f) copia mutada" "${_miss}"; fi
   else
-    for _needle in "${_needles[@]}"; do LC_ALL=C grep -aqF -- "${_needle}" "${_bin}" || _miss="${_miss} binario:${_needle:0:24}"; done
-    if [ -z "${_miss}" ]; then record_pass "cited-directive: (f) os 3 trechos literais estao no binario instalado E na guarda (sem deriva)"
-    else record_fail "cited-directive: (f) DERIVA" "ausente em:${_miss} — re-extraia o motor do binario ${_bin##*/} (TETO do cited-directive-check.sh)"; fi
+    _miss="${_miss}$(_cd_struct "${_bin}" | sed 's/^/ binario:/' | tr '\n' ' ')"
+    if [ -z "${_miss}" ]; then record_pass "cited-directive: (f) a estrutura dos 3 trechos esta no binario instalado E na guarda (renomear nao e deriva)"
+    else record_fail "cited-directive: (f) DERIVA" "ausente em:${_miss} — o COMPORTAMENTO do motor mudou no binario ${_bin##*/}: re-extraia (TETO do cited-directive-check.sh)"; fi
   fi
 }
 
@@ -14871,6 +15015,7 @@ _family run_resolve_scope_layers_selftests
 _family run_show_scope_selftests
 
 # Modo resolve-target — targeting fino por seletor no alvo: (F1.2 federação — mata o ruído).
+_family run_env_exposure_selftests
 _family run_pre_push_selftests
 _family run_resolve_target_selftests
 

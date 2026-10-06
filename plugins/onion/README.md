@@ -2,7 +2,7 @@
 
 Núcleo operacional do Sistema Onion: o orquestrador mestre (skill onion), runtime de knowledge graph (kg + radar soberano + kg-freshness), sessões e diário, orquestração de subagentes, condução (wizard/onboarding/retro), validação de meta-specs, co-evolução upstream e os adapters SDAAL de task-manager e forge.
 
-**Versão** `0.1.302` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
+**Versão** `0.1.306` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
 
 ## Instalar
 
@@ -25,7 +25,7 @@ claude plugin marketplace add marciocar/onion-plugins && claude plugin install o
 | Comandos | 27 |
 | Agentes | 2 |
 | Skills | 8 |
-| Hooks | 2 |
+| Hooks | 3 |
 
 **Capacidades (Capability Contract):** provê `master-orchestration`, `knowledge-graph-runtime`, `kg-freshness-reverify`, `sdaal-task-manager`, `sdaal-forge`, `session-runtime`, `dogfood-doctrine`, `language-standards`, `knowledge-graph-sdaal`, `learning-diary`, `orchestration`, `metaspec-validation`, `freshness-audits`, `constellation-map`, `co-evolution-upstream`, `plan-graph-drive`, `plan-graph-realign`, `guided-conduction`, `guided-onboarding`, `retro-feedback`; requer `skill:onion-orchestration`, `agent:metaspec-gate-keeper`.
 
@@ -89,6 +89,7 @@ Invocação: `/onion:<comando>` (namespace do plugin).
 |---|---|
 | `UserPromptSubmit` | `aside-router-hook.sh` |
 | `PostToolUse` | `bash-empty-result-guard.sh` |
+| `PreToolUse` | `pretooluse-env-guard.sh` |
 
 Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é a capacidade que só existe no Claude Code. Nenhum envia dados para fora; todos rodam local.
 
@@ -102,7 +103,7 @@ Hooks são determinísticos (bash) e podem VETAR uma ação com `exit 2` — é 
 | Campo | Valor |
 |---|---|
 | Origem | `marciocar/onion-evolve` (repositório privado) |
-| tree_sha (hash do conteúdo das fontes) | `7b1422b7edad` |
+| tree_sha (hash do conteúdo das fontes) | `525d698af98e` |
 
 A origem identifica DE ONDE este artefato foi gerado; o canal público de instalação, issues e suporte é https://github.com/marciocar/onion-plugins. Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 

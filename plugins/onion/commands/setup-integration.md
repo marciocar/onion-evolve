@@ -3,7 +3,7 @@ name: setup-integration
 description: |
   Configura integrações do Sistema Onion (Task Managers, Gamma, etc).
   Guia o usuário na configuração segura de variáveis de ambiente para MCPs e APIs.
-allowed-tools: Read Bash(test -f *) Bash(grep *) Bash(git ls-files*)
+allowed-tools: Read Bash(test -f *) Bash(grep *) Bash(git ls-files*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh *)
 parameters:
   - name: integration
     description: Nome da integração (task-manager, clickup, asana, linear, zoho, gamma, postgres)
@@ -49,22 +49,17 @@ SENÃO:
 
 ### Passo 2: Verificar Estado Atual
 
-**CRÍTICO:** Usar `Read` para ler `.env` sem expor valores sensíveis:
+**CRÍTICO:** o `.env` só é olhado pelo helper, que devolve **nomes** de chave e o provider — nunca valores:
 
 ```bash
-# Verificar se .env existe
-test -f .env && echo "✅ .env existe" || echo "⚠️ .env não encontrado"
-
-# Ler .env usando Read (não usar cat/grep que expõe valores)
-Read .env
-
-# Verificar variáveis específicas (sem expor valores)
-# Usar apenas para detectar presença, não para exibir conteúdo
+bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh --provider          # provider ativo (não é segredo)
+bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh --check <provider>  # presença, por NOME, das chaves obrigatórias
 ```
 
-**⚠️ REGRA DE SEGURANÇA:** 
-- **NUNCA** usar `cat .env` ou `grep` que mostre valores completos
-- **SEMPRE** usar `Read` que permite análise sem exposição
+**⚠️ REGRA DE SEGURANÇA:**
+- **NUNCA** ler o `.env` com `Read`, `cat` ou `grep` que mostre valores. `Read` devolve o arquivo inteiro ao
+  modelo: os segredos entram no contexto e no transcript. Até 2026-10-05 este passo afirmava o contrário, e um
+  hub mediu o vazamento ao configurar o Zoho.
 - **NUNCA** exibir tokens/senhas no output
 
 ### Passo 3: Guiar Configuração por Integração
@@ -165,37 +160,30 @@ POSTGRES_PASSWORD=change_me_in_production  # Use senhas seguras!
 
 ### Passo 4: Criar/Atualizar .env
 
-**SE `.env` não existir:**
-```bash
-# Verificar se .env.example existe
-if [ -f .env.example ]; then
-  cp .env.example .env
-  echo "✅ .env criado a partir de .env.example"
-else
-  # Criar .env básico
-  touch .env
-  echo "# Sistema Onion - Variáveis de Ambiente" >> .env
-  echo "# Gerado por /meta/setup-integration" >> .env
-  echo "" >> .env
-  echo "✅ .env criado"
-fi
-```
+**SE `.env` não existir:** `cp .env.example .env` (o exemplo nasce com `TASK_MANAGER_PROVIDER=none`).
 
-**SE `.env` já existir:**
+**A escolha do provider é a ÚNICA chave que o setup escreve** — e escreve com o valor escolhido, avisando se havia outro:
+```bash
+bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh --set-provider <jira|clickup|asana|linear|zoho|none>
+```
+As credenciais o **usuário** cola no `.env` (nunca passam pelo chat). Para as demais chaves:
 - **NUNCA** sobrescrever valores existentes
 - **SEMPRE** adicionar novas variáveis ao final
-- **AVISAR** se variável já existe com valor diferente
+
+> Até 2026-10-05 o `.env.example` vinha com `jira` e este passo proibia sobrescrever: quem escolhia outro
+> provider terminava com `jira` ativo e as variáveis novas sem efeito (sinal de campo, dogfood do Zoho).
 
 ### Passo 5: Validar Configuração
 
 Após o usuário adicionar as credenciais:
 
-**Para Task Manager:**
+**Para Task Manager** (só-leitura; nada é escrito no provider; imprime só o resultado, nunca a credencial):
 ```bash
-# Verificar se TASK_MANAGER_PROVIDER está configurado
-# Verificar se variáveis obrigatórias do provedor estão presentes
-# Sugerir teste: /product/task "Task de teste"
+bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh --check    # todas as chaves obrigatórias presentes?
+bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh --test     # a credencial vale? (Zoho: confere também que o PORTAL é visto por ela)
 ```
+Depois, carregue na sessão: `set -a; source .env; set +a` (o hook avisa quando o `.env` declara um provider que o
+ambiente da sessão não tem).
 
 **Para outras integrações:**
 ```bash
@@ -226,7 +214,7 @@ fi
 ## 🔒 Regras de Segurança
 
 1. **NUNCA** exiba tokens/senhas completos no output
-2. **SEMPRE** use `Read` para ler `.env` (não `cat` ou `grep` que expõem valores)
+2. **SEMPRE** olhe o `.env` pelo helper `env-check.sh` — **nunca** com `Read`, `cat` ou `grep` (os três expõem valores)
 3. **SEMPRE** verifique `.gitignore` antes de concluir
 4. **ALERTE** se detectar credenciais em arquivos não protegidos
 5. **SUGIRA** uso de vault/secrets manager para produção

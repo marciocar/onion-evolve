@@ -6,7 +6,8 @@
 
 **⚠️ CRÍTICO — EXECUTAR ANTES DE QUALQUER OUTRA AÇÃO. NUNCA assumir o provedor.**
 
-1. **Ler `.env`** (`Read .env`) e extrair `TASK_MANAGER_PROVIDER`
+1. **Obter o provider sem ler o `.env`**: `bash .claude/utils/task-manager/env-check.sh --provider` (e `--check` para a
+   presença das chaves) — **nunca** abrir o `.env` com a ferramenta de leitura de arquivo, que entrega os segredos ao modelo. Extrair `TASK_MANAGER_PROVIDER`
    (valores: `jira` | `clickup` | `asana` | `linear` | `zoho` | `none`).
 2. **Validar a variável obrigatória do provedor ativo:**
 

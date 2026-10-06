@@ -46,7 +46,7 @@ SKILLS=(
   ".claude/skills/onion-product-context"
 )
 HOOKS=()
-UTILS=()
+UTILS=(".claude/utils/task-manager")   # o helper env-check.sh: sem ele os comandos que leem o provider não têm caminho (o veto barra abrir o .env)
 VALIDATION=()
 TEMPLATES=()
 DOCS=(

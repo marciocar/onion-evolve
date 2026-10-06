@@ -3,7 +3,7 @@ name: sync
 description: |
   Sincronização automática de branches com GitFlow e proteção de branches críticas.
   Use após merge de PRs para manter branches atualizadas.
-allowed-tools: Bash(git *) Read Bash(cat .env*)
+allowed-tools: Bash(git *) Read Bash(bash .claude/utils/task-manager/env-check.sh *)
 
 parameters:
   - name: branch

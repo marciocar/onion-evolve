@@ -1,7 +1,7 @@
 ---
 name: validate-phase-sync
 description: Validar sincronização entre fases do plan.md e subtasks do Task Manager.
-allowed-tools: Read Grep Edit Bash(find .claude/sessions*) Bash(cat .env*)
+allowed-tools: Read Grep Edit Bash(find .claude/sessions*) Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh *)
 category: engineer
 tags: [validation, sync, task-manager]
 version: "3.0.0"

@@ -3,7 +3,7 @@ name: create
 description: |
   Cria estratégias completas de teste baseadas no Framework de Testes.
   Use para gerar estratégias multi-perspectiva (White-box, Grey-box, Black-box) com cálculo automático de QA Story Points.
-allowed-tools: Read Write Bash(mkdir *)
+allowed-tools: Read Write Bash(mkdir *) Bash(bash .claude/utils/task-manager/env-check.sh *)
 
 parameters:
   - name: feature-name
@@ -198,11 +198,11 @@ Total verificado: 4 + 5 + 5 = 14 ✅
 **CRÍTICO:** Seguir padrão de `/product/task`:
 
 ```bash
-# EXECUTAR PRIMEIRO: Ler .env
-Read .env
+# EXECUTAR PRIMEIRO: o provider, sem ler o .env (Read entregaria os segredos ao modelo)
+bash .claude/utils/task-manager/env-check.sh --provider
 ```
 
-**Extrair do .env:**
+**Obter pelo helper** (`bash .claude/utils/task-manager/env-check.sh --provider` e `--get <CHAVE>` para ids não-secretos como `CLICKUP_DEFAULT_LIST_ID`; o veto barra abrir o `.env`):
 - `TASK_MANAGER_PROVIDER` (clickup|asana|linear|zoho|none)
 - Variáveis de API correspondentes
 

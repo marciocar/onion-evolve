@@ -12,13 +12,13 @@ description: >
   pedido de orientação/entrada no sistema. NÃO ative por menções a "onion" dentro
   de frases (nomes de arquivo, docs, código, esta base de código se chama onion),
   apenas pela invocação isolada da palavra.
-allowed-tools: Bash(grep * .env) Bash(ls .claude/*) Bash(git branch*)
+allowed-tools: Bash(bash .claude/utils/task-manager/env-check.sh *) Bash(ls .claude/*) Bash(git branch*)
 ---
 
 ## Estado Atual do Projeto
 
 Provider ativo:
-!`grep -E '^TASK_MANAGER_PROVIDER=' .env 2>/dev/null | head -1 || echo "TASK_MANAGER_PROVIDER=não configurado"`
+!`p="$(bash .claude/utils/task-manager/env-check.sh --provider 2>/dev/null)" && echo "TASK_MANAGER_PROVIDER=${p}" || echo "TASK_MANAGER_PROVIDER=não configurado"`
 
 Sessões abertas:
 !`ls .claude/sessions/ 2>/dev/null || echo "(nenhuma sessão ativa)"`

@@ -1,7 +1,7 @@
 ---
 name: pr-update
 description: Atualizar PR existente com mudanças adicionais.
-allowed-tools: Bash(git *) Bash(cat .env*) Read Edit Write Grep
+allowed-tools: Bash(git *) Bash(bash .claude/utils/task-manager/env-check.sh *) Read Edit Write Grep
 category: engineer
 tags: [pr, update, git]
 version: "3.0.0"
@@ -59,7 +59,7 @@ Antes de operar com a task, carregue o `.env` e leia `TASK_MANAGER_PROVIDER` (`j
 
 O comentário de atualização deve documentar: tipo do commit (fix | feat | refactor | docs | chore), hash do commit, arquivos modificados, linhas adicionadas/removidas e descrição das mudanças.
 
-**Adicionar comentário via abstração agnóstica** (carregar `.env` → ler `TASK_MANAGER_PROVIDER`):
+**Adicionar comentário via abstração agnóstica** (provider pelo helper: `bash .claude/utils/task-manager/env-check.sh --provider`):
 
 Chamar `taskManager.addComment(taskId, conteudo)` e `taskManager.updateStatus(taskId, status)` — o adapter resolve automaticamente formato (ADF / Unicode / Markdown), transporte (REST API por padrão; MCP opcional via `TASK_MANAGER_TRANSPORT=mcp`) e qual especialista acionar por provider. Referências: `docs/meta-specs/integrations.md` e `.claude/utils/task-manager/adapters/`.
 

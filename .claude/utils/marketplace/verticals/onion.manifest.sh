@@ -73,6 +73,7 @@ SKILLS=(
 HOOKS=(
   ".claude/hooks/bash-empty-result-guard.sh"
   ".claude/hooks/aside-router-hook.sh"
+  ".claude/hooks/pretooluse-env-guard.sh"
 )
 UTILS=(
   ".claude/utils/diagnose"

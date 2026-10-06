@@ -5,7 +5,7 @@ category: meta
 tags: [federation, status, monitor, drift, ci, ledger, forge, sdaal]
 version: "1.0.0"
 updated: "2026-06-15"
-allowed-tools: Read Grep Glob Bash(cat .env*) Bash(bash .claude/validation/federation-status-scan.sh*)
+allowed-tools: Read Grep Glob Bash(bash .claude/utils/task-manager/env-check.sh *) Bash(bash .claude/validation/federation-status-scan.sh*)
 argument-hint: "[--ledger <path>]  (também via .env FEDERATION_LEDGER)"
 ---
 

@@ -1,7 +1,7 @@
 ---
 name: collect
 description: Coletar novas ideias de features ou bugs para o projeto.
-allowed-tools: Read Bash(cat .env*)
+allowed-tools: Read Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh *)
 category: product
 tags: [ideation, features, bugs]
 version: "3.0.0"

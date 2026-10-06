@@ -3,7 +3,7 @@ name: work
 description: |
   Continuar trabalho em feature ativa. Lê sessão e identifica próxima fase.
   Atualiza progresso via Task Manager abstraction.
-allowed-tools: Bash(git *) Bash(cat .env*) Bash(ls *) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh*) Read Write Edit Grep Glob
+allowed-tools: Bash(git *) Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh *) Bash(ls *) Bash(bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh*) Read Write Edit Grep Glob
 category: engineer
 tags: [development, workflow, session, kg-first]
 version: "3.1.0"
@@ -118,9 +118,9 @@ Toda vez que completar uma fase do plano (**checkpoint** — ver [worklog-protoc
 - Contrato de worklog (SSOT): [gitflow-patterns.md §Contrato de Sessão](${CLAUDE_PLUGIN_ROOT}/kb/gitflow-patterns.md#contrato-de-sessão-de-desenvolvimento)
 - Protocolo de leitura/resume/checkpoint: [worklog-protocol.md](${CLAUDE_PLUGIN_ROOT}/kb/worklog-protocol.md)
 - Higiene de contexto: context-window-optimization.md
-- Abstração: `.claude/utils/task-manager/`
-- Detector: `.claude/utils/task-manager/detector.md`
-- Factory: `.claude/utils/task-manager/factory.md`
+- Abstração: `${CLAUDE_PLUGIN_ROOT}/utils/task-manager/`
+- Detector: `${CLAUDE_PLUGIN_ROOT}/utils/task-manager/detector.md`
+- Factory: `${CLAUDE_PLUGIN_ROOT}/utils/task-manager/factory.md`
 - Padrões de comentários: `common/prompts/clickup-patterns.md`
 
 Agora, veja a fase atual de desenvolvimento e forneça um plano ao usuário sobre como abordá-la.
