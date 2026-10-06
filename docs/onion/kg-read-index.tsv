@@ -109,6 +109,7 @@
 .claude/commands/meta/orchestrate.md	E_F8_WORKTREE_ISOLADO_VIABILIZOU	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/commands/meta/personality-sync.md	E_PERSONALITY_SYNC_BUILT	docs/onion/graph/federation-health-2026-07.kg.yaml
 .claude/commands/meta/radar.md	Q_FLUXO_NAO_TEM_PASSO_DE_ABSORCAO	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
+.claude/commands/meta/setup-integration.md	Q_BYTECODE_SEM_TESTE	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 .claude/commands/product/check.md	C_QUATRO_ARTEFATOS_DE_VALIDACAO_CONTRA_METASPEC	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
 .claude/commands/product/consolidate-meetings.md	E_lacuna_pipeline	docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml
 .claude/commands/product/task.md	E_J_D3_6	docs/onion/graph/onion-evolution-2026-07.kg.yaml
@@ -437,6 +438,7 @@
 .claude/validation/lint-selftest.sh	C_BANCADA_ACHA_O_QUE_LEITURA_NAO_ACHA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/validation/lint-selftest.sh	C_GUARDA_CASO_TESTA_COPIA_NAO_O_SUT	docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	C_OPCAO_F_ABSORVER_TESTE_DE_MUTACAO_DE_REGRA	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
+.claude/validation/lint-selftest.sh	C_OS_TESTES_DO_BYTECODE_EXISTEM	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	C_TERCEIRA_CAUSA_DE_MUTANTE_QUE_NAO_MORDE	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	C_TESTE_QUE_AFIRMA_AUSENCIA_PASSA_DE_GRACA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	C_offline_csp	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
@@ -1673,6 +1675,7 @@ docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml	
 docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml	E_LACUNAS_EIXO_D_2026_10	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/SYNTHESIS.md	D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	C_EIXO_D_OPTION_D_SECOND_GATE_EVAL	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
+docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	D_QUATRO_PILARES_DEFINIDOS_PELO_MAESTRO	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	E_LACUNAS_NANOCHAT_2026_10	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	Q_EIXO_D_RECONCILE_PARENT_GRAPH	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
 docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml	Q_EIXO_D_SYNTHETIC_IDENTITY_BUDGET_2026_10	docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml
@@ -2061,6 +2064,7 @@ docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	C_EIXO_D_IDENTIT
 docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	C_OPCAO_A_NO_TRAINING_LLM_AS_VM	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	C_OPCAO_E_ONION_AS_WEIGHTS	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
+docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	D_PROMPTS_COMO_BYTECODE_LLM_COMO_VM_SUPERADA	docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml
 docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	E_CORPUS_SCALE_MEASURED	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml	E_OBJECAO_SYNTHETIC_DATA_AXIS_UNREAD	docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml
 docs/onion/graph/fios-abertos.kg.yaml	PO_ferramenta_da_vps_nao_se_encerra	docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml
