@@ -615,6 +615,14 @@ onion-core	specialization	hub-role
 onion-core	specialization	public-door	
 onion-core	tier	hub	
 onion-core	trust-advises	onion-evolve	
+onion-curation	adopts	onion-evolve	
+onion-curation	mode	greenfield	
+onion-curation	pin	5b529e980779	
+onion-curation	specialization	curadoria	
+onion-curation	specialization	dissecacao	
+onion-curation	specialization	mercado	
+onion-curation	tier	standalone	
+onion-curation	trust-advises	onion-evolve	
 onion-design	loads	when:brief -> kb-or-context:business-context	
 onion-design	loads	when:material -> reuse:presentation/canva	
 onion-design	provides	design-tokens-w3c-dtcg	

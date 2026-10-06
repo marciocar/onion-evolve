@@ -29,6 +29,7 @@ flowchart TD
   portal_gamificacao["portal-gamificacao<br/>standalone · greenfield"]:::standalone
   jogo_da_vida["jogo-da-vida<br/>standalone · greenfield"]:::standalone
   onion_slm["onion-slm<br/>standalone · greenfield"]:::standalone
+  onion_curation["onion-curation<br/>standalone · greenfield"]:::standalone
   metagamify -->|adopts| onion_evolve
   pulse_mais -->|adopts| onion_evolve
   granaai -->|adopts| onion_evolve
@@ -54,6 +55,7 @@ flowchart TD
   portal_gamificacao -->|adopts| onion_evolve
   jogo_da_vida -->|adopts| onion_evolve
   onion_slm -->|adopts| onion_evolve
+  onion_curation -->|adopts| onion_evolve
   classDef source fill:#1f6feb,color:#fff,stroke:#0b3d91;
   classDef hub fill:#238636,color:#fff,stroke:#033a16;
   classDef standalone fill:#8957e5,color:#fff,stroke:#3c1e70;
@@ -87,3 +89,4 @@ flowchart TD
 | portal-gamificacao | standalone | greenfield | gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers | `2e3f3a6f88ce` |
 | jogo-da-vida | standalone | greenfield | gamification, maagica, expo-universal, turborepo, kg-radar-js-port, pre-adoption-dogfood | `2e3f3a6f88ce` |
 | onion-slm | standalone | greenfield | slm, eval-de-dominio, roteiro-gradual | `9e75a73d0401` |
+| onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `5b529e980779` |
