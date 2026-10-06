@@ -4025,6 +4025,18 @@ run_merge_fixture() {
   lost="$(jq -nr --argjson ref "$(cat "${tgt}")" --argjson out "${out}" "${diff_jq}")"
   if [ -n "${lost}" ]; then record_fail "${fixture}" "hook próprio do alvo PERDIDO (clobber): ${lost}"; return; fi
 
+  # attribution: ausente no alvo → chega o da fonte; presente no alvo → fica o do alvo (never-clobber)
+  local attr_ok
+  attr_ok="$(jq -nr --argjson s "$(cat "${src}")" --argjson t "$(cat "${tgt}")" --argjson o "${out}" '
+    if $s.attribution == null then "ok"
+    elif $t.attribution == null then (if $o.attribution == $s.attribution then "ok" else "attribution da fonte NAO chegou ao alvo" end)
+    else (if $o.attribution == $t.attribution then "ok" else "attribution PROPRIO do alvo foi sobrescrito (clobber)" end) end')"
+  if [ "${attr_ok}" != ok ]; then record_fail "${fixture}" "${attr_ok}"; return; fi
+  case "${fixture}" in *own-attribution*)
+    bash "${helper}" "${src}" "${tgt}" 2>&1 >/dev/null | grep -q 'AVISO: o attribution do alvo difere' \
+      || { record_fail "${fixture}" "attribution divergente sem o AVISO no stderr"; return; } ;;
+  esac
+
   local tmp out2
   tmp="$(mktemp)"; printf '%s' "${out}" > "${tmp}"
   out2="$(bash "${helper}" "${src}" "${tmp}" 2>/dev/null)"; rm -f "${tmp}"
@@ -4234,6 +4246,132 @@ run_resolve_production_selftests() {
     record_fail "resolve-production: repo sem remote/commits" "esperava exit 0, veio ${RP_RC} (out='${RP_OUT}' err='${RP_ERR}')"
   fi
 
+
+  # (7) GitFlow RETOMADO (sinal de campo de um hub, 2026-10-05): develop recriada da master e MAIS RECENTE,
+  #     origin/HEAD→develop, integração onion/develop, sem config → "master". A recência elegia "develop".
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" symbolic-ref HEAD refs/heads/zzz-local
+  GIT_COMMITTER_DATE="2026-01-01T00:00:00" git -C "${d}" commit -q --allow-empty -m velho
+  old_sha="$(git -C "${d}" rev-parse HEAD)"
+  GIT_COMMITTER_DATE="2026-10-01T00:00:00" git -C "${d}" commit -q --allow-empty -m novo
+  new_sha="$(git -C "${d}" rev-parse HEAD)"
+  git -C "${d}" update-ref refs/remotes/origin/master "${old_sha}"
+  git -C "${d}" update-ref refs/remotes/origin/develop "${new_sha}"
+  git -C "${d}" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/develop
+  _rp_run "${d}" --integration onion/develop
+  if [ "${RP_OUT}" = "master" ]; then
+    record_pass "resolve-production: GitFlow retomado (develop mais nova, origin/HEAD→develop) → master, não a recência"
+  else
+    record_fail "resolve-production: GitFlow retomado" "esperava 'master', veio out='${RP_OUT}' err='${RP_ERR}'"
+  fi
+  # (8) config ENVENENADO (= origin/HEAD) não vira autoridade, no mesmo repo → segue "master"
+  git -C "${d}" config gitflow.branch.master develop
+  _rp_run "${d}" --integration onion/develop
+  if [ "${RP_OUT}" = "master" ]; then
+    record_pass "resolve-production: config com a assinatura do veneno (= origin/HEAD) é ignorado → master"
+  else
+    record_fail "resolve-production: config envenenado" "esperava 'master', veio out='${RP_OUT}'"
+  fi
+  # (9) config LEGÍTIMO com nome não-canônico vence a heurística (produção chamada 'production')
+  git -C "${d}" update-ref refs/remotes/origin/production "${old_sha}"
+  git -C "${d}" config gitflow.branch.master production
+  _rp_run "${d}" --integration onion/develop
+  rm -rf "${d}"
+  if [ "${RP_OUT}" = "production" ]; then
+    record_pass "resolve-production: gitflow.branch.master já configurado (ref existe, sem veneno) é a autoridade"
+  else
+    record_fail "resolve-production: config como autoridade" "esperava 'production', veio out='${RP_OUT}'"
+  fi
+
+
+  # (10) FALSO POSITIVO que derrubou a 1ª cura (Elenxo 2026-10-06): produção REAL é o origin/HEAD com nome
+  #      não-canônico (`production`, mais nova) e há `master` parada, sem config → "production", não "master"
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" symbolic-ref HEAD refs/heads/zzz-local
+  GIT_COMMITTER_DATE="2026-01-01T00:00:00" git -C "${d}" commit -q --allow-empty -m velho
+  old_sha="$(git -C "${d}" rev-parse HEAD)"
+  GIT_COMMITTER_DATE="2026-10-01T00:00:00" git -C "${d}" commit -q --allow-empty -m novo
+  new_sha="$(git -C "${d}" rev-parse HEAD)"
+  git -C "${d}" update-ref refs/remotes/origin/master "${old_sha}"
+  git -C "${d}" update-ref refs/remotes/origin/production "${new_sha}"
+  git -C "${d}" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/production
+  _rp_run "${d}" --integration develop
+  if [ "${RP_OUT}" = "production" ]; then
+    record_pass "resolve-production: origin/HEAD não-canônico (production) com master parada → production"
+  else
+    record_fail "resolve-production: production não-canônica" "esperava 'production', veio out='${RP_OUT}'"
+  fi
+  # (11) config setado à mão IGUAL ao origin/HEAD (production) é respeitado — a 1ª cura o tratava como veneno
+  git -C "${d}" config gitflow.branch.master production
+  _rp_run "${d}" --integration develop
+  if [ "${RP_OUT}" = "production" ] && [ -z "${RP_ERR}" ]; then
+    record_pass "resolve-production: config à mão igual ao origin/HEAD é respeitado (não é veneno)"
+  else
+    record_fail "resolve-production: config à mão = origin/HEAD" "esperava 'production' sem aviso, veio out='${RP_OUT}' err='${RP_ERR}'"
+  fi
+  # (12) config para branch INEXISTENTE: ignorado COM aviso (antes: silêncio e a adoção sobrescrevia)
+  git -C "${d}" config gitflow.branch.master prod-que-nao-existe
+  _rp_run "${d}" --integration develop
+  rm -rf "${d}"
+  if [ "${RP_OUT}" = "production" ] && grep -q 'não existe como branch' <<< "${RP_ERR}"; then
+    record_pass "resolve-production: config para branch inexistente é ignorado e DECLARADO no stderr"
+  else
+    record_fail "resolve-production: config inexistente" "out='${RP_OUT}' err='${RP_ERR}'"
+  fi
+  # (13) config envenenado vira autoridade quando o origin/HEAD é CONSERTADO? (1ª cura: sim) → não, segue master
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" symbolic-ref HEAD refs/heads/zzz-local
+  git -C "${d}" commit -q --allow-empty -m base
+  sha="$(git -C "${d}" rev-parse HEAD)"
+  git -C "${d}" update-ref refs/remotes/origin/master "${sha}"
+  git -C "${d}" update-ref refs/remotes/origin/develop "${sha}"
+  git -C "${d}" symbolic-ref refs/remotes/origin/HEAD refs/remotes/origin/master
+  git -C "${d}" config gitflow.branch.master develop
+  _rp_run "${d}" --integration onion/develop
+  rm -rf "${d}"
+  if [ "${RP_OUT}" = "master" ]; then
+    record_pass "resolve-production: config 'develop' com origin/HEAD já consertado continua ignorado → master"
+  else
+    record_fail "resolve-production: veneno após conserto do origin/HEAD" "esperava 'master', veio out='${RP_OUT}'"
+  fi
+
+  # (14) F1 — trunk-based por design: config=main, integração main, só main → "main" SEM aviso
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" symbolic-ref HEAD refs/heads/main
+  git -C "${d}" commit -q --allow-empty -m base
+  git -C "${d}" config gitflow.branch.master main
+  _rp_run "${d}" --integration main
+  rm -rf "${d}"
+  if [ "${RP_OUT}" = "main" ] && [ -z "${RP_ERR}" ]; then
+    record_pass "resolve-production: trunk-based com config=main=integração → main SEM falso alarme"
+  else
+    record_fail "resolve-production: trunk-based com config" "esperava 'main' sem stderr, veio out='${RP_OUT}' err='${RP_ERR}'"
+  fi
+  # (15) F2 — rename master→main sem prune, config velho 'master': o config vale, mas a divergência é ANUNCIADA
+  d="$(mktemp -d)"; git -C "${d}" init -q
+  git -C "${d}" symbolic-ref HEAD refs/heads/zzz-local
+  GIT_COMMITTER_DATE="2026-01-01T00:00:00" git -C "${d}" commit -q --allow-empty -m velho
+  old_sha="$(git -C "${d}" rev-parse HEAD)"
+  GIT_COMMITTER_DATE="2026-10-01T00:00:00" git -C "${d}" commit -q --allow-empty -m novo
+  new_sha="$(git -C "${d}" rev-parse HEAD)"
+  git -C "${d}" update-ref refs/remotes/origin/master "${old_sha}"
+  git -C "${d}" update-ref refs/remotes/origin/main "${new_sha}"
+  git -C "${d}" config gitflow.branch.master master
+  _rp_run "${d}" --integration develop
+  if [ "${RP_OUT}" = "master" ] && grep -q 'heurística elegeria "main"' <<< "${RP_ERR}"; then
+    record_pass "resolve-production: config velho (master) vale, e a heurística divergente (main) é ANUNCIADA"
+  else
+    record_fail "resolve-production: config velho em silêncio" "out='${RP_OUT}' err='${RP_ERR}'"
+  fi
+  # (16) F4 — `HEAD` não é config de produção
+  git -C "${d}" config gitflow.branch.master HEAD
+  _rp_run "${d}" --integration develop
+  rm -rf "${d}"
+  if [ "${RP_OUT}" = "main" ] && grep -q 'não é nome de branch' <<< "${RP_ERR}"; then
+    record_pass "resolve-production: gitflow.branch.master=HEAD é recusado com aviso"
+  else
+    record_fail "resolve-production: config HEAD" "out='${RP_OUT}' err='${RP_ERR}'"
+  fi
   unset -f _rp_run
 }
 

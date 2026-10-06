@@ -53,6 +53,12 @@ fi
 
 # Para cada evento, anexa ao alvo os hooks da fonte cujo .command ainda não
 # aparece no alvo (índice por .command). Preserva matchers/permissions/outros.
+# alvo JÁ tem attribution diferente da fonte: preserva (é dele) e AVISA — sinal de que o padrão da família mudou
+_div="$(jq -nr --slurpfile s "${SRC}" --slurpfile t "${TGT}" \
+  'if ($s[0].attribution != null) and ($t[0].attribution != null) and ($s[0].attribution != $t[0].attribution)
+   then "diverge" else "" end' 2>/dev/null || true)"
+[ "${_div}" = diverge ] && echo "AVISO: o attribution do alvo difere do da fonte — preservado o do alvo; confira se o padrão de assinatura da família mudou." >&2
+
 jq -n \
   --slurpfile s "${SRC}" \
   --slurpfile t "${TGT}" '
@@ -67,4 +73,8 @@ jq -n \
     | .hooks = (.hooks // {})
     | .hooks[$ev] = ((.hooks[$ev] // []) + [ $missing[] | {hooks: [.]} ])
   )
+  # attribution (a SSOT da assinatura de commit/PR) viaja NEVER-CLOBBER: só entra se o alvo não tem o
+  # campo. Até 2026-10-05 este merge levava só hooks, e o pr.md do adotante dizia que a assinatura vinha de
+  # um campo que o settings.json dele nunca recebia (sinal de campo de um hub).
+  | if ($src.attribution != null) and (.attribution == null) then .attribution = $src.attribution else . end
 '
