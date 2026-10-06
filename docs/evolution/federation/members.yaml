@@ -834,6 +834,27 @@ members:
       diary_classifications_shared: []
       exposes_downstream: []
 
+  - id: onion-kg-ssot
+    name: onion-kg-ssot (produto KG-SSOT)
+    role: standalone
+    kind: adopter
+    parent: onion-evolve
+    remote: https://github.com/marciocar/onion-kg-ssot (privado)
+    local_path: /home/marcio/onion-kg-ssot
+    onion_version: fe8359e38b43
+    adopted_at: 2026-10-06
+    mode: greenfield
+    personality_summary: "O grafo de conhecimento verificável como PRODUTO INDEPENDENTE: adota e usa o Onion, e o Onion adota e usa o KG-SSOT (dogfood nos dois sentidos). Tem contextos próprios, feitos de pesquisa profunda e de mercado ali dentro, e lê o core só para entender o encaixe. Primeiro marco: o contrato formal do .kg.yaml (JSON Schema + suíte de conformidade) que o core passará a consumir."
+    specializations: [kg-ssot, schema, produto]
+    personality_last_sync: 2026-10-06
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: []
+      exposes_downstream: []
+
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>

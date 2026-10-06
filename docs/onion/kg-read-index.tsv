@@ -155,6 +155,7 @@
 .claude/hooks/premodelswitch-guard.sh	E_LACUNAS_E3_0904	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_R3_F2_TROCA_DE_MODELO_RECHECA_E_NOMEIA	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	E_CURA_MERGE_GATE_2O_VETO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.claude/hooks/pretooluse-merge-gate.sh	E_MERGE_GATE_INERTE_NO_ADOTANTE	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
 .claude/hooks/pretooluse-protect-main.sh	E_BURACO_HEAD_MAIN_NO_VETO_EXISTENTE	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
@@ -233,6 +234,7 @@
 .claude/utils/adopt/vendor-manifest.sh	E_PADRAO_PRIVADO_FIXAVA_UM_NOME_E_O_IRMAO_PASSAVA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	E_QUATRO_COPIAS_DA_MESMA_LISTA_DUAS_DRIFTADAS	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
+.claude/utils/adopt/vendor-manifest.sh	E_SKILL_CORE_ONLY_VIAJOU	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/utils/adopt/vendor-manifest.sh	Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
 .claude/utils/adopt/write-stamp.sh	E_CORTE_QUE_NAO_SE_CARIMBA_NAO_ACONTECE	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/write-stamp.sh	E_W9_PIN_GREP_MEDIDO	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml

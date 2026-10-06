@@ -11506,7 +11506,13 @@ run_seed_adoption_graph_selftests() {
 
   # (a) alvo virgem → semeia, E o RADAR aprova o grafo gerado (exit 0, sem contradição estrutural).
   d="$(_seed_fixture)"
-  bash "${helper}" "${d}" --gate-proven >/dev/null 2>&1 || true
+  local _seed_err
+  _seed_err="$(bash "${helper}" "${d}" --gate-proven 2>&1 >/dev/null || true)"
+  # (a0) o semeador não executa nada do próprio corpo (2026-10-06): uma crase num comentário dentro do
+  #      heredoc SEM aspas virou `---: command not found` na adoção do onion-kg-ssot, com o comentário cortado.
+  if grep -q 'command not found' <<< "${_seed_err}"; then
+    record_fail "seed-graph: (a0) o semeador executou texto do próprio corpo" "$(grep 'command not found' <<< "${_seed_err}" | head -1)"
+  else record_pass "seed-graph: (a0) o semeador roda sem executar texto do corpo (stderr sem 'command not found')"; fi
   rc=0
   ( cd "${d}" && bash .claude/validation/kg-radar.sh docs/onion/graph/onion-adoption.kg.yaml >/dev/null 2>&1 ) || rc=$?
   if [ -f "${d}/docs/onion/graph/onion-adoption.kg.yaml" ] && [ "${rc}" -eq 0 ]; then
