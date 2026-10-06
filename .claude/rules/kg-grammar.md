@@ -16,7 +16,7 @@ paths:
 | Campo | Valor | Erro comum |
 |---|---|---|
 | **`node_type:`** | `entity` `claim` `decision` `question` `evidence` `artifact` (audit) · `entity` `state` `event` `rule` `invariant` `policy` (domain) | escrever **`type:`** — o radar não lê |
-| **`edge_type:`** | `SUPPORTS` `REFUTES` `SUPERSEDES` `CAUSES` `DEPENDS_ON` `TRACES_TO` (audit) · `HAS_STATE` `TRANSITIONS` `EMITS` `CONSTRAINS` `READS` `WRITES` (domain) | escrever **`type:`** |
+| **`edge_type:`** | `SUPPORTS` `REFUTES` `SUPERSEDES` `CAUSES` `DEPENDS_ON` `TRACES_TO` `CONSTRAINS` (audit: limita sem derrubar) · `HAS_STATE` `TRANSITIONS` `EMITS` `CONSTRAINS` `READS` `WRITES` (domain) | escrever **`type:`** |
 | `layer:` | `audit` (default) · `domain` | — |
 | `plane:` | `DEV` (código/branch) · `PROD` (artefato vivo) | `decision` só vira `done` verificada em **PROD** |
 | `status:` | `open` `confirmed` `drifted` `unverifiable` `refuted` `superseded` `done` | ~~valores fora do enum passam sem gate — 11 circulando hoje~~ **FALSO, e medido: o motor REPROVA (fator −1 em `lib/status-factor.awk`), e o corpus vivo tem 4.021 `status:` com ZERO fora do enum** (2026-09-22; achado #8 do sinal de campo de 2026-09-10, que foi ler a doutrina para construir em cima dela). A linha velha fica riscada em vez de apagada: doutrina que afirmava o oposto do código é o defeito que esta casa persegue, e apagá-la transformaria a correção em propaganda. `drifted`/`unverifiable` são a SAÍDA de `/meta:kg-freshness` e existem desde 2026-08-06: sem elas, selar um drift só dava para **recusar** (exit 1) ou **mentir de `refuted`**, que zera a atenção do nó que acabou de provar que a realidade andou |

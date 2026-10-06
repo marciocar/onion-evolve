@@ -36,6 +36,13 @@ KG_FIXTURE_RE='(^|/)(__)?fixtures?(__)?/|(^|/)testdata/|(^|/)__snapshots__/'
 
 kg_is_fixture() { printf '%s\n' "$1" | grep -qE "${KG_FIXTURE_RE}"; }
 
+# MATERIAL DIDÁTICO (2026-10-06, sinal de campo onion-slm): `docs/materials/` guarda grafos de EXEMPLO,
+# com dados fictícios (o example-domain: churn de 8% contra 3%), para ensinar adotante frio. Não é
+# fixture — o radar e as catracas SEGUEM validando —, mas também não é CONHECIMENTO: uma leitura de
+# corpus (kg-corpus-grep, o passo 0 do /warm-up) que o devolve como fato mente. Daí uma 2ª classe,
+# usada só pelas LEITURAS de conhecimento.
+KG_DIDACTIC_RE='(^|/)docs/materials/'
+
 kg_graphs() {   # $1=ROOT (default: repo atual)
   local root="${1:-.}"
   (cd "${root}" && git ls-files '*.kg.yaml' 2>/dev/null | grep -vE "${KG_FIXTURE_RE}") || true
@@ -57,6 +64,8 @@ case "${1:-}" in
   --list-exempt) kg_fixture_graphs "${2:-.}"; exit 0 ;;
   --graphs)      kg_graphs "${2:-.}"; exit 0 ;;
   --filter)      grep -vE "${KG_FIXTURE_RE}" || true; exit 0 ;;
+  # leitura de CONHECIMENTO: fora fixture E material didático (este segue validado pelo --filter)
+  --filter-knowledge) grep -vE "${KG_FIXTURE_RE}" | grep -vE "${KG_DIDACTIC_RE}" || true; exit 0 ;;
   # espelho do --filter: os ISENTOS de stdin. Existe para o consumidor calcular a partição em UMA
   # passada em vez de um fork por arquivo (perf medida: 121 forks = +2,2 s no lint).
   --list-exempt-stdin) grep -E "${KG_FIXTURE_RE}" || true; exit 0 ;;
@@ -80,6 +89,12 @@ case "${1:-}" in
     do
       if kg_is_fixture "$p"; then echo "  ✗ isentou o que NÃO é fixture: $p"; fails=$((fails+1)); else echo "  ✅ NÃO isenta: $p"; fi
     done
+    # material DIDÁTICO: fora da leitura de conhecimento, DENTRO da validação
+    _k="$(printf '%s\n' docs/materials/cold-adopter-2026-07/example-domain.kg.yaml docs/onion/graph/fios-abertos.kg.yaml | "${BASH_SOURCE[0]}" --filter-knowledge)"
+    _v="$(printf '%s\n' docs/materials/cold-adopter-2026-07/example-domain.kg.yaml | "${BASH_SOURCE[0]}" --filter)"
+    if [ "${_k}" = "docs/onion/graph/fios-abertos.kg.yaml" ] && [ -n "${_v}" ]; then
+      echo "  ✅ material didático: fora do --filter-knowledge, dentro do --filter (segue validado)"
+    else echo "  ✗ material didático mal classificado (knowledge='${_k}' validação='${_v}')"; fails=$((fails+1)); fi
     [ "${fails}" -eq 0 ] && { echo "kg-fixture-paths selftest: OK"; exit 0; }
     echo "kg-fixture-paths selftest: ${fails} falha(s)"; exit 1 ;;
   "")
