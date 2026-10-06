@@ -695,6 +695,21 @@ END {
       }
     }
     if (found && swarn == 0) print "  ✅ nenhum alvo de SUPERSEDES ficou por reconciliar"
+
+    # ⚠ DECISÃO `done` EM DEV (2026-10-06, sinal de campo onion-slm, operador MU-18): a gramática diz que
+    # `decision` só vira `done` verificada em PROD, e o motor só rebaixava a atenção (DEV/done = 0,5), sem
+    # aviso — 20 de 20 mutações passaram caladas. ⚠ AGREGADO, não um por nó: o corpus tem 95 casos em 36
+    # grafos, e 95 linhas por leitura ensinariam a ignorar o aviso. Não reprova (`problems` intocado).
+    ndd = 0; ddids = ""
+    for (i = 1; i <= nn; i++) {
+      id = order[i]
+      if (ntype[id] == "decision" && nstatus[id] == "done" && plane[id] == "DEV") {
+        ndd++
+        if (ndd <= 5) ddids = ddids (ddids == "" ? "" : ", ") id
+      }
+    }
+    if (ndd > 0)
+      printf "  ⚠ decision-done-em-DEV: %d decisão(ões) `done` com plane: DEV (%s%s) — a gramática pede `done` verificada em PROD: promova o plane com verified_at, ou volte a open\n", ndd, ddids, (ndd > 5 ? ", …" : "")
     print ""
   }
 

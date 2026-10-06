@@ -2,8 +2,8 @@
 title: 'Resíduo — o radar avisa decisão done em DEV (MU-18)'
 date: 2026-10-06
 branch: fix/radar-decision-done-in-dev
-reviewed_diff_sha256: 461e619c810b7ea0dfcc305abcfe8f4b5371d67ccb78d26f6fadfd00f15dfb01
-reviewed_code_sha256: c33e0e884d7b74b8675f2369e5e5950bea95e01e63fc0c53620ea568c1845d85
+reviewed_diff_sha256: c86e268bd6af401b13b09656e3a6158c88b7b5d29fdfc724354eaa91b13e11f2
+reviewed_code_sha256: 13e3f4cba94c633e2040cc24c01c57be7c54163488fb14698b236fee93bf90b8
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
@@ -23,6 +23,8 @@ nota: >-
 ---
 
 # Resíduo — `fix/radar-decision-done-in-dev`
+
+Depois do rebase sobre o #938 (que mexeu no mesmo radar e na mesma família), os plugins que embutem o radar foram regenerados — o 1º lint do commit acusou 4 HARD da REGRA 19 (Plugins de vertical (plugins/*) sincronizados com as fontes) por eu não ter regenerado. Revisado à mão.
 
 Teto declarado: os 95 casos existentes não são corrigidos aqui; o aviso os torna visíveis, e a triagem deles
 é por grafo (promover o plane com verified_at, ou voltar a open).
