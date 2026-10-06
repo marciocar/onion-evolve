@@ -11571,6 +11571,15 @@ run_seed_adoption_graph_selftests() {
   rm -rf "${d}"
 
   unset -f _seed_fixture
+  # (r1) o radar AVISA `decision` `done` em plane: DEV (MU-18, sinal onion-slm 2026-10-06) e CALA em PROD
+  local _dd; _dd="$(mktemp -d)"
+  printf 'meta:\n  id: dd\n  schema_version: "1"\nnodes:\n  - id: D1\n    node_type: decision\n    status: done\n    plane: DEV\n    impact: 2\n    confidence: 0.8\n    label: decisao em dev\n  - id: D2\n    node_type: decision\n    status: done\n    plane: PROD\n    impact: 2\n    confidence: 0.8\n    label: decisao em prod\n    verified_at: 2026-10-06\n    verified_against: x\nedges:\n  - from: D1\n    to: D2\n    edge_type: DEPENDS_ON\n' > "${_dd}/dd.kg.yaml"
+  local _ddo _ddrc=0
+  _ddo="$(bash "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${_dd}/dd.kg.yaml" --reconcile 2>&1)" || _ddrc=$?
+  if grep -q 'decision-done-em-DEV: 1 decisão(ões)' <<< "${_ddo}" && grep -q '(D1)' <<< "${_ddo}" && ! grep -q 'D2)' <<< "${_ddo}" && [ "${_ddrc}" = 0 ]; then
+    record_pass "seed-graph: (r1) o radar avisa decision done em DEV (só D1, agregado) sem reprovar"
+  else record_fail "seed-graph: (r1) aviso decision-done-em-DEV" "rc=${_ddrc} saída: $(grep 'decision-done' <<< "${_ddo}" | head -1)"; fi
+  rm -rf "${_dd}"
 }
 
 run_githook_selftests() {
