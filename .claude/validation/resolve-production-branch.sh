@@ -130,13 +130,69 @@ add_candidate() {
   CAND_REFS+=("${ref}")
 }
 
+# ── DISCRIMINANTE: "nome com forma de integração" (Elenxo, 2026-10-06) ─────────────────────────
+# A 1ª cura do GitFlow RETOMADO (sinal de campo de um hub, 2026-10-05: develop recriada da master e
+# mais nova, origin/HEAD→develop) fez "master/main vencem o origin/HEAD" — e o refutador mostrou que
+# isso elegia `master` parada onde a produção real é `production`/`trunk`/`release`, e ainda levava o
+# passo (3) da adoção a sobrescrever um config setado à mão. O critério certo é um só: um nome com FORMA
+# DE INTEGRAÇÃO nunca é produção — a integração dada, develop/development/dev, ou o prefixo onion/. Ele decide
+# o config (0) e o candidato vindo do origin/HEAD (2). (A 2ª passada derrubou a cláusula `gitflow.branch.develop`:
+# no adopt ela é sempre igual à integração, e fora dele elegia `master` parada sobre a produção real.)
+integration_shaped() {
+  local n="$1"
+  [ -n "${n}" ] || return 1
+  [ "${n}" = "${INTEGRATION}" ] && return 0
+  case "${n}" in develop|development|dev|onion/*) return 0 ;; esac
+  return 1
+}
+
+# (0) AUTORIDADE DO CONFIG JÁ GRAVADO: `gitflow.branch.master` que aponta para ref existente e NÃO tem forma
+#     de integração é a decisão de quem conhece o repo — vale antes de qualquer heurística. Ignorado, diz por quê.
+configured="$(git -C "${REPO_DIR}" config --get gitflow.branch.master 2>/dev/null || true)"
+[ -n "${ONION_RP_NO_CONFIG:-}" ] && configured=""      # re-invocação interna: só a heurística (F2)
+# F4: `HEAD` e nomes que não são branch não são config de produção
+if [ -n "${configured}" ] && { [ "${configured}" = HEAD ] || ! git check-ref-format --branch "${configured}" >/dev/null 2>&1; }; then
+  printf '⚠️  resolve-production-branch: gitflow.branch.master="%s" não é nome de branch — ignorado.\n' "${configured}" >&2
+  configured=""
+fi
+# F1: trunk-based POR DESIGN — config igual à integração e nenhum outro master/main distinto dele → é a resposta, sem alarme
+if [ -n "${configured}" ] && [ "${configured}" = "${INTEGRATION}" ]; then
+  _other=0
+  for _n in master main; do
+    [ "${_n}" = "${configured}" ] && continue
+    { ref_exists "refs/remotes/origin/${_n}" || ref_exists "refs/heads/${_n}"; } && _other=1
+  done
+  if [ "${_other}" = 0 ] && { ref_exists "refs/remotes/origin/${configured}" || ref_exists "refs/heads/${configured}"; }; then
+    printf '%s\n' "${configured}"
+    exit 0
+  fi
+fi
+if [ -n "${configured}" ]; then
+  if integration_shaped "${configured}"; then
+    printf '⚠️  resolve-production-branch: gitflow.branch.master="%s" tem forma de INTEGRAÇÃO — ignorado (é a assinatura do config envenenado).\n' "${configured}" >&2
+  elif ref_exists "refs/remotes/origin/${configured}" || ref_exists "refs/heads/${configured}"; then
+    # F2: o config vale, mas um config VELHO (rename master→main sem prune) não passa em silêncio — a heurística
+    # roda também, e a divergência é anunciada
+    heur="$(ONION_RP_NO_CONFIG=1 bash "${BASH_SOURCE[0]}" "${REPO_DIR}" --integration "${INTEGRATION}" 2>/dev/null || true)"
+    if [ -n "${heur}" ] && [ "${heur}" != "${configured}" ]; then
+      printf '⚠️  resolve-production-branch: gitflow.branch.master="%s" vale (é config), mas a heurística elegeria "%s" (commit mais recente) — confira se o config não ficou velho.\n' "${configured}" "${heur}" >&2
+    fi
+    printf '%s\n' "${configured}"
+    exit 0
+  else
+    printf '⚠️  resolve-production-branch: gitflow.branch.master="%s" não existe como branch — ignorado.\n' "${configured}" >&2
+  fi
+fi
+
 # (1) Nomes convencionais de produção.
 add_candidate "master"
 add_candidate "main"
 
 # (2) Default do repo (origin/HEAD): candidato SÓ se diferir da integração.
 default_branch="$(git -C "${REPO_DIR}" symbolic-ref --quiet --short refs/remotes/origin/HEAD 2>/dev/null | sed 's@^origin/@@' || true)"
-if [ -n "${default_branch:-}" ] && [ "${default_branch}" != "${INTEGRATION}" ]; then
+# o default do remote só é candidato se NÃO tiver forma de integração (develop/onion/* também não, mesmo
+# quando a integração dada é outra — o GitFlow retomado do sinal de campo)
+if [ -n "${default_branch:-}" ] && ! integration_shaped "${default_branch}"; then
   add_candidate "${default_branch}"
 fi
 
