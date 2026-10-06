@@ -5,7 +5,7 @@ findings_total: 4
 findings_real: 2
 tokens: 119597
 duration_min: 12
-verdict: APROVADO_COM_CURA
+verdict: CORRIGIDO
 elenxo: sim
 nota: >
   Medido no PR #932 (2026-10-06): mexer em onion-engineering/onion-product.manifest.sh fazia o pre-commit
