@@ -11,6 +11,13 @@ meta:
   id: onion-doctrine-elenxo-bulbo-2026-07
   schema_version: "1"
   date: 2026-07-22
+  # 2026-10-05: a tese LLM-como-VM foi SUPERADA (Aufhebung), nao apagada — a refutacao vive no grafo de
+  # 2026-06 e a superacao vive aqui; a aresta e intra-arquivo, entao a ligacao vai por meta.
+  # TETO declarado (Elenxo 2026-10-06): nenhuma guarda le este campo fora das rodadas de radar
+  # (radar-aufhebung-check.sh varre so docs/evolution/research/*/radar-*); aqui e declaracao sem cobranca,
+  # e o grafo de 2026-06 nao aponta para frente.
+  supersedes_external:
+    - docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml#S7_claim_llm_as_vm
 nodes:
   # ---- decidido (as nomeacoes assentadas) ----
   - id: D_ELENXO_IS_METHOD
@@ -239,6 +246,55 @@ nodes:
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 1/1 — Lido o nó inteiro (label/trace/status=open) e o draft trace (docs/analysis/onion-quadro-ci'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó descreve um estado ("nasceu, gated, aguardando área futura de doutrinas") que foi parcialmente superado: a área de doutrinas que era a condição do gate JÁ NASCEU e está no ar (Q_PUBLICATION_AREA=done, 2026-08-25) — mas isso resolveu só a metade das CUNHAGENS (D_GRADUATED_TO_VENDORED_KB, PR #630'
 
+  # ---- 2026-10-05: as quatro definicoes do maestro e a superacao do LLM-como-VM ----
+  - id: D_QUATRO_PILARES_DEFINIDOS_PELO_MAESTRO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.95
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'mensagem do maestro, sessao 800cd025, 2026-10-05T18:19:47Z (verbatim abaixo). Leitura do condutor, NAO do maestro: a mensagem chegou como "duvida" sobre as pesquisas Nanochat/SLM, e o condutor a leu como correcao de um enquadramento estreito (SDAAL como "LLM=runtime", Elenxo como "refutador").'
+    trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml'
+    label: 'AS QUATRO DOUTRINAS NA PALAVRA DO MAESTRO (2026-10-05, verbatim): "dogfood - dogfood master, só tem uma" · "kg-ssot runtime e first - é o conhecomento em grafo (kg) como fonte única da verdade (ssot), lendo sempre primeiro o grafo kg.yaml (first) e usando a maquinaria em tempo de execução (runtime) para gestão da fonte única da verdade, mantendo ele sempre atualizado, integro, eficiente e eficaz. Mais que guardar dados, ter as decisões e superações mapeadas aproveitando a doutrina e a metodologia." · "SDAAL - Adapters para camadas de abstração em IApode ser usada em todas as fases, planejamento, construção, usada em tempo de execução, fazendo validações, se adaptando e superando obstáculos para encontrar caminhos. Usando critérios especificos para padronizar, evoluir e superar obstaculos em tempo de execução." · "Elenxo - Este movimento de superação do Onion Evolve". CUNHAGENS: Elenxo, SDAAL e KG-SSOT First+Runtime (dogfooding e termo de industria; a cunhagem da casa e Dogfood-de-fronteira, D_COINAGES_DECLARED). LEITURA DO CONDUTOR (nao do maestro): o refutador adversarial e uma peca do Elenxo, nao o Elenxo inteiro — o que refina, sem contradizer, D_ELENXO_IS_METHOD.'
+
+  - id: D_PROMPTS_COMO_BYTECODE_LLM_COMO_VM_SUPERADA
+    node_type: decision
+    layer: audit
+    plane: DEV
+    impact: 5
+    confidence: 0.8
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'DIRETRIZ (reforco) do maestro, sessao 800cd025, 2026-10-05T18:20:54Z: "reforço: precisamos superar e adequar, sim prompts como bytecode e llm como vm" — nao e selo do argumento abaixo, que e do CONDUTOR. A tese refutada e federation-research-2026-06-reconciled#S7_claim_llm_as_vm; a REFUTACAO e S7_claim_metaphor_fragile ("frágil se levada a sério tecnicamente — cadê os testes?").'
+    trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
+    label: 'SUPERACAO (Aufhebung) DA TESE-MAE, por diretriz do maestro: prompts como BYTECODE, LLM como VM. A refutacao de 2026-06 nao e apagada — e a objecao que a superacao responde. ARGUMENTO DO CONDUTOR: o "cade os testes?" tem resposta parcial na propria casa — o bytecode (markdown de comando, doutrina, grafo) e interpretado pela VM (o LLM), e PARTE do que a VM executa e verificada por maquinaria deterministica que nao depende dela: o lint (verificacao estatica do bytecode) e os vetos exit 2 (sandbox em runtime); a bancada e a meta-camada que testa esses verificadores. A metafora deixa de ser fragil onde o resultado da VM passa por um verificador que nao e a VM; onde nao passa, fica em Q_BYTECODE_SEM_TESTE. O "ADEQUAR" da diretriz NAO foi tratado aqui — lacuna declarada: o que muda na forma do bytecode para caber na metafora segue em aberto.'
+
+  - id: C_OS_TESTES_DO_BYTECODE_EXISTEM
+    node_type: claim
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.85
+    status: confirmed
+    verified_at: '2026-10-05'
+    verified_against: 'gate do pre-commit em 2026-10-05: "216 famílias em 8 workers" (lint-selftest.sh); lint-artifacts.sh com as REGRAS numeradas e catracas; kg-radar.sh --integrity --schema; vetos PreToolUse exit 2 (PR #921, 186 casos de bancada, 74/75 mutantes)'
+    trace: '.claude/validation/lint-selftest.sh'
+    label: 'OS TESTES DO BYTECODE, CONTADOS, EM DUAS CAMADAS: (1) testes do BYTECODE — o lint aplica as REGRAS numeradas com catraca (verificacao estatica), o radar recusa grafo ilegivel ou incoerente, e os vetos PreToolUse barram com exit 2 o que a VM nao pode fazer, mesmo sob bypassPermissions (sandbox em runtime); (2) testes dos VERIFICADORES — a bancada, com 216 familias de auto-teste das guardas. E a resposta material, parcial, ao "cade os testes?" de S7_claim_metaphor_fragile — medida, nao prometida.'
+
+  - id: Q_BYTECODE_SEM_TESTE
+    node_type: question
+    layer: audit
+    plane: DEV
+    impact: 4
+    confidence: 0.8
+    status: open
+    verified_at: '2026-10-05'
+    verified_against: 'caso medido no mesmo dia: o /meta:setup-integration manda ler o .env com Read "sem expor valores" e o Read expoe tudo (sinal do hub gmill, 2026-10-05) — instrucao de prosa que nenhuma guarda confere'
+    trace: '.claude/commands/meta/setup-integration.md'
+    label: 'O QUE A SUPERACAO AINDA NAO COBRE: bytecode que nenhum teste confere — instrucao em prosa de comando que a VM obedece sem verificador. Exemplo medido no mesmo dia: o setup-integration afirma que ler o .env com Read "nao expoe valores", e expoe; a doutrina dizia o contrario do que a ferramenta faz, e nada pegou ate um adotante usar. A medida desta lacuna e a fila de trabalho do Elenxo como movimento de superacao: cada instrucao critica de prosa ganha guarda (fix-must-become-mechanism) ou fica declarada como confianca-no-modelo. GATILHO: cada defeito de prosa medido em campo.'
+
 edges:
   # as auto-incriminacoes reais sustentam a tese central (a forma prova a filosofia)
   - from: E_ZIMMERMAN_FIX
@@ -311,4 +367,16 @@ edges:
     edge_type: DEPENDS_ON
   - from: E_CENSO0901_D_QUADRO_CITACOES
     to: D_QUADRO_CITACOES
+    edge_type: CONSTRAINS
+  - from: D_QUATRO_PILARES_DEFINIDOS_PELO_MAESTRO
+    to: D_ELENXO_IS_METHOD
+    edge_type: SUPPORTS
+  - from: D_QUATRO_PILARES_DEFINIDOS_PELO_MAESTRO
+    to: D_PROMPTS_COMO_BYTECODE_LLM_COMO_VM_SUPERADA
+    edge_type: SUPPORTS
+  - from: C_OS_TESTES_DO_BYTECODE_EXISTEM
+    to: D_PROMPTS_COMO_BYTECODE_LLM_COMO_VM_SUPERADA
+    edge_type: SUPPORTS
+  - from: Q_BYTECODE_SEM_TESTE
+    to: D_PROMPTS_COMO_BYTECODE_LLM_COMO_VM_SUPERADA
     edge_type: CONSTRAINS
