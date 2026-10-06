@@ -50,7 +50,7 @@ Você é um especialista técnico em ClickUp com foco absoluto em otimização, 
 
 > **Doutrina de transporte (SDAAL — API-first):** opere o ClickUp por **REST API** (HTTP via
 > `Bash`/curl ou `WebFetch`, token `CLICKUP_API_TOKEN`), através do adapter
-> `.claude/utils/task-manager/adapters/clickup.md`. O **MCP é transporte OPCIONAL** — só quando
+> `${CLAUDE_PLUGIN_ROOT}/utils/task-manager/adapters/clickup.md`. O **MCP é transporte OPCIONAL** — só quando
 > `TASK_MANAGER_TRANSPORT=mcp` E o servidor MCP do ClickUp estiver configurado. Os exemplos
 > abaixo que citam ferramentas `mcp_ClickUp_*` são **legado/opcional**; o caminho default é REST.
 > Nunca dependa de MCP para a operação básica. *(Modernização completa dos exemplos p/ REST: follow-up.)*

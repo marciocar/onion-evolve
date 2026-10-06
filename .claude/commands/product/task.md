@@ -5,7 +5,7 @@ description: |
   Use para criar tasks estruturadas com subtasks e action items.
   Suporta: Jira, ClickUp, Asana, Linear, Zoho Projects (via TASK_MANAGER_PROVIDER).
   Diferença vs /product:create-task-structure: este PERSISTE no task manager ativo; o create-task-structure é decomposição LOCAL read-only (saída textual, não grava).
-allowed-tools: Bash(cat .env*) Read Write Grep Glob
+allowed-tools: Bash(bash .claude/utils/task-manager/env-check.sh *) Read Write Grep Glob
 parameters:
   - name: description
     description: Descrição da task
@@ -47,7 +47,7 @@ antes de qualquer execução, com plano confirmado pelo usuário.
 ## 🚨 PASSO 0 (OBRIGATÓRIO): Detectar Provedor
 
 Detectar e validar o provedor ativo **antes de qualquer ação**, seguindo o
-fragmento canônico `common:prompts:task-manager-provider-detection`: ler `.env`,
+fragmento canônico `common:prompts:task-manager-provider-detection`: obter o provider pelo helper (`bash .claude/utils/task-manager/env-check.sh --provider`), nunca abrindo o `.env`,
 validar a variável obrigatória do provedor e aplicar o fallback gracioso em
 modo offline.
 

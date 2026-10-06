@@ -36,7 +36,16 @@ fi
 #     Avisa honesto (não anuncia provider cosmético). Caminho relativo à raiz do projeto.
 ENV_FILE="${CLAUDE_PROJECT_DIR:-.}/.env"
 if [ -f "${ENV_FILE}" ]; then
-  pf="$(grep -E "^TASK_MANAGER_PROVIDER=" "${ENV_FILE}" 2>/dev/null | head -1 | cut -d= -f2 | tr -d "[:space:]")"
+  # UM parser só: o do env-check.sh, quando presente (o Elenxo mediu que dois parsers "alinhados" divergiam em aspas e
+  # comentário). Sem o helper, o awk abaixo; e um valor fora da lista de providers não é ecoado.
+  HELPER="${CLAUDE_PROJECT_DIR:-.}/.claude/utils/task-manager/env-check.sh"
+  if [ -f "${HELPER}" ]; then
+    pf="$(TASK_MANAGER_PROVIDER= bash "${HELPER}" --env "${ENV_FILE}" --provider 2>/dev/null)"
+    [ "${pf}" = ausente ] && pf=""
+  else
+  pf="$(awk '{ l=$0; sub(/^[ \t]*export[ \t]+/, "", l) } l ~ /^[ \t]*TASK_MANAGER_PROVIDER[ \t]*=/ { v=l; sub(/^[^=]*=[ \t]*/, "", v); sub(/[ \t]+#.*$/, "", v); sub(/[ \t]+$/, "", v); gsub(/^["\047]|["\047]$/, "", v); sub(/[ \t]+$/, "", v); last=v } END { printf "%s", last }' "${ENV_FILE}" 2>/dev/null)"
+    case "${pf}" in jira|clickup|asana|linear|zoho|none|"") ;; *) pf=invalido ;; esac
+  fi
   if [ -n "${pf}" ]; then
     emit "Onion: TASK_MANAGER_PROVIDER=${pf} declarado no .env mas NAO no ambiente — carregue (set -a; source .env; set +a) senao o adapter fica cego"
     exit 0

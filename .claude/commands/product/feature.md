@@ -1,7 +1,7 @@
 ---
 name: feature
 description: Criar task de feature no gerenciador configurado para planejamento e backlog.
-allowed-tools: Read Bash(cat .env*)
+allowed-tools: Read Bash(bash .claude/utils/task-manager/env-check.sh *)
 category: product
 tags: [feature, task-manager, backlog]
 version: "3.0.0"

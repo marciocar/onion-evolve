@@ -1,7 +1,7 @@
 ---
 name: build-tech-docs
 description: Gerar arquitetura de contexto técnico em `docs/technical-context/`.
-allowed-tools: Read Write Bash(git *) Bash(cat .env*) Bash(find *) Bash(ls *)
+allowed-tools: Read Write Bash(git *) Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh *) Bash(find *) Bash(ls *)
 
 parameters:
   - name: sources

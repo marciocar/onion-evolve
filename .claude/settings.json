@@ -9,7 +9,6 @@
       "Bash(git log *)",
       "Bash(git diff *)",
       "Bash(ls .claude/*)",
-      "Bash(grep * .env)",
       "Bash(wc -l *)",
       "Bash(find .claude *)",
       "Read",
@@ -124,6 +123,15 @@
       }
     ],
     "PreToolUse": [
+      {
+        "matcher": "Read|Grep|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/pretooluse-env-guard.sh\""
+          }
+        ]
+      },
       {
         "matcher": "Bash",
         "hooks": [

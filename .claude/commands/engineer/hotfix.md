@@ -3,7 +3,7 @@ name: hotfix
 description: |
   Emergency workflow completo: task no Task Manager + branch hotfix + desenvolvimento.
   Use para correções urgentes em produção.
-allowed-tools: Bash(git *) Read Edit Write Bash(cat .env*)
+allowed-tools: Bash(git *) Read Edit Write Bash(bash .claude/utils/task-manager/env-check.sh *)
 
 parameters:
   - name: description

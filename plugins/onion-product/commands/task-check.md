@@ -1,7 +1,7 @@
 ---
 name: task-check
 description: Verificar se task do Task Manager foi implementada no código.
-allowed-tools: Read Grep Glob Bash(cat .env*) Bash(git *) Bash(find *)
+allowed-tools: Read Grep Glob Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh *) Bash(git *) Bash(find *)
 category: product
 tags: [verification, implementation, audit]
 version: "3.0.0"
@@ -23,7 +23,7 @@ Realizar uma **verificação factual e técnica** para determinar se:
 ## 🚨 PASSO 0 (OBRIGATÓRIO): Detectar Provedor
 
 Detectar e validar o provedor ativo **antes de qualquer ação**, seguindo o
-fragmento canônico `common:prompts:task-manager-provider-detection`: ler `.env`,
+fragmento canônico `common:prompts:task-manager-provider-detection`: obter o provider pelo helper (`bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh --provider`), nunca abrindo o `.env`,
 validar a variável obrigatória do provedor, **validar a compatibilidade do
 `task-id`** com o provedor e aplicar o fallback gracioso em modo offline.
 

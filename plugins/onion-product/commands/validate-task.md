@@ -1,7 +1,7 @@
 ---
 name: validate-task
 description: Validar e analisar task existente do Task Manager.
-allowed-tools: Read Bash(cat .env*)
+allowed-tools: Read Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh *)
 category: product
 tags: [validation, task-manager, analysis]
 version: "3.0.0"
@@ -15,7 +15,7 @@ Você é um especialista em produto e arquitetura encarregado de carregar, anali
 ## 🚨 PASSO 0 (OBRIGATÓRIO): Detectar Provedor
 
 Detectar e validar o provedor ativo **antes de qualquer ação**, seguindo o
-fragmento canônico `common:prompts:task-manager-provider-detection`: ler `.env`,
+fragmento canônico `common:prompts:task-manager-provider-detection`: obter o provider pelo helper (`bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh --provider`), nunca abrindo o `.env`,
 validar a variável obrigatória do provedor, **validar a compatibilidade do
 `task-id`** com o provedor e aplicar o fallback gracioso em modo offline.
 

@@ -142,11 +142,8 @@ done
 # Check 4: task manager
 echo ""
 echo "--- Task Manager ---"
-if [ -f "$REPO/.env" ]; then
-  grep "TASK_MANAGER_PROVIDER" "$REPO/.env" 2>/dev/null || echo "TASK_MANAGER_PROVIDER não encontrado no .env"
-else
-  echo ".env AUSENTE"
-fi
+# o provider pelo helper — abrir o .env entregaria os segredos ao modelo (o veto pretooluse-env-guard barra)
+echo "TASK_MANAGER_PROVIDER=$(bash "$REPO/${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh" --env "$REPO/.env" --provider)"
 
 # Check 5: integration branch
 echo ""
@@ -164,7 +161,7 @@ Com base no diagnóstico, coletar o que não foi auto-detectado:
 
 ### Task Manager (se ausente no .env)
 
-Ler `.env` do repo: `TASK_MANAGER_PROVIDER` e `TASK_MANAGER_TRANSPORT`. Se ausente, perguntar:
+Obter do repo, sem abrir o `.env`: `bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh --provider` e `bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh --get TASK_MANAGER_TRANSPORT`. Se ausente, perguntar:
 
 - Qual o provider? (`jira` / `clickup` / `asana` / `linear` / `zoho` / `none`)
 - Transport: `api` (padrão) ou `mcp`

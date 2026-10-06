@@ -3,7 +3,7 @@ name: flow
 description: |
   Dispatcher único do ciclo de vida GitFlow: feature/release/hotfix × start/publish/finish.
   Orquestrador fino sobre o motor GitFlow (KB) + adapters forge e task-manager.
-allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Bash(cat .env*)
+allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh *)
 category: git
 tags: [gitflow, feature, release, hotfix, dispatcher]
 version: "1.0.0"

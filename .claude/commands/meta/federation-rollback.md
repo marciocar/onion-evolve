@@ -5,7 +5,7 @@ category: meta
 tags: [federation, rollback, ledger, semver, recovery, sdaal]
 version: "1.0.0"
 updated: "2026-06-15"
-allowed-tools: Read Write Edit Grep Glob Bash(cat .env*) Bash(bash .claude/validation/federation-contract-validate.sh*) Bash(git *)
+allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/utils/task-manager/env-check.sh *) Bash(bash .claude/validation/federation-contract-validate.sh*) Bash(git *)
 argument-hint: "<id-do-contrato> [--to <version>] [--ledger <path>] [--reason \"motivo\"]"
 ---
 

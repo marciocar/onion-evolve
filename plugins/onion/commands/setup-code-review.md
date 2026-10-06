@@ -3,7 +3,7 @@ name: setup-code-review
 description: |
   Setup, validação e otimização de code review automático no CI (GitHub Actions).
   Use para configurar o workflow de review de PRs do projeto.
-allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Bash(cat .env*)
+allowed-tools: Bash(git *) Bash(gh *) Read Edit Write Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh *)
 
 parameters:
   - name: mode

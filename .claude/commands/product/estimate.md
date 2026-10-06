@@ -4,7 +4,7 @@ description: |
   Orquestra estimativas de story points utilizando o Framework de Story Points.
   Use para estimar tarefas, quebrar épicos e calibrar velocity do time.
   Integra com @story-points-framework-specialist e framework completo.
-allowed-tools: Read Bash(cat .env*)
+allowed-tools: Read Bash(bash .claude/utils/task-manager/env-check.sh *)
 
 parameters:
   - name: task_description

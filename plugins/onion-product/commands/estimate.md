@@ -4,7 +4,7 @@ description: |
   Orquestra estimativas de story points utilizando o Framework de Story Points.
   Use para estimar tarefas, quebrar épicos e calibrar velocity do time.
   Integra com @story-points-framework-specialist e framework completo.
-allowed-tools: Read Bash(cat .env*)
+allowed-tools: Read Bash(bash ${CLAUDE_PLUGIN_ROOT}/utils/task-manager/env-check.sh *)
 
 parameters:
   - name: task_description
@@ -243,7 +243,7 @@ SE critérios de aceite não claros:
    ```
 
 3. **Criar via Adapter:**
-   - Usar adapter apropriado de `.claude/utils/task-manager/adapters/`
+   - Usar adapter apropriado de `${CLAUDE_PLUGIN_ROOT}/utils/task-manager/adapters/`
    - Adicionar custom field "Story Points" se disponível
    - Adicionar tags apropriadas (complexity, risk, etc)
 

@@ -5,7 +5,7 @@ category: meta
 tags: [federation, contract, spec-as-code, ledger, validation, sdaal]
 version: "1.1.0"
 updated: "2026-06-15"
-allowed-tools: Read Write Edit Grep Glob Bash(cat .env*) Bash(bash .claude/validation/federation-contract-validate.sh*) Bash(git *) Bash(mkdir *)
+allowed-tools: Read Write Edit Grep Glob Bash(bash .claude/utils/task-manager/env-check.sh *) Bash(bash .claude/validation/federation-contract-validate.sh*) Bash(git *) Bash(mkdir *)
 argument-hint: "<path-do-contrato> [--ledger <path>]  (ledger também via .env FEDERATION_LEDGER)"
 ---
 

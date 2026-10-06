@@ -3,7 +3,7 @@ name: analyze
 description: |
   Analisa estratégias de teste existentes e sugere melhorias baseadas no Framework de Testes.
   Use para auditar conformidade, identificar gaps e otimizar estratégias de teste com base no framework.
-allowed-tools: Read Write Bash(find *) Bash(grep *) Bash(mkdir *)
+allowed-tools: Read Write Bash(find *) Bash(grep *) Bash(mkdir *) Bash(bash .claude/utils/task-manager/env-check.sh *)
 
 parameters:
   - name: feature-id
@@ -89,7 +89,8 @@ SE algum arquivo não encontrado:
 **CRÍTICO:** Detectar provedor automaticamente do `.env` primeiro, depois usar fallback.
 
 ```bash
-Read .env
+# o provider, sem ler o .env (Read entregaria os segredos ao modelo)
+bash .claude/utils/task-manager/env-check.sh --provider
 ```
 
 **Lógica de detecção (prioridade):**

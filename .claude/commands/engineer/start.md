@@ -3,7 +3,7 @@ name: start
 description: |
   Iniciar desenvolvimento de feature. Cria sessão e analisa tasks.
   Suporta múltiplos gerenciadores via TASK_MANAGER_PROVIDER.
-allowed-tools: Bash(git *) Bash(cat .env*) Bash(ls .claude/*) Read Write Edit Grep Glob
+allowed-tools: Bash(git *) Bash(bash .claude/utils/task-manager/env-check.sh *) Bash(ls .claude/*) Read Write Edit Grep Glob
 category: engineer
 tags: [development, workflow, session]
 version: "3.0.0"
@@ -17,7 +17,7 @@ Este é o comando para iniciar o desenvolvimento de uma funcionalidade.
 ## 🚨 PASSO 0 (OBRIGATÓRIO): Detectar Provedor
 
 Detectar e validar o provedor ativo **antes de qualquer ação**, seguindo o
-fragmento canônico `common:prompts:task-manager-provider-detection`: ler `.env`,
+fragmento canônico `common:prompts:task-manager-provider-detection`: obter o provider pelo helper (`bash .claude/utils/task-manager/env-check.sh --provider`), nunca abrindo o `.env`,
 validar a variável obrigatória do provedor e aplicar o fallback gracioso em modo
 offline. Quando houver `task-id` salvo/recebido, validar a compatibilidade dele
 com o provedor ativo (item 3 do fragmento) — em caso de divergência, avisar o
