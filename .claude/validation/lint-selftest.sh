@@ -12242,7 +12242,12 @@ run_scaffold_diagnose_selftests() {
 # ---------------------------------------------------------------------------
 run_plugins_sync_selftests() {
   local asm="${REPO_ROOT}/.claude/utils/marketplace/assemble-plugin.sh"
-  local vdir="${REPO_ROOT}/.claude/utils/marketplace/verticals"
+  # A BARRA FINAL é de propósito (2026-10-06): o `_selftest_family_map` só trata como PREFIXO o caminho
+  # que termina em `/`. Esta família regenera CADA manifesto e compara com o plugin commitado — é a
+  # cobertura real de uma mudança de manifesto. Sem a barra, `onion-engineering`/`onion-product` não eram
+  # reivindicados por ninguém e o pre-commit caía no failsafe "tudo": 217 famílias, 27 min medidos no
+  # PR #932. O `//` resultante em "${vdir}/x" é inócuo (medido pela passada adversarial).
+  local vdir="${REPO_ROOT}/.claude/utils/marketplace/verticals/"
   if [ ! -f "${asm}" ] || [ ! -d "${vdir}" ]; then record_fail "plugins-sync" "assembler/verticals ausentes"; return; fi
   if ! command -v jq >/dev/null 2>&1; then record_skip "plugins-sync: jq ausente → pulado (gracioso)"; return; fi
   # Drift-guard de plugins committed é core-only: o adotante não vendoriza plugins/
@@ -16061,6 +16066,24 @@ PYABORT
   if grep -q 'famílias=<todas>' <<< "${out}"&& grep -q 'nenhuma família' <<< "${out}"; then
     record_pass "selftest-lanes: (g) failsafe: arquivo desconhecido no domínio ⇒ todas"
   else record_fail "selftest-lanes: (g) failsafe desconhecido" "$(printf '%s\n' "${out}" | tail -1 | cut -c1-120)"; fi
+  # (g2) TODO manifesto de vertical — inclusive um que ninguém cita pelo nome — seleciona as famílias que
+  #      percorrem o diretório inteiro (plugins_sync), e NÃO cai no failsafe "tudo". Medido em
+  #      2026-10-06: onion-engineering/onion-product compravam 217 famílias (27 min, PR #932) porque essas
+  #      duas famílias citavam `verticals` sem a barra final e o mapa só lê como prefixo o que termina em `/`.
+  #      O caminho é montado SEM o prefixo literal de REPO_ROOT de propósito: o mapa captura todo literal
+  #      `${REPO_ROOT}/.claude/...` do corpo da família, e o manifesto inexistente passaria por AUTOCITAÇÃO
+  #      (achado da passada adversarial, 2026-10-06), não pelo prefixo que este caso quer provar.
+  local _vd=".claude/utils/marketplace/verticals" _mf _bad_g2="" _names=()
+  for _mf in "${REPO_ROOT}/${_vd}"/*.manifest.sh; do _names+=("${_mf##*/}"); done
+  _names+=("zz-ninguem-cita.manifest.sh")
+  for _mf in "${_names[@]}"; do
+    out="$(bash "${sut}" --affected "${_vd}/${_mf}" --dry-run 2>&1 || true)"
+    if grep -q 'famílias=<todas>' <<< "${out}" || ! grep -q 'plugins_sync' <<< "${out}"; then
+      _bad_g2="${_bad_g2} ${_mf}"; fi
+  done
+  if [ -z "${_bad_g2}" ]; then
+    record_pass "selftest-lanes: (g2) manifesto de vertical (inclusive um que ninguém cita) ⇒ plugins_sync pelo prefixo, sem failsafe 'tudo'"
+  else record_fail "selftest-lanes: (g2) manifesto caiu no failsafe ou perdeu a família que o cobre" "${_bad_g2}"; fi
   # (h)(i)(j) cópia hermética com famílias sintéticas (REPO_ROOT da cópia = sandbox)
   # o top-level da bancada copia .claude/docs/CLAUDE.md p/ o sandbox e lê inventory.sh --env (grep vazio sob
   # pipefail aborta): a cópia leva .claude/ e docs/ inteiros (33 MB) — REPO_ROOT da cópia = este sandbox

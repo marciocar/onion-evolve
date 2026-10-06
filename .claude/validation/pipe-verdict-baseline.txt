@@ -8,7 +8,6 @@
 # CURA: conteúdo numa variável + `grep -q PAD <<< "$var"` (medida: 0 falhas em 480).
 .claude/hooks/bash-empty-result-guard.sh	10
 .claude/hooks/lib/invocation-lines.sh	2
-.claude/hooks/premodelswitch-guard.sh	1
 .claude/hooks/pretooluse-merge-gate.sh	3
 .claude/hooks/pretooluse-protect-main.sh	3
 .claude/hooks/rule-title-in-prose.sh	2
