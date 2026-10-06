@@ -2147,6 +2147,7 @@ ops/pr-merge-verified.sh	E_CURE_PROVEN_BY_BEHAVIOR	docs/onion/graph/sync-gate-su
 ops/pr-merge-verified.sh	E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 ops/review-gate-health.sh	E_ULTRAREVIEW_JA_EXISTIA_A_COLISAO_E_DE_CALENDARIO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
+ops/testing/selftest-shard-plan.sh	Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/testing/selftest-summary.sh	E_O_SUMARIO_REPORTA_NAO_JULGA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
 ops/update-bridge.sh	E_W9_BRIDGE_DEPLOY_0902	docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml
 ops/verify-adopter-gate.sh	E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml

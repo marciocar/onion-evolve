@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 6 NÓS ═══
+# ═══ TETO: 7 NÓS ═══ (6→7 em 2026-10-05: o 7º é a pergunta que o próprio CI deste PR levantou)
 meta:
   id: guard-pre-push-2026-10
   schema_version: "1"
@@ -76,6 +76,15 @@ nodes:
     trace: 'ops/pr-finalize.sh'
     label: 'A 2a PASSADA REABRIU O B1 PELA FORMA, NAO PELA LOGICA: o motor tratava qualquer reviewed_diff_sha256 nao-hex como "pendente" e recarimbava, e a guarda tira aspas — hash entre aspas virava revisao nova sobre codigo nao revisado. Cura: o motor le o campo como a guarda (so o frontmatter, sem aspas, sem espaco) e SO o literal pendente declara revisao nova; o resto nao-hex recusa. Junto: sobra de edicao commitada (linhas 157-165, invisivel ao bash -n), die dentro de $(...) que nao abortava, falso positivo no rebase limpo (hash cru -> git patch-id --stable), marcador conferido DEPOIS do gh (o caminho canonico terminava pedindo --no-verify), remote julgado pelo nome e nao pela URL, stdin do laco vazando para o lint. E a licao de bancada: stubs de caminho absoluto deixavam sobreviver "lint na arvore em vez do commit" — os stubs agora LEEM a arvore em que rodam, e o marcador compartilhado entre worktrees e neutralizado no inicio da familia (sem isso, 7 casos passavam pelo motivo errado).'
 
+  - id: Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.7
+    status: open
+    label: 'REVER (nota do maestro, 2026-10-05: "precisamos rever isso em algum momento"). Nasceu no CI DESTE PR: a faixa 4 da bancada estourou o teto de 25 min tres vezes; a 1a hipotese (5 faixas) foi refutada, e a evidencia da main mostrou a familia fixtures com 997 s + 936 s numa faixa so. A cura minima aplicada aqui reparte o manifest das fixtures entre todas as faixas (fixtures_lane i/n). A cura estrutural consagrada e outra: split por TEMPO MEDIDO (CircleCI test splitting, Knapsack Pro, pytest-split — bin packing com o tempo real), mais test impact analysis (ja temos --affected-staged) e fixtures cacheaveis (Bazel). O insumo ja existe: o --report TSV de cada faixa. GATILHO: a proxima faixa que encostar no teto, ou as fatias das fixtures desbalancearem mais de 2x entre faixas.'
+    trace: 'ops/testing/selftest-shard-plan.sh'
+
 edges:
   - from: E_ELENXO_REPROVOU_O_MOTOR_QUE_LAVAVA_RESIDUO
     to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
@@ -92,3 +101,6 @@ edges:
   - from: E_ELENXO_2_REABRIU_B1_PELA_FORMA_DO_HASH
     to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
     edge_type: SUPPORTS
+  - from: Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO
+    to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
+    edge_type: DEPENDS_ON
