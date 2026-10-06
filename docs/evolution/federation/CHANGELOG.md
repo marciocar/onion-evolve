@@ -9,6 +9,20 @@
 ---
 
 
+## 2026-10-06 · O .env nunca chega ao modelo, o attribution do adotante não é sobrescrito e develop nunca é eleita produção · COMPATÍVEL · alvo: hub-operacoes-enterprise, brain-granaai
+
+Os três sinais de 2026-10-05 viraram mecanismo no core. Os três defeitos do `/meta:setup-integration`
+(gmill, dogfood do Zoho) foram curados no PR #932 e no #934:
+- um veto `exit 2` em Read, Grep e Bash barra a leitura do conteúdo de `.env*`;
+- um helper (`task-manager/env-check.sh`) devolve só nomes;
+- o veto julga o corpo de heredoc pelo comando inteiro, e as três passadas adversariais fecharam 36 escapes.
+
+Os dois ajustes do update ab08 (brain-granaai) foram curados no PR #936: o `attribution` do adotante é
+never-clobber, com AVISO quando diverge, e um nome com forma de integração nunca é eleito produção.
+**Ação:** `/meta:adopt --update` na sessão de cada hub. **Efeito colateral:** gravar em arquivo, por heredoc,
+um texto que cite `.env` passa a ser vetado; nesses casos, use a ferramenta Write.
+
+
 ## 2026-10-05 · Os dois hubs atualizados para ab08cde, a causa do defeito 1 medida, e o veto que só protege main · COMPATÍVEL · alvo: hub-operacoes-enterprise, brain-granaai
 
 Os updates de gmill e brain-granaai rodaram hoje, sem push, com a regeneração das projeções e o lint
