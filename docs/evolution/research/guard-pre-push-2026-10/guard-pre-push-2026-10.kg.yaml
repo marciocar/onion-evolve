@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 7 NÓS ═══ (6→7 em 2026-10-05: o 7º é a pergunta que o próprio CI deste PR levantou)
+# ═══ TETO: 8 NÓS ═══ (6→7 em 2026-10-05: a pergunta do CI do PR #927; 7→8 em 2026-10-06: a lacuna do fechamento em repo sem CI)
 meta:
   id: guard-pre-push-2026-10
   schema_version: "1"
@@ -85,6 +85,17 @@ nodes:
     label: 'REVER (nota do maestro, 2026-10-05: "precisamos rever isso em algum momento"). Nasceu no CI DESTE PR: a faixa 4 da bancada estourou o teto de 25 min tres vezes; a 1a hipotese (5 faixas) foi refutada, e a evidencia da main mostrou a familia fixtures com 997 s + 936 s numa faixa so. A cura minima aplicada aqui reparte o manifest das fixtures entre todas as faixas (fixtures_lane i/n). A cura estrutural consagrada e outra: split por TEMPO MEDIDO (CircleCI test splitting, Knapsack Pro, pytest-split — bin packing com o tempo real), mais test impact analysis (ja temos --affected-staged) e fixtures cacheaveis (Bazel). O insumo ja existe: o --report TSV de cada faixa. GATILHO: a proxima faixa que encostar no teto, ou as fatias das fixtures desbalancearem mais de 2x entre faixas.'
     trace: 'ops/testing/selftest-shard-plan.sh'
 
+  - id: Q_MERGE_VERIFICADO_EM_REPO_SEM_CI
+    node_type: question
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: open
+    verified_at: '2026-10-06'
+    verified_against: 'onion-slm PR #1 (2026-10-06): o caminho verificado recusou "ZERO check-runs" e o escape --ci-inoperante recusou "não consegui LER os runs recentes" — a API de actions/runs devolve total_count 0 num repo que nunca teve CI'
+    trace: 'ops/pr-merge-verified.sh'
+    label: 'LACUNA DO CAMINHO VERIFICADO: ele fecha PR com CI vivo e, pelo escape --ci-inoperante, com CI MORTO (rajada de startup_failure). Repo SEM CI nenhum — o caso de todo adotante greenfield antes da oferta de CI — nao tem saida: o escape exige runs para provar morte, e zero runs nao e morte, e ausencia. Medido no 1o PR do onion-slm; resolvido ali instalando o CI (decisao do maestro, que paga os minutos). Cura possivel: um terceiro desfecho --sem-ci que prove AUSENCIA de workflow (nao morte) e rode o gate local; ou a adocao ofertar o CI ANTES do 1o PR. GATILHO: o proximo adotante que precise fechar PR sem CI.'
+
 edges:
   - from: E_ELENXO_REPROVOU_O_MOTOR_QUE_LAVAVA_RESIDUO
     to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
@@ -102,5 +113,8 @@ edges:
     to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
     edge_type: SUPPORTS
   - from: Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO
+    to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
+    edge_type: DEPENDS_ON
+  - from: Q_MERGE_VERIFICADO_EM_REPO_SEM_CI
     to: D_MOTOR_EM_OPS_E_GATILHO_NO_PRE_PUSH_DO_GIT
     edge_type: DEPENDS_ON

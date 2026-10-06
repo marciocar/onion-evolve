@@ -707,6 +707,14 @@ onion-product	requires	agent:product-agent
 onion-product	requires	agent:story-points-framework-specialist	
 onion-product	requires	agent:task-specialist	
 onion-product	requires	skill:onion-product-context	
+onion-slm	adopts	onion-evolve	
+onion-slm	mode	greenfield	
+onion-slm	pin	9e75a73d0401	
+onion-slm	specialization	eval-de-dominio	
+onion-slm	specialization	roteiro-gradual	
+onion-slm	specialization	slm	
+onion-slm	tier	standalone	
+onion-slm	trust-advises	onion-evolve	
 onion-standalone	adopts	onion-evolve	
 onion-standalone	mode	greenfield	
 onion-standalone	pin	685140eadd7d	

@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**378 itens abertos** em 79 grafo(s) com aberto (de 105 no escopo) · 80 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**379 itens abertos** em 79 grafo(s) com aberto (de 105 no escopo) · 80 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -692,6 +692,13 @@
 |--:|---|---|---|
 | 5.4 | `Q_MUDEZ_DA_GUARDA_NAO_SE_IDENTIFICA` | elenxo-mecanismos-lint-2026-08-13 | O TETO DA GUARDA DIRTY-TREE GANHA DONO NO GRAFO (8o Elenxo, fechamento do Q_PARECER): no caminho benigno a guarda NAO emite nada  |
 
+## guard-pre-push-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.4 | `Q_MERGE_VERIFICADO_EM_REPO_SEM_CI` | guard-pre-push-2026-10 | LACUNA DO CAMINHO VERIFICADO: ele fecha PR com CI vivo e, pelo escape --ci-inoperante, com CI MORTO (rajada de startup_failure). R |
+| 4.2 | `Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO` | guard-pre-push-2026-10 | REVER (nota do maestro, 2026-10-05: "precisamos rever isso em algum momento"). Nasceu no CI DESTE PR: a faixa 4 da bancada estouro |
+
 ## door-role-parity-2026-09 — 2 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -724,12 +731,6 @@
 | 4.5 | `Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE` | fios-abertos | PERGUNTA (classe B, estreitada em 2026-09-04 pelo /meta:drive): por que o caso (e) da familia kg_backlog — que monta um sandbox  |
 | 3.6 | `I_ADOPT_CAMADA_COLABORADOR` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): a skill onion-onboarding JA tem o ram |
 | 2.4 | `I_KB_GAMIFICACAO_RAMPA_GATED` | fios-abertos | ITEM GATED (sinal de campo do portal-gamificacao, 2026-09-04, triado no core em 2026-09-05): o core tem docs/knowledge-base/educat |
-
-## guard-pre-push-2026-10 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 4.2 | `Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO` | guard-pre-push-2026-10 | REVER (nota do maestro, 2026-10-05: "precisamos rever isso em algum momento"). Nasceu no CI DESTE PR: a faixa 4 da bancada estouro |
 
 ## radar-E3-2026-10-05-r7 — 1 item(ns)
 

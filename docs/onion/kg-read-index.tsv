@@ -2160,6 +2160,7 @@ ops/pr-merge-verified.sh	D_SYNC_GATED_IN_MERGE_PROOF	docs/onion/graph/sync-gate-
 ops/pr-merge-verified.sh	E_CURE_PROVEN_BY_BEHAVIOR	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml
 ops/pr-merge-verified.sh	E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
+ops/pr-merge-verified.sh	Q_MERGE_VERIFICADO_EM_REPO_SEM_CI	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/review-gate-health.sh	E_ULTRAREVIEW_JA_EXISTIA_A_COLISAO_E_DE_CALENDARIO	docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml
 ops/testing/selftest-shard-plan.sh	Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/testing/selftest-summary.sh	E_O_SUMARIO_REPORTA_NAO_JULGA	docs/onion/graph/testes-evidencia-2026-09.kg.yaml
