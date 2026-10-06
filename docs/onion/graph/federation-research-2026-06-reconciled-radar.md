@@ -21,10 +21,10 @@
 
 | Status | n |
 |---|---|
-| confirmed | 411 |
+| confirmed | 412 |
 | open | 319 |
 | superseded | 61 |
-| refuted | 53 |
+| refuted | 52 |
 | done | 38 |
 
 | Plano | n |

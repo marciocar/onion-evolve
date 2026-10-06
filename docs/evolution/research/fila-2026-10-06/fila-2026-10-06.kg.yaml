@@ -1,0 +1,278 @@
+# kg-backlog-guard: on
+# A fila que a sessão de 2026-10-06 abriu e o maestro aprovou. Ela vivia num arquivo temporário (o
+# parking-lot da sessão) e quase se perdeu num reinício; o achado mora aqui, com a medição que o
+# sustenta, e o backlog é projeção destes nós. Rótulo factual e curto; o porquê fica no comentário
+# (lição do mesmo dia: narrativa dentro do rótulo vazou o gabarito do eval da Porta 0).
+meta:
+  id: fila-2026-10-06
+  schema_version: "1"
+  baseline: 2026-10-06
+  review_after: 2026-11-05   # 30d: fila de trabalho; cada item fecha ao virar PR ou ao ser descartado
+  # ═══ TETO: 30 NÓS ═══
+  #   22 hoje (11 evidências + 11 compromissos). Fila que passa do teto pede triagem, não mais nós.
+nodes:
+  # ── evidências medidas hoje ──────────────────────────────────────────────────────────────────
+  - id: E_PRECOMMIT_RECARIMBA_RESIDUO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-06
+    verified_against: ".githooks/pre-commit l.215-229 num sandbox git"
+    trace: ".githooks/pre-commit"
+    label: "o pre-commit recarimba reviewed_diff_sha256 sem conferir reviewed_code_sha256 (o B1 que o pr-finalize curou segue vivo no hook)"
+  - id: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.6
+    verified_at: 2026-10-06
+    verified_against: "gh run list do linter por branch (#932-#936 e #923-#927)"
+    trace: "ops/pr-finalize.sh"
+    label: "com o pr-finalize, 5 de 5 PRs passaram no lint do CI de primeira; em 10-05, sem ele, 3 de 5 vieram com defeito (amostra pequena)"
+  - id: E_HOOK_PR_SEM_PASSADA_FALSO_POSITIVO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-10-06
+    verified_against: "aviso PR-SEM-PASSADA-ADVERSARIAL nos PRs #932-#939, todos com resíduo"
+    trace: ".claude/hooks/bash-empty-result-guard.sh"
+    label: "o aviso PR-SEM-PASSADA-ADVERSARIAL dispara em PR aberto de worktree com resíduo presente (procura no checkout principal)"
+  - id: E_MAPA_SEM_MERGE_ONION_HOOKS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-10-06
+    verified_against: "lint-selftest.sh --affected .claude/utils/adopt/merge-onion-hooks.sh --dry-run"
+    trace: ".claude/validation/lint-selftest.sh"
+    label: "merge-onion-hooks.sh não é citado por nenhuma família da bancada, e mexer nele cai no failsafe das 217 famílias"
+  - id: E_ADOPT_SEM_GITIGNORE_DE_SEGREDOS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-06
+    verified_against: "revisão adversarial da adoção do onion-curation (docs/evolution/review/onion-adopt.md lá)"
+    trace: ".claude/commands/meta/adopt.md"
+    label: "o /meta:adopt não gera .gitignore de segredos; nada impede commitar um .env no adotante (onion-curation e onion-slm)"
+  - id: E_DURABLE_COMMIT_SEM_ASSINATURA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.85
+    verified_at: 2026-10-06
+    verified_against: "commit de adoção do onion-curation (amend manual)"
+    trace: ".claude/utils/adopt/durable-commit.sh"
+    label: "o durable-commit.sh não escreve a assinatura da família no commit de adoção"
+  - id: E_CI_TEMPLATE_IGNORA_GITHOOKS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-10-06
+    verified_against: "revisão adversarial da adoção do onion-curation"
+    trace: ".claude/utils/adopt/ci-workflow-onion.tpl"
+    label: "o template de CI do adotante não dispara em mudança de .githooks/**"
+  - id: E_DOIS_LEITORES_DIVERGIAM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-06
+    verified_against: "kg-radar.sh exit 0 e kg-drive-project.sh exit 2 na semente com dois documentos (curado no PR #938)"
+    trace: ".claude/validation/kg-radar.sh"
+    label: "o radar (awk) e o drive (parser YAML) discordavam sobre o mesmo .kg.yaml; não há contrato formal entre os leitores"
+  - id: E_NARRATIVA_NO_ROTULO_VAZA_GABARITO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-06
+    verified_against: "eval da Porta 0 do onion-slm: 14 casos com REFUTA no rótulo, mais superou/substitui/ALEGAVA"
+    trace: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
+    label: "marcadores narrativos dentro do rótulo do nó entregaram o gabarito do eval da Porta 0"
+  - id: E_RADAR_CEGO_A_TIPO_TROCADO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-06
+    verified_against: "fumaça da Porta 0 do onion-slm: MU-07 20/20 passaram no radar; Claude zero-shot pegou 17/20"
+    trace: "docs/evolution/inbox/_processed/2026-10-06-radar-cego-mu07-mu18.md"
+    label: "o radar não detecta node_type trocado (MU-07); não é checável por regra"
+  - id: E_CANAL_VIVO_ENTRE_SESSOES_USADO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-06
+    verified_against: "trocas SendMessage core↔onion-slm em 2026-10-06; uma mensagem não chegou; escrita em db de página alheia"
+    trace: ".claude/commands/meta/co-evolve.md"
+    label: "o diálogo entre sessões (SendMessage) foi usado de verdade, contra a doutrina 'sem IA-fala-IA', com perda e fronteira negociadas na hora"
+  # ── a fila: compromissos abertos, um por item aprovado ───────────────────────────────────────
+  - id: Q_PRECOMMIT_NAO_LAVA_RESIDUO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    verified_against: ".githooks/pre-commit"
+    label: "fechar o recarimbo do pre-commit com a mesma proteção do motor (só recarimba se reviewed_code_sha256 casar)"
+  - id: Q_PR_FINALIZE_MELHORIAS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_against: "ops/pr-finalize.sh"
+    label: "pr-finalize: imprimir as violações ao reprovar, registrar etapa e rc com trap, catracas estáticas no checkpoint, rebase com índice sujo"
+  - id: Q_HOOK_LER_RESIDUO_DA_BRANCH_DO_PR
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_against: ".claude/hooks/bash-empty-result-guard.sh"
+    label: "o aviso de PR sem passada adversarial deve ler o resíduo da branch do PR, não do checkout principal"
+  - id: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.8
+    verified_against: ".claude/validation/lint-selftest.sh"
+    label: "nomear merge-onion-hooks.sh no corpo da família que o exercita, para o mapa da bancada o reivindicar"
+  - id: Q_ADOPT_TRES_DEFEITOS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.8
+    verified_against: ".claude/commands/meta/adopt.md"
+    label: "adopt: gerar .gitignore de segredos, assinar o commit de adoção e disparar o CI em .githooks/**"
+  - id: Q_KG_SCHEMA_FORMAL
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_against: ".claude/rules/kg-grammar.md"
+    label: "JSON Schema como contrato único do .kg.yaml; antes, medir quantos grafos passariam num schema estrito"
+  - id: Q_ROTULO_SEPARADO_DA_NARRATIVA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_against: ".claude/rules/kg-grammar.md"
+    label: "separar o rótulo factual da narrativa num campo próprio do nó"
+  - id: Q_PODA_CLAUDE_MD_REVISITA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_against: "docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml"
+    label: "revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros"
+  - id: Q_ONION_KG_SSOT_REPO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    verified_against: "docs/evolution/federation/members.yaml"
+    label: "criar e adotar o onion-kg-ssot: produto independente, dogfood nos dois sentidos, contextos próprios, core lido por caminho ou git"
+  - id: Q_MU07_TIPO_DE_NO_TROCADO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_against: "onion-slm eval/smoke"
+    label: "como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor)"
+  - id: Q_CANAL_VIVO_ENTRE_SESSOES
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_against: ".claude/commands/meta/co-evolve.md"
+    label: "o canal vivo entre sessões vira 3ª via da co-evolução (envelope fixo, registro do envio, decisão descendo ao grafo)? aguarda o maestro"
+edges:
+  - from: E_PRECOMMIT_RECARIMBA_RESIDUO
+    to: Q_PRECOMMIT_NAO_LAVA_RESIDUO
+    edge_type: SUPPORTS
+  - from: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA
+    to: Q_PR_FINALIZE_MELHORIAS
+    edge_type: SUPPORTS
+  - from: E_HOOK_PR_SEM_PASSADA_FALSO_POSITIVO
+    to: Q_HOOK_LER_RESIDUO_DA_BRANCH_DO_PR
+    edge_type: SUPPORTS
+  - from: E_MAPA_SEM_MERGE_ONION_HOOKS
+    to: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
+    edge_type: SUPPORTS
+  - from: E_ADOPT_SEM_GITIGNORE_DE_SEGREDOS
+    to: Q_ADOPT_TRES_DEFEITOS
+    edge_type: SUPPORTS
+  - from: E_DURABLE_COMMIT_SEM_ASSINATURA
+    to: Q_ADOPT_TRES_DEFEITOS
+    edge_type: SUPPORTS
+  - from: E_CI_TEMPLATE_IGNORA_GITHOOKS
+    to: Q_ADOPT_TRES_DEFEITOS
+    edge_type: SUPPORTS
+  - from: E_DOIS_LEITORES_DIVERGIAM
+    to: Q_KG_SCHEMA_FORMAL
+    edge_type: SUPPORTS
+  - from: E_NARRATIVA_NO_ROTULO_VAZA_GABARITO
+    to: Q_ROTULO_SEPARADO_DA_NARRATIVA
+    edge_type: SUPPORTS
+  - from: E_NARRATIVA_NO_ROTULO_VAZA_GABARITO
+    to: Q_PODA_CLAUDE_MD_REVISITA
+    edge_type: SUPPORTS
+  - from: Q_KG_SCHEMA_FORMAL
+    to: Q_ONION_KG_SSOT_REPO
+    edge_type: DEPENDS_ON
+  - from: Q_ROTULO_SEPARADO_DA_NARRATIVA
+    to: Q_KG_SCHEMA_FORMAL
+    edge_type: DEPENDS_ON
+  - from: E_RADAR_CEGO_A_TIPO_TROCADO
+    to: Q_MU07_TIPO_DE_NO_TROCADO
+    edge_type: SUPPORTS
+  - from: E_CANAL_VIVO_ENTRE_SESSOES_USADO
+    to: Q_CANAL_VIVO_ENTRE_SESSOES
+    edge_type: SUPPORTS

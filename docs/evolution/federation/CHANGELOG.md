@@ -9,6 +9,19 @@
 ---
 
 
+## 2026-10-06 · A semente da adoção em documento único, o radar mais atento e três reconciliações do corpus · COMPATÍVEL · alvo: onion-slm (informativo p/ todos)
+
+Os três sinais do onion-slm entraram no core em #938 e #939, mais o PR desta entrada:
+- A semente do `/meta:adopt` sai em documento único, e o radar avisa `.kg.yaml` multi-documento.
+- O material didático (`docs/materials/`) sai das leituras de conhecimento.
+- O `CONSTRAINS` foi admitido em audit.
+- O radar avisa `decision` `done` em DEV, agregado por grafo.
+- O B2_2 foi reconciliado como confirmado, com as ressalvas em CONSTRAINS.
+- As 61 arestas PR↔PR foram marcadas como remapeadas por LLM.
+
+**Para os demais adotantes:** a semente já semeada em vocês segue com dois `---` até alguém tirá-los. O radar avisa, sem reprovar.
+
+
 ## 2026-10-06 · O .env nunca chega ao modelo, o attribution do adotante não é sobrescrito e develop nunca é eleita produção · COMPATÍVEL · alvo: hub-operacoes-enterprise, brain-granaai
 
 Os três sinais de 2026-10-05 viraram mecanismo no core. Os três defeitos do `/meta:setup-integration`

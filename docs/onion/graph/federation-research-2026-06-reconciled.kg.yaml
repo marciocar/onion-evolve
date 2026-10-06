@@ -1357,13 +1357,19 @@ nodes:
     confidence: 0.85
     trace: "docs/analysis/onion-a2a-federation-reconcile-2026-06.md#5-síntese--fechamento-do-radar-de-orquestração-3-eixos-percorridos"
     label: "Radar de orquestração fechado nos 3 eixos (TOPO, MATH, A2A) — segue vivo para gatilhos futuros"
+  # RECONCILIADO em 2026-10-06 (decisão do maestro na Porta 0 do onion-slm): o status `refuted` foi posto no
+  # commit e0bf994a para a catraca do radar passar, não medido. O audit de origem (:18-21) dá o veredito
+  # "núcleo saudável" e lista bug de trust, guard vazio e drift de registro como RESSALVAS dentro dele — os
+  # nós que diziam isso entram como CONSTRAINS (limitam sem derrubar), não como REFUTES.
   - id: B2_2_claim_core_mechanic_healthy
     node_type: claim
     layer: audit
     plane: DEV
-    status: refuted
+    status: confirmed
     impact: 3
     confidence: 0.7
+    verified_at: 2026-10-06
+    verified_against: "docs/analysis/onion-federation-audit-2026-07-01.md:18-21"
     trace: "docs/analysis/onion-federation-audit-2026-07-01.md#0-sumário"
     label: "Núcleo mecânico da Federação formal está saudável (scripts rodam, fixtures passam, cross-refs resolvem); problemas reais são bug de código + guard vazio + drift de registro/vocabulário"
   - id: B2_2_evidence_dogfood_scripts
@@ -8608,13 +8614,13 @@ edges:
     edge_type: SUPPORTS
   - from: B2_2_claim_trust_topology_bug
     to: B2_2_claim_core_mechanic_healthy
-    edge_type: REFUTES
+    edge_type: CONSTRAINS
   - from: B2_2_decision_fix_trust_regex
     to: B2_2_claim_trust_topology_bug
     edge_type: DEPENDS_ON
   - from: B2_2_claim_adopt_guard_empty
     to: B2_2_claim_core_mechanic_healthy
-    edge_type: REFUTES
+    edge_type: CONSTRAINS
   - from: B2_2_decision_fix_onion_version_role
     to: B2_2_claim_adopt_guard_empty
     edge_type: DEPENDS_ON
@@ -8629,10 +8635,10 @@ edges:
     edge_type: SUPPORTS
   - from: B2_2_claim_manual_sync_fails_silently
     to: B2_2_claim_core_mechanic_healthy
-    edge_type: REFUTES
+    edge_type: CONSTRAINS
   - from: B2_2_claim_machinery_ahead_of_gate
     to: B2_2_claim_core_mechanic_healthy
-    edge_type: REFUTES
+    edge_type: CONSTRAINS
   - from: B2_2_decision_kb_federation_usage_modes
     to: B2_2_claim_three_role_namespaces
     edge_type: DEPENDS_ON
@@ -8782,7 +8788,7 @@ edges:
     edge_type: REFUTES
   - from: REC2_NO_CONTRACT_EVER_REGISTERED
     to: B2_2_claim_core_mechanic_healthy
-    edge_type: REFUTES
+    edge_type: CONSTRAINS
   - from: REC2_NO_CONTRACT_EVER_REGISTERED
     to: REC2_Q_FORMAL_FEDERATION_DEAD_OR_DORMANT
     edge_type: CAUSES

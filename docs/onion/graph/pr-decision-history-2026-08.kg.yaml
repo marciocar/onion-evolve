@@ -1,6 +1,9 @@
 # ÍNDICE + CATEGORIZAÇÃO + REFINO dos 672 PRs (fase 2b). Classe LLM p/ os 155 publicáveis
 # (heurística p/ o resto), arestas semânticas PR↔PR do refino. SUPERSEDES/REFUTES foram mapeadas
 # p/ DEPENDS_ON/CAUSES (não-reconciliadoras): entre PRs shipados o alvo não vira superseded/refuted.
+# MARCADAS (2026-10-06, sinal do onion-slm): toda aresta PR↔PR carrega `provenance: llm-remap-ffecf8da` —
+# o remapeamento não guardou qual era a relação original, então quem lê o grafo como SSOT de relação
+# entre PRs lê uma APROXIMAÇÃO, e o campo diz isso na própria aresta.
 # SSOT da qual as vitrines do site projetam (ver pr-showcase-selection-2026-08.md).
 meta:
   schema_version: 1
@@ -9242,183 +9245,244 @@ edges:
   - from: PR_304
     edge_type: DEPENDS_ON
     to: PR_299
+    provenance: llm-remap-ffecf8da
   - from: PR_376
     edge_type: DEPENDS_ON
     to: PR_375
+    provenance: llm-remap-ffecf8da
   - from: PR_398
     edge_type: DEPENDS_ON
     to: PR_375
+    provenance: llm-remap-ffecf8da
   - from: PR_15
     edge_type: DEPENDS_ON
     to: PR_14
+    provenance: llm-remap-ffecf8da
   - from: PR_29
     edge_type: DEPENDS_ON
     to: PR_10
+    provenance: llm-remap-ffecf8da
   - from: PR_30
     edge_type: DEPENDS_ON
     to: PR_29
+    provenance: llm-remap-ffecf8da
   - from: PR_44
     edge_type: DEPENDS_ON
     to: PR_43
+    provenance: llm-remap-ffecf8da
   - from: PR_58
     edge_type: DEPENDS_ON
     to: PR_49
+    provenance: llm-remap-ffecf8da
   - from: PR_82
     edge_type: DEPENDS_ON
     to: PR_81
+    provenance: llm-remap-ffecf8da
   - from: PR_83
     edge_type: DEPENDS_ON
     to: PR_26
+    provenance: llm-remap-ffecf8da
   - from: PR_83
     edge_type: DEPENDS_ON
     to: PR_81
+    provenance: llm-remap-ffecf8da
   - from: PR_150
     edge_type: DEPENDS_ON
     to: PR_143
+    provenance: llm-remap-ffecf8da
   - from: PR_151
     edge_type: DEPENDS_ON
     to: PR_143
+    provenance: llm-remap-ffecf8da
   - from: PR_169
     edge_type: DEPENDS_ON
     to: PR_143
+    provenance: llm-remap-ffecf8da
   - from: PR_169
     edge_type: DEPENDS_ON
     to: PR_151
+    provenance: llm-remap-ffecf8da
   - from: PR_171
     edge_type: CAUSES
     to: PR_169
+    provenance: llm-remap-ffecf8da
   - from: PR_172
     edge_type: DEPENDS_ON
     to: PR_169
+    provenance: llm-remap-ffecf8da
   - from: PR_172
     edge_type: DEPENDS_ON
     to: PR_171
+    provenance: llm-remap-ffecf8da
   - from: PR_174
     edge_type: DEPENDS_ON
     to: PR_169
+    provenance: llm-remap-ffecf8da
   - from: PR_198
     edge_type: DEPENDS_ON
     to: PR_195
+    provenance: llm-remap-ffecf8da
   - from: PR_455
     edge_type: DEPENDS_ON
     to: PR_454
+    provenance: llm-remap-ffecf8da
   - from: PR_519
     edge_type: DEPENDS_ON
     to: PR_512
+    provenance: llm-remap-ffecf8da
   - from: PR_527
     edge_type: DEPENDS_ON
     to: PR_526
+    provenance: llm-remap-ffecf8da
   - from: PR_528
     edge_type: DEPENDS_ON
     to: PR_527
+    provenance: llm-remap-ffecf8da
   - from: PR_546
     edge_type: CAUSES
     to: PR_547
+    provenance: llm-remap-ffecf8da
   - from: PR_547
     edge_type: CAUSES
     to: PR_546
+    provenance: llm-remap-ffecf8da
   - from: PR_550
     edge_type: CAUSES
     to: PR_546
+    provenance: llm-remap-ffecf8da
   - from: PR_553
     edge_type: DEPENDS_ON
     to: PR_550
+    provenance: llm-remap-ffecf8da
   - from: PR_557
     edge_type: DEPENDS_ON
     to: PR_555
+    provenance: llm-remap-ffecf8da
   - from: PR_564
     edge_type: DEPENDS_ON
     to: PR_563
+    provenance: llm-remap-ffecf8da
   - from: PR_229
     edge_type: DEPENDS_ON
     to: PR_222
+    provenance: llm-remap-ffecf8da
   - from: PR_231
     edge_type: DEPENDS_ON
     to: PR_229
+    provenance: llm-remap-ffecf8da
   - from: PR_237
     edge_type: DEPENDS_ON
     to: PR_229
+    provenance: llm-remap-ffecf8da
   - from: PR_242
     edge_type: CAUSES
     to: PR_243
+    provenance: llm-remap-ffecf8da
   - from: PR_243
     edge_type: DEPENDS_ON
     to: PR_242
+    provenance: llm-remap-ffecf8da
   - from: PR_245
     edge_type: DEPENDS_ON
     to: PR_239
+    provenance: llm-remap-ffecf8da
   - from: PR_246
     edge_type: DEPENDS_ON
     to: PR_239
+    provenance: llm-remap-ffecf8da
   - from: PR_279
     edge_type: DEPENDS_ON
     to: PR_254
+    provenance: llm-remap-ffecf8da
   - from: PR_293
     edge_type: DEPENDS_ON
     to: PR_292
+    provenance: llm-remap-ffecf8da
   - from: PR_567
     edge_type: DEPENDS_ON
     to: PR_566
+    provenance: llm-remap-ffecf8da
   - from: PR_568
     edge_type: CAUSES
     to: PR_569
+    provenance: llm-remap-ffecf8da
   - from: PR_569
     edge_type: DEPENDS_ON
     to: PR_568
+    provenance: llm-remap-ffecf8da
   - from: PR_573
     edge_type: DEPENDS_ON
     to: PR_571
+    provenance: llm-remap-ffecf8da
   - from: PR_592
     edge_type: CAUSES
     to: PR_590
+    provenance: llm-remap-ffecf8da
   - from: PR_594
     edge_type: DEPENDS_ON
     to: PR_592
+    provenance: llm-remap-ffecf8da
   - from: PR_594
     edge_type: DEPENDS_ON
     to: PR_593
+    provenance: llm-remap-ffecf8da
   - from: PR_598
     edge_type: CAUSES
     to: PR_593
+    provenance: llm-remap-ffecf8da
   - from: PR_664
     edge_type: CAUSES
     to: PR_674
+    provenance: llm-remap-ffecf8da
   - from: PR_666
     edge_type: DEPENDS_ON
     to: PR_665
+    provenance: llm-remap-ffecf8da
   - from: PR_667
     edge_type: DEPENDS_ON
     to: PR_665
+    provenance: llm-remap-ffecf8da
   - from: PR_667
     edge_type: DEPENDS_ON
     to: PR_666
+    provenance: llm-remap-ffecf8da
   - from: PR_671
     edge_type: DEPENDS_ON
     to: PR_672
+    provenance: llm-remap-ffecf8da
   - from: PR_672
     edge_type: DEPENDS_ON
     to: PR_671
+    provenance: llm-remap-ffecf8da
   - from: PR_673
     edge_type: DEPENDS_ON
     to: PR_672
+    provenance: llm-remap-ffecf8da
   - from: PR_674
     edge_type: DEPENDS_ON
     to: PR_664
+    provenance: llm-remap-ffecf8da
   - from: PR_633
     edge_type: DEPENDS_ON
     to: PR_630
+    provenance: llm-remap-ffecf8da
   - from: PR_646
     edge_type: DEPENDS_ON
     to: PR_635
+    provenance: llm-remap-ffecf8da
   - from: PR_648
     edge_type: DEPENDS_ON
     to: PR_644
+    provenance: llm-remap-ffecf8da
   - from: PR_649
     edge_type: DEPENDS_ON
     to: PR_648
+    provenance: llm-remap-ffecf8da
   - from: PR_650
     edge_type: DEPENDS_ON
     to: PR_644
+    provenance: llm-remap-ffecf8da
   - from: PR_658
     edge_type: DEPENDS_ON
     to: PR_657
+    provenance: llm-remap-ffecf8da
