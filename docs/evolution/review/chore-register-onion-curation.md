@@ -2,8 +2,8 @@
 title: 'Resíduo — o onion-curation entra no registro da federação'
 date: 2026-10-06
 branch: chore/register-onion-curation
-reviewed_diff_sha256: 092c957f4c1bdbfdce35c39edfa0255119f45270902a4fe91be953bb0fb9a78a
-reviewed_code_sha256: e56377eb77215bf2633213711b80e49550dbbb5cb56d4d2efa5bc02fda9b355c
+reviewed_diff_sha256: 3969235b7029b06b4b736418bcf808093b0738938d1402844454836064cdc0aa
+reviewed_code_sha256: 6d4e32c4a51b2fc92ad792d52be1192b73031f5d512bee7254db500c22b044fa
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
