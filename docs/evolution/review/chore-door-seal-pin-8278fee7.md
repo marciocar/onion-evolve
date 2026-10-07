@@ -2,7 +2,8 @@
 title: 'Resíduo — a porta re-publicada no pin 8278fee79d1c (com as curas do #952) é carimbada no registro'
 date: 2026-10-07
 branch: chore/door-seal-pin-8278fee7
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 1f50db038059eca8df4332ad34693525222a9d5d086ed4a3bb5c8d745a299f9d
+reviewed_code_sha256: 50c0c30961480b62db5157dbae4f92a8f49f0f6409dc6602f18c102aa97e02c7
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
