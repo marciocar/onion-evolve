@@ -10,7 +10,7 @@ meta:
   baseline: 2026-10-06
   review_after: 2026-11-05   # 30d: fila de trabalho; cada item fecha ao virar PR ou ao ser descartado
   # ═══ TETO: 30 NÓS ═══
-  #   23 em 2026-10-07, noite: colhidos os 5 `done` e as 4 evidências que só os sustentavam (a
+  #   24 em 2026-10-07, noite (+E_PR_FINALIZE_ATRITO_MEDIDO): colhidos os 5 `done` e as 4 evidências que só os sustentavam (a
   #   história fica no git e nos resíduos); entraram E_/Q_PRECOMMIT_SELECAO. Teto segue 30.
 nodes:
   # ── evidências medidas hoje ──────────────────────────────────────────────────────────────────
@@ -120,8 +120,8 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_against: "ops/pr-finalize.sh"
-    label: "pr-finalize: imprimir as violações ao reprovar, registrar etapa e rc com trap, catracas estáticas no checkpoint, rebase com índice sujo"
+    verified_against: "ops/pr-finalize.sh; cura aprovada pelo maestro 2026-10-07 (4 achados de E_PR_FINALIZE_ATRITO_MEDIDO)"
+    label: "pr-finalize: carimbar só depois de tudo passar, commit de projeções sem religar o pre-commit quando o pré-voo passou, imprimir as violações HARD ao reprovar, modo --check sem escrita, registrar etapa e rc com trap, catracas estáticas no checkpoint, rebase com índice sujo"
   - id: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
     node_type: question
     layer: audit
@@ -246,6 +246,17 @@ nodes:
     confidence: 0.6
     verified_against: "pedido do maestro 2026-10-07 após pular o pre-commit nos PRs do Zoho e do dado do KG"
     label: "re-forjar o pre-commit para escolher por caso: família pelo bloco que mudou na bancada, núcleo fixo justificado ou podado, motivo de cada failsafe impresso, modo checkpoint; o failsafe seguro fica"
+  - id: E_PR_FINALIZE_ATRITO_MEDIDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-07
+    verified_against: "fechamento do #955 (3 rodadas do ops/pr-finalize.sh --push) e as rodadas do #949-#954 no mesmo dia"
+    trace: "ops/pr-finalize.sh"
+    label: "pr-finalize em 4 atritos: run que falha deixa o resíduo carimbado (limpeza manual 3x no dia); o commit de projeções religa o pre-commit pulado (lint 2x por rodada); a violação HARD não sai na saída final; não há --check sem escrita"
 edges:
   - from: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA
     to: Q_PR_FINALIZE_MELHORIAS
@@ -285,4 +296,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_PRECOMMIT_SELECAO_GROSSA
     to: Q_PRECOMMIT_SELECAO_POR_CASO
+    edge_type: SUPPORTS
+  - from: E_PR_FINALIZE_ATRITO_MEDIDO
+    to: Q_PR_FINALIZE_MELHORIAS
     edge_type: SUPPORTS
