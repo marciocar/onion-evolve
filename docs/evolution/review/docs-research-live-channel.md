@@ -3,12 +3,12 @@ title: 'Resíduo — pesquisa do canal vivo entre sessões em máquinas e contas
 date: 2026-10-07
 branch: docs/research-live-channel
 reviewed_diff_sha256: pendente
-findings_total: 0
-findings_real: 0
-findings_fixed: 0
+findings_total: 1
+findings_real: 1
+findings_fixed: 1
 tokens: 1335388
 duration_min: 10
-verdict: SEM_ACHADOS
+verdict: CORRIGIDO
 elenxo: sim
 nota: >-
   Pedido do maestro: transformar em grafo a pesquisa sobre comunicação direta entre sessões Claude
@@ -18,8 +18,11 @@ nota: >-
   por verificador separado e Elenxo. Grafo novo: 42 evidências confirmed (34 ancoradas e as objeções
   sobreviventes), 1 pergunta-raiz open e 1 claim open com as restrições de desenho da classe 'live'.
   Nada selado, nenhum nó decision: a decisão do canal vivo é do maestro. 11 claims rejeitadas na
-  ancoragem (todas exageradas) estão contadas em E_LACUNAS_CANAL_VIVO_PRIMARIAS_1007. Teto declarado:
-  o Elenxo chegou truncado depois da objeção 16. Radar --integrity --schema exit 0. Nenhum .kg.yaml
+  ancoragem (todas exageradas) estão contadas em E_LACUNAS_CANAL_VIVO_PRIMARIAS_1007. Achado na
+  revisão do que ficou em aberto, pedida pelo maestro: o Elenxo NÃO foi truncado (julgou as 38
+  objeções); o workflow cortava o JSON dele em 7.000 chars antes do escritor. As 13 sobreviventes além
+  do corte foram recuperadas do journal do run e viraram nós E_ELENXO_* com CONSTRAINS (44 → 57 nós);
+  a cura do corte vai no PR fix/research-elenxo-not-truncated. Radar --integrity --schema exit 0. Nenhum .kg.yaml
   existente editado, logo REGRA 87 (PR que EDITA um .kg.yaml enxergou os confirmed dele) sem objeto.
   Pre-commit pulado por ordem do maestro; validação = radar + pr-finalize (0 HARD) + CI.
 ---
