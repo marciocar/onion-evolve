@@ -2,7 +2,8 @@
 title: 'Resíduo — defeitos de dado do .kg.yaml corrigidos, o radar cobra o alfabeto do id e avisa o valid_from sem aspas, e on: entra na gramática'
 date: 2026-10-07
 branch: fix/kg-data-defects-and-on-grammar
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 62f6c6201b88f2dbb1b0302ee4c01aec0cb3e79b5dca99555433992cfbd61eb9
+reviewed_code_sha256: d7540167e8e45dba7d4f8dbc567999fcafb00079a84dbcee47d70302543f910f
 findings_total: 3
 findings_real: 2
 findings_fixed: 2
