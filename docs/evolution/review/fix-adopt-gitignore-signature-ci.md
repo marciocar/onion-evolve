@@ -2,7 +2,7 @@
 title: 'Resíduo — o adopt protege os segredos, assina o commit e o CI do adotante vê o pre-commit'
 date: 2026-10-07
 branch: fix/adopt-gitignore-signature-ci
-reviewed_diff_sha256: 150ebbca7e0c55b05af85a005b1f4d9128bd5bf0b3df3f343fa333d1e2a656c5
+reviewed_diff_sha256: 9b7c4d08809c195cf459bc639a66dd0f059b41bff3e0282d6b4c2464ebbe74e1
 reviewed_code_sha256: 6a645d0df17508fd239c5d1198bfc9ac61f1d3d9a39ebb0d3b0afcf0e9408450
 findings_total: 1
 findings_real: 1
