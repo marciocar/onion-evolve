@@ -2,8 +2,8 @@
 title: 'Resíduo — o adopt protege os segredos, assina o commit e o CI do adotante vê o pre-commit'
 date: 2026-10-07
 branch: fix/adopt-gitignore-signature-ci
-reviewed_diff_sha256: 260121436c3d14a31e876e96e3a2f4957c7fd82a8331e50840f50f05765962e0
-reviewed_code_sha256: 263f000756c7a046ef090c77207d02a06a627f6813022f3456c3956208a1ec25
+reviewed_diff_sha256: 150ebbca7e0c55b05af85a005b1f4d9128bd5bf0b3df3f343fa333d1e2a656c5
+reviewed_code_sha256: 6a645d0df17508fd239c5d1198bfc9ac61f1d3d9a39ebb0d3b0afcf0e9408450
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
@@ -30,7 +30,7 @@ nota: >-
 
 O 1º lint do commit acusou o limite de linhas do adopt.md (802 de 800) — a chamada ficou em uma linha, com o porquê no cabeçalho do helper.
 
-O 1º CI abortou a faixa 4 com "empty ident name": o caso (f) roda depois do `unset` da identidade de teste da família, e local passava pela identidade global da máquina. Curado dando a identidade na chamada; conferido com HOME vazio, como o CI.
+O 1º CI abortou a faixa 4 com "empty ident name": o caso (f) roda depois do `unset` da identidade de teste da família, e local passava pela identidade global da máquina. A 1ª cura deu identidade só à chamada do helper; o 2º CI abortou igual, porque o `_dc_setup` do caso também commita — e a conferência local com HOME vazio NÃO reproduzia o runner (o git local cai no nome do usuário do sistema; no runner ele é vazio). Curado exportando a identidade no caso inteiro.
 
 Teto: adotantes JÁ adotados não recebem o .gitignore pelo --update se o passo (0b) não rodar no fluxo de
 update; o onion-curation e o onion-kg-ssot já o têm à mão, e o onion-slm segue sem (sinal a enviar no anúncio).

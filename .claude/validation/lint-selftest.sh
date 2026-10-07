@@ -4503,6 +4503,12 @@ run_durable_commit_selftests() {
 
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
   # (f) ASSINATURA do adotante no commit (2026-10-06): attribution.commit do settings.json DELE
+  # IDENTIDADE PARA O CASO INTEIRO: ele roda depois do `unset` da família, e tanto o `_dc_setup` quanto o
+  # helper fazem `git commit`. O CI abortou DUAS vezes com "empty ident name": a 1ª cura cobria só o helper,
+  # e a conferência local com HOME vazio não reproduzia o runner — aqui o git cai no nome do usuário do
+  # sistema, e no runner esse nome é vazio.
+  export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+         GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
   _dc_setup
   mkdir -p "${d}/.claude"; printf '{"attribution":{"commit":"Assinado pelo adotante X"}}\n' > "${d}/.claude/settings.json"
   # identidade NA CHAMADA: este caso roda depois do `unset` da família, e o CI não tem identidade git global
@@ -4514,6 +4520,7 @@ run_durable_commit_selftests() {
     record_pass "durable-commit: (f) o commit de adoção leva a assinatura do PRÓPRIO adotante"
   else record_fail "durable-commit: (f) assinatura" "o commit saiu sem a attribution.commit do adotante"; fi
   rm -rf "${d}"
+  unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
 }
 
 # ---------------------------------------------------------------------------
