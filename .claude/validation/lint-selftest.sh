@@ -18631,6 +18631,25 @@ PY
     record_pass "harvest-residue: resíduo COMPLETO → guarda cala (sem falso-positivo)"
   else record_fail "harvest-residue: completo" "falso-positivo com resíduo completo: ${out}"; fi
 
+  # (e) nó só MOVIDO (sai e volta no diff) não é colheita → cala. Falso positivo medido em
+  #     2026-10-07: a guarda pedia para nomear no resíduo um id que continuava no grafo.
+  ( cd "${sb}" && git checkout -q main && git checkout -q -b test/move-case
+    python3 - <<'PY2'
+import io
+p='docs/onion/graph/alvo.kg.yaml'; s=io.open(p,encoding='utf-8').read()
+i=s.index('  - id: N_SEGUNDO'); j=s.index('\nedges:', i)
+blk=s[i:j+1]; s=s[:i]+s[j+1:]
+k=s.index('  - id: N_PRIMEIRO'); s=s[:k]+blk+s[k:]
+io.open(p,'w',encoding='utf-8').write(s)
+PY2
+    git -c user.email=t@t -c user.name=t commit -qam mover ) >/dev/null 2>&1 || true
+  out="$(cd "${sb}" && bash .claude/validation/lint-artifacts.sh --only="${sb}/CLAUDE.md" 2>&1 || true)"
+  if grep -q 'N_SEGUNDO' <<< "$(cd "${sb}" && git diff main HEAD | grep -E '^-[[:space:]]*-[[:space:]]*id:')" \
+     && ! grep -q 'colheita sem registro' <<< "${out}" && ! grep -q 'não há resíduo de revisão' <<< "${out}"; then
+    record_pass "harvest-residue: nó só MOVIDO (sai e volta no diff) → guarda cala"
+  else record_fail "harvest-residue: movido" "nó movido virou colheita (ou o cenário não moveu): ${out}"; fi
+  ( cd "${sb}" && git checkout -q test/harvest-case ) >/dev/null 2>&1 || true
+
   # (d) SEM base resolvível → SOFT que DECLARA, nunca silêncio (o modo que matava a guarda no CI)
   local sbo
   sbo="$(TMPDIR=/tmp mktemp -d)"

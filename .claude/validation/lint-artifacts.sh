@@ -1526,9 +1526,17 @@ check_harvest_names_removed_nodes() {
 
   # ids REMOVIDOS de qualquer .kg.yaml neste ramo. `-  - id:` é a assinatura da colheita.
   local removed
-  removed="$(git -C "${REPO_ROOT}" diff --no-ext-diff --no-color "${base}" HEAD -- '*.kg.yaml' 2>/dev/null \
-             | grep -E '^-[[:space:]]*-[[:space:]]*id:' \
+  # O diff de linhas não sabe o que é MOVER: um nó que só mudou de lugar aparece como `-  - id:` e
+  # `+  - id:` no mesmo diff. Sem descontar os readicionados, a guarda acusava colheita de nó que
+  # continua no grafo (falso positivo medido em 2026-10-07, ao colher uma fila e inserir nós antes
+  # das arestas: o último nó "saiu" e "voltou" no diff, e o HARD pedia para nomear um id vivo).
+  local _kgdiff added
+  _kgdiff="$(git -C "${REPO_ROOT}" diff --no-ext-diff --no-color "${base}" HEAD -- '*.kg.yaml' 2>/dev/null || true)"
+  removed="$(grep -E '^-[[:space:]]*-[[:space:]]*id:' <<< "${_kgdiff}" \
              | sed -E 's/^-[[:space:]]*-[[:space:]]*id:[[:space:]]*//; s/[[:space:]]*$//' | sort -u || true)"
+  added="$(grep -E '^[+][[:space:]]*-[[:space:]]*id:' <<< "${_kgdiff}" \
+             | sed -E 's/^[+][[:space:]]*-[[:space:]]*id:[[:space:]]*//; s/[[:space:]]*$//' | sort -u || true)"
+  [ -n "${added}" ] && removed="$(comm -23 <(printf '%s\n' "${removed}") <(printf '%s\n' "${added}") | sed '/^$/d')"
   [ -n "${removed}" ] || return 0   # não houve colheita → nada a julgar
 
   slug="$(printf '%s' "${branch}" | tr '/' '-')"
