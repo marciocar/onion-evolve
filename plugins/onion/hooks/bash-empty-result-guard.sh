@@ -387,9 +387,42 @@ if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:spac
       add 'MERGE-SEM-REVISOR: este repo NÃO tem o workflow do revisor Onion, logo o check `onion-review-verdict` NÃO existe aqui — não vá procurá-lo. O merge não tem revisor automático: leia os checks que ESTE repo tem (`gh pr checks <N>`). Para ganhar o revisor: `meta:adopt` (ou a oferta de CI, se já adotado).'
     fi
 fi
+# O AVISO DO CREATE OLHA O ARTEFATO E O PAPEL, NÃO SÓ A STRING (sinal do onion-kg-ssot, 2026-10-07).
+# A 1ª redação casava o comando e nunca conferia nada, e mediu-se o defeito pelos DOIS lados no
+# mesmo dia: (1) o PR #3 de lá tinha o resíduo commitado ANTES do `gh pr create` e o aviso disparou
+# igual — avisar quem seguiu o ritual é a fadiga que este arquivo combate; (2) num repo com papel
+# `adopted|hub|standalone` a REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) sai fora de
+# escopo por desenho, e o aviso dizia "o gate vai acusar" — prometia uma cobrança que não existe.
+# Agora: resíduo COMMITADO na branch do PR → silêncio; repo derivado → o texto diz a verdade.
+# O diretório é o do último `cd` antes do create (PR aberto de worktree), senão o do projeto; a branch
+# é a do `--head`, senão a corrente. Inanalisável → o aviso continua (é aviso, não veto: errar para o
+# lado de falar). TETO: só vê `cd <caminho>` literal; caminho com variável cai no diretório do projeto.
+_pr_dir() {
+  local d
+  d="$(printf '%s\n' "$cmd" | sed -n 's/.*\bcd[[:space:]]\{1,\}\([^;&|[:space:]]\{1,\}\).*/\1/p' | tail -1)"
+  d="${d%\"}"; d="${d#\"}"; d="${d%\'}"; d="${d#\'}"
+  case "$d" in ''|*'$'*) d="${CLAUDE_PROJECT_DIR:-.}" ;; esac
+  [ -d "$d" ] || d="${CLAUDE_PROJECT_DIR:-.}"
+  printf '%s' "$d"; }
+_pr_branch() {  # $1=dir
+  local b
+  b="$(printf '%s\n' "$cmd" | sed -n 's/.*--head[[:space:]=]\{1,\}\([^[:space:];&|]\{1,\}\).*/\1/p' | tail -1)"
+  [ -n "$b" ] || b="$(git -C "$1" branch --show-current 2>/dev/null || true)"
+  printf '%s' "${b##*:}"; }
+_residuo_commitado() {  # $1=dir $2=branch — o resíduo da REGRA 56 está na branch que o PR vai mostrar?
+  [ -n "$2" ] || return 1
+  git -C "$1" cat-file -e "$2:docs/evolution/review/$(printf '%s' "$2" | tr / -).md" 2>/dev/null; }
+_repo_derivado() {  # o MESMO predicado da REGRA 56 (review-artifact-check.sh): fora de escopo ali
+  grep -qE '^(role:[[:space:]]*(adopted|hub|standalone)|decoupled_from:)' "$1/.claude/.onion-version" 2>/dev/null; }
+
 if printf '%s\n' "$cmd" | grep -qE '(^|[;&|][[:space:]]*|^[[:space:]]*)gh[[:space:]]+pr[[:space:]]+create([[:space:]]|$)'; then
-    if _tem_gate_r56; then
-      add 'PR-SEM-PASSADA-ADVERSARIAL: abrir PR sem a passada adversarial deixa a revisão para um CI que estoura turnos justamente nos PRs grandes. O artefato de revisão é exigido pela REGRA 56 (`docs/evolution/review/<branch>.md`) — se ele não existe, o gate vai acusar e você vai descobrir tarde.'
+    _prd="$(_pr_dir)"; _prb="$(_pr_branch "${_prd}")"
+    if _residuo_commitado "${_prd}" "${_prb}"; then
+      :   # ritual cumprido: resíduo commitado na branch do PR — calar é o que impede a fadiga
+    elif _repo_derivado "${_prd}"; then
+      add 'PR-SEM-PASSADA-ADVERSARIAL: o PR saiu sem resíduo da passada adversarial (`docs/evolution/review/<branch>.md` commitado na branch). Neste repo (papel adopted|hub|standalone) a REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) fica FORA DE ESCOPO por desenho — nenhum gate vai cobrar. É o ritual de revisão que se perdeu, não uma reprovação a caminho: faça a passada antes do merge.'
+    elif _tem_gate_r56; then
+      add 'PR-SEM-PASSADA-ADVERSARIAL: o PR saiu sem `docs/evolution/review/<branch>.md` commitado na branch. A REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial) vai acusar no lint e no CI — escreva o resíduo agora e commite, antes de o CI rodar sobre o PR.'
     else
       add 'PR-SEM-PASSADA-ADVERSARIAL: abrir PR sem passada adversarial deixa a revisão para depois. Este repo não tem o lint do Onion, então a REGRA 56 não o gateia — o resíduo em `docs/evolution/review/<branch>.md` é boa prática aqui, não obrigação.'
     fi
