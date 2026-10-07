@@ -21,8 +21,9 @@ nota: >-
   sem ela, o commit sai sem assinatura. (3) O template de CI do adotante dispara também em .githooks/**.
   Bancada: família nova secret_gitignore (a-g) e o caso (f) do durable_commit. O caso (g) nasceu com defeito
   próprio: o padrão começava com '-' e o grep o leu como opção; curado com '--'. Três mutantes mordem (helper
-  que não acrescenta, commit sem assinatura, CI sem .githooks). Nó da fila fechado com verified_at. Sem
-  Elenxo, declarado.
+  que não acrescenta, commit sem assinatura, CI sem .githooks). Nó da fila fechado com verified_at; os
+  `confirmed` que o sustentam foram relidos e seguem como estavam: E_ADOPT_SEM_GITIGNORE_DE_SEGREDOS (impacto 4),
+  E_DURABLE_COMMIT_SEM_ASSINATURA e E_CI_TEMPLATE_IGNORA_GITHOOKS. Sem Elenxo, declarado.
 ---
 
 # Resíduo — `fix/adopt-gitignore-signature-ci`
