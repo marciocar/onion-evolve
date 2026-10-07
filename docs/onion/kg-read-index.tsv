@@ -366,6 +366,7 @@
 .claude/validation/kg-radar.sh	C_CARIMBO_A_MAO_INSERE_EM_VEZ_DE_SUBSTITUIR	docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml
 .claude/validation/kg-radar.sh	C_OPCAO_O1_RADAR_CORPUS_GLOB	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
 .claude/validation/kg-radar.sh	C_OPCAO_O4_ARESTA_CROSS_ARQUIVO_PRIMEIRA_CLASSE	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
+.claude/validation/kg-radar.sh	D_GATILHO_E_TRIGGER	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
 .claude/validation/kg-radar.sh	D_ID_FORA_DO_ALFABETO_REPROVA_NO_INTEGRITY	docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml
 .claude/validation/kg-radar.sh	D_S2_ABSORBED	docs/onion/graph/granaai-doctrine-absorption-2026-07.kg.yaml
 .claude/validation/kg-radar.sh	D_m1_avisa_nao_reprova	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
