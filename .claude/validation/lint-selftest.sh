@@ -15151,6 +15151,14 @@ run_lint_hard_file_selftests() {
   if ! grep -q 'zz-hard-file-probe.md' "${hf}"; then
     record_pass "lint-hard-file: (b) arquivo limpo não escreve nada sobre si"
   else record_fail "lint-hard-file: (b)" "violação HARD inventada para a fixture boa"; fi
+  # (d) SEM a variável (o caso normal): o lint chega ao SUMÁRIO contando a HARD. A 1ª forma terminava o ramo HARD
+  #     de violation() com `[ -n "$VAR" ] && echo`, que devolve 1 sem a variável — o lint abortava e as 4 faixas
+  #     do CI do PR #944 quebraram; o caso (a), que sempre definia a variável, não via isso.
+  cp "${fx}" "${dir}/zz-hard-file-probe.md"
+  local _noenv; _noenv="$(env -u ONION_LINT_HARD_FILE bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${dir}/zz-hard-file-probe.md" 2>&1 || true)"
+  if grep -qE 'Violações HARD : [1-9]' <<< "${_noenv}"; then
+    record_pass "lint-hard-file: (d) sem a variável o lint chega ao sumário e conta a HARD (não aborta)"
+  else record_fail "lint-hard-file: (d) o lint aborta sem a variável" "$(tail -2 <<< "${_noenv}" | tr '\n' ' ')"; fi
   rm -f "${dir}/zz-hard-file-probe.md" "${hf}"
   # (c) o motor PEDE a lista e a IMPRIME ao reprovar (registro: arquivo que ninguém lê é recurso morto)
   if grep -q 'ONION_LINT_HARD_FILE="${_tmp}/hard.txt"' "${REPO_ROOT}/ops/pr-finalize.sh" \

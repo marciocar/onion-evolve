@@ -2,14 +2,14 @@
 title: 'Resíduo — o pr-finalize nomeia as violações HARD quando reprova'
 date: 2026-10-07
 branch: fix/pr-finalize-shows-violations
-reviewed_diff_sha256: dfe0afb92138dd3eb3aa46402bf3755e71efbc6e2ac8431d1b7e6e09716a6692
-reviewed_code_sha256: 0941d70c77abb776b439bcfd6808008b5ec51fd79df8c0765d97cabcd0cc3c5d
-findings_total: 0
-findings_real: 0
-findings_fixed: 0
+reviewed_diff_sha256: 48ddd9742c18f4b45becb7812848268582e3f5ca2c8c543ce45e2c465554f699
+reviewed_code_sha256: aea0037b108e8bf4b143aa730d96e3427e64b0dceca5bc5e35b1808b415dd2bd
+findings_total: 1
+findings_real: 1
+findings_fixed: 1
 tokens: 0
 duration_min: 20
-verdict: SEM_ACHADOS
+verdict: CORRIGIDO
 elenxo: nao
 nota: >-
   1ª das quatro melhorias de Q_PR_FINALIZE_MELHORIAS (fila-2026-10-06), a de maior atrito medido: em 2026-10-06
@@ -24,5 +24,7 @@ nota: >-
 ---
 
 # Resíduo — `fix/pr-finalize-shows-violations`
+
+O 1º CI quebrou as 4 faixas: o ramo HARD de violation() terminava em `[ -n "$VAR" ] && echo`, que devolve 1 sem a variável — o lint abortava. Só o caso (a) existia, e ele sempre definia a variável. Curado com `if … fi`, e o caso (d) roda o lint SEM a variável e exige o sumário com a HARD contada; o mutante (a forma antiga) morde.
 
 Teto: a lista mostra só as HARD; quem quiser as SOFT ainda roda o lint.
