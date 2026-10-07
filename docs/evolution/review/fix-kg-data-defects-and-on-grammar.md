@@ -2,7 +2,7 @@
 title: 'Resíduo — defeitos de dado do .kg.yaml corrigidos, o radar cobra o alfabeto do id e avisa o valid_from sem aspas, e o gatilho de TRANSITIONS passa a ser trigger: (on: vira legado)'
 date: 2026-10-07
 branch: fix/kg-data-defects-and-on-grammar
-reviewed_diff_sha256: d57746eae9ce3c53b2947b17281861a7621e9ff0f2d0105a0d9e5ec5fdb0ee81
+reviewed_diff_sha256: ae92cb2d5f697c6f6e6bf4fbaea4678877adb2b4bfc8c171c9cc95c657582c75
 reviewed_code_sha256: daac8cb07a45e0617fc1cdc257c08e517bef9623aaabe435834297d35a6d12ff
 findings_total: 4
 findings_real: 3
