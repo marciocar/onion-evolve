@@ -2,8 +2,8 @@
 title: 'Resíduo — o adopt protege os segredos, assina o commit e o CI do adotante vê o pre-commit'
 date: 2026-10-07
 branch: fix/adopt-gitignore-signature-ci
-reviewed_diff_sha256: fd70439b2a5c58c7a962e4e861a267607eedb2a047f0eed0bdadc4d01fd7344c
-reviewed_code_sha256: fd9604d602672a138024b6b17f52d527409a90dafc05fc2b0b53e8431e5ef36a
+reviewed_diff_sha256: 80351a32cf9e64af58d6ad21ae7d6c2658f25d09092a7c2dd3ee536bcab576f1
+reviewed_code_sha256: e07968993f972148b786892815cd0b46b7731506c01a5a2ce20a16ff7a113879
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
@@ -27,6 +27,8 @@ nota: >-
 ---
 
 # Resíduo — `fix/adopt-gitignore-signature-ci`
+
+O 1º lint do commit acusou o limite de linhas do adopt.md (802 de 800) — a chamada ficou em uma linha, com o porquê no cabeçalho do helper.
 
 Teto: adotantes JÁ adotados não recebem o .gitignore pelo --update se o passo (0b) não rodar no fluxo de
 update; o onion-curation e o onion-kg-ssot já o têm à mão, e o onion-slm segue sem (sinal a enviar no anúncio).
