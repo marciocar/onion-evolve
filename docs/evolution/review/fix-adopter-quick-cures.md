@@ -2,7 +2,8 @@
 title: 'Resíduo — curas rápidas dos adotantes recentes: HARD re-medido no --update, assinatura no merge da vendor, âncora da tarefa nos workflows e o aviso do aparte'
 date: 2026-10-07
 branch: fix/adopter-quick-cures
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 21455cbcaab51fd5660ee00128d0ad1700d46434161457eb37d360f3fae76e3f
+reviewed_code_sha256: 9061738b71087231de16aab0a893a0c97ab6f142e795aa47a05af6c9217ae92f
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
