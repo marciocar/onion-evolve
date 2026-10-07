@@ -5470,6 +5470,13 @@ run_research_workflow_selftests() {
   if [ -f "${rd}" ] && grep -qF "mode: 'primaries'" "${rd}" && grep -qF 'wf_88199ba9-b9a' "${rd}"; then
     record_pass "research-workflow: (m2) research-doctrine.md traz o gatilho varredura × primárias com os dois custos medidos"
   else record_fail "research-workflow: (m2)" "doutrina sem o gatilho de escolha varredura × primárias (ou sem os run ids)"; fi
+  # (o) o Elenxo chega INTEIRO ao write(KG). Medido em 2026-10-07 (run wf_da77c143-24c): um
+  #     .slice(0, 7000) sobre o JSON do Elenxo (17.832 chars) entregou 16 de 38 objeções ao escritor, e
+  #     13 sobreviventes (Slack, Teams, A2A, Discord) nunca viraram nó. Corte silencioso de evidência é
+  #     o defeito; a guarda reprova qualquer .slice( logo depois de serializar o Elenxo.
+  if grep -nE 'JSON\.stringify\((pElenxo|elenxo)[^)]*\)[^+;]*\.slice\(' "${wf}" >/dev/null; then
+    record_fail "research-workflow: (o)" "o JSON do Elenxo é cortado antes do write(KG): $(grep -nE 'JSON\.stringify\((pElenxo|elenxo)[^)]*\)[^+;]*\.slice\(' "${wf}" | head -2)"
+  else record_pass "research-workflow: (o) o Elenxo chega inteiro ao write(KG) (sem .slice sobre o JSON)"; fi
 }
 
 run_research_lens_selftests() {
