@@ -1,5 +1,6 @@
 meta:
-  schema_version: 1
+  id: inference-contract-audit-2026-07
+  schema_version: "1"
   title: "Audit das 8 passadas adversariais do contrato de conformidade de inferência (L1/L2)"
   layer: audit
   baseline: 2026-07-23

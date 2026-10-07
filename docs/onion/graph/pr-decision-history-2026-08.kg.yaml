@@ -6,7 +6,8 @@
 # entre PRs lê uma APROXIMAÇÃO, e o campo diz isso na própria aresta.
 # SSOT da qual as vitrines do site projetam (ver pr-showcase-selection-2026-08.md).
 meta:
-  schema_version: 1
+  id: pr-decision-history-2026-08
+  schema_version: "1"
   baseline: "2026-06-13"
 nodes:
   - id: E_PR_DECISION_LOG

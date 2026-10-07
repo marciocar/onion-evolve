@@ -3,6 +3,7 @@
 # pelo teste de conteúdo não-framework. As posições caídas ficam — são elas que explicam o guard.
 # ADR: docs/analysis/onion-adr-vendor-multi-integration-branch-2026-07.md
 meta:
+  id: vendor-multi-branch-2026-07
   schema_version: "1"
   baseline: 2026-07-01
 

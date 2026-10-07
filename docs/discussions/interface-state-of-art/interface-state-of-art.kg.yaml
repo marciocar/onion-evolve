@@ -4,6 +4,7 @@
 # behavior-mapping-kg e onion-pessoal-marcio tambem pisam (DEPENDS_ON) e que ainda esta open (base fragil).
 # Camada audit (epistemico). Design-only, isolado — nada foi pro core.
 meta:
+  schema_version: "1"
   id: interface-state-of-art
   date: 2026-07-12
 nodes:

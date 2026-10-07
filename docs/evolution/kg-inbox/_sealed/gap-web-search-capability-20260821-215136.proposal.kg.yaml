@@ -2,7 +2,8 @@
 # PROPOSTA de escrita no grafo — fila kg-inbox (write-leg F4b).
 # origem: onion-chat-conversa-usuario-2026-08-20 · recebida: 20260821-215136 · NÃO É FONTE até o core selar (I3).
 meta:
-  schema_version: 1
+  id: gap-web-search-capability-20260821-215136
+  schema_version: "1"
   baseline: "2026-08-20"
 nodes:
   - id: Q_WEB_SEARCH_GAP

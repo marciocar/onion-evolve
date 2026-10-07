@@ -148,7 +148,7 @@ nodes:
     confidence: 0.85
     verified_at: 2026-10-01
     verified_against: 'https://www.onyx.app/pricing — votos 3-0, pagina de preco do proprio fornecedor'
-    valid_from: 2026
+    valid_from: "2026"
     source_tier: 9
     source_kind: primary
     label: 'A Onyx (ex-Danswer) publica preco do tier Business a US$20 por usuario por mes, cobrado anualmente: a unidade e o ASSENTO, nao documento, consulta nem conector. O agravante para o Onion esta no que a Onyx NAO cobra: ela e open-source, e o que se paga nao e o conhecimento nem o motor — e o assento no receptor hospedado mais a governanca. Isso fixa o TETO de preco do mercado para busca sobre documentos da empresa em US$20 por assento COM O MOTOR GRATIS. Qualquer oferta (b) do Onion disputa esse teto sem ter receptor e sem ter conectores — e o conector, nao o grafo, e o que o comprador compara lado a lado.'
@@ -259,7 +259,7 @@ nodes:
     confidence: 0.8
     verified_at: 2026-10-01
     verified_against: 'https://www.port.io/pricing — votos 3-0, pagina de preco do proprio fornecedor'
-    valid_from: 2025
+    valid_from: "2025"
     source_tier: 8
     source_kind: primary
     label: 'O Port cobra por ASSENTO — usuario autenticado ou service account — com plano Free de 15 assentos e 10 mil entidades, Basic a US$30 por assento por mes, Standard a US$40 e Enterprise sob consulta. A rodada registrou isto e DESCARTOU o item que o completa, e o par e que importa: catalogo, Context Lake, Scorecards, Actions e AI Agents estao em TODOS os planos, inclusive no Free, e o pago adiciona SSO, SCIM, permissoes dinamicas, workspaces, Private Link e SLA. Traduzido: o CONTEUDO DE METODO e dado de graca, e o que se cobra e governanca de acesso e escala num receptor. Um template em .claude/ que distribui metodo por vendorizacao nao tem nem o lado gratis como funil (nao captura ninguem) nem o lado pago (nao hospeda identidade). Valid_from 2025 porque a pagina nao datou a tabela.'

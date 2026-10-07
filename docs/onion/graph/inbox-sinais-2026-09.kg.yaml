@@ -1,6 +1,7 @@
 version: 1
 kind: plan
 meta:
+  id: inbox-sinais-2026-09
   slug: inbox-sinais-2026-09
   title: "Os dez sinais de adotantes — triados, medidos e ordenados"
   schema_version: "1"

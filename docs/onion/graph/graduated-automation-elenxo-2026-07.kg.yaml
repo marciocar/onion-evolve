@@ -1,5 +1,6 @@
 meta:
-  schema_version: 1
+  id: graduated-automation-elenxo-2026-07
+  schema_version: "1"
   title: "Elenxo — a superação honesta da Automação Graduada do Onion"
   layer: audit
   baseline: 2026-07-24

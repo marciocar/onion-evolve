@@ -989,7 +989,7 @@ nodes:
     confidence: 0.85
     trace: "docs/evolution/research/federation-2026/GAPS-ADDENDUM.md"
     label: "Estatística MCP tool-poisoning corrigida: 7,2% vuln geral / 5,5% tool-poisoning específico de 1.899 servidores (não '30%+ de 1.800'), mas ~2.000 servidores scanneados TODOS sem autenticação por padrão"
-  - id: SYNTHESIS.md_REUSE_NOT_INVENTION
+  - id: SYNTHESIS_REUSE_NOT_INVENTION
     node_type: claim
     layer: audit
     plane: DEV
@@ -998,7 +998,7 @@ nodes:
     confidence: 0.85
     trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
     label: "O mercado já resolveu as peças que faltam ao Onion (Backstage, ArgoCD ApplicationSet, Flux, Argo CD Agent, A2A) — a jogada é reuso, não invenção"
-  - id: SYNTHESIS.md_GOVERNANCE_AHEAD_OBS_BEHIND
+  - id: SYNTHESIS_GOVERNANCE_AHEAD_OBS_BEHIND
     node_type: claim
     layer: audit
     plane: DEV
@@ -1007,7 +1007,7 @@ nodes:
     confidence: 0.8
     trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
     label: "Onion está À FRENTE em governança (git-async gated, entrega-sem-commit, SSOT executável) e ATRÁS em observabilidade (falta onde VER e derivar o mapa)"
-  - id: SYNTHESIS.md_VPS_SUFFICES
+  - id: SYNTHESIS_VPS_SUFFICES
     node_type: claim
     layer: audit
     plane: DEV
@@ -1016,7 +1016,7 @@ nodes:
     confidence: 0.85
     trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
     label: "A VPS KVM 8 já basta: console e mapa são render estático do SSOT (members.yaml + CHANGELOG + graph.sh) via Caddy, sem backend/DB novo"
-  - id: SYNTHESIS.md_SINGLE_SOURCE_MESH
+  - id: SYNTHESIS_SINGLE_SOURCE_MESH
     node_type: decision
     layer: audit
     plane: DEV
@@ -1025,7 +1025,7 @@ nodes:
     confidence: 0.75
     trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
     label: "Recomendação: manter SSOT single-source para identidade/contratos e federar só a comunicação via mesh git-async (+a2a-live gated); NÃO promover o membro regulado a role:source"
-  - id: SYNTHESIS.md_GRAPH_SH_INGESTS_MEMBERS
+  - id: SYNTHESIS_GRAPH_SH_INGESTS_MEMBERS
     node_type: decision
     layer: audit
     plane: DEV
@@ -1034,7 +1034,7 @@ nodes:
     confidence: 0.9
     trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
     label: "graph.sh precisa INGERIR members.yaml — pré-requisito técnico único de baixo esforço/alto retorno que habilita targeting, console e mapa"
-  - id: SYNTHESIS.md_FIRST_SLICE_ORDER
+  - id: SYNTHESIS_FIRST_SLICE_ORDER
     node_type: decision
     layer: audit
     plane: DEV
@@ -1043,7 +1043,7 @@ nodes:
     confidence: 0.8
     trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
     label: "Ordem do 1º slice: (1) graph.sh ingere members.yaml, (2) targeting por seletor no alvo:, (3) console read-only, (4) receiver que acorda — sem exigir decisão de doutrina"
-  - id: SYNTHESIS.md_TARGETING_SCHEMA_OPEN
+  - id: SYNTHESIS_TARGETING_SCHEMA_OPEN
     node_type: question
     layer: audit
     plane: DEV
@@ -1052,7 +1052,7 @@ nodes:
     confidence: 0.5
     trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
     label: "Esquema concreto do resolver de targeting (alvo: como query): sintaxe, precedência entre seletores, closure gated no graph.sh — ainda não pesquisado"
-  - id: SYNTHESIS.md_A2A_LIVE_HANDSHAKE_OPEN
+  - id: SYNTHESIS_A2A_LIVE_HANDSHAKE_OPEN
     node_type: question
     layer: audit
     plane: DEV
@@ -1061,7 +1061,7 @@ nodes:
     confidence: 0.5
     trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
     label: "Especificação do handshake a2a-live gated para o caso o membro regulado (regulado, integration_branch: develop, nunca live-pull) ainda não pesquisada"
-  - id: SYNTHESIS.md_A2A_RESILIENCE_PAIR
+  - id: SYNTHESIS_A2A_RESILIENCE_PAIR
     node_type: evidence
     layer: audit
     plane: DEV
@@ -1070,7 +1070,7 @@ nodes:
     confidence: 0.9
     trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
     label: "Par de resiliência A2A (SSE conectado + webhook offline + lifecycle 8 estados + resubscribe) bate literalmente com a spec oficial; maturidade real v1.0, 150+ orgs, ACP fundido"
-  - id: SYNTHESIS.md_BACKSTAGE_COST_REJECTED
+  - id: SYNTHESIS_BACKSTAGE_COST_REJECTED
     node_type: evidence
     layer: audit
     plane: DEV
@@ -1079,7 +1079,7 @@ nodes:
     confidence: 0.85
     trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
     label: "Self-host Backstage para 5 membros seria over-engineering caro (3+ engenheiros, ~US$450k/ano, 6-12 meses) — descartado como caminho para o console"
-  - id: SYNTHESIS.md_TOOL_POISONING_STAT_DOWNGRADED
+  - id: SYNTHESIS_TOOL_POISONING_STAT_DOWNGRADED
     node_type: claim
     layer: audit
     plane: DEV
@@ -1088,7 +1088,7 @@ nodes:
     confidence: 0.3
     trace: "docs/evolution/research/federation-2026/SYNTHESIS.md"
     label: "Estatística \"30%+ de 1.800 servidores MCP com tool-poisoning\" foi rebaixada na verificação adversarial — estudos comparáveis dão ~7%; a ameaça em si (thrust) permanece confirmed"
-  - id: SYNTHESIS.md_CRDT_HYPOTHESIS_UNSOURCED
+  - id: SYNTHESIS_CRDT_HYPOTHESIS_UNSOURCED
     node_type: claim
     layer: audit
     plane: DEV
@@ -8411,29 +8411,29 @@ edges:
   - from: GAPS_CRDT_SPOF_CONFIRMED
     to: GAPS_DECISION_SINGLE_SOURCE_MESH
     edge_type: SUPPORTS
-  - from: SYNTHESIS.md_A2A_RESILIENCE_PAIR
-    to: SYNTHESIS.md_REUSE_NOT_INVENTION
+  - from: SYNTHESIS_A2A_RESILIENCE_PAIR
+    to: SYNTHESIS_REUSE_NOT_INVENTION
     edge_type: SUPPORTS
-  - from: SYNTHESIS.md_BACKSTAGE_COST_REJECTED
-    to: SYNTHESIS.md_VPS_SUFFICES
+  - from: SYNTHESIS_BACKSTAGE_COST_REJECTED
+    to: SYNTHESIS_VPS_SUFFICES
     edge_type: SUPPORTS
-  - from: SYNTHESIS.md_CRDT_HYPOTHESIS_UNSOURCED
-    to: SYNTHESIS.md_SINGLE_SOURCE_MESH
+  - from: SYNTHESIS_CRDT_HYPOTHESIS_UNSOURCED
+    to: SYNTHESIS_SINGLE_SOURCE_MESH
     edge_type: SUPPORTS
-  - from: SYNTHESIS.md_TOOL_POISONING_STAT_DOWNGRADED
-    to: SYNTHESIS.md_A2A_LIVE_HANDSHAKE_OPEN
+  - from: SYNTHESIS_TOOL_POISONING_STAT_DOWNGRADED
+    to: SYNTHESIS_A2A_LIVE_HANDSHAKE_OPEN
     edge_type: SUPPORTS
-  - from: SYNTHESIS.md_A2A_LIVE_HANDSHAKE_OPEN
-    to: SYNTHESIS.md_SINGLE_SOURCE_MESH
+  - from: SYNTHESIS_A2A_LIVE_HANDSHAKE_OPEN
+    to: SYNTHESIS_SINGLE_SOURCE_MESH
     edge_type: DEPENDS_ON
-  - from: SYNTHESIS.md_FIRST_SLICE_ORDER
-    to: SYNTHESIS.md_GRAPH_SH_INGESTS_MEMBERS
+  - from: SYNTHESIS_FIRST_SLICE_ORDER
+    to: SYNTHESIS_GRAPH_SH_INGESTS_MEMBERS
     edge_type: DEPENDS_ON
-  - from: SYNTHESIS.md_TARGETING_SCHEMA_OPEN
-    to: SYNTHESIS.md_GRAPH_SH_INGESTS_MEMBERS
+  - from: SYNTHESIS_TARGETING_SCHEMA_OPEN
+    to: SYNTHESIS_GRAPH_SH_INGESTS_MEMBERS
     edge_type: DEPENDS_ON
-  - from: SYNTHESIS.md_GOVERNANCE_AHEAD_OBS_BEHIND
-    to: SYNTHESIS.md_VPS_SUFFICES
+  - from: SYNTHESIS_GOVERNANCE_AHEAD_OBS_BEHIND
+    to: SYNTHESIS_VPS_SUFFICES
     edge_type: SUPPORTS
   - from: REC_TRANSPORT_SDAAL_BUILT
     to: S1_DECISION_FEDERATION_TRANSPORT_ADAPTERS
@@ -8841,7 +8841,7 @@ edges:
     to: S2_HUBSPOKE_CONTROL_PLANE
     edge_type: SUPPORTS
   - from: B2_1_claim_pattern_across_axes
-    to: SYNTHESIS.md_REUSE_NOT_INVENTION
+    to: SYNTHESIS_REUSE_NOT_INVENTION
     edge_type: SUPPORTS
   - from: B2_2_claim_manual_sync_fails_silently
     to: REC_CONTRACT_DRIFT_GATE_EXISTS
