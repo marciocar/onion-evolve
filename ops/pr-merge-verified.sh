@@ -119,8 +119,29 @@ HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOi
 OWNER_REPO="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRepository,headRepositoryOwner \
   --jq '.headRepositoryOwner.login + "/" + .headRepository.name' 2>/dev/null)"
 HEAD_REF="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefName --jq '.headRefName' 2>/dev/null)"
+# ══ API DE CHECKS EM FALHA ≠ ZERO CHECK-RUNS ═════════════════════════════════════════════════
+# Defeito medido em 2026-10-07 (sinal de um adotante): a API de check-runs do GitHub devolveu HTTP
+# 500 para QUALQUER commit por ~7 minutos. Com `2>/dev/null` o erro virava saída vazia, e a saída
+# vazia caía no ramo de ZERO check-runs, que mandava esperar os checks nascerem e oferecia o escape
+# `--ci-inoperante`. A direção (não mergear) estava certa; o diagnóstico mandava esperar a coisa
+# errada e apontava um escape que ali seria o erro. O rc do `gh api` é lido à parte, e o erro dele
+# é dito pelo nome.
+_cr_err="$(mktemp)"
 head_runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
-  --jq '.check_runs[] | .name + "\t" + .status + "\t" + (.conclusion // "-")' 2>/dev/null)"
+  --jq '.check_runs[] | .name + "\t" + .status + "\t" + (.conclusion // "-")' 2>"${_cr_err}")"
+_cr_rc=$?
+if [ "${_cr_rc}" -ne 0 ]; then
+  _cr_http="$(grep -oE 'HTTP [0-9]{3}' "${_cr_err}" | head -1)"
+  _cr_msg="$(head -c 300 "${_cr_err}" | tr '\n' ' ')"
+  rm -f "${_cr_err}"
+  # 5xx é a API fora (esperar resolve); 4xx é a LEITURA recusada (repo/sha/credencial — esperar não resolve)
+  case "${_cr_http}" in
+    "HTTP 4"*) _cr_acao="a leitura foi RECUSADA — confira repo, head e credencial do gh; esperar não resolve" ;;
+    *)         _cr_acao="tente de novo quando a API voltar" ;;
+  esac
+  die "API de checks indisponível (${_cr_http:-rc=${_cr_rc}}) ao ler os check-runs do head ${HEAD_SHA:0:8} — não é janela pós-push nem CI morto; NÃO use --ci-inoperante. ${_cr_acao}. gh disse: ${_cr_msg}"
+fi
+rm -f "${_cr_err}"
 # ══ ZERO CHECK-RUNS: janela pós-push, ou CI MORTO? ═══════════════════════════════════════════
 # A v1 tratava os dois casos como um só e mandava esperar. Em 2026-09-28 o segundo aconteceu: o CI
 # do repositório entrou em `startup_failure` em TODAS as branches (inclusive main), com zero jobs

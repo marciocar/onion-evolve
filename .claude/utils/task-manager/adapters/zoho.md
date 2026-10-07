@@ -108,7 +108,22 @@ curl -s -X POST "${ZOHO_ACCOUNTS_HOST}/oauth/v2/token" \
 ```
 
 **Não vem `refresh_token`, e não faz falta**: o token dura 3600 s e se pede de novo com o mesmo par. Um
-segredo a menos para guardar e rotacionar. `ALL` só é documentado para `projects`, `tasks` e
+segredo a menos para guardar e rotacionar.
+
+⚠️ **Reuse o token: pedir um por chamada BLOQUEIA o client.** Medido por um adotante em 2026-10-07: depois
+de umas 30 emissões em poucos minutos o accounts.zoho devolveu `{"error":"Access Denied","error_description":
+"You have made too many requests continuously…"}` e o client ficou **~5 minutos sem operar** (o número é
+estimativa pela contagem das chamadas, não limite documentado). Uma fase do `/engineer:work` que atualiza
+várias tasks reproduz isso. O mecanismo é o helper, não esta frase:
+
+```bash
+set -a; source .env; set +a                       # no MESMO comando; nunca ler o .env para o contexto
+TOKEN="$(bash .claude/utils/task-manager/zoho-token.sh)"            # cache por escopo, renova a 300 s do fim
+bash .claude/utils/task-manager/zoho-token.sh --invalidate          # depois de um 401
+```
+
+O cache é por `host|client_id|escopo` (token de leitura não serve a escrita), em arquivo 600 fora do
+repositório (`${XDG_CACHE_HOME:-$HOME/.cache}/onion/`), e o segredo vai ao curl pela entrada padrão. `ALL` só é documentado para `projects`, `tasks` e
 `timesheets`; nos outros módulos peça a operação explícita.
 
 ---
@@ -121,6 +136,24 @@ portal → projeto → milestone → tasklist → task → subtask
 
 **Zoho Projects não tem "épico".** O equivalente funcional é o **milestone** (tem início, fim e agrupa
 tasklists); a tasklist é o agrupador de segundo nível. Medido montando a árvore inteira.
+
+### Criar milestone: a data segue o FORMATO DO PORTAL, não ISO-8601
+
+```
+POST /projects/{projectId}/milestones
+{ "name": "…", "start_date": "10-07-2026", "end_date": "10-31-2026" }
+```
+
+Medido por um adotante em 2026-10-07 (portal com formato de data padrão `MM-DD-AAAA`):
+
+| `start_date` | resultado |
+|---|---|
+| `2026-10-07T00:00:00Z`, `…000Z`, `…+00:00`, `…-03:00` | 400 `PATTERN_NOT_MATCHED` |
+| `2026-10-07` | 400 `INVALID_PARAMETER_VALUE` |
+| **`10-07-2026`** | **201** |
+
+⚠️ Isto **difere da task**, que aceita ISO-8601. O formato segue a configuração de data do portal, então
+um portal configurado em `DD-MM-AAAA` pode exigir outra ordem — **teto**: medido num portal só.
 
 ---
 
@@ -259,6 +292,33 @@ O adapter **descobre o mapa lendo uma task do projeto** e guarda `{id, name, is_
 `is_closed_type` é o que distingue status terminal — é o que o mapeamento canônico precisa para saber o
 que é "feito".
 
+⚠️ **No layout PADRÃO não há `In Progress`, e "ler uma task" não acha o mapa.** Medido por um adotante em
+2026-10-07, num projeto novo do layout padrão:
+
+| sonda | resultado |
+|---|---|
+| todas as tasks do portal | só `Open` aparece — ler task nunca encontra outro status |
+| `PATCH {"status":{"name":"In Progress"}}` | 400 `status id is invalid or missing` |
+| varredura de 30 ids vizinhos de `Open` (task descartável) | só **`Open`** (`is_closed_type: false`) e **`Closed`** (`true`) aceitos |
+| `PATCH {"completion_percentage":100}` | 200, e a task vira **`Closed`**, com o id do status no corpo |
+| `PATCH {"completion_percentage":10}` | 200, status fica `Open`, 10% gravados |
+| `GET /settings/status` (com `module=tasks` e `layout_id=…`) | 200, mas só o status padrão (`Open`), com qualquer filtro |
+| `GET /settings/layouts?module=tasks` | 200 só com o escopo `ZohoProjects.custom_fields.READ`; as opções do picklist de status **não vêm** |
+
+**O mecanismo, por status canônico:**
+
+- **`in_progress`** → se o mapa conhecido tiver um status de nome `In Progress`, use o id dele. Senão,
+  **mantenha `Open`** e grave `PATCH {"completion_percentage": <n>}`, com `n` proporcional às fases
+  concluídas do plano (1–99). É o que o layout padrão tem para "em andamento".
+- **`done`** (e `closed`/`canceled` quando não houver status terminal próprio) → `PATCH
+  {"completion_percentage": 100}`. A resposta traz o status `Closed` com o **id**, que passa a compor o
+  mapa. É o caminho para o terminal que **não depende de saber o id antes**.
+- O `is_closed_type` continua sendo a fonte de verdade do "terminal".
+
+**Teto:** medido num portal só, de teste, no layout padrão. Um portal com status customizados pode ter
+`In Progress` (e o mecanismo o usa quando existe); nenhum escopo emitido lista os status de um layout
+(`ZohoProjects.settings.READ` e `.layouts.READ` não são emitidos pelo accounts.zoho).
+
 ### `searchTasks(query)`
 
 ```
@@ -330,9 +390,9 @@ resolve por **nome**, lendo uma task, e usa `is_closed_type` para o terminal. A 
 | canônico | Zoho (nome observado) |
 |---|---|
 | `backlog` / `todo` | `Open` |
-| `in_progress` | `In Progress` |
+| `in_progress` | `In Progress` **se o mapa tiver**; no layout padrão, `Open` + `completion_percentage` 1–99 |
 | `review` | (não há nativo — usar status customizado do projeto) |
-| `done` / `closed` / `canceled` | o status com `is_closed_type: true` |
+| `done` / `closed` / `canceled` | o status com `is_closed_type: true` — sem id conhecido, `completion_percentage: 100` (devolve o de `Closed`) |
 
 ⚠️ `review` **não foi medido** num projeto com status customizado. Declarado como lacuna.
 
