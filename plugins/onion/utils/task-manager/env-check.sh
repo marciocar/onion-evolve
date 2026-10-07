@@ -123,9 +123,10 @@ case "${MODE}" in
                code="$(printf '%s\n' "${cfg}" | req "https://${host}/rest/api/$(v JIRA_API_VERSION | grep . || echo 3)/myself")" ;;
       zoho)    ahost="$(v ZOHO_ACCOUNTS_HOST)"; ahost="${ahost:-https://accounts.zoho.com}"
                tld="${ahost##*accounts.zoho.}"; tld="${tld%%/*}"
-               # um `data` por parâmetro: o curl os junta com `&` (e a query montada numa string só parecia nome comercial à guarda de scrub)
-               tok="$(printf 'data = "grant_type=client_credentials"\ndata = "client_id=%s"\ndata = "client_secret=%s"\ndata = "scope=ZohoProjects.portals.READ"\n' "$(v ZOHO_CLIENT_ID)" "$(v ZOHO_CLIENT_SECRET)" \
-                      | curl -s -K - -X POST "${ahost}/oauth/v2/token" | sed -n 's/.*"access_token":"\([^"]*\)".*/\1/p')"
+               # o token vem do helper com cache por escopo (2026-10-07: emitir por chamada bloqueou o client
+               # de um adotante por ~5 min). As credenciais vão pelo ambiente do filho, nunca pela linha de comando.
+               tok="$(ZOHO_CLIENT_ID="$(v ZOHO_CLIENT_ID)" ZOHO_CLIENT_SECRET="$(v ZOHO_CLIENT_SECRET)" ZOHO_ACCOUNTS_HOST="${ahost}" \
+                      bash "$(dirname "${BASH_SOURCE[0]}")/zoho-token.sh" --scope ZohoProjects.portals.READ)"
                if [ -z "${tok}" ]; then code="token-negado"
                else
                  body="$(printf 'header = "Authorization: Zoho-oauthtoken %s"\n' "${tok}" | curl -s -K - "https://projects.zoho.${tld}/api/v3/portals")"

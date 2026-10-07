@@ -1,7 +1,7 @@
 {
   "repository": "marciocar/onion-evolve",
-  "ref": "6378bcfae94d06d8fb86b9fa6ed9485184922ca1",
-  "tree_sha": "b3b9d33c487feb0a2f1a110630a841fb1df7c322",
-  "commit_date": "2026-10-06T18:14:31-03:00",
+  "ref": "064d0dffee54c34bc1160c4cf4f209751667139a",
+  "tree_sha": "11829ebf29817c4e9834c59872e2408cf8740ed7",
+  "commit_date": "2026-10-07T21:24:56+00:00",
   "note": "Proveniência content-addressed (padrão gh skill). tree_sha = hash do ls-tree das fontes canônicas em .claude/. SSOT = .claude/; este plugin é artefato gerado por assemble-plugin.sh + verticals/onion-product.manifest.sh."
 }
