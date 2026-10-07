@@ -4,12 +4,15 @@
 # sustenta, e o backlog é projeção destes nós. Rótulo factual e curto; o porquê fica no comentário
 # (lição do mesmo dia: narrativa dentro do rótulo vazou o gabarito do eval da Porta 0).
 meta:
+  drive_checkpoint: pending
+  drive_checkpoint_note: "2026-10-07 fim do dia: Q_HOOK_LER_RESIDUO_DA_BRANCH_DO_PR open→done (#948); Q_ONION_KG_SSOT_REPO open→done (adotado, registrado, atualizado); novos D_PAPEL_DUAS_DIMENSOES (confirmed, #949), Q_TABELA_DE_TEMPOS_NO_MAPA (done neste PR), Q_VETO_PRETOOLUSE_NO_PR_CREATE (open, GATED) e Q_GRANAAI_CLONE_SEM_CARIMBO (open, decisão do maestro)"
   id: fila-2026-10-06
   schema_version: "1"
   baseline: 2026-10-06
   review_after: 2026-11-05   # 30d: fila de trabalho; cada item fecha ao virar PR ou ao ser descartado
   # ═══ TETO: 30 NÓS ═══
-  #   26 hoje (13 evidências + 13 compromissos). Fila que passa do teto pede triagem, não mais nós.
+  #   30 em 2026-10-07 (13 evidências + 1 decisão + 16 compromissos). NO TETO: o próximo nó pede
+  #   triagem antes (fechar e arquivar os `done`), não mais nós.
 nodes:
   # ── evidências medidas hoje ──────────────────────────────────────────────────────────────────
   - id: E_PRECOMMIT_RECARIMBA_RESIDUO
@@ -178,10 +181,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 2
-    confidence: 0.8
-    verified_against: ".claude/hooks/bash-empty-result-guard.sh"
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "PR #948: bancada empty_result_guard (s)(t)(u) com mutantes; ao vivo, o #949 abriu de worktree sem o aviso falso"
     label: "o aviso de PR sem passada adversarial deve ler o resíduo da branch do PR, não do checkout principal"
   - id: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
     node_type: question
@@ -233,10 +237,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 5
-    confidence: 0.7
-    verified_against: "docs/evolution/federation/members.yaml"
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "repo adotado (pin fe8359e38b43, 2026-10-06) e registrado (8397810b); --update para d82ca211bea0 em 2026-10-07 com merge limpo da vendor; já devolveu 2 sinais medidos ao core"
     label: "criar e adotar o onion-kg-ssot: produto independente, dogfood nos dois sentidos, contextos próprios, core lido por caminho ou git"
   - id: Q_MU07_TIPO_DE_NO_TROCADO
     node_type: question
@@ -274,6 +279,46 @@ nodes:
     confidence: 0.5
     verified_against: ".claude/commands/meta/co-evolve.md"
     label: "o canal vivo entre sessões vira 3ª via da co-evolução (envelope fixo, registro do envio, decisão descendo ao grafo)? aguarda o maestro"
+  # ── 2026-10-07, fim do dia (lote do /meta:drive) ─────────────────────────────────────────────
+  - id: D_PAPEL_DUAS_DIMENSOES
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-07
+    verified_against: "PR #949: Elenxo REPROVOU o vocabulário único (carimbo standalone liga o modo porta: 0→16 e 0→14 HARD medidos em clones); maestro selou o desenho do Elenxo com hub→hub; bancada door_role_parity (g2)-(g5) + fixture, 3 mutantes"
+    trace: ".claude/validation/door-role-parity-check.sh"
+    label: "role do registro é o tier (source|hub|standalone|consumer) e o do carimbo é a relação/corte (adopted|hub|standalone); a REGRA 92 julga o adotante pelo mapa hub→hub, standalone|consumer→adopted"
+  - id: Q_VETO_PRETOOLUSE_NO_PR_CREATE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.4
+    verified_against: "sinal do onion-kg-ssot 2026-10-07, opção (a); aviso pós-ato curado no #948"
+    label: "GATED — vetar no PreToolUse o gh pr create sem resíduo? Reabre só se o aviso pós-ato do #948 deixar passar PR sem resíduo; antes de forjar, medir a taxa de falso positivo (PR draft, exploratório)"
+  - id: Q_TABELA_DE_TEMPOS_NO_MAPA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "bancada shard_plan (g): tabela versionada legível (217 famílias); --map liga shard_plan à tabela; mutante (TAB→espaço numa linha de dados) reprova"
+    label: "mudar ops/testing/selftest-family-times.tsv caía no failsafe da bancada inteira (219 famílias) porque nenhuma família citava a tabela"
+  - id: Q_GRANAAI_CLONE_SEM_CARIMBO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_against: "door-role-parity-check.sh sobre o vivo, 2026-10-07: [adotante/CARIMBO-AUSENTE] em /home/marcio/granaai"
+    label: "o clone registrado do granaai não tem .claude/.onion-version: local_path velho, Onion noutro checkout ou desacoplado? decisão do maestro, ato fora deste repo"
 edges:
   - from: E_PRECOMMIT_RECARIMBA_RESIDUO
     to: Q_PRECOMMIT_NAO_LAVA_RESIDUO
@@ -322,4 +367,13 @@ edges:
     edge_type: SUPPORTS
   - from: E_SKILL_CORE_ONLY_VIAJOU
     to: Q_MANIFESTO_SEM_SKILL_CORE_ONLY
+    edge_type: SUPPORTS
+  - from: E_HOOK_PR_SEM_PASSADA_FALSO_POSITIVO
+    to: Q_VETO_PRETOOLUSE_NO_PR_CREATE
+    edge_type: SUPPORTS
+  - from: E_MAPA_SEM_MERGE_ONION_HOOKS
+    to: Q_TABELA_DE_TEMPOS_NO_MAPA
+    edge_type: SUPPORTS
+  - from: D_PAPEL_DUAS_DIMENSOES
+    to: Q_GRANAAI_CLONE_SEM_CARIMBO
     edge_type: SUPPORTS
