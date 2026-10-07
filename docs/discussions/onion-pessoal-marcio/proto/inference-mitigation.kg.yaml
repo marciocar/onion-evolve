@@ -167,7 +167,7 @@ edges:
   - from: ST_INFERENCIA_INTERNA
     to: ST_EMISSAO
     edge_type: TRANSITIONS
-    on: EV_RELEASE_GATED
+    trigger: EV_RELEASE_GATED
 
   # as 6 camadas restringem o acesso (L1), o release (L2/L5) e a emissão (L3/L4/L6)
   - from: PO_L1_ESCOPO

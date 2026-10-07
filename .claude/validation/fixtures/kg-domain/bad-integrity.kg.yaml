@@ -1,5 +1,5 @@
 # Fixture: grafo QUEBRADO — layer inválido, aresta para nó inexistente,
-# on: apontando evento inexistente.
+# trigger: apontando evento inexistente.
 # Espera: kg-radar.sh --integrity exit 1.
 meta:
   id: fixture-bad-integrity
@@ -17,4 +17,4 @@ edges:
   - from: ST_ONLY
     to: ST_MISSING
     edge_type: TRANSITIONS
-    on: EV_MISSING
+    trigger: EV_MISSING

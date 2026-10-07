@@ -177,7 +177,8 @@ section == "edges" && /^[[:space:]]*- from:/ {
 }
 section == "edges" && /^[[:space:]]*to:/       { v=$0; sub(/^[[:space:]]*to:/,"",v);        eto[ne]=trim(v); next }
 section == "edges" && /^[[:space:]]*edge_type:/{ v=$0; sub(/^[[:space:]]*edge_type:/,"",v); etype[ne]=trim(v); next }
-section == "edges" && /^[[:space:]]*on:/       { v=$0; sub(/^[[:space:]]*on:/,"",v);        eon[ne]=trim(v); next }
+section == "edges" && /^[[:space:]]*trigger:/  { v=$0; sub(/^[[:space:]]*trigger:/,"",v);   eon[ne]=trim(v); next }
+section == "edges" && /^[[:space:]]*on:/       { v=$0; sub(/^[[:space:]]*on:/,"",v);        eon[ne]=trim(v); next }  # on: = legado de trigger: (paridade com o kg-radar.sh)
 
 END {
   # ⚠️ O `on:` CONTA NO GRAU — a lente parseava `eon[]` e nunca o usava, enquanto o motor conta

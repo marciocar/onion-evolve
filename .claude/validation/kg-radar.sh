@@ -322,7 +322,13 @@ section == "edges" && /^[[:space:]]+- from:/ {
 # `edge_type:` não casa `^[[:space:]]*to:`.)
 section == "edges" && /^[[:space:]]*to:/ { v = $0; sub(/^[[:space:]]*to:/, "", v); eto[ne] = trim(v); next }
 section == "edges" && /^[[:space:]]*edge_type:/ { v = $0; sub(/^[[:space:]]*edge_type:/, "", v); etype[ne] = trim(v); next }
-section == "edges" && /^[[:space:]]*on:/ { v = $0; sub(/^[[:space:]]*on:/, "", v); eon[ne] = trim(v); next }
+# GATILHO DE TRANSITIONS: `trigger:` (2026-10-07). A chave antiga era `on:`, e YAML 1.1 lê `on` como o
+# BOOLEANO true — um leitor tipado via o evento órfão onde este radar (texto) via a ligação: dois
+# leitores discordando do mesmo byte. O contrato formal do .kg.yaml, em curso, fixa perfil YAML 1.2
+# restrito com `on` PROIBIDO. `on:` segue LIDO (grafo fora do corpus não quebra) e é ACUSADO como
+# legado no --integrity; `eon` guarda o gatilho venha de qual chave vier.
+section == "edges" && /^[[:space:]]*trigger:/ { v = $0; sub(/^[[:space:]]*trigger:/, "", v); eon[ne] = trim(v); next }
+section == "edges" && /^[[:space:]]*on:/ { v = $0; sub(/^[[:space:]]*on:/, "", v); eon[ne] = trim(v); eonLegacy[ne] = 1; next }
 
 # meta: campos de governança de frescor/schema (proposta #1/#2 — ADR kg-freshness-gate)
 section == "meta" && /^[[:space:]]*schema_version:/ { v = $0; sub(/^[[:space:]]*schema_version:/, "", v); metaSchema = trim(v); next }
@@ -447,14 +453,14 @@ END {
     if (etype[i] == "HAS_STATE")   ownedState[eto[i]]++
     if (etype[i] == "TRACES_TO")   traceOut[efrom[i]]++
     if (etype[i] == "READS")       readsOut[efrom[i]]++
-    if (eon[i] != "")              { onUsed[eon[i]] = 1; deg[eon[i]]++ }  # on: conecta o evento (não é órfão)
+    if (eon[i] != "")              { onUsed[eon[i]] = 1; deg[eon[i]]++ }  # trigger: (ou on: legado) conecta o evento (não é órfão)
     outDeg[efrom[i]]++
   }
 
   if (mode == "--triples") {
     for (i = 1; i <= ne; i++) {
       t = efrom[i] " " etype[i] " " eto[i]
-      if (eon[i] != "") t = t " on " eon[i]
+      if (eon[i] != "") t = t " trigger " eon[i]
       print t
     }
     exit 0
@@ -1052,8 +1058,10 @@ END {
       }
       if (index(VE, etype[i]) == 0 || etype[i] == "") { print "  ✗ aresta " i ": edge_type inválido: [" etype[i] "]"; problems++ }
       if (eon[i] != "" && !(eon[i] in nodeSeen)) {
-        if (isProposal) { dangling++ } else { print "  ✗ aresta " i ": on aponta evento inexistente: " eon[i]; problems++ }
+        if (isProposal) { dangling++ } else { print "  ✗ aresta " i ": trigger aponta evento inexistente: " eon[i]; problems++ }
       }
+      # `on:` LEGADO: lido, nunca reprovado (grafo antigo fora do corpus não quebra), sempre dito.
+      if (eonLegacy[i]) print "  ⚠ ON-LEGADO aresta " i " (" efrom[i] " -> " eto[i] "): o gatilho usa a chave on:, que YAML 1.1 lê como booleano — renomeie para trigger: " eon[i]
     }
     for (i = 1; i <= nn; i++) {
       id = order[i]
