@@ -647,9 +647,9 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.2 | `Q_KG_SCHEMA_FORMAL` | fila-2026-10-06 | JSON Schema como contrato único do .kg.yaml; antes, medir quantos grafos passariam num schema estrito |
+| 6.3 | `Q_PR_FINALIZE_MELHORIAS` | fila-2026-10-06 | pr-finalize: carimbar só depois de tudo passar, commit de projeções sem religar o pre-commit quando o pré-voo passou, imprimir |
 | 5.4 | `Q_ROTULO_SEPARADO_DA_NARRATIVA` | fila-2026-10-06 | separar o rótulo factual da narrativa num campo próprio do nó |
 | 4.2 | `Q_MERGE_GATE_AVISA_NO_ADOTANTE` | fila-2026-10-06 | a trava de merge deve avisar no adotante em vez de sair calada |
-| 4.2 | `Q_PR_FINALIZE_MELHORIAS` | fila-2026-10-06 | pr-finalize: imprimir as violações ao reprovar, registrar etapa e rc com trap, catracas estáticas no checkpoint, rebase com ín |
 | 3.6 | `Q_GRANAAI_CLONE_SEM_CARIMBO` | fila-2026-10-06 | aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o valida |
 | 3.6 | `Q_PRECOMMIT_SELECAO_POR_CASO` | fila-2026-10-06 | re-forjar o pre-commit para escolher por caso: família pelo bloco que mudou na bancada, núcleo fixo justificado ou podado, motiv |
 | 3.2 | `Q_MAPA_NOMEAR_MERGE_ONION_HOOKS` | fila-2026-10-06 | nomear merge-onion-hooks.sh no corpo da família que o exercita, para o mapa da bancada o reivindicar |
