@@ -87,14 +87,18 @@ if isinstance(doc, dict):
         err("top-level 'members:' ausente ou não é lista")
         members = []
 
-    # ⚠️ VOCABULARIO UNIFICADO com o STAMP em 2026-09-24, e a medicao foi o que tornou isto barato:
-    #    o stamp (.claude/.onion-version, escrito por write-stamp.sh) carimba `adopted`, e este
-    #    validador exigia `consumer` — dois nomes para o MESMO papel, em dois SSOTs. O desempate
-    #    e por QUEM LE: `adopted` e lido em 22 sitios do lint-artifacts.sh; `consumer` vivia AQUI e
-    #    em mais nenhum lugar, e aparecia em UMA entrada do registro (20 membros). Unificar em
-    #    `adopted` nao migra ninguem. `consumer` fica aceito como SINONIMO LEGADO: derrubar valor de
-    #    SSOT vivo sem necessidade e quebrar por simetria.
-    ROLES = {"source", "hub", "standalone", "adopted", "consumer"}
+    # ⚠️ DUAS DIMENSÕES, DOIS VOCABULÁRIOS — e a "unificação" de 2026-09-24 foi REVERTIDA em 2026-10-07.
+    #    O `role:` DESTE registro é o TIER na rede: source (T0) · hub (T1, pode ter sub-adotados) ·
+    #    standalone (T3, adota o core direto) · consumer (T2, adota um hub; é o que o
+    #    trust-topology-check.sh lê). O `role:` do CARIMBO (.claude/.onion-version) é a RELAÇÃO com o
+    #    framework e o CORTE de maquinaria: adopted | hub | standalone (= porta). Em 2026-09-24 pôr
+    #    `adopted` aqui pareceu economizar um nome, e o custo foi medido depois: `adopted` passou a
+    #    nomear o T3 E o T2, o co-deliver e o resolve-target tiveram de contornar a ambiguidade
+    #    (2026-09-25), e um adotante leu a divergência registro×carimbo como furo (sinal de
+    #    campo, 2026-10-07). O par dos dois campos é julgado pela REGRA 92 por COMPATIBILIDADE
+    #    (hub→hub; standalone|consumer→adopted), não por igualdade — que valeria só para porta.
+    #    Ninguém migra: a única entrada `adopted` virou `standalone` no mesmo commit.
+    ROLES = {"source", "hub", "standalone", "consumer"}
     # `port` entrou em 2026-09-16 com o registro do onion-codex. Ele NÃO é `distillation`:
     # destilação é reescrita curada da MESMA doutrina no MESMO substrato; porte é TRADUÇÃO para
     # OUTRO substrato (aqui, `.codex/` + `.agents/skills/` no lugar de `.claude/`). Chamar porte

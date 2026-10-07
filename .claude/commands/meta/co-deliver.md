@@ -44,9 +44,10 @@ ele hardcoda `role: source` (é a identidade da FONTE) e, vendorizado num adotan
 
 `$ARGUMENTS` = `<member-id> [<outbox-file>] --target <path> [--dry-run]`.
 - `<member-id>` deve existir em `members.yaml` e **adotar o CORE direto** (T1/T3 — RFC-0003 §2.1; o
-  helper valida). Isso vale para `role: hub`, `role: standalone` **e** `role: adopted`: desde a
-  unificação de vocabulário de 2026-09-24, `adopted` nomeia também o adotante direto do core, e ele
-  recebe aqui como qualquer outro.
+  helper valida). Isso vale para `role: hub` e `role: standalone` do **registro** (o tier). Desde
+  2026-10-07 o registro **não aceita** `adopted`: essa palavra é do CARIMBO (relação/corte), e a
+  "unificação" de 2026-09-24 que a pôs aqui foi revertida — ela fazia `adopted` nomear o T3 e o T2 ao
+  mesmo tempo. O helper ainda trata `adopted` como legado (registro antigo ou sandbox).
   > ⚠️ **O critério é a tripla `adopts` do registro, não a lista de papéis** — curado em 2026-09-25,
   > depois de medir o dano: enquanto o helper enumerava `hub|standalone`, um membro `role: adopted`
   > ficava de fora de TODO anúncio e o `resolve-target todos` nem o listava. Silencioso nas duas

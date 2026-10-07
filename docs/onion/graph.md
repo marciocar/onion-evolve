@@ -444,7 +444,7 @@ metagamify	specialization	asana-integration
 metagamify	specialization	gamification	
 metagamify	specialization	metagamification	
 metagamify	specialization	nx-monorepo	
-metagamify	tier	hub	
+metagamify	tier	standalone	
 metagamify	trust-advises	onion-evolve	
 metaspec-gate-keeper	related	/engineer/pre-pr	
 metaspec-gate-keeper	related	c4-architecture-specialist	
@@ -812,7 +812,7 @@ sge	specialization	checklist-qualidade
 sge	specialization	lei-14133	
 sge	specialization	licitacao-publica	
 sge	specialization	regulated-greenfield	
-sge	tier	adopted	
+sge	tier	standalone	
 sge	trust-advises	onion-evolve	
 soc2-specialist	related	/docs/build-compliance-docs	
 soc2-specialist	related	iso-27001-specialist	
