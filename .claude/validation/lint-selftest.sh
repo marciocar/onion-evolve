@@ -11849,6 +11849,9 @@ case "$args" in
       printf '%s' "$body" > "${STUB_COMMENT}"
       exit "${GH_COMMENT_RC:-0}" ;;
   *"api "*check-runs*)
+      if [ -n "${GH_CHECKS_API_500:-}" ]; then
+        echo "gh: Server Error (HTTP 500)" >&2; exit 1
+      fi
       if [ -n "${GH_VERDICT_FAIL:-}" ]; then
         printf 'onion-review-verdict\tcompleted\tfailure\n'
       fi
@@ -12009,6 +12012,35 @@ STUB
   if [ "${_mv_rc}" -ne 0 ] && grep -q "não consegui REGISTRAR a dispensa" <<< "${_mv_out}"; then
     record_pass "pr-merge-verified: (n) post do registro falhando ⇒ die (precondição intacta)"
   else record_fail "pr-merge-verified: (n)" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  # ── (o)(p) API DE CHECKS EM FALHA ≠ ZERO CHECK-RUNS ────────────────────────────────────
+  # Defeito medido em 2026-10-07 (sinal de um adotante): HTTP 500 da API de check-runs por ~7 min.
+  # Com `2>/dev/null` o erro virava saída vazia e caía no ramo de ZERO check-runs, que mandava
+  # esperar e oferecia o --ci-inoperante. A direção (não mergear) era certa; o diagnóstico, não.
+  # (o) polaridade que ACUSA: API em 500 ⇒ die que NOMEIA a API e o HTTP, e NUNCA chega ao merge.
+  echo 0 > "${d}/n"; : > "${d}/merged"
+  _mv_out="$(PATH="${d}:${PATH}" STUB_N="${d}/n" GH_CHECKS_API_500=1 \
+             GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" \
+             GH_MERGE_RC=0 GH_MERGE_OUT=merged bash "${sut}" 999 2>&1)"; _mv_rc=$?
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "API de checks indisponível (HTTP 500)" <<< "${_mv_out}" \
+     && ! grep -q "ZERO check-runs" <<< "${_mv_out}" && ! grep -q "MERGED — provado" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (o) API de checks em HTTP 500 ⇒ die que nomeia a API (não 'zero check-runs')"
+  else record_fail "pr-merge-verified: (o) erro da API lido como zero check-runs" "rc=${_mv_rc} out=${_mv_out}"; fi
+  # (p) polaridade que CALA: API viva com zero runs continua no ramo antigo (espere / --ci-inoperante).
+  cat > "${d}/gh-zero" <<'STUB0'
+#!/usr/bin/env bash
+case "$*" in *"api "*check-runs*) exit 0 ;; esac
+exec "${GH_REAL_STUB}" "$@"
+STUB0
+  mkdir -p "${d}/zero"; cp "${d}/gh-zero" "${d}/zero/gh"; chmod +x "${d}/zero/gh"
+  echo 0 > "${d}/n"
+  _mv_out="$(PATH="${d}/zero:${d}:${PATH}" GH_REAL_STUB="${d}/gh" STUB_N="${d}/n" \
+             GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" \
+             GH_MERGE_RC=0 GH_MERGE_OUT=merged bash "${sut}" 999 2>&1)"; _mv_rc=$?
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "ZERO check-runs" <<< "${_mv_out}" \
+     && ! grep -q "API de checks indisponível" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (p) API viva com zero runs ⇒ ramo 'espere' intacto (sem falso alarme de API)"
+  else record_fail "pr-merge-verified: (p) zero runs virou erro de API" "rc=${_mv_rc} out=${_mv_out}"; fi
 
   unset -f _mv _mvd
 }
@@ -22326,6 +22358,21 @@ run_zoho_adapter_selftests() {
     record_pass "zoho-adapter: (e) o adapter avisa que ?search= NÃO filtra"
   else record_fail "zoho-adapter: (e)" "falta o aviso de que ?search= é aceito e ignorado — searchTasks devolveria a lista inteira como resultado"; fi
 
+  # (l)(m) os achados de 2026-10-07 (sinal de um adotante), cobrados NA SEÇÃO que os decide:
+  # o layout padrão não tem `In Progress` e o terminal sai por `completion_percentage:100`; a data do
+  # milestone é `MM-DD-AAAA`, não ISO. Sem isto o /engineer:work volta a pedir ao humano que mude o status.
+  local _s_st; _s_st="$(_zoho_sec 'updateStatus')"
+  if grep -qF '"completion_percentage":100' <<< "${_s_st}" && grep -qF 'Open' <<< "${_s_st}"; then
+    record_pass "zoho-adapter: (l) updateStatus diz o caminho do layout padrão (Open + completion_percentage, 100 fecha)"
+  else record_fail "zoho-adapter: (l)" "a seção do updateStatus não traz \`{\"completion_percentage\":100}\` — no layout padrão não há In Progress e o terminal só sai por aí"; fi
+  local _s_ms; _s_ms="$(_zoho_sec 'milestone')"
+  if grep -qF '"start_date":"10-07-2026"' <<< "${_s_ms}" && grep -qF 'PATTERN_NOT_MATCHED' <<< "${_s_ms}"; then
+    record_pass "zoho-adapter: (m) criar milestone usa a data do portal (MM-DD-AAAA), com o 400 do ISO escrito"
+  else record_fail "zoho-adapter: (m)" "a seção de milestone não mostra a data no formato do portal — ISO-8601 dá 400 PATTERN_NOT_MATCHED"; fi
+  if grep -qF 'zoho-token.sh' "${ad}"; then
+    record_pass "zoho-adapter: (n) o adapter aponta o helper de token com cache (emitir por chamada bloqueia o client)"
+  else record_fail "zoho-adapter: (n)" "o adapter não cita zoho-token.sh — o reuso do token volta a ser conselho"; fi
+
   # (f) createSubtask usa o vínculo ANINHADO. A guarda cobra a FORMA, e a razão é a história deste
   # caso: em 2026-09-30 ele mudou DUAS vezes num dia. Primeiro cobrava "V2 + 2026-12-31", canonizando
   # a promessa falsa de que a V2 entregava subtask (aceitei um 201 sem abrir o corpo). Depois cobrava
@@ -22940,6 +22987,77 @@ run_member_registered_selftests() {
   rm -rf "${d}"
 }
 _family run_member_registered_selftests
+
+# ── zoho-token.sh: o token do Zoho é REUSADO, não emitido por chamada (2026-10-07) ─────────────────
+# POR QUE EXISTE: um adotante que pedia token novo a cada chamada levou `Access Denied` do accounts.zoho
+# depois de ~30 emissões e ficou ~5 min sem operar. (a) é o caso medido: duas chamadas, UMA emissão.
+# (b) expirado renova; (c) o cache é 600; (d) emissão recusada não grava nada e não vaza o segredo;
+# (e) o segredo nunca vai na linha de comando do curl; (f) escopo diferente é cache diferente.
+# O `curl` é esboçado (o SUT fala com a rede) e CONTA as emissões. MUTANTE: tirar o ramo CACHE-HIT
+# reprova (a) — é o próprio defeito do adotante.
+run_zoho_token_selftests() {
+  local sut="${REPO_ROOT}/.claude/utils/task-manager/zoho-token.sh"
+  if [ ! -f "${sut}" ]; then record_fail "zoho-token" "SUT ausente: ${sut}"; return; fi
+  local d; d="$(mktemp -d)"; mkdir -p "${d}/bin" "${d}/cache"
+  cat > "${d}/bin/curl" <<'STUB'
+#!/usr/bin/env bash
+printf '%s\n' "$*" >> "${ZT_ARGV}"; cat > /dev/null
+case "$*" in *oauth/v2/token*) ;; *) echo '{"portals":[{"id":"777","name":"p"}]}'; exit 0 ;; esac
+n=$(cat "${ZT_COUNT}" 2>/dev/null || echo 0); echo $((n+1)) > "${ZT_COUNT}"
+if [ -n "${ZT_DENY:-}" ]; then echo '{"error":"Access Denied","error_description":"too many"}'; exit 0; fi
+echo "{\"access_token\":\"1000.tok$((n+1))\",\"token_type\":\"Bearer\",\"expires_in\":${ZT_TTL:-3600}}"
+STUB
+  chmod +x "${d}/bin/curl"
+  local SECRET="segredo-que-nao-pode-vazar-$$"
+  _zt() { PATH="${d}/bin:${PATH}" ZT_COUNT="${d}/n" ZT_ARGV="${d}/argv" ONION_ZOHO_TOKEN_CACHE_DIR="${d}/cache" \
+          ZOHO_CLIENT_ID=1000.cliente ZOHO_CLIENT_SECRET="${SECRET}" bash "${2:-${sut}}" ${1:+--scope "$1"}; }
+  local t1 t2 n
+  echo 0 > "${d}/n"; : > "${d}/argv"
+  t1="$(_zt '' 2>/dev/null)"; t2="$(_zt '' 2>/dev/null)"; n="$(cat "${d}/n")"
+  if [ "${n}" = 1 ] && [ -n "${t1}" ] && [ "${t1}" = "${t2}" ]; then
+    record_pass "zoho-token: (a) duas chamadas ⇒ UMA emissão, mesmo token (o Access Denied de 2026-10-07)"
+  else record_fail "zoho-token: (a) emitiu por chamada" "emissões=${n} t1=${t1} t2=${t2}"; fi
+
+  local f; f="$(ls "${d}/cache"/zoho-token-* 2>&1 | grep -v '\.lock$' | head -1)"
+  if [ -f "${f}" ] && [ "$(stat -c %a "${f}" 2>/dev/null || stat -f %Lp "${f}")" = 600 ]; then
+    record_pass "zoho-token: (c) o cache é 600"
+  else record_fail "zoho-token: (c) permissão do cache" "arquivo=${f} modo=$(stat -c %a "${f}" 2>&1)"; fi
+
+  printf '%s %s\n' "$(( $(date +%s) + 60 ))" "1000.velho" > "${f}"   # dentro da margem de 300 s
+  t2="$(_zt '' 2>/dev/null)"; n="$(cat "${d}/n")"
+  if [ "${n}" = 2 ] && [ "${t2}" != "1000.velho" ]; then
+    record_pass "zoho-token: (b) token a 60 s de expirar ⇒ renova (margem), não devolve o velho"
+  else record_fail "zoho-token: (b) não renovou" "emissões=${n} token=${t2}"; fi
+
+  _zt 'ZohoProjects.portals.READ' >/dev/null 2>&1; n="$(cat "${d}/n")"
+  if [ "${n}" = 3 ]; then record_pass "zoho-token: (f) escopo diferente ⇒ cache diferente (leitura não serve a escrita)"
+  else record_fail "zoho-token: (f)" "emissões=${n} (esperado 3)"; fi
+
+  local out rc; rm -f "${d}/cache"/zoho-token-*
+  rc=0; out="$(ZT_DENY=1 _zt '' 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'Access Denied' <<< "${out}" && ! grep -qF "${SECRET}" <<< "${out}" \
+     && [ -z "$(ls "${d}/cache"/zoho-token-* 2>/dev/null | grep -v '\.lock$')" ]; then
+    record_pass "zoho-token: (d) emissão recusada ⇒ rc=1 com o motivo, nada no cache, segredo fora da saída"
+  else record_fail "zoho-token: (d)" "rc=${rc} out=${out}"; fi
+
+  if ! grep -qF "${SECRET}" "${d}/argv"; then
+    record_pass "zoho-token: (e) o segredo nunca vai na linha de comando do curl (entrada padrão, -K -)"
+  else record_fail "zoho-token: (e) segredo no argv do curl" "$(cat "${d}/argv")"; fi
+
+  # (g) o CONSUMIDOR real: `env-check.sh --test zoho` passa pelo helper — dois testes, uma emissão.
+  local ec="${REPO_ROOT}/.claude/utils/task-manager/env-check.sh"
+  printf 'TASK_MANAGER_PROVIDER=zoho\nZOHO_CLIENT_ID=1000.cliente\nZOHO_CLIENT_SECRET=%s\nZOHO_PORTAL_ID=777\n' "${SECRET}" > "${d}/env.fixture"
+  echo 0 > "${d}/n"; rm -f "${d}/cache"/zoho-token-*
+  local o1 o2
+  o1="$(PATH="${d}/bin:${PATH}" ZT_COUNT="${d}/n" ZT_ARGV="${d}/argv" ONION_ZOHO_TOKEN_CACHE_DIR="${d}/cache" bash "${ec}" --env "${d}/env.fixture" --test zoho 2>&1)"
+  o2="$(PATH="${d}/bin:${PATH}" ZT_COUNT="${d}/n" ZT_ARGV="${d}/argv" ONION_ZOHO_TOKEN_CACHE_DIR="${d}/cache" bash "${ec}" --env "${d}/env.fixture" --test zoho 2>&1)"
+  n="$(cat "${d}/n")"
+  if [ "${n}" = 1 ] && grep -q 'conexão OK' <<< "${o1}" && grep -q 'conexão OK' <<< "${o2}" && ! grep -qF "${SECRET}" <<< "${o1}${o2}"; then
+    record_pass "zoho-token: (g) env-check --test zoho usa o helper — dois testes, UMA emissão, segredo fora da saída"
+  else record_fail "zoho-token: (g) env-check emite por conta própria" "emissões=${n} o1=${o1} o2=${o2}"; fi
+  rm -rf "${d}"; unset -f _zt
+}
+_family run_zoho_token_selftests
 # ── remeasure-hard.sh: o relatório do --update cita HARD MEDIDO, nunca lembrado (2026-10-07) ──────
 # (a) e (d) são as polaridades; (b) é o caso medido (o relatório disse 0 e havia 1); (c) é o fail-open
 # que o helper existe para não ter: lint QUEBRADO não é "0 HARD". MUTANTE: tirar o teste
