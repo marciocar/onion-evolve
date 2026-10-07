@@ -34,6 +34,22 @@ MEMBERS="${2:-$(cd "${HERE}/../../.." && pwd)/docs/evolution/federation/members.
 
 # Compara CAMINHO CANÔNICO, não string: `~/x`, `/home/u/x/` e `/home/u/./x` são o mesmo alvo, e um
 # registro correto não pode ser lido como ausente por causa de uma barra a mais.
+# O `local_path` é lido com YAML DE VERDADE. A 1ª versão usava uma regex ancorada no FIM da linha, e
+# comentário inline (`local_path: "/x"   # nota`) a fazia NÃO casar: medido em 2026-10-07, três membros
+# registrados (o hub mais antigo, um adotante de cliente e um hub recente) saíam "FORA DO REGISTRO" no
+# ops/audit-adopters-registry.sh. Mesma classe que a REGRA 92 (Papel da porta no registro concorda com
+# o CARIMBO dela) já curou no door-role-parity-check.sh: um TERCEIRO leitor do members.yaml, menos fiel
+# que o `yaml.safe_load` do members-validate.sh. Sem PyYAML, cai para uma regex que tira o comentário.
+_local_paths() {
+  python3 - "$1" 2>/dev/null <<'PY' && return 0
+import sys, yaml
+for m in (yaml.safe_load(open(sys.argv[1], encoding="utf-8")) or {}).get("members") or []:
+    if isinstance(m, dict) and m.get("local_path"):
+        print(str(m["local_path"]).strip())
+PY
+  sed -n 's/^[[:space:]]*local_path:[[:space:]]*//p' "$1" | sed 's/[[:space:]]#.*$//; s/^"//; s/"[[:space:]]*$//; s/[[:space:]]*$//'
+}
+
 _target="$(cd "${TARGET}" && pwd -P)"
 _found=""
 while IFS= read -r _lp; do
@@ -42,7 +58,7 @@ while IFS= read -r _lp; do
   [ -d "${_lp}" ] || continue
   _can="$(cd "${_lp}" 2>/dev/null && pwd -P)" || continue
   [ "${_can}" = "${_target}" ] && { _found=1; break; }
-done < <(sed -n 's/^[[:space:]]*local_path:[[:space:]]*"\{0,1\}\([^"]*\)"\{0,1\}[[:space:]]*$/\1/p' "${MEMBERS}")
+done < <(_local_paths "${MEMBERS}")
 
 if [ -n "${_found}" ]; then
   echo "✓ registro da federação: '${_target}' já está no members.yaml"
