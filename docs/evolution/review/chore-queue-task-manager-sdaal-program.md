@@ -2,7 +2,8 @@
 title: 'Resíduo — o programa do SDAAL completo do task manager entra na fila'
 date: 2026-10-07
 branch: chore/queue-task-manager-sdaal-program
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ef08d3c4dd1632cc8ae1128d497899e14485b982afed430c5ffa0bd913759c0a
+reviewed_code_sha256: 1e74177c7469fc8f4427784b9b0eec1a52b4973d1c507759da127494912b0dbc
 findings_total: 0
 findings_real: 0
 findings_fixed: 0

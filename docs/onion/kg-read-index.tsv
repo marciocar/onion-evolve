@@ -295,6 +295,7 @@
 .claude/utils/task-manager/adapters/clickup.md	E_CLICKUP_STATUS_POR_LIST_MEDIDO_AO_VIVO	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
 .claude/utils/task-manager/adapters/clickup.md	E_SDAAL_SEM_VAZAMENTO_DE_PROVIDER	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
 .claude/utils/task-manager/adapters/clickup.md	Q_CLICKUP_DELETE_PELO_MCP_NAO_MEDIDO	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
+.claude/utils/task-manager/adapters/zoho.md	E_TM_PERCENTUAL_IGNORA_STORY_POINTS	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/utils/task-manager/factory.md	C_D7_19	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/utils/task-manager/factory.md	E_J_D7_19	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/validation/	E_sem_gate_client_safe	docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml
