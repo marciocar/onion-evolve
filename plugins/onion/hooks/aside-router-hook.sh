@@ -30,6 +30,11 @@ ENGINE="${HERE}/../validation/aside-router.sh"
 
 route="$(printf '%s' "$prompt" | bash "$ENGINE" detect 2>/dev/null)" || route=""
 [ -n "$route" ] || exit 0   # sem marcador → silêncio (custo-zero)
+# APARTE + WORKFLOW NO MESMO TURNO (sinal de um adotante, 2026-10-07): o harness repassa a TODO agente de um
+# Workflow a ÚLTIMA mensagem do usuário no instante do disparo, mandando-a vencer a tarefa computada. Um aparte
+# respondido e seguido de `Workflow(...)` no mesmo turno virou o pedido de um run inteiro (4,59M tokens, nenhum
+# grafo). "Responda breve sem parar a tarefa" foi exatamente o que disparou o run — por isso o aviso vai junto.
+route="${route} ⚠️ Se um Workflow estava para ser disparado neste turno, dispare-o só no PRÓXIMO turno: o harness repassa esta mensagem a todo agente do run como o pedido que vence a tarefa."
 
 if command -v jq >/dev/null 2>&1; then
   jq -cn --arg ctx "$route" '{hookSpecificOutput:{hookEventName:"UserPromptSubmit",additionalContext:$ctx}}'

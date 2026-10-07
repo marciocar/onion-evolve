@@ -3240,6 +3240,11 @@ run_aside_router_hook_selftests() {
   local elsewhere; elsewhere="$(mktemp -d)"
   rc=0
   out="$(cd "${elsewhere}" && CLAUDE_PROJECT_DIR="${d}" bash "${d}/.claude/hooks/aside-router-hook.sh" <<<"${payload_marker}")" || rc=$?
+  # (w) o aparte roteado leva o aviso do Workflow (sinal 2026-10-07); a prosa sem marcador segue muda, e
+  #     isso já é cobrado pelos casos de silêncio abaixo. MUTANTE: tirar a linha `route="${route} ⚠️…"`.
+  if grep -q 'dispare-o só no PRÓXIMO turno' <<< "${out}"; then
+    record_pass "aside-router-hook: (w) aparte roteado avisa para não disparar Workflow no mesmo turno"
+  else record_fail "aside-router-hook: (w)" "o aviso do Workflow sumiu: ${out:0:200}"; fi
   if [ "${rc}" -eq 0 ] && grep -q '"hookEventName":"UserPromptSubmit"' <<< "${out}" \
      && grep -q 'APARTE dúvida' <<< "${out}"; then
     record_pass "aside-router-hook: marcador tipado + cwd neutro → resolve via CLAUDE_PROJECT_DIR, rota certa"
@@ -4811,6 +4816,22 @@ run_vendor_branch_selftests() {
     record_pass "vendor-branch: update limpo aplica framework + preserva produto"
   else record_fail "vendor-branch: update limpo" "v2 não aplicado ou produto perdido"; fi
 
+  # (b2) o commit de MERGE leva a assinatura do ADOTANTE (2026-10-07: o durable-commit assinava desde o
+  #      #943 e este seguia sem trailer). MUTANTE: tirar o `-m "${_sig}"` do merge reprova este caso.
+  local cs ts; cs="$(mktemp -d)/c"; ts="$(mktemp -d)/a"; _vb_core "$cs" 1; _vb_adopter "$ts" "$cs"
+  mkdir -p "$ts/.claude"; printf '{"attribution":{"commit":"Assinado-pelo-adotante-de-teste"}}\n' > "$ts/.claude/settings.json"
+  git -C "$ts" add -A; git -C "$ts" commit -qm "settings do adotante"
+  local ibs; ibs="$(git -C "$ts" rev-parse --abbrev-ref HEAD)"
+  bash "${helper}" seed "$ts" "$ibs" >/dev/null 2>&1
+  # produto ANDA depois do seed: sem isto o merge é fast-forward e o HEAD é o commit da VENDOR (que o
+  # durable-commit já assina) — o caso passaria com a cura revertida (mutante que não mordia, medido).
+  printf 'produto v2\n' > "$ts/src/app.js"; git -C "$ts" commit -qam "produto anda"
+  _vb_core "$cs" 2
+  bash "${helper}" update "$ts" "$cs" "$(git -C "$cs" rev-parse --short=12 HEAD)" "$ibs" >/dev/null 2>&1
+  if grep -q 'Assinado-pelo-adotante-de-teste' <<< "$(git -C "$ts" log -1 --format=%B)"; then
+    record_pass "vendor-branch: (b2) o commit de MERGE do framework (não fast-forward) sai com a assinatura do ADOTANTE"
+  else record_fail "vendor-branch: (b2)" "merge sem a assinatura do adotante: $(git -C "$ts" log -1 --format=%s)"; fi
+
   # (c) CONFLITO — o teste-chave
   printf 'cmd v2 CUSTOMIZADO\n' > "$t/.claude/commands/foo.md"; git -C "$t" add -A; git -C "$t" commit -qm custom
   _vb_core "$core" 3
@@ -5134,8 +5155,8 @@ run_compose_settings_selftests() {
 _research_primaries_anchoring_form() {
   local f="$1" ler anc
   grep -qF "if (MODE === 'primaries') {" "${f}" || { echo "sem o bloco do modo primaries"; return 1; }
-  ler="$(awk 'index($0,"label: \047ler:\047") && index($0,"phase: \047Leitura\047") && index($0,"schema: READ_SCHEMA") && /agent\(/ {print NR; exit}' "${f}" || true)"
-  anc="$(awk 'index($0,"label: \047ancorar:\047") && index($0,"phase: \047Ancoragem\047") && index($0,"schema: ANCHOR_SCHEMA") && /agent\(/ {print NR; exit}' "${f}" || true)"
+  ler="$(awk 'index($0,"label: \047ler:\047") && index($0,"phase: \047Leitura\047") && index($0,"schema: READ_SCHEMA") && /(^|[^A-Za-z_.$])(agent|ag)\(/ {print NR; exit}' "${f}" || true)"
+  anc="$(awk 'index($0,"label: \047ancorar:\047") && index($0,"phase: \047Ancoragem\047") && index($0,"schema: ANCHOR_SCHEMA") && /(^|[^A-Za-z_.$])(agent|ag)\(/ {print NR; exit}' "${f}" || true)"
   [ -n "${ler}" ] || { echo "sem chamada agent() de LEITOR (label ler:, phase Leitura, schema READ_SCHEMA)"; return 1; }
   [ -n "${anc}" ] || { echo "sem chamada agent() de ANCORADOR (label ancorar:, phase Ancoragem, schema ANCHOR_SCHEMA)"; return 1; }
   [ "${ler}" != "${anc}" ] || { echo "leitor e ancorador na MESMA chamada agent() (linha ${anc}) — não são agentes separados"; return 1; }
@@ -5434,7 +5455,7 @@ run_research_workflow_selftests() {
   local dm why1 why2
   dm="$(mktemp -d)"
   grep -vF "phase: 'Ancoragem'" "${wf}" > "${dm}/m1.js" || true
-  sed "s/agent(ANCHOR_PROMPT(s, r), {/__inline_anchor({/" "${wf}" > "${dm}/m2.js"
+  sed "s/ag(ANCHOR_PROMPT(s, r), {/__inline_anchor({/" "${wf}" > "${dm}/m2.js"
   if why1="$(_research_primaries_anchoring_form "${dm}/m1.js")"; then
     record_fail "research-workflow: (l1)" "MUTANTE que REMOVE a fase de ancoragem PASSOU no predicado (k) — a guarda não mede nada"
   else record_pass "research-workflow: (l1) mutante que REMOVE a ancoragem reprova em (k): ${why1}"; fi
@@ -22900,6 +22921,35 @@ run_member_registered_selftests() {
   rm -rf "${d}"
 }
 _family run_member_registered_selftests
+# ── remeasure-hard.sh: o relatório do --update cita HARD MEDIDO, nunca lembrado (2026-10-07) ──────
+# (a) e (d) são as polaridades; (b) é o caso medido (o relatório disse 0 e havia 1); (c) é o fail-open
+# que o helper existe para não ter: lint QUEBRADO não é "0 HARD". MUTANTE: tirar o teste
+# `lint_rc≠0 && n=0` reprova (c).
+run_remeasure_hard_selftests() {
+  local sut="${REPO_ROOT}/.claude/utils/adopt/remeasure-hard.sh"
+  if [ ! -f "${sut}" ]; then record_fail "remeasure-hard" "SUT ausente: ${sut}"; return; fi
+  local d rc out; d="$(mktemp -d)"
+  _rh_lint() { mkdir -p "${d}/$1/.claude/validation"; printf '#!/usr/bin/env bash\n# ONION_LINT_HARD_FILE\n%s\n' "$2" > "${d}/$1/.claude/validation/lint-artifacts.sh"; }
+  mkdir -p "${d}/sem-lint"
+  rc=0; bash "${sut}" "${d}/sem-lint" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 3 ]; then record_pass "remeasure-hard: (a) alvo sem lint → rc=3 (NÃO MEDIDO, nunca 0)"
+  else record_fail "remeasure-hard: (a)" "alvo sem lint saiu rc=${rc}"; fi
+  _rh_lint um-hard 'echo "VIOLATION: x.md: REGRA 8 (teste)" >> "${ONION_LINT_HARD_FILE}"; exit 1'
+  rc=0; out="$(bash "${sut}" "${d}/um-hard" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 1 ] && grep -q 'HARD medido: 1' <<< "${out}" && grep -q 'REGRA 8' <<< "${out}"; then
+    record_pass "remeasure-hard: (b) 1 HARD no alvo → rc=1 e a violação NOMEADA (o '0 HARD' declarado de 2026-09-30)"
+  else record_fail "remeasure-hard: (b)" "rc=${rc}: ${out}"; fi
+  _rh_lint quebrado 'exit 2'
+  rc=0; bash "${sut}" "${d}/quebrado" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 3 ]; then record_pass "remeasure-hard: (c) lint QUEBRADO sem violação nomeada → rc=3, não '0 HARD'"
+  else record_fail "remeasure-hard: (c)" "lint quebrado saiu rc=${rc} (fail-open)"; fi
+  _rh_lint limpo 'exit 0'
+  rc=0; out="$(bash "${sut}" "${d}/limpo" 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'HARD medido: 0' <<< "${out}"; then record_pass "remeasure-hard: (d) alvo limpo → rc=0 e 'HARD medido: 0'"
+  else record_fail "remeasure-hard: (d)" "rc=${rc}: ${out}"; fi
+  rm -rf "${d}"
+}
+_family run_remeasure_hard_selftests
 
 # ── REGRA 89: a divida de Aufhebung, e as SEIS evasoes que uma passada adversarial provou ─────
 # POR QUE EXISTE (2026-09-23): a 1a versao desta guarda varria so os `kg:` das baselines — a

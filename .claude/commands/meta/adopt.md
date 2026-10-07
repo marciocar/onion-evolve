@@ -784,8 +784,8 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   Em caso de conflito de merge (exit 10 acima), este passo roda **após** o maestro resolver e commitar o merge.
 - **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
   (`DEST="$TARGET"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`). Reusa o `diff --stat` já computado
-  acima. **Fecha o gap real:** sem isto, o relatório do update sai só no chat da fonte e o maestro tem que
-  repassá-lo à mão para a sessão do alvo (`docs/evolution/inbox/2026-06-19-flow-a-report-and-bidirectional-mail.md`).
+  acima. **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
+  `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-hard.sh" "$TARGET"` (o merge muda o que o lint vê; rc=3 = escreva NÃO MEDIDO).
 - **Tie com a federação:** o `source_commit` do stamp **é** a versão de cada membro (member-version
   awareness — [multi-repo-federation.md](../../../docs/knowledge-base/concepts/multi-repo-federation.md)).
 
