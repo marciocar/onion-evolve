@@ -22346,6 +22346,35 @@ run_hook_regen_table_selftests() {
     record_pass "hook-regen: (b) a tabela roda ANTES do re-carimbo do SHA da REGRA 56 (l.${l_tab} < l.${l_sha})"
   else record_fail "hook-regen: (b)" "tabela (l.${l_tab:-?}) não precede o carimbo (l.${l_sha:-?}) — o hash nasceria caduco"; fi
 
+  # (r56) NÃO LAVA RESÍDUO (2026-10-06): o pre-commit recarimbava o hash da REGRA 56 sem conferir o código
+  #       revisado — código mudado depois da revisão saía carimbado. Por EXECUÇÃO, sourçando a lib real:
+  #       pendente ⇒ carimba os dois; código igual ⇒ só o diff; código MUDADO ⇒ não toca (rc 1).
+  local _rw; _rw="$(mktemp -d)"
+  (
+    set -uo pipefail
+    cd "${_rw}" && git init -q -b main && git config user.email t@t && git config user.name t
+    echo base > a.txt && git add a.txt && git commit -qm base && git update-ref refs/remotes/origin/main HEAD
+    git checkout -qb pr && echo v1 > a.txt && mkdir -p docs/evolution/review
+    printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > docs/evolution/review/pr.md
+    git add -A
+    # shellcheck source=/dev/null
+    . "${REPO_ROOT}/.claude/validation/onion-regen-lib.sh"
+    R=docs/evolution/review/pr.md
+    onion_r56_restamp "$R" "$R" "$(printf '%064d' 1)" >/dev/null || { echo "FALHA pendente-rc"; exit 0; }
+    c1="$(sed -n 's/^reviewed_code_sha256: //p' "$R")"
+    grep -q "^reviewed_diff_sha256: $(printf '%064d' 1)$" "$R" && [ -n "${c1}" ] || { echo "FALHA pendente-carimbo"; exit 0; }
+    onion_r56_restamp "$R" "$R" "$(printf '%064d' 2)" >/dev/null || { echo "FALHA igual-rc"; exit 0; }
+    grep -q "^reviewed_diff_sha256: $(printf '%064d' 2)$" "$R" || { echo "FALHA igual-carimbo"; exit 0; }
+    echo v2 > a.txt && git add a.txt
+    if onion_r56_restamp "$R" "$R" "$(printf '%064d' 3)" >/dev/null; then echo "FALHA mudado-lavou"; exit 0; fi
+    grep -q "^reviewed_diff_sha256: $(printf '%064d' 2)$" "$R" || { echo "FALHA mudado-tocou"; exit 0; }
+    echo OK
+  ) > "${_rw}/out" 2>&1
+  if [ "$(tail -1 "${_rw}/out")" = OK ]; then
+    record_pass "hook-regen: (r56) recarimbo só do que a revisão viu — pendente carimba os dois, código igual só o diff, código mudado não toca"
+  else record_fail "hook-regen: (r56) o recarimbo lava resíduo" "$(tail -1 "${_rw}/out")"; fi
+  rm -rf "${_rw}"
+
   # ── COMPORTAMENTO do motor, por EXECUÇÃO: extrai `_onion_regen` e exercita as 3 polaridades.
   #    A bancada copia as OPÇÕES DE SHELL do runner ([[bancada-espelha-o-runner]]).
   local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN

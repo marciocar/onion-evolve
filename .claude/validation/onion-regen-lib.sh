@@ -62,3 +62,50 @@ onion_staged() {
   fi
   printf '%s' "${_out%%$'\n'*}"
 }
+
+# ── A IDENTIDADE DO CÓDIGO REVISADO (2026-10-06) ────────────────────────────────────────────────────
+# FONTE ÚNICA, usada pelo ops/pr-finalize.sh E pelo pre-commit. Antes ela vivia só no motor, e o
+# pre-commit recarimbava o resíduo da REGRA 56 (PR aberto carrega RESÍDUO da passada adversarial)
+# SEM conferi-la: código mudado depois da revisão saía com carimbo de revisado — o B1 que o motor
+# curou seguia vivo no hook (provado em sandbox pela avaliação do pr-finalize).
+# shellcheck disable=SC2034
+ONION_GENERATED="docs/onion/inventory.md docs/onion/graph.md docs/onion/testing-state.md docs/onion/testing-inventory.md docs/onion/kg-read-index.tsv docs/onion/federation-console.html docs/backlog.md .claude/validation/lint-rules.md"
+
+# onion_codehash <resíduo> → patch-id estável do diff STAGEADO contra a base, sem o resíduo e sem as
+# projeções geradas. `git patch-id --stable`: estável sob rebase limpo, muda quando o hunk muda.
+onion_codehash() {
+  local res="$1" base ex g
+  base="$(git merge-base origin/main HEAD 2>/dev/null || git merge-base main HEAD 2>/dev/null)" \
+    || { echo "onion_codehash: sem merge-base com origin/main nem main" >&2; return 1; }
+  ex=(":(exclude)${res}")
+  for g in ${ONION_GENERATED}; do ex+=(":(exclude)${g}"); done
+  git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color --cached "${base}" -- . "${ex[@]}" \
+    | git patch-id --stable | sort | sha256sum | cut -c1-64
+}
+
+# onion_r56_restamp <caminho do resíduo> <caminho relativo ao repo> <sha do diff> → rc 0 = recarimbou
+# (o chamador STAGEIA), rc 1 = NÃO recarimbou (avisa por quê no stdout). Só recarimba o que a revisão VIU:
+#   · `pendente`  → a declaração de quem revisou: carimba o diff E o código;
+#   · hash de código IGUAL ao revisado → o caso legítimo (o auto-fix mexeu só em projeções): só o diff;
+#   · qualquer outra coisa (código mudado, ou resíduo sem reviewed_code_sha256) → NÃO toca.
+onion_r56_restamp() {
+  local f="$1" rel="$2" sha="$3" decl rcode code
+  decl="$(sed -n 's/^reviewed_diff_sha256:[[:space:]]*//p' "${f}" | head -1 | tr -d '"')"
+  rcode="$(sed -n 's/^reviewed_code_sha256:[[:space:]]*//p' "${f}" | head -1 | tr -d '"')"
+  if ! code="$(onion_codehash "${rel}")" || [ -z "${code}" ]; then
+    echo "⚠️  ${rel}: hash de código indisponível — NÃO recarimbo (a REGRA 56 decide)"; return 1
+  fi
+  if [ "${decl}" = pendente ]; then
+    LC_ALL=C sed -i "s|^reviewed_diff_sha256: .*|reviewed_diff_sha256: ${sha}|" "${f}"
+    if LC_ALL=C grep -q '^reviewed_code_sha256:' "${f}"; then
+      LC_ALL=C sed -i "s|^reviewed_code_sha256: .*|reviewed_code_sha256: ${code}|" "${f}"
+    else LC_ALL=C sed -i "/^reviewed_diff_sha256:/a reviewed_code_sha256: ${code}" "${f}"; fi
+    return 0
+  fi
+  if [ -n "${rcode}" ] && [ "${rcode}" = "${code}" ]; then
+    LC_ALL=C sed -i "s|^reviewed_diff_sha256: .*|reviewed_diff_sha256: ${sha}|" "${f}"
+    return 0
+  fi
+  echo "⚠️  ${rel}: o CÓDIGO mudou depois da revisão (ou o resíduo não tem reviewed_code_sha256) — NÃO recarimbo; re-revise e ponha 'reviewed_diff_sha256: pendente'"
+  return 1
+}

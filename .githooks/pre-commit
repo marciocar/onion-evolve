@@ -222,8 +222,11 @@ if [ -n "${_RES_STAGED}" ]; then
       [ -f "${REPO_ROOT}/${_r56_f}" ] || continue
       LC_ALL=C grep -q '^reviewed_diff_sha256:' "${REPO_ROOT}/${_r56_f}" || continue
       LC_ALL=C grep -q "^reviewed_diff_sha256: ${_r56_sha}$" "${REPO_ROOT}/${_r56_f}" && continue
-      LC_ALL=C sed -i "s|^reviewed_diff_sha256: .*|reviewed_diff_sha256: ${_r56_sha}|" "${REPO_ROOT}/${_r56_f}"
-      git add "${REPO_ROOT}/${_r56_f}" && echo "🔁 hash da REGRA 56 re-carimbado em ${_r56_f} (o auto-fix mexeu no diff depois do carimbo)"
+      # NÃO LAVA RESÍDUO (2026-10-06): a decisão mora na lib (onion_r56_restamp), testada por execução na
+      # bancada; o hash da REGRA 56 só é recarimbado quando a revisão VIU o código que vai no commit.
+      if onion_r56_restamp "${REPO_ROOT}/${_r56_f}" "${_r56_f}" "${_r56_sha}"; then
+        git add "${REPO_ROOT}/${_r56_f}" && echo "🔁 hash da REGRA 56 re-carimbado em ${_r56_f} (o auto-fix mexeu só em projeções, ou a revisão é nova)"
+      fi
     done
   fi
 fi
