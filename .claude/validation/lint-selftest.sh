@@ -4505,7 +4505,10 @@ run_durable_commit_selftests() {
   # (f) ASSINATURA do adotante no commit (2026-10-06): attribution.commit do settings.json DELE
   _dc_setup
   mkdir -p "${d}/.claude"; printf '{"attribution":{"commit":"Assinado pelo adotante X"}}\n' > "${d}/.claude/settings.json"
-  bash "${helper}" "${d}" update NEW999 chore/onion-update-NEW999 >/dev/null 2>&1
+  # identidade NA CHAMADA: este caso roda depois do `unset` da família, e o CI não tem identidade git global
+  # (o 1º push abortou a faixa 4 com "empty ident name"; local passava pela identidade global da máquina)
+  GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test \
+    bash "${helper}" "${d}" update NEW999 chore/onion-update-NEW999 >/dev/null 2>&1
   local _body; _body="$(git -C "${d}" log -1 --format=%B)"
   if grep -qxF 'Assinado pelo adotante X' <<< "${_body}"; then
     record_pass "durable-commit: (f) o commit de adoção leva a assinatura do PRÓPRIO adotante"
