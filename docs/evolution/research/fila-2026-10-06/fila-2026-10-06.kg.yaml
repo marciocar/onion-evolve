@@ -10,7 +10,7 @@ meta:
   baseline: 2026-10-06
   review_after: 2026-11-05   # 30d: fila de trabalho; cada item fecha ao virar PR ou ao ser descartado
   # ═══ TETO: 30 NÓS ═══
-  #   24 em 2026-10-07, noite (+E_PR_FINALIZE_ATRITO_MEDIDO): colhidos os 5 `done` e as 4 evidências que só os sustentavam (a
+  #   26 em 2026-10-07, noite (+E_PR_FINALIZE_ATRITO_MEDIDO, +programa do SDAAL do task manager): colhidos os 5 `done` e as 4 evidências que só os sustentavam (a
   #   história fica no git e nos resíduos); entraram E_/Q_PRECOMMIT_SELECAO. Teto segue 30.
 nodes:
   # ── evidências medidas hoje ──────────────────────────────────────────────────────────────────
@@ -257,6 +257,26 @@ nodes:
     verified_against: "fechamento do #955 (3 rodadas do ops/pr-finalize.sh --push) e as rodadas do #949-#954 no mesmo dia"
     trace: "ops/pr-finalize.sh"
     label: "pr-finalize em 4 atritos: run que falha deixa o resíduo carimbado (limpeza manual 3x no dia); o commit de projeções religa o pre-commit pulado (lint 2x por rodada); a violação HARD não sai na saída final; não há --check sem escrita"
+  - id: E_TM_PERCENTUAL_IGNORA_STORY_POINTS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "zoho.md:311 (% proporcional à contagem de fases do plan.md, pós-#956); grep story.point em .claude/utils/task-manager/ só acha clickup.md; nenhum % de task-mãe calculado"
+    trace: ".claude/utils/task-manager/adapters/zoho.md"
+    label: "o % de progresso pesa todas as fases igual e ignora os story points; a task-mãe não tem % calculado em nenhum adapter"
+  - id: Q_TASK_MANAGER_SDAAL_COMPLETO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_against: "nota do maestro 2026-10-07: forjar o SDAAL do Task Manager por inteiro, incremental, com plano gerido num task manager"
+    label: "programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, busca, relatórios, toggles e triggers, story points, owner e responsável, testes, start e due date); cada adapter declara mínimo, obrigatório, implementado e não implementado por versão; maquinaria de criar, validar e atualizar adapter (forja, wizard, onboarding); inclui o % da task-mãe por story points. Pesquisa primeiro, entrega em ondas"
 edges:
   - from: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA
     to: Q_PR_FINALIZE_MELHORIAS
@@ -299,4 +319,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_PR_FINALIZE_ATRITO_MEDIDO
     to: Q_PR_FINALIZE_MELHORIAS
+    edge_type: SUPPORTS
+  - from: E_TM_PERCENTUAL_IGNORA_STORY_POINTS
+    to: Q_TASK_MANAGER_SDAAL_COMPLETO
     edge_type: SUPPORTS
