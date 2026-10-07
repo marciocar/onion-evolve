@@ -179,6 +179,25 @@ _restamp() {  # carimba o resíduo e o STAGEIA, sem commitar. Com o índice sujo
   git add -- "${RES}"
 }
 
+# 0. PRÉ-VOO sob checkpoint (2026-10-07): o checkpoint deixava a bancada inteira para o CI, e três PRs num dia
+#    quebraram lá por casos NOVOS que passavam local. Roda as famílias que o diff ALTEROU por dentro (+ a catraca
+#    estática `| grep -q`) num ambiente que IMITA o runner: git sem identidade adivinhada (user.useConfigOnly —
+#    o "empty ident name" do CI que a máquina local mascarava com o nome do usuário do sistema), HOME limpo,
+#    LC_ALL=C e sem as variáveis ONION_*. Não substitui o CI: corta as quebras baratas antes de pagar 17 min.
+if [ "${ONION_FINALIZE_CHECKPOINT:-0}" = 1 ] && [ "${ONION_FINALIZE_SKIP_PREFLIGHT:-0}" != 1 ] && [ -f ops/testing/preflight-families.sh ]; then
+  _pf_fams="$(bash ops/testing/preflight-families.sh)" || die "pré-voo: não descobri as famílias alteradas"
+  _pf_home="$(mktemp -d)"; printf '[user]\n\tuseConfigOnly = true\n' > "${_pf_home}/.gitconfig"
+  echo "PR-FINALIZE: pré-voo no ambiente do runner — famílias: ${_pf_fams}"
+  _pf_out="$(env -i PATH="${PATH}" HOME="${_pf_home}" GIT_CONFIG_NOSYSTEM=1 LC_ALL=C TERM=dumb \
+    bash .claude/validation/lint-selftest.sh --families "${_pf_fams}" 2>&1)"; _pf_rc=$?
+  rm -rf "${_pf_home}"
+  if [ "${_pf_rc}" != 0 ] || grep -q 'ABORTOU' <<< "${_pf_out}"; then
+    grep -E '  ✗ |ABORTOU' <<< "${_pf_out}" | head -12 >&2
+    die "pré-voo reprovou no ambiente do runner (rc=${_pf_rc}) — nada commitado; o CI quebraria igual"
+  fi
+  echo "PR-FINALIZE: pré-voo verde ($(grep -oE 'Passaram : [0-9]+' <<< "${_pf_out}" | tail -1))"
+fi
+
 # 1. conteúdo stageado + projeções + resíduo carimbado sobre esse mesmo índice → UM commit
 _regen
 _restamp
