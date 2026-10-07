@@ -2,7 +2,7 @@
 title: 'Resíduo — papel no registro e no carimbo são duas dimensões; a REGRA 92 julga o adotante por compatibilidade'
 date: 2026-10-07
 branch: fix/role-dimensions
-reviewed_diff_sha256: 498db9da8c912026aa580998bfe9677fffec63dfe6b43a83edbe1e395b6bce96
+reviewed_diff_sha256: 81f7be2f01b9d49ee033874d0ace4ada9ad37e60220c7bd58532b7ab10dcc381
 reviewed_code_sha256: 1db5e77e83ebeb8cb0e9a4ae8ebbe40ea396bceddeec1485bcab25be657dd8b5
 findings_total: 6
 findings_real: 6
