@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**392 itens abertos** em 80 grafo(s) com aberto (de 106 no escopo) · 81 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**391 itens abertos** em 80 grafo(s) com aberto (de 106 no escopo) · 81 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -611,13 +611,12 @@
 | 9.6 | `Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA` | federation-health-2026-07 | AS DUAS OPCOES PARA O `onion-standalone`, agora com custo MEDIDO em vez de suposto. (A) RE-MATERIALIZAR — ~1 min de maquina no t |
 | 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETE |
 
-## fila-2026-10-06 — 13 item(ns)
+## fila-2026-10-06 — 12 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 9.6 | `Q_KG_SCHEMA_FORMAL` | fila-2026-10-06 | JSON Schema como contrato único do .kg.yaml; antes, medir quantos grafos passariam num schema estrito |
 | 7.0 | `Q_ONION_KG_SSOT_REPO` | fila-2026-10-06 | criar e adotar o onion-kg-ssot: produto independente, dogfood nos dois sentidos, contextos próprios, core lido por caminho ou git |
-| 6.4 | `Q_PRECOMMIT_NAO_LAVA_RESIDUO` | fila-2026-10-06 | fechar o recarimbo do pre-commit com a mesma proteção do motor (só recarimba se reviewed_code_sha256 casar) |
 | 5.4 | `Q_ROTULO_SEPARADO_DA_NARRATIVA` | fila-2026-10-06 | separar o rótulo factual da narrativa num campo próprio do nó |
 | 4.2 | `Q_MERGE_GATE_AVISA_NO_ADOTANTE` | fila-2026-10-06 | a trava de merge deve avisar no adotante em vez de sair calada |
 | 4.2 | `Q_PR_FINALIZE_MELHORIAS` | fila-2026-10-06 | pr-finalize: imprimir as violações ao reprovar, registrar etapa e rc com trap, catracas estáticas no checkpoint, rebase com ín |
