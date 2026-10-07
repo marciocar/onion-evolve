@@ -10,21 +10,10 @@ meta:
   baseline: 2026-10-06
   review_after: 2026-11-05   # 30d: fila de trabalho; cada item fecha ao virar PR ou ao ser descartado
   # ═══ TETO: 30 NÓS ═══
-  #   30 em 2026-10-07 (13 evidências + 1 decisão + 16 compromissos). NO TETO: o próximo nó pede
-  #   triagem antes (fechar e arquivar os `done`), não mais nós.
+  #   23 em 2026-10-07, noite: colhidos os 5 `done` e as 4 evidências que só os sustentavam (a
+  #   história fica no git e nos resíduos); entraram E_/Q_PRECOMMIT_SELECAO. Teto segue 30.
 nodes:
   # ── evidências medidas hoje ──────────────────────────────────────────────────────────────────
-  - id: E_PRECOMMIT_RECARIMBA_RESIDUO
-    node_type: evidence
-    layer: audit
-    plane: DEV
-    status: confirmed
-    impact: 4
-    confidence: 0.85
-    verified_at: 2026-10-06
-    verified_against: ".githooks/pre-commit l.215-229 num sandbox git"
-    trace: ".githooks/pre-commit"
-    label: "o pre-commit recarimba reviewed_diff_sha256 sem conferir reviewed_code_sha256 (o B1 que o pr-finalize curou segue vivo no hook)"
   - id: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA
     node_type: evidence
     layer: audit
@@ -58,39 +47,6 @@ nodes:
     verified_against: "lint-selftest.sh --affected .claude/utils/adopt/merge-onion-hooks.sh --dry-run"
     trace: ".claude/validation/lint-selftest.sh"
     label: "merge-onion-hooks.sh não é citado por nenhuma família da bancada, e mexer nele cai no failsafe das 217 famílias"
-  - id: E_ADOPT_SEM_GITIGNORE_DE_SEGREDOS
-    node_type: evidence
-    layer: audit
-    plane: DEV
-    status: confirmed
-    impact: 4
-    confidence: 0.85
-    verified_at: 2026-10-06
-    verified_against: "revisão adversarial da adoção do onion-curation (docs/evolution/review/onion-adopt.md lá)"
-    trace: ".claude/commands/meta/adopt.md"
-    label: "o /meta:adopt não gera .gitignore de segredos; nada impede commitar um .env no adotante (onion-curation e onion-slm)"
-  - id: E_DURABLE_COMMIT_SEM_ASSINATURA
-    node_type: evidence
-    layer: audit
-    plane: DEV
-    status: confirmed
-    impact: 2
-    confidence: 0.85
-    verified_at: 2026-10-06
-    verified_against: "commit de adoção do onion-curation (amend manual)"
-    trace: ".claude/utils/adopt/durable-commit.sh"
-    label: "o durable-commit.sh não escreve a assinatura da família no commit de adoção"
-  - id: E_CI_TEMPLATE_IGNORA_GITHOOKS
-    node_type: evidence
-    layer: audit
-    plane: DEV
-    status: confirmed
-    impact: 2
-    confidence: 0.8
-    verified_at: 2026-10-06
-    verified_against: "revisão adversarial da adoção do onion-curation"
-    trace: ".claude/utils/adopt/ci-workflow-onion.tpl"
-    label: "o template de CI do adotante não dispara em mudança de .githooks/**"
   - id: E_DOIS_LEITORES_DIVERGIAM
     node_type: evidence
     layer: audit
@@ -157,16 +113,6 @@ nodes:
     trace: ".claude/utils/adopt/vendor-manifest.sh"
     label: "a skill onion-publish, que é só do core, pode ter viajado para o adotante (hipótese)"
   # ── a fila: compromissos abertos, um por item aprovado ───────────────────────────────────────
-  - id: Q_PRECOMMIT_NAO_LAVA_RESIDUO
-    node_type: question
-    layer: audit
-    plane: DEV
-    status: done
-    impact: 4
-    confidence: 0.9
-    verified_at: 2026-10-07
-    verified_against: "bancada hook_regen_table (r56): pendente carimba os dois, código igual só o diff, código mudado não toca; mutante morde"
-    label: "fechar o recarimbo do pre-commit com a mesma proteção do motor (só recarimba se reviewed_code_sha256 casar)"
   - id: Q_PR_FINALIZE_MELHORIAS
     node_type: question
     layer: audit
@@ -176,16 +122,6 @@ nodes:
     confidence: 0.7
     verified_against: "ops/pr-finalize.sh"
     label: "pr-finalize: imprimir as violações ao reprovar, registrar etapa e rc com trap, catracas estáticas no checkpoint, rebase com índice sujo"
-  - id: Q_HOOK_LER_RESIDUO_DA_BRANCH_DO_PR
-    node_type: question
-    layer: audit
-    plane: DEV
-    status: done
-    impact: 2
-    confidence: 0.9
-    verified_at: 2026-10-07
-    verified_against: "PR #948: bancada empty_result_guard (s)(t)(u) com mutantes; ao vivo, o #949 abriu de worktree sem o aviso falso"
-    label: "o aviso de PR sem passada adversarial deve ler o resíduo da branch do PR, não do checkout principal"
   - id: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
     node_type: question
     layer: audit
@@ -195,16 +131,6 @@ nodes:
     confidence: 0.8
     verified_against: ".claude/validation/lint-selftest.sh"
     label: "nomear merge-onion-hooks.sh no corpo da família que o exercita, para o mapa da bancada o reivindicar"
-  - id: Q_ADOPT_TRES_DEFEITOS
-    node_type: question
-    layer: audit
-    plane: DEV
-    status: done
-    impact: 4
-    confidence: 0.9
-    verified_at: 2026-10-07
-    verified_against: "bancada secret_gitignore (a-g) + durable_commit (f); 3 mutantes mordem"
-    label: "adopt: gerar .gitignore de segredos, assinar o commit de adoção e disparar o CI em .githooks/**"
   - id: Q_KG_SCHEMA_FORMAL
     node_type: question
     layer: audit
@@ -232,16 +158,6 @@ nodes:
     confidence: 0.5
     verified_against: "docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml"
     label: "revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros"
-  - id: Q_ONION_KG_SSOT_REPO
-    node_type: question
-    layer: audit
-    plane: DEV
-    status: done
-    impact: 5
-    confidence: 0.9
-    verified_at: 2026-10-07
-    verified_against: "repo adotado (pin fe8359e38b43, 2026-10-06) e registrado (8397810b); --update para d82ca211bea0 em 2026-10-07 com merge limpo da vendor; já devolveu 2 sinais medidos ao core"
-    label: "criar e adotar o onion-kg-ssot: produto independente, dogfood nos dois sentidos, contextos próprios, core lido por caminho ou git"
   - id: Q_MU07_TIPO_DE_NO_TROCADO
     node_type: question
     layer: audit
@@ -299,16 +215,6 @@ nodes:
     confidence: 0.4
     verified_against: "sinal do onion-kg-ssot 2026-10-07, opção (a); aviso pós-ato curado no #948"
     label: "GATED — vetar no PreToolUse o gh pr create sem resíduo? Reabre só se o aviso pós-ato do #948 deixar passar PR sem resíduo; antes de forjar, medir a taxa de falso positivo (PR draft, exploratório)"
-  - id: Q_TABELA_DE_TEMPOS_NO_MAPA
-    node_type: question
-    layer: audit
-    plane: DEV
-    status: done
-    impact: 2
-    confidence: 0.9
-    verified_at: 2026-10-07
-    verified_against: "bancada shard_plan (g): tabela versionada legível (217 famílias); --map liga shard_plan à tabela; mutante (TAB→espaço numa linha de dados) reprova"
-    label: "mudar ops/testing/selftest-family-times.tsv caía no failsafe da bancada inteira (219 famílias) porque nenhuma família citava a tabela"
   - id: Q_GRANAAI_CLONE_SEM_CARIMBO
     node_type: question
     layer: audit
@@ -319,27 +225,33 @@ nodes:
     verified_at: 2026-10-07
     verified_against: "door-role-parity-check.sh sobre o vivo ([adotante/CARIMBO-AUSENTE] em /home/marcio/granaai) + resposta do maestro 2026-10-07: o projeto granaai foi abandonado, o trabalho vive no brain-granaai"
     label: "aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o validador não tem status de membro aposentado"
+  # ── 2026-10-07, noite: seleção do pre-commit (pedido do maestro) ─────────────────────────────
+  - id: E_PRECOMMIT_SELECAO_GROSSA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "lint-selftest.sh --affected <arquivo> --dry-run em origin/main 33d4067a: lint-selftest.sh → TODAS (failsafe); docs/README.md → 14; kg-grammar.md → 14; pr-merge-verified.sh → 16; as 14 de docs/README.md estão nas três seleções"
+    trace: ".claude/validation/lint-selftest.sh"
+    label: "a seleção do pre-commit é grossa: tocar a própria bancada roda tudo, e um núcleo fixo de 14 famílias entra em qualquer commit"
+  - id: Q_PRECOMMIT_SELECAO_POR_CASO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_against: "pedido do maestro 2026-10-07 após pular o pre-commit nos PRs do Zoho e do dado do KG"
+    label: "re-forjar o pre-commit para escolher por caso: família pelo bloco que mudou na bancada, núcleo fixo justificado ou podado, motivo de cada failsafe impresso, modo checkpoint; o failsafe seguro fica"
 edges:
-  - from: E_PRECOMMIT_RECARIMBA_RESIDUO
-    to: Q_PRECOMMIT_NAO_LAVA_RESIDUO
-    edge_type: SUPPORTS
   - from: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA
     to: Q_PR_FINALIZE_MELHORIAS
     edge_type: SUPPORTS
-  - from: E_HOOK_PR_SEM_PASSADA_FALSO_POSITIVO
-    to: Q_HOOK_LER_RESIDUO_DA_BRANCH_DO_PR
-    edge_type: SUPPORTS
   - from: E_MAPA_SEM_MERGE_ONION_HOOKS
     to: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
-    edge_type: SUPPORTS
-  - from: E_ADOPT_SEM_GITIGNORE_DE_SEGREDOS
-    to: Q_ADOPT_TRES_DEFEITOS
-    edge_type: SUPPORTS
-  - from: E_DURABLE_COMMIT_SEM_ASSINATURA
-    to: Q_ADOPT_TRES_DEFEITOS
-    edge_type: SUPPORTS
-  - from: E_CI_TEMPLATE_IGNORA_GITHOOKS
-    to: Q_ADOPT_TRES_DEFEITOS
     edge_type: SUPPORTS
   - from: E_DOIS_LEITORES_DIVERGIAM
     to: Q_KG_SCHEMA_FORMAL
@@ -350,9 +262,6 @@ edges:
   - from: E_NARRATIVA_NO_ROTULO_VAZA_GABARITO
     to: Q_PODA_CLAUDE_MD_REVISITA
     edge_type: SUPPORTS
-  - from: Q_KG_SCHEMA_FORMAL
-    to: Q_ONION_KG_SSOT_REPO
-    edge_type: DEPENDS_ON
   - from: Q_ROTULO_SEPARADO_DA_NARRATIVA
     to: Q_KG_SCHEMA_FORMAL
     edge_type: DEPENDS_ON
@@ -371,9 +280,9 @@ edges:
   - from: E_HOOK_PR_SEM_PASSADA_FALSO_POSITIVO
     to: Q_VETO_PRETOOLUSE_NO_PR_CREATE
     edge_type: SUPPORTS
-  - from: E_MAPA_SEM_MERGE_ONION_HOOKS
-    to: Q_TABELA_DE_TEMPOS_NO_MAPA
-    edge_type: SUPPORTS
   - from: D_PAPEL_DUAS_DIMENSOES
     to: Q_GRANAAI_CLONE_SEM_CARIMBO
+    edge_type: SUPPORTS
+  - from: E_PRECOMMIT_SELECAO_GROSSA
+    to: Q_PRECOMMIT_SELECAO_POR_CASO
     edge_type: SUPPORTS
