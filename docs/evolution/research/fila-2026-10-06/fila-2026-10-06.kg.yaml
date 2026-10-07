@@ -196,10 +196,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 4
-    confidence: 0.8
-    verified_against: ".claude/commands/meta/adopt.md"
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "bancada secret_gitignore (a-g) + durable_commit (f); 3 mutantes mordem"
     label: "adopt: gerar .gitignore de segredos, assinar o commit de adoção e disparar o CI em .githooks/**"
   - id: Q_KG_SCHEMA_FORMAL
     node_type: question
