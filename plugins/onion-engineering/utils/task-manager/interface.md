@@ -184,7 +184,7 @@ interface ITaskManager {
 |-----------|---------|-------|------|--------|---------------|
 | `backlog` | "backlog" | - | "Backlog" | "Backlog" | "Open" |
 | `todo` | "to do" | - | "To Do" | "Todo" | "Open" |
-| `in_progress` | "in progress" | - | "In Progress" | "In Progress" | "In Progress" |
+| `in_progress` | "in progress" | - | "In Progress" | "In Progress" | "In Progress" **se o mapa tiver**; senão `Open` + `completion_percentage` |
 | `review` | "review" | - | "In Review" | "In Review" | ⚠️ sem nativo — status customizado do projeto (NÃO MEDIDO) |
 | `done` | "done" | completed: true | "Done" | "Done" | o status com `is_closed_type: true` |
 | `closed` | "closed" | completed: true | "Closed" | "Canceled" | idem (`is_closed_type: true`) |
@@ -194,6 +194,11 @@ interface ITaskManager {
 os liste** (medido 2026-09-30: seis caminhos candidatos devolvem 400). O adapter lê uma task do projeto
 para descobrir o mapa `{id, name, is_closed_type}`, e usa `is_closed_type` para saber qual é o terminal.
 A escrita é `{"status":{"id":"…"}}` — objeto, não nome, e **não** `custom_status`.
+
+⚠️ **O layout padrão do Zoho só tem `Open` e `Closed`** (medido por um adotante em 2026-10-07, num portal
+só). Não há `In Progress` para resolver por nome, e ler uma task nunca acha o resto do mapa quando todas
+estão `Open`. O caminho que funciona sem saber ids é o `completion_percentage`: `100` fecha a task e a
+resposta traz o id de `Closed`. Detalhe em [`adapters/zoho.md`](adapters/zoho.md) §`updateStatus`.
 
 ### Prioridade
 
