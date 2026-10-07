@@ -25,6 +25,14 @@ Passada **manual**, não por subagente independente: o executor é um fork, e fo
 revisão mais fraca que esta casa aceita. O revisor do CI é a segunda opinião, e o veredito abaixo é
 hipótese até ele falar.
 
+## Gate deste PR, por ordem do maestro (declarado)
+
+Os commits saíram com `--no-verify` (checkpoint, ordem do maestro em 2026-10-07): o pre-commit **não**
+rodou. A validação que valeu foi: as famílias tocadas (`pr_merge_verified`, `zoho_token`,
+`zoho_adapter`, `env_exposure`: 53 casos, 0 falhas, `LC_ALL=C`) + os mutantes abaixo, o
+`pr-finalize --push` (lint 0 HARD sobre o commit) e o **CI completo verde** antes do merge pelo
+`ops/pr-merge-verified.sh`. A bancada inteira só roda no CI.
+
 ## Mutantes (executados, todos morderam)
 
 | cura | mutante | caso que reprovou |
