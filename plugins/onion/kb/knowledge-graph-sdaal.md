@@ -108,7 +108,7 @@ camadas** (campo `layer`, default `audit` — retrocompatível):
   - `edge_type`: `SUPPORTS` · `REFUTES` · `SUPERSEDES` · `CAUSES` · `DEPENDS_ON` · `TRACES_TO`
 - **`layer: domain`** (SSOT durável — o que o sistema *é*):
   - `node_type`: `entity` · `state` · `event` · `rule` · `invariant` · `policy`
-  - `edge_type`: `HAS_STATE` · `TRANSITIONS` (com atributo `on:` = evento gatilho) · `EMITS` ·
+  - `edge_type`: `HAS_STATE` · `TRANSITIONS` (com atributo `trigger:` = evento gatilho; `on:` é legado proibido) · `EMITS` ·
     `CONSTRAINS` · `READS` · `WRITES`
 - **`plane`**: `DEV` (código/branch/commit) ou `PROD` (artefato vivo: deploy + config + dados)
 - **peso do nó**: `impact` (1–5) × `confidence` (0–1) × `status`
@@ -168,8 +168,10 @@ sem erro visível**. Evite:
 
 - **`on:` vira booleano `True` (YAML 1.1).** A chave `on:` de `TRANSITIONS ... on: EVENTO` é
   interpretada como o booleano `true` pelo parser YAML 1.1 → **os gatilhos de transição somem** (no
-  campo: 9 gatilhos perdidos numa migração, um estado-absorvente **falso** apareceu). **Cite o evento
-  entre aspas** (`on: "EVENTO"`) ou trate a chave `True` ao ler; nunca deixe `on:` nu.
+  campo: 9 gatilhos perdidos numa migração, um estado-absorvente **falso** apareceu). ~~Cite o evento
+  entre aspas (`on: "EVENTO"`)~~ — aspas no **valor** não salvam a **chave**. **Cura (2026-10-07):** o
+  gatilho chama-se **`trigger:`** e `on:` é **proibido** (alinhado ao contrato formal do `.kg.yaml`
+  em curso, perfil YAML 1.2 restrito). O radar ainda lê `on:` legado, mas acusa `ON-LEGADO`.
 - **Colisão de keyword-substring com o radar — CORRIGIDA em 2026-07-19 (não é mais footgun).** O
   `kg-radar.sh` é awk puro (por design determinístico: não aluga LLM) e **até 2026-07-19** capturava
   campos por substring de linha, tomando a **última** ocorrência: um campo livre (`label:`, `trace:`,
@@ -220,7 +222,7 @@ sem erro visível**. Evite:
    estado-absorvente pode ser terminal legítimo; o juízo é humano). As 5 checagens (promovidas do
    dogfood de campo 2026-07-08 + ADR design):
    - **estado-absorvente**: `state` que recebe `TRANSITIONS` e não emite nenhuma (limbo?);
-   - **EVENT-sem-efeito**: `event` que não origina aresta nem dispara `TRANSITIONS` via `on:`;
+   - **EVENT-sem-efeito**: `event` que não origina aresta nem dispara `TRANSITIONS` via `trigger:`;
    - **STATE-sem-dona**: `state` que nenhuma `entity` possui via `HAS_STATE`;
    - **RULE-sem-trace**: `rule|invariant|policy` sem `TRACES_TO` (regra não ancorada em artefato);
    - **fonte-única**: nó de domínio com >1 `READS` saindo (1 átomo = 1 fonte — ver §design abaixo).

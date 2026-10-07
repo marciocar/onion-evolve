@@ -24,15 +24,18 @@ paths:
 | `verified_at:` / `verified_against:` | data + o que foi medido | ausente em nó `PROD` → `STALE-MISSING` |
 | `valid_from:` · `source_tier:` (1–10) · `source_kind:` | opcionais em `evidence` — bi-temporal (o fato ≠ a verificação) e autoridade da fonte. `valid_from` **sempre entre aspas** (`"2026"`, `"2026-10-01"`) | confundir `valid_from` com `verified_at`; tier alto em blog de concorrente (`vendor-on-competitor`); **`valid_from: 2026` sem aspas** é INTEIRO para todo leitor YAML tipado (o radar avisa `VALID-FROM-INTEIRO`, SOFT) |
 | `id:` (nó) | só `[A-Za-z0-9_]` — o radar **reprova** (`--integrity`) id fora do alfabeto | prefixar com nome de arquivo **com a extensão** (`SYNTHESIS.md_X`): o ponto quebra quem endereça nó por caminho |
-| **`on:`** (aresta `TRANSITIONS`, camada domain) | id do nó `event` que dispara a transição: `- from: ST_A` / `to: ST_B` / `edge_type: TRANSITIONS` / `on: EV_X` | apontar evento que não existe no arquivo — o radar **reprova** (`on aponta evento inexistente`) e conta a aresta como ligação do evento |
+| **`trigger:`** (aresta `TRANSITIONS`, camada domain) | id do nó `event` que dispara a transição: `- from: ST_A` / `to: ST_B` / `edge_type: TRANSITIONS` / `trigger: EV_X` | apontar evento que não existe no arquivo — o radar **reprova** (`trigger aponta evento inexistente`) e conta a aresta como ligação do evento |
+| ~~`on:`~~ (**PROIBIDO**, legado de `trigger:`) | — | escrever `on:` — o radar ainda lê, mas acusa `ON-LEGADO` (SOFT na REGRA 52) |
 | `meta.review_after:` | data de revisita (grafos de pesquisa) | ausente em grafo novo de pesquisa → SOFT; vencido → SOFT |
 
-> ⚠️ **Teto declarado de `on:` (2026-10-07):** um leitor **YAML 1.1** (o default do PyYAML, por
-> exemplo) lê a chave `on:` como o **booleano `True`**, não como a string `"on"` — e aí o evento
-> referenciado parece órfão para ele, enquanto o radar (que lê texto) o aprova. Com os booleanos do
-> YAML 1.2 os dois leitores concordam. **O perfil de YAML ainda não está fixado nesta gramática**: é
-> decisão do contrato formal do `.kg.yaml`, em desenho. Até lá, quem escreve leitor tipado do corpus
-> trate a chave `True` de uma aresta como `on`, ou carregue com perfil 1.2.
+> ⚠️ **Por que `on:` virou `trigger:` (2026-10-07):** um leitor **YAML 1.1** (o default do PyYAML,
+> por exemplo) lê a chave `on` como o **booleano `True`**, não como a string `"on"`. O evento
+> referenciado parecia órfão para esse leitor enquanto o radar (que lê texto) o aprovava: **dois
+> leitores discordando do mesmo byte**. O contrato formal do `.kg.yaml` em curso fixa perfil
+> **YAML 1.2 restrito** com a chave `on` proibida e o gatilho renomeado para `trigger`; esta gramática
+> se alinha a ele. O corpus do core foi migrado (zero `on:` fora da bancada que prova o aviso). O
+> radar segue **lendo** `on:` para não quebrar grafo antigo fora do corpus — lê, conta a ligação e
+> avisa; quem lê o corpus com leitor tipado trata uma chave `True` numa aresta como `trigger` legado.
 
 **Formato estrito:** o radar é `awk`, não parser YAML. Uma chave por linha; listas com `- id:` /
 `- from:`. `id` em **inglês**, `label` em **pt-BR**.

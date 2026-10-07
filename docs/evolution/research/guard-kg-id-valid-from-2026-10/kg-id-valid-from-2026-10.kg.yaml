@@ -1,5 +1,5 @@
 # kg-backlog-guard: on
-# ═══ TETO: 8 NÓS ═══
+# ═══ TETO: 10 NÓS ═══
 meta:
   id: kg-id-valid-from-2026-10
   schema_version: "1"
@@ -82,7 +82,18 @@ nodes:
     confidence: 0.85
     status: open
     trace: '.claude/rules/kg-grammar.md'
-    label: 'TETO: a chave on: das arestas TRANSITIONS foi documentada na gramatica, com o aviso de que YAML 1.1 a le como booleano. Politica de extensoes, MUST x SHOULD de verified_at em PROD e o perfil YAML 1.2 ficaram FORA de proposito: decisao do contrato, nao deste PR.'
+    label: 'TETO: politica de extensoes e MUST x SHOULD de verified_at em PROD ficaram FORA de proposito — decisao do contrato formal do .kg.yaml em curso, nao deste PR. O que o contrato JA selou (perfil YAML 1.2 restrito, on proibido, gatilho = trigger) foi adotado aqui: ver D_GATILHO_E_TRIGGER.'
+
+  - id: D_GATILHO_E_TRIGGER
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: done
+    verified_at: '2026-10-07'
+    verified_against: 'grep -rn ^ *on: em *.kg.yaml = 0 (7 arestas do corpus + 3 das fixtures migradas); familia kg_radar_integrity (i)(j); mutante sem o parse de trigger faz (j) reprovar por evento orfao; mutante sem o aviso faz (i) reprovar'
+    trace: '.claude/validation/kg-radar.sh'
+    label: 'DECISAO DO MAESTRO (2026-10-07): o gatilho de TRANSITIONS passa a ser trigger:, alinhado ao contrato selado no adotante que desenha o contrato formal (YAML 1.2 restrito, on proibido). O radar e o kg-view leem trigger:; on: segue LIDO (grafo antigo fora do corpus nao quebra) e acusado como ON-LEGADO, SOFT na REGRA 52. A 1a redacao deste PR documentava on: na gramatica, na direcao oposta ao contrato — foi trocada antes do merge.'
 
 edges:
   - from: E_DEFEITO_DADO_MEDIDO_POR_LEITOR_TIPADO
@@ -103,3 +114,6 @@ edges:
   - from: C_TETO_PERFIL_YAML_E_DO_CONTRATO
     to: D_ID_FORA_DO_ALFABETO_REPROVA_NO_INTEGRITY
     edge_type: CONSTRAINS
+  - from: E_DEFEITO_DADO_MEDIDO_POR_LEITOR_TIPADO
+    to: D_GATILHO_E_TRIGGER
+    edge_type: SUPPORTS
