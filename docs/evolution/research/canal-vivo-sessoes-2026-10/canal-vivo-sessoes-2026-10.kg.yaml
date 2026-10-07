@@ -1,0 +1,795 @@
+meta:
+  id: canal-vivo-sessoes-2026-10
+  schema_version: "1"
+  baseline: 2026-10-07
+  review_after: 2026-11-06   # cadência FERRAMENTA = 30d. Tipo dominante: comportamento do Claude Code
+                             # (cross-session messaging, Remote Control, Channels em research preview,
+                             # Agent Teams experimental), que muda por release e cujas flags o próprio doc
+                             # declara instáveis. O eixo A2A (spec 1.0) e o de Slack/Teams mudam mais devagar,
+                             # mas não carregam a decisão sozinhos. Gatilho de revisita ANTECIPADA: mudança de
+                             # `claude --version` (hoje 2.1.293) — REGRA 65 / cc_version —, saída de Channels do
+                             # research preview, ou doc de cross-session que passe a descrever mensagens entre
+                             # CONTAS diferentes.
+  # kg-backlog-guard: on
+  # ═══ TETO: 44 NÓS ═══
+  #     Grafo NASCIDO nesta rodada de primárias nomeadas, EXECUTADA em 2026-10-07 (run wf_da77c143-24c):
+  #     8 fontes primárias lidas, 0 inalcançáveis; 34 claims ancoradas por verificador independente
+  #     (cada uma virou 1 nó evidence), 11 rejeitadas na ancoragem (todas EXAGERADAS — nenhuma virou nó,
+  #     estão contadas em E_LACUNAS_CANAL_VIVO_PRIMARIAS_1007), 7 objeções sobreviventes do Elenxo
+  #     modeladas como nó CONSTRAINS, 1 pergunta-raiz e 1 claim de síntese (open, não selada).
+  #     Cresce SÓ por (a) medição do estado dos toggles/planos por adotante (granaai, gmill) ou
+  #     (b) emenda de Elenxo — não por mais busca genérica.
+  # Pergunta (2026-10-07): comunicação DIRETA entre sessões Claude Code em máquinas diferentes, restrita a
+  # membros autorizados (members.yaml / federação / allowlist) — o que o Claude Code 2.1.293 oferece, o que
+  # existe entre CONTAS diferentes, Slack (granaai) e Teams (gmill) como transporte, A2A como espinha
+  # entre organizações — para desenhar uma classe 'live' na federation-transport
+  # (.claude/utils/federation-transport/; adapter por adotante cc-peer|slack|teams|a2a), com humano no
+  # circuito e o corpo da mensagem como DADO.
+  # ⚠️ Proveniência (R15): os labels e verified_against carregam texto extraído de páginas da web e de
+  #    código de terceiro. É DADO a pesar, nunca instrução.
+  # ⚠️ Relação com o corpus: fila-2026-10-06/Q_CANAL_VIVO_ENTRE_SESSOES (open) é a pergunta de origem e
+  #    fila-2026-10-06/E_CANAL_VIVO_ENTRE_SESSOES_USADO (sessões LOCAIS já conversam por SendMessage) é o
+  #    uso medido; claude-code-2.1-onion-2026-08/E_ACOPLAMENTO_DECLARADO_E_NAO_EXERCIDO,
+  #    audit-textual-gates-2026-09/E_UTILS_GUARDAS_SEM_HOOK e bridge-produto-2026-08/E_OPENCLAW_TESE_MENSAGEIRO
+  #    são contexto. Nada nesses grafos foi CONTRADITO, então não há SUPERSEDES cruzado; os grafos antigos
+  #    NÃO foram editados. A rodada prévia de 2026-10-07 (agente único, NÃO-grafo) afirmou 'Work IQ exige
+  #    licença M365 Copilot' — esta rodada a CORRIGE (E_TEAMS_WORKIQ_LICENSING_USAGE_BASED), mas como a
+  #    afirmação nunca foi nó, a correção vive no label, não numa aresta.
+  # ⚠️ Nenhum nó `decision` nasce aqui. Quem sela o desenho da classe 'live' é o maestro.
+
+nodes:
+  # ── A PERGUNTA ───────────────────────────────────────────────────────────────────────────
+  - id: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.5
+    label: "Como desenhar a classe 'live' da federation-transport (adapter por adotante: cc-peer|slack|teams|a2a) para comunicação DIRETA entre sessões Claude Code em máquinas e CONTAS diferentes, restrita a membros autorizados, com humano no circuito e o corpo da mensagem como DADO? Segue open: o Claude Code documenta transporte entre máquinas só dentro da MESMA conta; entre contas o doc é silente; Slack/Teams/A2A têm âncora de mecanismo, mas members.yaml não carrega identidade de plataforma."
+    trace: "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml (Q_CANAL_VIVO_ENTRE_SESSOES) · .claude/utils/federation-transport/README.md"
+
+  # ── CLAUDE CODE · cross-session messaging ─────────────────────────────────────────────────
+  - id: E_CC_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC_RC
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'On another of your machines | Through Anthropic servers, arriving over that machine's [Remote Control](/docs/en/remote-control) connection' — locator: Message sessions on other machines, tabela de transporte — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Entre máquinas DO MESMO USUÁRIO a mensagem passa pelos servidores da Anthropic e chega pela conexão Remote Control da máquina destino; no cloud vai direto à sessão cloud; só na mesma máquina é socket local, sem Anthropic. (Tier não declarado pelo leitor; atribuído 9 por ser a mesma página das demais claims desta fonte.) Escopo: 'another of YOUR machines' — não prova transporte entre membros."
+    trace: "https://code.claude.com/docs/en/cross-session-messaging"
+
+  - id: E_CC_XSESSION_REACH_OWN_SESSIONS_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Your Remote Control sessions on other machines**: shown while this session is connected to [Remote Control](/docs/en/remote-control), and labeled `Remote Control`.' — locator: See which sessions Claude can reach, lista de linhas — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O alcance listado são só as sessões do próprio usuário ('Your cloud sessions', 'Your Remote Control sessions on other machines'). O doc NÃO descreve mensagens entre contas diferentes — ausência, não negação expressa."
+    trace: "https://code.claude.com/docs/en/cross-session-messaging"
+
+  - id: E_CC_XSESSION_NO_RC_MEANS_NO_REPLY_ADDRESS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'If this session isn't connected to Remote Control when Claude sends to a session beyond this machine, the message still goes through, but without a [reply address](#what-a-message-looks-like), so the receiving Claude can't answer it.' — locator: Message sessions on other machines, parágrafo após a lista de condições — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Sessão remetente sem Remote Control envia para fora da máquina SEM endereço de resposta: o Claude receptor não consegue responder (one-way cross-machine)."
+    trace: "https://code.claude.com/docs/en/cross-session-messaging"
+
+  - id: E_CC_XSESSION_DEFAULT_HOLDS_WHEN_RECEIVER_BYPASSES
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'The receiving session bypasses permission prompts**: Claude Code holds each message for your approval. It delivers one only when the sending session identifies itself as also bypassing.' — locator: Control inbound messages, lista do default; Non-interactive sessions — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Sem crossSessionInbound configurado, o default decide pelas classes de permissão: receptor em bypass RETÉM cada mensagem para aprovação humana, salvo se o remetente também declarar bypass. Sessões -p não mostram diálogo e descartam após dialogExpiry (5 min)."
+    trace: "https://code.claude.com/docs/en/cross-session-messaging"
+
+  - id: E_CC_XSESSION_ISOLATE_PEER_MACHINES_OUTBOUND_GATE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Claude Code asks for your approval before Claude's message to a session beyond this machine leaves, even in `bypassPermissions` mode, which skips ordinary permission prompts.' — locator: Require approval for cross-machine messages — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "isolatePeerMachines=true exige aprovação humana explícita antes de qualquer SendMessage SAIR da máquina, mesmo em bypassPermissions; um true em qualquer escopo vale (o projeto pode ligar, não desligar) — logo o Onion pode impor o portão de saída pelo .claude/settings.json do adotado. Não pergunta para mensagens na mesma máquina."
+    trace: "https://code.claude.com/docs/en/cross-session-messaging"
+
+  # ── CLAUDE CODE · Remote Control ──────────────────────────────────────────────────────────
+  - id: E_CC_RC_REQUIRES_CLAUDEAI_SUBSCRIPTION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'available on Pro, Max, Team, and Enterprise plans. API keys are not supported. On Team and Enterprise, an Owner must first enable the Remote Control toggle in' — locator: Requirements, bullet Subscription (l.28); login claude.ai no bullet Authentication (l.29) e Troubleshooting (l.457) — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Remote Control exige login claude.ai por assinatura (Pro/Max/Team/Enterprise); chave de API NÃO é suportada; em Team/Enterprise um Owner precisa ligar o toggle. Sessão que roda com secret de API (ex.: revisor do CI) não entra no cc-peer cross-machine."
+    trace: "https://code.claude.com/docs/en/remote-control"
+
+  - id: E_CC_RC_AUTOCONNECT_OWN_ACCOUNT_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Auto-connect signs in with your own claude.ai account, so a session it starts appears only in your own account's Claude apps and grants no one else access.' — locator: Enable Remote Control for all sessions (l.199) — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Sessão iniciada por AUTO-CONNECT usa a conta do próprio usuário e não dá acesso a mais ninguém. Escopo: vale para auto-connect; para RC manual 'não serve a outras pessoas' fica sem âncora expressa (a claim geral foi rejeitada na ancoragem)."
+    trace: "https://code.claude.com/docs/en/remote-control"
+
+  - id: E_CC_RC_TRUSTED_DEVICES_BINDING
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.75
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'It ties Remote Control access to a known device and a recent authentication, not just a signed-in account.' — locator: Trusted Devices (l.237) — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Trusted Devices amarra o acesso ao Remote Control a dispositivo conhecido + autenticação recente, não só a conta logada. (O leitor parafraseou 'membros da própria organização'; o Elenxo apontou que a citação NÃO diz isso — o label fica restrito ao que o texto prova.)"
+    trace: "https://code.claude.com/docs/en/remote-control"
+
+  - id: E_CC_RC_OUTBOUND_HTTPS_TRANSCRIPT_STORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Your local Claude Code session makes outbound HTTPS requests only and never opens inbound ports on your machine.' — locator: Connection and security, parágrafo 1 (l.221); armazenamento da transcrição no parágrafo 3 (l.225) — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Remote Control usa só HTTPS de saída, roteado pelo servidor da Anthropic, e a transcrição fica armazenada nos servidores da Anthropic — o corpo de toda mensagem cross-machine reside na Anthropic, dado de residência que o adapter cc-peer precisa declarar."
+    trace: "https://code.claude.com/docs/en/remote-control"
+
+  - id: E_CC_RC_UNAVAILABLE_UNDER_ZDR_HIPAA
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Organizations with Zero Data Retention enabled, or with the HIPAA configuration applied, can't enable Remote Control.' — locator: Connection and security, último parágrafo (l.227) — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Remote Control fica indisponível em organizações com ZDR ou configuração HIPAA — para adotante regulado (ex.: compliance médico) o cc-peer cross-machine é vetado por construção e o adapter precisa de fallback (git-async ou a2a)."
+    trace: "https://code.claude.com/docs/en/remote-control"
+
+  # ── CLAUDE CODE · Channels ────────────────────────────────────────────────────────────────
+  - id: E_CC_CHANNELS_RESEARCH_PREVIEW
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Channels are a research preview feature. Availability is rolling out gradually, and the `--channels` flag syntax and protocol contract may change based on feedback.' — locator: channels, seção Research preview, par. 1 — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 10
+    source_kind: vendor-on-self
+    label: "Channels são research preview: sintaxe da flag e contrato do protocolo podem mudar; as flags não aparecem no --help; --channels só aceita plugins de allowlist mantida pela Anthropic (ou pela org). Todo adapter apoiado em Channels nasce experimental e gated."
+    trace: "https://code.claude.com/docs/en/channels"
+
+  - id: E_CC_CHANNELS_DEV_FLAG_INTERACTIVE_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.95
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'If you pass it in non-interactive mode with `-p` or through the Agent SDK, Claude Code ignores the flag and the channel doesn't register.' — locator: channels-reference, seção Test during the research preview, par. 2 — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 10
+    source_kind: vendor-on-self
+    label: "A flag de desenvolvimento de canal só roda em sessão interativa (com prompt de confirmação); em -p ou Agent SDK é ignorada e o canal não registra; e não contorna channelsEnabled. Canal Slack/Teams próprio não roda headless nem agendado — exige humano presente."
+    trace: "https://code.claude.com/docs/en/channels-reference"
+
+  - id: E_CC_CHANNELS_ENABLED_MASTER_SWITCH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Master switch. Must be `true` for any channel to deliver messages. Blocks all channels including the development flag when off.' — locator: channels, seção Enterprise controls, tabela, linha channelsEnabled — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 10
+    source_kind: vendor-on-self
+    label: "channelsEnabled é chave mestra gerenciada; em Team/Enterprise vem bloqueada até um Owner habilitar, e bloqueia inclusive a flag de desenvolvimento."
+    trace: "https://code.claude.com/docs/en/channels"
+
+  - id: E_CC_CHANNELS_SENDER_ALLOWLIST_GOVERNS_RELAY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Anyone who can reply through the channel can approve or deny tool use in your session, so only allowlist senders you trust with that authority.' — locator: channels, seção Security, último par. — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 10
+    source_kind: vendor-on-self
+    label: "Cada plugin de canal aprovado mantém allowlist de remetentes; os demais são descartados em silêncio; a MESMA allowlist governa o permission relay, dando ao remetente autoridade de aprovar/negar ferramentas na sessão."
+    trace: "https://code.claude.com/docs/en/channels"
+
+  - id: E_CC_CHANNELS_RELAY_ONLY_WITH_AUTHENTICATED_SENDER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Only declare the capability if your channel [authenticates the sender](#gate-inbound-messages), because anyone who can reply through your channel can approve or deny tool use in your session.' — locator: channels-reference, seção Relay permission prompts > Add relay to a chat bridge, par. após a lista de 3 componentes — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 10
+    source_kind: vendor-on-self
+    label: "Permission relay: o canal declara a capability e encaminha o prompt; vale o primeiro veredito (terminal ou remoto); description/input_preview devem ser tratados como NÃO confiáveis; sem remetente autenticado a capability não deve ser declarada."
+    trace: "https://code.claude.com/docs/en/channels-reference"
+
+  # ── CLAUDE CODE · Agent Teams ─────────────────────────────────────────────────────────────
+  - id: E_CC_AGENT_TEAMS_SESSION_SCOPED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: '**One team per session**: a session has exactly one team, scoped to that session. You can't create additional named teams or share a team across sessions.' — locator: agent-teams, Limitations — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Um Agent Team é escopo de UMA sessão e não pode ser compartilhado entre sessões — logo não é transporte entre sessões, máquinas ou contas."
+    trace: "https://code.claude.com/docs/en/agent-teams"
+
+  - id: E_CC_AGENT_TEAMS_EXPERIMENTAL_INTERACTIVE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Agent teams are experimental and disabled by default. Enable them by setting `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1` in your [settings.json](/docs/en/settings) or environment.' — locator: agent-teams, Warning no topo; seção Enable agent teams — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Agent Teams é experimental e desabilitado por padrão; só funciona em sessão interativa (não -p/SDK)."
+    trace: "https://code.claude.com/docs/en/agent-teams"
+
+  # ── CLAUDE CODE · plugin oficial de canal (Discord) ───────────────────────────────────────
+  - id: E_CC_DISCORD_PLUGIN_DROPS_BOT_AUTHORS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE (prefixo verbatim): 'client.on('messageCreate', msg => { if (msg.author.bot) return handleInbound(msg) [...]' — locator: external_plugins/discord/server.ts l.805-808; única ocorrência de author.bot (grep) em l.806 — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: repo
+    label: "O plugin oficial de canal do Discord descarta INCONDICIONALMENTE toda mensagem de autor bot, antes de qualquer gate/allowlist: duas sessões Claude Code (cada qual um bot) não se ouvem no mesmo canal Discord — o canal oficial é humano↔sessão, não sessão↔sessão."
+    trace: "https://github.com/anthropics/claude-plugins-official/blob/main/external_plugins/discord/server.ts"
+
+  # ── SLACK ─────────────────────────────────────────────────────────────────────────────────
+  - id: E_SLACK_MCP_READ_AND_SEND
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'The MCP server can retrieve and send messages throughout a Slack workspace:' — locator: slack-mcp-server, seção Retrieving and sending messages — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O Slack MCP server oficial lê E envia mensagens no workspace."
+    trace: "https://docs.slack.dev/ai/slack-mcp-server/"
+
+  - id: E_SLACK_MCP_SEND_ANY_READ_FULL_HISTORY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Read channels — grab the complete message history of channels.' — locator: slack-mcp-server, Retrieving and sending messages — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Capacidades concretas do Slack MCP: enviar a qualquer tipo de conversa e ler o histórico completo de canais."
+    trace: "https://docs.slack.dev/ai/slack-mcp-server/"
+
+  - id: E_SLACK_MCP_MARKETPLACE_OR_INTERNAL_ONLY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Only apps published in the Slack Marketplace and internal apps can use MCP at this time;' — locator: slack-mcp-server, Security concerns — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Só apps do Slack Marketplace ou apps INTERNOS podem usar MCP; apps não listados são proibidos — restringe quais clientes MCP podem servir de transporte (um adapter Onion seria app interno do workspace da granaai)."
+    trace: "https://docs.slack.dev/ai/slack-mcp-server/"
+
+  - id: E_SLACK_MCP_ADMIN_APPROVAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Workspace admins can approve and manage all MCP client integrations, keeping your Slack data safe.' — locator: slack-mcp-server, overview e App Identity — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "Admins do workspace aprovam e gerenciam toda integração de cliente MCP pelo processo padrão de aprovação de apps do Slack — há um portão humano de ADMISSÃO do lado do workspace."
+    trace: "https://docs.slack.dev/ai/slack-mcp-server/"
+
+  - id: E_SLACK_BOT_MESSAGE_EVENT_IDENTIFIES_BOT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'you can detect if a message was sent by a bot by the presence of the bot_id and bot_profile fields in the event payload.' — locator: reference/events/message/bot_message, Bot identification — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O evento bot_message (Events API) não exige scopes e identifica o bot por bot_id/bot_profile. A página NÃO diz se é entregue a OUTROS apps nem trata do app receber as próprias mensagens — a lacuna 'sessão↔sessão via Slack' segue aberta."
+    trace: "https://docs.slack.dev/reference/events/message/bot_message/"
+
+  # ── MICROSOFT TEAMS · Work IQ MCP ─────────────────────────────────────────────────────────
+  - id: E_TEAMS_WORKIQ_TEN_TOOLS_NO_PUSH
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'fetch /me/chats/{id}/messages → read Teams chat messages' — locator: Work IQ MCP overview, seção How tools work — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "Work IQ MCP: endpoint único, 10 tools genéricas sobre caminhos (CRUD, do_action, ask); sem tool de subscrição/webhook/push; ler chats do Teams é possível via fetch. (Tier não declarado pelo leitor; atribuído 8 — doc oficial do fornecedor sobre o próprio produto.)"
+    trace: "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/work-iq/mcp/overview"
+
+  - id: E_TEAMS_WORKIQ_GA_STATUS_UNANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'New workloads, backends, and data sources add **paths**, not tools. The tool surface stays fixed at 10.' — locator: Work IQ MCP overview, seção How tools work — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "A overview do Work IQ não declara Preview nem GA — o estado de GA NÃO está ancorado nesta fonte; a superfície de tools é fixa em 10 (novos workloads entram como caminhos)."
+    trace: "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/work-iq/mcp/overview"
+
+  - id: E_TEAMS_WORKIQ_LICENSING_USAGE_BASED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.75
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'A usage-based billing plan set up in Copilot Studio with an Azure subscription and resource group assigned.' — locator: Enable your tenant for Work IQ, seção Prerequisites — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "Pré-requisito do Work IQ API: plano de cobrança POR USO (Copilot Studio) com assinatura Azure + Global Admin para setup único; a página de habilitação NÃO exige licença M365 Copilot por usuário. CORRIGE a rodada prévia não-grafo de 2026-10-07 ('Work IQ exige licença M365 Copilot'), que nunca foi nó."
+    trace: "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/work-iq/enable-work-iq"
+
+  - id: E_TEAMS_WORKIQ_BILLING_NO_COPILOT_LICENSE_MARK
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Work IQ API for custom apps and agents' — locator: Usage-Based Billing for Copilot Credits, lista Services managed by usage-based billing — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "A página de billing lista 'Work IQ API for custom apps and agents' como serviço de cobrança por uso SEM a marca 'Copilot license required', ao contrário de Cowork e SharePoint/OneDrive."
+    trace: "https://learn.microsoft.com/en-us/microsoft-365/copilot/usage-based-billing-overview-copilot-credits"
+
+  - id: E_TEAMS_WORKIQ_ASK_DELEGATED_HUMAN_IDENTITY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Allows the app to ask Work IQ agents questions and receive responses on behalf of the signed-in user.' — locator: Work IQ API permissions reference, seção WorkIQAgent.Ask — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "WorkIQAgent.Ask é permissão DELEGADA com consentimento de admin obrigatório, agindo em nome do usuário conectado (leitura e escrita) — identidade humana, não bot-a-bot: a sessão que usa Work IQ fala no Teams COMO a pessoa."
+    trace: "https://learn.microsoft.com/en-us/microsoft-365/copilot/extensibility/work-iq/permissions"
+
+  - id: E_TEAMS_AGENTS_RECEIVE_ONLY_WHEN_MENTIONED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'By default, agents in group chats and channels only receive messages when they're directly @mentioned. They don't receive other messages sent to the conversation.' — locator: Channel and Group Conversation Chat for Agents - Teams, parágrafo 2 — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "No Teams, agentes em canais e chats de grupo só recebem mensagens quando @mencionados, salvo RSC; a doc NÃO trata de mensagens vindas de outros bots."
+    trace: "https://learn.microsoft.com/en-us/microsoftteams/platform/bots/how-to/conversations/channel-and-group-conversations"
+
+  # ── A2A ───────────────────────────────────────────────────────────────────────────────────
+  - id: E_A2A_V1_STABLE_SIGNED_CARDS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-07
+    valid_from: 2026-04-09
+    verified_against: "QUOTE: 'A2A's momentum accelerated with the release of version 1.0, its first stable specification.' — locator: LF press release, 2026-04-09 — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "A2A 1.0 é a primeira especificação ESTÁVEL (Linux Foundation, 9 abr 2026), anunciada com Signed Agent Cards para verificação criptográfica de identidade."
+    trace: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+
+  - id: E_A2A_ADOPTION_150_ORGS_CLOUD
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.7
+    verified_at: 2026-10-07
+    valid_from: 2026-04-09
+    verified_against: "QUOTE: 'Cloud providers have reinforced that momentum by embedding A2A directly into their platforms.' — locator: LF press release, 2026-04-09 — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 8
+    source_kind: vendor-on-self
+    label: "A LF reporta mais de 150 organizações, A2A embutido em plataformas de nuvem e uso em produção (eixo mercado: a espinha entre organizações tem tração institucional; números são auto-declarados pela fundação)."
+    trace: "https://www.linuxfoundation.org/press/a2a-protocol-surpasses-150-organizations-lands-in-major-cloud-platforms-and-sees-enterprise-production-use-in-first-year"
+
+  - id: E_A2A_CARD_SIGNING_IS_OPTIONAL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Agent Cards MAY be digitally signed using JSON Web Signature (JWS)' — locator: A2A spec §8.4 Agent Card Signing — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: primary
+    label: "Na spec, assinar o Agent Card é OPCIONAL (MAY) e verificar é SHOULD, não MUST — o Onion precisa EXIGIR assinatura na sua política (o core já pina chaves por membro: members.yaml keys + a2a-verify.sh)."
+    trace: "https://a2a-protocol.org/latest/specification/"
+
+  - id: E_A2A_REVOKED_KEYS_AND_JCS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Expired or revoked keys MUST NOT be used for verification' — locator: A2A spec §8.4 Agent Card Signing (§8.4.1 e §8.4.3) — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: primary
+    label: "Chaves expiradas ou revogadas NÃO podem ser usadas na verificação; canonicalização JCS é obrigatória antes de assinar."
+    trace: "https://a2a-protocol.org/latest/specification/"
+
+  - id: E_A2A_INPUT_VALIDATION_NO_UNTRUSTED_AGENT_CONTENT
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-10-07
+    verified_against: "QUOTE: 'Agents MUST validate all input parameters before processing' — locator: A2A spec §13.4 Security Considerations, Input Validation — ancorada por verificador independente (wf_da77c143-24c)"
+    source_tier: 9
+    source_kind: primary
+    label: "A spec exige validação de entrada, mas a seção de segurança lida NÃO traz orientação dedicada a tratar o conteúdo de outro agente como não confiável — 'corpo como DADO' é responsabilidade do Onion, não herança do protocolo."
+    trace: "https://a2a-protocol.org/latest/specification/"
+
+  # ── OBJEÇÕES SOBREVIVENTES DO ELENXO (dissent que LIMITA = CONSTRAINS) ───────────────────
+  - id: E_ELENXO_CC_VERSION_NOT_ANCHORED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: 2026-10-07
+    verified_against: "`claude --version` nesta máquina = '2.1.293 (Claude Code)' (re-medido pelo escritor em 2026-10-07); nenhuma das claims cc-* ancora a versão da página citada (docs vivas, sem data no locator)"
+    source_tier: 10
+    source_kind: measurement
+    label: "Nenhuma claim do Claude Code ancora o comportamento à versão 2.1.293 que a pergunta nomeia: as páginas são vivas e sem data. O desenho precisa carimbar cc_version no momento de selar (REGRA 65) e re-medir no update."
+    trace: "https://code.claude.com/docs/en/cross-session-messaging"
+
+  - id: E_ELENXO_MEMBERS_YAML_HAS_NO_PLATFORM_IDENTITY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.85
+    verified_at: 2026-10-07
+    verified_against: "docs/evolution/federation/members.yaml: granaai (l.140-182) traz só remote/local_path e keys: [granaai-1] (JWKS do A2A); gmill (membro hub-operacoes-enterprise, l.298-304) sem campo keys algum; grep -ciE slack|teams|claude_account no arquivo = 0 (re-medido pelo escritor em 2026-10-07)"
+    source_tier: 10
+    source_kind: measurement
+    label: "members.yaml não tem campo de Slack user ID, tenant do Teams nem conta claude.ai — só a chave A2A pinada. 'Restrita a membros do members.yaml' não tem caminho ancorado para cc-peer, slack nem teams; só a2a tem âncora de identidade hoje. A classe 'live' exige estender o registro antes de qualquer allowlist de plataforma."
+    trace: "docs/evolution/federation/members.yaml"
+
+  - id: E_ELENXO_CROSS_ACCOUNT_UNDOCUMENTED_INFERRED
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.6
+    verified_at: 2026-10-07
+    verified_against: "Elenxo do run wf_da77c143-24c sobre as claims 1 e 2 de cross-session: 'On another of YOUR machines' prova transporte de UMA conta; o listing só mostra sessões do próprio usuário; nenhuma frase nega expressamente mensagens entre contas"
+    source_tier: 6
+    source_kind: analysis
+    label: "Entre CONTAS diferentes o Claude Code está NÃO DOCUMENTADO, não 'impossível': a frase 'nada entre contas' da rodada prévia entra como INFERIDA (certeza ≠ confirmada). Consequência: um cc-peer cross-adotante não ganha transporte com o que está documentado; vale só para o maestro falar consigo mesmo entre máquinas."
+    trace: "https://code.claude.com/docs/en/cross-session-messaging"
+
+  - id: E_CC_CLOUD_SESSION_CANNOT_REPLY_TOOL_DESCRIPTION
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-07
+    verified_against: "QUOTE (descrição da ferramenta ListAgents no runtime do Claude Code 2.1.293, lida pelo escritor nesta sessão): 'a cloud session receives your message but cannot message any session back yet — do not ask it to reply' — fonte rotulada: DECLARAÇÃO do produto instalado, não doc"
+    source_tier: 9
+    source_kind: vendor-on-self
+    label: "O próprio runtime declara que uma sessão CLOUD recebe a mensagem mas ainda não consegue responder a nenhuma sessão. Fecha a sublacuna que a claim de cross-session deixou frouxa ('o doc não diz que o cloud nunca responde'); rótulo de fonte: descrição de ferramenta, não documentação."
+    trace: "claude-code 2.1.293 · tool ListAgents (descrição)"
+
+  - id: E_ELENXO_RECEIVER_HUMAN_GATE_ONLY_ON_BYPASS
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-10-07
+    verified_against: "Elenxo do run wf_da77c143-24c sobre a claim 4 de cross-session + a claim parceira sobre crossSessionInbound REJEITADA na ancoragem (hold explícito não abre diálogo; refuse descarta sem humano)"
+    source_tier: 6
+    source_kind: analysis
+    label: "O portão humano do lado RECEPTOR só está ancorado para receptor em bypass; o que o default faz com receptor em modo normal não está citado (provável entrega automática). Sessões -p descartam após dialogExpiry: receptor headless não serve de cc-peer com humano no circuito. O portão ancorado de ponta a ponta é o de SAÍDA (isolatePeerMachines)."
+    trace: "https://code.claude.com/docs/en/cross-session-messaging"
+
+  - id: E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.8
+    verified_at: 2026-10-07
+    verified_against: "Elenxo do run wf_da77c143-24c sobre as claims 14 e 15 de channels: quem está na allowlist APROVA uso de ferramentas; a allowlist é por ID de plataforma"
+    source_tier: 7
+    source_kind: analysis
+    label: "Em canal cross-org, remetente com permission relay deixa de ser DADO e vira AUTORIDADE sobre a sessão — conflito direto com 'corpo como dado'. Regra derivada para o desenho: o adapter live NUNCA declara a capability de relay entre organizações."
+    trace: "https://code.claude.com/docs/en/channels-reference"
+
+  - id: E_ELENXO_CHANNELS_TOGGLE_UNMEASURED_PER_ADOPTER
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: 2026-10-07
+    verified_against: "Elenxo do run wf_da77c143-24c sobre a claim 13 de channels: o mecanismo está provado, mas a rodada não mediu plano claude.ai nem estado dos toggles (channelsEnabled, Remote Control) nas orgs da granaai e da gmill"
+    source_tier: 6
+    source_kind: analysis
+    label: "Lacuna OPERACIONAL, não documental: sem medir o plano claude.ai e o estado de channelsEnabled/Remote Control por adotante (granaai, gmill), não dá para escolher o adapter por adotante."
+    trace: "https://code.claude.com/docs/en/channels"
+
+  # ── SÍNTESE (open — não selada; quem decide é o maestro) ──────────────────────────────────
+  - id: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    label: "Restrições que a evidência ancorada impõe ao desenho da classe 'live' (NÃO é decisão): (1) cc-peer só vale DENTRO da mesma conta claude.ai por assinatura — serve ao maestro entre as próprias máquinas, não entre adotantes; vetado em org ZDR/HIPAA; corpo reside na Anthropic; portão humano de saída disponível via isolatePeerMachines=true no settings do projeto. (2) slack/teams não têm canal oficial sessão↔sessão: Channels é research preview, só interativo, com relay que transforma remetente em autoridade — nunca declarar relay entre orgs; Slack MCP exige app interno aprovado por admin; Work IQ fala COMO o usuário (delegado) e agentes no Teams só ouvem quando @mencionados. (3) a2a é a única via com âncora de identidade já no members.yaml (chave pinada), mas a spec deixa assinatura opcional e não trata conteúdo de agente como não confiável — o Onion precisa exigir as duas coisas. (4) toda via precisa de identidade de plataforma no members.yaml antes de qualquer allowlist."
+    trace: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml"
+
+  # ── CONTABILIDADE DA RODADA ───────────────────────────────────────────────────────────────
+  - id: E_LACUNAS_CANAL_VIVO_PRIMARIAS_1007
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "retorno do run wf_da77c143-24c (modo primaries): 8 fontes nomeadas (cc-cross-session, cc-remote-control, cc-channels, cc-agent-teams-claude-tag, cc-plugins-official-discord, slack-mcp-events, teams-workiq-mcp, a2a-spec-lf), 8 lidas, 0 inalcançáveis; 45 claims à ancoragem, 34 ANCORADAS, 11 REJEITADAS (11 exageradas, 0 não-encontradas)"
+    source_tier: 10
+    source_kind: internal-audit
+    label: "CONTABILIDADE 2026-10-07. Fontes: 8 lidas, 0 inalcançáveis. Claims: 34 ancoradas (cada uma virou nó), 11 REJEITADAS na ancoragem, todas EXAGERADAS: (1) crossSessionInbound accept/hold/refuse 'com humano aprovando' — diálogo só existe no default; hold explícito não expira e não abre diálogo, refuse descarta sem humano; (2) RC 'cliente remoto deve usar mesma conta e org' — frase é do passo de push notifications do app móvel, locator errado; (3) Channels 'não há Slack nem Teams oficial' — inferência por silêncio, e omitia a rota de allowlist da org; (4) Agent Teams 'sem transporte de rede entre máquinas' — inferência, a página só descreve escrita em arquivo local; (5) Agent Teams 'corpo como dado' — não está nesta página (estaria em cross-session-messaging); (6) Claude Tag 'sandbox na nuvem, não alcança sessão local' — 'nuvem' e o alcance são inferência; (7) Claude Tag 'intra-organização, não entre contas' — a doc não discute entre contas, e por padrão qualquer um do workspace Slack pareado marca @Claude sem seat; (8) plugin telegram 'filtro só por ID' — vale para chat privado, grupo exige groupAllowFrom+requireMention; (9) 'Slack e Teams não constam como plugin oficial' — FALSO para Slack: o marketplace.json oficial tem a entrada slack (slackapi/slack-mcp-plugin), só não está em external_plugins; Teams de fato ausente; (10) Slack MCP 'modelo pull, sem push' — ausência observada não é afirmação do texto; (11) A2A 'spec delega autorização sem escopo/validade/revogação' — a quote era de §7.6.4 (escopo de auth in-task), não geral. LACUNAS QUE CONTINUAM ABERTAS: comunicação entre CONTAS claude.ai (não documentada); comportamento do default com receptor em modo normal; Slack entregar evento de um bot a OUTRO app (sessão↔sessão via Slack); Slack MCP com push/evento; estado GA do Work IQ; Teams bot↔bot; plano e toggles (Remote Control, channelsEnabled) medidos por adotante (granaai, gmill); identidade de plataforma no members.yaml; ancoragem à versão 2.1.293; e orientação A2A para conteúdo de agente não confiável. ⚠️ O retorno do Elenxo chegou ao escritor TRUNCADO após a objeção 16: os vereditos das objeções 17+ (Discord, Slack, Teams, A2A) NÃO foram lidos aqui e nenhuma delas virou nó."
+    trace: "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml"
+
+edges:
+  # ── evidências informam a pergunta ──
+  - from: E_CC_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC_RC
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  - from: E_CC_XSESSION_REACH_OWN_SESSIONS_ONLY
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  - from: E_CC_XSESSION_NO_RC_MEANS_NO_REPLY_ADDRESS
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  - from: E_CC_XSESSION_DEFAULT_HOLDS_WHEN_RECEIVER_BYPASSES
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  - from: E_CC_XSESSION_ISOLATE_PEER_MACHINES_OUTBOUND_GATE
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  - from: E_CC_AGENT_TEAMS_SESSION_SCOPED
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  - from: E_CC_DISCORD_PLUGIN_DROPS_BOT_AUTHORS
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  - from: E_SLACK_MCP_READ_AND_SEND
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  - from: E_TEAMS_WORKIQ_TEN_TOOLS_NO_PUSH
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  - from: E_A2A_V1_STABLE_SIGNED_CARDS
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  - from: E_LACUNAS_CANAL_VIVO_PRIMARIAS_1007
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  - from: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: SUPPORTS
+  # ── a síntese: cc-peer ──
+  - from: E_CC_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC_RC
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_CC_XSESSION_ISOLATE_PEER_MACHINES_OUTBOUND_GATE
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_CC_RC_REQUIRES_CLAUDEAI_SUBSCRIPTION
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_CC_RC_AUTOCONNECT_OWN_ACCOUNT_ONLY
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_CC_RC_TRUSTED_DEVICES_BINDING
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_CC_RC_OUTBOUND_HTTPS_TRANSCRIPT_STORED
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_CC_RC_UNAVAILABLE_UNDER_ZDR_HIPAA
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_CC_CLOUD_SESSION_CANNOT_REPLY_TOOL_DESCRIPTION
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_ELENXO_CROSS_ACCOUNT_UNDOCUMENTED_INFERRED
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  # ── a síntese: slack/teams/channels ──
+  - from: E_CC_CHANNELS_RESEARCH_PREVIEW
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_CC_CHANNELS_DEV_FLAG_INTERACTIVE_ONLY
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_CC_CHANNELS_ENABLED_MASTER_SWITCH
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_CC_CHANNELS_RELAY_ONLY_WITH_AUTHENTICATED_SENDER
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_CC_AGENT_TEAMS_EXPERIMENTAL_INTERACTIVE
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_SLACK_MCP_SEND_ANY_READ_FULL_HISTORY
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_SLACK_MCP_MARKETPLACE_OR_INTERNAL_ONLY
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_SLACK_MCP_ADMIN_APPROVAL
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_SLACK_BOT_MESSAGE_EVENT_IDENTIFIES_BOT
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_TEAMS_WORKIQ_LICENSING_USAGE_BASED
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_TEAMS_WORKIQ_BILLING_NO_COPILOT_LICENSE_MARK
+    to: E_TEAMS_WORKIQ_LICENSING_USAGE_BASED
+    edge_type: SUPPORTS
+  - from: E_TEAMS_WORKIQ_ASK_DELEGATED_HUMAN_IDENTITY
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_TEAMS_AGENTS_RECEIVE_ONLY_WHEN_MENTIONED
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  # ── a síntese: a2a ──
+  - from: E_A2A_ADOPTION_150_ORGS_CLOUD
+    to: E_A2A_V1_STABLE_SIGNED_CARDS
+    edge_type: SUPPORTS
+  - from: E_A2A_CARD_SIGNING_IS_OPTIONAL
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_A2A_REVOKED_KEYS_AND_JCS
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_A2A_INPUT_VALIDATION_NO_UNTRUSTED_AGENT_CONTENT
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  - from: E_ELENXO_MEMBERS_YAML_HAS_NO_PLATFORM_IDENTITY
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: SUPPORTS
+  # ── dissent que LIMITA (CONSTRAINS) ──
+  - from: E_A2A_CARD_SIGNING_IS_OPTIONAL
+    to: E_A2A_V1_STABLE_SIGNED_CARDS
+    edge_type: CONSTRAINS
+  - from: E_CC_RC_REQUIRES_CLAUDEAI_SUBSCRIPTION
+    to: E_CC_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC_RC
+    edge_type: CONSTRAINS
+  - from: E_CC_RC_UNAVAILABLE_UNDER_ZDR_HIPAA
+    to: E_CC_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC_RC
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_CROSS_ACCOUNT_UNDOCUMENTED_INFERRED
+    to: E_CC_XSESSION_CROSS_MACHINE_VIA_ANTHROPIC_RC
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_CROSS_ACCOUNT_UNDOCUMENTED_INFERRED
+    to: E_CC_XSESSION_REACH_OWN_SESSIONS_ONLY
+    edge_type: CONSTRAINS
+  - from: E_CC_CLOUD_SESSION_CANNOT_REPLY_TOOL_DESCRIPTION
+    to: E_CC_XSESSION_NO_RC_MEANS_NO_REPLY_ADDRESS
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_RECEIVER_HUMAN_GATE_ONLY_ON_BYPASS
+    to: E_CC_XSESSION_DEFAULT_HOLDS_WHEN_RECEIVER_BYPASSES
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY
+    to: E_CC_CHANNELS_SENDER_ALLOWLIST_GOVERNS_RELAY
+    edge_type: CONSTRAINS
+  - from: E_CC_CHANNELS_RELAY_ONLY_WITH_AUTHENTICATED_SENDER
+    to: E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY
+    edge_type: SUPPORTS
+  - from: E_CC_CHANNELS_SENDER_ALLOWLIST_GOVERNS_RELAY
+    to: E_ELENXO_RELAY_TURNS_DATA_INTO_AUTHORITY
+    edge_type: SUPPORTS
+  - from: E_ELENXO_MEMBERS_YAML_HAS_NO_PLATFORM_IDENTITY
+    to: E_CC_CHANNELS_SENDER_ALLOWLIST_GOVERNS_RELAY
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_MEMBERS_YAML_HAS_NO_PLATFORM_IDENTITY
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_CHANNELS_TOGGLE_UNMEASURED_PER_ADOPTER
+    to: E_CC_CHANNELS_ENABLED_MASTER_SWITCH
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_CHANNELS_TOGGLE_UNMEASURED_PER_ADOPTER
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_CC_VERSION_NOT_ANCHORED
+    to: C_LIVE_CLASS_DESIGN_CONSTRAINTS
+    edge_type: CONSTRAINS
+  - from: E_ELENXO_CC_VERSION_NOT_ANCHORED
+    to: Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS
+    edge_type: CONSTRAINS
+  - from: E_TEAMS_WORKIQ_GA_STATUS_UNANCHORED
+    to: E_TEAMS_WORKIQ_TEN_TOOLS_NO_PUSH
+    edge_type: CONSTRAINS
