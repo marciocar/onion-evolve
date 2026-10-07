@@ -11,11 +11,11 @@
 
 | Dimensão | Nº | Produtor |
 |----------|---:|----------|
-| Famílias na bancada | **220** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
-| Sítios de asserção (**não** asserções executadas) | **1505** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
-| Linhas do manifesto de fixtures | **107** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
+| Famílias na bancada | **219** | `grep -cE '^_family ' .claude/validation/lint-selftest.sh` |
+| Sítios de asserção (**não** asserções executadas) | **1501** | `grep -cE '^\s*(record_pass\|record_fail\|record_skip) ' .claude/validation/lint-selftest.sh` |
+| Linhas do manifesto de fixtures | **108** | `awk -F'\t' '!/^#/ && NF && $1!="kind"' .claude/validation/fixtures/manifest.tsv` |
 | Kinds no manifesto | **6** | idem, `length(k)` da coluna 1 |
-| Arquivos de fixture rastreados | **151** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
+| Arquivos de fixture rastreados | **152** | `git ls-files '.claude/validation/fixtures/*'` menos o manifesto |
 | Regras do lint | **95** | `bash .claude/validation/rules-registry.sh --counts` |
 | — das quais HARD | **84** | idem |
 | — das quais SOFT | **33** | idem |
@@ -33,7 +33,7 @@ Este arquivo conta o que **existe**. Quantas asserções de fato **passaram** é
 execução, vive em `docs/onion/metrics/selftest-runs.jsonl` (**2** envelope(s)
 coletado(s)) e é projetado em [`testing-state.md`](testing-state.md).
 
-A distinção não é formalismo. Há **1505** sítios estáticos de asserção e a última
+A distinção não é formalismo. Há **1501** sítios estáticos de asserção e a última
 execução completa contou **mais** que isso, porque sítio dentro de laço dispara N vezes.
 Publicar o número estático como "tamanho da bancada" trocaria uma defasagem por um erro de
 categoria — e foi por confundir os dois que `689 asserções` sobreviveu em três comentários

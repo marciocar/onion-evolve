@@ -70,7 +70,10 @@ members:
 
   - id: metagamify
     name: MetaGamify          # id/name públicos = SÓ "metagamify" (o nome da empresa NÃO entra em superfície — correção 2026-07-09)
-    role: hub                 # TIER 1 — central; pode ter sub-adotados
+    role: standalone          # TIER 3 desde 2026-10-07 (era `hub`): o carimbo dele diz `adopted`, nenhum
+                              # `parent:` aponta para ele, e o maestro decidiu que o registro desce em vez de
+                              # promover. Se um dia adotar projetos próprios, a ordem é a da REGRA 92: a
+                              # sessão dele roda `--promote-hub` (carimbo) e o PR seguinte sobe o registro.
     kind: adopter       # projeto que vendoriza o framework p/ o proprio trabalho
     parent: onion-evolve
     remote: github.com/marciocar/metagamify
@@ -660,11 +663,11 @@ members:
 
   - id: sge
     name: sge (Sistema de Gestão de Editais — licitação pública brasileira, Lei 14.133/2021)
-    role: adopted               # TIER 3 — consumidor puro; nao re-adota. MESMA palavra do stamp
-                                # (.claude/.onion-version): os dois vocabularios foram unificados em
-                                # 2026-09-24, ao custo de duas linhas — `consumer` vivia em UM sitio
-                                # do validador e em UMA entrada do registro, contra 22 sitios que
-                                # leem `adopted` no lint. Sinonimo legado segue aceito.
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados. Era `adopted` desde
+                                # 2026-09-24 (a "unificação" dos vocabulários); revertido em 2026-10-07,
+                                # porque registro e carimbo respondem a perguntas DIFERENTES: aqui o
+                                # TIER na rede, lá a RELAÇÃO com o framework. Ver o cabeçalho do
+                                # members-validate.sh e a REGRA 92 (compatibilidade, não igualdade).
     kind: adopter
     parent: onion-evolve
     remote: n/a                 # SÓ LOCAL por ora: criar repo remoto é ato outward-facing, e o maestro não autorizou

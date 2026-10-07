@@ -2726,6 +2726,12 @@ check_door_role_parity() {
   local line
   while IFS= read -r line; do
     case "${line}" in
+      # ADOTANTE (desde 2026-10-07): compatibilidade registro×carimbo por mapa, SOFT — a cura pode morar
+      # no clone dele (carimbo, ato da sessão dele, I3) e nenhuma edição neste PR a garante. Vem ANTES
+      # dos padrões de porta porque `*CARIMBO-AUSENTE*` também casaria a tag do adotante.
+      *"[adotante/"*)
+        violation "SOFT" "docs/evolution/federation/members.yaml" "REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela): ${line}"
+        ;;
       # ⚠️ POR QUE ISTO É HARD, quando a REGRA 85 vizinha teve de virar SOFT: lá a cura é
       # RE-MATERIALIZAR a porta, o que só é possível DEPOIS do merge (materializar do HEAD da branch
       # publicaria trabalho não-mergeado num repo público) — HARD que nenhuma ação dentro do PR limpa.

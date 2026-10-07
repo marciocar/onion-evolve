@@ -39,12 +39,21 @@
 # fato (nenhum `parent:` apontando para ele). Quem dá essa capacidade é exatamente a maquinaria que o
 # carimbo nomeia. Por isso nas portas os dois campos respondem à mesma pergunta.
 #
-# ── Fronteira DECLARADA: só `kind: door`, e a razão NÃO é escopo, é SEMÂNTICA ────────────
-# Em `kind: adopter` o mesmo par de campos responde a perguntas DIFERENTES, e a casa já escreveu isso
-# no próprio registro: o `role:` do members.yaml diz o **TIER na rede** (T3: adota o core direto) e o
-# do carimbo diz a **RELAÇÃO com o framework** (este repo vendoriza o Onion) — então `standalone` no
-# registro com `adopted` no carimbo é CORRETO, não drift. Aplicar paridade a adotante produziria falso
-# positivo em massa. Coberto pelo caso (g) da bancada, para que a fronteira não seja só esta frase.
+# ── ADOTANTE: COMPATIBILIDADE, não paridade — e a razão é SEMÂNTICA ─────────────────────
+# Em `kind: adopter` o mesmo par de campos responde a perguntas DIFERENTES: o `role:` do members.yaml
+# diz o **TIER na rede** (T3: adota o core direto) e o do carimbo diz a **RELAÇÃO com o framework**
+# (este repo vendoriza o Onion) — então `standalone` no registro com `adopted` no carimbo é CORRETO,
+# não drift. Paridade ali produziria falso positivo em massa (caso (g) da bancada). Até 2026-10-07 o
+# adotante ficava FORA desta guarda, e o custo apareceu: registro e carimbo podiam dizer coisas
+# INCOMPATÍVEIS sem nenhum gate avisar (sinal de um adotante, 2026-10-07; medidos: um hub no
+# registro com `adopted` no carimbo, e `adopted` no registro de um T3). Agora o adotante é julgado por um MAPA de pares
+# permitidos — SOFT, porque a cura pode morar no clone (carimbo) ou aqui (registro):
+#     registro hub        → carimbo hub       (a autoridade de adoção É a maquinaria do carimbo)
+#     registro standalone → carimbo adopted   (carimbo `standalone` liga o MODO PORTA no lint: medido,
+#     registro consumer   → carimbo adopted    dois adotantes medidos: 0→16 e 0→14 HARD)
+# O mapa NÃO é a "terceira fonte" recusada acima: ele não diz que papel cada membro TEM, diz que
+# pares de vocabulário têm sentido juntos — é a tradução entre as duas dimensões, e muda só se o
+# vocabulário mudar.
 #
 # ── Fronteira DECLARADA: ela só julga o que pode LER ─────────────────────────────────────
 # O carimbo vive no CLONE da porta, resolvido por `local_path` do registro. Num runner de CI o
@@ -84,11 +93,12 @@ try:
 except Exception:
     sys.exit(5)          # YAML inválido é problema do members-validate.sh, não desta guarda
 for m in (doc.get('members') or []):
-    if not isinstance(m, dict) or str(m.get('kind', '')).strip() != 'door':
+    kind = str(m.get('kind', '')).strip() if isinstance(m, dict) else ''
+    if kind not in ('door', 'adopter'):
         continue
-    print("%s\x1f%s\x1f%s" % (str(m.get('id', '')).strip(),
+    print("%s\x1f%s\x1f%s\x1f%s" % (str(m.get('id', '')).strip(),
                               str(m.get('role', '') or '').strip(),
-                              str(m.get('local_path', '') or '').strip()))
+                              str(m.get('local_path', '') or '').strip(), kind))
 PY
 )"
 py_rc=$?
@@ -96,16 +106,37 @@ case "${py_rc}" in
   4) echo "door-role-parity: PyYAML ausente — a guarda RECUSA julgar (o repo lê este arquivo com yaml.safe_load; regex seria um leitor menos fiel)." >&2; exit 3 ;;
   5) echo "door-role-parity: members.yaml não é YAML válido — cobrança é do members-validate.sh." >&2; exit 3 ;;
 esac
-[ -n "${doors}" ] || { echo "door-role-parity: nenhuma porta (kind: door) no registro — nada a medir."; exit 0; }
+[ -n "${doors}" ] || { echo "door-role-parity: nenhuma porta nem adotante no registro — nada a medir."; exit 0; }
 
 # Normaliza um valor de papel: tira comentário inline, aspas e espaço. Vale para os DOIS lados —
 # comentário inline no carimbo (`role: hub   # carimbado`) produzia falso DIVERGE.
 _norm_role() { printf '%s' "$1" | sed 's/[[:space:]]*#.*$//; s/^[[:space:]]*//; s/[[:space:]]*$//; s/^["'"'"']//; s/["'"'"']$//'; }
 
-found=0; unreadable=0
-while IFS=$'\x1f' read -r mid role path; do
+# O mapa de pares permitidos registro→carimbo do ADOTANTE (ver o cabeçalho).
+_compat_ok() {  # $1=registro $2=carimbo
+  case "$1:$2" in hub:hub|standalone:adopted|consumer:adopted) return 0 ;; *) return 1 ;; esac; }
+
+found=0; unreadable=0; adopter_unreadable=0
+while IFS=$'\x1f' read -r mid role path kind; do
   [ -n "${mid}" ] || continue
   role="$(_norm_role "${role}")"
+
+  if [ "${kind}" = "adopter" ]; then
+    # Sem clone (CI) → não-medido, contado e declarado; sem papel no registro é cobrança do
+    # members-validate.sh, não desta guarda.
+    [ -n "${role}" ] || continue
+    if [ -z "${path}" ] || [ ! -d "${path}" ]; then adopter_unreadable=$((adopter_unreadable + 1)); continue; fi
+    if [ ! -f "${path}/.claude/.onion-version" ]; then
+      echo "REGRA 92: [adotante/CARIMBO-AUSENTE] adotante '${mid}' tem clone em ${path} mas NENHUM \`.claude/.onion-version\` — o registro diz que ele vendoriza o Onion e o clone não confirma; o clone está em outro checkout, desacoplou, ou o \`local_path\` envelheceu"
+      found=1; continue
+    fi
+    astamp="$(_norm_role "$(grep -m1 -E '^[[:space:]]*role:' "${path}/.claude/.onion-version" | sed 's/^[[:space:]]*role:[[:space:]]*//')")"
+    if ! _compat_ok "${role}" "${astamp}"; then
+      echo "REGRA 92: [adotante/PAPEL-INCOMPATIVEL] adotante '${mid}': registro \`${role}\` (tier) com carimbo \`${astamp:-<vazio>}\` (relação/corte) não é par permitido — o mapa é hub→hub e standalone|consumer→adopted. Decida qual lado está errado: promover/rebaixar o carimbo é ato da sessão DELE (\`/meta:adopt --update --role …\`); o registro se alinha aqui"
+      found=1
+    fi
+    continue
+  fi
 
   # (a) porta SEM `role:` no registro: não é divergência, é lacuna — e ela impede a comparação.
   if [ -z "${role}" ]; then
@@ -138,6 +169,9 @@ while IFS=$'\x1f' read -r mid role path; do
 done <<< "${doors}"
 
 # A DECLARAÇÃO do não-medido é impressa SEMPRE que houver — silêncio aqui seria fail-open.
+if [ "${adopter_unreadable}" -gt 0 ]; then
+  echo "door-role-parity: ${adopter_unreadable} adotante(s) com clone INALCANÇÁVEL — compatibilidade registro×carimbo NÃO MEDIDA neles." >&2
+fi
 if [ "${unreadable}" -gt 0 ]; then
   echo "door-role-parity: ${unreadable} porta(s) com clone INALCANÇÁVEL (sem local_path, ou diretório ausente) — paridade NÃO MEDIDA nelas. É o caso esperado no CI, onde o clone não existe; medir exigiria rede e credencial dentro do lint." >&2
 fi

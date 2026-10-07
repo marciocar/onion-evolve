@@ -113,7 +113,8 @@ if [ -n "${PARENT}" ]; then
   if [ "${PARENT}" != "${CORE_MEMBER_ID}" ]; then
     echo "ERRO: '${MEMBER}' adota '${PARENT}', não o core — é T2 (via-hub) e recebe PELO hub, não pelo carteiro do core (RFC-0003 §2.1). Entregue a '${PARENT}' e deixe o hub propagar." >&2; exit 2
   fi
-elif [ "${ROLE}" = "adopted" ]; then
+elif [ "${ROLE}" = "adopted" ]; then   # LEGADO: desde 2026-10-07 o members-validate.sh recusa `adopted` no registro
+                                       # (é vocabulário do CARIMBO). O ramo fica para registro antigo/sandbox.
   echo "ERRO: '${MEMBER}' tem role='adopted' e NENHUM campo \`parent:\` no registro — e sem ele eu não sei se ele adota o core direto (recebe aqui) ou um hub (recebe pelo hub). Declare \`parent:\` na entrada de '${MEMBER}' em members.yaml. Não escolho um lado por conveniência." >&2; exit 2
 elif [ "${ROLE}" != "hub" ] && [ "${ROLE}" != "standalone" ]; then
   echo "ERRO: '${MEMBER}' tem role='${ROLE}' e nenhum \`parent:\` — papel desconhecido para o carteiro-local (esperado hub, standalone, ou adopted com parent)." >&2; exit 2

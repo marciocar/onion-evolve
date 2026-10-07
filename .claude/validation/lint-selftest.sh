@@ -21934,6 +21934,37 @@ run_door_role_parity_selftests() {
     record_pass "door-role-parity: (g) kind adopter standalone×adopted NÃO é divergência (fronteira semântica)"
   else record_fail "door-role-parity: (g)" "acusou adotante, onde os dois campos respondem perguntas diferentes (rc=${arc}): $(_emit "${aout}" | head -c 200)"; fi
 
+  # (g2)…(g5) ADOTANTE POR COMPATIBILIDADE (2026-10-07, sinal de um adotante): o par registro×carimbo
+  # é julgado por um MAPA (hub→hub; standalone|consumer→adopted), não por igualdade. (g2) e (g3) são os
+  # dois pares incompatíveis medidos no vivo (um hub no registro com `adopted` no carimbo; e `standalone` no carimbo, que
+  # liga o modo porta no lint); (g4) o par legítimo de hub em silêncio; (g5) clone sem carimbo nomeado.
+  # MUTANTE: `_compat_ok` devolvendo sempre 0 reprova (g2) e (g3); voltar a pular `kind: adopter`
+  # reprova os quatro.
+  _drpa() { # $1=registro $2=carimbo ('' = sem .onion-version)
+    rm -f "${d}/porta/.claude/.onion-version"
+    [ -n "$2" ] && printf 'role: %s\n' "$2" > "${d}/porta/.claude/.onion-version"
+    { echo 'members:'; echo '  - id: adotante-de-teste'; echo '    kind: adopter'
+      echo "    role: $1"; echo "    local_path: \"${d}/porta\"" ; } > "${d}/docs/evolution/federation/members.yaml"
+    if _drpa_out="$(bash "${sut}" "${d}" 2>&1)"; then _drpa_rc=0; else _drpa_rc=$?; fi
+  }
+  _drpa hub adopted
+  if [ "${_drpa_rc}" = "1" ] && grep -q 'adotante/PAPEL-INCOMPATIVEL' <<< "${_drpa_out}"; then
+    record_pass "door-role-parity: (g2) adotante hub×adopted é INCOMPATÍVEL (o caso medido em 2026-10-07)"
+  else record_fail "door-role-parity: (g2)" "par incompatível passou calado (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
+  _drpa standalone standalone
+  if [ "${_drpa_rc}" = "1" ] && grep -q 'adotante/PAPEL-INCOMPATIVEL' <<< "${_drpa_out}"; then
+    record_pass "door-role-parity: (g3) adotante standalone×standalone é INCOMPATÍVEL (carimbo de porta num adotante)"
+  else record_fail "door-role-parity: (g3)" "carimbo de porta em adotante passou calado (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
+  _drpa hub hub
+  if [ "${_drpa_rc}" = "0" ] && ! grep -q 'adotante/' <<< "${_drpa_out}"; then
+    record_pass "door-role-parity: (g4) adotante hub×hub é compatível → SILENCIOSO"
+  else record_fail "door-role-parity: (g4)" "acusou par legítimo de hub (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
+  _drpa standalone ''
+  if [ "${_drpa_rc}" = "1" ] && grep -q 'adotante/CARIMBO-AUSENTE' <<< "${_drpa_out}"; then
+    record_pass "door-role-parity: (g5) adotante com clone e SEM carimbo é nomeado (não passa calado)"
+  else record_fail "door-role-parity: (g5)" "clone sem carimbo passou calado (rc=${_drpa_rc}): $(_emit "${_drpa_out}" | head -c 200)"; fi
+  mkdir -p "${d}/porta/.claude"
+
   # (h) YAML LEGAL com ASPAS não pode cegar a guarda. A 1ª versão lia por regex: `kind: "door"` fazia a
   # porta DESAPARECER — e a guarda então AFIRMAVA "nenhuma porta no registro", que é pior que um erro,
   # é uma afirmação falsa. Achado de passada adversarial, 2026-09-30.

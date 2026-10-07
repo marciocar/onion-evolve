@@ -6,7 +6,7 @@
 ```mermaid
 flowchart TD
   onion_evolve["onion-evolve<br/>source"]:::source
-  metagamify["metagamify<br/>hub · legacy"]:::hub
+  metagamify["metagamify<br/>standalone · legacy"]:::standalone
   pulse_mais["pulse-mais<br/>standalone · greenfield"]:::standalone
   granaai["granaai<br/>standalone · regulated"]:::standalone
   gustavo_pulga["gustavo-pulga<br/>standalone · greenfield"]:::standalone
@@ -23,7 +23,7 @@ flowchart TD
   poc_venda_direta_pdi["poc-venda-direta-pdi<br/>standalone · greenfield"]:::standalone
   arandek["arandek<br/>standalone · legacy"]:::standalone
   onion_dist["onion-dist<br/>standalone · greenfield"]:::standalone
-  sge["sge<br/>adopted · regulated"]:::adopted
+  sge["sge<br/>standalone · regulated"]:::standalone
   hub_formacao_enterprise["hub-formacao-enterprise<br/>hub · greenfield"]:::hub
   sacola_de_ideias["sacola-de-ideias<br/>standalone · greenfield"]:::standalone
   portal_gamificacao["portal-gamificacao<br/>standalone · greenfield"]:::standalone
@@ -68,7 +68,7 @@ flowchart TD
 | id | tier | mode | specializations | pin |
 |----|------|------|-----------------|-----|
 | onion-evolve | source |  | framework-template, sdaal, co-evolution, dogfooding, breadcrumbs | `—` |
-| metagamify | hub | legacy | gamification, nx-monorepo, asana-integration, metagamification | `21213cc6c3d6` |
+| metagamify | standalone | legacy | gamification, nx-monorepo, asana-integration, metagamification | `21213cc6c3d6` |
 | pulse-mais | standalone | greenfield | education, srl-plea, learning-materials | `c711baa17617` |
 | granaai | standalone | regulated | regulated-fintech, canonicalization, ssot-governance | `6cc162f32d1c` |
 | gustavo-pulga | standalone | greenfield | field-dogfood, greenfield-adoption | `c9eb2c40bc3b` |
@@ -85,7 +85,7 @@ flowchart TD
 | poc-venda-direta-pdi | standalone | greenfield | greenfield-adoption, document-comparison, compliance-nda, public-procurement | `219e9a5f365b` |
 | arandek | standalone | legacy | field-dogfood, legacy-adoption, monorepo, upstream-signal | `65d8a7501a03` |
 | onion-dist | standalone | greenfield | distribution-algorithms, kg-sdaal-method, research-arm, benchmarking | `e88c1e11e051` |
-| sge | adopted | regulated | licitacao-publica, lei-14133, regulated-greenfield, analise-tecnica, checklist-qualidade | `ba0d2d423c17` |
+| sge | standalone | regulated | licitacao-publica, lei-14133, regulated-greenfield, analise-tecnica, checklist-qualidade | `ba0d2d423c17` |
 | hub-formacao-enterprise | hub | greenfield | hub-de-adocao, formacao-hands-on, company-brain, spec-as-code | `f32e2f931c73` |
 | sacola-de-ideias | standalone | greenfield | astro-site, institutional, greenfield-dogfood | `8e2517724c0a` |
 | portal-gamificacao | standalone | greenfield | gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers | `2e3f3a6f88ce` |
