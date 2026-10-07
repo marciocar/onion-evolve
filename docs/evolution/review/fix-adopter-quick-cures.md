@@ -3,7 +3,6 @@ title: 'Resíduo — curas rápidas dos adotantes recentes: HARD re-medido no --
 date: 2026-10-07
 branch: fix/adopter-quick-cures
 reviewed_diff_sha256: pendente
-reviewed_code_sha256: pendente
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
