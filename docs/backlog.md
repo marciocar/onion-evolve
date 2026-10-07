@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**393 itens abertos** em 80 grafo(s) com aberto (de 106 no escopo) · 81 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**392 itens abertos** em 80 grafo(s) com aberto (de 106 no escopo) · 81 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -568,14 +568,13 @@
 | 13.5 | `Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE` | passada-adversarial-2026-09 | COMO FAZER A PERNA DE LEITURA ALCANCAR A SESSAO QUE ESCREVE NO GRAFO, sem virar ruido? Tres desenhos candidatos, nenhum medido: (a |
 | 6.8 | `Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER` | passada-adversarial-2026-09 | COMO FAZER O MAPA ENXERGAR O QUE A BANCADA EXERCITA POR FUNCAO-HELPER? Hoje ele le so o corpo de `run_*_selftests()`, e helpers de |
 
-## fila-2026-10-06 — 14 item(ns)
+## fila-2026-10-06 — 13 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 12.8 | `Q_ADOPT_TRES_DEFEITOS` | fila-2026-10-06 | adopt: gerar .gitignore de segredos, assinar o commit de adoção e disparar o CI em .githooks/** |
 | 9.6 | `Q_KG_SCHEMA_FORMAL` | fila-2026-10-06 | JSON Schema como contrato único do .kg.yaml; antes, medir quantos grafos passariam num schema estrito |
 | 7.0 | `Q_ONION_KG_SSOT_REPO` | fila-2026-10-06 | criar e adotar o onion-kg-ssot: produto independente, dogfood nos dois sentidos, contextos próprios, core lido por caminho ou git |
-| 6.4 | `Q_PRECOMMIT_NAO_LAVA_RESIDUO` | fila-2026-10-06 | fechar o recarimbo do pre-commit com a mesma proteção do motor (só recarimba se reviewed_code_sha256 casar) |
 | 5.4 | `Q_ROTULO_SEPARADO_DA_NARRATIVA` | fila-2026-10-06 | separar o rótulo factual da narrativa num campo próprio do nó |
 | 4.2 | `Q_MERGE_GATE_AVISA_NO_ADOTANTE` | fila-2026-10-06 | a trava de merge deve avisar no adotante em vez de sair calada |
 | 4.2 | `Q_PR_FINALIZE_MELHORIAS` | fila-2026-10-06 | pr-finalize: imprimir as violações ao reprovar, registrar etapa e rc com trap, catracas estáticas no checkpoint, rebase com ín |

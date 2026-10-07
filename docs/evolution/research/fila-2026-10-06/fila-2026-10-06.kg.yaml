@@ -159,10 +159,11 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 4
-    confidence: 0.8
-    verified_against: ".githooks/pre-commit"
+    confidence: 0.9
+    verified_at: 2026-10-07
+    verified_against: "bancada hook_regen_table (r56): pendente carimba os dois, código igual só o diff, código mudado não toca; mutante morde"
     label: "fechar o recarimbo do pre-commit com a mesma proteção do motor (só recarimba se reviewed_code_sha256 casar)"
   - id: Q_PR_FINALIZE_MELHORIAS
     node_type: question

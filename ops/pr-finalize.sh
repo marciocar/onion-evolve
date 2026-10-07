@@ -62,7 +62,14 @@ VERIFY=(); [ "${ONION_FINALIZE_CHECKPOINT:-0}" = 1 ] && VERIFY=(--no-verify)
 
 # .claude/validation/lint-rules.md (REGRA 39) também é regenerado pelo regen-ssot-projections.sh: fora da
 # lista, ficava regenerado na árvore e defasado no commit (bloqueador B2 do Elenxo).
-GENERATED="docs/onion/inventory.md docs/onion/graph.md docs/onion/testing-state.md docs/onion/testing-inventory.md docs/onion/kg-read-index.tsv docs/onion/federation-console.html docs/backlog.md .claude/validation/lint-rules.md"
+# A lista e o hash de código vêm da FONTE ÚNICA (onion-regen-lib.sh), que o pre-commit também usa.
+# shellcheck source=/dev/null
+# Carregada do lado DO MOTOR (ops/../.claude/validation), não do repo onde ele roda: a bancada exercita o
+# motor num sandbox sem a lib, e a 1ª forma (git rev-parse) quebrou ali — a lib é do motor, não do alvo.
+_ONION_LIB="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)/.claude/validation/onion-regen-lib.sh"
+[ -r "${_ONION_LIB}" ] || { echo "PR-FINALIZE: lib ausente (${_ONION_LIB}) — não calculo hash de código sem ela" >&2; exit 1; }
+. "${_ONION_LIB}"
+GENERATED="${ONION_GENERATED}"
 RES="docs/evolution/review/$(printf '%s' "${BR}" | tr / -).md"
 # Julga SEMPRE no contexto de PR, como o runner (antes do `gh pr create` a guarda do resíduo dizia "fora de
 # escopo" e o motor aceitava — maior M3 do Elenxo). Número real se houver; 0 se ainda não há PR.
@@ -76,11 +83,7 @@ _codehash() {  # identidade do CÓDIGO do índice contra a base, SEM o resíduo 
   # contexto mudam num rebase LIMPO — o motor dizia "o código mudou" sem ninguém ter mudado nada, e o
   # falso positivo ensinava a lavar à mão. O patch-id é estável sob rebase e muda quando o hunk muda.
   # Exclui SÓ o resíduo deste PR (menor 8): outro arquivo em docs/evolution/review/ é código.
-  local base ex=(":(exclude)${RES}") g
-  base="$(_base)" || { echo "PR-FINALIZE: sem merge-base com origin/main nem main" >&2; return 1; }
-  for g in ${GENERATED}; do ex+=(":(exclude)${g}"); done
-  git -c core.abbrev=40 -c diff.noprefix=false diff --no-ext-diff --no-color --cached "${base}" -- . "${ex[@]}" \
-    | git patch-id --stable | sort | sha256sum | cut -c1-64
+  onion_codehash "${RES}"
 }
 _field() {  # lê o campo como a guarda lê (só o frontmatter, sem aspas), e sem espaço nas pontas
   awk 'NR==1 && $0!="---"{exit} NR>1 && $0=="---"{exit} NR>1' "${RES}" \
