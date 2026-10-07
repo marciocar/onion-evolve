@@ -22,8 +22,17 @@ paths:
 | `status:` | `open` `confirmed` `drifted` `unverifiable` `refuted` `superseded` `done` | ~~valores fora do enum passam sem gate — 11 circulando hoje~~ **FALSO, e medido: o motor REPROVA (fator −1 em `lib/status-factor.awk`), e o corpus vivo tem 4.021 `status:` com ZERO fora do enum** (2026-09-22; achado #8 do sinal de campo de 2026-09-10, que foi ler a doutrina para construir em cima dela). A linha velha fica riscada em vez de apagada: doutrina que afirmava o oposto do código é o defeito que esta casa persegue, e apagá-la transformaria a correção em propaganda. `drifted`/`unverifiable` são a SAÍDA de `/meta:kg-freshness` e existem desde 2026-08-06: sem elas, selar um drift só dava para **recusar** (exit 1) ou **mentir de `refuted`**, que zera a atenção do nó que acabou de provar que a realidade andou |
 | `impact:` / `confidence:` | 1–5 / 0–1 | — |
 | `verified_at:` / `verified_against:` | data + o que foi medido | ausente em nó `PROD` → `STALE-MISSING` |
-| `valid_from:` · `source_tier:` (1–10) · `source_kind:` | opcionais em `evidence` — bi-temporal (o fato ≠ a verificação) e autoridade da fonte | confundir `valid_from` com `verified_at`; tier alto em blog de concorrente (`vendor-on-competitor`) |
+| `valid_from:` · `source_tier:` (1–10) · `source_kind:` | opcionais em `evidence` — bi-temporal (o fato ≠ a verificação) e autoridade da fonte. `valid_from` **sempre entre aspas** (`"2026"`, `"2026-10-01"`) | confundir `valid_from` com `verified_at`; tier alto em blog de concorrente (`vendor-on-competitor`); **`valid_from: 2026` sem aspas** é INTEIRO para todo leitor YAML tipado (o radar avisa `VALID-FROM-INTEIRO`, SOFT) |
+| `id:` (nó) | só `[A-Za-z0-9_]` — o radar **reprova** (`--integrity`) id fora do alfabeto | prefixar com nome de arquivo **com a extensão** (`SYNTHESIS.md_X`): o ponto quebra quem endereça nó por caminho |
+| **`on:`** (aresta `TRANSITIONS`, camada domain) | id do nó `event` que dispara a transição: `- from: ST_A` / `to: ST_B` / `edge_type: TRANSITIONS` / `on: EV_X` | apontar evento que não existe no arquivo — o radar **reprova** (`on aponta evento inexistente`) e conta a aresta como ligação do evento |
 | `meta.review_after:` | data de revisita (grafos de pesquisa) | ausente em grafo novo de pesquisa → SOFT; vencido → SOFT |
+
+> ⚠️ **Teto declarado de `on:` (2026-10-07):** um leitor **YAML 1.1** (o default do PyYAML, por
+> exemplo) lê a chave `on:` como o **booleano `True`**, não como a string `"on"` — e aí o evento
+> referenciado parece órfão para ele, enquanto o radar (que lê texto) o aprova. Com os booleanos do
+> YAML 1.2 os dois leitores concordam. **O perfil de YAML ainda não está fixado nesta gramática**: é
+> decisão do contrato formal do `.kg.yaml`, em desenho. Até lá, quem escreve leitor tipado do corpus
+> trate a chave `True` de uma aresta como `on`, ou carregue com perfil 1.2.
 
 **Formato estrito:** o radar é `awk`, não parser YAML. Uma chave por linha; listas com `- id:` /
 `- from:`. `id` em **inglês**, `label` em **pt-BR**.
