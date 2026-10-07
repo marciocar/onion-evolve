@@ -37,7 +37,6 @@
 .claude/commands/meta/adopt.md	C_PESO_ADOPT_E_KG	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
 .claude/commands/meta/adopt.md	C_PRECONDICAO_INTEGRACAO_SOBREVIVE	docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml
 .claude/commands/meta/adopt.md	D_CURE_AMEND_FILTERED_BASELINE_INTO_MERGE	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
-.claude/commands/meta/adopt.md	E_ADOPT_SEM_GITIGNORE_DE_SEGREDOS	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/commands/meta/adopt.md	E_F10_SETTINGS_POS_STARTUP_VALEM	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/commands/meta/adopt.md	E_LS_UNUSED	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 .claude/commands/meta/adopt.md	E_MECHANISM_ORPHAN	docs/onion/graph/graduated-automation-elenxo-2026-07.kg.yaml
@@ -194,10 +193,8 @@
 .claude/skills/onion-publish/SKILL.md	E_R3_F10_RELOAD_PLUGINS_HEADLESS	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .claude/skills/onion/SKILL.md	D_FASE_A_SKILLS_EN	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/skills/onion/SKILL.md	SY6_ev_regua_p0p3_skill	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
-.claude/utils/adopt/ci-workflow-onion.tpl	E_CI_TEMPLATE_IGNORA_GITHOOKS	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/utils/adopt/decouple-source.sh	TX_decouple	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
 .claude/utils/adopt/durable-commit.sh	C_TETO_ADOCAO_INICIAL_NAO_PASSA_A_LISTA	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
-.claude/utils/adopt/durable-commit.sh	E_DURABLE_COMMIT_SEM_ASSINATURA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/utils/adopt/durable-commit.sh	E_HAVIA_UMA_QUINTA_COPIA_DA_LISTA	docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml
 .claude/utils/adopt/durable-commit.sh	E_UPDATE_PERDIA_ARQUIVO_NOVO_IGNORADO	docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml
 .claude/utils/adopt/durable-commit.sh	Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA	docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml
@@ -469,6 +466,7 @@
 .claude/validation/lint-selftest.sh	E_MAPA_SEM_MERGE_ONION_HOOKS	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/lint-selftest.sh	E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/lint-selftest.sh	E_OBJECAO_1_DOR_E_SCRIPT_SEQUENCIAL_NAO_HOOK	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
+.claude/validation/lint-selftest.sh	E_PRECOMMIT_SELECAO_GROSSA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/validation/lint-selftest.sh	E_REPLACE_PRIMEIRO_ACERTOU_O_COMENTARIO	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/lint-selftest.sh	E_SELFTEST	docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml
 .claude/validation/lint-selftest.sh	E_minha_guarda_deu_fail_open	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
@@ -510,7 +508,6 @@
 .githooks/pre-commit	C_OPCAO_B_ABSORVER_ORDEM_DERIVADA	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .githooks/pre-commit	E_OBJECAO_3_FIXPOINT_DO_ESLINT_SUBEXPLORADO	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .githooks/pre-commit	E_PRECOMMIT_CONDICIONAL_A_CONFIG_LOCAL	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
-.githooks/pre-commit	E_PRECOMMIT_RECARIMBA_RESIDUO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .githooks/pre-commit	E_gate_declara_1min_e_leva_15	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
 .githooks/pre-commit	Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .githooks/pre-push	C_TETO_O_QUE_O_PRE_PUSH_NAO_PEGA	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml

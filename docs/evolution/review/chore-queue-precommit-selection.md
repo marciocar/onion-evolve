@@ -1,14 +1,15 @@
 ---
-title: 'Resíduo — colheita da fila 2026-10-06 e o nó da seleção do pre-commit'
+title: 'Resíduo — colheita da fila 2026-10-06, o nó da seleção do pre-commit e um falso positivo da REGRA 63'
 date: 2026-10-07
 branch: chore/queue-precommit-selection
-reviewed_diff_sha256: pendente
-findings_total: 0
-findings_real: 0
-findings_fixed: 0
+reviewed_diff_sha256: 9d256599f38ec9148aa61bcb7252d6997d0c139c3340852553648e3646a282eb
+reviewed_code_sha256: db7dc732fdde00a23b017b94f04bcace34b875326f184b5c60aa21813f88ac09
+findings_total: 1
+findings_real: 1
+findings_fixed: 1
 tokens: 0
 duration_min: 10
-verdict: LIMPO
+verdict: CORRIGIDO
 elenxo: nao
 nota: >-
   Registro pedido pelo maestro: re-forjar o pre-commit para escolher a bancada por caso. Antes de
@@ -22,7 +23,14 @@ nota: >-
   E_DURABLE_COMMIT_SEM_ASSINATURA, E_CI_TEMPLATE_IGNORA_GITHOOKS). Nenhum outro grafo cita esses ids;
   só resíduos antigos, em prosa, e a história fica no git. 30 → 23 nós; radar --integrity --schema
   exit 0. REGRA 87 (PR que EDITA um .kg.yaml enxergou os confirmed dele) — confirmed vistos: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA, E_HOOK_PR_SEM_PASSADA_FALSO_POSITIVO, E_MAPA_SEM_MERGE_ONION_HOOKS, E_DOIS_LEITORES_DIVERGIAM, E_NARRATIVA_NO_ROTULO_VAZA_GABARITO, E_RADAR_CEGO_A_TIPO_TROCADO, E_CANAL_VIVO_ENTRE_SESSOES_USADO, E_MERGE_GATE_INERTE_NO_ADOTANTE, D_PAPEL_DUAS_DIMENSOES, E_PRECOMMIT_SELECAO_GROSSA.
-  Sem Elenxo, declarado: registro de compromisso e colheita de itens já fechados, sem decisão nova.
+  Achado curado no caminho: a REGRA 63 (Colheita de grafo emite os ids colhidos no resíduo de
+  revisão) acusou HARD pedindo para nomear Q_GRANAAI_CLONE_SEM_CARIMBO, que NÃO foi colhido: ao
+  inserir os nós novos antes das arestas, o diff de linhas mostrou esse nó saindo e voltando. A
+  guarda agora desconta os ids readicionados no mesmo diff; caso (e) da família harvest_residue
+  (nó só movido → cala), e o mutante que remove o desconto faz o caso reprovar (medido). Pre-commit
+  pulado por ordem do maestro (checkpoint --no-verify); validação = família tocada + mutante +
+  pr-finalize + CI. Sem Elenxo, declarado: registro de compromisso, colheita de itens já fechados e
+  uma cura estreita de falso positivo com caso e mutante.
 ---
 
 # Resíduo — `chore/queue-precommit-selection`
