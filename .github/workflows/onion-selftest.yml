@@ -133,6 +133,9 @@ jobs:
         # está bom" de "não verifiquei" — no CI só o primeiro vale verde.
         env:
           ONION_SELFTEST_STRICT: '1'
+          # ⏱ por família no log: é a medida que o collect-family-times.sh lê para o plano dividir as faixas
+          # por TEMPO, e não por round-robin (faixas de 5 a 19 min no mesmo PR, 2026-10-07)
+          ONION_SELFTEST_TIMING: '1'
           # a fatia desta faixa no manifest da família `fixtures` (o plano a reparte entre TODAS as faixas)
           ONION_SELFTEST_FIXTURES_LANE: ${{ matrix.faixa.fixtures_lane }}
         # --jobs auto: faixa paralela (D_BANCADA_FAIXAS_E_MAPA, 2026-09-03) — cada worker é um

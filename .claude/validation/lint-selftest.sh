@@ -22702,6 +22702,29 @@ print("OK" if f1 and f2 and f1[0] != f2[0] else "CONTIGUO")
   else record_fail "shard-plan: (d)" "sem SUT saiu rc=${rcd} (esperado 2 — nao pude planejar != plano vazio)"; fi
   rm -rf "$d"
 
+  # (f) TEMPO MEDIDO (2026-10-07): com a tabela, o LPT põe o caro na faixa mais leve — a faixa mais pesada
+  #     fica abaixo da do round-robin para os MESMOS tempos — e a cobertura continua exata.
+  local _tt _ev; _tt="$(mktemp)"
+  bash "${REPO_ROOT}/.claude/validation/lint-selftest.sh" --list 2>/dev/null | awk 'NR%7==1{print $1"	300";next}{print $1"	"(NR%5+1)*10}' > "${_tt}"
+  _ev="$(ONION_ROOT="${REPO_ROOT}" TT="${_tt}" SUT="${sut}" python3 -c '
+import json, os, subprocess
+t = {l.split("	")[0]: float(l.split("	")[1]) for l in open(os.environ["TT"]) if "	" in l}
+def plan(env):
+    e = dict(os.environ); e.update(env)
+    return json.loads(subprocess.run(["bash", os.environ["SUT"], "4"], capture_output=True, text=True, env=e).stdout)
+def worst(sh): return max(sum(t.get(f, 0) for f in s["familias"].split(",") if f != "fixtures") for s in sh)
+lpt = plan({"ONION_SHARD_TIMES": os.environ["TT"]})
+rr = plan({"ONION_SHARD_TIMES": "/nao/existe"})
+got = sorted(f for s in lpt for f in s["familias"].split(",") if f != "fixtures")
+want = sorted(f for s in rr for f in s["familias"].split(",") if f != "fixtures")
+print("OK %d<%d" % (worst(lpt), worst(rr)) if got == want and worst(lpt) < worst(rr) else "FALHA lpt=%d rr=%d cobre=%s" % (worst(lpt), worst(rr), got == want))
+' 2>&1)"
+  rm -f "${_tt}"
+  case "${_ev}" in
+    OK*) record_pass "shard-plan: (f) com tempo medido, a faixa mais pesada cai (${_ev#OK }) e nenhuma família se perde" ;;
+    *)   record_fail "shard-plan: (f) o plano por tempo não equilibra" "${_ev}" ;;
+  esac
+
   # (e) LISTA VAZIA => exit 1. E o fail-open mais caro num gate de gate: matriz vazia = job verde
   #     que nao exerceu NADA. Fixture: um --list que devolve zero linhas com rc 0.
   local e; e="$(mktemp -d)"; mkdir -p "$e/ops/testing" "$e/.claude/validation"
