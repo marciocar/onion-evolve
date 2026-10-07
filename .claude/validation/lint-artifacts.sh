@@ -412,7 +412,9 @@ violation() {
     # motor reprovava com "HARD=1" e a sessão relintava a árvore inteira para descobrir qual (4x num dia).
     # O formato da linha fica intacto (o pre-push e a bancada leem `^VIOLATION`); quem quer a lista pede
     # por esta variável.
-    [ -n "${ONION_LINT_HARD_FILE:-}" ] && echo "VIOLATION: ${rel_file}: ${rule}" >> "${ONION_LINT_HARD_FILE}"
+    # `if`, NUNCA `[ ] && echo` como última instrução: sem a variável, o `&&` devolvia 1, a função
+    # `violation()` retornava 1 e o lint ABORTAVA (todas as faixas do CI no PR #944).
+    if [ -n "${ONION_LINT_HARD_FILE:-}" ]; then echo "VIOLATION: ${rel_file}: ${rule}" >> "${ONION_LINT_HARD_FILE}"; fi
   else
     SOFT_COUNT=$(( SOFT_COUNT + 1 ))
   fi
