@@ -3911,12 +3911,17 @@ edges:
     edge_type: SUPPORTS
     reason: "campo livre cujo texto contém on: como substring"
 KGEOF
+  # ⚠️ Desde 2026-10-07 id com ':' é REPROVADO pela gramática (alfabeto [A-Za-z0-9_]), então este
+  # grafo não sai mais verde. O que o caso prova continua o mesmo — a âncora do PARSE: o `to:` não é
+  # recortado na última ocorrência (nada de "v2" inexistente) e o `on:` não é lido de dentro do
+  # `reason:`. Por isso a única reprova aceita é a do ALFABETO; qualquer 'inexistente' é o bug velho.
   rc=0; out=$(bash "${radar}" "${tmp}/edge-collision.kg.yaml" --integrity 2>&1) || rc=$?
-  if [ "${rc}" -eq 0 ] \
-     && grep -q 'sem contradições estruturais' <<< "${out}" \
+  if [ "${rc}" -eq 1 ] \
+     && grep -q 'D_migrate_to:v2: id fora do alfabeto' <<< "${out}" \
+     && [ "$(grep -c '✗' <<< "${out}")" -eq 1 ] \
      && ! grep -q 'inexistente' <<< "${out}"; then
-    record_pass "kg-label-collision: aresta com id contendo ':' e campo livre citando 'on:' → integridade verde"
-  else record_fail "kg-label-collision: arestas/meta ancoradas" "esperava exit 0 sem 'inexistente'; rc=${rc} out=${out}"; fi
+    record_pass "kg-label-collision: aresta com id contendo ':' e campo livre citando 'on:' → parse ancorado (só o alfabeto reprova, nada 'inexistente')"
+  else record_fail "kg-label-collision: arestas/meta ancoradas" "esperava exit 1 SÓ por 'id fora do alfabeto', sem 'inexistente'; rc=${rc} out=${out}"; fi
 }
 
 # ---------------------------------------------------------------------------
