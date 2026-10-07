@@ -93,7 +93,7 @@ edges:
     to: C_MEU_CLAIM
     edge_type: SUPPORTS      # AUDIT: SUPPORTS | REFUTES | SUPERSEDES | CAUSES | DEPENDS_ON | TRACES_TO
                              # DOMAIN: HAS_STATE | TRANSITIONS | EMITS | CONSTRAINS | READS | WRITES
-    on: EV_GATILHO           # só TRANSITIONS: o evento que dispara (conta como conexão do evento)
+    trigger: EV_GATILHO      # só TRANSITIONS: o evento que dispara (conta como conexão do evento; `on:` é legado PROIBIDO)
 ```
 
 Peso do nó = `impact × confidence × fator de status` (open/confirmed = 1.0 · refuted = 0 ·
@@ -148,7 +148,7 @@ bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-console.sh <arquivo> > grafo.html      
   EVENT-sem-efeito · STATE-sem-dona · RULE-sem-trace · fonte-única (>1 READS — átomo lendo de 2 fontes).
   *Foi esta checagem que fez o SLOT-limbo emergir do modelo no dogfood de campo.*
 - **INTEGRIDADE** = órfãos, arestas para nós inexistentes, contradições (REFUTES entrando em nó
-  ainda `confirmed`), enums inválidos (incl. `layer`, `on:` para evento inexistente).
+  ainda `confirmed`), enums inválidos (incl. `layer`, `trigger:` para evento inexistente).
   **Exit 1 = reconciliar antes de commitar.**
 - **FRESCOR** (⚠ **não reprova**) = a SSOT foi re-verificada contra o vivo? **STALE-MISSING** (nó rastreado —
   `plane:PROD` **ou** com `verified_against:` — sem `verified_at:`) · **STALE-OLD** (`verified_at` anterior à
@@ -200,7 +200,7 @@ entidades, estados, transições (com evento gatilho), regras/invariantes — **
 regras+estados+eventos) que ela toca.
 
 **Jornadas/fluxos → máquina de estados** (por identidade, não analogia): passos da jornada = `state`
-do progresso do ator (ou do processo, se fluxo de sistema); avanço = `TRANSITIONS` com `on:` no
+do progresso do ator (ou do processo, se fluxo de sistema); avanço = `TRANSITIONS` com `trigger:` no
 evento (ação do usuário ou do sistema); cada passo `TRACES_TO` a tela/endpoint que toca. O radar
 paga na hora: **estado-absorvente = ponto de drop-off/limbo do funil** — o mesmo motor que achou o
 SLOT-limbo acha onde a jornada morre. Sem tipos novos até um dogfood pedir (gated-until-trigger).

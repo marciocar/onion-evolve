@@ -1,19 +1,18 @@
 ---
-title: 'Resíduo — defeitos de dado do .kg.yaml corrigidos, o radar cobra o alfabeto do id e avisa o valid_from sem aspas, e on: entra na gramática'
+title: 'Resíduo — defeitos de dado do .kg.yaml corrigidos, o radar cobra o alfabeto do id e avisa o valid_from sem aspas, e o gatilho de TRANSITIONS passa a ser trigger: (on: vira legado)'
 date: 2026-10-07
 branch: fix/kg-data-defects-and-on-grammar
-reviewed_diff_sha256: 62f6c6201b88f2dbb1b0302ee4c01aec0cb3e79b5dca99555433992cfbd61eb9
-reviewed_code_sha256: d7540167e8e45dba7d4f8dbc567999fcafb00079a84dbcee47d70302543f910f
-findings_total: 3
-findings_real: 2
-findings_fixed: 2
+reviewed_diff_sha256: pendente
+findings_total: 4
+findings_real: 3
+findings_fixed: 3
 tokens: 0
 duration_min: 60
 verdict: CORRIGIDO
 elenxo: nao
 nota: >-
   Triagem do sinal 2026-10-07-spike-schema-defeitos-de-dado-e-gramatica (maestro: corrigir o DADO e
-  documentar on:; política de extensões, MUST×SHOULD e perfil YAML ficam com o contrato em desenho).
+  documentar o gatilho; depois o maestro decidiu ADOTAR trigger:, alinhado ao contrato selado no adotante).
   Medido por leitor tipado (yaml.safe_load) nos 138 grafos: 12 ids SYNTHESIS.md_* (29 ocorrências),
   6 valid_from inteiros em 4 grafos, 6 sem schema_version, 9 sem meta.id, 7 com schema_version
   inteiro. Depois: 0 em todas. Passada adversarial feita pela própria sessão (fork sem permissão de
@@ -57,10 +56,21 @@ Conferido por ausência: `grep -rn 'SYNTHESIS\.md_'` no repo = 0.
    adotantes clonados carregam 42 ocorrências em 7 grafos de 3 clones: o próximo `--update` deles
    nasceria vermelho por dado antigo. Ficou SOFT (REGRA 52 repassa `VALID-FROM-INTEIRO`).
 
+4. **REAL, CORRIGIDO — a 1ª redação documentava `on:` na direção oposta ao contrato.** O contrato
+   formal do `.kg.yaml` em curso selou perfil YAML 1.2 restrito, `on` proibido e o gatilho renomeado
+   para `trigger`. O maestro decidiu adotar: `kg-radar.sh` e `kg-view.sh` leem `trigger:`; `on:` segue
+   lido e acusado (`ON-LEGADO`, SOFT na REGRA 52, nomeando o arquivo); 7 arestas do corpus e 3 das
+   fixtures migradas (`grep -rn '^ *on: ' --include=*.kg.yaml` = 0); gramática, `/meta:kg` e a KB
+   atualizados. A saída `--triples` passou a escrever `trigger` no lugar de `on` (o único consumidor,
+   `kg-drive-project.sh`, lê só os 3 primeiros campos). A chave `on` do JSON interno do `kg-view` ficou
+   (não é YAML).
+
 ## Validação (ordem do maestro: pre-commit pulado)
 
 - Commits com `--no-verify` (checkpoint, por ordem do maestro). Validação feita: família de bancada
-  tocada `kg_radar_integrity` 8/8 com `LC_ALL=C`; três mutantes morderam — desligar a cobrança do id
+  tocada `kg_radar_integrity` 10/10 com `LC_ALL=C`; cinco mutantes morderam — sem o parse de
+  `trigger:` reprova (j) por evento órfão; sem o aviso de legado reprova (i); famílias que leem as
+  fixtures migradas (`fixtures`, `kg_console`, `kg_freshness`, `kg_view`, `kg_census_parity`) 156/156; — desligar a cobrança do id
   reprova (e); ler o valid_from trimado reprova (h); tirar o repasse SOFT reprova (g). Gate final:
   `ops/pr-finalize.sh --push` (0 HARD) e CI completo verde antes do merge.
 - Dogfood: REGRA 52 sobre o corpus do core = 0 achados; radar num grafo real de adotante = 15 avisos,
