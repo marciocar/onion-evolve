@@ -2,8 +2,8 @@
 title: 'Resíduo — lote de fim do dia da fila 2026-10-06 + a tabela de tempos entra no mapa da bancada'
 date: 2026-10-07
 branch: chore/queue-reconcile-and-times-map
-reviewed_diff_sha256: 13007a790c2b0705399ffa2ab4a3f7e38608ea8f72f6e0f816570b68d50051a3
-reviewed_code_sha256: a9ca43abc2946d0e56905c77293adb520e45af71f546af83d85b5c7bf382a753
+reviewed_diff_sha256: 83697b61d2cd73122987f2eadca1cd0e8ee96373d61cf91bd59196280365bb2a
+reviewed_code_sha256: 63c1283d999d018f1ff36f2def74daa1949a9fb8f135515aa491a1055ec754a9
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
@@ -31,7 +31,9 @@ nota: >-
   E_CI_TEMPLATE_IGNORA_GITHOOKS, E_DOIS_LEITORES_DIVERGIAM, E_NARRATIVA_NO_ROTULO_VAZA_GABARITO,
   E_RADAR_CEGO_A_TIPO_TROCADO, E_CANAL_VIVO_ENTRE_SESSOES_USADO, E_MERGE_GATE_INERTE_NO_ADOTANTE,
   D_PAPEL_DUAS_DIMENSOES. Sem Elenxo, declarado: reconciliação de estado já medido e um caso de bancada
-  com mutante.
+  com mutante. Depois do CI verde o maestro selou o lote (drive_checkpoint: sealed) e respondeu o
+  granaai: projeto abandonado em favor do brain-granaai; o nó passou a nomear o próximo passo (aposentar
+  o membro sem perder a proteção da REGRA 36), revisado nesta mesma passada.
 ---
 
 # Resíduo — `chore/queue-reconcile-and-times-map`
