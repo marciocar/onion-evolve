@@ -2,7 +2,8 @@
 title: 'Resíduo — colheita da fila 2026-10-06, o nó da seleção do pre-commit e um falso positivo da REGRA 63'
 date: 2026-10-07
 branch: chore/queue-precommit-selection
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 897743a412c96b0b0d7f32123743005bb65d27cca66da54458d3f4283c9625eb
+reviewed_code_sha256: e6d7cd3b6bd9313624744ceba88804619e330905523ab6dd1b60fcc9e0c9019a
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
