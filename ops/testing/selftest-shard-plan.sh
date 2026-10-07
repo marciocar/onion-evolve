@@ -40,18 +40,39 @@ if [ "${#FAMS[@]}" -eq 0 ]; then
   exit 1
 fi
 
-printf '%s\n' "${FAMS[@]}" | N="${N}" python3 -c '
+# TEMPO MEDIDO (2026-10-07): com a tabela `familia<TAB>segundos` (medida no RUNNER pelo coletor
+# ops/testing/collect-family-times.sh), o plano distribui por LPT guloso — a familia mais cara vai para a
+# faixa mais leve. Medido antes: faixas de 5/10/17/19 min no mesmo PR, com a soma pedindo ~11 por faixa.
+# Sem a tabela, segue o round-robin. Familia que a tabela nao conhece entra com a MEDIANA, nunca com zero.
+TIMES="${ONION_SHARD_TIMES:-${ROOT}/ops/testing/selftest-family-times.tsv}"
+[ -f "${TIMES}" ] || TIMES=""
+printf '%s\n' "${FAMS[@]}" | N="${N}" TIMES="${TIMES}" python3 -c '
 import json, os, sys
 fams = [l.strip() for l in sys.stdin if l.strip()]
 n = max(1, int(os.environ["N"]))
+times = {}
+if os.environ.get("TIMES"):
+    for line in open(os.environ["TIMES"], encoding="utf-8"):
+        parts = line.rstrip("\n").split("\t")
+        if len(parts) == 2 and not parts[0].startswith("#"):
+            try: times[parts[0]] = float(parts[1])
+            except ValueError: pass
 # `fixtures` NAO entra no round-robin: vai a TODA faixa com a sua fatia do manifest (fixtures_lane i/n).
 # Medido 2026-10-05: ~1600 s de CPU numa faixa so, teto de 25 min estourado 3x no PR #927 — somar
 # faixas nao ajudava enquanto ela inteira caisse numa so.
 fx = "fixtures" in fams
 rest = [f for f in fams if f != "fixtures"]
 shards = [[] for _ in range(n)]
-for i, f in enumerate(rest):
-    shards[i % n].append(f)
+if times:
+    known = sorted(v for v in times.values())
+    med = known[len(known) // 2] if known else 1.0
+    load = [0.0] * n
+    for f in sorted(rest, key=lambda f: -times.get(f, med)):   # LPT: o mais caro primeiro
+        k = load.index(min(load))
+        shards[k].append(f); load[k] += times.get(f, med)
+else:
+    for i, f in enumerate(rest):
+        shards[i % n].append(f)
 out = []
 for i, s in enumerate(shards):
     if fx: s = ["fixtures"] + s
