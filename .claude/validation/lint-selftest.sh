@@ -8329,9 +8329,15 @@ run_empty_result_guard_selftests() {
   # (j) prova que dispara nos dois verbos que importam; (k) prova que NAO virou ruido nos verbos
   # vizinhos de LEITURA (`view`/`checks`/`list`), que sao justamente o que a guarda esta mandando ler.
   # Sem (k), a guarda ensinaria a ignorar a si mesma no momento exato em que quer ser obedecida.
+  # Projeto HERMÉTICO para o create: desde 2026-10-07 o aviso confere o resíduo commitado na branch,
+  # e rodar no checkout vivo faria (j) depender de a branch corrente ter resíduo.
+  local _pj; _pj="$(mktemp -d)"; git -C "${_pj}" init -q
+  git -C "${_pj}" -c user.name=t -c user.email=t@t commit -q --allow-empty -m i
+  git -C "${_pj}" checkout -q -b feat/x; mkdir -p "${_pj}/.claude/validation"; : > "${_pj}/.claude/validation/lint-artifacts.sh"
+  mkdir -p "${_pj}/.github/workflows"; : > "${_pj}/.github/workflows/onion-review.yml"   # (j) cita a FONTE do revisor
   local mg_ok=1 v
-  for v in '"gh pr merge 551 --squash --delete-branch"' '"gh pr create --base main --head x"'; do
-    out="$(_erg "${v}" '"ok"' || true)"
+  for v in '"gh pr merge 551 --squash --delete-branch"' '"gh pr create --base main --head feat/x"'; do
+    out="$(CLAUDE_PROJECT_DIR="${_pj}" _erg "${v}" '"ok"' || true)"
     grep -qE 'MERGE-SEM-FONTE-LIDA|PR-SEM-PASSADA-ADVERSARIAL' <<< "${out}"|| mg_ok=0
   done
   if [ "${mg_ok}" -eq 1 ]; then
@@ -8351,6 +8357,29 @@ run_empty_result_guard_selftests() {
   if [ "${mg_noisy}" -eq 0 ]; then
     record_pass "empty-result-guard: (k) MENÇÃO ao comando (grep/echo) e verbos de leitura → SILENCIOSO"
   else record_fail "empty-result-guard: (k) anti-ruido do 5o" "disparou em verbo de LEITURA — ensinaria a ignorar o proprio aviso"; fi
+
+  # (s)(t)(u) — o aviso do CREATE olha o ARTEFATO e o PAPEL (sinal do onion-kg-ssot, 2026-10-07: o
+  # PR #3 de lá tinha o resíduo commitado e o aviso disparou igual; e no adotante ele prometia "o gate
+  # vai acusar" onde a REGRA 56 sai fora de escopo). (s) é o par anti-ruído; (t) o par honesto do
+  # papel; (u) prova que o `cd` de um PR aberto de worktree é seguido. MUTANTE: tirar o
+  # `_residuo_commitado` reprova (s) e (u); tirar o `_repo_derivado` reprova (t).
+  local _ok; _ok="$(mktemp -d)"; cp -r "${_pj}/." "${_ok}/"
+  mkdir -p "${_ok}/docs/evolution/review"; echo r > "${_ok}/docs/evolution/review/feat-x.md"
+  git -C "${_ok}" add -A; git -C "${_ok}" -c user.name=t -c user.email=t@t commit -qm r
+  out="$(CLAUDE_PROJECT_DIR="${_ok}" _erg '"gh pr create --fill"' '"ok"' || true)"
+  if ! grep -q 'PR-SEM-PASSADA' <<< "${out}"; then
+    record_pass "empty-result-guard: (s) create com resíduo COMMITADO na branch → SILENCIOSO (quem seguiu o ritual não é avisado)"
+  else record_fail "empty-result-guard: (s)" "avisou quem já tinha o resíduo — fadiga: ${out}"; fi
+  local _ad; _ad="$(mktemp -d)"; cp -r "${_pj}/." "${_ad}/"; printf 'role: adopted\n' > "${_ad}/.claude/.onion-version"
+  out="$(CLAUDE_PROJECT_DIR="${_ad}" _erg '"gh pr create --fill"' '"ok"' || true)"
+  if grep -q 'FORA DE ESCOPO' <<< "${out}" && ! grep -q 'vai acusar' <<< "${out}"; then
+    record_pass "empty-result-guard: (t) create no ADOTANTE sem resíduo → avisa SEM prometer gate que a REGRA 56 não aplica ali"
+  else record_fail "empty-result-guard: (t)" "o aviso do adotante promete cobrança inexistente: ${out}"; fi
+  out="$(CLAUDE_PROJECT_DIR="${_pj}" _erg "\"cd ${_ok} && gh pr create --fill\"" '"ok"' || true)"
+  if ! grep -q 'PR-SEM-PASSADA' <<< "${out}"; then
+    record_pass "empty-result-guard: (u) create de outro checkout (\`cd <worktree> &&\`) olha o resíduo DALI"
+  else record_fail "empty-result-guard: (u)" "olhou o projeto em vez do worktree do cd: ${out}"; fi
+  rm -rf "${_pj}" "${_ok}" "${_ad}"
 
   # (e) exit 2 quando dispara — é a ÚNICA via medida em que o stderr de PostToolUse chega ao modelo.
   #     Com exit 0 a guarda roda e o aviso EVAPORA (dogfood 2026-08-02). Esta asserção é load-bearing.
@@ -13196,13 +13225,39 @@ run_corelay_selftests() {
   else record_fail "co-relay: invariante I3" "esperava untracked (??) e 0 commits; status='${st}' commits=${commits}"; fi
   rm -rf "${d}" "${core}"
 
-  # (h) never-clobber: sinal já presente no inbox do core → no-op exit 0
+  # (h) never-clobber do que o core JÁ COMMITOU: mesmo nome, conteúdo diferente, TRACKED → no-op
+  #     (desde 2026-10-07 a colisão decide por conteúdo; o que nunca se sobrescreve é a árvore do core)
   d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
   mk_adopter "${d}" adopted
   printf '# já existe (versão do core)\n' > "${core}/${SIG}"
+  git -C "${core}" add -A >/dev/null 2>&1
+  git -C "${core}" -c user.name=t -c user.email=t@t commit -qm triado >/dev/null 2>&1
+  local out_h; rc=0; out_h="$( ( cd "${d}" && bash "${helper}" --target "${core}" ) 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'versão do core' "${core}/${SIG}" && grep -q 'JÁ COMMITOU' <<< "${out_h}"; then
+    record_pass "co-relay: never-clobber do tracked (no-op que DIZ como entregar a atualização)"
+  else record_fail "co-relay: never-clobber" "exit ${rc} — clobberou o tracked ou calou: ${out_h}"; fi
+  rm -rf "${d}" "${core}"
+
+  # (h2) sinal ATUALIZADO sobre a entrega anterior ainda UNTRACKED → entrega por cima (sinal do
+  #      onion-kg-ssot, 2026-10-07: a checagem de existência saía "já relayado" antes do dedup e a
+  #      versão nova nunca chegava). MUTANTE: voltar ao `[ -e ] → no-op` reprova este caso.
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  mk_adopter "${d}" adopted
+  printf '# entrega anterior, ainda nao triada\n' > "${core}/${SIG}"
   rc=0; ( cd "${d}" && bash "${helper}" --target "${core}" ) >/dev/null 2>&1 || rc=$?
-  if [ "${rc}" -eq 0 ] && grep -q 'versão do core' "${core}/${SIG}"; then record_pass "co-relay: never-clobber (no-op idempotente)"
-  else record_fail "co-relay: never-clobber" "exit ${rc} — clobberou o arquivo já presente?"; fi
+  if [ "${rc}" -eq 0 ] && grep -q 'sinal de teste' "${core}/${SIG}"; then
+    record_pass "co-relay: mesmo nome, destino untracked, conteúdo novo → ATUALIZA (o carteiro não cala a versão nova)"
+  else record_fail "co-relay: atualização untracked" "exit ${rc} — a versão nova não chegou: $(head -1 "${core}/${SIG}")"; fi
+  rm -rf "${d}" "${core}"
+
+  # (h3) mesmo nome, conteúdo IDÊNTICO → no-op (a cura não virou re-entrega a cada rodada)
+  d="$(mktemp -d)"; core="$(mktemp -d)"; git -C "${core}" init -q; mkdir -p "${core}/docs/evolution/inbox"
+  mk_adopter "${d}" adopted
+  cp "${d}/${SIG}" "${core}/${SIG}"
+  local out_h3; rc=0; out_h3="$( ( cd "${d}" && bash "${helper}" --target "${core}" ) 2>&1)" || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q '0 relayado' <<< "${out_h3}"; then
+    record_pass "co-relay: mesmo nome e conteúdo idêntico → no-op"
+  else record_fail "co-relay: idêntico" "exit ${rc} — re-entregou o idêntico: ${out_h3}"; fi
   rm -rf "${d}" "${core}"
 
   # (i) --dry-run não escreve nada

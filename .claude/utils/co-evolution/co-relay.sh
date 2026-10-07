@@ -139,9 +139,29 @@ mkdir -p "${DEST_DIR}" 2>/dev/null || { echo "ERRO: não foi possível criar ${D
 relayed=0 ; skipped=0
 for f in "${FILES[@]}"; do
   base="$(basename "$f")"
+  # COLISÃO DE NOME decide por CONTEÚDO, não pela existência (sinal do onion-kg-ssot, 2026-10-07):
+  # esta checagem saía "já relayado" ANTES do dedup abaixo, e a versão atualizada de um sinal nunca
+  # chegava (medido: `cmp` diferiu no byte 2871 e o carteiro calou) — o contrário do que o cabeçalho
+  # promete. Idêntico → no-op. Diferente e o destino UNTRACKED (o core ainda não triou) → entrega por
+  # cima: é a mesma entrega-sem-commit, atualizada. Diferente e o destino TRACKED → o core já commitou
+  # aquela versão; sobrescrever mexeria na árvore dele (I3), então recusa e diz como seguir.
   if [ -e "${DEST_DIR}/${base}" ]; then
-    echo "Onion: já relayado (no-op): ${base}" >&2
-    skipped=$((skipped + 1))
+    if cmp -s "$f" "${DEST_DIR}/${base}"; then
+      echo "Onion: já relayado, conteúdo idêntico (no-op): ${base}" >&2
+      skipped=$((skipped + 1))
+      continue
+    fi
+    if git -C "${TARGET}" ls-files --error-unmatch "docs/evolution/inbox/${base}" >/dev/null 2>&1; then
+      echo "AVISO: ${base} mudou, mas o core JÁ COMMITOU a versão anterior — não sobrescrevo a árvore dele. Entregue a atualização com nome novo (ex.: ${base%.md}-v2.md)." >&2
+      skipped=$((skipped + 1))
+      continue
+    fi
+    if cp "$f" "${DEST_DIR}/${base}" 2>/dev/null; then
+      echo "Onion: 📬 ATUALIZADO (o destino era a entrega anterior, ainda não triada) → ${TARGET}/docs/evolution/inbox/${base}" >&2
+      relayed=$((relayed + 1))
+    else
+      echo "AVISO: falha ao atualizar ${base} em ${DEST_DIR} (permissão?)." >&2
+    fi
     continue
   fi
   # Dedup por CONTEÚDO vs inbox/ E _processed/ do core — cura da corrida do assíncrono
