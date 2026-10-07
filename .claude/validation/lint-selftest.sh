@@ -4502,6 +4502,15 @@ run_durable_commit_selftests() {
   rm -rf "${d}" "${_req}"
 
   unset GIT_AUTHOR_NAME GIT_AUTHOR_EMAIL GIT_COMMITTER_NAME GIT_COMMITTER_EMAIL
+  # (f) ASSINATURA do adotante no commit (2026-10-06): attribution.commit do settings.json DELE
+  _dc_setup
+  mkdir -p "${d}/.claude"; printf '{"attribution":{"commit":"Assinado pelo adotante X"}}\n' > "${d}/.claude/settings.json"
+  bash "${helper}" "${d}" update NEW999 chore/onion-update-NEW999 >/dev/null 2>&1
+  local _body; _body="$(git -C "${d}" log -1 --format=%B)"
+  if grep -qxF 'Assinado pelo adotante X' <<< "${_body}"; then
+    record_pass "durable-commit: (f) o commit de adoção leva a assinatura do PRÓPRIO adotante"
+  else record_fail "durable-commit: (f) assinatura" "o commit saiu sem a attribution.commit do adotante"; fi
+  rm -rf "${d}"
 }
 
 # ---------------------------------------------------------------------------
@@ -7257,6 +7266,50 @@ run_prettierignore_selftests() {
 # (escopa um ignore CEGO de .claude/ p/ que a superfície do framework + stamp sejam
 # TRACKEÁVEIS no adotante; sinal de campo de adotante 2026-07-24). Self-contained.
 # ---------------------------------------------------------------------------
+# ── .gitignore de SEGREDOS no adotante (2026-10-06): as adoções do onion-curation e do onion-kg-ssot mediram
+#    que o /meta:adopt não gerava o bloco, e nada impedia commitar um .env. E o CI do adotante não disparava
+#    em .githooks/** (achado na mesma adoção).
+run_secret_gitignore_selftests() {
+  local helper="${REPO_ROOT}/.claude/utils/adopt/ensure-secret-gitignore.sh"
+  if [ ! -f "${helper}" ]; then record_fail "secret-gitignore" "helper ausente: ${helper}"; return; fi
+  local d before after out
+  # (a) sem .gitignore → cria com o bloco
+  d="$(mktemp -d)"; bash "${helper}" "${d}" >/dev/null 2>&1
+  if grep -qxF '.env' "${d}/.gitignore" && grep -qxF '!.env.example' "${d}/.gitignore"; then
+    record_pass "secret-gitignore: (a) sem .gitignore → cria com .env e a exceção do .env.example"
+  else record_fail "secret-gitignore: (a)" "o bloco não nasceu"; fi
+  rm -rf "${d}"
+  # (b) .gitignore do adotante preservado + bloco acrescentado; (c) 2ª rodada é no-op
+  d="$(mktemp -d)"; printf 'node_modules/\ndist/' > "${d}/.gitignore"
+  bash "${helper}" "${d}" >/dev/null 2>&1; before="$(cat "${d}/.gitignore")"
+  bash "${helper}" "${d}" >/dev/null 2>&1; after="$(cat "${d}/.gitignore")"
+  if grep -qxF 'node_modules/' "${d}/.gitignore" && grep -qxF 'dist/' "${d}/.gitignore" && grep -qxF '.env' "${d}/.gitignore" && [ "${before}" = "${after}" ]; then
+    record_pass "secret-gitignore: (b) preserva o do adotante (até sem \\n final) e (c) a 2ª rodada é no-op"
+  else record_fail "secret-gitignore: (b/c)" "perdeu linha do adotante, colou na última, ou não é idempotente"; fi
+  rm -rf "${d}"
+  # (d) regra do adotante que já cobre .env → nada muda
+  d="$(mktemp -d)"; printf '*.env\n' > "${d}/.gitignore"; before="$(cat "${d}/.gitignore")"
+  bash "${helper}" "${d}" >/dev/null 2>&1
+  if [ "$(cat "${d}/.gitignore")" = "${before}" ]; then record_pass "secret-gitignore: (d) regra própria do adotante respeitada"
+  else record_fail "secret-gitignore: (d)" "acrescentou bloco sobre uma regra que já cobria .env"; fi
+  rm -rf "${d}"
+  # (e) .env JÁ versionado → avisa em voz alta (não destrackeia)
+  d="$(mktemp -d)"; git -C "${d}" init -q; printf 'X=1\n' > "${d}/.env"; git -C "${d}" add .env
+  out="$(bash "${helper}" "${d}" 2>&1)"
+  if grep -q 'JÁ VERSIONADO' <<< "${out}"; then record_pass "secret-gitignore: (e) .env já versionado → aviso explícito"
+  else record_fail "secret-gitignore: (e)" "o .env versionado passou calado"; fi
+  rm -rf "${d}"
+  # (f) o adopt CHAMA o helper (registro: helper que ninguém chama é guarda morta)
+  if grep -q 'ensure-secret-gitignore.sh' "${REPO_ROOT}/.claude/commands/meta/adopt.md"; then
+    record_pass "secret-gitignore: (f) o /meta:adopt chama o helper no passo (0b)"
+  else record_fail "secret-gitignore: (f)" "o adopt não chama o helper"; fi
+  # (g) o CI do adotante dispara em .githooks/**
+  if grep -qF -- "- '.githooks/**'" "${REPO_ROOT}/.claude/utils/adopt/ci-workflow-onion.tpl"; then
+    record_pass "secret-gitignore: (g) o template de CI dispara em .githooks/**"
+  else record_fail "secret-gitignore: (g)" "o CI do adotante não dispara em .githooks/**"; fi
+}
+_family run_secret_gitignore_selftests
+
 run_scope_gitignore_selftests() {
   local helper="${REPO_ROOT}/.claude/utils/adopt/scope-claude-gitignore.sh"
   if [ ! -f "${helper}" ]; then record_fail "scope-gitignore" "helper ausente: ${helper}"; return; fi

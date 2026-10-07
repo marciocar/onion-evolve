@@ -112,6 +112,17 @@ case "${OP}" in
   *)      _subj="${OP} no pin ${PIN}" ;;
 esac
 [ -n "${SUBJECT:-}" ] && _subj="${SUBJECT}"
-git -C "${DEST}" commit --no-verify -m "chore(onion): ${_subj}" >/dev/null 2>&1 \
+# ASSINATURA (2026-10-06, medido nas adoções do onion-curation e do onion-kg-ssot): o commit de adoção saía
+# SEM a assinatura, e as duas sessões fizeram amend à mão. Vale a do PRÓPRIO adotante (`attribution.commit` do
+# settings.json DELE, que o merge never-clobber preserva — PR #936); sem ela, o commit sai sem assinatura.
+_sig=""
+if [ -f "${DEST}/.claude/settings.json" ] && command -v python3 >/dev/null 2>&1; then
+  _sig="$(python3 -c 'import json,sys
+try: print((json.load(open(sys.argv[1])).get("attribution") or {}).get("commit") or "")
+except Exception: print("")' "${DEST}/.claude/settings.json")"
+fi
+_msg=(-m "chore(onion): ${_subj}")
+[ -n "${_sig}" ] && _msg+=(-m "${_sig}")
+git -C "${DEST}" commit --no-verify "${_msg[@]}" >/dev/null 2>&1 \
   && { echo "Onion: instalação commitada em ${BR} (durável — imune a descarte de working-tree)."; exit 0; } \
   || { echo "⚠️  commit durável falhou em ${DEST} (${BR})." >&2; exit 1; }
