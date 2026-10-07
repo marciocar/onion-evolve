@@ -283,7 +283,17 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   fi
 
   # Merge do onion/vendor na integração (3-way; base comum). Conflito = never-clobber estrutural.
-  if git -C "$T" merge "$VENDOR" -m "chore(onion): atualizar o Onion para o pin ${PIN}" >/dev/null 2>&1; then
+  # ASSINATURA do adotante também no MERGE (2026-10-07): o durable-commit já assinava desde o #943, e
+  # este commit, que é o do framework, seguia sem trailer — a sessão do adotante fazia amend à mão.
+  # Vale o `attribution.commit` do settings.json DO ALVO; sem ele, sai sem assinatura (nunca inventa).
+  local _sig="" _mmsg=(-m "chore(onion): atualizar o Onion para o pin ${PIN}")
+  if [ -f "$T/.claude/settings.json" ] && command -v python3 >/dev/null 2>&1; then
+    _sig="$(python3 -c 'import json,sys
+try: print((json.load(open(sys.argv[1])).get("attribution") or {}).get("commit") or "")
+except Exception: print("")' "$T/.claude/settings.json")"
+  fi
+  [ -n "${_sig}" ] && _mmsg+=(-m "${_sig}")
+  if git -C "$T" merge "$VENDOR" "${_mmsg[@]}" >/dev/null 2>&1; then
     echo "Onion: framework atualizado via merge limpo de $VENDOR (pin ${PIN})."
     return 0
   fi

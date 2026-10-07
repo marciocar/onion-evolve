@@ -40,9 +40,9 @@ nodes:
     plane: PROD
     impact: 4
     confidence: 0.7
-    status: open
-    verified_at: '2026-10-05'
-    verified_against: 'adopt.md passo (8) e Procedimento de Relatorio Downstream lidos em 2026-10-05; o relatorio carimba o lint sem re-rodar depois do merge do vendor'
+    status: done
+    verified_at: 2026-10-07
+    verified_against: "PR fix/adopter-quick-cures: remeasure-hard.sh + adopt.md (--update cita HARD MEDIDO); bancada remeasure_hard (a)-(d), mutante (c) morde"
     trace: '.claude/commands/meta/adopt.md'
     label: 'CURA PROPOSTA (o pedido do hub, conferido no core e coerente com exit-code-nao-e-a-verificacao): o --update regenera as projecoes SSOT DEPOIS do merge de onion/vendor e re-roda o lint antes de escrever o relatorio; o numero de HARD do relatorio passa a ser o MEDIDO nessa passada, nunca herdado. Antes da cura, medir a causa exata (ordem do passo 8 vs. merge, ou alvo do regen). GATILHO: antes do proximo --update de qualquer hub (gmill e brain-granaai estao em espera por ordem do maestro, 2026-10-05).'
 
@@ -73,9 +73,9 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.85
-    status: open
-    verified_at: '2026-10-05'
-    verified_against: 'sinal do brain-granaai 2026-10-05 (antes-do-update-do-core): reescreveram mensagens com filter-branch 3 vezes; nos dois updates de 2026-10-05 os 3 commits de vendor-branch.sh/durable-commit.sh sairam sem assinatura, nos dois alvos'
+    status: done
+    verified_at: 2026-10-07
+    verified_against: "#943 (durable-commit) + PR fix/adopter-quick-cures (merge do vendor-branch.sh assina com o attribution do alvo); bancada vendor_branch (b2) com merge não-fast-forward, mutante morde"
     trace: '.claude/utils/adopt/durable-commit.sh'
     label: 'PEDIDO DE ADOTANTE, medido em dois alvos no mesmo dia: os commits feitos pelos helpers do update (vendor-branch.sh e durable-commit.sh) saem sem a assinatura que o repo exige, e o adotante reescreve historia para corrigir (3 vezes no brain-granaai). CURA: os dois scripts aceitam um trailer por variavel de ambiente (ou leem o attribution do settings.json do alvo) e o anexam as mensagens. GATILHO: a proxima mudanca nos helpers do update — junto com as curas dos defeitos 1 e 2.'
 
