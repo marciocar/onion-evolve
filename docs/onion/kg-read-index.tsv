@@ -2164,6 +2164,7 @@ ops/mcp-onion-kg/server.py	E_OBJECAO_4_NAMESPACE_NAO_ISOLA_CUSTO_NEM_MENTIRA	doc
 ops/pr-finalize.sh	E_ELENXO_2_REABRIU_B1_PELA_FORMA_DO_HASH	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/pr-finalize.sh	E_ELENXO_REPROVOU_O_MOTOR_QUE_LAVAVA_RESIDUO	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/pr-finalize.sh	E_O_DOGFOOD_ACHOU_DOIS_DEFEITOS_NO_PROPRIO_MOTOR	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
+ops/pr-finalize.sh	E_PR_FINALIZE_ATRITO_MEDIDO	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 ops/pr-finalize.sh	E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 ops/pr-finalize.sh	E_TRES_PRS_AO_CI_COM_LINT_VERMELHO	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/pr-merge-verified.sh	C_CHAINED_SYNC_IS_FLAWED	docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml

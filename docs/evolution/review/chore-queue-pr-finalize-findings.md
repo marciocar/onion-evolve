@@ -2,7 +2,8 @@
 title: 'Resíduo — os 4 atritos medidos do pr-finalize entram na fila'
 date: 2026-10-07
 branch: chore/queue-pr-finalize-findings
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 60d55ea753314c07cac90c128c382d77334a508c3c9a04495d7ceb1eee094cd3
+reviewed_code_sha256: f873059eb65af4ccc3b1fb5db06b046b21e0c0f99ddbad8d5f2648f43de472a9
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
