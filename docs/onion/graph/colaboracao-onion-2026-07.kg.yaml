@@ -381,7 +381,7 @@ edges:
   - from: ST_SINAL_INBOX
     to: ST_SINAL_PROCESSED
     edge_type: TRANSITIONS
-    on: EV_RELAY
+    trigger: EV_RELAY
   # domain — invariantes/regras/politica
   - from: IN_I3
     to: EN_REPO

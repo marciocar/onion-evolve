@@ -65,11 +65,11 @@ edges:
   - from: ST_OPEN
     to: ST_CLOSED
     edge_type: TRANSITIONS
-    on: EV_PAYMENT
+    trigger: EV_PAYMENT
   - from: ST_CLOSED
     to: ST_OPEN
     edge_type: TRANSITIONS
-    on: EV_PAYMENT
+    trigger: EV_PAYMENT
   - from: RU_SINGLE_CLOSE
     to: ST_CLOSED
     edge_type: CONSTRAINS

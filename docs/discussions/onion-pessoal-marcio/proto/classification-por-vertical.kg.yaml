@@ -193,7 +193,7 @@ edges:
   - from: ST_BRUTO
     to: ST_DESTILADO
     edge_type: TRANSITIONS
-    on: EV_DISCLOSURE_GATED
+    trigger: EV_DISCLOSURE_GATED
 
   # classificação por vertical (private vs protected)
   - from: PO_PRIVATE

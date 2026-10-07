@@ -173,7 +173,7 @@ edges:
   - from: ST_SAUDE_DECLARADA
     to: ST_SAUDE_VIVIDA
     edge_type: TRANSITIONS
-    on: EV_COMPORTAMENTO
+    trigger: EV_COMPORTAMENTO
   # --- o confronto DEV×PROD reconciliado (Hegel: nega+conserva+eleva; NÃO deleta) ---
   - from: C_VIVIDO_SAUDE
     to: C_DECLARADO_SAUDE

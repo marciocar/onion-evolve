@@ -9820,6 +9820,34 @@ run_kg_radar_integrity_selftests() {
     record_pass "kg-integridade: (h) valid_from: '2026' entre aspas → silêncio"
   else record_fail "kg-integridade: (h)" "falso-positivo em ano entre aspas: ${out}"; fi
   rm -rf "$d"
+
+  # (i)/(j) GATILHO DE TRANSITIONS: `trigger:` é a chave; `on:` é legado (YAML 1.1 lê `on` como
+  #     booleano). Grafo de domínio mínimo: estado A --TRANSITIONS--> estado B, disparado por EV_X.
+  _mkt() {  # $1=dir  $2=chave do gatilho
+    mkdir -p "$1/.claude/validation" "$1/docs/onion/graph"
+    cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "$1/.claude/validation/"; _lib_beside "$1/.claude/validation"
+    { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
+      local n; for n in ST_A:state ST_B:state EV_X:event; do
+        printf '  - id: %s\n    node_type: %s\n    layer: domain\n    plane: DEV\n    impact: 3\n    status: confirmed\n    label: "x"\n' "${n%%:*}" "${n#*:}"
+      done
+      printf 'edges:\n  - from: ST_A\n    to: ST_B\n    edge_type: TRANSITIONS\n    %s: EV_X\n' "$2"
+    } > "$1/docs/onion/graph/t.kg.yaml"
+    ( cd "$1" && git init -q . && git add -A && git -c user.email=t@t -c user.name=t commit -qm x ) 2>/dev/null
+  }
+  # (i) `on:` legado → SOFT ON-LEGADO, nunca HARD (o evento segue LIGADO: sem órfão).
+  d="$(mktemp -d)"; _mkt "$d" on
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if grep -q '^SOFT	ON-LEGADO	docs/onion/graph/t.kg.yaml' <<< "${out}" && ! grep -q '^HARD' <<< "${out}"; then
+    record_pass "kg-integridade: (i) gatilho em on: (legado) → SOFT ON-LEGADO nomeando o arquivo, sem HARD"
+  else record_fail "kg-integridade: (i)" "on: legado não virou SOFT (ou reprovou): ${out}"; fi
+  rm -rf "$d"
+  # (j) o MESMO grafo com `trigger:` → silêncio, e o evento conta como ligado (sem órfão).
+  d="$(mktemp -d)"; _mkt "$d" trigger
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if [ -z "${out}" ]; then
+    record_pass "kg-integridade: (j) gatilho em trigger: → silêncio (evento ligado, sem aviso)"
+  else record_fail "kg-integridade: (j)" "trigger: acusado ou evento órfão: ${out}"; fi
+  rm -rf "$d"
 }
 
 run_kg_census_parity_selftests() {

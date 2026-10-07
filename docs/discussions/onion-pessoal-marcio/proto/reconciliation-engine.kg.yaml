@@ -188,15 +188,15 @@ edges:
   - from: ST_C_DECLARADO
     to: ST_C_MANTIDO
     edge_type: TRANSITIONS
-    on: EV_DEFECCAO
+    trigger: EV_DEFECCAO
   - from: ST_C_DECLARADO
     to: ST_C_LIBERADO
     edge_type: TRANSITIONS
-    on: EV_SUNSET_RATIFICADO
+    trigger: EV_SUNSET_RATIFICADO
   - from: ST_C_MANTIDO
     to: ST_C_LIBERADO
     edge_type: TRANSITIONS
-    on: EV_MARCO
+    trigger: EV_MARCO
 
   # --- o RAMO-BUG reconciliado (Aufhebung: nega+conserva — superado, não deletado) ---
   - from: C_FATO_16H

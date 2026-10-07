@@ -131,6 +131,12 @@ while IFS= read -r g; do
     emit SOFT VALID-FROM-INTEIRO "${g}" \
       "${vfi} nó(s) com valid_from inteiro sem aspas (ex.: valid_from: 2026) — leitor YAML tipado lê NÚMERO, não data parcial; escreva \"2026\""
   fi
+  # `on:` legado como gatilho de TRANSITIONS: o radar lê e avisa; aqui vira SOFT nomeando o arquivo.
+  onl="$(grep -c 'ON-LEGADO' <<< "${out}" || true)"
+  if [ "${onl:-0}" -gt 0 ]; then
+    emit SOFT ON-LEGADO "${g}" \
+      "${onl} aresta(s) TRANSITIONS com a chave on: (legado) — YAML 1.1 lê on como booleano e o evento parece órfão para leitor tipado; renomeie para trigger:"
+  fi
 # ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
 #    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos
 #    deliberadamente inválidos de um adotante viraram 5 HARD no dia 1 da adoção dele.
