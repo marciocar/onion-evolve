@@ -2,7 +2,7 @@
 title: 'Resíduo — pré-voo do pr-finalize no ambiente do runner'
 date: 2026-10-07
 branch: fix/pr-finalize-preflight
-reviewed_diff_sha256: 5ee1d384bc98c93c9a7970a3330420f7422a3e7493a996dfa3ecdbf186efbf8c
+reviewed_diff_sha256: d0581d1d5b9876ac44ee968e8fdc768a5804c044485d13898a912696e1b3ebcd
 reviewed_code_sha256: 1326ab27ac4f28109e46aedc94b1edf5236e74765a19fda9b039c09851f6104f
 findings_total: 0
 findings_real: 0
