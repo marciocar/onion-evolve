@@ -2,7 +2,7 @@
 title: 'Resíduo — o aviso do gh pr create olha o resíduo e o papel; o carteiro decide a colisão de nome pelo conteúdo'
 date: 2026-10-07
 branch: fix/pr-residue-warning-and-relay
-reviewed_diff_sha256: 1cae17b682b8c7a75ac39c9edcad9d1075ccc83027604307872b325726ec6f67
+reviewed_diff_sha256: b69cadeaeb86e110cf66a04594d86e962f48da9228d2b51b32bec1a276172917
 reviewed_code_sha256: 5939df97d3d147d24841e854a347edd82c57466f80ad2ed9ca34024cc601fc4d
 findings_total: 3
 findings_real: 3
