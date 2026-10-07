@@ -4,8 +4,7 @@
 # sustenta, e o backlog é projeção destes nós. Rótulo factual e curto; o porquê fica no comentário
 # (lição do mesmo dia: narrativa dentro do rótulo vazou o gabarito do eval da Porta 0).
 meta:
-  drive_checkpoint: pending
-  drive_checkpoint_note: "2026-10-07 fim do dia: Q_HOOK_LER_RESIDUO_DA_BRANCH_DO_PR open→done (#948); Q_ONION_KG_SSOT_REPO open→done (adotado, registrado, atualizado); novos D_PAPEL_DUAS_DIMENSOES (confirmed, #949), Q_TABELA_DE_TEMPOS_NO_MAPA (done neste PR), Q_VETO_PRETOOLUSE_NO_PR_CREATE (open, GATED) e Q_GRANAAI_CLONE_SEM_CARIMBO (open, decisão do maestro)"
+  drive_checkpoint: sealed
   id: fila-2026-10-06
   schema_version: "1"
   baseline: 2026-10-06
@@ -317,8 +316,9 @@ nodes:
     status: open
     impact: 3
     confidence: 0.6
-    verified_against: "door-role-parity-check.sh sobre o vivo, 2026-10-07: [adotante/CARIMBO-AUSENTE] em /home/marcio/granaai"
-    label: "o clone registrado do granaai não tem .claude/.onion-version: local_path velho, Onion noutro checkout ou desacoplado? decisão do maestro, ato fora deste repo"
+    verified_at: 2026-10-07
+    verified_against: "door-role-parity-check.sh sobre o vivo ([adotante/CARIMBO-AUSENTE] em /home/marcio/granaai) + resposta do maestro 2026-10-07: o projeto granaai foi abandonado, o trabalho vive no brain-granaai"
+    label: "aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o validador não tem status de membro aposentado"
 edges:
   - from: E_PRECOMMIT_RECARIMBA_RESIDUO
     to: Q_PRECOMMIT_NAO_LAVA_RESIDUO
