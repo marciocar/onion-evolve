@@ -68,8 +68,8 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 72.0 | `C_LIVE_CLASS_DESIGN_CONSTRAINTS` | canal-vivo-sessoes-2026-10 | Restrições que a evidência ancorada impõe ao desenho da classe 'live' (NÃO é decisão): (1) cc-peer só vale DENTRO da mesma |
-| 30.0 | `Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS` | canal-vivo-sessoes-2026-10 | Como desenhar a classe 'live' da federation-transport (adapter por adotante: cc-peer·slack·teams·a2a) para comunicação DIRETA |
+| 74.4 | `C_LIVE_CLASS_DESIGN_CONSTRAINTS` | canal-vivo-sessoes-2026-10 | Restrições que a evidência ancorada impõe ao desenho da classe 'live' (NÃO é decisão): (1) cc-peer só vale DENTRO da mesma |
+| 32.0 | `Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS` | canal-vivo-sessoes-2026-10 | Como desenhar a classe 'live' da federation-transport (adapter por adotante: cc-peer·slack·teams·a2a) para comunicação DIRETA |
 
 ## jev-decision-round2-2026-10 — 10 item(ns)
 

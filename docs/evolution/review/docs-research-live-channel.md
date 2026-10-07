@@ -2,7 +2,8 @@
 title: 'Resíduo — pesquisa do canal vivo entre sessões em máquinas e contas diferentes'
 date: 2026-10-07
 branch: docs/research-live-channel
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 348853f9b2a10bbacad68dacd9c9d6ff2e391b0d3869905c74eacc98ad37586d
+reviewed_code_sha256: 4553ac77746e01d54df895cc3f392cc5b864dd2382c3f8b8756016b3450b0619
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
