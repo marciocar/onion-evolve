@@ -425,7 +425,7 @@ members:
     #    orfao unico + force-push, e nao ha nada a preservar nisso. LIMITE DECLARADO: o objeto antigo
     #    segue acessivel por SHA ate o GC do GitHub, e quem clonou tem copia — o force-push torna
     #    INALCANCAVEL, nunca inexistente.
-    onion_version: 8e244df4bb82   # carimbado por ops/door-seal-pin.sh (remoto conferido)
+    onion_version: 8278fee79d1c   # carimbado por ops/door-seal-pin.sh (remoto conferido)
                                   # via `gh api repos/marciocar/onion-core/commits/main` -> 5063e81b2d8d.
                                   # ⚠️ SEGUNDA vez EM UM DIA que este numero e avancado A MAO, e a 1a vez
                                   # eu escrevi aqui que 'numero mantido a mao apodrece'. Apodreceu em duas

@@ -77,7 +77,7 @@ flowchart TD
 | hub-operacoes-enterprise | hub | greenfield | hub, task-manager-integration, itsm | `cff9214c3b9a` |
 | brain-granaai | hub | brownfield | company-brain, clickup, pesquisa-primaria | `663fdbc5bdcc` |
 | vendas-pdi-enterprise | standalone | greenfield | vendas, spec-as-code, rag-bridge | `24118c5d7a97` |
-| onion-core | hub | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `8e244df4bb82` |
+| onion-core | hub | greenfield | public-door, full-machinery, hub-role, deterministic-guards | `8278fee79d1c` |
 | onion-codex | standalone | distilled | substrate-port, openai-codex, portability-proof, deterministic-guards | `n/a` |
 | marcio-pessoal | standalone | regulated | life-kg, kg-sdaal-method, research-arm, n1-dogfood | `n/a` |
 | onion-pedro | standalone | greenfield | field-dogfood, greenfield-adoption, compliance | `165e1e13b11f` |
