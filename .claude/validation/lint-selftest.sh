@@ -22633,6 +22633,30 @@ _family run_workflow_syntax_selftests
 # foi shardar em 4 faixas de matriz. Dai em diante, QUALQUER familia que o plano perca deixa de
 # ser exercida no CI — e o job sai VERDE, porque as faixas que rodaram passaram. O plano virou
 # superficie critica: perder familia e pior que reprovar, porque nao aparece.
+# ── PRÉ-VOO do motor (2026-10-07): as famílias que o diff alterou por dentro, para rodar no ambiente do runner
+run_preflight_families_selftests() {
+  local sut="${REPO_ROOT}/ops/testing/preflight-families.sh"
+  if [ ! -f "${sut}" ]; then record_fail "preflight-families" "SUT ausente: ${sut}"; return; fi
+  local d out; d="$(mktemp -d)"
+  (
+    cd "${d}" && git init -q -b main && git config user.email t@t && git config user.name t
+    mkdir -p .claude/validation
+    printf 'run_alfa_selftests() {\n  echo a\n}\nrun_beta_selftests() {\n  echo b\n}\n' > .claude/validation/lint-selftest.sh
+    git add -A && git commit -qm base && git update-ref refs/remotes/origin/main HEAD
+    git checkout -qb pr && sed -i 's/echo b/echo B mudou/' .claude/validation/lint-selftest.sh && git add -A
+  ) >/dev/null 2>&1
+  out="$(cd "${d}" && bash "${sut}" 2>&1)" || true
+  if grep -q 'beta' <<< "${out}" && grep -q 'shell_pipefail_robustness' <<< "${out}" && ! grep -q 'alfa' <<< "${out}"; then
+    record_pass "preflight-families: (a) acha a família alterada (beta), soma a catraca e não acusa a intocada (alfa)"
+  else record_fail "preflight-families: (a)" "saída: ${out}"; fi
+  rm -rf "${d}"
+  # (b) o motor chama o pré-voo no ambiente do runner (useConfigOnly), sob checkpoint
+  if grep -q 'preflight-families.sh' "${REPO_ROOT}/ops/pr-finalize.sh" && grep -q 'useConfigOnly = true' "${REPO_ROOT}/ops/pr-finalize.sh"; then
+    record_pass "preflight-families: (b) o pr-finalize roda o pré-voo com git sem identidade adivinhada"
+  else record_fail "preflight-families: (b)" "o motor não chama o pré-voo no ambiente do runner"; fi
+}
+_family run_preflight_families_selftests
+
 run_shard_plan_selftests() {
   local sut="${REPO_ROOT}/ops/testing/selftest-shard-plan.sh"
   if [ ! -f "${sut}" ]; then record_skip "shard-plan: o SUT nao existe (${sut})"; return; fi
