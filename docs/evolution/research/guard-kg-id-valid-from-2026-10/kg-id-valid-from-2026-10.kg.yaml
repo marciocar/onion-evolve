@@ -1,0 +1,105 @@
+# kg-backlog-guard: on
+# ═══ TETO: 8 NÓS ═══
+meta:
+  id: kg-id-valid-from-2026-10
+  schema_version: "1"
+  layer: audit
+  baseline: 2026-10-07
+  review_after: 2026-11-21
+  supersedes_none: >
+    Cura de dado + extensao do radar, sem guarda anterior da classe. Medida contra o --integrity do
+    kg-radar.sh e a REGRA 52, os gates mais proximos: nenhum deles olhava o alfabeto do id nem a forma
+    crua do valid_from, entao nada neles e derrubado — eles ganham duas cobrancas.
+nodes:
+  - id: E_DEFEITO_DADO_MEDIDO_POR_LEITOR_TIPADO
+    node_type: evidence
+    plane: PROD
+    impact: 4
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-07'
+    verified_against: 'yaml.safe_load sobre os 138 .kg.yaml do core (fora fixtures e materials): 12 ids SYNTHESIS.md_* (29 ocorrencias) num grafo; 6 valid_from inteiros em 4 grafos; 6 grafos sem schema_version, 9 sem meta.id, 7 com schema_version inteiro. Depois da cura: 0 em todas as contagens.'
+    trace: 'docs/evolution/inbox/2026-10-07-spike-schema-defeitos-de-dado-e-gramatica.md'
+    label: 'O DEFEITO, DATADO: em 2026-10-07 um sinal de campo trouxe a medicao de um leitor tipado do corpus do core, e ela se reproduziu aqui pelo mesmo metodo. O radar awk aprovava tudo, porque le texto: id com ponto e ano sem aspas so viram defeito para um leitor que tipa o YAML. Dois leitores discordando do mesmo byte e a classe.'
+
+  - id: E_ORIGEM_DOS_IDS_FOI_MODELAGEM_A_MAO
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 0.9
+    status: confirmed
+    verified_at: '2026-10-07'
+    verified_against: 'git log -S SYNTHESIS.md_ no grafo: nasceu em e0bf994a (2026-07-21), commit que so toca o grafo e o baseline de cobertura; nenhum script gerador no repo produz o prefixo'
+    trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
+    label: 'A CAUSA DOS IDS NAO TEM GERADOR A CURAR: os 12 ids nasceram numa modelagem feita por sessao, que usou o nome do documento-fonte como prefixo (G1_, G2_ ... e SYNTHESIS.md_ sem tirar a extensao). Sem gerador, a cura de causa e a cobranca no radar: a proxima sessao que errar recebe o HARD antes do commit.'
+
+  - id: D_ID_FORA_DO_ALFABETO_REPROVA_NO_INTEGRITY
+    node_type: decision
+    plane: DEV
+    impact: 4
+    confidence: 0.9
+    status: done
+    verified_at: '2026-10-07'
+    verified_against: 'familia kg_radar_integrity (e)(f); mutante que desliga a cobranca faz (e) reprovar; varredura de 16 clones de adotantes e das fixtures: 0 ids fora de [A-Za-z0-9_]'
+    trace: '.claude/validation/kg-radar.sh'
+    label: 'SUBSTRATO: cobranca no --integrity do proprio radar (molde: as cobrancas de node_type/plane ja vivem ali), HARD sem baseline porque o passivo medido e zero no core, nas fixtures e nos adotantes clonados. Aspas duplas em volta do id sao aceitas (caso f).'
+
+  - id: D_VALID_FROM_INTEIRO_E_SOFT
+    node_type: decision
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: done
+    verified_at: '2026-10-07'
+    verified_against: 'familia kg_radar_integrity (g)(h); mutante que le o valor ja sem aspas faz (h) reprovar; mutante que tira o repasse SOFT faz (g) reprovar; dogfood num grafo real de adotante: 15 avisos, rc 0'
+    trace: '.claude/validation/kg-radar-integrity.sh'
+    label: 'SUBSTRATO: o radar AVISA (VALID-FROM-INTEIRO) e a REGRA 52 repassa como SOFT. Nao reprova porque os adotantes carregam 42 ocorrencias em 7 grafos de 3 clones: HARD faria o proximo update deles nascer vermelho por dado antigo. A causa no gerador (o write(KG) do onion-research.js) foi curada no prompt, que agora manda aspas.'
+
+  - id: E_PRIMEIRA_REDACAO_ACUSOU_35_NOS_CORRETOS
+    node_type: evidence
+    plane: DEV
+    impact: 3
+    confidence: 1.0
+    status: confirmed
+    verified_at: '2026-10-07'
+    verified_against: 'kg-radar-integrity.sh --format tsv no core: 10 SOFT falsos (35 nos com valid_from entre aspas simples); 0 depois de ler a forma crua'
+    trace: '.claude/validation/kg-radar.sh'
+    label: 'FALSO POSITIVO DA 1a REDACAO, preservado: o aviso lia validFrom ja trimado, e o trim do radar tira as aspas, entao valid_from: ''2017'' parecia inteiro. O dogfood no corpus inteiro pegou antes do commit. O caso (h) da bancada existe por causa disto.'
+
+  - id: C_TETO_DATAS_ISO_SEM_ASPAS
+    node_type: claim
+    plane: DEV
+    impact: 2
+    confidence: 0.8
+    status: open
+    trace: '.claude/rules/kg-grammar.md'
+    label: 'TETO: valid_from: 2026-10-01 sem aspas e lido como DATA (timestamp YAML 1.1) por um leitor tipado, nao como string — 88 ocorrencias no core. Esta guarda nao cobra isso: e questao do perfil YAML e do tipo do campo, que pertencem ao contrato formal do .kg.yaml em desenho, nao a uma decisao unilateral do core.'
+
+  - id: C_TETO_PERFIL_YAML_E_DO_CONTRATO
+    node_type: claim
+    plane: DEV
+    impact: 3
+    confidence: 0.85
+    status: open
+    trace: '.claude/rules/kg-grammar.md'
+    label: 'TETO: a chave on: das arestas TRANSITIONS foi documentada na gramatica, com o aviso de que YAML 1.1 a le como booleano. Politica de extensoes, MUST x SHOULD de verified_at em PROD e o perfil YAML 1.2 ficaram FORA de proposito: decisao do contrato, nao deste PR.'
+
+edges:
+  - from: E_DEFEITO_DADO_MEDIDO_POR_LEITOR_TIPADO
+    to: D_ID_FORA_DO_ALFABETO_REPROVA_NO_INTEGRITY
+    edge_type: SUPPORTS
+  - from: E_DEFEITO_DADO_MEDIDO_POR_LEITOR_TIPADO
+    to: D_VALID_FROM_INTEIRO_E_SOFT
+    edge_type: SUPPORTS
+  - from: E_ORIGEM_DOS_IDS_FOI_MODELAGEM_A_MAO
+    to: D_ID_FORA_DO_ALFABETO_REPROVA_NO_INTEGRITY
+    edge_type: SUPPORTS
+  - from: E_PRIMEIRA_REDACAO_ACUSOU_35_NOS_CORRETOS
+    to: D_VALID_FROM_INTEIRO_E_SOFT
+    edge_type: SUPPORTS
+  - from: C_TETO_DATAS_ISO_SEM_ASPAS
+    to: D_VALID_FROM_INTEIRO_E_SOFT
+    edge_type: CONSTRAINS
+  - from: C_TETO_PERFIL_YAML_E_DO_CONTRATO
+    to: D_ID_FORA_DO_ALFABETO_REPROVA_NO_INTEGRITY
+    edge_type: CONSTRAINS
