@@ -22875,6 +22875,32 @@ print("OK %d" % ok if ok and not bad else "FALHA ok=%d ruins=%d" % (ok, bad))
 }
 _family run_shard_plan_selftests
 
+# ── check-member-registered.sh: o registro é lido como YAML, não por regex de fim de linha ───────
+# POR QUE EXISTE (2026-10-07): a regex ancorada no fim da linha não casava `local_path: "/x"  # nota`,
+# e o ops/audit-adopters-registry.sh dava três membros REGISTRADOS como "FORA DO REGISTRO" — um alarme
+# falso numa auditoria que existe para pegar o esquecimento real. (a) é o caso medido; (b) e (c) são as
+# duas polaridades de sempre. MUTANTE: voltar à regex antiga reprova (a).
+run_member_registered_selftests() {
+  local sut="${REPO_ROOT}/.claude/utils/adopt/check-member-registered.sh"
+  if [ ! -f "${sut}" ]; then record_fail "member-registered" "SUT ausente: ${sut}"; return; fi
+  local d; d="$(mktemp -d)"; mkdir -p "${d}/comentado" "${d}/limpo" "${d}/fora"
+  { echo 'members:'
+    echo '  - id: com-comentario'; echo "    local_path: \"${d}/comentado\"   # nota inline"
+    echo '  - id: sem-comentario'; echo "    local_path: \"${d}/limpo\"" ; } > "${d}/members.yaml"
+  local rc
+  rc=0; bash "${sut}" "${d}/comentado" "${d}/members.yaml" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "member-registered: (a) local_path com comentário inline é reconhecido (o falso FORA DO REGISTRO de 2026-10-07)"
+  else record_fail "member-registered: (a)" "membro registrado com comentário inline saiu rc=${rc}"; fi
+  rc=0; bash "${sut}" "${d}/limpo" "${d}/members.yaml" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 0 ]; then record_pass "member-registered: (b) local_path entre aspas sem comentário é reconhecido"
+  else record_fail "member-registered: (b)" "membro registrado saiu rc=${rc}"; fi
+  rc=0; bash "${sut}" "${d}/fora" "${d}/members.yaml" >/dev/null 2>&1 || rc=$?
+  if [ "${rc}" -eq 3 ]; then record_pass "member-registered: (c) repo fora do registro sai rc=3 (o aviso não emudeceu)"
+  else record_fail "member-registered: (c)" "repo fora do registro saiu rc=${rc} (esperado 3)"; fi
+  rm -rf "${d}"
+}
+_family run_member_registered_selftests
+
 # ── REGRA 89: a divida de Aufhebung, e as SEIS evasoes que uma passada adversarial provou ─────
 # POR QUE EXISTE (2026-09-23): a 1a versao desta guarda varria so os `kg:` das baselines — a
 # rodada ATUAL de cada eixo — e por isso contava 1 de uma divida de 6. Cada rodada nova DESPEJAVA
