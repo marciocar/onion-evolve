@@ -2,7 +2,8 @@
 branch: fix/zoho-status-and-merge-api-error
 pr: pendente
 date: 2026-10-07
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 37a793a23fd52918e2720cc2968c1099a2e1e54e1aef2f85db14eaab54a50e80
+reviewed_code_sha256: 7828d1d7419916a78b2f20203a236df189f866f35b754bc5d8671cae2ba45a5b
 findings_total: 6
 findings_real: 2
 findings_fixed: 2
