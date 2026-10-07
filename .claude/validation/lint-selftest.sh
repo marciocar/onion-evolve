@@ -15133,6 +15133,33 @@ run_guardrails_selftests() {
 # ---------------------------------------------------------------------------
 if [ "${SELFTEST_LIST}${SELFTEST_CHILD}" = "00" ]; then echo "=== Onion Lint Selftest — auto-teste das guardas ==="; echo ""; fi
 
+# ── QUAIS são as HARD (2026-10-07): o lint grava em ONION_LINT_HARD_FILE só as violações HARD, sem mudar
+#    o formato da linha. O motor (pr-finalize) usa isso para nomear o que reprovou.
+run_lint_hard_file_selftests() {
+  local fx="${REPO_ROOT}/.claude/validation/fixtures/r12-tool-names/bad-provider-mcp.md"
+  local good="${REPO_ROOT}/.claude/validation/fixtures/r12-tool-names/good-native.md"
+  if [ ! -f "${fx}" ] || [ ! -f "${good}" ] || [ -z "${SANDBOX:-}" ]; then
+    record_skip "lint-hard-file: fixture ou sandbox ausente → pulado"; return; fi
+  local dir="${SANDBOX}/.claude/agents/development" hf; hf="$(mktemp)"
+  mkdir -p "${dir}"; cp "${fx}" "${dir}/zz-hard-file-probe.md"
+  ONION_LINT_HARD_FILE="${hf}" bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${dir}/zz-hard-file-probe.md" >/dev/null 2>&1 || true
+  if grep -q '^VIOLATION: .*zz-hard-file-probe.md' "${hf}"; then
+    record_pass "lint-hard-file: (a) a violação HARD da fixture vai para ONION_LINT_HARD_FILE, nomeada"
+  else record_fail "lint-hard-file: (a)" "a HARD não chegou ao arquivo ($(wc -l < "${hf}") linha[s])"; fi
+  : > "${hf}"; cp "${good}" "${dir}/zz-hard-file-probe.md"
+  ONION_LINT_HARD_FILE="${hf}" bash "${SANDBOX}/.claude/validation/lint-artifacts.sh" --only="${dir}/zz-hard-file-probe.md" >/dev/null 2>&1 || true
+  if ! grep -q 'zz-hard-file-probe.md' "${hf}"; then
+    record_pass "lint-hard-file: (b) arquivo limpo não escreve nada sobre si"
+  else record_fail "lint-hard-file: (b)" "violação HARD inventada para a fixture boa"; fi
+  rm -f "${dir}/zz-hard-file-probe.md" "${hf}"
+  # (c) o motor PEDE a lista e a IMPRIME ao reprovar (registro: arquivo que ninguém lê é recurso morto)
+  if grep -q 'ONION_LINT_HARD_FILE="${_tmp}/hard.txt"' "${REPO_ROOT}/ops/pr-finalize.sh" \
+     && grep -q 'as violações HARD do commit' "${REPO_ROOT}/ops/pr-finalize.sh"; then
+    record_pass "lint-hard-file: (c) o pr-finalize pede a lista e a imprime quando reprova"
+  else record_fail "lint-hard-file: (c)" "o motor não usa a lista"; fi
+}
+_family run_lint_hard_file_selftests
+
 run_fixtures_selftests() {
 # SHARD (faixa paralela): ONION_SELFTEST_SHARD=i/n → este worker processa só as linhas do manifest
 # cujo índice % n == i. A família `fixtures` é ~97% do tempo serial (94 casos × ~10 s); sem fatiar,

@@ -195,9 +195,13 @@ done
 git diff --cached --quiet || die "sobrou conteúdo stageado fora do commit — nada enviado"
 _tmp="$(mktemp -d)"; trap 'git worktree remove --force "${_tmp}/wt" >/dev/null 2>&1; rm -rf "${_tmp}"' EXIT
 git worktree add -q --detach "${_tmp}/wt" HEAD || die "não montei o HEAD para julgar"
-_lint="$(cd "${_tmp}/wt" && _ci env LC_ALL=C bash .claude/validation/lint-artifacts.sh 2>&1)"; _rc=$?
+_lint="$(cd "${_tmp}/wt" && _ci env LC_ALL=C ONION_LINT_HARD_FILE="${_tmp}/hard.txt" bash .claude/validation/lint-artifacts.sh 2>&1)"; _rc=$?
 _hard="$(grep -oE 'Violações HARD : [0-9]+' <<< "${_lint}" | grep -oE '[0-9]+$' | tail -1)"
-[ "${_rc}" = 0 ] && [ "${_hard}" = 0 ] || die "lint do COMMIT rc=${_rc}, HARD=${_hard:-?} — nada enviado (os commits locais ficam). Rode o lint para ver os HARD."
+if ! { [ "${_rc}" = 0 ] && [ "${_hard}" = 0 ]; }; then
+  # as HARD, nomeadas (2026-10-07): antes o motor só dizia "rode o lint", e cada reprovação custava um lint inteiro
+  if [ -s "${_tmp}/hard.txt" ]; then echo "PR-FINALIZE: as violações HARD do commit:" >&2; sed 's/^/  /' "${_tmp}/hard.txt" >&2; fi
+  die "lint do COMMIT rc=${_rc}, HARD=${_hard:-?} — nada enviado (os commits locais ficam)."
+fi
 # marcador para o pre-push não relintar o MESMO commit (maior M6: ~11 min por fechamento com lint duplicado)
 printf '%s\n' "$(git rev-parse HEAD)" > "$(git rev-parse --git-common-dir)/onion-prefinalize-ok"
 echo "PR-FINALIZE: ${BR} pronto — 0 HARD, resíduo casando, projeções estáveis."

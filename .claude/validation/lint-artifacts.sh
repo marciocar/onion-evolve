@@ -408,6 +408,11 @@ violation() {
 
   if [ "${severity}" = "HARD" ]; then
     HARD_COUNT=$(( HARD_COUNT + 1 ))
+    # QUAIS são as HARD (2026-10-07): a linha VIOLATION não diz a severidade, e o sumário só CONTA — o
+    # motor reprovava com "HARD=1" e a sessão relintava a árvore inteira para descobrir qual (4x num dia).
+    # O formato da linha fica intacto (o pre-push e a bancada leem `^VIOLATION`); quem quer a lista pede
+    # por esta variável.
+    [ -n "${ONION_LINT_HARD_FILE:-}" ] && echo "VIOLATION: ${rel_file}: ${rule}" >> "${ONION_LINT_HARD_FILE}"
   else
     SOFT_COUNT=$(( SOFT_COUNT + 1 ))
   fi
