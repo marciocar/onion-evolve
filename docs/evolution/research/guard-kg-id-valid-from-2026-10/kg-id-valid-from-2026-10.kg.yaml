@@ -19,7 +19,7 @@ nodes:
     status: confirmed
     verified_at: '2026-10-07'
     verified_against: 'yaml.safe_load sobre os 138 .kg.yaml do core (fora fixtures e materials): 12 ids SYNTHESIS.md_* (29 ocorrencias) num grafo; 6 valid_from inteiros em 4 grafos; 6 grafos sem schema_version, 9 sem meta.id, 7 com schema_version inteiro. Depois da cura: 0 em todas as contagens.'
-    trace: 'docs/evolution/inbox/2026-10-07-spike-schema-defeitos-de-dado-e-gramatica.md'
+    trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
     label: 'O DEFEITO, DATADO: em 2026-10-07 um sinal de campo trouxe a medicao de um leitor tipado do corpus do core, e ela se reproduziu aqui pelo mesmo metodo. O radar awk aprovava tudo, porque le texto: id com ponto e ano sem aspas so viram defeito para um leitor que tipa o YAML. Dois leitores discordando do mesmo byte e a classe.'
 
   - id: E_ORIGEM_DOS_IDS_FOI_MODELAGEM_A_MAO

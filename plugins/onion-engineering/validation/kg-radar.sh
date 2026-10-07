@@ -287,6 +287,8 @@ section == "nodes" && nid != "" {
     v = line; sub(/^[[:space:]]*valid_from:/, "", v)
     if (nid in validFrom && validFrom[nid] != trim(v)) dupKey[nid "|valid_from"] = validFrom[nid] " -> " trim(v)
     validFrom[nid] = trim(v)
+    # A FORMA crua, antes do trim (que tira as aspas): só dígitos SEM aspas é inteiro para YAML.
+    validFromBare[nid] = (v ~ /^[[:space:]]*[0-9]+[[:space:]]*$/)
   }
   else if (line ~ /^[[:space:]]*source_tier:/) {
     v = line; sub(/^[[:space:]]*source_tier:/, "", v)
@@ -1067,6 +1069,21 @@ END {
       if (refutedBy[id] > 0 && pendingTarget(nstatus[id], ntype[id])) {
         print "  ✗ CONTRADIÇÃO: " id " recebe REFUTES mas segue status=" nstatus[id] " (reconciliar: refuted ou superseded)"; problems++
       }
+      # ALFABETO DO ID (2026-10-07, sinal de campo de um adotante que escreveu um leitor tipado do
+      # corpus): 12 ids `SYNTHESIS.md_*` num grafo do core — o nome do documento-fonte virou prefixo
+      # SEM tirar a extensão. Este radar os aceitava (o `id` é só texto para o awk), mas um ponto no
+      # id quebra quem endereça nó por caminho (`grafo#nó`, `a.b`) e não passa em nenhum schema
+      # tipado. Medido antes de reprovar: 0 ids fora de [A-Za-z0-9_] no corpus do core (pós-cura),
+      # nas fixtures e em 16 clones de adotantes — nasce HARD sem baseline. Aspas duplas são aceitas
+      # (o programa awk vive entre aspas SIMPLES do shell: a aspa simples não pode aparecer aqui).
+      _idc = id; gsub(/^"|"$/, "", _idc)
+      if (_idc !~ /^[A-Za-z0-9_]+$/) { print "  ✗ " id ": id fora do alfabeto [A-Za-z0-9_] — renomeie o nó e TODAS as arestas que o citam"; problems++ }
+      # `valid_from: 2026` SEM ASPAS é um INTEIRO para todo leitor YAML tipado, não uma data parcial:
+      # este radar lê o texto e não vê diferença, um leitor tipado vê. Dois leitores discordando do
+      # mesmo byte é a classe; o motor não decide o tipo, só avisa. AVISO e não reprova porque os
+      # adotantes carregam o passivo (42 ocorrências em 7 grafos de 3 clones, medido no mesmo dia) —
+      # a REGRA 52 o repassa como SOFT para que seja visto no lint.
+      if (validFromBare[id]) { print "  ⚠ VALID-FROM-INTEIRO " id ": valid_from: " validFrom[id] " é número para leitor tipado — escreva entre aspas (\"" validFrom[id] "\")" }
     }
     # O QUE FOI RELAXADO SAI NUMERADO. Sem esta linha o modo proposta seria exatamente o defeito
     # que ele cura, uma camada acima: um ✅ que não conta o que deixou de cobrar.
