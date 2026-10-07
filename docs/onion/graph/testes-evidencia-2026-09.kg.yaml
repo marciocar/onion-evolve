@@ -1,6 +1,8 @@
 version: 1
 kind: plan
 meta:
+  id: testes-evidencia-2026-09
+  schema_version: "1"
   slug: testes-evidencia-2026-09
   title: "Testes, evidência e métrica de IA — a onda que cura o medível antes de pesquisar"
   purpose: |

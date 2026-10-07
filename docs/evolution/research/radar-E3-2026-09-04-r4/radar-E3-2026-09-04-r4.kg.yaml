@@ -56,7 +56,7 @@ nodes:
     confidence: 0.9
     verified_at: 2026-09-04
     verified_against: 'https://code.claude.com/docs/en/permissions — votos 3-0; requer v2.1.210+'
-    valid_from: 2026
+    valid_from: "2026"
     source_tier: 9
     source_kind: primary
     label: 'EIXO 5 (PERMISSOES) — o achado de maior consequencia da rodada. O Claude Code SO CONSULTA regras de caminho para os tipos de ferramenta Edit(path) e Read(path); regras de caminho escritas para Write, NotebookEdit, Glob ou MultiEdit sao ACEITAS mas NUNCA consultadas (com aviso no startup), exceto Glob passado via --allowedTools. Isto e a classe "guarda verde-vazia" da propria casa (o dano medido em .claude/rules/kg-grammar.md: guarda que passa sempre porque grepa o campo errado), agora vinda da plataforma. NO ONION: hoje nao morde — as 4 camadas de settings sao allow-only, zero deny e zero ask (E_R3_F11_REGRAS_DE_PERMISSAO, radar-E3-2026-09-04). ACAO PREVENTIVA nomeada: qualquer deny/allow de caminho futuro em .claude/settings.json vale so como Edit(path)/Read(path), e um lint de "settings bem-formados" que aceitasse Write(path) nasceria verde-vazio — se a regra de settings for escrita, ela precisa REPROVAR caminho em Write/NotebookEdit/MultiEdit.'

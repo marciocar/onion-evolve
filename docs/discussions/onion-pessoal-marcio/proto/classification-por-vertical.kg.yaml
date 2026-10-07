@@ -7,6 +7,7 @@
 # íntimo (nunca sai); a saída é predicado provado sob budget de ε; e o gap SEM cifra é a INFERÊNCIA (IN_INFERENCIA_GAP).
 # status: confirmed = maquinaria/postura que já transfere; status: open = peça nova/gap a desenhar.
 meta:
+  schema_version: "1"
   id: marcio-privacidade-p4
   date: 2026-07-12
 nodes:

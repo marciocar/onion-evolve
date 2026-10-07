@@ -9,6 +9,7 @@
 # O discriminador é híbrido de 3 órgãos (screen-hard IGUAL/maduro · marca-humana + resíduo DIFERENTE/novo).
 # status: confirmed = maquinaria madura que TRANSFERE (IGUAL); status: open = peça nova a desenhar (DIFERENTE).
 meta:
+  schema_version: "1"
   id: marcio-motor-reconciliacao-p2
   date: 2026-07-12
 nodes:

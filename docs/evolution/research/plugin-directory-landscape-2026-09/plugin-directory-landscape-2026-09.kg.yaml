@@ -96,7 +96,7 @@ nodes:
     impact: 3
     confidence: 0.95
     verified_at: 2026-09-04
-    valid_from: 2026
+    valid_from: "2026"
     verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — votos 3-0'
     source_tier: 10
     source_kind: primary
@@ -109,7 +109,7 @@ nodes:
     impact: 4
     confidence: 0.95
     verified_at: 2026-09-04
-    valid_from: 2026
+    valid_from: "2026"
     verified_against: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — votos 3-0'
     source_tier: 10
     source_kind: primary

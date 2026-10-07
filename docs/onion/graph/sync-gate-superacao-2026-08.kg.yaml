@@ -3,7 +3,8 @@
 # e registrei a lição do meu erro como PROSA na memória. Este grafo é a metade que faltava da Aufhebung:
 # o padrão falho SUPERSEDED pela cura-mecanismo, com a prova por comportamento anexada.
 meta:
-  schema_version: 1
+  id: sync-gate-superacao-2026-08
+  schema_version: "1"
   baseline: "2026-08-26"
 nodes:
   - id: C_CHAINED_SYNC_IS_FLAWED

@@ -129,7 +129,7 @@ nodes:
     confidence: 0.75
     verified_at: 2026-10-01
     verified_against: 'https://www.amazon.science/publications/symcert-verifying-smt-based-policy-analyses — DOIS recortes da MESMA pagina, ambos 3-0; a pagina e landing de publicacao da Amazon (o vendedor da tecnologia), tier 8 por dominio e nao por independencia'
-    valid_from: 2026
+    valid_from: "2026"
     source_tier: 8
     source_kind: paper
     label: 'CONFIRMADA (tier 8, 2026): o Cedar foi projetado para analise de politica sound and complete por reducao a SMT, e — palavra da propria publicacao — erros de codificacao nessas analises podem comprometer a corretude SILENCIOSAMENTE e ESCAPAM DE TESTES. Por isso existe o SymCert (Emina Torlak, FMCAD 2026): um framework em Lean que verifica formalmente as analises SMT do Cedar, com compilador simbolico verificado, autorizador, enforcer de hierarquia e extrator de contraexemplos. E o unico achado datado de 2026 sobre a maquinaria do Cedar — e revela que a cadeia de confianca tem TRES niveis, cujo terceiro so nasceu agora.'

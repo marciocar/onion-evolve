@@ -7,6 +7,7 @@
 # fronteira. Defesa = 6 camadas NEGATIVAS na fronteira (começa no ACESSO: a saída não filtra o que nunca foi string).
 # status: confirmed = postura/peça Onion que transfere; status: open = camada nova a desenhar OU o gap irredutível.
 meta:
+  schema_version: "1"
   id: marcio-mitigacao-inferencia-p5
   date: 2026-07-12
 nodes:

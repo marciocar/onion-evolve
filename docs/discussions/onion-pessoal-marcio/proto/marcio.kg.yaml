@@ -9,6 +9,7 @@
 # (status open — a pré-condição peer é filosoficamente fundamentada, psicometricamente não-testada);
 # uma instância trabalhada de reconciliação DEV×PROD (declarado × vivido → REFUTES → superseded = Aufhebung).
 meta:
+  schema_version: "1"
   id: marcio-verticais-p1
   date: 2026-07-12
 nodes:

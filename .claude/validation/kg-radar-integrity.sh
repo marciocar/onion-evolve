@@ -124,6 +124,13 @@ while IFS= read -r g; do
     emit SOFT MODO-PROPOSTA "${g}" \
       "grafo passou em MODO PROPOSTA — grau 0 e referência para fora do arquivo NÃO foram cobrados aqui ($(sed -n 's/^[[:space:]]*ℹ[[:space:]]*\(relaxado pelo MODO PROPOSTA.*\)/\1/p' <<< "${out}" | head -1 || true)). Isto é legítimo num fragmento da fila de propostas e SUSPEITO em qualquer outro lugar: o gate do grafo fechado é a SELAGEM"
   fi
+  # `valid_from` inteiro nu: o radar só AVISA (os adotantes carregam passivo); aqui o aviso vira
+  # SOFT para não morrer na saída humana de um modo que o lint descarta. Um SOFT por grafo, contado.
+  vfi="$(grep -c 'VALID-FROM-INTEIRO' <<< "${out}" || true)"
+  if [ "${vfi:-0}" -gt 0 ]; then
+    emit SOFT VALID-FROM-INTEIRO "${g}" \
+      "${vfi} nó(s) com valid_from inteiro sem aspas (ex.: valid_from: 2026) — leitor YAML tipado lê NÚMERO, não data parcial; escreva \"2026\""
+  fi
 # ⚠️ A isenção de FIXTURE vem do predicado ÚNICO kg-fixture-paths.sh (2026-09-05): antes cada
 #    consumidor repetia `grep -v '/fixtures/'` e o `__fixtures__/` do Vitest ESCAPAVA — 5 grafos
 #    deliberadamente inválidos de um adotante viraram 5 HARD no dia 1 da adoção dele.

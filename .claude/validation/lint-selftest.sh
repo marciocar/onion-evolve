@@ -9778,6 +9778,48 @@ run_kg_radar_integrity_selftests() {
     record_pass "kg-integridade: (d) grafo UNTRACKED contraditório é invisível — ponto cego declarado no cabeçalho"
   else record_fail "kg-integridade: (d)" "o ponto cego declarado não confere: ${out}"; fi
   rm -rf "$d"
+
+  # (e)-(h) DEFEITOS DE DADO medidos por um leitor tipado (2026-10-07): 12 ids `SYNTHESIS.md_*`
+  #     (nome de documento virou prefixo com a extensão) e `valid_from: 2026` sem aspas, que todo
+  #     leitor YAML tipado lê como INTEIRO. O id reprova; o valid_from inteiro só avisa (SOFT),
+  #     porque os adotantes carregam passivo. Cada polaridade tem o seu par.
+  # (e) id com PONTO → HARD, verbatim como apareceu no corpus.
+  d="$(mktemp -d)"; _mki "$d" sao
+  sed -i 's/C_alvo/SYNTHESIS.md_ALVO/g' "$d/docs/onion/graph/t.kg.yaml"
+  ( cd "$d" && git add -A && git -c user.email=t@t -c user.name=t commit -qm y ) 2>/dev/null
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if grep -q '^HARD.*id fora do alfabeto' <<< "${out}"; then
+    record_pass "kg-integridade: (e) id com ponto (SYNTHESIS.md_*) → HARD 'id fora do alfabeto'"
+  else record_fail "kg-integridade: (e)" "id com ponto não reprovou: ${out}"; fi
+  rm -rf "$d"
+  # (f) id entre ASPAS duplas é o mesmo id → silêncio (o alfabeto não pode reprovar a citação).
+  d="$(mktemp -d)"; _mki "$d" sao
+  sed -i 's/- id: C_alvo/- id: "C_alvo"/' "$d/docs/onion/graph/t.kg.yaml"
+  ( cd "$d" && git add -A && git -c user.email=t@t -c user.name=t commit -qm y ) 2>/dev/null
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if [ -z "${out}" ]; then
+    record_pass "kg-integridade: (f) id entre aspas duplas → silêncio (aspas não são o alfabeto)"
+  else record_fail "kg-integridade: (f)" "falso-positivo em id entre aspas: ${out}"; fi
+  rm -rf "$d"
+  # (g) valid_from: 2026 SEM aspas → SOFT VALID-FROM-INTEIRO, e NÃO HARD.
+  d="$(mktemp -d)"; _mki "$d" sao
+  sed -i '/- id: E_ref/a\    valid_from: 2026' "$d/docs/onion/graph/t.kg.yaml"
+  ( cd "$d" && git add -A && git -c user.email=t@t -c user.name=t commit -qm y ) 2>/dev/null
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if grep -q '^SOFT	VALID-FROM-INTEIRO' <<< "${out}" && ! grep -q '^HARD' <<< "${out}"; then
+    record_pass "kg-integridade: (g) valid_from: 2026 sem aspas → SOFT VALID-FROM-INTEIRO (nunca HARD)"
+  else record_fail "kg-integridade: (g)" "valid_from inteiro não virou SOFT: ${out}"; fi
+  rm -rf "$d"
+  # (h) o MESMO ano entre aspas → silêncio. O radar tira as aspas no trim; a guarda lê a forma
+  #     crua — a 1ª redação lia o valor já sem aspas e acusou 35 nós corretos em 10 grafos do core.
+  d="$(mktemp -d)"; _mki "$d" sao
+  sed -i "/- id: E_ref/a\\    valid_from: '2026'" "$d/docs/onion/graph/t.kg.yaml"
+  ( cd "$d" && git add -A && git -c user.email=t@t -c user.name=t commit -qm y ) 2>/dev/null
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if [ -z "${out}" ]; then
+    record_pass "kg-integridade: (h) valid_from: '2026' entre aspas → silêncio"
+  else record_fail "kg-integridade: (h)" "falso-positivo em ano entre aspas: ${out}"; fi
+  rm -rf "$d"
 }
 
 run_kg_census_parity_selftests() {
