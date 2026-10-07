@@ -2,7 +2,7 @@
 title: 'Resíduo — o Elenxo chega inteiro ao write(KG) do /onion-research'
 date: 2026-10-07
 branch: fix/research-elenxo-not-truncated
-reviewed_diff_sha256: 0cadc25ce91e4429503719aa3991c3b7e76de821e98329c1254c1cc125b72e7d
+reviewed_diff_sha256: 0396004cc69810e9f282f8cca141ac650c1758884245863b16490efdfa619f81
 reviewed_code_sha256: edefaafc61ec2ff05ad94d28a7386385a6102cdafad2896e5f34215de2f00579
 findings_total: 1
 findings_real: 1
