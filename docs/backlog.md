@@ -616,15 +616,15 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 9.6 | `Q_KG_SCHEMA_FORMAL` | fila-2026-10-06 | JSON Schema como contrato único do .kg.yaml; antes, medir quantos grafos passariam num schema estrito |
-| 7.0 | `Q_ONION_KG_SSOT_REPO` | fila-2026-10-06 | criar e adotar o onion-kg-ssot: produto independente, dogfood nos dois sentidos, contextos próprios, core lido por caminho ou git |
 | 5.4 | `Q_ROTULO_SEPARADO_DA_NARRATIVA` | fila-2026-10-06 | separar o rótulo factual da narrativa num campo próprio do nó |
 | 4.2 | `Q_MERGE_GATE_AVISA_NO_ADOTANTE` | fila-2026-10-06 | a trava de merge deve avisar no adotante em vez de sair calada |
 | 4.2 | `Q_PR_FINALIZE_MELHORIAS` | fila-2026-10-06 | pr-finalize: imprimir as violações ao reprovar, registrar etapa e rc com trap, catracas estáticas no checkpoint, rebase com ín |
-| 3.2 | `Q_HOOK_LER_RESIDUO_DA_BRANCH_DO_PR` | fila-2026-10-06 | o aviso de PR sem passada adversarial deve ler o resíduo da branch do PR, não do checkout principal |
+| 3.6 | `Q_GRANAAI_CLONE_SEM_CARIMBO` | fila-2026-10-06 | o clone registrado do granaai não tem .claude/.onion-version: local_path velho, Onion noutro checkout ou desacoplado? decisão do |
 | 3.2 | `Q_MAPA_NOMEAR_MERGE_ONION_HOOKS` | fila-2026-10-06 | nomear merge-onion-hooks.sh no corpo da família que o exercita, para o mapa da bancada o reivindicar |
 | 3.0 | `Q_CANAL_VIVO_ENTRE_SESSOES` | fila-2026-10-06 | o canal vivo entre sessões vira 3ª via da co-evolução (envelope fixo, registro do envio, decisão descendo ao grafo)? aguarda  |
 | 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |
 | 3.0 | `Q_PODA_CLAUDE_MD_REVISITA` | fila-2026-10-06 | revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros |
+| 2.4 | `Q_VETO_PRETOOLUSE_NO_PR_CREATE` | fila-2026-10-06 | GATED — vetar no PreToolUse o gh pr create sem resíduo? Reabre só se o aviso pós-ato do #948 deixar passar PR sem resíduo; a |
 | 2.0 | `E_SKILL_CORE_ONLY_VIAJOU` | fila-2026-10-06 | a skill onion-publish, que é só do core, pode ter viajado para o adotante (hipótese) |
 | 2.0 | `Q_MANIFESTO_SEM_SKILL_CORE_ONLY` | fila-2026-10-06 | medir se a skill onion-publish viaja ao adotante e, se viajar, tirá-la do manifesto |
 

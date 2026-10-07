@@ -22835,6 +22835,31 @@ print("OK %d<%d" % (worst(lpt), worst(rr)) if got == want and worst(lpt) < worst
     *)   record_fail "shard-plan: (f) o plano por tempo não equilibra" "${_ev}" ;;
   esac
 
+  # (g) A TABELA VERSIONADA É LEGÍVEL (2026-10-07). O plano IGNORA em silêncio linha que não for
+  #     `familia<TAB>segundos` — uma tabela corrompida inteira faria o CI voltar ao round-robin sem
+  #     ninguém ver (a faixa de 25 min estourando de novo). Este caso também é o que faz o mapa da
+  #     bancada reivindicar ops/testing/selftest-family-times.tsv para esta família: antes dele, mudar
+  #     a tabela caía no failsafe "não é citado por nenhuma família" e rodava as 219.
+  #     MUTANTE: uma linha `kg_backlog 927` (espaço no lugar do TAB) na tabela reprova este caso.
+  local _tab="${ONION_SHARD_TIMES_UNDER_TEST:-${REPO_ROOT}/ops/testing/selftest-family-times.tsv}" _tv
+  _tv="$(TAB="${_tab}" python3 -c '
+import os
+ok = bad = 0
+for i, l in enumerate(open(os.environ["TAB"], encoding="utf-8"), 1):
+    l = l.rstrip("\n")
+    if not l or l.startswith("#"): continue
+    p = l.split("\t")
+    try:
+        if len(p) == 2 and p[0] and float(p[1]) >= 0: ok += 1; continue
+    except ValueError: pass
+    bad += 1; print("linha %d ilegível: %r" % (i, l[:60]))
+print("OK %d" % ok if ok and not bad else "FALHA ok=%d ruins=%d" % (ok, bad))
+' 2>&1 | tail -1)"
+  case "${_tv}" in
+    OK*) record_pass "shard-plan: (g) a tabela versionada de tempos é toda legível (${_tv#OK } famílias) — nada cai no round-robin em silêncio" ;;
+    *)   record_fail "shard-plan: (g) tabela de tempos ilegível" "${_tv} (${_tab})" ;;
+  esac
+
   # (e) LISTA VAZIA => exit 1. E o fail-open mais caro num gate de gate: matriz vazia = job verde
   #     que nao exerceu NADA. Fixture: um --list que devolve zero linhas com rc 0.
   local e; e="$(mktemp -d)"; mkdir -p "$e/ops/testing" "$e/.claude/validation"
