@@ -3,7 +3,8 @@ title: "Revisão — /meta:cc-update forjado pelo /meta:forge (medidor, doutrina
 date: 2026-10-08
 branch: feat/meta-cc-update
 reviewer: "passada adversarial do próprio fork de execução (a ordem proibia subagente); mandato: achar onde o artefato AFIRMA mais do que mede. Evidência por execução: dogfood de carga headless nos dois modos, diff -r contra o data/ da r8, 9 mutantes, radar e contrato v3"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 85e9e9469d4c100a7c3d56252db5975cd6aad407d30c2c11c98e9f1b1662d384
+reviewed_code_sha256: c060f0e3d21be1d3225776169c28c5af2fe92b10f0ff36133a4e9d0076c82330
 findings_total: 7
 findings_real: 7
 verdict: APROVADO
