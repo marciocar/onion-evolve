@@ -2,11 +2,10 @@
 title: 'Resíduo — os fixes confirmados dos sinais do contrato e da suíte de conformidade do .kg.yaml'
 date: 2026-10-08
 branch: fix/kg-ssot-signals-confirmed
-reviewed_diff_sha256: 46a719edb426d31ce5d0a7e6128bc600e04d87d2200a07aed712d04f587ada66
-reviewed_code_sha256: ec739df9fb91b241dbc27455848ca4b1af125afb09ea670617f81a9a3ddf9675
-findings_total: 2
-findings_real: 2
-findings_fixed: 2
+reviewed_diff_sha256: pendente
+findings_total: 3
+findings_real: 3
+findings_fixed: 3
 tokens: 0
 duration_min: 60
 verdict: CORRIGIDO
@@ -31,7 +30,11 @@ nota: >-
   pagou por guarda cega ao material de teste); isenção muda contrariaria isso, por isso SOFT nomeado e
   não silêncio, com (e2) provando que o mesmo conteúdo fora de fixtures segue HARD. ACHADO 2: a bancada
   da 82 copiava o helper sem o predicado, e a 1ª rodada abortou; as duas guardas agora falham fechado
-  (exit 2) sem o predicado e a bancada copia a dependência. (3) O backlog NÃO inclui grafo não
+  (exit 2) sem o predicado e a bancada copia a dependência. ACHADO 3 (do CI, faixa 4): a família
+  kg_fixture_paths (c) só reconhecia dois jeitos de USAR o predicado (`bash "${_KFP}"` e
+  `kg-fixture-paths.sh" --`); as 78/82 o SOURCEIAM e aplicam a regex no laço (lê por NUL, fork por
+  arquivo custaria segundos). O caso passou a aceitar a 3ª forma exigindo as duas peças juntas (source
+  E uso de KG_FIXTURE_RE); mutante que tira o uso da regex na 82 faz o caso reprovar. (3) O backlog NÃO inclui grafo não
   rastreado (o CI regenera de clone limpo e a projeção divergiria, REGRA 62): passa a AVISAR no stderr,
   nomeando cada grafo; a skill manda regenerar depois do `git add`. (4) zoho.md: createTask manda
   `owners_and_work` aninhado na criação. Mutantes, todos morderam (LC_ALL=C): checagem genérica

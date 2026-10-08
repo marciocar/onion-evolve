@@ -18132,7 +18132,11 @@ run_kg_fixture_paths_selftests() {
     #    PRESENTE. Foi a classe que EU curei em 496 sítios nesta sessão e reintroduzi aqui: local
     #    1054/0, CI de 2 cores reprovando 1 caso. Conteúdo em VARIÁVEL, veredito por here-string.
     local _code; _code="$(grep -vE '^[[:space:]]*#' "${_root2}/${c}" || true)"
+    # 3ª forma de USO (2026-10-08): SOURCE do predicado + a regex dele aplicada no laço. As REGRAS 78 e
+    # 82 leem os caminhos por NUL (`-z`) e testam um a um; um fork por arquivo custaria segundos no
+    # lint. As duas peças são exigidas juntas: sourcear sem aplicar seria menção com outra roupa.
     grep -qF 'bash "${_KFP}"' <<< "${_code}" || grep -qF 'kg-fixture-paths.sh" --' <<< "${_code}" \
+      || { grep -qF '. "${_KFP}"' <<< "${_code}" && grep -qF 'KG_FIXTURE_RE' <<< "${_code}"; } \
       || cmiss="${cmiss} ${c}:não-INVOCA-o-predicado(menção em comentário não conta)"
     # e nenhuma reintrodução do grep próprio, nas 3 grafias que escapavam da 1ª versão (aspas
     # simples, aspas duplas, alternação -E). Ancorado no PADRÃO, não na pontuação.
