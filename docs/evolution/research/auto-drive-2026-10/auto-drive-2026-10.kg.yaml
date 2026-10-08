@@ -77,8 +77,8 @@ nodes:
     impact: 4
     confidence: 0.8
     verified_at: 2026-10-08
-    verified_against: "2026-10-08, início do SAC-66: o core moveu a issue por script direto na API do Linear em vez do adapter do task manager, e o estado escolhido por tipo saiu 'In Review' (dois estados started); o sinal da suíte de conformidade do adotante do KG-SSOT já apontava o mesmo: 'é dogfood e não interpretação de comandos'; decisão do maestro no mesmo dia: acrescentar ao auto-drive"
-    label: "o auto-drive nasce pelo /meta:forge (as 7 peças medidas pelo censo da forja) e, por item, invoca os comandos reais do Onion (/engineer:start, /engineer:work, /engineer:pr, /meta:drive) em vez de reimplementar o fluxo; onde o comando não der conta vira achado no grafo, nunca contorno; depende do adapter executável (SAC-65)"
+    verified_against: "2026-10-08, início do SAC-66: o core moveu a issue por script direto na API do Linear em vez do adapter do task manager, e o estado escolhido por tipo saiu 'In Review' (dois estados started); o sinal da suíte de conformidade do adotante do KG-SSOT já apontava o mesmo: 'é dogfood e não interpretação de comandos'; decisão do maestro no mesmo dia: acrescentar ao auto-drive, e o reforço de que vale para skills, agentes e tudo mais (o /product:collect manda chamar o @story-points-framework-specialist e a estimativa do SAC-66..73 foi feita à mão)"
+    label: "o auto-drive nasce pelo /meta:forge (as 7 peças medidas pelo censo da forja) e, por item, USA a maquinaria do Onion — comandos (/engineer:start, /engineer:work, /engineer:pr, /meta:drive), skills, agentes especialistas, adapters e scripts de validação — em vez de interpretá-la e refazer o trabalho à mão; onde o comando não der conta vira achado no grafo, nunca contorno; depende do adapter executável (SAC-65)"
   - id: Q_GUARDA_API_DIRETA_DE_PROVEDOR
     node_type: question
     layer: audit
