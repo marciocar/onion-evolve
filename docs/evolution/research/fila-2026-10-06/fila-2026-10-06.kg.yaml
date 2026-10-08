@@ -135,19 +135,21 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 0.6
-    verified_against: ".claude/rules/kg-grammar.md"
+    verified_at: "2026-10-08"
+    verified_against: "execução mergeada e medida: PR #967 (2026-10-08T05:27:28Z, 69409a84e3b5) vendorizou o contrato v3 do .kg.yaml (JSON Schema 2020-12, MUST e SHOULD) por pin e o gate por grafo roda no CI (run 37731420161: 142 de 142 no MUST); a medição pedida (quantos grafos passariam num schema estrito) foi feita pelo adotante dedicado e repetida aqui"
     label: "JSON Schema como contrato único do .kg.yaml; antes, medir quantos grafos passariam num schema estrito"
   - id: Q_ROTULO_SEPARADO_DA_NARRATIVA
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.6
-    verified_against: ".claude/rules/kg-grammar.md"
+    verified_at: "2026-10-08"
+    verified_against: "execução mergeada e medida: o contrato v3 vendorizado tem o campo narrative no nó (vendor/kg-ssot/spec/kg-contract-v3.schema.json) e alerta label acima de 280; o PR #969 (6a6c55a4b940) ensinou os geradores a escrever label curto mais narrative; a migração do corpus antigo é o SAC-73"
     label: "separar o rótulo factual da narrativa num campo próprio do nó"
   - id: Q_PODA_CLAUDE_MD_REVISITA
     node_type: question
