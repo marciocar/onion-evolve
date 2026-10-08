@@ -1,0 +1,80 @@
+meta:
+  schema_version: "1"
+  id: valid-node-every-status
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: EV_A
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: "A evidência sintética que sustenta A."
+    provenance:
+      source: "medição sintética"
+      locator: "caso de conformidade"
+      method: "medição"
+  - id: C_OPEN
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.1
+    label: "Nó sintético com status open."
+  - id: C_CONFIRMED
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.1
+    label: "Nó sintético com status confirmed."
+    provenance:
+      source: "medição sintética"
+      locator: "caso de conformidade"
+      method: "medição"
+  - id: C_DRIFTED
+    node_type: claim
+    plane: DEV
+    status: drifted
+    impact: 1
+    confidence: 0.1
+    label: "Nó sintético com status drifted."
+  - id: C_UNVERIFIABLE
+    node_type: claim
+    plane: DEV
+    status: unverifiable
+    impact: 1
+    confidence: 0.1
+    label: "Nó sintético com status unverifiable."
+  - id: C_DONE
+    node_type: claim
+    plane: DEV
+    status: done
+    impact: 1
+    confidence: 0.1
+    label: "Nó sintético com status done."
+edges:
+  - from: C_OPEN
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: C_CONFIRMED
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: C_DRIFTED
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: C_UNVERIFIABLE
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: C_DONE
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: EV_A
+    to: Q_A
+    edge_type: SUPPORTS

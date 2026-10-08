@@ -1,0 +1,197 @@
+{
+  "description": "Padrão de id, intervalos, tipos e datas dos campos do nó.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-node-id-pattern.kg.yaml",
+      "description": "id com hífen, fora do padrão; a aresta que o cita herda o defeito",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.id",
+        "form.pattern.edge.from"
+      ]
+    },
+    {
+      "file": "bad-node-impact-zero.kg.yaml",
+      "description": "impact abaixo de 1",
+      "valid": false,
+      "codes": [
+        "form.range.node.impact"
+      ]
+    },
+    {
+      "file": "bad-node-impact-six.kg.yaml",
+      "description": "impact acima de 5",
+      "valid": false,
+      "codes": [
+        "form.range.node.impact"
+      ]
+    },
+    {
+      "file": "bad-node-impact-float.kg.yaml",
+      "description": "impact fracionário",
+      "valid": false,
+      "codes": [
+        "form.type.node.impact"
+      ]
+    },
+    {
+      "file": "bad-node-confidence-above-one.kg.yaml",
+      "description": "confidence acima de 1",
+      "valid": false,
+      "codes": [
+        "form.range.node.confidence"
+      ]
+    },
+    {
+      "file": "bad-node-confidence-string.kg.yaml",
+      "description": "confidence como texto",
+      "valid": false,
+      "codes": [
+        "form.type.node.confidence"
+      ]
+    },
+    {
+      "file": "bad-node-label-empty.kg.yaml",
+      "description": "label vazio",
+      "valid": false,
+      "codes": [
+        "form.range.node.label"
+      ]
+    },
+    {
+      "file": "bad-node-verified-at-format.kg.yaml",
+      "description": "verified_at fora do formato AAAA-MM-DD",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.verified_at"
+      ]
+    },
+    {
+      "file": "bad-node-valid-from-integer.kg.yaml",
+      "description": "valid_from como inteiro (achado F5 do spike)",
+      "valid": false,
+      "codes": [
+        "form.type.node.valid_from"
+      ]
+    },
+    {
+      "file": "bad-node-source-tier-eleven.kg.yaml",
+      "description": "source_tier acima de 10",
+      "valid": false,
+      "codes": [
+        "form.range.node.source_tier"
+      ]
+    },
+    {
+      "file": "valid-node-prod-verified.kg.yaml",
+      "description": "nó PROD com verified_at",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-node-valid-from-partial.kg.yaml",
+      "description": "valid_from com data parcial (ano e ano-mês)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-node-id-trailing-newline.kg.yaml",
+      "description": "id com quebra de linha no fim: em ECMA-262 o $ não casa antes do \\n (um leitor JS reprova)",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.id",
+        "form.pattern.edge.to"
+      ]
+    },
+    {
+      "file": "bad-node-valid-from-malformed.kg.yaml",
+      "description": "valid_from com mês de um dígito",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.valid_from"
+      ]
+    },
+    {
+      "file": "bad-node-trace-integer.kg.yaml",
+      "description": "trace como inteiro",
+      "valid": false,
+      "codes": [
+        "form.type.node.trace"
+      ]
+    },
+    {
+      "file": "bad-node-verified-against-integer.kg.yaml",
+      "description": "verified_against como inteiro",
+      "valid": false,
+      "codes": [
+        "form.type.node.verified_against"
+      ]
+    },
+    {
+      "file": "bad-node-source-kind-integer.kg.yaml",
+      "description": "source_kind como inteiro",
+      "valid": false,
+      "codes": [
+        "form.type.node.source_kind"
+      ]
+    },
+    {
+      "file": "bad-node-source-tier-string.kg.yaml",
+      "description": "source_tier como texto \"3\"",
+      "valid": false,
+      "codes": [
+        "form.type.node.source_tier"
+      ]
+    },
+    {
+      "file": "bad-node-source-tier-zero.kg.yaml",
+      "description": "source_tier abaixo de 1",
+      "valid": false,
+      "codes": [
+        "form.range.node.source_tier"
+      ]
+    },
+    {
+      "file": "bad-node-impact-boolean.kg.yaml",
+      "description": "impact booleano (true não é inteiro no JSON Schema)",
+      "valid": false,
+      "codes": [
+        "form.type.node.impact"
+      ]
+    },
+    {
+      "file": "bad-node-confidence-boolean.kg.yaml",
+      "description": "confidence booleano",
+      "valid": false,
+      "codes": [
+        "form.type.node.confidence"
+      ]
+    },
+    {
+      "file": "bad-node-confidence-negative.kg.yaml",
+      "description": "confidence abaixo de 0",
+      "valid": false,
+      "codes": [
+        "form.range.node.confidence"
+      ]
+    },
+    {
+      "file": "bad-node-label-integer.kg.yaml",
+      "description": "label como inteiro",
+      "valid": false,
+      "codes": [
+        "form.type.node.label"
+      ]
+    },
+    {
+      "file": "bad-node-label-null.kg.yaml",
+      "description": "label nulo",
+      "valid": false,
+      "codes": [
+        "form.type.node.label"
+      ]
+    }
+  ]
+}

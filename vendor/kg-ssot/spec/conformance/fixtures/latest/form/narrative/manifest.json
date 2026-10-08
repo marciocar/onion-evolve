@@ -1,0 +1,65 @@
+{
+  "description": "Rótulo × narrativa (Q_CONTRACT_FACT_NARRATIVE, selada no PR #18): o nó tem narrative opcional, o label curto alerta acima de 280 caracteres e o meta conhece note e purpose.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-node-with-narrative.kg.yaml",
+      "description": "label curto e a explicação em narrative",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-node-narrative-integer.kg.yaml",
+      "description": "narrative tem de ser texto",
+      "valid": false,
+      "codes": [
+        "form.type.node.narrative"
+      ]
+    },
+    {
+      "file": "warn-label-over-280.kg.yaml",
+      "description": "label com 281 caracteres: alerta, a narrativa vai para narrative",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.node.label"
+      ]
+    },
+    {
+      "file": "valid-label-exactly-280.kg.yaml",
+      "description": "label com exatamente 280 caracteres não alerta",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-meta-note-and-purpose.kg.yaml",
+      "description": "note e purpose são chaves conhecidas do meta: não alertam",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-meta-note-integer.kg.yaml",
+      "description": "note do meta tem de ser texto",
+      "valid": false,
+      "codes": [
+        "form.type.meta.note"
+      ]
+    },
+    {
+      "file": "valid-label-280-astral.kg.yaml",
+      "description": "280 caracteres fora do plano básico (emoji): o tamanho conta code points, não unidades UTF-16 (um port JS com str.length erraria)",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-label-281-astral.kg.yaml",
+      "description": "281 code points fora do plano básico alertam",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.node.label"
+      ]
+    }
+  ]
+}

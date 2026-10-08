@@ -1,0 +1,23 @@
+{
+  "version": "3.0.0",
+  "tag": "contract-v3.0.0",
+  "contract": {
+    "must": "spec/kg-contract-v3.schema.json",
+    "should": "spec/kg-contract-v3.should.schema.json"
+  },
+  "files": [
+    "ADOPTING.md",
+    "spec/release.json",
+    "spec/kg-contract-v3.schema.json",
+    "spec/kg-contract-v3.should.schema.json",
+    "spec/conformance/README.md",
+    "spec/conformance/manifest.schema.json",
+    "spec/conformance/fixtures/",
+    "spec/conformance/metaschema-tests/",
+    "tools/kg_validate.py",
+    "tools/kg_conformance.py",
+    "tools/kg_gate.py",
+    "tools/kg_vendor.py",
+    "tools/requirements.txt"
+  ]
+}

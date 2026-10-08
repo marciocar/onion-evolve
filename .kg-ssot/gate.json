@@ -1,0 +1,33 @@
+{
+  "contract": "kg-contract-v3.schema.json",
+  "contract_sha256": "6e9e0af7ff3ec5603dcd07f1ac156bcf1b4a6385475b3c1d14ccc158c3be6abd",
+  "graphs": 142,
+  "failing": {},
+  "debt": {
+    "form.range.node.label": 113,
+    "form.required.node.provenance": 142,
+    "form.required.node.verified_at": 12,
+    "form.unknown-key.edge.provenance": 1,
+    "form.unknown-key.meta.dissect_tool": 1,
+    "form.unknown-key.meta.drive_checkpoint": 1,
+    "form.unknown-key.meta.label": 2,
+    "form.unknown-key.meta.revisited": 1,
+    "form.unknown-key.meta.run_id": 2,
+    "form.unknown-key.meta.slug": 2,
+    "form.unknown-key.meta.source_run": 1,
+    "form.unknown-key.meta.supersedes_external": 4,
+    "form.unknown-key.meta.supersedes_none": 10,
+    "form.unknown-key.meta.title": 5,
+    "form.unknown-key.meta.trace": 2,
+    "form.unknown-key.node.dissect_level": 1,
+    "form.unknown-key.node.dissect_verdict": 1,
+    "form.unknown-key.node.gatilho": 2,
+    "form.unknown-key.node.resolution": 2,
+    "form.unknown-key.node.reverify_note": 1,
+    "form.unknown-key.node.status_note": 1,
+    "form.unknown-key.node.superseded_note": 1,
+    "form.unknown-key.top.kind": 2,
+    "form.unknown-key.top.version": 2,
+    "yaml.unquoted-date": 138
+  }
+}

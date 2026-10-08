@@ -1,0 +1,3 @@
+# Versões exatas: a matriz do leitor de referência tem de ser reproduzível no CI.
+PyYAML==6.0.3
+jsonschema==4.26.0

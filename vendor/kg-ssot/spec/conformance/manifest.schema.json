@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onion-kg-ssot/spec/conformance/manifest.schema.json",
+  "title": "manifest.json de um grupo da suíte de conformidade do .kg.yaml",
+  "description": "Cada grupo da suíte é uma pasta com um manifest.json e um .kg.yaml real por caso. O manifesto diz o veredito esperado de cada caso: valid, os códigos MUST (codes, reprovam) e os códigos SHOULD (warnings, só alertam). A regra de pending_on por pasta (vazio em latest/, não vazio em proposals/) é do runner, porque o metaschema não vê a pasta.",
+  "type": "object",
+  "required": ["description", "layer", "pending_on", "cases"],
+  "additionalProperties": false,
+  "properties": {
+    "description": { "type": "string", "minLength": 1 },
+    "layer": { "enum": ["parse", "form", "integrity", "yaml", "semantic"] },
+    "pending_on": {
+      "description": "Ids das decisões abertas de que o veredito depende (ex.: Q_CONTRACT_CONFORMANCE_LEVELS).",
+      "type": "array",
+      "uniqueItems": true,
+      "items": { "type": "string", "pattern": "^[A-Z][A-Z0-9_]*$" }
+    },
+    "cases": { "type": "array", "minItems": 1, "items": { "$ref": "#/$defs/case" } }
+  },
+  "$defs": {
+    "code": {
+      "description": "Código estável de regra, em slug por camada.",
+      "type": "string",
+      "anyOf": [
+        { "pattern": "^parse\\.[a-z][a-z0-9-]*$" },
+        { "pattern": "^form\\.(required|enum|type|pattern|range|const|unknown-key)\\.(top|meta|node|edge)\\.[A-Za-z_][A-Za-z0-9_-]*(\\.[A-Za-z_][A-Za-z0-9_-]*)*$" },
+        { "pattern": "^integrity\\.[a-z][a-z0-9-]*$" },
+        { "pattern": "^yaml\\.[a-z][a-z0-9-]*$" },
+        { "pattern": "^semantic\\.[a-z][a-z0-9-]*$" }
+      ]
+    },
+    "codes": { "type": "array", "uniqueItems": true, "items": { "$ref": "#/$defs/code" } },
+    "case": {
+      "type": "object",
+      "required": ["file", "description", "valid", "codes"],
+      "additionalProperties": false,
+      "properties": {
+        "file": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*\\.(kg\\.)?yaml$" },
+        "description": { "type": "string", "minLength": 1 },
+        "valid": { "type": "boolean" },
+        "codes": { "$ref": "#/$defs/codes" },
+        "warnings": { "$ref": "#/$defs/codes" }
+      },
+      "if": { "properties": { "valid": { "const": true } } },
+      "then": { "properties": { "codes": { "maxItems": 0 } } },
+      "else": { "properties": { "codes": { "minItems": 1 } } }
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "description": "O arquivo tem de ser YAML válido, com um documento só, e a raiz tem de ser um mapa.",
+  "layer": "parse",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-yaml-syntax.yaml",
+      "description": "YAML malformado: colchete aberto sem fechar. Extensão .yaml, não .kg.yaml, porque há validadores de repositório que varrem todo .kg.yaml rastreado sem respeitar a convenção de fixture",
+      "valid": false,
+      "codes": [
+        "parse.yaml-error"
+      ]
+    },
+    {
+      "file": "bad-two-documents.kg.yaml",
+      "description": "dois documentos YAML no mesmo arquivo",
+      "valid": false,
+      "codes": [
+        "parse.not-single-document"
+      ]
+    },
+    {
+      "file": "bad-root-is-list.kg.yaml",
+      "description": "a raiz é uma lista, não um mapa",
+      "valid": false,
+      "codes": [
+        "parse.root-not-mapping"
+      ]
+    },
+    {
+      "file": "valid-sequence-zero-indent.kg.yaml",
+      "description": "listas sem indentação sob a chave (estilo padrão do PyYAML): YAML válido, o mesmo grafo do caso mínimo",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-empty-file.kg.yaml",
+      "description": "arquivo vazio: nenhum documento",
+      "valid": false,
+      "codes": [
+        "parse.empty-document"
+      ]
+    },
+    {
+      "file": "bad-comment-only.kg.yaml",
+      "description": "só comentário: nenhum documento",
+      "valid": false,
+      "codes": [
+        "parse.empty-document"
+      ]
+    },
+    {
+      "file": "bad-null-document.kg.yaml",
+      "description": "só o marcador de documento, sem conteúdo",
+      "valid": false,
+      "codes": [
+        "parse.empty-document"
+      ]
+    },
+    {
+      "file": "bad-null-scalar.kg.yaml",
+      "description": "o documento é o nulo ~",
+      "valid": false,
+      "codes": [
+        "parse.empty-document"
+      ]
+    }
+  ]
+}

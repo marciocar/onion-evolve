@@ -1,0 +1,8 @@
+meta:
+  schema_version: '1'
+  id: bad-nodes-null
+nodes: null
+edges:
+  - from: EV_A
+    to: Q_A
+    edge_type: SUPPORTS

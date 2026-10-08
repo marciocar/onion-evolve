@@ -1,0 +1,96 @@
+{
+  "description": "Proveniência estruturada (Q_CONTRACT_STRUCTURED_PROVENANCE, selada no PR #21): provenance com source, locator e method; no v3, nó confirmed ou PROD sem ela alerta, e no v4 reprova.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-confirmed-with-provenance.kg.yaml",
+      "description": "nó confirmed com provenance completa",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-confirmed-without-provenance.kg.yaml",
+      "description": "nó confirmed sem provenance: alerta no v3",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "warn-prod-without-provenance.kg.yaml",
+      "description": "nó PROD só com verified_against em texto: alerta no v3",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "bad-provenance-missing-locator.kg.yaml",
+      "description": "provenance sem locator: quando presente, os três campos são obrigatórios",
+      "valid": false,
+      "codes": [
+        "form.required.node.provenance.locator"
+      ]
+    },
+    {
+      "file": "bad-provenance-source-empty.kg.yaml",
+      "description": "source vazio",
+      "valid": false,
+      "codes": [
+        "form.range.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-provenance-not-object.kg.yaml",
+      "description": "provenance como texto, não objeto",
+      "valid": false,
+      "codes": [
+        "form.type.node.provenance"
+      ]
+    },
+    {
+      "file": "warn-provenance-unknown-key.kg.yaml",
+      "description": "chave fora de source, locator e method alerta (quote não entrou no v3)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.node.provenance.quote"
+      ]
+    },
+    {
+      "file": "valid-provenance-x-key.kg.yaml",
+      "description": "extensão x_ dentro de provenance é livre",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-provenance-null.kg.yaml",
+      "description": "provenance nulo reprova; a ausência só alerta",
+      "valid": false,
+      "codes": [
+        "form.type.node.provenance"
+      ]
+    },
+    {
+      "file": "warn-edge-provenance.kg.yaml",
+      "description": "provenance só existe no nó; na aresta é chave desconhecida",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.edge.provenance"
+      ]
+    },
+    {
+      "file": "warn-confirmed-and-prod-without-provenance.kg.yaml",
+      "description": "confirmed e PROD ao mesmo tempo: um alerta só",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.provenance"
+      ]
+    }
+  ]
+}

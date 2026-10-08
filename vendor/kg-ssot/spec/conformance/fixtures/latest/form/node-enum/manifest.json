@@ -1,0 +1,51 @@
+{
+  "description": "Os enums do nó.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-node-type-enum.kg.yaml",
+      "description": "node_type fora do enum",
+      "valid": false,
+      "codes": [
+        "form.enum.node.node_type"
+      ]
+    },
+    {
+      "file": "bad-node-plane-enum.kg.yaml",
+      "description": "plane fora do enum (só DEV e PROD)",
+      "valid": false,
+      "codes": [
+        "form.enum.node.plane"
+      ]
+    },
+    {
+      "file": "bad-node-status-enum.kg.yaml",
+      "description": "status fora do enum",
+      "valid": false,
+      "codes": [
+        "form.enum.node.status"
+      ]
+    },
+    {
+      "file": "bad-node-layer-enum.kg.yaml",
+      "description": "layer fora do enum (só audit e domain)",
+      "valid": false,
+      "codes": [
+        "form.enum.node.layer"
+      ]
+    },
+    {
+      "file": "valid-node-every-type.kg.yaml",
+      "description": "um nó de cada node_type, todos ligados",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-node-every-status.kg.yaml",
+      "description": "um nó de cada status válido de forma (open, confirmed, drifted, unverifiable, done); refuted e superseded têm semântica própria e vão para a camada semântica",
+      "valid": true,
+      "codes": []
+    }
+  ]
+}

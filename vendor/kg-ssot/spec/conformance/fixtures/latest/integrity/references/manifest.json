@@ -1,0 +1,51 @@
+{
+  "description": "Integridade referencial e de grau: o que nenhum JSON Schema expressa (E_SPIKE_FIXTURES_TEST_SEMANTICS).",
+  "layer": "integrity",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-duplicate-id.kg.yaml",
+      "description": "dois nós com o mesmo id, ambos ligados",
+      "valid": false,
+      "codes": [
+        "integrity.duplicate-id"
+      ]
+    },
+    {
+      "file": "bad-dangling-to.kg.yaml",
+      "description": "aresta que aponta para um id que não existe",
+      "valid": false,
+      "codes": [
+        "integrity.dangling-to"
+      ]
+    },
+    {
+      "file": "bad-dangling-from.kg.yaml",
+      "description": "aresta que parte de um id que não existe",
+      "valid": false,
+      "codes": [
+        "integrity.dangling-from"
+      ]
+    },
+    {
+      "file": "bad-orphan-node.kg.yaml",
+      "description": "nó sem nenhuma aresta (grau 0)",
+      "valid": false,
+      "codes": [
+        "integrity.orphan-node"
+      ]
+    },
+    {
+      "file": "valid-chain.kg.yaml",
+      "description": "cadeia de três nós, cada um ligado ao seguinte",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-node-touched-only-as-target.kg.yaml",
+      "description": "nó que só aparece como destino de aresta não é órfão",
+      "valid": true,
+      "codes": []
+    }
+  ]
+}

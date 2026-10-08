@@ -1,0 +1,5 @@
+meta:
+  schema_version: '1'
+  id: valid-empty-graph
+nodes: []
+edges: []
