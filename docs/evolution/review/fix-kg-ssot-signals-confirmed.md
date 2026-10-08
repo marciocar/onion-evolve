@@ -2,7 +2,8 @@
 title: 'Resíduo — os fixes confirmados dos sinais do contrato e da suíte de conformidade do .kg.yaml'
 date: 2026-10-08
 branch: fix/kg-ssot-signals-confirmed
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 46a719edb426d31ce5d0a7e6128bc600e04d87d2200a07aed712d04f587ada66
+reviewed_code_sha256: ec739df9fb91b241dbc27455848ca4b1af125afb09ea670617f81a9a3ddf9675
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
