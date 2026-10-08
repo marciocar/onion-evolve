@@ -2,7 +2,7 @@
 title: 'Resíduo — o conflito só de projeção em plugins/ se resolve no rebase do pr-finalize, e o mapa da federação entra na lista do motor'
 date: 2026-10-08
 branch: fix/generated-projection-merge
-reviewed_diff_sha256: 4561cef02b50403ba5452e8365edc1fb8ec22154be8bd8322becbb37fcade091
+reviewed_diff_sha256: 6b40f4cd087b9a6ee7051378424ae4cd5513fda3ce48b60096e23ea0aac1a875
 reviewed_code_sha256: 986053ba6d0d36bbe0f15d981bf7b69d8357081142f6ac8dfeca0f59b385d484
 findings_total: 1
 findings_real: 1
