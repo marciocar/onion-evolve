@@ -9,7 +9,7 @@ meta:
   baseline: "2026-10-08"
   review_after: "2026-11-07"   # 30d: programa de trabalho
   # ═══ TETO: 15 NÓS ═══
-  #   13 em 2026-10-08 (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08). Onda nova exige onda colhida.
+  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08). Onda nova exige onda colhida.
 nodes:
   - id: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     node_type: evidence
@@ -186,6 +186,22 @@ nodes:
     verified_against: "sinal 2026-10-08-rebase-merge-breaks-kg-provenance do onion-curation: o PR 3 de lá, mergeado por rebase pelo pr-merge-verified, deixou 6 provenance caminho@sha apontando para commits fora da main, com radar, lint e CI verdes; ops/pr-merge-verified.sh conferido: rebase é o modo padrão e só --merge-commit preserva o SHA"
     label: "merge por rebase reescreve o SHA que a provenance caminho@commit cita, e nenhum gate acusa; cura selada: o pr-merge-verified exige --merge-commit quando o diff cita commit da própria branch (SAC-80)"
     narrative: "É a mesma classe que o --assert-ancestor curou para o vendor. A prevenção vem antes da detecção (checar que todo @sha é ancestral da base). Precisa estar pronta antes da onda O1, que escreve milhares de source."
+  - id: E_CONTRATO_V4_ADOTADO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-08"
+    verified_against: "worktree feat/kg-ssot-contract-v4: kg_vendor.py update --tag contract-v4.0.0 (93f61ac9ba2a, 239 arquivos) e check íntegro; kg_gate.py --update com --accept-regression e os mesmos --exclude do CI: 138 grafos, 7 passam no MUST, 131 na dívida herdada; famílias drive, dissect, kg_migrate_v3, kg_contract_check, cc_delta_census, census_seal e seed_graph verdes, com mutante de cada caso novo"
+    label: "o core adotou o contrato v4: provenance é MUST com a dívida herdada travada na base, e os geradores passam a escrever extensão com x_ e method na forma canônica"
+    narrative: "Medido no corpus, três escritores fariam todo grafo novo reprovar no v4: o checkpoint do /meta:drive, os marcadores do /meta:dissect e o supersedes do /meta:radar, todos sem x_. Os leitores aceitam as duas formas, para o grafo herdado. Os dados do corpus foram migrados. Seis geradores emitiam method fora de '<classe>: <detalhe>', que no v4 é SHOULD e reprova grafo novo pelo kg-contract-check. O demo fictício foi para fixtures/, e kg-inbox arquivado e proto pessoais saem por --exclude explícito no CI (D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE)."
+    trace: ".kg-ssot/gate.json"
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version e .kg-ssot/gate.json na branch feat/kg-ssot-contract-v4"
+      locator: "tag contract-v4.0.0 e a base com 131 grafos na dívida herdada"
+      method: "medição: kg_vendor check, kg_gate e bancada com mutantes em 2026-10-08"
 edges:
   - from: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
@@ -223,3 +239,9 @@ edges:
   - from: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
     to: Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH
     edge_type: DEPENDS_ON
+  - from: E_CONTRATO_V4_ADOTADO
+    to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
+    edge_type: SUPPORTS
+  - from: E_CONTRATO_V4_ADOTADO
+    to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
+    edge_type: SUPPORTS
