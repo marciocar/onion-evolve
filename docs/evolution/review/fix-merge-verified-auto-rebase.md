@@ -2,7 +2,8 @@
 title: 'Resíduo — o caminho de merge verificado rebaseia sozinho o PR em conflito de projeção, e espera as runs nascerem'
 date: 2026-10-08
 branch: fix/merge-verified-auto-rebase
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 31057bcd5e3f391499c8ef4dca8fe8c039c5791b9bfaba1cc095b429b0192171
+reviewed_code_sha256: c4b97b5418dba2bb0987305eafd471c74b09949ac49613fc695181d35e7cfdd8
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
