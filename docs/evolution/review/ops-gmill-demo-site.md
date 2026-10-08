@@ -2,7 +2,7 @@
 title: 'Resíduo — gmill.onionevolve.com: o 1º vhost de conf.d versionado, com segredo fora do git'
 date: 2026-10-08
 branch: ops/gmill-demo-site
-reviewed_diff_sha256: 260f65308ef1adcb61bcffa522645ed3e3e2663e3020b84bb5a9816a75ab9ee7
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 2a90f09a138e011ac1fe35a335112fb0b5ac5b1c1ad24c978b6c45d89d78fd84
 findings_total: 7
 findings_real: 6
@@ -96,3 +96,5 @@ segredos rotacionados, que nunca apareceram em saída nenhuma.
   - **Resposta:** a senha e o cookie foram trocados na hora (`caddy-site-secrets.sh --rotate` e reinstalação).
   - **Verificação:** a senha antiga dá 401 e a nova dá 200.
   - **Lição:** prova com credencial imprime só `http_code`, nunca `url_effective` nem `redirect_url`.
+
+- **Demo sem dados.** O Basic do vhost seguia ao upstream, e o IdP de teste o lia no `/default/token` como autenticação do cliente OAuth (`client_secret_basic`, client `gmill` desconhecido). Por isso o token saía como `vendedor-01/filial-01`, perfil sem dados. A cura é `header_up -Authorization` só na rota do Basic, já que a rota do cookie mantém o Bearer. Medido: `/api/v1/me` passou de `vendedor-01` a `demo-admin / DEMO-ES`.
