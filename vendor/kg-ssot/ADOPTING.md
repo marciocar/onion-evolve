@@ -28,14 +28,14 @@ O adotante usa só `update` e `check`.
 A primeira vez, a partir de um clone deste repo:
 
 ```bash
-python3 -I tools/kg_vendor.py update --tag contract-v3.0.0 --dest <adotante>/vendor/kg-ssot
+python3 -I -B tools/kg_vendor.py update --tag contract-v3.0.2 --dest <adotante>/vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v3.1.0 --source <caminho ou URL deste repo>
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v3.1.0 --source <caminho ou URL deste repo>
 ```
 
 - **Leitura:** o vendor lê a tag com `git archive`, nunca a árvore de trabalho. Os nomes são literais: um `*`
@@ -56,7 +56,7 @@ Na raiz do adotante:
 
 ```bash
 pip install -r vendor/kg-ssot/tools/requirements.txt
-python3 -I vendor/kg-ssot/tools/kg_gate.py --update      # grava .kg-ssot/gate.json
+python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update      # grava .kg-ssot/gate.json
 ```
 
 O gate mede os `.kg.yaml` rastreados por git (`git ls-files`, lidos da árvore de trabalho). Um arquivo que
@@ -79,13 +79,16 @@ Commite o `.kg-ssot/gate.json`.
 - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
   run: |
     pip install -r vendor/kg-ssot/tools/requirements.txt
-    python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
-    python3 -I vendor/kg-ssot/tools/kg_gate.py
+    python3 -I -B vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
+    python3 -I -B vendor/kg-ssot/tools/kg_gate.py
 ```
 
 **`check`** reprova (rc 1) quando um arquivo do vendor foi editado, apagado ou acrescentado. Isso inclui
 bytecode num `__pycache__`, que trocaria o leitor sem mudar a fonte, e symlink. Os scripts do kit não gravam
-bytecode, então rodar o gate não suja o vendor.
+bytecode quando rodam como script. Mas uma ferramenta sua que **importa** um módulo do kit grava o `.pyc` dele
+no `__pycache__` do vendor, porque o Python compila antes de executar o módulo, e o próximo `check` reprova.
+Por isso todo comando deste guia usa `python3 -I -B`, e quem importa o kit roda com `-B` ou
+`PYTHONDONTWRITEBYTECODE=1`.
 
 O contrato não se customiza no adotante: uma mudança necessária volta ao produto como sinal e vira caso ou
 decisão de contrato.
@@ -143,7 +146,7 @@ como compromisso medido.
 Para provar que um leitor próprio concorda com o contrato, rode a suíte com o leitor de referência:
 
 ```bash
-python3 -I vendor/kg-ssot/tools/kg_conformance.py
+python3 -I -B vendor/kg-ssot/tools/kg_conformance.py
 ```
 
 Depois compare com os códigos que o seu leitor emite. O formato dos casos e o contrato de runner estão em

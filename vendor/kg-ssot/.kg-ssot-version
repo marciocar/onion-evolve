@@ -1,15 +1,15 @@
 {
   "product": "kg-ssot",
-  "tag": "contract-v3.0.1",
-  "commit": "263fbd9a01c02f55274e3fbf17a30648742b073f",
-  "version": "3.0.1",
+  "tag": "contract-v3.0.2",
+  "commit": "408fefa6a12f567746d20627f3263b7ef0664ea0",
+  "version": "3.0.2",
   "contract": {
     "must": "spec/kg-contract-v3.schema.json",
     "should": "spec/kg-contract-v3.should.schema.json"
   },
   "vendored_at": "2026-10-08",
   "files": {
-    "ADOPTING.md": "e9bff53c3325d816339853c15484218df67d43dc3a31d80129b1950ee11ff2c0",
+    "ADOPTING.md": "54f92f6328b39ddedb5f8447aa447b04f8cce85b2924bc36fe013f2907e83162",
     "spec/conformance/README.md": "99519b7b13873a12c6fc81c6c9e2ef7438326b400b3a7df9a9a00f797d30a013",
     "spec/conformance/fixtures/latest/form/edge/bad-edge-from-integer.kg.yaml": "22b9088ed8bfe604d242ab3cdc4571497edf95ad31aeb011f35b94da9fa55a3c",
     "spec/conformance/fixtures/latest/form/edge/bad-edge-from-null.kg.yaml": "a2c455b1e602b4ee9fd8202ab486a4c5c404247ec98abe30c139dca31abd58a2",
@@ -185,11 +185,11 @@
     "spec/conformance/metaschema-tests/good/valid-with-warning.json": "013208da50d8eb7c9340d123b32134f1041d8f7a01831326b1dab814f479b5e9",
     "spec/kg-contract-v3.schema.json": "61e5d9f95df030942d58c1a3f7d2ca967911296f84c098c4babc90eae9c053ce",
     "spec/kg-contract-v3.should.schema.json": "414ddf17c54faeea1492934cc27349432d0d9c849d7e744bd813f9692855632c",
-    "spec/release.json": "89e019d77784886b780058c66e0efd6223b07f0ac2b7984193cc0ce31baf47bc",
+    "spec/release.json": "bd893e235b6c19e99990ee4b2d144e3ec1755a395417d262cd611fc27a14b8d6",
     "tools/kg_conformance.py": "56d55303e36c832940a4a6e08686a867dd2c2475a504f7d51833eca94aca108e",
     "tools/kg_gate.py": "a15ae1e73e22543a6225626143f28352540faef7b819e7aa93184235bca9ee2d",
     "tools/kg_validate.py": "af5a80cbce70adf58d8a1c1739f2c08647487dd0bb68b1a75a93fbdf34775093",
-    "tools/kg_vendor.py": "1d7753ca22fcb8bf105335a2b9c96008096f247952703ccae61b14a20c2d8213",
+    "tools/kg_vendor.py": "7f08826a3c892f8dfb24a846f9f6acb30a66400a7c5cf1a53db78bfb2e121681",
     "tools/requirements.txt": "8c517ecd0745c1f2ce2cb5db88ac614f56dcbbd7a630c834ad4bd27f0daaee54"
   }
 }

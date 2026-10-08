@@ -1,11 +1,11 @@
 {
   "contract": "kg-contract-v3.schema.json",
   "contract_sha256": "6e9e0af7ff3ec5603dcd07f1ac156bcf1b4a6385475b3c1d14ccc158c3be6abd",
-  "graphs": 143,
+  "graphs": 144,
   "failing": {},
   "debt": {
     "form.range.node.label": 113,
-    "form.required.node.provenance": 141,
+    "form.required.node.provenance": 139,
     "form.required.node.verified_at": 12,
     "form.unknown-key.edge.provenance": 1,
     "form.unknown-key.meta.dissect_tool": 1,
@@ -28,6 +28,6 @@
     "form.unknown-key.node.superseded_note": 1,
     "form.unknown-key.top.kind": 2,
     "form.unknown-key.top.version": 2,
-    "yaml.unquoted-date": 137
+    "yaml.unquoted-date": 135
   }
 }
