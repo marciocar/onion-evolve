@@ -30,7 +30,13 @@
 #     (`env`, `printenv`, `set`, `export -p`, `declare -p`) é barrado; o eco nominal fica como teto;
 #   · `sed -i` sobre o .env é barrado (lê e reescreve): o caminho é `env-check.sh --set-provider`;
 #   · só o plugin `onion` embarca este veto; quem instala só onion-product/onion-engineering recebe o
-#     helper sem o veto (o plugin onion é a dependência recomendada dos dois).
+#     helper sem o veto (o plugin onion é a dependência recomendada dos dois);
+#   · `grep -r`/`rg` sobre uma PASTA lê o .env de dentro dela — o veto julga o argumento, não a recursão;
+#   · glob conferido no disco vê a pasta no instante do veto: x.env criado na mesma linha por nome montado
+#     em runtime (sem citar .env) escaparia.
+# SAC-68 (2026-10-08): 7 vetos numa leva em comando que não lia .env. Glob passou a ser julgado pela regra
+# do bash e pelo disco (ver glob_reaches_env); o grep no .env segue vetado e ganhou caminho sancionado
+# (`env-check.sh --lint`). Bancada: casos (l) e (m) de run_env_exposure_selftests, 7 mutantes.
 # HISTÓRICO: 2 passadas do Elenxo REPROVARAM (2026-10-06) — a 1ª mostrou que trocar permissões não proíbe
 # nada; a 2ª, que a quebra de linha não separava comandos (`test -f .env` na 1ª linha liberava o bloco
 # inteiro), que comentário e `echo` viravam falso positivo nos blocos da própria cura, e que `git diff
@@ -41,11 +47,41 @@ input="$(cat)"
 # heredoc ERA a entrada padrão: o JSON nunca chegava e o veto passava tudo (18 de 18 vetos falharam na 1ª
 # bateria — fail-open total, pego antes de registrar o hook).
 GUARD_PY=$(cat <<'PY'
-import fnmatch, json, os, re, shlex, sys
+import fnmatch, glob, json, os, re, shlex, sys
 
 # ── O QUE É UM ARQUIVO .env ───────────────────────────────────────────────────────────────────
 SAFE_SUFFIX = re.compile(r'^(example|sample|template|dist|example\.onion)$', re.I)
 PROBES = ('.env', '.env.local', '.env.production', 'app.env')   # alvos contra os quais um GLOB é testado
+DOT_PROBES = ('.env', '.env.local', '.env.production')
+NONDOT_PROBES = ('app.env', 'prod.env')
+# ── GLOB: julgado pela regra do BASH e pelo DISCO, não pela forma (SAC-68, 2026-10-08) ──────────────
+# Medido numa leva: 6 vetos em comando que não lia .env nenhum — `*)` de um `case`, `ops/testing/*`,
+# `for d in */`, `/home/marcio/*/` e um corpo de heredoc com `**`. A causa era testar o glob contra
+# `.env` com fnmatch, que casa `*` com nome oculto; o bash (dotglob desligado, o default) NÃO casa.
+# Três regras, nesta ordem: (1) glob que termina em `/` só expande para DIRETÓRIO — nunca é um .env;
+# (2) glob cuja última parte começa com `.` alcança um .env oculto — fecha como antes; (3) glob sem
+# ponto só alcançaria um `x.env` SEM ponto, e isso se confere no DISCO, na pasta onde o comando roda.
+# Fecha (como antes) quando a pasta não é conhecida (cd com variável, subshell com cd, pushd) e quando a
+# linha CITA um .env literal em qualquer lugar (`cp .env x.env && cat *` criaria o alvo depois do veto).
+CTX = {'base': None, 'strict': True}                  # Read/Grep e entrada sem cwd: fechado, como antes
+RAW = {'cmd': ''}
+
+def glob_reaches_env(pattern, b):
+    if b.startswith('.') and any(fnmatch.fnmatch(p, b) for p in DOT_PROBES):
+        return True
+    if not any(fnmatch.fnmatch(p, b) for p in NONDOT_PROBES):
+        return False
+    # glob que NOMEIA env (`*.env`, `*env*`) declara a intenção, e o disco do topo não basta: `grep -r
+    # --include=*.env .` desce às subpastas. Escape que a 1ª redação desta cura abria — pego pelo caso (h2).
+    if CTX['strict'] or not CTX['base'] or 'env' in b.lower():
+        return True
+    # variável ou substituição no caminho (`$HOME/*`, `` `pwd`/* ``): o disco não sabe onde é — fecha.
+    # `~` se expande aqui (o bash o expande antes do glob). Escapes da passada adversarial do SAC-68.
+    if re.search(r'[$`]', pattern):
+        return True
+    pattern = os.path.expanduser(pattern)
+    hits = glob.glob(pattern if os.path.isabs(pattern) else os.path.join(CTX['base'], pattern))
+    return any(is_env_name(os.path.basename(h.rstrip('/'))) for h in hits)
 
 def is_env_name(b):
     b = b.strip()
@@ -70,11 +106,13 @@ def is_env_token(tok):
     t = re.sub(r'^[<>]+', '', t)
     t = re.sub(r'^[A-Za-z0-9_.-]*:', '', t) if re.match(r'^[A-Za-z0-9_./-]*:\.?[^/]*$', t) and ':' in t else t  # `:.env`, `HEAD:.env`
     for cand in expand_braces(t):
+        if re.search(r'[*?\[]', cand) and cand.endswith('/'):
+            continue                                                       # glob de DIRETÓRIO: nunca é um .env
         b = os.path.basename(cand.rstrip('/'))
         if is_env_name(b):
             return True
-        if re.search(r'[*?\[]', b) and any(fnmatch.fnmatch(p, b) for p in PROBES):
-            return True                                                    # glob que casa um .env
+        if re.search(r'[*?\[]', b) and glob_reaches_env(cand, b):
+            return True                                                    # glob que alcança um .env
     return False
 
 def cites_env(text):
@@ -254,6 +292,15 @@ def judge(cmd, depth=0):
         if not args:
             continue
         name = os.path.basename(args[0])
+        # a pasta onde os próximos segmentos rodam (para o glob conferido no disco)
+        if name in ('pushd', 'popd'):
+            CTX['base'] = None
+        elif name == 'cd':
+            tgt = args[1] if len(args) > 1 else '~'
+            if CTX['base'] and '(' not in RAW['cmd'] and not re.search(r'[$`*?\[]', tgt) and tgt != '-':
+                CTX['base'] = os.path.normpath(os.path.join(CTX['base'], os.path.expanduser(tgt)))
+            else:
+                CTX['base'] = None
         if is_env_token(args[0]):
             return 'um arquivo .env na posição de comando (nome montado em runtime)'
         # o que segue um VALUE_FLAG é valor, não arquivo lido
@@ -321,7 +368,10 @@ elif tool == 'Grep':
     if is_env_token(str(ti.get('path') or '')) or (ti.get('glob') and is_env_token(str(ti.get('glob')))):
         reason = 'Grep sobre um arquivo .env (caminho ou glob)'
 elif tool == 'Bash':
-    reason = judge(str(ti.get('command') or ''))
+    RAW['cmd'] = str(ti.get('command') or '')
+    CTX['base'] = str(d.get('cwd') or '') or os.getcwd()
+    CTX['strict'] = cites_env(RAW['cmd'])            # um .env literal na linha: o glob volta a fechar
+    reason = judge(RAW['cmd'])
 print(reason or '')
 PY
 )

@@ -2,7 +2,7 @@
 
 Vertical de produto do Onion: descoberta a backlog (collect→refine→spec→feature), decomposição de tasks agnóstica ao provider, story points, extração de reuniões, apresentações e documentação de contexto (business/technical context, C4 + Mermaid, engenharia reversa, docs-health).
 
-**Versão** `0.1.88` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
+**Versão** `0.1.89` (derivada do conteúdo: anda quando o conteúdo anda) · **Licença** MIT · **Conformance** `silver`
 
 ## Instalar
 
@@ -105,7 +105,7 @@ Invocação: `/onion-product:<comando>` (namespace do plugin).
 | Campo | Valor |
 |---|---|
 | Origem | `marciocar/onion-evolve` (repositório privado) |
-| tree_sha (hash do conteúdo das fontes) | `3d2d196c3180` |
+| tree_sha (hash do conteúdo das fontes) | `691e0f3a4eaa` |
 
 A origem identifica DE ONDE este artefato foi gerado; o canal público de instalação, issues e suporte é https://github.com/marciocar/onion-plugins. Ref e data do commit de origem estão em `.claude-plugin/provenance.json`.
 
