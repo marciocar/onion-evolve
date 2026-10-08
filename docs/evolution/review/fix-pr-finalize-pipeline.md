@@ -2,7 +2,8 @@
 title: 'Resíduo — o pr-finalize sem os quatro atritos da leva de 2026-10-07/08 (SAC-66)'
 date: 2026-10-08
 branch: fix/pr-finalize-pipeline
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7623d086e92e918231abe31a096a40e3724eab911e19444254b7c5a04cec424b
+reviewed_code_sha256: fba62ee132635164f24fb3c3ce79326e2b1da7c90a280315d4e19c07fbfc4386
 findings_total: 4
 findings_real: 4
 findings_fixed: 2
