@@ -10,7 +10,7 @@ meta:
   baseline: 2026-10-06
   review_after: 2026-11-05   # 30d: fila de trabalho; cada item fecha ao virar PR ou ao ser descartado
   # ═══ TETO: 30 NÓS ═══
-  #   26 em 2026-10-07, noite (+E_PR_FINALIZE_ATRITO_MEDIDO, +programa do SDAAL do task manager): colhidos os 5 `done` e as 4 evidências que só os sustentavam (a
+  #   28 em 2026-10-08 (+E_PR_FINALIZE_ATRITO_MEDIDO, +programa do SDAAL do task manager, +conflito de projeção gerada): colhidos os 5 `done` e as 4 evidências que só os sustentavam (a
   #   história fica no git e nos resíduos); entraram E_/Q_PRECOMMIT_SELECAO. Teto segue 30.
 nodes:
   # ── evidências medidas hoje ──────────────────────────────────────────────────────────────────
@@ -277,6 +277,26 @@ nodes:
     confidence: 0.6
     verified_against: "nota do maestro 2026-10-07: forjar o SDAAL do Task Manager por inteiro, incremental, com plano gerido num task manager"
     label: "programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, busca, relatórios, toggles e triggers, story points, owner e responsável, testes, start e due date); cada adapter declara mínimo, obrigatório, implementado e não implementado por versão; maquinaria de criar, validar e atualizar adapter (forja, wizard, onboarding); inclui o % da task-mãe por story points. Pesquisa primeiro, entrega em ondas"
+  - id: E_CONFLITO_DE_PROJECAO_GERADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-08
+    verified_against: "leva de 2026-10-07/08 com até 6 PRs abertos: #956, #957 (2x), #959 e #960 entraram em CONFLICTING após merges vizinhos; os conflitos relatados nos rebases foram em testing-state.md, testing-inventory.md, backlog.md, kg-read-index.tsv e plugins/ regenerados; conflito de código só 1 (onion-research.js, #957 x #959). PR em CONFLICTING não dispara CI"
+    trace: "ops/pr-finalize.sh"
+    label: "com PRs em paralelo, cada merge deixa os outros em conflito nas projeções geradas que todo PR commita, e o PR em conflito fica sem CI"
+  - id: Q_MERGE_DRIVER_PARA_PROJECAO_GERADA
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_against: "pedido do maestro 2026-10-08; medir antes quanto do conflito é só projeção"
+    label: "merge driver para as projeções geradas (no conflito, regenerar em vez de pedir resolução), para PRs paralelos não se invalidarem a cada merge; alternativas: não commitar a projeção no PR, ou fila de merge serial"
 edges:
   - from: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA
     to: Q_PR_FINALIZE_MELHORIAS
@@ -322,4 +342,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_TM_PERCENTUAL_IGNORA_STORY_POINTS
     to: Q_TASK_MANAGER_SDAAL_COMPLETO
+    edge_type: SUPPORTS
+  - from: E_CONFLITO_DE_PROJECAO_GERADA
+    to: Q_MERGE_DRIVER_PARA_PROJECAO_GERADA
     edge_type: SUPPORTS
