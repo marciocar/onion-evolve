@@ -2,11 +2,10 @@
 title: 'Resíduo — o pr-finalize sem os quatro atritos da leva de 2026-10-07/08 (SAC-66)'
 date: 2026-10-08
 branch: fix/pr-finalize-pipeline
-reviewed_diff_sha256: 3d6d21b220cf40708e032615481f74f04300ba794d67058acc0942de42146d06
-reviewed_code_sha256: 6c34249b1eadc9f6bf83b9b13424a27c396c7cbf002a1e0514a64ba55b712401
-findings_total: 3
-findings_real: 3
-findings_fixed: 1
+reviewed_diff_sha256: pendente
+findings_total: 4
+findings_real: 4
+findings_fixed: 2
 tokens: 0
 duration_min: 60
 verdict: CORRIGIDO
@@ -44,7 +43,9 @@ nota: >-
   catracas estáticas no checkpoint, rebase com índice sujo); radar --integrity --schema exit 0, nenhum
   id colhido. REGRA 87 (PR que EDITA um .kg.yaml enxergou os confirmed dele) — confirmed vistos neste
   grafo: os 16 nós confirmed da fila, inclusive E_PR_FINALIZE_ATRITO_MEDIDO, que sustenta o nó editado.
-  Sem Elenxo de agente separado, declarado. Pre-commit pulado por ordem do maestro (commits com
+  (d) REAL e curado, achado pelo CI (faixa 3): dois dos casos novos decidiam por `<produtor> | grep -q`
+  e a catraca do shell_pipefail_robustness subiu de 34 para 36 sítios; os dois viraram here-string, e
+  a família da catraca passa. Sem Elenxo de agente separado, declarado. Pre-commit pulado por ordem do maestro (commits com
   --no-verify como checkpoint); validação = famílias tocadas + mutantes + pr-finalize + CI.
 ---
 
