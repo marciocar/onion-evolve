@@ -62,7 +62,7 @@ const KG_ANCHOR = '\n\n⚠️ ANCORAGEM DO CAMINHO (não negociável): `' + KG_P
 const CONTRACT_V3 = '\n\n## CONTRATO v3 do .kg.yaml (não negociável — o gate do CI reprova grafo novo fora dele)\n'
   + '- **Datas entre aspas**: `baseline: "' + TODAY + '"`, `review_after: "…"`, `verified_at: "' + TODAY + '"`, `valid_from: "2026"`. Sem aspas a data é data em YAML 1.1 e o contrato acusa yaml.unquoted-date.\n'
   + '- **provenance em todo nó confirmed (ou plane PROD)**: bloco aninhado com as três chaves, cada uma num nível a mais de indentação:\n'
-  + '  `provenance:` / `  source: "<URL ou caminho@commit lido>"` / `  locator: "<seção, artigo ou trecho>"` / `  method: "<leitura | medição | votação de juízes | ancoragem>"`.\n'
+  + '  `provenance:` / `  source: "<URL ou caminho@commit lido>"` / `  locator: "<seção, artigo ou trecho>"` / `  method: "<classe>: <detalhe>"`, com a classe em leitura, medição, juízes, derivado ou testemunho (contrato v4; ex.: `"juízes: votação 3/2 do run"`, `"leitura: WebFetch da seção 4"`).\n'
   + '  A fonte tem de ser VERIFICÁVEL: a URL que o leitor abriu, o caminho@commit que foi medido. **Sem fonte real, o nó NÃO é confirmed** (deixe open) — nunca invente source para passar no contrato.\n'
   + '- **label ≤ 280 caracteres**: só a afirmação curta. Contexto, porquê e detalhe vão em `narrative: "…"` no mesmo nó.\n'
   + '- Depois do radar, rode `bash .claude/validation/kg-contract-check.sh ' + KG_PATH + '` e exija rc 0 — ele usa o leitor de referência do contrato vendorizado; rc 1 = CORRIJA e rode de novo (máx 3 tentativas); rc 2 = o contrato não está vendorizado neste repo: declare no summary e siga (não é reprovação).'

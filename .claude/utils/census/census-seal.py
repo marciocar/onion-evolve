@@ -105,7 +105,7 @@ def seal(consol):
             _div = sanitize(m['divergence'], terms).replace("'", "''")
             _lab = f"MEDIDO {HOJE}, o vivo superou o nó {m['node_id']}"
             _src = f"{p}#{m['node_id']} medido contra o vivo".replace("'", "''")
-            _met = f"{RUN}, juiz {m['juiz']}".replace("'", "''")
+            _met = f"juízes: {RUN}, juiz {m['juiz']}".replace("'", "''")
             _loc = sanitize(m['method'], terms)[:200].replace("'", "''")
             node = (f"  - id: {nid_new}\n    node_type: evidence\n    plane: PROD\n    status: confirmed\n"
                     f"    impact: 4\n    confidence: 0.9\n    verified_at: \"{HOJE}\"\n"
