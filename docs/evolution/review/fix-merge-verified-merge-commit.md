@@ -2,7 +2,8 @@
 title: 'Resíduo — o pr-merge-verified ganha --merge-commit, e o update do adotante preserva a ancestralidade com onion/vendor'
 date: 2026-10-08
 branch: fix/merge-verified-merge-commit
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: d759a980256b38205ab4c215d6b6801b349d7b47b78816a7822d4637bb41c7d4
+reviewed_code_sha256: 1214f7efdfb505d993a0702bfaa58d584af74b961cdbbd003ae14c0d0e1ae26d
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
