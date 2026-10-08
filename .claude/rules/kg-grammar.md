@@ -27,6 +27,9 @@ paths:
 | **`trigger:`** (aresta `TRANSITIONS`, camada domain) | id do nó `event` que dispara a transição: `- from: ST_A` / `to: ST_B` / `edge_type: TRANSITIONS` / `trigger: EV_X` | apontar evento que não existe no arquivo — o radar **reprova** (`trigger aponta evento inexistente`) e conta a aresta como ligação do evento |
 | ~~`on:`~~ (**PROIBIDO**, legado de `trigger:`) | — | escrever `on:` — o radar ainda lê, mas acusa `ON-LEGADO` (SOFT na REGRA 52) |
 | `meta.review_after:` | data de revisita (grafos de pesquisa) | ausente em grafo novo de pesquisa → SOFT; vencido → SOFT |
+| **datas** (`baseline`, `review_after`, `verified_at`, `valid_from`) | **sempre entre aspas**: `verified_at: "2026-10-08"` | sem aspas é DATA para leitor YAML 1.1 e STRING em 1.2 — o contrato acusa `yaml.unquoted-date` |
+| **`provenance:`** (nó `confirmed` ou `plane: PROD`) | bloco com as três chaves, um nível a mais de indentação: `source:` (o que foi lido: URL, caminho@commit, comando) · `locator:` (onde: seção, linha, citação) · `method:` (como: leitura, medição, juízes) | **inventar a fonte para passar no contrato.** Sem fonte verificável o nó **não é** `confirmed` — deixe `open` |
+| **`label:`** + **`narrative:`** | `label` ≤ **280 caracteres**, só a afirmação curta; o porquê e o contexto vão em `narrative:` no mesmo nó. No `meta`, `note:` e `purpose:` são chaves conhecidas | label-parágrafo (o contrato acusa `form.range.node.label`); chave inventada no topo ou no `meta` (o contrato acusa `form.unknown-key.*` — extensão própria leva prefixo `x_`) |
 
 > ⚠️ **Por que `on:` virou `trigger:` (2026-10-07):** um leitor **YAML 1.1** (o default do PyYAML,
 > por exemplo) lê a chave `on` como o **booleano `True`**, não como a string `"on"`. O evento
@@ -53,7 +56,13 @@ ao dissent, por isso ele a *restringe*, não a derruba.
 
 ```bash
 bash .claude/validation/kg-radar.sh <arquivo>.kg.yaml    # exit 0 obrigatório
+bash .claude/validation/kg-contract-check.sh <arquivo>.kg.yaml   # rc 0 obrigatório onde o contrato está vendorizado
 ```
+
+> **Por que as três linhas do contrato v3 (2026-10-08):** o contrato formal do `.kg.yaml` (vendorizado por
+> pin em `vendor/kg-ssot`, onde existe) tem um gate por grafo no CI que **reprova grafo novo** que suba a
+> dívida SHOULD. O `kg-contract-check.sh` é o mesmo leitor, por arquivo, **antes** do commit — o gate do CI
+> só enxerga arquivo rastreado. Grafo antigo não é cobrado pela dívida que já tinha: só por piorá-la.
 
 Descoberta de grafos (o glob hardcoded era **36% cego**):
 

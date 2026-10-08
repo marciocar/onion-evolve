@@ -2,13 +2,14 @@
 # A absorção, pelo core, do contrato do .kg.yaml que o adotante dedicado provou.
 # Nasceu da triagem de 2026-10-08 (/meta:co-evolve) dos sinais contrato-v1..v3, suíte de conformidade e
 # matriz leitor x caso. Fica fora da fila de 2026-10-06 porque a fila está no teto.
+# Migrado ao contrato v3 no SAC-71 (2026-10-08): datas entre aspas e provenance nos nós confirmed.
 meta:
   id: contrato-kg-absorcao-2026-10
   schema_version: "1"
-  baseline: 2026-10-08
-  review_after: 2026-11-07   # 30d: programa de trabalho
+  baseline: "2026-10-08"
+  review_after: "2026-11-07"   # 30d: programa de trabalho
   # ═══ TETO: 15 NÓS ═══
-  #   7 em 2026-10-08 (+E_GATE_DO_CONTRATO_NO_CI). Onda nova exige onda colhida.
+  #   9 em 2026-10-08 (+E_GERADORES_ESCREVEM_O_CONTRATO_V3, +E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO). Onda nova exige onda colhida.
 nodes:
   - id: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     node_type: evidence
@@ -17,9 +18,13 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "sinal 2026-10-08-matriz-leitor-caso do onion-kg-ssot (matriz leitor x caso, radar no pin d82ca211bea0 e em 85943cb71b66): 58 casos que o contrato reprova passam em kg-radar.sh --integrity --schema; 3 válidos reprovados (grafo vazio, trigger, lista sem indentação)"
     label: "o gate de escrita do core não checa forma: aceita grafo que o contrato do .kg.yaml reprova, e recusa 3 casos válidos"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-08-matriz-leitor-caso.md"
+      locator: "item 1 (o gate do core não checa forma) e item 2 (o radar reprova 3 casos válidos)"
+      method: "leitura do sinal; a matriz foi medida pelo adotante"
   - id: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
     node_type: decision
     layer: audit
@@ -27,9 +32,14 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.75
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "selado pelo maestro 2026-10-08 na triagem do /meta:co-evolve"
-    label: "o gate do core passa a chamar o validador JSON Schema do contrato do .kg.yaml ao lado do radar (a peça provou no adotante, o core absorve); o radar segue dono de integridade e semântica; a forma tem um leitor só, o do contrato"
+    label: "o gate do core chama o validador do contrato do .kg.yaml ao lado do radar; o radar segue dono de integridade e semântica, e a forma tem um leitor só"
+    narrative: "A peça provou no adotante, o core absorve. O validador é o JSON Schema 2020-12 do contrato, vendorizado por pin."
+    provenance:
+      source: "resposta do maestro à pergunta da triagem do /meta:co-evolve em 2026-10-08 (PR #963)"
+      locator: "pergunta 'Gate do core vs contrato do .kg.yaml'"
+      method: "selo humano registrado no resíduo do PR #963"
   - id: Q_ABSORVER_VALIDADOR_DO_CONTRATO
     node_type: question
     layer: audit
@@ -46,9 +56,13 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "sinais 2026-10-07-contrato-v2 e -v3 do onion-kg-ssot, medidos no commit d31ef4c0da6a (138 grafos, 4.916 nós)"
     label: "o contrato v2 alerta 2.290 labels acima de 280 caracteres (narrative) e o v3 pede provenance estruturada em 3.739 nós confirmed ou PROD; os dois são SHOULD, e o v4 torna a proveniência MUST"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-07-contrato-v2-migracao-narrative.md e 2026-10-07-contrato-v3-proveniencia-estruturada.md"
+      locator: "seção 1 de cada sinal (a migração medida)"
+      method: "leitura dos sinais; contagens medidas pelo adotante no commit d31ef4c0da6a"
   - id: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
     node_type: question
     layer: audit
@@ -56,8 +70,9 @@ nodes:
     status: open
     impact: 3
     confidence: 0.6
-    verified_against: "direção selada pelo maestro 2026-10-08: gerador primeiro, corpus em ondas"
-    label: "programa: os geradores (write(KG) da pesquisa, carimbo do /meta:drive) passam a escrever narrative e provenance; o corpus antigo migra em ondas no mesmo passe por nó, antes do v4"
+    verified_against: "direção selada pelo maestro 2026-10-08: gerador primeiro, corpus em ondas; a parte do gerador foi feita no SAC-71 (E_GERADORES_ESCREVEM_O_CONTRATO_V3)"
+    label: "o que resta: migrar o corpus antigo para narrative e provenance, em ondas e antes do v4 (SAC-73), e o checkpoint do /meta:drive"
+    narrative: "Os geradores já nascem no v3 (SAC-71). Falta o passe por nó no corpus herdado e a decisão sobre as chaves drive_checkpoint, que o contrato não conhece (E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO)."
   - id: Q_PORT_JS_DO_RADAR_DIVERGE
     node_type: question
     layer: audit
@@ -74,10 +89,46 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "worktree feat/kg-ssot-contract-v3-gate sobre origin/main: kg_vendor.py update --tag contract-v3.0.0 (commit 820de3bbb967, 179 arquivos) e check íntegro; kg_gate.py --update gravou .kg-ssot/gate.json com 142 grafos e 0 na dívida herdada; kg_gate.py rc=0 (142 de 142 no MUST); mutante: um grafo rastreado sem label deu PIOROU form.required.node.label com rc=1; passo novo no onion-validate.yml com os paths vendor/kg-ssot/** e .kg-ssot/**"
     trace: ".github/workflows/onion-validate.yml"
     label: "o gate do contrato v3, vendorizado por pin, roda no CI ao lado do radar: 142 de 142 grafos no MUST, dívida herdada zero, e um grafo sem label reprova"
+    provenance:
+      source: "run 37731420161 do onion-validate.yml (PR #967, merge 69409a84)"
+      locator: "passo 'Contrato KG-SSOT (vendor íntegro + gate por grafo)'"
+      method: "leitura do log do CI e execução local do gate e do mutante"
+  - id: E_GERADORES_ESCREVEM_O_CONTRATO_V3
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-08"
+    verified_against: "SAC-71 na worktree feat/kg-generators-contract-v3: kg-contract-check.sh novo (família kg_contract_check 5/5, dois mutantes mordem); onion-research.js com CONTRACT_V3 nos dois write(KG) (caso p, mutante morde); seed-adoption-graph.sh de 11 avisos SHOULD para 0 (caso v3, mutante morde); census-seal.py com data entre aspas e nó DRIFTED com label curto, narrative e provenance (caso v3, mutante morde)"
+    trace: ".claude/validation/kg-contract-check.sh"
+    label: "os geradores de grafo do core nascem no contrato v3: write(KG) da pesquisa, semente da adoção e carimbo do censo, com checagem por arquivo antes do commit"
+    narrative: "Antes, o grafo novo saía com data sem aspas, nó confirmed sem provenance e label longo, e foi curado à mão no #967 e no #968. O kg-contract-check.sh importa o leitor de referência do vendor (não reimplementa o contrato): grafo novo tem de sair com MUST e SHOULD vazios; grafo rastreado não pode piorar o SHOULD que já tinha."
+    provenance:
+      source: "branch feat/kg-generators-contract-v3 do core"
+      locator: "famílias kg_contract_check, research_workflow (p), seed_adoption_graph (v3) e census_seal (v3)"
+      method: "execução da bancada com LC_ALL=C e mutantes"
+  - id: E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-08"
+    verified_against: "kg-drive-project.sh --close-lot sobre uma cópia do grafo auto-drive-2026-10 (conforme): o kg-contract-check passou a acusar form.unknown-key.meta.drive_checkpoint e form.unknown-key.meta.drive_checkpoint_note"
+    trace: ".claude/validation/kg-drive-project.sh"
+    label: "o checkpoint do /meta:drive grava no meta duas chaves que o contrato não conhece, e todo lote fechado num grafo novo sobe a dívida SHOULD"
+    narrative: "Não foi curado no gerador: renomear para o prefixo x_ toca o kg-drive-project.sh, o kg-seal-exception.sh, a bancada, as fixtures e 2 grafos com dado, e a alternativa é o contrato conhecer as chaves. É decisão de contrato, que volta como sinal ao adotante dedicado."
+    provenance:
+      source: ".claude/validation/kg-drive-project.sh (função _ckpt)"
+      locator: "linhas que escrevem drive_checkpoint e drive_checkpoint_note"
+      method: "execução do --close-lot num sandbox e medição pelo kg-contract-check"
 edges:
   - from: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
@@ -97,3 +148,9 @@ edges:
   - from: E_GATE_DO_CONTRATO_NO_CI
     to: Q_ABSORVER_VALIDADOR_DO_CONTRATO
     edge_type: SUPPORTS
+  - from: E_GERADORES_ESCREVEM_O_CONTRATO_V3
+    to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
+    edge_type: SUPPORTS
+  - from: E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO
+    to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
+    edge_type: CONSTRAINS

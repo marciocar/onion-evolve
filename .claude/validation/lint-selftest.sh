@@ -5482,6 +5482,17 @@ run_research_workflow_selftests() {
   if grep -nE 'JSON\.stringify\((pElenxo|elenxo)[^)]*\)[^+;]*\.slice\(' "${wf}" >/dev/null; then
     record_fail "research-workflow: (o)" "o JSON do Elenxo é cortado antes do write(KG): $(grep -nE 'JSON\.stringify\((pElenxo|elenxo)[^)]*\)[^+;]*\.slice\(' "${wf}" | head -2)"
   else record_pass "research-workflow: (o) o Elenxo chega inteiro ao write(KG) (sem .slice sobre o JSON)"; fi
+  # (p) o write(KG) nasce no CONTRATO v3 (2026-10-08, SAC-71): desde o #967 o gate do contrato no CI
+  #     reprova grafo NOVO que suba a dívida SHOULD, e o escritor saía com data sem aspas, confirmed sem
+  #     provenance e label longo (curado à mão no #967 e no #968). Os DOIS prompts de write(KG) — o do modo
+  #     primárias e o dos demais — têm de carregar o bloco e mandar rodar o kg-contract-check.sh.
+  local _ncv _nck
+  _ncv="$(grep -c 'CONTRACT_V3 +\|+ CONTRACT_V3' "${wf}" || true)"
+  _nck="$(grep -c 'kg-contract-check.sh' "${wf}" || true)"
+  if grep -q "^const CONTRACT_V3 = " "${wf}" && [ "${_ncv:-0}" -ge 2 ] && [ "${_nck:-0}" -ge 3 ] \
+     && grep -q 'Sem fonte real, o nó NÃO é confirmed' "${wf}"; then
+    record_pass "research-workflow: (p) os dois write(KG) exigem o contrato v3 e rodam o kg-contract-check (sem inventar fonte)"
+  else record_fail "research-workflow: (p)" "write(KG) sem o contrato v3: def=$(grep -c '^const CONTRACT_V3 = ' "${wf}" || true) usos=${_ncv:-0} checagens=${_nck:-0}"; fi
 }
 
 run_research_lens_selftests() {
@@ -11822,6 +11833,21 @@ run_seed_adoption_graph_selftests() {
   if [ -f "${d}/docs/onion/graph/onion-adoption.kg.yaml" ] && [ "${rc}" -eq 0 ]; then
     record_pass "seed-graph: (a) semeia e o RADAR aprova o próprio artefato gerado"
   else record_fail "seed-graph: (a)" "não semeou, ou o radar reprovou o grafo gerado (rc=${rc})"; fi
+  # (v3) a semente nasce conforme ao CONTRATO v3 do .kg.yaml (2026-10-08, SAC-71): a 1ª redação trazia
+  #      chaves de topo fora do contrato, datas sem aspas e labels de até 520 caracteres sem provenance —
+  #      11 avisos SHOULD no 1º grafo de todo adotante. Julga com o leitor de referência vendorizado.
+  if [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && python3 -c 'import yaml, jsonschema' >/dev/null 2>&1; then
+    local _v3o _v3rc _v3sb; _v3sb="$(mktemp -d)"
+    mkdir -p "${_v3sb}/.claude/validation" "${_v3sb}/vendor" "${_v3sb}/g"
+    cp "${REPO_ROOT}/.claude/validation/kg-contract-check.sh" "${_v3sb}/.claude/validation/"
+    cp -a "${REPO_ROOT}/vendor/kg-ssot" "${_v3sb}/vendor/"
+    cp "${d}/docs/onion/graph/onion-adoption.kg.yaml" "${_v3sb}/g/semente.kg.yaml"
+    git -C "${_v3sb}" init -q 2>/dev/null
+    if _v3o="$(cd "${_v3sb}" && bash .claude/validation/kg-contract-check.sh g/semente.kg.yaml 2>&1)"; then _v3rc=0; else _v3rc=$?; fi
+    if [ "${_v3rc}" -eq 0 ]; then record_pass "seed-graph: (v3) a semente nasce conforme ao contrato v3 (MUST e SHOULD vazios)"
+    else record_fail "seed-graph: (v3)" "a semente sai fora do contrato v3 (rc=${_v3rc}): ${_v3o}"; fi
+    rm -rf "${_v3sb}"
+  else record_skip "seed-graph: (v3) vendor do contrato ou PyYAML/jsonschema ausentes (SUT não exercido)"; fi
   # (a2) DOCUMENTO ÚNICO, e o /meta:drive o LÊ (sinal de campo onion-slm, 2026-10-06): a semente abria e
   #      fechava o cabeçalho com `---`; o radar aceitava e o kg-drive-project.sh recusava com exit 2 — o 1º
   #      grafo de todo adotante nascia fora do /meta:drive. A asserção é a do CONSUMIDOR que recusava.
@@ -18971,6 +18997,27 @@ PY
      && awk '/to: N_MORTO/{getline; print}' "$d/$g" | grep -q SUPERSEDES; then
     record_pass "census-seal: (d) DRIFTED+GATED vira CONSTRAINS (alvo segue open) e DRIFTED+MORTO vira SUPERSEDES"
   else record_fail "census-seal: (d)" "aresta pela realidade nao aplicada (rc=$rc): $out $(grep -A1 'to: N_' "$d/$g")"; fi
+  # (v3) o que o censo ESCREVE nasce no contrato v3 (2026-10-08, SAC-71): partindo de um grafo conforme,
+  #      o carimbo (CONFIRMED) e o nó novo (DRIFTED) não podem sujá-lo — data entre aspas, label ≤ 280 com
+  #      narrative, e provenance no nó confirmed. Antes, o nó DRIFTED nascia com label de até 330
+  #      caracteres, sem provenance, e o carimbo gravava a data sem aspas.
+  if [ -f "${REPO_ROOT}/vendor/kg-ssot/tools/kg_gate.py" ] && python3 -c 'import yaml, jsonschema' >/dev/null 2>&1; then
+    local v3o v3rc
+    rm -f "$d/$g"; mkdir -p "$d/.claude/validation" "$d/vendor" "$d/docs/onion/graph"
+    cp "${REPO_ROOT}/.claude/validation/kg-contract-check.sh" "$d/.claude/validation/"; cp -a "${REPO_ROOT}/vendor/kg-ssot" "$d/vendor/"
+    printf 'meta:\n  id: fx\n  schema_version: "1"\nnodes:\n  - id: N_GATED\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: "2026-01-01"\n    verified_against: x\n    label: "a"\n  - id: N_OK\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 4\n    confidence: 0.9\n    verified_at: "2026-01-01"\n    verified_against: x\n    label: "b"\n\nedges:\n  - from: N_GATED\n    to: N_OK\n    edge_type: SUPPORTS\n' > "$d/$g"
+    python3 - "$d/c.json" "$g" <<'PY'
+import json,sys
+m=lambda n,v,r: {"node_id":n,"kg_file":sys.argv[2],"verdict":v,"realidade":r,"gatilho_disparou":"NAO","juiz":"APROVADO","claims_total":1,"claims_measured":1,"method":"m","observed":"o","divergence":"d"*400}
+json.dump({"run_id":"wf_fixture","medidos":[m("N_GATED","DRIFTED","GATED"),m("N_OK","CONFIRMED","REAL")],"juizo":{},"nao_medidos_por_teto":[],"parametros":{}},open(sys.argv[1],'w'))
+PY
+    ONION_CENSUS_ROOT="$d" python3 "${seal}" seal "$d/c.json" >/dev/null 2>&1 || true
+    git -C "$d" init -q 2>/dev/null
+    if v3o="$(cd "$d" && bash .claude/validation/kg-contract-check.sh "$g" 2>&1)"; then v3rc=0; else v3rc=$?; fi
+    if [ "${v3rc}" -eq 0 ] && grep -q 'E_CENSO' "$d/$g"; then
+      record_pass "census-seal: (v3) o carimbo e o nó DRIFTED do censo nascem conformes ao contrato v3"
+    else record_fail "census-seal: (v3)" "o censo sujou o grafo (rc=${v3rc}): ${v3o}"; fi
+  else record_skip "census-seal: (v3) vendor do contrato ou PyYAML/jsonschema ausentes (SUT não exercido)"; fi
   rm -rf "$d"
 }
 
@@ -22924,6 +22971,60 @@ _family run_hook_regen_table_selftests
 _family run_hook_chain_order_selftests
 _family run_corpus_grep_selftests
 _family run_research_workflow_selftests
+
+# kg-contract-check — o escritor de grafo julga o próprio arquivo contra o contrato v3 vendorizado ANTES
+# do commit (o gate do CI só vê arquivo rastreado). Nasceu do SAC-71 (2026-10-08): o grafo novo saía com
+# data sem aspas, confirmed sem provenance e label longo, e foi curado à mão no #967 e no #968.
+_kcc_graph() {
+  printf 'meta:\n  id: %s\n  schema_version: "1"\n  baseline: "2026-10-08"\nnodes:\n' "$1"
+  printf '  - id: Q_A\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.5\n    label: "pergunta A"\n'
+  printf '  - id: E_A\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 3\n    confidence: 0.9\n    verified_at: "2026-10-08"\n    label: "evidência A"\n'
+  printf '    provenance:\n      source: "caminho@commit"\n      locator: "linha 1"\n      method: "medição"\n'
+  printf 'edges:\n  - from: E_A\n    to: Q_A\n    edge_type: SUPPORTS\n'
+}
+run_kg_contract_check_selftests() {
+  local chk="${REPO_ROOT}/.claude/validation/kg-contract-check.sh" ven="${REPO_ROOT}/vendor/kg-ssot"
+  if [ ! -f "${chk}" ] || [ ! -f "${ven}/tools/kg_gate.py" ]; then record_fail "kg-contract-check" "checador ou vendor ausente"; return; fi
+  python3 -c 'import yaml, jsonschema' >/dev/null 2>&1 || { record_skip "kg-contract-check: PyYAML/jsonschema ausentes (SUT não exercido)"; return; }
+  local sb out rc long
+  sb="$(TMPDIR=/tmp mktemp -d)"
+  mkdir -p "${sb}/.claude/validation" "${sb}/vendor" "${sb}/g"
+  cp "${chk}" "${sb}/.claude/validation/"; cp -a "${ven}" "${sb}/vendor/"
+  _kcc_graph limpo > "${sb}/g/limpo.kg.yaml"
+  _kcc_graph divida | sed -e 's/verified_at: "2026-10-08"/verified_at: 2026-10-08/' > "${sb}/g/divida.kg.yaml"
+  ( cd "${sb}" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm base ) >/dev/null 2>&1 \
+    || { record_skip "kg-contract-check: git init falhou"; rm -rf "${sb}"; return; }
+  # (a) grafo NOVO conforme → rc 0
+  _kcc_graph novo > "${sb}/g/novo.kg.yaml"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/novo.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ]; then record_pass "kg-contract-check: (a) grafo novo conforme ao v3 → rc 0"
+  else record_fail "kg-contract-check: (a)" "grafo novo conforme reprovado rc=${rc}: ${out}"; fi
+  # (b) grafo NOVO com confirmed sem provenance → rc 1 nomeando o código
+  _kcc_graph semprov | sed -e '/provenance:/,/method:/d' > "${sb}/g/semprov.kg.yaml"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/semprov.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q 'form.required.node.provenance' <<< "${out}"; then
+    record_pass "kg-contract-check: (b) grafo novo com confirmed sem provenance → rc 1 nomeando o código"
+  else record_fail "kg-contract-check: (b)" "esperava rc 1 com provenance: rc=${rc} ${out}"; fi
+  # (c) grafo RASTREADO com dívida herdada (data sem aspas desde a base), mexido sem piorar → rc 0
+  sed -i 's/label: "pergunta A"/label: "pergunta A, revista"/' "${sb}/g/divida.kg.yaml"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/divida.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ]; then record_pass "kg-contract-check: (c) grafo rastreado com dívida herdada e sem piora → rc 0"
+  else record_fail "kg-contract-check: (c)" "dívida herdada cobrada como nova: rc=${rc} ${out}"; fi
+  # (d) grafo RASTREADO que ganha código novo (label acima de 280) → rc 1
+  long="$(printf 'x%.0s' $(seq 1 300))"
+  sed -i "s/label: \"evidência A\"/label: \"${long}\"/" "${sb}/g/limpo.kg.yaml"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/limpo.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q 'form.range.node.label' <<< "${out}"; then
+    record_pass "kg-contract-check: (d) grafo rastreado que passa a ter label longo → rc 1"
+  else record_fail "kg-contract-check: (d)" "piora no rastreado não acusada: rc=${rc} ${out}"; fi
+  # (e) sem vendor → rc 2, nunca verde
+  rm -rf "${sb}/vendor/kg-ssot"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/novo.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ]; then record_pass "kg-contract-check: (e) sem o vendor do contrato → rc 2 (não julga, não passa)"
+  else record_fail "kg-contract-check: (e)" "sem vendor saiu rc=${rc}"; fi
+  rm -rf "${sb}"
+}
+_family run_kg_contract_check_selftests
 
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
 _family run_kg_scope_selftests
