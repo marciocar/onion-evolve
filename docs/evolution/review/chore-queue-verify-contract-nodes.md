@@ -2,7 +2,8 @@
 title: 'Resíduo — dois nós da fila cumpridos pela adoção do contrato v3 são fechados com medição'
 date: 2026-10-08
 branch: chore/queue-verify-contract-nodes
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 078cd53e4fcaa99124e63d928c6fcbcb1b163b1febd22783db0de425f61d04ff
+reviewed_code_sha256: 4053ec89887b522a3082850a6750f89dea09c56f6606a6830a7e7a1c8d247fbd
 findings_total: 0
 findings_real: 0
 findings_fixed: 0

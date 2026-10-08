@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**403 itens abertos** em 85 grafo(s) com aberto (de 111 no escopo) · 86 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**401 itens abertos** em 85 grafo(s) com aberto (de 111 no escopo) · 86 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -664,27 +664,6 @@
 | 7.2 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: migrar o corpus antigo para narrative e provenance, em ondas e antes do v4 (SAC-73), e o checkpoint do /meta:drive |
 | 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
-## fila-2026-10-06 — 16 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 7.2 | `Q_KG_SCHEMA_FORMAL` | fila-2026-10-06 | JSON Schema como contrato único do .kg.yaml; antes, medir quantos grafos passariam num schema estrito |
-| 6.3 | `Q_PR_FINALIZE_MELHORIAS` | fila-2026-10-06 | pr-finalize: os 4 atritos de E_PR_FINALIZE_ATRITO_MEDIDO estão curados (carimbo transacional, commit só de projeção sem o hook |
-| 5.4 | `Q_ROTULO_SEPARADO_DA_NARRATIVA` | fila-2026-10-06 | separar o rótulo factual da narrativa num campo próprio do nó |
-| 4.8 | `Q_TASK_MANAGER_SDAAL_COMPLETO` | fila-2026-10-06 | programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, bu |
-| 4.2 | `Q_MERGE_GATE_AVISA_NO_ADOTANTE` | fila-2026-10-06 | a trava de merge deve avisar no adotante em vez de sair calada |
-| 3.6 | `Q_GRANAAI_CLONE_SEM_CARIMBO` | fila-2026-10-06 | aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o valida |
-| 3.6 | `Q_MERGE_DRIVER_PARA_PROJECAO_GERADA` | fila-2026-10-06 | merge driver para as projeções geradas (no conflito, regenerar em vez de pedir resolução), para PRs paralelos não se invalida |
-| 3.6 | `Q_PRECOMMIT_SELECAO_POR_CASO` | fila-2026-10-06 | re-forjar o pre-commit para escolher por caso: família pelo bloco que mudou na bancada, núcleo fixo justificado ou podado, motiv |
-| 3.2 | `Q_MAPA_NOMEAR_MERGE_ONION_HOOKS` | fila-2026-10-06 | nomear merge-onion-hooks.sh no corpo da família que o exercita, para o mapa da bancada o reivindicar |
-| 3.0 | `Q_CANAL_VIVO_ENTRE_SESSOES` | fila-2026-10-06 | o canal vivo entre sessões vira 3ª via da co-evolução (envelope fixo, registro do envio, decisão descendo ao grafo)? aguarda  |
-| 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |
-| 3.0 | `Q_ONION_BRAIN_MCP` | fila-2026-10-06 | MCP remoto só leitura do Onion (kg_list, kg_radar, kg_node com o parser do radar, docs_search) para o Company Brain fora do Claud |
-| 3.0 | `Q_PODA_CLAUDE_MD_REVISITA` | fila-2026-10-06 | revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros |
-| 2.4 | `Q_VETO_PRETOOLUSE_NO_PR_CREATE` | fila-2026-10-06 | GATED — vetar no PreToolUse o gh pr create sem resíduo? Reabre só se o aviso pós-ato do #948 deixar passar PR sem resíduo; a |
-| 2.0 | `E_SKILL_CORE_ONLY_VIAJOU` | fila-2026-10-06 | a skill onion-publish, que é só do core, pode ter viajado para o adotante (hipótese) |
-| 2.0 | `Q_MANIFESTO_SEM_SKILL_CORE_ONLY` | fila-2026-10-06 | medir se a skill onion-publish viaja ao adotante e, se viajar, tirá-la do manifesto |
-
 ## rito-task-manager-2026-09 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -699,6 +678,25 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 6.8 | `Q_O_GATILHO_NASCE_ANTES_DO_COMANDO_RE_FORJADO` | evolve-staleness-2026-10 | A INVERSAO DELIBERADA, e ela fica nomeada porque e incomum: o GATILHO nasceu ANTES do comando ser re-forjado. O `/meta:evolve` est |
+
+## fila-2026-10-06 — 14 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 6.3 | `Q_PR_FINALIZE_MELHORIAS` | fila-2026-10-06 | pr-finalize: os 4 atritos de E_PR_FINALIZE_ATRITO_MEDIDO estão curados (carimbo transacional, commit só de projeção sem o hook |
+| 4.8 | `Q_TASK_MANAGER_SDAAL_COMPLETO` | fila-2026-10-06 | programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, bu |
+| 4.2 | `Q_MERGE_GATE_AVISA_NO_ADOTANTE` | fila-2026-10-06 | a trava de merge deve avisar no adotante em vez de sair calada |
+| 3.6 | `Q_GRANAAI_CLONE_SEM_CARIMBO` | fila-2026-10-06 | aposentar o membro granaai do registro SEM perder a proteção da REGRA 36 (os termos dela vêm do members.yaml) — hoje o valida |
+| 3.6 | `Q_MERGE_DRIVER_PARA_PROJECAO_GERADA` | fila-2026-10-06 | merge driver para as projeções geradas (no conflito, regenerar em vez de pedir resolução), para PRs paralelos não se invalida |
+| 3.6 | `Q_PRECOMMIT_SELECAO_POR_CASO` | fila-2026-10-06 | re-forjar o pre-commit para escolher por caso: família pelo bloco que mudou na bancada, núcleo fixo justificado ou podado, motiv |
+| 3.2 | `Q_MAPA_NOMEAR_MERGE_ONION_HOOKS` | fila-2026-10-06 | nomear merge-onion-hooks.sh no corpo da família que o exercita, para o mapa da bancada o reivindicar |
+| 3.0 | `Q_CANAL_VIVO_ENTRE_SESSOES` | fila-2026-10-06 | o canal vivo entre sessões vira 3ª via da co-evolução (envelope fixo, registro do envio, decisão descendo ao grafo)? aguarda  |
+| 3.0 | `Q_MU07_TIPO_DE_NO_TROCADO` | fila-2026-10-06 | como detectar node_type trocado sem regra (o espaço onde um especialista do Onion SLM teria de provar valor) |
+| 3.0 | `Q_ONION_BRAIN_MCP` | fila-2026-10-06 | MCP remoto só leitura do Onion (kg_list, kg_radar, kg_node com o parser do radar, docs_search) para o Company Brain fora do Claud |
+| 3.0 | `Q_PODA_CLAUDE_MD_REVISITA` | fila-2026-10-06 | revisitar a poda (revisita vencida), medir o custo em tokens do CLAUDE.md e enxugar para regras com ponteiros |
+| 2.4 | `Q_VETO_PRETOOLUSE_NO_PR_CREATE` | fila-2026-10-06 | GATED — vetar no PreToolUse o gh pr create sem resíduo? Reabre só se o aviso pós-ato do #948 deixar passar PR sem resíduo; a |
+| 2.0 | `E_SKILL_CORE_ONLY_VIAJOU` | fila-2026-10-06 | a skill onion-publish, que é só do core, pode ter viajado para o adotante (hipótese) |
+| 2.0 | `Q_MANIFESTO_SEM_SKILL_CORE_ONLY` | fila-2026-10-06 | medir se a skill onion-publish viaja ao adotante e, se viajar, tirá-la do manifesto |
 
 ## core — 2 item(ns)
 
