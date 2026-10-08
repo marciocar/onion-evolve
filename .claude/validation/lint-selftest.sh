@@ -6344,7 +6344,7 @@ run_pre_push_selftests() {
   _hits() { [ -f "$1/hooklog" ] && wc -l < "$1/hooklog" | tr -d ' ' || echo 0; }
   _respend() {  # o resíduo está 'pendente' no arquivo E no índice, sem hash de código?
     grep -qx 'reviewed_diff_sha256: pendente' "$1/w/${R}" && ! grep -q '^reviewed_code_sha256:' "$1/w/${R}" \
-      && git -C "$1/w" show ":${R}" | grep -qx 'reviewed_diff_sha256: pendente'
+      && grep -qx 'reviewed_diff_sha256: pendente' <<< "$(git -C "$1/w" show ":${R}")"
   }
   # (2) commit SÓ de projeção não religa o hook — o lint do commit no passo 3 é a passada única
   if _new sac-proj; then
@@ -6366,7 +6366,7 @@ run_pre_push_selftests() {
   if _new sac-reprova; then
     _hk "${sb}"; : > "${sb}/hookfail"
     g="$(_pfn "${sb}")"; _pfc "SAC-66 (3): hook reprova o commit" 1 "${g}" "${sb}"
-    if grep -A1 'PR-FINALIZE: o que reprovou o commit:' "${sb}/out" | grep -q 'REGRA 99'; then
+    if grep -q 'REGRA 99' <<< "$(grep -A1 'PR-FINALIZE: o que reprovou o commit:' "${sb}/out")"; then
       record_pass "pr-finalize: SAC-66 (3) a violação do hook sai NOMEADA no fim da saída"
     else record_fail "pr-finalize: SAC-66 (3) violação não nomeada" "$(tail -3 "${sb}/out" | tr '\n' ' ')"; fi
     if _respend "${sb}"; then record_pass "pr-finalize: SAC-66 (1) commit recusado → resíduo volta a 'pendente' (arquivo e índice)"
