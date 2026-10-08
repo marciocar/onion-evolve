@@ -12078,7 +12078,13 @@ case "$args" in
         printf 'onion-review-verdict\tfail\t7s\turl\n'
       fi
       printf 'selftest\tpass\t1s\turl\n'; exit 0 ;;
-  *"pr merge"*)                    printf '%s\n' "${GH_MERGE_OUT}"; exit "${GH_MERGE_RC}" ;;
+  *"pr view"*baseRefName*)         echo "main"; exit 0 ;;
+  *"api "*pulls*commits*)
+      # os pais de cada commit do PR, um número por linha (1 = commit comum, 2 = commit de merge)
+      printf '%s\n' ${GH_PR_PARENTS:-1}; exit "${GH_PR_COMMITS_RC:-0}" ;;
+  *"pr merge"*)
+      [ -n "${STUB_MERGE_ARGS:-}" ] && printf '%s\n' "$args" >> "${STUB_MERGE_ARGS}"
+      printf '%s\n' "${GH_MERGE_OUT}"; exit "${GH_MERGE_RC}" ;;
 esac
 exit 0
 STUB
@@ -12259,7 +12265,58 @@ STUB0
     record_pass "pr-merge-verified: (p) API viva com zero runs ⇒ ramo 'espere' intacto (sem falso alarme de API)"
   else record_fail "pr-merge-verified: (p) zero runs virou erro de API" "rc=${_mv_rc} out=${_mv_out}"; fi
 
-  unset -f _mv _mvd
+  # ── (q)-(v) MODO DE MERGE E ANCESTRALIDADE (SAC-76, 2026-10-08) ──────────────────────────────
+  # Defeito medido num adotante: o script só fazia --rebase (fallback --squash); o PR de update, que
+  # traz um merge real com onion/vendor, entrava linearizado, e o update seguinte conflitava em falso.
+  _mvm() { # $1=GH_PR_PARENTS, resto = flags extras do SUT; grava em ${d}/margs os args do merge
+    echo 0 > "${d}/n"; : > "${d}/margs"
+    local _p="$1"; shift
+    _mv_out="$(PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MERGE_ARGS="${d}/margs" GH_PR_PARENTS="${_p}" \
+               GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" \
+               GH_MERGE_RC=0 GH_MERGE_OUT=merged bash "${sut}" 999 "$@" 2>&1)"; _mv_rc=$?
+  }
+  # (q) --merge-commit ⇒ o merge sai com --merge, nunca --rebase/--squash, e o estado continua a prova
+  _mvm "1 2" --merge-commit
+  if [ "${_mv_rc}" -eq 0 ] && grep -q -- '--merge' "${d}/margs" && ! grep -q -- '--rebase\|--squash' "${d}/margs" \
+     && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (q) --merge-commit ⇒ gh pr merge --merge, com a prova pelo estado"
+  else record_fail "pr-merge-verified: (q)" "rc=${_mv_rc} args=$(cat "${d}/margs") out=${_mv_out}"; fi
+  # (r) sem a flag ⇒ o comportamento antigo intacto (--rebase), mesmo com merge interno na branch
+  _mvm "1 2"
+  if [ "${_mv_rc}" -eq 0 ] && grep -q -- '--rebase' "${d}/margs" && ! grep -q -- ' --merge' "${d}/margs"; then
+    record_pass "pr-merge-verified: (r) sem --merge-commit ⇒ --rebase intacto (o modo nunca muda em silêncio)"
+  else record_fail "pr-merge-verified: (r)" "rc=${_mv_rc} args=$(cat "${d}/margs") out=${_mv_out}"; fi
+  # (s) polaridade que ACUSA: branch com commit de merge e sem a flag ⇒ aviso nomeado
+  if grep -q "carrega commit de MERGE" <<< "${_mv_out}" && grep -q -- "--merge-commit" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (s) merge interno sem --merge-commit ⇒ aviso que nomeia a flag"
+  else record_fail "pr-merge-verified: (s) aviso ausente" "out=${_mv_out}"; fi
+  # (t) polaridade que CALA: branch só com commits comuns ⇒ nenhum aviso
+  _mvm "1 1 1"
+  if [ "${_mv_rc}" -eq 0 ] && ! grep -q "carrega commit de MERGE" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (t) branch sem merge interno ⇒ sem aviso (nada de falso alarme)"
+  else record_fail "pr-merge-verified: (t) falso alarme" "out=${_mv_out}"; fi
+  # (u)(v) --assert-ancestor num repo de verdade: a ref É ancestral ⇒ rc 0; NÃO é ⇒ rc 3 nomeado
+  local r="${d}/repo"; mkdir -p "${r}"
+  ( cd "${r}" && git init -q -b main && git config user.email t@t && git config user.name t \
+    && echo a > a && git add a && git commit -qm base \
+    && git checkout -q -b onion/vendor && echo v > v && git add v && git commit -qm vendor \
+    && git checkout -q main && git merge -q --no-ff --no-edit onion/vendor \
+    && git checkout -q -b fora main~1 && echo x > x && git add x && git commit -qm fora \
+    && git checkout -q main && git remote add origin "${r}" ) >/dev/null 2>&1
+  echo 0 > "${d}/n"
+  _mv_out="$(cd "${r}" && PATH="${d}:${PATH}" STUB_N="${d}/n" GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" \
+             GH_MERGE_RC=0 GH_MERGE_OUT=merged bash "${sut}" 999 --merge-commit --assert-ancestor onion/vendor 2>&1)"; _mv_rc=$?
+  if [ "${_mv_rc}" -eq 0 ] && grep -q "onion/vendor é ancestral de origin/main" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (u) --assert-ancestor com a ref ancestral ⇒ rc 0 e confirmação nomeada"
+  else record_fail "pr-merge-verified: (u)" "rc=${_mv_rc} out=${_mv_out}"; fi
+  echo 0 > "${d}/n"
+  _mv_out="$(cd "${r}" && PATH="${d}:${PATH}" STUB_N="${d}/n" GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" \
+             GH_MERGE_RC=0 GH_MERGE_OUT=merged bash "${sut}" 999 --merge-commit --assert-ancestor fora 2>&1)"; _mv_rc=$?
+  if [ "${_mv_rc}" -eq 3 ] && grep -q "fora NÃO é ancestral de origin/main" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (v) --assert-ancestor com a ref fora da base ⇒ rc 3 nomeando a ref"
+  else record_fail "pr-merge-verified: (v)" "rc=${_mv_rc} out=${_mv_out}"; fi
+
+  unset -f _mv _mvd _mvm
 }
 
 # ═══ REGRA 90 — paridade papel: o SCRIPT aceita, a PROSA menciona ═════════════════════════
