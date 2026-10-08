@@ -2,7 +2,8 @@
 title: 'Resíduo — o conflito de projeção gerada entre PRs paralelos entra na fila'
 date: 2026-10-08
 branch: chore/queue-generated-projection-conflicts
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 2dd794cf5e2416c3f1aa534d208cafe11a8c5ee4c024cd0c878bae9489d73ae6
+reviewed_code_sha256: f4c740e74e2df5f1f178f5ff29280b7d7fce5e8dbdad090ed9200e976cdfd41f
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
