@@ -1,0 +1,21 @@
+{
+  "description": "Grupo de exemplo: o menor grafo válido e o mesmo grafo sem o label de um nó.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-minimal.kg.yaml",
+      "description": "meta com schema_version e id, dois nós com os campos obrigatórios e uma aresta que liga os dois",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-node-missing-label.kg.yaml",
+      "description": "um nó sem label, o campo obrigatório que carrega a afirmação",
+      "valid": false,
+      "codes": [
+        "form.missing-label"
+      ]
+    }
+  ]
+}

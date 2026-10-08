@@ -1,0 +1,116 @@
+meta:
+  schema_version: '1'
+  id: valid-node-every-type
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: A pergunta sintética A.
+  - id: EV_A
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: A evidência sintética que sustenta A.
+    provenance:
+      source: "medição sintética"
+      locator: "caso de conformidade"
+      method: "medição"
+  - id: N_ENTITY
+    node_type: entity
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.1
+    label: Nó sintético do tipo entity.
+  - id: N_CLAIM
+    node_type: claim
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.1
+    label: Nó sintético do tipo claim.
+  - id: N_DECISION
+    node_type: decision
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.1
+    label: Nó sintético do tipo decision.
+  - id: N_ARTIFACT
+    node_type: artifact
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.1
+    label: Nó sintético do tipo artifact.
+  - id: N_STATE
+    node_type: state
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.1
+    label: Nó sintético do tipo state.
+  - id: N_EVENT
+    node_type: event
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.1
+    label: Nó sintético do tipo event.
+  - id: N_RULE
+    node_type: rule
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.1
+    label: Nó sintético do tipo rule.
+  - id: N_INVARIANT
+    node_type: invariant
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.1
+    label: Nó sintético do tipo invariant.
+  - id: N_POLICY
+    node_type: policy
+    plane: DEV
+    status: open
+    impact: 1
+    confidence: 0.1
+    label: Nó sintético do tipo policy.
+edges:
+  - from: EV_A
+    to: Q_A
+    edge_type: SUPPORTS
+  - from: N_ENTITY
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: N_CLAIM
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: N_DECISION
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: N_ARTIFACT
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: N_STATE
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: N_EVENT
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: N_RULE
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: N_INVARIANT
+    to: Q_A
+    edge_type: TRACES_TO
+  - from: N_POLICY
+    to: Q_A
+    edge_type: TRACES_TO

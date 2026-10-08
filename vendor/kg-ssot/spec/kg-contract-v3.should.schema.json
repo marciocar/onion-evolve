@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onion-kg-ssot/spec/kg-contract-v3.should.schema.json",
+  "title": "kg.yaml — contrato v3, nível SHOULD",
+  "description": "O nível SHOULD (alerta, não reprova) do contrato v3. Só traz o que o MUST não traz: as chaves de cada objeto ficam fechadas na gramática mais o prefixo x_ (Q_CONTRACT_EXTENSION_POLICY: chave desconhecida sem prefixo alerta nesta versão e vira MUST na próxima) e nó PROD pede verified_at (Q_CONTRACT_CONFORMANCE_LEVELS). A chave on da aresta não alerta aqui porque já reprova como yaml.forbidden-key-on. Nome de chave que não é slug ([A-Za-z_][A-Za-z0-9_-]*) alerta como form.pattern.<escopo>.key. No v2, o label do nó acima de 280 caracteres alerta (form.range.node.label): a narrativa vai para narrative (Q_CONTRACT_FACT_NARRATIVE). No v3, nó confirmed ou PROD sem provenance alerta (form.required.node.provenance): a rampa da proveniência estruturada, que vira MUST no v4; as chaves de provenance ficam fechadas em source, locator, method e x_. Grafo sem nós (nodes: []) alerta como form.range.top.nodes (Q_CONTRACT_EMPTY_GRAPH): é válido, como o primeiro uso de um app, mas o aviso pega o parse que falhou em silêncio, que é o que o radar do core recusa. Emenda de 2026-10-08 no v3, que ainda não foi adotado fora deste repo.",
+  "type": "object",
+  "propertyNames": {
+    "allOf": [
+      {
+        "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+      },
+      {
+        "anyOf": [
+          {
+            "enum": [
+              "edges",
+              "meta",
+              "nodes"
+            ]
+          },
+          {
+            "pattern": "^x_"
+          }
+        ]
+      }
+    ]
+  },
+  "properties": {
+    "meta": {
+      "type": "object",
+      "propertyNames": {
+        "allOf": [
+          {
+            "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+          },
+          {
+            "anyOf": [
+              {
+                "enum": [
+                  "baseline",
+                  "date",
+                  "id",
+                  "layer",
+                  "note",
+                  "purpose",
+                  "review_after",
+                  "schema_version"
+                ]
+              },
+              {
+                "pattern": "^x_"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "allOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+            },
+            {
+              "anyOf": [
+                {
+                  "enum": [
+                    "confidence",
+                    "drive_kind",
+                    "evidence_class",
+                    "id",
+                    "impact",
+                    "label",
+                    "layer",
+                    "narrative",
+                    "node_type",
+                    "owner",
+                    "plane",
+                    "provenance",
+                    "sealed_at",
+                    "sealed_by",
+                    "source_kind",
+                    "source_tier",
+                    "status",
+                    "trace",
+                    "valid_from",
+                    "verified_against",
+                    "verified_at"
+                  ]
+                },
+                {
+                  "pattern": "^x_"
+                }
+              ]
+            }
+          ]
+        },
+        "properties": {
+          "label": {
+            "maxLength": 280
+          },
+          "provenance": {
+            "propertyNames": {
+              "allOf": [
+                {
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "locator",
+                        "method",
+                        "source"
+                      ]
+                    },
+                    {
+                      "pattern": "^x_"
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "plane": {
+                  "const": "PROD"
+                }
+              },
+              "required": [
+                "plane"
+              ]
+            },
+            "then": {
+              "required": [
+                "verified_at"
+              ]
+            }
+          },
+          {
+            "if": {
+              "anyOf": [
+                {
+                  "properties": {
+                    "status": {
+                      "const": "confirmed"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ]
+                },
+                {
+                  "properties": {
+                    "plane": {
+                      "const": "PROD"
+                    }
+                  },
+                  "required": [
+                    "plane"
+                  ]
+                }
+              ]
+            },
+            "then": {
+              "required": [
+                "provenance"
+              ]
+            }
+          }
+        ]
+      },
+      "minItems": 1
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "allOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+            },
+            {
+              "anyOf": [
+                {
+                  "enum": [
+                    "edge_type",
+                    "from",
+                    "label",
+                    "on",
+                    "to",
+                    "trigger"
+                  ]
+                },
+                {
+                  "pattern": "^x_"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

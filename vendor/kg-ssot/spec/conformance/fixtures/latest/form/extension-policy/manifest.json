@@ -1,0 +1,46 @@
+{
+  "description": "Política de extensão do contrato v1 (Q_CONTRACT_EXTENSION_POLICY, selada no PR #13): chave com prefixo x_ é ignorada; chave desconhecida sem prefixo alerta nesta versão (SHOULD) e vira MUST na próxima.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-node-x-prefixed-key.kg.yaml",
+      "description": "nó com chave de extensão x_origem: o leitor ignora",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-meta-x-prefixed-key.kg.yaml",
+      "description": "meta com chave de extensão x_nota",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-node-unknown-key.kg.yaml",
+      "description": "nó com chave desconhecida sem prefixo: válido nesta versão, com warning",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.node.origem"
+      ]
+    },
+    {
+      "file": "warn-meta-unknown-key.kg.yaml",
+      "description": "meta com chave desconhecida sem prefixo: o escopo do código é meta, não top",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.meta.nota"
+      ]
+    },
+    {
+      "file": "warn-node-dotted-key.kg.yaml",
+      "description": "chave com ponto no nome não é slug: um alerta só, form.pattern, nunca unknown-key ambíguo com campo aninhado",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.key"
+      ]
+    }
+  ]
+}

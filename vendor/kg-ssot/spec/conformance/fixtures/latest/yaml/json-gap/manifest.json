@@ -1,0 +1,99 @@
+{
+  "description": "O vão entre o YAML 1.2 core e o modelo JSON (Q_CONTRACT_YAML_JSON_GAP, selada no PR #18): .nan e .inf reprovam como tipo, e data que não existe no calendário reprova como padrão.",
+  "layer": "yaml",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-confidence-nan.kg.yaml",
+      "description": "confidence: .nan não é número em JSON; o mínimo e o máximo não o pegam",
+      "valid": false,
+      "codes": [
+        "form.type.node.confidence"
+      ]
+    },
+    {
+      "file": "bad-date-not-in-calendar.kg.yaml",
+      "description": "se o contrato exigir data válida no calendário, 2026-02-30 reprova",
+      "valid": false,
+      "codes": [
+        "form.pattern.meta.baseline"
+      ]
+    },
+    {
+      "file": "bad-confidence-inf.kg.yaml",
+      "description": ".inf também não existe em JSON: reprova como tipo, não como intervalo",
+      "valid": false,
+      "codes": [
+        "form.type.node.confidence"
+      ]
+    },
+    {
+      "file": "bad-valid-from-not-in-calendar.kg.yaml",
+      "description": "valid_from completo também tem de existir no calendário",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.valid_from"
+      ]
+    },
+    {
+      "file": "bad-valid-from-month-13.kg.yaml",
+      "description": "valid_from parcial com mês 13",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.valid_from"
+      ]
+    },
+    {
+      "file": "valid-valid-from-leap-day.kg.yaml",
+      "description": "29 de fevereiro de ano bissexto existe",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-meta-nan.kg.yaml",
+      "description": "meta inteiro como .nan: tipo errado no topo, não campos faltando",
+      "valid": false,
+      "codes": [
+        "form.type.top.meta"
+      ]
+    },
+    {
+      "file": "bad-node-item-nan.kg.yaml",
+      "description": "um item de nodes que é .nan",
+      "valid": false,
+      "codes": [
+        "form.type.node.item"
+      ]
+    },
+    {
+      "file": "bad-x-key-nan.kg.yaml",
+      "description": ".nan reprova também em chave x_ e dentro de lista: o JSON não o representa, e um leitor JS o perderia",
+      "valid": false,
+      "codes": [
+        "form.type.node.x_medida"
+      ]
+    },
+    {
+      "file": "valid-valid-from-year-0001.kg.yaml",
+      "description": "ano 0001 existe",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-valid-from-year-0000.kg.yaml",
+      "description": "ano 0000 não existe no calendário, também na forma parcial",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.valid_from"
+      ]
+    },
+    {
+      "file": "bad-provenance-source-nan.kg.yaml",
+      "description": ".nan dentro de provenance: o código desce no objeto, como os outros erros",
+      "valid": false,
+      "codes": [
+        "form.type.node.provenance.source"
+      ]
+    }
+  ]
+}

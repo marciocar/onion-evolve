@@ -1,0 +1,142 @@
+{
+  "description": "As chaves obrigatórias do topo e do meta, e o valor fixo de schema_version.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-top-missing-meta.kg.yaml",
+      "description": "sem a chave meta",
+      "valid": false,
+      "codes": [
+        "form.required.top.meta"
+      ]
+    },
+    {
+      "file": "bad-top-missing-edges.kg.yaml",
+      "description": "sem a chave edges; o nó que só a aresta ligava fica de grau 0",
+      "valid": false,
+      "codes": [
+        "form.required.top.edges",
+        "integrity.orphan-node"
+      ]
+    },
+    {
+      "file": "bad-meta-missing-schema-version.kg.yaml",
+      "description": "meta sem schema_version",
+      "valid": false,
+      "codes": [
+        "form.required.meta.schema_version"
+      ]
+    },
+    {
+      "file": "bad-meta-missing-id.kg.yaml",
+      "description": "meta sem id",
+      "valid": false,
+      "codes": [
+        "form.required.meta.id"
+      ]
+    },
+    {
+      "file": "bad-meta-schema-version-2.kg.yaml",
+      "description": "schema_version diferente de \"1\"",
+      "valid": false,
+      "codes": [
+        "form.const.meta.schema_version"
+      ]
+    },
+    {
+      "file": "bad-meta-schema-version-integer.kg.yaml",
+      "description": "schema_version como inteiro 1, não a string \"1\" (achado F3 do spike)",
+      "valid": false,
+      "codes": [
+        "form.const.meta.schema_version"
+      ]
+    },
+    {
+      "file": "valid-meta-optional-dates.kg.yaml",
+      "description": "meta com baseline, review_after e layer válidos",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-meta-baseline-format.kg.yaml",
+      "description": "baseline fora de AAAA-MM-DD",
+      "valid": false,
+      "codes": [
+        "form.pattern.meta.baseline"
+      ]
+    },
+    {
+      "file": "bad-meta-baseline-trailing-newline.kg.yaml",
+      "description": "baseline com quebra de linha no fim: em ECMA-262 o $ não casa antes do \\n",
+      "valid": false,
+      "codes": [
+        "form.pattern.meta.baseline"
+      ]
+    },
+    {
+      "file": "bad-meta-review-after-integer.kg.yaml",
+      "description": "review_after como inteiro",
+      "valid": false,
+      "codes": [
+        "form.type.meta.review_after"
+      ]
+    },
+    {
+      "file": "bad-meta-date-format.kg.yaml",
+      "description": "date fora de AAAA-MM-DD",
+      "valid": false,
+      "codes": [
+        "form.pattern.meta.date"
+      ]
+    },
+    {
+      "file": "bad-meta-layer-enum.kg.yaml",
+      "description": "layer do meta fora do enum",
+      "valid": false,
+      "codes": [
+        "form.enum.meta.layer"
+      ]
+    },
+    {
+      "file": "bad-meta-id-empty.kg.yaml",
+      "description": "id do meta vazio",
+      "valid": false,
+      "codes": [
+        "form.range.meta.id"
+      ]
+    },
+    {
+      "file": "bad-meta-id-integer.kg.yaml",
+      "description": "id do meta como inteiro",
+      "valid": false,
+      "codes": [
+        "form.type.meta.id"
+      ]
+    },
+    {
+      "file": "bad-meta-schema-version-boolean.kg.yaml",
+      "description": "schema_version booleano",
+      "valid": false,
+      "codes": [
+        "form.const.meta.schema_version"
+      ]
+    },
+    {
+      "file": "bad-meta-not-a-mapping.kg.yaml",
+      "description": "meta é uma lista, não um mapa",
+      "valid": false,
+      "codes": [
+        "form.type.top.meta"
+      ]
+    },
+    {
+      "file": "bad-meta-null.kg.yaml",
+      "description": "meta nulo",
+      "valid": false,
+      "codes": [
+        "form.type.top.meta"
+      ]
+    }
+  ]
+}

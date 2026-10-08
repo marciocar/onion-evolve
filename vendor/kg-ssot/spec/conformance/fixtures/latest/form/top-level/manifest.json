@@ -1,0 +1,80 @@
+{
+  "description": "O tipo das listas do topo e dos itens dentro delas.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-nodes-mapping.kg.yaml",
+      "description": "nodes é um mapa, não uma lista; a aresta fica sem nós",
+      "valid": false,
+      "codes": [
+        "form.type.top.nodes",
+        "integrity.dangling-from",
+        "integrity.dangling-to"
+      ]
+    },
+    {
+      "file": "bad-nodes-scalar.kg.yaml",
+      "description": "nodes é um número; a aresta fica sem nós",
+      "valid": false,
+      "codes": [
+        "form.type.top.nodes",
+        "integrity.dangling-from",
+        "integrity.dangling-to"
+      ]
+    },
+    {
+      "file": "bad-nodes-null.kg.yaml",
+      "description": "nodes nulo; a aresta fica sem nós",
+      "valid": false,
+      "codes": [
+        "form.type.top.nodes",
+        "integrity.dangling-from",
+        "integrity.dangling-to"
+      ]
+    },
+    {
+      "file": "bad-edges-mapping.kg.yaml",
+      "description": "edges é um mapa; os nós ficam de grau 0",
+      "valid": false,
+      "codes": [
+        "form.type.top.edges",
+        "integrity.orphan-node"
+      ]
+    },
+    {
+      "file": "bad-edges-null.kg.yaml",
+      "description": "edges nulo; os nós ficam de grau 0",
+      "valid": false,
+      "codes": [
+        "form.type.top.edges",
+        "integrity.orphan-node"
+      ]
+    },
+    {
+      "file": "bad-node-item-not-mapping.kg.yaml",
+      "description": "um item de nodes que é texto, não mapa",
+      "valid": false,
+      "codes": [
+        "form.type.node.item"
+      ]
+    },
+    {
+      "file": "bad-edge-item-not-mapping.kg.yaml",
+      "description": "um item de edges que é texto, não mapa",
+      "valid": false,
+      "codes": [
+        "form.type.edge.item"
+      ]
+    },
+    {
+      "file": "valid-empty-graph.kg.yaml",
+      "description": "o grafo vazio: nodes e edges como listas vazias. Válido, com aviso (Q_CONTRACT_EMPTY_GRAPH): o aviso pega o parse que falhou em silêncio",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.top.nodes"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "description": "Perfil YAML do contrato v1 (Q_CONTRACT_CONFORMANCE_LEVELS, selada no PR #13): YAML 1.2 core, chaves únicas, documento único, chave on proibida, datas como string entre aspas em SHOULD.",
+  "layer": "yaml",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-edge-on-key.kg.yaml",
+      "description": "aresta com a chave on: (em YAML 1.1 vira o booleano True); o contrato a proíbe",
+      "valid": false,
+      "codes": [
+        "yaml.forbidden-key-on"
+      ]
+    },
+    {
+      "file": "warn-date-unquoted.kg.yaml",
+      "description": "data sem aspas: em YAML 1.2 é string, mas um leitor YAML 1.1 a lê como data; SHOULD estar entre aspas",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "yaml.unquoted-date"
+      ]
+    },
+    {
+      "file": "valid-label-yes.kg.yaml",
+      "description": "label: yes é a string \"yes\" em YAML 1.2, não o booleano",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-duplicate-key-node.kg.yaml",
+      "description": "chave repetida no nó: o PyYAML fica com a última, um leitor JS dá erro",
+      "valid": false,
+      "codes": [
+        "parse.duplicate-key"
+      ]
+    },
+    {
+      "file": "bad-null-document-plus-graph.kg.yaml",
+      "description": "um documento nulo antes do grafo: são dois documentos",
+      "valid": false,
+      "codes": [
+        "parse.not-single-document"
+      ]
+    },
+    {
+      "file": "valid-label-sexagesimal.kg.yaml",
+      "description": "label: 1:30 é a string \"1:30\" em YAML 1.2; em YAML 1.1 vira o inteiro 90",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-merge-key-is-plain-key.kg.yaml",
+      "description": "<< é chave comum no YAML 1.2 core (não há merge); o nome não é slug, então alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.key"
+      ]
+    },
+    {
+      "file": "bad-key-collision-json.kg.yaml",
+      "description": "as chaves 1 e \"1\" são distintas em YAML, mas a mesma no modelo JSON que um leitor JS vê",
+      "valid": false,
+      "codes": [
+        "parse.duplicate-key"
+      ]
+    },
+    {
+      "file": "warn-unquoted-date-as-key.kg.yaml",
+      "description": "data sem aspas usada como chave também alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "yaml.unquoted-date"
+      ]
+    },
+    {
+      "file": "warn-unquoted-invalid-date.yaml",
+      "description": "2026-02-30 sem aspas é string no YAML 1.2 core: o leitor não quebra, alerta pelas aspas e, desde o v2, reprova pelo calendário. Extensão .yaml: há validador de repositório que lê .kg.yaml com o YAML 1.1 e o recusa",
+      "valid": false,
+      "codes": [
+        "form.pattern.meta.baseline"
+      ],
+      "warnings": [
+        "yaml.unquoted-date"
+      ]
+    }
+  ]
+}

@@ -34,6 +34,11 @@ on:
       # que a variavel declarada por um adapter existe de fato. Dava para quebrar uma
       # regra HARD sem o CI ver.
       - '.env.example'
+      # vendor/kg-ssot/ + .kg-ssot/ = o contrato do .kg.yaml vendorizado por pin e a linha de base do gate
+      # dele (2026-10-08). Sem estes paths, um PR que só troca a tag ou a base não roda o gate que eles
+      # alimentam — a mesma classe de path novo invisível ao CI que este bloco já pagou quatro vezes.
+      - 'vendor/kg-ssot/**'
+      - '.kg-ssot/**'
       # docs/ + CLAUDE.md são guardados pelas regras de SSOT (R9/R15/R16/R22:
       # contagens vivas, carimbo de frescor, links da co-evolução). Sem estes
       # paths, um PR docs-only deriva contagens sem o CI ver (observado no #254:
@@ -122,6 +127,18 @@ jobs:
           # no CI um runner sem jq passaria em verde sem validar nada. Exige jq aqui.
           command -v jq >/dev/null 2>&1 || { echo "ERRO: jq indisponível no runner — gate de design não pode rodar."; exit 1; }
           bash .claude/validation/lint-design-tokens.sh
+
+      - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
+        # O radar (kg-radar.sh) é o leitor de semântica e integridade; a FORMA do .kg.yaml é julgada pelo
+        # contrato v3 vendorizado por pin (tag contract-v3.0.0 do adotante dedicado ao KG-SSOT). Medido em
+        # 2026-10-08: o radar sozinho aceitava 55 casos da suíte que o contrato reprova. O vendor não se
+        # edita aqui (o check reprova qualquer byte alterado); mudança no contrato volta como sinal.
+        # Catraca POR GRAFO contra .kg-ssot/gate.json: grafo novo ou que passou a falhar no MUST reprova,
+        # e a dívida SHOULD só pode descer. rc 2 = entrada quebrada, nunca verde.
+        run: |
+          python3 -m pip install --quiet -r vendor/kg-ssot/tools/requirements.txt
+          python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
+          python3 -I vendor/kg-ssot/tools/kg_gate.py
 
       - name: Lembrete — checagens semânticas são locais
         run: |

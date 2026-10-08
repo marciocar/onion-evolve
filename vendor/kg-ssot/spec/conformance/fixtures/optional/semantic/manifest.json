@@ -1,0 +1,51 @@
+{
+  "description": "A camada semântica do radar (E3: T14, T15, T16), em optional/: o contrato ainda não a torna MUST, e o leitor de referência não a implementa. Esperado escrito a partir do comportamento documentado do kg-radar.sh: REFUTES sobre nó confirmed é contradição e reprova; SUPERSEDES sobre nó que segue valendo e decision done em DEV só alertam.",
+  "layer": "semantic",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-refutes-confirmed.kg.yaml",
+      "description": "REFUTES sobre um nó que segue confirmed: contradição (T15)",
+      "valid": false,
+      "codes": [
+        "semantic.contradiction"
+      ]
+    },
+    {
+      "file": "valid-refutes-refuted.kg.yaml",
+      "description": "REFUTES sobre um nó já refuted: reconciliado",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-refutes-superseded.kg.yaml",
+      "description": "REFUTES sobre um nó superseded: reconciliado",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-supersedes-unreconciled.kg.yaml",
+      "description": "SUPERSEDES sobre um nó que segue confirmed: o radar só alerta (Aufhebung por reconciliar, T16)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "semantic.supersedes-unreconciled"
+      ]
+    },
+    {
+      "file": "valid-supersedes-reconciled.kg.yaml",
+      "description": "SUPERSEDES com o alvo superseded: Aufhebung completa",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-decision-done-in-dev.kg.yaml",
+      "description": "decision done em plane DEV: o radar só alerta (pede verificação em PROD, T16)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "semantic.decision-done-dev"
+      ]
+    }
+  ]
+}

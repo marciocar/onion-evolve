@@ -1,0 +1,21 @@
+{
+  "description": "O gatilho de TRANSITIONS como referência ao evento, com o nome trigger (Q_CONTRACT_CONFORMANCE_LEVELS, selada no PR #13; a chave on fica proibida).",
+  "layer": "integrity",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-trigger-references-event.kg.yaml",
+      "description": "o evento só aparece como trigger e por isso não é órfão",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-dangling-trigger.kg.yaml",
+      "description": "trigger aponta para um evento que não existe",
+      "valid": false,
+      "codes": [
+        "integrity.dangling-trigger"
+      ]
+    }
+  ]
+}

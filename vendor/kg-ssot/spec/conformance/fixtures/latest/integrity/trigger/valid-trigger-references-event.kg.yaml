@@ -1,0 +1,31 @@
+meta:
+  schema_version: '1'
+  id: valid-trigger-references-event
+  layer: domain
+nodes:
+  - id: S_ABERTO
+    node_type: state
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    label: Estado sintético aberto.
+  - id: S_FECHADO
+    node_type: state
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    label: Estado sintético fechado.
+  - id: EVT_FECHAR
+    node_type: event
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    label: Evento sintético que fecha.
+edges:
+  - from: S_ABERTO
+    to: S_FECHADO
+    edge_type: TRANSITIONS
+    trigger: EVT_FECHAR

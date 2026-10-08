@@ -1,0 +1,4 @@
+meta:
+  schema_version: "1"
+  id: bad-yaml-syntax
+nodes: [

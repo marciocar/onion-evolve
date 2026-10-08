@@ -1,0 +1,16 @@
+{
+  "description": "Níveis MUST × SHOULD do contrato v1 (Q_CONTRACT_CONFORMANCE_LEVELS, selada no PR #13): nó PROD sem verified_at alerta, não reprova.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "warn-node-prod-without-verified-at.kg.yaml",
+      "description": "nó PROD sem verified_at: válido, com warning",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.verified_at"
+      ]
+    }
+  ]
+}

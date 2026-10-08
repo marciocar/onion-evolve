@@ -1,0 +1,57 @@
+{
+  "description": "Os sete campos obrigatórios do nó, um ausente por caso.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-node-missing-id.kg.yaml",
+      "description": "nó sem id; sem id ele não pode ser ponta de aresta, então fica de grau 0 e a aresta que o citava fica órfã",
+      "valid": false,
+      "codes": [
+        "form.required.node.id",
+        "integrity.orphan-node",
+        "integrity.dangling-from"
+      ]
+    },
+    {
+      "file": "bad-node-missing-node-type.kg.yaml",
+      "description": "nó sem node_type",
+      "valid": false,
+      "codes": [
+        "form.required.node.node_type"
+      ]
+    },
+    {
+      "file": "bad-node-missing-plane.kg.yaml",
+      "description": "nó sem plane",
+      "valid": false,
+      "codes": [
+        "form.required.node.plane"
+      ]
+    },
+    {
+      "file": "bad-node-missing-status.kg.yaml",
+      "description": "nó sem status",
+      "valid": false,
+      "codes": [
+        "form.required.node.status"
+      ]
+    },
+    {
+      "file": "bad-node-missing-impact.kg.yaml",
+      "description": "nó sem impact",
+      "valid": false,
+      "codes": [
+        "form.required.node.impact"
+      ]
+    },
+    {
+      "file": "bad-node-missing-confidence.kg.yaml",
+      "description": "nó sem confidence",
+      "valid": false,
+      "codes": [
+        "form.required.node.confidence"
+      ]
+    }
+  ]
+}

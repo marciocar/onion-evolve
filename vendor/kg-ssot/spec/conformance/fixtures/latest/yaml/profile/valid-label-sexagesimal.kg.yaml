@@ -1,0 +1,26 @@
+meta:
+  schema_version: '1'
+  id: valid-label-sexagesimal
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: 1:30
+  - id: EV_A
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    label: A evidência sintética que sustenta A.
+    provenance:
+      source: "medição sintética"
+      locator: "caso de conformidade"
+      method: "medição"
+edges:
+  - from: EV_A
+    to: Q_A
+    edge_type: SUPPORTS

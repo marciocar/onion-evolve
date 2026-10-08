@@ -1,0 +1,103 @@
+{
+  "description": "Campos obrigatórios e enum da aresta. Uma segunda aresta mantém os nós ligados, para o defeito ser um só.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-edge-missing-from.kg.yaml",
+      "description": "aresta sem from; a ponta ausente não aponta para nó nenhum",
+      "valid": false,
+      "codes": [
+        "form.required.edge.from",
+        "integrity.dangling-from"
+      ]
+    },
+    {
+      "file": "bad-edge-missing-to.kg.yaml",
+      "description": "aresta sem to; a ponta ausente não aponta para nó nenhum",
+      "valid": false,
+      "codes": [
+        "form.required.edge.to",
+        "integrity.dangling-to"
+      ]
+    },
+    {
+      "file": "bad-edge-missing-edge-type.kg.yaml",
+      "description": "aresta sem edge_type",
+      "valid": false,
+      "codes": [
+        "form.required.edge.edge_type"
+      ]
+    },
+    {
+      "file": "bad-edge-type-enum.kg.yaml",
+      "description": "edge_type fora do enum",
+      "valid": false,
+      "codes": [
+        "form.enum.edge.edge_type"
+      ]
+    },
+    {
+      "file": "valid-edge-with-label.kg.yaml",
+      "description": "aresta com label opcional",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-edge-label-integer.kg.yaml",
+      "description": "label da aresta como inteiro",
+      "valid": false,
+      "codes": [
+        "form.type.edge.label"
+      ]
+    },
+    {
+      "file": "bad-edge-from-pattern.kg.yaml",
+      "description": "from fora do padrão de id; um id inválido nunca é nó existente, então a ponta fica órfã",
+      "valid": false,
+      "codes": [
+        "form.pattern.edge.from",
+        "integrity.dangling-from"
+      ]
+    },
+    {
+      "file": "bad-edge-to-pattern.kg.yaml",
+      "description": "to fora do padrão de id; a ponta fica órfã",
+      "valid": false,
+      "codes": [
+        "form.pattern.edge.to",
+        "integrity.dangling-to"
+      ]
+    },
+    {
+      "file": "bad-edge-from-integer.kg.yaml",
+      "description": "from como inteiro; a ponta fica órfã",
+      "valid": false,
+      "codes": [
+        "form.type.edge.from",
+        "integrity.dangling-from"
+      ]
+    },
+    {
+      "file": "bad-edge-from-null.kg.yaml",
+      "description": "from nulo; a ponta fica órfã",
+      "valid": false,
+      "codes": [
+        "form.type.edge.from",
+        "integrity.dangling-from"
+      ]
+    },
+    {
+      "file": "valid-edge-every-type.kg.yaml",
+      "description": "uma aresta de cada edge_type de forma entre os mesmos dois nós; REFUTES e SUPERSEDES têm semântica própria (contradição, Aufhebung) e são testados na camada semântica",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-refutes-and-supersedes-reconciled.kg.yaml",
+      "description": "REFUTES e SUPERSEDES na forma, com os status refuted e superseded nos alvos: válido também na semântica, então todo leitor tem de aceitar",
+      "valid": true,
+      "codes": []
+    }
+  ]
+}
