@@ -22516,6 +22516,12 @@ run_zoho_adapter_selftests() {
   if grep -qF 'zoho-token.sh' "${ad}"; then
     record_pass "zoho-adapter: (n) o adapter aponta o helper de token com cache (emitir por chamada bloqueia o client)"
   else record_fail "zoho-adapter: (n)" "o adapter não cita zoho-token.sh — o reuso do token volta a ser conselho"; fi
+  # (o) createTask manda o DONO na criação, na forma aninhada (sinal de campo 2026-10-07: 16 tasks
+  #     nasceram "Unassigned User" porque a seção de criação não falava do campo).
+  local _s_ct; _s_ct="$(_zoho_sec 'createTask\\(input\\)')"
+  if grep -qF '"owners_and_work":{"owners":[{"zpuid":' <<< "${_s_ct}"; then
+    record_pass "zoho-adapter: (o) createTask manda owners_and_work aninhado NA CRIAÇÃO (task não nasce sem dono)"
+  else record_fail "zoho-adapter: (o)" "a seção createTask não mostra \`owners_and_work\` aninhado no POST — a task nasce Unassigned"; fi
 
   # (f) createSubtask usa o vínculo ANINHADO. A guarda cobra a FORMA, e a razão é a história deste
   # caso: em 2026-09-30 ele mudou DUAS vezes num dia. Primeiro cobrava "V2 + 2026-12-31", canonizando
