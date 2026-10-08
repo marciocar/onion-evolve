@@ -23,7 +23,8 @@ nota: >-
   nenhum id colhido (6 nós saíram da fila no mesmo PR em que nasceram, nunca estiveram na main). REGRA
   87 (PR que EDITA um .kg.yaml enxergou os confirmed dele) — confirmed vistos: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA, E_HOOK_PR_SEM_PASSADA_FALSO_POSITIVO, E_MAPA_SEM_MERGE_ONION_HOOKS, E_DOIS_LEITORES_DIVERGIAM, E_NARRATIVA_NO_ROTULO_VAZA_GABARITO, E_RADAR_CEGO_A_TIPO_TROCADO, E_CANAL_VIVO_ENTRE_SESSOES_USADO, E_MERGE_GATE_INERTE_NO_ADOTANTE, D_PAPEL_DUAS_DIMENSOES, E_PRECOMMIT_SELECAO_GROSSA, E_PR_FINALIZE_ATRITO_MEDIDO, E_TM_PERCENTUAL_IGNORA_STORY_POINTS, E_CONFLITO_DE_PROJECAO_GERADA, E_BRAIN_MCP_PEDIDO_DE_CAMPO, E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA, D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO, E_CONTRATOS_V2_V3_PEDEM_MIGRACAO. Sem Elenxo,
   declarado: registro de decisões já seladas pelo maestro. Pre-commit pulado por ordem do maestro;
-  validação = pr-finalize + CI.
+  validação = pr-finalize + CI. O nó Q_TASK_MANAGER_SDAAL_COMPLETO ganhou o vínculo com a projeção no
+  Linear (SAC-62 a SAC-65).
 ---
 
 # Resíduo — `chore/queue-kg-ssot-signals-triage`
