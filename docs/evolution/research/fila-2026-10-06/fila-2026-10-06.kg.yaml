@@ -290,6 +290,7 @@ nodes:
     verified_against: "leva de 2026-10-07/08 com até 6 PRs abertos: #956, #957 (2x), #959 e #960 entraram em CONFLICTING após merges vizinhos; os conflitos relatados nos rebases foram em testing-state.md, testing-inventory.md, backlog.md, kg-read-index.tsv e plugins/ regenerados; conflito de código só 1 (onion-research.js, #957 x #959). PR em CONFLICTING não dispara CI"
     trace: "ops/pr-finalize.sh"
     label: "com PRs em paralelo, cada merge deixa os outros em conflito nas projeções geradas que todo PR commita, e o PR em conflito fica sem CI"
+    narrative: "medição do SAC-67 em 2026-10-08, sandbox (clone --shared do core em 730b653d): dois PRs que tocam fontes DIFERENTES (um grafo da fila e a rule kg-grammar num; outro grafo e o kg-radar.sh no outro), cada um regenerando as projeções como o pr-finalize; o segundo, rebaseado sobre o primeiro, conflitou em 4 arquivos, TODOS projeção gerada e TODOS fora da lista do pr-finalize (plugins/onion e plugins/onion-engineering: provenance.json e README.md), e em 0 de fonte. A história confirma: os commits 'plugins regenerados depois do rebase sobre #959 e #960' e 'depois do rebase sobre a cura do Zoho' foram as rodadas à mão que o --rebase do motor recusava como conflito real. O mapa da federação (REGRA 38) tinha o defeito vizinho: o motor não o regenerava e o lint do commit o cobrou 3 vezes na leva."
   - id: Q_MERGE_DRIVER_PARA_PROJECAO_GERADA
     node_type: question
     layer: audit
@@ -297,8 +298,8 @@ nodes:
     status: open
     impact: 3
     confidence: 0.6
-    verified_against: "pedido do maestro 2026-10-08; medir antes quanto do conflito é só projeção"
-    label: "merge driver para as projeções geradas (no conflito, regenerar em vez de pedir resolução), para PRs paralelos não se invalidarem a cada merge; alternativas: não commitar a projeção no PR, ou fila de merge serial"
+    verified_against: "pedido do maestro 2026-10-08; medido antes (narrative de E_CONFLITO_DE_PROJECAO_GERADA); a resolução do conflito medido entrou pelo SAC-67 (pr-finalize --rebase remonta plugins/ das fontes mescladas, a lista do motor ganhou plugins/ e o mapa da federação), escolhida no lugar do merge driver por não exigir config em cada clone e no CI"
+    label: "o que resta depois do SAC-67: o PR em CONFLICTING ainda fica sem CI até alguém rodar o pr-finalize --rebase; falta o disparo (detectar o PR em conflito e rebasear sozinho), não a resolução"
   - id: E_BRAIN_MCP_PEDIDO_DE_CAMPO
     node_type: evidence
     layer: audit

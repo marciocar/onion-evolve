@@ -6327,6 +6327,46 @@ run_pre_push_selftests() {
     ( cd "${sb}/o" && git config user.email o@o && git config user.name o && sed -i 2s/.*/MAIN/ c.txt && git commit -qam main2 && git push -q origin main ) >/dev/null 2>&1
     g="$(_pf "${sb}" --rebase)"; _pfc "rebase limpo sobre main que mexe noutra linha → passa" 0 "${g}" "${sb}"
   fi
+  # ── SAC-67 (2026-10-08): conflito SÓ de projeção em plugins/ se resolve no --rebase; conflito de FONTE
+  # continua recusa. Medido antes: dois PRs que tocam fontes DIFERENTES conflitaram em 4 arquivos de
+  # plugins/ (provenance.json, README.md) e em 0 de fonte. Plugin de mentira: plugins/vx/README.md =
+  # s1.txt + s2.txt, montado por um assemble-plugin.sh que lê as fontes da árvore em que roda.
+  _plugsb() {  # <nome> → sandbox com plugins/vx na main, PR mexendo em s1.txt (linha adjacente à de s2)
+    sb="${d}/$1"; _sbmk "${sb}" || { record_fail "pr-finalize: sandbox $1" "não montou"; return 1; }
+    ( cd "${sb}/w" && git switch -q main \
+      && mkdir -p .claude/utils/marketplace/verticals plugins/vx \
+      && printf 'PLUGIN_NAME=vx\n' > .claude/utils/marketplace/verticals/vx.manifest.sh \
+      && printf '%s\n' '#!/bin/bash' 'mkdir -p "$3" && cat "$2/s1.txt" "$2/s2.txt" > "$3/README.md"' > .claude/utils/marketplace/assemble-plugin.sh \
+      && chmod +x .claude/utils/marketplace/assemble-plugin.sh \
+      && echo s1-base > s1.txt && echo s2-base > s2.txt && cat s1.txt s2.txt > plugins/vx/README.md \
+      && git add -A && git commit -qm plugbase && git push -q origin main \
+      && git switch -q feat/x && git reset -q --hard main \
+      && echo v1 > a.txt && sed -i 50s/.*/PR/ c.txt && echo s1-PR > s1.txt && cat s1.txt s2.txt > plugins/vx/README.md \
+      && printf -- '---\nreviewed_diff_sha256: pendente\nverdict: APROVADO\n---\n' > "${R}" && git add -A ) >/dev/null 2>&1
+  }
+  # (x1) a main mexe em s2.txt (outra FONTE): o README do plugin conflita, a fonte não → remonta e passa
+  if _plugsb plug1; then
+    g="$(_pf "${sb}" -m t1)"
+    git clone -q "${sb}/remote.git" "${sb}/o" 2>/dev/null
+    ( cd "${sb}/o" && git config user.email o@o && git config user.name o && echo s2-MAIN > s2.txt \
+      && cat s1.txt s2.txt > plugins/vx/README.md && git commit -qam main-s2 && git push -q origin main ) >/dev/null 2>&1
+    g="$(_pf "${sb}" --rebase)"
+    _rd="$(tr '\n' '|' < "${sb}/w/plugins/vx/README.md" 2>/dev/null)"
+    if [ "${g}" = 0 ] && [ "${_rd}" = "s1-PR|s2-MAIN|" ] && grep -q 'remontado das fontes mescladas' "${sb}/out"; then
+      record_pass "pr-finalize: SAC-67 (x1) conflito só de projeção em plugins/ → remontado das fontes mescladas (rc=0)"
+    else record_fail "pr-finalize: SAC-67 (x1) plugin em conflito" "rc=${g} README=${_rd}: $(tail -2 "${sb}/out" | tr '\n' ' ')"; fi
+  fi
+  # (x2) a main mexe na MESMA fonte (s1.txt): conflito REAL → recusa, rebase abortado, nada mudou
+  if _plugsb plug2; then
+    g="$(_pf "${sb}" -m t1)"; _h0="$(git -C "${sb}/w" rev-parse HEAD)"
+    git clone -q "${sb}/remote.git" "${sb}/o" 2>/dev/null
+    ( cd "${sb}/o" && git config user.email o@o && git config user.name o && echo s1-MAIN > s1.txt \
+      && cat s1.txt s2.txt > plugins/vx/README.md && git commit -qam main-s1 && git push -q origin main ) >/dev/null 2>&1
+    g="$(_pf "${sb}" --rebase)"
+    if [ "${g}" = 1 ] && grep -q 'conflito REAL em s1.txt' "${sb}/out" && [ "$(git -C "${sb}/w" rev-parse HEAD)" = "${_h0}" ]; then
+      record_pass "pr-finalize: SAC-67 (x2) conflito em FONTE continua recusa (rebase abortado, HEAD intacto)"
+    else record_fail "pr-finalize: SAC-67 (x2) conflito de fonte escondido" "rc=${g}: $(tail -2 "${sb}/out" | tr '\n' ' ')"; fi
+  fi
   # o hook julga o COMMIT EMPURRADO, não a árvore: commit com HARD, árvore limpa por cima
   if _new hookwt; then
     ( cd "${sb}/w" && printf 'v-v1\n' > .claude/validation/lint-rules.md && echo 1 > verdict && git add -A && git commit -qm bad && echo 0 > verdict ) >/dev/null 2>&1
