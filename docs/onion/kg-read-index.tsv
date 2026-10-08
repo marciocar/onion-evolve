@@ -534,6 +534,7 @@
 .github/workflows/onion-review.yml	Q_MUDEZ_DA_GUARDA_NAO_SE_IDENTIFICA	docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml
 .github/workflows/onion-review.yml	Q_POR_QUE_O_REVISOR_SEMANTICO_MORRE	docs/onion/graph/fios-abertos.kg.yaml
 .github/workflows/onion-validate.yml	E_GATE_DO_CONTRATO_NO_CI	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
+.kg-ssot/gate.json	E_CONTRATO_V4_ADOTADO	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 docs/INDEX.md	C_D7_18	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/INDEX.md	E_J_D7_18	docs/onion/graph/onion-evolution-2026-07.kg.yaml
 docs/INDEX.md	SY5_index_residual_drift	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml

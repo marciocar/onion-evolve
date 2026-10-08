@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**406 itens abertos** em 88 grafo(s) com aberto (de 114 no escopo) · 89 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**405 itens abertos** em 87 grafo(s) com aberto (de 113 no escopo) · 88 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -535,6 +535,15 @@
 |--:|---|---|---|
 | 15.0 | `Q_REVISOR_SEM_SALDO_DERRUBA_TODO_PR` | review-gate-saldo-2026-09 | enquanto a conta de API do CI estiver sem saldo, TODO PR deste repo mergeia por dispensa em vez de aprovacao — o gate semantico  |
 
+## contrato-kg-absorcao-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 14.4 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
+| 7.2 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
+| 6.4 | `Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH` | contrato-kg-absorcao-2026-10 | merge por rebase reescreve o SHA que a provenance caminho@commit cita, e nenhum gate acusa; cura selada: o pr-merge-verified exige |
+| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
+
 ## radar-E3-2026-10-03-r6 — 5 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -579,15 +588,6 @@
 |--:|---|---|---|
 | 12.8 | `O_N1_NAO_E_PADRAO` | forge-comando-framework-2026-09 | OBJEÇÃO SOBREVIVENTE (a ser absorvida no desenho, não removida): N=1 — uma instância não é padrão. Uma forja derivada só |
 | 7.5 | `Q_DESTINO_DIFERENCIAL_OU_LACUNA` | forge-comando-framework-2026-09 | HERDADA de Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART (grafo agent-command-composition-2026-09), cujo VEREDITO foi selado em  |
-
-## contrato-kg-absorcao-2026-10 — 4 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 12.6 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
-| 7.2 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
-| 6.4 | `Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH` | contrato-kg-absorcao-2026-10 | merge por rebase reescreve o SHA que a provenance caminho@commit cita, e nenhum gate acusa; cura selada: o pr-merge-verified exige |
-| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
 ## evolve-round-2026-10 — 1 item(ns)
 
@@ -724,12 +724,6 @@
 |--:|---|---|---|
 | 6.0 | `Q_COUNTABLE_CRITERIA` | graduated-automation-elenxo-2026-07 | Onda 3: criterios de promocao CONTAVEIS (N execucoes monitoradas sem anomalia => destrava) + rollback provado como pre-condicao de |
 | 6.0 | `Q_PREDICTIVE_ALERTS` | graduated-automation-elenxo-2026-07 | Onda 4: alertas PREDITIVOS — territorio novo (o core e reativo/CI-safe por design). anteceder a falha da automacao antes de ela  |
-
-## cafe-aroma-demo — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 5.6 | `Q_excecao_enterprise` | cafe-aroma-demo | Cliente enterprise com contrato de 3 anos merece exceção ao teto? Dúvida ABERTA — sobe para a Ana como pergunta explícita, n |
 
 ## constellation-dialogic-layer-2026-07 — 2 item(ns)
 
