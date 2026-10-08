@@ -16459,6 +16459,10 @@ run_role_cut_selftests() {
         #     MENÇÃO, não "a guarda MANDA rodar" — é a mesma classe que esta casa já mediu duas
         #     vezes (caso que cobra menção em vez de predicado). Separar os dois exige ler a
         #     POSIÇÃO da citação (mensagem de violação vs comentário), e isso é leva própria.
+        # `cc-update` entrou em 2026-10-08 pelo MESMO critério: re-mede a ESTRATÉGIA do core a
+        #     cada versão do Claude Code (radar E3 + selo da baseline do core), declara `Core-only`
+        #     na própria `description:`, e o `cc-delta-census.sh` o cita só no docstring. Quarto
+        #     comando pego na PRIMEIRA corrida depois de nascer (CI do PR #980).
         adopt|evolve|forge|dissect|forge-guard|create-*|federation-*|co-announce|co-deliver) continue ;;  # fábrica/federação
         nao|federation-) continue ;;                                            # falsos positivos do grep
       esac
