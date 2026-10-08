@@ -12148,9 +12148,20 @@ run_pr_merge_verified_selftests() {
 #!/usr/bin/env bash
 args="$*"
 case "$args" in
-  *"pr view"*headRefOid*)          echo "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"; exit 0 ;;
+  *"pr view"*"json mergeable"*)
+      # sequência de respostas (uma por chamada) — o auto-rebase lê de novo depois de cada rebase
+      if [ -n "${GH_MERGEABLE_SEQ:-}" ]; then
+        k=$(cat "${STUB_MK}" 2>/dev/null || echo 0); k=$((k+1)); echo "$k" > "${STUB_MK}"
+        v="$(printf '%s\n' ${GH_MERGEABLE_SEQ} | sed -n "${k}p")"
+        [ -n "$v" ] || v="$(printf '%s\n' ${GH_MERGEABLE_SEQ} | tail -1)"
+        echo "$v"
+      fi
+      exit 0 ;;
+  *"pr view"*headRefOid*)
+      if [ -n "${STUB_HEAD_FROM:-}" ]; then git -C "${STUB_HEAD_FROM}" rev-parse HEAD; else echo "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"; fi
+      exit 0 ;;
   *"pr view"*headRepositoryOwner*) echo "owner/repo"; exit 0 ;;
-  *"pr view"*headRefName*)         echo "feat/alguma-coisa"; exit 0 ;;
+  *"pr view"*headRefName*)         echo "${GH_HEAD_REF:-feat/alguma-coisa}"; exit 0 ;;
   *"pr view"*statusCheckRollup*)
       if [ -n "${GH_VERDICT_FAIL:-}" ]; then echo "FAILURE"; else echo "SUCCESS"; fi; exit 0 ;;
   *"pr view"*state,mergedAt*)
@@ -12166,6 +12177,7 @@ case "$args" in
       printf '%s' "$body" > "${STUB_COMMENT}"
       exit "${GH_COMMENT_RC:-0}" ;;
   *"api "*check-runs*)
+      [ -n "${GH_RUNS_EMPTY:-}" ] && exit 0
       if [ -n "${GH_CHECKS_API_500:-}" ]; then
         echo "gh: Server Error (HTTP 500)" >&2; exit 1
       fi
@@ -12416,7 +12428,61 @@ STUB0
     record_pass "pr-merge-verified: (v) --assert-ancestor com a ref fora da base ⇒ rc 3 nomeando a ref"
   else record_fail "pr-merge-verified: (v)" "rc=${_mv_rc} out=${_mv_out}"; fi
 
-  unset -f _mv _mvd _mvm
+  # ── (w)-(z) AUTO-REBASE de PR CONFLICTING (2026-10-08) ─────────────────────────────────────
+  # Medido: o GitHub não dispara CI em PR em conflito, e a espera ficava parada em "no checks
+  # reported" (#957 2x, #959, #960, #975). Sandbox: um repo com a branch do PR numa worktree que tem
+  # um `ops/pr-finalize.sh` de mentira — ele registra a chamada e, conforme PF_MODE, simula o rebase
+  # bom (commit novo, HEAD anda) ou a recusa de conflito de FONTE. O SUT só pode rebasear ali.
+  local r2="${d}/r2" w2="${d}/r2-wt"
+  ( mkdir -p "${r2}" && cd "${r2}" && git init -q -b main && git config user.email t@t && git config user.name t \
+    && echo a > a && git add a && git commit -qm base && git branch feat/alguma-coisa \
+    && git worktree add -q "${w2}" feat/alguma-coisa ) >/dev/null 2>&1
+  mkdir -p "${w2}/ops"
+  cat > "${w2}/ops/pr-finalize.sh" <<'PFSTUB'
+#!/usr/bin/env bash
+echo "$*" >> "${PF_LOG}"
+if [ "${PF_MODE:-ok}" = fail ]; then
+  echo "PR-FINALIZE: conflito REAL em src/x.sh — rebase abortado, nada mudou; resolva à mão" >&2; exit 1
+fi
+echo "r$(wc -l < "${PF_LOG}")" > r; git add r; git -c user.email=t@t -c user.name=t commit -qm rebase
+echo "PR-FINALIZE: enviado feat/alguma-coisa @ $(git rev-parse --short HEAD)"
+PFSTUB
+  _mva() { # $1=sequência de mergeable  $2=PF_MODE  $3=headRefName ; o SUT roda a partir do repo principal
+    echo 0 > "${d}/n"; echo 0 > "${d}/mk"; : > "${d}/pflog"; : > "${d}/margs"
+    _mv_out="$(cd "${r2}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MK="${d}/mk" GH_MERGEABLE_SEQ="$1" \
+               PF_MODE="$2" PF_LOG="${d}/pflog" GH_HEAD_REF="$3" STUB_HEAD_FROM="${w2}" STUB_MERGE_ARGS="${d}/margs" \
+               ONION_MERGE_POLL_SECS=0 ONION_MERGE_WAIT_SECS=5 \
+               GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" GH_MERGE_RC=0 GH_MERGE_OUT=merged \
+               bash "${_sut_a:-${sut}}" 999 2>&1)"; _mv_rc=$?
+  }
+  # (w) CONFLICTING só-de-projeção ⇒ rebase UMA vez na worktree da branch, as runs nascem, o merge segue
+  _mva "CONFLICTING MERGEABLE" ok feat/alguma-coisa
+  if [ "${_mv_rc}" -eq 0 ] && [ "$(grep -c -- '--rebase --push' "${d}/pflog")" -eq 1 ] \
+     && grep -q "auto-rebase 1/2" <<< "${_mv_out}" && grep -q "MERGED — provado pelo ESTADO" <<< "${_mv_out}"; then
+    record_pass "pr-merge-verified: (w) PR CONFLICTING ⇒ auto-rebase na worktree da branch e merge provado"
+  else record_fail "pr-merge-verified: (w)" "rc=${_mv_rc} pf=[$(cat "${d}/pflog")] out=${_mv_out}"; fi
+  # (w2) depois do rebase as runs do head novo NÃO nascem ⇒ para no prazo, dizendo isso (não "CI verde vazio")
+  _mv_out="$(export GH_RUNS_EMPTY=1; _mva "CONFLICTING MERGEABLE" ok feat/alguma-coisa; printf '%s' "${_mv_out}")"
+  if grep -q "não nasceram/terminaram" <<< "${_mv_out}" && [ ! -s "${d}/margs" ]; then
+    record_pass "pr-merge-verified: (w2) runs do head novo não nascem ⇒ para no prazo, sem merge"
+  else record_fail "pr-merge-verified: (w2) espera das runs" "margs=[$(cat "${d}/margs")] out=${_mv_out}"; fi
+  # (x) conflito de FONTE ⇒ para nomeando o arquivo, e NÃO mergeia
+  _mva "CONFLICTING MERGEABLE" fail feat/alguma-coisa
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "conflito REAL em src/x.sh" <<< "${_mv_out}" && [ ! -s "${d}/margs" ]; then
+    record_pass "pr-merge-verified: (x) conflito de fonte ⇒ para nomeando o arquivo, sem merge"
+  else record_fail "pr-merge-verified: (x) conflito real escondido" "rc=${_mv_rc} margs=[$(cat "${d}/margs")] out=${_mv_out}"; fi
+  # (y) branch fora de qualquer worktree ⇒ não rebaseia; diz o comando exato e para (nunca espera calado)
+  _mva "CONFLICTING MERGEABLE" ok feat/outra-branch
+  if [ "${_mv_rc}" -ne 0 ] && grep -qF "bash ops/pr-finalize.sh --rebase --push" <<< "${_mv_out}" && [ ! -s "${d}/pflog" ]; then
+    record_pass "pr-merge-verified: (y) sem worktree local ⇒ comando nomeado, nenhum rebase às cegas"
+  else record_fail "pr-merge-verified: (y)" "rc=${_mv_rc} pf=[$(cat "${d}/pflog")] out=${_mv_out}"; fi
+  # (z) conflito que VOLTA ⇒ no máximo 2 rebases, depois para (nada de laço)
+  _mva "CONFLICTING CONFLICTING CONFLICTING MERGEABLE" ok feat/alguma-coisa
+  if [ "${_mv_rc}" -ne 0 ] && grep -q "depois de 2 rebase" <<< "${_mv_out}" && [ "$(grep -c -- '--rebase' "${d}/pflog")" -eq 2 ]; then
+    record_pass "pr-merge-verified: (z) conflito recorrente ⇒ limite de 2 rebases, sem laço"
+  else record_fail "pr-merge-verified: (z) laço/limite" "rc=${_mv_rc} pf=[$(cat "${d}/pflog")] out=${_mv_out}"; fi
+
+  unset -f _mv _mvd _mvm _mva
 }
 
 # ═══ REGRA 90 — paridade papel: o SCRIPT aceita, a PROSA menciona ═════════════════════════

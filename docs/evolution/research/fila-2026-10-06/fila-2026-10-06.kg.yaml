@@ -295,11 +295,13 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 3
     confidence: 0.6
-    verified_against: "pedido do maestro 2026-10-08; medido antes (narrative de E_CONFLITO_DE_PROJECAO_GERADA); a resolução do conflito medido entrou pelo SAC-67 (pr-finalize --rebase remonta plugins/ das fontes mescladas, a lista do motor ganhou plugins/ e o mapa da federação), escolhida no lugar do merge driver por não exigir config em cada clone e no CI"
-    label: "o que resta depois do SAC-67: o PR em CONFLICTING ainda fica sem CI até alguém rodar o pr-finalize --rebase; falta o disparo (detectar o PR em conflito e rebasear sozinho), não a resolução"
+    verified_at: "2026-10-08"
+    verified_against: "pedido do maestro 2026-10-08; a resolução entrou pelo SAC-67 (pr-finalize --rebase remonta plugins/ e regenera projeções, recusa conflito de fonte) e o disparo entrou em fix/merge-verified-auto-rebase: o pr-merge-verified.sh, ao ver o PR CONFLICTING, roda o pr-finalize --rebase --push na worktree local da branch (máx. 2), para nomeando o arquivo em conflito de fonte, diz o comando quando não há worktree, e espera as runs do head novo nascerem; bancada pr_merge_verified casos (w)(w2)(x)(y)(z), 5 mutantes morderam"
+    label: "PR em CONFLICTING por projeção gerada é rebaseado sozinho pelo caminho de merge verificado, e as runs do head novo têm de nascer antes do merge"
+    narrative: "Decisão do maestro em 2026-10-08, depois da avaliação das três opções. Opção 1 (ponte de processo): não abrir PR de registro em paralelo a PR de execução aberto. Opção 2 (este fechamento): o disparo automático no pr-merge-verified. Opção 3 (estrutural: parar de commitar projeção no PR e regenerar depois do merge, o que mexe nas REGRAS 62 e 81) fica com GATILHO: reabrir a decisão de não commitar projeção no PR se, depois do auto-rebase, ainda houver PR travado por projeção. Teto: o auto-rebase só age quando a branch do PR está numa worktree deste repo; PR de fork ou de outra máquina recebe só o comando a rodar."
   - id: E_BRAIN_MCP_PEDIDO_DE_CAMPO
     node_type: evidence
     layer: audit
