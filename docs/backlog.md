@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**393 itens abertos** em 81 grafo(s) com aberto (de 107 no escopo) · 82 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**395 itens abertos** em 82 grafo(s) com aberto (de 108 no escopo) · 83 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -722,6 +722,13 @@
 |--:|---|---|---|
 | 5.4 | `Q_MERGE_VERIFICADO_EM_REPO_SEM_CI` | guard-pre-push-2026-10 | LACUNA DO CAMINHO VERIFICADO: ele fecha PR com CI vivo e, pelo escape --ci-inoperante, com CI MORTO (rajada de startup_failure). R |
 | 4.2 | `Q_BANCADA_FAIXAS_POR_TEMPO_MEDIDO` | guard-pre-push-2026-10 | REVER (nota do maestro, 2026-10-05: "precisamos rever isso em algum momento"). Nasceu no CI DESTE PR: a faixa 4 da bancada estouro |
+
+## kg-id-valid-from-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 5.1 | `C_TETO_PERFIL_YAML_E_DO_CONTRATO` | kg-id-valid-from-2026-10 | TETO: politica de extensoes e MUST x SHOULD de verified_at em PROD ficaram FORA de proposito — decisao do contrato formal do .kg |
+| 3.2 | `C_TETO_DATAS_ISO_SEM_ASPAS` | kg-id-valid-from-2026-10 | TETO: valid_from: 2026-10-01 sem aspas e lido como DATA (timestamp YAML 1.1) por um leitor tipado, nao como string — 88 ocorrenc |
 
 ## door-role-parity-2026-09 — 2 item(ns)
 
