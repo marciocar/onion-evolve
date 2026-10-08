@@ -14,7 +14,12 @@
 # artefato: um caminho só, que falha fechado.
 #
 # Uso:
-#   bash ops/pr-finalize.sh [--rebase] [--push] [-m "<assunto do commit de projeções>"]
+#   bash ops/pr-finalize.sh [--rebase] [--push] [--check] [-m "<assunto do commit de projeções>"]
+#
+#   --check   faz o pré-voo inteiro numa worktree DESCARTÁVEL e diz o que faria — projeções que
+#             mudariam, o carimbo do resíduo (ou a recusa), as violações HARD do commit — sem escrever
+#             nada no repo: nem árvore, nem índice, nem resíduo, nem ref, nem push. Saída 0 = a rodada
+#             real passaria; 1 = recusaria, com o motivo.
 #
 #   --rebase  traz a branch para cima da origin/main antes de tudo. Conflito em PROJEÇÃO GERADA é
 #             resolvido pela versão do commit e regenerado logo depois; conflito em qualquer outro
@@ -26,7 +31,14 @@
 #   · trabalha sobre o que JÁ ESTÁ STAGEADO: o conteúdo do PR é decisão de quem chama; este script só
 #     acrescenta as projeções geradas e o carimbo do resíduo. Nunca faz `git add -A`.
 #   · os commits que ele cria respeitam os hooks (sem --no-verify), salvo ONION_FINALIZE_CHECKPOINT=1,
-#     que é checkpoint DECLARADO — nesse caso o gate final é o CI.
+#     que é checkpoint DECLARADO — nesse caso o gate final é o CI. EXCEÇÃO (2026-10-08, SAC-66): o commit
+#     que carrega SÓ projeção gerada e o resíduo deste PR sai sem o hook. O hook rodaria o lint inteiro
+#     sobre a árvore, e o passo 3 abaixo roda o MESMO lint sobre o MESMO commit, no ambiente do CI: eram
+#     duas passadas por rodada (medido na leva de 2026-10-07/08). O commit que traz conteúdo do PR segue
+#     pelo hook. Não é fail-open: nada é enviado sem o lint do commit dar 0 HARD.
+#   · O CARIMBO SÓ FICA EM RODADA QUE TERMINA (2026-10-08, SAC-66): uma rodada que falha devolve o resíduo
+#     ao estado em que o encontrou (arquivo e índice). Antes, a falha deixava o resíduo carimbado, a rodada
+#     seguinte recusava "o código mudou depois da revisão", e a limpeza era à mão (3 vezes num dia).
 #   · exit 0 só com: lint em "Violações HARD : 0" literal (rc lido) julgado sobre o COMMIT (worktree destacada
 #     do HEAD, com o env do CI — o mesmo que o pre-push e o runner veem), resíduo ✅, painel estável.
 #     Qualquer outra coisa = exit 1, nada enviado (commits locais já feitos FICAM, e a mensagem diz).
@@ -39,10 +51,11 @@
 set -uo pipefail
 
 die() { echo "PR-FINALIZE: $*" >&2; exit 1; }
-PUSH=0; REBASE=0; SUBJ="docs: projeções geradas regeneradas"
+PUSH=0; REBASE=0; CHECK=0; SUBJ="docs: projeções geradas regeneradas"
 while [ $# -gt 0 ]; do
   case "$1" in
     --push) PUSH=1 ;;
+    --check) CHECK=1 ;;
     --rebase) REBASE=1 ;;
     -m) shift; SUBJ="${1:?-m exige assunto}" ;;
     *) die "argumento desconhecido: $1" ;;
@@ -50,6 +63,7 @@ while [ $# -gt 0 ]; do
   shift
 done
 
+[ "${CHECK}" = 1 ] && { [ "${PUSH}" = 1 ] || [ "${REBASE}" = 1 ]; } && die "--check não escreve nada: não combina com --push nem --rebase"
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null)" || die "fora de um repositório git"
 cd "${ROOT}" || die "não entrei em ${ROOT}"
 BR="$(git branch --show-current)"
@@ -90,6 +104,32 @@ _field() {  # lê o campo como a guarda lê (só o frontmatter, sem aspas), e se
     | sed -n "s/^$1:[[:space:]]*//p" | head -1 | tr -d '"' | sed 's/[[:space:]]*$//'
 }
 
+# ── LIMPEZA ÚNICA E O CARIMBO TRANSACIONAL (SAC-66, 2026-10-08) ─────────────────────────────
+# Um trap só: antes havia um `trap … EXIT` no passo 3, e qualquer outro trap o sobrescreveria em silêncio.
+_WTS=(); _DIRS=(); _DONE=0; _RES_SNAP=""; _RES_IDX=""; _RES_HAD_IDX=0
+_snap_res() {  # o estado do resíduo ANTES de a rodada mexer nele: arquivo e entrada do índice
+  [ -f "${ROOT}/${RES}" ] || return 0
+  _RES_SNAP="$(mktemp)"; _DIRS+=("${_RES_SNAP}")
+  cp "${ROOT}/${RES}" "${_RES_SNAP}"
+  if _RES_IDX="$(git -C "${ROOT}" rev-parse -q --verify ":${RES}" 2>/dev/null)"; then _RES_HAD_IDX=1; else _RES_IDX=""; fi
+}
+_restore_res() {  # rodada que NÃO terminou não deixa carimbo: devolve arquivo e índice como estavam
+  [ "${_DONE}" = 1 ] && return 0
+  [ -n "${_RES_SNAP}" ] && [ -f "${_RES_SNAP}" ] || return 0
+  local cur; cur="$(git -C "${ROOT}" rev-parse -q --verify ":${RES}" 2>/dev/null || true)"
+  if cmp -s "${_RES_SNAP}" "${ROOT}/${RES}" && [ "${cur}" = "${_RES_IDX}" ]; then return 0; fi
+  cp "${_RES_SNAP}" "${ROOT}/${RES}"
+  if [ "${_RES_HAD_IDX}" = 1 ]; then git -C "${ROOT}" update-index --cacheinfo "100644,${_RES_IDX},${RES}"
+  else git -C "${ROOT}" reset -q -- "${RES}" >/dev/null 2>&1 || true; fi
+  echo "PR-FINALIZE: a rodada não terminou — o resíduo voltou ao estado em que foi encontrado (o carimbo só fica em rodada que termina)" >&2
+}
+_cleanup() {
+  _restore_res
+  local w; for w in "${_WTS[@]}"; do git -C "${ROOT}" worktree remove --force "${w}" >/dev/null 2>&1; done
+  local x; for x in "${_DIRS[@]}"; do rm -rf "${x}"; done
+}
+trap _cleanup EXIT
+
 if [ "${REBASE}" = 1 ]; then
   # o --autostash devolveria o conteúdo stageado FORA do índice, e ele sumiria do commit em silêncio
   git diff --cached --quiet || die "--rebase exige índice limpo: commite o conteúdo do PR antes"
@@ -115,11 +155,39 @@ if [ "${REBASE}" = 1 ]; then
   echo "PR-FINALIZE: rebaseado sobre origin/main @ $(git rev-parse --short origin/main)"
 fi
 
+_only_generated() {  # o índice só traz projeção gerada e o resíduo deste PR?
+  local f
+  while IFS= read -r f; do
+    [ -n "${f}" ] || continue
+    [ "${f}" = "${RES}" ] && continue
+    case " ${GENERATED} " in *" ${f} "*) ;; *) return 1 ;; esac
+  done < <(git diff --cached --name-only)
+  return 0
+}
+
 _commit() {  # $1 = assunto; commita SÓ se há algo stageado
   git diff --cached --quiet && return 0
-  local args=(-q "${VERIFY[@]}" -m "$1")
+  local v=("${VERIFY[@]}") why=""
+  # SÓ projeção + resíduo: o hook seria a 2ª passada do mesmo lint que o passo 3 faz sobre ESTE commit,
+  # no ambiente do CI, antes de qualquer envio. Conteúdo do PR no índice → o hook roda, como sempre.
+  if [ "${#v[@]}" = 0 ] && _only_generated; then
+    v=(--no-verify); why=" — só projeção e resíduo: o lint do commit (passo 3) é o gate, uma passada em vez de duas"
+  fi
+  local args=(-q "${v[@]}" -m "$1")
   [ -n "${TRAILER}" ] && args+=(-m "${TRAILER}")
-  git commit "${args[@]}" || die "commit recusado ('$1') — o gate local reprovou; corrija e rode de novo"
+  local log hf; log="$(mktemp)"; hf="$(mktemp)"; _DIRS+=("${log}" "${hf}")
+  if ! ONION_LINT_HARD_FILE="${hf}" git commit "${args[@]}" > "${log}" 2>&1; then
+    cat "${log}" >&2
+    # o QUE reprovou, por último (SAC-66): antes saía só "o gate local reprovou", e saber a regra custava
+    # rodar o lint inteiro de novo
+    echo "PR-FINALIZE: o que reprovou o commit:" >&2
+    if [ -s "${hf}" ]; then sed 's/^/  /' "${hf}" >&2
+    else grep -E 'VIOLATION|❌|✗|ABORTOU|MORREU' "${log}" | tail -15 | sed 's/^/  /' >&2; fi
+    die "commit recusado ('$1') — o gate local reprovou; corrija e rode de novo"
+  fi
+  cat "${log}"
+  [ -n "${why}" ] && echo "PR-FINALIZE: commit '$1' sem o hook${why}"
+  return 0
 }
 
 _regen() {  # regenera TODA projeção gerada com catraca no lint e stageia só elas
@@ -198,7 +266,44 @@ if [ "${ONION_FINALIZE_CHECKPOINT:-0}" = 1 ] && [ "${ONION_FINALIZE_SKIP_PREFLIG
   echo "PR-FINALIZE: pré-voo verde ($(grep -oE 'Passaram : [0-9]+' <<< "${_pf_out}" | tail -1))"
 fi
 
+_lint_in() {  # <worktree com o commit a julgar> <arquivo de HARD> → _rc e _hard; o env do CI, como o runner
+  _lint="$(cd "$1" && _ci env LC_ALL=C ONION_LINT_HARD_FILE="$2" bash .claude/validation/lint-artifacts.sh 2>&1)"; _rc=$?
+  _hard="$(grep -oE 'Violações HARD : [0-9]+' <<< "${_lint}" | grep -oE '[0-9]+$' | tail -1)"
+  [ "${_rc}" = 0 ] && [ "${_hard}" = 0 ]
+}
+
+# ── --check: a rodada inteira numa worktree DESCARTÁVEL, montada do ÍNDICE (SAC-66, 2026-10-08) ──────
+# O que se quer saber antes de escrever: o que o regen mudaria, se o resíduo carimba ou é recusado, e se o
+# commit resultante passa no lint. Tudo isso roda na cópia; o repo vivo (árvore, índice, resíduo, refs)
+# não é tocado. Ficam só objetos soltos no banco do git, que o gc recolhe — declarado.
+if [ "${CHECK}" = 1 ]; then
+  _ck="$(mktemp -d)"; _DIRS+=("${_ck}")
+  _t0="$(git write-tree)" || die "--check: não li o índice como árvore"
+  _c0="$(git commit-tree "${_t0}" -p HEAD -m "pr-finalize --check")" || die "--check: não montei o índice como commit"
+  git worktree add -q --detach "${_ck}/wt" "${_c0}" >/dev/null 2>&1 || die "--check: não montei a worktree descartável"
+  _WTS+=("${_ck}/wt")
+  _ckrc=0
+  ( cd "${_ck}/wt" && ROOT="${_ck}/wt" && _regen && _restamp ) > "${_ck}/out" 2>&1 || _ckrc=$?
+  echo "PR-FINALIZE --check: o que a rodada faria (nada foi escrito no repo)"
+  _proj="$(git -C "${_ck}/wt" diff --cached --name-only -- ${GENERATED} | tr '\n' ' ')"
+  echo "  projeções que o regen mudaria: ${_proj:-nenhuma}"
+  if [ "${_ckrc}" != 0 ]; then
+    echo "  resíduo: a rodada RECUSARIA —"; grep 'PR-FINALIZE:' "${_ck}/out" | tail -3 | sed 's/^/    /'
+    exit 1
+  fi
+  if git -C "${_ck}/wt" diff --cached --quiet -- "${RES}"; then echo "  resíduo: já casa, nada a carimbar"
+  else echo "  resíduo: carimbaria —"; git -C "${_ck}/wt" diff --cached -- "${RES}" | grep -E '^\+reviewed_' | sed 's/^+/    /'; fi
+  git -C "${_ck}/wt" -c user.name=pr-finalize -c user.email=check@pr-finalize commit -q --no-verify -m "pr-finalize --check" >/dev/null 2>&1 || true
+  if _lint_in "${_ck}/wt" "${_ck}/hard.txt"; then
+    echo "  lint do commit resultante: 0 HARD — a rodada real passaria"; exit 0
+  fi
+  echo "  lint do commit resultante: rc=${_rc}, HARD=${_hard:-?} — a rodada real recusaria:"
+  [ -s "${_ck}/hard.txt" ] && sed 's/^/    /' "${_ck}/hard.txt"
+  exit 1
+fi
+
 # 1. conteúdo stageado + projeções + resíduo carimbado sobre esse mesmo índice → UM commit
+_snap_res
 _regen
 _restamp
 _commit "${SUBJ}"
@@ -212,15 +317,15 @@ for _i in 1 2 3; do
 done
 # 3. o veredito sobre o COMMIT, não a árvore (bloqueador B2): worktree destacada do HEAD, env do CI
 git diff --cached --quiet || die "sobrou conteúdo stageado fora do commit — nada enviado"
-_tmp="$(mktemp -d)"; trap 'git worktree remove --force "${_tmp}/wt" >/dev/null 2>&1; rm -rf "${_tmp}"' EXIT
+_tmp="$(mktemp -d)"; _DIRS+=("${_tmp}")
 git worktree add -q --detach "${_tmp}/wt" HEAD || die "não montei o HEAD para julgar"
-_lint="$(cd "${_tmp}/wt" && _ci env LC_ALL=C ONION_LINT_HARD_FILE="${_tmp}/hard.txt" bash .claude/validation/lint-artifacts.sh 2>&1)"; _rc=$?
-_hard="$(grep -oE 'Violações HARD : [0-9]+' <<< "${_lint}" | grep -oE '[0-9]+$' | tail -1)"
-if ! { [ "${_rc}" = 0 ] && [ "${_hard}" = 0 ]; }; then
+_WTS+=("${_tmp}/wt")
+if ! _lint_in "${_tmp}/wt" "${_tmp}/hard.txt"; then
   # as HARD, nomeadas (2026-10-07): antes o motor só dizia "rode o lint", e cada reprovação custava um lint inteiro
   if [ -s "${_tmp}/hard.txt" ]; then echo "PR-FINALIZE: as violações HARD do commit:" >&2; sed 's/^/  /' "${_tmp}/hard.txt" >&2; fi
-  die "lint do COMMIT rc=${_rc}, HARD=${_hard:-?} — nada enviado (os commits locais ficam)."
+  die "lint do COMMIT rc=${_rc}, HARD=${_hard:-?} — nada enviado (os commits locais ficam; o resíduo volta como estava)."
 fi
+_DONE=1   # daqui em diante o carimbo é legítimo: o commit que o carrega passou no lint
 # marcador para o pre-push não relintar o MESMO commit (maior M6: ~11 min por fechamento com lint duplicado)
 printf '%s\n' "$(git rev-parse HEAD)" > "$(git rev-parse --git-common-dir)/onion-prefinalize-ok"
 echo "PR-FINALIZE: ${BR} pronto — 0 HARD, resíduo casando, projeções estáveis."

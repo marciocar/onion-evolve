@@ -120,8 +120,8 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_against: "ops/pr-finalize.sh; cura aprovada pelo maestro 2026-10-07 (4 achados de E_PR_FINALIZE_ATRITO_MEDIDO)"
-    label: "pr-finalize: carimbar só depois de tudo passar, commit de projeções sem religar o pre-commit quando o pré-voo passou, imprimir as violações HARD ao reprovar, modo --check sem escrita, registrar etapa e rc com trap, catracas estáticas no checkpoint, rebase com índice sujo"
+    verified_against: "ops/pr-finalize.sh; cura aprovada pelo maestro 2026-10-07 (4 achados de E_PR_FINALIZE_ATRITO_MEDIDO). EXECUÇÃO 2026-10-08 (SAC-66, branch fix/pr-finalize-pipeline): os 4 atritos curados, com 15 casos novos na família pre_push e 5 mutantes que reprovam (sem restauro do resíduo: 3 casos; hook sempre: 1; hook nunca: 4; sem o resumo final: 1; --check caindo no modo real: 2). A fila está no teto de 30, por isso a evidência da execução mora aqui e não num nó novo"
+    label: "pr-finalize: os 4 atritos de E_PR_FINALIZE_ATRITO_MEDIDO estão curados (carimbo transacional, commit só de projeção sem o hook, violação nomeada no fim, --check sem escrita); resta registrar a etapa e o rc da falha, catracas estáticas no checkpoint e o rebase com índice sujo"
   - id: Q_MAPA_NOMEAR_MERGE_ONION_HOOKS
     node_type: question
     layer: audit

@@ -6325,6 +6325,81 @@ run_pre_push_selftests() {
     if [ "${rc}" = 1 ]; then record_pass "pre-push: commit com HARD e árvore limpa → RECUSA (julga o commit)"
     else record_fail "pre-push: julgou a árvore" "rc=${rc}"; fi
   fi
+
+  # ── SAC-66 (2026-10-08): os quatro atritos medidos na leva de 2026-10-07/08 ─────────────────────
+  # Hook de commit REAL no sandbox (core.hooksPath fora da árvore): conta as chamadas e reprova se
+  # houver ${s}/hookfail. Ao reprovar, escreve a violação no ONION_LINT_HARD_FILE que o motor passa.
+  _hk() {  # <dir> → instala o hook contador no sandbox
+    mkdir -p "$1/hooks"
+    printf '%s\n' '#!/bin/bash' "echo x >> '$1/hooklog'" \
+      "if [ -f '$1/hookfail' ]; then echo 'VIOLATION: x: REGRA 99 (Teste do motor)'; [ -n \"\${ONION_LINT_HARD_FILE:-}\" ] && echo 'VIOLATION: x: REGRA 99 (Teste do motor)' > \"\${ONION_LINT_HARD_FILE}\"; echo '❌ Commit bloqueado'; exit 1; fi" \
+      'exit 0' > "$1/hooks/pre-commit"
+    chmod +x "$1/hooks/pre-commit"; git -C "$1/w" config core.hooksPath "$1/hooks"
+  }
+  _pfn() {  # <dir> [args...] → rc do motor SEM checkpoint (o hook vale)
+    local s="$1" r=0; shift
+    (cd "${s}/w" && env -u ONION_FINALIZE_CHECKPOINT bash "${pf}" "$@" > "${s}/out" 2>&1) || r=$?
+    printf '%s' "${r}"
+  }
+  _hits() { [ -f "$1/hooklog" ] && wc -l < "$1/hooklog" | tr -d ' ' || echo 0; }
+  _respend() {  # o resíduo está 'pendente' no arquivo E no índice, sem hash de código?
+    grep -qx 'reviewed_diff_sha256: pendente' "$1/w/${R}" && ! grep -q '^reviewed_code_sha256:' "$1/w/${R}" \
+      && git -C "$1/w" show ":${R}" | grep -qx 'reviewed_diff_sha256: pendente'
+  }
+  # (2) commit SÓ de projeção não religa o hook — o lint do commit no passo 3 é a passada única
+  if _new sac-proj; then
+    _hk "${sb}"
+    ( cd "${sb}/w" && git commit -q --no-verify -m conteudo -- a.txt c.txt ) >/dev/null 2>&1
+    g="$(_pfn "${sb}")"; _pfc "SAC-66 (2): commit só de projeção e resíduo" 0 "${g}" "${sb}"
+    if [ "$(_hits "${sb}")" = 0 ] && grep -q 'sem o hook' "${sb}/out"; then
+      record_pass "pr-finalize: SAC-66 (2) commit só de projeção NÃO religa o hook (0 chamadas, declarado na saída)"
+    else record_fail "pr-finalize: SAC-66 (2) religou o hook" "chamadas=$(_hits "${sb}"): $(tail -2 "${sb}/out" | tr '\n' ' ')"; fi
+  fi
+  # (2, polaridade) conteúdo do PR no índice → o hook RODA, como sempre
+  if _new sac-conteudo; then
+    _hk "${sb}"
+    g="$(_pfn "${sb}")"; _pfc "SAC-66 (2) polaridade: conteúdo no índice" 0 "${g}" "${sb}"
+    if [ "$(_hits "${sb}")" -ge 1 ]; then record_pass "pr-finalize: SAC-66 (2) conteúdo do PR no índice → o hook roda ($(_hits "${sb}") chamada(s))"
+    else record_fail "pr-finalize: SAC-66 (2) pulou o hook com conteúdo" "0 chamadas — fail-open"; fi
+  fi
+  # (3) e (1) o hook reprova: o motor NOMEIA a violação por último, e o resíduo volta a 'pendente'
+  if _new sac-reprova; then
+    _hk "${sb}"; : > "${sb}/hookfail"
+    g="$(_pfn "${sb}")"; _pfc "SAC-66 (3): hook reprova o commit" 1 "${g}" "${sb}"
+    if grep -A1 'PR-FINALIZE: o que reprovou o commit:' "${sb}/out" | grep -q 'REGRA 99'; then
+      record_pass "pr-finalize: SAC-66 (3) a violação do hook sai NOMEADA no fim da saída"
+    else record_fail "pr-finalize: SAC-66 (3) violação não nomeada" "$(tail -3 "${sb}/out" | tr '\n' ' ')"; fi
+    if _respend "${sb}"; then record_pass "pr-finalize: SAC-66 (1) commit recusado → resíduo volta a 'pendente' (arquivo e índice)"
+    else record_fail "pr-finalize: SAC-66 (1) carimbo ficou após o commit recusado" "$(grep '^reviewed_' "${sb}/w/${R}" | tr '\n' ' ')"; fi
+  fi
+  # (1) o lint do COMMIT reprova DEPOIS de o commit com o carimbo existir: o resíduo volta a 'pendente'
+  if _new sac-lint; then
+    ( cd "${sb}/w" && echo 1 > verdict && git add verdict ) >/dev/null 2>&1
+    g="$(_pf "${sb}")"; _pfc "SAC-66 (1): lint do commit reprova" 1 "${g}" "${sb}"
+    if _respend "${sb}"; then record_pass "pr-finalize: SAC-66 (1) lint do commit reprova → resíduo volta a 'pendente' (arquivo e índice)"
+    else record_fail "pr-finalize: SAC-66 (1) carimbo ficou após a falha" "$(grep '^reviewed_' "${sb}/w/${R}" | tr '\n' ' ')"; fi
+    # e a rodada seguinte, sem ninguém tocar no resíduo, carimba de novo em vez de recusar "o código mudou"
+    ( cd "${sb}/w" && echo 0 > verdict && git add verdict ) >/dev/null 2>&1
+    g="$(_pf "${sb}")"; _pfc "SAC-66 (1): a rodada seguinte, com a cura, passa sem limpeza à mão" 0 "${g}" "${sb}"
+  fi
+  # (4) --check não escreve NADA: árvore, índice, HEAD, refs e resíduo idênticos antes e depois
+  _st() { ( cd "$1/w" && git status --porcelain && git write-tree && git rev-parse HEAD && git for-each-ref && sha256sum "${R}" ) 2>&1; }
+  if _new sac-check; then
+    local _a _b; _a="$(_st "${sb}")"
+    g="$(_pfn "${sb}" --check)"; _pfc "SAC-66 (4): --check com a rodada que passaria" 0 "${g}" "${sb}"
+    _b="$(_st "${sb}")"
+    if [ "${_a}" = "${_b}" ] && grep -q 'lint-rules.md' "${sb}/out" && grep -q 'carimbaria' "${sb}/out"; then
+      record_pass "pr-finalize: SAC-66 (4) --check relata projeção e carimbo e não escreve nada"
+    else record_fail "pr-finalize: SAC-66 (4) --check" "estado mudou ou relato incompleto: $(tr '\n' ' ' < "${sb}/out" | cut -c1-200)"; fi
+    ( cd "${sb}/w" && echo 1 > verdict && git add verdict ) >/dev/null 2>&1
+    _a="$(_st "${sb}")"
+    g="$(_pfn "${sb}" --check)"; _pfc "SAC-66 (4): --check com HARD no commit resultante" 1 "${g}" "${sb}"
+    _b="$(_st "${sb}")"
+    if [ "${_a}" = "${_b}" ] && grep -q 'recusaria' "${sb}/out"; then
+      record_pass "pr-finalize: SAC-66 (4) --check que recusa também não escreve nada"
+    else record_fail "pr-finalize: SAC-66 (4) --check com HARD" "estado mudou ou sem a recusa: $(tr '\n' ' ' < "${sb}/out" | cut -c1-200)"; fi
+    g="$(_pfn "${sb}" --check --push)"; _pfc "SAC-66 (4): --check com --push → recusa" 1 "${g}" "${sb}"
+  fi
 }
 
 # ---------------------------------------------------------------------------
@@ -15448,7 +15523,9 @@ run_lint_hard_file_selftests() {
   else record_fail "lint-hard-file: (d) o lint aborta sem a variável" "$(tail -2 <<< "${_noenv}" | tr '\n' ' ')"; fi
   rm -f "${dir}/zz-hard-file-probe.md" "${hf}"
   # (c) o motor PEDE a lista e a IMPRIME ao reprovar (registro: arquivo que ninguém lê é recurso morto)
-  if grep -q 'ONION_LINT_HARD_FILE="${_tmp}/hard.txt"' "${REPO_ROOT}/ops/pr-finalize.sh" \
+  # (a forma mudou em 2026-10-08, SAC-66: o lint do commit virou a função _lint_in, que recebe o arquivo)
+  if grep -q 'ONION_LINT_HARD_FILE="$2"' "${REPO_ROOT}/ops/pr-finalize.sh" \
+     && grep -q '_lint_in "${_tmp}/wt" "${_tmp}/hard.txt"' "${REPO_ROOT}/ops/pr-finalize.sh" \
      && grep -q 'as violações HARD do commit' "${REPO_ROOT}/ops/pr-finalize.sh"; then
     record_pass "lint-hard-file: (c) o pr-finalize pede a lista e a imprime quando reprova"
   else record_fail "lint-hard-file: (c)" "o motor não usa a lista"; fi
