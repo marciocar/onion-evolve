@@ -2,7 +2,8 @@
 title: 'Resíduo — selo do veto do .env, vendor do contrato em 3.0.1, e o checador deixa de plantar bytecode no vendor'
 date: 2026-10-08
 branch: chore/seal-env-guard-decision
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 5c2d68072bb94528a0d1a8c764b87f48a9c7d857c052c9de2170dc347f2f1126
+reviewed_code_sha256: 559bfc7ecbb093cdf0b08fc980b3358518cf51a825c094e569108cae98c67b5d
 findings_total: 2
 findings_real: 2
 findings_fixed: 2
