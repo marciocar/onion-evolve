@@ -91,5 +91,5 @@ flowchart TD
 | portal-gamificacao | standalone | greenfield | gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers | `2e3f3a6f88ce` |
 | jogo-da-vida | standalone | greenfield | gamification, maagica, expo-universal, turborepo, kg-radar-js-port, pre-adoption-dogfood | `2e3f3a6f88ce` |
 | onion-slm | standalone | greenfield | slm, eval-de-dominio, roteiro-gradual | `9e75a73d0401` |
-| onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `5b529e980779` |
+| onion-curation | standalone | greenfield | curadoria, dissecacao, mercado | `7818b8a25ae6` |
 | onion-kg-ssot | standalone | greenfield | kg-ssot, schema, produto | `fe8359e38b43` |
