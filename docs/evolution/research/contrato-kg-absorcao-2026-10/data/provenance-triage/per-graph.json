@@ -1,0 +1,609 @@
+{
+ "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml": {
+  "R": 13
+ },
+ "docs/discussions/onion-pessoal-marcio/proto/classification-por-vertical.kg.yaml": {
+  "R": 15,
+  "A2": 1
+ },
+ "docs/discussions/onion-pessoal-marcio/proto/fronteira-decision.kg.yaml": {
+  "R": 7,
+  "A2": 3
+ },
+ "docs/discussions/onion-pessoal-marcio/proto/inference-mitigation.kg.yaml": {
+  "R": 11,
+  "A2": 1
+ },
+ "docs/discussions/onion-pessoal-marcio/proto/marcio.kg.yaml": {
+  "R": 11,
+  "A2": 2
+ },
+ "docs/discussions/onion-pessoal-marcio/proto/reconciliation-engine.kg.yaml": {
+  "R": 12,
+  "A2": 1
+ },
+ "docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml": {
+  "A2": 6,
+  "R": 1
+ },
+ "docs/evolution/kg-inbox/_rejected/grana-ai-mapeamento-2026-08-20260821-215957.proposal.kg.yaml": {
+  "A2": 1,
+  "R": 2
+ },
+ "docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml": {
+  "R": 1
+ },
+ "docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml": {
+  "A1": 19,
+  "R": 4,
+  "A2": 1
+ },
+ "docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml": {
+  "A1": 13,
+  "R": 2,
+  "A2": 5
+ },
+ "docs/evolution/research/autonomous-thread-runtime-2026-07/autonomous-thread-runtime.kg.yaml": {
+  "A2": 4,
+  "R": 7
+ },
+ "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml": {
+  "R": 14,
+  "A1": 5
+ },
+ "docs/evolution/research/breadcrumb-doctrine-2026-07/breadcrumb-doctrine.kg.yaml": {
+  "A2": 2,
+  "R": 11
+ },
+ "docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml": {
+  "A2": 28,
+  "R": 11
+ },
+ "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml": {
+  "A1": 35,
+  "A2": 19,
+  "R": 1
+ },
+ "docs/evolution/research/claude-code-2.1-onion-2026-08/claude-code-2.1-onion-2026-08.kg.yaml": {
+  "R": 30
+ },
+ "docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/company-brain-e-conducao-como-servico-2026-10.kg.yaml": {
+  "A2": 6,
+  "A1": 33,
+  "R": 2
+ },
+ "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml": {
+  "A1": 28,
+  "R": 12,
+  "A2": 67
+ },
+ "docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml": {
+  "A1": 7,
+  "R": 5
+ },
+ "docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml": {
+  "A1": 34,
+  "A2": 11,
+  "R": 1
+ },
+ "docs/evolution/research/doctrine-sync-ingestor-2026-07/doctrine-sync-ingestor.kg.yaml": {
+  "R": 2,
+  "A2": 5
+ },
+ "docs/evolution/research/email-logto-2026-08/email-logto-2026-08.kg.yaml": {
+  "A2": 12,
+  "R": 4
+ },
+ "docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml": {
+  "A1": 29,
+  "R": 2,
+  "A2": 5
+ },
+ "docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml": {
+  "A1": 1,
+  "A2": 5
+ },
+ "docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml": {
+  "A2": 6,
+  "A1": 8,
+  "R": 2
+ },
+ "docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml": {
+  "A1": 7,
+  "A2": 13,
+  "R": 2
+ },
+ "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml": {
+  "A2": 7,
+  "A1": 6,
+  "R": 1
+ },
+ "docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml": {
+  "A2": 8,
+  "A1": 1
+ },
+ "docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml": {
+  "A1": 4,
+  "A2": 1,
+  "R": 2
+ },
+ "docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml": {
+  "A1": 1,
+  "A2": 3
+ },
+ "docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml": {
+  "A2": 6,
+  "A1": 1,
+  "R": 1
+ },
+ "docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml": {
+  "R": 7
+ },
+ "docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml": {
+  "A2": 6,
+  "A1": 2
+ },
+ "docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml": {
+  "A2": 3
+ },
+ "docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml": {
+  "A2": 4,
+  "R": 9
+ },
+ "docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml": {
+  "A1": 1,
+  "R": 1,
+  "A2": 3
+ },
+ "docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml": {
+  "A2": 3,
+  "A1": 1
+ },
+ "docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml": {
+  "A2": 7,
+  "A1": 27,
+  "R": 1
+ },
+ "docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml": {
+  "A2": 8,
+  "A1": 14
+ },
+ "docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml": {
+  "A1": 24,
+  "A2": 4
+ },
+ "docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml": {
+  "A2": 23,
+  "A1": 1,
+  "R": 2
+ },
+ "docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml": {
+  "A1": 20,
+  "R": 2
+ },
+ "docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml": {
+  "A2": 8,
+  "R": 1
+ },
+ "docs/evolution/research/librechat-2026-08/librechat-2026-08.kg.yaml": {
+  "R": 9,
+  "A2": 3,
+  "A1": 1
+ },
+ "docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml": {
+  "R": 8,
+  "A2": 6,
+  "A1": 4
+ },
+ "docs/evolution/research/m8-serial-2026-08/m8-serial-2026-08.kg.yaml": {
+  "A2": 1,
+  "R": 3,
+  "A1": 1
+ },
+ "docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml": {
+  "A2": 35,
+  "R": 24,
+  "A1": 3
+ },
+ "docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml": {
+  "A2": 6,
+  "A1": 2,
+  "R": 1
+ },
+ "docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml": {
+  "A2": 21,
+  "R": 2
+ },
+ "docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml": {
+  "A1": 14,
+  "A2": 6,
+  "R": 5
+ },
+ "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml": {
+  "A1": 21,
+  "R": 1
+ },
+ "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml": {
+  "A1": 19,
+  "A2": 16,
+  "R": 2
+ },
+ "docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml": {
+  "A1": 13,
+  "R": 3
+ },
+ "docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml": {
+  "A1": 17,
+  "R": 5,
+  "A2": 11
+ },
+ "docs/evolution/research/onion-brand-voice-2026-07/onion-brand-voice-2026-07.kg.yaml": {
+  "R": 5,
+  "A2": 1
+ },
+ "docs/evolution/research/onion-d2-data-currency-2026-07/onion-d2-data-currency-2026-07.kg.yaml": {
+  "R": 7
+ },
+ "docs/evolution/research/onion-market-kg-2026-08/onion-market-kg-2026-08.kg.yaml": {
+  "A2": 22,
+  "R": 6
+ },
+ "docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml": {
+  "A2": 13,
+  "R": 1
+ },
+ "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml": {
+  "A2": 27,
+  "R": 4,
+  "A1": 34
+ },
+ "docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml": {
+  "R": 9,
+  "A2": 1
+ },
+ "docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml": {
+  "R": 6,
+  "A2": 34,
+  "A1": 11
+ },
+ "docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml": {
+  "A1": 15,
+  "R": 1,
+  "A2": 1
+ },
+ "docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml": {
+  "A1": 13,
+  "A2": 4,
+  "R": 5
+ },
+ "docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml": {
+  "A1": 24,
+  "R": 3,
+  "A2": 1
+ },
+ "docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml": {
+  "A1": 10,
+  "A2": 2,
+  "R": 1
+ },
+ "docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml": {
+  "A2": 6,
+  "A1": 7,
+  "R": 3
+ },
+ "docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml": {
+  "A2": 5,
+  "R": 5,
+  "A1": 6
+ },
+ "docs/evolution/research/radar-E3-2026-09-04-r4/radar-E3-2026-09-04-r4.kg.yaml": {
+  "A1": 7,
+  "A2": 2
+ },
+ "docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml": {
+  "A2": 6,
+  "R": 6,
+  "A1": 2
+ },
+ "docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml": {
+  "R": 5,
+  "A1": 2,
+  "A2": 6
+ },
+ "docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml": {
+  "A1": 7,
+  "A2": 2,
+  "R": 3
+ },
+ "docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml": {
+  "A1": 4,
+  "R": 2
+ },
+ "docs/evolution/research/scope-inheritance-2026/scope-inheritance-2026.kg.yaml": {
+  "R": 43,
+  "A2": 7
+ },
+ "docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml": {
+  "R": 1,
+  "A1": 27,
+  "A2": 1
+ },
+ "docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml": {
+  "A2": 2,
+  "A1": 43
+ },
+ "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml": {
+  "A2": 13,
+  "R": 2,
+  "A1": 2
+ },
+ "docs/evolution/research/telescope-doctrine-2026-07/telescope-doctrine.kg.yaml": {
+  "R": 11,
+  "A2": 2
+ },
+ "docs/evolution/research/triagem-inbox-2026-09/triagem-inbox-2026-09.kg.yaml": {
+  "R": 8,
+  "A2": 1,
+  "A1": 1
+ },
+ "docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml": {
+  "A1": 14,
+  "A2": 3
+ },
+ "docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/unidade-bilhetavel-do-onion-2026-10.kg.yaml": {
+  "A1": 11,
+  "A2": 10,
+  "R": 2
+ },
+ "docs/evolution/research/vaultwarden-logto-2026-08/vaultwarden-logto-2026-08.kg.yaml": {
+  "A2": 7,
+  "R": 3
+ },
+ "docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml": {
+  "A2": 20,
+  "R": 1
+ },
+ "docs/evolution/research/websearch-cap-2026-09/websearch-cap-2026-09.kg.yaml": {
+  "A1": 3,
+  "R": 2,
+  "A2": 2
+ },
+ "docs/evolution/research/whatsapp-api-2026-07/whatsapp-api-2026-07.kg.yaml": {
+  "R": 5,
+  "A2": 22,
+  "A1": 6
+ },
+ "docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg.yaml": {
+  "A1": 11,
+  "R": 3
+ },
+ "docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml": {
+  "A2": 20,
+  "R": 3
+ },
+ "docs/onion/graph/cafe-aroma-demo.kg.yaml": {
+  "A2": 3
+ },
+ "docs/onion/graph/catraca-regra49-2026-08.kg.yaml": {
+  "A2": 20,
+  "R": 8,
+  "A1": 6
+ },
+ "docs/onion/graph/coexistence-two-homes-2026-07.kg.yaml": {
+  "R": 9,
+  "A2": 3
+ },
+ "docs/onion/graph/colaboracao-onion-2026-07.kg.yaml": {
+  "R": 18,
+  "A1": 5,
+  "A2": 5
+ },
+ "docs/onion/graph/company-brain-market-2026-07.kg.yaml": {
+  "R": 18,
+  "A2": 9
+ },
+ "docs/onion/graph/constellation-dialogic-layer-2026-07.kg.yaml": {
+  "R": 23,
+  "A2": 4
+ },
+ "docs/onion/graph/constellation.kg.yaml": {
+  "R": 7
+ },
+ "docs/onion/graph/context-freshness-2026-08-12.kg.yaml": {
+  "A2": 10,
+  "R": 2,
+  "A1": 1
+ },
+ "docs/onion/graph/d5-pricing-2026-07.kg.yaml": {
+  "R": 10,
+  "A2": 2
+ },
+ "docs/onion/graph/doctrine-behavior-over-declaration-2026-07.kg.yaml": {
+  "A2": 4
+ },
+ "docs/onion/graph/door-role-parity-2026-09.kg.yaml": {
+  "A2": 2,
+  "R": 2,
+  "A1": 2
+ },
+ "docs/onion/graph/drive-superacao-2026-08.kg.yaml": {
+  "A1": 2
+ },
+ "docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml": {
+  "A2": 8,
+  "R": 7
+ },
+ "docs/onion/graph/elenxos-2026-08-07.kg.yaml": {
+  "A2": 7,
+  "A1": 2,
+  "R": 8
+ },
+ "docs/onion/graph/federation-health-2026-07.kg.yaml": {
+  "A2": 14,
+  "R": 1,
+  "A1": 3
+ },
+ "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml": {
+  "A2": 478,
+  "R": 27,
+  "A1": 1
+ },
+ "docs/onion/graph/fios-abertos.kg.yaml": {
+  "A2": 8,
+  "R": 3
+ },
+ "docs/onion/graph/forge-comando-framework-2026-09.kg.yaml": {
+  "R": 2,
+  "A2": 1,
+  "A1": 2
+ },
+ "docs/onion/graph/graduated-automation-elenxo-2026-07.kg.yaml": {
+  "R": 8,
+  "A2": 1
+ },
+ "docs/onion/graph/granaai-doctrine-absorption-2026-07.kg.yaml": {
+  "A2": 10,
+  "R": 3
+ },
+ "docs/onion/graph/gtm-decisions-2026-07.kg.yaml": {
+  "R": 11,
+  "A2": 1,
+  "A1": 1
+ },
+ "docs/onion/graph/guardas-revisao-2026-08.kg.yaml": {
+  "R": 33,
+  "A1": 9,
+  "A2": 5
+ },
+ "docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml": {
+  "A2": 9,
+  "R": 4,
+  "A1": 1
+ },
+ "docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml": {
+  "R": 17,
+  "A2": 20
+ },
+ "docs/onion/graph/inbox-sinais-2026-09.kg.yaml": {
+  "A2": 8,
+  "A1": 1
+ },
+ "docs/onion/graph/inference-contract-audit-2026-07.kg.yaml": {
+  "A2": 4,
+  "R": 6
+ },
+ "docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml": {
+  "A2": 14
+ },
+ "docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml": {
+  "A2": 5,
+  "A1": 1,
+  "R": 2
+ },
+ "docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml": {
+  "A1": 3,
+  "A2": 6
+ },
+ "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml": {
+  "A2": 84,
+  "R": 14,
+  "A1": 4
+ },
+ "docs/onion/graph/m3-federation-admin-2026-07.kg.yaml": {
+  "A2": 4,
+  "A1": 3,
+  "R": 1
+ },
+ "docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml": {
+  "R": 10,
+  "A2": 10,
+  "A1": 2
+ },
+ "docs/onion/graph/onion-evolution-2026-07-30.kg.yaml": {
+  "A2": 4,
+  "R": 1,
+  "A1": 2
+ },
+ "docs/onion/graph/onion-evolution-2026-07.kg.yaml": {
+  "R": 4,
+  "A2": 9
+ },
+ "docs/onion/graph/onion-family-topology-2026-07.kg.yaml": {
+  "R": 7,
+  "A2": 7
+ },
+ "docs/onion/graph/onion-identity-2026-07.kg.yaml": {
+  "A1": 7,
+  "R": 36,
+  "A2": 20
+ },
+ "docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml": {
+  "A1": 15,
+  "A2": 8,
+  "R": 1
+ },
+ "docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml": {
+  "A2": 4
+ },
+ "docs/onion/graph/perception-instruments-2026-07.kg.yaml": {
+  "R": 10,
+  "A2": 1
+ },
+ "docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml": {
+  "A1": 6,
+  "A2": 7,
+  "R": 9
+ },
+ "docs/onion/graph/pr-decision-history-2026-08.kg.yaml": {
+  "R": 9,
+  "A1": 672
+ },
+ "docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml": {
+  "A2": 9,
+  "R": 4,
+  "A1": 2
+ },
+ "docs/onion/graph/residuos-2026-08-18.kg.yaml": {
+  "A2": 3,
+  "A1": 3,
+  "R": 2
+ },
+ "docs/onion/graph/review-gate-saldo-2026-09.kg.yaml": {
+  "R": 4
+ },
+ "docs/onion/graph/rito-task-manager-2026-09.kg.yaml": {
+  "R": 15,
+  "A1": 2,
+  "A2": 1
+ },
+ "docs/onion/graph/session-2026-07-18-evolve-review-triage.kg.yaml": {
+  "R": 10,
+  "A2": 10
+ },
+ "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml": {
+  "A1": 1,
+  "A2": 3
+ },
+ "docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml": {
+  "A2": 2,
+  "A1": 1
+ },
+ "docs/onion/graph/technical-context-core-2026-07.kg.yaml": {
+  "A2": 16,
+  "R": 1
+ },
+ "docs/onion/graph/testes-evidencia-2026-09.kg.yaml": {
+  "A2": 18,
+  "A1": 4,
+  "R": 3
+ },
+ "docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml": {
+  "A2": 8,
+  "R": 1
+ },
+ "docs/onion/graph/vps-shared-tools-2026-07.kg.yaml": {
+  "A2": 11,
+  "R": 4,
+  "A1": 1
+ }
+}
