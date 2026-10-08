@@ -8,7 +8,7 @@ meta:
   baseline: 2026-10-08
   review_after: 2026-11-07   # 30d: decisão em aberto
   # ═══ TETO: 12 NÓS ═══
-  #   3 em 2026-10-08.
+  #   6 em 2026-10-08 (+ a segunda opinião do KG-SSOT, em 3 restrições).
 nodes:
   - id: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM
     node_type: evidence
@@ -33,11 +33,42 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
+    verified_at: 2026-10-08
     impact: 3
     confidence: 0.5
     verified_against: "pergunta enviada pelo core à sessão do adotante dedicado ao KG-SSOT em 2026-10-08, a pedido do maestro"
     label: "segunda opinião do adotante do KG-SSOT: qual é a SSOT da hierarquia (task manager ou grafo), o que o contrato v3 deve exigir de nó fechado sem humano para o carimbo não ser auto-atestado, e que risco falta na lista"
+  - id: E_OPINIAO_EXPANSAO_AINDA_NAO_CONFIAVEL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-10-08
+    verified_against: "resposta da sessão do adotante dedicado ao KG-SSOT ao core em 2026-10-08 (mensagem entre sessões), opinião, não selo"
+    label: "a expansão da cadeia não é confiável para rodar sozinha: o gate do core aceita 56 casos que o contrato reprova, e o contrato não proíbe ciclo em DEPENDS_ON nem define pai e filho; o grafo deve ser a SSOT da ordem e o task manager projeção, e a expansão para em voz alta em ciclo, item sem nó, nó sem item ou pai e filho divergentes; esperar o core adotar o kit do contrato (tag contract-v3.0.0) antes do AUTOMATE"
+  - id: E_OPINIAO_CARIMBO_PELO_QUE_FOI_LIDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-10-08
+    verified_against: "resposta da sessão do adotante dedicado ao KG-SSOT ao core em 2026-10-08 (mensagem entre sessões), opinião, não selo"
+    label: "nó fechado pelo auto-drive exige provenance que o fechador não escreveu: locator com URL do PR mergeado, SHA do merge e id do run de CI; source sendo o estado lido (mergedAt, conclusão dos checks); method nomeando a máquina; nunca fecha decision nem faz flip de status de verdade; verified_against cita o que foi lido, nunca o que foi feito"
+  - id: E_OPINIAO_RISCOS_QUE_FALTAVAM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.7
+    verified_at: 2026-10-08
+    verified_against: "resposta da sessão do adotante dedicado ao KG-SSOT ao core em 2026-10-08 (mensagem entre sessões), opinião, não selo"
+    label: "riscos que faltavam: CI verde pode ser vazio (filtro de paths, sem check obrigatório), então a parada exige check presente e verde; Elenxo do mesmo modelo é uma voz só, falta um agente separado que reabra os artefatos; cadeia parcial pede estado retomável por item e não fechar o épico com filho aberto; insumo vencido pede --freshness antes e parada em STALE de alto impacto; o status do Zoho de layout padrão mente por omissão; --merge deve ser false por padrão até a primeira cadeia provada, e true só para item que não é decision"
 edges:
   - from: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM
     to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
@@ -45,3 +76,15 @@ edges:
   - from: D_AUTO_DRIVE_DEGRAU_AUTOMATE
     to: Q_SEGUNDA_OPINIAO_KG_SSOT
     edge_type: DEPENDS_ON
+  - from: E_OPINIAO_EXPANSAO_AINDA_NAO_CONFIAVEL
+    to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
+    edge_type: CONSTRAINS
+  - from: E_OPINIAO_CARIMBO_PELO_QUE_FOI_LIDO
+    to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
+    edge_type: CONSTRAINS
+  - from: E_OPINIAO_RISCOS_QUE_FALTAVAM
+    to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
+    edge_type: CONSTRAINS
+  - from: E_OPINIAO_EXPANSAO_AINDA_NAO_CONFIAVEL
+    to: Q_SEGUNDA_OPINIAO_KG_SSOT
+    edge_type: SUPPORTS
