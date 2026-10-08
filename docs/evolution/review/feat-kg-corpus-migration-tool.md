@@ -2,7 +2,8 @@
 title: 'Resíduo — a ferramenta de migração do corpus ao contrato v3 nasce e passa na onda piloto'
 date: 2026-10-08
 branch: feat/kg-corpus-migration-tool
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 84149d8d825a852c00bf0c7b386eac5b039db95de0199a59744a7b8e4675386a
+reviewed_code_sha256: 0c75856ad6d3c3d30fb1f6fc782cdefc4065265d83944cefe03175ef6c32e24b
 findings_total: 2
 findings_real: 2
 findings_fixed: 2

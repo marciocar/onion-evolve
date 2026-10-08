@@ -254,6 +254,7 @@
 .claude/utils/forge/interface.md	E_FORGE_PRECEDENTE_MEDIDO_16_METODOS	docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg.yaml
 .claude/utils/guardrails/onion-untrusted-wrap.sh	E_UTILS_GUARDAS_SEM_HOOK	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/utils/guardrails/onion-untrusted-wrap.sh	Q_R15_WRAP_NO_CAMINHO_CRITICO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
+.claude/utils/kg/kg-migrate-v3.py	E_FERRAMENTA_DE_MIGRACAO_E_ONDA_PILOTO	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO	docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	D_CONTATO_DESACOPLADO	docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml
 .claude/utils/marketplace/assemble-plugin.sh	D_CURA_POR_CONSTRUCAO_NO_ASSEMBLER	docs/onion/graph/residuos-2026-08-18.kg.yaml
