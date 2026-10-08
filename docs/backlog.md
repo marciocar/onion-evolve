@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**404 itens abertos** em 85 grafo(s) com aberto (de 111 no escopo) · 86 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**405 itens abertos** em 86 grafo(s) com aberto (de 112 no escopo) · 87 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -804,6 +804,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
+
+## dissect-forge-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.6 | `Q_COSTURA_DISSECT_FORGE` | dissect-forge-2026-10 | costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprend |
 
 ## inbox-triage-2026-10-04 — 1 item(ns)
 
