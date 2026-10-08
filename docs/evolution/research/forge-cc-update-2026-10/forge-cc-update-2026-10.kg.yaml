@@ -1,0 +1,141 @@
+# kg-backlog-guard: on
+# Forja do /meta:cc-update pelo /meta:forge (2026-10-08): evidência, decisão e tetos da peça nova.
+meta:
+  id: forge-cc-update-2026-10
+  schema_version: "1"
+  baseline: "2026-10-08"
+  review_after: "2026-11-07"   # 30d: cadência de ferramenta; a 1ª rodada de verdade é o teste
+  x_supersedes_none: "Forja de superfície nova, não rodada de eixo: nenhum grafo anterior é superado. As rodadas r7 e r8 do radar E3 são o MOLDE, não o superado."
+  # ═══ TETO: 10 NÓS ═══
+  #   8 na forja (2026-10-08).
+nodes:
+  - id: E_R8_FOI_FEITA_A_MAO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.95
+    verified_at: "2026-10-08"
+    verified_against: "SYNTHESIS e grafo da r8; o juiz reprovou 4 nós, dos quais 3 por ligação com o core sem medição viva"
+    label: "a rodada r8 do radar E3 foi conduzida à mão: delta por python avulso, 3 ligações com o core reprovadas pelo juiz por falta de medição"
+    narrative: "Duas dívidas de forma também só apareceram no CI: a chave de superação sem o prefixo x_ (reprovada pelo contrato v3) e o plugin onion não regenerado (REGRA 19). O procedimento já tinha rodado 8 vezes sem superfície."
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-10-08-r8/SYNTHESIS.md"
+      locator: "seções Juiz e Cura feita nesta rodada"
+      method: "leitura do artefato selado"
+  - id: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
+    node_type: decision
+    layer: audit
+    plane: PROD
+    status: done
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-08"
+    trace: ".claude/commands/meta/cc-update.md"
+    verified_against: "decisão do maestro em 2026-10-08, por pergunta com opções: comando próprio, script mede e juiz julga, até o PR mergeado, ação vira nó + issue"
+    label: "comando próprio /meta:cc-update: o medidor determinístico separa o delta, a rodada liga medindo o vivo, um juiz opus refuta, e sela até o PR mergeado"
+    provenance:
+      source: ".claude/commands/meta/cc-update.md"
+      locator: "Procedimento, passos 1 a 10"
+      method: "superfície forjada pelo /meta:forge e invocada de verdade"
+  - id: E_CENSO_DA_FORJA_0_PARA_6
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: "2026-10-08"
+    verified_against: "forge-census --tsv antes: cc-update ausente entre 59 candidatos; depois do git add: 6 cc-update 1 1 0 1 1 1"
+    label: "o censo da forja mediu o /meta:cc-update em 6 de 7 peças; falta só a peça 4, ausente por desenho"
+    provenance:
+      source: ".claude/validation/forge-census.sh"
+      locator: "linha cc-update da saída --tsv"
+      method: "execução do medidor antes e depois de ligar as peças"
+  - id: E_DELTA_DO_SANDBOX_IGUAL_A_R8
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 1.0
+    verified_at: "2026-10-08"
+    verified_against: "CC_DELTA_BASELINE=2.1.289 com --write num sandbox; diff -r contra data/ da r8 sem diferença; o esqueleto passou no radar --integrity --schema e no kg-contract-check"
+    label: "com a baseline simulada em 2.1.289, o medidor extraiu 2.1.290 a 2.1.295 byte a byte iguais ao data/ da r8"
+    narrative: "A 1ª extração diferia numa linha em branco final por seção; o medidor passou a copiar a seção crua, como a r8. Com a baseline real (2.1.295 = disco = processo) o veredito é NADA A MEDIR."
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-10-08-r8/data/"
+      locator: "2.1.290.txt a 2.1.295.txt"
+      method: "diff -r contra a saída do medidor"
+  - id: E_DOGFOOD_DE_CARGA_ACHOU_O_OVERRIDE_MUDO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: "2026-10-08"
+    verified_against: "claude -p com o comando: NADA A MEDIR e parada no passo 1; com CC_DELTA_URL inalcançável, rc 2 declarado e parada; após a cura, a sessão nomeou o override como causa"
+    label: "a invocação real do comando carregou viva e parou certo; o modo de falha revelou que o erro culpava a fonte quando a causa era um override herdado"
+    narrative: "Cura no mesmo laço: o medidor declara todo CC_DELTA_* ativo antes do veredito, caso (g) da bancada com mutante que morde. O re-dogfood de carga confirmou que a sessão passou a apontar a variável."
+    provenance:
+      source: ".claude/commands/meta/cc-update.md"
+      locator: "diretivas de injeção do contexto medido"
+      method: "invocação headless do comando, nos dois modos"
+  - id: E_BANCADA_9_CASOS_9_MUTANTES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 1.0
+    verified_at: "2026-10-08"
+    verified_against: "run_cc_delta_census_selftests 9/9 sob LC_ALL=C; um mutante por caso, os 9 reprovaram o caso dele"
+    label: "a família run_cc_delta_census_selftests tem 9 casos sem rede, e cada mutante reprova o caso que vigia"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "run_cc_delta_census_selftests"
+      method: "execução da família e de 9 versões defeituosas do medidor"
+  - id: C_MEDIDOR_NAO_LIGA_ITEM_A_SUPERFICIE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.9
+    verified_at: "2026-10-08"
+    verified_against: "fronteira declarada no cabeçalho do medidor e na cláusula 3 da doutrina, derivada das 3 reprovações da r8"
+    label: "teto declarado: o medidor não decide se um item do CHANGELOG toca o Onion; casar por palavra-chave fabricaria as ligações que a r8 reprovou"
+  - id: Q_ISSUE_PELO_ADAPTER_EXECUTAVEL
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_at: "2026-10-08"
+    verified_against: "o passo 8 do comando segue o adapter doc do Linear, que ainda é prosa (SAC-65); gatilho: o adapter executável existir"
+    label: "quando o adapter executável do task manager existir (SAC-65), o passo de ação vira chamada, não prosa seguida pela sessão?"
+edges:
+  - from: E_R8_FOI_FEITA_A_MAO
+    to: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
+    edge_type: SUPPORTS
+  - from: E_CENSO_DA_FORJA_0_PARA_6
+    to: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
+    edge_type: SUPPORTS
+  - from: E_DELTA_DO_SANDBOX_IGUAL_A_R8
+    to: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
+    edge_type: SUPPORTS
+  - from: E_DOGFOOD_DE_CARGA_ACHOU_O_OVERRIDE_MUDO
+    to: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
+    edge_type: SUPPORTS
+  - from: E_BANCADA_9_CASOS_9_MUTANTES
+    to: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
+    edge_type: SUPPORTS
+  - from: C_MEDIDOR_NAO_LIGA_ITEM_A_SUPERFICIE
+    to: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
+    edge_type: CONSTRAINS
+  - from: Q_ISSUE_PELO_ADAPTER_EXECUTAVEL
+    to: D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA
+    edge_type: DEPENDS_ON

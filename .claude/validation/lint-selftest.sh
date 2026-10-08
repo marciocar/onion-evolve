@@ -24155,6 +24155,87 @@ _family run_evolve_staleness_selftests
 _family run_evolve_census_selftests
 _family run_evolve_workflow_selftests
 
+# cc-delta-census — o MEDIDOR do /meta:cc-update (peça 3). Nasceu em 2026-10-08 da rodada r8 do radar E3,
+# feita à mão: o delta foi separado por um python avulso e três ligações item↔Onion afirmadas sem medição
+# foram reprovadas pelo juiz. A família vigia o que o medidor PROMETE (só o delta, nada-a-medir, rc 2
+# nomeado sem fonte, hook sem onFailure contado, esqueleto conforme) — e é sem rede: CHANGELOG de fixture.
+_ccd_changelog() {
+  printf '# Changelog\n\n'
+  printf '## 1.0.4\n\n- item quatro\n\n'
+  printf '## 1.0.3\n\n- item tres a\n- item tres b citando claude-zeta-9\n\n'
+  printf '## 1.0.2\n\n- item dois\n\n'
+  printf '## 1.0.1\n\n- item um\n\n'
+  printf '## 1.0.0\n\n- item zero\n'
+}
+run_cc_delta_census_selftests() {
+  local sut="${REPO_ROOT}/.claude/validation/cc-delta-census.sh"
+  [ -f "${sut}" ] || { record_fail "cc-delta-census" "medidor ausente: ${sut}"; return; }
+  command -v python3 >/dev/null 2>&1 || { record_skip "cc-delta-census: python3 ausente (SUT não exercido)"; return; }
+  local sb out rc g
+  sb="$(TMPDIR=/tmp mktemp -d)"
+  mkdir -p "${sb}/r/.claude" "${sb}/r/docs/onion" "${sb}/w"
+  _ccd_changelog > "${sb}/CHANGELOG.md"
+  printf 'axes:\n  - id: E3-claude-code-delta\n    cc_version: "1.0.1"\n    kg: docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml\n  - id: E6-outro\n    cc_version: "9.9.9"\n' > "${sb}/r/docs/onion/radar-baselines.yaml"
+  printf '{"hooks":{"PreToolUse":[{"matcher":"Bash","hooks":[{"type":"command","command":"bash .claude/hooks/veto-a.sh"},{"type":"command","command":"bash .claude/hooks/veto-b.sh","onFailure":"block"}]}]}}\n' > "${sb}/r/.claude/settings.json"
+  # (a) baseline 1.0.1 (lida do eixo E3, não do E6) e disco 1.0.3 → extrai SÓ 1.0.2 e 1.0.3, byte a byte
+  if out="$(CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= CC_DELTA_TODAY=2026-10-08 \
+       bash "${sut}" "${sb}/r" --markdown --write "${sb}/w/radar-E3-2026-10-08-r9" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q 'DELTA 2 versão(ões): 1.0.2 a 1.0.3' <<< "${out}" \
+     && [ "$(ls "${sb}/w/radar-E3-2026-10-08-r9/data" 2>/dev/null | tr '\n' ' ')" = "1.0.2.txt 1.0.3.txt " ] \
+     && [ "$(cat "${sb}/w/radar-E3-2026-10-08-r9/data/1.0.2.txt")" = "$(printf '## 1.0.2\n\n- item dois\n')" ]; then
+    record_pass "cc-delta-census: (a) extrai só o delta entre as duas versões (nem a baseline nem a posterior à instalada)"
+  else record_fail "cc-delta-census: (a)" "rc=${rc} data=$(ls "${sb}/w/radar-E3-2026-10-08-r9/data" 2>/dev/null | tr '\n' ' ') $(_emit "${out}" | head -3 | tr '\n' ' ')"; fi
+  # (b) instalada = baseline → NADA A MEDIR, rc 0, e nenhuma rodada escrita
+  if out="$(CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK=1.0.1 CC_DELTA_PROC= \
+       bash "${sut}" "${sb}/r" --markdown --write "${sb}/w/igual" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q 'VEREDITO: NADA A MEDIR' <<< "${out}" && [ -z "$(ls "${sb}/w/igual/data" 2>/dev/null)" ] \
+     && [ ! -e "${sb}/w/igual/igual.kg.yaml" ]; then
+    record_pass "cc-delta-census: (b) versões iguais → NADA A MEDIR, rc 0, sem rodada escrita"
+  else record_fail "cc-delta-census: (b)" "rc=${rc} $(_emit "${out}" | head -3 | tr '\n' ' ')"; fi
+  # (c) CHANGELOG ausente → rc 2 nomeado
+  if out="$(CC_DELTA_CHANGELOG="${sb}/nao-existe.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= bash "${sut}" "${sb}/r" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -q 'CHANGELOG vazio ou ausente' <<< "${out}"; then
+    record_pass "cc-delta-census: (c) CHANGELOG ausente → rc 2 nomeando a falta"
+  else record_fail "cc-delta-census: (c)" "rc=${rc} $(_emit "${out}" | head -2 | tr '\n' ' ')"; fi
+  # (c2) fonte inalcançável (offline) → rc 2 que DECLARA a lacuna, nunca delta inventado
+  if out="$(CC_DELTA_URL="file://${sb}/nao-existe.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= bash "${sut}" "${sb}/r" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -q 'inalcançável' <<< "${out}"; then
+    record_pass "cc-delta-census: (c2) fonte inalcançável → rc 2 que declara a lacuna"
+  else record_fail "cc-delta-census: (c2)" "rc=${rc} $(_emit "${out}" | head -2 | tr '\n' ' ')"; fi
+  # (g) e a mesma saída NOMEIA o override: no 1º dogfood de carga um CC_DELTA_URL herdado de teste fez a
+  #     sessão ler "fonte fora do ar" quando a causa era a variável
+  if grep -q 'override ativo.*CC_DELTA_URL=file://' <<< "${out}"; then
+    record_pass "cc-delta-census: (g) override ativo é declarado junto do erro (a causa não fica parecendo a fonte)"
+  else record_fail "cc-delta-census: (g)" "override não declarado: $(_emit "${out}" | head -2 | tr '\n' ' ')"; fi
+  # (c3) baseline fora do CHANGELOG → rc 2 (o delta seria chute)
+  if out="$(CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_BASELINE=0.9.9 CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= bash "${sut}" "${sb}/r" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 2 ] && grep -q 'não está no CHANGELOG' <<< "${out}"; then
+    record_pass "cc-delta-census: (c3) baseline fora do CHANGELOG → rc 2"
+  else record_fail "cc-delta-census: (c3)" "rc=${rc} $(_emit "${out}" | head -2 | tr '\n' ' ')"; fi
+  # (d) o inventário conta o hook SEM onFailure (veto-a) e não o que declara block (veto-b)
+  if out="$(CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= bash "${sut}" "${sb}/r" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q "^hooks$(printf '\t')2$(printf '\t')sem_onFailure$(printf '\t')1\$" <<< "${out}"; then
+    record_pass "cc-delta-census: (d) inventário acusa o hook sem onFailure (1 de 2)"
+  else record_fail "cc-delta-census: (d)" "rc=${rc} $(_emit "${out}" | grep '^hooks' | tr '\t' ' ')"; fi
+  # (f) o diretório da próxima rodada sai do `kg:` do eixo E3 (r7 → r8), não da memória de quem conduz
+  if out="$(CC_DELTA_CHANGELOG="${sb}/CHANGELOG.md" CC_DELTA_DISK=1.0.3 CC_DELTA_PROC= CC_DELTA_TODAY=2026-10-08 bash "${sut}" "${sb}/r" --tsv 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 0 ] && grep -q "^proxima_rodada$(printf '\t')docs/evolution/research/radar-E3-2026-10-08-r8/\$" <<< "${out}"; then
+    record_pass "cc-delta-census: (f) próxima rodada derivada da baseline (r7 → r8)"
+  else record_fail "cc-delta-census: (f)" "rc=${rc} $(_emit "${out}" | grep '^proxima_rodada' | tr '\t' ' ')"; fi
+  # (e) o ESQUELETO escrito em (a) passa no radar (--integrity --schema) e no contrato v3
+  g="${sb}/w/radar-E3-2026-10-08-r9/radar-E3-2026-10-08-r9.kg.yaml"
+  if [ ! -f "${g}" ]; then record_fail "cc-delta-census: (e)" "esqueleto não escrito em ${g}"
+  elif ! out="$(bash "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${g}" --integrity --schema 2>&1)"; then
+    record_fail "cc-delta-census: (e)" "radar reprovou o esqueleto: $(_emit "${out}" | grep -m2 '✗' | tr '\n' ' ')"
+  elif ! python3 -c 'import yaml, jsonschema' >/dev/null 2>&1; then
+    record_skip "cc-delta-census: (e) contrato v3 — PyYAML/jsonschema ausentes (radar passou; contrato NÃO verificado)"
+  elif out="$(cd "${REPO_ROOT}" && bash .claude/validation/kg-contract-check.sh "${g}" 2>&1)"; then
+    record_pass "cc-delta-census: (e) o esqueleto passa no radar e no kg-contract-check (rc 0)"
+  else record_fail "cc-delta-census: (e)" "contrato v3 reprovou o esqueleto: $(_emit "${out}" | head -3 | tr '\n' ' ')"; fi
+  rm -rf "${sb}"
+}
+_family run_cc_delta_census_selftests
+
 
 
 
