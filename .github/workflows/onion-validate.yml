@@ -130,7 +130,7 @@ jobs:
 
       - name: Contrato KG-SSOT (vendor íntegro + gate por grafo)
         # O radar (kg-radar.sh) é o leitor de semântica e integridade; a FORMA do .kg.yaml é julgada pelo
-        # contrato v3 vendorizado por pin (tag contract-v3.0.0 do adotante dedicado ao KG-SSOT). Medido em
+        # contrato v4 vendorizado por pin (tag contract-v4.0.0 do adotante dedicado ao KG-SSOT). Medido em
         # 2026-10-08: o radar sozinho aceitava 55 casos da suíte que o contrato reprova. O vendor não se
         # edita aqui (o check reprova qualquer byte alterado); mudança no contrato volta como sinal.
         # Catraca POR GRAFO contra .kg-ssot/gate.json: grafo novo ou que passou a falhar no MUST reprova,
@@ -138,7 +138,15 @@ jobs:
         run: |
           python3 -m pip install --quiet -r vendor/kg-ssot/tools/requirements.txt
           python3 -I vendor/kg-ssot/tools/kg_vendor.py check --dest vendor/kg-ssot
-          python3 -I vendor/kg-ssot/tools/kg_gate.py
+          # FORA DO CORPUS, explícito e visível no diff (política selada pelo maestro, 2026-10-08, sobre a
+          # posição do dono do contrato): propostas arquivadas do kg-inbox são história, e os grafos proto
+          # do Onion pessoal não são grafo do produto. O demo fictício foi para fixtures/ (default).
+          # ⚠️ A base (.kg-ssot/gate.json) tem de ser gravada com os MESMOS --exclude:
+          #    python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update <os --exclude abaixo>
+          python3 -I vendor/kg-ssot/tools/kg_gate.py \
+            --exclude 'docs/evolution/kg-inbox/_rejected/*' \
+            --exclude 'docs/evolution/kg-inbox/_sealed/*' \
+            --exclude 'docs/discussions/onion-pessoal-marcio/proto/*'
 
       - name: Lembrete — checagens semânticas são locais
         run: |

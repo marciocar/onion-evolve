@@ -15,7 +15,7 @@
 # ── DESCOBERTA POR REFERÊNCIA, NUNCA POR NOME CONSTRUÍDO ───────────────────────────────────
 # Mesma cláusula 1 que rege o forge-census.sh, e pela mesma razão: construir o caminho/nome do
 # artefato a partir do nome do candidato errou 3 vezes em 2026-09-28. Aqui a dissecação se
-# ANUNCIA — o grafo carrega `dissect_tool:` no meta e `dissect_level:`/`dissect_verdict:` nos
+# ANUNCIA — o grafo carrega `x_dissect_tool:` no meta e `x_dissect_level:`/`x_dissect_verdict:` (contrato v4: extensão leva `x_`; a forma sem prefixo segue lida em grafo herdado) nos
 # nós, e o censo LÊ esses marcadores. Grafo que fala de uma ferramenta sem se declarar
 # dissecação é invisível a este censo, e isso é verdade útil: a sessão também não o acharia.
 #
@@ -57,7 +57,7 @@ for rel in "${GRAPHS[@]}"; do
   f="${REPO}/${rel}"
   [ -f "${f}" ] || continue
 
-  tool="$(sed -n 's/^[[:space:]]*dissect_tool:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#]*\).*/\1/p' "${f}" | head -1 | sed 's/[[:space:]]*$//')"
+  tool="$(sed -n 's/^[[:space:]]*\(x_\)\{0,1\}dissect_tool:[[:space:]]*["'"'"']\{0,1\}\([^"'"'"'#]*\).*/\2/p' "${f}" | head -1 | sed 's/[[:space:]]*$//')"
   [ -n "${tool}" ] || continue
   found=$((found + 1))
 
@@ -67,9 +67,9 @@ for rel in "${GRAPHS[@]}"; do
   while IFS= read -r lv; do
     case "${lv}" in ''|*[!0-9]*) continue ;; esac
     [ "${lv}" -gt "${level}" ] && level="${lv}"
-  done < <(sed -n 's/^[[:space:]]*dissect_level:[[:space:]]*\([0-9]\+\).*/\1/p' "${f}")
+  done < <(sed -n 's/^[[:space:]]*\(x_\)\{0,1\}dissect_level:[[:space:]]*\([0-9]\+\).*/\2/p' "${f}")
 
-  verdict="$(sed -n 's/^[[:space:]]*dissect_verdict:[[:space:]]*["'"'"']\{0,1\}\([a-z]*\).*/\1/p' "${f}" | head -1)"
+  verdict="$(sed -n 's/^[[:space:]]*\(x_\)\{0,1\}dissect_verdict:[[:space:]]*["'"'"']\{0,1\}\([a-z]*\).*/\2/p' "${f}" | head -1)"
   [ -n "${verdict}" ] || verdict="-"
   baseline="$(sed -n 's/^[[:space:]]*baseline:[[:space:]]*\([0-9-]\{10\}\).*/\1/p' "${f}" | head -1)"
   [ -n "${baseline}" ] || baseline="-"
@@ -100,7 +100,7 @@ fi
 printf '# censo de dissecações · %s grafo(s) rastreado(s) · %s dissecação(ões) declarada(s)\n' \
   "${#GRAPHS[@]}" "${found}"
 if [ "${found}" -eq 0 ]; then
-  printf '\nNenhum grafo do corpus se declara dissecação (marcador `dissect_tool:` no `meta:`).\n'
+  printf '\nNenhum grafo do corpus se declara dissecação (marcador `x_dissect_tool:` no `meta:`).\n'
   printf 'Toda ferramenta entra pelo N0 — não há nível pago a reusar.\n'
 else
   printf 'ferramenta | nível | veredito | baseline | review_after | frescor\n'

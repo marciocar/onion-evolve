@@ -6,7 +6,7 @@ meta:
   layer: audit
   baseline: 2026-10-07
   review_after: 2026-11-21
-  supersedes_none: >
+  x_supersedes_none: >
     Cura de dado + extensao do radar, sem guarda anterior da classe. Medida contra o --integrity do
     kg-radar.sh e a REGRA 52, os gates mais proximos: nenhum deles olhava o alfabeto do id nem a forma
     crua do valid_from, entao nada neles e derrubado — eles ganham duas cobrancas.

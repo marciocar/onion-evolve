@@ -1,6 +1,6 @@
 meta:
   schema_version: "1"
-  id: warn-merge-key-is-plain-key
+  id: bad-node-dotted-key
 nodes:
   - id: Q_A
     node_type: question
@@ -9,7 +9,7 @@ nodes:
     impact: 3
     confidence: 0.5
     label: "A pergunta sintética A."
-    <<: {x_a: 1}
+    "x.y": 1
   - id: EV_A
     node_type: evidence
     plane: DEV
@@ -20,7 +20,7 @@ nodes:
     provenance:
       source: "medição sintética"
       locator: "caso de conformidade"
-      method: "medição"
+      method: "medição: caso de conformidade"
 edges:
   - from: EV_A
     to: Q_A

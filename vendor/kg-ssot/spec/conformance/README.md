@@ -1,9 +1,9 @@
 # Suíte de conformidade do `.kg.yaml`
 
 > **Projeção do grafo do produto KG-SSOT, nunca fonte paralela** (os ids entre crases são nós dele). O formato
-> é o de `A_CONFORMANCE_SUITE_SEED` (`EPIC_1_SUITE_FORMAT`). Os casos medem o contrato v3
-> (`A_CONTRACT_V3`): `spec/kg-contract-v3.schema.json` (MUST) e `spec/kg-contract-v3.should.schema.json`
-> (SHOULD), com as cinco decisões do E0 e a proveniência estruturada.
+> é o de `A_CONFORMANCE_SUITE_SEED` (`EPIC_1_SUITE_FORMAT`). Os casos medem o contrato v4
+> (`A_CONTRACT_V4`): `spec/kg-contract-v4.schema.json` (MUST) e `spec/kg-contract-v4.should.schema.json`
+> (SHOULD), com as cinco decisões do E0, a proveniência estruturada e a rampa do v4 (`EPIC_9_CONTRACT_V4_RAMP`).
 
 Todo leitor de `.kg.yaml` tem de passar nesta suíte: o radar e o drive do Onion, um extrator de grafos,
 o port JS de um adotante e o leitor de referência `tools/kg_validate.py`. Os casos são **dados puros**,
@@ -66,12 +66,22 @@ Schema: um emoji vale 1, não 2 unidades UTF-16 (`str.length` de JS erraria), e 
 Data completa tem de existir no calendário, e o código é `form.pattern`: o `format: date` do schema é
 **asserção**, e todo leitor tem de checá-lo. `.nan` e `.inf` reprovam como `form.type` em qualquer
 posição, também em chave `x_` e dentro de lista, porque o JSON não os representa. Um item de lista que não é mapa usa o
-campo `item` (`form.type.node.item`). Nome de chave que não é slug (`<<`, `1.0`) alerta como
-`form.pattern.<escopo>.key`. As chaves são comparadas na forma JSON: `1` e `"1"` colidem
+campo `item` (`form.type.node.item`). Nome de chave que não é slug (`<<`, `1.0`, `a.b`) reprova como
+`form.pattern.<escopo>.key` e, com o prefixo `x_`, só alerta. As chaves são comparadas na forma JSON: `1` e `"1"` colidem
 (`parse.duplicate-key`), `true` vira `true`, não `True`. Uma aresta com `on` reprova por
-`yaml.forbidden-key-on`; se o alvo de `on` não existir, sai também `integrity.dangling-on`. `unknown-key` é SHOULD no v1 (chave fora da gramática e
-sem o prefixo `x_`) e vira MUST na próxima versão. Os `pattern` têm a semântica do ECMA-262, a do JSON
-Schema: `$` não casa antes de uma quebra de linha final.
+`yaml.forbidden-key-on`; se o alvo de `on` não existir, sai também `integrity.dangling-on`. Os `pattern` têm a
+semântica do ECMA-262, a do JSON Schema: `$` não casa antes de uma quebra de linha final.
+
+O que o v4 mudou de severidade, e o que entrou:
+
+| Código | No v3 | No v4 |
+|---|---|---|
+| `form.required.node.provenance` (nó `confirmed` ou PROD sem `provenance`; o `unverifiable` não exige) | SHOULD | **MUST** |
+| `form.unknown-key.<escopo>.<chave>` (chave fora da gramática e sem `x_`, no topo, no meta, no nó e na aresta) | SHOULD | **MUST** |
+| `form.pattern.<escopo>.key` (nome que não é slug, sem `x_`) | SHOULD | **MUST** (com `x_`, segue SHOULD) |
+| `form.pattern.node.provenance.source` (`source` placeholder: só espaço, `desconhecida`, `unknown`, `n/a`, `none`, `null`, `sem fonte`, `tbd`, hífens, travessão, `?`...) | — | **MUST** (o vazio segue `form.range`) |
+| `form.pattern.node.provenance.method` (fora de `'<classe>: <detalhe>'`, classe em `medição`, `leitura`, `juízes`, `derivado`, `testemunho`) | — | SHOULD (MUST no v5) |
+| `form.unknown-key.node.provenance.<chave>` (chave desconhecida dentro de `provenance`) | SHOULD | SHOULD |
 O mesmo código pode aparecer como MUST num caso e como SHOULD em outro, porque a severidade é do
 caso, não do código.
 
@@ -94,16 +104,24 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
 `pending_on` e cita o nó selado. Nada antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`, e `proposals/` está vazia:
-toda decisão de contrato está aplicada. Ela volta a ter casos quando abrir uma pergunta nova, como
-`Q_CONTRACT_STRUCTURED_PROVENANCE`.
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 188 casos contra o v4. Os grupos do
+rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
+`unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito
+viraram `bad-*`. Todo caso usa `method` canônico (`medição: caso de conformidade`), para que o aviso de
+vocabulário só apareça onde o caso o pede. `proposals/` está vazia.
 
 ## Rodar
 
 ```bash
 pip install -r tools/requirements.txt          # PyYAML e jsonschema, versões exatas
 python3 -I tools/kg_conformance.py             # --suite DIR, --schema F, --should-schema F, --json OUT
+# proposals/ contra um contrato candidato, quando houver um rascunho de versão futura
+python3 -I tools/kg_conformance.py --proposals-schema <candidato>.schema.json \
+  --proposals-should-schema <candidato>.should.schema.json
 ```
+
+As duas opções `--proposals-*` vão juntas e medem só `proposals/` contra um contrato candidato; `latest/` e
+`optional/` seguem no `--schema`, e o rc não muda.
 
 rc `0` se `latest/` passa inteiro, `1` se algum caso de `latest/` falha e `2` se a própria suíte está
 quebrada: metaschema ou manifesto ilegível ou inválido, `pending_on` fora da regra, pasta

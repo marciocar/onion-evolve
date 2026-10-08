@@ -1,6 +1,6 @@
 meta:
   schema_version: "1"
-  id: warn-confirmed-without-provenance
+  id: warn-prod-without-verified-at
 nodes:
   - id: Q_A
     node_type: question
@@ -11,11 +11,15 @@ nodes:
     label: "A pergunta sintética A."
   - id: EV_A
     node_type: evidence
-    plane: DEV
+    plane: PROD
     status: confirmed
     impact: 3
     confidence: 0.9
     label: "A evidência sintética que sustenta A."
+    provenance:
+      source: "medição sintética"
+      locator: "caso de conformidade"
+      method: "medição: caso de conformidade"
 edges:
   - from: EV_A
     to: Q_A

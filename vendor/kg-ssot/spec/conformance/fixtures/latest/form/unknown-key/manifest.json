@@ -1,0 +1,62 @@
+{
+  "description": "Contrato v4: chave desconhecida sem o prefixo x_ reprova no topo, no meta, no nó e na aresta (Q_UNKNOWN_KEY_RAMP, Q_CONTRACT_EXTENSION_POLICY), com a mesma lista de chaves conhecidas do SHOULD v3. Nome sem x_ que nem é slug reprova como form.pattern.<escopo>.key; x_ segue livre.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-unknown-key-node.kg.yaml",
+      "description": "nó com chave desconhecida sem prefixo",
+      "valid": false,
+      "codes": [
+        "form.unknown-key.node.origem"
+      ]
+    },
+    {
+      "file": "bad-unknown-key-edge.kg.yaml",
+      "description": "aresta com chave desconhecida sem prefixo",
+      "valid": false,
+      "codes": [
+        "form.unknown-key.edge.weight"
+      ]
+    },
+    {
+      "file": "bad-unknown-key-meta.kg.yaml",
+      "description": "meta com chave desconhecida sem prefixo",
+      "valid": false,
+      "codes": [
+        "form.unknown-key.meta.nota"
+      ]
+    },
+    {
+      "file": "bad-unknown-key-top.kg.yaml",
+      "description": "topo com chave desconhecida sem prefixo",
+      "valid": false,
+      "codes": [
+        "form.unknown-key.top.extra"
+      ]
+    },
+    {
+      "file": "bad-non-slug-key-node.kg.yaml",
+      "description": "chave com ponto e sem x_: reprova como form.pattern.node.key, uma vez",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.key"
+      ]
+    },
+    {
+      "file": "valid-x-prefixed-key.kg.yaml",
+      "description": "chave x_ no topo, no meta, no nó e na aresta: o leitor ignora",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-x-prefixed-non-slug-key.kg.yaml",
+      "description": "chave x_ cujo nome não é slug: só alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.key"
+      ]
+    }
+  ]
+}

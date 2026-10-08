@@ -6,7 +6,7 @@ meta:
   layer: audit
   baseline: 2026-10-04
   review_after: 2026-11-18
-  supersedes_none: >
+  x_supersedes_none: >
     Guarda nova de classe ainda descoberta. Medida contra a REGRA 96, a guarda mais proxima: ela
     cobra CORTE em diretiva viva e isenta como "citado" o que esta guarda acusa. Nada a derrubar
     nela — a isencao segue certa para a pergunta dela; o comentario que chamava crase dupla de "forma

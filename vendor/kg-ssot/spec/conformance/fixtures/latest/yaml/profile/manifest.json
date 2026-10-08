@@ -49,13 +49,13 @@
       "codes": []
     },
     {
-      "file": "warn-merge-key-is-plain-key.kg.yaml",
-      "description": "<< é chave comum no YAML 1.2 core (não há merge); o nome não é slug, então alerta",
-      "valid": true,
-      "codes": [],
-      "warnings": [
+      "file": "bad-merge-key-is-plain-key.kg.yaml",
+      "description": "<< é chave comum no YAML 1.2 core (não há merge); o nome não é slug e não tem x_, então reprova desde o v4",
+      "valid": false,
+      "codes": [
         "form.pattern.node.key"
-      ]
+      ],
+      "warnings": []
     },
     {
       "file": "bad-key-collision-json.kg.yaml",

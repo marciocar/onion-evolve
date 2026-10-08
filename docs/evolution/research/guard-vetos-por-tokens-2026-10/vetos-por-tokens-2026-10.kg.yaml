@@ -6,7 +6,7 @@ meta:
   layer: audit
   baseline: 2026-10-05
   review_after: 2026-11-19
-  supersedes_external:
+  x_supersedes_external:
     - docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml#Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH
   # Forja de CURA DE CLASSE (/meta:forge-guard) dos dois vetos PreToolUse existentes — não guarda
   # nova. O maestro pediu que fosse BEM ESTUDADA antes de forjada: os nós E_ESTUDO_* são o estudo, e

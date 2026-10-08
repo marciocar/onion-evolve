@@ -29,8 +29,8 @@
 #   (2) MEDIÇÃO        PARCIAL    — exige `verified_at`+`verified_against` com valor real (YAML), mas
 #                                   NENHUM script sabe se o texto descreve uma medição que ocorreu
 #   (3) AUFHEBUNG      MECANIZADA — aresta REFUTES/SUPERSEDES real → alvo reconciliado
-#   (4) DECLARADO      MECANIZADA (2026-10-04) — o grafo tem `meta.drive_checkpoint: pending` e a
-#                                   `drive_checkpoint_note` NOMEIA o id. Antes era "nomear no STATE.md",
+#   (4) DECLARADO      MECANIZADA (2026-10-04) — o grafo tem `meta.x_drive_checkpoint: pending` e a
+#                                   `x_drive_checkpoint_note` NOMEIA o id. Antes era "nomear no STATE.md",
 #                                   que é gitignorado: o maestro nunca via, e o Elenxo da leva 2 mostrou
 #                                   que era o mesmo defeito que a cura do drive curava, deslocado para cá.
 #                                   A nota viaja no diff do PR, que é onde o maestro sela.
@@ -192,7 +192,7 @@ try:
 except ImportError:
     print("SEM-YAML"); sys.exit(0)
 m = (yaml.safe_load(open(sys.argv[1], encoding='utf-8')) or {}).get('meta') or {}
-ck = str(m.get('drive_checkpoint') or ''); note = str(m.get('drive_checkpoint_note') or '')
+ck = str(m.get('x_drive_checkpoint', m.get('drive_checkpoint')) or ''); note = str(m.get('x_drive_checkpoint_note', m.get('drive_checkpoint_note')) or '')  # contrato v4: x_; a forma antiga só em grafo herdado
 import re
 named = re.search(r'(?<![A-Za-z0-9_])' + re.escape(sys.argv[2]) + r'(?![A-Za-z0-9_])', note)
 print('OK' if ck == 'pending' and named else 'FALTA:' + ck)
@@ -201,7 +201,7 @@ SEAL4_PY
 case "${_CK4}" in
   OK) : ;;
   SEM-YAML) halt "(4) PyYAML ausente — não dá para ler o checkpoint do lote" ;;
-  *) halt "(4) o flip não está NOMEADO no checkpoint do lote: o grafo precisa de meta.drive_checkpoint: pending e de '${NODE}' na drive_checkpoint_note (rode kg-drive-project.sh <grafo> --close-lot \"... ${NODE} ...\")" ;;
+  *) halt "(4) o flip não está NOMEADO no checkpoint do lote: o grafo precisa de meta.x_drive_checkpoint: pending e de '${NODE}' na x_drive_checkpoint_note (rode kg-drive-project.sh <grafo> --close-lot \"... ${NODE} ...\")" ;;
 esac
 
 say "AUTO — flip de '${NODE}' dispensa selo SEPARADO (exceção nomeada §4.1)"
@@ -209,5 +209,5 @@ say "  (1) não está em nenhum .kg.yaml de ${BASE}, nem na história dela (base
 [ -z "${_DEGRADED}" ] || say "      ⚠️ leitura DEGRADADA (texto, não YAML) em: ${_DEGRADED} — nenhum deles menciona o id"
 say "  (2) derrubado por '${SRC}' com verified_at + verified_against preenchidos — teto: o script não julga se a medição ocorreu"
 say "  (3) aresta ${KIND} → alvo '${TARGET_STATUS}' (Aufhebung aplicada) · kg-radar --integrity --schema exit 0"
-say "  (4) o flip está nomeado na drive_checkpoint_note do lote pendente — viaja no diff do PR, onde o maestro sela"
+say "  (4) o flip está nomeado na x_drive_checkpoint_note do lote pendente — viaja no diff do PR, onde o maestro sela"
 exit 0

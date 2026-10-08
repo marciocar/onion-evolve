@@ -19559,6 +19559,14 @@ run_drive_selftests() {
   printf 'meta:\n  schema_version: 1\n%s\n' "${body}" > "${d2}/lote.kg.yaml"
   local _w=0
   bash "${ds}" "${d2}/lote.kg.yaml" --close-lot 'lote 9: PR #1' >/dev/null 2>&1 || _w=1
+  # CONTRATO v4 (2026-10-08): chave de extensão sem `x_` REPROVA no MUST, e todo grafo novo fechado
+  # por lote sairia reprovado no gate do CI. A escrita tem de ser `x_drive_checkpoint(_note)`, e a
+  # forma antiga não pode sobrar (a leitura dela segue aceita para grafo herdado, casos acima).
+  if grep -qx '  x_drive_checkpoint: pending' "${d2}/lote.kg.yaml" \
+     && grep -qx '  x_drive_checkpoint_note: "lote 9: PR #1"' "${d2}/lote.kg.yaml" \
+     && ! grep -qE '^  drive_checkpoint(_note)?:' "${d2}/lote.kg.yaml"; then
+    record_pass "drive: --close-lot escreve x_drive_checkpoint(+_note), a extensao que o contrato v4 aceita"
+  else record_fail "drive: chave do checkpoint" "a escrita nao saiu com o prefixo x_: $(grep -n checkpoint "${d2}/lote.kg.yaml" | head -3)"; fi
   rc=0; bash "${ds}" "${d2}/lote.kg.yaml" --check >/dev/null 2>&1 || rc=$?; [ "${rc}" -eq 1 ] || _w=2
   bash "${ds}" "${d2}/lote.kg.yaml" --seal >/dev/null 2>&1 || _w=3
   rc=0; bash "${ds}" "${d2}/lote.kg.yaml" --check >/dev/null 2>&1 || rc=$?; [ "${rc}" -eq 0 ] || _w=4
@@ -22317,6 +22325,30 @@ KG
     record_pass "dissect: (c2) review_after no passado ⇒ VENCIDO"
   else record_fail "dissect: (c2)" "esperado VENCIDO, veio '$(_col beta 6)'"; fi
 
+  # (x) CONTRATO v4 (2026-10-08): extensão sem `x_` REPROVA no MUST, então a dissecação nova se
+  #     declara com `x_dissect_tool`/`x_dissect_level`/`x_dissect_verdict`. O censo tem de ler a
+  #     forma nova com o MESMO rigor da antiga (nível máximo e veredito). MUTANTE: o grupo `(x_)`
+  #     fora do sed faz o grafo sumir do censo; o `\1` no lugar do `\2` devolve "x_" como ferramenta.
+  mkdir -p "${d}/docs/evolution/dissect/delta-2026-10"
+  cat > "${d}/docs/evolution/dissect/delta-2026-10/delta-2026-10.kg.yaml" <<'KG'
+meta:
+  id: delta-2026-10
+  x_dissect_tool: delta
+  baseline: "2026-10-01"
+  review_after: "2099-01-01"
+nodes:
+  - id: E_N3
+    x_dissect_level: 3
+  - id: E_N1
+    x_dissect_level: 1
+  - id: D_DELTA
+    x_dissect_verdict: absorver
+KG
+  _dc --tsv
+  if [ "$(_col delta 2)" = "3" ] && [ "$(_col delta 3)" = "absorver" ]; then
+    record_pass "dissect: (x) marcadores x_dissect_* (contrato v4) contam, com nivel maximo e veredito"
+  else record_fail "dissect: (x)" "esperado delta nivel 3 + absorver, veio: $(_emit "${_dc_out}" | grep delta | head -c 200)"; fi
+
   # (c3) MUTANTE DA POLARIDADE — SEM review_after ⇒ NAO-DECLARADO, JAMAIS "fresco" por omissao.
   #      Guarda que nao sabe nunca afirma conformidade (P0 da REGRA 30).
   mkdir -p "${d}/docs/evolution/dissect/gama-2026-10"
@@ -23353,8 +23385,8 @@ run_kg_migrate_v3_selftests() {
     record_pass "kg-migrate-v3: (a) datas sem aspas ganham aspas (valid_from inteiro vira \"2026\") e o comentário fica"
   else record_fail "kg-migrate-v3: (a)" "datas não citadas: rc=${rc} ${out}"; fi
   # (b) provenance derivada do trace, com o método declarando a derivação
-  if python3 -I -B -c 'import json,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_COM_TRACE"]["provenance"]; assert p["source"]=="ops/algum-script.sh" and p["locator"]=="medição X no commit abc" and "derivado" in p["method"]' "${y}" 2>/dev/null; then
-    record_pass "kg-migrate-v3: (b) provenance derivada do trace do nó, locator = verified_against, method declara a derivação"
+  if python3 -I -B -c 'import json,re,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_COM_TRACE"]["provenance"]; assert p["source"]=="ops/algum-script.sh" and p["locator"]=="medição X no commit abc" and re.match(r"derivado: \S", p["method"])' "${y}" 2>/dev/null; then
+    record_pass "kg-migrate-v3: (b) provenance derivada do trace do nó, locator = verified_against, method na forma canônica 'derivado: …' (contrato v4)"
   else record_fail "kg-migrate-v3: (b)" "provenance do trace ausente/errada: ${y}"; fi
   # (c2) sem trace, fonte = URL citada no verified_against
   if python3 -I -B -c 'import json,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; assert n["E_COM_URL"]["provenance"]["source"]=="https://exemplo.org/doc#sec-2"' "${y}" 2>/dev/null; then

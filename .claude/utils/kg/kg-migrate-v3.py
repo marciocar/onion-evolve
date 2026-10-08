@@ -119,7 +119,7 @@ def migrate(text):
                     "    provenance:",
                     "      source: " + q(src),
                     "      locator: " + q(va),
-                    "      method: " + q(f"derivado na migração ao contrato v3 ({how}); não reverificado na migração"),
+                    "      method: " + q(f"derivado: na migração ao contrato v3 ({how}); não reverificado"),
                 ]
                 rep["prov"].append(nid)
             else:

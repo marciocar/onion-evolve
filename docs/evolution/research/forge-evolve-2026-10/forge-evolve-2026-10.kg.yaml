@@ -5,7 +5,7 @@ meta:
   schema_version: "1"
   baseline: 2026-10-04
   review_after: 2026-11-18
-  supersedes_none: >
+  x_supersedes_none: >
     Re-forja de superficie existente, nao rodada de eixo: nao ha baseline de radar a reconciliar.
     O que esta leva CONSTRANGE vive em grafos de hoje e e reconciliado la (a aresta do motor e
     intra-arquivo): o no C_O_EVOLVE_NAO_E_FRACO_E_SEM_GATILHO (medidores-silenciosos) teve o

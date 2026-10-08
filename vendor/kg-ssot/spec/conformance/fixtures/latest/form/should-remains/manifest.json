@@ -1,0 +1,34 @@
+{
+  "description": "Contrato v4: o SHOULD que fica, o do v3 menos o que subiu a MUST: nó PROD sem verified_at, label acima de 280 caracteres e grafo sem nós alertam (Q_CONTRACT_CONFORMANCE_LEVELS, Q_CONTRACT_FACT_NARRATIVE, Q_CONTRACT_EMPTY_GRAPH).",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "warn-prod-without-verified-at.kg.yaml",
+      "description": "nó PROD com provenance e sem verified_at: só alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.verified_at"
+      ]
+    },
+    {
+      "file": "warn-label-over-280.kg.yaml",
+      "description": "label do nó com 300 caracteres: só alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.node.label"
+      ]
+    },
+    {
+      "file": "warn-empty-graph.kg.yaml",
+      "description": "grafo sem nós: válido, com aviso",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.range.top.nodes"
+      ]
+    }
+  ]
+}

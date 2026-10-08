@@ -4,7 +4,7 @@ meta:
   baseline: 2026-09-21
   review_after: 2026-11-05   # radar de mundo: cadencia 45d (REGRA 65/67)
 
-  supersedes_none: >
+  x_supersedes_none: >
     Esta rodada nao derrubou no nenhum da BASELINE ANTERIOR do eixo E3, que e a
     `radar-E3-2026-09-04-r4` — e nomear o grafo certo importa, porque a 1a versao desta
     declaracao mirava o `claude-code-2.1-onion-2026-08`, que NUNCA foi baseline do E3 (o

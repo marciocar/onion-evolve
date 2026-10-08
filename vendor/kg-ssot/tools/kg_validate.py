@@ -33,8 +33,8 @@ from jsonschema.exceptions import ValidationError
 
 _ROOT = __import__("pathlib").Path(__file__).resolve().parent.parent
 # O contrato VIGENTE, num lugar só: a suíte, a matriz, a medição do core e a catraca leem daqui.
-CONTRACT_MUST = _ROOT / "spec" / "kg-contract-v3.schema.json"
-CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v3.should.schema.json"
+CONTRACT_MUST = _ROOT / "spec" / "kg-contract-v4.schema.json"
+CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
 
 
 class Yaml12BoolLoader(yaml.SafeLoader):
@@ -318,6 +318,8 @@ def form_codes(error):
             return []  # nome não-slug já alerta como form.pattern.<escopo>.key; não repete como unknown-key
         return [f"form.unknown-key.{scope}.{'.'.join(prefix + [str(error.instance)])}"]  # fora da gramática e sem x_
     kind = FORM_TYPE.get(error.validator, error.validator)
+    if error.validator == "not" and isinstance(error.validator_value, dict) and "pattern" in error.validator_value:
+        kind = "pattern"  # o v4 diz "não pode casar com placeholder" por not+pattern, sem lookahead (portável a RE2)
     if error.validator in ("additionalProperties", "required"):
         # O erro é do OBJETO (o topo, o meta, um nó, uma aresta ou um objeto dentro deles).
         if error.validator == "required":

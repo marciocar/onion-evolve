@@ -1,5 +1,5 @@
 {
-  "description": "Proveniência estruturada (Q_CONTRACT_STRUCTURED_PROVENANCE, selada no PR #21): provenance com source, locator e method; no v3, nó confirmed ou PROD sem ela alerta, e no v4 reprova.",
+  "description": "Proveniência estruturada (Q_CONTRACT_STRUCTURED_PROVENANCE, selada no PR #21): provenance com source, locator e method; nó confirmed ou PROD sem ela alertou no v3 e reprova desde o v4.",
   "layer": "form",
   "pending_on": [],
   "cases": [
@@ -10,22 +10,22 @@
       "codes": []
     },
     {
-      "file": "warn-confirmed-without-provenance.kg.yaml",
-      "description": "nó confirmed sem provenance: alerta no v3",
-      "valid": true,
-      "codes": [],
-      "warnings": [
+      "file": "bad-confirmed-without-provenance.kg.yaml",
+      "description": "nó confirmed sem provenance: alertava no v3, reprova desde o v4",
+      "valid": false,
+      "codes": [
         "form.required.node.provenance"
-      ]
+      ],
+      "warnings": []
     },
     {
-      "file": "warn-prod-without-provenance.kg.yaml",
-      "description": "nó PROD só com verified_against em texto: alerta no v3",
-      "valid": true,
-      "codes": [],
-      "warnings": [
+      "file": "bad-prod-without-provenance.kg.yaml",
+      "description": "nó PROD só com verified_against em texto: alertava no v3, reprova desde o v4",
+      "valid": false,
+      "codes": [
         "form.required.node.provenance"
-      ]
+      ],
+      "warnings": []
     },
     {
       "file": "bad-provenance-missing-locator.kg.yaml",
@@ -75,22 +75,22 @@
       ]
     },
     {
-      "file": "warn-edge-provenance.kg.yaml",
-      "description": "provenance só existe no nó; na aresta é chave desconhecida",
-      "valid": true,
-      "codes": [],
-      "warnings": [
+      "file": "bad-edge-provenance.kg.yaml",
+      "description": "provenance só existe no nó; na aresta é chave desconhecida, que reprova desde o v4",
+      "valid": false,
+      "codes": [
         "form.unknown-key.edge.provenance"
-      ]
+      ],
+      "warnings": []
     },
     {
-      "file": "warn-confirmed-and-prod-without-provenance.kg.yaml",
-      "description": "confirmed e PROD ao mesmo tempo: um alerta só",
-      "valid": true,
-      "codes": [],
-      "warnings": [
+      "file": "bad-confirmed-and-prod-without-provenance.kg.yaml",
+      "description": "confirmed e PROD ao mesmo tempo: um código só; reprova desde o v4",
+      "valid": false,
+      "codes": [
         "form.required.node.provenance"
-      ]
+      ],
+      "warnings": []
     }
   ]
 }

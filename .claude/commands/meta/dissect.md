@@ -67,7 +67,7 @@ não gasta o plano de absorção em algo que ainda vai ser rejeitado).
 4. **VEREDITO** — um dos quatro, com razão escrita. `parquear` **exige gatilho nomeado**.
 5. **DESTINO (peça 5)** — `write(KG)` em
    `docs/evolution/dissect/<ferramenta>-<AAAA-MM>/<ferramenta>-<AAAA-MM>.kg.yaml` com os
-   marcadores que o censo lê (`meta.dissect_tool:`, `dissect_level:` por nó, `dissect_verdict:` no
+   marcadores que o censo lê (`meta.x_dissect_tool:`, `x_dissect_level:` por nó, `x_dissect_verdict:` no
    nó de decisão), `meta.review_after` pela cadência (ferramenta/preço 30d), `# kg-backlog-guard:
    on` e `# ═══ TETO: N NÓS ═══`. **`kg-radar` exit 0 é obrigatório** antes de qualquer prosa.
    O `SYNTHESIS.md` é **projeção**, com o **contrato de custo** no frontmatter: `kg:` · `run_id` ·
