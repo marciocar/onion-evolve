@@ -19,7 +19,10 @@ nota: >-
   relacionado ao SAC-63. Radar --integrity --schema exit 0. Nenhum .kg.yaml existente editado, logo
   REGRA 87 (PR que EDITA um .kg.yaml enxergou os confirmed dele) sem objeto. Sem Elenxo, declarado: a
   decisão fica aberta e o Elenxo é condição dela. Pre-commit pulado por ordem do maestro; validação =
-  pr-finalize + CI.
+  pr-finalize + CI. Achado ao rebasear sobre o #967 (gate do contrato v3 no CI): o grafo novo subia três
+  dívidas SHOULD (provenance ausente em nó confirmado, data sem aspas, label acima de 280). Curado no
+  próprio grafo: datas entre aspas, provenance estruturada nos 5 confirmed, labels longos divididos em
+  label curto mais narrative. É o primeiro grafo do core conforme ao contrato v3 no SHOULD; gate rc=0.
 ---
 
 # Resíduo — `chore/auto-drive-decision-node`
