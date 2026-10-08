@@ -23815,6 +23815,11 @@ run_radar_aufhebung_selftests() {
   # (d) a UNICA forma expressavel de Aufhebung cross-file — a aresta do motor e INTRA-arquivo, e o
   #     /meta:radar manda grafo PROPRIO por rodada. Sem este caso a guarda pune quem obedece.
   _r89 e  '  supersedes_external: "outro.kg.yaml#E_VELHO"' ""; _esp e 0 "(d) supersedes_external conta (a aresta nao cruza arquivo)"
+  # (d2) a forma de EXTENSAO do contrato v3 do .kg.yaml (chave com prefixo x_). Medido em 2026-10-08: o
+  #      contrato acusa `meta.supersedes_external` como chave desconhecida (SHOULD) e o gate por grafo do CI
+  #      reprova grafo NOVO que suba essa divida — toda rodada de radar nova reprovava. A guarda aceita as duas.
+  _r89 e2 '  x_supersedes_external: "outro.kg.yaml#E_VELHO"' ""; _esp e2 0 "(d2) x_supersedes_external (extensao do contrato v3) conta"
+  _r89 e3 '  x_supersedes_none: a razao real' ""; _esp e3 0 "(d3) x_supersedes_none (extensao do contrato v3) conta"
 
   # (e) FAIL-OPEN provado no grafo REAL: bastava a PALAVRA para calar a guarda. Tres formas vazias.
   _r89 f1 '  supersedes_none:'                 ""            ; _esp f1 1 "(e1) supersedes_none VAZIO NAO cala a guarda"
