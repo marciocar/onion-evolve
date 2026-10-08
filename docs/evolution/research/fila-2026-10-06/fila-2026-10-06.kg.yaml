@@ -275,7 +275,7 @@ nodes:
     status: open
     impact: 4
     confidence: 0.6
-    verified_against: "nota do maestro 2026-10-07: forjar o SDAAL do Task Manager por inteiro, incremental, com plano gerido num task manager"
+    verified_against: "nota do maestro 2026-10-07: forjar o SDAAL do Task Manager por inteiro, incremental, com plano gerido num task manager; projeção no Linear (time Sacola) criada em 2026-10-08: projeto Onion — SDAAL do Task Manager, ondas SAC-62 a SAC-65"
     label: "programa: interface do task manager com assinaturas para o vocabulário padrão (status, comentários, alertas, notificações, busca, relatórios, toggles e triggers, story points, owner e responsável, testes, start e due date); cada adapter declara mínimo, obrigatório, implementado e não implementado por versão; maquinaria de criar, validar e atualizar adapter (forja, wizard, onboarding); inclui o % da task-mãe por story points. Pesquisa primeiro, entrega em ondas"
   - id: E_CONFLITO_DE_PROJECAO_GERADA
     node_type: evidence

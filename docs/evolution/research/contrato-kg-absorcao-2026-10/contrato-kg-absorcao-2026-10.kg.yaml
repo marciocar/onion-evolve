@@ -7,6 +7,8 @@ meta:
   schema_version: "1"
   baseline: 2026-10-08
   review_after: 2026-11-07   # 30d: programa de trabalho
+  # ═══ TETO: 15 NÓS ═══
+  #   6 em 2026-10-08. Onda nova exige onda colhida.
 nodes:
   - id: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     node_type: evidence
