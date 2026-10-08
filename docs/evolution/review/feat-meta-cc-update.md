@@ -3,10 +3,9 @@ title: "Revisão — /meta:cc-update forjado pelo /meta:forge (medidor, doutrina
 date: 2026-10-08
 branch: feat/meta-cc-update
 reviewer: "passada adversarial do próprio fork de execução (a ordem proibia subagente); mandato: achar onde o artefato AFIRMA mais do que mede. Evidência por execução: dogfood de carga headless nos dois modos, diff -r contra o data/ da r8, 9 mutantes, radar e contrato v3"
-reviewed_diff_sha256: 6af74e046e3f95f94cdb0a1fa78728b95369eb5cdbb7051f08b45e372d24d7de
-reviewed_code_sha256: 070945a8a81122ec6f386a8855a629364714d1571f2a9ca33643ab2776e90f43
-findings_total: 6
-findings_real: 6
+reviewed_diff_sha256: pendente
+findings_total: 7
+findings_real: 7
 verdict: APROVADO
 tokens: 0
 duration_min: 90
@@ -20,7 +19,7 @@ Forja do `/meta:cc-update` (decisão do maestro de 2026-10-08): o medidor
 `docs/evolution/research/forge-cc-update-2026-10/`. Censo da forja: o comando entrou com **6 de 7**
 peças (a peça 4 está ausente por desenho, declarada).
 
-## Achados da passada (6, todos reais, todos curados neste PR)
+## Achados da passada (7, todos reais, todos curados neste PR)
 
 1. **O erro culpava a fonte quando a causa era um override.** Achado no dogfood de CARGA: com um
    `CC_DELTA_URL` de teste herdado, a sessão leu "CHANGELOG inalcançável". Cura: todo `CC_DELTA_*` ativo
@@ -37,6 +36,12 @@ peças (a peça 4 está ausente por desenho, declarada).
    `CONSTRAINS`.
 6. **Nó aberto do esqueleto sem `verified_at`.** O radar avisaria STALE-MISSING em toda rodada nova.
    Cura: o esqueleto carimba a data.
+7. **O caso (k) do role-cut reprovou no CI.** O docstring do medidor cita `/meta:cc-update`, e o caso
+   cobra que todo comando citado por guarda viaje para o papel standalone. O comando é core-only:
+   re-mede a estratégia do core e sela a baseline do core. Cura: entra na lista de exceções da fábrica,
+   pelo mesmo critério de `forge`, `dissect` e `forge-guard`, com a razão escrita junto. A cura
+   apareceu na worktree escrita por outra sessão. Eu a revisei, rodei `role_cut` com 17/17 e a adotei.
+   O registro fica aqui porque a I3 (um escritor por repo) foi tocada.
 
 ## Tetos declarados (não são achados, são fronteira)
 
