@@ -16463,7 +16463,7 @@ run_role_cut_selftests() {
         #     cada versão do Claude Code (radar E3 + selo da baseline do core), declara `Core-only`
         #     na própria `description:`, e o `cc-delta-census.sh` o cita só no docstring. Quarto
         #     comando pego na PRIMEIRA corrida depois de nascer (CI do PR #980).
-        adopt|evolve|forge|dissect|forge-guard|create-*|federation-*|co-announce|co-deliver) continue ;;  # fábrica/federação
+        adopt|evolve|forge|dissect|forge-guard|cc-update|create-*|federation-*|co-announce|co-deliver) continue ;;  # fábrica/federação
         nao|federation-) continue ;;                                            # falsos positivos do grep
       esac
       [ -f "${REPO_ROOT}/.claude/commands/meta/${_c}.md" ] || continue          # comando que não existe
