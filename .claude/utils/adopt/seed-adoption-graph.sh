@@ -85,13 +85,22 @@ fi
 
 case "${GATE}" in
   proven)   GATE_STATUS="confirmed"
-            GATE_LABEL="O gate determinístico foi PROVADO POR EXECUÇÃO na adoção (hook nativo via core.hooksPath, commit-sonda barrado com o lint reprovando) — não por existência de arquivo. Isso importa porque a medição de 2026-08-16 achou o gate INERTE em 4 de 6 adotantes (husky sombreando o hooksPath, hooksPath para diretório vazio, hook ausente), e nenhum caso era visível sem executar."
+            GATE_LABEL="O gate determinístico foi PROVADO POR EXECUÇÃO na adoção: um commit-sonda foi barrado com o lint reprovando"
+            GATE_NARRATIVE="Prova por execução, não por existência de arquivo (hook nativo via core.hooksPath). A medição de 2026-08-16 achou o gate INERTE em 4 de 6 adotantes (husky sombreando o hooksPath, hooksPath para diretório vazio, hook ausente), e nenhum caso era visível sem executar."
+            GATE_SOURCE="install-onion-githook.sh rodado na adoção (linha GATE VIVO)"
+            GATE_METHOD="execução de commit-sonda"
             GATE_VERIF="verify-adopter-gate-executado-na-adocao" ;;
   unproven) GATE_STATUS="open"
-            GATE_LABEL="O gate está INSTALADO mas NÃO foi provado por execução nesta adoção (alvo sem commits, ou lint indisponível no momento). Instalar não é sinônimo de proteger: rode 'bash ops/verify-adopter-gate.sh <este-repo>' a partir do core, ou faça um commit que viole o lint de propósito e confirme que ele é BARRADO. Enquanto isto for \`open\`, a proteção deste repo é declarada, não verificada."
+            GATE_LABEL="O gate está INSTALADO mas NÃO foi provado por execução nesta adoção"
+            GATE_NARRATIVE="Alvo sem commits, ou lint indisponível no momento. Instalar não é sinônimo de proteger: rode 'bash ops/verify-adopter-gate.sh <este-repo>' a partir do core, ou faça um commit que viole o lint de propósito e confirme que ele é BARRADO. Enquanto isto for open, a proteção deste repo é declarada, não verificada."
+            GATE_SOURCE="install-onion-githook.sh rodado na adoção (prova adiada)"
+            GATE_METHOD="instalação sem execução de prova"
             GATE_VERIF="nao-verificado-gate-declarado-e-nao-provado" ;;
   *)        GATE_STATUS="open"
-            GATE_LABEL="O gate foi instalado; se ele BARRA de fato, ninguém mediu nesta adoção (o semeador não recebeu --gate-proven nem --gate-unproven). Prove antes de confiar: 'bash ops/verify-adopter-gate.sh <este-repo>' do core."
+            GATE_LABEL="O gate foi instalado; se ele BARRA de fato, ninguém mediu nesta adoção"
+            GATE_NARRATIVE="O semeador não recebeu --gate-proven nem --gate-unproven. Prove antes de confiar: 'bash ops/verify-adopter-gate.sh <este-repo>' do core."
+            GATE_SOURCE="semeador da adoção, sem informação do instalador do gate"
+            GATE_METHOD="nenhuma medição"
             GATE_VERIF="nao-informado-ao-semeador" ;;
 esac
 
@@ -99,25 +108,11 @@ OUT="${DEST}/docs/onion/graph/onion-adoption.kg.yaml"
 mkdir -p "$(dirname "${OUT}")"
 
 cat > "${OUT}" <<YAML
-graph: onion-adoption
-title: "Adoção do Onion neste repositório — a semente do KG"
-layer: mixed
-created: ${TODAY}
-updated: ${TODAY}
-owner: ${SLUG}
-purpose: |
-  Este é o PRIMEIRO grafo deste repo, semeado pela adoção do Onion. Ele existe por um motivo
-  operacional: o passo 0 do /warm-up é "se existir um .kg.yaml, consulte-o PRIMEIRO" — e com zero
-  grafos esse passo fica VAZIO, a sessão degrada para ler prosa, e o conhecimento do projeto segue
-  preso ao contexto de uma conversa em vez de morar no repo.
-  Leia com: bash .claude/validation/kg-radar.sh docs/onion/graph/onion-adoption.kg.yaml
-  A seção ESTADO mostra o que segue \`open\` — é a fila real, ordenada pelo que pesa.
-como_usar: |
-  NÃO trate este arquivo como template a preencher. Ele carrega FATOS verificados da adoção e UMA
-  pergunta aberta: qual é o domínio deste repo. Ao responder, crie o SEU grafo em
-  docs/onion/graph/<seu-tema>.kg.yaml e reconcilie a pergunta daqui para \`done\`.
-  Gramática antes de escrever: .claude/rules/kg-grammar.md (o campo é \`node_type:\`/\`edge_type:\`,
-  nunca \`type:\`; nó PROD de alto impacto sem \`verified_at\` é acusado pela catraca).
+# Adoção do Onion neste repositório — a semente do KG (dono: ${SLUG}).
+# Nasce conforme ao CONTRATO v3 do .kg.yaml (2026-10-08): só chaves que o contrato conhece no topo e
+# no meta, datas entre aspas, provenance em todo nó confirmed ou PROD, label curto + narrative. A 1ª
+# redação trazia graph/title/layer/created/updated/owner/purpose/como_usar no TOPO, datas sem aspas e
+# labels de até 520 caracteres — 11 avisos SHOULD no 1º grafo de todo adotante.
 # DOCUMENTO ÚNICO de propósito (sinal de campo 2026-10-06, onion-slm): a 1ª redação abria e fechava
 # este cabeçalho com linhas de três hífens, o que para um parser YAML são DOIS documentos. O radar (linha a linha)
 # aceitava; o kg-drive-project.sh e o kg-realign-project.sh recusavam com exit 2 — o 1º grafo de
@@ -131,8 +126,9 @@ como_usar: |
 meta:
   id: onion-adoption-${SLUG}
   schema_version: "1"
-  baseline: ${TODAY}
-  date: ${TODAY}
+  baseline: "${TODAY}"
+  purpose: "PRIMEIRO grafo deste repo, semeado pela adoção do Onion: o passo 0 do /warm-up é consultar o .kg.yaml antes de tudo, e com zero grafos esse passo fica vazio e a sessão degrada para ler prosa. Leia com: bash .claude/validation/kg-radar.sh docs/onion/graph/onion-adoption.kg.yaml (a seção ESTADO é a fila real)."
+  note: "NÃO é template a preencher: carrega FATOS verificados da adoção e UMA pergunta aberta (o domínio deste repo). Ao responder, crie o SEU grafo em docs/onion/graph/<seu-tema>.kg.yaml e reconcilie a pergunta daqui para done. Gramática antes de escrever: .claude/rules/kg-grammar.md."
 
 nodes:
   - id: THIS_REPO
@@ -142,9 +138,14 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 1.0
-    verified_at: ${TODAY}
+    verified_at: "${TODAY}"
     verified_against: basename-do-alvo-e-stamp-claude-onion-version
-    label: "\`${SLUG}\` — este repositório, consumidor do framework Onion (papel \`${ROLE}\`). Ele é a entidade dona dos estados abaixo; o domínio do NEGÓCIO dele ainda não está mapeado (ver a pergunta aberta)."
+    label: "\`${SLUG}\` — este repositório, consumidor do framework Onion (papel \`${ROLE}\`)"
+    narrative: "É a entidade dona dos estados abaixo; o domínio do NEGÓCIO dele ainda não está mapeado (ver a pergunta aberta)."
+    provenance:
+      source: ".claude/.onion-version deste repo"
+      locator: "campo role e o nome do diretório"
+      method: "leitura na adoção"
 
   - id: ONION_INSTALLED
     layer: domain
@@ -153,9 +154,14 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 1.0
-    verified_at: ${TODAY}
+    verified_at: "${TODAY}"
     verified_against: stamp-claude-onion-version-lido-na-adocao
-    label: "Framework instalado: pin \`${PIN}\`, modo \`${MODE}\`, papel \`${ROLE}\`, branch de integração \`${IB}\`. Atualizar depois com /meta:adopt --update a partir do core — o merge de \`onion/vendor\` transforma customização local em conflito git real, resolvível, em vez de sobrescrita silenciosa."
+    label: "Framework instalado: pin \`${PIN}\`, modo \`${MODE}\`, papel \`${ROLE}\`, branch de integração \`${IB}\`"
+    narrative: "Atualizar depois com /meta:adopt --update a partir do core — o merge de onion/vendor transforma customização local em conflito git real, resolvível, em vez de sobrescrita silenciosa."
+    provenance:
+      source: ".claude/.onion-version deste repo"
+      locator: "campos source_commit, mode, role e integration_branch"
+      method: "leitura na adoção"
 
   - id: DETERMINISTIC_GATE
     layer: domain
@@ -164,9 +170,14 @@ nodes:
     status: ${GATE_STATUS}
     impact: 5
     confidence: 0.9
-    verified_at: ${TODAY}
+    verified_at: "${TODAY}"
     verified_against: ${GATE_VERIF}
     label: "${GATE_LABEL}"
+    narrative: "${GATE_NARRATIVE}"
+    provenance:
+      source: "${GATE_SOURCE}"
+      locator: "hook nativo via core.hooksPath deste repo"
+      method: "${GATE_METHOD}"
 
   - id: Q_WHAT_IS_THIS_REPO_DOMAIN
     node_type: question
@@ -174,9 +185,14 @@ nodes:
     status: open
     impact: 5
     confidence: 1.0
-    verified_at: ${TODAY}
+    verified_at: "${TODAY}"
     verified_against: semente-da-adocao-dominio-ainda-nao-mapeado
-    label: "A PERGUNTA QUE ABRE O HÁBITO, e o radar vai afundá-la a cada leitura até ela ser respondida: qual é o domínio deste repo — as entidades, os estados, as decisões já tomadas e as premissas que ainda são premissa? Responder é criar docs/onion/graph/<tema>.kg.yaml com nós reais e reconciliar esta pergunta para \`done\`. Enquanto ela estiver aberta, a próxima sessão que abrir este repo tem de reconstruir o entendimento da prosa — que é exatamente o custo que o KG existe para eliminar."
+    label: "Qual é o domínio deste repo: as entidades, os estados, as decisões já tomadas e as premissas que ainda são premissa?"
+    narrative: "A pergunta que abre o hábito; o radar a afunda a cada leitura até ser respondida. Responder é criar docs/onion/graph/<tema>.kg.yaml com nós reais e reconciliar esta pergunta para done. Enquanto ela estiver aberta, cada sessão nova reconstrói o entendimento da prosa, que é o custo que o KG existe para eliminar."
+    provenance:
+      source: "semeador da adoção (seed-adoption-graph.sh)"
+      locator: "ausência de grafo de domínio no repo na hora da adoção"
+      method: "verificação de ausência por git ls-files"
 
   - id: D_ADOPT_ONION
     node_type: decision
@@ -184,10 +200,15 @@ nodes:
     status: done
     impact: 4
     confidence: 1.0
-    verified_at: ${TODAY}
+    verified_at: "${TODAY}"
     verified_against: superficie-do-framework-presente-e-stamp-carimbado
     trace: "adoção executada por /meta:adopt a partir do core onion-evolve, pin ${PIN}, em ${TODAY}"
-    label: "DECISÃO: adotar o Onion neste repo (modo \`${MODE}\`). O que se ganha não é o inventário de scripts — é o gate determinístico que REPROVA e o KG como fonte de estado. As duas metades se sustentam: gate sem grafo protege sintaxe sem memória; grafo sem gate é acervo que ninguém é obrigado a manter honesto."
+    label: "DECISÃO: adotar o Onion neste repo (modo \`${MODE}\`), pelo gate que reprova e pelo KG como fonte de estado"
+    narrative: "O que se ganha não é o inventário de scripts. As duas metades se sustentam: gate sem grafo protege sintaxe sem memória; grafo sem gate é acervo que ninguém é obrigado a manter honesto."
+    provenance:
+      source: "commit da adoção neste repo e o .claude/.onion-version"
+      locator: "superfície do framework presente e stamp carimbado"
+      method: "leitura na adoção"
 
 edges:
   - from: THIS_REPO

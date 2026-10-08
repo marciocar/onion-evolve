@@ -56,6 +56,16 @@ const KG_ANCHOR = '\n\n⚠️ ANCORAGEM DO CAMINHO (não negociável): `' + KG_P
   + 'a partir dali. Ao devolver `kgPath`, devolva o caminho ABSOLUTO que você realmente escreveu '
   + '(saída de `readlink -f`), não o relativo que recebeu — uma sessão que troca de worktree no meio '
   + 'do run já fez um grafo nascer na árvore errada com radar exit 0.'
+// CONTRATO v3 do .kg.yaml (2026-10-08, SAC-71): desde o #967 o gate do contrato roda no CI e reprova grafo
+// NOVO que suba a dívida SHOULD. O escritor tem de nascer conforme — antes deste bloco o grafo saía com
+// data sem aspas, nó confirmed sem provenance e label longo, e foi curado à mão duas vezes no mesmo dia.
+const CONTRACT_V3 = '\n\n## CONTRATO v3 do .kg.yaml (não negociável — o gate do CI reprova grafo novo fora dele)\n'
+  + '- **Datas entre aspas**: `baseline: "' + TODAY + '"`, `review_after: "…"`, `verified_at: "' + TODAY + '"`, `valid_from: "2026"`. Sem aspas a data é data em YAML 1.1 e o contrato acusa yaml.unquoted-date.\n'
+  + '- **provenance em todo nó confirmed (ou plane PROD)**: bloco aninhado com as três chaves, cada uma num nível a mais de indentação:\n'
+  + '  `provenance:` / `  source: "<URL ou caminho@commit lido>"` / `  locator: "<seção, artigo ou trecho>"` / `  method: "<leitura | medição | votação de juízes | ancoragem>"`.\n'
+  + '  A fonte tem de ser VERIFICÁVEL: a URL que o leitor abriu, o caminho@commit que foi medido. **Sem fonte real, o nó NÃO é confirmed** (deixe open) — nunca invente source para passar no contrato.\n'
+  + '- **label ≤ 280 caracteres**: só a afirmação curta. Contexto, porquê e detalhe vão em `narrative: "…"` no mesmo nó.\n'
+  + '- Depois do radar, rode `bash .claude/validation/kg-contract-check.sh ' + KG_PATH + '` e exija rc 0 — ele usa o leitor de referência do contrato vendorizado; rc 1 = CORRIJA e rode de novo (máx 3 tentativas); rc 2 = o contrato não está vendorizado neste repo: declare no summary e siga (não é reprovação).'
 let CORPUS = String(A.corpus || '')
 const MODE = String(A.mode || 'research')
 // ─── mode: 'primaries' — as lacunas JÁ TÊM NOME (F5) ───
@@ -292,8 +302,8 @@ if (MODE === 'primaries') {
     '\n\n### Fontes inalcançáveis\n' + (unreachable.length ? unreachable.join(', ') : '(nenhuma)') +
     '\n\n### Corpus prévio\n' + (CORPUS || '(vazio)') +
     '\n\n### Elenxo (inteiro — NÃO corte: em 2026-10-07 um .slice(0, 7000) jogou fora 22 de 38 objeções, e 13 sobreviventes nunca viraram nó)\n' + JSON.stringify(pElenxo || {}) +
-    KG_ANCHOR +
-    '\n\n## Passos\n1. Read do arquivo (se existir). 2. Write/Edit. 3. `bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema` — capture o exit code; se ≠ 0, CORRIJA e rode de novo (máx 3 tentativas). 4. Devolva kgPath, radarExit (o último), nodes (os ADICIONADOS nesta rodada), edges (idem), nodesTotal (o total do grafo ao fim) e summary (1 frase).\n\n' +
+    KG_ANCHOR + CONTRACT_V3 +
+    '\n\n## Passos\n1. Read do arquivo (se existir). 2. Write/Edit. 3. `bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema` — capture o exit code; se ≠ 0, CORRIJA e rode de novo (máx 3 tentativas). 3b. `bash .claude/validation/kg-contract-check.sh ' + KG_PATH + '` — rc 1 = CORRIJA e rode de novo; rc 2 = contrato não vendorizado aqui, declare no summary. 4. Devolva kgPath, radarExit (o último), nodes (os ADICIONADOS nesta rodada), edges (idem), nodesTotal (o total do grafo ao fim) e summary (1 frase).\n\n' +
     'Somente saída estruturada.',
     { label: 'write-kg-primarias', phase: 'write(KG)', schema: KG_SCHEMA_PRIMARIES, model: TIER.judge.model, effort: TIER.judge.effort })
   if (!pKg) return { error: 'write(KG) não devolveu resultado — o grafo não foi escrito. Nada selado.', question: QUESTION, anchoredCount: anchored.length, elenxo: pElenxo }
@@ -477,7 +487,7 @@ const kg = await ag(
   '\n### Mercado (do sintetizador)\n' + (report ? webText(report.market) : '(sem síntese: 0 confirmadas)') +
   '\n### Não verificadas / refutadas\n' + unverified.map(c => '- ? ' + webText(c.claim) + ' | ' + webText(c.sourceUrl)).join('\n') + '\n' + killed.map(c => '- ✗ ' + webText(c.claim) + ' | ' + webText(c.sourceUrl) + ' tier=' + c.sourceTier).join('\n') +
   '\n### Corpus prévio\n' + (CORPUS || '(vazio)') +
-  (REVISIT ? '\n\n## MODO REVISITA — o grafo JÁ EXISTE (' + REVISIT + '): NÃO reescreva. Para cada nó revisitado: se a claim SOBREVIVEU, edite só verified_at=' + TODAY + ' (+ verified_against com o voto); se foi REFUTADA, apende um nó evidence novo E_…_REVISITA_' + TODAY.replace(/-/g, '') + ' com a verdade atual e aresta SUPERSEDES para o nó antigo, e mude o status do antigo para superseded (Aufhebung — nunca apague). Atualize meta.review_after para hoje + cadência. Nós revisitados: ' + JSON.stringify(rankedClaims.map(c => ({ id: c.revisitId, verdict: confirmed.includes(c) ? 'CONFIRMED' : killed.includes(c) ? 'REFUTED' : 'UNVERIFIED' }))) : '') + '\n\n## Passos\n1. ' + (REVISIT ? 'Edit do arquivo ' + REVISIT : 'Write do arquivo em ' + KG_PATH + ' (crie o diretório)') + '.\n2. Rode: bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema — capture o exit code. Se ≠ 0, CORRIJA e rode de novo (máx 3 tentativas).\n3. Devolva kgPath, radarExit (o último), nodes, edges, summary (1 frase).\n\nSomente saída estruturada.',
+  (REVISIT ? '\n\n## MODO REVISITA — o grafo JÁ EXISTE (' + REVISIT + '): NÃO reescreva. Para cada nó revisitado: se a claim SOBREVIVEU, edite só verified_at=' + TODAY + ' (+ verified_against com o voto); se foi REFUTADA, apende um nó evidence novo E_…_REVISITA_' + TODAY.replace(/-/g, '') + ' com a verdade atual e aresta SUPERSEDES para o nó antigo, e mude o status do antigo para superseded (Aufhebung — nunca apague). Atualize meta.review_after para hoje + cadência. Nós revisitados: ' + JSON.stringify(rankedClaims.map(c => ({ id: c.revisitId, verdict: confirmed.includes(c) ? 'CONFIRMED' : killed.includes(c) ? 'REFUTED' : 'UNVERIFIED' }))) : '') + '\n\n## Passos\n1. ' + (REVISIT ? 'Edit do arquivo ' + REVISIT : 'Write do arquivo em ' + KG_PATH + ' (crie o diretório)') + '.\n2. Rode: bash .claude/validation/kg-radar.sh ' + KG_PATH + ' --integrity --schema — capture o exit code. Se ≠ 0, CORRIJA e rode de novo (máx 3 tentativas).\n2b. Rode: bash .claude/validation/kg-contract-check.sh ' + KG_PATH + ' — contrato v3: rc 1 = CORRIJA e rode de novo; rc 2 = contrato não vendorizado aqui, declare no summary.' + CONTRACT_V3 + '\n3. Devolva kgPath, radarExit (o último), nodes, edges, summary (1 frase).\n\nSomente saída estruturada.',
   { label: 'write-kg', phase: 'write(KG)', schema: (MODE === 'decision' && elenxo) ? KG_SCHEMA_DECISION : KG_SCHEMA, model: TIER.judge.model, effort: TIER.judge.effort })
 if (!kg) return { error: 'write(KG) não devolveu resultado — o grafo não foi escrito. Nada selado.', question: QUESTION, findings: report ? report.findings : [] }
 if (MODE === 'decision' && elenxo && (!kg.decisionNodeId || !(kg.constrainsEdges >= 1))) return { error: 'modo decisão sem nó D_/CONSTRAINS no grafo — o write(KG) não cumpriu o contrato de decisão; nada selado.', question: QUESTION, kgPath: kg.kgPath, radarExit: kg.radarExit }

@@ -56,7 +56,9 @@ def stamp(t, nid, vag):
     if i is None: return t, False
     blk = t[i:j]
     if 'verified_at:' in blk:
-        blk = re.sub(r'verified_at:\s*\S+', f'verified_at: {HOJE}', blk, count=1)
+        # data ENTRE ASPAS (contrato v3 do .kg.yaml, 2026-10-08): sem aspas é data em YAML 1.1 e o gate
+        # do contrato acusa yaml.unquoted-date — o carimbo do censo não pode sujar o grafo que ele mede.
+        blk = re.sub(r'verified_at:\s*\S+', f'verified_at: "{HOJE}"', blk, count=1)
         blk = re.sub(r"verified_against:\s*(?:'(?:[^']|'')*'|\"[^\"]*\")", f"verified_against: '{vag}'", blk, count=1)
         # DEDUPE (lei do carimbo, 2ª mordida 2026-09-01): rodadas sucessivas deixavam pares extras
         # (o radar reprova verified_against repetido) — só o PRIMEIRO par sobrevive.
@@ -70,7 +72,7 @@ def stamp(t, nid, vag):
     m = re.search(r'\n(\s+)label:', blk)
     if not m: return t, False
     ind = m.group(1)
-    blk = blk[:m.start()] + f"\n{ind}verified_at: {HOJE}\n{ind}verified_against: '{vag}'" + blk[m.start():]
+    blk = blk[:m.start()] + f"\n{ind}verified_at: \"{HOJE}\"\n{ind}verified_against: '{vag}'" + blk[m.start():]
     return t[:i] + blk + t[j:], True
 
 def seal(consol):
@@ -98,10 +100,19 @@ def seal(consol):
             nid_new = f"E_CENSO{HOJE.replace('-','')[4:]}_{m['node_id'][:34]}"
             if nid_new in t: continue
             if '\nedges:' not in t: skip.append(m['node_id'] + ':sem-edges'); continue
+            # Nó novo nasce no CONTRATO v3 (2026-10-08): data entre aspas, label ≤ 280 com o resto em
+            # narrative, e provenance — o que foi lido (o nó medido, o método do worker) e por quem.
+            _div = sanitize(m['divergence'], terms).replace("'", "''")
+            _lab = f"MEDIDO {HOJE}, o vivo superou o nó {m['node_id']}"
+            _src = f"{p}#{m['node_id']} medido contra o vivo".replace("'", "''")
+            _met = f"{RUN}, juiz {m['juiz']}".replace("'", "''")
+            _loc = sanitize(m['method'], terms)[:200].replace("'", "''")
             node = (f"  - id: {nid_new}\n    node_type: evidence\n    plane: PROD\n    status: confirmed\n"
-                    f"    impact: 4\n    confidence: 0.9\n    verified_at: {HOJE}\n"
+                    f"    impact: 4\n    confidence: 0.9\n    verified_at: \"{HOJE}\"\n"
                     f"    verified_against: '{RUN}: DRIFTED {m['claims_measured']}/{m['claims_total']} — {sanitize(m['method'],terms)[:90]}'\n"
-                    f"    label: 'MEDIDO {HOJE}, o vivo superou o no: {sanitize(m['divergence'],terms)[:300]}'\n\nedges:")
+                    f"    label: '{_lab[:280]}'\n"
+                    f"    narrative: '{_div[:1200]}'\n"
+                    f"    provenance:\n      source: '{_src}'\n      locator: '{_loc}'\n      method: '{_met}'\n\nedges:")
             t = t.replace('\nedges:', '\n' + node, 1)
             # TIPO DA ARESTA PELA REALIDADE (lei de 2026-09-02, regra do proprio radar): SUPERSEDES
             # diz "deixou de valer" e exige flip do alvo — mas um DRIFTED cuja realidade e GATED ou
