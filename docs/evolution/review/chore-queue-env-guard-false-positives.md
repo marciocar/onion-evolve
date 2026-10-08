@@ -2,7 +2,8 @@
 title: 'Resíduo — os falsos positivos do veto do .env viram nó'
 date: 2026-10-08
 branch: chore/queue-env-guard-false-positives
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: bece593e76a3f0c9b1e740722fb208c60ddf325e66a13c34816cf957e23719fd
+reviewed_code_sha256: 77e2ff0af7aebbeeb6db74d95abe69b116d39e63635957badb685fd9dd8f390b
 findings_total: 0
 findings_real: 0
 findings_fixed: 0

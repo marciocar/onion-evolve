@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**400 itens abertos** em 83 grafo(s) com aberto (de 109 no escopo) · 84 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**401 itens abertos** em 84 grafo(s) com aberto (de 110 no escopo) · 85 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -790,6 +790,12 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
+
+## env-falso-positivo-2026-10 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 3.6 | `Q_ENV_GUARD_SEM_FALSO_POSITIVO` | env-falso-positivo-2026-10 | curar os falsos positivos do veto do .env sem abrir escape: medir cada forma com /meta:forge-guard (as duas polaridades e mutante) |
 
 ## inbox-triage-2026-10-04 — 1 item(ns)
 
