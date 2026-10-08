@@ -2,7 +2,8 @@
 title: 'Resíduo — radar E3 rodada 8 (2.1.290→2.1.295) e a REGRA 89 aceitando a forma de extensão do contrato'
 date: 2026-10-08
 branch: docs/radar-e3-r8
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: c073ce751224990d2173b1008f20f2cc1f9f02751591c6b7e75a1f8114d188ef
+reviewed_code_sha256: 92724c183d721fcbf2de0e3504294a00dc8326e1098b38bfe0e640b7ca45fd2f
 findings_total: 6
 findings_real: 6
 findings_fixed: 6
