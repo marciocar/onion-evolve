@@ -45,7 +45,6 @@ nodes:
     trace: docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md
     verified_at: 2026-10-01
     verified_against: 'rodada de 2026-10-01: 23 fontes, 61 claims, 29 confirmadas que colapsam em ~8 artefatos distintos; 4 refutadas por fonte fraca; 0 nao-verificadas por 403/truncagem; 2 medicoes locais tier 10 acrescentadas nesta sessao'
-    trace: 'docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml'
 
   # ═══════════════════ O QUE A CASA JA TEM (medicao local, tier 10) ═══════════════════
 

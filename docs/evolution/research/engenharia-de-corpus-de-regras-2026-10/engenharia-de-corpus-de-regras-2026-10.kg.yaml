@@ -59,7 +59,6 @@ nodes:
     confidence: 0.6
     label: 'Como a comunidade GERENCIA, MEDE e APOSENTA um corpus grande de regras escritas à mão, e o que o Onion ABSORVE, ADOTA ou RECUSA em outubro de 2026? Segue `open`, e o motivo é nomeado: dos sete eixos, o de maior interesse declarado (3 — sequenciamento/dependência) recebeu da rodada uma resposta majoritariamente NEGATIVA (ninguém deriva ordem; ESLint descobre conflito de fix só EXECUTANDO e sem nomear as regras; o precommit do R manda checker depois de fixer como REGRA GERAL em prosa; o Cedar ordena por camada FIXA), e as cinco primárias que poderiam virar o veredito em positivo ficaram NÃO LIDAS. Resposta negativa com as fontes certas não lidas não é resposta: é orçamento esgotado. O achado forte da rodada é, por isso, de outra natureza — o desenho FIXPOINT do autofix do ESLint (rodar fixers até estabilizar, só então julgar) é a única convenção de RUNTIME encontrada, e ela é transferível para a classe de defeito ARTEFATO-CADUCO desta casa.'
     trace: docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/SYNTHESIS.md
-    trace: 'docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml'
 
   # ── MEDIÇÃO PRÓPRIA DESTA CASA (não é web; é o chão contra o qual tudo acima se pesa) ──
   - id: E_CASA_MEDIDA_ORDEM_E_CORPUS_1001
