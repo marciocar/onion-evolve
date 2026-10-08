@@ -8,7 +8,7 @@ meta:
   baseline: 2026-10-08
   review_after: 2026-11-07   # 30d: decisão em aberto
   # ═══ TETO: 12 NÓS ═══
-  #   7 em 2026-10-08 (+ a segunda opinião do KG-SSOT, em 3 restrições, + dogfood por comando real).
+  #   8 em 2026-10-08 (+ a segunda opinião do KG-SSOT, em 3 restrições, + dogfood por comando real, + a guarda de API direta).
 nodes:
   - id: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM
     node_type: evidence
@@ -79,6 +79,15 @@ nodes:
     verified_at: 2026-10-08
     verified_against: "2026-10-08, início do SAC-66: o core moveu a issue por script direto na API do Linear em vez do adapter do task manager, e o estado escolhido por tipo saiu 'In Review' (dois estados started); o sinal da suíte de conformidade do adotante do KG-SSOT já apontava o mesmo: 'é dogfood e não interpretação de comandos'; decisão do maestro no mesmo dia: acrescentar ao auto-drive"
     label: "o auto-drive nasce pelo /meta:forge (as 7 peças medidas pelo censo da forja) e, por item, invoca os comandos reais do Onion (/engineer:start, /engineer:work, /engineer:pr, /meta:drive) em vez de reimplementar o fluxo; onde o comando não der conta vira achado no grafo, nunca contorno; depende do adapter executável (SAC-65)"
+  - id: Q_GUARDA_API_DIRETA_DE_PROVEDOR
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_against: "pedido do maestro 2026-10-08, depois de elevar o dogfood por comando real a fluxo obrigatório; projeção no Linear: SAC-75, bloqueado por SAC-65"
+    label: "guarda (forjada pelo /meta:forge-guard) que acusa chamada direta à API de provedor de task manager (api.linear.app, zohoapis, api.clickup.com, Jira, Asana) fora do adapter executável; só nasce depois do adapter executável (SAC-65), porque antes dele barraria o único caminho que existe"
 edges:
   - from: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM
     to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
@@ -101,3 +110,6 @@ edges:
   - from: E_DOGFOOD_POR_COMANDO_REAL
     to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
     edge_type: CONSTRAINS
+  - from: E_DOGFOOD_POR_COMANDO_REAL
+    to: Q_GUARDA_API_DIRETA_DE_PROVEDOR
+    edge_type: SUPPORTS
