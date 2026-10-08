@@ -3,12 +3,12 @@ title: 'Resíduo — a proposta do auto-drive vira nó de decisão aberto'
 date: 2026-10-08
 branch: chore/auto-drive-decision-node
 reviewed_diff_sha256: pendente
-findings_total: 0
-findings_real: 0
-findings_fixed: 0
+findings_total: 1
+findings_real: 1
+findings_fixed: 1
 tokens: 0
 duration_min: 10
-verdict: SEM_ACHADOS
+verdict: CORRIGIDO
 elenxo: nao
 nota: >-
   Pedido do maestro (2026-10-08): registrar na fila e no Linear a proposta do auto-drive (o degrau

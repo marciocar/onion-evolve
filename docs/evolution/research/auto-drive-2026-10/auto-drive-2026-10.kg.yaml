@@ -5,8 +5,8 @@
 meta:
   id: auto-drive-2026-10
   schema_version: "1"
-  baseline: 2026-10-08
-  review_after: 2026-11-07   # 30d: decisão em aberto
+  baseline: "2026-10-08"
+  review_after: "2026-11-07"   # 30d: decisão em aberto
   # ═══ TETO: 12 NÓS ═══
   #   8 em 2026-10-08 (+ a segunda opinião do KG-SSOT, em 3 restrições, + dogfood por comando real, + a guarda de API direta).
 nodes:
@@ -17,9 +17,13 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "leva de 2026-10-07/08 do core: PRs #955 a #965 conduzidos de start a merge sob a ordem permanente do maestro 'pode seguir até o merge', pelo mesmo ciclo (worktree, bancada com mutante, resíduo, pr-finalize, CI, pr-merge-verified com dispensa nomeada, Linear/grafo). Custos medidos no mesmo ciclo: 3 rebases por conflito de projeção gerada, PR em conflito sem CI, 6 falsos positivos do veto do .env, recusas do pr-finalize por carimbo"
     label: "o ciclo start→merge já roda na prática por ordem do maestro, 11 vezes numa leva, e quebra sempre nos mesmos pontos da esteira"
+    provenance:
+      source: "histórico de PRs do core no GitHub (marciocar/onion-evolve)"
+      locator: "PRs #955 a #965, mergeados em 2026-10-07/08"
+      method: "leitura do estado dos PRs (gh pr list/view) e dos logs das rodadas"
   - id: D_AUTO_DRIVE_DEGRAU_AUTOMATE
     node_type: decision
     layer: audit
@@ -28,13 +32,14 @@ nodes:
     impact: 4
     confidence: 0.55
     verified_against: "proposta do core em 2026-10-08, aguardando a segunda opinião pedida ao adotante que evolui o KG-SSOT, o Elenxo e o selo do maestro; projeção no Linear: SAC-74, bloqueado por SAC-66 e SAC-67"
-    label: "proposta: forjar o degrau AUTOMATE do /meta:drive — 1..n raízes (issue ou id de nó; sem item drena a fila-pronta até o budget), expansão da cadeia (épico, task, subtask e DEPENDS_ON) em ordem topológica, cada item até o merge (--merge=true por padrão porque o maestro invoca; nunca cron), relatório por item no task manager e no grafo; paradas duras em decisão não-tomada, Elenxo reprovado, CI vermelho inesperado, path vendorizado ou repo alheio e budget; merge serial enquanto não houver merge driver. Depende de SAC-66 e SAC-67 (esteira) e da interface do SAC-63; muda o degrau selado 'merge 100% humano, em lote', logo passa pelo Elenxo"
+    label: "proposta: forjar o degrau AUTOMATE do /meta:drive, que conduz 1..n raízes e a cadeia inteira até o merge, com paradas duras e relatório por item; decisão aberta"
+    narrative: "proposta: forjar o degrau AUTOMATE do /meta:drive — 1..n raízes (issue ou id de nó; sem item drena a fila-pronta até o budget), expansão da cadeia (épico, task, subtask e DEPENDS_ON) em ordem topológica, cada item até o merge (--merge=true por padrão porque o maestro invoca; nunca cron), relatório por item no task manager e no grafo; paradas duras em decisão não-tomada, Elenxo reprovado, CI vermelho inesperado, path vendorizado ou repo alheio e budget; merge serial enquanto não houver merge driver. Depende de SAC-66 e SAC-67 (esteira) e da interface do SAC-63; muda o degrau selado 'merge 100% humano, em lote', logo passa pelo Elenxo"
   - id: Q_SEGUNDA_OPINIAO_KG_SSOT
     node_type: question
     layer: audit
     plane: DEV
     status: done
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     impact: 3
     confidence: 0.5
     verified_against: "pergunta enviada pelo core à sessão do adotante dedicado ao KG-SSOT em 2026-10-08, a pedido do maestro"
@@ -46,9 +51,14 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "resposta da sessão do adotante dedicado ao KG-SSOT ao core em 2026-10-08 (mensagem entre sessões), opinião, não selo"
-    label: "a expansão da cadeia não é confiável para rodar sozinha: o gate do core aceita 56 casos que o contrato reprova, e o contrato não proíbe ciclo em DEPENDS_ON nem define pai e filho; o grafo deve ser a SSOT da ordem e o task manager projeção, e a expansão para em voz alta em ciclo, item sem nó, nó sem item ou pai e filho divergentes; esperar o core adotar o kit do contrato (tag contract-v3.0.0) antes do AUTOMATE"
+    label: "a expansão da cadeia ainda não é confiável para rodar sozinha: o grafo deve ser a SSOT da ordem, e o core deve adotar o contrato antes do AUTOMATE"
+    narrative: "a expansão da cadeia não é confiável para rodar sozinha: o gate do core aceita 56 casos que o contrato reprova, e o contrato não proíbe ciclo em DEPENDS_ON nem define pai e filho; o grafo deve ser a SSOT da ordem e o task manager projeção, e a expansão para em voz alta em ciclo, item sem nó, nó sem item ou pai e filho divergentes; esperar o core adotar o kit do contrato (tag contract-v3.0.0) antes do AUTOMATE"
+    provenance:
+      source: "mensagem entre sessões do adotante dedicado ao KG-SSOT ao core"
+      locator: "resposta à pergunta 1, em 2026-10-08"
+      method: "leitura da resposta; opinião, não medição"
   - id: E_OPINIAO_CARIMBO_PELO_QUE_FOI_LIDO
     node_type: evidence
     layer: audit
@@ -56,9 +66,14 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "resposta da sessão do adotante dedicado ao KG-SSOT ao core em 2026-10-08 (mensagem entre sessões), opinião, não selo"
-    label: "nó fechado pelo auto-drive exige provenance que o fechador não escreveu: locator com URL do PR mergeado, SHA do merge e id do run de CI; source sendo o estado lido (mergedAt, conclusão dos checks); method nomeando a máquina; nunca fecha decision nem faz flip de status de verdade; verified_against cita o que foi lido, nunca o que foi feito"
+    label: "nó fechado pelo auto-drive carrega provenance do que foi lido (PR, merge, CI), nunca do que o agente fez, e nunca fecha decisão"
+    narrative: "nó fechado pelo auto-drive exige provenance que o fechador não escreveu: locator com URL do PR mergeado, SHA do merge e id do run de CI; source sendo o estado lido (mergedAt, conclusão dos checks); method nomeando a máquina; nunca fecha decision nem faz flip de status de verdade; verified_against cita o que foi lido, nunca o que foi feito"
+    provenance:
+      source: "mensagem entre sessões do adotante dedicado ao KG-SSOT ao core"
+      locator: "resposta à pergunta 2, em 2026-10-08"
+      method: "leitura da resposta; opinião, não medição"
   - id: E_OPINIAO_RISCOS_QUE_FALTAVAM
     node_type: evidence
     layer: audit
@@ -66,9 +81,14 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.7
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "resposta da sessão do adotante dedicado ao KG-SSOT ao core em 2026-10-08 (mensagem entre sessões), opinião, não selo"
-    label: "riscos que faltavam: CI verde pode ser vazio (filtro de paths, sem check obrigatório), então a parada exige check presente e verde; Elenxo do mesmo modelo é uma voz só, falta um agente separado que reabra os artefatos; cadeia parcial pede estado retomável por item e não fechar o épico com filho aberto; insumo vencido pede --freshness antes e parada em STALE de alto impacto; o status do Zoho de layout padrão mente por omissão; --merge deve ser false por padrão até a primeira cadeia provada, e true só para item que não é decision"
+    label: "riscos que faltavam: CI verde vazio, revisor correlacionado, cadeia parcial, insumo vencido, status do Zoho que mente e --merge true por padrão"
+    narrative: "riscos que faltavam: CI verde pode ser vazio (filtro de paths, sem check obrigatório), então a parada exige check presente e verde; Elenxo do mesmo modelo é uma voz só, falta um agente separado que reabra os artefatos; cadeia parcial pede estado retomável por item e não fechar o épico com filho aberto; insumo vencido pede --freshness antes e parada em STALE de alto impacto; o status do Zoho de layout padrão mente por omissão; --merge deve ser false por padrão até a primeira cadeia provada, e true só para item que não é decision"
+    provenance:
+      source: "mensagem entre sessões do adotante dedicado ao KG-SSOT ao core"
+      locator: "resposta à pergunta 3, em 2026-10-08"
+      method: "leitura da resposta; opinião, não medição"
   - id: E_DOGFOOD_POR_COMANDO_REAL
     node_type: evidence
     layer: audit
@@ -76,9 +96,14 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.8
-    verified_at: 2026-10-08
+    verified_at: "2026-10-08"
     verified_against: "2026-10-08, início do SAC-66: o core moveu a issue por script direto na API do Linear em vez do adapter do task manager, e o estado escolhido por tipo saiu 'In Review' (dois estados started); o sinal da suíte de conformidade do adotante do KG-SSOT já apontava o mesmo: 'é dogfood e não interpretação de comandos'; decisão do maestro no mesmo dia: acrescentar ao auto-drive, e o reforço de que vale para skills, agentes e tudo mais (o /product:collect manda chamar o @story-points-framework-specialist e a estimativa do SAC-66..73 foi feita à mão)"
-    label: "o auto-drive nasce pelo /meta:forge (as 7 peças medidas pelo censo da forja) e, por item, USA a maquinaria do Onion — comandos (/engineer:start, /engineer:work, /engineer:pr, /meta:drive), skills, agentes especialistas, adapters e scripts de validação — em vez de interpretá-la e refazer o trabalho à mão; onde o comando não der conta vira achado no grafo, nunca contorno; depende do adapter executável (SAC-65)"
+    label: "o auto-drive nasce pela forja e, por item, USA a maquinaria do Onion (comandos, skills, agentes, adapters) em vez de interpretá-la; depende do SAC-65"
+    narrative: "o auto-drive nasce pelo /meta:forge (as 7 peças medidas pelo censo da forja) e, por item, USA a maquinaria do Onion — comandos (/engineer:start, /engineer:work, /engineer:pr, /meta:drive), skills, agentes especialistas, adapters e scripts de validação — em vez de interpretá-la e refazer o trabalho à mão; onde o comando não der conta vira achado no grafo, nunca contorno; depende do adapter executável (SAC-65)"
+    provenance:
+      source: "issue SAC-66 no Linear e o estado escolhido pelo script"
+      locator: "primeira transição do SAC-66 em 2026-10-08 (In Review em vez de In Progress)"
+      method: "leitura do estado da issue pela API depois da transição"
   - id: Q_GUARDA_API_DIRETA_DE_PROVEDOR
     node_type: question
     layer: audit
@@ -87,7 +112,8 @@ nodes:
     impact: 3
     confidence: 0.6
     verified_against: "pedido do maestro 2026-10-08, depois de elevar o dogfood por comando real a fluxo obrigatório; projeção no Linear: SAC-75, bloqueado por SAC-65"
-    label: "guarda (forjada pelo /meta:forge-guard) que acusa chamada direta à API de provedor de task manager (api.linear.app, zohoapis, api.clickup.com, Jira, Asana) fora do adapter executável; só nasce depois do adapter executável (SAC-65), porque antes dele barraria o único caminho que existe"
+    label: "guarda que acusa chamada direta à API de provedor de task manager fora do adapter executável; só nasce depois do SAC-65"
+    narrative: "guarda (forjada pelo /meta:forge-guard) que acusa chamada direta à API de provedor de task manager (api.linear.app, zohoapis, api.clickup.com, Jira, Asana) fora do adapter executável; só nasce depois do adapter executável (SAC-65), porque antes dele barraria o único caminho que existe"
 edges:
   - from: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM
     to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
