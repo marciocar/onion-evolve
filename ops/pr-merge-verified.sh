@@ -23,6 +23,15 @@
 #   --sync: após PROVAR o merge pelo estado, faz `git checkout main + pull --ff-only` — o sync
 #           gated que substitui o `checkout main` encadeado à mão (que me deixou em main após um
 #           merge recusado, 2026-08-26). Superação de sync-only-after-merge-succeeds, virada mecanismo.
+#   --merge-commit: mergeia com `gh pr merge --merge` (merge commit) em vez de --rebase/--squash, com
+#           os MESMOS gates (checks, veredito, dispensa, prova pelo estado). Para o PR de UPDATE de um
+#           adotante: ele traz um merge real com `onion/vendor`, e rebase ou squash o linearizam — a
+#           `onion/vendor` deixa de ser ancestral da main e o update seguinte acusa conflito espúrio
+#           (medido 2026-10-08 num adotante: PR por rebase → conflito em lint-selftest.sh no update
+#           seguinte; o PR que preservou a ancestralidade teve de ser mergeado à mão).
+#   --assert-ancestor <ref>: depois do merge PROVADO, confere `merge-base --is-ancestor <ref>
+#           origin/<base>`; se não for ancestral, sai rc=3 nomeando a ref (o merge aconteceu — o que
+#           falhou foi a ancestralidade pedida). Use com --merge-commit: --assert-ancestor onion/vendor.
 set -uo pipefail
 
 PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch] [--dispensa <check> --motivo <texto>]}"; shift || true
@@ -53,6 +62,7 @@ DO_SYNC=0   # --sync: o script faz `checkout main + pull`, mas SÓ dentro do ram
 #   de herdado de uma frase que o próprio check deixou de dizer.
 _DISPENSAVEIS=(onion-review-verdict)
 DISPENSA=(); REASON=""; CI_INOPERANTE=0; CI_INOPERANTE_PROVADO=""
+MERGE_COMMIT=0; ASSERT_ANCESTOR=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --repo) REPO_ARG=(--repo "$2"); shift 2 ;;
@@ -65,6 +75,8 @@ while [ $# -gt 0 ]; do
     # apaga à mão depois. Sem esta opção o mecanismo teria destruído um PR ao "acertar".
     --keep-branch) DEL=(); shift ;;
     --sync) DO_SYNC=1; shift ;;
+    --merge-commit) MERGE_COMMIT=1; shift ;;
+    --assert-ancestor) ASSERT_ANCESTOR="${2:?--assert-ancestor exige a ref (ex.: onion/vendor)}"; shift 2 ;;
     *) shift ;;
   esac
 done
@@ -372,9 +384,33 @@ if [ "${#DISPENSA[@]}" -gt 0 ]; then
   say "✓ dispensa registrada no PR #${PR} (comentário), antes do merge"
 fi
 
+# ── MERGE INTERNO NA BRANCH × MODO DE MERGE (SAC-76, 2026-10-08) ─────────────────────────────────
+# Rebase e squash linearizam um merge que a branch do PR carrega. Quando esse merge É o conteúdo (o
+# PR de update de um adotante, que mergeia `onion/vendor`), linearizar destrói a ancestralidade e o
+# próximo update conflita em falso. Sem --merge-commit, AVISO — nunca troco o modo em silêncio: uma
+# branch com main mergeada por cima (stack, "update branch") também tem merge interno e pode querer
+# rebase. Os pais são lidos do FORGE; se a leitura falhar, digo que não sei, e não aviso nada falso.
+if [ "${MERGE_COMMIT}" -eq 0 ]; then
+  _slug="${OWNER_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _slug="${REPO_ARG[1]}"
+  if [ -n "${_slug}" ] && _pais="$(gh api "repos/${_slug}/pulls/${PR}/commits?per_page=100" --jq '.[] | (.parents | length)' 2>/dev/null)"; then
+    if grep -qx '[2-9]' <<< "${_pais}"; then
+      say "⚠️  a branch do PR carrega commit de MERGE, e este run vai linearizar (--rebase/--squash)."
+      say "⚠️  se o merge é o conteúdo (ex.: PR de update de adotante com onion/vendor), interrompa e"
+      say "⚠️  rode de novo com --merge-commit — senão a ancestralidade se perde e o próximo update conflita."
+    fi
+  else
+    say "ℹ️  não li os pais dos commits do PR — não sei se a branch carrega merge interno (aviso desligado)."
+  fi
+fi
+
 t0="$(date -u +%s)"
-merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --rebase "${DEL[@]}" 2>&1)"; rc=$?
-if [ "$rc" -ne 0 ]; then
+if [ "${MERGE_COMMIT}" -eq 1 ]; then
+  say "modo: --merge-commit (gh pr merge --merge) — mesmos gates, só muda como o histórico entra"
+  merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --merge "${DEL[@]}" 2>&1)"; rc=$?
+else
+  merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --rebase "${DEL[@]}" 2>&1)"; rc=$?
+fi
+if [ "$rc" -ne 0 ] && [ "${MERGE_COMMIT}" -eq 0 ]; then
   if printf '%s' "$merge_out" | grep -qi "can't be rebased\|cannot be rebased"; then
     say "⚠️  --rebase recusado (stack re-apontada); degradando p/ --squash com os mesmos gates"
     merge_out="$(gh pr merge "$PR" "${REPO_ARG[@]}" --squash "${DEL[@]}" 2>&1)"; rc=$?
@@ -442,6 +478,19 @@ case "$state" in
     die "estado diz MERGED mas mergedAt é nulo/vazio — inconsistente, não declaro" ;;
   MERGED\|*)
     printf '✓ PR #%s MERGED — provado pelo ESTADO (mergedAt=%s)\n' "$PR" "${state#*|}"
+    # ANCESTRALIDADE PEDIDA (--assert-ancestor): o merge está provado; aqui confiro o que o modo de
+    # merge prometia. Falha = rc 3 (distinto do 1 de "não mergeou"), nomeando a ref e a base.
+    if [ -n "${ASSERT_ANCESTOR}" ]; then
+      _base="$(gh pr view "$PR" "${REPO_ARG[@]}" --json baseRefName --jq '.baseRefName' 2>/dev/null)"
+      if [ -z "${_base}" ] || ! git fetch -q origin "${_base}" 2>/dev/null; then
+        printf '✗ merge PROVADO, mas não consegui ler a base (%s) para conferir a ancestralidade de %s — NÃO afirmo que ela vale\n' "${_base:-?}" "${ASSERT_ANCESTOR}"; exit 3
+      fi
+      if git merge-base --is-ancestor "${ASSERT_ANCESTOR}" FETCH_HEAD 2>/dev/null; then
+        say "✓ ${ASSERT_ANCESTOR} é ancestral de origin/${_base} — a ancestralidade se manteve"
+      else
+        printf '✗ merge PROVADO, mas %s NÃO é ancestral de origin/%s — o próximo update vai conflitar em falso (o PR entrou linearizado?)\n' "${ASSERT_ANCESTOR}" "${_base}"; exit 3
+      fi
+    fi
     # SUPERAÇÃO (2026-08-26): o sync de main vive AQUI DENTRO — estruturalmente inacessível
     # sem o merge provado pelo estado. Cura o erro que me deixou em main após um merge RECUSADO
     # (o `checkout main` encadeado, não condicionado). Agora "não consigo" repetir, nem esquecendo.

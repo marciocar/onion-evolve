@@ -448,7 +448,7 @@ flow: downstream (core→consumidor / distribuição)
 ## Próximos passos (NO ALVO)
 1. Revisar o commit da instalação (já feito automaticamente na branch \`${BR}\` pelo 🔒 Procedimento de
    Commit Durável — a instalação já é objeto git, não se perde num descarte de working-tree).
-2. Push / abrir PR dessa branch para a branch de integração (gitflow do próprio repo).
+2. Push / abrir PR dessa branch para a integração e mergear com **merge commit** (\`pr-merge-verified.sh --merge-commit --assert-ancestor onion/vendor\` onde houver, senão "Create a merge commit" no forge; nunca rebase/squash): linearizar tira a \`onion/vendor\` da ancestralidade e o próximo update conflita em falso.
 3. (Opcional) Devolver sinal de campo ao core via inbox/ (upstream).
 EOF
 ```
