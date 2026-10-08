@@ -1,0 +1,294 @@
+# kg-backlog-guard: on
+# Radar E3 (ecossistema Claude Code), rodada 8: o delta de 2.1.290 a 2.1.295 contra a baseline r7 (2.1.289).
+# Fonte primária: o CHANGELOG oficial (data/2.1.29x.txt, extraídos em 2026-10-08), cruzado com o vivo do core.
+meta:
+  id: radar-E3-2026-10-08-r8
+  schema_version: "1"
+  baseline: "2026-10-08"
+  review_after: "2026-11-07"   # 30d: cadência de ferramenta
+  x_supersedes_none: "medido contra a baseline do eixo (r7, 2.1.289): nenhum nó dela derrubado; as correções de mod da r8 são evidência A FAVOR da tese da r7 (mod tem janelas de falha aberta), não superação — veredito do juiz"
+  # ═══ TETO: 20 NÓS ═══
+  #   17 em 2026-10-08 (12 da rodada, corrigidos pelo juiz, + 5 do que faltou).
+nodes:
+  - id: E_DELTA_SEIS_VERSOES
+    trace: "docs/evolution/research/radar-E3-2026-10-08-r8/SYNTHESIS.md"
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-08"
+    verified_against: "CHANGELOG oficial baixado em 2026-10-08: seções 2.1.290 a 2.1.295 contíguas (193, 5, 95, 59, 5 e 146 linhas); disco em 2.1.295; baseline r7 em 2.1.289"
+    label: "o delta desde a baseline são seis versões contíguas, de 2.1.290 a 2.1.295, sem buraco no CHANGELOG"
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
+      locator: "seções ## 2.1.290 a ## 2.1.295 (cópias em data/)"
+      method: "leitura e contagem"
+  - id: E_HOOK_ONFAILURE_BLOCK
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 5
+    confidence: 0.9
+    verified_at: "2026-10-08"
+    verified_against: "2.1.295: 'Added onFailure: block for command and HTTP hooks: a hook that can't start, times out, or exits with an unexpected code blocks the action instead of letting it through'; no core, .claude/settings.json tem 20 hooks command e NENHUM com onFailure (medido por leitura do JSON)"
+    label: "o harness ganhou onFailure: block (2.1.295) e nenhum dos 20 hooks do Onion o usa: nos PreToolUse, hook que não inicia, estoura o timeout ou sai com código fora de 0/2 deixa a ação passar (doc de hooks); o PreModelSwitch já bloqueia por timeout"
+    narrative: "Os vetos do Onion se apoiam no exit 2 (a capacidade que justifica o acoplamento, no CLAUDE.md). O modo de falha que eles não cobriam por construção é o hook que nem roda: python ausente, timeout, crash antes do exit 2. Esses casos eram tratados um a um dentro de cada script (fail-closed escrito à mão). O harness agora oferece fail-closed declarativo para o hook inteiro."
+    provenance:
+      source: "CHANGELOG 2.1.295 e .claude/settings.json@d56f685c"
+      locator: "2.1.295, 1º item 'Added onFailure'; settings.json, chave hooks"
+      method: "leitura e medição"
+  - id: Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 5
+    confidence: 0.7
+    verified_against: "proposta da rodada r8; ainda não medida ao vivo (falta provar que o harness 2.1.295 bloqueia um hook que crasha)"
+    label: "adotar onFailure: block nos PreToolUse (env-guard, protect-main, merge-gate e avaliar o kg-read-leg) e provar ao vivo, com um hook que crasha, que a ação fica bloqueada"
+    narrative: "Não nos hooks de aviso (SessionStart, UserPromptSubmit, Stop), onde bloquear por falha do próprio hook travaria a sessão. Três cuidados do juiz: a doc oficial de hooks não tem nenhuma ocorrência de onFailure, então a única fonte é o CHANGELOG e a medição ao vivo é obrigatória; adotantes pinados abaixo de 2.1.295 recebem uma chave que o harness deles não conhece (medir o efeito antes de vendorizar); os PreToolUse não declaram timeout, logo vale o padrão de 600 s."
+  - id: E_REGRAS_POR_CAMINHO_CARREGAM_VIA_BASH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-08"
+    verified_against: "2.1.293: 'Fixed path-scoped rules and nested CLAUDE.md files not loading when Claude views a file with a single-file cat, head, tail, sed -n or grep command in the Bash tool instead of the Read tool'"
+    label: "as lentes por caminho do Onion (kg-grammar, research-lens, guard-lens) passaram a carregar também quando o arquivo é lido por cat, head, sed -n ou grep no Bash"
+    provenance:
+      source: "CHANGELOG 2.1.293"
+      locator: "item 'Fixed path-scoped rules and nested CLAUDE.md files not loading'"
+      method: "leitura"
+  - id: E_AGENT_TOOL_GANHOU_EFFORT
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-08"
+    verified_against: "2.1.292: 'Added an effort parameter to the Agent tool, so Claude runs a sub-agent at the effort level you ask for'"
+    label: "o Agent tool ganhou effort (2.1.292), o que estende o tiering por fase aos subagentes que não são fork; forks o ignoram e o /meta:drive ainda não o passa: capacidade disponível, não adotada"
+    provenance:
+      source: "CHANGELOG 2.1.292"
+      locator: "item 'Added an effort parameter to the Agent tool'"
+      method: "leitura"
+  - id: E_REESCRITA_DO_PRETOOLUSE_REVALIDADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.8
+    verified_at: "2026-10-08"
+    verified_against: "2.1.290: 'Fixed some permission rules and safety checks not being applied to a tool call after a PreToolUse hook rewrote its input'"
+    label: "até a 2.1.289 algumas regras de permissão não se aplicavam a chamada cujo input um PreToolUse reescreveu (2.1.290); o core não é afetado: nenhum hook seu reescreve input e não há regra deny ou ask"
+    provenance:
+      source: "CHANGELOG 2.1.290"
+      locator: "item 'Fixed some permission rules and safety checks not being applied ... after a PreToolUse hook rewrote its input'"
+      method: "leitura"
+  - id: E_MODS_GUARDA_NO_RESTART_CURADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: "2026-10-08"
+    verified_against: "2.1.292:51 e :59, 2.1.293:23, 2.1.295:59 (correções da janela de restart) e 2.1.295:41 (hook de mod recebia input aninhado cortado sem erro, e a guarda passava o que não viu); conferido pelo juiz contra o CHANGELOG oficial"
+    label: "a janela em que hooks de plugin e mod deixavam chamadas passar no restart do worker recebeu 4 correções em 3 versões (2.1.292, 2.1.293, 2.1.295), e a 2.1.295 traz outra; a recorrência é evidência de classe aberta, não cura"
+    narrative: "Não supera a r7: E_MODS_FALHAM_ABERTO_NO_UPGRADE afirmava mod que não carrega depois do upgrade e aprovação de mod por cima de deny/ask, e nenhuma destas correções trata disso. É evidência A FAVOR de Q_MOD_YOU_SHOULD_KNOW_E_UM_ELENXO_FRACO da r7 (aresta cross-file não expressável no motor). O TETO 3 do grafo vetos-por-tokens (mod por cima do exit 2) segue não medido."
+    provenance:
+      source: "CHANGELOG 2.1.290 e 2.1.295"
+      locator: "itens sobre plugin hooks worker restart"
+      method: "leitura"
+  - id: E_SESSIONSTART_ASYNC_DUPLICAVA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 1
+    confidence: 0.7
+    verified_at: "2026-10-08"
+    verified_against: "2.1.295:72; .claude/settings.json@d56f685c com 4 SessionStart síncronos (nenhum async); hooks.md: SessionStart roda de novo no resume com source=resume"
+    label: "a 2.1.295 corrige a reinjeção do contexto inalterado de SessionStart ASYNC a cada retomada; não toca o core: os 4 SessionStart dele são síncronos e, por desenho, re-rodam no resume"
+    provenance:
+      source: "CHANGELOG 2.1.295 e o transcript da sessão de 2026-10-07"
+      locator: "item 'async SessionStart hook's unchanged context'"
+      method: "leitura e observação"
+  - id: E_FORK_EM_WORKTREE_VIA_GIT_DO_PAI
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.7
+    verified_at: "2026-10-08"
+    verified_against: "2.1.295: 'Fixed subagents in their own linked worktree being shown the parent session's git branch, status and recent commits'; 'Fixed forked skills invoked from Workflow subagents delivering their results to the main conversation instead of the invoking agent'"
+    label: "a 2.1.295 deixa de mostrar a subagentes em worktree vinculada a branch e o status da sessão-mãe (o juiz, numa worktree, viu a branch certa); o retorno de skill forkada em workflow não toca o core, que tem 0 skills fork"
+    provenance:
+      source: "CHANGELOG 2.1.295"
+      locator: "itens 'subagents in their own linked worktree' e 'forked skills invoked from Workflow subagents'"
+      method: "leitura"
+  - id: E_HAIKU_5_5_E_O_GUARDA_DE_MODELO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.6
+    verified_at: "2026-10-08"
+    verified_against: "2.1.293: 'Added Claude Haiku 5.5 (claude-haiku-5-5), now the default Haiku model'; o core tem premodelswitch-guard.sh e casos de bancada com claude-haiku-4-5 como exemplo de veto"
+    label: "o Haiku 5.5 virou o padrão (2.1.293); impacto nulo no core: a guarda de modelo é allowlist sem haiku e nenhum agente usa o alias haiku"
+    provenance:
+      source: "CHANGELOG 2.1.293 e .claude/hooks/premodelswitch-guard.sh"
+      locator: "item 'Added Claude Haiku 5.5'"
+      method: "leitura"
+  - id: E_CANAL_VIVO_DOIS_AJUSTES
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-08"
+    verified_against: "2.1.290: 'Fixed --channels permission relay: a reply ID that repeats within a session is now ignored instead of approving a different prompt'; 'Fixed --restricted sessions opening the cross-session messaging socket'"
+    label: "dois ajustes que tocam a pesquisa do canal vivo: o relay de permissão do Channels deixou de aprovar prompt trocado por id repetido, e sessão restrita não abre mais o socket entre sessões"
+    provenance:
+      source: "CHANGELOG 2.1.290"
+      locator: "itens '--channels permission relay' e '--restricted ... cross-session messaging socket'"
+      method: "leitura"
+  - id: Q_CONFERIR_GUARDA_DE_MODELO_COM_HAIKU_5_5
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: done
+    verified_at: "2026-10-08"
+    impact: 2
+    confidence: 0.6
+    verified_against: "respondida pela medição do juiz: allowlist session_models sem haiku, o caso de bancada haiku-4-5 → VETO segue válido, e 0 arquivos com model: haiku"
+    label: "conferir se o premodelswitch-guard e a allowlist de modelo tratam claude-haiku-5-5 como devem (alias haiku na REGRA 3)"
+  - id: E_WORKTREE_DE_FORK_PERDIA_ESCRITA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-08"
+    verified_against: "2.1.290:111: background subagents losing write and Bash access in their worktree after the main session enters or exits a different worktree"
+    label: "subagentes em segundo plano perdiam escrita e Bash na própria worktree quando a sessão-mãe entrava ou saía de outra worktree (2.1.290), exatamente o padrão de forks que o core usa"
+    provenance:
+      source: "CHANGELOG oficial do Claude Code, seções 2.1.290 a 2.1.295"
+      locator: "2.1.290:111"
+      method: "leitura pelo juiz da rodada"
+  - id: E_HOOK_POR_LLM_FALHAVA_ABERTO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-08"
+    verified_against: "2.1.294:3: prompt and agent hooks written as instructions allowing what they should block"
+    label: "hooks do tipo prompt e agent, escritos como instrução, deixavam passar o que deveriam barrar (2.1.294): fail-open de veto julgado por LLM, evidência a favor do exit 2 determinístico que o Onion usa"
+    provenance:
+      source: "CHANGELOG oficial do Claude Code, seções 2.1.290 a 2.1.295"
+      locator: "2.1.294:3"
+      method: "leitura pelo juiz da rodada"
+  - id: E_ZERO_SILENCIOSO_NAS_FERRAMENTAS
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-08"
+    verified_against: "2.1.290:18 (WebFetch descartava em silêncio texto acima de 100.000 caracteres; agora avisa e aceita offset); 2.1.292:24 (Grep e Glob respondiam no matches quando o caminho não podia ser lido)"
+    label: "duas ferramentas do harness tinham o zero silencioso que o Onion persegue: WebFetch cortava acima de 100 mil caracteres sem avisar e Grep/Glob davam no matches em caminho ilegível; as duas foram curadas"
+    provenance:
+      source: "CHANGELOG oficial do Claude Code, seções 2.1.290 a 2.1.295"
+      locator: "2.1.290:18 e 2.1.292:24"
+      method: "leitura pelo juiz da rodada"
+  - id: E_WORKFLOW_SCRIPTPATH_SEM_READ
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-08"
+    verified_against: "2.1.295:112: o scriptPath do Workflow é recusado em sessão sem a ferramenta Read e o harness manda passar o script inline; o core invoca Workflow({scriptPath}) no onion-orchestration e no onion-research"
+    label: "a invocação canônica do core, Workflow com scriptPath, é recusada em sessões sem a ferramenta Read (2.1.295); onde Read existe nada muda, mas o caminho alternativo inline precisa estar documentado"
+    provenance:
+      source: "CHANGELOG oficial do Claude Code, seções 2.1.290 a 2.1.295"
+      locator: "2.1.295:112"
+      method: "leitura pelo juiz da rodada"
+  - id: E_DISTRIBUICAO_DO_MARKETPLACE
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 2
+    confidence: 0.8
+    verified_at: "2026-10-08"
+    verified_against: "2.1.292:3 (plugin install --marketplace <source>); 2.1.295:12 (validate aconselha a linha de instalação no README); 2.1.295:27 (marketplace add com nome não instalável é recusado); 2.1.295:6 (aviso quando o settings escrito não carrega)"
+    label: "quatro mudanças tocam a distribuição do onion-plugins: install direto com --marketplace, validate pedindo a linha de instalação no README, recusa de marketplace com nome não instalável e aviso de settings que não carrega"
+    provenance:
+      source: "CHANGELOG oficial do Claude Code, seções 2.1.290 a 2.1.295"
+      locator: "2.1.292:3; 2.1.295:6, :12, :27"
+      method: "leitura pelo juiz da rodada"
+edges:
+  - from: E_HOOK_ONFAILURE_BLOCK
+    to: Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_HOOK_ONFAILURE_BLOCK
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_REGRAS_POR_CAMINHO_CARREGAM_VIA_BASH
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_AGENT_TOOL_GANHOU_EFFORT
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_REESCRITA_DO_PRETOOLUSE_REVALIDADA
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_MODS_GUARDA_NO_RESTART_CURADA
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_SESSIONSTART_ASYNC_DUPLICAVA
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_FORK_EM_WORKTREE_VIA_GIT_DO_PAI
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_CANAL_VIVO_DOIS_AJUSTES
+    edge_type: SUPPORTS
+  - from: E_HAIKU_5_5_E_O_GUARDA_DE_MODELO
+    to: Q_CONFERIR_GUARDA_DE_MODELO_COM_HAIKU_5_5
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_WORKTREE_DE_FORK_PERDIA_ESCRITA
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_HOOK_POR_LLM_FALHAVA_ABERTO
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_ZERO_SILENCIOSO_NAS_FERRAMENTAS
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_WORKFLOW_SCRIPTPATH_SEM_READ
+    edge_type: SUPPORTS
+  - from: E_DELTA_SEIS_VERSOES
+    to: E_DISTRIBUICAO_DO_MARKETPLACE
+    edge_type: SUPPORTS
+  - from: E_HOOK_POR_LLM_FALHAVA_ABERTO
+    to: Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS
+    edge_type: SUPPORTS

@@ -13,17 +13,14 @@ axes:
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml
   - id: E3-claude-code-delta
-    last_run: 2026-10-05
-    cc_version: "2.1.289"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
-    descartes: "2/5 no juiz + o supersedes_none reprovado"   # rodada 7 (2.1.288->2.1.289, UMA versao, 27 itens,
-                            # contigua em 3 fontes). Os 2 reprovados nao erraram FATO, generalizaram ALEM DO MEDIDO:
-                            # "a classe nao existe no veto proprio" (o juiz achou 15 formas que escapam do merge-gate,
-                            # entre elas o force-push `git push origin +main` — o host NAO protege a main, 403) e
-                            # "a contiguidade da r6 foi respondida" (a pergunta era sobre o MECANISMO). Contagens de
-                            # composicao tambem nao fechavam (6/2 contra 5/3). Achado de maior consequencia NAO E da
-                            # versao: e dos vetos proprios — no Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH, gatilho ja disparado.
-                            # Historico da r6 (9 versoes, 5/6 reprovados por atribuicao de versao) no proprio kg dela.
-    kg: docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
+    last_run: 2026-10-08
+    cc_version: "2.1.295"   # versão do Claude Code na rodada (processo E disco) — instalada ≠ esta ⇒ SOFT "estratégia pode ter drift"
+    descartes: "4/12 reprovados no juiz + 3 exagerados corrigidos + o supersedes sobre a r7 reprovado (trocado por x_supersedes_none)"
+                            # rodada 8 (2.1.290->2.1.295, SEIS versões contíguas). O achado principal: onFailure: block
+                            # para hooks, que nenhum dos 20 hooks do Onion usa. Os reprovados afirmavam ligação com o
+                            # core que não existe (reescrita de input, SessionStart async, guarda de modelo). Historico
+                            # da r7 no proprio kg dela.
+    kg: docs/evolution/research/radar-E3-2026-10-08-r8/radar-E3-2026-10-08-r8.kg.yaml
   - id: E4-capital
     last_run: 2026-08-31
     kg: docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml

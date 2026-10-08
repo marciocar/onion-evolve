@@ -89,9 +89,9 @@ _declares() { # $1=arquivo  → 0 se declarou COM VALOR NÃO-VAZIO no meta
   # ingênuo — mesma família do campo vazio, só que disfarçada.
   awk '
     /^[a-zA-Z_]/ && !/^meta:/ { exit 1 }
-    /^[[:space:]]+supersedes_(none|external):/ {
+    /^[[:space:]]+(x_)?supersedes_(none|external):/ {
       v = $0
-      sub(/^[[:space:]]+supersedes_(none|external):[[:space:]]*/, "", v)
+      sub(/^[[:space:]]+(x_)?supersedes_(none|external):[[:space:]]*/, "", v)
       gsub(/^["'"'"']|["'"'"']$/, "", v)
       gsub(/[[:space:]]/, "", v)
       if (v != "") { found = 1; exit 0 }
