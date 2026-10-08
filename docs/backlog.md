@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**391 itens abertos** em 80 grafo(s) com aberto (de 106 no escopo) · 81 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**393 itens abertos** em 81 grafo(s) com aberto (de 107 no escopo) · 82 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -63,6 +63,13 @@
 | 17.5 | `C_OPCAO_NENHUMA_COMPLETAR_OS_EIXOS` | company-brain-e-conducao-como-servico-2026-10 | OPCAO NENHUMA AGORA — rodada de COMPLETUDE dos eixos 1 pelo lado da suite, 3 cemiterio, 6 ICP e 7 capital antes de qualquer selo |
 | 13.8 | `C_OPCAO_BD_PACOTE_NO_FORMATO_GURU` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (b mais d) — O PACOTE NA FORMA QUE O MERCADO JA VALIDOU: software de conhecimento VERIFICADO com conducao humana EMBUTIDA, |
 | 13.8 | `C_OPCAO_D_CONDUCAO_COMO_SERVICO` | company-brain-e-conducao-como-servico-2026-10 | OPCAO (d) — CONDUCAO / ADOCAO COMO SERVICO: cobrar pelo metodo (/meta:adopt, gate instalado, federacao) de forma recorrente. A F |
+
+## canal-vivo-sessoes-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 74.4 | `C_LIVE_CLASS_DESIGN_CONSTRAINTS` | canal-vivo-sessoes-2026-10 | Restrições que a evidência ancorada impõe ao desenho da classe 'live' (NÃO é decisão): (1) cc-peer só vale DENTRO da mesma |
+| 32.0 | `Q_LIVE_CHANNEL_ACROSS_MACHINES_FOR_MEMBERS` | canal-vivo-sessoes-2026-10 | Como desenhar a classe 'live' da federation-transport (adapter por adotante: cc-peer·slack·teams·a2a) para comunicação DIRETA |
 
 ## jev-decision-round2-2026-10 — 10 item(ns)
 
