@@ -355,10 +355,12 @@
 .claude/validation/kg-console.sh	C_OPCAO_O8_CONSOLE_MULTI_GRAFO	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
 .claude/validation/kg-console.sh	C_single_artifact_ethos	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/kg-console.sh	E_scale_881	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
+.claude/validation/kg-contract-check.sh	E_GERADORES_ESCREVEM_O_CONTRATO_V3	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 .claude/validation/kg-corpus-grep.sh	E_AS_DUAS_CURAS_COM_CONTRAPROVA	docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml
 .claude/validation/kg-corpus-grep.sh	E_CORPUS_VIROU_INSTRUMENTO_DE_ISENCAO	docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml
 .claude/validation/kg-coverage-baseline.txt	C_OPCAO_C_ADOTAR_SARIF_E_INTERCAMBIO	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
 .claude/validation/kg-coverage-baseline.txt	E_OBJECAO_6_CATRACA_JA_E_MENOS_PERMISSIVO	docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml
+.claude/validation/kg-drive-project.sh	E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 .claude/validation/kg-drive-project.sh	E_LEVA2_CHECKPOINT_DO_DRIVE_NO_GRAFO	docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml
 .claude/validation/kg-narrate-validate.sh	D_regra47_mechanism	docs/onion/graph/kg-console-rich-design-2026-07.kg.yaml
 .claude/validation/kg-provenance-coverage.sh	SY_evid_provenance_coverage_gate	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml

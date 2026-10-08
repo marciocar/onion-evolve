@@ -2,7 +2,8 @@
 title: 'Resíduo — os geradores de grafo do core nascem no contrato v3 do .kg.yaml'
 date: 2026-10-08
 branch: feat/kg-generators-contract-v3
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 83158cc9689d1fef772914368c95f9d5ea095de71a69616a684cf63ec3ece852
+reviewed_code_sha256: fa3540618644fa1ac325a6401f75e1edd7a22272e300d9f81e588dda4c4bd4bf
 findings_total: 2
 findings_real: 2
 findings_fixed: 1
