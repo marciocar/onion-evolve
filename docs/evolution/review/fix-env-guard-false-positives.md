@@ -2,7 +2,8 @@
 title: 'Resíduo — o veto do .env julga glob pelo bash e pelo disco, e a pergunta do \r ganha caminho sancionado'
 date: 2026-10-08
 branch: fix/env-guard-false-positives
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 91a1d6949e86b88ab4be5c829b96e4dcbddbb69f168e74f10bbcfddc72d25ba2
+reviewed_code_sha256: 95edd4e6f68cc4ab842fad7a6206c403e2f229c163aa92f0831175bf971c6d73
 findings_total: 4
 findings_real: 4
 findings_fixed: 4

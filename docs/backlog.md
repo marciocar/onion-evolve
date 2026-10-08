@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**402 itens abertos** em 86 grafo(s) com aberto (de 112 no escopo) · 87 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**404 itens abertos** em 85 grafo(s) com aberto (de 111 no escopo) · 86 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -632,6 +632,15 @@
 | 3.6 | `Q_PRECOMMIT_ARMADO_EM_CLONE_FRESCO` | audit-textual-gates-2026-09 | O pre-commit do core depende de `git config core.hooksPath .githooks` LOCAL — um clone fresco (maquina nova, worktree de adotant |
 | 3.6 | `Q_R15_WRAP_NO_CAMINHO_CRITICO` | audit-textual-gates-2026-09 | onion-untrusted-wrap.sh (R15, anti-prompt-injection) nao e chamado por hook nenhum; a defesa depende de o modelo seguir untrusted- |
 
+## env-falso-positivo-2026-10 — 4 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 8.4 | `Q_ENV_GUARD_SEM_FALSO_POSITIVO` | env-falso-positivo-2026-10 | o que resta para o maestro selar: 5 das 7 formas medidas passam; o grep no .env e o heredoc que grava texto citando .env em arquiv |
+| 4.2 | `C_TETO_GREP_RECURSIVO_SEM_INCLUDE` | env-falso-positivo-2026-10 | teto: grep -r ou rg sobre uma pasta lê o .env que estiver dentro dela, e o veto julga o argumento (a pasta), não o que a recurs |
+| 4.2 | `D_GREP_E_HEREDOC_SEGUEM_VETADOS` | env-falso-positivo-2026-10 | proposta: grep no .env (mesmo só contando) e heredoc que grava em arquivo texto citando .env seguem vetados, porque o caminho san |
+| 2.8 | `C_TETO_DISCO_NO_MOMENTO_DO_VETO` | env-falso-positivo-2026-10 | teto: o glob conferido no disco vê a pasta no momento do veto; um x.env criado na mesma linha por nome montado em runtime, sem ci |
+
 ## company-brain-market-2026-07 — 1 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -795,18 +804,6 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 4.0 | `Q_REVERSE_JOIN_SCOPE` | guardrails-2nd-pr-state-2026-07 | GATED/deferido: o join-reverso (arquivo->guardrails que governam) so vira ferramenta barata SE as guardas passarem a self-declarar |
-
-## dissect-forge-2026-10 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 3.6 | `Q_COSTURA_DISSECT_FORGE` | dissect-forge-2026-10 | costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprend |
-
-## env-falso-positivo-2026-10 — 1 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 3.6 | `Q_ENV_GUARD_SEM_FALSO_POSITIVO` | env-falso-positivo-2026-10 | curar os falsos positivos do veto do .env sem abrir escape: medir cada forma com /meta:forge-guard (as duas polaridades e mutante) |
 
 ## inbox-triage-2026-10-04 — 1 item(ns)
 
