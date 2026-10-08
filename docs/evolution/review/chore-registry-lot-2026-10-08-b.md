@@ -2,14 +2,14 @@
 title: 'Resíduo — registro da triagem de provenance e dos sinais do onion-curation'
 date: 2026-10-08
 branch: chore/registry-lot-2026-10-08-b
-reviewed_diff_sha256: 8835a2264e7b8c3cfa663dc8f28d4327dbd9ef5a5b0c118e64595f96be475d2a
+reviewed_diff_sha256: b2a3a7e4c6ff1edf551688bb55282ab313ee1df1e67f78ed33e9e7ebeb480943
 reviewed_code_sha256: e744c31fa1f34af8736bef9134990df2b1cf6e3a6a94f14922231f1bac5ce779
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
 tokens: 0
 duration_min: 10
-verdict: ACHADOS_CURADOS
+verdict: CORRIGIDO
 elenxo: nao
 nota: >-
   PR de registro, sem superfície executável: nós, dados da triagem e sinais arquivados. A passada
