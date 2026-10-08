@@ -32,6 +32,10 @@
 #   --assert-ancestor <ref>: depois do merge PROVADO, confere `merge-base --is-ancestor <ref>
 #           origin/<base>`; se não for ancestral, sai rc=3 nomeando a ref (o merge aconteceu — o que
 #           falhou foi a ancestralidade pedida). Use com --merge-commit: --assert-ancestor onion/vendor.
+#   AUTO-REBASE (sem flag, 2026-10-08): PR CONFLICTING (que o GitHub não testa) é rebaseado sozinho
+#           pelo `pr-finalize --rebase --push` na worktree local da branch, até ONION_MERGE_REBASE_MAX
+#           (2) vezes; conflito de fonte para nomeado; sem worktree local, diz o comando e para. Depois
+#           espera as runs do head novo nascerem e terminarem (ONION_MERGE_WAIT_SECS, 1800).
 set -uo pipefail
 
 PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch] [--dispensa <check> --motivo <texto>]}"; shift || true
@@ -131,6 +135,63 @@ HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOi
 OWNER_REPO="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRepository,headRepositoryOwner \
   --jq '.headRepositoryOwner.login + "/" + .headRepository.name' 2>/dev/null)"
 HEAD_REF="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefName --jq '.headRefName' 2>/dev/null)"
+# ══ AUTO-REBASE: PR em CONFLICTING não dispara CI ══════════════════════════════════════════════
+# Defeito medido em 2026-10-07/08: 25 PRs, 33 commits de "projeções geradas regeneradas". Todo PR
+# commita as projeções (backlog, testing-state, kg-read-index, plugins/), então cada merge deixa os
+# PRs abertos CONFLICTING — e o GitHub NÃO dispara CI em PR em conflito. A espera ficava parada em
+# "no checks reported" (#957 duas vezes, #959, #960, #975) até alguém rodar o rebase à mão. Desde o
+# #973 o `pr-finalize --rebase --push` resolve com segurança o conflito SÓ de projeção (remonta
+# plugins/ das fontes, regenera o resto) e RECUSA conflito de fonte. Aqui ele é DISPARADO sozinho:
+#   · só na worktree LOCAL da branch do PR (achada por `git worktree list`), nunca às cegas: sem
+#     worktree, digo o comando exato e paro (fail-loud — esperar em silêncio era o defeito);
+#   · conflito de FONTE para com rc≠0 nomeando o arquivo — o rebase nunca esconde conflito real;
+#   · LIMITE de tentativas (ONION_MERGE_REBASE_MAX, default 2): conflito que volta não vira laço;
+#   · depois do rebase, as runs do head NOVO têm de NASCER e terminar (check presente, não só
+#     "sem vermelho"), com prazo (ONION_MERGE_WAIT_SECS); prazo vencido = paro e digo.
+# Leitura vazia de `mergeable` não é CONFLICTING: só o literal dispara; o resto segue os gates de sempre.
+pr_mergeable() { gh pr view "$PR" "${REPO_ARG[@]}" --json mergeable --jq '.mergeable' 2>/dev/null; }
+_wt_of_branch() { # $1=branch → caminho da worktree que a tem em checkout (vazio se nenhuma)
+  git worktree list --porcelain 2>/dev/null \
+    | awk -v b="branch refs/heads/$1" '/^worktree /{w=substr($0,10)} $0==b{print w; exit}'
+}
+_REBASE_MAX="${ONION_MERGE_REBASE_MAX:-2}"
+_WAIT_SECS="${ONION_MERGE_WAIT_SECS:-1800}"
+_POLL_SECS="${ONION_MERGE_POLL_SECS:-30}"
+_mg="$(pr_mergeable)"
+_n=0; while [ "$_mg" = UNKNOWN ] && [ "$_n" -lt 6 ]; do sleep "${_POLL_SECS}"; _mg="$(pr_mergeable)"; _n=$((_n+1)); done
+_rebases=0
+while [ "$_mg" = CONFLICTING ]; do
+  _rebases=$((_rebases+1))
+  [ "$_rebases" -le "$_REBASE_MAX" ] \
+    || die "PR #${PR} segue CONFLICTING depois de ${_REBASE_MAX} rebase(s) automático(s) — algo volta a conflitar a cada vez; não entro em laço. Investigue a branch '${HEAD_REF}'."
+  _wt="$(_wt_of_branch "${HEAD_REF}")"
+  [ -n "$_wt" ] \
+    || die "PR #${PR} está CONFLICTING (o GitHub não dispara CI em PR em conflito) e a branch '${HEAD_REF}' não está em nenhuma worktree deste repo — não rebaseio às cegas. Rode na worktree da branch: bash ops/pr-finalize.sh --rebase --push ; depois rode este comando de novo."
+  say "PR #${PR} CONFLICTING — auto-rebase ${_rebases}/${_REBASE_MAX} na worktree ${_wt} (pr-finalize --rebase --push)"
+  _rb_out="$(cd "$_wt" && bash ops/pr-finalize.sh --rebase --push 2>&1)"; _rb_rc=$?
+  if [ "$_rb_rc" -ne 0 ]; then
+    _real="$(printf '%s\n' "$_rb_out" | grep -o 'conflito REAL em [^ ]*' | head -1)"
+    die "auto-rebase RECUSADO (${_real:-rc=${_rb_rc}}) — conflito de FONTE não se resolve sozinho e não escondo conflito real; resolva à mão na worktree ${_wt}. pr-finalize disse: $(printf '%s\n' "$_rb_out" | tail -2 | tr '\n' ' ')"
+  fi
+  _new="$(git -C "$_wt" rev-parse HEAD 2>/dev/null)"
+  HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOid' 2>/dev/null)"
+  [ -n "$_new" ] && [ "$HEAD_SHA" != "$_new" ] \
+    && die "depois do auto-rebase o head do PR (${HEAD_SHA:0:8}) não é o HEAD da worktree (${_new:0:8}) — a branch rebaseada não é a do PR; paro."
+  _mg="$(pr_mergeable)"
+  _n=0; while [ "$_mg" = UNKNOWN ] && [ "$_n" -lt 6 ]; do sleep "${_POLL_SECS}"; _mg="$(pr_mergeable)"; _n=$((_n+1)); done
+done
+if [ "$_rebases" -gt 0 ]; then
+  say "auto-rebase feito — esperando as runs do head ${HEAD_SHA:0:8} NASCEREM e terminarem (prazo ${_WAIT_SECS}s)"
+  _t0w="$(date +%s)"
+  while :; do
+    _runs="$(gh api "repos/${OWNER_REPO}/commits/${HEAD_SHA}/check-runs?per_page=100" \
+      --jq '.check_runs[] | .name + "\t" + .status' 2>/dev/null)"
+    if [ -n "$_runs" ] && printf '%s\n' "$_runs" | awk -F'\t' '$2!="completed"{exit 1}'; then break; fi
+    [ $(( $(date +%s) - _t0w )) -ge "$_WAIT_SECS" ] \
+      && die "as runs do head ${HEAD_SHA:0:8} não nasceram/terminaram em ${_WAIT_SECS}s depois do auto-rebase — rode este comando de novo quando o CI terminar."
+    sleep "${_POLL_SECS}"
+  done
+fi
 # ══ API DE CHECKS EM FALHA ≠ ZERO CHECK-RUNS ═════════════════════════════════════════════════
 # Defeito medido em 2026-10-07 (sinal de um adotante): a API de check-runs do GitHub devolveu HTTP
 # 500 para QUALQUER commit por ~7 minutos. Com `2>/dev/null` o erro virava saída vazia, e a saída
