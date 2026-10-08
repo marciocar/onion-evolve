@@ -8,7 +8,7 @@ meta:
   baseline: 2026-10-08
   review_after: 2026-11-07   # 30d: decisão em aberto
   # ═══ TETO: 12 NÓS ═══
-  #   6 em 2026-10-08 (+ a segunda opinião do KG-SSOT, em 3 restrições).
+  #   7 em 2026-10-08 (+ a segunda opinião do KG-SSOT, em 3 restrições, + dogfood por comando real).
 nodes:
   - id: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM
     node_type: evidence
@@ -69,6 +69,16 @@ nodes:
     verified_at: 2026-10-08
     verified_against: "resposta da sessão do adotante dedicado ao KG-SSOT ao core em 2026-10-08 (mensagem entre sessões), opinião, não selo"
     label: "riscos que faltavam: CI verde pode ser vazio (filtro de paths, sem check obrigatório), então a parada exige check presente e verde; Elenxo do mesmo modelo é uma voz só, falta um agente separado que reabra os artefatos; cadeia parcial pede estado retomável por item e não fechar o épico com filho aberto; insumo vencido pede --freshness antes e parada em STALE de alto impacto; o status do Zoho de layout padrão mente por omissão; --merge deve ser false por padrão até a primeira cadeia provada, e true só para item que não é decision"
+  - id: E_DOGFOOD_POR_COMANDO_REAL
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-08
+    verified_against: "2026-10-08, início do SAC-66: o core moveu a issue por script direto na API do Linear em vez do adapter do task manager, e o estado escolhido por tipo saiu 'In Review' (dois estados started); o sinal da suíte de conformidade do adotante do KG-SSOT já apontava o mesmo: 'é dogfood e não interpretação de comandos'; decisão do maestro no mesmo dia: acrescentar ao auto-drive"
+    label: "o auto-drive nasce pelo /meta:forge (as 7 peças medidas pelo censo da forja) e, por item, invoca os comandos reais do Onion (/engineer:start, /engineer:work, /engineer:pr, /meta:drive) em vez de reimplementar o fluxo; onde o comando não der conta vira achado no grafo, nunca contorno; depende do adapter executável (SAC-65)"
 edges:
   - from: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM
     to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
@@ -88,3 +98,6 @@ edges:
   - from: E_OPINIAO_EXPANSAO_AINDA_NAO_CONFIAVEL
     to: Q_SEGUNDA_OPINIAO_KG_SSOT
     edge_type: SUPPORTS
+  - from: E_DOGFOOD_POR_COMANDO_REAL
+    to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
+    edge_type: CONSTRAINS
