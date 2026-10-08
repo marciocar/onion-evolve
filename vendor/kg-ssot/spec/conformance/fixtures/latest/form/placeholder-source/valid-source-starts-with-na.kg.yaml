@@ -1,7 +1,6 @@
 meta:
-  schema_version: '1'
-  id: warn-meta-unknown-key
-  nota: sintética
+  schema_version: "1"
+  id: valid-source-starts-with-na
 nodes:
   - id: Q_A
     node_type: question
@@ -9,18 +8,18 @@ nodes:
     status: open
     impact: 3
     confidence: 0.5
-    label: A pergunta sintética A.
+    label: "A pergunta sintética A."
   - id: EV_A
     node_type: evidence
     plane: DEV
     status: confirmed
     impact: 3
     confidence: 0.9
-    label: A evidência sintética que sustenta A.
+    label: "A evidência sintética que sustenta A."
     provenance:
-      source: "medição sintética"
+      source: "na ata da reunião sintética"
       locator: "caso de conformidade"
-      method: "medição"
+      method: "medição: caso de conformidade"
 edges:
   - from: EV_A
     to: Q_A

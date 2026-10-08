@@ -6,7 +6,7 @@ meta:
   layer: audit
   baseline: 2026-10-05
   review_after: 2026-11-05
-  supersedes_none: >
+  x_supersedes_none: >
     Triagem dos dois sinais do hub brain-granaai de 2026-10-04. O grafo da triagem anterior
     (inbox-triage-2026-10) esta no teto e manda que a cura more no grafo de quem a executou; nada
     nele e derrubado aqui — o Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO segue aberto para adotantes em

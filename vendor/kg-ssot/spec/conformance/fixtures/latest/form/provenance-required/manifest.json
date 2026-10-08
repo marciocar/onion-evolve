@@ -1,0 +1,75 @@
+{
+  "description": "Contrato v4: nó confirmed ou PROD sem provenance reprova (Q_CONTRACT_STRUCTURED_PROVENANCE), e status unverifiable segue sem exigir, também em PROD, que é o destino do nó sem fonte recuperável (Q_CONTRACT_SOURCELESS_CONFIRMED). Origem em pessoa ou sessão recuperável vale, com method de testemunho.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-minimal-v4.kg.yaml",
+      "description": "o grafo mínimo válido no v4: nó confirmed com provenance completa",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-confirmed-without-provenance.kg.yaml",
+      "description": "nó confirmed sem provenance: reprova no v4",
+      "valid": false,
+      "codes": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "bad-prod-without-provenance.kg.yaml",
+      "description": "nó PROD (open) só com verified_against em texto: reprova no v4",
+      "valid": false,
+      "codes": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "bad-confirmed-and-prod-without-provenance.kg.yaml",
+      "description": "confirmed e PROD ao mesmo tempo: um código só",
+      "valid": false,
+      "codes": [
+        "form.required.node.provenance"
+      ]
+    },
+    {
+      "file": "valid-unverifiable-without-provenance.kg.yaml",
+      "description": "nó unverifiable sem provenance: não exige, é o destino do nó sem fonte recuperável",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-prod-unverifiable-without-provenance.kg.yaml",
+      "description": "nó PROD rebaixado a unverifiable, sem provenance: também não exige",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-testimony-provenance.kg.yaml",
+      "description": "origem é uma pessoa e uma sessão recuperáveis, com method de testemunho: o nó segue confirmed",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-provenance-unknown-key.kg.yaml",
+      "description": "chave desconhecida DENTRO de provenance segue SHOULD no v4",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.unknown-key.node.provenance.quote"
+      ]
+    },
+    {
+      "file": "bad-done-prod-without-provenance.kg.yaml",
+      "description": "nó done em PROD sem provenance: PROD exige",
+      "valid": false,
+      "codes": [
+        "form.required.node.provenance"
+      ],
+      "warnings": [
+        "form.required.node.verified_at"
+      ]
+    }
+  ]
+}

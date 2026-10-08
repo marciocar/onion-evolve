@@ -1,0 +1,22 @@
+meta:
+  schema_version: "1"
+  id: bad-done-prod-without-provenance
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: EV_A
+    node_type: evidence
+    plane: PROD
+    status: done
+    impact: 3
+    confidence: 0.9
+    label: "A evidência sintética que sustenta A."
+edges:
+  - from: EV_A
+    to: Q_A
+    edge_type: SUPPORTS

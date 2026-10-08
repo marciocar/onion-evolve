@@ -6,7 +6,7 @@ meta:
   layer: audit
   baseline: 2026-10-04
   review_after: 2026-11-18
-  supersedes_external:
+  x_supersedes_external:
     - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_CREATE_SKILL_EXECUTA_GIT_DIFF_A_CADA_INVOCACAO
     - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_LINK_QUEBRADO_NA_DOUTRINA_DE_CLIENTE
     - docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml#C_RAIO_X_PUBLICA_ALVOS_FALSOS_DE_SKILLS

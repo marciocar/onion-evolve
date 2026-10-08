@@ -1,0 +1,402 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onion-kg-ssot/spec/kg-contract-v4.schema.json",
+  "title": "kg.yaml — contrato v4, nível MUST",
+  "description": "O contrato v4 do .kg.yaml, nível MUST (reprova), o vigente desde a rampa EPIC_9_CONTRACT_V4_RAMP (substitui o v3). É o v3 com três promoções a MUST. (1) Q_CONTRACT_STRUCTURED_PROVENANCE: nó confirmed ou PROD exige provenance com source, locator e method (form.required.node.provenance), que no v3 só alertava; status unverifiable não exige, mesmo em PROD, porque é o destino do nó sem fonte recuperável (Q_CONTRACT_SOURCELESS_CONFIRMED). (2) Q_CONTRACT_SOURCELESS_CONFIRMED: provenance.source não pode ser placeholder: só espaço, ou um destes sozinho, sem distinguir maiúscula e com pontuação final (. ou :) e espaço em volta (inclusive NBSP, espaço ideográfico, BOM e espaço de largura zero) ignorados: desconhecida, desconhecido, unknown, n/a, n / a, na, n.a., none, null, sem fonte, tbd, um ou mais hífens, travessão, meia-risca, ?. A regra é um not+pattern sem lookahead, portável a leitores RE2: form.pattern.node.provenance.source. O vazio segue form.range.node.provenance.source, como no v3. Origem que é uma pessoa ou sessão recuperável é fonte válida, com method de testemunho. (3) Q_UNKNOWN_KEY_RAMP e Q_CONTRACT_EXTENSION_POLICY: chave desconhecida sem o prefixo x_ no topo, no meta, no nó e na aresta reprova (form.unknown-key.<escopo>.<chave>), com a mesma lista de chaves conhecidas que o SHOULD v3 usava; nome sem x_ que nem é slug reprova como form.pattern.<escopo>.key. Chave x_ segue livre, e x_ com nome que não é slug só alerta. A chave on da aresta segue na lista porque já reprova como yaml.forbidden-key-on. Dentro de provenance, a chave desconhecida segue SHOULD. O resto é o v3: escrito à mão em JSON Schema 2020-12 (Q_CONTRACT_SOURCE_OF_TRUTH); PROD sem verified_at é SHOULD e o gatilho de TRANSITIONS é trigger (Q_CONTRACT_CONFORMANCE_LEVELS); narrative no nó, note e purpose no meta, data no calendário (format: date é ASSERÇÃO) e .nan ou .inf reprovando como tipo (Q_CONTRACT_FACT_NARRATIVE, Q_CONTRACT_YAML_JSON_GAP); provenance, quando presente, com os três campos não vazios, e provenance: null reprova. O par SHOULD é kg-contract-v4.should.schema.json; as regras de perfil YAML (chave on proibida, chave duplicada, documento único) são do leitor, porque o JSON não as vê.",
+  "type": "object",
+  "required": [
+    "meta",
+    "nodes",
+    "edges"
+  ],
+  "properties": {
+    "meta": {
+      "$ref": "#/$defs/meta"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/node"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/edge"
+      }
+    }
+  },
+  "$defs": {
+    "date": {
+      "type": "string",
+      "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$",
+      "format": "date"
+    },
+    "partialDate": {
+      "type": "string",
+      "pattern": "^(000[1-9]|00[1-9][0-9]|0[1-9][0-9]{2}|[1-9][0-9]{3})(-(0[1-9]|1[0-2])(-[0-9]{2})?)?$",
+      "if": {
+        "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+      },
+      "then": {
+        "format": "date"
+      }
+    },
+    "nodeId": {
+      "type": "string",
+      "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+    },
+    "layer": {
+      "enum": [
+        "audit",
+        "domain"
+      ]
+    },
+    "meta": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "id"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "1"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "baseline": {
+          "$ref": "#/$defs/date"
+        },
+        "date": {
+          "$ref": "#/$defs/date"
+        },
+        "review_after": {
+          "$ref": "#/$defs/date"
+        },
+        "layer": {
+          "$ref": "#/$defs/layer"
+        },
+        "note": {
+          "type": "string"
+        },
+        "purpose": {
+          "type": "string"
+        }
+      },
+      "propertyNames": {
+        "if": {
+          "pattern": "^x_"
+        },
+        "else": {
+          "allOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+            },
+            {
+              "enum": [
+                "baseline",
+                "date",
+                "id",
+                "layer",
+                "note",
+                "purpose",
+                "review_after",
+                "schema_version"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "node": {
+      "type": "object",
+      "required": [
+        "id",
+        "node_type",
+        "plane",
+        "status",
+        "impact",
+        "confidence",
+        "label"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nodeId"
+        },
+        "node_type": {
+          "enum": [
+            "entity",
+            "claim",
+            "decision",
+            "question",
+            "evidence",
+            "artifact",
+            "state",
+            "event",
+            "rule",
+            "invariant",
+            "policy"
+          ]
+        },
+        "layer": {
+          "$ref": "#/$defs/layer"
+        },
+        "plane": {
+          "enum": [
+            "DEV",
+            "PROD"
+          ]
+        },
+        "status": {
+          "enum": [
+            "open",
+            "confirmed",
+            "drifted",
+            "unverifiable",
+            "refuted",
+            "superseded",
+            "done"
+          ]
+        },
+        "impact": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 5
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "label": {
+          "type": "string",
+          "minLength": 1
+        },
+        "trace": {
+          "type": "string"
+        },
+        "verified_at": {
+          "$ref": "#/$defs/date"
+        },
+        "verified_against": {
+          "type": "string"
+        },
+        "valid_from": {
+          "$ref": "#/$defs/partialDate"
+        },
+        "source_tier": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 10
+        },
+        "source_kind": {
+          "type": "string"
+        },
+        "owner": {
+          "type": "string"
+        },
+        "drive_kind": {
+          "type": "string"
+        },
+        "evidence_class": {
+          "type": "string"
+        },
+        "sealed_by": {
+          "type": "string"
+        },
+        "sealed_at": {
+          "type": "string"
+        },
+        "narrative": {
+          "type": "string"
+        },
+        "provenance": {
+          "$ref": "#/$defs/provenance"
+        }
+      },
+      "propertyNames": {
+        "if": {
+          "pattern": "^x_"
+        },
+        "else": {
+          "allOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+            },
+            {
+              "enum": [
+                "confidence",
+                "drive_kind",
+                "evidence_class",
+                "id",
+                "impact",
+                "label",
+                "layer",
+                "narrative",
+                "node_type",
+                "owner",
+                "plane",
+                "provenance",
+                "sealed_at",
+                "sealed_by",
+                "source_kind",
+                "source_tier",
+                "status",
+                "trace",
+                "valid_from",
+                "verified_against",
+                "verified_at"
+              ]
+            }
+          ]
+        }
+      },
+      "if": {
+        "anyOf": [
+          {
+            "properties": {
+              "status": {
+                "const": "confirmed"
+              }
+            },
+            "required": [
+              "status"
+            ]
+          },
+          {
+            "properties": {
+              "plane": {
+                "const": "PROD"
+              }
+            },
+            "required": [
+              "plane"
+            ]
+          }
+        ],
+        "not": {
+          "properties": {
+            "status": {
+              "const": "unverifiable"
+            }
+          },
+          "required": [
+            "status"
+          ]
+        }
+      },
+      "then": {
+        "required": [
+          "provenance"
+        ]
+      }
+    },
+    "edge": {
+      "type": "object",
+      "required": [
+        "from",
+        "to",
+        "edge_type"
+      ],
+      "properties": {
+        "from": {
+          "$ref": "#/$defs/nodeId"
+        },
+        "to": {
+          "$ref": "#/$defs/nodeId"
+        },
+        "edge_type": {
+          "enum": [
+            "SUPPORTS",
+            "REFUTES",
+            "SUPERSEDES",
+            "CAUSES",
+            "DEPENDS_ON",
+            "TRACES_TO",
+            "CONSTRAINS",
+            "HAS_STATE",
+            "TRANSITIONS",
+            "EMITS",
+            "READS",
+            "WRITES"
+          ]
+        },
+        "label": {
+          "type": "string"
+        },
+        "trigger": {
+          "$ref": "#/$defs/nodeId"
+        }
+      },
+      "propertyNames": {
+        "if": {
+          "pattern": "^x_"
+        },
+        "else": {
+          "allOf": [
+            {
+              "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+            },
+            {
+              "enum": [
+                "edge_type",
+                "from",
+                "label",
+                "on",
+                "to",
+                "trigger"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "provenance": {
+      "type": "object",
+      "required": [
+        "source",
+        "locator",
+        "method"
+      ],
+      "properties": {
+        "source": {
+          "type": "string",
+          "minLength": 1,
+          "not": {
+            "type": "string",
+            "pattern": "^(?:[ \t\n\r 　﻿​]+|[ \t\n\r 　﻿​]*(?:[Dd][Ee][Ss][Cc][Oo][Nn][Hh][Ee][Cc][Ii][Dd][AaOo]|[Uu][Nn][Kk][Nn][Oo][Ww][Nn]|[Nn] ?/? ?[Aa]|[Nn]\\.[Aa]\\.?|[Nn][Oo][Nn][Ee]|[Nn][Uu][Ll][Ll]|[Ss][Ee][Mm] [Ff][Oo][Nn][Tt][Ee]|[Tt][Bb][Dd]|-+|—|–|\\?)[.:]?[ \t\n\r 　﻿​]*)$"
+          }
+        },
+        "locator": {
+          "type": "string",
+          "minLength": 1
+        },
+        "method": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "propertyNames": {
+    "if": {
+      "pattern": "^x_"
+    },
+    "else": {
+      "allOf": [
+        {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+        },
+        {
+          "enum": [
+            "edges",
+            "meta",
+            "nodes"
+          ]
+        }
+      ]
+    }
+  }
+}

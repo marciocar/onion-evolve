@@ -1,5 +1,5 @@
 {
-  "description": "Política de extensão do contrato v1 (Q_CONTRACT_EXTENSION_POLICY, selada no PR #13): chave com prefixo x_ é ignorada; chave desconhecida sem prefixo alerta nesta versão (SHOULD) e vira MUST na próxima.",
+  "description": "Política de extensão (Q_CONTRACT_EXTENSION_POLICY, selada no PR #13): chave com prefixo x_ é ignorada; chave desconhecida sem prefixo alertou (SHOULD) do v1 ao v3 e reprova desde o v4 (Q_UNKNOWN_KEY_RAMP).",
   "layer": "form",
   "pending_on": [],
   "cases": [
@@ -16,31 +16,31 @@
       "codes": []
     },
     {
-      "file": "warn-node-unknown-key.kg.yaml",
-      "description": "nó com chave desconhecida sem prefixo: válido nesta versão, com warning",
-      "valid": true,
-      "codes": [],
-      "warnings": [
+      "file": "bad-node-unknown-key.kg.yaml",
+      "description": "nó com chave desconhecida sem prefixo: reprova desde o v4",
+      "valid": false,
+      "codes": [
         "form.unknown-key.node.origem"
-      ]
+      ],
+      "warnings": []
     },
     {
-      "file": "warn-meta-unknown-key.kg.yaml",
-      "description": "meta com chave desconhecida sem prefixo: o escopo do código é meta, não top",
-      "valid": true,
-      "codes": [],
-      "warnings": [
+      "file": "bad-meta-unknown-key.kg.yaml",
+      "description": "meta com chave desconhecida sem prefixo: o escopo do código é meta, não top; reprova desde o v4",
+      "valid": false,
+      "codes": [
         "form.unknown-key.meta.nota"
-      ]
+      ],
+      "warnings": []
     },
     {
-      "file": "warn-node-dotted-key.kg.yaml",
-      "description": "chave com ponto no nome não é slug: um alerta só, form.pattern, nunca unknown-key ambíguo com campo aninhado",
-      "valid": true,
-      "codes": [],
-      "warnings": [
+      "file": "bad-node-dotted-key.kg.yaml",
+      "description": "chave com ponto no nome e sem x_ não é slug: um código só, form.pattern, nunca unknown-key ambíguo com campo aninhado; reprova desde o v4",
+      "valid": false,
+      "codes": [
         "form.pattern.node.key"
-      ]
+      ],
+      "warnings": []
     }
   ]
 }

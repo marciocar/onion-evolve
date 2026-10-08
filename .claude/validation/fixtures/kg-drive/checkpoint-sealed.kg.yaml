@@ -3,7 +3,7 @@ meta:
   schema_version: 1
   baseline: "2026-08-01"
   # drive_checkpoint: pending  (comentario com o valor OPOSTO: se contasse, o caso viraria PENDENTE)
-  drive_checkpoint: sealed
+  x_drive_checkpoint: sealed
 nodes:
   - id: A_FUNDACAO
     node_type: question

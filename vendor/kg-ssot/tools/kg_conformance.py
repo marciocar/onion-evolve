@@ -17,8 +17,12 @@ da regra, pasta desconhecida, arquivo ausente, repetido ou fora de todo manifest
 optional/ e proposals/ reportam e nunca mudam o rc.
 
 Uso:
-  kg_conformance.py [--suite spec/conformance] [--schema spec/kg-contract-v3.schema.json]
-                    [--should-schema spec/kg-contract-v3.should.schema.json] [--json OUT]
+  kg_conformance.py [--suite spec/conformance] [--schema spec/kg-contract-v4.schema.json]
+                    [--should-schema spec/kg-contract-v4.should.schema.json] [--json OUT]
+                    [--proposals-schema F --proposals-should-schema F]
+
+--proposals-schema e --proposals-should-schema (juntos) medem só proposals/ contra um contrato candidato (ex.: o
+rascunho de uma versão futura), e latest/ e optional/ seguem no --schema; sem eles, tudo roda no --schema. Não mudam o rc.
 """
 import argparse
 import json
@@ -93,25 +97,28 @@ def suite_errors(suite, meta_validator):
     return out
 
 
-def run_cases(suite, validator, should_validator):
+def run_cases(suite, validator, should_validator, proposals=None):
+    """proposals: (validator, should_validator) só para proposals/; None usa o par de latest/."""
     results = []
     cases_root = suite / "fixtures"
     for m in sorted(cases_root.glob("*/**/manifest.json")):
         data = load_json(m)
+        folder = m.relative_to(cases_root).parts[0]
+        must_v, should_v = proposals if proposals and folder == "proposals" else (validator, should_validator)
         for case in data["cases"]:
             path = m.parent / case["file"]
             want_codes = sorted(set(case["codes"]))
             want_warn = sorted(set(case.get("warnings", [])))
             row = {
-                "folder": m.relative_to(cases_root).parts[0],
+                "folder": folder,
                 "case": str(path.relative_to(cases_root)),
                 "pending_on": data["pending_on"],
                 "expected": {"codes": want_codes, "warnings": want_warn},
             }
             try:
                 text = path.read_text(encoding="utf-8")
-                got_codes = sorted(set(kg_validate.codes(text, validator)))
-                got_warn = sorted(set(kg_validate.warnings(text, validator, should_validator)))
+                got_codes = sorted(set(kg_validate.codes(text, must_v)))
+                got_warn = sorted(set(kg_validate.warnings(text, must_v, should_v)))
             except Exception as exc:  # noqa: BLE001 — o leitor caiu: falha DO CASO, o gate da pasta decide o rc
                 row.update({"pass": False, "emitted": None, "error": f"{exc.__class__.__name__}: {exc}"})
             else:
@@ -128,7 +135,11 @@ def main(argv=None):
     ap.add_argument("--schema", default=str(kg_validate.CONTRACT_MUST))
     ap.add_argument("--should-schema", default=str(kg_validate.CONTRACT_SHOULD))
     ap.add_argument("--json")
+    ap.add_argument("--proposals-schema", help="MUST candidato, só para proposals/")
+    ap.add_argument("--proposals-should-schema", help="SHOULD candidato, só para proposals/")
     args = ap.parse_args(argv)
+    if bool(args.proposals_schema) != bool(args.proposals_should_schema):
+        ap.error("--proposals-schema e --proposals-should-schema vão juntos")
     suite = pathlib.Path(args.suite)
     try:
         meta = load_json(suite / "manifest.schema.json")
@@ -140,19 +151,23 @@ def main(argv=None):
         if broken:
             raise SuiteBroken("\n".join(broken))
         schemas = []
-        for path in (args.schema, args.should_schema):
+        paths = [args.schema, args.should_schema]
+        if args.proposals_schema:
+            paths += [args.proposals_schema, args.proposals_should_schema]
+        for path in paths:
             data = load_json(pathlib.Path(path))
             try:
                 Draft202012Validator.check_schema(data)
             except SchemaError as exc:
                 raise SuiteBroken(f"{path}: não é JSON Schema válido: {exc.message}") from exc
             schemas.append(kg_validate.make_validator(data))
-        validator, should_validator = schemas
+        validator, should_validator = schemas[:2]
+        proposals = tuple(schemas[2:]) or None
     except SuiteBroken as exc:
         for line in str(exc).splitlines():
             print(f"SUÍTE QUEBRADA  {line}")
         return 2
-    results = run_cases(suite, validator, should_validator)
+    results = run_cases(suite, validator, should_validator, proposals)
     for r in results:
         line = f"{'PASS' if r['pass'] else 'FAIL'}  {r['case']}"
         if not r["pass"]:
@@ -164,6 +179,8 @@ def main(argv=None):
         if rows:
             ok = sum(r["pass"] for r in rows)
             gate = "reprova" if folder == "latest" else "só reporta"
+            if folder == "proposals" and proposals:
+                gate += f", contra {pathlib.Path(args.proposals_schema).name}"
             print(f"{folder}: {ok}/{len(rows)} ({gate})")
     if args.json:
         def shown(path):
@@ -171,7 +188,10 @@ def main(argv=None):
             return str(path.relative_to(root)) if path.is_relative_to(root) else path.name
         with open(args.json, "w", encoding="utf-8") as fh:
             json.dump({"reader": "kg_validate.py", "schema": shown(args.schema),
-                       "should_schema": shown(args.should_schema), "results": results},
+                       "should_schema": shown(args.should_schema),
+                       **({"proposals_schema": shown(args.proposals_schema),
+                           "proposals_should_schema": shown(args.proposals_should_schema)} if proposals else {}),
+                       "results": results},
                       fh, ensure_ascii=False, indent=1)
     return 1 if any(not r["pass"] for r in results if r["folder"] == "latest") else 0
 

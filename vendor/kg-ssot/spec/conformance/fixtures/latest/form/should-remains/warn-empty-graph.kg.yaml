@@ -1,0 +1,5 @@
+meta:
+  schema_version: "1"
+  id: warn-empty-graph
+nodes: []
+edges: []

@@ -6,7 +6,7 @@ meta:
   schema_version: "1"
   baseline: 2026-10-03
   review_after: 2026-11-17
-  supersedes_none: >
+  x_supersedes_none: >
     DESFECHO DE 1a CLASSE, e a 1a redacao desta linha era um DEFEITO DA MESMA ESPECIE que a
     rodada inteira persegue: ela declarava `supersedes_external` apontando para
     `radar-E3-2026-09-21-r5#E_CC_VERSION_DA_RODADA` — um no que NAO EXISTE. O r5 tem 15 nos e

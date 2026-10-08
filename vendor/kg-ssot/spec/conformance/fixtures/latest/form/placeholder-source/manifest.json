@@ -1,0 +1,185 @@
+{
+  "description": "Contrato v4: provenance.source placeholder reprova como form.pattern.node.provenance.source (Q_CONTRACT_SOURCELESS_CONFIRMED). Placeholder é desconhecida, desconhecido, unknown, n/a, na, -, ?, tbd, sem distinguir maiúscula e ignorando espaço em volta, ou só espaço; o vazio segue form.range, como no v3.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "bad-source-desconhecida.kg.yaml",
+      "description": "source: desconhecida",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-desconhecido-capitalized.kg.yaml",
+      "description": "source: Desconhecido (maiúscula não muda)",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-unknown-upper.kg.yaml",
+      "description": "source: UNKNOWN",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-n-a.kg.yaml",
+      "description": "source: N/A",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-na.kg.yaml",
+      "description": "source: na",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-dash.kg.yaml",
+      "description": "source: -",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-question-mark.kg.yaml",
+      "description": "source: ?",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-tbd.kg.yaml",
+      "description": "source: TBD",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-whitespace-only.kg.yaml",
+      "description": "source só com espaço",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-padded-placeholder.kg.yaml",
+      "description": "placeholder com espaço e quebra de linha em volta",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-empty.kg.yaml",
+      "description": "source vazio: um código só, form.range, como no v3",
+      "valid": false,
+      "codes": [
+        "form.range.node.provenance.source"
+      ]
+    },
+    {
+      "file": "valid-source-starts-with-na.kg.yaml",
+      "description": "texto que só começa como um placeholder é fonte",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-source-question-in-url.kg.yaml",
+      "description": "texto com ? no meio é fonte",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "bad-source-unknown-trailing-dot.kg.yaml",
+      "description": "source: Unknown. (pontuação final)",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-n-dot-a-dot.kg.yaml",
+      "description": "source: N.A.",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-em-dash.kg.yaml",
+      "description": "source: travessão",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-double-hyphen.kg.yaml",
+      "description": "source: --",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-none.kg.yaml",
+      "description": "source: none",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-null-string.kg.yaml",
+      "description": "source: \"null\" como texto",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-sem-fonte.kg.yaml",
+      "description": "source: Sem fonte",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-source-nbsp-padded.kg.yaml",
+      "description": "source: unknown com NBSP em volta",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "bad-unverifiable-with-placeholder-source.kg.yaml",
+      "description": "unverifiable dispensa provenance, mas a que vier não pode ter placeholder",
+      "valid": false,
+      "codes": [
+        "form.pattern.node.provenance.source"
+      ]
+    },
+    {
+      "file": "valid-source-unknown-unknowns-paper.kg.yaml",
+      "description": "source legítima que começa com unknown",
+      "valid": true,
+      "codes": []
+    }
+  ]
+}

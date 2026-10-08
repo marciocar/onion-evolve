@@ -1,0 +1,89 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://onion-kg-ssot/spec/kg-contract-v4.should.schema.json",
+  "title": "kg.yaml — contrato v4, nível SHOULD",
+  "description": "O contrato v4 do .kg.yaml, nível SHOULD (alerta, não reprova), o vigente desde a rampa EPIC_9_CONTRACT_V4_RAMP. É o SHOULD v3 menos o que o v4 promoveu a MUST: a chave desconhecida sem x_ no topo, no meta, no nó e na aresta (Q_UNKNOWN_KEY_RAMP) e o nó confirmed ou PROD sem provenance (Q_CONTRACT_STRUCTURED_PROVENANCE). Segue alertando: nome de chave que não é slug ([A-Za-z_][A-Za-z0-9_-]*), como form.pattern.<escopo>.key, que sem x_ também reprova no MUST; nó PROD sem verified_at (Q_CONTRACT_CONFORMANCE_LEVELS); label do nó acima de 280 caracteres, form.range.node.label, porque a narrativa vai para narrative (Q_CONTRACT_FACT_NARRATIVE); a chave desconhecida dentro de provenance, fechada em source, locator, method e x_; e o grafo sem nós (nodes: []), como form.range.top.nodes (Q_CONTRACT_EMPTY_GRAPH): é válido, como o primeiro uso de um app, mas o aviso pega o parse que falhou em silêncio. No v4, provenance.method alerta (form.pattern.node.provenance.method) quando não segue a forma canônica '<classe>: <detalhe>', com a classe em medição, leitura, juízes, derivado, testemunho (Q_CONTRACT_METHOD_VOCABULARY); reprova no v5. Medição feita por terceiro e lida pelo autor do grafo é testemunho.",
+  "type": "object",
+  "propertyNames": {
+    "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+  },
+  "properties": {
+    "meta": {
+      "type": "object",
+      "propertyNames": {
+        "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+        },
+        "properties": {
+          "label": {
+            "maxLength": 280
+          },
+          "provenance": {
+            "propertyNames": {
+              "allOf": [
+                {
+                  "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+                },
+                {
+                  "anyOf": [
+                    {
+                      "enum": [
+                        "locator",
+                        "method",
+                        "source"
+                      ]
+                    },
+                    {
+                      "pattern": "^x_"
+                    }
+                  ]
+                }
+              ]
+            },
+            "properties": {
+              "method": {
+                "pattern": "^(?:medição|leitura|juízes|derivado|testemunho): [^ \t\n\r]"
+              }
+            }
+          }
+        },
+        "allOf": [
+          {
+            "if": {
+              "properties": {
+                "plane": {
+                  "const": "PROD"
+                }
+              },
+              "required": [
+                "plane"
+              ]
+            },
+            "then": {
+              "required": [
+                "verified_at"
+              ]
+            }
+          }
+        ]
+      },
+      "minItems": 1
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "propertyNames": {
+          "pattern": "^[A-Za-z_][A-Za-z0-9_-]*$"
+        }
+      }
+    }
+  }
+}

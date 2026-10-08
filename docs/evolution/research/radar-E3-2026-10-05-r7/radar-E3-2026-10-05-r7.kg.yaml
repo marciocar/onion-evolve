@@ -6,7 +6,7 @@ meta:
   layer: audit
   baseline: 2026-10-05
   review_after: 2026-11-19
-  supersedes_none: >
+  x_supersedes_none: >
     Medido contra a baseline anterior do eixo E3 (radar-E3-2026-10-03-r6, cc 2.1.288): o delta e UMA
     versao (2.1.289) e nenhum dos 15 nos da r6 e DERRUBADO. Dois sao ALTERADOS em conteudo, sem
     flip: o Q_MOD_YOU_SHOULD_KNOW_E_UM_ELENXO_FRACO ganha evidencia (no E_MODS_FALHAM_ABERTO_NO_UPGRADE

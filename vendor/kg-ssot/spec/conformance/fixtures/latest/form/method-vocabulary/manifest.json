@@ -1,0 +1,64 @@
+{
+  "description": "O vocabulário de provenance.method no v4 (Q_CONTRACT_METHOD_VOCABULARY): '<classe>: <detalhe>', classe em medição, leitura, juízes, derivado, testemunho. SHOULD no v4, MUST no v5.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "valid-method-medicao.kg.yaml",
+      "description": "classe medição",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-method-leitura.kg.yaml",
+      "description": "classe leitura",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-method-juizes.kg.yaml",
+      "description": "classe juízes",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-method-derivado.kg.yaml",
+      "description": "classe derivado",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-method-testemunho-terceiro.kg.yaml",
+      "description": "medição de terceiro lida aqui é testemunho",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-method-free-text.kg.yaml",
+      "description": "classe sem ': <detalhe>' alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.method"
+      ]
+    },
+    {
+      "file": "warn-method-unknown-class.kg.yaml",
+      "description": "classe fora da lista alerta",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.method"
+      ]
+    },
+    {
+      "file": "warn-method-uppercase-class.kg.yaml",
+      "description": "a classe é em minúscula",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.pattern.node.provenance.method"
+      ]
+    }
+  ]
+}

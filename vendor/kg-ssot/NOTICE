@@ -1,0 +1,10 @@
+KG-SSOT — contrato formal do .kg.yaml, suíte de conformidade e kit de adoção
+Copyright 2026 Marcio Carvalho
+
+Licenciado sob a Apache License, Version 2.0 (ver o arquivo LICENSE).
+
+Escopo: este LICENSE e este NOTICE cobrem os arquivos que a release leva, listados em spec/release.json:
+o contrato (os JSON Schemas em spec/), a suíte de conformidade (spec/conformance/, inclusive os casos
+.kg.yaml, os manifestos e os metaschema-tests), o kit em tools/ (leitor de referência, runner da suíte,
+gate e vendor) e o ADOPTING.md. Os casos .kg.yaml da suíte são parte do contrato e seguem esta licença,
+não uma licença de material de método.

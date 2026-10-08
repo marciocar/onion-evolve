@@ -19,7 +19,7 @@ nodes:
     provenance:
       source: "medição sintética"
       locator: "caso de conformidade"
-      method: "medição"
+      method: "medição: caso de conformidade"
     verified_against: 7
 edges:
   - from: EV_A

@@ -7,7 +7,7 @@ meta:
   schema_version: "1"
   baseline: 2026-10-03
   review_after: 2026-12-02
-  supersedes_none: >
+  x_supersedes_none: >
     Nada a derrubar numa baseline de eixo: esta leva nao e rodada de radar, e a FASE DE MEDICAO do
     re-forjar do /meta:evolve — o raio-X que a clausula-mae manda rodar ANTES do raciocinio. O que
     ela corrige nao e no de grafo, e uma MIGALHA de diario (2026-10-02), corrigida no lugar com a

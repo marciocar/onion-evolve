@@ -16,7 +16,7 @@ meta:
   # TETO declarado (Elenxo 2026-10-06): nenhuma guarda le este campo fora das rodadas de radar
   # (radar-aufhebung-check.sh varre so docs/evolution/research/*/radar-*); aqui e declaracao sem cobranca,
   # e o grafo de 2026-06 nao aponta para frente.
-  supersedes_external:
+  x_supersedes_external:
     - docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml#S7_claim_llm_as_vm
 nodes:
   # ---- decidido (as nomeacoes assentadas) ----

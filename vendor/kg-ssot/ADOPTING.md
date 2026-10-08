@@ -8,12 +8,18 @@ compartilhado.
 ## O que vem na release
 
 A lista está em [`spec/release.json`](spec/release.json):
-- o contrato (`spec/kg-contract-v3.schema.json` e `spec/kg-contract-v3.should.schema.json`);
+- o contrato v4, o vigente (`spec/kg-contract-v4.schema.json` e `spec/kg-contract-v4.should.schema.json`);
 - a suíte (`spec/conformance/`);
 - o leitor de referência (`tools/kg_validate.py`, `tools/kg_conformance.py`);
 - o gate (`tools/kg_gate.py`) e o vendor (`tools/kg_vendor.py`);
 - as dependências fixadas (`tools/requirements.txt`, Python 3 com PyYAML e jsonschema);
 - este guia.
+- a licença (`LICENSE`, Apache-2.0) e o `NOTICE`, que dizem o escopo dela.
+
+Tudo isso é **Apache-2.0**, inclusive os casos `.kg.yaml` da suíte. A Apache-2.0 dá, além do direito autoral,
+uma licença das patentes do autor e dos contribuidores sobre o que eles contribuíram. Essa licença termina para
+quem processar alegando que o contrato infringe patente. Quem escreve um leitor próprio pode usar o contrato e a
+suíte, inclusive comercialmente, mantendo o `LICENSE` e o `NOTICE`.
 
 Do lado do mantenedor deste repo, uma conferência de higiene que não viaja confere essa lista no CI:
 - toda entrada é coberta por arquivo rastreado;
@@ -28,14 +34,14 @@ O adotante usa só `update` e `check`.
 A primeira vez, a partir de um clone deste repo:
 
 ```bash
-python3 -I -B tools/kg_vendor.py update --tag contract-v3.0.2 --dest <adotante>/vendor/kg-ssot
+python3 -I -B tools/kg_vendor.py update --tag contract-v4.0.0 --dest <adotante>/vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v3.1.0 --source <caminho ou URL deste repo>
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.0.0 --source <caminho ou URL deste repo>
 ```
 
 - **Leitura:** o vendor lê a tag com `git archive`, nunca a árvore de trabalho. Os nomes são literais: um `*`
@@ -140,6 +146,45 @@ O PR que muda a tag faz três coisas:
 
 Aviso novo no SHOULD sobe a dívida por desenho. As rampas do contrato (SHOULD hoje, MUST depois) chegam assim,
 como compromisso medido.
+
+## 5. Do v3 para o v4
+
+O v4 é uma versão maior: o que alertava no v3 passa a reprovar. Quem está numa tag `contract-v3.x` sobe pela
+**rampa** do gate, sem truque de data no schema e sem consertar o corpus inteiro de uma vez.
+
+O que muda no v4:
+- **`provenance` é MUST** em nó `confirmed` ou PROD (`form.required.node.provenance`), com `source`, `locator` e
+  `method` não vazios. O nó `unverifiable` não exige, nem em PROD.
+- **`provenance.source` placeholder reprova** (`form.pattern.node.provenance.source`): só espaço, `desconhecida`,
+  `desconhecido`, `unknown`, `n/a`, `na`, `n.a.`, `none`, `null`, `sem fonte`, `tbd`, hífens, travessão ou `?`,
+  sem distinguir maiúscula e ignorando pontuação final e espaço em volta.
+- **Chave desconhecida sem o prefixo `x_` reprova** no topo, no `meta`, no nó e na aresta
+  (`form.unknown-key.<escopo>.<chave>`), e o nome sem `x_` que nem é slug reprova como
+  `form.pattern.<escopo>.key`. Dentro de `provenance`, a chave desconhecida segue só alertando.
+- **`provenance.method` tem vocabulário** (SHOULD no v4, MUST no v5): `'<classe>: <detalhe>'`, com a classe em
+  `medição` (o autor do grafo executou), `leitura` (documento primário), `juízes` (painel de agentes ou juízes),
+  `derivado` (derivação mecânica de campo, não reverificada) ou `testemunho` (uma pessoa ou sessão afirmou;
+  inclui a medição de terceiro lida aqui). Fora disso alerta como `form.pattern.node.provenance.method`.
+
+O caminho, num PR só:
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.0.0 --source <caminho ou URL deste repo>`;
+2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
+   falhar no MUST;
+3. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "<motivo>"` grava esses grafos em
+   `failing`, como **dívida herdada**. Sem o motivo, o `--update` recusa, porque grafo que passava e falha é
+   piora. Daí em diante vale a catraca: grafo novo tem de passar no v4, grafo de `failing` não ganha código MUST
+   novo, e a dívida só encolhe, com `--update` a cada conserto.
+
+O que fazer com um nó `confirmed` ou PROD **sem fonte recuperável**:
+- **o padrão é rebaixar** o `status` para `unverifiable`, que não exige `provenance`: o que não se rastreia não
+  está confirmado;
+- **quando a origem é uma pessoa ou sessão recuperável**, a `provenance` aponta essa origem, com `method` de
+  `testemunho`, e o nó segue `confirmed`;
+- **nunca um placeholder** em `source`: ele reprova.
+
+Trocar o `status` de um nó é decisão sobre a verdade do grafo, e fica com quem é dono dele. A migração pode
+propor `provenance` a partir de campos que o nó já tem, mas o `method` é declarado por quem revisa, nunca
+inventado. Uma chave própria sem `x_` se resolve renomeando para `x_<nome>`.
 
 ## Conformidade de outro leitor
 

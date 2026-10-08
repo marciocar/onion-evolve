@@ -19,7 +19,7 @@ nodes:
     provenance:
       source: "medição sintética"
       locator: "caso de conformidade"
-      method: "medição"
+      method: "medição: caso de conformidade"
   - id: D_X
     node_type: claim
     plane: DEV
@@ -32,7 +32,7 @@ nodes:
     provenance:
       source: "medição sintética"
       locator: "caso de conformidade"
-      method: "medição"
+      method: "medição: caso de conformidade"
 edges:
   - from: D_X
     to: Q_A

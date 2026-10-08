@@ -19,7 +19,7 @@ nodes:
     provenance:
       source: "medição sintética"
       locator: "caso de conformidade"
-      method: "medição"
+      method: "medição: caso de conformidade"
   - id: C_OPEN
     node_type: claim
     plane: DEV
@@ -37,7 +37,7 @@ nodes:
     provenance:
       source: "medição sintética"
       locator: "caso de conformidade"
-      method: "medição"
+      method: "medição: caso de conformidade"
   - id: C_DRIFTED
     node_type: claim
     plane: DEV

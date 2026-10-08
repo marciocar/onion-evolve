@@ -18,7 +18,7 @@ nodes:
     label: "A evidência sintética que sustenta A."
     provenance:
       source: "medição sintética"
-      method: "medição"
+      method: "medição: caso de conformidade"
 edges:
   - from: EV_A
     to: Q_A
