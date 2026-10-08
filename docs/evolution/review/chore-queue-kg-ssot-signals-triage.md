@@ -2,7 +2,8 @@
 title: 'Resíduo — triagem dos sinais do contrato do .kg.yaml e do Brain MCP'
 date: 2026-10-08
 branch: chore/queue-kg-ssot-signals-triage
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 738bb39b575aebf5164f9cce4ad35dff529c9b545a90d4825ea276459f04b13f
+reviewed_code_sha256: 2298c8cfe8e4ccb68454c178b10431b98c778b824d111c7dca0745597199e642
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
