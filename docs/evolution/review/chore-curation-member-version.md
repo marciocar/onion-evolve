@@ -2,7 +2,8 @@
 title: 'Resíduo — o registro acompanha o pin do onion-curation, e o sinal de papel é arquivado como retratado'
 date: 2026-10-08
 branch: chore/curation-member-version
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 169d9c3f43712ae62506986d01458c582b74c7e3ac42adcc9327f64025bc8011
+reviewed_code_sha256: 2d00d2a2fb16ae09e66bba517493ac3e3164d7c0e7880e49e2744d54cccb0319
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
