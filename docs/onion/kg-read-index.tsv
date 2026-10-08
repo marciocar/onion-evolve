@@ -396,6 +396,7 @@
 .claude/validation/kg-trace-resolve.sh	E_OBJECAO_1_ARGUMENTO_DE_AUSENCIA_NAO_DISCRIMINA	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
 .claude/validation/kg-trace-resolve.sh	E_OBJECAO_4_PROXY_NODE_SEM_INTEGRIDADE_REFERENCIAL	docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml
 .claude/validation/kg-trace-resolve.sh	E_m4_trace_resolve_refutou_a_spec	docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml
+.claude/validation/kg-trace-resolve.sh	Q_TRACE_DE_ARQUIVO_DA_RAIZ_CEGO	docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml
 .claude/validation/kg-verification-baseline.txt	E_CUSTO_ZERO_PROVA_QUE_E_CURA_E_NAO_APERTO	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/kg-verification-baseline.txt	E_PRIMEIRO_DOGFOOD_REAL	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
 .claude/validation/kg-verification-baseline.txt	Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_CLASSES	docs/onion/graph/catraca-regra49-2026-08.kg.yaml
@@ -1408,6 +1409,7 @@ docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartil
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	Q_INDIVIDUAL_ORGANIZATION_SHARING_VS_SURVEILLANCE	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	Q_R2_REVISAO_DO_SELO_C	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
 docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml	Q_R3_EMENDAS_DE_MECANISMO_AO_DESENHO_DE_C	docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml
+docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/REPORT.md	E_TRIAGEM_DA_PROVENANCE_DO_CORPUS	docs/evolution/research/contrato-kg-absorcao-2026-10/contrato-kg-absorcao-2026-10.kg.yaml
 docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml	C_OPCAO_E_APLICAR_OS_QUATRO_ACHADOS	docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml
 docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml	C_OPCAO_F_PARAR_E_MEDIR_O_ALVO	docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml
 docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml	D_DECK_ARCO_PREMIUM_0924	docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml
