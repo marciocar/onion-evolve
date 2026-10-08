@@ -52,6 +52,7 @@
 .claude/commands/meta/adopt.md	TX_create	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
 .claude/commands/meta/adopt.md	TX_promote_hub	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
 .claude/commands/meta/adopt.md	TX_update	docs/onion/graph/onion-family-topology-2026-07.kg.yaml
+.claude/commands/meta/cc-update.md	D_COMANDO_PROPRIO_SCRIPT_MEDE_JUIZ_JULGA	docs/evolution/research/forge-cc-update-2026-10/forge-cc-update-2026-10.kg.yaml
 .claude/commands/meta/census.md	E_F9_WORKER_CORTADO_CONTINUA	docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml
 .claude/commands/meta/co-announce.md	A_ANUNCIO_DERIVA_O_NUMERO_DA_MEDICAO	docs/onion/graph/fios-abertos.kg.yaml
 .claude/commands/meta/co-announce.md	SY4_prod_co_announce_docbridge	docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml
