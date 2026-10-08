@@ -13,6 +13,13 @@
 #   env-check.sh [--env <arq>] --get <CHAVE>           → valor de uma chave NÃO-secreta (lista fechada)
 #   env-check.sh [--env <arq>] --set-provider <p>      → grava SÓ TASK_MANAGER_PROVIDER (avisa se trocou)
 #   env-check.sh [--env <arq>] --test [<provider>]     → teste de conexão SÓ-LEITURA (imprime o resultado)
+#   env-check.sh [--env <arq>] --lint                  → defeitos de FORMA por NOME de chave (CR, espaço no
+#                                                        fim, aspas desbalanceadas, chave repetida); nunca o valor
+#
+# --lint (SAC-68, 2026-10-08): a pergunta "a chave nova foi colada com \r no fim?" só se respondia com
+# `grep -c $'\r' .env`, que o veto barra — e com razão, porque `grep` no .env é a forma mais perigosa de
+# todas. O caminho sancionado responde a mesma pergunta sem tocar o valor. E o leitor daqui passou a
+# tirar o \r final: uma chave colada de um editor Windows ou do celular saía com o \r e virava HTTP 401.
 #
 # Exit: 0 ok · 1 chave obrigatória ausente / teste reprovado · 2 uso inválido · 3 .env ausente (e nada no ambiente).
 #
@@ -30,12 +37,12 @@ die() { printf 'env-check: %s\n' "$*" >&2; exit 2; }
 while [ $# -gt 0 ]; do
   case "$1" in
     --env) shift; ENV_FILE="${1:?--env exige arquivo}" ;;
-    --provider|--check|--set-provider|--test|--get) MODE="${1#--}"; if [ $# -gt 1 ] && [ "${2#--}" = "$2" ]; then shift; ARG="$1"; fi ;;
+    --provider|--check|--set-provider|--test|--get|--lint) MODE="${1#--}"; if [ $# -gt 1 ] && [ "${2#--}" = "$2" ]; then shift; ARG="$1"; fi ;;
     *) die "argumento desconhecido: $1" ;;
   esac
   shift
 done
-[ -n "${MODE}" ] || die "diga o que fazer: --provider | --check | --get <CHAVE> | --set-provider <p> | --test"
+[ -n "${MODE}" ] || die "diga o que fazer: --provider | --check | --get <CHAVE> | --set-provider <p> | --test | --lint"
 
 valid_provider() { local p; for p in "${PROVIDERS[@]}"; do [ "$1" = "$p" ] && return 0; done; return 1; }
 required() {
@@ -50,7 +57,7 @@ required() {
 file_value() {
   [ -f "${ENV_FILE}" ] || return 0
   awk -v k="$1" '
-    { line=$0; sub(/^[ \t]*export[ \t]+/, "", line) }
+    { line=$0; sub(/\r$/, "", line); sub(/^[ \t]*export[ \t]+/, "", line) }
     line ~ "^[ \t]*" k "[ \t]*=" {
       v=line; sub("^[ \t]*" k "[ \t]*=[ \t]*", "", v)
       if (v ~ /^"/) { sub(/^"/, "", v); sub(/".*$/, "", v) }
@@ -82,6 +89,23 @@ case "${MODE}" in
     else echo "✅ TASK_MANAGER_PROVIDER=${p}"; fi
     echo "   Carregue na sessão: set -a; source ${ENV_FILE}; set +a"
     exit 0 ;;
+  lint)
+    [ -f "${ENV_FILE}" ] || { echo "⚠️  ${ENV_FILE} não encontrado"; exit 3; }
+    # só NOMES e o tipo do defeito saem daqui; o valor nunca é impresso
+    awk '
+      { raw=$0; cr=sub(/\r$/, "", raw) }
+      raw ~ /^[ \t]*(#|$)/ { next }
+      { line=raw; sub(/^[ \t]*export[ \t]+/, "", line)
+        if (line !~ /^[A-Za-z_][A-Za-z0-9_]*[ \t]*=/) { printf "  ❌ linha %d: não é CHAVE=valor\n", NR; bad=1; next }
+        k=line; sub(/[ \t]*=.*$/, "", k); v=line; sub(/^[^=]*=[ \t]*/, "", v)
+        if (cr) { printf "  ❌ %s: termina em \\r (fim de linha Windows) — o valor sai com o \\r grudado\n", k; bad=1 }
+        if (v ~ /^"/ && v !~ /^"[^"]*"/) { printf "  ❌ %s: aspas duplas sem fechar\n", k; bad=1 }
+        if (v ~ /^'"'"'/ && v !~ /^'"'"'[^'"'"']*'"'"'/) { printf "  ❌ %s: aspas simples sem fechar\n", k; bad=1 }
+        if (v !~ /^["'"'"']/ && v ~ /[ \t]+$/) { printf "  ⚠️  %s: espaço no fim do valor (o leitor o tira; outros leitores não)\n", k }
+        if (seen[k]++) { printf "  ⚠️  %s: chave repetida — vale a última\n", k }
+      }
+      END { if (!bad) print "✅ forma do arquivo sem defeito"; exit bad }' "${ENV_FILE}"
+    exit $? ;;
   get)
     k="${ARG:-}"; [ -n "${k}" ] || die "--get exige a chave"
     [[ "${k}" =~ ${SAFE_KEYS_RE} ]] || die "'${k}' não está na lista de chaves NÃO-secretas — segredo não sai por aqui"
