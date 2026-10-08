@@ -171,6 +171,16 @@ nodes:
     confidence: 0.6
     label: "GATED (nao e a cura B): hook per-turno que RODA o radar e INJETA O VEREDITO (ids + top-atencao), sem clausula de mtime, escopo = TODOS os .kg.yaml. E a unica forma que atende ao pedido LITERAL do campo ('o KG nao esta no meu contexto por default'). GATILHO para reabrir: o mesmo padrao fiado A MAO, fresco e descartavel, 2-3x em sessao real, com run monitorado registrando se o veredito injetado MUDOU A RESPOSTA. Sem esse dogfood e decreto sem lastro; gated-work-derives-fresh proibe pre-cozinhar"
 
+  - id: Q_TRACE_DE_ARQUIVO_DA_RAIZ_CEGO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.8
+    verified_against: "sinal 2026-10-08-kg-trace-root-file-unwatched do onion-curation; conferido no core: kg-trace-resolve.sh condição (b) exige barra no alvo e kg-read-leg.sh tira o ./ do caminho lido antes de casar"
+    trace: ".claude/validation/kg-trace-resolve.sh"
+    label: "trace para arquivo da raiz, como o CLAUDE.md, fica fora do índice de leitura do KG e o hook nunca avisa; cura selada: aceitar alvo sem barra que exista na raiz e normalizar o ./ dos dois lados (SAC-81)"
 edges:
   - from: E_recurrence_is_the_data
     to: Q_read_leg
@@ -224,3 +234,6 @@ edges:
   - from: E_proximity_zero_failed
     to: Q_hook_injects_verdict
     edge_type: CONSTRAINS
+  - from: Q_TRACE_DE_ARQUIVO_DA_RAIZ_CEGO
+    to: E_glob_blind_36pct
+    edge_type: SUPPORTS
