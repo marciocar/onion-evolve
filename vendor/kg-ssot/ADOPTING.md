@@ -15,7 +15,7 @@ A lista está em [`spec/release.json`](spec/release.json):
 - as dependências fixadas (`tools/requirements.txt`, Python 3 com PyYAML e jsonschema);
 - este guia.
 
-Do lado do mantenedor deste repo, `kg_vendor.py release-check` confere essa lista no CI:
+Do lado do mantenedor deste repo, uma conferência de higiene que não viaja confere essa lista no CI:
 - toda entrada é coberta por arquivo rastreado;
 - a tag é `contract-v<version>`;
 - o contrato citado é o vigente;

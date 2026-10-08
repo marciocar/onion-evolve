@@ -56,7 +56,7 @@ Cada código é um slug estável por camada, e o metaschema confere a forma.
 | form | `form.<tipo>.<escopo>.<campo>` | `form.required.node.label`, `form.enum.node.node_type`, `form.range.node.impact`, `form.pattern.edge.to`, `form.type.node.item` |
 | integrity | `integrity.<regra>` | `integrity.duplicate-id`, `integrity.dangling-from`, `integrity.dangling-to`, `integrity.dangling-trigger`, `integrity.orphan-node` |
 | yaml | `yaml.<regra>` | `yaml.forbidden-key-on` (MUST), `yaml.unquoted-date` (SHOULD) |
-| semantic | `semantic.<regra>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.decision-done-dev` (SHOULD) — só em `optional/` |
+| semantic | `semantic.<regra>` | `semantic.contradiction` (MUST); `semantic.supersedes-unreconciled`, `semantic.decision-done-dev`, `semantic.stale-missing` (SHOULD) — só em `optional/` |
 
 `<tipo>` ∈ `required enum type pattern range const unknown-key`. `<escopo>` ∈ `top meta node edge`.
 Num objeto aninhado, `<campo>` é o caminho com ponto: `form.required.node.provenance.locator`.
@@ -133,4 +133,4 @@ runner**: `runner <caso>` imprime, na última linha do stdout, UM objeto JSON, e
 Os casos são escritos aqui, sem copiar as fixtures do core, e usam ids sintéticos (`Q_A`, `EV_A`...),
 sem caminho de máquina e sem id de nó privado (`EPIC_7_PUBLICATION_HYGIENE`). Este arquivo viaja na release
 (`spec/release.json`): o que é operação do repo do produto (a matriz, a catraca, a paridade) não mora aqui, e o
-`kg_vendor.py release-check` reprova referência privada nos arquivos da release.
+a conferência de higiene do mantenedor reprova referência privada em `spec/` e nos arquivos da release.

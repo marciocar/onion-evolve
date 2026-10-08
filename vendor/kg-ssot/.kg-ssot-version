@@ -1,16 +1,16 @@
 {
   "product": "kg-ssot",
-  "tag": "contract-v3.0.0",
-  "commit": "820de3bbb967b95bfefc49c450b86fdb14526b3f",
-  "version": "3.0.0",
+  "tag": "contract-v3.0.1",
+  "commit": "263fbd9a01c02f55274e3fbf17a30648742b073f",
+  "version": "3.0.1",
   "contract": {
     "must": "spec/kg-contract-v3.schema.json",
     "should": "spec/kg-contract-v3.should.schema.json"
   },
   "vendored_at": "2026-10-08",
   "files": {
-    "ADOPTING.md": "086dffc026e87289ed303bc072177824da50993810803f943d61d4364634796b",
-    "spec/conformance/README.md": "ed7bf7ed965ab8363fa6949ac11ebacf6e4c7875419c5ecb70aa7143e35a12b1",
+    "ADOPTING.md": "e9bff53c3325d816339853c15484218df67d43dc3a31d80129b1950ee11ff2c0",
+    "spec/conformance/README.md": "99519b7b13873a12c6fc81c6c9e2ef7438326b400b3a7df9a9a00f797d30a013",
     "spec/conformance/fixtures/latest/form/edge/bad-edge-from-integer.kg.yaml": "22b9088ed8bfe604d242ab3cdc4571497edf95ad31aeb011f35b94da9fa55a3c",
     "spec/conformance/fixtures/latest/form/edge/bad-edge-from-null.kg.yaml": "a2c455b1e602b4ee9fd8202ab486a4c5c404247ec98abe30c139dca31abd58a2",
     "spec/conformance/fixtures/latest/form/edge/bad-edge-from-pattern.kg.yaml": "51c3785f4006a23ca90f992eb08431d6e3b7b201dbc257afa5620d6aa3740ba5",
@@ -166,11 +166,14 @@
     "spec/conformance/fixtures/latest/yaml/profile/warn-unquoted-date-as-key.kg.yaml": "6a295996a217de63ac5f83ee66749305a013cddceade5e046b62617d8caa88f7",
     "spec/conformance/fixtures/latest/yaml/profile/warn-unquoted-invalid-date.yaml": "99dba96054f33ae74bfd5744213f40b34eebefc89e2cc4de2353886640b2f3ff",
     "spec/conformance/fixtures/optional/semantic/bad-refutes-confirmed.kg.yaml": "970d6ac92e3bb7617eebff31cff0e50a6de41de24a0b516ccb4fa99dcf48f17a",
-    "spec/conformance/fixtures/optional/semantic/manifest.json": "8d2f3b44d0ff196f85e633c3bd7745ae631346bf79ab32696645d5db2945b4a0",
+    "spec/conformance/fixtures/optional/semantic/manifest.json": "595eff79843d87cb61f126a47adb843528f20c1d5ce317c089b21cb92ea6d3f2",
+    "spec/conformance/fixtures/optional/semantic/valid-decision-done-in-prod.kg.yaml": "56c2a49777e1268b02a90532b6220a86ebcad3f86fa9a193873ce1c00dec92f4",
+    "spec/conformance/fixtures/optional/semantic/valid-fresh-verified-against.kg.yaml": "bdaeffa18d8fe11e95b64af2050eb4b9c13386449a3d20c7e56c709894e31a8a",
     "spec/conformance/fixtures/optional/semantic/valid-refutes-refuted.kg.yaml": "43f7cb5e477db04e94890afb83b11f3cd4a6d7c661a5fd04b284cb34d42d1f5f",
     "spec/conformance/fixtures/optional/semantic/valid-refutes-superseded.kg.yaml": "eae137a791a05502a7dae872efc97484b1ccca050248013f7ecc94de941a3d00",
     "spec/conformance/fixtures/optional/semantic/valid-supersedes-reconciled.kg.yaml": "84f3330172f91d051cbb719f184bc3929a460849d76dd704d6b33fc10f0d7f3e",
     "spec/conformance/fixtures/optional/semantic/warn-decision-done-in-dev.kg.yaml": "3d41ab6c127a02cfab4f4cfca7fcf9dfcd826cf68c2d46a3bd7373d0647569a6",
+    "spec/conformance/fixtures/optional/semantic/warn-stale-missing-verified-against.kg.yaml": "ba2603f1c9c5fe814fc923b39c92c1590179807140cea2379b5eaf2fc2cb0c7e",
     "spec/conformance/fixtures/optional/semantic/warn-supersedes-unreconciled.kg.yaml": "747e4d113ea1ae2d4cd114e72a208764538389fb720500806d19952ab0f3d65c",
     "spec/conformance/fixtures/proposals/.gitkeep": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
     "spec/conformance/manifest.schema.json": "852e428d2678e9a242f9e511911cd3cb6661e80690d1da9d8c5c8e3307e80d6e",
@@ -182,11 +185,11 @@
     "spec/conformance/metaschema-tests/good/valid-with-warning.json": "013208da50d8eb7c9340d123b32134f1041d8f7a01831326b1dab814f479b5e9",
     "spec/kg-contract-v3.schema.json": "61e5d9f95df030942d58c1a3f7d2ca967911296f84c098c4babc90eae9c053ce",
     "spec/kg-contract-v3.should.schema.json": "414ddf17c54faeea1492934cc27349432d0d9c849d7e744bd813f9692855632c",
-    "spec/release.json": "fbda83424155c89bc8a10a912649daea1e1cbbeec7ebeb3596e307d8c4a79eaa",
+    "spec/release.json": "89e019d77784886b780058c66e0efd6223b07f0ac2b7984193cc0ce31baf47bc",
     "tools/kg_conformance.py": "56d55303e36c832940a4a6e08686a867dd2c2475a504f7d51833eca94aca108e",
     "tools/kg_gate.py": "a15ae1e73e22543a6225626143f28352540faef7b819e7aa93184235bca9ee2d",
     "tools/kg_validate.py": "af5a80cbce70adf58d8a1c1739f2c08647487dd0bb68b1a75a93fbdf34775093",
-    "tools/kg_vendor.py": "2431aa4d8c8d103872f5d37ad0d1a88fd70d05037a7278ec94ea705de789f1d5",
+    "tools/kg_vendor.py": "1d7753ca22fcb8bf105335a2b9c96008096f247952703ccae61b14a20c2d8213",
     "tools/requirements.txt": "8c517ecd0745c1f2ce2cb5db88ac614f56dcbbd7a630c834ad4bd27f0daaee54"
   }
 }

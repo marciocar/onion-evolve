@@ -1,6 +1,6 @@
 {
-  "version": "3.0.0",
-  "tag": "contract-v3.0.0",
+  "version": "3.0.1",
+  "tag": "contract-v3.0.1",
   "contract": {
     "must": "spec/kg-contract-v3.schema.json",
     "should": "spec/kg-contract-v3.should.schema.json"
