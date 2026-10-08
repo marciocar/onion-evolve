@@ -31,7 +31,9 @@ gmill.onionevolve.com {
         header Cookie *gmill_demo=@@GMILL_DEMO_COOKIE@@*
     }
     handle @api_cookie {
-        reverse_proxy 127.0.0.1:39081
+        reverse_proxy 127.0.0.1:39081 {
+            header_down Location "^https?://[^/]+:8080/" "/"   # ver o bloco de baixo
+        }
     }
 
     # Todo o resto (incluindo /api/* sem cookie): Basic obrigatório.
@@ -43,7 +45,12 @@ gmill.onionevolve.com {
                 gmill @@GMILL_DEMO_BASIC_HASH@@
             }
             header Set-Cookie "gmill_demo=@@GMILL_DEMO_COOKIE@@; Path=/api/; Max-Age=43200; HttpOnly; Secure; SameSite=Strict"
-            reverse_proxy 127.0.0.1:39081
+            reverse_proxy 127.0.0.1:39081 {
+                # O nginx da demo escuta 8080 DENTRO do container e devolve redirect ABSOLUTO com a porta
+                # (Location: http://gmill.onionevolve.com:8080/demo/index.html — relatado pelo maestro em
+                # 2026-10-08). Reescreve para caminho relativo: o navegador fica no https do domínio.
+                header_down Location "^https?://[^/]+:8080/" "/"
+            }
         }
     }
 }

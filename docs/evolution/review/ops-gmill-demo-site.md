@@ -2,7 +2,7 @@
 title: 'Resíduo — gmill.onionevolve.com: o 1º vhost de conf.d versionado, com segredo fora do git'
 date: 2026-10-08
 branch: ops/gmill-demo-site
-reviewed_diff_sha256: e40ef40f71ef4757de448b8437b0fe1a2e95316946086883b9c89f8829508971
+reviewed_diff_sha256: pendente
 reviewed_code_sha256: 8256ee394202cb907e26090c83165cba1d2e02020d7d068cbcdb71e155b2cb58
 findings_total: 7
 findings_real: 6
@@ -82,3 +82,17 @@ segredos rotacionados, que nunca apareceram em saída nenhuma.
 - A stack `carteira` roda **sem** o override `compose.gmill.yaml` (`OIDC_ISSUER=http://localhost:39080/default`).
   Tokens emitidos pelo domínio terão `iss` divergente até a sessão `meugmill-vendas-6d` subir com o
   override. Isso é do repo da demo, não deste.
+
+# Adendo (2026-10-08, depois do primeiro uso real pelo maestro)
+
+- **Redirect com a porta interna.** Ao entrar com o usuário `gmill`, o navegador ia para
+  `http://gmill.onionevolve.com:8080/demo/index.html`.
+  - **Causa:** o nginx da demo escuta 8080 dentro do container e devolve redirect absoluto com a porta.
+  - **Cura no vhost:** `header_down Location "^https?://[^/]+:8080/" "/"` nos dois `reverse_proxy`.
+  - **Medido ao vivo com a credencial:** `location: /demo/index.html` e 200 seguindo o redirect.
+  - **Cura de raiz:** `absolute_redirect off` no nginx da demo, a cargo da sessão meugmill-vendas.
+- **Incidente de exposição de segredo (2º do dia).** Na prova do 200, o `-w '%{url_effective}'` do curl
+  imprimiu a URL com a senha do Basic.
+  - **Resposta:** a senha e o cookie foram trocados na hora (`caddy-site-secrets.sh --rotate` e reinstalação).
+  - **Verificação:** a senha antiga dá 401 e a nova dá 200.
+  - **Lição:** prova com credencial imprime só `http_code`, nunca `url_effective` nem `redirect_url`.
