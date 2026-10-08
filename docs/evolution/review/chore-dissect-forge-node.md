@@ -2,7 +2,8 @@
 title: 'Resíduo — a costura entre o dissect e o forge vira nó, com exemplos de construção e prova'
 date: 2026-10-08
 branch: chore/dissect-forge-node
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 6911626024fbd98d7369c34140853c96b49e9e379c4cc9fe7b854bc157e26af0
+reviewed_code_sha256: 94aee7c849d2e84024f5d2112d01df2d639dfba762ecddafe5918dd13377022e
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
