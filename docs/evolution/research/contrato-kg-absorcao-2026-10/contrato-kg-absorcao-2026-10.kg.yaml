@@ -1,0 +1,80 @@
+# kg-backlog-guard: on
+# A absorção, pelo core, do contrato do .kg.yaml que o adotante dedicado provou.
+# Nasceu da triagem de 2026-10-08 (/meta:co-evolve) dos sinais contrato-v1..v3, suíte de conformidade e
+# matriz leitor x caso. Fica fora da fila de 2026-10-06 porque a fila está no teto.
+meta:
+  id: contrato-kg-absorcao-2026-10
+  schema_version: "1"
+  baseline: 2026-10-08
+  review_after: 2026-11-07   # 30d: programa de trabalho
+nodes:
+  - id: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-08
+    verified_against: "sinal 2026-10-08-matriz-leitor-caso do onion-kg-ssot (matriz leitor x caso, radar no pin d82ca211bea0 e em 85943cb71b66): 58 casos que o contrato reprova passam em kg-radar.sh --integrity --schema; 3 válidos reprovados (grafo vazio, trigger, lista sem indentação)"
+    label: "o gate de escrita do core não checa forma: aceita grafo que o contrato do .kg.yaml reprova, e recusa 3 casos válidos"
+  - id: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.75
+    verified_at: 2026-10-08
+    verified_against: "selado pelo maestro 2026-10-08 na triagem do /meta:co-evolve"
+    label: "o gate do core passa a chamar o validador JSON Schema do contrato do .kg.yaml ao lado do radar (a peça provou no adotante, o core absorve); o radar segue dono de integridade e semântica; a forma tem um leitor só, o do contrato"
+  - id: Q_ABSORVER_VALIDADOR_DO_CONTRATO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.6
+    verified_against: "execução de D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO"
+    label: "absorver o validador do contrato no core e ligá-lo ao gate (lint e pre-commit), com a suíte de conformidade como teste; resolver junto os 3 válidos que o radar recusa (lista sem indentação, grafo vazio, trigger) e o perfil YAML 1.2 da REGRA 78"
+  - id: E_CONTRATOS_V2_V3_PEDEM_MIGRACAO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-08
+    verified_against: "sinais 2026-10-07-contrato-v2 e -v3 do onion-kg-ssot, medidos no commit d31ef4c0da6a (138 grafos, 4.916 nós)"
+    label: "o contrato v2 alerta 2.290 labels acima de 280 caracteres (narrative) e o v3 pede provenance estruturada em 3.739 nós confirmed ou PROD; os dois são SHOULD, e o v4 torna a proveniência MUST"
+  - id: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_against: "direção selada pelo maestro 2026-10-08: gerador primeiro, corpus em ondas"
+    label: "programa: os geradores (write(KG) da pesquisa, carimbo do /meta:drive) passam a escrever narrative e provenance; o corpus antigo migra em ondas no mesmo passe por nó, antes do v4"
+  - id: Q_PORT_JS_DO_RADAR_DIVERGE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.6
+    verified_against: "sinal 2026-10-08-matriz-leitor-caso, item 3: kgRadar.ts (7b99f3452566) diverge do radar em 10 vereditos e recusa os status drifted e unverifiable"
+    label: "o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core"
+edges:
+  - from: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
+    to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
+    edge_type: SUPPORTS
+  - from: Q_ABSORVER_VALIDADOR_DO_CONTRATO
+    to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
+    edge_type: DEPENDS_ON
+  - from: E_CONTRATOS_V2_V3_PEDEM_MIGRACAO
+    to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
+    edge_type: SUPPORTS
+  - from: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
+    to: Q_PORT_JS_DO_RADAR_DIVERGE
+    edge_type: SUPPORTS

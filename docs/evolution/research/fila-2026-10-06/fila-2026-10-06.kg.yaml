@@ -10,7 +10,7 @@ meta:
   baseline: 2026-10-06
   review_after: 2026-11-05   # 30d: fila de trabalho; cada item fecha ao virar PR ou ao ser descartado
   # ═══ TETO: 30 NÓS ═══
-  #   28 em 2026-10-08 (+E_PR_FINALIZE_ATRITO_MEDIDO, +programa do SDAAL do task manager, +conflito de projeção gerada): colhidos os 5 `done` e as 4 evidências que só os sustentavam (a
+  #   30 em 2026-10-08, NO TETO (+par do Brain MCP; os nós do contrato vivem em contrato-kg-absorcao-2026-10; +E_PR_FINALIZE_ATRITO_MEDIDO, +programa do SDAAL do task manager, +conflito de projeção gerada): colhidos os 5 `done` e as 4 evidências que só os sustentavam (a
   #   história fica no git e nos resíduos); entraram E_/Q_PRECOMMIT_SELECAO. Teto segue 30.
 nodes:
   # ── evidências medidas hoje ──────────────────────────────────────────────────────────────────
@@ -297,6 +297,25 @@ nodes:
     confidence: 0.6
     verified_against: "pedido do maestro 2026-10-08; medir antes quanto do conflito é só projeção"
     label: "merge driver para as projeções geradas (no conflito, regenerar em vez de pedir resolução), para PRs paralelos não se invalidarem a cada merge; alternativas: não commitar a projeção no PR, ou fila de merge serial"
+  - id: E_BRAIN_MCP_PEDIDO_DE_CAMPO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-08
+    verified_against: "sinal 2026-10-08-onion-brain-mcp do brain-granaai: artefato do claude.ai com chat (sample) não executa o radar; MCP host: só serve ao dono da máquina; o business-context (~570 KB) não cabe num prompt"
+    label: "um hub precisa que o time não técnico consulte o Company Brain com o veredito do Onion fora do Claude Code, e hoje o paliativo é um segundo leitor do corpus em JS"
+  - id: Q_ONION_BRAIN_MCP
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_against: "sinal 2026-10-08-onion-brain-mcp do brain-granaai (hub); direção do maestro 2026-10-08: pesquisa + decisão, com o hub como piloto"
+    label: "MCP remoto só leitura do Onion (kg_list, kg_radar, kg_node com o parser do radar, docs_search) para o Company Brain fora do Claude Code: o framework mantém ou a família hospeda, auth por org, escopo por raiz, frescor por commit"
 edges:
   - from: E_PR_FINALIZE_PAGOU_PRIMEIRO_DIA
     to: Q_PR_FINALIZE_MELHORIAS
@@ -345,4 +364,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_CONFLITO_DE_PROJECAO_GERADA
     to: Q_MERGE_DRIVER_PARA_PROJECAO_GERADA
+    edge_type: SUPPORTS
+  - from: E_BRAIN_MCP_PEDIDO_DE_CAMPO
+    to: Q_ONION_BRAIN_MCP
     edge_type: SUPPORTS
