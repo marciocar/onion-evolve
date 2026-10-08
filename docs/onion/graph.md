@@ -617,7 +617,7 @@ onion-core	tier	hub
 onion-core	trust-advises	onion-evolve	
 onion-curation	adopts	onion-evolve	
 onion-curation	mode	greenfield	
-onion-curation	pin	5b529e980779	
+onion-curation	pin	7818b8a25ae6	
 onion-curation	specialization	curadoria	
 onion-curation	specialization	dissecacao	
 onion-curation	specialization	mercado	
