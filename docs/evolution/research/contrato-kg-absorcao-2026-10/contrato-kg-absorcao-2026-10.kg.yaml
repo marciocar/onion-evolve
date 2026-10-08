@@ -9,7 +9,7 @@ meta:
   baseline: "2026-10-08"
   review_after: "2026-11-07"   # 30d: programa de trabalho
   # ═══ TETO: 15 NÓS ═══
-  #   9 em 2026-10-08 (+E_GERADORES_ESCREVEM_O_CONTRATO_V3, +E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO). Onda nova exige onda colhida.
+  #   10 em 2026-10-08 (+E_GERADORES_ESCREVEM_O_CONTRATO_V3, +E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO, +E_FERRAMENTA_DE_MIGRACAO_E_ONDA_PILOTO). Onda nova exige onda colhida.
 nodes:
   - id: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     node_type: evidence
@@ -71,8 +71,8 @@ nodes:
     impact: 3
     confidence: 0.6
     verified_against: "direção selada pelo maestro 2026-10-08: gerador primeiro, corpus em ondas; a parte do gerador foi feita no SAC-71 (E_GERADORES_ESCREVEM_O_CONTRATO_V3)"
-    label: "o que resta: migrar o corpus antigo para narrative e provenance, em ondas e antes do v4 (SAC-73), e o checkpoint do /meta:drive"
-    narrative: "Os geradores já nascem no v3 (SAC-71). Falta o passe por nó no corpus herdado e a decisão sobre as chaves drive_checkpoint, que o contrato não conhece (E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO)."
+    label: "o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte recuperável, os labels longos e o checkpoint do /meta:drive"
+    narrative: "Os geradores já nascem no v3 (SAC-71) e a ferramenta de migração e a onda piloto entraram no SAC-73 parte 1 (E_FERRAMENTA_DE_MIGRACAO_E_ONDA_PILOTO). Pelo ensaio sobre o corpus inteiro, as ondas citam 3.460 datas e derivam provenance para 2.539 nós; 1.255 nós confirmed ou PROD não têm fonte recuperável (decisão humana: fonte ou rebaixar) e 2.310 labels longos pedem a divisão fato e narrativa (decisão humana). Falta também a decisão sobre as chaves drive_checkpoint (E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO)."
   - id: Q_PORT_JS_DO_RADAR_DIVERGE
     node_type: question
     layer: audit
@@ -129,6 +129,22 @@ nodes:
       source: ".claude/validation/kg-drive-project.sh (função _ckpt)"
       locator: "linhas que escrevem drive_checkpoint e drive_checkpoint_note"
       method: "execução do --close-lot num sandbox e medição pelo kg-contract-check"
+  - id: E_FERRAMENTA_DE_MIGRACAO_E_ONDA_PILOTO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-08"
+    verified_against: "worktree feat/kg-corpus-migration-tool sobre origin/main d56f685c: .claude/utils/kg/kg-migrate-v3.py aplicada a docs/evolution/research/guard-pre-push-2026-10 (8 nós): sem provenance 5→0, datas sem aspas 2→0, labels longos 8→8 (só reportados); 2ª aplicação no-op; radar exit 0, kg-contract-check rc 0, gate 141→139 (provenance) e 137→135 (data sem aspas), base travada; ensaio sem escrita no corpus: 144 grafos, 129 com mudança, 3.460 datas, 2.539 provenance deriváveis, 1.255 sem fonte, 2.310 labels longos"
+    label: "a ferramenta de migração ao v3 existe e foi provada na onda piloto: cita datas, deriva provenance só de fonte que o nó já traz e não corta label"
+    narrative: "A ferramenta é determinística e idempotente, edita por linha (o radar é awk) e nunca grava YAML inválido. A provenance derivada aponta o trace do nó ou a URL ou caminho citado no verified_against, com o verified_against como locator e um method que declara a derivação sem reverificação. Nó sem fonte derivável não recebe nada e sai no relatório; label longo fica intacto. Família de bancada kg_migrate_v3 com 8 casos e 5 mutantes que reprovam."
+    trace: ".claude/utils/kg/kg-migrate-v3.py"
+    provenance:
+      source: ".claude/utils/kg/kg-migrate-v3.py e docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml"
+      locator: "saída da ferramenta e do kg_gate.py na worktree feat/kg-corpus-migration-tool"
+      method: "medição executada (ferramenta, radar, kg-contract-check, kg_gate) em 2026-10-08"
 edges:
   - from: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
@@ -154,3 +170,6 @@ edges:
   - from: E_CHECKPOINT_DO_DRIVE_FORA_DO_CONTRATO
     to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
     edge_type: CONSTRAINS
+  - from: E_FERRAMENTA_DE_MIGRACAO_E_ONDA_PILOTO
+    to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
+    edge_type: SUPPORTS

@@ -23256,6 +23256,133 @@ run_kg_contract_check_selftests() {
 }
 _family run_kg_contract_check_selftests
 
+# Modo kg-migrate-v3 — SAC-73 parte 1: a ferramenta de migração do corpus ao contrato v3
+# (.claude/utils/kg/kg-migrate-v3.py) cita datas, deriva provenance SÓ de fonte que o nó já traz,
+# nunca corta label, --check não escreve, e a 2ª aplicação é no-op. O risco que a família vigia é a
+# ferramenta INVENTAR proveniência ou mudar significado — por isso (c) e (d) são os casos centrais.
+_kmv_graph() {
+  cat <<'KG'
+meta:
+  id: kmv
+  schema_version: "1"
+  baseline: 2026-10-08
+  review_after: 2026-11-07   # comentário preservado
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "pergunta A"
+  - id: E_COM_TRACE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-08
+    verified_against: "medição X no commit abc"
+    trace: "ops/algum-script.sh"
+    label: "evidência com trace"
+  - id: E_COM_URL
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-08
+    valid_from: 2026
+    verified_against: "lido em https://exemplo.org/doc#sec-2 em 2026-10-08"
+    label: "evidência com URL"
+  - id: E_SEM_FONTE
+    node_type: evidence
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-08
+    verified_against: "conversa com o maestro"
+    label: "evidência sem fonte verificável"
+  - id: E_LONGO
+    node_type: evidence
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.5
+    label: "LONGO_INICIO xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx LONGO_FIM"
+edges:
+  - from: E_COM_TRACE
+    to: Q_A
+    edge_type: SUPPORTS
+  - from: E_COM_URL
+    to: Q_A
+    edge_type: SUPPORTS
+  - from: E_SEM_FONTE
+    to: Q_A
+    edge_type: SUPPORTS
+  - from: E_LONGO
+    to: Q_A
+    edge_type: SUPPORTS
+KG
+}
+run_kg_migrate_v3_selftests() {
+  local tool="${REPO_ROOT}/.claude/utils/kg/kg-migrate-v3.py"
+  [ -f "${tool}" ] || { record_fail "kg-migrate-v3" "ferramenta ausente: ${tool}"; return; }
+  python3 -c 'import yaml' >/dev/null 2>&1 || { record_skip "kg-migrate-v3: PyYAML ausente (SUT não exercido)"; return; }
+  local d out rc g y h1 h2
+  d="$(TMPDIR=/tmp mktemp -d)"; g="${d}/g.kg.yaml"
+  _kmv_graph > "${g}"
+  # (e) --check: rc 1 com mudança pendente e o arquivo intacto
+  h1="$(sha256sum "${g}" | cut -d' ' -f1)"
+  if out="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check "${g}" 2>&1)"; then rc=0; else rc=$?; fi
+  h2="$(sha256sum "${g}" | cut -d' ' -f1)"
+  if [ "${rc}" -eq 1 ] && [ "${h1}" = "${h2}" ] && grep -q 'PENDENTE' <<< "${out}"; then
+    record_pass "kg-migrate-v3: (e) --check acusa a mudança pendente (rc 1) e não escreve nada"
+  else record_fail "kg-migrate-v3: (e)" "--check rc=${rc}, arquivo mudou=$([ "${h1}" = "${h2}" ] && echo não || echo SIM): ${out}"; fi
+  # aplica
+  if out="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" "${g}" 2>&1)"; then rc=0; else rc=$?; fi
+  y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${g}" 2>&1)" || true
+  # (a) datas entre aspas, inclusive o valid_from inteiro; o comentário do meta sobrevive
+  if [ "${rc}" -eq 0 ] && grep -q '^  baseline: "2026-10-08"$' "${g}" && grep -q '    valid_from: "2026"$' "${g}" \
+     && grep -q 'review_after: "2026-11-07"   # comentário preservado' "${g}"; then
+    record_pass "kg-migrate-v3: (a) datas sem aspas ganham aspas (valid_from inteiro vira \"2026\") e o comentário fica"
+  else record_fail "kg-migrate-v3: (a)" "datas não citadas: rc=${rc} ${out}"; fi
+  # (b) provenance derivada do trace, com o método declarando a derivação
+  if python3 -I -B -c 'import json,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_COM_TRACE"]["provenance"]; assert p["source"]=="ops/algum-script.sh" and p["locator"]=="medição X no commit abc" and "derivado" in p["method"]' "${y}" 2>/dev/null; then
+    record_pass "kg-migrate-v3: (b) provenance derivada do trace do nó, locator = verified_against, method declara a derivação"
+  else record_fail "kg-migrate-v3: (b)" "provenance do trace ausente/errada: ${y}"; fi
+  # (c2) sem trace, fonte = URL citada no verified_against
+  if python3 -I -B -c 'import json,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; assert n["E_COM_URL"]["provenance"]["source"]=="https://exemplo.org/doc#sec-2"' "${y}" 2>/dev/null; then
+    record_pass "kg-migrate-v3: (c2) sem trace, a fonte é a URL que o próprio verified_against cita"
+  else record_fail "kg-migrate-v3: (c2)" "fonte por URL não derivada: ${y}"; fi
+  # (c) sem fonte verificável: NADA de provenance inventada, e o nó sai no relatório
+  if python3 -I -B -c 'import json,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; assert "provenance" not in n["E_SEM_FONTE"]' "${y}" 2>/dev/null \
+     && grep -q 'SEM FONTE RECUPERÁVEL.*E_SEM_FONTE' <<< "${out}"; then
+    record_pass "kg-migrate-v3: (c) nó sem fonte verificável NÃO ganha provenance inventada — sai como SEM FONTE RECUPERÁVEL"
+  else record_fail "kg-migrate-v3: (c)" "proveniência inventada ou nó escondido: ${out} ${y}"; fi
+  # (d) label longo: texto intacto, só reportado
+  if grep -q 'LONGO_INICIO x.* LONGO_FIM"$' "${g}" && grep -q 'label longo.*E_LONGO' <<< "${out}"; then
+    record_pass "kg-migrate-v3: (d) label acima de 280 fica intacto e é só reportado (separar fato e narrativa é decisão humana)"
+  else record_fail "kg-migrate-v3: (d)" "label longo alterado ou não reportado: ${out}"; fi
+  # (f) idempotência: 2ª aplicação não muda nada e o --check sai 0
+  h1="$(sha256sum "${g}" | cut -d' ' -f1)"
+  PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" "${g}" >/dev/null 2>&1 || true
+  h2="$(sha256sum "${g}" | cut -d' ' -f1)"
+  if out="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check "${g}" 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${h1}" = "${h2}" ] && [ "${rc}" -eq 0 ] && grep -q 'nada a migrar' <<< "${out}"; then
+    record_pass "kg-migrate-v3: (f) idempotente — a 2ª aplicação não muda nada e o --check sai 0"
+  else record_fail "kg-migrate-v3: (f)" "não idempotente: mudou=$([ "${h1}" = "${h2}" ] && echo não || echo SIM) rc=${rc} ${out}"; fi
+  # (g) YAML inválido de entrada → rc 2 sem tocar
+  printf 'meta:\n  id: x\n nodes: [\n' > "${d}/bad.kg.yaml"; h1="$(sha256sum "${d}/bad.kg.yaml" | cut -d' ' -f1)"
+  if out="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" "${d}/bad.kg.yaml" 2>&1)"; then rc=0; else rc=$?; fi
+  h2="$(sha256sum "${d}/bad.kg.yaml" | cut -d' ' -f1)"
+  if [ "${rc}" -eq 2 ] && [ "${h1}" = "${h2}" ]; then record_pass "kg-migrate-v3: (g) YAML inválido na entrada → rc 2 e nada gravado"
+  else record_fail "kg-migrate-v3: (g)" "rc=${rc} mudou=$([ "${h1}" = "${h2}" ] && echo não || echo SIM)"; fi
+  rm -rf "${d}"
+}
+_family run_kg_migrate_v3_selftests
+
 # Modo kg-scope — --scope do gate (insumo do /meta:kg backfill); protege a catraca canônica.
 _family run_kg_scope_selftests
 

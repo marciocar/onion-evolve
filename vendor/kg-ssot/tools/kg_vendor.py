@@ -18,7 +18,9 @@
 rc: 0 ok · 1 vendor divergente do carimbo · 2 entrada quebrada (tag inexistente, release.json ausente ou que
 não bate com a tag, entrada da release sem arquivo, membro da tag que não é arquivo regular, carimbo ausente,
 ilegível ou fora do formato, DIR sem carimbo ou editado sem --force).
-Os scripts do kit não gravam bytecode (sys.dont_write_bytecode): rodar o gate não suja o vendor.
+Os scripts do kit não gravam bytecode (sys.dont_write_bytecode): RODAR o gate como script não suja o vendor.
+IMPORTAR um módulo do kit a partir de outro processo suja: o Python grava o .pyc do módulo antes de executar o
+código dele. Por isso o guia roda tudo com `python3 -I -B`, e quem importa o kit usa -B ou PYTHONDONTWRITEBYTECODE=1.
 """
 import sys
 
