@@ -153,6 +153,7 @@
 .claude/hooks/premodelswitch-guard.sh	E_LACUNAS_E3_0903	docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_LACUNAS_E3_0904	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
 .claude/hooks/premodelswitch-guard.sh	E_R3_F2_TROCA_DE_MODELO_RECHECA_E_NOMEIA	docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml
+.claude/hooks/pretooluse-env-guard.sh	E_ENV_GUARD_VETOU_COMANDO_SEM_ENV	docs/evolution/research/guard-env-falso-positivo-2026-10/env-falso-positivo-2026-10.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	E_CURA_MERGE_GATE_2O_VETO	docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	E_MERGE_GATE_INERTE_NO_ADOTANTE	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 .claude/hooks/pretooluse-merge-gate.sh	E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE	docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml
