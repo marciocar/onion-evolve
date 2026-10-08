@@ -13,7 +13,7 @@ elenxo: nao
 nota: >-
   Pedido do maestro (2026-10-08): registrar na fila e no Linear a proposta do auto-drive (o degrau
   AUTOMATE do /meta:drive) e pedir segunda opinião ao adotante que evolui o KG-SSOT. A fila está no teto
-  de 30, então a proposta nasceu num grafo próprio, auto-drive-2026-10, com 3 nós.
+  de 30, então a proposta nasceu num grafo próprio, auto-drive-2026-10, com 6 nós: a segunda opinião chegou no mesmo dia e virou 3 evidências com CONSTRAINS sobre a decisão (expansão ainda não confiável, carimbo pelo que foi lido, riscos que faltavam), e a pergunta que a pedia foi fechada como done no próprio rascunho, que nunca esteve na main.
   E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM sustenta D_AUTO_DRIVE_DEGRAU_AUTOMATE (open, não selado), que
   depende de Q_SEGUNDA_OPINIAO_KG_SSOT. Projeção no Linear: SAC-74, bloqueado por SAC-66 e SAC-67 e
   relacionado ao SAC-63. Radar --integrity --schema exit 0. Nenhum .kg.yaml existente editado, logo
