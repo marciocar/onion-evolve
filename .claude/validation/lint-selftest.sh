@@ -23240,6 +23240,13 @@ run_kg_contract_check_selftests() {
   if [ "${rc}" -eq 1 ] && grep -q 'form.range.node.label' <<< "${out}"; then
     record_pass "kg-contract-check: (d) grafo rastreado que passa a ter label longo → rc 1"
   else record_fail "kg-contract-check: (d)" "piora no rastreado não acusada: rc=${rc} ${out}"; fi
+  # (f) o checador NÃO deixa bytecode no vendor. Medido em 2026-10-08: rodar o leitor de referência sem -B
+  #     plantava tools/__pycache__/*.pyc, e o `kg_vendor.py check` seguinte reprovava o vendor como
+  #     "divergente da tag" (o check rejeita bytecode de propósito). Rodamos sem PYTHONDONTWRITEBYTECODE,
+  #     como uma sessão comum roda.
+  if [ -z "$(find "${sb}/vendor/kg-ssot" -name '__pycache__' -o -name '*.pyc' 2>/dev/null)" ]; then
+    record_pass "kg-contract-check: (f) o checador não planta bytecode no vendor (o check do vendor segue íntegro)"
+  else record_fail "kg-contract-check: (f)" "bytecode plantado no vendor: $(find "${sb}/vendor/kg-ssot" -name '*.pyc' | head -2)"; fi
   # (e) sem vendor → rc 2, nunca verde
   rm -rf "${sb}/vendor/kg-ssot"
   if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/novo.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi

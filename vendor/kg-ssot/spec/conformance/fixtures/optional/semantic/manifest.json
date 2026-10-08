@@ -1,5 +1,5 @@
 {
-  "description": "A camada semântica do radar (E3: T14, T15, T16), em optional/: o contrato ainda não a torna MUST, e o leitor de referência não a implementa. Esperado escrito a partir do comportamento documentado do kg-radar.sh: REFUTES sobre nó confirmed é contradição e reprova; SUPERSEDES sobre nó que segue valendo e decision done em DEV só alertam.",
+  "description": "A camada semântica do radar (E3: T14, T15, T16), em optional/: o contrato ainda não a torna MUST, e o leitor de referência não a implementa. Esperado escrito a partir do comportamento documentado do kg-radar.sh: REFUTES sobre nó confirmed é contradição e reprova; SUPERSEDES sobre nó que segue valendo, decision done em DEV e nó com verified_against sem verified_at (frescor STALE-MISSING) só alertam.",
   "layer": "semantic",
   "pending_on": [],
   "cases": [
@@ -46,6 +46,27 @@
       "warnings": [
         "semantic.decision-done-dev"
       ]
+    },
+    {
+      "file": "valid-decision-done-in-prod.kg.yaml",
+      "description": "decision done em plane PROD, com verified_at: nada a alertar",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-stale-missing-verified-against.kg.yaml",
+      "description": "nó com verified_against e sem verified_at: o radar só alerta (frescor STALE-MISSING)",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "semantic.stale-missing"
+      ]
+    },
+    {
+      "file": "valid-fresh-verified-against.kg.yaml",
+      "description": "nó com verified_against e verified_at: frescor em dia",
+      "valid": true,
+      "codes": []
     }
   ]
 }

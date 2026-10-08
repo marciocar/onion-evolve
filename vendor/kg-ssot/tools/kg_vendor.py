@@ -14,9 +14,6 @@
       __pycache__ e symlink) → rc 1. O contrato não se customiza no adotante; uma mudança necessária volta como
       sinal ao produto. LIMITE: o carimbo atesta a si mesmo; o check pega edição acidental, não quem edita um
       arquivo E recalcula o carimbo. Isso o review do PR do adotante pega (o diff do carimbo fica à vista).
-  release-check
-      Confere o spec/release.json deste repo: forma, toda entrada coberta por arquivo RASTREADO, a tag igual a
-      contract-v<version> e o contrato citado igual ao vigente. É do mantenedor deste repo, não do adotante.
 
 rc: 0 ok · 1 vendor divergente do carimbo · 2 entrada quebrada (tag inexistente, release.json ausente ou que
 não bate com a tag, entrada da release sem arquivo, membro da tag que não é arquivo regular, carimbo ausente,
@@ -45,10 +42,6 @@ STAMP = ".kg-ssot-version"
 RELEASE = "spec/release.json"
 DEFAULT_DEST = "vendor/kg-ssot"
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
-# o que não viaja: caminho de máquina, o harness, o repo e os segredos do core, os repos dos outros leitores
-PRIVATE = re.compile(r"/(?:home|Users)/|\.claude/|onion-evolve|onion-slm|ONION_CORE|\.onion-version|KG_CORE_DIR|"
-                     r"KG_APP_DIR|docs/onion/|docs/evolution/")
-
 
 class Broken(Exception):
     """Entrada quebrada: rc 2."""
@@ -215,30 +208,6 @@ def check(dest):
     return 0
 
 
-def release_check(root=ROOT):
-    sys.path.insert(0, str(root / "tools"))
-    import kg_validate
-    release = read_release((root / RELEASE).read_text(encoding="utf-8"), "a árvore de trabalho")
-    files = release_files(git(root, "ls-files").splitlines(), release["files"])  # só o que vai para a tag
-    if release.get("tag") != f"contract-v{release.get('version')}":
-        raise Broken(f"{RELEASE}: a tag {release.get('tag')!r} não é contract-v<version> ({release.get('version')!r})")
-    current = {"must": kg_validate.CONTRACT_MUST, "should": kg_validate.CONTRACT_SHOULD}
-    for level, path in current.items():
-        if release["contract"][level] != path.relative_to(root).as_posix():
-            raise Broken(f"{RELEASE} cita contract.{level} = {release['contract'][level]!r}, e o vigente é "
-                         f"{path.relative_to(root).as_posix()!r}")
-    missing = [e for e in (RELEASE, *release["contract"].values()) if e not in files]
-    if missing:
-        raise Broken(f"{RELEASE} não leva {', '.join(missing)}")
-    leaks = [f"{f}:{n}" for f in files if f != "tools/kg_vendor.py"  # este arquivo carrega o próprio padrão
-             for n, line in enumerate((root / f).read_text(encoding="utf-8", errors="replace").splitlines(), 1)
-             if PRIVATE.search(line)]
-    if leaks:
-        raise Broken(f"referência privada em arquivo da release (EPIC_7_PUBLICATION_HYGIENE): {', '.join(leaks[:8])}")
-    print(f"✓ release {release['tag']}: {len(files)} arquivos, contrato vigente")
-    return 0
-
-
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -249,14 +218,11 @@ def main(argv=None):
     up.add_argument("--force", action="store_true", help="substitui um vendor que diverge do carimbo")
     ck = sub.add_parser("check", help="confere o destino contra o carimbo")
     ck.add_argument("--dest", default=DEFAULT_DEST)
-    sub.add_parser("release-check", help="confere o spec/release.json deste repo (mantenedor)")
     args = ap.parse_args(argv)
     try:
         if args.cmd == "update":
             return update(args.dest, args.tag, args.source, args.force)
-        if args.cmd == "check":
-            return check(args.dest)
-        return release_check()
+        return check(args.dest)
     except (Broken, OSError, tarfile.TarError) as exc:
         print(f"VENDOR QUEBRADO  {exc}")
         return 2

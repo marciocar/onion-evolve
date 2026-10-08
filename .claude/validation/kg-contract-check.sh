@@ -25,7 +25,9 @@ VENDOR="${KG_CONTRACT_VENDOR:-${ROOT}/vendor/kg-ssot}"
 [ "$#" -ge 1 ] || { echo "uso: kg-contract-check.sh <arquivo.kg.yaml>..." >&2; exit 2; }
 [ -f "${VENDOR}/tools/kg_gate.py" ] || { echo "kg-contract-check: vendor do contrato ausente em ${VENDOR} — não dá para julgar" >&2; exit 2; }
 
-python3 -I - "${VENDOR}/tools" "${ROOT}" "$@" <<'PY'
+# -B: sem bytecode. O leitor importa as ferramentas do vendor; sem -B ele plantava tools/__pycache__ e o
+# `kg_vendor.py check` seguinte reprovava o vendor como divergente da tag (medido 2026-10-08).
+python3 -I -B - "${VENDOR}/tools" "${ROOT}" "$@" <<'PY'
 import os, subprocess, sys
 tools, root, files = sys.argv[1], sys.argv[2], sys.argv[3:]
 sys.path.insert(0, tools)
