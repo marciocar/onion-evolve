@@ -2,7 +2,8 @@
 title: 'Resíduo — o contrato v3 do .kg.yaml entra no core por pin, e o gate dele roda no CI ao lado do radar'
 date: 2026-10-08
 branch: feat/kg-ssot-contract-v3-gate
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a569f2cca25c719248a24da405e1efef1883c283867b091f5fddbc2cd7a56429
+reviewed_code_sha256: 759c6c8967feeea984b04d5669dfe4f49968f9cb6325ffba14ae5eb627ab5264
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
