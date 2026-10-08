@@ -23238,7 +23238,7 @@ _kcc_graph() {
   printf 'meta:\n  id: %s\n  schema_version: "1"\n  baseline: "2026-10-08"\nnodes:\n' "$1"
   printf '  - id: Q_A\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.5\n    label: "pergunta A"\n'
   printf '  - id: E_A\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 3\n    confidence: 0.9\n    verified_at: "2026-10-08"\n    label: "evidência A"\n'
-  printf '    provenance:\n      source: "caminho@commit"\n      locator: "linha 1"\n      method: "medição"\n'
+  printf '    provenance:\n      source: "caminho@commit"\n      locator: "linha 1"\n      method: "medição: comando de prova"\n'
   printf 'edges:\n  - from: E_A\n    to: Q_A\n    edge_type: SUPPORTS\n'
 }
 run_kg_contract_check_selftests() {
