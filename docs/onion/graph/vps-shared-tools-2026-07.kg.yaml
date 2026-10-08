@@ -58,6 +58,16 @@ nodes:
     verified_against: "PONTA A PONTA em 2026-08-19: caddy validate+reload OK; DNS criado VIA API Hostinger (PUT zones append, verificado por RELEITURA da zona, nao pelo eco do PUT) apos o maestro informar o token em ~/.config/hostinger; resolucao publica OK; cert Let s Encrypt emitido (valido ate 2026-11-17); https://waha.onionevolve.com/api/sessions devolve 401 JSON do WAHA sem chave E com chave errada — cadeia DNS->TLS->Caddy->auth inteira viva"
     label: "ROTA PUBLICA ABERTA por ordem do maestro (2026-08-19): waha.onionevolve.com -> 127.0.0.1:3999 via /etc/caddy/conf.d/waha.caddy (convencao de bloco opcional da casa). Motivo: integracao de app externo (Lovable) — o app na nuvem nao alcanca loopback. O bind do container SEGUE no localhost (o Caddy e o unico expositor; TLS na frente, X-Api-Key do WAHA em toda chamada). PENDENTES RESOLVIDOS em 2026-08-19: registro A criado via API Hostinger (token em ~/.config/hostinger, informado pelo maestro) e cert ACME emitido. Desligar = rm do .caddy + reload; revogar acesso = trocar WAHA_API_KEY no compose"
 
+  - id: E_gmill_demo_route_caddy
+    node_type: evidence
+    plane: PROD
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: 2026-10-08
+    verified_against: "PONTA A PONTA em 2026-10-08: A gmill -> 179.197.65.94 via API Hostinger (PUT append overwrite:false, zona 44->45 conjuntos, 0 perdidos/alterados, relida); cert Let's Encrypt emitido (ssl_verify 0); curl sem credencial 401, /api com Bearer sem cookie 401, cookie errado 401, Bearer+cookie valido 200, pagina so com cookie 401, 401 sem Set-Cookie; install-caddy-config.sh rc 0 e --check sem drift; os 7 conf.d nao geridos intocados (mtime/perm iguais)"
+    label: "ROTA PUBLICA ABERTA por ordem do maestro (2026-10-08, pedido da sessao meugmill-vendas-6d): gmill.onionevolve.com -> 127.0.0.1:39081 (demo MeuGmill Vendas). PRIMEIRO vhost de conf.d VERSIONADO (ops/caddy/conf.d/gmill.caddy), instalado por ops/install-caddy-config.sh, que agora gere conf.d com segredo fora do git (marcadores resolvidos de /etc/caddy/secrets/gmill.env, root 0600; senha e cookie no pass onion/gmill-demo-*). Auth = opcao B do maestro: Basic em tudo; /api/* aceita o cookie HttpOnly emitido apos o Basic, porque a demo manda Authorization: Bearer e o navegador nao mistura o Basic guardado com Authorization explicito (medido: Bearer -> 401 com basic_auth puro). O route e load-bearing: sem ele o 401 levava o Set-Cookie (medido por mutante). Pendente-com-dono: a stack carteira ainda roda SEM o override compose.gmill.yaml (OIDC_ISSUER=localhost), entao tokens emitidos pelo dominio terao iss divergente ate a sessao meugmill-vendas subir com o override"
+
   - id: E_librechat_install_started
     node_type: evidence
     plane: PROD
@@ -411,6 +421,10 @@ edges:
   # a rota publica e materia da direcao dual-WAHA-default: o lado vivo ganhou alcance externo
   - from: E_waha_public_route_caddy
     to: D_whatsapp_dual_waha_default
+    edge_type: SUPPORTS
+  # o catalogo ganha a 1a rota publica com conf.d versionado e segredo fora do git
+  - from: E_gmill_demo_route_caddy
+    to: D_framing_catalogo
     edge_type: SUPPORTS
   - from: D_whatsapp_dual_waha_default
     to: C_dual_adapter_presumido_construido

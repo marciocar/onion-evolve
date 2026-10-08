@@ -1,0 +1,49 @@
+# Demonstração do MeuGmill Vendas para a GMill (stack `carteira`, web em 127.0.0.1:39081).
+# Aberto por ordem do maestro em 2026-10-08, a pedido da sessão meugmill-vendas-6d.
+#
+# MODELO SECRETO (fonte versionada, segredo fora do git):
+#   Os marcadores @@...@@ são resolvidos pelo ops/install-caddy-config.sh a partir de /etc/caddy/secrets/gmill.env
+#   (root 0600, escrito por ops/caddy-site-secrets.sh). A senha em claro e o cookie vivem no `pass`:
+#   onion/gmill-demo-basic-auth e onion/gmill-demo-cookie. Placeholder sem valor = instalação RECUSADA.
+#
+# POR QUE COOKIE ALÉM DO BASIC (medido 2026-10-08, Caddy descartável): a demo manda
+# `Authorization: Bearer <token>` em toda chamada /api/*. O navegador não mistura o Basic guardado com
+# um Authorization explícito, então basic_auth puro devolvia 401 à API e a tela não funcionava.
+# Saída decidida pelo maestro (opção B): depois do Basic, o Caddy entrega um cookie HttpOnly restrito
+# a /api/; o /api/* aceita o cookie OU o Basic; todo o resto exige o Basic.
+#
+# Por que a senha é obrigatória aqui: o IdP de teste da demo entrega token de ADMIN a quem pedir
+# (/default/token). Quem protege é este vhost.
+#
+# Sem limite de corpo de propósito: o CSV da demo vai até 16 MB, e o nginx da web limita em 17m.
+# O reverse_proxy do Caddy já envia X-Forwarded-Proto=https e preserva o Host (o IdP monta o `iss` deles).
+#
+# Desligar = remover este arquivo do repo e rodar ops/install-caddy-config.sh (ele remove o vivo gerido).
+#
+# verify: https://gmill.onionevolve.com/ 401
+# verify: https://gmill.onionevolve.com/api/health 401
+gmill.onionevolve.com {
+    header X-Robots-Tag "noindex, nofollow"
+
+    # API com o cookie emitido depois do Basic: passa mesmo com Authorization: Bearer.
+    @api_cookie {
+        path /api/*
+        header Cookie *gmill_demo=@@GMILL_DEMO_COOKIE@@*
+    }
+    handle @api_cookie {
+        reverse_proxy 127.0.0.1:39081
+    }
+
+    # Todo o resto (incluindo /api/* sem cookie): Basic obrigatório.
+    # `route` fixa a ordem: o Set-Cookie só sai DEPOIS do basic_auth aceitar. Sem `route`, a ordem
+    # padrão de diretivas do Caddy põe `header` antes de `basic_auth`, e o 401 levaria o cookie junto.
+    handle {
+        route {
+            basic_auth {
+                gmill @@GMILL_DEMO_BASIC_HASH@@
+            }
+            header Set-Cookie "gmill_demo=@@GMILL_DEMO_COOKIE@@; Path=/api/; Max-Age=43200; HttpOnly; Secure; SameSite=Strict"
+            reverse_proxy 127.0.0.1:39081
+        }
+    }
+}
