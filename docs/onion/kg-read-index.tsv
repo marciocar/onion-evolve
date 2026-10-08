@@ -2173,6 +2173,7 @@ ops/mcp-onion-exec/server.py	E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA	
 ops/mcp-onion-kg/server.py	E_OBJECAO_2_ZERO_ANNOTATIONS_EXPOR_E_REESCREVER	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
 ops/mcp-onion-kg/server.py	E_OBJECAO_4_NAMESPACE_NAO_ISOLA_CUSTO_NEM_MENTIRA	docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml
+ops/pr-finalize.sh	E_CONFLITO_DE_PROJECAO_GERADA	docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml
 ops/pr-finalize.sh	E_ELENXO_2_REABRIU_B1_PELA_FORMA_DO_HASH	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/pr-finalize.sh	E_ELENXO_REPROVOU_O_MOTOR_QUE_LAVAVA_RESIDUO	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
 ops/pr-finalize.sh	E_O_DOGFOOD_ACHOU_DOIS_DEFEITOS_NO_PROPRIO_MOTOR	docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml
