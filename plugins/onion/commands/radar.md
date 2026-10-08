@@ -47,6 +47,9 @@ introspecção e **zero percepção externa recorrente** (S9 parada desde 07-06)
      1ª classe. **Forçar `SUPERSEDES` inventado é pior que a dívida**, e a razão tem de dizer
      contra QUAL baseline se mediu (a do eixo, não um corpus qualquer).
   Os dois `meta.*` exigem **valor**: campo vazio não conta.
+  ⚠️ **Escreva com o prefixo `x_`** (`x_supersedes_external`, `x_supersedes_none`): o contrato v3 do
+  `.kg.yaml` só reconhece extensão com `x_`, e o gate do CI reprova rodada nova que traga a chave sem ele
+  (medido em 2026-10-08). A REGRA 89 aceita as duas formas; as rodadas antigas seguem válidas.
 - **Lacuna declarada é desfecho de 1ª classe** (molde `E_REDDIT_INALCANCAVEL`): fonte
   inalcançável vira `lacunas_declaradas`, nunca finding.
 
