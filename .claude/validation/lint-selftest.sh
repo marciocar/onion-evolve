@@ -19039,6 +19039,24 @@ run_backlog_projection_selftests() {
     record_pass "backlog-projection: arg desconhecido → exit 2 e arquivo INTACTO (sem escrita silenciosa)"
   else record_fail "backlog-projection: arg desconhecido" "esperava rc=2 e arquivo intacto; rc=${rc} mutou=$([ "${before}" = "${after}" ] && echo nao || echo SIM)"; fi
 
+  # (c2)/(c3) GRAFO NOVO NÃO RASTREADO (sinal de campo 2026-10-07): fica FORA da projeção (o CI
+  #     regenera de clone limpo e não o vê) — mas é DITO no stderr, nomeado. Depois do `git add`, cala.
+  mkdir -p "${sb}/docs/evolution/research/sonda-untracked"
+  printf '# kg-backlog-guard: on\nmeta:\n  id: sonda-untracked\n  schema_version: "1"\nnodes:\n  - id: Q_SONDA\n    node_type: question\n    plane: DEV\n    impact: 3\n    confidence: 0.5\n    status: open\n    label: "sonda"\n  - id: E_SONDA\n    node_type: evidence\n    plane: DEV\n    impact: 3\n    confidence: 0.5\n    status: confirmed\n    label: "e"\nedges:\n  - from: E_SONDA\n    to: Q_SONDA\n    edge_type: SUPPORTS\n' \
+    > "${sb}/docs/evolution/research/sonda-untracked/sonda-untracked.kg.yaml"
+  local _err _md
+  _err="$(cd "${sb}" && bash .claude/validation/kg-backlog-project.sh --markdown 2>&1 >/dev/null || true)"
+  _md="$(cd "${sb}" && bash .claude/validation/kg-backlog-project.sh --markdown 2>/dev/null || true)"
+  if grep -q 'NÃO RASTREADO' <<< "${_err}" && grep -q 'sonda-untracked.kg.yaml' <<< "${_err}" && ! grep -q 'Q_SONDA' <<< "${_md}"; then
+    record_pass "backlog-projection: (c2) grafo novo não rastreado → fora da projeção, mas AVISADO e nomeado"
+  else record_fail "backlog-projection: (c2)" "não avisou (ou entrou na projeção): err=${_err}"; fi
+  ( cd "${sb}" && git add docs/evolution/research/sonda-untracked ) >/dev/null 2>&1 || true
+  _err="$(cd "${sb}" && bash .claude/validation/kg-backlog-project.sh --markdown 2>&1 >/dev/null || true)"
+  if ! grep -q 'NÃO RASTREADO' <<< "${_err}"; then
+    record_pass "backlog-projection: (c3) depois do git add → aviso cala"
+  else record_fail "backlog-projection: (c3)" "aviso persistiu após git add: ${_err}"; fi
+  ( cd "${sb}" && git rm -q -r --cached docs/evolution/research/sonda-untracked && rm -rf docs/evolution/research/sonda-untracked ) >/dev/null 2>&1 || true
+
   # (d) PARIDADE de render: `--markdown` (stdout, o que o lint compara) tem de ser
   #     byte-idêntico ao que `--write` grava. Senão a catraca compara dois renderizadores.
   ( cd "${sb}" && bash .claude/validation/kg-backlog-project.sh --markdown > "${sb}/md.out" 2>/dev/null
