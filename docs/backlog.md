@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**402 itens abertos** em 86 grafo(s) com aberto (de 112 no escopo) · 87 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**403 itens abertos** em 87 grafo(s) com aberto (de 113 no escopo) · 88 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -608,6 +608,12 @@
 | 10.8 | `Q_TENANT_WRITE_DESTINATION` | librechat-kg-runtime-2026-08 | BURACO revelado pela selagem: a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/ad |
 | 7.7 | `Q_MAP_LEG_GATED` | librechat-kg-runtime-2026-08 | BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_cola |
 | 5.4 | `Q_KG_INBOX_FORA_DO_PLUGIN` | librechat-kg-runtime-2026-08 | LACUNA DECLARADA (achado do Elenxo de 2026-09-05, medida): o /meta:kg-inbox NAO esta em plugins/onion/commands/ — o diretorio te |
+
+## radar-E3-2026-10-08-r8 — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 10.5 | `Q_ADOTAR_ONFAILURE_BLOCK_NOS_VETOS` | radar-E3-2026-10-08-r8 | adotar onFailure: block nos PreToolUse (env-guard, protect-main, merge-gate e avaliar o kg-read-leg) e provar ao vivo, com um hook |
 
 ## gmill-update-547-2026-10 — 2 item(ns)
 
