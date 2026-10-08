@@ -1,0 +1,35 @@
+# kg-backlog-guard: on
+# Falsos positivos do veto PreToolUse do .env (pretooluse-env-guard.sh) medidos numa leva só.
+# Guarda que veta trabalho honesto treina a sessão a contorná-la (guard-doctrine, cláusula 4).
+meta:
+  id: env-falso-positivo-2026-10
+  schema_version: "1"
+  baseline: 2026-10-08
+  review_after: 2026-11-07   # 30d: defeito de guarda
+  # ═══ TETO: 10 NÓS ═══
+  #   2 em 2026-10-08.
+nodes:
+  - id: E_ENV_GUARD_VETOU_COMANDO_SEM_ENV
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: 2026-10-08
+    verified_against: "leva de 2026-10-07/08, sessão do core e dois forks: 6 vetos do pretooluse-env-guard.sh. Dois em comando que não tocava .env nenhum: o laço de espera do CI (case sobre a saída do gh, 'nome montado em runtime') e um grep com glob ops/testing/* (fork). Três em leitura que não expunha valor: laço sobre diretórios chamando o env-check.sh de cada repo, glob /home/marcio/*/ (fork) e grep -c de CR no .env. E o sexto no próprio registro deste nó: um heredoc que só CITAVA o nome do arquivo num texto de grafo. Cada um custou um contorno"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "o veto do .env barra comando que não lê .env e leitura que não expõe valor; em uma leva foram 6 vetos e 6 contornos"
+  - id: Q_ENV_GUARD_SEM_FALSO_POSITIVO
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_against: "pedido do maestro 2026-10-08"
+    label: "curar os falsos positivos do veto do .env sem abrir escape: medir cada forma com /meta:forge-guard (as duas polaridades e mutante), e oferecer um caminho sancionado para o que hoje não tem (testar credencial de outro repo, contar CR, laço sobre repos com o env-check)"
+edges:
+  - from: E_ENV_GUARD_VETOU_COMANDO_SEM_ENV
+    to: Q_ENV_GUARD_SEM_FALSO_POSITIVO
+    edge_type: SUPPORTS
