@@ -1,0 +1,39 @@
+# kg-backlog-guard: on
+# A costura entre o /meta:dissect (que PROPÕE absorver ou costurar) e o /meta:forge (que FORJA as peças).
+# Nasceu de uma nota do maestro em 2026-10-08. Fora da fila de 2026-10-06 porque ela está no teto.
+meta:
+  id: dissect-forge-2026-10
+  schema_version: "1"
+  baseline: "2026-10-08"
+  review_after: "2026-11-07"   # 30d: programa de trabalho
+  # ═══ TETO: 10 NÓS ═══
+  #   2 em 2026-10-08.
+nodes:
+  - id: E_DISSECT_QUASE_NAO_USADO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.8
+    verified_at: "2026-10-08"
+    verified_against: "grep no core em 2026-10-08: só 2 .kg.yaml citam /meta:dissect e não há nenhuma pesquisa de dissecação em docs/evolution/research; o veredito do dissect (absorver, costurar, parquear, rejeitar) termina em prosa e nada o entrega ao /meta:forge"
+    label: "o /meta:dissect quase não foi usado, e o veredito dele não vira trabalho sozinho: termina em prosa, sem passagem para o /meta:forge"
+    provenance:
+      source: ".claude/commands/meta/dissect.md e os .kg.yaml do core"
+      locator: "grep -rl 'meta:dissect' --include='*.kg.yaml' (2 arquivos) e ls docs/evolution/research (nenhum dissect)"
+      method: "medição por grep no repositório em 2026-10-08"
+  - id: Q_COSTURA_DISSECT_FORGE
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.6
+    verified_against: "nota do maestro 2026-10-08, que escolheu dogfood antes de desenho; projeção no Linear: SAC-77"
+    label: "costurar o /meta:dissect ao /meta:forge pelo uso real: dissecar Channels, Conductor e /fork do Claude Code para construir e aprender, guardar outros para a prova, e só então forjar a costura"
+    narrative: "Sem comando novo ao lado dos três (dissect, absorb-skill, forge): o veredito absorver ou costurar do dissect passa a entregar ao forge um plano medido — quais das 7 peças, proveniência e licença da origem (absorver sem registrar é o roubo que a casa proíbe), prova de paridade na bancada (a peça faz o que a original fazia) e, no costurar, adapter SDAAL em vez de cópia (como o contrato do KG-SSOT, vendor por pin). Exemplos de construção e aprendizagem: o Channels do Claude Code (pesquisa canal-vivo-sessoes-2026-10), o Conductor (corpus agent-command-composition-2026-09) e o /fork do Claude Code (o subagente que herda o contexto, usado nesta leva). Ferramentas novas ficam para a prova, que mede se a costura generaliza além dos exemplos que a formaram."
+edges:
+  - from: E_DISSECT_QUASE_NAO_USADO
+    to: Q_COSTURA_DISSECT_FORGE
+    edge_type: SUPPORTS
