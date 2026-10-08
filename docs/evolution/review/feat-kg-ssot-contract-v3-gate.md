@@ -3,12 +3,12 @@ title: 'Resíduo — o contrato v3 do .kg.yaml entra no core por pin, e o gate d
 date: 2026-10-08
 branch: feat/kg-ssot-contract-v3-gate
 reviewed_diff_sha256: pendente
-findings_total: 0
-findings_real: 0
-findings_fixed: 0
+findings_total: 1
+findings_real: 1
+findings_fixed: 1
 tokens: 0
 duration_min: 30
-verdict: SEM_ACHADOS
+verdict: CORRIGIDO
 elenxo: nao
 nota: >-
   SAC-69, conduzido pelo /meta:drive a partir do sinal 2026-10-08-graduacao-contrato-v3 do adotante

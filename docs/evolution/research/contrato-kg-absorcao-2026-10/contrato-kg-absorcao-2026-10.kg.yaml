@@ -37,8 +37,8 @@ nodes:
     status: open
     impact: 4
     confidence: 0.6
-    verified_against: "execução de D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO"
-    label: "o que resta depois do gate do contrato no CI (2026-10-08, E_GATE_DO_CONTRATO_NO_CI): decidir se o gate entra também no pre-commit (hoje só CI, para não pesar a esteira); os válidos que o radar ainda recusa (lista sem indentação, grafo vazio); o perfil YAML 1.2 na REGRA 78; e o caminho (b), o radar chamar o leitor de referência, medido pela matriz"
+    verified_against: "execução de D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO; em 2026-10-08 o gate entrou no CI (E_GATE_DO_CONTRATO_NO_CI) e ficou fora do pre-commit para não pesar a esteira; o caminho (b) é o radar chamar o leitor de referência, medido pela matriz do adotante"
+    label: "o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação, grafo vazio), o YAML 1.2 na REGRA 78 e o caminho (b)"
   - id: E_CONTRATOS_V2_V3_PEDEM_MIGRACAO
     node_type: evidence
     layer: audit
