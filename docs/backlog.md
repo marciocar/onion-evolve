@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**401 itens abertos** em 84 grafo(s) com aberto (de 110 no escopo) · 85 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**403 itens abertos** em 85 grafo(s) com aberto (de 111 no escopo) · 86 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
 
@@ -513,6 +513,13 @@
 | 5.2 | `C_p4_audit_trail` | m3-federation-admin-2026-07 | REQ P4 (SHOULD condicional): trilha de auditoria legível/exportável das sessões e fases executadas (quem/quando/o quê) derivad |
 | 4.8 | `Q_onprem_tension` | m3-federation-admin-2026-07 | TENSÃO M3 não-resolvida: comprador P4 regulado costuma exigir multi-ambiente/on-prem/auditoria de 3º × identidade Claude Code- |
 | 2.0 | `Q_wake_session` | m3-federation-admin-2026-07 | GAP de design/dogfood aberto (não pesquisa): evoluir o receiver git-async para 'acordar a sessão' via SSE/webhook sem quebrar pu |
+
+## auto-drive-2026-10 — 2 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 15.4 | `D_AUTO_DRIVE_DEGRAU_AUTOMATE` | auto-drive-2026-10 | proposta: forjar o degrau AUTOMATE do /meta:drive, que conduz 1..n raízes e a cadeia inteira até o merge, com paradas duras e re |
+| 3.6 | `Q_GUARDA_API_DIRETA_DE_PROVEDOR` | auto-drive-2026-10 | guarda que acusa chamada direta à API de provedor de task manager fora do adapter executável; só nasce depois do SAC-65 |
 
 ## cedar-2026-10 — 3 item(ns)
 

@@ -2,7 +2,8 @@
 title: 'Resíduo — a proposta do auto-drive vira nó de decisão aberto'
 date: 2026-10-08
 branch: chore/auto-drive-decision-node
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 0387e8b48406ab35e5d4ae85d1e4b030631e9422a33fff5d07b9a9e17967a599
+reviewed_code_sha256: 0a1a692c453051aa5f8910cffeb52b8f1b832b9b0d1838eccbe8942cdeb3b8bb
 findings_total: 1
 findings_real: 1
 findings_fixed: 1
