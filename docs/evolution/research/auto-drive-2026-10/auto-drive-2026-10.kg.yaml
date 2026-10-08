@@ -1,0 +1,47 @@
+# kg-backlog-guard: on
+# O degrau AUTOMATE do /meta:drive ("auto-drive"): conduzir 1..n raízes e a cadeia inteira até o merge.
+# Nasceu da pergunta do maestro em 2026-10-08. A doutrina do drive já o previa como Fase 2 gated
+# (topológica dirigida + AUTOMATE); este grafo é o gatilho dela, ainda NÃO selado.
+meta:
+  id: auto-drive-2026-10
+  schema_version: "1"
+  baseline: 2026-10-08
+  review_after: 2026-11-07   # 30d: decisão em aberto
+  # ═══ TETO: 12 NÓS ═══
+  #   3 em 2026-10-08.
+nodes:
+  - id: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.8
+    verified_at: 2026-10-08
+    verified_against: "leva de 2026-10-07/08 do core: PRs #955 a #965 conduzidos de start a merge sob a ordem permanente do maestro 'pode seguir até o merge', pelo mesmo ciclo (worktree, bancada com mutante, resíduo, pr-finalize, CI, pr-merge-verified com dispensa nomeada, Linear/grafo). Custos medidos no mesmo ciclo: 3 rebases por conflito de projeção gerada, PR em conflito sem CI, 6 falsos positivos do veto do .env, recusas do pr-finalize por carimbo"
+    label: "o ciclo start→merge já roda na prática por ordem do maestro, 11 vezes numa leva, e quebra sempre nos mesmos pontos da esteira"
+  - id: D_AUTO_DRIVE_DEGRAU_AUTOMATE
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 4
+    confidence: 0.55
+    verified_against: "proposta do core em 2026-10-08, aguardando a segunda opinião pedida ao adotante que evolui o KG-SSOT, o Elenxo e o selo do maestro; projeção no Linear: SAC-74, bloqueado por SAC-66 e SAC-67"
+    label: "proposta: forjar o degrau AUTOMATE do /meta:drive — 1..n raízes (issue ou id de nó; sem item drena a fila-pronta até o budget), expansão da cadeia (épico, task, subtask e DEPENDS_ON) em ordem topológica, cada item até o merge (--merge=true por padrão porque o maestro invoca; nunca cron), relatório por item no task manager e no grafo; paradas duras em decisão não-tomada, Elenxo reprovado, CI vermelho inesperado, path vendorizado ou repo alheio e budget; merge serial enquanto não houver merge driver. Depende de SAC-66 e SAC-67 (esteira) e da interface do SAC-63; muda o degrau selado 'merge 100% humano, em lote', logo passa pelo Elenxo"
+  - id: Q_SEGUNDA_OPINIAO_KG_SSOT
+    node_type: question
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    verified_against: "pergunta enviada pelo core à sessão do adotante dedicado ao KG-SSOT em 2026-10-08, a pedido do maestro"
+    label: "segunda opinião do adotante do KG-SSOT: qual é a SSOT da hierarquia (task manager ou grafo), o que o contrato v3 deve exigir de nó fechado sem humano para o carimbo não ser auto-atestado, e que risco falta na lista"
+edges:
+  - from: E_LEVA_CONDUZIDA_ATE_O_MERGE_POR_ORDEM
+    to: D_AUTO_DRIVE_DEGRAU_AUTOMATE
+    edge_type: SUPPORTS
+  - from: D_AUTO_DRIVE_DEGRAU_AUTOMATE
+    to: Q_SEGUNDA_OPINIAO_KG_SSOT
+    edge_type: DEPENDS_ON
