@@ -43,7 +43,10 @@ nota: >-
   + mutantes + pr-finalize + CI. Passada adversarial feita pelo próprio fork (ele não abre subagente);
   sem Elenxo, declarado. REGRA 87 (PR que EDITA um .kg.yaml enxergou os confirmed dele): os 5 grafos
   editados tiveram só a linha duplicada removida (e um `verified_against` estendido); nenhum status,
-  label ou aresta mudou, e o radar --integrity --schema sai 0 em todos.
+  label ou aresta mudou, e o radar --integrity --schema sai 0 em todos. Os confirmed de maior
+  impacto desses arquivos (E_SEMGREP_FINGERPRINT_INCLUI_NOME_DA_REGRA, E_PRECOMMIT_R_CHECKER_DEPOIS_DE_FIXER,
+  E_OBJECAO_8_FINGERPRINT_SEM_REGRA_E_DETECTOR_DE_SOBREPOSICAO) foram lidos: tratam do corpus de regras e
+  não respondem nem contrariam o que este PR muda, que é só a forma do mapa do nó.
 ---
 
 # Resíduo — `fix/kg-ssot-signals-confirmed`

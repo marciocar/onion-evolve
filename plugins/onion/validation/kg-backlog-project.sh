@@ -74,6 +74,22 @@ mapfile -t GRAPHS < <( {
   grep -qE '^[[:space:]]*#[[:space:]]*kg-backlog-archive:[[:space:]]*on\b' "$g" 2>/dev/null || echo "$g"
 done )
 
+# GRAFO NOVO AINDA NÃO RASTREADO FICA DE FORA — e isso é DITO, nunca calado (sinal de campo
+# 2026-10-07: a skill de pesquisa mandava regenerar antes do commit, o grafo recém-escrito ainda
+# não estava no índice, e a projeção saiu com 22 abertos em vez de 30, sem aviso nenhum).
+# Por que NÃO incluir o não-rastreado: o CI regenera de um clone limpo, onde ele não existe; uma
+# projeção que o contasse divergiria do CI byte a byte (REGRA 62). A cura é avisar: `git add` e
+# regenere. Só conta grafo que entraria no escopo (canônico ou marcado), fora de fixture.
+_untracked_in_scope="$( { git ls-files --others --exclude-standard 'docs/onion/graph/*.kg.yaml'
+  git ls-files --others --exclude-standard '*.kg.yaml' | while read -r g; do
+    grep -qE '^[[:space:]]*#[[:space:]]*kg-backlog-guard:[[:space:]]*on\b' "$g" 2>/dev/null && echo "$g"
+  done; } 2>/dev/null | bash "${_KFP}" --filter | sort -u )"
+if [ -n "${_untracked_in_scope}" ]; then
+  echo "kg-backlog-project: AVISO — $(printf '%s\n' "${_untracked_in_scope}" | grep -c .) grafo(s) NÃO RASTREADO(S) ficaram FORA da projeção:" >&2
+  printf '%s\n' "${_untracked_in_scope}" | sed 's/^/    · /' >&2
+  echo "  O CI regenera de um clone limpo e não os vê. Dê 'git add' e regenere." >&2
+fi
+
 # Saneador de UTF-8 do rotulo truncado. Existe porque a SUPERFICIE DE CONTROLE precisa
 # ser grep-avel: com um byte invalido, o grep trata docs/backlog.md como BINARIO e
 # SUPRIME A SAIDA — uma busca por um no aberto devolve vazio como se ele nao existisse

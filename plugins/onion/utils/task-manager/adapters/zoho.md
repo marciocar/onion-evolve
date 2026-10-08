@@ -187,6 +187,20 @@ POST /projects/{projectId}/tasks
 O vínculo com a tasklist é **objeto aninhado**. `tasklist_id` plano dá **400** (medido; a forma
 aceito-e-ignorado da §1 vale para `milestone_id`, **não** para este — não generalize de um para o outro).
 
+⚠️ **Sem `owners_and_work` a task nasce "Unassigned User"** (medido por um adotante em 2026-10-07: 16
+tasks criadas pelo adapter sem dono; só as que levaram o campo no POST nasceram atribuídas). Quando
+`input.assignee` vier, mande o dono **na criação**, na mesma forma aninhada da
+[atribuição](#atribuir-responsável--o-campo-é-owners_and_work-e-é-objeto):
+
+```
+POST /projects/{projectId}/tasks
+{ "name": "...", "tasklist": { "id": "..." },
+  "owners_and_work": { "owners": [ { "zpuid": "<zpuid do dono>" } ] } }
+```
+
+Atribuir depois com `PATCH` funciona, mas cria uma janela em que a task existe sem dono — e um fluxo que
+cai entre os dois passos deixa a task órfã.
+
 ### `getTask(taskId)` · `updateTask(taskId, updates)`
 
 ```
