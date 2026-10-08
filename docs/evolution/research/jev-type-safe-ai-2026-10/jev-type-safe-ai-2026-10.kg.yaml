@@ -43,8 +43,7 @@ nodes:
     confidence: 0.55
     label: 'O que e o JEV (jevtypesafeai.com): onde se enquadra na taxonomia de ferramentas de IA para desenvolvimento, que funcionalidades expoe, qual e a arquitetura, COMO sustenta a afirmacao de que nao alucina, como se integra (skill de agente, integracoes, tools) e qual e o modelo de distribuicao/licenca? FECHADO nesta rodada: forma da API, as tres primitivas, superficie de integracao e o fato de ser modelo FECHADO e HOSPEDADO. ABERTO: a ARQUITETURA (nenhuma fonte diz como o modelo e feito nem treinado), o MECANISMO do "nao alucina" (que o Elenxo mostrou ser slogan do revendedor, contradito pelo fabricante), o PRECO real conciliado, o regime de acesso e a licenca (ausencia de informacao, nao afirmacao).'
     trace: docs/evolution/research/jev-type-safe-ai-2026-10/SYNTHESIS.md
-    verified_against: 'rodada de primarias de 2026-10-01: 6 URLs lidas (todas do mesmo dominio de terceiro), 22 claims ancoradas, 13 rejeitadas na ancoragem; +2 fontes abertas pelo Elenxo (typesafe.ai, eesel.ai) que corrigiram preco, mecanismo e regime de acesso'
-    trace: 'https://jevtypesafeai.com/'
+    verified_against: 'rodada de primarias de 2026-10-01: 6 URLs lidas (todas do mesmo dominio de terceiro), 22 claims ancoradas, 13 rejeitadas na ancoragem; +2 fontes abertas pelo Elenxo (typesafe.ai, eesel.ai) que corrigiram preco, mecanismo e regime de acesso; dominio lido: https://jevtypesafeai.com/'
 
   # ───────────────── jev-home (fonte: revendedor) ─────────────────
   - id: E_JEV_TYPED_DECISIONS_NOT_TEXT

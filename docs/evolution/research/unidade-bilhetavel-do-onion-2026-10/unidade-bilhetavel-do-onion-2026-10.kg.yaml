@@ -55,7 +55,6 @@ nodes:
     trace: docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/SYNTHESIS.md
     verified_at: 2026-10-01
     verified_against: 'rodada de 2026-10-01: 17 claims confirmadas e 17 refutadas por fonte fraca, 0 nao-verificadas por 403 ou truncagem; 10 objecoes sobreviventes do Elenxo (a decima chegou TRUNCADA no repasse); duas medicoes locais tier 10 acrescentadas nesta sessao (binario 2.1.286 e corpus de 109 grafos)'
-    trace: 'docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/unidade-bilhetavel-do-onion-2026-10.kg.yaml'
 
   # ═══════════════════ MEDICAO LOCAL (tier 10 — o artefato antes da web) ═══════════════════
 

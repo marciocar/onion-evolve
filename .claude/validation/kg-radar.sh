@@ -229,10 +229,27 @@ section == "nodes" && /^[[:space:]]+- id:/ {
   if (nid in nodeSeen) dup[nid] = 1
   nodeSeen[nid] = 1
   order[++nn] = nid
+  # Indentação dos CAMPOS deste nó = a do traço + 2 (é onde o `id:` vive). Só chave nesta coluna
+  # conta como chave do nó: texto de bloco (`>-`) e mapas aninhados ficam mais à direita.
+  match($0, /-/); fieldIndent = RSTART + 1
   next
 }
 section == "nodes" && nid != "" {
   line = $0; sub(/#.*$/, "", line)
+  # CHAVE REPETIDA, QUALQUER CHAVE (2026-10-08, sinal de campo de um adotante com leitor YAML 1.2):
+  # o YAML exige chave única num mapa. Um leitor tipado (PyYAML) fica com a ÚLTIMA em silêncio, e
+  # este radar lia as duas como texto — a proveniência sumia sem erro. A guarda abaixo de 2026-08-12
+  # só cobria 4 campos (verified_*, valid_from, source_tier) e só quando os valores DIFERIAM; o
+  # defeito medido foi `trace` repetido em 5 grafos do core. Agora vale para toda chave do nó,
+  # inclusive com valor igual (duas linhas iguais também são mapa inválido).
+  if (match($0, /^ +[A-Za-z_][A-Za-z0-9_]*:/) && RLENGTH > 0) {
+    _ind = match($0, /[^ ]/) - 1
+    if (_ind == fieldIndent) {
+      _k = substr($0, _ind + 1); sub(/:.*/, "", _k)
+      if ((nid "|" _k) in nodeKeySeen) { if (!((nid "|" _k) in dupKey)) dupKey[nid "|" _k] = "linhas " nodeKeySeen[nid "|" _k] " e " NR }
+      else nodeKeySeen[nid "|" _k] = NR
+    }
+  }
   # ── CAMPO SÓ EM POSIÇÃO DE CAMPO (âncora ^[[:space:]]*<campo>:) ──────────────────────────────
   # O parser é line-based: um match SOLTO (`line ~ /layer:/` + `sub(/.*layer:/…)`) lê CONTEÚDO como
   # CONFIGURAÇÃO — basta um label citar o token. Real, não hipotético:

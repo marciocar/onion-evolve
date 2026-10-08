@@ -133,7 +133,6 @@ nodes:
     verified_at: 2026-08-30
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): As duas afirmacoes mecanicas do label seguem verdadeiras (mecanismo por-instancia via /meta:personality-sync + relay upstream; marcio-pessoal segue gated/n-a) mas o NUMER"
     label: "6 dos 7 adotantes seguem personality_summary SEED MANUAL datado (o 7o, marcio-pessoal, e gated/n-a soberano) — o sync e por-instancia (sessao do adotante, I3); vira emergente quando cada um rodar /meta:personality-sync e relayar upstream. Estado esperado, nao divida do core."
-    trace: "docs/evolution/federation/members.yaml"
     trace: "docs/evolution/federation/members.yaml:36"
   - id: C_FED_STRUCTURE_IS_TRIPLES
     node_type: claim

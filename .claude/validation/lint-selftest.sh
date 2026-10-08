@@ -9853,6 +9853,28 @@ run_kg_radar_integrity_selftests() {
     record_pass "kg-integridade: (j) gatilho em trigger: → silêncio (evento ligado, sem aviso)"
   else record_fail "kg-integridade: (j)" "trigger: acusado ou evento órfão: ${out}"; fi
   rm -rf "$d"
+
+  # (k)/(l) CHAVE REPETIDA NUM NÓ (2026-10-08, sinal de campo: `trace` repetido em 5 grafos do core;
+  #     YAML 1.2 exige chave única e um leitor tipado fica com a última em silêncio). (k) usa o MESMO
+  #     valor nas duas linhas — a guarda antiga (2026-08-12) só via valores DIFERENTES e só em 4 campos.
+  d="$(mktemp -d)"; _mki "$d" sao
+  sed -i '/- id: E_ref/a\    trace: "a.md"\n    trace: "a.md"' "$d/docs/onion/graph/t.kg.yaml"
+  ( cd "$d" && git add -A && git -c user.email=t@t -c user.name=t commit -qm y ) 2>/dev/null
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if grep -q '^HARD' <<< "${out}" && grep -q 'trace repetido em E_ref' <<< "${out}"; then
+    record_pass "kg-integridade: (k) trace repetido num nó, mesmo com valor igual → HARD nomeando o nó"
+  else record_fail "kg-integridade: (k)" "chave repetida não reprovou: ${out}"; fi
+  rm -rf "$d"
+  # (l) UMA chave trace + label em bloco (>-) cujo texto tem 'trace:' mais à direita → silêncio.
+  #     Só a coluna dos campos do nó conta; texto de bloco e mapa aninhado não são chave do nó.
+  d="$(mktemp -d)"; _mki "$d" sao
+  sed -i '/- id: E_ref/a\    trace: "a.md"\n    narrative: >-\n      trace: dentro do texto\n      trace: de novo' "$d/docs/onion/graph/t.kg.yaml"
+  ( cd "$d" && git add -A && git -c user.email=t@t -c user.name=t commit -qm y ) 2>/dev/null
+  out="$(bash "${helper}" "$d" --format tsv 2>/dev/null || true)"
+  if [ -z "${out}" ]; then
+    record_pass "kg-integridade: (l) trace único + 'trace:' dentro de texto em bloco → silêncio"
+  else record_fail "kg-integridade: (l)" "falso-positivo com texto em bloco: ${out}"; fi
+  rm -rf "$d"
 }
 
 run_kg_census_parity_selftests() {
