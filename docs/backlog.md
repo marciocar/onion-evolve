@@ -623,6 +623,14 @@
 | 9.6 | `Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA` | federation-health-2026-07 | AS DUAS OPCOES PARA O `onion-standalone`, agora com custo MEDIDO em vez de suposto. (A) RE-MATERIALIZAR — ~1 min de maquina no t |
 | 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETE |
 
+## contrato-kg-absorcao-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 9.0 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
+| 7.2 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
+| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
+
 ## audit-textual-gates-2026-09 — 4 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -655,14 +663,6 @@
 | 7.5 | `Q_instrument_metrics` | gtm-decisions-2026-07 | Falta 'valor medido por adotante' (metrics.md `[a instrumentar]`) + taxa de conversão free→paid (sem benchmark p/ frameworks de |
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
-
-## contrato-kg-absorcao-2026-10 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 7.2 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
-| 7.2 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: migrar o corpus antigo para narrative e provenance, em ondas e antes do v4 (SAC-73), e o checkpoint do /meta:drive |
-| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
 ## rito-task-manager-2026-09 — 4 item(ns)
 
