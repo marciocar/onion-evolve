@@ -86,12 +86,26 @@ fi
 
 # I/O e YAML são erros DIFERENTES: arquivo apagado-mas-no-índice ou symlink quebrado não é
 # "YAML inválido", e reportá-lo assim manda alguém consertar sintaxe de um arquivo que não existe.
+# FIXTURE INVÁLIDA É DITA, NUNCA REPROVADA — pelo predicado ÚNICO da casa (kg-fixture-paths.sh, o
+# mesmo da REGRA 52). Sinal de campo de 2026-10-07: um adotante montou uma suíte de conformidade do
+# .kg.yaml com casos DELIBERADAMENTE não parseáveis sob `fixtures/`, e esta guarda os acusava HARD —
+# a baseline não servia (a catraca só encolhe) e o contorno foi renomear o caso para `.yaml`.
+# Fixture inválida pode ser o TESTE. Mas a casa já pagou por guarda CEGA ao próprio material de
+# teste, então a isenção não é silêncio: a fixture inválida sai SOFT (FIXTURE-INVALIDA), nomeada.
+# A regex vem do predicado (sourced), nunca copiada aqui.
+# shellcheck source=kg-fixture-paths.sh
+_KFP="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/kg-fixture-paths.sh"
+[ -f "${_KFP}" ] || { echo "kg-yaml-validity: predicado de fixture ausente (${_KFP}) — NAO VERIFICADO" >&2; exit 2; }
+. "${_KFP}"
+export KG_FIXTURE_RE
 _PYCHK='
-import sys, yaml
+import os, re, sys, yaml
+_fix = re.compile(os.environ["KG_FIXTURE_RE"])
 for raw in sys.stdin.buffer.read().split(b"\0"):
     if not raw:
         continue
     name = raw.decode("utf-8", "surrogateescape")
+    _tag = "FIXYAML" if _fix.search(name) else "YAML"
     try:
         txt = open(name, "rb").read().decode("utf-8", "replace")
     except OSError as e:
@@ -106,13 +120,14 @@ for raw in sys.stdin.buffer.read().split(b"\0"):
         #    o gerador nem chega a parsear o 2º documento e o erro some.
         list(yaml.safe_load_all(txt))
     except Exception as e:
-        print("%s\tYAML\t%s" % (name, str(e).replace("\n", " ")[:140]))
+        print("%s\t%s\t%s" % (name, _tag, str(e).replace("\n", " ")[:140]))
 '
 _scan="$(cd "${ROOT}" && git ls-files -z '*.kg.yaml' | python3 -c "${_PYCHK}" 2>/dev/null)" || {
   echo "kg-yaml-validity: a varredura FALHOU ao rodar — NAO VERIFICADO (nunca leia isto como verde)" >&2; exit 2; }
 
 _bad="$(printf '%s\n' "${_scan}" | awk -F'\t' '$2=="YAML"{print $1"\t"$3}')"
 _io="$(printf '%s\n' "${_scan}"  | awk -F'\t' '$2=="IO"{print $1"\t"$3}')"
+_fix="$(printf '%s\n' "${_scan}" | awk -F'\t' '$2=="FIXYAML"{print $1"\t"$3}')"
 
 if [ "${FMT}" = "emit" ]; then
   printf '# kg-yaml-validity-baseline — arquivos .kg.yaml que o PyYAML rejeita e que estão TOLERADOS.\n'
@@ -156,6 +171,11 @@ while IFS=$'\t' read -r f err; do
   [ -n "${f}" ] || continue
   _out SOFT ILEGIVEL "${f}" "versionado mas não deu para LER (${err}) — apagado sem git rm? symlink quebrado? isto não é erro de YAML"
 done <<< "${_io}"
+
+while IFS=$'\t' read -r f err; do
+  [ -n "${f}" ] || continue
+  _out SOFT FIXTURE-INVALIDA "${f}" "fixture de teste que não é YAML válido (${err}) — se o caso é proposital, ok; se não, a bancada testa contra lixo"
+done <<< "${_fix}"
 
 [ "${passivo}" -eq 0 ] || _out SOFT PASSIVO "${BASELINE_REL}" "${passivo} grafo(s) inválido(s) tolerado(s) pelo baseline — a métrica de saúde é este número DIMINUINDO"
 exit "${rc}"

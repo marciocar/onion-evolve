@@ -161,8 +161,16 @@ _scan_one() {   # $1 = arquivo relativo à ROOT; emite `arquivo<TAB>CLASSE<TAB>d
   return 0
 }
 
+# FIXTURE FICA DE FORA da varredura do corpus, pelo predicado ÚNICO (kg-fixture-paths.sh, o mesmo da
+# REGRA 52). Sinal de campo de 2026-10-07: casos de conformidade que o radar NÃO lê de propósito
+# viravam SOFT aqui. Com `--file` explícito o arquivo pedido é medido mesmo sendo fixture.
+# shellcheck source=kg-fixture-paths.sh
+_KFP="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/kg-fixture-paths.sh"
+[ -f "${_KFP}" ] || { echo "kg-census-parity: predicado de fixture ausente (${_KFP}) — NAO VERIFICADO" >&2; exit 2; }
+. "${_KFP}"
 _scan=""
 while IFS= read -r -d '' _f; do
+  if [ -z "${ONLY_FILE}" ] && [[ "${_f}" =~ ${KG_FIXTURE_RE} ]]; then continue; fi
   _scan="${_scan}$(_scan_one "${_f}")"$'\n'
 done < <(cd "${ROOT}" && if [ -n "${ONLY_FILE}" ]; then git ls-files -z -- "${ONLY_FILE}"; else git ls-files -z '*.kg.yaml'; fi)
 

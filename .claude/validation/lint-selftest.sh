@@ -9933,6 +9933,18 @@ run_kg_census_parity_selftests() {
   else record_fail "kg-paridade: (b)" "falso-positivo em grafo so: rc=${rc} ${out}"; fi
   rm -rf "$d"
 
+  # (b2) o MESMO grafo forjado de (a), mas sob fixtures/ → fora da varredura (predicado ÚNICO de
+  #      fixture, o da REGRA 52). Sinal de campo 2026-10-07: casos de conformidade que o radar não lê
+  #      de propósito viravam aviso aqui. (a) prova que o conteúdo ainda é acusado fora de fixtures.
+  d="$(mktemp -d)"; _mkpar "$d" forjado
+  ( cd "$d" && mkdir -p docs/fixtures && git mv docs/t.kg.yaml docs/fixtures/t.kg.yaml \
+      && git -c user.email=t@t -c user.name=t commit -qm fx ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${helper}" "$d" --format tsv 2>/dev/null)" || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q 'B_ESCONDIDO' <<< "${out}"; then
+    record_pass "kg-paridade: (b2) grafo forjado sob fixtures/ → fora da varredura (predicado único)"
+  else record_fail "kg-paridade: (b2)" "fixture entrou na varredura: rc=${rc} ${out}"; fi
+  rm -rf "$d"
+
   # (c) MUT DO REQUISITO NAO-NEGOCIAVEL — e o unico caso desta familia que justifica a familia.
   #     O no forjado a SEIS espacos. Guarda que ancora em dois fixos passa aqui e e decoracao.
   d="$(mktemp -d)"; _mkpar "$d" forjado-fundo
@@ -9950,7 +9962,7 @@ run_kg_census_parity_selftests() {
   #     imitar), e a asercao passa a ser sobre isso: com o radar MUTADO, a guarda tem de concordar
   #     com o motor mutado — nao com a memoria do antigo.
   d="$(mktemp -d)"; mkdir -p "$d/val/lib" "$d/docs"
-  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${helper}" "$d/val/"
+  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${helper}" "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "$d/val/"
   cp "${REPO_ROOT}/.claude/validation/lib/status-factor.awk" "$d/val/lib/"
   # grafo SAO e comum: os dois leitores concordam, entao silencio
   { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
@@ -9997,7 +10009,7 @@ PYCR
   #      lib ao lado, a guarda leu saida vazia como `radar=0` e acusou DIVERGE num grafo SAO —
   #      ausencia lida como RESULTADO, a classe exata que esta onda cura.
   d="$(mktemp -d)"; mkdir -p "$d/val/lib" "$d/docs"
-  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${helper}" "$d/val/"
+  cp "${REPO_ROOT}/.claude/validation/kg-radar.sh" "${helper}" "${REPO_ROOT}/.claude/validation/kg-fixture-paths.sh" "$d/val/"
   { printf 'meta:\n  id: t\n  schema_version: "1"\nnodes:\n'
     printf '  - id: A_REAL\n    node_type: claim\n    plane: DEV\n    status: open\n'
     printf '    impact: 3\n    confidence: 0.8\n    label: "x"\nedges: []\n'
@@ -19681,15 +19693,25 @@ run_kg_yaml_validity_selftests() {
   if [ "${rc}" = "1" ] && grep -q 'mau2' <<< "${out}"; then
     record_pass "kg-yaml-validity: (d) NOVO fora da baseline → HARD (a catraca aperta, não afrouxa)"
   else record_fail "kg-yaml-validity: (d)" "arquivo novo passou com baseline armada (rc=${rc}): ${out}"; fi
-  # (e) FIXTURE inválida CONTA. Isentar fixture aqui seria isentar justamente o que a bancada usa
-  #     para provar que a guarda morde — e a casa já pagou por guarda cega ao próprio material de teste.
+  # (e) FIXTURE inválida é DITA (SOFT FIXTURE-INVALIDA) e NUNCA reprova. Antes de 2026-10-08 ela
+  #     CONTAVA como HARD, e um adotante com suíte de conformidade (casos deliberadamente não
+  #     parseáveis sob fixtures/) teve de renomear o caso para .yaml para passar. Mas isenção muda
+  #     seria a guarda cega ao próprio material de teste, que a casa já pagou: por isso é SOFT nomeado.
   rm -f "${d}/r/g/mau.kg.yaml" "${d}/r/g/mau2.kg.yaml"
   printf 'meta: { schema_version: 1 }\nnodes:\n  - id: Z\n    label: "fixture \\$ quebrada"\nedges: []\n' > "${d}/r/fx/fixtures/f.kg.yaml"
   ( cd "${d}/r" && git add -A ) >/dev/null 2>&1 || true
   rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
-  if [ "${rc}" = "1" ] && grep -q 'fixtures/f.kg.yaml' <<< "${out}"; then
-    record_pass "kg-yaml-validity: (e) fixture inválida CONTA (não há isenção para material de teste)"
-  else record_fail "kg-yaml-validity: (e)" "fixture inválida passou (rc=${rc}): ${out}"; fi
+  if [ "${rc}" = "0" ] && grep -q '^SOFT	FIXTURE-INVALIDA	fx/fixtures/f.kg.yaml' <<< "${out}" && ! grep -q '^HARD' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (e) fixture inválida → SOFT FIXTURE-INVALIDA nomeada, nunca HARD (nem cega, nem bloqueante)"
+  else record_fail "kg-yaml-validity: (e)" "esperava SOFT FIXTURE-INVALIDA com rc=0, veio rc=${rc}: ${out}"; fi
+  # (e2) o MESMO conteúdo FORA de fixtures segue HARD: a isenção é do predicado, não do conteúdo.
+  cp "${d}/r/fx/fixtures/f.kg.yaml" "${d}/r/g/fora.kg.yaml"
+  ( cd "${d}/r" && git add -A ) >/dev/null 2>&1 || true
+  rc=0; out="$(bash "${h}" "${d}/r" --format tsv 2>&1)" || rc=$?
+  if [ "${rc}" = "1" ] && grep -q '^HARD	INVALIDO	g/fora.kg.yaml' <<< "${out}"; then
+    record_pass "kg-yaml-validity: (e2) o mesmo conteúdo fora de fixtures/ → HARD (a isenção é do caminho)"
+  else record_fail "kg-yaml-validity: (e2)" "conteúdo inválido fora de fixtures não reprovou (rc=${rc}): ${out}"; fi
+  rm -f "${d}/r/g/fora.kg.yaml"; ( cd "${d}/r" && git add -A ) >/dev/null 2>&1 || true
   # (f) FAIL-CLOSED: verificador que não roda tem de sair 2, NUNCA 0. Foi assim que a 1ª versão
   #     mentiu — dois redirecionadores de entrada no mesmo comando, SyntaxError, e exit 0.
   mkdir -p "${d}/stub"
