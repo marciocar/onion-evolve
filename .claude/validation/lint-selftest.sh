@@ -6155,6 +6155,66 @@ HDPY
       record_pass "env-exposure: (k) heredoc: corpo de texto entre aspas passa (markdown com **), corpo para shell/interpretador e expansão sem aspas são barrados; os 15 escapes das duas curas anteriores seguem barrados (30 casos)"
     else record_fail "env-exposure: (k) heredoc julgado pelo consumidor" "casos divergentes (índice:esperado>veio): ${hd_out}"; fi
   fi
+  # (l) GLOB pela regra do bash e pelo DISCO (SAC-68, 2026-10-08). Medido numa leva: 6 vetos em comando que
+  #     não lia .env nenhum — `*)` de um `case`, `ops/testing/*`, `for d in */`, `/home/marcio/*/` e `**`
+  #     num corpo de heredoc — porque o glob era testado com fnmatch, que casa `*` com nome OCULTO e o bash
+  #     não. As duas polaridades com pastas reais (o cwd vai no JSON, como o hook recebe): as formas medidas
+  #     passam; os escapes que a cura poderia abrir seguem barrados (pasta com prod.env, cd literal para ela,
+  #     cd com variável, subshell com cd, .env citado na mesma linha, glob com ponto).
+  if [ -f "${guard}" ]; then
+    local gl_out
+    gl_out="$(python3 - "${guard}" <<'GLPY'
+import json, os, subprocess, sys, tempfile
+E = '.' + 'env'
+root = tempfile.mkdtemp()
+com, sem = os.path.join(root, 'com'), os.path.join(root, 'sem')
+os.makedirs(os.path.join(com, 'sub')); os.makedirs(sem)
+open(os.path.join(com, 'prod' + E), 'w').close(); open(os.path.join(sem, 'a.txt'), 'w').close()
+def t(cmd, cwd):
+    p = subprocess.run(['bash', sys.argv[1]], input=json.dumps({'tool_name': 'Bash', 'tool_input': {'command': cmd}, 'cwd': cwd}),
+                       capture_output=True, text=True)
+    return p.returncode
+C = [(0, 'for i in $(seq 1 3); do s=$(gh pr checks 1 --json state); case "$s" in *PENDING*|"") sleep 1;; *) break;; esac; done', sem),
+     (0, "grep -n family ops/testing/*", sem),
+     (0, 'for d in */; do ( cd "$d" && bash x/env-check.sh --test linear ); done', sem),
+     (0, 'for d in /home/marcio/*/; do [ -f "${d}' + E + '" ] && echo "$d"; done', sem),
+     (0, "if x; then gh pr create --body-file /dev/stdin <<'B' && y $(z); fi\n- **CI:** vendor/kg/** e base:**\nB", sem),
+     (0, 'cat *', sem),
+     (0, 'for d in */; do test -f "$d/' + E + '" && echo "$d"; done', com),   # .env citado: só a regra do diretório salva
+     (2, 'cat *', com),
+     (2, 'grep -n T *', com),
+     (2, 'cd com && cat *', root),
+     (2, 'cd "$X" && cat *', sem),
+     (2, '(cd /tmp) ; cat *', com),
+     (2, 'cp ' + E + ' x' + E + ' && cat *', sem),
+     (2, 'cat .*', sem),
+     (2, 'cat *env', com),
+     (2, 'cat $X/*', sem),                       # variável no caminho: o disco não sabe onde é
+     (2, 'cat ./*', com),
+     (2, 'cat sub/../*', com),
+     (2, 'for f in */' + E + '; do cat "$f"; done', sem),
+     (2, 'for d in */; do cat "$d/' + E + '"; done', sem)]
+print(' '.join('%d:%d>%d' % (i, e, g) for i, (e, c, w) in enumerate(C) for g in [t(c, w)] if g != e))
+GLPY
+)" || gl_out="o harness do caso (l) não rodou"
+    if [ -z "${gl_out}" ]; then
+      record_pass "env-exposure: (l) glob julgado pela regra do bash e pelo disco: as 5 formas medidas passam; pasta com prod.env, cd, subshell, .env na linha e glob com ponto seguem barrados"
+    else record_fail "env-exposure: (l) glob" "casos divergentes (índice:esperado>veio): ${gl_out}"; fi
+  fi
+  # (m) o caminho sancionado para a pergunta "a chave tem \r?": --lint fala por NOME, nunca pelo valor; e o
+  #     leitor tira o \r final (uma chave colada de editor Windows saía com ele e virava HTTP 401)
+  local lt; lt="$(mktemp -d)"
+  printf 'LINEAR_API_KEY=SENTINELA-CR\r\nX="aberta\nY=ok\nLINEAR_TEAM_ID=team42\r\n' > "${lt}/.env"
+  printf 'A=1\nB="dois"\n' > "${lt}/ok"
+  local l1 l2 l3 lrc1=0 lrc2=0
+  l1="$(bash "${h}" --env "${lt}/.env" --lint 2>&1)" || lrc1=$?
+  l2="$(bash "${h}" --env "${lt}/ok" --lint 2>&1)" || lrc2=$?
+  l3="$(bash "${h}" --env "${lt}/.env" --get LINEAR_TEAM_ID 2>&1)"
+  rm -rf "${lt}"
+  if [ "${lrc1}" = 1 ] && [ "${lrc2}" = 0 ] && grep -q 'LINEAR_API_KEY: termina em' <<< "${l1}" && grep -q 'X: aspas duplas sem fechar' <<< "${l1}" \
+     && ! grep -q SENTINELA <<< "${l1}" && [ "${l3}" = team42 ]; then
+    record_pass "env-exposure: (m) --lint acusa \\r e aspas por NOME sem imprimir valor, cala no arquivo limpo, e o leitor tira o \\r final"
+  else record_fail "env-exposure: (m) --lint" "rc=${lrc1}/${lrc2} get=$(printf '%q' "${l3}") out=${l1:0:160}"; fi
   # (i) o veto está REGISTRADO no settings.json (guarda escrita e não ligada é guarda morta)
   if python3 -c 'import json,sys;d=json.load(open(sys.argv[1]));sys.exit(0 if any("pretooluse-env-guard.sh" in h.get("command","") for g in d["hooks"]["PreToolUse"] for h in g.get("hooks",[])) else 1)' "${REPO_ROOT}/.claude/settings.json"; then
     record_pass "env-exposure: (i) o veto está registrado no PreToolUse"

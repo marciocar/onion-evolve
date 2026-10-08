@@ -4,10 +4,10 @@
 meta:
   id: env-falso-positivo-2026-10
   schema_version: "1"
-  baseline: 2026-10-08
-  review_after: 2026-11-07   # 30d: defeito de guarda
+  baseline: "2026-10-08"
+  review_after: "2026-11-07"   # 30d: defeito de guarda
   # ═══ TETO: 10 NÓS ═══
-  #   2 em 2026-10-08.
+  #   6 em 2026-10-08 (+ a cura do SAC-68: o glob julgado pelo bash e pelo disco, o --lint, e dois tetos).
 nodes:
   - id: E_ENV_GUARD_VETOU_COMANDO_SEM_ENV
     node_type: evidence
@@ -16,20 +16,81 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.8
-    verified_at: 2026-10-08
-    verified_against: "leva de 2026-10-07/08, sessão do core e dois forks: 6 vetos do pretooluse-env-guard.sh. Dois em comando que não tocava .env nenhum: o laço de espera do CI (case sobre a saída do gh, 'nome montado em runtime') e um grep com glob ops/testing/* (fork). Três em leitura que não expunha valor: laço sobre diretórios chamando o env-check.sh de cada repo, glob /home/marcio/*/ (fork) e grep -c de CR no .env. E o sexto no próprio registro deste nó: um heredoc que só CITAVA o nome do arquivo num texto de grafo. Cada um custou um contorno"
+    verified_at: "2026-10-08"
+    verified_against: "leva de 2026-10-07/08, sessão do core e dois forks: 7 vetos do pretooluse-env-guard.sh, todos reproduzidos na cura do SAC-68 com o JSON do PreToolUse"
     trace: ".claude/hooks/pretooluse-env-guard.sh"
-    label: "o veto do .env barra comando que não lê .env e leitura que não expõe valor; em uma leva foram 6 vetos e 6 contornos"
+    label: "o veto do .env barra comando que não lê .env e leitura que não expõe valor; em uma leva foram 7 vetos e 7 contornos"
+    narrative: "Dois em comando que não tocava .env nenhum: o laço de espera do CI (um `*)` de case lido como glob na posição de comando) e um grep com glob ops/testing/*. Três em leitura que não expunha valor: laço sobre diretórios chamando o env-check.sh de cada repo, glob /home/marcio/*/ e grep -c de CR no .env. Um num corpo de heredoc (`base:**` virando o glob `**`). E um no próprio registro deste nó: heredoc que só CITAVA o nome do arquivo num texto de grafo."
+    provenance:
+      source: ".claude/hooks/pretooluse-env-guard.sh na main 2beae385"
+      locator: "as 7 formas reproduzidas no harness do SAC-68 (6 vetos com a mensagem literal de cada um)"
+      method: "medição: o hook rodado com o JSON do PreToolUse no stdin"
   - id: Q_ENV_GUARD_SEM_FALSO_POSITIVO
     node_type: question
     layer: audit
     plane: DEV
     status: open
     impact: 3
-    confidence: 0.6
-    verified_against: "pedido do maestro 2026-10-08"
-    label: "curar os falsos positivos do veto do .env sem abrir escape: medir cada forma com /meta:forge-guard (as duas polaridades e mutante), e oferecer um caminho sancionado para o que hoje não tem (testar credencial de outro repo, contar CR, laço sobre repos com o env-check)"
+    confidence: 0.7
+    verified_against: "pedido do maestro 2026-10-08; execução no SAC-68 (E_GLOB_JULGADO_PELO_DISCO): 5 das 7 formas passam, 2 seguem vetadas por desenho com caminho sancionado"
+    label: "o que resta para o maestro selar: 5 das 7 formas medidas passam; o grep no .env e o heredoc que grava texto citando .env em arquivo seguem vetados por desenho, com --lint e a ferramenta Write como caminhos"
+  - id: E_GLOB_JULGADO_PELO_DISCO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.85
+    verified_at: "2026-10-08"
+    verified_against: "família env_exposure 14 de 14 (casos l e m novos) com LC_ALL=C; famílias afetadas 39 de 39; 6 mutantes, todos reprovando o caso deles"
+    trace: ".claude/hooks/pretooluse-env-guard.sh"
+    label: "o veto passa a julgar glob pela regra do bash e pelo disco: 5 falsos positivos medidos somem e os 8 escapes testados seguem barrados"
+    narrative: "Três regras, nesta ordem: glob que termina em / só expande para diretório e nunca é um .env; glob cuja última parte começa com ponto alcança um .env oculto e fecha como antes; glob sem ponto só alcançaria um x.env sem ponto, e isso se confere no disco, na pasta onde o comando roda (o cwd do JSON, seguindo cd literal). Fecha como antes quando a pasta não é conhecida (cd com variável, subshell com cd, pushd), quando a linha cita um .env literal (cp .env x.env && cat * criaria o alvo depois do veto) e quando o glob nomeia env (grep -r --include=*.env desce às subpastas: escape que a 1ª redação abria, pego pelo caso h2 da bancada). E o env-check ganha --lint, que acusa por NOME o \\r no fim, aspas sem fechar e chave repetida sem imprimir valor; o leitor dele passou a tirar o \\r final."
+    provenance:
+      source: "bancada run_env_exposure_selftests (casos l e m) e o harness de mutantes do SAC-68"
+      locator: "lint-selftest.sh, família env_exposure; mutantes M1 a M6"
+      method: "medição: bancada com LC_ALL=C e mutante por cura"
+  - id: D_GREP_E_HEREDOC_SEGUEM_VETADOS
+    node_type: decision
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_against: "cura do SAC-68 em 2026-10-08, proposta ao maestro"
+    label: "proposta: grep no .env (mesmo só contando) e heredoc que grava em arquivo texto citando .env seguem vetados, porque o caminho sancionado existe e é seguro"
+    narrative: "O grep é a forma mais perigosa de ler o .env: abri-lo para contar abriria para imprimir. O caminho é env-check --lint, que responde a pergunta real (há \\r? aspas sem fechar?) por nome de chave. O heredoc que grava em arquivo um texto citando .env pode virar script depois, e a ferramenta Write grava o mesmo texto sem passar pelo shell — foi o que se usou na leva."
+  - id: C_TETO_GREP_RECURSIVO_SEM_INCLUDE
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.7
+    verified_against: "passada adversarial do SAC-68 em 2026-10-08: o veto da main já deixava passar grep -r sem --include sobre uma pasta (o argumento é uma pasta, não um arquivo .env); não é escape aberto pela cura"
+    label: "teto: grep -r ou rg sobre uma pasta lê o .env que estiver dentro dela, e o veto julga o argumento (a pasta), não o que a recursão alcança"
+  - id: C_TETO_DISCO_NO_MOMENTO_DO_VETO
+    node_type: claim
+    layer: audit
+    plane: DEV
+    status: open
+    impact: 2
+    confidence: 0.7
+    verified_against: "cura do SAC-68 em 2026-10-08"
+    label: "teto: o glob conferido no disco vê a pasta no momento do veto; um x.env criado na mesma linha por nome montado em runtime, sem citar .env, escaparia"
 edges:
   - from: E_ENV_GUARD_VETOU_COMANDO_SEM_ENV
     to: Q_ENV_GUARD_SEM_FALSO_POSITIVO
     edge_type: SUPPORTS
+  - from: E_GLOB_JULGADO_PELO_DISCO
+    to: Q_ENV_GUARD_SEM_FALSO_POSITIVO
+    edge_type: SUPPORTS
+  - from: D_GREP_E_HEREDOC_SEGUEM_VETADOS
+    to: Q_ENV_GUARD_SEM_FALSO_POSITIVO
+    edge_type: CONSTRAINS
+  - from: C_TETO_GREP_RECURSIVO_SEM_INCLUDE
+    to: E_GLOB_JULGADO_PELO_DISCO
+    edge_type: CONSTRAINS
+  - from: C_TETO_DISCO_NO_MOMENTO_DO_VETO
+    to: E_GLOB_JULGADO_PELO_DISCO
+    edge_type: CONSTRAINS
