@@ -5602,6 +5602,16 @@ run_research_workflow_selftests() {
      && grep -qF 'nó PROD não se apoia em testemunho' <<< "${_v41}"; then
     record_pass "research-workflow: (q) o contrato do write(KG) ensina os avisos do v4.1 (alvo do carimbo, trace da decisão, testemunho fora de PROD)"
   else record_fail "research-workflow: (q)" "CONTRACT_V3 sem a linha do v4.1 (verified_against, trace da decisão, testemunho em PROD)"; fi
+  # (r) o bloco do contrato ensina a `locality` do v4.2 (2026-10-09, SAC-97) DENTRO do CONTRACT_V3 (o que os dois
+  #     write(KG) recebem): as quatro classes, o código que acusa valor fora delas e "na dúvida, omita" (nunca
+  #     inventar onde a fonte mora). Mutante: tirar a linha da locality reprova.
+  local _v42
+  _v42="$(sed -n '/^const CONTRACT_V3 = /,/^let CORPUS/p' "${wf}" | grep -F -m1 'locality' || true)"
+  if grep -qF '"web"' <<< "${_v42}" && grep -qF '"repo"' <<< "${_v42}" && grep -qF '"host"' <<< "${_v42}" \
+     && grep -qF '"pessoa"' <<< "${_v42}" && grep -qF 'form.enum.node.provenance.locality' <<< "${_v42}" \
+     && grep -qF 'na dúvida, omita a chave' <<< "${_v42}"; then
+    record_pass "research-workflow: (r) o contrato do write(KG) ensina a locality do v4.2 (4 classes, o código do aviso, omitir na dúvida)"
+  else record_fail "research-workflow: (r)" "CONTRACT_V3 sem a linha da locality do v4.2: ${_v42:-<ausente>}"; fi
 }
 
 run_research_lens_selftests() {
@@ -12063,6 +12073,15 @@ run_seed_adoption_graph_selftests() {
     if _v3o="$(cd "${_v3sb}" && bash .claude/validation/kg-contract-check.sh g/semente.kg.yaml 2>&1)"; then _v3rc=0; else _v3rc=$?; fi
     if [ "${_v3rc}" -eq 0 ]; then record_pass "seed-graph: (v3) a semente nasce conforme ao contrato v3 (MUST e SHOULD vazios)"
     else record_fail "seed-graph: (v3)" "a semente sai fora do contrato v3 (rc=${_v3rc}): ${_v3o}"; fi
+    # (v42) contrato v4.2 (2026-10-09, SAC-97): TODA provenance da semente diz onde a fonte mora — a fonte de cada
+    #       nó é conhecida pelo semeador (stamp e commit = repo; execução do gate e core.hooksPath = host).
+    #       Mutante: tirar uma linha `locality:` do molde deixa um bloco sem ela e reprova.
+    local _np _nl
+    _np="$(LC_ALL=C grep -c '^    provenance:$' "${_v3sb}/g/semente.kg.yaml" || true)"
+    _nl="$(LC_ALL=C grep -cE '^      locality: "(repo|web|host|pessoa)"$' "${_v3sb}/g/semente.kg.yaml" || true)"
+    if [ "${_np:-0}" -ge 5 ] && [ "${_np}" = "${_nl}" ]; then
+      record_pass "seed-graph: (v42) toda provenance da semente traz locality do vocabulário do v4.2 (${_nl}/${_np})"
+    else record_fail "seed-graph: (v42)" "provenance sem locality na semente: ${_nl:-0} de ${_np:-0}"; fi
     rm -rf "${_v3sb}"
   else record_skip "seed-graph: (v3) vendor do contrato ou PyYAML/jsonschema ausentes (SUT não exercido)"; fi
   # (a2) DOCUMENTO ÚNICO, e o /meta:drive o LÊ (sinal de campo onion-slm, 2026-10-06): a semente abria e
@@ -19793,8 +19812,10 @@ PY
     ONION_CENSUS_ROOT="$d" python3 "${seal}" seal "$d/c.json" >/dev/null 2>&1 || true
     git -C "$d" init -q 2>/dev/null
     if v3o="$(cd "$d" && bash .claude/validation/kg-contract-check.sh "$g" 2>&1)"; then v3rc=0; else v3rc=$?; fi
-    if [ "${v3rc}" -eq 0 ] && grep -q 'E_CENSO' "$d/$g"; then
-      record_pass "census-seal: (v3) o carimbo e o nó DRIFTED do censo nascem conformes ao contrato v3"
+    # + contrato v4.2 (SAC-97): a provenance do nó DRIFTED diz que a fonte (o próprio grafo) mora no repo.
+    #   Mutante: tirar a linha da locality do census-seal.py reprova.
+    if [ "${v3rc}" -eq 0 ] && grep -q 'E_CENSO' "$d/$g" && LC_ALL=C grep -q "^      locality: 'repo'$" "$d/$g"; then
+      record_pass "census-seal: (v3) o carimbo e o nó DRIFTED do censo nascem conformes ao contrato v3 (e com locality 'repo' do v4.2)"
     else record_fail "census-seal: (v3)" "o censo sujou o grafo (rc=${v3rc}): ${v3o}"; fi
   else record_skip "census-seal: (v3) vendor do contrato ou PyYAML/jsonschema ausentes (SUT não exercido)"; fi
   rm -rf "$d"
@@ -23874,6 +23895,18 @@ run_kg_contract_check_selftests() {
   if [ "${rc}" -eq 1 ] && grep -q 'SHOULD integrity.untraced-decision — decision sem origem: dê a ela trace:' <<< "${out}"; then
     record_pass "kg-contract-check: (g) decisão nova sem origem → rc 1 com o código do v4.1 e a cura (trace)"
   else record_fail "kg-contract-check: (g)" "esperava rc 1 com integrity.untraced-decision e a dica: rc=${rc} ${out}"; fi
+  # (h) aviso do v4.2 (2026-10-09, SAC-97): locality fora de {repo, web, host, pessoa} acusa
+  #     form.enum.node.provenance.locality com a cura; locality válida passa limpa. Mutante: tirar a dica do HINT
+  #     deixa só o código e reprova este caso.
+  _kcc_graph locruim | sed -e 's/      method: "medição: comando de prova"/&\n      locality: "nuvem"/' > "${sb}/g/locruim.kg.yaml"
+  _kcc_graph locboa | sed -e 's/      method: "medição: comando de prova"/&\n      locality: "repo"/' > "${sb}/g/locboa.kg.yaml"
+  local outb rcb
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/locruim.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if outb="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/locboa.kg.yaml 2>&1)"; then rcb=0; else rcb=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q 'SHOULD form.enum.node.provenance.locality — provenance.locality fora do vocabulário: use repo, web, host ou pessoa' <<< "${out}" \
+     && [ "${rcb}" -eq 0 ]; then
+    record_pass "kg-contract-check: (h) locality fora do vocabulário → rc 1 com o código do v4.2 e a cura; locality válida → rc 0"
+  else record_fail "kg-contract-check: (h)" "esperava rc 1 com a dica e rc 0 na válida: rc=${rc} rcb=${rcb} ${out} ${outb}"; fi
   # (f) o checador NÃO deixa bytecode no vendor. Medido em 2026-10-08: rodar o leitor de referência sem -B
   #     plantava tools/__pycache__/*.pyc, e o `kg_vendor.py check` seguinte reprovava o vendor como
   #     "divergente da tag" (o check rejeita bytecode de propósito). Rodamos sem PYTHONDONTWRITEBYTECODE,
@@ -24185,6 +24218,58 @@ assert n["D_K_DUV"]["plane"]=="PROD" and n["D_K_DUV"]["provenance"]["source"]=="
      && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --promote-unverifiable --apply-judged "${ck}" "${gk}" >/dev/null 2>&1; then
     record_pass "kg-migrate-v3: (k) ondas 2-3 da O3: corrigir-label leva o label anterior à narrative; label > 280 recusa a linha inteira; refutar reconcilia (radar reprovava, passa) e nomeia o confirmed apoiado no refutado; --promote-unverifiable; dev-dúvida fica em PROD com fonte; 2ª passada no-op"
   else record_fail "kg-migrate-v3: (k)" "ondas 2-3 apagaram a história do label, aceitaram label longo, não reconciliaram o refutado ou não são idempotentes: rc=${rc} radar antes=${rk1} depois=${rk2} idem=$([ "${h1}" = "${h2}" ] && echo sim || echo NÃO) ${out} ${y}"; fi
+  # (l) --locality (contrato v4.2, 2026-10-09, SAC-97): num repo git de verdade (a regra de `repo` confere a raiz
+  #     e o sha com o git), cada classe sai do source; o sha que o git não conhece, a citação bibliográfica e a
+  #     fonte já com locality ficam como estão; fonte mista vale a MENOS reverificável (repo + host → host); o YAML
+  #     relido é o de antes mais a chave; a 2ª passada é no-op e o contrato não acusa nada. Mutantes que este caso
+  #     reprova: mista pela MAIS reverificável (min no lugar de max), sha aceito sem o git conferir, sem certeza → repo.
+  local lr gl sha
+  lr="${d}/lrepo"; mkdir -p "${lr}/ops" "${lr}/docs"; printf 'echo\n' > "${lr}/ops/a.sh"
+  ( cd "${lr}" && git init -q -b main && git add -A && git -c user.email=t@t -c user.name=t commit -qm base ) >/dev/null 2>&1 \
+    || { record_skip "kg-migrate-v3: (l) git init falhou (SUT não exercido)"; rm -rf "${d}"; return; }
+  sha="$(git -C "${lr}" rev-parse --short=8 HEAD)"
+  gl="${lr}/docs/l.kg.yaml"
+  {
+    printf 'meta:\n  id: l\n  schema_version: "1"\n  baseline: "2026-10-09"\nnodes:\n'
+    _kmv_loc() { printf '  - id: %s\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    verified_at: "2026-10-09"\n    verified_against: "x"\n    label: "%s"\n    provenance:\n      source: "%s"\n      locator: "l.1"\n      method: "leitura: x"\n' "$1" "$1" "$2"; }
+    _kmv_loc E_L_REPO "ops/a.sh:1"
+    _kmv_loc E_L_WEB "https://exemplo.org/doc"
+    _kmv_loc E_L_DOM "tst.jus.br — notícia do tribunal"
+    _kmv_loc E_L_HOST "/home/x/journal.log"
+    _kmv_loc E_L_WF "runs wf_0a1b2c3d-4e5"
+    _kmv_loc E_L_PESSOA "resposta do maestro na sessão de 2026-10-09"
+    _kmv_loc E_L_SHA "${sha} (corpo do commit)"
+    _kmv_loc E_L_FAKESHA "deadbeef0 (corpo do commit)"
+    _kmv_loc E_L_MISTA "ops/a.sh + /etc/z.conf"
+    _kmv_loc E_L_LIVRO "Denning (1979), ACM TODS 4(1)"
+    _kmv_loc E_L_JA "ops/a.sh"
+    printf '      locality: "web"\n'
+    printf 'edges:\n  - from: E_L_REPO\n    to: E_L_WEB\n    edge_type: SUPPORTS\n'
+  } > "${gl}"
+  local ybefore
+  ybefore="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str, sort_keys=True))' "${gl}" 2>&1)" || true
+  if out="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --locality "${gl}" 2>&1)"; then rc=0; else rc=$?; fi
+  y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str, sort_keys=True))' "${gl}" 2>&1)" || true
+  h1="$(sha256sum "${gl}" | cut -d' ' -f1)"
+  LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --locality "${gl}" >/dev/null 2>&1 || true
+  h2="$(sha256sum "${gl}" | cut -d' ' -f1)"
+  local contrato=""
+  contrato="$(python3 -I -B "${REPO_ROOT}/vendor/kg-ssot/tools/kg_validate.py" "${gl}" 2>&1)" || true
+  if [ "${rc}" -eq 0 ] && [ "${h1}" = "${h2}" ] && ! grep -q 'form.enum.node.provenance.locality' <<< "${contrato}" \
+     && grep -q 'TOTAL · repo 2 · web 2 · host 3 · pessoa 1 · sem certeza 2' <<< "${out}" \
+     && python3 -I -B -c '
+import json,sys
+a,b=json.loads(sys.argv[1]),json.loads(sys.argv[2])
+loc={n["id"]:n["provenance"].get("locality") for n in b["nodes"]}
+want={"E_L_REPO":"repo","E_L_WEB":"web","E_L_DOM":"web","E_L_HOST":"host","E_L_WF":"host","E_L_PESSOA":"pessoa",
+      "E_L_SHA":"repo","E_L_FAKESHA":None,"E_L_MISTA":"host","E_L_LIVRO":None,"E_L_JA":"web"}
+assert loc==want, loc
+for n in b["nodes"]:
+    if n["id"]!="E_L_JA": n["provenance"].pop("locality",None)
+assert a==b
+' "${ybefore}" "${y}" 2>/dev/null; then
+    record_pass "kg-migrate-v3: (l) --locality: repo/web/host/pessoa saem do source (sha só se o git o conhece); sem certeza fica sem a chave; mista vale a menos reverificável; locality já escrita fica; só a chave muda; 2ª passada no-op; o contrato v4.2 não acusa"
+  else record_fail "kg-migrate-v3: (l)" "locality errada, inventada ou com efeito colateral: rc=${rc} idem=$([ "${h1}" = "${h2}" ] && echo sim || echo NÃO) ${out} ${y} ${contrato}"; fi
   rm -rf "${d}"
 }
 _family run_kg_migrate_v3_selftests
@@ -25043,8 +25128,11 @@ run_cc_delta_census_selftests() {
     record_fail "cc-delta-census: (e)" "radar reprovou o esqueleto: $(_emit "${out}" | grep -m2 '✗' | tr '\n' ' ')"
   elif ! python3 -c 'import yaml, jsonschema' >/dev/null 2>&1; then
     record_skip "cc-delta-census: (e) contrato v3 — PyYAML/jsonschema ausentes (radar passou; contrato NÃO verificado)"
+  elif ! LC_ALL=C grep -q '^      locality: "web"$' "${g}"; then
+    # contrato v4.2 (SAC-97): a fonte do delta é o CHANGELOG público (URL) → locality web. Mutante: tirar a linha reprova.
+    record_fail "cc-delta-census: (e)" "a evidência do delta saiu sem locality \"web\" (contrato v4.2)"
   elif out="$(cd "${REPO_ROOT}" && bash .claude/validation/kg-contract-check.sh "${g}" 2>&1)"; then
-    record_pass "cc-delta-census: (e) o esqueleto passa no radar e no kg-contract-check (rc 0)"
+    record_pass "cc-delta-census: (e) o esqueleto passa no radar e no kg-contract-check (rc 0), com locality web na evidência"
   else record_fail "cc-delta-census: (e)" "contrato v3 reprovou o esqueleto: $(_emit "${out}" | head -3 | tr '\n' ' ')"; fi
   rm -rf "${sb}"
 }

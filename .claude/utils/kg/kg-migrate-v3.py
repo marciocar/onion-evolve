@@ -50,12 +50,18 @@ O que ela FAZ (determinístico, idempotente, edição por linha — o radar é a
     nada da linha é aplicado): method fora das classes do contrato, source/locator vazios, label_final vazio ou
     acima de 280, refutar sobre status que não é confirmed, nó ausente do grafo, rebaixar sobre status que não é
     confirmed. Edição por linha; a 2ª aplicação é no-op. Datas não são citadas neste modo.
+  · COM --locality (contrato v4.2, 2026-10-09, SAC-97): só ACRESCENTA `provenance.locality` (repo|web|host|
+    pessoa) às provenances em bloco que ainda não a têm, quando o `source` a determina pela regra de locality_of
+    (ver o bloco "provenance.locality" abaixo); sem certeza, o nó fica sem a chave e sai na contagem. Prova, por
+    grafo, que o YAML relido é o de antes mais a chave nova (senão rc 2, nada gravado). Idempotente: re-rodar
+    regenera o mesmo resultado, o que resolve conflito com PR paralelo. Os modos que ESCREVEM provenance (o de
+    sempre, --routing e --apply-judged) passam a escrever a locality junto, pela mesma regra.
 O que ela NÃO faz (é decisão humana ou do contrato, nunca da ferramenta):
   · nó sem fonte derivável NÃO recebe provenance inventada: sai no relatório como "sem fonte recuperável"
     (a gramática diz: sem fonte verificável, o nó não é confirmed — rebaixar é decisão de quem conhece o nó);
   · label acima de 280 NÃO é cortado: separar fato e narrativa é semântico; sai no relatório.
 
-Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv> | --apply-judged <juiz.csv> [--promote-unverifiable]] <arquivo.kg.yaml>...
+Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv> | --apply-judged <juiz.csv> [--promote-unverifiable] | --locality] <arquivo.kg.yaml>...
 rc:    0 = nada pendente (ou aplicado) · 1 = --check e há mudança pendente · 2 = entrada quebrada
        (arquivo ausente, routing ilegível ou sem as colunas, YAML inválido antes ou DEPOIS da edição — a edição
        nunca grava YAML inválido).
@@ -121,6 +127,131 @@ def routes_for(routing, f):
     return g, {i: v for (gg, i), v in routing.items() if gg == g}
 
 
+# ── provenance.locality (contrato v4.2, 2026-10-09, SAC-97) ───────────────────────────────────────────────
+# Onde a fonte MORA: repo (versionado neste repo), web (endereço público), host (só existe numa máquina) ou
+# pessoa (relato de alguém). Opcional no contrato; serve para medir o que um terceiro reverifica e para barrar
+# `host` quando o grafo vai a público. A regra é DETERMINÍSTICA e erra para o lado de CALAR: sem certeza, não
+# há locality (None), e o nó segue sem a chave — nunca se inventa onde a fonte mora.
+#   · o source é partido em segmentos (" · ", " + ", " ; ", "; ", " e "); cada segmento é julgado pelo 1º token;
+#   · web     — token http(s)://…, ou um domínio (tst.jus.br, github.com/x) que não é caminho do repo;
+#   · host    — caminho absoluto (/…, ~/…) ou journal de workflow (wf_…, "run(s) wf_…": mora no host);
+#   · repo    — caminho cujo 1º componente existe na raiz do repo (sem :linha/#âncora/@ref), ou sha de commit
+#               que o git DESTE repo conhece (`git cat-file -e <sha>^{commit}`, também em git:<sha>, commit <sha>,
+#               <sha>:<caminho>);
+#   · pessoa  — segmento que abre por sessão/sessao, resposta do maestro, mensagem, relato, conversa, maestro;
+#   · segmento que não cai em nenhuma classe → o source inteiro fica SEM locality;
+#   · segmentos de classes diferentes → vale a MENOS reverificável (repo < web < host < pessoa): uma fonte
+#     metade-host não se reverifica de fora, e é a que a porta precisa barrar.
+LOCALITIES = ("repo", "web", "host", "pessoa")
+_LOC_SPLIT = re.compile(r'\s+·\s+|\s+\+\s+|\s*;\s+|\s+e\s+')
+_LOC_PESSOA = re.compile(r'^(sess[ãa]o|resposta d[oa]|mensage[mn]|relato|conversa|maestro)\b', re.I)
+_LOC_SHA = re.compile(r'^(?:git:\s*|commit\s+)?([0-9a-f]{7,40})(?:[\^~]\d*)?(?::\S*)?(?:\s|$)')
+_LOC_DOMAIN = re.compile(r'^(?:[a-z0-9-]+\.)+([a-z]{2,6})(?:/\S*)?$', re.I)
+_FILE_EXT = {"md", "yaml", "yml", "sh", "py", "js", "json", "ts", "tsx", "css", "txt", "html", "astro", "toml", "csv", "tsv"}
+_SHA_CACHE = {}
+
+
+def _is_commit(sha, root):
+    key = (root, sha)
+    if key not in _SHA_CACHE:
+        import subprocess
+        _SHA_CACHE[key] = subprocess.run(["git", "-C", root, "cat-file", "-e", sha + "^{commit}"],
+                                         capture_output=True).returncode == 0
+    return _SHA_CACHE[key]
+
+
+def _segment_locality(seg, root):
+    seg = seg.strip().strip('"\'')
+    if not seg:
+        return None
+    if _LOC_PESSOA.match(seg):
+        return "pessoa"
+    low = seg.lower()
+    if re.match(r'^(?:runs?\s+)?wf_[0-9a-f]', low):
+        return "host"
+    tok = seg.split()[0].rstrip(",;")
+    if re.match(r'^https?://', tok):
+        return "web"
+    if tok.startswith("/") or tok.startswith("~/"):
+        return "host"
+    if root:
+        m = _LOC_SHA.match(seg)
+        if m and _is_commit(m.group(1), root):
+            return "repo"
+        bare = re.split(r'[:#@]', tok)[0].rstrip("/")
+        first = bare.split("/")[0]
+        if first and first not in (".", "..") and os.path.exists(os.path.join(root, first)):
+            return "repo"
+    d = _LOC_DOMAIN.match(tok)
+    if d and d.group(1).lower() not in _FILE_EXT:
+        return "web"
+    return None
+
+
+def locality_of(src, root=None):
+    """locality do source (ver o bloco acima), ou None quando não há certeza. root: a raiz do repo (sem ela,
+    nada é `repo`, porque não há contra o que conferir)."""
+    if not isinstance(src, str) or not src.strip():
+        return None
+    got = [_segment_locality(s, root) for s in _LOC_SPLIT.split(src.strip())]
+    if not got or None in got:
+        return None
+    return max(got, key=LOCALITIES.index)
+
+
+def repo_root_of(path):
+    """A raiz git do arquivo (para julgar `repo`), ou None fora de um repo git."""
+    import subprocess
+    d = os.path.dirname(os.path.abspath(path)) or "."
+    r = subprocess.run(["git", "-C", d, "rev-parse", "--show-toplevel"], capture_output=True, text=True)
+    return r.stdout.strip() if r.returncode == 0 and r.stdout.strip() else None
+
+
+def _loc_line(src, root):
+    loc = locality_of(src, root)
+    return ["      locality: " + q(loc)] if loc else []
+
+
+def add_locality(text, root):
+    """Escreve `locality` nas provenances em bloco que ainda não a têm, quando o source a determina. Edição por
+    linha, só ACRESCENTA uma linha ao fim do bloco provenance. Devolve (texto, {classe: [ids]}, [ids sem certeza],
+    [ids em forma de fluxo])."""
+    lines = text.split("\n")
+    out, by, unsure, flow = [], {k: [] for k in LOCALITIES}, [], []
+    in_nodes, nid, i = False, None, 0
+    while i < len(lines):
+        ln = lines[i]
+        if re.match(r'^nodes:\s*(#.*)?$', ln):
+            in_nodes = True
+        elif re.match(r'^[A-Za-z_]', ln):
+            in_nodes = False
+        m = NODE_RE.match(ln) if in_nodes else None
+        if m:
+            nid = m.group(1)
+        if in_nodes and nid and re.match(r'^    provenance:', ln):
+            if not re.match(r'^    provenance:[ \t]*(#.*)?$', ln):
+                flow.append(nid); out.append(ln); i += 1; continue
+            j = i + 1
+            while j < len(lines) and lines[j].startswith("      "):
+                j += 1
+            body = lines[i:j]
+            try:
+                cur = yaml.safe_load("\n".join(x[4:] for x in body))["provenance"]
+            except Exception:
+                cur = None
+            out.extend(body)
+            if isinstance(cur, dict) and "locality" not in cur:
+                loc = locality_of(cur.get("source"), root)
+                if loc:
+                    out.append("      locality: " + q(loc)); by[loc].append(nid)
+                else:
+                    unsure.append(nid)
+            i = j
+            continue
+        out.append(ln); i += 1
+    return "\n".join(out), by, unsure, flow
+
+
 def scalar(raw):
     """Valor YAML de uma linha (aspas tiradas por YAML, não por regex). Bloco > | não é tratado aqui."""
     raw = raw.strip()
@@ -163,7 +294,7 @@ def trace_locator(src, root):
     return gone, bool(URL_RE.search(src) or paths or loose)
 
 
-def migrate(text, routes=None, graph=None, root=None):
+def migrate(text, routes=None, graph=None, root=None, lroot=None):
     """routes=None: o modo de sempre. routes={id: (final, method_class)}: só provenance, só nos ids A1/A2.
     graph: o caminho do próprio grafo (modo routing), para recusar a fonte circular."""
     lines = text.split("\n")
@@ -241,7 +372,7 @@ def migrate(text, routes=None, graph=None, root=None):
                         "      source: " + q(src),
                         "      locator: " + q(src),
                         "      method: " + q(method),
-                    ]
+                    ] + _loc_line(src, lroot)
                     rep["prov"].append(nid)
             elif routes is not None and src and va:
                 # política 4 selada (D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE): fonte em caminho do host, fora do repo,
@@ -255,7 +386,7 @@ def migrate(text, routes=None, graph=None, root=None):
                     "      source: " + q(src),
                     "      locator: " + q(va),
                     "      method: " + q(f"{cls}: {detail}"),
-                ]
+                ] + _loc_line(src, lroot)
                 rep["prov"].append(nid)
             elif routes is None and src and va:
                 block = block + [
@@ -263,7 +394,7 @@ def migrate(text, routes=None, graph=None, root=None):
                     "      source: " + q(src),
                     "      locator: " + q(va),
                     "      method: " + q(f"derivado: na migração ao contrato v3 ({how}); não reverificado"),
-                ]
+                ] + _loc_line(src, lroot)
                 rep["prov"].append(nid)
             else:
                 rep["nosource"].append(nid)
@@ -313,9 +444,14 @@ def _set_field(block, key, old, new):
     return block, False, None
 
 
-def _put_provenance(block, src, loc, method):
-    """Escreve o bloco provenance (ou substitui o existente, no mesmo lugar). (bloco, mudou?)."""
-    new = ["    provenance:", "      source: " + q(src), "      locator: " + q(loc), "      method: " + q(method)]
+def _put_provenance(block, src, loc, method, lroot=None):
+    """Escreve o bloco provenance (ou substitui o existente, no mesmo lugar), com a locality quando o source a
+    determina (contrato v4.2). (bloco, mudou?)."""
+    new = ["    provenance:", "      source: " + q(src), "      locator: " + q(loc), "      method: " + q(method)] \
+        + _loc_line(src, lroot)
+    want = {"source": src, "locator": loc, "method": method}
+    if locality_of(src, lroot):
+        want["locality"] = locality_of(src, lroot)
     for n, b in enumerate(block[1:], 1):
         if re.match(r'^    provenance:[ \t]*(#.*)?$', b):
             e = n + 1
@@ -327,7 +463,7 @@ def _put_provenance(block, src, loc, method):
                 cur = yaml.safe_load("\n".join(x[4:] for x in block[n:e]))["provenance"]
             except Exception:
                 cur = None
-            if cur == {"source": src, "locator": loc, "method": method}:
+            if cur == want:
                 return block, False
             return block[:n] + new + block[e:], True
         if re.match(r'^    provenance:', b):  # forma em fluxo ({...}): não reescrevo o que não sei editar por linha
@@ -358,7 +494,7 @@ def _append_narrative(block, text):
     return block[:at] + ["    narrative: " + q(text)] + block[at:], True
 
 
-def apply_judged(text, judged, promote=False, wave=""):
+def apply_judged(text, judged, promote=False, wave="", lroot=None):
     """judged={id: linha da planilha}: aplica só APROVADO/CORRIGIDO, por linha. Devolve (texto, relatório).
     promote=True é o selo do maestro que leva `unverifiable` a `confirmed` quando o juiz deu fonte (onda 3 da O3).
     A linha recusada é atômica: nada dela é aplicado (nem a provenance de um corrigir-label com label longo)."""
@@ -437,7 +573,7 @@ def apply_judged(text, judged, promote=False, wave=""):
                     else:
                         rep["unpromoted"].append(nid)
                 if refused is None:
-                    block, c = _put_provenance(block, src, loc, method)
+                    block, c = _put_provenance(block, src, loc, method, lroot)
                     if c is None:
                         refused = "provenance em forma de fluxo"
                     elif c:
@@ -457,7 +593,7 @@ def apply_judged(text, judged, promote=False, wave=""):
             elif cur != "DEV":
                 refused = f"dev-óbvio sobre plane {cur}"
             if refused is None and status == "confirmed" and "provenance" not in fields and has_src and good_method:
-                block, c2 = _put_provenance(block, src, loc, method)
+                block, c2 = _put_provenance(block, src, loc, method, lroot)
                 if c2:
                     rep["prov"].append(nid)
         else:
@@ -498,9 +634,51 @@ def refuted_dependents(text, ids):
     return out
 
 
+def main_locality(files, check):
+    """O laço do --locality: acrescenta `locality` (contrato v4.2) onde o source a determina. Prova, por grafo,
+    que o YAML lido depois é IGUAL ao de antes com a chave acrescentada — e nada mais (senão rc 2, nada gravado)."""
+    if not files:
+        print(__doc__.strip().split("\n\n")[-1], file=sys.stderr); return 2
+    pending, tot, unsure_tot = False, {k: 0 for k in LOCALITIES}, 0
+    for f in files:
+        try:
+            text = open(f, encoding="utf-8").read()
+            before = yaml.safe_load(text)
+        except FileNotFoundError:
+            print(f"kg-migrate-v3: {f} não existe", file=sys.stderr); return 2
+        except yaml.YAMLError as e:
+            print(f"kg-migrate-v3: {f} não é YAML válido ({e.__class__.__name__}) — não toco", file=sys.stderr); return 2
+        new, by, unsure, flow = add_locality(text, repo_root_of(f))
+        try:
+            after = yaml.safe_load(new)
+        except yaml.YAMLError as e:
+            print(f"kg-migrate-v3: a locality em {f} daria YAML inválido ({e.__class__.__name__}) — nada gravado", file=sys.stderr); return 2
+        written = {i for v in by.values() for i in v}
+        for n in (after or {}).get("nodes") or []:
+            if isinstance(n, dict) and n.get("id") in written and isinstance(n.get("provenance"), dict):
+                n["provenance"].pop("locality", None)
+        if after != before:
+            print(f"kg-migrate-v3: a locality em {f} mudaria mais que a chave nova — nada gravado", file=sys.stderr); return 2
+        changed = new != text
+        for k in LOCALITIES:
+            tot[k] += len(by[k])
+        unsure_tot += len(unsure)
+        verb = ("PENDENTE" if check else "aplicado") if changed else "nada a escrever"
+        print(f"{f}: {verb} · " + " · ".join(f"{k} {len(by[k])}" for k in LOCALITIES)
+              + f" · sem certeza (intocado) {len(unsure)}" + (f" · forma de fluxo (intocado) {len(flow)}" if flow else ""))
+        if changed:
+            pending = True
+            if not check:
+                open(f, "w", encoding="utf-8").write(new)
+    print("TOTAL · " + " · ".join(f"{k} {tot[k]}" for k in LOCALITIES) + f" · sem certeza {unsure_tot}")
+    return 1 if (check and pending) else 0
+
+
 def main(argv):
     check = "--check" in argv
     argv = [a for a in argv if a != "--check"]
+    if "--locality" in argv:
+        return main_locality([a for a in argv if a != "--locality"], check)
     routing = judged = None
     if "--apply-judged" in argv:
         k = argv.index("--apply-judged")
@@ -545,7 +723,7 @@ def main(argv):
         if gpath is not None:
             norm = os.path.abspath(f).replace("\\", "/")
             root = norm[:-len(gpath)] or "/"
-        new, rep = migrate(text, routes, gpath, root)
+        new, rep = migrate(text, routes, gpath, root, repo_root_of(f))
         try:
             yaml.safe_load(new)
         except yaml.YAMLError as e:
@@ -591,7 +769,7 @@ def main_judged(files, judged, check, promote=False, wave=""):
         except yaml.YAMLError as e:
             print(f"kg-migrate-v3: {f} não é YAML válido antes da migração ({e.__class__.__name__}) — não toco", file=sys.stderr); return 2
         _, rows = routes_for(judged, f)
-        new, rep = apply_judged(text, rows, promote, wave)
+        new, rep = apply_judged(text, rows, promote, wave, repo_root_of(f))
         deps = refuted_dependents(new, set(rep["refute"]))
         try:
             yaml.safe_load(new)

@@ -236,6 +236,7 @@ nodes:
       source: "https://raw.githubusercontent.com/anthropics/claude-code/main/CHANGELOG.md"
       locator: "seções ## {delta[0]} a ## {delta[-1]} (cópias em {rel}/)"
       method: "medição: extração determinística pelo cc-delta-census.sh"
+      locality: "web"
   - id: Q_O_QUE_O_DELTA_TOCA_NO_ONION
     node_type: question
     layer: audit
