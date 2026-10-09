@@ -203,6 +203,22 @@ if isinstance(doc, dict):
     n_sources = sum(1 for m in members if isinstance(m, dict) and m.get("kind") == "source")
     if n_sources != 1:
         err(f"registro: esperado EXATAMENTE 1 membro fonte (kind:source), encontrado {n_sources} (fonte≠derivação: uma só fonte)")
+
+    # LINHAGEM HISTÓRICA (2026-10-09, selo do maestro sobre Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO):
+    # `superseded_by: <id>` tira o membro do escopo do ops/registry-pins.sh. Por isso o campo é
+    # cobrado aqui: um id que não existe (ou que aponta para si, ou para outro histórico) esconderia
+    # uma divergência VIVA atrás de uma linhagem inventada.
+    by_id = {m.get("id"): m for m in members if isinstance(m, dict)}
+    for m in members:
+        if not isinstance(m, dict) or m.get("superseded_by") in (None, ""):
+            continue
+        sup, mid = m.get("superseded_by"), m.get("id")
+        if sup == mid:
+            err(f"membro '{mid}': 'superseded_by' aponta para o próprio membro")
+        elif sup not in by_id:
+            err(f"membro '{mid}': 'superseded_by' aponta para '{sup}', que não está no registro")
+        elif by_id[sup].get("superseded_by"):
+            err(f"membro '{mid}': 'superseded_by' aponta para '{sup}', que também é linhagem histórica (cadeia não permitida)")
 elif doc is not None:
     err("documento raiz não é um mapa (esperado: chaves version/trust_policy_version/members)")
 
