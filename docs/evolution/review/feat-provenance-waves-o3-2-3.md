@@ -3,9 +3,10 @@ title: "Revisão — ondas 2 e 3 da O3 da migração de provenance (SAC-73): 615
 date: 2026-10-09
 branch: feat/provenance-waves-o3-2-3
 reviewer: "passada adversarial com o mandato de achar linha REPROVADA aplicada, label acima de 280, label antigo apagado, refutado contraditório, nó fora da planilha alterado ou flip fora do selo. Fiz a conferência mecânica das 618 linhas contra os 91 arquivos finais, uma amostra de 15 aplicados (semente 20261009) com o nó aberto, a idempotência e a bancada kg_migrate_v3 12/12 com LC_ALL=C, com 6 mutantes no caso (k)"
-reviewed_diff_sha256: pendente
-findings_total: 4
-findings_real: 2
+reviewed_diff_sha256: d7549d1795398dbe1f0d714f74a3fc926bede9ebd414a3b23418f8487eb8b2a2
+reviewed_code_sha256: 9d58d484dc08c7d7a61b976e248efc66290b4c1b60c5ad34d475de77807df00d
+findings_total: 6
+findings_real: 4
 verdict: CORRIGIDO
 tokens: 0
 duration_min: 120
@@ -44,6 +45,21 @@ conjuntos de grafos não se sobrepõem. A aplicação segue os selos do maestro 
    A queima segue o insumo `testimony-in-prod` do v4.1. Os 7 grafos que saíram da conta são aqueles em
    que o dev-óbvio levou o testemunho para DEV. A base foi travada com `--accept-regression`, e esse
    motivo ficou gravado nela.
+5. **REAL, curado: a fonte do juiz vazava nome de membro privado.** O `pr-finalize --check` acusou a
+   REGRA 30 (Segurança de PROJEÇÃO: nome comercial de membro privado não sai) em
+   `colaboracao-onion-2026-07.kg.yaml`. O `source_final` de `C_ASYNC_REPO` citava o caminho da pasta da
+   vertical privada do adotante. **Cura:** o source agora nomeia o arquivo e o commit
+   (`gustavo-pulga@2e5e0a4`), mas omite a pasta, e diz que a omissão é da REGRA 30. É a única divergência
+   deliberada entre a planilha e o arquivo final. A planilha `o3-wave3-juiz.csv` (l.308) e a proposta
+   ainda trazem o termo, e o lint não as varre. Fica para o maestro decidir antes de mandar a planilha
+   ao onion-kg-ssot.
+6. **REAL, curado: os resumos dos proponentes e uma lente nasceram fora do grafo.** O `--check` acusou
+   mais 3 HARD:
+   - `o3-wave2-resumo.md` e `o3-wave3-resumo.md` sem nó, pela REGRA 29 (Gate de PROVENIÊNCIA INVERTIDO,
+     com catraca). Os dois entraram no `trace` de `E_ONDAS_O3_2_3_APLICADAS`, ao lado dos resumos dos
+     juízes;
+   - a lente `federation-research-2026-06-reconciled-radar.md` defasada, pela REGRA 31 (Lente do grafo:
+     DERIVADA e em paridade com o motor). Foi regenerada pelo `kg-view.sh`.
 
 ## Amostra (15 aplicados, semente 20261009, conferidos no arquivo final)
 
@@ -101,7 +117,7 @@ Nenhum nó `confirmed` se apoia nele. O radar não acusa contradição, e as are
 história.
 
 **Conferência e idempotência:**
-- A conferência mecânica da planilha contra os arquivos finais deu **0 divergências** e **0 nós fora da
+- A conferência mecânica da planilha contra os arquivos finais deu **0 divergências** (antes da cura da REGRA 30 no achado 5, que é a única divergência deliberada) e **0 nós fora da
   planilha alterados**. O meta e as arestas dos 91 grafos ficaram intactos.
 - A 2ª aplicação com `--check` deu rc 0 nas duas planilhas.
 
