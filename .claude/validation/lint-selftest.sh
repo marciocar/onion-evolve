@@ -21181,7 +21181,7 @@ STUB
     record_pass "registry-pins: (e) leitura de clone acusa a divergência, mas o --seal só carimba o remoto"
   else record_fail "registry-pins: (e) carimbou leitura de clone" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
 
-  # (f) carimbo de OUTRA adoção no mesmo remoto (o caso granaai × brain-granaai da passada real):
+  # (f) carimbo de OUTRA adoção no mesmo remoto (dois membros no mesmo remoto, medido na passada real):
   #     registro `standalone`, carimbo `role: hub` ⇒ acusa papel e o --seal NÃO carimba.
   #     MUTANTE: tirar o `case` de papel reprova este caso.
   rm -rf "${clone}"; rm -f "${stamps}"/*; _rp_stamp vizinho "${PIN_OLD}"

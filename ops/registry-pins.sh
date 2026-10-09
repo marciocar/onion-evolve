@@ -10,8 +10,8 @@
 #
 # ══ POR QUE EXISTE (F1.5 das portas, SAC-90, 2026-10-09) ══════════════════════════════════════
 # O `onion_version` de um `kind: adopter` no `members.yaml` era mantido À MÃO, e à mão apodrece —
-# medido no mesmo dia em dois membros: o brain-granaai estava registrado em 663fdbc5 com o carimbo
-# vivo em 1c459812, e o onion-kg-ssot em fe8359e3 depois de um update que o levou a 0d293c07.
+# medido no mesmo dia em dois membros: um hub estava registrado em 663fdbc5 com o carimbo
+# vivo em 1c459812, e outro adotante em fe8359e3 depois de um update que o levou a 0d293c07.
 # A porta já tinha o `ops/door-seal-pin.sh`; o adotante não tinha equivalente. Este é o molde dele,
 # com as diferenças que o objeto pede:
 #   · porta é ESPELHO do core e se confere pelo clone + push; adotante é REPO DE OUTRA SESSÃO, e o que
@@ -111,7 +111,7 @@ while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch regrole; do
 
   # ── a branch de integração ──────────────────────────────────────────────────────────────
   # ⚠️ A 1ª versão consultava o carimbo da ÁRVORE do clone antes do remoto, e a passada real a
-  #    derrubou no primeiro membro: o clone do metagamify estava parado numa branch de trabalho cujo
+  #    derrubou no primeiro membro: o clone de um adotante estava parado numa branch de trabalho cujo
   #    carimbo dizia `integration_branch: chore/onion-framework`, e o pin lido lá era ANTERIOR ao do
   #    registro — o --seal teria rebaixado o registro. O carimbo versionado na branch DEFAULT do
   #    remoto diz `develop`. Árvore de clone é onde a outra sessão está, não onde ela integra.
@@ -161,9 +161,9 @@ while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch regrole; do
   fi
   live12="${live:0:12}"
   # PAPEL do carimbo lido × tier do registro, pelo MESMO mapa da REGRA 92 (hub→hub;
-  # standalone|consumer→adopted). Achado da passada adversarial da F1.5: granaai e brain-granaai
+  # standalone|consumer→adopted). Achado da passada adversarial da F1.5: dois membros
   # apontam o MESMO remoto, e o carimbo da develop (role hub, adopted_at 2026-10-01) é a adoção do
-  # brain — a 1ª versão carimbou esse pin no granaai (standalone). Carimbo de outra adoção não é pin
+  # outro membro (um hub) — a 1ª versão carimbou esse pin no membro standalone. Carimbo de outra adoção não é pin
   # deste membro: acusa e não carimba, nem quando o pin bate.
   stamp_role="$(printf '%s\n' "${_st}" | awk '/^role:/{sub(/^role:[[:space:]]*/,""); sub(/[[:space:]]*#.*$/,""); gsub(/[[:space:]"\047]/,""); print; exit}')"
   if [ -n "${stamp_role}" ] && [ -n "${regrole}" ]; then
@@ -188,7 +188,7 @@ while IFS=$'\x1f' read -r mid kind remote lpath regpin ibranch regrole; do
   if ! git -C "${CORE}" cat-file -e "${live}^{commit}" 2>/dev/null; then verdict="DIVERGE (pin vivo NÃO é commit deste core)"
   elif ! git -C "${CORE}" merge-base --is-ancestor "${live}" "${CORE_TIP}" 2>/dev/null; then verdict="DIVERGE (pin vivo fora de ${CORE_TIP})"
   # Pin vivo ANTERIOR ao do registro: o adotante não volta no tempo por update; o sinal mais provável é
-  # branch errada (o caso do metagamify na 1ª passada). Acusa e não carimba — rebaixar o registro
+  # branch errada (o caso medido na 1ª passada). Acusa e não carimba — rebaixar o registro
   # pela leitura de uma branch parada é a mentira na direção oposta.
   elif git -C "${CORE}" cat-file -e "${regpin}^{commit}" 2>/dev/null \
        && git -C "${CORE}" merge-base --is-ancestor "${live}" "${regpin}" 2>/dev/null; then verdict="DIVERGE (vivo ATRÁS do registro — branch de integração errada?)"
