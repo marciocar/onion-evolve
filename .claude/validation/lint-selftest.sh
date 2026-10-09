@@ -16541,6 +16541,8 @@ run_role_cut_selftests() {
   mkdir -p "${rf}/.claude/utils/adopt" "${rf}/.claude/utils/marketplace" "${rf}/.claude/commands/meta" \
            "${rf}/${_P}" "${rf}/.claude/rules" "${rf}/.claude/validation" "${rf}/.claude/workflows" "${rf}/docs/meta-specs"
   cp "${vm}" "${rf}/.claude/utils/adopt/vendor-manifest.sh"
+  # a PLANTA cita a peça como dado — medido no 1º commit da cura: o comentário dela mantinha vivas 3 peças
+  printf '# exemplo documentado: `.claude/workflows/cortado.js`\n' >> "${rf}/.claude/utils/adopt/vendor-manifest.sh"
   printf '#!/usr/bin/env bash\necho mantido\n' > "${rf}/.claude/utils/marketplace/resolve-role-bundle.sh"
   printf 'leia `%s/mantido-doctrine.md` e `.claude/validation/shared-census.sh`; lente `.claude/rules/viva-aponta.md`\n' "${_P}" \
     > "${rf}/.claude/commands/meta/mantido.md"
