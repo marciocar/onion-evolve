@@ -54,7 +54,7 @@ DOT_PROBES = ('.env', '.env.local', '.env.production')
 NONDOT_PROBES = ('app.env', 'prod.env')
 # ── GLOB: julgado pela regra do BASH e pelo DISCO, não pela forma (SAC-68, 2026-10-08) ──────────────
 # Medido numa leva: 6 vetos em comando que não lia .env nenhum — `*)` de um `case`, `ops/testing/*`,
-# `for d in */`, `/home/marcio/*/` e um corpo de heredoc com `**`. A causa era testar o glob contra
+# `for d in */`, `/home/<usuario>/*/` e um corpo de heredoc com `**`. A causa era testar o glob contra
 # `.env` com fnmatch, que casa `*` com nome oculto; o bash (dotglob desligado, o default) NÃO casa.
 # Três regras, nesta ordem: (1) glob que termina em `/` só expande para DIRETÓRIO — nunca é um .env;
 # (2) glob cuja última parte começa com `.` alcança um .env oculto — fecha como antes; (3) glob sem

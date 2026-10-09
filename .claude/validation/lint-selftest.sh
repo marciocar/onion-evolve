@@ -6156,11 +6156,13 @@ HDPY
     else record_fail "env-exposure: (k) heredoc julgado pelo consumidor" "casos divergentes (índice:esperado>veio): ${hd_out}"; fi
   fi
   # (l) GLOB pela regra do bash e pelo DISCO (SAC-68, 2026-10-08). Medido numa leva: 6 vetos em comando que
-  #     não lia .env nenhum — `*)` de um `case`, `ops/testing/*`, `for d in */`, `/home/marcio/*/` e `**`
+  #     não lia .env nenhum — `*)` de um `case`, `ops/testing/*`, `for d in */`, `/home/<usuario>/*/` e `**`
   #     num corpo de heredoc — porque o glob era testado com fnmatch, que casa `*` com nome OCULTO e o bash
   #     não. As duas polaridades com pastas reais (o cwd vai no JSON, como o hook recebe): as formas medidas
   #     passam; os escapes que a cura poderia abrir seguem barrados (pasta com prod.env, cd literal para ela,
   #     cd com variável, subshell com cd, .env citado na mesma linha, glob com ponto).
+  #     O caso do glob absoluto usa `/home/usuario/*/` — literal NEUTRO e sem `<>` (que seria
+  #     redirecionamento e mudaria o que o hook julga). O caminho pessoal viajava para as três portas.
   if [ -f "${guard}" ]; then
     local gl_out
     gl_out="$(python3 - "${guard}" <<'GLPY'
@@ -6177,7 +6179,7 @@ def t(cmd, cwd):
 C = [(0, 'for i in $(seq 1 3); do s=$(gh pr checks 1 --json state); case "$s" in *PENDING*|"") sleep 1;; *) break;; esac; done', sem),
      (0, "grep -n family ops/testing/*", sem),
      (0, 'for d in */; do ( cd "$d" && bash x/env-check.sh --test linear ); done', sem),
-     (0, 'for d in /home/marcio/*/; do [ -f "${d}' + E + '" ] && echo "$d"; done', sem),
+     (0, 'for d in /home/usuario/*/; do [ -f "${d}' + E + '" ] && echo "$d"; done', sem),
      (0, "if x; then gh pr create --body-file /dev/stdin <<'B' && y $(z); fi\n- **CI:** vendor/kg/** e base:**\nB", sem),
      (0, 'cat *', sem),
      (0, 'for d in */; do test -f "$d/' + E + '" && echo "$d"; done', com),   # .env citado: só a regra do diretório salva
@@ -16526,6 +16528,68 @@ run_role_cut_selftests() {
   if [ "${_rc_v}" -ne 0 ]; then
     record_pass "role-cut: (e2) repo SEM superfície Onion → manifesto vazio FALHA ALTO (rc=${_rc_v}); pathspec ausente copiaria o repo inteiro"
   else record_fail "role-cut: (e2)" "manifesto vazio saiu 0 — o consumidor copiaria o repositório INTEIRO (pathspec ausente = todos), biografia e segredos junto"; fi
+
+  # (m) O COMPANHEIRO DO COMANDO CORTADO NÃO VIAJA; O DO COMANDO MANTIDO, SIM (2026-10-09). Medido na
+  #     materialização do onion-standalone: o corte tirava `/meta:evolve`, `/meta:forge-guard`… e
+  #     deixava viajar doutrina, lente, censo e workflow que SÓ eles usam — duas lentes com ponteiro
+  #     morto para o comando ausente. O repo sintético exercita cada aresta do algoritmo por REFERÊNCIA:
+  #     ciclo doutrina↔lente (só o fecho transitivo os corta), censo citado SÓ pela bancada (bancada não
+  #     é âncora), doutrina citada em PROSA sem extensão por uma guarda mantida (prosa não é âncora),
+  #     censo COMPARTILHADO com o comando mantido (fica) e lente VIVA que cita o comando cortado (sai
+  #     mesmo assim, e avisa). E o hub não perde nada.
+  local rf="${d}/repo-comp" _P=.claude/commands/common/prompts
+  mkdir -p "${rf}/.claude/utils/adopt" "${rf}/.claude/utils/marketplace" "${rf}/.claude/commands/meta" \
+           "${rf}/${_P}" "${rf}/.claude/rules" "${rf}/.claude/validation" "${rf}/.claude/workflows" "${rf}/docs/meta-specs"
+  cp "${vm}" "${rf}/.claude/utils/adopt/vendor-manifest.sh"
+  printf '#!/usr/bin/env bash\necho mantido\n' > "${rf}/.claude/utils/marketplace/resolve-role-bundle.sh"
+  printf 'leia `%s/mantido-doctrine.md` e `.claude/validation/shared-census.sh`; lente `.claude/rules/viva-aponta.md`\n' "${_P}" \
+    > "${rf}/.claude/commands/meta/mantido.md"
+  printf 'leia `%s/cortado-doctrine.md`, `.claude/rules/cortado-lens.md`, `.claude/validation/cortado-census.sh`, `.claude/validation/shared-census.sh` e `.claude/workflows/cortado.js`\n' "${_P}" \
+    > "${rf}/.claude/commands/meta/cortado.md"
+  printf 'doutrina do mantido\n' > "${rf}/${_P}/mantido-doctrine.md"
+  printf 'a lente é `.claude/rules/cortado-lens.md`\n' > "${rf}/${_P}/cortado-doctrine.md"
+  printf -- '---\npaths:\n  - .claude/commands/meta/cortado.md\n---\nleia `%s/cortado-doctrine.md`\n' "${_P}" > "${rf}/.claude/rules/cortado-lens.md"
+  printf 'rode /meta:cortado\n' > "${rf}/.claude/rules/viva-aponta.md"
+  printf '#!/usr/bin/env bash\n:\n' > "${rf}/.claude/validation/cortado-census.sh"
+  printf '#!/usr/bin/env bash\n:\n' > "${rf}/.claude/validation/shared-census.sh"
+  printf '// workflow\n' > "${rf}/.claude/workflows/cortado.js"
+  printf '#!/usr/bin/env bash\n# exercita cortado-census.sh\n' > "${rf}/.claude/validation/lint-selftest.sh"
+  printf '#!/usr/bin/env bash\n# cláusula 1 da cortado-doctrine (prosa, sem extensão)\n' > "${rf}/.claude/validation/x-check.sh"
+  printf 'y\n' > "${rf}/docs/meta-specs/y.md"
+  git -C "${rf}" init -q >/dev/null 2>&1
+  git -C "${rf}" add -A >/dev/null 2>&1
+  git -C "${rf}" -c user.email=t@t -c user.name=t commit -qm base >/dev/null 2>&1
+  _m_check() {  # $1=manifesto → vazio se correto; senão a lista do que divergiu
+    local _m="$1" _x _bad=""
+    for _x in .claude/commands/meta/cortado.md "${_P}/cortado-doctrine.md" .claude/rules/cortado-lens.md \
+              .claude/validation/cortado-census.sh .claude/workflows/cortado.js .claude/rules/viva-aponta.md; do
+      grep -qxF ":(exclude)${_x}" <<< "${_m}" || _bad="${_bad} viajou:${_x}"
+    done
+    for _x in .claude/commands/meta/mantido.md "${_P}/mantido-doctrine.md" .claude/validation/shared-census.sh; do
+      grep -qxF ":(exclude)${_x}" <<< "${_m}" && _bad="${_bad} cortado:${_x}"
+    done
+    printf '%s' "${_bad}"
+  }
+  local _fs _fe _fh _fbad
+  _fs="$(bash "${vm}" --role standalone --repo "${rf}" 2>"${d}/m.err")"
+  _fbad="$(_m_check "${_fs}")"
+  if [ -n "${_fs}" ] && [ -z "${_fbad}" ] && grep -q "viva-aponta.md.*mantido.md" "${d}/m.err"; then
+    record_pass "role-cut: (m) companheiros do comando cortado (doutrina↔lente em ciclo, censo só-da-bancada, workflow, lente viva com ponteiro) NÃO viajam; os do mantido e o censo compartilhado viajam; o ponteiro morto é AVISADO"
+  else record_fail "role-cut: (m)" "${_fbad:- divergência só no aviso: $(tr '\n' ' ' < "${d}/m.err")}"; fi
+  _fh="$(bash "${vm}" --role hub --repo "${rf}" 2>/dev/null)"
+  if ! grep -qE '^:\(exclude\)\.claude/(commands|rules|validation|workflows)/' <<< "${_fh}"; then
+    record_pass "role-cut: (m-hub) o hub não perde companheiro nenhum (não corta comando, logo não deriva corte)"
+  else record_fail "role-cut: (m-hub)" "o hub cortou: $(grep '^:(exclude)' <<< "${_fh}" | tr '\n' ' ')"; fi
+  # (m-MUT) sem a derivação, o caso (m) tem de reprovar — prova que ele mede a cura, não o corte antigo.
+  local mut3="${d}/vm-sem-companheiro.sh"
+  sed 's|^_emit_companion_excludes() {.*|_emit_companion_excludes() { cat >/dev/null; return 0; }\n_desligado() {|' "${vm}" > "${mut3}"
+  if ! cmp -s "${vm}" "${mut3}"; then
+    _fe="$(bash "${mut3}" --role standalone --repo "${rf}" 2>/dev/null)"
+    if [ -n "$(_m_check "${_fe}")" ]; then
+      record_pass "role-cut: (m-MUT) sem a derivação por referência os companheiros voltam a viajar — (m) é load-bearing"
+    else record_fail "role-cut: (m-MUT)" "o mutante ainda corta os companheiros — (m) não prova que o corte vem da derivação"; fi
+  else record_fail "role-cut: (m-MUT) setup" "a mutação não foi aplicada"; fi
+  unset -f _m_check
 
   # (k) A SSOT DO ESCOPO NÃO PODE DEFASAR EM SILÊNCIO — o critério é medido, não opinado:
   #     **comando que as mensagens das guardas mandam o ALVO rodar tem de viajar para o alvo.**

@@ -191,6 +191,140 @@ _emit_command_excludes() {  # $1=REPO $2=papel → :(exclude) dos comandos de me
   done < <(git -C "${_repo}" -c core.quotePath=false ls-tree -r -z --name-only HEAD -- .claude/commands/meta)
 }
 
+# ── OS COMPANHEIROS DO COMANDO CORTADO SAEM COM ELE — derivados por REFERÊNCIA, não por nome ────
+# ⚠️ O DEFEITO, MEDIDO E DATADO (2026-10-09): materializando o `onion-standalone` de `origin/main`
+# (98cc49e2), o corte acima tirou `/meta:evolve`, `/meta:forge-guard`, `/meta:dissect`,
+# `/meta:cc-update` e `/meta:forge` — e deixou viajar 14 arquivos que SÓ eles usam: a doutrina
+# (`common/prompts/<x>-doctrine.md`), a lente (`rules/<x>-lens.md`), o censo (`validation/<x>-census.sh`)
+# e o workflow (`workflows/evolve.js`). Dois nasciam com PONTEIRO MORTO na porta pública:
+# `evolve-lens.md` cita `commands/meta/evolve.md` e `guard-lens.md` cita `commands/meta/forge-guard.md`.
+# É a LIÇÃO DE FORMA do bloco acima repetida ao pé da letra: as peças do comando-com-framework
+# nasceram DEPOIS do corte (forja de 2026-09-29 em diante), em diretórios que o corte não olha.
+#
+# POR QUE REFERÊNCIA, E NÃO CONVENÇÃO DE NOME: a convenção `<cmd>-doctrine/-lens/-census` já tem dois
+# desvios medidos — `forge-guard` → `guard-*` e `cc-update` → `cc-delta-census.sh` — e o próximo
+# comando inventa o terceiro. O grafo de citação é o que o `forge-census.sh` já usa para descobrir
+# as peças ("descoberta por citação — o artefato nomeia as suas"), e é imune a nome.
+#
+# O ALGORITMO, e cada passo tem razão nomeada:
+#   ZONA      = só as quatro formas de PEÇA da forja: `common/prompts/*-doctrine.md`, `rules/*.md`,
+#               `validation/*-census.sh`, `workflows/*.js`. Fora dela nada é derivado: um script de
+#               lint citado só por um comando cortado pode ser chamado por glob, e cortá-lo por
+#               inferência é trocar ponteiro morto por guarda morta.
+#   ÂNCORA    = todo arquivo que VIAJA e não é peça da zona — comando mantido, skill, agente, hook, KB.
+#               A BANCADA não é âncora (`lint-selftest.sh` e `fixtures/`): ela TESTA a maquinaria, não
+#               a consome; se contasse, todo censo ficaria vivo porque a bancada o exercita.
+#   VIVA      = peça citada por uma âncora, ou por outra peça viva (fecho transitivo — a doutrina
+#               cita a lente que cita o censo, e o ciclo doutrina↔lente não se salva sozinho).
+#   CORTADA   = peça NÃO viva que é citada por um arquivo cortado (comando, prefixo de papel) ou por
+#               outra peça cortada. Peça órfã de todos os lados não é assunto deste corte — fica.
+#   LENTE FORÇADA = lente (`rules/*.md`) que cita comando cortado sai MESMO viva: a lente carrega por
+#               `paths:` e manda ler um comando que a porta não tem. Se alguma âncora a cita, o
+#               ponteiro morto passa para ela — e isso é DITO em stderr, nunca calado.
+# Citação = o NOME DO ARQUIVO com extensão, delimitado (`evolve.js` não casa `onion-evolve.js`). Nome
+# sem extensão é prosa ("cláusula 1 da guard-doctrine") e não conta — medido: três guardas mantidas
+# citam `guard-doctrine` assim, e contá-las manteria viva a doutrina de um comando ausente.
+_emit_companion_excludes() {  # $1=REPO $2=papel, stdin = caminhos já cortados → :(exclude) das peças órfãs
+  local _repo="$1" _role="$2" _f _z _r _b _re _changed
+  [ -n "$(_role_cut "${_role}")" ] || { cat >/dev/null; return 0; }
+  local -A _cut=() _zone=() _alive=() _gone=() _forced=()
+  while IFS= read -r _f; do [ -n "${_f}" ] && _cut["${_f}"]=1; done
+  [ "${#_cut[@]}" -gt 0 ] || return 0
+  while IFS= read -r -d '' _f; do
+    [ -n "${_f}" ] || continue
+    [ -n "${_cut[${_f}]:-}" ] && continue
+    case "${_f}" in
+      .claude/commands/common/prompts/*-doctrine.md|.claude/rules/*.md|.claude/validation/*-census.sh|.claude/workflows/*.js)
+        _zone["${_f}"]=1 ;;
+    esac
+  done < <(git -C "${_repo}" -c core.quotePath=false ls-tree -r -z --name-only HEAD -- "${_base[@]}")
+  [ "${#_zone[@]}" -gt 0 ] || return 0
+
+  # Quem cita cada peça (em HEAD, a mesma árvore do transporte). UM `git grep -o` para a zona inteira:
+  # a 1a redação fazia um por peça (e um por lente×comando) e levava o manifesto de 1,8s a 8,5s,
+  # medido — custo pago em todo `adopt`, todo `vendor-branch` e toda faixa da bancada que o chama.
+  # O casamento é por TOKEN inteiro: o grep devolve o token maximal em volta do nome, e só o token
+  # IGUAL ao nome conta (`onion-evolve.js` e `evolve.json` não são `evolve.js`). A forma por
+  # delimitador consumia o separador e perdia a 2a citação colada ("a.sh b.sh").
+  local -A _refs=() _byname=()
+  local _alt="" _line _path _tok
+  for _z in "${!_zone[@]}"; do
+    _b="$(basename "${_z}")"
+    _byname["${_b}"]="${_byname[${_b}]:-}${_z}"$'\n'
+  done
+  for _b in "${!_byname[@]}"; do _alt="${_alt:+${_alt}|}${_b//./\\.}"; done
+  while IFS= read -r _line; do
+    _line="${_line#HEAD:}"; _path="${_line%:*}"; _tok="${_line##*:}"
+    [ -n "${_byname[${_tok}]:-}" ] || continue
+    while IFS= read -r _z; do
+      [ -n "${_z}" ] && [ "${_z}" != "${_path}" ] || continue
+      case $'\n'"${_refs[${_z}]:-}" in *$'\n'"${_path}"$'\n'*) continue ;; esac
+      _refs["${_z}"]="${_refs[${_z}]:-}${_path}"$'\n'
+    done <<< "${_byname[${_tok}]}"
+  done < <(git -C "${_repo}" -c core.quotePath=false grep -o -E "[A-Za-z0-9_-]*(${_alt})[A-Za-z0-9_-]*" HEAD -- "${_base[@]}" 2>/dev/null || true)
+
+  # Lente forçada: cita, por caminho ou por nome de comando, um comando que o papel não recebe.
+  local -A _cmds=()
+  for _f in "${!_cut[@]}"; do
+    case "${_f}" in .claude/commands/meta/*.md) _cmds["$(basename "${_f}" .md)"]=1 ;; esac
+  done
+  local _lenses=()
+  for _z in "${!_zone[@]}"; do case "${_z}" in .claude/rules/*.md) _lenses+=("${_z}") ;; esac; done
+  if [ "${#_lenses[@]}" -gt 0 ] && [ "${#_cmds[@]}" -gt 0 ]; then
+    while IFS= read -r _line; do
+      _line="${_line#HEAD:}"; _path="${_line%%:*}"; _tok="${_line#*:}"
+      _tok="${_tok#commands/meta/}"; _tok="${_tok%.md}"; _tok="${_tok#/meta:}"
+      [ -n "${_cmds[${_tok}]:-}" ] && _forced["${_path}"]=1
+    done < <(git -C "${_repo}" -c core.quotePath=false grep -o -E "commands/meta/[a-z0-9-]+\.md|/meta:[a-z0-9-]+" HEAD -- "${_lenses[@]}" 2>/dev/null || true)
+  fi
+
+  # VIVA: fecho transitivo a partir das âncoras. A lente forçada nunca é viva (nem empresta vida).
+  _changed=1
+  while [ "${_changed}" -eq 1 ]; do
+    _changed=0
+    for _z in "${!_zone[@]}"; do
+      [ -n "${_alive[${_z}]:-}" ] || [ -n "${_forced[${_z}]:-}" ] && continue
+      while IFS= read -r _r; do
+        [ -n "${_r}" ] || continue
+        [ -n "${_cut[${_r}]:-}" ] && continue
+        [ -n "${_forced[${_r}]:-}" ] && continue
+        case "${_r}" in .claude/validation/lint-selftest.sh|.claude/validation/fixtures/*) continue ;; esac
+        if [ -z "${_zone[${_r}]:-}" ] || [ -n "${_alive[${_r}]:-}" ]; then
+          _alive["${_z}"]=1; _changed=1; break
+        fi
+      done <<< "${_refs[${_z}]}"
+    done
+  done
+
+  # CORTADA: fecho transitivo a partir do que já saiu (e das lentes forçadas).
+  for _z in "${!_forced[@]}"; do _gone["${_z}"]=1; done
+  _changed=1
+  while [ "${_changed}" -eq 1 ]; do
+    _changed=0
+    for _z in "${!_zone[@]}"; do
+      [ -n "${_gone[${_z}]:-}" ] || [ -n "${_alive[${_z}]:-}" ] && continue
+      while IFS= read -r _r; do
+        [ -n "${_r}" ] || continue
+        if [ -n "${_cut[${_r}]:-}" ] || [ -n "${_gone[${_r}]:-}" ]; then
+          _gone["${_z}"]=1; _changed=1; break
+        fi
+      done <<< "${_refs[${_z}]}"
+    done
+  done
+
+  # A lente forçada que uma âncora cita deixa um ponteiro morto NELA — dito, não calado.
+  for _z in "${!_forced[@]}"; do
+    while IFS= read -r _r; do
+      [ -n "${_r}" ] || continue
+      [ -n "${_cut[${_r}]:-}" ] || [ -n "${_gone[${_r}]:-}" ] && continue
+      case "${_r}" in .claude/validation/lint-selftest.sh|.claude/validation/fixtures/*) continue ;; esac
+      echo "AVISO: a lente '${_z}' sai do papel '${_role}' (cita comando cortado), mas '${_r}' a cita e viaja — ponteiro morto." >&2
+    done <<< "${_refs[${_z}]}"
+  done
+
+  for _z in "${!_gone[@]}"; do printf ':(exclude)%s\n' "${_z}"; done | LC_ALL=C sort
+}
+
 # CONTRATO — arquivos que vivem DENTRO de um subcaminho cortado e AINDA ASSIM viajam, porque uma
 # guarda do ALVO os lê em runtime. Lista curta e manual de propósito: cada entrada custa uma
 # justificativa nomeada, e a bancada prova que ela está COMPLETA (nenhum consumidor sobrevivente
@@ -287,6 +421,11 @@ if [ "${MODE}" = "manifest" ]; then
   done
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_role_excludes "${REPO}" "${ROLE}")
   while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(_emit_command_excludes "${REPO}" "${ROLE}")
+  # Os companheiros SÓ podem ser derivados DEPOIS dos dois cortes acima: eles são definidos pelo que
+  # já saiu. Ordem invertida = nenhum comando cortado ainda = nenhum companheiro achado, em silêncio.
+  while IFS= read -r local_p; do [ -n "${local_p}" ] && _spec+=("${local_p}"); done < <(
+    for local_p in "${_spec[@]}"; do case "${local_p}" in ':(exclude)'*) printf '%s\n' "${local_p#:(exclude)}" ;; esac; done \
+      | _emit_companion_excludes "${REPO}" "${ROLE}")
   # A exclusão de IDENTIDADE vale nos três papéis: quem o bundle NOMEIA não é assunto de quanta
   # fábrica ele leva. Mas a POSIÇÃO dela não é estética — ela entra DEPOIS da guarda de
   # precondição abaixo, e a razão é um fail-open que a bancada pegou em 2026-09-17.
