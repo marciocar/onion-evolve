@@ -3,7 +3,8 @@ title: "Revisão — onda 1 da O3 da migração de provenance (SAC-73): --apply-
 date: 2026-10-09
 branch: feat/provenance-wave-o3-1
 reviewer: "passada adversarial com mandato de achar linha REPROVADA aplicada, provenance empilhada ou divergente da planilha, flip fora do selo: conferência mecânica das 276 linhas contra o arquivo final, amostra de 10 aplicados (semente 20261009) com o nó aberto, idempotência, e bancada kg_migrate_v3 11/11 com LC_ALL=C e 6 mutantes do caso (j)"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 5323035780b1a9dea69e982dddc5b4d8443cc68cc4d6d517295b60c5bbdb5e29
+reviewed_code_sha256: 30839ad02eaeba572b91f8b3259ae4e53d782c2beac095031d51f7b006f9ce4e
 findings_total: 4
 findings_real: 2
 verdict: CORRIGIDO

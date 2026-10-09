@@ -5,9 +5,9 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**406 itens abertos** em 87 grafo(s) com aberto (de 113 no escopo) · 88 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**415 itens abertos** em 87 grafo(s) com aberto (de 113 no escopo) · 88 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
-## compartilhamento-individuo-organizacao-2026-09 — 4 item(ns)
+## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -15,6 +15,10 @@
 | 27.5 | `Q_R3_EMENDAS_DE_MECANISMO_AO_DESENHO_DE_C` | compartilhamento-individuo-organizacao-2026-09 | TRES EMENDAS DE MECANISMO PROPOSTAS AO DESENHO DA OPCAO C, com evidencia ancorada nesta rodada — o maestro decide; D_INDIVIDUAL_ |
 | 12.8 | `D_FRONTEIRA_NAO_EMITIR_ATE_FECHAR` | compartilhamento-individuo-organizacao-2026-09 | SUPERA D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA, e a saida vem do mesmo corpus que a derrubou. O corpus nao deixou so a refuta |
 | 12.8 | `Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL` | compartilhamento-individuo-organizacao-2026-09 | A FRONTEIRA QUE A E2 NAO COBRE, E ELA E NOVA. A E2 diz que a alavanca que mede e o CONTROLE DO ALVO. O adotante devolveu: num dese |
+| 8.0 | `E_R3_TST_MONITORAR_FORMA_E_CONTEUDO_EMAIL_CORPORATIVO` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5) — A CLAIM DE MAIOR CARGA DA RODADA: a conclusao dispositiva AUTORIZA o empregador a mo |
+| 3.2 | `E_R3_TST_CIENCIA_PREVIA_AFASTA_EXPECTATIVA` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5): a licitude do monitoramento e condicionada a CIENCIA PREVIA do empregado de que a caixa |
+| 2.4 | `E_R3_TST_EMAIL_PESSOAL_VS_CORPORATIVO` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DURA DE LOCATOR (tier 5, nao 9): o TST distingue e-mail PESSOAL (provedor proprio, protegido pela inviolabil |
+| 2.4 | `E_R3_TST_PROPORCIONALIDADE_PARCIMONIA_NA_ILICITUDE` | compartilhamento-individuo-organizacao-2026-09 | ANCORADA COM RESSALVA DE LOCATOR (tier 5): o acordao invoca o principio da PROPORCIONALIDADE para exigir PARCIMONIA na qualificaca |
 
 ## plugin-mcp-posture-2026-09 — 5 item(ns)
 
@@ -86,13 +90,14 @@
 | 9.6 | `C_OPCAO_A_STATUS_QUO` | jev-decision-round2-2026-10 | OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de m |
 | 5.6 | `C_OPTION_B_BASIS_IS_WEAK_SOURCED` | jev-decision-round2-2026-10 | ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao |
 
-## infra-vps-2026-10 — 7 item(ns)
+## infra-vps-2026-10 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 66.0 | `Q_INFRA_VPS_TREATMENT_2026` | infra-vps-2026-10 | Como o Onion deve tratar INFRA/VPS — sistema operacional, servicos, Docker, firewall, reboot e updates pendentes, sessoes orfas  |
 | 22.0 | `C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS` | infra-vps-2026-10 | OPCAO B linha (B enxuta) — RECOMENDADA pelo Elenxo: censo shell que COMPOE sinais nativos (needrestart -b, /var/run/reboot-requi |
 | 12.0 | `C_OPCAO_B_GRAFO_CENSO_COMANDO` | infra-vps-2026-10 | OPCAO B — grafo de dominio da VPS como SSOT viva + censo determinístico ops/vps-census.sh medindo o vivo contra o grafo + coman |
+| 6.8 | `E_LACUNAS_INFRA_VPS_1005` | infra-vps-2026-10 | LACUNAS DECLARADAS. (1) Orcamento: 33 fontes e 26 claims; 17 confirmadas, 8 refutadas por fonte fraca ou voto, 0 nao verificadas p |
 | 5.4 | `Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA` | infra-vps-2026-10 | VAZAMENTO JA EXISTENTE, achado ao medir a pergunta do maestro: a guarda vps-exposure-check.sh mora em .claude/validation/ (raiz qu |
 | 4.0 | `C_OPCAO_A_NADA_NOVO` | infra-vps-2026-10 | OPCAO A — nada novo: manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh. A FA |
 | 0.9 | `C_OPCAO_C_VERTICAL_INFRA` | infra-vps-2026-10 | OPCAO C — vertical de engenharia infra que viaja para adotantes. Reprovada pela recomendacao do Elenxo: nenhum 2o adotante pediu |
@@ -109,13 +114,15 @@
 | 7.2 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
 | 5.6 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
 
-## ocr-local-sei-2026-09 — 10 item(ns)
+## ocr-local-sei-2026-09 — 12 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 54.0 | `Q_OCR_LOCAL_SEI_0908` | ocr-local-sei-2026-09 | Qual motor de OCR LOCAL escolher para ler PDF-imagem de documento administrativo brasileiro do SEI (fonte serifada, tabelas, carim |
+| 22.5 | `E_LACUNAS_DECLARADAS_OCR_0908` | ocr-local-sei-2026-09 | LACUNAS DECLARADAS (39 fontes, 23 claims, 5 confirmadas). (1) REFUTADAS POR FONTE FRACA — tier 3-4, agregadores e blogs de vendo |
 | 14.0 | `C_OPCAO_PROCEDIMENTO_CONSENSO_DOIS_MOTORES` | ocr-local-sei-2026-09 | OPCAO (9) — O PROCEDIMENTO, que o Elenxo recomenda decidir ANTES do motor: consenso entre 2 motores ARQUITETURALMENTE INDEPENDEN |
 | 9.0 | `C_OPCAO_BASELINE_SEM_OCR_PDFTOTEXT` | ocr-local-sei-2026-09 | OPCAO (8) — O PASSO 0, e a de maior confianca do grafo (0.9): antes de instalar QUALQUER motor, rodar `pdftotext -layout` e `pdf |
+| 6.3 | `E_MERCADO_OCR_LOCAL_0908` | ocr-local-sei-2026-09 | EIXO MERCADO — SEM SINAL ENCONTRADO (registro explicito: o eixo e invariante mesmo vazio). Nenhuma claim de capital sobreviveu a |
 | 6.0 | `C_OPCAO_TESSERACT5_TESSDATA_BEST` | ocr-local-sei-2026-09 | OPCAO (1): Tesseract 5 instalado por apt com por.traineddata do tessdata_best — saida TSV com confidence e bounding box POR PALA |
 | 3.6 | `C_OPCAO_DOCTR_TORCH_VENV` | ocr-local-sei-2026-09 | OPCAO (3): docTR (python-doctr + torch) em venv isolado. Compatibilidade com Python 3.12 CONFIRMADA em tier 9 (E_DOCTR_PYTHON_311_ |
 | 3.2 | `C_OPCAO_DOTSOCR_3B_CPU` | ocr-local-sei-2026-09 | OPCAO (5): dots.ocr / dots.mocr 3B em CPU, sem flash-attn/vLLM (que nao instalam sem GPU). O arco do dossie aponta este como estad |
@@ -247,13 +254,14 @@
 | 0.9 | `C_CHAT_BGE_M3_MTEB_63` | onion-slm-2026-10 | AFIRMACAO DO CHAT: bge-m3 = 63,0 no MTEB (via premai.io). NAO VERIFICAVEL como comparacao: a primaria (card Qwen3-Embedding-0.6B)  |
 | 0.6 | `C_CHAT_QWEN37_PROPRIETARY` | onion-slm-2026-10 | AFIRMACAO DO CHAT (8): o Qwen3.7 e proprietario. NAO VERIFICAVEL: nem a listagem HF visivel nem o agregador mostram o 3.7; sem pri |
 
-## poda-instruction-bloat-2026-09 — 5 item(ns)
+## poda-instruction-bloat-2026-09 — 6 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 41.6 | `Q_PODA_INSTRUCTION_BLOAT_CORE` | poda-instruction-bloat-2026-09 | O que podar do CLAUDE.md (246 linhas / 17.041 bytes) e das skills do core do Onion para curar o agent instruction bloat (Thoughtwo |
 | 21.0 | `C_OPCAO_C_MEDIR_PRIMEIRO_COM_INSTRUCTIONSLOADED` | poda-instruction-bloat-2026-09 | OPCAO C — medir primeiro com InstructionsLoaded e podar so o que nunca carrega / nunca muda comportamento. A favor: e a unica op |
 | 12.0 | `C_OPCAO_A_DOUTRINA_EM_SKILLS_E_RULES_POR_PATH` | poda-instruction-bloat-2026-09 | OPCAO A — mover doutrina para skills/rules por path e deixar o CLAUDE.md so com identidade + roteamento. A favor: e a cura que o |
+| 5.4 | `E_LACUNAS_DECLARADAS_PODA_0903` | poda-instruction-bloat-2026-09 | LACUNAS (custo declarado: 40 fontes, 12 claims, 2 confirmadas, 8 refutadas, 0 nao-verificadas por 403/truncagem). REFUTADAS QUE O  |
 | 2.8 | `C_OPCAO_D_NAO_PODAR` | poda-instruction-bloat-2026-09 | OPCAO D — nao podar. A favor, e mais forte do que a rodada admitiu: 17.041 bytes sao ~0,5% da janela de 1M, o custo de janela e  |
 | 2.4 | `C_OPCAO_B_MANTER_CLAUDE_MD_E_COMPRIMIR` | poda-instruction-bloat-2026-09 | OPCAO B — manter o CLAUDE.md e comprimir. A favor: custo zero de arquitetura, nada se move de lugar, nenhum risco de doutrina su |
 
@@ -273,7 +281,7 @@
 | 6.3 | `C_OPCAO_II_BILINGUE_POR_CAMPOS` | plugin-language-policy-2026-09 | OPCAO (ii) — bilingue por campos: `description` + `description_en` no plugin.json, README com EN em cima e pt-BR abaixo, ambos c |
 | 3.8 | `C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS` | plugin-language-policy-2026-09 | OPCAO (iii) — ingles integral nas superficies e corpos traduzidos progressivamente. A favor: e a unica que casa 100% com o norte |
 
-## deck-patterns-2026-09 — 8 item(ns)
+## deck-patterns-2026-09 — 9 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -281,6 +289,7 @@
 | 26.2 | `C_OPCAO_G_FUSAO_A_D_C_COM_GATE_F` | deck-patterns-2026-09 | OPCAO (G) — RECOMENDADA PELO ELENXO: fusao A+D+C, com F como gate de 30 minutos antes. A divisao de trabalho entre as tres, que  |
 | 24.5 | `C_OPCAO_A_ARCO_ATOS_DECK_DE_CAMPO` | deck-patterns-2026-09 | OPCAO (A): arco em ATOS problem-first, derivado do deck de campo — usar docs/evolution/decks/iftl-frameworks-agentes-2026-08.htm |
 | 24.0 | `C_OPCAO_F_PARAR_E_MEDIR_O_ALVO` | deck-patterns-2026-09 | OPCAO (F): PARAR antes de reorganizar — medir qual deck e o alvo real (o de 65 slides nao existe neste repo) e rodar uma 2a roda |
+| 17.0 | `E_LACUNAS_DECK_PATTERNS_0924` | deck-patterns-2026-09 | LACUNAS DECLARADAS. (0) DIVERGENCIA DE CONTAGEM, declarada e NAO harmonizada: o sintetizador reportou "17 fontes, 10 claims"; a co |
 | 14.0 | `C_OPCAO_D_ARCO_SRL_PLEA_DA_CASA` | deck-patterns-2026-09 | OPCAO (D): arco SRL/PLEA da casa — Orient -> Activate -> Reinforce com planificar->executar->avaliar por ato, sobre o chassi sel |
 | 7.2 | `C_OPCAO_C_ARCO_DOC_CLAUDE_CODE` | deck-patterns-2026-09 | OPCAO (C): arco da doc do Claude Code — instalar/rodar -> o que da para fazer -> escada de customizacao (memoria -> skills -> ho |
 | 4.5 | `C_OPCAO_B_ARCO_DIATAXIS` | deck-patterns-2026-09 | OPCAO (B): arco Diataxis — reorganizar o deck nas 4 categorias (tutorials -> how-to -> reference -> explanation) mantendo-as est |
@@ -390,6 +399,14 @@
 | 21.2 | `Q_RODAR_O_EVOLVE_E_A_PROXIMA_LEVA` | forge-evolve-2026-10 | O EVOLVE ESTA FORJADO E NAO FOI RODADO, e isso e deliberado: o dogfood desta forja era a CARGA (a superficie executa a injecao), n |
 | 7.2 | `Q_PECA_4_WORKFLOW_INLINE_CONTRA_A_SKILL` | forge-evolve-2026-10 | A PECA QUE FALTA E UMA CONTRADICAO INTERNA, nao so uma lacuna: o evolve manda "Autore o script Workflow" INLINE, e a skill `onion- |
 
+## contrato-kg-absorcao-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 19.8 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
+| 7.2 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
+| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
+
 ## fable-5-1-superacao-2026-09 — 9 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -466,14 +483,6 @@
 | 13.5 | `D_PR_DA_ONDA_0` | testes-evidencia-2026-09 | O PR da Onda 0 + R0: 9 commits, 35 arquivos, 3144 insercoes, SHA canonico 4ac84bdc. NAO ABRE enquanto o residuo do Elenxo e a cura |
 | 7.2 | `Q_BLOCKED_BY_ESTA_SOBRECARREGADO` | testes-evidencia-2026-09 | QUATRO dos cinco rebaixamentos do R0 foram G1, e ao ler os motivos a causa nao e worker desonesto: e campo SOBRECARREGADO. `Q_GUAR |
 | 7.0 | `Q_PESQUISA_E2E_E_METRICA` | testes-evidencia-2026-09 | AS DUAS RODADAS (~3M, orçamento selado pelo maestro): R1 `e2e-agent-testing-2026-09` — como se testa ponta a ponta um agente/CL |
-
-## contrato-kg-absorcao-2026-10 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 18.0 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
-| 7.2 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
-| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
 ## guard-forge-2026-10 — 4 item(ns)
 
@@ -614,7 +623,7 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 10.8 | `Q_TENANT_WRITE_DESTINATION` | librechat-kg-runtime-2026-08 | BURACO revelado pela selagem: a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/ad |
+| 10.8 | `Q_TENANT_WRITE_DESTINATION` | librechat-kg-runtime-2026-08 | QUESTAO DE DESENHO (gated): a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/adot |
 | 7.7 | `Q_MAP_LEG_GATED` | librechat-kg-runtime-2026-08 | BURACO exposto pelo protocolo: a perna MAP (ingestao doc->grafo) nao tem tool no core — existe so na PoC (ingerir_documento_cola |
 | 5.4 | `Q_KG_INBOX_FORA_DO_PLUGIN` | librechat-kg-runtime-2026-08 | LACUNA DECLARADA (achado do Elenxo de 2026-09-05, medida): o /meta:kg-inbox NAO esta em plugins/onion/commands/ — o diretorio te |
 
