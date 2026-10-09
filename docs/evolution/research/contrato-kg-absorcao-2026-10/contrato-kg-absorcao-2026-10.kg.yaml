@@ -4,12 +4,14 @@
 # matriz leitor x caso. Fica fora da fila de 2026-10-06 porque a fila está no teto.
 # Migrado ao contrato v3 no SAC-71 (2026-10-08): datas entre aspas e provenance nos nós confirmed.
 meta:
+  x_drive_checkpoint: pending
+  x_drive_checkpoint_note: "lote 1 (SAC-80): Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH → done pela guarda no pr-merge-verified; PR para merge humano"
   id: contrato-kg-absorcao-2026-10
   schema_version: "1"
   baseline: "2026-10-08"
   review_after: "2026-11-07"   # 30d: programa de trabalho
   # ═══ TETO: 15 NÓS ═══
-  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08). Onda nova exige onda colhida.
+  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08); 15 em 2026-10-09 (+E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH). NO TETO: onda nova exige onda colhida.
 nodes:
   - id: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     node_type: evidence
@@ -180,12 +182,28 @@ nodes:
     node_type: question
     layer: audit
     plane: DEV
-    status: open
+    status: done
     impact: 4
     confidence: 0.8
+    verified_at: "2026-10-09"
     verified_against: "sinal 2026-10-08-rebase-merge-breaks-kg-provenance do onion-curation: o PR 3 de lá, mergeado por rebase pelo pr-merge-verified, deixou 6 provenance caminho@sha apontando para commits fora da main, com radar, lint e CI verdes; ops/pr-merge-verified.sh conferido: rebase é o modo padrão e só --merge-commit preserva o SHA"
     label: "merge por rebase reescreve o SHA que a provenance caminho@commit cita, e nenhum gate acusa; cura selada: o pr-merge-verified exige --merge-commit quando o diff cita commit da própria branch (SAC-80)"
     narrative: "É a mesma classe que o --assert-ancestor curou para o vendor. A prevenção vem antes da detecção (checar que todo @sha é ancestral da base). Precisa estar pronta antes da onda O1, que escreve milhares de source."
+  - id: E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-09"
+    verified_against: "bancada pr_merge_verified com LC_ALL=C: 36 casos, 0 falhas, e os 9 casos novos (kg-a..kg-g) reprovados por mutantes que tiram a parte da cura que cada um protege; sandbox git de verdade com o SUT e o mutante sem a cura lado a lado"
+    label: "o pr-merge-verified recusa o rebase quando o .kg.yaml do PR cita, em provenance.source, commit da própria branch, e com --merge-commit confere depois do merge que cada sha é ancestral da base"
+    narrative: "A guarda lê só as linhas que o PR adiciona em *.kg.yaml, e só o valor de uma chave source:. Um @sha em label, narrative ou locator é prosa e não dispara. O sha é classificado pelo git: se não resolve neste repo, fica fora do escopo e é contado; se é ancestral da base, nada muda; se não é, é commit da branch. Sem --merge-commit a recusa vem antes de qualquer efeito, nomeando sha e arquivo. Com --merge-commit, a ancestralidade é conferida depois do merge provado, e a falha sai com rc 3, como no --assert-ancestor. O auto-rebase também é barrado nesse caso, porque reescreveria o commit citado. PR sem .kg.yaml não faz leitura de git."
+    provenance:
+      source: "ops/pr-merge-verified.sh e .claude/validation/lint-selftest.sh (família pr_merge_verified) na branch fix/merge-verified-kg-provenance"
+      locator: "_kg_guard_pre e _kg_guard_post no script; casos (kg-a) a (kg-g) na bancada"
+      method: "medição: bancada com mutantes e sandbox git em 2026-10-09"
   - id: E_CONTRATO_V4_ADOTADO
     node_type: evidence
     layer: audit
@@ -244,4 +262,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_CONTRATO_V4_ADOTADO
     to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
+    edge_type: SUPPORTS
+  - from: E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH
+    to: Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH
     edge_type: SUPPORTS

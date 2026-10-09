@@ -12158,7 +12158,8 @@ case "$args" in
       fi
       exit 0 ;;
   *"pr view"*headRefOid*)
-      if [ -n "${STUB_HEAD_FROM:-}" ]; then git -C "${STUB_HEAD_FROM}" rev-parse HEAD; else echo "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"; fi
+      if [ -n "${STUB_HEAD_SHA:-}" ]; then echo "${STUB_HEAD_SHA}"
+      elif [ -n "${STUB_HEAD_FROM:-}" ]; then git -C "${STUB_HEAD_FROM}" rev-parse HEAD; else echo "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"; fi
       exit 0 ;;
   *"pr view"*headRepositoryOwner*) echo "owner/repo"; exit 0 ;;
   *"pr view"*headRefName*)         echo "${GH_HEAD_REF:-feat/alguma-coisa}"; exit 0 ;;
@@ -12194,8 +12195,13 @@ case "$args" in
   *"api "*pulls*commits*)
       # os pais de cada commit do PR, um número por linha (1 = commit comum, 2 = commit de merge)
       printf '%s\n' ${GH_PR_PARENTS:-1}; exit "${GH_PR_COMMITS_RC:-0}" ;;
+  *"api "*pulls*files*)
+      # os arquivos do PR, um por linha (SAC-80: só PR que toca .kg.yaml faz a guarda ler git)
+      [ -n "${GH_PR_FILES:-}" ] && printf '%s\n' ${GH_PR_FILES}; exit 0 ;;
   *"pr merge"*)
       [ -n "${STUB_MERGE_ARGS:-}" ] && printf '%s\n' "$args" >> "${STUB_MERGE_ARGS}"
+      # o merge DE VERDADE no sandbox, quando o caso precisa que a base mude (SAC-80, pós-merge)
+      [ -n "${STUB_MERGE_CMD:-}" ] && bash -c "${STUB_MERGE_CMD}" >/dev/null 2>&1
       printf '%s\n' "${GH_MERGE_OUT}"; exit "${GH_MERGE_RC}" ;;
 esac
 exit 0
@@ -12482,7 +12488,105 @@ PFSTUB
     record_pass "pr-merge-verified: (z) conflito recorrente ⇒ limite de 2 rebases, sem laço"
   else record_fail "pr-merge-verified: (z) laço/limite" "rc=${_mv_rc} pf=[$(cat "${d}/pflog")] out=${_mv_out}"; fi
 
-  unset -f _mv _mvd _mvm _mva
+  # ── (kg-a)-(kg-g) PROVENANCE DA BRANCH × REBASE (SAC-80, 2026-10-09) ─────────────────────────
+  # Defeito medido num adotante: o .kg.yaml do PR citava `caminho@<sha>` de commit da PRÓPRIA branch,
+  # o merge por rebase reescreveu o sha e 6 provenance ficaram fora da main com radar/lint/CI verdes.
+  # Sandbox: repo git de verdade (origin = ele mesmo), branches com o .kg.yaml citando a branch, a
+  # base, prosa e hex que não é sha. Cada caso roda contra o SUT E contra um MUTANTE que tira a
+  # parte da cura que o caso protege — o caso só passa se o mutante REPROVA (mutante que sobrevive
+  # é caso que não mede nada).
+  local r3="${d}/r3" _k_base _k_c1 _k_c1s _K_MSEQ=""
+  ( mkdir -p "${r3}" && cd "${r3}" && git init -q -b main && git config user.email t@t && git config user.name t \
+    && mkdir -p docs && printf 'nodes:\n' > docs/g.kg.yaml && echo a > a && git add -A && git commit -qm base \
+    && git checkout -q -b feat && echo doc > docs/doc.md && git add -A && git commit -qm doc \
+    && git checkout -q main && git remote add origin "${r3}" ) >/dev/null 2>&1
+  _k_base="$(git -C "${r3}" rev-parse main)"; _k_c1="$(git -C "${r3}" rev-parse feat)"; _k_c1s="${_k_c1:0:8}"
+  _kbr() { # $1=branch  $2=arquivo  $3=conteúdo acrescentado — a branch nasce de feat (que tem o commit citável)
+    ( cd "${r3}" && git checkout -q -b "$1" feat && printf '%s\n' "$3" >> "$2" && git add -A && git commit -qm "$1" \
+      && git checkout -q main ) >/dev/null 2>&1
+  }
+  _kbr pa docs/g.kg.yaml "  - id: E_X
+    provenance:
+      source: \"docs/doc.md@${_k_c1s}\"
+      method: \"medição: x\""
+  _kbr pc docs/g.kg.yaml "  - id: E_X
+    provenance: {source: \"a@${_k_base:0:8}\", method: \"medição: x@${_k_c1s}\"}"
+  _kbr pd docs/notes.md "source: \"docs/doc.md@${_k_c1s}\""
+  _kbr pe docs/g.kg.yaml "  - id: E_X
+    label: \"a prosa cita docs/doc.md@${_k_c1s} e não é proveniência\"
+    narrative: \"source: docs/doc.md@${_k_c1s}\"
+    provenance:
+      source: \"outro-repo/x.md@deadbee1\"
+      locator: \"docs/doc.md@${_k_c1s}\"
+      method: \"medição: y\""
+  _mvk() { # $1=SUT $2=branch $3=GH_PR_FILES $4=STUB_MERGE_CMD $5=STUB_HEAD_SHA ('' = o da branch) ; resto = flags
+    local s="$1" b="$2" fl="$3" mc="$4" hs="$5"; shift 5
+    [ -n "${hs}" ] || hs="$(git -C "${r3}" rev-parse "${b}" 2>/dev/null)"
+    git -C "${r3}" reset -q --hard "${_k_base}" >/dev/null 2>&1   # a base volta ao ponto de partida
+    echo 0 > "${d}/n"; echo 0 > "${d}/mk"; : > "${d}/margs"; : > "${d}/pflog"
+    _mv_out="$(cd "${r3}" && PATH="${d}:${PATH}" STUB_N="${d}/n" STUB_MK="${d}/mk" STUB_MERGE_ARGS="${d}/margs" \
+               STUB_HEAD_SHA="${hs}" GH_HEAD_REF="${b}" GH_PR_FILES="${fl}" STUB_MERGE_CMD="${mc}" \
+               GH_MERGEABLE_SEQ="${_K_MSEQ}" PF_LOG="${d}/pflog" ONION_MERGE_POLL_SECS=0 ONION_MERGE_WAIT_SECS=5 \
+               GH_STATE_BEFORE="OPEN|null" GH_STATE_AFTER="${M}" GH_MERGE_RC=0 GH_MERGE_OUT=merged \
+               bash "${s}" 999 "$@" 2>&1)"; _mv_rc=$?
+  }
+  # mutantes: âncoras por index() (string literal), e cada um PROVA que mudou o SUT antes de valer
+  local _m0="${d}/m0.sh" _mscope="${d}/mscope.sh" _mfield="${d}/mfield.sh" _manc="${d}/manc.sh"
+  awk '$0=="_kg_guard_pre"||$0=="    _kg_guard_post"{print ":"; next} {print}' "${sut}" > "${_m0}"
+  awk 'index($0,"grep -qE '"'"'\\.kg\\.yaml$'"'"'")>0{sub(/\\\.kg\\\.yaml\$/,".")} index($0,"-- '"'"'*.kg.yaml'"'"'")>0{sub(/-- '"'"'\*\.kg\.yaml'"'"'/,"-- .")} {print}' "${sut}" > "${_mscope}"
+  awk 'index($0,"if (l ~ /^[ \\t]*(-[ \\t]+)?source:/")>0{print "      if (1) {"; next} {print}' "${sut}" > "${_mfield}"
+  awk 'index($0,"if git merge-base --is-ancestor \"${_full}\" \"${_base_sha}\"")>0{sub(/if git merge-base --is-ancestor "\$\{_full\}" "\$\{_base_sha\}"/,"if false")} {print}' "${sut}" > "${_manc}"
+  local _mm _mok=1
+  for _mm in "${_m0}" "${_mscope}" "${_mfield}" "${_manc}"; do
+    cmp -s "${sut}" "${_mm}" && { _mok=0; record_fail "pr-merge-verified: (kg) âncora do mutante $(basename "${_mm}") não casou" "o SUT mudou de forma; reancore o mutante"; }
+  done
+  # _kcase "<nome>" <asserção> <mutante> -- <args do _mvk sem o SUT>
+  _kcase() {
+    local nm="$1" fn="$2" mu="$3"; shift 4
+    _mvk "${sut}" "$@"; local o1="${_mv_out}" r1="${_mv_rc}"
+    if ! "${fn}"; then record_fail "pr-merge-verified: ${nm}" "rc=${r1} margs=[$(cat "${d}/margs")] out=${o1}"; return; fi
+    [ "${_mok}" -eq 1 ] || return
+    _mvk "${mu}" "$@"
+    if "${fn}"; then
+      record_fail "pr-merge-verified: ${nm} — o MUTANTE $(basename "${mu}") SOBREVIVEU (o caso não mede a cura)" "rc=${_mv_rc} out=${_mv_out}"
+    else
+      record_pass "pr-merge-verified: ${nm} (mutante $(basename "${mu}") reprovado)"
+    fi
+  }
+  _ka() { [ "${_mv_rc}" -ne 0 ] && grep -qF "PRÓPRIA BRANCH" <<< "${_mv_out}" && grep -qF "${_k_c1s} em docs/g.kg.yaml" <<< "${_mv_out}" \
+          && grep -qF -- "--merge-commit" <<< "${_mv_out}" && [ ! -s "${d}/margs" ]; }
+  _kb() { [ "${_mv_rc}" -eq 0 ] && grep -q -- '--merge' "${d}/margs" && grep -qF "são ancestrais de origin/main" <<< "${_mv_out}"; }
+  _kb2() { [ "${_mv_rc}" -eq 3 ] && grep -qF "NÃO é ancestral de origin/main: ${_k_c1s} em docs/g.kg.yaml" <<< "${_mv_out}"; }
+  _kc() { [ "${_mv_rc}" -eq 0 ] && grep -q -- '--rebase' "${d}/margs" && grep -qF "nenhum commit da branch" <<< "${_mv_out}"; }
+  _kd() { [ "${_mv_rc}" -eq 0 ] && grep -q -- '--rebase' "${d}/margs" && ! grep -qi "provenance" <<< "${_mv_out}"; }
+  _ke() { [ "${_mv_rc}" -eq 0 ] && grep -q -- '--rebase' "${d}/margs" && grep -qF "1 @sha no .kg.yaml não resolve" <<< "${_mv_out}" \
+          && ! grep -qF "PRÓPRIA BRANCH" <<< "${_mv_out}"; }
+  _kf() { [ "${_mv_rc}" -ne 0 ] && grep -qF "auto-rebase reescreveria" <<< "${_mv_out}" && [ ! -s "${d}/pflog" ] && [ ! -s "${d}/margs" ]; }
+  _kg() { [ "${_mv_rc}" -ne 0 ] && grep -qF "não tenho o head" <<< "${_mv_out}" && [ ! -s "${d}/margs" ]; }
+  local KG="docs/g.kg.yaml docs/doc.md"
+  local MC_OK="git -C '${r3}' merge -q --no-ff --no-edit pa"
+  local MC_LIN="git -C '${r3}' merge -q --squash pa && git -C '${r3}' commit -qm linearizado"
+  # (kg-a) acusa: cita commit da branch, sem --merge-commit ⇒ recusa ANTES do merge, nomeando sha e arquivo
+  _kcase "(kg-a) .kg.yaml cita a branch, sem --merge-commit ⇒ recusa sem mergear" _ka "${_m0}" -- pa "${KG}" "" ""
+  # (kg-b) o mesmo com --merge-commit e um merge de verdade ⇒ passa, e a ancestralidade é CONFERIDA depois
+  _kcase "(kg-b) o mesmo com --merge-commit ⇒ mergeia e confere a ancestralidade" _kb "${_m0}" -- pa "${KG}" "${MC_OK}" "" --merge-commit
+  # (kg-b2) modo de falha: --merge-commit, mas o PR entra linearizado ⇒ rc 3 nomeando sha e arquivo
+  _kcase "(kg-b2) --merge-commit mas a base recebeu cópia linearizada ⇒ rc 3 nomeado" _kb2 "${_m0}" -- pa "${KG}" "${MC_LIN}" "" --merge-commit
+  # (kg-c) cala: sha ancestral da base (mais um @sha da branch dentro do `method:` do MESMO mapa em fluxo)
+  _kcase "(kg-c) sha ancestral da base ⇒ passa por --rebase sem exigir nada" _kc "${_m0}" -- pc "${KG}" "" ""
+  _kcase "(kg-c') idem contra o mutante sem o teste de ancestralidade" _kc "${_manc}" -- pc "${KG}" "" ""
+  # (kg-d) cala: PR sem .kg.yaml (o .md cita a branch num `source:`) ⇒ nada muda, nem leitura de git
+  _kcase "(kg-d) PR sem .kg.yaml ⇒ comportamento antigo intacto" _kd "${_mscope}" -- pd "docs/notes.md" "" ""
+  # (kg-e) FALSO POSITIVO: sha da branch em label/narrative/locator e hex que não é sha no source ⇒ não recusa
+  _kcase "(kg-e) sha da branch só em prosa + hex que não é sha ⇒ não recusa, e conta o que não resolve" _ke "${_mfield}" -- pe "${KG}" "" ""
+  # (kg-f) PR CONFLICTING com a branch citada ⇒ o auto-rebase NÃO roda (reescreveria o sha citado)
+  _K_MSEQ="CONFLICTING MERGEABLE"
+  _kcase "(kg-f) CONFLICTING + .kg.yaml citando a branch ⇒ sem auto-rebase, sem merge" _kf "${_m0}" -- pa "${KG}" "" "" --merge-commit
+  _K_MSEQ=""
+  # (kg-g) fail-closed: toca .kg.yaml e o head não existe localmente ⇒ não classifica, não mergeia
+  _kcase "(kg-g) .kg.yaml no PR e head ilegível ⇒ para (fail-closed)" _kg "${_m0}" -- nao-existe "${KG}" "" "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef"
+
+  unset -f _mv _mvd _mvm _mva _mvk _kbr _kcase _ka _kb _kb2 _kc _kd _ke _kf _kg
 }
 
 # ═══ REGRA 90 — paridade papel: o SCRIPT aceita, a PROSA menciona ═════════════════════════

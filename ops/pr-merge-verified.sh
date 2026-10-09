@@ -36,6 +36,11 @@
 #           pelo `pr-finalize --rebase --push` na worktree local da branch, até ONION_MERGE_REBASE_MAX
 #           (2) vezes; conflito de fonte para nomeado; sem worktree local, diz o comando e para. Depois
 #           espera as runs do head novo nascerem e terminarem (ONION_MERGE_WAIT_SECS, 1800).
+#   PROVENANCE DA BRANCH (sem flag, SAC-80, 2026-10-09): se o PR ADICIONA em `*.kg.yaml` um `source:`
+#           com `@<sha>` de commit que NÃO é ancestral da base (commit da própria branch), o rebase o
+#           reescreveria e a provenance ficaria fora da main. Sem --merge-commit, RECUSA antes do
+#           merge nomeando sha e arquivo; com --merge-commit, mergeia e confere depois que cada sha
+#           é ancestral de origin/<base> (rc 3 se não for, como o --assert-ancestor).
 set -uo pipefail
 
 PR="${1:?uso: $0 <numero-do-PR> [--repo owner/nome] [--keep-branch] [--dispensa <check> --motivo <texto>]}"; shift || true
@@ -135,6 +140,103 @@ HEAD_SHA="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefOid --jq '.headRefOi
 OWNER_REPO="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRepository,headRepositoryOwner \
   --jq '.headRepositoryOwner.login + "/" + .headRepository.name' 2>/dev/null)"
 HEAD_REF="$(gh pr view "$PR" "${REPO_ARG[@]}" --json headRefName --jq '.headRefName' 2>/dev/null)"
+# ══ PROVENANCE QUE CITA A PRÓPRIA BRANCH × REBASE (SAC-80, 2026-10-09) ══════════════════════════
+# Defeito medido num adotante (sinal 2026-10-08-rebase-merge-breaks-kg-provenance): o contrato do
+# .kg.yaml pede `provenance.source: "<caminho>@<sha>"`, e este script mergeia por REBASE por padrão.
+# O rebase reescreve os SHAs da branch; o grafo que citava um commit da própria branch entrou na main
+# apontando para commit FORA da main — 6 provenance quebradas, com radar, lint e CI verdes.
+# A guarda olha só o que o PR ADICIONA em `*.kg.yaml`, e só o VALOR de uma chave `source:` (em bloco,
+# ou dentro de um mapa em fluxo `{…source: …}`): `@<hex>` em label/narrative/locator é prosa, não
+# proveniência, e não dispara. O sha é classificado pelo GIT, nunca pela forma:
+#   · não resolve como commit neste repo (outro repo da família, hex que não é sha, sha curto
+#     ambíguo) → fora do escopo, contado e dito;
+#   · resolve e É ancestral da base → nada a fazer (o rebase não o toca);
+#   · resolve e NÃO é ancestral da base → é commit da branch: o rebase o tira da main.
+# Sem --merge-commit, RECUSA antes de qualquer efeito (comentário, rebase, merge). Com --merge-commit,
+# segue, e depois do merge PROVADO confere a ancestralidade de cada um (o mecanismo do --assert-ancestor).
+# PR que não toca .kg.yaml não faz leitura nenhuma de git — o comportamento antigo fica intacto.
+# Ler é fail-closed SÓ quando há .kg.yaml no PR: sem os commits locais não sei classificar, e não
+# classificar seria deixar passar exatamente o caso que esta guarda existe para pegar.
+KG_BRANCH_SHAS=""   # "sha<TAB>arquivo", um por linha
+_kg_base=""
+_kg_guard_pre() {
+  local _slug="${OWNER_REPO:-}"; [ "${#REPO_ARG[@]}" -ge 2 ] && _slug="${REPO_ARG[1]}"
+  local _files
+  _files="$(gh api "repos/${_slug}/pulls/${PR}/files?per_page=100" --paginate --jq '.[].filename' 2>/dev/null)" \
+    || die "não consegui LER os arquivos do PR #${PR} — sem eles não sei se o .kg.yaml cita commit da branch (SAC-80). Não prossigo."
+  grep -qE '\.kg\.yaml$' <<< "${_files}" || return 0
+  _kg_base="$(gh pr view "$PR" "${REPO_ARG[@]}" --json baseRefName --jq '.baseRefName' 2>/dev/null)"
+  [ -n "${_kg_base}" ] || die "o PR #${PR} toca .kg.yaml e eu não li a base — não consigo checar a provenance (SAC-80). Não prossigo."
+  git fetch -q origin "${_kg_base}" 2>/dev/null \
+    || die "o PR #${PR} toca .kg.yaml e não consegui buscar origin/${_kg_base} — rode a partir de um clone deste repo (SAC-80). Não prossigo."
+  local _base_sha; _base_sha="$(git rev-parse -q --verify 'FETCH_HEAD^{commit}' 2>/dev/null)"
+  [ -n "${_base_sha}" ] || die "o PR #${PR} toca .kg.yaml e a base buscada não resolve como commit (SAC-80). Não prossigo."
+  if ! git cat-file -e "${HEAD_SHA}^{commit}" 2>/dev/null; then
+    git fetch -q origin "pull/${PR}/head" 2>/dev/null || { [ -n "${HEAD_REF}" ] && git fetch -q origin "${HEAD_REF}" 2>/dev/null; }
+  fi
+  git cat-file -e "${HEAD_SHA}^{commit}" 2>/dev/null \
+    || die "o PR #${PR} toca .kg.yaml e não tenho o head ${HEAD_SHA:0:8} localmente — sem ele não sei se a provenance cita a branch (SAC-80). Rode a partir de um clone deste repo. Não prossigo."
+  # flags canônicas: sem cor, sem textconv/diff externo da config pessoal ([[r56-sha-canonical-flags]])
+  local _diff
+  _diff="$(git -c core.quotepath=off diff --no-color --no-ext-diff --no-textconv --unified=0 \
+           "${_base_sha}...${HEAD_SHA}" -- '*.kg.yaml' 2>/dev/null)" \
+    || die "o PR #${PR} toca .kg.yaml e o git diff da base ao head falhou (SAC-80). Não prossigo."
+  # arquivo<TAB>valor-do-source, das linhas ADICIONADAS. O valor é cortado no fim da string citada
+  # (ou no `,`/`}`/` #` se não for citado): o `method:` ao lado, num mapa em fluxo, não entra.
+  local _pairs
+  _pairs="$(LC_ALL=C awk -v sq="'" '
+    /^\+\+\+ /{ f=substr($0,5); sub(/^b\//,"",f); next }
+    /^\+/ {
+      l=substr($0,2)
+      if (l ~ /^[ \t]*(-[ \t]+)?source:/ || l ~ /\{[^}]*source:/) {
+        v=l; sub(/^[^{]*\{[^}]*source:|^[ \t]*(-[ \t]+)?source:/,"",v); sub(/^[ \t]+/,"",v)
+        q=substr(v,1,1)
+        if (q=="\"" || q==sq) { v=substr(v,2); i=index(v,q); if (i>0) v=substr(v,1,i-1) }
+        else { sub(/[,}].*$/,"",v); sub(/[ \t]+#.*$/,"",v) }
+        print f "\t" v
+      }
+    }' <<< "${_diff}")"
+  local _f _v _sha _full _n_anc=0 _n_out=0 _seen=""
+  while IFS=$'\t' read -r _f _v; do
+    [ -n "${_f}" ] || continue
+    for _sha in $(LC_ALL=C grep -oE '@[0-9a-f]{7,40}([^0-9A-Za-z_]|$)' <<< "${_v}" | LC_ALL=C grep -oE '[0-9a-f]{7,40}'); do
+      case " ${_seen} " in *" ${_sha}|${_f} "*) continue ;; esac
+      _seen="${_seen} ${_sha}|${_f}"
+      _full="$(git rev-parse -q --verify "${_sha}^{commit}" 2>/dev/null)" || { _n_out=$((_n_out+1)); continue; }
+      if git merge-base --is-ancestor "${_full}" "${_base_sha}" 2>/dev/null; then
+        _n_anc=$((_n_anc+1))
+      else
+        KG_BRANCH_SHAS="${KG_BRANCH_SHAS}${_sha}"$'\t'"${_f}"$'\n'
+      fi
+    done
+  done <<< "${_pairs}"
+  [ "${_n_out}" -gt 0 ] && say "ℹ️  provenance: ${_n_out} @sha no .kg.yaml não resolve(m) como commit neste repo (outro repo, ou não é sha) — fora do escopo desta guarda"
+  if [ -z "${KG_BRANCH_SHAS}" ]; then
+    say "✓ provenance: .kg.yaml do PR com ${_n_anc} @sha ancestral(is) da base e nenhum commit da branch — o modo de merge não importa"
+    return 0
+  fi
+  local _lst; _lst="$(printf '%s' "${KG_BRANCH_SHAS}" | awk -F'\t' 'NF{printf "%s%s em %s", (n++?"; ":""), $1, $2}')"
+  if [ "${MERGE_COMMIT}" -ne 1 ]; then
+    die "o .kg.yaml do PR cita commit da PRÓPRIA BRANCH em provenance.source (${_lst}) — o --rebase reescreveria esse SHA e a provenance ficaria fora da main (SAC-80). Nada foi mergeado. Rode de novo com --merge-commit, que preserva o SHA."
+  fi
+  say "✓ provenance cita commit da branch (${_lst}); --merge-commit preserva o SHA — confiro a ancestralidade depois do merge"
+}
+_kg_guard_post() { # depois do merge PROVADO: cada sha da branch tem de ser ancestral de origin/<base>
+  [ -n "${KG_BRANCH_SHAS}" ] || return 0
+  if ! git fetch -q origin "${_kg_base}" 2>/dev/null; then
+    printf '✗ merge PROVADO, mas não consegui ler origin/%s para conferir a provenance da branch — NÃO afirmo que ela vale\n' "${_kg_base:-?}"; exit 3
+  fi
+  local _sha _f _bad=""
+  while IFS=$'\t' read -r _sha _f; do
+    [ -n "${_sha}" ] || continue
+    git merge-base --is-ancestor "${_sha}" FETCH_HEAD 2>/dev/null || _bad="${_bad}${_bad:+; }${_sha} em ${_f}"
+  done <<< "${KG_BRANCH_SHAS}"
+  if [ -n "${_bad}" ]; then
+    printf '✗ merge PROVADO, mas a provenance cita commit que NÃO é ancestral de origin/%s: %s — o PR entrou linearizado?\n' "${_kg_base}" "${_bad}"; exit 3
+  fi
+  say "✓ provenance: os commits da branch citados pelo .kg.yaml são ancestrais de origin/${_kg_base}"
+}
+_kg_guard_pre
 # ══ AUTO-REBASE: PR em CONFLICTING não dispara CI ══════════════════════════════════════════════
 # Defeito medido em 2026-10-07/08: 25 PRs, 33 commits de "projeções geradas regeneradas". Todo PR
 # commita as projeções (backlog, testing-state, kg-read-index, plugins/), então cada merge deixa os
@@ -164,6 +266,10 @@ while [ "$_mg" = CONFLICTING ]; do
   _rebases=$((_rebases+1))
   [ "$_rebases" -le "$_REBASE_MAX" ] \
     || die "PR #${PR} segue CONFLICTING depois de ${_REBASE_MAX} rebase(s) automático(s) — algo volta a conflitar a cada vez; não entro em laço. Investigue a branch '${HEAD_REF}'."
+  # SAC-80: o rebase da branch reescreveria os commits que o .kg.yaml cita — e aí nem o --merge-commit
+  # os salva (a citação passa a apontar para o commit velho, órfão). Conflito assim se resolve à mão.
+  [ -z "${KG_BRANCH_SHAS}" ] \
+    || die "PR #${PR} está CONFLICTING e o .kg.yaml cita commit da própria branch ($(printf '%s' "${KG_BRANCH_SHAS}" | awk -F'\t' 'NF{printf "%s%s", (n++?" ":""), $1}')) — o auto-rebase reescreveria esses SHAs e a citação ficaria órfã (SAC-80). Resolva o conflito mergeando a base na branch, à mão, e rode de novo."
   _wt="$(_wt_of_branch "${HEAD_REF}")"
   [ -n "$_wt" ] \
     || die "PR #${PR} está CONFLICTING (o GitHub não dispara CI em PR em conflito) e a branch '${HEAD_REF}' não está em nenhuma worktree deste repo — não rebaseio às cegas. Rode na worktree da branch: bash ops/pr-finalize.sh --rebase --push ; depois rode este comando de novo."
@@ -552,6 +658,7 @@ case "$state" in
         printf '✗ merge PROVADO, mas %s NÃO é ancestral de origin/%s — o próximo update vai conflitar em falso (o PR entrou linearizado?)\n' "${ASSERT_ANCESTOR}" "${_base}"; exit 3
       fi
     fi
+    _kg_guard_post
     # SUPERAÇÃO (2026-08-26): o sync de main vive AQUI DENTRO — estruturalmente inacessível
     # sem o merge provado pelo estado. Cura o erro que me deixou em main após um merge RECUSADO
     # (o `checkout main` encadeado, não condicionado). Agora "não consigo" repetir, nem esquecendo.
