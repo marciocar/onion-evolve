@@ -379,7 +379,7 @@ nodes:
     provenance:
       source: "gustavo-pulga@21ff04f:.claude/diary/"
       locator: "9 entradas 2026-07-14..16; 2026-07-16-retro-como-instrumento-spec-as-code.md:10 next_recommended 'Avaliar uma skill de retro/feedback… como produto do core'"
-      method: "leitura: diário autoral do adotante no repo clonado /home/marcio/gustavo-pulga"
+      method: "leitura: diário autoral do adotante em gustavo-pulga@21ff04f (clone local; id do members.yaml)"
 
   - id: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6
     node_type: evidence

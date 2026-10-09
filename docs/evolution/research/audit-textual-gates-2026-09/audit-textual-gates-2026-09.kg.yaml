@@ -200,7 +200,7 @@ nodes:
     trace: '.githooks/pre-commit'
     provenance:
       source: ".githooks/pre-commit"
-      locator: "git config core.hooksPath = /home/marcio/onion-evolve/.githooks (medido nesta sessao); .git/hooks/pre-commit inexistente (so .sample); .githooks/pre-commit:30-36 (main/develop), :122-127 (HARD), :142-149 (selftest das guardas se toca validation/)"
+      locator: "git config core.hooksPath = <raiz do clone>/.githooks (valor absoluto, config local do host) (medido nesta sessao); .git/hooks/pre-commit inexistente (so .sample); .githooks/pre-commit:30-36 (main/develop), :122-127 (HARD), :142-149 (selftest das guardas se toca validation/)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 

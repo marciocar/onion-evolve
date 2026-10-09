@@ -105,9 +105,9 @@ nodes:
     label: 'O CLAUDE CODE EMBUTE HOJE UMA CAMADA DE PERMISSAO DECLARATIVA COM 88 REGRAS, e o Onion nao a exercita (tem 6 vetos `exit 2` entre 18 entradas de hook / 15 scripts). A sobreposicao e real mas NAO e substituicao, e a diferenca importa: as regras de auto-mode classificam ACOES POR RISCO GENERICO (git destrutivo, deploy em producao, weaken de TLS); os 6 vetos do Onion cobram DOUTRINA DESTA CASA (merge so pelo caminho verificado, commit em main, citacao de REGRA com titulo, forma de veredito no shell) — coisas que nenhuma lista generica conhece. O achado util nao e "migrar", e que existe um `critique` que aceita REGRAS PROPRIAS: ha uma superficie oficial para expressar politica que hoje so existe como shell. Fio aberto, nao decisao.'
     provenance:
       source: ".claude/hooks"
-      locator: "`claude auto-mode defaults` no binario 2.1.278 devolve JSON com 17 regras `allow`, 70 `soft_deny`, 1 `hard_deny` e um bloco `environment` (copia em data/automode-defaults-2.1.278.json). O subcomando expoe ainda `config` (config efetiva) e `critique` (feedback de IA sobre regras proprias). No repo, medido: 18 ENTRADAS de hook em .claude/settings.json / 15 SCRIPTS distintos (session-beacon-hook.sh aparece 3x) / 6 que vetam por `exit 2`. Os tres numeros descrevem populacoes diferentes e o grafo passa a dizer qual."
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "repo"
+      locator: "`claude auto-mode defaults` no binario 2.1.278 devolve JSON com 17 regras `allow`, 70 `soft_deny`, 1 `hard_deny` e um bloco `environment` (copia em data/automode-defaults-2.1.278.json). O subcomando expoe ainda `config` (config efetiva) e `critique` (feedback de IA sobre regras proprias). No repo, medido em onion-evolve@6e4e5088: 18 ENTRADAS de hook em .claude/settings.json / 15 SCRIPTS distintos (session-beacon-hook.sh aparece 3x) / 6 que vetam por `exit 2`. Os tres numeros descrevem populacoes diferentes e o grafo passa a dizer qual."
+      method: "medição: `claude auto-mode defaults` sobre o binário do Claude Code 2.1.278 (saída em data/automode-defaults-2.1.278.json) + contagem de hooks em onion-evolve@6e4e5088:.claude/settings.json"
+      locality: "web"
 
   - id: E_RESPAWN_JA_EXISTIA_E_A_CASA_NAO_SABIA
     node_type: evidence

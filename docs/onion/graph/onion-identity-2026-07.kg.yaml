@@ -175,7 +175,7 @@ nodes:
     verified_at: 2026-07-17
     provenance:
       source: "github.com/marciocar/metagamify"
-      locator: "merge-base 62ef2c10 (origin/develop) f7e4b034 (origin/rhilo/main), pontas de 2026-07-11 = 05f96a05 (\"Merge pull request #75\", 2026-07-01 11:05 -0300); clone em /home/marcio/rhilo-metagamify"
+      locator: "merge-base 62ef2c10 (origin/develop) f7e4b034 (origin/<branch do fork privado>/main), pontas de 2026-07-11 = 05f96a05 (\"Merge pull request #75\", 2026-07-01 11:05 -0300)"
       method: "leitura: merge-base dos commits 62ef2c10 e f7e4b034 do marciocar/metagamify = 05f96a05 (2026-07-01)"
       locality: "web"
   - id: C_TOPO_MAIN_HAS_FW
@@ -286,7 +286,7 @@ nodes:
     verified_at: 2026-07-17
     provenance:
       source: "github.com/marciocar/metagamify"
-      locator: "merge-base 62ef2c10 (origin/develop@2026-07-11) f7e4b034 (origin/rhilo/main@2026-07-11) = 05f96a05; log -1 05f96a05 = 2026-07-01 11:05 -0300; clone em /home/marcio/rhilo-metagamify"
+      locator: "merge-base 62ef2c10 (origin/develop@2026-07-11) f7e4b034 (origin/<branch do fork privado>/main@2026-07-11) = 05f96a05; log -1 05f96a05 = 2026-07-01 11:05 -0300"
       method: "leitura: merge-base dos commits 62ef2c10 e f7e4b034 do marciocar/metagamify = 05f96a05 (2026-07-01)"
       locality: "web"
   - id: E_GIT_LSTREE_MAIN
@@ -300,7 +300,7 @@ nodes:
     trace: "git ls-tree -r --name-only origin/main -- .claude"
     provenance:
       source: "github.com/marciocar/metagamify"
-      locator: "ls-tree -r --name-only bfb9bce2 -- .claude | wc -l = 239 (bfb9bce2 = origin/main do marciocar/metagamify, \"adoção do framework Onion\", 2026-06-26, a mesma ponta em 07-11); clone em /home/marcio/rhilo-metagamify"
+      locator: "ls-tree -r --name-only bfb9bce2 -- .claude | wc -l = 239 (bfb9bce2 = origin/main do marciocar/metagamify, \"adoção do framework Onion\", 2026-06-26, a mesma ponta em 07-11)"
       method: "leitura: árvore .claude do commit bfb9bce2 do marciocar/metagamify (239 arquivos)"
       locality: "web"
   - id: E_CLAUDE_MD

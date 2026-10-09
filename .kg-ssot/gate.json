@@ -76,7 +76,7 @@
     "form.range.node.label": 2224,
     "form.required.node.verified_against": 141,
     "form.required.node.verified_at": 15,
-    "integrity.testimony-in-prod": 8,
+    "integrity.testimony-in-prod": 1,
     "integrity.untraced-decision": 36,
     "yaml.unquoted-date": 129
   },

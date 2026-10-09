@@ -73,9 +73,9 @@ nodes:
     trace: '.claude/validation/lint-artifacts.sh · .claude/hooks/'
     provenance:
       source: ".claude/validation/lint-artifacts.sh · .claude/hooks/"
-      locator: "medicao nesta maquina em 2026-10-01 — `claude --version` = 2.1.286; o binario /home/marcio/.local/share/claude/versions/2.1.286 e ELF 64-bit e `grep -ao` nele devolve PreToolUse 243x, bypassPermissions 195x e billing 167x; `ls .claude/hooks/*.sh` = 15 hooks, dos quais 6 contem `exit 2`; `wc -l .claude/validation/lint-artifacts.sh` = 5282 com 203 chamadas `violation \"` e 13 arquivos de baseline-catraca"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
-      locality: "repo"
+      locator: "medicao nesta maquina em 2026-10-01 — `claude --version` = 2.1.286; o binário do Claude Code 2.1.286 é ELF 64-bit e `grep -ao` nele devolve PreToolUse 243x, bypassPermissions 195x e billing 167x; `ls .claude/hooks/*.sh` em onion-evolve@0f8a2d41 = 15 hooks, dos quais 6 contem `exit 2`; `wc -l .claude/validation/lint-artifacts.sh` = 5282 com 203 chamadas `violation \"` e 13 arquivos de baseline-catraca"
+      method: "medição: `grep -ao <termo>` (ocorrências de PreToolUse, bypassPermissions e billing) sobre o binário do Claude Code 2.1.286 + contagens do repo em onion-evolve@0f8a2d41"
+      locality: "web"
 
   - id: E_CORPUS_AUSENCIA_DE_UNIDADE_BILHETAVEL
     node_type: evidence
@@ -404,10 +404,10 @@ nodes:
     label: 'OBJECAO 1 (Elenxo, 1 agente sem votacao) — o achado PROVA O CONTRARIO do que a pergunta precisa: se o exit 2 e NATIVO da plataforma e documentado publicamente, ele e um PRIMITIVO GRATIS disponivel a qualquer concorrente, nao unidade bilhetavel nem moat. Qualquer um escreve um hook que sai 2; ninguem paga pelo que a plataforma da de graca. E o CLAUDE.md ja diz que isso compra o acoplamento — comprar acoplamento NAO e gerar receita, e a rodada confunde as duas coisas. CORRECAO DE NUMERO desta sessao, porque refutador tambem se re-mede: o Elenxo declarou 117 ocorrencias de PreToolUse no binario; medido aqui com `grep -ao` sao 243 (provavel diferenca de metodo, linhas versus ocorrencias). A direcao da objecao nao muda.'
     trace: '/home/marcio/.local/share/claude/versions/2.1.286'
     provenance:
-      source: "binário do Claude Code 2.1.286 (host)"
+      source: "binário do Claude Code 2.1.286"
       locator: "achado 1 (exit 2 nativo, tier 9) lido contra a medicao local de 2026-10-01: o binario 2.1.286 traz 243 ocorrencias de PreToolUse e 195 de bypassPermissions — o Elenxo declarou 117, numero que NAO reproduz aqui"
       method: "medição: contagem de ocorrências no binário do Claude Code 2.1.286 no host 2026-10-01 (PreToolUse=243, bypassPermissions=195), comando exato não registrado; o 2.1.286 não está mais instalado (versions/ tem 2.1.293 a 2.1.296)"
-      locality: "host"
+      locality: "web"
 
   - id: E_OBJECAO_STYRA_E_DE_2025_E_INFERENCIA
     node_type: evidence

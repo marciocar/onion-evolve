@@ -26,7 +26,7 @@ nodes:
   - id: E_SKILLS_FORMATO_IDENTICO
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.95
     status: confirmed
@@ -41,7 +41,7 @@ nodes:
   - id: E_OIDC_GENERICO_SEM_GUIA_LOGTO
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.9
     status: confirmed
@@ -89,7 +89,7 @@ nodes:
   - id: E_PEGADINHAS_OPERACIONAIS
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.9
     status: confirmed
@@ -104,7 +104,7 @@ nodes:
   - id: E_HEADROOM_SWAP_100
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.95
     status: confirmed
@@ -121,7 +121,7 @@ nodes:
   - id: E_SKILLSYNC_DORMANT_V087
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.95
     status: confirmed
@@ -167,7 +167,7 @@ nodes:
     node_type: decision
     trace: /home/marcio/onion-vps-librechat/docker-compose.yml
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.9
     status: confirmed
@@ -200,7 +200,7 @@ nodes:
   - id: Q_EMBEDDINGS_KEY_PENDENTE
     node_type: question
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 0.9
     status: confirmed

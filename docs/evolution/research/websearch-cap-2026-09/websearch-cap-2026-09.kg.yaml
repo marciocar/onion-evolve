@@ -137,9 +137,9 @@ nodes:
     trace: 'python3 re.finditer sobre o binario 2.1.258; docs/evolution/research/websearch-cap-2026-09/SYNTHESIS.md'
     provenance:
       source: "python3 re.finditer sobre o binario 2.1.258; docs/evolution/research/websearch-cap-2026-09/SYNTHESIS.md"
-      locator: "binario ~/.local/share/claude/versions/2.1.258 (python re.finditer): `var Ee=200;function BQn(){return a.CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION??Ee}` e a mensagem `this session has used its web search budget (${v} of ${k} WebSearch calls)... ask the user to raise CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` junto de `n.taskRegistry.incrementWebSearchCalls()`"
+      locator: "binário do Claude Code 2.1.258 (python3 re.finditer sobre os bytes): `var Ee=200;function BQn(){return a.CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION??Ee}` e a mensagem `this session has used its web search budget (${v} of ${k} WebSearch calls)... ask the user to raise CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` junto de `n.taskRegistry.incrementWebSearchCalls()`"
       method: "medição: python3 re.finditer sobre o binário do Claude Code 2.1.258 (sessão 2026-09-02)"
-      locality: "host"
+      locality: "web"
 
   - id: E_BINARIO_2_1_258_MAX_CONCURRENT_SUBAGENTS_20
     node_type: evidence
@@ -156,9 +156,9 @@ nodes:
     trace: 'python3 re.finditer sobre o binario 2.1.258'
     provenance:
       source: "python3 re.finditer sobre o binario 2.1.258"
-      locator: "binario 2.1.258: `_e=20;function FQn(){return a.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS??_e}` na mesma regiao do codigo"
+      locator: "binário do Claude Code 2.1.258 (python3 re.finditer): `_e=20;function FQn(){return a.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS??_e}` na mesma regiao do codigo"
       method: "medição: python3 re.finditer sobre o binário do Claude Code 2.1.258 (sessão 2026-09-02)"
-      locality: "host"
+      locality: "web"
 
 edges:
   - from: E_CAP_DEFAULT_200_PER_SESSION

@@ -474,7 +474,7 @@ nodes:
     trace: '.claude/utils/adopt/write-stamp.sh'
     provenance:
       source: ".claude/utils/adopt/write-stamp.sh"
-      locator: "write-stamp.sh --role standalone saia 2; /home/marcio/onion-standalone/.claude/.onion-version carrega role: adopted"
+      locator: "write-stamp.sh --role standalone saia 2; o carimbo .claude/.onion-version da porta onion-standalone (clone local) carregava role: adopted"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
@@ -506,7 +506,7 @@ nodes:
     trace: 'ops/verify-adopter-gate.sh'
     provenance:
       source: "ops/verify-adopter-gate.sh"
-      locator: "adocao real do jogo-da-vida abortou com rc=1; `core.hooksPath` = /home/marcio/jogo-da-vida/.githooks (absoluto) contra a comparacao `[ \"${DIR}\" != \".githooks\" ]`; apos a cura com -ef o mesmo alvo devolve GATE VIVO"
+      locator: "adocao real do jogo-da-vida abortou com rc=1; `core.hooksPath` = caminho ABSOLUTO para .githooks no clone de jogo-da-vida contra a comparacao `[ \"${DIR}\" != \".githooks\" ]`; apos a cura com -ef o mesmo alvo devolve GATE VIVO"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
@@ -538,7 +538,7 @@ nodes:
     trace: 'ops/audit-adopters-registry.sh'
     provenance:
       source: "ops/audit-adopters-registry.sh"
-      locator: "ops/audit-adopters-registry.sh /home/marcio — varredura por STAMP (.claude/.onion-version com role != source) cruzada com members.yaml: 19 adotantes no disco, 9 sem entrada"
+      locator: "ops/audit-adopters-registry.sh <diretório-pai dos clones no host> — varredura por STAMP (.claude/.onion-version com role != source) cruzada com members.yaml: 19 adotantes no disco, 9 sem entrada"
       method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
@@ -693,7 +693,7 @@ nodes:
     trace: '.claude/validation/lint-artifacts.sh'
     provenance:
       source: ".claude/validation/lint-artifacts.sh"
-      locator: "lint-artifacts.sh rodado na porta REAL (/home/marcio/onion-core, repo git, pin 7a3504e6b121): 1 HARD em .claude/rules/research-lens.md — contra o \"rc=0, 0 HARD\" que eu declarei do MESMO pin, medido num destino materializado SEM git init"
+      locator: "lint-artifacts.sh rodado na porta REAL (clone local da porta onion-core, repo git, pin 7a3504e6b121): 1 HARD em .claude/rules/research-lens.md — contra o \"rc=0, 0 HARD\" que eu declarei do MESMO pin, medido num destino materializado SEM git init"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
@@ -806,7 +806,7 @@ nodes:
     trace: '.claude/validation/vps-exposure-check.sh'
     provenance:
       source: ".claude/validation/vps-exposure-check.sh"
-      locator: "grep de /home/<conta>/ e do host de backend nas 11 raizes de varredura: 14 sitios remanescentes, todos em codigo funcional (defaults de varredura, endpoints, URL de pull)"
+      locator: "grep do prefixo de home de conta e do host de backend nas 11 raizes de varredura: 14 sitios remanescentes, todos em codigo funcional (defaults de varredura, endpoints, URL de pull)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 

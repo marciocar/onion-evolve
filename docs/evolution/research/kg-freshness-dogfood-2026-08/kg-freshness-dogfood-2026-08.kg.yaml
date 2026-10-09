@@ -218,7 +218,7 @@ nodes:
     provenance:
       source: "ec4c8442 (corpo do commit) + ec4c8442:docs/evolution/federation/members.yaml"
       locator: "corpo de ec4c8442 l.20 ('existem DOIS members.yaml nesta máquina (9 e 8 adotantes)'); git show ec4c8442:docs/evolution/federation/members.yaml | md5sum = a31526aa; último commit do arquivo 31f9d697 (2026-08-17)"
-      method: "testemunho: medição da sessão 2026-08-29 (md5sum + PyYAML nos dois caminhos) relatada em 1ª pessoa no corpo de ec4c8442 (Claude-Session); a metade versionada conferida por leitura (md5 a31526aa, 9 adopters incl. poc-venda-direta-pdi); /home/onion sem permissão hoje"
+      method: "testemunho: medição da sessão 2026-08-29 (md5sum + PyYAML nos dois caminhos) relatada em 1ª pessoa no corpo de ec4c8442 (Claude-Session); a metade versionada conferida por leitura (md5 a31526aa, 9 adopters incl. poc-venda-direta-pdi); o home da conta de serviço onion sem permissão hoje"
       locality: "repo"
 
   - id: C_PROJETOR_DE_IDENTIDADE_SEM_ANCORA
@@ -256,7 +256,7 @@ nodes:
 
   - id: E_CONSOLE_LIGADO_DESDE_08_10
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 4
     confidence: 1.0
@@ -266,9 +266,9 @@ nodes:
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml (C_console_not_the_path, reverify_note)"
     provenance:
       source: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml (C_console_not_the_path, reverify_note)"
-      locator: "console.sh status → LIGADO; /etc/caddy/conf.d/logto-console.caddy sem .disabled"
-      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "repo"
+      locator: "console.sh status → LIGADO; vhost logto-console.caddy do Caddy do host sem .disabled (host)"
+      method: "testemunho: console.sh status e o vhost do Caddy lidos no host 2026-08-29"
+      locality: "host"
 
   # ═══════════════ Perguntas abertas, com gatilho nomeado ═══════════════
   - id: Q_REVERIFY_NOTE_E_PROSA_GRAMPEADA
