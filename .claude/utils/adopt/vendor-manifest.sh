@@ -214,6 +214,7 @@ _emit_command_excludes() {  # $1=REPO $2=papel → :(exclude) dos comandos de me
 #   ÂNCORA    = todo arquivo que VIAJA e não é peça da zona — comando mantido, skill, agente, hook, KB.
 #               A BANCADA não é âncora (`lint-selftest.sh` e `fixtures/`): ela TESTA a maquinaria, não
 #               a consome; se contasse, todo censo ficaria vivo porque a bancada o exercita.
+#               Nem esta planta, que cita nomes como dado (`_is_anchor`, logo abaixo, tem a medição).
 #   VIVA      = peça citada por uma âncora, ou por outra peça viva (fecho transitivo — a doutrina
 #               cita a lente que cita o censo, e o ciclo doutrina↔lente não se salva sozinho).
 #   CORTADA   = peça NÃO viva que é citada por um arquivo cortado (comando, prefixo de papel) ou por
@@ -224,6 +225,18 @@ _emit_command_excludes() {  # $1=REPO $2=papel → :(exclude) dos comandos de me
 # Citação = o NOME DO ARQUIVO com extensão, delimitado (`evolve.js` não casa `onion-evolve.js`). Nome
 # sem extensão é prosa ("cláusula 1 da guard-doctrine") e não conta — medido: três guardas mantidas
 # citam `guard-doctrine` assim, e contá-las manteria viva a doutrina de um comando ausente.
+# Quem pode ANCORAR (manter viva) uma peça. Fora: a bancada (testa, não consome) e ESTE arquivo.
+# ⚠️ ESTE ARQUIVO SAIU POR MEDIÇÃO, não por cautela (2026-10-09): o comentário acima, ao documentar o
+# defeito, nomeia `cc-delta-census`, `forge-census` e o workflow do evolve COM extensão — e a planta
+# viaja como contrato. No primeiro commit da cura, o manifesto cortava 14 peças com a árvore antiga e
+# 11 com a nova: a própria explicação mantinha vivas 3 das peças que explicava. A planta cita nomes
+# como DADO sobre o transporte; quem a lê não executa nada do que ela nomeia.
+_is_anchor() {  # $1=path → 0 se a citação dele mantém viva uma peça
+  case "$1" in
+    .claude/validation/lint-selftest.sh|.claude/validation/fixtures/*|.claude/utils/adopt/vendor-manifest.sh) return 1 ;;
+  esac
+  return 0
+}
 _emit_companion_excludes() {  # $1=REPO $2=papel, stdin = caminhos já cortados → :(exclude) das peças órfãs
   local _repo="$1" _role="$2" _f _z _r _b _re _changed
   [ -n "$(_role_cut "${_role}")" ] || { cat >/dev/null; return 0; }
@@ -288,7 +301,7 @@ _emit_companion_excludes() {  # $1=REPO $2=papel, stdin = caminhos já cortados 
         [ -n "${_r}" ] || continue
         [ -n "${_cut[${_r}]:-}" ] && continue
         [ -n "${_forced[${_r}]:-}" ] && continue
-        case "${_r}" in .claude/validation/lint-selftest.sh|.claude/validation/fixtures/*) continue ;; esac
+        _is_anchor "${_r}" || continue
         if [ -z "${_zone[${_r}]:-}" ] || [ -n "${_alive[${_r}]:-}" ]; then
           _alive["${_z}"]=1; _changed=1; break
         fi
@@ -317,7 +330,7 @@ _emit_companion_excludes() {  # $1=REPO $2=papel, stdin = caminhos já cortados 
     while IFS= read -r _r; do
       [ -n "${_r}" ] || continue
       [ -n "${_cut[${_r}]:-}" ] || [ -n "${_gone[${_r}]:-}" ] && continue
-      case "${_r}" in .claude/validation/lint-selftest.sh|.claude/validation/fixtures/*) continue ;; esac
+      _is_anchor "${_r}" || continue
       echo "AVISO: a lente '${_z}' sai do papel '${_role}' (cita comando cortado), mas '${_r}' a cita e viaja — ponteiro morto." >&2
     done <<< "${_refs[${_z}]}"
   done
