@@ -24,10 +24,10 @@
 #             sem grafo → o plano de execução do core (fios-abertos.kg.yaml)
 #             --check   → só o veredito; exit 1 se há ABERTOS mas a FILA-PRONTA está
 #                         VAZIA (tudo bloqueado = anomalia de plano/deadlock) OU se o grafo
-#                         carrega um CHECKPOINT PENDENTE (meta.drive_checkpoint: pending)
+#                         carrega um CHECKPOINT PENDENTE (meta.x_drive_checkpoint: pending)
 #
 # P0.5 MECANIZADO (2026-10-04): o checkpoint do lote vive NO GRAFO, versionado, em
-#             `meta.drive_checkpoint: pending|sealed` (+ `meta.drive_checkpoint_note:`). Antes ele
+#             `meta.x_drive_checkpoint: pending|sealed` (+ `meta.x_drive_checkpoint_note:`). Antes ele
 #             vivia só no `.claude/sessions/<slug>/STATE.md`, que é GITIGNORADO e que NENHUM script
 #             lia: o anti-thrashing existia só na máquina onde foi escrito e só como prosa — num
 #             clone ou worktree novo o P0.5 passava por AUSÊNCIA (rodada do meta:evolve de
@@ -61,7 +61,7 @@ done
 # ⚠️ A 1a versão lia com awk e o Elenxo mediu 7 formas YAML válidas em que ela errava (aspas simples,
 #    a chave citada dentro de um label, `drive_checkpoint : x`, bloco `>-`, chave duplicada, meta
 #    depois de nodes, `xdrive_checkpoint`). Campo de controle se lê com o parser que o define.
-_ckpt() {   # $1 = read | close | seal ; lê/escreve meta.drive_checkpoint(+_note) de $GRAPH
+_ckpt() {   # $1 = read | close | seal ; lê/escreve meta.x_drive_checkpoint(+_note) de $GRAPH
   python3 - "$1" "$GRAPH" "$NOTE" <<'CKPT_PY'
 import sys, re
 try:
@@ -75,9 +75,11 @@ try:
 except Exception as e:
     print("ERRO: YAML ilegivel em %s: %s" % (path, e), file=sys.stderr); sys.exit(2)
 if mode == 'read':
-    v = meta.get('drive_checkpoint')
+    # contrato v4 (2026-10-08): extensão leva prefixo `x_`. Lê a forma nova e, para grafo antigo
+    # (dívida travada na base do gate), a sem prefixo; escreve só a nova.
+    v = meta.get('x_drive_checkpoint', meta.get('drive_checkpoint'))
     v = '' if v is None else str(v)
-    n = meta.get('drive_checkpoint_note') or ''
+    n = meta.get('x_drive_checkpoint_note', meta.get('drive_checkpoint_note')) or ''
     print(v + '\t' + ' '.join(str(n).split())); sys.exit(0)
 # escrita: só no bloco `meta:` em forma de BLOCO (flow-style não se edita com segurança)
 lines = txt.split('\n')
@@ -88,14 +90,14 @@ except StopIteration:
 j = i + 1
 while j < len(lines) and (lines[j].startswith(' ') or lines[j].strip() == '' or lines[j].lstrip().startswith('#')):
     j += 1
-body = [l for l in lines[i+1:j] if not re.match(r'^\s+drive_checkpoint(_note)?\s*:', l)]
-new = ['  drive_checkpoint: ' + ('pending' if mode == 'close' else 'sealed')]
+body = [l for l in lines[i+1:j] if not re.match(r'^\s+(x_)?drive_checkpoint(_note)?\s*:', l)]
+new = ['  x_drive_checkpoint: ' + ('pending' if mode == 'close' else 'sealed')]
 if mode == 'close':
-    new.append('  drive_checkpoint_note: "%s"' % note.replace('\\', '\\\\').replace('"', '\\"'))
+    new.append('  x_drive_checkpoint_note: "%s"' % note.replace('\\', '\\\\').replace('"', '\\"'))
 out = '\n'.join(lines[:i+1] + new + body + lines[j:])
 chk = (yaml.safe_load(out) or {}).get('meta') or {}
 want = 'pending' if mode == 'close' else 'sealed'
-if chk.get('drive_checkpoint') != want or (mode == 'close' and chk.get('drive_checkpoint_note') != note):
+if chk.get('x_drive_checkpoint') != want or (mode == 'close' and chk.get('x_drive_checkpoint_note') != note):
     print("ERRO: a escrita nao releu como escrita — nada gravado", file=sys.stderr); sys.exit(2)
 open(path, 'w', encoding='utf-8').write(out)
 print("checkpoint %s em %s" % (want, path))
@@ -137,7 +139,7 @@ RESULT="$(awk '
   FILENAME==ARGV[3] {
     if ($0 ~ /^[[:space:]]*- id:/) { cur=$0; sub(/^[[:space:]]*- id:[[:space:]]*/,"",cur); sub(/[[:space:]]*$/,"",cur) }
     else if ($0 ~ /^[^[:space:]]/) cur=""
-    if ($0 ~ /^[[:space:]]*drive_kind:/ && cur!="") { dk=$0; sub(/^[^:]*:[[:space:]]*/,"",dk); gsub(/"/,"",dk); sub(/[[:space:]]*$/,"",dk); DKIND[cur]=dk }
+    if ($0 ~ /^[[:space:]]*(x_)?drive_kind:/ && cur!="") { dk=$0; sub(/^[^:]*:[[:space:]]*/,"",dk); gsub(/"/,"",dk); sub(/[[:space:]]*$/,"",dk); DKIND[cur]=dk }
     next
   }
   END {
@@ -171,13 +173,13 @@ CKPT="${_CK%%$'\t'*}"; CKPT_NOTE="${_CK#*$'\t'}"
 case "$CKPT" in
   ""|sealed) : ;;
   pending) V="CHECKPOINT-PENDENTE" ;;
-  *) echo "ERRO: meta.drive_checkpoint com valor desconhecido: '$CKPT' (aceito: pending|sealed)" >&2; exit 2 ;;
+  *) echo "ERRO: meta.x_drive_checkpoint com valor desconhecido: '$CKPT' (aceito: pending|sealed)" >&2; exit 2 ;;
 esac
 
 if [ "$MODE" = "check" ]; then
   printf 'drive %s — %s: pronto=%s bloqueado=%s (aberto=%s)\n' \
     "$(basename "$GRAPH" .kg.yaml)" "$V" "$n_ready" "$n_blocked" "$n_open"
-  [ "$V" = "CHECKPOINT-PENDENTE" ] && printf '  lote anterior NÃO selado: %s\n' "${CKPT_NOTE:-(sem drive_checkpoint_note)}"
+  [ "$V" = "CHECKPOINT-PENDENTE" ] && printf '  lote anterior NÃO selado: %s\n' "${CKPT_NOTE:-(sem x_drive_checkpoint_note)}"
   case "$V" in DEADLOCK|CHECKPOINT-PENDENTE) exit 1 ;; *) exit 0 ;; esac
 fi
 
@@ -202,7 +204,7 @@ else printf '  _nada bloqueado._\n'; fi
 
 printf '\n## Ação\n'
 case "$V" in
-  CHECKPOINT-PENDENTE) printf '  ⛔ P0.5: o lote anterior NÃO foi selado (meta.drive_checkpoint: pending) — %s. PARE: o maestro sela (troca para sealed) antes de nova passada. `--check` sai ≠0.\n' "${CKPT_NOTE:-sem nota}" ;;
+  CHECKPOINT-PENDENTE) printf '  ⛔ P0.5: o lote anterior NÃO foi selado (meta.x_drive_checkpoint: pending) — %s. PARE: o maestro sela (troca para sealed) antes de nova passada. `--check` sai ≠0.\n' "${CKPT_NOTE:-sem nota}" ;;
   DONE)     printf '  ✅ plano sem trabalho aberto — nada a conduzir.\n' ;;
   DEADLOCK) printf '  ⛔ há aberto(s) mas a fila-pronta está VAZIA: um predecessor DEPENDS_ON está travado (predecessor UNVERIFIABLE, ciclo, ou onda mal-modelada). Resolva o bloqueador antes de seguir. `--check` sai ≠0.\n' ;;
   READY)    printf '  ▶ conduza o topo da fila-pronta (P2 do laço); os bloqueados voltam sozinhos quando o predecessor fechar.\n' ;;

@@ -38,12 +38,12 @@ introspecção e **zero percepção externa recorrente** (S9 parada desde 07-06)
   **três** desfechos, não um. Cobrado pela **REGRA 89 (Rodada de radar selada reconcilia o corpus
   que superou (Aufhebung), com catraca)**:
   1. `SUPERSEDES` no próprio grafo, quando o nó derrubado vive nele;
-  2. `meta.supersedes_external: <grafo>#<nó>`, quando ele vive na rodada ANTERIOR — e este caso é
+  2. `meta.x_supersedes_external: <grafo>#<nó>`, quando ele vive na rodada ANTERIOR — e este caso é
      a regra, não a exceção. ⚠️ **A aresta do motor é INTRA-ARQUIVO** (`kg-radar.sh` recebe um
      arquivo por invocação): obedecer ao "grafo próprio por rodada" torna `SUPERSEDES` sobre a
      baseline anterior *inalcançável*. Esta linha mandou o impossível por semanas, e a guarda
      nasceu quase punindo quem a obedecia;
-  3. `meta.supersedes_none: <razão>`, quando a rodada genuinamente não derrubou nada — desfecho de
+  3. `meta.x_supersedes_none: <razão>`, quando a rodada genuinamente não derrubou nada — desfecho de
      1ª classe. **Forçar `SUPERSEDES` inventado é pior que a dívida**, e a razão tem de dizer
      contra QUAL baseline se mediu (a do eixo, não um corpus qualquer).
   Os dois `meta.*` exigem **valor**: campo vazio não conta.

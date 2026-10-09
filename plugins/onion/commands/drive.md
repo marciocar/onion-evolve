@@ -18,7 +18,7 @@ achando superação — com o `/onion:realign` como **verificador-por-turno**. �
 
 - Opera no degrau **AUDIT**: conduz cada fio **até PR-verde sozinho**; **merge no main é 100% humano, em LOTE** num checkpoint.
 - **Maestro-invocado.** Nunca auto-inicia, nunca `/loop`/`schedule`/cron sobre si (W7 = MOAT).
-- **Budget-capped, retomável.** Sem budget não há laço. Retomada = re-censo (o status do nó É o progresso) + o checkpoint pendente **no grafo** (`meta.drive_checkpoint`).
+- **Budget-capped, retomável.** Sem budget não há laço. Retomada = re-censo (o status do nó É o progresso) + o checkpoint pendente **no grafo** (`meta.x_drive_checkpoint`).
 - **MOAT (PARA sempre):** deploy · escrever repo alheio (I3) · merge de path vendorizado/outward-facing · agendar por relógio.
 
 ## Uso
@@ -36,8 +36,8 @@ bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-radar.sh <grafo> --integrity --schema  
 Não se conduz grafo que o motor não lê.
 
 ### P0.5 — Checkpoint pendente (guarda 1-passada/checkpoint) — MECANIZADO
-O censo do P1 já o cobra: grafo com `meta.drive_checkpoint: pending` sai **`CHECKPOINT-PENDENTE`**
-(e `--check` ≠0), vencendo qualquer outro veredito. **PARE** e reporte a `drive_checkpoint_note`: o
+O censo do P1 já o cobra: grafo com `meta.x_drive_checkpoint: pending` sai **`CHECKPOINT-PENDENTE`**
+(e `--check` ≠0), vencendo qualquer outro veredito. **PARE** e reporte a `x_drive_checkpoint_note`: o
 maestro sela o lote **no próprio PR do lote, antes do merge** (`kg-drive-project.sh <grafo> --seal`) —
 o merge é o selo. Lote que entra no `main` ainda `pending` bloqueia o próximo censo até ser selado, e
 isso é o anti-thrashing funcionando, não defeito. (AUDIT é batch-confirm.)
@@ -93,7 +93,7 @@ Toda execução: **rodou o artefato de verdade** + o **modo-de-falha** (não só
 ```bash
 bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-drive-project.sh <grafo> --close-lot "<o lote numa linha, NOMEANDO cada flip auto-selado>"
 ```
-Escreve `drive_checkpoint: pending` + a nota no `meta:` (lê e relê por YAML; meta em flow-style recusa).
+Escreve `x_drive_checkpoint: pending` + a nota no `meta:` (lê e relê por YAML; meta em flow-style recusa).
 O `STATE.md` local é rascunho, **nunca** o controle nem o lugar de nomear flip — ele é gitignorado e o
 maestro não o vê. Consolide: PRs-verdes **para merge humano** · vereditos **DRIFTED/REFUTED para selo** · decisões propostas · C-gated. Feche a reconciliação:
 ```bash
@@ -121,8 +121,8 @@ bash ${CLAUDE_PLUGIN_ROOT}/validation/kg-seal-exception.sh <grafo> <NODE_ID>   #
 Ele prova o que é provável por máquina: o id não está em nenhum `*.kg.yaml` da base nem na história
 dela (recusando repo raso e `origin/main` defasado) · a derrubada traz `verified_at`+`verified_against`
 não-placeholder · Aufhebung completa e `kg-radar --integrity --schema` exit 0.
-Desde 2026-10-04 ele prova também a **4ª precondição**: o grafo tem `drive_checkpoint: pending` e a
-`drive_checkpoint_note` **nomeia** o id (fronteira de identificador, não substring). A nota viaja no
+Desde 2026-10-04 ele prova também a **4ª precondição**: o grafo tem `x_drive_checkpoint: pending` e a
+`x_drive_checkpoint_note` **nomeia** o id (fronteira de identificador, não substring). A nota viaja no
 diff do PR — é ela que põe o flip diante do maestro. (Antes era "nomear no `STATE.md`", que é
 gitignorado: o mesmo defeito que o P0.5 curou, deslocado para cá — achado do Elenxo.)
 **O que ele NÃO prova:** se a medição de fato ocorreu (o campo é auto-atestado). `exit 0` não quer
