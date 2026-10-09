@@ -3,227 +3,40 @@
   "contract_sha256": "dcc872a35afecf8751ab2b7f740a5c55516c51ad4a4e54206ba612e14c0a16d5",
   "graphs": 138,
   "failing": {
-    "docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/audit-textual-gates-2026-09/audit-textual-gates-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/autonomous-thread-runtime-2026-07/autonomous-thread-runtime.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.meta.label",
       "form.unknown-key.meta.trace"
-    ],
-    "docs/evolution/research/breadcrumb-doctrine-2026-07/breadcrumb-doctrine.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/bridge-produto-2026-08/bridge-produto-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/canal-vivo-sessoes-2026-10/canal-vivo-sessoes-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/claude-code-2.1-onion-2026-08/claude-code-2.1-onion-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/company-brain-e-conducao-como-servico-2026-10/company-brain-e-conducao-como-servico-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/compartilhamento-individuo-organizacao-2026-09.kg.yaml": [
-      "form.required.node.provenance"
     ],
     "docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml": [
       "form.unknown-key.node.resolution"
     ],
-    "docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/doctrine-sync-ingestor-2026-07/doctrine-sync-ingestor.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/email-logto-2026-08/email-logto-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/kg-read-leg-2026-08/kg-read-leg-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/librechat-2026-08/librechat-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/m8-serial-2026-08/m8-serial-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/maestro-vivo-2026-08/maestro-vivo-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/onion-d2-data-currency-2026-07/onion-d2-data-currency-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/radar-E3-2026-10-03-r6/radar-E3-2026-10-03-r6.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/telescope-doctrine-2026-07/telescope-doctrine.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/triagem-inbox-2026-09/triagem-inbox-2026-09.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.node.resolution"
     ],
-    "docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/unidade-bilhetavel-do-onion-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/vaultwarden-logto-2026-08/vaultwarden-logto-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/websearch-cap-2026-09/websearch-cap-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/whatsapp-api-2026-07/whatsapp-api-2026-07.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.meta.revisited"
     ],
-    "docs/evolution/research/zoho-glpi-adapters-2026-09/zoho-glpi-adapters-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/arandek-adoption-dogfood-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/onion/graph/catraca-regra49-2026-08.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.node.status_note"
-    ],
-    "docs/onion/graph/coexistence-two-homes-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/colaboracao-onion-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/company-brain-market-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/constellation-dialogic-layer-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/constellation.kg.yaml": [
-      "form.required.node.provenance"
     ],
     "docs/onion/graph/context-freshness-2026-08-12.kg.yaml": [
       "form.unknown-key.meta.run_id"
-    ],
-    "docs/onion/graph/d5-pricing-2026-07.kg.yaml": [
-      "form.required.node.provenance"
     ],
     "docs/onion/graph/doctrine-behavior-over-declaration-2026-07.kg.yaml": [
       "form.unknown-key.meta.title"
     ],
     "docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.meta.run_id"
     ],
-    "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/fios-abertos.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/forge-comando-framework-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/onion/graph/graduated-automation-elenxo-2026-07.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.meta.title"
     ],
-    "docs/onion/graph/granaai-doctrine-absorption-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/gtm-decisions-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/onion/graph/guardas-revisao-2026-08.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.meta.label",
       "form.unknown-key.meta.trace"
-    ],
-    "docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml": [
-      "form.required.node.provenance"
     ],
     "docs/onion/graph/inbox-sinais-2026-09.kg.yaml": [
       "form.unknown-key.meta.slug",
@@ -235,77 +48,36 @@
       "form.required.node.provenance",
       "form.unknown-key.meta.title"
     ],
-    "docs/onion/graph/kg-diagnose-automation-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.node.reverify_note",
       "form.unknown-key.node.superseded_note"
     ],
-    "docs/onion/graph/m3-federation-admin-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/onion/graph/onion-evolution-2026-07.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.meta.source_run"
     ],
-    "docs/onion/graph/onion-family-topology-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/onion-identity-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/perception-instruments-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/plugins-en-compliance-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/onion/graph/pr-decision-history-2026-08.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.edge.provenance"
     ],
-    "docs/onion/graph/residuos-2026-08-18.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/onion/graph/review-gate-saldo-2026-09.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.node.gatilho"
     ],
     "docs/onion/graph/rito-task-manager-2026-09.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.node.gatilho"
-    ],
-    "docs/onion/graph/session-2026-07-18-evolve-review-triage.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/technical-context-core-2026-07.kg.yaml": [
-      "form.required.node.provenance"
     ],
     "docs/onion/graph/testes-evidencia-2026-09.kg.yaml": [
       "form.unknown-key.meta.slug",
       "form.unknown-key.meta.title",
       "form.unknown-key.top.kind",
       "form.unknown-key.top.version"
-    ],
-    "docs/onion/graph/vps-shared-tools-2026-07.kg.yaml": [
-      "form.required.node.provenance"
     ]
   },
   "debt": {
     "form.pattern.node.provenance.method": 6,
-    "form.range.node.label": 112,
+    "form.range.node.label": 111,
     "form.required.node.verified_against": 16,
-    "form.required.node.verified_at": 7,
-    "integrity.testimony-in-prod": 34,
-    "integrity.untraced-decision": 19,
+    "form.required.node.verified_at": 6,
+    "integrity.testimony-in-prod": 36,
+    "integrity.untraced-decision": 14,
     "yaml.unquoted-date": 129
   },
   "accepted_regressions": [
@@ -454,6 +226,13 @@
         "✗ PIOROU  debt.form.required.node.verified_against: 0 → 16",
         "✗ PIOROU  debt.integrity.testimony-in-prod: 0 → 34",
         "✗ PIOROU  debt.integrity.untraced-decision: 0 → 19"
+      ]
+    },
+    {
+      "date": "2026-10-09",
+      "reason": "testimony-in-prod 34→36 GRAFOS é efeito da contagem por grafo: os NÓS PROD com method testemunho caíram de 107 para 103 nos 91 grafos tocados pelas ondas 2 e 3 da O3; os 11 grafos novos vêm de testemunho em PROD selado pelo maestro em 2026-10-09 (dev-dúvida mantido em PROD com fonte, e testemunho com origem explícita no lugar de DEV); a queima segue o insumo testimony-in-prod do v4.1 (SAC-73)",
+      "worse": [
+        "✗ PIOROU  debt.integrity.testimony-in-prod: 34 → 36"
       ]
     }
   ]
