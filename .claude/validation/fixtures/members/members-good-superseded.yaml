@@ -1,5 +1,5 @@
 # FIXTURE (pass) — linhagem histórica: `superseded_by` aponta um membro que existe e não é histórico.
-# Dados fictícios (2026-10-09, selo do maestro sobre Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO).
+# Dados fictícios (2026-10-09, selo do maestro sobre um adotante superado por outro no mesmo remoto).
 version: 2
 trust_policy_version: 1
 members:
