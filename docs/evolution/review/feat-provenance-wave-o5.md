@@ -3,7 +3,8 @@ title: "Revisão — onda O5 da migração de provenance (SAC-73): 81 linhas jul
 date: 2026-10-09
 branch: feat/provenance-wave-o5
 reviewer: "passada adversarial com o mandato de achar linha aplicada fora do veredito, plano mexido por manter-dev-binario, status mexido por dev-historia, caminho de máquina que sobrou em source, locator ou method, locality inventada ou apagada, nó fora da planilha alterado e regressão do gate. Conferi mecanicamente as 81 linhas aplicáveis contra os 34 arquivos finais e abri uma amostra estratificada de 10 aplicados (semente 20261009) com o nó antes e depois. Rodei a idempotência, a bancada kg_migrate_v3 16/16 com LC_ALL=C e 4 mutantes"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: ec70373b2ac49c5049280161e74f7330e7c23db301ffee85d7fd09d3f95e4d1e
+reviewed_code_sha256: 7bcda5171f36091416d1725532d22a9d5a13f2b533d40a4aee82e059ceb885d4
 findings_total: 6
 findings_real: 3
 verdict: CORRIGIDO
