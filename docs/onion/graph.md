@@ -367,7 +367,7 @@ granaai	trust-advises	onion-evolve
 granaai	trust-corrects	onion-evolve	
 gustavo-pulga	adopts	onion-evolve	
 gustavo-pulga	mode	greenfield	
-gustavo-pulga	pin	c9eb2c40bc3b	
+gustavo-pulga	pin	7fd9392cd43b	
 gustavo-pulga	specialization	field-dogfood	
 gustavo-pulga	specialization	greenfield-adoption	
 gustavo-pulga	tier	standalone	
@@ -383,7 +383,7 @@ hub-formacao-enterprise	tier	hub
 hub-formacao-enterprise	trust-advises	onion-evolve	
 hub-operacoes-enterprise	adopts	onion-evolve	
 hub-operacoes-enterprise	mode	greenfield	
-hub-operacoes-enterprise	pin	cff9214c3b9a	
+hub-operacoes-enterprise	pin	8278fee79d1c	
 hub-operacoes-enterprise	specialization	hub	
 hub-operacoes-enterprise	specialization	itsm	
 hub-operacoes-enterprise	specialization	task-manager-integration	
@@ -401,7 +401,7 @@ jira-specialist	related	product-agent
 jira-specialist	related	task-specialist	
 jogo-da-vida	adopts	onion-evolve	
 jogo-da-vida	mode	greenfield	
-jogo-da-vida	pin	2e3f3a6f88ce	
+jogo-da-vida	pin	df031ef53683	
 jogo-da-vida	specialization	expo-universal	
 jogo-da-vida	specialization	gamification	
 jogo-da-vida	specialization	kg-radar-js-port	
@@ -676,7 +676,7 @@ onion-evolve	specialization	sdaal
 onion-evolve	tier	source	
 onion-kg-ssot	adopts	onion-evolve	
 onion-kg-ssot	mode	greenfield	
-onion-kg-ssot	pin	fe8359e38b43	
+onion-kg-ssot	pin	0d293c077a28	
 onion-kg-ssot	specialization	kg-ssot	
 onion-kg-ssot	specialization	produto	
 onion-kg-ssot	specialization	schema	
@@ -690,7 +690,7 @@ onion-mini	specialization	entry-level
 onion-mini	specialization	multi-platform	
 onion-mini	specialization	plea-cycles	
 onion-mini	specialization	task-management-lite	
-onion-mini	tier	standalone	
+onion-mini	tier	mini	
 onion-mini	trust-advises	onion-evolve	
 onion-pedro	adopts	onion-evolve	
 onion-pedro	mode	greenfield	
@@ -700,6 +700,14 @@ onion-pedro	specialization	field-dogfood
 onion-pedro	specialization	greenfield-adoption	
 onion-pedro	tier	standalone	
 onion-pedro	trust-advises	onion-evolve	
+onion-plugins	adopts	onion-evolve	
+onion-plugins	mode	greenfield	
+onion-plugins	pin	947e69ce069d	
+onion-plugins	specialization	claude-code	
+onion-plugins	specialization	plugin-marketplace	
+onion-plugins	specialization	public-distribution	
+onion-plugins	tier	plugins	
+onion-plugins	trust-advises	onion-evolve	
 onion-product	loads	embed:kb/framework-story-points.md	
 onion-product	loads	embed:kb/identificar-precificar-dor-cliente.md	
 onion-product	loads	when:spec -> resolve:business-context (skill onion-product-context)	
@@ -853,7 +861,7 @@ test-planner	related	branch-test-planner
 test-planner	related	test-engineer	
 vendas-pdi-enterprise	adopts	onion-evolve	
 vendas-pdi-enterprise	mode	greenfield	
-vendas-pdi-enterprise	pin	24118c5d7a97	
+vendas-pdi-enterprise	pin	4299290b73d4	
 vendas-pdi-enterprise	specialization	rag-bridge	
 vendas-pdi-enterprise	specialization	spec-as-code	
 vendas-pdi-enterprise	specialization	vendas	
