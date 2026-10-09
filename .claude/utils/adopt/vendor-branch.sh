@@ -247,7 +247,10 @@ _update() {  # <TARGET> <SOURCE_ROOT> <PIN> <INTEGRATION_BRANCH>
   [ -s "$req" ] || { echo "ERRO: a lista do que o core transporta saiu VAZIA (sha ${sha:0:12}) — recuso seguir sem ela." >&2
                      git -C "$T" worktree remove --force "$wt" 2>/dev/null; rm -f "$req"; return 12; }
   local _dc=0
-  ONION_REQUIRED_LIST="$req" ONION_REQUIRED_NUL=1 bash "$HERE/durable-commit.sh" "$wt" update "$PIN" "$VENDOR" >/dev/null 2>"$req.err" || _dc=$?
+  # ONION_DURABLE_VERIFY=0 FIXO: o commit da onion/vendor é framework puro numa worktree temporária; um
+  # VERIFY=1 exportado pelo operador para o commit final do --update vazaria até aqui, o hook recusaria
+  # e o erro viraria rc=12 "não levou o framework inteiro" — mentira (Elenxo do PR da F1, O2).
+  ONION_DURABLE_VERIFY=0 ONION_REQUIRED_LIST="$req" ONION_REQUIRED_NUL=1 bash "$HERE/durable-commit.sh" "$wt" update "$PIN" "$VENDOR" >/dev/null 2>"$req.err" || _dc=$?
   git -C "$T" worktree remove --force "$wt" 2>/dev/null
   if [ "$_dc" -ne 0 ]; then
     echo "ERRO: o commit durável do $VENDOR NÃO levou o framework inteiro (durable-commit rc=$_dc) — NADA foi mergeado." >&2

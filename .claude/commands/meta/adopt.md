@@ -419,7 +419,7 @@ cat > "$REPORT" <<EOF
 title: 'Relatório de ${OP} Onion — pin ${PIN}'
 date: $(date +%F)
 from: core (sessão-fonte, source-driven)
-to: $(basename "$DEST") (consumidor)
+to: $(basename "${TARGET:-$DEST}") (consumidor)
 type: flow-a-report
 source_commit: ${PIN}
 previous_commit: ${PREV:-—}
@@ -771,6 +771,10 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   # No UPDATE o helper PRESERVA adopted_from/mode/integration_branch/adopted_at (adopted_at NUNCA re-carimba),
   # atualiza source_commit/date e escreve updated_at; adopted_at perdido → members.yaml, ou omitido com AVISO.
   ```
+- **Auto-emitir o relatório NO ALVO — ANTES do commit durável, que o leva na branch dedicada** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
+  (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`, `BR=$UPDATE_BR`). Reusa o `diff --stat` já computado
+  acima. **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
+  `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-hard.sh" "$WORK"` (o merge muda o que o lint vê; rc=3 = escreva NÃO MEDIDO).
 - **Commit durável dos passos pós-merge (config + re-stamp):** o framework já veio pelo **merge** (acima,
   já commitado na branch dedicada); resta commitar o que o merge NÃO cobre — o `settings.json` merjado e o
   `.onion-version` re-carimbado. Aplicar o [🔒 Procedimento de Commit Durável](#-procedimento-de-commit-durável-never-clobber)
@@ -782,10 +786,6 @@ git -C "$SOURCE_ROOT" ls-tree HEAD -- .env.example | grep -q . && manifest+=(.en
   na integração e no `$WORK`) admite `--no-verify` **declarado no corpo do PR** — calado, nunca. Em caso de conflito de merge (exit 10 acima), este passo roda **após** o maestro resolver e commitar o merge.
 - **Integrar por PR:** push de `$UPDATE_BR` e PR para `$INTEGRATION_BRANCH` com **merge commit** (nunca
   rebase/squash: tira a `onion/vendor` da ancestralidade); com worktree irmã, `git -C "$TARGET" worktree remove "$WORK"` depois.
-- **Auto-emitir o relatório NO ALVO** via o [📨 Procedimento de Relatório Downstream](#-procedimento-de-relatório-downstream-auto-emitido-no-alvo)
-  (`DEST="$WORK"`, `OP=update`, `PIN=$NOW`, `PREV=$ADOPTED_COMMIT`, `BR=$UPDATE_BR`). Reusa o `diff --stat` já computado
-  acima. **O número de HARD do relatório é MEDIDO, nunca lembrado:** antes de escrevê-lo, rode
-  `bash "$SOURCE_ROOT/.claude/utils/adopt/remeasure-hard.sh" "$WORK"` (o merge muda o que o lint vê; rc=3 = escreva NÃO MEDIDO).
 - **Tie com a federação:** o `source_commit` do stamp **é** a versão de cada membro (member-version
   awareness — [multi-repo-federation.md](../../../docs/knowledge-base/concepts/multi-repo-federation.md)).
 

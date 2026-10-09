@@ -33,6 +33,18 @@ if [ "${_has_br}" = 0 ] && ! git -C "${TOP}" rev-parse --verify --quiet "${BASE}
   echo "ERRO: base '${BASE}' não resolve para um commit em ${TOP}." >&2; exit 2
 fi
 
+# ── RETOMADA: a branch já está aberta numa worktree? Então é lá, com ou sem farol agora ─────────────
+# Passada adversarial do PR da F1 (D1): 1ª rodada com farol vivo cria a worktree irmã; a outra sessão
+# sai; a retomada (shell novo, WORK não persiste) ia pelo caminho "sem farol", tentava `checkout` da
+# branch no alvo e o git recusava (a branch está em uso pela worktree) — --update irretomável, rc=2.
+git -C "${TOP}" worktree prune 2>/dev/null || true   # worktree com diretório apagado não é retomada
+_existing="$(git -C "${TOP}" worktree list --porcelain | awk -v b="refs/heads/${BR}" '/^worktree /{w=substr($0,10)} $0=="branch " b {print w; exit}')"
+if [ -n "${_existing}" ]; then
+  [ "${_existing}" != "${TOP}" ] && echo "  retomada: '${BR}' já está aberta na worktree ${_existing} — trabalho lá." >&2
+  printf '%s\n' "${_existing}"
+  exit 0
+fi
+
 # ── farol: há OUTRA sessão viva no alvo? ─────────────────────────────────────────────────────────
 BEACON="${HERE}/../../validation/session-beacon.sh"
 LIVE=1

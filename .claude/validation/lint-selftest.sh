@@ -16874,23 +16874,48 @@ run_adopt_robust_selftests() {
   if [ -z "${_ub}" ] || [ -z "${_vb}" ]; then
     record_fail "adopt-robust: (c4) setup" "não extraí a prosa do --update (bloco da branch dedicada e/ou a linha do vendor-branch)"
   else
-    local fc="${d}/fcore" ta="${d}/tadopt"
-    rm -rf "${fc}"; mkdir -p "${fc}/.claude/commands" "${fc}/docs/meta-specs"; git -C "${fc}" init -q
-    printf 'spec v1\n' > "${fc}/docs/meta-specs/spec.md"; printf 'cmd\n' > "${fc}/.claude/commands/foo.md"
-    git -C "${fc}" add -A; git -C "${fc}" commit -qm v1
-    rm -rf "${ta}"; mkdir -p "${ta}/src"; git -C "${ta}" init -q -b main; printf 'produto\n' > "${ta}/src/app.js"
-    git -C "${fc}" archive HEAD -- .claude docs | tar -x -C "${ta}"; git -C "${ta}" add -A; git -C "${ta}" commit -qm "adopt v1"
-    bash "${ad}/vendor-branch.sh" seed "${ta}" main >/dev/null 2>&1
-    printf 'spec v2\n' > "${fc}/docs/meta-specs/spec.md"; git -C "${fc}" commit -qam v2
-    local _pin; _pin="$(git -C "${fc}" rev-parse --short=12 HEAD)"; _m0="$(git -C "${ta}" rev-parse main)"
-    { printf 'SOURCE_ROOT=%q TARGET=%q NOW=%q TOOLS=%q\n' "${fc}" "${ta}" "${_pin}" "${REPO_ROOT}"
-      printf '%s\n' "${_ub}" "${_vb}" | sed -E 's#"\$SOURCE_ROOT/\.claude/#"$TOOLS/.claude/#g'
-      printf 'echo "WORK=$WORK"\n'; } > "${d}/upd.sh"
-    if _out="$(bash "${d}/upd.sh" 2>&1)"; then _rc=0; else _rc=$?; fi
-    if [ "${_rc}" -eq 0 ] && [ "$(git -C "${ta}" rev-parse main)" = "${_m0}" ] \
-       && git -C "${ta}" show "chore/onion-update-${_pin}:docs/meta-specs/spec.md" 2>/dev/null | grep -q 'v2'; then
-      record_pass "adopt-robust: (c4) a prosa do --update, executada: framework novo em chore/onion-update-<pin>; a integração NÃO andou"
-    else record_fail "adopt-robust: (c4)" "rc=${_rc} main andou? $([ "$(git -C "${ta}" rev-parse main)" = "${_m0}" ] && echo não || echo SIM) · ${_out:0:250}"; fi
+    # Dois modos, e o 2º existe por um mutante que NÃO mordia (Elenxo do PR da F1, O1): sem farol
+    # WORK == TARGET, então trocar `"$WORK"` por `"$TARGET"` na prosa passava verde. Com farol vivo a
+    # prosa roda numa worktree irmã, e o caso também lê o re-carimbo: ele tem de cair no WORK.
+    local _mode fc ta _pin _wk
+    for _mode in sem-farol farol-vivo; do
+      fc="${d}/fcore-${_mode}"; ta="${d}/tadopt-${_mode}"
+      rm -rf "${fc}"; mkdir -p "${fc}/.claude/commands" "${fc}/docs/meta-specs"; git -C "${fc}" init -q
+      printf 'spec v1\n' > "${fc}/docs/meta-specs/spec.md"; printf 'cmd\n' > "${fc}/.claude/commands/foo.md"
+      git -C "${fc}" add -A; git -C "${fc}" commit -qm v1
+      rm -rf "${ta}"; mkdir -p "${ta}/src" "${ta}/.claude"; git -C "${ta}" init -q -b main; printf 'produto\n' > "${ta}/src/app.js"
+      git -C "${fc}" archive HEAD -- .claude docs | tar -x -C "${ta}"
+      printf 'framework: f\nsource_commit: %s\nsource_commit_date: 2026-10-01\nrole: adopted\nadopted_at: 2026-10-01\n' "$(git -C "${fc}" rev-parse --short=12 HEAD)" > "${ta}/.claude/.onion-version"
+      git -C "${ta}" add -f -A; git -C "${ta}" commit -qm "adopt v1"
+      bash "${ad}/vendor-branch.sh" seed "${ta}" main >/dev/null 2>&1
+      printf 'spec v2\n' > "${fc}/docs/meta-specs/spec.md"; git -C "${fc}" commit -qam v2
+      _pin="$(git -C "${fc}" rev-parse --short=12 HEAD)"; _m0="$(git -C "${ta}" rev-parse main)"
+      [ "${_mode}" = farol-vivo ] && [ -f "${sb}" ] && bash "${sb}" up "${ta}" sessao-alheia-c4 >/dev/null 2>&1
+      { printf 'SOURCE_ROOT=%q TARGET=%q NOW=%q TOOLS=%q\n' "${fc}" "${ta}" "${_pin}" "${REPO_ROOT}"
+        printf '%s\n' "${_ub}" "${_vb}" | sed -E 's#"\$SOURCE_ROOT/\.claude/#"$TOOLS/.claude/#g'
+        printf 'bash "$TOOLS/.claude/utils/adopt/write-stamp.sh" "$WORK" --framework f --commit "$NOW" --commit-date 2026-10-09 >/dev/null\n'
+        printf 'echo "WORK=$WORK"\n'; } > "${d}/upd.sh"
+      if _out="$(bash "${d}/upd.sh" 2>&1)"; then _rc=0; else _rc=$?; fi
+      _wk="$(sed -n 's/^WORK=//p' <<< "${_out}" | tail -1)"
+      local _i4=""
+      [ "${_rc}" -eq 0 ] || _i4="${_i4} rc=${_rc}"
+      [ "$(git -C "${ta}" rev-parse main)" = "${_m0}" ] || _i4="${_i4} main-andou"
+      git -C "${ta}" show "chore/onion-update-${_pin}:docs/meta-specs/spec.md" 2>/dev/null | grep -q 'v2' || _i4="${_i4} v2-fora-da-branch"
+      if [ "${_mode}" = farol-vivo ]; then
+        [ -n "${_wk}" ] && [ "${_wk}" != "${ta}" ] || _i4="${_i4} sem-worktree-irmã"
+        [ "$(git -C "${ta}" rev-parse --abbrev-ref HEAD)" = main ] || _i4="${_i4} checkout-alheio-trocou"
+        grep -qx "source_commit: ${_pin}" "${_wk}/.claude/.onion-version" 2>/dev/null || _i4="${_i4} re-carimbo-fora-do-WORK"
+        grep -qx "source_commit: ${_pin}" "${ta}/.claude/.onion-version" 2>/dev/null && _i4="${_i4} re-carimbo-no-checkout-alheio"
+        # (c4r) RETOMADA com o farol APAGADO (Elenxo D1): a branch está na worktree — volta-se para lá.
+        rm -rf "${ta}/.claude/beacons"
+        local _wk2=""; _wk2="$(bash "${db}" "${ta}" "chore/onion-update-${_pin}" main 2>/dev/null)" || _i4="${_i4} retomada-rc≠0"
+        [ "${_wk2}" = "${_wk}" ] || _i4="${_i4} retomada-noutro-lugar(${_wk2})"
+      fi
+      if [ -z "${_i4}" ]; then
+        record_pass "adopt-robust: (c4/${_mode}) a prosa do --update, executada: framework e re-carimbo em chore/onion-update-<pin>; a integração NÃO andou$([ "${_mode}" = farol-vivo ] && echo '; worktree irmã, e a retomada sem farol volta a ela')"
+      else record_fail "adopt-robust: (c4/${_mode})" "${_i4} · ${_out:0:250}"; fi
+      [ -n "${_wk}" ] && [ "${_wk}" != "${ta}" ] && { git -C "${ta}" worktree remove --force "${_wk}" >/dev/null 2>&1 || true; }
+    done
   fi
   unset -f _ar_repo
 
