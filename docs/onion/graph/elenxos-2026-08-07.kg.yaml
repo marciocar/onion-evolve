@@ -23,6 +23,10 @@ nodes:
     verified_against: elenxo-556+varredura-dos-predicados-de-status-no-kg-radar-e-irmaos
     label: "PADRAO, nao bug pontual: predicado escrito como ALLOWLIST (`== confirmed`, `confirmed || open`) QUEBRA quando o enum CRESCE; escrito como DENYLIST (`!= superseded && != refuted`) trata o valor novo POR CONSTRUCAO. Medido quando `drifted`/`unverifiable` entraram em 2026-08-06: as tres allowlists do kg-radar os engoliram EM SILENCIO enquanto as tres denylists do mesmo arquivo os trataram certo sem uma linha de mudanca"
     trace: "docs/evolution/review/fix-radar-allowlist-denylist.md"
+    provenance:
+      source: "docs/evolution/review/fix-radar-allowlist-denylist.md"
+      locator: "elenxo-556+varredura-dos-predicados-de-status-no-kg-radar-e-irmaos"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ALLOWLIST_NO_RADAR_LATENTE
     node_type: evidence
@@ -34,6 +38,10 @@ nodes:
     verified_against: corpus-de-55-grafos-137-arestas-SUPERSEDES
     label: "SITIO 1 (curado no #556, LATENTE): tres allowlists no kg-radar.sh — origem de SUPERSEDES, alvo de SUPERSEDES, alvo de REFUTES. Alcance real ZERO no corpus (0 nos `drifted` em 2.095; os 35 alvos de origem nao-confirmed ja estavam superseded/refuted). Armava no primeiro selo que gravasse `drifted` num no que emite SUPERSEDES"
     trace: "docs/evolution/review/fix-radar-allowlist-denylist.md"
+    provenance:
+      source: "docs/evolution/review/fix-radar-allowlist-denylist.md"
+      locator: "corpus-de-55-grafos-137-arestas-SUPERSEDES"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ALLOWLIST_NA_CATRACA_49_ATIVO
     node_type: evidence
@@ -45,6 +53,10 @@ nodes:
     verified_against: reproducao-propria-trocar-um-no-PROD-para-drifted-sem-carimbar
     label: "SITIO 2 (NAO CURADO, e aqui o fail-open e ATIVO): kg-verification-coverage.sh:87,115 — a catraca da REGRA 49 — tem a MESMA allowlist, duplicada. Reproduzido por mim: trocar UM no plane:PROD impact 5 de `confirmed` para `drifted`, sem medir nem carimbar NADA, leva o gate de 48 para 47 no escopo e emite '[OBSOLETA] entrada OBSOLETA (no ja carimbado ou removido) — remova do baseline'. O gate AFIRMA um carimbo que nao existe e convida a encolher um baseline que so pode encolher por medicao. Destroi a propriedade fundadora escrita no cabecalho do proprio script: 'rodar o kg-freshness e a UNICA forma de diminuir o numero'"
     trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      locator: "reproducao-propria-trocar-um-no-PROD-para-drifted-sem-carimbar"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # SUCESSOR do no acima (2026-08-08). O rotulo antigo NAO foi reescrito: ele continua descrevendo o
   # fail-open como ele era, que e o unico jeito de a escada continuar legivel depois da correcao.
@@ -58,6 +70,10 @@ nodes:
     verified_against: mesma-mutacao-nos-dois-scripts-lado-a-lado-47-com-OBSOLETA-vs-48-limpo
     label: "SITIO 2 CURADO na F2.5: o predicado virou DENYLIST em sitio unico e a saida do escopo passou a ser CLASSIFICADA contra o vivo (CARIMBADO/RECONCILIADO/REMOVIDO sao SOFT; FUGA-SEM-ARESTA e FUGA-DE-ESCOPO sao HARD). Provado no par: a MESMA mutacao devolve 47 + [OBSOLETA] no script antigo e 48 limpo no novo. Custo no corpus real: ZERO nos a mais (48 -> 48) — fecha a porta sem mexer no gate. Detalhe e achados vizinhos em docs/onion/graph/catraca-regra49-2026-08.kg.yaml"
     trace: ".claude/validation/kg-verification-coverage.sh"
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "mesma-mutacao-nos-dois-scripts-lado-a-lado-47-com-OBSOLETA-vs-48-limpo"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ALLOWLIST_NO_KG_VIEW
     node_type: evidence
@@ -79,6 +95,10 @@ nodes:
     verified_against: PR-556-mergeado-7742d8d
     label: "DECISAO (#556): predicado de status nomeia quem NAO conta, nunca quem conta. E a exclusao por TIPO quando o criterio e de tipo: `done` fica fora so para `question` — porque question fechada como done e o remedio que a propria secao prescreve, e excluir `done` de TODOS os tipos calava uma `decision` fechada e superada, que e o defeito exato que o arquivo cura. A razao antiga ('criaria 11 acusacoes novas') era verdadeira no numero e ERRADA no motivo: os 11 sao question, 11/11"
     trace: "docs/evolution/review/fix-radar-allowlist-denylist.md"
+    provenance:
+      source: "docs/evolution/review/fix-radar-allowlist-denylist.md"
+      locator: "PR-556-mergeado-7742d8d"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── A TESE QUE OS TRES PRs CONFIRMARAM, CADA UM DE UM JEITO ─────────────────────────────────
   - id: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE
@@ -90,6 +110,10 @@ nodes:
     verified_at: '2026-09-09'
     verified_against: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A 25 \"id: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE\" docs/onion/graph/elenxos-2026-08-07.kg.yaml (nó + evidências filhas E_SITIO_HARD_SEM_COBERTURA, E_STEP_DE_CI_SEM_SELFTEST, E_BANCADA_QUE_NAO_SE_VERIFICAVA, e as arestas SUPPORTS); find . -iname \"*selftest-summary*\" -o -iname \"*collect-selftest*\" -o -iname \"*review-ledger*\" -o -iname \"*harness-inventory*\" -o -iname \"*testing-state*\"; grep -rn \"REGRA 80\\|REGRA 81\" docs/ ; sed -n '160,300p' docs/onion/graph/testes-evidencia-2026-09.kg.yaml"
     label: "TESE: o defeito sobrevive exatamente onde nenhum teste olha, e o tempo de sobrevivencia mede a lacuna de cobertura, nao a raridade do bug. TRES instancias medidas em 2026-08-07, em PRs independentes: (1) o sitio de REFUTES que REPROVA era o unico sem cobertura — revertendo so ele, 0 diffs em 438 comparacoes; (2) o step de CI que posta era codigo sem selftest, e o revisor ficou invisivel por 15 commits; (3) a bancada de fixtures nao se verificava, e tres malformacoes identicas acusaram o SUT inocente por 4 rodadas"
+    provenance:
+      source: "docs/onion/graph/elenxos-2026-08-07.kg.yaml"
+      locator: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A 25 \"id: C_O_DEFEITO_VIVE_ONDE_NAO_HA_TESTE\" docs/onion/graph/elenxos-2026-08-07.kg.yaml (nó + evidências filhas E_SITIO_HARD_SEM_COBERTURA, E_STEP_DE_CI_SEM_SELFTEST, E_BANCADA_QUE_NAO_SE_VERIFICAVA, e as arestas SUPPORTS); find . -iname \"*selftest-summary*\" -o -iname \"*collect-selftest*\" -o -iname \"*review-ledger*\" -o -iname \"*harness-inventory*\" -o -iname \"*testing-state*\"; grep -rn \"REGRA 80\\|REGRA 81\" docs/ ; sed -n '160,300p' docs/onion/graph/testes-evidencia-2026-09.kg.yaml"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: E_SITIO_HARD_SEM_COBERTURA
     node_type: evidence
@@ -131,6 +155,10 @@ nodes:
     verified_against: PR-557-mergeado-ee8067a+sabotagem-provada
     label: "DECISAO (#557, a pedido explicito do maestro na 3a ocorrencia): a bancada passa a verificar o que ELA MESMA gerou. `_fixture_sane` compara o que o CASO pretendia (nos/arestas declarados na chamada) com o que o arquivo TEM, e falha dizendo 'BANCADA MALFORMADA … O SUT NAO foi exercido', isolando o campo corrompido. O esperado NAO pode vir da string de entrada: dois dos tres defeitos a corrompiam, e conta-la concordaria com o arquivo. Provada por sabotagem"
     trace: "docs/evolution/review/feat-kg-seal-check.md"
+    provenance:
+      source: "docs/evolution/review/feat-kg-seal-check.md"
+      locator: "PR-557-mergeado-ee8067a+sabotagem-provada"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── A PREMISSA FALSA DA F4, E A SUPERACAO ──────────────────────────────────────────────────
   - id: C_F4_CAUSA_ERA_CREDENCIAL
@@ -173,6 +201,10 @@ nodes:
     verified_against: parser-real-da-action-shell-quote+CLI-do-pin+probe-do-SDK
     label: "MEDIDO E REVERTIDO no mesmo PR, para ninguem tentar de novo: passar `--json-schema` por `claude_args` NAO funciona neste pin. O parser da action passa claude_args por `shell-quote`, que COME as aspas do JSON — 371 bytes entram, 253 saem, `JSON.parse` falha. O CLI real responde `Error: --json-schema is not valid JSON` e sai 1; o SDK morre em t=0 com ZERO mensagens e o execution_file sai `[]`; o review-verdict classifica `revisou=false / json-ilegivel` nas DUAS tentativas. Seria REGRESSAO ESTRITA: hoje o revisor roda 41 turnos com sucesso. Reabilitar exige passar o schema por ARQUIVO, e o input nao aceita isso no pin be7b93b"
     trace: "docs/evolution/review/fix-revisor-invisivel.md"
+    provenance:
+      source: "docs/evolution/review/fix-revisor-invisivel.md"
+      locator: "parser-real-da-action-shell-quote+CLI-do-pin+probe-do-SDK"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_LACUNA_DA_SPEC_FECHA_NA_SPEC
     node_type: decision
@@ -234,6 +266,10 @@ nodes:
     verified_at: 2026-09-02
     verified_against: 'lint-artifacts.sh:1687-1698 — a REGRA 10 (anti-provider-direto) varre .github/workflows/*.yml como CONSUMIDOR, violacao HARD; bancada sdaal-workflows (a-b) prova a mordida; PR #758 (Onda 8, 2026-09-01)'
     label: "PAGO (Onda 8): a cegueira que este no denunciava CAIU para a REGRA 10 — .github/workflows/*.yml entrou no _find e chamada direta a provider num step de Actions e HARD. RESTO DECLARADO, nao dividia: .claude/validation/*.sh e review-artifact-check.sh:87 (gh pr view) seguem fora do alcance — sao a PECA EXECUTAVEL do adapter (transporte cli, forge/factory.md), nao consumidor; a REGRA 11 (forge-method-existe) segue restrita a commands/agents por desenho."
+    provenance:
+      source: ".github/workflows"
+      locator: "lint-artifacts.sh:1687-1698 — a REGRA 10 (anti-provider-direto) varre .github/workflows/*.yml como CONSUMIDOR, violacao HARD; bancada sdaal-workflows (a-b) prova a mordida; PR #758 (Onda 8, 2026-09-01)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
 edges:
   - from: E_JSON_SCHEMA_NAO_PASSA

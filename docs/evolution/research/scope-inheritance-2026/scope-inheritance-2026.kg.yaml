@@ -184,6 +184,10 @@ nodes:
     verified_at: 2026-07-17
     label: "cita verbatim: '1"
     trace: "code.claude.com/docs/en/settings"
+    provenance:
+      source: "code.claude.com/docs/en/settings"
+      locator: "research-2026-07"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_H2_02
     node_type: claim
     plane: DEV
@@ -204,6 +208,10 @@ nodes:
     verified_at: 2026-07-17
     label: "verbatim: load order broad→specific = Managed policy → User → Project → Local; 'All discovered files…"
     trace: "code.claude.com/docs/en/memory"
+    provenance:
+      source: "code.claude.com/docs/en/memory"
+      locator: "research-2026-07"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_H2_05
     node_type: claim
     plane: DEV
@@ -264,6 +272,10 @@ nodes:
     verified_at: 2026-07-17
     label: "verbatim: 4 modos (Installed by default / Available for install / Not available / Required — 'withou…"
     trace: "support.claude.com/.../13837433"
+    provenance:
+      source: "support.claude.com/.../13837433"
+      locator: "research-2026-07"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_H2_11
     node_type: claim
     plane: DEV
@@ -294,6 +306,10 @@ nodes:
     verified_at: 2026-07-17
     label: "verbatim: , /, , e o  hook que lê o dir de launch e recomenda o plugin daquele caminho"
     trace: "permissions.additionalDirectories"
+    provenance:
+      source: "permissions.additionalDirectories"
+      locator: "research-2026-07"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_H3_01
     node_type: claim
     plane: DEV
@@ -424,6 +440,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Verbatim na primária (): 'All discovered files are concatenated into context rather than overriding …"
     trace: "code.claude.com/docs/en/memory"
+    provenance:
+      source: "code.claude.com/docs/en/memory"
+      locator: "research-2026-07"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_H4_F2
     node_type: claim
     plane: DEV
@@ -474,6 +494,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Primária () confirma precedência por escopo ('When multiple subagents share the same name, Claude Co…"
     trace: "code.claude.com/docs/en/sub-agents"
+    provenance:
+      source: "code.claude.com/docs/en/sub-agents"
+      locator: "research-2026-07"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_H4_F7
     node_type: claim
     plane: DEV
@@ -504,6 +528,10 @@ nodes:
     verified_at: 2026-07-17
     label: "Verbatim na primária (): 'By default, every group inherits that organization-wide setting' + 'When y…"
     trace: "support.claude.com/.../manage-plugins"
+    provenance:
+      source: "support.claude.com/.../manage-plugins"
+      locator: "research-2026-07"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_H4_F10
     node_type: claim
     plane: DEV

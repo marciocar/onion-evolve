@@ -23,6 +23,10 @@ nodes:
     verified_against: fan-out-6-dims-mais-verificacao
     label: "VEREDITO: framework SAUDÁVEL — 0 blocker, 0 dívida estrutural. Nenhum agente acima do limite de peso; nenhum resíduo .onion/CLI/npm/multi-IDE; lint 0 HARD. Os 8 sobreviventes são polimento (notas de diferenciação, consolidação de common/, 1 dep MCP não-declarada)"
     trace: ".claude/validation/lint-artifacts.sh"
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "fan-out-6-dims-mais-verificacao"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   # ── SOBREVIVENTES (recommended) ──
   - id: C_d6_sysdoc_mcp
     node_type: claim
@@ -120,6 +124,10 @@ nodes:
     verified_against: verdicts-do-workflow
     label: "O juiz adversarial (opus) refutou 3 achados de D3: duplicações que eram na verdade ADAPTERS finos (engineer/pr.md) ou CITAÇÕES ao fragmento canônico (common:prompts:task-manager-*) — conceito compartilhado, não texto duplicado. Protegeu contra consolidação falsa"
     trace: "wf_7a6ca1e6-064 journal"
+    provenance:
+      source: "wf_7a6ca1e6-064 journal"
+      locator: "verdicts-do-workflow"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: A_relatorio_evolve
     node_type: artifact
     plane: PROD
@@ -130,6 +138,10 @@ nodes:
     verified_against: relatorio-escrito
     label: "O relatório do evolve (projeção deste grafo — vista markdown, não fonte paralela)"
     trace: "docs/analysis/onion-evolution-2026-07-30.md"
+    provenance:
+      source: "docs/analysis/onion-evolution-2026-07-30.md"
+      locator: "relatorio-escrito"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_no_absolute_link_convention
     node_type: evidence
     plane: DEV
@@ -140,6 +152,10 @@ nodes:
     verified_against: "censo lote 7 (run wf_05b33768-48c) + selo do maestro 2026-08-30: code-standards.md par.2.5 linha 91 + varredura dos 55 arquivos de .claude/commands/"
     label: "REFUTA [C_d7_discussion_links]: a 'convencao de links absolutos do .claude/' que o no dizia divergida NAO EXISTE — a SSOT (docs/meta-specs/code-standards.md par.2.5) manda exatamente o OPOSTO ('sempre paths relativos, nao absolutos') e a pratica dos 55 arquivos de .claude/commands/ e 100%% relativa. Os docs de discussao estavam CONFORMES; a divergencia era com uma regra imaginada. Selado REFUTED pelo maestro em 2026-08-30."
     trace: "docs/meta-specs/code-standards.md"
+    provenance:
+      source: "docs/meta-specs/code-standards.md"
+      locator: "censo lote 7 (run wf_05b33768-48c) + selo do maestro 2026-08-30: code-standards.md par.2.5 linha 91 + varredura dos 55 arquivos de .claude/commands/"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CENSO0901_C_d3_comment_dup
     node_type: evidence
@@ -160,6 +176,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total (wf_2944480c-98f): REFUTED 1/1 — grep -n "clickup-patterns\|Unicode\|━━━" .claude/commands/product/task.md .claude/commands/product/feature.md;. Selo do maestro: ordem vai-na-ordem 2026-09-01 (etapa 1)'
     label: 'MEDIDO: '
+    provenance:
+      source: ".claude/commands/product/task.md"
+      locator: "revisao-total (wf_2944480c-98f): REFUTED 1/1 — grep -n \"clickup-patterns\\|Unicode\\|━━━\" .claude/commands/product/task.md .claude/commands/product/feature.md;. Selo do maestro: ordem vai-na-ordem 2026-09-01 (etapa 1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
 edges:
   - from: D_veredito_saudavel

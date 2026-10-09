@@ -18,6 +18,10 @@ nodes:
     verified_against: "onion-adr-family-repo-topology-2026-07.md D5/F5: 'o core sabe empacotar in-repo e ser adotado, mas NAO sabe empurrar bundle para repo git publico externo' — project-door.sh gated-until-trigger (>=2 doors). O maestro pediu explicitamente o repo publico onion-plugins → gatilho disparado."
     trace: docs/analysis/onion-adr-family-repo-topology-2026-07.md
     label: "O elo source->repo-publico-de-plugin (project-door) estava GATED por doutrina ate haver gatilho concreto. O pedido do maestro (criar onion-plugins) e o gatilho: o gate abre e o gerador nasce."
+    provenance:
+      source: "docs/analysis/onion-adr-family-repo-topology-2026-07.md"
+      locator: "onion-adr-family-repo-topology-2026-07.md D5/F5: 'o core sabe empacotar in-repo e ser adotado, mas NAO sabe empurrar bundle para repo git publico externo' — project-door.sh gated-until-trigger (>=2 doors). O maestro pediu explicitamente o repo publico onion-plugins → gatilho disparado."
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: C_INSTALL_IS_NOT_ADOPT
     node_type: claim
@@ -30,6 +34,10 @@ nodes:
     verified_against: "docs oficiais Claude Code (plugin-marketplaces.md) + diario 2026-07-08: install = /plugin marketplace add + /plugin install → capacidade read-only namespaced, atualiza por /plugin marketplace update (tag/SHA). SEM vendor-branch, SEM --update, SEM merge 3-way. Adopt (vendoriza+co-evolui) e canal SEPARADO. Coexistem por camada."
     trace: docs/analysis/onion-plugin-marketplace-runbook-2026-07.md
     label: "O canal de INSTALACAO (plugin) nao tem linkage de adopt: instala capacidade read-only, atualiza pelo plugin manager, nunca por merge. A cura da catraca-baseline (REGRA 49) nem se aplica (sem vendorizacao). Adopt segue como canal separado p/ quem customiza."
+    provenance:
+      source: "docs/analysis/onion-plugin-marketplace-runbook-2026-07.md"
+      locator: "docs oficiais Claude Code (plugin-marketplaces.md) + diario 2026-07-08: install = /plugin marketplace add + /plugin install → capacidade read-only namespaced, atualiza por /plugin marketplace update (tag/SHA). SEM vendor-branch, SEM --update, SEM merge 3-way. Adopt (vendoriza+co-evolui) e canal SEPARADO. Coexistem por camada."
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ONION_CORE_PLUGIN_BORN
     node_type: evidence
@@ -42,6 +50,10 @@ nodes:
     verified_against: "verticals/onion.manifest.sh + assemble-plugin.sh → plugins/onion/ (exit 0, tree_sha=b05c5e8b): skills(onion mestre+language-standards+patterns+validation+orchestration) + commands(warm-up/catch-up/onion) + agents(onion) + validation(kg-radar+lib) + hooks(exit-2+aside-router) + utils(task-manager+forge) + kb(dogfood/kg-sdaal/behavior). Prova de moat por ARQUIVO: 0 create-*/adopt/marketplace, 0 *.kg.yaml, 0 dir adopt/marketplace."
     trace: .claude/utils/marketplace/verticals/onion.manifest.sh
     label: "Nasceu o plugin-nucleo `onion` — o 'plugin do Onion' em si (orquestrador+skills core+runtime+motores+guardas+SDAAL+doutrina), a lacuna que o onion-work-tools nao cobria. Empacota so CAPACIDADE; o grafo do adotante nao viaja (KG-SSOT-First: leva o MOTOR, nao os dados)."
+    provenance:
+      source: ".claude/utils/marketplace/verticals/onion.manifest.sh"
+      locator: "verticals/onion.manifest.sh + assemble-plugin.sh → plugins/onion/ (exit 0, tree_sha=b05c5e8b): skills(onion mestre+language-standards+patterns+validation+orchestration) + commands(warm-up/catch-up/onion) + agents(onion) + validation(kg-radar+lib) + hooks(exit-2+aside-router) + utils(task-manager+forge) + kb(dogfood/kg-sdaal/behavior). Prova de moat por ARQUIVO: 0 create-*/adopt/marketplace, 0 *.kg.yaml, 0 dir adopt/marketplace."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: D_MOAT_BOUNDARY_IS_MECHANISM
     node_type: decision
@@ -54,6 +66,10 @@ nodes:
     verified_against: "REGRA 61 (check_moat_boundary em lint-artifacts.sh): sourcia cada verticals/*.manifest.sh e REPROVA HARD se um array declarar meta-fabrica (create-*/adopt/marketplace/decouple) ou docs/onion/graph/*. Provada RED (fixture com create-vertical+adopt+grafo → HARD) + GREEN (so capacidade → limpo; comentario que MENCIONA meta-fabrica nao dispara, pois checa os ARRAYS via source, nao a prosa). Selftest run_moat_boundary_selftests 2/2."
     trace: .claude/validation/lint-artifacts.sh
     label: "A fronteira L1-distribui/L2-L3-moat virou MECANISMO, nao disciplina: vazar a meta-fabrica ou o SSOT privado num plugin publicavel e erro de LINT. Checa a DECLARACAO (manifesto), o ponto unico onde o que-se-publica e decidido. behavior-over-declaration: a cura e a guarda, nao a lembranca."
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "REGRA 61 (check_moat_boundary em lint-artifacts.sh): sourcia cada verticals/*.manifest.sh e REPROVA HARD se um array declarar meta-fabrica (create-*/adopt/marketplace/decouple) ou docs/onion/graph/*. Provada RED (fixture com create-vertical+adopt+grafo → HARD) + GREEN (so capacidade → limpo; comentario que MENCIONA meta-fabrica nao dispara, pois checa os ARRAYS via source, nao a prosa). Selftest run_moat_boundary_selftests 2/2."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_MATERIALIZE_HELPER_NEXT
     node_type: decision
@@ -66,6 +82,10 @@ nodes:
     verified_against: "materialize-marketplace-repo.sh criado + testado por comportamento: materializa 8 plugins num tmp (name onion-plugins, sources relative-path, README), 0 vazamento de moat, commit no alvo SEM push (I3). Selftest run_materialize_repo_selftests 2/2."
     trace: .claude/utils/marketplace/materialize-marketplace-repo.sh
     label: "FASE 2 FEITA: o helper materialize-marketplace-repo.sh (o project-door que faltava) monta TODOS os plugins fresco + marketplace.json (name onion-plugins, self-contained) + README num dir-alvo; push HUMAN-GATED (I3). Falta: skill wizard onion-publish (Fase 3) e o repo publico marciocar/onion-plugins (Fase 5, o maestro cria+push)."
+    provenance:
+      source: ".claude/utils/marketplace/materialize-marketplace-repo.sh"
+      locator: "materialize-marketplace-repo.sh criado + testado por comportamento: materializa 8 plugins num tmp (name onion-plugins, sources relative-path, README), 0 vazamento de moat, commit no alvo SEM push (I3). Selftest run_materialize_repo_selftests 2/2."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MOAT_GUARD_HARDENED_BY_REVIEW
     node_type: evidence
@@ -78,6 +98,10 @@ nodes:
     verified_against: "branch-code-reviewer adversarial (veredito 🔴 no commit inicial) provou 2 vazamentos reais: C1 (regex v1 cego a federacao/evolve/absorb-skill e a grafos FORA de docs/onion/graph — incl. o life-KG marcio.kg.yaml) e C2 (bypass por DIRETORIO-PAI: declarar commands/meta arrasta a fabrica sem casar a string). Guarda reescrita para checar a EXPANSAO (o que o assembler copiaria), nao a string. Provada RED (C1 abrangente + C2 dir-pai) + GREEN (upstream/produto/reais) + selftest run_moat_boundary_selftests 3/3."
     trace: .claude/validation/lint-artifacts.sh
     label: "A 1a guarda VAZAVA por dois caminhos que a revisao adversarial pegou (declarado≠verificado: o conserto estava na working tree, nao no commit). C1: regex fraco. C2: bypass estrutural por dir-pai — nenhum regex fecha, so checar a EXPANSAO. Endurecida e provada. Exemplo vivo de behavior-over-declaration: o revisor mediu o que o commit FAZIA, nao o que o header afirmava."
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "branch-code-reviewer adversarial (veredito 🔴 no commit inicial) provou 2 vazamentos reais: C1 (regex v1 cego a federacao/evolve/absorb-skill e a grafos FORA de docs/onion/graph — incl. o life-KG marcio.kg.yaml) e C2 (bypass por DIRETORIO-PAI: declarar commands/meta arrasta a fabrica sem casar a string). Guarda reescrita para checar a EXPANSAO (o que o assembler copiaria), nao a string. Provada RED (C1 abrangente + C2 dir-pai) + GREEN (upstream/produto/reais) + selftest run_moat_boundary_selftests 3/3."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_PUBLISH_WIZARD_BORN
     node_type: evidence
     layer: audit
@@ -89,6 +113,10 @@ nodes:
     verified_against: ".claude/skills/onion-publish/SKILL.md criada e auto-descoberta (aparece na lista de skills do harness). Conduz: orient(role:source) → confirma moat → colhe alvo → materialize-marketplace-repo.sh → valida → PARA no push (human-gated I3). É CORE-ONLY (nao entra em plugin — publicar e ato da FONTE; distribui-la seria meta-fabrica)."
     trace: .claude/skills/onion-publish/SKILL.md
     label: "FASE 3 FEITA: a skill wizard onion-publish (par de onion-wizard) conduz a publicacao do marketplace, delegando ao helper deterministico e parando no push. Core-only por desenho — consistente com o moat (nao distribui a capacidade de gerar marketplace)."
+    provenance:
+      source: ".claude/skills/onion-publish/SKILL.md"
+      locator: ".claude/skills/onion-publish/SKILL.md criada e auto-descoberta (aparece na lista de skills do harness). Conduz: orient(role:source) → confirma moat → colhe alvo → materialize-marketplace-repo.sh → valida → PARA no push (human-gated I3). É CORE-ONLY (nao entra em plugin — publicar e ato da FONTE; distribui-la seria meta-fabrica)."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_PUBLIC_REPO_LIVE
     node_type: evidence
     layer: audit
@@ -100,6 +128,10 @@ nodes:
     verified_against: "gh repo view marciocar/onion-plugins → PUBLIC, branch master, url https://github.com/marciocar/onion-plugins. marketplace.json remoto: name onion-plugins, 8 plugins relative-path. plugin.json do onion acessivel via API. Verificacao final de moat ANTES do push: 0 meta-fabrica, 0 grafo, 0 dir sensivel, 0 segredo REAL (so mencao de var em docs), 0 nome comercial."
     trace: .claude/utils/marketplace/materialize-marketplace-repo.sh
     label: "FASE 5 FEITA (2026-08-25): o repo publico marciocar/onion-plugins esta NO AR, 8 plugins, instalavel por /plugin marketplace add. O maestro autorizou; a verificacao final de moat (irreversivel) passou limpa. O ciclo source→repo-publico (project-door) fechou de ponta a ponta."
+    provenance:
+      source: ".claude/utils/marketplace/materialize-marketplace-repo.sh"
+      locator: "gh repo view marciocar/onion-plugins → PUBLIC, branch master, url https://github.com/marciocar/onion-plugins. marketplace.json remoto: name onion-plugins, 8 plugins relative-path. plugin.json do onion acessivel via API. Verificacao final de moat ANTES do push: 0 meta-fabrica, 0 grafo, 0 dir sensivel, 0 segredo REAL (so mencao de var em docs), 0 nome comercial."
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_KGFRESHNESS_GAP_IN_PLUGIN
     node_type: evidence
     layer: audit
@@ -111,6 +143,10 @@ nodes:
     verified_against: "medido nos manifestos: /meta:kg + kb-freshness + context-freshness estao em onion-work-tools (distribuidos); kg-freshness NAO estava em NENHUM plugin (core-only). kg-freshness re-verifica os grafos do adotante contra o vivo (mede+re-carimba) — e runtime KG-SSOT do adotante, nao meta-fabrica nem grafo privado. Gap, nao moat. Achado por duvida do maestro apos a publicacao."
     trace: .claude/utils/marketplace/verticals/onion.manifest.sh
     label: "GAP de cobertura: o runtime KG do plugin `onion` levava o MOTOR (kg-radar) mas nao a re-verificacao (kg-freshness), que ficava core-only. Nao e moat — kg-freshness opera sobre os grafos DO ADOTANTE (KG-SSOT-First). Curado: kg-freshness entra no nucleo `onion`, junto do kg-radar, fechando a historia do runtime KG."
+    provenance:
+      source: ".claude/utils/marketplace/verticals/onion.manifest.sh"
+      locator: "medido nos manifestos: /meta:kg + kb-freshness + context-freshness estao em onion-work-tools (distribuidos); kg-freshness NAO estava em NENHUM plugin (core-only). kg-freshness re-verifica os grafos do adotante contra o vivo (mede+re-carimba) — e runtime KG-SSOT do adotante, nao meta-fabrica nem grafo privado. Gap, nao moat. Achado por duvida do maestro apos a publicacao."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_HOOKS_INERT_ON_INSTALL_FIXED
     node_type: evidence
     layer: audit
@@ -122,6 +158,10 @@ nodes:
     verified_against: "dogfood de INSTALL num Claude Code limpo (claude 2.1.243): claude plugin marketplace add marciocar/onion-plugins + install onion@onion-plugins → skills/comandos/agente OK, mas `details` mostrou Hooks: 0 — os 2 hooks (exit-2 guard PostToolUse + aside-router UserPromptSubmit) viajavam como ARQUIVO INERTE. Causa: assemble-plugin.sh so copiava o .sh, deixava o registro 'a cargo do consumidor'. Cura: assemble gera hooks/hooks.json (auto-descoberto) mapeando cada hook ao evento do settings.json do core, path ${CLAUDE_PLUGIN_ROOT}. Re-dogfood: install → Hooks: 2. Provado por comportamento."
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "DOGFOOD de INSTALL pegou o que lint nenhum acharia: o plugin empacotava os hooks mas nao os ATIVAVA (Hooks: 0) — a guarda exit-2 (a capacidade que 'compra' o acoplamento ao Claude Code) chegava morta. Assemble agora gera o hooks.json que o Claude Code auto-descobre. Instalar o onion = ganhar a guarda de verdade. fix→re-dogfood no mesmo loop."
+    provenance:
+      source: ".claude/utils/marketplace/assemble-plugin.sh"
+      locator: "dogfood de INSTALL num Claude Code limpo (claude 2.1.243): claude plugin marketplace add marciocar/onion-plugins + install onion@onion-plugins → skills/comandos/agente OK, mas `details` mostrou Hooks: 0 — os 2 hooks (exit-2 guard PostToolUse + aside-router UserPromptSubmit) viajavam como ARQUIVO INERTE. Causa: assemble-plugin.sh so copiava o .sh, deixava o registro 'a cargo do consumidor'. Cura: assemble gera hooks/hooks.json (auto-descoberto) mapeando cada hook ao evento do settings.json do core, path ${CLAUDE_PLUGIN_ROOT}. Re-dogfood: install → Hooks: 2. Provado por comportamento."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: Q_PLUGIN_SEM_DRIVE_NEM_ADOPT
     node_type: question
     plane: PROD
@@ -132,6 +172,10 @@ nodes:
     verified_at: '2026-09-05'
     verified_against: 'medido 2026-09-05: ls plugins/onion/commands/ = 20 comandos, drive.md e adopt.md AUSENTES; grep -l "drive\|adopt" nos *.manifest.sh do marketplace = 0 hits; sinal de campo em docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md'
     trace: 'plugins/onion/commands/'
+    provenance:
+      source: "plugins/onion/commands/"
+      locator: "medido 2026-09-05: ls plugins/onion/commands/ = 20 comandos, drive.md e adopt.md AUSENTES; grep -l \"drive\\|adopt\" nos *.manifest.sh do marketplace = 0 hits; sinal de campo em docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_MARKETPLACE_PUBLICO_EM_GERACAO_ANTIGA
     node_type: question
@@ -143,6 +187,10 @@ nodes:
     verified_at: '2026-09-05'
     verified_against: 'sinal de campo com o caso concreto (build-tech-docs em dois namespaces) em docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md; consolidacao 8->5 em main desde 2026-09-04 (commit bab64742)'
     trace: 'docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md'
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md"
+      locator: "sinal de campo com o caso concreto (build-tech-docs em dois namespaces) em docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md; consolidacao 8->5 em main desde 2026-09-04 (commit bab64742)"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_UPDATE_EXIGE_ADOCAO_INTEGRADA
     node_type: question
@@ -154,6 +202,10 @@ nodes:
     verified_at: '2026-09-05'
     verified_against: 'medido no jogo-da-vida em 2026-09-05: rc=11 do vendor-branch update; 48 arquivos nao-framework em `git diff --name-only develop onion/adopt`; develop INTOCADA apos a recusa; vendor avancado a b967b71835f2; precondicao ausente do comando (grep = 0 hits) antes desta cura'
     trace: '.claude/utils/adopt/vendor-branch.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-branch.sh"
+      locator: "medido no jogo-da-vida em 2026-09-05: rc=11 do vendor-branch update; 48 arquivos nao-framework em `git diff --name-only develop onion/adopt`; develop INTOCADA apos a recusa; vendor avancado a b967b71835f2; precondicao ausente do comando (grep = 0 hits) antes desta cura"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_VENDOR_ENTRELACADO_COM_PRODUTO
     node_type: question
@@ -176,6 +228,10 @@ nodes:
     verified_at: '2026-09-05'
     verified_against: 'medido ao vivo em 2026-09-05: `session-beacon.sh check` devolveu rc=1 com DUAS linhas VIVA — a da sessao corrente (age=6min, branch correta) e a da sessao encerrada pelo maestro (age=664min); o rc=1 persistiu APOS o stop'
     trace: '.claude/validation/session-beacon.sh'
+    provenance:
+      source: ".claude/validation/session-beacon.sh"
+      locator: "medido ao vivo em 2026-09-05: `session-beacon.sh check` devolveu rc=1 com DUAS linhas VIVA — a da sessao corrente (age=6min, branch correta) e a da sessao encerrada pelo maestro (age=664min); o rc=1 persistiu APOS o stop"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_VENDOR_PRODUTO_REFUTADO_EM_SANDBOX
     node_type: evidence
@@ -187,6 +243,10 @@ nodes:
     verified_at: '2026-09-05'
     verified_against: 'sandbox determinístico em /home/marcio/.claude/jobs/3e42276a/tmp/vendor_repro.sh: monta core+adotante do zero, semeia vendor de onion/adopt, integra, produz 3 commits de produto, avança o framework do core e roda `vendor-branch.sh update` → "framework atualizado via merge limpo", rc=0, 0 conflitos'
     trace: '.claude/utils/adopt/vendor-branch.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-branch.sh"
+      locator: "sandbox determinístico em /home/marcio/.claude/jobs/3e42276a/tmp/vendor_repro.sh: monta core+adotante do zero, semeia vendor de onion/adopt, integra, produz 3 commits de produto, avança o framework do core e roda `vendor-branch.sh update` → \"framework atualizado via merge limpo\", rc=0, 0 conflitos"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_DRIVE_NAO_E_MOAT_MAS_DEPS_NAO_VIAJAM
     node_type: evidence
@@ -198,6 +258,10 @@ nodes:
     verified_at: '2026-09-05'
     verified_against: 'medido 2026-09-05 no core: `grep -oE DEST|TARGET|INSTALL_DIR` em drive.md = 0 ocorrencias vs 60 hits de linguagem MOAT em adopt.md; `ls plugins/onion/validation/` mostra kg-radar/session-beacon/kg-backlog-project presentes e kg-drive-project/kg-realign-project AUSENTES; plugins/onion/commands/realign.md AUSENTE; 26 comandos de meta/ nao viajam ao todo, a maioria por serem Camada 1 (autoria do framework) ou Camada 3 (federacao) — corretamente core-only'
     trace: 'plugins/onion/commands/'
+    provenance:
+      source: "plugins/onion/commands/"
+      locator: "medido 2026-09-05 no core: `grep -oE DEST|TARGET|INSTALL_DIR` em drive.md = 0 ocorrencias vs 60 hits de linguagem MOAT em adopt.md; `ls plugins/onion/validation/` mostra kg-radar/session-beacon/kg-backlog-project presentes e kg-drive-project/kg-realign-project AUSENTES; plugins/onion/commands/realign.md AUSENTE; 26 comandos de meta/ nao viajam ao todo, a maioria por serem Camada 1 (autoria do framework) ou Camada 3 (federacao) — corretamente core-only"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: D_DRIVE_VIAJA_NO_PLUGIN
     node_type: decision
@@ -209,6 +273,10 @@ nodes:
     verified_at: '2026-09-06'
     verified_against: 'provado por EXECUCAO no host instalado (CLAUDE_PLUGIN_ROOT=plugins/onion, repo sintetico sem .claude/): kg-drive-project.sh devolveu "READY: pronto=2 bloqueado=1"; kg-realign-project.sh --check devolveu "ATENCAO: (c)=0 (b)=1 (a)=2 agg=15.0" rc=0; kg-seal-exception.sh percorreu as QUATRO precondicoes e devolveu AUTO rc=0 num grafo do proprio host, com o radar resolvido por BASH_SOURCE dentro do plugin. O harness tambem listou os comandos como `onion:drive` e `onion:realign` apos a montagem.'
     trace: '.claude/utils/marketplace/verticals/onion.manifest.sh'
+    provenance:
+      source: ".claude/utils/marketplace/verticals/onion.manifest.sh"
+      locator: "provado por EXECUCAO no host instalado (CLAUDE_PLUGIN_ROOT=plugins/onion, repo sintetico sem .claude/): kg-drive-project.sh devolveu \"READY: pronto=2 bloqueado=1\"; kg-realign-project.sh --check devolveu \"ATENCAO: (c)=0 (b)=1 (a)=2 agg=15.0\" rc=0; kg-seal-exception.sh percorreu as QUATRO precondicoes e devolveu AUTO rc=0 num grafo do proprio host, com o radar resolvido por BASH_SOURCE dentro do plugin. O harness tambem listou os comandos como `onion:drive` e `onion:realign` apos a montagem."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_EXCECAO_DE_SELO_VIROU_PREDICADO
     node_type: evidence
@@ -220,6 +288,10 @@ nodes:
     verified_at: '2026-09-06'
     verified_against: 'executado: `kg-seal-exception.sh <grafo> Q_VENDOR_ENTRELACADO_COM_PRODUTO --base b77f90f5^` → AUTO rc=0; o mesmo com Q_UPDATE_EXIGE_ADOCAO_INTEGRADA → PARA rc=1 por (1). Bancada: `lint-selftest.sh --families seal_exception` = 19 passaram / 0 falharam; mutacao da varredura da arvore → caso (k3) reprova; mutacao do edge_type → caso (n) reprova'
     trace: '.claude/validation/kg-seal-exception.sh'
+    provenance:
+      source: ".claude/validation/kg-seal-exception.sh"
+      locator: "executado: `kg-seal-exception.sh <grafo> Q_VENDOR_ENTRELACADO_COM_PRODUTO --base b77f90f5^` → AUTO rc=0; o mesmo com Q_UPDATE_EXIGE_ADOCAO_INTEGRADA → PARA rc=1 por (1). Bancada: `lint-selftest.sh --families seal_exception` = 19 passaram / 0 falharam; mutacao da varredura da arvore → caso (k3) reprova; mutacao do edge_type → caso (n) reprova"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_CORPUS_TEM_GRAFO_QUE_O_YAML_REJEITA
     node_type: question
@@ -231,6 +303,10 @@ nodes:
     verified_at: '2026-09-06'
     verified_against: 'medido 2026-09-06: laco `for f in $(git ls-files "*.kg.yaml")` com `yaml.safe_load` devolveu 4 arquivos com SyntaxError/ScannerError, todos com `kg-radar --integrity --schema` exit 0'
     trace: 'docs/onion/graph/'
+    provenance:
+      source: "docs/onion/graph/"
+      locator: "medido 2026-09-06: laco `for f in $(git ls-files \"*.kg.yaml\")` com `yaml.safe_load` devolveu 4 arquivos com SyntaxError/ScannerError, todos com `kg-radar --integrity --schema` exit 0"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_SELO_DO_MAESTRO_REVERTEU_O_FLIP
     node_type: decision
@@ -252,6 +328,10 @@ nodes:
     verified_at: '2026-09-05'
     verified_against: 'medido no jogo-da-vida em 2026-09-05: rc=11 do vendor-branch update; 48 arquivos nao-framework em `git diff --name-only develop onion/adopt`; develop INTOCADA apos a recusa. A precondicao esta escrita em .claude/commands/meta/adopt.md'
     trace: '.claude/commands/meta/adopt.md'
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: "medido no jogo-da-vida em 2026-09-05: rc=11 do vendor-branch update; 48 arquivos nao-framework em `git diff --name-only develop onion/adopt`; develop INTOCADA apos a recusa. A precondicao esta escrita em .claude/commands/meta/adopt.md"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_SUPERADO_SEM_SUPERADOR_VIVO_MERECE_GUARDA
     node_type: question
@@ -263,6 +343,10 @@ nodes:
     verified_at: '2026-09-06'
     verified_against: 'medido com script reproduzivel (scratchpad/conta.py, PyYAML sobre `git ls-files "*.kg.yaml"`): 121 grafos, 4 ilegiveis para o PyYAML e nao contados; classe larga = 13 pares em 5 arquivos; classe estreita = 17 de 211 superseded (8%) em 7 arquivos. ⚠️ TRES parsers independentes deram 9, 13 e 14 para a classe larga — a verdade das arestas do corpus depende do parser, que e a propria motivacao da REGRA 78'
     trace: '.claude/validation/kg-radar.sh'
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "medido com script reproduzivel (scratchpad/conta.py, PyYAML sobre `git ls-files \"*.kg.yaml\"`): 121 grafos, 4 ilegiveis para o PyYAML e nao contados; classe larga = 13 pares em 5 arquivos; classe estreita = 17 de 211 superseded (8%) em 7 arquivos. ⚠️ TRES parsers independentes deram 9, 13 e 14 para a classe larga — a verdade das arestas do corpus depende do parser, que e a propria motivacao da REGRA 78"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_LINT_ABORTA_SEM_PYTHON_E_NAO_DIZ
     node_type: question
@@ -274,6 +358,10 @@ nodes:
     verified_at: '2026-09-06'
     verified_against: 'medido 2026-09-06 com um stub de `python3` que sai 1, rodando `lint-artifacts.sh` IN-TREE em duas arvores: worktree de origin/main e a branch de trabalho. Nos dois casos a ultima linha e a VIOLATION da REGRA 39 e `grep -c Sumario` = 0'
     trace: '.claude/validation/lint-artifacts.sh'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "medido 2026-09-06 com um stub de `python3` que sai 1, rodando `lint-artifacts.sh` IN-TREE em duas arvores: worktree de origin/main e a branch de trabalho. Nos dois casos a ultima linha e a VIOLATION da REGRA 39 e `grep -c Sumario` = 0"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   - from: E_PROJECT_DOOR_GATE_OPENED

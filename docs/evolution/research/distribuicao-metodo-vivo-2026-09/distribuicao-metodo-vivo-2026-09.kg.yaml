@@ -63,6 +63,10 @@ nodes:
     source_kind: primary
     label: 'O GitHub distingue explicitamente fork de template pela HISTORIA: o fork carrega TODA a historia de commits do repositorio pai; o repositorio criado a partir de template nasce com UM unico commit, sem historia. Isto resolve o canal HISTORIA da fronteira — e so ele.'
     trace: 'https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template'
+    provenance:
+      source: "https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template"
+      locator: "docs.github.com — Creating a repository from a template, secao comparativa fork vs. template, bloco Commit History; QUOTE verbatim: \"A new fork includes the entire commit history of the parent repository, while a repository created from a template starts with a single commit.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_TEMPLATE_SEM_PR_DE_VOLTA_HISTORIAS_NAO_RELACIONADAS
     node_type: evidence
     plane: DEV
@@ -75,6 +79,10 @@ nodes:
     source_kind: primary
     label: 'Repositorio criado a partir de template NAO fica ligado ao template de origem: as branches nascem com historias nao-relacionadas, o que torna impossivel abrir PR ou fazer merge entre eles. Consequencia direta para esta rodada: escolher TEMPLATE e escolher, no mesmo ato, ficar SEM canal de atualizacao por git — template e update-por-merge sao mutuamente exclusivos.'
     trace: 'https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template'
+    provenance:
+      source: "https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template"
+      locator: "docs.github.com — Creating a repository from a template, nota sobre branches criadas a partir de template; QUOTE verbatim: \"Branches created from a template have unrelated histories, which means you cannot create pull requests or merge between the branches.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_FORK_MANTEM_CONEXAO_COM_UPSTREAM
     node_type: evidence
     plane: DEV
@@ -87,6 +95,10 @@ nodes:
     source_kind: primary
     label: 'O fork mantem settings e permissoes proprios mas permanece CONECTADO ao repositorio upstream, e o GitHub exibe essa relacao. Leitura restrita exigida pelo Elenxo: conectado aqui e relacao de UI/rede (fork network, sync fork), NAO mecanismo de atualizacao nem fronteira de privacidade — e a conexao e bidirecional em VISIBILIDADE, o fork exibe publicamente a origem.'
     trace: 'https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks'
+    provenance:
+      source: "https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/working-with-forks/about-forks"
+      locator: "docs.github.com — About forks, primeiro paragrafo da secao introdutoria logo apos a definicao de fork; QUOTE verbatim: \"A fork has its own settings and permissions but stays connected to the upstream repository.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_POLYFORM_INTERNAL_USE_USO_INTERNO_SEM_DISTRIBUIR
     node_type: evidence
     plane: DEV
@@ -99,6 +111,10 @@ nodes:
     source_kind: primary
     label: 'A PolyForm Internal Use 1.0.0 e, entre as lidas, a licenca que mais se aproxima do pedido: concede o que de outro modo infringiria o copyright para qualquer proposito PERMITIDO, define proposito permitido como as operacoes internas de negocio do licenciado e da sua empresa, e proibe explicitamente DISTRIBUIR e SUBLICENCIAR/TRANSFERIR.'
     trace: 'https://polyformproject.org/licenses/internal-use/1.0.0'
+    provenance:
+      source: "https://polyformproject.org/licenses/internal-use/1.0.0"
+      locator: "PolyForm Internal Use License 1.0.0 — polyformproject.org/licenses/internal-use/1.0.0; QUOTE verbatim: \"you may not distribute the software\" + \"Use of the software for the internal business operations of you and your company is use for a permitted purpose.\" + \"These terms do not allow you to sublicense or transfer any of your licenses to anyone else\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_POLYFORM_NONCOMMERCIAL_NAO_SERVE_A_CLIENTE_COMERCIAL
     node_type: evidence
     plane: DEV
@@ -111,6 +127,10 @@ nodes:
     source_kind: primary
     label: 'A PolyForm Noncommercial 1.0.0 usa a MESMA clausula de concessao de direitos autorais da Internal Use, mas amarra proposito permitido a uso NAO-COMERCIAL (pesquisa pessoal, hobby, entidade sem fins lucrativos). Nao serve a cliente de consultoria que usa comercialmente na propria empresa — eliminada por evidencia, nao por gosto.'
     trace: 'https://polyformproject.org/licenses/noncommercial/1.0.0'
+    provenance:
+      source: "https://polyformproject.org/licenses/noncommercial/1.0.0"
+      locator: "PolyForm Noncommercial License 1.0.0 — polyformproject.org/licenses/noncommercial/1.0.0; QUOTE verbatim: \"Any noncommercial purpose is a permitted purpose, including personal use for research, experiment, and testing for the benefit of public knowledge, personal study, private entertainment, hobby projects, amateur pursuits, or religious observance, without any anticipated commercial application.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_BSL_E_ESQUELETO_COM_CHANGE_DATE
     node_type: evidence
     plane: DEV
@@ -123,6 +143,10 @@ nodes:
     source_kind: primary
     label: 'A BSL 1.1 concede copiar, modificar, criar obras derivadas, redistribuir e uso nao-produtivo; condiciona o uso alem do Additional Use Grant a licenca comercial; e reverte a Change License no Change Date (tipicamente 4 anos). NAO veta por natureza revenda como concorrente — isso depende do texto do Additional Use Grant, que a BSL deixa EM BRANCO por padrao. Logo: a BSL e ESQUELETO, nao decisao; e o Change Date entrega ao cliente por cronometro exatamente o direito que se quer negar.'
     trace: 'https://mariadb.com/bsl11'
+    provenance:
+      source: "https://mariadb.com/bsl11"
+      locator: "Business Source License 1.1 — mariadb.com/bsl11, clausula de grant + Change Date; QUOTE verbatim: \"The Licensor hereby grants you the right to copy, modify, create derivative works, redistribute, and make non-production use of the Licensed Work.\" e \"Effective on the Change Date, or the fourth anniversary of the first publicly available distribution of a specific version of the Licensed Work under this License, whichever comes first, the Licensor hereby grants you rights under the terms of the Change License\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_ELASTIC_V2_VETA_SAAS_NAO_USO_INTERNO
     node_type: evidence
     plane: DEV
@@ -135,6 +159,10 @@ nodes:
     source_kind: primary
     label: 'A Elastic License 2.0 concede usar, copiar, distribuir, tornar disponivel e preparar obras derivadas; sua restricao central e vetar oferecer o software como servico hospedado/gerenciado a terceiros. Alvo DIFERENTE (SaaS concorrente), sem nada equivalente a operacoes internas de negocio da PolyForm — num framework de metodo entregue a consultoria nao ha servico hospedado a vetar, e a ELv2 seria permissiva justamente no eixo que importa: o cliente redistribuir o metodo.'
     trace: 'https://www.elastic.co/licensing/elastic-license'
+    provenance:
+      source: "https://www.elastic.co/licensing/elastic-license"
+      locator: "Elastic License 2.0, secao Limitations — elastic.co/licensing/elastic-license; QUOTE verbatim: \"You may not provide the software to third parties as a hosted or managed service, where the service provides users with access to any substantial set of the features or functionality of the software.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_APACHE_AVISO_PROEMINENTE_EM_ARQUIVO_MODIFICADO
     node_type: evidence
     plane: DEV
@@ -147,6 +175,10 @@ nodes:
     source_kind: primary
     label: 'A Apache 2.0 permite forkar e redistribuir com ou sem modificacoes, mas EXIGE que todo arquivo modificado carregue aviso PROEMINENTE de que foi alterado. E o mecanismo textual que sinaliza ao cliente forkado que ele nao pode apagar a distincao entre a doutrina original e a sua propria evolucao.'
     trace: 'https://www.apache.org/licenses/LICENSE-2.0'
+    provenance:
+      source: "https://www.apache.org/licenses/LICENSE-2.0"
+      locator: "Apache License 2.0, Secao 4, alinea (b); QUOTE verbatim: \"You must cause any modified files to carry prominent notices stating that You changed the files\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_LICENCA_NAO_CONCEDE_MARCA
     node_type: evidence
     plane: DEV
@@ -159,6 +191,10 @@ nodes:
     source_kind: primary
     label: 'A licenca NAO concede nenhuma permissao de uso de nome ou marca do licenciante: a permissividade do codigo e estritamente separada da MARCA. E o texto que impede o cliente de chamar o fork dele pelo nome do doador — mas repare no que ele faz: remete a lei de marcas, nao cria protecao por si.'
     trace: 'https://www.apache.org/licenses/LICENSE-2.0'
+    provenance:
+      source: "https://www.apache.org/licenses/LICENSE-2.0"
+      locator: "Apache License 2.0, Secao 6, Trademarks; QUOTE verbatim: \"This License does not grant permission to use the trade names, trademarks, service marks, or product names of the Licensor, except as required for reasonable and customary use in describing the origin of the Work and reproducing the content of the NOTICE file\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_ASF_DERIVADO_SOB_MARCA_PROPRIA_SEM_CONFUSAO
     node_type: evidence
     plane: DEV
@@ -171,6 +207,10 @@ nodes:
     source_kind: primary
     label: 'A politica da ASF confirma na pratica o que a Secao 6 declara em tese: derivados podem existir sob marca PROPRIA do forker, nunca sob nome confusamente similar ao do projeto original — o teste e likelihood of confusion, nao a permissividade da licenca. Limite declarado: e politica de uma FUNDACAO que POSSUI marcas registradas, executavel so por quem tem o mesmo ativo.'
     trace: 'https://www.apache.org/foundation/marks/'
+    provenance:
+      source: "https://www.apache.org/foundation/marks/"
+      locator: "Apache Software Foundation, Apache Trademark Policy (apache.org/foundation/marks/), secao sobre derivative works; QUOTE verbatim: \"you may not apply trademarks to your derivative works of _ProjectName_ software that are confusingly similar to \"_ProjectName_\" or \"Apache _ProjectName_\"\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_GITLAB_HANDBOOK_FIRST_PUBLICO_POR_POLITICA
     node_type: evidence
     plane: DEV
@@ -183,6 +223,10 @@ nodes:
     source_kind: primary
     label: 'O GitLab declara que seu handbook e public-first e publicamente acessivel como POLITICA deliberada de transparencia, nao acrescimo tardio — o analogo mais proximo, em fonte primaria, de doutrina que viaja publicamente. Limite: prova EXISTENCIA de precedente e nada sobre a FRONTEIRA nomeada, porque handbook corporativo nao tem analogo de diario pessoal, grafo da vida do maestro, achado de seguranca de adotante ou material sob NDA.'
     trace: 'https://handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/'
+    provenance:
+      source: "https://handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/"
+      locator: "handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/ — abertura do corpo do artigo, logo apos o titulo The importance of a handbook-first approach to communication; QUOTE verbatim: \"GitLab is intentional about documenting in a manner that creates a single source of truth. It operates handbook-first, and in valuing transparency, makes its handbook publicly accessible to all.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_HANDBOOK_PUBLICO_CRIA_ACCOUNTABILITY
     node_type: evidence
     plane: DEV
@@ -195,6 +239,10 @@ nodes:
     source_kind: primary
     label: 'O GitLab da uma RAZAO explicita para escolher o publico em vez de wiki interno: exposicao publica cria accountability que repositorio interno nao cria, porque este apodrece sem pressao externa. E argumento de VALOR de publicar, nao de ONDE CORTAR — e aponta para um risco diferente do desta rodada.'
     trace: 'https://handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/'
+    provenance:
+      source: "https://handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/"
+      locator: "handbook.gitlab.com/handbook/company/culture/all-remote/handbook-first/ — secao Make handbook-first a value, frase seguinte a citacao anterior; QUOTE verbatim: \"Public handbooks lead to accountability. It is easier to let an internal wiki rot than it is a handbook which is open to the world.\" — ancorada por verificador independente (a forma original usa a contracao)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_THOUGHTBOT_PLAYBOOK_CC_BY_NC
     node_type: evidence
     plane: DEV
@@ -207,6 +255,10 @@ nodes:
     source_kind: primary
     label: 'A thoughtbot licencia o playbook como Creative Commons Attribution-NonCommercial justamente para que outros usem as taticas na propria empresa: precedente de METODO publicado a parte, com licenca que permite uso e adaptacao mas bloqueia revenda comercial do metodo. Contradicao que a rodada NAO resolveu: e a MESMA clausula NC que esta rodada descartou em E_POLYFORM_NONCOMMERCIAL_NAO_SERVE_A_CLIENTE_COMERCIAL.'
     trace: 'https://thoughtbot.com/playbook'
+    provenance:
+      source: "https://thoughtbot.com/playbook"
+      locator: "thoughtbot.com/playbook — rodape, logo antes da linha de copyright; QUOTE verbatim: \"The playbook is free and licensed as Creative Commons Attribution-NonCommercial so you may learn from, or use, our tactics in your own company.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_COPIER_CONFLITO_INLINE_NUNCA_EM_SILENCIO
     node_type: evidence
     plane: DEV
@@ -219,6 +271,10 @@ nodes:
     source_kind: primary
     label: 'Quando a mudanca do DOADOR colide com a customizacao do DONO, o Copier nao auto-resolve em silencio: o comportamento padrao e escrever marcadores de conflito no estilo git merge, para um humano resolver. Esta e a EXIGENCIA que o mecanismo de atualizacao do Onion precisa herdar — colisao resolvida por humano, nunca calada.'
     trace: 'https://copier.readthedocs.io/en/stable/updating/'
+    provenance:
+      source: "https://copier.readthedocs.io/en/stable/updating/"
+      locator: "copier.readthedocs.io/en/stable/updating/ — opcao --conflict inline (default); QUOTE verbatim: \"Updates the file with conflict markers. This is quite similar to the conflict markers created when a git merge command encounters a conflict.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_COPIER_MODO_REJ_ISOLA_O_DIFF
     node_type: evidence
     plane: DEV
@@ -231,6 +287,10 @@ nodes:
     source_kind: primary
     label: 'O Copier oferece um modo alternativo que ISOLA os diffs nao-mesclaveis em arquivos .rej separados, em vez de injetar marcadores dentro do arquivo versionado — util quando o arquivo do dono nao pode ser sujado pelo processo de update.'
     trace: 'https://copier.readthedocs.io/en/stable/updating/'
+    provenance:
+      source: "https://copier.readthedocs.io/en/stable/updating/"
+      locator: "copier.readthedocs.io/en/stable/updating/ — opcao --conflict rej; QUOTE verbatim: \"Creates a separate .rej file for each file with conflicts. These files contain the unresolved diffs.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_COPIER_ANSWERS_NAO_SE_EDITA_A_MAO
     node_type: evidence
     plane: DEV
@@ -243,6 +303,10 @@ nodes:
     source_kind: primary
     label: 'O Copier avisa que editar a mao o arquivo de respostas QUEBRA a premissa do mecanismo de update, porque passa a atribuir silenciosamente ao estado atual um conjunto de respostas que nao o produziu. Licao transportavel: todo canal de update por scaffolding tem um estado de proveniencia que, se mentir, faz o update mentir junto — declarado que nao bate com verificado, na propria ferramenta.'
     trace: 'https://copier.readthedocs.io/en/stable/updating/'
+    provenance:
+      source: "https://copier.readthedocs.io/en/stable/updating/"
+      locator: "copier.readthedocs.io/en/stable/updating/ — secao Never change the answers file manually, bloco Important; QUOTE verbatim: \"This will trick Copier, making it believe that those modified answers produced the current subproject, while it was produced by a different answers set.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_CRUFT_UPDATE_E_PORTAO_DE_REVISAO
     node_type: evidence
     plane: DEV
@@ -255,6 +319,10 @@ nodes:
     source_kind: primary
     label: 'O fluxo de update declarado pelo Cruft e um PORTAO revisar-depois-aplicar: a ferramenta mostra o diff que chega do template e exige revisao do dono antes de aplicar, em vez de empurrar a mudanca do doador direto para dentro do fork. Segundo precedente independente do Copier para a mesma exigencia.'
     trace: 'https://cruft.github.io/cruft/'
+    provenance:
+      source: "https://cruft.github.io/cruft/"
+      locator: "cruft.github.io/cruft/ — secao Updating a Project; QUOTE verbatim: \"To update an existing project, that was created using cruft, run cruft update in the root of the project. If there are any updates, cruft will have you review them before applying.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_PLUGIN_SO_LEVA_README_NA_RAIZ
     node_type: evidence
     plane: DEV
@@ -267,6 +335,10 @@ nodes:
     source_kind: primary
     label: 'O unico lugar documentado para enviar DOCUMENTACAO ESCRITA junto com um plugin e um README.md na raiz do plugin, listado como passo de compartilhamento e NAO como tipo de componente carregado. Consequencia para esta rodada: o canal de plugin transporta MAQUINARIA (skills, commands, agents, hooks), nao o corpus de PROSA (knowledge-base, REGRAs, gramatica do grafo, exemplos) que e justamente a doutrina que precisa viajar.'
     trace: 'https://code.claude.com/docs/en/plugins'
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins"
+      locator: "code.claude.com/docs/en/plugins, secao Share your plugins; QUOTE verbatim: \"Add documentation: Include a README.md with installation and usage instructions\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_MARKETPLACE_PROPRIO_SEM_EXIGENCIA_DE_PUBLICO
     node_type: evidence
     plane: DEV
@@ -279,6 +351,10 @@ nodes:
     source_kind: primary
     label: 'Nao existe exigencia de repositorio publico para um marketplace que o proprio usuario adiciona: repositorios privados sao explicitamente suportados nesse caminho. Isto DELIMITA E_REPO_PUBLICO_OBRIGATORIO (plugin-directory-landscape-2026-09), que vale para o DIRETORIO OFICIAL — o canal de plugin tem duas portas, e so uma exige publicidade.'
     trace: 'https://code.claude.com/docs/en/plugin-marketplaces'
+    provenance:
+      source: "https://code.claude.com/docs/en/plugin-marketplaces"
+      locator: "code.claude.com/docs/en/plugin-marketplaces — o heading real e Private repositories (NAO existe heading chamado Public vs. Private Repository Requirements nesta pagina); QUOTE verbatim: \"Claude Code supports installing plugins from private repositories.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_PLUGIN_INTERNO_VIA_MARKETPLACE_PRIVADO
     node_type: evidence
     plane: DEV
@@ -291,6 +367,10 @@ nodes:
     source_kind: primary
     label: 'O caminho documentado para manter um plugin privado ao time, ainda usando o canal de plugin, e hospedar o seu marketplace em repositorio PRIVADO — distinto de submeter aos marketplaces publicos comunitario/oficial da Anthropic. E o veiculo candidato para entrega a cliente de consultoria sem publicar nada.'
     trace: 'https://code.claude.com/docs/en/plugins'
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins"
+      locator: "code.claude.com/docs/en/plugins, secao Share your plugins; QUOTE verbatim: \"To keep a plugin internal to your team, host the marketplace in a private repository.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_ORG_SETTINGS_EXIGE_PUBLICO_FORA_DO_OWNER
     node_type: evidence
     plane: DEV
@@ -303,6 +383,10 @@ nodes:
     source_kind: primary
     label: 'Na distribuicao gerenciada por organizacao (Organization settings > Plugins), fontes sob outro OWNER ou em outro host precisam ser PUBLICAS, porque a sincronizacao da org busca toda fonte que nao seja do mesmo owner sem credencial. Consequencia dura para consultoria: o marketplace privado so fica privado enquanto o cliente instalar por conta propria; no caminho gerenciado pela organizacao DELE, um repo do maestro seria fonte de outro owner e teria de ser publico.'
     trace: 'https://code.claude.com/docs/en/plugin-marketplaces'
+    provenance:
+      source: "https://code.claude.com/docs/en/plugin-marketplaces"
+      locator: "code.claude.com/docs/en/plugin-marketplaces — heading real Distribute through organization settings (nao Public vs. Private Repository Requirements, nome inexistente no documento); QUOTE verbatim: \"github.com repositories under a different owner and repositories on other hosts, such as GitLab or Bitbucket, must be public.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_GITLAB_CORTE_POR_PERSONA_DE_COMPRADOR
     node_type: evidence
     plane: DEV
@@ -315,6 +399,10 @@ nodes:
     source_kind: primary
     label: 'O criterio de corte open-core declarado pelo GitLab e a PERSONA DO COMPRADOR, nao o tipo da feature nem a escala de uso: aberto se o comprador provavel for um contribuidor individual, source-available/pago caso contrario. E o analogo mais util desta rodada para desenhar a fronteira doutrina/biografia por CRITERIO NOMEADO em vez de por lista de pastas.'
     trace: 'https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md'
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md"
+      locator: "GitLab stewardship.md, secao What Features Are Paid-Only, linhas 41-42; QUOTE verbatim: \"To determine what is open source and what not we ask ourselves: **Who cares the most about the feature**. If the likely buyer is an individual contributor the feature will be open source, otherwise it will be source-available (proprietary).\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_CORTE_E_RELATIVO_NAO_EXCLUSIVO
     node_type: evidence
     plane: DEV
@@ -327,6 +415,10 @@ nodes:
     source_kind: primary
     label: 'O criterio e sobre quem se importa RELATIVAMENTE mais, nao sobre exclusividade: toda feature paga ainda tem valor para o contribuidor individual, e o tiering segue profundidade e amplitude de uso. Limita a leitura ingenua do corte: fronteira por persona nao produz duas pilhas disjuntas, produz uma gradacao — e quem desenhar a fronteira do Onion assim tera itens que doem dos dois lados.'
     trace: 'https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md'
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md"
+      locator: "GitLab stewardship.md, secao What Features Are Paid-Only, linhas 44-48; QUOTE verbatim: \"There aren not any features that are only useful to managers, directors, and executives. So for every source-available feature there will be an individual contributor who cares about it.\" (a forma original usa a contracao) + \"The more of GitLab that you use the more likely it is that you benefit from a higher tier.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_PISO_ABERTO_SEM_LIMITE_ARTIFICIAL
     node_type: evidence
     plane: DEV
@@ -339,6 +431,10 @@ nodes:
     source_kind: primary
     label: 'O GitLab se compromete com um PISO: a base aberta tem todas as features essenciais para operar o produto em escala real, sem limites artificiais — o lado pago e ADITIVO, nunca um core mutilado. Transportado para esta rodada: a versao que o cliente forka precisa RODAR DE VERDADE (gate determinístico, radar, dogfood), senao o que viaja e demo, nao metodo.'
     trace: 'https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md'
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md"
+      locator: "GitLab stewardship.md, secao Promises, itens 4-5, linhas 23-24; QUOTE verbatim: \"The open source codebase will have all the features that are essential to running a large forge with public and private repositories.\" + \"The open source codebase will not contain any artificial limits (repositories, users, size, performance, requiring a trademarked header, etc.).\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_PROMESSA_NAO_COBRE_O_SAAS_DO_PROPRIO_VENDOR
     node_type: evidence
     plane: DEV
@@ -351,6 +447,10 @@ nodes:
     source_kind: primary
     label: 'A promessa de stewardship exclui explicitamente o SaaS operado pelo proprio vendor: o corte vale para a base de codigo DISTRIBUIDA, nao para o servico multi-tenant vivo, que pode ter limites proprios. Limita E_PISO_ABERTO_SEM_LIMITE_ARTIFICIAL — o piso e promessa sobre o que VIAJA, nao sobre o que o doador OPERA.'
     trace: 'https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md'
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md"
+      locator: "GitLab stewardship.md, secao Software as a Service, linhas 35-36; QUOTE verbatim: \"Our stewardship promise applies only to the GitLab open source codebase, not to GitLab, Inc services such as GitLab Software as a Service (SaaS). For GitLab SaaS, we may add limits around usage (e.g., storage, compute, traffic) or proxies for usage (e.g., number of users in a group) as we seek to optimize costs and revenues.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_SEPARACAO_FISICA_DIRETORIO_E_MIRROR
     node_type: evidence
     plane: DEV
@@ -363,6 +463,10 @@ nodes:
     source_kind: primary
     label: 'O GitLab mantem os dois lados FISICAMENTE separados no proprio repositorio — um diretorio dedicado ao codigo proprietario dentro da arvore principal, mais um repo espelho downstream somente open source — e e essa separacao fisica que torna o corte AUDITAVEL. E o desenho de mecanismo mais diretamente transportavel desta rodada: fronteira que nao vira diretorio (ou filtro de export) nao e fronteira, e intencao.'
     trace: 'https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md'
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/blob/master/doc/development/stewardship.md"
+      locator: "GitLab stewardship.md, secao Promises, 12o e ultimo bullet, linha 31; QUOTE verbatim: \"This will be implemented with a separate directory for EE code and a Git repo downstream that is open source only.\" — ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_BIOGRAFIA_VIVE_DENTRO_DO_CLAUDE_QUE_O_ADOPT_VENDORIZA
     node_type: evidence
     plane: DEV
@@ -375,6 +479,10 @@ nodes:
     source_kind: local-measurement
     label: 'A biografia nao vaza pela HISTORIA, vaza pela ARVORE — e pior do que o Elenxo supos: os 127 arquivos do diario vivem em .claude/diary, DENTRO do diretorio que o /meta:adopt copia, e o adopt.md nao tem UMA ocorrencia da palavra exclude (zero mecanismo de filtro). members.yaml e o achado de seguranca do arandek estao no working tree. Logo: template de 1 commit publica a biografia inteira com historia limpa, e fork publica tudo duas vezes. O filtro nao existe hoje em nenhum dos veiculos.'
     trace: '.claude/diary/ · .claude/commands/meta/adopt.md · docs/evolution/federation/members.yaml · docs/analysis/arandek-repo-exposure-2026-08.md'
+    provenance:
+      source: ".claude/diary/ · .claude/commands/meta/adopt.md · docs/evolution/federation/members.yaml · docs/analysis/arandek-repo-exposure-2026-08.md"
+      locator: "medicao local em /home/marcio/onion-evolve nesta rodada: ls .claude/diary | wc -l = 127 arquivos (o primeiro e 2026-07-01-audit-dogfood-finds-code-bugs.md); grep -c exclude .claude/commands/meta/adopt.md = 0; docs/evolution/federation/members.yaml e docs/analysis/arandek-repo-exposure-2026-08.md presentes no working tree. CORRECAO de rota feita nesta medicao: o Elenxo citou docs/diary, que NAO EXISTE — o diario vive em .claude/diary, ou seja, DENTRO do diretorio que o /meta:adopt vendoriza"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_LICENCA_ATUAL_E_MIT_JA_CONCEDIDA
     node_type: evidence
     plane: DEV
@@ -387,6 +495,10 @@ nodes:
     source_kind: local-measurement
     label: 'O artefato de hoje e MIT, e a concessao MIT JA SAIU: o repo e os 5 plugins publicados carregam MIT. Licenca nova nao retrai concessao ja dada sobre o mesmo material — qualquer opcao source-available so alcanca o que for publicado DAQUI PARA A FRENTE. Segunda limitacao medida: MIT nao tem clausula de marca nem obrigacao de sinalizar arquivo alterado, entao as protecoes descritas em E_APACHE_AVISO_PROEMINENTE_EM_ARQUIVO_MODIFICADO e E_LICENCA_NAO_CONCEDE_MARCA descrevem uma licenca que este artefato NAO usa.'
     trace: 'LICENSE · plugins/onion/LICENSE · plugins/onion-product/LICENSE · plugins/onion-engineering/LICENSE · plugins/onion-compliance/LICENSE · plugins/onion-design/LICENSE'
+    provenance:
+      source: "LICENSE · plugins/onion/LICENSE · plugins/onion-product/LICENSE · plugins/onion-engineering/LICENSE · plugins/onion-compliance/LICENSE · plugins/onion-design/LICENSE"
+      locator: "medicao local nesta rodada: head -3 LICENSE = \"MIT License / Copyright (c) 2026 Marcio Carvalho\"; ls plugins/*/LICENSE = 5 arquivos (onion, onion-product, onion-engineering, onion-compliance, onion-design), todos comecando com \"MIT License\" e ja publicados (memoria onion-plugin-marketplace-publication-state, PR 791)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_MASSA_138K_DISTRIBUIVEL_VS_151K_BIOGRAFIA
     node_type: evidence
     plane: DEV
@@ -399,6 +511,10 @@ nodes:
     source_kind: local-measurement
     label: 'A massa do repo esta partida quase ao meio: cerca de 138 mil linhas de framework distribuivel contra cerca de 151 mil de autobiografia e projeto. Nao e um apendice biografico num framework — sao duas metades de tamanho comparavel, e a maior delas e a que NAO deve viajar. Isso desqualifica qualquer veiculo que copie a arvore inteira e faz da fronteira uma necessidade de mecanismo, nao de bom senso.'
     trace: 'medicao da sessao de 2026-09-13'
+    provenance:
+      source: "medicao da sessao de 2026-09-13"
+      locator: "medicao da sessao repassada pelo orquestrador desta rodada: ~138 mil linhas de framework distribuivel contra ~151 mil de autobiografia e projeto. NAO re-medida por este escritor — confianca 0.7 por isso; re-medir antes de usar como base de corte"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_LACUNAS_DISTRIBUICAO_0913
     node_type: evidence
     plane: DEV
@@ -411,6 +527,10 @@ nodes:
     source_kind: primary
     label: 'LACUNAS E QUEDAS DA RODADA DE 2026-09-13. (a) FONTES: 15 documentos primarios lidos inteiros; INALCANCAVEIS: 0. (b) CLAIMS: 33 submetidas, 26 ancoradas, 7 REJEITADAS como EXAGERADAS — (1) que a UNICA fronteira declarada pelo GitLab para o que fica FORA do handbook publico seja legal: a frase existe, mas e recomendacao a OUTRAS empresas e o claim afirmava exaustividade que uma pagina entre milhares nao sustenta; (2) que a thoughtbot reconheca implicitamente publicar um SUBCONJUNTO CURADO: o so far do texto fala de evolucao no TEMPO, nao de selecao de topicos; (3) que o update do Copier seja um three-way diff contra a versao NOVA do template: o proprio diagrama mostra o inverso — a copia fresca vem da versao ATUAL/ja instalada e o diff captura o que o DONO mudou, nao o que o template mudou; (4) que o Copier dispense o usuario de reconfigurar: a mesma pagina diz que ele volta a perguntar, so com as respostas anteriores como default, salvo --defaults explicito; (5) que os diretorios reconhecidos de um plugin sejam um conjunto fixo enumerado: a conclusao e verdadeira mas a QUOTE fornecida era citacao editada, pulava a linha de commands e removia a formatacao de tabela; (6) que qualquer arquivo nao-reconhecido dentro da pasta de UM plugin seja ignorado: o texto fala de subpastas SEM MANIFESTO numa pasta que agrega varios plugins; (7) que mover feature de pago para aberto aconteca ROTINEIRAMENTE no GitLab: o documento usa on occasion e from time to time, linguagem de correcao ocasional. (c) EIXOS QUE CONTINUAM ABERTOS, por ausencia de fonte e nao por descuido: o VEICULO nao foi decidido (nenhuma fonte compara fork vs template vs plugin vs export curado para corpus de PROSA); a LICENCA nao foi redigida (nenhum Additional Use Grant de BSL escrito, nenhuma medicao sobre titularidade ou registro da marca Onion, palavra generica); o CANAL DE UPDATE nao foi pareado ao veiculo (Copier e Cruft geram projeto a partir de respostas, o Onion VENDORIZA corpus — o modelo nao transfere sem desenho); e nao ha fonte sobre como um fork divergente reintegra DOUTRINA sem reintegrar BIOGRAFIA. (d) ACHADO META: das 7 quedas, 4 sao da mesma familia — o leitor leu a intencao do mecanismo e nao a direcao dele (Copier 2x), ou generalizou o escopo de uma frase (plugin 2x). Em rodada de primarias o erro dominante nao e inventar citacao, e ESTICAR o que ela sustenta.'
     trace: 'docs/evolution/research/distribuicao-metodo-vivo-2026-09/'
+    provenance:
+      source: "docs/evolution/research/distribuicao-metodo-vivo-2026-09/"
+      locator: "contabilidade da propria rodada: 15 documentos primarios lidos inteiros em 7 lacunas nomeadas, 33 claims submetidas a ancoragem independente, 26 ANCORADAS, 7 EXAGERADAS, 0 NAO-ENCONTRADAS, 0 fonte inalcancavel"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: Q_FRONTEIRA_EXECUTAVEL_NO_ADOPT
     node_type: question
     plane: DEV
@@ -464,6 +584,10 @@ nodes:
     source_kind: internal-measurement
     label: 'A FRONTEIRA DE DIRETORIO JA ESTA RESOLVIDA, e eu tinha afirmado o contrario. O `/meta:adopt` NAO copia arvore: ele usa ALLOWLIST de 11 pathspecs mais `git archive HEAD` — duas barreiras em serie, e a segunda garante que untracked/ignored nunca viajam. O `grep -c exclude` que eu citei como prova de ausencia de filtro deu ZERO porque o desenho NAO USA DENYLIST — que e exatamente o que a rodada de primarias recomendou. Medido por execucao, nao por leitura.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "procedimento de copia do adopt.md rodado VERBATIM num diretorio vazio: 680 arquivos chegaram; diario, sessions, beacons, identity, scratchpad, worktrees, settings.local.json, docs/{evolution,analysis,discussions,materials,applying,onion} e backlog.md NAO chegaram. Confirmado em 6 adotantes reais: zero tem .claude/diary ou members.yaml"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_QUATRO_COPIAS_DA_MESMA_LISTA_DUAS_DRIFTADAS
     node_type: evidence
@@ -477,6 +601,10 @@ nodes:
     source_kind: internal-measurement
     label: 'ERAM QUATRO COPIAS DA MESMA LISTA, nao tres como a medicao inicial disse: adopt.md (duas vezes, transporte e delta do --update), vendor-branch.sh, o `roots=` da REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente) e o `VENDORED_ROOTS` da REGRA 45 (Link vendorizado nao aponta caminho core-privado, com catraca). As DUAS guardas estavam defasadas do transporte. Guarda que varre MENOS do que o transporte emite e fail-open com cara de cobertura. CURADO: SSOT unica em vendor-manifest.sh, consumida pelas quatro superficies, com caso de bancada que reprova se a lista literal voltar.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "adopt.md copiava 11 pathspecs; o `roots=` da REGRA 36 varria 9 e o `VENDORED_ROOTS` da REGRA 45 varria 9 — `.claude/rules` e `.claude/workflows` viajavam SEM ser varridos por nome comercial de cliente nem por link core-privado"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_BASELINES_SAO_INDICE_DO_REPO_PRIVADO_E_JA_CHEGARAM
     node_type: evidence
@@ -490,6 +618,10 @@ nodes:
     source_kind: internal-measurement
     label: 'A BIOGRAFIA QUE VAZA HOJE VAZA DENTRO DE DIRETORIO PERMITIDO. Os `*-baseline.txt` de .claude/validation/ sao INDICE NOMINAL do repo privado — 32 paths unicos, entre eles 5 arquivos do grafo pessoal do maestro — e nao sao LINK, entao a REGRA 45 nao os ve. Ja chegaram a 5 adotantes. CURADO na EMISSAO (nao no destino): `--stub-baselines` reescreve o baseline com o mesmo cabecalho que o regen-baselines semeia, e `--check-bundle` reprova se algum baseline emitido citar caminho privado. Para um cliente de consultoria, que forka e le tudo, a fronteira precisava descer do diretorio ao ARQUIVO — e desceu.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "medido nos repos entregues: sacola-de-ideias 24 linhas, jogo-da-vida 24, venda-direta-pdi 24, portal-gamificacao 24, onion-adopt-granaa-ai 25 — todas citando docs/discussions, docs/analysis ou docs/materials do core; onion-standalone: 0 (nao passou pelo caminho padrao)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ROLES_YAML_E_OUTRA_GRANULARIDADE
     node_type: evidence
@@ -503,6 +635,10 @@ nodes:
     source_kind: internal-measurement
     label: 'O `roles.yaml` NAO resolve o problema do transporte, e eu tinha proposto liga-lo ao adopt como se resolvesse. Ele mapeia papel->plugins/comandos; o corte que a consultoria precisa e papel->PATHSPEC. O `--role` do vendor-manifest.sh nasce com os tres papeis do transporte (adopted|hub|standalone) e hoje entrega a mesma base para os tres: o corte por papel (tirar a meta-fabrica do standalone, como o onion-standalone provou em 2026-07-19) fica NOMEADO e nao implementado — e essa e a proxima execucao, nao uma decisao do maestro.'
     trace: '.claude/utils/marketplace/roles.yaml'
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml"
+      locator: "resolve-role-bundle.sh resolve VERTICAIS (plugins) e WORK_TOOLS (comandos) a partir de roles.yaml; o corte do onion-standalone (274 arquivos a menos, zero a mais, meta-fabrica fora) e corte de PATHSPEC. Sao SSOTs de coisas diferentes; nenhuma invocacao de resolve-role-bundle.sh existe no adopt.md"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ══ AS QUATRO DECISOES DO MAESTRO (2026-09-14) ══════════════════════════════════════════════
   - id: D_VEICULO_STANDALONE_PUBLICO_MAIS_ADOPT
@@ -515,6 +651,10 @@ nodes:
     verified_against: 'selado pelo maestro 2026-09-14, em resposta a quatro perguntas apresentadas com opcoes e recomendacao'
     label: 'SELADA: o veiculo e o onion-standalone PUBLICO como vitrine do metodo MAIS o /meta:adopt rodando no repo DO CLIENTE — com a ressalva do maestro: `pode ser opcao 1 mas com todos os comandos e funcionalidades do core atual`. Descartadas: core publico novo para forkar (fork sem upstream ativo apodrece e a atualizacao vira PR manual), template (historicos nao-relacionados: NAO existe merge de volta — medido na doc do GitHub) e marketplace privado (entrega CONSUMO, install != adopt). O REENQUADRAMENTO que sustenta a escolha: o /meta:adopt com `onion/vendor` JA E um mecanismo de fork-com-atualizacao, e melhor que template ou copier — o framework vive numa branch do repo do cliente, o update chega por merge e a customizacao dele vira CONFLITO GIT REAL (never-clobber estrutural). O cliente nao forka o core: ele recebe o framework onde vai usa-lo.'
     trace: 'docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md"
+      locator: "selado pelo maestro 2026-09-14, em resposta a quatro perguntas apresentadas com opcoes e recomendacao"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
     node_type: decision
@@ -526,6 +666,10 @@ nodes:
     verified_against: 'selado pelo maestro 2026-09-14, em resposta a quatro perguntas apresentadas com opcoes e recomendacao'
     label: 'SELADA: o que viaja e TUDO, inclusive a meta-fabrica (adopt, marketplace, wizard, federacao). Descartado o corte do onion-standalone de 2026-07-19 (274 arquivos a menos) e descartada a entrega so-maquinaria — esta ultima por evidencia: a maquinaria JA transfere (9 de 11 adotantes) e a PRATICA nao (grafo autoral 3 de 7, diario 1 de 7), entao mandar so o motor e repetir o que nao pegou. CONSEQUENCIA QUE O MAESTRO ASSUME, nomeada antes da execucao: como o standalone e PUBLICO, isto publica a maquina de fabricar Onion para QUALQUER UM, nao so para quem contrata. Defensavel pela doutrina da casa (o fosso e o mecanismo verificavel mais o dogfood mais a autobiografia, nao o codigo), e diferente de `dar ao cliente`. CORRECAO 2026-09-14 (passada adversarial): a redacao anterior dizia que `o --role do transporte segue existindo para quem quiser corte menor` — INSINUANDO capacidade que nao existe. Medido: `--role adopted|hub|standalone` devolve listas IDENTICAS, e no codigo ROLE e inicializado, parseado, validado e NUNCA MAIS LIDO. Para ESTE veiculo o efeito e o desejado (a base inteira), mas quem confiar em `--role standalone` para um repo publico embarca 63 arquivos de meta-fabrica mais os 43 comandos de meta/.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "selado pelo maestro 2026-09-14, em resposta a quatro perguntas apresentadas com opcoes e recomendacao"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC
     node_type: decision
@@ -562,6 +706,10 @@ nodes:
     source_kind: primary-gov
     label: 'CUSTO E CLASSE MEDIDOS. O nucleo do negocio (consultoria + framework + SaaS) cai INTEIRO na classe 42: R$ 880,00 cheio ou R$ 440,00 com desconto de ME/EPP/MEI, POR CLASSE. Achado nao-obvio: a CONCESSAO e o primeiro decenio custam R$ 0,00 — o custo esta todo no deposito e, dez anos depois, na prorrogacao (R$ 1.000,00). Tres classes (9+41+42) sairiam por R$ 2.640,00 / R$ 1.320,00. PRAZO MEDIO DE EXAME: NAO MEDIDO (estatisticas do INPI atras de login e de painel Power BI) — so os prazos LEGAIS foram lidos: 60 dias de publicacao para oposicao (art. 158) e vigencia de 10 anos da concessao (art. 133).'
     trace: 'https://www.gov.br/inpi/pt-br/servicos/marcas/custos-e-pagamento'
+    provenance:
+      source: "https://www.gov.br/inpi/pt-br/servicos/marcas/custos-e-pagamento"
+      locator: "Tabela de Retribuicoes do INPI (PDF oficial, Portaria GM/MDIC 110/2025), codigo 389 \"Pedido de registro de marca (com especificacao pre-aprovada) - valor por classe\" R$ 880,00 / 440,00 com desconto; codigos 372/373 \"Primeiro decenio de vigencia... e expedicao de certificado\" R$ 0,00; codigo 374 prorrogacao R$ 1.000,00 / 500,00. Classes NCL 13a ed.: 42 cobre \"projeto e desenvolvimento de hardware e de software de computador\", \"consultoria tecnologica\" e \"software enquanto servico (SaaS)\"; 41 cobre \"provimento de treinamento\"; 9 so se houver software distribuido como copia"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MARCA_ONION_FORTE_NA_LEI_FRACA_NO_CAMPO
     node_type: evidence
@@ -575,6 +723,10 @@ nodes:
     source_kind: primary-law
     label: 'A TESOURA QUE DECIDE: juridicamente FORTE, praticamente FRACA. Nao ha barreira de distintividade — "cebola" nao descreve software, entao o registro e possivel. Mas EXCLUSIVIDADE PRATICA nao se compra: no vocabulario de software o termo ja carrega tres referentes fortes (Tor/.onion na IANA, o padrao Onion Architecture de Palermo, e o jornal). O vizinho mais proximo do produto e justamente o padrao arquitetural homonimo. Registrar na 42 daria direito de barrar CONCORRENTE de servico de TI; nao daria controle sobre o termo nem resolveria a colisao semantica. O risco aqui e de POSICIONAMENTO, nao de ilegalidade.'
     trace: 'https://www.rfc-editor.org/rfc/rfc7686.txt'
+    provenance:
+      source: "https://www.rfc-editor.org/rfc/rfc7686.txt"
+      locator: "LPI art. 124 VI barra o que e generico/descritivo EM RELACAO ao produto — \"onion\" nao descreve software, logo e marca ARBITRARIA (a categoria mais forte). Contra: RFC 7686 (out/2015) registra \".onion\" como Special-Use Domain Name na IANA; Tor Project usa \"onion services\"; Jeffrey Palermo publicou \"Onion Architecture\" em 29/07/2008 e o padrao tem 18 anos de uso corrente; pacote npm `onion` existe desde 11/06/2011"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MARCA_SEM_REGISTRO_SO_PRECEDENCIA_E_CONCORRENCIA_DESLEAL
     node_type: evidence
@@ -588,6 +740,10 @@ nodes:
     source_kind: primary-law
     label: 'O QUE PROTEGE SEM REGISTRO, e o limite exato: o uso anterior da PRECEDENCIA AO REGISTRO (art. 129 §1o), que e municao DEFENSIVA — serve para opor-se no INPI se um terceiro depositar —, e NAO direito de excluir terceiro. Propriedade so nasce do registro (art. 129 caput). O que sobra contra terceiro e concorrencia desleal (art. 195) e perdas e danos (art. 209), que exigem PROVAR confusao ou desvio de clientela. Precedencia sem exercicio vira nada quando o registro alheio se consolida. Um CONTRATO de consultoria pode declarar o sinal, licenciar uso limitado e revogavel, proibir registro pelo cliente e obrigar rename na rescisao — mas so INTER PARTES.'
     trace: 'https://www.gov.br/inpi/pt-br/servicos/marcas/arquivos/legislacao/lpitradpmsrevpms.pdf'
+    provenance:
+      source: "https://www.gov.br/inpi/pt-br/servicos/marcas/arquivos/legislacao/lpitradpmsrevpms.pdf"
+      locator: "LPI art. 129 caput: \"A propriedade da marca adquire-se pelo registro validamente expedido... sendo assegurado ao titular seu uso exclusivo em todo o territorio nacional\"; art. 129 §1o da a quem usa de boa-fe ha 6 meses o \"direito de precedencia AO REGISTRO\"; arts. 195 III/IV/V (concorrencia desleal) e 209 (perdas e danos) — tradução oficial da LPI hospedada pelo proprio INPI, porque o Planalto caiu (ECONNRESET x5)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MARCA_CLAUSULA_DE_RENAME_SO_TEM_DENTES_COM_REGISTRO
     node_type: evidence
@@ -601,6 +757,10 @@ nodes:
     source_kind: primary-org
     label: 'A CLAUSULA-MODELO EXISTE E E CURTA — "distribuiu modificado, renomeie" — mas os DENTES vem do registro. A politica da ASF e da Linux Foundation governa quem COOPERA: funciona no dia a dia porque quase ninguem quer brigar. Quando alguem quis brigar (Amazon), o que resolveu foi PROCESSO POR INFRACAO DE MARCA REGISTRADA, e o desfecho foi exatamente o rename. Nuance a registrar: a propria ASF trata o Secao 6 da Apache 2.0 como CONDICAO DE USO do software ("This policy is already summarized in section 6... and so it is a condition for your use of ASF software") — postura declarada da fundacao, nao decisao judicial.'
     trace: 'https://www.apache.org/foundation/marks/faq/'
+    provenance:
+      source: "https://www.apache.org/foundation/marks/faq/"
+      locator: "ASF FAQ: \"If you distribute modified versions of Apache Software you must do so under a new name\"; ASF policy: \"you may not apply trademarks to your derivative works... that are confusingly similar\"; Linux Foundation: \"A copyright license, even an open source copyright license, does not include an implied right or license to use a trademark\". Caso concreto medido: AWS anuncia o fork OpenSearch em 12/04/2021 (\"we will rename our existing Amazon Elasticsearch Service\") e a Elastic declara em 16/02/2022 que \"resolved the trademark infringement lawsuit\""
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MARCA_LACUNAS_DA_RODADA_0914
     node_type: evidence
@@ -636,6 +796,10 @@ nodes:
     verified_against: 'selado pelo maestro 2026-09-14: limpar no proximo /meta:adopt --update de cada adotante, um repo por vez, com o gate de la — em vez de cinco PRs hoje'
     label: 'SELADA: os 5 adotantes que ja receberam o indice nominal do repo privado (24-25 linhas cada) sao limpos NO PROXIMO UPDATE de cada um, nao hoje. O `--stub-baselines` do PR #826 ja faz a emissao limpa, entao o proximo update de cada repo o corrige sozinho. Razao: respeita I3 (um escritor por repo) e nao exige abrir cinco PRs em repos com gates proprios. CUSTO ACEITO E DECLARADO: as linhas seguem la ate o proximo update de cada adotante. Deixa de ser aceitavel se algum desses repos virar PUBLICO ou ganhar terceiros — esse e o gatilho de reabertura.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "selado pelo maestro 2026-09-14: limpar no proximo /meta:adopt --update de cada adotante, um repo por vez, com o gate de la — em vez de cinco PRs hoje"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── SCRUB POR FORMA: o vazamento que a REGRA 36 nao via, achado ao medir antes de publicar (2026-09-14) ──
   - id: E_VAZAMENTO_REAL_DE_CLIENTE_NA_SUPERFICIE_QUE_VIAJA
@@ -650,6 +814,10 @@ nodes:
     source_kind: internal-audit
     label: 'A REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente) NAO VIU um vazamento real, e a razao e estrutural: ela deriva os termos do members.yaml, entao CLIENTE QUE NUNCA FOI REGISTRADO E INVISIVEL PARA ELA. Derivar do registro e certo — nome hardcoded num script E o proprio vazamento — mas o defeito dominante em guarda de lista e o VOCABULARIO, nao a logica. Achado so porque a decisao de publicar obrigou a medir antes; sem a publicacao em vista, o nome do cliente seguiria viajando para todo adotante novo.'
     trace: '.claude/validation/vendor-scrub-form-check.sh'
+    provenance:
+      source: ".claude/validation/vendor-scrub-form-check.sh"
+      locator: "medicao no proprio repo: nome comercial de um cliente real de PoC encontrado em DOIS arquivos dentro da superficie vendorizada (.claude/commands/meta/adopt.md e .claude/utils/adopt/regen-baselines.sh), ambos emitidos pelo transporte do /meta:adopt"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_SCRUB_POR_FORMA_CURADO_ANTES_DE_PUBLICAR
     node_type: decision
@@ -661,6 +829,10 @@ nodes:
     verified_against: 'selado pelo maestro 2026-09-14: curar antes de publicar, nao depois; nome do cliente removido dos dois arquivos no mesmo PR'
     label: 'SELADA: o nome do cliente sai do texto AGORA (antes de qualquer publicacao), e a guarda passa a asserir a FORMA e nao a lista. O detector novo (.claude/validation/vendor-scrub-form-check.sh) pega duas formas na superficie que viaja: AMPERSAND CORPORATIVO (com pelo menos um lado de 2+ caracteres, o que ja exclui M&A, Q&A, V&V, R&D) e ANCORA DE CONTEXTO (PoC/cliente/adotante/empresa seguida de nome proprio). Forma gera CANDIDATO, nunca veredito: o legitimo (sigla do oficio, nome ficticio de exemplo, citacao academica) vai para um baseline que SO ENCOLHE, e candidato novo e HARD — o mesmo idioma das REGRAS 45 (Link vendorizado nao aponta caminho core-privado, com catraca) e 49 (Catraca de passivo declarado). TETO DECLARADO: nome comercial SEM ampersand e SEM ancora continua invisivel; alargar o padrao mataria a guarda de falso-positivo. Ligado na segunda metade da REGRA 36, com familia vendor_scrub_form de 6 casos e mutante provado.'
     trace: '.claude/validation/vendor-scrub-form-check.sh'
+    provenance:
+      source: ".claude/validation/vendor-scrub-form-check.sh"
+      locator: "selado pelo maestro 2026-09-14: curar antes de publicar, nao depois; nome do cliente removido dos dois arquivos no mesmo PR"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_MARCA_BUSCA_INPI_EXECUTADA_0915
     node_type: evidence
@@ -674,6 +846,10 @@ nodes:
     source_kind: primary-registry
     label: 'A COLIDENCIA FOI MEDIDA, e ela DERRUBA a recomendacao de depositar `ONION` puro. Dos 9 processos de `onion`, o que decide e o 933007990 (CARLOS VINICIUS DE JESUS SANTOS, 19/12/2023, NCL(12) 42, marca MISTA): esta VIVO — `Marca requerida / Aguardando exame de merito` — e e ANTERIOR a qualquer deposito de hoje. Se deferido, um pedido de `ONION` nominativa em 42 cai por colidencia (LPI art. 124, XIX). O outro processo em 42, o 826663907 (Onion Sistemas Imobiliarios, 2004), esta ARQUIVADO e nao bloqueia. Fora da 42 ha dois vivos em 35: 915978512 (Rodrigo Cavalcanti, REGISTRO EM VIGOR) e 943418925 (Bruno Martins, requerida). E A SAIDA ESTAVA NA MESMA BUSCA: `onion evolve` devolveu NENHUM RESULTADO. TETO DECLARADO pelo proprio INPI na pagina: busca satisfatoria NAO garante registro — o exame refaz a busca e decide.'
     trace: 'https://busca.inpi.gov.br/pePI'
+    provenance:
+      source: "https://busca.inpi.gov.br/pePI"
+      locator: "busca do maestro em busca.inpi.gov.br/pePI em 2026-09-15 as 11:19 (base atualizada ate 15/09/2026): termo `onion` devolveu 9 processos; termo `onion evolve` devolveu ZERO"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: A_MARCA_LER_ESPECIFICACAO_DO_933007990
     node_type: decision
@@ -706,6 +882,10 @@ nodes:
     verified_against: 'vendor-manifest.sh --emit-scrub-roots listava 11 raizes e nenhuma era plugins/; e grep do prefixo da familia do vertical pessoal achou 6 citacoes, duas ja dentro do plugin publico montado'
     label: 'O QUE A CONTA DOS 59 NAO VIA, e so a passada adversarial desta cura achou: o no Q_LIBERAR mediu PONTEIROS dentro da fabrica e concluiu que o criterio nao precisava de mecanismo novo, so de resolver os 59. Estava certo sobre os 59 e errado sobre o mecanismo, por uma razao de ESCOPO: as tres maquinas que ele cita (REGRA 36, --stub-baselines, REGRA 45) consomem `--emit-scrub-roots`, e aquela SSOT nao incluia `plugins/` — o diretorio que o marketplace publica para qualquer pessoa. O conteudo estava limpo; a COBERTURA nao existia. Junto, o `_priv` do --check-bundle fixava o NOME COMPLETO de um repo do vertical pessoal quando a familia tem varios, e o irmao viajava. Curados no PR #836 (lista `_SCRUB_EXTRA` so no modo scrub, e predicado por PREFIXO). A licao para esta pergunta: "o criterio nao precisa de mecanismo novo" so vale depois de conferir se o mecanismo existente ALCANCA o transporte — e o mais publico deles era o que ninguem varria. Ver E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA no grafo passada-adversarial-2026-09.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "vendor-manifest.sh --emit-scrub-roots listava 11 raizes e nenhuma era plugins/; e grep do prefixo da familia do vertical pessoal achou 6 citacoes, duas ja dentro do plugin publico montado"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: A_FALTA_SO_A_PECA_4_PARAMETRIZAR_DESTINO
     node_type: decision

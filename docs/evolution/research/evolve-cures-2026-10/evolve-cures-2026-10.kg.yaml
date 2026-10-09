@@ -25,6 +25,10 @@ nodes:
     verified_against: 'simulador das regex do harness 2.1.289 (pTe/uDn/cDn) sobre create-skill.md e agent-skills-specialist.md: 6 diretivas vivas ANTES, 0 DEPOIS'
     trace: '.claude/commands/meta/create-skill.md'
     label: 'CURA 1 da rodada: os seis sitios que o harness lia como diretiva viva (create-skill l.86 e l.219; agent-skills-specialist l.75, l.154, l.155, l.249) passaram a DESCREVER a forma ("o caractere ! colado a um comando entre crases") em vez de escreve-la — o precedente do /meta:forge-guard. Medido com um simulador das tres regex do binario: 6 antes, 0 depois. O /meta:create-skill deixou de rodar git diff a cada invocacao. Varrido o resto de commands/skills/agents/plugins: as unicas diretivas vivas que sobram sao intencionais e executaveis. MEDIDO PELO ELENXO no binario: o harness NAO injeta em corpo de AGENTE (as 7 ocorrencias da funcao executora estao no getPromptForCommand de commands e skills) — a cura no agent-skills-specialist e PREVENTIVA, nao corretiva. E o texto passou a dizer a ORDEM (exclamacao fora e antes da 1a crase) e a apontar a forma literal em docs/knowledge-base/tools/agent-skills.md:170, porque a 1a redacao podia ser lida como a forma errada.'
+    provenance:
+      source: ".claude/commands/meta/create-skill.md"
+      locator: "simulador das regex do harness 2.1.289 (pTe/uDn/cDn) sobre create-skill.md e agent-skills-specialist.md: 6 diretivas vivas ANTES, 0 DEPOIS"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_LEVA1_LINK_DA_DOUTRINA_DE_CLIENTE
     node_type: evidence
@@ -36,6 +40,10 @@ nodes:
     verified_against: 'ls do alvo resolvido a partir de .claude/commands/common/prompts/ com quatro niveis; demais links relativos do arquivo varridos, zero mortos'
     trace: '.claude/commands/common/prompts/client-material-doctrine.md'
     label: 'CURA 2: o link para evidence-source-interest no client-material-doctrine.md:114 tinha tres niveis onde sao quatro. Corrigido e conferido resolvendo o caminho a partir do diretorio do arquivo; os outros links relativos do mesmo arquivo foram varridos e nenhum esta morto.'
+    provenance:
+      source: ".claude/commands/common/prompts/client-material-doctrine.md"
+      locator: "ls do alvo resolvido a partir de .claude/commands/common/prompts/ com quatro niveis; demais links relativos do arquivo varridos, zero mortos"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_LEVA1_SKILL_E_NAO_MEDIVEL
     node_type: evidence
@@ -47,6 +55,10 @@ nodes:
     verified_against: 'log local de carga com 141 linhas e ZERO de skill; familias instructions_loaded (c,e) e evolve_census (j) verdes; tres mutantes morderam (skill volta a NUNCA; rule vira NAO-MEDIVEL; evolve-census trata NAO-MEDIVEL como alvo)'
     trace: '.claude/validation/instructions-loaded-census.sh'
     label: 'CURA 3: skill com paths: sai NAO-MEDIVEL no instructions-loaded-census (o hook InstructionsLoaded e cego para skills: 141 cargas no log, nenhuma de skill), e o evolve-census a manda para O QUE NAO FOI MEDIDO, nunca para os ALVOS. O raio-X passou de 4 alvos de doutrina para 1 (dissect-lens, uma rule recem-nascida). Tres mutantes, tres mordidas — inclusive o que cegaria as rules, que e o modo de falha da propria cura.'
+    provenance:
+      source: ".claude/validation/instructions-loaded-census.sh"
+      locator: "log local de carga com 141 linhas e ZERO de skill; familias instructions_loaded (c,e) e evolve_census (j) verdes; tres mutantes morderam (skill volta a NUNCA; rule vira NAO-MEDIVEL; evolve-census trata NAO-MEDIVEL como alvo)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_LEVA1_PREMISSA_DO_D9_CORRIGIDA
     node_type: evidence
@@ -58,6 +70,10 @@ nodes:
     verified_against: 'git ls-files docs/business-context (15) e docs/technical-context (9)'
     trace: '.claude/commands/meta/evolve.md'
     label: 'CURA 7: a linha do D9 no evolve.md que afirmava "no framework = no-op" ficou riscada (nao apagada) com a medicao ao lado: 15 e 9 arquivos rastreados, populados. O D9 roda no core; vazio silencioso e falha.'
+    provenance:
+      source: ".claude/commands/meta/evolve.md"
+      locator: "git ls-files docs/business-context (15) e docs/technical-context (9)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_LEVA2_CURAS_M_RESTANTES
     node_type: question
@@ -79,6 +95,10 @@ nodes:
     verified_against: 'forge-census.sh: evolve 6/7 -> 7/7; familia evolve_workflow (a-g) verde com agent() simulado que imita o runtime (stage que lanca vira null); seis mutantes morderam, inclusive os dois com que o Elenxo provou a 1a bancada decorativa (survived=all; correlacao por indice)'
     trace: '.claude/workflows/evolve.js'
     label: 'CURA 5: o script que a rodada autorou inline virou a peca 4 em .claude/workflows/evolve.js, com JSON Schema real (FINDINGS, VERDICT) e a correlacao achado-veredito POR CONSTRUCAO. O Passo 3 da superficie perdeu o bloco de JS que nao rodava (runCommand x3, sweepSessionMemory) e ganhou o Passo 2.5: D4/D5/D9/D10 no contexto principal, antes do fan-out, sem orquestracao aninhada. Workflow e Agent entraram no allowed-tools. O script RECUSA D4 sem gastar agente e NAO roda a MAQ sem os alvos do raio-X — nunca inventa alvo. O evolve passou de 6/7 para 7/7 no censo da forja. O ELENXO REPROVOU A 1a VERSAO com tres blockers, todos fail-open: juiz que devolvia null deixava o achado em survived e ainda contava como verificado; dimensao cujo worker lancava sumia sem log; e o caso (d) da bancada era decorativo (passava com survived=all). Curados: unjudged e lost viraram campos de 1a classe, entrada ruim recusa, e todo achado que toque fusao de fase e julgado qualquer que seja a severidade.'
+    provenance:
+      source: ".claude/workflows/evolve.js"
+      locator: "forge-census.sh: evolve 6/7 -> 7/7; familia evolve_workflow (a-g) verde com agent() simulado que imita o runtime (stage que lanca vira null); seis mutantes morderam, inclusive os dois com que o Elenxo provou a 1a bancada decorativa (survived=all; correlacao por indice)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_LEVA2_CHECKPOINT_DO_DRIVE_NO_GRAFO
     node_type: evidence
     plane: DEV
@@ -89,6 +109,10 @@ nodes:
     verified_against: 'familias drive e seal_exception verdes (33 casos); 5 mutantes pos-Elenxo morderam (leitura por texto; pending ignorado; close-lot nao grava; (4) sempre OK; (4) por substring) e, antes, 4 mutantes morderam (pending ignorado; comentario passa a contar; valor desconhecido aceito; pendente sai 0) — o do comentario so mordeu depois de a fixture trazer o valor OPOSTO no comentario'
     trace: '.claude/validation/kg-drive-project.sh'
     label: 'CURA 4: o checkpoint do lote do /meta:drive mora no GRAFO, versionado, em meta.drive_checkpoint (pending|sealed) com drive_checkpoint_note — e o censo o cobra: pendente vence qualquer veredito, sai CHECKPOINT-PENDENTE e o --check sai 1; valor desconhecido RECUSA (rc=2). O P0.5 deixou de ser prosa sobre um STATE.md gitignorado que nenhum script lia. O STATE.md segue como rascunho local, nunca o controle. O ELENXO REPROVOU A 1a VERSAO: a leitura era awk e errava em 7 formas YAML validas; ninguem ESCREVIA o pending (a ausencia conta como selado); e a doutrina passou a se contradizer — a 4a precondicao da excecao de selo mandava nomear o flip no STATE.md gitignorado. Curado: leitura e escrita por YAML, kg-drive-project --close-lot/--seal, e a 4a precondicao MECANIZADA no kg-seal-exception (o id na drive_checkpoint_note, por fronteira de identificador). Segue social: a sessao CHAMAR o --close-lot no P5, declarado na Honestidade do drive.'
+    provenance:
+      source: ".claude/validation/kg-drive-project.sh"
+      locator: "familias drive e seal_exception verdes (33 casos); 5 mutantes pos-Elenxo morderam (leitura por texto; pending ignorado; close-lot nao grava; (4) sempre OK; (4) por substring) e, antes, 4 mutantes morderam (pending ignorado; comentario passa a contar; valor desconhecido aceito; pendente sai 0) — o do comentario so mordeu depois de a fixture trazer o valor OPOSTO no comentario"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_CYCLE_COMPLETION_MEDE_RECENCIA_PELO_STATE
     node_type: question

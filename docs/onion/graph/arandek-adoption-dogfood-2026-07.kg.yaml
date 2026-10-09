@@ -319,6 +319,10 @@ nodes:
     verified_at: 2026-07-27
     verified_against: stamps-e-frontmatter-do-adotante-comparados
     label: "O pin canonico vive DERIVADO em artefatos que o --update nao toca: memorias de sessao gravadas na adocao original, frontmatter de sinais em rascunho, docs que citam a versao do core. O update avanca o .onion-version e as copias ficam para tras EM SILENCIO — o artefato derivado passa a declarar um pin que nao e mais o vivo. Familia declarado!=verificado"
+    provenance:
+      source: "docs/analysis/onion-adopt-update-pin-staleness-2026-07.md"
+      locator: "stamps-e-frontmatter-do-adotante-comparados"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PIN_STALE_IN_SIGNAL
     node_type: evidence
@@ -331,6 +335,10 @@ nodes:
     verified_at: 2026-07-27
     verified_against: frontmatter-do-sinal-vs-onion-version
     label: "CASO REAL: adocao em 24/07 (pin 5e3ea5ee46ac), update em 25/07 (pin 65d8a7501a03, branch develop). Um sinal upstream posterior carimbou no frontmatter source_commit: 5e3ea5e — o pin da ADOCAO ORIGINAL, nao o vivo — porque o valor veio da memoria de sessao nunca reconciliada no update. O CONTEUDO nao foi afetado (o adotante verificou os fixes contra o FILESYSTEM, nao a prosa), mas a classe de erro e real: se a triagem usasse o pin para aferir se um fix ja alcancou o adotante, a conta partiria de dois dias e um update de distancia"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-27-correcao-pin-declarado-no-sinal-anterior.md"
+      locator: "frontmatter-do-sinal-vs-onion-version"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_GREP_OLD_PIN
     node_type: decision
@@ -376,6 +384,10 @@ nodes:
     verified_against: "grep -rl <8hex do pin anterior> em /home/marcio/{aura,gustavo-pulga,mvp-venda-direta-pdi,<adotante-a>,onion-arthur,onion-pedro,onion-standalone,poc-venda-direta-pdi,pulse-mais,rhilo-metagamify} (pins anteriores lidos do git log do .onion-version)"
     label: "RESPOSTA a Q_PIN_GREP_WORTH_IT (drive W9, 2026-09-02): dos 10 adotantes locais, 5 tiveram update; 4 deles ainda citam pin anterior em 22 arquivos — 19 sao historia legitima (docs/evolution/inbox|inbound processados, que DEVEM citar o pin da epoca) e 3 sao SSOT viva (technical-context/index.md no <adotante-a>; project.kg.yaml e onion-adoption.kg.yaml no mvp-venda-direta-pdi). Conclusao: o grep vale UM grep — mas so com exclusao de historia, senao 86% e ruido. Implementado em write-stamp.sh (detecta, nao conserta; bancada + mutacao provadas)."
     trace: ".claude/utils/adopt/write-stamp.sh"
+    provenance:
+      source: ".claude/utils/adopt/write-stamp.sh"
+      locator: "grep -rl <8hex do pin anterior> em /home/marcio/{aura,gustavo-pulga,mvp-venda-direta-pdi,<adotante-a>,onion-arthur,onion-pedro,onion-standalone,poc-venda-direta-pdi,pulse-mais,rhilo-metagamify} (pins anteriores lidos do git log do .onion-version)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: E_GAP2_ZERO

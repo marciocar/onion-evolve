@@ -29,6 +29,10 @@ nodes:
     verified_against: comando-real-no-core
     label: "JÁ EXISTE: /meta:create-vertical (211 linhas, orquestrador fino) + helpers F1 reais (bootstrap-new-project.sh, scaffold-book-dir.sh, templates). Nasceu de sinal de adotante A1. Behavior-over-declaration: o adotante propôs construir o que o core já tem"
     trace: ".claude/commands/meta/create-vertical.md"
+    provenance:
+      source: ".claude/commands/meta/create-vertical.md"
+      locator: "comando-real-no-core"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_p2_gerador_decks
     node_type: claim
     plane: DEV
@@ -47,6 +51,10 @@ nodes:
     verified_against: grep-core-zero
     label: "GAP: nenhum gerador de deck dedicado no core (os matches de grep eram ruído — README/design/skill onion)"
     trace: ".claude/commands/ .claude/skills/"
+    provenance:
+      source: ".claude/commands/ .claude/skills/"
+      locator: "grep-core-zero"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_p3_retro_skill
     node_type: claim
     plane: DEV
@@ -65,6 +73,10 @@ nodes:
     verified_against: ls-skills-zero
     label: "GAP: sem skill de retro/feedback em .claude/skills/. Mas o protótipo funcionou ponta a ponta (a retro do Gustavo foi coletada e fechada 2026-07-29)"
     trace: ".claude/skills/"
+    provenance:
+      source: ".claude/skills/"
+      locator: "ls-skills-zero"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: C_p5_absorcao_skill
     node_type: claim
     plane: DEV
@@ -83,6 +95,10 @@ nodes:
     verified_against: grep-core-zero
     label: "GAP: sem fluxo de absorção/auditoria de skill de terceiro no core"
     trace: ".claude/commands/ .claude/skills/ .claude/validation/"
+    provenance:
+      source: ".claude/commands/ .claude/skills/ .claude/validation/"
+      locator: "grep-core-zero"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_p4_perfil_visitante
     node_type: claim
     plane: DEV
@@ -111,6 +127,10 @@ nodes:
     verified_against: radar-topologia-exit0-e-projecao-authorities
     label: "ENTREGUE: encaixado no onion-onboarding (não skill nova). Nó AUTH_visitor na topologia-SSOT (autoridade-de-pessoa, dimensão ORTOGONAL aos tiers de repo ROLE_) + modo --authorities no topology-projection.sh + lente na fase Orient (entrega-não-relaya, I3, repo-only, relay maestro-only). fonte≠derivação: a fronteira muda sozinha se a topologia mudar. Fecha o Sinal 8"
     trace: "docs/onion/graph/onion-family-topology-2026-07.kg.yaml"
+    provenance:
+      source: "docs/onion/graph/onion-family-topology-2026-07.kg.yaml"
+      locator: "radar-topologia-exit0-e-projecao-authorities"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_p6_kg_consultoria
     node_type: claim
     plane: DEV
@@ -129,6 +149,10 @@ nodes:
     verified_against: modo-map-no-comando
     label: "PARCIAL (REFUTADO): eu disse 'wrapper fino sobre /meta:kg map'. Errado — conflei software (map) com engajamento de negócio (diagnose). map=atom-map/SourceTag/front-end; diagnose=descoberta→KG diagnóstico. Objetos diferentes"
     trace: ".claude/commands/meta/kg.md"
+    provenance:
+      source: ".claude/commands/meta/kg.md"
+      locator: "modo-map-no-comando"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: D_p6_diagnose_delivered
     node_type: decision
     plane: PROD
@@ -139,6 +163,10 @@ nodes:
     verified_against: modo-diagnose-documentado-radar-exit0
     label: "ENTREGUE: modo /meta:kg diagnose — o KG-SDAAL como diagnóstico de engajamento. Reformulei meu próprio veredito (o único produto que subiu de valor na re-análise). Método canônico: reusa kg-radar (--domain estado-absorvente=gargalo do cliente) + 2 camadas + pipeline extract/consolidate; cadência PAUSA-numerada; soberania do engajamento. Dogfood: kg-diagnose-design-2026-07.kg.yaml (radar exit 0). Follow-up gated: automação do pipeline"
     trace: "docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml"
+    provenance:
+      source: "docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml"
+      locator: "modo-diagnose-documentado-radar-exit0"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_p7_gate_client_safe
     node_type: claim
     plane: DEV
@@ -157,6 +185,10 @@ nodes:
     verified_against: validation-scripts-zero
     label: "GAP (REFUTADO): a 1ª triagem disse '0 scripts de gate client-safe' — errado. projection-safety.sh já existia (grep varreu só commands/skills/validation, não achou o nome 'projection-safety')"
     trace: ".claude/validation/"
+    provenance:
+      source: ".claude/validation/"
+      locator: "validation-scripts-zero"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_projection_safety_exists
     node_type: evidence
     plane: PROD
@@ -167,6 +199,10 @@ nodes:
     verified_against: helper-rodado-em-artefato-arbitrario
     label: "JÁ EXISTIA: projection-safety.sh (REGRA 30, dogfoodado P0-P4) é o gate determinístico — deriva termos de members.yaml, audita artefato arbitrário, exit 1 no vazamento. Como o #1 (create-vertical), o adotante propôs mecanismo que o core já tinha (behavior-over-declaration)"
     trace: ".claude/validation/projection-safety.sh"
+    provenance:
+      source: ".claude/validation/projection-safety.sh"
+      locator: "helper-rodado-em-artefato-arbitrario"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: D_p7_terms_extension
     node_type: decision
     plane: PROD
@@ -177,6 +213,10 @@ nodes:
     verified_against: selftests-T1-T3-verdes
     label: "ENTREGUE: o gap RESIDUAL real do #7 era o SOURCE dos termos (members.yaml = nomes de MEMBRO). Estendi projection-safety.sh com --terms <lista>: o adotante declara os PRÓPRIOS nomes de cliente e gateia um artefato antes de cruzar a fronteira. Mesma disciplina P0 fail-loud; run_audit fatorado (uma verdade só); selftests T1-T3"
     trace: ".claude/validation/projection-safety.sh"
+    provenance:
+      source: ".claude/validation/projection-safety.sh"
+      locator: "selftests-T1-T3-verdes"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: D_prioridade
     node_type: decision
     plane: DEV

@@ -29,6 +29,10 @@ nodes:
     verified_at: 2026-07-23
     label: "granaai linhagem local-kvm8: pin DECLARADO 74c470e mas pin-integrity=untrusted (canario divergente DRIFT-ONION) — re-verificar pos-update; mantem o ultimo verificado 4332ac8d"
     trace: "docs/evolution/federation/members.yaml:126"
+    provenance:
+      source: "docs/evolution/federation/members.yaml:126"
+      locator: "pin"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_GRANAAI_PIN_REVERIFIED
     node_type: evidence
     layer: audit
@@ -40,6 +44,10 @@ nodes:
     verified_at: 2026-07-23
     label: "re-verificado 2026-07-23: granaai atualizou 91d5dbb->6cc162f (adopt --update); pin-integrity-check pin-ok 6cc162f + vendor-audit 5/5 limpo. O 74c470e era STALE (a linhagem andou alem), nao drift real. members.yaml onion_version atualizado ao pin verificado."
     trace: "docs/evolution/federation/members.yaml:119"
+    provenance:
+      source: "docs/evolution/federation/members.yaml:119"
+      locator: "pin"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_ANNOUNCE_BACKLOG
     node_type: claim
     layer: audit
@@ -71,6 +79,10 @@ nodes:
     label: "metagamify linhagem production: pin 8e22352 verificado 2026-07-03 mas o commit ficou pendente na sessao do rhilo (entrega-sem-commit I3) — verificado no artefato, nao no ledger"
     verified_at: 2026-07-03
     trace: "docs/evolution/federation/members.yaml:73"
+    provenance:
+      source: "docs/evolution/federation/members.yaml:73"
+      locator: "commit"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_METAGAMIFY_PIN_REVERIFIED
     node_type: evidence
     layer: audit
@@ -82,6 +94,10 @@ nodes:
     verified_at: 2026-07-23
     label: "re-verificado 2026-07-23: rhilo atualizou 8e22352->9547ca7 (commit 880fab34 presente, branch chore/onion-framework); pin-integrity pin-ok 9547ca7. O 'commit pendente' de 07-03 esta resolvido."
     trace: "docs/evolution/federation/members.yaml:61"
+    provenance:
+      source: "docs/evolution/federation/members.yaml:61"
+      locator: "pin"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_METAGAMIFY_VENDOR_VNEXTPIN
     node_type: claim
     layer: audit
@@ -93,6 +109,10 @@ nodes:
     verified_at: 2026-08-30
     label: "metagamify onion/vendor tem 1 pin INVALIDO na historia: '2026-07-12' (uma DATA, nao commit — vnextpin). Merge-base pode ficar errada; dano latente. Fix e adopter-side (sessao do rhilo re-stampa o vendor); --audit-vendor detecta do core."
     trace: "docs/evolution/federation/members.yaml:61"
+    provenance:
+      source: "docs/evolution/federation/members.yaml:61"
+      locator: "pin"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_GRANAAI_LINEAGES_UNKNOWN
     node_type: claim
     layer: audit
@@ -104,6 +124,10 @@ nodes:
     verified_against: "censo lote 4: worker CONFIRMED e juiz opus/high APROVOU (run wf_da7d6a16-49e)"
     label: "granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETERMINADO por design"
     trace: "docs/evolution/federation/members.yaml:131"
+    provenance:
+      source: "docs/evolution/federation/members.yaml:131"
+      locator: "censo lote 4: worker CONFIRMED e juiz opus/high APROVOU (run wf_da7d6a16-49e)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_PERSONALITY_SEEDS
     node_type: claim
     layer: audit
@@ -134,6 +158,10 @@ nodes:
     verified_against: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): As duas afirmacoes mecanicas do label seguem verdadeiras (mecanismo por-instancia via /meta:personality-sync + relay upstream; marcio-pessoal segue gated/n-a) mas o NUMER"
     label: "6 dos 7 adotantes seguem personality_summary SEED MANUAL datado (o 7o, marcio-pessoal, e gated/n-a soberano) — o sync e por-instancia (sessao do adotante, I3); vira emergente quando cada um rodar /meta:personality-sync e relayar upstream. Estado esperado, nao divida do core."
     trace: "docs/evolution/federation/members.yaml:36"
+    provenance:
+      source: "docs/evolution/federation/members.yaml:36"
+      locator: "censo lote 6 (run wf_f5bedede-dfb, 2026-08-30): As duas afirmacoes mecanicas do label seguem verdadeiras (mecanismo por-instancia via /meta:personality-sync + relay upstream; marcio-pessoal segue gated/n-a) mas o NUMER"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_FED_STRUCTURE_IS_TRIPLES
     node_type: claim
     layer: audit
@@ -183,6 +211,10 @@ nodes:
     trace: "ops/materialize-door.sh"
     verified_against: 'materializacao EXECUTADA 4x em destinos descartaveis a partir de HEAD (ops/materialize-door.sh --role standalone), cronometrada com /usr/bin/time em 3 amostras; lint-artifacts.sh rodado DENTRO do resultado; diff -ru <destino> /home/marcio/onion-standalone --exclude=.git | grep -c "^[+-]" para as linhas e diff -rq | grep -c . para os caminhos'
     label: 'CUSTO RE-MEDIDO DEPOIS DE UMA CURA QUE A PROPRIA MEDICAO PROVOCOU — e os numeros da 1a rodada estavam TODOS errados, pela mesma razao. A 1a medicao deu 1,26 s para materializar porque o passo de regeneracao de projecoes NAO RODAVA no papel `standalone` (ver E_MATERIALIZE_DOOR_FAIL_OPEN_NO_REGEN): eu cronometrei um script que pulava trabalho em silencio. Com a cura, materializar leva 13,6-15,3 s (3 amostras) e ja entrega as projecoes. NUMEROS ATUAIS, cada um com o comando que o produz no `verified_against`: materializar 13,6-15,3 s (620 arquivos) · lint dentro da porta ~27-49 s conforme a carga da maquina (a 1a amostra rodou com a bancada concorrente; medir sob carga e declarar o numero sem dizer isso foi defeito meu) · 4 HARD na porta ja regenerada · 272 caminhos divergentes e 4.096 linhas de `diff -ru` contadas por `grep -c "^[+-]"` — a 1a redacao dizia 4.605, numero que NENHUMA derivacao reproduz, e a lição e que numero de diff SO vale com o comando nomeado junto. IDENTIFICACAO DOS 4 HARD, corrigida (a 1a errou DOIS): (1) REGRA 81 (Painel de estado e GERADO dos produtores) — e regenerar DEGRADA o painel na porta, porque la nao existe `docs/evolution/review/`, entao `Resíduos/Achados/Precisão` viram NAO MEDIDO e os produtores vivos caem de 2/3 para 1/3; fechar o HARD publica um painel mais pobre, nao melhor. (2) REGRA 44 (Integridade da escada de Automacao Graduada) — `promoted_by=docs/evolution/federation/members.yaml INALCANCAVEL`; eu a OMITI e no lugar contei a REGRA 42, que sai SOFT (`violation "SOFT"` em lint-artifacts.sh:3075). (3+4) os dois ponteiros mortos em skills que viajam: `onion-publish/SKILL.md:71` e `onion-wizard/SKILL.md:50`. CONSEQUENCIA: a classe "artefato que viaja citando caminho que o papel nao recebe" tem TRES membros aqui, nao dois — a REGRA 44 e a mesma familia, e eu a perdi por classificar no olho em vez de instrumentar a severidade. O QUE NAO SE MEDE COM LINT, declarado: se alguma das mudancas quebra um consumidor do bundle — isso exige leitura.'
+    provenance:
+      source: "ops/materialize-door.sh"
+      locator: "materializacao EXECUTADA 4x em destinos descartaveis a partir de HEAD (ops/materialize-door.sh --role standalone), cronometrada com /usr/bin/time em 3 amostras; lint-artifacts.sh rodado DENTRO do resultado; diff -ru <destino> /home/marcio/onion-standalone --exclude=.git | grep -c \"^[+-]\" para as linhas e diff -rq | grep -c . para os caminhos"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CATRACA_DA_PORTA_STANDALONE_VIROU_CONTADOR
     node_type: evidence
@@ -194,6 +226,10 @@ nodes:
     trace: ".claude/validation/door-staleness-baseline.txt"
     verified_against: 'git log -p em .claude/validation/door-staleness-baseline.txt (todas as refs) + door-staleness-check.sh medindo contra merge-base; em `main` a serie do onion-standalone e 373 → 374 → 381 → 383 → 384 → 388 entre 2026-09-17 e 2026-09-18'
     label: 'O teto do `onion-standalone` SO SOBE, e sobe desde 2026-07-19 — 384 para 388 numa unica sessao. Uma catraca cujo unico movimento e para cima deixou de ser catraca: e CONTADOR. Ela registra a divida com honestidade e se acomoda a ela, sem criar pressao nenhuma — enquanto a metrica de saude declarada em todo baseline desta casa e o numero DIMINUINDO. A guarda esta CORRETA; o defeito nao e dela. E o irmao `onion-core` prova que o mecanismo funciona quando ha decisao: voltou a ZERO duas vezes no mesmo dia, pelo ciclo materializar → avancar o pin. ⚠️ UMA QUEDA EXISTIU, e omiti-la seria o defeito que este no denuncia: em 21a2436f (2026-09-17) o numero caiu 380 → 372. Ela NAO desmente a tese, e a distincao e de OBJETO: aquele commit corrigiu a MEDICAO (a ponta passou de HEAD para merge-base, tirando do teto o trabalho em voo que a porta nao teria como espelhar), nao a PORTA. O passivo real nao encolheu um commit; o instrumento e que parou de mentir para mais. A 1a redacao deste no citava uma serie comecando em 372 que NAO EXISTE em `main` — achado da passada adversarial do PR #848.'
+    provenance:
+      source: ".claude/validation/door-staleness-baseline.txt"
+      locator: "git log -p em .claude/validation/door-staleness-baseline.txt (todas as refs) + door-staleness-check.sh medindo contra merge-base; em `main` a serie do onion-standalone e 373 → 374 → 381 → 383 → 384 → 388 entre 2026-09-17 e 2026-09-18"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA
     node_type: question
@@ -215,6 +251,10 @@ nodes:
     verified_against: 'ops/materialize-door.sh:238 (redacao anterior) + vendor-manifest.sh --role standalone mostrando :(exclude).claude/utils/adopt/regen-ssot-projections.sh; materializacao executada antes e depois da cura, com o lint dentro do destino: 8 HARD antes, 4 depois'
     trace: "ops/materialize-door.sh"
     label: 'O SCRIPT QUE PUBLICA A PORTA PULAVA A REGENERACAO DE PROJECOES EM SILENCIO, e so no papel `standalone`. O teste era `[ -f "${DEST}/.claude/utils/adopt/regen-ssot-projections.sh" ]` — mas o manifesto do papel `standalone` EXCLUI esse arquivo, e a exclusao esta CERTA (e ferramenta core-only, nao deve viajar). Resultado: o `if` falha, o `|| true` engole, o script sai rc=0 dizendo "✅ Porta materializada", e a porta nasce PUBLICADA com 8 HARD em vez de 4. O papel `hub` escapava POR ACIDENTE DE MANIFESTO (la o arquivo viaja) — que e a pior forma de um gate funcionar: por coincidencia, num caminho so, enquanto o outro publica quebrado. CURA: procurar o regenerador no destino E no core, rodando do core contra o destino (ele sempre recebeu o alvo como argumento), e DECLARAR quando nao houver nenhum dos dois em vez de seguir calado. EFEITO COLATERAL QUE IMPORTA PARA QUEM LE MEDICAO: a materializacao passou de 1,26 s para 13,6-15,3 s — o tempo antigo media um script que pulava trabalho. Numero de desempenho colhido sobre caminho fail-open mede a falha, nao a tarefa.'
+    provenance:
+      source: "ops/materialize-door.sh"
+      locator: "ops/materialize-door.sh:238 (redacao anterior) + vendor-manifest.sh --role standalone mostrando :(exclude).claude/utils/adopt/regen-ssot-projections.sh; materializacao executada antes e depois da cura, com o lint dentro do destino: 8 HARD antes, 4 depois"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   - from: C_GRANAAI_PIN_UNTRUSTED

@@ -53,6 +53,10 @@ nodes:
     source_kind: paper
     label: 'CONFIRMADA (tier 7, 3-0): "Instrucoes mais antigas em CLAUDE.md ficam progressivamente menos propensas a serem deletadas (log-hazard de -0.032 por commit), ou seja, quanto mais tempo uma regra sobrevive, mais intocavel ela se torna — mesmo sem evidencia de que ainda importa." Confianca travada em 0.7 e nao mais alta pela objecao E_OBJECAO_TRIAGEM_INCOERENTE_DO_PREPRINT: a mesma rodada REFUTOU tres irmas do mesmo preprint e manteve so esta manchete. A DIRECAO se corrobora localmente com tier 10 (ver E_MEDIDO_LOCAL_TIER10_NO_PROPRIO_REPO); o NUMERO nao e utilizavel como criterio de poda.'
     trace: 'https://www.alphaxiv.org/abs/2608.11095'
+    provenance:
+      source: "https://www.alphaxiv.org/abs/2608.11095"
+      locator: "https://www.alphaxiv.org/abs/2608.11095 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_RADAR_V34_BLOAT_CAUTION_SKILLS_TRIAL
     node_type: evidence
@@ -67,6 +71,10 @@ nodes:
     source_kind: analyst
     label: 'CONFIRMADA (tier 6, 3-0): "O Thoughtworks Technology Radar (v34, abril 2026) classifica agent instruction bloat como um problema associado a esgotamento da janela de contexto do agente, recomendando Agent Skills (status TRIAL) como mitigacao — carregar contexto em pacotes sob demanda em vez de tudo sempre-carregado." Registro de aneis, que a propria rodada quase perdeu: Agent Skills esta em TRIAL (adote com cuidado), instruction bloat esta em CAUTION — sao dois blips distintos e a correcao foi cortada por orcamento antes de ser aplicada. Confianca 0.6: e conselho de analista, nao medicao, e o mecanismo alegado (esgotamento de janela) nao transfere para este repo — ver E_OBJECAO_PREMISSA_SUPERESTIMADA_CINCO_VEZES.'
     trace: 'https://www.thoughtworks.com/en-br/radar/techniques/agent-skills'
+    provenance:
+      source: "https://www.thoughtworks.com/en-br/radar/techniques/agent-skills"
+      locator: "https://www.thoughtworks.com/en-br/radar/techniques/agent-skills — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EVIDÊNCIA LOCAL tier 10 (o artefato instalado e o proprio repo) ──────────────────────
   - id: E_MEDIDO_LOCAL_TIER10_NO_PROPRIO_REPO
@@ -82,6 +90,10 @@ nodes:
     source_kind: installed-artifact
     label: 'MEDIDO (tier 10, artefato instalado + historia do proprio repo, custo = 4 comandos): a assimetria adiciona-vs-deleta e REAL AQUI — 323 linhas adicionadas contra 77 removidas em 59 commits, e a maior remocao unica de toda a historia do CLAUDE.md e de 5 linhas. Mas o tamanho NAO e o constrangimento: 17.041 bytes sao ~0,5% da janela de 1M do opus-5[1m]. E a plataforma ja entrega a cura recomendada: so a `description` do frontmatter entra sempre; o corpo do SKILL.md carrega sob demanda, e duas skills do core ja declaram `paths:`. Densidade de imperativos em CLAUDE.md: 13 bullets pelo grep literal / 29 com -i, em 110 bullets — duas ordens de grandeza abaixo do regime de 500 instrucoes de qualquer benchmark de densidade.'
     trace: 'CLAUDE.md · .claude/skills/*/SKILL.md · /home/marcio/.local/share/claude/versions/2.1.259'
+    provenance:
+      source: "CLAUDE.md · .claude/skills/*/SKILL.md · /home/marcio/.local/share/claude/versions/2.1.259"
+      locator: "medicao propria, 4 comandos no repo e no binario instalado: (1) `git log --follow --numstat -- CLAUDE.md` = 59 commits, adds=323, dels=77, maior remocao unica de toda a historia = 5 linhas; (2) `wc -lc CLAUDE.md` = 246 linhas / 17.041 bytes (~5k tokens = ~0,5% de uma janela de 1M); (3) `grep -n \"^paths:\" .claude/skills/*/SKILL.md` = onion-patterns [\".claude/**\",\"docs/onion/**\"] e onion-validation [\".claude/**\"] JA declaram escopo por path; (4) `grep -ao InstructionsLoaded <binario 2.1.259>` = 21 ocorrencias, incluindo executeInstructionsLoadedHooks / hasInstructionsLoadedHook e a lista de eventos de hook — o hook EXISTE no artefato instalado."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── A PREMISSA DO CORPUS QUE ESTA RODADA DERRUBA ────────────────────────────────────────
   - id: C_PREMISSA_SKILLS_SEMPRE_CARREGADAS
@@ -107,6 +119,10 @@ nodes:
     source_kind: analyst
     label: 'MERCADO — SEM SINAL DE CAPITAL. Nenhuma rodada, M&A, valuation ou down round apareceu: "instruction bloat" e "context engineering" circulam como TECNICA, nao como categoria com capital nomeado. O unico movimento de mercado relevante e o do analista: a mitigacao (Agent Skills, carga sob demanda) virou PADRAO ABERTO adotado pelos fornecedores de agente. Leitura para o Onion: isso REDUZ o valor de construir um mecanismo proprietario de poda (a plataforma ja da a carga preguicosa de graca) e AUMENTA o valor de MEDIR o que carrega e o que muda comportamento — que e onde o Onion tem moat (mecanismo verificavel), nao onde tem concorrente.'
     trace: 'https://www.thoughtworks.com/en-br/radar/techniques/agent-skills'
+    provenance:
+      source: "https://www.thoughtworks.com/en-br/radar/techniques/agent-skills"
+      locator: "varredura do eixo mercado/capital sobre as 12 claims da rodada: nenhuma rodada de investimento, M&A, valuation ou down round nomeado sobreviveu aos votos; o unico sinal de mercado e o analista (Thoughtworks Radar v34, abr/2026)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── LACUNAS DECLARADAS (clausula 6 + regua de saida #2) ──────────────────────────────────
   - id: E_LACUNAS_DECLARADAS_PODA_0903
@@ -184,6 +200,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO SOBREVIVENTE — a triagem e incoerente e por isso o achado externo nao pode carregar a decisao. Ou o preprint vale, e as tres irmas voltam (inclusive a que refuta a opcao B), ou nao vale, e a manchete cai junto: nao existe base para aceitar o resultado e refutar o mecanismo que o explica. Substantivamente o numero e inutilizavel como criterio: um hazard POPULACIONAL nao diz QUAL linha cortar. E a direcao se corrobora com evidencia tier 10 do proprio repo (adds=323/dels=77, maior remocao unica = 5 linhas), o que torna a citacao externa SUPERFLUA e o resto do preprint um passivo. Limite imposto: a decisao nao deve citar o -0.032 como criterio, e a opcao B nao pode ser tratada como refutada por uma irma que a rodada descartou.'
     trace: 'https://www.alphaxiv.org/abs/2608.11095'
+    provenance:
+      source: "https://www.alphaxiv.org/abs/2608.11095"
+      locator: "a propria triagem da rodada: quatro claims saem do mesmo preprint (alphaXiv 2608.11095) e receberam vereditos opostos — a manchete do log-hazard -0.032 CONFIRMADA, e as tres irmas REFUTADAS (O(1) para adicionar vs O(2^|D|) para deletar; \"poda estruturada eliminou 99,3%\"; \"refactor nao-estruturado retoma +4,1% a +4,9%\"). Teste local que ninguem rodou e custa 1 comando: `git log --follow --numstat -- CLAUDE.md` = 59 commits, adds=323, dels=77, maior remocao unica = 5 linhas."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_PREMISSA_SUPERESTIMADA_CINCO_VEZES
     node_type: evidence
@@ -197,6 +217,10 @@ nodes:
     source_kind: installed-artifact
     label: 'OBJECAO SOBREVIVENTE — o achado do Radar v34 nao transfere como enunciado. (a) Aneis misturados: instruction bloat esta em CAUTION, Agent Skills esta em TRIAL; a rodada cortou a correcao e selou o enquadramento errado. (b) O mecanismo alegado (esgotamento de janela) nao se aplica: ~0,5% de uma janela de 1M. (c) A premissa que o achado sustenta e FALSA — no Claude Code o corpo do SKILL.md carrega sob demanda, so a `description` entra sempre, e duas skills do core ja declaram `paths:`. As "5 skills sempre-carregadas, 1.139 linhas" NAO EXISTEM: o problema esta superestimado ~5x e a cura recomendada ja e o default da plataforma. Limite imposto: a opcao A perde a maior parte do seu ganho alegado, e a decisao nao pode se justificar por tamanho de contexto.'
     trace: 'https://www.thoughtworks.com/en-br/radar/techniques/agent-skills'
+    provenance:
+      source: "https://www.thoughtworks.com/en-br/radar/techniques/agent-skills"
+      locator: "tres furos medidos: (a) mistura de aneis — Agent Skills esta em TRIAL, nao e avaliacao CAUTION, e a correcao foi cortada por orcamento nesta mesma rodada; (b) `wc -c CLAUDE.md` = 17.041 bytes (~5k tokens) contra janela de 1M = ~0,5%, logo \"esgotamento da janela de contexto\" nao e o constrangimento vivo; (c) a listagem de skills desta propria sessao mostra apenas as `description` no contexto, e `grep -n \"^paths:\" .claude/skills/*/SKILL.md` devolve onion-patterns e onion-validation ja escopadas."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_SKILLS_JA_SAO_SOB_DEMANDA
     node_type: evidence
@@ -211,6 +235,10 @@ nodes:
     source_kind: installed-artifact
     label: 'OBJECAO SOBREVIVENTE (era descarte por comodismo, e reabre) — este e o fato que COLAPSA a premissa da pergunta, e a rodada o REFUTOU. Agent Skills carrega so o necessario pela `description`; o corpo do SKILL.md entra sob demanda. Verificavel em 1 comando sem web, e o proprio repo ja documenta `paths` em docs/knowledge-base/tools/agent-skills.md:131. Faltou olhar duas coisas que estavam a mao: a listagem de skills do proprio prompt e o KB do repo. Limite imposto: a opcao A nao pode ser vendida como "adotar carga sob demanda" — isso ja esta adotado; o que resta de A e apenas mover doutrina de arquivo, que e a cura que o placar interno reprovou por 1 a 9.'
     trace: 'docs/knowledge-base/tools/agent-skills.md'
+    provenance:
+      source: "docs/knowledge-base/tools/agent-skills.md"
+      locator: "artefato instalado, 1 comando, sem web: binario /home/marcio/.local/share/claude/versions/2.1.259 + a listagem de skills do proprio prompt desta sessao (so descriptions no contexto; o corpo de onion-orchestration, 296 linhas, so entra via ferramenta Skill) + docs/knowledge-base/tools/agent-skills.md:131 documentando `paths` para skill"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_EFEITO_NAO_UNIFORME_POR_MODELO
     node_type: evidence
@@ -225,6 +253,10 @@ nodes:
     source_kind: paper
     label: 'OBJECAO SOBREVIVENTE (era descarte por comodismo, e reabre) — refutar a evidencia tier 8 que sustenta exatamente a opcao que sobra (C) e auto-sabotagem. E o efeito nao-uniforme e operacionalmente critico AQUI: o Onion roda opus-5[1m] no maestro e modelos menores em subagentes por doutrina de tiering. Poda calibrada no modelo que DECIDE pode quebrar o modelo que EXECUTA. Limite imposto: qualquer replay de poda tem de rodar no tier menor tambem, nao so no opus — e a opcao A, que move doutrina para skills ativadas por path, herda o mesmo risco sem nem ter o instrumento para medi-lo.'
     trace: 'https://arxiv.org/pdf/2507.11538'
+    provenance:
+      source: "https://arxiv.org/pdf/2507.11538"
+      locator: "https://arxiv.org/pdf/2507.11538 (tier 8) — \"o padrao de degradacao por densidade correlaciona com tamanho do modelo e capacidade de raciocinio, ou seja, o efeito NAO e uniforme\" — cruzado com a doutrina de tiering do repo (memoria efficiency-over-economy: model+effort por fase; opus-5[1m] no maestro, modelos menores em subagentes)"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_CUSTO_ASSIMETRICO_ADICIONAR_VS_DELETAR
     node_type: evidence
@@ -239,6 +271,10 @@ nodes:
     source_kind: paper
     label: 'OBJECAO SOBREVIVENTE (era descarte por comodismo, e reabre) — vem do mesmo preprint do achado 1, que a rodada manteve; nao existe base para aceitar a manchete e refutar o mecanismo que a explica. E esta e a peca que justifica FERRAMENTA em vez de DISCIPLINA, que e a doutrina do repo (migalha fix-must-become-mechanism). Limite imposto em duas direcoes: contra a opcao B, porque comprimir a mao e disciplina e a assimetria garante que ela nao se sustenta; e contra a opcao D, porque nao podar hoje encarece podar amanha de forma exponencial, e o custo de nao decidir nao e zero.'
     trace: 'https://www.alphaxiv.org/abs/2608.11095'
+    provenance:
+      source: "https://www.alphaxiv.org/abs/2608.11095"
+      locator: "https://www.alphaxiv.org/abs/2608.11095 (tier 7) — \"adicionar instrucoes custa O(1), deletar com seguranca custa O(2^|D|)\" — o MESMO preprint cuja manchete a rodada MANTEVE; corroborado localmente por adds=323 / dels=77 em 59 commits e maior remocao unica = 5 linhas"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_REGISTRAR_O_PORQUE_DE_CADA_INSTRUCAO
     node_type: evidence
@@ -253,6 +289,10 @@ nodes:
     source_kind: paper
     label: 'OBJECAO SOBREVIVENTE (era descarte por comodismo, e reabre parcialmente) — se "99,3% em benchmark controlado" nao transfere (e nao transfere), o hazard -0.032 do mesmo autor tambem nao; a incoerencia e a mesma de E_OBJECAO_TRIAGEM_INCOERENTE_DO_PREPRINT. Mas ha um residuo aproveitavel que a rodada jogou fora junto com o numero e que e BARATO: registrar POR QUE cada instrucao existe, para que a delecao futura seja DECIDIVEL em vez de exponencial. Limite imposto sobre a opcao C: medir sem registrar motivo resolve a poda de hoje e reabre o mesmo problema no proximo ano — o comentario de motivo e parte do mecanismo, nao enfeite.'
     trace: 'https://www.alphaxiv.org/abs/2608.11095'
+    provenance:
+      source: "https://www.alphaxiv.org/abs/2608.11095"
+      locator: "https://www.alphaxiv.org/abs/2608.11095 (tier 7) — \"medir primeiro (telemetria de quais instrucoes influenciam decisoes) + comentarios registrando por que cada instrucao foi criada + poda estruturada eliminou 99,3% das instrucoes excedentes, mas so quando estruturada\" — terceira claim do mesmo preprint, refutada enquanto a manchete ficou de pe"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_LOST_IN_THE_MIDDLE_E_O_MECANISMO_CAUSAL
     node_type: evidence
@@ -267,6 +307,10 @@ nodes:
     source_kind: analyst
     label: 'OBJECAO SOBREVIVENTE (era descarte por comodismo, e reabre) — era o UNICO mecanismo causal ligando tamanho a comportamento, e e exatamente o que o corpus observou ao vivo. Sem esse mecanismo a recomendacao fica sem teoria e a poda vira contagem de linhas. Faltou olhar o proprio grafo kg-read-leg-2026-08, que corrobora a literatura com controle empirico. Limite imposto em duas direcoes: contra a opcao D, porque existe dano observado que NAO depende de esgotar a janela (0,5% de 1M nao esgota nada, e o caso C1 falhou assim mesmo); e sobre a decisao inteira, porque fixa a metrica certa — a poda se justifica por ATENCAO e comportamento, nunca por bytes.'
     trace: 'docs/evolution/research/kg-read-leg-2026-08/'
+    provenance:
+      source: "docs/evolution/research/kg-read-leg-2026-08/"
+      locator: "https://www.thoughtworks.com/radar/techniques/agent-instruction-bloat (tier 6) — \"instrucoes longas e conflitantes fazem o modelo atender menos ao conteudo enterrado no meio de contextos longos\" — corroborado ao vivo pelo corpus: kg-read-leg-2026-08/E_claude_md_has_control (a secao entrou no CLAUDE.md em 2026-06-22 e o caso C1 falhou ~6 semanas depois SOB ELA CARREGADA, com o agente arbitrando entre imperativos concorrentes) e o placar kg-read-leg-2026-08/E_replay_scoreboard (cura A = 1/9)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_INSTRUCTIONSLOADED_PAYLOAD_MEDIDO_0903
     node_type: evidence
     plane: PROD
@@ -279,6 +323,10 @@ nodes:
     source_kind: primary
     label: 'PRE-REQUISITO da decisao RESOLVIDO (tier 10, o binario): o hook InstructionsLoaded entrega file_path, memory_type (User|Project|Local|Managed), load_reason (session_start|nested_traversal|path_glob_match|include|compact), globs, trigger_file_path, parent_file_path. Registra CARGA e motivo — NAO distingue carregou de influenciou. Consequencia para a opcao C re-especificada: o hook mede COBERTURA (camada L1, barata, mecanismo: hook logger + censo por arquivo x motivo, candidatas = SO-SESSION-START e NUNCA); INFLUENCIA exige replay de comportamento (camada L2, cara, dirigida pelas candidatas do L1, nos dois tiers). A decisao deixa de ter dependencia e passa a ter ORDEM: L1 agora, L2 quando o censo tiver >= 20 sessoes ou 14 dias.'
     trace: 'docs/analysis/poda-instrucoes-protocolo-2026-09.md'
+    provenance:
+      source: "docs/analysis/poda-instrucoes-protocolo-2026-09.md"
+      locator: "binario instalado 2.1.259 (~/.local/share/claude/versions/2.1.259, strings): schema Toe = base + file_path + memory_type in [User,Project,Local,Managed] + load_reason in Eoe=[session_start,nested_traversal,path_glob_match,include,compact] + globs? + trigger_file_path? + parent_file_path?; 15 ocorrencias"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   # ── evidências sustentam a pergunta ──

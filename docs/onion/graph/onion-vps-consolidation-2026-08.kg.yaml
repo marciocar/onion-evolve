@@ -23,6 +23,10 @@ nodes:
     verified_against: iptables-nat-DOCKER+DOCKER-USER-vazio+redis-auth-probe-vivo
     label: "INCIDENTE MEDIDO (não presumido): o Docker publica portas furando o ufw (DOCKER-FORWARD antes das regras ufw na FORWARD, DOCKER-USER vazio, DNAT incondicional) → data stores alcançáveis da internet (179.197.65.94). 2 Redis SEM SENHA (prodfiel:6390, onionfresh:6391 — ambientes do maestro) + postgres/milvus/minio/attu do arandek (redis do arandek COM senha)."
     trace: "docs/analysis/onion-vps-network-exposure-2026-08.md"
+    provenance:
+      source: "docs/analysis/onion-vps-network-exposure-2026-08.md"
+      locator: "iptables-nat-DOCKER+DOCKER-USER-vazio+redis-auth-probe-vivo"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_containment_docker_user
     node_type: decision
@@ -34,6 +38,10 @@ nodes:
     verified_against: iptables-S-DOCKER-USER+systemctl-active
     label: "CONTENÇÃO aplicada+persistida: regra DOCKER-USER default-deny (-i eth0; RETURN established + DROP novo) em onion-vps-docker-firewall.service (systemd oneshot idempotente, After=docker). Reversível, não toca compose de adotante, zero lockout (não mexe em INPUT). Cura durável na FONTE = rebind ports 0.0.0.0->127.0.0.1 (gated por-tenant; arandek notificado via co-deliver; prodfiel/onionfresh = fix direto do maestro)."
     trace: "docs/analysis/onion-vps-network-exposure-2026-08.md"
+    provenance:
+      source: "docs/analysis/onion-vps-network-exposure-2026-08.md"
+      locator: "iptables-S-DOCKER-USER+systemctl-active"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_catalog_doctrine_promoted
     node_type: decision
@@ -45,6 +53,10 @@ nodes:
     verified_against: KB-escrita+lint-verde
     label: "DOUTRINA PROMOVIDA: o veredito D_framing_catalogo (catálogo != plataforma) virou KB durável (4a irmã das doutrinas de decisão), citando abstraction-doctrine + ADR nested + integrations.md (L0), sem recopiar. Gate 'premissas medidas' codificado (lição da F2 reprovada). Esqueleto repo-por-ferramenta documentado."
     trace: "docs/knowledge-base/concepts/onion-vps-catalog-doctrine.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-vps-catalog-doctrine.md"
+      locator: "KB-escrita+lint-verde"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_naming_onion_vps
     node_type: decision
@@ -56,6 +68,10 @@ nodes:
     verified_against: docker-ps+systemctl-vivo+logto-users2-apps10
     label: "CONVENÇÃO (maestro): serviços Onion+padrão-VPS usam prefixo onion-vps- (waha/logto/logto-postgres/bridge/docker-firewall renomeados e VIVOS, dados preservados: Logto users=2/apps=10), distinto de onion-adopt-<nome>-* e dos nomes próprios do adotante. Método seguro: só container_name (projeto/volumes intactos)."
     trace: "docs/knowledge-base/tools/vps-tool-repo-skeleton.md"
+    provenance:
+      source: "docs/knowledge-base/tools/vps-tool-repo-skeleton.md"
+      locator: "docker-ps+systemctl-vivo+logto-users2-apps10"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: CL_net_exposure_incident

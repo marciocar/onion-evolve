@@ -71,6 +71,10 @@ nodes:
     source_kind: internal-audit
     label: 'MEDIDO AQUI, nao citado — e corrige o numero do proprio refutador: o binario instalado do Claude Code (2.1.286) traz 243 ocorrencias de PreToolUse e 195 de bypassPermissions, nao as 117 que a objecao 1 declarou (provavel diferenca de metodo: linhas com casamento versus ocorrencias). A direcao da objecao NAO muda — o veto por exit 2 e primitivo nativo e gratuito —, mas o numero de um refutador tambem precisa ser re-medido antes de virar premissa. O que a casa tem do lado dela, medido: 15 hooks, 6 deles com exit 2, um motor de 5.282 linhas com 203 violations e 13 baselines de catraca. Consequencia direta para a pergunta: o PRIMITIVO e gratis para todos; o que o Onion tem e o CORPUS de regras e as catracas construidos sobre ele, e e isso, nao o exit 2, que pode ser cobravel.'
     trace: '.claude/validation/lint-artifacts.sh · .claude/hooks/'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh · .claude/hooks/"
+      locator: "medicao nesta maquina em 2026-10-01 — `claude --version` = 2.1.286; o binario /home/marcio/.local/share/claude/versions/2.1.286 e ELF 64-bit e `grep -ao` nele devolve PreToolUse 243x, bypassPermissions 195x e billing 167x; `ls .claude/hooks/*.sh` = 15 hooks, dos quais 6 contem `exit 2`; `wc -l .claude/validation/lint-artifacts.sh` = 5282 com 203 chamadas `violation \"` e 13 arquivos de baseline-catraca"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CORPUS_AUSENCIA_DE_UNIDADE_BILHETAVEL
     node_type: evidence
@@ -85,6 +89,10 @@ nodes:
     source_kind: internal-audit
     label: 'AUSENCIA MEDIDA no corpus: em 109 grafos NAO existe um unico no sobre unidade bilhetavel. Preco aparece de raspao (pricing em 11 grafos, cobranca em 6, monetizacao em 4, open-core em 3) sempre como atributo de uma FERRAMENTA DE TERCEIRO que a casa estava avaliando — nunca como pergunta sobre o proprio Onion. Este grafo e a primeira entrada do tema: nao ha no previo a corroborar nem a contradizer, e por isso nenhum SUPERSEDES cross-grafo e escrito. Consequencia metodologica: uma decisao de modelo de negocio esta sendo tomada sobre corpus ZERO, o que por si so pesa a favor da opcao (f).'
     trace: 'docs/onion/graph/ · docs/evolution/research/'
+    provenance:
+      source: "docs/onion/graph/ · docs/evolution/research/"
+      locator: "bash .claude/validation/kg-corpus-grep.sh \"unidade bilhetavel\" → 109 grafos varridos, 0 nos; contagem por termo nos mesmos 109 grafos via `git ls-files \"*.kg.yaml\" | grep -v /fixtures/ | xargs grep -il <termo> | wc -l`: pricing 11, cobranca 6, monetiz 4, open-core 3, \"unidade bilhet\" 0"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ═══════════════════ O GATE COMO PRIMITIVO (eixo 2) ═══════════════════
 
@@ -100,6 +108,10 @@ nodes:
     source_kind: primary
     label: 'Em eventos que podem bloquear (PreToolUse), o exit code 2 bloqueia a acao independentemente de qualquer JSON impresso: o gate deterministico e NATIVO do Claude Code e esta documentado publicamente. Para a pergunta da unidade bilhetavel isto corta nos DOIS sentidos e a rodada so leu um: e a capacidade que compra o acoplamento (CLAUDE.md), E e um primitivo gratuito disponivel a qualquer concorrente. Documentado publicamente = replicavel por qualquer um = nao e moat nem unidade cobravel.'
     trace: 'https://code.claude.com/docs/en/hooks'
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "https://code.claude.com/docs/en/hooks — votos 3-0, fonte primaria da plataforma"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_GOVERNANCA_EM_HOOK_JA_E_NATIVA_SYSTEMPROMPT
     node_type: evidence
@@ -114,6 +126,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'Hooks PreToolUse funcionam como gate deterministico (aprovar, negar ou modificar a chamada) e allowManagedHooksOnly forca o uso so de hooks gerenciados — ou seja, a coleira de agente que a opcao (c) quer vender JA EXISTE nativamente na plataforma, inclusive com a trava corporativa. O fornecedor que publica isto se posiciona como camada self-hosted ACIMA dos managed settings e NAO publica preco: cobra por seat ou deployment sob negociacao. Confianca rebaixada a 0,45 por tier 4 e por ser vendor falando do terreno do concorrente.'
     trace: 'https://systemprompt.io/guides/enterprise-claude-code-managed-settings'
+    provenance:
+      source: "https://systemprompt.io/guides/enterprise-claude-code-managed-settings"
+      locator: "https://systemprompt.io/guides/enterprise-claude-code-managed-settings — votos 3-0, mas source_kind vendor-on-competitor (clausula 7: sempre suspeito), sem numero de preco publicado"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ O CASO STYRA (eixo 5, anti-padrao) ═══════════════════
 
@@ -130,6 +146,10 @@ nodes:
     source_kind: primary
     label: 'Em 2025-08-20 os criadores do OPA e varios membros da Styra passaram a integrar a Apple. A segunda fonte qualifica o fato e DESMONTA a leitura forte: foi acquihire SEM aquisicao — a Apple contratou os cofundadores e engenheiros core, sem comprar a empresa nem seus ativos. Logo "absorcao do principal vendedor comercial de motor de regras" e INFERENCIA, nao fato observado; nenhuma fonte de 2026 nesta rodada diz que a Styra parou de vender. Confianca 0,6 apesar do tier 9 por tres razoes somadas: votacao 2-1 (nao unanime), o fato tem 13 meses e a rodada nao o declarou como possivelmente superado, e a conclusao que dele se tira e inferida.'
     trace: 'https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371'
+    provenance:
+      source: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371"
+      locator: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371 (primaria, votos 2-1) cruzada com https://cloudnativenow.com/editorial-calendar/best-of-2025/apple-buys-styra-brains-opa-remains-open-2/ (agregador tier 5, votos 3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_STYRA_PRODUTO_COMERCIAL_VIROU_CNCF
     node_type: evidence
@@ -144,6 +164,10 @@ nodes:
     source_kind: primary
     label: 'Os produtos COMERCIAIS da Styra (EOPA, a distribuicao otimizada do OPA, e o OPA Control Plane) foram encaminhados a organizacao CNCF OPA no GitHub: o que era vendavel virou comunidade aberta. E o unico caso desta rodada em que se ve, de ponta a ponta, o que acontece com um negocio construido em volta de um motor de regras aberto. ATENCAO a inferencia que NAO se sustenta: isto nao prova que motor de regras nao monetiza — prova que quem monetiza e a PLATAFORMA que opera o control plane, nao o vendedor do motor. Fato de 2025, N=1.'
     trace: 'https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371'
+    provenance:
+      source: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371"
+      locator: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371 — votos 3-0, fonte primaria dos proprios fundadores"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ PRECO POR DECISAO: O PISO DO MERCADO (eixo 1) ═══════════════════
 
@@ -160,6 +184,10 @@ nodes:
     source_kind: analyst
     label: 'O AWS Bedrock AgentCore Policy (autorizacao baseada em Cedar) e cobrado POR REQUISICAO DE AUTORIZACAO a US$0,000025 por request — cerca de US$0,025 por mil decisoes; 100 milhoes de chamadas de ferramenta por mes custam US$2.500. E o unico preco-por-veredito do campo achado nesta rodada, e e o piso contra o qual qualquer unidade da opcao (a) sera comparada: preco de COMMODITY de infraestrutura, so sustentavel para quem ja opera o control plane e o cobra junto com Gateway e Evaluations. Confianca 0,55 por tier 6 derivado e pela inversao de hierarquia: a versao tier 9 do MESMO fato foi descartada.'
     trace: 'https://cloudburn.io/blog/amazon-bedrock-agentcore-pricing'
+    provenance:
+      source: "https://cloudburn.io/blog/amazon-bedrock-agentcore-pricing"
+      locator: "https://cloudburn.io/blog/amazon-bedrock-agentcore-pricing — votos 3-0, mas e analista de terceiro que DERIVA o numero; a pagina de precos da propria AWS (tier 9) foi REFUTADA nesta mesma rodada e NAO aparece lida de nenhum lado"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_AGENT_CUSTODY_COBRA_PELO_RECIBO
     node_type: evidence
@@ -174,6 +202,10 @@ nodes:
     source_kind: primary
     label: 'O caso MAIS PROXIMO do que o Onion tem, e e preciso dizer o tamanho dele: o repo svayatta/agent-custody vende a PROVA como produto — recibos assinados por chamada de ferramenta, log a prova de adulteracao com inclusao em Merkle, verificacao offline (verifyBundle) e um custody pack for counsel como evidence pack. A unidade bilhetavel e o RECIBO/APPEND, cobrado por volume: gratis ate 10 mil appends/mes, US$50/mes por 1 milhao. E o unico precedente de preco-por-prova achado. Tamanho real, declarado: 8 estrelas, menos de um mes de vida, sem receita, sem cliente conhecido — e precedente de FORMA, nunca prova de demanda.'
     trace: 'https://github.com/svayatta/agent-custody'
+    provenance:
+      source: "https://github.com/svayatta/agent-custody"
+      locator: "https://github.com/svayatta/agent-custody — repo Apache-2.0 com 8 estrelas, criado em 2026-09-04; preco no proprio repo; a claim do conteudo do produto veio com votos 2-1"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ PROVA COMO PRODUTO: FUNDAMENTO SEM MERCADO (eixo 4) ═══════════════════
 
@@ -190,6 +222,10 @@ nodes:
     source_kind: paper
     label: 'Atestacao composta: Evidence de hardware avaliada sob IETF RATS e vinculada a um AEP de software, demonstrada com TPM EMULADO — prova de conceito academica, sem produto comercial e sem preco. Para a pergunta isto tem valor duplo e contraditorio, e a rodada so extraiu metade: da FUNDAMENTO TECNICO a opcao (a), mostrando que veredito auditavel tem padrao aberto por tras (RATS), e ao mesmo tempo mostra que a area ainda esta no estagio de PAPER COM TPM EMULADO — o que e argumento CONTRA bilhetar prova hoje. A mesma fonte nao traz modelo de cobranca, preco, fornecedor, open-core, anti-padrao nem capital.'
     trace: 'https://arxiv.org/pdf/2608.00801'
+    provenance:
+      source: "https://arxiv.org/pdf/2608.00801"
+      locator: "https://arxiv.org/pdf/2608.00801 — votos 3-0 nas duas claims (a tecnica e a declaracao de que a fonte nao responde aos seis eixos)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_VIZINHANCA_SEM_PRECO_PUBLICADO
     node_type: evidence
@@ -204,6 +240,10 @@ nodes:
     source_kind: primary
     label: 'Dois dos entrantes da categoria nao publicam preco NO REPOSITORIO: o Vectimus e Apache-2.0 distribuido por pipx sem tier pago visivel, e a pagina do Sondera para hooks de agente nao traz preco, tier, SaaS, unidade bilhetavel nem atestacao de veredito. CONFIANCA DELIBERADAMENTE BAIXA (0,4) e o motivo e metodologico: ausencia de preco no README NAO e ausencia de monetizacao — e o padrao open-core, em que o preco mora no site (o Semgrep e LGPL no GitHub e cobra por contributor no site, e esse exato item caiu no lado refutado desta rodada). O que este no registra e uma MEDICAO INCOMPLETA, nao um fato de mercado.'
     trace: 'https://github.com/vectimus/vectimus · https://github.com/marcofanti/sondera-coding-agent-hooks-java'
+    provenance:
+      source: "https://github.com/vectimus/vectimus · https://github.com/marcofanti/sondera-coding-agent-hooks-java"
+      locator: "https://github.com/vectimus/vectimus (votos 2-1) e https://github.com/marcofanti/sondera-coding-agent-hooks-java (votos 3-0) — em AMBOS o que se mediu foi o REPOSITORIO, nao o site, docs ou release notes do fornecedor"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_FONTES_QUE_NAO_RESPONDEM_A_PERGUNTA
     node_type: evidence
@@ -218,6 +258,10 @@ nodes:
     source_kind: analyst
     label: 'Duas fontes foram seladas como achado dizendo apenas que NAO respondem: a pagina do Thoughtworks Radar nao traz modelo de cobranca, open-core, atestacao nem capital, e a openappa.com nao traz unidade bilhetavel, preco, rodada, M&A ou TAM. Registradas aqui com impacto 2 e confianca 0,5 porque sao, no maximo, lacuna documentada — e uma delas foi medida no CAMINHO ERRADO: thoughtworks.com/radar e a LANDING; o conteudo vive nos blips individuais e no PDF do volume, que ninguem abriu. O eixo de ANALISTA (Gartner, Forrester, Thoughtworks) esta, na pratica, VAZIO nesta rodada.'
     trace: 'https://www.thoughtworks.com/en-th/radar · https://www.openappa.com/'
+    provenance:
+      source: "https://www.thoughtworks.com/en-th/radar · https://www.openappa.com/"
+      locator: "https://www.thoughtworks.com/en-th/radar (votos 3-0) e https://www.openappa.com/ (votos 3-0) — ambas registradas como achado de AUSENCIA, nao de conteudo"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ MERCADO E CAPITAL (eixo 6) ═══════════════════
 
@@ -234,6 +278,10 @@ nodes:
     source_kind: analyst
     label: 'O EIXO MERCADO FALOU, e o sinal e de CATEGORIA ADJACENTE, nao da unidade. Rodadas de 2026 em governanca/seguranca de agente: Neo saiu do stealth em 20/07/2026 com US$100M totais, incluindo Serie A de US$75M co-liderada por a16z e Bessemer; Geordie AI levantou US$30M Serie A liderada pela Balderton em 28/05/2026 a cerca de US$180M post-money (US$36,5M totais); Hush Security levantou US$30M Serie A em 28/07/2026 com a Akamai como investidor estrategico, para acesso just-in-time escopado, revogacao e trilhas de auditoria de agentes. TRES RESSALVAS que mudam o peso: (1) a fonte da Neo e permalink cru de WordPress sem slug nem autor para uma afirmacao de nove digitos que teria release primario, e a rodada nao diz O QUE a Neo faz; (2) os agregados que dariam tamanho a categoria (12 rodadas somando US$186,8M, Gray Swan US$40M, Cinder US$41M) foram REFUTADOS por fonte fraca, entao nao ha TAM nem numero de categoria neste grafo; (3) ZERO analista de casa (Gartner, Forrester, IDC) foi lido. Capital na vizinhanca nao e capital na unidade: dinheiro em runtime enforcement mais evidencia nao prova que alguem paga por veredito avulso.'
     trace: 'https://fortune.com/2026/05/28/geordie-security-governance-ai-agents/'
+    provenance:
+      source: "https://fortune.com/2026/05/28/geordie-security-governance-ai-agents/"
+      locator: "tres rodadas confirmadas em fontes de tiers diferentes: https://barc.com/?p=155644 (tier 7, votos 3-0), https://fortune.com/2026/05/28/geordie-security-governance-ai-agents/ (tier 6, votos 3-0) e https://newmarketpitch.com/blogs/news/ai-governance-funding-news (tier 5, votos 3-0); os agregados da MESMA fonte (12 rodadas, US$186,8M, Gray Swan, Cinder) ficaram no lado REFUTADO"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ LACUNAS (clausula 8 — lacuna vira no) ═══════════════════
 
@@ -337,6 +385,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 1 (Elenxo, 1 agente sem votacao) — o achado PROVA O CONTRARIO do que a pergunta precisa: se o exit 2 e NATIVO da plataforma e documentado publicamente, ele e um PRIMITIVO GRATIS disponivel a qualquer concorrente, nao unidade bilhetavel nem moat. Qualquer um escreve um hook que sai 2; ninguem paga pelo que a plataforma da de graca. E o CLAUDE.md ja diz que isso compra o acoplamento — comprar acoplamento NAO e gerar receita, e a rodada confunde as duas coisas. CORRECAO DE NUMERO desta sessao, porque refutador tambem se re-mede: o Elenxo declarou 117 ocorrencias de PreToolUse no binario; medido aqui com `grep -ao` sao 243 (provavel diferenca de metodo, linhas versus ocorrencias). A direcao da objecao nao muda.'
     trace: '/home/marcio/.local/share/claude/versions/2.1.286'
+    provenance:
+      source: "/home/marcio/.local/share/claude/versions/2.1.286"
+      locator: "achado 1 (exit 2 nativo, tier 9) lido contra a medicao local de 2026-10-01: o binario 2.1.286 traz 243 ocorrencias de PreToolUse e 195 de bypassPermissions — o Elenxo declarou 117, numero que NAO reproduz aqui"
+      method: "testemunho: leitura do arquivo /home/marcio/.local/share/claude/versions/2.1.286 no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_STYRA_E_DE_2025_E_INFERENCIA
     node_type: evidence
@@ -350,6 +402,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 2 (Elenxo, 1 agente sem votacao) — o fato e de 2025-08-20, mais de 13 meses antes de hoje: exatamente a classe que a exigencia de atualidade manda DECLARAR como possivelmente superada, e a rodada nao declarou. Pior: o achado 12 da mesma rodada diz acquihire SEM aquisicao — contratou os cofundadores, sem comprar a empresa nem seus ativos. Logo absorcao do vendedor comercial e INFERENCIA, nao fato observado: nao ha UMA fonte de 2026 dizendo que a Styra parou de vender DAS. Votos 2-1 (nao unanime) e a conclusao foi selada mesmo assim.'
     trace: 'https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371'
+    provenance:
+      source: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371"
+      locator: "achado 2 (valid_from 2025-08-20) contra a EXIGENCIA DE ATUALIDADE da propria rodada, e contra o achado 12 da MESMA rodada (acquihire sem aquisicao)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_QUEM_MONETIZA_E_O_CONTROL_PLANE
     node_type: evidence
@@ -363,6 +419,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 3 (Elenxo, 1 agente sem votacao) — o fato e de primeira mao, mas a INFERENCIA que a rodada tira dele (o que era vendavel virou comunidade aberta, logo motor de regras nao se vende) e refutada pela propria rodada: o achado 7 mostra a AWS cobrando US$0,000025 por decisao de um motor deterministico. O que o caso Styra mostra nao e que motor de regras nao monetiza — e que quem monetiza e a PLATAFORMA que roda o control plane, nao o vendedor do motor. N=1 e de 2025. E para o Onion isso e PIOR, nao melhor: ele nao tem control plane. Esta objecao e a que mais pesa sobre (a) e (b), e e exatamente o que a pergunta de selagem P3 cobra do maestro.'
     trace: 'https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371'
+    provenance:
+      source: "https://openpolicyagent.org/blog/note-from-teemu-tim-and-torin-to-the-open-policy-agent-community-2dbbfe494371"
+      locator: "achado 3 (produtos comerciais da Styra para a CNCF) lido contra o achado 7 da MESMA rodada (AWS cobrando por decisao de Cedar) — os dois juntos derrubam a inferencia que a rodada tirou do primeiro"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_NEO_SEM_OBJETO_E_PERMALINK_CRU
     node_type: evidence
@@ -376,6 +436,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 4 (Elenxo, 1 agente sem votacao) — o achado nao diz O QUE a Neo faz, nem que ela esteja na categoria da pergunta (governanca/autorizacao de agente). Sem o objeto da empresa, capital levantado nao e evidencia sobre unidade bilhetavel: e hype de categoria adjacente. E a fonte e permalink cru de WordPress com tier 7 atribuido a um agregador, para um numero de nove digitos que os proprios investidores publicam. Nao se sela rodada de nove digitos por permalink de blog.'
     trace: 'https://barc.com/?p=155644'
+    provenance:
+      source: "https://barc.com/?p=155644"
+      locator: "achado 4 inspecionado: a fonte e barc.com/?p=155644, permalink cru de WordPress sem slug, sem autor e sem data no URL, carregando tier 7 para uma afirmacao de US$100M que teria release primario de a16z e Bessemer"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_RADAR_MEDIDO_NO_CAMINHO_ERRADO
     node_type: evidence
@@ -389,6 +453,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 5 (Elenxo, 1 agente sem votacao) — medicao no CAMINHO ERRADO, que e o mesmo que nao ter medido: declarar ausencia a partir da capa e o erro de metodo ja registrado no corpus da casa (testar-no-caminho-errado-e-nao-testar). Alem disso, um achado que so diz que a fonte nao responde NAO e achado: infla a contagem de evidencia confirmada. Cinco dos 17 achados desta rodada sao declaracoes de ausencia (5, 10, 13, 17 e parte do 8).'
     trace: 'https://www.thoughtworks.com/en-th/radar'
+    provenance:
+      source: "https://www.thoughtworks.com/en-th/radar"
+      locator: "achado 5 lido contra o corpus de metodo da casa: thoughtworks.com/en-th/radar e a LANDING do Radar; o conteudo vive nos blips individuais e no PDF do volume, nenhum dos quais aparece lido na rodada"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_GEORDIE_REFUTA_C_NA_FORMA_ONION
     node_type: evidence
@@ -402,6 +470,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 6 (Elenxo, 1 agente sem votacao) — mesmo aceitando o numero, ele nao sustenta nenhuma das candidatas: o item cortado por orcamento na MESMA rodada diz que a Geordie vende discovery, risk mapping e remediacao por context engineering, packaging de plataforma e nao gate por veredito. Ou seja, a evidencia de capital que a rodada sela REFUTA a opcao (c) na forma que o Onion tem — e isso foi descartado por orcamento em vez de pesado. Capital na vizinhanca nao e capital na unidade. ATENCAO ao tier: o item cortado e primario CITADO, NAO LIDO nesta rodada.'
     trace: 'https://fortune.com/2026/05/28/geordie-security-governance-ai-agents/'
+    provenance:
+      source: "https://fortune.com/2026/05/28/geordie-security-governance-ai-agents/"
+      locator: "achado 6 lido contra o item CORTADO POR ORCAMENTO na mesma rodada, que descreve o que a Geordie vende: discovery mais risk mapping mais remediacao por context engineering — packaging de plataforma, NAO gate deterministico por veredito"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_TIER_INVERTIDO_E_PISO_DE_COMMODITY
     node_type: evidence
@@ -415,6 +487,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 7 (Elenxo, 1 agente sem votacao) — INCOERENCIA FATAL DA RODADA: a rodada rejeitou a fonte FORTE e guardou a FRACA para o mesmo fato, invertendo a hierarquia de evidencia que a clausula 7 impoe. E o preco, se real, e US$0,025 por mil decisoes: preco de COMMODITY de infraestrutura, so sustentavel para quem ja opera o control plane e o cobra junto com Gateway e Evaluations (itens que tambem foram cortados por orcamento). Como piso de mercado ele DESTROI a opcao (a): ninguem vai pagar mais caro pelo veredito de um framework vendorizado do que a AWS cobra pelo dela.'
     trace: 'https://cloudburn.io/blog/amazon-bedrock-agentcore-pricing'
+    provenance:
+      source: "https://cloudburn.io/blog/amazon-bedrock-agentcore-pricing"
+      locator: "comparacao direta das duas listas do repasse: a MESMA afirmacao de preco esta REFUTADA em tier 9 (aws.amazon.com/bedrock/agentcore/pricing) e CONFIRMADA em tier 6 (cloudburn.io); a pagina da propria AWS nao aparece lida em nenhum dos dois lados"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_SEM_PRICING_NAO_E_SEM_MONETIZACAO
     node_type: evidence
@@ -428,6 +504,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 8 (Elenxo, 1 agente sem votacao) — nao ha preco no repositorio NAO e nao ha monetizacao: e o padrao open-core, em que o preco mora no site e nao no README. A rodada nao checou site, docs nem release notes do Vectimus. Concluir ausencia de modelo de negocio a partir da ausencia de um arquivo PRICING e o erro que o corpus da casa chama de declarado diferente de verificado. Votos 2-1.'
     trace: 'https://github.com/vectimus/vectimus'
+    provenance:
+      source: "https://github.com/vectimus/vectimus"
+      locator: "achado 8 (votos 2-1) lido contra o padrao open-core documentado na propria rodada: o Semgrep e LGPL no GitHub e cobra US$35 por contributor/mes no SITE — e esse item caiu no lado refutado desta mesma rodada"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_ATESTACAO_AINDA_E_PAPER
     node_type: evidence
@@ -441,6 +521,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 9 (Elenxo, 1 agente sem votacao) — prova de conceito academica, sem produto e sem preco: por construcao, ZERO evidencia sobre unidade bilhetavel. O que ela faz e dar FUNDAMENTO TECNICO a opcao (a) e, no mesmo movimento, mostrar que (a) ainda esta no estagio de paper — o que e argumento CONTRA bilhetar hoje. A rodada selou o item como achado confirmado sem extrair essa consequencia.'
     trace: 'https://arxiv.org/pdf/2608.00801'
+    provenance:
+      source: "https://arxiv.org/pdf/2608.00801"
+      locator: "achado 9: prova de conceito academica com TPM EMULADO, sem produto e sem preco — a propria descricao do item"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_AUSENCIA_CONTADA_COMO_ACHADO
     node_type: evidence

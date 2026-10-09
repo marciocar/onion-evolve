@@ -32,6 +32,10 @@ nodes:
     verified_against: repo-HEAD-5c6e2cf
     label: "NAO E FALHA NOVA — e a 8a+ ocorrencia de modo de falha ja diagnosticado, medido e nomeado. O autor da doutrina ignorou o KG 3x na MESMA sessao minutos apos monta-lo, e >=4x DEPOIS de escrever a doutrina. A KB ja cravou o veredito: 'A reincidencia E o dado. Nao e falha de disciplina do consumidor — e falha de DESIGN DO LOOP'. Numero do gargalo registrado: recall passivo quase perfeito 'despenca para 40-60% no uso ativo em decisao'"
     trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md:431"
+    provenance:
+      source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md:431"
+      locator: "repo-HEAD-5c6e2cf"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_write_leg_only
     node_type: evidence
@@ -54,6 +58,10 @@ nodes:
     verified_against: medicao-direta-VPS
     label: "CUSTO NAO E O OBSTACULO (medido): kg-radar.sh em 1 grafo = 16ms; grep cross-grafo nos 43 arquivos = 11ms. Ler e praticamente de graca. Logo o problema NAO e custo nem capacidade — e DISPARO. Isto elimina de antemao toda classe de cura do tipo 'torne a leitura mais barata'"
     trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+      locator: "medicao-direta-VPS"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_timing_hypothesis
     node_type: claim
@@ -73,6 +81,10 @@ nodes:
     verified_against: _processed/2026-07-16-ssot-como-runtime-para-adr.md
     label: "O QUE REFUTA O TIMING: os casos C4-C6 aconteceram MINUTOS depois de o proprio agente AUTORAR o grafo, na mesma sessao, com arquivo e ids no contexto imediato. Distancia temporal ~0, salienciamaxima — e falhou 3x. SE DISTANCIA 0 FALHOU TRES VEZES, nao ha evidencia de que distancia 1 (additionalContext no mesmo prompt) funcione. PRESENCA != CONSULTA. O timing e verdadeiro como observacao de escopo e irrelevante para 6 dos 7 casos de leitura"
     trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+      locator: "_processed/2026-07-16-ssot-como-runtime-para-adr.md"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_glob_blind_36pct
     node_type: evidence
@@ -84,6 +96,10 @@ nodes:
     verified_against: execucao-verbatim-do-glob-no-HEAD
     label: "DEFEITO MEDIDO E VERIFICADO INDEPENDENTEMENTE: o glob de descoberta do passo-0 dos 3 comandos cabeados ('ls docs/onion/graph/*.kg.yaml docs/*/graph/*.kg.yaml *.kg.yaml') enxerga 31 grafos unicos; existem 49 rastreados no git (sem fixtures). CEGO PARA 18 (36%) — porque docs/*/graph/ NAO alcanca docs/evolution/research/<tema>/. Os grafos que responderiam C1 (waha-adapter-2026-07) e C2 (email-logto-2026-08) estao entre os cegos. MESMO SE o modelo tivesse obedecido perfeitamente ao passo 0, nao teria achado. ARMADILHA: o glob casa docs/onion/graph/ em DOIS padroes e duplica a saida (31x2=62) — a primeira contagem do proprio agente caiu nela"
     trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+      locator: "execucao-verbatim-do-glob-no-HEAD"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_replay_scoreboard
     node_type: evidence
@@ -95,6 +111,10 @@ nodes:
     verified_against: elenxo-14-workers-wf_38afb1f2-ee7
     label: "O PLACAR (a regua): cura A (secao no CLAUDE.md) = 1/9; cura B (hook UserPromptSubmit sensor-de-ausencia) = 1/9; cura C (kg-radar --grep cross-grafo) = 0/9. O UNICO caso que A e B pegam e O MESMO (C7) — logo a uniao das tres e 1/9, identica a melhor isolada. Somar as tres e somar superficie, nao cobertura. Descontando C8/C9 (perna da escrita, ja curados), na perna de LEITURA: 1/7, 1/7, 0/7"
     trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+      locator: "elenxo-14-workers-wf_38afb1f2-ee7"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_claude_md_has_control
     node_type: evidence
@@ -106,6 +126,10 @@ nodes:
     verified_against: CLAUDE.md-git-blame
     label: "CONTROLE EMPIRICO DA CURA A, e reprovou: a secao 'Dogfood e o padrao master' entrou no CLAUDE.md em 2026-06-22 — prosa imperativa, mesmo registro, mesmo arquivo sempre-carregado. O caso C1 falhou ~6 semanas depois SOB ESSA SECAO CARREGADA. Pior: em C1 o agente APLICOU outra doutrina em prosa (os 5 portoes, de memoria) e PULOU o grafo — ele ja arbitra entre imperativos concorrentes, e o de KG perdeu a disputa"
     trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+      locator: "CLAUDE.md-git-blame"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ammunition_not_trigger
     node_type: evidence
@@ -117,6 +141,10 @@ nodes:
     verified_against: replay-corpus-9-casos
     label: "A PINCA QUE MATA A CURA DE DESCOBERTA: em 0 de 9 casos ha registro de alguem que QUIS consultar e NAO ACHOU — sete sao 'nao consultou'. Em C4-C6 a descoberta ja custava zero (grafo recem-autorado pelo proprio agente) e a leitura falhou; em C7 a leitura aconteceu e o instrumento ATUAL bastou (corrigiu 4 erros, revelou que metade do redesenho ja existia como no). Onde descobrir era gratis, falhou; onde leu, o velho serviu. --grep e MUNICAO, nao GATILHO. E o repo ja tem TRES nivel-4 disponiveis-e-ignorados — somar um quarto nome e somar ao denominador"
     trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+      locator: "replay-corpus-9-casos"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_residue_is_the_property
     node_type: claim
@@ -137,6 +165,10 @@ nodes:
     verified_against: elenxo-wf_38afb1f2-ee7
     label: "VEREDITO: NAO CONSTRUIR nenhuma das tres curas na forma proposta. As tres sao, respectivamente, disciplina em prosa (A), disciplina em prosa injetada com mais frequencia (B) e ferramenta melhor para um ato que nunca e emitido (C). O corpus sustenta a leitura dura que a propria KB ja tinha: e DESIGN DO LOOP e nao tem cura barata. Escopo ratificado pelo maestro: core primeiro, adotante gated; regua = replay primeiro, depois repensar"
     trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+      locator: "elenxo-wf_38afb1f2-ee7"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_fix_glob_not_a_cure
     node_type: decision

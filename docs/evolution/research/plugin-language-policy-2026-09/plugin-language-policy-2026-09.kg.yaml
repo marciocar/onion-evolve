@@ -62,6 +62,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0): "A Anthropic Software Directory Policy exige que a descricao do plugin corresponda precisamente a funcionalidade real, mas nao declara nenhum requisito de idioma ou campo de locale para as superficies do plugin (description, README, plugin.json)." Sustenta EXATAMENTE uma proposicao — nada e PROIBIDO. Nao sustenta que nada e PENALIZADO (ver E_OBJECAO_SILENCIO_CORTA_PARA_OS_DOIS_LADOS).'
     trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+    provenance:
+      source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
+      locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_POLITICA_PRIVACIDADE_E_DOC_SEM_LOCALE
     node_type: evidence
@@ -76,6 +80,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0): "A politica exige politica de privacidade acessivel explicando coleta/uso/retencao de dados, documentacao de como o software funciona, proposito pretendido e troubleshooting, mas nao menciona idioma nem campo de locale em plugin.json ou SKILL.md." O ponto operacional: "documentacao de como o software funciona + troubleshooting" e justamente a superficie que o Onion GERA — logo o requisito TOCA o item em disputa, e a rodada nao perguntou em que idioma o revisor a le.'
     trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+    provenance:
+      source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
+      locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_POLITICA_TRES_EXEMPLOS_SEM_IDIOMA
     node_type: evidence
@@ -89,6 +97,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0): "A politica exige ao menos tres exemplos de prompt funcionais para o plugin, sem especificar o idioma desses exemplos." Os exemplos de prompt sao a UNICA superficie que alguem COPIA E EXECUTA — inclusive o revisor que testa se a descricao corresponde precisamente a funcionalidade.'
     trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+    provenance:
+      source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
+      locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_TRADUCAO_MANUAL_PARA_MEDIANA_ZERO
     node_type: evidence
@@ -103,6 +115,10 @@ nodes:
     source_kind: paper
     label: 'CONFIRMADA (tier 6, 3-0): "Traducoes mescladas em repositorios grandes nao recebem atualizacoes continuas: a versao traduzida teve mediana de 0 commits em 6 meses, enquanto a versao em ingles teve mediana de 8,5 commits no mesmo periodo." E a evidencia mais forte contra bilinguismo MANTIDO A MAO. Transferencia LIMITADA: o paper mede traducao manual, e a metade GERADA do onion-plugins e travada byte-a-byte pela REGRA 19 [HARD] (lint-artifacts.sh:1161) — la o modo de falha medido e mecanicamente impossivel.'
     trace: 'https://arxiv.org/html/2508.02497v1'
+    provenance:
+      source: "https://arxiv.org/html/2508.02497v1"
+      locator: "https://arxiv.org/html/2508.02497v1 — verificacao adversarial 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MIRROR_COMUNITARIO_SEM_POLITICA_DE_IDIOMA
     node_type: evidence
@@ -117,6 +133,10 @@ nodes:
     source_kind: aggregator
     label: 'CONFIRMADA (tier 5, 3-0): "O repositorio oficial (mirror) de submissao de plugins da comunidade Anthropic nao declara politica de idioma nem campo de locale nos requisitos de submissao." O que foi lido foi o README do mirror; o portao real (template de PR, bot de revisao, listagem viva com contador de instalacoes) NAO foi inspecionado. Confianca travada em 0.6: agregador, e ausencia-de-linha sem exemplo observado nao decide nada.'
     trace: 'https://github.com/anthropics/claude-plugins-community'
+    provenance:
+      source: "https://github.com/anthropics/claude-plugins-community"
+      locator: "https://github.com/anthropics/claude-plugins-community — verificacao adversarial 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_ANTHROPIC_RECOMENDA_IDIOMA_EXPLICITO
     node_type: evidence
@@ -131,6 +151,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "Quando a aplicacao permite ao usuario escolher idioma em tempo real, a recomendacao da Anthropic e interpolar essa escolha no system prompt em vez de depender da inferencia automatica do Claude a partir da mensagem do usuario." Este e o unico achado tier 10 de RUNTIME da rodada e ele DERRUBA a premissa confortavel de (i) e (iii) — se o modo confiavel e instrucao explicita, nenhuma opcao esta completa enquanto nao disser ONDE mora a instrucao de idioma num plugin distribuido.'
     trace: 'https://docs.claude.com/en/docs/build-with-claude/multilingual-support'
+    provenance:
+      source: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support"
+      locator: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support — verificacao adversarial 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_JETBRAINS_DECLARADO_IRRELEVANTE
     node_type: evidence
@@ -144,6 +168,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA COM RESSALVA (tier 3, 2-1 — maioria apertada): "O documento oficial do JetBrains Plugin SDK sobre traducao nao aborda politica de idioma para descricoes/metadados de marketplace, nao compara plugins nao-anglofonos e nao trata do comportamento de resposta de LLMs por idioma." Achado NEGATIVO. Confianca travada em 0.5 pela clausula 7 (tier <= 3 nunca acima de 0.7) e pelo voto dissidente — que o Elenxo reabriu em E_OBJECAO_JETBRAINS_TEM_LOCALE_EXPLICITO.'
     trace: 'https://plugins.jetbrains.com/docs/intellij/providing-translations.html'
+    provenance:
+      source: "https://plugins.jetbrains.com/docs/intellij/providing-translations.html"
+      locator: "https://plugins.jetbrains.com/docs/intellij/providing-translations.html — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── MEDIÇÃO LOCAL DESTA RODADA (dogfood tier 10 no proprio repo) ─────────────────────────
   - id: E_MEDIDO_LOCAL_SUPERFICIE_GERADA_VEM_DO_CORPO_0904
@@ -159,6 +187,10 @@ nodes:
     source_kind: internal-audit
     label: 'MEDIDO NO ARTEFATO (behavior-over-declaration): a premissa comum as tres opcoes da pergunta — "superficie e gerada, corpo e escrito" — e FALSA neste repo. (a) As 8 descriptions de plugin.json sao MANUAIS: o gerador do marketplace apenas as copia, entao "superficie gerada em EN" nao chega nelas de graca. (b) O CORPO ALIMENTA A SUPERFICIE: os READMEs gerados imprimem tabelas cujo texto sai do `description:` de frontmatter de 134 artefatos embarcados (176 na fonte) mais os argument-hint em prosa; traduzir a superficie SEM tocar os corpos e impossivel por construcao. (c) O proprio gerador carrega 24 blocos de prosa pt-BR. Conclusao: a fronteira idioma-superficie / idioma-corpo NAO coincide com a fronteira gerado / escrito, e so uma definicao MECANICA (o que o gerador EMITE) e implementavel.'
     trace: '.claude/utils/marketplace/plugin-readme.sh; .claude/utils/marketplace/generate-marketplace.sh; plugins/*/.claude-plugin/plugin.json'
+    provenance:
+      source: ".claude/utils/marketplace/plugin-readme.sh; .claude/utils/marketplace/generate-marketplace.sh; plugins/*/.claude-plugin/plugin.json"
+      locator: "medicao no repo em 2026-09-04 (Claude Code 2.1.260): `ls plugins/` = 8; as 8 `description` de plugins/*/.claude-plugin/plugin.json estao em pt-BR e sao ESCRITAS A MAO; `generate-marketplace.sh` so as COPIA (`desc=\"$(field \"${pj}\" description)\"`); `plugin-readme.sh` tem 24 blocos `out.append` de prosa pt-BR hardcoded e monta as tabelas \"O que faz\" / \"Especialidade\" / \"Quando ativa\" a partir do `description:` de frontmatter; populacao-fonte em .claude/ = 112 comandos + 51 agentes + 13 skills = 176 descricoes e 29 `argument-hint`; populacao EMBARCADA em plugins/ = 76 + 46 + 12 = 134 descricoes e 13 `argument-hint`"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MEDIDO_LOCAL_ZERO_EXEMPLOS_DE_PROMPT_0904
     node_type: evidence
@@ -173,6 +205,10 @@ nodes:
     source_kind: internal-audit
     label: 'MEDIDO NO ARTEFATO: os 8 READMEs de plugin gerados hoje tem ZERO exemplos de prompt. A politica do diretorio EXIGE >= 3 (E_POLITICA_TRES_EXEMPLOS_SEM_IDIOMA). Ou seja: o artefato que a politica cobra em idioma nao-especificado NAO EXISTE ainda, e nenhuma das tres opcoes da pergunta o menciona. A decisao de idioma dos exemplos precisa ser tomada JUNTO com a decisao de CRIA-LOS — e como sao copiados-e-executados, sao a superficie onde o idioma tem consequencia operacional, nao estetica.'
     trace: 'plugins/*/README.md; .claude/utils/marketplace/plugin-readme.sh'
+    provenance:
+      source: "plugins/*/README.md; .claude/utils/marketplace/plugin-readme.sh"
+      locator: "medicao no repo em 2026-09-04: `grep -rc \"Exemplo\" plugins/*/README.md` devolve 0 nos 8 READMEs; os headings gerados sao Instalar / O que traz / Comandos / Agentes / Skills / Hooks / Requisitos / Proveniencia / Comandos do core citados / Licenca — nenhuma secao de exemplos de prompt"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── EIXO MERCADO/CAPITAL (invariante — clausula 4) ───────────────────────────────────────
   - id: E_MERCADO_SEM_SINAL_DE_CAPITAL_EM_I18N_DE_CATALOGO
@@ -264,6 +300,10 @@ nodes:
     source_kind: primary
     label: 'OBJECAO SOBREVIVENTE (achado 1) — inferencia do silencio corta para os DOIS lados. A mesma ausencia que "libera" pt-BR nao autoriza concluir neutralidade na PRATICA: a curadoria e de duas camadas (revisao automatica a cada push + selo Verified), e o corpus ja carimbou que i18n NAO foi respondido. Este achado sustenta exatamente "nada e PROIBIDO"; nunca "nada e PENALIZADO". Usa-lo como base de escolha e decidir por ausencia de dado — e nenhuma observacao do diretorio VIVO foi feita nesta rodada.'
     trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+    provenance:
+      source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
+      locator: "a propria E_POLITICA_SEM_REQUISITO_DE_IDIOMA (tier 9) lida com rigor logico, cruzada com plugin-directory-landscape-2026-09/E_CURADORIA_DUAS_CAMADAS (revisao automatica a cada push + selo Anthropic Verified) e com E_LACUNAS_PLUGIN_DIRECTORY_0904 (\"i18n NAO respondido\")"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_TRES_ACHADOS_SAO_UMA_SO_PAGINA
     node_type: evidence
@@ -290,6 +330,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO SOBREVIVENTE (achado 3) — o paper mata a parte MANUAL, nao o bilinguismo inteiro. Na metade GERADA e travada por catraca [HARD], o modo de falha medido (traducao que para de receber commits) e mecanicamente impossivel. O achado transfere, e transfere com forca, para o que e ESCRITO A MAO: as 8 descriptions de plugin.json, os 29 argument-hint da fonte (13 embarcados) e as 176 descriptions de frontmatter (134 embarcadas). Usa-lo para matar (ii) INTEIRO e sobre-generalizacao; usa-lo para matar a metade manual de (ii) e legitimo — e e exatamente por isso que a saida recomendada e GERAR o segundo idioma, nao mante-lo.'
     trace: 'https://arxiv.org/html/2508.02497v1'
+    provenance:
+      source: "https://arxiv.org/html/2508.02497v1"
+      locator: "https://arxiv.org/html/2508.02497v1 (regime medido: traducao MANTIDA A MAO) cruzado com a medicao local — READMEs de plugin e do marketplace sao GERADOS por .claude/utils/marketplace/plugin-readme.sh e marketplace-readme.sh e travados byte-a-byte pela REGRA 19 [HARD] em .claude/validation/lint-artifacts.sh:1161"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_MIRROR_NAO_FOI_MEDIDO
     node_type: evidence
@@ -303,6 +347,10 @@ nodes:
     source_kind: aggregator
     label: 'OBJECAO SOBREVIVENTE (achado 4) — ausencia de linha de politica SOMADA a ausencia de exemplo observado e ZERO evidencia em qualquer direcao. O portao real nao foi inspecionado. E era medivel em um comando (`gh api` sobre o repo do mirror, contando quantos plugin.json tem description nao-inglesa) e nao foi medido. Enquanto isso nao rodar, tanto "pt-BR passa" quanto "pt-BR nao passa" sao especulacao.'
     trace: 'https://github.com/anthropics/claude-plugins-community'
+    provenance:
+      source: "https://github.com/anthropics/claude-plugins-community"
+      locator: "https://github.com/anthropics/claude-plugins-community — o que foi lido foi o README do mirror; o template de PR, o bot de revisao e a listagem viva com contador de instalacoes nao foram inspecionados, e a propria rodada registra em \"descartados\" que o fetch nao encontrou exemplos de plugins nao-anglofonos"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_JETBRAINS_TEM_LOCALE_EXPLICITO
     node_type: evidence
@@ -316,6 +364,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'OBJECAO SOBREVIVENTE (achado 5) — o eixo declarado irrelevante e o precedente mais proximo da opcao (ii). O achado 5 e NEGATIVO, passou por maioria apertada (2-1), e o material que o refuta foi cortado por ORCAMENTO: o JetBrains SDK tem exatamente o "campo de locale em manifesto" que a pergunta procura. Declarar irrelevante o eixo cujas evidencias decisivas ficaram fora do orcamento e fechar a pergunta pelo lado do CUSTO, nao da evidencia. Ressalva propria: tier 3 vendor-on-competitor, e o Claude Code nao le plugin.xml — o precedente ensina DESENHO (locale explicito, bundles separados por idioma), nao autoriza copiar o campo.'
     trace: 'https://plugins.jetbrains.com/docs/intellij/providing-translations.html'
+    provenance:
+      source: "https://plugins.jetbrains.com/docs/intellij/providing-translations.html"
+      locator: "material do JetBrains SDK citado pelo Elenxo e cortado por orcamento na rodada: language packs com atributo de locale explicito (locale=\"zh-CN\" no plugin.xml) e bundled translations por diretorio (/localization/$LANGUAGE_CODE$/) — nao re-buscado nesta rodada, por isso confianca 0.6"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_IDIOMA_EXIGE_INSTRUCAO_EXPLICITA
     node_type: evidence
@@ -329,6 +381,10 @@ nodes:
     source_kind: primary
     label: 'OBJECAO SOBREVIVENTE (achado 6) — nenhuma das opcoes diz ONDE mora a instrucao de idioma. Se o modo confiavel e interpolar a escolha no system prompt em vez de confiar na inferencia, entao (i), (ii), (iii) e (i-linha) estao todas incompletas: nenhuma nomeia se a instrucao vive no system prompt do usuario, no corpo do comando ou num campo do plugin.json que ninguem consome. Agrava: o idioma do PROMPT mexe em caracteristica de saida (resposta ~52% mais longa em ingles, tier 6), logo o idioma do corpo nao e neutro — e ninguem mediu isso invocando um comando do Onion.'
     trace: 'https://docs.claude.com/en/docs/build-with-claude/multilingual-support'
+    provenance:
+      source: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support"
+      locator: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support (tier 10, 3-0) somado ao tier 6 descartado de que prompt em ingles produz resposta ~52% mais longa (https://arxiv.org/html/2608.26186)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_EXEMPLOS_DE_PROMPT_SUBESPECIFICADOS
     node_type: evidence
@@ -343,6 +399,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO SOBREVIVENTE (achado 7) — as opcoes estao subespecificadas exatamente no artefato que a politica EXIGE. Os exemplos de prompt sao a UNICA superficie copiada-e-executada, inclusive pelo revisor que testa se a descricao corresponde precisamente a funcionalidade; e o silencio da politica sobre idioma tem, ai, consequencia operacional e nao estetica. Nenhuma das opcoes nomeadas os menciona: (i) fala de description/README/argument-hint/marketplace.json, (ii) de campos, (iii) de superficies e corpos. Agravante medido hoje: eles nao existem — zero nos oito READMEs — logo a decisao de idioma tem de ser tomada JUNTO com a decisao de cria-los, e isso e trabalho, nao ajuste de politica.'
     trace: 'plugins/*/README.md; https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+    provenance:
+      source: "plugins/*/README.md; https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
+      locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy (>= 3 exemplos de prompt exigidos) cruzado com a medicao local de 2026-09-04: `grep -rc \"Exemplo\" plugins/*/README.md` = 0 nos oito READMEs; nenhum heading de exemplos entre os 10 gerados"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_DOGFOOD_DE_IDIOMA_NAO_FOI_FEITO
     node_type: evidence
@@ -356,6 +416,10 @@ nodes:
     source_kind: primary
     label: 'OBJECAO SOBREVIVENTE (descarte por comodismo) — a claim tier 10 "Claude infere o idioma da conversa, nao do corpo; travar exige instrucao explicita" responde LITERALMENTE a uma das perguntas do escopo e foi DESCARTADA, enquanto o achado 6 — que diz o mesmo pelo outro lado — foi mantido. Faltou o dogfood que a casa exige (doutrina de dogfooding: invoque o artefato e observe): rodar um comando de corpo pt-BR numa sessao em ingles e OBSERVAR idioma da resposta e ativacao da skill. Sem isso, a metade permissiva da decisao — "corpo pt-BR nao trava nada" — fica DECLARADA e nao verificada, que e o defeito-raiz que o repo mais persegue.'
     trace: 'https://docs.claude.com/en/docs/build-with-claude/multilingual-support'
+    provenance:
+      source: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support"
+      locator: "https://docs.claude.com/en/docs/build-with-claude/multilingual-support (tier 10) — claim descartada pela rodada apesar de responder LITERALMENTE a uma das perguntas do escopo; nenhuma invocacao de comando de corpo pt-BR em sessao EN foi executada nesta rodada"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_PENALIDADE_DE_DESCOBERTA_DESCARTADA
     node_type: evidence
@@ -369,6 +433,10 @@ nodes:
     source_kind: paper
     label: 'OBJECAO SOBREVIVENTE (descarte por comodismo) — a UNICA evidencia quantitativa a favor do norte internacional sumiu sem contra-evidencia escrita. Se a objecao era "correlacao, nao causa", ela precisava estar no grafo. Ressalva propria, e ela e seria: o venue real NAO e o GitHub por estrelas — e um diretorio CURADO com contador de instalacoes, onde o mecanismo de descoberta e outro. Ou seja, a claim nao pode ser usada como prova da penalidade no diretorio; ela pode e deve ser usada como RAZAO PARA MEDIR o diretorio vivo antes de selar. E a mesma medicao que E_OBJECAO_MIRROR_NAO_FOI_MEDIDO pede.'
     trace: 'https://arxiv.org/html/2602.19446'
+    provenance:
+      source: "https://arxiv.org/html/2602.19446"
+      locator: "https://arxiv.org/html/2602.19446 (tier 7) — claim descartada pela rodada sem contra-evidencia nomeada: repos dominados por ingles com mediana de 36 estrelas contra 12 (mistos) e 2 (nao-ingles)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 
   # ── CENSO DO VENUE (CONSTRAIN 2 cumprida — medido por gh api em 2026-09-04) ─────────────

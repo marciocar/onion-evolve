@@ -44,6 +44,10 @@ nodes:
     source_kind: primary
     label: 'N0 IDENTIDADE — Cedar: linguagem e motor de autorizacao da AWS, repo cedar-policy/cedar-spec, Apache 2.0, vivo e com material de 2026. Licenca compativel, mantenedor corporativo com sucessao obvia. PASSA o N0. ⚠️ Ressalva herdada do no de origem: o anuncio do Cedar Analysis tem valid_from 2025-06-16, anterior a outubro de 2026 — a ATUALIDADE da capacidade nao foi reverificada nesta dissecacao, e por isso o frescor deste grafo vence em 30 dias.'
     trace: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/'
+    provenance:
+      source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
+      locator: "nivel PAGO pelo corpus: engenharia-de-corpus-de-regras-2026-10 traz o repo cedar-policy/cedar-spec sob Apache 2.0, mantido pela AWS, com Cedar Analysis anunciado no blog de open source do fornecedor"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_N1_CAPACIDADE
     node_type: evidence
@@ -58,6 +62,10 @@ nodes:
     source_kind: primary
     label: 'N1 CAPACIDADE — os VERBOS que o Onion nao tem: (1) detectar regra SOMBREADA por outra; (2) detectar condicao IMPOSSIVEL (guarda que nunca dispara); (3) detectar regra que ANULA outra; (4) COMPARAR dois corpus e dizer o que mudou em comportamento, nao em texto. O Onion tem catraca, severidade e baseline — e nao tem NENHUM dos quatro. O delta e real e tem consumidor nomeado aqui: a pergunta "quais das 92 regras estao vivas, e quais se sobrepoem" e dor medida desta casa. PASSA o N1.'
     trace: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/'
+    provenance:
+      source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
+      locator: "nivel PAGO pelo corpus (tier 8, votos 2-1): o Cedar Analysis detecta por analise estatica permits sombreados, condicoes impossiveis, forbid que anula permits e negacao total de acoes; ha CLI que COMPARA dois corpus de politicas"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_N2_MECANISMO
     node_type: evidence
@@ -72,6 +80,10 @@ nodes:
     source_kind: primary
     label: 'N2 MECANISMO — e aqui a dissecacao vira: correcao e completude vem de a LINGUAGEM ser RESTRITA e DECIDIVEL, com codificacao SMT do espaco inteiro de requisicoes. O determinismo nao mora na ferramenta nem na pratica de engenharia: mora na restricao da linguagem. Shell arbitrario nao tem codificacao SMT nenhuma — nao existe formula que represente "todas as entradas possiveis" de um script que le o filesystem, roda git e chama grep.'
     trace: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/'
+    provenance:
+      source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
+      locator: "nivel PAGO pelo corpus (tier 8, votos 3-0): a analise e correta e completa, com prova formalizada em Lean, usando SMT solver (CVC5) sobre formulas que representam TODAS as requisicoes possiveis"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_N2_LACUNA_EXECUCAO
     node_type: evidence
@@ -96,6 +108,10 @@ nodes:
     source_kind: internal-audit
     label: 'N3 VEREDITO — DIFERENTE, logo NAO TRANSFERE: adotar o Cedar como ferramenta de analise do corpus do Onion e FALSA ANALOGIA. A capacidade e propriedade da linguagem restrita, e o corpus do Onion e shell arbitrario por desenho — o mesmo shell AGNOSTICO que roda em qualquer CI, que e metade do fosso desta casa. Trocar shell por DSL restrita para ganhar analise seria pagar com a capacidade que compra o fosso. E o custo de descobrir isto TARDE e alto: seria uma reescrita de 26.596 linhas apostando numa propriedade formal que o Onion nunca precisou provar.'
     trace: 'docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml"
+      locator: "regua de transferencia aplicada contra E_N2_MECANISMO, com a objecao do refutador do grafo irmao (E_OBJECAO_5_CEDAR_NAO_E_PORTAVEL) sobrevivendo"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_N3_O_QUE_TRANSFERE
     node_type: evidence
@@ -110,6 +126,10 @@ nodes:
     source_kind: primary
     label: 'N3 — O QUE TRANSFERE, e nao e a ferramenta: o PADRAO "a IA AUTORA, o verificador DETERMINISTICO admite". Esta casa ja o pratica com outro nome em tres lugares: a bancada admite a guarda, o lint admite o artefato, o radar admite o grafo. Logo o Cedar entra como CONFIRMACAO EXTERNA de um desenho que ja existe aqui — valor real e barato, porque nao exige absorver nada. IGUAL, logo transfere: e o unico pedaco do Cedar que transfere.'
     trace: 'https://arxiv.org/pdf/2607.03656'
+    provenance:
+      source: "https://arxiv.org/pdf/2607.03656"
+      locator: "nivel PAGO pelo corpus (tier 7, votos 3-0): AutoCedar (arXiv 2607.03656, jul/2026) usa laco agentico de LLM com verificador formal SMT como GATE para autoria de politica — a politica gerada e verificada antes de ser aceita"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_N3_ORDEM_NINGUEM_DERIVA
     node_type: evidence
@@ -124,6 +144,10 @@ nodes:
     source_kind: primary
     label: 'N3 — a resposta que ALIVIA uma pressao interna: nem o motor mais analisavel do mercado DERIVA ordem entre regras. O Cedar resolve ordenacao por CAMADA FIXA declarada. Lido contra a pergunta aberta desta casa sobre sequenciamento e dependencia entre as 92 regras, isto diz que ordem declarada por camada e o estado da arte, nao um atalho preguicoso — e que a fronteira real de ordenacao do Onion sao os 13 pontos que ESCREVEM, nao as 92 que so leem.'
     trace: 'https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/'
+    provenance:
+      source: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/"
+      locator: "nivel PAGO pelo corpus (tier 7, votos 3-0): o Cedar autorizando agentes em cadeia multi-agente avalia em 3 camadas L1 a L3 com halt no primeiro deny, e a ordem e FIXA POR CAMADA, sem derivacao de dependencia entre politicas"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CORPUS_PAGOU_N0_A_N2
     node_type: evidence

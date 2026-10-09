@@ -22,6 +22,10 @@ nodes:
     verified_against: 'durable-commit.sh l.59 lido (git add sem -f e stderr engolido); defeito reproduzido em bancada (durable_commit g2: sem a lista o arquivo novo ignorado some com rc=0)'
     trace: '.claude/utils/adopt/durable-commit.sh'
     label: 'O DEFEITO, medido pelo hub e confirmado no core: o update via onion/vendor perdia em silencio todo arquivo NOVO do core quando o .gitignore da vendor cobria .claude/ — o durable-commit fazia git add sem -f (e com stderr engolido), o git add PULA arquivo novo ignorado com rc=0, e o update reportava merge limpo. No hub: 17 arquivos em dois updates, entre eles um hook ja registrado no settings.json cujo script nunca chegou (erro em todo fim de turno). Nenhum arquivo MODIFICADO se perdia, so os novos.'
+    provenance:
+      source: ".claude/utils/adopt/durable-commit.sh"
+      locator: "durable-commit.sh l.59 lido (git add sem -f e stderr engolido); defeito reproduzido em bancada (durable_commit g2: sem a lista o arquivo novo ignorado some com rc=0)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: D_EXIGIDOS_ATRAVESSAM_O_GITIGNORE
     node_type: decision
@@ -54,6 +58,10 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: 'grep dos chamadores do durable-commit: so o vendor-branch update passa ONION_REQUIRED_LIST'
     label: 'TETO DECLARADO: a adocao inicial (Fase 5 do /meta:adopt) chama o durable-commit SEM a lista de exigidos. O .claude/ inteiro ignorado e tratado na adocao pelo scope-claude-gitignore.sh, mas um ignore PARCIAL (ex.: .claude/hooks/) passaria calado ali — a 1a redacao deste no dizia que o efeito seria visivel, e o Elenxo mostrou que nao e. GATILHO: um alvo com ignore parcial de .claude/ ser adotado, ou a adocao inicial passar a montar a lista do transporte como o update ja faz.'
+    provenance:
+      source: ".claude/utils/adopt/durable-commit.sh"
+      locator: "grep dos chamadores do durable-commit: so o vendor-branch update passa ONION_REQUIRED_LIST"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CLICKUP_STATUS_POR_LIST_MEDIDO_AO_VIVO
     node_type: evidence
@@ -65,6 +73,10 @@ nodes:
     verified_against: 'medido PELO HUB contra o adapter do pin 663fdbc5bdcc no workspace real, tasks de teste criadas e apagadas (GET final 404); nao re-medido no core'
     trace: '.claude/utils/task-manager/adapters/clickup.md'
     label: 'O adapter ClickUp com STATUS_SYNONYMS resolve os canonicos para os status da List real (review vira pull request, canceled vira Closed) e updateStatus in_progress -> review -> done devolveu 200 nos tres, sem 400; createTask, createSubtask com include_subtasks e addTag/removeTag tambem 200. NAO medido: clickup_delete_task no MCP oficial.'
+    provenance:
+      source: ".claude/utils/task-manager/adapters/clickup.md"
+      locator: "medido PELO HUB contra o adapter do pin 663fdbc5bdcc no workspace real, tasks de teste criadas e apagadas (GET final 404); nao re-medido no core"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_CLICKUP_DELETE_PELO_MCP_NAO_MEDIDO
     node_type: question

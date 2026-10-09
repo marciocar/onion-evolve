@@ -1372,6 +1372,10 @@ nodes:
     verified_against: "docs/analysis/onion-federation-audit-2026-07-01.md:18-21"
     trace: "docs/analysis/onion-federation-audit-2026-07-01.md#0-sumário"
     label: "Núcleo mecânico da Federação formal está saudável (scripts rodam, fixtures passam, cross-refs resolvem); problemas reais são bug de código + guard vazio + drift de registro/vocabulário"
+    provenance:
+      source: "docs/analysis/onion-federation-audit-2026-07-01.md#0-sumário"
+      locator: "docs/analysis/onion-federation-audit-2026-07-01.md:18-21"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: B2_2_evidence_dogfood_scripts
     node_type: evidence
     layer: audit

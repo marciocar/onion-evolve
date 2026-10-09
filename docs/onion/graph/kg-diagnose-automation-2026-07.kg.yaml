@@ -13,6 +13,10 @@ nodes:
     verified_against: helper-testado-7-selftests-verdes
     label: "ENTREGUE: automação parcial do pipeline diagnose = scaffold-diagnose-store.sh (o gap mecânico real) + o bloco 'Automação parcial' no kg.md. Escopo escolhido pelo maestro: só o mecânico, NÃO o orquestrador que dispara agentes"
     trace: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
+    provenance:
+      source: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
+      locator: "helper-testado-7-selftests-verdes"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_pausa_e_o_valor
     node_type: claim
     plane: DEV
@@ -31,6 +35,10 @@ nodes:
     verified_against: "kg.md lido no vivo (L434/454/435-436/358): automacao = so fan-out mecanico (scaffold/candidatos/gate-do-radar); PAUSA e selo sao humanos ('o humano sela'); NAO existe --auto de diagnostico (transform tem auto legitimo, o 'ao contrario' do label) — linha vermelha INTACTA"
     label: "LINHA VERMELHA: a automação substitui só o fan-out MECÂNICO (scaffold, extract/consolidate, candidatos, gate-do-radar). NUNCA o selo na PAUSA. Não existe --auto de diagnóstico de propósito (ao contrário do transform, onde auto é legítimo p/ tasks)"
     trace: ".claude/commands/meta/kg.md"
+    provenance:
+      source: ".claude/commands/meta/kg.md"
+      locator: "kg.md lido no vivo (L434/454/435-436/358): automacao = so fan-out mecanico (scaffold/candidatos/gate-do-radar); PAUSA e selo sao humanos ('o humano sela'); NAO existe --auto de diagnostico (transform tem auto legitimo, o 'ao contrario' do label) — linha vermelha INTACTA"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_gap_scaffold
     node_type: evidence
     plane: PROD
@@ -41,6 +49,10 @@ nodes:
     verified_against: exploracao-nenhum-scaffold-de-kg-nem-state
     label: "GAP mecânico REAL: não existia scaffold de .kg.yaml nem de STATE.md em .claude/utils/ — o store do diagnose era 100% manual (o LLM escrevia o skeleton à mão). O scaffold-diagnose-store.sh fecha isso (contrato F1: never-clobber/dry-run/idempotente)"
     trace: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
+    provenance:
+      source: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
+      locator: "exploracao-nenhum-scaffold-de-kg-nem-state"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_reusa_state_pointer
     node_type: evidence
     plane: PROD
@@ -61,6 +73,10 @@ nodes:
     verified_against: radar-legibilidade-medida
     label: "MEU CLAIM DE PLANO ERRADO, corrigido: 'o skeleton passa o --schema' é FALSO — skeleton vazio (0 nós) REPROVA a guarda de legibilidade do radar (anti-falso-verde). Isso é CORRETO e vira feature: o valor nasce quando o humano preenche o 1º lote. Selftest c1 (vazio reprova) + c2 (1º lote → exit 0)"
     trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "radar-legibilidade-medida"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_precedente_interactive
     node_type: claim
     plane: DEV
@@ -89,6 +105,10 @@ nodes:
     verified_against: 7-selftests-verdes
     label: "scaffold-diagnose-store.sh + 3 templates (kg-2layer/diagnose-state/notes-stub) + selftest (6 artefatos, bem-formado, vazio-reprova, 1º-lote-válido, never-clobber, dry-run, slug)"
     trace: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
+    provenance:
+      source: ".claude/utils/diagnose/scaffold-diagnose-store.sh"
+      locator: "7-selftests-verdes"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 edges:
   - from: C_pausa_e_o_valor
     to: D_linha_vermelha

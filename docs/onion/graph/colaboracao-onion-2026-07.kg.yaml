@@ -40,6 +40,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. cd /home/marcio/onion-evolve && ls -la docs/evolution/inbox/ docs/evolution/outbox/ docs/e => Claim 1 (repositório é meio de colaboração assíncrona): CONFIRMADO ao vivo. `docs/evolution/{inbox,outbox,inbo…'
     label: "repositorio — meio de colaboracao assincrona e SSOT-de-registro"
+    provenance:
+      source: "docs/evolution/inbox"
+      locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. cd /home/marcio/onion-evolve && ls -la docs/evolution/inbox/ docs/evolution/outbox/ docs/e => Claim 1 (repositório é meio de colaboração assíncrona): CONFIRMADO ao vivo. `docs/evolution/{inbox,outbox,inbo…"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
   - id: EN_VERTICAL
     node_type: entity
     layer: domain
@@ -50,6 +54,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. cd /home/marcio/onion-evolve && test -f .claude/commands/meta/create-vertical.md && echo E => EXISTS. Linha 123: "`.claude/skills/<slug>/SKILL.md` — hub-roteador homônimo (deriva da SSOT viva, nunca hardc…'
     label: "vertical Onion (book/SSOT + hub + helpers) — produzida a partir de spec"
+    provenance:
+      source: ".claude/commands/meta/create-vertical.md"
+      locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. cd /home/marcio/onion-evolve && test -f .claude/commands/meta/create-vertical.md && echo E => EXISTS. Linha 123: \"`.claude/skills/<slug>/SKILL.md` — hub-roteador homônimo (deriva da SSOT viva, nunca hardc…"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
   - id: ST_SINAL_INBOX
     node_type: state
     layer: domain
@@ -76,6 +84,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. 1) grep -nE "cp |git add|git commit|git push" .claude/utils/co-evolution/co-relay.sh 2) ls => (1) linha 154: `cp "$f" "${DEST_DIR}/${base}"` — único transporte no script; ZERO ocorrências de git add/commi…'
     label: "relay — maestro transporta o sinal ao inbox do core (entrega-sem-commit)"
+    provenance:
+      source: ".claude/utils/co-evolution/co-relay.sh"
+      locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. 1) grep -nE \"cp |git add|git commit|git push\" .claude/utils/co-evolution/co-relay.sh 2) ls => (1) linha 154: `cp \"$f\" \"${DEST_DIR}/${base}\"` — único transporte no script; ZERO ocorrências de git add/commi…"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
   - id: IN_I3
     node_type: invariant
     layer: domain
@@ -337,6 +349,10 @@ nodes:
     verified_at: 2026-08-30
     verified_against: "git log do core: commit 5e511195 (PR #298, mesclado em main) de colaborador externo escrevendo direto em docs/evolution/inbox/ — selado pelo maestro 2026-08-30"
     label: "REFUTA a exclusividade do relay (piloto kg-freshness 2026-08-29, juiz APROVOU a refutacao): o historico do core mostra commit de terceiro (colaborador registrado em members.yaml) escrevendo direto no caminho de relay. C1 (dono do core) confirma; C2 (unico que relaya) caiu pelo ATO — behavior-over-declaration: mesmo commit marcado como teste, o ato de relay foi de terceiro. Selado REFUTED pelo maestro em 2026-08-30."
+    provenance:
+      source: "docs/evolution/inbox"
+      locator: "git log do core: commit 5e511195 (PR #298, mesclado em main) de colaborador externo escrevendo direto em docs/evolution/inbox/ — selado pelo maestro 2026-08-30"
+      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
   - id: E_MEDIDO_EN_KG_CLIENTE_2026_09
     node_type: evidence
     plane: PROD
@@ -356,6 +372,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): REFUTED 2/2 — git log --all --format=''%H %an'' -- docs/evolution/inbox/ | grep -v "Marcio Carvalho". FLIP NAO E NOVO: executa o selo do maestro de 2026-08-31 (PR #724, C_MAESTRO_NAO_E_UNICO_RELAY, mesmo fato: commit 5e511195/PR #298 por terceiro na rota de relay)'
     label: 'MEDIDO: O nó afirma DUAS coisas: (1) ''só o maestro relaya/tria'' e (2) ''o visitante entrega, não relaya''. O histórico do git mostra 4 commits de um colaborador externo (Mauricio Matos, registrado como membro) escrevendo DIRETO em docs/evolution/inbox/ — o caminho de relay em si, não uma entrega para tria'
+    provenance:
+      source: "docs/evolution/inbox"
+      locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): REFUTED 2/2 — git log --all --format='%H %an' -- docs/evolution/inbox/ | grep -v \"Marcio Carvalho\". FLIP NAO E NOVO: executa o selo do maestro de 2026-08-31 (PR #724, C_MAESTRO_NAO_E_UNICO_RELAY, mesmo fato: commit 5e511195/PR #298 por terceiro na rota de relay)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
 edges:
   # domain — papeis e canais

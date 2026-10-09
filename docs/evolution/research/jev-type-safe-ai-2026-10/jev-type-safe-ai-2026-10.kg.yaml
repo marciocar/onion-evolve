@@ -58,6 +58,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'O JEV se autodescreve como um MODELO de IA que devolve decisoes TIPADAS em vez de texto — ou seja, um modelo hospedado de decisao tipada, nao um LLM gerador de texto. E o enquadramento central, e e o unico grupo de claims da rodada que resistiu ao Elenxo com corroboracao do fabricante.'
     trace: 'https://jevtypesafeai.com/'
+    provenance:
+      source: "https://jevtypesafeai.com/"
+      locator: "citacao verbatim \"The AI model that returns typed decisions, not text.\" — Home, hero (h1; a quebra de linha fica entre \"returns\" e \"typed decisions\"); ancorada por verificador independente. CORROBORADA FORA do site lido pelo proprio fabricante (ver E_VENDOR_SYSTEM_ONE_CATEGORY), por isso a objecao do Elenxo caiu."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_JEV_LATENCY_AND_THREE_FORMATS
     node_type: evidence
     plane: DEV
@@ -70,6 +74,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'Proposta de valor declarada: decisoes rapidas e tipadas para AGENTES de IA e SOFTWARE, em 70-500 ms, em tres formatos (escolha, nota, probabilidade sim/nao). O publico-alvo e maquina, nao humano lendo texto. A latencia foi o unico numero do site que um terceiro independente copiou CORRETAMENTE do fabricante — guarde o contraste com o preco.'
     trace: 'https://jevtypesafeai.com/'
+    provenance:
+      source: "https://jevtypesafeai.com/"
+      locator: "citacao verbatim \"Jev = fast, typed decisions for AI agents and software — choice, score, or yes/no probability, in 70–500ms.\" — Home, linha logo abaixo do hero; ancorada por verificador independente. Latencia CORROBORADA por terceiro independente (eesel.ai, 2026-09-21: \"70ms to 500ms\" end-to-end e \"40x to 200x faster\")."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_ZERO_HALLUCINATION_SLOGAN
     node_type: evidence
     plane: DEV
@@ -94,6 +102,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'As saidas sao tres primitivas tipadas: Choice (ate 255 opcoes rotuladas), Score (espectro ordenado de 2-10 niveis) e noul (sim/nao expresso como probabilidade). A taxonomia resiste; duas bordas NAO resistem e estao nos nos que a restringem: o numero 255 nao aparece em nenhuma fonte do fabricante nem na cobertura independente, e chamar o noul de "calibrado" e adjetivo, nao medida.'
     trace: 'https://jevtypesafeai.com/'
+    provenance:
+      source: "https://jevtypesafeai.com/"
+      locator: "citacao verbatim \"Pick one of up to 255 labelled options\" — Home, secao \"The three primitives\" (choice, score, noul); ancorada por verificador independente. Taxonomia CORROBORADA por eesel.ai (\"three primitives: Noul (probability), Choice (select from list), and Score (numeric rating)\")."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_PRICE_ON_RESELLER_SITE
     node_type: evidence
     plane: DEV
@@ -118,6 +130,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'Licenca e distribuicao: modelo FECHADO, HOSPEDADO, acessado por API. O que e aberto e so o ferramental em volta (awesome-jev, jev-mcp, integracao LangChain) — nao o modelo. Fato FECHADO, sem dissenso em nenhuma fonte. Nenhuma pagina lida, porem, chega a declarar LICENCA: a ausencia de open-source e dita, a licenca do servico nao.'
     trace: 'https://jevtypesafeai.com/'
+    provenance:
+      source: "https://jevtypesafeai.com/"
+      locator: "citacao verbatim \"No — Jev is a hosted model from TypeSafe AI, called over an API.\" — Home, FAQ \"Is Jev open source?\" (secao Getting started); ancorada por verificador independente. Sustentado por fonte do fabricante (console de sign-in, zero mencao a pesos abertos) e por eesel.ai (\"hosted/closed\", acesso via Cloudflare Workers AI e lista de early-access)."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── jev-docs ─────────────────
   - id: E_DECIDE_API_SHAPE
@@ -132,6 +148,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'A forma da API: entra um `state` mais perguntas TIPADAS, saem respostas no formato fixado pelo pedido. E classificacao/pontuacao sobre um estado, nao geracao livre — varias perguntas contra o mesmo contexto numa passada. ⚠️ FORMA DE API NAO E ARQUITETURA: a rodada apresentou esta claim como se respondesse "qual e a arquitetura", e ela nao responde (ver Q_JEV_ARCHITECTURE_UNKNOWN).'
     trace: 'https://jevtypesafeai.com/docs'
+    provenance:
+      source: "https://jevtypesafeai.com/docs"
+      locator: "citacao verbatim \"One call: a state plus typed questions, calibrated answers back.\" — /docs, \"Core API — /v1/decide\"; ancorada por verificador independente. CORROBORADA por eesel.ai, que descreve multiplas perguntas avaliadas contra o mesmo state \"in a single parallel pass\"."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_TYPE_FIXED_BY_REQUEST_NO_PARSING
     node_type: evidence
     plane: DEV
@@ -144,6 +164,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'A UNICA garantia real do produto, e ela e ESTRUTURAL: o tipo da resposta e fixado pelo pedido, logo o cliente ramifica em codigo comum, sem parsing nem regex. E a unica frase da doc que aproxima "garantia" de saida — e trata de ESTRUTURA (conjunto fechado de rotulos + tipo), nunca de VERDADE. Um rotulo errado DENTRO do conjunto e saida perfeitamente valida.'
     trace: 'https://jevtypesafeai.com/docs'
+    provenance:
+      source: "https://jevtypesafeai.com/docs"
+      locator: "citacao verbatim \"Because every answer's type is fixed by your request, you branch on it in plain code — no parsing, no regex.\" — /docs, \"Response\"; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia, ver E_SOURCE_TIER_INFLATED). CORROBORADA por eesel.ai: \"cannot make a type error and cannot return an option that was not in your list\"."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_LIMITS_AND_PIN_MODEL_VERSION
     node_type: evidence
     plane: DEV
@@ -156,6 +180,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'Limites operacionais (64k state+perguntas, 32k state+maior pergunta, 255 opcoes, 2-10 niveis) E a recomendacao de FIXAR a versao do modelo em producao "para os thresholds nao deslocarem". Esta ultima frase e o achado mais consequente da rodada e prova o CONTRARIO de garantia: se os limiares deslocam entre versoes, a fronteira de decisao e NAO-DETERMINISTICA NO TEMPO. E exatamente isso que mata o "0 hallucinations by construction" e o que desqualifica o JEV num gate determinístico do Onion.'
     trace: 'https://jevtypesafeai.com/docs'
+    provenance:
+      source: "https://jevtypesafeai.com/docs"
+      locator: "citacao verbatim \"Pin a model version in production so thresholds don't shift.\" — /docs, \"Best practice\"; ancorada por verificador independente. Limites declarados na mesma secao: 64k tokens de state+perguntas, 32k para state+maior pergunta, ate 255 opcoes em choice, 2-10 niveis em score."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── jev-get ─────────────────
   - id: E_FREE_PLAYGROUND_NO_SIGNUP
@@ -170,6 +198,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'Ha playground gratuito no navegador, sem chave e sem cadastro — a via de teste de menor atrito. RESTRINGIDO: o playground e do OPERADOR TERCEIRO, rodando sobre uma chave dele e com o markup dele; testar ali nao mede o JEV em condicao de producao, nem o preco, nem a quota.'
     trace: 'https://jevtypesafeai.com/get-jev'
+    provenance:
+      source: "https://jevtypesafeai.com/get-jev"
+      locator: "citacao verbatim \"Run real Jev calls in your browser, no key and no signup.\" — /get-jev, item 1 \"Try it now — free playground\"; ancorada por verificador independente."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_DISTRIBUTION_GATEWAYS
     node_type: evidence
     plane: DEV
@@ -194,6 +226,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'A CLAIM QUE REFUTA A PREMISSA DA RODADA. Quem desenvolve e a TypeSafe AI; o site lido e operado por empresa INDEPENDENTE, sem afiliacao nem endosso. Logo as 6 URLs desta rodada nao sao fontes primarias do produto — sao fonte primaria de um INTERMEDIARIO sobre o produto. Procedencia indireta e o tier de 22 claims, e e por isso que preco e "0 hallucinations" sairam errados.'
     trace: 'https://jevtypesafeai.com/get-jev'
+    provenance:
+      source: "https://jevtypesafeai.com/get-jev"
+      locator: "citacao verbatim \"Jev is developed by TypeSafe AI. This platform is independently operated by CODEFASHION TECH LTD and is not affiliated with or endorsed by TypeSafe AI.\" — /get-jev, aviso ao fim do corpo da pagina, repetido no rodape (\"© 2026 CODEFASHION TECH LTD.\", \"Not affiliated with or endorsed by TypeSafe AI.\"); ancorada por verificador independente."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── jev-agent-skill ─────────────────
   - id: E_SKILL_TEACHES_FUZZY_IF
@@ -208,6 +244,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'O enquadramento de uso para agentes: a skill ensina o agente a chamar a Decision API como um "fuzzy if" TIPADO — roteamento, guardrails, scoring e gating. E a primitiva que mais interessa a um framework de orquestracao: um `if` cuja condicao e difusa mas cujo RESULTADO e um rotulo de conjunto fechado.'
     trace: 'https://jevtypesafeai.com/agent-skill'
+    provenance:
+      source: "https://jevtypesafeai.com/agent-skill"
+      locator: "citacao verbatim \"Give any AI coding agent a fast, typed \"fuzzy if\": one skill teaches it to call the Jev Decision API for routing, guardrails, scoring and gating\" — /agent-skill, subtitulo de abertura sob \"Add the Jev skill to your agent\"; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia)."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_SKILL_INSTALL_PROMPT_AND_CURL
     node_type: evidence
     plane: DEV
@@ -220,6 +260,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'Distribuicao da skill por DOIS caminhos sem pacote: um prompt de colar que manda o agente buscar a URL do SKILL.md, e um curl para ~/.claude/skills/jev/. O caminho ~/.claude/ e o layout do Claude Code, mas a pagina NAO declara o formato da skill nem cita a Agent Skills spec — e o SKILL.md nao foi conferido nesta rodada.'
     trace: 'https://jevtypesafeai.com/agent-skill'
+    provenance:
+      source: "https://jevtypesafeai.com/agent-skill"
+      locator: "citacao verbatim \"curl -o ~/.claude/skills/jev/SKILL.md --create-dirs https://jevtypesafeai.com/skill/SKILL.md\" — /agent-skill, \"Copy to your agent\" (\"Any agent — paste this prompt\" e \"Any agent — install the file manually\"); ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia)."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_SKILL_TEACHES_API_CONTRACT
     node_type: evidence
     plane: DEV
@@ -232,6 +276,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'O conteudo da skill, metade contrato: endpoint, auth Bearer e os tipos choice/score/noul, mais a forma exata de request/response, para o agente ramificar por valores tipados sem parsing. E uma skill que carrega um CONTRATO DE API — o mesmo padrao que o Onion chama de adapter, so que entregue como instrucao ao agente.'
     trace: 'https://jevtypesafeai.com/agent-skill'
+    provenance:
+      source: "https://jevtypesafeai.com/agent-skill"
+      locator: "citacao verbatim \"The exact request / response shape, so the agent branches on typed values with no parsing\" — /agent-skill, \"What the skill teaches your agent\", itens 1 e 3; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia)."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_SKILL_TEACHES_WHEN_AND_COST
     node_type: evidence
     plane: DEV
@@ -244,6 +292,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'A outra metade da skill e DOUTRINA DE ROTEAMENTO: quando chamar o JEV em vez de outro LLM (roteamento, guardrail de tool-call, compactacao de contexto, classificacao) e as regras de custo e seguranca. Uma skill que ensina o agente QUANDO NAO usar o proprio produto e o padrao mais proximo do que o Onion faz com seus fragmentos canonicos.'
     trace: 'https://jevtypesafeai.com/agent-skill'
+    provenance:
+      source: "https://jevtypesafeai.com/agent-skill"
+      locator: "citacao verbatim \"When to call Jev instead of another LLM — routing, tool-call guardrails, context compaction, classification\" — /agent-skill, \"What the skill teaches your agent\", itens 2 e 4; ancorada por verificador independente (leitor declarou tier 9; REBAIXADO a 6 por procedencia)."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── jev-integrations ─────────────────
   - id: E_TYPESCRIPT_SDK
@@ -258,6 +310,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'Ha SDK TypeScript/Node: instalar, configurar a chave e obter choice/score/noul tipado, com exemplo de 30 linhas. A superficie de integracao e uma GRADE DE CARDS (SDK, MCP, LangChain, Claude Code, Cursor, OpenCode, Hermes, OpenRouter, Bedrock, Hugging Face), nao uma arquitetura declarada — a propria pagina resume tudo a "one HTTP call".'
     trace: 'https://jevtypesafeai.com/integrations'
+    provenance:
+      source: "https://jevtypesafeai.com/integrations"
+      locator: "citacao verbatim \"Call Jev from TypeScript/Node: install the SDK, set your key, and get a typed, calibrated choice / score / noul with a 30-line working example.\" — /integrations, card \"SDK / TypeScript\"; ancorada por verificador independente."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── jev-tools ─────────────────
   - id: E_TOOLS_AGENTS_DEV_DEMOS
@@ -272,6 +328,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'As demos da categoria Agents & Dev sao, uma a uma, o vocabulario de guarda de agente: gate de shell ALLOW/CONFIRM/BLOCK com risk score, detector de prompt injection/jailbreak, detector de loop, compactacao de contexto KEEP/TRUNCATE/DROP, skill router e model router. E a superficie onde o JEV encosta DIRETAMENTE no que o Onion faz com hooks e gates.'
     trace: 'https://jevtypesafeai.com/tools'
+    provenance:
+      source: "https://jevtypesafeai.com/tools"
+      locator: "citacao verbatim \"Paste an agent's shell commands — Jev gates each one ALLOW / CONFIRM / BLOCK with a risk score.\" — /tools l.42-153, Featured demos; ancorada por verificador independente."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_ROUTERS_SKILL_AND_MODEL
     node_type: evidence
     plane: DEV
@@ -284,6 +344,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'Dois roteadores como produto: o Skill Router escolhe UMA unica tool por tarefa, com confianca; o Model Router escolhe o modelo mais barato CAPAZ e mostra a economia contra um modelo de fronteira. E a tese de "decisao barata antes da geracao cara" — o mesmo problema que a escada de modelos do Onion resolve por regra declarada em vez de por classificador.'
     trace: 'https://jevtypesafeai.com/tools'
+    provenance:
+      source: "https://jevtypesafeai.com/tools"
+      locator: "citacao verbatim \"Route each task to the one tool an agent should call — web search, code, DB, email — with confidence.\" — /tools l.97-100 (Skill Router) e l.150-153 (Model Router); ancorada por verificador independente."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_PR_JUDGE_VERDICT
     node_type: evidence
     plane: DEV
@@ -296,6 +360,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'PR Judge: um veredito estruturado SAFE/REVIEW/BLOCK por chamada, com checks estruturados e custo por chamada declarado. E o analogo mais direto do parecer de revisor do Onion — e a comparacao a fazer na rodada seguinte nao e de qualidade do veredito, e de ONDE ele pode sentar: parecer que BLOQUEIA exige fronteira estavel no tempo, que E_LIMITS_AND_PIN_MODEL_VERSION mostra nao existir.'
     trace: 'https://jevtypesafeai.com/tools'
+    provenance:
+      source: "https://jevtypesafeai.com/tools"
+      locator: "citacao verbatim \"Paste a GitHub PR — Jev returns SAFE / REVIEW / BLOCK with structured checks, in one call.\" — /tools l.188-191, PR Judge; ancorada por verificador independente."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_TOOLS_TAXONOMY_AND_BATCH
     node_type: evidence
     plane: DEV
@@ -308,6 +376,10 @@ nodes:
     source_kind: vendor-reseller
     label: 'A taxonomia de aplicacao declarada pelo site: Data, Agents & Dev, Sales & Support, Marketing e Just for fun. Em Data, o Batch Analyzer tipa cada LINHA de um CSV com 1-8 perguntas; em Agents & Dev, Agent Risk Checker, Context Cleaner e Prompt Guardrail. O enquadramento comercial e horizontal (classificacao em massa), com a vertical de agentes como carro-chefe.'
     trace: 'https://jevtypesafeai.com/tools'
+    provenance:
+      source: "https://jevtypesafeai.com/tools"
+      locator: "citacao verbatim \"Upload a CSV or paste rows, ask 1–8 questions, and get a typed answer for every row — filter, sort, export.\" — /tools l.269-308; ancorada por verificador independente."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── Evidencia trazida pelo ELENXO (fontes que a rodada NAO abriu) ─────────────────
   - id: E_VENDOR_SYSTEM_ONE_CATEGORY
@@ -322,6 +394,10 @@ nodes:
     source_kind: primary
     label: 'O NOME DA CATEGORIA, que a rodada tinha perdido: o fabricante cunha "System One Model" — uma classe nova de modelo de IA para DECISOES DENTRO DE SOFTWARE (alusao ao Sistema 1 de Kahneman; "Jev" alude a W. S. Jevons). O JEV e o primeiro System One Model publico da TypeSafe. Era exatamente o que "onde ele se enquadra" pedia, e estava a 1 chamada de distancia do dominio que a rodada leu 6 vezes.'
     trace: 'https://typesafe.ai/'
+    provenance:
+      source: "https://typesafe.ai/"
+      locator: "typesafe.ai (fonte do FABRICANTE, lida no Elenxo desta rodada): \"Jev is TypeSafe's first public System One Model, optimized for automation. Send Jev structured questions and get typed decisions with probabilities and confidence that your software can act on\" e \"System One Models are a new class of AI model built for decisions inside software\"."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_VENDOR_CONFIDENCE_ESCALATES
     node_type: evidence
     plane: DEV
@@ -334,6 +410,10 @@ nodes:
     source_kind: primary
     label: 'O FABRICANTE FORMULA O OPOSTO DO SLOGAN. Cada decisao vem com estimativa de confianca justamente para o software AGIR quando a confianca e alta e ESCALAR quando nao e — e escalar pressupoe erro. Quem vende o modelo nao promete zero alucinacao; promete um numero para o chamador decidir quando nao confiar. A frase "0 hallucinations by construction" nao e do fabricante.'
     trace: 'https://typesafe.ai/'
+    provenance:
+      source: "https://typesafe.ai/"
+      locator: "typesafe.ai (fabricante): \"Every Jev decision comes with a confidence estimate, so your software can act when confidence is high and escalate when it is not.\""
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_TYPED_WRONG_ANSWER_POSSIBLE
     node_type: evidence
     plane: DEV
@@ -346,6 +426,10 @@ nodes:
     source_kind: independent-coverage
     label: 'A COBERTURA INDEPENDENTE E EXPLICITA: uma resposta tipada CONFIANTEMENTE ERRADA continua possivel. O teto do que o JEV garante e "nao produzir erro de tipo" e "nao devolver opcao fora da sua lista". Ou seja: a garantia e de FORMA (tipo + conjunto fechado), nunca de VERDADE. Esta e a resposta real a pergunta "por que ele diz nao alucinar": ele nao diz — o revendedor diz.'
     trace: 'https://www.eesel.ai/'
+    provenance:
+      source: "https://www.eesel.ai/"
+      locator: "eesel.ai (cobertura independente, 2026-09-21): \"a confidently wrong typed answer is still possible\"; o teto da garantia e \"cannot produce a type error\" / \"cannot make a type error and cannot return an option that was not in your list\"."
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_VENDOR_PRICE_42_PER_BILLION
     node_type: evidence
     plane: DEV
@@ -358,6 +442,10 @@ nodes:
     source_kind: primary
     label: 'O PRECO DO PRODUTO E OUTRO: US$ 42 por BILHAO de tokens de entrada, isto e US$ 0,042/M — confirmado por terceiro independente, que ainda situa a ordem de grandeza (238x menor que um modelo de fronteira). O site lido cobra 6x a 10x isso. Esta aresta e a licao de procedencia da rodada em forma de aritmetica.'
     trace: 'https://typesafe.ai/'
+    provenance:
+      source: "https://typesafe.ai/"
+      locator: "typesafe.ai (fabricante): \"$42 Per Billion input tokens\" = US$ 0,042 por milhao; CORROBORADO por eesel.ai: \"$0.042 / MTok\" e \"238x lower than Claude Fable 5.1\"."
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_NOUL_IS_BARE_NUMBER
     node_type: evidence
     plane: DEV
@@ -370,6 +458,10 @@ nodes:
     source_kind: measurement
     label: 'O "calibrado" do noul nao tem medida por tras. Choice e Score devolvem confianca e distribuicao; o noul devolve um unico float, sem confianca nem distribuicao. E a doc em nenhum lugar descreve metodologia de calibracao. Logo a primitiva que mais serve a um GUARDRAIL (sim/nao) e justamente a que menos informacao da ao chamador para decidir quando nao confiar.'
     trace: 'https://jevtypesafeai.com/docs'
+    provenance:
+      source: "https://jevtypesafeai.com/docs"
+      locator: "medicao do verificador independente sobre /docs ao rejeitar a claim \"os tres tipos devolvem probabilidades e confianca calibradas\": so choice e score devolvem `confidence` e `probabilities`; o noul devolve UM numero nu — exemplo da propria doc: {\"type\":\"noul\",\"noul\":0.94}. A doc nao cita metodologia de calibracao nem garantia alguma; \"calibrated\" aparece so como adjetivo."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_CONTEXT_WINDOW_CONFLICT
     node_type: evidence
     plane: DEV
@@ -382,6 +474,10 @@ nodes:
     source_kind: independent-coverage
     label: 'A janela de contexto e um limite LOAD-BEARING com DUAS versoes e nenhuma reconciliacao: 64k no site do revendedor, 32k na cobertura independente para jev-1.13.0. Projetar uso real (compactacao de contexto, PR inteiro, CSV) sobre o numero maior e apostar na fonte mais fraca.'
     trace: 'https://www.eesel.ai/'
+    provenance:
+      source: "https://www.eesel.ai/"
+      locator: "conflito MEDIDO entre fontes: /docs (revendedor) declara 64k tokens para state+perguntas e 32k para state+maior pergunta; eesel.ai (independente) reporta \"32,000 tokens\" como a JANELA de jev-1.13.0. Nenhuma fonte reconcilia os dois numeros."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_ACCESS_REGIME_WAITLIST_VS_OPEN
     node_type: evidence
     plane: DEV
@@ -394,6 +490,10 @@ nodes:
     source_kind: independent-coverage
     label: 'DOIS REGIMES DE ACESSO, e nao sao o mesmo produto de compra: o FABRICANTE opera por lista de early-access e console; o REVENDEDOR anuncia acesso ao vivo, gratis e sem cadastro. "Hosted" do fabricante e "live, gratis, sem cadastro" do terceiro nao descrevem o mesmo regime — logo a facilidade de testar que a rodada registrou e propriedade do intermediario, nao do JEV.'
     trace: 'https://www.eesel.ai/'
+    provenance:
+      source: "https://www.eesel.ai/"
+      locator: "eesel.ai (independente): acesso ao JEV via \"Cloudflare Workers AI\" e por \"early-access waitlist\"; typesafe.ai expoe console de sign-in. O site do revendedor, por contraste, anuncia \"live — try it free, no signup\"."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_OPENROUTER_SLUG_NOT_CONFIRMED
     node_type: evidence
     plane: DEV
@@ -418,6 +518,10 @@ nodes:
     source_kind: measurement
     label: 'ZERO FONTES PRIMARIAS DO PRODUTO FORAM LIDAS na fase de leitura, apesar de o mandato dizer que a rodada fecharia "so o que as fontes primarias do proprio produto dizem". A licao e de MECANISMO, nao de zelo: o modo primarias nomeadas confere a CITACAO contra o DOCUMENTO, e nao confere se o DOCUMENTO e de quem o mandato supoe. Duas chamadas ao dominio do fabricante corrigiram tres respostas centrais.'
     trace: 'https://typesafe.ai/'
+    provenance:
+      source: "https://typesafe.ai/"
+      locator: "auditoria da propria rodada: as 6 URLs do mandato (/, /get-jev, /docs, /agent-skill, /integrations, /tools) pertencem TODAS ao dominio jevtypesafeai.com, que declara nao ter afiliacao com a TypeSafe AI. typesafe.ai e console.typesafe.ai nao foram abertos na fase de leitura; abri-los no Elenxo custou 2 chamadas e devolveu categoria, mecanismo e preco real."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_SOURCE_TIER_INFLATED
     node_type: evidence
     plane: DEV
@@ -430,6 +534,10 @@ nodes:
     source_kind: measurement
     label: 'OS TIERS DA RODADA ESTAVAM INFLADOS e este grafo os rebaixou. Ancoragem verifica se a CITACAO existe no documento; ela nao julga a AUTORIDADE do documento. Sem o rebaixamento, 5 claims de um intermediario entrariam no corpus com peso de fonte definitiva — e o radar ordena atencao por peso. Classe a mecanizar: tier declarado por quem LE nao e tier da FONTE.'
     trace: 'https://jevtypesafeai.com/get-jev'
+    provenance:
+      source: "https://jevtypesafeai.com/get-jev"
+      locator: "auditoria dos tiers declarados: o leitor declarou tier 9 para 5 claims (/docs Response e as 4 de /agent-skill) e tier 6 para 9 claims, todas do MESMO dominio de terceiro nao afiliado. Pela clausula 7, fonte que fala de produto alheio sem afiliacao nao recebe tier de fonte definitiva. Rebaixadas a 6 (as de tier 9) e 5 (as sem tier declarado, onde o conteudo e numero de marketing)."
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ───────────────── Claims (o que a rodada estabelece, sem selar) ─────────────────
   - id: C_JEV_CATEGORY_IS_SYSTEM_ONE
@@ -482,6 +590,10 @@ nodes:
     source_kind: measurement
     label: 'CONTABILIDADE. FONTES: 6 pedidas, 6 lidas, 0 inalcançaveis por rede — MAS 0 primarias do produto (todas do dominio do revendedor); +2 abertas pelo Elenxo (typesafe.ai, eesel.ai). CLAIMS: 22 ancoradas, 13 REJEITADAS. Motivo das rejeicoes: 12 EXAGERADAS e 1 por frase inexistente, e o padrao e UM SO — inferencia do leitor vendida como afirmacao do documento: negativas que o texto nao traz ("nada roda localmente", "nao e binario/pacote local", "sem licenca aberta", "so o cliente MCP e npm", "o motor continua remoto"), rotulos que o texto nao usa ("revendedor", "servidor MCP", "cliente", "protocolo aberto central", "Direct Integrations", "Protocol & Infrastructure"), atribuicao de causa que o texto nao faz (ligar "nao alucina" ao formato de saida em 2 paginas que NUNCA mencionam alucinacao) e garantia a partir de marketing ("sem chamadas extras de modelo" onde o texto diz "instead of a slow second model call"; "~70-500ms" do proprio site como se fosse medicao). LACUNAS QUE CONTINUAM ABERTAS: (1) arquitetura e treino do modelo — nenhuma fonte; (2) mecanismo do "nao alucina" — nao existe como claim do fabricante; (3) preco e regime de acesso conciliados entre fabricante e revendedor; (4) LICENCA do servico — ausencia de informacao, nao afirmacao; (5) janela de contexto (32k x 64k) sem reconciliacao; (6) lista de gateways nao confirmada em catalogo de origem (OpenRouter 404 em slug adivinhado; npm, PyPI e HF nao batidos); (7) o SKILL.md nao foi baixado nem lido; (8) MERCADO/CAPITAL — invariante da clausula 4 NAO COBERTO: zero sobre rodadas, investidores, M&A ou tracao da TypeSafe AI; (9) estado da arte e concorrentes (Laya, OpenJev e classificadores hospedados) fora de escopo por mandato; (10) nenhuma medicao INDEPENDENTE de latencia, acuracia ou calibracao — todos os numeros de desempenho sao do proprio vendedor.'
     trace: 'https://jevtypesafeai.com/'
+    provenance:
+      source: "https://jevtypesafeai.com/"
+      locator: "contabilidade fechada da rodada de primarias de 2026-10-01, conferida contra o retorno do verificador de ancoragem e contra o Elenxo"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ───────────────── Fios abertos (proposta; esta rodada NAO sela) ─────────────────
   - id: Q_JEV_ARCHITECTURE_UNKNOWN

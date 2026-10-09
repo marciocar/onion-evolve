@@ -57,9 +57,6 @@
     "docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/evolve-cures-2026-10/evolve-cures-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
@@ -69,13 +66,7 @@
     "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/forge-evolve-2026-10/forge-evolve-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml": [
@@ -84,28 +75,13 @@
     "docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/guard-kg-id-valid-from-2026-10/kg-id-valid-from-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/inbox-triage-2026-10/inbox-triage-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/jev-type-safe-ai-2026-10/jev-decision-round2-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/jev-type-safe-ai-2026-10/jev-type-safe-ai-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml": [
@@ -189,9 +165,6 @@
     "docs/evolution/research/radar-E3-2026-09-03/radar-E3-2026-09-03.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/radar-E3-2026-09-04-r4/radar-E3-2026-09-04-r4.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/radar-E3-2026-09-04/radar-E3-2026-09-04.kg.yaml": [
       "form.required.node.provenance"
     ],
@@ -210,9 +183,6 @@
     "docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/slm-frameworks-2026-10/slm-frameworks-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml": [
       "form.required.node.provenance"
     ],
@@ -222,9 +192,6 @@
     "docs/evolution/research/triagem-inbox-2026-09/triagem-inbox-2026-09.kg.yaml": [
       "form.required.node.provenance",
       "form.unknown-key.node.resolution"
-    ],
-    "docs/evolution/research/typesafe-ai-2026-09/typesafe-ai-2026-09.kg.yaml": [
-      "form.required.node.provenance"
     ],
     "docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/unidade-bilhetavel-do-onion-2026-10.kg.yaml": [
       "form.required.node.provenance"
@@ -278,12 +245,6 @@
       "form.required.node.provenance",
       "form.unknown-key.meta.title"
     ],
-    "docs/onion/graph/door-role-parity-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/drive-superacao-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml": [
       "form.required.node.provenance",
       "form.unknown-key.meta.run_id"
@@ -325,7 +286,6 @@
       "form.required.node.provenance"
     ],
     "docs/onion/graph/inbox-sinais-2026-09.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.meta.slug",
       "form.unknown-key.meta.title",
       "form.unknown-key.top.kind",
@@ -371,9 +331,6 @@
     "docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/onion/graph/perception-instruments-2026-07.kg.yaml": [
       "form.required.node.provenance"
     ],
@@ -399,12 +356,6 @@
       "form.unknown-key.node.gatilho"
     ],
     "docs/onion/graph/session-2026-07-18-evolve-review-triage.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/sinais-de-campo-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/sync-gate-superacao-2026-08.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/onion/graph/technical-context-core-2026-07.kg.yaml": [

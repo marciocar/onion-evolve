@@ -17,6 +17,10 @@ nodes:
     verified_at: 2026-08-26
     verified_against: "incidente medido na sessao: git push inesperado bec436cd->730bc67b em main"
     trace: "ops/pr-merge-verified.sh"
+    provenance:
+      source: "ops/pr-merge-verified.sh"
+      locator: "incidente medido na sessao: git push inesperado bec436cd->730bc67b em main"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: D_SYNC_GATED_IN_MERGE_PROOF
     node_type: decision
     label: "Superacao: o sync de main vive DENTRO do ramo do merge PROVADO pelo estado (ops/pr-merge-verified.sh --sync) — estruturalmente inacessivel sem a prova. Behavior-over-declaration, nao migalha de 'lembrar de conferir a branch'. Cura que vira MECANISMO, como manda fix-must-become-mechanism"
@@ -27,6 +31,10 @@ nodes:
     verified_at: 2026-08-26
     verified_against: "ops/pr-merge-verified.sh: o bloco --sync so existe dentro do case MERGED\\|* (pos-prova); os ramos `die` saem antes"
     trace: "ops/pr-merge-verified.sh"
+    provenance:
+      source: "ops/pr-merge-verified.sh"
+      locator: "ops/pr-merge-verified.sh: o bloco --sync so existe dentro do case MERGED\\|* (pos-prova); os ramos `die` saem antes"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_CURE_PROVEN_BY_BEHAVIOR
     node_type: evidence
     label: "Prova por comportamento: `bash ops/pr-merge-verified.sh 999999 --sync` MORRE ao ler o headRefOid e NUNCA imprime 'sincronizada' — o sync nao alcanca sem o merge provado. Verificado por execucao, nao por leitura do codigo"
@@ -37,6 +45,10 @@ nodes:
     verified_at: 2026-08-26
     verified_against: "execucao do script com PR inexistente 999999 --sync"
     trace: "ops/pr-merge-verified.sh"
+    provenance:
+      source: "ops/pr-merge-verified.sh"
+      locator: "execucao do script com PR inexistente 999999 --sync"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 edges:
   - from: D_SYNC_GATED_IN_MERGE_PROOF
     edge_type: SUPERSEDES

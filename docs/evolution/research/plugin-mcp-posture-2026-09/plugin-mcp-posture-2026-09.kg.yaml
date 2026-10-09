@@ -59,6 +59,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "Anthropic exige tools de leitura e escrita separados em servidores MCP — um tool unico que aceita metodos seguros e inseguros (ex.: catch-all api_request com parametro method) e rejeitado na triagem." ATENCAO ao endereco da fonte: esta pagina governa o Connector Directory (MCP remoto do claude.ai), nao a curadoria de PLUGINS do Claude Code — ver E_OBJECAO_1_FONTE_MAL_ENDERECADA_E_TRIADE_JA_FALHA.'
     trace: 'https://claude.com/docs/connectors/building/review-criteria'
+    provenance:
+      source: "https://claude.com/docs/connectors/building/review-criteria"
+      locator: "https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_TOOL_ANNOTATIONS_OBRIGATORIAS
     node_type: evidence
@@ -73,6 +77,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "Todo tool MCP submetido ao diretorio deve ter anotacoes title e readOnlyHint/destructiveHint, que determinam se roda sem confirmacao por chamada (read-only) ou sempre pede confirmacao (destrutivo) no Claude."'
     trace: 'https://claude.com/docs/connectors/building/review-criteria'
+    provenance:
+      source: "https://claude.com/docs/connectors/building/review-criteria"
+      locator: "https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_PLUGIN_EMBARCA_MCP_VIA_PLUGIN_ROOT
     node_type: evidence
@@ -87,6 +95,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "Plugins Claude Code podem empacotar servidores MCP declarando um bloco mcpServers em .mcp.json (ou plugin.json), com comando/args resolvidos via ${CLAUDE_PLUGIN_ROOT}." Eleva a tier 10 o que o corpus R1 tinha em tier 4 (plugin-directory-landscape-2026-09/E_MCP_SERVER_REGISTRAVEL_POR_PLUGIN). CAPACIDADE confirmada; o ENCAIXE e outra coisa — ver E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA.'
     trace: 'https://code.claude.com/docs/en/plugins-reference'
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins-reference"
+      locator: "https://code.claude.com/docs/en/plugins-reference — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_TOOLS_NAMESPACED_POR_PLUGIN
     node_type: evidence
@@ -101,6 +113,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "Tools expostas por um MCP server embarcado num plugin sao namespaced automaticamente como mcp__plugin_<plugin-name>_<server-name>__<tool>, isolando-as de outros plugins/servers." Isola NOMES; nao isola confianca nem custo de contexto — ver E_OBJECAO_4_NAMESPACE_NAO_ISOLA_CUSTO_NEM_MENTIRA.'
     trace: 'https://code.claude.com/docs/en/plugins-reference'
+    provenance:
+      source: "https://code.claude.com/docs/en/plugins-reference"
+      locator: "https://code.claude.com/docs/en/plugins-reference — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MCP_REMOTO_EXIGE_OAUTH_CA
     node_type: evidence
@@ -115,6 +131,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 2-1): "MCP remotos que exigem autenticacao devem usar OAuth 2.0 seguro com certificados de autoridades reconhecidas" — a opcao (a) tem exigencia formal explicita na politica do diretorio, elevando o custo de curadoria dessa rota. Confianca 0.8 (nao 0.9) pelo voto dissidente. O corpus mostra que OAuth e CONSTRUIVEL aqui (JWKS/IdP ja deployado, onion-bridge); o que bloqueia (a) e outra coisa — ver E_OBJECAO_5_TOPOLOGIA_PRIVADA_BLOQUEIA_A.'
     trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+    provenance:
+      source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
+      locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_POLITICA_REMOTO_VS_LOCAL
     node_type: evidence
@@ -128,6 +148,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 2-1): "A politica distingue e impoe requisitos DIFERENTES (mais rigorosos) para servidores MCP remotos vs. locais/embarcados — a opcao (b) tem barra de conformidade mais baixa que a (a), sem exigencia de OAuth." Claim COMPARATIVO: diz que (b) < (a), nao diz quanto e o absoluto de (b) — ver E_OBJECAO_6_COMPARATIVO_USADO_COMO_LUZ_VERDE.'
     trace: 'https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy'
+    provenance:
+      source: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy"
+      locator: "https://support.claude.com/en/articles/13145358-anthropic-software-directory-policy — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_PLUGIN_JSON_CAMPO_MCPSERVERS
     node_type: evidence
@@ -142,6 +166,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0): "O plugin.json do Claude Code suporta um campo mcpServers que permite ao plugin embarcar servidores MCP como parte de sua distribuicao."'
     trace: 'https://code.claude.com/docs/en/plugin-marketplaces'
+    provenance:
+      source: "https://code.claude.com/docs/en/plugin-marketplaces"
+      locator: "https://code.claude.com/docs/en/plugin-marketplaces — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MARKETPLACE_JSON_MCPSERVERS
     node_type: evidence
@@ -155,6 +183,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0): "Entradas de plugin no marketplace.json tambem suportam o campo mcpServers (string ou objeto) para configuracao de servidor MCP." E o MESMO fato de E_PLUGIN_JSON_CAMPO_MCPSERVERS, na MESMA pagina, visto do outro lado do manifesto — contado aqui por fidelidade a rodada, mas com impact rebaixado a 2 para nao inflar a contagem de evidencia (ver E_OBJECAO_8_DUPLICATA_INFLA_CONTAGEM).'
     trace: 'https://code.claude.com/docs/en/plugin-marketplaces'
+    provenance:
+      source: "https://code.claude.com/docs/en/plugin-marketplaces"
+      locator: "https://code.claude.com/docs/en/plugin-marketplaces — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MCP_JSON_OPCIONAL_NO_OFICIAL
     node_type: evidence
@@ -169,6 +201,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0): "No .claude-plugin/plugin.json de um plugin, o arquivo .mcp.json (configuracao de servidor MCP) e explicitamente opcional, nao obrigatorio." E a evidencia mais direta a favor de (c): o canal publico NAO cobra MCP para aceitar um plugin — logo nao ha forca externa empurrando o Onion para (b).'
     trace: 'https://github.com/anthropics/claude-plugins-official'
+    provenance:
+      source: "https://github.com/anthropics/claude-plugins-official"
+      locator: "https://github.com/anthropics/claude-plugins-official — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_POSTMARK_MCP_MALICIOSO
     node_type: evidence
@@ -183,6 +219,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA (tier 4, 2-1) — texto original: "A malicious version of the postmark-mcp npm package was found to have been modified to secretly BCC email contents to an external attacker-controlled domain, compromising any agentic pipeline that had installed it." Confianca travada em 0.5: vendor-on-competitor e sempre suspeito (clausula 7) — a Snyk vende justamente a deteccao desse risco. Ainda assim e o caso concreto que sustenta a preocupacao de superficie na triagem do comunitario (opcoes a/b).'
     trace: 'https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/'
+    provenance:
+      source: "https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/"
+      locator: "https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MCP_ALTO_TRUST_AMPLA_PERMISSAO
     node_type: evidence
@@ -196,6 +236,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA (tier 4, 3-0) — texto original: "MCP servers operate with high trust and broad permissions inside agent toolchains, so any data they handle can be exposed if the server is compromised." Confianca 0.5 pelo tier e pelo conflito de interesse do emissor. Le-se junto com a doutrina do core: o que o Onion serviria por MCP embarcado e conteudo PRIVADO do adotante (KG, diario, KBs).'
     trace: 'https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/'
+    provenance:
+      source: "https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/"
+      locator: "https://snyk.io/blog/malicious-mcp-server-on-npm-postmark-mcp-harvests-emails/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_KG_MCP_TERCEIRO_MULTI_HOST_STDIO
     node_type: evidence
@@ -210,6 +254,10 @@ nodes:
     source_kind: aggregator
     label: 'CONFIRMADA (tier 3, 3-0): "Um servidor MCP de knowledge graph de projeto de terceiros declara explicitamente suportar multiplos hosts nao-Claude-Code (Codex, Cursor, Windsurf, Claude Desktop) via stdio, nao remoto/OAuth." E o unico sinal desta rodada sobre a metade "ha demanda de hosts nao-Claude-Code?" da pergunta — e e sinal de OFERTA (alguem construiu), nao de DEMANDA (alguem usa). Confianca travada em 0.6 pela clausula 7 (tier <= 3 nunca acima de 0.7).'
     trace: 'https://github.com/hilyfux/knowledge-graph'
+    provenance:
+      source: "https://github.com/hilyfux/knowledge-graph"
+      locator: "https://github.com/hilyfux/knowledge-graph — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MCP_DEVE_CHAMAR_API_PRIMEIRA_PARTE
     node_type: evidence
@@ -224,6 +272,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "O servidor MCP deve chamar APIs de primeira parte do proprio publicador (ou que ele legitimamente faz proxy); o dominio do servidor MCP deve corresponder ao servico." Para (a) isto e favoravel — mcp.onionevolve.com serviria o proprio Onion e o dominio corresponde. Nao e este o criterio que derruba (a).'
     trace: 'https://claude.com/docs/connectors/building/review-criteria'
+    provenance:
+      source: "https://claude.com/docs/connectors/building/review-criteria"
+      locator: "https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_PLUGIN_EXIGE_REPO_PUBLICO
     node_type: evidence
@@ -238,6 +290,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "Plugins submetidos ao diretorio precisam vincular um repositorio publico no GitHub — codigo fechado nao e aceito." Cruzada com a topologia real do Onion (core PRIVADO; migalha family-repo-topology-door-core-collapse), esta e a evidencia de maior consequencia da rodada: o repo que TEM o KG nao pode ser submetido, e o repo que PODE ser submetido (onion-plugins) nao tem o KG.'
     trace: 'https://claude.com/docs/connectors/building/review-criteria'
+    provenance:
+      source: "https://claude.com/docs/connectors/building/review-criteria"
+      locator: "https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_EXIGE_DOC_PUBLICA_E_CREDENCIAIS_TESTE
     node_type: evidence
@@ -252,6 +308,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "Documentacao publica (post de blog ou artigo de central de ajuda) e exigida ate a data de publicacao, e credenciais de teste com conta totalmente populada sao obrigatorias na submissao." Custo operacional continuo que a opcao (a) herda inteiro: alguem precisa manter conta de teste populada com um KG de demonstracao — que nao pode ser o KG real do core, por ser privado.'
     trace: 'https://claude.com/docs/connectors/building/review-criteria'
+    provenance:
+      source: "https://claude.com/docs/connectors/building/review-criteria"
+      locator: "https://claude.com/docs/connectors/building/review-criteria — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EIXO MERCADO/CAPITAL (invariante, clausula 4) ────────────────────────────────────
   - id: E_MERCADO_PLUGIN_MCP_0904
@@ -343,6 +403,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 1 — dupla. (i) FONTE MAL ENDERECADA: review-criteria governa o Connector Directory (MCP remoto do claude.ai), nao o marketplace/diretorio de PLUGINS do Claude Code, cujos requisitos vem de code.claude.com. Cinco dos quinze achados saem dessa pagina e sao aplicados a opcao (b) sem que nada estabeleca que a submissao de plugin herda o criterio de conector. (ii) E ONDE O CRITERIO SE APLICA, A TRIADE JA FALHA: medido — ops/mcp-onion-exec/server.py mistura tres tools de leitura com uma de escrita no mesmo servidor. O corpus celebra librechat-kg-runtime-2026-08/D_TRIADE_MCP_POR_EIXO como "separada por risco", mas a separacao e entre SERVIDORES, nao entre READ e WRITE — que e exatamente o eixo que o criterio cobra. O achado foi lido como custo externo quando e defeito interno ja presente.'
     trace: 'ops/mcp-onion-exec/server.py'
+    provenance:
+      source: "ops/mcp-onion-exec/server.py"
+      locator: "E_ANTHROPIC_READ_WRITE_SEPARADOS (https://claude.com/docs/connectors/building/review-criteria) cruzada com medicao no repo: ops/mcp-onion-exec/server.py — dict TOOLS l.92-95 com run_lint, run_inventory, kg_freshness (leitura) e propose_kg_write (escrita, `open(fpath, \"w\")` em docs/evolution/kg-inbox/) NO MESMO SERVIDOR"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_2_ZERO_ANNOTATIONS_EXPOR_E_REESCREVER
     node_type: evidence
@@ -356,6 +420,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 2: os tres servidores da triade tem ZERO annotations. O dicionario de FERRAMENTAS e montado so com name/description/inputSchema. Consequencia direta sobre o enunciado da decisao: a opcao (a) NAO e "expor a triade existente" — e REESCREVER a superficie de tools dos tres servidores para atender E_TOOL_ANNOTATIONS_OBRIGATORIAS. O verbo "expor" embute um custo zero que a medicao refuta.'
     trace: 'ops/mcp-onion-kg/server.py'
+    provenance:
+      source: "ops/mcp-onion-kg/server.py"
+      locator: "grep -c \"readOnlyHint|destructiveHint|annotations\" em ops/mcp-onion-kg/server.py, ops/mcp-onion-exec/server.py, ops/mcp-onion-framework/server.py -> 0, 0, 0 (executado 2026-09-04); a unica string \"title\" e a de serverInfo, nao por-tool"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_3_PLUGIN_ROOT_RESOLVE_RAIZ_ERRADA
     node_type: evidence
@@ -369,6 +437,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 3: capacidade nao e encaixe, e aqui o encaixe esta QUEBRADO NA RAIZ. Sob ${CLAUDE_PLUGIN_ROOT}, o REPO calculado por tres dirname sobre __file__ resolve para o diretorio do PLUGIN INSTALADO, nao para o projeto do adotante. E os caminhos sao caminhos do CORE; no plugin materializado o layout e OUTRO (medido: plugins/onion/kb com 4 arquivos, plugins/onion/validation/kg-radar.sh). Logo o servidor embarcado serviria os arquivos DO PROPRIO PLUGIN, ou nada — jamais "o KG do adotante". A opcao (b) nao e um adapter: e reescrita com um problema de resolucao de raiz nao resolvido, e ${CLAUDE_PLUGIN_ROOT}, o unico mecanismo que a doc oferece, aponta justamente para a raiz ERRADA.'
     trace: 'ops/mcp-onion-kg/server.py'
+    provenance:
+      source: "ops/mcp-onion-kg/server.py"
+      locator: "ops/mcp-onion-kg/server.py l.21 `REPO = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))` e todo `_run` com cwd=REPO; caminhos hardcoded do CORE (docs/knowledge-base/, .claude/validation/kg-radar.sh, .claude/diary/index.md, docs/onion/inventory.md) contra o layout medido do plugin materializado: plugins/onion/kb (4 arquivos) e plugins/onion/validation/kg-radar.sh"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_4_NAMESPACE_NAO_ISOLA_CUSTO_NEM_MENTIRA
     node_type: evidence
@@ -382,6 +454,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 4: o namespacing (mcp__plugin_<plugin>_<server>__<tool>) isola NOMES; nao isola confianca nem custo de contexto. Cada tool entra em TODO request com name + description + inputSchema. E a descricao ja mente hoje: o kb_search declara "91 KBs" enquanto a contagem real e 94 — a familia count-drift do proprio core, embarcada num artefato que o adotante nao regenera. Seis tools com prosa estatica = imposto permanente de contexto em toda sessao do adotante, inclusive as que nunca tocam o KG, para uma capacidade que commands+skills ja servem (precedente 2026-08-07).'
     trace: 'ops/mcp-onion-kg/server.py'
+    provenance:
+      source: "ops/mcp-onion-kg/server.py"
+      locator: "ops/mcp-onion-kg/server.py l.85 declara \"Busca um termo nas 91 KBs (docs/knowledge-base)\" contra `find docs/knowledge-base -name \"*.md\" | wc -l` = 94 (executado 2026-09-04)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_5_TOPOLOGIA_PRIVADA_BLOQUEIA_A
     node_type: evidence
@@ -395,6 +471,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 5: o achado do OAuth subestima o bloqueio de (a) ao apresenta-lo como "custo de curadoria". OAuth e CONSTRUIVEL — o corpus tem JWKS/IdP deployado (onion-bridge-update-state). O que NAO e construivel e a exigencia de repositorio publico combinada com a topologia: o core e PRIVADO e as tools servem exatamente o conteudo privado dele (diario, grafos, KBs, inventario). A opcao (a) nao esta "gated em OAuth"; esta bloqueada por um fato de topologia que a rodada nao havia cruzado.'
     trace: 'https://claude.com/docs/connectors/building/review-criteria'
+    provenance:
+      source: "https://claude.com/docs/connectors/building/review-criteria"
+      locator: "E_PLUGIN_EXIGE_REPO_PUBLICO (review-criteria, tier 10, 3-0) cruzada com a topologia real: onion-claude equivale a onion-evolve e e PRIVATE (migalha family-repo-topology-door-core-collapse); as tools da triade servem docs/knowledge-base/, .claude/diary/ e os .kg.yaml, que so existem no repo privado"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_6_COMPARATIVO_USADO_COMO_LUZ_VERDE
     node_type: evidence
@@ -464,6 +544,10 @@ nodes:
     source_kind: primary
     label: 'MEDIDO — gatilho (i) da reabertura de (b): o regime de review de um MCP EMBUTIDO em plugin e o do DIRETORIO DE PLUGINS (revisao automatica basica + selo Verified opcional), NAO o do Connector Directory (que so aceita servidores REMOTOS submetidos a parte). Resolve a CONSTRAIN 1 (conflacao de regime): os 5 achados tier 10 do review-criteria valem contra (a) e NAO se aplicam a (b). Ressalva do proprio venue: "we strongly encourage using connectors that already exist in the Connectors Directory… will reduce the number of warnings shown to users" — MCP proprio embarcado passa, com mais avisos. §5 da Software Directory Policy (Additional Requirements for MCP Servers) nao diz se cobre MCP embutido — NAO ESTABELECIDO.'
     trace: 'https://claude.com/docs/plugins/submit'
+    provenance:
+      source: "https://claude.com/docs/plugins/submit"
+      locator: "WebFetch claude.com/docs/plugins/submit (\"separate and complementary directory from the Connectors Directory\"; \"a plugin can include any MCP of any kind in its .mcp.json\"; \"basic automated review\"), connectors/building/submission (\"The portal accepts remote MCP servers only. Local servers are distributed as desktop extensions or plugins\"), review-criteria (escopo = servidores NO Connector Directory), Software Directory Policy §3.F e §5"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   # ── evidência web -> pergunta ────────────────────────────────────────────────────────

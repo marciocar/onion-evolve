@@ -62,6 +62,10 @@ nodes:
     verified_against: 'pedido do maestro relayed verbatim pelo harness deste run: "criar um espaço separado, fazer esta pesquisa e direcionar a execução, seguindo o padrão do Onion Evolve, ser Gradual, (Ex: spike, PoC, mvp, ...), pesquisa para saber o que entra e o que sai e como, qual é o resultado final possível, exemplos esperados ... tem um framework para seguir do huggingface e outros ... pesquisa completa progressiva, com formulários com sugestões, explicações e recomendações" (grafia normalizada). O mote "modelo = Dogfood + KG-SSOT First + Runtime SDAAL encarnado; o moat é o mecanismo verificável" veio do texto computado do workflow, coerente com as memórias quatro-pilares-definidos-pelo-maestro e onion-moat-verifiable-mechanism.'
     label: 'ENQUADRAMENTO DO MAESTRO: o roteiro do Onion SLM é GRADUAL (spike → PoC → MVP → …), em espaço separado, e cada etapa precisa declarar o que entra, o que sai e como passa; a pesquisa é progressiva e conduzida por FORMULÁRIOS com sugestões, explicações e recomendações. Consequência de leitura: o vocabulário das etapas é do maestro (não das fontes), e onde as fontes calam (limiares) a decisão vira pergunta ao maestro com opções — não número inventado. O moat segue sendo o mecanismo verificável, não o modelo.'
     trace: 'harness do workflow onion-research (2026-10-05)'
+    provenance:
+      source: "harness do workflow onion-research (2026-10-05)"
+      locator: "pedido do maestro relayed verbatim pelo harness deste run: \"criar um espaço separado, fazer esta pesquisa e direcionar a execução, seguindo o padrão do Onion Evolve, ser Gradual, (Ex: spike, PoC, mvp, ...), pesquisa para saber o que entra e o que sai e como, qual é o resultado final possível, exemplos esperados ... tem um framework para seguir do huggingface e outros ... pesquisa completa progressiva, com formulários com sugestões, explicações e recomendações\" (grafia normalizada). O mote \"modelo = Dogfood + KG-SSOT First + Runtime SDAAL encarnado; o moat é o mecanismo verificável\" veio do texto computado do workflow, coerente com as memórias quatro-pilares-definidos-pelo-maestro e onion-moat-verifiable-mechanism."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: X_REF_NANOCHAT_DECISION
     node_type: entity
@@ -73,6 +77,10 @@ nodes:
     verified_against: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.335-338 nesta worktree (branch research/onion-slm-roadmap-2026-10) — D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, node_type decision, status: done'
     label: 'ÂNCORA CROSS-GRAFO (espelho, não editável daqui): nanochat-onion-2026-10#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, SELADA done — A operante: não treinar agora; fine-tune só após eval de domínio que falhe; C (SLM-ferramenta de conjunto fechado via SDAAL) viva em gatilho nomeado. Esta rodada não a revisa.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10'
+    provenance:
+      source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10"
+      locator: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.335-338 nesta worktree (branch research/onion-slm-roadmap-2026-10) — D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, node_type decision, status: done"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: X_REF_NANOCHAT_Q_EVAL
     node_type: entity
@@ -84,6 +92,10 @@ nodes:
     verified_against: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.548-553 nesta worktree — Q_EVAL_DE_DOMINIO_DO_ONION, node_type question, status: open'
     label: 'ÂNCORA CROSS-GRAFO: nanochat-onion-2026-10#Q_EVAL_DE_DOMINIO_DO_ONION (open) — o eval de domínio, pré-requisito de B, C e D, que hoje NÃO EXISTE. Esta rodada acrescenta-lhe três requisitos de método (ver C_EVAL_SET_PRIVATE_EXCLUDED_FROM_DOOR e C_LLM_JUDGE_VETOED_SINGLE_ANNOTATOR) e nenhum tamanho mínimo ancorado.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#Q_EVAL_DE_DOMINIO_DO_ONION'
+    provenance:
+      source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#Q_EVAL_DE_DOMINIO_DO_ONION"
+      locator: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.548-553 nesta worktree — Q_EVAL_DE_DOMINIO_DO_ONION, node_type question, status: open"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: X_REF_SLM_Q_OPTION_C
     node_type: entity
@@ -95,6 +107,10 @@ nodes:
     verified_against: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.997-1003 nesta worktree — Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF, node_type question, status: open'
     label: 'ÂNCORA CROSS-GRAFO: onion-slm-2026-10#Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF (open) — proposta: o eval de domínio começa medindo ZERO-SHOT os especialistas prontos (OPF e GLiNER2-PII para de-id pt-BR; NuExtract3 e GLiNER2.5 para extração tipada) contra o LLM atual, F1 como piso, holdout de erros reais, custo medido na VPS; base para fine-tune só se todos falharem.'
     trace: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF'
+    provenance:
+      source: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF"
+      locator: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.997-1003 nesta worktree — Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF, node_type question, status: open"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: X_REF_SLM_EVAL_DESIGN
     node_type: entity
@@ -106,6 +122,10 @@ nodes:
     verified_against: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.980-986 nesta worktree — C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS, node_type claim, status: open'
     label: 'ÂNCORA CROSS-GRAFO: onion-slm-2026-10#C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS (open) — F1 automático é PISO, não medida; o gabarito vem de nós SELADOS; o holdout de detecção usa ERROS REAIS do corpus (refuted/superseded/drifted com aresta nomeada); rótulo por corrupção serve a treino, não certifica.'
     trace: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS'
+    provenance:
+      source: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS"
+      locator: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.980-986 nesta worktree — C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS, node_type claim, status: open"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: X_REF_SLM_FINETUNE_NARROW
     node_type: entity
@@ -117,6 +137,10 @@ nodes:
     verified_against: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.964-970 nesta worktree — C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT, node_type claim, status: open'
     label: 'ÂNCORA CROSS-GRAFO: onion-slm-2026-10#C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT (open) — SLM ajustado vence em tarefa ESTREITA de conjunto fechado e perde em conhecimento amplo; prompt primeiro, fine-tune só quando o prompt incha.'
     trace: 'docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT'
+    provenance:
+      source: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml#C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT"
+      locator: "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml l.964-970 nesta worktree — C_FINETUNE_WINS_ONLY_NARROW_AFTER_PROMPT, node_type claim, status: open"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: X_REF_SLM_SMOL_OMITTED
     node_type: entity
@@ -128,6 +152,10 @@ nodes:
     verified_against: 'docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md l.109-110 nesta worktree: "Smol Training Playbook: OMITIDO — o leitor não produziu claim nem marcou inalcançável. É objeção sobrevivente por omissão (cláusula 6)." (o E_LACUNAS daquele grafo NÃO o menciona; está na síntese e no run-wf_78edad4f-896.json l.1270)'
     label: 'ÂNCORA CROSS-GRAFO: a rodada onion-slm-2026-10 OMITIU o Smol Training Playbook (sem claim e sem inalcançável). Esta rodada o leu e ancorou 5 claims — fecha a omissão no eixo "quando treinar e quando não", mas as ablações são de PRÉ-TREINO, sem transferência ao Onion.'
     trace: 'docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md"
+      locator: "docs/evolution/research/onion-slm-2026-10/SYNTHESIS.md l.109-110 nesta worktree: \"Smol Training Playbook: OMITIDO — o leitor não produziu claim nem marcou inalcançável. É objeção sobrevivente por omissão (cláusula 6).\" (o E_LACUNAS daquele grafo NÃO o menciona; está na síntese e no run-wf_78edad4f-896.json l.1270)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EVIDÊNCIAS ANCORADAS · Smol Training Playbook (Hugging Face) ─────────────────────────
   - id: E_SMOL_DECIDE_WHETHER_TO_TRAIN
@@ -142,6 +170,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: a decisão de SE treinar vem antes de qualquer hiperparâmetro — projetos falham por treinar modelo desnecessário. Elenxo SOBREVIVEU: a fonte é sobre PRÉ-TREINO do SmolLM3; sustenta "não pré-treinar" e só por analogia "não ajustar agora". HABILITA: a porta 0 (decidir se treina) como etapa explícita do roteiro.'
     trace: 'https://huggingfacetb-smol-training-playbook.hf.space/'
+    provenance:
+      source: "https://huggingfacetb-smol-training-playbook.hf.space/"
+      locator: "QUOTE verbatim: \"many failed training projects didn't fail because of bad hyperparameters or buggy code; they failed because someone decided to train a model they didn't need.\" — LOCATOR: Smol Training Playbook, seção Why: The Question Nobody Wants to Answer. Tier 7 propagado (o leitor declarou 7 para outras claims da mesma fonte). ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SMOL_BUILD_ON_SOTA_FIRST
     node_type: evidence
@@ -155,6 +187,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: gate antes de treinar — gastar POUCOS DIAS sobre um modelo SOTA pronto e ver se prompting, tool use ou pós-treino atingem a meta. Elenxo SOBREVIVEU: critério de saída indefinido ("your performance goals", sem número); nomeia LLMs generalistas, não especialistas de span; e aceita PÓS-TREINO como saída (veta pré-treino, não veta fine-tune). HABILITA: o spike "medir pronto primeiro" com prazo curto. NÃO DÁ: limiar.'
     trace: 'https://huggingfacetb-smol-training-playbook.hf.space/'
+    provenance:
+      source: "https://huggingfacetb-smol-training-playbook.hf.space/"
+      locator: "QUOTE verbatim: \"Spend a few days building on top of Qwen3, Gemma 3, or another current state-of-the-art (SOTA) model. Can you reach your performance goals through prompting, tool use, or post-training?\" — LOCATOR: Smol Training Playbook, seção Production: Why Can't You Use an Existing Model? Tier 7 propagado. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SMOL_ONE_VARIABLE_PER_ABLATION
     node_type: evidence
@@ -168,6 +204,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: regra de ablação — uma variável por experimento, o resto idêntico. Elenxo NÃO sobreviveu: transfere sem perda à comparação de especialistas (eval selado FIXO, troca-se só o modelo ou o limiar). HABILITA: protocolo do spike e de qualquer ajuste posterior.'
     trace: 'https://huggingfacetb-smol-training-playbook.hf.space/'
+    provenance:
+      source: "https://huggingfacetb-smol-training-playbook.hf.space/"
+      locator: "QUOTE verbatim: \"Change one thing at a time. Keep everything else identical between experiments.\" — LOCATOR: Smol Training Playbook, Rules of Engagement (ablações). ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SMOL_ABLATION_COST_GPU_HOURS
     node_type: evidence
@@ -181,6 +221,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: ablações e depuração custaram 161.280 GPU-h, mais da metade do treino principal (276.480 GPU-h), em mais de 100 ablações. Elenxo SOBREVIVEU: escala de PRÉ-TREINO, ordens de grandeza acima de um LoRA de especialista pequeno — usar este número para justificar "não treinar agora" no Onion é ERRO DE CATEGORIA. VETA: argumento de custo a partir desta fonte.'
     trace: 'https://huggingfacetb-smol-training-playbook.hf.space/'
+    provenance:
+      source: "https://huggingfacetb-smol-training-playbook.hf.space/"
+      locator: "QUOTE verbatim: \"Ablations and debugging consumed a total of 161,280 GPU hours, more than half the cost of our main training run (276,480 GPU hours).\" — LOCATOR: Smol Training Playbook, Estimating Ablation Cost. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SMOL_ABLATION_REDUCED_SCALE
     node_type: evidence
@@ -194,6 +238,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: ablação em escala reduzida — modelo de 1B com 45B tokens (~1,5 dia num nó de 8 H100) como proxy de sinal estável. Elenxo SOBREVIVEU: setup de pré-treino, sem transferência ao roteiro do Onion (zero-shot de especialistas). Registro de método, não de etapa.'
     trace: 'https://huggingfacetb-smol-training-playbook.hf.space/'
+    provenance:
+      source: "https://huggingfacetb-smol-training-playbook.hf.space/"
+      locator: "QUOTE verbatim: \"We train for 45B tokens to ensure we get stable signal, though ~35B is Chinchilla-optimal for this model size.\" — LOCATOR: Smol Training Playbook, Ablation Setup. Tier 7 propagado. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EVIDÊNCIAS ANCORADAS · HF Evaluation Guidebook ──────────────────────────────────────
   - id: E_GUIDEBOOK_INSPECT_50_SAMPLES
@@ -208,6 +256,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: a qualidade do eval é limitada pelo dataset; o guia manda inspecionar 50 amostras aleatórias (clareza, correção, relevância). Elenxo SOBREVIVEU: a quote cobre só as 50 — os "~100 para significância" NÃO estão na quote conferida; e a seção trata de dataset EXISTENTE, não de dataset próprio de erros reais. HABILITA: gate barato de entrada do spike (inspeção manual de 50). NÃO DÁ: tamanho mínimo.'
     trace: 'https://github.com/huggingface/evaluation-guidebook'
+    provenance:
+      source: "https://github.com/huggingface/evaluation-guidebook"
+      locator: "QUOTE verbatim: \"Take 50 random samples and manually inspect them:\" — LOCATOR: evaluation-guidebook, designing-your-automatic-evaluation.md, Choosing a dataset > Selecting an existing dataset > #### Samples (linhas 23-32). ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_GUIDEBOOK_EVAL_BOUND_BY_DATASET
     node_type: evidence
@@ -221,6 +273,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: o resultado só é tão bom quanto o dataset de eval, e o guia prefere datasets criados por especialistas. Elenxo NÃO sobreviveu: prova exatamente a premissa de C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS. Ressalva sem derrubar: o Onion tem UM rotulador (o maestro), sem acordo entre anotadores.'
     trace: 'https://github.com/huggingface/evaluation-guidebook'
+    provenance:
+      source: "https://github.com/huggingface/evaluation-guidebook"
+      locator: "QUOTE verbatim: \"**your evaluation result will only be as good as your evaluation dataset**.\" — LOCATOR: evaluation-guidebook, designing-your-automatic-evaluation.md, Choosing a dataset, parágrafo de abertura (linha 4); preferência por especialistas na linha 9. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_GUIDEBOOK_ASSUME_CONTAMINATION
     node_type: evidence
@@ -234,6 +290,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: todo dataset público deve ser presumido contaminado; mitigação por canary string, forma cifrada/gated e benchmark dinâmico, sem detecção infalível. Elenxo NÃO sobreviveu e TIROU a consequência operacional: os especialistas prontos podem ter treinado em benchmarks públicos de PII (o eval PRIVADO selado é a mitigação), e se o eval entrar em origin/main o ops/materialize-door.sh o projeta na porta pública onion-core (REGRA 85, Porta pública espelha o core, com catraca) e ele se contamina.'
     trace: 'https://github.com/huggingface/evaluation-guidebook'
+    provenance:
+      source: "https://github.com/huggingface/evaluation-guidebook"
+      locator: "QUOTE verbatim: \"you should assume that a dataset publicly available on the internet is or will be contaminated.\" — LOCATOR: evaluation-guidebook, automated-benchmarks/tips-and-tricks.md, Managing contamination (linhas 4-9, 11). ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EVIDÊNCIAS ANCORADAS · lighteval (Hugging Face) ─────────────────────────────────────
   - id: E_LIGHTEVAL_MULTI_BACKEND
@@ -248,6 +308,10 @@ nodes:
     source_kind: vendor-on-self
     label: 'ANCORADA: lighteval é toolkit multi-backend — local em CPU/GPU (transformers/accelerate, vLLM) ou contra serviços (endpoints, LiteLLM, TGI). Elenxo SOBREVIVEU: os backends são de LMs generativos/loglikelihood; GLiNER2 e o OpenAI Privacy Filter são classificadores de token/extratores de span, e que o lighteval rode ESSES modelos NÃO está provado.'
     trace: 'https://huggingface.co/docs/lighteval'
+    provenance:
+      source: "https://huggingface.co/docs/lighteval"
+      locator: "QUOTE verbatim: \"`transformers`: Evaluate models on CPU or one or more GPUs using [🤗 Accelerate](https://github.com/huggingface/transformers)\" — LOCATOR: docs/lighteval, Key Features > Multi-Backend Support. Tier 9 propagado (declarado para outras claims da mesma doc). ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_LIGHTEVAL_SAMPLE_BY_SAMPLE
     node_type: evidence
@@ -261,6 +325,10 @@ nodes:
     source_kind: vendor-on-self
     label: 'ANCORADA: guarda resultado amostra a amostra, o que permite inspecionar erros reais — mas não diz o que medir antes de treinar: é INSTRUMENTO, não roteiro. Elenxo SOBREVIVEU (a própria claim admite que prova menos).'
     trace: 'https://huggingface.co/docs/lighteval'
+    provenance:
+      source: "https://huggingface.co/docs/lighteval"
+      locator: "QUOTE verbatim: \"saving and exploring detailed, sample-by-sample results to debug and see how your models stack up.\" — LOCATOR: docs/lighteval, parágrafo de abertura. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_LIGHTEVAL_CUSTOM_TASK_PROMPT_FN
     node_type: evidence
@@ -274,6 +342,10 @@ nodes:
     source_kind: vendor-on-self
     label: 'ANCORADA: tarefa customizada exige função de prompt que converte cada linha em Doc (query, choices, gold_index); o eval de domínio precisaria virar dataset com gold selado. Elenxo SOBREVIVEU: o Doc é de múltipla escolha/geração — PII/NER por span não cabe nativamente e exigiria adaptador que serialize spans, de custo NÃO medido (pode sair mais caro que harness próprio).'
     trace: 'https://huggingface.co/docs/lighteval/adding-a-custom-task'
+    provenance:
+      source: "https://huggingface.co/docs/lighteval/adding-a-custom-task"
+      locator: "QUOTE verbatim: \"You need to define a prompt function that will convert a line from your dataset to a document to be used for evaluation.\" — LOCATOR: docs/lighteval/adding-a-custom-task, Step 2: Define the Prompt Function. Tier 9 propagado. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_LIGHTEVAL_TASK_CONFIG_LOCAL_RUN
     node_type: evidence
@@ -287,6 +359,10 @@ nodes:
     source_kind: vendor-on-self
     label: 'ANCORADA: a tarefa é declarada em LightevalTaskConfig (hf_repo, splits, metrics, generation_size) e rodada localmente com --custom-tasks. Elenxo SOBREVIVEU: "hf_repo" indica dataset no formato e na origem do Hub; suporte a dataset LOCAL/privado NÃO foi ancorado, e subir o eval selado ao Hub o contamina — tensão não resolvida.'
     trace: 'https://huggingface.co/docs/lighteval/adding-a-custom-task'
+    provenance:
+      source: "https://huggingface.co/docs/lighteval/adding-a-custom-task"
+      locator: "QUOTE verbatim: \"lighteval accelerate \\ \"model_name=openai-community/gpt2\" \\ \"myothertask|3\" \\ --custom-tasks community_tasks/my_custom_task.py\" — LOCATOR: docs/lighteval/adding-a-custom-task, Running Your Custom Task > Example Usage. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_LIGHTEVAL_F1_WORD_OVERLAP
     node_type: evidence
@@ -300,6 +376,10 @@ nodes:
     source_kind: vendor-on-self
     label: 'ANCORADA: as métricas embutidas de geração incluem exact_match e F1 por SOBREPOSIÇÃO DE PALAVRAS — não F1 de entidade/span; métrica de domínio exige SampleLevelMetric customizada. Elenxo SOBREVIVEU: mostrar que o F1 embutido é a grandeza errada para spans NÃO prova que F1 de entidade seja piso (outra grandeza); "F1 é piso" segue sustentado por C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS e por Yan, não por esta.'
     trace: 'https://huggingface.co/docs/lighteval/metric-list'
+    provenance:
+      source: "https://huggingface.co/docs/lighteval/metric-list"
+      locator: "QUOTE verbatim: \"`f1_score`: Average F1 score in terms of word overlap between the model output and gold (normalisation optional).\" — LOCATOR: docs/lighteval/metric-list, Automatic metrics for generative tasks > Base. Tier 9 propagado. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_LIGHTEVAL_CUSTOM_SAMPLE_METRIC
     node_type: evidence
@@ -313,6 +393,10 @@ nodes:
     source_kind: vendor-on-self
     label: 'ANCORADA: métrica customizada é possível definindo função por amostra e agregação de corpus — habilita recall por tipo de entidade sensível e métrica sobre erro real selado. Elenxo NÃO sobreviveu: a claim só afirma "é possível", que é o que o texto dá. Quem escreve a métrica continua sendo o Onion.'
     trace: 'https://huggingface.co/docs/lighteval/adding-a-custom-task'
+    provenance:
+      source: "https://huggingface.co/docs/lighteval/adding-a-custom-task"
+      locator: "QUOTE verbatim: \"sample_level_fn=lambda x: x, # How to compute score for one sample corpus_level_fn=np.mean, # How to aggregate the sample metrics\" — LOCATOR: docs/lighteval/adding-a-custom-task, Step 3: Creating Custom Metrics (SampleLevelMetric). ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EVIDÊNCIAS ANCORADAS · HF LLM Course, capítulo 11 (fine-tuning) ──────────────────────
   - id: E_HFCOURSE_SFT_AFTER_PROMPTING
@@ -327,6 +411,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: o curso só recomenda SFT depois que o prompting não basta (ou quando o pequeno ajustado sai mais barato). Elenxo NÃO sobreviveu: sustenta "medir zero-shot primeiro" na ordem certa. A falta de limiar numérico para "não basta" é lacuna do roteiro, não refuta a claim.'
     trace: 'https://huggingface.co/learn/llm-course/chapter11/3'
+    provenance:
+      source: "https://huggingface.co/learn/llm-course/chapter11/3"
+      locator: "QUOTE verbatim: \"Need additional performance beyond what prompting can achieve\" — LOCATOR: huggingface.co/learn/llm-course chapter11/3, When to Use SFT. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HFCOURSE_COST_CONDITION
     node_type: evidence
@@ -340,6 +428,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: a condição de custo para ajustar é o modelo geral grande custar mais que ajustar um pequeno. Elenxo SOBREVIVEU: é gate ECONÔMICO e a régua declarada do maestro é eficiência e eficácia, não economia (memória efficiency-over-economy); e o custo do caminho atual nunca foi medido no corpus. VETA: usar este gate como critério do Onion.'
     trace: 'https://huggingface.co/learn/llm-course/chapter11/3'
+    provenance:
+      source: "https://huggingface.co/learn/llm-course/chapter11/3"
+      locator: "QUOTE verbatim: \"the cost of using a large general-purpose model outweighs the cost of fine-tuning a smaller model\" — LOCATOR: chapter11/3, When to Use SFT. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HFCOURSE_SFT_INPUT_OUTPUT_PAIRS
     node_type: evidence
@@ -353,6 +445,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: o pré-requisito de dados do SFT são pares entrada/saída esperada, e a qualidade dos dados é decisiva. Elenxo SOBREVIVEU: a quote é sobre dados de TREINO; "eval selado é pré-condição" é inferência. E o selado NÃO pode virar treino — vazamento treino/eval anula o gate. VETA: reutilizar o eval selado como dataset de ajuste.'
     trace: 'https://huggingface.co/learn/llm-course/chapter11/3'
+    provenance:
+      source: "https://huggingface.co/learn/llm-course/chapter11/3"
+      locator: "QUOTE verbatim: \"a task-specific dataset structured with input-output pairs. Each pair should consist of: An input prompt, The expected model response\" — LOCATOR: chapter11/3, seção Dataset Preparation (não \"Dataset Requirements\"). ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HFCOURSE_LORA_SMALL_RANK
     node_type: evidence
@@ -366,6 +462,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: para LoRA, rank pequeno (4-8), loss monitorada, conjunto de validação e comparação com baseline de ajuste completo; SEM limiar numérico de passagem e com resultado que varia por tarefa. Elenxo SOBREVIVEU: não fecha "critério de passagem"; o rank × esquecimento já vive em nanochat-eixo-d-2026-10.'
     trace: 'https://huggingface.co/learn/llm-course/chapter11/4'
+    provenance:
+      source: "https://huggingface.co/learn/llm-course/chapter11/4"
+      locator: "QUOTE verbatim: \"start with small rank values (4-8) for LoRA and monitor training loss. Use validation sets to prevent overfitting and compare results with full fine-tuning baselines when possible.\" — LOCATOR: chapter11/4, bloco de boas práticas do LoRA. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HFCOURSE_PROGRESSIVE_EVAL
     node_type: evidence
@@ -379,6 +479,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: avaliação PROGRESSIVA — benchmarks como baseline → requisitos do caso de uso → dataset próprio → camadas automática, humana e de especialista; o curso admite que benchmark não garante eficácia real. Elenxo SOBREVIVEU: é a sequência mais próxima de "roteiro gradual" da rodada, mas avalia modelo JÁ ajustado e não tem critério de saída entre camadas.'
     trace: 'https://huggingface.co/learn/llm-course/chapter11/5'
+    provenance:
+      source: "https://huggingface.co/learn/llm-course/chapter11/5"
+      locator: "QUOTE verbatim: \"Develop custom evaluation datasets that reflect your actual use case\" — LOCATOR: chapter11/5, Custom Evaluation (passo 3 de 4); caveat na seção de benchmarks. Tier 7 propagado. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EVIDÊNCIAS ANCORADAS · Hamel Husain (evals) ─────────────────────────────────────────
   - id: E_HAMEL_THREE_LEVELS
@@ -392,6 +496,10 @@ nodes:
     source_kind: engineer
     label: 'ANCORADA: três níveis — L1 assertions, L2 avaliação humana+modelo sobre traces, L3 A/B; L1 é o degrau barato e inicial e mapeia ao gate determinístico do Onion. Elenxo SOBREVIVEU: os níveis são CAMADAS, não fases com passagem ("There isn''t a strict formula as to when to introduce each level" — a cadência foi rejeitada na ancoragem). Prova menos que spike → PoC → MVP.'
     trace: 'https://hamel.dev/blog/posts/evals/'
+    provenance:
+      source: "https://hamel.dev/blog/posts/evals/"
+      locator: "QUOTE verbatim: \"Unit tests for LLMs are assertions (like you would write in pytest).\" — LOCATOR: hamel.dev/blog/posts/evals/, Level 1: Unit Tests. Tier NÃO declarado pelo leitor (campo ausente). ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HAMEL_ERROR_ANALYSIS_FIRST
     node_type: evidence
@@ -404,6 +512,10 @@ nodes:
     source_kind: engineer
     label: 'ANCORADA: a análise de erros vem PRIMEIRO e decide quais evals escrever. Elenxo NÃO sobreviveu: prova exatamente "erros reais selados antes de qualquer modelo" (C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS) — a âncora mais forte da rodada para a porta 0.'
     trace: 'https://hamel.dev/blog/posts/evals-faq/'
+    provenance:
+      source: "https://hamel.dev/blog/posts/evals-faq/"
+      locator: "QUOTE verbatim: \"Error analysis is the most important activity in evals. Error analysis helps you decide what evals to write in the first place.\" — LOCATOR: hamel.dev/blog/posts/evals-faq/, Q: Why is \"error analysis\" so important in AI evals, and how is it performed? Tier NÃO declarado pelo leitor. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HAMEL_FINETUNE_IS_DATA
     node_type: evidence
@@ -416,6 +528,10 @@ nodes:
     source_kind: engineer
     label: 'ANCORADA: fine-tuning vem depois de existir infraestrutura de eval, e quase todo o trabalho é montar dados, não treinar. Elenxo SOBREVIVEU e INVERTEU parte da leitura: o argumento é que, COM evals, o ajuste fica barato — empurra para ajustar DEPOIS, não veta. "Não treinar agora" só se sustenta enquanto o eval não existe.'
     trace: 'https://hamel.dev/blog/posts/evals/'
+    provenance:
+      source: "https://hamel.dev/blog/posts/evals/"
+      locator: "QUOTE verbatim: \"99% of the labor involved with fine-tuning is assembling high-quality data that covers your AI product's surface area.\" — LOCATOR: hamel.dev/blog/posts/evals/, Eval Systems Unlock Superpowers For Free > Fine-Tuning. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EVIDÊNCIAS ANCORADAS · Eugene Yan (evals e LLM-evaluators) ───────────────────────────
   - id: E_YAN_EXTRACTION_METRICS
@@ -430,6 +546,10 @@ nodes:
     source_kind: engineer
     label: 'ANCORADA: para classificação/extração, medir recall, precision, ROC-AUC, PR-AUC e separação de distribuições — não um F1 único. Elenxo NÃO sobreviveu, com ressalva que vira REQUISITO DO SPIKE: ROC-AUC/PR-AUC exigem SCORE contínuo, então cada especialista precisa expor o score, não só o span com limiar já aplicado.'
     trace: 'https://eugeneyan.com/writing/evals/'
+    provenance:
+      source: "https://eugeneyan.com/writing/evals/"
+      locator: "QUOTE verbatim: \"Recall, precision, ROC-AUC, PR-AUC, separation of distributions\" — LOCATOR: eugeneyan.com/writing/evals, seção Classification/Extraction. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_YAN_SIMILARITY_METRICS_FAIL
     node_type: evidence
@@ -443,6 +563,10 @@ nodes:
     source_kind: engineer
     label: 'ANCORADA: métricas de similaridade/n-gram falham quando positivos e negativos ficam próximos demais para cortar limiar. Elenxo SOBREVIVEU: refere-se a saídas generativas; a tarefa do Onion é extração de span com gabarito exato — pesa pouco no roteiro, só reforça usar gabarito exato em vez de similaridade.'
     trace: 'https://eugeneyan.com/writing/evals/'
+    provenance:
+      source: "https://eugeneyan.com/writing/evals/"
+      locator: "QUOTE verbatim: \"The similarity distributions of positive and negative instances are too close...not discriminative enough to cut a threshold.\" — LOCATOR: eugeneyan.com/writing/evals, seção Metrics That Don't Work. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_YAN_SUMMARIZATION_NLI_1000
     node_type: evidence
@@ -456,6 +580,10 @@ nodes:
     source_kind: engineer
     label: 'ANCORADA: em sumarização, ROUGE/METEOR/BERTScore são impraticáveis e G-Eval pouco confiável; a alternativa é NLI para consistência factual, com ~mil amostras. Elenxo SOBREVIVEU: tarefa FORA do escopo (PII/extração) — o "~1000" NÃO se transfere como dimensionamento do eval do Onion.'
     trace: 'https://eugeneyan.com/writing/evals/'
+    provenance:
+      source: "https://eugeneyan.com/writing/evals/"
+      locator: "QUOTE verbatim: \"With a thousand samples or more, it becomes a solid factual consistency eval and may be good enough as a hallucination guardrail.\" — LOCATOR: eugeneyan.com/writing/evals, seção Summarization. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_YAN_LLM_EVALUATOR_CALIBRATION
     node_type: evidence
@@ -469,6 +597,10 @@ nodes:
     source_kind: engineer
     label: 'ANCORADA: LLM-evaluators se calibram contra anotadores humanos (correlação LLM-humano ≈ humano-humano) e não substituem humanos de forma sistemática; para produção de baixa latência, treinar classificador. Elenxo SOBREVIVEU: o requisito exige PELO MENOS DOIS anotadores humanos e o Onion tem um (o maestro) — LLM-as-judge fica VETADO como gate até existir segundo rotulador.'
     trace: 'https://eugeneyan.com/writing/llm-evaluators/'
+    provenance:
+      source: "https://eugeneyan.com/writing/llm-evaluators/"
+      locator: "QUOTE verbatim: \"Most folks have human annotators as the baseline. Here, we aim for the LLM-human correlation to match human-human correlation.\" — LOCATOR: eugeneyan.com/writing/llm-evaluators, seção Human Annotation. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EVIDÊNCIAS ANCORADAS · Google, Rules of Machine Learning ─────────────────────────────
   - id: E_GOOGLE_R1_NO_ML_WITHOUT_DATA
@@ -483,6 +615,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: Regra 1 — sem ML obrigatório e sem dados, lance com heurística. Elenxo NÃO sobreviveu: sustenta a porta 0 diretamente. Ressalva: "a heurística dá metade do ganho" foi REJEITADA na ancoragem — a heurística é ponto de partida, não baseline quantificada.'
     trace: 'https://developers.google.com/machine-learning/guides/rules-of-ml'
+    provenance:
+      source: "https://developers.google.com/machine-learning/guides/rules-of-ml"
+      locator: "QUOTE verbatim: \"If machine learning is not absolutely required for your product, don't use it until you have data.\" — LOCATOR: developers.google.com/machine-learning/guides/rules-of-ml, Rule #1: Don't be afraid to launch a product without machine learning. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_GOOGLE_R2_METRICS_FIRST
     node_type: evidence
@@ -496,6 +632,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: Regra 2 — métricas e instrumentação vêm antes de formalizar o que o sistema de ML fará. Elenxo NÃO sobreviveu: prova a ordem instrumentar → medir → modelar que o roteiro precisa.'
     trace: 'https://developers.google.com/machine-learning/guides/rules-of-ml'
+    provenance:
+      source: "https://developers.google.com/machine-learning/guides/rules-of-ml"
+      locator: "QUOTE verbatim: \"Before formalizing what your machine learning system will do, track as much as possible in your current system.\" — LOCATOR: rules-of-ml, Rule #2: First, design and implement metrics. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_GOOGLE_R5_TEST_INFRA_INDEPENDENTLY
     node_type: evidence
@@ -509,6 +649,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: Regra 5 — testar a infraestrutura independente do aprendizado, incluindo paridade de score treino/serving. Elenxo NÃO sobreviveu: sustenta o harness de eval como peça testável à parte (o padrão bancada/selftest do Onion) e o adapter SDAAL que encapsula o modelo. A paridade treino/serving fica latente enquanto não há treino.'
     trace: 'https://developers.google.com/machine-learning/guides/rules-of-ml'
+    provenance:
+      source: "https://developers.google.com/machine-learning/guides/rules-of-ml"
+      locator: "QUOTE verbatim: \"Make sure that the infrastructure is testable, and that the learning parts of the system are encapsulated so that you can test everything around it.\" — LOCATOR: rules-of-ml, Rule #5: Test the infrastructure independently from the machine learning. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_GOOGLE_PHASE2_GATE_E2E
     node_type: evidence
@@ -522,6 +666,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: critério de passagem — só com sistema ponta a ponta funcionando e instrumentado com testes unitários e de sistema começa a Fase II. Elenxo NÃO sobreviveu: é o ÚNICO critério de passagem EXPLÍCITO das 9 fontes, ainda que QUALITATIVO. Ressalva: na Fase I do Google já há modelo simples lançado (Regra 4), logo o gate é "pipeline e2e com modelo simples" — compatível com especialista pronto no papel de modelo simples.'
     trace: 'https://developers.google.com/machine-learning/guides/rules-of-ml'
+    provenance:
+      source: "https://developers.google.com/machine-learning/guides/rules-of-ml"
+      locator: "QUOTE verbatim: \"After you have a working end to end system with unit and system tests instrumented, Phase II begins.\" — LOCATOR: rules-of-ml, ML Phase II: Feature Engineering, introdução. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EVIDÊNCIAS ANCORADAS · Anthropic, Define success criteria ───────────────────────────
   - id: E_ANTHROPIC_SUCCESS_CRITERIA_FIRST
@@ -535,6 +683,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: critérios de sucesso específicos, mensuráveis, alcançáveis e relevantes são definidos ANTES de construir os evals. Elenxo NÃO sobreviveu: prova a ordem critério → eval. Só metade do guia fecha: as 4 claims de "develop test cases" (distribuição real, bordas, volume, automatizar correção) foram REJEITADAS por exagero.'
     trace: 'https://platform.claude.com/docs/en/test-and-evaluate/define-success'
+    provenance:
+      source: "https://platform.claude.com/docs/en/test-and-evaluate/define-success"
+      locator: "QUOTE verbatim: \"Building a successful LLM-based application starts with clearly defining your success criteria and then designing evaluations to measure performance against them.\" — LOCATOR: platform.claude.com/docs/en/test-and-evaluate/define-success, Define Success Criteria, abertura (parágrafo 1). Tier NÃO declarado pelo leitor. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_ANTHROPIC_ACHIEVABLE_TARGETS
     node_type: evidence
@@ -547,6 +699,10 @@ nodes:
     source_kind: primary
     label: 'ANCORADA: a meta se ancora em benchmark, experimento prévio, pesquisa ou conhecimento de especialista e não pode exceder a capacidade atual. Elenxo SOBREVIVEU: a frase prende a meta a "current frontier model capabilities" (LLMs de fronteira, não SLMs especialistas); ler "prior experiments" como "medir especialista pronto zero-shot" é inferência plausível que o guia não manda.'
     trace: 'https://platform.claude.com/docs/en/test-and-evaluate/define-success'
+    provenance:
+      source: "https://platform.claude.com/docs/en/test-and-evaluate/define-success"
+      locator: "QUOTE verbatim: \"Base your targets on industry benchmarks, prior experiments, AI research, or expert knowledge. Your success metrics should not be unrealistic to current frontier model capabilities.\" — LOCATOR: define-success, Define Your Success Criteria > Achievable. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EVIDÊNCIAS ANCORADAS · NVIDIA, conversão LLM → SLM em agentes (arXiv 2506.02153) ─────
   - id: E_NVIDIA_S1_INSTRUMENT
@@ -560,6 +716,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA: S1 — entrada: chamadas não-HCI do agente; saída: log seguro e anonimizado de prompts, respostas e tool calls; sem critério numérico (é instrumentação). Elenxo SOBREVIVEU: na NVIDIA a tarefa EMERGE dos logs (S1 → S3); no Onion a tarefa (PII/extração) foi escolhida de cima para baixo, antes de qualquer log — molde INVERTIDO, a declarar.'
     trace: 'https://arxiv.org/abs/2506.02153'
+    provenance:
+      source: "https://arxiv.org/abs/2506.02153"
+      locator: "QUOTE verbatim: \"deploying instrumentation to log all non-HCI agent calls, capturing input prompts, output responses, contents of individual tool calls, and optionally latency metrics for a later targeted optimization.\" — LOCATOR: arXiv 2506.02153, Seção 6, passo S1. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_NVIDIA_S2_CURATE_10K_100K
     node_type: evidence
@@ -572,6 +732,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA: S2 — entrada: logs do S1; saída: dataset curado sem PII/PHI; o único limiar é regra de bolso de VOLUME DE TREINO (10k-100k), não critério de qualidade. Elenxo SOBREVIVEU: é CIRCULAR para o Onion — S2 manda remover PII antes de especializar, e a tarefa candidata do Onion É o detector de PII; e 10k-100k não dimensiona eval.'
     trace: 'https://arxiv.org/abs/2506.02153'
+    provenance:
+      source: "https://arxiv.org/abs/2506.02153"
+      locator: "QUOTE verbatim: \"Once a satisfactory amount of data has been collected (10k-100k examples being sufficient for fine-tuning of small models as a rule of thumb [5, 22]), it is necessary to remove any PII, PHI\" — LOCATOR: arXiv 2506.02153, Seção 6, passo S2. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_NVIDIA_S3_CLUSTER_TASKS
     node_type: evidence
@@ -584,6 +748,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA: S3 — entrada: prompts e ações curados; saída: clusters que definem tarefas candidatas; SEM critério de saída. Elenxo SOBREVIVEU: não fornece gate e não se aplica ao Onion, cuja tarefa já foi escolhida.'
     trace: 'https://arxiv.org/abs/2506.02153'
+    provenance:
+      source: "https://arxiv.org/abs/2506.02153"
+      locator: "QUOTE verbatim: \"Employ unsupervised clustering techniques on the collected prompts and agent actions to identify recurring patterns of requests or internal agent operations [35, 42, 21]. These clusters help define candidate tasks\" — LOCATOR: arXiv 2506.02153, Seção 6, passo S3. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_NVIDIA_S4_SELECT_SLM
     node_type: evidence
@@ -596,6 +764,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA: S4 — entrada: tarefas do S3; saída: SLMs candidatos por tarefa; critérios: capacidade, benchmark do tipo de tarefa, licença e footprint; NÃO manda medir zero-shot antes de treinar. Elenxo SOBREVIVEU: seleciona por benchmark GENÉRICO, que C_EVAL_DESIGN_F1_FLOOR_REAL_ERRORS rejeita como suficiente — no Onion o S4 é SUBSTITUÍDO pelo eval selado; licença e footprint se aproveitam como filtro de entrada.'
     trace: 'https://arxiv.org/abs/2506.02153'
+    provenance:
+      source: "https://arxiv.org/abs/2506.02153"
+      locator: "QUOTE verbatim: \"Criteria for selection include the SLM’s inherent capabilities (e.g., instruction following, reasoning, context window size), its performance on relevant benchmarks for the task type, its licensing, and its deployment footprint\" — LOCATOR: arXiv 2506.02153, Seção 6, passo S4. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_NVIDIA_S5_FINETUNE_PEFT
     node_type: evidence
@@ -608,6 +780,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA: S5 — entrada: dataset de S2/S3; saída: SLM especialista afinado por PEFT (LoRA/QLoRA), ajuste completo ou destilação; NÃO há gate de aceitação medido entre S5 e S6. Elenxo SOBREVIVEU: o molde NVIDIA não tem gate medido em ponto nenhum — serve de ESQUELETO de etapas, não de critério de passagem.'
     trace: 'https://arxiv.org/abs/2506.02153'
+    provenance:
+      source: "https://arxiv.org/abs/2506.02153"
+      locator: "QUOTE verbatim: \"fine-tune the chosen SLMs on these specialized datasets. PEFT techniques such as LoRA [34] or QLoRA [20] can be leveraged to reduce computational costs and memory requirements\" — LOCATOR: arXiv 2506.02153, Seção 6, passo S5. Tier NÃO declarado pelo leitor. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── CONTABILIDADE DA RODADA ─────────────────────────────────────────────────────────────
   - id: E_LACUNAS_SLM_FRAMEWORKS_PRIMARIES_1005
@@ -621,6 +797,10 @@ nodes:
     source_kind: internal-audit
     label: 'CONTABILIDADE DA RODADA DE PRIMÁRIAS (2026-10-05). FONTES: 9 lidas × 0 inalcançáveis (smol-playbook, hf-evaluation-guidebook, lighteval, hf-llm-course-finetune, hamel-evals, eugene-yan-evals, google-rules-ml, anthropic-evals-guide, nvidia-slm-conversion). CLAIMS: 37 ANCORADAS (viraram nó) × 17 REJEITADAS na ancoragem (NÃO viram nó), TODAS por EXAGERO (zero não-encontradas — rejeitadas por esticar o texto, não por inexistência). Rejeitadas e motivo: [smol] eval por tarefa antes de treinar (a quote trata de ler ablações DEPOIS de lançadas; outras passagens sustentam, não ancoradas); [guidebook] pior caso em domínio sensível com PII e "F1 médio insuficiente" (PII não aparece; F1 só citado como métrica possível); dados sintéticos "alternativa, não certificação" (acréscimo editorial); avaliar o LLM-juiz com 50 exemplos, métrica binária e limiar ANTES (binário não é exigência; "antes" não está no texto); [hf-course] gate pós-treino held-out/template/retenção ("consider", não "manda"; sem critério de passagem); [hamel] cadência L1/L2/L3 com gates (prática pessoal; "There isn''t a strict formula"); olhar os dados como "fundação contínua" do L2 (a fundação do L2 é o L1); dimensionamento do 1º dataset como gate do spike (o critério é SATURAÇÃO — "Continue until new traces stop revealing failure modes" — com 100 traces de mínimo; 100-200 por modo de falha é do Stage 2); [yan] evals de prateleira não correlacionam (quote remontada, seção inexistente); humano padrão-ouro geral (o texto restringe a tarefas complexas e "for now"); [google] heurística dá metade do ganho como baseline (ilustração condicional); Regra 4 "o ganho vem da infraestrutura" (infra é esforço/risco, não fonte do ganho); [anthropic] temas vagos "devem" virar limiar (o texto diz "can be quantified"); privacidade com eval por critério e "não só acurácia" (generalização de exemplos); distribuição real "veta eval só sintético" (contrariado pelo exemplo de consultas simuladas); "volume sobre qualidade do gabarito" (desloca o contraste; omite "when possible"); [nvidia] laço S6 que "veta F1 genérico" (F1 não aparece; o paper não veta nada sobre gates). TIER: hamel, anthropic e nvidia sem tier declarado pelo leitor — campo AUSENTE; valid_from não declarado por nenhum leitor. FECHA PARCIALMENTE uma omissão do corpus: o Smol Training Playbook, OMITIDO na rodada onion-slm-2026-10, foi lido (eixo "quando treinar"; ablações sem transferência). LACUNAS QUE CONTINUAM ABERTAS (gapsOpen do Elenxo): (1) Smol: re-ancorar as passagens que sustentam eval-antes-de-treinar; (2) guidebook: LLM-as-judge (avaliar o avaliador, 50 de baseline, limiar), dados sintéticos e o "~100 amostras mínimo" sem âncora; (3) Anthropic: "develop test cases" com as 4 claims rejeitadas; (4) lighteval: serventia para modelos NÃO generativos (span/token) não provada; dataset local/privado sem âncora (hf_repo) em tensão com contaminação; (5) HF Course: gate pós-treino rejeitado, nenhum critério numérico; (6) NVIDIA: zero gates de aceitação e molde invertido (tarefa escolhida antes dos logs; S2 depende do próprio detector de PII); (7) TRANSVERSAL: nenhuma fonte usa spike → PoC → MVP → produto — cunhagem do Onion a declarar com autoria e data; (8) TRANSVERSAL: "resultado final possível" e "exemplos esperados" por etapa NÃO fechados por fonte nenhuma; (9) TRANSVERSAL: nenhum critério NUMÉRICO de passagem em nenhuma das 9 fontes; o único gate explícito é qualitativo (Google, Fase II); (10) TRANSVERSAL: o eixo invariante de MERCADO/CAPITAL e de trajetória de ferramentas (lighteval × alternativas) está AUSENTE desta rodada — cláusula 4 da doutrina de pesquisa não cumprida; (11) Q_SLM_OPTION_C_EVAL_STARTS_WITH_OFF_THE_SHELF segue open — nenhum especialista foi MEDIDO, a rodada só reuniu método; (12) Q_EVAL_DE_DOMINIO_DO_ONION segue open — sem tamanho mínimo ancorado, sem segundo rotulador, sem política de exclusão da porta onion-core para o eval selado.'
     trace: 'workflow onion-research (mode primaries), run wf_e53f21ed-be6, 2026-10-05'
+    provenance:
+      source: "workflow onion-research (mode primaries), run wf_e53f21ed-be6, 2026-10-05"
+      locator: "retorno do workflow onion-research mode primaries de 2026-10-05 (run wf_e53f21ed-be6): listas de claims ANCORADAS (37), REJEITADAS na ancoragem (17), fontes inalcançáveis (nenhuma) e o Elenxo completo (36 objeções + gapsClosed + gapsOpen + recommendation) lido no journal do run, linha 39"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── LEITURAS DE SÍNTESE: o roteiro gradual por etapa (cunhagem do Onion sobre a ordem das fontes) ──
   - id: C_ROADMAP_VOCAB_IS_ONION_COINAGE

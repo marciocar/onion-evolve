@@ -66,6 +66,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 2-1): "A API GraphQL do GLPI (endpoint /api.php/GraphQL) e somente leitura (sem mutators), o que a torna adequada especificamente para extracao de atividades para apuracao/relatorios (caso de uso fonte de atividade), sem risco de escrita acidental via essa via." ⚠️ A SEGUNDA METADE DESTA FRASE NAO SOBREVIVEU AO ELENXO: read-only nao e suficiente (a atividade por tarefa com tempo e justamente a lacuna conhecida da API) nem e garantia de seguranca (a legacy API COM escrita continua disponivel). Ver E_OBJECAO_1_READONLY_NEM_SUFICIENTE_NEM_SEGURO. E a existencia da GraphQL/v2 NA INSTANCIA da empresa nunca foi medida.'
     trace: 'https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2'
+    provenance:
+      source: "https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2"
+      locator: "https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2 — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_ZOHO_SEM_ENDPOINT_TRANSICAO
     node_type: evidence
@@ -79,6 +83,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 2-1): "Zoho Projects nao tem um endpoint dedicado de transicao de status (diferente do Jira, que exige POST /issue/{key}/transitions); a mudanca de status e feita reaproveitando o endpoint genérico de Update Task com o parametro status/custom_status." Consequencia de desenho: `updateStatus`, 1 dos 14 metodos da interface do task-manager, mapeia para um PATCH/POST genérico — nao ha stub, ha mapeamento. ⚠️ Confianca rebaixada a 0.55 porque o achado NAO REGISTRA A VERSAO do endpoint e a propria pagina e MISTA (v2 e v3 convivem nela) — ver E_OBJECAO_2_ZOHO_V3_CORTE_DEZ_2025.'
     trace: 'https://www.zoho.com/projects/help/rest-api/tasks-api.html'
+    provenance:
+      source: "https://www.zoho.com/projects/help/rest-api/tasks-api.html"
+      locator: "https://www.zoho.com/projects/help/rest-api/tasks-api.html — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_GLPI_CLOUD_SAAS_OVH_EUROPA
     node_type: evidence
@@ -93,6 +101,10 @@ nodes:
     source_kind: vendor
     label: 'CONFIRMADA (tier 7, 2-1): "GLPI Network Cloud e oferecido como SaaS, com servidores localizados na Europa, operados pela OVH, e backup diario dos dados — relevante como possivel fonte de atividade GLPI hospedada antes de migrar para self-hosted em VPS." ⚠️ Impacto rebaixado a 2 e confianca a 0.5: e pagina de VENDAS (tier 7), o "backup diario" e propriedade de DISPONIBILIDADE e nao caminho de SAIDA, e NADA nesta rodada estabeleceu que a empresa roda o Network Cloud — o maestro disse apenas que "hoje buscamos as atividades la via API". Ver E_OBJECAO_3_INSTANCIA_REAL_NUNCA_MEDIDA.'
     trace: 'https://www.glpi-project.org/en/glpi-network-cloud/'
+    provenance:
+      source: "https://www.glpi-project.org/en/glpi-network-cloud/"
+      locator: "https://www.glpi-project.org/en/glpi-network-cloud/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1); pagina de VENDAS do fornecedor"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_GLPI_EXPORT_DOC_DESACONSELHA_PHPMYADMIN
     node_type: evidence
@@ -106,6 +118,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0): "A documentacao oficial do GLPI desaconselha explicitamente phpMyAdmin (dumps incompletos), o menu de Manutencao do GLPI (recurso legado) e PowerShell (codificacao nao-padrao) como metodos de exportacao para migracao, recomendando apenas CLI ou HeidiSQL." O que a rodada NAO extraiu e e o fato decisivo: o metodo recomendado abre com "Once connected in CLI on your server hosting your database" — pressupoe shell/DB no servidor, que e exatamente o que uma instancia HOSPEDADA nega, e a pagina nao tem uma linha sobre cloud->self-hosted. Isso INVERTE a ordem D1 proposta pelo maestro. Ver E_OBJECAO_4_EXPORT_DOCUMENTADO_INVERTE_A_ORDEM.'
     trace: 'https://help.glpi-project.org/tutorials/my-instance/export_database'
+    provenance:
+      source: "https://help.glpi-project.org/tutorials/my-instance/export_database"
+      locator: "https://help.glpi-project.org/tutorials/my-instance/export_database — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0); citacao verbatim confirmada na pagina"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_GLPI_DOCKER_PAGINA_SILENTE
     node_type: evidence
@@ -119,6 +135,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0) e VAZIA DE INFORMACAO: "Esta pagina oficial do GLPI sobre Docker NAO trata de integracao com task managers externos (como Zoho Projects), nao menciona a REST API do GLPI, nem descreve procedimento de migracao/backup entre uma instancia online e uma self-hosted — a questao de como o adapter SDAAL do Onion se conecta ao GLPI como fonte de atividade permanece sem resposta nesta fonte." Registrado por honestidade (achado negativo e dado), com impacto 2: um dos 5 achados da rodada e a constatacao de que uma fonte nao responde. Ver E_OBJECAO_5_ACHADO_VAZIO_COM_DEZ_NAO_LIDAS para o que isso diz sobre o PROCESSO da rodada.'
     trace: 'https://www.glpi-project.org/en/run-glpi-with-docker/'
+    provenance:
+      source: "https://www.glpi-project.org/en/run-glpi-with-docker/"
+      locator: "https://www.glpi-project.org/en/run-glpi-with-docker/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0); achado NEGATIVO (ausencia de informacao na fonte)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── MEDIÇÃO PRÓPRIA (a casa, não a web) ──────────────────────────────────────────────
   - id: E_FORGE_PRECEDENTE_MEDIDO_16_METODOS
@@ -133,6 +153,10 @@ nodes:
     source_kind: measurement
     label: 'MEDIDA NA CASA (tier 10): a familia SDAAL IRMA com interface PROPRIA ja e precedente vivo e nao hipotese — `.claude/utils/forge/` tem 16 metodos seus (nenhum compartilhado com os 14 do task-manager) e um `NoForgeAdapter` que degrada com elegancia (modo local: push funciona, PR/CI degradam). Isto e o que sustenta a OPCAO A tecnicamente: nascer `.claude/utils/activity-source/` com 4-6 metodos proprios nao inventa padrao, REPETE um que a casa ja roda. Observacao que corta para os dois lados: o forge tambem mostra que familia irma custa README + detector + factory + interface + types + adapters — e a rodada NAO mediu esse custo para o activity-source.'
     trace: '.claude/utils/forge/interface.md'
+    provenance:
+      source: ".claude/utils/forge/interface.md"
+      locator: "medicao nesta sessao: grep dos metodos em .claude/utils/forge/interface.md devolve EXATAMENTE 16 — createPR, updatePR, getPR, getPRStatus, listPRs, mergePR, addReviewComment, getReviewComments, updateReviewComment, requestReviewers, getCIStatus, getCheckRuns, createRelease, getRelease, validateRepo, getProviderFromRemote; e `NoForgeAdapter` existe em .claude/utils/forge/adapters/none.md (tambem citado em README.md e factory.md). Comparacao: .claude/utils/task-manager/ tem interface propria de 14 metodos e 5 adapters (jira 887 linhas, clickup 796, linear 785, asana 546, none 46)."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EIXO MERCADO (invariante, mesmo vazio) ───────────────────────────────────────────
   - id: E_MERCADO_ZOHO_GLPI_0923
@@ -252,6 +276,10 @@ nodes:
     source_kind: community
     label: 'OBJECAO SOBREVIVENTE 1 (confianca 0.6 — UM agente, sem votacao) — tripla, contra E_GLPI_GRAPHQL_READONLY. (i) READ-ONLY NAO E SUFICIENTE, e a lacuna e EXATAMENTE a atividade que o maestro apura: o forum primario diz "The actiontime field on the ticket itself is just one accumulated total, which isn.t enough", "The only field that we could find that is exportable via the REST API is actiontime", "We also tried the timetracking plugin, but it doesn.t seem to work reliably on GLPI 10.x"; um moderador reconhece a lacuna e diz que o suporte na API nova e "still a work in progress"; o workaround real relatado e plugin Advanced Dashboard + export CSV, NAO a API. (ii) READ-ONLY NAO E SEGURO: a propria pagina v2 diz "The original API is now referred to as the legacy API but it is still available and in some cases, allows more functionality" — se a cobertura empurrar para a legacy, cai-se numa superficie COM escrita (POST/PUT/DELETE, auth por app-token/user-token), e a garantia de "sem escrita acidental" evapora; ela tem de vir de PERFIL/ESCOPO DE TOKEN no GLPI, nao da ausencia de mutators. (iii) A EXISTENCIA da GraphQL/v2 NA INSTANCIA nunca foi medida: a pagina v2 nao tem nota de versao (verificado), a release note do 11.0.0 nao menciona API nova, e coexistem 10.0.27 mantido, 11.0.9 GA e 12.0.0-rc2 (2026-09-16, github.com/glpi-project/glpi/releases).'
     trace: 'https://forum.glpi-project.org/viewtopic.php?id=294972'
+    provenance:
+      source: "https://forum.glpi-project.org/viewtopic.php?id=294972"
+      locator: "https://forum.glpi-project.org/viewtopic.php?id=294972 — fonte que a rodada listou como NAO LIDA e que o Elenxo leu, com trechos verbatim; cruzada com a propria pagina v2 do GLPI e com github.com/glpi-project/glpi/releases. Afirmacao de UM agente, sem votacao adversarial."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_2_ZOHO_V3_CORTE_DEZ_2025
     node_type: evidence
@@ -266,6 +294,10 @@ nodes:
     source_kind: vendor-partner
     label: 'OBJECAO SOBREVIVENTE 2 (confianca 0.55 — UM agente, tier 4 no ponto decisivo) — contra E_ZOHO_SEM_ENDPOINT_TRANSICAO. O achado nao registra a VERSAO do endpoint, e a pagina citada e MISTA: expoe endpoints v2 em /restapi/portal/[PORTALID]/projects/[PROJECTID]/tasks/ E endpoints v3 em /api/v3/portal/[PORTALID]/..., incluindo GET /api/v3/portal/{Portal_Id}/taskstatushistory — ha superficie v3 DEDICADA a status que o achado ignora. Pior: a fonte de consultoria (tier 4) afirma "All pre-V3 Zoho Projects APIs vanish on 31 December 2025", "Any call to a legacy endpoint will 404/410 from 1 January 2026" e "Replace POST /update calls with PATCH". Hoje e 2026-09-23 — NOVE MESES depois do corte alegado. O achado pode estar descrevendo o meio MORTO de uma pagina viva. ⚠️ A primaria que fecharia isto, projects.zoho.com/api-docs, e PRIMARIO CITADO E NAO LIDO — o corte de 31/12/2025 NAO esta confirmado em fonte de 1a parte nesta rodada. Consequencia de desenho: `updateStatus` e 1 dos 14 metodos e e precisamente onde nasce stub ou quebra em producao; falta ainda medir se `custom_status` aceita NOME ou exige ID NUMERICO (tabela de mapeamento no adapter).'
     trace: 'https://www.zoho.com/projects/help/rest-api/tasks-api.html'
+    provenance:
+      source: "https://www.zoho.com/projects/help/rest-api/tasks-api.html"
+      locator: "https://www.zoho.com/projects/help/rest-api/tasks-api.html (lida pelo Elenxo: expoe v2 e v3 na MESMA pagina) + https://ascentbusiness.co.uk/zoho-projects-api-deadline-migrate-to-v3-by-31-december-2025/ (consultoria/parceiro, tier 4). A primaria projects.zoho.com/api-docs e PRIMARIO CITADO, NAO LIDO. Afirmacao de UM agente, sem votacao."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_3_INSTANCIA_REAL_NUNCA_MEDIDA
     node_type: evidence
@@ -279,6 +311,10 @@ nodes:
     source_kind: vendor
     label: 'OBJECAO SOBREVIVENTE 3 (confianca 0.6 — UM agente) — tres defeitos em E_GLPI_CLOUD_SAAS_OVH_EUROPA. (a) E ESPECULACAO SOBRE A INSTANCIA REAL: nenhuma rodada mediu QUAL hospedagem/versao a empresa roda; um GET /api.php/ autenticado (ou o rodape da UI) decide tudo o que vem depois, e e 1 comando — a migalha da casa verify-access-before-specifying registra 3 rodadas perdidas por nao tentar ler o sistema antes de especificar em volta dele. (b) "BACKUP DIARIO" E PROPRIEDADE DE DISPONIBILIDADE, NAO CAMINHO DE SAIDA: a pagina de export instrui "Once connected in CLI on your server hosting your database" — acesso que SaaS nao da — e nao tem UMA linha sobre cloud->self-hosted. (c) DADO DE ATIVIDADE DA EMPRESA EM SAAS EUROPEU levanta residencia/LGPD e direito de saida contratual, que o achado apresenta como VANTAGEM. Tudo isso num tier 7 de pagina de VENDAS, promovido a achado enquanto fontes tier 9 ficaram nao-lidas.'
     trace: 'https://www.glpi-project.org/en/glpi-network-cloud/'
+    provenance:
+      source: "https://www.glpi-project.org/en/glpi-network-cloud/"
+      locator: "https://www.glpi-project.org/en/glpi-network-cloud/ (tier 7, pagina de vendas) confrontada com: a fala do maestro (\"hoje buscamos as atividades la via API\", sem dizer a hospedagem) e com https://help.glpi-project.org/tutorials/my-instance/export_database, lida pelo Elenxo, que instrui \"Once connected in CLI on your server hosting your database\" e nao tem uma linha sobre cloud->self-hosted. Afirmacao de UM agente, sem votacao."
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_4_EXPORT_DOCUMENTADO_INVERTE_A_ORDEM
     node_type: evidence
@@ -292,6 +328,10 @@ nodes:
     source_kind: primary
     label: 'OBJECAO SOBREVIVENTE 4 (confianca 0.6 — UM agente; a CITACAO e tier 9 e verbatim) — a evidencia E_GLPI_EXPORT_DOC_DESACONSELHA_PHPMYADMIN esta carregando peso na DIRECAO ERRADA. O metodo recomendado pressupoe shell/DB — "Once connected in CLI on your server hosting your database" + mysqldump/tar, com alternativa HeidiSQL exigindo conectividade direta ao banco — que e exatamente o que uma instancia HOSPEDADA nega. E a pagina nao tem procedimento cloud->self-hosted. A CONCLUSAO QUE O RELATORIO NAO TIROU: o unico caminho de export DOCUMENTADO so existe DEPOIS que voce ja self-hospeda, o que INVERTE a ordem "online primeiro, VPS depois" (D1) que o maestro propos. Um achado que descreve COMO exportar nao responde SE VOCE PODE exportar — e essa segunda pergunta e a que decide D1 vs D2/D3.'
     trace: 'https://help.glpi-project.org/tutorials/my-instance/export_database'
+    provenance:
+      source: "https://help.glpi-project.org/tutorials/my-instance/export_database"
+      locator: "https://help.glpi-project.org/tutorials/my-instance/export_database — citacao verbatim tier 9 confirmada (\"Once connected in CLI on your server hosting your database\", mysqldump/tar, alternativa HeidiSQL exigindo conectividade direta ao banco), lida pelo Elenxo, e AUSENCIA verificada de procedimento cloud->self-hosted na pagina. Afirmacao de UM agente, sem votacao."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_5_ACHADO_VAZIO_COM_DEZ_NAO_LIDAS
     node_type: evidence
@@ -318,6 +358,10 @@ nodes:
     source_kind: primary
     label: 'OBJECAO SOBREVIVENTE 6 (confianca 0.55 — UM agente; texto do handoff TRUNCADO, ver verified_against) — a claim "basta trocar a base URL" foi DESCARTADA SEM OLHAR, e ela e justamente a que sustentaria "migrar sem reescrever o adapter". Tres coisas nunca verificadas: (1) se a v2/GraphQL existe na versao INSTALADA (10.0.27 segue mantido; a doc v2 nao tem nota "since"; a release note do 11.0.0 nao menciona API nova); (2) se o GLPI Network Cloud PERMITE criar client OAuth2 (e config de administracao, que SaaS pode nao expor); (3) que a legacy API usa app-token/user-token — auth COMPLETAMENTE diferente, logo "basta trocar a base URL" falha no caso em que a cobertura empurra para a legacy (que e o caso que E_OBJECAO_1 torna provavel). ⚠️ O terceiro ponto interrompe no handoff em "basta trocar a base UR" — o que vinha depois NAO foi reconstruido por adivinhacao. Consequencia: a promessa central da pergunta do maestro ("sem reescrever o adapter") esta NAO VERIFICADA nos dois sentidos — nem confirmada, nem refutada por evidencia.'
     trace: 'https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2'
+    provenance:
+      source: "https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2"
+      locator: "a claim REFUTADA \"a API v2 autentica por OAuth2 Password Grant e nao distingue cloud vs self-hosted, logo basta trocar a base URL\" (https://help.glpi-project.org/documentation/modules/configuration/general/api/restful-api-v2, tier 9) reaberta pelo Elenxo sob a clausula 6 (descartado por evidencia ou por comodismo?) — veredito: por comodismo. ⚠️ O texto desta objecao chegou TRUNCADO ao handoff desta sessao; modelados os 3 sub-pontos legiveis. Afirmacao de UM agente, sem votacao."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   # ── evidência -> pergunta (SUPPORTS) ─────────────────────────────────────────────────

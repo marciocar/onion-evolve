@@ -73,6 +73,10 @@ nodes:
     source_kind: primary
     label: 'MEDIÇÃO PRÓPRIA (tier 10, artefato instalado antes da web — cláusula 2 da doutrina de pesquisa): o corpus do Onion são 93 cabeçalhos de regra em 5.282 linhas de shell, com 13 baselines de catraca que só encolhem, ZERO SARIF, e NENHUMA guarda declarando dependência de outra. A dor do eixo 3 mora em `.githooks/pre-commit` e no pipeline de lint — script bash SEQUENCIAL, onde a ordem JÁ é expressável —, não nos hooks do Claude Code: a guarda nascida nesta sessão (`run_hook_chain_order_selftests`, lint-selftest.sh:4945) ancora no pre-commit, e nos dois únicos eventos com múltiplos hooks (SessionStart=4, UserPromptSubmit=4) não existe par escreve→lê. Este nó é o chão: tudo que a web disse acima se pesa contra ele, e é ele que desloca o diagnóstico do lugar onde o achado tier 10 apontava.'
     trace: '.claude/validation/lint-selftest.sh'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "Medido nesta sessão, nesta árvore, com comando por medida: (a) `grep -cE \"^# REGRA [0-9]+\" .claude/validation/lint-artifacts.sh` = 93 cabeçalhos de regra; (b) `wc -l .claude/validation/lint-artifacts.sh` = 5282 linhas; (c) `ls .claude/validation/*baseline*.txt` = 13 baselines de catraca (compose-exposure, doctrine-freshness, door-staleness, identifier-language, kb-applies-to, kb-vendored-link, kg-coverage, kg-verification, kg-yaml-validity, pipe-verdict, plugin-bare-path, radar-aufhebung, vendor-scrub-form); (d) `grep -ril sarif .claude docs` = 1 ocorrência, e ela é o PRÓPRIO pré-registro escrito hoje, logo SARIF é ZERO no motor e na doutrina; (e) `grep -n run_hook_chain_order_selftests .claude/validation/lint-selftest.sh` = linha 4945, e a linha 4946 ancora em `${REPO_ROOT}/.githooks/pre-commit`; (f) hooks por evento no settings.json, contados por python3/json: SessionStart 4, UserPromptSubmit 4, PreToolUse 3, os demais 1; (g) o único par escreve/lê entre hooks é `premodelswitch-guard.sh` (escreve .claude/sessions/model-switch.jsonl, evento PreModelSwitch) e `session-degraded-notice.sh` (lê, evento UserPromptSubmit) — eventos DIFERENTES, logo fora de qualquer corrida paralela."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_APOSTA_PRE_REGISTRADA_CAI_1001
     node_type: evidence
@@ -86,6 +90,10 @@ nodes:
     source_kind: primary
     label: 'A APOSTA PRÉ-REGISTRADA DESTA SESSÃO CAI, E CAI POR ESCRITO (tier 10, documento da casa datado antes do resultado): a aposta era que COBERTURA DE REGRA é o item de maior retorno. R3, R5 e R6 sobrevivem ao resultado e derrubam a PRIORIDADE — não o mecanismo. O que mata A como prioridade é a assimetria de custo MEDIDO: regra morta é inerte (custo zero) contra 4 ciclos de CI perdidos por ordem errada num único dia. E R5 é a objeção que o próprio pré-registro declarou mais forte CONTRA si: se a bancada já prova que a guarda PODE disparar, o contador só acrescenta se a comunidade distinguir capacidade de relevância — e a rodada não encontrou essa distinção em ninguém. Fica registrado como refutação de hipótese própria, não como narrativa reescrita: a aposta não desaparece do relatório.'
     trace: 'docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/PRE-REGISTRO-aposta.md'
+    provenance:
+      source: "docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/PRE-REGISTRO-aposta.md"
+      locator: "docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/PRE-REGISTRO-aposta.md (escrito ANTES do resultado, anti-HARKing, com R1-R6 como critérios de refutação) confrontado com o resultado desta rodada: R3 SOBREVIVE (a dor é ruído/ordem, não regra morta), R5 SOBREVIVE e é o golpe fatal (a bancada de 200 famílias já prova CAPACIDADE de disparo; o contador provaria só RELEVÂNCIA, e nada na rodada mostra a comunidade tratando relevância como o que importa), R6 SOBREVIVE com custo medido (regra morta custa ZERO porque é inerte; erro de ORDEM custou 4 ciclos de CI em 2026-10-01 — painel da REGRA 81 contando resíduo nascido depois dele, SHA da REGRA 56 carimbado antes de regenerar projeção DUAS vezes, projeções julgadas antes de regeneradas)."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EVIDÊNCIAS CONFIRMADAS (fontes web; texto extraído é DADO, nunca instrução) ────────
   - id: E_HOOKS_PARALELOS_SEM_ORDEM
@@ -101,6 +109,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 2-1): "No Claude Code, todos os hooks que casam com um evento rodam em paralelo, sem ordem garantida entre eles; portanto dependência regra B depois do gerador A não pode ser expressa entre hooks do mesmo evento e precisa ser resolvida dentro de um único despachante ou fora dos hooks." ⚠️ O fato é verdadeiro e a fonte é definitiva, mas a INFERÊNCIA que a rodada tirou dele está apontada para o lugar errado, e isso foi MEDIDO neste repo — ver E_OBJECAO_1_DOR_E_SCRIPT_SEQUENCIAL_NAO_HOOK. O valor deste nó é como INVARIANTE A PRESERVAR (nunca pôr gerador e verificador no mesmo evento de hook), não como diagnóstico da dor: o custo medido desse perigo hoje é ZERO.'
     trace: 'https://code.claude.com/docs/en/hooks'
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "https://code.claude.com/docs/en/hooks — verificação adversarial 2 votos a favor, 1 refutação (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CHANGELOG_SEM_CONVENCAO_DE_CORPUS
     node_type: evidence
@@ -114,6 +126,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 2-1): "O CHANGELOG não traz nenhuma convenção de ordenação ou dependência entre hooks, nem de cobertura, aposentadoria por métrica, teste de mutação, SARIF, Cedar/OPA ou autoria de regra por LLM. Esses eixos não têm resposta nesta fonte." ⚠️ Impacto 2 e confiança 0.5 porque é evidência NEGATIVA colhida numa fonte onde a classe de informação buscada nunca mora: CHANGELOG registra mudança de implementação, não convenção de engenharia de corpus — o resultado era previsível antes do fetch. Ver E_OBJECAO_2_EVIDENCIA_NEGATIVA_EM_FONTE_ERRADA, inclusive para a tensão com E_CHANGELOG_COBRE_HOOKS_E_EXIT_2, que diz que a MESMA página cobre hooks.'
     trace: 'https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md'
+    provenance:
+      source: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md"
+      locator: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md — verificação adversarial 2 votos a favor, 1 refutação (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_ESLINT_CIRCULAR_FIX_RUNTIME_SEM_NOMES
     node_type: evidence
@@ -127,6 +143,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0): "O ESLint detecta fixes circulares em runtime (regra A desfaz o fix da regra B entre passes) e emite um aviso nomeado, mas a mensagem não nomeia quais regras conflitam." É a ÚNICA convenção de RUNTIME que a rodada encontrou para conflito entre regras, e por isso impacto 5: a detecção existe e é automática, mas para no sintoma — quem lê o aviso ainda tem de descobrir à mão o par culpado, o que é exatamente o padrão que esta casa chama de falhar sem NOMEAR. Ver E_OBJECAO_3_FIXPOINT_DO_ESLINT_SUBEXPLORADO para a lição transferível que a rodada tinha nas mãos e não converteu em candidato de absorção.'
     trace: 'https://eslint.org/docs/head/use/troubleshooting/circular-fixes'
+    provenance:
+      source: "https://eslint.org/docs/head/use/troubleshooting/circular-fixes"
+      locator: "https://eslint.org/docs/head/use/troubleshooting/circular-fixes — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_ESLINT_AUTOFIX_MULTIPASSE_NAO_DERIVADO
     node_type: evidence
@@ -140,6 +160,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0): "O autofix do ESLint opera em múltiplos passes; a ordem/conflito não é declarada nem derivada estaticamente, e a interação entre regras só aparece ao executar." Impacto 5 porque o DESENHO escondido nesta frase é a resposta mais útil que a rodada trouxe ao eixo 3: aplicar FIXERS em múltiplos passes até o FIXPOINT e só então considerar o resultado estável. Isso cura, por construção e sem declarar DAG nenhum, a classe ARTEFATO-CADUCO desta casa (carimbar o SHA da REGRA 56 antes de regenerar projeção), e o pipeline do core TEM auto-fix real (`sed -i` e `git add` dentro de `.githooks/pre-commit`). A metade NEGATIVA da frase ("não é derivada estaticamente") é a resposta ao eixo 3 pelo lado do incumbente, e deveria ter PROMOVIDO a busca por quem deriva — as três candidatas (Nx inferred tasks, Ruff, overcommit#143) ficaram não lidas.'
     trace: 'https://eslint.org/docs/head/use/troubleshooting/circular-fixes'
+    provenance:
+      source: "https://eslint.org/docs/head/use/troubleshooting/circular-fixes"
+      locator: "https://eslint.org/docs/head/use/troubleshooting/circular-fixes — verificação adversarial 3 votos a favor, 0 refutações (3-0). MESMA URL de E_ESLINT_CIRCULAR_FIX_RUNTIME_SEM_NOMES: são duas proposições distintas da mesma página, e a objeção 4 mediu que isso infla o numerador."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CEDAR_ANALISE_DETECTA_SOMBREADO
     node_type: evidence
@@ -154,6 +178,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 2-1): "Cedar Analysis (Apache 2.0, repo cedar-policy/cedar-spec) detecta automaticamente por análise estática/SMT do corpus de políticas: permits sombreados (shadowed), condições impossíveis, forbid que anula permits e negação total de ações." É a melhor resposta ABSOLUTA ao eixo 2 que existe hoje. ⚠️ Confiança 0.6 por duas razões nomeadas: (a) `valid_from` 2025-06-16 é anterior a out/2026 e o escopo da rodada exigia sinal de 2026 — a atualidade não foi reverificada; (b) a capacidade NÃO é portável para o corpus do Onion, e o achado original não dizia isso — ver E_OBJECAO_5_CEDAR_NAO_E_PORTAVEL.'
     trace: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/'
+    provenance:
+      source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
+      locator: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/ — verificação adversarial 2 votos a favor, 1 refutação (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CEDAR_CLI_COMPARA_DOIS_CORPUS
     node_type: evidence
@@ -168,6 +196,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 3-0): "A CLI compara dois conjuntos de políticas e classifica a relação como Equivalent, More Permissive, Less Permissive ou Incomparable, permitindo verificar que uma refatoração não mudou permissões sem querer." É a peça mais forte da rodada para o eixo 2. ⚠️ Não toca o eixo 3 (prioridade declarada do maestro): comparar dois corpus não diz nada sobre "B só roda depois do gerador A". E o análogo barato DESTA CASA já existe numa forma degenerada e não foi nomeado pela rodada: as 13 baselines de CATRACA QUE SÓ ENCOLHEM são exatamente um teste de "menos permissivo ou igual" entre duas versões do corpus — ver E_OBJECAO_6_CATRACA_JA_E_MENOS_PERMISSIVO.'
     trace: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/'
+    provenance:
+      source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
+      locator: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/ — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CEDAR_ANALISE_COMPLETA_PROVA_LEAN_SMT
     node_type: evidence
@@ -182,6 +214,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 3-0): "A análise é correta e completa, com prova formalizada em Lean, usando SMT solvers (ex.: CVC5) sobre fórmulas que representam todas as requisições possíveis." Este nó é o que EXPLICA por que a capacidade do Cedar não se transporta: correção e completude vêm de a linguagem ser RESTRITA e decidível, com codificação SMT do espaço de requisições. Shell arbitrário não tem codificação SMT nenhuma — logo "análise estática do corpus" é propriedade da LINGUAGEM, não prática de engenharia a copiar.'
     trace: 'https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/'
+    provenance:
+      source: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/"
+      locator: "https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies/ — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SEMGREP_DEDUP_FINDING_NAO_REGRA
     node_type: evidence
@@ -195,6 +231,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 2-1): "Semgrep deduplica FINDINGS (ocorrências) por fingerprint match_based_id derivado de caminho do arquivo, nome da regra e padrão com metavariáveis substituídas; não detecta sobreposição entre REGRAS distintas." É a resposta NEGATIVA do líder de mercado ao eixo 2. ⚠️ Este é 1 de QUATRO nós extraídos desta mesma URL (com E_SEMGREP_FINGERPRINT_INCLUI_NOME_DA_REGRA, E_SEMGREP_FINGERPRINT_CORRELACAO_ENTRE_BRANCHES e E_SEMGREP_API_EXIGE_DEDUP_TRUE) — ver E_OBJECAO_7_QUATRO_ACHADOS_DE_UMA_URL_NEGATIVA.'
     trace: 'https://docs.semgrep.dev/semgrep-code/remove-duplicates'
+    provenance:
+      source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
+      locator: "https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 2 votos a favor, 1 refutação (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SEMGREP_FINGERPRINT_INCLUI_NOME_DA_REGRA
     node_type: evidence
@@ -208,6 +248,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 3-0): "Como o match_based_id inclui o nome da regra, duas regras diferentes cobrindo o mesmo código geram findings distintos: dedup é por identidade de achado ao longo do tempo, não análise estática do corpus de regras." Impacto 5 porque a conclusão OPERACIONAL está invertida pela própria evidência: se o fingerprint é (arquivo, regra, padrão com metavariáveis), então REMOVER o componente "regra" e agrupar por (arquivo, trecho) é precisamente um detector de SOBREPOSIÇÃO entre regras — barato, sem ferramenta nova, e construível no shell que já existe. A rodada tinha a chave e concluiu "não dá". Ver E_OBJECAO_8_FINGERPRINT_SEM_REGRA_E_DETECTOR_DE_SOBREPOSICAO.'
     trace: 'https://docs.semgrep.dev/semgrep-code/remove-duplicates'
+    provenance:
+      source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
+      locator: "https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SEMGREP_FINGERPRINT_CORRELACAO_ENTRE_BRANCHES
     node_type: evidence
@@ -221,6 +265,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 3-0): "A correlação por fingerprint entre branches consolida findings automaticamente, facilitando a triagem (baseline/dedup de achados, não de regras)." É o que o eixo 6 (intercâmbio e triagem) dá de graça e um motor caseiro não tem: identidade estável de achado ATRAVÉS de branches, que é o que permite "só o que nasceu neste diff" sem reimplementar baseline.'
     trace: 'https://docs.semgrep.dev/semgrep-code/remove-duplicates'
+    provenance:
+      source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
+      locator: "https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SEMGREP_API_EXIGE_DEDUP_TRUE
     node_type: evidence
@@ -234,6 +282,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 3-0): "A API do Semgrep não agrupa findings com mesmo match-based ID entre branches por padrão; é preciso passar dedup=true." Nó pequeno com lição grande para a opção C: o benefício do intercâmbio NÃO vem ligado — é um default que engana, e quem adota paga em pegadinha de flag. É a mesma classe de armadilha que esta casa já mediu no portal da Zoho (parâmetro aceito e ignorado, HTTP 200).'
     trace: 'https://docs.semgrep.dev/semgrep-code/remove-duplicates'
+    provenance:
+      source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
+      locator: "https://docs.semgrep.dev/semgrep-code/remove-duplicates — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CEDAR_AUTORIZA_AGENTE_TRES_CAMADAS
     node_type: evidence
@@ -248,6 +300,10 @@ nodes:
     source_kind: engineer
     label: 'CONFIRMADA (tier 7, 3-0): "Cedar é usado como policy engine para autorizar agentes de IA em cadeias multi-agente em 3 camadas (agente-ferramenta, agente-agente, usuário de origem), com avaliação ordenada L1→L2→L3 e halt no primeiro deny; a ordem é fixa por camada, sem derivação de dependência entre políticas." É o eixo 7 pelo lado inverso (política autorizando AGENTE), com sinal de 2026, e é a confirmação de que mesmo o motor mais analisável do mercado resolve ORDEM por camada FIXA declarada — ninguém deriva. Ver E_OBJECAO_9_TRUNCADA_ORDEM_FIXA_SEM_DERIVACAO.'
     trace: 'https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/'
+    provenance:
+      source: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/"
+      locator: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/ — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_AUTOCEDAR_LLM_COM_VERIFICADOR_SMT
     node_type: evidence
@@ -262,6 +318,10 @@ nodes:
     source_kind: paper
     label: 'CONFIRMADA (tier 7, 3-0): "AutoCedar (arXiv 2607.03656, jul/2026) usa um laço agêntico de LLM com verificador formal (SMT, Cedar) como gate para autoria de políticas de controle de acesso, de modo que a política gerada é verificada antes de ser aceita." É a melhor resposta ao eixo 7 (autoria com IA) e é de 2026. O padrão — LLM AUTORA, verificador determinístico ADMITE — é exatamente a forma que esta casa já pratica com outro nome: a bancada admite a guarda, o lint admite o artefato, o radar admite o grafo. Transferível como CONFIRMAÇÃO de desenho, não como ferramenta.'
     trace: 'https://arxiv.org/pdf/2607.03656'
+    provenance:
+      source: "https://arxiv.org/pdf/2607.03656"
+      locator: "https://arxiv.org/pdf/2607.03656 — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_PRECOMMIT_R_CHECKER_DEPOIS_DE_FIXER
     node_type: evidence
@@ -275,6 +335,10 @@ nodes:
     source_kind: engineer
     label: 'CONFIRMADA (tier 5, 3-0): "The R precommit package hook-order vignette states a general ordering rule: hooks that only read (checkers) should run after hooks that write (fixers/generators)." Tier 5, mas impacto 5: é a ÚNICA convenção EXPLÍCITA de ordenação que a rodada encontrou em qualquer ecossistema, e ela é exatamente a regra que o Onion precisa — e que o Onion violou 4 vezes num dia. Decisivo para a opção B: a regra é UNIVERSAL (escritores antes de leitores) e, sendo universal, é DERIVÁVEL se o motor souber quem escreve e quem lê — o que dispensa declaração à mão. Na mesma página, a claim de que as dependências de ordem são declaradas par a par À MÃO foi REFUTADA nesta rodada (ver E_LACUNAS).'
     trace: 'https://lorenzwalthert.r-universe.dev/precommit/doc/hook-order.html'
+    provenance:
+      source: "https://lorenzwalthert.r-universe.dev/precommit/doc/hook-order.html"
+      locator: "https://lorenzwalthert.r-universe.dev/precommit/doc/hook-order.html — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_GITLAB_APOSENTA_REGRA_POR_FALSO_POSITIVO
     node_type: evidence
@@ -288,6 +352,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 5, 3-0): "O GitLab propôs remover a regra detect-object-injection do ESLint e do Semgrep (analisadores SAST) por taxa alta de falso positivo, pois ela casa em quase todo acesso a propriedade via colchetes." É o único caso REAL e nomeado de APOSENTADORIA DE REGRA POR MÉTRICA que sobreviveu à verificação — e sustenta R3 do pré-registro: o que mata a adoção de um gate é RUÍDO, não regra morta. A outra metade do achado (o critério de sucesso ser queda de dismissal rastreada em dashboard) foi REFUTADA nesta rodada; ver E_LACUNAS.'
     trace: 'https://gitlab.com/gitlab-org/gitlab/-/issues/351399'
+    provenance:
+      source: "https://gitlab.com/gitlab-org/gitlab/-/issues/351399"
+      locator: "https://gitlab.com/gitlab-org/gitlab/-/issues/351399 — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SEMGREP_KB_FP_NAO_RESPONDE_EIXOS
     node_type: evidence
@@ -301,6 +369,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 5, 3-0): "A página não trata de sobreposição/conflito entre regras, sequenciamento/dependência, teste de mutação, SARIF/baseline nem autoria por IA; é irrelevante para os eixos 2, 3, 6 e 7." Evidência negativa útil por um motivo só: a página do líder de mercado DEDICADA a falso positivo não menciona nada de corpus-como-sistema. Isso é sinal de que o eixo 3 não tem resposta pronta a adotar — logo a superação é para construir, não para comprar.'
     trace: 'https://semgrep.dev/docs/kb/semgrep-code/reduce-false-positives'
+    provenance:
+      source: "https://semgrep.dev/docs/kb/semgrep-code/reduce-false-positives"
+      locator: "https://semgrep.dev/docs/kb/semgrep-code/reduce-false-positives — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_BULLY_REVIEW_REGRA_MORTA_E_RUIDOSA
     node_type: evidence
@@ -315,6 +387,10 @@ nodes:
     source_kind: aggregator
     label: 'CONFIRMADA (tier 4, 2-1): "O skill bully-review (dynamik-dev/bully) detecta regras mortas (zero hits) e ruidosas (violation_rate acima de threshold, padrão 0.5) a partir de telemetria JSONL, via pipeline/analyzer.py." É a ÚNICA implementação encontrada que faz literalmente o eixo 1 (cobertura de regra) — e é num skill do ecossistema Claude Code, não numa ferramenta de SAST. ⚠️ Confiança 0.4 e teto rígido: a fonte é AGREGADOR (skillsmp.com), o repo original não foi lido, e por isso nem o threshold nem a existência do analyzer.py estão verificados na primária. Sustenta a opção A como DESENHO (contador + threshold + duas classes: morta e ruidosa), não como prova de que funciona.'
     trace: 'https://skillsmp.com/creators/dynamik-dev/bully/skills-bully-review'
+    provenance:
+      source: "https://skillsmp.com/creators/dynamik-dev/bully/skills-bully-review"
+      locator: "https://skillsmp.com/creators/dynamik-dev/bully/skills-bully-review — verificação adversarial 2 votos a favor, 1 refutação (2-1); fonte AGREGADORA, não o repo original"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_NATOMA_OPA_VS_CEDAR_FORA_DO_ESCOPO
     node_type: evidence
@@ -329,6 +405,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA (tier 4, 3-0): "O artigo (28/07/2025, Katharine Xiao) não cobre autoria de política por LLM, cobertura de regra, SARIF/baseline, dependência/ordem entre regras nem aposentadoria de política; é comparação arquitetural OPA vs Cedar para controle de acesso MCP." Evidência negativa numa fonte que o próprio tier desqualifica para claims positivas, e com `valid_from` de 2025 — 14 meses antes do escopo exigido. Entra no grafo só para que a próxima rodada não a redescubra como promissora.'
     trace: 'https://natoma.ai/blog/mcp-access-control-opa-vs-cedar-the-definitive-guide'
+    provenance:
+      source: "https://natoma.ai/blog/mcp-access-control-opa-vs-cedar-the-definitive-guide"
+      locator: "https://natoma.ai/blog/mcp-access-control-opa-vs-cedar-the-definitive-guide — verificação adversarial 3 votos a favor, 0 refutações (3-0); fonte VENDOR-ON-COMPETITOR, sempre suspeita (cláusula 7)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OPENGREP_RULES_ARQUIVADO
     node_type: evidence
@@ -343,6 +423,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 3, 3-0): "O repo opengrep/opengrep-rules é um fork de semgrep-rules (base de 2024-12-13, 3.820 commits) e está ARQUIVADO/somente-leitura desde 2025-11-28, com 6 estrelas e 10 forks: não é fonte viva de convenção de gestão de corpus em outubro de 2026." É o achado de TRAJETÓRIA da rodada, e vale como aviso de adoção: o fork comunitário do corpus de regras do líder MORREU. Quem adota corpus de terceiro herda o risco de o corpus parar — argumento direto contra a opção C na parte que depende de ecossistema, e a favor de mecanismo próprio.'
     trace: 'https://github.com/opengrep/opengrep-rules'
+    provenance:
+      source: "https://github.com/opengrep/opengrep-rules"
+      locator: "https://github.com/opengrep/opengrep-rules — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SEMGREP_AI_BEST_PRACTICES_SEM_EIXO
     node_type: evidence
@@ -356,6 +440,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 3, 3-0): "A página não documenta nenhum dos sete eixos (cobertura, conflito, sequenciamento/dependência, eficácia, teste de mutação, SARIF/baseline, autoria com IA); é só ponteiro para o pack de regras." Impacto 1: é custo de busca registrado, não cobertura. Fica no grafo para a próxima rodada não repetir o fetch.'
     trace: 'https://github.com/semgrep/ai-best-practices'
+    provenance:
+      source: "https://github.com/semgrep/ai-best-practices"
+      locator: "https://github.com/semgrep/ai-best-practices — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MOVE_TEST_GEN_MUTACAO_DETERMINISTICA
     node_type: evidence
@@ -369,6 +457,10 @@ nodes:
     source_kind: engineer
     label: 'CONFIRMADA (tier 3, 3-0): "move-test-gen aplica teste de mutação determinístico (7 operadores: flip de comparadores e drop de assert) e trata mutação sobrevivente como evidência de teste fraco." Tier 3 e confiança 0.5 (repo pequeno, não é convenção de ecossistema), mas impacto 4: é o único achado do eixo 5 que mostra mutação com OPERADORES FIXOS E DETERMINÍSTICOS — o que a torna automatizável num gate de shell sem LLM. Sustenta a opção F: esta casa já pratica mutação À MÃO (mutar o sujeito e exigir que a guarda reprove) e a forma determinística é o que falta para virar mecanismo.'
     trace: 'https://github.com/talongate/move-test-gen'
+    provenance:
+      source: "https://github.com/talongate/move-test-gen"
+      locator: "https://github.com/talongate/move-test-gen — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_PRETOOLUSE_COMO_POLICY_ENGINE
     node_type: evidence
@@ -383,6 +475,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "PreToolUse funciona como policy engine para agente: pode negar/permitir/perguntar via permissionDecision e casar ferramentas MCP pelo padrão mcp__<server>__<tool> com sufixo .* para todo o servidor." Resposta do eixo 7 pelo lado da PLATAFORMA, com a fonte definitiva: o Onion JÁ TEM o motor de política para agente que o resto do mercado está montando com Cedar/OPA — e tem 3 hooks de PreToolUse medidos nesta árvore. Argumento forte contra a opção D: adotar Cedar para autorizar agente seria pagar por capacidade que a plataforma entrega nativa e com exit 2.'
     trace: 'https://code.claude.com/docs/en/hooks'
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "https://code.claude.com/docs/en/hooks — verificação adversarial 3 votos a favor, 0 refutações (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CHANGELOG_COBRE_HOOKS_E_EXIT_2
     node_type: evidence
@@ -396,6 +492,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0): "O CHANGELOG oficial do Claude Code (versões 2.1.281-2.1.286 no trecho lido) cobre hooks, incluindo o exit code 2 como mecanismo de bloqueio, mas apenas em nível de implementação." Útil por um motivo só: confirma que a capacidade comprada por esta casa (exit 2 determinístico) continua viva e documentada na versão corrente — o que mantém de pé a régua de acoplamento que decide A/B (absorver, roda em qualquer CI) contra C/D (adotar externo).'
     trace: 'https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md'
+    provenance:
+      source: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md"
+      locator: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md — verificação adversarial 3 votos a favor, 0 refutações (3-0). ⚠️ TENSÃO MEDIDA com E_CHANGELOG_SEM_CONVENCAO_DE_CORPUS: dois achados da MESMA página discordando sobre o que ela cobre é sinal de leitura por trecho, não de medição — registrado, não resolvido."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── MERCADO / CAPITAL (invariante da cláusula 4 — presente mesmo vazio) ───────────────
   - id: E_MERCADO_CORPUS_DE_REGRAS_1001
@@ -410,6 +510,10 @@ nodes:
     source_kind: analyst
     label: 'MERCADO/CAPITAL — SEM SINAL, E ISTO É MEDIDA, NÃO OMISSÃO. O eixo foi atacado por dois flancos e os dois voltaram vazios nos sete eixos. (1) A página de research da Sacra sobre o Semgrep (analyst, tier 5, 3-0) explicitamente "não diz nada sobre cobertura, sobreposição, sequenciamento, mutação, SARIF/baseline ou Cedar/OPA para agentes — não responde aos eixos 1-3 e 5-7". (2) A tentativa pelo Thoughtworks Radar Vol. 34 foi REFUTADA — nenhuma claim sobreviveu. Nenhuma rodada de investimento, M&A, parceria ou down round dos últimos 6-12 meses foi encontrada endereçando engenharia de CORPUS de regras. Leitura da ausência, e ela é acionável: capital mostra o ESCASSO, e aqui não há capital porque não há PRODUTO — ninguém vende "gestão do seu corpus de regras", todos vendem o corpus. Isso REFORÇA absorver (A/B/F) e ENFRAQUECE adotar (C/D): não existe incumbente a comprar neste nicho, e o único fork comunitário do corpus do líder está ARQUIVADO (E_OPENGREP_RULES_ARQUIVADO).'
     trace: 'https://sacra.com/research/semgrep'
+    provenance:
+      source: "https://sacra.com/research/semgrep"
+      locator: "https://sacra.com/research/semgrep — verificação adversarial 3 votos a favor, 0 refutações (3-0), fonte ANALYST tier 5; mais a tentativa pelo Thoughtworks Radar Vol. 34 (https://www.thoughtworks.com/en-gb/radar, tier 6), cuja claim foi REFUTADA: não sobreviveu afirmação de que o Radar traga passagem sobre gerenciar, medir ou aposentar corpus de regras."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── LACUNAS (cláusula 8 — lacuna vira nó de 1ª classe, com a contabilidade EXATA) ─────
   - id: E_LACUNAS_CORPUS_DE_REGRAS_1001
@@ -505,6 +609,10 @@ nodes:
     source_kind: primary
     label: 'OBJEÇÃO 1 SOBREVIVE (e é a mais forte do conjunto porque foi RE-MEDIDA nesta árvore): o fato tier 10 é verdadeiro, mas a INFERÊNCIA aponta para o lugar errado. Os 4 ciclos de CI perdidos em 2026-10-01 aconteceram em `.githooks/pre-commit` e no pipeline de lint — script bash SEQUENCIAL, onde a ordem JÁ é expressável —, não entre hooks do Claude Code. A guarda nascida na sessão prova isso pelo que ancora. E nos dois únicos eventos com múltiplos hooks NÃO existe par escreve→lê: o único consumidor de artefato alheio está em OUTRO evento, logo fora da corrida. CONCLUSÃO: o achado tier 10 descreve um perigo com custo medido ZERO hoje e não sustenta trabalho nenhum — vale como INVARIANTE A PRESERVAR (nunca pôr gerador e verificador no mesmo evento de hook), não como diagnóstico da dor. Isso LIMITA a opção B no escopo (B tem de atacar o script sequencial, não os hooks) e LIMITA a decisão (o diagnóstico que a rodada trouxe estava deslocado).'
     trace: '.claude/validation/lint-selftest.sh'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "Objeção do Elenxo contra o achado 1 (hooks do mesmo evento rodam em paralelo, code.claude.com/docs/en/hooks, tier 10). ESTA objeção é a única do conjunto cuja evidência esta sessão RE-MEDIU por conta própria, e ela passou: lint-selftest.sh:4945 ancora em ${REPO_ROOT}/.githooks/pre-commit (linha 4946); settings.json tem SessionStart=4 e UserPromptSubmit=4 hooks; o único par escreve→lê é premodelswitch-guard.sh (PreModelSwitch) → session-degraded-notice.sh (UserPromptSubmit), eventos DIFERENTES. Ver E_CASA_MEDIDA_ORDEM_E_CORPUS_1001."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_2_EVIDENCIA_NEGATIVA_EM_FONTE_ERRADA
     node_type: evidence
@@ -518,6 +626,10 @@ nodes:
     source_kind: engineer
     label: 'OBJEÇÃO 2 SOBREVIVE: evidência negativa colhida numa fonte onde a classe de informação buscada NUNCA mora. CHANGELOG registra mudança de implementação, não convenção de engenharia de corpus — o resultado era previsível antes do fetch, o que torna o achado tautológico e o custo do fetch desperdiçado. Pior, e esta parte é verificável no próprio grafo: contradiz parcialmente o achado 21, que diz que a MESMA página cobre hooks e o exit 2. Dois achados da mesma página discordando sobre o que ela cobre é sinal de leitura por trecho, não de medição. LIMITA a decisão (parte do numerador da rodada é custo, não cobertura) e LIMITA a opção E (a rodada estreita precisa escolher fontes onde a classe de informação MORA, ou repete o desperdício).'
     trace: 'https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md'
+    provenance:
+      source: "https://github.com/anthropics/claude-code/blob/main/CHANGELOG.md"
+      locator: "Objeção do Elenxo contra o achado 2 (CHANGELOG não traz convenção, tier 9). A parte VERIFICÁVEL nesta sessão é a contradição interna, e ela existe: E_CHANGELOG_SEM_CONVENCAO_DE_CORPUS e E_CHANGELOG_COBRE_HOOKS_E_EXIT_2 são a mesma URL com vereditos divergentes sobre o que a página cobre."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_3_FIXPOINT_DO_ESLINT_SUBEXPLORADO
     node_type: evidence
@@ -531,6 +643,10 @@ nodes:
     source_kind: primary
     label: 'OBJEÇÃO 3 SOBREVIVE, e é a que mais rende: o achado para no sintoma e descarta a lição transferível. O mecanismo do ESLint é aplicar FIXERS em múltiplos passes até o FIXPOINT, e só então considerar o resultado estável. Esse desenho cura a classe ARTEFATO-CADUCO desta casa (SHA da REGRA 56 carimbado antes de regenerar projeção) por CONSTRUÇÃO, sem declaração de ordem — e o pipeline do core TEM auto-fix real, logo o desenho se aplica literalmente. A rodada tinha nas mãos a única convenção de RUNTIME encontrada e não a converteu em candidato de absorção. LIMITA a decisão (o relatório subavaliou o próprio achado mais útil) e SUSTENTA a opção B, que é onde o fixpoint entra como mecanismo.'
     trace: '.githooks/pre-commit'
+    provenance:
+      source: ".githooks/pre-commit"
+      locator: "Objeção do Elenxo contra o achado 3 (ESLint detecta fixes circulares mas não nomeia as regras, tier 9). A parte desta objeção que esta sessão MEDIU: o pipeline do core tem auto-fix real — `sed -i` e `git add` dentro de `.githooks/pre-commit` —, que é exatamente o que a guarda (b) do hook-chain-order vigia."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_4_QUASE_DUPLICATA_FECHA_O_EIXO
     node_type: evidence
@@ -544,6 +660,10 @@ nodes:
     source_kind: primary
     label: 'OBJEÇÃO 4 SOBREVIVE: é quase-duplicata do achado 3 — mesma URL, mesma frase reescrita —, e dois dos 24 achados sendo a mesma medição da mesma página é inflação do numerador. E o enunciado "não é derivada estaticamente" é exatamente a resposta NEGATIVA ao eixo 3; ela deveria ter PROMOVIDO a busca por quem DERIVA (Nx inferred tasks, Ruff, overcommit issue 143) — e as três ficaram como fonte não lida. Achado que FECHA o eixo em vez de abrir. LIMITA a decisão (o eixo prioritário foi fechado por omissão, não por medição) e SUSTENTA a opção E, que é a reabertura dirigida dessas mesmas fontes.'
     trace: 'https://eslint.org/docs/head/use/troubleshooting/circular-fixes'
+    provenance:
+      source: "https://eslint.org/docs/head/use/troubleshooting/circular-fixes"
+      locator: "Objeção do Elenxo contra o achado 4 (autofix multipasse, ordem não derivada estaticamente, tier 9). Verificável no grafo: achados 3 e 4 têm a MESMA URL (eslint.org/docs/head/use/troubleshooting/circular-fixes), e as três candidatas que deveriam ter sido promovidas (Nx inferred tasks, Ruff, overcommit) constam como fonte NÃO LIDA em E_LACUNAS_CORPUS_DE_REGRAS_1001."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_5_CEDAR_NAO_E_PORTAVEL
     node_type: evidence
@@ -557,6 +677,10 @@ nodes:
     source_kind: primary
     label: 'OBJEÇÃO 5 SOBREVIVE: a capacidade NÃO é portável, e o achado original não dizia isso. Ela existe porque Cedar é linguagem RESTRITA e decidível, com codificação SMT do espaço de requisições; o corpus do Onion são 93 regras em 5.282 linhas de bash arbitrário, para o qual não existe codificação SMT nenhuma. Tratar "análise estática do corpus" como estratégia absorvível é confundir propriedade da LINGUAGEM com prática de engenharia. Soma-se a falha de ATUALIDADE exigida pelo escopo: a citação é de junho/2025, quinze meses antes de out/2026, e o próprio descarte da rodada registra material Cedar relacionado da mesma época. LIMITA a opção D de forma quase terminal e LIMITA a decisão (um dos dois candidatos a ADOTAR cai por natureza, não por preço).'
     trace: '.claude/validation/lint-artifacts.sh'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "Objeção do Elenxo contra o achado 5 (Cedar Analysis detecta permits sombreados, tier 8). Partes MEDIDAS nesta sessão: o corpus do Onion são 93 cabeçalhos de regra em 5.282 linhas de `.claude/validation/lint-artifacts.sh` (shell arbitrário, sem codificação SMT possível); e as três evidências de Cedar Analysis carregam `valid_from` 2025-06-16, anterior a out/2026, sem reverificação de atualidade."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_6_CATRACA_JA_E_MENOS_PERMISSIVO
     node_type: evidence
@@ -583,6 +707,10 @@ nodes:
     source_kind: primary
     label: 'OBJEÇÃO 7 SOBREVIVE: o achado é verdadeiro, mas é 1 de QUATRO extraídos da MESMA URL — 17% do corpus confirmado vem de uma única página cuja conclusão é NEGATIVA para a pergunta. Quatro entradas para dizer "Semgrep não responde o eixo 2" é contagem inflada, não cobertura. LIMITA a decisão (o numerador de 24 achados não mede 24 fontes de conhecimento) e LIMITA a opção C (o fornecedor que seria adotado é justamente o que não resolve o eixo 2, e a página dele diz isso quatro vezes).'
     trace: 'https://docs.semgrep.dev/semgrep-code/remove-duplicates'
+    provenance:
+      source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
+      locator: "Objeção do Elenxo contra o achado 7 (Semgrep deduplica findings por match_based_id, tier 8). Verificável no próprio grafo: quatro nós de evidência carregam a mesma URL docs.semgrep.dev/semgrep-code/remove-duplicates — E_SEMGREP_DEDUP_FINDING_NAO_REGRA, E_SEMGREP_FINGERPRINT_INCLUI_NOME_DA_REGRA, E_SEMGREP_FINGERPRINT_CORRELACAO_ENTRE_BRANCHES e E_SEMGREP_API_EXIGE_DEDUP_TRUE."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_8_FINGERPRINT_SEM_REGRA_E_DETECTOR_DE_SOBREPOSICAO
     node_type: evidence
@@ -596,6 +724,10 @@ nodes:
     source_kind: primary
     label: 'OBJEÇÃO 8 SOBREVIVE: é a explicação do achado 7, não um achado independente — e a conclusão operacional está INVERTIDA pela própria evidência. Se o fingerprint é (arquivo, regra, padrão com metavariáveis), então REMOVER o componente "regra" e agrupar por (arquivo, trecho) é precisamente um detector de SOBREPOSIÇÃO entre regras, barato e sem ferramenta nova. A rodada tinha a chave e concluiu "não dá". LIMITA a opção C (o que se iria adotar para isso é construível aqui em poucas linhas) e LIMITA a decisão (o eixo 2 não está sem resposta, está com a resposta lida ao contrário); e SUSTENTA a opção A, porque o agrupamento por (arquivo, trecho) só existe depois que cada guarda registra ONDE casou — que é a mesma instrumentação que A pede.'
     trace: 'https://docs.semgrep.dev/semgrep-code/remove-duplicates'
+    provenance:
+      source: "https://docs.semgrep.dev/semgrep-code/remove-duplicates"
+      locator: "Objeção do Elenxo contra o achado 8 (match_based_id inclui o nome da regra, logo duas regras geram findings distintos, tier 8). A inversão lógica é verificável no próprio enunciado do achado: se o fingerprint é (arquivo, regra, padrão com metavariáveis), remover o componente `regra` deixa (arquivo, trecho)."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_9_TRUNCADA_ORDEM_FIXA_SEM_DERIVACAO
     node_type: evidence
@@ -609,6 +741,10 @@ nodes:
     source_kind: engineer
     label: 'OBJEÇÃO 9 SOBREVIVE, MAS CHEGOU TRUNCADA — e esta sessão declara o corte em vez de adivinhar o argumento. O que é legível: o alvo é o achado de que o Cedar ordena a autorização de agente por camadas FIXAS (L1→L2→L3, halt no primeiro deny), SEM derivação de dependência entre políticas. A leitura mínima e defensável do alvo, que não depende do texto perdido: mesmo o motor mais analisável do mercado resolve ORDEM por declaração fixa, o que é CONFIRMAÇÃO da resposta negativa do eixo 3 e, ao mesmo tempo, retira do Cedar qualquer vantagem no eixo que o maestro priorizou. LIMITA a opção D (ela não entrega o eixo 3, só o eixo 2) e LIMITA a decisão (uma objeção sobrevivente entrou no grafo pela metade, e a contagem total de sobreviventes é >= 9 e DESCONHECIDA — ver E_LACUNAS_CORPUS_DE_REGRAS_1001 item 5).'
     trace: 'https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/'
+    provenance:
+      source: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/"
+      locator: "Objeção do Elenxo contra o achado 9 (Cedar autoriza agentes em 3 camadas L1→L2→L3 com halt no primeiro deny, ordem fixa sem derivação, tier 7). ⚠️ O TEXTO DESTA OBJEÇÃO CHEGOU TRUNCADO ao handoff desta sessão — corta em \"Este achado é evidê\" —, e nada depois disso foi reconstruído. Confiança 0.45 (abaixo do teto de 0.6 das demais) justamente por isso: modela-se o alvo e o enunciado do achado atacado, não o argumento, que não chegou."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   # ── evidência -> pergunta (SUPPORTS) ─────────────────────────────────────────────────

@@ -80,6 +80,10 @@ nodes:
     verified_at: 2026-08-29
     verified_against: "DRIFTED pelo OP-1 (PR #697, medido no drive 2026-08-27): a manchete 'NENHUMA mutação tem comando dedicado; /meta:adopt só SUGERE' caiu parcialmente — /meta:federation-member register EXISTE e adopt.md:632 agora INVOCA o comando (não mais 'oferecer registrar' passivo). O gap PERSISTE só para OP-2/3/4 (promote/update/revoke seguem 100% edição manual de YAML): grep em .claude/commands/meta/ = zero comando promote/update/revoke."
     label: "GAP (parcial após OP-1): read-model completo + 1 gate de escrita (trust-topology-check, só LOG). OP-1 REGISTRAR virou comando dedicado (/meta:federation-member register; adopt INVOCA). Restam SEM comando OP-2 PROMOVER / OP-3 ATUALIZAR / OP-4 REVOGAR — mutação por edição manual de YAML + commit"
+    provenance:
+      source: ".claude/commands/meta/federation-member.md"
+      locator: "DRIFTED pelo OP-1 (PR #697, medido no drive 2026-08-27): a manchete 'NENHUMA mutação tem comando dedicado; /meta:adopt só SUGERE' caiu parcialmente — /meta:federation-member register EXISTE e adopt.md:632 agora INVOCA o comando (não mais 'oferecer registrar' passivo). O gap PERSISTE só para OP-2/3/4 (promote/update/revoke seguem 100% edição manual de YAML): grep em .claude/commands/meta/ = zero comando promote/update/revoke."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_op_register
     node_type: claim
     trace: .claude/commands/meta/federation-member.md
@@ -205,6 +209,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'selo Onda 8 (2026-09-01): medicao da revisao-total (README Logto + members.yaml) sem contra-evidencia'
     label: "FRONTEIRA commodity-BUY (Logto) × diferencial-BUILD (Onion): comprar identidade/sessão/token/MFA/CRUD de org/Secret Vault (undifferentiated); construir a tradução papel-grosso→semântica de tier (D7) + matriz de confiança fina de members.yaml (nunca delegável ao Logto sem duplicar a SSOT)"
+    provenance:
+      source: "/home/marcio/onion-vps-logto/README.md"
+      locator: "selo Onda 8 (2026-09-01): medicao da revisao-total (README Logto + members.yaml) sem contra-evidencia"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-logto/README.md no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_trust_matrix_stays_onion
     node_type: claim
     trace: docs/evolution/federation/members.yaml:57-83
@@ -227,6 +235,10 @@ nodes:
     verified_at: 2026-08-27
     verified_against: "CONFIRMED (drive 2026-08-27): a fronteira segue fisicamente amarrada — federation-console.sh:6 ainda declara 'NAO e plataforma (Backstage/Port = over-engineering p/ N pequeno)', read-only/zero-backend; e a premissa N=8 segue de pé: 0 membros role:consumer (T2) em members.yaml. Nada exige plataforma."
     label: "ANTI-plataforma p/ N=8: Backstage/Port custam 3+ engenheiros + US$450k/ano e só compensam a 200-1000+ devs (S3·F1). A fronteira 'NÃO é plataforma' JÁ está fisicamente amarrada ao artefato (federation-console.sh:6-9) e travada por REGRA 24/38 — read-only projeção, zero backend/DB, git como event store"
+    provenance:
+      source: ".claude/validation/federation-console.sh:6-9"
+      locator: "CONFIRMED (drive 2026-08-27): a fronteira segue fisicamente amarrada — federation-console.sh:6 ainda declara 'NAO e plataforma (Backstage/Port = over-engineering p/ N pequeno)', read-only/zero-backend; e a premissa N=8 segue de pé: 0 membros role:consumer (T2) em members.yaml. Nada exige plataforma."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: C_reuse_readmodel
     node_type: claim
     trace: docs/evolution/research/federation-2026/SYNTHESIS.md:15-36
@@ -342,6 +354,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — grep -n C_trust_matrix_stays_onion docs/onion/graph/m3-federation-admin-2026-07.kg.yaml; s'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó está com status:open pedindo algo que já existe e está em produção: a matriz fina não é "grosso demais" resolvida por Logto — ela nunca dependeu do RBAC Logto para enforcement fino; trust-topology-check.sh já lê members.yaml como dado e já está composto no gate real (a2a-verify.sh Camada 1). O '
+    provenance:
+      source: "docs/onion/graph/m3-federation-admin-2026-07.kg.yaml"
+      locator: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — grep -n C_trust_matrix_stays_onion docs/onion/graph/m3-federation-admin-2026-07.kg.yaml; s"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: E_CENSO0901_Q_members_ci_gate
     node_type: evidence
@@ -352,6 +368,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — grep -n "members-validate\|check_members" .claude/validation/lint-artifacts.sh; git log --'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pedia ligar HARD o gate de CI sobre members.yaml vivo (estava só na rota do comando + selftest). Isso foi entregue: REGRA 66 faz exatamente isso, com PR(s) 6799c8df/4b749df5 e refinamento 3554f13d. O gatilho nomeado no próprio nó ("nascimento de OP-2/3/4" ou "1a mutação manual que passou") disp'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — grep -n \"members-validate\\|check_members\" .claude/validation/lint-artifacts.sh; git log --"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: E_CENSO0901_C_p3_agg_view
     node_type: evidence

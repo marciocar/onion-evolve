@@ -53,6 +53,10 @@ nodes:
     verified_against: 'tres ocorrencias medidas em tres guardas distintas no mesmo dia, cada uma com comando e saida no residuo do PR #827'
     label: 'Em guarda que enumera VOCABULARIO, o defeito dominante e a lista estar incompleta — nunca a logica estar errada. E a lista nunca esta completa, porque o mundo ganha termos novos e a guarda nao. A cura estrutural e sempre a mesma: asserir a FORMA e deixar a CATRACA julgar (candidato legitimo entra no baseline uma vez; candidato novo e HARD). Isto ja era migalha nesta casa; hoje virou medicao com N=3 em um dia.'
     trace: '.claude/validation/vendor-scrub-form-check.sh'
+    provenance:
+      source: ".claude/validation/vendor-scrub-form-check.sh"
+      locator: "tres ocorrencias medidas em tres guardas distintas no mesmo dia, cada uma com comando e saida no residuo do PR #827"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_LISTA_1_REGRA36_NAO_VE_CLIENTE_NAO_REGISTRADO
     node_type: evidence
@@ -66,6 +70,10 @@ nodes:
     source_kind: internal-audit
     label: 'OCORRENCIA 1 — a REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente) deriva os termos do members.yaml, entao CLIENTE QUE NUNCA FOI REGISTRADO e invisivel para ela. Derivar do registro e o desenho CERTO (nome hardcoded num script E o proprio vazamento); o furo e o vocabulario. Achado so porque a decisao de publicar obrigou a medir antes.'
     trace: '.claude/validation/vendor-scrub-form-check.sh'
+    provenance:
+      source: ".claude/validation/vendor-scrub-form-check.sh"
+      locator: "medicao no proprio repo: nome comercial de cliente real de PoC em DOIS arquivos da superficie vendorizada, e a REGRA 36 nunca cobrou"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_LISTA_2_REGEN_BASELINES_TOMOU_O_LINT_POR_EMISSOR
     node_type: evidence
@@ -79,6 +87,10 @@ nodes:
     source_kind: internal-audit
     label: 'OCORRENCIA 2 — uma MENSAGEM PRESTATIVA quebrou a maquinaria de adocao. Ao escrever `regenere: bash ... --emit-baseline > ...` num aviso do lint, a string entrou no arquivo pela primeira vez; como o LINT cita TODO baseline (ao dizer como conserta-lo), ele virou candidato a emissor de 8 de uma vez. A regra que faltava: quem FALA de todos os baselines nao e emissor de NENHUM — bancada e lint sao consumidores universais.'
     trace: '.claude/utils/adopt/regen-baselines.sh'
+    provenance:
+      source: ".claude/utils/adopt/regen-baselines.sh"
+      locator: "grep -c --emit-baseline no lint-artifacts.sh: era 0, virou 1 com uma mensagem de remediacao; 8 dos 10 baselines passaram a resolver 2 emissores e NENHUM foi regenerado"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_LISTA_3_CATRACA_DO_EPIPE_SEM_GIT_E_SEM_BASH
     node_type: evidence
@@ -92,6 +104,10 @@ nodes:
     source_kind: internal-audit
     label: 'OCORRENCIA 3, E A MAIS INSTRUTIVA: JA EXISTIA CATRACA para a classe do EPIPE, com baseline e selftest — e ela nao viu nenhuma das duas instancias, porque o PRODUTOR era enumerado. Guarda madura, com mecanismo completo, cega pelo mesmo motivo das outras duas. Cura: o detector passa a asserir a FORMA (qualquer produtor em posicao de veredito seguido de | grep -q). Custo medido: 88 para 137 sitios, absorvidos como passivo.'
     trace: '.claude/validation/pipe-verdict-check.sh'
+    provenance:
+      source: ".claude/validation/pipe-verdict-check.sh"
+      locator: "o detector pipe-verdict-check.sh enumerava _emit|grep|awk|sed|cat|printf; as duas instancias do dia tinham produtor `git` e `bash`, ambos fora da lista"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── A CLASSE EPIPE: recorrencia que estava registrada SEM cura ──
   - id: C_PIPEFAIL_EPIPE_ACUSA_O_VIVO_DE_MORTO
@@ -104,6 +120,10 @@ nodes:
     verified_against: 'duas instancias medidas no mesmo dia, ambas com o padrao PRESENTE e o veredito FALSO; 0 falhas em 200 tentativas locais contra reprovacao no runner de 2 nucleos'
     label: '`<produtor> | grep -q PADRAO` em posicao de VEREDITO, sob `set -euo pipefail`, e uma CORRIDA: o grep casa e SAI, o produtor que ainda tem bytes leva EPIPE e sai 141, o pipefail propaga, e o veredito sai FALSO COM O PADRAO PRESENTE. O modo de falha e o mais caro que existe — VERDE no dev, VERMELHO no CI, sobre arquivo que ninguem tocou — porque manda o proximo leitor procurar no lugar errado. Nao depende de tamanho grande: bastam varias chamadas de write (10 KB ja bastam) e um runner sob carga.'
     trace: '.claude/validation/lint-artifacts.sh'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "duas instancias medidas no mesmo dia, ambas com o padrao PRESENTE e o veredito FALSO; 0 falhas em 200 tentativas locais contra reprovacao no runner de 2 nucleos"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_EPIPE_ACUSOU_REGRA_VIVA_DE_MORTA
     node_type: evidence
@@ -117,6 +137,10 @@ nodes:
     source_kind: internal-audit
     label: 'INSTANCIA A: `git ls-files -- "$g" | grep -q .` no matcher de globs da regra path-scoped acusou `.claude/rules/research-lens.md` de nunca carregar. A regra esta VIVA e casa 139 arquivos. Medido: 0 falhas em 200 tentativas locais — a corrida so perde num runner de 2 nucleos sob carga.'
     trace: '.claude/validation/lint-artifacts.sh'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "CI do PR #827 reprovou com 1 HARD que nao reproduz local; o glob docs/evolution/research/** casa 139 arquivos rastreados (10 KB de caminhos)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_EPIPE_ACUSOU_O_TRANSPORTE_DE_NAO_CARREGAR
     node_type: evidence
@@ -130,6 +154,10 @@ nodes:
     source_kind: internal-audit
     label: 'INSTANCIA B, achada pela bancada MINUTOS depois de eu curar a A: `bash vendor-manifest.sh --emit-scrub-roots | grep -qx .claude/workflows` acusou o transporte de nao carregar um diretorio que ele carrega. Sobram 3 linhas para o SIGPIPE. Curar a classe num arquivo fez o vizinho aparecer — e e por isso que cura de SITIO nao encerra classe.'
     trace: '.claude/validation/lint-selftest.sh'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "a bancada reprovou upstream-portal (b) no mesmo minuto em que a instancia A foi curada; .claude/workflows e a 8a de 11 linhas emitidas"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_A_RECORRENCIA_ESTAVA_NOMEADA_E_SEM_CURA
     node_type: evidence
@@ -143,6 +171,10 @@ nodes:
     source_kind: internal-audit
     label: 'O PADRAO DE META-FALHA: a fixture da bancada nascia de `git archive HEAD` — testava o JA COMMITADO, nao o staging — e isso JA ESTAVA ESCRITO no proprio arquivo (`o CI pegou, a bancada local nao, porque o sandbox nasce de git archive HEAD`). Ficou NOMEADA e SEM CURA, e por isso voltou. Erro conhecido que nao ganha cura anexada nao e conhecimento: e uma nota de rodape que o proximo leitor ignora.'
     trace: '.claude/validation/lint-selftest.sh'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "o caso (e) da familia regen_baselines ja trazia a frase, escrita numa passada anterior, sem cura anexada"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── O QUE A PASSADA ACHOU NOS MEUS PROPRIOS ARTEFATOS ──
   - id: E_A_GUARDA_NOVA_ERA_CODIGO_MORTO_NO_DESTINO_MAJORITARIO
@@ -157,6 +189,10 @@ nodes:
     source_kind: internal-audit
     label: 'A IRONIA CENTRAL DA RODADA: a metade por FORMA — escrita PORQUE guarda-de-lista falha pelo vocabulario — nasceu como bloco no fim da funcao irma e ficou atras de DOIS `return 0` que nao sao dela. O `IS_LEAF` (isencao de adotante-folha, que existe por CIRCULARIDADE da derivacao) a matava em `role: adopted`, o destino da MAIORIA; e o `[ -n "$terms" ]` a gateava em a LISTA produzir vocabulario. A cura que existe porque a lista falha so rodava se a lista funcionasse. Cura estrutural: funcao propria — quem nao compartilha a precondicao nao compartilha a funcao.'
     trace: '.claude/validation/lint-artifacts.sh'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "mutante provado: nome de cliente injetado passa em role:adopted e e pego em role:hub; com members.yaml enxuto o detector nao varria nada"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_O_DETECTOR_NAO_PEGAVA_METADE_DO_VAZAMENTO_QUE_O_MOTIVOU
     node_type: evidence
@@ -170,6 +206,10 @@ nodes:
     source_kind: internal-audit
     label: 'O detector por forma nascia cego para METADE do identificador que o motivou: o padrao exigia [A-Z][a-z] e a segunda metade era sigla em caixa alta. Se o cliente se chamasse so por ela, a guarda nasceria cega para o proprio caso que a criou. Junto caiam preposicao, dois-pontos e acento (sob LC_ALL=C o acento truncava a chave, e tolerar o prefixo tolera todo homografo no arquivo). Curado em DUAS voltas: a 1a aceitou caixa alta sozinha e o repo saltou de 9 para 36 candidatos (27 de prosa); a 2a exige segundo token em forma de nome — 17 candidatos.'
     trace: '.claude/validation/vendor-scrub-form-check.sh'
+    provenance:
+      source: ".claude/validation/vendor-scrub-form-check.sh"
+      locator: "rodado sobre o texto original do vazamento: o ampersand pega a primeira metade, a ancora NAO pega a segunda (caixa alta) na mesma frase"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_O_PASSO_QUE_EU_ESCREVI_NASCIA_MORTO
     node_type: evidence
@@ -183,6 +223,10 @@ nodes:
     source_kind: internal-audit
     label: 'Escrevi um passo que declara OBRIGATORIO disparar subagente, num comando SEM permissao para isso — a classe que o proprio lint desta casa nomeia (`a permissao nao casa; o comando nasce MORTO`). Achado no PRIMEIRO uso do passo, pelo refutador que o proprio passo mandou disparar. O mecanismo se autorrefutou em uso real, que e o unico jeito de saber.'
     trace: '.claude/commands/engineer/pr.md'
+    provenance:
+      source: ".claude/commands/engineer/pr.md"
+      locator: "allowed-tools do /engineer:pr nao tinha Task, Workflow nem Skill; os irmaos meta/census e meta/drive tem"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ESCOLHI_O_NUMERO_QUE_FECHAVA_O_ARGUMENTO
     node_type: evidence
@@ -196,6 +240,10 @@ nodes:
     source_kind: internal-audit
     label: 'O ACHADO MAIS PERIGOSO DO DIA, e nao e um bug: num arquivo que vira DOUTRINA e VIAJA para adotantes, escrevi `custo do primeiro CI: 24 min` e `eles caberiam INTEIROS dentro da primeira espera`. O primeiro CI durou 19,0 min (24,2 sao o 2o e o 3o) e a refutacao levou 19,5 — NAO cabem, estouram por ~30s. Eu havia escolhido o numero que fazia o argumento fechar. O argumento sobrevive sem a muleta e fica mais honesto: o ganho nao e caber numa espera, e os ciclos deixarem de ser tres.'
     trace: '.claude/commands/engineer/pr.md'
+    provenance:
+      source: ".claude/commands/engineer/pr.md"
+      locator: "gh run view nos tres runs: 19,0 · 24,2 · 24,2 min. Eu escrevera `primeiro CI: 24 min` e `cabem inteiros`; os refutadores levaram 19,5 min de parede"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_A_CURA_DAS_LICENCAS_ERA_ATIVAMENTE_DANOSA
     node_type: evidence
@@ -209,6 +257,10 @@ nodes:
     source_kind: internal-audit
     label: 'Pus LICENSE no manifesto para impedir relicenciamento silencioso, e isso PRODUZIA relicenciamento silencioso na direcao MAIS GRAVE: o passo de copia e um `cp -R` incondicional e o unico never-clobber por-arquivo e o .env.example — o never-clobber que meu comentario AFIRMAVA nao existe. Um aviso proprietario na raiz do repo de um cliente de consultoria viraria MIT em nome do autor do core. REVERTIDO.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "dois refutadores mediram independentemente: com LICENSE no manifesto, o cp -R do adopt sobrescreve o LICENSE do alvo; grep -c LICENSE no adopt.md = 0"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_HAVIA_UMA_QUINTA_COPIA_DA_LISTA
     node_type: evidence
@@ -222,6 +274,10 @@ nodes:
     source_kind: internal-audit
     label: 'O PR #826 criou a SSOT vendor-manifest.sh para matar `quatro copias da mesma lista`. Havia uma QUINTA, em durable-commit.sh — entao no caminho --update a licenca nao viajaria nem estando no manifesto. A varredura que fundou a SSOT parou nos consumidores obvios; so a passada adversarial, que simula a ADOCAO INTEIRA, alcancou o quinto. Contar copias nao e o mesmo que provar que nao ha mais nenhuma.'
     trace: '.claude/utils/adopt/durable-commit.sh'
+    provenance:
+      source: ".claude/utils/adopt/durable-commit.sh"
+      locator: "durable-commit.sh:43 tem ONION_PATHS hardcoded e independente da SSOT criada no PR #826"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── A DECISAO QUE SAIU DISSO ──
   - id: D_PASSADA_ADVERSARIAL_VIRA_PASSO_EM_PARALELO_AO_CI
@@ -234,6 +290,10 @@ nodes:
     verified_against: 'selado pelo maestro 2026-09-14 (`faz virar mecanismo no /engineer:pr`) e DOGFOODADO no PR que o criou: a 2a rodada rodou dentro da espera do CI e achou 9 HARD'
     label: 'SELADA: a passada adversarial vira PASSO 6 do /engineer:pr, disparada no MESMO movimento do PR e em PARALELO ao CI — nunca depois dele. O CI e FILA, nao barreira: enquanto roda, a sessao esta ociosa e o diff ja esta estavel. UM REFUTADOR POR LENTE (maquinaria · o artefato mente? · pelo lado do adotante), porque tres copias do mesmo prompt convergem no mesmo ponto cego. E a clausula que PROTEGE O PROPOSITO: o achado entra NESTE PR — sem ela, mais agentes geram mais achados que geram mais ciclos, e o laco expande em vez de fechar.'
     trace: '.claude/commands/engineer/pr.md'
+    provenance:
+      source: ".claude/commands/engineer/pr.md"
+      locator: "selado pelo maestro 2026-09-14 (`faz virar mecanismo no /engineer:pr`) e DOGFOODADO no PR que o criou: a 2a rodada rodou dentro da espera do CI e achou 9 HARD"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_O_REVISOR_DO_CI_NAO_REVISA_HA_DUAS_OCORRENCIAS
     node_type: evidence
@@ -247,6 +307,10 @@ nodes:
     source_kind: internal-audit
     label: 'O revisor semantico do CI NAO revisou nenhum dos cinco ciclos deste PR: ele tenta postar comentario, nao tem ferramenta para isso, e morre com negacoes de permissao. A unica defesa hoje e uma INSTRUCAO EM PROSA no prompt dizendo `nao tente postar comentario` — e ele a ignora, duas ocorrencias medidas. Conselho onde precisava de mecanismo. Enquanto isso, todo PR grande cai em soft-pass e o check de veredito vermelho vira ruido que se aprende a ignorar, que e como uma guarda morre.'
     trace: '.github/workflows/onion-review.yml'
+    provenance:
+      source: ".github/workflows/onion-review.yml"
+      locator: "permission_denials_count: 9 no PR #827 e 14 em 2026-08-07, registrado no proprio workflow; pre-voo da credencial HTTP 200, logo nao e auth"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── OS FIOS ABERTOS, com dono e gatilho ──
   # ⚠️ `plane: DEV` nos A_*, e a REGRA 49 (Nó plane:PROD de alto impacto carrega VERIFICAÇÃO, com
@@ -263,6 +327,10 @@ nodes:
     verified_against: 'medido no PR #828, o PRIMEIRO depois do merge da cura e pelo CAMINHO REAL (nao edita onion-review.yml, logo sem auto-pulo): permission_denials_count 0 (era 9, e 14 em 2026-08-07) · is_error false (era true) · num_turns 8 COMPLETOS (antes 18 morrendo, ou 1 sem partir) · total_cost_usd 0.37 (trabalho real, nao morte em t=0). onion-review-verdict SUCCESS de verdade, nao soft-pass.'
     label: 'FECHADO — A CURA PEGOU, e o alvo veio de evidencia que dormia ha CINCO SEMANAS. O revisor semantico do CI nao revisava desde 2026-08-07: tentava postar COMENTARIO INLINE DE REVIEW, acumulava negacao de permissao e morria. A frase que nomeava o subsistema — `No buffered inline comments` — estava registrada NO PROPRIO WORKFLOW desde a 1a ocorrencia, ao lado do `permission_denials_count: 14`, e ninguem a leu como o alvo que era: liam o numero, nao a frase. A defesa existente era INSTRUCAO EM PROSA no prompt (`NAO tente postar comentario`), ignorada nas duas ocorrencias — conselho onde precisava de mecanismo. Cura: `--allowedTools Read Grep Glob Bash` nos dois sitios (tentativa e retry); a ferramenta deixa de existir na lista dele, entao nao ha o que tentar. TETO QUE VALEU: a cura nao pode ser validada no PR que a escreveu (PR que edita onion-review.yml faz a action se auto-pular), e por isso este no nasceu `open` com o gatilho escrito — fechou no PR SEGUINTE, como previsto. LICAO DE METODO: cinco ciclos de CI do PR #827 sairam com o verdict vermelho e eu li aquilo como `o de sempre`; alarme que a gente aprende a ignorar ja morreu antes de quebrar.'
     trace: '.github/workflows/onion-review.yml'
+    provenance:
+      source: ".github/workflows/onion-review.yml"
+      locator: "medido no PR #828, o PRIMEIRO depois do merge da cura e pelo CAMINHO REAL (nao edita onion-review.yml, logo sem auto-pulo): permission_denials_count 0 (era 9, e 14 em 2026-08-07) · is_error false (era true) · num_turns 8 COMPLETOS (antes 18 morrendo, ou 1 sem partir) · total_cost_usd 0.37 (trabalho real, nao morte em t=0). onion-review-verdict SUCCESS de verdade, nao soft-pass."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: A_LICENCA_VIAJA_COM_NEVER_CLOBBER_E_QUINTA_COPIA
     node_type: decision
@@ -274,6 +342,10 @@ nodes:
     verified_against: 'dogfood dos DOIS cenarios por execucao: alvo virgem recebe LICENSE e LICENSE-DOCS; alvo com LICENSE proprietario PRESERVA o dele (Apache/Cliente Ficticio intacto) e recebe o nosso como LICENSE.onion. Familia license_travels 5/5 com mutante provado — a copia cega CLOBRA, logo o caso (b) prova algo.'
     label: 'FECHADO com as duas pernas, e a SEGUNDA PREMISSA DO PROPRIO NO CAIU NA MEDICAO. (1) NEVER-CLOBBER no adopt, passo (f), pelo molde exato do .env.example: a licenca fica FORA do manifesto de transporte de proposito — se entrasse, cairia no $TMP e o `cp -R` incondicional do passo (d) sobrescreveria o LICENSE do alvo, que e o relicenciamento silencioso na direcao MAIS GRAVE (aviso proprietario de cliente virando MIT em nome do autor do core). Alvo que ja tem o seu recebe `LICENSE.onion`; o merge e decisao do maestro DO ALVO. (2) STAGING no durable-commit, as 4 grafias: sem ele o arquivo chega UNTRACKED — some num git clean, e no --update o worktree e removido --force. Curar so uma metade nao entrega nada. CORRECAO DA PREMISSA: eu havia chamado o ONION_PATHS do durable-commit de `QUINTA COPIA da mesma lista`, e a leitura estava ERRADA — medido, ele usa `.claude` INTEIRO (superset das 8 raizes .claude/* da SSOT) e acrescenta os ARTEFATOS GERADOS na adocao (CLAUDE.md, docs/onion, os tres contextos, .githooks), que nao viajam do core. Propositos diferentes: a SSOT diz o que COPIA, o ONION_PATHS diz o que se COMMITA no alvo. Unifica-los quebraria a durabilidade dos gerados — a cura certa era ACRESCENTAR, nao unificar. Licao: `copia da mesma lista` foi diagnostico por SEMELHANCA DE FORMA; so a comparacao lado a lado mostrou que sao coisas distintas.'
     trace: '.claude/commands/meta/adopt.md'
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: "dogfood dos DOIS cenarios por execucao: alvo virgem recebe LICENSE e LICENSE-DOCS; alvo com LICENSE proprietario PRESERVA o dele (Apache/Cliente Ficticio intacto) e recebe o nosso como LICENSE.onion. Familia license_travels 5/5 com mutante provado — a copia cega CLOBRA, logo o caso (b) prova algo."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: A_PLUGINS_A_SUPERFICIE_PUBLICA_SEM_DETECTOR
     node_type: decision
@@ -296,6 +368,10 @@ nodes:
     verified_against: 'bundle EXTRAIDO e contado: `--role adopted` 685 arquivos, `--role standalone` 578 (107 cortados, delta exato do prefixo da meta-fabrica); familia `role_cut` da bancada 11/11, com mutante provando que o corte vem de _role_cut e nao de outro lugar.'
     label: 'CURADO: o `--role` CORTA. O corte e DERIVADO de HEAD por PREFIXO de caminho (helper novo dentro de `.claude/utils/adopt/` nasce cortado sem lista a manter — cura da classe guarda-por-lista-falha-pelo-vocabulario aplicada ao transporte), e a unica lista manual e o CONTRATO. Tres medicoes fixaram o desenho, e a segunda derrubou a 1a tentativa: (1) `:(exclude)` VENCE o positivo em qualquer ordem — nao se poupa arquivo dentro de diretorio cortado, o corte tem de ser emitido arquivo a arquivo; (2) cortar `.claude/utils/adopt` INTEIRO leva junto o proprio `vendor-manifest.sh`, e a REGRA 36 falha FECHADA sem ele (`lint-artifacts` HARD, `vendor-scrub-form-check` exit 2) — o standalone nasceria VERMELHO, trocando um gap invisivel por outro; dai a distincao a FABRICA nao viaja, a PLANTA que as guardas do alvo leem, sim; (3) o corte da instalacao nao vale nada se o `--update` o desfizer — o papel agora vem do STAMP DO ALVO (`onion-version.sh` hardcoda `role: source`, nao serve) e o `vendor-branch.sh` o propaga. `--emit-scrub-roots` IGNORA o papel de proposito: varrer mais do que viaja nunca e fail-open, varrer menos e.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "bundle EXTRAIDO e contado: `--role adopted` 685 arquivos, `--role standalone` 578 (107 cortados, delta exato do prefixo da meta-fabrica); familia `role_cut` da bancada 11/11, com mutante provando que o corte vem de _role_cut e nao de outro lugar."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CORTE_POR_PAPEL_MEDIDO_0915
     node_type: evidence
@@ -307,6 +383,10 @@ nodes:
     verified_against: 'git archive dos dois papeis + tar -t + lint no sandbox extraido'
     label: 'SUPERADO NO MESMO PR pela passada adversarial. Afirmava "nenhum arquivo da meta-fabrica vazou alem do contrato" com base num caso de bancada TAUTOLOGICO: ele fazia grep dos MESMOS 7 prefixos do `_role_cut`, entao perguntava ao codigo o que o codigo respondera. Os numeros de arquivo estavam certos (685 -> 578); a AFIRMACAO sobre o que vazou, nao.'
     trace: '.claude/validation/lint-selftest.sh'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "git archive dos dois papeis + tar -t + lint no sandbox extraido"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CORTE_ESTAVA_INVERTIDO_MEDIDO_0915
     node_type: evidence
@@ -318,6 +398,10 @@ nodes:
     verified_against: 'ls do repo PUBLICO onion-standalone (corte manual de 2026-07-19) + resolve-role-bundle.sh standalone --tools + bundle extraido e lintado'
     label: 'O CORTE ESTAVA INVERTIDO em relacao ao precedente que ele afirmava mecanizar. O onion-standalone MANTEVE 14 dos 43 comandos de `meta/` — `kg` (o norte NS1, citado por 31 sobreviventes), `setup-integration` (o fallback que o proprio CLAUDE.md manda sugerir), `diary`, `orchestrate`, `co-evolve` — e cortou a meta-fabrica ARQUIVO A ARQUIVO (−274). A 1a versao fazia o oposto: apagava `commands/meta/` inteiro (−107) e mantinha `skills/onion-publish` e `agents/meta/*-creator-*`, que o manual removera. E os 29 cortados NAO compartilham prefixo, entao prefixo nunca poderia reproduzir o corte. Consequencia de metodo: as 27 ocorrencias de REGRA 22 que eu declarei em stderr como "doutrina citando caminho do core" eram, medidas, o corte levando comandos que deviam ficar — diagnostico errado ANUNCIADO como medicao. Com o corte derivado do roles.yaml e a SSOT do escopo corrigida elas caem para 9.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "ls do repo PUBLICO onion-standalone (corte manual de 2026-07-19) + resolve-role-bundle.sh standalone --tools + bundle extraido e lintado"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_A_SSOT_DO_ESCOPO_JA_EXISTIA
     node_type: evidence
@@ -351,6 +435,10 @@ nodes:
     verified_against: 'write-stamp.sh --role standalone saia 2; /home/marcio/onion-standalone/.claude/.onion-version carrega role: adopted'
     label: 'O MECANISMO NAO TINHA PORTA DE ENTRADA. O transporte aprendeu a cortar por papel e o `--update` aprendeu a LER o papel do stamp — mas `write-stamp.sh` recusava `standalone` (so `adopted|hub`), e o unico standalone do mundo, o repo PUBLICO, carrega `role: adopted` ate hoje. Somado ao `ONION_ROLE` que nenhum codigo atribuia, o corte nao disparava para adotante NENHUM que exista: gap invisivel trocado por gap invisivel, que e exatamente a tese do no que este PR fecha. Curado: o stamp aceita o papel e o `--update` EXPORTA `ONION_ROLE` para quem copia.'
     trace: '.claude/utils/adopt/write-stamp.sh'
+    provenance:
+      source: ".claude/utils/adopt/write-stamp.sh"
+      locator: "write-stamp.sh --role standalone saia 2; /home/marcio/onion-standalone/.claude/.onion-version carrega role: adopted"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_A_SSOT_DO_ESCOPO_ESTAVA_DEFASADA
     node_type: evidence
@@ -362,6 +450,10 @@ nodes:
     verified_against: 'contagem das mencoes a /meta:* nas mensagens de .claude/validation/*.sh: inventory 32x, kg-freshness 27x, drive 5x, radar 4x, backlog 3x, kg-inbox 3x'
     label: 'CONSUMIR UMA SSOT TORNA A DEFASAGEM DELA CONSEQUENTE. `work_tool_sets.full` do roles.yaml foi escrito quando `inventory`, `kg-freshness`, `backlog`, `drive`, `radar`, `realign`, `graph`, `census` e `kg-inbox` nao existiam, e nada media a lista contra o que o alvo precisa. Enquanto o transporte ignorava o papel a defasagem era inofensiva; no instante em que o corte passou a consumir o arquivo, ela virou ENTREGA ERRADA — o standalone nasceria sem o motor do proprio metodo. O maestro apontou ("mesmo o kg e metas tem que ir com standalone core geral"; "hub ... todo") e a medicao confirmou. O criterio que fecha e objetivo: comando que as mensagens das guardas mandam o ALVO rodar tem de viajar para o alvo — entregar a guarda sem o comando da cura e dar uma instrucao impossivel de cumprir. standalone: 14 -> 23 comandos. Licao de segunda ordem: passar a consumir uma SSOT exige MEDIR se ela ainda e verdadeira, porque ate ali ninguem pagava o preco de ela nao ser.'
     trace: '.claude/utils/marketplace/roles.yaml'
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml"
+      locator: "contagem das mencoes a /meta:* nas mensagens de .claude/validation/*.sh: inventory 32x, kg-freshness 27x, drive 5x, radar 4x, backlog 3x, kg-inbox 3x"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_O_VERIFICADOR_DO_GATE_DECIDIA_POR_STRING
     node_type: evidence
@@ -373,6 +465,10 @@ nodes:
     verified_against: 'adocao real do jogo-da-vida abortou com rc=1; `core.hooksPath` = /home/marcio/jogo-da-vida/.githooks (absoluto) contra a comparacao `[ "${DIR}" != ".githooks" ]`; apos a cura com -ef o mesmo alvo devolve GATE VIVO'
     label: 'O VERIFICADOR QUE EXISTE PARA PROVAR COMPORTAMENTO DECIDIA POR DECLARACAO DE PATH — e ABORTOU UMA ADOCAO REAL. `ops/verify-adopter-gate.sh` comparava `core.hooksPath` por STRING contra `.githooks`; um alvo com o caminho na forma ABSOLUTA (que o git aceita e resolve para o MESMO diretorio) reprovava. O veredito saia contradizendo as proprias linhas seguintes do script: `✗ o git IGNORA o hook` impresso LOGO ACIMA de `✓ o hook EXECUTOU no commit` e `✓ o commit foi BARRADO — bloqueio provado`. O `ABS` resolvido ja era calculado 15 linhas antes, exatamente para isto; so esta checagem nao o usava. E a causa de FUNDO nao e o operador `!=`: e que `ops/verify-adopter-gate.sh` tinha ZERO cobertura de bancada, sendo ele quem a adocao consulta para decidir se ENTREGOU o produto. Guarda sem bancada e guarda cujo defeito so aparece no repo de um cliente. Curado: comparacao por IDENTIDADE (`-ef`) + familia `adopter_gate` (4 casos), com mutante que devolve a comparacao a string e prova o caso, e um caso que mantem o fail-closed do gate SOMBREADO (husky ocupando o hooksPath) para a cura nao virar fail-open.'
     trace: 'ops/verify-adopter-gate.sh'
+    provenance:
+      source: "ops/verify-adopter-gate.sh"
+      locator: "adocao real do jogo-da-vida abortou com rc=1; `core.hooksPath` = /home/marcio/jogo-da-vida/.githooks (absoluto) contra a comparacao `[ \"${DIR}\" != \".githooks\" ]`; apos a cura com -ef o mesmo alvo devolve GATE VIVO"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_O_VEREDITO_DO_GATE_CONFUNDIA_EXECUTAR_COM_BARRAR
     node_type: evidence
@@ -384,6 +480,10 @@ nodes:
     verified_against: 'sinal de campo de um adotante (inbox 2026-09-15) + leitura do verificador: o `info` imprime "o BLOQUEIO nao foi exercido — declarado, nao aprovado" e o veredito 3 linhas abaixo diz "GATE VIVO — provado por execucao"'
     label: 'O VEREDITO APAGAVA UMA DISTINCAO QUE O PROPRIO SCRIPT IMPRIMIA. Com o lint do alvo limpo, o verificador dizia textualmente que o bloqueio NAO fora exercido e mesmo assim fechava com `GATE VIVO — provado por execucao`. Executar e barrar sao afirmacoes diferentes, e um gate que roda e sempre passa e indistinguivel de um gate quebrado ate o dia em que precisa barrar. O estrago nao parava no texto: o `adopt.md` faz `grep GATE VIVO` na saida para carimbar `--gate-proven` na semente do KG do adotante — entao o GRAFO DO CLIENTE afirmava prova que ninguem fez, o defeito exato que aquele passo declara existir para nao repetir. Curado mantendo a string `GATE VIVO` EXCLUSIVA do caso provado: o consumidor fica correto POR CONSTRUCAO, nao por disciplina. Chegou por SINAL DE CAMPO, no mesmo dia da adocao — o adotante viu o relatorio afirmar prova contra um no `open` no grafo dele.'
     trace: 'ops/verify-adopter-gate.sh'
+    provenance:
+      source: "ops/verify-adopter-gate.sh"
+      locator: "sinal de campo de um adotante (inbox 2026-09-15) + leitura do verificador: o `info` imprime \"o BLOQUEIO nao foi exercido — declarado, nao aprovado\" e o veredito 3 linhas abaixo diz \"GATE VIVO — provado por execucao\""
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_METADE_DO_PARQUE_FORA_DO_REGISTRO_DA_FEDERACAO
     node_type: evidence
@@ -395,6 +495,10 @@ nodes:
     verified_against: 'ops/audit-adopters-registry.sh /home/marcio — varredura por STAMP (.claude/.onion-version com role != source) cruzada com members.yaml: 19 adotantes no disco, 9 sem entrada'
     label: 'O SINAL APONTOU UM CASO; A VARREDURA REVELOU UMA CLASSE — 9 de 19 adotantes no disco (47%) estao FORA do registro da federacao. Alguns sao residuo (onion-pedro-old, onion-pedro-hub-bak, onion-adopt-granaa-ai = worktree de adocao), mas ha repos REAIS na lista: aura, gustavo-pulga, rhilo-metagamify, poc-venda-direta-pdi, venda-direta-pdi, venda-direta-pdi-entrega. CONSEQUENCIA: o core nao resolve o `--target` do /meta:co-deliver para nenhum deles, entao todo anuncio futuro do CHANGELOG fica SEM DESTINATARIO — e cada um segue verde, porque o hook do adotante conta o que CHEGOU, nao o que deveria ter chegado. POR QUE NENHUM GATE ACUSOU, e e a licao: a reconciliacao `outbox x inbound` compara o que o core transportou contra o que chegou, e para um membro que NAO EXISTE ela compara DOIS CONJUNTOS VAZIOS e sai limpa. Toda guarda desta casa pergunta pelo que ESTA; esta precisou perguntar pelo que DEVERIA ESTAR, e para isso precisou de uma fonte independente — o disco. Ausencia nao dispara nada por construcao. O numero (9) e do maestro decidir: parte e lixo a podar, parte e registro a fazer, e a distincao exige julgamento (NDA, id, papel).'
     trace: 'ops/audit-adopters-registry.sh'
+    provenance:
+      source: "ops/audit-adopters-registry.sh"
+      locator: "ops/audit-adopters-registry.sh /home/marcio — varredura por STAMP (.claude/.onion-version com role != source) cruzada com members.yaml: 19 adotantes no disco, 9 sem entrada"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: A_DOUTRINA_VENDORIZADA_LINKA_CAMINHO_DO_CORE
     node_type: decision
@@ -420,6 +524,10 @@ nodes:
       COMANDOS diverge hoje; agentes, skills e KBs coincidem nos tres papeis — e a coincidencia nao e
       garantia, porque o corte e por PREFIXO de caminho.'
     trace: '.claude/commands/meta/adopt.md'
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: "lint completo rodado DENTRO dos bundles adopted/hub/standalone montados da arvore de trabalho (git stash create) e de main, por REGRA; e diff do conjunto normalizado de violacoes entre os dois lados, nos tres papeis"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_MANIFESTO_VAZIO_ERA_TODOS
     node_type: evidence
@@ -431,6 +539,10 @@ nodes:
     verified_against: 'repo de teste sem nenhuma raiz da superficie Onion: manifesto saia com ZERO pathspecs e rc=0'
     label: 'ACHADO PELA PROPRIA BANCADA DESTE CORTE, investigando por que o caso (e) reprovava. Para o git, pathspec AUSENTE significa TODOS, nao NENHUM: um repo sem nenhuma raiz da superficie emitia manifesto vazio com rc=0, e o consumidor que lesse so o rc copiaria o REPOSITORIO INTEIRO — biografia e segredos junto. E a 1a versao da minha propria guarda nova aprovava a si mesma pelo mesmo motivo: contava com `diff-tree --` sem pathspec, que casa tudo. Curado: manifesto vazio e falha de precondicao (exit 3), nunca "nada a copiar". Classe `exit-code-nao-e-a-verificacao`, agora no transporte.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "repo de teste sem nenhuma raiz da superficie Onion: manifesto saia com ZERO pathspecs e rc=0"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: A_ADOTANTE_GREENFIELD_NASCE_COM_HARD
     node_type: decision
@@ -478,6 +590,10 @@ nodes:
     source_kind: internal-audit
     label: 'A METADE VERDADEIRA DO NO, medida pela passada adversarial do PR #831 e que eu NAO tinha medido: no merge-base, o procedimento completo entregava 1 HARD. O bullet da Fase 3 salvava o `inventory.md` — mas gerava SOMENTE ele, nunca o `graph.md` (REGRA 21). Entao nem o operador que lia o documento inteiro escapava: as DUAS implementacoes do mesmo passo estavam erradas, cada uma de um jeito. Eu media `com mkdir vs sem mkdir` e concluia que o mkdir era a unica variavel; a variavel real era QUANTAS PROJECOES cada metade do documento gerava. Licao: ao comparar dois caminhos, medir o RESULTADO de cada um, nunca so a diferenca que eu ja tinha nomeado.'
     trace: '.claude/commands/meta/adopt.md'
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: "procedimento PRE-CURA seguido POR INTEIRO (inclusive o bullet da Fase 3 que tinha o mkdir) num alvo simulado: lint dentro do alvo = 1 HARD, `docs/onion/graph.md: grafo ausente`"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PLUGINS_NAO_ERA_RAIZ_DE_VARREDURA
     node_type: evidence
@@ -489,6 +605,10 @@ nodes:
     verified_against: 'vendor-manifest.sh --emit-scrub-roots listava 11 raizes e NENHUMA era plugins/; e lint completo rodado depois de acrescenta-la achou 6 candidatos que nenhuma guarda via'
     label: 'A GUARDA NAO OLHAVA O TRANSPORTE MAIS PUBLICO QUE EXISTE. `--emit-scrub-roots` — a SSOT que as REGRAS 36 e 45 consomem para saber O QUE VARRER — emitia 11 raizes sob `.claude/` e `docs/`, e `plugins/` nao estava entre elas. O marketplace publica aquele diretorio para qualquer pessoa. Na medicao o CONTEUDO estava limpo, e essa e exatamente a frase perigosa: limpo era o conteudo, nao a COBERTURA. E a tese do cabecalho do proprio `vendor-manifest.sh` ("guarda que varre menos do que o transporte emite e fail-open com cara de cobertura") aplicada um andar acima dela mesma — `plugins/` nao estava nem no transporte que a SSOT descreve, entao ninguem o olhava. CURADO com uma lista SEPARADA (`_SCRUB_EXTRA`), emitida so no modo scrub: por em `_base` faria o plugin montado VIAJAR dentro do bundle, que e outra coisa e esta errada. A assimetria ja era desenho declarado: varrer mais do que viaja nunca e fail-open; varrer menos e. Achado por refutador adversarial, nao por leitura minha.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "vendor-manifest.sh --emit-scrub-roots listava 11 raizes e NENHUMA era plugins/; e lint completo rodado depois de acrescenta-la achou 6 candidatos que nenhuma guarda via"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_PADRAO_PRIVADO_FIXAVA_UM_NOME_E_O_IRMAO_PASSAVA
     node_type: evidence
@@ -500,6 +620,10 @@ nodes:
     verified_against: 'grep do prefixo da familia na superficie que viaja: 6 citacoes num motor e numa KB que o padrao anterior nao casava, duas delas ja dentro do plugin publico montado'
     label: 'O `_priv` do `--check-bundle` — a guarda que reprova biografia dentro de um bundle — fixava o NOME COMPLETO de um repo do vertical pessoal. A familia tem mais de um repo, e o irmao passava batido: 6 citacoes viajavam, e duas ja estavam no plugin PUBLICO montado. Mesma classe de C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO, agora no predicado de privacidade: o defeito e o VOCABULARIO, nao a logica. CURADO trocando o nome completo pelo PREFIXO da familia — que cobre inclusive o repo que ninguem criou ainda — e neutralizando as 6 citacoes, que passaram a creditar o SINAL DE CAMPO sem nomear o repo. A licao que fica: predicado de privacidade escrito por enumeracao envelhece a cada repo novo; escrito por prefixo, nao.'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "grep do prefixo da familia na superficie que viaja: 6 citacoes num motor e numa KB que o padrao anterior nao casava, duas delas ja dentro do plugin publico montado"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_A_GUARDA_DAVA_VEREDITOS_OPOSTOS_EM_GIT_E_NAO_GIT
     node_type: evidence
@@ -511,6 +635,10 @@ nodes:
     verified_against: 'lint-artifacts.sh rodado na porta REAL (/home/marcio/onion-core, repo git, pin 7a3504e6b121): 1 HARD em .claude/rules/research-lens.md — contra o "rc=0, 0 HARD" que eu declarei do MESMO pin, medido num destino materializado SEM git init'
     label: 'O `_rule_glob_matches` tinha dois ramos e eles DISCORDAVAM. Em repo git usava `git ls-files`; fora dele, `find -name "${g##*/}"` — e `${g##*/}` de `docs/evolution/research/**` e `**`, um curinga que casa QUALQUER arquivo. Consequencia: num destino sem `git init` toda regra path-scoped passava trivialmente. Eu materializei a porta de dogfood num destino assim e declarei 0 HARD; a porta real e repo git e reprovava. O modo de falha e o pior desta casa: a medicao BARATA era a que mentia, e foi a que escolhi — [[testar-no-caminho-errado-e-nao-testar]] dentro do harness da propria porta, o instrumento que deveria prevenir exatamente isso. Quem achou nao fui eu: foi a PORTA, num sinal de campo escrito por uma sessao limpa dela. CURADO: o ramo nao-git passa a respeitar o PREFIXO literal do glob, como o pathspec do git faz, com dois casos de bancada segurando os dois lados (nao casar quando o objeto falta; ainda casar quando existe — cura que cega a guarda nao e cura).'
     trace: '.claude/validation/lint-artifacts.sh'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "lint-artifacts.sh rodado na porta REAL (/home/marcio/onion-core, repo git, pin 7a3504e6b121): 1 HARD em .claude/rules/research-lens.md — contra o \"rc=0, 0 HARD\" que eu declarei do MESMO pin, medido num destino materializado SEM git init"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: C_REGRA_VENDORIZADA_CUJO_OBJETO_NAO_VIAJA
     node_type: claim
@@ -522,6 +650,10 @@ nodes:
     verified_against: 'diff -q das duas copias de .claude/rules/research-lens.md (byte-identicas) x git ls-files docs/evolution/research/** nos dois repos: 140 arquivos no core, 0 na porta'
     label: 'CLASSE, nao caso: uma regra path-scoped viaja com `.claude/**` enquanto o OBJETO do glob dela fica para tras na allowlist, e no alvo ela so PODE reprovar. As duas decisoes estao certas isoladas — `.claude/` viaja inteiro; `docs/evolution/` nao viaja porque inbox/inbound sao infra LOCAL do alvo (vendor-manifest.sh:91). Juntas produzem regra morta por construcao. A irma `kg-grammar.md` sobrevive por ACASO: seu glob `**/*.kg.yaml` casa as fixtures de `.claude/validation/`, que viajam — sorte do glob, nao imunidade de desenho. Por isso e classe: hoje N=1, e a cada rule nova o dado e sorteado outra vez. CURADO com guarda papel-consciente que DECLARA a isencao ([papel/SEM-OBJETO], vocabulario ja usado pelo door-staleness-check) em vez de reprovar cego, e cujo predicado DERIVA da SSOT do transporte (`vendor-manifest.sh --emit-scrub-roots`) em vez de repetir uma lista de prefixos que envelheceria sozinha. Tres invariantes na bancada: na FONTE a mesma ausencia segue HARD (senao o recorte vira fail-open universal); glob que mira superficie que VIAJA continua cobrado em qualquer papel; e sem o manifesto NAO se concede isencao (fail-closed — "nao sei" nunca vira "passa").'
     trace: '.claude/validation/lint-artifacts.sh'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "diff -q das duas copias de .claude/rules/research-lens.md (byte-identicas) x git ls-files docs/evolution/research/** nos dois repos: 140 arquivos no core, 0 na porta"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_A_CATRACA_DA_PORTA_ERA_ESTEIRA
     node_type: evidence
@@ -533,6 +665,10 @@ nodes:
     verified_against: 'observado ao vivo em tres tentativas de fechar o mesmo gate na branch feat/door-cycle-mechanized: 378 -> 380 -> 381, cada subida de teto invalidada pelo proprio commit que a fez; depois da cura, a medicao honesta contra merge-base devolveu 372/0'
     label: 'A catraca da REGRA 85 media `git log <pin>..HEAD` — HEAD da BRANCH. Consequencia estrutural: todo commit que toca `.claude/**` afasta a porta em +1; subir o teto para destravar EXIGE um commit; esse commit afasta de novo. Esteira, nao catraca. E a saida legitima nao existia: a porta so pode ser re-materializada a partir de main MERGEADA, logo a cura que o gate cobra nunca esta disponivel quando ele cobra — guarda satisfazivel so pos-merge nao e gate de pre-merge. Descoberto DIRIGINDO o mecanismo que eu mesmo tinha acabado de construir; nenhum refutador apontou, foi o uso. CURADO: a ponta passa a ser o `merge-base` com o ramo default (fallback declarado para HEAD sem remote — mais estrito, nunca mais frouxo). O efeito colateral prova a cura: os tetos CAIRAM de 378/2 para 372/0 sem ninguem re-materializar nada, porque os numeros antigos cobravam por trabalho em voo que a porta nao teria como espelhar. A catraca nao afrouxou; ficou honesta. Bancada: (e) commit em voo nao defasa, (f) o MESMO commit ja em main defasa — cura que cega a guarda nao e cura.'
     trace: '.claude/validation/door-staleness-check.sh'
+    provenance:
+      source: ".claude/validation/door-staleness-check.sh"
+      locator: "observado ao vivo em tres tentativas de fechar o mesmo gate na branch feat/door-cycle-mechanized: 378 -> 380 -> 381, cada subida de teto invalidada pelo proprio commit que a fez; depois da cura, a medicao honesta contra merge-base devolveu 372/0"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_PATHSPEC_DE_EXCLUSAO_DESLIGOU_DUAS_GUARDAS
     node_type: claim
@@ -544,6 +680,10 @@ nodes:
     verified_against: 'bancada rodada em worktree do merge-base (b586ffd1) = 35/35 verde contra a branch = 31/4, isolando as quatro como REGRESSAO DESTA PILHA; reproducao manual do caso vendor-branch §8 mostrou foo.md indo de "cmd v1 CUSTOM" para "cmd v2" com rc=0'
     label: 'A cura de seguranca que impede a CHAVE PRIVADA de viajar (`_IDENTITY_EXCLUDES`, um pathspec `:(exclude)`) entrou no manifesto de transporte e DESLIGOU duas guardas de outra familia, as duas falhando para o lado inseguro e em silencio. (1) `vendor-manifest`: o `:(exclude)` era apendado ANTES da guarda de precondicao `${#_spec[@]} -eq 0`, entao o array nunca era vazio e o fail-loud ficou MORTO — e a segunda guarda tambem caiu, porque spec composto SO de exclusao casa TUDO MENOS aquilo: num repo sem superficie Onion o manifesto saia rc=0 mandando copiar o repositorio inteiro, biografia e segredos junto. (2) `vendor-branch`: `git ls-tree` RECUSA magia de pathspec; ele errava, o `2>/dev/null` engolia, a variavel voltava vazia, e `_clean_baseline` lia esse vazio como "nao existe baseline limpo" — ramificava do HEAD e o merge SOBRESCREVIA a customizacao do adotante. Medido: `cmd v1 CUSTOM` virou `cmd v2` com rc=0. A CLASSE: uma linha de seguranca nao e local — ela muda o VALOR que atravessa todos os consumidores, e cada consumidor tem contrato proprio (`git archive` aceita magia e DEVE receber; `ls-tree` recusa). E os dois defeitos falharam por SAIDA VAZIA COM rc ESCONDIDO, nao por logica errada. CURADO: guarda de precondicao conta so os POSITIVOS e roda antes de apendar a exclusao; quem COMPARA arvores usa `_manifest_positivo`, quem TRANSPORTA usa o manifesto inteiro; e o ls-tree que falha agora FALA, porque "sem baseline" e "nao consegui olhar" nao podem soar igual.'
     trace: '.claude/utils/adopt/vendor-branch.sh'
+    provenance:
+      source: ".claude/utils/adopt/vendor-branch.sh"
+      locator: "bancada rodada em worktree do merge-base (b586ffd1) = 35/35 verde contra a branch = 31/4, isolando as quatro como REGRESSAO DESTA PILHA; reproducao manual do caso vendor-branch §8 mostrou foo.md indo de \"cmd v1 CUSTOM\" para \"cmd v2\" com rc=0"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_O_DIAGNOSTICO_QUE_A_DOUTRINA_MANDA_RODAR_ESTAVA_MORTO
     node_type: evidence
@@ -555,6 +695,10 @@ nodes:
     verified_against: 'gh workflow run onion-review-diagnose.yml devolveu HTTP 422: "failed to parse workflow: (Line: 39, Col: 5) env is already defined"; git log -S localizou a quebra em 3d39372e (2026-09-16)'
     label: 'O `onion-review.yml` carrega um aviso epistemico explicito — "este comentario ja mentiu duas vezes; nao reescreva causa neste bloco sem rodar o diagnostico" — e o diagnostico (`onion-review-diagnose.yml`) tinha DOIS blocos `env:` no mesmo job: o YAML nao parseava e o workflow estava INEXECUTAVEL havia um dia. A doutrina mandava nao adivinhar e apontava para um instrumento morto, entao adivinhar virava a unica coisa que sobrava. POR QUE NADA PEGOU: `workflow_dispatch` so falha quando alguem DISPARA, e o gatilho `pull_request` do arquivo e restrito a ele mesmo — ninguem mais o tocou desde a quebra. O `harness-inventory.sh` CONTAVA os workflows e nunca os LIA: contar nao e validar, e SSOT que conta artefato quebrado exibe um numero com cara de saude. CURADO com a REGRA 86 (Workflow de CI PARSEIA como YAML). E a bancada pegou a MINHA cura pela metade: `yaml.safe_load` NU aceita chave duplicada (fica com a ultima) enquanto o GitHub a rejeita — a 1a redacao da regra passava verde no defeito EXATO que a originou. Loader estrito, e o caso (b) da bancada e justamente esse arquivo.'
     trace: '.claude/validation/lint-artifacts.sh'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "gh workflow run onion-review-diagnose.yml devolveu HTTP 422: \"failed to parse workflow: (Line: 39, Col: 5) env is already defined\"; git log -S localizou a quebra em 3d39372e (2026-09-16)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_A_DIVIDA_DA_REGRA_45_ERA_O_QUE_PRENDIA_A_PORTA
     node_type: evidence
@@ -566,6 +710,10 @@ nodes:
     verified_against: 'kb-vendored-link-check.sh antes: "Links core-privados: 22 · Baseline: 24 entradas"; depois da migracao link->texto+gloss em 15 arquivos: "Links core-privados: 0 · Baseline: 0 entradas"'
     label: 'O ACOPLAMENTO SO APARECEU QUANDO O VAZAMENTO SAIU DA FRENTE. A porta publica re-materializada nasceu com 22 HARD da REGRA 45, e o instinto errado seria tratar a piora como regressao. Medido: a porta ANTERIOR tinha 1 HARD porque carregava um `kb-vendored-link-baseline.txt` POPULADO — 22 entradas, cada uma NOMEANDO um caminho core-privado (dois ADRs, um RFC, o template de discussoes, uma mensagem de inbox) num repo PUBLICO. O baseline comprava lint verde ao preco de publicar a topologia privada; os 22 HARD eram o sintoma HONESTO. Disso saiu um acoplamento que ninguem tinha declarado: a porta publica so fica verde quando a divida da REGRA 45 no core chegar a ZERO, porque o ledger que tolera os links so funciona NOMEANDO o que ele tolera — e o que ele nomeia e justamente o que nao pode viajar. CURADO na mesma sessao: 22 links migrados para texto+gloss em 15 arquivos, com os pares lidos da PROPRIA guarda (SSOT, nunca lista minha), e o baseline encolhido de 24 para 0 — a catraca chegou ao fundo, que e a unica direcao que ela admite. A guarda ainda declarou, sozinha, que suspendia a catraca de CRESCIMENTO nesta rodada porque o escopo mudou (ganhou `plugins/`): passivos de escopos distintos nao sao comparaveis.'
     trace: '.claude/validation/kb-vendored-link-check.sh'
+    provenance:
+      source: ".claude/validation/kb-vendored-link-check.sh"
+      locator: "kb-vendored-link-check.sh antes: \"Links core-privados: 22 · Baseline: 24 entradas\"; depois da migracao link->texto+gloss em 15 arquivos: \"Links core-privados: 0 · Baseline: 0 entradas\""
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_A_GUARDA_CONTRA_NOME_DE_CLIENTE_CONTINHA_NOMES_DE_CLIENTE
     node_type: evidence
@@ -577,6 +725,10 @@ nodes:
     verified_against: 'gh api repos/marciocar/onion-core/contents/.claude/validation/vendor-scrub-form-check.sh devolveu as fixtures com quatro nomes comerciais reais no repo PUBLICO; depois da cura, `git grep` desses nomes na superficie que viaja devolve ZERO e a sonda ao vivo (injetar o nome num agente) passou a ser pega pela REGRA 36'
     label: 'A guarda que impede NOME DE CLIENTE de viajar CONTINHA nomes de cliente, e estava PUBLICA. As fixtures de `vendor-scrub-form-check.sh` usavam quatro nomes comerciais REAIS como exemplo — um deles o cliente sob NDA — e o arquivo vive em `.claude/validation/`, que VIAJA; logo estavam no `onion-core`, publico. Publicar "PoC <cliente>" e "adotante: <cliente>" revela CARTEIRA DE CLIENTES, que e comercialmente sensivel e, para o NDA, potencialmente quebra. POR QUE NADA ACUSOU, e nao e defeito da guarda: a REGRA 36 deriva os termos do `members.yaml`, e nenhum daqueles clientes esta registrado — [[vendor-scrub-blind-spot]] com dano CONSUMADO em vez de hipotese, e irmao do E_METADE_DO_PARQUE_FORA_DO_REGISTRO_DA_FEDERACAO (9 de 19 fora). COMO APARECEU: nao por leitura nem por refutador — por ADOTAR um repo novo e varrer o alvo por nome de cliente, isto e, pelo uso. CURA EM DUAS METADES, porque uma so seria meia-cura: (1) as fixtures passam a usar nomes ficticios que PRESERVAM a forma testada (sigla caixa-alta + 2o token, nome normal + 2o token, conector, acento UTF-8) — a bancada segue 11/11, a guarda nao cegou; (2) uma TERCEIRA fonte de termos, DECLARADA, em `docs/evolution/federation/client-terms.txt` — que NAO VIAJA, e essa e a invariante que torna a cura possivel em vez de ser o vazamento. Registrar no `members.yaml` NAO serviria: o `name:` de um membro e PROJETADO para o console e o mapa publicos, entao trocaria um vazamento por outro. LIMITE DECLARADO: o historico publico do `onion-core` mantem os nomes ate o GC do GitHub; force-push torna inalcancavel, nunca inexistente.'
     trace: 'docs/evolution/federation/client-terms.txt'
+    provenance:
+      source: "docs/evolution/federation/client-terms.txt"
+      locator: "gh api repos/marciocar/onion-core/contents/.claude/validation/vendor-scrub-form-check.sh devolveu as fixtures com quatro nomes comerciais reais no repo PUBLICO; depois da cura, `git grep` desses nomes na superficie que viaja devolve ZERO e a sonda ao vivo (injetar o nome num agente) passou a ser pega pela REGRA 36"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: A_CAMINHO_DE_MAQUINA_EM_CODIGO_FUNCIONAL_E_PARAMETRIZACAO
     node_type: decision
@@ -589,6 +741,10 @@ nodes:
     verified_against: 'grep de /home/<conta>/ e do host de backend nas 11 raizes de varredura: 14 sitios remanescentes, todos em codigo funcional (defaults de varredura, endpoints, URL de pull)'
     label: 'ABERTO E DECLARADO, com a fronteira medida. A varredura por caminho de maquina na superficie que viaja achou dois tipos, e eles tem desfechos OPOSTOS. (1) NARRATIVA — anedota de campo, topologia de hospedagem, ponteiro para documento do core: 7 sitios, CURADOS neste PR (inclusive a secao 10 da KB de identidade, que descrevia backend, TLS e o caminho do clone em disco, e que viaja no `plugins/onion/kb/` publico). (2) FUNCIONAL — `vps-exposure-check.sh` varre diretorios de backup por default, `a2a-agent-card.sh` publica endpoint, `inbox-pull.sh` tem URL de core: 14 sitios. Ali o caminho NAO e prosa a limpar, e VALOR PADRAO a PARAMETRIZAR, e parametrizar destino e desenho, nao limpeza. E exatamente a peca (4) que o no Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN ja nomeia como a unica que o criterio "sem segredo" nao resolve sozinho: `marketplace/*` publica NO REPO DO MAESTRO. Gatilho: a decisao do maestro sobre parametrizar destino — a mesma decisao cobre os dois.'
     trace: '.claude/validation/vps-exposure-check.sh'
+    provenance:
+      source: ".claude/validation/vps-exposure-check.sh"
+      locator: "grep de /home/<conta>/ e do host de backend nas 11 raizes de varredura: 14 sitios remanescentes, todos em codigo funcional (defaults de varredura, endpoints, URL de pull)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_REVISOR_SEMANTICO_VOLTOU_A_RODAR_COM_CREDITO
     node_type: evidence
@@ -600,6 +756,10 @@ nodes:
     verified_against: 'gh pr checks nos PRs #846 e #847 apos o maestro repor credito: onion-review pass em 8m1s (#846) e 5m3s + onion-review-verdict pass em 3s (#847); antes, no #842, o mesmo workflow saia is_error:true com turnos=1 e custo=0'
     trace: '.github/workflows/onion-review.yml'
     label: 'A CAUSA ERA SALDO, E A PROVA E COMPORTAMENTAL: reposto o credito, o revisor semantico voltou a rodar de verdade — 8m1s no #846 e 5m3s no #847, com turnos reais e veredito lido da FONTE (nao inferido), enquanto no #842 ele saia `is_error:true` com turnos=1 e custo=0. O QUE ISSO ENSINA ALEM DO CASO: o modo de falha por CREDENCIAL/SALDO se disfarca de defeito de runner — `is_error` sem mensagem util, custo zero, e um pre-voo HTTP 200 que so prova que a chave EXISTE, nao que ela pode gastar. Diagnosticar pela saude do transporte (o POST de 1 token respondeu) e concluir sobre a capacidade de EXECUTAR foi o erro de leitura que custou as rodadas anteriores. O sinal honesto e o custo: run com `custo=0` e turnos=1 nao e run curto, e run que NAO ACONTECEU.'
+    provenance:
+      source: ".github/workflows/onion-review.yml"
+      locator: "gh pr checks nos PRs #846 e #847 apos o maestro repor credito: onion-review pass em 8m1s (#846) e 5m3s + onion-review-verdict pass em 3s (#847); antes, no #842, o mesmo workflow saia is_error:true com turnos=1 e custo=0"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_A_MESMA_CAUSA_VOLTOU_E_AGORA_COM_O_CORPO_DA_API
     node_type: evidence
@@ -612,6 +772,10 @@ nodes:
     verified_against: 'Log do job onion-review do PR #874 (run 36131799171, 2026-09-25T11:52:55Z): pre-voo POST /v1/messages com claude-sonnet-5 devolveu HTTP 400 e corpo {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API"}}. Nas duas ocorrencias (2026-09-18 e 2026-09-25) a causa foi a MESMA. O maestro reps o credito no mesmo dia.'
     trace: '.github/workflows/onion-review.yml'
     label: 'A CAUSA VOLTOU, E DESTA VEZ COM O CORPO DA API NA MAO — e a diferenca entre as duas ocorrencias e o que vale registrar. Em 2026-09-18 o diagnostico foi COMPORTAMENTAL (reposto o credito, voltou a rodar): certo, mas indireto, e por isso tres hipoteses erradas sobreviveram tres dias a cada rodada. Em 2026-09-25 o pre-voo IMPRIMIU a mensagem da propria API, e o diagnostico saiu em uma leitura. O que mudou nao foi o sintoma, foi a EVIDENCIA PRESERVADA: a cura do PR #874 existe exatamente para isso. DUAS LICOES DE MECANISMO, ambas curadas no mesmo PR: (1) o pre-voo JA capturava a causa e a jogava num `::warning::` que morre no log do job — quem le `gh pr checks` na hora de mergear via so `1a tentativa: sem-arquivo`, verdadeiro e inutil; agora a causa VIAJA para o `onion-review-verdict` pelos outputs `preflight_http`/`preflight_causa` e sai nomeada no erro e no sumario. (2) o `ops/pr-merge-verified.sh` registrava a dispensa com um corpo que saia VAZIO (um contra-barra) e ainda dizia `dispensa registrada`, porque o rc do `gh pr comment` era a unica prova — o registro que o proprio bloco chama de PRECONDICAO DE AUDITORIA nao registrava nada; agora o corpo e CONTADO antes de postar, com mutante na bancada. E a licao epistemica que generaliza: sonda verde mede O MOMENTO DELA. Quando um pre-voo passa e o trabalho real falha, o que foi refutado e `estava quebrado antes de comecar`, nunca `a causa nao e X` — descarte de causa vai ao registro com o ESCOPO DA MEDICAO junto, nao como veredito atemporal.'
+    provenance:
+      source: ".github/workflows/onion-review.yml"
+      locator: "Log do job onion-review do PR #874 (run 36131799171, 2026-09-25T11:52:55Z): pre-voo POST /v1/messages com claude-sonnet-5 devolveu HTTP 400 e corpo {\"type\":\"error\",\"error\":{\"type\":\"invalid_request_error\",\"message\":\"Your credit balance is too low to access the Anthropic API\"}}. Nas duas ocorrencias (2026-09-18 e 2026-09-25) a causa foi a MESMA. O maestro reps o credito no mesmo dia."
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PERNA_DE_LEITURA_E_CEGA_A_BASH
     node_type: evidence
@@ -623,6 +787,10 @@ nodes:
     verified_against: '.claude/settings.json:141 (matcher "Read") e .claude/hooks/kg-read-leg.sh:35 (le tool_input.file_path, campo que NAO existe numa chamada Bash); medido pelo proprio incidente de 2026-09-19, em que o condutor leu e editou um .kg.yaml inteiramente por sed/grep/python-heredoc e o hook nunca falou'
     trace: '.claude/hooks/kg-read-leg.sh'
     label: 'O HOOK QUE EXISTE PARA IMPEDIR EXATAMENTE ESTE ERRO NAO DISPAROU — e a razao e de SUPERFICIE, nao de logica. `kg-read-leg.sh` e PreToolUse com matcher `Read`, e le `tool_input.file_path`. Uma sessao que trabalha o grafo por BASH (`sed -n`, `grep -n`, heredoc de python) nunca aciona o matcher e nunca tem `file_path` — o hook fica mudo justamente para quem esta ESCREVENDO no grafo, que e quem mais precisa de ter lido. O PRECO, medido no mesmo dia: uma proposta de desenho foi ao maestro, foi SELADA, e caiu na passada adversarial contra DOIS nos `confirmed` do proprio arquivo que estava sendo editado — um deles tier 9, textual ("C NAO deve desenhar nada que dependa de opt-in do empregado COMO SALVAGUARDA"), o outro registrando o desenho proposto como JA REFUTADO. A ironia que fecha o caso: o hook nasceu (2026-09-16) de um sinal de campo em que uma sessao publicou quatro teses erradas num corpus que tinha a resposta. Ele curou a leitura por `Read` e deixou aberta a porta por onde o mesmo erro voltou. CURA CANDIDATA, nao feita aqui: o matcher precisa alcancar as ferramentas que de fato tocam `.kg.yaml` — e para `Bash` isso exige o hook inspecionar `tool_input.command` em vez de `file_path`, com o cuidado de nao virar ruido em toda chamada de shell. Fica NOMEADO porque a cura mexe num hook que roda em TODA sessao, e desenhar isso as pressas depois de um incidente e como o proprio incidente.'
+    provenance:
+      source: ".claude/hooks/kg-read-leg.sh"
+      locator: ".claude/settings.json:141 (matcher \"Read\") e .claude/hooks/kg-read-leg.sh:35 (le tool_input.file_path, campo que NAO existe numa chamada Bash); medido pelo proprio incidente de 2026-09-19, em que o condutor leu e editou um .kg.yaml inteiramente por sed/grep/python-heredoc e o hook nunca falou"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_COMO_A_PERNA_DE_LEITURA_ALCANCA_QUEM_ESCREVE
     node_type: question
@@ -654,6 +822,10 @@ nodes:
     verified_against: 'seletor REAL (_selftest_affected_families) rodado arquivo a arquivo sobre os 253 do dominio; e lint-selftest.sh:3924 mostrando `bash "${SCRIPT_DIR}/members-validate.sh"` dentro de helper despachado pela familia fixtures'
     trace: '.claude/validation/lint-selftest.sh'
     label: 'UMA TENTATIVA DE AFROUXAR O FAILSAFE, REPROVADA POR DOIS MOTIVOS INDEPENDENTES — e a doutrina dela continua boa. A IDEIA: arquivo que a bancada nao alcanca nao ganha cobertura por rodar tudo, entao o failsafe deveria DECLARAR a lacuna em vez de comprar ~30 min. (a) FALSO-NEGATIVO PERIGOSO: o mapa so enxerga referencias dentro do corpo de `run_*_selftests()`; chamadas em FUNCOES-HELPER sao invisiveis. `members-validate.sh` e EXECUTADO na l.3924 por helper da familia `fixtures`, com 5 fixtures asseverando seu exit code — e o predicado dizia "nao coberto", tirando dele o failsafe que o protege. Mesma classe em `federation-contract-validate.sh`, `lib/pt-br-words.txt` (o DADO que dirige a guarda de idioma) e `scaffold-diagnose-store.sh`. (b) A POPULACAO ESTAVA ERRADA POR 6,6x: publiquei "13 nao-cobertos, todos em ops/" no codigo, em 4 casos de bancada, no commit e no PR. Rodando o seletor REAL: 86 seriam declarados nao-cobertos, 33 rodariam tudo, 134 selecionariam familias. Eu havia medido O MEU MODELO do codigo (um script python que aproximava o predicado), nao o codigo — e pior, "corrigi" para baixo um numero que estava aproximadamente certo (116 ~ 114 reais) restringindo a populacao a `ops/` SEM DIZER. (c) E as guardas que deveriam ter pego isso eram TAUTOLOGIAS: dois casos faziam `grep -qF` no proprio script por uma string que a LINHA DO TESTE continha, entao apagar o predicado inteiro deixava a bancada verde — reincidencia direta do defeito curado no commit ANTERIOR da mesma branch. REVERTIDO; o failsafe volta a fail-closed com a razao escrita no lugar onde a proxima tentativa vai ler.'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "seletor REAL (_selftest_affected_families) rodado arquivo a arquivo sobre os 253 do dominio; e lint-selftest.sh:3924 mostrando `bash \"${SCRIPT_DIR}/members-validate.sh\"` dentro de helper despachado pela familia fixtures"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_PREDICADO_QUE_ENXERGUE_INVOCACAO_POR_HELPER
     node_type: question
@@ -674,6 +846,10 @@ nodes:
     verified_against: 'Medido em 2026-09-20 no core, e o numero final e do GATE, nao da minha leitura: rodando o checker NOVO (lista de 153 termos) contra o `origin/main` do dia, ele acusa 46 identificadores pt-BR em 16 arquivos — os mesmos que o checker VELHO (102 termos) reportava como `0 HARD - 0 tolerados pelo baseline`. Distribuicao: lint-selftest.sh 15, lint-artifacts.sh 8, review-verdict.sh 5, vendor-manifest.sh 3, e 10 em `ops/`, que nem sequer estava no universo. Em paralelo, 33 pareceres do `onion-review` mostraram 10 com violacao, SEIS delas desta mesma classe, a ~US$ 0,80 por PR.'
     trace: '.claude/validation/lib/pt-br-words.txt'
     label: 'OCORRENCIA 4, E A PIOR DA SERIE: a guarda cega era a da REGRA 60 — justamente a regra sobre IDIOMA DE IDENTIFICADOR — e ela tinha o mecanismo COMPLETO que as outras tres nao tinham: baseline com catraca no chao (zero entradas toleradas), fail-loud se a lista sumir, 7 casos de bancada, guarda-da-guarda contra homografo, e estava LIGADA no lint desde 2026-08-09. Nada disso importou: a lista tinha 102 termos e NENHUM era palavra que aparece nos identificadores deste repo. Mecanismo completo mais vocabulario vazio = `0 HARD` por 42 dias, sobre 46 violacoes reais. DUAS LICOES ALEM DA CLASSE. (1) A EXCLUSAO tambem e vocabulario: o caso (g) proibia `nome` na lista SEM RAZAO DECLARADA — nao e palavra inglesa, entrou por arrasto junto de `base`/`total`/`local`/`final` que sao —, e a prova do arrasto e que `nomes` nunca foi excluido. Guarda de lista falha pelo vocabulario nos DOIS sentidos, e o lado da exclusao e mais silencioso porque parece prudencia. (2) O CUSTO TEM NOME: enquanto a guarda gratuita dizia 0, o revisor semantico do CI achava esta classe a ~US$ 0,80 o PR — e os achados dele sao ADVISORY, entao o defeito era apontado, mergeado e ficava. Pagava-se pela descoberta e nao se recolhia a entrega. A CURA que fecha a classe: o LLM caro descobre o termo novo UMA VEZ e ele vira check deterministico permanente (caso (h) da bancada ancora os 22 segmentos reais, com mutante provando que encolher a lista quebra antes do CI; caso (i) prova as DUAS metades do universo consciente de papel — `ops/` e varrido na FONTE e fica FORA no adotante, porque a guarda viaja). O criterio de reentrada na exclusao deixou de ser opiniao: so volta a excluir quem ACUSAR ingles legitimo no corpus, medido.'
+    provenance:
+      source: ".claude/validation/lib/pt-br-words.txt"
+      locator: "Medido em 2026-09-20 no core, e o numero final e do GATE, nao da minha leitura: rodando o checker NOVO (lista de 153 termos) contra o `origin/main` do dia, ele acusa 46 identificadores pt-BR em 16 arquivos — os mesmos que o checker VELHO (102 termos) reportava como `0 HARD - 0 tolerados pelo baseline`. Distribuicao: lint-selftest.sh 15, lint-artifacts.sh 8, review-verdict.sh 5, vendor-manifest.sh 3, e 10 em `ops/`, que nem sequer estava no universo. Em paralelo, 33 pareceres do `onion-review` mostraram 10 com violacao, SEIS delas desta mesma classe, a ~US$ 0,80 por PR."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_BACKTICK_EM_PROSA_DENTRO_DE_CONTEXTO_QUE_INTERPRETA
     node_type: claim
@@ -686,6 +862,10 @@ nodes:
     verified_against: 'TRES ocorrencias medidas em dois dias, cada uma com o artefato saindo 0: (1) 2026-09-25, `ops/pr-merge-verified.sh` — o corpo do registro de dispensa era montado com `printf %s\\n` seguido de DOIS contra-barras; o primeiro escapava o segundo, a linha terminava ali e as seguintes viraram comando que o bash tentou EXECUTAR (`## Merge com check DISPENSADO: command not found`). O `gh pr comment` postou um contra-barra, saiu 0, e o script disse `dispensa registrada`. (2) 2026-09-26, `ops/materialize-door.sh` — `onion_version` em crase dentro de heredoc NAO-CITADO virou substituicao de comando e a palavra saiu VAZIA da instrucao nova; so apareceu porque eu EXECUTEI a instrucao em vez de reler. (3) a mesma familia no `.claude/diary/` — caminho em crase citado para dizer que NAO existe, barrado pela guarda de ponteiro morto, que esta certa em nao distinguir a intencao.'
     label: "CLASSE: crase em PROSA dentro de um contexto que a INTERPRETA — heredoc nao-citado, argumento de shell, corpo montado por `printf`. O padrao de falha e sempre o mesmo e e o pior formato possivel: o artefato sai 0, o arquivo fica nao-vazio, e o conteudo esta mutilado. Nenhuma das tres verificacoes baratas pega (rc, `[ -s ]`, `bash -n`), e nas tres vezes o que revelou foi RODAR e OLHAR A SAIDA. POR QUE ISTO E CARO NESTA CASA especificamente: a doutrina daqui manda escrever o PORQUE dentro do artefato, em prosa densa, e essa prosa cita caminhos, campos e comandos em crase — logo a superficie exposta a esta classe cresce com a propria pratica que da qualidade ao resto. GATILHO PARA MECANIZAR, e ele JA DISPAROU pelo criterio da casa (recorrencia medida >= 3): o desenho candidato e uma guarda de bancada que extraia todo heredoc NAO-CITADO de `ops/**` e `.claude/**/*.sh` e reprove crase nao-escapada dentro dele — `<<'EOF'` (citado) e isento por construcao, e a cura no sitio e escolher o heredoc citado ou escapar a crase. FICA GATED na decisao do maestro sobre construir: o diagnostico esta fechado, a superficie e enumeravel, e a distincao citado-vs-nao-citado e mecanica."
     trace: 'ops/pr-merge-verified.sh · ops/materialize-door.sh'
+    provenance:
+      source: "ops/pr-merge-verified.sh · ops/materialize-door.sh"
+      locator: "TRES ocorrencias medidas em dois dias, cada uma com o artefato saindo 0: (1) 2026-09-25, `ops/pr-merge-verified.sh` — o corpo do registro de dispensa era montado com `printf %s\\\\n` seguido de DOIS contra-barras; o primeiro escapava o segundo, a linha terminava ali e as seguintes viraram comando que o bash tentou EXECUTAR (`## Merge com check DISPENSADO: command not found`). O `gh pr comment` postou um contra-barra, saiu 0, e o script disse `dispensa registrada`. (2) 2026-09-26, `ops/materialize-door.sh` — `onion_version` em crase dentro de heredoc NAO-CITADO virou substituicao de comando e a palavra saiu VAZIA da instrucao nova; so apareceu porque eu EXECUTEI a instrucao em vez de reler. (3) a mesma familia no `.claude/diary/` — caminho em crase citado para dizer que NAO existe, barrado pela guarda de ponteiro morto, que esta certa em nao distinguir a intencao."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   - from: C_BACKTICK_EM_PROSA_DENTRO_DE_CONTEXTO_QUE_INTERPRETA

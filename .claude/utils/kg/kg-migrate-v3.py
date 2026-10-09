@@ -17,7 +17,9 @@ O que ela FAZ (determinístico, idempotente, edição por linha — o radar é a
     para A1 ou A2 (coluna `final`). O `method` usa a classe que o routing propôs (coluna `method_class`):
     "<classe>: provenance derivada na migração …; não reverificado". Datas NÃO são citadas neste modo (a onda
     é só de provenance). Nó fora de A1/A2 (resíduo R, ou ausente do routing) fica intocado e sai no relatório;
-    nó roteado com classe de method fora do contrato também. Sem --routing, nada muda.
+    nó roteado com classe de method fora do contrato também, e nó cujo trace é o PRÓPRIO grafo (fonte circular).
+    Fonte em caminho absoluto do host vira "testemunho: leitura do arquivo <x> no host; …" (política 4 selada).
+    Sem --routing, nada muda.
 O que ela NÃO faz (é decisão humana ou do contrato, nunca da ferramenta):
   · nó sem fonte derivável NÃO recebe provenance inventada: sai no relatório como "sem fonte recuperável"
     (a gramática diz: sem fonte verificável, o nó não é confirmed — rebaixar é decisão de quem conhece o nó);
@@ -73,15 +75,15 @@ def load_routing(path):
 
 
 def routes_for(routing, f):
-    """As rotas do grafo f: casa o caminho do routing (relativo à raiz do repo) com o fim do caminho dado."""
+    """(caminho do grafo no routing, {id: rota}): casa o caminho do routing (relativo à raiz) com o fim do dado."""
     norm = f.replace("\\", "/")
     while norm.startswith("./"):
         norm = norm[2:]
     graphs = {g for g, _ in routing if norm == g or norm.endswith("/" + g)}
     if not graphs:
-        return {}
+        return None, {}
     g = max(graphs, key=len)
-    return {i: v for (gg, i), v in routing.items() if gg == g}
+    return g, {i: v for (gg, i), v in routing.items() if gg == g}
 
 
 def scalar(raw):
@@ -114,10 +116,12 @@ def source_of(fields):
     return None, None
 
 
-def migrate(text, routes=None):
-    """routes=None: o modo de sempre. routes={id: (final, method_class)}: só provenance, só nos ids A1/A2."""
+def migrate(text, routes=None, graph=None):
+    """routes=None: o modo de sempre. routes={id: (final, method_class)}: só provenance, só nos ids A1/A2.
+    graph: o caminho do próprio grafo (modo routing), para recusar a fonte circular."""
     lines = text.split("\n")
-    out, rep = [], {"dates": 0, "prov": [], "nosource": [], "longlabel": [], "unrouted": [], "badclass": []}
+    out, rep = [], {"dates": 0, "prov": [], "nosource": [], "longlabel": [], "unrouted": [], "badclass": [],
+                    "circular": []}
     # 1) datas (fora do modo routing: a onda O1 é só de provenance)
     for ln in lines:
         m = DATE_RE.match(ln) if routes is None else None
@@ -167,13 +171,22 @@ def migrate(text, routes=None):
                 rep["unrouted"].append(f"{nid} ({route[0] if route else 'sem rota'})")
             elif routes is not None and route[1] not in METHOD_CLASSES:
                 rep["badclass"].append(f"{nid} ({route[1]})")
+            elif routes is not None and graph and how == "trace do nó" and re.split(r"[\s#:@]", src.strip())[0] == graph:
+                # o trace aponta o PRÓPRIO grafo: a fonte seria circular (o que foi lido está noutro lugar).
+                # Medido na passada adversarial da O1 (2026-10-09): 6 nós assim, todos com a fonte real fora do grafo.
+                rep["circular"].append(nid)
             elif routes is not None and src and va:
+                # política 4 selada (D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE): fonte em caminho do host, fora do repo,
+                # é testemunho da leitura no host — a CI não alcança o arquivo; a classe do routing não vale aqui
+                host = src.strip().startswith("/")
+                cls = "testemunho" if host else route[1]
+                detail = (f"leitura do arquivo {src.strip().split()[0]} no host; " if host else "") + \
+                    f"provenance derivada na migração ao contrato v4 ({how}; rota {route[0]} da triagem); não reverificado"
                 block = block + [
                     "    provenance:",
                     "      source: " + q(src),
                     "      locator: " + q(va),
-                    "      method: " + q(f"{route[1]}: provenance derivada na migração ao contrato v4 ({how};"
-                                      f" rota {route[0]} da triagem); não reverificado"),
+                    "      method: " + q(f"{cls}: {detail}"),
                 ]
                 rep["prov"].append(nid)
             elif routes is None and src and va:
@@ -217,7 +230,8 @@ def main(argv):
             print(f"kg-migrate-v3: {f} não existe", file=sys.stderr); return 2
         except yaml.YAMLError as e:
             print(f"kg-migrate-v3: {f} não é YAML válido antes da migração ({e.__class__.__name__}) — não toco", file=sys.stderr); return 2
-        new, rep = migrate(text, None if routing is None else routes_for(routing, f))
+        gpath, routes = (None, None) if routing is None else routes_for(routing, f)
+        new, rep = migrate(text, routes, gpath)
         try:
             yaml.safe_load(new)
         except yaml.YAMLError as e:
@@ -225,12 +239,14 @@ def main(argv):
         changed = new != text
         verb = ("PENDENTE" if check else "aplicado") if changed else "nada a migrar"
         extra = "" if routing is None else (f" · fora da rota A1/A2 (intocado) {len(rep['unrouted'])}"
-                                             f" · classe de method fora do contrato {len(rep['badclass'])}")
+                                             f" · classe de method fora do contrato {len(rep['badclass'])}"
+                                             f" · fonte circular (trace = o próprio grafo) {len(rep['circular'])}")
         print(f"{f}: {verb} · datas citadas {rep['dates']} · provenance derivada {len(rep['prov'])}"
               f" · sem fonte recuperável {len(rep['nosource'])} · label > {LABEL_MAX}: {len(rep['longlabel'])}{extra}")
         for k, title in (("prov", "provenance derivada"), ("nosource", "SEM FONTE RECUPERÁVEL (decisão humana: fonte ou rebaixar)"),
                          ("unrouted", "FORA DA ROTA A1/A2 (intocado: onda O2/O3)"),
                          ("badclass", "CLASSE DE METHOD FORA DO CONTRATO (intocado)"),
+                         ("circular", "FONTE CIRCULAR: o trace é o próprio grafo (intocado: onda O3)"),
                          ("longlabel", "label longo (decisão humana: label curto + narrative)")):
             if rep[k]:
                 print(f"  {title}: " + ", ".join(rep[k]))

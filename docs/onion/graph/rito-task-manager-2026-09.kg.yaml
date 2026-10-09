@@ -100,6 +100,10 @@ nodes:
     source_kind: repo
     source_tier: 10
     label: "o backlog do core JA EXISTE e JA e projecao do grafo, com regua de atencao e proibicao de edicao manual (a populacao vive na projecao, nunca carimbada aqui)"
+    provenance:
+      source: "docs/backlog.md"
+      locator: "docs/backlog.md e PROJECAO GERADA (kg-backlog-project.sh) dos nos status:open, ordenados por atencao, com 'nao editar a mao: feche o item no grafo e ele sai daqui' escrito no topo. O NUMERO nao entra neste no de proposito: a 1a versao cravou '229 em 51' e a projecao do MESMO commit ja dizia 230 em 52 — o no invalidava o proprio numero ao nascer, pela 4a vez nesta classe. O FATO e que o backlog e projecao do grafo; a populacao vive na projecao, que se regenera."
+      method: "derivado: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   # ── AS DUAS DECISÕES SELADAS ────────────────────────────────────────────────────────────────
   - id: D_SLUG_DA_SESSION_E_A_BRANCH
@@ -123,6 +127,10 @@ nodes:
     verified_against: "SELADO pelo maestro em 2026-09-30, REVISANDO o selo da mesma tarde ('uma task por leva'). A revisao veio de ele pedir que eu repensasse e EU MEDIR que o backlog do core ja e projecao do grafo."
     label: "SELADO (maestro, 2026-09-30): UMA TASK POR FIO — a unidade e o NO do grafo, nao a leva nem o PR. O fio existe ANTES do trabalho, tem nome que significa algo, aceita 1..N PRs como COMENTARIOS, e o status dele mapeia direto para o estado da task. Consequencia de arquitetura: o task manager vira PROJECAO do grafo, nunca segunda fonte — igual ao docs/backlog.md."
     trace: "docs/backlog.md · .claude/validation/kg-backlog-project.sh"
+    provenance:
+      source: "docs/backlog.md · .claude/validation/kg-backlog-project.sh"
+      locator: "SELADO pelo maestro em 2026-09-30, REVISANDO o selo da mesma tarde ('uma task por leva'). A revisao veio de ele pedir que eu repensasse e EU MEDIR que o backlog do core ja e projecao do grafo."
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: D_MAPA_NO_MAP_CANONICO
     node_type: decision
     layer: audit
@@ -214,6 +222,10 @@ nodes:
     label: "nenhuma das tres capacidades (ordem leitor/escritor, diferencial spec-impl, SMT de conflito) se absorve sem plano que diga o que QUEBRA — o plano existe e a execucao e decisao do maestro"
     trace: docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md
     gatilho: "o maestro mandar executar. O passo 1 da Capacidade 1 (classificar as 91 por le-arquivo / escreve / depende-de-ordem, IMPRIMINDO sem julgar) e o unico trabalho que paga duas contas: serve a ordem E ao gatilho da Capacidade 3."
+    provenance:
+      source: "docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md"
+      locator: "selado pelo maestro: 'nenhuma agora, PRIMEIRO tem que analisar a proposta de cada uma e suas consequencias e o que pode quebrar para ter um plano de implementacao sem falhas'. Plano escrito em docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_LADO_CLASSICO_DO_ZEN_NAO_MEDIDO
     node_type: question

@@ -61,6 +61,10 @@ nodes:
     source_kind: internal-audit
     label: 'O gate do Onion MEDIDO hoje, nao citado: o motor de regras a mao tem 5.282 linhas num arquivo (lint-artifacts.sh), 203 chamadas `violation "`, regras numeradas ate 93 (92 tokens distintos no corpo), 13 arquivos de baseline-catraca e um harness de 20.619 linhas (lint-selftest.sh) que JA e metade de um teste diferencial. E o dado que decide a viabilidade de qualquer migracao: nesta maquina cedar, opa, java, cargo, mvn e drools NAO EXISTEM — so jq, python3 e node. Um gate cuja capacidade compradora e vetar com exit 2 sob bypassPermissions nao pode depender de binario ausente.'
     trace: '.claude/validation/lint-artifacts.sh · .claude/validation/lint-selftest.sh'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh · .claude/validation/lint-selftest.sh"
+      locator: "medicao no repo em 2026-10-01: `wc -l .claude/validation/lint-artifacts.sh` = 5282 · `grep -c 'violation \"' lint-artifacts.sh` = 203 · maior numero de regra no lint = REGRA 93, com 92 tokens `REGRA N` distintos · `ls .claude/validation/ | grep -i baseline` = 13 arquivos *-baseline.txt · `wc -l .claude/validation/lint-selftest.sh` = 20619 · `command -v` devolve AUSENTE para cedar, opa, java, cargo, mvn e drools, e presente so para jq, python3 e node"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CORPUS_AUSENCIA_DE_MOTOR_DE_REGRAS
     node_type: evidence
@@ -75,6 +79,10 @@ nodes:
     source_kind: internal-audit
     label: 'AUSENCIA MEDIDA no corpus: em 109 grafos nao existe UM no sobre motor de regras, decision engine, DMN, Rego, Cedar, OPA, Drools ou ZEN Engine. Este grafo e a primeira entrada do tema — nao ha no previo a corroborar nem a contradizer, e por isso nao ha SUPERSEDES cross-grafo. O vizinho relevante existe e e outro objeto: a auditoria audit-textual-gates-2026-09 classificou os gates em VETO-MECANICO, AVISO-TEXTUAL e CONFIANCA-NO-MODELO, com a regua de que gate em prosa nao e gate. No core existe o agente @zen-engine-specialist (JDM/GoRules) servindo um projeto ADOTANTE de gamificacao — nao ha motor ZEN no core.'
     trace: 'docs/onion/graph/ · docs/evolution/research/audit-textual-gates-2026-09/'
+    provenance:
+      source: "docs/onion/graph/ · docs/evolution/research/audit-textual-gates-2026-09/"
+      locator: "bash .claude/validation/kg-corpus-grep.sh sobre motor de regras / decision engine / DMN / Rego / Cedar / OPA / Drools / ZEN Engine → 109 grafos varridos, 0 no sobre o tema; os 3.276 nos devolvidos casaram por colisao de termo generico (decision, engine)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ═══════════════════ CEDAR: VERIFICACAO FORMAL E O METODO (VGD) ═══════════════════
 
@@ -91,6 +99,10 @@ nodes:
     source_kind: paper
     label: 'CONFIRMADA (tier 8): o Cedar (AWS) e construido por verification-guided development — modelos executaveis em Lean com propriedades provadas mecanicamente (forbid vence permit, default deny, soundness da validacao) MAIS o codigo de producao em Rust checado contra o modelo por teste diferencial aleatorio sobre milhoes de entradas, imposto pelo CI. Para a pergunta 4 o que transfere e o METODO, nao o motor: codigo de producao escrito a mao + oraculo pequeno verificado + teste diferencial no CI. Fonte de 2024-07, pode estar superada em 2026 — e nenhuma fonte desta rodada mediu release ou commit atual.'
     trace: 'https://arxiv.org/pdf/2407.01688'
+    provenance:
+      source: "https://arxiv.org/pdf/2407.01688"
+      locator: "https://arxiv.org/pdf/2407.01688 (3-0) + https://arxiv.org/html/2407.01688v1 (3-0) + https://arxiv.org/pdf/2403.04651 (3-0) — TRES recortes de DOIS papers; a confianca NAO foi somada por repeticao"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CEDAR_COMPILADOR_SIMBOLICO_SMT
     node_type: evidence
@@ -105,6 +117,10 @@ nodes:
     source_kind: paper
     label: 'CONFIRMADA (tier 8): o compilador simbolico do Cedar traduz politicas para SMT-LIB com codificacao solida, completa e DECIDIVEL, o que permite provar equivalencia entre dois conjuntos de politicas, achar um request permitido por um e negado pelo outro, e detectar conflito, redundancia e politica vacua. O paper reporta cerca de 75 ms em media para codificar e resolver. E a capacidade de cobertura/conflito que o gate em bash nao tem — mas o objeto e EQUIVALENCIA DE POLITICA sobre um schema de entidades (principal/action/resource/context), nao conflito entre predicados de shell sobre o filesystem; ver E_OBJECAO_EQUIVALENCIA_NAO_E_CONFLITO_DE_LINT e E_OBJECAO_75MS_NAO_MEDE_HOOK.'
     trace: 'https://arxiv.org/pdf/2403.04651'
+    provenance:
+      source: "https://arxiv.org/pdf/2403.04651"
+      locator: "https://arxiv.org/pdf/2407.01688 (3-0) + https://arxiv.org/html/2407.01688v1 (3-0) + https://arxiv.org/pdf/2403.04651 (3-0) — mesmos dois papers"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CEDAR_VGD_ACHOU_25_BUGS
     node_type: evidence
@@ -119,6 +135,10 @@ nodes:
     source_kind: paper
     label: 'CONFIRMADA COM RESSALVA (tier 8, 2-1): o VGD achou 25 bugs no Cedar — 4 no validador pelas provas em Lean e 21 por teste diferencial aleatorio e property-based testing — em codigo de PRODUCAO que teste unitario e code review nao pegaram. Confianca travada em 0.7 pelo voto dissidente. O conteudo corta para os dois lados e isso esta modelado: sustenta que oraculo + DRT acham o que revisao nao acha, e ao mesmo tempo mede que a implementacao de um motor declarativo tem defeito proprio (E_OBJECAO_25_BUGS_MEDEM_DEFEITO_DO_MOTOR).'
     trace: 'https://arxiv.org/pdf/2407.01688'
+    provenance:
+      source: "https://arxiv.org/pdf/2407.01688"
+      locator: "https://arxiv.org/pdf/2407.01688 — votacao adversarial 2-1 (maioria apertada)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SYMCERT_VERIFICA_AS_ANALISES_SMT
     node_type: evidence
@@ -133,6 +153,10 @@ nodes:
     source_kind: paper
     label: 'CONFIRMADA (tier 8, 2026): o Cedar foi projetado para analise de politica sound and complete por reducao a SMT, e — palavra da propria publicacao — erros de codificacao nessas analises podem comprometer a corretude SILENCIOSAMENTE e ESCAPAM DE TESTES. Por isso existe o SymCert (Emina Torlak, FMCAD 2026): um framework em Lean que verifica formalmente as analises SMT do Cedar, com compilador simbolico verificado, autorizador, enforcer de hierarquia e extrator de contraexemplos. E o unico achado datado de 2026 sobre a maquinaria do Cedar — e revela que a cadeia de confianca tem TRES niveis, cujo terceiro so nasceu agora.'
     trace: 'https://www.amazon.science/publications/symcert-verifying-smt-based-policy-analyses'
+    provenance:
+      source: "https://www.amazon.science/publications/symcert-verifying-smt-based-policy-analyses"
+      locator: "https://www.amazon.science/publications/symcert-verifying-smt-based-policy-analyses — DOIS recortes da MESMA pagina, ambos 3-0; a pagina e landing de publicacao da Amazon (o vendedor da tecnologia), tier 8 por dominio e nao por independencia"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CEDAR_CNCF_SANDBOX_2026_01
     node_type: evidence
@@ -147,6 +171,10 @@ nodes:
     source_kind: analyst
     label: 'CONFIRMADA COM RESSALVA (tier 6, 2-1): o Cedar, linguagem de politica originada na AWS, ingressou no CNCF como projeto Sandbox, noticiado pelo InfoQ em janeiro de 2026, e e descrito como formalmente verificado em Lean com teste diferencial aleatorio. E o unico sinal de GOVERNANCA datado de 2026 da rodada — um hyperscaler doando a linguagem de politica para governanca neutra. Nao e sinal de atividade de codigo: nenhuma fonte desta rodada rodou `gh api repos/cedar-policy/cedar/releases`.'
     trace: 'https://infoq.com/news/2026/01/cedar-joins-cncf-sandbox/'
+    provenance:
+      source: "https://infoq.com/news/2026/01/cedar-joins-cncf-sandbox/"
+      locator: "https://infoq.com/news/2026/01/cedar-joins-cncf-sandbox/ — 2-1 na claim de ingresso no CNCF, 3-0 na claim de verificacao formal"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ MOTOR + IA: O PADRAO LLM PROPOE, MOTOR DECIDE ═══════════════════
 
@@ -163,6 +191,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 2026-07): a AWS publicou padrao de producao em que o Cedar impoe least-privilege em cadeias multi-agente em tres camadas (agente para ferramenta, agente para agente com limite de profundidade de delegacao, e autorizacao do usuario originador), avaliado FORA do laco de raciocinio do agente, numa Lambda separada. E a forma concreta do padrao LLM propoe, motor decide — e e o unico dominio desta rodada com evidencia de producao datada de 2026, o que sustenta a opcao E (alvo cirurgico em autorizacao de agente) e NAO a migracao do gate de lint.'
     trace: 'https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/'
+    provenance:
+      source: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/"
+      locator: "https://aws.amazon.com/blogs/security/enforce-least-privilege-authorization-in-multi-agent-ai-chains-using-cedar/ (3-0) + o mesmo post no mirror https://noise.getoto.net/2026/07/06/... (2-1) — primario E mirror foram contados como duas fontes na rodada; aqui sao UMA"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_AUTOFORMALIZACAO_GERADOR_CRITICO_CEDAR
     node_type: evidence
@@ -177,6 +209,10 @@ nodes:
     source_kind: paper
     label: 'CONFIRMADA (tier 7, 2026-06-25): Mondl, Maisel e Brock (arXiv 2606.26649, tambem no workshop Agents in the Wild do ICML 2026) apresentam autoformalizacao que traduz prompts de agente, descricoes de ferramentas MCP e politica em linguagem natural para politicas Cedar, por laco gerador-critico: um Hard Critic DETERMINISTICO (parser Cedar, checagem de schema, analise estatica de politica vacua) impede o LLM de confabular entidades, e um Soft Critic LLM julga alinhamento semantico contra a especificacao. E o desenho exato de LLM propoe, motor decide — e o papel do critico duro e o mesmo papel que o gate em bash do Onion ja exerce. A claim de cobertura no MedAgentBench foi REFUTADA (sem numeros na pagina).'
     trace: 'https://arxiv.org/pdf/2606.26649'
+    provenance:
+      source: "https://arxiv.org/pdf/2606.26649"
+      locator: "https://arxiv.org/pdf/2606.26649 (3-0, duas claims) + https://icml.cc/virtual/2026/67916 (3-0) + https://www.emergentmind.com/papers/2606.26649 (3-0, duas claims) — CINCO recortes do MESMO paper em tres hosts; confianca travada em 0.7 pela concentracao e pelo tier do agregador"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_AGENTCORE_ESCOLHEU_CEDAR_NEUROSIMBOLICO
     node_type: evidence
@@ -191,6 +227,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA COM RESSALVA (tier 5, vendor): a AWS escolheu Cedar para o Policy do Bedrock AgentCore pela semantica DETERMINISTICA — mesma requisicao devolve sempre a mesma decisao, com default deny, forbid vence e sem ordenacao de regras — e descreve um padrao neurosimbolico em que o LLM traduz linguagem natural em politicas Cedar validadas contra um schema gerado automaticamente das ferramentas MCP, com a Cedar Analysis detectando impossibilidade logica. Capital do incumbente em forma de PRODUTO e o sinal mais pesado do eixo mercado desta rodada; a confianca fica em 0.5 porque e o fornecedor falando do proprio produto e porque os tres achados sao um unico post.'
     trace: 'https://noise.getoto.net/2026/05/20/why-policy-in-amazon-bedrock-agentcore-chose-cedar-for-securing-agentic-workflows/'
+    provenance:
+      source: "https://noise.getoto.net/2026/05/20/why-policy-in-amazon-bedrock-agentcore-chose-cedar-for-securing-agentic-workflows/"
+      locator: "https://noise.getoto.net/2026/05/20/why-policy-in-amazon-bedrock-agentcore-chose-cedar-for-securing-agentic-workflows/ — TRES recortes do MESMO post, no MESMO mirror (3-0, 2-1, 3-0); source_kind vendor-on-competitor, que a clausula 7 manda tratar como SEMPRE suspeito"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HOOKS_DE_AGENTE_COM_POLICY_ENGINE
     node_type: evidence
@@ -205,6 +245,10 @@ nodes:
     source_kind: aggregator
     label: 'CONFIRMADA COM RESSALVA (tier 5): autorizacao de agente por policy engine no nivel da TOOL CALL ja e padrao concreto e existem implementacoes nomeadas — ToolHive, ScopeBlind protect-mcp, Permit.io MCP Gateway, Vectimus (governanca determinística de agentes de codigo com Cedar, sem LLM no loop) e Sondera coding-agent-hooks, que normaliza Cedar como policy engine em hooks locais de Claude Code, Cursor, GitHub Copilot CLI e Gemini CLI. E o achado mais perto de casa: alguem ja usa a MESMA superficie de hook do Claude Code que o Onion usa, com politica declarativa em vez de shell. MAS a claim de que o Vectimus veta por exit 2 na camada de tool-calling foi REFUTADA nesta rodada, e a de que o Cedar v0.6.0 saiu em 2026-08-24 tambem — ou seja, o elo que ligaria isto ao veto do Onion e justamente o nao-verificado.'
     trace: 'https://blog.sondera.ai/p/hooking-coding-agents-with-the-cedar'
+    provenance:
+      source: "https://blog.sondera.ai/p/hooking-coding-agents-with-the-cedar"
+      locator: "https://chatforest.com/reviews/authorization-policy-engine-mcp-servers/ (agregador, 3-0) + https://blog.sondera.ai/p/hooking-coding-agents-with-the-cedar (blog de engenheiro, 3-0) + https://github.com/vectimus/vectimus (repo, 2-1); confianca travada em 0.5 pela clausula 7 — tier <= 5 com agregador e blog pessoal, sem fonte primaria de fornecedor"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ O LADO NAO-CEDAR QUE A RODADA ALCANCOU (2 fontes) ═══════════════════
 
@@ -221,6 +265,10 @@ nodes:
     source_kind: engineer
     label: 'CONFIRMADA COM RESSALVA (tier 5): o OPA segue projeto GRADUADO da CNCF sob Apache-2.0, com governanca e licenca inalteradas depois da saida dos fundadores e da equipe da Styra para a Apple — acquihire de talento, nao aquisicao da empresa. O fato e de 2025-08 e pode estar superado; e tambem o retrato do buraco desta rodada: o concorrente mais usado do campo (Rego/Datalog, o eixo da pergunta 2 sobre revival de logica declarativa) entrou no grafo por UM blog pessoal, sem licenca de release, sem velocidade de commit e sem comparacao de capacidade.'
     trace: 'https://www.youngju.dev/blog/2026-07-17-opa-post-styra-apple-acquihire-reality.en'
+    provenance:
+      source: "https://www.youngju.dev/blog/2026-07-17-opa-post-styra-apple-acquihire-reality.en"
+      locator: "https://www.youngju.dev/blog/2026-07-17-opa-post-styra-apple-acquihire-reality.en — blog de engenheiro, 3-0; tier 5, e a UNICA fonte da rodada sobre OPA/Rego"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_GORULES_BRE_VERSUS_BRMS_SEM_DATA
     node_type: evidence
@@ -234,6 +282,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA, E O ACHADO E NEGATIVO (tier 6, sem data): a unica fonte da rodada sobre o lado ZEN/GoRules e a propria documentacao do fornecedor, e ela diz apenas quando usar BRMS (usuario de NEGOCIO cria ou altera regra, versionamento, trilha de auditoria, varias equipes colaborando) versus BRE embarcado (so desenvolvedor gerencia a regra, controle maximo). A propria rodada registrou que a pagina NAO cobre concorrentes, NAO cobre verificacao formal, Datalog/SMT, cobertura ou conflito de regra, NAO cobre uso com IA e NAO traz datas. Para o Onion o criterio e util e aponta para o BRE/escrita a mao: quem gerencia as 93 regras e o desenvolvedor do core, nao usuario de negocio.'
     trace: 'https://docs.gorules.io/developers/overview/bre-vs-brms.md'
+    provenance:
+      source: "https://docs.gorules.io/developers/overview/bre-vs-brms.md"
+      locator: "https://docs.gorules.io/developers/overview/bre-vs-brms.md — DOIS recortes da mesma pagina de documentacao do fornecedor, 3-0 cada; SEM DATA na pagina, logo sem valid_from"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ EIXO MERCADO / CAPITAL (invariante, clausula 4) ═══════════════════
 
@@ -341,6 +393,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 1 (Elenxo, 1 agente sem votacao) — a frase que sustenta o achado 1 e AUTORREFUTANTE como argumento de migracao: se a analise SMT de um motor com prova em Lean pode comprometer a corretude silenciosamente e escapar de testes, adotar o motor NAO entrega prova — entrega uma segunda camada que tambem precisa ser verificada, e foi por isso que o SymCert existiu. Para o Onion, trocar 5.282 linhas de bash auditaveis por um pipeline Cedar+SMT importa um modo de falha NOVO (codificacao simbolica errada) que o gate atual nao tem, porque bash nao codifica nada: ele grep-a o arquivo e emite violation. E a fonte e a landing page de publicacao da Amazon, vendedora da tecnologia — tier 8 por dominio, nao por independencia.'
     trace: 'https://www.amazon.science/publications/symcert-verifying-smt-based-policy-analyses'
+    provenance:
+      source: "https://www.amazon.science/publications/symcert-verifying-smt-based-policy-analyses"
+      locator: "a propria frase citada no achado 1, da landing de publicacao da Amazon: erros de codificacao nas analises SMT do Cedar podem comprometer a corretude silenciosamente e escapam de testes"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_TRES_NIVEIS_DE_CONFIANCA_E_BINARIO_AUSENTE
     node_type: evidence
@@ -354,6 +410,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 2 (Elenxo, 1 agente sem votacao) — o SymCert e evidencia de que a cadeia de confianca do Cedar tem TRES niveis (politica, compilador simbolico, prova do compilador) e que o terceiro so nasceu em 2026: ate 2026 a analise de conflito do Cedar estava NAO-VERIFICADA. E nada na rodada mede se o SymCert e codigo disponivel, se roda fora da Amazon, ou se cobre a versao do Cedar que alguem instalaria hoje. Medido aqui: `command -v cedar` devolve NADA nesta maquina, assim como opa, java, cargo, mvn e drools — so jq, python3 e node existem. Um gate que precisa vetar sob bypassPermissions nao pode depender de binario ausente.'
     trace: '.claude/validation/lint-artifacts.sh'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "achado 2 lido contra a medicao local de 2026-10-01: `command -v cedar` devolve NADA nesta maquina, assim como opa, java, cargo, mvn e drools; so jq, python3 e node existem"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_VGD_PRESCREVE_ORACULO_NAO_MIGRACAO
     node_type: evidence
@@ -367,6 +427,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 3 (Elenxo, 1 agente sem votacao) — este achado REFUTA a opcao de migrar e ninguem notou: o verification-guided development descrito E exatamente codigo de producao escrito a mao mais oraculo pequeno verificado mais teste diferencial no CI, ou seja, a receita PRESCREVE escrever um oraculo independente para o gate em bash, nao substituir o gate por um motor. E o item que diz isso explicitamente (rejeitaram Lean com C gerado, escolheram Rust idiomatico mais modelo Lean cerca de 10x menor) foi CORTADO POR ORCAMENTO: a evidencia contraria a migracao foi a que nao entrou. O Onion ja tem a metade do DRT — lint-selftest.sh com 20.619 linhas e 13 arquivos de baseline-catraca. ATENCAO ao tier: o item cortado e primario CITADO, NAO LIDO nesta rodada.'
     trace: 'https://arxiv.org/pdf/2407.01688'
+    provenance:
+      source: "https://arxiv.org/pdf/2407.01688"
+      locator: "achado 3 lido contra a medicao local: lint-selftest.sh tem 20.619 linhas e .claude/validation/ tem 13 arquivos *-baseline.txt de catraca — o Onion ja tem metade do teste diferencial que o VGD prescreve"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_25_BUGS_MEDEM_DEFEITO_DO_MOTOR
     node_type: evidence
@@ -380,6 +444,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 4 (Elenxo, 1 agente sem votacao; o achado ja vinha 2-1) — o conteudo corta contra o uso que se quer dar: 25 bugs em codigo de producao de um motor COM prova formal e medida de que a implementacao de um motor declarativo e ela mesma defeituosa. Adotar Cedar nao remove defeito do pipeline do Onion — importa a superficie de defeito de um projeto de terceiros, com a diferenca de que o Onion hoje consegue LER as 203 chamadas violation do seu gate por um grep, e o Cedar nao e legivel assim. O achado sustenta tenha oraculo mais DRT, nunca troque de motor.'
     trace: 'https://arxiv.org/pdf/2407.01688'
+    provenance:
+      source: "https://arxiv.org/pdf/2407.01688"
+      locator: "achado 4 (votacao 2-1) lido contra a medicao local: `grep -c 'violation \"' lint-artifacts.sh` = 203 — o gate do Onion e legivel por grep, um motor declarativo de terceiro nao e legivel assim"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_EQUIVALENCIA_NAO_E_CONFLITO_DE_LINT
     node_type: evidence
@@ -393,6 +461,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 5 (Elenxo, 1 agente sem votacao) — a capacidade prometida e sobre EQUIVALENCIA DE CONJUNTOS DE POLITICAS sobre um schema de entidades (principal/action/resource/context). A pergunta de conflito do Onion e outra: a REGRA 36 e a REGRA 85 podem disparar no mesmo artefato exigindo coisas contraditorias? — predicados de shell sobre o filesystem, que rodam git e find (306 das 5.282 linhas invocam grep/sed/awk/find/python). O Cedar e decidivel PRECISAMENTE porque EXCLUI esse poder; o fragmento decidivel nao comporta o que o gate faz, entao a capacidade nao transfere. E nenhuma fonte da rodada mostra alguem expressando lint de artefato em Cedar.'
     trace: '.claude/validation/lint-artifacts.sh'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "achado 5 lido contra o que o gate FAZ: 306 das 5.282 linhas de lint-artifacts.sh invocam grep/sed/awk/find/python sobre o filesystem e o git; nenhuma fonte da rodada mostra lint de artefato expresso em Cedar"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_ZERO_DADO_DE_ATUALIDADE_2026
     node_type: evidence
@@ -432,6 +504,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 8 (Elenxo, 1 agente sem votacao) — a analogia esta INVERTIDA. O drift do Onion nao e entre spec e implementacao: e entre DOCSTRING e CORPO da guarda, e ja existe mecanismo medindo isso (rules-registry.sh deriva a severidade de violation HARD/SOFT no CORPO, nao do comentario, e reprova em 6 catracas de clareza). O proprio registro documenta uma falha MEDIDA: a REGRA 85 saiu HARD onde e HARD+SOFT e a projecao byte-a-byte APROVOU. Ou seja, o problema do Onion e ORACULO INDEPENDENTE DO GERADOR, e um motor declarativo nao resolve isso — criaria um SEGUNDO artefato (arquivos de politica) com drift proprio, exatamente a classe que a REGRA 62 ja teve de catracar.'
     trace: '.claude/validation/rules-registry.sh'
+    provenance:
+      source: ".claude/validation/rules-registry.sh"
+      locator: "achado 8 contra o mecanismo que JA existe: rules-registry.sh deriva a severidade de violation \"HARD\"/\"SOFT\" NO CORPO da guarda (nao do comentario) e reprova em 6 catracas de clareza; a falha medida da REGRA 85 (saiu HARD onde e HARD+SOFT, com a projecao byte-a-byte APROVANDO) esta no proprio registro"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_ACHADO_9_E_DUPLICATA_DO_3
     node_type: evidence
@@ -445,6 +521,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO 9 (Elenxo, 1 agente sem votacao) — o achado 9 e DUPLICATA do achado 3: mesma publicacao, mesmo conteudo (modelos Lean com propriedades provadas — forbid vence permit, default deny, soundness — mais teste diferencial), lido num host diferente. A objecao nao e de conteudo e sim de CONTABILIDADE: contar o mesmo paper duas vezes INFLACIONA a confianca na direcao da migracao, e e o mesmo defeito em escala maior na rodada inteira. Por isso esta rodada escreveu 12 nos de evidencia a partir de 29 claims, declarando a deduplicacao em cada verified_against em vez de somar votos de recortes.'
     trace: 'https://arxiv.org/html/2407.01688v1'
+    provenance:
+      source: "https://arxiv.org/html/2407.01688v1"
+      locator: "achado 9 confrontado com o achado 3: mesma publicacao (arXiv 2407.01688), mesmo conteudo (modelos Lean com propriedades provadas — forbid trumps permit, default deny, soundness — mais DRT), lido em host diferente (html em vez de pdf)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_28_ACHADOS_SAO_8_ARTEFATOS
     node_type: evidence
