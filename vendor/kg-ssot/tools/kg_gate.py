@@ -12,6 +12,11 @@ schema MUST ou sha256 dos schemas). Consertar um grafo não compensa quebrar out
 grafo. A dívida SHOULD é por código (total de grafos): tirar um aviso de A e pôr o mesmo em B empata.
 Ganho (grafo que sai de failing, código que some, dívida que cai): passa, com aviso "trave com --update".
 
+Depois da comparação, o detalhe da medição (os mesmos códigos de kg_validate.py, sem mudar o rc):
+  MUST   <grafo> (novo|regredido|herdado): <código> · <código>   — um por grafo que reprova no MUST;
+  SHOULD <código>: N grafos                                        — a dívida, por código.
+Para ver as ocorrências de um grafo: kg_validate.py <grafo> (sem --schema, o mesmo contrato do gate).
+
 --update mostra a comparação antes de gravar; se algo piorou, só grava com --accept-regression "<motivo>", e o
 motivo fica na base. rc 2: entrada quebrada (não é repo git, base ilegível, fora do formato ou ausente sem
 --update, .kg.yaml ilegível).
@@ -130,6 +135,28 @@ def compare(base, now, present=None):
     return rc, lines, worse_any
 
 
+def detail(base, now):
+    """As linhas do que o gate está carregando: cada grafo que reprova no MUST, com os códigos, e a dívida
+    SHOULD por código. Não mudam o rc; dizem o que consertar sem rodar o leitor à parte.
+
+    O rótulo do grafo: novo (fora da base), regredido (na base, com código que não tinha) ou herdado.
+    Sem base (o primeiro --update), tudo o que reprova entra como herdado.
+    """
+    want_f = (base or {}).get("failing", {})
+    lines = []
+    for name, got in now["failing"].items():
+        if base is not None and name not in want_f:
+            kind = "novo"
+        elif set(got) - set(want_f.get(name, got)):
+            kind = "regredido"
+        else:
+            kind = "herdado"
+        lines.append(f"  MUST   {name} ({kind}): {' · '.join(got)}")
+    for code, count in now["debt"].items():
+        lines.append(f"  SHOULD {code}: {count} grafo{'s' if count != 1 else ''}")
+    return lines
+
+
 def read_base(path):
     try:
         base = json.loads(path.read_text(encoding="utf-8"))
@@ -176,7 +203,7 @@ def main(argv=None):
         print(f"GATE QUEBRADO  {exc}")
         return 2
     rc, lines, worse = compare(base, now, set(measured)) if base is not None else (0, [], False)
-    print("\n".join(lines))
+    print("\n".join(lines + detail(base, now)))
     if not args.update:
         return rc
     if worse and not args.accept_regression:

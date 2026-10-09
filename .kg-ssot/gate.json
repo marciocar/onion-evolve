@@ -1,6 +1,6 @@
 {
   "contract": "kg-contract-v4.schema.json",
-  "contract_sha256": "87b56e1aaa736df6a8b3f4c15577f49afc6f73e04461fb3954a869fcd9c87ba1",
+  "contract_sha256": "dcc872a35afecf8751ab2b7f740a5c55516c51ad4a4e54206ba612e14c0a16d5",
   "graphs": 138,
   "failing": {
     "docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml": [
@@ -302,7 +302,10 @@
   "debt": {
     "form.pattern.node.provenance.method": 6,
     "form.range.node.label": 112,
+    "form.required.node.verified_against": 16,
     "form.required.node.verified_at": 7,
+    "integrity.testimony-in-prod": 34,
+    "integrity.untraced-decision": 19,
     "yaml.unquoted-date": 129
   },
   "accepted_regressions": [
@@ -442,6 +445,15 @@
         "✗ PIOROU  docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml falha no MUST: form.required.node.provenance",
         "✗ PIOROU  docs/onion/graph/vps-shared-tools-2026-07.kg.yaml falha no MUST: form.required.node.provenance",
         "✗ PIOROU  debt.form.pattern.node.provenance.method: 0 → 6"
+      ]
+    },
+    {
+      "date": "2026-10-09",
+      "reason": "adoção do contrato v4.1.0 (7543bdf0fdd8): nenhum MUST muda; SHOULD novos medidos no corpus (verified_against 16, testimony-in-prod 34, untraced-decision 19, verified-before-fact 0 grafos); a dívida queima pelas ondas 2-3 do SAC-73",
+      "worse": [
+        "✗ PIOROU  debt.form.required.node.verified_against: 0 → 16",
+        "✗ PIOROU  debt.integrity.testimony-in-prod: 0 → 34",
+        "✗ PIOROU  debt.integrity.untraced-decision: 0 → 19"
       ]
     }
   ]

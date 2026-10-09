@@ -1,0 +1,79 @@
+{
+  "description": "Coerência entre campos e arestas (v4.1, Q_RADAR_WARNINGS_WITHOUT_CASES): avisos SHOULD que o schema não exprime e o leitor computa. Nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe testemunho) alerta integrity.testimony-in-prod; verified_at anterior a valid_from, na granularidade do mais curto, alerta integrity.verified-before-fact; decision viva sem trace, sem provenance e sem aresta TRACES_TO saindo dela alerta integrity.untraced-decision.",
+  "layer": "integrity",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "warn-testimony-class-in-prod.kg.yaml",
+      "description": "nó PROD com evidence_class: testimony: relato não é artefato vivo",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.testimony-in-prod"
+      ]
+    },
+    {
+      "file": "warn-testimony-method-in-prod.kg.yaml",
+      "description": "nó PROD cuja provenance.method é da classe testemunho",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.testimony-in-prod"
+      ]
+    },
+    {
+      "file": "valid-testimony-in-dev.kg.yaml",
+      "description": "o mesmo testemunho em plane DEV: nada a alertar",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-verified-before-fact.kg.yaml",
+      "description": "verified_at 2026-10-08 anterior a valid_from 2026-10-09: impossível",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.verified-before-fact"
+      ]
+    },
+    {
+      "file": "valid-verified-same-year.kg.yaml",
+      "description": "valid_from 2026 e verified_at 2026-10-08: comparados no ano, nada a alertar",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "warn-untraced-decision.kg.yaml",
+      "description": "decision open sem trace, sem provenance e sem TRACES_TO: origem não ancorada",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "integrity.untraced-decision"
+      ]
+    },
+    {
+      "file": "valid-decision-traces-to.kg.yaml",
+      "description": "decision com aresta TRACES_TO saindo dela",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-decision-trace-field.kg.yaml",
+      "description": "decision com o campo trace",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-decision-with-provenance.kg.yaml",
+      "description": "decision com provenance: a origem está no próprio nó",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-decision-superseded-untraced.kg.yaml",
+      "description": "decision superseded sem origem: história, não SSOT viva",
+      "valid": true,
+      "codes": []
+    }
+  ]
+}

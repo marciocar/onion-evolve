@@ -1,3 +1,11 @@
 # Versões exatas: a matriz do leitor de referência tem de ser reproduzível no CI.
+# Diretas: PyYAML e jsonschema. As transitivas do jsonschema também são fixadas, porque o pip as instala sem
+# pino: uma versão nova de referencing (ou de outra transitiva) mudaria o leitor sem mudar a tag. São as
+# versões com que a suíte passa neste repo.
 PyYAML==6.0.3
 jsonschema==4.26.0
+attrs==26.1.0
+jsonschema-specifications==2025.9.1
+referencing==0.37.0
+rpds-py==2026.6.3
+typing-extensions==4.16.0 ; python_version < "3.13"

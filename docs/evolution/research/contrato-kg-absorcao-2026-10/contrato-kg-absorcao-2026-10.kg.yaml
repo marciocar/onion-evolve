@@ -5,13 +5,13 @@
 # Migrado ao contrato v3 no SAC-71 (2026-10-08): datas entre aspas e provenance nos nós confirmed.
 meta:
   x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "lote 4 (O3 onda 1): planilha julgada aplicada em 264 nós de 37 grafos; 11 flips confirmed→unverifiable (E_R3_TST_CIENCIA_PREVIA_AFASTA_EXPECTATIVA, E_R3_TST_EMAIL_PESSOAL_VS_CORPORATIVO, E_R3_TST_MONITORAR_FORMA_E_CONTEUDO_EMAIL_CORPORATIVO, E_R3_TST_PROPORCIONALIDADE_PARCIMONIA_NA_ILICITUDE, E_LACUNAS_DECK_PATTERNS_0924, E_MERCADO_OCR_LOCAL_0908, E_LACUNAS_DECLARADAS_PODA_0903, E_LACUNAS_DECLARADAS_OCR_0908, E_LACUNAS_INFRA_VPS_1005, E_MD_PICO_APRESENTADO_COMO_REGUA, E_LAND_EXPAND) e 5 PROD→DEV (Q_RISCO_ACERVO_VIRA_CEMITERIO, Q_RISCO_CONCORRENTE_MAIS_RIGOROSO, Q_RISCO_PLATAFORMA_COME_O_GATE, D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION, Q_TENANT_WRITE_DESTINATION); 12 REPROVADOS intocados; PR para merge humano"
+  x_drive_checkpoint_note: "lote 5 (adoção do contrato v4.1.0): vendor contract-v4.1.0 e base do gate regravada com --accept-regression; dívida SHOULD 254→323 pelos avisos novos (verified_against 16, testimony-in-prod 34, untraced-decision 19); 125 nós PROD em testemunho listados em v41-testimony-in-prod.tsv para as ondas 2-3 do SAC-73; onion-research.js e kg-contract-check curados com mutante; PR para merge humano"
   id: contrato-kg-absorcao-2026-10
   schema_version: "1"
   baseline: "2026-10-08"
   review_after: "2026-11-07"   # 30d: programa de trabalho
-  # ═══ TETO: 18 NÓS ═══
-  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08); 15 em 2026-10-09 (+E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH); 16 em 2026-10-09 (+E_ONDA_O1_APLICADA: a onda O1 é colhida aqui, e a evidência dela pertence ao programa que a mede, não a um grafo novo); 17 em 2026-10-09 (+E_ONDA_O2_APLICADA: mesma razão da O1 — cada onda colhida é um nó de evidência do programa que a mede, e a O1 já está colhida). 18 em 2026-10-09 (+E_ONDA_O3_1_APLICADA: +1 justificado — a O3 é a 1ª onda com JUIZ independente e selo humano por nó, e a evidência dela carrega o que O1/O2 não têm: os flips de status e de plano nomeados, e os REPROVADOS que voltam; fundir com a O1 ou a O2 apagaria a fronteira entre derivação mecânica e aplicação julgada). NO TETO: a onda 2 da O3 entra só colhendo a onda 1 (fundindo-a no nó da onda 2).
+  # ═══ TETO: 19 NÓS ═══
+  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08); 15 em 2026-10-09 (+E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH); 16 em 2026-10-09 (+E_ONDA_O1_APLICADA: a onda O1 é colhida aqui, e a evidência dela pertence ao programa que a mede, não a um grafo novo); 17 em 2026-10-09 (+E_ONDA_O2_APLICADA: mesma razão da O1 — cada onda colhida é um nó de evidência do programa que a mede, e a O1 já está colhida). 18 em 2026-10-09 (+E_ONDA_O3_1_APLICADA: +1 justificado — a O3 é a 1ª onda com JUIZ independente e selo humano por nó, e a evidência dela carrega o que O1/O2 não têm: os flips de status e de plano nomeados, e os REPROVADOS que voltam; fundir com a O1 ou a O2 apagaria a fronteira entre derivação mecânica e aplicação julgada). 19 em 2026-10-09 (+E_CONTRATO_V41_ADOTADO: +1 justificado — a adoção do v4.1 é lote próprio por decisão do maestro, antes das ondas 2 e 3, e carrega o que nenhum nó de onda carrega: a dívida SHOULD nova medida, a lista de testemunho em PROD que alimenta as ondas e as duas divergências do radar contra o contrato; fundir com E_CONTRATO_V4_ADOTADO apagaria a fronteira entre a versão que tornou provenance MUST e a que só acrescenta avisos). NO TETO: a onda 2 da O3 entra só colhendo a onda 1 (fundindo-a no nó da onda 2).
 nodes:
   - id: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     node_type: evidence
@@ -268,6 +268,22 @@ nodes:
       source: ".claude/utils/kg/kg-migrate-v3.py, docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o3-wave1-juiz.csv e .kg-ssot/gate.json na branch feat/provenance-wave-o3-1"
       locator: "o relatório do kg-migrate-v3 --apply-judged (provenance escrita, confirmed→unverifiable, PROD→DEV, REPROVADO intocado, selo do maestro) e a chave failing da base (91 grafos)"
       method: "medição: kg-migrate-v3 --apply-judged, kg-radar, kg-contract-check, kg_gate e bancada com mutantes em 2026-10-09"
+  - id: E_CONTRATO_V41_ADOTADO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-09"
+    verified_against: "branch feat/kg-ssot-contract-v41 sobre origin/main ea1b105a: kg_vendor.py update --tag contract-v4.1.0 (7543bdf0fdd8, 269 arquivos) e check íntegro; kg_gate.py --update com --accept-regression e os mesmos --exclude do CI: 138 grafos, 91 na dívida MUST herdada (sem mudança); bancada de 9 famílias de geradores com LC_ALL=C verde e 2 casos novos reprovados pelo mutante"
+    label: "o core adotou o contrato v4.1: nenhum MUST mudou, a dívida SHOULD subiu de 254 para 323 incidências pelos 3 avisos novos que o corpus acusa, e 125 nós PROD de 34 grafos se apoiam em testemunho"
+    narrative: "Dívida SHOULD por código (grafos), antes → depois: provenance.method 6 → 6, label 112 → 112, verified_at 7 → 7, yaml.unquoted-date 129 → 129, e entram form.required.node.verified_against 16, integrity.testimony-in-prod 34 e integrity.untraced-decision 19; integrity.verified-before-fact fica em 0. O onion-kg-ssot mediu no pin dele 16, 1 e 22 para verified_against, verified-before-fact e untraced-decision; a diferença é do corpus, que a O3 onda 1 mudou depois. O testemunho em PROD é o insumo das ondas 2 e 3 (candidatos a PROD → DEV): 125 nós, todos pelo method da classe testemunho e nenhum por evidence_class. Daí a 1ª divergência do radar contra o contrato: o MISPLANED do kg-radar.sh lê só evidence_class: testimony, então não vê nenhum dos 125. A 2ª: a decisão-sem-proveniência do radar só aceita trace ou aresta TRACES_TO, e o contrato aceita também provenance; medido, são 9 decisões vivas de 4 grafos que o radar cobra e o contrato aceita, contra 53 de 19 grafos que os dois cobram. Geradores: nenhum reprovou na bancada; o write(KG) do onion-research.js (e o /meta:dissect, que o usa no modo decisão) escreve um D_ open sem trace obrigatório, e passou a ensinar os 4 avisos; o kg-contract-check ganhou a dica de cura de cada código novo."
+    trace: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/v41-testimony-in-prod.tsv"
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version, .kg-ssot/gate.json e docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/v41-testimony-in-prod.tsv na branch feat/kg-ssot-contract-v41"
+      locator: "tag contract-v4.1.0, a chave debt da base e as 125 linhas do TSV"
+      method: "medição: kg_vendor check, kg_gate --update, extração dos nós PROD com method testemunho e bancada com mutantes em 2026-10-09"
 edges:
   - from: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
@@ -321,5 +337,11 @@ edges:
     to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
     edge_type: SUPPORTS
   - from: E_ONDA_O3_1_APLICADA
+    to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
+    edge_type: SUPPORTS
+  - from: E_CONTRATO_V41_ADOTADO
+    to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
+    edge_type: SUPPORTS
+  - from: E_CONTRATO_V41_ADOTADO
     to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
     edge_type: SUPPORTS
