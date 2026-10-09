@@ -2,7 +2,8 @@
 title: 'Resíduo — o pr-merge-verified recusa o rebase quando o .kg.yaml cita commit da própria branch'
 date: 2026-10-09
 branch: fix/merge-verified-kg-provenance
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 8dec10d0a8b15718528607f0016f6df1269569f1ce3a99b3d99bdb9ffa3b409d
+reviewed_code_sha256: 75ae36ac0eaf242eaea6ca5a866d518438b026aa7a7582aad561a9e0d754a84d
 findings_total: 3
 findings_real: 1
 findings_fixed: 1
