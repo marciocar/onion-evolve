@@ -2,7 +2,8 @@
 title: 'Resíduo — kg-radar alinhado ao contrato v4.1: testemunho em PROD e decisão com provenance (SAC-96)'
 date: 2026-10-09
 branch: fix/radar-contract-alignment
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 2c671301e2e89745d09007cf44d36eb30151c8fa71977a044981593c39649b16
+reviewed_code_sha256: d7cfefae3dda04849bd697c77c8276cdd19ca341b7cefcdb35e415f9d8f49eba
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
