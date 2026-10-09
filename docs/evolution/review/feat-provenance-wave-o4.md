@@ -3,10 +3,9 @@ title: "Revisão — onda O4 da migração de provenance (SAC-73): 269 linhas ju
 date: 2026-10-09
 branch: feat/provenance-wave-o4
 reviewer: "passada adversarial com o mandato de achar linha aplicada fora do veredito, status mexido por dev-historia, caminho absoluto que sobrou na source, locality inventada, nó fora da planilha alterado, regressão do gate e termo de cliente que deixou de ser protegido. Fiz a conferência mecânica das 269 linhas contra os 57 arquivos finais, uma amostra estratificada de 15 aplicados (semente 20261009) com o nó aberto antes e depois, a idempotência, a bancada kg_migrate_v3 15/15 e registry_pins 8/8 com LC_ALL=C, e 6 mutantes"
-reviewed_diff_sha256: 021c6d8465333bcd7d029cd1ec324f706a79e79c3805ef47d60a929dbbff7045
-reviewed_code_sha256: 54367fbf1d0fb07ca381809642bd55705a34a12cef7839c32c23dc68b684bda8
-findings_total: 6
-findings_real: 3
+reviewed_diff_sha256: pendente
+findings_total: 7
+findings_real: 4
 verdict: CORRIGIDO
 tokens: 0
 duration_min: 150
@@ -89,7 +88,12 @@ Nenhum dos 15 diverge da planilha.
 5. **Declarado: a família `fixtures` não rodou inteira localmente.** Ela roda o lint por fixture e passou de
    25 minutos. Conferi as duas fixtures novas direto no `members-validate.sh` (good rc 0, bad rc 1) e a CI é
    o gate final.
-6. **Declarado: o `verified_at` dos 116 dev-historia não mudou**, por desenho. DEV aqui quer dizer "não
+6. **REAL, curado: o id do nó do grafo vazou para a superfície vendorizada.** O comentário novo do
+   `members-validate.sh` e o cabeçalho da fixture `members-good-superseded.yaml` citavam o id do nó de
+   pergunta, que carrega o nome do adotante. A REGRA 36 (Superfície VENDORIZADA sem nome comercial de
+   cliente) reprovou 4 HARD no lint do `pr-finalize`, e nada foi enviado. Os dois comentários foram
+   generalizados. É a guarda funcionando sobre o próprio PR que mexia nos termos dela.
+7. **Declarado: o `verified_at` dos 116 dev-historia não mudou**, por desenho. DEV aqui quer dizer "não
    conferido", e a data continua sendo a da observação original.
 
 ## Mutantes

@@ -204,7 +204,7 @@ if isinstance(doc, dict):
     if n_sources != 1:
         err(f"registro: esperado EXATAMENTE 1 membro fonte (kind:source), encontrado {n_sources} (fonte≠derivação: uma só fonte)")
 
-    # LINHAGEM HISTÓRICA (2026-10-09, selo do maestro sobre Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO):
+    # LINHAGEM HISTÓRICA (2026-10-09, selo do maestro sobre dois membros no mesmo remoto):
     # `superseded_by: <id>` tira o membro do escopo do ops/registry-pins.sh. Por isso o campo é
     # cobrado aqui: um id que não existe (ou que aponta para si, ou para outro histórico) esconderia
     # uma divergência VIVA atrás de uma linhagem inventada.
