@@ -112,7 +112,9 @@ def seal(consol):
                     f"    verified_against: '{RUN}: DRIFTED {m['claims_measured']}/{m['claims_total']} — {sanitize(m['method'],terms)[:90]}'\n"
                     f"    label: '{_lab[:280]}'\n"
                     f"    narrative: '{_div[:1200]}'\n"
-                    f"    provenance:\n      source: '{_src}'\n      locator: '{_loc}'\n      method: '{_met}'\n\nedges:")
+                    f"    provenance:\n      source: '{_src}'\n      locator: '{_loc}'\n      method: '{_met}'\n"
+                    # locality (contrato v4.2, SAC-97): o source é o próprio grafo do repo (kg_file relativo)
+                    f"      locality: 'repo'\n\nedges:")
             t = t.replace('\nedges:', '\n' + node, 1)
             # TIPO DA ARESTA PELA REALIDADE (lei de 2026-09-02, regra do proprio radar): SUPERSEDES
             # diz "deixou de valer" e exige flip do alvo — mas um DRIFTED cuja realidade e GATED ou
