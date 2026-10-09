@@ -304,7 +304,9 @@ mkdir -p "${DEST}/.claude"
 # nada se herda, `materialized_at` em vez de `adopted_at`). Os leitores do campo antigo
 # (`door-seal-pin.sh`) leem `source_commit` com fallback a `onion_version`, para as portas já
 # publicadas no dialeto velho até a próxima materialização.
-_fw="$(bash "${REPO_ROOT}/.claude/validation/onion-version.sh" | awk '/^framework:/{print $2; exit}')"
+# `framework` = o NOME DA PORTA, não o do core: o core é privado e a porta é "sem biografia"; e é o que o
+# `onion-version.sh` da própria porta responde (deriva do remote dela). Elenxo do PR da F1, O5.
+_fw="${_slug}"
 _pin_date="$(git -C "${REPO_ROOT}" log -1 --format=%cd --date=short "${SRC_REF}")"
 bash "${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh" "${DEST}" --kind door --role "${ROLE}" \
   --framework "${_fw}" --commit "${_pin_ph}" --commit-date "${_pin_date}" --adopted-from "${_slug}" >/dev/null \

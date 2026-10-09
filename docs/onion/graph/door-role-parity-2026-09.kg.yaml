@@ -235,7 +235,7 @@ nodes:
     status: confirmed
     valid_from: "2026-10-09"
     verified_at: "2026-10-09"
-    verified_against: "família de bancada adopt_robust (15 casos) + door (f2) + door_seal_pin (l)(m) + role_cut (i) + role_promotion (a) sob LC_ALL=C, cada caso com mutante que reprova; dogfood dos blocos do próprio adopt.md num sandbox (adoção --role standalone, --update e --promote-hub com farol vivo)"
+    verified_against: "família de bancada adopt_robust (14 casos, c4 em dois modos) + door (f2) + door_seal_pin (l)(m) + role_cut (i) + role_promotion (a) sob LC_ALL=C, cada caso com mutante que reprova; dogfood dos blocos do próprio adopt.md num sandbox (adoção --role standalone, --update e --promote-hub com farol vivo)"
     source_kind: repo
     source_tier: 10
     label: "F1 das portas: a adoção ficou robusta — manifesto que falha aborta, o --role percorre até o carimbo, --update e --promote-hub vão a branch dedicada, offer-onion-ci aceita worktree e a porta tem um escritor de carimbo só"
