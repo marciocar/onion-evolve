@@ -312,6 +312,7 @@
 .claude/validation/cited-directive-check.sh	C_TETO_REGEX_TRANSCRITAS_DE_UMA_VERSAO	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
 .claude/validation/cited-directive-check.sh	D_MOTOR_E_COPIA_LITERAL_DO_BINARIO	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
 .claude/validation/cited-directive-check.sh	D_SUBSTRATO_CHECK_DE_LINT_MOTOR_PYTHON	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
+.claude/validation/cited-directive-check.sh	E_REEXTRACAO_2_1_295_SO_NOMES	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
 .claude/validation/cited-directive-check.sh	E_SEIS_MUTANTES_MORDERAM	docs/evolution/research/guard-cited-directive-2026-10/cited-directive-2026-10.kg.yaml
 .claude/validation/consumed-mode-check.sh	A_DOCUMENTACAO_LIDA_COMO_INVOCACAO_E_CLASSE_SISTEMICA	docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml
 .claude/validation/consumed-mode-check.sh	D_SUBSTRATO_CHECK_DE_LINT_MOLDE_CONSUMED_MODE	docs/evolution/research/guard-injected-cut-2026-10/injected-cut-2026-10.kg.yaml
