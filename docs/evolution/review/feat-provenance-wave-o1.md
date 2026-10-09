@@ -3,7 +3,8 @@ title: "Revisão — onda O1 da migração de provenance (SAC-73): --routing no 
 date: 2026-10-09
 branch: feat/provenance-wave-o1
 reviewer: "passada adversarial com mandato de achar provenance INVENTADA (fonte que não existe ou que é o próprio grafo): varredura mecânica dos 2.291 nós escritos + amostra de 20 com a fonte aberta (gh, curl, leitura do arquivo); bancada kg_migrate_v3 9/9 com LC_ALL=C e 5 mutantes do caso (h)"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 7c5e8e08b6ddb55bd029f7287f8cc392576c74e266112d971442415c40672c9a
+reviewed_code_sha256: 73cfdb7facf85b3ffcc633bb972875f7d28f658d2b0d70e157327b4de56bbcc6
 findings_total: 3
 findings_real: 2
 verdict: REPROVADO_E_CURADO
