@@ -10,7 +10,15 @@
 #   distillation  — reescrita curada da doutrina, sem vendor  (onion_version: n/a)
 #   door          — vendoriza, mas o proposito e DISTRIBUIR o bundle
 #   method        — adota o METODO (KG SDAAL) sem vendorizar  (onion_version: n/a)
+#   port          — traducao para outro substrato (.codex/), sem vendorizar  (onion_version: n/a)
 # Discriminador medivel por tras: `onion_version: n/a` marca quem NAO vendoriza.
+# PAPEIS DE PORTA (2026-10-09, F1.5 das portas, SAC-90): `role: plugins` (o standalone empacotado em
+# marketplace) e `role: mini` (porta didatica gerada por allowlist) so valem com `kind: door`. A `mini`
+# e a unica porta que pode declarar `onion_version: n/a`, ate a 1a materializacao (F5).
+# REGISTRO GUARDA ESTADO, NAO BIOGRAFIA: o historico de pins e as narrativas que moravam em comentario
+# foram para o grafo docs/onion/graph/door-role-parity-2026-09.kg.yaml (no E_REGISTRO_HONESTO_F15 e
+# vizinhos). O pin de adotante se confere com `ops/registry-pins.sh --check` e se carimba com `--seal`;
+# o de porta, com `ops/door-seal-pin.sh`.
 # (Compatível com /meta:federation-* quando a Federação formal graduar — ver ../rfc/rfc-0001 §gatilho.)
 version: 2
 trust_policy_version: 1
@@ -78,18 +86,9 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/metagamify
     local_path: "/home/marcio/rhilo-metagamify"   # dir físico legado no disco (privado, não-exposto); doc-bridge depende dele — não renomear sem migrar o clone
-    onion_version: 21213cc6c3d6   # VERIFICADO por pin-integrity-check.sh (pin-ok 2026-07-29). Reconciliado
-                                  # de 9547ca7 (stale desde 07-23): o clone avançou a 21213cc em 07-25 sem o
-                                  # pin subir. O update do console rico (core e34b858) está preparado na branch
-                                  # chore/onion-console-rich-e34b858c5ec4 do clone, AINDA NÃO mergeada na
-                                  # integração — o pin sobe a e34b858 quando ela entrar (declarado≠verificado:
-                                  # não carimbo e34b858 antes de estar na árvore committed do metagamify).
-                                  # ⚠️ PASSIVO adopter-side: --audit-vendor achou 1 pin INVÁLIDO no onion/vendor
-                                  # ('2026-07-12' — uma DATA, não commit; vnextpin). Fix é da sessão do rhilo
-                                  # (re-stampar o vendor). Membro MULTI-LINHAGEM: pins por linhagem em lineages:
-                                  # abaixo (parecer onion-parecer-rhilo-lineages-2026-07, D2). Regra: pin só
-                                  # entra aqui VERIFICADO por pin-integrity-check.sh — nunca do stamp declarado
-                                  # (histórico: a458a0fc6b71 era FORJADO por restore manual de 06-30).
+    onion_version: 21213cc6c3d6   # conferido no remoto (develop) por ops/registry-pins.sh em 2026-10-09
+                                  # ⚠️ passivo do lado dele: 1 pin inválido no onion/vendor ('2026-07-12'); a cura é da sessão dele
+    integration_branch: develop   # do carimbo versionado na develop do remoto
     lineages:                     # estado declarado E verificado por linhagem (D2; linhagem = 4º membro da família "declarado ≠ verificado")
       framework:                  # onde a co-evolução vive (inbox/inbound commitados, sinais, diário)
         branch: develop
@@ -144,26 +143,8 @@ members:
     parent: onion-evolve
     remote: github.com/GranaAi/granaai   # PRIVADO — não citar em superfície pública
     local_path: "/home/marcio/granaai"   # re-clonado 2026-07-08 no novo lar (KVM 8); acesso via token gh de marciocar (org GranaAi privada)
-    onion_version: 6cc162f32d1c   # VERIFICADO por pin-integrity-check.sh (pin-ok 2026-07-23) +
-                                  # vendor-audit 5/0 limpo. A sessão do adotante atualizou 91d5dbb->6cc162f
-                                  # (via /meta:adopt --update, branch chore/onion-update-*); re-verificado
-                                  # do core em 2026-07-23 — RESOLVE o "pin untrusted 74c470e" do grafo
-                                  # federation-health (nó C_GRANAAI_PIN_UNTRUSTED era STALE).
-                                  # Pin anterior verificado: 91d5dbb05a6d (07-19, sessão do adotante).
-                                  # Membro MULTI-LINHAGEM: pins por linhagem no mapa lineages: abaixo
-                                  # (regra: pin só entra aqui VERIFICADO por pin-integrity-check.sh —
-                                  # nunca do stamp declarado).
-    lineages:                     # ≥3 adoções distintas (sinal 2026-07-10-granaai-multi-lineage, testemunho
-                                  # do maestro; padrão metagamify/D2 — linhagem = "declarado ≠ verificado")
-                                  # NOTA (2026-07-19, correção de "declarado ≠ verificado"): a anotação antiga
-                                  # aqui sobre "drift consciente DRIFT-ONION do lint local" NÃO se confirmou.
-                                  # Verificado por grep no repo inteiro da granaai: o marcador DRIFT-ONION NÃO
-                                  # EXISTE lá (únicas ocorrências são dois docs de inbound criados hoje,
-                                  # 2026-07-19, sem relação com o lint). A suspeita era diagnóstico do CORE
-                                  # sobre a linhagem local-kvm8 (2026-07-10), não algo reportado pelo adotante.
-                                  # A linhagem local-kvm8 (branch onion/adopt-update-74c470e, pin 4332ac8d1884)
-                                  # ficou OBSOLETA — superada pelo update de 2026-07-19 acima (via a linhagem
-                                  # da própria sessão do adotante) e foi removida deste mapa.
+    onion_version: 6f3ab3a3905c   # carimbado por ops/registry-pins.sh (remoto develop conferido em 2026-10-09)
+    lineages:                     # ≥3 adoções distintas (sinal 2026-07-10-granaai-multi-lineage; padrão metagamify/D2)
       mauricio:                   # máquina do Mauricio Matos — a linhagem da adoção registrada (2026-07-01);
                                   # reconciliação #1094/#1096 revisada por ele. Pin não-verificável deste host.
         pin: nao-verificavel-deste-host
@@ -199,9 +180,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/projeto-betahauss-tornak   # PRIVADO
     local_path: "/home/marcio/gustavo-pulga"   # dir físico difere do nome do repo (não renomear sem migrar o clone)
-    onion_version: c9eb2c40bc3b   # VERIFICADO por pin-integrity-check.sh (pin-ok, 2026-07-19) —
-                                  # regularização de registro: o stamp existia (adopted_from: onion-evolve)
-                                  # mas o membro faltava em members.yaml (drift de registro; ADR claude-door-topology D4).
+    onion_version: 7fd9392cd43b   # carimbado por ops/registry-pins.sh (remoto onion/adopt conferido em 2026-10-09)
     adopted_at: 2026-07-09
     updated_at: 2026-07-14        # do stamp .claude/.onion-version
     mode: greenfield
@@ -219,16 +198,15 @@ members:
 
   - id: onion-mini
     name: onion-mini (Onion Mini — a versão mini e portátil, ex-onion-portable)
-    # MATRIZ DAS PORTAS (2026-10-09, D_MATRIZ_DE_PORTAS_2026_10): vira porta didática, role: mini e
-    #   kind: door, gerada do core por allowlist na F5 (SAC-94). O schema ainda recusa os dois valores
-    #   (members-validate.sh, medido): a ampliação é da F2, e até lá a entrada segue como está.
-    role: standalone            # DESTILAÇÃO CURADA, não adoção (não vendoriza .claude/) — role
-    kind: distillation  # reescrita curada da doutrina; onion_version: n/a — NAO vendoriza
-                                # 'distilled' formal é costura gated (2ª destilação; ADR mini-distillation D2)
+    # PORTA DIDÁTICA (D_MATRIZ_DE_PORTAS_2026_10). A materialização por ALLOWLIST a partir do core vem
+    #   na F5 (SAC-94); até lá o repo segue sendo a destilação antiga, sem carimbo, e por isso o pin é
+    #   `n/a` (exceção nomeada no members-validate.sh) e a REGRA 92 declara a paridade não-medida.
+    role: mini                  # papel de porta: allowlist didática para iniciantes
+    kind: door                  # distribui; até a F5, conteúdo ainda é a destilação curada
     parent: onion-evolve
     remote: github.com/marciocar/onion-mini
     local_path: "/home/marcio/onion-mini"
-    onion_version: n/a          # sem stamp: destilação (reescrita curada da doutrina), não vendor do framework
+    onion_version: n/a          # ainda não materializada pelo carimbo (F5, SAC-94)
     adopted_at: 2026-07-05      # data da adoção definitiva/rebrand (repo existe desde jun/2026)
     mode: distilled             # anotação livre; o trust engine só valida role
     published_at: "https://onionevolve.com/mini/"   # vitrine no site da família (M2 ✅ 2026-07-05); código: github.com/marciocar/onion-mini
@@ -244,30 +222,16 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
-  # PORTA DE FRAMEWORK (não projeto-adotante, não destilação) — a porta pública Claude que desfaz o
-  # colapso porta≡core (ADR onion-adr-family-repo-topology-2026-07 F2; doutrina public-door-vs-private-core).
-  # Nasceu 2026-07-19 via /meta:adopt role-scoped (composição: resolve-role-bundle standalone → verticais →
-  # vendor .claude/), SEM meta-factory nem memória privada. Doutrina que circula anonimizada na raiz (PR #438).
-  # PÚBLICA desde 2026-07-19 — o flip FOI FEITO e está verificado ao vivo (ver `remote:` abaixo).
-  # Corrigido 2026-08-05: este comentário ainda dizia "Nasce PRIVADA; o flip é gate do maestro",
-  # contradizendo a própria linha `remote:` do mesmo bloco — declarado≠verificado dentro do registro.
-  # Segue gated APENAS o re-apontar do redirect onion-claude (MOAT-lock-4).
+  # PORTA DE FRAMEWORK — o core em uso direto num projeto individual (D_MATRIZ_DE_PORTAS_2026_10).
+  # Nascimento, flip público e o papel decidido: grafo door-role-parity-2026-09 (E_REGISTRO_HONESTO_F15).
   - id: onion-standalone
     name: onion-standalone (porta pública Claude — instância adotada role-scoped, bundle standalone)
-    # ⚠️ ESTE PAPEL ESTÁ DECIDIDO, e a decisão é da DOUTRINA — não é questão aberta. Em 2026-09-30 eu
-    #    escrevi que ele "ficava aberto, com evidência nos dois sentidos"; era falso, e o custo de
-    #    afirmar isso é conhecido: foi lendo o registro em vez de medir que a `onion-core` foi
-    #    re-materializada com o papel errado e a face pública perdeu 85 arquivos de meta-fábrica.
-    #    `public-door-vs-private-core.md` classifica `onion-standalone` como **Porta de framework** e
-    #    diz, textualmente, "**Nunca**: meta-factory" — o que É o corte do papel `standalone`. Registro
-    #    e carimbo concordam (medido). A REGRA 92 agora cobra essa concordância a cada lint.
-    # MATRIZ DAS PORTAS (2026-10-09, D_MATRIZ_DE_PORTAS_2026_10): o "Nunca: meta-factory" acima é
-    #   SUPERADO como destino. O standalone passa a levar a meta-fábrica e perde só adoção e federação;
-    #   o corte novo é a F2. Até lá o corte vigente segue o descrito acima.
-    role: standalone            # TIER 3 — mas é PORTA DE FRAMEWORK (distribui o bundle standalone), não projeto-adotante
-    kind: door          # vendoriza, mas o proposito e DISTRIBUIR o bundle, nao usar num projeto
+    # Corte vigente até a F2: sem meta-fábrica. Pela matriz, a F2 devolve a meta-fábrica e tira só
+    #   adoção e federação. Registro e carimbo dizem `standalone` (REGRA 92).
+    role: standalone            # papel de porta: o bundle standalone
+    kind: door                  # vendoriza para DISTRIBUIR o bundle, não para usar num projeto
     parent: onion-evolve
-    remote: github.com/marciocar/onion-standalone   # PÚBLICO desde 2026-07-19 (flip feito, verificado ao vivo). Resta gated: reapontar o redirect onion-claude→onion-standalone (onion-claude segue privado)
+    remote: github.com/marciocar/onion-standalone   # PÚBLICO. Gated: reapontar o redirect onion-claude→onion-standalone
     local_path: "/home/marcio/onion-standalone"
     onion_version: 947e69ce069d   # carimbado por ops/door-seal-pin.sh (remoto conferido)
     adopted_at: 2026-07-19
@@ -283,24 +247,9 @@ members:
       diary_classifications_shared: [public, collective]
       exposes_downstream: []
 
-  # PORTA PÚBLICA DO CORE (nasceu 2026-09-17, no mesmo movimento em que o core FECHOU). É a face
-  # que distribui a maquinaria COMPLETA — papel `hub`, meta-fábrica inclusa — sem a biografia.
-  # Materializada por `ops/materialize-door.sh`, que é AUTORITATIVO: o que sai do manifesto sai da
-  # porta. O `onion_version` abaixo é o pin de onde ela foi materializada, e é o que a guarda de
-  # ciclo compara contra a superfície que viaja — porta sem re-materialização envelhece, e o
-  # `onion-standalone` (372 commits atrás, medido 2026-09-17) é a prova de que isso acontece.
-  # ⚠️ REGISTRADO EM 2026-09-30, E O ATRASO CUSTOU: este hub estava FORA do members.yaml desde a
-  #    adoção (2026-09-16). A REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) deriva
-  #    os termos que varre DESTE arquivo — logo um membro não registrado é INVISÍVEL à guarda, e o
-  #    nome dele podia vazar para superfície vendorizada sem nada acusar. É a segunda vez que a casa
-  #    paga por isso (a primeira foi um repo de prefixo `onion-`, que a guarda também não enxergava).
-  #    Registrar é ato de segurança, não burocracia.
-  # ⚠️ SLUG NEUTRO POR DECISÃO DO MAESTRO (2026-09-30): ele confirmou que o nome é COMERCIAL, e o `id`
-  #    é justamente o que vai para as superfícies PROJETADAS — medido no mesmo dia: o nome comercial já
-  #    havia entrado em `federation-map.md`, `federation-console.html` E `graph.md` nas horas em que
-  #    ficou registrado nominalmente. Trocado por slug de função, no padrão de `hub-formacao-enterprise`.
-  #    Quem é a empresa vive no CLAUDE.md dela, nunca aqui. O `local_path` NÃO viaja para projeção
-  #    (medido: zero ocorrências de local_path nas três), então o caminho local pode manter o nome real.
+  # ⚠️ SLUG NEUTRO POR DECISÃO DO MAESTRO (2026-09-30): o nome é COMERCIAL e o `id` vai para as
+  #    superfícies PROJETADAS. Quem é a empresa vive no CLAUDE.md dela, nunca aqui; o `local_path` não
+  #    viaja para projeção. O registro atrasado e o vazamento medido: grafo door-role-parity-2026-09.
   - id: hub-operacoes-enterprise
     name: hub-operacoes-enterprise (hub de operações — empresa com projetos próprios, nome comercial sob reserva)
     role: hub                   # TIER 1 — pode ter sub-adotados; carimbo do clone diz `role: hub`
@@ -308,7 +257,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/gmill   # PRIVADO — o remote É o nome real do repo; não há como neutralizá-lo sem renomear o repo, e ele não entra nas projeções
     local_path: "/home/marcio/gmill"     # clonado em 2026-09-30 para validar as KBs do sinal
-    onion_version: cff9214c3b9a          # do carimbo do clone; commit VERIFICADO na história do core
+    onion_version: 8278fee79d1c   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-09)
     adopted_at: 2026-09-16               # do carimbo (`adopted_at`), não de suposição
     mode: greenfield                     # do carimbo (`mode`)
     personality_summary: "Hub de operações que adota os próprios projetos. Fonte do sinal upstream de 2026-09-30 com três KBs (Zoho Projects API V3, GLPI API V1×V2 e o padrão chamado→tarefa), absorvidas no core com scrub e carimbo de versão."
@@ -323,33 +272,15 @@ members:
       exposes_downstream: []
 
   - id: brain-granaai
-    # ⚠️ REGISTRADO EM 2026-10-02, e o ATRASO custou: este adotante foi adotado em 2026-10-01 e, antes
-    #    de entrar aqui, já havia mandado TRÊS sinais de severidade `high` — um deles com medição AO
-    #    VIVO (24 chamadas REST num workspace real) que achou o maior bug ativo do adapter ClickUp.
-    #    Enquanto esteve fora do registro: (a) a REGRA 36 (Superfície VENDORIZADA sem nome comercial
-    #    de cliente) NÃO o protegia, porque ela deriva termos deste arquivo; (b) o /meta:co-announce
-    #    não conseguia resolvê-lo como alvo, logo NÃO HAVIA COMO responder ao sinal dele por doutrina
-    #    — o fechamento de laço estava mecanicamente impedido. Registrar é ato de SEGURANÇA e de
-    #    COMUNICAÇÃO, não burocracia; o maestro apontou a ausência da resposta e ela estava aqui.
+    # Registro (2026-10-02, atrasado) e promoção a hub: grafo door-role-parity-2026-09 (E_REGISTRO_HONESTO_F15).
     name: brain-granaai (adotante de campo — base de conhecimento da Grana.Ai, a redocumentar como Company Brain)
-    # ⚠️ PROMOVIDO A HUB pelo maestro em 2026-10-02, do lado do adotante (`--promote-hub`), e o
-    #    registro ficou atrás — ele chegou por SINAL dele, não por guarda. Aqui carimbo e tier
-    #    AGORA CONCORDAM (`hub` nos dois), ao contrário da redação anterior, que explicava uma
-    #    divergência legítima entre `adopted` (relação com o framework) e `standalone` (tier na rede).
-    #    O que ele ganha: adotar e atualizar os projetos da GranaAI (Camada 2). O que NÃO ganha:
-    #    autoria do framework (Camada 1) nem federação cross-empresa (Camada 3).
-    #    ⚠️ E O BURACO QUE ISTO EXPÔS: a REGRA 92 (Papel da porta no registro concorda com o CARIMBO
-    #    dela) declara fronteira `kind: door` — logo NENHUMA guarda comparava registro × carimbo de
-    #    ADOTANTE, e esta deriva só apareceu porque ele mandou sinal. Mesma família do
-    #    `vendor-scrub-blind-spot`: a guarda protege uma categoria e a outra fica nua.
-    role: hub                   # TIER 2 — adota o core E adota/atualiza os projetos dele (Camada 2)
+    role: hub                   # TIER 2 — adota o core E adota/atualiza os projetos dele (Camada 2); carimbo também diz `hub`
     kind: adopter
     parent: onion-evolve
-    remote: n/a                 # repo LOCAL; expor é ato do maestro (outward-facing)
+    remote: github.com/GranaAi/granaai   # PRIVADO — medido 2026-10-09: o origin do clone é o repo da granaai, na branch onion/develop
     local_path: "/home/marcio/brain-granaai"
-    onion_version: 6f3ab3a3905c # carimbo VIVO no remoto 2026-10-09 (onion/develop, merge --no-ff a57041bed; onion/vendor ancestral verificado). Anterior: 1c459812f48b
-                                # (o registro dizia 663fdbc5bdcc, mas o carimbo vivo antes do update ja era 1c459812f48b:
-                                # registro defasado de um update anterior nao carimbado; medido pelo stamp no remoto)
+    onion_version: 6f3ab3a3905c # conferido no remoto (onion/develop) por ops/registry-pins.sh em 2026-10-09
+    integration_branch: onion/develop   # medido: branch do clone e do carimbo vivo (o carimbo não declara o campo)
     adopted_at: 2026-10-01
     mode: brownfield            # repo que já existia (master), adotado como atualização
     personality_summary: "O adotante que mais SINALIZOU em menos tempo, e com a evidência mais forte: três sinais `high` em 48h, um deles com medição ao vivo (24 chamadas REST, tasks criadas e apagadas, limpeza confirmada por 404) e grafo de pesquisa versionado. Achou o que o core não via — o parâmetro de subtasks que devolvia vazio e quebrava quatro comandos em TODO adotante ClickUp — e corrigiu uma correção errada do core antes de ela viajar. Precedente: adotante como refutador do core, não só consumidor."
@@ -358,18 +289,7 @@ members:
     trust:
       can_receive_from: [onion-evolve]
       can_advise_to: [onion-evolve]
-      # ⚠️ ELEVADO EM 2026-10-02, e a elevação é CORREÇÃO DE DECLARADO≠VERIFICADO, não cortesia.
-      #    Um Elenxo mediu: com `can_correct_to: []`, `trust-topology-check.sh --from brain-granaai
-      #    --to onion-evolve --action correct` devolvia `🚫 BLOQUEADO (rc=1)` — enquanto este mesmo
-      #    PR, a prosa acima e o CHANGELOG chamavam o membro de "refutador medido do core". A casa
-      #    estava registrando como impossível um ato que ele JÁ PRATICOU DUAS VEZES em 48h: a
-      #    medição ao vivo que derrubou o meu conserto errado de `tags`, e a re-medição que derrubou
-      #    o meu veredito "não reproduz no core" sobre o pre-commit (eu havia procurado no caminho
-      #    errado). Critério idêntico ao precedente desta casa em 2026-07-06 (rigor comprovado:
-      #    achou + corrigiu bug real), e é `trust` elevado — NUNCA `role` elevado.
-      #    MAESTRO: esta é a única linha deste PR que muda POSTURA e não conserta defeito. Vetar
-      #    aqui não desfaz nada do resto.
-      can_correct_to: [onion-evolve]   # elevado 2026-10-02: refutou o core 2x com medição executada
+      can_correct_to: [onion-evolve]   # elevado 2026-10-02: refutou o core 2x com medição executada (razão no grafo)
       diary_readable_by: []
       diary_classifications_shared: []
       exposes_downstream: []
@@ -382,17 +302,12 @@ members:
     #    porque a guarda reconhece por LISTA e não conhecia o nome — falha por vocabulário. Quem é o
     #    cliente vive no CLAUDE.md do adotante, nunca aqui.
     name: vendas-pdi-enterprise (adotante de campo — vendas enterprise, cliente sob NDA)
-    # ⚠️ `standalone` aqui e `adopted` no `.claude/.onion-version` NÃO se contradizem — respondem a
-    #    perguntas diferentes: o carimbo diz a RELAÇÃO com o framework (este repo vendoriza o Onion),
-    #    o registro diz o TIER na rede (T3: adota o core direto, sem sub-adotados). Escrevi `adopted`
-    #    aqui na 1ª tentativa e o `members-validate.sh` recusou, nomeando o vocabulário aceito —
-    #    guarda fazendo exatamente o que deve: barrar antes, não deixar drift entrar calado.
-    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
+    role: standalone            # TIER 3 — adota o core direto, sem sub-adotados (carimbo diz `adopted`: par permitido, REGRA 92)
     kind: adopter
     parent: onion-evolve
-    remote: n/a                 # repo LOCAL; o remoto privado é ato do maestro (outward-facing)
+    remote: github.com/marciocar/vendas-pdi-enterprise   # PRIVADO — medido 2026-10-09 no origin do clone (o registro dizia n/a)
     local_path: "/home/marcio/vendas-pdi-enterprise"
-    onion_version: 24118c5d7a97 # ATUALIZADO 2026-09-18 (commit cf20e30 no alvo, empurrado): o registro seguia no pin da adoção enquanto o alvo já rodava o framework novo — atualizar sem avançar o registro deixa a federação medindo contra o passado
+    onion_version: 4299290b73d4   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-09)
     adopted_at: 2026-09-17
     mode: greenfield            # repo novo; gate PROVADO por execução: lint 0 HARD / 8 SOFT
     # ⚠️ CONFIDENCIALIDADE — material do cliente sob NDA vive em `material/`, IGNORADO pelo git
@@ -411,60 +326,45 @@ members:
 
   - id: onion-core
     name: onion-core (porta pública do core — maquinaria completa, papel hub, sem biografia)
-    # MATRIZ DAS PORTAS (2026-10-09, D_MATRIZ_DE_PORTAS_2026_10): o papel vira `source` na F2, junto
-    #   com o carimbo novo. Trocar só aqui antes disso faria a REGRA 92 (Papel da porta no registro
-    #   concorda com o CARIMBO dela) reprovar.
-    role: hub                   # CORRIGIDO 2026-09-30: dizia `standalone` e o CARIMBO da porta diz `hub`
-                                #   — 11 materializações seguidas (22/09→27/09) carimbaram hub, e o CLAUDE.md
-                                #   declara esta porta como "mesma plataforma, mesma MAQUINARIA, sem biografia".
-                                #   A anotação errada CUSTOU: em 2026-09-30 eu li o registro em vez do carimbo,
-                                #   materializei com --role standalone e a porta PÚBLICA perdeu 85 arquivos de
-                                #   meta-fábrica (adopt/create-*/federation-*/marketplace/wizard/onion-publish).
-                                #   Restaurado em 4eb55ac. O carimbo é o que a porta É; o registro é anotação.
-    kind: door          # DISTRIBUI a maquinaria; o proposito e ser a face publica do core
+    # A troca do papel para `source` (D_MATRIZ_DE_PORTAS_2026_10) vem com a F2/F3 e a re-materialização,
+    #   nessa ordem: carimbo primeiro, registro depois. Trocar só aqui faria a REGRA 92 reprovar.
+    role: hub                   # = carimbo da porta (REGRA 92); o incidente de 2026-09-30 está no grafo
+    kind: door                  # DISTRIBUI a maquinaria; é a face pública do core
     parent: onion-evolve
-    remote: github.com/marciocar/onion-core   # PÚBLICO desde 2026-09-17
+    remote: github.com/marciocar/onion-core   # PÚBLICO desde 2026-09-17; história reescrita uma vez (vazamento medido)
     local_path: "/home/marcio/onion-core"
-    # ⚠️ HISTORIA REESCRITA em 2026-09-17, e a razao e um VAZAMENTO MEDIDO: o baseline
-    #    `kb-vendored-link-baseline.txt` viajou POPULADO nas materializacoes anteriores, nomeando 22
-    #    caminhos CORE-PRIVADOS (dois ADRs, um RFC, o template de discussoes, uma mensagem de inbox)
-    #    num repo PUBLICO — exatamente a topologia que o `--stub-baselines` existe para reter.
-    #    A porta e PROJECAO GERADA: a historia dela nao tem valor autoral, entao a cura foi um commit
-    #    orfao unico + force-push, e nao ha nada a preservar nisso. LIMITE DECLARADO: o objeto antigo
-    #    segue acessivel por SHA ate o GC do GitHub, e quem clonou tem copia — o force-push torna
-    #    INALCANCAVEL, nunca inexistente.
-    onion_version: 947e69ce069d   # carimbado por ops/door-seal-pin.sh (remoto conferido)
-                                  # via `gh api repos/marciocar/onion-core/commits/main` -> 5063e81b2d8d.
-                                  # ⚠️ SEGUNDA vez EM UM DIA que este numero e avancado A MAO, e a 1a vez
-                                  # eu escrevi aqui que 'numero mantido a mao apodrece'. Apodreceu em duas
-                                  # horas: a porta foi publicada, este campo ficou atras, e a REGRA 85
-                                  # (Porta publica espelha o core, com catraca) seguiu acusando 3 commits
-                                  # de defasagem porque ela le o REGISTRO, nao a porta. O gatilho para
-                                  # mecanizar disparou DUAS vezes; a proposta esta no no
-                                  # Q_QUEM_CARIMBA_O_PIN_DA_PORTA do grafo de fios abertos.
-                                  # `gh api repos/marciocar/onion-core/commits/main` → 07c81b974880.
-                                  # ⚠️ ESTA foi a 1a materializacao cuja FONTE e comprovadamente
-                                  # `origin/main`: ate hoje o `materialize-door.sh` usava `git archive
-                                  # HEAD`, e rodado de uma branch de trabalho montaria a porta PUBLICA
-                                  # com codigo NAO MERGEADO (observado ao vivo: 1a tentativa carimbou o
-                                  # topo de um PR aberto). Curado no mesmo dia; os 8 pins anteriores
-                                  # foram medidos e estao todos em main, logo o defeito era latente.
-                                  # ⚠️ E O QUE NENHUMA GUARDA PEGA, declarado: o `pin-integrity-check.sh`
-                                  # devolve `pin-untrusted unknown` — ele NAO confere este campo contra o
-                                  # que a porta de fato publicou. Logo este numero e mantido A MAO, e
-                                  # numero mantido a mao apodrece. Candidato a mecanismo.
-    onion_version_19a: d55ddc10c6af   # pin da 19a materializacao (2026-09-24) — a leva do #869: a cura do lint que MORRIA calado com baseline vazio. Push VERIFICADO NO REMOTO via `gh api repos/marciocar/onion-core/commits/main`: f03726abc45d. DOGFOOD MEDIDO NA PORTA, nao declarado: o lint dela agora sai `rc=0`, 0 HARD, ZERO `MORREU`, sumario alcancado — e o baseline da REGRA 89 chegou com 14 linhas SO DE COMENTARIO, que o `grep -v` reprova igual ao vazio, confirmando que sem a cura a morte seria a mesma.
-    onion_version_18a: 77e5f0ab6cc6   # pin da 18a materializacao (2026-09-23) — leva do #868. Push VERIFICADO NO REMOTO via `gh api repos/marciocar/onion-core/commits/main`: 4e55eb4e3920, nao a nota do script nem o disco. ⚠️ Esta versao da porta AINDA carrega o lint que morre com baseline vazio (o `--stub-baselines` o esvazia por desenho): a cura esta no #869 e entra na 19a materializacao. Publicar esta ANTES foi o que destravou o deadlock — a REGRA 85 (Porta publica espelha o core, com catraca) so se satisfaz com a porta espelhando main, e o #869 nao mergeia com ela defasada. O custo (duas materializacoes) e o nucleo de `D_ONDE_COBRAR_A_DEFASAGEM_DA_PORTA`.
-    onion_version_anterior: 0e5d6a7ddf58   # pin da 17a materializacao (2026-09-23) — leva do #866 (sinal 09-07, guarda de idioma que enxerga .js, e a bancada do CI em 4 faixas de matriz). De worktree DESTACADA em origin/main. Push verificado no remoto: 5d83730797ab, 2026-09-23 (git ls-remote, nao a nota do script).
+    onion_version: 947e69ce069d   # carimbado por ops/door-seal-pin.sh (remoto conferido); pins 17ª–19ª no grafo
     adopted_at: 2026-09-17
     mode: greenfield            # repo vazio -> materializacao pelo manifesto (nunca copia de disco)
-    # ⚠️ A PORTA NASCE COM 22 HARD DA REGRA 45, E ISSO E O ESTADO VERDADEIRO, NAO REGRESSAO. A
-    #    superficie vendorizada linka para caminhos core-privados, e o ledger que os tolerava so
-    #    funcionava NOMEANDO esses caminhos — era ele o vazamento. Acoplamento que ninguem tinha
-    #    declarado: a porta so fica verde quando a divida da REGRA 45 no core chegar a ZERO.
     personality_summary: "A porta pública do core: a maquinaria COMPLETA (comandos, agentes, skills, guardas, meta-fábrica) sem a biografia. Nasceu no dia em que o core foi fechado, e existe porque método viaja e história não. É PROJEÇÃO — não recebe PR; correção feita nela é sobrescrita na próxima materialização."
     specializations: [public-door, full-machinery, hub-role, deterministic-guards]
     personality_last_sync: 2026-09-17
+    trust:
+      can_receive_from: [onion-evolve]
+      can_advise_to: [onion-evolve]
+      can_correct_to: []
+      diary_readable_by: [onion-evolve]
+      diary_classifications_shared: [public, collective]
+      exposes_downstream: []
+
+  # PORTA DE PLUGINS (D_MATRIZ_DE_PORTAS_2026_10) — a superfície do standalone empacotada em marketplace.
+  # Registrada em 2026-10-09 (F1.5, SAC-90), público desde 2026-08-25 e FORA daqui até então: o ponto
+  # cego da REGRA 36 (Superfície VENDORIZADA sem nome comercial de cliente) para repo de prefixo `onion-`.
+  # O carimbo dela NÃO é `.claude/.onion-version` (não há árvore .claude/): é o `provenance.json` de cada
+  # plugin, e o pin abaixo é o `ref` dele, lido do REMOTO publicado.
+  - id: onion-plugins
+    name: onion-plugins (porta de plugins — o standalone empacotado em marketplace do Claude Code)
+    role: plugins               # papel de porta: marketplace, sem árvore .claude/
+    kind: door
+    parent: onion-evolve
+    remote: github.com/marciocar/onion-plugins   # PÚBLICO desde 2026-08-25; branch master
+    local_path: "/home/marcio/onion-plugins"
+    onion_version: 947e69ce069d   # `ref` de plugins/onion/.claude-plugin/provenance.json no remoto (gh api, 2026-10-09)
+    adopted_at: 2026-08-25      # 1ª publicação (criação do repo e 1º commit)
+    mode: greenfield            # repo gerado pelo assemble-plugin.sh, nunca editado à mão
+    personality_summary: "A porta de instalação do Onion como plugins do Claude Code: a superfície do standalone empacotada em marketplace, sem adoção nem federação. É projeção gerada do core e carimba a origem por provenance.json, não por .onion-version."
+    specializations: [plugin-marketplace, public-distribution, claude-code]
+    personality_last_sync: 2026-10-09   # seed manual, no registro
     trust:
       can_receive_from: [onion-evolve]
       can_advise_to: [onion-evolve]
@@ -591,12 +491,15 @@ members:
     role: standalone            # TIER 3 — adota o core direto, sem sub-adotados
     kind: adopter       # projeto que vendoriza o framework
     parent: onion-evolve
-    remote: github.com/marciocar/poc-venda-direta-pdi   # PRIVADO
-    # ── SUCESSÃO (selo do maestro 2026-08-31): o projeto evoluiu de PoC para MVP. O slug do
-    #    membro PERMANECE (identificador de segurança/NDA, não de fase); o VIVO mudou de casa; a
-    #    PoC fica como histórico em /home/marcio/poc-venda-direta-pdi (pin congelado b9580a520e5b).
+    # ── SUCESSÃO (selo do maestro 2026-08-31): o projeto evoluiu de PoC para MVP; o slug PERMANECE
+    #    (identificador de segurança/NDA, não de fase). O VIVO é o MVP, e ele é SÓ LOCAL (medido
+    #    2026-10-09: o clone não tem `origin`). A PoC histórica segue em
+    #    github.com/marciocar/poc-venda-direta-pdi (PRIVADO), pin congelado b9580a520e5b — e era esse o
+    #    `remote:` daqui, o que fazia toda leitura remota medir a PoC e não o MVP.
+    remote: n/a                   # o MVP vivo não tem remoto
     local_path: "/home/marcio/mvp-venda-direta-pdi"
-    onion_version: 219e9a5f365b   # pin do update 2026-08-31 (mvp); confirmar com pin-integrity-check.sh
+    onion_version: 219e9a5f365b   # conferido no carimbo commitado do clone local por ops/registry-pins.sh em 2026-10-09
+    integration_branch: main      # do carimbo do MVP
     adopted_at: 2026-08-17
     mode: greenfield              # repo novo; gate PROVADO por execução na adoção; lint 0 HARD / 4 SOFT
     # ⚠️ CONFIDENCIALIDADE — este membro carrega material de TERCEIRO sob NDA em análise no Jurídico
@@ -623,16 +526,16 @@ members:
     kind: adopter       # monorepo legacy que vendoriza o framework
     parent: onion-evolve
     remote: github.com/ArandekBR/arandek   # PRIVADO
-    # ATENÇÃO doc-bridge: o local_path é a WORKTREE, não o checkout do produto. A adoção é `legacy`
-    # e vive em onion/adopt + onion/vendor (a main do produto NÃO tem .claude/). Só a worktree tem
-    # docs/evolution/{inbox,inbound}/ — entregar em /home/marcio/arandek seria correio no vazio.
-    # É exatamente o modo-de-falha medido no granaai (anúncios no checkout que não trabalha).
+    # ATENÇÃO doc-bridge: o local_path é a WORKTREE, não o checkout do produto (a main do produto NÃO
+    # tem .claude/). Só a worktree tem docs/evolution/{inbox,inbound}/ — entregar em
+    # /home/marcio/arandek seria correio no vazio.
     local_path: "/home/marcio/onion-adopt-arandek"
-    onion_version: 65d8a7501a03   # VERIFICADO por pin-integrity-check.sh (pin-ok, 2026-07-26)
+    onion_version: 65d8a7501a03   # conferido no remoto (develop) por ops/registry-pins.sh em 2026-10-09
     adopted_at: 2026-07-24
     updated_at: 2026-07-25        # do stamp .claude/.onion-version
     mode: legacy                  # monorepo existente (NX + Bun + SST); adoção por worktree
-    integration_branch: onion/adopt
+    integration_branch: develop   # medido 2026-10-09: o carimbo versionado na develop declara develop; o registro dizia
+                                  # onion/adopt, onde o carimbo ficou num pin ANTERIOR (91439b65261d)
     personality_summary: "Adotante legacy num monorepo de plataforma de agentes IA. É o remetente mais produtivo do canal upstream: o dogfood da adoção rendeu os gaps de durable-commit e approx-count adopter-aware, e a autocorreção do sinal do entrypoint virou o terceiro desfecho do auto-teste e a âncora UNANCHORED do radar."  # seed manual
     specializations: [field-dogfood, legacy-adoption, monorepo, upstream-signal]
     personality_last_sync: 2026-07-26   # seed manual (registro; sem /meta:personality-sync no alvo)
@@ -678,9 +581,9 @@ members:
                                 # members-validate.sh e a REGRA 92 (compatibilidade, não igualdade).
     kind: adopter
     parent: onion-evolve
-    remote: n/a                 # SÓ LOCAL por ora: criar repo remoto é ato outward-facing, e o maestro não autorizou
+    remote: github.com/marciocar/sge   # PRIVADO — medido 2026-10-09 no origin do clone (o registro dizia n/a)
     local_path: "/home/marcio/sge"
-    onion_version: ba0d2d423c17   # pin da adoção (2026-09-24); VERIFICAR com pin-integrity-check.sh após o 1º push
+    onion_version: ba0d2d423c17   # conferido no remoto (main) por ops/registry-pins.sh em 2026-10-09
     adopted_at: 2026-09-24
     mode: regulated             # licitação PÚBLICA: trilha de auditoria desde o dia 1, não camada opcional
     personality_summary: "Mapeia editais de licitação pública brasileira em três etapas encadeadas: mapeamento do objeto (lotes/itens/subitens), ficha de análise técnica (exigência × oferta) e checklist de qualidade da saída. Recorte inicial: veículos. BASE LEGAL: Lei 14.133/2021 por decisão do maestro — a 8.666/93 é regime histórico. Foi o adotante que ACHOU o defeito da REGRA 84 (Índice de leitura do KG em sincronia com os traces): o gate barrava o primeiro commit de TODO adotante porque a guarda lia índice vazio como gerador quebrado, quando no dia 1 isso é o estado normal. Curado na fonte no mesmo dia."
@@ -712,7 +615,7 @@ members:
     parent: onion-evolve
     remote: n/a                 # repo LOCAL; criar remoto é ato outward-facing e não foi autorizado
     local_path: "/home/marcio/avansat"
-    onion_version: f32e2f931c73 # pin da adoção (2026-09-25); VERIFICAR com pin-integrity-check.sh após o 1º push
+    onion_version: f32e2f931c73 # conferido no carimbo commitado do clone local (sem remoto) por ops/registry-pins.sh em 2026-10-09
     adopted_at: 2026-09-25
     mode: greenfield            # repo novo; gate PROVADO por execução (commit-sonda barrado), lint 0 HARD / 9 SOFT
     # ⚠️ CONFIDENCIALIDADE — este repo carrega o MÉTODO e os padrões que a própria equipe do cliente
@@ -736,7 +639,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/sacola-de-ideias   # PRIVADO
     local_path: "/home/marcio/sacola-de-ideias"
-    onion_version: 8e2517724c0a   # pin = main do core no dia da adoção (F1 da lente de pesquisa); VERIFICAR com pin-integrity-check.sh após o 1º push
+    onion_version: 8e2517724c0a   # conferido no remoto (main) por ops/registry-pins.sh em 2026-10-09
     adopted_at: 2026-09-02
     mode: greenfield              # site Astro recém-criado (1 página) → TX_create; framework cheio + canais de co-evolução
     personality_summary: "Site institucional da Sacola de Ideias (empresa do maestro, um dos criadores do Arandek e do Onion): Astro 7, pt-BR, sem CDN. Nasceu já com a lente de pesquisa (F1) — e foi o 1º adotante a medir que a rule research-lens faz o greenfield nascer com 1 HARD (sinal upstream 2026-09-02)."
@@ -758,8 +661,9 @@ members:
     remote: github.com/marciocar/portal-gamificacao
     local_path: "/home/marcio/portal-gamificacao"
     onion_version: 2e3f3a6f88ce   # pin-ok em 2026-09-05 apos o 1o --update (pin-integrity-check.sh, nao o stamp cru)
+    integration_branch: develop   # vivia só em comentário; a main do remoto não tem carimbo (medido 2026-10-09)
     adopted_at: 2026-09-04
-    mode: greenfield              # integration_branch: develop
+    mode: greenfield
     personality_summary: "Portal de gamificação sobre a metodologia MAAGICA (MPIE/IFRS) e dois livros autorais do maestro, num PROJETO A DOIS: dono + professor universitário co-autor que usa Claude Code e não deve aprender o framework. Foi o 1º adotante a forjar a CAMADA DE COLABORADOR (comandos finos /portal:*, guia de 2 páginas, um-escritor-por-ARQUIVO) e a primeira KB de domínio de adotante em duas camadas (gamification/{sources,theories,applications,graph}); e o único a forjar um comando LOCAL de selagem (/portal:selar) porque o /meta:kg-inbox do core recusava rodar em role: adopted — sinal que virou a cura de 2026-09-05 (a I3 é fronteira de REPO, não de papel)."
     specializations: [gamification, maagica, collaborator-layer, kg-sealing-field-signal, domain-kb-two-layers]
     personality_last_sync: 2026-09-05   # seed manual, na triagem dos 6 sinais de 2026-09-04
@@ -789,7 +693,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/jogo-da-vida
     local_path: "/home/marcio/jogo-da-vida"
-    onion_version: 2e3f3a6f88ce   # pin-ok em 2026-09-05 apos o 1o --update (pin-integrity-check.sh, nao o stamp cru)
+    onion_version: df031ef53683   # carimbado por ops/registry-pins.sh (remoto develop conferido em 2026-10-09)
     adopted_at: 2026-09-05
     mode: greenfield              # integration_branch: develop; producao = main
     personality_summary: "App de desenvolvimento pessoal gamificado sobre a metodologia MAAGICA — irmao do portal-gamificacao (mesmo corpus, produto distinto). Monorepo pnpm/Turborepo com app Expo universal (web+iOS+Android). Entregou uma feature INTEIRA antes de adotar, so com os plugins: 9 ADRs, worklog faseado completo com 4 revisores, grafo de dominio, e2e Playwright. Foi o adotante que PORTOU o kg-radar para JS com teste de conformidade JS<->sh (6 fixtures) — e cuja convencao __fixtures__ do Vitest expos que a isencao de fixture do core estava copiada em seis lugares com um vocabulario so."
@@ -852,7 +756,7 @@ members:
     parent: onion-evolve
     remote: https://github.com/marciocar/onion-kg-ssot (privado)
     local_path: /home/marcio/onion-kg-ssot
-    onion_version: fe8359e38b43
+    onion_version: 0d293c077a28   # carimbado por ops/registry-pins.sh (remoto main conferido em 2026-10-09)
     adopted_at: 2026-10-06
     mode: greenfield
     personality_summary: "O grafo de conhecimento verificável como PRODUTO INDEPENDENTE: adota e usa o Onion, e o Onion adota e usa o KG-SSOT (dogfood nos dois sentidos). Tem contextos próprios, feitos de pesquisa profunda e de mercado ali dentro, e lê o core só para entender o encaixe. Primeiro marco: o contrato formal do .kg.yaml (JSON Schema + suíte de conformidade) que o core passará a consumir."
@@ -869,8 +773,9 @@ members:
 # --- TEMPLATE: copiar p/ onboardar um novo projeto ---
 #  - id: <slug-do-projeto>
 #    name: <nome>
-#    role: hub | standalone | consumer   # hub = terá sub-adotados; standalone = adota core direto sem sub-adotados; consumer = T2, adota um HUB (não o core)
-#    kind: adopter | distillation | door | method   # NATUREZA (≠ tier). Só `adopter` vira Organization no Logto.
+#    role: hub | standalone | consumer | plugins | mini   # hub = terá sub-adotados; standalone = adota core direto sem sub-adotados; consumer = T2, adota um HUB (não o core); plugins|mini = papel de PORTA (só com kind: door)
+#    kind: adopter | distillation | door | method | port   # NATUREZA (≠ tier). Só `adopter` vira Organization no Logto.
+#    integration_branch: <branch>   # opcional; onde o carimbo vivo é commitado (ops/registry-pins.sh lê daqui primeiro)
 #    parent: onion-evolve      # p/ hub/standalone; um T2 (role: consumer) usa parent: <id-do-hub>.
 #                              # T2 onboarda VIA CORE (source-driven; RFC-0003 §5, decisão 2026-07-02) —
 #                              # o hub NÃO roda adopt; hub-driven adoption é gatilho futuro (1º T2 real)

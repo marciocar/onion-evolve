@@ -98,7 +98,18 @@ if isinstance(doc, dict):
     #    campo, 2026-10-07). O par dos dois campos é julgado pela REGRA 92 por COMPATIBILIDADE
     #    (hub→hub; standalone|consumer→adopted), não por igualdade — que valeria só para porta.
     #    Ninguém migra: a única entrada `adopted` virou `standalone` no mesmo commit.
-    ROLES = {"source", "hub", "standalone", "consumer"}
+    # `mini` e `plugins` entraram em 2026-10-09 (F1.5 das portas, SAC-90), e são PAPEL DE PORTA, não
+    # tier de rede: o nó D_MATRIZ_DE_PORTAS_2026_10 fixa onion-mini como porta didática gerada por
+    # allowlist e onion-plugins como o standalone empacotado. Na F0 este validador recusou os dois
+    # (E_REGISTRO_RECUSA_PAPEL_MINI_E_PLUGINS), e a matriz ficou sem como ser escrita. Por serem papel
+    # de porta, só valem com `kind: door` (regra abaixo): um adotante `role: mini` não tem sentido e
+    # passaria calado. TETO DECLARADO: este é o vocabulário do REGISTRO; o corte de maquinaria
+    # (`roles.yaml`, `vendor-manifest.sh --role`) ainda NÃO conhece mini nem plugins, e a ampliação dele
+    # é da F2. Nenhum leitor passa o `role:` do registro ao corte (medido: materialize-door e
+    # resolve-role-bundle leem o carimbo e o roles.yaml), e se um dia passar, o vendor-manifest recusa
+    # o papel desconhecido com rc 2, alto.
+    ROLES = {"source", "hub", "standalone", "consumer", "mini", "plugins"}
+    DOOR_ONLY_ROLES = {"mini", "plugins"}
     # `port` entrou em 2026-09-16 com o registro do onion-codex. Ele NÃO é `distillation`:
     # destilação é reescrita curada da MESMA doutrina no MESMO substrato; porte é TRADUÇÃO para
     # OUTRO substrato (aqui, `.codex/` + `.agents/skills/` no lugar de `.claude/`). Chamar porte
@@ -141,6 +152,9 @@ if isinstance(doc, dict):
         # NATUREZA (kind==source), não só pelo tier. Isentar só por role:source abria escape-hatch:
         # um adopter marcado role:source evadia o pin VERIFICADO (o false-green de pin que este
         # validador existe p/ matar). Exigir role:source ⇔ kind:source fecha o buraco.
+        if role in DOOR_ONLY_ROLES and kind != "door":
+            err(f"{tag}: 'role:{role}' é papel de PORTA e exige 'kind: door' (veio kind='{kind}')")
+
         is_source_role = role == "source"
         is_source_kind = kind == "source"
         if is_source_role != is_source_kind:
@@ -156,7 +170,13 @@ if isinstance(doc, dict):
         if ver in (None, ""):
             err(f"{tag}: 'onion_version' ausente (use 'n/a' só p/ distillation/method)")
         elif kind in VENDOR:
-            if str(ver) == "n/a":
+            # EXCEÇÃO ÚNICA E NOMEADA: a porta `mini` ainda não foi materializada pelo carimbo (a 1ª
+            # materialização por allowlist é a F5, SAC-94). Até lá não existe pin, e escrever um seria
+            # inventar. Só `role: mini` com `kind: door` pode declarar `n/a`; o `plugins` não, porque o
+            # pin dele existe (o `ref` do provenance.json publicado).
+            if str(ver) == "n/a" and kind == "door" and role == "mini":
+                pass
+            elif str(ver) == "n/a":
                 err(f"{tag}: kind '{kind}' vendoriza — 'onion_version' não pode ser 'n/a' (pin VERIFICADO obrigatório)")
             elif not re.fullmatch(r"[0-9a-f]{7,40}", str(ver)):
                 err(f"{tag}: 'onion_version' não parece um commit curto ('{ver}')")

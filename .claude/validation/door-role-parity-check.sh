@@ -116,7 +116,7 @@ _norm_role() { printf '%s' "$1" | sed 's/[[:space:]]*#.*$//; s/^[[:space:]]*//; 
 _compat_ok() {  # $1=registro $2=carimbo
   case "$1:$2" in hub:hub|standalone:adopted|consumer:adopted) return 0 ;; *) return 1 ;; esac; }
 
-found=0; unreadable=0; adopter_unreadable=0
+found=0; unreadable=0; adopter_unreadable=0; mini_pending=0
 while IFS=$'\x1f' read -r mid role path kind; do
   [ -n "${mid}" ] || continue
   role="$(_norm_role "${role}")"
@@ -149,6 +149,28 @@ while IFS=$'\x1f' read -r mid role path kind; do
     unreadable=$((unreadable + 1)); continue
   fi
 
+  # (b2) PORTAS SEM ÁRVORE `.claude/` (F1.5 das portas, 2026-10-09). Duas portas da matriz
+  #      (D_MATRIZ_DE_PORTAS_2026_10) não carregam `.claude/.onion-version`, e por razões diferentes:
+  #   · `plugins` é MARKETPLACE: o carimbo dela é o `provenance.json` de cada plugin
+  #     (`plugins/<p>/.claude-plugin/provenance.json`, campo `ref`). Ele não tem campo `role:` — o
+  #     papel se reconhece pela FORMA do repo. Medido no clone em 2026-10-09: 5 plugins, nenhum
+  #     `.claude/`. Sem este ramo a guarda acusaria CARIMBO-AUSENTE e mandaria rodar o
+  #     materialize-door.sh, que monta uma árvore `.claude/` — a cura ERRADA para essa porta.
+  #   · `mini` ainda NÃO foi materializada pelo carimbo: a 1ª materialização por allowlist é a F5
+  #     (SAC-94). Hoje o clone é a destilação antiga, sem carimbo. A guarda DECLARA não-medido, como
+  #     no CI; depois da F5 o carimbo existe e cai na comparação normal abaixo.
+  #   Se uma dessas portas tiver `.onion-version`, NENHUM ramo especial vale: compara como as outras.
+  if [ ! -f "${path}/.claude/.onion-version" ]; then
+    if [ "${role}" = "plugins" ]; then
+      if compgen -G "${path}/plugins/*/.claude-plugin/provenance.json" >/dev/null; then continue; fi
+      echo "REGRA 92: [porta/CARIMBO-AUSENTE] porta '${mid}' (role plugins) tem clone em ${path} mas NENHUM \`plugins/*/.claude-plugin/provenance.json\` — sem proveniência o marketplace não diz de que commit do core saiu; re-publique pelo assemble-plugin.sh (não pelo materialize-door.sh, que monta árvore .claude/)"
+      found=1; continue
+    fi
+    if [ "${role}" = "mini" ]; then
+      mini_pending=$((mini_pending + 1)); continue
+    fi
+  fi
+
   # (c) clone PRESENTE e carimbo AUSENTE não é o caso do CI — é porta quebrada: sem o carimbo ela
   #     se declara a FONTE, e todo guard de adotante desliga (o modo-de-falha da REGRA 40).
   if [ ! -f "${path}/.claude/.onion-version" ]; then
@@ -171,6 +193,9 @@ done <<< "${doors}"
 # A DECLARAÇÃO do não-medido é impressa SEMPRE que houver — silêncio aqui seria fail-open.
 if [ "${adopter_unreadable}" -gt 0 ]; then
   echo "door-role-parity: ${adopter_unreadable} adotante(s) com clone INALCANÇÁVEL — compatibilidade registro×carimbo NÃO MEDIDA neles." >&2
+fi
+if [ "${mini_pending}" -gt 0 ]; then
+  echo "door-role-parity: ${mini_pending} porta(s) \`mini\` ainda sem carimbo (a materialização por allowlist é a F5, SAC-94) — paridade NÃO MEDIDA nelas." >&2
 fi
 if [ "${unreadable}" -gt 0 ]; then
   echo "door-role-parity: ${unreadable} porta(s) com clone INALCANÇÁVEL (sem local_path, ou diretório ausente) — paridade NÃO MEDIDA nelas. É o caso esperado no CI, onde o clone não existe; medir exigiria rede e credencial dentro do lint." >&2
