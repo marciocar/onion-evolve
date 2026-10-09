@@ -341,10 +341,9 @@ members:
     parent: onion-evolve
     remote: n/a                 # repo LOCAL; expor é ato do maestro (outward-facing)
     local_path: "/home/marcio/brain-granaai"
-    onion_version: 663fdbc5bdcc # pin do carimbo VIVO dele em 2026-10-02 (era 547e2e3edf3b, da adoção
-                                # de 10-01); CONFERIDO: `git cat-file -e` prova que é commit real do
-                                # core (o merge do PR #903), não o HEAD do adotante — ver o bug do
-                                # snippet `--promote-hub` curado nesta mesma leva
+    onion_version: 6f3ab3a3905c # carimbo VIVO no remoto 2026-10-09 (onion/develop, merge --no-ff a57041bed; onion/vendor ancestral verificado). Anterior: 1c459812f48b
+                                # (o registro dizia 663fdbc5bdcc, mas o carimbo vivo antes do update ja era 1c459812f48b:
+                                # registro defasado de um update anterior nao carimbado; medido pelo stamp no remoto)
     adopted_at: 2026-10-01
     mode: brownfield            # repo que já existia (master), adotado como atualização
     personality_summary: "O adotante que mais SINALIZOU em menos tempo, e com a evidência mais forte: três sinais `high` em 48h, um deles com medição ao vivo (24 chamadas REST, tasks criadas e apagadas, limpeza confirmada por 404) e grafo de pesquisa versionado. Achou o que o core não via — o parâmetro de subtasks que devolvia vazio e quebrava quatro comandos em TODO adotante ClickUp — e corrigiu uma correção errada do core antes de ela viajar. Precedente: adotante como refutador do core, não só consumidor."
