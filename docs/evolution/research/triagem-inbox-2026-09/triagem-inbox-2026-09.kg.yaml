@@ -21,6 +21,10 @@ nodes:
     verified_at: '2026-09-22'
     verified_against: 'contagem no fios-abertos.kg.yaml em 2026-09-22: 19 nós no arquivo contra teto declarado de 19; 10 deles open, e nenhum colhível (2 são GATED com gatilho nomeado, 1 tem a metade viva do sinal, 1 é questão aberta)'
     label: 'A catraca do backlog estava EXATAMENTE no teto (19/19) quando a triagem de 3 sinais chegou. Isso não é acidente desta triagem: é o estado em que o backlog vinha operando, e significa que QUALQUER sinal novo triado nao tinha onde ser registrado sem furar a catraca ou colher uma onda. A catraca funcionou — ela recusou a adicao e forcou esta decisao de onde por o conhecimento — mas o fato de ela estar saturada e informacao de gestao, nao ruido de lint.'
+    provenance:
+      source: "400d780364147906f39a19eecffa43c9e4f85992:docs/onion/graph/fios-abertos.kg.yaml + 9aa881a9 (corpo do commit)"
+      locator: "400d7803:fios-abertos.kg.yaml l.39 (TETO 19) ; contagem de nós ; 9aa881a9 corpo"
+      method: "medição: git show 400d7803:docs/onion/graph/fios-abertos.kg.yaml | grep -c '^ - id:' = 19 + leitura l.39 \"TETO: 19 NÓS\"; recusa da catraca = corpo de 9aa881a9 (1ª pessoa)"
 
   - id: I_AGENTE_EXPO_RN
     node_type: decision
@@ -68,6 +72,10 @@ nodes:
     verified_at: '2026-09-22'
     verified_against: 'varredura do corpus em 2026-09-22: 0 ocorrencias de `status: drifted` em 4.021 campos status de 100 grafos (eram 0 em 3.715 quando o sinal chegou — o corpus cresceu 306 nos e o contador nao saiu do lugar)'
     label: 'O ACHADO #9 DO SINAL DE 2026-09-10, separado porque nao e bug e sim DESENHO parado: `drifted` e o unico fator de status que SOBE a atencao (1.3 em lib/status-factor.awk) e existe desde 2026-08-06 como saida do /meta:kg-freshness — e o corpus tem ZERO nos com ele. Sem `drifted`, selar um drift so da para RECUSAR (exit 1) ou MENTIR de `refuted`, que zera a atencao justamente do no que acabou de provar que a realidade andou. A auto-avaliacao do proprio core confirma o buraco por outro angulo (company-brain-market-2026-07.kg.yaml, C_three_verbs_selfcheck): /meta:kg-freshness com 0 runs em 34 dias. DECISAO DO MAESTRO: o laco esta parado por falta de GATILHO (ninguem roda o freshness), por falta de CAMINHO (o comando nao se encaixa no fluxo), ou porque `drifted` nao serve e o desenho deve mudar? As tres tem cura diferente, e medir mais nao distingue entre elas — e chamada de produto.'
+    provenance:
+      source: "9aa881a92ba8 (corpus docs/**/*.kg.yaml) + .claude/validation/lib/status-factor.awk + docs/evolution/inbox/_processed/2026-09-10-doutrina-versus-codigo-no-motor-do-kg.md + docs/onion/graph/company-brain-market-2026-07.kg.yaml"
+      locator: "git grep em 9aa881a9 ; status-factor.awk l.28 ; inbox 2026-09-10 l.28, l.39 ; company-brain-market-2026-07.kg.yaml l.160-169 ; e054d69c (2026-08-06)"
+      method: "medição: git grep -h -E '^\\s*status:\\s*drifted' 9aa881a9 -- 'docs/*.kg.yaml' = 0 (de 4.024 linhas status em 101 grafos) + leitura: status-factor.awk l.28, inbox l.28/l.39, company-brain l.169"
 
   - id: D_O_RADAR_NUNCA_EMITIU_SUPERSEDES
     node_type: decision
@@ -78,6 +86,10 @@ nodes:
     verified_at: '2026-09-22'
     verified_against: 'grep -c SUPERSEDES no grafo da rodada 5 = 0; versoes citadas no corpus claude-code-2.1-onion-2026-08 = 2.1.211 a 2.1.233; cc_version da baseline E3 = 2.1.278; kg-radar --freshness nos dois grafos com revisita vencida = 0 nos STALE'
     label: 'DIVIDA DE AUFHEBUNG MEDIDA (2026-09-22): o comando /meta:radar declara como invariante "write(KG) por rodada: grafo proprio com SUPERSEDES sobre os nos da baseline anterior que a rodada derrubar (Aufhebung)". O grafo da rodada 5, selado em 2026-09-21, tem ZERO arestas SUPERSEDES. A consequencia e visivel no lint: o corpus claude-code-2.1-onion-2026-08 cobre 2.1.211 a 2.1.233 e a baseline E3 hoje e 2.1.278 — 45 versoes a frente —, e a REGRA 67 (Grafo de pesquisa com REVISITA carimbada) acusa revisita vencida que vai VENCER DE NOVO faca-se o que se fizer, porque nenhuma rodada jamais reconciliou o corpus que superou. Os 35 nos daquele grafo tem 0 STALE pelo --freshness: o que venceu foi a DATA do review_after, nao a verdade medida dos nos — o que torna a reconciliacao um ato de MODELAGEM (quais nos a rodada nova derruba), nao de re-medicao. DECISAO DO MAESTRO: reconciliar os 35 nos agora, ou mecanizar o SUPERSEDES na propria rodada do radar para a divida parar de crescer, ou as duas.'
+    provenance:
+      source: "9aa881a92ba8:docs/evolution/research/radar-E3-2026-09-21-r5/radar-E3-2026-09-21-r5.kg.yaml + 9aa881a9:docs/evolution/research/claude-code-2.1-onion-2026-08/claude-code-2.1-onion-2026-08.kg.yaml + 9aa881a9:docs/onion/radar-baselines.yaml + 9aa881a9:.claude/commands/meta/radar.md"
+      locator: "r5.kg.yaml (grep -c SUPERSEDES) ; claude-code-2.1-onion-2026-08.kg.yaml (35 nós, versões 2.1.211–2.1.233, --freshness) ; radar-baselines.yaml l.17 ; radar.md l.36-37"
+      method: "medição: git show 9aa881a9:<r5>.kg.yaml | grep -c SUPERSEDES = 0 + kg-radar.sh <claude-code-2.1-onion@9aa881a9> --freshness = 0 STALE (34 com frescor declarado) + leitura: radar-baselines.yaml l.17 cc_version 2.1.278, radar.md l.36-37"
 
   - id: E_BANCADA_EM_FAIXA_NAO_REPLICA_A_FALHA
     node_type: evidence
@@ -94,6 +106,10 @@ nodes:
     verified_at: '2026-09-22'
     verified_against: 'rodada de 2026-09-22 com --affected-staged --jobs auto (183 familias / 8 workers em 1117s): 1409 passaram, 1 falhou, e a busca no arquivo de saida devolveu a linha do NOME e nada mais; a mesma familia rodada isolada deu 3 passes'
     label: 'MEDIDO AO VIVO: a bancada em faixa paralela (--jobs auto) imprime, no rodape, apenas o NOME do caso que falhou — sem a saida que o record_fail capturou. O flaky `kg-reverify-schema: selftest` caiu numa rodada de 1409 casos e a unica informacao foi a string do nome. Isto contradiz a licao ja registrada na casa de que "a falha agora carrega a saida": a cura de diagnosticabilidade existe, mas NAO alcanca o caminho da faixa paralela — que e justamente o caminho que o CI e o pre-commit usam. Flaky sem saida capturada e flaky para sempre.'
+    provenance:
+      source: "9aa881a9 (nó criado pela sessão 2026-09-22) + 0595c2d5 (corpo do commit) + 0595c2d5:.claude/validation/lint-selftest.sh"
+      locator: "corpo de 0595c2d5 ('E_BANCADA_EM_FAIXA_NAO_REPLICA_A_FALHA → refutado'); lint-selftest.sh@0595c2d5 l.401, l.495"
+      method: "testemunho: medição da sessão 2026-09-22 (bancada --affected-staged --jobs auto lida de arquivo truncado por | tail -14), comando de captura não registrado; a truncagem e a refutação estão em 1ª pessoa no corpo de 0595c2d5, e o código l.401/l.495 a confirma"
 
   - id: E_A_FAIXA_CARREGA_O_DETALHE_EU_E_QUE_TRUNQUEI
     node_type: evidence
@@ -104,6 +120,10 @@ nodes:
     verified_at: '2026-09-23'
     verified_against: 'reproducao executada em 2026-09-23: mutante que faz o workflow-syntax-check.sh sair sempre 0, rodado com `--families workflow_syntax,shard_plan,identifier_language --jobs auto`, saida COMPLETA capturada em arquivo. Linhas 17-23 trazem `✗ <caso> — <motivo>` para os 6 casos que reprovaram; o rodape nas linhas 40-45 traz so os nomes, como sempre foi. Alem disso, `lint-selftest.sh:401` mostra o pai replicando a saida do filho (`grep -vE ^#ONION_SELFTEST_`), e `record_fail` (l.495) imprime nome E motivo.'
     label: 'REFUTA `E_BANCADA_EM_FAIXA_NAO_REPLICA_A_FALHA`: a faixa paralela CARREGA o detalhe da falha, sim. O que eu medi em 2026-09-22 foi um arquivo TRUNCADO — rodei a bancada com `| tail -14`, o harness guardou so a cauda, e depois eu grepei aquele arquivo e conclui que o detalhe nao existia. O rodape lista nomes porque e rodape; o detalhe vive inline, onde o caso falhou, e estava la o tempo todo. Classe do erro: medir o proprio artefato de captura em vez do artefato medido — a mesma familia de `exit-code-nao-e-a-verificacao`, so que aplicada a uma saida de terminal. E a licao que fica e mais estreita e mais util que o nó falso: PIPE QUE TRUNCA ANTES DE UM BACKGROUND TASK DESTROI A EVIDENCIA, e o arquivo resultante parece completo.'
+    provenance:
+      source: "0595c2d5:.claude/validation/lint-selftest.sh + 0595c2d5 (corpo do commit)"
+      locator: "0595c2d5:lint-selftest.sh l.401, l.495 ; 0595c2d5 corpo"
+      method: "leitura: 0595c2d5:.claude/validation/lint-selftest.sh l.401 (pai replica a saída do filho) e l.495 (record_fail imprime nome E motivo); reprodução com mutante = testemunho da sessão 2026-09-23 (corpo 0595c2d5)"
 
   - id: D_PREDICADO_E_RADAR_SE_CONTRADIZEM_NO_REFUTES_DE_NO_JA_SELADO
     node_type: decision
@@ -114,6 +134,10 @@ nodes:
     verified_at: '2026-09-23'
     verified_against: 'medido em 2026-09-23 neste grafo: com status=refuted o radar sai 0 e o kg-seal-exception.sh sai PARA; com status=open (o flip desfeito, como a doutrina manda) o radar sai 1 com "CONTRADICAO: recebe REFUTES mas segue status=open"'
     label: 'BURACO DE DOUTRINA ACHADO CONDUZINDO: quando um no JA EM origin/main e refutado por medicao posterior, os dois mecanismos do drive mandam coisas opostas. O `kg-seal-exception.sh` diz PARA (correto — o flip de verdade e do maestro) e a doutrina §4.1 conclui "desfaca o flip e leve ao maestro"; mas o grafo com o flip desfeito tem um no recebendo REFUTES e ainda `open`, que o radar reprova como contradicao estrutural — e o P0 do proprio drive proibe conduzir grafo que o motor nao le. Nao ha estado que satisfaca os dois. OPCOES PARA O MAESTRO: (a) a doutrina passa a dizer "mantenha o flip e NOMEIE no checkpoint" quando desfazer quebraria a integridade — o que e o que eu fiz aqui, por necessidade; (b) nasce um status intermediario tipo `refuted-pending-seal` que o radar aceite e que o checkpoint liste; (c) o radar passa a tolerar `open` recebendo REFUTES quando houver um marcador de flip-pendente. A (a) e a mais barata e nao muda motor nenhum; a (b) e a mais honesta porque o estado "medido mas nao selado" passa a EXISTIR na gramatica em vez de se disfarcar de selado.'
+    provenance:
+      source: "0595c2d5 (corpo do commit) + 0595c2d5:docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      locator: "0595c2d5 corpo (\"E achei um buraco de doutrina conduzindo\"); KB l.202-204 (contradição REFUTES em nó open reprova)"
+      method: "testemunho: medição da sessão 2026-09-23 (radar e kg-seal-exception.sh com status refuted×open), comando não registrado — origem: corpo do commit 0595c2d5 em 1ª pessoa"
 
   - id: E_A_KB_JA_FOI_CORRIGIDA_EM_09_18_SO_A_IMPLEMENTACAO_FALTA
     node_type: evidence
@@ -124,6 +148,10 @@ nodes:
     verified_at: '2026-09-23'
     verified_against: 'lido em 2026-09-23 em knowledge-graph-sdaal.md:203-218: o item lista as CINCO reprovacoes que o motor de fato faz (ids duplicados, aresta para no inexistente, orfao, contradicao REFUTES, enum invalido) e traz um bloco CORRIGIDO em 2026-09-18 que registra o placar antigo em vez de apaga-lo; o cabecalho kg-radar.sh:25-32 traz a mesma lista'
     label: 'ESTREITA `D_KG_DOUTRINA_PROMETE_CINCO_REPROVACOES_E_O_MOTOR_FAZ_UMA`: a metade DOUTRINARIA ja estava curada quando escrevi aquele no. A KB foi corrigida em 2026-09-18 pelo mesmo sinal, e hoje ela diz exatamente o que o motor faz — com o placar antigo REGISTRADO, nao apagado, e com a frase que importa: "a correcao e o texto alcancar o codigo, nunca o contrario". Eu repeti a afirmacao do sinal sem medir a KB, um dia depois de ela ja ter sido corrigida: e a mesma classe que este ciclo persegue, so que do meu lado. O QUE RESTA do no e so a decisao de IMPLEMENTAR as quatro reprovacoes ausentes (ciclo DEPENDS_ON, decision done fora de PROD, refuted recebendo SUPPORTS, migalha pendente que hoje e ⚠) — e essa segue legitimamente aberta, porque a KB ja a declara como "decisao em aberto, nao divida escondida".'
+    provenance:
+      source: "0595c2d5:docs/knowledge-base/concepts/knowledge-graph-sdaal.md + 0595c2d5:.claude/validation/kg-radar.sh"
+      locator: "KB l.202-218 ; kg-radar.sh l.27-29 ; 251adf6f (2026-09-18)"
+      method: "leitura: 0595c2d5:knowledge-graph-sdaal.md l.202-218 + kg-radar.sh l.27-29; data da correção por git log -S\"CORRIGIDO em 2026-09-18\" = 251adf6f (2026-09-18)"
 
   - id: E_REGRA_85_E_INSATISFAZIVEL_ANTES_DO_MERGE
     node_type: evidence
@@ -166,6 +194,10 @@ nodes:
       que verifica que a cobranca pos-merge EXISTE, para a defasagem nao sair do PR e nao chegar a
       lugar nenhum. O custo que motivou a decisao esta medido no proprio door-staleness-baseline.txt:
       5+ ocorrencias de "o gate fica VERMELHO ate o push", e uma leva que pagou DUAS materializacoes.
+    provenance:
+      source: "3d8cb0b5 (corpo do commit) + cfcff558ccb3:.claude/validation/door-staleness-baseline.txt"
+      locator: "3d8cb0b5 corpo; cfcff558:door-staleness-baseline.txt l.103, l.116, l.143, l.147"
+      method: "leitura: corpo do commit 3d8cb0b5 (selo do maestro citado) + door-staleness-baseline.txt no pai cfcff558"
 
   - id: Q_QUEM_CARIMBA_O_PIN_DA_PORTA
     node_type: question

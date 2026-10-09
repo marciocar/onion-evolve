@@ -37,6 +37,10 @@ nodes:
     verified_against: populacao-PROD-impact4-por-status-antes-de-escrever-a-primeira-linha
     label: "Medido ANTES de escrever: 43 confirmed + 5 open sem carimbo = 48; drifted, unverifiable e done sem carimbo = ZERO. Logo a denylist inclui tres status a mais e o numero NAO SE MOVE (48 -> 48). Uma guarda que fecha porta sem mexer no gate e cura; se o numero tivesse subido, seria aperto disfarcado de correcao — e a diferenca so aparece medindo antes."
     trace: ".claude/validation/kg-verification-baseline.txt"
+    provenance:
+      source: "docs/evolution/review/fix-catraca-regra49.md"
+      locator: "l.101-103 (\"A outra medição central resistiu\")"
+      method: "juízes: Elenxo wf_fa9e6ad4-4b7 (4 refutadores por lente + juiz opus/high) conferiu no corpus 43 confirmed + 5 open, drifted/unverifiable/done sem carimbo = 0, gate 48 antes e depois — registrado no resíduo REGRA 56 do PR #559"
 
   # ── A FORMA DA CURA ─────────────────────────────────────────────────────────────────────────
   - id: C_SAIR_DO_ESCOPO_E_ENCOLHER_O_BASELINE
@@ -175,6 +179,10 @@ nodes:
     verified_against: lint-artifacts.sh-rodado-no-mesmo-worktree-com-e-sem-GIT_DIR-2-HARD-vs-0-HARD
     label: "O pre-commit acusa 2 HARD FANTASMAS dentro de qualquer worktree: federation-console.html e agent-card.json 'desatualizados vs SSOT', com os arquivos CORRETOS (regerados dao saida byte-identica). Causa: `ROOT=$(git -C $HERE rev-parse --show-toplevel)` devolve o PROPRIO $HERE quando GIT_DIR esta setado — o gerador nao acha members.yaml, emite `members: []` e o diff acusa. No repo principal GIT_DIR e RELATIVO, o git falha e o fallback salva; em worktree ele e ABSOLUTO e o erro passa calado. ~35 scripts com o mesmo padrao, numa casa que recomenda worktrees por doutrina."
     trace: ".claude/validation/federation-console.sh"
+    provenance:
+      source: "docs/evolution/review/fix-catraca-regra49.md"
+      locator: "l.186-200 (§\"Correção de um relato meu: o defeito de família do GIT_DIR não existe\")"
+      method: "leitura: resíduo REGRA 56 do PR #559 registra o diagnóstico de sessão e sua refutação; corpo do commit 17e786a0 idem"
 
   - id: Q_QUANTOS_DOS_35_SITIOS_SAO_ALCANCAVEIS
     node_type: question
@@ -225,6 +233,10 @@ nodes:
     verified_against: git-cherry-mais-diff-de-arvore-antes-de-apagar
     label: "Re-verificado contra o vivo em vez de confiar na nota: `git cherry main` marca os dois commits com '-' (ja aplicados) e a arvore da branch esta 8683 delecoes atras do main, com inventario defasado (88 Knowledge Bases contra 90). Apagar era certo; mergear seria REGRESSAO. Sha registrado antes de apagar: f33afad."
     trace: "docs/onion/inventory.md"
+    provenance:
+      source: "commit f33afad (branch feat/maestro-aside, apagada)"
+      locator: "git cherry 17e786a0^1 f33afad; git diff --shortstat f33afad 17e786a0^1; docs/onion/inventory.md l.14 nos dois commits"
+      method: "medição: git cherry 17e786a0^1 f33afad → 2 commits \"-\"; git diff --shortstat f33afad 17e786a0^1 → 8683 insertions; git show <sha>:docs/onion/inventory.md l.14 → KB 88 (f33afad) vs 90 (main de 2026-08-08)"
 
   - id: C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA
     node_type: claim
@@ -349,6 +361,10 @@ nodes:
     verified_against: 'flip 2026-09-02 (selo): SUPERSEDED por E_CENSO0901 — a premissa (0 dogfood real) morreu: 3 dogfoods reais registrados no proprio grafo desde 2026-08-08; label preservado como historia'
     label: "As CINCO classes novas nao tem NENHUMA cobertura de campo. `--emit-baseline` e hoje identico ao baseline versionado, logo o laco da guarda de direcao nunca executou no corpus real, nem uma vez — toda a evidencia e sintetica. O primeiro no que sair do baseline de verdade, via `/meta:kg-freshness`, e o PRIMEIRO dogfood real desta guarda, e e ai que ela vale ou cai. O verde do CI nao substitui essa medicao, e este no existe para nao deixar que substitua."
     trace: ".claude/validation/kg-verification-baseline.txt"
+    provenance:
+      source: "docs/evolution/review/fix-catraca-regra49.md"
+      locator: "l.230-233 (dívida declarada: as cinco classes sem cobertura de campo)"
+      method: "leitura: resíduo REGRA 56 do PR #559 (2026-08-08) e o \"NÃO-VERIFICADO, declarado\" do corpo do commit 17e786a0"
 
   - id: Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE
     node_type: question
@@ -375,6 +391,10 @@ nodes:
     verified_at: '2026-09-09'
     verified_against: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A25 \"id: E_UPDATE_FILTER_REMOVIDO_COLLISION\" docs/onion/graph/catraca-regra49-2026-08.kg.yaml; sed -n '140,200p' .claude/utils/adopt/vendor-branch.sh; sed -n '280,345p' .claude/validation/kg-verification-coverage.sh; grep -n \"filter\\|--filter\\|bmode\" .claude/utils/adopt/regen-baselines.sh"
     label: "BUG de mecanismo no --update de adotante NAO-greenfield: regen-baselines (filtra divida estrangeira no working) COLIDE com kg-verificacao/REMOVIDO (compara contra o HEAD committado, que o merge deixou nao-filtrado) → 47 HARD sobre nos que o adotante NUNCA teve. Greenfield (PoC) nao bate (sem baseline prévio); regulado-com-historia (granaai) bate"
+    provenance:
+      source: "commit d7eae7d1"
+      locator: "corpo do commit d7eae7d1 (2026-08-24) + docs/evolution/review/docs-materialize-update-removido-bug.md l.17-19"
+      method: "leitura: corpo do commit que materializou o bug grafo-primeiro, medido pelo fork contra o clone da granaai; mecanismo re-lido no R0 kg-freshness 2026-09-09 (comandos no verified_against)"
   - id: D_CURE_AMEND_FILTERED_BASELINE_INTO_MERGE
     node_type: decision
     layer: audit
@@ -395,6 +415,10 @@ nodes:
     verified_against: "dogfood REAL 2026-08-24 (clone descartavel): com a cura o update da granaai NAO contamina mais (vendor 0 chaves estrangeiras). MAS a granaai segue com lint HARD — nao por REMOVIDO (curado), e sim por NO-BASELINE (46 HARD): ela nunca teve baseline de catraca proprio (estado PRE-catraca, medido no develop aa7732e6 ANTES de qualquer update). Ou seja: a contaminacao esta curada; o bloqueio remanescente e OUTRO (E_GRANAAI_NOBASELINE_PREEXISTING) e independe do update."
     status_note: "RESOLVIDA 2026-08-25"
     label: "RESOLVIDA: os DOIS bloqueios curados e provados no dogfood real do clone da granaai — (1) CONTAMINACAO (chave estrangeira → REMOVIDO) por D_CURE_PRESERVE_ADOPTER_BASELINE; (2) NO-BASELINE (pre-catraca) por D_ADOPT_MUST_EMIT_MISSING_BASELINES (--ensure-from emite do corpus dela). Update da granaai agora fecha limpo (kg-verification rc=0). Falta so o maestro RODAR o update real na granaai quando quiser (a maquinaria esta pronta)."
+    provenance:
+      source: "docs/evolution/review/fix-adopt-emit-missing-baselines.md"
+      locator: "l.16-35 (fecha D_ADOPT_MUST_EMIT_MISSING_BASELINES; veredito l.33-35)"
+      method: "leitura: resíduo REGRA 56 do PR do commit cfd56a4b (2026-08-26) + corpo de a787ab4f (cura da contaminação)"
   - id: C_REGULATED_ADOPTER_IS_THE_ORACLE
     node_type: claim
     layer: audit
@@ -405,6 +429,10 @@ nodes:
     verified_at: 2026-08-24
     verified_against: "duas rodadas do mesmo comando no mesmo dia: PoC greenfield (--update) passou; granaai regulada (--update) bateu no bug. A diferenca e a HISTORIA de baseline committado — que so o adotante antigo/regulado tem"
     label: "DOGFOOD: o adotante REGULADO com historia de baseline e o oraculo que o GREENFIELD nao pode ser. A PoC (fresh, sem baseline previo) nao podia acionar a colisao REMOVIDO; a granaai sim. O campo revela o modo-de-falha que a instalacao limpa esconde — instancia fresca da doutrina dogfood"
+    provenance:
+      source: "commit d7eae7d1"
+      locator: "corpo do commit d7eae7d1 (2026-08-24) + docs/evolution/review/docs-materialize-update-removido-bug.md l.17-19"
+      method: "leitura: corpo do commit que materializou o bug (d7eae7d1) e o resíduo REGRA 56 do mesmo PR"
   - id: D_CURE_PRESERVE_ADOPTER_BASELINE
     node_type: decision
     layer: audit
@@ -482,6 +510,10 @@ nodes:
     verified_against: "D_linha_vermelha medido contra kg.md (STALE-MISSING->OK); baseline 47->46; coverage rc=0"
     label: "PRIMEIRO DOGFOOD REAL da catraca (2026-08-27, surgido do 1o /meta:realign invocado pelo maestro): D_linha_vermelha (kg-diagnose-automation, PROD/imp5) foi MEDIDO contra o kg.md vivo — linha vermelha intacta (automacao so no fan-out mecanico L434/454, selo humano na PAUSA L435/358, sem --auto de diagnostico) —, carimbado, e SAIU do baseline (47->46). A propriedade fundadora da REGRA 49 ('so encolhe por MEDICAO') executou sobre dado REAL pela 1a vez, nao mais sintetica; coverage rc=0. PARCIAL: 1 caminho exercido (PASSIVO->medido->removido); as 2 classes HARD (NO-BASELINE, REGRESSAO) e as demais seguem sem execucao de campo — por isso a Q permanece open."
     trace: ".claude/validation/kg-verification-baseline.txt"
+    provenance:
+      source: "docs/evolution/review/feat-kg-first-real-dogfood.md"
+      locator: "l.24 (47→46), l.30-31 (L434/L454/L435/L358), l.33 (coverage rc=0), l.39-40 (PARCIAL: 1 de 5 caminhos)"
+      method: "leitura: resíduo REGRA 56 do PR do commit 88099af3 (2026-08-27)"
   - id: E_CINCO_CLASSES_ESTADO_MEDIDO
     node_type: evidence
     plane: PROD

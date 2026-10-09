@@ -26,8 +26,13 @@ nodes:
     confidence: 0.95
     status: confirmed
     verified_at: 2026-07-24
-    label: "o ignore cego de .claude/ JÁ custara 242 arquivos (71 skills, 39 comandos) ao arandek em mai/2026 — custo real é o trabalho do adotante perdido em silêncio, não só o stamp Onion"
+    label: "o ignore cego de .claude/ JÁ custara 242 arquivos (70 skills, 39 comandos) ao arandek em mai/2026 — custo real é o trabalho do adotante tirado do versionamento em silêncio, não só o stamp Onion"
+    narrative: "label anterior: o ignore cego de .claude/ JÁ custara 242 arquivos (71 skills, 39 comandos) ao arandek em mai/2026 — custo real é o trabalho do adotante perdido em silêncio, não só o stamp Onion"
     trace: "arandek commits 1aa794f9 / 88d93f26"
+    provenance:
+      source: "arandek@88d93f26 ; arandek@1aa794f9 (clone /home/marcio/arandek)"
+      locator: "git ls-tree -r 88d93f26^ -- .claude (242 arquivos; 39 em .claude/commands; 70 .claude/skills/*/SKILL.md); corpo de 88d93f26 ('242 arquivos sob .claude/ removidos do index ... Arquivos permanecem no working tree') e de 1aa794f9"
+      method: "leitura: história git do adotante arandek (commits 88d93f26 e 1aa794f9)"
 
   - id: C_GAP3
     node_type: claim

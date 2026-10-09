@@ -47,6 +47,10 @@ nodes:
     verified_against: lint-artifacts.sh-HEAD
     label: "ASSIMETRIA ESTRUTURAL MEDIDA: as ~11 regras de lint que tocam KG (26, 29, 31, 32, 41, 42, 43, 47) verificam ARTEFATO — nasceu arquivo / e citado / ponteiro e sao. read(KG) NAO TEM MECANISMO NENHUM. Nenhum hook toca KG (.claude/hooks/ tem 5 scripts, zero mencionam kg). CLAUDE.md — o unico texto sempre carregado — tem ZERO mencao a KG/grafo. Os niveis 2 e 3 da hierarquia de forcing-function da propria doutrina nunca foram instalados"
     trace: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "0e520d51:.claude/validation/lint-artifacts.sh"
+      locator: "0e520d51 (main antes do PR #510, 2026-08-01 21:09 -0300): .claude/validation/lint-artifacts.sh cabecalhos REGRA 26/29/31/32/41/42/43/47; .claude/hooks/ (5 scripts); CLAUDE.md; docs/knowledge-base/concepts/knowledge-graph-sdaal.md l.441-449"
+      method: "leitura: arvore de 0e520d51 (HEAD 5c6e2cf citado na SYNTHESIS nao existe mais no repo)"
 
   - id: E_cost_is_not_the_barrier
     node_type: evidence

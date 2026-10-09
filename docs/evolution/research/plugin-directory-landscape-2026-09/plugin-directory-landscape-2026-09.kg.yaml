@@ -271,8 +271,13 @@ nodes:
     verified_against: 'exploracao local no repo do core em 2026-09-04 (contagem por grep sobre .claude/ e sobre os manifestos dos plugins)'
     source_tier: 10
     source_kind: primary
-    label: 'MEDICAO LOCAL (o artefato antes da web, clausula 2): o Onion publica 8 plugins e carrega 544 referencias de comando no namespace do CORE (/categoria:cmd) em vez de /<plugin>:<cmd>, mais 124 caminhos .claude/ NUS. Cruzado com E_NAMESPACE_SEMPRE_QUALIFICADO e E_CMD_NU_NAO_RESOLVE, essas 544 referencias NAO RESOLVEM para quem instalou o Onion como plugin — e defeito de distribuicao, nao estilo. Alem disso: nenhum plugin embarca .mcp.json; tudo em pt-BR; o diretorio oficial exige plugin.json + README + LICENSE por plugin e nomes IMUTAVEIS; o marketplace.json ficou sem version por entrada.'
+    label: "MEDICAO LOCAL 2026-09-04: 8 plugins publicados; o plugin-namespace-check.sh mediu 531 refs de comando no namespace do core em plugins/** (194 mesmo-plugin, 208 cross, 129 dangling), zero /<plugin>:<cmd> — nao resolvem para quem instala. Nenhum plugin embarca .mcp.json."
+    narrative: "label anterior: MEDICAO LOCAL (o artefato antes da web, clausula 2): o Onion publica 8 plugins e carrega 544 referencias de comando no namespace do CORE (/categoria:cmd) em vez de /<plugin>:<cmd>, mais 124 caminhos .claude/ NUS. Cruzado com E_NAMESPACE_SEMPRE_QUALIFICADO e E_CMD_NU_NAO_RESOLVE, essas 544 referencias NAO RESOLVEM para quem instalou o Onion como plugin — e defeito de distribuicao, nao estilo. Alem disso: nenhum plugin embarca .mcp.json; tudo em pt-BR; o diretorio oficial exige plugin.json + README + LICENSE por plugin e nomes IMUTAVEIS; o marketplace.json ficou sem version por entrada."
     trace: 'docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml · projeção: docs/evolution/research/plugin-directory-landscape-2026-09/SYNTHESIS.md'
+    provenance:
+      source: "commit dcd1c3ee + docs/evolution/research/plugin-directory-landscape-2026-09/SYNTHESIS.md + commit 5f91e64b"
+      locator: "corpo de dcd1c3ee (\"531 referências... 194/208/129... ZERO na forma /<plugin>:<cmd>\"); SYNTHESIS.md l.31 (531, ponteiros mortos) e l.39 (nenhum .mcp.json); 5f91e64b:.claude-plugin/marketplace.json (8 entradas); git ls-tree 5f91e64b sem .mcp.json"
+      method: "leitura: corpo do commit dcd1c3ee (medição do plugin-namespace-check.sh, 2026-09-04) + SYNTHESIS da rodada + árvore de 5f91e64b"
   - id: E_MERCADO_PLUGIN_DIRECTORY_0904
     node_type: evidence
     plane: DEV

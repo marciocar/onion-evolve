@@ -151,6 +151,10 @@ nodes:
     status: done
     label: "Contagem de KBs (53, inventario gerado) inclui 4 READMEs — convencao legitima nao documentada na declaracao (CLAUDE.md)"
     trace: "docs/onion/inventory.md:1"
+    provenance:
+      source: "docs/analysis/onion-evolution-2026-07-04.md"
+      locator: "§1 backlog item 15, l.34"
+      method: "leitura: relatório versionado da auditoria /meta:evolve wf_01b63531-114 (commit 70f9a26c, 2026-07-04)"
   - id: C_D4_9
     node_type: claim
     plane: DEV
@@ -267,6 +271,10 @@ nodes:
     status: confirmed
     label: "Qualificador de 3 palavras e afordance inline; ocorrencias substantivas citam a SSOT"
     trace: ".claude/commands/engineer/pr-update.md:65"
+    provenance:
+      source: "docs/analysis/onion-evolution-2026-07-04.md"
+      locator: "§2 tabela de refutados, l.47 (D3-7)"
+      method: "juízes: refutação do juiz adversarial opus no run wf_01b63531-114, registrada no relatório versionado"
   - id: E_J_FENCES
     node_type: evidence
     plane: DEV
@@ -275,6 +283,10 @@ nodes:
     status: confirmed
     label: "Falso-positivo sistemico: scanner de links ingenuo le conteudo dentro de code fences (derrubou D7-13 e D7-16)"
     trace: "docs/knowledge-base/patterns/sdaal-examples.md:40"
+    provenance:
+      source: "docs/analysis/onion-evolution-2026-07-04.md"
+      locator: "§2 tabela de refutados, l.48-49 (D7-13, D7-16) + lição l.59-60"
+      method: "juízes: refutação do juiz adversarial opus no run wf_01b63531-114, registrada no relatório versionado"
   - id: E_J_D7_18
     node_type: evidence
     plane: DEV
@@ -283,6 +295,10 @@ nodes:
     status: confirmed
     label: "Diretorio resolve e link de colecao e intencional — preferencia de estilo nao e defeito"
     trace: "docs/INDEX.md:488"
+    provenance:
+      source: "docs/analysis/onion-evolution-2026-07-04.md"
+      locator: "§2 tabela de refutados, l.50 (D7-18)"
+      method: "juízes: refutação do juiz adversarial opus no run wf_01b63531-114, registrada no relatório versionado"
   - id: E_J_D7_19
     node_type: evidence
     plane: DEV

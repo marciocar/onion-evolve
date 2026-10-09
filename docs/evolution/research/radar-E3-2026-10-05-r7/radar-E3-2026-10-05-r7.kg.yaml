@@ -44,9 +44,9 @@ nodes:
     trace: '.claude/agents/development/claude-code-specialist.md'
     label: 'A 2.1.289 corrige QUATRO furos em regras deny/ask (a 1a redacao dizia seis): comando atras de prefixo de variavel com valor expandido (o exemplo oficial e TZ="$HOME" rm -rf build) e atribuicao nua antes do comando, sob sandbox auto-allow; parte aninhada de comando composto sobre aprovacao de mod; Read deny via symlink. O core NAO instala deny/ask em lugar nenhum — mas o @claude-code-specialist, que VIAJA no plugin onion-engineering, RECOMENDA a adotantes deny rules da forma exata do furo (Bash(rm -rf:*)). Adotante que seguiu o conselho ficou exposto ate a 2.1.288. A afirmacao da 1a redacao de que "a classe nao existe no veto proprio" foi REPROVADA pelo juiz e mora agora no no E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE.'
     provenance:
-      source: ".claude/agents/development/claude-code-specialist.md"
-      locator: ".claude/settings.json so allow (13), settings.local.json so allow (97); plugins/onion/hooks/hooks.json sem permissoes; merge-onion-hooks e compose-settings nao injetam deny; MAS plugins/onion-engineering/agents/claude-code-specialist.md:223 RECOMENDA deny rules a adotantes"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      source: "docs/evolution/research/radar-E3-2026-10-05-r7/SYNTHESIS.md"
+      locator: "l.22-25 (quatro furos; core não instala; specialist recomenda) + l.36-37 (juiz reprovou a 1ª redação)"
+      method: "leitura: SYNTHESIS e data/2.1.289.txt (l.2, l.4, l.15, l.16) da rodada, conferidos contra o commit 2786f56c (settings.json, plugin onion-engineering) e o checkpoint 5035ca19"
 
   - id: E_PLUGIN_VALIDATE_FIX_NAO_TOCA_OS_PLUGINS
     node_type: evidence
@@ -83,6 +83,10 @@ nodes:
     source_tier: 10
     verified_against: 'git grep "auth status" .claude: 10 ocorrencias em 4 arquivos, TODAS gh auth status (forge, adopt); zero claude auth status'
     label: 'O unico item que DESFAZ algo da 2.1.288: o [VSCode] reverte uma mudanca no claude auth status que podia aumentar os sign-outs. O core nao invoca claude auth status em script nenhum; registrado so porque e a unica regressao assumida pela fonte no delta.'
+    provenance:
+      source: ".claude/ no commit 2786f56c"
+      locator: "git grep \"auth status\" 2786f56c -- .claude (+ data/2.1.289.txt l.5)"
+      method: "medição: git grep -c \"auth status\" 2786f56c -- .claude → 10 ocorrências em 4 arquivos (invite-collaborator.sh, transfer-ownership.sh, forge/adapters/github.md, forge/detector.md), git grep \"claude auth status\" → 0"
 
   - id: E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE
     node_type: evidence
@@ -119,7 +123,12 @@ nodes:
     verified_at: '2026-10-05'
     source_tier: 10
     verified_against: 'data/2.1.289.txt: "Fixed installed mods not loading in the first session after an upgrade"; "Fixed a mod Client that fails while drawn ... now fails alone and raises ui.fault"; e o item da aprovacao de mod sobre deny/ask'
-    label: 'EVIDENCIA PARA o Q_MOD_YOU_SHOULD_KNOW_E_UM_ELENXO_FRACO da r6 (que pergunta se a guarda deve morar em mod): ate a 2.1.288 um mod instalado NAO CARREGAVA na primeira sessao depois de um upgrade — guarda que more em mod some exatamente no momento de maior mudanca, fail-open silencioso. E a aprovacao de um mod passava por cima de deny/ask. Os dois pesam contra mover guarda para mod antes de medir o modo de falha dele.'
+    label: "EVIDENCIA PARA o Q_MOD_YOU_SHOULD_KNOW_E_UM_ELENXO_FRACO da r6: ate a 2.1.288 um mod instalado NAO CARREGAVA na primeira sessao apos um upgrade; e, em maquinas gerenciadas, a aprovacao de um mod do usuario passava por cima de deny/ask sobre parte aninhada de comando composto."
+    narrative: "label anterior: EVIDENCIA PARA o Q_MOD_YOU_SHOULD_KNOW_E_UM_ELENXO_FRACO da r6 (que pergunta se a guarda deve morar em mod): ate a 2.1.288 um mod instalado NAO CARREGAVA na primeira sessao depois de um upgrade — guarda que more em mod some exatamente no momento de maior mudanca, fail-open silencioso. E a aprovacao de um mod passava por cima de deny/ask. Os dois pesam contra mover guarda para mod antes de medir o modo de falha dele."
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-10-05-r7/data/2.1.289.txt"
+      locator: "l.8 (mods não carregavam na 1ª sessão após upgrade) + l.2 (deny/ask em parte aninhada sobre aprovação de mod, máquinas gerenciadas) + l.22"
+      method: "leitura: bloco do CHANGELOG 2.1.289 versionado no diretório da rodada (conferido pelo juiz em 3 fontes, SYNTHESIS l.16-18)"
 
 edges:
   - from: E_DELTA_E_UMA_VERSAO_CONTIGUA

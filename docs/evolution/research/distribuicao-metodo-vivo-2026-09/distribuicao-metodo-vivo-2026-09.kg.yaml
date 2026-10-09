@@ -654,9 +654,9 @@ nodes:
     narrative: "CONSTRAINS pela D_MATRIZ_DE_PORTAS_2026_10, selado pelo maestro em 2026-10-09 sem flip (o status fica; a aresta mora em x_constrained_by porque o motor de arestas e intra-arquivo). CAIU: o standalone como vitrine com adocao (a vitrine com adocao passa a ser o onion-core). SOBREVIVE: o reenquadramento de que o cliente nao forka e recebe o framework pelo /meta:adopt com onion/vendor."
     trace: 'docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md'
     provenance:
-      source: "docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md"
-      locator: "selado pelo maestro 2026-09-14, em resposta a quatro perguntas apresentadas com opcoes e recomendacao"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "commit a74ff166 · docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md"
+      locator: "a74ff166 corpo (\"veículo — onion-standalone público MAIS /meta:adopt no repo do cliente\") · SYNTHESIS.md:170 (selo Veículo, ressalva e reenquadramento) e 246 (backlog 1: levar o standalone ao core completo)"
+      method: "leitura: corpo do commit a74ff166 e SYNTHESIS.md versionada"
 
   - id: D_CORTE_E_TUDO_INCLUSIVE_META_FABRICA
     node_type: decision
@@ -671,9 +671,9 @@ nodes:
     narrative: "CONSTRAINS pela D_MATRIZ_DE_PORTAS_2026_10, selado pelo maestro em 2026-10-09 sem flip (o status fica; a aresta mora em x_constrained_by porque o motor de arestas e intra-arquivo). CAIU: 'adocao e federacao viajam para o standalone'. SOBREVIVE: 'tudo viaja' para o onion-core e 'a meta-fabrica viaja' para standalone e plugins."
     trace: '.claude/utils/adopt/vendor-manifest.sh'
     provenance:
-      source: ".claude/utils/adopt/vendor-manifest.sh"
-      locator: "selado pelo maestro 2026-09-14, em resposta a quatro perguntas apresentadas com opcoes e recomendacao"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "commit a74ff166 · docs/evolution/research/distribuicao-metodo-vivo-2026-09/SYNTHESIS.md"
+      locator: "a74ff166 corpo (\"corte — viaja tudo, inclusive a meta-fábrica\") · SYNTHESIS.md:171 (selo Corte: 9 de 11, 3 de 7) e :147-157 (--role idênticas, ROLE nunca mais lido, 63 arquivos + 43 comandos)"
+      method: "leitura: corpo do commit a74ff166 e SYNTHESIS.md versionada"
 
   - id: D_LICENCA_DUAL_CODIGO_MIT_DOUTRINA_CC
     node_type: decision
@@ -792,7 +792,7 @@ nodes:
 
   - id: D_LIMPAR_BASELINES_NO_PROXIMO_UPDATE
     node_type: decision
-    plane: PROD
+    plane: DEV
     status: done
     impact: 4
     confidence: 0.85
@@ -834,13 +834,13 @@ nodes:
     label: 'SELADA: o nome do cliente sai do texto AGORA (antes de qualquer publicacao), e a guarda passa a asserir a FORMA e nao a lista. O detector novo (.claude/validation/vendor-scrub-form-check.sh) pega duas formas na superficie que viaja: AMPERSAND CORPORATIVO (com pelo menos um lado de 2+ caracteres, o que ja exclui M&A, Q&A, V&V, R&D) e ANCORA DE CONTEXTO (PoC/cliente/adotante/empresa seguida de nome proprio). Forma gera CANDIDATO, nunca veredito: o legitimo (sigla do oficio, nome ficticio de exemplo, citacao academica) vai para um baseline que SO ENCOLHE, e candidato novo e HARD — o mesmo idioma das REGRAS 45 (Link vendorizado nao aponta caminho core-privado, com catraca) e 49 (Catraca de passivo declarado). TETO DECLARADO: nome comercial SEM ampersand e SEM ancora continua invisivel; alargar o padrao mataria a guarda de falso-positivo. Ligado na segunda metade da REGRA 36, com familia vendor_scrub_form de 6 casos e mutante provado.'
     trace: '.claude/validation/vendor-scrub-form-check.sh'
     provenance:
-      source: ".claude/validation/vendor-scrub-form-check.sh"
-      locator: "selado pelo maestro 2026-09-14: curar antes de publicar, nao depois; nome do cliente removido dos dois arquivos no mesmo PR"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "commit a74ff166 · .claude/validation/vendor-scrub-form-check.sh@a74ff166 · .claude/validation/lint-selftest.sh@a74ff166 · .claude/validation/lint-artifacts.sh@a74ff166"
+      locator: "a74ff166 corpo (scrub — curar ANTES, forma, teto) · vendor-scrub-form-check.sh@a74ff166:7-27 (ampersand 2+ chars, âncora, catraca, REGRAS 45/49, teto) · lint-selftest.sh@a74ff166:4232-4279 (run_vendor_scrub_form_selftests, casos a-f, mutante e) · lint-artifacts.sh@a74ff166:3276-3286 (ligado na REGRA 36)"
+      method: "leitura: commit a74ff166 e os arquivos que ele cria"
 
   - id: E_MARCA_BUSCA_INPI_EXECUTADA_0915
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.95
@@ -873,8 +873,13 @@ nodes:
     confidence: 0.95
     verified_at: '2026-09-16'
     verified_against: 'lint-artifacts.sh rodado DENTRO dos bundles adopted/hub/standalone montados da arvore de trabalho e de main, por REGRA; grep por ausencia na superficie que viaja e em plugins/; PRs #835 e #836'
-    label: 'A CONTA DOS 59 PONTEIROS, EXECUTADA — os tres tercos do Q_LIBERAR tiveram os tres desfechos que o no previu, e nenhum deles mudou de ideia no caminho. [A] 20 citacoes de DIRETORIO NU ficaram: elas descrevem a FRONTEIRA (dizem o que NAO viaja); remove-las apagaria a explicacao da propria allowlist. [B] 20 ADRs PROMOVIDOS ao docs/knowledge-base/ no PR #835, que viaja — e a passada daquele PR achou 32 nomes que iam junto, inclusive o cliente de um adotante que nenhum grep por id do members.yaml alcancaria. [C] 19 documentos NOMEADOS neutralizados no PR #836: citacao pelo nome sem caminho, marcada `(core-only)`. Medido no bundle standalone: REGRA 22 16->0 e REGRA 16 11->0 nos tres papeis, total 88->58, e o diff do conjunto normalizado devolve ZERO violacao nova em adopted, hub e standalone. O criterio do maestro ("sem nada pessoal, sem segredo, sem identificacao de empresa") deixou de ser promessa e virou medicao nos tres papeis.'
+    label: "Q_LIBERAR feito: [A] 20 citações de diretório nu ficam (descrevem a fronteira); [B] 20 citações a ADR resolvidas por 13 ADRs promovidos (PR #835); [C] 19 documentos nomeados neutralizados (#836). Standalone: REGRA 22 16→0, REGRA 16 11→0, total 88→58; zero regressão nos 3 papéis"
+    narrative: "label anterior: A CONTA DOS 59 PONTEIROS, EXECUTADA — os tres tercos do Q_LIBERAR tiveram os tres desfechos que o no previu, e nenhum deles mudou de ideia no caminho. [A] 20 citacoes de DIRETORIO NU ficaram: elas descrevem a FRONTEIRA (dizem o que NAO viaja); remove-las apagaria a explicacao da propria allowlist. [B] 20 ADRs PROMOVIDOS ao docs/knowledge-base/ no PR #835, que viaja — e a passada daquele PR achou 32 nomes que iam junto, inclusive o cliente de um adotante que nenhum grep por id do members.yaml alcancaria. [C] 19 documentos NOMEADOS neutralizados no PR #836: citacao pelo nome sem caminho, marcada `(core-only)`. Medido no bundle standalone: REGRA 22 16->0 e REGRA 16 11->0 nos tres papeis, total 88->58, e o diff do conjunto normalizado devolve ZERO violacao nova em adopted, hub e standalone. O criterio do maestro (\"sem nada pessoal, sem segredo, sem identificacao de empresa\") deixou de ser promessa e virou medicao nos tres papeis."
     trace: '.claude/utils/adopt/vendor-manifest.sh'
+    provenance:
+      source: "docs/evolution/review/docs-free-meta-factory-private-pointers.md · PR #835 · PR #836 · commit 33b6ae69 · distribuicao-metodo-vivo-2026-09.kg.yaml (Q_LIBERAR_A_META_FABRICA_PARA_O_PLUGIN.verified_against)"
+      locator: "resíduo l.41-47 (REGRA 22 5/5/16→0/0/0, REGRA 16 standalone 11→0, total 88→58, zero linhas novas) · PR #835 título (\"promove 13 ADRs\") · corpo de 33b6ae69 ([A] 20 ficam, [C] 19 no #836) · grafo l.40 (A=20/B=20/C=19)"
+      method: "leitura: resíduo REGRA 56 do PR #836, corpos dos PRs #835 e #836 (gh pr view) e o verified_against do Q_LIBERAR no próprio grafo"
 
   - id: E_A_COBERTURA_FALTAVA_ONDE_MAIS_IMPORTAVA
     node_type: evidence

@@ -120,6 +120,10 @@ nodes:
     status: confirmed
     label: "RFC-0004 trata de federacao inter-instancias, nao do arranjo de branches interno"
     trace: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
+    provenance:
+      source: "82c85e3f:docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
+      locator: "RFC-0004@82c85e3f l.2 (título) + l.18-23 (§1 Decisão: federar a COMUNICAÇÃO entre instâncias) + docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md l.141 (\"RFC-0004 = federação inter-instâncias (não trata do trio de branches interno)\")"
+      method: "leitura: RFC-0004 no commit 82c85e3f + diagnóstico do plano §3"
   - id: C_RFC5_SCOPE_NOT_BRANCH
     node_type: claim
     layer: audit
@@ -165,6 +169,10 @@ nodes:
     label: "develop e rhilo-main compartilham base 05f96a05 (01/07); nao disjuntas desde 15/06"
     trace: "git merge-base origin/develop origin/rhilo/main"
     verified_at: 2026-07-17
+    provenance:
+      source: "github.com/marciocar/metagamify"
+      locator: "merge-base 62ef2c10 (origin/develop) f7e4b034 (origin/rhilo/main), pontas de 2026-07-11 = 05f96a05 (\"Merge pull request #75\", 2026-07-01 11:05 -0300); clone em /home/marcio/rhilo-metagamify"
+      method: "leitura: merge-base dos commits 62ef2c10 e f7e4b034 do marciocar/metagamify = 05f96a05 (2026-07-01)"
   - id: C_TOPO_MAIN_HAS_FW
     node_type: claim
     layer: audit
@@ -269,6 +277,10 @@ nodes:
     label: "merge-base origin/develop origin/rhilo-main = 05f96a05 em 2026-07-01"
     trace: "git merge-base"
     verified_at: 2026-07-17
+    provenance:
+      source: "github.com/marciocar/metagamify"
+      locator: "merge-base 62ef2c10 (origin/develop@2026-07-11) f7e4b034 (origin/rhilo/main@2026-07-11) = 05f96a05; log -1 05f96a05 = 2026-07-01 11:05 -0300; clone em /home/marcio/rhilo-metagamify"
+      method: "leitura: merge-base dos commits 62ef2c10 e f7e4b034 do marciocar/metagamify = 05f96a05 (2026-07-01)"
   - id: E_GIT_LSTREE_MAIN
     node_type: evidence
     layer: audit
@@ -278,6 +290,10 @@ nodes:
     status: superseded
     label: "git ls-tree origin/main .claude conta 239 arquivos"
     trace: "git ls-tree -r --name-only origin/main -- .claude"
+    provenance:
+      source: "github.com/marciocar/metagamify"
+      locator: "ls-tree -r --name-only bfb9bce2 -- .claude | wc -l = 239 (bfb9bce2 = origin/main do marciocar/metagamify, \"adoção do framework Onion\", 2026-06-26, a mesma ponta em 07-11); clone em /home/marcio/rhilo-metagamify"
+      method: "leitura: árvore .claude do commit bfb9bce2 do marciocar/metagamify (239 arquivos)"
   - id: E_CLAUDE_MD
     node_type: evidence
     layer: audit
@@ -314,9 +330,14 @@ nodes:
     impact: 4
     confidence: 1.0
     status: confirmed
-    label: "dogfood pegou bugs reais (#126 #89 #128; adopt-vendor 392arq/1conflito/7-7 asserts)"
+    label: "dogfood pegou bugs reais (#126 #89 #128); e o dogfood de campo do adopt-vendor PROVOU o never-clobber (392 arquivos, conflito isolado no 1 arquivo customizado, 7/7 asserts) — prova de funcionamento, não bug"
+    narrative: "label anterior: dogfood pegou bugs reais (#126 #89 #128; adopt-vendor 392arq/1conflito/7-7 asserts)"
     trace: "F2 Q4"
     verified_at: 2026-07-17
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/pull/126"
+      locator: "gh pr view 126/89/128 (bugs achados por dogfood) + docs/knowledge-base/decisions/onion-adr-adopt-vendor-branch-merge-2026-07.md l.135-138 (verificação de campo: 392 arquivos, conflito isolado em 1 customizado, 7/7 asserts)"
+      method: "leitura: corpos dos PRs #126/#89/#128 + ADR adopt-vendor-branch-merge §verificação de campo"
   - id: E_MARKET_SCAN
     node_type: evidence
     layer: audit
@@ -326,6 +347,10 @@ nodes:
     status: confirmed
     label: "scan de mercado: Spec Kit 93k, BMAD 49k, 15k+ plugins, awesome-claude-code 36.8k"
     trace: "F2 Q3 (web)"
+    provenance:
+      source: "sessão de 2026-07-11 (commit 82c85e3f)"
+      locator: "trace \"F2 Q3 (web)\"; números só no próprio nó; sessão de 2026-07-11 (commit 82c85e3f)"
+      method: "testemunho: medição da sessão 2026-07-11 (pesquisa F2 Q3 na web), comando não registrado"
   - id: E_ORBIT
     node_type: evidence
     layer: audit
@@ -335,8 +360,13 @@ nodes:
     # SUPERSEDIDO em 2026-08-04 por E_ORBIT_0804 — por CONTAGEM, nao por refutacao:
     # a substancia ("todos na orbita; ZERO frio") continua VERDADEIRA. Era um snapshot de 07-11.
     status: superseded
-    label: "5 adotantes = repos de Marcio ou consultoria/CTO; ZERO adotante frio/externo"
+    label: "4 membros não-source em 2026-07-11 (metagamify, pulse-mais, granaai, onion-mini — este destilação, não adotante) = repos de Marcio ou consultoria/CTO; ZERO adotante frio/externo"
+    narrative: "label anterior: 5 adotantes = repos de Marcio ou consultoria/CTO; ZERO adotante frio/externo"
     trace: "F2 Q2 (members.yaml + remotes)"
+    provenance:
+      source: "9c180625:docs/evolution/federation/members.yaml"
+      locator: "members.yaml@9c180625 (último antes de 2026-07-12) l.55-164: membros não-source = metagamify, pulse-mais, granaai, onion-mini; remotes l.59,96,117,164"
+      method: "leitura: registro da federação fixado em 2026-07-10 (9c180625)"
   - id: E_SITE_LIVE
     node_type: evidence
     layer: audit
@@ -346,6 +376,10 @@ nodes:
     status: superseded
     label: "onionevolve.com exibe 96/51/8 e reflete o loop (verificado live 200)"
     trace: "F2 Q1 (curl)"
+    provenance:
+      source: "82c85e3f:site/index.html"
+      locator: "trace \"F2 Q1 (curl)\" da sessão de 2026-07-11 (commit 82c85e3f); corroboração parcial: 82c85e3f:site/index.html l.420,488-490 e l.379,391"
+      method: "testemunho: medição da sessão 2026-07-11 (curl em onionevolve.com), comando completo e saída não registrados"
   # -- claims de valor/mercado --
   - id: C_DOGFOOD_VALUE
     node_type: claim
@@ -358,10 +392,14 @@ nodes:
     trace: "F2 Q4"
     verified_at: 2026-08-04
     verified_against: "PRs #126, #89, #128 (gh pr view, todos MERGED) — cada corpo nomeia 'dogfood' como origem do bug: CLAUDE.md fora dos roots de varredura, .env.example clobbered em adocao real, lacunas do /meta:all-tools so visiveis rodando"
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/pull/126"
+      locator: "gh pr view 126 (§Validação \"Dogfood ponta a ponta... pegou um bug que o happy-path escondia: o CLAUDE.md mora fora dos roots\"), 89 (título \"Bug (achado pelo dogfooding)\"), 128 (\"Rodar o comando de verdade expôs 2 lacunas... o tipo de coisa que só o uso revela\") — todos MERGED"
+      method: "leitura: corpos dos PRs #126, #89, #128 (gh pr view --repo marciocar/onion-evolve)"
   - id: C_MARKET_COMMODITY
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.88
     status: confirmed
@@ -369,6 +407,10 @@ nodes:
     trace: "F2 Q3"
     verified_at: 2026-08-04
     verified_against: "re-scan externo (WebSearch 2026-08-04): Spec Kit 120.2k estrelas, BMAD-METHOD 48.6k, awesome-claude-code 51.5k — eram 93k/49k/36.8k em F2 Q3; a commodity ficou MAIS densa, claim reforcada"
+    provenance:
+      source: "docs/evolution/research/spec-as-code-evolution-2026/SYNTHESIS.md"
+      locator: "spec-as-code SYNTHESIS l.33-34 (Spec Kit, BMAD) e l.120 (Spec Kit/Kiro/BMAD todos markdown) + verified_against do nó (WebSearch 2026-08-04, sessão do commit 28db0b0e)"
+      method: "testemunho: re-scan WebSearch da sessão de 2026-08-04 (/meta:kg-freshness, commit 28db0b0e), resultados não persistidos"
   - id: C_ORBIT_CAVEAT
     node_type: claim
     layer: audit
@@ -380,6 +422,10 @@ nodes:
     trace: "F2 Q2"
     verified_at: 2026-08-04
     verified_against: "docs/evolution/federation/members.yaml @ 27ce2b4 (12 membros, 8 kind:adopter, nenhum frio) + varredura Q_COLD_ADOPTER em docs/ (segue aberto, experimento em 'desenhado-para-execucao')"
+    provenance:
+      source: "27ce2b4:docs/evolution/federation/members.yaml"
+      locator: "members.yaml@27ce2b4 l.65-371 (8 kind: adopter; pulse-mais l.108-119 \"via consultoria de Marcio Carvalho\"; granaai l.131-140 \"acesso via token gh de marciocar\"; arandek l.335-352 local_path worktree na máquina do maestro)"
+      method: "leitura: registro da federação no commit 27ce2b4 (2026-08-03)"
   - id: C_MARKET_PULL
     node_type: claim
     layer: audit
@@ -399,6 +445,10 @@ nodes:
     label: "VALOR PROVADO: co-evolucao transporta sinal bidirecional sub-dia; 1o a2a REGULADO fechou F2.2"
     trace: "F2 Q4"
     verified_at: 2026-07-17
+    provenance:
+      source: "docs/evolution/federation/CHANGELOG.md"
+      locator: "CHANGELOG.md l.872-874 (F2.2 COMPLETO, 1o handshake com membro regulado granaai) + inbox/_processed/2026-07-10-rfc5-docs-only-adoption-ground-truth.md l.2-5 (sinal upstream 2026-07-10) + federation/outbox/granaai/_processed/2026-07-10-resposta-rfc5-ground-truth-absorvido.md l.3,6,12 (resposta downstream 2026-07-10, \"absorvida no mesmo dia\")"
+      method: "leitura: CHANGELOG da federação + par sinal/resposta datados no mesmo dia"
   # -- claims de identidade --
   - id: C_FLOW_EVOLUTION
     node_type: claim
@@ -409,6 +459,10 @@ nodes:
     status: confirmed
     label: "fluxo REAL do core = loop auto/co-evolucao, nao o pipeline product->pr do pitch"
     trace: "F2 Q1"
+    provenance:
+      source: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md"
+      locator: "plano l.228 (§8 F3, \"A identidade real = o loop de auto/co-evolução, não o pipeline product→pr do pitch\")"
+      method: "testemunho: veredito F3 da sessão de 2026-07-11 sobre a pesquisa F2 (13 agentes, verificação adversarial), registrado no plano §8 e no commit 82c85e3f; saída bruta dos agentes não persistida"
   - id: C_IDENTITY_DRIFT
     node_type: claim
     layer: audit
@@ -418,6 +472,10 @@ nodes:
     status: confirmed
     label: "drift SUBESTIMA: KB de identidade em 82/49/5/34 vs SSOT/site em 96/51/8/66"
     trace: "F2 Q1"
+    provenance:
+      source: "82c85e3f:docs/knowledge-base/meta/onion-framework-identity.md"
+      locator: "82c85e3f:docs/knowledge-base/meta/onion-framework-identity.md l.105-109 (82 comandos/49 agentes/34 KBs) + l.280 (5 skills) x 82c85e3f:docs/onion/inventory.md l.11-14 (96/51/8/66) x 82c85e3f:site/index.html l.420,488-490"
+      method: "leitura: KB, inventário e fonte do site fixados no commit de ingestão da F2 (82c85e3f, 2026-07-11)"
   - id: C_PUBLIC_AHEAD
     node_type: claim
     layer: audit
@@ -425,8 +483,13 @@ nodes:
     impact: 3
     confidence: 0.85
     status: superseded
-    label: "pitch PUBLICO ja correto e reflete o loop; a maior distancia esta no SSOT/KB INTERNO"
+    label: "a fonte do site (pitch público) em 82c85e3f batia com o inventory.md (96/51/8/66) e falava do loop; a maior distância estava na KB de identidade interna (82/49/5/34), não no SSOT"
+    narrative: "label anterior: pitch PUBLICO ja correto e reflete o loop; a maior distancia esta no SSOT/KB INTERNO"
     trace: "F2 Q1"
+    provenance:
+      source: "82c85e3f:site/index.html"
+      locator: "82c85e3f:site/index.html l.420,488-490 (96/51/8/66) e l.379,391 (loop) x 82c85e3f:docs/knowledge-base/meta/onion-framework-identity.md l.83-109 (82/49/5/34) x 82c85e3f:docs/onion/inventory.md l.11-14"
+      method: "leitura: fonte do site, KB e inventário fixados no commit 82c85e3f (2026-07-11)"
   - id: C_PIPELINE_COMMODITY
     node_type: claim
     layer: audit
@@ -436,6 +499,10 @@ nodes:
     status: confirmed
     label: "pipeline product->pr (33 cmds) e commodity aspiracional/adopter-facing, nao bandeira"
     trace: "F2 Q1/Q3"
+    provenance:
+      source: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md"
+      locator: "plano l.251 (§8 \"Não investir no pipeline product→pr (33 cmds) como diferencial — é commodity + aspiracional\") + 82c85e3f:docs/onion/inventory.md l.21-22 (product 21 + engineer 12 = 33)"
+      method: "testemunho: veredito F3 da sessão de 2026-07-11 (plano §8, commit 82c85e3f); o 33 é leitura do inventário no mesmo commit"
   # -- claims de ICP/metodo --
   - id: C_ICP_REGULATED
     node_type: claim
@@ -446,6 +513,10 @@ nodes:
     status: confirmed
     label: "ICP decidido (2026-06-17) = orgs reguladas + multi-repo; interno, NAO validado por mercado"
     trace: "F2 Q2"
+    provenance:
+      source: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md"
+      locator: "docs/analysis/onion-repositioning-sdaal-session-2026-06-17.md l.191-194 (decisão do usuário via AskUserQuestion: \"ICP: orgs reguladas e multi-repo\", date 2026-06-17 l.3) + docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md l.231-232 e l.264-265 (zero adotante frio, zero cliente pagante)"
+      method: "leitura: handoff da sessão de estratégia de 2026-06-17"
   - id: C_ICP_TENSION
     node_type: claim
     layer: audit
@@ -477,6 +548,10 @@ nodes:
     status: confirmed
     label: "KG-sobre-NEGOCIO/IDENTIDADE e DESENHO, nao uso vivo — o salto diferenciador continua nao-executado"
     trace: "F2 Q4/Q6-C5"
+    provenance:
+      source: "docs/analysis/onion-plan-identity-kg-dogfood-2026-07.md"
+      locator: "plano l.235 (§8 \"O salto diferenciador (KG-sobre-negócio) é DESENHO, não uso vivo — continua não-executado\") + l.265 (lacunas)"
+      method: "testemunho: veredito F3 da sessão de 2026-07-11 sobre a pesquisa F2, registrado no plano §8 (commit 82c85e3f)"
   - id: C_CATEGORY_UNNAMED
     node_type: claim
     layer: audit
@@ -486,6 +561,10 @@ nodes:
     status: confirmed
     label: "a categoria do combo Onion nao tem nome de mercado (usa agent-harness/agentic-SDLC emprestados)"
     trace: "F2 Q5"
+    provenance:
+      source: "docs/analysis/onion-vision-concept-map-2026-06.md"
+      locator: "concept-map l.29 + l.139 (\"Aberta: nomear a categoria do Onion (hoje: agent harness técnico / agentic SDLC funcional)\") + SYNTHESIS knowledge-centric l.18 e l.241"
+      method: "leitura: mapa de conceitos 2026-06 (termos emprestados) + síntese knowledge-centric (combo sem nome)"
   - id: C_EDGE_HAGEL
     node_type: claim
     layer: audit
@@ -497,6 +576,10 @@ nodes:
     trace: "F2 Q5 (56 nos/81 arestas, /meta:evolve 2026-07-04)"
     verified_at: 2026-08-04
     verified_against: "commits 70f9a26 (.claude/validation/kg-radar.sh: comentario 'NAO port do radar.js do rhilo' + 'prometido ao rhilo no D3') e 3823978 (plano tecendo 'Hagel edge-core' em Q3/Q5) — evidencia git de 1a mao de que o dogfood do rhilo PRECEDEU e puxou /meta:kg + kg-radar no core"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-02-sinal-sdaal-knowledge-graph.md"
+      locator: "sinal l.3-8 (from: instância rhilo-metagamify, 2026-07-02, \"dogfoodado numa auditoria real de produção\") + l.39,67 (scripts/kg/radar.js) + l.73 (propõe /meta:kg ao core) + commit 70f9a26 (2026-07-04, #239: \"/meta:kg nasce do dogfood\", kg-radar.sh \"NÃO port do radar.js do rhilo\", \"prometido ao rhilo no D3\")"
+      method: "leitura: sinal upstream do rhilo (2026-07-02) + corpo e kg-radar.sh l.16 do commit 70f9a26"
   # -- decisao de north-star + candidatos --
   - id: Q_NORTHSTAR
     node_type: question
@@ -567,6 +650,10 @@ nodes:
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. WebSearch: ''YC Requests for Startups "Company Brain" Summer 2026'' => Confirmado por múltiplas fontes independentes (modelence.com, aigrants.in, vccafe.com, theaiopportunities.com, extruct.a…'
     label: "eixo knowledge-centric esta QUENTE — 'Company Brain' virou aposta YC RFS Summer 2026"
     trace: "KC research"
+    provenance:
+      source: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.20 (\"virou categoria quente em 2026\") + l.163-170 (§8, Company Brain = categoria #4 do YC RFS Summer 2026, Blomfield) + ressalva l.264-265"
+      method: "leitura: síntese da pesquisa knowledge-centric 2026-07 (fontes secundárias datadas [31][32])"
   - id: C_PEER_UNIQUE
     node_type: claim
     layer: audit
@@ -574,10 +661,15 @@ nodes:
     impact: 5
     confidence: 0.78
     status: confirmed
-    label: "NINGUEM trata negocio+eng+compliance como 3 verticais IGUAIS; todo player ancora numa e trata o resto como contexto"
+    label: "no material pesquisado (síntese knowledge-centric, jul/2026) ninguém trata negócio+eng+compliance como 3 verticais IGUAIS; todo player encontrado ancora numa e trata o resto como contexto — negativa por amostragem, não prova exaustiva"
+    narrative: "label anterior: NINGUEM trata negocio+eng+compliance como 3 verticais IGUAIS; todo player ancora numa e trata o resto como contexto"
     trace: "KC research (o eixo unico do Onion)"
     verified_at: 2026-08-04
     verified_against: "WebSearch 2026-08-04 (2 buscas, KG/compliance enterprise): Vanta, Purview, Atlan, Collibra, Glean, OvalEdge, Promethium — todos ancorados numa vertical, resto como contexto; NENHUM trata as 3 como peer. RESSALVA: e negativa existencial ('NINGUEM'), logo sampling = nao-refutacao, nao prova exaustiva"
+    provenance:
+      source: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.158-161 (\"ninguém NO MATERIAL ENCONTRADO unifica...\") + l.215-218 (\"não encontrei ninguém... Todos os players são ancorados numa vertical e tratam as outras como fontes de contexto\") + l.269-270"
+      method: "leitura: §7 e veredito (b) da síntese knowledge-centric 2026-07"
   - id: C_COMBO_UNOCCUPIED
     node_type: claim
     layer: audit
@@ -587,6 +679,10 @@ nodes:
     status: confirmed
     label: "companhia existe por PROPRIEDADE, nao por COMBINACAO; o combo multi-vertical-reconciliado esta desocupado"
     trace: "KC research veredito"
+    provenance:
+      source: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.227-229 (\"cada propriedade isolada tem dono; a conjunção não tem\") + l.235-237 (\"Companhia existe por propriedade, não por combinação\")"
+      method: "leitura: veredito (b) da síntese knowledge-centric 2026-07"
   - id: C_RECONCILE_VALUE
     node_type: claim
     layer: audit
@@ -594,10 +690,15 @@ nodes:
     impact: 4
     confidence: 0.82
     status: confirmed
-    label: "RAG/GraphRAG e recuperacao, nao reconciliacao (VersionRAG 64%/10%) — reconciliar VERDADE e o diferencial"
+    label: "RAG/GraphRAG é recuperação, não reconciliação (VersionRAG, arXiv:2510.08109: GraphRAG 64% em VersionQA; baselines 0-10% em detecção implícita de mudança) — reconciliar VERDADE é o diferencial"
+    narrative: "label anterior: RAG/GraphRAG e recuperacao, nao reconciliacao (VersionRAG 64%/10%) — reconciliar VERDADE e o diferencial"
     trace: "KC research (VersionRAG arXiv:2510.08109)"
     verified_at: 2026-08-04
     verified_against: "abstract do arXiv:2510.08109 lido via WebFetch em 2026-08-04 — GraphRAG 64% em VersionQA; o '10%' e o TETO da faixa de baselines (0-10%) em deteccao implicita de mudanca, nao um numero solto: ajustar o label nessa precisao numa proxima edicao"
+    provenance:
+      source: "https://arxiv.org/abs/2510.08109"
+      locator: "abstract arXiv:2510.08109 (\"VersionRAG achieves 90% accuracy, outperforming naive RAG (58%) and GraphRAG (64%)\"; \"where baselines fail (0-10%)\") + SYNTHESIS knowledge-centric l.115-119"
+      method: "leitura: abstract do VersionRAG (lido via WebFetch em 2026-10-09) + síntese knowledge-centric"
   - id: C_TOKI_TWIN
     node_type: claim
     layer: audit
@@ -607,6 +708,10 @@ nodes:
     status: confirmed
     label: "TOKI (jun/2026) = maquinaria GEMEA do radar (contradicao write-time, preserva perdedor), mas sobre MEMORIA DE AGENTE"
     trace: "KC research (TOKI arXiv:2606.06240)"
+    provenance:
+      source: "https://arxiv.org/abs/2606.06240"
+      locator: "abstract arXiv:2606.06240 (submetido 2026-06-04: \"contradiction resolution is write-time concurrency control\"; \"provenance annotation that preserves the losing fact in an audit row\") + SYNTHESIS knowledge-centric l.98-104 e l.197-200 (\"maquinaria epistêmica gêmea do radar\")"
+      method: "leitura: abstract do TOKI (WebFetch 2026-10-09) + síntese knowledge-centric"
   - id: C_DEMAND_AXIS_NOT_ONION
     node_type: claim
     layer: audit
@@ -618,6 +723,10 @@ nodes:
     trace: "KC research + C_ORBIT_CAVEAT"
     verified_at: 2026-08-04
     verified_against: "docs/evolution/federation/members.yaml @ 27ce2b4 — 8 adotantes (kind:adopter) / 11 membros nao-source; TODOS remetem a marciocar/*, GranaAi (CTO) ou consultoria; 'zero adotante frio' segue verdadeiro pelo mesmo metodo (members.yaml + remotes) de E_ORBIT"
+    provenance:
+      source: "27ce2b4:docs/evolution/federation/members.yaml"
+      locator: "members.yaml@27ce2b4 l.65-371 (8 entradas kind: adopter; remotes marciocar/* exceto GranaAi/granaai e ArandekBR/arandek) + SYNTHESIS knowledge-centric l.167-170 e l.269-270"
+      method: "leitura: registro da federação no commit 27ce2b4 (2026-08-03) + síntese knowledge-centric"
   - id: C_NAME_SLICES
     node_type: claim
     layer: audit
@@ -628,6 +737,10 @@ nodes:
     label: "ha nome de mercado pra FATIAS (Company Brain/Active Ontology/DTO), nao pro COMBO — nomear o combo e ato estrategico aberto"
     trace: "KC research"
     verified_at: 2026-07-17
+    provenance:
+      source: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.239-252 (§(c) \"O mercado ainda não nomeou o combo do Onion. Nomes existentes cobrem só fatias\": Company Brain, Active Ontology, DTO)"
+      method: "leitura: §(c) da síntese knowledge-centric 2026-07"
   - id: C_NS2_PORTABLE
     node_type: claim
     layer: audit
@@ -674,6 +787,10 @@ nodes:
     label: "curl onionevolve.com exibe 96 comandos; SSOT inventory.md diz 97 desde 2026-07-15 — o site publico esta stale"
     trace: "curl https://onionevolve.com x docs/onion/inventory.md"
     verified_at: 2026-07-17
+    provenance:
+      source: "https://onionevolve.com"
+      locator: "curl https://onionevolve.com em 2026-07-17 (trace) x c488a123:docs/onion/inventory.md l.11 (97) + log -S: 97 entra no inventário em 9df3a2dc (2026-07-15); corroboração c488a123:site/index.html l.488 (data-n=96) e corpo do commit c488a123 (\"o site exibe 96\")"
+      method: "medição: curl https://onionevolve.com x docs/onion/inventory.md (sessão de 2026-07-17, commit c488a123); saída do curl não persistida"
   - id: C_INTERNAL_AHEAD_0717
     node_type: claim
     layer: audit
@@ -681,9 +798,14 @@ nodes:
     impact: 4
     confidence: 0.9
     status: confirmed
-    label: "INVERTEU: o SSOT interno esta correto (97) e o pitch PUBLICO ficou atras (96) — a maior distancia agora e do lado publico"
+    label: "INVERTEU só entre SSOT e site: o inventory.md (SSOT) está correto (97) e o pitch PÚBLICO ficou atrás (96); mas a KB de identidade interna seguia com 82 comandos (l.122/137/274; só a l.44 foi a 97) — a maior distância continuava do lado INTERNO (KB)"
+    narrative: "label anterior: INVERTEU: o SSOT interno esta correto (97) e o pitch PUBLICO ficou atras (96) — a maior distancia agora e do lado publico"
     trace: "docs/onion/inventory.md x site live"
     verified_at: 2026-07-17
+    provenance:
+      source: "c488a123:docs/onion/inventory.md"
+      locator: "c488a123:inventory.md l.11 (97) x c488a123:site/index.html l.488 (data-n=96) x c488a123:docs/knowledge-base/meta/onion-framework-identity.md l.122,137,274 (82) + corpo do commit c488a123"
+      method: "leitura: inventário, site e KB fixados no commit da re-verificação de 2026-07-17"
   - id: E_LSTREE_MAIN_0717
     node_type: evidence
     layer: audit
@@ -698,6 +820,10 @@ nodes:
     label: "git ls-tree origin/main .claude conta 399 arquivos (era 239 em 11/07) — main segue adotando, nao parada"
     trace: "git ls-tree -r --name-only origin/main -- .claude"
     verified_at: 2026-07-17
+    provenance:
+      source: "/home/marcio/onion-evolve"
+      locator: "git ls-tree -r --name-only fb08cc6b -- .claude | wc -l = 399 no CORE (origin/main do onion-evolve em 2026-07-16 20:45 -0300) x git -C /home/marcio/rhilo-metagamify ls-tree ... bfb9bce2 = 239"
+      method: "medição: git ls-tree -r --name-only <onion-evolve origin/main @2026-07-16..17> -- .claude | wc -l (reproduz o 399 no repo ERRADO)"
   - id: C_VERTICALS_PARTIAL_0717
     node_type: claim
     layer: audit
@@ -756,6 +882,10 @@ nodes:
     verified_against: relato-do-maestro-2026-08-02
     evidence_class: testimony   # fonte é RELATO — não re-verificável por máquina (Q_TESTEMUNHO_NAO_MEDIVEL_0804)
     label: "O MULTI-IDE FOI ATO DELIBERADO COM PROPOSITO DE NEGOCIO, nao dispersao: para atender ao Curso de Desenvolvimento com IA (spec-as-code) na PULSE MAIS, a versao Cursor foi TRANSPORTADA para Claude, Antigravity, Codex e outros — cada repo adaptado as REGRAS DA FERRAMENTA. Os ALUNOS usaram o onion-portable como padrao. Ou seja: houve USO DE CAMPO com alunos reais, nao prova de conceito"
+    provenance:
+      source: "git:65289818"
+      locator: "corpo do commit 65289818 (#514, 2026-08-02) §\"A HISTORIA\": \"o multi-IDE foi ATO DELIBERADO COM PROPOSITO DE NEGOCIO: para o Curso de Desenvolvimento com IA (spec-as-code) na PULSE MAIS... ALUNOS usaram o onion-portable como padrao — uso de campo real\""
+      method: "testemunho: relato do maestro de 2026-08-02, registrado no corpo do commit 65289818"
 
   - id: E_FAMILIA_MULTIIDE_CONGELADA
     node_type: evidence
@@ -771,9 +901,9 @@ nodes:
     narrative: "CONSTRAINS pela D_MATRIZ_DE_PORTAS_2026_10, selado pelo maestro em 2026-10-09 sem flip (o status fica; a aresta mora em x_constrained_by porque o motor de arestas e intra-arquivo). CAIU: onion-mini e onion-standalone dentro do regime congelado (passam a porta). SOBREVIVE: o restante da familia multi-IDE como congelado."
     trace: "https://github.com/marciocar/onion"
     provenance:
-      source: "https://github.com/marciocar/onion"
-      locator: "gh-api-2026-08-02-e-relato-do-maestro"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "git:65289818"
+      locator: "corpo do commit 65289818 (#514, 2026-08-02): \"familia multi-IDE esta CONGELADA (confirmado pelo maestro)\" + \"os 7 repos publicos\"; createdAt re-medido em 2026-10-09 via gh repo list marciocar (imutável): 6 dos 7 depois de 2026-05-18"
+      method: "testemunho: medição gh api da sessão de 2026-08-02 e confirmação do maestro, registradas no corpo do commit 65289818; createdAt re-medido em 2026-10-09"
 
   - id: D_CLAUDE_CODE_POR_CAPACIDADE
     node_type: decision
@@ -787,6 +917,10 @@ nodes:
     evidence_class: testimony   # fonte é RELATO — não re-verificável por máquina (Q_TESTEMUNHO_NAO_MEDIVEL_0804)
     label: "A DECISAO FOI TECNICA, NAO ABANDONO DO AGNOSTICISMO: optou-se por PARAR DE GASTAR ENERGIA sendo agnostico e assumir o Claude Code como ferramenta principal PARA PODER USAR RECURSOS MODERNOS — nominalmente o SendMessage entre agentes no modo Teams. Trade-off explicito: capacidade de fronteira > portabilidade horizontal. Isto REENQUADRA a linha 'Plataforma unica: Claude Code' do CLAUDE.md: ela e a CONCLUSAO de um experimento multi-IDE de escala real, nao uma restricao de origem"
     trace: "docs/analysis/onion-review-2026-05.md"
+    provenance:
+      source: "git:65289818"
+      locator: "corpo do commit 65289818 (#514, 2026-08-02): \"a decisao de 2026-05-18 foi TECNICA: parar de gastar energia em agnosticismo para poder usar recursos de fronteira (SendMessage entre agentes no modo Teams). Trade-off explicito...\" + 65289818:CLAUDE.md l.10-14"
+      method: "testemunho: relato do maestro de 2026-08-02, registrado no corpo do commit 65289818 (sessão em 1a pessoa: \"O maestro contou a historia que faltava\")"
 
   - id: C_POSTURA_ACOPLAMENTO
     node_type: claim
@@ -797,7 +931,12 @@ nodes:
     status: confirmed
     verified_at: 2026-08-02
     verified_against: formulacao-do-maestro-2026-08-02
-    label: "A POSTURA DE ACOPLAMENTO (formulacao do maestro, criterio de decisao e NAO documentacao): 'o Onion esta ACOPLADO ao Claude Code para tirar vantagem de sua ESTRUTURA E MAQUINARIA, mas buscando manter INDEPENDENCIA sempre que isso for MAIS VANTAJOSO e o acoplamento NAO FOR NECESSIDADE'. E o teste que decide toda adocao de substrato: acoplar so quando a capacidade que se ganha nao existe fora — nunca por conveniencia nem por simetria. Governa decisoes ja tomadas hoje (.claude/rules/, tipos de hook, o slice de rules) e as futuras"
+    label: "postura de acoplamento (formulação do maestro, 2026-08-02): acoplado ao Claude Code para tirar vantagem da estrutura e maquinaria, mas mantendo independência quando for mais vantajoso e o acoplamento não for necessidade; é o teste de toda adoção de substrato"
+    narrative: "label anterior: A POSTURA DE ACOPLAMENTO (formulacao do maestro, criterio de decisao e NAO documentacao): 'o Onion esta ACOPLADO ao Claude Code para tirar vantagem de sua ESTRUTURA E MAQUINARIA, mas buscando manter INDEPENDENCIA sempre que isso for MAIS VANTAJOSO e o acoplamento NAO FOR NECESSIDADE'. E o teste que decide toda adocao de substrato: acoplar so quando a capacidade que se ganha nao existe fora — nunca por conveniencia nem por simetria. Governa decisoes ja tomadas hoje (.claude/rules/, tipos de hook, o slice de rules) e as futuras"
+    provenance:
+      source: "65289818:CLAUDE.md"
+      locator: "corpo do commit 65289818 (#514, 2026-08-02) §\"O QUE MUDA\" item 2 + 65289818:CLAUDE.md l.15-18"
+      method: "testemunho: formulação do maestro de 2026-08-02, citada no corpo do commit 65289818 e projetada no CLAUDE.md l.15-18"
 
   - id: C_CORE_NAO_E_FAMILIA
     node_type: claim
@@ -809,6 +948,10 @@ nodes:
     verified_at: 2026-08-02
     verified_against: leitura-do-CLAUDE.md-mais-gh-api
     label: "A DISTINCAO QUE FALTAVA NA DOUTRINA: CLAUDE.md:9-10 ('nao e distribuido publicamente' + 'Plataforma unica: Claude Code') descreve O CORE (onion-evolve) e e lido como descrevendo TUDO. A FAMILIA multi-IDE e outro objeto, com outro proposito (curso + prova de portabilidade) e outro ciclo de vida (CONGELADO). Sem a distincao escrita, quem le conclui violacao — foi exatamente o que esta sessao concluiu, errado, em 2026-08-02"
+    provenance:
+      source: "65289818^:CLAUDE.md"
+      locator: "65289818^:CLAUDE.md l.9 (\"não é distribuído publicamente\") + l.10 (\"Plataforma única: Claude Code\") + corpo do commit 65289818 (#514, 2026-08-02) §\"O QUE MUDA\" item 3"
+      method: "leitura: CLAUDE.md no pai do PR #514 + corpo do commit da sessão de 2026-08-02 em 1a pessoa"
 
   - id: C_FATIAS_JA_TESTADAS
     node_type: claim
@@ -830,6 +973,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     label: "ERRO DE LEITURA REGISTRADO (2026-08-02, para nao se repetir): esta sessao afirmou que 'a doutrina diz indivisivel enquanto o plugins/ divide'. FALSO. CLAUDE.md:12 diz que os workflows faseados 'nao devem ser CONSOLIDADOS' — isto e, nao devem ser FUNDIDOS UM NO OUTRO. Ler 'consolidados' como 'divididos' inverte o sentido: manter product/ e engineer/ como fluxos distintos e COMPATIVEL com envia-los como verticais separadas. A afirmacao falsa foi commitada em docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md e no no C_objecao_mattpocock_vence"
+    provenance:
+      source: "3e6a962d:docs/evolution/research/onion-market-kg-2026-08/onion-market-kg-2026-08.kg.yaml"
+      locator: "3e6a962d:onion-market-kg-2026-08.kg.yaml l.152-160 (C_objecao_mattpocock_vence: \"enquanto a doutrina diz que e indivisivel\") + 3e6a962d:SYNTHESIS.md l.101-103 (agravante) + 65289818^:CLAUDE.md l.12 (\"não devem ser consolidados\") + corpo do commit 65289818"
+      method: "leitura: versão do grafo e da síntese que carregava o erro (3e6a962d) + CLAUDE.md no pai do PR #514 + correção no corpo do 65289818"
 
   # ═══ RE-VERIFICACAO CONTRA O VIVO (/meta:kg-freshness, 2026-08-04) ═══
   # Fila do radar: 31 nos; medidos os 16 de maior atencao (15 fora do corte). 16 workers
@@ -1009,6 +1156,10 @@ nodes:
     verified_against: direcao-do-maestro-2026-08-06
     label: "NORTH-STAR = NS1, KG/CONHECIMENTO (decisao do maestro, 2026-08-06, fechando Q_NORTHSTAR que estava aberta ha semanas com atencao 10,0). O diferencial e o GRAFO COMO SSOT-RUNTIME: conhecimento que nao evapora entre sessoes, com radar, Elenxo e declarado!=verificado. E a capacidade que nao existe pronta fora. CONSEQUENCIA DE ORDENACAO, e e por isso que a pergunta importava: o MESMO trabalho tem valor diferente sob cada norte — sob NS3 (educacao) as curas de adopter-awareness de 2026-08-06 eram o dia inteiro; sob NS2 o achado do M8 sobre o fallback era o item mais valioso; sob NS4 quase nada daquele dia importaria. Com NS1, ado\u00e7ao/curso/portabilidade sao VEICULO do KG, nao fim. AS DESCARTADAS NAO SUMIRAM: NS2 fica registrada em Q_CUSTO_DO_PORTE (registrada, nao trabalhada); NS3 sobrevive como restricao (o curso e a familia congelada nao podem quebrar); NS4 fica com o dissent de auth-transversal aberto"
     trace: "docs/onion/graph/onion-identity-2026-07.kg.yaml"
+    provenance:
+      source: "git:e054d69c"
+      locator: "corpo do commit e054d69c (#554, 2026-08-06): \"NORTH-STAR: NS1 — KG / conhecimento\", \"Q_NORTHSTAR 10,0\", §\"POR QUE ISTO ORDENA\" e §\"AS DESCARTADAS NÃO SUMIRAM\""
+      method: "testemunho: decisão do maestro de 2026-08-06 registrada no corpo do commit e054d69c"
 
   - id: D_ICP_EMPRESA_MAIS_N1
     node_type: decision
@@ -1019,8 +1170,13 @@ nodes:
     status: confirmed
     verified_at: 2026-08-06
     verified_against: direcao-do-maestro-2026-08-06+members-yaml-como-evidencia-de-campo
-    label: "ICP COMPOSTO, e a composicao e o ponto (decisao do maestro, 2026-08-06, fechando Q_ICP — atencao 12,0, a maior do grafo). PRIMARIO: a empresa que roda os PROPRIOS projetos (evidencia viva no members.yaml: metagamify com role hub e sub-adotados; arandek, monorepo NX+Bun+SST). ESTENDIDO: o individuo com Company Brain N=1 (evidencia: marcio-pessoal e o app companheiro com F0 fechado no device real). CONSULTORIA NAO EXCLUIDA — e isto e RESTRICAO DE DESENHO, nao nota de rodape: gustavo-pulga e onion-arthur sao adotantes vivos (ids publicos; o credito nominal fica no diario privado), e NADA pode quebrar para eles. Foi exatamente essa classe que produziu os 3 defeitos de core achados em 2026-08-06 rodando o lint DENTRO da copia. LIMITE DECLARADO: o primario e ASPIRACIONAL na parte hub — ha UM unico role:hub no members.yaml e ele e do maestro; priorizar por ele sem medir seria chute com aparencia de metodo"
+    label: "ICP composto (decisão do maestro, 2026-08-06, fecha Q_ICP 12,0): empresa nos próprios projetos + Company Brain (N=1); consultoria NÃO excluída, como restrição de desenho (adotantes vivos); a parte hub é aspiracional: há um único role:hub no members.yaml"
+    narrative: "label anterior: ICP COMPOSTO, e a composicao e o ponto (decisao do maestro, 2026-08-06, fechando Q_ICP — atencao 12,0, a maior do grafo). PRIMARIO: a empresa que roda os PROPRIOS projetos (evidencia viva no members.yaml: metagamify com role hub e sub-adotados; arandek, monorepo NX+Bun+SST). ESTENDIDO: o individuo com Company Brain N=1 (evidencia: marcio-pessoal e o app companheiro com F0 fechado no device real). CONSULTORIA NAO EXCLUIDA — e isto e RESTRICAO DE DESENHO, nao nota de rodape: gustavo-pulga e onion-arthur sao adotantes vivos (ids publicos; o credito nominal fica no diario privado), e NADA pode quebrar para eles. Foi exatamente essa classe que produziu os 3 defeitos de core achados em 2026-08-06 rodando o lint DENTRO da copia. LIMITE DECLARADO: o primario e ASPIRACIONAL na parte hub — ha UM unico role:hub no members.yaml e ele e do maestro; priorizar por ele sem medir seria chute com aparencia de metodo"
     trace: "docs/evolution/federation/members.yaml"
+    provenance:
+      source: "git:e054d69c"
+      locator: "corpo do commit e054d69c (#554, 2026-08-06: \"O maestro respondeu em 2026-08-06\"; ICP composto; consultoria não-excluída como restrição; 3 defeitos de core; hub aspiracional) + e054d69c:docs/evolution/federation/members.yaml l.65-67 (único role: hub = metagamify), l.352 (arandek NX+Bun+SST), l.186/267/317"
+      method: "testemunho: decisão do maestro de 2026-08-06 registrada no corpo do commit e054d69c; evidência de campo por leitura do members.yaml no mesmo commit"
 
   - id: D_VALOR_ORQUESTRACAO_ANCORADA
     node_type: decision
@@ -1058,6 +1214,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 1/1 — grep -n \"eixos diferentes\\|coexistem\\|nao entortar\" docs/ CLAUDE.md — achou docs/analy'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó está status: open no grafo, mas o trabalho que ele descreve (aplicar a diretriz "não entortar doutrina" ao decidir o papel da develop) foi CONCLUÍDO, RATIFICADO e ENTREGUE em 2026-07-11 — o mesmo dia da investigação. O status open é resíduo de carimbagem: o nó nunca foi fechado no grafo apesar '
+    provenance:
+      source: "93459973:docs/analysis/onion-veredito-branch-methodology-2026-07.md"
+      locator: "veredito l.5-7 (status ratificado, ratificado_em 2026-07-11, por maestro) + l.17-20 (\"não entortar doutrina… os eixos coexistem\"; liberado para resposta ao consumidor) + federation/outbox/metagamify/_processed/2026-07-11-veredito-metodologia-branches.md (entregue em 3004f156, 2026-07-11) + e5e81af2^:docs/onion/graph/onion-identity-2026-07.kg.yaml l.230 (D_NO_DISTORT status open)"
+      method: "leitura: veredito ratificado (commit 93459973, 2026-07-11) + anúncio entregue na outbox + estado open do nó no pai da revisão-total e5e81af2"
 
   - id: E_CENSO0901_C_NS2_PORTABLE
     node_type: evidence
@@ -1082,6 +1242,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — grep no nó (linhas 424-432) + trace F2 Q3/Q5; leitura de C_ICP_REGULATED/C_ICP_TENSION (já'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó (F2, jul/2026, status open) foi SUPERSEDIDO por D6 (decisions.md, ratificado 2026-07-25): as claims 1 e 2 (vertical rara + casa com ICP regulado) viraram decisão canônica confirmada ("whitespace compliance-peer confirmado", diferencial #1 em strategy.md) — não precisam mais ser "claim aberta", '
+    provenance:
+      source: "dd0f3ffb:docs/business-context/decisions.md"
+      locator: "decisions.md@dd0f3ffb l.92 (D6 ratificado 2026-07-25), l.97 (\"MENSAGEM = P4 (regulado)\"), l.99 (\"único whitespace confirmado — compliance-peer\") + b57930a8:docs/business-context/02-product/strategy.md l.32-34 (§Diferenciais, item 1 \"3 dimensões peer (inc. compliance) — whitespace confirmado\")"
+      method: "leitura: decisions.md e strategy.md fixados no último commit antes de 2026-09-02"
 
   - id: E_W9_TESTIMONY_MECANIZADO
     node_type: evidence

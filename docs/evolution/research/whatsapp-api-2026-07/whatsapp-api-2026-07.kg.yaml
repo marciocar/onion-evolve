@@ -50,6 +50,10 @@ nodes:
     status: confirmed
     label: "Evolution API NÃO é a melhor opção em nenhum cenário (fintech nem dogfood)"
     trace: "SYNTHESIS.md#veredito"
+    provenance:
+      source: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
+      locator: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md:3, :7, :27 @a6d2524f"
+      method: "leitura: SYNTHESIS da pesquisa WhatsApp (§Veredito)"
   - id: D_FINTECH_OFICIAL
     node_type: decision
     plane: DEV
@@ -58,14 +62,23 @@ nodes:
     status: confirmed
     label: "Grana.Ai (fintech regulada): canal OFICIAL (Cloud API/BSP), nunca não-oficial (ToS/ban)"
     trace: "SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
+      locator: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md:3-5 @a6d2524f"
+      method: "leitura: SYNTHESIS da pesquisa WhatsApp (cenário A)"
   - id: D_DOGFOOD_WAHA
     node_type: decision
     plane: DEV
     impact: 4
     confidence: 0.85
     status: confirmed
-    label: "Dogfood interno: WAHA (Apache-2.0 limpo, sem heartbeat), não Evolution"
+    label: "Dogfood interno: lib não-oficial de licença limpa — WAHA (Apache-2.0, grátis, sem heartbeat), Baileys (MIT) ou whatsapp-web.js (Apache-2.0) — não Evolution; ou a Cloud API oficial no tier gratuito se o dogfood tolera o canal oficial"
+    narrative: "label anterior: Dogfood interno: WAHA (Apache-2.0 limpo, sem heartbeat), não Evolution"
     trace: "SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
+      locator: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md:8, :10, :27, :31 @a6d2524f"
+      method: "leitura: SYNTHESIS da pesquisa WhatsApp (veredito cenário B)"
   - id: C_S1_F1
     node_type: claim
     plane: DEV
@@ -752,6 +765,10 @@ nodes:
     source_kind: internal-synthesis
     label: "MERCADO/CAPITAL — SEM SINAL NOVO nesta revisita: nada de rodada, M&A, down round ou reprecificação posterior a 2026-07-17 foi verificado, e a única claim de mercado votada (lista de BSPs no Brasil) caiu, junto do markup da 360dialog. O que o corpus de julho carrega e NÃO foi reconfirmado — Take Blip como líder brasileiro para médias/grandes (C_S5_F7, C_S2_F6) — não deve ser citado como atual."
     trace: "docs/evolution/research/whatsapp-api-2026-07/whatsapp-api-2026-07.kg.yaml#E_MERCADO_WHATSAPP_REVISITA_20260903"
+    provenance:
+      source: "docs/evolution/review/feat-research-lens-f4.md"
+      locator: "docs/evolution/review/feat-research-lens-f4.md:5; corpo de 79a8a878; whatsapp-api-2026-07.kg.yaml:195,255"
+      method: "testemunho: eixo mercado do run wf_9487391f da sessão 2026-09-03 (Claude-Session session_01J14a87…), journal não preservado no host"
   - id: E_LACUNAS_WHATSAPP_REVISITA_20260903
     node_type: evidence
     plane: DEV
@@ -761,8 +778,13 @@ nodes:
     verified_at: 2026-09-03
     verified_against: "contabilidade da própria revisita 2026-09-03: 6 nós revisitados (1 sobreviveu, 5 caíram), 0 fontes lidas, 0 claims deixadas em 'não verificado' por falha de acesso, 39 claims cortadas por orçamento"
     source_kind: internal-synthesis
-    label: "LACUNAS DECLARADAS (lista de 1ª classe): (a) REFUTADAS POR FONTE FRACA — 5: preço de marketing BR, mecânica do quality rating, regras de template 550c/10 emojis, lista de BSPs no Brasil, markup da 360dialog; (b) NÃO VERIFICADAS — 0; (c) CORTADAS POR ORÇAMENTO — 39 claims, com 0 fontes lidas nesta passada. Consequência honesta: esta revisita NÃO mediu preço, limite, política, versão nem risco de banimento contra fonte primária — ela só derrubou o que já era frágil. A pergunta segue ABERTA."
+    label: "Revisita 2026-09-03 (run wf_9487391f-594): 6 nos vencidos re-medidos, 1 reconfirmado e 5 superados, todos sobre blog tier 4 (preco de template BR, quality rating, 550 chars/10 emojis, BSPs no Brasil, markup da 360dialog); nenhum eixo teve mudanca verificada em fonte primaria"
+    narrative: "label anterior: LACUNAS DECLARADAS (lista de 1ª classe): (a) REFUTADAS POR FONTE FRACA — 5: preço de marketing BR, mecânica do quality rating, regras de template 550c/10 emojis, lista de BSPs no Brasil, markup da 360dialog; (b) NÃO VERIFICADAS — 0; (c) CORTADAS POR ORÇAMENTO — 39 claims, com 0 fontes lidas nesta passada. Consequência honesta: esta revisita NÃO mediu preço, limite, política, versão nem risco de banimento contra fonte primária — ela só derrubou o que já era frágil. A pergunta segue ABERTA."
     trace: "docs/evolution/research/whatsapp-api-2026-07/whatsapp-api-2026-07.kg.yaml#E_LACUNAS_WHATSAPP_REVISITA_20260903"
+    provenance:
+      source: "79a8a878:docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md · docs/evolution/review/feat-research-lens-f4.md"
+      locator: "SYNTHESIS@79a8a878 l.44-53 (§Revisita 2026-09-03); resíduo l.5 (wf_9487391f 1,32M: 1 reconfirmado, 5 SUPERSEDES)"
+      method: "leitura: apêndice datado da revisita no SYNTHESIS (commit 79a8a878) e resíduo R56 do PR"
 
 edges:
   - from: C_S1_F1

@@ -64,6 +64,10 @@ nodes:
     verified_at: 2026-08-18
     verified_against: "gh run list --event=schedule: 1 run na historia do repo; 1 unico workflow declara schedule; zero paradas observadas"
     label: "TESTE DO GATILHO do alarme-de-ausencia: zero agendados pararam silenciosamente aqui — o gatilho NAO disparou"
+    provenance:
+      source: "gh run list (marciocar/onion-evolve) + .github/workflows/@9781efd0"
+      locator: "gh run list --event schedule --created '<=2026-08-18' (1 run: 2026-08-18T04:52Z, Onion Guard Selftest); git grep -l schedule: 9781efd0 -- .github/workflows/ (só onion-selftest.yml); docs/evolution/review/fix-residuos-2026-08-18.md l.45-46"
+      method: "medição: gh run list --repo marciocar/onion-evolve --event schedule --created '<=2026-08-18' (comando do verified_against, com o recorte de data) + git grep -l -E '^\\s*schedule:' 9781efd0 -- .github/workflows/"
 
   # ---- decisao: o que EXECUTAR, em ordem de valor declarado ----
   - id: D_CURA_POR_CONSTRUCAO_NO_ASSEMBLER
@@ -133,6 +137,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "ordem de valor = MECANISMO antes de INSTANCIA: curar por construcao (impossivel) vale mais que guarda (detectavel), que vale mais que corrigir a ocorrencia (some no proximo commit)"
+    provenance:
+      source: "docs/evolution/review/fix-residuos-2026-08-18.md"
+      locator: "fix-residuos-2026-08-18.md l.38-41 ('A cura certa não é guarda (detecção): é o assembler converter no empacotamento (construção) — R_MECANISMO_ANTES_DE_INSTANCIA: impossível > detectável > corrigido-uma-vez'); corpo do commit 9781efd0 ('A CURA É POR CONSTRUÇÃO, não por detecção — mecanismo antes de instância')"
+      method: "leitura: resíduo do PR #632 e corpo do commit 9781efd0"
 
 edges:
   - from: E_PLUGIN_DEAD_LINKS_15

@@ -261,6 +261,10 @@ nodes:
     verified_at: 2026-08-06
     verified_against: "24-avisos-sem-corte-contra-13-com-corte"
     label: "TODO FILTRO DESTA GUARDA NASCEU DE UM FALSO-POSITIVO MEDIDO, nao de prudencia — e o numero mostra por que: sem os cortes seriam 24 avisos com ~46% de falso-positivo. Foram tres rodadas de correcao, cada uma pega comparando contra o numero anterior: (1) resolvedor de raiz unica dava 8 mortos, dos quais 7 eram SYNTHESIS.md relativo ao DIRETORIO DO GRAFO — 87% de falso-positivo; duas raizes e requisito, nao detalhe. (2) caminho ABSOLUTO (/home/onion/onion-bridge na VPS, /etc/caddy) e URL nao sao julgaveis: existem, so nao aqui. (3) `memory/` e raiz externa declarada (dir de memoria da sessao). Mais os filtros de forma: argumento de comando, prosa entre parenteses e dominio-sem-esquema passavam por 'tem barra'. TETO DECLARADO em vez de escondido: ancora de NOME SOLTO (SYNTHESIS.md, 7 casos reais) NAO e vigiada — preferi cobertura menor e crivel a cobertura maior e barulhenta, porque aviso que adivinha e o que treina o leitor a ignorar"
+    provenance:
+      source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+      locator: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md:189-203 @d1fb7552"
+      method: "leitura: SYNTHESIS da refinaria §\"Todo filtro nasceu de um falso-positivo medido\""
 
 edges:
   - from: E_m4_trace_resolve_refutou_a_spec

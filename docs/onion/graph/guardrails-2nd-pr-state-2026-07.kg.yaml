@@ -51,12 +51,13 @@ nodes:
     impact: 5
     confidence: 1.0
     verified_at: 2026-07-24
-    label: "VIVO no core (nao quarentena): .claude/utils/guardrails/onion-untrusted-wrap.sh + .claude/validation/guardrails/onion-effect-gate.sh; wired em lint-artifacts.sh + lint-selftest.sh (run_guardrails_selftests); fragmento SSOT common/prompts/untrusted-content-provenance.md existe"
+    label: "VIVO no core (nao quarentena): .claude/utils/guardrails/onion-untrusted-wrap.sh + .claude/validation/guardrails/onion-effect-gate.sh; wired em lint-selftest.sh (run_guardrails_selftests); fragmento SSOT common/prompts/untrusted-content-provenance.md existe"
+    narrative: "label anterior: VIVO no core (nao quarentena): .claude/utils/guardrails/onion-untrusted-wrap.sh + .claude/validation/guardrails/onion-effect-gate.sh; wired em lint-artifacts.sh + lint-selftest.sh (run_guardrails_selftests); fragmento SSOT common/prompts/untrusted-content-provenance.md existe"
     trace: ".claude/validation/guardrails/onion-effect-gate.sh"
     provenance:
-      source: ".claude/validation/guardrails/onion-effect-gate.sh"
-      locator: ".claude/validation/guardrails/onion-effect-gate.sh"
-      method: "derivado: trace do nó, sem registro de medição"
+      source: "PR #452 (marciocar/onion-evolve, merge 633658a3) + .claude/validation/lint-selftest.sh @96d2beae"
+      locator: "gh pr view 452 --json files (onion-untrusted-wrap.sh, onion-effect-gate.sh, untrusted-content-provenance.md, lint-selftest.sh); 96d2beae:.claude/validation/lint-selftest.sh l.4765 (def run_guardrails_selftests) e l.4828 (chamada)"
+      method: "leitura: gh pr view 452 + git show 96d2beae (commit que criou o grafo, 2026-07-24) dos arquivos"
 
   - id: C_ANTI_DRIFT_BY_CONSTRUCTION
     node_type: claim

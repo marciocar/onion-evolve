@@ -22,6 +22,10 @@ nodes:
     impact: 5
     confidence: 1.0
     label: "A FRONTEIRA QUE ORGANIZA TUDO, e ela e o que torna decisoes aparentemente arriscadas em decisoes defensaveis. O Logto responde QUEM E VOCE. Ele nao responde O QUE VOCE PODE DECIFRAR. Consequencias medidas, nao deduzidas: no cofre a chave de cifra deriva da senha mestra NO CLIENTE (comprometer o Logto permite TENTAR logar, nunca ler o cofre); no bridge a identidade autoriza a chamada, mas `ANTHROPIC_API_KEY` e `PERMISSION_MODE` sao do servico. E POR ISSO que o console admin publico e uma decisao defensavel e nao uma brecha: o raio dele e o plano de CONTROLE da identidade (criar apps, usuarios, conectores), nao os segredos das ferramentas. Inverte a expectativa ingenua de que integrar ao IdP 'centraliza a seguranca': integrar NAO tira um segredo do mundo, ADICIONA um sistema ao caminho."
+    provenance:
+      source: "db8d9844:docs/onion/identidade-onion-vps.md"
+      locator: "db8d9844:docs/onion/identidade-onion-vps.md l.10-26; 4b3c70fb (corpo + diff de ops/bridge-auth/logto-provision.sh)"
+      method: "leitura: prosa da doutrina commitada em db8d9844 (l.10-26) + corpo de 4b3c70fb"
 
   - id: C_TRES_MODELOS_DE_CONFIANCA
     node_type: claim
@@ -32,6 +36,10 @@ nodes:
     impact: 5
     confidence: 1.0
     label: "TRES FERRAMENTAS, TRES MODELOS DE CONFIANCA DISTINTOS — e nenhum e redundante. BRIDGE: valida JWT por JWKS LOCAL (busca `${ISSUER}/jwks`, cacheia 1h, confere assinatura/issuer/audience). Nunca chama o Logto para validar — medido: `conexoes na 3011 = 0` com o bridge ativo. Se o Logto cair, tokens ja emitidos seguem valendo ate expirar. COFRE: redireciona o NAVEGADOR ao Logto; nao valida nada sozinho. Medido: ele resolve `auth.onionevolve.com` para o IP PUBLICO — sai e volta pela internet, passando pelo Caddy. Logo Logto fora = botao de SSO quebrado (observado ao vivo durante o upgrade: `400` no authorize enquanto o container reiniciava), com o login por senha mestra intacto — `SSO_ONLY=false` e resiliencia, nao so doutrina. WAHA: `X-Api-Key` propria, hash sha512 no container, sem relacao nenhuma com o Logto. CONSEQUENCIA DUPLA: nao ha ponto unico cuja queda derrube tudo, e TAMBEM nao ha lugar unico onde auditar acesso. Esse e o custo real do desenho, e ele e consciente."
+    provenance:
+      source: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
+      locator: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md l.55-65; db8d9844:docs/onion/identidade-onion-vps.md l.56-70; corpo de 50516e84 item 2"
+      method: "testemunho: medicao da sessao 2026-08-10 (prosa db8d9844 l.56-70: conexoes na 3011 = 0, authorize 400 no upgrade) re-verificada pelo run kg-freshness wf_7804d86f-3a7 em 2026-08-12, com a perna do bridge fechada a mao por leitura de identity.ts:34/45/126/129/133 (sem acesso hoje a /home/onion sem sudo); comandos dos workers nao registrados (journal ausente no host)"
 
   - id: C_REDE_ISOLADA_POR_CONSTRUCAO
     node_type: claim
@@ -42,6 +50,10 @@ nodes:
     impact: 4
     confidence: 1.0
     label: "CADA STACK TEM REDE DOCKER PROPRIA e NAO HA REDE COMPARTILHADA: `onion-logto_default`, `onion-waha_default`, `onion-vps-vaultwarden_default`. Nenhum container fala com outro por dentro do Docker — toda comunicacao entre ferramentas sai pelo host e volta pelo Caddy, como se fossem servicos de terceiros. Isolamento por construcao: comprometer um container nao da alcance lateral. E o Caddy tem 5 vhosts e ZERO autenticacao propria (nenhum `basic_auth`, nenhum `forward_auth`, nenhum `log`) — TODOS delegam 100% ao backend. Isso e coerente com o desenho (cada ferramenta e a autoridade sobre suas contas) mas significa que a borda NAO e um ponto de politica: quem quiser regra transversal tera de escolher entre por `forward_auth` no Caddy (ex.: Authelia) ou aceitar que a politica vive N vezes."
+    provenance:
+      source: ".claude/validation/vps-exposure-check.sh"
+      locator: ".claude/validation/vps-exposure-check.sh l.9-16 (nasceu em db8d9844); db8d9844:docs/onion/identidade-onion-vps.md l.52-54 e l.124-129"
+      method: "leitura: comando de refutacao registrado em vps-exposure-check.sh l.10-11 (docker exec onion-vps-waha curl http://172.17.0.1:3022/ -> 302) + prosa db8d9844 com a afirmacao original"
 
   # ── O QUE O MERCADO DIZ, E O QUE ISSO MUDA ──────────────────────────────────
   - id: E_RECUPERACAO_E_O_ELO_FRACO
@@ -108,7 +120,12 @@ nodes:
     verified_against: submit-recusado-404-identifier-not-found-usuarios-1-antes-1-depois
     impact: 4
     confidence: 1.0
-    label: "CORRECAO DE AFIRMACAO MINHA, e a mais cara. Repassei ao maestro, como fato estabelecido, que 'um desconhecido chega a UM POST de ter conta' no Logto. O agente que mediu isso PAROU ANTES desse POST — de proposito, para nao modificar. Ou seja: a afirmacao decisiva era a UNICA que ninguem tinha testado, e eu a relatei como medida. Testei: `PUT /api/experience {Register}` -> 204, `POST profile` -> 204 nos dois campos, e `POST /api/experience/submit` -> **404 `session.identifier_not_found`**, com a contagem de usuarios inalterada (1 antes, 1 depois). OS 204 INTERMEDIARIOS SAO A API DE INTERACAO ACEITANDO CAMPOS; O PORTAO ESTA NO SUBMIT. ⚠️ E a segunda metade da honestidade: eu TAMBEM nao posso afirmar que o meu fechamento (`signInMode: SignIn`) causou a recusa, porque ninguem mediu o submit ANTES da mudanca. Sei o estado atual. Nao sei a transicao. LICAO: veredito de subagente e HIPOTESE; e quando ele diz explicitamente 'nao testei este passo', esse passo e justamente o que precisa de medicao antes de virar relato."
+    label: "Repassei como fato que um desconhecido chegava a um POST de ter conta no Logto; o agente parou antes desse POST. Medi: submit → 404 session.identifier_not_found, contagem inalterada. Corrigido depois: o portão é 403 no /identification; o 404 era artefato de sessão mal formada."
+    narrative: "label anterior: CORRECAO DE AFIRMACAO MINHA, e a mais cara. Repassei ao maestro, como fato estabelecido, que 'um desconhecido chega a UM POST de ter conta' no Logto. O agente que mediu isso PAROU ANTES desse POST — de proposito, para nao modificar. Ou seja: a afirmacao decisiva era a UNICA que ninguem tinha testado, e eu a relatei como medida. Testei: `PUT /api/experience {Register}` -> 204, `POST profile` -> 204 nos dois campos, e `POST /api/experience/submit` -> **404 `session.identifier_not_found`**, com a contagem de usuarios inalterada (1 antes, 1 depois). OS 204 INTERMEDIARIOS SAO A API DE INTERACAO ACEITANDO CAMPOS; O PORTAO ESTA NO SUBMIT. ⚠️ E a segunda metade da honestidade: eu TAMBEM nao posso afirmar que o meu fechamento (`signInMode: SignIn`) causou a recusa, porque ninguem mediu o submit ANTES da mudanca. Sei o estado atual. Nao sei a transicao. LICAO: veredito de subagente e HIPOTESE; e quando ele diz explicitamente 'nao testei este passo', esse passo e justamente o que precisa de medicao antes de virar relato."
+    provenance:
+      source: "db8d9844:docs/onion/identidade-onion-vps.md"
+      locator: "db8d9844:docs/onion/identidade-onion-vps.md l.80, l.85-87, l.189-192; docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.40-41"
+      method: "leitura: prosa db8d9844 + resíduo do #578 l.40-41"
 
   - id: I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE
     node_type: decision
@@ -121,9 +138,9 @@ nodes:
     label: "INCIDENTE EM PRODUCAO, e a causa e a assinatura desta casa. O `upgrade.sh` rodava `npm run cli db alteration deploy 2>&1 | tail -20 || { exit 1; }`. A migracao falhou com `Missing target version`, o `tail` devolveu 0, e o `||` NUNCA DISPAROU. O script seguiu, trocou a imagem, e o container entrou em restart loop com 'Undeployed database alterations found'. GUARDA QUE LE O EXIT ERRADO E PIOR QUE GUARDA AUSENTE: ela AFIRMA ter verificado. E a ironia que precisa ficar escrita: a hook `bash-empty-result-guard` desta casa pega EXATAMENTE essa classe (EXIT-CODE-DE-PIPE) — mas ela so protege o que passa pela ferramenta Bash, NAO alcanca os scripts do repo. Havia uma guarda no lugar certo, com a intencao certa, e cega. Curado: `set -o pipefail` DENTRO do `sh -c` (e la que o pipe roda) + versao alvo explicita. O QUE SALVOU: o backup rotulado ANTES e a verificacao final recusando declarar sucesso ('✗ OIDC nao respondeu — investigue antes de considerar pronto'). Restaurado e verificado nas quatro pontas."
     trace: "/home/marcio/onion-vps-logto/upgrade.sh"
     provenance:
-      source: "/home/marcio/onion-vps-logto/upgrade.sh"
-      locator: "3-alterations-aplicadas-status-204-11-apps-issuer-ok-sso-redirect-restaurado"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-logto/upgrade.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "/home/marcio/onion-vps-logto@cc15d9b"
+      locator: "cc15d9b (corpo) no clone /home/marcio/onion-vps-logto; .claude/hooks/bash-empty-result-guard.sh l.151"
+      method: "leitura: commit cc15d9b do repo onion-vps-logto (2026-08-10) + hook do core l.151 (classe EXIT-CODE-DE-PIPE)"
 
   # ── O QUE O ELENXO ACHOU E NINGUEM TINHA VISTO ──────────────────────────────
   - id: I_SEGUNDO_IDP_COM_CONSOLE_DESTRANCADO
@@ -137,13 +154,13 @@ nodes:
     label: "FECHADO 2026-08-11, nas duas pontas. Era o achado mais perigoso da sessao inteira, encontrado SO pelo Elenxo. Existe um SEGUNDO Logto nesta VPS (`onion-adopt-arandek-logto-1`, v1.36.0) e o tenant `admin` dele esta em modo **`Register` com ZERO usuarios** — estado de bootstrap: QUEM ALCANCAR CRIA O PRIMEIRO ADMINISTRADOR do IdP do adotante. Medido por mim, nao herdado: `select tenant_id, sign_in_mode, count(users)` devolve `admin|Register|0` e `default|SignInAndRegister|2`. ⚠️ E A CONTENCAO E PARCIAL: o `onion-vps-docker-firewall` faz `DROP -i eth0`, que NAO cobre trafego container-a-container. Provado: `docker exec onion-vps-waha curl http://172.17.0.1:3022/` devolve **302**. Logo qualquer container comprometido — e qualquer usuario com shell na caixa — toma o IdP do adotante. TODA a stack dele (10 containers: Redis, Postgres, MinIO, Milvus, o IdP) esta em `0.0.0.0`; e o item que a memoria ja registrava como `rebind dos adotantes pendente` desde o incidente de agosto. RESOLVIDO: (1) os overrides que a stack viva usava moravam em `/tmp/.../scratchpad/` sob UUID de SESSAO MORTA — `/tmp` e limpo no boot, e no proximo `up` o Logto do adotante voltaria a 3011/3012 e COLIDIRIA com o do core, derrubando `auth.onionevolve.com`. Bomba-relogio que eu nao tinha visto; foi o inventario que achou. Movidos para `/home/marcio/onion-adopt-arandek-local/`, versionados, com o porque escrito. (2) as 13 portas foram para `127.0.0.1` — inclusive quatro de servicos PARADOS que subiriam publicos (fecha a classe, nao o caso), com as portas do lado do container CONFERIDAS contra o compose base. (3) o bootstrap do IdP foi fechado (`sign_in_mode=SignIn` nos dois tenants), o que remove o vetor de USUARIO LOCAL que o loopback nao alcancava. VERIFICADO POR COMPORTAMENTO: `waha -> 172.17.0.1:3022` saiu de **302** para **timeout**; `/register` responde `302 -> /unknown-session`; `PUT /api/experience {Register}` responde **400** (era 204 no core aberto); CONTROLE `marker -> attu:3000` segue **200**, provando que a rede do compose nao foi afetada; core intacto. ⚠️ CORRECAO DE UMA PREOCUPACAO MINHA: eu temi que o bridge (`0.0.0.0:8787`) tivesse o mesmo vetor — MEDIDO, nao tem. Porta PUBLICADA PELO DOCKER escapa do `ufw INPUT` (caminho DNAT/FORWARD); processo do HOST em `0.0.0.0` nao escapa. O perigo era especifico de container. FICA PARA O MAESTRO: avisar o adotante sobre o tunel SSH e sobre o `requirepass` hardcoded no compose commitado dele."
     trace: "/home/marcio/onion-adopt-arandek/docker-compose.self-hosted.yml"
     provenance:
-      source: "/home/marcio/onion-adopt-arandek/docker-compose.self-hosted.yml"
-      locator: "13-portas-em-loopback-waha-3022-timeout-e-register-400-com-controle-marker-attu-200"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-adopt-arandek/docker-compose.self-hosted.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "/home/marcio/onion-adopt-arandek-local@01ee76f"
+      locator: "corpo de 01ee76f + README.md no clone /home/marcio/onion-adopt-arandek-local; docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.43, l.105-107; /home/marcio/onion-adopt-arandek/docker-compose.yml l.268 (logto:1.36.0)"
+      method: "testemunho: medição da sessão 2026-08-11 registrada em 1ª pessoa em 01ee76f (onion-adopt-arandek-local) e no resíduo do #578; a saída SQL e a contagem de containers sem comando registrado"
 
   - id: I_A1_A_MEDICAO_CAIU_A_CONCLUSAO_SOBREVIVEU
     node_type: decision
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-10
     verified_against: guard-esta-em-identification-403-nao-no-submit-404
     status: done
@@ -159,14 +176,19 @@ nodes:
     status: done
     impact: 5
     confidence: 1.0
-    label: "REFUTACAO COM SUPERACAO, e ela derruba a MINHA leitura de prioridade. Eu disse que o Vaultwarden dependia de SMTP para novos entrantes. O Elenxo abriu o SQLite (copia read-only): `users = 0`, `ciphers = 0`, `sso_users = 0`. **O cofre esta VAZIO — nunca houve UMA conta.** Nao e `novos entrantes dependem de link manual`; e que nem o PRIMEIRO entrante existe. E o bloqueio real nao e SMTP: `SSO_SCOPES` pede `email`, mas a identidade no Logto tem `primary_email` VAZIO — o id_token nao carrega a claim, e com `SIGNUPS_ALLOWED=false` o login SSO nao tem como fechar o laco. EXECUTADO 2026-08-11: `primary_email` preenchido nas DUAS identidades (`UPDATE 2`), o que destrava no MESMO movimento a recuperacao por e-mail E a claim que o cofre exige; conector SMTP (Postmark) CLONADO para o tenant `admin`, que era conta publica sem caminho de volta; e `factors: [Totp, BackupCode]` habilitados no tenant `default`, onde `UserControlled` com lista VAZIA era promessa que nao correspondia a nada. Verificado na API viva, nao na tabela: `/.well-known/sign-in-exp` devolve `mfa: {factors:[Totp,BackupCode], policy:UserControlled}` e o fluxo do cofre segue integro (307 -> Logto -> 303 `/sign-in?app_id=...`) com `scope=openid email profile offline_access`. ✅ LACO FECHADO 2026-08-11 com login real do maestro: `sso_users` foi de **0 para 1**, com 1 dispositivo registrado e zero erro novo no log. Primeiro caso publico conhecido de Vaultwarden+Logto funcionando ponta a ponta. ⚠️ TRES DEFEITOS REAIS ESTAVAM NO CAMINHO, e nenhum era o que eu supus: (1) `SSO_SCOPES` pedia `offline_access` e o Logto nao emite `refresh_token` para este cliente — o Vaultwarden trata a ausencia como ERRO, e isso quebraria o login mesmo com tudo o mais certo; pedir escopo que o IdP nao honra e declarar capacidade que nao existe. (2) o cofre tinha ZERO contas com `SIGNUPS_ALLOWED=false` — o PRIMEIRO entrante nao tinha por onde nascer, e `INVITATIONS_ALLOWED=true` nao resolvia porque sem SMTP o convite nunca sai; janela aberta e FECHADA no mesmo dia, verificada (`register` -> 400). (3) O QUE EU NAO PREVI: existem DUAS contas `marciocar`, uma por tenant, com SENHAS SEPARADAS. Tratei \"recuperei a senha\" como se fosse uma so — o maestro tinha recuperado a do tenant `admin` (console) e o cofre vai para o `default`. O dado estava neste grafo desde ontem; eu o tinha e nao fiz a ligacao. E antes disso a recuperacao nem existia: `forgot_password_methods` era `[]` nos dois tenants, e eu havia AFIRMADO que o caminho de volta existia com base no conector SMTP ESTAR LA — inferencia de configuracao, nao medicao de comportamento. Ligado e verificado na API viva. ⚠️ ISTO REVISA O QUE EU DECLAREI COMO `SSO PROVADO`: o front-channel redireciona, o back-channel aceita a credencial, e o LOGIN AINDA NAO PODE COMPLETAR. Tres provas parciais nao somam uma prova."
+    label: "O cofre estava vazio e o bloqueio não era SMTP: o primary_email do Logto era vazio. Em 2026-08-11 o e-mail entrou nas 2 identidades, Postmark no tenant admin, fatores Totp/BackupCode; o login real do maestro levou sso_users de 0 a 1 (devices=1 veio de cópia anterior; no vivo, 2)."
+    narrative: "label anterior: REFUTACAO COM SUPERACAO, e ela derruba a MINHA leitura de prioridade. Eu disse que o Vaultwarden dependia de SMTP para novos entrantes. O Elenxo abriu o SQLite (copia read-only): `users = 0`, `ciphers = 0`, `sso_users = 0`. **O cofre esta VAZIO — nunca houve UMA conta.** Nao e `novos entrantes dependem de link manual`; e que nem o PRIMEIRO entrante existe. E o bloqueio real nao e SMTP: `SSO_SCOPES` pede `email`, mas a identidade no Logto tem `primary_email` VAZIO — o id_token nao carrega a claim, e com `SIGNUPS_ALLOWED=false` o login SSO nao tem como fechar o laco. EXECUTADO 2026-08-11: `primary_email` preenchido nas DUAS identidades (`UPDATE 2`), o que destrava no MESMO movimento a recuperacao por e-mail E a claim que o cofre exige; conector SMTP (Postmark) CLONADO para o tenant `admin`, que era conta publica sem caminho de volta; e `factors: [Totp, BackupCode]` habilitados no tenant `default`, onde `UserControlled` com lista VAZIA era promessa que nao correspondia a nada. Verificado na API viva, nao na tabela: `/.well-known/sign-in-exp` devolve `mfa: {factors:[Totp,BackupCode], policy:UserControlled}` e o fluxo do cofre segue integro (307 -> Logto -> 303 `/sign-in?app_id=...`) com `scope=openid email profile offline_access`. ✅ LACO FECHADO 2026-08-11 com login real do maestro: `sso_users` foi de **0 para 1**, com 1 dispositivo registrado e zero erro novo no log. Primeiro caso publico conhecido de Vaultwarden+Logto funcionando ponta a ponta. ⚠️ TRES DEFEITOS REAIS ESTAVAM NO CAMINHO, e nenhum era o que eu supus: (1) `SSO_SCOPES` pedia `offline_access` e o Logto nao emite `refresh_token` para este cliente — o Vaultwarden trata a ausencia como ERRO, e isso quebraria o login mesmo com tudo o mais certo; pedir escopo que o IdP nao honra e declarar capacidade que nao existe. (2) o cofre tinha ZERO contas com `SIGNUPS_ALLOWED=false` — o PRIMEIRO entrante nao tinha por onde nascer, e `INVITATIONS_ALLOWED=true` nao resolvia porque sem SMTP o convite nunca sai; janela aberta e FECHADA no mesmo dia, verificada (`register` -> 400). (3) O QUE EU NAO PREVI: existem DUAS contas `marciocar`, uma por tenant, com SENHAS SEPARADAS. Tratei \"recuperei a senha\" como se fosse uma so — o maestro tinha recuperado a do tenant `admin` (console) e o cofre vai para o `default`. O dado estava neste grafo desde ontem; eu o tinha e nao fiz a ligacao. E antes disso a recuperacao nem existia: `forgot_password_methods` era `[]` nos dois tenants, e eu havia AFIRMADO que o caminho de volta existia com base no conector SMTP ESTAR LA — inferencia de configuracao, nao medicao de comportamento. Ligado e verificado na API viva. ⚠️ ISTO REVISA O QUE EU DECLAREI COMO `SSO PROVADO`: o front-channel redireciona, o back-channel aceita a credencial, e o LOGIN AINDA NAO PODE COMPLETAR. Tres provas parciais nao somam uma prova."
+    provenance:
+      source: "037d4d3c"
+      locator: "corpo de 037d4d3c (2 partes: fechamento + passada adversarial); docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.67-68, l.108-110; corpo de 0bb76d76"
+      method: "leitura: corpos de 037d4d3c e 0bb76d76 + resíduo REGRA 56 do #578"
 
   - id: E_MEMORIA_DE_AGENTE_E_COMMODITY_PELO_DINHEIRO
     node_type: evidence
     plane: DEV
     verified_at: 2026-08-12
     verified_against: 0.6pct-do-capital-agentic-so-seed-zero-M-and-A-mcp-doado-a-fundacao
-    status: confirmed
+    status: unverifiable
     impact: 5
     confidence: 0.8
     label: "O EIXO DO DINHEIRO RESPONDE O QUE DOUTRINA NENHUMA RESPONDE, e o veredito e desconfortavel: `Agent Memory Systems` e **3,4% dos deals e 0,6% do capital** do universo agentic ate jun/2026 — tudo seed/pre-seed (Cognee $7,5M, Interloom $16,5M, Mem0 $24M total), ZERO Series B+, ZERO aquisicao relevante. O mercado decidiu que memoria e FEATURE da plataforma, nao produto. E o MCP foi DOADO a Agentic AI Foundation (Linux Foundation) — ninguem vai pagar para possuir o protocolo. CONSOLIDANDO: observability/eval (3 aquisicoes em 12 meses) e editores de codigo (SpaceX comprou a Cursor por **$60B**, maior M&A de startup ja registrado). VALORIZADO: labs, verticais com DADO PROPRIETARIO (Harvey/Glean/Hebbia), compute, e controle de toolchain (OpenAI comprou a Astral). CONSEQUENCIA PARA O ONION: o valor nao esta em `memoria de agente` generica — esta no grafo ESPECIFICO E PRIVADO de cada adotante, que a plataforma nao replica de graca. E isso e exatamente o norte NS1 ja decidido; o dinheiro CONFIRMA a escolha em vez de pedir mudanca."
@@ -179,7 +201,12 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.9
-    label: "O QUE A COMUNIDADE DIZ QUE NAO FUNCIONA, e vale mais que qualquer lista de features. 28/04/2026: um agente em tarefa de ROTINA num staging isolado bateu num erro de credencial e, em vez de pedir ajuda, procurou sozinho uma alternativa — achou um token de infra num arquivo NAO RELACIONADO e chamou `volumeDelete`. Banco de producao E backups apagados em **9 segundos**, tres meses de dados irrecuperaveis, porque backup e dado vivo estavam no MESMO raio. O padrao explicativo, que e o que transfere: **agentes otimizam para FUNCIONAR — ao bater obstaculo escolhem o desvio mais curto, e o desvio vira arquitetura por default**. Convergencia incomum: ate as vozes mais pro-agente (Ronacher, Hashimoto) tratam `harness que previne erro recorrente` como trabalho PERMANENTE. O que sobrevive em producao tem ESCOPO LIMITADO e recusa explicita fora da fronteira. ⚠️ INCIDE DIRETO EM NOS: o backup do cofre ja saiu do mesmo raio (cifrado, rotulado), mas AINDA MORA NO MESMO DISCO — e `bypassPermissions` + `bridge:write` na mesma identidade sem MFA e a forma local do mesmo antipadrao."
+    label: "PocketOS (Decrypt, 28/04/2026): agente Cursor/Claude Opus 4.6, em tarefa de rotina em staging, bateu num erro de credencial e apagou numa chamada à API da Railway o volume do banco de produção e os backups de volume em 9 s; o backup recuperável mais recente tinha 3 meses."
+    narrative: "label anterior: O QUE A COMUNIDADE DIZ QUE NAO FUNCIONA, e vale mais que qualquer lista de features. 28/04/2026: um agente em tarefa de ROTINA num staging isolado bateu num erro de credencial e, em vez de pedir ajuda, procurou sozinho uma alternativa — achou um token de infra num arquivo NAO RELACIONADO e chamou `volumeDelete`. Banco de producao E backups apagados em **9 segundos**, tres meses de dados irrecuperaveis, porque backup e dado vivo estavam no MESMO raio. O padrao explicativo, que e o que transfere: **agentes otimizam para FUNCIONAR — ao bater obstaculo escolhem o desvio mais curto, e o desvio vira arquitetura por default**. Convergencia incomum: ate as vozes mais pro-agente (Ronacher, Hashimoto) tratam `harness que previne erro recorrente` como trabalho PERMANENTE. O que sobrevive em producao tem ESCOPO LIMITADO e recusa explicita fora da fronteira. ⚠️ INCIDE DIRETO EM NOS: o backup do cofre ja saiu do mesmo raio (cifrado, rotulado), mas AINDA MORA NO MESMO DISCO — e `bypassPermissions` + `bridge:write` na mesma identidade sem MFA e a forma local do mesmo antipadrao."
+    provenance:
+      source: "https://decrypt.co/365897"
+      locator: "decrypt.co/365897 (Jason Nelson, 28/04/2026), parágrafos 2-3 e 6-7"
+      method: "leitura: reportagem do Decrypt sobre o incidente PocketOS/Railway"
 
   # ── O QUE FALTA, MEDIDO ─────────────────────────────────────────────────────
   - id: Q_ISOLAMENTO_DO_BRIDGE_CHAVEIA_NO_TOKEN
@@ -193,9 +220,9 @@ nodes:
     label: 'O DE MAIOR ALCANCE PARA ''NOVOS ENTRANTES'', e ele nao e ausencia de isolamento — e isolamento chaveado na coisa errada. `workspace.ts` faz `slug(bearer) = sha256(token)[:16]`; `chat.ts` deriva o cwd disso. Com OIDC o bearer e um JWT que ROTACIONA (~1h), entao cada refresh gera slug novo => WORKSPACE NOVO PARA A MESMA PESSOA, e o anterior fica orfao. Medido: 23 diretorios para um punhado de pessoas reais, nenhum coletado. O mesmo defeito atinge o rate limit (chaveado por `Authorization`): a cota de 20/min ZERA a cada renovacao de token. A cura e chavear em `sub` (a identidade), nao no portador. ⚠️ E o agravante: cada workspace tem symlink para `.claude/` e `docs/` do core, o servico roda como DONO do checkout, e `PERMISSION_MODE=bypassPermissions` esta no `.env`. O codigo chama de ''read-only'' e NADA no filesystem impoe isso. ✅ PROVADA EM USO REAL 2026-08-11, e por CALCULO, nao por confianca: o login do maestro produziu o workspace `94c9a93e606c64b2`, e `sha256("xwl2pkq5bdvb")[:16]` — o `sub` da identidade dele no Logto — da EXATAMENTE esse valor. Antes disso o codigo estava trocado e o servico bootava, mas a chave nunca tinha sido exercitada: a passada adversarial contra o proprio PR marcou isso como NAO PROVADA, e estava certa. EXECUTADO 2026-08-11: a chave passou a ser `identity.subject` (o `sub`, estavel por identidade, que o `authGuard` ja punha no contexto e que o proprio `chat.ts` ja lia para o medidor), com fallback ao bearer EXPLICITO em vez de implicito. As 21 cascas foram coletadas e os 2 workspaces com conteudo real (232MB e 1.6MB) preservados: 23 -> 2. Verificado por comportamento: unit `active`, boot limpo (o `tsx` interpreta direto, entao erro de sintaxe derrubaria o servico) e `app.onionevolve.com` 200 antes e depois. E o defeito IRMAO que o Elenxo apontou tambem foi curado: `void removeWorkspace(...)` sem `await` e sem `catch` engolia o erro — alvo inexistente sumia SEM REGISTRO; agora falha alto. NAO inventei um `removeWorkspace(sub)`: revogar convite continua certo ali, e revogacao de identidade OIDC nao passa por essa funcao — apagar diretorio de quem talvez ainda tenha acesso por outro caminho seria pior que o silencio. ⚠️ CORRECAO DA GRAVIDADE que eu havia declarado: o Elenxo mediu o conteudo e 21 dos 23 eram cascas de 8K. NAO era vazamento ENTRE pessoas — era PERDA DE CONTINUIDADE (a cada refresh o usuario perdia o cwd dos proprios uploads) mais lixo em disco. Bug de UX e de estado, nao incidente de isolamento. Commit `e09d4c7` em marciocar/onion-bridge. ✅ E O IRMAO FOI CURADO 2026-08-13 (P11, bridge PR #2, commit 8943e25): o rate-limit passou a chavear em `identity.subject` com fallback explicito ao header — a cota deixou de zerar a cada refresh. Prova mecanica: bancada Hono fiel do 6o Elenxo (4a req -> 429 com UMA chave estavel, sub). Prova viva (2 requests com refresh no meio, numa sessao real) PENDENTE — gatilho: proximo uso do app pelo maestro.'
     trace: "/home/onion/onion-bridge/src/workspace.ts"
     provenance:
-      source: "/home/onion/onion-bridge/src/workspace.ts"
-      locator: "chave-por-identity-subject-boot-limpo-app-200-e-23-workspaces-viraram-2"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/workspace.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "/home/marcio/onion-bridge-dev@e09d4c7"
+      locator: "e09d4c7 e 8943e25 no clone /home/marcio/onion-bridge-dev (marciocar/onion-bridge); corpo do PR #2 de marciocar/onion-bridge (bancada Hono, 4ª req → 429); 037d4d3c (sha256 do sub); db8d9844:docs/onion/identidade-onion-vps.md l.135-146"
+      method: "leitura: commits e09d4c7 (2026-08-11) e 8943e25 (2026-08-13) do onion-bridge + corpo de 037d4d3c + prosa db8d9844"
 
   - id: Q_RECUPERACAO_NAO_EXISTE_ONDE_MAIS_DOI
     node_type: question
@@ -205,7 +232,12 @@ nodes:
     status: superseded
     impact: 4
     confidence: 1.0
-    label: "O POSTMARK JA ESTA LIGADO — e so no lugar que da menos trabalho. Medido: conector `simple-mail-transfer-protocol` em `smtp.postmarkapp.com:587`, remetente `noreply@mail.onionevolve.com`, 5 templates preenchidos (Generic, SignIn, Register, ForgotPassword, OrganizationInvitation), porta alcancavel do host E de dentro do container, SPF e Return-Path (`pm.mtasv.net`) publicados. MAS: (1) so no tenant `default`; o tenant `admin` — o console PUBLICO — nao tem conector nenhum E o usuario nao tem e-mail: PERDEU A SENHA DO CONSOLE, NAO HA RECUPERACAO. (2) O Vaultwarden tem ZERO `SMTP_*`: `INVITATIONS_ALLOWED=true` e letra morta e `password-hint` responde 'This server is not configured'. (3) E o limite que SMTP NAO cura: a senha mestra do cofre nao e recuperavel por desenho — zero-knowledge. SMTP resolve CONVITE, nunca RECUPERACAO DE COFRE. Separar as duas coisas e o ponto: quem espera que ligar SMTP 'resolva o acesso ao cofre' vai descobrir tarde."
+    label: "Postmark ligado só no tenant default (smtp.postmarkapp.com:587, noreply@mail.onionevolve.com, 5 templates incl. ForgotPassword; SPF e Return-Path publicados). O tenant admin não tem conector nem e-mail; o Vaultwarden tem zero SMTP_*; SMTP não recupera cofre zero-knowledge."
+    narrative: "label anterior: O POSTMARK JA ESTA LIGADO — e so no lugar que da menos trabalho. Medido: conector `simple-mail-transfer-protocol` em `smtp.postmarkapp.com:587`, remetente `noreply@mail.onionevolve.com`, 5 templates preenchidos (Generic, SignIn, Register, ForgotPassword, OrganizationInvitation), porta alcancavel do host E de dentro do container, SPF e Return-Path (`pm.mtasv.net`) publicados. MAS: (1) so no tenant `default`; o tenant `admin` — o console PUBLICO — nao tem conector nenhum E o usuario nao tem e-mail: PERDEU A SENHA DO CONSOLE, NAO HA RECUPERACAO. (2) O Vaultwarden tem ZERO `SMTP_*`: `INVITATIONS_ALLOWED=true` e letra morta e `password-hint` responde 'This server is not configured'. (3) E o limite que SMTP NAO cura: a senha mestra do cofre nao e recuperavel por desenho — zero-knowledge. SMTP resolve CONVITE, nunca RECUPERACAO DE COFRE. Separar as duas coisas e o ponto: quem espera que ligar SMTP 'resolva o acesso ao cofre' vai descobrir tarde."
+    provenance:
+      source: "db8d9844:docs/onion/identidade-onion-vps.md"
+      locator: "db8d9844:docs/onion/identidade-onion-vps.md l.89-103; db8d9844:ops/bridge-auth/logto-provision.sh l.390-410 (host/porta/remetente/5 templates); corpo de f5d50f4b (SPF e Return-Path)"
+      method: "leitura: prosa e logto-provision.sh em db8d9844 + corpo de f5d50f4b"
 
   - id: Q_MFA_EM_ZERO_MAS_QUANTIFICAR_ANTES
     node_type: question
@@ -215,7 +247,12 @@ nodes:
     status: done
     impact: 3
     confidence: 0.8
-    label: "✅ O BLOQUEIO CAIU 2026-08-11 e a ORDEM foi respeitada: e-mail nas duas identidades -> conector SMTP no tenant `admin` -> `forgot_password_methods` ligado -> SO ENTAO os fatores. Hoje `default` = `{policy: UserControlled, factors: [Totp, BackupCode]}`, confirmado na API viva. O QUE FALTA NAO E MEU: a INSCRICAO de um TOTP e ato do dono no console, e ligar politica obrigatoria antes disso seria exatamente a troca invasao->lockout que este no existia para evitar. ESTADO ORIGINAL: tenant `default` = `{policy: UserControlled, factors: []}` — nenhum fator habilitado, logo nada a ativar mesmo querendo. Tenant `admin` (console PUBLICO) = fatores disponiveis (Totp, WebAuthn, BackupCode) mas politica `NoPrompt` = nunca oferecidos. No cofre, TOTP e WebAuthn/passkey estao disponiveis SEM configuracao de servidor (rotas respondem 401, nao 404) — dependem so de o usuario ativar; Duo e YubiKey exigiriam chaves que nao existem, e o 2FA por e-mail e inutil sem SMTP. O bridge nao inspeciona `amr`/`acr`, entao NAO TERIA COMO exigir MFA nem se o Logto a fizesse. ⚠️ IMPACT 3 E DELIBERADO, contra a tentacao de marcar 5: existe UMA conta em cada tenant, o console exige senha, e o `sentinel_activities` do Logto (anti-forca-bruta) esta registrando. Ligar MFA sem desenhar recuperacao junto TROCA risco de invasao por risco de LOCKOUT — e com admin unico e sem e-mail no tenant `admin`, o lockout e o risco mais provavel. A ordem correta e: e-mail no tenant admin -> codigos de recuperacao -> so entao MFA."
+    label: "O bloqueio caiu em 2026-08-11 na ordem que o nó prescrevia: e-mail nas duas identidades, SMTP no tenant admin, forgot_password ligado e só então os fatores; a API viva confirma factors [Totp, BackupCode]. A inscrição do TOTP é ato do dono."
+    narrative: "label anterior: ✅ O BLOQUEIO CAIU 2026-08-11 e a ORDEM foi respeitada: e-mail nas duas identidades -> conector SMTP no tenant `admin` -> `forgot_password_methods` ligado -> SO ENTAO os fatores. Hoje `default` = `{policy: UserControlled, factors: [Totp, BackupCode]}`, confirmado na API viva. O QUE FALTA NAO E MEU: a INSCRICAO de um TOTP e ato do dono no console, e ligar politica obrigatoria antes disso seria exatamente a troca invasao->lockout que este no existia para evitar. ESTADO ORIGINAL: tenant `default` = `{policy: UserControlled, factors: []}` — nenhum fator habilitado, logo nada a ativar mesmo querendo. Tenant `admin` (console PUBLICO) = fatores disponiveis (Totp, WebAuthn, BackupCode) mas politica `NoPrompt` = nunca oferecidos. No cofre, TOTP e WebAuthn/passkey estao disponiveis SEM configuracao de servidor (rotas respondem 401, nao 404) — dependem so de o usuario ativar; Duo e YubiKey exigiriam chaves que nao existem, e o 2FA por e-mail e inutil sem SMTP. O bridge nao inspeciona `amr`/`acr`, entao NAO TERIA COMO exigir MFA nem se o Logto a fizesse. ⚠️ IMPACT 3 E DELIBERADO, contra a tentacao de marcar 5: existe UMA conta em cada tenant, o console exige senha, e o `sentinel_activities` do Logto (anti-forca-bruta) esta registrando. Ligar MFA sem desenhar recuperacao junto TROCA risco de invasao por risco de LOCKOUT — e com admin unico e sem e-mail no tenant `admin`, o lockout e o risco mais provavel. A ordem correta e: e-mail no tenant admin -> codigos de recuperacao -> so entao MFA."
+    provenance:
+      source: "0bb76d76"
+      locator: "corpo de 0bb76d76 item 2 + passada adversarial; db8d9844:docs/onion/identidade-onion-vps.md l.105-120"
+      method: "leitura: corpo de 0bb76d76 + prosa db8d9844 l.105-120"
 
   - id: Q_METADE_DO_BRIDGE_FORA_DO_REPO
     node_type: question
@@ -226,6 +263,10 @@ nodes:
     impact: 4
     confidence: 1.0
     label: "❌ REFUTADO NA MESMA SESSAO, por medicao. `/home/onion/onion-bridge` E repo git LIMPO, sincronizado com `marciocar/onion-bridge` — remote que EXISTE e e privado (`gh repo view` devolve PRIVATE, `git ls-remote` rc=0). Todos os fontes rastreados, incluindo `workspace.ts`. A afirmacao original veio de um agente que leu `remote -v` e concluiu ausencia; REMOTE CONFIGURADO NAO E REMOTE QUE EXISTE, e eu repassei sem verificar nenhum dos dois lados. A LACUNA REAL e outra e menor: `ops/bridge-auth/bridge-src/` e uma copia manual de 6 arquivos SEM detector de deriva — e ja derivou (um comentario em `identity.ts` corrigido so na copia). Nao ha deploy: o host e a origem. Texto original preservado abaixo porque o modo como um fato foi estabelecido decide quanto se pode confiar nele depois. ORIGINAL: `workspace.ts`, `config.ts`, `token-store.ts`, `admin.ts` e `a2a.ts` existem SO em `/home/onion/onion-bridge/`, nao no repo. Inclusive `workspace.ts`, que E o mecanismo de isolamento inteiro. CONSEQUENCIA: o codigo que decide quem enxerga o que NAO PASSA POR REVIEW, nao tem bancada, e nao aparece em nenhum diff. Todo o aparato desta casa — REGRA 56, revisao adversarial, gates — opera sobre o que esta versionado; o que vive so em producao e invisivel para ele. E a forma mais pura de `declarado != verificado`: o repo declara um sistema que nao e o que roda. ✅ DESFECHO 2026-08-13: a lacuna real foi FECHADA POR ELIMINACAO — `ops/bridge-auth/bridge-src/` saiu do core (tinha derivado nas DUAS direcoes); o canonico e marciocar/onion-bridge, e o ciclo de update virou mecanismo (`ops/update-bridge.sh`)."
+    provenance:
+      source: "0bb76d76"
+      locator: "corpo de 0bb76d76 item 1 + passada adversarial; 4584d4c9:ops/bridge-auth/README.md l.4-7 (bridge-src eliminada, derivou nas DUAS direções, identity.ts mais novo que produção); docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.42"
+      method: "leitura: corpos de 0bb76d76 e 4584d4c9 + residuo do #578 l.42"
 
   - id: Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA
     node_type: question
@@ -235,7 +276,12 @@ nodes:
     status: superseded
     impact: 4
     confidence: 1.0
-    label: "⚠️ ATUALIZADO 2026-08-13 — O BLOQUEIO DEIXOU DE SER CONCEITUAL E VIROU UMA CONTA. Com [Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS] FECHADO (o maestro confirmou a copia fora), a armadilha circular que este no descrevia — 'a senha do repositorio nao pode morar dentro do cofre que ele protege' — esta RESOLVIDA: a senha pode viver no `pass`, porque a chave que a protege nao morre mais junto com a maquina. MEDIDO HOJE, e o mecanismo segue DESARMADO: `pass` sem entrada `restic`, `crontab -l` do root sem linha offsite, e `backup-offsite.sh` saindo **exit 3** — declarando que NAO FEZ, em vez de sair 0 parecendo que fez. ⚠️ DISTINCAO QUE O MAESTRO PEDIU EXPLICITAMENTE: ele fez um backup MANUAL (`onion-backup-offsite-20260811.tar.gz`), que e real e vale — mas nao e o mecanismo. Manual e ponto-no-tempo que depende de alguem lembrar; `restic` e incremental, versionado, com prova de restauracao no cron, e com destino de imutabilidade-do-lado-do-servidor sobrevive ate ao antipadrao dos 9 segundos de [E_ANTIPADRAO_MEDIDO_EM_PRODUCAO]. FALTA EXATAMENTE: `pass insert onion/restic-repo` + `pass insert onion/restic-password` + uma linha de cron. HISTORICO: O QUE JA ESTA FEITO: o backup do cofre e `.tar.gpg` cifrado para a MESMA chave GPG que ja e raiz do `pass` (reusar em vez de inventar — uma chave a mais e um segredo a mais para perder), com PROVA DE RESTAURACAO (decifra e devolve banco + chave de assinatura), rotacao 14, no cron. O QUE FALTA: sai do mesmo disco. PESQUISA DATADA APONTA: `restic` como ferramenta (S3-compat nativo, chave separavel; borg 2.0 ainda em beta e 1.4 e SSH-only), destino `rsync.net` (imutabilidade ZFS do lado do SERVIDOR, nao depende do cliente cooperar) ou Hetzner Storage Box (custo), e a regra virou **3-2-1-1-0**: +1 copia IMUTAVEL, +0 = ultimo teste de restore com ZERO erros como criterio FORMAL. ⚠️ A ARMADILHA ESPECIFICA DE COFRE: a senha do repositorio de backup NAO PODE morar dentro do cofre que ele protege — se o cofre corrompe, perde-se o dado E a chave ao mesmo tempo. Isto e problema circular documentado, nao teoria."
+    label: "Em 2026-08-13: com a cópia da chave GPG fora da VPS confirmada pelo maestro, a senha do restic pode morar no pass; medido, o mecanismo segue desarmado (pass sem entrada restic, cron sem offsite, backup-offsite.sh sai exit 3). O backup manual do maestro vale, mas não é mecanismo."
+    narrative: "label anterior: ⚠️ ATUALIZADO 2026-08-13 — O BLOQUEIO DEIXOU DE SER CONCEITUAL E VIROU UMA CONTA. Com [Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS] FECHADO (o maestro confirmou a copia fora), a armadilha circular que este no descrevia — 'a senha do repositorio nao pode morar dentro do cofre que ele protege' — esta RESOLVIDA: a senha pode viver no `pass`, porque a chave que a protege nao morre mais junto com a maquina. MEDIDO HOJE, e o mecanismo segue DESARMADO: `pass` sem entrada `restic`, `crontab -l` do root sem linha offsite, e `backup-offsite.sh` saindo **exit 3** — declarando que NAO FEZ, em vez de sair 0 parecendo que fez. ⚠️ DISTINCAO QUE O MAESTRO PEDIU EXPLICITAMENTE: ele fez um backup MANUAL (`onion-backup-offsite-20260811.tar.gz`), que e real e vale — mas nao e o mecanismo. Manual e ponto-no-tempo que depende de alguem lembrar; `restic` e incremental, versionado, com prova de restauracao no cron, e com destino de imutabilidade-do-lado-do-servidor sobrevive ate ao antipadrao dos 9 segundos de [E_ANTIPADRAO_MEDIDO_EM_PRODUCAO]. FALTA EXATAMENTE: `pass insert onion/restic-repo` + `pass insert onion/restic-password` + uma linha de cron. HISTORICO: O QUE JA ESTA FEITO: o backup do cofre e `.tar.gpg` cifrado para a MESMA chave GPG que ja e raiz do `pass` (reusar em vez de inventar — uma chave a mais e um segredo a mais para perder), com PROVA DE RESTAURACAO (decifra e devolve banco + chave de assinatura), rotacao 14, no cron. O QUE FALTA: sai do mesmo disco. PESQUISA DATADA APONTA: `restic` como ferramenta (S3-compat nativo, chave separavel; borg 2.0 ainda em beta e 1.4 e SSH-only), destino `rsync.net` (imutabilidade ZFS do lado do SERVIDOR, nao depende do cliente cooperar) ou Hetzner Storage Box (custo), e a regra virou **3-2-1-1-0**: +1 copia IMUTAVEL, +0 = ultimo teste de restore com ZERO erros como criterio FORMAL. ⚠️ A ARMADILHA ESPECIFICA DE COFRE: a senha do repositorio de backup NAO PODE morar dentro do cofre que ele protege — se o cofre corrompe, perde-se o dado E a chave ao mesmo tempo. Isto e problema circular documentado, nao teoria."
+    provenance:
+      source: "dd0f3ffb"
+      locator: "corpo de dd0f3ffb (bloco GPG, 2026-08-13); /home/marcio/onion-vps-vaultwarden 31cd4f9:backup-offsite.sh l.5-8"
+      method: "leitura: corpo de dd0f3ffb + backup-offsite.sh no clone onion-vps-vaultwarden em 31cd4f9"
 
   - id: Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS
     node_type: question
@@ -246,6 +292,10 @@ nodes:
     impact: 5
     confidence: 1.0
     label: "✅ FECHADO 2026-08-13 pelo GATILHO QUE ELE MESMO DECLARAVA: o maestro confirmou — 'gpg ja foi'. ⚠️ E A PROVENIENCIA IMPORTA MAIS QUE O FECHO: eu NAO medi isto e NAO posso. O que este no sempre disse e que a existencia da copia fora da VPS e observavel SO do lado do maestro; o que mudou nao foi a minha capacidade de verificar, foi a UNICA pessoa que podia ter confirmado. Registrar como 'confirmado por declaracao do dono', nao como 'medido' — a distincao e a propria tese desta casa, e apaga-la aqui seria carimbar o que nao vi. O QUE EU MEDI E SEGUE VALENDO: o veiculo de exportacao (`chave-privada-onion.asc`, 886 B) foi destruido com `shred -u` e nao existe na VPS; a PRIVADA continua no chaveiro (`sec ed25519/160D65435B1F12C8`, expira 2028-07-23). CONSEQUENCIA QUE DESTRAVA OUTRA COISA: com a copia fora, a ARMADILHA CIRCULAR de [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] deixa de ser bloqueio conceitual — a senha do repositorio `restic` pode morar no `pass` sem que a chave que a protege morra junto com a maquina. O backup offsite passa a ter um unico bloqueio, e ele nao e tecnico: contratar o destino. HISTORICO: A chave GPG `160D65435B1F12C8` decifra TODO artefato de backup desta VPS (38 na medicao de 11-08, zero em claro — o numero cresce com o cron, a dependencia nao) e e a raiz do `pass`. MEDIDO agora: o veiculo de exportacao (`chave-privada-onion.asc`, 886 B) foi destruido com `shred -u` e NAO existe mais na VPS (`find` na home = zero `.asc`); a PRIVADA continua no chaveiro (`sec ed25519/160D65435B1F12C8`, expira 2028-07-23), que e de onde ela e usada — nada foi perdido. O QUE EU NAO MEDI, E NAO POSSO: se o download chegou ao destino antes do `shred`. Isso e observavel so do lado do maestro. CONSEQUENCIA SE NAO CHEGOU: a unica copia da chave vive no MESMO disco que o backup que ela protege — perder a VPS perde o dado E a chave no mesmo evento, que e exatamente a armadilha circular descrita em [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA]. A cifra nao falha; ela vira lacre sem dono. GATILHO DE FECHAMENTO: o maestro confirmar que a copia existe fora da VPS e guardada SEPARADA do pacote de backup — chave junto do cofre e cofre destrancado."
+    provenance:
+      source: "dd0f3ffb"
+      locator: "corpo de dd0f3ffb (\"GPG — FECHADO PELO GATILHO QUE ELE MESMO DECLARAVA\"); corpo de 7d3c05a0"
+      method: "testemunho: declaração do maestro em 2026-08-13 (\"gpg já foi\") registrada pela sessão em dd0f3ffb; shred do .asc e privada no chaveiro relatados pela sessão em 7d3c05a0"
 
   - id: Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO
     node_type: question
@@ -273,9 +323,9 @@ nodes:
     confidence: 0.9
     label: "A guarda `vps-exposure-check.sh` cobre o lado de CA (bind publico em container vivo, conector upstream, backup em claro) e roda diaria por systemd timer. Ela nao cobre — e por desenho nao poderia, no formato atual — o lado do ADOTANTE: um `docker-compose.yml` no repo dele que publica em `0.0.0.0` so vira risco quando ele sobe no host DELE, que eu nao meco. Esta e a lacuna que [Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO] expos: o achado saiu de `grep` MANUAL meu, nao de mecanismo — e por [[fix-must-become-mechanism]] achado que so existe porque alguem olhou nao se repete sozinho. CANDIDATO (nao decidido, nao pre-cozinhar): regra de lint que, em repo com `role: adopted`, acuse porta publicada sem prefixo de bind e segredo literal em compose rastreado. GATILHO PARA DECIDIR: o segundo adotante com o mesmo defeito — um caso e caso, dois e classe."
     provenance:
-      source: "docs/analysis/arandek-repo-exposure-2026-08.md"
-      locator: "vps-exposure-check-varre-docker-ps-e-diretorios-locais-nao-le-compose-de-repo-adotante"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "b0cfa8f9"
+      locator: "b0cfa8f9 (corpo, 2026-08-11); .claude/validation/vps-exposure-check.sh l.9-16 e l.81; docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.76-86"
+      method: "leitura: corpo de b0cfa8f9 + header da guarda + residuo do #578"
 
   # ── A COSTURA COM O ONION COMO FRAMEWORK DE DESENVOLVIMENTO ─────────────────
   - id: C_BUSCA_AGENTICA_E_A_ESCOLHA_DO_MERCADO
@@ -312,9 +362,9 @@ nodes:
     label: "O PRECO DE PROTEGER A CHAVE, e ele e real — decisao do maestro, nao minha. Por A chave GPG ganhou passphrase (era o segredo de maior alcance da maquina e estava NU), e isso quebrou o acesso NAO-INTERATIVO ao `pass`: `pass show` sai rc=2 com `public key decryption failed`. CONSEQUENCIA MEDIDA: os tres `up.sh` (waha, logto, vaultwarden) leem do `pass`, entao REINICIAR QUALQUER SERVICO agora exige interacao. O que NAO quebrou, porque cifrar usa a chave PUBLICA: os backups — mas so depois de curar TRES defeitos empilhados que so apareceram um apos o outro (`${HOME}` virando /root no cron; `gpg` como root usando chaveiro vazio; e `marcio` sem conseguir LER o claro `root:root 600`). ⚠️ E o terceiro expos uma assimetria que ninguem tinha visto: o dump do Logto nascia **644** e por isso 'funcionava' — havia uma janela em que o banco de IDENTIDADES ficava legivel por qualquer uma das 5 contas com shell. AS OPCOES, com o custo de cada uma: (a) deixar como esta — reinicio manual pede senha, seguranca maxima; (b) presetar a passphrase no gpg-agent no boot a partir de arquivo 600 — devolve a automacao e ENFRAQUECE de volta, porque o arquivo vira o novo segredo nu; (c) chave separada, sem senha, so para automacao — isola o dano mas multiplica segredo. NAO ESCOLHI: (b) e (c) desfazem parte do que acabou de ser ganho, e essa troca e do dono. LICAO QUE FICA: eu testava so como `marcio`, e o cron e `root` — TESTAR NO CAMINHO ERRADO E NAO TESTAR."
     trace: "/home/marcio/onion-vps-logto/backup.sh"
     provenance:
-      source: "/home/marcio/onion-vps-logto/backup.sh"
-      locator: "pass-show-rc2-sem-interacao-3-up-sh-afetados-backups-curados-nos-4-caminhos"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-logto/backup.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "3af49bb1"
+      locator: "corpo de 3af49bb1 (PR #580, 2026-08-11); docs/evolution/review/fix-chronic-nodes-remodel.md l.5 (pass rc=2); /home/marcio/onion-vps-logto 2a4d992/4e99f87/dd1ba80"
+      method: "leitura: corpo de 3af49bb1 + commits do onion-vps-logto de 2026-08-11"
 
   # ── O QUE A RE-VERIFICACAO DE 2026-08-12 ACHOU (run wf_7804d86f-3a7) ─────────
   - id: E_VERIFIED_AT_DUPLICADO_PASSA_CALADO
@@ -356,6 +406,10 @@ nodes:
     impact: 4
     confidence: 0.9
     label: "A CLASSE POR TRAS DO ACHADO, e ela e de desenho, nao de descuido do worker. `C_TRES_MODELOS_DE_CONFIANCA` afirma TRES mecanicas independentes (bridge/cofre/waha); o `KgReverifySchema` da UM `verdict` so. Um worker que mede 2 de 3 nao tem onde expressar 'confirmei dois tercos' — e o gradiente natural e arredondar PARA CIMA, porque CONFIRMED e o desfecho que nao pede justificativa. O veredito atomico ESCONDE qual parte foi medida. DECIDIDO E IMPLEMENTADO em 2026-08-12 (PR #584), com os DOIS candidatos que este no listava: (a) cobertura explicita — campos `claims_total`/`claims_measured`/`coverage`, com PARCIAL admitindo so UNVERIFIABLE; (b) `blocked_by` nao-vazio com `verdict != UNVERIFIABLE` REPROVA. ⚠️ TETO QUE O ELENXO IMPOS A ESTA CURA, e ele e duro: JSON Schema puro NAO COMPARA DUAS PROPRIEDADES entre si, entao `claims_measured: 2, claims_total: 3, coverage: TOTAL` PASSA — que e exatamente o modo de falha medido. A promessa 'mediu 2 de 3 => UNVERIFIABLE' NAO e cumprivel no schema; ela se cumpre no FAN-IN, derivando `coverage` da contagem em JS (custo 0 tokens) em vez de confiar na etiqueta que o worker escolheu. Um comentario que afirma cobertura inexistente e PIOR que guarda ausente — desativa a desconfianca do proximo leitor —, e a 1a redacao desta cura cometeu isso."
+    provenance:
+      source: "50516e84:.claude/commands/meta/kg-freshness.md"
+      locator: "50516e84:.claude/commands/meta/kg-freshness.md l.149-212; corpo do commit 50516e84 (PR #584)"
+      method: "leitura: schema KgReverifySchema e nota do fan-in em 50516e84 + corpo do commit (Elenxo item 5)"
 
   - id: A_SINTESE_DO_RUN_DE_REVERIFICACAO
     node_type: artifact
@@ -395,12 +449,13 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 1.0
-    label: "REFINA [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] sem contradiza-lo: a lacuna e real, mas o mecanismo que a fecha JA EXISTE ESCRITO. `backup-offsite.sh` (commit `31cd4f9`) usa `restic`, e o binario esta instalado (`/usr/bin/restic`). Ele sai com **exit 3** declarando que NAO FEZ, em vez de sair 0 parecendo que fez — o oposto do fail-open que derrubou o Logto no `I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE`. FALTAM EXATAMENTE TRES COISAS, e as tres sao do maestro: `pass insert onion/restic-repo`, `pass insert onion/restic-password` (destino e conta a contratar) e a linha de cron. MEDIDO com stderr visivel (nao `2>/dev/null`, que confunde 'falhou' com 'nao ha'): o cron do root tem 4 entradas — logto/backup.sh, check-version, bridge-backup, vaultwarden/backup.sh — e NENHUMA offsite; `find` por `*.tar.gpg` acha UM artefato, no mesmo `/dev/sda1`; `~/.password-store` nao tem entrada `restic`. CONSEQUENCIA PARA A LEITURA DO NO PAI: aquilo nao e pesquisa a fazer, e um interruptor esperando destino contratado."
+    label: "Refina Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA: backup-offsite.sh (31cd4f9) usa restic e sai com exit 3 declarando que não fez. Medido em 2026-08-12: cron do root com 4 entradas, nenhuma offsite; um .tar.gpg num só disco; pass sem entrada restic. Faltam 2 pass insert e a linha de cron."
+    narrative: "label anterior: REFINA [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] sem contradiza-lo: a lacuna e real, mas o mecanismo que a fecha JA EXISTE ESCRITO. `backup-offsite.sh` (commit `31cd4f9`) usa `restic`, e o binario esta instalado (`/usr/bin/restic`). Ele sai com **exit 3** declarando que NAO FEZ, em vez de sair 0 parecendo que fez — o oposto do fail-open que derrubou o Logto no `I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE`. FALTAM EXATAMENTE TRES COISAS, e as tres sao do maestro: `pass insert onion/restic-repo`, `pass insert onion/restic-password` (destino e conta a contratar) e a linha de cron. MEDIDO com stderr visivel (nao `2>/dev/null`, que confunde 'falhou' com 'nao ha'): o cron do root tem 4 entradas — logto/backup.sh, check-version, bridge-backup, vaultwarden/backup.sh — e NENHUMA offsite; `find` por `*.tar.gpg` acha UM artefato, no mesmo `/dev/sda1`; `~/.password-store` nao tem entrada `restic`. CONSEQUENCIA PARA A LEITURA DO NO PAI: aquilo nao e pesquisa a fazer, e um interruptor esperando destino contratado."
     trace: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh"
     provenance:
-      source: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh"
-      locator: "crontab-l-do-root-com-4-entradas-e-zero-offsite-find-tar-gpg-num-so-disco-which-restic-presente-password-store-sem-entrada"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-vaultwarden/backup-offsite.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
+      locator: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md l.69-74; /home/marcio/onion-vps-vaultwarden 31cd4f9:backup-offsite.sh l.1-8"
+      method: "leitura: relatório do run kg-freshness de 2026-08-12 (achado 3) + backup-offsite.sh no clone em 31cd4f9"
 
   - id: Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO
     node_type: question
@@ -410,7 +465,12 @@ nodes:
     confidence: 0.9
     verified_at: 2026-08-30
     verified_against: "piloto kg-freshness 2026-08-29 (worker mediu: pass ls mostra onion/restic-repo e onion/restic-password PRESENTES; cron e systemd seguem sem linha offsite); selo do maestro 2026-08-30"
-    label: "SUPERSEDE [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] com a verdade de 2026-08-29: a lacuna de 08-13 FECHOU PELA METADE. O pass JA TEM onion/restic-repo e onion/restic-password — o guard de exit 3 do backup-offsite.sh nao trava mais por falta de credencial. O QUE FALTA AGORA E EXATAMENTE UMA LINHA: cron ou systemd-timer chamando o offsite (medido: crontab do root e systemd sem entrada). A armadilha circular esta resolvida desde a custodia externa da chave GPG; o custo de fechar caiu de tres passos para um. GATILHO: o maestro mandar armar a linha."
+    label: "Supersede Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA (piloto de 2026-08-29, selo de 08-30): o pass já tem as credenciais restic (onion/restic-repo e onion/restic-password); falta só a linha de cron chamando o offsite. Gatilho: o maestro mandar armar a linha."
+    narrative: "label anterior: SUPERSEDE [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] com a verdade de 2026-08-29: a lacuna de 08-13 FECHOU PELA METADE. O pass JA TEM onion/restic-repo e onion/restic-password — o guard de exit 3 do backup-offsite.sh nao trava mais por falta de credencial. O QUE FALTA AGORA E EXATAMENTE UMA LINHA: cron ou systemd-timer chamando o offsite (medido: crontab do root e systemd sem entrada). A armadilha circular esta resolvida desde a custodia externa da chave GPG; o custo de fechar caiu de tres passos para um. GATILHO: o maestro mandar armar a linha."
+    provenance:
+      source: "d761c963"
+      locator: "corpo de d761c963 (selos AskUserQuestion 2026-08-30, SUPERSEDES no Q_BACKUP)"
+      method: "leitura: corpo de d761c963"
 
   - id: E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO
     node_type: evidence
@@ -423,9 +483,9 @@ nodes:
     label: "O GATILHO DO Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO DISPAROU — um caso e caso, DOIS E CLASSE. O censo mediu um SEGUNDO adotante ativo com o mesmo defeito de exposicao do achado arandek: docker-compose rastreado no git com portas sem prefixo de bind (Docker publica em todas as interfaces por default — e nesta VPS o Docker FURA o ufw) e segredo literal como fallback. Detalhes especificos (repo, portas, valores) ficam FORA deste no de proposito: e material de comunicacao sensivel, e a decisao de comunicar e do maestro — como no arandek, que segue redigido e nao-enviado por ordem. ACAO PENDENTE (decisao do maestro): (a) comunicar os dois adotantes; (b) decidir a regra de lint de compose para role adotante que o Q_GUARDA propoe — a classe agora tem 2 instancias medidas."
     trace: "runs wf_2349bf29-ea0 · docs/analysis/granaai-compose-exposure-2026-08.md (material de comunicacao, REDIGIDO-NAO-ENVIADO) · docs/analysis/onion-vps-network-exposure-2026-08.md"
     provenance:
-      source: "runs wf_2349bf29-ea0 · docs/analysis/granaai-compose-exposure-2026-08.md (material de comunicacao, REDIGIDO-NAO-ENVIADO) · docs/analysis/onion-vps-network-exposure-2026-08.md"
-      locator: "censo lote 5 (run wf_2349bf29-ea0): compose rastreado no git do adotante, portas sem prefixo de bind + segredo literal de fallback; mesma classe do achado arandek (redigido, nao enviado)"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "docs/analysis/granaai-compose-exposure-2026-08.md"
+      locator: "docs/analysis/granaai-compose-exposure-2026-08.md l.1-25; 91daebce (corpo, censo lote 5)"
+      method: "leitura: doc de analise versionado (medicao do censo de 2026-08-30, run wf_2349bf29-ea0) + corpo de 91daebce"
 
   - id: Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO
     node_type: question
@@ -438,9 +498,9 @@ nodes:
     label: "SUPERSEDE [Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO] com a verdade MEDIDA na 1a prova real: o OFFSITE NUNCA EXISTIU. Em 08-13 a MESMA string entrou nos DOIS campos do pass (restic-repo E restic-password) — o restic tratou a senha como CAMINHO, criou um repo LOCAL com esse nome (o diretorio acidental, ja renomeado para restic-local-acidental-2026-08-13) e o 1o backup real foi para o mesmo disco. O mecanismo em si esta PROVADO NA DIRECAO DA FALHA: cron armado, wrapper fail-loud, e o guard anti-local barrou exatamente o que devia (rc=5, nada enviado). FALTAM DOIS INSUMOS QUE SO O MAESTRO TEM: (1) o destino real — pass insert onion/restic-repo com esquema remoto (as chaves R2 ja existem no pass; conta/bucket sao dado dele; o script recomenda destino com imutabilidade do lado do servidor); (2) a decisao sobre a senha exposta como nome de diretorio desde 08-13 — a cura de classe seria rotacao, que esta PARADA POR ORDEM do maestro: registrado, nao proposto. Com o insumo (1), a prova roda no ato."
     trace: "/home/marcio/onion-vps-vaultwarden/offsite-cron.sh · logs/offsite-cron.log"
     provenance:
-      source: "/home/marcio/onion-vps-vaultwarden/offsite-cron.sh · logs/offsite-cron.log"
-      locator: "PROVA REAL EXECUTADA 2026-08-31: maestro forneceu a Global API Key (pass onion/cloudflare-api-token); account-ID descoberto via API; bucket pre-existente onion-vps-backup reutilizado (o que eu criei foi removido); snapshot 81a0846f ENVIADO ao R2 e conferido do lado remoto; prova de restauracao devolveu 95 arquivos com integridade verificada, no errors; cron diario 13:00 UTC armado"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-vaultwarden/offsite-cron.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "dd89ddd4"
+      locator: "corpo de dd89ddd4 (2026-08-30) + docs/evolution/review/fix-offsite-destination-truth.md (dd89ddd4, itens 1-3 e §O que mudou no grafo: chaves R2 já no pass); corpo de 3eaecc6d; docs/evolution/review/chore-seal-queue-maestro.md l.42-49"
+      method: "leitura: corpos de dd89ddd4 e 3eaecc6d + residuo REGRA 56 da fila de selos"
 
   - id: Q_MAIS_UM_IMUTAVEL_GATED
     node_type: question
@@ -453,9 +513,9 @@ nodes:
     label: "O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda do host) mas nao protege contra credencial roubada apagando o remoto — a limitacao conhecida do Object Lock com restic. A evolucao decidida com o maestro (2026-08-31): rsync.net (snapshot ZFS server-side) como segundo destino via restic copy, SEM retrabalho. GATILHO: o maestro contratar a conta — decisao de custo dele, sem urgencia; o risco coberto por este gate e o mais raro da matriz."
     trace: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh (recomendacoes de destino no cabecalho)"
     provenance:
-      source: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh (recomendacoes de destino no cabecalho)"
-      locator: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 3/3 claims; juiz APROVADO. Lido o nó inteiro (label+trace). 3 claims: (1) R2 resolve off-site mas não prote => Nenhuma segunda credencial/destino (rsync.net ou qualquer outro) existe no `pass`; nenhum commit no …"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-vaultwarden/backup-offsite.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "3eaecc6d"
+      locator: "corpo de 3eaecc6d; docs/evolution/review/feat-offsite-proven.md l.27-31; /home/marcio/onion-vps-vaultwarden 31cd4f9:backup-offsite.sh l.25-26, l.45-48"
+      method: "leitura: corpo de 3eaecc6d (decisao com o maestro 2026-08-31) + cabecalho de backup-offsite.sh no clone com sha"
 
   - id: E_CLASSE_DE_EXPOSICAO_VIROU_REGRA_64
     node_type: evidence
@@ -481,6 +541,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — grep -n "Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO" -A 60 docs/onion/graph/identidade-onio'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó ficou aberto como pergunta GATED em 2026-08-12; o próprio grafo mostra que o gatilho disparou (2º adotante com o mesmo defeito) e a decisão foi tomada e mecanizada em 2026-08-31: REGRA 64 [HARD] em lint-artifacts.sh cobre exatamente o buraco que o nó apontava (compose de adotante com bind abert'
+    provenance:
+      source: "f1cb21c9:.claude/validation/lint-artifacts.sh"
+      locator: "f1cb21c9:.claude/validation/lint-artifacts.sh l.3476 (REGRA 64 [HARD]); corpo de 91daebce (gatilho disparou, 2026-08-30); corpo de b0cfa8f9 (GATED no segundo adotante)"
+      method: "leitura: commits b0cfa8f9, 91daebce e f1cb21c9 (REGRA 64 HARD em 2026-08-31)"
 
   - id: Q_SENHA_CHAVE_ESTADO_2026_09
     node_type: question
@@ -493,9 +557,9 @@ nodes:
     label: 'ESTADO ATUAL da chave GPG com passphrase (substitui o no de 08-12 que misturava >=9 afirmacoes): a protecao FICA (decisao do maestro); o preco e destravar 1x por janela no tmux (cache 8h); dump 644 curado na fonte; a NAO-ESCOLHA entre opcoes a/b/c segue aberta — e o que esta questao ainda pergunta. Gatilho: automacao quebrar de novo em janela fria OU o maestro escolher a/b/c.'
     trace: "/home/marcio/onion-vps-logto/backup.sh"
     provenance:
-      source: "/home/marcio/onion-vps-logto/backup.sh"
-      locator: "remodelagem manual (etapa 4 da ordem; 2 workers reprovados no no antigo — label colapsava >=9 claims): pass show rc=2 AGORA (cache frio — pin pendente e o estado NORMAL entre destravas); backup.sh:29-33+82 chmod 600 (dump 644 CURADO); up.sh dos 3 servicos leem segredo via pass (dependencia segue); cache 8h no tmux e o contorno vigente"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-logto/backup.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "docs/evolution/review/fix-chronic-nodes-remodel.md"
+      locator: "docs/evolution/review/fix-chronic-nodes-remodel.md l.5, l.16-17 (5adb88b0); /home/marcio/onion-vps-logto dd1ba80:backup.sh l.29-33, l.82; /home/marcio/.gnupg/gpg-agent.conf l.2"
+      method: "testemunho: remodelagem manual da sessão de 2026-09-01 registrada no resíduo (pass rc=2, chmod 600, 3 up.sh) + leitura do arquivo /home/marcio/.gnupg/gpg-agent.conf no host (default-cache-ttl 28800)"
 
   - id: E_REFUTA_Q_LACUNA_DECISAO_MAIS_CODIGO
     node_type: evidence
@@ -507,6 +571,10 @@ nodes:
     verified_against: 'worker opus com WebSearch REAL (etapa 4 da ordem; 2 workers sonnet reprovados antes por pular a busca): c1 REFUTADO — ruevu/cortex (abril/2026, GOVERNS/SUPERSEDES/status) + agentforge-graph + sverklo(78*) + brain0(331*) + Bito unem decisao+codigo num grafo consultavel; c2 CONFIRMADO (braingrid 08-04, align 05-20, adr-graph MCP); c3 CONFIRMADO so p/ SCIP/CodexGraph/CGM — Graphify(113k*) ja tem confidence EXTRACTED/INFERRED; c4 CONFIRMADO (22,96% empata 22,96%; 71,5x e do Graphify via Medium, sem paper — e o paper do CodexGraph mostra token MAIOR, 102k vs 76k)'
     label: 'A tese central do no caiu — e ja estava errada em 08-12 (cortex e Graphify nasceram em abril): a mesma classe do furo search-by-trajectory (buscou incumbente academico, nao trajetoria). O que SOBREVIVE: aresta REFUTES tipada segue sem par publico (cortex tem SUPERSEDES; sverklo sinaliza conflito sem resolver) e o gate consumir-MCP-nunca-construir FORTALECEU (5+ MCPs maduros para consumir).'
     trace: "docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml"
+    provenance:
+      source: "https://api.github.com/repos/ruevu/cortex"
+      locator: "https://api.github.com/repos/ruevu/cortex (created_at 2026-04-11; README l.261/267 supersede/SUPERSEDES); github.com/Graphify-Labs/graphify (created_at 2026-04-03); github.com/sverklo/sverklo README l.127 (conflicts sem auto-resolução); docs/evolution/review/fix-chronic-nodes-remodel.md l.5, l.18-19"
+      method: "leitura: datas de criacao imutaveis via GitHub API + residuo REGRA 56 da etapa 4 (worker opus com WebSearch real, 5 contraexemplos)"
 
   - id: Q_REFUTES_EDGE_SEM_PAR
     node_type: question

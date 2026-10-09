@@ -85,6 +85,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "DOUTRINA: integridade tecnica (grafo nao se contradiz) nao eh completude de rastreabilidade (cada no aponta a evidencia/decisao que o sustenta) — familia declarado-nao-verificado estendida"
+    provenance:
+      source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      locator: "knowledge-graph-sdaal.md l.50-59 ('Nota de doutrina — integridade técnica ≠ completude de rastreabilidade')"
+      method: "leitura: nota de doutrina viva na KB, absorvida pelo commit e21c82ba (2026-07-18) do sinal granaai 2026-07-17-redogfood-kg-sdaal-validation-gaps.md"
   - id: C_S3a
     node_type: claim
     layer: audit
@@ -94,6 +98,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "DOUTRINA: validador local de .kg.yaml DELEGA ao kg-radar soberano, nao reimplementa a gramatica — parser duplicado divergente eh a superficie onde o falso-verde volta"
+    provenance:
+      source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      locator: "knowledge-graph-sdaal.md l.61-63 ('Doutrina (S3a) — soberania do validador') e l.551-552"
+      method: "leitura: nota de doutrina viva na KB, absorvida pelo commit e21c82ba (2026-07-18) do sinal granaai 2026-07-17-kg-fail-open-primo-validador-local-duplicado.md"
   - id: C_S3b
     node_type: claim
     layer: audit
@@ -104,10 +112,14 @@ nodes:
     verified_at: 2026-08-30
     verified_against: "censo lote 3 (run wf_8cf0e944-64b, 2026-08-30): O nó descreve um bug ('--update deixa inventory.md stale, lint HARD bloqueia o 1º commit') que já foi corrigido no vivo em 2026-07-18 (commit 773d5e4a), 6 semanas antes d"
     label: "FEATURE: --update deixa docs/onion/inventory.md stale (inventory.sh so roda na Fase 3 da adocao) — lint HARD bloqueia o 1o commit do adotante"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md + commit 773d5e4a"
+      locator: "sinal l.52-53 e l.63; git show 773d5e4a (2026-07-18, fix(adopt): --update regenera inventory.md pos-copia); mecanismo vivo em .claude/commands/meta/adopt.md l.310 (passo 8 regenera inventory+graph)"
+      method: "leitura: sinal de campo granaai (2026-07-17) que descreve a feature + commit 773d5e4a que a construiu"
   - id: C_S4
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 2
     confidence: 0.8
     status: open
@@ -123,6 +135,10 @@ nodes:
     status: superseded
     verified_at: 2026-07-17
     label: "VISAO ANTIGA: kg-radar validava o carimbo (schema_version), nao a forma — grafo ilegivel passava verde"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-17-kg-radar-falso-verde-grafo-ilegivel.md"
+      locator: "l.94-96 ('o radar valida o carimbo, não a forma') e l.28 ('parseou zero nós e mesmo assim passou verde')"
+      method: "leitura: sinal de campo do adotante granaai (2026-07-17) em docs/evolution/inbox/_processed/"
   - id: D_ABSORB_KB
     node_type: decision
     layer: audit

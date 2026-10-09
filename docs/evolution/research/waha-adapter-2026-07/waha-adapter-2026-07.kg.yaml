@@ -225,7 +225,7 @@ nodes:
 
   - id: Q_vps_access_blocked
     node_type: question
-    plane: PROD
+    plane: DEV
     status: refuted
     impact: 4
     confidence: 1.0
@@ -271,7 +271,7 @@ nodes:
 
   - id: E_waha_deployed_prod
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 1.0
@@ -287,7 +287,7 @@ nodes:
   # ── GATILHO FECHADO 2026-08-01: 1a mensagem REAL enviada ──
   - id: E_gatilho_fechado
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: superseded
     impact: 5
     confidence: 1.0
@@ -310,6 +310,10 @@ nodes:
     verified_against: dogfood-de-campo-mais-fonte-oficial
     label: "ACHADO DE CAMPO (custou 4 tentativas): so o aparelho PRINCIPAL pode vincular dispositivos — companheiro NAO tem o menu 'Dispositivos conectados' (confirmado em fonte: 'only the primary device can initiate the process of adding additional connected sessions'). O maestro migrou de celular e o principal antigo foi FORMATADO. Alem disso: sessao WAHA cai SCAN_QR_CODE->FAILED em ~2-3min sem pareamento, e o restart as vezes nasce FAILED (precisa stop+DELETE+create limpo). RECOMENDACAO DE DESIGN QUE NASCE DAQUI: bot NAO deve parear no numero PESSOAL do maestro — numero DEDICADO (chip separado) ou Cloud API oficial. Reforca a operacao getSessionStatus no contrato (sessao expira: primary precisa logar a cada ~14 dias)"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "commit bdc06bd9"
+      locator: "corpo do commit bdc06bd9 (2026-08-01 04:05), parágrafos \"ACHADO DE CAMPO\" e \"RECOMENDAÇÃO DE DESIGN\""
+      method: "testemunho: dogfood de campo da sessão 2026-08-01 relatado em 1ª pessoa no corpo do commit bdc06bd9; comando não registrado"
 
   # ── ACHADO RAIZ 2026-08-01: ENDERECAMENTO LID (o mais valioso da rodada) ──
   - id: E_lid_addressing_root_cause
@@ -323,9 +327,9 @@ nodes:
     label: "CAUSA RAIZ (medida, 3 envios controlados): o WhatsApp moderno endereca por LID (Linked ID), nao por telefone. '5551997702725@c.us' (com 9) -> ERRO 'No LID for user'; '555197702725@c.us' (sem 9) -> falha; '84190032855084@lid' -> ENVIOU E CHEGOU (confirmado pelo maestro). GET /api/contacts/check-exists?phone=... devolve {numberExists:true, chatId:'84190032855084@lid'} — o telefone e CHAVE DE BUSCA, o LID e a identidade. O mesmo LID ja aparecia no me.lid da sessao NOWEB (consistente)"
     trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
     provenance:
-      source: "/home/marcio/onion-vps-waha/docker-compose.yml"
-      locator: "tres-envios-controlados-com-9-sem-9-e-lid"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "commit 18ec63f2 + docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "corpo do commit 18ec63f2 (2026-08-01 04:35) parágrafo \"CAUSA RAIZ\"; SYNTHESIS.md l.70-81; onion-vps-waha@86662e0:README.md l.33-34"
+      method: "testemunho: medição da sessão 2026-08-01 (3 envios controlados), comando não registrado; relatada em 1ª pessoa no commit 18ec63f2"
 
   - id: D_resolve_is_contract
     node_type: decision
@@ -380,9 +384,9 @@ nodes:
     label: "PENDENCIA 1 FECHADA — ENGINE DEFAULT = NOWEB. Re-teste com endereçamento LID correto: NOWEB enviou e a mensagem CHEGOU (confirmado pelo destinatario humano), com ZERO erros de USync nos logs (antes falhava sempre). Portanto o engine NUNCA foi a causa — era enderecamento. NOWEB e o default por medicao (412.9 MiB vs 638.8 do WEBJS, ~35% mais leve) SEM perda de funcionalidade. O valor real do WEBJS foi DIAGNOSTICO: mensagem de erro legivel ('No LID for user') vs o WARN silencioso do NOWEB ('USync yielded no results') — registrar como nota de troubleshooting, nao como default"
     trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
     provenance:
-      source: "/home/marcio/onion-vps-waha/docker-compose.yml"
-      locator: "reteste-noweb-mais-LID-confirmado-por-humano"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "commit f1ac4623 (corpo) · /home/marcio/onion-vps-waha@86662e0:docker-compose.yml"
+      locator: "f1ac4623 corpo §PENDÊNCIA 1 (2026-08-01 05:10Z) · onion-vps-waha@86662e0:docker-compose.yml l.18 (WHATSAPP_DEFAULT_ENGINE: NOWEB) · README.md l.13"
+      method: "leitura: corpo do commit f1ac4623 + compose do repo onion-vps-waha no commit 86662e0"
 
   - id: E_ack_lifecycle_proven
     node_type: evidence

@@ -265,6 +265,10 @@ nodes:
     verified_at: 2026-07-25
     label: "Workflows faseados retomáveis — contrato de fase plan.md ([DONE]/[ACTIVE]/[TODO], exatamente-uma-ACTIVE), sessões persistentes em .claude/sessions/"
     trace: ".claude/commands/engineer/plan.md; .claude/sessions/"
+    provenance:
+      source: ".claude/commands/engineer/plan.md"
+      locator: "plan.md l.27 e l.36 (vocabulário [DONE]/[ACTIVE]/[TODO], invariante exatamente uma [ACTIVE]); l.21 (.claude/sessions/<feature-slug>); .gitignore l.4-8"
+      method: "leitura: comando vivo /engineer:plan + .gitignore do core"
 
 edges:
   # index hub -> depende das 4 camadas que ele indexa

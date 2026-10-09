@@ -15,10 +15,14 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "revisor adversarial fable achou 7 furos (3 ALTA): farol eh breadcrumb nao instrumento; a2a-verify eh gate-ator nao sensor; instrumentos-leem-breadcrumbs eh falso (inventory le filesystem, a2a le relogio NTP)"
+    provenance:
+      source: ".claude/diary/2026-07-18-perception-instruments-doctrine.md"
+      locator: ".claude/diary/2026-07-18-perception-instruments-doctrine.md l.24; corpo do commit 8fd6c736"
+      method: "leitura: diário 2026-07-18 (decision) e corpo do commit 8fd6c736"
   - id: C_HYP_FAROL_INSTRUMENT
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: superseded
@@ -27,7 +31,7 @@ nodes:
   - id: C_HYP_READS_CRUMBS
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: superseded
@@ -42,6 +46,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "4 PAPEIS: SENSOR (percebe e reporta) · GATE (percebe e decide/escreve, ex a2a-verify) · PROJECAO (view derivada, ex console) · BREADCRUMB (a marca deixada, nao eh instrumento)"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-perception-instruments.md"
+      locator: "docs/knowledge-base/concepts/onion-perception-instruments.md l.23-27 (seção \"Os 4 PAPÉIS\")"
+      method: "leitura: KB da doutrina versionada no commit 8fd6c736 (2026-07-18)"
   - id: C_3_GENERA
     node_type: claim
     layer: audit
@@ -51,6 +59,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "3 GENEROS de sensor por OBJETO: PRESENCA-VIVA (farol-check, telescopio) · ESTADO-DURAVEL (radar, grafo, inventario, canary) · MENSAGEM-NA-FRONTEIRA (you-have-mail, inbox-scan)"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-perception-instruments.md"
+      locator: "docs/knowledge-base/concepts/onion-perception-instruments.md l.29-34 (tabela \"Os 3 GÊNEROS de sensor\")"
+      method: "leitura: KB da doutrina versionada no mesmo commit 8fd6c736 (2026-07-18)"
   - id: C_3_SOURCES
     node_type: claim
     layer: audit
@@ -60,6 +72,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "3 FONTES que um sensor le (a amarra correta): marca (breadcrumb: beacon, verified_at, stamp) · estrutura (spec-as-code: filesystem, members) · vivo (runtime: relogio NTP, git, tela)"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-perception-instruments.md"
+      locator: "docs/knowledge-base/concepts/onion-perception-instruments.md l.40-45 (seção \"As 3 FONTES que um sensor lê\")"
+      method: "leitura: KB da doutrina versionada no commit 8fd6c736 (2026-07-18)"
   - id: C_UNIT_CHECK
     node_type: claim
     layer: audit
@@ -69,6 +85,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "unidade de classificacao = o CHECK, nao o script (um script empacota varios checks — inbox-check faz inbox E migalha-vencida; kg-radar tem 7 modos)"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-perception-instruments.md + .claude/hooks/co-evolution-inbox-check.sh e .claude/validation/kg-radar.sh @8fd6c736"
+      locator: "KB l.19-21; co-evolution-inbox-check.sh@8fd6c736 l.3-6; kg-radar.sh@8fd6c736 l.44 (uso com os 7 modos)"
+      method: "leitura: KB + código dos dois scripts no commit 8fd6c736 (2026-07-18)"
   - id: C_VEREDITO_AXIS
     node_type: claim
     layer: audit
@@ -78,6 +98,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "eixo transversal (nao genero): veredito advisory vs gate. kg-radar REPROVA (exit 1); federation-radar eh advisory (exit 0 sempre) — contratos opostos sob o mesmo nome radar, declarar por check"
+    provenance:
+      source: ".claude/validation/kg-radar.sh e .claude/validation/federation-radar.sh @8fd6c736 + docs/knowledge-base/concepts/onion-perception-instruments.md"
+      locator: "kg-radar.sh@8fd6c736 l.35 (Exit 1 = INTEGRIDADE ou SCHEMA); federation-radar.sh@8fd6c736 l.14 (ADVISORY: exit 0) e l.74 (exit 0); KB l.37"
+      method: "leitura: código dos dois radares no commit 8fd6c736 + KB da doutrina"
   - id: C_CANARY
     node_type: claim
     layer: audit
@@ -87,6 +111,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "CANARY (pergunta B): pin-integrity-check usa um canario (arquivo vendorizado que muda no core; divergencia byte-a-byte delata pin forjado/stale) — tripwire de declarado-nao-verificado. Sensor de estado, fonte=marca"
+    provenance:
+      source: ".claude/validation/pin-integrity-check.sh @8fd6c736 + docs/knowledge-base/concepts/onion-perception-instruments.md"
+      locator: "pin-integrity-check.sh@8fd6c736 l.21 (CANARY=lint-artifacts.sh) e l.34-35 (diff -q → \"pin-untrusted canario-divergente\"); KB l.48-50"
+      method: "leitura: código do pin-integrity-check.sh no commit 8fd6c736 + KB da doutrina"
   - id: C_FRESHNESS_LAZY
     node_type: claim
     layer: audit
@@ -96,6 +124,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "PRAZOS/CHECAGENS (pergunta C): o instrumento eh o eixo VALIDADE/FRESCOR — review_after + conflict_class + o gatilho lazy-por-sessao (co-evolution-inbox-check emite quando vencido). NAO cron (W7 rejeitado)"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-perception-instruments.md + .claude/hooks/co-evolution-inbox-check.sh @8fd6c736"
+      locator: "KB l.38 (eixo VALIDADE/FRESCOR); co-evolution-inbox-check.sh@8fd6c736 l.19-20, l.29, l.42"
+      method: "leitura: KB da doutrina + código do hook co-evolution-inbox-check.sh no commit 8fd6c736"
   - id: D_INSTRUMENTS_DOCTRINE
     node_type: decision
     layer: audit

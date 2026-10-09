@@ -430,8 +430,13 @@ nodes:
     confidence: 0.95
     verified_at: '2026-09-15'
     verified_against: 'mapfile com papel invalido -> array vazio -> git archive HEAD -- : 2222 arquivos no tar, 353 de biografia, rc=0'
-    label: 'O VAZAMENTO MAIOR, e ele e PRE-EXISTENTE que as minhas guardas novas tornaram ALCANCAVEL. `mapfile -t manifest < <(script)` ENGOLE o rc do produtor. Com o manifesto saindo ≠0 (papel desconhecido, repo sem superficie) o array fica VAZIO, e `git archive HEAD --` sem pathspec significa TODOS para o git: 2222 arquivos, o diario inteiro, docs/discussions e materials, rc=0. As guardas `exit 2/3` que eu acrescentei ao manifesto AUMENTARAM as portas para esse estado sem que ninguem do outro lado as lesse. Guarda que o consumidor nao le e decoracao — a mesma classe do nome deste no, uma camada adiante. Curado: o adopt captura o rc e CONTA o array antes de virar pathspec.'
+    label: "VAZAMENTO PRÉ-EXISTENTE: `mapfile -t manifest < <(script)` engole o rc; manifesto ≠0 → array vazio → `git archive HEAD --` copia TODOS: 2222 arquivos, 353 de biografia, rc=0. NÃO curado: resolve-manifest.sh sai 3, mas o adopt.md o consome pelo mesmo mapfile, que engole o 3."
+    narrative: "label anterior: O VAZAMENTO MAIOR, e ele e PRE-EXISTENTE que as minhas guardas novas tornaram ALCANCAVEL. `mapfile -t manifest < <(script)` ENGOLE o rc do produtor. Com o manifesto saindo ≠0 (papel desconhecido, repo sem superficie) o array fica VAZIO, e `git archive HEAD --` sem pathspec significa TODOS para o git: 2222 arquivos, o diario inteiro, docs/discussions e materials, rc=0. As guardas `exit 2/3` que eu acrescentei ao manifesto AUMENTARAM as portas para esse estado sem que ninguem do outro lado as lesse. Guarda que o consumidor nao le e decoracao — a mesma classe do nome deste no, uma camada adiante. Curado: o adopt captura o rc e CONTA o array antes de virar pathspec."
     trace: '.claude/commands/meta/adopt.md'
+    provenance:
+      source: "docs/evolution/review/fix-adopt-role-cut-transport.md + commit df031ef5 + .claude/utils/adopt/resolve-manifest.sh + .claude/commands/meta/adopt.md"
+      locator: "resíduo l.77-84 (§4: 2222 arquivos, 353 de biografia, rc=0, pré-existente); corpo de df031ef5 (2026-09-15); resolve-manifest.sh l.25-34 (exit 3 com rc≠0 ou saída vazia); adopt.md l.112-113 e l.737-738 (mapfile ... < <(resolve-manifest.sh) || ABORTADO), igual em df031ef5:adopt.md l.113/l.737"
+      method: "leitura: resíduo R56, corpo do commit df031ef5, resolve-manifest.sh e adopt.md (no worktree e em df031ef5)"
 
   - id: E_CORTE_QUE_NAO_SE_CARIMBA_NAO_ACONTECE
     node_type: evidence

@@ -114,6 +114,10 @@ nodes:
     source_kind: vendor-on-self
     label: 'F6 EMENDADO. l.49: auto-compact em modelos de 1M (Opus e Fable) compacta pouco antes do limite e a compactacao de recuperacao em contextos muito grandes deixa de estourar 10 min. Relevante a doutrina de sessoes longas do core. Nota.'
     trace: 'docs/onion/radar-baselines.yaml'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md"
+      locator: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md l.49; docs/evolution/research/radar-E3-2026-09-04/data/f1-findings-pre-juiz.md l.15"
+      method: "leitura: changelog verbatim l.49"
   - id: E_R3_F7_WORKFLOW_SCHEMA_E_STALL
     node_type: evidence
     plane: DEV
@@ -158,6 +162,10 @@ nodes:
     source_kind: vendor-on-self
     label: 'F10 EMENDADO. l.5: /reload-plugins em sessoes headless; l.35: instalacao de plugin de marketplace por URL deixa de falhar quando o host guarda a entrada como diretorio. Com a versao derivada (#787) o plugin update volta a andar; se /reload-plugins dispensa reinicio para plugin COM hooks e PENDENTE DE MEDICAO (a casa ja viu hook novo exigir reinicio).'
     trace: '.claude/skills/onion-publish/SKILL.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md"
+      locator: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md l.5, l.35; 980bdbe3 (versao derivada); bee1122b (hooks exigem reiniciar, 2026-09-02); docs/evolution/research/radar-E3-2026-09-04/SYNTHESIS.md l.18, l.31"
+      method: "leitura: changelog verbatim l.5/l.35 + commits 980bdbe3 e bee1122b; emenda do juiz registrada em SYNTHESIS l.18/l.31"
   - id: E_R3_F11_REGRAS_DE_PERMISSAO
     node_type: evidence
     plane: DEV
@@ -170,6 +178,10 @@ nodes:
     source_kind: vendor-on-self
     label: 'F11 APROVADO. Regras de permissao: caminho com parenteses era descartado e deixava pasta "read-only" gravavel (l.9); padrao incompilavel quebrava toda edicao (l.10); zsh escondendo substituicao em REPORTTIME etc. era auto-aprovado (l.11); texto apos o parentese passa a ser invalido em vez de ignorado (l.54). O core e allow-only nas 4 camadas: nada disso morde hoje; nota para adotante com deny rules. Regra de lint "settings bem-formados" adiada (nao ha deny para validar).'
     trace: '.claude/settings.json'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md"
+      locator: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md l.9, l.10, l.11, l.54; 1ab1429e:.claude/settings.json; docs/evolution/research/radar-E3-2026-09-04/data/f1-findings-pre-juiz.md l.25; SYNTHESIS.md l.18"
+      method: "leitura: changelog verbatim + camadas de settings (1ab1429e:.claude/settings.json allow=13; host /home/marcio/onion-evolve/.claude/settings.local.json 97, ~/.claude/settings.json.bak-2026-09-04 3, ~/.claude/settings.local.json 24; zero deny/ask) + F11 do rascunho; juiz APROVOU (SYNTHESIS l.18)"
   - id: E_R3_F12_GITLAB_SUBGRUPOS_TAMBEM_NO_FORGE_DO_CORE
     node_type: evidence
     plane: PROD
@@ -198,6 +210,10 @@ nodes:
     source_kind: vendor-on-self
     label: 'F13 EMENDADO. l.59: comandos digitados no prompt `!` (bash-mode) rodam FORA do sandbox mesmo em modo estrito. O core nao tem sandbox configurado em camada nenhuma: hoje nao morde. Sinal prospectivo para a doutrina de sessoes compartilhadas na VPS — se um adotante ligar sandbox estrito, `!` e escape declarado.'
     trace: 'docs/analysis/onion-vps-network-exposure-2026-08.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md"
+      locator: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md l.59; 1ab1429e:.claude/settings.json; docs/evolution/research/radar-E3-2026-09-04/data/f1-findings-pre-juiz.md l.29"
+      method: "leitura: changelog verbatim l.59 + ausencia da chave sandbox nas 4 camadas de settings (1ab1429e:.claude/settings.json e as 3 do host)"
   - id: E_R3_OMISSOES_JUIZ_0904
     node_type: evidence
     plane: DEV
@@ -210,6 +226,10 @@ nodes:
     source_kind: vendor-on-self
     label: '8 OMISSOES do rascunho, apontadas pelo juiz: (1) l.16 deny de Skill(name) nao cobria a forma aninhada <dir>:name — o core tem 13 skills e o plugin as expoe aninhadas (a mais grave). (2) l.55 claudeMd gerenciado deixa de pedir aprovacao de seguranca; hooks, sandbox e env inseguro seguem pedindo — toca o exit 2 (a capacidade que compra o acoplamento) e a fusao de CLAUDE.md na adocao. (3) l.8 userPluginMarketplacesEnabled/userPluginUploadsEnabled: uma organizacao pode desligar marketplaces de usuario, barrando o canal da Fase 5 (onion-plugins). (4) l.13/l.28/l.44 trio de worktree: leitura bloqueada escondendo o checkout do subagente isolado; -p --resume falhando sem metadados git; exclusao de sessao nomeando branch e commits nao enviados. (5) l.60 --kill-session-after-min libera sessao pausada em vez de mata-la (headless na VPS). (6) l.4 /cost e prompt_cache nomeando a causa do miss — o instrumento que F5 manda usar. (7) l.22 servidores MCP do SDK faltando no 1o turno (MCP = transporte opcional). (8) l.46 CPU ocioso de sessoes -p/SDK (host compartilhado).'
     trace: 'docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md"
+      locator: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md l.4, l.8, l.13, l.16, l.22, l.28, l.44, l.46, l.55, l.60; docs/evolution/research/radar-E3-2026-09-04/data/f1-findings-pre-juiz.md; SYNTHESIS.md l.18, l.33-34"
+      method: "leitura: changelog verbatim nas 10 linhas citadas + rascunho pre-juiz (confere a omissao) + placar do juiz em SYNTHESIS l.18 (\"8 omissoes\") e l.33-34"
   - id: E_LACUNAS_E3_0904
     node_type: evidence
     plane: DEV
@@ -220,8 +240,13 @@ nodes:
     verified_against: 'juiz opus/high 2026-09-04; model-switch.jsonl (1 registro, anterior ao campo ladder); instructions-loaded.jsonl (2 cargas de CLAUDE.md por session_start)'
     source_tier: 9
     source_kind: vendor-on-self
-    label: 'LACUNAS DECLARADAS: (1) NENHUM comportamento de 2.1.260 foi observado — 13 achados sao leitura de changelog; o processo desta sessao ja e 2.1.260, mas as observacoes ficam para uso real. (2) ladder=restored nunca foi observado (o unico registro do log de switches e anterior ao campo); com l.18, o caso mensuravel e: de Opus/piso, pick de Fable ⇒ restored + aviso cala. (3) /reload-plugins com hooks embarcados: dispensa reinicio? medir antes de afirmar. (4) cota do Fable no Max (fallback nativo emite PreModelSwitch? source?) — segue da rodada 2. (5) O censo L1 da poda ja registra (2 cargas de CLAUDE.md por session_start); regras com paths: so aparecem quando um arquivo casar.'
+    label: "LACUNAS DECLARADAS (sessão 2026-09-04): nenhum comportamento de 2.1.260 observado (achados = leitura de changelog); ladder=restored nunca observado (o único registro do log de switches, de 09-02, é anterior ao campo); /reload-plugins com hooks e cota do Fable: não medidos"
+    narrative: "label anterior: LACUNAS DECLARADAS: (1) NENHUM comportamento de 2.1.260 foi observado — 13 achados sao leitura de changelog; o processo desta sessao ja e 2.1.260, mas as observacoes ficam para uso real. (2) ladder=restored nunca foi observado (o unico registro do log de switches e anterior ao campo); com l.18, o caso mensuravel e: de Opus/piso, pick de Fable ⇒ restored + aviso cala. (3) /reload-plugins com hooks embarcados: dispensa reinicio? medir antes de afirmar. (4) cota do Fable no Max (fallback nativo emite PreModelSwitch? source?) — segue da rodada 2. (5) O censo L1 da poda ja registra (2 cargas de CLAUDE.md por session_start); regras com paths: so aparecem quando um arquivo casar."
     trace: '.claude/hooks/premodelswitch-guard.sh'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-04/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.36-37; corpo de 1ab1429e ('Nada de 2.1.260 foi observado — lacunas declaradas', 2026-09-04 00:58Z); host /home/marcio/onion-evolve/.claude/sessions/model-switch.jsonl l.1 (09-02, sem campo ladder; l.2 é 09-04T17:27, posterior ao commit)"
+      method: "testemunho: lacunas declaradas pela sessão 2026-09-04 no corpo de 1ab1429e e SYNTHESIS l.37; cláusula do ladder por leitura de .claude/sessions/model-switch.jsonl no host"
 edges:
   - from: E_R3_F1_REVERT_DENY_READ_BASH
     to: Q_E3_DELTA_2_1_260

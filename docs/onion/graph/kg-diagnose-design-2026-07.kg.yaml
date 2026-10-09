@@ -140,6 +140,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — Lido o nó completo (label/trace, linhas 92-99) + a única aresta (DEPENDS_ON → D_diagnose_m'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó ficou aberto (status:open) como se a pergunta seguisse pendente, mas ela já foi respondida e a resposta já foi construída no mesmo dia (PR #500): automação parcial mecânica com PAUSA preservada, documentada em .claude/commands/meta/kg.md §"Automação parcial" e materializada em scaffold-diagnose'
+    provenance:
+      source: "d726efb2:.claude/commands/meta/kg.md"
+      locator: "commit d726efb2 (#500, 2026-07-30): kg.md §\"Automação parcial\" (hoje l.442) + .claude/utils/diagnose/scaffold-diagnose-store.sh; e5e81af2^:docs/onion/graph/kg-diagnose-design-2026-07.kg.yaml l.97 (status: open); Q nascido em 5a2e1c90 (#499, 2026-07-30)"
+      method: "leitura: git (commits #499/#500 e estado do nó antes do censo)"
 
 edges:
   - from: E_map_e_software_diagnose_e_negocio

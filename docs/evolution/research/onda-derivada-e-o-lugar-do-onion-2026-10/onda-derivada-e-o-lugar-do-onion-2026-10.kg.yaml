@@ -156,6 +156,10 @@ nodes:
     source_kind: internal-audit
     label: 'MEDIDO AQUI: o core é o caso-exemplo do CAUTION que ele queria citar como aliado. 71.676 linhas de markdown rastreado em `.claude/` contra 48.944 de shell, e o índice de memória desta própria sessão estourou o teto e teve 19 linhas CORTADAS na carga. Se bloat de instrução degrada comportamento de agente, vender "o corpus que decide" vende o item que o anel manda vigiar. Isto limita a opção META/Company Brain por dentro, não por fora.'
     trace: '.claude/'
+    provenance:
+      source: "commit 44ceba79 (pai do 30eecf28, árvore medida) · commit 30eecf28"
+      locator: "git ls-tree -r 44ceba79 .claude/ — .md fora de fixtures: 408 arquivos, 71.675 linhas; .sh: 48.757 (sem fixtures) / 48.950 (todos)"
+      method: "testemunho: medição da sessão 2026-10-01 (commit 30eecf28), comando parcialmente registrado ('git ls-files, fixtures excluídos'); aviso de teto do MEMORY.md é evento da sessão"
 
   - id: E_CORPUS_O_QUE_AS_RODADAS_DE_HOJE_JA_MEDIRAM
     node_type: evidence
@@ -656,6 +660,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJEÇÃO F6 (Elenxo, 1 agente sem votação) — este achado é AUTO-INCRIMINAÇÃO, não aliado. Se bloat de instrução degrada comportamento de agente, o Onion é o caso-exemplo do Caution, e vender "o corpus que decide" contraria o anel. A prova é desta casa e desta sessão: a metade que ACONSELHA é ~1,46× a que REPROVA, e o índice de memória estourou o teto com 19 linhas CORTADAS na carga — o defeito não é hipótese, aconteceu aqui hoje. De pé: o achado pesa contra a tese que ele foi recrutado para sustentar.'
     trace: '.claude/'
+    provenance:
+      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcacd012-07e.json (host) · commit 44ceba79 (árvore)"
+      locator: "result.decision.objections, entrada target 'F6 — Agent instruction bloat em Caution (Radar Vol 34)' · ls-tree 44ceba79 .claude/ (408 .md, 71.675 linhas)"
+      method: "testemunho: leitura do arquivo wf_fcacd012-07e.json no host (objeção F6 do refutador) + medição local da sessão 2026-10-01"
 
   - id: E_OBJECAO_F7_PRECO_DE_TABELA_NAO_E_RECEITA
     node_type: evidence
@@ -735,8 +743,13 @@ nodes:
     verified_against: 'o repasse desta sessão: a 11a objeção chega com o alvo "F11 — TRACE prova autoria" e o CORPO cortado no meio, emendado sem separador ao bloco de recomendação do refutador. O texto da objeção não existe aqui; declará-la completa seria inventar conteúdo.'
     source_tier: 1
     source_kind: internal-audit
-    label: 'OBJEÇÃO F11 (Elenxo, 1 agente sem votação) — CHEGOU TRUNCADA e está modelada COMO TRUNCADA. O alvo é legível ("TRACE prova autoria e integridade do registro, mas não o com-base-em-quê; proveniência de hardware só na v0.3"), o CORPO não: o repasse emendou o fim da objeção ao bloco de recomendação sem separador. O que se pode afirmar com o alvo é que ele converge com F10 e aponta a MESMA lacuna — e é justamente ali que o grafo bi-temporal do Onion tem superfície. Confiança 0,3 e tier 1 por desenho: afirmação de um agente, entregue incompleta. AÇÃO NOMEADA para a rodada G: recuperar o texto íntegro de F11 antes de pesar a opção B.'
+    label: "OBJEÇÃO F11 (Elenxo, 1 agente sem votação) — alvo: TRACE prova autoria/integridade mas não o 'com base em quê'. De pé: a lacuna é real, mas o achado não mede DEMANDA — o Guru empacota lineage e verificação sem preço próprio; lacuna técnica confundida com espaço de mercado."
+    narrative: "label anterior: OBJEÇÃO F11 (Elenxo, 1 agente sem votação) — CHEGOU TRUNCADA e está modelada COMO TRUNCADA. O alvo é legível (\"TRACE prova autoria e integridade do registro, mas não o com-base-em-quê; proveniência de hardware só na v0.3\"), o CORPO não: o repasse emendou o fim da objeção ao bloco de recomendação sem separador. O que se pode afirmar com o alvo é que ele converge com F10 e aponta a MESMA lacuna — e é justamente ali que o grafo bi-temporal do Onion tem superfície. Confiança 0,3 e tier 1 por desenho: afirmação de um agente, entregue incompleta. AÇÃO NOMEADA para a rodada G: recuperar o texto íntegro de F11 antes de pesar a opção B."
     trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+    provenance:
+      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcacd012-07e.json (host)"
+      locator: "result.decision.objections, entrada target 'F11 — TRACE prova autoria/integridade mas não o com base em quê' (kind finding, survives true)"
+      method: "testemunho: leitura do journal /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcacd012-07e.json no host em 2026-10-09"
 
   - id: E_OBJECAO_G_QUATRO_FONTES_SEM_LEITURA
     node_type: evidence
@@ -750,6 +763,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJEÇÃO QUE RESTRINGE A PRÓPRIA RECOMENDAÇÃO G (Elenxo, 1 agente sem votação) — quatro fontes que DECIDEM ficaram sem leitura, e duas delas (permit.io/mcp-gateway e toolbooth) são as ÚNICAS endereçadas a TRILHO DE COBRANÇA, com o eixo 4 concluído sem abrir nenhuma. Brain0 é o concorrente mais próximo da tese INTEIRA (grafo de decisão commit↔intenção + gate pré-commit) e github.blog default model enablement é a medida da taxa de absorção. ⚠️ Todas são PRIMÁRIO CITADO, NÃO LIDO — nenhuma entra aqui como tier alto confirmado, e o que Brain0 faz é descrição do refutador, não medição. Isto LIMITA G em duas direções: G é necessária porque as quatro faltam, e G é insuficiente se a rodada curta não abrir as quatro E reabrir as três refutações tier 9.'
     trace: 'docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml'
+    provenance:
+      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_fcacd012-07e.json (host)"
+      locator: "result.decision.recommendation (opção G: 'quatro fontes que decidem ficaram sem leitura... Brain0... cortado por orçamento CINCO vezes') · result.budgetDropped (permit.io/mcp-gateway, toolbooth/toolbooth, github.blog 2026-07-29 default-model-enablement)"
+      method: "testemunho: leitura do arquivo wf_fcacd012-07e.json no host (recomendação do refutador)"
 
   - id: AR_SYNTHESIS_ONDA_DERIVADA_1001
     node_type: artifact

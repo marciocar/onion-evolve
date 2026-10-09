@@ -27,6 +27,10 @@ nodes:
     impact: 5
     confidence: 1.0
     label: "MAXIMA (cunhagem do maestro, 2026-07-24): automacao se CONQUISTA por acao provada; automatizar o que nunca foi realizado tem grandes chances de fracasso — HITL enquanto amadurece, depois testes/monitores/alertas/contencao"
+    provenance:
+      source: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96"
+      locator: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:9-16 (§'A máxima (cunhagem do maestro, 2026-07-24)')"
+      method: "leitura: KB versionada que registra a máxima com autoria e data"
 
   # ── A escada de refutacoes (cada claim 'esta pronto' cai) ──────────────────
   - id: C1_HAVE_GRADUATED
@@ -39,7 +43,7 @@ nodes:
 
   - id: C2_AUTOMATE_READY
     node_type: claim
-    plane: PROD
+    plane: DEV
     status: refuted
     impact: 4
     confidence: 0.2
@@ -63,6 +67,10 @@ nodes:
     verified_at: 2026-07-24
     label: "a DOUTRINA existe ~75% mas ESPALHADA em 6 docs sem citar-se como familia: escada Audit->Automate->Moat (ADR), esteira assess->trial->adopt (onion-promotion-ladder), catraca, 3 modos, linha INTAKE!=EXECUCAO — 2 escadas nunca unidas"
     trace: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
+    provenance:
+      source: "commit 07397d96 (corpo) · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96"
+      locator: "07397d96 corpo ('Finding (3 explorers): the doctrine is ~75% ALREADY in the core, scattered across 6 docs') · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:3-4 e :85-91 (Referências: as peças que a escada unifica)"
+      method: "leitura: corpo do commit 07397d96 e a lista de peças da KB"
 
   - id: E_MECHANISM_ORPHAN
     node_type: evidence
@@ -74,9 +82,9 @@ nodes:
     label: "o MECANISMO e PARCIALMENTE orfao: o runtime de conducao de fios NUNCA virou comando (roda a mao; verificado — sem comando thread-*); AUTOMATE gated por 3 pre-condicoes NUNCA cabeadas (verificado — sem branch auto/*); a UI HITL->HOTL segue design-note nao-construida. [CORRIGIDO 2026-07-24: a alegacao original de que o onion-effect-gate.sh estava orfao era FALSA — ver E_EFFECT_GATE_LIVE]"
     trace: ".claude/commands/meta/adopt.md"
     provenance:
-      source: ".claude/commands/meta/adopt.md"
-      locator: ".claude/commands/meta/adopt.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      source: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md@6a6ac459 · árvore .claude/commands@6a6ac459 · docs/discussions/interface-state-of-art/NOTE-04-intake-execucao-governa-a-interface.md@6a6ac459 · commit 6a6ac459"
+      locator: "ls-tree 6a6ac459 .claude/commands (134 arquivos, 0 com 'thread') · docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md:48 (AUTOMATE teto DESENHADO, GATED, 3 pré-condições) · NOTE-04:60 (HITL→HOTL é futuro)"
+      method: "leitura: árvore e documentos no commit 6a6ac459 (2026-07-24)"
 
   - id: E_EFFECT_GATE_LIVE
     node_type: evidence
@@ -87,6 +95,10 @@ nodes:
     verified_at: 2026-07-24
     label: "CORRECAO (Onda 2, declarado!=verificado sobre o proprio grafo): o onion-effect-gate.sh NAO e orfao — esta no CORE (.claude/validation/guardrails/onion-effect-gate.sh, identico ao prototipo) e CABEADO aos canais C3 (adopt.md + reverse-consolidate.md via untrusted-content-provenance) com selftest. A CONTENCAO do intake!=execucao ja e mecanismo vivo — a premissa da Onda 2 ('promover o orfao') estava stale"
     trace: ".claude/validation/guardrails/onion-effect-gate.sh"
+    provenance:
+      source: ".claude/validation/guardrails/onion-effect-gate.sh@6a6ac459 · .claude/commands/common/prompts/untrusted-content-provenance.md@6a6ac459 · .claude/validation/lint-selftest.sh@6a6ac459"
+      locator: "untrusted-content-provenance.md@6a6ac459:32 (invoca onion-effect-gate.sh) · adopt.md e reverse-consolidate.md@6a6ac459 (citam untrusted-content-provenance) · lint-selftest.sh@6a6ac459:4758-4768"
+      method: "leitura: arquivos do core no commit 6a6ac459 (2026-07-24); identidade com o protótipo conferida por diff no host"
 
   - id: E_ACTION_NOT_PROVEN
     node_type: evidence
@@ -96,6 +108,10 @@ nodes:
     confidence: 0.9
     verified_at: 2026-07-24
     label: "AUTOMATE esta CORRETAMENTE gated: a acao (rodar a escada a mao, monitorada) ainda nao acumulou execucoes provadas — a maxima do maestro em ato. O ADR e 'proposed — TRIAL autorizado', nao ativo"
+    provenance:
+      source: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md@07397d96 · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96"
+      locator: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md@07397d96:5 (status) e :48 (AUTOMATE gated) · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:82-83 ('hoje é juízo humano')"
+      method: "leitura: ADR e KB no commit 07397d96"
 
   - id: E_RUNGS_MISSING
     node_type: evidence
@@ -106,6 +122,10 @@ nodes:
     verified_at: 2026-07-24
     label: "3 degraus genuinamente NOVOS faltam: (a) o degrau MONITORADO/shadow explicito entre HUMANO e AUTO; (b) ALERTAS PREDITIVOS (o core e reativo por design, CI-safe); (c) CRITERIOS de promocao CONTAVEIS (N execucoes provadas => sobe; hoje e juizo humano)"
     trace: "docs/knowledge-base/concepts/onion-promotion-ladder.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96"
+      locator: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:76-83 (§'As três lacunas genuinamente novas')"
+      method: "leitura: KB no commit 07397d96"
 
   # ── A tese-nucleo: a superacao ─────────────────────────────────────────────
   - id: D_OVERCOMING
@@ -115,6 +135,10 @@ nodes:
     impact: 5
     confidence: 0.9
     label: "SUPERACAO: nao ativar AUTOMATE. Nomear a escada unica (human->monitorado->dinamico->auto + MOAT invariante), CITAR (nao recopiar) as pecas, mecanizar os degraus BAIXOS + um gate de integridade da escada (senao e prosa), acumular acao provada, deixar AUTOMATE ser GANHO"
+    provenance:
+      source: "commit 07397d96 (corpo) · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96"
+      locator: "07397d96 corpo (bullets KB/MECHANISM e 'eventually AUTOMATE (earned, never decreed)') · docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:3-7 (cita, não recopia), :31-37 (escada HUMANO→MONITORADO→DINÂMICO→AUTO + MOAT), :68-74 (gate de integridade)"
+      method: "leitura: corpo do commit 07397d96 e a KB que ele cria"
 
   - id: D_MECHANISM_OR_PROSE
     node_type: decision
@@ -124,6 +148,10 @@ nodes:
     confidence: 0.9
     label: "mechanism-beats-prose: a KB da escada so dura se vier com MECANISMO — um gate de lint que reprova 'classe subiu de degrau sem gate de promocao'. Sem ele, prosa de meia-vida curta"
     trace: ".claude/diary/2026-07-21-mechanism-beats-prose.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96 · .claude/diary/2026-07-21-mechanism-beats-prose.md"
+      locator: "docs/knowledge-base/concepts/graduated-automation-ladder.md@07397d96:68-74 (§'O mecanismo (senão é prosa)') · mechanism-beats-prose.md:10 (next_recommended: 'meia-vida curta')"
+      method: "leitura: KB no commit 07397d96 e a migalha citada no trace"
 
   # ── Os 3 degraus faltantes como perguntas abertas (Ondas 2-4) ──────────────
   - id: Q_MONITORED_RUNG

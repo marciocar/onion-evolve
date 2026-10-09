@@ -1521,6 +1521,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "docs/evolution/federation/members.yaml (ids dos 9 membros); docs/onion/agent-card.json"
     label: "REFUTA metade da 'ação barata' de junho: o esquema NÃO foi alinhado aos formatos emergentes — ids seguem slugs planos (onion-evolve, granaai, gustavo-pulga), sem namespace reverse-DNS e sem tier trust verified|community. Só o Agent Card em well-known e o pin-como-provenance-de-commit foram adotados"
+    provenance:
+      source: "docs/evolution/federation/members.yaml@4e54b052"
+      locator: "members.yaml@4e54b052 (linhas '  - id:'; pins l.61-73, l.98, l.119); grafo@4e54b052 l.207 (a 'ação barata' de junho); a2a-agent-card.sh (Agent Card em well-known)"
+      method: "leitura: members.yaml e o nó de junho l.207 lidos no commit 4e54b052"
   - id: REC_STAGING_ROT_AND_MISSING_MAILBOX
     node_type: evidence
     layer: audit
@@ -1531,6 +1535,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "git 83a7830; git 419a390; .claude/validation/lint-artifacts.sh (REGRA 28, linhas 670-741); /home/marcio/onion-pessoal/docs/evolution/inbound/"
     label: "REFUTA o enquadramento de junho (o gargalo era protocolo/liveness): o que travou de fato foi mundano — 11 anúncios apodreceram em staging até 13 dias (4 arquivados em 83a7830; 6 de marcio-pessoal + 1 órfão de onion-hub em 419a390) porque um membro method-only (onion_version: n/a) NÃO TINHA CAIXA POSTAL. Fix: caixa postal ≠ framework (inbound/ sem vendorizar) + lint REGRA 28 (SOFT, 3 classes) para o repo sozinho decidir 'este membro tem canal?'"
+    provenance:
+      source: "git 83a7830d + git 419a3907 (onion-evolve)"
+      locator: "83a7830d --stat (4 anúncios para _processed); 419a3907 --stat (6 de marcio-pessoal + 1 órfão de onion-hub) e corpo; lint-artifacts.sh@4e54b052 l.670 (REGRA 28 [SOFT]) e l.689 ('TRÊS classes')"
+      method: "leitura: commits 83a7830d e 419a3907 e REGRA 28 em lint-artifacts.sh no commit 4e54b052"
   - id: REC_PIN_DRIFT_REAL_HEALTH_METRIC
     node_type: evidence
     layer: audit
@@ -1541,6 +1549,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "git rev-list --count c9eb2c40bc3b..HEAD = 292; git rev-list --count b8208cc1a3da..91d5dbb05a6d = 42; docs/evolution/federation/members.yaml (granaai onion_version, gustavo-pulga onion_version); /home/marcio/gustavo-pulga/.claude/.onion-version"
     label: "REFUTA 'o híbrido subtree+pin é o padrão certo, resolvido': a métrica que doeu em julho foi drift de pin silencioso — gustavo-pulga está 292 commits atrás do core (pin c9eb2c40bc3b, verificado por rev-list) e granaai chegou a 42 atrás antes de a própria sessão do adotante atualizar em 2026-07-19 (b8208cc1a3da→91d5dbb05a6d, 13 atrás hoje). Nenhum dos 9 docs de junho modela envelhecimento de pin"
+    provenance:
+      source: "git rev-list (onion-evolve) + docs/evolution/federation/members.yaml@4e54b052"
+      locator: "members.yaml@4e54b052 l.172 (gustavo-pulga onion_version c9eb2c40bc3b), l.119-123 (granaai 91d5dbb05a6d, update de 2026-07-19 pela sessão do adotante, pin anterior b8208cc1a3da); docs/evolution/research/federation-2026/ (9 docs + SYNTHESIS)"
+      method: "medição: git rev-list --count c9eb2c40bc3b..4e54b052^ (=292); git rev-list --count b8208cc1a3da..91d5dbb05a6d (=42); git rev-list --count 91d5dbb05a6d..4e54b052^ (=13)"
   - id: REC_CONTRACT_DRIFT_GATE_EXISTS
     node_type: evidence
     layer: audit
@@ -1551,6 +1563,10 @@ nodes:
     verified_at: 2026-07-21
     trace: ".claude/validation/federation-status-scan.sh (linhas 3-19, 62-94); .claude/validation/federation-radar.sh"
     label: "CONFIRMOU-SE: o corte 'identidade/contratos exigem escritor único e verificação forte' virou script — federation-status-scan.sh classifica contract-drift determinístico (in-sync|drift|unpublished) e federation-radar.sh dá o veredito advisory de saúde-de-verificação (4 checks declarado≠verificado, incl. anúncio-em-staging-não-transportado)"
+    provenance:
+      source: ".claude/validation/federation-status-scan.sh@4e54b052"
+      locator: "federation-status-scan.sh@4e54b052 l.3-19, l.62-73; federation-radar.sh@4e54b052 l.3-14"
+      method: "leitura: os dois scripts lidos no commit 4e54b052 (2026-07-21)"
   - id: REC_GIT_ASYNC_STILL_DEFAULT
     node_type: evidence
     layer: audit
@@ -1574,7 +1590,12 @@ nodes:
     confidence: 0.9
     verified_at: 2026-07-21
     trace: "docs/evolution/trust-log.md (9 linhas, mtime 2026-07-03); .claude/validation/trust-topology-check.sh (log_attempt/--dry-run)"
-    label: "REFUTA a metade operacional da decisão de junho ('instrumentar o trust-log para acumular histórico primeiro, depois medir'): o trust-log.md existe mas tem 9 linhas e não é escrito desde 2026-07-03 — em 17 dias de federação viva não acumulou amostra nenhuma. Reputação-condicionando-veto não está gated por dogfood, está gated por AUSÊNCIA DE DADO"
+    label: "REFUTA a metade operacional da decisão de junho ('acumular histórico no trust-log, depois medir'): o trust-log.md tem 9 linhas e a última entrada é de 2026-07-01 — em 20 dias não acumulou amostra. Reputação-condicionando-veto está gated por AUSÊNCIA DE DADO, não por dogfood"
+    narrative: "label anterior: REFUTA a metade operacional da decisão de junho ('instrumentar o trust-log para acumular histórico primeiro, depois medir'): o trust-log.md existe mas tem 9 linhas e não é escrito desde 2026-07-03 — em 17 dias de federação viva não acumulou amostra nenhuma. Reputação-condicionando-veto não está gated por dogfood, está gated por AUSÊNCIA DE DADO"
+    provenance:
+      source: "docs/evolution/trust-log.md@4e54b052"
+      locator: "trust-log.md@4e54b052 l.7-9 (as 3 entradas, '2026-07-01 13:36'); corpo do commit 4e54b052 l.26-28 ('has not been written since 2026-07-01')"
+      method: "leitura: trust-log.md no commit 4e54b052 + corpo do próprio commit que criou o nó"
   - id: REC_FABRICATED_CITATIONS_INSTITUTIONALIZED
     node_type: evidence
     layer: audit
@@ -2203,6 +2224,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "docs/evolution/federation/ (só members.yaml, CHANGELOG.md, outbox/, onboarding-remote-member.md — SEM contracts/); .claude/validation/fixtures/contracts (únicos contratos existentes são fixtures de teste); grep -i 'rollback|federation-check' em docs/evolution/federation/CHANGELOG.md = 0 ocorrências"
     label: "REFUTA a leitura de que a Federação formal está 'entregue e viva': em >5 semanas nenhum contrato real foi registrado — o ledger não tem sequer o diretório contracts/, os únicos contratos no repo são fixtures de validação, e não há registro de nenhum federation-check/rollback exercido. Os 5 comandos e os 3 scripts existem e passam nos fixtures; a capacidade nunca encontrou um caso real"
+    provenance:
+      source: "docs/evolution/federation/@e0bf994a"
+      locator: "git ls-tree -r e0bf994a (contracts só em .claude/validation/fixtures/contracts/); CHANGELOG.md@e0bf994a; .claude/commands/meta/federation-{check,publish,register,rollback,status}.md@e0bf994a; federation-register.md criado em 14ecfeb7 (2026-06-14), federation-status-scan.sh em 768bb1bf (2026-06-15)"
+      method: "medição: git ls-tree -r --name-only e0bf994a | grep -i contract; git show e0bf994a:docs/evolution/federation/CHANGELOG.md | grep -c -i -E 'rollback|federation-check' (=0)"
   - id: REC2_LEDGER_TRAFFIC_IS_DOCBRIDGE
     node_type: evidence
     layer: audit
@@ -2213,6 +2238,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "docs/evolution/federation/CHANGELOG.md (53 entradas, formato '## <data> · <assunto> · COMPATÍVEL|BREAKING · alvo: <seletor>'); docs/evolution/federation/outbox/{granaai,gustavo-pulga,marcio-pessoal,metagamify,onion-hub,onion-mini,pulse-mais,rhilo-metagamify}/"
     label: "NUANÇA que junho não previu: a espinha git do design v2 materializou-se, mas o tráfego que ela carrega é ANÚNCIO de co-evolução (doc-bridge, campo alvo:), não bump de contrato. O CHANGELOG virou mailbox do doc-bridge com 53 entradas e 8 outboxes por membro — o inbox de contratos previsto na Fase 2 ficou vazio. A federação que pegou foi a de documentos, não a de contratos"
+    provenance:
+      source: "docs/evolution/federation/CHANGELOG.md@e0bf994a"
+      locator: "CHANGELOG.md@e0bf994a (cabeçalhos '## '); docs/evolution/federation/outbox/@e0bf994a (8 dirs); docs/evolution/federation/@e0bf994a (sem contracts/)"
+      method: "medição: git show e0bf994a:docs/evolution/federation/CHANGELOG.md | grep -c '^## ' (=53) e git ls-tree --name-only e0bf994a docs/evolution/federation/outbox/"
   - id: REC2_A2A_FORMAT_BUILT_WITHOUT_TRIGGER
     node_type: evidence
     layer: audit
@@ -2223,6 +2252,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "docs/onion/agent-card.json (protocolVersion 0.3.0, mtime 2026-07-09); .claude/validation/a2a-agent-card.sh; .claude/utils/federation-transport/ (a2a-verify.sh, a2a-ssrf-check.sh, jwks/, adapters/a2a-live.md); docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
     label: "REFUTA 'nada a fazer no eixo A2A agora': a projeção de formato FOI construída ~3 semanas depois do ADR (agent-card.json em /.well-known/, gerador + guarda de lint, JWKS pinado, verificador de 6 camadas) SEM que o gatilho declarado (1º consumidor não-Onion / interop real) tivesse disparado — o gatilho que disparou de fato foi interno (RFC-0004, transporte a2a-live gated entre membros Onion). O ADR estava certo no eixo runtime×formato e errado no gatilho"
+    provenance:
+      source: "docs/analysis/onion-federation-adr-a2a-format-interop-2026-06.md@e0bf994a"
+      locator: "ADR@e0bf994a l.3 (date 2026-06-15), l.153-161 (§Gatilho); adapters/a2a-live.md@e0bf994a l.5 ('6 camadas'); a2a-verify.sh@e0bf994a l.15-22 (camadas 0-6); a2a-agent-card.sh@e0bf994a l.3-8; jwks/README.md@e0bf994a l.1; lint-artifacts.sh@e0bf994a l.648 (REGRA 25); agent-card.json criado em a359f3ed (2026-07-09)"
+      method: "leitura: ADR, a2a-live.md, gerador, verificador, JWKS e lint lidos no commit e0bf994a (2026-07-21)"
   - id: REC2_TRUST_MACHINERY_IDLE
     node_type: evidence
     layer: audit
@@ -2232,7 +2265,12 @@ nodes:
     confidence: 0.9
     verified_at: 2026-07-21
     trace: "docs/evolution/trust-log.md (9 linhas, 3 tentativas, todas de 2026-07-01 13:36)"
-    label: "REFUTA a implicação de que consertar o id_in_list destravou a topologia de confiança: o trust-log registra 3 tentativas, todas do próprio dia do dogfood (01-jul), e nada desde então. O bug foi corrigido e guardado por 11 cenários de selftest, mas a maquinaria de trust não é invocada em produção há 20 dias — código verde, uso zero"
+    label: "NUANÇA ao 'fix do id_in_list destravou a topologia': o trust-log versionado tem só 3 tentativas, todas de 01-jul, e nada até 07-21 — mas o trust-check é a camada 1 do a2a-verify, exercida nos handshakes a2a-live de 07-10 sem linha no log versionado. Bug guardado por 11 selftests"
+    narrative: "label anterior: REFUTA a implicação de que consertar o id_in_list destravou a topologia de confiança: o trust-log registra 3 tentativas, todas do próprio dia do dogfood (01-jul), e nada desde então. O bug foi corrigido e guardado por 11 cenários de selftest, mas a maquinaria de trust não é invocada em produção há 20 dias — código verde, uso zero"
+    provenance:
+      source: "docs/evolution/trust-log.md@e0bf994a + docs/evolution/federation/CHANGELOG.md@e0bf994a + .claude/utils/federation-transport/a2a-verify.sh@e0bf994a"
+      locator: "trust-log.md@e0bf994a l.7-9 (3 tentativas, '2026-07-01 13:36'); CHANGELOG.md@e0bf994a l.342-346 (handshake a2a-live 07-10, 7 camadas); a2a-verify.sh@e0bf994a l.17, l.89-93 (camada 1 compõe trust-topology-check); corpo de 21842a51 l.36, l.47"
+      method: "leitura: trust-log, CHANGELOG e a2a-verify no commit e0bf994a + corpo do commit 21842a51"
   - id: REC2_DIARY_GATE_MET
     node_type: evidence
     layer: audit
@@ -2257,6 +2295,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "grep -i 'federa' em docs/materials/*.md → 'Federation multi-repo', 'Federation v2 — Coordenação Multi-Repo'; zero ocorrências de 'federação de agentes' fora dos próprios docs/analysis de junho"
     label: "CONFIRMOU o risco como não-materializado: os materiais de divulgação nunca usaram 'federação de agentes' — falam 'Federation multi-repo' / 'coordenação multi-repo sem quebrar nada'. A recomendação de rename foi satisfeita em substância sem ato de rename; o termo enganoso ficou confinado aos próprios documentos de análise que o criticaram"
+    provenance:
+      source: "docs/materials/@e0bf994a"
+      locator: "docs/materials/case-studies.md@e0bf994a l.22, l.29; landing-page.md l.64; manual-toc.md l.103; docs/analysis/onion-federation-review-2026-06.md@e0bf994a l.87 (a recomendação de rename)"
+      method: "medição: git grep -n -i 'federa' e0bf994a -- 'docs/materials/*.md' + git grep -l -i 'federação de agentes' e0bf994a (comando do trace, re-rodado no commit da data)"
   - id: REC2_HUB_VS_PEER_REFERENTS
     node_type: claim
     layer: audit
@@ -2266,10 +2308,14 @@ nodes:
     confidence: 0.8
     trace: "docs/analysis/onion-federation-design-v2-2026-06.md §1; docs/evolution/federation/members.yaml (SSOT única, escritor único, role: hub para metagamify); .claude/utils/federation-transport/README.md (§Invariantes)"
     label: "RECONCILIAÇÃO: o 'abandono do hub' de junho e o 'hub-and-spoke é ótimo em escala pequena' do grafo irmão não se contradizem — têm referentes distintos. O que foi abandonado foi o hub de RUNTIME (uma sessão Claude orquestrando dirs alheios, SA-3); o que sobreviveu e é central é o hub de IDENTIDADE (members.yaml single-source, escritor único), e o repo até reintroduziu role: hub como topologia de adoção. Julho confirma os dois lados"
+    provenance:
+      source: "docs/analysis/onion-federation-design-v2-2026-06.md@e0bf994a"
+      locator: "design-v2 l.13, l.16, l.26 (hub v1 = 1 sessão opera N dirs alheios, SA-3); members.yaml@e0bf994a l.3 ('Fonte canônica: o core'), l.12, l.57 (metagamify role: hub); federation-transport/README.md@e0bf994a l.55-60 (I3 um escritor por repo); grafo@e0bf994a l.297 (nó 'hub-and-spoke é o ótimo operacional')"
+      method: "derivado: reconciliação construída a partir de design-v2, members.yaml, README do transporte e do nó irmão l.297, lidos em e0bf994a"
   - id: REC2_Q_FORMAL_FEDERATION_DEAD_OR_DORMANT
     node_type: question
     layer: audit
-    plane: PROD
+    plane: DEV
     status: open
     impact: 4
     confidence: 0.4
@@ -5079,6 +5125,10 @@ nodes:
     verified_at: 2026-07-21
     trace: ".claude/utils/scope/compose-settings.sh · .claude/utils/scope/resolve-scope-layers.sh:1-60 (cadeia empresa→time→pessoa, merge type-aware) · git log: d20918a (#309) 6db26f4 (#314) 2dab19b (#320)"
     label: "O 'único gap real de engenharia' (settings.json não herda pela árvore) está FECHADO em código: compose-settings.sh compõe N camadas com merge type-aware e resolve-scope-layers.sh descobre a cadeia empresa→time→pessoa automaticamente"
+    provenance:
+      source: ".claude/utils/scope/compose-settings.sh@6ee5a7fa"
+      locator: "compose-settings.sh@6ee5a7fa l.3-13 (N camadas, merge type-aware); resolve-scope-layers.sh@6ee5a7fa l.3-8 (empresa→time→pessoa); commits d20918a4 (#309), 6db26f49 (#314), 2dab19b2 (#320)"
+      method: "leitura: dois scripts no commit 6ee5a7fa + mensagens dos commits d20918a4, 6db26f49, 2dab19b2"
   - id: SY4_prod_show_scope_provenancia
     node_type: evidence
     layer: audit
@@ -5159,6 +5209,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "docs/knowledge-base/concepts/onion-relation-vocabulary.md:96 (nó sumarizador ↔ aggregator/sub-synthesizer) · docs/knowledge-base/concepts/agent-orchestration.md:507 (frase-âncora locus≠forma na KB que o leitor consome)"
     label: "Os dois diferimentos de camada 3 do review viraram realidade: a cunhagem 'nó sumarizador' está ancorada ao termo de mercado numa tabela do TBox, e a doutrina do eixo forma-do-grafo tem frase-âncora dentro da KB (não só no ADR)"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-relation-vocabulary.md@6ee5a7fa"
+      locator: "onion-relation-vocabulary.md@6ee5a7fa l.96 ('| nó sumarizador | aggregator / sub-synthesizer |'); agent-orchestration.md@6ee5a7fa l.507 ('Locus ≠ forma'); topology-review-2026-06-22.md@6ee5a7fa l.53 (Tema C ⏳ DIFERIDO À PROMOÇÃO)"
+      method: "leitura: KBs e review lidos no commit 6ee5a7fa"
   - id: SY4_prod_orchestrates_workers
     node_type: evidence
     layer: audit
@@ -5353,6 +5407,10 @@ nodes:
     confidence: 0.7
     trace: "docs/analysis/onion-orchestration-math-phase-transition-2026-06.md (b·m≤W, saturação de fan-in) · docs/analysis/onion-orchestration-topology-review-2026-06-22.md (achado 'b·m≤W reancorada') · docs/analysis/onion-orchestration-topology-adr-2026-06-21.md:133-136"
     label: "DUPLICATA PARCIAL declarada: math-phase-transition e topology-review compartilham o MESMO objeto (b·m≤W e o nó sumarizador) — o paper é a fonte, o ADR é a aplicação e o review é o controle de qualidade da aplicação; o ADR absorveu a heurística, tornando o insumo do math redundante como recomendação"
+    provenance:
+      source: "docs/analysis/onion-orchestration-topology-adr-2026-06-21.md@6ee5a7fa"
+      locator: "topology-adr l.130-136 (b·m ≤ W no agente sintetizador/nó sumarizador); math-phase-transition-2026-06.md@6ee5a7fa l.42, l.64 (b·m≤W, aponta o ADR); topology-review-2026-06-22.md@6ee5a7fa l.50, l.53, l.75 ('reancorado em primeiros princípios')"
+      method: "derivado: sobreposição apurada pela leitura dos três documentos no commit 6ee5a7fa"
   - id: SY4_dup_ontology_f3_e_review_metadados
     node_type: claim
     layer: audit
@@ -5388,6 +5446,10 @@ nodes:
     confidence: 0.7
     trace: ".claude/utils/scope/resolve-scope-layers.sh (proveniência por-chave de settings) vs .claude/validation/kg-provenance-coverage.sh + .claude/validation/kg-coverage-baseline.txt (cobertura de relatórios no grafo)"
     label: "Duas 'proveniências' coexistem no core e NÃO devem ser confundidas: proveniência-por-chave de configuração (RFC-0005) e cobertura-de-proveniência do KG (qual relatório existe no grafo) — mesmo princípio declarado≠verificado, objetos distintos"
+    provenance:
+      source: ".claude/utils/scope/resolve-scope-layers.sh@6ee5a7fa"
+      locator: "resolve-scope-layers.sh@6ee5a7fa l.5, l.12-16 (--show-scope/--provenance por chave, RFC-0005); .claude/validation/kg-provenance-coverage.sh@6ee5a7fa l.3-16 ('este RELATÓRIO existe no grafo?'); kg-coverage-baseline.txt"
+      method: "derivado: distinção construída da leitura dos dois scripts no commit 6ee5a7fa"
   - id: B5_1_mcp_first_leak
     node_type: claim
     layer: audit
@@ -7272,7 +7334,12 @@ nodes:
     confidence: 0.7
     verified_at: 2026-07-21
     trace: "docs/onion/inventory.md:1 · .claude/validation/inventory.sh · .claude/validation/lint-artifacts.sh:1018,1293"
-    label: "PROVA: o drift de contagem virou SSOT gerada + guarda mecânica — docs/onion/inventory.md tem header 'GENERATED BY .claude/validation/inventory.sh — NÃO EDITE À MÃO' e o lint tem REGRA 16 (inventário-total divergente) + REGRA 8 (SSOT regenerada, nunca editada frase-a-frase) cobrindo derivados, não só CLAUDE.md."
+    label: "PROVA: o drift de contagem virou SSOT gerada + guarda — inventory.md tem header 'GENERATED BY .claude/validation/inventory.sh — NÃO EDITE À MÃO', a REGRA 8 compara a SSOT com o filesystem e a REGRA 16 cobre docs além do CLAUDE.md, mas isenta docs/materials/ (derivado, deferido)"
+    narrative: "label anterior: PROVA: o drift de contagem virou SSOT gerada + guarda mecânica — docs/onion/inventory.md tem header 'GENERATED BY .claude/validation/inventory.sh — NÃO EDITE À MÃO' e o lint tem REGRA 16 (inventário-total divergente) + REGRA 8 (SSOT regenerada, nunca editada frase-a-frase) cobrindo derivados, não só CLAUDE.md."
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh@123749e2"
+      locator: "docs/onion/inventory.md@123749e2 l.1; lint-artifacts.sh@123749e2 l.383-386 (REGRA 8), l.1018-1033 (REGRA 16, incl. ISENTA docs/materials/), l.1293-1294"
+      method: "leitura: inventory.md e lint-artifacts.sh no commit 123749e2"
   - id: SY5_index_residual_drift
     node_type: claim
     layer: audit
@@ -7292,6 +7359,10 @@ nodes:
     verified_at: 2026-07-21
     trace: ".claude/commands/meta/kb-freshness.md · plugins/onion-work-tools/commands/{kb-freshness,context-freshness}.md · .claude/validation/lint-artifacts.sh:994 · docs/analysis/onion-adr-kg-freshness-gate-2026-07.md"
     label: "PROVA: o gate de frescor de KB deixou de ser data no frontmatter e virou executável — /meta:kb-freshness e /meta:context-freshness existem (inclusive empacotados em onion-work-tools), lint REGRA 15 carimba frescor de contexto e há ADR kg-freshness-gate."
+    provenance:
+      source: ".claude/commands/meta/kb-freshness.md@123749e2"
+      locator: ".claude/commands/meta/{kb-freshness,context-freshness}.md@123749e2; plugins/onion-work-tools/commands/{kb-freshness,context-freshness}.md@123749e2; lint-artifacts.sh@123749e2 l.994 (REGRA 15); docs/analysis/onion-adr-kg-freshness-gate-2026-07.md@123749e2"
+      method: "leitura: git ls-tree -r --name-only 123749e2 | grep freshness + lint-artifacts.sh l.994 no commit 123749e2"
   - id: SY5_evolve_diaries_redecide
     node_type: claim
     layer: audit
@@ -7301,7 +7372,12 @@ nodes:
     confidence: 0.7
     verified_at: 2026-07-21
     trace: "docs/analysis/onion-evolution-2026-06-{15,16,17}.md"
-    label: "DUPLICATA REAL: os diários 06-15, 06-16 e 06-17 re-decidem os MESMOS 3 achados (varredura MCP-first, drift de contagem, categorias fantasma) em 3 dias consecutivos — o próprio 06-16 registra 'não executado desde o run anterior'. Não é fan-out redundante: é backlog-em-prosa não executando."
+    label: "DUPLICATA REAL (parcial): os diários 06-15/16/17 repetem achados — MCP-first nos três, categorias fantasma em 06-15 e 06-16, drift de contagem em 06-15 e 06-17 (06-16: inventário limpo) — e o 06-16 diz o MCP-first 'NÃO executado desde 2026-06-15'. é backlog-em-prosa parado"
+    narrative: "label anterior: DUPLICATA REAL: os diários 06-15, 06-16 e 06-17 re-decidem os MESMOS 3 achados (varredura MCP-first, drift de contagem, categorias fantasma) em 3 dias consecutivos — o próprio 06-16 registra 'não executado desde o run anterior'. Não é fan-out redundante: é backlog-em-prosa não executando."
+    provenance:
+      source: "docs/analysis/onion-evolution-2026-06-16.md@123749e2"
+      locator: "onion-evolution-2026-06-15.md@123749e2 l.36, l.56, l.67; -06-16.md l.36-37, l.83, l.86, l.92, l.139; -06-17.md l.61, l.69-70, l.76"
+      method: "leitura: os três diários lidos no commit 123749e2"
   - id: SY5_prose_backlog_antipattern
     node_type: claim
     layer: audit
@@ -7312,6 +7388,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "contraste .claude/validation/lint-artifacts.sh (fechou) × docs/analysis/onion-evolution-2026-06-*.md (repetiu)"
     label: "Lição destilada da tripla: backlog que mora em prosa datada re-nasce todo dia; só morre quando vira guarda mecânica no lint ou SSOT gerada — foi o que aconteceu com contagem (REGRA 16/8) e não aconteceu com os achados que ficaram só no relatório."
+    provenance:
+      source: "commit 123749e2 (corpo) + .claude/validation/lint-artifacts.sh@123749e2"
+      locator: "corpo do commit 123749e2 l.22-27; lint-artifacts.sh@123749e2 l.383 (REGRA 8), l.1018 (REGRA 16); docs/analysis/onion-evolution-2026-06-16.md@123749e2 l.92 (achado repetido)"
+      method: "leitura: corpo do commit 123749e2 + lint e diário 06-16 no mesmo commit"
   - id: SY5_phase_merge_invariant_held
     node_type: claim
     layer: audit
@@ -7337,9 +7417,9 @@ nodes:
     trace: "docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md:5 (re: handoff + 4 docs irmãos)"
     label: "Os 3 docs strategy-layer de 06-17 (blindspots + capability-draft + handoff) NÃO são repetição: são um pacote de uma sessão só (handoff=Doc 3, capability=Doc 2, blindspots=Doc 4/4) — e o próprio RFC-0002 os cita como '+4 docs irmãos' de um único handoff."
     provenance:
-      source: "docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md:5 (re: handoff + 4 docs irmãos)"
-      locator: "docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md:5 (re: handoff + 4 docs irmãos)"
-      method: "derivado: trace do nó, sem registro de medição"
+      source: "docs/evolution/rfc/rfc-0002-meta-strategy-verdict.md@123749e2"
+      locator: "rfc-0002 l.5 ('re: ...onion-strategy-layer-handoff-2026-06-17.md (+ 4 docs irmãos)'); onion-strategy-layer-capability-draft-2026-06-17.md l.19 ('Doc 2 de 4 do handoff de 2026-06-17 15:18'); -handoff-2026-06-17.md l.22 ('Doc 3 de 4'); -blindspots-2026-06-17.md l.17 ('Doc 4 de 4'); -adr-draft-2026-06-17.md l.20 ('Doc 1 de 4')"
+      method: "leitura: RFC-0002 e os quatro docs strategy-layer no commit 123749e2"
   - id: SY5_rfc0002_judged_trio
     node_type: claim
     layer: audit
@@ -7415,6 +7495,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "plugins/onion-work-tools/commands/ (14 arquivos, sem create-*/adopt/federation/evolve/graph/inventory)"
     label: "PROVA da doutrina 'meta-factory nunca é plugin': o onion-work-tools empacota só meta cross-cutting (kg, diary, orchestrate, metaspec-validate, kb/context-freshness, co-evolve, co-relay, recover, setup-*) e NENHUM /meta:create-*, adopt, federation-*, evolve, graph ou inventory."
+    provenance:
+      source: "plugins/onion-work-tools/commands/@123749e2"
+      locator: "git ls-tree --name-only 123749e2 plugins/onion-work-tools/commands/ (14 arquivos); docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md@123749e2 l.28 (D4 meta-fábrica = create-*/adopt/federation-*/evolve/graph/inventory)"
+      method: "medição: git ls-tree --name-only 123749e2 plugins/onion-work-tools/commands/ (14 entradas)"
   - id: SY5_onion_meta_question_dissolved
     node_type: claim
     layer: audit
@@ -7425,6 +7509,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "plugins/onion-work-tools/.claude-plugin/plugin.json (description: 'nao meta-fabrica')"
     label: "A pergunta #4 ('empacotar os 30 comandos meta/ tensiona a doutrina, exige RFC') foi dissolvida por DECOMPOSIÇÃO, não por RFC: separou-se meta-ferramenta-de-trabalho (empacotável) de meta-fábrica (nunca empacotável)."
+    provenance:
+      source: "docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md@123749e2"
+      locator: "patch-draft l.82-83 ('#4 onion-meta — os 30 comandos meta/ ... Tensiona a doutrina → RFC'); plugins/onion-work-tools/.claude-plugin/plugin.json@123749e2 (description 'nao meta-fabrica'); docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md@123749e2 l.28"
+      method: "leitura: patch-draft, plugin.json e SYNTHESIS da tier-matrix no commit 123749e2"
   - id: SY5_orchestration_skill_shipped_elsewhere
     node_type: claim
     layer: audit
@@ -7435,6 +7523,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "plugins/onion-work-tools/skills/onion-orchestration/ · plugins/onion-design/ (sem skills/) · plugins/onion-design/commands/generate.md:50"
     label: "Patch #2 aconteceu, mas em outro alvo: a skill onion-orchestration foi empacotada em onion-work-tools, não no manifest do onion-design — o onion-design não tem dir skills/ e alcança a orquestração só por referência textual."
+    provenance:
+      source: "plugins/@123749e2"
+      locator: "plugins/onion-work-tools/skills/onion-orchestration/SKILL.md@123749e2; git ls-tree 123749e2 plugins/onion-design/ (sem skills/); plugins/onion-design/commands/generate.md@123749e2 l.50; docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md@123749e2 l.44 (Patch #2 → onion-design)"
+      method: "leitura: árvore de plugins/, generate.md e patch-draft no commit 123749e2"
   - id: SY5_runflow_patch_open
     node_type: claim
     layer: audit
@@ -7454,6 +7546,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "find plugins -name 'catch-up*' = vazio · plugins/{onion-product,onion-engineering}/commands/warm-up.md"
     label: "Gap C4 confirmado por inspeção e ainda vivo: nenhum plugin embarca catch-up (só warm-up, em product e engineering) — /catch-up segue exclusivo do caminho adopt."
+    provenance:
+      source: "plugins/@123749e2"
+      locator: "git ls-tree -r 123749e2 plugins (warm-up só em plugins/onion-engineering/commands/ e plugins/onion-product/commands/); .claude/commands/catch-up.md@123749e2; docs/analysis/onion-plugin-coverage-patch-draft-2026-07.md@123749e2 l.80-81 (gap do /catch-up)"
+      method: "medição: git ls-tree -r --name-only 123749e2 plugins | grep -i -E 'catch-up|warm-up' (equivalente ao find do trace, no commit da data)"
   - id: SY5_smoke_test_never_run
     node_type: claim
     layer: audit
@@ -7500,6 +7596,10 @@ nodes:
     verified_at: 2026-07-21
     trace: ".claude/validation/resolve-production-branch.sh:1-25 · .claude/validation/resolve-integration-branch.sh"
     label: "PROVA parcial do branch-roles SDAAL: nasceu o SEGUNDO resolver de papel — resolve-production-branch.sh, irmão do resolve-integration-branch.sh, criado por sinal de campo da granaai (07-19: origin/HEAD apontando para develop envenenava gitflow.branch.master)."
+    provenance:
+      source: ".claude/validation/resolve-production-branch.sh@123749e2"
+      locator: "resolve-production-branch.sh@123749e2 l.3-18"
+      method: "leitura: cabeçalho do script no commit 123749e2"
   - id: SY5_branch_roles_adr_still_proposed
     node_type: claim
     layer: audit
@@ -7542,6 +7642,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md (status proposed-GATED) · .claude/validation/session-beacon.sh:1-12 · docs/onion/graph/autonomous-thread-runtime-2026-07.kg.yaml"
     label: "O runtime de autonomia virou ADR proposed-GATED com KG próprio, e uma das guardas duras já é código: session-beacon.sh implementa o beacon-check ('um escritor por repo inclui SESSÕES'), nascido do incidente de colisão W1×W2."
+    provenance:
+      source: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md@123749e2"
+      locator: "adr l.5 ('status: proposed — GATED'), l.70, l.85 (beacon-check); .claude/validation/session-beacon.sh@123749e2 l.1-11; docs/evolution/research/autonomous-thread-runtime-2026-07/autonomous-thread-runtime.kg.yaml@123749e2"
+      method: "leitura: ADR, script e grafo lidos no commit 123749e2"
   - id: SY5_ingestor_doctrine_accepted_code_absent
     node_type: claim
     layer: audit
@@ -7551,7 +7655,12 @@ nodes:
     confidence: 0.7
     verified_at: 2026-07-21
     trace: "docs/analysis/onion-adr-doctrine-ingestor-2026-07.md (status accepted) · grep -rl ingestor .claude/ → só .claude/diary/*"
-    label: "O ingestor de doutrina virou ADR ACEITO (trust-gate via members.yaml can_correct_to, KG-backed, human-gated, 1º dogfood granaai), mas o executável do ingestor não existe — nenhum script/comando 'ingestor' em .claude/, só ADR e migalhas de diário."
+    label: "O ingestor de doutrina virou ADR ACEITO (trust-gate por can_correct_to do members.yaml, KG-backed, human-gated, 1º dogfood granaai), mas o executável não existe: nenhum script/comando 'ingestor' em .claude/ — o termo só aparece em diários e, noutro sentido, no design-source"
+    narrative: "label anterior: O ingestor de doutrina virou ADR ACEITO (trust-gate via members.yaml can_correct_to, KG-backed, human-gated, 1º dogfood granaai), mas o executável do ingestor não existe — nenhum script/comando 'ingestor' em .claude/, só ADR e migalhas de diário."
+    provenance:
+      source: "docs/analysis/onion-adr-doctrine-ingestor-2026-07.md@123749e2"
+      locator: "adr l.2 (título), l.5 (status accepted, 1º dogfood granaai), l.36-38 (can_correct_to); git grep -l -i ingestor 123749e2 -- .claude/ (3 diários + diary/index.md + utils/design-source/README.md l.6, l.9, l.11)"
+      method: "leitura: ADR no commit 123749e2 + git grep -l -i ingestor 123749e2 -- .claude/"
   - id: SY5_federation_kg_ontology_answered
     node_type: claim
     layer: audit
@@ -7636,6 +7745,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "síntese desta leva"
     label: "Veredito da leva 5: 17 docs, ~2/3 do passivo já morreu em código sem ninguém marcar; o que sobra concentra-se em 3 fios reais (adopt --profile, guarda de scrub/confidencialidade, absorção do spec-as-run) + 2 pendências de materialização barata (playbooks em onion-patterns, runflow-dev no manifest)."
+    provenance:
+      source: "commit 123749e2 (corpo) + nós SY5_* do grafo@123749e2"
+      locator: "corpo de 123749e2 ('Seventeen documents', 'About two thirds of this batch had already died in code'); grafo@123749e2 nós SY5_profile_never_built (l.6093), SY5_g3_scrub_guard_absent (l.6075), SY5_spec_as_run_not_absorbed (l.6190), SY5_playbooks_materialization_open (l.5978), SY5_runflow_patch_open (l.6047)"
+      method: "derivado: veredito composto do corpo do commit 123749e2 e dos nós SY5_* da mesma leva"
   - id: B6_1_veredicto_pre_aplicavel
     node_type: claim
     layer: audit
@@ -9527,6 +9640,10 @@ nodes:
     verified_at: 2026-07-21
     trace: ".claude/utils/task-manager/adapters/none.md · .claude/utils/forge/adapters/none.md"
     label: "task-manager/adapters/none.md existe — as 3 abstrações voltaram a ser simétricas; a violação da própria regra §7/§14.3 do whitepaper foi fechada"
+    provenance:
+      source: "docs/analysis/onion-sdaal-fidelity-audit-2026-06.md@e94fd6f1"
+      locator: "sdaal-fidelity-audit@e94fd6f1 l.40 ('As 3 abstrações agora simétricas'); git ls-tree -r e94fd6f1 .claude/utils/ (adapters/none.md em task-manager, forge, de-identification); onion-repositioning-sdaal-session-2026-06-17.md@e94fd6f1 l.113-118"
+      method: "leitura: auditoria SDAAL, árvore .claude/utils/ e doc de reposicionamento no commit e94fd6f1"
   - id: SY6_ev_lint_regra5_por_tipo
     node_type: claim
     layer: audit
@@ -9635,6 +9752,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "grep STATE.md → .claude/commands/{catch-up,onion,engineer/start,engineer/plan,engineer/hotfix,engineer/warm-up,design/identity,…}.md"
     label: "STATE.md virou o ponteiro único lido por 10+ comandos (catch-up, onion, engineer:start/plan/work/warm-up…), matando o protocolo 'ler todos os .md da pasta'"
+    provenance:
+      source: ".claude/commands/@e94fd6f1"
+      locator: "git grep -l STATE.md e94fd6f1 -- .claude/commands/ (13 arquivos); engineer/work.md@e94fd6f1 l.25; docs/analysis/onion-sessions-review-2026-06.md@e94fd6f1 l.44 (o protocolo antigo 'Ler todos os arquivos markdown na pasta'), l.62 (STATE.md Tier-0)"
+      method: "medição: git grep -l STATE.md e94fd6f1 -- .claude/commands/ | wc -l (=13, comando do trace no commit da data)"
   - id: SY6_ev_symlinks_removidos
     node_type: claim
     layer: audit
@@ -9645,6 +9766,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "find .claude -type l → vazio"
     label: "Zero symlinks em .claude/; product/help.md não existe mais — os 2 ponteiros mortos para .onion/contexts/ foram removidos"
+    provenance:
+      source: ".claude/@e94fd6f1"
+      locator: "git ls-tree -r e94fd6f1 .claude (0 entradas modo 120000); .claude/commands/product/ sem help.md; docs/analysis/onion-vv-baseline-2026-06.md@e94fd6f1 l.92-98 (os 2 symlinks para .onion/contexts/)"
+      method: "medição: git ls-tree -r e94fd6f1 .claude | grep -c '^120000' (=0) e git ls-tree -r --name-only e94fd6f1 .claude/commands/product/ | grep -c help (=0)"
   - id: SY6_ev_allowed_tools_universal
     node_type: claim
     layer: audit
@@ -9655,6 +9780,10 @@ nodes:
     verified_at: 2026-07-21
     trace: "grep -rl allowed-tools .claude/commands/ → 98"
     label: "allowed-tools passou de 1/93 para 98 arquivos de comando — cobertura dos invocáveis, tratado como capability surface e não documentação"
+    provenance:
+      source: ".claude/commands/@e94fd6f1"
+      locator: "git grep -l allowed-tools e94fd6f1 -- .claude/commands/ (98); docs/onion/inventory.md@e94fd6f1 l.11 ('Comandos invocáveis | 98'); docs/analysis/onion-vv-baseline-2026-06.md@e94fd6f1 l.66 ('allowed-tools em comandos | ⚠️ 1/93'); docs/knowledge-base/meta/onion-framework-identity.md@e94fd6f1 l.261 (capability surface)"
+      method: "medição: git grep -l allowed-tools e94fd6f1 -- .claude/commands/ | wc -l (=98, comando do trace no commit da data)"
   - id: SY6_ev_settings_presentes
     node_type: claim
     layer: audit
@@ -9665,6 +9794,10 @@ nodes:
     verified_at: 2026-07-21
     trace: ".claude/settings.json · .claude/settings.local.json · find *execution*template* → vazio"
     label: "settings.json e settings.local.json presentes; templates órfãos de execução removidos"
+    provenance:
+      source: "/home/marcio/onion-evolve/.claude/settings.local.json + .claude/settings.json@e94fd6f1"
+      locator: ".claude/settings.json@e94fd6f1; .gitignore@e94fd6f1 l.46 (.claude/settings.local.json ignorado); git ls-tree -r e94fd6f1 | grep -i execution (vazio); docs/analysis/onion-sessions-review-2026-06.md@e94fd6f1 l.38 (os templates órfãos)"
+      method: "testemunho: medição da sessão 2026-07-21 (commit e94fd6f1), comando não registrado, para .claude/settings.local.json (gitignored, .gitignore@e94fd6f1 l.46); settings.json e ausência dos templates por leitura de e94fd6f1"
   - id: SY6_ev_mcp_json_ausente
     node_type: claim
     layer: audit
@@ -9878,7 +10011,12 @@ nodes:
     confidence: 0.7
     verified_at: 2026-07-21
     trace: "ls / → sem whatsapp-sender · .claude/utils/ → sem messenger (eixo SDAAL segue gated)"
-    label: "Raiz do repo contém apenas CLAUDE.md, CONTRIBUTING.md, LICENSE, README.md, docs/, plugins/, site/ — zero código de aplicação: a extração via subtree split foi executada"
+    label: "Raiz do repo (entradas não-ocultas) contém apenas CLAUDE.md, CONTRIBUTING.md, LICENSE, README.md, docs/, plugins/, site/ — zero código de aplicação: a extração via subtree split foi executada"
+    narrative: "label anterior: Raiz do repo contém apenas CLAUDE.md, CONTRIBUTING.md, LICENSE, README.md, docs/, plugins/, site/ — zero código de aplicação: a extração via subtree split foi executada"
+    provenance:
+      source: "commit f05ba421 (onion-evolve) + árvore @e94fd6f1"
+      locator: "git ls-tree --name-only e94fd6f1 (raiz); git ls-tree --name-only e94fd6f1 .claude/utils/ (sem messenger); corpo de f05ba421 l.5-10 (subtree split para marciocar/whatsapp-sender)"
+      method: "leitura: árvore do commit e94fd6f1 e corpo do commit f05ba421 (#252)"
   - id: SY6_ev_slm_virou_adr
     node_type: claim
     layer: audit
@@ -9902,7 +10040,12 @@ nodes:
     confidence: 0.7
     verified_at: 2026-07-21
     trace: ".claude/commands/meta/evolve.md:74 (coluna de modelo por dimensão)"
-    label: "O roteamento dinâmico por tarefa (fim do 'modelo herói') é operacional: /meta:evolve define modelo por dimensão de auditoria (D1-D8), tiering como régua"
+    label: "O roteamento dinâmico por tarefa (fim do 'modelo herói') é operacional: /meta:evolve define tier por dimensão de auditoria (D1-D10) — modelo fixo (haiku/sonnet) nas dimensões executadas por worker e delegação a comando/rotina nas compostas (D4, D5, D9, D10), tiering como régua"
+    narrative: "label anterior: O roteamento dinâmico por tarefa (fim do 'modelo herói') é operacional: /meta:evolve define modelo por dimensão de auditoria (D1-D8), tiering como régua"
+    provenance:
+      source: ".claude/commands/meta/evolve.md@e94fd6f1"
+      locator: "evolve.md@e94fd6f1 l.64-65 (D4, D5, D9, D10 são composição — delegam a comandos/rotina), l.67-78 (tabela Dimensão × Tier)"
+      method: "leitura: tabela de dimensões do /meta:evolve no commit e94fd6f1"
   - id: SY6_ev_kg_virou_guarda
     node_type: claim
     layer: audit
@@ -10007,6 +10150,10 @@ nodes:
     verified_at: 2026-08-30
     verified_against: "piloto kg-freshness 2026-08-29: worker re-mediu as 4 afirmacoes ao vivo; selo do maestro 2026-08-30"
     label: "SUPERSEDE [REC_STAGING_ROT_AND_MISSING_MAILBOX] (2026-07-21) com a verdade de 2026-08-29: TRES das quatro afirmacoes seguem verdadeiras e re-medidas (os 11 anuncios apodrecidos ate 13 dias; a causa membro method-only sem caixa postal; o fix caixa-postal-nao-e-framework, vivo e recebendo correio ate 2026-08-18). A QUARTA driftou: o label citava a REGRA 28 com 3 classes SOFT — em 2026-08 a revisao do double-firing AMPUTOU a classe de outbox orfao (absorvida pela REGRA 46), deixando a 28 com 2 classes. No que cita numero de classes de uma guarda apodrece quando a guarda e refatorada — mesma classe do /admin/stats do m2."
+    provenance:
+      source: "docs/evolution/review/feat-pilot-sealing-batch.md@d761c963"
+      locator: "resíduo feat-pilot-sealing-batch.md@d761c963 l.26 e l.43-44; lint-artifacts.sh@d761c963 l.1479-1497 (REGRA 28, AMPUTAÇÃO 2026-08) e l.1509 ('DUAS classes'); lint-artifacts.sh@4e54b052 l.689 ('TRÊS classes'); commits 83a7830d e 419a3907 (4+7=11); commit 757a6676 (2026-08-18) + docs/evolution/federation/outbox/marcio-pessoal/_processed/2026-08-18-elenxo-doctrine-vendorizada.md@d761c963"
+      method: "leitura: resíduo de selagem, lint em d761c963 e 4e54b052, commits 83a7830d/419a3907/757a6676 do core"
 
 edges:
   - from: G1_INTERRUPT_STATES

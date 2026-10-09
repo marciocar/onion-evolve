@@ -69,6 +69,10 @@ nodes:
     confidence: 0.7
     status: confirmed
     label: "REC D6: cindir a pergunta. MENSAGEM/posicionamento = P4 (único whitespace confirmado), MAS sem prometer L1-L6 gated (só workflows faseados + auditabilidade estrutural, que já existem). PIPELINE/1ª receita = P3 (mais líquido, ciclo curto). P5 descartado como primário (D7 já decidiu = MOAT). P6 fora (pré-req branding)"
+    provenance:
+      source: "docs/business-context/gtm-decision-brief-2026-07.md"
+      locator: "docs/business-context/gtm-decision-brief-2026-07.md:25-41 e :65-66 @21213cc6"
+      method: "leitura: brief-irmão do grafo, recomendação D6 do analista"
   - id: C_D1_rec
     node_type: claim
     layer: audit
@@ -77,6 +81,10 @@ nodes:
     confidence: 0.7
     status: confirmed
     label: "REC D1: RATIFICAR A (camadas) — deixa de ser hipótese; o que falta fechar é o GATILHO de abrir, não o modelo. C (SaaS control-plane) = HORIZONTE pós-D2, não escolha imediata (colide com identidade sem-infra). B (licença) contraria guardrail anti-relicenciamento. D (consultoria-only) = não-decidir disfarçado"
+    provenance:
+      source: "docs/business-context/gtm-decision-brief-2026-07.md"
+      locator: "docs/business-context/gtm-decision-brief-2026-07.md:47 e :127-135 @21213cc6"
+      method: "leitura: brief-irmão do grafo (header do .kg.yaml l.6), recomendação D1 do analista"
   - id: C_D5_rec
     node_type: claim
     layer: audit
@@ -95,6 +103,10 @@ nodes:
     confidence: 0.65
     status: confirmed
     label: "REC D3: opção C — DESACOPLAR mentoria (receita D4, sem artefato não-provado, pricing $149-399/mês compatível com D5) do app-consumer (F0/F1, N=1, mantém gated). D como refinamento de marca depois. Preserva opcionalidade sem travar receita nem furar D5"
+    provenance:
+      source: "docs/business-context/gtm-decision-brief-2026-07.md"
+      locator: "docs/business-context/gtm-decision-brief-2026-07.md:49, :180, :183-186 @21213cc6"
+      method: "leitura: brief-irmão do grafo, recomendação D3 do analista"
 
   # ---- EVIDÊNCIA (evidence) ----
   - id: E_anthropic_pricing
@@ -104,7 +116,12 @@ nodes:
     impact: 5
     confidence: 0.9
     status: confirmed
-    label: "Anthropic opera a MESMA fronteira no ecossistema onde o Onion vive: Claude Code pleno em Pro $20/Max $100 (individual); marketplace privado/department-agents gated a Team Premium ($100-150/seat, min 5) ou Enterprise. url: claude.com/pricing + adwaitx.com/claude-marketplace-enterprise (fev/2026)"
+    label: "Anthropic opera a MESMA fronteira: Claude Code pleno em Pro/Max (individual); marketplace/governança gated a Team/Enterprise — o marketplace completo de parceiros exige Enterprise, cujo preço não é público. url: claude.com/pricing (fev/2026, via brief) + adwaitx.com (mar/2026)"
+    narrative: "label anterior: Anthropic opera a MESMA fronteira no ecossistema onde o Onion vive: Claude Code pleno em Pro $20/Max $100 (individual); marketplace privado/department-agents gated a Team Premium ($100-150/seat, min 5) ou Enterprise. url: claude.com/pricing + adwaitx.com/claude-marketplace-enterprise (fev/2026)"
+    provenance:
+      source: "https://adwaitx.com/claude-marketplace-enterprise"
+      locator: "docs/business-context/gtm-decision-brief-2026-07.md:128 @21213cc6; adwaitx.com/claude-marketplace-enterprise (\"full enterprise marketplace with partner solutions requires an Enterprise subscription\"; \"Claude for Enterprise pricing is not publicly disclosed\")"
+      method: "leitura: brief-irmão l.128 + página adwaitx lida em 2026-10-09"
   - id: E_whitespace_compliance
     node_type: evidence
     layer: audit
@@ -113,6 +130,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "Whitespace confirmado (10+ buscas): nenhum concorrente SDD trata compliance como dimensão peer. trace: docs/business-context/02-product/strategy.md §Posicionamento; personas.md P4 (shadow AI 82%, riscos FINRA — Zylos 2026)"
+    provenance:
+      source: "docs/business-context/02-product/strategy.md"
+      locator: "docs/business-context/02-product/strategy.md:30 @b57930a8; docs/business-context/01-customer/personas.md:36 @a4e5f8a2"
+      method: "leitura: strategy.md §Posicionamento l.30 + personas.md P4 l.36"
   - id: E_compliance_grc_market
     node_type: evidence
     layer: audit
@@ -120,7 +141,12 @@ nodes:
     impact: 4
     confidence: 0.8
     status: confirmed
-    label: "GRC/compliance software $10-40k/ano (Scytale, Vanta ~$15-60k, Drata ~$15-75k); add-on AI governance $40-150k/ano (Credo AI/Holistic AI). Mercado compliance projetado $15.2B até 2026 (14.8% CAGR). url: layer3labs.io/guides/ai-compliance-software, reco.ai"
+    label: "GRC/compliance software $10-40k/ano (Scytale), Vanta ~$15-60k, Drata ~$15-75k; add-on AI governance $40-150k/ano (Credo AI/Holistic AI). url: layer3labs.io/guides/ai-compliance-software"
+    narrative: "label anterior: GRC/compliance software $10-40k/ano (Scytale, Vanta ~$15-60k, Drata ~$15-75k); add-on AI governance $40-150k/ano (Credo AI/Holistic AI). Mercado compliance projetado $15.2B até 2026 (14.8% CAGR). url: layer3labs.io/guides/ai-compliance-software, reco.ai"
+    provenance:
+      source: "https://layer3labs.io/guides/ai-compliance-software"
+      locator: "layer3labs.io/guides/ai-compliance-software (lida 2026-10-09, \"Updated Sep 28, 2026\"); docs/business-context/gtm-decision-brief-2026-07.md:60"
+      method: "leitura: página layer3labs lida em 2026-10-09 + brief-irmão l.60"
   - id: E_safe_cert
     node_type: evidence
     layer: audit
@@ -129,6 +155,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "Certificação de metodologia (âncora): SAFe SPC $795 exame + $3.5-7k total, renovação $195-995/ano; EOS implementer ~$3.500/mês por engajamento (capacidade limitada). url: staragile.com, agile36.com, guestcanpost.com"
+    provenance:
+      source: "docs/business-context/gtm-decision-brief-2026-07.md"
+      locator: "docs/business-context/gtm-decision-brief-2026-07.md:150 e :152 @21213cc6"
+      method: "testemunho: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
   - id: E_consulting_daterate
     node_type: evidence
     layer: audit
@@ -137,6 +167,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "Consultoria sênior de IA solo $1.200-$2.800/dia; dev-tool premium tier recorrente $130-260/mês — âncora dos 2 degraus vendíveis já (treino/consultoria = receita 'mais próxima' de D4). url: groovyweb.co, pertamapartners.com, promptstoproduct.com"
+    provenance:
+      source: "docs/business-context/gtm-decision-brief-2026-07.md"
+      locator: "docs/business-context/gtm-decision-brief-2026-07.md:128 e :150 @21213cc6"
+      method: "testemunho: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
   - id: E_consumer_pipoca
     node_type: evidence
     layer: audit
@@ -144,7 +178,12 @@ nodes:
     impact: 4
     confidence: 0.8
     status: confirmed
-    label: "Apps 'AI second brain' consumer precificam PIPOCA: Reflect/Capacities/Mem $9,99-40/mês ou pacote único $197 — CONTRADIZ a diretriz D5 ($129+ > pipoca). Comprometer app-consumer agora forçaria furar D5 ou vender caro demais p/ leigo. url: iwoszapar.com, Taskade, toolfinder (jul/2026)"
+    label: "Apps 'AI second brain' consumer precificam PIPOCA: Reflect/Capacities/Mem $9,99-40/mês — CONTRADIZ a diretriz D5 ($129+ > pipoca). Comprometer app-consumer agora forçaria furar D5 ou vender caro demais p/ leigo. url: iwoszapar.com (jul/2026)"
+    narrative: "label anterior: Apps 'AI second brain' consumer precificam PIPOCA: Reflect/Capacities/Mem $9,99-40/mês ou pacote único $197 — CONTRADIZ a diretriz D5 ($129+ > pipoca). Comprometer app-consumer agora forçaria furar D5 ou vender caro demais p/ leigo. url: iwoszapar.com, Taskade, toolfinder (jul/2026)"
+    provenance:
+      source: "docs/business-context/gtm-decision-brief-2026-07.md"
+      locator: "docs/business-context/gtm-decision-brief-2026-07.md:178 @21213cc6; docs/onion/graph/company-brain-market-2026-07.kg.yaml:65"
+      method: "leitura: brief-irmão l.178 + nó irmão do company-brain-market (url iwoszapar com path)"
   - id: E_mentoria_pricing
     node_type: evidence
     layer: audit
@@ -152,7 +191,12 @@ nodes:
     impact: 4
     confidence: 0.8
     status: confirmed
-    label: "Mentoria/comunidade premium com coaching: $149-399/mês (180-420 membros) ou cohorts $97-497/vaga — ordem de grandeza COMPATÍVEL com ticket premium de D5, ao contrário do app-consumer puro. url: communipass.com, kourses.com (jul/2026)"
+    label: "Mentoria/comunidade premium com coaching: $149-399/mês ou cohorts $97-497/vaga — ordem de grandeza COMPATÍVEL com ticket premium de D5, ao contrário do app-consumer puro. url: communipass.com, kourses.com (jul/2026)"
+    narrative: "label anterior: Mentoria/comunidade premium com coaching: $149-399/mês (180-420 membros) ou cohorts $97-497/vaga — ordem de grandeza COMPATÍVEL com ticket premium de D5, ao contrário do app-consumer puro. url: communipass.com, kourses.com (jul/2026)"
+    provenance:
+      source: "docs/business-context/gtm-decision-brief-2026-07.md"
+      locator: "docs/business-context/gtm-decision-brief-2026-07.md:180 @21213cc6"
+      method: "testemunho: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
   - id: E_hybrid_pricing_trend
     node_type: evidence
     layer: audit
@@ -160,7 +204,12 @@ nodes:
     impact: 3
     confidence: 0.75
     status: confirmed
-    label: "Mercado IA migra p/ pricing híbrido/por outcome: 43%→61% hybrid em 2026, seat-based caindo 21%→15% (Bessemer VP) — mas depende de telemetria que o Onion NÃO tem instrumentada (mesma lacuna que trava preço-por-outcome). url: flexprice.io/blog/top-solutions-for-ai-and-agentic-monetization; BCG 2025"
+    label: "Hybrid pricing de IA: 43%→61% em 2026 (Bessemer, citado no brief sem link; a URL flexprice.io não traz o número) — mas depende de telemetria que o Onion NÃO tem instrumentada, a mesma lacuna que trava preço por outcome."
+    narrative: "label anterior: Mercado IA migra p/ pricing híbrido/por outcome: 43%→61% hybrid em 2026, seat-based caindo 21%→15% (Bessemer VP) — mas depende de telemetria que o Onion NÃO tem instrumentada (mesma lacuna que trava preço-por-outcome). url: flexprice.io/blog/top-solutions-for-ai-and-agentic-monetization; BCG 2025"
+    provenance:
+      source: "docs/business-context/gtm-decision-brief-2026-07.md"
+      locator: "docs/business-context/gtm-decision-brief-2026-07.md:130 e :151 @21213cc6"
+      method: "testemunho: pesquisa de mercado da sessão registrada no brief GTM em 21213cc6 (2026-07); primária citada só por domínio, sem localizador"
 
   # ---- QUESTÕES ABERTAS (question) ----
   - id: Q_d6_message_vs_pipeline

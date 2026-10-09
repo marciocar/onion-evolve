@@ -420,15 +420,20 @@ nodes:
   - id: E_LACUNAS_INFRA_VPS_1005
     node_type: evidence
     plane: DEV
-    status: unverifiable
+    status: confirmed
     impact: 4
     confidence: 0.85
     verified_at: 2026-10-05
     verified_against: 'contabilidade da rodada de 2026-10-05: 33 fontes, 26 claims, 17 confirmadas, 8 refutadas, 0 nao verificadas; Elenxo 12 sobreviventes, 12 modeladas; payload do workflow truncado em dois pontos'
     source_tier: 10
     source_kind: internal-audit
-    label: 'LACUNAS DECLARADAS. (1) Orcamento: 33 fontes e 26 claims; 17 confirmadas, 8 refutadas por fonte fraca ou voto, 0 nao verificadas por 403/truncagem; 1 claim sem destino contabilizado (26 = 17 + 8 + 1). (2) Refutadas por fonte fraca: homelab listar-conferir-agir (tier 4); DOCKER-USER unica cadeia que o Docker honra (tier 4); heinzel todo SSH aprovado por humano (tier 4); tres claims qovery de custo de plataforma (tier 3); skill de audit nao cobre reboot/updates/sessoes (tier 3); checkrestart com falsos positivos (tier 8, refutada no voto). (3) Elenxo: 12 objecoes sobreviventes, 12 modeladas — nenhuma fora do grafo. (4) TRUNCAGEM no payload: a evidencia da objecao aos achados 15 e 16 corta em Se houver qualquer integracao por, e a recomendacao do Elenxo corta no constraint 2 (Compor o que ja esta instalado: needrestar); os constraints 2 em diante NAO chegaram e nao foram reconstruidos. (5) Nao medidos nesta sessao: 45 pacotes atualizaveis, restart policy dos 31 containers, 16 mosh orfaos, release 26.04.1; kernel 146 nao reproduzido. (6) Nao medido: comportamento de needrestart -b no kernel 6.8.0-139 em execucao.'
+    label: "LACUNAS (journal wf_b5f60320-80d): 15 fontes lidas (33 cortadas); 51 claims, 25 verificadas = 17 confirmadas + 8 refutadas (7 de fonte tier 3-4, 1 de tier 8); 26 fora do orçamento. Elenxo: 41 objeções, 27 sobrevivem, 12 no grafo; a recomendação chegou truncada ao escritor."
+    narrative: "label anterior: LACUNAS DECLARADAS. (1) Orcamento: 33 fontes e 26 claims; 17 confirmadas, 8 refutadas por fonte fraca ou voto, 0 nao verificadas por 403/truncagem; 1 claim sem destino contabilizado (26 = 17 + 8 + 1). (2) Refutadas por fonte fraca: homelab listar-conferir-agir (tier 4); DOCKER-USER unica cadeia que o Docker honra (tier 4); heinzel todo SSH aprovado por humano (tier 4); tres claims qovery de custo de plataforma (tier 3); skill de audit nao cobre reboot/updates/sessoes (tier 3); checkrestart com falsos positivos (tier 8, refutada no voto). (3) Elenxo: 12 objecoes sobreviventes, 12 modeladas — nenhuma fora do grafo. (4) TRUNCAGEM no payload: a evidencia da objecao aos achados 15 e 16 corta em Se houver qualquer integracao por, e a recomendacao do Elenxo corta no constraint 2 (Compor o que ja esta instalado: needrestar); os constraints 2 em diante NAO chegaram e nao foram reconstruidos. (5) Nao medidos nesta sessao: 45 pacotes atualizaveis, restart policy dos 31 containers, 16 mosh orfaos, release 26.04.1; kernel 146 nao reproduzido. (6) Nao medido: comportamento de needrestart -b no kernel 6.8.0-139 em execucao."
     trace: 'docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/infra-vps-2026-10/data/wf_b5f60320-80d.json + docs/evolution/research/infra-vps-2026-10/SYNTHESIS.md"
+      locator: "journal: result.stats {sources 15, claims 51, verified 25, confirmed 17, refuted 8, unverified 0}; len(budgetDropped)=33; len(notVerifiedByBudget)=26; refuted[0..7] (tiers 4,4,4,3,3,3,3,8); logs \"Elenxo: 41 objeções, 27 sobreviventes\"; grafo: 12 \"id: E_OBJECAO\"; SYNTHESIS.md l.50-55 (tabela) e l.57 (recomendação chegou truncada ao escritor)"
+      method: "leitura: journal versionado data/wf_b5f60320-80d.json (git ls-files) + SYNTHESIS.md"
 
   # ═══════════════════ OPCOES ═══════════════════
 

@@ -55,6 +55,10 @@ nodes:
     verified_against: m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find
     label: "WHATSAPP: o unico lado VIVO hoje e o WAHA — container onion-vps-waha (devlikeapro/waha:latest), running desde 2026-08-05, bind 127.0.0.1:3999, API responde 401 (exige key). O whatsapp-sender NAO ESTA VIVO: zero processo (ps), zero container (docker ps -a), zero unit systemd, sem pm2 instalado. O CODIGO e a sessao pareada (.wwebjs_auth, mtime 2026-07-05) EXISTEM EM DISCO, mas em /home/onion/onion-bridge/workspaces/7f2a16301adad917/whatsapp-sender (workspace de agente do bridge, 234M, sem .git) e NAO em ~onion/whatsapp-sender, que e o caminho que o parecer de 2026-07-05 e o rotulo anterior afirmavam. RESSALVA SOBRE A PROPRIA MEDICAO: o worker do M8 concluiu que nao havia nem diretorio — a busca dele foi incompleta e o diretorio existe; o que nao existe e o SERVICO. Pesquisa research/whatsapp-api-2026-07 decide eixo oficial x nao-oficial (regulado->Cloud API; dogfood->WAHA>Evolution)"
     trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
+      locator: "ledger l.22 (ENT_whatsapp DRIFTED: WAHA vivo; whatsapp-sender inexistente) · corpo de 8b005f65 l.49-53 (sudo find no workspace do bridge: o diretório existe, o serviço não) · onion-vps-waha@3408d82 docker-compose.yml l.12 (image devlikeapro/waha:latest) e l.16 (127.0.0.1:3999:3000)"
+      method: "testemunho: medição no host vivo srv1812846 em 2026-08-06/07 (ps, docker ps -a, systemctl, sudo find), registrada no ledger M8 e nos commits a8b6cfb7/8b005f65; 234M, mtime de .wwebjs_auth, \"running desde 2026-08-05\" e o 401 não têm comando versionado"
 
   - id: E_waha_public_route_caddy
     node_type: evidence
@@ -66,9 +70,9 @@ nodes:
     verified_against: "PONTA A PONTA em 2026-08-19: caddy validate+reload OK; DNS criado VIA API Hostinger (PUT zones append, verificado por RELEITURA da zona, nao pelo eco do PUT) apos o maestro informar o token em ~/.config/hostinger; resolucao publica OK; cert Let s Encrypt emitido (valido ate 2026-11-17); https://waha.onionevolve.com/api/sessions devolve 401 JSON do WAHA sem chave E com chave errada — cadeia DNS->TLS->Caddy->auth inteira viva"
     label: "ROTA PUBLICA ABERTA por ordem do maestro (2026-08-19): waha.onionevolve.com -> 127.0.0.1:3999 via /etc/caddy/conf.d/waha.caddy (convencao de bloco opcional da casa). Motivo: integracao de app externo (Lovable) — o app na nuvem nao alcanca loopback. O bind do container SEGUE no localhost (o Caddy e o unico expositor; TLS na frente, X-Api-Key do WAHA em toda chamada). PENDENTES RESOLVIDOS em 2026-08-19: registro A criado via API Hostinger (token em ~/.config/hostinger, informado pelo maestro) e cert ACME emitido. Desligar = rm do .caddy + reload; revogar acesso = trocar WAHA_API_KEY no compose"
     provenance:
-      source: "https://waha.onionevolve.com/api/sessions"
-      locator: "PONTA A PONTA em 2026-08-19: caddy validate+reload OK; DNS criado VIA API Hostinger (PUT zones append, verificado por RELEITURA da zona, nao pelo eco do PUT) apos o maestro informar o token em ~/.config/hostinger; resolucao publica OK; cert Let s Encrypt emitido (valido ate 2026-11-17); https://waha.onionevolve.com/api/sessions devolve 401 JSON do WAHA sem chave E com chave errada — cadeia DNS->TLS->Caddy->auth inteira viva"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (URL citada no verified_against; rota A1 da triagem); não reverificado"
+      source: "docs/evolution/review/ops-waha-public-route.md"
+      locator: "l.18 (Origem: ordem do maestro, integração Lovable) + §Prova l.46 (caddy validate, 401 sem chave/chave errada) + §Adendo l.54-62 (token ~/.config/hostinger informado pelo maestro, PUT overwrite:false verificado por releitura, cert LE válido até 2026-11-17, 401 JSON do WAHA); onion-vps-waha@c92ff68 README.md l.41-46"
+      method: "leitura: resíduo R56 do PR #634 + commit 21e62755 + README do repo onion-vps-waha@c92ff68"
 
   - id: E_gmill_demo_route_caddy
     node_type: evidence
@@ -79,6 +83,10 @@ nodes:
     verified_at: 2026-10-08
     verified_against: "PONTA A PONTA em 2026-10-08: A gmill -> 179.197.65.94 via API Hostinger (PUT append overwrite:false, zona 44->45 conjuntos, 0 perdidos/alterados, relida); cert Let's Encrypt emitido (ssl_verify 0); curl sem credencial 401, /api com Bearer sem cookie 401, cookie errado 401, Bearer+cookie valido 200, pagina so com cookie 401, 401 sem Set-Cookie; install-caddy-config.sh rc 0 e --check sem drift; os 7 conf.d nao geridos intocados (mtime/perm iguais)"
     label: "ROTA PUBLICA ABERTA por ordem do maestro (2026-10-08, pedido da sessao meugmill-vendas-6d): gmill.onionevolve.com -> 127.0.0.1:39081 (demo MeuGmill Vendas). PRIMEIRO vhost de conf.d VERSIONADO (ops/caddy/conf.d/gmill.caddy), instalado por ops/install-caddy-config.sh, que agora gere conf.d com segredo fora do git (marcadores resolvidos de /etc/caddy/secrets/gmill.env, root 0600; senha e cookie no pass onion/gmill-demo-*). Auth = opcao B do maestro: Basic em tudo; /api/* aceita o cookie HttpOnly emitido apos o Basic, porque a demo manda Authorization: Bearer e o navegador nao mistura o Basic guardado com Authorization explicito (medido: Bearer -> 401 com basic_auth puro). O route e load-bearing: sem ele o 401 levava o Set-Cookie (medido por mutante). Pendente-com-dono: a stack carteira ainda roda SEM o override compose.gmill.yaml (OIDC_ISSUER=localhost), entao tokens emitidos pelo dominio terao iss divergente ate a sessao meugmill-vendas subir com o override"
+    provenance:
+      source: "docs/evolution/review/ops-gmill-demo-site.md"
+      locator: "l.24 (Origem: ordem do maestro, sessão meugmill-vendas-6d) + §Achados l.39+ (1: Bearer→401, opção B cookie; 2: route load-bearing, mutante) + §\"Prova ao vivo (2026-10-08)\" l.67+ + §Pendente-com-dono l.80; ops/caddy/conf.d/gmill.caddy l.5-7, l.34-46"
+      method: "leitura: resíduo R56 do branch ops/gmill-demo-site + vhost versionado (commit afca438e)"
 
   - id: E_librechat_install_started
     node_type: evidence
@@ -89,6 +97,10 @@ nodes:
     verified_at: 2026-08-20
     verified_against: "CAMPO VERIFICADO 2026-08-20 (maestro no navegador): SSO Onion ID login success — ES384 PROVADO em uso real (1o precedente Logto+LibreChat conhecido); troca de conta via end-session OK; chat Claude streaming OK; documento-em-contexto OK (teto default ~34k p/ modelo desconhecido no v0.8.7 — v0.8.8 traz os token maps da familia 5); Meili com primary key explicita e 7 docs (pegadinha 12538 nao mordeu); VIA RAG PROVADA no F6.2 (2026-08-20): agente Onion-KB com 4 bundles/92 KBs, pgvector 0->793 embeddings, teste de aceitacao via Agents API respondeu as 5 etapas do Elenxo COM citacao de arquivo-fonte. UPGRADE v0.8.8-rc1 (2026-08-20, carta branca do maestro; backup pre-upgrade): sonnet-5 pleno de volta ao agente (re-testado com citacao); skillSync segue SEM caller de boot ate no rc1 — a gestao e do Admin Panel (skillsynccredentials por tenant; request-scoped recusa config==server, lido no codigo) — painel onion-vps-librechat-admin no ar, pin 1.0.0, LOOPBACK-ONLY 3027 (superficie admin = tunel, doutrina da casa); FECHADO 2026-08-20: 11/11 skills sincronizadas (run succeeded via POST /api/admin/skills/sync/run; o gate final era github.enabled default-off, ligado pelo painel como override role __base__); periodicidade por MECANISMO — skill-sync-run.sh (JWT cunhado) no cron root 05:15, testado como marcio e root. A INTEGRACAO #1 DO TOP-5 ESTA ENTREGUE: o repo Onion e fonte VIVA das skills do LibreChat. 4 fixes de campo commitados no repo da VPS (secret null->vivo, end-session, LOGIN_MAX 20, conta admin promovida a openid c/ break-glass documentado)"
     label: "LIBRECHAT NO AR (2026-08-20, boot verificado por comportamento): face de chat multiusuario da casa (chat.onionevolve.com), SSO Logto, so-Anthropic v1, escopo completo com RAG. Pesquisa-fonte: docs/evolution/research/librechat-2026-08/ (3 exploracoes, mapa TRANSFERE/DESENHA/NAO-VALE). NAO e adapter SDAAL: e consumidor das ferramentas do catalogo"
+    provenance:
+      source: "onion-vps-librechat@c943a9b"
+      locator: "README.md l.9-12 (\"chat.onionevolve.com — SSO Logto (Onion ID), só Anthropic na v1 (família Claude 5), escopo completo com RAG\") + corpo do commit (\"boot verificado... VERIFICADO POR COMPORTAMENTO\"); onion-vps-catalog-doctrine.md l.187; docs/evolution/research/librechat-2026-08/SYNTHESIS.md l.12 e l.50-55"
+      method: "leitura: commit c943a9b no repo onion-vps-librechat (/home/marcio/onion-vps-librechat) + KB e síntese versionadas no core"
 
   # ── TOOL 3: EMAIL (gap) ──
   - id: ENT_email
@@ -137,6 +149,10 @@ nodes:
     verified_against: direcao-do-maestro+estado-material-medido-no-host-2026-08-06+m8-serial-2026-08-reverificado
     label: "DIRECAO: MANTER o whatsapp-web.js nao-oficial (whatsapp-sender) E ADICIONAR o adapter do WAHA como PADRAO. Forma SDAAL: dois adapters sob a abstracao de mensageria, WAHA default. (A pesquisa ja lastreia WAHA>Evolution p/ nao-oficial). ESTADO MATERIAL EM 2026-08-06, MEDIDO E NAO PRESUMIDO: o dual tem UM SO LADO — WAHA up (onion-vps-waha), whatsapp-sender sem processo/unit/container (so codigo + sessao pareada em disco, no workspace do bridge). E nenhum dos dois adapters foi construido: .claude/utils/whatsapp NAO existe. A DIRECAO segue de pe porque nao foi revogada pelo maestro; o que falta e EXECUCAO — e o F1 ja a reordenou para DOGFOOD ANTES DE SDAAL (D_f1_whatsapp_dogfood_first)"
     trace: "docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/discussions/vps-shared-tools/SEED.md"
+      locator: "SEED.md l.39 (direção do maestro: MANTER web.js + WAHA PADRÃO, dois adapters) · docs/evolution/research/whatsapp-api-2026-07/SYNTHESIS.md l.27 (Evolution perde para WAHA/Baileys/wwebjs) · docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv l.22, l.25, l.27 · corpo de 8b005f65 l.49-53 (código em disco no workspace do bridge; o serviço não existe) · git ls-tree 8b005f65 .claude/utils/ (sem whatsapp) · vps-shared-tools-2026-07.kg.yaml D_f1_whatsapp_dogfood_first"
+      method: "leitura: direção do maestro no SEED + SYNTHESIS whatsapp-api + ledger M8 versionado (2026-08-06) + corpo de 8b005f65 + git ls-tree 8b005f65"
 
   - id: D_email_plus_logto_connector
     node_type: decision
@@ -241,6 +257,10 @@ nodes:
     verified_against: elenxo-framing-2-steelman-1-juiz-opus+m8-serial-2026-08-reverificado
     label: "VEREDITO F0: o conjunto e CATALOGO (nao plataforma; HIBRIDO recusado — reservaria vaga pro dead-layer com folha-de-figueira build-gated). E a soma de N adapters individualmente justificados por demanda (pull-not-push): cada tool = 1 SDAAL se passa o Teste-do-Eixo, senao 1 script-gated, atras do bridge, roteado por .env como task-manager/forge. NAO E: zero backend/registry/UI propria; members.yaml=unica fonte de identidade; NENHUMA visao agregada/cross-tool e pre-autorizada (qualquer painel composto e capacidade NOVA sujeita ao proprio pull-not-push). Precedente vivo decisivo: task-manager+forge ja escalam 1->N sem registry central"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
+    provenance:
+      source: "commit 1125dfdd (corpo + o nó nascido no diff do mesmo commit)"
+      locator: "1125dfdd corpo l.4-12 (VEREDITO CATÁLOGO; híbrido recusado com folha-de-figueira build-gated; nenhuma visão agregada/cross-tool pré-autorizada; precedente task-manager+forge 1→N sem registry) + 1125dfdd:docs/onion/graph/vps-shared-tools-2026-07.kg.yaml (D_framing_catalogo, label integral nascido com o veredito)"
+      method: "juízes: Elenxo de framing wf_8a8eca55 (2 steelman + juiz adversarial), veredito registrado no corpo de 1125dfdd (2026-07-31); journal ausente do host"
 
   - id: C_dissent_auth_transversal
     node_type: claim
@@ -407,43 +427,59 @@ nodes:
 
   - id: E_CENSO0901_ENT_monitoring
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 4
     confidence: 0.9
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — Leitura do nó completo + das arestas SUPPORTS que apontam para ele (Q_monitoring_stack, C_'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pede "pesquisa documentada + Elenxo de stack" como trabalho ABERTO ("zero desenho"). Isso já foi feito e respondido: F2 (stack-harmonia-2026-08, 2026-08-01) rodou o Elenxo (4 pesquisas + crítico adversarial + verificação independente) e o veredito sobrevivente é explícito — Langfuse/OTel/Promet'
+    provenance:
+      source: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
+      locator: "meta.note l.8-12 (F2+F2-b, dois Elenxos, síntese REPROVADA pelo crítico, verificação independente) + l.207 (ANTI-CATÁLOGO: OTel/Prometheus/Grafana e Langfuse NÃO AGORA); docs/analysis/backlog-real-2026-09.md l.53"
+      method: "leitura: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
 
   - id: E_CENSO0901_A_analysis_structure
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 4
     confidence: 0.9
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 5/5 — Lido o nó inteiro + os nós relacionados (D_structured_plan_and_doctrine, C_escada_analise_'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pede uma escada sequencial F0→F4 que segue tecnicamente incompleta (F2 reprovada e nunca refeita; F3/F4 nunca rodaram como fases formais). Mas o OBJETIVO da escada — "síntese que deriva a doutrina + o plano faseado gated" — já foi alcançado por um mecanismo diferente e mais leve, já em produção'
+    provenance:
+      source: "docs/analysis/backlog-real-2026-09.md"
+      locator: "l.77 (§3 PROPOSTAS DE SELO, linha A_analysis_structure; run_id wf_2944480c-98f no frontmatter); stack-harmonia-2026-08.kg.yaml l.16-24 (D_sintese_reprovada)"
+      method: "leitura: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
 
   - id: E_CENSO0901_C_axis_tunneling
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 4
     confidence: 0.9
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — 1) Leitura do nó (linhas 257-264) e do irmão ENT_tunneling (linhas 94-104, já status:super'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pedia decidir, na F1, se tunneling era SDAAL-candidato ou script-gated entre 3 providers concretos (ngrok/Cloudflare Tunnel/Tailscale). A pesquisa F2b (stack-harmonia-2026-08, 08-01) respondeu de forma que torna a pergunta original mal-colocada: nenhum dos 3 providers é necessário — "tunneling"'
+    provenance:
+      source: "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml"
+      locator: "l.214-222 (C_tunneling_nome_errado: \"tunneling é o NOME ERRADO... INGRESSO AUTENTICADO... Caddy + Logto\") + l.207 (ANTI-CATÁLOGO); docs/analysis/backlog-real-2026-09.md l.62"
+      method: "leitura: veredito datado do censo/revisão-total de 2026-09-01 (journal wf_2944480c-98f ausente do host); substância conferida no versionado citado"
 
   - id: E_CENSO0901_Q_tunneling
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 4
     confidence: 0.9
     verified_at: 2026-09-01
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 3/3 — Leitura do nó Q_tunneling (linhas 184-191) + dos nós-irmãos já selados nesta mesma passada'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó pede pesquisa+Elenxo comparando 4 providers concretos para decidir "para quê" e ligar ao downstream-by-pull. O vivo superou: a pesquisa (F2b-pesquisa-tunneling, 2026-08-01) já rodou e concluiu que a pergunta estava mal-colocada — "tunneling" nem é a capacidade certa (é "ingresso autenticado", j'
+    provenance:
+      source: "docs/evolution/research/census-2026-09-01/data/rodada1.json"
+      locator: "medidos[18] (node_id Q_tunneling, run_id wf_90dd73fe-cd2: verdict DRIFTED, claims 3/3, campo divergence = texto do label)"
+      method: "leitura: docs/evolution/research/census-2026-09-01/data/rodada1.json medidos[18] (node_id Q_tunneling, verdict DRIFTED, claims 3/3, divergence = texto do label), run wf_90dd73fe-cd2"
 
 edges:
   # o LibreChat entra como CONSUMIDOR do catalogo (Logto/Caddy), sob o framing decidido

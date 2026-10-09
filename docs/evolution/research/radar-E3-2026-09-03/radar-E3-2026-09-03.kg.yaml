@@ -68,6 +68,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F3 EMENDADO. l.4: `--permission-prompts none` para hosts headless — tudo que pediria prompt e NEGADO automaticamente, e o modo de permissao ativo (incl. auto) segue decidindo. Sob bypassPermissions (o que o core usa nos jobs da VPS) a flag NAO altera nada; o valor e para adotante headless SEM bypass (fail-closed por default). Nao muda a doutrina: o exit 2 determinístico de hook continua sendo a capacidade que compra o acoplamento.'
     trace: 'CLAUDE.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md"
+      locator: "l.4 (\"Added --permission-prompts none for unattended headless hosts: anything that would prompt is denied automatically while the active permission mode (including auto mode) keeps deciding\") + SYNTHESIS.md l.21-25 (placar: F3 entre os 8 emendados) e l.45"
+      method: "juízes: juiz adversarial opus/high (juiz-e3-0903) emendou F3; texto conferido no CHANGELOG verbatim em data/"
   - id: E_F4_CLAUDE_JSON_CONCORRENTE
     node_type: evidence
     plane: DEV
@@ -80,6 +84,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F4 EMENDADO. l.7: sessoes concorrentes deixam de reverter em silencio as mudancas de ~/.claude.json (trust do workspace nao reseta; estado MCP/projeto nao se perde). A VPS do core roda dezenas de sessoes (numero de 09-02, nao re-medido): perda de trust/MCP entre sessoes era sintoma plausivel e nunca registrado. Nota, sem acao.'
     trace: 'docs/analysis/onion-vps-network-exposure-2026-08.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md"
+      locator: "l.7 (\"Fixed concurrent sessions silently reverting each other's ~/.claude.json changes — workspace trust no longer resets and MCP/project state is no longer lost\") + SYNTHESIS.md l.21-25 (F4 emendado) + data/f1-findings-pre-juiz.md (F4: \"40 processos claude medidos em 09-02\")"
+      method: "juízes: juiz adversarial opus/high (juiz-e3-0903) emendou F4 (número de 09-02 não re-medido); texto conferido no CHANGELOG verbatim"
   - id: E_F5_DENY_READ_COBERTURA_E_O_ALLOW_DO_ENV
     node_type: evidence
     plane: DEV
@@ -127,6 +135,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F7 EMENDADO. l.3: `managedMcpServers` (organizacao entrega servidores HTTP/SSE a todos; entradas com comando sao puladas). l.37: `allowedMcpServers` passa a governar SO servidores adicionados por usuario — servidor gerenciado literal que a allowlist filtrava CARREGA no upgrade; usar deniedMcpServers. O core e MCP-opcional (SDAAL); impacto so em adotante corporativo com managed settings. Nota.'
     trace: 'docs/meta-specs/integrations.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md"
+      locator: "l.3 (managedMcpServers: HTTP/SSE para todos; entradas com comando são puladas) + l.37 (allowedMcpServers governa só servidores adicionados por usuário; usar deniedMcpServers) + SYNTHESIS.md l.21-25"
+      method: "juízes: juiz adversarial opus/high corrigiu a linha citada (l.38→l.37) e emendou F7; texto conferido no CHANGELOG verbatim"
   - id: E_F8_STOP_HOOK_NAO_SE_APLICA
     node_type: evidence
     plane: DEV
@@ -203,6 +215,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: '8 OMISSOES do rascunho, apontadas pelo juiz: (1) l.26 Stop nao parava agentes de background nem workflows em sessao de controle remoto; agora tarefas mortas seguem visiveis e re-paraveis — a mais grave: o core roda agentes/Workflow e o maestro opera por controle remoto na VPS. (2) l.28 URL de marketplace no github.com com barra final ou ?/# gerava clone inutilizavel — cai na publicacao human-gated do onion-plugins. (3) l.22 servidor MCP que cai durante a listagem de tools aparecia conectado e sem tools em vez de reportar erro — classe declarado != verificado que a casa nomeia. (4) l.16 --resume falhava e --continue abria vazio com anexo sem payload — o core depende de sessoes retomaveis (foi /exit + --resume que provou o veto do PreModelSwitch). (5) l.24 deteccao de repositorio perdia identidade apos falha transitoria de sonda git — irma de l.20 para quem opera worktrees. (6) l.33 /workflows formata resultado JSON com quebras reais e dobra os longos — observabilidade do onion-research.js. (7) l.39 + 2.1.258 l.44: sessoes remotas/agendadas travando apos aprovacao de permissao de connector com sessao pausada e falhando com conteudo vazio — atinge sessoes agendadas na VPS; o descarte de 2.1.258 inteira no cabecalho foi presumido, nao julgado (macOS 12 e de fato fora de escopo em VPS Linux). (8) l.13 CLAUDE_CODE_MAX_CONTEXT_TOKENS ignorado para IDs estilo Vertex — o core nao define a variavel (so mencao comentada em KB): omissao legitima, duvida fechada.'
     trace: 'docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-03/data/changelog-2.1.258-259.md"
+      locator: "l.26, l.28, l.22, l.16, l.24, l.33, l.39, l.44 (2.1.258), l.13 — todas por grep -n; SYNTHESIS.md l.21-25 (placar: 8 omissões) e l.50"
+      method: "juízes: juiz adversarial opus/high (juiz-e3-0903) apontou as 8 omissões, registradas no placar do SYNTHESIS; linhas conferidas no CHANGELOG verbatim"
   - id: D_COMANDOS_SEM_MODEL_OU_NO_LINEUP
     node_type: decision
     plane: PROD
@@ -229,6 +245,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'LACUNAS DECLARADAS (desfecho de 1a classe) — todas exigem sessao NOVA em processo 2.1.259 (a mudanca segue o processo, nao o disco): (1) frontmatter model: chega a emitir PreModelSwitch, e com qual source:? o unico evento registrado tem source=picker (/model manual); invocar /warm-up e ler a 2a linha de .claude/sessions/model-switch.jsonl. (2) o que acontece com o comando APOS o veto — roda no modelo da sessao, erra, ou aborta calado? e a pergunta que decide se as 96 declaracoes sonnet sao incomodo ou quebra. (3) mesmo probe para model: haiku (meta/backlog.md, meta/co-evolve.md, meta/inventory.md), que resolveria para fora do lineup; para model: opus a expectativa e liberacao. (4) como --permission-prompts none compoe com bypassPermissions e qual vence (importa ao degrau AUDIT do /meta:drive). (5) versao do PROCESSO das sessoes vivas da VPS: disco em 2.1.259, baseline registrava 2.1.257 — a estrategia desta rodada foi medida a partir de baseline vencida, por construcao (e o gatilho). (6) [escada, 2026-09-03] o fallback NATIVO (sobrecarga) dispara PreModelSwitch? com que source? — a guarda trata source != picker como fallback; e o que acontece quando a COTA do Fable fecha no Max (troca automatica? bloqueio?) — nao ha fallback por cota no binario. Tentativa minha: invocar a skill onion-patterns pela ferramenta Skill num job em background gerou 0 eventos — e a skill nem declara model: real.'
     trace: '.claude/hooks/premodelswitch-guard.sh'   # o log model-switch.jsonl e local, nao rastreado (o CI acusou TARGET-MISSING)
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-03/SYNTHESIS.md"
+      locator: "l.54-60 (§\"Lacunas declaradas\", itens 1-5) + corpo do commit eaedbc83 (item 6: \"fallback nativo só por sobrecarga (529); por cota não existe (lacuna)\") + .claude/hooks/premodelswitch-guard.sh@eaedbc83 l.61-74 (piso só por fallback, source != picker)"
+      method: "leitura: SYNTHESIS l.56-60 + commit eaedbc83 (corpo e premodelswitch-guard.sh l.61-74) + frontmatter dos comandos em 09564b8c; a cláusula da tentativa (0 eventos em .claude/sessions/model-switch.jsonl) é testemunho: medição da sessão 2026-09-03, comando não registrado"
   - id: E_FALLBACK_NATIVO_MEDIDO_0903
     node_type: evidence
     plane: PROD

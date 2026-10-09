@@ -30,7 +30,12 @@ nodes:
     impact: 4
     confidence: 0.8
     status: confirmed
-    label: "KB candidata do core: transfer-heuristic-aristotle.md (branch docs/transfer-heuristic-aristotle-kb, nao mesclada)"
+    label: "KB candidata do core: transfer-heuristic-aristotle.md (status: candidato), mesclada em main em 2026-07-12 (merge 0dcacbb1)"
+    narrative: "label anterior: KB candidata do core: transfer-heuristic-aristotle.md (branch docs/transfer-heuristic-aristotle-kb, nao mesclada)"
+    provenance:
+      source: "docs/knowledge-base/concepts/transfer-heuristic-aristotle.md + commit 0dcacbb1"
+      locator: "transfer-heuristic-aristotle.md l.5 'status: candidato'; 0dcacbb1 (2026-07-12 16:42Z, merge com pais 5fb21f5b e e0b2d6ad: 'merge: transfer-heuristic (Aristotle) KB — earned by use')"
+      method: "leitura: frontmatter da KB + merge 0dcacbb1"
   - id: ENT_DIALOGIC_RESEARCH
     node_type: entity
     layer: audit

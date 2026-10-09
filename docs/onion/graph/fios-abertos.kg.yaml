@@ -75,6 +75,10 @@ nodes:
     verified_at: 2026-09-02
     verified_against: 'radar --integrity --schema exit 0 nos 9 grafos tocados; 0 alvos de SUPERSEDES pendentes (eram 13 em 8 grafos); bancada census-seal (d) PASS e FAIL com a regra removida'
     label: 'Fechamento dos nos-FONTE da Onda 8 (o fios-abertos marcava done, as fontes seguiam open): C_console_autooff_gap e E_LINT_NAO_ENXERGA_WORKFLOWS SUPERSEDED por evidencia medida; C_a2a_gate_narrow open->confirmed; Q_JWKS segue open com E_W8_JWKS_PR65_ABERTO (fecha no deploy do maestro). ACHADO no caminho: o census-seal emitia SUPERSEDES para TODO DRIFTED — 13 alvos ainda com trabalho pendente ficaram open sob SUPERSEDES; 7 refinados para CONSTRAINS (regra do radar), 6 flipados para superseded (premissa morta); e a regra virou mecanismo: aresta pela realidade (MORTO/FORA => SUPERSEDES, senao CONSTRAINS).'
+    provenance:
+      source: "49880151"
+      locator: "49880151 (corpo + diff em 10 grafos de docs/onion/graph, census-seal.py e lint-selftest.sh); b4c8df62 (residuo)"
+      method: "leitura: corpo e diff de 49880151 (2026-09-02)"
 
   - id: D_BANCADA_FAIXAS_E_MAPA
     node_type: decision
@@ -208,6 +212,10 @@ nodes:
     verified_against: 'os 4 arquivos re-medidos apos a cura: radar, PyYAML e a contagem anterior do radar BATEM nos tres (43/64/56/40 nos), zero no perdido ou inventado'
     trace: '.claude/validation/kg-yaml-validity-baseline.txt'
     label: "Os 4 defeitos eram QUATRO CLASSES DIFERENTES de escape, e isso e o que torna a catraca da REGRA 78 (`.kg.yaml` versionado e YAML VALIDO, com catraca) mais valiosa do que parecia: (1) escalar de aspas duplas ABERTO e nunca fechado; (2) aspa SIMPLES dentro de escalar de aspas simples — em YAML se escapa DOBRANDO, nunca com barra; (3) `\\$` como escape DESCONHECIDO em aspas duplas (a intencao era o literal `$in`, operador do Mongo — a barra nao fazia nada); (4) aspa DUPLA dentro de escalar de aspas duplas; e uma QUINTA forma, que a passada adversarial achou depois (bridge-produto l.310): TEXTO DEPOIS da aspa de fechamento — a ressalva `[RESSALVA C2 ...]` fora do escalar, que sobrou como uma aspa perdida no meio do label ate ser removida. Dois arquivos tinham MAIS DE UM defeito — o parser so mostra o primeiro, entao `consertei o que ele apontou` nao e `o arquivo esta bom`: o laco tem de iterar ate o parser calar. A verificacao que vale nao e `parseia`, e `os tres leitores concordam sobre a populacao`: radar, PyYAML e a contagem de antes."
+    provenance:
+      source: "2ec7603f"
+      locator: "2ec7603f (diff dos 4 grafos + kg-yaml-validity-baseline.txt); docs/evolution/review/fix-kg-yaml-passivo-zero.md l.70-71"
+      method: "leitura: diff de 2ec7603f nos 4 grafos e no baseline + residuo l.70-71; contagem de nos com PyYAML nos 4 arquivos em 2ec7603f (43/64/56/40)"
 
   - id: E_LOCALE_FRAGIL_EM_TRES_SITIOS_PRE_EXISTENTES
     node_type: evidence
@@ -245,7 +253,12 @@ nodes:
     verified_at: '2026-09-13'
     verified_against: 'squash-merge REAL de dois PRs concorrentes em sandbox: o git CONFLITA em plugins/<name>/README.md; resolvido descuidadamente (aceitando um lado), a REGRA 19 regenera e acusa DRIFT (commitado 0.1.1, derivado 0.1.2)'
     trace: '.claude/utils/marketplace/assemble-plugin.sh'
-    label: "⚠️ ESTE NO FOI CORRIGIDO PELA MEDICAO QUE ELE MESMO PEDIA — e a afirmacao original foi levada ao maestro DUAS VEZES como achado. A 1a redacao dizia que o teto da versao (dois PRs concorrentes sem rebase publicam o mesmo numero) ficara MUDO no esquema de fato commitado, `trocou-se um teto ruidoso por um mudo`. MEDIDO com squash-merge real, e FALSO: a colisao e barrada DUAS VEZES, independentes. (1) O GIT conflita — as duas PRs regeneram a projecao do plugin e ela diverge, entao o merge automatico e recusado. (2) Se alguem resolver o conflito DESCUIDADO, aceitando um lado, a REGRA 19 (Plugins de vertical (plugins/*) sincronizados com as fontes) regenera e acusa DRIFT: quem resolve pega o `tree_sha` de UM lado, mas a arvore real e A+B, logo o hash diverge e o derivado anda (0.1.1 commitado, 0.1.2 derivado). A segunda barreira funciona POR CAUSA do desenho de fato commitado, nao apesar dele. Quinta hipotese minha derrubada por medicao em 2026-09-12/13 — todas pela mesma via: afirmar o defeito pelo formato suspeito, sem executar."
+    label: "A 1a redacao afirmava que dois PRs concorrentes sem rebase publicariam a mesma versao em silencio no esquema commitado. Medido com squash-merge real em 2026-09-13, e FALSO: o git conflita, e a resolucao descuidada e pega pela REGRA 19 (commitado 0.1.1, derivado 0.1.2)"
+    narrative: "label anterior: ⚠️ ESTE NO FOI CORRIGIDO PELA MEDICAO QUE ELE MESMO PEDIA — e a afirmacao original foi levada ao maestro DUAS VEZES como achado. A 1a redacao dizia que o teto da versao (dois PRs concorrentes sem rebase publicam o mesmo numero) ficara MUDO no esquema de fato commitado, `trocou-se um teto ruidoso por um mudo`. MEDIDO com squash-merge real, e FALSO: a colisao e barrada DUAS VEZES, independentes. (1) O GIT conflita — as duas PRs regeneram a projecao do plugin e ela diverge, entao o merge automatico e recusado. (2) Se alguem resolver o conflito DESCUIDADO, aceitando um lado, a REGRA 19 (Plugins de vertical (plugins/*) sincronizados com as fontes) regenera e acusa DRIFT: quem resolve pega o `tree_sha` de UM lado, mas a arvore real e A+B, logo o hash diverge e o derivado anda (0.1.1 commitado, 0.1.2 derivado). A segunda barreira funciona POR CAUSA do desenho de fato commitado, nao apesar dele. Quinta hipotese minha derrubada por medicao em 2026-09-12/13 — todas pela mesma via: afirmar o defeito pelo formato suspeito, sem executar."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: ".claude/validation/lint-selftest.sh l.17997-18032 (familia plugin_version_derived, casos j1/j2, nascidos em 2ec7603f)"
+      method: "medição: bash .claude/validation/lint-selftest.sh --families plugin_version_derived (re-executado 2026-10-09: \"(j1) 2o PR concorrente sem rebase CONFLITA no git\"; \"(j2) resolucao descuidada e pega pela REGRA 19 - commitado 0.1.1, derivado 0.1.2\")"
 
   - id: D_O_TETO_DA_VERSAO_GANHA_GUARDA_OU_ACEITE
     node_type: decision

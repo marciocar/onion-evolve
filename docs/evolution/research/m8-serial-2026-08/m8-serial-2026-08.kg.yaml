@@ -28,8 +28,13 @@ nodes:
     status: confirmed
     verified_at: 2026-08-06
     verified_against: "9-de-9-itens-executados-pelos-4-passos-do-fragmento"
-    label: "O FALLBACK SERIAL RODA — e esta era a pergunta mais valiosa do menu inteiro. O orchestration-fallback.md estava escrito, testavel, e NUNCA havia sido executado nem uma vez; o proprio W3 dizia que 'se o fallback nao rodar, a rede de seguranca da portabilidade e ficcao — o maior achado possivel do menu'. NAO E FICCAO: os 4 passos do fragmento (health-check do substrato, aviso obrigatorio, iteracao serial com Agent mantendo o mesmo schema, tratamento de falha parcial e fan-in) executaram como escritos, 9 de 9 itens, zero SKIP. RESSALVA DECLARADA, porque o proprio fragmento a exige: o Passo 0 manda acionar o fallback SO se o Workflow estiver indisponivel, e aqui ele estava DISPONIVEL. Foi teste forcado, nao degradacao real — e fingir que o substrato falhou seria a mesma mentira que o fragmento proibe ('nunca fingir paralelismo inexistente' vale nos dois sentidos). O que fica provado e o CAMINHO DE CODIGO, nao o gatilho automatico: o gatilho segue nao-exercido"
+    label: "O fallback serial RODA, em teste forçado (Workflow disponível): Passos 2, 3 e 4 executaram em 9 de 9 itens, zero SKIP; Passos 0 e 1 não se aplicaram. Provado o caminho de código, não o gatilho automático, que segue não exercido."
+    narrative: "label anterior: O FALLBACK SERIAL RODA — e esta era a pergunta mais valiosa do menu inteiro. O orchestration-fallback.md estava escrito, testavel, e NUNCA havia sido executado nem uma vez; o proprio W3 dizia que 'se o fallback nao rodar, a rede de seguranca da portabilidade e ficcao — o maior achado possivel do menu'. NAO E FICCAO: os 4 passos do fragmento (health-check do substrato, aviso obrigatorio, iteracao serial com Agent mantendo o mesmo schema, tratamento de falha parcial e fan-in) executaram como escritos, 9 de 9 itens, zero SKIP. RESSALVA DECLARADA, porque o proprio fragmento a exige: o Passo 0 manda acionar o fallback SO se o Workflow estiver indisponivel, e aqui ele estava DISPONIVEL. Foi teste forcado, nao degradacao real — e fingir que o substrato falhou seria a mesma mentira que o fragmento proibe ('nunca fingir paralelismo inexistente' vale nos dois sentidos). O que fica provado e o CAMINHO DE CODIGO, nao o gatilho automatico: o gatilho segue nao-exercido"
     trace: ".claude/commands/common/prompts/orchestration-fallback.md"
+    provenance:
+      source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md · docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
+      locator: "SYNTHESIS.md l.38-40 (Passos 2, 3 e 4 em 9 de 9, zero SKIP), l.42-50 (Passo 0 e Passo 1 não executaram), l.56-64 (teste forçado; provado o caminho de código, não o gatilho) · ledger-por-item.tsv (9 itens com veredito)"
+      method: "leitura: síntese do M8 revisada em a8b6cfb7 (revisão adversarial do PR #548) + ledger-por-item.tsv"
 
   - id: E_DELTA_ENTRE_ITEM2_E_ITEM3
     node_type: evidence
@@ -65,7 +70,12 @@ nodes:
     status: confirmed
     verified_at: 2026-08-06
     verified_against: "697710-tokens-medidos-contra-300k-estimados"
-    label: "A ESTIMATIVA DO W3 ERRAVA POR 2,3x, e no sentido que importa. O menu dizia 'Alto: ~300k tokens, meia sessao (vs ~1,4M da corrida cheia)' para o M8 INTEIRO. Medido: so o LADO SERIAL consumiu 697.710 tokens — ja 2,3x a estimativa do item completo. Com o lado paralelo, a corrida projeta ~1,4M, que e exatamente o patamar da corrida cheia que o M8 foi reescopado para EVITAR. O item foi aprovado com um numero que nao se sustentou, e so a execucao disse isso — e essa e a justificativa concreta do contrato de custo do M6: sem carimbo por run, a proxima estimativa erraria igual, sem ninguem notar"
+    label: "A estimativa do W3 para o M8 inteiro (~300k tokens; citação de journal não verificável no repo) errou por 2,3x: só o lado serial mediu 697.710 tokens. Com o lado paralelo, ~1,4M é PISO por extrapolação linear (serial x2), não estimativa. Só a execução revelou o erro."
+    narrative: "label anterior: A ESTIMATIVA DO W3 ERRAVA POR 2,3x, e no sentido que importa. O menu dizia 'Alto: ~300k tokens, meia sessao (vs ~1,4M da corrida cheia)' para o M8 INTEIRO. Medido: so o LADO SERIAL consumiu 697.710 tokens — ja 2,3x a estimativa do item completo. Com o lado paralelo, a corrida projeta ~1,4M, que e exatamente o patamar da corrida cheia que o M8 foi reescopado para EVITAR. O item foi aprovado com um numero que nao se sustentou, e so a execucao disse isso — e essa e a justificativa concreta do contrato de custo do M6: sem carimbo por run, a proxima estimativa erraria igual, sem ninguem notar"
+    provenance:
+      source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md · docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
+      locator: "SYNTHESIS.md l.31-33 (citação do W3 não verificável) e l.102-119 (§A estimativa errou por 2,3×; 1,4M é PISO) · ledger-por-item.tsv (soma da col.3 = 697.710)"
+      method: "leitura: síntese do M8 revisada em a8b6cfb7 + ledger versionado (soma conferida por awk)"
 
   - id: C_DRIFT_44_PCT_NA_VPS
     node_type: claim
@@ -76,7 +86,12 @@ nodes:
     status: confirmed
     verified_at: 2026-08-06
     verified_against: "4-DRIFTED-em-9-medidos-contra-o-host-vivo"
-    label: "44% DE DRIFT nas afirmacoes do grafo da VPS (4 DRIFTED em 9), medido contra o host vivo e nao contra doc. Bem acima do limiar de 30% que o proprio /meta:kg-freshness define para acionar juiz adversarial. Os quatro: (1) ENT_substrate — bridge.onionevolve.com esta no label e resolve por DNS, mas NAO tem vhost no Caddy (curl retorna 000); o onion-bridge serve sob app., nao sob bridge. (2) ENT_whatsapp — o nó afirma whatsapp-sender VIVO; busca full-filesystem com sudo nao encontra processo, container, unit systemd nem diretorio, apesar do parecer de 2026-07-05 registrar reinstalacao em ~onion/whatsapp-sender. WAHA, esse sim, confirmado vivo. (3) D_whatsapp_dual_waha_default — o desenho 'dual adapter' tem so UM lado material hoje. (4) D_structured_plan_and_doctrine — a doutrina do catalogo FOI promovida a KB, mas por BYPASS do F0 direto, apos a fase F2 ser formalmente REPROVADA (stack-harmonia-2026-08, sintese com premissas fabricadas); A_analysis_structure segue `open`"
+    label: "44% DE DRIFT (4 DRIFTED em 9) no grafo da VPS, medido contra o host vivo: ENT_substrate (bridge. sem vhost no Caddy), ENT_whatsapp (sem o SERVIÇO whatsapp-sender; o diretório existe), D_whatsapp_dual (um só lado material), D_structured_plan (KB por bypass do F0)."
+    narrative: "label anterior: 44% DE DRIFT nas afirmacoes do grafo da VPS (4 DRIFTED em 9), medido contra o host vivo e nao contra doc. Bem acima do limiar de 30% que o proprio /meta:kg-freshness define para acionar juiz adversarial. Os quatro: (1) ENT_substrate — bridge.onionevolve.com esta no label e resolve por DNS, mas NAO tem vhost no Caddy (curl retorna 000); o onion-bridge serve sob app., nao sob bridge. (2) ENT_whatsapp — o nó afirma whatsapp-sender VIVO; busca full-filesystem com sudo nao encontra processo, container, unit systemd nem diretorio, apesar do parecer de 2026-07-05 registrar reinstalacao em ~onion/whatsapp-sender. WAHA, esse sim, confirmado vivo. (3) D_whatsapp_dual_waha_default — o desenho 'dual adapter' tem so UM lado material hoje. (4) D_structured_plan_and_doctrine — a doutrina do catalogo FOI promovida a KB, mas por BYPASS do F0 direto, apos a fase F2 ser formalmente REPROVADA (stack-harmonia-2026-08, sintese com premissas fabricadas); A_analysis_structure segue `open`"
+    provenance:
+      source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md · docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv · commit 8b005f65 (corpo)"
+      locator: "SYNTHESIS.md l.121-143 (§44% de drift) · ledger-por-item.tsv (9 linhas, 4 DRIFTED) · 8b005f65 corpo §\"CORRIGIDA UMA FALSIDADE FACTUAL\" (sudo find .../onion-bridge/workspaces -name whatsapp-sender devolve o caminho)"
+      method: "leitura: síntese e ledger versionados do M8 + correção registrada no corpo do commit 8b005f65 (2026-08-07)"
 
   - id: C_CONTRATO_M6_NAO_COBRE_SERIAL
     node_type: claim
