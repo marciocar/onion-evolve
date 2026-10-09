@@ -16704,11 +16704,18 @@ run_role_cut_selftests() {
   # (i) O CONSUMIDOR LÊ O rc DO MANIFESTO. É o caminho por onde o repo INTEIRO vaza: `mapfile` engole
   #     o rc, o array fica vazio e `git archive HEAD --` sem pathspec significa TODOS para o git —
   #     medido 2026-09-15: 2222 arquivos, 353 de biografia, o diário inteiro, rc=0.
-  local _i=""
-  grep -qE 'resolve-manifest\.sh"' <<< "${_code2}" || _i="${_i} não-usa-o-helper-que-lê-o-rc"
-  grep -qE 'resolve-manifest\.sh"[^|]*\\$' <<< "${_code2}" || _i="${_i} rc-não-lido(sem ||-abort)"
+  #     ⚠️ A 1ª REDAÇÃO DESTE CASO APROVAVA O DEFEITO (medido em 2026-10-09, F1 das portas): ela exigia a
+  #     STRING `resolve-manifest.sh" … \` no fim da linha, e era exatamente isso que o padrão quebrado
+  #     `mapfile -t manifest < <(bash resolve-manifest.sh …) \ || ABORTADO` tinha — o `||` lia o rc do
+  #     MAPFILE e o ABORTADO nunca disparava. Declaração verde sobre comportamento quebrado. A FORMA
+  #     aqui só recusa o padrão conhecido e exige a função nos dois sítios; o COMPORTAMENTO (o bloco do
+  #     adopt.md EXECUTADO com produtor rc=3) mora na família adopt_robust, casos (a1)/(a2).
+  local _i="" _nm
+  grep -qE 'mapfile[^<]*<[[:space:]]*<\(.*manifest' <<< "${_code2}" && _i="${_i} mapfile<<(…)-engole-o-rc"
+  _nm="$(grep -cE '^[[:space:]]*onion_load_manifest "\$SOURCE_ROOT"' <<< "${_code2}" || true)"
+  [ "${_nm}" -ge 2 ] || _i="${_i} função-em-${_nm}-de-2-sítios"
   if [ -z "${_i}" ]; then
-    record_pass "role-cut: (i) o adopt LÊ o rc do manifesto e CONTA o array antes de virar pathspec"
+    record_pass "role-cut: (i) o adopt carrega o manifesto pela função que LÊ o rc do produtor (2 sítios; nenhum mapfile<<(…))"
   else record_fail "role-cut: (i)" "falhou em:${_i} — manifesto que falha vira 'git archive HEAD --', que copia o repositório INTEIRO com rc=0"; fi
 
   # (j) CAMINHO COM ACENTO/ESPAÇO NÃO VAZA. `git ls-tree --name-only` aplica C-quoting e o `case` por
@@ -16723,6 +16730,216 @@ run_role_cut_selftests() {
     record_pass "role-cut: (j) a enumeração é NUL-separada e imune a core.quotePath (acento/espaço não vazam)"
   else record_fail "role-cut: (j)" "falhou em:${_j} — caminho com acento sai C-quotado, o prefixo não casa e o arquivo VAZA em silêncio"; fi
 
+  rm -rf "${d}"
+}
+
+# ---------------------------------------------------------------------------
+# adopt_robust — a ADOÇÃO ROBUSTA da F1 das portas (SAC-89, que absorve o SAC-87; 2026-10-09)
+#
+# Cinco defeitos medidos, um caso (ou mais) por defeito, e cada caso tem MUTANTE nomeado:
+#   (a) o `mapfile … < <(resolve-manifest) || ABORTADO` do adopt.md nunca abortava — o `||` lia o rc
+#       do mapfile. O bloco do adopt.md é EXTRAÍDO e EXECUTADO aqui (a prosa é o artefato que o
+#       orquestrador roda; testar um helper vizinho seria testar outra coisa).
+#   (b) o `--role` da adoção nova era decorativo — a Fase 2 lia uma env que ninguém atribuía e a
+#       Fase 5 não passava --role. Também executado do adopt.md.
+#   (c) o `--update`/`--promote-hub` commitavam NA integração, com `--no-verify`.
+#   (d) `offer-onion-ci.sh` recusava worktree (`[ -d .git ]`).
+#   (e) duas gramáticas de carimbo (o heredoc da porta × write-stamp) — o write-stamp --kind door.
+# ---------------------------------------------------------------------------
+run_adopt_robust_selftests() {
+  local md="${REPO_ROOT}/.claude/commands/meta/adopt.md"
+  local ad="${REPO_ROOT}/.claude/utils/adopt"
+  if [ ! -f "${md}" ] || [ ! -f "${ad}/load-manifest.sh" ]; then record_fail "adopt-robust" "adopt.md ou load-manifest.sh ausente"; return; fi
+  export GIT_AUTHOR_NAME=onion-selftest GIT_AUTHOR_EMAIL=ci@onion.test \
+         GIT_COMMITTER_NAME=onion-selftest GIT_COMMITTER_EMAIL=ci@onion.test
+  local d; d="$(mktemp -d)"
+  # 1º bloco ```bash depois da âncora (regex ERE sobre a linha); cercas indentadas também contam.
+  _ar_block() { awk -v pat="$1" 'f==0 && $0 ~ pat {f=1; next} f==1 && /^[[:space:]]*```bash/ {f=2; next} f==2 && /^[[:space:]]*```/ {exit} f==2 {print}' "${md}"; }
+
+  # ── (a) O ABORTADO DISPARA — bloco (a) da cópia segura, executado com produtor rc=3 / vazio ───────
+  # O trecho vai da 1ª linha do bloco até antes do `# (b)` (a extração): se o (a) não abortar, o script
+  # chega ao marcador REACHED — que é o lugar onde o `git archive HEAD --` copiaria o repo inteiro.
+  local _copy; _copy="$(_ar_block '^## .*Procedimento de c.*pia segura' | awk '/^# \(b\)/{exit} {print}' | grep -vE '^(DEST|ROLE)=')"
+  if [ -z "${_copy}" ] || ! grep -q 'manifest' <<< "${_copy}"; then
+    record_fail "adopt-robust: (a) setup" "não extraí o bloco (a) da cópia segura do adopt.md"
+  else
+    local fsrc="${d}/fsrc"; mkdir -p "${fsrc}/.claude/utils/adopt"; git -C "${fsrc}" init -q
+    cp "${ad}/load-manifest.sh" "${fsrc}/.claude/utils/adopt/"
+    local _out _rc
+    _ar_run_copy() {  # $1=cwd(SOURCE_ROOT) $2=ROLE → _out/_rc
+      { printf 'ROLE=%q\n' "$2"; printf '%s\n' "${_copy}"; printf 'echo "N=${#manifest[@]}"\necho REACHED\n'; } > "${d}/copy.sh"
+      if _out="$(cd "$1" && bash "${d}/copy.sh" 2>&1)"; then _rc=0; else _rc=$?; fi
+    }
+    # (a1) produtor rc=3 — o caso do bug. MUTANTE: devolver o `mapfile … < <(…) || ABORTADO` ao
+    #      adopt.md faz o script chegar a REACHED com N=0 (medido no PR da F1).
+    #      O produtor IMPRIME um pathspec e SÓ ENTÃO sai 3 (falha no meio do caminho): assim a recusa do
+    #      vazio não mascara a do rc — sem o rc lido, o array teria 1 elemento e seguiria adiante.
+    printf '#!/usr/bin/env bash\necho .claude\nexit 3\n' > "${fsrc}/.claude/utils/adopt/resolve-manifest.sh"
+    _ar_run_copy "${fsrc}" adopted
+    if [ "${_rc}" -ne 0 ] && ! grep -q REACHED <<< "${_out}" && grep -q 'rc=3' <<< "${_out}"; then
+      record_pass "adopt-robust: (a1) produtor do manifesto rc=3 ⇒ o bloco do adopt.md ABORTA antes da extração"
+    else record_fail "adopt-robust: (a1)" "rc=${_rc} — manifesto falho seguiu adiante (git archive HEAD -- copiaria o repo inteiro): ${_out:0:200}"; fi
+    # (a2) produtor rc=0 e saída VAZIA — `<<<""` dá UM elemento vazio; contar elementos não pega.
+    printf '#!/usr/bin/env bash\nexit 0\n' > "${fsrc}/.claude/utils/adopt/resolve-manifest.sh"
+    _ar_run_copy "${fsrc}" adopted
+    if [ "${_rc}" -ne 0 ] && ! grep -q REACHED <<< "${_out}" && grep -q 'VAZIO' <<< "${_out}"; then
+      record_pass "adopt-robust: (a2) manifesto VAZIO com rc=0 ⇒ recusado (pathspec ausente é TODOS)"
+    else record_fail "adopt-robust: (a2)" "rc=${_rc} — manifesto vazio passou: ${_out:0:200}"; fi
+    # (b1) O PAPEL CORTA NA ADOÇÃO NOVA — o mesmo bloco, contra o core real, com ROLE=standalone.
+    #      MUTANTE: trocar `"$ROLE"` por `"${ONION_ROLE:-adopted}"` no bloco dá a contagem do adopted.
+    local _n_std _n_ado
+    _n_std="$(bash "${ad}/resolve-manifest.sh" "${REPO_ROOT}" standalone 2>/dev/null | grep -c . || true)"
+    _n_ado="$(bash "${ad}/resolve-manifest.sh" "${REPO_ROOT}" adopted 2>/dev/null | grep -c . || true)"
+    _ar_run_copy "${REPO_ROOT}" standalone
+    if [ "${_rc}" -eq 0 ] && grep -qx "N=${_n_std}" <<< "${_out}" && [ "${_n_std}" != "${_n_ado}" ]; then
+      record_pass "adopt-robust: (b1) ROLE=standalone corta o manifesto da ADOÇÃO NOVA (${_n_std} pathspecs vs ${_n_ado} do adopted)"
+    else record_fail "adopt-robust: (b1)" "rc=${_rc} esperado N=${_n_std} (adopted=${_n_ado}) — o papel não chegou ao transporte: ${_out:0:200}"; fi
+    unset -f _ar_run_copy
+  fi
+
+  # ── (b2)(b3) PASSO 0f: papel inválido aborta ANTES de tocar o alvo; omitido vira adopted ─────────
+  local _p0; _p0="$(_ar_block '^### PASSO 0' | grep -E '^ROLE=|^case "\$ROLE"')"
+  if [ "$(grep -c . <<< "${_p0}")" -ne 2 ]; then
+    record_fail "adopt-robust: (b2) setup" "PASSO 0 sem o par ROLE=/case — o --role não é validado na entrada"
+  else
+    { printf 'ROLE=bogus\n'; printf '%s\n' "${_p0}"; printf 'echo SEGUIU\n'; } > "${d}/p0.sh"
+    if _out="$(bash "${d}/p0.sh" 2>&1)"; then _rc=0; else _rc=$?; fi
+    { printf '%s\n' "${_p0}"; printf 'echo "ROLE=$ROLE"\n'; } > "${d}/p0b.sh"
+    local _out_b; _out_b="$(bash "${d}/p0b.sh" 2>&1 || true)"
+    if [ "${_rc}" -ne 0 ] && ! grep -q SEGUIU <<< "${_out}" && grep -qx 'ROLE=adopted' <<< "${_out_b}"; then
+      record_pass "adopt-robust: (b2) PASSO 0 recusa --role inválido e assume adopted quando omitido"
+    else record_fail "adopt-robust: (b2)" "inválido rc=${_rc} (${_out:0:80}) · omitido → ${_out_b:0:80}"; fi
+  fi
+
+  # ── (b3) FASE 5 carimba o papel — o bloco executado. MUTANTE: tirar a linha `--role` ⇒ `role: adopted`.
+  local _f5; _f5="$(_ar_block '^### Fase 5')"
+  local inst="${d}/inst"; mkdir -p "${inst}/.claude"
+  { printf 'SOURCE_ROOT=%q INSTALL_DIR=%q SRC_FRAMEWORK=onion-x SRC_COMMIT=abc123def456 SRC_COMMIT_DATE=2026-10-09 MODE=greenfield INTEGRATION_BRANCH=\n' "${REPO_ROOT}" "${inst}"
+    printf 'ROLE=standalone\n'; printf '%s\n' "${_f5}"; } > "${d}/f5.sh"
+  bash "${d}/f5.sh" >/dev/null 2>&1 || true
+  local _st_ok=0; grep -qx 'role: standalone' "${inst}/.claude/.onion-version" 2>/dev/null && _st_ok=1
+  rm -f "${inst}/.claude/.onion-version"
+  { printf 'SOURCE_ROOT=%q INSTALL_DIR=%q SRC_FRAMEWORK=onion-x SRC_COMMIT=abc123def456 SRC_COMMIT_DATE=2026-10-09 MODE=greenfield INTEGRATION_BRANCH=\n' "${REPO_ROOT}" "${inst}"
+    printf 'unset ROLE\n'; printf '%s\n' "${_f5}"; } > "${d}/f5b.sh"
+  local _rc5=0; bash "${d}/f5b.sh" >/dev/null 2>&1 || _rc5=$?
+  if [ "${_st_ok}" = 1 ] && [ "${_rc5}" -ne 0 ] && [ ! -f "${inst}/.claude/.onion-version" ]; then
+    record_pass "adopt-robust: (b3) a Fase 5 carimba o papel do STATE (standalone) e RECUSA sem ele (nunca cai em adopted calado)"
+  else record_fail "adopt-robust: (b3)" "carimbo standalone=${_st_ok} · sem ROLE rc=${_rc5} — a Fase 5 não propaga o papel"; fi
+
+  # ── (c) BRANCH DEDICADA — dedicated-branch.sh, e a prosa do --update executada ──────────────────
+  local db="${ad}/dedicated-branch.sh" sb="${REPO_ROOT}/.claude/validation/session-beacon.sh"
+  _ar_repo() { rm -rf "$1"; mkdir -p "$1"; git -C "$1" init -q -b main; printf 'x\n' > "$1/a.txt"; git -C "$1" add -A; git -C "$1" commit -qm base; }
+  local t1="${d}/t1"; _ar_repo "${t1}"
+  local _m0; _m0="$(git -C "${t1}" rev-parse main)"
+  # (c1) sem farol: a branch nasce no próprio checkout; a integração não anda.
+  if _out="$(bash "${db}" "${t1}" chore/onion-update-abc main 2>/dev/null)"; then _rc=0; else _rc=$?; fi
+  local _tp; _tp="$(cd "${t1}" && pwd -P)"
+  if [ "${_rc}" -eq 0 ] && [ "${_out}" = "${_tp}" ]; then
+    if [ "$(git -C "${t1}" rev-parse --abbrev-ref HEAD)" = chore/onion-update-abc ]; then
+      record_pass "adopt-robust: (c1) sem farol ⇒ branch dedicada no próprio checkout"
+    else record_fail "adopt-robust: (c1)" "HEAD=$(git -C "${t1}" rev-parse --abbrev-ref HEAD)"; fi
+  else record_fail "adopt-robust: (c1)" "rc=${_rc} out=${_out:0:120}"; fi
+  # (c2) COM FAROL VIVO: worktree irmã, e o checkout do alvo fica onde estava. MUTANTE: forçar
+  #      LIVE=0 no helper faz o checkout trocar de branch debaixo da outra sessão.
+  local t2="${d}/t2"; _ar_repo "${t2}"
+  if [ -f "${sb}" ]; then
+    bash "${sb}" up "${t2}" sessao-alheia-selftest >/dev/null 2>&1 || true
+    if _out="$(bash "${db}" "${t2}" chore/onion-update-abc main 2>/dev/null)"; then _rc=0; else _rc=$?; fi
+    if [ "${_rc}" -eq 0 ] && [ -n "${_out}" ] && [ "${_out}" != "${t2}" ] \
+       && [ "$(git -C "${t2}" rev-parse --abbrev-ref HEAD)" = main ] \
+       && [ "$(git -C "${_out}" rev-parse --abbrev-ref HEAD 2>/dev/null)" = chore/onion-update-abc ]; then
+      record_pass "adopt-robust: (c2) farol VIVO no alvo ⇒ worktree irmã; o checkout da outra sessão segue em main"
+    else record_fail "adopt-robust: (c2)" "rc=${_rc} out=${_out:0:120} HEAD(alvo)=$(git -C "${t2}" rev-parse --abbrev-ref HEAD)"; fi
+    # `|| true`: sob o mutante o "_out" é o próprio alvo, e o `worktree remove` dele sai 128 — sob
+    # `set -e` isso matava a suíte inteira em vez de registrar o ✗ (medido rodando o mutante).
+    if [ -n "${_out}" ] && [ "${_out}" != "${t2}" ] && [ -d "${_out}" ]; then git -C "${t2}" worktree remove --force "${_out}" >/dev/null 2>&1 || true; fi
+  else record_skip "adopt-robust: (c2) session-beacon.sh ausente — o lado do farol não foi exercido"; fi
+  # (c3) árvore SUJA sem farol ⇒ recusa (não carrega trabalho alheio para a branch do update).
+  local t3="${d}/t3"; _ar_repo "${t3}"; printf 'sujo\n' >> "${t3}/a.txt"
+  if bash "${db}" "${t3}" chore/onion-update-abc main >/dev/null 2>&1; then _rc=0; else _rc=$?; fi
+  if [ "${_rc}" -eq 2 ] && [ "$(git -C "${t3}" rev-parse --abbrev-ref HEAD)" = main ]; then
+    record_pass "adopt-robust: (c3) árvore suja ⇒ rc=2, nenhuma troca de branch"
+  else record_fail "adopt-robust: (c3)" "rc=${_rc} HEAD=$(git -C "${t3}" rev-parse --abbrev-ref HEAD)"; fi
+
+  # (c4) A PROSA DO --update, EXECUTADA: o bloco da branch dedicada + a linha do vendor-branch, contra um
+  #      core falso. A integração (main) NÃO pode andar; o framework novo cai em chore/onion-update-<pin>.
+  #      Os helpers vêm do core sob teste (`$SOURCE_ROOT/.claude/` → REPO_ROOT); o framework transportado
+  #      vem do core falso. MUTANTE: a prosa passar "$INTEGRATION_BRANCH" ao vendor-branch move a main.
+  local _ub _vb
+  _ub="$(_ar_block 'Branch dedicada, nunca a integra')"
+  _vb="$(grep -oE 'bash "\$SOURCE_ROOT/\.claude/utils/adopt/vendor-branch\.sh" update [^`]*' "${md}" | head -1)"
+  if [ -z "${_ub}" ] || [ -z "${_vb}" ]; then
+    record_fail "adopt-robust: (c4) setup" "não extraí a prosa do --update (bloco da branch dedicada e/ou a linha do vendor-branch)"
+  else
+    local fc="${d}/fcore" ta="${d}/tadopt"
+    rm -rf "${fc}"; mkdir -p "${fc}/.claude/commands" "${fc}/docs/meta-specs"; git -C "${fc}" init -q
+    printf 'spec v1\n' > "${fc}/docs/meta-specs/spec.md"; printf 'cmd\n' > "${fc}/.claude/commands/foo.md"
+    git -C "${fc}" add -A; git -C "${fc}" commit -qm v1
+    rm -rf "${ta}"; mkdir -p "${ta}/src"; git -C "${ta}" init -q -b main; printf 'produto\n' > "${ta}/src/app.js"
+    git -C "${fc}" archive HEAD -- .claude docs | tar -x -C "${ta}"; git -C "${ta}" add -A; git -C "${ta}" commit -qm "adopt v1"
+    bash "${ad}/vendor-branch.sh" seed "${ta}" main >/dev/null 2>&1
+    printf 'spec v2\n' > "${fc}/docs/meta-specs/spec.md"; git -C "${fc}" commit -qam v2
+    local _pin; _pin="$(git -C "${fc}" rev-parse --short=12 HEAD)"; _m0="$(git -C "${ta}" rev-parse main)"
+    { printf 'SOURCE_ROOT=%q TARGET=%q NOW=%q TOOLS=%q\n' "${fc}" "${ta}" "${_pin}" "${REPO_ROOT}"
+      printf '%s\n' "${_ub}" "${_vb}" | sed -E 's#"\$SOURCE_ROOT/\.claude/#"$TOOLS/.claude/#g'
+      printf 'echo "WORK=$WORK"\n'; } > "${d}/upd.sh"
+    if _out="$(bash "${d}/upd.sh" 2>&1)"; then _rc=0; else _rc=$?; fi
+    if [ "${_rc}" -eq 0 ] && [ "$(git -C "${ta}" rev-parse main)" = "${_m0}" ] \
+       && git -C "${ta}" show "chore/onion-update-${_pin}:docs/meta-specs/spec.md" 2>/dev/null | grep -q 'v2'; then
+      record_pass "adopt-robust: (c4) a prosa do --update, executada: framework novo em chore/onion-update-<pin>; a integração NÃO andou"
+    else record_fail "adopt-robust: (c4)" "rc=${_rc} main andou? $([ "$(git -C "${ta}" rev-parse main)" = "${_m0}" ] && echo não || echo SIM) · ${_out:0:250}"; fi
+  fi
+  unset -f _ar_repo
+
+  # (c5) durable-commit: ONION_DURABLE_VERIFY=1 RODA o gate do alvo; o default (adoção) segue pulando.
+  #      MUTANTE: tirar a linha que esvazia `_nv` ⇒ o hook não roda sob VERIFY=1.
+  local t5="${d}/t5"; rm -rf "${t5}"; mkdir -p "${t5}/.githooks" "${t5}/.claude"; git -C "${t5}" init -q -b main
+  printf '#!/usr/bin/env bash\ntouch "%s/HOOK_RODOU"\nexit "${HOOK_RC:-0}"\n' "${d}" > "${t5}/.githooks/pre-commit"; chmod +x "${t5}/.githooks/pre-commit"
+  git -C "${t5}" config core.hooksPath .githooks; printf 'x\n' > "${t5}/.claude/a.md"
+  rm -f "${d}/HOOK_RODOU"; bash "${ad}/durable-commit.sh" "${t5}" update abc chore/onion-update-abc >/dev/null 2>&1
+  local _h_default=0; [ -f "${d}/HOOK_RODOU" ] && _h_default=1
+  printf 'y\n' > "${t5}/.claude/b.md"; rm -f "${d}/HOOK_RODOU"
+  ONION_DURABLE_VERIFY=1 bash "${ad}/durable-commit.sh" "${t5}" update abc chore/onion-update-abc >/dev/null 2>&1
+  local _h_verify=0; [ -f "${d}/HOOK_RODOU" ] && _h_verify=1
+  printf 'z\n' > "${t5}/.claude/c.md"; local _rc_refuse=0
+  HOOK_RC=1 ONION_DURABLE_VERIFY=1 bash "${ad}/durable-commit.sh" "${t5}" update abc chore/onion-update-abc >/dev/null 2>&1 || _rc_refuse=$?
+  if [ "${_h_default}" = 0 ] && [ "${_h_verify}" = 1 ] && [ "${_rc_refuse}" -eq 1 ] \
+     && git -C "${t5}" diff --cached --name-only | grep -q 'c.md'; then
+    record_pass "adopt-robust: (c5) VERIFY=1 roda o gate do alvo (e a recusa dele é rc=1 com a mudança à vista); default segue --no-verify"
+  else record_fail "adopt-robust: (c5)" "hook default=${_h_default} (esperado 0) · verify=${_h_verify} (esperado 1) · recusa rc=${_rc_refuse} (esperado 1)"; fi
+
+  # ── (d) offer-onion-ci aceita WORKTREE e recusa o que não é raiz de repo ─────────────────────────
+  #      MUTANTE: devolver `[ -d "$DEST/.git" ]` reprova (d1) — o `.git` da worktree é ARQUIVO.
+  local oc="${ad}/offer-onion-ci.sh" t4="${d}/t4" wt4="${d}/t4-wt"
+  rm -rf "${t4}"; mkdir -p "${t4}/sub"; git -C "${t4}" init -q -b main; printf 'x\n' > "${t4}/sub/a"; git -C "${t4}" add -A; git -C "${t4}" commit -qm b
+  git -C "${t4}" worktree add -q -b wtb "${wt4}" >/dev/null 2>&1
+  local _o1 _r1=0 _r2=0 _r3=0
+  _o1="$(bash "${oc}" "${wt4}" 2>&1)" || _r1=$?
+  bash "${oc}" "${t4}/sub" >/dev/null 2>&1 || _r2=$?
+  mkdir -p "${d}/nao-repo"; bash "${oc}" "${d}/nao-repo" >/dev/null 2>&1 || _r3=$?
+  if [ "${_r1}" -ne 2 ] && ! grep -q 'não é' <<< "${_o1}" && [ "${_r2}" -eq 2 ] && [ "${_r3}" -eq 2 ]; then
+    record_pass "adopt-robust: (d1) offer-onion-ci aceita worktree (.git é arquivo) e recusa subdiretório e não-repo"
+  else record_fail "adopt-robust: (d1)" "worktree rc=${_r1} (${_o1:0:100}) · subdir rc=${_r2} · não-repo rc=${_r3}"; fi
+
+  # ── (e) write-stamp --kind door: um escritor só para o carimbo da porta ──────────────────────────
+  local ws="${ad}/write-stamp.sh" pd="${d}/porta"; mkdir -p "${pd}/.claude"
+  printf 'role: hub\nadopted_from: velho\nonion_version: aaaaaaaaaaaa\nadopted_at: 2026-01-01\n' > "${pd}/.claude/.onion-version"
+  local _re1=0 _re2=0 _re3=0
+  bash "${ws}" "${pd}" --kind door --framework f --commit bbbbbbbbbbbb --commit-date 2026-10-09 >/dev/null 2>&1 || _re1=$?
+  bash "${ws}" "${pd}" --kind porta --role hub --framework f --commit bbbbbbbbbbbb --commit-date 2026-10-09 >/dev/null 2>&1 || _re2=$?
+  bash "${ws}" "${pd}" --kind door --role standalone --framework f --commit bbbbbbbbbbbb --commit-date 2026-10-09 --adopted-from onion-standalone >/dev/null 2>&1 || _re3=$?
+  local _st="${pd}/.claude/.onion-version" _ie=""
+  grep -qx 'role: standalone' "${_st}" || _ie="${_ie} role-herdado"
+  grep -qx 'source_commit: bbbbbbbbbbbb' "${_st}" || _ie="${_ie} sem-source_commit"
+  grep -qx 'kind: door' "${_st}" || _ie="${_ie} sem-kind"
+  grep -qE '^materialized_at: [0-9]{4}-' "${_st}" || _ie="${_ie} sem-materialized_at"
+  grep -qE '^(adopted_at|updated_at|onion_version):' "${_st}" && _ie="${_ie} campo-de-adoção-ou-legado"
+  grep -qx 'adopted_from: onion-standalone' "${_st}" || _ie="${_ie} adopted_from-herdado"
+  if [ "${_re1}" -eq 2 ] && [ "${_re2}" -eq 2 ] && [ "${_re3}" -eq 0 ] && [ -z "${_ie}" ]; then
+    record_pass "adopt-robust: (e1) write-stamp --kind door: role obrigatório, args vencem o stamp velho, materialized_at e kind, sem campos de adoção"
+  else record_fail "adopt-robust: (e1)" "sem-role rc=${_re1} (esp. 2) · kind inválido rc=${_re2} (esp. 2) · ok rc=${_re3} ·${_ie}"; fi
+
+  unset -f _ar_block
   rm -rf "${d}"
 }
 
@@ -16912,6 +17129,7 @@ run_sweep_fixtures_selftests() {
 _family run_license_travels_selftests
 _family run_ssot_projections_selftests
 _family run_role_cut_selftests
+_family run_adopt_robust_selftests
 _family run_adopter_gate_selftests
 _family run_sweep_fixtures_selftests
 _family run_seed_adoption_graph_selftests
@@ -20676,6 +20894,28 @@ STUB
   if [ "${_r}" -eq 2 ] && grep -qiE 'ilegivel|ilegível' <<< "${_o}"; then
     record_pass "door-seal-pin: (i) pin ilegível no stamp ⇒ rc=2"
   else record_fail "door-seal-pin: (i)" "rc=${_r} out=${_o:0:200}"; fi
+
+  # (l)(m) STAMP ÚNICO (F1 das portas, 2026-10-09): a porta passou a ser carimbada pelo `write-stamp.sh
+  #     --kind door`, que escreve `source_commit` — o dialeto velho (`onion_version`) segue lido como
+  #     fallback para as portas já publicadas. (l) o dialeto NOVO é lido; (m) com os DOIS campos, o novo
+  #     vence (o velho carrega um pin forjado: se ele vencesse, o caso (f) recusaria). MUTANTES: tirar a
+  #     leitura de `source_commit` reprova (l) e (m); tirar o fallback reprova (a)/(k).
+  printf 'framework: x\nsource_commit: %s\nsource_commit_date: 2026-10-09\nrole: hub\nkind: door\nmaterialized_at: 2026-10-09\n' "${PIN_OK}" > "${doorway}/.claude/.onion-version"
+  git -C "${doorway}" add -A >/dev/null 2>&1
+  git -C "${doorway}" -c user.email=t@t -c user.name=t commit -q -m 'stamp dialeto novo' 2>/dev/null || true
+  _registry door "ffffffffffff"
+  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
+  if [ "${_r}" -eq 0 ] && grep -qF "onion_version: ${PIN_OK}" "${fakecore}/docs/evolution/federation/members.yaml"; then
+    record_pass "door-seal-pin: (l) stamp do write-stamp --kind door (source_commit) é lido e carimbado"
+  else record_fail "door-seal-pin: (l) dialeto novo não lido" "rc=${_r} out=${_o:0:200}"; fi
+  printf 'source_commit: %s\nonion_version: deadbeefcafe\nrole: hub\nkind: door\n' "${PIN_OK}" > "${doorway}/.claude/.onion-version"
+  git -C "${doorway}" add -A >/dev/null 2>&1
+  git -C "${doorway}" -c user.email=t@t -c user.name=t commit -q -m 'stamp com os dois campos' 2>/dev/null || true
+  _registry door "ffffffffffff"
+  GH_REMOTE_SHA="$(git -C "${doorway}" rev-parse HEAD)" _seal
+  if [ "${_r}" -eq 0 ] && grep -qF "onion_version: ${PIN_OK}" "${fakecore}/docs/evolution/federation/members.yaml"; then
+    record_pass "door-seal-pin: (m) com source_commit E onion_version, o campo NOVO vence"
+  else record_fail "door-seal-pin: (m) o campo legado venceu" "rc=${_r} out=${_o:0:200}"; fi
   unset -f _seal _doorway_stamp _registry
 }
 
@@ -20790,6 +21030,17 @@ run_door_selftests() {
     if [ "${_absent_n}" -eq 0 ]; then
       record_pass "door: (f) papel SEM o regenerador ainda sai com as 5 projeções (rodado do core)"
     else record_fail "door: (f)" "${_absent_n} projeção(ões) ausente(s) no papel standalone — o fail-open de :238 voltou"; fi
+    # (f2) STAMP ÚNICO (F1 das portas, 2026-10-09): o carimbo da porta sai do `write-stamp.sh --kind door`
+    #      (source_commit + kind: door + role), não de um heredoc com outra gramática. MUTANTE: devolver
+    #      o heredoc antigo reprova (sem source_commit e sem kind). O pin tem de ser o da fonte resolvida.
+    local _st5="${d5}/.claude/.onion-version" _i5=""
+    grep -qx 'role: standalone' "${_st5}" 2>/dev/null || _i5="${_i5} role"
+    grep -qx 'kind: door' "${_st5}" 2>/dev/null || _i5="${_i5} kind"
+    grep -qE '^source_commit: [0-9a-f]{12}$' "${_st5}" 2>/dev/null || _i5="${_i5} source_commit"
+    grep -q '^onion_version:' "${_st5}" 2>/dev/null && _i5="${_i5} dialeto-velho(onion_version)"
+    if [ -z "${_i5}" ]; then
+      record_pass "door: (f2) carimbo da porta vem do write-stamp --kind door (role + kind + source_commit; sem o dialeto velho)"
+    else record_fail "door: (f2)" "carimbo fora da gramática única:${_i5} — $(tr '\n' '|' < "${_st5}" 2>/dev/null | cut -c1-200)"; fi
   else record_fail "door: (f)" "materialização standalone abortou"; fi
   rm -rf "${d5}"
 

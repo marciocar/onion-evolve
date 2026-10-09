@@ -16,7 +16,8 @@
 #           branch que a Fase 2 já cria; o --update dedica chore/onion-update-<pin>)
 #
 # Never-clobber: staja SÓ a superfície Onion — código de produto uncommitted do maestro fica de fora.
-# commit --no-verify (worktree legacy sem node_modules: husky/lint-staged daria ENOENT e REVERTERIA).
+# commit --no-verify por DEFAULT (worktree legacy sem node_modules: husky/lint-staged daria ENOENT e
+# REVERTERIA); ONION_DURABLE_VERIFY=1 roda o gate do alvo (o --update/--promote-hub em branch dedicada).
 # Gracioso: DEST não-git → aviso + exit 0. Nada a commitar → exit 0 (idempotente).
 # ONION_REQUIRED_LIST=<arquivo> (opcional; ONION_REQUIRED_NUL=1 = separado por NUL): caminhos que TÊM de estar no commit — staja com
 #   `-f` (atravessa .gitignore) e confere depois; faltou algum → exit 3 nomeando. Ver o bloco abaixo.
@@ -123,6 +124,15 @@ except Exception: print("")' "${DEST}/.claude/settings.json")"
 fi
 _msg=(-m "chore(onion): ${_subj}")
 [ -n "${_sig}" ] && _msg+=(-m "${_sig}")
-git -C "${DEST}" commit --no-verify "${_msg[@]}" >/dev/null 2>&1 \
-  && { echo "Onion: instalação commitada em ${BR} (durável — imune a descarte de working-tree)."; exit 0; } \
-  || { echo "⚠️  commit durável falhou em ${DEST} (${BR})." >&2; exit 1; }
+# ── --no-verify é o DEFAULT, e ONION_DURABLE_VERIFY=1 o desliga (F1 das portas, SAC-89, 2026-10-09) ──
+# O default existe pela adoção: o 1º commit de uma worktree legacy sem node_modules morre no husky
+# (ENOENT) e o lint-staged REVERTE. Mas o --update e o --promote-hub commitam num alvo que JÁ tem o
+# gate do Onion instalado, numa branch dedicada que vai a PR — ali pular o gate é pular a única
+# checagem local do adotante. Com VERIFY=1 o hook roda; se ele recusa, o erro dele é mostrado e o
+# exit é 1: a mudança fica aplicada e NÃO commitada na branch dedicada, à vista, para o maestro curar.
+_nv=(--no-verify)
+[ "${ONION_DURABLE_VERIFY:-0}" = 1 ] && _nv=()
+_cout="$(git -C "${DEST}" commit "${_nv[@]}" "${_msg[@]}" 2>&1)" \
+  && { echo "Onion: instalação commitada em ${BR} (durável — imune a descarte de working-tree)$([ "${#_nv[@]}" = 0 ] && echo '; gate do alvo RODOU')."; exit 0; } \
+  || { echo "⚠️  commit durável falhou em ${DEST} (${BR})$([ "${#_nv[@]}" = 0 ] && echo ' — o GATE do alvo recusou; a mudança segue aplicada e não commitada nesta branch')." >&2
+       printf '%s\n' "${_cout}" | tail -15 | sed 's/^/    /' >&2; exit 1; }
