@@ -74,7 +74,7 @@ nodes:
     label: "ROTA PUBLICA ABERTA por ordem do maestro (2026-08-19): waha.onionevolve.com -> 127.0.0.1:3999 via /etc/caddy/conf.d/waha.caddy (convencao de bloco opcional da casa). Motivo: integracao de app externo (Lovable) — o app na nuvem nao alcanca loopback. O bind do container SEGUE no localhost (o Caddy e o unico expositor; TLS na frente, X-Api-Key do WAHA em toda chamada). PENDENTES RESOLVIDOS em 2026-08-19: registro A criado via API Hostinger (token em ~/.config/hostinger, informado pelo maestro) e cert ACME emitido. Desligar = rm do .caddy + reload; revogar acesso = trocar WAHA_API_KEY no compose"
     provenance:
       source: "docs/evolution/review/ops-waha-public-route.md"
-      locator: "l.18 (Origem: ordem do maestro, integração Lovable) + §Prova l.46 (caddy validate, 401 sem chave/chave errada) + §Adendo l.54-62 (token ~/.config/hostinger informado pelo maestro, PUT overwrite:false verificado por releitura, cert LE válido até 2026-11-17, 401 JSON do WAHA); onion-vps-waha@c92ff68 README.md l.41-46"
+      locator: "l.18 (Origem: ordem do maestro, integração Lovable) + §Prova l.46 (caddy validate, 401 sem chave/chave errada) + §Adendo l.54-62 (token da Hostinger no diretório de config do usuário (host), informado pelo maestro, PUT overwrite:false verificado por releitura, cert LE válido até 2026-11-17, 401 JSON do WAHA); onion-vps-waha@c92ff68 README.md l.41-46"
       method: "leitura: resíduo R56 do PR #634 + commit 21e62755 + README do repo onion-vps-waha@c92ff68"
       locality: "repo"
 
@@ -95,7 +95,7 @@ nodes:
 
   - id: E_librechat_install_started
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 4
     confidence: 0.9
@@ -105,7 +105,8 @@ nodes:
     provenance:
       source: "onion-vps-librechat@c943a9b"
       locator: "README.md l.9-12 (\"chat.onionevolve.com — SSO Logto (Onion ID), só Anthropic na v1 (família Claude 5), escopo completo com RAG\") + corpo do commit (\"boot verificado... VERIFICADO POR COMPORTAMENTO\"); onion-vps-catalog-doctrine.md l.187; docs/evolution/research/librechat-2026-08/SYNTHESIS.md l.12 e l.50-55"
-      method: "leitura: commit c943a9b no repo onion-vps-librechat (/home/marcio/onion-vps-librechat) + KB e síntese versionadas no core"
+      method: "testemunho: leitura do commit c943a9b no repo onion-vps-librechat (sem remoto alcançável; host) + KB e síntese versionadas no core"
+      locality: "host"
 
   # ── TOOL 3: EMAIL (gap) ──
   - id: ENT_email

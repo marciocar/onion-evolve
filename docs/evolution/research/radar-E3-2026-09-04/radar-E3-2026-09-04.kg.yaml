@@ -190,7 +190,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md"
       locator: "docs/evolution/research/radar-E3-2026-09-04/data/changelog-2.1.260.md l.9, l.10, l.11, l.54; 1ab1429e:.claude/settings.json; docs/evolution/research/radar-E3-2026-09-04/data/f1-findings-pre-juiz.md l.25; SYNTHESIS.md l.18"
-      method: "leitura: changelog verbatim + camadas de settings (1ab1429e:.claude/settings.json allow=13; host /home/marcio/onion-evolve/.claude/settings.local.json 97, ~/.claude/settings.json.bak-2026-09-04 3, ~/.claude/settings.local.json 24; zero deny/ask) + F11 do rascunho; juiz APROVOU (SYNTHESIS l.18)"
+      method: "leitura: changelog verbatim + camadas de settings (1ab1429e:.claude/settings.json allow=13; settings.local.json do projeto (gitignored, host) 97, settings.json.bak-2026-09-04 do usuário (host) 3, settings.local.json do usuário (host) 24; zero deny/ask) + F11 do rascunho; juiz APROVOU (SYNTHESIS l.18)"
       locality: "repo"
   - id: E_R3_F12_GITLAB_SUBGRUPOS_TAMBEM_NO_FORGE_DO_CORE
     node_type: evidence
@@ -258,7 +258,7 @@ nodes:
     trace: '.claude/hooks/premodelswitch-guard.sh'
     provenance:
       source: "docs/evolution/research/radar-E3-2026-09-04/SYNTHESIS.md"
-      locator: "SYNTHESIS.md l.36-37; corpo de 1ab1429e ('Nada de 2.1.260 foi observado — lacunas declaradas', 2026-09-04 00:58Z); host /home/marcio/onion-evolve/.claude/sessions/model-switch.jsonl l.1 (09-02, sem campo ladder; l.2 é 09-04T17:27, posterior ao commit)"
+      locator: "SYNTHESIS.md l.36-37; corpo de 1ab1429e ('Nada de 2.1.260 foi observado — lacunas declaradas', 2026-09-04 00:58Z); .claude/sessions/model-switch.jsonl (gitignored, host) l.1 (09-02, sem campo ladder; l.2 é 09-04T17:27, posterior ao commit)"
       method: "testemunho: lacunas declaradas pela sessão 2026-09-04 no corpo de 1ab1429e e SYNTHESIS l.37; cláusula do ladder por leitura de .claude/sessions/model-switch.jsonl no host"
       locality: "repo"
 edges:

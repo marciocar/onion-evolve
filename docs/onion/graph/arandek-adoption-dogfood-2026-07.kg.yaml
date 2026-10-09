@@ -184,7 +184,7 @@ nodes:
     provenance:
       source: "arandek@1aa794f9 ; arandek@88d93f26"
       locator: "git ls-tree -r --name-only 88d93f26^ -- .claude"
-      method: "leitura: git show/ls-tree dos commits 1aa794f9 e 88d93f26 no clone /home/marcio/arandek"
+      method: "leitura: git show/ls-tree dos commits 1aa794f9 e 88d93f26 no clone local de arandek"
 
   - id: E_C1_SSOT
     node_type: evidence
@@ -480,7 +480,7 @@ nodes:
     trace: ".claude/utils/adopt/write-stamp.sh"
     provenance:
       source: ".claude/utils/adopt/write-stamp.sh"
-      locator: "grep -rl <8hex do pin anterior> em /home/marcio/{aura,gustavo-pulga,mvp-venda-direta-pdi,<adotante-a>,onion-arthur,onion-pedro,onion-standalone,poc-venda-direta-pdi,pulse-mais,rhilo-metagamify} (pins anteriores lidos do git log do .onion-version)"
+      locator: "grep -rl <8hex do pin anterior> nos clones locais dos 10 adotantes (<adotante-sem-registro>, gustavo-pulga, poc-venda-direta-pdi [clone do MVP], <adotante-a>, onion-arthur, onion-pedro, onion-standalone, poc-venda-direta-pdi [clone da PoC], pulse-mais, metagamify) (pins anteriores lidos do git log do .onion-version)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 

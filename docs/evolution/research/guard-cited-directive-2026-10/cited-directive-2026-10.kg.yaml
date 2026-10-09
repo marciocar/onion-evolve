@@ -126,10 +126,10 @@ nodes:
       Licao mecanizada no cc-delta-census.sh: o relatorio lista as guardas de deriva de binario (familias que
       leem `command -v claude`, hoje so cited_directive), caso (h) na bancada, porque o CI nao tem o binario.
     provenance:
-      source: "binário do Claude Code 2.1.295 (host) e git show HEAD:.claude/validation/cited-directive-check.sh"
-      locator: "offset 215300431 do binario (funcao UPe ate Ltr); bloco verbatim do _engine da guarda"
+      source: "binário do Claude Code 2.1.295 e git show HEAD:.claude/validation/cited-directive-check.sh"
+      locator: "binário do Claude Code 2.1.295, offset 215300431 (função UPe até Ltr); bloco verbatim do _engine da guarda"
       method: "medição: extracao por python lendo bytes, comparacao normalizada por renomeacao, bancada --families cited_directive e tres mutantes"
-      locality: "host"
+      locality: "web"
 
 edges:
   - from: E_REEXTRACAO_2_1_295_SO_NOMES

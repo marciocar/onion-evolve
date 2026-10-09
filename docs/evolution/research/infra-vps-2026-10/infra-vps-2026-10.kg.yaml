@@ -61,7 +61,7 @@ nodes:
     trace: '/var/run/reboot-required.pkgs · /boot · systemctl · docker ps'
     provenance:
       source: "estado do host da VPS: pacotes de reboot pendente, kernels em boot, systemctl e docker ps (host)"
-      locator: "re-medido nesta sessao em 2026-10-05: uname -r = 6.8.0-139-generic; /boot tem vmlinuz-6.8.0-139 e vmlinuz-6.8.0-142; /var/run/reboot-required existe desde 2026-09-24 com .pkgs = libc6, linux-image-6.8.0-142-generic, linux-base; systemctl is-enabled docker e onion-vps-docker-firewall = enabled; docker ps = 31 containers. NAO re-medidos aqui (vindos do worker de escopo): 45 pacotes atualizaveis, 31 unless-stopped, 16 mosh-server orfaos encerrados a mao, release 26.04.1 disponivel; kernel 146 disponivel NAO reproduzido"
+      locator: "re-medido nesta sessao em 2026-10-05: uname -r = 6.8.0-139-generic; o diretório de boot tem vmlinuz-6.8.0-139 e vmlinuz-6.8.0-142; o marcador reboot-required do sistema existe desde 2026-09-24 com .pkgs = libc6, linux-image-6.8.0-142-generic, linux-base; systemctl is-enabled docker e onion-vps-docker-firewall = enabled; docker ps = 31 containers. NAO re-medidos aqui (vindos do worker de escopo): 45 pacotes atualizaveis, 31 unless-stopped, 16 mosh-server orfaos encerrados a mao, release 26.04.1 disponivel; kernel 146 disponivel NAO reproduzido"
       method: "testemunho: leitura de reboot-required.pkgs, kernels instalados, systemctl e docker ps no host 2026-10-05"
       locality: "host"
 
@@ -552,7 +552,7 @@ nodes:
     trace: '/usr/sbin/needrestart'
     provenance:
       source: "needrestart instalado e checkrestart ausente no sistema (host)"
-      locator: "medido nesta VPS em 2026-10-05: which checkrestart vazio; /usr/sbin/needrestart existe"
+      locator: "medido nesta VPS em 2026-10-05: which checkrestart vazio; needrestart existe (sbin do sistema)"
       method: "testemunho: which checkrestart e presença do needrestart no host 2026-10-05"
       locality: "host"
 
@@ -588,7 +588,7 @@ nodes:
     trace: '/var/run/reboot-required.pkgs · /boot'
     provenance:
       source: "reboot-required.pkgs e kernels em boot do host (host)"
-      locator: "medido nesta VPS em 2026-10-05: canonical-livepatch ausente; /var/run/reboot-required existe com .pkgs libc6, linux-image-6.8.0-142-generic, linux-base; uname -r 139"
+      locator: "medido nesta VPS em 2026-10-05: canonical-livepatch ausente; o marcador reboot-required do sistema existe com .pkgs libc6, linux-image-6.8.0-142-generic, linux-base; uname -r 139"
       method: "testemunho: leitura de reboot-required.pkgs e dos kernels instalados no host 2026-10-05"
       locality: "host"
 
@@ -748,7 +748,7 @@ nodes:
     label: 'VAZAMENTO JA EXISTENTE, achado ao medir a pergunta do maestro: a guarda vps-exposure-check.sh mora em .claude/validation/ (raiz que viaja) e carrega caminhos FIXOS desta VPS. Nao sao segredos, mas sao topologia da maquina do maestro, e chegaram a tres adotantes e a porta PUBLICA onion-core. CURA, junto da forja da opcao B: a guarda vira core-only (fora do pacote) ou o caminho passa a vir da configuracao, e a porta e re-materializada. GATILHO: a forja da opcao B.'
     provenance:
       source: ".claude/validation/vps-exposure-check.sh"
-      locator: "grep em .claude/validation/vps-exposure-check.sh: 3 linhas com /home/marcio/onion-vps-*/backups, /home/marcio/backups/*, /home/onion/.claude/backups; o arquivo existe em brain-granaai, gmill, sacola-de-ideias e na porta publica onion-core"
+      locator: "grep em onion-evolve@9e75a73d:.claude/validation/vps-exposure-check.sh: três diretórios de backup fixos da VPS (dois sob a conta do maestro, um sob a conta de serviço) nas l.89-92 (comentário) e l.99 (default de BACKUP_DIRS); o arquivo existe em brain-granaai, hub-operacoes-enterprise, sacola-de-ideias e na porta publica onion-core"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 

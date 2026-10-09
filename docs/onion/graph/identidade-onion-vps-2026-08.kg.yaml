@@ -40,7 +40,7 @@ nodes:
     provenance:
       source: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
       locator: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md l.55-65; db8d9844:docs/onion/identidade-onion-vps.md l.56-70; corpo de 50516e84 item 2"
-      method: "testemunho: medicao da sessao 2026-08-10 (prosa db8d9844 l.56-70: conexoes na 3011 = 0, authorize 400 no upgrade) re-verificada pelo run kg-freshness wf_7804d86f-3a7 em 2026-08-12, com a perna do bridge fechada a mao por leitura de identity.ts:34/45/126/129/133 (sem acesso hoje a /home/onion sem sudo); comandos dos workers nao registrados (journal ausente no host)"
+      method: "testemunho: medicao da sessao 2026-08-10 (prosa db8d9844 l.56-70: conexoes na 3011 = 0, authorize 400 no upgrade) re-verificada pelo run kg-freshness wf_7804d86f-3a7 em 2026-08-12, com a perna do bridge fechada a mao por leitura de identity.ts:34/45/126/129/133 (sem acesso hoje ao home da conta de serviço onion sem sudo); comandos dos workers nao registrados (journal ausente no host)"
       locality: "repo"
 
   - id: C_REDE_ISOLADA_POR_CONSTRUCAO
@@ -295,7 +295,7 @@ nodes:
     narrative: "label anterior: ⚠️ ATUALIZADO 2026-08-13 — O BLOQUEIO DEIXOU DE SER CONCEITUAL E VIROU UMA CONTA. Com [Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS] FECHADO (o maestro confirmou a copia fora), a armadilha circular que este no descrevia — 'a senha do repositorio nao pode morar dentro do cofre que ele protege' — esta RESOLVIDA: a senha pode viver no `pass`, porque a chave que a protege nao morre mais junto com a maquina. MEDIDO HOJE, e o mecanismo segue DESARMADO: `pass` sem entrada `restic`, `crontab -l` do root sem linha offsite, e `backup-offsite.sh` saindo **exit 3** — declarando que NAO FEZ, em vez de sair 0 parecendo que fez. ⚠️ DISTINCAO QUE O MAESTRO PEDIU EXPLICITAMENTE: ele fez um backup MANUAL (`onion-backup-offsite-20260811.tar.gz`), que e real e vale — mas nao e o mecanismo. Manual e ponto-no-tempo que depende de alguem lembrar; `restic` e incremental, versionado, com prova de restauracao no cron, e com destino de imutabilidade-do-lado-do-servidor sobrevive ate ao antipadrao dos 9 segundos de [E_ANTIPADRAO_MEDIDO_EM_PRODUCAO]. FALTA EXATAMENTE: `pass insert onion/restic-repo` + `pass insert onion/restic-password` + uma linha de cron. HISTORICO: O QUE JA ESTA FEITO: o backup do cofre e `.tar.gpg` cifrado para a MESMA chave GPG que ja e raiz do `pass` (reusar em vez de inventar — uma chave a mais e um segredo a mais para perder), com PROVA DE RESTAURACAO (decifra e devolve banco + chave de assinatura), rotacao 14, no cron. O QUE FALTA: sai do mesmo disco. PESQUISA DATADA APONTA: `restic` como ferramenta (S3-compat nativo, chave separavel; borg 2.0 ainda em beta e 1.4 e SSH-only), destino `rsync.net` (imutabilidade ZFS do lado do SERVIDOR, nao depende do cliente cooperar) ou Hetzner Storage Box (custo), e a regra virou **3-2-1-1-0**: +1 copia IMUTAVEL, +0 = ultimo teste de restore com ZERO erros como criterio FORMAL. ⚠️ A ARMADILHA ESPECIFICA DE COFRE: a senha do repositorio de backup NAO PODE morar dentro do cofre que ele protege — se o cofre corrompe, perde-se o dado E a chave ao mesmo tempo. Isto e problema circular documentado, nao teoria."
     provenance:
       source: "dd0f3ffb"
-      locator: "corpo de dd0f3ffb (bloco GPG, 2026-08-13); /home/marcio/onion-vps-vaultwarden 31cd4f9:backup-offsite.sh l.5-8"
+      locator: "corpo de dd0f3ffb (bloco GPG, 2026-08-13); onion-vps-vaultwarden@31cd4f9:backup-offsite.sh l.5-8"
       method: "leitura: corpo de dd0f3ffb + backup-offsite.sh no clone onion-vps-vaultwarden em 31cd4f9"
       locality: "repo"
 
@@ -383,7 +383,7 @@ nodes:
     trace: "/home/marcio/onion-vps-logto/backup.sh"
     provenance:
       source: "3af49bb1"
-      locator: "corpo de 3af49bb1 (PR #580, 2026-08-11); docs/evolution/review/fix-chronic-nodes-remodel.md l.5 (pass rc=2); /home/marcio/onion-vps-logto 2a4d992/4e99f87/dd1ba80"
+      locator: "corpo de 3af49bb1 (PR #580, 2026-08-11); docs/evolution/review/fix-chronic-nodes-remodel.md l.5 (pass rc=2); onion-logto@2a4d992, @4e99f87 e @dd1ba80"
       method: "leitura: corpo de 3af49bb1 + commits do onion-vps-logto de 2026-08-11"
       locality: "repo"
 
@@ -480,7 +480,7 @@ nodes:
     trace: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh"
     provenance:
       source: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
-      locator: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md l.69-74; /home/marcio/onion-vps-vaultwarden 31cd4f9:backup-offsite.sh l.1-8"
+      locator: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md l.69-74; onion-vps-vaultwarden@31cd4f9:backup-offsite.sh l.1-8"
       method: "leitura: relatório do run kg-freshness de 2026-08-12 (achado 3) + backup-offsite.sh no clone em 31cd4f9"
       locality: "repo"
 
@@ -544,7 +544,7 @@ nodes:
     trace: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh (recomendacoes de destino no cabecalho)"
     provenance:
       source: "3eaecc6d"
-      locator: "corpo de 3eaecc6d; docs/evolution/review/feat-offsite-proven.md l.27-31; /home/marcio/onion-vps-vaultwarden 31cd4f9:backup-offsite.sh l.25-26, l.45-48"
+      locator: "corpo de 3eaecc6d; docs/evolution/review/feat-offsite-proven.md l.27-31; onion-vps-vaultwarden@31cd4f9:backup-offsite.sh l.25-26, l.45-48"
       method: "leitura: corpo de 3eaecc6d (decisao com o maestro 2026-08-31) + cabecalho de backup-offsite.sh no clone com sha"
       locality: "repo"
 
@@ -591,8 +591,8 @@ nodes:
     trace: "/home/marcio/onion-vps-logto/backup.sh"
     provenance:
       source: "docs/evolution/review/fix-chronic-nodes-remodel.md"
-      locator: "docs/evolution/review/fix-chronic-nodes-remodel.md l.5, l.16-17 (5adb88b0); /home/marcio/onion-vps-logto dd1ba80:backup.sh l.29-33, l.82; /home/marcio/.gnupg/gpg-agent.conf l.2"
-      method: "testemunho: remodelagem manual da sessão de 2026-09-01 registrada no resíduo (pass rc=2, chmod 600, 3 up.sh) + leitura do arquivo /home/marcio/.gnupg/gpg-agent.conf no host (default-cache-ttl 28800)"
+      locator: "docs/evolution/review/fix-chronic-nodes-remodel.md l.5, l.16-17 (5adb88b0); onion-logto@dd1ba80:backup.sh l.29-33, l.82; gpg-agent.conf do usuário (host) l.2"
+      method: "testemunho: remodelagem manual da sessão de 2026-09-01 registrada no resíduo (pass rc=2, chmod 600, 3 up.sh) + leitura do gpg-agent.conf do usuário no host (default-cache-ttl 28800)"
       locality: "repo"
 
   - id: E_REFUTA_Q_LACUNA_DECISAO_MAIS_CODIGO

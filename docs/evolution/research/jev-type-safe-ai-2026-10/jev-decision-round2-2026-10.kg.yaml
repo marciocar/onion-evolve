@@ -78,7 +78,7 @@ nodes:
     trace: 'docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md'
     provenance:
       source: "docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md"
-      locator: "rodado por mim: `git ls-files | grep -i llms-full` → vazio; `find /home/marcio/onion-evolve -name \"*llms-full*\" -not -path \"*/.git/*\"` → vazio; `find docs/evolution/research/typesafe-ai-2026-09 -type f` → exatamente 2 arquivos (SYNTHESIS.md, typesafe-ai-2026-09.kg.yaml)"
+      locator: "rodado por mim: `git ls-files | grep -i llms-full` → vazio; `find <raiz do clone do core> -name \"*llms-full*\" -not -path \"*/.git/*\"` → vazio; `find docs/evolution/research/typesafe-ai-2026-09 -type f` → exatamente 2 arquivos (SYNTHESIS.md, typesafe-ai-2026-09.kg.yaml)"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 

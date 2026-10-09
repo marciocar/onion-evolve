@@ -51,7 +51,7 @@ nodes:
     label: "repositorio — meio de colaboracao assincrona e SSOT-de-registro"
     provenance:
       source: "docs/evolution/inbox"
-      locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. cd /home/marcio/onion-evolve && ls -la docs/evolution/inbox/ docs/evolution/outbox/ docs/e => Claim 1 (repositório é meio de colaboração assíncrona): CONFIRMADO ao vivo. `docs/evolution/{inbox,outbox,inbo…"
+      locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. cd <raiz do clone do core> && ls -la docs/evolution/inbox/ docs/evolution/outbox/ docs/e => Claim 1 (repositório é meio de colaboração assíncrona): CONFIRMADO ao vivo. `docs/evolution/{inbox,outbox,inbo…"
       method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: EN_VERTICAL
@@ -66,7 +66,7 @@ nodes:
     label: "vertical Onion (book/SSOT + hub + helpers) — produzida a partir de spec"
     provenance:
       source: ".claude/commands/meta/create-vertical.md"
-      locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. cd /home/marcio/onion-evolve && test -f .claude/commands/meta/create-vertical.md && echo E => EXISTS. Linha 123: \"`.claude/skills/<slug>/SKILL.md` — hub-roteador homônimo (deriva da SSOT viva, nunca hardc…"
+      locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. cd <raiz do clone do core> && test -f .claude/commands/meta/create-vertical.md && echo E => EXISTS. Linha 123: \"`.claude/skills/<slug>/SKILL.md` — hub-roteador homônimo (deriva da SSOT viva, nunca hardc…"
       method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: ST_SINAL_INBOX

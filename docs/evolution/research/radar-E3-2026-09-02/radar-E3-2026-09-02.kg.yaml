@@ -80,7 +80,7 @@ nodes:
     trace: 'CLAUDE.md'
     provenance:
       source: "CLAUDE.md"
-      locator: "CHANGELOG l.98; grep -l bypassPermissions em 26 settings*.json (/home/marcio/*/.claude + core) rc=1 (ausencia); onion-bridge src/workspace.ts:105 + config.ts:28; juiz EMENDOU 2 numeros"
+      locator: "CHANGELOG l.98; grep -l bypassPermissions em 26 settings*.json (clones de adotantes no host + core) rc=1 (ausencia); onion-bridge src/workspace.ts:105 + config.ts:28; juiz EMENDOU 2 numeros"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
@@ -96,7 +96,7 @@ nodes:
     trace: '.claude/commands/meta/kg-freshness.md'
     provenance:
       source: ".claude/commands/meta/kg-freshness.md"
-      locator: "CHANGELOG l.16; kg-freshness.md:120-126 (\"Bloqueio de acesso so vale TENTADO\", cita /home/onion/onion-bridge/src/)"
+      locator: "CHANGELOG l.16; 8320b1c3:.claude/commands/meta/kg-freshness.md:120-126 (\"Bloqueio de acesso so vale TENTADO\", cita o caminho do clone de produção do onion-bridge na conta de serviço)"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 

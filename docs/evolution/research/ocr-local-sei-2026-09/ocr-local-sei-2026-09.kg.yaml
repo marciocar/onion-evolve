@@ -359,7 +359,7 @@ nodes:
     trace: 'https://mindee.github.io/doctr/getting_started/installing.html'
     provenance:
       source: "https://mindee.github.io/doctr/getting_started/installing.html"
-      locator: "E_DOCTR_PYTHON_311_PLUS (https://mindee.github.io/doctr/getting_started/installing.html, tier 9, 3-0) confrontada com o venv real do projeto (/opt/venv: numpy, pillow, pypdf, openpyxl) e com o requisito (c) do enunciado"
+      locator: "E_DOCTR_PYTHON_311_PLUS (https://mindee.github.io/doctr/getting_started/installing.html, tier 9, 3-0) confrontada com o venv real do projeto (venv do projeto: numpy, pillow, pypdf, openpyxl) e com o requisito (c) do enunciado"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "web"
 

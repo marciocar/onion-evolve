@@ -25,7 +25,7 @@ nodes:
     label: 'O DEFEITO, DATADO: em 2026-10-05 o juiz do radar E3 mediu 15 formas que escapavam dos dois vetos com rc=0, a pior o force-push git push origin +main — num repo cujo host NAO protege a main (403), logo o hook e a unica barreira. O estudo achou mais dois escapes que o juiz nao listou: heredoc SEM aspas com $(gh pr merge 1) no corpo (EXECUTA o merge; a lib descartava o corpo inteiro) e brace expansion no nome do comando. E no MESMO dia um FALSO POSITIVO: o sed partia texto ENTRE ASPAS no ; e vetou um comando cuja unica mencao a gh pr merge era uma string literal. A lista de formas barradas era menor que a lingua do shell — guarda-por-lista falhando pelo vocabulario pela 2a vez na mesma lib.'
     provenance:
       source: ".claude/hooks/lib/invocation-lines.sh"
-      locator: "payload JSON sintetico contra pretooluse-merge-gate.sh e pretooluse-protect-main.sh do main (2786f56c): +main, \"main\", TZ=… bash -c, timeout, gh -R, /usr/bin/gh, eval, xargs, $(echo gh), & simples, if/then, heredoc SEM aspas com $(…), {gh,} — rc=0 nos dois; branch protection do host: 403"
+      locator: "payload JSON sintetico contra pretooluse-merge-gate.sh e pretooluse-protect-main.sh do main (2786f56c): +main, \"main\", TZ=… bash -c, timeout, gh -R, gh por caminho absoluto do binário, eval, xargs, $(echo gh), & simples, if/then, heredoc SEM aspas com $(…), {gh,} — rc=0 nos dois; branch protection do host: 403"
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 
@@ -56,9 +56,9 @@ nodes:
     label: 'ESTUDO 2, o binario: o Claude Code 2.1.289 analisa comando para as regras de permissao com TREE-SITTER e mantem ~145 motivos de RECUSA — o que ele nao consegue provar sobre o que o shell vai executar, ele nao supoe. Os que importam a estes vetos e viraram regra aqui: "Command name is runtime-determined", "Brace expansion", eval ("evaluates arguments as shell code" — RECUSADO, nao recursado), "timeout/stdbuf/nice … can''t be checked before it runs" para argumento runtime, "What xargs adds to X can''t be checked", e "Heredoc with unquoted delimiter undergoes shell expansion" — este ultimo revelou o escape do heredoc que ninguem tinha listado.'
     provenance:
       source: "commit 0766a4d7 (sessão session_01NSeoZ75idrWT2wShxLsVfA) ; .claude/hooks/lib/invocation-lines.sh l.22-23"
-      locator: "verified_against do nó (parseCommand/tree-sitter, 145 strings reason: em torno de 'tree-sitter mis-parse') + cabeçalho da lib l.22-23"
+      locator: "binário do Claude Code 2.1.289: verified_against do nó (parseCommand/tree-sitter, 145 strings reason: em torno de \"tree-sitter mis-parse\") + cabeçalho da lib l.22-23"
       method: "medição: análise do binário do Claude Code 2.1.289 na sessão 2026-10-05 (parseCommand/tree-sitter, cerca de 145 strings reason:), comando não registrado"
-      locality: "host"
+      locality: "web"
 
   - id: E_ESTUDO_SO_O_SHLEX_EXISTE_EM_TODO_LUGAR
     node_type: evidence
@@ -96,7 +96,7 @@ nodes:
     label: 'O TESTE DE FALSO POSITIVO MAIS FORTE DISPONIVEL: reexecutar contra o hook antigo e o novo todos os 12.268 comandos Bash reais que as sessoes deste repo ja rodaram. A 1a versao da lib divergiu em 6: curou 1 falso positivo antigo (o proprio comando que escrevia esta lib) e CRIOU 5 — tres por um scanner de $(…) que contava parenteses ignorando aspas (quebrava em "$(printf ''%s'' "$x" | grep ''y'')", que o bash aceita), dois por marcar como inanalisavel todo xargs diante de gh (inclusive leituras como xargs gh run view), e todos amplificados por um criterio de relevancia que aceitava a palavra merge/push solta. Os tres foram curados na raiz. A v3 mostrou que os 5 vetos restantes, que o hook ANTIGO tambem dava, eram falso positivo PRE-existente — todos cd /outro/repo && git push origin main — e a isencao por cd literal (com escopo) os curou. A v4 achou um IndexError: os ) de padroes de case em bash -c esvaziavam a pilha de escopo, e o fallback vetava a string inteira; curado com restauracao por tamanho e com toda excecao passando pelo mesmo criterio de relevancia. LICAO DE PROCEDIMENTO medida aqui: a v2 rodou ao mesmo tempo que os scripts de mutante e julgou parte dos comandos com a lib MUTADA — medicao concorrente com mutacao no mesmo arquivo nao vale; desde a v3 o hash dos hooks e conferido antes e depois.'
     provenance:
       source: "commit 0766a4d7 (sessão session_01NSeoZ75idrWT2wShxLsVfA) ; .claude/validation/lint-selftest.sh l.5787-5800"
-      locator: "lint-selftest.sh l.5787 (5 FP da reexecução dos 12.268 comandos), l.5793 (cd /outro/repo, v3), l.5796 (IndexError de case em bash -c, v4)"
+      locator: "lint-selftest.sh l.5787 (5 FP da reexecução dos 12.268 comandos), l.5793 (cd para outro repo por caminho absoluto, v3), l.5796 (IndexError de case em bash -c, v4)"
       method: "testemunho: medição da sessão 2026-10-05, comando não registrado (replay.py não preservado)"
       locality: "repo"
 

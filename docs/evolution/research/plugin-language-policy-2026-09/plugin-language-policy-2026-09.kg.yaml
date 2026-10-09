@@ -256,7 +256,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/plugin-language-policy-2026-09/SYNTHESIS.md · docs/evolution/research/plugin-language-policy-2026-09/plugin-language-policy-2026-09.kg.yaml"
       locator: "SYNTHESIS l.24 (15 fontes · 33 claims · 25 verificadas, 7/18), l.29, l.42-43 (venue e dogfood não feitos), l.55 (8 claims, 34 fontes fora do orçamento); grafo: 7 evidências externas confirmadas, 3 com trace support.claude.com/13145358"
-      method: "leitura: SYNTHESIS.md (projeção do run wf_bde10f3f-28c; journal ausente no host, find /home/marcio vazio) + contagem dos nós confirmados do grafo"
+      method: "leitura: SYNTHESIS.md (projeção do run wf_bde10f3f-28c; journal ausente no host, find no home do host vazio) + contagem dos nós confirmados do grafo"
       locality: "repo"
 
   # ── AS OPÇÕES (uma claim por opção, todas open) ──────────────────────────────────────────

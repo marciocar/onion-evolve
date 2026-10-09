@@ -157,7 +157,7 @@ nodes:
     provenance:
       source: "git:f5d50f4b"
       locator: "corpo do commit f5d50f4b ('DNS ESCRITO NA HOSTINGER VIA API, NÃO-DESTRUTIVO'); onion-waha@86662e0:dns-backup/onionevolve-20260801-114722.json (zona ANTES)"
-      method: "testemunho: escrita e releitura da zona relatadas em 1ª pessoa no commit f5d50f4b (2026-08-01); backup prévio lido em onion-waha@86662e0 e leitura do arquivo /home/marcio/onion-vps-waha/dns-backup/onionevolve-20261008-232540.json no host para os registros criados"
+      method: "testemunho: escrita e releitura da zona relatadas em 1ª pessoa no commit f5d50f4b (2026-08-01); backup prévio lido em onion-waha@86662e0 e leitura do backup dns-backup/onionevolve-20261008-232540.json do clone de onion-waha (não versionado, só no host) para os registros criados"
       locality: "repo"
 
   - id: E_domain_verified

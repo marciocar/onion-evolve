@@ -255,7 +255,7 @@ nodes:
 
   - id: E_VENDOR_PRODUTO_REFUTADO_EM_SANDBOX
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.95
     status: confirmed
@@ -265,9 +265,9 @@ nodes:
     trace: '.claude/utils/adopt/vendor-branch.sh'
     provenance:
       source: ".claude/utils/adopt/vendor-branch.sh"
-      locator: "sandbox determinístico em /home/marcio/.claude/jobs/3e42276a/tmp/vendor_repro.sh: monta core+adotante do zero, semeia vendor de onion/adopt, integra, produz 3 commits de produto, avança o framework do core e roda `vendor-branch.sh update` → \"framework atualizado via merge limpo\", rc=0, 0 conflitos"
-      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
-      locality: "repo"
+      locator: "sandbox determinístico vendor_repro.sh no diretório de job do harness (jobs/3e42276a, host; não preservado): monta core+adotante do zero, semeia vendor de onion/adopt, integra, produz 3 commits de produto, avança o framework do core e roda `vendor-branch.sh update` → \"framework atualizado via merge limpo\", rc=0, 0 conflitos"
+      method: "testemunho: sandbox vendor_repro.sh executado no host 2026-09-05 (script não preservado)"
+      locality: "host"
 
   - id: E_DRIVE_NAO_E_MOAT_MAS_DEPS_NAO_VIAJAM
     node_type: evidence

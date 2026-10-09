@@ -535,7 +535,7 @@ nodes:
     node_type: question
     trace: docs/analysis/onion-m2-bridge-logto-integration-2026-07.md
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.5
     status: open
@@ -544,9 +544,9 @@ nodes:
     label: "VPS-DECLARADO: o inventário EXATO das rotas do app Hono só existe no host. A tabela do §3.4 é CONTRATO, não fato. P0.2 enumera com comando — dump de RUNTIME (app.routes, comportamento) como autoritativo + grep na fonte (agora incluindo route|mount) como rede de segurança — e classifica cada rota PROTEGIDA/ABERTA/DUPLO-GATE. P0.2b anota o ÍNDICE de cada handler (fix C). P0.2c localiza o /a2a (fix L1)"
     provenance:
       source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
-      locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 4/4 claims medidas ao vivo. sudo -n grep -n \"app\\.get(\\|app\\.post(\\|app\\.use(\\|app\\.route(\\|app\\.mount(\" /home/onion/o => Rodando no próprio host (srv1812846) com sudo -n: (1) server.ts vivo mostra 46 registros app.get/post/... e middlewares…"
-      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "repo"
+      locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 4/4 claims medidas ao vivo. sudo -n grep -n \"app\\.get(\\|app\\.post(\\|app\\.use(\\|app\\.route(\\|app\\.mount(\" <clone de produção do onion-bridge na conta de serviço>/… => Rodando no próprio host (srv1812846) com sudo -n: (1) server.ts vivo mostra 46 registros app.get/post/... e middlewares…"
+      method: "testemunho: kg-freshness Onda 7 (wf_405c7716-7b3) mediu no host em 2026-09-01 com sudo -n grep no clone de produção do onion-bridge; o resultado só está registrado no próprio grafo"
+      locality: "host"
 
   - id: Q_a2a_after_flip
     node_type: question
@@ -2063,7 +2063,7 @@ nodes:
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A premissa que mantinha o nó bloqueado ("exigiria desligar uma guarda no bridge VIVO" / sem ambiente de teste) mudou: existe hoje um clone local rodável fora de produção (`/home/marcio/onion-bridge-dev`, `npm run dev`) — exatamente o "quando houver ambiente de teste do bridge" que o próprio nó defin'
     provenance:
       source: "docs/analysis/backlog-real-2026-09.md"
-      locator: "§1 l.32 (Q_p10_mutation_not_run); /home/marcio/onion-bridge-dev/package.json l.11"
+      locator: "§1 l.32 (Q_p10_mutation_not_run); package.json l.11 do clone de desenvolvimento do onion-bridge (host)"
       method: "juízes: revisão-total wf_2944480c (censo+realidade, juiz opus) — DRIFTED"
       locality: "repo"
 
@@ -2079,7 +2079,7 @@ nodes:
     provenance:
       source: "docs/evolution/research/census-2026-09-01/data/rodada2.json"
       locator: "medidos[node_id=D_pkce_risk_mitigations] (run wf_102a9bec-52f; campos method/observed/verdict=REFUTED; reproduz rodada1.json)"
-      method: "medição: census r2 wf_102a9bec (worker, sem juiz) — sudo grep accessTokenTtl/refreshTokenTtlInDays/rotat logto-provision.sh; sudo cat /etc/caddy/Caddyfile; grep Content-Security-Policy server.ts; curl -sI https://app.onionevolve.com/health"
+      method: "medição: census r2 wf_102a9bec (worker, sem juiz) — sudo grep accessTokenTtl/refreshTokenTtlInDays/rotat logto-provision.sh; sudo cat do Caddyfile do host; grep Content-Security-Policy server.ts; curl -sI https://app.onionevolve.com/health"
       locality: "repo"
 
   - id: D_TTL_UX_TRADEOFF
@@ -2149,7 +2149,7 @@ nodes:
   - id: E_W9_BRIDGE_DEPLOY_0902
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.95
     status: confirmed
@@ -2159,9 +2159,9 @@ nodes:
     trace: "ops/update-bridge.sh"
     provenance:
       source: "ops/update-bridge.sh"
-      locator: "ops/update-bridge.sh rc=0 (clone 5c40b1cc, bridge 1f7fb3f1, invocacao 75264042); systemctl show onion-vps-bridge: ActiveState=active, NRestarts=0, ActiveEnterTimestamp 02:07:16Z; journal -3min: 0 error/unhandled; /health 3x ~0,25ms; sudo -n git -C /home/onion/onion-bridge log = merges #65 e #66 no topo"
-      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
-      locality: "repo"
+      locator: "ops/update-bridge.sh rc=0 (clone 5c40b1cc, bridge 1f7fb3f1, invocacao 75264042); systemctl show onion-vps-bridge: ActiveState=active, NRestarts=0, ActiveEnterTimestamp 02:07:16Z; journal -3min: 0 error/unhandled; /health 3x ~0,25ms; sudo -n git log no clone de produção do onion-bridge (conta de serviço) = merges #65 e #66 no topo"
+      method: "testemunho: deploy medido no serviço do host 2026-09-02 (update-bridge.sh rc, systemctl show, journal, /health, git log do clone de produção)"
+      locality: "host"
 
 edges:
   - from: E_floors_effective_measured_20260729

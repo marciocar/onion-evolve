@@ -93,10 +93,10 @@ nodes:
     label: 'MEDIDO (tier 10, artefato instalado + historia do proprio repo, custo = 4 comandos): a assimetria adiciona-vs-deleta e REAL AQUI — 323 linhas adicionadas contra 77 removidas em 59 commits, e a maior remocao unica de toda a historia do CLAUDE.md e de 5 linhas. Mas o tamanho NAO e o constrangimento: 17.041 bytes sao ~0,5% da janela de 1M do opus-5[1m]. E a plataforma ja entrega a cura recomendada: so a `description` do frontmatter entra sempre; o corpo do SKILL.md carrega sob demanda, e duas skills do core ja declaram `paths:`. Densidade de imperativos em CLAUDE.md: 13 bullets pelo grep literal / 29 com -i, em 110 bullets — duas ordens de grandeza abaixo do regime de 500 instrucoes de qualquer benchmark de densidade.'
     trace: 'CLAUDE.md · .claude/skills/*/SKILL.md · /home/marcio/.local/share/claude/versions/2.1.259'
     provenance:
-      source: "CLAUDE.md · .claude/skills/*/SKILL.md · binário do Claude Code 2.1.259 (host)"
+      source: "CLAUDE.md · .claude/skills/*/SKILL.md · binário do Claude Code 2.1.259"
       locator: "medicao propria, 4 comandos no repo e no binario instalado: (1) `git log --follow --numstat -- CLAUDE.md` = 59 commits, adds=323, dels=77, maior remocao unica de toda a historia = 5 linhas; (2) `wc -lc CLAUDE.md` = 246 linhas / 17.041 bytes (~5k tokens = ~0,5% de uma janela de 1M); (3) `grep -n \"^paths:\" .claude/skills/*/SKILL.md` = onion-patterns [\".claude/**\",\"docs/onion/**\"] e onion-validation [\".claude/**\"] JA declaram escopo por path; (4) `grep -ao InstructionsLoaded <binario 2.1.259>` = 21 ocorrencias, incluindo executeInstructionsLoadedHooks / hasInstructionsLoadedHook e a lista de eventos de hook — o hook EXISTE no artefato instalado."
       method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
-      locality: "host"
+      locality: "web"
 
   # ── A PREMISSA DO CORPUS QUE ESTA RODADA DERRUBA ────────────────────────────────────────
   - id: C_PREMISSA_SKILLS_SEMPRE_CARREGADAS
@@ -243,7 +243,7 @@ nodes:
     trace: 'docs/knowledge-base/tools/agent-skills.md'
     provenance:
       source: "docs/knowledge-base/tools/agent-skills.md"
-      locator: "artefato instalado, 1 comando, sem web: binario /home/marcio/.local/share/claude/versions/2.1.259 + a listagem de skills do proprio prompt desta sessao (so descriptions no contexto; o corpo de onion-orchestration, 296 linhas, so entra via ferramenta Skill) + docs/knowledge-base/tools/agent-skills.md:131 documentando `paths` para skill"
+      locator: "artefato instalado, 1 comando, sem web: binário do Claude Code 2.1.259 + a listagem de skills do proprio prompt desta sessao (so descriptions no contexto; o corpo de onion-orchestration, 296 linhas, so entra via ferramenta Skill) + docs/knowledge-base/tools/agent-skills.md:131 documentando `paths` para skill"
       method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
 
@@ -336,7 +336,7 @@ nodes:
     trace: 'docs/analysis/poda-instrucoes-protocolo-2026-09.md'
     provenance:
       source: "docs/analysis/poda-instrucoes-protocolo-2026-09.md"
-      locator: "binario instalado 2.1.259 (~/.local/share/claude/versions/2.1.259, strings): schema Toe = base + file_path + memory_type in [User,Project,Local,Managed] + load_reason in Eoe=[session_start,nested_traversal,path_glob_match,include,compact] + globs? + trigger_file_path? + parent_file_path?; 15 ocorrencias"
+      locator: "binário do Claude Code 2.1.259 (strings): schema Toe = base + file_path + memory_type in [User,Project,Local,Managed] + load_reason in Eoe=[session_start,nested_traversal,path_glob_match,include,compact] + globs? + trigger_file_path? + parent_file_path?; 15 ocorrencias"
       method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 

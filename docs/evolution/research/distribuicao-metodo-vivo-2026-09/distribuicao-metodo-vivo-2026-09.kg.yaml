@@ -507,7 +507,7 @@ nodes:
     trace: '.claude/diary/ · .claude/commands/meta/adopt.md · docs/evolution/federation/members.yaml · docs/analysis/arandek-repo-exposure-2026-08.md'
     provenance:
       source: ".claude/diary/ · .claude/commands/meta/adopt.md · docs/evolution/federation/members.yaml · docs/analysis/arandek-repo-exposure-2026-08.md"
-      locator: "medicao local em /home/marcio/onion-evolve nesta rodada: ls .claude/diary | wc -l = 127 arquivos (o primeiro e 2026-07-01-audit-dogfood-finds-code-bugs.md); grep -c exclude .claude/commands/meta/adopt.md = 0; docs/evolution/federation/members.yaml e docs/analysis/arandek-repo-exposure-2026-08.md presentes no working tree. CORRECAO de rota feita nesta medicao: o Elenxo citou docs/diary, que NAO EXISTE — o diario vive em .claude/diary, ou seja, DENTRO do diretorio que o /meta:adopt vendoriza"
+      locator: "medição local em onion-evolve@27179d37 (main de 2026-09-13) nesta rodada: ls .claude/diary | wc -l = 127 arquivos (o primeiro e 2026-07-01-audit-dogfood-finds-code-bugs.md); grep -c exclude .claude/commands/meta/adopt.md = 0; docs/evolution/federation/members.yaml e docs/analysis/arandek-repo-exposure-2026-08.md presentes no working tree. CORRECAO de rota feita nesta medicao: o Elenxo citou docs/diary, que NAO EXISTE — o diario vive em .claude/diary, ou seja, DENTRO do diretorio que o /meta:adopt vendoriza"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
       locality: "repo"
   - id: E_LICENCA_ATUAL_E_MIT_JA_CONCEDIDA

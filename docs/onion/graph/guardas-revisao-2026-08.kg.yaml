@@ -529,7 +529,7 @@ nodes:
     provenance:
       source: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md · c2504994 (corpo do commit)"
       locator: "migalha l.28-31; corpo de c2504994 §1"
-      method: "testemunho: medição da sessão 2026-08-28 (beacons vivos + /proc) relatada em 1ª pessoa no commit c2504994; comando não registrado"
+      method: "testemunho: medição da sessão 2026-08-28 (beacons vivos + procfs) relatada em 1ª pessoa no commit c2504994; comando não registrado"
       locality: "repo"
 
   - id: C_GUARDA_QUE_GRITA_ERRADO
@@ -559,7 +559,7 @@ nodes:
     label: 'CURA A (behavior-over-declaration): o beacon grava owner_pid + owner_start (starttime do /proc, defesa contra REUSO DE PID) e o veredito passa a ser MEDIDO — live (dono vivo) · declared (dono nao medido: cai no TTL e BLOQUEIA, conservador) · orphan (dono medido morto: nao bloqueia, sweep remove) · stale. Direcao do erro escolhida: falso orphan reabre o incidente W1xW2 que criou o farol, falso declared so custa uma verificacao — logo ausencia de prova cai no comportamento antigo, NUNCA em pode-escrever'
     provenance:
       source: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
-      locator: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A25 \"id: D_MEDIR_O_DONO_NAO_O_CARIMBO\" docs/onion/graph/guardas-revisao-2026-08.kg.yaml; grep -n \"owner_pid|owner_start|proc_starttime|beacon_verdict\" .claude/validation/session-beacon.sh; git log --oneline --since=2026-08-28 -- .claude/validation/session-beacon.sh; then live functional test: cd /tmp/sb-test && bash session-beacon.sh up . mytest && bash session-beacon.sh verdict .claude/beacons/mytest.beacon (verdict=live); handcrafted .beacon with owner_pid=999999 (dead) → verdict=orphan; handcrafted .beacon with no owner_pid → verdict=declared; then bash session-beacon.sh check . on the declared beacon (exit 1, blocks); bash session-beacon.sh sweep . on the orphan beacon (removed, declared beacon preserved)"
+      locator: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A25 \"id: D_MEDIR_O_DONO_NAO_O_CARIMBO\" docs/onion/graph/guardas-revisao-2026-08.kg.yaml; grep -n \"owner_pid|owner_start|proc_starttime|beacon_verdict\" .claude/validation/session-beacon.sh; git log --oneline --since=2026-08-28 -- .claude/validation/session-beacon.sh; then live functional test: cd <diretório descartável> && bash session-beacon.sh up . mytest && bash session-beacon.sh verdict .claude/beacons/mytest.beacon (verdict=live); handcrafted .beacon with owner_pid=999999 (dead) → verdict=orphan; handcrafted .beacon with no owner_pid → verdict=declared; then bash session-beacon.sh check . on the declared beacon (exit 1, blocks); bash session-beacon.sh sweep . on the orphan beacon (removed, declared beacon preserved)"
       method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
       locality: "repo"
 

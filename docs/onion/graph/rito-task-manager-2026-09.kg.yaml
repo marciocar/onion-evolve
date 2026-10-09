@@ -148,7 +148,7 @@ nodes:
     label: "SELADO (maestro, 2026-09-30) — OPCAO A: o slug de .claude/sessions/<slug> e DERIVADO da branch (`git branch --show-current | tr / -`, igual ao residuo da REGRA 56), unificando as duas variaveis atuais. Sessions que nao sao de tarefa (drive-, adopt-) sao CLASSE DISTINTA declarada. Sem baseline e sem regra nova: medido que nao ha passivo a cobrar."
     provenance:
       source: "commit 198393e4 · docs/evolution/review/feat-kbs-zoho-glpi-regra93.md · .claude/sessions/ (host)"
-      locator: "feat-kbs-zoho-glpi-regra93.md §'O que este PR toca no grafo' (Frente 2 não entrou) · ls /home/marcio/onion-evolve/.claude/sessions"
+      locator: "feat-kbs-zoho-glpi-regra93.md §'O que este PR toca no grafo' (Frente 2 não entrou) · ls .claude/sessions (gitignored, host)"
       method: "testemunho: selo do maestro registrado no nó em 2026-09-30 (commit 198393e4); contagem das sessions lida no host"
       locality: "repo"
   - id: D_UMA_TASK_POR_FIO
