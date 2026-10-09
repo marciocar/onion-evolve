@@ -5497,10 +5497,10 @@ run_research_workflow_selftests() {
   #     `D_` open, e decisão sem trace, sem provenance e sem TRACES_TO acusa integrity.untraced-decision,
   #     SHOULD que o kg-contract-check cobra vazio em grafo novo. Mutante: tirar a linha do v4.1 reprova.
   local _v41
-  _v41="$(grep -F 'Contrato v4.1' "${wf}" | head -1 || true)"
-  if printf '%s' "${_v41}" | grep -qF 'leva `verified_against`' \
-     && printf '%s' "${_v41}" | grep -qF 'leva `trace:' \
-     && printf '%s' "${_v41}" | grep -qF 'nó PROD não se apoia em testemunho'; then
+  _v41="$(grep -F -m1 'Contrato v4.1' "${wf}" || true)"
+  if grep -qF 'leva `verified_against`' <<< "${_v41}" \
+     && grep -qF 'leva `trace:' <<< "${_v41}" \
+     && grep -qF 'nó PROD não se apoia em testemunho' <<< "${_v41}"; then
     record_pass "research-workflow: (q) o contrato do write(KG) ensina os avisos do v4.1 (alvo do carimbo, trace da decisão, testemunho fora de PROD)"
   else record_fail "research-workflow: (q)" "CONTRACT_V3 sem a linha do v4.1 (verified_against, trace da decisão, testemunho em PROD)"; fi
 }
