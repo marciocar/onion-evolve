@@ -183,6 +183,18 @@ for pat in ('.claude/**/*.md', '.claude/**/*.js', '.claude/**/*.mjs'):
             if 'scriptPath' in open(f, encoding='utf-8').read(): wf.append(os.path.relpath(f, repo))
         except Exception: pass
 inv['workflow_scriptpath'] = sorted(set(wf))
+# guardas de DERIVA DE BINÁRIO: famílias da bancada que leem o Claude Code INSTALADO (`command -v claude`).
+# No CI não há binário e elas só medem a cópia; a deriva do motor só aparece onde ele existe — então a
+# rodada as roda aqui. Nasceu do SAC-84 (2026-10-09): a 2.1.295 renomeou as locais do parser de diretivas
+# e o (f) do cited_directive reprovou a main LOCAL, invisível ao CI.
+bin_guards, fam = [], None
+st = os.path.join(repo, '.claude/validation/lint-selftest.sh')
+if os.path.isfile(st):
+    for ln in open(st, encoding='utf-8', errors='replace'):
+        m = re.match(r'^(run_[A-Za-z0-9_]+)_selftests\(\)\s*\{', ln)
+        if m: fam = m.group(1)[4:]
+        elif fam and re.search(r'command -v claude\b', ln) and fam not in bin_guards: bin_guards.append(fam)
+inv['guardas_binario'] = bin_guards
 # sinal factual, não ligação: id de modelo citado no delta que não está na allowlist do E6
 novos = sorted({m for v in delta for m in re.findall(r'claude-[a-z]+-\d+(?:-\d+)?', sections[v])} - set(inv['session_models']))
 
@@ -246,6 +258,7 @@ if fmt == '--tsv':
     print(f'rodada_anterior\t{prev_kg}'); print(f'proxima_rodada\t{next_dir}')
     for v in delta: print(f'versao\t{v}\t{lines[v]}\t{items[v]}')
     print(f'hooks\t{len(hooks)}\tsem_onFailure\t{len(sem_onfail)}')
+    for f in inv['guardas_binario']: print(f'guarda_binario\t{f}')
     for a in avisos: print(f'aviso\t{a}')
     sys.exit(0)
 
@@ -271,6 +284,9 @@ print('- agentes por model: ' + ', '.join(f'{k}={v}' for k, v in inv['agentes_po
 print('- allowlist de modelo (E6 `session_models`): ' + (', '.join(inv['session_models']) or '— (não lida)'))
 print(f'- plugins ({len(inv["plugins"])}): ' + ', '.join(inv['plugins']) + f' · marketplace.json: {"sim" if inv["marketplace"] else "não"}')
 print(f'- arquivos de `.claude/` que citam `scriptPath` (citação, não execução): {len(inv["workflow_scriptpath"])}')
+gb = inv['guardas_binario']
+print(f'- guardas de deriva de binário ({len(gb)}; só medem onde o Claude Code está instalado, o CI não as vê — RODE-AS nesta rodada): '
+      + (', '.join(f'`LC_ALL=C bash .claude/validation/lint-selftest.sh --families {f}`' for f in gb) or '—'))
 if novos: print(f'\n- sinal: ids de modelo citados no delta e fora da allowlist do E6: ' + ', '.join(novos))
 print('\n(TETO: este censo mede versões, delta e superfícies. Ele NÃO diz que um item toca o Onion —'
       ' na r8 três ligações assim foram reprovadas pelo juiz medindo o vivo.)')
