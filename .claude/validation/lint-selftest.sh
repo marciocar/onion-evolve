@@ -23591,6 +23591,21 @@ run_kg_migrate_v3_selftests() {
   h2="$(sha256sum "${d}/bad.kg.yaml" | cut -d' ' -f1)"
   if [ "${rc}" -eq 2 ] && [ "${h1}" = "${h2}" ]; then record_pass "kg-migrate-v3: (g) YAML inválido na entrada → rc 2 e nada gravado"
   else record_fail "kg-migrate-v3: (g)" "rc=${rc} mudou=$([ "${h1}" = "${h2}" ] && echo não || echo SIM)"; fi
+  # (h) --routing (onda O1 do SAC-73): só os ids A1/A2 do routing ganham provenance, com a classe de method do
+  #     routing; o id roteado R fica intocado e sai no relatório; nenhuma data é citada neste modo.
+  #     O risco vigiado: a ferramenta ignorar o routing e escrever provenance no resíduo (que é da O2/O3).
+  local gr="${d}/docs/x/r.kg.yaml" tsv="${d}/routing.tsv"
+  mkdir -p "${d}/docs/x"; _kmv_graph > "${gr}"
+  printf 'graph\tid\tstatus\tplane\tclass\tsubclass\tfinal\tmethod_class\ttool_derives\n' > "${tsv}"
+  printf 'docs/x/r.kg.yaml\tE_COM_TRACE\tconfirmed\tDEV\tA1\tcaminho-lido\tA1\tmedição\tderivavel\n' >> "${tsv}"
+  printf 'docs/x/r.kg.yaml\tE_COM_URL\tconfirmed\tDEV\tC\tsuporte-fraco\tR\tleitura\tderivavel\n' >> "${tsv}"
+  if out="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --routing "${tsv}" "${gr}" 2>&1)"; then rc=0; else rc=$?; fi
+  y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${gr}" 2>&1)" || true
+  if [ "${rc}" -eq 0 ] \
+     && python3 -I -B -c 'import json,re,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_COM_TRACE"]["provenance"]; assert p["source"]=="ops/algum-script.sh" and re.match(r"medição: \S", p["method"]) and "não reverificado" in p["method"]; assert "provenance" not in n["E_COM_URL"] and "provenance" not in n["E_SEM_FONTE"]' "${y}" 2>/dev/null \
+     && grep -q 'FORA DA ROTA A1/A2.*E_COM_URL (R)' <<< "${out}" && grep -q '  baseline: 2026-10-08$' "${gr}"; then
+    record_pass "kg-migrate-v3: (h) --routing escreve só no id A1/A2 com a classe de method do routing ('medição: …'); o id em R fica intocado e é reportado; datas não mudam"
+  else record_fail "kg-migrate-v3: (h)" "routing ignorado ou classe errada: rc=${rc} ${out} ${y}"; fi
   rm -rf "${d}"
 }
 _family run_kg_migrate_v3_selftests
