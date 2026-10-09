@@ -3,9 +3,6 @@
   "contract_sha256": "87b56e1aaa736df6a8b3f4c15577f49afc6f73e04461fb3954a869fcd9c87ba1",
   "graphs": 138,
   "failing": {
-    "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
@@ -42,7 +39,6 @@
       "form.required.node.provenance"
     ],
     "docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.node.resolution"
     ],
     "docs/evolution/research/distribuicao-metodo-vivo-2026-09/distribuicao-metodo-vivo-2026-09.kg.yaml": [
@@ -54,19 +50,10 @@
     "docs/evolution/research/email-logto-2026-08/email-logto-2026-08.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/engenharia-de-corpus-de-regras-2026-10/engenharia-de-corpus-de-regras-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/evolve-round-2026-10/evolve-round-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/fable-5-1-superacao-2026-09/fable-5-1-superacao-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/fila-2026-10-06/fila-2026-10-06.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/gmill-update-547-2026-10/gmill-update-547-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/guard-evolve-staleness-2026-10/evolve-staleness-2026-10.kg.yaml": [
@@ -75,13 +62,7 @@
     "docs/evolution/research/guard-forge-2026-10/guard-forge-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/guard-vetos-por-tokens-2026-10/vetos-por-tokens-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/inbox-triage-2026-10-04/inbox-triage-2026-10-04.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/infra-vps-2026-10/infra-vps-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/kg-freshness-dogfood-2026-08/kg-freshness-dogfood-2026-08.kg.yaml": [
@@ -96,9 +77,6 @@
     "docs/evolution/research/librechat-2026-08/librechat-2026-08.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/librechat-kg-runtime-2026-08/librechat-kg-runtime-2026-08.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/m8-serial-2026-08/m8-serial-2026-08.kg.yaml": [
       "form.required.node.provenance"
     ],
@@ -108,40 +86,22 @@
     "docs/evolution/research/medidores-silenciosos-2026-10/medidores-silenciosos-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/meta-research-lens-2026-09/meta-research-lens-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/motores-de-regras-deterministicos-2026-10/motores-de-regras-deterministicos-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/nanochat-eixo-d-2026-10/nanochat-eixo-d-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/ocr-local-sei-2026-09/ocr-local-sei-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/onda-derivada-e-o-lugar-do-onion-2026-10/onda-derivada-e-o-lugar-do-onion-2026-10.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/onion-brand-voice-2026-07/onion-brand-voice-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/onion-d2-data-currency-2026-07/onion-d2-data-currency-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/onion-market-kg-2026-08/onion-market-kg-2026-08.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/onion-refinaria-2026-08/onion-refinaria-2026-08.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/onion-slm-2026-10/onion-slm-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/onion-tier-matrix-2026-07/onion-tier-matrix-2026-07.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/passada-adversarial-2026-09/passada-adversarial-2026-09.kg.yaml": [
@@ -154,9 +114,6 @@
       "form.required.node.provenance"
     ],
     "docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/poda-instruction-bloat-2026-09/poda-instruction-bloat-2026-09.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml": [
@@ -177,13 +134,7 @@
     "docs/evolution/research/radar-E3-2026-10-05-r7/radar-E3-2026-10-05-r7.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/evolution/research/scope-inheritance-2026/scope-inheritance-2026.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/evolution/research/slm-capitalizacao-2026-10/slm-capitalizacao-2026-10.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/evolution/research/stack-harmonia-2026-08/stack-harmonia-2026-08.kg.yaml": [
       "form.required.node.provenance"
     ],
     "docs/evolution/research/telescope-doctrine-2026-07/telescope-doctrine.kg.yaml": [
@@ -235,7 +186,6 @@
       "form.required.node.provenance"
     ],
     "docs/onion/graph/context-freshness-2026-08-12.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.meta.run_id"
     ],
     "docs/onion/graph/d5-pricing-2026-07.kg.yaml": [
@@ -247,12 +197,6 @@
     "docs/onion/graph/elenxo-mecanismos-lint-2026-08-13.kg.yaml": [
       "form.required.node.provenance",
       "form.unknown-key.meta.run_id"
-    ],
-    "docs/onion/graph/elenxos-2026-08-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/federation-health-2026-07.kg.yaml": [
-      "form.required.node.provenance"
     ],
     "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml": [
       "form.required.node.provenance"
@@ -277,9 +221,6 @@
       "form.required.node.provenance",
       "form.unknown-key.meta.label",
       "form.unknown-key.meta.trace"
-    ],
-    "docs/onion/graph/guardrails-2nd-pr-state-2026-07.kg.yaml": [
-      "form.required.node.provenance"
     ],
     "docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml": [
       "form.required.node.provenance"
@@ -308,12 +249,6 @@
     "docs/onion/graph/m3-federation-admin-2026-07.kg.yaml": [
       "form.required.node.provenance"
     ],
-    "docs/onion/graph/onion-doctrine-elenxo-bulbo-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
-    "docs/onion/graph/onion-evolution-2026-07-30.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/onion/graph/onion-evolution-2026-07.kg.yaml": [
       "form.required.node.provenance",
       "form.unknown-key.meta.source_run"
@@ -337,9 +272,6 @@
       "form.required.node.provenance",
       "form.unknown-key.edge.provenance"
     ],
-    "docs/onion/graph/relay-gustavo-pulga-triage-2026-07.kg.yaml": [
-      "form.required.node.provenance"
-    ],
     "docs/onion/graph/residuos-2026-08-18.kg.yaml": [
       "form.required.node.provenance"
     ],
@@ -358,14 +290,10 @@
       "form.required.node.provenance"
     ],
     "docs/onion/graph/testes-evidencia-2026-09.kg.yaml": [
-      "form.required.node.provenance",
       "form.unknown-key.meta.slug",
       "form.unknown-key.meta.title",
       "form.unknown-key.top.kind",
       "form.unknown-key.top.version"
-    ],
-    "docs/onion/graph/vendor-multi-branch-2026-07.kg.yaml": [
-      "form.required.node.provenance"
     ],
     "docs/onion/graph/vps-shared-tools-2026-07.kg.yaml": [
       "form.required.node.provenance"
