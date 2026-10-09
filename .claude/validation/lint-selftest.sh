@@ -21207,6 +21207,18 @@ STUB
   if [ "${_r}" -eq 3 ] && grep -qE '^alvo .*ILEGÍVEL' <<< "${_o}" && ! grep -qE '^alvo .* ok$' <<< "${_o}"; then
     record_pass "registry-pins: (g) remoto falhou e só o clone confirma ⇒ ILEGÍVEL rc=3 (clone parado não vira 'em dia')"
   else record_fail "registry-pins: (g) clone parado virou ok" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
+  # (h) LINHAGEM HISTÓRICA (selo do maestro, 2026-10-09): membro com `superseded_by` cujo remoto carrega o
+  #     carimbo de OUTRA adoção (o caso (f), que acusaria) sai do escopo — "fora (linhagem histórica → id)",
+  #     rc=0 e registro intacto. MUTANTE: tirar o ramo do superseded_by reprova este caso (volta a DIVERGE, rc=1).
+  rm -rf "${clone}"; rm -f "${stamps}"/*; _rp_stamp vizinho "${PIN_OLD}"
+  printf 'source_commit: %s\nrole: hub\n' "${PIN_NEW}" > "${stamps}/dono_alvo_main"
+  _rp_reg "${PIN_OLD}" "${PIN_OLD}" "github.com/dono/alvo"
+  sed -i '/^  - id: alvo$/a\    role: standalone\n    superseded_by: vizinho' "${REG}"
+  local _sumh; _sumh="$(cksum < "${REG}")"
+  _rp --seal
+  if [ "${_r}" -eq 0 ] && grep -qE '^alvo .*fora \(linhagem histórica → vizinho\)' <<< "${_o}" && [ "$(cksum < "${REG}")" = "${_sumh}" ]; then
+    record_pass "registry-pins: (h) linhagem histórica (superseded_by) sai do escopo ⇒ fora, rc=0 e registro intacto"
+  else record_fail "registry-pins: (h) linhagem histórica conferida como membro vivo" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
   unset -f _rp _rp_reg _rp_stamp
 }
 
@@ -24369,6 +24381,108 @@ assert n["D_K_DUV"]["plane"]=="PROD" and n["D_K_DUV"]["provenance"]["source"]=="
      && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --promote-unverifiable --apply-judged "${ck}" "${gk}" >/dev/null 2>&1; then
     record_pass "kg-migrate-v3: (k) ondas 2-3 da O3: corrigir-label leva o label anterior à narrative; label > 280 recusa a linha inteira; refutar reconcilia (radar reprovava, passa) e nomeia o confirmed apoiado no refutado; --promote-unverifiable; dev-dúvida fica em PROD com fonte; 2ª passada no-op"
   else record_fail "kg-migrate-v3: (k)" "ondas 2-3 apagaram a história do label, aceitaram label longo, não reconciliaram o refutado ou não são idempotentes: rc=${rc} radar antes=${rk1} depois=${rk2} idem=$([ "${h1}" = "${h2}" ] && echo sim || echo NÃO) ${out} ${y}"; fi
+  # (m) onda O4 (SAC-73, 2026-10-09), planilha com `regra` e `locality_final`: dev-historia leva PROD→DEV sem tocar
+  #     status nem provenance (inclusive em nó open); plane já DEV é no-op; REPROVADO fica em PROD; manter-prod-medido
+  #     fica em PROD com a provenance medida e o verified_at do --verified-at; manter com method que não é medição é
+  #     recusado inteiro; nó fora da planilha intocado byte a byte; 2ª passada no-op. Mutantes que este caso
+  #     reprova: aplicar o REPROVADO (veredito ignorado) e dev-historia que mexe no status.
+  local gm="${d}/docs/x/m.kg.yaml" cm="${d}/o4-m.csv" mfora1 mfora2
+  {
+    printf 'meta:\n  id: m\n  schema_version: "1"\n  baseline: "2026-10-09"\nnodes:\n'
+    _kmv_o4() { printf '  - id: %s\n    node_type: evidence\n    plane: %s\n    status: %s\n    impact: 2\n    confidence: 0.8\n    verified_at: "2026-09-01"\n    verified_against: "x"\n    label: "%s"\n    provenance:\n      source: "%s"\n      locator: "l.1"\n      method: "testemunho: relato da sessão"\n' "$1" "$2" "$3" "$1" "$4"; }
+    _kmv_o4 E_M_DEV PROD confirmed "sessão 2026-09-01"
+    _kmv_o4 E_M_JA DEV confirmed "sessão 2026-09-01"
+    _kmv_o4 Q_M_OPEN PROD open "sessão 2026-09-01"
+    _kmv_o4 E_M_REPROV PROD confirmed "sessão 2026-09-01"
+    _kmv_o4 E_M_MANTER PROD confirmed "sessão 2026-09-01"
+    _kmv_o4 E_M_MANTER_RUIM PROD confirmed "sessão 2026-09-01"
+    _kmv_o4 E_M_FORA PROD confirmed "sessão 2026-09-01"
+    printf 'edges:\n  - from: E_M_DEV\n    to: Q_M_OPEN\n    edge_type: SUPPORTS\n'
+  } > "${gm}"
+  {
+    printf 'id,grafo,regra,proposta_original,veredito,proposta_final,source_final,locator_final,method_final,locality_final,motivo,confianca\n'
+    printf 'E_M_DEV,docs/x/m.kg.yaml,1,dev-historia,APROVADO,dev-historia,,,,,testemunho,0.85\n'
+    printf 'E_M_JA,docs/x/m.kg.yaml,1,dev-historia,APROVADO,dev-historia,,,,,já DEV,0.85\n'
+    printf 'Q_M_OPEN,docs/x/m.kg.yaml,1,dev-historia,APROVADO,dev-historia,,,,,open,0.85\n'
+    printf 'E_M_REPROV,docs/x/m.kg.yaml,1,dev-historia,REPROVADO,dev-historia,,,,,não,0.85\n'
+    printf 'E_M_MANTER,docs/x/m.kg.yaml,1,manter-prod-medido,APROVADO,manter-prod-medido,ops/a.sh,l.3,medição: grep -n x ops/a.sh → l.3,repo,medido,0.85\n'
+    printf 'E_M_MANTER_RUIM,docs/x/m.kg.yaml,1,manter-prod-medido,APROVADO,manter-prod-medido,ops/a.sh,l.3,leitura: ops/a.sh,repo,sem medição,0.85\n'
+  } > "${cm}"
+  mfora1="$(sed -n '/id: E_M_FORA/,/method:/p' "${gm}" | sha256sum)"
+  if out="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --verified-at 2026-10-09 --apply-judged "${cm}" "${gm}" 2>&1)"; then rc=0; else rc=$?; fi
+  y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${gm}" 2>&1)" || true
+  mfora2="$(sed -n '/id: E_M_FORA/,/method:/p' "${gm}" | sha256sum)"
+  if [ "${rc}" -eq 0 ] && [ "${mfora1}" = "${mfora2}" ] \
+     && python3 -I -B -c '
+import json,sys
+n={x["id"]:x for x in json.loads(sys.argv[1])["nodes"]}
+t={"source":"sessão 2026-09-01","locator":"l.1","method":"testemunho: relato da sessão"}
+assert n["E_M_DEV"]["plane"]=="DEV" and n["E_M_DEV"]["status"]=="confirmed" and n["E_M_DEV"]["provenance"]==t and n["E_M_DEV"]["verified_at"]=="2026-09-01", n["E_M_DEV"]
+assert n["E_M_JA"]["plane"]=="DEV"
+assert n["Q_M_OPEN"]["plane"]=="DEV" and n["Q_M_OPEN"]["status"]=="open"
+assert n["E_M_REPROV"]["plane"]=="PROD" and n["E_M_REPROV"]["provenance"]==t
+assert n["E_M_MANTER"]["plane"]=="PROD" and n["E_M_MANTER"]["verified_at"]=="2026-10-09"
+assert n["E_M_MANTER"]["provenance"]=={"source":"ops/a.sh","locator":"l.3","method":"medição: grep -n x ops/a.sh → l.3","locality":"repo"}, n["E_M_MANTER"]
+assert n["E_M_MANTER_RUIM"]["provenance"]==t and n["E_M_MANTER_RUIM"]["verified_at"]=="2026-09-01"
+assert n["E_M_FORA"]["plane"]=="PROD"
+' "${y}" 2>/dev/null \
+     && grep -q 'REPROVADO pelo juiz (intocado): E_M_REPROV \[regra 1\] (REPROVADO)' <<< "${out}" \
+     && grep -q 'RECUSADO.*E_M_MANTER_RUIM \[regra 1\] (manter-prod-medido sem method medição)' <<< "${out}" \
+     && grep -q 'TOTAL · plane 2 · prov 1 · verified 0 · same 1 · rejected 1' <<< "${out}" \
+     && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --verified-at 2026-10-09 --apply-judged "${cm}" "${gm}" >/dev/null 2>&1; then
+    record_pass "kg-migrate-v3: (m) onda O4 dev-historia: PROD→DEV sem tocar status nem provenance (open inclusive); REPROVADO fica em PROD; manter-prod-medido fica em PROD com provenance medida e verified_at novo; manter sem medição recusado inteiro; nó fora da planilha intocado; 2ª passada no-op"
+  else record_fail "kg-migrate-v3: (m)" "onda O4 aplicou o reprovado, mexeu no status ou não é idempotente: rc=${rc} ${out} ${y}"; fi
+  # (n) onda O4 reescrever-source e corrigir-method-locality: a locality é a do JUIZ (a regra de locality_of calaria
+  #     sobre "repo-x@abc:README.md (host)"); `(inalterado)` copia o valor atual; o mesmo nó em duas regras recebe as
+  #     duas (dev-historia + reescrever); caminho absoluto de arquivo na source final recusa a linha inteira, rota
+  #     HTTP (/threads) não; locality fora do contrato e `(inalterado)` sem provenance são recusados; 2ª passada
+  #     no-op. Mutantes que este caso reprova: locality do juiz ignorada e a guarda de caminho absoluto desligada.
+  local gn="${d}/docs/x/n.kg.yaml" cn="${d}/o4-n.csv"
+  {
+    printf 'meta:\n  id: n\n  schema_version: "1"\n  baseline: "2026-10-09"\nnodes:\n'
+    _kmv_o4n() { printf '  - id: %s\n    node_type: evidence\n    plane: %s\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    verified_at: "2026-09-01"\n    verified_against: "x"\n    label: "%s"\n    provenance:\n      source: "/home/x/repo-x @abc:README.md"\n      locator: "abc:README.md l.7"\n      method: "leitura: README do repo /home/x/repo-x"\n' "$1" "$2" "$1"; }
+    _kmv_o4n E_N_ABS DEV
+    _kmv_o4n E_N_DUAS PROD
+    _kmv_o4n E_N_LOCRUIM DEV
+    _kmv_o4n E_N_AINDA_ABS DEV
+    _kmv_o4n E_N_ROTA DEV
+    printf '  - id: E_N_CML\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    verified_at: "2026-09-01"\n    verified_against: "x"\n    label: "binário"\n    provenance:\n      source: "binário do Claude Code 2.1.258"\n      locator: "teto 200"\n      method: "derivado: x"\n'
+    printf '  - id: E_N_SEMPROV\n    node_type: evidence\n    plane: DEV\n    status: open\n    impact: 2\n    confidence: 0.5\n    label: "sem provenance"\n'
+    printf 'edges:\n  - from: E_N_ABS\n    to: E_N_DUAS\n    edge_type: SUPPORTS\n'
+  } > "${gn}"
+  {
+    printf 'id,grafo,regra,proposta_original,veredito,proposta_final,source_final,locator_final,method_final,locality_final,motivo,confianca\n'
+    printf 'E_N_ABS,docs/x/n.kg.yaml,2,reescrever-source,APROVADO,reescrever-source,repo-x@abc:README.md (host),(inalterado),testemunho: leitura do README do repo-x no host,host,abs,0.9\n'
+    printf 'E_N_DUAS,docs/x/n.kg.yaml,1,dev-historia,APROVADO,dev-historia,,,,,testemunho,0.85\n'
+    printf 'E_N_DUAS,docs/x/n.kg.yaml,2,reescrever-source,CORRIGIDO,reescrever-source,repo-x@abc:README.md (host),abc:README.md l.8,testemunho: leitura no host,host,abs,0.9\n'
+    printf 'E_N_LOCRUIM,docs/x/n.kg.yaml,2,reescrever-source,APROVADO,reescrever-source,repo-x@abc:README.md,(inalterado),leitura: x,planeta,abs,0.9\n'
+    printf 'E_N_AINDA_ABS,docs/x/n.kg.yaml,2,reescrever-source,APROVADO,reescrever-source,Caddyfile em /etc/caddy/Caddyfile,(inalterado),testemunho: leitura no host,host,abs,0.9\n'
+    printf 'E_N_ROTA,docs/x/n.kg.yaml,2,reescrever-source,CORRIGIDO,reescrever-source,GET /threads contra o bridge em produção (host),(inalterado),medição: curl /threads → 401,host,rota,0.9\n'
+    printf 'E_N_CML,docs/x/n.kg.yaml,3,(omitida),CORRIGIDO,corrigir-method-locality,(inalterada),(inalterado),medição: re.finditer sobre o binário 2.1.258,host,binário,0.8\n'
+    printf 'E_N_SEMPROV,docs/x/n.kg.yaml,2,reescrever-source,APROVADO,reescrever-source,(inalterada),(inalterado),leitura: x,repo,sem prov,0.9\n'
+  } > "${cn}"
+  if out="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --apply-judged "${cn}" "${gn}" 2>&1)"; then rc=0; else rc=$?; fi
+  y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${gn}" 2>&1)" || true
+  if [ "${rc}" -eq 0 ] \
+     && python3 -I -B -c '
+import json,sys
+n={x["id"]:x for x in json.loads(sys.argv[1])["nodes"]}
+old={"source":"/home/x/repo-x @abc:README.md","locator":"abc:README.md l.7","method":"leitura: README do repo /home/x/repo-x"}
+assert n["E_N_ABS"]["provenance"]=={"source":"repo-x@abc:README.md (host)","locator":"abc:README.md l.7","method":"testemunho: leitura do README do repo-x no host","locality":"host"}, n["E_N_ABS"]
+assert n["E_N_DUAS"]["plane"]=="DEV" and n["E_N_DUAS"]["provenance"]["locator"]=="abc:README.md l.8" and n["E_N_DUAS"]["provenance"]["locality"]=="host"
+assert n["E_N_LOCRUIM"]["provenance"]==old and n["E_N_AINDA_ABS"]["provenance"]==old
+assert n["E_N_ROTA"]["provenance"]["source"]=="GET /threads contra o bridge em produção (host)"
+assert n["E_N_CML"]["provenance"]=={"source":"binário do Claude Code 2.1.258","locator":"teto 200","method":"medição: re.finditer sobre o binário 2.1.258","locality":"host"}
+assert "provenance" not in n["E_N_SEMPROV"]
+assert all(x["verified_at"]=="2026-09-01" for x in n.values() if "verified_at" in x)
+' "${y}" 2>/dev/null \
+     && [ "$(grep -c '^    provenance:' "${gn}")" -eq 6 ] \
+     && grep -q 'E_N_LOCRUIM \[regra 2\] (locality fora do contrato (planeta))' <<< "${out}" \
+     && grep -q 'E_N_AINDA_ABS \[regra 2\] (caminho absoluto na source final)' <<< "${out}" \
+     && grep -q 'E_N_SEMPROV \[regra 2\] ((inalterado) sem provenance de onde copiar)' <<< "${out}" \
+     && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --apply-judged "${cn}" "${gn}" >/dev/null 2>&1; then
+    record_pass "kg-migrate-v3: (n) onda O4 reescrever-source/corrigir-method-locality: locality do juiz (não a deduzida), (inalterado) copia o atual, nó em duas regras recebe as duas, caminho absoluto na source final recusa a linha (rota HTTP não), locality fora do contrato e (inalterado) sem provenance recusados; 2ª passada no-op"
+  else record_fail "kg-migrate-v3: (n)" "onda O4 ignorou a locality do juiz, deixou caminho absoluto ou não é idempotente: rc=${rc} ${out} ${y}"; fi
   # (l) --locality (contrato v4.2, 2026-10-09, SAC-97): num repo git de verdade (a regra de `repo` confere a raiz
   #     e o sha com o git), cada classe sai do source; o sha que o git não conhece, a citação bibliográfica e a
   #     fonte já com locality ficam como estão; fonte mista vale a MENOS reverificável (repo + host → host); o YAML
