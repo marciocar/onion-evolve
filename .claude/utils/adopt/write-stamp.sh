@@ -22,7 +22,14 @@
 #
 # Uso : write-stamp.sh <target_root> --framework <n> --commit <sha> --commit-date <AAAA-MM-DD>
 #         [--adopted-from <url>] [--mode <m>] [--role <adopted|hub|standalone>] [--integration-branch <b>]
-#         [--members <members.yaml>] [--member-id <id>]
+#         [--members <members.yaml>] [--member-id <id>] [--kind door]
+#   --kind door: carimbo de PORTA (ops/materialize-door.sh). A porta é PROJEÇÃO regenerada inteira a
+#           cada materialização, então: --role é OBRIGATÓRIO (a porta nunca herda papel — a REGRA 92
+#           compara este campo com o registro); os args VENCEM o stamp antigo; não há adopted_at nem
+#           updated_at, e sim `materialized_at`; e sai `kind: door`. Antes (até 2026-10-09) a porta
+#           tinha um heredoc PRÓPRIO com outra gramática (`onion_version` em vez de `source_commit`) —
+#           dois escritores do mesmo arquivo, e o `pin-integrity-check` lia `pin-untrusted unknown`
+#           em toda porta, porque procurava o campo que só este script escreve.
 #   --role: papel de adoção. Default 'adopted' (consumidor). 'hub' = empresa que adota os próprios
 #           projetos (Camada 2 — pode rodar /meta:adopt local; ver adopter-onboarding.md). Sem --role
 #           num update, PRESERVA o role do stamp (não rebaixa hub→adopted). 'source' é o core, que
@@ -34,7 +41,7 @@ set -euo pipefail
 
 TARGET=""; FRAMEWORK=""; COMMIT=""; COMMIT_DATE=""; ADOPTED_FROM=""; MODE=""; IBRANCH=""
 FRAMEWORK_SET=""; COMMIT_SET=""; COMMIT_DATE_SET=""   # flag AUSENTE herda; PRESENTE E VAZIA e erro (F2)
-MEMBERS=""; MEMBER_ID=""; ROLE=""
+MEMBERS=""; MEMBER_ID=""; ROLE=""; KIND=""
 while [ "$#" -gt 0 ]; do case "$1" in
   # ⚠️ `*_SET` existe por um FAIL-OPEN que o Elenxo mediu (F2, 2026-10-02): o fallback da 1a versao
   #    olhava so `[ -z "${COMMIT}" ]`, entao `--commit ""` — que e o que um `awk` de extracao
@@ -52,12 +59,20 @@ while [ "$#" -gt 0 ]; do case "$1" in
   --integration-branch) IBRANCH="${2:-}"; shift 2 ;;
   --members)            MEMBERS="${2:-}"; shift 2 ;;
   --member-id)          MEMBER_ID="${2:-}"; shift 2 ;;
+  --kind)               KIND="${2:-}"; shift 2 ;;
   -*) echo "uso: write-stamp.sh <target_root> --framework <n> --commit <sha> --commit-date <d> [...]" >&2; exit 2 ;;
   *)  [ -z "${TARGET}" ] && TARGET="$1"; shift ;;
 esac; done
 [ -n "${TARGET}" ] && [ -d "${TARGET}" ] || { echo "ERRO: target_root inválido: '${TARGET}'" >&2; exit 2; }
 
 STAMP="${TARGET}/.claude/.onion-version"
+case "${KIND}" in
+  "") : ;;
+  door) [ -n "${ROLE}" ] || { echo "ERRO: --kind door exige --role explícito — a porta nunca herda papel do stamp antigo." >&2; exit 2; }
+        [ -n "${FRAMEWORK}" ] && [ -n "${COMMIT}" ] && [ -n "${COMMIT_DATE}" ] \
+          || { echo "ERRO: --kind door exige --framework/--commit/--commit-date (a porta é projeção: nada se herda)." >&2; exit 2; } ;;
+  *) echo "ERRO: --kind aceita só 'door' (veio '${KIND}')" >&2; exit 2 ;;
+esac
 # ⚠️ NORMALIZA comentario inline e espaco final (F9 do Elenxo): o fallback abaixo e o 1o consumidor
 # que ESCREVE DE VOLTA o que `field()` le, e carimbo no mundo real tem `source_commit: abc # pin da
 # adocao`. Sem isto o pin voltava ao stamp COM o comentario dentro e o `pin-integrity-check` recusava.
@@ -99,7 +114,9 @@ fi
   || { echo "ERRO: framework/source_commit/source_commit_date indefinidos — stamp AUSENTE, ou PRESENTE sem o(s) campo(s). Passe --framework/--commit/--commit-date." >&2; exit 2; }
 
 OLD_EXISTS=""
-if [ -f "${STAMP}" ]; then
+if [ "${KIND}" = door ]; then
+  ADOPTED_AT=""   # porta: projeção, não adoção — o carimbo de tempo é materialized_at, abaixo
+elif [ -f "${STAMP}" ]; then
   OLD_EXISTS=1
   # PRESERVE: o stamp antigo vence os args nestes campos (semântica única do audit 2026-07-01 #5)
   old_from="$(field adopted_from)";        [ -n "${old_from}" ]  && ADOPTED_FROM="${old_from}"
@@ -148,6 +165,7 @@ mkdir -p "${TARGET}/.claude"
   [ -n "${OLD_EXISTS}" ]   && printf 'updated_at: %s\n'   "$(date +%F)"
   [ -n "${MODE}" ]         && printf 'mode: %s\n'         "${MODE}"
   [ -n "${IBRANCH}" ]      && printf 'integration_branch: %s\n' "${IBRANCH}"
+  [ "${KIND}" = door ]     && printf 'kind: door\nmaterialized_at: %s\n' "$(date -u +%F)"
 } > "${STAMP}"
 # D_GREP_OLD_PIN — detecta, não conserta: corrigir cada artefato exige a semântica de cada um.
 OLD_COMMIT="${OLD_COMMIT:-}"
@@ -160,4 +178,5 @@ if [ -n "${OLD_EXISTS}" ] && [ -n "${OLD_COMMIT}" ] && [ "${OLD_COMMIT:0:8}" != 
     printf '%s\n' "${stale}" | sed "s#^${TARGET}/##; s#^#  · #" >&2
   fi
 fi
+if [ "${KIND}" = door ]; then echo "stamp escrito: ${STAMP} (porta — role: ${ROLE}, source_commit: ${COMMIT})"; exit 0; fi
 echo "stamp escrito: ${STAMP} ($([ -n "${OLD_EXISTS}" ] && echo "update — adopted_at preservado: ${ADOPTED_AT:-<ausente>}" || echo "adoção — adopted_at: ${ADOPTED_AT}"))"

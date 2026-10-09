@@ -80,8 +80,14 @@ _DIRTY="$(git -C "${LOCAL}" status --porcelain 2>/dev/null | wc -l | tr -d ' ')"
 [ "${_DIRTY}" = "0" ] || { echo "ERRO: a árvore da porta tem ${_DIRTY} arquivo(s) não-commitado(s) — materialização no disco NÃO é publicação. Commite e empurre primeiro; carimbar agora afirmaria público o que ninguém pode ver." >&2; exit 1; }
 STAMP_TREE="${LOCAL}/.claude/.onion-version"
 [ -f "${STAMP_TREE}" ] || { echo "ERRO: stamp ausente em ${STAMP_TREE} — a porta não declara pin." >&2; exit 2; }
-DOORPIN="$(git -C "${LOCAL}" show HEAD:.claude/.onion-version 2>/dev/null | grep -m1 '^onion_version:' | sed 's/^onion_version:[[:space:]]*//; s/[[:space:]]*#.*$//')"
-[ -n "${DOORPIN}" ] || { echo "ERRO: não li \`onion_version\` do stamp COMMITADO da porta (HEAD:.claude/.onion-version) — e eu não leio da árvore, porque árvore não é o que o remoto contém." >&2; exit 2; }
+# STAMP ÚNICO (F1 das portas, 2026-10-09): a porta passou a ser carimbada pelo `write-stamp.sh --kind
+# door`, que escreve `source_commit`. As portas publicadas ANTES falam o dialeto velho (`onion_version`)
+# até a próxima materialização — o fallback lê as duas, e o campo novo vence quando ambos existem.
+_DOORSTAMP="$(git -C "${LOCAL}" show HEAD:.claude/.onion-version 2>/dev/null || true)"
+_stamp_field() { printf '%s\n' "${_DOORSTAMP}" | grep -m1 "^$1:" | sed "s/^$1:[[:space:]]*//; s/[[:space:]]*#.*\$//; s/[[:space:]]*\$//"; }
+DOORPIN="$(_stamp_field source_commit)"
+[ -n "${DOORPIN}" ] || DOORPIN="$(_stamp_field onion_version)"
+[ -n "${DOORPIN}" ] || { echo "ERRO: não li \`source_commit\` (nem o legado \`onion_version\`) do stamp COMMITADO da porta (HEAD:.claude/.onion-version) — e eu não leio da árvore, porque árvore não é o que o remoto contém." >&2; exit 2; }
 printf '%s' "${DOORPIN}" | grep -qE '^[0-9a-f]{7,40}$' \
   || { echo "ERRO: pin ilegível no stamp da porta: '${DOORPIN}' — não carimbo o que não consigo ler." >&2; exit 2; }
 

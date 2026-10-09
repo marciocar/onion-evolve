@@ -296,15 +296,20 @@ echo "  (5) raiz da porta: README.md · CLAUDE.md · LICENSE · LICENSE-DOCS"
 #
 # Os três se curam com helpers que JÁ EXISTEM. Escrever um quarto seria a quarta cópia.
 mkdir -p "${DEST}/.claude"
-cat > "${DEST}/.claude/.onion-version" <<STAMP
-# Carimbo de identidade da PORTA — escrito por ops/materialize-door.sh.
-# Sem ele o onion-version.sh cai no fallback 'source' e a porta se declara a FONTE.
-role: ${ROLE}
-adopted_from: ${_slug}
-onion_version: ${_pin_ph}
-materialized_at: $(date -u +%Y-%m-%d)
-STAMP
-echo "  (6) carimbo de identidade: role=${ROLE} (sem ele a porta se declara 'source')"
+# ⚠️ STAMP ÚNICO (F1 das portas, SAC-89, 2026-10-09): aqui havia um heredoc PRÓPRIO, com outra
+# gramática (`onion_version`/`materialized_at`) que a do `write-stamp.sh` (`source_commit`/
+# `source_commit_date`/`framework`). Dois escritores do mesmo arquivo: o `pin-integrity-check` lia
+# `pin-untrusted unknown` em toda porta (procura `source_commit`), e cada leitor novo tinha de saber
+# qual dialeto a porta falava. O escritor é um só; `--kind door` diz que é projeção (role explícito,
+# nada se herda, `materialized_at` em vez de `adopted_at`). Os leitores do campo antigo
+# (`door-seal-pin.sh`) leem `source_commit` com fallback a `onion_version`, para as portas já
+# publicadas no dialeto velho até a próxima materialização.
+_fw="$(bash "${REPO_ROOT}/.claude/validation/onion-version.sh" | awk '/^framework:/{print $2; exit}')"
+_pin_date="$(git -C "${REPO_ROOT}" log -1 --format=%cd --date=short "${SRC_REF}")"
+bash "${REPO_ROOT}/.claude/utils/adopt/write-stamp.sh" "${DEST}" --kind door --role "${ROLE}" \
+  --framework "${_fw}" --commit "${_pin_ph}" --commit-date "${_pin_date}" --adopted-from "${_slug}" >/dev/null \
+  || { echo "ERRO: o write-stamp recusou o carimbo da porta (papel '${ROLE}')." >&2; exit 3; }
+echo "  (6) carimbo de identidade: role=${ROLE}, kind=door, source_commit=${_pin_ph} (sem ele a porta se declara 'source')"
 
 # `settings.json` NÃO está no manifesto — e é deliberado: ele carrega hooks e permissões da
 # INSTÂNCIA, e um adotante não deve herdar as do core. Mas TRÊS docs que viajam o citam em

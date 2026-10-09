@@ -22,7 +22,13 @@ set -uo pipefail
 
 DEST="${1:-}"
 [ -n "${DEST}" ] || { echo "uso: offer-onion-ci.sh <dest-dir> [--apply]" >&2; exit 2; }
-[ -d "${DEST}/.git" ] || { echo "✗ '${DEST}' não é repositório git" >&2; exit 2; }
+# ⚠️ `[ -d "$DEST/.git" ]` RECUSAVA WORKTREE (F1 das portas, 2026-10-09): numa worktree o `.git` é
+# ARQUIVO (`gitdir: …`), não diretório — e a adoção legacy instala justamente numa worktree (Fase 2a).
+# Pergunta-se ao git, e exige-se que DEST seja a RAIZ: um subdiretório comum dentro de outro repo
+# também responde a `rev-parse`, e o workflow nasceria no lugar errado.
+_top="$(git -C "${DEST}" rev-parse --show-toplevel 2>/dev/null)" \
+  && [ "$(cd "${_top}" && pwd -P)" = "$(cd "${DEST}" && pwd -P)" ] \
+  || { echo "✗ '${DEST}' não é a raiz de um repositório git (nem de uma worktree)" >&2; exit 2; }
 APPLY=0
 [ "${2:-}" = "--apply" ] && APPLY=1
 
