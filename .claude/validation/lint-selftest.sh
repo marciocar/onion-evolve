@@ -23611,6 +23611,38 @@ run_kg_migrate_v3_selftests() {
      && grep -q '  baseline: 2026-10-08$' "${gr}"; then
     record_pass "kg-migrate-v3: (h) --routing escreve só no id A1/A2 com a classe de method do routing ('medição: …'); o id em R e o de trace circular ficam intocados e são reportados; fonte no host vira testemunho; datas não mudam"
   else record_fail "kg-migrate-v3: (h)" "routing ignorado ou classe errada: rc=${rc} ${out} ${y}"; fi
+  # (i) onda O2 do SAC-73: nó A1/A2 com trace e SEM verified_against recebe o trace como source e locator, com
+  #     method "derivado: trace do nó, sem registro de medição". Recusa (intocado, vai para a O3): trace circular,
+  #     caminho do repo que sumiu, trace que registra um comando (é medição: política 2) e citação textual sem
+  #     localizador. Trace no host vira testemunho (política 4). Nó roteado R com trace válido segue intocado.
+  #     O risco vigiado: a ferramenta INVENTAR o locator onde o trace não aponta nada que exista.
+  local go="${d}/docs/x/o2.kg.yaml" t2="${d}/routing-o2.tsv" nid
+  mkdir -p "${d}/ops"; printf '#!/bin/sh\n' > "${d}/ops/real.sh"
+  {
+    printf 'meta:\n  id: o2\n  schema_version: "1"\n  baseline: "2026-10-09"\nnodes:\n'
+    printf '  - id: Q_A\n    node_type: question\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.5\n    label: "pergunta"\n'
+    for nid in E_O2_TRACE:ops/real.sh E_O2_SUMIDO:ops/sumiu.sh E_O2_CIRC:docs/x/o2.kg.yaml E_O2_HOST:/etc/algum.conf \
+               "E_O2_CMD:grep -rl foo ops/ → 3" "E_O2_TEXTO:conversa com o maestro na sessão" E_O2_R:ops/real.sh; do
+      printf '  - id: %s\n    node_type: evidence\n    plane: PROD\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    trace: "%s"\n    label: "evidência %s"\n' \
+        "${nid%%:*}" "${nid#*:}" "${nid%%:*}"
+    done
+    printf 'edges:\n  - from: E_O2_TRACE\n    to: Q_A\n    edge_type: SUPPORTS\n'
+  } > "${go}"
+  printf 'graph\tid\tstatus\tplane\tclass\tsubclass\tfinal\tmethod_class\ttool_derives\n' > "${t2}"
+  for nid in E_O2_TRACE E_O2_SUMIDO E_O2_CIRC E_O2_HOST E_O2_CMD E_O2_TEXTO; do
+    printf 'docs/x/o2.kg.yaml\t%s\tconfirmed\tPROD\tA2\tcaminho-trace+sem-va\tA2\tderivado\tsem-fonte\n' "${nid}" >> "${t2}"
+  done
+  printf 'docs/x/o2.kg.yaml\tE_O2_R\tconfirmed\tPROD\tC\tsuporte-fraco+sem-va\tR\t—\tsem-fonte\n' >> "${t2}"
+  if out="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --routing "${t2}" "${go}" 2>&1)"; then rc=0; else rc=$?; fi
+  y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${go}" 2>&1)" || true
+  if [ "${rc}" -eq 0 ] \
+     && python3 -I -B -c 'import json,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_O2_TRACE"]["provenance"]; assert p=={"source":"ops/real.sh","locator":"ops/real.sh","method":"derivado: trace do nó, sem registro de medição"}, p; assert n["E_O2_HOST"]["provenance"]["method"].startswith("testemunho: leitura do arquivo /etc/algum.conf no host"); assert all("provenance" not in n[k] for k in ("E_O2_SUMIDO","E_O2_CIRC","E_O2_CMD","E_O2_TEXTO","E_O2_R"))' "${y}" 2>/dev/null \
+     && grep -q 'TRACE SUMIDO.*E_O2_SUMIDO (ops/sumiu.sh)' <<< "${out}" && grep -q 'FONTE CIRCULAR.*E_O2_CIRC' <<< "${out}" \
+     && grep -q 'REGISTRO DE COMANDO.*E_O2_CMD' <<< "${out}" && grep -q 'SEM LOCALIZADOR.*E_O2_TEXTO' <<< "${out}" \
+     && grep -q 'FORA DA ROTA A1/A2.*E_O2_R (R)' <<< "${out}" \
+     && PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --routing "${t2}" "${go}" >/dev/null 2>&1; then
+    record_pass "kg-migrate-v3: (i) onda O2: A2 com trace e sem verified_against ganha o trace como locator e 'derivado: trace do nó, sem registro de medição'; circular, sumido, registro de comando e citação sem localizador ficam intocados; host vira testemunho; R intocado; 2ª passada no-op"
+  else record_fail "kg-migrate-v3: (i)" "onda O2 inventou locator, recusou o válido ou não é idempotente: rc=${rc} ${out} ${y}"; fi
   rm -rf "${d}"
 }
 _family run_kg_migrate_v3_selftests

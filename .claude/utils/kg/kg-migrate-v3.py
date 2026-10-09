@@ -20,6 +20,14 @@ O que ela FAZ (determinístico, idempotente, edição por linha — o radar é a
     nó roteado com classe de method fora do contrato também, e nó cujo trace é o PRÓPRIO grafo (fonte circular).
     Fonte em caminho absoluto do host vira "testemunho: leitura do arquivo <x> no host; …" (política 4 selada).
     Sem --routing, nada muda.
+  · ONDA O2 (2026-10-09, dentro do --routing): nó A1/A2 com `trace:` e SEM `verified_against` (o registro do que
+    foi medido não existe, então não há locator a copiar) recebe o trace como source E como locator, com
+    `method: "derivado: trace do nó, sem registro de medição"` (política selada da O2). Recusa, e deixa para a
+    O3: trace circular (o próprio grafo) e trace com caminho do repo que não existe mais (resolvido a partir da
+    raiz que o routing implica: o arquivo termina com o caminho do grafo no routing) e trace sem localizador
+    (citação textual: memória, histórico de outro repo — sem URL nem caminho) e trace que registra um comando
+    (grep/ls/find/git, run, PR #N: é medição, e a política 2 é da O3). Trace em caminho do host
+    segue a política 4 (testemunho). Nó sem trace e sem fonte no verified_against segue "sem fonte recuperável".
 O que ela NÃO faz (é decisão humana ou do contrato, nunca da ferramenta):
   · nó sem fonte derivável NÃO recebe provenance inventada: sai no relatório como "sem fonte recuperável"
     (a gramática diz: sem fonte verificável, o nó não é confirmed — rebaixar é decisão de quem conhece o nó);
@@ -30,6 +38,7 @@ rc:    0 = nada pendente (ou aplicado) · 1 = --check e há mudança pendente ·
        (arquivo ausente, routing ilegível ou sem as colunas, YAML inválido antes ou DEPOIS da edição — a edição
        nunca grava YAML inválido).
 """
+import os
 import re
 import sys
 
@@ -46,6 +55,10 @@ NODE_RE = re.compile(r'^  - id:[ \t]*(\S+)')
 FIELD_RE = re.compile(r'^    ([A-Za-z_][A-Za-z0-9_]*):[ \t]*(.*)$')
 URL_RE = re.compile(r'https?://[^\s"\'<>),;]+')
 PATH_RE = re.compile(r'(?<![\w./-])((?:\.claude|docs|ops|vendor|plugins|\.github)/[\w./+-]*[\w+-])')
+# trace que REGISTRA um comando (grep/ls/find/git, run do Actions, PR #N) é registro de medição, e o method
+# "sem registro de medição" seria falso: vai para a O3, onde a política 2 decide ("medição: <comando>").
+# Passada adversarial da O2 (2026-10-09): 8 nós escritos assim; o `→` solto ficou de fora (casava descrição de cadeia).
+CMD_TRACE_RE = re.compile(r'\b(grep|ls|find)\s|\bgit\s+(show|log|ls-files|ls-tree|merge-base|diff)\b|\bruns?\s+\d{6,}|\bPR\s*#\d+')
 LABEL_MAX = 280
 # as classes de method do contrato v4 (SHOULD: ^(medição|leitura|juízes|derivado|testemunho): \S)
 METHOD_CLASSES = ("medição", "leitura", "juízes", "derivado", "testemunho")
@@ -116,12 +129,24 @@ def source_of(fields):
     return None, None
 
 
-def migrate(text, routes=None, graph=None):
+def trace_locator(src, root):
+    """(caminhos sumidos, tem localizador) do trace na onda O2. Localizador = URL http(s), caminho do repo que
+    existe (com o prefixo de PATH_RE, ou o 1º token, sem :linha/#âncora, existindo a partir da raiz). Citação
+    textual (comando, memória, "síntese desta leva", histórico de outro repo) NÃO é localizador: sem o registro
+    da medição, nada ali se resolve — fica para a O3 (passada adversarial da O2, 2026-10-09: 15 nós assim)."""
+    paths = [m.group(1) for m in PATH_RE.finditer(src)]
+    gone = [p for p in paths if not os.path.exists(os.path.join(root, p))]
+    first = re.sub(r"[:#].*$", "", re.split(r"[\s;,·]", src)[0])
+    loose = bool(first) and "/" not in first[:1] and os.path.isfile(os.path.join(root, first))
+    return gone, bool(URL_RE.search(src) or paths or loose)
+
+
+def migrate(text, routes=None, graph=None, root=None):
     """routes=None: o modo de sempre. routes={id: (final, method_class)}: só provenance, só nos ids A1/A2.
     graph: o caminho do próprio grafo (modo routing), para recusar a fonte circular."""
     lines = text.split("\n")
     out, rep = [], {"dates": 0, "prov": [], "nosource": [], "longlabel": [], "unrouted": [], "badclass": [],
-                    "circular": []}
+                    "circular": [], "gone": [], "nolocator": [], "cmdtrace": []}
     # 1) datas (fora do modo routing: a onda O1 é só de provenance)
     for ln in lines:
         m = DATE_RE.match(ln) if routes is None else None
@@ -175,6 +200,27 @@ def migrate(text, routes=None, graph=None):
                 # o trace aponta o PRÓPRIO grafo: a fonte seria circular (o que foi lido está noutro lugar).
                 # Medido na passada adversarial da O1 (2026-10-09): 6 nós assim, todos com a fonte real fora do grafo.
                 rep["circular"].append(nid)
+            elif routes is not None and src and not va and how == "trace do nó":
+                # onda O2: sem o registro da medição, o trace é o único locator honesto — e o method diz que é só isso
+                s = src.strip()
+                host = s.startswith("/")
+                gone, located = (([], True) if host else ([], False) if root is None else trace_locator(s, root))
+                if gone:
+                    rep["gone"].append(f"{nid} ({gone[0]})")
+                elif CMD_TRACE_RE.search(s):
+                    rep["cmdtrace"].append(nid)
+                elif not located:
+                    rep["nolocator"].append(nid)
+                else:
+                    method = (f"testemunho: leitura do arquivo {s.split()[0]} no host; trace do nó, sem registro de medição"
+                              if host else "derivado: trace do nó, sem registro de medição")
+                    block = block + [
+                        "    provenance:",
+                        "      source: " + q(src),
+                        "      locator: " + q(src),
+                        "      method: " + q(method),
+                    ]
+                    rep["prov"].append(nid)
             elif routes is not None and src and va:
                 # política 4 selada (D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE): fonte em caminho do host, fora do repo,
                 # é testemunho da leitura no host — a CI não alcança o arquivo; a classe do routing não vale aqui
@@ -231,7 +277,11 @@ def main(argv):
         except yaml.YAMLError as e:
             print(f"kg-migrate-v3: {f} não é YAML válido antes da migração ({e.__class__.__name__}) — não toco", file=sys.stderr); return 2
         gpath, routes = (None, None) if routing is None else routes_for(routing, f)
-        new, rep = migrate(text, routes, gpath)
+        root = None
+        if gpath is not None:
+            norm = os.path.abspath(f).replace("\\", "/")
+            root = norm[:-len(gpath)] or "/"
+        new, rep = migrate(text, routes, gpath, root)
         try:
             yaml.safe_load(new)
         except yaml.YAMLError as e:
@@ -240,13 +290,19 @@ def main(argv):
         verb = ("PENDENTE" if check else "aplicado") if changed else "nada a migrar"
         extra = "" if routing is None else (f" · fora da rota A1/A2 (intocado) {len(rep['unrouted'])}"
                                              f" · classe de method fora do contrato {len(rep['badclass'])}"
-                                             f" · fonte circular (trace = o próprio grafo) {len(rep['circular'])}")
+                                             f" · fonte circular (trace = o próprio grafo) {len(rep['circular'])}"
+                                             f" · trace sumido {len(rep['gone'])}"
+                                             f" · trace sem localizador {len(rep['nolocator'])}"
+                                             f" · trace é registro de comando {len(rep['cmdtrace'])}")
         print(f"{f}: {verb} · datas citadas {rep['dates']} · provenance derivada {len(rep['prov'])}"
               f" · sem fonte recuperável {len(rep['nosource'])} · label > {LABEL_MAX}: {len(rep['longlabel'])}{extra}")
         for k, title in (("prov", "provenance derivada"), ("nosource", "SEM FONTE RECUPERÁVEL (decisão humana: fonte ou rebaixar)"),
                          ("unrouted", "FORA DA ROTA A1/A2 (intocado: onda O2/O3)"),
                          ("badclass", "CLASSE DE METHOD FORA DO CONTRATO (intocado)"),
                          ("circular", "FONTE CIRCULAR: o trace é o próprio grafo (intocado: onda O3)"),
+                         ("gone", "TRACE SUMIDO: o caminho citado não existe mais (intocado: onda O3)"),
+                         ("nolocator", "TRACE SEM LOCALIZADOR: citação textual sem verified_against (intocado: onda O3)"),
+                         ("cmdtrace", "TRACE É REGISTRO DE COMANDO: medição, política 2 (intocado: onda O3)"),
                          ("longlabel", "label longo (decisão humana: label curto + narrative)")):
             if rep[k]:
                 print(f"  {title}: " + ", ".join(rep[k]))
