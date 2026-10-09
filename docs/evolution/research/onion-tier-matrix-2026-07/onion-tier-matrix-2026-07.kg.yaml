@@ -118,6 +118,8 @@ nodes:
     confidence: 0.95
     status: confirmed
     label: "ADOTAR o reframe; codificar a fronteira std=hub-em-trabalho, hub=+federação, meta-fábrica core-only"
+    x_constrained_by: "docs/onion/graph/door-role-parity-2026-09.kg.yaml#D_MATRIZ_DE_PORTAS_2026_10"
+    narrative: "CONSTRAINS pela D_MATRIZ_DE_PORTAS_2026_10, selado pelo maestro em 2026-10-09 sem flip (o status fica; a aresta mora em x_constrained_by porque o motor de arestas e intra-arquivo). CAIU: 'meta-fabrica core-only' (a meta-fabrica viaja para standalone e plugins). SOBREVIVE: std = hub em trabalho."
     provenance:
       source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
       locator: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"

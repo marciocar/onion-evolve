@@ -767,6 +767,8 @@ nodes:
     verified_at: 2026-08-02
     verified_against: gh-api-2026-08-02-e-relato-do-maestro
     label: "A FAMILIA MULTI-IDE EXISTE, E PUBLICA, E ESTA CONGELADA (confirmado pelo maestro 2026-08-02). Medido via gh api: marciocar/onion (hub, 'uma metodologia, SEIS ferramentas de IA, prova de universalidade'), onion-cursor, onion-antigravity, onion-copilot, onion-architect, onion-mini, onion-standalone — todos PUBLICOS. Seis dos sete nasceram DEPOIS da decisao de 2026-05-18. CONGELADO = material de curso e prova de portabilidade, NAO linha de manutencao ativa"
+    x_constrained_by: "docs/onion/graph/door-role-parity-2026-09.kg.yaml#D_MATRIZ_DE_PORTAS_2026_10"
+    narrative: "CONSTRAINS pela D_MATRIZ_DE_PORTAS_2026_10, selado pelo maestro em 2026-10-09 sem flip (o status fica; a aresta mora em x_constrained_by porque o motor de arestas e intra-arquivo). CAIU: onion-mini e onion-standalone dentro do regime congelado (passam a porta). SOBREVIVE: o restante da familia multi-IDE como congelado."
     trace: "https://github.com/marciocar/onion"
     provenance:
       source: "https://github.com/marciocar/onion"
@@ -1103,7 +1105,7 @@ nodes:
     plane: PROD
     impact: 5
     confidence: 0.95
-    status: confirmed
+    status: superseded
     owner: maestro
     verified_at: 2026-09-16
     verified_against: "decisao do maestro em 2026-09-16 ('linha viva'), com o porte medido no mesmo dia: 0 scripts de guarda antes, 4 guardas + bancada 11/11 + gate no CI depois"
@@ -1124,6 +1126,8 @@ nodes:
     verified_at: 2026-09-23
     verified_against: "instrucao do maestro em 2026-09-23 ('faltou o onion-core na documentacao'), com a omissao MEDIDA: `grep -c onion-core CLAUDE.md` devolvia ZERO e este grafo tambem; o repo aparecia so nas projecoes GERADAS (members.yaml kind: door, graph.md, federation-map.md)"
     label: "A FAMILIA TEM TRES REGIMES, nao dois. Ao CONGELADOS e a LINHA VIVA soma-se a PORTA: `onion-core`, publica desde 2026-09-17, que e a face publica do core — mesma plataforma, mesma maquinaria, SEM biografia. Nao e porte multi-IDE nem repo congelado: e PROJECAO GERADA de origin/main por ops/materialize-door.sh, re-materializada a cada leva (18 vezes ate 2026-09-23) e cobrada pela REGRA 85 (Porta publica espelha o core, com catraca). POR QUE FALTAVA, e a causa e de DATAS, nao de descuido: a decisao dos dois regimes foi selada em 16/09 e a porta nasceu publica em 17/09 — um dia depois, sem ninguem emendar a lista. E a repeticao EXATA do caso `onion-codex` que o no superado ja descrevia: repo publico, prefixo `onion-`, invisivel a REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente), que deriva termos do members.yaml e ignora esse prefixo. A DIFERENCA que importa: este ESTA no members.yaml, entao o registro protege — o que faltava era a doutrina que humano e IA leem. Duas vezes em oito dias a mesma lista ficou atrasada em relacao ao mundo; a licao e que lista de repos escrita a mao envelhece por construcao, e o gatilho de emenda tem de ser o NASCIMENTO do repo, nao a lembranca de alguem."
+    x_constrained_by: "docs/onion/graph/door-role-parity-2026-09.kg.yaml#D_MATRIZ_DE_PORTAS_2026_10"
+    narrative: "CONSTRAINS pela D_MATRIZ_DE_PORTAS_2026_10, selado pelo maestro em 2026-10-09 sem flip (o status fica; a aresta mora em x_constrained_by porque o motor de arestas e intra-arquivo). CAIU: o mini e o standalone como congelados e o onion-core como porta unica (as portas sao quatro, publicadas sob demanda). SOBREVIVEM: os regimes congelado e linha viva."
     trace: 'CLAUDE.md · docs/evolution/federation/members.yaml'
     provenance:
       source: "CLAUDE.md · docs/evolution/federation/members.yaml"
