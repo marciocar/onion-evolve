@@ -29,8 +29,8 @@
 
 | Plano | n |
 |---|---|
-| DEV | 706 |
-| PROD | 176 |
+| DEV | 707 |
+| PROD | 175 |
 
 ## Radar — 25 focos de atenção (peso × centralidade)
 
