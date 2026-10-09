@@ -248,6 +248,10 @@ nodes:
     verified_against: "medido 2026-09-07 no marketplace.json do diretorio oficial (n=291): development 120, productivity 52, database 38, monitoring 20, security 18, deployment 9, design 8, automation 3, learning 3, testing 2, location 2, migration 1, math 1 — e nem `core` nem `vertical` existem"
     trace: .claude/utils/marketplace/generate-marketplace.sh
     label: "DECISAO DO MAESTRO — em que categoria oficial entra o onion-compliance. Nenhuma categoria do vocabulario diz compliance ou governanca. `productivity` e chute; `security` seria enganoso porque compliance nao e appsec, e descricao que nao corresponde a funcionalidade e criterio de rejeicao (2.B). As outras quatro estao decididas: onion e onion-engineering em development, onion-product em productivity, onion-design em design."
+    provenance:
+      source: "https://raw.githubusercontent.com/anthropics/claude-plugins-official/9a82e83070719068aa449b6114e9a5755920142f/.claude-plugin/marketplace.json + docs/analysis/plugins-en-compliance-2026-09-plano.md"
+      locator: "marketplace.json no sha 9a82e830 (último commit até 2026-09-07): contagem de plugins[].category; plano l.60 (B9) e l.244"
+      method: "medição: curl do marketplace.json no sha 9a82e830 + Counter(plugins[].category)"
 
   - id: Q_TETO_DE_CONTEXTO
     node_type: question
@@ -260,6 +264,10 @@ nodes:
     verified_against: "medido 2026-09-07 com claude plugin details: onion ~5.017 tokens always-on, onion-product ~3.981, onion-engineering ~3.453, onion-design ~1.262, onion-compliance ~669"
     trace: .claude/utils/marketplace/plugin-readme.sh
     label: "DECISAO DO MAESTRO — qual teto de contexto a catraca cobra. A UI mostra Context cost ANTES do install e agrupa plugins nao usados sugerindo desinstalar, entao peso virou superficie competitiva. O onion a ~5k always-on parece caro contra ~669 do compliance, mas nao ha percentil publico do diretorio para calibrar — sem numero do maestro a guarda nasce arbitraria, e guarda arbitraria e a que se aprende a ignorar."
+    provenance:
+      source: "plugins Onion (onion, onion-product, onion-engineering, onion-design, onion-compliance) via CLI"
+      locator: "claude plugin details <plugin> (2026-09-07)"
+      method: "medição: claude plugin details"
 
   - id: Q_SEMVER_DA_L0
     node_type: question
@@ -329,6 +337,10 @@ nodes:
     verified_against: "DECIDIDO pelo maestro na invocacao do /meta:drive de 2026-09-07: e-mail de suporte = suporte@onionevolve.com (nao o pessoal). Estado medido do artefato: `author` nos 5 plugin.json (l.5) e objeto so com `name`, sem email nem url"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "DECIDIDO — o contato de suporte e suporte@onionevolve.com, do dominio, nao o pessoal. Destino: author.email dos 5 plugin.json (assemble-plugin.sh:339), o SUPPORT.md do PR 10 e o site/public/.well-known/security.txt. A ESCOLHA esta selada; a PRECONDICAO nao — ver E_ONIONEVOLVE_NAO_RECEBE_EMAIL e o gate Q_MX_DO_ONIONEVOLVE. Como author.email fica publico para sempre, o endereco so entra no artefato DEPOIS de provar entrega."
+    provenance:
+      source: "maestro, invocação do /meta:drive de 2026-09-07, Claude-Session session_01GmCAnwnTGRDk7tMNfZmYeH (commits 9857681a e 145d7973, 2026-09-07)"
+      locator: "maestro decidiu: e-mail de suporte = suporte@onionevolve.com (não o pessoal); nó gravado no commit 9857681a (2026-09-07 14:35)"
+      method: "testemunho: decisão do maestro na invocação do /meta:drive de 2026-09-07"
 
   - id: E_ONIONEVOLVE_NAO_RECEBE_EMAIL
     node_type: evidence
@@ -340,6 +352,10 @@ nodes:
     verified_against: "medido 2026-09-07 nesta sessao, pelos DOIS caminhos que a RFC 5321 permite: (a) MX explicito — `dig @1.1.1.1 +short MX onionevolve.com` e `dig @8.8.8.8 +short MX onionevolve.com` devolvem VAZIO nos dois resolvers, e `dig +short TXT onionevolve.com` tambem (sem SPF); (b) fallback implicit-MX no A record — `dig +short A onionevolve.com` = 179.197.65.94, e conexao TCP nesse IP volta `Connection refused` em 25 e em 587. O dominio EXISTE e serve web (SOA pixel.dns-parking.com serial 2026090602, NS da Hostinger, HTTPS 200) — o que falta e correio, so correio"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "MEDIDO — suporte@onionevolve.com e INDELIVERAVEL hoje. Isto NAO refuta a escolha do maestro (D_EMAIL_SUPORTE_E_O_DO_DOMINIO segue de pe); refuta a PRECONDICAO de que estampa-la ja satisfaz o requisito 3.B, que pede contato de suporte VERIFICADO. Estampar no artefato publico um endereco que bounce e pior que nao declarar contato: falha o 3.B com evidencia contra, e author.email nao volta atras. Por que a medicao foi ate o 587 e ate o fallback: 'sem MX' sozinho nao prova indisponibilidade — a RFC manda tentar o A. Tentei; recusa."
+    provenance:
+      source: "DNS de onionevolve.com (medição de 2026-09-07)"
+      locator: "dig @1.1.1.1 +short MX onionevolve.com ; dig @8.8.8.8 +short MX onionevolve.com ; TCP 179.197.65.94:25/587"
+      method: "medição: dig MX nos 2 resolvers + conexão TCP 25/587 no A record"
 
   - id: Q_MX_DO_ONIONEVOLVE
     node_type: question
@@ -352,6 +368,10 @@ nodes:
     verified_against: "aberto 2026-09-07 a partir de E_ONIONEVOLVE_NAO_RECEBE_EMAIL — zero MX em dois resolvers, zero SPF, 25 e 587 recusados no A record"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "FECHADO 2026-09-07: os tres passos do aceite cumpridos — (1) MX e (2) SPF medidos por mim no DNS, (3) chegada da caixa CONFIRMADA PELO MAESTRO (ver E_CAIXA_DE_SUPORTE_RECEBE). Desbloqueia o D_PR10_LEGAL_E_SUPORTE. GATE DO MAESTRO (instrumento humano — o painel DNS da Hostinger nao e superficie do driver): publicar MX + SPF para onionevolve.com e criar a caixa suporte@. ACEITE EXECUTAVEL, nesta ordem: (1) `dig @1.1.1.1 +short MX onionevolve.com` devolve pelo menos um host; (2) `dig @1.1.1.1 +short TXT onionevolve.com` traz um registro `v=spf1`; (3) um envio de fora chega na caixa e o maestro confirma. BLOQUEIA o PR 10 por DEPENDS_ON, e nao por CONSTRAINS, DE PROPOSITO: o censo do drive so imprime bloqueio de DEPENDS_ON, entao uma restricao seria invisivel na proxima passada e o e-mail acabaria estampado por omissao — fail-closed num artefato publico e irreversivel. Se o maestro preferir destravar o resto do PR 10 (PRIVACY, SECURITY, CODE_OF_CONDUCT, security.txt sem e-mail), a mudanca e trocar esta aresta para CONSTRAINS — decisao dele, nao minha."
+    provenance:
+      source: "maestro + sessão de 2026-09-07 (Claude-Session session_01GmCAnwnTGRDk7tMNfZmYeH (commits 9857681a e 145d7973, 2026-09-07)) + E_CAIXA_DE_SUPORTE_RECEBE"
+      locator: "passos (1)(2) dig MX/TXT medidos; passo (3) e-mail ONION-MX-01 da conta Gmail do maestro, \"email recebido\" confirmado pelo maestro (gravado em 145d7973, 2026-09-07 19:29)"
+      method: "testemunho: maestro confirmou a chegada na caixa em 2026-09-07; passos 1-2 por dig"
 
   - id: E_ELENXO_DESACOPLAR_APROVADO_COM_RESSALVA
     node_type: evidence
@@ -363,6 +383,10 @@ nodes:
     verified_against: "Elenxo adversarial rodado 2026-09-07 contra D_CONTATO_DESACOPLADO, com mandato de REFUTAR. Tres ataques mecanicos CAIRAM, medidos: (1) `claude plugin validate --strict` (claude 2.1.263) sobre uma copia de plugins/onion-compliance com homepage=https://onionevolve.com e repository=https://github.com/marciocar/onion-plugins devolve `Validation passed` rc=0 — o split nao quebra o manifesto; (2) nenhum consumidor mecanico resolve a URL de provenance.repository — `grep -rn provenance.json` em .claude/ docs/ site/ acha so lint-artifacts.sh:1216,1221-1222 (que EXCLUI provenance.json do diff e compara so tree_sha) e materialize-marketplace-repo.sh:135 (usa o arquivo como marcador de existencia para a poda), zero fetch/clone; (3) sem contradicao doutrinaria — a REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente) tem por sujeito nome de CLIENTE derivado do members.yaml, e install!=adopt segue preservado nos textos que a carregam"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "ELENXO: APROVADO-COM-RESSALVA. A saida (b) sobrevive a todo ataque mecanico, e a derivacao e de UMA variavel so — assemble-plugin.sh:292 (`repository` <- git remote get-url origin) alimenta :308 provenance, :340 homepage e :341 repository; separar os tres e edicao no gerador, nao configuracao. A OBJECAO QUE SOBREVIVE e sobre o ACEITE, nao sobre a decisao: issues habilitadas sao um CANAL, nao o 'contato verificado' que o 3.B pede, e o e-mail escolhido nao entrega (ver E_ONIONEVOLVE_NAO_RECEBE_EMAIL). Logo o criterio de aceite do PR 10 NAO pode ser '3.B resolvido' — tem de ser 'o 404 saiu de toda superficie publica E o canal de suporte aponta para repo publico com issues', com a suficiencia para 3.B pendente do Q_MX_DO_ONIONEVOLVE. HONESTIDADE DECLARADA: o texto literal do requisito 3.B NAO existe neste repo — o que existe e a parafrase do maestro em docs/analysis/plugins-en-compliance-2026-09-plano.md:42 e no label de Q_EMAIL_DE_SUPORTE_VERIFICADO; ninguem aqui pode decidir se 'issues publicas' basta."
+    provenance:
+      source: "docs/evolution/review/feat-plugins-en-compliance.md"
+      locator: "frontmatter verdict: APROVADO-COM-RESSALVA (worker elenxo-desacoplar); Achados 1-2"
+      method: "juízes: Elenxo adversarial com mandato de refutar, veredito registrado no resíduo R56"
 
   - id: Q_RESIDUOS_DA_FONTE_PRIVADA_NO_PUBLICO
     node_type: question
@@ -406,6 +430,10 @@ nodes:
     verified_against: "medido 2026-09-07, DEPOIS de o maestro cadastrar o correio na Hostinger: `dig +short MX onionevolve.com` devolve `5 mx1.hostinger.com` e `10 mx2.hostinger.com` nos dois resolvers (1.1.1.1 e 8.8.8.8); `dig +short TXT onionevolve.com` = `v=spf1 include:_spf.mail.hostinger.com ~all`; `_dmarc.onionevolve.com` = `v=DMARC1; p=none`; `autodiscover.onionevolve.com` = CNAME autodiscover.mail.hostinger.com; e mx1.hostinger.com:25 responde banner `220-ESMTP mx.hostinger.com` com STARTTLS anunciado. INCONCLUSIVO por projeto: a sonda SMTP RCPT devolveu `550 5.5.1 Protocol error` TAMBEM para o controle `naoexiste-zzz9@onionevolve.com` — o servidor recusa dialogo antes do STARTTLS, entao a sonda nao diz nada sobre a caixa; nao e evidencia contra"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "SUPERA a medicao da manha: onionevolve.com PASSOU A TER CORREIO. Os passos (1) MX e (2) SPF do aceite de Q_MX_DO_ONIONEVOLVE estao VERDES, medidos. O passo (3) — um envio de fora CHEGAR na caixa — segue por verificar, e e por isso que Q_MX_DO_ONIONEVOLVE NAO foi fechado: a diferenca entre 'o dominio aceita correio' e 'esta caixa recebe' e exatamente a que o requisito 3.B cobra, e author.email nao volta atras. Um e-mail de teste entregue fecha o no."
+    provenance:
+      source: "DNS de onionevolve.com"
+      locator: "dig +short MX onionevolve.com ; dig +short TXT onionevolve.com"
+      method: "medição: dig +short MX/TXT onionevolve.com"
 
   - id: D_EMAIL_SUPORTE_E_MARCIO_ARROBA
     node_type: decision
@@ -417,6 +445,10 @@ nodes:
     verified_against: "DECIDIDO pelo maestro em 2026-09-07, no selo do checkpoint da passada 1: 'cadastrei no hostinger e mudei o email para marcio@onionevolve.com ele deve ser o email do suporte'. Substitui a escolha da mesma sessao por suporte@onionevolve.com, que nunca chegou a ser estampada em artefato nenhum — `author` nos 5 plugin.json segue objeto so com `name`"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "DECIDIDO — o contato de suporte e marcio@onionevolve.com (revoga suporte@onionevolve.com, escolhido horas antes na mesma sessao e nunca publicado). Destino inalterado: author.email dos 5 plugin.json (assemble-plugin.sh:339), o SUPPORT.md do PR 10 e o security.txt. A ressalva do Elenxo continua valendo palavra por palavra: o aceite do PR 10 nao e '3.B resolvido', e 'o 404 saiu de toda superficie publica E o suporte aponta para repo publico com issues' — e o e-mail so entra no artefato depois do passo (3) de Q_MX_DO_ONIONEVOLVE."
+    provenance:
+      source: "maestro, sessão /meta:drive de 2026-09-07 (selo do checkpoint da passada 1), Claude-Session session_01GmCAnwnTGRDk7tMNfZmYeH (commits 9857681a e 145d7973, 2026-09-07)"
+      locator: "maestro: 'cadastrei no hostinger e mudei o email para marcio@onionevolve.com ele deve ser o email do suporte' (citação gravada no nó no commit 9857681a, 2026-09-07 14:35)"
+      method: "testemunho: decisão do maestro na sessão de 2026-09-07, citação literal no verified_against"
 
   - id: E_FACE_PUBLICA_VIROU_COSTURA_E_CATRACA
     node_type: evidence

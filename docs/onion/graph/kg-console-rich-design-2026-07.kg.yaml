@@ -56,9 +56,9 @@ nodes:
     label: "Vendorizar UM arquivo (cose embutido, resto à mão) é mais fiel ao ethos 'um artefato' do Onion do que 3 libs encadeadas"
     trace: ".claude/validation/kg-console.sh"
     provenance:
-      source: ".claude/validation/kg-console.sh"
-      locator: ".claude/validation/kg-console.sh"
-      method: "derivado: trace do nó, sem registro de medição"
+      source: "docs/analysis/onion-adr-kg-console-rich-2026-07.md ; .claude/validation/kg-console.sh"
+      locator: "ADR §D2 l.34-37 ; kg-console.sh l.34 e l.157 (vendor inline)"
+      method: "leitura: ADR do kg-console + script"
   - id: D_contract_travels
     node_type: decision
     plane: DEV

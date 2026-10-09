@@ -41,6 +41,10 @@ nodes:
     status: confirmed
     label: "PRODUTO 2 — gerador de deck de treino/onboarding auto-guiado (spec → HTML progressive-disclosure, copiar, offline). Adotante TOPA TOCAR (montou os decks; molde existe) — maior prontidão"
     trace: "relay Sinal 4"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
+      locator: "Sinal 4, tabela l.73 (produto 2) + Sinal 1 l.44-50"
+      method: "leitura: relay do adotante gustavo-pulga"
   - id: E_sem_gerador_decks
     node_type: evidence
     plane: PROD
@@ -63,6 +67,10 @@ nodes:
     status: confirmed
     label: "PRODUTO 3 — skill de retro/feedback como spec-as-code (par perguntas/respostas, NPS+CSAT+eixos). Adotante TOPA TOCAR (baixo esforço; a retro fechada é o protótipo)"
     trace: "relay Sinal 3/4"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
+      locator: "Sinal 3 l.61-65 + Sinal 4 tabela l.74"
+      method: "leitura: relay do adotante gustavo-pulga"
   - id: E_sem_retro_skill
     node_type: evidence
     plane: PROD
@@ -85,6 +93,10 @@ nodes:
     status: confirmed
     label: "PRODUTO 5 — fluxo de absorção+auditoria de skill de terceiro (importar → adherence-lint → fonte self-contained → registrar). Adotante TOPA TOCAR (a skill de design é contribuição dele)"
     trace: "relay Sinal 2/4"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
+      locator: "Sinal 2 l.54-58 + Sinal 4 tabela l.75"
+      method: "leitura: relay do adotante gustavo-pulga"
   - id: E_sem_absorcao
     node_type: evidence
     plane: PROD
@@ -117,6 +129,10 @@ nodes:
     verified_against: adopter-onboarding-zero-mencoes
     label: "GAP (superado): o boundary do visitante era praticado mas não projetado. Metade já existia — TX_invite (convite, no wizard) + onion-onboarding (papel de repo). O gap real era estreito: faltava a AUTORIDADE-DE-PESSOA como fonte + a lente na Orient"
     trace: "docs/knowledge-base/concepts/adopter-onboarding.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/adopter-onboarding.md ; .claude/skills/onion-onboarding/SKILL.md ; relay 2026-07-30 Sinal 8"
+      locator: "grep -c -i visitante na KB = 0 em 2ccd39e3 (main de 2026-07-30) e hoje (último commit da KB 2026-07-26, f6bb7c7d); TX_invite na onion-onboarding SKILL.md; relay l.114-124"
+      method: "medição: grep -c -i visitante docs/knowledge-base/concepts/adopter-onboarding.md (verified_against \"adopter-onboarding-zero-mencoes\")"
   - id: D_p4_visitor_authority
     node_type: decision
     plane: PROD

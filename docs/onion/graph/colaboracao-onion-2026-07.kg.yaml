@@ -20,6 +20,10 @@ nodes:
     confidence: 1.0
     status: refuted
     label: "maestro/mantenedor — dono do core; unico que relaya sinais ao core"
+    provenance:
+      source: "git:5e511195 (PR #298) docs/evolution/inbox/2026-07-08-test-message.md"
+      locator: "git show --stat 5e511195 (autor mauriciomatos, 2026-07-08, escreve em docs/evolution/inbox/)"
+      method: "leitura: commit do core que refuta a exclusividade do relay"
   - id: EN_VISITANTE
     node_type: entity
     layer: domain
@@ -30,6 +34,10 @@ nodes:
     verified_at: 2026-08-30
     verified_against: "piloto kg-freshness 2026-08-29: worker mediu papel contra o vivo (canais de escrita no repo); selo do maestro 2026-08-30"
     label: "colaborador visitante — acesso repo-only; entrega sinais como arquivos"
+    provenance:
+      source: "gustavo-pulga@e88af2e:.claude/diary/2026-07-14-colaborador-visitante-acesso.md"
+      locator: "seção Signal (\"acesso repo-only: envia mensagens pelo repo ... sinais em docs/evolution/inbox/; não acessa o core nem relaya\")"
+      method: "leitura: migalha de diário do adotante (commit e88af2e, 2026-07-14)"
   - id: EN_REPO
     node_type: entity
     layer: domain
@@ -66,6 +74,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     label: "sinal pendente no inbox (entregue, nao relayado)"
+    provenance:
+      source: ".claude/commands/meta/co-relay.md"
+      locator: "l.3/l.14 (o carteiro transporta o sinal para docs/evolution/inbox/ do core, sem commit; a triagem é da sessão do core)"
+      method: "leitura: doutrina do carteiro upstream"
   - id: ST_SINAL_PROCESSED
     node_type: state
     layer: domain
@@ -74,6 +86,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     label: "sinal relayado ao core e arquivado em _processed"
+    provenance:
+      source: ".claude/commands/meta/co-evolve.md"
+      locator: "l.15 (\"só move mensagens para _processed/ quando você confirmar\") + ls docs/evolution/inbox/_processed (154 arquivos)"
+      method: "leitura: comando co-evolve + diretório _processed"
   - id: EV_RELAY
     node_type: event
     layer: domain
@@ -98,6 +114,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. grep -n "IN_I3" docs/onion/graph/colaboracao-onion-2026-07.kg.yaml; sed -n ''73,80p'' docs => Nó IN_I3 (invariant, layer domain, plane PROD, impact 5, confidence 1.0, status confirmed) tem label "I3 — um …'
     label: "I3 — um escritor por recurso; entrega-sem-commit (sem commit cross-repo)"
+    provenance:
+      source: ".claude/commands/meta/co-relay.md"
+      locator: "l.25 (\"A sessão do adotante nunca commita/pusha no repo alheio (I3 — um escritor por repo)\") + l.3 (ENTREGA-SEM-COMMIT)"
+      method: "leitura: doutrina do carteiro upstream no core"
   - id: RU_RELAY_MAESTRO
     node_type: rule
     layer: domain
@@ -108,6 +128,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): refutado — ver E_RELAY_NAO_EXCLUSIVO_2026_09; flip executa selo pre-existente do maestro (PR #724)'
     label: "so o maestro relaya/tria; o visitante entrega, nao relaya"
+    provenance:
+      source: "docs/evolution/inbox (git log do core)"
+      locator: "git log --all --format='%h %an' -- docs/evolution/inbox/ | grep -v \"Marcio Carvalho\""
+      method: "medição: git log de autores em docs/evolution/inbox"
   - id: RU_BRANCH_TWO_TIER
     node_type: rule
     layer: domain
@@ -116,6 +140,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     label: "branch two-tier — vendor(core)/adopt(integracao)/master(release)/work(pessoal)"
+    provenance:
+      source: "gustavo-pulga@682fbcc:.claude/diary/2026-07-14-branch-model-two-tier.md"
+      locator: "l.16-17 (onion/vendor=core, onion/adopt=integração, master=release, work/<nome>=pessoal)"
+      method: "leitura: migalha de diário do adotante (682fbcc)"
   - id: PO_SSOT_GIT
     node_type: policy
     layer: domain
@@ -126,6 +154,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 2/2 claims medidas ao vivo. 1) grep -rn "SSOT-de-registro" --include="*.md" --include="*.yaml" . | grep -v node_module => (1) "SSOT-de-registro" aparece em 3 lugares vivos: o próprio label do nó EN_REPO (linha 40 do mesmo grafo), o …'
     label: "git e o SSOT-de-registro canonico; ambientes sao vistas que leem/escrevem de volta"
+    provenance:
+      source: "gustavo-pulga@682fbcc:.claude/diary/2026-07-14-ssot-compartilhado.md"
+      locator: "l.22 (\"git = SSOT-de-registro canônico; ambientes = views que leem/escrevem de volta\")"
+      method: "leitura: migalha de diário do adotante (682fbcc)"
   # ---- camada audit (epistemica — teses e evidencias do que funciona) ----
   - id: E_TREINO_OK
     node_type: evidence
@@ -137,6 +169,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. Nó sem `trace`/`verified_against` prévios. Evento é externo ao repo (engajamento de consul => 3 claims independentes checadas: (1) "treino de cliente ocorreu a partir de specs" — confirmado pelo relay 202…'
     label: "treino de cliente entregue com sucesso a partir de specs (2026-07-15)"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
+      locator: "Sinal 1 (\"Um engajamento real de consultoria+treino foi entregue inteiro a partir de specs\") + frontmatter evidencia \"sessão 2026-07-15/16\""
+      method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
   - id: E_DIARY_MIGALHAS
     node_type: evidence
     layer: audit
@@ -145,6 +181,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "5 migalhas do diario (branch-model, visitante, ssot, ssh, design-vertical)"
+    provenance:
+      source: "gustavo-pulga@e88af2e:.claude/diary/2026-07-14-*.md"
+      locator: "git ls-tree e88af2e .claude/diary/: as 5 migalhas de 2026-07-14 (branch-model-two-tier, colaborador-visitante-acesso, ssot-compartilhado, provisionamento-ssh-colaborador, design-vertical-e-onboarding-autoguiado)"
+      method: "leitura: diário do adotante no clone local (gustavo-pulga@e88af2e)"
   - id: E_RETRO
     node_type: evidence
     layer: audit
@@ -163,6 +203,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "uma boa spec e multiplicador de artefatos (skill/plugin/doc/deck/onboarding)"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
+      locator: "Sinal 1 (\"Tese confirmada: uma boa spec é um multiplicador de artefatos\")"
+      method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
   - id: C_ASYNC_REPO
     node_type: claim
     layer: audit
@@ -179,6 +223,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "onboarding auto-guiado (usar+ajustar, exemplo preenchido) reduz friccao de adocao"
+    provenance:
+      source: "gustavo-pulga@682fbcc:.claude/diary/2026-07-14-design-vertical-e-onboarding-autoguiado.md"
+      locator: "seção Evidence (exemplo preenchido copiável mata a fricção; \"usar+ajustar, não criar do zero\")"
+      method: "leitura: migalha de diário do adotante (gustavo-pulga@682fbcc)"
   - id: D_KG_SEPARADO
     node_type: decision
     layer: audit
@@ -216,6 +264,10 @@ nodes:
     confidence: 0.7
     status: confirmed
     label: "deep-research colaboracao moderna 2026 (24 fontes, 9 findings verificados) — preprints, cautela"
+    provenance:
+      source: "gustavo-pulga@2e5e0a4:docs/knowledge-base/concepts/colaboracao-moderna.md"
+      locator: "l.3-7 (cabeçalho: fonte = deep-research citado, \"24 fontes, 9 findings verificados adversarialmente\"; \"fontes centrais são preprints\")"
+      method: "leitura: KB do adotante que resume o relatório da deep-research (gustavo-pulga@2e5e0a4)"
   - id: C_I3_VALIDADO
     node_type: claim
     layer: audit
@@ -224,6 +276,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "delivery-without-commit (I3) validado externamente pelo KPR (Knowledge-Based Pull Requests)"
+    provenance:
+      source: "gustavo-pulga@2e5e0a4:docs/knowledge-base/concepts/colaboracao-moderna.md"
+      locator: "l.21 (linha Delivery-without-commit: KPR -> I3) + l.58 (KPR arxiv 2606.26721)"
+      method: "leitura: KB do adotante que cita o KPR (preprint arxiv 2606.26721)"
   - id: C_RETRO_CIENTIFICA
     node_type: claim
     layer: audit
@@ -232,6 +288,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "retro que combina perceptual + dado objetivo e a recomendada pela ciencia (DevEx)"
+    provenance:
+      source: "gustavo-pulga@2e5e0a4:docs/knowledge-base/concepts/colaboracao-moderna.md"
+      locator: "l.26 (Feedback perceptual + objetivo: DevEx, ACM Queue 2023)"
+      method: "leitura: KB do adotante que cita DevEx (ACM Queue 2023)"
   - id: C_NPS_PREDITOR
     node_type: claim
     layer: audit
@@ -267,6 +327,10 @@ nodes:
     verified_at: 2026-08-30
     verified_against: "piloto kg-freshness 2026-08-29: worker CONFIRMED; selo do maestro 2026-08-30"
     label: "particao de visibilidade — uma SSOT, duas projecoes (interna completa x client-safe despida)"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
+      locator: "Sinal 6 (\"Uma SSOT, duas projeções ... a interna (completa) e a client-safe (a interna despida)\")"
+      method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
   - id: IN_CLIENT_SAFE
     node_type: invariant
     layer: domain
@@ -277,6 +341,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. 1) grep -n "IN_CLIENT_SAFE" -A 10 docs/onion/graph/colaboracao-onion-2026-07.kg.yaml (leit => (2) REALEXIT=0; saída: "Arquivos varridos: 855 / OK ✓ — nenhuma superfície carrega termo sensível." — o gate r…'
     label: "artefato que sai (cliente/core) passa por gate determinístico grep client-safe = 0"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
+      locator: "Sinal 6 l.65-67 ('Antes de qualquer artefato cruzar para o cliente ou para o core, roda-se um grep de termos sensíveis → tem que dar 0')"
+      method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
   - id: EN_KG_CLIENTE
     node_type: entity
     layer: domain
@@ -287,6 +355,10 @@ nodes:
     verified_at: 2026-09-02
     verified_against: 'flip 2026-09-02 (selo): SUPERSEDED por E_MEDIDO_EN_KG_CLIENTE_2026_09 (marcador real e 1 no com aviso de cabecalho, nao N nos com lock); label preservado como historia'
     label: "KG do engajamento — confidencial (nos 🔒 marcados); fica no repo dev, nunca sai"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
+      locator: "Sinal 7, bullet \"KG do engajamento\" (\"Contém nós 🔒 confidenciais explicitamente marcados ... Fica no repo dev — nunca sai\")"
+      method: "leitura: sinal upstream do adotante que originou o label (relay 2026-07-16)"
   - id: EN_KG_COLAB
     node_type: entity
     layer: domain
@@ -297,6 +369,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): 3/3 claims medidas ao vivo. 1) `grep -inE "<adotante-a>|<adotante-b>|<adotante-c>|<adotante-d>|bwp|hpe|pedro|arthur|cl => Comando 1 (identificadores conhecidos de cliente/adotante): saída vazia, `grep` retornou exit code 1 (zero mat…'
     label: "KG de colaboracao (este) — meta-Onion, sem dado de cliente; shareable ao core"
+    provenance:
+      source: "docs/onion/graph/colaboracao-onion-2026-07.kg.yaml"
+      locator: "bash .claude/validation/projection-safety.sh docs/onion/graph/colaboracao-onion-2026-07.kg.yaml (6 termos derivados do members.yaml; 1 arquivo; OK) + cabeçalho l.1 (META-ONION, não é dado de cliente)"
+      method: "medição: bash .claude/validation/projection-safety.sh docs/onion/graph/colaboracao-onion-2026-07.kg.yaml"
   - id: EN_MARCA
     node_type: entity
     layer: domain
@@ -305,6 +381,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     label: "marca/entidade entregadora — vinculos assimetricos com os consultores (detalhes fora do escopo do framework)"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
+      locator: "Sinal 8, bullet \"Vínculos assimétricos com a entidade entregadora\" (marca sob a qual o serviço é entregue)"
+      method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
   - id: D_VISIBILIDADE
     node_type: decision
     layer: audit
@@ -329,6 +409,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "consultores tem vinculos assimetricos com a marca; o role-model deve acomodar sem conhecer detalhes"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-16-treino-vertical-colaboracao-produtos.md"
+      locator: "Sinal 8, bullet \"Vínculos assimétricos com a entidade entregadora\""
+      method: "leitura: sinal upstream do adotante (relay 2026-07-16)"
   - id: Q_AUTORIZACAO_NAO_FORMALIZADA
     node_type: question
     layer: audit
@@ -362,6 +446,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED 3/3 — cd /home/marcio/<membro-t2> && ls -la docs/<dominio-t2>/graph/<dominio-t2>.kg.yaml && grep -c ''🔒'' '
     label: 'MEDIDO 2026-09-01, a verdade atual supera o label de julho: O label afirma ''nos 🔒 marcados'' (plural, marcação estrutural explícita por nó). No vivo: só 1 nó (D_UPSELL) está marcado como confidencial, e o marcador real é ⚠️ num comentário de cabeçalho do arquivo — não 🔒, não um campo por nó, não plural. As outras duas cláusulas do label (''fica no repo dev'' e ''nunca sai'') s'
+    provenance:
+      source: "gustavo-pulga@4113a55:docs/<dominio-t2>/graph/<dominio-t2>.kg.yaml"
+      locator: "l.3 (cabeçalho ⚠️ marcando só D_UPSELL como confidencial) + grep -c 🔒 = 0"
+      method: "leitura: arquivo do grafo do engajamento no repo do adotante (último commit 4113a55)"
 
   - id: E_RELAY_NAO_EXCLUSIVO_2026_09
     node_type: evidence

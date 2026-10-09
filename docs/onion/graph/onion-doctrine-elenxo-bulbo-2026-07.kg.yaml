@@ -29,6 +29,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "Elenxo (do grego elenchos, refutacao socratica) nomeia o METODO: a fonte-unica que se refuta em publico para se superar"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "l.32; KB onion-elenxo-doctrine.md l.256"
+      method: "leitura: rascunho (trace) + KB graduada"
   - id: D_BULBO_IS_ARCH
     node_type: decision
     trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
@@ -85,6 +89,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "a forma prova a filosofia: as correcoes de citacao feitas NO corpo sao a demonstracao viva — esconder um erro numa pagina sobre porosidade a refutaria"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "l.42 (correção no corpo), l.109 e l.143 (\"A forma prova a filosofia\")"
+      method: "leitura: rascunho da doutrina (trace do grafo)"
   - id: C_POROSITY_STRUCTURAL
     node_type: claim
     layer: audit
@@ -93,6 +101,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "porosidade epistemica e exigencia ESTRUTURAL (o corte no bulbo revela a camada de baixo), nao gentileza — SSOT fechada e dogma com formatacao bonita"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "l.44 (\"fechada é dogma com formatação bonita\"), l.87 (\"corte no bulbo sempre revele a camada de baixo\"), l.99 (\"estruturalmente aberta... Não por gentileza, por desenho\")"
+      method: "leitura: rascunho da doutrina"
   - id: C_VIRAL_BY_SUBSTANCE
     node_type: claim
     layer: audit
@@ -101,6 +113,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "viral pela concepcao, nao pelo midiatismo: escrutinio (refutavel + datado + publico) e a unica atencao que se propaga sem hype"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "l.46 e l.151"
+      method: "leitura: rascunho da doutrina"
   - id: C_SSOT_NO_AUTHOR
     node_type: claim
     trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
@@ -138,6 +154,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "erro real corrigido: a triade tese/antitese/sintese e de Chalybaus (1837), nao de Hegel; o termo hegeliano certo e Aufhebung (cancela+preserva+eleva)"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "l.42, l.81, l.125; KB l.182, l.249"
+      method: "leitura: rascunho (trace) + KB"
   - id: E_GATE_50_FINDINGS
     node_type: evidence
     trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
@@ -161,6 +181,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "ciencia cita a fonte real; o que e nosso declara autoria nossa — os dois NUNCA se confundem (nem plagio, nem credito emprestado)"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "l.113-115 e tabelas l.121-136; KB l.238"
+      method: "leitura: rascunho §ciência vs cunhagem"
 
   # ---- duvidas / incomodos (a fronteira honesta) ----
   - id: Q_PUBLICATION_AREA
@@ -208,6 +232,10 @@ nodes:
     confidence: 0.95
     status: confirmed
     label: "Substrato: o Transformer (Vaswani et al. 2017, arXiv:1706.03762) — ciencia dada, nao nossa; o Onion orquestra em cima, nao reinventa"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "l.58, l.121 (arXiv:1706.03762); KB l.147"
+      method: "leitura: rascunho/KB com localizador arXiv"
   - id: ENT_CQRS_CODD
     node_type: entity
     layer: audit
@@ -216,6 +244,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "Fonte->projecao: CQRS (Young 2010) sobre CQS (Meyer 1988); a raiz de SSOT e a normalizacao de Codd (1970) — cada fato num unico lugar"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "l.38, l.66, l.122, l.135 (KB l.157, l.268: Codd, CACM 1970)"
+      method: "leitura: tabela de fontes do rascunho/KB"
   - id: ENT_POPPER
     node_type: entity
     layer: audit
@@ -224,6 +256,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "Falseabilidade (Popper, A Logica da Descoberta Cientifica, 1934) — PARENTE, nao identidade, da porosidade epistemica"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "l.44, l.136; KB l.260"
+      method: "leitura: rascunho/KB"
 
   # ---- 2026-08-17: a GRADUACAO (o rascunho saiu de gated e virou KB vendorizada) ----
   - id: E_ADOPTER_DID_NOT_KNOW_ELENXO
@@ -281,6 +317,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 1/1 — Lido o nó inteiro (label/trace/status=open) e o draft trace (docs/analysis/onion-quadro-ci'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó descreve um estado ("nasceu, gated, aguardando área futura de doutrinas") que foi parcialmente superado: a área de doutrinas que era a condição do gate JÁ NASCEU e está no ar (Q_PUBLICATION_AREA=done, 2026-08-25) — mas isso resolveu só a metade das CUNHAGENS (D_GRADUATED_TO_VENDORED_KB, PR #630'
+    provenance:
+      source: "docs/evolution/research/census-2026-09-01/data/rodada1.json"
+      locator: "run_id wf_90dd73fe-cd2, medidos[11] node_id=D_QUADRO_CITACOES verdict=DRIFTED"
+      method: "medição: /meta:census 2026-09-01 (wf_90dd73fe-cd2), worker leu o nó + draft e mediu git log/grep"
 
   # ---- 2026-10-05: as quatro definicoes do maestro e a superacao do LLM-como-VM ----
   - id: D_QUATRO_PILARES_DEFINIDOS_PELO_MAESTRO

@@ -16,6 +16,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "roles.yaml:20-25 — standalone.base == hub.base e optional byte-a-byte idênticos; só trust/downstream separa"
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml@9ed41811"
+      locator: "l.20-21 (hub base/optional) × l.24-25 (standalone base/optional)"
+      method: "leitura: git show 9ed41811:.claude/utils/marketplace/roles.yaml"
   - id: E_DEADREF
     node_type: evidence
     layer: audit
@@ -25,6 +29,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "work.md:24 cabeia kg-radar.sh no passo-0, mas onion-engineering.manifest.sh tem VALIDATION=() → dead-ref em todo standalone montado"
+    provenance:
+      source: ".claude/commands/engineer/work.md@9ed41811 + .claude/utils/marketplace/verticals/onion-engineering.manifest.sh@9ed41811"
+      locator: "work.md l.24 (passo 0 roda bash .claude/validation/kg-radar.sh) + manifest l.31 VALIDATION=()"
+      method: "leitura: git show 9ed41811 dos dois arquivos"
   - id: E_ANTHROPIC_JOINT
     node_type: evidence
     layer: audit
@@ -34,13 +42,17 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "Anthropic: Agent Skills plenas em plano pago individual; marketplace+auto-install-por-grupo gated a Team/Enterprise (support.claude.com 13837433)"
+    provenance:
+      source: "https://support.claude.com/en/articles/13837433 + https://support.claude.com/en/articles/12512176"
+      locator: "13837433 \"Manage plugins for your organization\": \"Plugin marketplaces let Team and Enterprise plan owners distribute curated plugins\" + acesso por grupo; 12512176: \"Skills are available for users on Free, Pro, Max, Team, and Enterprise plans\""
+      method: "leitura: artigos de suporte da Anthropic (lidos 2026-10-09)"
   - id: E_LAND_EXPAND
     node_type: evidence
     layer: audit
     plane: PROD
     impact: 3
     confidence: 0.8
-    status: confirmed
+    status: unverifiable
     verified_at: 2026-07-19
     label: "land-and-expand (Datadog): gatilho de expansão = chegada do MULTI (2º repo/2ª pessoa), não uso individual crescer"
   # --- claims ---
@@ -53,6 +65,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "reframe (hub=empresa-com-federação / standalone=solo-completo-sem-federação) SUSTENTADO: motor+doutrina+mercado convergem"
+    provenance:
+      source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
+      locator: "§Veredito central l.21-34 (motor roles.yaml:20-25 + doutrina D4 + mercado Anthropic/Datadog)"
+      method: "derivado: síntese da pesquisa wf_ab57a814-c16 a partir de E_BASE_IDENTICAL, E_ANTHROPIC_JOINT e E_LAND_EXPAND"
   - id: C_MATRIX_GAP
     node_type: claim
     layer: audit
@@ -62,6 +78,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "matriz estruturalmente incompleta: roles.yaml só modela verticais (base/optional), sem eixo p/ os 16 work_tools; nenhum manifesto referencia commands/meta"
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml@9ed41811 + verticals/*.manifest.sh@9ed41811"
+      locator: "git show 9ed41811:.claude/utils/marketplace/roles.yaml (só base/optional, sem work_tools) ; git grep -c \"commands/meta\" 9ed41811 -- .claude/utils/marketplace/verticals/ (0 casamentos)"
+      method: "medição: leitura da árvore no commit da pesquisa (9ed41811, 2026-07-19)"
   - id: C_KG_SCRIPT_TRAVELS
     node_type: claim
     layer: audit
@@ -71,6 +91,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "doutrina: viaja o SCRIPT (kg-radar.sh), nunca o DADO (.kg.yaml do core); cláusula 'motor não viaja' é escopada à Federação de orgs, não ao door-mesma-família"
+    provenance:
+      source: "docs/knowledge-base/concepts/public-door-vs-private-core.md@9ed41811 + docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md@9ed41811"
+      locator: "KB l.91-92 (\"Os .kg.yaml do core ... são privados e não viajam ... Um door que investigue gera os seus .kg.yaml locais\"); SYNTHESIS l.75-77 (viaja o script, nunca o dado) e l.92-93 (kg.md:60-61 escopado à Federação)"
+      method: "leitura: KB de porta pública × core privado e síntese no commit da pesquisa"
   - id: C_STD_MOAT_NOT_REVENUE
     node_type: claim
     layer: audit
@@ -80,6 +104,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "standalone = MOAT/advocacy/dogfood-de-campo, NÃO funil de receita (D5: solo não sustenta volume; receita mira P3/P4-empresa via hub+serviço)"
+    provenance:
+      source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
+      locator: "§Recorte do funil l.61 (\"É MOAT/advocacy, não funil de receita (D5: solo não sustenta volume)\")"
+      method: "derivado: síntese da pesquisa wf_ab57a814-c16 (frente business/funil)"
   # --- decisões ---
   - id: D_ADOPT_REFRAME
     node_type: decision
@@ -143,6 +171,10 @@ nodes:
     confidence: 1.0
     status: open
     label: "são 16 work-tools (não ~17 do brief) — reconciliar contagem com o maestro"
+    provenance:
+      source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
+      locator: "§\"Mas: a matriz está estruturalmente incompleta\" l.44 (\"Contagem: são 16 work-tools (não ~17). Reconciliar.\")"
+      method: "leitura: síntese da pesquisa wf_ab57a814-c16"
 edges:
   - from: E_BASE_IDENTICAL
     to: C_REFRAME_SUSTAINED

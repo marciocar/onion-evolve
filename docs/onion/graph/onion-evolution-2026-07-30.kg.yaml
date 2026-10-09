@@ -114,6 +114,10 @@ nodes:
     verified_against: grep-e-lint-medidos
     label: "O juiz adversarial só julgou os 'risky' (engineer/product); 2 falso-positivos não-risky escaparam dele e foram pegos na VERIFICAÇÃO do fan-in (rodei grep/lint contra o vivo). Behavior-over-declaration nos próprios achados da auditoria — o backstop de completude"
     trace: "docs/onion/graph/onion-evolution-2026-07-30.kg.yaml"
+    provenance:
+      source: "docs/analysis/onion-evolution-2026-07-30.md"
+      locator: "linhas 12-14 (run wf_7a6ca1e6-064; 13 → 5 refutados = 3 juiz adversarial + 2 verificação principal) e :46 (D8: 2 achados brutos refutados na verificação)"
+      method: "leitura: relatório da auditoria /meta:evolve 2026-07-30"
   - id: E_juiz_refutou_3
     node_type: evidence
     plane: PROD
@@ -166,6 +170,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 2/2 — Lido o nó (label linha 74, trace linha 75). Medido o trace verbatim: `sed -n ''190,270p'' '
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A claim original ("~40 linhas de template Unicode duplicado entre task.md e feature.md") não sobrevive à medição: task.md foi refatorado (não se sabe por qual PR exato — não é o #504, que tratou de estimativa) para uma nota curta que delega formatação ao adapter; feature.md ficou para trás, ainda em'
+    provenance:
+      source: "docs/evolution/research/census-2026-09-01/data/rodada1.json (commit 9c2fa06b)"
+      locator: "sed -n '190,270p' .claude/commands/product/task.md · sed -n '195,300p' .claude/commands/product/feature.md"
+      method: "medição: sed -n dos blocos de template em task.md e feature.md (/meta:census 2026-09-01)"
 
   - id: E_REFUTA_C_d3_comment_dup
     node_type: evidence

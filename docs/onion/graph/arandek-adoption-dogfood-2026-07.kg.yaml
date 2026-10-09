@@ -73,6 +73,10 @@ nodes:
     status: confirmed
     label: "hook SessionStart lia o ARQUIVO .env; o adapter (detector.md) lê o AMBIENTE (process.env) — fontes divergentes, hook anuncia none com Linear provado via direnv"
     trace: ".claude/settings.json:26 vs .claude/utils/task-manager/detector.md:46"
+    provenance:
+      source: ".claude/settings.json@d6aba0e^1 l.26 ; .claude/utils/task-manager/detector.md l.46 ; docs/evolution/inbox/_processed/2026-07-24-sinal-adocao-arandek.md §D2"
+      locator: "settings.json:26 (antes do merge) vs detector.md:46"
+      method: "leitura: as duas linhas citadas no trace + sinal do adotante"
 
   - id: C_D3
     node_type: claim
@@ -109,9 +113,9 @@ nodes:
     label: "teste adopted-role/link-guard reprovava — anterior à REGRA 45, assumia core-only pulado em silêncio; falha PRÉ-EXISTENTE (reproduz no main), não regressão"
     trace: ".claude/validation/lint-selftest.sh run_adopted_role_selftests"
     provenance:
-      source: ".claude/validation/lint-selftest.sh run_adopted_role_selftests"
-      locator: ".claude/validation/lint-selftest.sh run_adopted_role_selftests"
-      method: "derivado: trace do nó, sem registro de medição"
+      source: "commit b201cea (onion-evolve) ; PR #454"
+      locator: "corpo do commit b201cea: \"Reconcilia teste stale: adopted-role/link-guard (anterior a REGRA 45) assumia core-only pulado em silencio\""
+      method: "leitura: corpo do commit b201cea e do PR #454"
 
   - id: E_GAP2_ZERO
     node_type: evidence
@@ -122,6 +126,10 @@ nodes:
     verified_at: 2026-07-24
     label: "verificado no arandek: .gitignore ignorava .claude/ (linhas 106+117); o durable-commit stajou 0 arquivos .claude/ (só docs/)"
     trace: "git ls-files .claude no onion-adopt-arandek pós 1º commit"
+    provenance:
+      source: "arandek HEAD:.gitignore ; clone /home/marcio/onion-adopt-arandek commit 611329a1"
+      locator: ".gitignore l.106 e l.117 (\".claude/\"); 611329a1 \"chore(onion): adopt to pin 5e3ea5ee46ac\" (2026-07-24) — git diff-tree: 0 arquivos .claude/, 101 em docs/"
+      method: "leitura: .gitignore do adotante + diff-tree do 1º commit durável no clone do adotante"
 
   - id: E_GAP3_FP
     node_type: evidence
@@ -132,6 +140,10 @@ nodes:
     verified_at: 2026-07-24
     label: "capability-registry.md do arandek ('100+ agentes' do PRODUTO deles) foi flagado pela regra como divergência do inventário Onion"
     trace: "arandek docs/specs/capability-registry.md"
+    provenance:
+      source: "arandek docs/specs/capability-registry.md ; commit b201cea (onion-evolve)"
+      locator: "capability-registry.md l.178 (\"orgs com 100+ agentes\") ; corpo de b201cea \"Fecha o falso-positivo 100+ agentes do capability-registry do arandek\""
+      method: "leitura: arquivo do adotante + corpo do commit de cura"
 
   - id: E_GAP1_SKIP
     node_type: evidence
@@ -155,6 +167,10 @@ nodes:
     verified_at: 2026-07-24
     label: "commits 1aa794f9 (remove .claude/) e 88d93f26 (untrack .claude/ mantém local) — 242 arquivos sumiram de todo checkout; busca exaustiva não achou cópia fora do git; sintoma = 8 refs mortas no CLAUDE.md"
     trace: "arandek git history mai/2026; git show 88d93f26^:.claude/"
+    provenance:
+      source: "arandek@1aa794f9 ; arandek@88d93f26"
+      locator: "git ls-tree -r --name-only 88d93f26^ -- .claude"
+      method: "leitura: git show/ls-tree dos commits 1aa794f9 e 88d93f26 no clone /home/marcio/arandek"
 
   - id: E_C1_SSOT
     node_type: evidence
@@ -204,6 +220,10 @@ nodes:
     status: confirmed
     label: "a REGRA 45 (commit 165e1e1) flaga link core-privado vivo com [link-vendorizado]; o teste é anterior e assume skip silencioso; falha reproduz idêntica no main via stash"
     trace: "lint-artifacts.sh REGRA 45; commit 165e1e1"
+    provenance:
+      source: "commit b201cea ; PR #454 (corpo) ; .claude/validation/lint-artifacts.sh l.3764"
+      locator: "b201cea: 'a REGRA 45 agora flaga link core-privado vivo com [link-vendorizado]'; PR #454: 'era falha pré-existente'"
+      method: "testemunho: medição da sessão 2026-07-24 (reprodução no main via stash), comando não registrado"
 
   - id: E_SELFTEST
     node_type: evidence
@@ -215,9 +235,9 @@ nodes:
     label: "selftest completo do core: 465 passaram, 0 falharam (inclui os novos scope-gitignore/inventory-adopter-scope/task-manager-hook)"
     trace: ".claude/validation/lint-selftest.sh"
     provenance:
-      source: ".claude/validation/lint-selftest.sh"
-      locator: ".claude/validation/lint-selftest.sh"
-      method: "derivado: trace do nó, sem registro de medição"
+      source: "PR #454 marciocar/onion-evolve (corpo)"
+      locator: "corpo do PR: 'Selftest completo: 465 pass / 0 fail'"
+      method: "testemunho: medição da sessão 2026-07-24 relatada no corpo do PR #454, comando não registrado"
 
   - id: E_CI
     node_type: evidence
@@ -228,6 +248,10 @@ nodes:
     verified_at: 2026-07-24
     label: "PR #454 CI verde: lint-onion-artifacts pass (6m11s) + onion-review pass (3m34s); mergeado como d6aba0e (merge commit, 6 commits preservados)"
     trace: "github.com/marciocar/onion-evolve/pull/454"
+    provenance:
+      source: "PR #454 marciocar/onion-evolve (runs 30133615820 e 30133615797)"
+      locator: "gh pr view 454 --json statusCheckRollup"
+      method: "medição: gh pr view 454 --json statusCheckRollup,mergeCommit"
 
   - id: D_FIX_GAP2
     node_type: decision
@@ -328,6 +352,10 @@ nodes:
     verified_at: 2026-07-24
     label: "PR #454 mergeado em main (d6aba0e) — os 6 fixes do dogfood vivos no core; merge commit preserva D1 revertável isolado"
     trace: "merge d6aba0e"
+    provenance:
+      source: "onion-evolve merge d6aba0e (PR #454)"
+      locator: "git show d6aba0e ; git log d6aba0e^1..d6aba0e^2 (6 commits)"
+      method: "leitura: merge commit e PR #454"
 
   - id: Q_ARANDEK_UPDATE
     node_type: question
@@ -416,6 +444,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 2/2 — 1) git -C onion-evolve merge-base --is-ancestor d6aba0e 65d8a7501a03 (confirma que o pin d'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó estava formulado como pergunta em aberto sobre um evento futuro ("quando... rodar"); o evento não só ocorreu como foi superado por múltiplos ciclos adicionais de update no adotante. A pergunta não tem mais objeto: já foi respondida pelo próprio comportamento do adotante, e a segunda cláusula (s'
+    provenance:
+      source: "onion-evolve (git) ; clone /home/marcio/onion-adopt-arandek (ArandekBR/arandek) ; docs/analysis/backlog-real-2026-09.md l.79"
+      locator: "git merge-base --is-ancestor d6aba0e 65d8a7501a03 (rc=0); no adotante, git log --all -- .claude/.onion-version: fbde45ad 07-25 (pin 65d8a750), 68f5cd8c 07-30, e05fd15a/908e8376/cd682ac4 08-31"
+      method: "medição: git merge-base --is-ancestor d6aba0e 65d8a7501a03 + git log --all -- .claude/.onion-version no clone do adotante"
 
   - id: E_W9_PIN_GREP_MEDIDO
     node_type: evidence

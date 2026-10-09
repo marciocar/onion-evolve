@@ -14,6 +14,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "o gancho anti-hype = especificidade do dado verificavel (0-20% delegacao; 40%/55%, Anthropic 2026), nao superlativo"
+    provenance:
+      source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+      locator: "l.19-21 (§Decisão central: \"0–20%\", \"40% menos erro / 55% mais rápido\", Anthropic 2026)"
+      method: "leitura: SYNTHESIS.md da rodada wf_09aabf00-bfe"
   - id: E_README_GOLD
     node_type: evidence
     layer: audit
@@ -23,6 +27,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "README de onion-standalone ja e padrao-ouro de arquitetura de marca (Onion H1; plataforma badge cinza + <sub>)"
+    provenance:
+      source: "onion-standalone@51b76be:README.md"
+      locator: "l.3 '# 🧅 Onion · Standalone', l.7 <sub>…Claude Code</sub>, l.12 badge base-Claude_Code-lightgrey"
+      method: "leitura: README do onion-standalone no commit de nascimento"
   - id: C_TENSION_RESOLVED
     node_type: claim
     layer: audit
@@ -32,6 +40,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "tensao anti-hype-mas-fisga RESOLVIDA: a precisao do numero citado e a fisga; mantem tom denso do core sem hype"
+    provenance:
+      source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+      locator: "l.19-21 (§Decisão central)"
+      method: "leitura: SYNTHESIS.md da rodada wf_09aabf00-bfe"
   - id: C_BRAND_ARCH
     node_type: claim
     layer: audit
@@ -41,6 +53,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "Casa de Marca: Onion herói/mãe; plataforma = metadado de compatibilidade (nunca H1); universalidade citada como FATO"
+    provenance:
+      source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+      locator: "l.24-25 (§Pilares, bullet Arquitetura: Casa de Marca, plataforma=metadado nunca H1, universalidade como FATO)"
+      method: "leitura: SYNTHESIS.md da rodada wf_09aabf00-bfe"
   - id: C_COMMERCIAL_BOUNDARY
     node_type: claim
     layer: audit
@@ -50,6 +66,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "voz sela a fronteira comercial: gratis=o texto (standalone completo); moat=a rede (federacao=hub). Nunca prometer federacao no standalone; nunca pricing na porta (D1)"
+    provenance:
+      source: "docs/evolution/research/onion-brand-voice-2026-07/SYNTHESIS.md"
+      locator: "l.26-27 (§Pilares, bullet Fronteira comercial na voz)"
+      method: "leitura: SYNTHESIS.md da rodada wf_09aabf00-bfe"
   - id: D_MESSAGING_DEFINITIVE
     node_type: decision
     trace: docs/business-context/04-operations/messaging-framework.md

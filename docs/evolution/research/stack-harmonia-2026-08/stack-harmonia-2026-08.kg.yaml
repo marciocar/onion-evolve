@@ -38,6 +38,10 @@ nodes:
     verified_against: grep-c-members-mais-find-outbox-mais-git-log
     label: "OS TRES ERROS, RE-MEDIDOS POR MIM (nao aceitos do critico): (1) 'e membros' -> grep -c '^  - id:' em members.yaml da 12 ENTRADAS, nao 9; logo o '44% da federacao sem canal' era percentual FABRICADO carregando a peca mais cara do plano. (2) 'canal partido, 4 membros sem nada' -> os 8 outboxes tem ZERO PENDENTES (tudo em _processed/); ausencia de diretorio e ausencia de EMISSAO, nao canal partido, e os 4 membros foram registrados DEPOIS do ultimo anuncio. (3) 'deriva de projecao do org-map' -> federation-orgs.json entrou no repo em 9d17c5e 2026-07-28 e o checkout de producao esta em 965224c 07-27, um dia ANTES do arquivo existir: e GIT PULL PENDENTE, nao deriva. Divergencia menor do critico: ele disse 'ultimo anuncio 07-18', eu medi 07-27 por nome de arquivo — nao muda a substancia"
     trace: "docs/evolution/federation/members.yaml"
+    provenance:
+      source: "docs/evolution/federation/members.yaml@c4986d24 + git log"
+      locator: "git show c4986d24:docs/evolution/federation/members.yaml | grep -c '^  - id:' → 12; git log --diff-filter=A -- docs/onion/federation-orgs.json → eb0bf582 2026-07-28"
+      method: "medição: grep -c members.yaml + git log do org-map"
 
   - id: C_nao_promover_doutrina
     node_type: claim
@@ -202,6 +206,10 @@ nodes:
     verified_against: evidencia-herdada-mais-critica
     label: "ANTI-CATALOGO (o que NAO construir — sobreviveu inteiro a critica, porque foi HERDADO da evidencia, nao inventado): admin platform/painel agregado (ja status:refuted no KG m3) · SDAAL para email e para whatsapp (falham o Teste do Eixo COM evidencia) · OTel/Prometheus/Grafana AGORA · Langfuse AGORA (v3 = 6 conteineres com ClickHouse; Helicone em maintenance mode desde mar/2026) · gateway dedicado de webhook (Svix/Outpost sao para ENVIAR; Hookdeck e SaaS-only; webhook.site e debug-tool; n8n nem e OSI) · multi-tenancy de adotante no Logto do CORE (o isolamento por container ja e limpo) · tunneling (Caddy+Logto ja sao a porta unica; ssh -L resolve o caso real) · F1.2 seletor fino / F2.1 SDAAL de transporte / F2.3 veto por reputacao (nenhum dos 87 sinais de inbox pediu) · decompor o bridge em servicos (anti-padrao p/ 1 operador) · E a rota POST /hooks/:provider — que com o WAHA desligado tem N=0 produtores"
     trace: "docs/onion/graph/m3-federation-admin-2026-07.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/stack-harmonia-2026-08/SYNTHESIS.md"
+      locator: "§O anti-catálogo (l.46-53)"
+      method: "leitura: SYNTHESIS.md da rodada stack-harmonia"
 
   - id: C_tunneling_nome_errado
     node_type: claim

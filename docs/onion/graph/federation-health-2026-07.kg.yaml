@@ -160,9 +160,9 @@ nodes:
     label: "F2 construida: /meta:personality-sync existe (RFC-0003 §2.4) e foi DOGFOODADO no core — .claude/identity/personality.md do onion-evolve gerado a partir de 74 migalhas do diario + git inicial + .onion-version, cada afirmacao ancorada ([[slug]]). O personality_summary do core deixou de ser seed manual. RESTA (por-instancia, gated na sessao de cada adotante): dos 7 adotantes, 6 seguem seed-manual datado + 1 (marcio-pessoal) gated/n-a — so viram emergentes quando cada um rodar o proprio sync."
     trace: ".claude/commands/meta/personality-sync.md"
     provenance:
-      source: ".claude/commands/meta/personality-sync.md"
-      locator: ".claude/commands/meta/personality-sync.md"
-      method: "derivado: trace do nó, sem registro de medição"
+      source: ".claude/identity/personality.md + git: d7807bf7"
+      locator: "personality.md l.10 (\"74 migalhas\"); mensagem de d7807bf7 (\"All 27 [[slug]] anchors are real entries\"; \"6 of 7 adopters still seed-manual, 1 gated/n-a\"); d7807bf7:members.yaml l.36 (personality_summary do core EMERGENTE)"
+      method: "leitura: artefato gerado + commit d7807bf7"
   - id: C_ADOPTER_PERSONALITY_SEEDS_PENDING
     node_type: claim
     layer: audit
@@ -215,6 +215,10 @@ nodes:
     status: superseded
     verified_at: 2026-07-24
     label: "FALTA um radar de federacao: pin declarado!=verificado, anuncio staging-nao-transportado, hub sem sub-adotado, linhagem sem pin verificado — hoje espalhados em pin-integrity-check.sh/reconcile, fora do motor KG"
+    provenance:
+      source: "git: 1d9fd485 + ff6c22a6:.claude/validation/federation-radar.sh"
+      locator: "ff6c22a6:.claude/validation/federation-radar.sh l.5-7 (\"Consolida os checks que hoje vivem espalhados (pin-integrity-check.sh, reconcile-inputs.sh, /meta:federation-*)\"); claim nasce em 1d9fd485 (2026-07-18 15:50) antes do radar (ff6c22a6, 19:22)"
+      method: "leitura: histórico git e cabeçalho do radar no commit de criação"
   - id: E_FED_RADAR_BUILT
     node_type: evidence
     layer: audit
@@ -227,8 +231,8 @@ nodes:
     trace: ".claude/validation/federation-radar.sh"
     provenance:
       source: ".claude/validation/federation-radar.sh"
-      locator: ".claude/validation/federation-radar.sh"
-      method: "derivado: trace do nó, sem registro de medição"
+      locator: "bash .claude/validation/federation-radar.sh"
+      method: "medição: bash .claude/validation/federation-radar.sh (re-executado 2026-10-09; o run de 07-24 não tem comando registrado)"
   - id: E_CUSTO_MEDIDO_REMATERIALIZAR_STANDALONE
     node_type: evidence
     plane: DEV

@@ -420,7 +420,7 @@ nodes:
   - id: E_LACUNAS_INFRA_VPS_1005
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: unverifiable
     impact: 4
     confidence: 0.85
     verified_at: 2026-10-05

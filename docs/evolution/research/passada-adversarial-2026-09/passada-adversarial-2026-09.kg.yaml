@@ -41,6 +41,10 @@ nodes:
     verified_against: 'duas rodadas medidas no PR #827: gates mecanicos VERDES (lint 0 HARD, bancada 1232/0/0, selftest CI pass) e 25 HARD achados pelos refutadores no MESMO codigo'
     label: 'RESPONDIDA: o gate mecanico e a passada adversarial medem coisas DIFERENTES, e a diferenca nao e de grau. Os tres gates estavam VERDES quando os refutadores acharam 25 HARD — entre eles uma guarda que era codigo morto no destino da maioria dos adotantes, uma flag que o artefato afirmava recortar e nao recortava, e um passo de comando que nascia sem a permissao que ele proprio declara obrigatoria. O gate responde `o artefato viola alguma regra escrita?`; a passada responde `o artefato FAZ o que DIZ que faz?`. Nenhum lint desta casa faz a segunda pergunta.'
     trace: 'docs/evolution/review/feat-public-distribution-decisions.md'
+    provenance:
+      source: "docs/evolution/review/feat-public-distribution-decisions.md (PR #827)"
+      locator: "l.127 (\"3 refutadores, 16 HARD\") + l.221-226 (2ª rodada: \"9 HARD\") + l.305-314 (bancada 1232/0/0, lint 0 HARD, CI lint+selftest pass no SHA 98b35bc5)"
+      method: "leitura: resíduo R56 do PR #827 (MERGED 2026-09-14)"
 
   # ── A CLASSE DOMINANTE: 3 ocorrencias em guardas DIFERENTES no mesmo dia ──
   - id: C_GUARDA_DE_LISTA_FALHA_PELO_VOCABULARIO
@@ -413,6 +417,10 @@ nodes:
     verified_against: 'bash .claude/utils/marketplace/resolve-role-bundle.sh standalone --tools devolve exatamente os 14 comandos que o corte manual manteve'
     label: 'A FRONTEIRA NAO VIVIA SO EM PROSA — e eu afirmei que vivia, duas vezes, inclusive num comentario do proprio manifesto ("os dois sao SSOTs de coisas diferentes"). `roles.yaml` declara o escopo por papel e `resolve-role-bundle.sh <papel> --tools` JA devolvia os 14 exatos do precedente, alem de `downstream: false` e os verticais. As duas alternativas que cheguei a implementar — lista de prefixos, depois campo `travels:` no frontmatter de cada comando — eram SEGUNDAS SSOTs do mesmo fato, repetindo uma camada acima a duplicacao que o PR #826 curou. Licao de metodo, e ela e maior que este PR: antes de declarar que algo so existe em prosa, PROCURE O RESOLVEDOR. O custo de nao procurar foi duas implementacoes descartadas e uma decisao do maestro tomada sobre premissa falsa.'
     trace: '.claude/utils/marketplace/roles.yaml'
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml no commit df031ef5^ + .claude/utils/marketplace/resolve-role-bundle.sh"
+      locator: "git show df031ef5^:.claude/utils/marketplace/roles.yaml l.27-41 (work_tool_sets.full: 14 entradas kg..co-relay); resolvedor criado em a07fa90b (2026-07-08) e lê roles.yaml"
+      method: "leitura: roles.yaml no pai do commit do nó + git log do resolvedor"
 
   - id: E_O_MANIFESTO_QUE_FALHA_COPIAVA_TUDO
     node_type: evidence
@@ -554,6 +562,10 @@ nodes:
     verified_against: 'CINDIDO apos a 5a medicao (passada adversarial do PR #831): a metade dos 3 ponteiros mortos e FALSA (E_ADOCAO_COMPLETA_NASCE_VERDE_MEDIDA_0915 a refuta — o passo (1) copia o settings.json); a metade do docs/onion era VERDADEIRA e foi CURADA neste PR (E_MKDIR_ERA_DEFEITO_REAL_MEDIDO_0915: o procedimento PRE-CURA completo dava 1 HARD).'
     label: 'CINDIDO E FECHADO — metade falsa, metade real e curada. O no afirmava 4 HARD por duas causas, e as duas tiveram desfechos OPOSTOS. (1) FALSA: os tres ponteiros mortos para .claude/settings.json resolvem no passo (1) da Configuracao pos-copia, que COPIA o arquivo (rastreado no core, fora do manifesto — quem instala e o procedimento, nao o transporte). Era artefato de simulacao parcial. (2) VERDADEIRA: o bloco (8)/(8b) redirecionava para docs/onion sem mkdir e o `|| true` engolia o erro. O bullet da Fase 3 tinha o mkdir MAS SO GERAVA O INVENTORY, nunca o graph — entao ATE o operador que lia o documento INTEIRO entregava um adotante com 1 HARD. Curado aqui: extracao para regen-ssot-projections.sh, e a 2a implementacao (o bullet incompleto) REMOVIDA. POR QUE `done` E NAO `refuted`, e isto e o achado de metodo: `refuted` carimba `a afirmacao era falsa`, e o radar trata refuted como MORTO (atencao 0, pulado em toda reconciliacao). Carimbar assim apagaria do backlog legivel por maquina o fato de que o defeito era REAL e foi CURADO. A 1a redacao deste no usou `refuted` e a passada adversarial pegou: quando um no tem metades com desfechos opostos, a disposicao correta e CINDIR, nao escolher a que soa mais limpa.'
     trace: '.claude/utils/adopt/regen-ssot-projections.sh'
+    provenance:
+      source: "commit 58992add (merge do PR #831) + docs/evolution/review/fix-adopt-docs-onion-mkdir.md + .claude/utils/adopt/regen-ssot-projections.sh"
+      locator: "git show -s 58992add (corpo: FALSA = ponteiros resolvem no passo (1); VERDADEIRA = \"procedimento PRÉ-CURA seguido POR INTEIRO dava 1 HARD\", bullet da Fase 3 só gerava o inventory; refuted→done); resíduo l.25-42 e l.70-79; script l.33 (mkdir -p docs/onion)"
+      method: "leitura: mensagem do commit 58992add (PR #831 mergeado 2026-09-15) + resíduo R56 + script curado"
 
   - id: A_SKIP_SILENCIOSO_NA_FAIXA_E_FAIL_OPEN
     node_type: decision
@@ -577,6 +589,10 @@ nodes:
     source_kind: internal-audit
     label: 'A ADOCAO COMPLETA ENTREGA UM ADOTANTE VERDE, e os passos que pareciam dispensaveis sao os que fazem isso: o (1) COPIA o settings.json (rastreado no core, fora do manifesto — quem o instala e o procedimento, nao o transporte) e faz tres ponteiros em backtick resolverem; o (2b) roda o `starter-research-seed.sh`, que SEMEIA `docs/evolution/research/` e faz a rule path-scoped carregar no alvo. ESTE E O DESENHO CERTO PARA REGRA QUE VIAJA: doutrina de framework NAO vira core-only quando o path nao existe no destino — o transporte SEMEIA o path. A tipologia completa do que viaja: doutrina vai COM SEMENTE do path que a ativa; biografia fica FORA do manifesto (allowlist falha fechada); config do alvo entra por NEVER-CLOBBER ou merge; licenca chega com NOME PROPRIO.'
     trace: '.claude/utils/adopt/starter-research-seed.sh'
+    provenance:
+      source: "PR #831 (marciocar/onion-evolve), corpo"
+      locator: "gh pr view 831 --json body, l.5: \"Simulação da adoção completa → lint-artifacts.sh dentro do alvo: rc=0, HARD 0, SOFT 8\"; resíduo fix-adopt-docs-onion-mkdir.md l.29 (medição 4) e l.36-42"
+      method: "medição: lint-artifacts.sh no alvo simulado após o procedimento completo (registrada no PR #831)"
 
   - id: E_MKDIR_ERA_DEFEITO_REAL_MEDIDO_0915
     node_type: evidence
@@ -811,6 +827,10 @@ nodes:
     verified_against: 'extracao por jq sobre 29 transcricoes de ~/.claude/projects/-home-marcio-onion-evolve (841 MB): 19.084 chamadas de ferramenta com nome e alvo; recorte por ocorrencia de `.kg.yaml` em file_path/command/pattern/path'
     trace: '.claude/hooks/kg-read-leg.sh'
     label: 'A MEDICAO QUE DECIDIA ENTRE OS TRES DESENHOS, e ela e mais extrema do que a hipotese. Das 2.457 chamadas que TOCAM um `.kg.yaml`: Bash 2.341 (95,3%) · Edit 83 (3,4%) · Read 17 (0,7%) · Write 16 (0,7%). O hook vigiava `Read` — ZERO-VIRGULA-SETE POR CENTO da superficie que existe para vigiar. Isso REPROVA o desenho (b) (mover para Edit|Write cobriria 4,1%) e escolhe o (a). CUSTO DO (a), tambem medido: `Bash` e 16.338 das 19.084 chamadas da base (86%), entao o hook passa a rodar em quase tudo — por isso a saida muda vem ANTES de qualquer parse, num `case` de shell sobre a string crua. TETO DA MEDICAO, declarado: ela conta CHAMADAS, nao sessoes-que-deviam-ter-lido. Um `bash` que roda o radar conta igual a um que edita o grafo. O numero diz ONDE o hook precisa estar; nao diz quantas vezes ele teria mudado um resultado. E POR ISSO O (c) ENTROU JUNTO, nao no lugar: um aviso perdido entre 16 mil chamadas de shell tem chance real de passar despercebido, e o (c) fala no PR, onde a proposta ja esta escrita e ainda da tempo de voltar.'
+    provenance:
+      source: "docs/evolution/review/fix-read-leg-reaches-bash.md"
+      locator: "l.23-28 (tabela Bash 2.341/95,3% · Edit 83 · Read 17 · Write 16) + l.31-32 (29 transcrições, 841 MB, 19.084 chamadas, jq) + l.59 (Bash 16.338/86%) + l.138 (\"Os números reproduzem ... exatos\")"
+      method: "leitura: resíduo R56 que registra a extração jq e a reprodução pelo refutador"
 
   - id: E_FAILSAFE_AFROUXADO_REPROVOU_POR_MEDICAO
     node_type: evidence

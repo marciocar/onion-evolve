@@ -37,6 +37,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: issue-34556-anthropics-claude-code-78-comentarios-lida-via-api
     label: "A comunidade convergiu, SEM coordenação, para a MESMA arquitetura de memória do Onion: issue #34556 do repo oficial (78 comentários) documenta '59 compactações em 26 dias' e propõe memória em 3 camadas — L1 sempre carregado, L2 por tópico, L3 vault — pedindo suporte NATIVO. É exatamente o `MEMORY.md` + arquivos por tópico que o Onion já opera. Leitura: a forma está validada externamente; o diferencial do Onion NÃO é ter memória em camadas (isso virou convenção), é o que ele faz com ela. FONTE: github.com/anthropics/claude-code/issues/34556"
+    provenance:
+      source: "https://github.com/anthropics/claude-code/issues/34556"
+      locator: "issue #34556, corpo §'3-Tier Memory Architecture' (L1 MEMORY.md, L2 topic files, L3 vault)"
+      method: "leitura: issue #34556 via gh api (2026-10-09)"
 
   - id: E_DOR_DOMINANTE_E_CONTEXTO_E_CUSTO
     node_type: evidence
@@ -57,6 +61,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: varredura-por-trajetoria-github-created-maior-2026-05-01-sort-stars
     label: "A hipótese 'a plataforma engoliu os frameworks' NÃO se confirma na medição — o padrão observado é FRAGMENTAÇÃO ATIVA. Busca por trajetória (created:>2026-05-01, sort:stars) devolve uma safra inteira apostando que orquestração/memória/convenção-de-diretório é camada que vale construir FORA da Anthropic: ponytail (~104k★ em ~2 meses), loop-engineering (10,4k★), omnigent (8,9k★, 'meta-harness' que troca de harness sem reescrever), gsd-core (8,3k★). Também emerge uma convenção `.agents/` cross-ferramenta (commands/skills/hooks/subagents/workflows/rules) — 'um Onion sem o nome', porém AGNÓSTICO. Ninguém achou dizendo que framework-sobre-CC é bobagem; a crítica achada é a genérica de 'abstraction debt' (wrappers truncando contexto e minando o raciocínio)."
+    provenance:
+      source: "sessão do core 2026-08-16 (frente de pesquisa externa do run claude-code-2.1) — corpo do commit 6850818d (\"duas frentes de pesquisa externa\")"
+      locator: "filtros registrados no verified_against (created:>2026-05-01, sort:stars); repos sem owner nem termos de busca"
+      method: "testemunho: medição da sessão 2026-08-16, comando não registrado"
 
   - id: E_CONCORRENTE_DE_POSICAO_COMPANY_BRAIN
     node_type: evidence
@@ -67,6 +75,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: hn-thread-03-jun-2026-79-pontos-78-comentarios
     label: "Existe concorrência DE POSICIONAMENTO, não só de feature, no norte NS1 do Onion: Hyper (YC P26) se apresenta literalmente como 'company brain for agentic development' (heyhyper.ai). O Onion decidiu NS1 = conhecimento/KG com ICP 'empresa nos próprios projetos + Company Brain'. Quando um YC ocupa o MESMO vocabulário, a diferenciação precisa ser demonstrável, não declarada. Este nó existe para que a superação seja formulada CONTRA um concorrente real, não no vácuo."
+    provenance:
+      source: "https://news.ycombinator.com/item?id=48387095"
+      locator: "título da Launch HN (2026-06-03, 79 pontos, 78 comentários): \"Launch HN: Hyper (YC P26) – Company brain to power agentic development\""
+      method: "leitura: thread HN via API Algolia (2026-10-09)"
 
   - id: E_FRAGILIDADE_HERDADA_DA_PLATAFORMA
     node_type: evidence
@@ -77,6 +89,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: issues-87145-87146-54394-abertas-e-vivas-em-2026-08-16
     label: "Acoplar herda fragilidade sem controle, e isso é MEDIDO, não temido: #87145 (OAuth token não repassado a subprocessos de hook no Windows — plugin de segurança fica cego), #87146 (ScheduleWakeup nunca dispara em sessão filha de Remote Control), #54394 (heap V8 estoura 8GB+ em WSL2 por backtracking de regex no ugrep embutido; aberta desde abril). O Onion depende de hooks em TODA guarda determinística. Consequência de desenho: guarda que só existe como hook é guarda que a plataforma pode apagar — a redundância (lint no CI + hook local) deixa de ser zelo e vira requisito."
+    provenance:
+      source: "https://github.com/anthropics/claude-code/issues/87145 · /87146 · /54394"
+      locator: "issues #87145, #87146, #54394"
+      method: "leitura: issues via gh api (2026-10-09)"
 
   - id: Q_ONDE_MORA_A_SUPERACAO
     node_type: question
@@ -107,6 +123,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: dogfood-headless-sessao-nova-2.1.233-opus-5-respondeu-TASK_TOOLS_AUSENTES
     label: "BREAKING medido, não lido: a 2.1.233 desliga Task/todo tools por padrão em Opus 4.8+ (`CLAUDE_CODE_ENABLE_TODO_TOOLS=1` religa). Verificado por DOGFOOD — sessão headless nova, versão nova, `--model claude-opus-5`, instruída a chamar TaskList: respondeu `TASK_TOOLS_AUSENTES`. Duas leituras que só a medição separa: (a) o FRAMEWORK Onion NÃO depende disso — grep em .claude/{commands,agents,skills} devolve ZERO instruções de TaskCreate/TaskUpdate/TaskList; a dependência era do fluxo do orquestrador, não dos artefatos; (b) a desativação é DELIBERADA da Anthropic nos modelos novos, provavelmente porque Opus 4.8+/5 planejam nativamente sem o andaime — logo religar por reflexo pode PIORAR, e a decisão de religar é do maestro, não minha. O risco real que fica: o maestro trocou o default para Opus 5 hoje; sessões novas perdem o rastreio de tarefas sem avisar."
+    provenance:
+      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md)"
+      locator: "## 2.1.233: 'Todo/task-tracking tools… are no longer available on Opus 4.8, Sonnet 5, Fable 5, Mythos 5, and newer models; set CLAUDE_CODE_ENABLE_TODO_TOOLS=1' (cópia local l.3195)"
+      method: "leitura: CHANGELOG 2.1.233 (o dogfood headless TASK_TOOLS_AUSENTES fica como testemunho sem comando registrado)"
 
   - id: E_CONTRATO_DE_HOOKS_EXPLODIU
     node_type: evidence
@@ -117,6 +137,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: docs-primarias-MAIS-verificacao-no-binario-2.1.233-instalado-com-controle
     label: "A superfície de hooks — onde vive TODA a maquinaria determinística do Onion — multiplicou. Eventos hoje: PreToolUse, PermissionRequest, PermissionDenied, PostToolUse, PostToolUseFailure, PostToolBatch, UserPromptSubmit, UserPromptExpansion, Stop, StopFailure, SessionStart, SessionEnd, Setup, PreCompact, PostCompact, SubagentStart, SubagentStop, TaskCreated, TaskCompleted, TeammateIdle, WorktreeCreate, WorktreeRemove, Notification, ConfigChange, InstructionsLoaded, CwdChanged, DirectoryAdded, FileChanged, MessageDisplay, Elicitation, ElicitationResult (~30, contra os ~8 clássicos). E os HANDLERS deixaram de ser só `command`: agora há `http`, `mcp_tool`, `prompt` e `agent` — ou seja, uma guarda pode ser um PROMPT ou um SUBAGENTE, não só um script. Timeouts e exit codes documentados (2 bloqueia; e desde 2.1.214 exit 2 com JSON inválido BLOQUEIA corretamente — antes não bloqueava, o que valida a guarda anti-fail-open do Onion). É a maior oportunidade técnica do levantamento para quem, como o Onion, faz da guarda o produto. CONFIRMADO LOCALMENTE, não só em doc: grep no ELF instalado (2.1.233) acha PermissionDenied(46), TeammateIdle(23), InstructionsLoaded(20), FileChanged(31), DirectoryAdded(28), PostToolUseFailure(30), hookSpecificOutput(35) — com CONTROLE (PreToolUse 93, SessionStart 79) provando que o método enxerga. Ou seja: está disponível NESTA máquina, hoje, não é roadmap."
+    provenance:
+      source: "docs/evolution/review/docs-claude-code-2-1-audit.md + CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md)"
+      locator: "resíduo PR #616 §'Verificação cruzada' (revisor re-mediu os eventos no binário 2.1.233) · CHANGELOG ## 2.1.214 'Fixed hooks with exit code 2 not blocking… when stdout JSON fails schema validation'"
+      method: "juízes: re-medição independente do revisor adversarial registrada no resíduo R56 do PR #616"
 
   - id: E_PLATAFORMA_ABSORVEU_DISTRIBUICAO_E_ISOLAMENTO
     node_type: evidence
@@ -127,6 +151,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: changelog-2.1.219-a-2.1.233-fonte-primaria
     label: "A plataforma passou a fazer sozinha coisas que um framework faria: plugin source `archive` (zip por HTTPS com pin SHA-256 — distribuição sem git/npm), `claude self-hosted-runner` (rodar sessões na própria infra), marketplaces com allowlist/blocklist e wildcard, sandbox com CREDENTIAL MASKING ciente de JWT e re-assinatura AWS SigV4, isolamento de worktree corrigido (sessões isoladas conseguiam rodar git destrutivo no checkout principal — fix de segurança), `--max-budget-usd` cortando subagente de background, nesting de subagentes 1→3 e cap de concorrência 20. Consequência para o Onion: a régua da postura de acoplamento (2026-05-18: 'acople só quando a capacidade não existe fora') tem itens novos para reavaliar — parte do que o Onion carrega em `adopt/vendor` pode virar `archive` com pin, e parte do que ele guarda com disciplina pode virar sandbox nativo."
+    provenance:
+      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md)"
+      locator: "## 2.1.224 (archive com SHA-256, self-hosted-runner, credential masking jwt/sigv4) · ## 2.1.222 (worktree isolation destructive git) · ## 2.1.219 (nesting depth 3) · ## 2.1.217 (cap 20 concorrentes, --max-budget-usd em background)"
+      method: "leitura: CHANGELOG 2.1.217–2.1.224"
 
   - id: E_ASSIMETRIA_DE_PERMISSAO_DIR
     node_type: evidence
@@ -137,6 +165,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: changelog-2.1.211-e-2.1.214-mais-varredura-do-settings-do-core
     label: "Semântica de padrão mudou por baixo de configuração existente: `dir/**` de segmento único em REGRA DE PERMISSÃO e em `if:` de HOOK deixou de auto-aprovar em qualquer profundidade e passou a valer só `<cwd>/dir` (2.1.211/2.1.214) — mas as regras `deny`/`ask` MANTIVERAM o casamento em qualquer profundidade. Assimetria viva: o mesmo padrão significa coisas diferentes conforme o lado. Varredura no core: o `settings.local.json` usa caminhos ABSOLUTOS multi-segmento (`Read(//home/marcio/**)`), que não caem na mudança — o core passou ileso POR ACIDENTE de estilo, não por desenho. Registrado porque adotante com `Edit(src/**)` relativo teve o efeito da regra alterado sem tocar em nada."
+    provenance:
+      source: "CHANGELOG oficial do Claude Code (github.com/anthropics/claude-code/blob/main/CHANGELOG.md; copia local /home/marcio/.claude/cache/changelog.md)"
+      locator: "## 2.1.214: 'Fixed single-segment dir/** allow rules like Edit(src/**)… only <cwd>/dir' e 'Changed single-segment dir/** hook if: conditions… deny/ask permission rules keep their any-depth match' (cópia local l.3604 e l.3647)"
+      method: "leitura: CHANGELOG 2.1.214"
 
   - id: E_ELENXO_DERRUBOU_METADE_DA_TESE
     node_type: evidence
@@ -147,6 +179,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: passada-adversarial-com-47-scripts-e-63-grafos-medidos-no-repo
     label: "O Elenxo mediu, não opinou: 63 grafos · 2.278 nós · 964 (42%) com verified_at · 60 guardas no lint (3.323 linhas) · 59 REGRAs, TODAS com modo-de-falha declarado · 204 emissões HARD · bancada com 689 asserções e 29 fixtures · 63/63 artefatos de revisão com sha256 · 22.710 linhas de shell determinístico. DERRUBOU duas cláusulas: (1) 'KG como SSOT de RUNTIME' — o próprio lint-artifacts.sh:832 diz que o radar 'valida o grafo contra SI MESMO, nunca contra o veredito que o run produziu', NENHUM dos 7 hooks lê .kg.yaml, e quem lê são 10 .md de comando (instrução ao modelo = a categoria que a casa chama de CONSELHO); (2) 'o único' — Cruxible (grafo tipado em runtime, recibo com content-hash + assinatura, ZERO LLM na verificação) e AsDecided (290★, `decided gate` que bloqueia PR violando decisão registrada) atacam a mesma tese, e o primeiro tem MAIS rigor numa fatia. CONFIRMOU o eixo do custo, invertendo meu próprio nó: o sempre-ligado é ~9k tokens (CLAUDE.md+MEMORY.md) e as 22.710 linhas rodam FORA da janela, em CI, a custo zero de token — a pressão de contexto do Onion vem da PROSA doutrinária, não da maquinaria."
+    provenance:
+      source: "docs/evolution/review/docs-claude-code-2-1-audit.md"
+      locator: "frontmatter (REVISOR_ADVERSARIAL elenxo-superacao, 47 scripts e 63 grafos) + achados 1, 2 e 5; .claude/validation/lint-artifacts.sh@6850818d:831"
+      method: "juízes: passada adversarial Elenxo registrada no resíduo R56 do PR #616"
 
   - id: E_A_CASA_JA_TINHA_REFUTADO_A_PERNA_DA_LEITURA
     node_type: evidence
@@ -157,6 +193,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: docs-evolution-research-kg-read-leg-2026-08-SYNTHESIS-lido-integralmente
     label: "A refutação mais dura não veio de fora: a própria casa mediu e publicou (2026-08-02, PR #510, Elenxo de 14 workers) que dos 9 casos documentados de falha da perna de LEITURA do KG, 7 falharam por NÃO-CONSULTA e ZERO por 'consultei e não achei' — e que as três curas candidatas cobriam 1/9, 1/9 e 0/9, com veredito NÃO CONSTRUIR. A frase que fecha: 'o que de fato disparou a consulta na realidade foi um humano perguntando — gate social, não instrumento'. Em três casos o agente ignorou 3× em minutos um grafo que ELE MESMO acabara de autorar. Consequência imediata nesta sessão: eu estava prestes a construir um relógio (review_after nos grafos) como cura da leitura — seria a QUARTA cura da mesma classe, cobrindo o defeito errado (o medido é não-consulta, não obsolescência). O registro me parou. É a porosidade funcionando: a fonte guardou a evidência que impede a fonte de repetir o erro."
+    provenance:
+      source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md (PR #510, commit 3e6a962d)"
+      locator: "frontmatter l.6-7 (Elenxo 14 workers, run wf_38afb1f2-ee7) · §Veredito l.17-32 (1/9·1/9·0/9, gate social) · l.40-42 (C4–C6 falhou 3×) · l.48-49 (0 de 9 consultou e não achou; sete não consultou)"
+      method: "leitura: SYNTHESIS do Elenxo de 2026-08-02"
 
   - id: E_ACOPLAMENTO_DECLARADO_E_NAO_EXERCIDO
     node_type: evidence
@@ -167,6 +207,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: grep-SendMessage-em-claude-devolve-zero-na-maquinaria-viva
     label: "Refutação PARCIAL da própria doutrina de acoplamento, medida: o CLAUDE.md nomeia `SendMessage` entre agentes como A capacidade de fronteira que justificou 'parar de gastar energia em agnosticismo' (decisão de 2026-05-18) — e `grep -rn SendMessage .claude --include=*.md --include=*.sh --include=*.json` devolve ZERO na maquinaria viva. O termo só aparece em docs/analysis, KG e KB: é ARGUMENTO, não uso. É a pior categoria de acoplamento — paga-se o preço doutrinário (perder o agnosticismo) sem receber a capacidade. Segundo item por conveniência: marketplace e empacotamento próprios (7 verticais, assemble-plugin.sh, generate-marketplace.sh) enquanto o nativo já entrega marketplace GitHub+GitLab, fonte `archive` com pin SHA-256 e `plugin validate --strict`. O que cumpre a postura à risca são as 22.710 linhas de shell, que rodam em QUALQUER CI sem Claude Code."
+    provenance:
+      source: ".claude/ no commit 6850818d (2026-08-16)"
+      locator: "grep -rn SendMessage .claude --include=*.md --include=*.sh --include=*.json"
+      method: "medição: grep -rn SendMessage .claude (comando registrado no label)"
 
   - id: D_SUPERACAO_REESCRITA_REINCIDENCIA
     node_type: decision
@@ -181,7 +225,7 @@ nodes:
 
   - id: Q_RISCO_ACERVO_VIRA_CEMITERIO
     node_type: question
-    plane: PROD
+    plane: DEV
     status: open
     impact: 4
     confidence: 0.8
@@ -191,7 +235,7 @@ nodes:
 
   - id: Q_RISCO_PLATAFORMA_COME_O_GATE
     node_type: question
-    plane: PROD
+    plane: DEV
     status: open
     impact: 4
     confidence: 0.75
@@ -201,7 +245,7 @@ nodes:
 
   - id: Q_RISCO_CONCORRENTE_MAIS_RIGOROSO
     node_type: question
-    plane: PROD
+    plane: DEV
     status: open
     impact: 3
     confidence: 0.7
@@ -218,6 +262,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: executada-2-de-5-itens-os-outros-3-REFUTADOS-ao-medir-antes-de-apagar
     label: "O que o Onion deve PARAR (proposto pelo Elenxo, decisão do maestro): (1) MARKETPLACE E EMPACOTAMENTO próprios — o nativo já faz GitHub+GitLab, `archive` com pin SHA-256, `plugin validate --strict` e `plugin init`; manter os MANIFESTOS (a semântica das verticais é do Onion), descartar a MECÂNICA de empacotar. (2) CURAR MEMORY.md como camada do framework — o auto-memory nativo já faz MEMORY.md + tópicos, sobrevive a compaction, é por-projeto; manter só a DOUTRINA do que merece entrar. (3) SCAFFOLDING genérico de configuração — o `/init` multifase nativo já explora o codebase com subagente; ao Onion sobra o que ele não sabe (3 dimensões peer, workflows faseados retomáveis). (4) O MAIS DURO, e não é sobre a plataforma: PARAR DE ANUNCIAR 'KG como SSOT de runtime' enquanto a leitura for gate social — a KB de identidade já registra que `KG-first` e `drive-to-verify` foram anunciados a 3 adotantes antes de terem casa no core; repetir agora numa ADR seria a TERCEIRA da mesma classe. (5) NOVO, do adendo: PARAR DE JUSTIFICAR O ACOPLAMENTO POR `SendMessage` — a capacidade citada no CLAUDE.md como razão de abandonar o agnosticismo tem ZERO uso na maquinaria; ou se usa, ou a justificativa migra para o que de fato compra acoplamento: o `exit 2` de hook que vale sob bypassPermissions, real, medido e insubstituível."
+    provenance:
+      source: "docs/analysis/onion-adr-superacao-reincidencia-2026-08.md"
+      locator: "cabeçalho (Status: ACEITA, ratificada pelo maestro 2026-08-16) + §Consequências linhas 72-81"
+      method: "leitura: ADR ratificada"
 
   - id: E_INVERSAO_O_QUE_REPROVA_E_AGNOSTICO
     node_type: evidence
@@ -228,6 +276,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: massa-medida-26596-linhas-de-shell-vs-52655-de-markdown-acoplado
     label: "A INVERSÃO que ninguém tinha olhado, medida em linhas: shell AGNÓSTICO (validation + hooks + utils, roda em qualquer CI sem Claude Code) = 26.596 linhas; markdown ACOPLADO ao contrato do Claude Code (commands + agents + skills) = 52.655. Cruzando com `SendMessage` = ZERO na maquinaria viva, a leitura vira: **100% do que REPROVA no Onion é agnóstico; 100% do que ACONSELHA é acoplado** — e a própria Anthropic documenta que a metade que aconselha 'é contexto, não configuração forçada'. Ou seja: o Onion declarou acoplamento em 2026-05-18 por uma capacidade que nunca exercitou, e construiu o fosso inteiro na metade que não precisa de acoplamento nenhum. É `declarado ≠ verificado` na direção CONTRÁRIA — dependência anunciada que não existe. NÃO é motivo para voltar ao agnosticismo (parar de gastar energia nele segue certo); é motivo para parar de anunciar dependência inexistente. O único acoplamento que COMPRA o que se pagou: o `exit 2` determinístico de hook, que vale inclusive sob bypassPermissions e não existe fora do Claude Code."
+    provenance:
+      source: "sessão do core 2026-08-16 (adendo do Elenxo) — corpo do commit 6850818d + resíduo docs/evolution/review/docs-claude-code-2-1-audit.md achado 3 (l.31-34)"
+      locator: "26.596 shell (validation+hooks+utils) × 52.655 markdown (commands+agents+skills) declarados no corpo de 6850818d e no resíduo PR #616 l.31"
+      method: "testemunho: medição da sessão 2026-08-16, comando não registrado"
 
   - id: Q_GATE_REABRE_POR_DOGFOOD_NAO_POR_CHANGELOG
     node_type: question
@@ -238,6 +290,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: gatilho-de-reabertura-declarado-no-synthesis-da-perna-de-leitura
     label: "A ARMADILHA desta rodada, nomeada antes de cair nela: a superfície nova de hooks (18 eventos, handlers `prompt`/`agent`/`http`/`mcp_tool` — verificados no binário por DOIS medidores independentes) torna CONSTRUÍVEL exatamente a cura da perna de leitura que a casa REFUTOU por medição há 14 dias (1/9, NÃO CONSTRUIR). Três janelas novas são de natureza diferente do que foi testado: `InstructionsLoaded` (dispara quando a doutrina entra, antes de a tarefa existir e competir por atenção), `PermissionDenied`/`PostToolUseFailure` (disparam NO DANO, não no relógio — e a doutrina da casa diz que o gatilho eficaz é o dano), `FileChanged` (dispara quando um .kg.yaml muda, que é quando ele deixa de valer). MAS: construir agora PORQUE FICOU FÁCIL é acoplar por CONVENIÊNCIA — a refutação da postura de 2026-05-18, cometida na mesma semana em que se escreveria a ADR que a reafirma. O SYNTHESIS declarou o gatilho de reabertura e ele NÃO é changelog: 'o mesmo padrão fiado à mão, fresco e descartável, 2–3× em sessão real, REGISTRANDO SE O VEREDITO INJETADO MUDOU A RESPOSTA'. GATILHO: esse dogfood. RODADO em 2026-08-16 a pedido do maestro — resultado 3/3 NÃO MUDOU ([[E_DOGFOOD_DA_PERNA_DE_LEITURA_3_DE_3_NAO_MUDOU]]): o gate NÃO reabre, e o NÃO CONSTRUIR sai mais forte por ter resistido à facilidade E a um teste de boa-fé. Fica aberto o desenho SEGUINTE, que ataca o modo de falha certo: sessão executando TAREFA cujo caminho óbvio contradiz um nó, medindo se a injeção muda a AÇÃO (não a resposta a uma pergunta dirigida)."
+    provenance:
+      source: "docs/evolution/research/kg-read-leg-2026-08/SYNTHESIS.md"
+      locator: "linha 122 (gatilho de reabertura: 'fiado à mão, fresco e descartável, 2–3× em sessão real, registrando se o veredito injetado mudou a resposta')"
+      method: "leitura: gatilho declarado no SYNTHESIS de 2026-08-02 + docs/analysis/onion-adr-superacao-reincidencia-2026-08.md:70"
 
   - id: E_A_LISTA_DO_QUE_PARAR_ENCOLHEU_AO_SER_MEDIDA
     node_type: evidence
@@ -248,6 +304,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: medicao-de-proposito-de-cada-script-antes-de-remover-qualquer-coisa
     label: "Executar a lista do 'que parar' produziu a refutação de 3 dos seus 5 itens — e o método que os derrubou foi o mesmo que a tese defende: MEDIR ANTES DE APAGAR. (1) MARKETPLACE/EMPACOTAMENTO — REFUTADO: o nativo tem `plugin init` (scaffold de plugin NOVO), `validate` (schema de manifesto), `tag` (confere plugin.json × entrada no marketplace) e `marketplace add/update` (distribuição) — NENHUM faz PROJEÇÃO. O `assemble-plugin.sh` projeta a SSOT `.claude/` no layout de plugin dirigido por manifesto, e o `generate-marketplace.sh` agrega o REGISTRO — e nasceu de defeito de campo MEDIDO (adotante 2026-07-13: o repo dele falhava o próprio lint por ausência de marketplace.json e não havia gerador; escrevia à mão). Pior para a recomendação: delegar a validação ao `claude plugin validate` ACOPLARIA a metade que hoje REPROVA — que a medição desta mesma rodada identificou como o fosso agnóstico. (2) CURAR MEMORY.md — REFUTADO: o framework não cura; `catch-up` LÊ para orientação e o `evolve` D10 VARRE testando a validade de cada entrada com veredito UNVERIFIABLE explícito quando não pode medir. O auto-memory nativo MANTÉM o arquivo; o Onion testa se o CONTEÚDO ainda é verdade — atos diferentes, e o segundo é a camada de aprendizagem autorregulada. (3) SCAFFOLDING GENÉRICO — REFUTADO: os `setup-*` são específicos (integração de task manager, code review no CI), não o `/init` genérico. SOBREVIVERAM e foram EXECUTADOS os dois itens de VERDADE: parar de anunciar 'KG como SSOT de runtime' (corrigido na KB canônica) e parar de justificar o acoplamento por `SendMessage` (corrigido no CLAUDE.md, trocado pelo `exit 2` de hook, que é o que a medição prova comprado). LIÇÃO DE CLASSE: recomendação derivada de CAPACIDADE-do-outro é hipótese; só medir o PROPÓSITO do próprio código a converte em decisão."
+    provenance:
+      source: "docs/analysis/onion-adr-superacao-reincidencia-2026-08.md"
+      locator: "§Consequências linhas 72-81"
+      method: "leitura: ADR ratificada 2026-08-16 (commit db2f21bf)"
 
   - id: E_DOGFOOD_DA_PERNA_DE_LEITURA_3_DE_3_NAO_MUDOU
     node_type: evidence
@@ -258,6 +318,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: ab-cego-3-casos-sessao-headless-opus-5-com-e-sem-hook-fiado-a-mao
     label: "O dogfood do gatilho RODOU (pedido do maestro 2026-08-16) e o resultado é NEGATIVO para construir: **3 de 3 — o veredito injetado NÃO mudou a resposta**. Desenho: hook DESCARTÁVEL em SessionStart injetando o veredito do radar (com ids de nó) via additionalContext, e A/B cego — a MESMA pergunta em sessão headless nova (Opus 5), com e sem o hook, comparando as respostas. Casos: (1) 'devemos construir a cura agora que os hooks novos permitem?' → NÃO nos dois; (2) 'devemos descartar o empacotamento próprio pelo nativo?' → NÃO nos dois; (3) 'qual o critério numérico de acervo-cemitério?' (fato que só existe no grafo) → os dois acertaram, e o CONTROLE citou o nó `Q_RISCO_ACERVO_VIRA_CEMITERIO` com arquivo:linha. Em 3 de 3 a sessão SEM hook foi ao grafo por conta própria. Efeito do hook: mudou a FORMA (mais ids citados, mais conciso), não a DECISÃO. LIMITE DE DESENHO DECLARADO, e é o que impede transformar isto em veredito universal: eu testei 'acha quando PERGUNTADO de forma dirigida', e o modo de falha medido no corpus de 08-02 é outro — 'consulta enquanto está OCUPADO com outra tarefa', onde o grafo compete por atenção com o trabalho em curso. Para atacar aquele modo, o desenho certo é uma sessão executando TAREFA cujo caminho óbvio contradiz um nó, medindo se a injeção muda a AÇÃO — não a resposta a uma pergunta. Consequência imediata: o `NÃO CONSTRUIR` de 2026-08-02 SOBREVIVE e sai mais forte, por ter resistido à facilidade E a um teste feito de boa-fé para derrubá-lo."
+    provenance:
+      source: "sessão do core 2026-08-16 (agente a pedido do maestro) — .claude/diary/2026-08-16-dogfood-que-refutou-a-propria-cura.md + corpo do commit caedc046"
+      locator: "diário l.13 (significance) e l.25-37 (desenho A/B cego + tabela 3/3); corpo de caedc046 (2026-08-16 19:12)"
+      method: "testemunho: medição da sessão 2026-08-16, comando não registrado"
 
   - id: E_O_CORPUS_NAO_TRANSFERE_E_METADE_DA_CULPA_E_NOSSA
     node_type: evidence
@@ -268,6 +332,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: 11-repos-de-adotante-medidos-no-disco-com-ausencia-distinguida-de-vazio
     label: "A medição que o Elenxo declarou como a mais importante (se o corpus não transfere, o fosso é biografia deste repo e não produto) FOI FEITA — 11 dos 12 membros da federação medidos no disco. Resultado em três camadas. (1) A MAQUINARIA TRANSFERE: 9 de 11 têm `.claude/validation/` com 13–40 scripts; `kg-radar.sh`, `diary-index.sh` e o comando `/meta:diary` estão em TODOS os adotantes verificados. (2) A PRÁTICA QUASE NÃO TRANSFERE: grafo autoral em 3 de 7 (gustavo-pulga 2, arandek 3, onion-dist 1); diário em 1 de 7 (gustavo-pulga, 9 entradas); e — o número que decide — CI rodando a maquinaria em 1 de 7 (só o onion-standalone; 5 nunca tiveram `.github/workflows`, e o metagamify tem workflow que não cita o Onion). Guarda que existe como arquivo e não roda em CI é guarda inalcançável: a mesma classe que o core já registrou em 2026-08-02. (3) A INVERSÃO QUE A MEDIÇÃO REVELOU, e que salva os adotantes da acusação: `docs/evolution/review/` está AUSENTE nos 11, mas `review-artifact-check.sh` NUNCA FOI VENDORIZADO para nenhum deles — o zero de resíduos R56 não é prática que não pegou, é CAPACIDADE QUE NUNCA ENVIAMOS. A medição sugerida pelo revisor ('contar .kg.yaml e docs/evolution/review/ nos adotantes') teria produzido exatamente a conclusão errada, culpando o adotante por uma ausência do core. VEREDITO HONESTO: o corpus NÃO transfere hoje — mas a causa se reparte entre não-uso (grafo/diário, enviados e pouco usados) e não-envio (R56, jamais embarcado), e só a segunda é acionável por nós agora."
+    provenance:
+      source: "sessão 2026-08-16 (agente do core) — commit 614e35b6 + leitura dos repos de adotante no host /home/marcio/<repo>"
+      locator: "11 de 12 membros medidos no disco: validation/ em 9/11, grafo autoral 3/7, diário 1/7, CI 1/7, review-artifact-check.sh nunca vendorizado"
+      method: "testemunho: leitura dos repos de adotante no host (medição da sessão 2026-08-16, comando não registrado)"
 
   - id: Q_O_QUE_FAZER_COM_A_NAO_TRANSFERENCIA
     node_type: question
@@ -288,6 +356,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: diario-autoral-do-outlier-mais-creditos-nomeados-em-artefatos-do-core
     label: "A investigação do 'não-uso' (escolhida pelo maestro sobre embarcar mais maquinaria) DISSOLVEU a própria premissa. O outlier gustavo-pulga tem 9 entradas de diário AUTORAIS (nenhuma existe no core — verificado arquivo a arquivo), com `instance: gustavo-pulga`, `share_with: [core]` e `review_after` — protocolo completo. E uma delas propõe literalmente 'avaliar uma skill de retro/feedback como produto do core' — skill que o core TEM hoje (`onion-retro`). Medindo o fluxo INVERSO: artefatos do core creditam nominalmente sinais de campo de metagamify (guard de base cruzada, CHANGELOG 07-27), granaai (07-17), gustavo-pulga, arandek (GAP2/GAP3 no lint) e onion-pessoal. CONCLUSÃO QUE INVERTE A PERGUNTA: o corpus não deixa de transferir por desuso — ele CENTRALIZA POR DESENHO. O adotante usa a maquinaria, gera SINAL, o sinal sobe pela co-evolução, o core o converte em guarda/regra/KB, e a guarda volta para TODOS por update. O corpus local fica fino porque o valor foi absorvido acima. Isso não é falha: é a federação funcionando — e muda a promessa correta de 'você acumula o aprendizado' para 'você herda guardas nascidas do dano dos outros, e o seu dano vira guarda para eles'."
+    provenance:
+      source: "gustavo-pulga@21ff04f:.claude/diary/"
+      locator: "9 entradas 2026-07-14..16; 2026-07-16-retro-como-instrumento-spec-as-code.md:10 next_recommended 'Avaliar uma skill de retro/feedback… como produto do core'"
+      method: "leitura: diário autoral do adotante no repo clonado /home/marcio/gustavo-pulga"
 
   - id: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6
     node_type: evidence
@@ -298,6 +370,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: core-hooksPath-e-githooks-medidos-repo-a-repo-apos-eu-medir-o-lugar-errado
     label: "O DEFEITO ACIONÁVEL que a investigação encontrou, e ele é NOSSO: o gate determinístico do adotante está INERTE em 4 de 6 medidos — e em nenhum caso isso é visível sem medir. granaai e gustavo-pulga: `core.hooksPath=.githooks` + hook presente = VIVO. metagamify: hook PRESENTE mas `core.hooksPath=.husky` — o husky ganha e o hook do Onion nunca roda (guarda INALCANÇÁVEL: 'a ausência se vê no code review, a inalcançabilidade dá impressão de cobertura', registrado no core em 2026-08-02). onion-pedro e onion-arthur: `core.hooksPath=.githooks` CONFIGURADO apontando para diretório SEM hook — gate declarado e inexistente. onion-dist: nada. Some-se CI rodando a maquinaria em 1 de 7. Os 13–40 scripts vendorizados são INVENTÁRIO, não capacidade, na maioria. ⚠️ NOTA DE MÉTODO: minha primeira medição olhou `.git/hooks` e teria reportado '6 de 6 ausentes' — errado, porque o adopt usa `core.hooksPath`. Medir o lugar errado é não ter medido; só não virou número publicado porque desconfiei da uniformidade."
+    provenance:
+      source: "sessão do core 2026-08-16 (agente a pedido do maestro) — corpo do commit 49f12f42 §2 + nota de método; corroboração parcial em docs/evolution/federation/CHANGELOG.md l.255-257"
+      locator: "corpo de 49f12f42 (2026-08-16 20:52) §2 e NOTA DE MÉTODO; federation/CHANGELOG.md l.257 (metagamify: gate INERTE sob husky, 2026-08-31)"
+      method: "testemunho: medição da sessão 2026-08-16 (core.hooksPath/.githooks repo a repo), comando não registrado"
 
   - id: D_CURAR_O_GATE_INERTE_DO_ADOTANTE
     node_type: decision
@@ -318,6 +394,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: medicao-8-prs-do-dia-6-tocaram-zero-maquinaria-mais-686s-de-729s
     label: "SUPERAÇÃO da questão 'CI longo' — a pergunta era errada. Eu tinha proposto shardar a bancada em matriz (mesmo trabalho, em paralelo, mais minutos de runner). A medição reformulou: a bancada era **686s de 729s = 94% do CI** e rodava em TODO PR, mas dos 8 PRs daquele dia **6 tocaram ZERO arquivo de maquinaria** — esperaram 12 min por uma suíte que não podia lhes dizer nada, porque ela prova as GUARDAS e as guardas não estavam no diff. A distinção que dissolve o problema: `onion-validate` é GATE SOBRE A MUDANÇA (lê o diff, reprova o artefato, ~44s); a bancada é TESTE DE REGRESSÃO DA MAQUINARIA. Gatilhos diferentes, workflows diferentes. Resultado: PR de docs cai de ~12 min para ~1 min, e o custo em minutos de runner DIMINUI (em vez de aumentar, como no sharding). ⚠️ E o filtro de path NÃO repete os três pontos cegos históricos (#241 plugins, #254 docs, #509 ops): o defeito comum daqueles não foi filtrar, foi filtrar e não ter mais nada — path fora da lista nunca era coberto. Aqui há REDE DEBAIXO: `schedule` noturno roda a bancada inteira na main, independente de path, então a cobertura deixa de depender de alguém tocar o arquivo certo."
+    provenance:
+      source: ".github/workflows/onion-selftest.yml@61a950ee"
+      locator: "linhas 3-34 (cabeçalho + on: pull_request.paths + schedule cron '17 4 * * *')"
+      method: "leitura: workflow criado no commit 61a950ee (2026-08-17)"
 
   - id: E_MEDICAO_DOS_REMOTOS_PERDEU_VALOR_DE_DECISAO
     node_type: evidence
@@ -328,6 +408,10 @@ nodes:
     verified_at: 2026-08-16
     verified_against: origem-de-cada-conclusao-rastreada-mais-o-update-verificado-no-adopt
     label: "SUPERAÇÃO da segunda questão pendente ('medir os remotos dos adotantes'): ela perdeu valor de decisão, e a checagem mostra por quê. Rastreando a ORIGEM de cada conclusão: 'o corpus centraliza' veio dos CRÉDITOS medidos DENTRO DO CORE (13 no CHANGELOG de co-evolução, 7 no lint) — independe do disco de ninguém; já 'gate inerte em 4 de 6' veio do disco local, e essa é justamente a parte que a cura mecânica resolve sem eu auditar mais nada. Ou seja: medir os remotos hoje seria vigiar repo alheio para confirmar um defeito que já tem cura automática, com dado que envelhece no instante em que a medição termina. A SUPERAÇÃO é inverter o fluxo — em vez de EU auditar, o veredito do gate CHEGA pelo canal que já funciona (co-evolução upstream), porque o `--update` re-aplica o procedimento de configuração pós-cópia, onde o instalador agora PROVA o gate e falha alto. VERIFICADO ao escrever este nó, e vale a nota: eu havia AFIRMADO duas vezes ao maestro que 'os 4 serão pegos no próximo --update' SEM ter checado se o --update passa por lá. Passa (adopt.md §'Atualizar um repo adotado' → 'Re-aplicar a configuração install-only'). A afirmação estava certa por sorte, não por verificação — e é a classe que esta rodada inteira existe para curar."
+    provenance:
+      source: ".claude/commands/meta/adopt.md@61a950ee"
+      locator: "§'Atualizar um repo adotado (--update)' l.605 → 'Re-aplicar a configuração install-only' l.653"
+      method: "leitura: adopt.md no commit que registrou o nó"
 
 
   - id: E_O_GATE_DO_ADOTANTE_NASCE_REPROVADO_POR_PASSIVO_ALHEIO
@@ -339,6 +423,10 @@ nodes:
     verified_at: '2026-09-09'
     verified_against: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A 25 \"id: E_O_GATE_DO_ADOTANTE_NASCE_REPROVADO_POR_PASSIVO_ALHEIO\" docs/evolution/research/claude-code-2.1-onion-2026-08/claude-code-2.1-onion-2026-08.kg.yaml grep -rn \"baseline\" .claude/commands/meta/adopt.md ls -la .claude/utils/adopt/regen-baselines.sh sed -n '1,60p' .claude/utils/adopt/regen-baselines.sh grep -n \"regen-baselines\" .claude/validation/lint-selftest.sh"
     label: "O IRMÃO do gate inerte, e é pior porque o gate está VIVO: numa adoção greenfield real (2026-08-17) o lint do adotante nasceu com 47 violações HARD, todas [kg-verificacao/REMOVIDO], cobrando nós de grafos que só existem no core (docs/discussions, onion-pessoal-marcio, bridge-produto-2026-08). CAUSA: o manifesto copia `.claude/validation/` INTEIRO, então os CINCO baselines de catraca viajam com o passivo do core, e o passo (9) do adopt regenerava UM — e o comentário desse mesmo passo já descrevia o modo-de-falha da omissão ('o gate nasceria reprovando o repo do adotante no dia 1 e seria desligado'). AGRAVANTE: a catraca resolve a referência caminhando até o PRIMEIRO commit que tenha o baseline, então o passivo entra na história antes de tudo e regenerar depois não basta — no alvo a história foi reescrita para o commit raiz já trazer os baselines dele. Simetria que fecha o diagnóstico: os MESMOS 47 são, no core, `PASSIVO` tolerado. Gate vivo que reprova por dívida alheia é gate que o adotante desliga — e aí perde-se a guarda inteira, não só o baseline."
+    provenance:
+      source: "docs/evolution/review/fix-adopt-regen-all-baselines.md (PR #628) + .claude/utils/adopt/regen-baselines.sh"
+      locator: "resíduo §'Origem: dogfood de campo' e §Achado 1; regen-baselines.sh:6-13 ('47 chaves de grafos do core… 47 violações HARD')"
+      method: "leitura: resíduo R56 do PR #628 e cabeçalho do helper que curou"
 
   - id: E_A_GUARDA_DE_PROJECAO_CONFIAVA_NA_METADE_SEGURA
     node_type: evidence
@@ -349,6 +437,10 @@ nodes:
     verified_at: 2026-08-17
     verified_against: nome-de-cliente-sob-NDA-apareceu-no-console-gerado-com-lint-verde
     label: "O PRESSUPOSTO da guarda falhou, não um caso dela: registrei o adotante novo no members.yaml com o nome comercial do cliente (sob NDA) no campo `name:`, e ele APARECEU no federation-console.html publicado — com o lint VERDE. O console publica só o trecho antes de ' (' (o parêntese é anotação interna do maestro), e toda a força da projection-safety mira essa ANOTAÇÃO: o trecho anterior era seguro POR CONSTRUÇÃO. Duas cegueiras somadas: (1) o termo não era derivado do members.yaml, porque o próprio membro o introduzia; (2) a superfície `federation-map.md` — projeção gerada pelo MESMO graph.sh do console — nunca esteve na lista auditada, embora o console esteja desde o incidente de 2026-07-10. Nomear terceiro em superfície projetada era proibido por convenção e permitido pela máquina."
+    provenance:
+      source: ".claude/validation/projection-safety.sh + docs/evolution/review/fix-adopt-regen-all-baselines.md"
+      locator: "projection-safety.sh l.371-378 (pressuposto falho, nome NDA no console com guarda verde) · resíduo §Achado 2 l.37-46 (federation-map.md nunca auditado)"
+      method: "leitura: cabeçalho da guarda que curou + resíduo R56 do PR #628"
 
   - id: D_INVARIANTE_PROJETADO_IGUAL_AO_SLUG_COM_ISENCAO_NO_DADO
     node_type: decision
@@ -359,6 +451,10 @@ nodes:
     verified_at: 2026-08-17
     verified_against: P6-provado-em-4-casos-na-bancada-inclusive-o-falso-positivo
     label: "A cura escolhida e a POLARIDADE que a faz funcionar: não é lista de nomes proibidos — essas falham pelo VOCABULÁRIO (o nome novo nunca está nelas; 4ª ocorrência dessa classe nesta casa) — é a invariante 'trecho projetado == slug' com allowlist de ids ISENTOS, que falha FECHADA: membro novo tem de cumprir e a isenção é ato deliberado com motivo escrito. E a isenção mora NO DADO (`projection_name_exempt` no members.yaml), não no script: a 1ª versão a punha como variável no projection-safety.sh e a REGRA 36 (vendor-scrub) reprovou com razão, porque script vendorizado viaja para todo adotante e id de adotante ali é vazamento cross-tenant por adoção. O modo-de-falha vira excesso de bloqueio, que é visível, em vez de vazamento, que não é."
+    provenance:
+      source: ".claude/validation/projection-safety.sh + docs/evolution/federation/members.yaml"
+      locator: "projection-safety.sh:370-401 (bloco P6) · members.yaml:505 (projection_name_exempt: true)"
+      method: "leitura: código da guarda P6 e dado de isenção"
 
   - id: D_REGENERAR_BASELINE_POR_DESCOBERTA_NAO_POR_LISTA
     node_type: decision
@@ -369,6 +465,10 @@ nodes:
     verified_at: 2026-08-17
     verified_against: helper-com-5-casos-na-bancada-e-defeito-original-reproduzido-em-fixture
     label: "regen-baselines.sh varre `*-baseline.txt` e resolve o emissor de cada um, em vez de listar os cinco nomes: baseline novo entra coberto POR CONSTRUÇÃO. Três decisões de desenho, cada uma contra um modo-de-falha medido: (a) falha RUIDOSA (rc=3) quando não resolve o emissor, e PRESERVA o baseline em vez de trocá-lo por vazio, porque catraca vazia não cobra nada e passa a mentir verde; (b) RECUSA rodar no core, onde o baseline é o ledger legítimo da dívida própria; (c) o papel se PERGUNTA ao onion-version.sh — a 1ª guarda lia o arquivo `.claude/.onion-version` e ficava MUDA no core, que não o tem, e só passou por idempotência (os baselines saíram byte-idênticos), isto é: certo por sorte, não por verificação."
+    provenance:
+      source: ".claude/utils/adopt/regen-baselines.sh (commit 31f9d697)"
+      locator: "linhas 20-25 (varre *-baseline.txt; sai 3), 78-89 (NUNCA no core; papel via onion-version.sh), :133 'exit 3' em 31f9d697"
+      method: "leitura: código do helper + resíduo docs/evolution/review/fix-adopt-regen-all-baselines.md (PR #628)"
 
 edges:
   - from: E_COMUNIDADE_MEMORIA_3_CAMADAS

@@ -19,6 +19,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "estrela discuss/onion-pessoal-marcio — onde a regua de Aristoteles foi mais trabalhada (par regua/motor)"
+    provenance:
+      source: "docs/discussions/onion-pessoal-marcio/ (README.md, 01-verticais-peer.md, 02-reconciliacao.md)"
+      locator: "01-verticais-peer.md:7 e 25-30; 02-reconciliacao.md:28-34"
+      method: "leitura: arquivos da estrela no repo"
   - id: ENT_KB_CORE
     node_type: entity
     layer: audit
@@ -35,6 +39,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "pesquisa da camada dialogica — onde D_ARISTOTLE_HOME_IS_KB propos dar casa a regua"
+    provenance:
+      source: "docs/onion/graph/constellation-dialogic-layer-2026-07.kg.yaml + docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "constellation-dialogic-layer-2026-07.kg.yaml:306 (D_ARISTOTLE_HOME_IS_KB, trace para o .md de análise)"
+      method: "leitura: grafo e relatório da pesquisa da camada dialógica"
 
   # ---- as premissas cruzadas ----
   - id: C_ARISTOTLE_STAR
@@ -45,6 +53,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "par regua/motor: Aristoteles decide O QUE transfere; Hegel (motor, Aufhebung, sem telos) decide COMO a tensao vira combustivel — tratamento rico da estrela"
+    provenance:
+      source: "docs/discussions/onion-pessoal-marcio/01-verticais-peer.md"
+      locator: "l.7 (lente \"Aristóteles (a régua) + Hegel (o motor)\") e l.23-32 (régua; Hegel motor, Aufhebung, \"recusa-se o telos\")"
+      method: "leitura: estrela discuss/onion-pessoal-marcio"
   - id: C_ARISTOTLE_KB
     node_type: claim
     layer: audit
@@ -53,6 +65,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "a KB core da regua de transferencia (transfer-heuristic-aristotle.md) — era CEGA a estrela; reconciliada/enriquecida com ela em 2026-07-12 e MESCLADA em main (invocada por /meta:adopt); drive-to-verify 2026-07-19 confirmou o arquivo vivo"
+    provenance:
+      source: "docs/knowledge-base/concepts/transfer-heuristic-aristotle.md + .claude/commands/meta/adopt.md"
+      locator: "KB l.17-19 (reconciliada com a estrela 2026-07-12); adopt.md l.26 (link para a régua de transferência = invocação por /meta:adopt); merge 0dcacbb1 (2026-07-12 16:42); drive-to-verify e700f471 (2026-07-19)"
+      method: "leitura: KB viva + /meta:adopt + histórico git"
   - id: E_STAR_CAUGHT_ITSELF
     node_type: evidence
     layer: audit
@@ -61,6 +77,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "prova viva: a estrela aplicou a regua a si mesma e pegou a PROPRIA falsa distincao (belief base/Hansson; argumentacao bipolar Cayrol 2005 ja existiam) — o uso real que ganha o pao"
+    provenance:
+      source: "docs/discussions/onion-pessoal-marcio/02-reconciliacao.md"
+      locator: "linhas 28-34 (belief base/Hansson; argumentação bipolar desde 2005 Cayrol-Lagasquerie-Schiex; \"A P1 marcou… como novo por otimismo\")"
+      method: "leitura: estrela 02-reconciliacao"
   - id: C_RECONCILED_AGREE
     node_type: claim
     layer: audit
@@ -69,6 +89,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "reconciliacao = ACORDO + enriquecimento, nao contradicao: estrela e KB concordam no nucleo; a estrela enriquece a KB (par regua/motor + a prova viva)"
+    provenance:
+      source: "docs/knowledge-base/concepts/transfer-heuristic-aristotle.md"
+      locator: "linhas 17-19 e 76 (KB \"puxa da estrela\"; par régua/motor + a régua pegando a própria falsa distinção)"
+      method: "leitura: KB reconciliada (commit 68c2e1fc \"reconcile Aristotle KB with the star\")"
 edges:
   - from: C_ARISTOTLE_STAR
     to: ENT_STAR_PESSOAL

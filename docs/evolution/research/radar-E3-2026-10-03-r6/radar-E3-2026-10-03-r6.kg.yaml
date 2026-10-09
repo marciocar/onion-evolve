@@ -134,6 +134,10 @@ nodes:
     label: 'A 2.1.288 (02/10) — e SO ela, nao "287 e 288" como a 1a passada afirmou — corrige: "Fixed PreToolUse and PermissionRequest hooks being skipped when matching them failed or the tool input could not be serialized to JSON; the call is now blocked". O Onion tem DUAS guardas em PreToolUse, ambas com matcher `Bash`: `pretooluse-protect-main.sh` (veta FORCE-PUSH para main) e `pretooluse-merge-gate.sh` (veta `gh pr merge`, `gh api .../pulls/N/merge` e push NAO-force com alvo main). ⚠️ CORRECAO DO JUIZ, e ela importa: o commit em main NAO e barrado por essas guardas — e barrado pelo `.githooks/pre-commit`, mecanismo DIFERENTE. A 1a passada inflou o escopo delas, e o corpus JA media isso (audit-textual-gates-2026-09 / E_CURA_MERGE_GATE_2O_VETO). TETO: ambas desserializam `tool_input`, logo pertencem a classe corrigida; mas o matcher literal `Bash` torna "matching failed" implausivel para elas — o candidato real e matcher REGEX (o do kg-read-leg.sh). A alcancabilidade da condicao NAO FOI MEDIDA: isto e inferencia declarada, nao medicao.'
     trace: '.claude/settings.json'
     verified_against: 'data/2.1.288.txt verbatim; juiz mediu os dois scripts (39 e 65 linhas) e o .githooks/pre-commit l.31; corpus: E_CURA_MERGE_GATE_2O_VETO e C_CONTAGEM_POS_RODADA'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-10-03-r6/data/2.1.288.txt"
+      locator: "l.58 'Fixed PreToolUse and PermissionRequest hooks being skipped when matching them failed… the call is now blocked'"
+      method: "leitura: changelog 2.1.288 verbatim em data/"
 
   - id: Q_SKILL_VERIFY_E_ABSORCAO_SEM_TROCAR_MECANISMO
     node_type: question
@@ -246,6 +250,10 @@ nodes:
     label: 'PLACAR DA RODADA, para a proxima nao herdar numero inflado: 1 APROVADO (A5, Claude Mods/You should know, as tres citacoes verbatim com versao correta), 5 REPROVADOS (A1 metade falsa sobre a 2.1.280; A2 versao errada; A3 inflacao do escopo das guardas + contradicao com no confirmed do corpus; A4 versao errada vinda de dentro da janela "selada" + analogia apresentada como medicao; A6 atribuicao errada), 1 LACUNA GENUINA (2.1.279 nao existe na fonte). Mais a ISENCAO DE ESCOPO reprovada estruturalmente, com prova auto-executavel: o juiz colheu um item da 2.1.286, de dentro da janela que eu declarei coberta. Custo do juiz: 122.349 tokens, 26 chamadas, 5,6 min.'
     trace: 'docs/onion/radar-baselines.yaml'
     verified_against: 'juiz opus/high em worktree isolada, mandato REFUTAR, abriu a fonte (HTTP 200, 4.071.840 bytes, 19.245 linhas, 154 cabecalhos de versao) e mediu o repo'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-10-03-r6/SYNTHESIS.md"
+      locator: "l.76 'Placar do juiz: 1 aprovado · 5 reprovados · 1 lacuna genuína' + l.9 tokens: 122349"
+      method: "juízes: juiz opus/high em worktree isolada (placar registrado na SYNTHESIS)"
 
   - id: E_A_GUARDA_VETOU_O_PROPRIO_MAESTRO
     node_type: evidence

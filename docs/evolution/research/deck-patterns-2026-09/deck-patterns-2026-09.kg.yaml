@@ -141,12 +141,16 @@ nodes:
     source_kind: measurement
     label: 'MERCADO: SEM SINAL, e declarado como tal. O eixo mercado/capital/analistas nao devolveu NENHUMA claim confirmada nesta rodada — zero capital, zero M&A, zero analista sobrevivente. A unica fonte de classe analista que passou foi a NN/g, e ela e usabilidade de interface, nao capital. As 2 claims sobre o Thoughtworks Radar foram refutadas e NAO podem ser citadas como achado. CONSEQUENCIA A REGISTRAR: a invariante follow-the-money (clausula 4 da doutrina de pesquisa) NAO foi satisfeita nesta rodada. Isso e esperado em parte — "como apresentar um framework" e tema de oficio, nao de mercado de capitais — mas ha um eixo de mercado REAL que ninguem procurou e que decidiria a pergunta: a base rate de ADOCAO dos arcos (quantos frameworks de infra com tracao usam problema-first vs instalar-primeiro nas suas landing/docs), e o sinal de conversao que essas empresas publicam. Lacuna nomeada, nao ausencia de eixo.'
     trace: 'docs/evolution/research/deck-patterns-2026-09/deck-patterns-2026-09.kg.yaml'
+    provenance:
+      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_cd666d1e-81d.json"
+      locator: "result.market"
+      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/4ac7b783-276e-462b-848a-4c7910c4a9c1/workflows/wf_cd666d1e-81d.json no host"
 
   # ── LACUNAS (cláusula 8: lacuna vira nó) ─────────────────────────────────────────────
   - id: E_LACUNAS_DECK_PATTERNS_0924
     node_type: evidence
     plane: DEV
-    status: confirmed
+    status: unverifiable
     impact: 4
     confidence: 0.85
     verified_at: 2026-09-24
@@ -284,6 +288,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 2 — TRANSFERENCIA DE DOMINIO SEM LICENCA + REFUTADO PELO ARTEFATO DA CASA. (i) O artigo da NN/g trata de OPCOES DE INTERFACE (quantos controles mostrar numa tela), nao de sequenciamento pedagogico de slides; 9 secoes de deck nao sao "9 camadas de disclosure". Sem essa ponte de dominio o achado nao morde a pergunta — e ele e o unico com consenso fragil (2-1). (ii) MEDIDO: o deck versionado JA implementa exatamente 2 camadas — 52 slides, 18 marcados `short:1`, com o rotulo "caminho curto" e "essenciais" no mapa. O teto que o achado recomenda ja e pratica de campo aqui, e ninguem mediu isso antes de recomenda-lo. Consequencia para o desenho: a pergunta util nao e "quantas camadas" e sim "os 18 essenciais sao os certos para CADA um dos dois publicos" — e essa ninguem fez.'
     trace: 'deck de campo medido nesta rodada (52 slides, 9 atos, 18 short:1) — vive SO nas branches docs-deck-iftl-rebased e docs-deck-iftl-frameworks-agentes, NUNCA em main; onde ele passa a viver e fio aberto declarado em docs/onion/deck/SPEC.md'
+    provenance:
+      source: "docs/deck-iftl-rebased:docs/evolution/decks/iftl-frameworks-agentes-2026-08.html"
+      locator: "git show <branch>:<deck> | grep -o \"short:1\" | wc -l ; grep -c \"^{act:\""
+      method: "medição: grep short:1 e ^{act: no deck da branch docs/deck-iftl-rebased"
 
   - id: E_OBJECAO_3_QUATRO_ACHADOS_SAO_DUAS_FONTES
     node_type: evidence
@@ -314,6 +322,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 4 — NAO DISCRIMINA NADA E JA ESTA ENTREGUE. (i) A claim e quase tautologica ("diga ao usuario o que cada nivel contem") — nao decide NENHUMA questao de ordem, que e o que foi perguntado; serve para qualquer ordem, logo nao e critério. (ii) MEDIDO: o artefato da casa ja faz — contador, rodape de navegacao, mapa clicavel ("Clique para saltar") e a expectativa explicita do caminho curto. Delta acionavel = zero. E somado a objecao 2, e a mesma fonte contada duas vezes.'
     trace: 'deck de campo medido nesta rodada (52 slides, 9 atos, 18 short:1) — vive SO nas branches docs-deck-iftl-rebased e docs-deck-iftl-frameworks-agentes, NUNCA em main; onde ele passa a viver e fio aberto declarado em docs/onion/deck/SPEC.md'
+    provenance:
+      source: "docs/deck-iftl-rebased:docs/evolution/decks/iftl-frameworks-agentes-2026-08.html"
+      locator: "grep -oiE \"(navegar|mapa|Clique para saltar|caminho curto|essenciais)\""
+      method: "medição: grep dos rótulos de navegação no deck da branch docs/deck-iftl-rebased"
 
   - id: E_OBJECAO_5_CORPUS_VAZIO_E_FALSO_NEGATIVO
     node_type: evidence
@@ -344,6 +356,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 6 — ARTEFATO NAO VERIFICADO (behavior-over-declaration, doutrina da casa). A premissa do Scope afirmava "o deck atual tem 65 slides em 9 secoes, nesta ordem: identidade/arquitetura Bulbo -> inventario -> 17 slides de KG -> maquinaria -> ...". REPRODUZI a medicao: nao existe deck de 65 slides em nenhuma branch; ha UM unico deck Onion na historia — docs/evolution/decks/iftl-frameworks-agentes-2026-08.html — que NAO esta em main (so em docs/deck-iftl-frameworks-agentes e docs/deck-iftl-rebased). E o arco dele CONTRADIZ a premissa: 9 ATOS, 52 slides, abrindo por "Ato 0 O gancho" -> "Ato 1 A evolucao do ecossistema" -> "Ato 2 De onde o Onion veio" -> "Ato 3 Declarado != verificado" -> "Ato 4 A maquinaria" -> "Ato 5 Federacao e A2A" -> "Ato 6 Infraestrutura" -> "Ato 7 O mesmo metodo N=1" -> "Ato 8 O que isso muda / Sua vez". Isto e, o deck real JA E problem-first e JA coloca a maquinaria depois da tese — o oposto da ordem que a premissa descrevia como defeito a corrigir. Reorganizar a partir da premissa seria mover slides de um artefato que nao existe e desfazer a ordem certa de um que existe.'
     trace: 'deck de campo medido nesta rodada (52 slides, 9 atos, 18 short:1) — vive SO nas branches docs-deck-iftl-rebased e docs-deck-iftl-frameworks-agentes, NUNCA em main; onde ele passa a viver e fio aberto declarado em docs/onion/deck/SPEC.md'
+    provenance:
+      source: "docs/deck-iftl-rebased:docs/evolution/decks/iftl-frameworks-agentes-2026-08.html"
+      locator: "git branch -a --list \"*deck*\" ; git ls-tree -r --name-only main | grep -c evolution/decks/ ; grep -c \"^{act:\""
+      method: "medição: branches *deck*, ls-tree de main e contagem de atos"
 
 edges:
   # ── evidência -> pergunta (SUPPORTS) ─────────────────────────────────────────────────

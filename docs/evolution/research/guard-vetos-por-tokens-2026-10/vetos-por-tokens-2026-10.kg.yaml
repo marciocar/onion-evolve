@@ -37,6 +37,10 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: 'git grep -i "shlex|bashlex|tree-sitter|tokeniz" em *.kg.yaml, hooks e KBs: zero decisao; kg-corpus-grep veto/pretooluse/invocation: a auditoria audit-textual-gates-2026-09 escolheu sed sem registrar alternativa'
     label: 'ESTUDO 1, o corpus: a forma anterior (sed, 2026-09-02) foi escolhida sem registrar alternativa — nenhum no do corpus considerou nem recusou um tokenizador. Nao havia decisao a derrubar, so a lacuna a preencher.'
+    provenance:
+      source: "corpus em 0766a4d7~1 (*.kg.yaml, .claude/hooks, docs/knowledge-base)"
+      locator: "git grep -i -l -E 'shlex|bashlex|tree-sitter|tokeniz' 0766a4d7~1 -- '*.kg.yaml' .claude/hooks docs/knowledge-base"
+      method: "medição: git grep no corpus antes da forja"
 
   - id: E_ESTUDO_O_CLAUDE_CODE_RECUSA_O_QUE_NAO_PROVA
     node_type: evidence
@@ -49,6 +53,10 @@ nodes:
     source_kind: primary
     verified_against: 'binario 2.1.289 (/home/marcio/.local/share/claude/versions/2.1.289): parseCommand(e) devolve rootNode (tree-sitter); 145 strings reason: distintas extraidas por offset em torno de "tree-sitter mis-parse"'
     label: 'ESTUDO 2, o binario: o Claude Code 2.1.289 analisa comando para as regras de permissao com TREE-SITTER e mantem ~145 motivos de RECUSA — o que ele nao consegue provar sobre o que o shell vai executar, ele nao supoe. Os que importam a estes vetos e viraram regra aqui: "Command name is runtime-determined", "Brace expansion", eval ("evaluates arguments as shell code" — RECUSADO, nao recursado), "timeout/stdbuf/nice … can''t be checked before it runs" para argumento runtime, "What xargs adds to X can''t be checked", e "Heredoc with unquoted delimiter undergoes shell expansion" — este ultimo revelou o escape do heredoc que ninguem tinha listado.'
+    provenance:
+      source: "commit 0766a4d7 (sessão session_01NSeoZ75idrWT2wShxLsVfA) ; .claude/hooks/lib/invocation-lines.sh l.22-23"
+      locator: "verified_against do nó (parseCommand/tree-sitter, 145 strings reason: em torno de 'tree-sitter mis-parse') + cabeçalho da lib l.22-23"
+      method: "testemunho: medição da sessão 2026-10-05 sobre o binário 2.1.289, comando não registrado"
 
   - id: E_ESTUDO_SO_O_SHLEX_EXISTE_EM_TODO_LUGAR
     node_type: evidence
@@ -59,6 +67,10 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: 'python3 -c import bashlex / tree_sitter / tree_sitter_bash: ausentes nesta maquina; shellcheck/shfmt ausentes; o workflow de selftest do CI nao instala nenhum; shlex e stdlib (python 3.12.3)'
     label: 'ESTUDO 3, o estado da arte disponivel: bashlex (pip 0.18) e tree-sitter-bash dariam AST de verdade, mas NAO estao instalados aqui nem no CI, e um hook que falha fechado sem a dependencia travaria a sessao onde ela faltasse ([[fail-closed-exposes-incomplete-harness]]). O shlex e da stdlib: o unico tokenizador REAL presente em todo lugar onde o hook roda. Por isso o motor e shlex + uma camada de gramatica propria + o catalogo de recusas do Claude Code — nao um parser completo.'
+    provenance:
+      source: "host + .github/workflows"
+      locator: "python3 -I -c 'import bashlex' / tree_sitter / tree_sitter_bash; command -v shellcheck shfmt; git grep bashlex|tree.sitter|shellcheck|shfmt .github/workflows"
+      method: "medição: import dos parsers e grep nos workflows de CI"
 
   - id: D_TOKENIZADOR_SHLEX_COM_RECUSA
     node_type: decision
@@ -80,6 +92,10 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: 'replay.py: 12.268 comandos Bash unicos de 17 transcripts deste repo, contra os hooks antigos e os novos num repo-sandbox armado, com sha256 dos hooks conferido ANTES e DEPOIS de cada rodada. v1: 5 FP novos; v2: CONTAMINADA (mutantes trocavam a lib no disco durante a rodada) e descartada; v3: 0 FP novo; v4: 1 FP novo (IndexError); v5 FINAL: 5 divergencias, todas FP ANTIGOS curados, 0 FP novo, 1 veto restante (cd $SBP dinamico, fechado por desenho)'
     label: 'O TESTE DE FALSO POSITIVO MAIS FORTE DISPONIVEL: reexecutar contra o hook antigo e o novo todos os 12.268 comandos Bash reais que as sessoes deste repo ja rodaram. A 1a versao da lib divergiu em 6: curou 1 falso positivo antigo (o proprio comando que escrevia esta lib) e CRIOU 5 — tres por um scanner de $(…) que contava parenteses ignorando aspas (quebrava em "$(printf ''%s'' "$x" | grep ''y'')", que o bash aceita), dois por marcar como inanalisavel todo xargs diante de gh (inclusive leituras como xargs gh run view), e todos amplificados por um criterio de relevancia que aceitava a palavra merge/push solta. Os tres foram curados na raiz. A v3 mostrou que os 5 vetos restantes, que o hook ANTIGO tambem dava, eram falso positivo PRE-existente — todos cd /outro/repo && git push origin main — e a isencao por cd literal (com escopo) os curou. A v4 achou um IndexError: os ) de padroes de case em bash -c esvaziavam a pilha de escopo, e o fallback vetava a string inteira; curado com restauracao por tamanho e com toda excecao passando pelo mesmo criterio de relevancia. LICAO DE PROCEDIMENTO medida aqui: a v2 rodou ao mesmo tempo que os scripts de mutante e julgou parte dos comandos com a lib MUTADA — medicao concorrente com mutacao no mesmo arquivo nao vale; desde a v3 o hash dos hooks e conferido antes e depois.'
+    provenance:
+      source: "commit 0766a4d7 (sessão session_01NSeoZ75idrWT2wShxLsVfA) ; .claude/validation/lint-selftest.sh l.5787-5800"
+      locator: "lint-selftest.sh l.5787 (5 FP da reexecução dos 12.268 comandos), l.5793 (cd /outro/repo, v3), l.5796 (IndexError de case em bash -c, v4)"
+      method: "testemunho: medição da sessão 2026-10-05, comando não registrado (replay.py não preservado)"
 
   - id: C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE
     node_type: claim
@@ -105,6 +121,10 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: 'documentacao do shlex (posix=True, punctuation_chars); o catalogo de recusas do 2.1.289 cobre zsh, aritmetica, [[ ]], IFS, PS4 — nada disso modelado aqui'
     label: 'TETO 2: shlex tokeniza, nao faz parse de bash. Nao modela: ANSI-C $''…'' (cai como nome dinamico, logo fechado), aritmetica $((…)), [[ ]], IFS alterado, case, process substitution como nome de comando, zsh. Onde ele erra para o lado do inanalisavel, o hook fecha; onde ele erraria para o lado do analisavel-errado, e a fronteira que a reexecucao dos comandos reais mede. Um parser de verdade (bashlex, tree-sitter) e o caminho se o gatilho disparar — GATILHO: um escape novo medido que o shlex nao consiga ver, ou a dependencia passar a existir no CI.'
+    provenance:
+      source: "https://docs.python.org/3/library/shlex.html"
+      locator: "§shlex — 'makes it easy to write lexical analyzers for simple syntaxes resembling that of the Unix shell'; punctuation_chars"
+      method: "leitura: documentação oficial do shlex"
 
   - id: C_TETO_APROVACAO_DE_MOD_SOBRE_EXIT_2
     node_type: question
@@ -115,6 +135,10 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: 'estado vivo medido: nenhum mod instalado (~/.claude/mods e .claude/mods ausentes; settings.json sem chave mods) — hoje o desvio nao pode ocorrer nesta casa; a PERGUNTA (o mod passa por cima do exit 2?) segue sem medida'
     label: 'TETO 3, herdado do radar: a 2.1.289 mostra que a aprovacao de um MOD instalado passava por cima de regras deny/ask. Nao medido se ela passa tambem por cima do EXIT 2 de um PreToolUse — e nesse exit 2 que estes dois vetos (e o CLAUDE.md, como razao do acoplamento) se apoiam. Sem mod instalado para testar. GATILHO: o primeiro mod instalado nesta casa, ou a doc do harness responder.'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-10-05-r7/data/2.1.289.txt"
+      locator: "l.2"
+      method: "leitura: changelog 2.1.289 verbatim do radar E3 r7"
 
   - id: C_TETO_MUTANTES_QUE_AS_CAMADAS_ESCONDEM
     node_type: claim
@@ -125,6 +149,10 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: 'mut11/mut12: cada metade da cura da pilha sozinha NAO corrompe nada; excecao-so-Unanalyzable sem efeito observavel com a pilha certa. CORRIGIDO pela 2a passada do Elenxo (e2/mutA|B|C, 2026-10-05): dos tres mutantes declarados redundantes, DOIS eram a unica protecao do seu caso — a isencao do caminho verificado chamado por $(…)/ops/ (falso positivo com --motivo citando gh pr merge) e o parentese que so fecha escopo que ele abriu (escape: bash -c com case e cd para outro repo). Os dois casos entraram na bancada e os mutantes agora mordem. O terceiro (git-common-dir) foi PROCURADO antes de declarado: o unico caso em que ele decidiria sozinho e uma worktree com config propria (extensions.worktreeConfig) e outro origin — e ai o push vai MESMO para o outro remoto, logo a isencao pelo destino ja esta certa sem ele. Redundante por medicao.'
     label: 'TETO 4, sobre a propria bancada: as defesas sao em CAMADAS (excecao capturada com o mesmo criterio de relevancia; fallback em bash com o mesmo criterio) e isso torna bug interno do analisador INVISIVEL de ponta a ponta — o comando honesto passa mesmo com o Python quebrado. Por isso existe o modo de diagnostico ONION_INVOCATION_STRICT=1, que so a bancada liga. A 1a redacao deste no afirmava que tres mutantes nao mordiam POR REDUNDANCIA, e a afirmacao era falsa para dois deles: "nao morde" significava "falta caso", nao "camada repetida" — o Elenxo achou para cada um o comando em que ele era a UNICA defesa. A licao generaliza: mutante que nao morde so se declara redundante depois de se procurar o caso que ele protegeria sozinho. O cd que o analisador nao segue (cd $X, condicional, pushd) torna o diretorio DESCONHECIDO e nunca isenta — a 2a redacao dizia "cd $X segue vetando" e a 3a passada mostrou que era falso quando o cwd do JSON era outro projeto.'
+    provenance:
+      source: "docs/evolution/review/fix-veto-normalize-by-tokens.md"
+      locator: "nota (l.13-15) + §Os confirmed (l.40-41); .claude/hooks/lib/invocation-lines.sh l.1216 (ONION_INVOCATION_STRICT)"
+      method: "juízes: Elenxo 2ª passada (resíduo R56 fix/veto-normalize-by-tokens)"
 
   - id: E_ELENXO_REPROVOU_A_1A_REESCRITA
     node_type: evidence
@@ -135,6 +163,10 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: 'Elenxo opus em worktree isolada, bateria propria de 442 casos (old x new) em sandbox com worktree e clones reais; reexecucao dele nos transcripts de subagentes; latencia medida'
     label: 'O ELENXO REPROVOU A 1a VERSAO DESTA REESCRITA, e com escapes NOVOS — exatamente o que a forja de guarda manda procurar. Quatro que o hook antigo barrava: (B1) o shlex com commenters="#" lia x#; git push -f origin main como comentario e o push sumia; (B2) a isencao por cd/-C comparava so o toplevel, e uma worktree agent-* desta casa (mesmo projeto, mesma main) contava como outro repo; (B3) time -p fazia do -p o nome do comando; (B4) X="gh pr merge"; $X sem word-splitting. Mais escapes antigos reais (continuacao de linha, heads/main, glob e brace no refspec, branch padrao por symbolic-ref, $((1<<x)) lido como heredoc, shell lendo stdin, executores como watch/flock/su -c/find -exec, env -S, gh pr MERGE, alias definido na string, API com %6D e //, merges e git/refs pela REST, GraphQL alem do mergePullRequest, IFS) e falsos positivos novos (o caminho verificado chamado por $(…)/ops/, $PYTHON tools/merge.py, comando acima de 128 KiB que estourava argv). Todos curados na raiz; os que ficam sao fronteira declarada (C_TETO_FRONTEIRA_DO_QUE_O_HOOK_VE).'
+    provenance:
+      source: "docs/evolution/review/fix-veto-normalize-by-tokens.md"
+      locator: "tabela §As três passadas, linha 1ª (l.28) + frontmatter verdict REPROVADO_E_CURADO"
+      method: "juízes: Elenxo opus em worktree isolada, 1ª passada (resíduo R56)"
 
   - id: E_A_REEXECUCAO_MENTIA_POR_ESTADO
     node_type: evidence
@@ -145,6 +177,10 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: 'corpus completo (22.662 comandos de 2.964 transcripts): 81 divergencias na 1a passada; classify.py reanalisa cada uma com a "branch atual" fixada em feat — as que somem sao artefato de ESTADO; as que persistem eram 2 bugs (heredoc dentro de $( dentro de aspas; regra de substituicao de processo disparando com qualquer $(…)); depois das curas: 0 persistem, 31 artefatos de estado, 4 FP antigos curados'
     label: 'LICAO DE MEDICAO, a 2a desta forja: a reexecucao dos comandos reais julga cada comando contra o DISCO DE HOJE. Uma regra que depende de estado (a branch atual, para resolver push sem refspec) da veto em comando que, quando rodou, estava numa branch de feature — e hoje, sentado na main, o veto estaria CERTO. Separar estado de bug exigiu reanalisar com a branch neutra. Foi assim que dois bugs reais apareceram escondidos entre 77 artefatos: o heredoc de TODO gh pr create desta casa (--body "$(cat <<EOF …") nao era reconhecido, e o corpo do PR virava comando.'
+    provenance:
+      source: "commit 0766a4d7 (sessão session_01NSeoZ75idrWT2wShxLsVfA) ; .claude/hooks/lib/invocation-lines.sh l.54-59 ; docs/evolution/review/fix-veto-normalize-by-tokens.md l.47"
+      locator: "invocation-lines.sh l.54-59 (FP que somem com a branch neutra = estado do disco de hoje); resíduo l.47 (31 artefatos de estado, 4 FP antigos)"
+      method: "testemunho: medição da sessão 2026-10-05, comando não registrado (replay.py/classify.py não preservados)"
 
   - id: E_ELENXO_2A_PASSADA_O_DIRETORIO_ERRADO
     node_type: evidence

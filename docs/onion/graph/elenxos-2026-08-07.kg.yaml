@@ -124,6 +124,10 @@ nodes:
     verified_at: 2026-08-07
     verified_against: elenxo-556-73-grafos-x-6-modos-438-comparacoes
     label: "INSTANCIA 1: a contradicao de REFUTES e o UNICO sitio da troca allowlist->denylist que REPROVA (exit 1); os outros dois so avisam. E era o unico SEM COBERTURA NENHUMA: revertendo so essa chamada e comparando os dois binarios sobre 73 .kg.yaml x 6 modos, 0 diffs em 438 comparacoes. A linha que pode travar o CI era a que ninguem podia mexer com seguranca"
+    provenance:
+      source: "commit 7742d8df (#556)"
+      locator: "corpo (git show -s --format=%B 7742d8df) l.10 (\"alvo de REFUTES … único que REPROVA, exit 1\") e l.30-31 (\"o sítio que REPROVA não tinha nenhuma… 73 .kg.yaml × 6 modos: 0 diffs em 438 comparações\")"
+      method: "leitura: corpo do commit do PR #556"
 
   - id: E_STEP_DE_CI_SEM_SELFTEST
     node_type: evidence
@@ -134,6 +138,10 @@ nodes:
     verified_at: 2026-08-07
     verified_against: log-da-run-31200047905-job-92937606558+PRs-549-a-557
     label: "INSTANCIA 2: o job onion-review rodava 41-46 turnos a ~US$1,27 por PR e os PRs #549..#557 tinham TODOS comments=0 e reviews=0. Nenhum teste olhava para o caminho de posting porque ele vivia dentro da action, fora do alcance da casa. O log da run mostra `permission_denials_count: 14` e `No buffered inline comments`"
+    provenance:
+      source: "run 31200047905 job 92937606558 + PRs #549..#557 + commit 422c61d3"
+      locator: "gh run view --job=92937606558 --log (l.519 num_turns 41, l.521 permission_denials_count 14, l.547 No buffered inline comments); gh pr view 549..557 --json comments,reviews (9/9 c=0 r=0); \"41-46 turnos a ~US$1,27\" no corpo de 422c61d3 l.1-2"
+      method: "medição: gh run view --job=92937606558 --log + gh pr view 549..557 --json comments,reviews"
 
   - id: E_BANCADA_QUE_NAO_SE_VERIFICAVA
     node_type: evidence
@@ -144,6 +152,10 @@ nodes:
     verified_at: 2026-08-07
     verified_against: PR-557-tres-defeitos-identicos-na-mesma-funcao
     label: "INSTANCIA 3: escrevendo os selftests da REGRA 57, TRES defeitos identicos apareceram na mesma funcao — `$( )` come a quebra de linha FINAL e a linha seguinte cola na anterior (verified_at no label; label no `- id:` seguinte; `edges:` no ultimo label). Em todos, a fixture saia malformada e o caso acusava o SUT, que estava CERTO. Diagnosticar custou 4 rodadas"
+    provenance:
+      source: "commit ee8067af (#557)"
+      locator: "corpo (git show -s --format=%B ee8067af) l.54-58: \"Três defeitos IDÊNTICOS… $( ) come a quebra de linha FINAL… diagnosticar custou 4 rodadas\" + cura _fixture_sane"
+      method: "leitura: corpo do commit do PR #557"
 
   - id: D_GUARDA_DA_BANCADA_NOMEIA_A_CAUSA
     node_type: decision
@@ -170,6 +182,10 @@ nodes:
     verified_at: 2026-08-07
     verified_against: log-da-run-31200047905-OIDC-App-token-obtido
     label: "SUPERADA (foi a premissa da 1a F4, por algumas horas): 'o revisor nao posta porque falta github_token'. REFUTADA por medicao no log real: a action faz OIDC->App token com contents/pull_requests/issues:write por default, e o log diz 'App token successfully obtained'. A credencial NUNCA faltou. Pior, passar github_token seria REGRESSAO: o override troca o App token por secrets.GITHUB_TOKEN, que e limitado pelo bloco permissions"
+    provenance:
+      source: "run 31200047905 job 92937606558 (marciocar/onion-evolve)"
+      locator: "gh run view --job=92937606558 --log --repo marciocar/onion-evolve | grep 'App token successfully obtained'"
+      method: "medição: gh run view --job=92937606558 --log --repo marciocar/onion-evolve"
 
   - id: E_CAUSA_REAL_ERA_FERRAMENTA
     node_type: evidence
@@ -180,6 +196,10 @@ nodes:
     verified_at: 2026-08-07
     verified_against: log-da-run-31200047905+parser-real-da-action-parse-tools-ts
     label: "A CAUSA REAL: falta de FERRAMENTA, nao de credencial. O `claude_args` nao declara `--allowedTools`, entao o servidor MCP de comentario inline nunca e instalado — e o buffer que o step final drena tem um unico produtor, que nao existe. Assinatura no log: `permission_denials_count: 14` (o revisor TENTOU e foi negado) e `No buffered inline comments`"
+    provenance:
+      source: "run 31200047905 job 92937606558 (marciocar/onion-evolve)"
+      locator: "gh run view --job=92937606558 --log --repo marciocar/onion-evolve | grep 'permission_denials_count\\|No buffered inline comments'"
+      method: "medição: gh run view --job=92937606558 --log --repo marciocar/onion-evolve"
 
   - id: D_REVISOR_DEVOLVE_ONION_POSTA
     node_type: decision
@@ -190,6 +210,10 @@ nodes:
     verified_at: 2026-08-07
     verified_against: F4-refeita-json-schema-fail-closed+post-review-comment-sh
     label: "DECISAO (F4, a pedido do maestro que recusou MCP e perguntou por SDAAL): o revisor deixa de POSTAR e passa a DEVOLVER o parecer, e o Onion posta pelo transporte do forge. Ganhos que a rota MCP nao teria: o posting vira SHELL e portanto TESTAVEL; sobrevive a mudanca de pin da action; funciona no modo de falha, onde nao ha `.result` mas ha `errors[]` e texto parcial de `assistant`. ESCOPO REAL DO QUE EMBARCOU: o parecer vem em PROSA formatada, nao em structured_output — ver E_JSON_SCHEMA_NAO_PASSA"
+    provenance:
+      source: "commit 422c61d3 (#558) + .github/workflows/onion-review.yml"
+      locator: ".github/workflows/onion-review.yml l.573 e l.687 (bash .claude/utils/forge/post-review-comment.sh)"
+      method: "leitura: commit #558 e o workflow vivo"
 
   - id: E_JSON_SCHEMA_NAO_PASSA
     node_type: evidence
@@ -215,6 +239,10 @@ nodes:
     verified_at: 2026-08-07
     verified_against: interface-md-types-md-adapters-github-md-emendados-no-PR-da-F4
     label: "DECISAO, e ela corrige o METODO da 1a versao (pergunta do maestro: 'a ideia do SDAAL nao e justamente criar as partes que faltam?'): SIM — e criar significa ESCREVER NA SPEC, nao contornar com script. A 1a versao implementou o modo sticky e o edit-por-id DENTRO do helper e chamou de 'extensao declarada'; a interface nao sabia que existiam, e o helper nasceu orfao. Corrigido: `updateReviewComment` e `ReviewCommentInput.upsertBy` entraram em interface.md/types.md/adapters, e o helper passa a CITAR. REGRA QUE FICA: quando um consumidor CONTORNA a abstracao, o defeito e da abstracao ate prova em contrario — o `gh api` cru do onion-review existia porque a operacao de EDITAR comentario nao existia sob nome nenhum"
+    provenance:
+      source: "commit 422c61d3 (#558) + .claude/utils/forge/interface.md, adapters/github.md"
+      locator: "interface.md l.94 (upsertBy); adapters/github.md l.224-241 (updateReviewComment)"
+      method: "leitura: commit #558 e a spec do forge"
 
   - id: Q_SDAAL_EXECUTAVEL_ONDE_PARA
     node_type: question
@@ -256,6 +284,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 6/6 — git log -1 --format=%ad --date=short 422c61d3 (data do commit que introduziu o nó); grep -'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó captura o diagnóstico ANTES do fix — mas o mesmo commit/PR (#558) que o escreveu também SHIPOU a cura parcial: 3 operações (addReviewComment, getReviewComments, updateReviewComment) ganharam consumidor shell-puro (post-review-comment.sh) com uso real em produção (onion-review.yml), não zero. O '
+    provenance:
+      source: "commit 422c61d3 (#558) + .github/workflows/onion-review.yml"
+      locator: "git show --stat 422c61d3 (post-review-comment.sh +126, onion-review.yml); onion-review.yml l.573/687; backlog-real-2026-09.md l.41"
+      method: "medição: git show --stat 422c61d3 + git grep post-review-comment.sh .github/workflows (revisão-total wf_2944480c)"
 
   - id: E_W8_LINT_VE_WORKFLOWS
     node_type: evidence

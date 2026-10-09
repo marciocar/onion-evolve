@@ -20,6 +20,10 @@ nodes:
     verified_at: 2026-08-20
     verified_against: "transcript da PoC: agente sem tools de grafo tentou read_file('skills/kg-ssot/SKILL.md'), recebeu erro, e concluiu 'nao existe kg-ssot' — capacidade tratada como ausente; agravado por config quebrada (tools renomeadas sem alias). O maestro nomeou a tese: 'nao adianta levar o assistente sem levar o KG-SSOT-first e o runtime SDAAL'"
     label: "PROVA DE CAMPO da F4b: agente LibreChat sem a perna KG nao degrada gracioso — ALUCINA o caminho e nega a capacidade. A doutrina precisa viajar COM o agente, nao ficar implicita"
+    provenance:
+      source: "/home/marcio/poc-venda-direta-pdi@e9fe9a4 (marciocar/poc-venda-direta-pdi) docs/onion/graph/phase2-plan.kg.yaml + corpo do commit e9fe9a4; tese do maestro em docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md@c44687b0"
+      locator: "phase2-plan.kg.yaml nó LICAO_RENOMEAR_QUEBRA_AGENTE (l.743-751: \"o modelo, sem a ferramenta, alucina alternativas (vou ler skills/kg-ssot/SKILL.md) e conclui que a capacidade não existe — parece falta de projeto, é config quebrada\"); corpo de e9fe9a4 (2026-08-20 20:47, \"o modelo então alucinou alternativas e concluiu que a capacidade não existia\"); SYNTHESIS.md l.11-14 (citação do maestro)"
+      method: "leitura: nó do incidente e commit no repo da PoC + síntese do core"
   - id: E_POC_MCP_HAS_KG_RUNTIME
     node_type: evidence
     layer: audit
@@ -30,6 +34,10 @@ nodes:
     verified_at: 2026-08-20
     verified_against: "sessao da PoC: ingerir_documento_colado -> dossie segmentado -> GRAFO do caso -> radar rc=0; h1..h5+navegar_caso operam sobre o grafo. O padrao ja existe do lado do MCP"
     label: "O MCP da PoC JA CARREGA o runtime KG do lado do servidor (texto->grafo->radar como pipeline de ingestao) — o que falta e o LADO DO AGENTE: saber que o grafo e a fonte e usa-lo primeiro"
+    provenance:
+      source: "/home/marcio/poc-venda-direta-pdi@e9fe9a4 (marciocar/poc-venda-direta-pdi) scripts/f2/case_ingest.py + scripts/f2/mcp_server.py"
+      locator: "case_ingest.py l.85-111 (ingere_texto: \"texto → dossiê → grafo do caso → radar\", subprocess kg-radar.sh l.101); mcp_server.py l.129-133 (ingerir_documento_colado), l.142-177 (h1..h5 + navegar_caso)"
+      method: "leitura: código do MCP da PoC no commit de 2026-08-20"
   - id: D_READ_LEG_DESIGN
     node_type: decision
     trace: docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md
@@ -83,6 +91,10 @@ nodes:
     verified_at: 2026-08-21
     verified_against: "agent_onion_702171 'Onion' criado no LibreChat com os 15 tools dos 3 MCPs + ACL, instructions read-first (F4b), sonnet-5; sobrevive a restart. Onion KB (RAG) curado no mesmo dia: os 793 embeddings re-apontados ao agente novo (owned-by-agent-id era a causa do erro que o maestro viu), responde as 5 etapas do Elenxo citando onion-kb-conceitos-1.md. Ressalva: Agents API headless sobe RAG mas nao o pool MCP (limite do beta) — via UI funciona"
     label: "A TRIADE tem consumidor: o agente-vitrine 'Onion' liga os 3 MCPs de uma vez com a disciplina read-first embutida — o maestro conversa com o framework sem montar selecao a mao. E o Onion KB (RAG) foi curado (embeddings re-apontados, zero re-embed)"
+    provenance:
+      source: "sessão do core 2026-08-21 (LibreChat na VPS), registrada no commit c3fd467a (2026-08-21 18:13)"
+      locator: "agent_onion_702171 criado com 15 tools dos 3 MCPs + ACL, read-first, sonnet-5; 793 embeddings re-apontados"
+      method: "testemunho: medição da sessão 2026-08-21, comando não registrado"
 
   - id: D_TRIADE_MCP_POR_EIXO
     node_type: decision
@@ -95,6 +107,10 @@ nodes:
     verified_at: 2026-08-20
     verified_against: "duvida do maestro ('um MCP do Framework e suas verticais?') respondida por CONSTRUCAO: 3 MCPs, uma identidade, tres EIXOS separados por RISCO — onion-kg (conhecimento, read), onion-exec (acao contida), onion-framework (identidade, read). Log LibreChat: 4 configured servers and 24 tools. NAO fundir num so: colapsar read+exec numa porta obriga proteger tudo no nivel do mais perigoso"
     label: "A TRIADE de MCPs do Onion: separar por RISCO (nao por origem) e a decisao — o onion-framework (identidade: verticais/comandos/agentes/cunhagens) e a 3a natureza que faz o chat CONHECER o Onion, complementar a conhecimento(kg) e acao(exec)"
+    provenance:
+      source: "commit 5f610327 (#645, 2026-08-20) + ops/mcp-onion-framework/server.py, ops/mcp-onion-kg/, ops/mcp-onion-exec/"
+      locator: "corpo do commit 5f610327, 3o item feat(mcp): onion-framework (\"eu fragmentara por RISCO só; faltava o eixo IDENTIDADE... 3ª natureza, não fusão (colapsar read+exec baixa a segurança ao mais perigoso)... Log: 4 servers 24 tools\")"
+      method: "leitura: corpo do commit #645 + servidores versionados em ops/"
 
   - id: E_SERVER_LEGS_PROVEN
     node_type: evidence
@@ -106,6 +122,10 @@ nodes:
     verified_at: 2026-08-21
     verified_against: "pre-run direto nos 3 MCPs (curl JSON-RPC, 2026-08-21): READ(KG) kg_list=67 grafos + kb_search 'Elenxo'=13 ocorrencias com arquivo:linha; VERIFY run_lint exit 0 (saida real de violacoes) + kg_radar exit; ACT run_inventory exit 0 (inventario gerado); WRITE propose_kg_write -> proposta caiu em kg-inbox/dogfood-prerun-test-*.proposal.kg.yaml E o grafo vivo F4b ficou INTACTO (git limpo) — I3 provado por comportamento; IDENTIDADE describe_coinage 'Elenxo'. Reconcilia o descompasso de redacao: a fila kg-inbox ESTA construida e recebe (a clausula 'fila ainda nao construida' de Q_ONION_KG_MCP_NEXT era stale de 08-20)"
     label: "As pernas de SERVIDOR do loop read->verify->act->write-como-proposta estao VIVAS e provadas por COMPORTAMENTO (nao declaracao): curl direto nos MCPs, saidas reais, e o grafo vivo intacto apos a proposta (I3)"
+    provenance:
+      source: "MCPs onion-kg :3032, onion-exec :3034, onion-framework :3036 (VPS) ; docs/evolution/research/librechat-kg-runtime-2026-08/DOGFOOD-PROTOCOL.md l.44-77"
+      locator: "curl -s http://172.23.0.1:3032 -H X-Api-Key -d tools/call kg_list (e as demais tools da tabela)"
+      method: "medição: curl JSON-RPC tools/call nos 3 MCPs"
   - id: D_DOGFOOD_PROTOCOL
     node_type: decision
     trace: docs/evolution/research/librechat-kg-runtime-2026-08/DOGFOOD-PROTOCOL.md
@@ -156,6 +176,10 @@ nodes:
     verified_at: 2026-08-21
     verified_against: "medido no pre-run: run_lint via onion-exec levou ~103s (vs ~16-28s local) — provavel pressao de swap/cwd do server. curl com max-time 30/90 devolveu 0 bytes (BrokenPipe no server); so max-time 200 capturou o exit 0"
     label: "RESSALVA de dogfood: run_lint via MCP leva ~103s — pela UI do LibreChat um tool-call tao longo provavelmente estoura o timeout. Ferramenta lenta e um modo-de-falha real da bancada, nao happy-path"
+    provenance:
+      source: "MCP onion-exec (172.23.0.1:3034) ; docs/evolution/research/librechat-kg-runtime-2026-08/DOGFOOD-PROTOCOL.md l.70-77 e l.125"
+      locator: "curl JSON-RPC tools/call run_lint em onion-exec com --max-time 30/90/200"
+      method: "medição: curl tools/call run_lint (max-time 30/90/200)"
 
   - id: E_SEALING_MECHANISM
     node_type: evidence
@@ -191,6 +215,10 @@ nodes:
     verified_at: 2026-08-21
     verified_against: "chat 2026-08-20: usuario pediu mapear site externo; nenhuma das 3 MCPs expoe fetch/crawl/SerpAPI; kb_search por 'SerpAPI'/'grana.ai' = 0 ocorrencias no corpus"
     label: "Evidencia da gap: as 3 MCPs conectadas nao expoem tool de web — a face conversavel e cega a dominio externo"
+    provenance:
+      source: "docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml"
+      locator: "l.16-22 (nó E_NO_WEB_TOOL da proposta; origem onion-chat-conversa-usuario-2026-08-20, l.3) + cabeçalho de selagem l.1"
+      method: "leitura: proposta selada da fila kg-inbox"
   - id: D_ROUTE_TO_BRIDGE
     node_type: decision
     trace: docs/evolution/kg-inbox/_sealed/gap-web-search-capability-20260821-215136.proposal.kg.yaml
@@ -205,13 +233,14 @@ nodes:
   - id: Q_TENANT_WRITE_DESTINATION
     node_type: question
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 0.9
     status: open
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 1/1 claims; juiz APROVADO. grep -n "Q_TENANT_WRITE_DESTINATION" -A40 no arquivo do nó; cat docs/evolution/k => O nó (1 claim: "destino correto para escrita de conhecimento no papel-de-negócio do tenant não exist…'
-    label: "BURACO revelado pela selagem: a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/adotante), nao a kg-inbox do core. Hoje toda proposta cai no core — risco de fonte-paralela por repo. Gated: nasce quando houver multi-tenant KG routing"
+    label: "QUESTAO DE DESENHO (gated): a escrita de um chat no PAPEL-DE-NEGOCIO (tenant) precisa de destino FORA do core (fila do tenant/adotante), nao a kg-inbox do core, sob risco de fonte-paralela por repo. Nasce quando houver multi-tenant KG routing"
+    narrative: "Label corrigido em 2026-10-09 (O3 onda 1 do SAC-73, selo do maestro): deixou de afirmar estado vivo (o antigo dizia: hoje toda proposta cai no core). O estado vivo esta coberto por E_KG_INBOX_ROTEIA_POR_PAPEL_0905 (2026-09-05, aresta CONSTRAINS para este no): metade FECHADA (o adotante com repo Onion proprio tem a fila docs/evolution/kg-inbox/ dele) e metade ABERTA (a proposta que chega ao core pertencendo a outro repo, e o tenant sem repo Onion). Plano PROD -> DEV: o objeto e desenho futuro, nao sistema vivo (juiz da O3 onda 1: dev-duvida, selado pelo maestro)."
 
   - id: E_KG_INBOX_ROTEIA_POR_PAPEL_0905
     node_type: evidence

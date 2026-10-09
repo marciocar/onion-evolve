@@ -98,6 +98,10 @@ nodes:
     verified_against: "#943 (durable-commit) + PR fix/adopter-quick-cures (merge do vendor-branch.sh assina com o attribution do alvo); bancada vendor_branch (b2) com merge não-fast-forward, mutante morde"
     trace: '.claude/utils/adopt/durable-commit.sh'
     label: 'PEDIDO DE ADOTANTE, medido em dois alvos no mesmo dia: os commits feitos pelos helpers do update (vendor-branch.sh e durable-commit.sh) saem sem a assinatura que o repo exige, e o adotante reescreve historia para corrigir (3 vezes no brain-granaai). CURA: os dois scripts aceitam um trailer por variavel de ambiente (ou leem o attribution do settings.json do alvo) e o anexam as mensagens. GATILHO: a proxima mudanca nos helpers do update — junto com as curas dos defeitos 1 e 2.'
+    provenance:
+      source: ".claude/utils/adopt/vendor-branch.sh + .claude/utils/adopt/durable-commit.sh"
+      locator: "vendor-branch.sh:287-292; durable-commit.sh:116-121; commit 9d5eb535; PR #943 MERGED 2026-10-07"
+      method: "leitura: código dos helpers + gh pr view 943"
 
   - id: Q_VETO_DE_FORCE_PUSH_SO_PROTEGE_O_LITERAL_MAIN
     node_type: question
@@ -109,6 +113,10 @@ nodes:
     verified_against: 'teste do agente de update no brain-granaai (pin ab08cde): git push origin +main -> rc=2 (vetado); git push origin +master -> rc=0 (passa); a producao do alvo e master (GitFlow onion/develop -> develop -> master, estrategia CONFIRMADA pelo maestro em 2026-10-05); o merge-gate nao age no alvo porque depende de ops/pr-merge-verified.sh, que so existe no core'
     trace: '.claude/hooks/pretooluse-protect-main.sh'
     label: 'A CURA DE CLASSE DOS VETOS (PR #921) AINDA ASSUME QUE A PRODUCAO SE CHAMA main. Num adotante com GitFlow cuja producao e master — o brain-granaai, cuja estrategia onion/develop -> develop -> master o maestro confirmou em 2026-10-05 — o force-push na producao passa com rc=0: o veto nao protege nada la. Nao e regressao do update; e a fronteira do proprio veto, nao declarada no TETO dele. CURA: a branch protegida passa a ser a de producao RESOLVIDA do repo (gitflow.branch.master, ou a padrao do remoto), com caso de bancada num repo cuja producao e master; e o TETO do grafo vetos-por-tokens-2026-10 ganha esta fronteira. GATILHO: ja disparou — ha adotante desprotegido hoje.'
+    provenance:
+      source: ".claude/hooks/pretooluse-protect-main.sh"
+      locator: "payload PreToolUse com git push origin +master / -f origin master"
+      method: "medição: hook alimentado com payload JSON (git push origin +master)"
 
 edges:
   - from: E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1
