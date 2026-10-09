@@ -2,8 +2,7 @@
 title: 'Resíduo — adoção do contrato v4 e extensões com x_ (SAC-79)'
 date: 2026-10-08
 branch: feat/kg-ssot-contract-v4
-reviewed_diff_sha256: 1bc6ff45505584a18b9bc717564b4cf603228508ea325cb0e30dbb3b16d8e2bd
-reviewed_code_sha256: a5aca5a3f7543d1a2e7558215089fcb2c46df711f0a97dc351a666115bbe5f32
+reviewed_diff_sha256: pendente
 findings_total: 4
 findings_real: 4
 findings_fixed: 4
