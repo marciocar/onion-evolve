@@ -21844,6 +21844,9 @@ case "${_args}" in
   *"--json headRefOid"*)        echo "deadbeefcafe0000000000000000000000000000" ;;
   *"--json headRepository,headRepositoryOwner"*) echo "o/r" ;;
   *"--json headRefName"*)       echo "feat/x" ;;
+  # SAC-80: o SUT lê os arquivos do PR antes de tudo (fail-closed se não ler). Aqui o PR não toca
+  # .kg.yaml, então a guarda de provenance cala e esta família segue medindo só a dispensa.
+  *"pulls/"*"/files"*)          echo "ops/pr-merge-verified.sh" ;;
   *check-runs*)                 printf '%s\n' "${STUB_RUNS}" ;;
   "pr checks"*)                 printf '%s\n' "${STUB_CHECKS}" ;;
   *statusCheckRollup*)          printf '%s\n' "${STUB_VERDICT}" ;;
