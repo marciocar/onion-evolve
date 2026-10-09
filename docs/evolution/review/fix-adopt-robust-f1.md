@@ -3,7 +3,7 @@ title: "Revisão — F1 das portas: adoção robusta (SAC-89, absorve SAC-87)"
 date: 2026-10-09
 branch: fix/adopt-robust-f1
 reviewer: "passada adversarial por subagente independente (só leitura, reprodução em /tmp) sobre o diff inteiro; bancada adopt_robust + door/door_seal_pin/role_cut/role_promotion sob LC_ALL=C com um mutante por caso; dogfood dos blocos do próprio adopt.md num sandbox"
-reviewed_diff_sha256: ab0920c6ee22a1f5868b1f7a4acbeedd37397ea9ae2b9e0fa6e3f38154ffd489
+reviewed_diff_sha256: cc46f0e8c58d747f476b27ec192b76b9a79f611a4c51ea4f25c0eb30de2d0a20
 reviewed_code_sha256: f425390d80bb73cdf2fb56a33318bea1c14f4e83114cba49d71631ff159aed52
 findings_total: 8
 findings_real: 5
