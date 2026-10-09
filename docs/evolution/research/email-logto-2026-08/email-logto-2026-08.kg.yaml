@@ -83,6 +83,10 @@ nodes:
     verified_against: licao-do-whatsapp-aplicada-ao-email
     label: "A LICAO DO WHATSAPP REENCENADA: o Logto e FIRE-AND-FORGET (Nodemailer, sem ACK nativo — hipotese nao refutada). Logo A PROVA DE ENTREGA VEM DO WEBHOOK DO PROVIDER, fora do Logto (email.delivered/bounced/complained), COM IDEMPOTENCIA (o Resend pode duplicar evento). Sem isso 'o convite foi enviado' e DECLARACAO, nao medicao. E o 'Send test email' do console prova SO o aceite SMTP 250 — o teste real e o convite caindo na INBOX de duas caixas distintas (Gmail + Outlook)"
     trace: "docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.72-78 ('A lição do WhatsApp, reencenada no email')"
+      method: "leitura: SYNTHESIS.md da pesquisa F1 email (run wf_c93e95b8-fdd, 2026-08-01, commit 80180539)"
 
   - id: D_dns_is_critical_path
     node_type: decision
@@ -128,6 +132,10 @@ nodes:
     verified_against: teste-tcp-da-vps-para-smtp.postmarkapp.com
     label: "GAP #4 FECHADO POR MEDICAO: da VPS, porta 587 ABERTA (STARTTLS) e 2525 ABERTA; porta 465 (TLS implicito) BLOQUEADA; 443 aberta (plano B da API HTTP). CONSEQUENCIA DIRETA: o conector SMTP do Logto TEM de usar 587 — o padrao comum 465 teria falhado em silencio. O rate-limit de 5 msg/min da Hostinger e questao SEPARADA (volume, nao conectividade) e segue nao medido"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "git:f5d50f4b"
+      locator: "corpo do commit f5d50f4b (2026-08-01 11:52, 'PORTAS MEDIDAS da VPS para smtp.postmarkapp.com')"
+      method: "testemunho: medição da sessão 2026-08-01, comando não registrado (commit f5d50f4b)"
 
   - id: E_dns_written_nondestructive
     node_type: evidence
@@ -140,9 +148,9 @@ nodes:
     label: "DNS ESCRITO NA HOSTINGER VIA API, NAO-DESTRUTIVO: zona onionevolve.com foi de 26 -> 30 registros, com os 25 A-records PRESERVADOS (verificado relendo a zona depois). Metodo: backup da zona ANTES + PUT /api/dns/v1/zones com overwrite:FALSE (contrato confirmado por pesquisa: false=append/update, true=deleta os que casam name+type). Criados: DKIM TXT (20260801114651pm._domainkey.mail), Return-Path CNAME (pm-bounces.mail -> pm.mtasv.net), SPF TXT (mail -> v=spf1 include:spf.mtasv.net ~all), DMARC TXT (_dmarc -> v=DMARC1; p=none;). DMARC publicado SEM rua= (nao publicar email pessoal no DNS sem decisao do maestro)"
     trace: "/home/marcio/onion-vps-waha/dns-backup/"
     provenance:
-      source: "/home/marcio/onion-vps-waha/dns-backup/"
-      locator: "hostinger-api-put-overwrite-false-mais-releitura-da-zona"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/dns-backup/ no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "git:f5d50f4b"
+      locator: "corpo do commit f5d50f4b ('DNS ESCRITO NA HOSTINGER VIA API, NÃO-DESTRUTIVO'); onion-waha@86662e0:dns-backup/onionevolve-20260801-114722.json (zona ANTES)"
+      method: "testemunho: escrita e releitura da zona relatadas em 1ª pessoa no commit f5d50f4b (2026-08-01); backup prévio lido em onion-waha@86662e0 e leitura do arquivo /home/marcio/onion-vps-waha/dns-backup/onionevolve-20261008-232540.json no host para os registros criados"
 
   - id: E_domain_verified
     node_type: evidence
@@ -161,7 +169,7 @@ nodes:
 
   - id: Q_postmark_pending_approval
     node_type: question
-    plane: PROD
+    plane: DEV
     status: done
     impact: 5
     confidence: 1.0
@@ -210,6 +218,10 @@ nodes:
     verified_against: confirmacao-humana-do-destinatario
     label: "PROVA FINAL — CAIXA DE ENTRADA, NAO SPAM: os DOIS envios (0b6d6ffb e 5220c9d3) chegaram na caixa NORMAL do Gmail, confirmado pelo destinatario humano. Isto fecha a unica lacuna que NENHUMA API mostra: o evento Delivered + '250 OK' provava entrega AO SERVIDOR; inbox-vs-spam so o humano ve. Dominio NOVO caindo direto na caixa normal = DKIM+SPF+Return-Path alinhados fizeram o trabalho, sem periodo de aquecimento. A cadeia de prova esta COMPLETA: aceite (MessageID) -> entrega ao servidor (evento Delivered) -> INBOX (humano). Os tres degraus sao distintos e so o terceiro decide se o canal serve p/ convite de auth"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "git:c8e133de"
+      locator: "corpo do commit c8e133de (2026-08-01 19:18, 'prova final, caixa de entrada confirmada por humano')"
+      method: "testemunho: confirmação do destinatário humano relatada em 1ª pessoa no corpo do commit c8e133de (2026-08-01); repetida em onion-email/README.md §'O que já foi provado'"
 
   - id: E_connector_live_invite_sent
     node_type: evidence
@@ -252,9 +264,9 @@ nodes:
     label: "ACHADO DE ARQUITETURA (so o dogfood revelou): o LOGTO NAO TEM PAGINA DE ACEITE DE CONVITE. As unicas rotas sao de API (PUT /api/organization-invitations/{id}/status). O link do convite e RESPONSABILIDADE DA APLICACAO — o Logto so envia o que vier em messagePayload.link, nao sabe nem inventa destino. Verificado: o bridge NAO tem rota de aceite (rotas reais: /chat /commands /a2a /federation/inbox/:member /admin/* /health); o 'INVITE_TOKENS_*' do bridge e OUTRA coisa (tokens de cortesia da era pre-OIDC). CONSEQUENCIA: o email do convite FUNCIONA (renderizou {{link}}, chegou na INBOX — confirmado pelo maestro) mas o fluxo NAO FECHA ponta a ponta sem uma pagina que: (1) receba o invitationId, (2) autentique o convidado via Logto, (3) chame o PUT de status. ERRO MEU SOMADO: inventei a URL 'auth.onionevolve.com/invite' como placeholder, que nunca existiu — o 404 tem duas causas empilhadas"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
     provenance:
-      source: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
-      locator: "openapi-da-instancia-mais-rotas-do-bridge-mais-404-visto-pelo-maestro"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "git:c3cb87d3"
+      locator: "corpo do commit c3cb87d3 (2026-08-01 19:40, 'achado — o Logto não tem página de aceite de convite')"
+      method: "testemunho: achado relatado em 1ª pessoa no corpo do commit c3cb87d3 (2026-08-01), 404 visto pelo maestro; OpenAPI da instância e rotas do bridge não versionados nesta fonte"
 
   - id: Q_where_acceptance_page_lives
     node_type: question

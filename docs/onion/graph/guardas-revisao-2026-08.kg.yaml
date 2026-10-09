@@ -27,6 +27,10 @@ nodes:
     verified_at: 2026-08-30
     verified_against: 'lint-artifacts.sh + rules-registry.sh + medicao dos 51 grafos'
     label: 'o debito das guardas NAO e formato — e COBERTURA e VISIBILIDADE: guarda que ninguem ve e guarda que ninguem roda falham igual'
+    provenance:
+      source: "9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
+      locator: "§1 l.26-37 (tabela \"Sintoma medido\" + \"A régua deste mapa\")"
+      method: "leitura: diagnóstico do mapa das guardas no commit 9c4f3082, apoiado nos 4 sintomas medidos que viraram REGRAS 50-53"
 
   # ── as 4 lacunas medidas, cada uma fechada por uma regra nova ─────────────
   - id: E_GUARDA_HARD_INVISIVEL
@@ -38,6 +42,10 @@ nodes:
     verified_at: 2026-08-03
     verified_against: 'grep de headers # REGRA em lint-artifacts.sh'
     label: 'check_site_inventory_sync era HARD ATIVA com header sem numero — o regex do gerador nao a capturava, invisivel no registro que a rede le'
+    provenance:
+      source: "9c4f3082^:.claude/validation/lint-artifacts.sh · 9c4f3082^:.claude/validation/rules-registry.sh"
+      locator: "lint l.792 (header), l.806 (função), l.824/l.830 (violation HARD), l.2399 (chamada); registry l.28 (regex)"
+      method: "leitura: header sem número e regex do gerador no commit pai de 9c4f3082"
 
   - id: E_GUARDA_SOFT_INVISIVEL
     node_type: evidence
@@ -48,6 +56,10 @@ nodes:
     verified_at: 2026-08-03
     verified_against: 'grep de headers # REGRA em lint-artifacts.sh'
     label: 'check_branch_agent_distinction era SOFT ativa sem numero E sem o campo previne obrigatorio'
+    provenance:
+      source: "9c4f3082^:.claude/validation/lint-artifacts.sh"
+      locator: "l.391-398 (header + docstring), l.399 (função), l.2396 (chamada)"
+      method: "leitura: header e docstring no commit pai de 9c4f3082"
 
   # plane:DEV e nao PROD — o radar apontou MISPLANED e tem razao: a evidencia e um
   # grep na FONTE (codigo), nao uma medicao do artefato vivo.
@@ -59,7 +71,12 @@ nodes:
     status: confirmed
     verified_at: 2026-08-03
     verified_against: 'grep kg-radar em lint-artifacts.sh, workflows e pre-commit'
-    label: 'kg-radar.sh — unico mecanismo que reprova contradicao estrutural — nao era executado por NENHUMA cadencia; so alcance indireto via R43 (18 de 51 grafos) e R31'
+    label: "kg-radar.sh — unico mecanismo que reprova contradicao estrutural — nao era executado por NENHUMA cadencia; so alcance indireto via R43 (11 de 51 grafos) e R31"
+    narrative: "label anterior: kg-radar.sh — unico mecanismo que reprova contradicao estrutural — nao era executado por NENHUMA cadencia; so alcance indireto via R43 (18 de 51 grafos) e R31"
+    provenance:
+      source: "9c4f3082^:.claude/validation/lint-artifacts.sh · 9c4f3082:.claude/validation/lint-artifacts.sh"
+      locator: "git grep -n kg-radar 9c4f3082^ -- .github/workflows .githooks = 0 linhas; lint@9c4f3082^ só cita kg-radar em mensagem/docstring; docstring R52@9c4f3082 l.393-396 e l.400"
+      method: "leitura: workflows, hook e lint no commit pai + docstring da R52 no commit 9c4f3082"
 
   - id: E_RULES_SEM_GUARDA
     node_type: evidence
@@ -70,6 +87,10 @@ nodes:
     verified_at: 2026-08-03
     verified_against: 'grep claude/rules em lint-artifacts.sh → zero ocorrencias'
     label: '.claude/rules/ era a UNICA superficie de .claude/ sem guarda nenhuma — frontmatter nao validado, glob nao verificado'
+    provenance:
+      source: "9c4f3082^:.claude/validation/lint-artifacts.sh · 9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
+      locator: "grep -c 'claude/rules' no lint@9c4f3082^ = 0; docstring da REGRA 53@9c4f3082 l.461-468; mapa l.34"
+      method: "leitura: lint no commit pai de 9c4f3082, docstring da REGRA 53 e tabela de sintomas do mapa"
 
   # ── a decisao estruturante ────────────────────────────────────────────────
   - id: D_PROMOVER_COGNITIVO_A_MECANICO
@@ -96,6 +117,10 @@ nodes:
     verified_at: 2026-08-03
     verified_against: 'kg-grammar.md:41 declara exit 0 obrigatorio; nenhum mecanismo o executa'
     label: 'regra path-scoped nao substitui gate: so carrega ao TOCAR o arquivo, depende do ator obedecer, e nao pega degradacao passiva (REFUTES que chega depois)'
+    provenance:
+      source: "9c4f3082:.claude/validation/lint-artifacts.sh"
+      locator: "docstring da R52 l.413-416"
+      method: "leitura: docstring da R52 no commit 9c4f3082"
 
   # ── a pergunta do maestro que virou mecanismo ─────────────────────────────
   - id: Q_SEV_COSMETICO
@@ -105,6 +130,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     label: 'a tag [SEV] no header das regras e cosmetica?'
+    provenance:
+      source: "9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md · 9c4f3082 (corpo do commit)"
+      locator: "mapa §2.1 l.71; corpo de 9c4f3082 §\"Nasceram de uma pergunta do maestro\""
+      method: "testemunho: pergunta do maestro citada pela sessão (2026-08-02/03) no corpo do commit 9c4f3082 e no mapa"
 
   - id: E_SEV_LOAD_BEARING
     node_type: evidence
@@ -115,6 +144,10 @@ nodes:
     verified_at: 2026-08-03
     verified_against: 'contagem de literais violation HARD/SOFT no corpo de cada guarda'
     label: 'NAO e cosmetica: REGRAS 43 e 44 tem ZERO literal no corpo (delegam com violation ${sev}) — o tag e a UNICA fonte de severidade delas'
+    provenance:
+      source: "9c4f3082^:.claude/validation/lint-artifacts.sh · 9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
+      locator: "lint R43 l.1637-1672 e R44 l.1674-1692; mapa §2.1 l.71-73"
+      method: "leitura: corpos da R43/R44 no commit pai de 9c4f3082"
 
   - id: D_TAG_OBRIGATORIO
     node_type: decision
@@ -170,7 +203,12 @@ nodes:
     status: confirmed
     verified_at: 2026-08-03
     verified_against: 'diff do registro gerado apos aplicar o fix — 46 linhas alteradas'
-    label: 'o fix engolia o CORPO do docstring no campo previne de 23 regras (o repo tem 2 convencoes de indentacao); a cura certa foi seguir a convencao de 1 linha'
+    label: "o fix sugerido pela revisao (parser aceitar previne: multi-linha), implementado e medido, engolia o CORPO do docstring em 23 regras; a cura certa era seguir a convencao"
+    narrative: "label anterior: o fix engolia o CORPO do docstring no campo previne de 23 regras (o repo tem 2 convencoes de indentacao); a cura certa foi seguir a convencao de 1 linha"
+    provenance:
+      source: "9c4f3082 (corpo do commit, PR #519)"
+      locator: "corpo §'E_FIX_PIORA_23_REGRAS REFUTES C_PARSER_PREVINE_MULTILINHA'"
+      method: "testemunho: corpo do commit 9c4f3082 da sessão 2026-08-02 em 1ª pessoa; o diff do fix não foi versionado"
 
   # ── sobreposicao real, declarada ──────────────────────────────────────────
   - id: C_R52_SOBREPOE_R43
@@ -181,7 +219,12 @@ nodes:
     status: confirmed
     verified_at: 2026-08-03
     verified_against: 'contagem de docs com kg: no frontmatter — 18 grafos distintos de 51'
-    label: 'a R52 sobrepoe a R43 em 18 dos 51 grafos; e superset com ganho real de 33 — sobreposicao aceita e DECLARADA no docstring'
+    label: "a R52 sobrepoe a R43 em 11 dos 51 grafos; e superset com ganho real de 40 — sobreposicao aceita e DECLARADA no docstring (a 1a redacao dizia 18/33, numeros nao-reproduziveis)"
+    narrative: "label anterior: a R52 sobrepoe a R43 em 18 dos 51 grafos; e superset com ganho real de 33 — sobreposicao aceita e DECLARADA no docstring"
+    provenance:
+      source: "9c4f3082:.claude/validation/lint-artifacts.sh"
+      locator: "docstring da R52 l.399-405 (com o comando de re-medição embutido)"
+      method: "leitura: docstring da R52 no commit 9c4f3082"
 
   # ── o debito que a revisao encontrou e nao fechou ─────────────────────────
   - id: C_DUPLICACAO_4_CLONES
@@ -192,7 +235,12 @@ nodes:
     status: done
     verified_at: 2026-08-30
     verified_against: 'normalizacao e diff dos corpos das REGRAS 21, 38, 24, 25'
-    label: 'REGRAS 21/38/24/25 sao clones byte-identicos apos normalizar literais — helper economizaria ~69 linhas e daria UM lugar p/ o 2>/dev/null que engole erro de gerador'
+    label: "REGRAS 38/24/25 sao clones (regenera p/ temp + diff -q, diferindo so em literais) e a 21 segue o mesmo esqueleto com guarda extra de jq — o mapa estimou que um helper economizaria ~69 linhas e daria UM lugar p/ o 2>/dev/null que engole erro de gerador"
+    narrative: "label anterior: REGRAS 21/38/24/25 sao clones byte-identicos apos normalizar literais — helper economizaria ~69 linhas e daria UM lugar p/ o 2>/dev/null que engole erro de gerador"
+    provenance:
+      source: "9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
+      locator: "lint-artifacts.sh l.727-816 (R21 check_graph_sync l.735, R38 l.756, R24 l.777, R25 l.799); mapa §7.4 l.233-240"
+      method: "leitura: os quatro corpos e a estimativa do mapa §7.4 no commit 9c4f3082"
 
   - id: C_R28_R46_DOUBLE_FIRING
     node_type: claim
@@ -203,6 +251,10 @@ nodes:
     verified_at: 2026-08-30
     verified_against: 'leitura dos corpos: R28 classe (1) e R46 detectam a mesma condicao'
     label: 'R28 classe (1) e R46 detectam a MESMA condicao — um dir orfao com 3 anuncios emite 4 SOFT para um fato so; cura e amputar a classe (1) da R28'
+    provenance:
+      source: "9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
+      locator: "lint-artifacts.sh l.869-875 (R28 classe (1)) e l.2273-2302 (R46); mapa §7.3 l.225-231"
+      method: "leitura: corpos das duas regras e a cura proposta no mapa, commit 9c4f3082"
 
   - id: C_SEM_GATE_REGRA_SEM_TESTE
     node_type: claim
@@ -213,6 +265,10 @@ nodes:
     verified_at: 2026-08-30
     verified_against: 'leitura do lint-selftest.sh — STRICT reprova skip por tooling, nao regra sem fixture'
     label: 'nao existe gate regra-sem-fixture; o STRICT do CI reprova skip por tooling ausente, o que e outra coisa — candidato a 6a catraca'
+    provenance:
+      source: "9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md · 9c4f3082:.claude/validation/lint-selftest.sh"
+      locator: "mapa §6 l.187-189 e §8 l.277; lint-selftest.sh l.64 e l.69"
+      method: "leitura: limite declarado no mapa e o modo STRICT no selftest, commit 9c4f3082"
 
   - id: C_R45_COBERTURA_FALSA
     node_type: claim
@@ -237,6 +293,10 @@ nodes:
     verified_at: 2026-08-03
     verified_against: 'grep de kg: fora do escopo da R43 + test -e no alvo'
     label: 'um kg: PENDURADO vivo e invisivel — inbox/_processed aponta p/ promocao-main-elenxo.kg.yaml que nao existe; e o MISSING-PATH HARD que a R43 existe p/ emitir'
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-27-sinal-plane-vs-procedencia-e-evaporacao.md · 0ce2fff4:docs/analysis/onion-guardas-mapa-2026-08.md"
+      locator: "sinal l.9; mapa@0ce2fff4 §7.2 l.212-240 (veredito + texto original preservado no <details>)"
+      method: "leitura: a citação kg: do sinal e o achado original + refutação registrados no mapa (nó refuted)"
 
   - id: E_KG_PENDURADO_E_DO_REMETENTE
     node_type: evidence
@@ -247,6 +307,10 @@ nodes:
     verified_at: 2026-08-03
     verified_against: 'frontmatter do sinal (from: arandek) + leitura de extract_kg em kg-born-marker.sh'
     label: 'os 2 "pendurados" nao sao defeito: um e sinal de campo com from: adotante, cujo kg: aponta p/ grafo do repo DELE; o outro e placeholder de template no heredoc do /meta:diary, fora do frontmatter — e extract_kg le SO o frontmatter, entao nunca seria pego'
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-27-sinal-plane-vs-procedencia-e-evaporacao.md · 0ce2fff4:.claude/commands/meta/diary.md · 0ce2fff4:.claude/validation/kg-born-marker.sh"
+      locator: "sinal l.4 e l.9; diary.md@0ce2fff4 l.115; kg-born-marker.sh@0ce2fff4 l.147-165"
+      method: "leitura: frontmatter do sinal, placeholder do template e extract_kg no commit 0ce2fff4"
 
   - id: E_MODO_DE_FALHA_NUNCA_OCORREU
     node_type: evidence
@@ -272,6 +336,10 @@ nodes:
     verified_against: 'medicao dos 8 arquivos com kg: fora do escopo + historico de remocao/renomeacao'
     trace: ".claude/validation/kg-born-marker.sh:extract_kg"
     label: 'NAO ampliar o escopo da R43 — gated-until-trigger: zero achado hoje, zero ocorrencia historica, e ampliar exigiria excluir inbox/inbound sob pena de reprovar sinal de adotante como se fosse defeito nosso'
+    provenance:
+      source: "0ce2fff4:docs/analysis/onion-guardas-mapa-2026-08.md · 0ce2fff4:.claude/validation/kg-born-marker.sh"
+      locator: "mapa §7.2 l.212-232; kg-born-marker.sh l.147-165 (extract_kg)"
+      method: "leitura: decisão e medições registradas no mapa e no extrator no commit 0ce2fff4 (PR #524)"
 
   - id: C_DOCSTRINGS_STALE
     node_type: claim
@@ -282,6 +350,10 @@ nodes:
     verified_at: 2026-08-30
     verified_against: 'contagem real dos baselines vs o que o docstring afirma'
     label: 'R45 diz "nasce com 101" (baseline tem 0) e R44 diz "tudo em HUMAN" (15 classes, 1 MONITORED) — declarado != verificado DENTRO da propria guarda'
+    provenance:
+      source: "9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082:.claude/validation/kb-vendored-link-baseline.txt · 9c4f3082:.claude/validation/automation-ladder-registry.txt"
+      locator: "lint-artifacts.sh l.1797 (R44) e l.1822 (R45); baseline sem linhas úteis; registry com 15 linhas de classe"
+      method: "leitura: docstrings da R44/R45 e os dois arquivos de estado no commit 9c4f3082 (2026-08-02)"
 
   - id: E_R47_MORTA_SOB_ONLY
     node_type: evidence
@@ -292,6 +364,10 @@ nodes:
     verified_at: 2026-08-03
     verified_against: 'MUT: --only na propria narracao dava silencio antes do fix, acusa id inexistente depois'
     label: 'a R47 comparava ONLY_PATH (absoluto) com caminho relativo — no-op SILENCIOSO no modo que o pre-commit e o selftest usam; fixture dela passaria como good para sempre'
+    provenance:
+      source: "9c4f3082^:.claude/validation/lint-artifacts.sh · 9c4f3082:.claude/validation/lint-artifacts.sh"
+      locator: "pré l.106-110 (ONLY_PATH normalizado p/ absoluto) e l.2204-2205; pós l.2323-2328"
+      method: "leitura: código da R47 antes e depois da cura (commit 9c4f3082)"
 
   - id: D_CORRIGIR_R47
     node_type: decision
@@ -304,9 +380,9 @@ nodes:
     trace: ".claude/validation/lint-artifacts.sh:check_kg_narration_valid"
     label: 'corrigir a comparacao da R47 para absoluto, como as 15 irmas ja faziam — uma palavra'
     provenance:
-      source: ".claude/validation/lint-artifacts.sh:check_kg_narration_valid"
-      locator: "lint-artifacts.sh — comparacao agora absoluta, MUT versionado no relato"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      source: "9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082^:.claude/validation/lint-artifacts.sh"
+      locator: "pós l.2323-2328 (case ONLY_PATH in \"${narr}\"); pré l.2205 (\"${rel}\") e as 15 outras comparações case \"${ONLY_PATH}\" in das regras (l.1523-l.2247)"
+      method: "leitura: diff de uma palavra (rel → narr) entre 9c4f3082^ e 9c4f3082 + contagem das comparações irmãs"
 
   - id: E_R52_NUMEROS_ERRADOS
     node_type: evidence
@@ -317,6 +393,10 @@ nodes:
     verified_at: 2026-08-03
     verified_against: 'contagem de grafos distintos citados em kg: no escopo da R43'
     label: 'a 1a redacao do docstring da R52 dizia 18/33; o medido e 11/40 — regra nascida hoje ja carregava numero nao-reproduzivel, o defeito que ela existe p/ pegar'
+    provenance:
+      source: "9c4f3082:.claude/validation/lint-artifacts.sh · 9c4f3082:docs/analysis/onion-guardas-mapa-2026-08.md"
+      locator: "lint l.400-404 (docstring R52 + comando); mapa@9c4f3082 l.149-150"
+      method: "leitura: docstring da R52 no commit 9c4f3082"
 
   - id: A_MAPA
     node_type: artifact
@@ -347,6 +427,10 @@ nodes:
     verified_at: 2026-08-04
     verified_against: 'execucao do lint-artifacts.sh de dentro de .claude/worktrees/kg-freshness-identity-0804'
     label: 'FURO DE PRUNE: o lint poda */.claude/worktrees/* — exatamente o caminho que worktree-convention-2026.md define como canonico para worktree de HARNESS. Rodando de la, varre 0 agentes (deveria varrer 51) SEM reclamar, e morre em "wc: standard input: Is a directory" (o "(" do grupo find vaza para as raizes em _find, e o -prune imprime o diretorio podado). Como o pre-commit chama o lint, NENHUM commit sai de um worktree de harness'
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/pull/537"
+      locator: "mensagem do commit 79a7b89 do PR #537 (causas 1 e 2)"
+      method: "testemunho: execução da sessão 2026-08-04 relatada no commit 79a7b89; a worktree kg-freshness-identity-0804 não existe mais"
 
   - id: E_FUROESCOPO_EVOLUTION_0804
     node_type: evidence
@@ -371,6 +455,10 @@ nodes:
     verified_at: 2026-08-04
     verified_against: 'kg-radar.sh --integrity em onion-identity-2026-07.kg.yaml antes da correcao (exit 0 com a contradicao dentro)'
     label: 'FURO SEMANTICO: a INTEGRIDADE do kg-radar so ve contradicao ESTRUTURAL (REFUTES entrando em no que segue confirmed). Nao ve evidencia que SUPPORTS um claim que ela CONTRADIZ TEXTUALMENTE — E_LSTREE_MAIN_0717 ("main segue adotando, NAO parada") sustentou C_TOPO_MAIN_HAS_FW ("nao vazia, apenas PARADA") por 18 dias, com o radar exit 0 o tempo todo'
+    provenance:
+      source: "28db0b0e^:docs/onion/graph/onion-identity-2026-07.kg.yaml · https://github.com/marciocar/onion-evolve/pull/537"
+      locator: "onion-identity@28db0b0e^ l.148 (C_TOPO_MAIN_HAS_FW), l.594 (E_LSTREE_MAIN_0717), l.948-950 (aresta SUPPORTS); corpo do PR #537 §\"Achado colateral\""
+      method: "leitura: o grafo no commit pai da correção + corpo do PR #537"
 
   - id: C_TRES_FORMAS_DE_VERDE_SEM_OLHAR_0804
     node_type: claim
@@ -380,11 +468,16 @@ nodes:
     status: superseded
     verified_at: 2026-08-30
     verified_against: 'os 3 nos de evidencia E_FURO*_0804, cada um medido de forma independente em 2026-08-04'
-    label: 'RESPOSTA PARCIAL A Q_GUARDAS_COERENTES: ha lacuna, e ela tem TRES FORMAS DISTINTAS que produzem o MESMO sintoma (verde sem ter olhado) — (1) PRUNE: a guarda se apaga no lugar onde roda; (2) ESCOPO: a pasta nunca entra na varredura; (3) SEMANTICA: o veredito nao cobre a dimensao em que o erro mora. Corrigir uma NAO corrige as outras, e nenhuma das tres e detectavel pela saida da propria guarda — todas dizem OK. E por isso que o fix pontual foi vetado'
+    label: "Ha lacuna nas guardas com TRES FORMAS do mesmo sintoma, verde sem ter olhado: PRUNE (a poda comia a arvore varrida), ESCOPO (pasta que nunca entra na varredura) e SEMANTICA (o radar nao ve evidencia que contradiz o claim que ela sustenta), esta de outra natureza"
+    narrative: "label anterior: RESPOSTA PARCIAL A Q_GUARDAS_COERENTES: ha lacuna, e ela tem TRES FORMAS DISTINTAS que produzem o MESMO sintoma (verde sem ter olhado) — (1) PRUNE: a guarda se apaga no lugar onde roda; (2) ESCOPO: a pasta nunca entra na varredura; (3) SEMANTICA: o veredito nao cobre a dimensao em que o erro mora. Corrigir uma NAO corrige as outras, e nenhuma das tres e detectavel pela saida da propria guarda — todas dizem OK. E por isso que o fix pontual foi vetado"
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/pull/537"
+      locator: "corpo do PR #537 §'Os três furos nas guardas' e §'Fica aberto' (forma semântica); corpo do commit 39b9484 ('poda que se come e raiz que nunca entra (escopo)'; 'A forma SEMANTICA ... é outra natureza')"
+      method: "leitura: corpo do PR #537 e mensagem do commit 39b9484"
 
   - id: D_ESTUDAR_FAMILIA_ANTES_DE_CORRIGIR_0804
     node_type: decision
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: done
@@ -403,6 +496,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'medicao dos beacons vivos + /proc: 2 faroes anunciados VIVOS, ambos com started_at == refreshed_at e sem processo'
     label: 'o farol definia VIVA como refreshed_at dentro do TTL de 480min — carimbo que a propria sessao escreve. Como refreshed_at so avanca no UserPromptSubmit, toda sessao que some sem SessionEnd (crash, Remote Control, resume abortado) lia VIVA por 8h. Medidos no core: 2 faroes anunciados como vivos NUNCA receberam um prompt e NAO tinham processo — um deles nasceu 150s antes da propria sessao que leu o aviso, mesma branch e worktree'
+    provenance:
+      source: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md · c2504994 (corpo do commit)"
+      locator: "migalha l.28-31; corpo de c2504994 §1"
+      method: "testemunho: medição da sessão 2026-08-28 (beacons vivos + /proc) relatada em 1ª pessoa no commit c2504994; comando não registrado"
 
   - id: C_GUARDA_QUE_GRITA_ERRADO
     node_type: claim
@@ -457,6 +554,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'dogfood do hook pelo caminho real: owner_pid gravado = bash transitorio (comm=bash), nao o processo claude'
     label: 'O DOGFOOD PEGOU O BUG NA DIRECAO PERIGOSA: a 1a sonda casava *claude* no CMDLINE e elegia o shell transitorio do proprio hook, cujo path carrega ~/.claude/shell-snapshots/. Esse shell morre em segundos — o farol viraria orphan COM A SESSAO VIVA, exatamente o erro que o desenho proibe. Cura: casar por IDENTIDADE do executavel (comm = claude), com teste de regressao dedicado. Substring de path nao e identidade'
+    provenance:
+      source: "c2504994 (corpo do commit) · .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
+      locator: "corpo de c2504994 §\"O dogfood pegou um bug meu\"; migalha l.53-55"
+      method: "testemunho: dogfood do hook pela sessão 2026-08-28, relatado em 1ª pessoa"
 
   - id: C_REGRA_COPIADA_ENVELHECE_SEPARADA
     node_type: claim
@@ -467,6 +568,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'constellation-map.sh presence_of tinha 2a implementacao do vivo por TTL; passou a chamar session-beacon.sh verdict'
     label: 'o mapa da constelacao carregava uma SEGUNDA implementacao da regra de vivo (TTL copiado). Cura no motor nao alcanca copia: quando o farol aprendeu a medir o dono, a coluna PRESENCA continuaria pintando live para fantasma. A regra de vivo passou a morar num lugar so (subcomando verdict), com fallback ao TTL para worktree irma de motor antigo'
+    provenance:
+      source: "c2504994^:.claude/validation/constellation-map.sh · c2504994:.claude/validation/constellation-map.sh"
+      locator: "pré: l.46 (TTL_MIN 480) e l.82-91 (presence_of por idade); pós: l.87-102"
+      method: "leitura: presence_of antes e depois do commit c2504994"
 
   - id: E_INVARIANTE_QUEBRADA_NA_1A_VERSAO
     node_type: evidence
@@ -477,6 +582,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'revisao adversarial em EXECUCAO: beacon com refreshed_at == now saiu orphan e check devolveu 0; + mutacao provando a bancada cega'
     label: 'A CURA NASCEU VIOLANDO A PROPRIA INVARIANTE QUE DECLARAVA. beacon_verdict curto-circuitava no dono e NUNCA consultava o heartbeat: sessao que trocou de processo (resume/restart, mesmo sid) ou lida de outra visao de /proc (container, hidepid, outra maquina) saia `orphan` com heartbeat de SEGUNDOS atras — check devolvia 0 e AUTORIZAVA outra sessao a escrever por cima. O incidente W1xW2 reaberto pelo mecanismo feito para impedi-lo. E a bancada era CEGA no ponto: mutando `live` para nao bloquear, a suite passava toda verde (o exit 1 conferido vinha dos beacons do teste vizinho, sandbox compartilhado). Quem derrubou foi revisor adversarial EXECUTANDO, nao lendo'
+    provenance:
+      source: "289bc263 (corpo do commit) · .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
+      locator: "corpo de 289bc263 §1-2 e §\"A BANCADA ESTAVA CEGA\"; migalha l.41-45 e l.64"
+      method: "testemunho: revisão adversarial em execução relatada pela sessão 2026-08-28 em 1ª pessoa no commit 289bc263"
 
   - id: D_ORFAO_EXIGE_TRES_PROVAS
     node_type: decision
@@ -502,6 +611,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'medido: migalha do PR #700 existia no disco e NAO no index.md; lint passou 0 HARD; diary-index.sh regenerou 106->107'
     label: 'LACUNA DE COBERTURA medida em 2026-08-28: `.claude/diary/index.md` e projecao GERADA e nao tem catraca de em-sync, ao contrario do inventario (inventory.sh) e dos plugins (REGRA 19). Consequencia observada: escrevi a migalha do farol e nao rodei o diary-index.sh — a entrada ficou INVISIVEL no Tier-0 pointer que as sessoes leem para se orientar, e o lint passou verde. Migalha fora do indice nao orienta ninguem, que e o oposto do proposito dela. Quem pegou foi o MAESTRO perguntando, nao mecanismo — a mesma assinatura de C_LACUNA_E_COBERTURA. GATILHO REFINADO POR MEDICAO (2026-08-28, ao TENTAR implementar a cura): a cura prescrita NAO e diretamente aplicavel ao indice do diario, por DOIS bloqueios medidos. (1) diary-index.sh faz REPO=${1:-...} — o 1o argumento e o CAMINHO DO REPO, nao uma flag: chama-lo com --markdown criaria um diretorio chamado --markdown, e ele nao tem modo stdout, que e o que _gen_into exige. (2) o indice embute `Gerado em: <hoje>` — comparacao por bytes dispararia TODO DIA por mudanca so de data, uma maquina de falso-positivo. A catraca nasceu (REGRA 62) cobrindo SO docs/backlog.md, que e deterministico. Fechar este no agora seria fecha-lo por decreto. GATILHO: dar ao diary-index.sh modo stdout E declarar a linha `Gerado em:` como volatil-ignorada (ha precedente: o plugins-sync ignora provenance pelo mesmo motivo)'
+    provenance:
+      source: "docs/evolution/review/chore-diary-index-farol.md · d10ad708:.claude/validation/diary-index.sh · .claude/diary/2026-08-28-a-bancada-achou-o-defeito-destrutivo-que-eu-ia-enviar.md · 5111720a:.claude/validation/lint-artifacts.sh"
+      locator: "resíduo l.21-29; diary-index.sh@d10ad708 l.7 e l.24; migalha l.44-48; lint@5111720a l.1004 e l.1053-1054"
+      method: "leitura: resíduo R56 do PR do índice, gerador no commit da REGRA 62, migalha e precedente do plugins-sync"
 
   - id: D_REGRA62_CATRACA_DE_PROJECAO
     node_type: decision
@@ -527,6 +640,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'a propria bancada reprovou no 1o caso; mutacao removendo a guarda devolve `mutou=SIM` — a projecao boa E sobrescrita'
     label: 'A BANCADA ACHOU UM DEFEITO DESTRUTIVO QUE EU IA ENVIAR. O projetor enumera grafos por `git ls-files`; sem indice git (ou com GIT_DIR torto — incidente ja medido em 2026-08-04, 4 falsos de uma vez) isso devolve VAZIO e o render sai com cabecalho e ZERO itens. Nao e vazio o bastante para o _gen_into chamar de QUEBRA, entao viraria DRIFT e a mensagem mandaria REGENERAR POR CIMA — sobrescrevendo a projecao boa por uma quase-vazia. Falha aberta que vira DESTRUTIVA, exatamente a classe que o _gen_into existe para impedir, entrando pelo lado do GERADOR. Cura: enumeracao vazia com docs/onion/graph presente = QUEBRA, recusa com exit 2'
+    provenance:
+      source: ".claude/diary/2026-08-28-a-bancada-achou-o-defeito-destrutivo-que-eu-ia-enviar.md · d10ad708 (corpo do commit) · d10ad708:.claude/validation/lint-selftest.sh"
+      locator: "migalha l.30-36; corpo de d10ad708 §'A BANCADA ACHOU UM DEFEITO DESTRUTIVO'; selftest caso (f) l.10541-10554"
+      method: "testemunho: migalha e corpo de commit da sessão 2026-08-28 em 1ª pessoa; a cura tem caso de bancada versionado"
 
   - id: C_PROSA_PROMETIA_OWNER_INEXISTENTE
     node_type: claim
@@ -537,6 +654,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'grep de owner: em todo o corpus .kg.yaml = 0 ocorrencias; 3 lugares em prosa afirmavam o agrupamento'
     label: 'MESMA ASSINATURA QUE ORIGINOU A REGRA 58, noutro artefato: o campo `owner:` e LIDO pelo projetor desde a origem e NUNCA foi escrito por ninguem (0 ocorrencias no corpus), enquanto a descricao do comando, o procedimento e o /meta:realign afirmavam agrupamento por owner. Prosa que sobrevive ao mecanismo. Cura escolhida: NAO construir o mecanismo (o gatilho disparou para HONESTIDADE, e `owner` cai do lado VEDADO do invariante de escopo da onda) — a projecao passa a IMPRIMIR que zero nos declaram owner e que o agrupamento efetivo e por grafo'
+    provenance:
+      source: "bb39b568:.claude/validation/kg-backlog-project.sh · d10ad708^:.claude/commands/meta/backlog.md · d10ad708^:.claude/commands/meta/realign.md · d10ad708:.claude/validation/kg-backlog-project.sh · d10ad708 (corpo do commit) · docs/evolution/research/backlog-grafo-2026-08/SYNTHESIS.md"
+      locator: "projetor@bb39b568 l.10 e l.40; git grep -E '^\\s*owner:' d10ad708^ -- '*.kg.yaml' = 0 linhas; backlog.md@d10ad708^ l.3 e l.43; realign.md@d10ad708^ l.52; projetor@d10ad708 l.87 e l.128; corpo de d10ad708 §'O QUE NÃO FOI CONSTRUÍDO' (l.37-40); SYNTHESIS l.252"
+      method: "leitura: projetor na criação e na cura, prosa no commit pai da cura, corpo do commit d10ad708 e o invariante de escopo da onda"
 
   - id: E_A_GUARDA_SELAVA_A_PROPRIA_DOENCA
     node_type: evidence
@@ -547,6 +668,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'revisao adversarial reproduziu com comando: 1 grafo ilegivel => 27 itens somem, --fix grava, REGRA 62 reporta ZERO violacoes; e sem status-factor.awk o backlog vai de 39469 para 785 bytes com exit 0'
     label: 'A 1a VERSAO DA REGRA 62 CERTIFICAVA DE VERDE A PERDA SILENCIOSA QUE ELA EXISTE PARA IMPEDIR. O gerador chamava `kg-radar --open-tsv 2>/dev/null` dentro de process substitution: stderr descartado e RC NUNCA LIDO. Um unico grafo ingramatical fazia dezenas de itens sumirem da projecao, o --fix gravava a perda, e a guarda dizia "em sincronia". Eu havia fechado a porta da falha destrutiva pelo lado do `git ls-files` e a MESMA destruicao entrava intacta pelo lado do radar. `[ -s ]` nao protegia: a saida destrutiva era PLAUSIVEL (cabecalho + "nada aberto"), nao vazia. Cura: rc do radar lido por grafo, grafo enumerado-mas-ausente = QUEBRA, e sanidade enumerados==processados'
+    provenance:
+      source: "e830cd64 (corpo do commit) · d10ad708:.claude/validation/kg-backlog-project.sh"
+      locator: "corpo de e830cd64 §'CRÍTICO 1'; projetor@d10ad708 l.104"
+      method: "testemunho: revisão adversarial relatada pela sessão 2026-08-28 em 1ª pessoa no corpo do commit e830cd64; comandos não registrados"
 
   - id: E_RENDER_ERA_LOCALE_DEPENDENTE
     node_type: evidence
@@ -557,6 +682,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'revisao adversarial: diff entre C.UTF-8 e en_US.UTF-8 troca a ordem de dois nos empatados em 7.5; sob pt_BR o printf emite 38,0 no lugar de 38.2 com 190 erros em stderr E exit 0'
     label: 'CATRACA BYTE-A-BYTE COMPRA UM EIXO QUE EU NAO TINHA PINADO. Eu escrevi, ao instalar o pre-requisito do iconv, que "guarda que acusa o ambiente e pior que guarda nenhuma" — e deixei SEIS `sort` sem LC_ALL=C e um `printf %.1f` lendo LC_NUMERIC. Consequencias medidas: em en_US a ordem de nos empatados inverte (a guarda HARD reprova repo CERTO); sob locale de virgula decimal o printf grava `38,0`, sai exit 0, e o lint manda REGENERAR — quem obedece grava lixo. O locale do maestro e pt_BR. Os irmaos (graph.sh, kg-view.sh) ja pinavam; este era o unico fora do padrao. Cura `export LC_ALL=C`, verificada NO-OP no artefato atual'
+    provenance:
+      source: "e830cd64 (corpo do commit) · d10ad708:.claude/validation/kg-backlog-project.sh"
+      locator: "corpo de e830cd64 §'CRÍTICO 2'; projetor@d10ad708 sem LC_ALL, printf %.1f em l.149"
+      method: "testemunho: medição da revisão adversarial relatada pela sessão 2026-08-28 em 1ª pessoa no commit e830cd64; comandos não registrados"
 
   - id: Q_TRES_GRAFOS_NAO_SAO_YAML_VALIDO
     node_type: question
@@ -567,6 +696,10 @@ nodes:
     verified_at: 2026-08-29
     verified_against: 'python3 -c "yaml.safe_load(...)" sobre os 75 .kg.yaml rastreados (sem fixtures): 71 validos, 4 invalidos. Apos a colheita do fios-abertos restam 3: identidade-onion-vps-2026-08 (l.142), bridge-produto-2026-08 (l.278), scope-inheritance-2026 (l.555)'
     label: 'DECLARADO != VERIFICADO NO PROPRIO FORMATO DA SSOT. O formato se chama `.kg.yaml` e 4 de 75 arquivos NAO passavam num parser YAML de verdade — aspas quebradas dentro de `label:` (ex.: um `sha512:$(...)` com aspas embutidas, um `"recuperei a senha"` dentro de string simples, um `\$in` em string dupla). NADA nunca pegou porque o radar e awk LINHA-A-LINHA e tolera; qualquer consumidor com parser real quebra. O fios-abertos era um deles e voltou a ser valido por acidente da colheita — os nos defeituosos sairam. GATILHO para fechar: consertar os 3 restantes E nascer a guarda determinística (um `yaml.safe_load` por arquivo no lint) — mas NESTA ORDEM, porque guarda HARD antes do conserto reprova o repo inteiro'
+    provenance:
+      source: "9e4aaecc^ e 9cb4b27e (árvore git)"
+      locator: "9e4aaecc^: 75 .kg.yaml sem fixtures, 4 inválidos (bridge-produto l.278, scope-inheritance l.555, fios-abertos l.184, identidade-onion-vps l.142); 9cb4b27e: 75, 3 inválidos (o fios-abertos saiu)"
+      method: "medição: python3 yaml.safe_load(git show <sha>:<f>) sobre git ls-tree -r <sha> filtrado por *.kg.yaml fora de /fixtures/, reproduzido em 2026-10-09 contra 9e4aaecc^ (antes da colheita) e 9cb4b27e (commit do nó)"
 
   - id: E_A_FORMA_PRUNE_DEIXOU_DE_SER_INVISIVEL
     node_type: evidence

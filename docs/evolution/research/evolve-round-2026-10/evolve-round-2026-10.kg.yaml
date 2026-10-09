@@ -121,7 +121,7 @@ nodes:
 
   - id: A_DOCUMENTACAO_LIDA_COMO_INVOCACAO_E_CLASSE_SISTEMICA
     node_type: claim
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.9
     status: confirmed
@@ -129,6 +129,10 @@ nodes:
     label: 'ALERTA SISTEMICO (3+ achados, mesma causa): "texto que CITA um comando e lido por um mecanismo como se FOSSE a invocacao". Contagem no fim do dia, em SEIS sitios e CINCO mecanismos diferentes: (1) a REGRA 96 proibia documentar a si mesma (lint) — curado; (2) o /meta:forge-guard nasceu morto na carga (harness) — curado; (3) minha mensagem de violacao virou par fantasma da REGRA 59 (extrator) — curado; (4) o /meta:create-skill EXECUTA git diff a cada invocacao (harness) — VIVO; (5) o extrator da REGRA 59 ainda le mensagens de `violation` como producao (o par vendor-scrub-form-check --emit-baseline existe so por causa de uma mensagem, e infla o PRODN usado como prova de visao) — VIVO, contido; (6) o `regen-baselines.sh` resolve emissor de baseline por MENCAO de string, contido so por denylist de 3 nomes — ja mordeu uma vez. Tres curados por instancia, tres vivos. A CURA DE CLASSE que o worker propos e concreta: um simulador das regex do PROPRIO HARNESS rodando sobre commands/skills/plugins, forjado como guarda — porque cada mecanismo tem sua convencao de citar e o autor tem de adivinhar qual leitor vai passar pelo texto.'
     trace: '.claude/validation/consumed-mode-check.sh'
     verified_against: 'MAQ-0, MAQ-5 e MAQ-7 da rodada, mais os tres casos curados em 2026-10-04 (PRs #909, #910 e #911)'
+    provenance:
+      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json"
+      locator: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json → findings MAQ-0, MAQ-5, MAQ-7; corpo de d688f71d; corpos de a102675b, 33039e0d, 9c17b4da"
+      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json no host (run wf_9cba4ab5 de 2026-10-04) + corpos de d688f71d/a102675b/33039e0d/9c17b4da"
 
   - id: C_LENTES_CASAM_O_ARTEFATO_NAO_A_INVOCACAO
     node_type: claim
@@ -140,6 +144,10 @@ nodes:
     label: 'OPPORTUNISTIC (MAQ-6), mas de desenho: `dissect-lens` e `evolve-lens` NAO sao doutrina morta — sao RECEM-NASCIDAS (a evolve-lens nasceu as 16:58 e a ultima linha do log de carga e das 01:37), e os paths delas casam arquivos reais. O defeito real e o GATILHO: as lentes casam o ARTEFATO que o comando produz, nao a INVOCACAO do comando. A dissect-lens diz "leia antes de dissecar" e so carrega quando a sessao ja toca a SAIDA da dissecacao; a evolve-lens casa o evolve.md, que e editado na forja e nao lido quando o /meta:evolve roda. Hipotese NAO medida: leitura por `cat` via Bash (comum em bypass) pode nunca disparar path_glob_match. CURA: a census separa NUNCA de RECEM-NASCIDA comparando a data de criacao com a ultima sessao do log; e o proprio comando passa a citar a lente no corpo.'
     trace: '.claude/rules/dissect-lens.md'
     verified_against: 'git log --diff-filter=A das duas lentes vs o ultimo timestamp do instructions-loaded.jsonl; find docs/evolution/dissect'
+    provenance:
+      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json"
+      locator: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json → findings, id MAQ-6 (dimension MAQ)"
+      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_9cba4ab5-0ac.json no host (achado MAQ-6 do run wf_9cba4ab5, 2026-10-04)"
 
   - id: C_PESO_ADOPT_E_KG
     node_type: claim

@@ -1569,7 +1569,12 @@ nodes:
     status: confirmed
     verified_at: 2026-07-28
     verified_against: state-de-replay-e-resposta-do-endpoint
-    label: "CORRECAO DE PRESSUPOSTO MEU: eu ia tratar o a2a como desenho no papel. O endpoint invoca a2a-verify.sh do core por spawnSync, rejeita fail-safe NOMEANDO a camada que falhou (layer_failed: parse), e o state de replay guarda um handshake REAL aceito em 2026-07-11 21:40 (hs-real-1783806004). Chaves metagamify-1.pem e granaai-1.pem pinadas em disco. O gate funciona; o que falta e o REMETENTE"
+    label: "O a2a NAO e desenho no papel: o endpoint invoca a2a-verify.sh do core por spawnSync e rejeita fail-safe NOMEANDO a camada que falhou (layer_failed, ex.: parse). Chaves metagamify-1.pem e granaai-1.pem pinadas em disco. O gate esta construido; o que falta e o REMETENTE"
+    narrative: "label anterior: CORRECAO DE PRESSUPOSTO MEU: eu ia tratar o a2a como desenho no papel. O endpoint invoca a2a-verify.sh do core por spawnSync, rejeita fail-safe NOMEANDO a camada que falhou (layer_failed: parse), e o state de replay guarda um handshake REAL aceito em 2026-07-11 21:40 (hs-real-1783806004). Chaves metagamify-1.pem e granaai-1.pem pinadas em disco. O gate funciona; o que falta e o REMETENTE"
+    provenance:
+      source: "onion-bridge@c22517e:src/a2a.ts + .claude/utils/federation-transport/a2a-verify.sh@f5121e0d + .claude/utils/federation-transport/jwks/ + docs/analysis/onion-adr-federation-transport-pull-2026-07.md"
+      locator: "a2a.ts l.11 e l.51 (spawnSync), l.19 (VERIFY → a2a-verify.sh do core), l.45-46 e l.70-71 (fail-safe, layer_failed); a2a-verify.sh l.61-62 (veto emite layer_failed nomeado), l.67-76 (camada parse); jwks/metagamify-1.pem (668c03f5, 2026-07-09) e jwks/granaai-1.pem (dc489b45, 2026-07-10); ADR l.62-64 (\"Construímos o receptor e a alfândega, nunca o remetente\")"
+      method: "leitura: código do endpoint /a2a (onion-bridge@c22517e), gate e chaves versionados no core e ADR f5121e0d (2026-07-28)"
 
   - id: C_no_sender_exists
     node_type: claim
@@ -2008,7 +2013,12 @@ nodes:
     status: confirmed
     verified_at: 2026-09-02
     verified_against: 'grep -n systemd-run /home/marcio/onion-vps-logto/console.sh => linhas 30-37: sudo systemd-run --unit=onion-logto-console-autooff --on-active=60min no case on), com aviso fail-loud se o timer nao armar (onion-logto@master, Onda 8, I_CONSOLE_AUTOOFF em fios-abertos)'
-    label: "PAGO (Onda 8, 2026-09-01): o GAP deixou de existir — console.sh arma auto-off transitorio de 60min via systemd-run em modo SYSTEM no case on) (sobrevive ao fim da sessao SSH), e o case off) para o timer. O dogfood achou o console LIGADO por esquecimento — exatamente o caso que o gap descrevia. Janela escolhida: 60min (nao os 30 do desenho) por pedido de uso real do painel."
+    label: "PAGO (Onda 8, 2026-09-01): o `on` do console.sh arma auto-off de 60min (sudo systemd-run transient, sobrevive ao fim da sessão de shell) e avisa se não armar; o `off` NÃO para o timer. O dogfood achou o console LIGADO por esquecimento. Janela de 60min; o desenho previa 30."
+    narrative: "label anterior: PAGO (Onda 8, 2026-09-01): o GAP deixou de existir — console.sh arma auto-off transitorio de 60min via systemd-run em modo SYSTEM no case on) (sobrevive ao fim da sessao SSH), e o case off) para o timer. O dogfood achou o console LIGADO por esquecimento — exatamente o caso que o gap descrevia. Janela escolhida: 60min (nao os 30 do desenho) por pedido de uso real do painel."
+    provenance:
+      source: "onion-vps-logto@a0ce0fd:console.sh + corpo do commit onion-vps-logto@a0ce0fd"
+      locator: "console.sh l.28-41 (case on: sudo systemd-run --unit=onion-logto-console-autooff --on-active=60min, aviso \"auto-off NÃO armado\") e l.42-46 (case off: só mv + reload); corpo de a0ce0fd (2026-09-01, \"No dogfood o console estava LIGADO de esquecimento\"); janela de 30 do desenho em docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml l.791"
+      method: "leitura: script e mensagem do commit a0ce0fd no repo onion-vps-logto"
 
   - id: E_W8_JWKS_PR65_ABERTO
     node_type: evidence

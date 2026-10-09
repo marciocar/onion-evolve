@@ -17,11 +17,12 @@ nodes:
     verified_at: 2026-08-24
     verified_against: "onion-adr-family-repo-topology-2026-07.md D5/F5: 'o core sabe empacotar in-repo e ser adotado, mas NAO sabe empurrar bundle para repo git publico externo' — project-door.sh gated-until-trigger (>=2 doors). O maestro pediu explicitamente o repo publico onion-plugins → gatilho disparado."
     trace: docs/analysis/onion-adr-family-repo-topology-2026-07.md
-    label: "O elo source->repo-publico-de-plugin (project-door) estava GATED por doutrina ate haver gatilho concreto. O pedido do maestro (criar onion-plugins) e o gatilho: o gate abre e o gerador nasce."
+    label: "O elo source→repo-público-de-plugin (project-door, F5) estava GATED no ADR até ≥2 doors provarem o padrão; em 2026-08-24 o commit 65682c73 abriu a Fase 1 da publicação do Onion como plugin+marketplace, declarada 'o gatilho do project-door/F5', e registrou o gate aberto."
+    narrative: "label anterior: O elo source->repo-publico-de-plugin (project-door) estava GATED por doutrina ate haver gatilho concreto. O pedido do maestro (criar onion-plugins) e o gatilho: o gate abre e o gerador nasce."
     provenance:
       source: "docs/analysis/onion-adr-family-repo-topology-2026-07.md"
-      locator: "onion-adr-family-repo-topology-2026-07.md D5/F5: 'o core sabe empacotar in-repo e ser adotado, mas NAO sabe empurrar bundle para repo git publico externo' — project-door.sh gated-until-trigger (>=2 doors). O maestro pediu explicitamente o repo publico onion-plugins → gatilho disparado."
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locator: "docs/analysis/onion-adr-family-repo-topology-2026-07.md l.88-94 (D5) e l.115 (F5 gated ≥2 doors); corpo de 65682c73 (2026-08-24)"
+      method: "leitura: ADR de topologia da família (D5/F5) + corpo do commit 65682c73"
 
   - id: C_INSTALL_IS_NOT_ADOPT
     node_type: claim
@@ -189,8 +190,8 @@ nodes:
     trace: 'docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md'
     provenance:
       source: "docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md"
-      locator: "sinal de campo com o caso concreto (build-tech-docs em dois namespaces) em docs/evolution/inbox/_processed/2026-09-05-jogo-da-vida-pedido-de-adocao-e-sinais.md; consolidacao 8->5 em main desde 2026-09-04 (commit bab64742)"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locator: "sinal l.28-31 (\"Dois marketplaces habilitados = comandos duplicados... onion-plugins (GitHub, 8 plugins) e onion-evolve (local, consolidado 8→5)... build-tech-docs aparecia em onion-docs: e onion-product:... Resolvido desabilitando @onion-plugins. Proposta: publicar... ou meta:adopt/onboarding detectar\") + l.107-110 (triagem) + commit bab64742 (2026-09-04, consolidação 8→5 onion←work-tools, engineering←testing, product←docs)"
+      method: "leitura: sinal de campo de 2026-09-05 (inbox/_processed) + assunto do commit bab64742"
 
   - id: Q_UPDATE_EXIGE_ADOCAO_INTEGRADA
     node_type: question
@@ -217,6 +218,10 @@ nodes:
     verified_at: '2026-09-05'
     verified_against: 'medido 2026-09-05 nos dois adotantes locais: um com rc=11 e 48 nao-framework; outro com adocao integrada, rc=10, 97 nao-framework e 29 conflitos, com 29/29 identicos ao pin antigo (sha256 contra `git show <pin>:<arquivo>`); resolucao pelo lado do framework VERIFICADA byte-a-byte contra o core no pin novo'
     trace: '.claude/utils/adopt/vendor-branch.sh'
+    provenance:
+      source: "git:b77f90f5"
+      locator: "corpo do commit b77f90f5 (2026-09-05) §\"Os dois --update reais\", item 2 (sandbox determinístico REFUTOU, rc=0, zero conflitos → refuted)"
+      method: "leitura: corpo de b77f90f5 (refutação em sandbox determinístico)"
 
   - id: Q_BEACON_NAO_LIBERA_NO_STOP
     node_type: question
@@ -318,6 +323,10 @@ nodes:
     verified_at: '2026-09-06'
     verified_against: 'executado: `kg-seal-exception.sh <grafo> Q_UPDATE_EXIGE_ADOCAO_INTEGRADA --base b77f90f5^` → PARA rc=1 por (1) "JA EXISTE em b77f90f5^". A restauracao da aresta foi medida numa copia: `kg-radar.sh --all` rc=0 e a secao RECONCILIACAO fecha com "nenhum alvo de SUPERSEDES ficou por reconciliar". As contagens do corpus vem de scratchpad/conta.py (PyYAML sobre git ls-files), nao de regex ad-hoc — tres parsers ad-hoc tinham dado 9, 13 e 14 para a mesma pergunta.'
     trace: 'docs/onion/graph/onion-plugin-publication-2026-08.kg.yaml'
+    provenance:
+      source: "git:c6310692"
+      locator: "corpo de c6310692 (2026-09-06) §(1) e §\"guarda que eu decidi NÃO construir\" (17 de 211); c6310692:docs/evolution/review/fix-kg-yaml-validity-ratchet.md l.60-73 (evidence→decision, aresta restaurada)"
+      method: "leitura: corpo de c6310692 + resíduo fix-kg-yaml-validity-ratchet.md do mesmo commit"
   - id: C_PRECONDICAO_INTEGRACAO_SOBREVIVE
     node_type: claim
     plane: PROD

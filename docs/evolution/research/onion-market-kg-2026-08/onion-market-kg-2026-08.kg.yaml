@@ -470,10 +470,15 @@ nodes:
     plane: PROD
     impact: 3
     confidence: 0.95
-    status: unverifiable
+    status: confirmed
     verified_at: 2026-08-28
     verified_against: 'trendshift.io: #1 em 18/08/2026; em 25/08 ja era #8 de JavaScript e #18 na semana 34'
-    label: 'BARULHO NOMEADO: o badge "GitHub Trending #1 Repository of the Day" e um PICO DE UM DIA (18/08) exibido sem data. Uma semana depois ja era #8/#18. Hype nao e retencao — e apresentar o melhor dia como se fosse a regua permanente e a forma mais barata de inflar tracao. Vale como contra-exemplo para a nossa propria comunicacao: numero de vitrine sem carimbo de data envelhece mentindo'
+    label: "BARULHO NOMEADO: o badge 'GitHub Trending: #1 Repository of the Day' do README não traz data nem recorte. O trendshift que ele linka dá #1 só em TypeScript (18 e 19/08/2026); no geral, #2, #3 e #10 (18 a 20/08); nada depois. Vitrine sem data e recorte envelhece mentindo."
+    narrative: "label anterior: BARULHO NOMEADO: o badge \"GitHub Trending #1 Repository of the Day\" e um PICO DE UM DIA (18/08) exibido sem data. Uma semana depois ja era #8/#18. Hype nao e retencao — e apresentar o melhor dia como se fosse a regua permanente e a forma mais barata de inflar tracao. Vale como contra-exemplo para a nossa propria comunicacao: numero de vitrine sem carimbo de data envelhece mentindo"
+    provenance:
+      source: "https://trendshift.io/repositories/46562 + https://raw.githubusercontent.com/HarnessMD/munder-difflin/main/README.md"
+      locator: "trendshift: array \"trendings\" (trend_date 2026-08-16..20; trending_language typescript = #6/#7 16/08, #1 18/08, #1 19/08, #2 20/08; null = #2 18/08, #3 19/08, #10 20/08); README l.10 (alt \"GitHub Trending: #1 Repository of the Day\")"
+      method: "leitura: trendshift.io/repositories/46562 (curl com User-Agent de navegador, HTTP 200, 206 KB, 2026-10-09) e README raw l.10"
 
   - id: C_MD_AUDITAVEL_DECLARADO_SEM_ARQUIVO
     node_type: claim

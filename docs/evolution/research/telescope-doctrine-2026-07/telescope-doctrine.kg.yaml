@@ -9,52 +9,72 @@ nodes:
   - id: E_LENS_TRANSFORMER
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
     verified_at: 2026-07-18
     label: "lente Transformer: nome e mecanismo quando os entailments da palavra implicam o invariante sem reler a doutrina; telescopio entrega observar-nao-comunicar de graca"
+    provenance:
+      source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.24-27"
+      method: "leitura: SYNTHESIS.md registra a lente Transformer-absorção da orquestração wf_35e1e7a2"
   - id: E_LENS_MARKET
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 1.0
     status: confirmed
     verified_at: 2026-07-18
     label: "lente Mercado: read-only mora na convencao+allowed-tools, nao numa flag (tmux documenta attach -r como convenience not security -> preferir capture-pane)"
+    provenance:
+      source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.30-31; ADR l.63-64"
+      method: "leitura: SYNTHESIS.md registra a lente mercado/prior-art da orquestração wf_35e1e7a2"
   - id: E_LENS_RISK
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
     verified_at: 2026-07-18
     label: "lente Risco (adversarial): telescopio como instrumento permanente convida ao daemon-vigia; a unidade do ato precisa ser evento pontual, nao instalacao"
+    provenance:
+      source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.19 e l.42 (inv.8)"
+      method: "leitura: SYNTHESIS.md registra a lente risco-adversarial (daemon-vigia) e o invariante on-demand"
   - id: C_NAME_TELESCOPE
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.85
     status: confirmed
     verified_at: 2026-07-18
     label: "NOME: telescopio (conceito) par por oposicao com o farol (farol emite metadado consentido; telescopio recebe conteudo pleno unilateral) — capacidade nova, nao sinonimo"
+    provenance:
+      source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.15-17; ADR l.30-34"
+      method: "leitura: SYNTHESIS.md registra o nome telescópio e o par por oposição com o farol"
   - id: C_ACT_VISLUMBRE
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.85
     status: confirmed
     verified_at: 2026-07-18
     label: "unidade do ATO: vislumbre — da-se um vislumbre pelo telescopio, nunca telescopio ligado; carrega efemeridade (prova nada, efemero) que telescopio carrega mal"
+    provenance:
+      source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.18-20 (vislumbre = unidade do ato); ADR l.35-36"
+      method: "leitura: SYNTHESIS.md da orquestração wf_35e1e7a2 registra vislumbre como unidade do ato"
   - id: C_PEEK_RAW
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 1.0
     status: superseded
@@ -77,7 +97,7 @@ nodes:
   - id: C_INV9_RAW
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: superseded
@@ -86,39 +106,55 @@ nodes:
   - id: E_FURO_A
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
     verified_at: 2026-07-18
     label: "FURO A (verify adversarial): consentimento — a observada precisa de opt-in explicito (campo telescope-allowed que o MEMBRO seta), espelhando que o farol e dela levantar"
+    provenance:
+      source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.50 (FURO A)"
+      method: "juízes: furo A achado pela verificação adversarial opus da orquestração wf_35e1e7a2"
   - id: E_FURO_B
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
     verified_at: 2026-07-18
     label: "FURO B (verify adversarial): telescopar sessao viva E live-pull; restringir a leitura LOCAL same-machine pelo maestro humano (capture-pane localhost), largar remoto/tokens"
+    provenance:
+      source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.51 (FURO B)"
+      method: "juízes: furo B achado pela verificação adversarial opus da orquestração wf_35e1e7a2"
   - id: C_FURO_C
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 1.0
     status: confirmed
     verified_at: 2026-07-18
     label: "FURO C (reuso): #1/#5 herdam a regra da NOTE-04 — guardar nao eh aceitar nao eh aplicar; o vislumbre (intake) degrada SKIP, so a acao derivada degrada VETO"
+    provenance:
+      source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.52 (FURO C)"
+      method: "juízes: furo C achado pela verificação adversarial opus da orquestração wf_35e1e7a2, registrado no SYNTHESIS"
   - id: C_INV9_FIXED
     node_type: claim
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.9
     status: confirmed
     verified_at: 2026-07-18
     label: "INVARIANTE 9 CORRIGIDO: opt-in da observada (telescope-allowed) + LOCAL-ONLY (capture-pane localhost pelo maestro humano; remoto = excecao gated a2a-live nomeada)"
+    provenance:
+      source: "docs/analysis/onion-adr-telescope-session-observation-2026-07.md"
+      locator: "ADR l.54-60 (invariante 9 corrigido); SYNTHESIS.md l.43, l.50-51"
+      method: "juízes: correção do invariante 9 pelos furos A/B da verificação adversarial wf_35e1e7a2, registrada no ADR e no SYNTHESIS"
   - id: D_VALIDATION_PATTERN
     node_type: decision
     layer: audit

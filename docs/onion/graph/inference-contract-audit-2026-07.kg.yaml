@@ -74,6 +74,10 @@ nodes:
     impact: 5
     confidence: 0.9
     label: "P8: a POLITICA (matriz + rotulagem) e a superficie de ESCRITA do motor escaparam 7 passadas — o motor edita a regra e as fixtures ficam verdes por construcao"
+    provenance:
+      source: ".claude/diary/2026-07-20-admission-rule-blindspot.md · docs/knowledge-base/concepts/inference-mitigation.md@ac259e25"
+      locator: ".claude/diary/2026-07-20-admission-rule-blindspot.md:19-20 e :30-33 · docs/knowledge-base/concepts/inference-mitigation.md@ac259e25:111-114 (item (0) superfície de escrita) e :137-142 (POLÍTICA escapou, fixtures verdes por construção)"
+      method: "leitura: migalha e KB do contrato no commit ac259e25"
 
   # ── A evidencia adversarial (as 8 passadas) ───────────────────────────────
   - id: E_VERIFY_RECIPIENT
@@ -90,7 +94,12 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    label: "verify P2-P7: MESMA falha de forma cada rodada — o mecanismo criado para fechar o furo anterior entra ELE PROPRIO sem provar seus pressupostos (destinatario->concessao->assinatura->ancora->revogacao/relogio->politica)"
+    label: "verify: MESMA falha de forma a cada rodada — o mecanismo criado para fechar o furo anterior entra ELE PROPRIO sem provar seus pressupostos (destinatario->concessao->assinatura->ancora->revogacao/relogio/via-viva->politica->superficie de escrita); politica so vista na 8a passada"
+    narrative: "label anterior: verify P2-P7: MESMA falha de forma cada rodada — o mecanismo criado para fechar o furo anterior entra ELE PROPRIO sem provar seus pressupostos (destinatario->concessao->assinatura->ancora->revogacao/relogio->politica)"
+    provenance:
+      source: ".claude/diary/2026-07-20-admission-rule-blindspot.md · commit 474b194f (corpo)"
+      locator: ".claude/diary/2026-07-20-admission-rule-blindspot.md:17-19 (falha de forma), :23-26 (escada destinatário→…→política→superfície de escrita), :30-33 (política só vista na 8ª) · 474b194f corpo ('always the same failure of FORM, one level deeper each time')"
+      method: "leitura: migalha versionada e corpo do commit 474b194f"
 
   - id: E_VERIFY_BACKGROUND_BLINDSPOT
     node_type: evidence
@@ -134,6 +143,10 @@ nodes:
     impact: 4
     confidence: 0.9
     label: "limites declarados simetricos: L1 fecha so topologia ROTULADA; L2 nao fecha inferencia DENTRO do proposito; ambos por-TURNO (composicao = L3/L6 gated); nao quantifica reducao"
+    provenance:
+      source: "commit 474b194f (corpo) · docs/knowledge-base/concepts/inference-mitigation.md@474b194f"
+      locator: "474b194f corpo §'Honest limits kept explicit and symmetric' · inference-mitigation.md@474b194f:144-148 (escopo por-TURNO; composição = L3/L6 GATED), :165-169 (limite honesto de L1: só o rotulado), :183-186 (limite de L2: não fecha inferência dentro do propósito; não quantifica redução)"
+      method: "leitura: corpo do commit 474b194f e a KB do contrato no mesmo commit"
 
   # ── O artefato e a migalha ────────────────────────────────────────────────
   - id: A_CONTRACT_KB
@@ -159,6 +172,10 @@ nodes:
     verified_at: 2026-07-20
     label: "migalha 2026-07-20-admission-rule-blindspot — a licao de metodo saiu do contrato para o diario, reusavel no proximo contrato"
     trace: ".claude/diary/2026-07-20-admission-rule-blindspot.md"
+    provenance:
+      source: ".claude/diary/2026-07-20-admission-rule-blindspot.md"
+      locator: ".claude/diary/2026-07-20-admission-rule-blindspot.md:34-38 (§Evidence, regra de admissão vive só no contrato) e :10 (next_recommended)"
+      method: "leitura: a migalha versionada apontada no trace"
 
 edges:
   - from: D_CONTRACT_IS_AUTHORITY

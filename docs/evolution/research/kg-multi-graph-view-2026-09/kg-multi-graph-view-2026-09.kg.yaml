@@ -269,6 +269,10 @@ nodes:
     source_kind: measurement
     label: 'LACUNAS DECLARADAS (1a classe). (A) NAO VERIFICADAS POR FALHA DE ACESSO: ZERO — nenhum 403, nenhuma doc truncada; toda fonte tentada foi lida. (B) REFUTADAS NA VERIFICACAO ADVERSARIAL: 15 claims, entre elas 5 de tier 10 (owl:sameAs como mecanismo padrao de referencia cross-named-graph; isomorfismo de grafos como comparacao deterministica; "cada endpoint federado retem soberania total"; "named graph delimita contexto de verdade"; "RDF datasets sao o mecanismo padrao para N grafos peer sob SSOT unico"), 2 de tier 9 (JSON-LD @context por URL; named graph na spec JSON-LD), 1 de tier 9 sobre OWL 2 Imports NAO cobrir N grafos peer, 2 de tier 7 (Logseq: grafo = pasta, sem fusao), 1 de tier 6 (N-Quads), 2 de tier 5 (o dashboard agregado do Multi-Vault; a ausencia de cross-vault no MCP). CONSEQUENCIA DIRETA PARA A DECISAO: as refutacoes derrubaram justamente as fontes que dariam base externa a O6 (owl:imports) e a "comparabilidade sem camada nova" (isomorfismo) — ou seja, O6 chega a mesa SEM sustentacao externa sobrevivente, e a comparabilidade so tem base em Freeman/closeness, que exigem normalizacao. (C) CORTADAS POR ORCAMENTO: a medicao propria da dispersao de atencao entre os 4 grafos peer do Onion pessoal (o grafo bruto e privado por P3, nao acessivel a esta sessao); o custo absoluto de implementar o resolver-irmao de O5; e a base rate de quantos adotantes chegam a ter N grafos peer (N=1 hoje). (D) SEM PRECEDENTE ENCONTRADO: "atencao/centralidade comparavel entre grafos de dominios diferentes" nao tem precedente de FERRAMENTA — so tem precedente MATEMATICO (normalizacao), e nenhum produto o expoe.'
     trace: 'docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/kg-multi-graph-view-2026-09/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.24 (10 confirmadas, 15 refutadas), l.49 (C5 lacunas), l.57 (NÃO-VERIFICADOS); corpo do commit a71023c6"
+      method: "testemunho: contabilidade da rodada /onion-research wf_bb97173d-425 (2026-09-04, commit a71023c6); journal do run ausente no host, detalhamento por tier só no próprio nó"
 
   # ── A DECISÃO (OPEN — o maestro sela; nenhuma sessão converte recomendação em veredito) ─
   - id: D_KG_MULTI_GRAPH_VIEW_0904
@@ -385,6 +389,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 2 — o pressuposto de SERVICE e um PROCESSADOR DE CONSULTA VIVO por grafo, atras de um IRI de rede. Aqui os 4 grafos peer sao arquivos no MESMO repo, no MESMO disco, do MESMO dono: nao existe fronteira de rede nem de autoridade a federar. O padrao importa o custo (endpoint, protocolo, juncao de bindings) sem o beneficio. Alem disso, SERVICE e o precedente do caso ENTRE adotantes — que o corpus ja declara GATED (Q_BACKLOG_FEDERADO). Usa-lo para o caso DENTRO de um adotante importa a arquitetura do fio gated para dentro do fio nao-gated, e e assim que um fio gated vaza.'
     trace: 'docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/kg-multi-graph-view-2026-09/kg-multi-graph-view-2026-09.kg.yaml"
+      locator: "cabeçalho do grafo l.36-39 (E_OBJECAO_2 e Q_BACKLOG_FEDERADO); docs/evolution/research/backlog-grafo-2026-08/backlog-grafo-2026-08.kg.yaml l.281-288 (Q_BACKLOG_FEDERADO open, gatilho literal); SYNTHESIS.md l.29, l.34-36"
+      method: "juízes: objeção sobrevivente do Elenxo da rodada wf_bb97173d-425 (cabeçalho declara 10 objeções sobreviventes; veredito do Elenxo no SYNTHESIS l.34-36); premissa gated por leitura do nó Q_BACKLOG_FEDERADO"
 
   - id: E_OBJECAO_3_COMPOSITE_E_ADMIN_PLATFORM_E_SILENTE_SOBRE_METRICA
     node_type: evidence

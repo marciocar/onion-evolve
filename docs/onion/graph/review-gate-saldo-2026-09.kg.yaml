@@ -21,7 +21,12 @@ nodes:
     verified_against: "artefato review-evidence-36782105288 do PR #895, lido do proprio run: {\"is_error\":true,\"api_error_status\":400,\"terminal_reason\":\"api_error\",\"result\":\"Credit balance is too low\",\"total_cost_usd\":0,\"num_turns\":1}. A run anterior (36781367066, 21:44Z) revisou com sucesso; a seguinte (21:51Z) ja falhou — o credito acabou entre as duas."
     source_kind: repo
     source_tier: 10
-    label: "o revisor semantico do CI cai por SALDO DE API, e o pre-voo nao pega: ele devolve HTTP 200 porque testa CREDENCIAL, nao saldo"
+    label: "o revisor semantico do CI cai por SALDO DE API, e o pre-voo nao pega: o POST /v1/messages de 1 token devolve HTTP 200 e o revisor morre em seguida com 400 Credit balance is too low — o pre-voo mede uma chamada minima, nao saldo suficiente"
+    narrative: "label anterior: o revisor semantico do CI cai por SALDO DE API, e o pre-voo nao pega: ele devolve HTTP 200 porque testa CREDENCIAL, nao saldo"
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/actions/runs/36782105288"
+      locator: "artefato review-evidence-36782105288 (claude-execution-output.json) + log do passo de pré-voo; run anterior 36781367066"
+      method: "medição: gh run download 36782105288 --repo marciocar/onion-evolve -n review-evidence-36782105288 + gh run view 36782105288 --log + gh api .../actions/runs (36781367066 success 21:44Z, 36782105288 failure 21:51Z)"
 
   - id: C_PREVOO_MEDE_CREDENCIAL_NAO_SALDO
     node_type: claim
@@ -33,7 +38,12 @@ nodes:
     verified_against: "no mesmo run: PREFLIGHT_HTTP=200 e HAS_ANTHROPIC_KEY=true, com o revisor morrendo em api_error_status 400 'Credit balance is too low'. O pre-voo existe para dizer a CAUSA e disse 200 — verde que nao cobre o modo de falha que de fato ocorreu."
     source_kind: repo
     source_tier: 10
-    label: "o pre-voo do revisor da verde para credencial valida com saldo zero — o verde nao cobre o modo de falha real"
+    label: "o pré-voo do revisor dá verde (HTTP 200 num POST /v1/messages com max_tokens=1) com saldo insuficiente para a revisão — o verde não cobre o modo de falha real (400 'Credit balance is too low' ~70s depois, no mesmo run)"
+    narrative: "label anterior: o pre-voo do revisor da verde para credencial valida com saldo zero — o verde nao cobre o modo de falha real"
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/actions/runs/36782105288"
+      locator: "log do run 36782105288, job onion-review, passo 'Pré-voo — a credencial consegue RODAR o modelo do revisor?' (21:51:59Z: 'POST /v1/messages, modelo claude-sonnet-5, max_tokens=1: HTTP 200') + artefato review-evidence-36782105288 (revisor 21:53:11Z: is_error, 400, 'Credit balance is too low')"
+      method: "medição: gh run view 36782105288 --repo marciocar/onion-evolve --log | grep pré-voo + gh run download 36782105288 -n review-evidence-36782105288"
 
   - id: Q_REVISOR_SEM_SALDO_DERRUBA_TODO_PR
     node_type: question
@@ -47,6 +57,10 @@ nodes:
     source_tier: 10
     label: "enquanto a conta de API do CI estiver sem saldo, TODO PR deste repo mergeia por dispensa em vez de aprovacao — o gate semantico fica inerte por causa externa"
     gatilho: "o maestro repor o saldo. Ao repor: rodar o onion-review de novo num PR aberto e conferir REVISOU=true no verdict ANTES de voltar a confiar no verde. A cura de MECANISMO (pre-voo que meça saldo, nao so credencial) fica gated neste mesmo gatilho — hoje nao ha como medir saldo sem gastar."
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/actions/runs/36782105288"
+      locator: "log do run 36782105288, job onion-review-verdict (REVISOU: false, ACHADOS: -1) ; listagem de runs \"Onion Code Review\" desde 2026-09-30"
+      method: "medição: gh run view 36782105288 --repo marciocar/onion-evolve --log | grep -E 'REVISOU|ACHADOS' + gh api 'repos/marciocar/onion-evolve/actions/runs?created=>2026-09-30' (conclusões do Onion Code Review)"
 
   - id: D_SEM_CREDITO_POR_ORA
     node_type: decision
@@ -58,6 +72,10 @@ nodes:
     verified_against: "selado pelo maestro em 2026-10-01, em resposta direta a pergunta sobre como travar o revisor: 'so saber que neste momento nao vamos colocar credito ele nao vai funcionar no CI'. Nenhuma mudanca de workflow foi pedida nem feita."
     label: "DECISAO, nao espera: por ora NAO se repoe credito, e o revisor semantico do CI fica inerte. O verdict vermelho com REVISOU=false e ESTADO CONHECIDO — nao se diagnostica de novo, e o merge segue por dispensa NOMEADA no PR"
     gatilho: "o maestro dizer que quer o revisor de volta. Ate la: nao propor religar, nao reinvestigar a causa, nao mexer no onion-review.yml — e nao deixar o desligamento virar verde silencioso (o check CONTINUA vermelho de proposito, porque ausencia de revisao tem de ficar visivel no historico)."
+    provenance:
+      source: "90fb5006 (corpo do commit) + docs/evolution/review/docs-review-gate-sem-credito-por-decisao.md"
+      locator: "90fb5006 corpo"
+      method: "testemunho: selo do maestro em 2026-10-01, citação verbatim registrada no corpo do commit 90fb5006 da sessão"
 
 edges:
   - from: C_PREVOO_MEDE_CREDENCIAL_NAO_SALDO

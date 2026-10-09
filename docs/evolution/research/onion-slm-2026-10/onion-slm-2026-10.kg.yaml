@@ -83,6 +83,10 @@ nodes:
     verified_against: 'git show origin/docs/research-infra-nanochat-2026-10:docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml — no D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 com status: done'
     label: 'ANCORA CROSS-GRAFO (espelho, nao editavel daqui): nanochat-onion-2026-10#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10, SELADA done — A operante: nao treinar agora; B/C/D vivas em gatilho nomeado; C so com veiculo que NAO seja o Nanochat (primitiva tipada local sem treino), fine-tune so apos eval de dominio que falhe; E (o Onion como modelo) refutada.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10 (branch docs/research-infra-nanochat-2026-10)'
+    provenance:
+      source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml"
+      locator: "baa56596:docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.395-403 (D_NANOCHAT_ONION_DOMAIN_TRAINING_2026_10: status done, verified_against SELADO PELO MAESTRO, label)"
+      method: "leitura: nó-alvo no grafo nanochat, hoje em main (o verified_against apontava a branch, que entrou em main)"
 
   - id: X_REF_NANOCHAT_OPTION_C
     node_type: entity
@@ -94,6 +98,10 @@ nodes:
     verified_against: 'git show origin/docs/research-infra-nanochat-2026-10 — no C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL com status: open'
     label: 'ANCORA CROSS-GRAFO: nanochat-onion-2026-10#C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL (open) — SLM-ferramenta de dominio estreito via adapter SDAAL: tarefa tipada de CONJUNTO FECHADO e verificavel, nunca orquestrador; caminho de menor risco = decisao tipada local (llama.cpp + gramatica + n_probs) sobre SLM aberto PRE-TREINADO, sem treino; juiz do Elenxo destilado do Claude VETADO; gatilho = 2o caso de uso de SLM alem do de-id.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL (branch docs/research-infra-nanochat-2026-10)'
+    provenance:
+      source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml"
+      locator: "baa56596:docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.363-371 (C_OPCAO_C_DOMAIN_SLM_TOOL_SDAAL)"
+      method: "leitura: nó-alvo no grafo nanochat em main"
 
   - id: X_REF_NANOCHAT_Q_EVAL
     node_type: entity
@@ -105,6 +113,10 @@ nodes:
     verified_against: 'git show origin/docs/research-infra-nanochat-2026-10 — no Q_EVAL_DE_DOMINIO_DO_ONION com status: open'
     label: 'ANCORA CROSS-GRAFO: nanochat-onion-2026-10#Q_EVAL_DE_DOMINIO_DO_ONION (open) — o eval de dominio, pre-requisito de B, C e D, que hoje NAO EXISTE: tarefas estreitas com gabarito do proprio corpus (tipo do no, declarado-nao-verificado, orfao, julgar verified_against) + corretor deterministico.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#Q_EVAL_DE_DOMINIO_DO_ONION (branch docs/research-infra-nanochat-2026-10)'
+    provenance:
+      source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml"
+      locator: "baa56596:docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.688-696 (Q_EVAL_DE_DOMINIO_DO_ONION)"
+      method: "leitura: nó-alvo no grafo nanochat em main"
 
   - id: X_REF_NANOCHAT_OBJ_CORRELATED_ERROR
     node_type: entity
@@ -116,6 +128,10 @@ nodes:
     verified_against: 'git show origin/docs/research-infra-nanochat-2026-10 — no E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR com status: confirmed'
     label: 'ANCORA CROSS-GRAFO: nanochat-onion-2026-10#E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR (confirmed) — destilar o juiz do Elenxo a partir do Claude produz ERRO CORRELACIONADO com o gerador das claims e destroi a independencia adversarial; juiz SLM so em decisao de conjunto fechado e verificavel.'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml#E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR (branch docs/research-infra-nanochat-2026-10)'
+    provenance:
+      source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml"
+      locator: "baa56596:docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml l.435-443 (E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR)"
+      method: "leitura: nó-alvo no grafo nanochat em main"
 
   - id: X_REF_DEID_NONE_FAILSAFE
     node_type: entity

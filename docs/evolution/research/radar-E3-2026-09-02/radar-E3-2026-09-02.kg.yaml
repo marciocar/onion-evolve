@@ -117,6 +117,10 @@ nodes:
     verified_against: 'CHANGELOG l.53 (permissions.ask em subshell), l.61 (deny Read/Edit cobre < file e tac/egrep), l.54 (plugin nao le fora via symlink); find plugins -type l | wc -l = 0 (rc=0); juiz EMENDOU: minha 1a medicao foi em .claude/plugins, que NAO EXISTE (fail-open)'
     label: 'F5 EMENDADO (medicao fail-open corrigida). Tres reforcos de permissao: (a) `permissions.ask` agora vale dentro de comando composto/subshell em auto mode; (b) deny de Read()/Edit() em Bash cobre `< file` e leitores como tac/egrep; (c) plugin nao le fora do proprio dir por componente symlink. Re-medido no alvo REAL (plugins/, 8 plugins, manifesto .claude-plugin/marketplace.json): 0 symlinks. A 1a medicao rodou `find` sobre `.claude/plugins` inexistente — a classe que a guarda anti-fail-open do core existe para pegar, e o juiz pegou. Impacto: so reforco.'
     trace: 'docs/evolution/research/radar-E3-2026-09-02/data/f1-findings-pre-juiz.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md · docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md · commit 8320b1c3"
+      locator: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md tabela Vereditos, linha F5 (EMENDADO, medição fail-open: .claude/plugins não existe; plugins/ = 0 symlinks) · docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md:46,47,54 (= CHANGELOG oficial l.53/54/61) · data/f1-findings-pre-juiz.md:9 (rascunho antes do juiz)"
+      method: "juízes: veredito EMENDADO do juiz-e3 (opus/high, mandato REFUTAR) registrado na tabela de vereditos do SYNTHESIS.md"
 
   - id: E_F6_DETACHED_MORRE_NO_STOP
     node_type: evidence
@@ -143,6 +147,10 @@ nodes:
     verified_against: 'grep -c "exit 2\|PreToolUse\|memory tool" na entrada 2.1.257 = 0 (rc=1); "hook" 2x (l.54, l.86), nenhuma toca semantica de bloqueio; juiz EMENDOU o non-sequitur'
     label: 'F7 EMENDADO. Sem sinal no delta sobre hooks novos (PreModelSwitch etc.), memory tool nativo ou semantica do exit 2: a capacidade que compra o acoplamento permanece intacta. CORRIGIDO: "reforcada por F5a" era non-sequitur — `permissions.ask` em subshell e regra de permissao do harness, nao hook PreToolUse; e "sem sinal sobre hooks" e impreciso: l.54 muda o path de componente `hooks` de plugin (symlink recusado).'
     trace: 'docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md · docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md"
+      locator: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md tabela Vereditos, linha F7 (EMENDADO, non-sequitur 'reforçada por F5a' removido) · docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md:47 e :79 (únicas linhas com 'hook') · data/f1-findings-pre-juiz.md:11"
+      method: "juízes: veredito EMENDADO do juiz-e3 (opus/high) registrado na tabela de vereditos do SYNTHESIS.md"
 
   - id: E_F8_WORKTREE_ISOLADO_VIABILIZOU
     node_type: evidence
@@ -169,6 +177,10 @@ nodes:
     verified_against: 'CHANGELOG l.49 (subagente cortado mid-stream continua sozinho) + l.62 (transcript > 5 MB falhava "No transcript found"); 15 comandos em .claude/commands/meta/ fazem fan-out'
     label: 'F9 (omissao apontada pelo juiz). O modo de falha dos workers MUDOU e a doutrina assume o antigo: subagente cortado no meio do stream (sleep, queda, erro de servidor) agora continua em vez de terminar incompleto (l.49); retomar/mensagear subagente com transcript > 5 MB falhava (l.62) — modo real em censo longo. Consequencia: "worker devolveu resposta incompleta" deixa de ser sintoma de CORTE e vira sintoma de CONTEUDO — muda o que um UNVERIFIABLE significa e o que o juiz fixo deve suspeitar.'
     trace: '.claude/commands/meta/census.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md · docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md"
+      locator: "docs/evolution/research/radar-E3-2026-09-02/data/changelog-2.1.257.md:42 (subagente cortado mid-stream continua) e :55 (transcript > 5 MB 'No transcript found') · docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md tabela Vereditos linha F9 ('omissão do juiz') e Lacunas item 3"
+      method: "leitura: cópia versionada da entrada 2.1.257 do CHANGELOG e a tabela de vereditos"
 
   - id: E_F10_SETTINGS_POS_STARTUP_VALEM
     node_type: evidence
@@ -257,9 +269,9 @@ nodes:
     label: 'MEDIDO: o auto-updater troca o binario com a sessao VIVA — a sessao do maestro rodou 2.1.247 por 6 dias com o disco em 2.1.258. Picker de modelo, hooks (PreModelSwitch so existe em >= 2.1.251) e capacidades refletem o PROCESSO, nao o disco. A REGRA 65 comparava cc_version com `claude --version` (DISCO) e afirmava "instalado=2.1.258": declarado != verificado, exatamente a classe que a regra existe para pegar. Dano: Fable 5.1 invisivel por 6 dias; 1 rodada de medicao do hook perdida. 4 sessoes abaixo de 2.1.255 no host naquele momento.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md'
     provenance:
-      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md"
-      locator: "/proc/<pid>/exe da sessao interativa do maestro → …/versions/2.1.247 (deleted), iniciada 2026-08-27; disco (symlink ~/.local/bin/claude) → 2.1.258; picker do /model: \"Fable 5.1 (disabled) — Update to 2.1.255+\"; lint REGRA 65 dizia instalado=2.1.258"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "commit aabfa699 (corpo) · docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md · .claude/validation/lint-artifacts.sh@aabfa699^"
+      locator: "aabfa699 corpo ('rodou 2.1.247 por 6 dias com o disco em 2.1.258... REGRA 65 dizia instalado=2.1.258. Fable 5.1 ficou invisível') · probe-premodelswitch.md:12 (binário deletado, picker 'Update to 2.1.255+', eventos nasceram em 2.1.251, 4 PIDs < 2.1.255, 1ª tentativa não disparou) · lint-artifacts.sh@aabfa699^:3617-3619 (installed_cc via `claude --version`)"
+      method: "leitura: corpo do commit aabfa699, sonda versionada e o lint anterior à cura"
 
   - id: D_REGRA65_MEDE_O_PROCESSO
     node_type: decision

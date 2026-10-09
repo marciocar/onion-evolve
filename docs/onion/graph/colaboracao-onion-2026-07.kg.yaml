@@ -214,7 +214,12 @@ nodes:
     impact: 4
     confidence: 0.8
     status: confirmed
-    label: "colaboracao assincrona via repo (I3) escala sem chat ao vivo compartilhado"
+    label: "colaboracao assincrona via repo (I3) segue o substrato para o qual o estado-da-arte converge: git como coordenacao assincrona grosseira, adequada ao ritmo humano da dupla"
+    narrative: "label anterior: colaboracao assincrona via repo (I3) escala sem chat ao vivo compartilhado"
+    provenance:
+      source: "gustavo-pulga@2e5e0a4:docs/tornak/research/colaboracao-moderna-2026.md + gustavo-pulga@2e5e0a4:docs/knowledge-base/concepts/colaboracao-moderna.md"
+      locator: "relatório l.12-13 (converge para git como substrato de coordenação assíncrona), l.25 (finding 1, voto 3-0), l.45-49 (git = assíncrona grosseira; adequado ao ritmo humano×humano da dupla); KB l.10-11, l.21 (delivery-without-commit = I3), l.31"
+      method: "leitura: relatório da deep-research do adotante e KB destilada dele, ambos no commit gustavo-pulga@2e5e0a4"
   - id: C_ONBOARDING_AUTOGUIADO
     node_type: claim
     layer: audit

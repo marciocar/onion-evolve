@@ -15,6 +15,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "cadeia doutrina adotante->core partida no meio: metade produtora+transporte construida; metade ingestora no core desenhada mas GATED"
+    provenance:
+      source: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.11-13 (achado central) e l.17-26 (tabela de elos: produtora/transporte ✅, ingestor ❌ buraco central, F4/F2/F3 GATED)"
+      method: "leitura: SYNTHESIS.md irmão do grafo"
   - id: E_DOCTRINE_TERRAIN
     node_type: evidence
     layer: audit
@@ -38,6 +42,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "granaai e onion-pessoal pressionam a MESMA doutrina: fechar read(KG)->verify->act->write(KG) — auto-persist, forma-nao-carimbo, arquivo:linha, domain+frescor"
+    provenance:
+      source: "docs/evolution/research/doctrine-sync-ingestor-2026-07/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.54-56 ('Tema comum: os dois pressionam a mesma doutrina — fechar read(KG)→verify→act→write(KG) ... (1) persistência automática ... (2) forma, não carimbo; (3) arquivo:linha; (4) domain + frescor')"
+      method: "leitura: SYNTHESIS.md irmão do grafo (write(KG) da orquestração de 2026-07-18)"
   - id: E_PENDING_SIGNAL
     node_type: evidence
     layer: audit
@@ -63,9 +71,9 @@ nodes:
     label: "granaai entregou 4 sinais de doutrina ao core: integridade-nao-eh-rastreabilidade (TRACES_TO), fail-open do radar, validador-local-delega-radar, formalizar /meta:kg map"
     trace: "/home/marcio/granaai/docs/evolution/inbox/_processed/"
     provenance:
-      source: "/home/marcio/granaai/docs/evolution/inbox/_processed/"
-      locator: "/home/marcio/granaai/docs/evolution/inbox/_processed/"
-      method: "testemunho: leitura do arquivo /home/marcio/granaai/docs/evolution/inbox/_processed/ no host; trace do nó, sem registro de medição"
+      source: "docs/evolution/inbox/_processed/ (onion-evolve)"
+      locator: "_processed/2026-07-17-redogfood-kg-sdaal-validation-gaps.md l.2, l.15 (rastreabilidade/TRACES_TO); 2026-07-17-kg-radar-falso-verde-grafo-ilegivel.md l.2 (fail-open do radar); 2026-07-17-kg-fail-open-primo-validador-local-duplicado.md l.2, l.20 (validador local duplicado → radar); 2026-07-17-kg-discovery-granaai-canonical-monorepo.md l.69 ('/meta:kg map <projeto>'); SYNTHESIS.md l.48-51"
+      method: "leitura: os 4 sinais (from: granaai) versionados no inbox _processed do core + SYNTHESIS.md:48-51"
   - id: E_PESSOAL_LIFEKG
     node_type: evidence
     layer: audit

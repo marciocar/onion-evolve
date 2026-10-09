@@ -14,6 +14,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "P5: inferencia do motor local sobre o KG do dono e feature (indefesa); a defesa desloca-se p/ a FRONTEIRA DE SAIDA (L1-L6) — nao emitir bruto"
+    provenance:
+      source: "docs/discussions/onion-pessoal-marcio/05-mitigacao-inferencia.md"
+      locator: "docs/discussions/onion-pessoal-marcio/05-mitigacao-inferencia.md:26-29, :68-69, :81 @754497e4"
+      method: "leitura: discussão P5 (mitigação de inferência) do onion-pessoal"
   - id: E_RFC4_SINGLE_SOURCE
     node_type: evidence
     layer: audit
@@ -23,6 +27,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "RFC-0004: single-source p/ identidade/contratos; federa-se so a comunicacao/derivacao — a fonte fica soberana, so o destilado circula"
+    provenance:
+      source: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md"
+      locator: "docs/evolution/rfc/rfc-0004-a2a-live-interop.md:20 e :37-38 @7aa81347; docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:41"
+      method: "leitura: RFC-0004 §1-2"
   - id: E_FAILSAFE_RATIFIED
     node_type: evidence
     layer: audit
@@ -32,6 +40,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "doutrina JA ratificada: de-id 'none'=fail-safe, 'private' inviolavel mesmo p/ o core, declarado!=verificado (VETO sem prova)"
+    provenance:
+      source: "docs/discussions/onion-pessoal-marcio/04-privacidade-soberania.md"
+      locator: "docs/discussions/onion-pessoal-marcio/04-privacidade-soberania.md:25, :35, :40-41 @470d1350; docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:23 @9d6fac2c (JÁ ratificada)"
+      method: "leitura: discussão P4 (privacidade/soberania) do onion-pessoal"
   - id: E_EU_AI_ACT
     node_type: evidence
     layer: audit
@@ -40,7 +52,12 @@ nodes:
     confidence: 0.85
     status: confirmed
     verified_at: 2026-07-19
-    label: "EU AI Act + EDPB 2026 fecham a via livre de scraping/pooling: base legal GDPR + minimizacao antes de pooling (URLs)"
+    label: "EDPB (Guidelines 03/2026, 08/07/2026) aplica o GDPR em cheio ao scraping de dado pessoal para treino de IA e encerra o passe livre: base legal com balanceamento caso a caso e minimização já na coleta; não proíbe treinar sobre dado web; o AI Act (GPAI, 02/08/2026) é complementar."
+    narrative: "label anterior: EU AI Act + EDPB 2026 fecham a via livre de scraping/pooling: base legal GDPR + minimizacao antes de pooling (URLs)"
+    provenance:
+      source: "https://www.techtimes.com/articles/320024/20260709/gdpr-applies-ai-training-data-eu-ends-web-scraping-free-pass-every-lab.htm"
+      locator: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:54 @9d6fac2c; techtimes (publicado 2026-07-09)"
+      method: "leitura: artigo techtimes citado no SYNTHESIS l.54"
   - id: E_SSOT_PROTOTIPO
     node_type: evidence
     layer: audit
@@ -50,6 +67,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "o SSOT unico das 6 camadas (classificacao-por-inferencia + gate-por-proposito + eps-ledger) e SO prototipo .kg.yaml hoje — nao operacional (P5 item 6)"
+    provenance:
+      source: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md"
+      locator: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:24 @9d6fac2c; docs/discussions/onion-pessoal-marcio/05-mitigacao-inferencia.md:122-123 @754497e4"
+      method: "leitura: SYNTHESIS D2 l.24 + item 6 da P5"
   - id: C_A_ELIMINADA
     node_type: claim
     layer: audit
@@ -59,6 +80,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "opcao (a) sem-restricao ELIMINADA: regride doutrina fail-safe vigente + contradiz o pilar compliance-peer (EU AI Act) que o Onion vende"
+    provenance:
+      source: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md"
+      locator: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:23 e :29-30 @9d6fac2c"
+      method: "leitura: SYNTHESIS da pesquisa D2 (wf_b533468d-41c)"
   - id: C_CARD_FUNDE_DUAS
     node_type: claim
     layer: audit
@@ -68,6 +93,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-19
     label: "o card D2 FUNDE duas decisoes: DIRECAO (arquitetura c) vs ATIVACAO (ligar o flywheel) — separaveis e compativeis"
+    provenance:
+      source: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md"
+      locator: "docs/evolution/research/onion-d2-data-currency-2026-07/SYNTHESIS.md:19-26 @9d6fac2c"
+      method: "leitura: SYNTHESIS da pesquisa D2"
   - id: C_P5_ESCOPO_N1
     node_type: claim
     layer: audit

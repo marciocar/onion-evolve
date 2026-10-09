@@ -30,6 +30,10 @@ nodes:
     source_kind: repo
     source_tier: 10
     label: "o rito esta COMPLETO em fases e gates; falta a chave unica que o auto-localiza — o slug da session tem DUAS variaveis na propria maquinaria e nao deriva da branch"
+    provenance:
+      source: "commit 198393e4 (árvore) · docs/evolution/review/feat-kbs-zoho-glpi-regra93.md"
+      locator: "ls-tree 198393e4 .claude/commands/product (22 arquivos) e engineer (13) · git grep 'sessions/<slug>' e 'sessions/<feature-slug>' em 198393e4"
+      method: "testemunho: medição da sessão 2026-09-30 (commit 198393e4), comando não registrado"
   - id: E_DIA_INTEIRO_FORA_DO_PROVIDER
     node_type: evidence
     layer: audit
@@ -42,6 +46,10 @@ nodes:
     source_kind: repo
     source_tier: 10
     label: "a cadeia nao se ROMPEU, nunca foi INICIADA: sem session nao ha o que sincronizar, e a session so nasce por invocacao explicita"
+    provenance:
+      source: "commit 198393e4 (corpo) · docs/onion/graph/rito-task-manager-2026-09.kg.yaml (cabeçalho)"
+      locator: "198393e4 corpo (REGRA 93, 3 KBs do hub absorvidas, hub registrado no members.yaml) · .claude/commands/engineer/start.md (session nasce por invocação)"
+      method: "testemunho: medição da sessão 2026-09-30 (commit 198393e4), comando não registrado"
   - id: E_WORKLOG_E_MECANISMO_MORTO
     node_type: evidence
     layer: audit
@@ -54,6 +62,10 @@ nodes:
     source_kind: repo
     source_tier: 10
     label: "o worklog e MECANISMO MORTO medido: resume_command em 0 de 12, porque o hook resolve por branch e nenhuma das 12 sessions tem branch — e um dos dois hooks ainda carrega o filtro que ja foi provado no-op em 96% das branches"
+    provenance:
+      source: "/home/marcio/onion-evolve/.claude/sessions/*/STATE.md (host) · .claude/hooks/worklog-capture-session.sh@198393e4 · .claude/hooks/worklog-precompact-breadcrumb.sh@198393e4 · commit 3e6a962d"
+      locator: "12 STATE.md com mtime ≤ 2026-09-30 · capture-session@198393e4:28-29 · precompact@198393e4:11-12 · 3e6a962d diff do hook (l.455 'NO-OP em 56 de 58 branches reais (96%)')"
+      method: "testemunho: leitura dos 12 STATE.md no host + leitura dos hooks no commit 198393e4 e do commit 3e6a962d"
   - id: E_ESQUEMA_DIVERGIU_DA_PRATICA
     node_type: evidence
     layer: audit
@@ -66,6 +78,10 @@ nodes:
     source_kind: repo
     source_tier: 10
     label: "o esquema canonico do STATE.md divergiu 100% da pratica — tres secoes e todos os campos tipados existem em ZERO dos 12 arquivos reais"
+    provenance:
+      source: "/home/marcio/onion-evolve/.claude/sessions/*/STATE.md (host) · docs/knowledge-base/concepts/worklog-protocol.md@198393e4"
+      locator: "STATE.md dos 12 diretórios com mtime ≤ 2026-09-30 · worklog-protocol.md@198393e4:62,65,68,88 (Objective/Constraints/Map/resume_command)"
+      method: "testemunho: leitura dos 12 arquivos .claude/sessions/*/STATE.md no host (fora do git) + leitura do esquema em worklog-protocol.md@198393e4"
   - id: C_PRECEDENTE_DERIVAR_DA_BRANCH_FUNCIONA
     node_type: claim
     layer: audit
@@ -76,6 +92,10 @@ nodes:
     verified_at: 2026-09-30
     verified_against: "a REGRA 56 (PR aberto carrega RESIDUO da passada adversarial) deriva o nome do residuo de `git branch --show-current | tr / -` ha meses; e na sessao de 2026-09-30 DOIS gates foram perdidos exatamente quando o nome foi digitado em vez de derivado. Ressalva medida: os hooks usam `${branch#*/}`, que NAO e equivalente — em branch de tres niveis ele deixa barra dentro do slug."
     label: "derivar da branch e padrao PROVADO nesta casa; mas ha DUAS derivacoes incompativeis convivendo (`tr / -` no residuo, `${branch#*/}` nos hooks) e so uma serve"
+    provenance:
+      source: ".claude/validation/review-artifact-check.sh@198393e4 · .claude/validation/lint-artifacts.sh@198393e4 · .claude/hooks/worklog-capture-session.sh@198393e4 · .claude/hooks/worklog-precompact-breadcrumb.sh@198393e4"
+      locator: "review-artifact-check.sh@198393e4:165 (REGRA 56: SLUG=tr / -, desde cd0f847b 2026-08-06) · lint-artifacts.sh@198393e4:1527 (REGRA 63) e :2387 (REGRA 87) · worklog-capture-session.sh@198393e4:28-29 · worklog-precompact-breadcrumb.sh@198393e4:11-12 (slug=\"${branch#*/}\")"
+      method: "leitura: código das duas derivações no commit 198393e4 (o dia do nó)"
   - id: E_LEVA_NAO_SERVE_COMO_UNIDADE
     node_type: evidence
     layer: audit
@@ -88,6 +108,10 @@ nodes:
     source_kind: repo
     source_tier: 10
     label: "a LEVA nao serve como unidade de task: conceito interno, escopo que so existe depois, e ja rendeu 2 PRs numa ocorrencia"
+    provenance:
+      source: "commit 198393e4 · PRs #890 e #891 (marciocar/onion-evolve)"
+      locator: "gh pr view 890/891 (merge 2026-09-30T08:29Z e 13:42Z)"
+      method: "testemunho: medição da sessão 2026-09-30 (commit 198393e4), comando não registrado"
   - id: E_BACKLOG_DO_GRAFO_JA_EXISTE
     node_type: evidence
     layer: audit
@@ -109,17 +133,21 @@ nodes:
   - id: D_SLUG_DA_SESSION_E_A_BRANCH
     node_type: decision
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.9
     status: confirmed
     verified_at: 2026-09-30
     verified_against: "SELADA pelo maestro em 2026-09-30, opcao A. A verificacao e o ATO DE DECIDIR. Medicao posterior ao selo MELHOROU o custo: as 12 sessions sao 3 adopt- + 9 drive-, ou seja NENHUMA e session de tarefa — a regra nasce SEM PASSIVO, governando uma classe que ainda nao existe no disco."
     label: "SELADO (maestro, 2026-09-30) — OPCAO A: o slug de .claude/sessions/<slug> e DERIVADO da branch (`git branch --show-current | tr / -`, igual ao residuo da REGRA 56), unificando as duas variaveis atuais. Sessions que nao sao de tarefa (drive-, adopt-) sao CLASSE DISTINTA declarada. Sem baseline e sem regra nova: medido que nao ha passivo a cobrar."
+    provenance:
+      source: "commit 198393e4 · docs/evolution/review/feat-kbs-zoho-glpi-regra93.md · .claude/sessions/ (host)"
+      locator: "feat-kbs-zoho-glpi-regra93.md §'O que este PR toca no grafo' (Frente 2 não entrou) · ls /home/marcio/onion-evolve/.claude/sessions"
+      method: "testemunho: selo do maestro registrado no nó em 2026-09-30 (commit 198393e4); contagem das sessions lida no host"
   - id: D_UMA_TASK_POR_FIO
     node_type: decision
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 0.9
     status: confirmed
@@ -134,13 +162,17 @@ nodes:
   - id: D_MAPA_NO_MAP_CANONICO
     node_type: decision
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 0.85
     status: confirmed
     verified_at: 2026-09-30
     verified_against: "SELADO pelo maestro em 2026-09-30, escolhendo entre ressuscitar o esquema e seguir a pratica. O slot ja existe em worklog-protocol.md:71 (`task-manager -> main: <id> · provider:`) e em ZERO dos 12 arquivos."
     label: "SELADO (maestro, 2026-09-30): o par fio<->task_id mora no `## Map` CANONICO do STATE.md, ressuscitando o esquema em vez de criar uma segunda gramatica. Honestidade impressa: `## Map` sem `task-manager` faz o comando DIZER que nao ha sincronia, no molde de kg-backlog-project.sh:178-182 (o eixo de agrupamento e IMPRESSO, nunca prometido)."
+    provenance:
+      source: "commit 198393e4 (corpo: rito-task-manager-2026-09.kg.yaml nasce com os nós selados) · docs/knowledge-base/concepts/worklog-protocol.md@198393e4 · .claude/validation/kg-backlog-project.sh@198393e4"
+      locator: "worklog-protocol.md@198393e4:68,72 (`## Map` e `- task-manager → main: <id> · provider:`) · kg-backlog-project.sh@198393e4:178-182"
+      method: "testemunho: selo do maestro registrado no nó em 2026-09-30 (commit 198393e4); slot e molde conferidos por leitura"
 
   # ── O QUE FICA ABERTO ───────────────────────────────────────────────────────────────────────
   - id: Q_COMPROMISSO_ESPERA_COLHEITA
@@ -163,6 +195,10 @@ nodes:
     source_kind: repo
     source_tier: 10
     label: "a absorcao de KB de adotante se pagou NO MESMO DIA: o core absorveu a v1.1 dele de manha e a v1.2 dele corrigiu o core a tarde"
+    provenance:
+      source: "commit fbf9ac12 (corpo) · /home/marcio/gmill@6d60149 e @148a87e:docs/knowledge-base/platforms/zoho-projects-api.md · core@198393e4"
+      locator: "fbf9ac12 corpo §'E o que isto diz da federação' · gmill@6d60149:16 (v1.1, 10:49 -0300) · gmill@148a87e:16 (v1.2, 15:30 -0300) · core@198393e4 zoho-projects-api.md:26 (v1.1)"
+      method: "leitura: corpo do commit fbf9ac12 e as duas versões da KB no histórico do adotante (gmill)"
 
   - id: E_IMPOSSIBILIDADE_ERA_FORMA_NAO_TESTADA
     node_type: evidence
@@ -175,6 +211,10 @@ nodes:
     source_kind: repo
     source_tier: 10
     label: "declarei impossibilidade a partir de tres formas PLANAS, num arquivo que diz que todo vinculo e ANINHADO — nao faltou medicao, faltou aplicar a mim a regra que eu acabara de descobrir"
+    provenance:
+      source: "commit fbf9ac12 (corpo) · commit 265f6a89 (diff de .claude/utils/task-manager/adapters/zoho.md)"
+      locator: "fbf9ac12 corpo §'O erro ensina mais que o endpoint' · 265f6a89 corpo l.7-9 ('createSubtask NÃO FUNCIONA por caminho nenhum') · zoho.md@265f6a89:38 (vínculo é objeto aninhado)"
+      method: "leitura: corpos dos commits 265f6a89 e fbf9ac12 e o adapter zoho.md em 265f6a89"
 
   - id: Q_GMILL_MAIN_DIVERGIU
     node_type: question
@@ -188,6 +228,10 @@ nodes:
     source_tier: 10
     label: "o main do clone do adotante DIVERGIU do remoto (3x3): push apagaria o ADR da equipe, pull cego reescreveria os updates do Onion — reconciliacao e sobre CONTEUDO deles, nao minha de decidir"
     gatilho: "o maestro dizer qual lado ganha em cada um dos 6 arquivos sobrepostos, OU a equipe do adotante reconciliar no repo dela. Ate la o Onion entrega em branch dedicada a partir do origin/main REAL, sem tocar o main."
+    provenance:
+      source: "commit c383df21 (corpo) · /home/marcio/gmill@e1e0ec3 e @148a87e"
+      locator: "c383df21 corpo §Q_GMILL_MAIN_DIVERGIU (\"divergiu 3x3 do remoto... PR #2 da equipe (ADR, 219 linhas)... seis arquivos se sobrepõem\") · gmill@e1e0ec3 (Merge PR #2 ... SAC-59, 2026-09-30 15:40) · gmill@148a87e numstat adr-zoho-projects-task-mapping.md +219"
+      method: "leitura: corpo do commit c383df21 (2026-09-30) + commits e1e0ec3 e 148a87e no clone /home/marcio/gmill"
 
   - id: D_NAO_SOBRESCREVER_KB_DE_ADOTANTE
     node_type: decision
@@ -199,6 +243,10 @@ nodes:
     verified_against: "medido: a KB do adotante estava em v1.2 (com /api/v3.1/, global-statuses, escopo custom_fields.READ) contra a v1.1 que o core absorveu. Aplicar o bundle por cima seria REGRESSAO para ele."
     label: "o update NAO sobrescreve KB de terceiro que o adotante evoluiu: o manifesto transporta docs/knowledge-base, mas never-clobber tem de valer ali tambem — o core absorve o que falta, nunca o contrario"
     gatilho: "mecanizar: hoje a exclusao das 3 KBs e MANUAL na entrega. Vira guarda quando um segundo adotante tiver KB propria mais nova que a do core."
+    provenance:
+      source: "commit c383df21 (corpo) · /home/marcio/gmill@148a87e:docs/knowledge-base/platforms/zoho-projects-api.md · docs/knowledge-base/platforms/zoho-projects-api.md@198393e4"
+      locator: "c383df21 corpo §D_NAO_SOBRESCREVER_KB_DE_ADOTANTE · gmill@148a87e zoho-projects-api.md:16,18,232,304 (v1.2, /api/v3.1/, global-statuses, custom_fields.READ) · core@198393e4 zoho-projects-api.md:26 (v1.1)"
+      method: "leitura: corpo do commit c383df21 + KB do adotante no commit gmill@148a87e contra a KB do core em 198393e4"
 
   # ── SELOS DO MAESTRO EM 2026-10-01 (pesquisa de motores e corpus de regras) ─────────────────
   - id: D_NAO_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO
@@ -210,6 +258,10 @@ nodes:
     verified_at: 2026-10-01
     verified_against: "rodada motores-de-regras-deterministicos-2026-10 (132 agentes, 9,18M tokens): o estado da arte confirmado e de motores de AUTORIZACAO — permit/forbid, decisao pura, ordem-independente POR PROJETO. Medido no proprio repo: o lint SO LE (93 check_* em sequencia, zero geracao no corpo) e quem ESCREVE e o pre-commit (7 git add)."
     label: "o gate do Onion NAO migra para motor declarativo: as guardas produzem artefato, dependem de ordem e precisam do exit 2 de hook — o que transfere e a CAPACIDADE, nunca o substrato"
+    provenance:
+      source: "docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md"
+      locator: "docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md:14-17 (§'A resposta primeiro')"
+      method: "leitura: síntese versionada da rodada motores-de-regras-deterministicos-2026-10 (run wf_fcfb94bc-f30)"
 
   - id: D_CAPACIDADES_ANALISADAS_ANTES_DE_ABSORVER
     node_type: decision
@@ -237,6 +289,10 @@ nodes:
     verified_against: "a rodada atacou Drools, Camunda/DMN, OpenL, json-rules-engine, Easy Rules, NRules, Clara e GoRules BRMS e NENHUMA claim sobreviveu aos votos adversariais — licenca, cadencia e sinal de vida seguem nao medidos. A unica alegacao de versao 2026 foi REFUTADA."
     label: "nao ha resposta sobre SUBSTITUTO do ZEN Engine: o lado classico voltou vazio, e o maestro selou 'nao agora' em 2026-10-01"
     gatilho: "o projeto ADOTANTE de gamificacao sinalizar dor real com o ZEN. A urgencia e dele, nao do core — nao ha motor ZEN no core, so o agente @zen-engine-specialist. Modo recomendado quando reabrir: primarias nomeadas (~42k/no) e nao varredura (~291k/no), porque os motores ja tem nome."
+    provenance:
+      source: "docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md"
+      locator: "docs/evolution/research/motores-de-regras-deterministicos-2026-10/SYNTHESIS.md:42-45 (§'NÃO-VERIFICADOS, e esta lacuna importa')"
+      method: "leitura: síntese versionada da rodada motores-de-regras-deterministicos-2026-10"
 
   - id: E_O_LINT_SO_LE_E_O_HOOK_ESCREVE
     node_type: evidence
@@ -249,6 +305,10 @@ nodes:
     source_kind: repo
     source_tier: 10
     label: "a fronteira de ORDEM nao esta entre as 93 guardas — esta entre o hook que ESCREVE e o lint que LE, e dentro da cadeia do hook; isso reduz o escopo das tres propostas"
+    provenance:
+      source: "docs/analysis/onion-absorcao-capacidades-de-motor-2026-10.md · commit 0f8a2d41"
+      locator: "onion-absorcao-capacidades-de-motor-2026-10.md:14-20 (tabela leitor/escritor e 'reduz o escopo das três propostas') e :24-25 (check_scan_sanity primeira por desenho)"
+      method: "leitura: análise versionada no commit 0f8a2d41 (2026-10-01)"
 
   - id: Q_CLAUSULA_11_ONDA_DERIVADA
     node_type: question

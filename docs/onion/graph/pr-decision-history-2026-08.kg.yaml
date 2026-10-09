@@ -20,6 +20,10 @@ nodes:
     verified_at: 2026-08-26
     verified_against: "gh pr list --state merged (672)"
     trace: "docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
+    provenance:
+      source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
+      locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (672 nos PR_*); corpos de b5fcc25d e ffecf8da"
+      method: "derivado: 672 nos PR_* no grafo em ffecf8da (cada um com trace github.com/marciocar/onion-evolve/pull/N) + corpo de ffecf8da (\"a PROJECAO que as vitrines do site devem consumir\")"
   - id: E_CLASS_INCIDENTE
     node_type: entity
     label: "Classe: incidente — 85 PRs (refino LLM nos publicaveis, heuristica no resto)"
@@ -29,6 +33,10 @@ nodes:
     status: confirmed
     verified_at: 2026-08-26
     verified_against: "fase 2b"
+    provenance:
+      source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
+      locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (arestas TRACES_TO -> E_CLASS_INCIDENTE); corpo de ffecf8da; docs/onion/graph/pr-showcase-selection-2026-08.md l.5"
+      method: "derivado: contagem das arestas TRACES_TO dos nos PR_* para E_CLASS_INCIDENTE no grafo em ffecf8da (fase 2b) + corpo do commit"
   - id: E_CLASS_DOUTRINA
     node_type: entity
     label: "Classe: doutrina — 111 PRs (refino LLM nos publicaveis, heuristica no resto)"
@@ -38,6 +46,10 @@ nodes:
     status: confirmed
     verified_at: 2026-08-26
     verified_against: "fase 2b"
+    provenance:
+      source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
+      locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (arestas TRACES_TO -> E_CLASS_DOUTRINA); corpo de ffecf8da; docs/onion/graph/pr-showcase-selection-2026-08.md l.5"
+      method: "derivado: contagem das arestas TRACES_TO dos nos PR_* para E_CLASS_DOUTRINA no grafo em ffecf8da (fase 2b) + corpo do commit"
   - id: E_CLASS_MARCO
     node_type: entity
     label: "Classe: marco — 26 PRs (refino LLM nos publicaveis, heuristica no resto)"
@@ -47,6 +59,10 @@ nodes:
     status: confirmed
     verified_at: 2026-08-26
     verified_against: "fase 2b"
+    provenance:
+      source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
+      locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (arestas TRACES_TO -> E_CLASS_MARCO); corpo de ffecf8da; docs/onion/graph/pr-showcase-selection-2026-08.md l.5"
+      method: "derivado: contagem das arestas TRACES_TO dos nos PR_* para E_CLASS_MARCO no grafo em ffecf8da (fase 2b) + corpo do commit"
   - id: E_CLASS_MECANISMO
     node_type: entity
     label: "Classe: mecanismo — 245 PRs (refino LLM nos publicaveis, heuristica no resto)"
@@ -56,6 +72,10 @@ nodes:
     status: confirmed
     verified_at: 2026-08-26
     verified_against: "fase 2b"
+    provenance:
+      source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
+      locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (arestas TRACES_TO -> E_CLASS_MECANISMO); corpo de ffecf8da; docs/onion/graph/pr-showcase-selection-2026-08.md l.5"
+      method: "derivado: contagem das arestas TRACES_TO dos nos PR_* para E_CLASS_MECANISMO no grafo em ffecf8da (fase 2b) + corpo do commit"
   - id: E_CLASS_ROTINA
     node_type: entity
     label: "Classe: rotina — 205 PRs (refino LLM nos publicaveis, heuristica no resto)"
@@ -65,6 +85,10 @@ nodes:
     status: confirmed
     verified_at: 2026-08-26
     verified_against: "fase 2b"
+    provenance:
+      source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
+      locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (arestas TRACES_TO -> E_CLASS_ROTINA); corpo de ffecf8da; docs/onion/graph/pr-showcase-selection-2026-08.md l.5"
+      method: "derivado: contagem das arestas TRACES_TO dos nos PR_* para E_CLASS_ROTINA no grafo em ffecf8da (fase 2b) + corpo do commit"
   - id: E_VITRINE_PROVA
     node_type: entity
     label: "Vitrine: prova — 72 PRs selecionados p/ projetar"
@@ -73,6 +97,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-26
+    provenance:
+      source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
+      locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (arestas TRACES_TO -> E_VITRINE_PROVA); corpo de ffecf8da; docs/onion/graph/pr-showcase-selection-2026-08.md"
+      method: "derivado: contagem das arestas TRACES_TO para E_VITRINE_PROVA no grafo em ffecf8da + corpo do commit"
   - id: E_VITRINE_HISTORIA
     node_type: entity
     label: "Vitrine: historia — 55 PRs selecionados p/ projetar"
@@ -81,6 +109,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-26
+    provenance:
+      source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
+      locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (arestas TRACES_TO -> E_VITRINE_HISTORIA); corpo de ffecf8da; docs/onion/graph/pr-showcase-selection-2026-08.md"
+      method: "derivado: contagem das arestas TRACES_TO para E_VITRINE_HISTORIA no grafo em ffecf8da + corpo do commit"
   - id: E_VITRINE_TICKER
     node_type: entity
     label: "Vitrine: ticker — 4 PRs selecionados p/ projetar"
@@ -89,6 +121,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: 2026-08-26
+    provenance:
+      source: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml"
+      locator: "ffecf8da:docs/onion/graph/pr-decision-history-2026-08.kg.yaml (arestas TRACES_TO -> E_VITRINE_TICKER); corpo de ffecf8da; docs/onion/graph/pr-showcase-selection-2026-08.md"
+      method: "derivado: contagem das arestas TRACES_TO para E_VITRINE_TICKER no grafo em ffecf8da + corpo do commit"
   - id: PR_2
     node_type: decision
     label: "feat: camada nativa de Frota de Agentes (fleet orchestration) + hardening de confiabilidade"

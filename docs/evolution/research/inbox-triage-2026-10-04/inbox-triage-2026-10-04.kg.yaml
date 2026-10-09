@@ -47,6 +47,10 @@ nodes:
     verified_at: '2026-10-05'
     verified_against: 'para cada adotante em /home/marcio com .onion-version e pin conhecido do core (22): git archive do pin sobre as raizes do manifesto que existiam no pin, menos baselines, comparado ao ls-tree do HEAD do adotante'
     label: 'MEDIDO NOS ADOTANTES DESTA MAQUINA, so lendo: 22 com pin conhecido, ZERO com a perda silenciosa. Dois (gustavo-pulga, poc-venda-direta-pdi) nao tem .claude/rules/kg-grammar.md, mas o diretorio .claude/rules inteiro falta e um deles nem ignora .claude — e evolucao do manifesto (as rules entraram depois da adocao deles), chega no proximo --update. O hub ja tinha se curado sozinho. A 1a passada da medicao deu esperados=0 em 12 adotantes: o git archive falhava com raiz do manifesto de HOJE que nao existia no pin, e o erro era engolido — zero que era cegueira, curado filtrando as raizes por pin.'
+    provenance:
+      source: "docs/evolution/federation/outbox/brain-granaai/_processed/2026-10-05-update-perdia-arquivo-novo-curado.md · docs/evolution/review/fix-adopt-vendor-ignored-new-files.md · commit dfdfa52d"
+      locator: "outbox ...curado.md:40 ('adotantes desta máquina com a perda hoje (22 com pin conhecido) | 0 — vocês já tinham se curado') · docs/evolution/federation/CHANGELOG.md:97 (mesma linha) · resíduo §'Os confirmed dos grafos' (nó nasceu no PR #918)"
+      method: "testemunho: medição da sessão 2026-10-04/05 (nó nascido no commit dfdfa52d, PR #918), comando descrito no verified_against mas não registrado verbatim"
 
   - id: C_TETO_ADOCAO_INICIAL_NAO_PASSA_A_LISTA
     node_type: claim

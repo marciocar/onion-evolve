@@ -50,7 +50,12 @@ nodes:
     confidence: 0.8
     verified_at: 2026-08-16
     verified_against: hn-e-github-issues-lidos-via-api-agosto-2026
-    label: "A dor #1 do ecossistema é CONTEXTO/CUSTO, e ela já gerou uma categoria inteira de ferramentas-parasita cujo único trabalho é comprimir a saída de OUTRAS ferramentas antes que cheguem ao agente (Context Mode: 315KB→5.4KB de saída MCP; Graft: -42% dos tokens de grep; Smooth CLI). Relato de campo: schemas de MCP consomem 50k+ tokens antes de qualquer trabalho útil; orçamento de US$2 vira US$8 por tarefa. Cuidado direto para o Onion: cada superfície que ele injeta (skills, regras, recall de hooks, KB vendorizada) compete pelo MESMO orçamento — a virtude 'mais contexto curado' vira vício quando o mercado inteiro está cortando contexto."
+    label: "Dor recorrente no ecossistema: CONTEXTO/CUSTO. Show HN de ferramentas que cortam tokens do agente (Context Mode: 315KB→5,4KB de saída MCP; Graft: -42% em grep; Smooth CLI). Relatos: definições de ferramentas de um MCP queimaram 50k+ tokens; tarefa esperada a US$2 saiu a US$8."
+    narrative: "label anterior: A dor #1 do ecossistema é CONTEXTO/CUSTO, e ela já gerou uma categoria inteira de ferramentas-parasita cujo único trabalho é comprimir a saída de OUTRAS ferramentas antes que cheguem ao agente (Context Mode: 315KB→5.4KB de saída MCP; Graft: -42% dos tokens de grep; Smooth CLI). Relato de campo: schemas de MCP consomem 50k+ tokens antes de qualquer trabalho útil; orçamento de US$2 vira US$8 por tarefa. Cuidado direto para o Onion: cada superfície que ele injeta (skills, regras, recall de hooks, KB vendorizada) compete pelo MESMO orçamento — a virtude 'mais contexto curado' vira vício quando o mercado inteiro está cortando contexto."
+    provenance:
+      source: "https://news.ycombinator.com/item?id=47148025 · 49299985 · 46901233 · 47400262 · 47780622"
+      locator: "47148025 título (Context Mode, 315 KB→5.4 KB, 2026-02-25); 49299985 título (Graft, -42% grep, 2026-08-14); 46901233 título (Smooth CLI, token-efficient browser, 2026-02-05); 47400262 texto (gertjandewilde, 2026-03-16: \"tool definitions alone burned 50,000+ tokens\"); 47780622 texto (bennettdixon, 2026-04-15: \"a task I expected to cost $2 comes back at $8\")"
+      method: "leitura: itens HN via API (hacker-news.firebaseio.com/v0/item/<id>.json), lidos em 2026-10-09"
 
   - id: E_FRAGMENTACAO_NAO_ABSORCAO
     node_type: evidence
@@ -363,7 +368,7 @@ nodes:
 
   - id: E_O_GATE_DO_ADOTANTE_ESTA_INERTE_EM_4_DE_6
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 0.9

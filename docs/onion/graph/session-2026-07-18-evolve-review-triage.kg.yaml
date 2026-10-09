@@ -16,6 +16,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "familia-raiz: mecanismos confiam em estado DECLARADO sem verificar o VIVO — reaparece em adopt-update, KB de identidade, onion-review is_error e KG false-green"
+    provenance:
+      source: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md"
+      locator: "docs/analysis/onion-evolution-adopt-update-hardening-2026-07-17.md l.9,l.21-22; PR #412 corpo §\"Família\"; .claude/diary/2026-08-03-o-revisor-verde-que-nunca-revisou.md l.19-30; docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md l.32"
+      method: "derivado: síntese de 4 fontes lidas, uma por ocorrência da família"
   - id: E_ADOPT_SIGNAL
     node_type: evidence
     layer: audit
@@ -52,7 +56,12 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: 2026-07-18
-    label: "soft-pass do onion-review foi desenhado p/ crash transiente mas MASCAROU falha 100% persistente por 4 dias (silence != success) — gap: escalar falha persistente"
+    label: "soft-pass (#361) e retry (#363) do onion-review dispararam em 07-14..07-18 (action v1.0.172+ sai exit 1 em is_error): check verde com aviso 'não revisado' sobre falha 100% persistente por 4 dias; após o pin v1.0.171 a action sai exit 0 com is_error e nenhum dos dois dispara"
+    narrative: "label anterior: soft-pass do onion-review foi desenhado p/ crash transiente mas MASCAROU falha 100% persistente por 4 dias (silence != success) — gap: escalar falha persistente"
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/actions/runs/29621079157"
+      locator: "run 29621079157 (PR #413, 07-17) passos review/retry/soft-pass + comentário do bot no PR #413; runs 29644692142/29645267201 (pós-pin, retry e soft-pass skipped); ec165436 (#361) e 471aedcf (#363) corpos; PR #414 corpo ('mascarado pelo soft-pass'); diário revisor-verde l.27-30"
+      method: "medição: gh run view 29621079157 --log (review e retry 'Process completed with exit code 1' em is_error; soft-pass rodou e comentou no PR) + gh run view 29644692142 --json jobs"
   - id: C_EVOLVE_BACKLOG
     node_type: artifact
     layer: audit
@@ -83,6 +92,10 @@ nodes:
     confidence: 1.0
     status: confirmed
     label: "juiz verificou: o core executavel ja vive em .claude/utils/adopt/*.sh; inline restante e orquestracao de fase, nao conceito extraivel"
+    provenance:
+      source: "docs/analysis/onion-evolution-2026-07-17.md"
+      locator: "docs/analysis/onion-evolution-2026-07-17.md l.4,l.25"
+      method: "juízes: veredito do juiz adversarial opus do /meta:evolve 2026-07-17 (5 juízes, l.4), registrado no relatório"
   - id: C_ITEM6
     node_type: claim
     layer: audit
@@ -97,7 +110,7 @@ nodes:
     plane: DEV
     impact: 3
     confidence: 1.0
-    status: confirmed
+    status: unverifiable
     label: "drive-to-verify: os 5 pontos sao o MESMO conceito enquadrado por audiencia/profundidade (index vs normativo vs troubleshooting); extrair achataria — Modernization Doctrine veta over-engineering"
   - id: C_MODEL_CAUSE
     node_type: claim
@@ -116,16 +129,25 @@ nodes:
     status: confirmed
     verified_at: 2026-07-18
     label: "crash 100% desde 2026-07-14 (runs 07-13 verdes); naquele dia mudaram DOIS: o bump de modelo E a @v1 saltando p/ v1.0.172/173/174"
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/pull/414"
+      locator: "PR #414 corpo (§Experimento controlado, §Evidência); 33da605f corpo"
+      method: "leitura: corpo do PR #414 e do commit 33da605f (07-18)"
   - id: E_EXPERIMENT
     node_type: evidence
     layer: audit
     plane: PROD
     impact: 5
     confidence: 1.0
-    status: confirmed
+    status: refuted
     verified_at: 2026-07-18
     label: "experimento controlado #414: pinar action em v1.0.171 MANTENDO sonnet-5 → onion-review RECUPEROU (review success, retry skipped) e refez review real em #415/#416"
+    narrative: "refutado na onda 2 da O3 (2026-10-09): JUIZ-MESTRE sobrescreve o worker (que propôs corrigir-label): abri os 3 runs; o núcleo 'RECUPEROU' e 'refez review real' cai (is_error, 1 turno, custo 0; no #414 a action nem rodou); 'review success, retry skipped' é o sintoma do silenciamento, não cláusula sobrevivente; reescrever inverteria o nó e suas arestas REFUTES/SUPPORTS → refutar; a fonte passa a ser a medição dos runs"
     trace: "PR #414; .github/workflows/onion-review.yml"
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/actions/runs/29644692142"
+      locator: "runs 29624922938 (#414: 'Action skipped due to workflow validation'), 29644692142 (#415) e 29645267201 (#416): is_error true, num_turns 1, total_cost_usd 0; PRs #415/#416 com 0 reviews e 0 comments"
+      method: "medição: gh run view 29624922938/29644692142/29645267201 --log + gh pr view 415/416 --json reviews,comments"
   - id: C_ACTION_CAUSE
     node_type: claim
     layer: audit
@@ -136,6 +158,10 @@ nodes:
     verified_at: 2026-08-03
     label: "ALEGAVA (07-18): a regressao da claude-code-action (v1.0.172+, 07-14) era a causa do crash — REFUTADO em 08-03; era COINCIDENCIA DE DATA"
     trace: "PR #530, #532, #533; .github/workflows/onion-review-diagnose.yml"
+    provenance:
+      source: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md"
+      locator: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md l.36-38"
+      method: "leitura: diário de 2026-08-03 (migalha type:error da sessão que fechou a causa)"
   - id: E_BOTH_PINS_FAIL
     node_type: evidence
     layer: audit
@@ -146,6 +172,10 @@ nodes:
     verified_at: 2026-08-03
     label: "pin testado nas DUAS pontas — v1.0.171 (11/07) e v1.0.183 (25/07): assinatura identica (is_error, num_turns 1, cost 0, ~180s). A versao nunca foi a causa"
     trace: "runs 30845128611/30835633464/30812516128/30782135096 (v1.0.171); 30858672053 (v1.0.183)"
+    provenance:
+      source: "https://github.com/marciocar/onion-evolve/pull/532"
+      locator: "PR #532 corpo, tabela \"Onde estamos\", linha \"versão da action\"; PR #530 corpo, tabela dos 4 runs"
+      method: "leitura: corpos dos PRs #532 e #530"
   - id: E_401_IN_RUNNER
     node_type: evidence
     layer: audit
@@ -156,6 +186,10 @@ nodes:
     verified_at: 2026-08-03
     label: "de dentro do runner: GET /v1/models → 401 authentication_error em 0,07s, rede impecavel (DNS 3,5ms/TCP 5,6ms/TLS 27ms), chave BEM FORMADA (108 chars, sk-ant-, mesma normalizada) — revogada, nao mal-colada"
     trace: ".github/workflows/onion-review-diagnose.yml; run 30861731536"
+    provenance:
+      source: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md"
+      locator: ".claude/diary/2026-08-03-o-401-que-chegou-vestido-de-timeout.md l.29-33; PR #533 corpo (tabela antes/depois)"
+      method: "leitura: diário 2026-08-03 + PR #533 (medição de dentro do runner relatada pela sessão)"
   - id: C_CREDENTIAL_CAUSE
     node_type: claim
     layer: audit
@@ -180,6 +214,10 @@ nodes:
     verified_at: 2026-08-03
     label: "chave trocada → diagnostico HTTP 200 em 2,2s, e o revisor passou a TRABALHAR (9 turnos, US$ 0,34, 35s), falhando so por error_max_turns com --max-turns 8"
     trace: "run 30862182140 (diagnostico); run 30862852519 (revisor, PR #533)"
+    provenance:
+      source: "7a737711:.claude/validation/review-verdict.sh"
+      locator: "commit 7a737711 (#534) corpo §1-2; PR #533 corpo (tabela antes/depois)"
+      method: "leitura: corpo do commit #534 + PR #533"
   - id: C_MEASURE_RIGHT_INFER_WRONG
     node_type: claim
     layer: audit
@@ -211,7 +249,12 @@ nodes:
     confidence: 1.0
     status: done
     verified_at: 2026-07-18
-    label: "DECISAO: pinar claude-code-action em v1.0.171 (e90deca4) mantendo sonnet-5; des-pinar quando versao nova corrigir o hang"
+    label: "DECISAO (07-18): pinar claude-code-action em v1.0.171 (e90deca4) mantendo sonnet-5 como experimento de isolamento; trocado por v1.0.183 em 08-03 (#530) porque o pin nao curava"
+    narrative: "label anterior: DECISAO: pinar claude-code-action em v1.0.171 (e90deca4) mantendo sonnet-5; des-pinar quando versao nova corrigir o hang"
+    provenance:
+      source: "33da605f:.github/workflows/onion-review.yml"
+      locator: "33da605f diff (uses: anthropics/claude-code-action@e90deca4…, comentário PINADO v1.0.171); a0fe0208 (#530) corpo"
+      method: "leitura: commit do pin (07-18) e commit que o trocou (#530, 08-03)"
   - id: C_GENERATOR_LOCAL
     node_type: claim
     layer: audit
@@ -220,8 +263,13 @@ nodes:
     confidence: 1.0
     status: confirmed
     verified_at: 2026-07-18
-    label: "drive-to-verify: o 'generator' dos sinais granaai (kg-ssot-sdaal, kg-validate-v2.py) e LOCAL do adotante, nao o core /meta:kg; a gramatica do core JA suporta TRACES_TO/CONTROLLED_BY"
+    label: "drive-to-verify: o 'generator' dos sinais granaai (kg-ssot-sdaal, kg-validate-v2.py) e LOCAL do adotante, nao o core /meta:kg; a gramatica do core suporta TRACES_TO, mas NAO CONTROLLED_BY (ausente do kg-radar.sh e do kg.md em 7de0056d)"
+    narrative: "label anterior: drive-to-verify: o 'generator' dos sinais granaai (kg-ssot-sdaal, kg-validate-v2.py) e LOCAL do adotante, nao o core /meta:kg; a gramatica do core JA suporta TRACES_TO/CONTROLLED_BY"
     trace: ".claude/commands/meta/kg.md"
+    provenance:
+      source: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md"
+      locator: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md l.17-19; 7de0056d:.claude/validation/kg-radar.sh l.106; 7de0056d:.claude/commands/meta/kg.md l.89"
+      method: "leitura: backlog de triagem 07-18 + gramática do core no commit do nó"
   - id: E_FAILOPEN_FIELD
     node_type: evidence
     layer: audit
@@ -231,6 +279,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-17
     label: "granaai validou em campo: --update fez a guarda de legibilidade reprovar o .kg.yaml MAPA (exit 1) enquanto o LIST valido passa — fail-open fix funciona"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md"
+      locator: "docs/evolution/inbox/_processed/2026-07-17-kg-fail-open-primo-validador-local-duplicado.md l.15-17"
+      method: "leitura: sinal de campo do granaai (2026-07-17) arquivado em inbox/_processed"
   - id: D_LOCAL_VALIDATOR_DOCTRINE
     node_type: decision
     layer: audit
@@ -239,6 +291,10 @@ nodes:
     confidence: 0.95
     status: confirmed
     label: "DOUTRINA (o 'primo' do fail-open): validador LOCAL de .kg.yaml deve DELEGAR ao kg-radar.sh, nunca reimplementar a gramatica — parser duplicado e onde o falso-verde volta. Ack #415/#416"
+    provenance:
+      source: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md"
+      locator: "docs/analysis/onion-evolution-kg-sdaal-hardening-2026-07-18.md l.24-32; PR #416 corpo"
+      method: "leitura: backlog de triagem 07-18 (item 1) + PR #416 (ack ao granaai)"
   - id: D_DRIVE_VERIFY
     node_type: decision
     layer: audit

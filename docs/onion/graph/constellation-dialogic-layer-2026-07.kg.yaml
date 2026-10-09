@@ -24,6 +24,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "previa e auto-regulacao sao o MESMO objeto (o .kg.yaml da estrela) visto de dois lados"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.43, 50-52"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.43, 50-52"
   - id: C_TWO_QUANTITATIVES
     node_type: claim
     layer: audit
@@ -32,6 +36,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "ha dois quantitativos: confidence ATRIBUIDA (alca) x evidencia MEDIDA (dogfood)"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.67-72"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.67-72"
   - id: C_QUAL_TO_QUANT
     node_type: claim
     layer: audit
@@ -40,6 +48,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "o KG cristaliza julgamento nao-deterministico em dado rastreavel/contavel — explicito e enderecavel, nao objetivo"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.59-67"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.59-67"
   - id: C_ARISTOTLE_NO_HOME
     node_type: claim
     layer: audit
@@ -48,6 +60,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "a regua de Aristoteles so existe nas worktrees; Hegel/Bloom ja tem casa canonica no core"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.90-99 ; medição: git grep -il aristo 9dd375f6 = 0"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.90-99 + medição: git grep -il aristo 9dd375f6 = 0"
 
   # ---- evidencia (verificada) ----
   - id: E_INTERFACE_FOLD
@@ -58,6 +74,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "a dobra do refutador em interface-state-of-art.kg.yaml (nos+REFUTES, radar acende exit 1) e a prova viva da camada"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "interface-state-of-art.kg.yaml l.227-251, l.384-393 ; 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.112-120"
+      method: "leitura: interface-state-of-art.kg.yaml l.227-251 (nós REF_* do refutador) e l.384-393 (3 REFUTES) + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.112-120"
   - id: E_EXPLORE_ARISTOTLE
     node_type: evidence
     layer: audit
@@ -65,7 +85,12 @@ nodes:
     impact: 2
     confidence: 0.9
     status: confirmed
-    label: "exploracao: zero hits de 'aristo' no core; a regua so aparece nas worktrees (SYNTHESIS, NOTE-0x)"
+    label: "exploracao (2026-07-12): zero hits de 'aristo' no core (git grep em 9dd375f6, antes da pesquisa); a regua so aparece nas worktrees (mais articulada em discuss/onion-pessoal-marcio, aplicada nas notas da interface)"
+    narrative: "label anterior: exploracao: zero hits de 'aristo' no core; a regua so aparece nas worktrees (SYNTHESIS, NOTE-0x)"
+    provenance:
+      source: "9dd375f6c8c03a7f830331f45b5a7a0d4e6a04bb + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "git grep -il aristo 9dd375f6 (pai de 5265aced) ; 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.96-97"
+      method: "medição: git grep -il aristo 9dd375f6c8c0 (e aristó) = 0 arquivos + leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.96-97"
 
   # ---- decidido (decisions) ----
   - id: D_STORE_GATED
@@ -151,6 +176,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "a auto-regulacao RODA o motor-base kg-radar.sh no proprio grafo (como a dobra da interface fez) — so o ritual de autoria e novo"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.159-161"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.159-161"
   - id: C_PREVIA_CONTAINS_RADAR
     node_type: claim
     layer: audit
@@ -159,6 +188,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "a previa e uma vista agrupada-por-papel; sua secao 'duvidas/o-que-fazer-agora' CONTEM o radar-base per-graph (superset, nao competidor)"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.160"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.160"
   - id: C_RITUAL_IS_NEW
     node_type: claim
     layer: audit
@@ -167,6 +200,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "o unico conteudo genuinamente novo e o ritual de autoria Aristoteles+Hegel — upstream do radar (produz nos, nao os ranqueia)"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.161"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.161"
   - id: C_DIALOGIC_DECOMPOSED
     node_type: claim
     layer: audit
@@ -175,6 +212,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "a camada dialogica nao e um 4o servico monolitico: e o ritual de autoria [novo] + a previa como vista [fina], reusando o motor-base; ortogonal ao radar-da-constelacao (por-estrela x cross-study)"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.151-165"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.151-165"
   - id: D_DIALOGIC_ORTHOGONAL
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md
@@ -198,6 +239,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "nao ha bom ritmo fixo — o auto-check e EVENT-triggered (Aristoteles@intake, Hegel@contradicao, backstop@recolher); relogio manufatura teatro"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.169-180"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.169-180"
   - id: C_ANTITHEATER_DOGFOOD_GATED
     node_type: claim
     layer: audit
@@ -206,6 +251,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "anti-teatro: batch por unidade logica + dogfood-gated (re-testar, nunca re-carimbar); blocked_on_user subindo sinaliza que virou teatro"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.182-184"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.182-184"
   - id: C_PIGGYBACK_EXISTING_EVENTS
     node_type: claim
     layer: audit
@@ -213,7 +262,12 @@ nodes:
     impact: 3
     confidence: 0.8
     status: confirmed
-    label: "os 3 gatilhos ja acontecem (intake/contradicao/recolher) — piggyback = zero cadencia nova, zero overhead, nada a construir"
+    label: "os 3 gatilhos ja acontecem (intake/contradicao/recolher) — piggyback = zero cadencia nova, nada a construir; estende /meta:diary review + o recolher do worklog + o criterio §2.6"
+    narrative: "label anterior: os 3 gatilhos ja acontecem (intake/contradicao/recolher) — piggyback = zero cadencia nova, zero overhead, nada a construir"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.184-186"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.184-186"
   - id: D_AUTOREG_EVENT_TRIGGERED
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md
@@ -237,6 +291,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "o boletim e projecao por-papel de .kg.yaml + SEED: claim/evidence confirmed=AFERIDO, decision=DECIDIDO/DECIDINDO, question open=DUVIDAS, REFUTES/SUPERSEDES=INCOMODOS, radar=o-que-fazer-agora"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.190-200"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.190-200"
   - id: C_KG_IS_PUBLIC_FACE
     node_type: claim
     layer: audit
@@ -245,6 +303,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "o .kg.yaml e a face epistemica PUBLICA da estrela (labels+scores, curado pelo autor); o corpo NOTE-prose e privado (Tier-1-3, sob convite) — Aristoteles: igual a metadado, diferente do corpo"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.202-208"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.202-208"
   - id: C_PREVIA_IS_DETERMINISTIC
     node_type: claim
     layer: audit
@@ -253,6 +315,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "o boletim e projecao MECANICA de kg-radar.sh + SEED (molde federation-status-scan --json) — o core formata o que o motor computa, nao interpreta nem bisbilhota"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.142-143, 206-209"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.142-143, 206-209"
   - id: D_PREVIA_SCHEMA_DEFINED
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md
@@ -287,6 +353,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "a regua de Aristoteles JA e vivida no core sem nome (SDAAL: Asana/Linear reusam=igual, Jira/ClickUp especialista=diferente; /meta:adopt) — dar casa = NOMEAR o vivido, nao importar"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.218-221"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.218-221"
   - id: C_ARISTOTLE_PARITY
     node_type: claim
     layer: audit
@@ -295,6 +365,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "trio de reguas de pesquisa: Hegel (§2.6) e Bloom (§2.2) tem casa no core; Aristoteles so nas worktrees — merece paridade"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.90-99, 223-224"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.90-99, 223-224"
   - id: C_ARISTOTLE_IS_DISCIPLINE
     node_type: claim
     layer: audit
@@ -303,6 +377,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "o valor e a DISCIPLINA (declarar IGUAL->transfere / DIFERENTE->desenha com evidencia; bloqueia falsa-analogia e falsa-distincao) — refutador: nao e so DRY, e transferencia com 2 modos de falha"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.84-86, 226-229"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.84-86, 226-229"
   - id: D_ARISTOTLE_HOME_IS_KB
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md
@@ -324,6 +402,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "/meta:diary review — 'migalha vencida -> re-testar, nunca re-carimbar' (o molde do backstop TTL, dogfood-gated)"
+    provenance:
+      source: ".claude/commands/meta/diary.md + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: ".claude/commands/meta/diary.md l.7 ; 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.180-183"
+      method: "leitura: .claude/commands/meta/diary.md l.7 + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.180-183"
   - id: ENT_INTERFACE_STAR
     node_type: entity
     layer: audit
@@ -332,6 +414,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "estrela discuss/interface-state-of-art — onde a prova viva (a dobra) vive"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "interface-state-of-art.kg.yaml l.1, l.384-393 ; 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.112-117"
+      method: "leitura: docs/discussions/interface-state-of-art/interface-state-of-art.kg.yaml l.1 e l.384-393 + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.112-117"
   - id: ENT_CONSTELLATION_ADR
     node_type: entity
     layer: audit
@@ -340,6 +426,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "ADR da Constelacao (3 servicos: mapa/radar/carteiro) — o que este 4o estende"
+    provenance:
+      source: "docs/knowledge-base/decisions/onion-adr-constellation-operating-model-2026-07.md + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "onion-adr-constellation-operating-model-2026-07.md l.19-20, l.34 ; 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.22-24"
+      method: "leitura: ADR da Constelação l.19-20 e l.34 + 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.22-24"
   - id: ENT_KG_SDAAL
     node_type: entity
     layer: audit
@@ -348,6 +438,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "KG SDAAL / Dogfood — o motor qualitativo->quantitativo (confidence/impact/status/radar)"
+    provenance:
+      source: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.59-62, 74-75"
+      method: "leitura: 50d7f5b0:docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md l.59-62, 74-75"
 
   # ---- 3o face: o boletim core->estrela (padrao candidato, emergiu 1x) ----
   - id: C_BOLETIM_INFORM

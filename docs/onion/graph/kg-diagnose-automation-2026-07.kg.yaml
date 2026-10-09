@@ -40,9 +40,9 @@ nodes:
     label: "LINHA VERMELHA: a automação substitui só o fan-out MECÂNICO (scaffold, extract/consolidate, candidatos, gate-do-radar). NUNCA o selo na PAUSA. Não existe --auto de diagnóstico de propósito (ao contrário do transform, onde auto é legítimo p/ tasks)"
     trace: ".claude/commands/meta/kg.md"
     provenance:
-      source: ".claude/commands/meta/kg.md"
-      locator: "kg.md lido no vivo (L434/454/435-436/358): automacao = so fan-out mecanico (scaffold/candidatos/gate-do-radar); PAUSA e selo sao humanos ('o humano sela'); NAO existe --auto de diagnostico (transform tem auto legitimo, o 'ao contrario' do label) — linha vermelha INTACTA"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      source: ".claude/commands/meta/kg.md@88099af3"
+      locator: "l.453-456 (\"🚩 A linha vermelha: a automação substitui só o fan-out mecânico (scaffold, extract/consolidate, geração de candidatos, gate-do-radar). Nunca o selo humano na PAUSA. Não existe --auto de diagnóstico de propósito — ao contrário do transform\"); no HEAD atual l.463"
+      method: "leitura: kg.md no commit da re-verificação (88099af3, 2026-08-27)"
   - id: E_gap_scaffold
     node_type: evidence
     plane: PROD
@@ -67,6 +67,10 @@ nodes:
     verified_against: worklog-protocol-e-adopt
     label: "REUSA, não inventa: o STATE.md-NEXT-pointer (worklog-protocol, provado no /meta:adopt) é o mecanismo de retomada — já prescrito p/ o diagnose. O scaffold só materializa o template. Radar, extract, consolidate: reusados sem tocar"
     trace: "docs/knowledge-base/concepts/worklog-protocol.md"
+    provenance:
+      source: ".claude/commands/meta/kg.md@d726efb2"
+      locator: "l.400 (store \"commitado por lote + um STATE.md com ponteiro NEXT retomável\") + l.433 e l.444 (scaffold cria STATE.md com NEXT; \"Retoma frio pelo NEXT-pointer\"); docs/knowledge-base/concepts/worklog-protocol.md l.52-54 e l.75 (§3 STATE.md, ## NEXT); .claude/commands/meta/adopt.md l.463-464 (adopt usa STATE.md/NEXT); corpo do commit d726efb2"
+      method: "leitura: kg.md no commit da entrega + worklog-protocol + adopt.md"
   - id: E_skeleton_vazio_reprova
     node_type: evidence
     plane: PROD
@@ -89,6 +93,10 @@ nodes:
     status: confirmed
     label: "O precedente EXATO de 'automatiza o mecânico, preserva o julgamento' já existe: o eixo interactive/auto do /product:transform-consolidated (análise auto sempre; validação humana por bloco só no interactive) + o dry-run-como-gate do onion-wizard"
     trace: ".claude/commands/product/transform-consolidated.md"
+    provenance:
+      source: ".claude/commands/product/transform-consolidated.md"
+      locator: ".claude/commands/product/transform-consolidated.md l.76-86 + .claude/skills/onion-wizard/SKILL.md l.44-45 + .claude/commands/meta/kg.md@88099af3 l.436 (HEAD l.446-447)"
+      method: "leitura: comando transform-consolidated + skill onion-wizard"
   - id: Q_orquestrador_gated
     node_type: question
     plane: DEV

@@ -79,6 +79,10 @@ nodes:
     label: 'PRECISAO QUE CUSTOU UMA REPROVACAO, e fica escrita para nao se perder: relogio/cron NAO E VEDADO ao `/meta:evolve`. Em 2026-10-03 eu escrevi num no `open` de atencao maxima que "o que NAO pode ser: relogio/cron — isso e MOAT W7", e isso era INVENCAO — re-afirmava como doutrina o nao-sequitur que o Elenxo de 2026-08-31 ja havia derrubado POR MEDICAO, e usava a invencao para excluir justamente o candidato que aquela refutacao chamou de "resposta proporcional". Medido: ZERO mencoes a cron em `evolve.md`, e `automation-ladder-registry.txt` tem DUAS entradas MOAT, ambas de deploy. O W7 escopa o DRIVER, que EXECUTA; o evolve PROPOE e nao muta. ⚠️ ESTA GUARDA NAO DECIDE ISSO: ela avisa, no padrao da REGRA 62/65 (a maquina detecta, o humano dispara). A escolha entre AVISAR e AGENDAR segue sendo do maestro, e agora ele escolhe com o aviso na mao em vez de com o silencio.'
     trace: '.claude/validation/automation-ladder-registry.txt'
     verified_against: 'grep -ciE "cron|schedule|/loop|agend" em .claude/commands/meta/evolve.md = 0; duas entradas MOAT no registry (site-vps-deploy, bridge-deploy); o veredito do Elenxo re-verificado por mim na fonte antes de aceitar'
+    provenance:
+      source: "33039e0d1f27:.claude/commands/meta/evolve.md + 33039e0d:.claude/validation/automation-ladder-registry.txt + 34a02a34 + 33039e0d:docs/evolution/research/maestro-vivo-2026-08/data/f2-confronto.json"
+      locator: "evolve.md@33039e0d (grep) ; automation-ladder-registry.txt l.37-38 ; 34a02a34 (nó com 'isso e MOAT W7') ; f2-confronto.json l.422"
+      method: "medição: git show 33039e0d:.claude/commands/meta/evolve.md | grep -ciE 'cron|schedule|/loop|agend' = 0 + leitura: registry l.37-38, f2-confronto.json l.422, commit 34a02a34"
 
   - id: E_TETO_DECLARADO_DO_GATILHO
     node_type: evidence

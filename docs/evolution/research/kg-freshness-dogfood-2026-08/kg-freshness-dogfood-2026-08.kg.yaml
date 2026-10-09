@@ -206,9 +206,9 @@ nodes:
     label: 'EXISTEM DUAS CÓPIAS DO SSOT DA FEDERAÇÃO NESTA MÁQUINA, E ELAS DIVERGEM. /home/marcio/onion-evolve/docs/evolution/federation/members.yaml — md5 a31526aa, mtime 2026-08-17, 9 adopters (o vivo, versionado em git). /home/onion/onion-evolve/…/members.yaml — md5 ad1701c9, mtime 2026-08-13, 8 adopters: falta `poc-venda-direta-pdi`. Foi esta divergência que produziu o 9-vs-8 entre dois workers da mesma rodada — um rodou o projetor a partir do repo vivo, o outro leu o espelho caduco. Divergência de fonte entre workers é ACHADO, não ruído, e este cobrou a dívida: um nó foi declarado CONFIRMED sobre uma enumeração errada.'
     trace: "/home/marcio/onion-evolve/docs/evolution/federation/members.yaml · /home/onion/onion-evolve/…"
     provenance:
-      source: "/home/marcio/onion-evolve/docs/evolution/federation/members.yaml · /home/onion/onion-evolve/…"
-      locator: "md5sum + PyYAML nos dois caminhos, medido direto"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-evolve/docs/evolution/federation/members.yaml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "ec4c8442 (corpo do commit) + ec4c8442:docs/evolution/federation/members.yaml"
+      locator: "corpo de ec4c8442 l.20 ('existem DOIS members.yaml nesta máquina (9 e 8 adotantes)'); git show ec4c8442:docs/evolution/federation/members.yaml | md5sum = a31526aa; último commit do arquivo 31f9d697 (2026-08-17)"
+      method: "testemunho: medição da sessão 2026-08-29 (md5sum + PyYAML nos dois caminhos) relatada em 1ª pessoa no corpo de ec4c8442 (Claude-Session); a metade versionada conferida por leitura (md5 a31526aa, 9 adopters incl. poc-venda-direta-pdi); /home/onion sem permissão hoje"
 
   - id: C_PROJETOR_DE_IDENTIDADE_SEM_ANCORA
     node_type: claim
@@ -416,6 +416,10 @@ nodes:
     verified_against: 'aritmetica do steelman conferida: 190 x 68.585 = 13,0M'
     label: 'OBJECAO PRESERVADA DO ELENXO (o acoplamento que ninguem tinha visto): B (juiz fixo) e C (censo vs amostra) SAO A MESMA DECISAO. Com juiz opus/high fixo, o censo dos 190 custa 26,5M e nao cabe; SEM o juiz, custa 13,0M e cabe com folga. Ou seja: "o censo nao cabe" nao era um fato do mundo — era a consequencia orcamentaria de uma escolha de tiering feita sobre n=4 e nunca discutida como escolha. Por isso NENHUMA das duas decisoes duplicadas (D_CENSO_VIRA_AMOSTRA_ESTRATIFICADA em fios-abertos · Q_CENSO_DOS_63_CORTADOS aqui) fecha agora: fechar C antes de decidir B seria selar a consequencia antes da causa. Teto declarado do proprio numero: 13,0M extrapola o unitario de um grafo de auth para 30 grafos — serve para exibir o ACOPLAMENTO, nao para orcar.'
     trace: 'este grafo'
+    provenance:
+      source: "docs/evolution/review/fix-kg-freshness-schema-cure.md · e5a26a3c (corpo do commit) · 7bba14f3:docs/onion/graph/fios-abertos.kg.yaml (nó do custo unitário)"
+      locator: "resíduo l.5 (Elenxo wf_26433f93-c5d) e l.27-29 (steelman); corpo de e5a26a3c ('Nenhuma duplicata do censo fecha antes de B'); diff de 7bba14f3 (+label 'O PRECO DE RE-VERIFICAR UM NO': 68.585 por nó, 8 nós de um único grafo m2-bridge-logto, multiplicar = EXTRAPOLACAO)"
+      method: "juízes: steelman do Elenxo wf_26433f93-c5d (3 lentes cegas + steelman opus/high + refutador default REPROVADO) registrado no resíduo R56; journal ausente no host; custo unitário por leitura de 7bba14f3"
 
   - id: D_JUIZ_CALIBRACAO_GATED
     node_type: decision
@@ -439,6 +443,10 @@ nodes:
     verified_against: 'padrao-ouro sha256 c975fce6 carimbado ANTES do fan-out; 16 workers + 7 juizes; 4 grafos fora do m2'
     label: 'A CALIBRACAO QUE D_JUIZ_CALIBRACAO_GATED PEDIA, EXECUTADA. Ouro: 40 afirmacoes contadas pelo contexto principal em 8 nos, hash carimbado antes de qualquer worker. Resultados nos 7 nos-ouro medidos: workers declararam 19 afirmacoes, o ouro conta 34 — SUBCONTAGEM DE 44% FORA DO M2 (m2 era ~48%: o fenomeno e geral, nao do grafo). Juiz vs ouro: EXATO em 4/7 (57%), SOBRE-conta em 3/7, SUB-conta em 0/7 — o juiz NUNCA erra na direcao que importa. Das 5 acusacoes de subcontagem, o ouro sustenta 4 e rejeita 1 (C_LACUNA: juiz contou 4, ouro diz 2) — TAXA DE FALSO-POSITIVO NA ACUSACAO: 1/5 = 20%. E dois resultados fora da contagem: (a) o juiz APROVOU 1 de 7 (o REFUTED do EN_MAESTRO) — "o juiz sempre reprova" esta refutado; (b) o juiz pegou um worker APRESENTANDO UM LS CURADO como saida de comando (10 de 14 itens; EN_REPO) re-rodando o comando — a classe de defeito que nem schema nem fan-in podem ver. Teto declarado: n=7, juizes sobre-contam por granularidade (somas: worker 19 · juiz 44 · ouro 34), e o ouro e UMA contagem de UM contador.'
     trace: 'docs/evolution/research/kg-freshness-dogfood-2026-08/calibration-gold-standard-2026-08-29.md (sha256 c975fce64fca59396887a5f07443e7fa28069f0e2c6d9f24269f412575b4d240)'
+    provenance:
+      source: "docs/evolution/review/feat-kg-freshness-calibration-pilot.md · docs/evolution/research/kg-freshness-dogfood-2026-08/calibration-gold-standard-2026-08-29.md"
+      locator: "resíduo l.22-41 (tabela e números); ouro: 8 seções \"OURO:\" (l.5-62), sha256 c975fce64fca59396887a5f07443e7fa28069f0e2c6d9f24269f412575b4d240"
+      method: "leitura: tabela de calibração do resíduo R56 + padrão-ouro versionado (sha256 conferido em 2026-10-09)"
 
   - id: E_BARRAGEM_DO_SCHEMA_MEDIDA_EM_PRODUCAO
     node_type: evidence

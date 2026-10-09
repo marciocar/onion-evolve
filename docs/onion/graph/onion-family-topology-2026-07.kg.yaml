@@ -19,6 +19,10 @@ nodes:
     confidence: 0.95
     status: confirmed
     label: "source (T0) — a AUTORA do framework (onion-evolve); tem a meta-fábrica (create-*/evolve/graph/inventory); NÃO carrega stamp (lida ao vivo)"
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml"
+      locator: "l.72-77 (source: TIER 0 — o core (onion-evolve); note: meta-factory create-*/adopt/federation-*/evolve/graph/inventory core-only) + .claude/skills/onion-onboarding/SKILL.md l.41-42 (\"sem stamp = source\") + decouple-source.sh l.9-10 (\"o core original (que não tem stamp)\")"
+      method: "leitura: roles.yaml + skill de onboarding + cabeçalho do decouple-source.sh"
   - id: ROLE_hub
     node_type: entity
     layer: audit
@@ -27,6 +31,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "hub (T1) — EMPRESA: adota e controla os PRÓPRIOS projetos (Camada 2); role: hub no stamp; USA o framework, nao o autora"
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml"
+      locator: "l.79-89 (hub: TIER 1 — adoção de EMPRESA, autoridade sobre os PRÓPRIOS projetos; Camada 1 source-only \"Hub USA, nao autora\"; Camada 2 aberta; role: hub via --promote-hub)"
+      method: "leitura: roles.yaml (3 camadas de capacidade) + /meta:adopt --promote-hub"
   - id: ROLE_standalone
     node_type: entity
     layer: audit
@@ -35,6 +43,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "standalone (T3) — dev SOLO: framework completo, SEM sub-adotados nem federacao; adota o source direto"
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml"
+      locator: "l.91-95 (standalone: TIER 3 — dev solo com ferramenta COMPLETA, SEM federação; work_tools full; downstream false \"sem sub-adotados\") + arestas do próprio grafo l.174-176 (ROLE_standalone DEPENDS_ON TX_create DEPENDS_ON ROLE_source)"
+      method: "leitura: roles.yaml + arestas de transição do grafo de topologia"
   - id: ROLE_consumer
     node_type: entity
     layer: audit
@@ -43,6 +55,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "consumer (T2) — PROJETO adotado por um hub (parent=hub); folha da cadeia, role: adopted, NAO re-adota (FED-3-1)"
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml"
+      locator: "l.97-101 (consumer: TIER 2 — \"minimo (adota um hub, nao o core)\", downstream false) + .claude/commands/meta/adopt.md l.68 (role: adopted = consumidor, FED-3-1)"
+      method: "leitura: mapa role→bundle (roles.yaml) + PASSO 0 do /meta:adopt"
   - id: ROLE_distilled
     node_type: entity
     layer: audit
@@ -51,6 +67,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "distilled — onion-mini: destilacao curada (teaser); NAO vendoriza nem instala"
+    provenance:
+      source: ".claude/utils/marketplace/roles.yaml"
+      locator: "l.103-107 (distilled: \"NAO vendoriza nem instala — destilacao curada (onion-mini, prompt-as-bytecode)\") + docs/business-context/02-product/strategy.md l.46 (\"onion-mini (porta/teaser)\")"
+      method: "leitura: roles.yaml + estratégia de produto"
   - id: ROLE_decoupled_source
     node_type: entity
     layer: audit
@@ -59,6 +79,10 @@ nodes:
     confidence: 0.7
     status: confirmed
     label: "fonte-desacoplada — cliente que OWNA o proprio framework: role: source + decoupled_from, vira seu proprio T0, autora sozinho, corta o --update do core. 'A fonte e soberana de quem a usa' no limite. Mecanismo: decouple-source.sh"
+    provenance:
+      source: ".claude/utils/adopt/decouple-source.sh"
+      locator: "l.3-10 (cabeçalho: adotado/hub vira FONTE SOBERANA própria (own T0); adopted_from→decoupled_from; role→source; autora o próprio framework; NÃO recebe mais --update; \"A fonte é soberana de quem a usa\" no limite)"
+      method: "leitura: cabeçalho do mecanismo decouple-source.sh"
 
   # ---- AUTORIDADE DE PESSOA (entity, prefixo AUTH_) — dimensao ORTOGONAL aos tiers de REPO acima ----
   # Um ROLE_ e o tier do REPO (source/hub/adopted); um AUTH_ e o que uma PESSOA pode fazer DENTRO de um
@@ -72,6 +96,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "colaborador visitante — pessoa convidada a um repo (via TX_invite) com AUTORIDADE RESTRITA: ENTREGA sinais como arquivos (inbox) mas NAO relaya nem acessa o core (reforcado pelo SO); um-escritor-por-arquivo (I3, entrega-sem-commit); vinculo com a marca pode ser assimetrico (o framework nao precisa dos detalhes). So o maestro relaya/tria ao core. Sinal 8 do relay 2026-07-30"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-30-relay-treino-vertical-colaboracao-produtos.md"
+      locator: "l.114-119 (§\"Sinal 8 — responsabilidades assimétricas + autorização de fala com o core\") + .claude/skills/onion-onboarding/SKILL.md l.49-60 + corpo do commit daee2dee (#497)"
+      method: "leitura: sinal do relay 2026-07-30 (inbox processado) + skill de onboarding que projeta a fronteira"
 
   # ---- TRANSIÇÕES (decision) — os movimentos; trace: = o procedimento REAL (o scaffold) ----
   - id: TX_create

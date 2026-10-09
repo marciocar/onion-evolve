@@ -162,6 +162,10 @@ nodes:
     source_kind: internal-audit
     label: 'PROVA DO PROPRIO CENSO, e e o dogfood do /meta:dissect: no dia 1 o censo disse "148 grafos, ZERO dissecacao declarada" — correto e inutil ao mesmo tempo, porque o conhecimento do Cedar ESTAVA no corpus, apenas sem os marcadores que o censo le. E exatamente o teto que o medidor declara ("nao sabe de ferramenta que ninguem anotou COMO DISSECACAO"). Esta dissecacao e a primeira a carimbar os marcadores, e a partir dela o censo passa a responder "Cedar: N3, parquear, vence em 31/10".'
     trace: 'docs/evolution/dissect/cedar-2026-10/cedar-2026-10.kg.yaml'
+    provenance:
+      source: ".claude/validation/dissect-census.sh"
+      locator: "30eecf28^ (arvore anterior a 1a dissecacao); .claude/validation/dissect-census.sh l.23, l.117 em 30eecf28; corpo de 30eecf28"
+      method: "medição: bash .claude/validation/dissect-census.sh (registrado no verified_against; re-executado 2026-10-09 devolve \"cedar | N3 | parquear | 2026-10-01 | 2026-10-31\"); estado do dia 1 por leitura de 30eecf28^ (148 .kg.yaml rastreados, zero \"dissect_tool:\")"
 
   - id: D_CEDAR_1001
     node_type: decision

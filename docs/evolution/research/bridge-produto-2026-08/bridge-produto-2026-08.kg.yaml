@@ -48,7 +48,7 @@ nodes:
 
   - id: F0_ALICERCE_FIACAO
     node_type: entity
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-14
     verified_against: deploy-em-producao-health-ok-pwa-true-invocacao-nova-auth-enforce-noop-do-mecanismo-e-estabilidade
     status: done
@@ -74,7 +74,7 @@ nodes:
 
   - id: F2_ESPINHA_THREADS
     node_type: entity
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-14
     verified_against: deploy-em-producao-threads-401-sem-token-spa-fallback-servindo-index-bench-22-testes-gzip-253kib
     status: done
@@ -89,7 +89,7 @@ nodes:
 
   - id: F3_ROSTO_REDESIGN
     node_type: entity
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-14
     verified_against: deploy-pelo-mecanismo-ramo-cheio-limpo-bridge-1d45531-health-ok-38-testes-gzip-no-orcamento
     status: done
@@ -104,7 +104,7 @@ nodes:
 
   - id: F4_GOVERNO_ADMIN
     node_type: entity
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-14
     verified_against: deploy-limpo-3a-vez-invite-anonimo-401-em-producao-usage-guards-ok-spa-admin-200-m2m-no-env
     status: done
@@ -119,7 +119,7 @@ nodes:
 
   - id: F5_PRACA_DIVULGACAO
     node_type: entity
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-14
     verified_against: deploy-28f3ad96-provas-vivas-shared-404-noindex-nostore-share-anonimo-401-s-noindex-hit31-429-selftest-16-16-bench-verde
     status: done
@@ -134,7 +134,7 @@ nodes:
 
   - id: E_DEMO_CAMPO_2026_08_14
     node_type: evidence
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-14
     verified_against: demo-real-do-maestro-desktop-e-mobile-8-achados-com-screenshot-curas-em-29b946da
     status: confirmed
@@ -149,7 +149,7 @@ nodes:
 
   - id: E_SONDA_ENV_CONVIDADO_LIA_PRODUCAO
     node_type: evidence
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-15
     verified_against: sonda-agente-real-cwd-workspace-bypass-respondeu-14-linhas-do-.env-e-16-re-sondas-das-curas
     status: confirmed
@@ -164,7 +164,7 @@ nodes:
 
   - id: F_ID_1_ADOCAO_LIMPA
     node_type: entity
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-15
     verified_against: deploy-2e10b497-dogfood-catch-up-LIMPO-comandos-onion-50-vivos-cross-workspace-VIZINHO_BLOQUEADO-vendor-manifest-5-5
     status: done
@@ -179,7 +179,7 @@ nodes:
 
   - id: F_ID_2_CONTEXTOS_ORG
     node_type: entity
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-15
     verified_against: deploy-83033b25-org-granaai-povoada-dual-token-7-ataques-fail-closed-conflito-sem-marcadores-realpath-nega-symlink
     status: done
@@ -200,12 +200,13 @@ nodes:
     status: done
     impact: 4
     confidence: 0.82
-    label: "F-ID.3 SUPERFÍCIE (parcial em produção): F-ID.3a (bridge 3720e47) — dual-token de PONTA A PONTA: getOrganizationToken (refresh grant + organization_id; login pede urn:logto:scope:organizations) + activeCtx (orgHeader síncrono anexa X-Onion-Org-Token a /chat e /threads) + ContextSwitcher no header (👤 Pessoal / 🏢 org de /me/contexts; troca ativa o contexto e recarrega). Fecha o resíduo do org token (basta marcio@grana.ai logar+trocar). F-ID.3c (bridge d4bb1a5) — gestão da org SÓ para admin DA ORG (orgAdminGuard consulta isOrgAdmin no Logto, não confia no token; authGuard→withCtx→orgAdminGuard): GET /o/:id/members, POST /o/:id/invite (convite NATIVO do Logto POST /organization-invitations, E-MAIL REAL via Postmark, template OrganizationInvitation, 14d, member|admin — fecha o 'convite que não convida' da demo 08-14), DELETE membro. Front OrgMembers.tsx lazy, botão 👥 no contexto de org. Provado contra Grana.AI (membros, admin=true, convite valida) + 401 sem token em produção. Elenxo F-ID.3 em curso. RESTA na F-ID.3: Home de contextos + perfil /me (F-ID.3b) — nó segue OPEN até essas telas + o Elenxo. Depois F-ID.4 (MGM)."
+    label: "F-ID.3 SUPERFÍCIE em produção: 3a org token + switcher Pessoal↔Org (3720e47), 3b perfil /me (7aa03ae), 3c membros + convite nativo do Logto por e-mail (d4bb1a5); o Elenxo achou 2 críticos e ALTOs, curados (82a81ea, 22a383e). Virou done em 2026-08-15 (01ddba9c)."
+    narrative: "label anterior: F-ID.3 SUPERFÍCIE (parcial em produção): F-ID.3a (bridge 3720e47) — dual-token de PONTA A PONTA: getOrganizationToken (refresh grant + organization_id; login pede urn:logto:scope:organizations) + activeCtx (orgHeader síncrono anexa X-Onion-Org-Token a /chat e /threads) + ContextSwitcher no header (👤 Pessoal / 🏢 org de /me/contexts; troca ativa o contexto e recarrega). Fecha o resíduo do org token (basta marcio@grana.ai logar+trocar). F-ID.3c (bridge d4bb1a5) — gestão da org SÓ para admin DA ORG (orgAdminGuard consulta isOrgAdmin no Logto, não confia no token; authGuard→withCtx→orgAdminGuard): GET /o/:id/members, POST /o/:id/invite (convite NATIVO do Logto POST /organization-invitations, E-MAIL REAL via Postmark, template OrganizationInvitation, 14d, member|admin — fecha o 'convite que não convida' da demo 08-14), DELETE membro. Front OrgMembers.tsx lazy, botão 👥 no contexto de org. Provado contra Grana.AI (membros, admin=true, convite valida) + 401 sem token em produção. Elenxo F-ID.3 em curso. RESTA na F-ID.3: Home de contextos + perfil /me (F-ID.3b) — nó segue OPEN até essas telas + o Elenxo. Depois F-ID.4 (MGM)."
     trace: "/home/onion/onion-bridge/web/src/context/activeCtx.ts"
     provenance:
-      source: "/home/onion/onion-bridge/web/src/context/activeCtx.ts"
-      locator: "deploy-completo-org-token-switcher-membros-perfil-ALTOs-curados-teste-navegador-do-maestro-6-bugs-curados"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/web/src/context/activeCtx.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "01ddba9c (corpo, core) + /home/marcio/onion-bridge-dev 3720e47, 7aa03ae, d4bb1a5, 82a81ea, 22a383e"
+      locator: "git show -s 01ddba9c (\"F_ID_3_SUPERFICIE → done (ALTOs curados + teste de navegador...)\"); corpos de 3720e47 (3a), 7aa03ae (3b), d4bb1a5 (3c), 82a81ea (2 críticos), 22a383e (ALTOs) em /home/marcio/onion-bridge-dev"
+      method: "leitura: corpos de 3720e47/7aa03ae/d4bb1a5/82a81ea/22a383e em /home/marcio/onion-bridge-dev + corpo de 01ddba9c (transição a done)"
 
   - id: F_ID_4_MGM
     node_type: entity
@@ -215,12 +216,13 @@ nodes:
     status: done
     impact: 3
     confidence: 0.8
-    label: "F-ID.4 MEMBER-GET-MEMBER (bridge 600cd9b, deploy vivo — ÚLTIMA peça da fase Identidade): decisão selada do maestro (pedido com aprovação). referrals.ts store atômico (tmp+rename, cache mtime+size, Object.create(null)): addReferral (valida e-mail, idempotente por e-mail pendente), listReferrals, decideReferral. Rotas: POST /me/referrals (qualquer usuário, rate-limit 20/min), GET/POST /admin/referrals* (adminGuard; aprovar dispara inviteUser). Front: campo 'Indicar alguém' no perfil /me + seção 'Indicações pendentes' no dashboard admin (✅/✖️). ⚠️ NÃO REVISADO POR ELENXO ainda (typecheck+bench+teste-navegador só). ⚠️ convite (org+pessoal) INERTE p/ quem não tem conta (cadastro fechado + sem tela de aceite; mensagem honesta) — tela de aceite é próximo. FASE F-ID COMPLETA: P0+F-ID.1+F-ID.2+F-ID.3(+ALTOs)+F-ID.4 em produção. TESTE DE NAVEGADOR do maestro achou 6 bugs de superfície (comando/contexto/header/marca/nome/prompt-imagem) que sonda/curl não pegam — todos curados; META-LIÇÃO reforçada."
+    label: "F-ID.4 MEMBER-GET-MEMBER (bridge 600cd9b): indicação com aprovação do admin; store atômico (tmp+rename), POST /me/referrals, seção 'Indicações pendentes' no dashboard. Revisado depois pelo Elenxo F-ID.4 (c91374d, 13 achados), que provou o tenant aceitando e-mail como login."
+    narrative: "label anterior: F-ID.4 MEMBER-GET-MEMBER (bridge 600cd9b, deploy vivo — ÚLTIMA peça da fase Identidade): decisão selada do maestro (pedido com aprovação). referrals.ts store atômico (tmp+rename, cache mtime+size, Object.create(null)): addReferral (valida e-mail, idempotente por e-mail pendente), listReferrals, decideReferral. Rotas: POST /me/referrals (qualquer usuário, rate-limit 20/min), GET/POST /admin/referrals* (adminGuard; aprovar dispara inviteUser). Front: campo 'Indicar alguém' no perfil /me + seção 'Indicações pendentes' no dashboard admin (✅/✖️). ⚠️ NÃO REVISADO POR ELENXO ainda (typecheck+bench+teste-navegador só). ⚠️ convite (org+pessoal) INERTE p/ quem não tem conta (cadastro fechado + sem tela de aceite; mensagem honesta) — tela de aceite é próximo. FASE F-ID COMPLETA: P0+F-ID.1+F-ID.2+F-ID.3(+ALTOs)+F-ID.4 em produção. TESTE DE NAVEGADOR do maestro achou 6 bugs de superfície (comando/contexto/header/marca/nome/prompt-imagem) que sonda/curl não pegam — todos curados; META-LIÇÃO reforçada."
     trace: "/home/onion/onion-bridge/src/referrals.ts"
     provenance:
-      source: "/home/onion/onion-bridge/src/referrals.ts"
-      locator: "deploy-600cd9b-rotas-401-me-referrals-e-admin-referrals-store-atomico"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/referrals.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      source: "/home/marcio/onion-bridge-dev 600cd9b e c91374d (corpos)"
+      locator: "corpo de 600cd9b (store tmp+rename, POST /me/referrals, \"Indicações pendentes\"); corpo de c91374d (Elenxo F-ID.4, 13 achados, \"o tenant AGORA aceita e-mail como login\"); git show -s 01ddba9c"
+      method: "leitura: corpos de 600cd9b e c91374d em /home/marcio/onion-bridge-dev"
 
   - id: Q_GESTAO_USUARIOS_E_WORKSPACES
     node_type: question
@@ -234,7 +236,7 @@ nodes:
 
   - id: E_ROLE_BRIDGE_USER_CARREGAVA_ADMIN
     node_type: evidence
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-14
     verified_against: management-api-delete-204-role-bridge-admin-criada-201-scopes-finais-listados
     status: confirmed
@@ -249,7 +251,7 @@ nodes:
 
   - id: Q_G5_DOGFOOD_GO_LIVE
     node_type: question
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-14
     verified_against: gate-definido-f5-em-producao-relogio-de-dogfood-correndo
     status: open
@@ -497,6 +499,10 @@ nodes:
     impact: 3
     confidence: 0.9
     label: "G3 — FECHADO pelo maestro (2026-08-16) com EVIDÊNCIA, item a item, não por declaração. COM RASTRO (6): celular — os relatos dele com captura de tela ('layout não responsivo', 'cabeçalho sobrescrito') vieram de navegador em celular e geraram correção (flex-wrap, marca só-🧅); dark/claro — ele registrou escolhas de dark (bordas 1,35:1, splash creme) e o 14º Elenxo achou o `.dark` não pintando a conversa, curado; 2ª conversa e alternar — MEDIDO no thread-store: 4 fios pessoais com 3+4+3+1 = 11 conversas; deep-link /t/<id> — MEDIDO vivo, SPA fallback responde 200; comando com bloco de código — ele rodou /catch-up e reportou slug errado + args de tool ilegíveis, ambos corrigidos; chips do welcome — vistos nas capturas do redesign. SEM RASTRO, DECLARADOS (2): a BUSCA (a rota existe — /threads?q= sobre searchThreads — mas uso não deixa registro) e o ANEXO DE ARQUIVO (zero threads com o marcador que o servidor injeta, verificado com o padrão validado contra o chat.ts; anexo de IMAGEM, esse sim, foi exercitado — o bug 'prompt obrigatório com imagem' de 08-15 nasceu daí e foi curado). As três decisões que viajavam neste nó saíram para [[Q_F3_DECISOES_DE_ACABAMENTO]] — gate fechado não pode levar decisão viva junto."
+    provenance:
+      source: "21c74dce (corpo e diff do label, core) + 2e4d16d8 (corpo)"
+      locator: "git show -s 21c74dce (corpo l.4-21); docs/evolution/review/docs-close-g3-gate.md:21-39; git show -s 2e4d16d8 (corpo l.29-30: \"bordas dark 1,35:1... splash do PWA sempre creme\")"
+      method: "testemunho: medição da sessão 2026-08-16 (thread-store, deep-link, marcador de anexo) relatada em 1ª pessoa no commit 21c74dce e no resíduo PR #615, comando não registrado; as escolhas 1,35:1/splash creme registradas no corpo de 2e4d16d8"
 
   - id: D_FASE_ID_CONTEINER_DE_IDENTIDADE
     node_type: decision
@@ -506,7 +512,12 @@ nodes:
     status: done
     impact: 5
     confidence: 0.95
-    label: "F-ID (Identidade e Contextos) — o CONTÊINER Pessoal (Second Brain) × Organização (Company Brain) na camada de conta/workspace/superfície. NÃO é o F6/Brain; é onde ele vai morar. Nasceu do 3º uso real: marcio@grana.ai rodou /catch-up e viu os PRs do Onion Bridge (não-dev enxergando o contexto de dev do produto). Entregue fim-a-fim em produção: P0 contenção + F-ID.1 adoção limpa + F-ID.2 dual-token + F-ID.3 superfície/org + F-ID.4 member-get-member. Deploy vivo (bridge c91374d, /health ok, /me/referrals 401 sem token)."
+    label: "F-ID: contêiner Pessoal (Second Brain) × Organização (Company Brain), substrato do F6. Nasceu do furo exposto pela 3ª entrada (marcio@grana.ai, via /catch-up). Entregue fim-a-fim em produção: P0 + adoção limpa + dual-token + superfície/org + member-get-member (bridge c91374d)."
+    narrative: "label anterior: F-ID (Identidade e Contextos) — o CONTÊINER Pessoal (Second Brain) × Organização (Company Brain) na camada de conta/workspace/superfície. NÃO é o F6/Brain; é onde ele vai morar. Nasceu do 3º uso real: marcio@grana.ai rodou /catch-up e viu os PRs do Onion Bridge (não-dev enxergando o contexto de dev do produto). Entregue fim-a-fim em produção: P0 contenção + F-ID.1 adoção limpa + F-ID.2 dual-token + F-ID.3 superfície/org + F-ID.4 member-get-member. Deploy vivo (bridge c91374d, /health ok, /me/referrals 401 sem token)."
+    provenance:
+      source: "e103c346 (corpo, core) + /home/marcio/onion-bridge-dev 98ab1af e 869af3c (corpos)"
+      locator: "git show -s e103c346 (corpo l.3-6); /home/marcio/onion-bridge-dev 98ab1af corpo (\"Company Brain (org) e Second Brain (pessoal)\"; \"substrato do F6\"); 869af3c corpo (\"o furo que a 3ª entrada, marcio@grana.ai, expôs\"); docs/evolution/review/docs-kg-fase-f-id-fechada.md:23"
+      method: "leitura: corpo de e103c346 + corpos de 98ab1af e 869af3c em /home/marcio/onion-bridge-dev + resíduo PR #609 (docs-kg-fase-f-id-fechada.md:23)"
 
   - id: F_ID_2_DUAL_TOKEN_CONTEXTO
     node_type: decision
@@ -517,6 +528,10 @@ nodes:
     impact: 4
     confidence: 0.9
     label: "F-ID.2 — contêiner de contexto (kind,id): p:<sub> | o:<orgId>. Dual-token: Authorization (recurso, aud=bridge) + X-Onion-Org-Token (aud=urn:logto:organization). resolveCtx faz isBridgeOrg+isMember em Promise.all, fail-closed (inválido/outra-identidade/org-não-bridge/não-membro → 403); nunca aceita org token sozinho (mantém binding anti-replay). storeKey de org hasheado por injetividade; workspace de org = repo bare + checkout por membro. Org Grana.AI id=9mt40fgqoudb (customData.bridge=true, filtra da federação)."
+    provenance:
+      source: "/home/marcio/onion-bridge-dev c91374d:src/context.ts"
+      locator: "c91374d:src/context.ts:1-10 (par p:/o:, dual-token, anti-replay), :41 (storeKey h16), :44-80 (resolveCtx Promise.all, fail-closed → 403 em server.ts:236); corpo de 98ab1af e 83033b2; docs/onion/federation-orgs.json:2; corpo de 368e7a7"
+      method: "leitura: c91374d:src/context.ts e server.ts em /home/marcio/onion-bridge-dev + docs/onion/federation-orgs.json:2"
 
   - id: F_ID_4_MGM_REFERRALS
     node_type: decision
@@ -526,7 +541,12 @@ nodes:
     status: done
     impact: 3
     confidence: 0.9
-    label: "F-ID.4 — member-get-member: POST /me/referrals cria pedido pendente → admin aprova em Membros → convite Logto dispara. Store atômico (tmp+rename), teto 20 pendentes/user, poda decididos >90d, id opaco, idempotente. Revisado pelo Elenxo (13 achados, todos curados): approve-carimba-só-se-convite-deu-certo, mutex de token cross-aba (navigator.locks), bodySizeGuard, /usage/me-em-org=meu-consumo. Autorização RESISTIU (10 ataques de path). DECLARADOS não-feitos: cota de ORG própria (feature nova), byName mostra sub (UX), baldes rate-limit combinados (aceitável)."
+    label: "F-ID.4 member-get-member: POST /me/referrals cria pedido pendente; o admin decide em 'Indicações pendentes' do dashboard e, aprovado, sai o convite. Elenxo: 13 achados (approve só carimba se o convite deu certo, navigator.locks, bodySizeGuard); autorização resistiu a 10 ataques."
+    narrative: "label anterior: F-ID.4 — member-get-member: POST /me/referrals cria pedido pendente → admin aprova em Membros → convite Logto dispara. Store atômico (tmp+rename), teto 20 pendentes/user, poda decididos >90d, id opaco, idempotente. Revisado pelo Elenxo (13 achados, todos curados): approve-carimba-só-se-convite-deu-certo, mutex de token cross-aba (navigator.locks), bodySizeGuard, /usage/me-em-org=meu-consumo. Autorização RESISTIU (10 ataques de path). DECLARADOS não-feitos: cota de ORG própria (feature nova), byName mostra sub (UX), baldes rate-limit combinados (aceitável)."
+    provenance:
+      source: "/home/marcio/onion-bridge-dev c91374d:web/src/admin/UsageDashboard.tsx"
+      locator: "c91374d:web/src/admin/UsageDashboard.tsx:136-141 (\"Indicações pendentes\"); c91374d:web/src/org/OrgMembers.tsx:54; corpos de 600cd9b e c91374d"
+      method: "leitura: corpos de 600cd9b e c91374d + UsageDashboard.tsx/OrgMembers.tsx @c91374d em /home/marcio/onion-bridge-dev"
 
   - id: E_CONVITE_FUNCIONA_EMAIL_LOGIN
     node_type: evidence
@@ -537,6 +557,10 @@ nodes:
     impact: 3
     confidence: 0.85
     label: "DESCOBERTA do Elenxo F-ID.4: o tenant Logto AGORA aceita e-mail como identificador de login (a medição 08-14 'só username' ficou stale). Logo o CONVITE FUNCIONA — o convidado entra por e-mail+código de verificação; a mensagem 'em construção' era falsa e foi corrigida. Convite de ORG envia e-mail real (organization-invitations/Postmark); convite PESSOAL (member-get-member) cria o usuário mas NÃO envia e-mail automático (o admin avisa; a pessoa entra por e-mail+código). REFUTA a premissa 'tela de aceite necessária'."
+    provenance:
+      source: "/home/marcio/onion-bridge-dev 0914ff6:ops/logto-sign-in-exp.baseline.json"
+      locator: "ops/logto-sign-in-exp.baseline.json:30-32 @0914ff6 (identifier email, verificationCode true); corpo de c91374d; corpo de d4bb1a5; c91374d:web/src/admin/UsageDashboard.tsx:112-114"
+      method: "leitura: baseline do sign-in-exp versionado em 0914ff6 + corpos de c91374d e d4bb1a5 + UsageDashboard.tsx@c91374d (onion-bridge-dev)"
 
   - id: Q_G_ID_PROVA_HUMANA
     node_type: question
@@ -547,6 +571,10 @@ nodes:
     impact: 4
     confidence: 0.95
     label: "G-ID — FECHADO. O maestro rodou e os RASTROS confirmam (medidos, não declarados): marcio@grana.ai é membro da org (1 membro, último login 08-15) e o ledger do bridge tem **25 linhas com `org` preenchido** em 1 org distinta, sobre 4 subs — que era exatamente o critério do gate ('uma linha do meter do dia sai com org preenchido'). Nicole entrou como 2ª prova humana (senha + Totp + BackupCode + 1 PAT na conta dela). O contêiner de identidade está exercitado por gente de verdade, não por sonda."
+    provenance:
+      source: "2e1f212a (corpo do commit, core)"
+      locator: "git show -s 2e1f212a (corpo l.3-11); docs/evolution/review/docs-human-gates-closed.md:21-27"
+      method: "testemunho: medição da sessão 2026-08-16 no tenant Logto e no ledger do bridge (1ª pessoa em 2e1f212a e resíduo PR #614), comando não registrado"
 
   - id: D_ROUND_INVITE_SIGNUP_PROFILE
     node_type: decision
@@ -557,6 +585,10 @@ nodes:
     impact: 4
     confidence: 0.9
     label: "Rodada convite/cadastro/nome/perfil (pós-F-ID, pedido do maestro 08-15) — TUDO em produção (bridge 9ba71af0): F0 baseline sign-in-exp (contradição 08-14×08-15 resolvida: as duas medições eram certas nos seus tempos; tenant aceita e-mail+código) · F1 nome no lugar do sub (displayName canônico name??username??email, bySub do dashboard traduzido, byName resolvido no Logto) · F2a convite pessoal idempotente (alreadyExisted, sem 502) · F2b reenvio de convite de org NATIVO (resend/revogar/recriar; MEDIDO: Expired é estado FINAL — revoke dá 422, recriar = DELETE+invite; e a cura do 204-que-virava-falha em mapi: removeOrgMember/deleteUser eram bugs latentes) · F3 signUp username+senha (PATCH aditivo, MissingProfile, campo único por decisão) · F4 PATs (exchange RFC 8693 server-side; 3 sondas até a chave allowTokenExchange; scope vazio ≠ todos — herança por FILTRAGEM; prova viva 4/4: 200 sub-correto/403 anti-fabricação/401 lixo/401 revogado) · F5 segurança no perfil (Account API direto do navegador, CORS medido, verificação reforçada, MFA NoPrompt opt-in, /me/access). Decisões seladas: PAT (não app M2M) · reenvio nos 2 fluxos · senha campo único · 2FA opcional via perfil · aplicar direto + CHANGELOG."
+    provenance:
+      source: "/home/marcio/onion-bridge-dev (commits 0914ff6..9ba71af)"
+      locator: "corpos de 0914ff6 (F0), 2b04160 (F1), 61ef56e (F2a), 787e610+e1605e9 (F2b), 278d9bc (F3), 01cd4bf+d9699f0 (F4), 9ba71af (F5); docs/evolution/review/docs-round-invite-profile-announce.md:25; docs/evolution/federation/CHANGELOG.md:336-350"
+      method: "leitura: commits 0914ff6..9ba71af em /home/marcio/onion-bridge-dev + resíduo PR #610 (provas vivas) + CHANGELOG da federação (anúncio \"aplicar direto, registrar depois\")"
 
   - id: Q_ROUND_HUMAN_PROOF
     node_type: question
@@ -567,10 +599,14 @@ nodes:
     impact: 3
     confidence: 0.9
     label: "Prova humana da rodada — o maestro rodou 2026-08-15 e os RASTROS confirmam 4 dos 5 itens (medidos no tenant, não declarados): (1) CADASTRO COMPLETO — identidade nova criada 21:58, entrou 22:08 com **username definido** e senha, isto é, o fluxo MissingProfile (e-mail+código → criar usuário e senha) fechou de ponta a ponta num navegador de verdade; (2)+(3) 2FA — Totp **e** BackupCode em duas contas distintas (a nova e a da 2ª prova humana), que é a sequência obrigatória do Logto, com a senha trocada/definida antes (hasPassword=sim); (4) PAT — 1 token vivo em cada uma das duas contas. **(5) reenviar convite de ORG — FECHADO em 2026-08-16, e com as duas naturezas de prova separadas de propósito:** o maestro entrou como marcio@grana.ai (único admin da org), trocou para o contexto 🏢, abriu Membros e agiu sobre o convite. O **✖️ cancelar** está MEDIDO por mim: o convite saiu de `Pending` para `Revoked` no tenant. O **🔁 reenviar** NÃO deixa rastro de estado (só dispara e-mail; o status permanece Pending) — a prova é o **e-mail ter chegado, ATESTADO pelo maestro**, não medido por mim. Registro a diferença porque testemunho e medição não são a mesma coisa, e a caixa de entrada dele é a única fonte possível aqui. Antes disto, o reenvio estava provado só pelo NOSSO código em produção (inviteToOrg → listOrgInvitations → resendOrgInvitation = TRUE, com o 204 passando pelo mapiNoContent). Agora está provado também pela mão humana, na tela — que é a classe que sonda não cobre."
+    provenance:
+      source: "857654fc (corpo do commit, core)"
+      locator: "git show -s 2e1f212a (corpo l.13-21) e 857654fc (corpo l.3-14); docs/evolution/review/docs-close-round-human-proof.md:20-26; docs/evolution/review/docs-human-gates-closed.md:25-27"
+      method: "testemunho: medição da sessão 2026-08-15/16 no tenant (1ª pessoa em 2e1f212a e 857654fc), comando não registrado; item (5)🔁 = atestado do maestro (e-mail recebido), 2026-08-16"
 
   - id: Q_F3_DECISOES_DE_ACABAMENTO
     node_type: question
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-16
     verified_against: extraidas-do-G3-ao-fechar-para-nao-morrerem-com-o-gate
     status: open
@@ -586,7 +622,12 @@ nodes:
     status: confirmed
     impact: 4
     confidence: 0.9
-    label: "Elenxo adversarial da rodada (16 achados; 8 REFUTADOS com medição contra o swagger vivo do tenant) — todos curados no bridge 867f95de. CRÍTICO do lote: ALTO 1 o PAT do admin herdava bridge:admin e rodava o /chat em bypassPermissions SEM deny (Read do .env/.ssh/data, Bash com env do serviço) — uma credencial de longa vida = acesso privilegiado ao host; cura na raiz: bridge:admin FORA do exchange (PAT nunca vira admin) + callerIsAdmin(pat)=false + validade 90d. ALTO 2 pat_ anônimo amplificava contra o IdP antes do rate-limit → looksLikePat pré-rede + balde por IP + evicção-por-expiração. ALTO 3 2FA meio-ativado. MÉDIO 4 IDOR de convite (invGuard). Nasceu a bancada que faltava (pat-selftest). Provas vivas 5/5: PAT do admin sai só bridge:invoke, 403 reconhecimento, 200 uso legítimo, 401 pat_ malformado sem tocar IdP. META-LIÇÃO: dogfood-raso mente — sonda/curl passaram; o Elenxo achou o que elas não veem."
+    label: "Elenxo da rodada: 16 achados, 8 refutados contra o swagger vivo do tenant; curados no bridge (a7184ef, 7ff20f7, 867f95d): o PAT do admin herdava bridge:admin (cura: fora do exchange, callerIsAdmin(pat)=false, 90d), ALTOs 2-3, IDOR de convite; nasce pat-selftest. Provas vivas 5/5."
+    narrative: "label anterior: Elenxo adversarial da rodada (16 achados; 8 REFUTADOS com medição contra o swagger vivo do tenant) — todos curados no bridge 867f95de. CRÍTICO do lote: ALTO 1 o PAT do admin herdava bridge:admin e rodava o /chat em bypassPermissions SEM deny (Read do .env/.ssh/data, Bash com env do serviço) — uma credencial de longa vida = acesso privilegiado ao host; cura na raiz: bridge:admin FORA do exchange (PAT nunca vira admin) + callerIsAdmin(pat)=false + validade 90d. ALTO 2 pat_ anônimo amplificava contra o IdP antes do rate-limit → looksLikePat pré-rede + balde por IP + evicção-por-expiração. ALTO 3 2FA meio-ativado. MÉDIO 4 IDOR de convite (invGuard). Nasceu a bancada que faltava (pat-selftest). Provas vivas 5/5: PAT do admin sai só bridge:invoke, 403 reconhecimento, 200 uso legítimo, 401 pat_ malformado sem tocar IdP. META-LIÇÃO: dogfood-raso mente — sonda/curl passaram; o Elenxo achou o que elas não veem."
+    provenance:
+      source: "/home/marcio/onion-bridge-dev (commits a7184ef, 7ff20f7, 867f95d)"
+      locator: "corpos de a7184ef (ALTO 1/2, BAIXO 11/12), 7ff20f7 (MÉDIO 4-7), 867f95d (ALTO 3, pat-selftest); docs/evolution/review/docs-round-elenxo-cured.md:19-23"
+      method: "leitura: commits a7184ef/7ff20f7/867f95d em /home/marcio/onion-bridge-dev + resíduo PR #611 (docs-round-elenxo-cured.md:19-23)"
 
 edges:
   - from: E_ELENXO_ROUND_CURADO

@@ -381,7 +381,12 @@ nodes:
     confidence: 0.9
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 4/4 — Lido o nó completo (linhas 161-169) e seu contexto no grafo (D_spec_now_build_gated, Q_gat'
-    label: 'MEDIDO 2026-09-01, o vivo superou o no: O conteúdo do claim (P3 SHOULD-condicional, gated por D2) continua factualmente certo hoje, mas o MECANISMO de gate a que ele pertence morreu por substituição: o ADR 2026-08 (onion-adr-hosted-service-identity) refuta formalmente o irmão C_naive_admin_platform desta mesma spec e decreta que a spec in'
+    label: "MEDIDO 09-01: P3 (SHOULD-condicional, gated por D2) segue pendente, mas o gate mudou: o ADR hosted-service-identity §6 da a plataforma admin como ja refutada no m3, nao a reafirma e troca o gatilho tecnico por um de negocio (>=1 federado no Logto c/ recurso hospedado; hoje 0)"
+    narrative: "label anterior: MEDIDO 2026-09-01, o vivo superou o no: O conteúdo do claim (P3 SHOULD-condicional, gated por D2) continua factualmente certo hoje, mas o MECANISMO de gate a que ele pertence morreu por substituição: o ADR 2026-08 (onion-adr-hosted-service-identity) refuta formalmente o irmão C_naive_admin_platform desta mesma spec e decreta que a spec in"
+    provenance:
+      source: "docs/analysis/onion-adr-hosted-service-identity-2026-08.md + docs/analysis/backlog-real-2026-09.md + docs/onion/graph/m3-federation-admin-2026-07.kg.yaml"
+      locator: "ADR l.90-98 (§6: \"formalmente refutada (m3-federation-admin, status: refuted)\"; \"não é ressuscitada nem reafirmada\"; gate factual) e l.132 (Painel/administração: ≥1 federado migrado ao Logto consumindo recurso hospedado, hoje: 0); backlog-real-2026-09.md:61; m3 l.177-187 (C_p3_agg_view open, P3 SHOULD condicional, gated D2)"
+      method: "leitura: ADR §6 + projeção da revisão-total wf_2944480c (journal ausente do host) + nó C_p3_agg_view"
 
   - id: E_CENSO0901_D_spec_now_build_gated
     node_type: evidence
@@ -392,6 +397,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 5/5 — Li o nó completo (label linha 13-21) + trace (docs/analysis/onion-m3-federation-admin-spec'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A postura central ("build só liga no gatilho objetivo") foi parcialmente superada pela prática: OP-1 (mutação real de members.yaml) foi construído e endurecido em CI (REGRA 66) sem o gatilho técnico nomeado (1º T2 real OU 1º contrato em contracts/) ter disparado — ambos seguem em zero hoje. O que so'
+    provenance:
+      source: "docs/evolution/research/census-2026-09-01/data/rodada1.json"
+      locator: "rodada1.json:73-87 (medidos[node_id=D_spec_now_build_gated]: verdict DRIFTED, claims 5/5, divergence) + juizo[1].aprovados"
+      method: "juízes: medição do /meta:census wf_90dd73fe-cd2 aprovada pelo juiz fixo (juizo[1].aprovados lista D_spec_now_build_gated; \"juiz\": \"APROVADO\")"
 
   - id: E_CENSO0901_C_p4_gate_visibility
     node_type: evidence
@@ -402,6 +411,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 2/2 — Lido o nó completo (linhas 149-157) e seu contexto no grafo: edge C_p4_gate_visibility SUP'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó não está errado nem foi entregue — foi SUPERSEDIDO no mecanismo: o gate a que ele pertencia (D_spec_now_build_gated / Q_gatilho técnico de 2026-07) foi substituído pelo ADR de 2026-08 por um gate de negócio explícito e mais barato de checar ("≥1 federado no Logto consumindo recurso hospedado").'
+    provenance:
+      source: "docs/evolution/research/census-2026-09-01/data/rodada1.json"
+      locator: "rodada1.json:294-309 (medidos[node_id=C_p4_gate_visibility]: verdict DRIFTED, claims 2/2, divergence) + juizo[0].aprovados (l.382-383)"
+      method: "juízes: medição do /meta:census wf_90dd73fe-cd2 aprovada pelo juiz fixo (juizo[0].aprovados lista C_p4_gate_visibility; o registro também traz \"juiz\": \"APROVADO\")"
 
 edges:
   # o GAP motiva o spec; a decisão é registrada no artefato

@@ -143,6 +143,10 @@ nodes:
     verified_against: 'gates-prose: 107 hits (PARE/aguarde/confirmacao/gate humano) em .claude/commands|agents|skills → 19 descartados (menção/falso-positivo "comPARE") → 29 gates distintos; tabela em docs/analysis/onion-gates-textuais-2026-09.md §4'
     label: '29 gates em PROSA (21 INTERNA · 9 OUTWARD-FACING · 5 IRREVERSIVEL, 3 mistos). So 1 tem mecanismo por tras: onion-publish/SKILL.md:22,50,51,71 (vazamento de moat) coberto pela REGRA 61 check_moat_boundary. Os 8 IRREVERSIVEL/OUTWARD sem mecanismo, por consequencia: (1) cluster MOAT do /meta:drive:20,23,86 (merge no main · deploy · escrever repo alheio · agendar por relogio); (2) untrusted-content-provenance.md:30,33 (R15); (3) agents/meta/onion.md:767; (4) gamma-api-specialist.md:115 (key); (5) federation-rollback.md; (6) orchestrate.md:181; (7) co-announce.md:177 (repo alheio); (8) onion-publish/SKILL.md:58-59 (push do marketplace, W6). O item 1 ganhou mecanismo NESTE PR para o merge; deploy/repo alheio/relogio seguem prosa.'
     trace: '.claude/commands/meta/drive.md'
+    provenance:
+      source: "docs/analysis/onion-gates-textuais-2026-09.md"
+      locator: "5cf7dc39:docs/analysis/onion-gates-textuais-2026-09.md l.79-92 (§1.5)"
+      method: "leitura: análise dos gates textuais (projeção do grafo; linhas re-lidas no contexto principal) no commit 5cf7dc39"
 
   - id: E_OPS_GUARDAS_INTERNAS_INVOCACAO_VOLUNTARIA
     node_type: evidence
@@ -169,6 +173,10 @@ nodes:
     verified_against: 'grep de onion-untrusted-wrap em .claude/hooks/ e settings.json = 0 (gates-mech); a2a-verify.sh l.5-7 "endpoint vivo fica no repo da VPS"; a2a-accept.sh:34-35 RECUSADO exit 1 so se invocado'
     label: 'As guardas de .claude/utils/ (onion-untrusted-wrap R15 — PROTOTIPO declarado; a2a-verify/a2a-ssrf-check; a2a-accept) sao VETO-MECANICO internas e CONFIANCA-NO-MODELO na invocacao dentro deste corpus: nenhum hook as chama; o unico chamador real de a2a-verify vive no repo do bridge (fora do corpus). Conteudo externo pode entrar cru no contexto se o modelo nao seguir a instrucao em common/prompts/untrusted-content-provenance.md.'
     trace: '.claude/utils/guardrails/onion-untrusted-wrap.sh'
+    provenance:
+      source: "docs/analysis/onion-gates-textuais-2026-09.md"
+      locator: "5cf7dc39:docs/analysis/onion-gates-textuais-2026-09.md l.72-77 (§1.4); 5cf7dc39:.claude/utils/guardrails/onion-untrusted-wrap.sh l.4"
+      method: "leitura: análise dos gates textuais §1.4 + cabeçalho do wrap no mesmo commit"
 
   - id: E_PRECOMMIT_CONDICIONAL_A_CONFIG_LOCAL
     node_type: evidence
@@ -275,8 +283,8 @@ nodes:
     trace: 'docs/analysis/onion-gates-textuais-2026-09.md'
     provenance:
       source: "docs/analysis/onion-gates-textuais-2026-09.md"
-      locator: "consolidacao dos 3 relatorios + probes; tabela em docs/analysis/onion-gates-textuais-2026-09.md §2"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locator: "5cf7dc39:docs/analysis/onion-gates-textuais-2026-09.md l.96-104 (§2); l.43 (inbox-pull sha256); l.65-68 (REGRAs 29/42/49/56/57/58)"
+      method: "leitura: análise dos gates textuais no commit 5cf7dc39 (tabela antes→depois + inventário §1)"
 
   - id: C_ATESTACAO_NAO_TEM_CURA_DETERMINISTICA
     node_type: claim

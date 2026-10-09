@@ -326,6 +326,10 @@ nodes:
     source_kind: synthesis
     label: 'EIXO MERCADO — SEM SINAL DE CAPITAL para o canal de plugins nesta rodada (registro explicito: o eixo e invariante mesmo vazio). Nenhuma rodada, M&A ou valuation associado ao Claude Code plugin directory apareceu nas fontes colhidas. O unico sinal de mercado e TRACAO DE USO, nao de capital: os dois plugins de topo do diretorio passam de 1M de instalacoes (corpus R1) — a curadoria distribui volume real mas ainda nao atraiu capital rastreavel. O eixo de analistas veio VAZIO POR REFUTACAO: a leitura de que o Thoughtworks Technology Radar classifica MCP em "Trial" nao sobreviveu a verificacao (ver E_LACUNAS_*). Consequencia para a decisao: nao ha follow-the-money empurrando MCP embarcado como diferencial competitivo — a tese "embarcar MCP capta distribuicao" nao tem lastro de capital nesta rodada.'
     trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/plugin-mcp-posture-2026-09/SYNTHESIS.md + docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml"
+      locator: "SYNTHESIS.md l.56 (Mercado); plugin-directory-landscape-2026-09.kg.yaml E_MERCADO_PLUGIN_DIRECTORY_0904 label l.287; o \"Trial\" do Thoughtworks só em E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904 item (1), label l.341"
+      method: "leitura: SYNTHESIS.md da rodada (seção Mercado) + nó E_MERCADO_PLUGIN_DIRECTORY_0904 do corpus R1"
 
   # ── LACUNAS DECLARADAS (regra de saida #2) ───────────────────────────────────────────
   - id: E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904
@@ -340,6 +344,10 @@ nodes:
     source_kind: measurement
     label: 'LACUNAS DECLARADAS (36 fontes, 18 claims). (1) REFUTADAS POR FONTE FRACA — 10: ausencia de exigencia de SBOM/assinatura/pin para plugins com MCP (tier 9, ausencia nao provada); repo oficial nao certifica MCP de terceiros (tier 9); respostas de tool MCP nao sao sanitizadas antes do contexto (OWASP tier 8); descricoes de tool revisadas so na 1a conexao (OWASP tier 8); Thoughtworks Radar classifica MCP em "Trial" (tier 7) e o alerta de lacunas arquiteturais/MCP-Scan (tier 7) — as duas derrubam o eixo de analistas desta rodada; parceria Stytch+Cloudflare para Remote MCP Authorization (tier 5); deployment do KG MCP de terceiro ser stdio auto-registrado (tier 3); 52% dos 1.847 servidores MCP auditados abandonados (tier 3); so 17% prontos-para-producao (tier 3). (2) NAO VERIFICADAS POR FALHA DE ACESSO: ZERO — nenhum 403, nenhuma doc truncada. (3) CORTADAS POR ORCAMENTO, e sao exatamente as que decidiriam (b): (i) o requisito de "dependencias razoavelmente atuais, incl. node_modules" para servidores locais; (ii) se ha revisao CONTINUA da Anthropic para permanecer listado; (iii) se a curadoria do diretorio de PLUGINS (code.claude.com) cita MCP/SBOM/pin — hoje so temos a pagina de CONECTORES. (4) NUNCA PERGUNTADA: a base rate de terceiros — quantos dos plugins do diretorio publico embarcam .mcp.json. Sem ela, "o ecossistema faz isso" e opiniao.'
     trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/plugin-mcp-posture-2026-09/SYNTHESIS.md"
+      locator: "SYNTHESIS.md l.56 (analistas e Stytch refutados) e l.60 (refutados 10; fora do orçamento 18 claims e 36 fontes); docs/evolution/review/research-plugin-decisions-2026-09.md l.5 (wf_9ad3aba7-b48: 15/10)"
+      method: "testemunho: contabilidade da sessão session_01J14a87JnNoQou9hyFjASgN sobre o run wf_9ad3aba7-b48 (commit 1e346a5c, 2026-09-04); journal ausente do host; lista item a item só no grafo"
 
   # ── A DECISÃO (o maestro sela — esta sessão NUNCA sela) ──────────────────────────────
   - id: D_PLUGIN_MCP_POSTURE_0904
@@ -352,6 +360,10 @@ nodes:
     verified_against: 'SELO DO MAESTRO (2026-09-04, sessao do core): opcao (c) — nada agora, como POSICAO DE ESPERA (nao conclusao); (a) REPROVADA (core privado, nao e API de 1a parte, sem tenant, propose_kg_write sem cota); (b) REPROVADA COMO ESPECIFICADA (REPO resolve para o plugin sob CLAUDE_PLUGIN_ROOT, zero annotations, HTTP nao stdio); gatilho nomeado para reabrir (b): (i) regime de plugin-embedded lido nas 2 paginas de 1a parte, (ii) base rate de .mcp.json no diretorio oficial, (iii) raiz do projeto do adotante resolvida'
     label: 'DECISAO ABERTA (o maestro sela): o Onion deve se apresentar TAMBEM como MCP no canal publico de plugins? Opcoes — (a) expor a triade existente (onion-kg read-only 6 tools, onion-exec 4 tools com write-como-proposta, onion-framework 5 tools) como conector remoto publico em mcp.onionevolve.com com OAuth 2.1/PKCE, o F10 gated da federacao; (b) embarcar um servidor stdio read-only (adapter do onion-kg: kg_list, kg_radar, kb_search, kb_get, diary_index, inventory) via .mcp.json no plugin onion; (c) nada agora — commands + skills + shell (SDAAL) ja servem a capacidade; (d) skill-bundle via git-subdir (cortada por orcamento nesta rodada, nao considerada). RECOMENDACAO DO ELENXO: **(c) — nada agora — mas com a ressalva que E o veredito principal: a decisao como posta ainda nao e decidivel, e (c) hoje e a escolha certa pelo motivo ERRADO.** O motivo errado seria "MCP aumenta superficie na triagem"; o motivo certo e que os dois caminhos alternativos foram medidos e nenhum esta pronto. (1) A opcao (a) esta REPROVADA, nao gated — tres bloqueios independentes, cada um suficiente: repo publico obrigatorio contra core PRIVADO (E_PLUGIN_EXIGE_REPO_PUBLICO + E_OBJECAO_5), separacao read/write que a triade JA viola no onion-exec (E_OBJECAO_1), e ZERO annotations nos tres servidores, o que faz de "expor" uma reescrita e nao uma exposicao (E_OBJECAO_2). (2) A opcao (b) nao e um adapter: e reescrita com um problema de resolucao de raiz NAO RESOLVIDO — ${CLAUDE_PLUGIN_ROOT} aponta para a raiz errada e o servidor serviria os arquivos do proprio plugin, jamais o KG do adotante (E_OBJECAO_3); e seu custo absoluto de conformidade e justamente o que a rodada cortou por orcamento (E_OBJECAO_6). (3) O peso a favor de "o ecossistema faz isso" esta inflado por contagem duplicada de um fato de sintaxe (E_OBJECAO_7 e E_OBJECAO_8) e a base rate de terceiros nunca foi medida. CONDICAO DE REABERTURA NOMEADA (nao data): reabre quando (i) a base rate de plugins do diretorio com .mcp.json for medida, E (ii) existir um caminho provado de resolucao da raiz do projeto do adotante a partir de um plugin instalado. Ate la, (c) — e as duas curas internas que a rodada revelou (o count-drift "91 KBs" contra 94 reais no onion-kg, e a mistura read/write no onion-exec) valem por si, independentemente da decisao.'
     trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml · projeção: docs/evolution/research/plugin-mcp-posture-2026-09/SYNTHESIS.md'
+    provenance:
+      source: "commit 50f94101 + docs/evolution/review/docs-seal-plugin-decisions-2026-09.md"
+      locator: "corpo do commit 50f94101 (citação do maestro \"sela (i′) e (c), segue\", 2026-09-04); resíduo docs-seal-plugin-decisions-2026-09.md achado 1; SYNTHESIS.md l.33-52 (veredito do Elenxo)"
+      method: "testemunho: selo do maestro 2026-09-04 registrado no corpo do commit 50f94101 e no resíduo docs/evolution/review/docs-seal-plugin-decisions-2026-09.md"
 
   # ── AS OPÇÕES (uma claim por opção; quem sela é o maestro) ───────────────────────────
   - id: C_OPCAO_A_CONECTOR_REMOTO_PUBLICO
@@ -488,6 +500,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 6: claim COMPARATIVO usado como luz verde ABSOLUTA. "Barra mais baixa que (a)" nao diz qual e a barra. E as tres parcelas do custo absoluto de (b) sao justamente as CORTADAS POR ORCAMENTO nesta mesma rodada: (i) o requisito de dependencias razoavelmente atuais, incl. node_modules, para servidores locais; (ii) a existencia de revisao inicial E CONTINUA da Anthropic para permanecer listado; (iii) se a curadoria do diretorio de PLUGINS cita MCP/SBOM/pin. A conclusao "barra mais baixa logo escolha (b)" repousa sobre evidencia que a propria rodada decidiu nao coletar.'
     trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml"
+      locator: "nó E_POLITICA_REMOTO_VS_LOCAL (label l.149) e nó E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904 item (3) (label l.341)"
+      method: "derivado: confronto do nó E_POLITICA_REMOTO_VS_LOCAL com o item (3) do nó E_LACUNAS_DECLARADAS_PLUGIN_MCP_0904, no mesmo grafo"
 
   - id: E_OBJECAO_7_SINTAXE_TRES_VEZES_ADOCAO_NENHUMA
     node_type: evidence
@@ -501,6 +517,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 7: os achados 7 e 8 sao o MESMO fato da MESMA pagina (code.claude.com/docs/en/plugin-marketplaces) contados duas vezes, e o achado 3 e o mesmo mecanismo por uma terceira pagina. Tres votos 3-0 sobre um fato de SINTAXE inflam o peso de "o ecossistema faz isso" sem tocar na pergunta de ADOCAO. Medi o nosso lado: `find . -name .mcp.json` devolve ZERO, e nenhum dos 8 plugins do marketplace.json declara mcpServers. Mas isso e o Onion medindo a si mesmo (corpus R1/E_ONION_MEDIDO_LOCAL_0904) — auto-medicao nao e evidencia de mercado, e a base rate de terceiros continua desconhecida.'
     trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+    provenance:
+      source: "commit 1e346a5c (árvore do core) + docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml"
+      locator: "git ls-tree -r --name-only 1e346a5c | grep -c '\\.mcp\\.json$' → 0; git show 1e346a5c:.claude-plugin/marketplace.json (8 plugins, grep -c mcpServers → 0); nós E_PLUGIN_JSON_CAMPO_MCPSERVERS (l.163), E_MARKETPLACE_JSON_MCPSERVERS (l.181), E_PLUGIN_EMBARCA_MCP_VIA_PLUGIN_ROOT (verified_against code.claude.com/docs/en/plugins-reference)"
+      method: "medição: git ls-tree -r --name-only 1e346a5c | grep -c '\\.mcp\\.json$' (0) e git show 1e346a5c:.claude-plugin/marketplace.json | grep -c mcpServers (0, 8 plugins) — o comando do verified_against refeito no commit da rodada"
 
   - id: E_OBJECAO_8_DUPLICATA_INFLA_CONTAGEM
     node_type: evidence
@@ -514,6 +534,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 8: o achado 8 e duplicata do 7 — mesma URL, mesma pagina, mesmo mecanismo visto do outro lado do manifesto. Contado como achado independente com votos 3-0, distorce a contagem de evidencia a favor de (b) e faz a rodada parecer mais convergente do que e. Cura aplicada neste grafo: E_MARKETPLACE_JSON_MCPSERVERS entrou com impact rebaixado a 2 e a duplicidade declarada no proprio label, para que a contagem de nos nao seja lida como contagem de fatos independentes.'
     trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml'
+    provenance:
+      source: "docs/evolution/research/plugin-mcp-posture-2026-09/plugin-mcp-posture-2026-09.kg.yaml"
+      locator: "nós E_PLUGIN_JSON_CAMPO_MCPSERVERS (verified_against l.163) e E_MARKETPLACE_JSON_MCPSERVERS (impact l.178, verified_against l.181, label l.184)"
+      method: "derivado: comparação dos dois nós de evidência do mesmo grafo (URL, votos, impact e label)"
 
 
   # ── GATILHOS (i) e (ii) da reabertura de (b) — MEDIDOS em 2026-09-04 ────────────────────
@@ -530,6 +554,10 @@ nodes:
     source_kind: primary
     label: 'MEDIDO — gatilho (ii) da reabertura de (b): 143 de 291 plugins do diretorio OFICIAL (49%) embarcam servidor MCP (128 com .mcp.json na raiz + 33 com mcpServers inline; 0 na entrada do marketplace); 48 embarcam hooks/hooks.json. Refuta a premissa de (c) "MCP embarcado e raro/penalizado na triagem": e a NORMA do venue. Nao muda a reprova de (b) COMO ESPECIFICADA (raiz do projeto, annotations, stdio) — muda o peso: (b) deixa de ser excecao e vira o padrao a cumprir. Dados: data/venue-official-probe-2026-09-04.json, data/crawl.py.'
     trace: 'docs/evolution/research/plugin-mcp-posture-2026-09/data/venue-official-probe-2026-09-04.json'
+    provenance:
+      source: "docs/evolution/research/plugin-mcp-posture-2026-09/data/venue-official-probe-2026-09-04.json"
+      locator: "data/venue-official-probe-2026-09-04.json (291 registros; campos has_mcp_json, pj_mcpServers, has_hooks_json, pj_keys) + anthropics/claude-plugins-official@7fbbff80:.claude-plugin/marketplace.json"
+      method: "leitura: data/venue-official-probe-2026-09-04.json versionado no commit fa2f7c23 (gerado por data/crawl.py), conferido contra o marketplace.json oficial @7fbbff80"
 
   - id: E_REGIME_MCP_EMBUTIDO_E_DO_DIRETORIO_DE_PLUGINS
     node_type: evidence
