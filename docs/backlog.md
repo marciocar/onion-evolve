@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**416 itens abertos** em 87 grafo(s) com aberto (de 113 no escopo) · 88 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**414 itens abertos** em 88 grafo(s) com aberto (de 113 no escopo) · 89 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -90,14 +90,13 @@
 | 9.6 | `C_OPCAO_A_STATUS_QUO` | jev-decision-round2-2026-10 | OPCAO A — NAO ADOTAR nada e manter o status quo: juizo do Transformer nas camadas que aconselham, regra declarada na escada de m |
 | 5.6 | `C_OPTION_B_BASIS_IS_WEAK_SOURCED` | jev-decision-round2-2026-10 | ASSIMETRIA DE EVIDENCIA que a rodada produziu sem notar, e que atinge a opcao que o Elenxo RECOMENDA: toda a base factual da Opcao |
 
-## infra-vps-2026-10 — 8 item(ns)
+## infra-vps-2026-10 — 7 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 66.0 | `Q_INFRA_VPS_TREATMENT_2026` | infra-vps-2026-10 | Como o Onion deve tratar INFRA/VPS — sistema operacional, servicos, Docker, firewall, reboot e updates pendentes, sessoes orfas  |
 | 22.0 | `C_OPCAO_B_LEAN_CENSO_COMPOE_NATIVOS` | infra-vps-2026-10 | OPCAO B linha (B enxuta) — RECOMENDADA pelo Elenxo: censo shell que COMPOE sinais nativos (needrestart -b, /var/run/reboot-requi |
 | 12.0 | `C_OPCAO_B_GRAFO_CENSO_COMANDO` | infra-vps-2026-10 | OPCAO B — grafo de dominio da VPS como SSOT viva + censo determinístico ops/vps-census.sh medindo o vivo contra o grafo + coman |
-| 6.8 | `E_LACUNAS_INFRA_VPS_1005` | infra-vps-2026-10 | LACUNAS DECLARADAS. (1) Orcamento: 33 fontes e 26 claims; 17 confirmadas, 8 refutadas por fonte fraca ou voto, 0 nao verificadas p |
 | 5.4 | `Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA` | infra-vps-2026-10 | VAZAMENTO JA EXISTENTE, achado ao medir a pergunta do maestro: a guarda vps-exposure-check.sh mora em .claude/validation/ (raiz qu |
 | 4.0 | `C_OPCAO_A_NADA_NOVO` | infra-vps-2026-10 | OPCAO A — nada novo: manter ops/ + grafos de dominio + docker-specialist/linux-security-specialist + vps-exposure-check.sh. A FA |
 | 0.9 | `C_OPCAO_C_VERTICAL_INFRA` | infra-vps-2026-10 | OPCAO C — vertical de engenharia infra que viaja para adotantes. Reprovada pela recomendacao do Elenxo: nenhum 2o adotante pediu |
@@ -114,15 +113,13 @@
 | 7.2 | `C_OPCAO_D_CORPUS_DATASET_THIRD_PARTY` | nanochat-onion-2026-10 | OPCAO D — DATASET DO CORPUS para fine-tune de modelo de terceiro (sentido c): gerar SFT/preferencias a partir dos grafos, Elenxo |
 | 5.6 | `Q_EVAL_DE_DOMINIO_DO_ONION` | nanochat-onion-2026-10 | O EVAL DE DOMINIO, pre-requisito de B, C e D e que hoje NAO EXISTE: tarefas estreitas com gabarito tirado do proprio corpus (class |
 
-## ocr-local-sei-2026-09 — 12 item(ns)
+## ocr-local-sei-2026-09 — 10 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 54.0 | `Q_OCR_LOCAL_SEI_0908` | ocr-local-sei-2026-09 | Qual motor de OCR LOCAL escolher para ler PDF-imagem de documento administrativo brasileiro do SEI (fonte serifada, tabelas, carim |
-| 22.5 | `E_LACUNAS_DECLARADAS_OCR_0908` | ocr-local-sei-2026-09 | LACUNAS DECLARADAS (39 fontes, 23 claims, 5 confirmadas). (1) REFUTADAS POR FONTE FRACA — tier 3-4, agregadores e blogs de vendo |
 | 14.0 | `C_OPCAO_PROCEDIMENTO_CONSENSO_DOIS_MOTORES` | ocr-local-sei-2026-09 | OPCAO (9) — O PROCEDIMENTO, que o Elenxo recomenda decidir ANTES do motor: consenso entre 2 motores ARQUITETURALMENTE INDEPENDEN |
 | 9.0 | `C_OPCAO_BASELINE_SEM_OCR_PDFTOTEXT` | ocr-local-sei-2026-09 | OPCAO (8) — O PASSO 0, e a de maior confianca do grafo (0.9): antes de instalar QUALQUER motor, rodar `pdftotext -layout` e `pdf |
-| 6.3 | `E_MERCADO_OCR_LOCAL_0908` | ocr-local-sei-2026-09 | EIXO MERCADO — SEM SINAL ENCONTRADO (registro explicito: o eixo e invariante mesmo vazio). Nenhuma claim de capital sobreviveu a |
 | 6.0 | `C_OPCAO_TESSERACT5_TESSDATA_BEST` | ocr-local-sei-2026-09 | OPCAO (1): Tesseract 5 instalado por apt com por.traineddata do tessdata_best — saida TSV com confidence e bounding box POR PALA |
 | 3.6 | `C_OPCAO_DOCTR_TORCH_VENV` | ocr-local-sei-2026-09 | OPCAO (3): docTR (python-doctr + torch) em venv isolado. Compatibilidade com Python 3.12 CONFIRMADA em tier 9 (E_DOCTR_PYTHON_311_ |
 | 3.2 | `C_OPCAO_DOTSOCR_3B_CPU` | ocr-local-sei-2026-09 | OPCAO (5): dots.ocr / dots.mocr 3B em CPU, sem flash-attn/vLLM (que nao instalam sem GPU). O arco do dossie aponta este como estad |
@@ -281,7 +278,7 @@
 | 6.3 | `C_OPCAO_II_BILINGUE_POR_CAMPOS` | plugin-language-policy-2026-09 | OPCAO (ii) — bilingue por campos: `description` + `description_en` no plugin.json, README com EN em cima e pt-BR abaixo, ambos c |
 | 3.8 | `C_OPCAO_III_EN_INTEGRAL_CORPOS_TRADUZIDOS` | plugin-language-policy-2026-09 | OPCAO (iii) — ingles integral nas superficies e corpos traduzidos progressivamente. A favor: e a unica que casa 100% com o norte |
 
-## deck-patterns-2026-09 — 9 item(ns)
+## deck-patterns-2026-09 — 8 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
@@ -289,7 +286,6 @@
 | 26.2 | `C_OPCAO_G_FUSAO_A_D_C_COM_GATE_F` | deck-patterns-2026-09 | OPCAO (G) — RECOMENDADA PELO ELENXO: fusao A+D+C, com F como gate de 30 minutos antes. A divisao de trabalho entre as tres, que  |
 | 24.5 | `C_OPCAO_A_ARCO_ATOS_DECK_DE_CAMPO` | deck-patterns-2026-09 | OPCAO (A): arco em ATOS problem-first, derivado do deck de campo — usar docs/evolution/decks/iftl-frameworks-agentes-2026-08.htm |
 | 24.0 | `C_OPCAO_F_PARAR_E_MEDIR_O_ALVO` | deck-patterns-2026-09 | OPCAO (F): PARAR antes de reorganizar — medir qual deck e o alvo real (o de 65 slides nao existe neste repo) e rodar uma 2a roda |
-| 17.0 | `E_LACUNAS_DECK_PATTERNS_0924` | deck-patterns-2026-09 | LACUNAS DECLARADAS. (0) DIVERGENCIA DE CONTAGEM, declarada e NAO harmonizada: o sintetizador reportou "17 fontes, 10 claims"; a co |
 | 14.0 | `C_OPCAO_D_ARCO_SRL_PLEA_DA_CASA` | deck-patterns-2026-09 | OPCAO (D): arco SRL/PLEA da casa — Orient -> Activate -> Reinforce com planificar->executar->avaliar por ato, sobre o chassi sel |
 | 7.2 | `C_OPCAO_C_ARCO_DOC_CLAUDE_CODE` | deck-patterns-2026-09 | OPCAO (C): arco da doc do Claude Code — instalar/rodar -> o que da para fazer -> escada de customizacao (memoria -> skills -> ho |
 | 4.5 | `C_OPCAO_B_ARCO_DIATAXIS` | deck-patterns-2026-09 | OPCAO (B): arco Diataxis — reorganizar o deck nas 4 categorias (tutorials -> how-to -> reference -> explanation) mantendo-as est |
@@ -387,7 +383,7 @@
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
-| 21.6 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
+| 23.4 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
 | 7.2 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
 | 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
@@ -562,12 +558,13 @@
 | 5.1 | `Q_COMUNIDADE_E_EIXO_SEPARADO_E_NADA_CRUZA` | radar-E3-2026-10-03-r6 | BURACO DE FLUXO 2 (de 3), apontado pelo maestro: "visao da comunidade sobre a versao" NAO entra na rodada E3 por construcao. Medid |
 | 5.1 | `Q_SKILL_VERIFY_E_ABSORCAO_SEM_TROCAR_MECANISMO` | radar-E3-2026-10-03-r6 | A 2.1.286 (30/09) — e NAO a 2.1.287 como a 1a passada afirmou, e a versao errada era de DENTRO da janela que eu declarei selada  |
 
-## identidade-onion-vps-2026-08 — 6 item(ns)
+## identidade-onion-vps-2026-08 — 7 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 14.2 | `E_SEGUNDO_ADOTANTE_MESMA_CLASSE_DE_EXPOSICAO` | identidade-onion-vps-2026-08 | O GATILHO DO Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO DISPAROU — um caso e caso, DOIS E CLASSE. O censo mediu um SEGUNDO adotan |
 | 12.0 | `Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO` | identidade-onion-vps-2026-08 | ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. Medido em `/home/marcio/onion-adopt-arandek/dock |
+| 8.0 | `E_MEMORIA_DE_AGENTE_E_COMMODITY_PELO_DINHEIRO` | identidade-onion-vps-2026-08 | O EIXO DO DINHEIRO RESPONDE O QUE DOUTRINA NENHUMA RESPONDE, e o veredito e desconfortavel: `Agent Memory Systems` e **3,4% dos de |
 | 6.4 | `Q_REFUTES_EDGE_SEM_PAR` | identidade-onion-vps-2026-08 | A lacuna REAL que restou do Q_LACUNA refutado: a aresta REFUTES tipada (refutacao como cidada de 1a classe do grafo, com reconcili |
 | 5.6 | `Q_LOGTO_QUANDO_FECHAR_O_CADASTRO` | identidade-onion-vps-2026-08 | quando fechar de novo o cadastro do Logto (signInMode: SignIn) — GATILHO: o propósito do cadastro aberto acabar, surgir conta q |
 | 5.4 | `Q_SENHA_CHAVE_ESTADO_2026_09` | identidade-onion-vps-2026-08 | ESTADO ATUAL da chave GPG com passphrase (substitui o no de 08-12 que misturava >=9 afirmacoes): a protecao FICA (decisao do maest |
@@ -646,6 +643,12 @@
 |--:|---|---|---|
 | 9.6 | `Q_STANDALONE_REMATERIALIZAR_OU_CONGELAR_COM_DATA` | federation-health-2026-07 | AS DUAS OPCOES PARA O `onion-standalone`, agora com custo MEDIDO em vez de suposto. (A) RE-MATERIALIZAR — ~1 min de maquina no t |
 | 6.0 | `C_GRANAAI_LINEAGES_UNKNOWN` | federation-health-2026-07 | granaai linhagens mauricio (pin nao-verificavel-deste-host) e leonardo-offline (pin desconhecido) — estado de verificacao INDETE |
+
+## session-2026-07-18-evolve-review-triage — 1 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 9.0 | `E_ITEM6_VERIFY` | session-2026-07-18-evolve-review-triage | drive-to-verify: os 5 pontos sao o MESMO conceito enquadrado por audiencia/profundidade (index vs normativo vs troubleshooting); e |
 
 ## audit-textual-gates-2026-09 — 4 item(ns)
 
