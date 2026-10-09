@@ -28,12 +28,22 @@ O que ela FAZ (determinístico, idempotente, edição por linha — o radar é a
     (citação textual: memória, histórico de outro repo — sem URL nem caminho) e trace que registra um comando
     (grep/ls/find/git, run, PR #N: é medição, e a política 2 é da O3). Trace em caminho do host
     segue a política 4 (testemunho). Nó sem trace e sem fonte no verified_against segue "sem fonte recuperável".
+  · COM --apply-judged <csv> (onda O3, 2026-10-09): aplica a planilha JULGADA (data/provenance-triage/
+    o3-wave<N>-juiz.csv: id, grafo, veredito, proposta_final, source_final, locator_final, method_final). Só
+    linha com veredito APROVADO ou CORRIGIDO é aplicada; REPROVADO nunca é tocado e sai no relatório.
+      corrigir | testemunho → escreve (ou SUBSTITUI, no lugar) o bloco `provenance` com os valores *_final;
+      rebaixar             → `status: confirmed` vira `status: unverifiable` (o v4 isenta de provenance);
+      dev-óbvio            → `plane: PROD` vira `plane: DEV`; se o nó for confirmed sem provenance e a linha
+                             trouxer fonte, a fonte também é escrita.
+    Qualquer outra proposta (ex.: dev-dúvida) é decisão do maestro: intocada e reportada. Recusa (intocado e
+    reportado): method fora das classes do contrato, source/locator vazios, nó ausente do grafo, rebaixar sobre
+    status que não é confirmed. Edição por linha; a 2ª aplicação é no-op. Datas não são citadas neste modo.
 O que ela NÃO faz (é decisão humana ou do contrato, nunca da ferramenta):
   · nó sem fonte derivável NÃO recebe provenance inventada: sai no relatório como "sem fonte recuperável"
     (a gramática diz: sem fonte verificável, o nó não é confirmed — rebaixar é decisão de quem conhece o nó);
   · label acima de 280 NÃO é cortado: separar fato e narrativa é semântico; sai no relatório.
 
-Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv>] <arquivo.kg.yaml>...
+Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv> | --apply-judged <juiz.csv>] <arquivo.kg.yaml>...
 rc:    0 = nada pendente (ou aplicado) · 1 = --check e há mudança pendente · 2 = entrada quebrada
        (arquivo ausente, routing ilegível ou sem as colunas, YAML inválido antes ou DEPOIS da edição — a edição
        nunca grava YAML inválido).
@@ -251,9 +261,155 @@ def migrate(text, routes=None, graph=None, root=None):
     return "\n".join(out), rep
 
 
+JUDGED_COLS = ("id", "grafo", "veredito", "proposta_final", "source_final", "locator_final", "method_final")
+JUDGED_OK = ("APROVADO", "CORRIGIDO")
+PROV_ACTIONS = ("corrigir", "testemunho")
+
+
+def load_judged(path):
+    """{(grafo, id): linha} da planilha julgada. Coluna ausente, arquivo ilegível ou id duplicado → BrokenInput."""
+    import csv
+    try:
+        rows = list(csv.DictReader(open(path, encoding="utf-8", newline="")))
+    except OSError as e:
+        raise BrokenInput(f"planilha julgada ilegível ({path}): {e.__class__.__name__}")
+    if not rows or any(c not in rows[0] for c in JUDGED_COLS):
+        raise BrokenInput(f"planilha julgada sem as colunas {', '.join(JUDGED_COLS)} ({path})")
+    out = {}
+    for r in rows:
+        k = (r["grafo"], r["id"])
+        if k in out:
+            raise BrokenInput(f"planilha julgada com id duplicado ({path}): {k[1]} em {k[0]}")
+        out[k] = r
+    return out
+
+
+def _set_field(block, key, old, new):
+    """Troca `    <key>: <old>` por `<new>` no bloco, preservando aspas e comentário. (bloco, mudou?, valor atual)."""
+    for n, b in enumerate(block[1:], 1):
+        fm = FIELD_RE.match(b)
+        if fm and fm.group(1) == key:
+            cur = scalar(fm.group(2))
+            if cur != old:
+                return block, False, cur
+            raw = fm.group(2)
+            m = re.match(r'^(["\']?)' + re.escape(old) + r'\1([ \t]*(?:#.*)?)$', raw)
+            if not m:
+                return block, False, cur
+            block = block[:n] + [f"    {key}: {m.group(1)}{new}{m.group(1)}{m.group(2)}"] + block[n + 1:]
+            return block, True, cur
+    return block, False, None
+
+
+def _put_provenance(block, src, loc, method):
+    """Escreve o bloco provenance (ou substitui o existente, no mesmo lugar). (bloco, mudou?)."""
+    new = ["    provenance:", "      source: " + q(src), "      locator: " + q(loc), "      method: " + q(method)]
+    for n, b in enumerate(block[1:], 1):
+        if re.match(r'^    provenance:[ \t]*(#.*)?$', b):
+            e = n + 1
+            while e < len(block) and (block[e].startswith("      ") or not block[e].strip()):
+                e += 1
+            while e > n + 1 and not block[e - 1].strip():
+                e -= 1
+            try:
+                cur = yaml.safe_load("\n".join(x[4:] for x in block[n:e]))["provenance"]
+            except Exception:
+                cur = None
+            if cur == {"source": src, "locator": loc, "method": method}:
+                return block, False
+            return block[:n] + new + block[e:], True
+        if re.match(r'^    provenance:', b):  # forma em fluxo ({...}): não reescrevo o que não sei editar por linha
+            return block, None
+    return block + new, True
+
+
+def apply_judged(text, judged):
+    """judged={id: linha da planilha}: aplica só APROVADO/CORRIGIDO, por linha. Devolve (texto, relatório)."""
+    lines = text.split("\n")
+    rep = {"prov": [], "demote": [], "plane": [], "same": [], "rejected": [], "sealed": [], "refused": [], "missing": []}
+    seen, out, in_nodes, i = set(), [], False, 0
+    while i < len(lines):
+        ln = lines[i]
+        if re.match(r'^nodes:\s*(#.*)?$', ln):
+            in_nodes = True
+        elif re.match(r'^[A-Za-z_]', ln):
+            in_nodes = False
+        m = NODE_RE.match(ln) if in_nodes else None
+        if not m or m.group(1) not in judged:
+            out.append(ln); i += 1; continue
+        nid, j = m.group(1), i + 1
+        seen.add(nid)
+        while j < len(lines) and (lines[j].startswith("    ") or not lines[j].strip() or lines[j].lstrip().startswith("#")) \
+                and not NODE_RE.match(lines[j]):
+            j += 1
+        end = j
+        while end > i + 1 and (not lines[end - 1].strip() or lines[end - 1].lstrip().startswith("#")):
+            end -= 1
+        block, r = lines[i:end], judged[nid]
+        fields = {fm.group(1): fm.group(2) for fm in (FIELD_RE.match(b) for b in block[1:]) if fm}
+        status = scalar(fields.get("status", ""))
+        act, verdict = r["proposta_final"].strip(), r["veredito"].strip()
+        src, loc, method = r["source_final"].strip(), r["locator_final"].strip(), r["method_final"].strip()
+        has_src = bool(src and loc and method)
+        good_method = bool(re.match(r'^(' + "|".join(METHOD_CLASSES) + r'): \S', method))
+        changed = False
+        if verdict not in JUDGED_OK:
+            rep["rejected"].append(f"{nid} ({verdict})")
+        elif act in PROV_ACTIONS:
+            if not has_src:
+                rep["refused"].append(f"{nid} (source/locator/method vazio)")
+            elif not good_method:
+                rep["refused"].append(f"{nid} (method fora das classes do contrato)")
+            else:
+                block, changed = _put_provenance(block, src, loc, method)
+                if changed is None:
+                    rep["refused"].append(f"{nid} (provenance em forma de fluxo)"); changed = False
+                elif changed:
+                    rep["prov"].append(nid)
+        elif act == "rebaixar":
+            block, changed, cur = _set_field(block, "status", "confirmed", "unverifiable")
+            if changed:
+                rep["demote"].append(nid)
+            elif cur != "unverifiable":
+                rep["refused"].append(f"{nid} (rebaixar sobre status {cur})")
+        elif act == "dev-óbvio":
+            block, changed, cur = _set_field(block, "plane", "PROD", "DEV")
+            if changed:
+                rep["plane"].append(nid)
+            elif cur != "DEV":
+                rep["refused"].append(f"{nid} (dev-óbvio sobre plane {cur})")
+            if status == "confirmed" and "provenance" not in fields and has_src and good_method:
+                block, c2 = _put_provenance(block, src, loc, method)
+                if c2:
+                    rep["prov"].append(nid); changed = True
+        else:
+            rep["sealed"].append(f"{nid} ({act})")
+        if not changed and verdict in JUDGED_OK and act in PROV_ACTIONS + ("rebaixar", "dev-óbvio") \
+                and not any(x.startswith(nid + " ") for x in rep["refused"]):
+            rep["same"].append(nid)
+        out.extend(block)
+        out.extend(lines[end:j])
+        i = j
+    rep["missing"] = sorted(set(judged) - seen)
+    return "\n".join(out), rep
+
+
 def main(argv):
     check = "--check" in argv
     argv = [a for a in argv if a != "--check"]
+    routing = judged = None
+    if "--apply-judged" in argv:
+        k = argv.index("--apply-judged")
+        if k + 1 >= len(argv):
+            print("kg-migrate-v3: --apply-judged pede o caminho da planilha julgada", file=sys.stderr); return 2
+        if "--routing" in argv:
+            print("kg-migrate-v3: --apply-judged e --routing são ondas diferentes; use um só", file=sys.stderr); return 2
+        try:
+            judged = load_judged(argv[k + 1])
+        except BrokenInput as e:
+            print(f"kg-migrate-v3: {e}", file=sys.stderr); return 2
+        argv = argv[:k] + argv[k + 2:]
+        return main_judged(argv, judged, check)
     routing = None
     if "--routing" in argv:
         k = argv.index("--routing")
@@ -304,6 +460,45 @@ def main(argv):
                          ("nolocator", "TRACE SEM LOCALIZADOR: citação textual sem verified_against (intocado: onda O3)"),
                          ("cmdtrace", "TRACE É REGISTRO DE COMANDO: medição, política 2 (intocado: onda O3)"),
                          ("longlabel", "label longo (decisão humana: label curto + narrative)")):
+            if rep[k]:
+                print(f"  {title}: " + ", ".join(rep[k]))
+        if changed:
+            pending = True
+            if not check:
+                open(f, "w", encoding="utf-8").write(new)
+    return 1 if (check and pending) else 0
+
+
+def main_judged(files, judged, check):
+    """O laço do --apply-judged: um grafo por vez, YAML conferido antes e depois, nada gravado em --check."""
+    if not files:
+        print(__doc__.strip().split("\n\n")[-1], file=sys.stderr); return 2
+    pending = False
+    for f in files:
+        try:
+            text = open(f, encoding="utf-8").read()
+            yaml.safe_load(text)
+        except FileNotFoundError:
+            print(f"kg-migrate-v3: {f} não existe", file=sys.stderr); return 2
+        except yaml.YAMLError as e:
+            print(f"kg-migrate-v3: {f} não é YAML válido antes da migração ({e.__class__.__name__}) — não toco", file=sys.stderr); return 2
+        _, rows = routes_for(judged, f)
+        new, rep = apply_judged(text, rows)
+        try:
+            yaml.safe_load(new)
+        except yaml.YAMLError as e:
+            print(f"kg-migrate-v3: a aplicação em {f} daria YAML inválido ({e.__class__.__name__}) — nada gravado", file=sys.stderr); return 2
+        changed = new != text
+        verb = ("PENDENTE" if check else "aplicado") if changed else "nada a aplicar"
+        print(f"{f}: {verb} · linhas julgadas {len(rows)} · provenance escrita {len(rep['prov'])}"
+              f" · confirmed→unverifiable {len(rep['demote'])} · PROD→DEV {len(rep['plane'])}"
+              f" · já aplicado {len(rep['same'])} · REPROVADO (intocado) {len(rep['rejected'])}"
+              f" · selo do maestro (intocado) {len(rep['sealed'])} · recusado {len(rep['refused'])}"
+              f" · ausente do grafo {len(rep['missing'])}")
+        for k, title in (("prov", "provenance escrita"), ("demote", "confirmed→unverifiable"), ("plane", "PROD→DEV"),
+                         ("rejected", "REPROVADO pelo juiz (intocado: onda de revisão)"),
+                         ("sealed", "PROPOSTA QUE É SELO DO MAESTRO (intocado)"),
+                         ("refused", "RECUSADO (intocado)"), ("missing", "AUSENTE DO GRAFO")):
             if rep[k]:
                 print(f"  {title}: " + ", ".join(rep[k]))
         if changed:

@@ -4,8 +4,7 @@
 # matriz leitor x caso. Fica fora da fila de 2026-10-06 porque a fila está no teto.
 # Migrado ao contrato v3 no SAC-71 (2026-10-08): datas entre aspas e provenance nos nós confirmed.
 meta:
-  x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "lote 3 (O2): trace como locator nos A1/A2 sem verified_against; PR para merge humano"
+  x_drive_checkpoint: sealed
   id: contrato-kg-absorcao-2026-10
   schema_version: "1"
   baseline: "2026-10-08"
