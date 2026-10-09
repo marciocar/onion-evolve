@@ -5,7 +5,7 @@
 > item no grafo (status ≠ open, com carimbo) e ele sai daqui. Ordem = atenção (a régua do
 > radar: impact × incerteza × status). Sem corte NO ESCOPO; 2 grafo(s) de arquivo (opt-OUT) ficam fora — visíveis via `kg-radar --open-tsv`.
 
-**414 itens abertos** em 88 grafo(s) com aberto (de 113 no escopo) · 89 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
+**413 itens abertos** em 88 grafo(s) com aberto (de 113 no escopo) · 89 grupo(s), agrupados por `owner:` (6 nó(s) o declaram). A fila de decisão/execução do core; o topo por atenção é o que "custa caro estar errado".
 
 ## compartilhamento-individuo-organizacao-2026-09 — 8 item(ns)
 
@@ -319,6 +319,14 @@
 | 16.8 | `C_SELF_EVAL_IS_NOT_INDEPENDENT_BENCH` | slm-capitalizacao-2026-10 | LEITURA (bench do mecanismo): o que AA vende e medicao INDEPENDENTE ("Providers cannot pay for results"); um bench do Onion sobre  |
 | 14.4 | `C_OPEN_BENCH_RUNS_ON_CREDIT_NOT_REVENUE` | slm-capitalizacao-2026-10 | LEITURA (bench aberto comunitario): os benches abertos desta rodada (HF Open LLM Leaderboard, MMTEB) nao declaram monetizacao —  |
 
+## contrato-kg-absorcao-2026-10 — 3 item(ns)
+
+| Atenção | Nó | Grafo | O que é |
+|--:|---|---|---|
+| 27.0 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
+| 9.6 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
+| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
+
 ## meta-research-lens-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
@@ -326,14 +334,6 @@
 | 25.5 | `Q_DIRETRIZ_DE_PESQUISA_VIRA_MAQUINARIA` | meta-research-lens-2026-09 | Como a diretriz de pesquisa que o maestro re-digita a cada pesquisa/decisao (lente Onion, fontes atuais, Claude Code na versao atu |
 | 14.0 | `D_PODA_INSTRUCTION_BLOAT_MEDIDA` | meta-research-lens-2026-09 | DECISAO PROPOSTA (fio proprio, GATED): medir o que do CLAUDE.md/skills/rules carrega SEMPRE vs sob demanda (InstructionsLoaded hoo |
 | 6.3 | `D_BUSCA_COMO_SDAAL_GATED` | meta-research-lens-2026-09 | DECISAO PROPOSTA (GATED): adapter de busca em .claude/utils/search/ (irmao do task-manager: WebSearch nativo default; MCP Exa/Tavi |
-
-## contrato-kg-absorcao-2026-10 — 3 item(ns)
-
-| Atenção | Nó | Grafo | O que é |
-|--:|---|---|---|
-| 25.2 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
-| 9.6 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
-| 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
 ## typesafe-ai-2026-09 — 10 item(ns)
 
@@ -683,14 +683,13 @@
 | 4.4 | `Q_open_trigger` | gtm-decisions-2026-07 | Qual o GATILHO concreto de 'abrir publicamente' o standalone (métrica/data/nº de adotantes provados/aprovação do maestro)? É  |
 | 4.4 | `Q_p4_no_field_proof` | gtm-decisions-2026-07 | Zero adotante P4 (regulado) provado hoje — escolher P4 como mensagem é aposta em whitespace de pesquisa, não ICP validado. Fal |
 
-## door-role-parity-2026-09 — 4 item(ns)
+## door-role-parity-2026-09 — 3 item(ns)
 
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 7.2 | `Q_PREDICADO_SUCESSOR` | door-role-parity-2026-09 | a paridade é cega a 'ambas as fontes erradas do mesmo modo'; o sucessor mede o CONTEÚDO da porta contra o corte (vendor-manifest |
 | 6.3 | `Q_ROLE_DUPLA_LEITURA` | door-role-parity-2026-09 | o campo role: do members.yaml é projetado como tier (graph.sh:81) E lido como corte de papel; nas portas convergem por capacidade |
 | 5.4 | `Q_DURABLE_COMMIT_DEIXA_GITIGNORE_FORA` | door-role-parity-2026-09 | o commit durável da adoção deixa .gitignore e .env.example fora: a proteção de segredo que a adoção escreve no .gitignore n |
-| 5.4 | `Q_GRANAAI_E_BRAIN_NO_MESMO_REMOTO` | door-role-parity-2026-09 | granaai e brain-granaai apontam o mesmo remoto, e a develop dele já carrega o carimbo do brain: são um membro só, ou o granaai  |
 
 ## forge-cc-update-2026-10 — 2 item(ns)
 

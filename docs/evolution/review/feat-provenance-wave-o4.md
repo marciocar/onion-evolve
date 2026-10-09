@@ -3,7 +3,8 @@ title: "Revisão — onda O4 da migração de provenance (SAC-73): 269 linhas ju
 date: 2026-10-09
 branch: feat/provenance-wave-o4
 reviewer: "passada adversarial com o mandato de achar linha aplicada fora do veredito, status mexido por dev-historia, caminho absoluto que sobrou na source, locality inventada, nó fora da planilha alterado, regressão do gate e termo de cliente que deixou de ser protegido. Fiz a conferência mecânica das 269 linhas contra os 57 arquivos finais, uma amostra estratificada de 15 aplicados (semente 20261009) com o nó aberto antes e depois, a idempotência, a bancada kg_migrate_v3 15/15 e registry_pins 8/8 com LC_ALL=C, e 6 mutantes"
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: 021c6d8465333bcd7d029cd1ec324f706a79e79c3805ef47d60a929dbbff7045
+reviewed_code_sha256: 54367fbf1d0fb07ca381809642bd55705a34a12cef7839c32c23dc68b684bda8
 findings_total: 6
 findings_real: 3
 verdict: CORRIGIDO
