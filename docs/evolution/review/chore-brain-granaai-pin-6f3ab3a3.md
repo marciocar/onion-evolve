@@ -2,7 +2,8 @@
 title: 'Resíduo — carimbo do pin do brain-granaai (6f3ab3a3)'
 date: 2026-10-09
 branch: chore/brain-granaai-pin-6f3ab3a3
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: a8fc689101e6421927178272d214255386be7c1e6440a5bb539a65c2b660b1a3
+reviewed_code_sha256: 0f7cb2d8a5148b5c8bd84d6f92c480244cb9e477c101ed53be04c0e66a6ace25
 findings_total: 1
 findings_real: 1
 findings_fixed: 1

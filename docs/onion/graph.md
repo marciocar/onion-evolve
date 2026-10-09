@@ -280,7 +280,7 @@ assistant	proposes	maestro	conversa-plan-gate
 assistant	reports	maestro	conversa-plan-gate
 brain-granaai	adopts	onion-evolve	
 brain-granaai	mode	brownfield	
-brain-granaai	pin	663fdbc5bdcc	
+brain-granaai	pin	6f3ab3a3905c	
 brain-granaai	specialization	clickup	
 brain-granaai	specialization	company-brain	
 brain-granaai	specialization	pesquisa-primaria	
