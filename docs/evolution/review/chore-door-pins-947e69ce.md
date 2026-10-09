@@ -2,7 +2,8 @@
 title: 'Resíduo — selo dos pins das portas na 20a+ materialização (947e69ce)'
 date: 2026-10-09
 branch: chore/door-pins-947e69ce
-reviewed_diff_sha256: pendente
+reviewed_diff_sha256: f5c68ea1daf06b87cc61a98443b38cfd472f2a0ba918b70227646f6936d978f4
+reviewed_code_sha256: 4c83b25e66d7d63c0769690275b05951a23d8267b5507a0c9d4d40b487745d27
 findings_total: 0
 findings_real: 0
 findings_fixed: 0
