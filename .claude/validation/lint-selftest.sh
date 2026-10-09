@@ -5493,6 +5493,16 @@ run_research_workflow_selftests() {
      && grep -q 'Sem fonte real, o nó NÃO é confirmed' "${wf}"; then
     record_pass "research-workflow: (p) os dois write(KG) exigem o contrato v3 e rodam o kg-contract-check (sem inventar fonte)"
   else record_fail "research-workflow: (p)" "write(KG) sem o contrato v3: def=$(grep -c '^const CONTRACT_V3 = ' "${wf}" || true) usos=${_ncv:-0} checagens=${_nck:-0}"; fi
+  # (q) o bloco do contrato ensina os avisos do v4.1 (2026-10-09, SAC-73): o modo decisão escreve um nó
+  #     `D_` open, e decisão sem trace, sem provenance e sem TRACES_TO acusa integrity.untraced-decision,
+  #     SHOULD que o kg-contract-check cobra vazio em grafo novo. Mutante: tirar a linha do v4.1 reprova.
+  local _v41
+  _v41="$(grep -F 'Contrato v4.1' "${wf}" | head -1 || true)"
+  if printf '%s' "${_v41}" | grep -qF 'leva `verified_against`' \
+     && printf '%s' "${_v41}" | grep -qF 'leva `trace:' \
+     && printf '%s' "${_v41}" | grep -qF 'nó PROD não se apoia em testemunho'; then
+    record_pass "research-workflow: (q) o contrato do write(KG) ensina os avisos do v4.1 (alvo do carimbo, trace da decisão, testemunho fora de PROD)"
+  else record_fail "research-workflow: (q)" "CONTRACT_V3 sem a linha do v4.1 (verified_against, trace da decisão, testemunho em PROD)"; fi
 }
 
 run_research_lens_selftests() {
@@ -23452,6 +23462,16 @@ run_kg_contract_check_selftests() {
   if [ "${rc}" -eq 1 ] && grep -q 'form.range.node.label' <<< "${out}"; then
     record_pass "kg-contract-check: (d) grafo rastreado que passa a ter label longo → rc 1"
   else record_fail "kg-contract-check: (d)" "piora no rastreado não acusada: rc=${rc} ${out}"; fi
+  # (g) aviso do v4.1 (2026-10-09, SAC-73): decisão NOVA sem trace, sem provenance e sem TRACES_TO acusa
+  #     integrity.untraced-decision, e o checador diz COMO curar (o trace). Mutante: tirar a dica do HINT
+  #     deixa só o código e reprova este caso.
+  _kcc_graph semtrace | sed -e '/^edges:/,$d' > "${sb}/g/semtrace.kg.yaml"
+  printf '  - id: D_A\n    node_type: decision\n    plane: DEV\n    status: open\n    impact: 3\n    confidence: 0.5\n    label: "decisão A"\n' >> "${sb}/g/semtrace.kg.yaml"
+  printf 'edges:\n  - from: E_A\n    to: Q_A\n    edge_type: SUPPORTS\n  - from: D_A\n    to: Q_A\n    edge_type: SUPPORTS\n' >> "${sb}/g/semtrace.kg.yaml"
+  if out="$(cd "${sb}" && bash .claude/validation/kg-contract-check.sh g/semtrace.kg.yaml 2>&1)"; then rc=0; else rc=$?; fi
+  if [ "${rc}" -eq 1 ] && grep -q 'SHOULD integrity.untraced-decision — decision sem origem: dê a ela trace:' <<< "${out}"; then
+    record_pass "kg-contract-check: (g) decisão nova sem origem → rc 1 com o código do v4.1 e a cura (trace)"
+  else record_fail "kg-contract-check: (g)" "esperava rc 1 com integrity.untraced-decision e a dica: rc=${rc} ${out}"; fi
   # (f) o checador NÃO deixa bytecode no vendor. Medido em 2026-10-08: rodar o leitor de referência sem -B
   #     plantava tools/__pycache__/*.pyc, e o `kg_vendor.py check` seguinte reprovava o vendor como
   #     "divergente da tag" (o check rejeita bytecode de propósito). Rodamos sem PYTHONDONTWRITEBYTECODE,

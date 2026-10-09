@@ -1,0 +1,29 @@
+meta:
+  schema_version: "1"
+  id: valid-testimony-marked
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: C_A
+    node_type: claim
+    plane: DEV
+    status: confirmed
+    impact: 3
+    confidence: 0.9
+    verified_at: "2026-10-08"
+    verified_against: "relato-do-maestro em 2026-10-08"
+    evidence_class: testimony
+    label: "Nó sintético C_A."
+    provenance:
+      source: "medição sintética"
+      locator: "caso de conformidade"
+      method: "medição: caso de conformidade"
+edges:
+  - from: C_A
+    to: Q_A
+    edge_type: SUPPORTS

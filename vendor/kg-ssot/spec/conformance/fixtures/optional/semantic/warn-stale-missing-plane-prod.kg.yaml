@@ -1,0 +1,26 @@
+meta:
+  schema_version: "1"
+  id: warn-stale-missing-plane-prod
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: D_X
+    node_type: claim
+    plane: PROD
+    status: confirmed
+    impact: 2
+    confidence: 0.5
+    label: "Nó sintético D_X, que afirma sobre o vivo."
+    provenance:
+      source: "medição sintética"
+      locator: "caso de conformidade"
+      method: "medição: caso de conformidade"
+edges:
+  - from: D_X
+    to: Q_A
+    edge_type: SUPPORTS

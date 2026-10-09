@@ -1,0 +1,28 @@
+{
+  "description": "Carimbo sem alvo (v4.1, Q_RADAR_WARNINGS_WITHOUT_CASES): claim com verified_at e sem verified_against alerta (os outros tipos já se ancoram por outro campo), porque o carimbo sem alvo não distingue verificado de declarado. É o UNANCHORED do radar.",
+  "layer": "form",
+  "pending_on": [],
+  "cases": [
+    {
+      "file": "warn-verified-at-without-against.kg.yaml",
+      "description": "claim com verified_at e sem verified_against: válido, com aviso",
+      "valid": true,
+      "codes": [],
+      "warnings": [
+        "form.required.node.verified_against"
+      ]
+    },
+    {
+      "file": "valid-verified-at-with-against.kg.yaml",
+      "description": "verified_at com verified_against: nada a alertar",
+      "valid": true,
+      "codes": []
+    },
+    {
+      "file": "valid-evidence-verified-at-without-against.kg.yaml",
+      "description": "evidence com o mesmo carimbo: a evidência é a própria âncora, nada a alertar",
+      "valid": true,
+      "codes": []
+    }
+  ]
+}

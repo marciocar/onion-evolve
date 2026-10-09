@@ -65,6 +65,7 @@ const CONTRACT_V3 = '\n\n## CONTRATO v3 do .kg.yaml (não negociável — o gate
   + '  `provenance:` / `  source: "<URL ou caminho@commit lido>"` / `  locator: "<seção, artigo ou trecho>"` / `  method: "<classe>: <detalhe>"`, com a classe em leitura, medição, juízes, derivado ou testemunho (contrato v4; ex.: `"juízes: votação 3/2 do run"`, `"leitura: WebFetch da seção 4"`).\n'
   + '  A fonte tem de ser VERIFICÁVEL: a URL que o leitor abriu, o caminho@commit que foi medido. **Sem fonte real, o nó NÃO é confirmed** (deixe open) — nunca invente source para passar no contrato.\n'
   + '- **label ≤ 280 caracteres**: só a afirmação curta. Contexto, porquê e detalhe vão em `narrative: "…"` no mesmo nó.\n'
+  + '- **Contrato v4.1 (avisos que reprovam grafo novo no kg-contract-check)**: (1) todo nó com `verified_at` leva `verified_against` (o alvo do carimbo); (2) todo nó `decision` (inclusive o `D_` open) leva `trace: "<run, pergunta ou fonte que a originou>"`; (3) `testemunho` é classe de nó DEV: nó PROD não se apoia em testemunho; (4) `verified_at` nunca é anterior ao `valid_from` do mesmo nó.\n'
   + '- Depois do radar, rode `bash .claude/validation/kg-contract-check.sh ' + KG_PATH + '` e exija rc 0 — ele usa o leitor de referência do contrato vendorizado; rc 1 = CORRIJA e rode de novo (máx 3 tentativas); rc 2 = o contrato não está vendorizado neste repo: declare no summary e siga (não é reprovação).'
 let CORPUS = String(A.corpus || '')
 const MODE = String(A.mode || 'research')

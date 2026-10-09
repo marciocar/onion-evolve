@@ -34,14 +34,14 @@ O adotante usa só `update` e `check`.
 A primeira vez, a partir de um clone deste repo:
 
 ```bash
-python3 -I -B tools/kg_vendor.py update --tag contract-v4.0.0 --dest <adotante>/vendor/kg-ssot
+python3 -I -B tools/kg_vendor.py update --tag contract-v4.1.0 --dest <adotante>/vendor/kg-ssot
 ```
 
 Para atualizar, rode a partir do vendor, com `--source` obrigatório. Ele aceita caminho ou URL, e uma URL
 vira um clone nu descartável. Dentro do vendor, o repo git é o do adotante, que não tem a tag:
 
 ```bash
-python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.0.0 --source <caminho ou URL deste repo>
+python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.1.0 --source <caminho ou URL deste repo>
 ```
 
 - **Leitura:** o vendor lê a tag com `git archive`, nunca a árvore de trabalho. Os nomes são literais: um `*`
@@ -58,16 +58,63 @@ python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.0.0 --s
 
 ## 2. Gravar a linha de base
 
-Na raiz do adotante:
+Na raiz do adotante, **nesta ordem**:
 
 ```bash
-pip install -r vendor/kg-ssot/tools/requirements.txt
+pip install -r vendor/kg-ssot/tools/requirements.txt         # ou o venv da nota de ambiente, abaixo
+git add vendor/kg-ssot                                       # antes do gate: ele só mede arquivo rastreado
 python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update      # grava .kg-ssot/gate.json
 ```
 
 O gate mede os `.kg.yaml` rastreados por git (`git ls-files`, lidos da árvore de trabalho). Um arquivo que
 ainda não está no git não entra. Por padrão, `*/fixtures/*` e `docs/materials/*` ficam de fora, e isso já
-exclui as fixtures do próprio vendor.
+exclui as fixtures do próprio vendor: os `.kg.yaml` do vendor moram todos em `*/fixtures/*`. Por isso o
+`git add vendor/kg-ssot` vem antes do `--update`: com o vendor rastreado, a base gravada é a mesma que o CI vai
+medir depois do commit, e um grafo seu ainda não adicionado também precisa de `git add` antes.
+
+**Nota de ambiente.** Num sistema com PEP 668 (Ubuntu 24.04 em diante, entre outros), o `pip install` fora de um
+venv é recusado (`externally-managed-environment`). Instale as dependências num venv e rode o kit com o Python
+dele:
+
+```bash
+python3 -m venv .venv && .venv/bin/pip install -r vendor/kg-ssot/tools/requirements.txt
+.venv/bin/python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update
+```
+
+No GitHub Actions com `actions/setup-python`, o `pip install` do passo de CI funciona sem venv.
+
+### Ler o que reprova
+
+O gate lista, depois da comparação, cada grafo que reprova no MUST com os códigos dele (`novo`, `regredido` ou
+`herdado`) e a dívida SHOULD por código. Para ver as ocorrências de um grafo, rode o leitor de referência sem
+`--schema`: ele usa o mesmo contrato e o mesmo vocabulário do gate (`parse.*`, `form.*`, `integrity.*`, `yaml.*`),
+com a contagem de cada código:
+
+```bash
+python3 -I -B vendor/kg-ssot/tools/kg_validate.py docs/meu-grafo.kg.yaml
+# REPROVA docs/meu-grafo.kg.yaml
+#   MUST   form.required.node.provenance ×33 · yaml.forbidden-key-on ×7
+#   SHOULD form.required.node.verified_at ×33
+```
+
+rc 0 todo arquivo passa no MUST, 1 algum reprova, 2 entrada quebrada.
+
+### A chave `on:` em aresta vira `trigger:`
+
+`yaml.forbidden-key-on` é uma aresta com a chave `on:`. Ela é proibida desde o v1 porque um leitor YAML 1.1 (o
+PyYAML padrão, entre outros) lê `on` como o booleano `true`, e o evento referenciado parece órfão para esse leitor
+enquanto outro o aprova. O gatilho de uma `TRANSITIONS` se escreve `trigger:`, e a integridade aceita `trigger`
+como referência ao evento:
+
+```yaml
+- from: ST_IDLE
+  to: ST_BUSY
+  edge_type: TRANSITIONS
+  trigger: EV_START      # era: on: EV_START
+```
+
+A troca é mecânica (só o nome da chave) e tira o código do grafo. Se ela vier depois da base, o gate mostra o
+ganho e pede para travar com `--update`.
 
 `--exclude GLOB` é repetível e se soma a esses padrões. O glob é `fnmatch` sobre o caminho relativo, e `*`
 atravessa `/`. `--no-default-excludes` desliga os padrões, e aí as fixtures do vendor, quebradas de propósito,
@@ -140,12 +187,17 @@ Sobre `--update`:
 ## 4. Atualizar a tag
 
 O PR que muda a tag faz três coisas:
-1. roda `kg_vendor.py update` com a tag nova;
+1. roda `kg_vendor.py update` com a tag nova e `git add vendor/kg-ssot` (o gate mede só arquivo rastreado);
 2. roda `kg_gate.py` e explica no PR a diferença que aparecer;
 3. grava a base com `--update`, porque um contrato novo muda a identidade.
 
 Aviso novo no SHOULD sobe a dívida por desenho. As rampas do contrato (SHOULD hoje, MUST depois) chegam assim,
 como compromisso medido.
+
+Da `contract-v4.0.x` para a `contract-v4.1.0`, nenhum veredito muda: entram quatro avisos SHOULD (carimbo sem alvo,
+testemunho em PROD, verificação antes do fato e decisão sem origem; a tabela está em `spec/conformance/README.md`).
+Se a dívida SHOULD subir (por desenho, quando o corpus tem o que os avisos novos acusam), o `--update` desse PR vai com
+`--accept-regression "<motivo>"`; se não subir, o `--update` grava a identidade nova sem motivo.
 
 ## 5. Do v3 para o v4
 
@@ -165,9 +217,12 @@ O que muda no v4:
   `medição` (o autor do grafo executou), `leitura` (documento primário), `juízes` (painel de agentes ou juízes),
   `derivado` (derivação mecânica de campo, não reverificada) ou `testemunho` (uma pessoa ou sessão afirmou;
   inclui a medição de terceiro lida aqui). Fora disso alerta como `form.pattern.node.provenance.method`.
+  **Atenção:** se o seu CI cobra que grafo novo saia limpo também no SHOULD, este alerta já reprova lá no v4, e não só
+  no v5. Ajuste antes os geradores que escrevem `provenance` (no primeiro adotante, seis deles emitiam `method` livre).
 
 O caminho, num PR só:
-1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.0.0 --source <caminho ou URL deste repo>`;
+1. `python3 -I -B vendor/kg-ssot/tools/kg_vendor.py update --tag contract-v4.1.0 --source <caminho ou URL deste repo>`,
+   e `git add vendor/kg-ssot`;
 2. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py` mostra a identidade nova do contrato e os grafos que passam a
    falhar no MUST;
 3. `python3 -I -B vendor/kg-ssot/tools/kg_gate.py --update --accept-regression "<motivo>"` grava esses grafos em

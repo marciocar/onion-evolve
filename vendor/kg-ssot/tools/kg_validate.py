@@ -12,15 +12,31 @@ Camadas medidas por arquivo:
 Também é o leitor de referência da suíte spec/conformance/: codes(text, validator) devolve os
 códigos MUST estáveis (parse.*, form.*, integrity.*) que tools/kg_conformance.py compara.
 
+Saída humana (o CLI): por arquivo, o veredito e os códigos com o MESMO vocabulário do gate (kg_gate.py) e
+da suíte, os de codes() e warnings() (parse.*, form.*, integrity.*, yaml.*), com a contagem de ocorrências:
+  REPROVA <arquivo>   MUST  form.required.node.provenance ×33 · yaml.forbidden-key-on ×7
+                      SHOULD form.required.node.provenance.verified_at ×33
+  PASSA   <arquivo>   (SHOULD só avisa, não reprova)
+Sem --schema, o contrato é o vigente (CONTRACT_MUST) e os avisos são do SHOULD dele (CONTRACT_SHOULD). Com
+--schema S, o SHOULD é --should-schema, ou o vizinho S.should.schema.json quando existe, ou nenhum.
+
+--spike troca a saída humana e o rc pelos do spike (check() e classify(), perfil Yaml12BoolLoader), para
+reproduzir a medição do spike. --json OUT grava SEMPRE o formato do spike ({summary, results}),
+congelado, para as medições gravadas seguirem reproduzíveis.
+
+rc: 0 todo arquivo passa no MUST (com --spike: em schema + integridade) · 1 algum reprova · 2 entrada
+quebrada (schema ou arquivo ilegível, git show que falha).
+
 Uso:
-  kg_validate.py --schema spec/kg-strict.schema.json FILE...
-  kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT]
+  kg_validate.py [--schema S [--should-schema S2]] FILE...
+  kg_validate.py --schema S --git REPO --rev SHA --list LISTFILE [--json OUT] [--spike]
 """
 import argparse
 import collections
 import datetime
 import json
 import math
+import pathlib
 import subprocess
 import sys
 
@@ -31,7 +47,7 @@ from jsonschema import Draft202012Validator, FormatChecker, validators
 from jsonschema.exceptions import ValidationError
 
 
-_ROOT = __import__("pathlib").Path(__file__).resolve().parent.parent
+_ROOT = pathlib.Path(__file__).resolve().parent.parent
 # O contrato VIGENTE, num lugar só: a suíte, a matriz, a medição do core e a catraca leem daqui.
 CONTRACT_MUST = _ROOT / "spec" / "kg-contract-v4.schema.json"
 CONTRACT_SHOULD = _ROOT / "spec" / "kg-contract-v4.should.schema.json"
@@ -357,6 +373,25 @@ def parse_v1(text):
         return None, None, "parse.yaml-error"
 
 
+def code_counts(text, validator):
+    """Os códigos MUST de codes() com a contagem de ocorrências: Counter código → quantas vezes.
+
+    As chaves são exatamente as de codes(); a contagem é o que a saída humana mostra (33 nós sem
+    provenance, 7 arestas com on). Um código de parse conta 1: o arquivo não chega ao schema.
+    """
+    raw, doc, parse_code = parse_v1(text)
+    if parse_code:
+        return collections.Counter([parse_code])
+    out = collections.Counter(c for err in validator.iter_errors(doc) for c in form_codes(err))
+    out.update(non_finite_codes(doc))
+    out.update(integrity(doc, refs=("trigger", "on")))
+    edges = doc.get("edges") if isinstance(doc.get("edges"), list) else []
+    with_on = sum(1 for e in edges if isinstance(e, dict) and "on" in e)
+    if with_on:
+        out["yaml.forbidden-key-on"] += with_on  # o perfil proíbe on (em YAML 1.1 ela vira o booleano True)
+    return out
+
+
 def codes(text, validator):
     """Os códigos MUST que este leitor emite para um arquivo: lista ordenada, sem repetição.
 
@@ -364,15 +399,7 @@ def codes(text, validator):
     check() (parse, schema, integridade), mas com a taxonomia estável da suíte (form_codes) em vez
     das chaves de classify(), e conta documentos nulos no parse.
     """
-    raw, doc, parse_code = parse_v1(text)
-    if parse_code:
-        return [parse_code]
-    out = {c for err in validator.iter_errors(doc) for c in form_codes(err)}
-    out |= non_finite_codes(doc)
-    out |= set(integrity(doc, refs=("trigger", "on")))
-    if any(isinstance(e, dict) and "on" in e for e in (doc.get("edges") if isinstance(doc.get("edges"), list) else [])):
-        out.add("yaml.forbidden-key-on")  # o perfil proíbe on (em YAML 1.1 ela vira o booleano True)
-    return sorted(out)
+    return sorted(code_counts(text, validator))
 
 
 def _has_unquoted_date(value):
@@ -386,21 +413,68 @@ def _has_unquoted_date(value):
 SLUG = re.compile(r"^[A-Za-z_][A-Za-z0-9_-]*$")
 
 
+ISO_PREFIX = re.compile(r"^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$")
+TESTIMONY_METHOD = re.compile(r"^testemunho: ")
+
+
+def coherence_warnings(doc):
+    """Os avisos SHOULD que o schema não exprime, porque cruzam campos ou arestas (Q_RADAR_WARNINGS_WITHOUT_CASES):
+
+    - integrity.testimony-in-prod: nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe
+      testemunho): relato não é artefato vivo, e o plane pede DEV;
+    - integrity.verified-before-fact: verified_at anterior a valid_from, comparados na granularidade do mais curto
+      (AAAA, AAAA-MM ou AAAA-MM-DD); data que não está nessa forma não é comparada;
+    - integrity.untraced-decision: decision viva (não superseded nem refuted) sem origem: nem trace com texto, nem
+      provenance, nem aresta TRACES_TO saindo dela.
+    Um campo de tipo errado (from ou id em lista ou mapa) já reprova no MUST: aqui ele é ignorado, nunca quebra.
+    """
+    out = collections.Counter()
+    nodes = [n for n in doc.get("nodes") or [] if isinstance(n, dict)] if isinstance(doc.get("nodes"), list) else []
+    edges = doc.get("edges") if isinstance(doc.get("edges"), list) else []
+    # só texto entra no conjunto: um from ou id em lista ou mapa já reprova no MUST, e aqui não pode quebrar o leitor
+    traced = {e.get("from") for e in edges
+              if isinstance(e, dict) and e.get("edge_type") == "TRACES_TO" and isinstance(e.get("from"), str)}
+    for n in nodes:
+        prov = n.get("provenance") if isinstance(n.get("provenance"), dict) else {}
+        method = prov.get("method")
+        if n.get("plane") == "PROD" and (n.get("evidence_class") == "testimony"
+                                         or (isinstance(method, str) and TESTIMONY_METHOD.match(method))):
+            out["integrity.testimony-in-prod"] += 1
+        vf, va = n.get("valid_from"), n.get("verified_at")
+        if isinstance(vf, str) and isinstance(va, str) and ISO_PREFIX.match(vf) and ISO_PREFIX.match(va):
+            k = min(len(vf), len(va))
+            if va[:k] < vf[:k]:
+                out["integrity.verified-before-fact"] += 1
+        trace = n.get("trace")
+        if (n.get("node_type") == "decision" and n.get("status") not in ("superseded", "refuted")
+                and not (isinstance(trace, str) and trace.strip()) and not prov
+                and not (isinstance(n.get("id"), str) and n["id"] in traced)):
+            out["integrity.untraced-decision"] += 1
+    return out
+
+
+def warning_counts(text, validator, should_validator):
+    """Os códigos SHOULD de warnings() com a contagem de ocorrências (as chaves são as de warnings())."""
+    raw, doc, parse_code = parse_v1(text)
+    if parse_code:
+        return collections.Counter()
+    must = {c for err in validator.iter_errors(doc) for c in form_codes(err)}
+    should = collections.Counter(c for err in should_validator.iter_errors(doc) for c in form_codes(err))
+    out = collections.Counter({c: n for c, n in should.items() if c not in must})
+    if _has_unquoted_date(raw):
+        out["yaml.unquoted-date"] += 1
+    out.update(coherence_warnings(doc))
+    return out
+
+
 def warnings(text, validator, should_validator):
-    """Os códigos SHOULD: o que o schema SHOULD acusa e o MUST não, mais data sem aspas.
+    """Os códigos SHOULD: o que o schema SHOULD acusa e o MUST não, mais data sem aspas e os avisos de coerência
+    (coherence_warnings).
 
     Arquivo que já reprova no parse não recebe alerta de forma. Chave desconhecida cujo nome não é
     slug (<<, 1.0) alerta como form.pattern.<escopo>.key, o código que o schema SHOULD emite para ela.
     """
-    raw, doc, parse_code = parse_v1(text)
-    if parse_code:
-        return []
-    must = {c for err in validator.iter_errors(doc) for c in form_codes(err)}
-    should = {c for err in should_validator.iter_errors(doc) for c in form_codes(err)}
-    out = should - must
-    if _has_unquoted_date(raw):
-        out.add("yaml.unquoted-date")
-    return sorted(out)
+    return sorted(warning_counts(text, validator, should_validator))
 
 
 def load_sources(args):
@@ -440,34 +514,89 @@ def summarize(results):
     }
 
 
-def main():
+def should_for(schema_path):
+    """O SHOULD que acompanha um MUST: o vizinho <nome>.should.schema.json, se existe; senão, nenhum."""
+    path = pathlib.Path(schema_path)
+    if path.resolve() == CONTRACT_MUST.resolve():
+        return CONTRACT_SHOULD
+    if path.name.endswith(".schema.json") and not path.name.endswith(".should.schema.json"):
+        sibling = path.with_name(path.name[:-len(".schema.json")] + ".should.schema.json")
+        if sibling.is_file():
+            return sibling
+    return None
+
+
+def fmt_counts(counter):
+    return " · ".join(f"{c} ×{n}" for c, n in sorted(counter.items()))
+
+
+def report(name, must, should):
+    """As linhas humanas de um arquivo: veredito, códigos MUST e avisos SHOULD com contagem."""
+    lines = [f"{'REPROVA' if must else 'PASSA  '} {name}"]
+    if must:
+        lines.append(f"  MUST   {fmt_counts(must)}")
+    if should:
+        lines.append(f"  SHOULD {fmt_counts(should)}")
+    return lines
+
+
+def spike_summary(s):
+    lines = [f"arquivos: {s['files']}  parse: {s['parse_pass']}  schema: {s['schema_pass']}  "
+             f"schema+integridade: {s['schema_and_integrity_pass']}"]
+    for c in s["classes"][:25]:
+        lines.append(f"  {c['files']:4d} arq  {c['occurrences']:6d} ocorr  +{c['unlocks_if_relaxed_alone']:<3d} sozinho  {c['class']}")
+    for k, v in s["integrity"].items():
+        lines.append(f"  integridade {k}: {v}")
+    return lines
+
+
+def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("--schema", required=True)
+    ap.add_argument("--schema", default=str(CONTRACT_MUST), help="o MUST (default: o contrato vigente)")
+    ap.add_argument("--should-schema", help="o SHOULD dos avisos (default: o que acompanha --schema)")
     ap.add_argument("--git")
     ap.add_argument("--rev")
     ap.add_argument("--list")
-    ap.add_argument("--json")
+    ap.add_argument("--json", help="grava o formato do spike ({summary, results})")
+    ap.add_argument("--spike", action="store_true", help="saída humana e rc do spike (check/classify)")
     ap.add_argument("files", nargs="*")
-    args = ap.parse_args()
-    with open(args.schema, encoding="utf-8") as fh:
-        validator = make_validator(json.load(fh))
-    results = []
-    for name, text in load_sources(args):
+    args = ap.parse_args(argv)
+    should_path = args.should_schema or should_for(args.schema)
+    try:
+        with open(args.schema, encoding="utf-8") as fh:
+            validator = make_validator(json.load(fh))
+        should_v = None
+        if should_path:
+            with open(should_path, encoding="utf-8") as fh:
+                should_v = make_validator(json.load(fh))
+        sources = list(load_sources(args))
+    except (OSError, ValueError, UnicodeDecodeError, subprocess.CalledProcessError) as exc:
+        print(f"ENTRADA QUEBRADA  {exc}")
+        return 2
+    results, lines, failed, warned = [], [], 0, 0
+    for name, text in sources:
         r = check(text, validator)
         r["file"] = name
         results.append(r)
+        if args.spike:
+            continue
+        must = code_counts(text, validator)
+        should = warning_counts(text, validator, should_v) if should_v is not None else collections.Counter()
+        failed += bool(must)
+        warned += bool(should)
+        lines += report(name, must, should)
     summary = summarize(results)
     if args.json:
         with open(args.json, "w", encoding="utf-8") as fh:
             json.dump({"summary": summary, "results": results}, fh, ensure_ascii=False, indent=1)
-    s = summary
-    print(f"arquivos: {s['files']}  parse: {s['parse_pass']}  schema: {s['schema_pass']}  "
-          f"schema+integridade: {s['schema_and_integrity_pass']}")
-    for c in s["classes"][:25]:
-        print(f"  {c['files']:4d} arq  {c['occurrences']:6d} ocorr  +{c['unlocks_if_relaxed_alone']:<3d} sozinho  {c['class']}")
-    for k, v in s["integrity"].items():
-        print(f"  integridade {k}: {v}")
-    return 0 if s["schema_and_integrity_pass"] == s["files"] else 1
+    if args.spike:
+        print("\n".join(spike_summary(summary)))
+        return 0 if summary["schema_and_integrity_pass"] == summary["files"] else 1
+    contract = pathlib.Path(args.schema).name + (f" + {pathlib.Path(should_path).name}" if should_path else "")
+    lines.append(f"· {len(sources)} arquivos; {len(sources) - failed} passam no MUST; {warned} com aviso SHOULD"
+                 f" ({contract})")
+    print("\n".join(lines))
+    return 1 if failed else 0
 
 
 if __name__ == "__main__":

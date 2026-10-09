@@ -1,0 +1,75 @@
+meta:
+  schema_version: "1"
+  id: valid-domain-complete
+  layer: domain
+nodes:
+  - id: EN_A
+    node_type: entity
+    plane: DEV
+    status: open
+    layer: domain
+    impact: 3
+    confidence: 0.9
+    trace: "src/a.ts"
+    label: "Nó sintético EN_A."
+  - id: ST_A
+    node_type: state
+    plane: DEV
+    status: open
+    layer: domain
+    impact: 3
+    confidence: 0.9
+    label: "Nó sintético ST_A."
+  - id: ST_B
+    node_type: state
+    plane: DEV
+    status: open
+    layer: domain
+    impact: 3
+    confidence: 0.9
+    label: "Nó sintético ST_B."
+  - id: EV_GO
+    node_type: event
+    plane: DEV
+    status: open
+    layer: domain
+    impact: 3
+    confidence: 0.9
+    label: "Nó sintético EV_GO."
+  - id: RU_A
+    node_type: rule
+    plane: DEV
+    status: open
+    layer: domain
+    impact: 3
+    confidence: 0.9
+    label: "Nó sintético RU_A."
+  - id: AR_A
+    node_type: artifact
+    plane: DEV
+    status: open
+    layer: domain
+    impact: 3
+    confidence: 0.9
+    label: "Nó sintético AR_A."
+edges:
+  - from: EN_A
+    to: ST_A
+    edge_type: HAS_STATE
+  - from: EN_A
+    to: ST_B
+    edge_type: HAS_STATE
+  - from: ST_A
+    to: ST_B
+    edge_type: TRANSITIONS
+    trigger: EV_GO
+  - from: ST_B
+    to: ST_A
+    edge_type: TRANSITIONS
+    trigger: EV_GO
+  - from: RU_A
+    to: AR_A
+    edge_type: TRACES_TO
+  - from: EN_A
+    to: AR_A
+    edge_type: READS

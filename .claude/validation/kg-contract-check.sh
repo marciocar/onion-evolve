@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# kg-contract-check.sh — julga UM ou mais .kg.yaml contra o contrato v3 vendorizado, ANTES do commit.
+# kg-contract-check.sh — julga UM ou mais .kg.yaml contra o contrato vendorizado (hoje v4.1), ANTES do commit.
 #
 # Por que existe (2026-10-08, SAC-71): desde que o gate do contrato entrou no CI (vendor/kg-ssot,
 # kg_gate.py), todo grafo NOVO tem de nascer limpo no SHOULD — e o gate só enxerga arquivo rastreado
@@ -41,6 +41,11 @@ HINT = {
     "yaml.unquoted-date": "data sem aspas: escreva \"2026-10-08\" (baseline, review_after, verified_at, valid_from)",
     "form.required.node.provenance": "nó confirmed ou PROD sem provenance: {source, locator, method} com fonte VERIFICÁVEL; sem fonte, o nó não é confirmed",
     "form.range.node.label": "label acima de 280 caracteres: a afirmação curta fica no label, o resto vai para narrative",
+    # avisos do v4.1 (2026-10-09): SHOULD, mas grafo novo nasce sem nenhum
+    "form.required.node.verified_against": "claim com verified_at e sem verified_against: o carimbo diz QUANDO, falta CONTRA O QUÊ foi verificado",
+    "integrity.untraced-decision": "decision sem origem: dê a ela trace: \"<run, pergunta ou fonte>\", provenance ou uma aresta TRACES_TO",
+    "integrity.testimony-in-prod": "nó PROD apoiado em testemunho: rebaixe para DEV ou meça e troque o method para medição/leitura",
+    "integrity.verified-before-fact": "verified_at anterior ao valid_from: não se verifica um fato antes de ele valer; corrija uma das datas",
 }
 rc = 0
 for f in files:

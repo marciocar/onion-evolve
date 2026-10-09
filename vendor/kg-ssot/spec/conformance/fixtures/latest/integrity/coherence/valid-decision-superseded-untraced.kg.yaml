@@ -1,0 +1,22 @@
+meta:
+  schema_version: "1"
+  id: valid-decision-superseded-untraced
+nodes:
+  - id: Q_A
+    node_type: question
+    plane: DEV
+    status: open
+    impact: 3
+    confidence: 0.5
+    label: "A pergunta sintética A."
+  - id: D_A
+    node_type: decision
+    plane: DEV
+    status: superseded
+    impact: 3
+    confidence: 0.9
+    label: "Nó sintético D_A."
+edges:
+  - from: D_A
+    to: Q_A
+    edge_type: SUPPORTS

@@ -1,6 +1,6 @@
 meta:
   schema_version: "1"
-  id: warn-supersedes-unreconciled
+  id: valid-supersedes-open-superseder
 nodes:
   - id: Q_A
     node_type: question
@@ -23,14 +23,10 @@ nodes:
   - id: C_NEW
     node_type: claim
     plane: DEV
-    status: confirmed
+    status: open
     impact: 2
     confidence: 0.5
     label: "Nó sintético C_NEW."
-    provenance:
-      source: "medição sintética"
-      locator: "caso de conformidade"
-      method: "medição: caso de conformidade"
 edges:
   - from: C_NEW
     to: EV_A

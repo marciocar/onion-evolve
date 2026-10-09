@@ -1,6 +1,6 @@
 meta:
   schema_version: "1"
-  id: warn-supersedes-unreconciled
+  id: warn-verified-before-fact
 nodes:
   - id: Q_A
     node_type: question
@@ -15,26 +15,15 @@ nodes:
     status: confirmed
     impact: 3
     confidence: 0.9
-    label: "A evidência sintética que sustenta A."
-    provenance:
-      source: "medição sintética"
-      locator: "caso de conformidade"
-      method: "medição: caso de conformidade"
-  - id: C_NEW
-    node_type: claim
-    plane: DEV
-    status: confirmed
-    impact: 2
-    confidence: 0.5
-    label: "Nó sintético C_NEW."
+    valid_from: "2026-10-09"
+    verified_at: "2026-10-08"
+    verified_against: "medição sintética"
+    label: "Nó sintético EV_A."
     provenance:
       source: "medição sintética"
       locator: "caso de conformidade"
       method: "medição: caso de conformidade"
 edges:
-  - from: C_NEW
-    to: EV_A
-    edge_type: SUPERSEDES
   - from: EV_A
     to: Q_A
     edge_type: SUPPORTS
