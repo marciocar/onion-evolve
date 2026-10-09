@@ -4,13 +4,14 @@
 # matriz leitor x caso. Fica fora da fila de 2026-10-06 porque a fila está no teto.
 # Migrado ao contrato v3 no SAC-71 (2026-10-08): datas entre aspas e provenance nos nós confirmed.
 meta:
-  x_drive_checkpoint: sealed
+  x_drive_checkpoint: pending
+  x_drive_checkpoint_note: "lote 4 (O3 onda 1): planilha julgada aplicada em 264 nós de 37 grafos; 11 flips confirmed→unverifiable (E_R3_TST_CIENCIA_PREVIA_AFASTA_EXPECTATIVA, E_R3_TST_EMAIL_PESSOAL_VS_CORPORATIVO, E_R3_TST_MONITORAR_FORMA_E_CONTEUDO_EMAIL_CORPORATIVO, E_R3_TST_PROPORCIONALIDADE_PARCIMONIA_NA_ILICITUDE, E_LACUNAS_DECK_PATTERNS_0924, E_MERCADO_OCR_LOCAL_0908, E_LACUNAS_DECLARADAS_PODA_0903, E_LACUNAS_DECLARADAS_OCR_0908, E_LACUNAS_INFRA_VPS_1005, E_MD_PICO_APRESENTADO_COMO_REGUA, E_LAND_EXPAND) e 5 PROD→DEV (Q_RISCO_ACERVO_VIRA_CEMITERIO, Q_RISCO_CONCORRENTE_MAIS_RIGOROSO, Q_RISCO_PLATAFORMA_COME_O_GATE, D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION, Q_TENANT_WRITE_DESTINATION); 12 REPROVADOS intocados; PR para merge humano"
   id: contrato-kg-absorcao-2026-10
   schema_version: "1"
   baseline: "2026-10-08"
   review_after: "2026-11-07"   # 30d: programa de trabalho
-  # ═══ TETO: 17 NÓS ═══
-  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08); 15 em 2026-10-09 (+E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH); 16 em 2026-10-09 (+E_ONDA_O1_APLICADA: a onda O1 é colhida aqui, e a evidência dela pertence ao programa que a mede, não a um grafo novo); 17 em 2026-10-09 (+E_ONDA_O2_APLICADA: mesma razão da O1 — cada onda colhida é um nó de evidência do programa que a mede, e a O1 já está colhida). NO TETO: a O3 entra só colhendo a O2 ou fundindo O1 e O2 num nó.
+  # ═══ TETO: 18 NÓS ═══
+  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08); 15 em 2026-10-09 (+E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH); 16 em 2026-10-09 (+E_ONDA_O1_APLICADA: a onda O1 é colhida aqui, e a evidência dela pertence ao programa que a mede, não a um grafo novo); 17 em 2026-10-09 (+E_ONDA_O2_APLICADA: mesma razão da O1 — cada onda colhida é um nó de evidência do programa que a mede, e a O1 já está colhida). 18 em 2026-10-09 (+E_ONDA_O3_1_APLICADA: +1 justificado — a O3 é a 1ª onda com JUIZ independente e selo humano por nó, e a evidência dela carrega o que O1/O2 não têm: os flips de status e de plano nomeados, e os REPROVADOS que voltam; fundir com a O1 ou a O2 apagaria a fronteira entre derivação mecânica e aplicação julgada). NO TETO: a onda 2 da O3 entra só colhendo a onda 1 (fundindo-a no nó da onda 2).
 nodes:
   - id: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     node_type: evidence
@@ -251,6 +252,22 @@ nodes:
       source: ".claude/utils/kg/kg-migrate-v3.py, docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o3-universe.tsv e .kg-ssot/gate.json na branch feat/provenance-wave-o2"
       locator: "o relatório do kg-migrate-v3 --routing (provenance derivada, trace sem localizador, registro de comando), as colunas hint e bucket do o3-universe e a chave failing da base (114 grafos)"
       method: "medição: kg-migrate-v3 --routing, kg-radar, kg-contract-check, kg_gate e bancada com mutantes em 2026-10-09"
+  - id: E_ONDA_O3_1_APLICADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-09"
+    verified_against: "branch feat/provenance-wave-o3-1 sobre origin/main d9852a9e: kg-migrate-v3 --apply-judged o3-wave1-juiz.csv aplicado aos 37 grafos da planilha; --check rc 0 na 2ª passada; kg-radar --integrity --schema exit 0 nos 37 e no grafo do contrato; kg-contract-check sem código novo em nenhum (26 saíram do MUST de provenance); kg_gate.py com os --exclude do CI rc 0 e --update sem --accept-regression; bancada kg_migrate_v3 11/11 com LC_ALL=C e 6 mutantes reprovando o caso (j)"
+    label: "a onda 1 da O3 aplicou a planilha julgada em 264 nós de 37 grafos (248 provenances, 11 confirmed→unverifiable, 5 PROD→DEV); os 12 REPROVADOS ficaram intocados e a base do gate caiu de 114 para 91 grafos"
+    narrative: "Só as linhas APROVADO e CORRIGIDO de o3-wave1-juiz.csv foram aplicadas, por linha e sem regravar o YAML. Provenance: 223 corrigir e 25 testemunho, com os valores *_final do juiz (classes: leitura 132, juízes 53, medição 35, testemunho 25, derivado 3); 5 substituíram no lugar a provenance derivada da O2 (C_STALE, E_SELFTEST, E_FED_RADAR_BUILT, E_PERSONALITY_SYNC_BUILT, C_single_artifact_ethos). Flips confirmed→unverifiable (11): E_R3_TST_CIENCIA_PREVIA_AFASTA_EXPECTATIVA, E_R3_TST_EMAIL_PESSOAL_VS_CORPORATIVO, E_R3_TST_MONITORAR_FORMA_E_CONTEUDO_EMAIL_CORPORATIVO, E_R3_TST_PROPORCIONALIDADE_PARCIMONIA_NA_ILICITUDE, E_LACUNAS_DECK_PATTERNS_0924, E_MERCADO_OCR_LOCAL_0908, E_LACUNAS_DECLARADAS_PODA_0903, E_LACUNAS_DECLARADAS_OCR_0908, E_LACUNAS_INFRA_VPS_1005 (DEV) e E_MD_PICO_APRESENTADO_COMO_REGUA, E_LAND_EXPAND (PROD). PROD→DEV (5): Q_RISCO_ACERVO_VIRA_CEMITERIO, Q_RISCO_CONCORRENTE_MAIS_RIGOROSO, Q_RISCO_PLATAFORMA_COME_O_GATE, D_INDIVIDUAL_ORGANIZATION_SHARING_CRITERION (done, selo do maestro) e Q_TENANT_WRITE_DESTINATION (dev-dúvida, selo do maestro, aplicado à mão com o label corrigido e a narrative apontando E_KG_INBOX_ROTEIA_POR_PAPEL_0905). REPROVADOS intocados (12), voltam na onda de revisão: E_O_MANIFESTO_QUE_FALHA_COPIAVA_TUDO, E_WIRE_IN_LIVE, E_RESPAWN_JA_EXISTIA_E_A_CASA_NAO_SABIA, E_A_GUARDA_VETOU_O_PROPRIO_MAESTRO, C_V1, ENT_KB_CORE, C_ASYNC_REPO, E_W8_CONSOLE_AUTOOFF_VIVO, E_a2a_is_not_vaporware, E_PLANO_NASCEU_DE_TRES_MEDICOES, E_DOR_DOMINANTE_E_CONTEXTO_E_CUSTO, C_OBJECAO_ESTADO_PODE_NAO_BASTAR_EM_TIME_MINIMO. Nós confirmed ou PROD sem provenance no corpus do gate: 820 → 561. A dívida SHOULD do gate não mudou. Teto: a fonte de cada linha é do juiz (7 workers e um juiz-mestre da mesma família de modelo); a aplicação não re-verifica a fonte, só a forma do method."
+    trace: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o3-wave1-juiz.csv"
+    provenance:
+      source: ".claude/utils/kg/kg-migrate-v3.py, docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o3-wave1-juiz.csv e .kg-ssot/gate.json na branch feat/provenance-wave-o3-1"
+      locator: "o relatório do kg-migrate-v3 --apply-judged (provenance escrita, confirmed→unverifiable, PROD→DEV, REPROVADO intocado, selo do maestro) e a chave failing da base (91 grafos)"
+      method: "medição: kg-migrate-v3 --apply-judged, kg-radar, kg-contract-check, kg_gate e bancada com mutantes em 2026-10-09"
 edges:
   - from: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
@@ -301,5 +318,8 @@ edges:
     to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
     edge_type: SUPPORTS
   - from: E_ONDA_O2_APLICADA
+    to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
+    edge_type: SUPPORTS
+  - from: E_ONDA_O3_1_APLICADA
     to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
     edge_type: SUPPORTS
