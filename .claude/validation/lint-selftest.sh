@@ -24028,6 +24028,61 @@ assert "provenance" not in n["E_J_BADM"] and "provenance" not in n["E_J_FORA"]
      && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --apply-judged "${cj}" "${gj}" >/dev/null 2>&1; then
     record_pass "kg-migrate-v3: (j) onda O3 --apply-judged: corrigir/testemunho escrevem ou SUBSTITUEM no lugar a provenance (uma chave só); rebaixar vira só confirmed; dev-óbvio PROD→DEV; REPROVADO, dev-dúvida, method fora das classes e nó fora da planilha intocados e reportados; 2ª passada no-op"
   else record_fail "kg-migrate-v3: (j)" "onda O3 aplicou o reprovado, empilhou provenance, ou não é idempotente: rc=${rc} ${out} ${y}"; fi
+  # (k) ondas 2 e 3 da O3 (selos do maestro, 2026-10-09): corrigir-label troca o label e leva o ANTERIOR para a
+  #     narrative (cria a chave se faltar); label_final acima de 280 recusa a LINHA INTEIRA (nem a provenance
+  #     entra); refutar vira confirmed→refuted com o motivo na narrative, o grafo que o radar reprovava (REFUTES
+  #     entrando em nó confirmed) passa, e o relatório nomeia o confirmed apoiado no refutado; --promote-unverifiable
+  #     leva unverifiable→confirmed; dev-dúvida com fonte fica em PROD e ganha a provenance; 2ª passada no-op.
+  #     O risco vigiado: apagar a história do label, aceitar label longo, ou deixar o refutado contraditório.
+  local gk="${d}/docs/x/k.kg.yaml" ck="${d}/juiz-k.csv" long rk1 rk2
+  long="$(printf 'x%.0s' $(seq 1 281))"
+  {
+    printf 'meta:\n  id: k\n  schema_version: "1"\n  baseline: "2026-10-09"\nnodes:\n'
+    printf '  - id: E_K_LBL\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "label velho"\n    narrative: "contexto antigo"\n'
+    printf '  - id: E_K_NONARR\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "sem narrative"\n'
+    printf '  - id: E_K_LONG\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "fica"\n'
+    printf '  - id: E_K_REF\n    node_type: evidence\n    plane: PROD\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    verified_at: "2026-10-09"\n    label: "experimento que recuperou"\n'
+    printf '  - id: E_K_CONTRA\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "medição que contradiz"\n'
+    printf '  - id: C_K_SUP\n    node_type: claim\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    label: "claim apoiada no refutado"\n'
+    printf '  - id: E_K_UNV\n    node_type: evidence\n    plane: DEV\n    status: unverifiable\n    impact: 2\n    confidence: 0.8\n    label: "contradito"\n'
+    printf '  - id: D_K_DUV\n    node_type: decision\n    plane: PROD\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    verified_at: "2026-10-09"\n    label: "decisão em vigor"\n'
+    printf 'edges:\n  - from: E_K_CONTRA\n    to: E_K_REF\n    edge_type: REFUTES\n  - from: E_K_REF\n    to: C_K_SUP\n    edge_type: SUPPORTS\n'
+    for nid in E_K_LBL E_K_NONARR E_K_LONG E_K_UNV D_K_DUV; do printf '  - from: %s\n    to: C_K_SUP\n    edge_type: SUPPORTS\n' "${nid}"; done
+  } > "${gk}"
+  {
+    printf 'id,grafo,origem,proposta_original,veredito,proposta_final,source_final,locator_final,method_final,label_final,motivo,confianca\n'
+    printf 'E_K_LBL,docs/x/k.kg.yaml,onda3,corrigir-label,CORRIGIDO,corrigir-label,ops/a.sh,ops/a.sh l.1,leitura: ops/a.sh,label novo,ok,0.9\n'
+    printf 'E_K_NONARR,docs/x/k.kg.yaml,onda3,corrigir-label,APROVADO,corrigir-label,ops/a.sh,ops/a.sh l.2,leitura: ops/a.sh,label curto,ok,0.9\n'
+    printf 'E_K_LONG,docs/x/k.kg.yaml,onda3,corrigir-label,CORRIGIDO,corrigir-label,ops/a.sh,ops/a.sh l.3,leitura: ops/a.sh,%s,longo,0.9\n' "${long}"
+    printf 'E_K_REF,docs/x/k.kg.yaml,onda2,refutar,CORRIGIDO,refutar,https://ex.org/run/1,run 1 is_error true,medição: gh run view 1 --log,,o run mostra is_error,0.9\n'
+    printf 'E_K_UNV,docs/x/k.kg.yaml,revisão-onda1,corrigir-label,CORRIGIDO,corrigir-label,ops/b.sh,ops/b.sh l.1,leitura: ops/b.sh,label corrigido do unverifiable,ok,0.9\n'
+    printf 'D_K_DUV,docs/x/k.kg.yaml,onda3,dev-óbvio,CORRIGIDO,dev-dúvida,commit abc,corpo do commit abc,leitura: corpo do commit abc,,em vigor,0.6\n'
+  } > "${ck}"
+  if bash "${SCRIPT_DIR}/kg-radar.sh" "${gk}" --integrity >/dev/null 2>&1; then rk1=0; else rk1=$?; fi
+  if out="$(LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --promote-unverifiable --apply-judged "${ck}" "${gk}" 2>&1)"; then rc=0; else rc=$?; fi
+  if bash "${SCRIPT_DIR}/kg-radar.sh" "${gk}" --integrity >/dev/null 2>&1; then rk2=0; else rk2=$?; fi
+  y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${gk}" 2>&1)" || true
+  h1="$(sha256sum "${gk}" | cut -d' ' -f1)"
+  LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --promote-unverifiable --apply-judged "${ck}" "${gk}" >/dev/null 2>&1 || true
+  h2="$(sha256sum "${gk}" | cut -d' ' -f1)"
+  if [ "${rc}" -eq 0 ] && [ "${rk1}" -ne 0 ] && [ "${rk2}" -eq 0 ] && [ "${h1}" = "${h2}" ] \
+     && python3 -I -B -c '
+import json,sys
+n={x["id"]:x for x in json.loads(sys.argv[1])["nodes"]}
+assert n["E_K_LBL"]["label"]=="label novo" and n["E_K_LBL"]["narrative"]=="contexto antigo · label anterior: label velho", n["E_K_LBL"]
+assert n["E_K_LBL"]["provenance"]["locator"]=="ops/a.sh l.1"
+assert n["E_K_NONARR"]["label"]=="label curto" and n["E_K_NONARR"]["narrative"]=="label anterior: sem narrative"
+assert n["E_K_LONG"]["label"]=="fica" and "provenance" not in n["E_K_LONG"] and "narrative" not in n["E_K_LONG"]
+assert n["E_K_REF"]["status"]=="refuted" and "o run mostra is_error" in n["E_K_REF"]["narrative"] and n["E_K_REF"]["provenance"]["method"].startswith("medição: ")
+assert n["E_K_UNV"]["status"]=="confirmed" and n["E_K_UNV"]["label"]=="label corrigido do unverifiable"
+assert n["D_K_DUV"]["plane"]=="PROD" and n["D_K_DUV"]["provenance"]["source"]=="commit abc"
+' "${y}" 2>/dev/null \
+     && grep -q 'RECUSADO.*E_K_LONG (label_final com 281 caracteres > 280)' <<< "${out}" \
+     && grep -q 'RECONCILIAÇÃO DO REFUTADO.*E_K_REF SUPPORTS C_K_SUP (confirmed) ← CONFIRMED APOIADO EM REFUTADO' <<< "${out}" \
+     && grep -q 'unverifiable→confirmed (selo do maestro): E_K_UNV' <<< "${out}" \
+     && LC_ALL=C PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --check --promote-unverifiable --apply-judged "${ck}" "${gk}" >/dev/null 2>&1; then
+    record_pass "kg-migrate-v3: (k) ondas 2-3 da O3: corrigir-label leva o label anterior à narrative; label > 280 recusa a linha inteira; refutar reconcilia (radar reprovava, passa) e nomeia o confirmed apoiado no refutado; --promote-unverifiable; dev-dúvida fica em PROD com fonte; 2ª passada no-op"
+  else record_fail "kg-migrate-v3: (k)" "ondas 2-3 apagaram a história do label, aceitaram label longo, não reconciliaram o refutado ou não são idempotentes: rc=${rc} radar antes=${rk1} depois=${rk2} idem=$([ "${h1}" = "${h2}" ] && echo sim || echo NÃO) ${out} ${y}"; fi
   rm -rf "${d}"
 }
 _family run_kg_migrate_v3_selftests

@@ -35,15 +35,27 @@ O que ela FAZ (determinístico, idempotente, edição por linha — o radar é a
       rebaixar             → `status: confirmed` vira `status: unverifiable` (o v4 isenta de provenance);
       dev-óbvio            → `plane: PROD` vira `plane: DEV`; se o nó for confirmed sem provenance e a linha
                              trouxer fonte, a fonte também é escrita.
-    Qualquer outra proposta (ex.: dev-dúvida) é decisão do maestro: intocada e reportada. Recusa (intocado e
-    reportado): method fora das classes do contrato, source/locator vazios, nó ausente do grafo, rebaixar sobre
-    status que não é confirmed. Edição por linha; a 2ª aplicação é no-op. Datas não são citadas neste modo.
+    Ondas 2 e 3 da O3 (selos do maestro, 2026-10-09) acrescentam:
+      corrigir-label       → troca o `label` pelo `label_final` (≤280, senão a LINHA INTEIRA é recusada) e leva o
+                             label antigo para a `narrative` como "label anterior: …" (a história não se apaga);
+                             também escreve a provenance;
+      refutar              → `status: confirmed` vira `refuted`, o `motivo` do juiz entra na `narrative` como
+                             evidência, a provenance é escrita, e o relatório lista as arestas que tocam o nó
+                             (SUPPORTS saindo, REFUTES saindo, DEPENDS_ON entrando) para a reconciliação;
+      dev-dúvida           → fica em PROD: com fonte do juiz, escreve a provenance; sem fonte, intocado e listado;
+      --promote-unverifiable → nó `unverifiable` com corrigir/corrigir-label/testemunho e fonte julgada volta a
+                             `confirmed` (a classe "fonte contradiz o label" que a onda 1 rebaixou). Sem a flag,
+                             a provenance é escrita, o status fica, e o nó sai no relatório.
+    Qualquer outra proposta é decisão do maestro: intocada e reportada. Recusa (intocado e reportado, e atômica:
+    nada da linha é aplicado): method fora das classes do contrato, source/locator vazios, label_final vazio ou
+    acima de 280, refutar sobre status que não é confirmed, nó ausente do grafo, rebaixar sobre status que não é
+    confirmed. Edição por linha; a 2ª aplicação é no-op. Datas não são citadas neste modo.
 O que ela NÃO faz (é decisão humana ou do contrato, nunca da ferramenta):
   · nó sem fonte derivável NÃO recebe provenance inventada: sai no relatório como "sem fonte recuperável"
     (a gramática diz: sem fonte verificável, o nó não é confirmed — rebaixar é decisão de quem conhece o nó);
   · label acima de 280 NÃO é cortado: separar fato e narrativa é semântico; sai no relatório.
 
-Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv> | --apply-judged <juiz.csv>] <arquivo.kg.yaml>...
+Uso:   kg-migrate-v3.py [--check] [--routing <routing.tsv> | --apply-judged <juiz.csv> [--promote-unverifiable]] <arquivo.kg.yaml>...
 rc:    0 = nada pendente (ou aplicado) · 1 = --check e há mudança pendente · 2 = entrada quebrada
        (arquivo ausente, routing ilegível ou sem as colunas, YAML inválido antes ou DEPOIS da edição — a edição
        nunca grava YAML inválido).
@@ -323,11 +335,38 @@ def _put_provenance(block, src, loc, method):
     return block + new, True
 
 
-def apply_judged(text, judged):
-    """judged={id: linha da planilha}: aplica só APROVADO/CORRIGIDO, por linha. Devolve (texto, relatório)."""
+def _get_scalar(block, key):
+    """(índice da linha, valor) de `    <key>: <escalar>` no bloco; (None, None) se ausente; valor None se for bloco > |."""
+    for n, b in enumerate(block[1:], 1):
+        fm = FIELD_RE.match(b)
+        if fm and fm.group(1) == key:
+            return n, scalar(fm.group(2))
+    return None, None
+
+
+def _append_narrative(block, text):
+    """Acrescenta `text` à narrative (escalar de uma linha) ou cria a chave logo após o label. (bloco, mudou?)."""
+    n, cur = _get_scalar(block, "narrative")
+    if n is not None and cur is None:
+        return block, None  # narrative em bloco > |: não reescrevo por linha
+    if n is not None:
+        if text in cur:
+            return block, False
+        return block[:n] + ["    narrative: " + q((cur.rstrip() + " · " if cur.strip() else "") + text)] + block[n + 1:], True
+    li, _ = _get_scalar(block, "label")
+    at = (li + 1) if li is not None else len(block)
+    return block[:at] + ["    narrative: " + q(text)] + block[at:], True
+
+
+def apply_judged(text, judged, promote=False, wave=""):
+    """judged={id: linha da planilha}: aplica só APROVADO/CORRIGIDO, por linha. Devolve (texto, relatório).
+    promote=True é o selo do maestro que leva `unverifiable` a `confirmed` quando o juiz deu fonte (onda 3 da O3).
+    A linha recusada é atômica: nada dela é aplicado (nem a provenance de um corrigir-label com label longo)."""
     lines = text.split("\n")
-    rep = {"prov": [], "demote": [], "plane": [], "same": [], "rejected": [], "sealed": [], "refused": [], "missing": []}
+    rep = {"prov": [], "demote": [], "plane": [], "same": [], "rejected": [], "sealed": [], "refused": [], "missing": [],
+           "relabel": [], "refute": [], "promote": [], "unpromoted": [], "doubt": []}
     seen, out, in_nodes, i = set(), [], False, 0
+    tag = f"onda {wave} da O3" if wave else "O3"
     while i < len(lines):
         ln = lines[i]
         if re.match(r'^nodes:\s*(#.*)?$', ln):
@@ -346,52 +385,117 @@ def apply_judged(text, judged):
         while end > i + 1 and (not lines[end - 1].strip() or lines[end - 1].lstrip().startswith("#")):
             end -= 1
         block, r = lines[i:end], judged[nid]
+        orig = list(block)
         fields = {fm.group(1): fm.group(2) for fm in (FIELD_RE.match(b) for b in block[1:]) if fm}
         status = scalar(fields.get("status", ""))
         act, verdict = r["proposta_final"].strip(), r["veredito"].strip()
         src, loc, method = r["source_final"].strip(), r["locator_final"].strip(), r["method_final"].strip()
+        new_label = (r.get("label_final") or "").strip()
         has_src = bool(src and loc and method)
         good_method = bool(re.match(r'^(' + "|".join(METHOD_CLASSES) + r'): \S', method))
-        changed = False
+        refused = None
         if verdict not in JUDGED_OK:
             rep["rejected"].append(f"{nid} ({verdict})")
-        elif act in PROV_ACTIONS:
-            if not has_src:
-                rep["refused"].append(f"{nid} (source/locator/method vazio)")
+        elif act in PROV_ACTIONS + ("corrigir-label", "refutar", "dev-dúvida"):
+            if act == "dev-dúvida" and not has_src:
+                rep["sealed"].append(f"{nid} ({act})")  # sem fonte: fica em PROD, intocado
+            elif not has_src:
+                refused = "source/locator/method vazio"
             elif not good_method:
-                rep["refused"].append(f"{nid} (method fora das classes do contrato)")
+                refused = "method fora das classes do contrato"
+            elif act == "corrigir-label" and not new_label:
+                refused = "corrigir-label sem label_final"
+            elif act == "corrigir-label" and len(new_label) > LABEL_MAX:
+                refused = f"label_final com {len(new_label)} caracteres > {LABEL_MAX}"
+            elif act == "refutar" and status not in ("confirmed", "refuted"):
+                refused = f"refutar sobre status {status}"
             else:
-                block, changed = _put_provenance(block, src, loc, method)
-                if changed is None:
-                    rep["refused"].append(f"{nid} (provenance em forma de fluxo)"); changed = False
-                elif changed:
-                    rep["prov"].append(nid)
+                if act == "corrigir-label":
+                    li, old_label = _get_scalar(block, "label")
+                    if li is None or old_label is None:
+                        refused = "label ausente ou em bloco > |"
+                    elif old_label != new_label:
+                        block = block[:li] + ["    label: " + q(new_label)] + block[li + 1:]
+                        block, c = _append_narrative(block, "label anterior: " + old_label)
+                        if c is None:
+                            refused = "narrative em bloco > |"
+                        else:
+                            rep["relabel"].append(nid)
+                if refused is None and act == "refutar" and status == "confirmed":
+                    block, c, _ = _set_field(block, "status", "confirmed", "refuted")
+                    if c:
+                        block, c2 = _append_narrative(block, f"refutado na {tag} (2026-10-09): {r.get('motivo', '').strip()}")
+                        if c2 is None:
+                            refused = "narrative em bloco > |"
+                        else:
+                            rep["refute"].append(nid)
+                if refused is None and status == "unverifiable" and act in ("corrigir", "corrigir-label", "testemunho"):
+                    if promote:
+                        block, c, _ = _set_field(block, "status", "unverifiable", "confirmed")
+                        if c:
+                            rep["promote"].append(nid)
+                    else:
+                        rep["unpromoted"].append(nid)
+                if refused is None:
+                    block, c = _put_provenance(block, src, loc, method)
+                    if c is None:
+                        refused = "provenance em forma de fluxo"
+                    elif c:
+                        rep["prov"].append(nid)
+                        if act == "dev-dúvida":
+                            rep["doubt"].append(nid)
         elif act == "rebaixar":
             block, changed, cur = _set_field(block, "status", "confirmed", "unverifiable")
             if changed:
                 rep["demote"].append(nid)
             elif cur != "unverifiable":
-                rep["refused"].append(f"{nid} (rebaixar sobre status {cur})")
+                refused = f"rebaixar sobre status {cur}"
         elif act == "dev-óbvio":
             block, changed, cur = _set_field(block, "plane", "PROD", "DEV")
             if changed:
                 rep["plane"].append(nid)
             elif cur != "DEV":
-                rep["refused"].append(f"{nid} (dev-óbvio sobre plane {cur})")
-            if status == "confirmed" and "provenance" not in fields and has_src and good_method:
+                refused = f"dev-óbvio sobre plane {cur}"
+            if refused is None and status == "confirmed" and "provenance" not in fields and has_src and good_method:
                 block, c2 = _put_provenance(block, src, loc, method)
                 if c2:
-                    rep["prov"].append(nid); changed = True
+                    rep["prov"].append(nid)
         else:
             rep["sealed"].append(f"{nid} ({act})")
-        if not changed and verdict in JUDGED_OK and act in PROV_ACTIONS + ("rebaixar", "dev-óbvio") \
-                and not any(x.startswith(nid + " ") for x in rep["refused"]):
+        if refused is not None:
+            block = orig  # recusa é atômica: nada da linha é aplicado
+            rep["refused"].append(f"{nid} ({refused})")
+        elif block == orig and verdict in JUDGED_OK and (
+                act in PROV_ACTIONS + ("rebaixar", "dev-óbvio", "corrigir-label", "refutar")
+                or (act == "dev-dúvida" and has_src)):
             rep["same"].append(nid)
         out.extend(block)
         out.extend(lines[end:j])
         i = j
     rep["missing"] = sorted(set(judged) - seen)
     return "\n".join(out), rep
+
+
+def refuted_dependents(text, ids):
+    """Para cada nó refutado agora: quem ainda se apoia nele (SUPPORTS saindo dele, DEPENDS_ON entrando nele) e
+    quem ele REFUTA. É o relatório da reconciliação: a gramática cobra o status do alvo de REFUTES
+    (.claude/rules/kg-grammar.md), e o radar reprova a contradição; o resto é decisão de quem conhece o grafo."""
+    if not ids:
+        return []
+    g = yaml.safe_load(text) or {}
+    st = {n.get("id"): n.get("status") for n in g.get("nodes") or [] if isinstance(n, dict)}
+    out = []
+    for e in g.get("edges") or []:
+        if not isinstance(e, dict):
+            continue
+        f, t, k = e.get("from"), e.get("to"), e.get("edge_type")
+        if f in ids and k == "SUPPORTS":
+            out.append(f"{f} SUPPORTS {t} ({st.get(t)})" + (" ← CONFIRMED APOIADO EM REFUTADO" if st.get(t) == "confirmed" else ""))
+        elif f in ids and k == "REFUTES":
+            out.append(f"{f} REFUTES {t} ({st.get(t)})")
+        elif t in ids and k == "DEPENDS_ON":
+            out.append(f"{f} ({st.get(f)}) DEPENDS_ON {t}")
+    return out
 
 
 def main(argv):
@@ -408,8 +512,12 @@ def main(argv):
             judged = load_judged(argv[k + 1])
         except BrokenInput as e:
             print(f"kg-migrate-v3: {e}", file=sys.stderr); return 2
+        m = re.search(r'wave(\d+)', os.path.basename(argv[k + 1]))
+        wave = m.group(1) if m else ""
         argv = argv[:k] + argv[k + 2:]
-        return main_judged(argv, judged, check)
+        promote = "--promote-unverifiable" in argv
+        argv = [a for a in argv if a != "--promote-unverifiable"]
+        return main_judged(argv, judged, check, promote, wave)
     routing = None
     if "--routing" in argv:
         k = argv.index("--routing")
@@ -469,7 +577,7 @@ def main(argv):
     return 1 if (check and pending) else 0
 
 
-def main_judged(files, judged, check):
+def main_judged(files, judged, check, promote=False, wave=""):
     """O laço do --apply-judged: um grafo por vez, YAML conferido antes e depois, nada gravado em --check."""
     if not files:
         print(__doc__.strip().split("\n\n")[-1], file=sys.stderr); return 2
@@ -483,7 +591,8 @@ def main_judged(files, judged, check):
         except yaml.YAMLError as e:
             print(f"kg-migrate-v3: {f} não é YAML válido antes da migração ({e.__class__.__name__}) — não toco", file=sys.stderr); return 2
         _, rows = routes_for(judged, f)
-        new, rep = apply_judged(text, rows)
+        new, rep = apply_judged(text, rows, promote, wave)
+        deps = refuted_dependents(new, set(rep["refute"]))
         try:
             yaml.safe_load(new)
         except yaml.YAMLError as e:
@@ -491,16 +600,25 @@ def main_judged(files, judged, check):
         changed = new != text
         verb = ("PENDENTE" if check else "aplicado") if changed else "nada a aplicar"
         print(f"{f}: {verb} · linhas julgadas {len(rows)} · provenance escrita {len(rep['prov'])}"
+              f" · label corrigido {len(rep['relabel'])} · confirmed→refuted {len(rep['refute'])}"
+              f" · unverifiable→confirmed {len(rep['promote'])}"
               f" · confirmed→unverifiable {len(rep['demote'])} · PROD→DEV {len(rep['plane'])}"
               f" · já aplicado {len(rep['same'])} · REPROVADO (intocado) {len(rep['rejected'])}"
               f" · selo do maestro (intocado) {len(rep['sealed'])} · recusado {len(rep['refused'])}"
               f" · ausente do grafo {len(rep['missing'])}")
-        for k, title in (("prov", "provenance escrita"), ("demote", "confirmed→unverifiable"), ("plane", "PROD→DEV"),
+        for k, title in (("prov", "provenance escrita"), ("relabel", "label corrigido (o anterior foi para a narrative)"),
+                         ("refute", "confirmed→refuted (evidência na narrative)"),
+                         ("promote", "unverifiable→confirmed (selo do maestro)"),
+                         ("unpromoted", "UNVERIFIABLE COM FONTE JULGADA (fica unverifiable sem --promote-unverifiable)"),
+                         ("doubt", "dev-dúvida: fica em PROD com a fonte do juiz"),
+                         ("demote", "confirmed→unverifiable"), ("plane", "PROD→DEV"),
                          ("rejected", "REPROVADO pelo juiz (intocado: onda de revisão)"),
                          ("sealed", "PROPOSTA QUE É SELO DO MAESTRO (intocado)"),
                          ("refused", "RECUSADO (intocado)"), ("missing", "AUSENTE DO GRAFO")):
             if rep[k]:
                 print(f"  {title}: " + ", ".join(rep[k]))
+        if deps:
+            print("  RECONCILIAÇÃO DO REFUTADO (arestas que tocam o nó refutado): " + " · ".join(deps))
         if changed:
             pending = True
             if not check:
