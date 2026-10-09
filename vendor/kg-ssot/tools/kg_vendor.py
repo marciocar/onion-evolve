@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """O vendor do KG-SSOT por pin (E6, EPIC_6_CORE_GRADUATION): o adotante traz a release por TAG, nunca à mão.
 
-  update --tag T [--dest DIR] [--source REPO] [--force]
+  update --tag T [--dest DIR] [--source REPO] [--force] [--profile P]
       Lê da TAG (git archive, nunca a árvore de trabalho) os arquivos que o spec/release.json DESSA tag lista,
       e substitui DIR inteiro (arquivo que saiu da release some). Grava o carimbo DIR/.kg-ssot-version: tag,
       commit, versão, contrato e o sha256 de cada arquivo. Não commita: quem commita é o adotante.
@@ -9,6 +9,10 @@
       editado só é substituído com --force, para a edição local não sumir em silêncio.
       --source é o repo git (caminho ou URL) que tem a tag; o default é o repo deste script, e só vale quando
       ele é a raiz de um clone do KG-SSOT (dentro de um vendor, passe --source).
+      --profile P traz só o perfil P do release.json da tag (Q_RELEASE_MINIMAL_GATE_PROFILE): `gate` é o mínimo para
+      rodar o gate e o check (contrato, leitor, gate, vendor, requirements, guia e licença), sem a suíte. O carimbo
+      registra o perfil, o check confere só o que ele trouxe, e o update seguinte HERDA o perfil do carimbo;
+      --profile full volta à release inteira.
   check [--dest DIR]
       Recalcula os sha256 e compara com o carimbo: arquivo editado, faltando ou sobrando (inclusive bytecode em
       __pycache__ e symlink) → rc 1. O contrato não se customiza no adotante; uma mudança necessária volta como
@@ -42,6 +46,7 @@ import tempfile
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 STAMP = ".kg-ssot-version"
 RELEASE = "spec/release.json"
+VENDOR = "tools/kg_vendor.py"  # se a release o leva, todo perfil leva: sem ele não há check nem update
 DEFAULT_DEST = "vendor/kg-ssot"
 HEX64 = re.compile(r"^[0-9a-f]{64}$")
 
@@ -86,7 +91,30 @@ def read_release(text, where):
     contract = release.get("contract")
     if not isinstance(contract, dict) or not all(isinstance(contract.get(k), str) for k in ("must", "should")):
         raise Broken(f"{RELEASE} em {where}: contract tem de ter must e should")
+    profiles = release.get("profiles", {})
+    if not isinstance(profiles, dict) or not all(
+            isinstance(k, str) and isinstance(v, list) and v and all(isinstance(e, str) and e for e in v)
+            for k, v in profiles.items()):
+        raise Broken(f"{RELEASE} em {where}: profiles tem de mapear nome → lista não vazia de caminhos")
     return release
+
+
+def profile_files(release, full, listed, profile):
+    """Os arquivos de um perfil: as entradas dele, que têm de estar dentro da release e levar o release.json e o
+    contrato (sem eles o carimbo e o leitor não funcionam)."""
+    if profile not in release.get("profiles", {}):
+        raise Broken(f"a release {release.get('tag')!r} não tem o perfil {profile!r} "
+                     f"(perfis: {', '.join(sorted(release.get('profiles', {}))) or 'nenhum'})")
+    files = release_files(listed, release["profiles"][profile])
+    outside = sorted(set(files) - set(full))
+    if outside:
+        raise Broken(f"o perfil {profile!r} leva o que a release não leva: {', '.join(outside[:5])}")
+    # sem o release.json e o contrato o carimbo e o leitor não funcionam; sem o próprio vendor, o check e o update não rodam
+    need = [RELEASE, *release["contract"].values()] + ([VENDOR] if VENDOR in full else [])
+    missing = [f for f in need if f not in files]
+    if missing:
+        raise Broken(f"o perfil {profile!r} não leva {', '.join(missing)}")
+    return files
 
 
 def read_stamp(dest):
@@ -115,8 +143,25 @@ def default_source():
     return str(ROOT)
 
 
-def update(dest, tag, source, force=False):
+FULL = "full"
+
+
+def update(dest, tag, source, force=False, profile=None):
+    """profile None herda o perfil do carimbo que já existe (um update não tira o adotante do perfil em silêncio);
+    'full' traz a release inteira."""
     dest = pathlib.Path(dest)
+    if profile is not None and not profile.strip():
+        raise Broken("--profile vazio: diga o perfil, ou full para a release inteira")
+    if profile is None and (dest / STAMP).is_file():
+        try:
+            inherited = json.loads((dest / STAMP).read_text(encoding="utf-8")).get("profile")
+        except (OSError, json.JSONDecodeError, AttributeError):
+            inherited = None
+        if isinstance(inherited, str) and inherited:
+            profile = inherited
+            print(f"perfil {profile} herdado do carimbo (--profile {FULL} traz a release inteira)")
+    if profile == FULL:
+        profile = None
     if dest.exists():
         if not (dest / STAMP).is_file():
             raise Broken(f"{dest} existe e não tem o carimbo {STAMP}: não substituo um diretório que não é vendor")
@@ -148,7 +193,10 @@ def update(dest, tag, source, force=False):
         release = read_release(git(repo, "show", f"{commit}:{RELEASE}"), tag)
         if release.get("tag") != tag:
             raise Broken(f"o {RELEASE} da tag {tag} declara a tag {release.get('tag')!r}: release mal rotulada")
-        files = release_files(git(repo, "ls-tree", "-r", "--name-only", commit).splitlines(), release["files"])
+        listed = git(repo, "ls-tree", "-r", "--name-only", commit).splitlines()
+        files = release_files(listed, release["files"])
+        if profile:
+            files = profile_files(release, files, listed, profile)
         tar = tarfile.open(fileobj=io.BytesIO(git(repo, "archive", "--format=tar", commit, "--", *files, binary=True)))
         staged = pathlib.Path(tmp) / "staged"
         staged.mkdir()
@@ -171,6 +219,8 @@ def update(dest, tag, source, force=False):
         stamp = {"product": "kg-ssot", "tag": tag, "commit": commit, "version": release.get("version"),
                  "contract": release["contract"], "vendored_at": datetime.date.today().isoformat(),
                  "files": dict(sorted(hashes.items()))}
+        if profile:
+            stamp["profile"] = profile
         (staged / STAMP).write_text(json.dumps(stamp, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
         # troca por rename no mesmo diretório: o vendor nunca fica pela metade
         old = pathlib.Path(tmp) / "old"
@@ -182,7 +232,8 @@ def update(dest, tag, source, force=False):
             if old.exists():
                 old.rename(dest)  # devolve o vendor anterior
             raise
-    print(f"vendor atualizado: {dest} ← {tag} ({commit[:12]}), {len(hashes)} arquivos")
+    print(f"vendor atualizado: {dest} ← {tag} ({commit[:12]}), {len(hashes)} arquivos"
+          + (f", perfil {profile}" if profile else ""))
     return 0
 
 
@@ -218,12 +269,13 @@ def main(argv=None):
     up.add_argument("--dest", default=DEFAULT_DEST)
     up.add_argument("--source", help="repo git (caminho ou URL) que tem a tag (default: o clone deste script)")
     up.add_argument("--force", action="store_true", help="substitui um vendor que diverge do carimbo")
+    up.add_argument("--profile", help="traz só um perfil da release (ex.: gate, sem a suíte)")
     ck = sub.add_parser("check", help="confere o destino contra o carimbo")
     ck.add_argument("--dest", default=DEFAULT_DEST)
     args = ap.parse_args(argv)
     try:
         if args.cmd == "update":
-            return update(args.dest, args.tag, args.source, args.force)
+            return update(args.dest, args.tag, args.source, args.force, args.profile)
         return check(args.dest)
     except (Broken, OSError, tarfile.TarError) as exc:
         print(f"VENDOR QUEBRADO  {exc}")

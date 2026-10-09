@@ -92,6 +92,9 @@ Os três `integrity.*` cruzam campos ou arestas, por isso o leitor os computa fo
 | `integrity.testimony-in-prod` | nó PROD cuja base é testemunho (`evidence_class: testimony` ou `method` da classe `testemunho`) |
 | `integrity.verified-before-fact` | `verified_at` anterior a `valid_from`, comparados na granularidade do mais curto (`AAAA`, `AAAA-MM`, `AAAA-MM-DD`); data fora dessa forma não é comparada |
 | `integrity.untraced-decision` | `decision` que não é `superseded` nem `refuted` sem `trace`, sem `provenance` e sem aresta `TRACES_TO` saindo dela |
+
+O v4.2 acrescenta `provenance.locality`, opcional, com o enum `repo`, `web`, `host` ou `pessoa`. O valor fora do enum
+alerta como `form.enum.node.provenance.locality` (`latest/form/provenance-locality/`), e nenhum veredito muda.
 O mesmo código pode aparecer como MUST num caso e como SHOULD em outro, porque a severidade é do
 caso, não do código.
 
@@ -114,7 +117,7 @@ duas). Dentro de cada pasta, o grupo é livre; por convenção, `latest/<camada>
 aceitar o que o grupo exige (ex.: `trigger` em `integrity-trigger`). O PR da promoção esvazia
 `pending_on` e cita o nó selado. Nada antecipa decisão aberta.
 
-**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 201 casos contra o v4.1. Os grupos do
+**O placar de hoje.** O leitor de referência passa em 100% de `latest/`: 207 casos contra o v4.2. Os grupos do
 rascunho do v4 saíram de `proposals/` para `latest/form/` (`provenance-required`, `placeholder-source`,
 `unknown-key`, `method-vocabulary`, `should-remains`), e os casos herdados do v3 que o v4 muda de veredito
 viraram `bad-*`. Todo caso usa `method` canônico (`medição: caso de conformidade`), para que o aviso de

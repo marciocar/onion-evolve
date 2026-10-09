@@ -20,6 +20,7 @@ da suíte, os de codes() e warnings() (parse.*, form.*, integrity.*, yaml.*), co
 Sem --schema, o contrato é o vigente (CONTRACT_MUST) e os avisos são do SHOULD dele (CONTRACT_SHOULD). Com
 --schema S, o SHOULD é --should-schema, ou o vizinho S.should.schema.json quando existe, ou nenhum.
 
+--where acrescenta, por arquivo, uma linha por ocorrência com o nó ou a aresta (where()); a saída padrão não muda.
 --spike troca a saída humana e o rc pelos do spike (check() e classify(), perfil Yaml12BoolLoader), para
 reproduzir a medição do spike. --json OUT grava SEMPRE o formato do spike ({summary, results}),
 congelado, para as medições gravadas seguirem reproduzíveis.
@@ -253,39 +254,65 @@ def classify(error):
     return [f"{scope}.{field}:{v}"]
 
 
-def _items(doc, key):
-    """A lista de mapas sob a chave; escalar, mapa ou nulo no lugar da lista vira lista vazia."""
+def item_place(key, index, item):
+    """O lugar legível de um item: o nó pelo id (ou pela posição, contando de 1), a aresta pela posição e pelas pontas."""
+    if key == "nodes":
+        nid = item.get("id") if isinstance(item, dict) else None
+        return f"nó {nid}" if isinstance(nid, str) and nid else f"nó #{index + 1}"
+    if isinstance(item, dict):
+        return f"aresta #{index + 1} ({item.get('from')} -> {item.get('to')})"
+    return f"aresta #{index + 1}"
+
+
+def _located(doc, key):
+    """Os mapas sob a chave com o lugar de cada um; a posição conta a lista inteira, como o autor a vê."""
     raw = doc.get(key)
-    return [x for x in raw if isinstance(x, dict)] if isinstance(raw, list) else []
+    return [(x, item_place(key, i, x)) for i, x in enumerate(raw) if isinstance(x, dict)] if isinstance(raw, list) else []
 
 
-def integrity(doc, refs=("on",)):
-    """refs: as chaves de aresta que também são referência a nó. O spike usa só on (o legado que o
-    radar lia); o contrato v1 usa trigger, e on segue como referência para não acusar o evento duas vezes."""
+def integrity_located(doc, refs=("on",)):
+    """Os códigos de integridade com o lugar de cada ocorrência: lista de (código, lugar)."""
     out = []
-    nodes = _items(doc, "nodes")
+    nodes = _located(doc, "nodes")
     # Só ids presentes entram no conjunto: um sentinela como str(None) casaria com um nó de id "None".
-    ids = collections.Counter(str(n["id"]) for n in nodes if n.get("id") is not None)
-    out += ["integrity.duplicate-id"] * sum(c - 1 for c in ids.values() if c > 1)
+    ids = collections.Counter(str(n["id"]) for n, _ in nodes if n.get("id") is not None)
+    seen = collections.Counter()
+    raw = doc.get("nodes") if isinstance(doc.get("nodes"), list) else []
+    for n, place in nodes:
+        if n.get("id") is not None:
+            seen[str(n["id"])] += 1
+            if seen[str(n["id"])] > 1:  # qual das repetições: a posição, contando de 1
+                pos = next(i for i, x in enumerate(raw) if x is n) + 1
+                out.append(("integrity.duplicate-id", f"{place} (#{pos})"))
     touched = set()
-    for e in _items(doc, "edges"):
+    for e, place in _located(doc, "edges"):
         for end in ("from", "to"):
             ref = e.get(end)
             if ref is None or str(ref) not in ids:
-                out.append(f"integrity.dangling-{end}")
+                out.append((f"integrity.dangling-{end}", place))
             else:
                 touched.add(str(ref))
         for key in refs:  # o gatilho de TRANSITIONS é referência ao evento
             if key in e:
                 if e[key] is None or str(e[key]) not in ids:
-                    out.append(f"integrity.dangling-{key}")
+                    out.append((f"integrity.dangling-{key}", place))
                 else:
                     touched.add(str(e[key]))
     # Nó de grau 0 o radar reprova (achado do próprio spike: o leitor neutro não checava). Nó sem id
     # não pode ser ponta de aresta, então também tem grau 0.
-    out += ["integrity.orphan-node"] * sum(1 for i in ids if i not in touched)
-    out += ["integrity.orphan-node"] * sum(1 for n in nodes if n.get("id") is None)
+    first = {}
+    for n, place in nodes:
+        if n.get("id") is not None:
+            first.setdefault(str(n["id"]), place)
+    out += [("integrity.orphan-node", first[i]) for i in ids if i not in touched]
+    out += [("integrity.orphan-node", place) for n, place in nodes if n.get("id") is None]
     return out
+
+
+def integrity(doc, refs=("on",)):
+    """refs: as chaves de aresta que também são referência a nó. O spike usa só on (o legado que o
+    radar lia); o contrato v1 usa trigger, e on segue como referência para não acusar o evento duas vezes."""
+    return [code for code, _ in integrity_located(doc, refs)]
 
 
 def check(text, validator):
@@ -417,7 +444,7 @@ ISO_PREFIX = re.compile(r"^[0-9]{4}(-[0-9]{2}(-[0-9]{2})?)?$")
 TESTIMONY_METHOD = re.compile(r"^testemunho: ")
 
 
-def coherence_warnings(doc):
+def coherence_located(doc):
     """Os avisos SHOULD que o schema não exprime, porque cruzam campos ou arestas (Q_RADAR_WARNINGS_WITHOUT_CASES):
 
     - integrity.testimony-in-prod: nó PROD cuja base é testemunho (evidence_class: testimony ou method da classe
@@ -428,29 +455,33 @@ def coherence_warnings(doc):
       provenance, nem aresta TRACES_TO saindo dela.
     Um campo de tipo errado (from ou id em lista ou mapa) já reprova no MUST: aqui ele é ignorado, nunca quebra.
     """
-    out = collections.Counter()
-    nodes = [n for n in doc.get("nodes") or [] if isinstance(n, dict)] if isinstance(doc.get("nodes"), list) else []
+    out = []
     edges = doc.get("edges") if isinstance(doc.get("edges"), list) else []
     # só texto entra no conjunto: um from ou id em lista ou mapa já reprova no MUST, e aqui não pode quebrar o leitor
     traced = {e.get("from") for e in edges
               if isinstance(e, dict) and e.get("edge_type") == "TRACES_TO" and isinstance(e.get("from"), str)}
-    for n in nodes:
+    for n, place in _located(doc, "nodes"):
         prov = n.get("provenance") if isinstance(n.get("provenance"), dict) else {}
         method = prov.get("method")
         if n.get("plane") == "PROD" and (n.get("evidence_class") == "testimony"
                                          or (isinstance(method, str) and TESTIMONY_METHOD.match(method))):
-            out["integrity.testimony-in-prod"] += 1
+            out.append(("integrity.testimony-in-prod", place))
         vf, va = n.get("valid_from"), n.get("verified_at")
         if isinstance(vf, str) and isinstance(va, str) and ISO_PREFIX.match(vf) and ISO_PREFIX.match(va):
             k = min(len(vf), len(va))
             if va[:k] < vf[:k]:
-                out["integrity.verified-before-fact"] += 1
+                out.append(("integrity.verified-before-fact", place))
         trace = n.get("trace")
         if (n.get("node_type") == "decision" and n.get("status") not in ("superseded", "refuted")
                 and not (isinstance(trace, str) and trace.strip()) and not prov
                 and not (isinstance(n.get("id"), str) and n["id"] in traced)):
-            out["integrity.untraced-decision"] += 1
+            out.append(("integrity.untraced-decision", place))
     return out
+
+
+def coherence_warnings(doc):
+    """Os avisos de coherence_located() contados por código (Counter)."""
+    return collections.Counter(code for code, _ in coherence_located(doc))
 
 
 def warning_counts(text, validator, should_validator):
@@ -464,6 +495,43 @@ def warning_counts(text, validator, should_validator):
     if _has_unquoted_date(raw):
         out["yaml.unquoted-date"] += 1
     out.update(coherence_warnings(doc))
+    return out
+
+
+def schema_place(doc, path):
+    """O lugar de um erro do schema a partir do caminho: o nó ou a aresta, o meta, ou o topo."""
+    if path and path[0] in ("nodes", "edges") and len(path) >= 2 and isinstance(path[1], int):
+        items = doc.get(path[0]) if isinstance(doc.get(path[0]), list) else []
+        return item_place(path[0], path[1], items[path[1]] if path[1] < len(items) else None)
+    return "meta" if path and path[0] == "meta" else "topo"
+
+
+def where(text, validator, should_validator=None):
+    """Cada ocorrência com o lugar: lista de (nível, código, lugar), nível MUST ou SHOULD (Q_VALIDATOR_NODE_LOCATIONS).
+
+    Os códigos são exatamente os que code_counts() e warning_counts() contam, ocorrência por ocorrência (o teste
+    test_where_tem_os_mesmos_codigos_que_a_contagem guarda isso). O que não tem lugar mais fino sai como 'arquivo':
+    o parse, o .nan/.inf e a data sem aspas.
+    """
+    raw, doc, parse_code = parse_v1(text)
+    if parse_code:
+        return [("MUST", parse_code, "arquivo")]
+    out, must = [], set()
+    for err in validator.iter_errors(doc):
+        place = schema_place(doc, list(err.absolute_path))
+        for code in form_codes(err):
+            out.append(("MUST", code, place))
+            must.add(code)
+    out += [("MUST", code, "arquivo") for code in sorted(non_finite_codes(doc))]
+    out += [("MUST", code, place) for code, place in integrity_located(doc, refs=("trigger", "on"))]
+    out += [("MUST", "yaml.forbidden-key-on", place) for e, place in _located(doc, "edges") if "on" in e]
+    if should_validator is not None:
+        for err in should_validator.iter_errors(doc):
+            place = schema_place(doc, list(err.absolute_path))
+            out += [("SHOULD", code, place) for code in form_codes(err) if code not in must]
+        if _has_unquoted_date(raw):
+            out.append(("SHOULD", "yaml.unquoted-date", "arquivo"))
+        out += [("SHOULD", code, place) for code, place in coherence_located(doc)]
     return out
 
 
@@ -559,8 +627,12 @@ def main(argv=None):
     ap.add_argument("--list")
     ap.add_argument("--json", help="grava o formato do spike ({summary, results})")
     ap.add_argument("--spike", action="store_true", help="saída humana e rc do spike (check/classify)")
+    ap.add_argument("--where", action="store_true", help="lista cada ocorrência com o nó ou a aresta em que ela sai")
     ap.add_argument("files", nargs="*")
     args = ap.parse_args(argv)
+    if args.where and args.spike:
+        print("ENTRADA QUEBRADA  --where não vale com --spike (o spike tem saída própria, congelada)")
+        return 2
     should_path = args.should_schema or should_for(args.schema)
     try:
         with open(args.schema, encoding="utf-8") as fh:
@@ -585,6 +657,10 @@ def main(argv=None):
         failed += bool(must)
         warned += bool(should)
         lines += report(name, must, should)
+        if args.where:  # a mesma ocorrência repetida (os ramos if/then do schema) vira uma linha com ×n
+            found = collections.Counter(where(text, validator, should_v))
+            lines += [f"    {level:<6} {code}  {place}" + (f" ×{n}" if n > 1 else "")
+                      for (level, code, place), n in sorted(found.items(), key=lambda x: (x[0][0] != "MUST", x[0][1:]))]
     summary = summarize(results)
     if args.json:
         with open(args.json, "w", encoding="utf-8") as fh:
