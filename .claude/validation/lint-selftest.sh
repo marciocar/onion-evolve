@@ -21091,6 +21091,98 @@ STUB
   unset -f _seal _doorway_stamp _registry
 }
 
+# ── ops/registry-pins.sh — o pin do ADOTANTE conferido contra o carimbo VIVO (F1.5, SAC-90) ─────
+# Molde do door_seal_pin acima: core falso com origin/main de verdade, um `gh` esboçado que serve
+# carimbos de um diretório (arquivo ausente = remoto ilegível) e um registro com DOIS membros, o
+# vizinho primeiro — é ele que prova o carimbo cirúrgico. MUTANTES (cada um reprova o caso nomeado):
+#   _same_pin sempre verdadeiro → (a) · ilegível contado como ok → (b) · awk do --seal sem o filtro
+#   do membro → (c) · sem a guarda do pin que REGRIDE → (d) · --seal aceitando leitura de clone → (e)
+run_registry_pins_selftests() {
+  local sut="${REPO_ROOT}/ops/registry-pins.sh"
+  if [ ! -f "${sut}" ]; then record_skip "registry-pins: ops/ ausente (adotante) → pulado"; return; fi
+  command -v python3 >/dev/null 2>&1 && python3 -c 'import yaml' 2>/dev/null \
+    || { record_skip "registry-pins: python3+PyYAML ausente (o SUT recusa rodar)"; return; }
+  local d; d="$(mktemp -d)"; trap 'rm -rf "'"${d}"'"' RETURN
+  local upstream="${d}/upstream" fakecore="${d}/fakecore" stamps="${d}/stamps" clone="${d}/clone"
+  mkdir -p "${upstream}" "${stamps}"; git -C "${upstream}" init -q -b main
+  git -C "${upstream}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m velho
+  local PIN_OLD; PIN_OLD="$(git -C "${upstream}" rev-parse --short=12 HEAD)"
+  git -C "${upstream}" -c user.email=t@t -c user.name=t commit -q --allow-empty -m novo
+  local PIN_NEW; PIN_NEW="$(git -C "${upstream}" rev-parse --short=12 HEAD)"
+  git clone -q "${upstream}" "${fakecore}" 2>/dev/null
+  mkdir -p "${fakecore}/ops" "${fakecore}/docs/evolution/federation"
+  cp "${sut}" "${fakecore}/ops/"
+  local REG="${fakecore}/docs/evolution/federation/members.yaml"
+  # gh esboçado: default_branch = main; contents → base64 do arquivo <owner>_<repo>_<ref> (ausente = falha)
+  cat > "${d}/gh" <<'STUB'
+#!/usr/bin/env bash
+p="$2"
+case "${p}" in
+  repos/*/contents/*) r="${p#repos/}"; own="${r%%/*}"; r="${r#*/}"; repo="${r%%/*}"; ref="${p##*ref=}"
+    f="${GH_FAKE_DIR}/${own}_${repo}_${ref//\//-}"; [ -f "${f}" ] || exit 1; base64 -w0 < "${f}"; echo ;;
+  repos/*) echo main ;;
+  *) exit 1 ;;
+esac
+STUB
+  chmod +x "${d}/gh"
+  _rp_reg() {  # $1 = pin do vizinho  $2 = pin do alvo  $3 = remote do alvo
+    { printf 'version: 2\ntrust_policy_version: 1\nmembers:\n'
+      printf '  - id: vizinho\n    kind: adopter\n    remote: github.com/dono/vizinho\n    integration_branch: main\n'
+      printf '    onion_version: %s   # comentario do vizinho preservado\n' "$1"
+      printf '  - id: alvo\n    kind: adopter\n    remote: %s\n    local_path: "%s"\n' "$3" "${clone}"
+      printf '    integration_branch: main\n    onion_version: %s   # comentario antigo do alvo\n' "$2"
+    } > "${REG}"
+  }
+  _rp_stamp() { printf 'framework: x\nsource_commit: %s\nrole: adopted\n' "$2" > "${stamps}/dono_$1_main"; }
+  local _o _r
+  _rp() { if _o="$(cd "${d}" && PATH="${d}:${PATH}" GH_FAKE_DIR="${stamps}" bash "${fakecore}/ops/registry-pins.sh" "$@" 2>&1)"; then _r=0; else _r=$?; fi; }
+
+  # (a) carimbo vivo NOVO no remoto, registro VELHO ⇒ --check rc=1, DIVERGE, registro intacto
+  rm -f "${stamps}"/*; _rp_stamp vizinho "${PIN_OLD}"; _rp_stamp alvo "${PIN_NEW}"
+  _rp_reg "${PIN_OLD}" "${PIN_OLD}" "github.com/dono/alvo"; local _sum0; _sum0="$(cksum < "${REG}")"
+  _rp --check
+  if [ "${_r}" -eq 1 ] && grep -E '^alvo ' <<< "${_o}" | grep -q 'DIVERGE' && [ "$(cksum < "${REG}")" = "${_sum0}" ]; then
+    record_pass "registry-pins: (a) pin divergente no remoto ⇒ --check rc=1 e NÃO escreve"
+  else record_fail "registry-pins: (a) divergência não acusada" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
+
+  # (b) remoto ILEGÍVEL e sem clone ⇒ declarado ILEGÍVEL, rc=3, NUNCA 'ok' nem rc=0
+  rm -f "${stamps}/dono_alvo_main"
+  _rp --check
+  if [ "${_r}" -eq 3 ] && grep -E '^alvo ' <<< "${_o}" | grep -q 'ILEGÍVEL' && ! grep -E '^alvo ' <<< "${_o}" | grep -qE ' ok$'; then
+    record_pass "registry-pins: (b) remoto ilegível ⇒ ILEGÍVEL declarado e rc=3 (nunca zero silencioso)"
+  else record_fail "registry-pins: (b) ilegível virou ok" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
+
+  # (c) --seal carimba CIRÚRGICO: só a linha do alvo muda, o vizinho e o tamanho do arquivo ficam
+  _rp_stamp alvo "${PIN_NEW}"; local _n0; _n0="$(wc -l < "${REG}")"
+  _rp --seal
+  if [ "${_r}" -eq 0 ] && grep -qE "^    onion_version: ${PIN_NEW}   # carimbado por ops/registry-pins.sh" "${REG}" \
+     && grep -qF "onion_version: ${PIN_OLD}   # comentario do vizinho preservado" "${REG}" \
+     && [ "$(wc -l < "${REG}")" -eq "${_n0}" ]; then
+    _rp --check
+    if [ "${_r}" -eq 0 ]; then record_pass "registry-pins: (c) --seal carimba SÓ o membro divergente e o --check seguinte sai rc=0"
+    else record_fail "registry-pins: (c) depois do carimbo o --check não fechou" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
+  else record_fail "registry-pins: (c) carimbo não cirúrgico" "rc=${_r} reg=$(_emit "$(cat "${REG}")" | head -c 300)"; fi
+
+  # (d) carimbo vivo ANTERIOR ao do registro (branch errada) ⇒ acusa e o --seal NÃO rebaixa
+  _rp_stamp alvo "${PIN_OLD}"; _rp_reg "${PIN_OLD}" "${PIN_NEW}" "github.com/dono/alvo"
+  _rp --seal
+  if [ "${_r}" -eq 1 ] && grep -q 'ATRÁS do registro' <<< "${_o}" && grep -qF "onion_version: ${PIN_NEW}   # comentario antigo do alvo" "${REG}"; then
+    record_pass "registry-pins: (d) pin vivo que REGRIDE ⇒ acusado e registro NÃO rebaixado"
+  else record_fail "registry-pins: (d) --seal rebaixou o registro" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
+
+  # (e) SEM remoto: lê o carimbo COMMITADO do clone; acusa, mas o --seal não carimba leitura de clone
+  rm -rf "${clone}"; mkdir -p "${clone}/.claude"; git -C "${clone}" init -q -b main
+  printf 'source_commit: %s\nrole: adopted\n' "${PIN_NEW}" > "${clone}/.claude/.onion-version"
+  git -C "${clone}" add -A >/dev/null 2>&1; git -C "${clone}" -c user.email=t@t -c user.name=t commit -q -m stamp
+  _rp_reg "${PIN_OLD}" "${PIN_OLD}" "n/a"
+  _rp --seal
+  if [ "${_r}" -eq 1 ] && grep -E '^alvo ' <<< "${_o}" | grep -q 'clone-local' && grep -q 'só carimba o remoto' <<< "${_o}" \
+     && grep -qF "onion_version: ${PIN_OLD}   # comentario antigo do alvo" "${REG}"; then
+    record_pass "registry-pins: (e) leitura de clone acusa a divergência, mas o --seal só carimba o remoto"
+  else record_fail "registry-pins: (e) carimbou leitura de clone" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
+  unset -f _rp _rp_reg _rp_stamp
+}
+
 run_door_selftests() {
   local sb2 out rc
   sb2="$(mktemp -d)"
@@ -22268,6 +22360,7 @@ _family run_hub_role_guard_selftests
 _family run_inventory_adopter_scope_selftests
 _family run_door_selftests
 _family run_door_seal_pin_selftests
+_family run_registry_pins_selftests
 _family run_door_cycle_selftests
 # ── REGRA 86: workflow que não parseia é workflow MORTO, e o repo não sabe ────────────────────
 # Nasceu de um `env:` duplicado que deixou o `onion-review-diagnose.yml` inexecutável por um dia
@@ -23221,6 +23314,37 @@ run_door_role_parity_selftests() {
   if [ "${krc}" = "1" ] && grep -q 'CARIMBO-AUSENTE' <<< "${kout}"; then
     record_pass "door-role-parity: (k) clone SEM carimbo ⇒ ACUSA (porta quebrada), não 'não-medido do CI'"
   else record_fail "door-role-parity: (k)" "clone sem carimbo tratado como caso de CI (rc=${krc}): $(_emit "${kout}" | head -c 200)"; fi
+
+  # (p1)…(p4) AS PORTAS SEM ÁRVORE .claude/ (F1.5 das portas, 2026-10-09). `plugins` é marketplace e
+  # se carimba por provenance.json; `mini` ainda não foi materializada (F5). MUTANTES: tirar o ramo
+  # plugins reprova (p1) com CARIMBO-AUSENTE; fazê-lo aceitar sem provenance reprova (p2); tirar o
+  # ramo mini reprova (p3); deixar o ramo valer COM carimbo presente reprova (p4).
+  _drpx() { # $1=role  $2=provenance? (1/0)  $3=carimbo-role ('' = sem .onion-version)
+    rm -rf "${d}/porta"; mkdir -p "${d}/porta/.claude"
+    [ "$2" = "1" ] && { mkdir -p "${d}/porta/plugins/onion/.claude-plugin"
+      printf '{"ref": "abcdef1234567890"}\n' > "${d}/porta/plugins/onion/.claude-plugin/provenance.json"; }
+    [ -n "$3" ] && printf 'role: %s\n' "$3" > "${d}/porta/.claude/.onion-version"
+    { echo 'members:'; echo '  - id: porta-de-teste'; echo '    kind: door'; echo "    role: $1"
+      echo "    local_path: \"${d}/porta\"" ; } > "${d}/docs/evolution/federation/members.yaml"
+    if _drpx_out="$(bash "${sut}" "${d}" 2>&1)"; then _drpx_rc=0; else _drpx_rc=$?; fi
+  }
+  _drpx plugins 1 ''
+  if [ "${_drpx_rc}" = "0" ] && ! grep -qE 'CARIMBO|DIVERGE|NÃO MEDIDA' <<< "${_drpx_out}"; then
+    record_pass "door-role-parity: (p1) porta plugins com provenance.json e sem .claude/ ⇒ rc=0 (o carimbo dela é a proveniência)"
+  else record_fail "door-role-parity: (p1)" "porta plugins acusada pela falta de árvore .claude/ (rc=${_drpx_rc}): $(_emit "${_drpx_out}" | head -c 200)"; fi
+  _drpx plugins 0 ''
+  if [ "${_drpx_rc}" = "1" ] && grep -q 'CARIMBO-AUSENTE' <<< "${_drpx_out}" && grep -q 'provenance.json' <<< "${_drpx_out}"; then
+    record_pass "door-role-parity: (p2) porta plugins SEM provenance.json ⇒ ACUSA nomeando a proveniência"
+  else record_fail "door-role-parity: (p2)" "marketplace sem proveniência passou (rc=${_drpx_rc}): $(_emit "${_drpx_out}" | head -c 200)"; fi
+  _drpx mini 0 ''
+  if [ "${_drpx_rc}" = "0" ] && grep -q 'mini' <<< "${_drpx_out}" && grep -q 'NÃO MEDIDA' <<< "${_drpx_out}"; then
+    record_pass "door-role-parity: (p3) porta mini ainda sem carimbo (F5) ⇒ rc=0 DECLARANDO não-medido"
+  else record_fail "door-role-parity: (p3)" "mini sem carimbo não declarou ou foi acusada (rc=${_drpx_rc}): $(_emit "${_drpx_out}" | head -c 200)"; fi
+  _drpx mini 0 hub
+  if [ "${_drpx_rc}" = "1" ] && grep -q 'PAPEL-DIVERGE' <<< "${_drpx_out}"; then
+    record_pass "door-role-parity: (p4) porta mini COM carimbo divergente ⇒ ACUSA (o ramo especial só vale sem carimbo)"
+  else record_fail "door-role-parity: (p4)" "carimbo da mini ignorado (rc=${_drpx_rc}): $(_emit "${_drpx_out}" | head -c 200)"; fi
+  unset -f _drpx
 }
 
 # ── A RECUSA de troca de papel DENTRO do materializador (a 1ª linha de defesa) ────────────────

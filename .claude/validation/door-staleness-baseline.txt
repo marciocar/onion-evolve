@@ -207,3 +207,10 @@
 #   o que a catraca pode fazer, ela ja faz — nao deixar o passivo virar silencio.
 onion-standalone 423
 onion-core 0
+# 2026-10-09 (F1.5 das portas, SAC-90): `onion-plugins` entra no registro como `kind: door` e passa a
+#   ser medida por esta catraca. Nasce com o PASSIVO MEDIDO, nao com zero: o pin dela (947e69ce069d, o
+#   `ref` do provenance.json publicado) e o mesmo das outras duas portas, e o `--emit-baseline` deu 12
+#   para as tres. Teto 0 nasceria ANDOU-PARA-TRAS por trabalho que ja esta em main e que ela nao pode
+#   espelhar sem uma publicacao — que e o `/meta:publish` da F3. Ressalva declarada: a catraca conta as
+#   raizes do `--emit-scrub-roots` (a superficie vendorizada), nao a superficie do bundle de plugins.
+onion-plugins 12
