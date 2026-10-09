@@ -5,13 +5,13 @@
 # Migrado ao contrato v3 no SAC-71 (2026-10-08): datas entre aspas e provenance nos nós confirmed.
 meta:
   x_drive_checkpoint: pending
-  x_drive_checkpoint_note: "lote 7 (SAC-96): kg-radar alinhado ao contrato v4.1 — MISPLANED lê provenance.method testemunho em PROD (+102 avisos, 35 grafos) e decisão com provenance tem origem (64→38); --integrity --schema exit 0 nos 146 grafos; família kg_radar_contract com 2 mutantes; PR para revisão, sem merge"
+  x_drive_checkpoint_note: "lote 8 (contrato v4.2, SAC-97): vendor contract-v4.2.0; base do gate por nó sem accept-regression (MUST 19 grafos inalterado; testimony-in-prod 36 grafos = 121 nós, ganho de 4 desde o v4.1); locality determinística nas provenances do corpus (repo, web, host, pessoa; as sem certeza intocadas); geradores emitem locality; nenhum flip de status; PR para merge humano"
   id: contrato-kg-absorcao-2026-10
   schema_version: "1"
   baseline: "2026-10-08"
   review_after: "2026-11-07"   # 30d: programa de trabalho
-  # ═══ TETO: 21 NÓS ═══
-  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08); 15 em 2026-10-09 (+E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH); 16 em 2026-10-09 (+E_ONDA_O1_APLICADA: a onda O1 é colhida aqui, e a evidência dela pertence ao programa que a mede, não a um grafo novo); 17 em 2026-10-09 (+E_ONDA_O2_APLICADA: mesma razão da O1 — cada onda colhida é um nó de evidência do programa que a mede, e a O1 já está colhida). 18 em 2026-10-09 (+E_ONDA_O3_1_APLICADA: +1 justificado — a O3 é a 1ª onda com JUIZ independente e selo humano por nó, e a evidência dela carrega o que O1/O2 não têm: os flips de status e de plano nomeados, e os REPROVADOS que voltam; fundir com a O1 ou a O2 apagaria a fronteira entre derivação mecânica e aplicação julgada). 19 em 2026-10-09 (+E_CONTRATO_V41_ADOTADO: +1 justificado — a adoção do v4.1 é lote próprio por decisão do maestro, antes das ondas 2 e 3, e carrega o que nenhum nó de onda carrega: a dívida SHOULD nova medida, a lista de testemunho em PROD que alimenta as ondas e as duas divergências do radar contra o contrato; fundir com E_CONTRATO_V4_ADOTADO apagaria a fronteira entre a versão que tornou provenance MUST e a que só acrescenta avisos). 20 em 2026-10-09 (+E_ONDAS_O3_2_3_APLICADAS: +1 justificado — o maestro mandou subir o teto em vez de fundir a onda 1 no nó das ondas 2 e 3; fundir apagaria a lista nomeada dos REPROVADOS da onda 1 que a onda 3 revisou, e os flips de cada onda deixariam de ser endereçáveis por nó; as ondas 2 e 3 vão num nó só porque foram aplicadas no mesmo PR). 21 em 2026-10-09 (+E_RADAR_ALINHADO_AO_CONTRATO_TESTEMUNHO_E_DECISAO: +1 justificado — é a cura das duas divergências que E_CONTRATO_V41_ADOTADO só MEDIU; fundir com ele apagaria a fronteira entre o diagnóstico e a cura, e a medição antes × depois do radar no corpus não pertence a nenhuma onda de provenance, que mexe nos grafos e não no leitor). NO TETO: a próxima onda entra colhendo uma anterior.
+  # ═══ TETO: 22 NÓS ═══
+  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08); 15 em 2026-10-09 (+E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH); 16 em 2026-10-09 (+E_ONDA_O1_APLICADA: a onda O1 é colhida aqui, e a evidência dela pertence ao programa que a mede, não a um grafo novo); 17 em 2026-10-09 (+E_ONDA_O2_APLICADA: mesma razão da O1 — cada onda colhida é um nó de evidência do programa que a mede, e a O1 já está colhida). 18 em 2026-10-09 (+E_ONDA_O3_1_APLICADA: +1 justificado — a O3 é a 1ª onda com JUIZ independente e selo humano por nó, e a evidência dela carrega o que O1/O2 não têm: os flips de status e de plano nomeados, e os REPROVADOS que voltam; fundir com a O1 ou a O2 apagaria a fronteira entre derivação mecânica e aplicação julgada). 19 em 2026-10-09 (+E_CONTRATO_V41_ADOTADO: +1 justificado — a adoção do v4.1 é lote próprio por decisão do maestro, antes das ondas 2 e 3, e carrega o que nenhum nó de onda carrega: a dívida SHOULD nova medida, a lista de testemunho em PROD que alimenta as ondas e as duas divergências do radar contra o contrato; fundir com E_CONTRATO_V4_ADOTADO apagaria a fronteira entre a versão que tornou provenance MUST e a que só acrescenta avisos). 20 em 2026-10-09 (+E_ONDAS_O3_2_3_APLICADAS: +1 justificado — o maestro mandou subir o teto em vez de fundir a onda 1 no nó das ondas 2 e 3; fundir apagaria a lista nomeada dos REPROVADOS da onda 1 que a onda 3 revisou, e os flips de cada onda deixariam de ser endereçáveis por nó; as ondas 2 e 3 vão num nó só porque foram aplicadas no mesmo PR). 21 em 2026-10-09 (+E_RADAR_ALINHADO_AO_CONTRATO_TESTEMUNHO_E_DECISAO: +1 justificado — é a cura das duas divergências que E_CONTRATO_V41_ADOTADO só MEDIU; fundir com ele apagaria a fronteira entre o diagnóstico e a cura, e a medição antes × depois do radar no corpus não pertence a nenhuma onda de provenance, que mexe nos grafos e não no leitor). 22 em 2026-10-09 (+E_CONTRATO_V42_ADOTADO: +1 justificado — mesma razão do v4.1: cada versão do contrato é lote próprio e carrega o que nenhum nó anterior carrega, aqui a troca da catraca SHOULD de grafo para nó, com a tabela grafos → ocorrências, e a locality escrita no corpus pela regra determinística; fundir com E_CONTRATO_V41_ADOTADO apagaria a medição por grafo que justificou a troca, e fundir com E_RADAR_ALINHADO_AO_CONTRATO_TESTEMUNHO_E_DECISAO misturaria o leitor do core com a versão do contrato). NO TETO: a próxima onda entra colhendo uma anterior.
 nodes:
   - id: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     node_type: evidence
@@ -27,6 +27,7 @@ nodes:
       source: "docs/evolution/inbox/_processed/2026-10-08-matriz-leitor-caso.md"
       locator: "item 1 (o gate do core não checa forma) e item 2 (o radar reprova 3 casos válidos)"
       method: "leitura do sinal; a matriz foi medida pelo adotante"
+      locality: "repo"
   - id: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
     node_type: decision
     layer: audit
@@ -42,6 +43,7 @@ nodes:
       source: "resposta do maestro à pergunta da triagem do /meta:co-evolve em 2026-10-08 (PR #963)"
       locator: "pergunta 'Gate do core vs contrato do .kg.yaml'"
       method: "selo humano registrado no resíduo do PR #963"
+      locality: "pessoa"
   - id: Q_ABSORVER_VALIDADOR_DO_CONTRATO
     node_type: question
     layer: audit
@@ -131,6 +133,7 @@ nodes:
       source: ".claude/validation/kg-drive-project.sh (função _ckpt)"
       locator: "linhas que escrevem drive_checkpoint e drive_checkpoint_note"
       method: "execução do --close-lot num sandbox e medição pelo kg-contract-check"
+      locality: "repo"
   - id: E_FERRAMENTA_DE_MIGRACAO_E_ONDA_PILOTO
     node_type: evidence
     layer: audit
@@ -147,6 +150,7 @@ nodes:
       source: ".claude/utils/kg/kg-migrate-v3.py e docs/evolution/research/guard-pre-push-2026-10/guard-pre-push-2026-10.kg.yaml"
       locator: "saída da ferramenta e do kg_gate.py na worktree feat/kg-corpus-migration-tool"
       method: "medição executada (ferramenta, radar, kg-contract-check, kg_gate) em 2026-10-08"
+      locality: "repo"
   - id: E_TRIAGEM_DA_PROVENANCE_DO_CORPUS
     node_type: evidence
     layer: audit
@@ -163,6 +167,7 @@ nodes:
       source: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/routing.tsv"
       locator: "coluna final (A1, A2, R) e method_class, uma linha por nó"
       method: "medição: classify.py e measure.py sobre o corpus em e0bfcb17, com amostra julgada em duas rodadas"
+      locality: "repo"
   - id: D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE
     node_type: decision
     layer: audit
@@ -178,6 +183,7 @@ nodes:
       source: "resposta do maestro à pergunta 'Selo políticas' na sessão de 2026-10-08, sobre a posição do onion-kg-ssot"
       locator: "pergunta 'Selo políticas', opção 'Selar como está'"
       method: "testemunho: selo do maestro sobre a posição do dono do contrato"
+      locality: "pessoa"
   - id: Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH
     node_type: question
     layer: audit
@@ -204,6 +210,7 @@ nodes:
       source: "ops/pr-merge-verified.sh e .claude/validation/lint-selftest.sh (família pr_merge_verified) na branch fix/merge-verified-kg-provenance"
       locator: "_kg_guard_pre e _kg_guard_post no script; casos (kg-a) a (kg-g) na bancada"
       method: "medição: bancada com mutantes e sandbox git em 2026-10-09"
+      locality: "repo"
   - id: E_CONTRATO_V4_ADOTADO
     node_type: evidence
     layer: audit
@@ -220,6 +227,7 @@ nodes:
       source: "vendor/kg-ssot/.kg-ssot-version e .kg-ssot/gate.json na branch feat/kg-ssot-contract-v4"
       locator: "tag contract-v4.0.0 e a base com 131 grafos na dívida herdada"
       method: "medição: kg_vendor check, kg_gate e bancada com mutantes em 2026-10-08"
+      locality: "repo"
   - id: E_ONDA_O1_APLICADA
     node_type: evidence
     layer: audit
@@ -236,6 +244,7 @@ nodes:
       source: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/routing-v4.tsv e .kg-ssot/gate.json na branch feat/provenance-wave-o1"
       locator: "coluna final do routing (A1, A2, R) e a chave failing da base (115 grafos)"
       method: "medição: classificador, kg-migrate-v3 --routing, kg-radar, kg-contract-check e kg_gate em 2026-10-09"
+      locality: "repo"
   - id: E_ONDA_O2_APLICADA
     node_type: evidence
     layer: audit
@@ -252,6 +261,7 @@ nodes:
       source: ".claude/utils/kg/kg-migrate-v3.py, docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o3-universe.tsv e .kg-ssot/gate.json na branch feat/provenance-wave-o2"
       locator: "o relatório do kg-migrate-v3 --routing (provenance derivada, trace sem localizador, registro de comando), as colunas hint e bucket do o3-universe e a chave failing da base (114 grafos)"
       method: "medição: kg-migrate-v3 --routing, kg-radar, kg-contract-check, kg_gate e bancada com mutantes em 2026-10-09"
+      locality: "repo"
   - id: E_ONDA_O3_1_APLICADA
     node_type: evidence
     layer: audit
@@ -268,6 +278,7 @@ nodes:
       source: ".claude/utils/kg/kg-migrate-v3.py, docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o3-wave1-juiz.csv e .kg-ssot/gate.json na branch feat/provenance-wave-o3-1"
       locator: "o relatório do kg-migrate-v3 --apply-judged (provenance escrita, confirmed→unverifiable, PROD→DEV, REPROVADO intocado, selo do maestro) e a chave failing da base (91 grafos)"
       method: "medição: kg-migrate-v3 --apply-judged, kg-radar, kg-contract-check, kg_gate e bancada com mutantes em 2026-10-09"
+      locality: "repo"
   - id: E_CONTRATO_V41_ADOTADO
     node_type: evidence
     layer: audit
@@ -284,6 +295,7 @@ nodes:
       source: "vendor/kg-ssot/.kg-ssot-version, .kg-ssot/gate.json e docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/v41-testimony-in-prod.tsv na branch feat/kg-ssot-contract-v41"
       locator: "tag contract-v4.1.0, a chave debt da base e as 125 linhas do TSV"
       method: "medição: kg_vendor check, kg_gate --update, extração dos nós PROD com method testemunho e bancada com mutantes em 2026-10-09"
+      locality: "repo"
   - id: E_ONDAS_O3_2_3_APLICADAS
     node_type: evidence
     layer: audit
@@ -300,6 +312,7 @@ nodes:
       source: ".claude/utils/kg/kg-migrate-v3.py, docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o3-wave2-juiz.csv, o3-wave3-juiz.csv e .kg-ssot/gate.json na branch feat/provenance-waves-o3-2-3"
       locator: "o relatório do kg-migrate-v3 --apply-judged (provenance escrita, label corrigido, flips, PROD→DEV, REPROVADO intocado, reconciliação do refutado) e a chave failing da base (19 grafos)"
       method: "medição: kg-migrate-v3 --apply-judged, kg-radar, kg-contract-check, kg_gate, conferência planilha × arquivos e bancada com mutantes em 2026-10-09"
+      locality: "repo"
   - id: E_RADAR_ALINHADO_AO_CONTRATO_TESTEMUNHO_E_DECISAO
     node_type: evidence
     layer: audit
@@ -316,6 +329,24 @@ nodes:
       source: ".claude/validation/kg-radar.sh e .claude/validation/lint-selftest.sh na branch fix/radar-contract-alignment, e vendor/kg-ssot/spec/conformance/fixtures/latest/integrity/coherence/"
       locator: "os blocos PROVENANCE (leitura aninhada), FRESCOR (MISPLANED por method) e PROVENIÊNCIA (provSource) do radar; a família kg_radar_contract; os casos warn-testimony-method-in-prod e valid-decision-with-provenance"
       method: "medição: kg-radar antes × depois no corpus com LC_ALL=C, contagem independente com PyYAML e bancada com mutantes em 2026-10-09"
+      locality: "repo"
+  - id: E_CONTRATO_V42_ADOTADO
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-09"
+    verified_against: "branch feat/kg-ssot-contract-v42 sobre origin/main 9a45839d: kg_vendor.py update --tag contract-v4.2.0 (07d125c1cb50, 276 arquivos) e check íntegro; kg_gate.py --update --granularity node com os --exclude do CI, sem --accept-regression (comparado por grafo, nada piorou); kg-migrate-v3 --locality nos 138 grafos do gate, --check rc 0 na 2ª passada; bancada de 6 famílias com LC_ALL=C verde e 8 mutantes reprovando"
+    label: "o core adotou o contrato v4.2 (SAC-97, absorve o v4.1.1): a dívida SHOULD passou a ser travada por nó, e 3517 provenances de 137 grafos ganharam locality determinística (repo 1992, web 1381, host 129, pessoa 15)"
+    narrative: "Nenhum veredito MUST mudou: 138 grafos, 19 na dívida herdada, antes e depois. A troca de granularidade foi comparada na da base (por grafo), sem piora, e a base passou a guardar granularity node; o CI não passa --granularity, lê da base. Dívida SHOULD, grafos → ocorrências: provenance.method 6 → 39, label 111 → 2224, verified_against 16 → 141, verified_at 6 → 17, testimony-in-prod 36 → 121, untraced-decision 14 → 36, yaml.unquoted-date 129 → 129 (código de arquivo inteiro, 1 por grafo). O testimony-in-prod é o caso que pediu a granularidade: por grafo, as ondas 2 e 3 da O3 apareciam como piora (34 → 36 grafos); por nó, no corpus inteiro do gate, foi ganho de 4 (125 nós na adoção do v4.1 em 05194c07, 121 hoje). Os 107 → 103 do lote anterior são o mesmo −4 contado só nos 91 grafos tocados. Locality: a regra vive em kg-migrate-v3.py (locality_of) e erra para o lado de calar: segmento do source julgado pelo 1º token; sha só vale repo se o git deste repo o conhece; fonte mista vale a menos reverificável (repo < web < host < pessoa); sem certeza, sem chave. Corpus: 233 provenances ficaram sem locality (citação bibliográfica, CHANGELOG descrito em prosa, outro repo como gustavo-pulga@sha, sha que o git não conhece). Diff de 3517 linhas, só a chave nova, provado por releitura YAML grafo a grafo; é regenerável por --locality, o que resolve conflito com PR paralelo. Geradores: kg-migrate-v3 (os 3 modos que escrevem provenance + --locality), census-seal (repo), seed-adoption-graph (repo; o gate provado e o adiado são host, porque a execução e o core.hooksPath só existem na máquina), cc-delta-census (web) e o write(KG) do onion-research.js (ensina as 4 classes e omitir na dúvida). A convenção 'label anterior: …' já era a do --apply-judged desde a O3."
+    trace: "vendor/kg-ssot/ADOPTING.md (seções Dívida por nó e Onde a fonte mora) na tag contract-v4.2.0; Linear SAC-97"
+    provenance:
+      source: "vendor/kg-ssot/.kg-ssot-version, .kg-ssot/gate.json e .claude/utils/kg/kg-migrate-v3.py na branch feat/kg-ssot-contract-v42"
+      locator: "tag contract-v4.2.0, as chaves granularity e debt da base, e o TOTAL do kg-migrate-v3 --locality sobre os 138 grafos do gate"
+      method: "medição: kg_vendor check, kg_gate --update --granularity node, kg_validate --where por commit, kg-migrate-v3 --locality e bancada com mutantes em 2026-10-09"
+      locality: "repo"
 edges:
   - from: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
@@ -386,3 +417,9 @@ edges:
   - from: E_RADAR_ALINHADO_AO_CONTRATO_TESTEMUNHO_E_DECISAO
     to: E_CONTRATO_V41_ADOTADO
     edge_type: DEPENDS_ON
+  - from: E_CONTRATO_V42_ADOTADO
+    to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
+    edge_type: SUPPORTS
+  - from: E_CONTRATO_V42_ADOTADO
+    to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
+    edge_type: SUPPORTS
