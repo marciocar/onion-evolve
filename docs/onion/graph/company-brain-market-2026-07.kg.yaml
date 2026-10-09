@@ -194,6 +194,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-25
     label: "Onion JÁ TEM KG local-first como 'cérebro' (.kg.yaml SDAAL): modela audit+SSOT durável, radar determinístico (kg-radar.sh) p/ atenção/reconciliação/integridade/frescor, arestas REFUTES/SUPERSEDES auto-corrigem contradição. 3 dogfoods de campo — não é hipótese"
+    provenance:
+      source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      locator: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_onion_n1_device
     node_type: evidence
     trace: user memory onion-pessoal-app-state
@@ -214,6 +218,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-25
     label: "Onion JÁ TEM a peça que a concorrência NÃO tem: doutrina de mitigação de INFERÊNCIA — risco real = o motor deduzindo o não-declarado (Staab et al. 2024, até 85% top-1), não dado em repouso. Stack L1-L6 + mapa do que já-transfere (query-gate, gerador≠porteiro, de-id fail-safe, R15)"
+    provenance:
+      source: "docs/knowledge-base/concepts/inference-mitigation.md"
+      locator: "docs/knowledge-base/concepts/inference-mitigation.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_onion_l1l6_gated
     node_type: evidence
     trace: docs/business-context/decisions.md
@@ -223,6 +231,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "FALTA/GATED: o motor executável L1-L6 é declaradamente NÃO-embarcado no core (fronteira core=doutrina/adotante=SSOT executável). Onion vende FRAME de conformidade (REGRA DE ADMISSÃO G0-G8), não produto plug-and-play de brain seguro. Extrapolação N-tenant = 'a verificar', threat model muda (RBAC real)"
+    provenance:
+      source: "docs/business-context/decisions.md"
+      locator: "docs/business-context/decisions.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ---- CLAIMS / TESES DE DIFERENCIAL (claim) ----
   - id: C_diff_git_vs_llm
@@ -283,6 +295,10 @@ nodes:
     status: done
     verified_at: 2026-07-25
     label: "AMARRA GTM (ratificada 2026-07-25): D6=MENSAGEM P4 (regulado, whitespace) — promessa 'workflows faseados + auditabilidade estrutural', SEM prometer 'federação segura de dado regulado' (L1-L6 gated). D3=C: app-consumer/Company Brain N=1 DESACOPLADO e gated (lacuna de GTM, não técnica)"
+    provenance:
+      source: "docs/business-context/decisions.md"
+      locator: "docs/business-context/decisions.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ---- QUESTÕES (question) ----
   - id: Q_ntenant_proof

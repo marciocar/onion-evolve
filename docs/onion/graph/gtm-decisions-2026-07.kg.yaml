@@ -214,6 +214,10 @@ nodes:
     status: confirmed
     verified_at: 2026-07-25
     label: "Maestro ratificou 2026-07-25: D6 CINDIDO (MENSAGEM=P4 / PIPELINE=P3), D1=A (camadas), D3=C (desacoplar mentoria do app-consumer). Aplicado em decisions.md. D5 segue parcial (blend, número pendente instrumentação); D2-ativação segue gated"
+    provenance:
+      source: "docs/business-context/decisions.md"
+      locator: "docs/business-context/decisions.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_CENSO0901_Q_instrument_metrics
     node_type: evidence

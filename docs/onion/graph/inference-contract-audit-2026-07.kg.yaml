@@ -29,6 +29,10 @@ nodes:
     confidence: 0.9
     label: "sem impl de referencia no core (INVARIANTE 0), o CONTRATO e a autoridade — logo forma executavel, nunca prosa"
     trace: "docs/knowledge-base/concepts/inference-mitigation.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/inference-mitigation.md"
+      locator: "docs/knowledge-base/concepts/inference-mitigation.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ── A escada de refutacoes (cada nivel REFUTES o anterior 'esta fechado') ──
   - id: C_PAIR_SUFFICIENT
@@ -96,6 +100,10 @@ nodes:
     confidence: 0.95
     label: "verify P8: a politica escapou 7 passadas porque TODA fixture a usa como DADO — o que e pano de fundo nao e observado"
     trace: "docs/knowledge-base/concepts/inference-mitigation.md:139"
+    provenance:
+      source: "docs/knowledge-base/concepts/inference-mitigation.md:139"
+      locator: "docs/knowledge-base/concepts/inference-mitigation.md:139"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_VERIFY_APPROVED
     node_type: evidence
@@ -114,6 +122,10 @@ nodes:
     confidence: 0.95
     label: "REGRA DE ADMISSAO: todo mecanismo que fecha um furo entra provando os PROPRIOS pressupostos (chave, lista, canal, relogio, baseline); pressuposto nao enumerado e rodada adversarial futura"
     trace: "docs/knowledge-base/concepts/inference-mitigation.md:104"
+    provenance:
+      source: "docs/knowledge-base/concepts/inference-mitigation.md:104"
+      locator: "docs/knowledge-base/concepts/inference-mitigation.md:104"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: D_HONEST_LIMITS
     node_type: decision
@@ -133,6 +145,10 @@ nodes:
     verified_at: 2026-07-23
     label: "docs/knowledge-base/concepts/inference-mitigation.md — contrato L1/L2 no origin/main (commit ba6a85b); L3-L6 gated por dogfood do adotante"
     trace: "docs/knowledge-base/concepts/inference-mitigation.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/inference-mitigation.md"
+      locator: "docs/knowledge-base/concepts/inference-mitigation.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: A_ADMISSION_CRUMB
     node_type: artifact

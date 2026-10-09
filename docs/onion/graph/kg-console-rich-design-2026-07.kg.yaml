@@ -55,6 +55,10 @@ nodes:
     status: confirmed
     label: "Vendorizar UM arquivo (cose embutido, resto à mão) é mais fiel ao ethos 'um artefato' do Onion do que 3 libs encadeadas"
     trace: ".claude/validation/kg-console.sh"
+    provenance:
+      source: ".claude/validation/kg-console.sh"
+      locator: ".claude/validation/kg-console.sh"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_contract_travels
     node_type: decision
     plane: DEV
@@ -63,6 +67,10 @@ nodes:
     status: confirmed
     label: "O que viaja na federação é o CONTRATO JSON (kg-view --json) + o método de encoding + o arco de narração, NUNCA o JS. Cytoscape é UMA implementação de renderer. Ver ≠ distribuir"
     trace: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      locator: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_narration_prebaked
     node_type: decision
     plane: DEV
@@ -71,6 +79,10 @@ nodes:
     status: confirmed
     label: "Narração PRÉ-COZIDA (<slug>.narration.json autorada por agente, embutida, tocada offline) — não live-chat, que quebraria o autocontido/CSP. O console segue LLM-free; a IA está só na autoria"
     trace: ".claude/commands/meta/kg.md"
+    provenance:
+      source: ".claude/commands/meta/kg.md"
+      locator: ".claude/commands/meta/kg.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_narrative_beats_ceiling
     node_type: claim
     plane: DEV
@@ -79,6 +91,10 @@ nodes:
     status: confirmed
     label: "A narrativa é o que torna o grafo grande legível — resolve o teto de ~50 nós que a doutrina cita (o tour conduz por atenção em vez de desenhar tudo de uma vez)"
     trace: "docs/discussions/interface-state-of-art/NOTE-00-sintese.md"
+    provenance:
+      source: "docs/discussions/interface-state-of-art/NOTE-00-sintese.md"
+      locator: "docs/discussions/interface-state-of-art/NOTE-00-sintese.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_offline_csp
     node_type: claim
     plane: PROD
@@ -101,6 +117,10 @@ nodes:
     status: confirmed
     label: "REGRA 47 + kg-narrate-validate.sh: 'cita ids que existem' vira guard determinístico (HARD), não promessa — senão o console dropa id morto em silêncio"
     trace: ".claude/validation/kg-narrate-validate.sh"
+    provenance:
+      source: ".claude/validation/kg-narrate-validate.sh"
+      locator: ".claude/validation/kg-narrate-validate.sh"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_36_selftests
     node_type: evidence
     plane: PROD

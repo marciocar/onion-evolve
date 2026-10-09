@@ -39,6 +39,10 @@ nodes:
     verified_at: 2026-07-24
     label: "o wire-in R15 JA FOI: PR #452 (2026-07-19), 6 fases faseadas — helpers, anti-drift por construcao, dogfood comportamental 3/3 injecao 0%. O '2o PR' aconteceu; a memoria e stale."
     trace: ".claude/diary/2026-07-19-guardrails-promotion-design-vs-code.md"
+    provenance:
+      source: ".claude/diary/2026-07-19-guardrails-promotion-design-vs-code.md"
+      locator: ".claude/diary/2026-07-19-guardrails-promotion-design-vs-code.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_WIRE_IN_LIVE
     node_type: evidence
@@ -49,6 +53,10 @@ nodes:
     verified_at: 2026-07-24
     label: "VIVO no core (nao quarentena): .claude/utils/guardrails/onion-untrusted-wrap.sh + .claude/validation/guardrails/onion-effect-gate.sh; wired em lint-artifacts.sh + lint-selftest.sh (run_guardrails_selftests); fragmento SSOT common/prompts/untrusted-content-provenance.md existe"
     trace: ".claude/validation/guardrails/onion-effect-gate.sh"
+    provenance:
+      source: ".claude/validation/guardrails/onion-effect-gate.sh"
+      locator: ".claude/validation/guardrails/onion-effect-gate.sh"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: C_ANTI_DRIFT_BY_CONSTRUCTION
     node_type: claim
@@ -59,6 +67,10 @@ nodes:
     verified_at: 2026-07-24
     label: "o gate anti-drift da taxonomia (memoria: 'falta') foi resolvido POR CONSTRUCAO na F1: numeros de linha rebaixados -> read-path a nivel de arquivo + string de veto greppavel + escopo /meta:kb-freshness. Sem numero perpetuo = nada a driftar (nao violou o proprio ONION-R1)"
     trace: "docs/knowledge-base/concepts/onion-guardrails.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-guardrails.md"
+      locator: "docs/knowledge-base/concepts/onion-guardrails.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: C_STRUCTURAL_OVER_GATED
     node_type: claim
@@ -69,6 +81,10 @@ nodes:
     verified_at: 2026-07-24
     label: "F4 refinou o design: 'estrutural>gated' = impossivel-por-construcao, nao cercar todo transporte. a2a-accept NUNCA inlineia o corpo (R15.1 by-construction); co-relay copia verbatim (protecao migrou p/ read-time R15.2). Consumidores VERIFICADOS (co-evolve+adopt+reverse-consolidate), nao os produtores listados (F5)"
     trace: "docs/knowledge-base/concepts/onion-guardrails.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-guardrails.md"
+      locator: "docs/knowledge-base/concepts/onion-guardrails.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: C_SURFACE_REMAINS_GATED
     node_type: claim

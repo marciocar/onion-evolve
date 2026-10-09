@@ -73,6 +73,10 @@ nodes:
     verified_at: 2026-07-24
     label: "o MECANISMO e PARCIALMENTE orfao: o runtime de conducao de fios NUNCA virou comando (roda a mao; verificado — sem comando thread-*); AUTOMATE gated por 3 pre-condicoes NUNCA cabeadas (verificado — sem branch auto/*); a UI HITL->HOTL segue design-note nao-construida. [CORRIGIDO 2026-07-24: a alegacao original de que o onion-effect-gate.sh estava orfao era FALSA — ver E_EFFECT_GATE_LIVE]"
     trace: ".claude/commands/meta/adopt.md"
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: ".claude/commands/meta/adopt.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_EFFECT_GATE_LIVE
     node_type: evidence

@@ -23,6 +23,10 @@ nodes:
     confidence: 1.0
     label: "O CORACAO DA DECISAO, e ele nao e sobre configuracao. A wiki oficial do Vaultwarden diz literalmente `A master password will still be required and not controlled by the SSO`. Num cofre zero-knowledge a chave de cifra deriva da senha mestra NO CLIENTE — logo comprometer a sessao do Logto permite TENTAR logar, nunca ler o cofre. Consequencia que inverte a expectativa ingenua: integrar ao Logto NAO tira um segredo do mundo, ADICIONA um sistema ao caminho. O ganho real e provisionamento/desprovisionamento centralizado e botao unico, que e valor operacional legitimo — mas quem adotar esperando `o Logto passa a guardar a chave` vai adotar cerimonia. ⚠️ E isto ALINHA com o que a casa ja pratica: e a mesma forma do INVARIANTE 0 do onion-pessoal (KG cru nunca sai do device). Nao e limitacao a contornar; e a propriedade a preservar."
     trace: "https://github.com/dani-garcia/vaultwarden/wiki/Enabling-SSO-support-using-OpenId-Connect"
+    provenance:
+      source: "https://github.com/dani-garcia/vaultwarden/wiki/Enabling-SSO-support-using-OpenId-Connect"
+      locator: "https://github.com/dani-garcia/vaultwarden/wiki/Enabling-SSO-support-using-OpenId-Connect"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: E_SEM_EQUIVALENTE_A_KEY_CONNECTOR
     node_type: evidence

@@ -16,6 +16,10 @@ nodes:
     verified_at: 2026-07-18
     label: "prior-art 2026: estigmergia (Grasse 1959) reaplicada a agentes LLM — deixar rastro no ambiente compartilhado pro proximo seguir, sem fala direta (alinha com sem-IA-fala-IA + I3)"
     trace: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
+      locator: "docs/evolution/research/breadcrumb-doctrine-2026-07/SYNTHESIS.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_GREP_TRACE
     node_type: evidence
     layer: audit
@@ -133,6 +137,10 @@ nodes:
     verified_at: 2026-07-18
     label: "DOUTRINA UNIFICADA (KB v2.0.0): 3 generos por direcao + eixo de validade + amarra escopada a Trilha; radar-checkavel por genero (gap honesto: falta gate p/ Trilha e Absorcao)"
     trace: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
+    provenance:
+      source: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
+      locator: "docs/knowledge-base/agentic-patterns/ai-strategies/breadcrumb-patterns.md"
+      method: "derivado: trace do nó, sem registro de medição"
 edges:
   - from: E_PRIOR_STIGMERGY
     to: C_FAMILY

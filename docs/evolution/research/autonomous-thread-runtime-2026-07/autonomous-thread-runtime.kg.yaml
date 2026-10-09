@@ -16,6 +16,10 @@ nodes:
     verified_at: 2026-07-18
     label: "web 2026: autonomia e escada graduada Audit-Assist-Automate; Automate e estado GANHO (earned trust: permissoes estreitas + caminho verificado)"
     trace: "https://www.mindstudio.ai/blog/progressive-autonomy-ai-agents-safe-deployment"
+    provenance:
+      source: "https://www.mindstudio.ai/blog/progressive-autonomy-ai-agents-safe-deployment"
+      locator: "https://www.mindstudio.ai/blog/progressive-autonomy-ai-agents-safe-deployment"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_SRC_DETERMINISTIC
     node_type: evidence
     layer: audit
@@ -26,6 +30,10 @@ nodes:
     verified_at: 2026-07-18
     label: "web 2026: merge decidido por politica DETERMINISTICA, nunca probabilistica; IA sugere/acelera, politica decide/forca; agentic workflows read-only por padrao"
     trace: "https://medium.com/@mvtavares/ai-can-speed-up-code-review-but-merge-decisions-still-need-deterministic-guardrails"
+    provenance:
+      source: "https://medium.com/@mvtavares/ai-can-speed-up-code-review-but-merge-decisions-still-need-deterministic-guardrails"
+      locator: "https://medium.com/@mvtavares/ai-can-speed-up-code-review-but-merge-decisions-still-need-deterministic-guardrails"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_SRC_HITL
     node_type: evidence
     layer: audit
@@ -36,6 +44,10 @@ nodes:
     verified_at: 2026-07-18
     label: "web 2026: humano mantem autoridade sobre a minoria arriscada/irreversivel; IA cuida da maioria rotineira; oversight por nivel de risco no mesmo workflow"
     trace: "https://ideaforgestudios.com/2026/07/17/human-in-the-loop-ai-agents-autonomy-playbook/"
+    provenance:
+      source: "https://ideaforgestudios.com/2026/07/17/human-in-the-loop-ai-agents-autonomy-playbook/"
+      locator: "https://ideaforgestudios.com/2026/07/17/human-in-the-loop-ai-agents-autonomy-playbook/"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_GRADUATED_LADDER
     node_type: claim
     layer: audit

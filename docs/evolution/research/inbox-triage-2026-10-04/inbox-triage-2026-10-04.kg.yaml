@@ -86,6 +86,10 @@ nodes:
     status: open
     trace: '.claude/utils/task-manager/adapters/clickup.md'
     label: 'LACUNA que o proprio hub declarou: clickup_delete_task pelo MCP oficial nao foi medido (exige servidor MCP conectado). O transporte default e API, entao nao bloqueia ninguem hoje. GATILHO: um adotante ativar TASK_MANAGER_TRANSPORT=mcp com ClickUp.'
+    provenance:
+      source: ".claude/utils/task-manager/adapters/clickup.md"
+      locator: ".claude/utils/task-manager/adapters/clickup.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
 edges:
   - from: E_UPDATE_PERDIA_ARQUIVO_NOVO_IGNORADO

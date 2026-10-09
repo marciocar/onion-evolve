@@ -70,6 +70,10 @@ nodes:
     verified_at: 2026-07-18
     label: "DECISAO: telescopio (genero/conceito) + vislumbre (especie/ato) + slug /meta:telescope — nome CONFIRMADO pelo verify, confianca media-alta"
     trace: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+      locator: "docs/evolution/research/telescope-doctrine-2026-07/SYNTHESIS.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_INV9_RAW
     node_type: claim
     layer: audit
@@ -125,6 +129,10 @@ nodes:
     verified_at: 2026-07-18
     label: "PADRAO VIVO: a validacao de doutrina (fan-out de lentes -> sintese -> verify adversarial -> write(KG) com SUPERSEDES) e o motor de qualidade da superacao; nomeado playbook em onion-patterns"
     trace: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
+      locator: "docs/knowledge-base/concepts/onion-dogfooding-doctrine.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_GATED
     node_type: claim
     layer: audit

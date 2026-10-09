@@ -25,6 +25,10 @@ nodes:
     status: confirmed
     label: "A PAUSA (construir→pausar→perguntar→responder) é o VALOR — o dogfood fez humano-no-loop de propósito. Automatizar o julgamento apaga o selo humano; um orquestrador caixa-preta que ingere transcrições e cospe KG é o anti-padrão que o KG-SDAAL combate"
     trace: ".claude/commands/meta/kg.md"
+    provenance:
+      source: ".claude/commands/meta/kg.md"
+      locator: ".claude/commands/meta/kg.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_linha_vermelha
     node_type: decision
     plane: PROD

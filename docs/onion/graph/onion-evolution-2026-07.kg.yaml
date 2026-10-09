@@ -159,6 +159,10 @@ nodes:
     status: confirmed
     label: "D4 saudavel: nenhuma KB stale pelo gate de 18 meses (mais antiga 2025-11-18)"
     trace: "docs/knowledge-base/platforms/runflow.md:1"
+    provenance:
+      source: "docs/knowledge-base/platforms/runflow.md:1"
+      locator: "docs/knowledge-base/platforms/runflow.md:1"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ── Claims refutados (7) — preservados; REFUTES explicito, nunca delete ──
   - id: C_D1_2
@@ -227,6 +231,10 @@ nodes:
     status: confirmed
     label: "Juiz verificou em primeira mao e SUSTENTOU 7 achados gatilhados (D7-11/12/14/15/17, D2-4/5)"
     trace: "docs/analysis/onion-evolution-2026-07-04.md:1"
+    provenance:
+      source: "docs/analysis/onion-evolution-2026-07-04.md:1"
+      locator: "docs/analysis/onion-evolution-2026-07-04.md:1"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_J_D1_2
     node_type: evidence
     plane: DEV
@@ -235,6 +243,10 @@ nodes:
     status: confirmed
     label: "Leitura direta: comando de 214 linhas JA delega ao especialista — camadas deliberadas"
     trace: ".claude/commands/meta/create-agent.md:207"
+    provenance:
+      source: ".claude/commands/meta/create-agent.md:207"
+      locator: ".claude/commands/meta/create-agent.md:207"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_J_D3_6
     node_type: evidence
     plane: DEV
@@ -243,6 +255,10 @@ nodes:
     status: confirmed
     label: "PASSO 0 dos 4 comandos e ponteiro que CITA o fragmento; conteudo canonico so existe la"
     trace: ".claude/commands/product/task.md:47"
+    provenance:
+      source: ".claude/commands/product/task.md:47"
+      locator: ".claude/commands/product/task.md:47"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_J_D3_7
     node_type: evidence
     plane: DEV
@@ -275,6 +291,10 @@ nodes:
     status: confirmed
     label: "ls confirma factory.md/interface.md/types.md presentes — premissa do achado era falsa"
     trace: ".claude/utils/task-manager/factory.md:1"
+    provenance:
+      source: ".claude/utils/task-manager/factory.md:1"
+      locator: ".claude/utils/task-manager/factory.md:1"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ── Questões abertas e decisões que o grafo produz ─────────────────────
   - id: Q_LINT_LINKS
@@ -327,6 +347,10 @@ nodes:
     status: confirmed
     label: "Verificacao em primeira mao: adopt.md USA bash em 5 pontos (123/152/167/175/258) — a parte 'Bash(bash *) nao usado' do claim original era falsa; rm/cat largos confirmados"
     trace: ".claude/commands/meta/adopt.md:123"
+    provenance:
+      source: ".claude/commands/meta/adopt.md:123"
+      locator: ".claude/commands/meta/adopt.md:123"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: C_D5_10B
     node_type: claim
     plane: DEV
@@ -343,6 +367,10 @@ nodes:
     status: confirmed
     label: "Shed-ceremony do postgres-specialist (2026-07-10, gatilho = decisao do maestro que suspende o deferimento de D_SHED_CEREMONY): agente 1121→~160 linhas mantendo role/processo/guidelines; SQL de referencia, exemplos e troubleshooting extraidos verbatim para a KB tools/postgresql.md (mesmo padrao gamma/presentation)"
     trace: "docs/knowledge-base/tools/postgresql.md:1"
+    provenance:
+      source: "docs/knowledge-base/tools/postgresql.md:1"
+      locator: "docs/knowledge-base/tools/postgresql.md:1"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_TUNE_PAIRS
     node_type: evidence
     plane: DEV
@@ -351,6 +379,10 @@ nodes:
     status: confirmed
     label: "Avaliacao dos pares restantes (2026-07-10): create-skill JA delega estruturado (Passo 4 — padrao de referencia, sem mudanca); create-command NAO delegava (especialista so em referencias) → delegacao explicita adicionada; staleness L0 corrigida em create-{command,agent} (limites 400/300 vs meta-spec 500-800/1200-1500, categorias sem design/deployment, tools driftadas no template inline)"
     trace: ".claude/commands/meta/create-command.md:78"
+    provenance:
+      source: ".claude/commands/meta/create-command.md:78"
+      locator: ".claude/commands/meta/create-command.md:78"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_LS_UNUSED
     node_type: evidence
     plane: DEV
@@ -359,6 +391,10 @@ nodes:
     status: confirmed
     label: "Residuo pos-fix (2026-07-10): Bash(ls *) declarado sem nenhum ls standalone no corpo (so git ls-tree, coberto por git *) — grant morto removido, v1.9.1"
     trace: ".claude/commands/meta/adopt.md:9"
+    provenance:
+      source: ".claude/commands/meta/adopt.md:9"
+      locator: ".claude/commands/meta/adopt.md:9"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_QUICKWINS
     node_type: decision
     plane: DEV

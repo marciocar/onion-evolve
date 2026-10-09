@@ -103,6 +103,10 @@ nodes:
     status: confirmed
     label: "SOBERANIA (inegociável): o MÉTODO/modo vai pro core; o KG do ENGAJAMENTO (dado do cliente, nós confidenciais) fica no repo dev do adotante e NUNCA sai. Reforçado pelo gate projection-safety.sh --terms antes de qualquer projeção cruzar fronteira. Mesma partição do #7"
     trace: ".claude/validation/projection-safety.sh"
+    provenance:
+      source: ".claude/validation/projection-safety.sh"
+      locator: ".claude/validation/projection-safety.sh"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: A_kg_md
     node_type: artifact
     plane: PROD

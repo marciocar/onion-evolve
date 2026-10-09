@@ -88,6 +88,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "o dogfood e o motor que move um no da confidence atribuida para o numero medido"
+    provenance:
+      source: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_ARISTOTLE_HOME_CANDIDATE
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md
@@ -180,6 +184,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "resolvido: ortogonal ao radar-da-constelacao, mas REUSA o motor-base — sobreposicao e reuso (estende), nao competicao; encolhe o '4o servico' pra disciplina+vista"
+    provenance:
+      source: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ---- RESOLUCAO de Q_AUTOREG_RHYTHM (dissolve a premissa: gatilho, nao ritmo) ----
   - id: C_RHYTHM_IS_EVENT_NOT_CLOCK
@@ -215,6 +223,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "resolvido: sem ritmo fixo; event-triggered (Aristoteles@intake, Hegel@contradicao, TTL-backstop@recolher), dogfood-gated; estende /meta:diary review + recolher + §2.6"
+    provenance:
+      source: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ---- RESOLUCAO de Q_PREVIA_SCHEMA (projecao por-papel; o .kg.yaml e a face publica) ----
   - id: C_PREVIA_IS_ROLE_PROJECTION
@@ -250,6 +262,10 @@ nodes:
     confidence: 0.75
     status: confirmed
     label: "resolvido: schema = Tier-0 (fase/next_action) + as 4 saidas do kg-radar reagrupadas por papel; fonte = .kg.yaml + SEED, NUNCA o corpo; read-only sob convite; Fase 1 = formatador fino"
+    provenance:
+      source: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      locator: "docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_ISOLATION_EXTENSION_GATED
     node_type: decision
     trace: docs/analysis/onion-research-constellation-dialogic-layer-2026-07.md

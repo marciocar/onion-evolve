@@ -661,6 +661,10 @@ nodes:
     confidence: 0.8
     status: refuted
     label: "RACIOCÍNIO REFUTADO (v1): 'mem_reservation (Low) é o teto do praticável — aceitável, pois Logto está um degrau ABAIXO de Caddy/bridge na hierarquia de proteção (não é o site público)'. Deixou de ser verdade no instante em que o Logto virou o PORTÃO DE ENTRADA: sob pressão de memória, o OOM killer escolheria justamente o componente que, morto, fecha o bridge inteiro. RESSALVA DA v3: o 'patamar de Caddy/bridge' a que se queria igualar era MENOR DO QUE SE PENSAVA (C_ancestor_cap_zeroes_floors) — igualar-se a um floor inefetivo não teria adiantado nada"
+    provenance:
+      source: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
+      locator: "docs/analysis/onion-m2-bridge-logto-integration-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ---- F5 (preservado): ALGORITMO PINADO ----
   - id: D_pin_jwt_algorithms
@@ -1560,6 +1564,10 @@ nodes:
     confidence: 0.8
     status: confirmed
     label: "DESENHO (nao construido, gated na ratificacao): downstream por PULL — a sessao do adotante busca os proprios anuncios em GET /federation/inbox/<member-id> autenticado. Dissolve o filesystem compartilhado sem exigir que ninguem alem do core hospede endpoint (exigir isso e irreal: adotante nao tem servidor). Upstream segue push assinado e ganha o `a2a-send` que falta. Uma credencial M2M por adotante; organizacao por adotante volta SOB DEMANDA, pelo mecanismo ja construido. Puxar != aplicar: regulated mantem never-live-pull"
+    provenance:
+      source: "docs/analysis/onion-adr-federation-transport-pull-2026-07.md"
+      locator: "docs/analysis/onion-adr-federation-transport-pull-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   - id: C_adopters_never_authenticate
     node_type: claim

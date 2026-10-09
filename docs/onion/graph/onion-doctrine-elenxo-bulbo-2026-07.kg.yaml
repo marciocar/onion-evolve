@@ -38,6 +38,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "Bulbo nomeia a ARQUITETURA: organismo de 4 camadas (substrato/fonte/aprendizagem/adaptacao) + a porosidade transversal que corta todas"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_COINAGES_DECLARED
     node_type: decision
     trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
@@ -47,6 +51,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "as 6 cunhagens (Elenxo, Bulbo, SDAAL, KG-SSOT-first, porosidade epistemica, Dogfood-de-fronteira) declaradas como NOSSAS — nem escondidas, nem passadas por literatura"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_PAGE_GATED
     node_type: decision
     trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
@@ -102,6 +110,10 @@ nodes:
     confidence: 0.85
     status: confirmed
     label: "SSOT nao tem autor-fundador (verificado 2026-07-22); ancora so na normalizacao de Codd (1970) — nao inventar pai para a bibliografia"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ---- evidencia (as auto-incriminacoes REAIS — a prova de que o ciclo e real) ----
   - id: E_ZIMMERMAN_FIX
@@ -113,6 +125,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "erro real corrigido: o ciclo de autorregulacao (previsao/execucao/autorreflexao) e de Zimmerman (2002), nao de Pintrich — a atribuicao errada foi cometida e corrigida"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: E_CHALYBAUS_FIX
     node_type: evidence
     trace: docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md
@@ -131,6 +147,10 @@ nodes:
     confidence: 0.9
     status: confirmed
     label: "incidente 2026-07-20: gate auditou 50 achados (70 agentes, 10 refutados) e nao guardou NENHUM no grafo — porosidade falhou p/ dentro; virou a REGRA 29 invertida"
+    provenance:
+      source: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      locator: "docs/analysis/onion-doctrine-elenxo-bulbo-draft-2026-07.md"
+      method: "derivado: trace do nó, sem registro de medição"
 
   # ---- a trava (rule) ----
   - id: R_COINAGE_DISCIPLINE

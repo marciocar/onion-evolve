@@ -90,6 +90,10 @@ nodes:
     confidence: 0.95
     status: confirmed
     label: "ADOTAR o reframe; codificar a fronteira std=hub-em-trabalho, hub=+federação, meta-fábrica core-only"
+    provenance:
+      source: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
+      locator: "docs/evolution/research/onion-tier-matrix-2026-07/SYNTHESIS.md"
+      method: "derivado: trace do nó, sem registro de medição"
   - id: D_KGRADAR_FIX_NONGATED
     node_type: decision
     layer: audit
