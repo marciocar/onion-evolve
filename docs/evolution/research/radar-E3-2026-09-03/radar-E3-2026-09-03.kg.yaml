@@ -36,6 +36,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F1 EMENDADO. 2.1.259 corrige "frontmatter model: em custom commands e skills era IGNORADO em sessoes interativas" (l.17): passa a valer. Exposicao REAL do core: 109 comandos com model: (96 sonnet, 10 opus, 3 haiku); NENHUMA skill (as 2 ocorrencias em onion-patterns sao exemplos no corpo); 51 agentes (43 sonnet, 8 opus) — agentes sempre foram honrados (subagente), o delta e so em COMANDOS. Consequencia esperada: invocar /warm-up (model: sonnet) no picker de uma sessao Fable pede troca para sonnet; a guarda PreModelSwitch (lineup claude-fable-5-1/claude-opus-5, radar-baselines.yaml:34-35) VETA nos dois ramos, porque a plataforma resolve o apelido (evento medido 2026-09-02: requested=sonnet, to=claude-sonnet-5, decision=block). O que acontece com o comando APOS o veto NAO foi medido (E_LACUNAS). Estrategia: os 96 `model: sonnet` sao um DOWNGRADE latente da doutrina "sempre o maximo" que a plataforma agora executa — decisao proposta em D_COMANDOS_SEM_MODEL_OU_NO_LINEUP.'
     trace: 'docs/evolution/research/radar-E3-2026-09-03/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-03/SYNTHESIS.md"
+      locator: "CHANGELOG l.17; medicao frontmatter-only (awk entre os dois ---): commands 109 (96 sonnet/10 opus/3 haiku), skills 0, agents 51; juiz EMENDOU (meu grep contava exemplos no corpo: 111/1/163)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_F2_AUTO_MODE_MANTEM_SESSAO
     node_type: evidence
     plane: DEV
@@ -48,6 +52,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F2 EMENDADO. l.12: auto mode nao roda mais um turno num modelo que ele NAO SUPORTA quando o frontmatter de comando/skill nomeia um — o turno mantem o modelo da sessao. NAO e "em auto mode a sessao vence": e o contrapeso de l.17 recortado ao caso nao-suportado. Para o core (Fable/Opus no lineup) nao muda nada por si; combina com F1.'
     trace: 'docs/knowledge-base/concepts/agent-orchestration.md'
+    provenance:
+      source: "docs/knowledge-base/concepts/agent-orchestration.md"
+      locator: "CHANGELOG l.12 (eu citara l.10 = cache OAuth; juiz corrigiu)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_F3_PERMISSION_PROMPTS_NONE
     node_type: evidence
     plane: DEV
@@ -84,6 +92,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F5 REPROVADO e substituido. l.9 amplia a cobertura de deny rules Read() do Bash (valores de opcao como -f.env/@file, operandos de git diff/grep, compostos cd DIR && cat FILE; grep -r/cp -r sobre dir com arquivo negado passa a perguntar). Medido: o core NAO tem deny rule nenhuma; a linha 12 do settings.json e um ALLOW de `Bash(grep * .env)` — sentido contrario. Antes de adotar deny estilo Read(./.env) e preciso rever esse allow. A doutrina da casa (segredo nunca em claro no repo + pass) nao depende de deny rule; a cobertura nova e OPCAO, nao lacuna.'
     trace: '.claude/settings.json'
+    provenance:
+      source: ".claude/settings.json"
+      locator: "CHANGELOG l.9; grep -n deny .claude/settings.json .claude/settings.local.json = vazio; settings.json:12 \"Bash(grep * .env)\" esta em permissions.ALLOW (juiz REPROVOU minha leitura: li allow como deny)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
     # 2026-09-04 (rodada 3, l.42): a plataforma REVERTEU a cobertura de deny rules Read() em args do Bash — a metade
     # "cobertura e opcao a adotar" deste no esta superada (E_R3_F1_REVERT_DENY_READ_BASH em radar-E3-2026-09-04);
     # a metade do ALLOW Bash(grep * .env) segue viva. Superacao parcial: status fica confirmed.
@@ -99,6 +111,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F6 EMENDADO. l.6: `claude plugin validate --json` da relatorio legivel por maquina. O core JA usa `claude plugin validate --strict` como passo MANUAL opcional em onion-publish e o lint delega a validacao YAML a ele: --json nao entra do zero, ele torna um passo existente CONSUMIVEL POR GATE (parse do JSON no assemble/publish). Oportunidade concreta, pequena.'
     trace: '.claude/skills/onion-publish/SKILL.md'
+    provenance:
+      source: ".claude/skills/onion-publish/SKILL.md"
+      locator: "CHANGELOG l.6; .claude/skills/onion-publish/SKILL.md:9 (allowed-tools) e :55-56 (passo 5, --strict manual); lint-artifacts.sh:2284 delega validacao YAML ao plugin validate (juiz EMENDOU: nao e novo, ja e usado manualmente)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_F7_MANAGED_MCP_E_ALLOWLIST
     node_type: evidence
     plane: DEV
@@ -123,6 +139,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F8 REPROVADO e reduzido a nota. l.29: Stop hooks bloqueantes faziam o turno seguinte perder o raciocinio e, em alguns modelos, o cache. O core NAO tem hook Stop; os vetos sao PreToolUse e PreModelSwitch, fora do escopo de l.29. Vale so se o core vier a adotar um Stop bloqueante.'
     trace: '.claude/settings.json'
+    provenance:
+      source: ".claude/settings.json"
+      locator: "CHANGELOG l.29 (eu citara l.30 = MCP no navegador); settings.json configura SessionStart/UserPromptSubmit/SessionEnd/PreCompact/PostToolUse/PreToolUse/PreModelSwitch/PostModelSwitch — SEM hook Stop (juiz REPROVOU)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_F9_WORKTREE_E_WORKFLOW
     node_type: evidence
     plane: DEV
@@ -135,6 +155,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F9 EMENDADO. l.20: isolamento aceita worktrees criadas por hook; l.31: sessao isolada por worktree deixa de recusar loops/xargs/launchers; l.36: resultado de subagente aninhado fica no transcript do pai (resume e transcript compartilhado preservam); l.27: RESUME de workflow nao roda mais copias duplicadas dos agentes enquanto o run anterior ainda sai. O juiz subiu l.27 de nota para CORRECAO DE CUSTO: um resume do /onion-research (~1,3M tokens no modo research) dobraria a corrida. Tudo a favor da orquestracao do core; nada a mudar.'
     trace: '.claude/workflows/onion-research.js'
+    provenance:
+      source: ".claude/workflows/onion-research.js"
+      locator: "CHANGELOG l.20, l.27, l.31, l.36 (eu citara l.21/l.32; juiz corrigiu); git worktree list (worktree viva em .claude/worktrees/); .claude/workflows/onion-research.js (36 KB)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_F10_GITLAB_NA_PLATAFORMA
     node_type: evidence
     plane: DEV
@@ -147,6 +171,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F10 APROVADO. l.5: `glab mr create/merge/close/reopen/note/update` reconhecido (MR !N no sumario, badge no rodape); l.35: /install-github-app explica ser GitHub-only e aponta docs de GitLab CI/CD. A plataforma esta costurando GitLab; o forge SDAAL do core tem gitlab "costura pronta, nao implementado". Sinal estrategico: a demanda do lado da plataforma cresce; o adapter gitlab sobe na fila quando um adotante pedir.'
     trace: '.claude/utils/forge/adapters/github.md'
+    provenance:
+      source: ".claude/utils/forge/adapters/github.md"
+      locator: "CHANGELOG l.5 e l.35; .claude/utils/forge/adapters/ = github.md + none.md (github.md:9 declara-se o unico implementado; gitlab/bitbucket = costura em factory.md/detector.md)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_F11_MANAGED_SETTINGS_FAIL_LOUD
     node_type: evidence
     plane: DEV
@@ -159,6 +187,10 @@ nodes:
     source_kind: vendor-on-self   # CHANGELOG oficial, verbatim em data/ (DREAM 9 = definitiva), lido e re-medido pelo juiz
     label: 'F11 EMENDADO. l.25: managed settings ilegiveis (arquivo, drop-in, plist MDM, HKLM) deixam de ser IGNORADOS em silencio: o Claude Code recusa iniciar e nomeia a fonte. E o mesmo padrao que premodelswitch-guard.sh ja implementa (baseline presente mas ilegivel = VETO nomeando o arquivo, nunca liberacao silenciosa) — a plataforma convergiu com a doutrina fail-loud da casa.'
     trace: '.claude/hooks/premodelswitch-guard.sh'
+    provenance:
+      source: ".claude/hooks/premodelswitch-guard.sh"
+      locator: "CHANGELOG l.25 (eu citara l.24 = identidade do repo; juiz corrigiu); .claude/hooks/premodelswitch-guard.sh (baseline ilegivel = exit 2 nomeando o arquivo)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_OMISSOES_JUIZ_0903
     node_type: evidence
     plane: DEV
@@ -181,6 +213,10 @@ nodes:
     verified_at: '2026-09-03'
     verified_against: 'familia model_ladder 7/7 (guarda: piso/picker veta, piso/fallback degraded, restored, fora veta; aviso; REGRA 70; REGRA 71; sonda) + lint real sem REGRA 70/71 + 109 comandos sem model: no frontmatter'
     trace: 'docs/onion/radar-baselines.yaml'
+    provenance:
+      source: "docs/onion/radar-baselines.yaml"
+      locator: "familia model_ladder 7/7 (guarda: piso/picker veta, piso/fallback degraded, restored, fora veta; aviso; REGRA 70; REGRA 71; sonda) + lint real sem REGRA 70/71 + 109 comandos sem model: no frontmatter"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_LACUNAS_E3_0903
     node_type: evidence
     plane: DEV
@@ -205,6 +241,10 @@ nodes:
     source_kind: primary
     label: 'A plataforma TEM fallback nativo de modelo: settings.json:fallbackModel (lista ordenada) e --fallback-model (headless) disparam em SOBRECARGA da API (529 apos retries; FallbackTriggeredError reason=overloaded) com headers x-cc-fallback-*. Nao ha, no binario, fallback por COTA de plano (o teto do Fable no Max): quando a cota fecha, o comportamento e lacuna (E_LACUNAS). Consequencia de desenho: a escada da casa (session_models + session_floor) e a SSOT; fallbackModel e PROJECAO dela (REGRA 70), para a plataforma nunca cair fora da guarda.'
     trace: 'docs/onion/radar-baselines.yaml'
+    provenance:
+      source: "docs/onion/radar-baselines.yaml"
+      locator: "binario 2.1.259 (strings): chave de settings fallbackModel (aceita LISTA — merge especial), flag --fallback-model, classe FallbackTriggeredError(originalModel, fallbackModel, reason=\"overloaded\") apos retries de 529, headers x-cc-fallback-from-model/-trigger/-category; NAO encontrado fallback por COTA do plano"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_ESCADA_DE_MODELOS_IMPLEMENTADA_0903
     node_type: evidence
     plane: PROD
@@ -217,6 +257,10 @@ nodes:
     source_kind: primary
     label: 'IMPLEMENTADO (selo do maestro: piso Sonnet SIM, opcao A): (1) escada na baseline E6 — session_models [fable-5-1, opus-5] (troca livre) + session_floor claude-sonnet-5 (so por fallback, source != picker); (2) guarda PreModelSwitch: campo ladder (degraded|restored|same) no log, piso pelo /model = VETO nomeando o piso, piso por fallback = permite com aviso; (3) hook UserPromptSubmit session-degraded-notice.sh avisa a cada prompt enquanto degradado, cala ao restored; (4) settings.json:fallbackModel = [opus-5, sonnet-5] PROJETADO (REGRA 70 HARD paridade); (5) REGRA 71 HARD: comando nao declara model: — 109 comandos limpos, template e skill onion-patterns atualizados; (6) ops/model-lineup-probe.sh: acesso por degrau (ok|denied|timeout), TSV + jsonl, exit 1 se algum degrau nega — mecaniza o "confirmado na conta" da rodada E6. Reorganizacao quando surge modelo novo = REGRA 65 dispara a rodada E6 -> sonda -> edita a escada (1 arquivo) -> lint projeta -> guarda le.'
     trace: '.claude/hooks/premodelswitch-guard.sh'
+    provenance:
+      source: ".claude/hooks/premodelswitch-guard.sh"
+      locator: "familia model_ladder 7/7; 6 transicoes testadas a mao na guarda; lint real sem REGRA 70/71; 109 comandos sem model:"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: E_F1_MODEL_FRONTMATTER_VALE_INTERATIVO

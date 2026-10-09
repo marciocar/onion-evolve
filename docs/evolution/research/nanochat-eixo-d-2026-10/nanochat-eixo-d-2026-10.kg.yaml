@@ -72,6 +72,10 @@ nodes:
     source_kind: paper
     label: 'Trace2Skill constroi uma SKILL (texto) a partir de trajetorias SEM atualizar pesos: nao e SFT, logo nao mede esquecimento catastrofico nem identidade em pesos. Fecha o "cortado sem leitura" de E_LACUNAS_NANOCHAT_2026_10 pelo avesso — a fonte nomeada como "treino com corpus agentico" nao e treino em pesos. Ganha-se so um contraponto: existe rota trajetoria->texto, que converge com o que o Onion ja faz. "Preserva auditabilidade" NAO e da fonte (rejeitada na ancoragem).'
     trace: 'https://arxiv.org/abs/2603.25158'
+    provenance:
+      source: "https://arxiv.org/abs/2603.25158"
+      locator: "QUOTE \"Trace2Skill constructs a new skill from evolving-set trajectories without updating θ\" — locator: Secao 2.1 (formalizacao, Eq. 1); ancorada por verificador independente; tier nao declarado pelo leitor, herdado da outra claim da mesma fonte (7)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_TRACE2SKILL_PATCH_SELECTION_COSTLY
     node_type: evidence
     plane: DEV
@@ -85,6 +89,10 @@ nodes:
     source_kind: paper
     label: 'Limite declarado do Trace2Skill: selecionar um subconjunto melhor de patches por otimizacao bayesiana ajuda mas "e custoso" — sem numero, sem unidade. E custo de SELECIONAR patches de skill, nao de gerar dado nem de treinar; para o orcamento pedido, nao fornece valor (Elenxo, objecao 2 sobrevivente). O paper nao trata esquecimento.'
     trace: 'https://arxiv.org/abs/2603.25158'
+    provenance:
+      source: "https://arxiv.org/abs/2603.25158"
+      locator: "QUOTE \"Trace2Skill applies all consolidated patches by default; selecting a higher-quality subset with Bayesian optimization can help (§ 4.3), but it is costly.\" — locator: secao Limitations (nao numerada; \"secao 6\" nao confirmada); ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── arXiv 2308.08747 (esquecimento catastrofico) — sub-pergunta 2 ─────────────────
   - id: E_CF_DECODER_ONLY_FORGETS_LESS
@@ -100,6 +108,10 @@ nodes:
     source_kind: paper
     label: 'Decoder-only (BLOOMZ) esquece menos que encoder-decoder (mT0) com dados de treino semelhantes. UNICA claim do 2308.08747 que ancorou — e nao ajuda o Onion: o nanochat e qualquer candidato ja seriam decoder-only. As claims que respondiam "quanto e quando" (esquecimento de 1b a 7b, mistura Alpaca 34,72 -> 26,8 -> 30, ausencia de LoRA/replay) foram REBAIXADAS por falta de quote/locator e NAO existem nesta rodada (E_LACUNAS_EIXO_D_2026_10).'
     trace: 'https://arxiv.org/abs/2308.08747'
+    provenance:
+      source: "https://arxiv.org/abs/2308.08747"
+      locator: "QUOTE \"Comparing the decoder-only model BLOOMZ with the encoder-decoder model mT0, BLOOMZ exhibits less forgetting and retains more knowledge.\" — locator: Abstract; Secao 5.3 (Effect of Model Architecture); ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── arXiv 2305.11206 (LIMA) — sub-pergunta 3 ─────────────────
   - id: E_LIMA_1000_EXAMPLES_COMPOSITION
@@ -115,6 +127,10 @@ nodes:
     source_kind: paper
     label: 'LIMA: ~1.000 exemplos — 750 de foruns (Stack Exchange, wikiHow) amostrados por qualidade e diversidade + 250 escritos a mao. E ORDEM DE GRANDEZA de OUTRO regime: LLaMa 65B, alinhamento de FORMATO geral, nao identidade em modelo pequeno. 75% vem de foruns multi-comunidade, sem analogo no corpus de dominio unico do Onion (E_CORPUS_SCALE_MEASURED). A hipotese que licenciaria a transferencia (Superficial Alignment Hypothesis) foi REJEITADA na ancoragem por falta de quote.'
     trace: 'https://arxiv.org/abs/2305.11206'
+    provenance:
+      source: "https://arxiv.org/abs/2305.11206"
+      locator: "QUOTE \"We select 750 top questions and answers from community forums, such as Stack Exchange and wikiHow, sampling for quality and diversity. In addition, we manually write 250\" — locator: Secao 2 (Alignment Data), nao Secao 1; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_LIMA_DIVERSITY_QUALITY_OVER_QUANTITY
     node_type: evidence
     plane: DEV
@@ -128,6 +144,10 @@ nodes:
     source_kind: paper
     label: 'Ablacao do LIMA (LLaMa 7B): diversidade de entrada e qualidade de saida tem efeito positivo medido; so quantidade "talvez nao" (hedge da fonte). Aponta mais CONTRA o corpus do Onion do que a favor: o eixo que mais rende e a DIVERSIDADE, e o corpus e um dominio so (~4.181 nos de KG + KBs). Prova a direcao, nao da piso de exemplos.'
     trace: 'https://arxiv.org/abs/2305.11206'
+    provenance:
+      source: "https://arxiv.org/abs/2305.11206"
+      locator: "QUOTE \"for the purpose of alignment, scaling up input diversity and output quality have measurable positive effects, while scaling up quantity alone might not.\" — locator: Secao 5 (Why is Less More?), paragrafo 1; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_LIMA_CURATION_COSTLY_FRAGILE
     node_type: evidence
     plane: DEV
@@ -141,6 +161,10 @@ nodes:
     source_kind: paper
     label: 'Limites declarados pelo LIMA: a curadoria manual e "significativa e dificil de escalar" (sem horas, sem dolares — nomeia o custo, nao o mede) e o modelo e menos robusto que modelos de produto, fragil a prompt adversarial. A fragilidade adversarial pesa contra destilar a doutrina em pesos: o Elenxo e justamente adversarial.'
     trace: 'https://arxiv.org/abs/2305.11206'
+    provenance:
+      source: "https://arxiv.org/abs/2305.11206"
+      locator: "QUOTE \"the mental effort in constructing such examples is significant and difficult to scale up. Secondly, LIMA is not as robust as product-grade models; while LIMA typically generates good responses, an unlucky sample during decoding or an adversarial prompt\" — locator: Secao 7 (Discussion), paragrafo 1; ancorada por verificador independente"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── arXiv 2404.07503 (survey de dados sinteticos) — sub-perguntas 1 e 4 ─────────────────
   - id: E_SYNTH_MISAPPLIED_RAISES_HALLUCINATION
@@ -156,6 +180,10 @@ nodes:
     source_kind: paper
     label: 'Dado sintetico mal aplicado pode AUMENTAR alucinacao. Afirmacao de survey, condicional, sem taxa e sem limiar do que e "aplicar corretamente"; nao mede factualidade de sintetico gerado de corpus pequeno. A claim irma ("testes rigorosos") foi rebaixada na ancoragem.'
     trace: 'https://arxiv.org/abs/2404.07503'
+    provenance:
+      source: "https://arxiv.org/abs/2404.07503"
+      locator: "QUOTE \"synthetic data, if not applied correctly, can actually increase hallucina- tions in language models.\" — locator: Secao 2.5 Alignment, \"Mitigating hallucination\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_SYNTH_EVAL_CONTAMINATION_PROTECTED_BENCH
     node_type: evidence
     plane: DEV
@@ -169,6 +197,10 @@ nodes:
     source_kind: paper
     label: 'Sintetico dificulta a descontaminacao de avaliacao (parafrases do benchmark); a fonte RECOMENDA benchmarks internos e protegidos. E recomendacao, nao medicao — e e usada como tal: converge com Q_EVAL_DE_DOMINIO_DO_ONION (pai, aberto) e o torna PRE-CONDICAO de qualquer opcao D. Sem eval interna protegida, nenhum orcamento de identidade e mensuravel.'
     trace: 'https://arxiv.org/abs/2404.07503'
+    provenance:
+      source: "https://arxiv.org/abs/2404.07503"
+      locator: "QUOTE \"we recommend that model developers invest in creating and maintaining in- house and protected evaluation benchmarks.\" — locator: Secao 4 Limitations and Risks; ancorada por verificador independente; Elenxo objecao 8 NAO sobreviveu (a claim fica de pe no uso que a rodada faz dela)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_SYNTH_SCALING_OPEN_QUESTION
     node_type: evidence
     plane: DEV
@@ -182,6 +214,10 @@ nodes:
     source_kind: paper
     label: 'O escalonamento de dado sintetico (quantidade x qualidade) e QUESTAO EM ABERTO na literatura que o survey revisa; o paper nao da orcamento minimo. Ancora com honestidade uma AUSENCIA: a fonte que devia dar o orcamento declara que ele nao existe. A sub-pergunta (1), custo, continua aberta por isso.'
     trace: 'https://arxiv.org/abs/2404.07503'
+    provenance:
+      source: "https://arxiv.org/abs/2404.07503"
+      locator: "QUOTE \"whether we have similar conclusions on the training with synthetic data is still an open question, as the quality of synthetic data may not be as consistent as real-world data\" — locator: Secao 5 Directions for Future Work, \"Synthetic data scaling\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_SYNTH_DOMAIN_RAG_FUTURE_WORK
     node_type: evidence
     plane: DEV
@@ -195,6 +231,10 @@ nodes:
     source_kind: paper
     label: 'Gerar sintetico FIEL ao dominio via conhecimento de dominio (ex.: RAG) e DIRECAO FUTURA, nao resultado medido. A rota que o Onion usaria (sintetico ancorado no KG/KB publico, tipo RAG) e declarada NAO MEDIDA — a metade "qualidade" da sub-pergunta (1) segue sem evidencia.'
     trace: 'https://arxiv.org/abs/2404.07503'
+    provenance:
+      source: "https://arxiv.org/abs/2404.07503"
+      locator: "QUOTE \"methods that can incorporate domain-specific knowledge to ensure the generated data adheres to the underlying con- straints and patterns present in the target domain (e.g., via Retrieval Augmented Gener- ation (RAG)\" — locator: Secao 5 Directions for Future Work, \"Further improving quality and diversity of synthetic data\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_SYNTH_TOOL_TRAJECTORIES_POWERFUL
     node_type: evidence
     plane: DEV
@@ -208,6 +248,10 @@ nodes:
     source_kind: paper
     label: 'Trajetorias SINTETICAS de uso de ferramenta sao tratadas como "abordagem poderosa", motivadas pelo custo do dado humano real. Juizo de survey, sem medicao; fala de trajetorias SIMULADAS de ferramenta, nao de revisoes adversariais nem de trajetorias reais de PR. Nao enfrenta E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR: trajetorias geradas pelo Claude herdam o erro correlacionado do gerador.'
     trace: 'https://arxiv.org/abs/2404.07503'
+    provenance:
+      source: "https://arxiv.org/abs/2404.07503"
+      locator: "QUOTE \"Synthetic data is also a powerful ap- proach to enable LMs to learn tool-using abilities through simulated trajectories, as collect- ing real-world human tool-using data might be time-consuming\" — locator: Secao 2.2 Tool-using and planning, \"Learning tool-using through synthetic trajectories\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── nanochat discussao #139 + scripts/chat_sft.py — sub-perguntas 1, 3 e 5 ─────────────────
   - id: E_NANOCHAT_IDENTITY_SYNTHETIC_SFT_METHOD
@@ -223,6 +267,10 @@ nodes:
     source_kind: primary
     label: 'O metodo oficial de identidade do Nanochat (autor, "Guide: infusing identity to your nanochat") e SFT SINTETICO: descrever o comportamento em ingles e pedir conversas a um LLM maior via API. Prova que o METODO existe, nao que funciona nem o que custa em utilidade. Para o Onion o "bigger cousin" seria o Claude — o que REABRE E_OBJECAO_SLM_JUDGE_CORRELATED_ERROR: o destilado herda os vieses do gerador.'
     trace: 'https://github.com/karpathy/nanochat/discussions/139'
+    provenance:
+      source: "https://github.com/karpathy/nanochat/discussions/139"
+      locator: "QUOTE \"you just specify the behavior of your model in words (in English), and then ask for synthetic conversations from your favorite bigger cousin LLM of nanochat through an API.\" — locator: Discussao #139, paragrafo que cita dev/gen_synthetic_data.py; ancorada por verificador independente; createdAt da discussao 2025-10-21 medido por gh api graphql na escrita"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_NANOCHAT_IDENTITY_1000_CONVERSATIONS
     node_type: evidence
     plane: DEV
@@ -236,6 +284,10 @@ nodes:
     source_kind: primary
     label: 'UNICO numero de orcamento de identidade da rodada: 1.000 conversas multi-turno, geradas em "poucos minutos", adicionadas as misturas de midtraining e SFT. Cobre SO a GERACAO. Nao diz custo de API em dolares, custo de re-rodar midtraining+SFT, se a identidade "pegou", nem o que a mistura fez com CORE/MMLU/GSM8K. Minutos de geracao NAO sao o orcamento total.'
     trace: 'https://github.com/karpathy/nanochat/discussions/139'
+    provenance:
+      source: "https://github.com/karpathy/nanochat/discussions/139"
+      locator: "QUOTE \"In this case, I generated 1000 multi-turn conversations, which took only a few minutes. We then simply add these conversations to the midtraining and SFT data mixtures.\" — locator: Discussao #139, mesmo paragrafo do metodo; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_NANOCHAT_IDENTITY_STAGE_RETRAIN
     node_type: evidence
     plane: DEV
@@ -249,6 +301,10 @@ nodes:
     source_kind: primary
     label: 'O mecanismo e uma Task CustomJSON que serve um jsonl; o procedimento e REGENERAR e RE-RODAR os estagios de midtraining e SFT. Identidade nao e patch barato de dado: e retreino de ESTAGIOS a cada mudanca. Para o Onion, cada mudanca de doutrina custaria um ciclo de GPU sem trilha de PR — a forma concreta de S7_claim_analogy_breaks.'
     trace: 'https://github.com/karpathy/nanochat/discussions/139'
+    provenance:
+      source: "https://github.com/karpathy/nanochat/discussions/139"
+      locator: "QUOTE \"Re-generate the conversations and then re-run the midtraining and SFT stages. You'll notice both scripts now use a new `CustomJSON` Task, which serves conversations from simple jsonl file you pass it.\" — locator: Discussao #139, secao \"Your turn\"; ancorada por verificador independente; Elenxo objecao 14 NAO sobreviveu"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_NANOCHAT_MASTER_SFT_NO_IDENTITY
     node_type: evidence
     plane: DEV
@@ -261,6 +317,10 @@ nodes:
     source_kind: primary
     label: 'O SFT do master HOJE nao referencia identidade nem CustomJSON: a mistura e SmolTalk + MMLU x3 + GSM8K x4. Confirma o 404 da varredura (E_NANOCHAT_MASTER_NARROWED, pai) e que a identidade SAIU do SFT — medido por grep, sem afirmar o motivo. NAO ler "saiu do master" como "nao funcionou": a fonte nao diz isso.'
     trace: 'https://github.com/karpathy/nanochat/blob/master/scripts/chat_sft.py'
+    provenance:
+      source: "https://github.com/karpathy/nanochat/blob/master/scripts/chat_sft.py"
+      locator: "QUOTE \"SmolTalk(split=\"train\"), # 460K rows of general conversations *[MMLU(subset=\"all\", split=\"auxiliary_train\") for _ in range(args.mmlu_epochs)], # 100K rows per epoch\" — locator: scripts/chat_sft.py, linhas 163-165 e 65-66 (defaults); ancorada por verificador independente; Elenxo objecao 15 NAO sobreviveu"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── arXiv 2405.09673 (LoRA Learns Less and Forgets Less) — sub-pergunta 2 ─────────────────
   - id: E_LORA_UNDERPERFORMS_FULL_PRESERVES_OOD
@@ -276,6 +336,10 @@ nodes:
     source_kind: paper
     label: 'Em ranks LoRA padrao, LoRA fica bem abaixo do full finetuning no dominio-alvo (codigo e matematica, Llama-2-7B), mas preserva melhor o desempenho FORA do dominio. A direcao vale; o regime e CPT de bilhoes de tokens e IFT de ~100K pares, 2-3 ordens acima de um SFT de ~10^3 exemplos do Onion, sem identidade e sem modelo classe nanochat (Elenxo, objecao 16 sobrevivente).'
     trace: 'https://arxiv.org/abs/2405.09673'
+    provenance:
+      source: "https://arxiv.org/abs/2405.09673"
+      locator: "QUOTE \"Our results show that, in the standard low-rank settings, LoRA substantially underperforms full finetuning. Nevertheless, LoRA better maintains the base model’s performance on tasks outside the target domain.\" — locator: Abstract (arXiv v2); ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_LORA_IFT_HIGH_RANK_CLOSES_GAP
     node_type: evidence
     plane: DEV
@@ -289,6 +353,10 @@ nodes:
     source_kind: paper
     label: 'No regime de IFT (~100K pares), ranks mais altos fecham a maior parte da diferenca; em CPT o full finetuning e mais preciso e eficiente em amostras. O ponto de dado que fecha a diferenca e ~100x o que o corpus publico do Onion sustentaria com diversidade — nao informa o regime de 10^3 exemplos (Elenxo, objecao 17 sobrevivente).'
     trace: 'https://arxiv.org/abs/2405.09673'
+    provenance:
+      source: "https://arxiv.org/abs/2405.09673"
+      locator: "QUOTE \"Full finetuning is more accurate and sample-efficient than LoRA in continued pretraining (CPT) for code and math; in instruction finetuning (IFT), higher ranks can close most of the gaps (Sec.4.1).\" — locator: Sec. 1, lista de contribuicoes, 1o item; ancorada por verificador independente; tier nao declarado pelo leitor, herdado das demais claims da mesma fonte (8)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_LORA_FORGETTING_CONTROLLED_BY_RANK
     node_type: evidence
     plane: DEV
@@ -302,6 +370,10 @@ nodes:
     source_kind: paper
     label: 'O esquecimento e MEDIDO e controlado pelo rank: IFT esquece mais que CPT, codigo mais que matematica, e piora com a duracao; em matematica LoRA r=256 esquece quase tanto quanto o full. Mede esquecimento PROGRESSIVO em dominio largo — NAO o caso pedido (dado de identidade/dominio DOMINANDO a mistura), e nao ha experimento de mistura nem de replay (Elenxo, objecao 18 sobrevivente).'
     trace: 'https://arxiv.org/abs/2405.09673'
+    provenance:
+      source: "https://arxiv.org/abs/2405.09673"
+      locator: "QUOTE \"Most importantly, LoRA forgets less than full finetuning, and the extent of forgetting is controlled by rank. In code – for both CPT and IFT – full finetuning forgets substantially more than any LoRA configuration.\" — locator: Sec. 4.2, paragrafo 1 (Fig. 2; Tabelas S2, S4, S6, S8); ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_LORA_R16_R256_LEARN_FORGET
     node_type: evidence
     plane: DEV
@@ -315,6 +387,10 @@ nodes:
     source_kind: paper
     label: 'LoRA esquece menos que weight decay e attention dropout (que aprendem e esquecem tanto quanto o full). r=16 aprende menos e esquece menos; r=256 aprende como os outros metodos esquecendo menos. Responde literalmente "LoRA aprende menos e esquece menos?" — DENTRO do escopo Llama-2-7B, codigo e matematica (E_LORA_SCOPE_7B_ONLY).'
     trace: 'https://arxiv.org/abs/2405.09673'
+    provenance:
+      source: "https://arxiv.org/abs/2405.09673"
+      locator: "QUOTE \"LoRA, with the common r = 16, learns less and forgets less than all other models. LoRA r = 256, on the other hand, learns as much as the other methods while forgetting less.\" — locator: Sec. 4.5, \"LoRA forgets less than attention dropout and weight decay\" (Fig. 4); ancorada por verificador independente; Elenxo objecao 19 NAO sobreviveu"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_LORA_HYPERPARAM_SENSITIVE
     node_type: evidence
     plane: DEV
@@ -328,6 +404,10 @@ nodes:
     source_kind: paper
     label: 'LoRA e muito sensivel a hiperparametros (learning rate, modulos-alvo, rank, escala); acerta-los e PRE-REQUISITO para chegar perto do full. Componente de CUSTO que a rodada precisa: a varredura de hiperparametros multiplica as rodadas de treino. Sem numero — usado so como limite.'
     trace: 'https://arxiv.org/abs/2405.09673'
+    provenance:
+      source: "https://arxiv.org/abs/2405.09673"
+      locator: "QUOTE \"We find that LoRA is very sensitive to hyperparameters, including learning rates, choice of target modules, ranks, and scaling factors; setting these properly is a prerequisite to approach full finetuning performance.\" — locator: Sec. 1, paragrafo apos a pergunta de pesquisa (detalhado na Sec. 4.7); ancorada por verificador independente; Elenxo objecao 20 NAO sobreviveu"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_LORA_SCOPE_7B_ONLY
     node_type: evidence
     plane: DEV
@@ -341,6 +421,10 @@ nodes:
     source_kind: paper
     label: 'CERCA DE ESCOPO declarada pela fonte: so Llama-2-7B, codigo e matematica; o efeito do tamanho do modelo fica para trabalho futuro, e a analise espectral e so de CPT. E isso que IMPEDE transferir as claims de LoRA para um modelo classe GPT-2 (nanochat d20, CORE ~0,26) com ~10^3 exemplos.'
     trace: 'https://arxiv.org/abs/2405.09673'
+    provenance:
+      source: "https://arxiv.org/abs/2405.09673"
+      locator: "QUOTE \"we leave a rigorous study of these intriguing scaling properties to future work.\" — locator: Sec. 6, Discussion, \"Does the difference between LoRA and full finetuning change with model size?\"; ancorada por verificador independente; Elenxo objecao 21 NAO sobreviveu"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ───────────────── contabilidade da rodada ─────────────────
   - id: E_LACUNAS_EIXO_D_2026_10

@@ -22,6 +22,10 @@ nodes:
     verified_at: 2026-08-18
     verified_against: "varredura de plugins/*/kb/*.md resolvendo cada link irmao contra o disco: 15 mortos em DOIS plugins (onion-work-tools 12, onion-engineering 3)"
     label: "15 links irmaos MORTOS nos kb/ dos plugins — e sao DOIS plugins, nao um; as contagens anteriores (4, depois 11) mediram so onion-work-tools"
+    provenance:
+      source: "docs/evolution/review/docs-elenxo-doctrine-to-vendored-kb.md"
+      locator: "varredura de plugins/*/kb/*.md resolvendo cada link irmao contra o disco: 15 mortos em DOIS plugins (onion-work-tools 12, onion-engineering 3)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_KB_GENERATOR_DRIFT
     node_type: evidence
     layer: audit
@@ -32,6 +36,10 @@ nodes:
     verified_at: 2026-08-18
     verified_against: "grep '## ⚡ Quick Start' em docs/knowledge-base: 2 arquivos de 91"
     label: "o template de /meta:create-knowledge-base descreve forma que so 2 de 91 KBs usam — o gerador e que esta fora do corpus, nao os documentos"
+    provenance:
+      source: "docs/knowledge-base"
+      locator: "grep '## ⚡ Quick Start' em docs/knowledge-base: 2 arquivos de 91"
+      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
   - id: E_DIARY_MARKER_IN_SOURCE
     node_type: evidence
     layer: audit
@@ -42,6 +50,10 @@ nodes:
     verified_at: 2026-08-18
     verified_against: "grep '^classification: .*📤' em .claude/diary: 3 ocorrencias historicas (2 de 07-16 + 1 minha de 08-17, esta ja curada)"
     label: "o marcador de EXIBICAO 📤 (SHARE_MARKER do diary-index.sh:93) foi escrito dentro do frontmatter 3x — projecao gravada na fonte, fonte-diferente-de-derivacao invertido"
+    provenance:
+      source: ".claude/diary"
+      locator: "grep '^classification: .*📤' em .claude/diary: 3 ocorrencias historicas (2 de 07-16 + 1 minha de 08-17, esta ja curada)"
+      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
   - id: E_NENHUM_AGENDADO_PAROU
     node_type: evidence
     layer: audit
@@ -65,6 +77,10 @@ nodes:
     verified_at: 2026-08-18
     verified_against: "medido nos 2 plugins regenerados: 15 links mortos -> 0, titulos legiveis; kind da bancada 11/11 sob set -euo pipefail; MUTANTE (assembler sem a cura) reprovado com dead=12 — assercao load-bearing"
     label: "VALOR 1 FEITO — o assembler converte link-de-irma-NAO-embarcada em plain-text no empacotamento; a classe virou IMPOSSIVEL por construcao (caso (e4) na bancada guarda a regressao)"
+    provenance:
+      source: ".claude/utils/marketplace/assemble-plugin.sh"
+      locator: "medido nos 2 plugins regenerados: 15 links mortos -> 0, titulos legiveis; kind da bancada 11/11 sob set -euo pipefail; MUTANTE (assembler sem a cura) reprovado com dead=12 — assercao load-bearing"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: D_ALINHAR_GERADOR_DE_KB
     node_type: decision
     trace: .claude/commands/meta/create-knowledge-base.md
@@ -76,6 +92,10 @@ nodes:
     verified_at: 2026-08-18
     verified_against: "Fase 3 reescrita com as 2 familias MEDIDAS (38 REFERENCIA / 5 DOUTRINA / template antigo cobria 2 de 86) + nucleo comum invariante + gatilho de escolha; numeros medidos ancorados no proprio comando"
     label: "VALOR 2 FEITO — o gerador descreve as familias REAIS do corpus (referencia default + doutrina), com as secoes da referencia rebaixadas de contrato a sugestao"
+    provenance:
+      source: ".claude/commands/meta/create-knowledge-base.md"
+      locator: "Fase 3 reescrita com as 2 familias MEDIDAS (38 REFERENCIA / 5 DOUTRINA / template antigo cobria 2 de 86) + nucleo comum invariante + gatilho de escolha; numeros medidos ancorados no proprio comando"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: D_GUARDA_DO_MARCADOR_NA_FONTE
     node_type: decision
     trace: .claude/validation/diary-index.sh
@@ -87,6 +107,10 @@ nodes:
     verified_at: 2026-08-18
     verified_against: "2 migalhas de 07-16 curadas (grep de frontmatter = ZERO); guarda de enum na LINHA inteira no diary-index.sh; caso (h) na bancada (kind 8/8 sob set -euo pipefail); mutante honesto = versao de HEAD engole (rc=0) e a guarda reprova (rc=1)"
     label: "VALOR 3 FEITO — marcador de exibicao no frontmatter agora REPROVA (exit 1); a classe de 3 ocorrencias virou mecanismo, e o awk que lia so o campo 2 nao engole mais sufixo"
+    provenance:
+      source: ".claude/validation/diary-index.sh"
+      locator: "2 migalhas de 07-16 curadas (grep de frontmatter = ZERO); guarda de enum na LINHA inteira no diary-index.sh; caso (h) na bancada (kind 8/8 sob set -euo pipefail); mutante honesto = versao de HEAD engole (rc=0) e a guarda reprova (rc=1)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ---- questao GATED: parado, mas sob controle ----
   - id: Q_ALARME_DE_AUSENCIA_DE_AGENDADO

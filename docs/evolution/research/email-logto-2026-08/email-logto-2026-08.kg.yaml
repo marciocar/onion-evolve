@@ -23,6 +23,10 @@ nodes:
     verified_against: docs.logto.io-e-openapi.logto.io-webfetch
     label: "CONECTORES LOGTO (web-verificado): oficiais = SMTP generico, AWS SES, Mailgun, SendGrid, Aliyun, Postmark + HTTP custom. O 'built-in email service' e EXCLUSIVO do Logto CLOUD — self-hosted precisa configurar provider (confirma o gap). Conector SMTP exige host/port(string)/fromEmail/user/pass + templates[] por usageType. SO 1 conector de email ATIVO por tenant. Releases oficiais (docker) ja trazem conectores pre-embutidos. Email usado em 9 usageTypes (SignIn/Register/ForgotPassword/OrganizationInvitation/BindNewIdentifier/MfaVerification/BindMfa/UserPermissionValidation/Generic)"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+      locator: "docs.logto.io-e-openapi.logto.io-webfetch"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_premise_partially_false
     node_type: claim
@@ -34,6 +38,10 @@ nodes:
     verified_against: openapi.logto.io-operation-createorganizationinvitation
     label: "CORRECAO DE PREMISSA: a premissa registrada ('a falta de conector de email TRAVOU o convite de organizacao') e PARCIALMENTE FALSA. O Logto CRIA o convite SEM conector — POST /api/organizations/{id}/invitations com messagePayload:false retorna o id p/ entrega manual. Sem conector so o ENVIO AUTOMATICO falha (501 'No email connector is configured'). EMAIL E ACELERADOR DE ENTREGA, NAO PRE-REQUISITO DO CONVITE — e o --enroll que o gap forcou e o modo degradado LEGITIMO (o Null Object nativo do canal), a MANTER, nao a descartar"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
+    provenance:
+      source: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
+      locator: "openapi.logto.io-operation-createorganizationinvitation"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_email_is_script_not_sdaal
     node_type: decision
@@ -45,6 +53,10 @@ nodes:
     verified_against: teste-do-eixo-aplicado-as-duas-bocas
     label: "VEREDITO: email e SCRIPT, nao SDAAL — falha nos DOIS niveis. BOCA (a) conector do Logto: condicao (a) PASSA (providers intercambiaveis POR CONSTRUCAO — o contrato ja existe e se chama SMTP/RFC5321), mas (b) FALHA (a escolha vive no DB do Logto, nao no .env; 1 conector ativo por tenant = sem selecao em runtime) e (c) FALHA POR VACUIDADE (o consumidor e o LOGTO, que nao e nosso codigo e JA e cego). Envolver isso em interface+factory = RE-EMBRULHAR abstracao existente. BOCA (b) ferramenta de membro: (a) falha duro — ZERO solucao real hoje; ligar a 1a leva 0->1. NIVEL-1 tambem nao gradua: o ntfy e curl HARDCODED em mail-receiver.sh:59-66, nao adapter; somar script de email da DOIS SCRIPTS, nao dois adapters"
     trace: "docs/knowledge-base/concepts/onion-abstraction-doctrine.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-abstraction-doctrine.md"
+      locator: "teste-do-eixo-aplicado-as-duas-bocas"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_no_self_host_mta
     node_type: decision
@@ -56,6 +68,10 @@ nodes:
     verified_against: hostinger-rate-limit-mais-consenso-de-deliverability
     label: "NAO self-hospedar MTA de saida na VPS. Tres razoes MEDIDAS: (1) Hostinger limita 5 EMAILS/MIN (hostinger.com/support/7854530) — baixo p/ rajada de convites; (2) IP de datacenter frio e estruturalmente desconfiado por Gmail/Outlook/Yahoo (consenso qualitativo forte, sem taxa numerica publicada — declarado); (3) SEM webhook de bounce/complaint — bounces voltam como NDR a parsear a mao. 'Um convite de auth que cai no spam e um convite SILENCIOSAMENTE QUEBRADO' — o modo de falha exato da licao do whatsapp"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+      locator: "hostinger-rate-limit-mais-consenso-de-deliverability"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_ack_from_provider_not_logto
     node_type: decision
@@ -78,6 +94,10 @@ nodes:
     verified_against: requisitos-gmail-yahoo-2024-mais-propagacao-dns
     label: "O CAMINHO CRITICO E DNS, NAO O LOGTO: SPF+DKIM obrigatorios na pratica, DMARC comecando em p=none, PROPAGACAO 24-48h, so entao subir enforcement. A config do conector leva 10 MINUTOS. Enviar de SUBDOMINIO DEDICADO (mail.onionevolve.com), nao do apex — isola reputacao transacional e deixa o apex livre p/ MX humano. ATUALIZADO 2026-08-01: o GAP do 'DNS nunca verificado' FOI FECHADO (zona lida: 26 registros, ZERO TXT/MX — campo limpo, sem SPF conflitante). E a estimativa de 24-48h se provou CONSERVADORA DEMAIS p/ zona limpa com TTL 300: propagou IMEDIATAMENTE e o Postmark verificou DKIM+ReturnPath na 1a tentativa. A ordem 'DNS primeiro' continua correta; so o PRAZO estava superestimado"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+      locator: "requisitos-gmail-yahoo-2024-mais-propagacao-dns"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_provider_resend_vs_postmark
     node_type: question
@@ -119,6 +139,10 @@ nodes:
     verified_against: hostinger-api-put-overwrite-false-mais-releitura-da-zona
     label: "DNS ESCRITO NA HOSTINGER VIA API, NAO-DESTRUTIVO: zona onionevolve.com foi de 26 -> 30 registros, com os 25 A-records PRESERVADOS (verificado relendo a zona depois). Metodo: backup da zona ANTES + PUT /api/dns/v1/zones com overwrite:FALSE (contrato confirmado por pesquisa: false=append/update, true=deleta os que casam name+type). Criados: DKIM TXT (20260801114651pm._domainkey.mail), Return-Path CNAME (pm-bounces.mail -> pm.mtasv.net), SPF TXT (mail -> v=spf1 include:spf.mtasv.net ~all), DMARC TXT (_dmarc -> v=DMARC1; p=none;). DMARC publicado SEM rua= (nao publicar email pessoal no DNS sem decisao do maestro)"
     trace: "/home/marcio/onion-vps-waha/dns-backup/"
+    provenance:
+      source: "/home/marcio/onion-vps-waha/dns-backup/"
+      locator: "hostinger-api-put-overwrite-false-mais-releitura-da-zona"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/dns-backup/ no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_domain_verified
     node_type: evidence
@@ -130,6 +154,10 @@ nodes:
     verified_against: postmark-verifyDkim-e-verifyReturnPath-retornaram-True
     label: "DOMINIO mail.onionevolve.com VERIFICADO NO POSTMARK (domain id 8005037): DKIMVerified=True e ReturnPathDomainVerified=True. Propagacao foi IMEDIATA (TTL 300 + zona sem TXT previo) — a estimativa de 24-48h da pesquisa era conservadora demais para uma zona limpa; o caminho critico previsto NAO se materializou. Provider default = POSTMARK (decisao do maestro aplicando efficiency-over-economy: o dissent venceu a sintese)"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+      locator: "postmark-verifyDkim-e-verifyReturnPath-retornaram-True"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_postmark_pending_approval
     node_type: question
@@ -152,6 +180,10 @@ nodes:
     verified_against: postmark-messages-outbound-details-evento-Delivered
     label: "CANAL DE EMAIL PROVADO PONTA A PONTA (nao so aceito): apos a aprovacao da conta, envio p/ marciocar@gmail.com retornou MessageID 0b6d6ffb + Status 'Sent', e o detalhe da mensagem mostra evento **Delivered** com a resposta LITERAL do Google: 'smtp;250 2.0.0 OK ... - gsmtp'. ESTE E O ACK DO EMAIL — o analogo exato do ack=3 READ do whatsapp. A licao foi APLICADA: eu poderia ter parado no MessageID (aceite) e declarado sucesso, que foi exatamente o erro cometido 3x no canal whatsapp. RESSALVA HONESTA: o 250 OK prova ENTREGA AO SERVIDOR, nao INBOX-vs-SPAM — so o humano confirma essa parte"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+      locator: "postmark-messages-outbound-details-evento-Delivered"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_isolate_variable_method
     node_type: claim
@@ -163,6 +195,10 @@ nodes:
     verified_against: envio-mesmo-dominio-200-vs-externo-412
     label: "METODO QUE RESOLVEU O IMPASSE (o maestro dizia 'nao esta pendente', a API dizia 412): em vez de discutir, ISOLAR A VARIAVEL — enviei p/ o PROPRIO dominio (permitido no estado pendente) e deu ErrorCode 0 + MessageID; p/ gmail deu 412. Isso PROVOU que todo o pipeline (DKIM/RP/SPF/porta 587/token/dominio) estava OK e que a unica trava era a flag de aprovacao DA CONTA — separada da verificacao de DOMINIO (que ja estava True). A confusao era real e nomeavel: o Postmark tem DUAS coisas que parecem 'aprovado'"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+      locator: "envio-mesmo-dominio-200-vs-externo-412"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_inbox_confirmed_by_human
     node_type: evidence
@@ -185,6 +221,10 @@ nodes:
     verified_against: convite-real-201-mais-mensagem-Sent-no-postmark
     label: "GAP ORIGINAL FECHADO: conector SMTP criado no Logto (id 9ajv2zogz065, type Email) via MANAGEMENT API + CONVITE REAL de organizacao criado com messagePayload -> HTTP 201 (antes: 501 'No email connector is configured'), e o email SAIU (visto na fila do Postmark: 'Convite para a federacao Onion', status Sent). Cadeia completa provada: Logto -> conector SMTP (587) -> Postmark -> Gmail. Templates criados p/ 5 usageTypes incluindo OrganizationInvitation"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+      locator: "convite-real-201-mais-mensagem-Sent-no-postmark"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_five_doc_vs_behavior
     node_type: evidence
@@ -196,6 +236,10 @@ nodes:
     verified_against: erros-de-validacao-e-404-da-instancia-viva
     label: "CINCO doc!=comportamento numa sessao so (a instancia viva e a SSOT, confirmado na pratica): (1) a Management API TEM CRUD de conector (POST /api/connectors) — a pesquisa marcou como 'nao documentado'; (2) o token M2M da Management API NAO sai do endpoint publico nem do 127.0.0.1:3012 — so de console.onionevolve.com (tenant admin); (3) 'port' e NUMBER, nao string como a doc dizia; (4) a rota de convite e /api/organization-invitations, NAO /api/organizations/{id}/invitations como a doc publica; (5) o conector NATIVO postmark-mail exige templateAlias (templates criados NO Postmark) — mais lock-in e mais setup que o SMTP generico, o que CONFIRMA a decisao D3 por outro motivo. GAP #5 fechado: 9 factories de Email vem pre-embutidos na 1.41.0"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+      locator: "erros-de-validacao-e-404-da-instancia-viva"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_no_invite_acceptance_page
     node_type: evidence
@@ -207,6 +251,10 @@ nodes:
     verified_against: openapi-da-instancia-mais-rotas-do-bridge-mais-404-visto-pelo-maestro
     label: "ACHADO DE ARQUITETURA (so o dogfood revelou): o LOGTO NAO TEM PAGINA DE ACEITE DE CONVITE. As unicas rotas sao de API (PUT /api/organization-invitations/{id}/status). O link do convite e RESPONSABILIDADE DA APLICACAO — o Logto so envia o que vier em messagePayload.link, nao sabe nem inventa destino. Verificado: o bridge NAO tem rota de aceite (rotas reais: /chat /commands /a2a /federation/inbox/:member /admin/* /health); o 'INVITE_TOKENS_*' do bridge e OUTRA coisa (tokens de cortesia da era pre-OIDC). CONSEQUENCIA: o email do convite FUNCIONA (renderizou {{link}}, chegou na INBOX — confirmado pelo maestro) mas o fluxo NAO FECHA ponta a ponta sem uma pagina que: (1) receba o invitationId, (2) autentique o convidado via Logto, (3) chame o PUT de status. ERRO MEU SOMADO: inventei a URL 'auth.onionevolve.com/invite' como placeholder, que nunca existiu — o 404 tem duas causas empilhadas"
     trace: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/email-logto-2026-08/SYNTHESIS.md"
+      locator: "openapi-da-instancia-mais-rotas-do-bridge-mais-404-visto-pelo-maestro"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_where_acceptance_page_lives
     node_type: question

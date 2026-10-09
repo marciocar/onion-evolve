@@ -82,6 +82,10 @@ nodes:
     verified_against: 'REGRA 52 no lint + kg-radar-integrity.sh cobrindo 51 grafos'
     trace: ".claude/validation/kg-radar-integrity.sh + .claude/rules/kg-grammar.md:41"
     label: 'promover a convocacao COGNITIVA do radar (rules/kg-grammar.md) a MECANICA (REGRA 52), sem remover a rule — ela ensina antes de escrever, o gate mede depois'
+    provenance:
+      source: ".claude/validation/kg-radar-integrity.sh + .claude/rules/kg-grammar.md:41"
+      locator: "REGRA 52 no lint + kg-radar-integrity.sh cobrindo 51 grafos"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: C_RULE_NAO_BASTA
     node_type: claim
@@ -122,6 +126,10 @@ nodes:
     verified_against: 'catracas 4 e 5 no rules-registry.sh, provadas por MUT'
     trace: ".claude/validation/rules-registry.sh:catracas-4-e-5"
     label: 'tornar o tag [SEV] obrigatorio nas 53 e gatear severidade indefinida — a regra implicita que valia por disciplina virou mecanica'
+    provenance:
+      source: ".claude/validation/rules-registry.sh:catracas-4-e-5"
+      locator: "catracas 4 e 5 no rules-registry.sh, provadas por MUT"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── o que a revisao adversarial refutou ───────────────────────────────────
   - id: C_INDEX_SEM_COBERTURA
@@ -141,6 +149,10 @@ nodes:
     verified_at: 2026-08-03
     verified_against: 'feeders da R16 rodados a mao contra docs/INDEX.md — 3 hits em comandos invocaveis'
     label: 'ambos ESTAO no escopo da R16 e os feeders disparam neles; o que escapou foi FORMA DE FRASE (skills avulso, substantivo antes do numero, tabela), nao arquivo'
+    provenance:
+      source: "docs/INDEX.md"
+      locator: "feeders da R16 rodados a mao contra docs/INDEX.md — 3 hits em comandos invocaveis"
+      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: C_PARSER_PREVINE_MULTILINHA
     node_type: claim
@@ -211,6 +223,10 @@ nodes:
     verified_at: 2026-08-30
     verified_against: 'varredura de links markdown vivos p/ caminho core-privado fora de docs/knowledge-base'
     label: 'a R45 cobre 1 de 9 raizes vendorizadas — 46 links vivos p/ caminho core-privado em 21 arquivos ficam fora; o baseline em 0 declara vitoria falsa'
+    provenance:
+      source: "docs/knowledge-base"
+      locator: "varredura de links markdown vivos p/ caminho core-privado fora de docs/knowledge-base"
+      method: "derivado: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: C_R43_KG_PENDURADO
     node_type: claim
@@ -241,6 +257,10 @@ nodes:
     verified_at: 2026-08-03
     verified_against: 'git log --diff-filter=D e --diff-filter=R sobre docs/onion/graph/*.kg.yaml'
     label: 'em 51 grafos e toda a historia do repo, NENHUM foi removido ou renomeado — o modo de falha que a ampliacao preveniria tem ZERO ocorrencias'
+    provenance:
+      source: "docs/onion/graph"
+      locator: "git log --diff-filter=D e --diff-filter=R sobre docs/onion/graph/*.kg.yaml"
+      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: D_NAO_AMPLIAR_R43
     node_type: decision
@@ -283,6 +303,10 @@ nodes:
     verified_against: 'lint-artifacts.sh — comparacao agora absoluta, MUT versionado no relato'
     trace: ".claude/validation/lint-artifacts.sh:check_kg_narration_valid"
     label: 'corrigir a comparacao da R47 para absoluto, como as 15 irmas ja faziam — uma palavra'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh:check_kg_narration_valid"
+      locator: "lint-artifacts.sh — comparacao agora absoluta, MUT versionado no relato"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R52_NUMEROS_ERRADOS
     node_type: evidence
@@ -304,6 +328,10 @@ nodes:
     verified_against: 'arquivo commitado com contagens medidas do filesystem'
     trace: "docs/analysis/onion-guardas-mapa-2026-08.md"
     label: 'o mapa das guardas — vista markdown deste grafo, baseline para a proxima revisao'
+    provenance:
+      source: "docs/analysis/onion-guardas-mapa-2026-08.md"
+      locator: "arquivo commitado com contagens medidas do filesystem"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── 2026-08-04: tres furos MEDIDOS no mesmo dia, todos "verde sem ter olhado" ──
   # Achados de campo rodando /meta:kg-freshness. O maestro VETOU corrigir o primeiro
@@ -329,6 +357,10 @@ nodes:
     verified_at: 2026-08-04
     verified_against: 'find docs/evolution -maxdepth 1 -name *.md + grep ^kg: em cada um + saida de kg-provenance-coverage.sh'
     label: 'FURO DE ESCOPO: kg-born-marker.sh e kg-provenance-coverage.sh compartilham o escopo hardcoded "docs/analysis + docs/evolution/research". docs/evolution/*.md na RAIZ fica invisivel para AMBOS: sao 6 arquivos e ZERO tem marcador kg: — entre eles worktree-convention-2026.md, scope-convention-2026.md, federation-roadmap-2026.md e trust-log.md. O provenance reporta "105/105 cobertos" verde, sem nunca olhar a pasta onde vivem as CONVENCOES'
+    provenance:
+      source: "docs/evolution"
+      locator: "find docs/evolution -maxdepth 1 -name *.md + grep ^kg: em cada um + saida de kg-provenance-coverage.sh"
+      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: E_FUROSEMANTICO_RADAR_0804
     node_type: evidence
@@ -381,6 +413,10 @@ nodes:
     verified_at: '2026-09-09'
     verified_against: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A 25 'id: C_GUARDA_QUE_GRITA_ERRADO' docs/onion/graph/guardas-revisao-2026-08.kg.yaml (nó+aresta) ; grep -n -B2 -A12 'id: E_FAROL_ANUNCIAVA_FANTASMA' docs/onion/graph/guardas-revisao-2026-08.kg.yaml (evidência que SUPPORTS o claim) ; head -40 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md (trace da evidência) ; grep -n 'owner_pid\\|owner_start\\|starttime' .claude/validation/session-beacon.sh (checar se a cura causada pelo claim ainda vive no arquivo real hoje)"
     label: 'INSTANCIA DA LACUNA DE COBERTURA no lado caro: nao e guarda que ninguem ve nem guarda que ninguem roda — e guarda que RODA E MENTE. Ela nao falha em silencio: emite um aviso confiante que a sessao leitora repassa como fato ao maestro, com recomendacao de conduta junto. Guarda que grita errado ensina a ignorar guarda'
+    provenance:
+      source: "docs/onion/graph/guardas-revisao-2026-08.kg.yaml"
+      locator: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A 25 'id: C_GUARDA_QUE_GRITA_ERRADO' docs/onion/graph/guardas-revisao-2026-08.kg.yaml (nó+aresta) ; grep -n -B2 -A12 'id: E_FAROL_ANUNCIAVA_FANTASMA' docs/onion/graph/guardas-revisao-2026-08.kg.yaml (evidência que SUPPORTS o claim) ; head -40 .claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md (trace da evidência) ; grep -n 'owner_pid\\|owner_start\\|starttime' .claude/validation/session-beacon.sh (checar se a cura causada pelo claim ainda vive no arquivo real hoje)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: D_MEDIR_O_DONO_NAO_O_CARIMBO
     node_type: decision
@@ -392,6 +428,10 @@ nodes:
     verified_at: '2026-09-09'
     verified_against: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A25 \"id: D_MEDIR_O_DONO_NAO_O_CARIMBO\" docs/onion/graph/guardas-revisao-2026-08.kg.yaml; grep -n \"owner_pid|owner_start|proc_starttime|beacon_verdict\" .claude/validation/session-beacon.sh; git log --oneline --since=2026-08-28 -- .claude/validation/session-beacon.sh; then live functional test: cd /tmp/sb-test && bash session-beacon.sh up . mytest && bash session-beacon.sh verdict .claude/beacons/mytest.beacon (verdict=live); handcrafted .beacon with owner_pid=999999 (dead) → verdict=orphan; handcrafted .beacon with no owner_pid → verdict=declared; then bash session-beacon.sh check . on the declared beacon (exit 1, blocks); bash session-beacon.sh sweep . on the orphan beacon (removed, declared beacon preserved)"
     label: 'CURA A (behavior-over-declaration): o beacon grava owner_pid + owner_start (starttime do /proc, defesa contra REUSO DE PID) e o veredito passa a ser MEDIDO — live (dono vivo) · declared (dono nao medido: cai no TTL e BLOQUEIA, conservador) · orphan (dono medido morto: nao bloqueia, sweep remove) · stale. Direcao do erro escolhida: falso orphan reabre o incidente W1xW2 que criou o farol, falso declared so custa uma verificacao — logo ausencia de prova cai no comportamento antigo, NUNCA em pode-escrever'
+    provenance:
+      source: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
+      locator: "R0 /meta:kg-freshness 2026-09-09 (run wf_5b2f274e-83d) — comando executado, INTEIRO: grep -n -A25 \"id: D_MEDIR_O_DONO_NAO_O_CARIMBO\" docs/onion/graph/guardas-revisao-2026-08.kg.yaml; grep -n \"owner_pid|owner_start|proc_starttime|beacon_verdict\" .claude/validation/session-beacon.sh; git log --oneline --since=2026-08-28 -- .claude/validation/session-beacon.sh; then live functional test: cd /tmp/sb-test && bash session-beacon.sh up . mytest && bash session-beacon.sh verdict .claude/beacons/mytest.beacon (verdict=live); handcrafted .beacon with owner_pid=999999 (dead) → verdict=orphan; handcrafted .beacon with no owner_pid → verdict=declared; then bash session-beacon.sh check . on the declared beacon (exit 1, blocks); bash session-beacon.sh sweep . on the orphan beacon (removed, declared beacon preserved)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_AVISO_CARREGA_O_QUE_VALE
     node_type: decision
@@ -403,6 +443,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'session-beacon-hook.sh + caso (f2) do selftest: o aviso tem de conter INFORMADO, NAO VERIFICADO e VERIFIQUE QUEM E O QUE FAZ'
     label: 'CURA B (correcao do maestro: informado e diferente de verificado): rotular o veredito nao basta se o aviso segue AFIRMANDO. O motd passa a se declarar nao-verificado e a MANDAR verificar quem e e o que faz — rotulo (VIVA vs DECLARADA), a pista NUNCA refrescou (0 prompts), e a ordem de nao relatar como sessao alheia viva o que nao foi medido. Sinal e instrucao de como le-lo viajam JUNTOS, porque quem recebe nao tem como saber sozinho o que o sinal vale'
+    provenance:
+      source: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
+      locator: "session-beacon-hook.sh + caso (f2) do selftest: o aviso tem de conter INFORMADO, NAO VERIFICADO e VERIFIQUE QUEM E O QUE FAZ"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_SONDA_ELEGEU_O_SHELL_DO_HOOK
     node_type: evidence
@@ -444,6 +488,10 @@ nodes:
     trace: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
     verified_against: 'casos k/k2/k3/k4/k5 da bancada + mutacao MUT-E (restaurar o curto-circuito reprova 3 casos)'
     label: 'CURA DA CURA: `orphan` deixou de ser corolario de "dono nao encontrado" e passou a exigir CONJUNCAO — dono medido morto E heartbeat parado alem da janela de graca (30min, ONION_BEACON_ORPHAN_GRACE_MIN) E /proc legivel AQUI (proc_available separa "nao ha o que medir" de "prova de morte") E o beacon ser DESTA maquina (campo host, que ja era gravado e nao tinha consumidor). Assim o poder de matar fantasma sobrevive quase inteiro (8h->30min) e fica IMPOSSIVEL declarar morta uma sessao que acabou de agir. Corolario: teste que nao isola sandbox mede o vizinho — o caso do dono vivo ganhou sandbox proprio'
+    provenance:
+      source: ".claude/diary/2026-08-28-o-farol-anunciava-fantasma-como-sessao-viva.md"
+      locator: "casos k/k2/k3/k4/k5 da bancada + mutacao MUT-E (restaurar o curto-circuito reprova 3 casos)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_INDICE_DO_DIARIO_SEM_CATRACA
     node_type: question
@@ -465,6 +513,10 @@ nodes:
     trace: ".claude/validation/lint-artifacts.sh"
     verified_against: 'bancada run_backlog_projection_selftests 8/8 (inclui locale e radar-quebrado, os dois eixos que a revisao adversarial provou descobertos) + 5 mutacoes que reprovam + CI: lint rodou em runner diferente e a regra NAO disparou (render deterministico entre maquinas)'
     label: 'REGRA 62 [HARD]: docs/backlog.md tem de bater com a regeneracao da fonte. Fecha a classe que Q_INDICE_DO_DIARIO_SEM_CATRACA nomeou — projecao GERADA que envelhece calada — no unico artefato onde a comparacao e deterministica hoje. Pendurar a deteccao no LINT (e nao num cron) da o gatilho sem ferir o MOAT de auto-inicio: a maquina DETECTA, o humano ATUA. Pre-requisitos que a entrega exigiu, ambos assimetrias dentro de familia ja curada: modo --markdown (stdout) que o _gen_into exige e que os tres irmaos ja tinham, e `case` de args FECHADO com exit 2 (o MODE=${1:---write} era fail-open num caminho de ESCRITA: --dry-run sobrescrevia em silencio). CORE-ONLY por IS_DERIVED — o core e o pior oraculo do que viaja'
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "bancada run_backlog_projection_selftests 8/8 (inclui locale e radar-quebrado, os dois eixos que a revisao adversarial provou descobertos) + 5 mutacoes que reprovam + CI: lint rodou em runner diferente e a regra NAO disparou (render deterministico entre maquinas)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ENUMERACAO_VAZIA_ERA_DESTRUTIVA
     node_type: evidence
@@ -526,6 +578,10 @@ nodes:
     verified_against: 'bash .claude/validation/lint-artifacts.sh + leitura de check_scan_sanity e safe-count.sh, medido 2026-09-09'
     trace: '.claude/validation/lint-artifacts.sh (check_scan_sanity)'
     label: "R0 2026-09-09 — a TAXONOMIA das tres formas de verde-sem-olhar segue valida, mas a alegacao UNIVERSAL de indetectabilidade nao cobre mais a forma PRUNE. Depois de 2026-08-04 a maquinaria ganhou `check_scan_sanity`, uma checagem HARD que usa `safe-count.sh` como chao-de-verdade e APARECE na saida da guarda quando a varredura fica cega (0 arquivos onde deveria ver >0) — cobre poda-que-se-come e raiz-que-nunca-entra. As outras duas formas seguem EXATAMENTE como descritas: ESCOPO (kg-born-marker.sh e kg-provenance-coverage.sh nao enxergam docs/evolution/*.md da raiz, reportando 166/166 verde) e SEMANTICO (--integrity nao checa contradicao textual entre SUPPORTS). Drift por a maquinaria ter andado, nao erro do no."
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh (check_scan_sanity)"
+      locator: "bash .claude/validation/lint-artifacts.sh + leitura de check_scan_sanity e safe-count.sh, medido 2026-09-09"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   - from: C_LACUNA_E_COBERTURA

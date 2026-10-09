@@ -92,6 +92,10 @@ nodes:
     verified_against: 'kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED — ver E_MEDIDO_D_RUNTIME_CONTRACT_2026_09 (SUPERSEDES); label de julho preservado como historia'
     label: "DECISAO (proposed-GATED): escada graduada Nivel0/AUDIT/AUTOMATE-gated/MOAT; 1a passada so no AUDIT (main humano); sela so apos dogfood da Fase 2"
     trace: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
+    provenance:
+      source: "docs/analysis/onion-adr-autonomous-thread-runtime-2026-07.md"
+      locator: "kg-freshness Onda 7 (wf_405c7716-7b3, 2026-09-01): DRIFTED — ver E_MEDIDO_D_RUNTIME_CONTRACT_2026_09 (SUPERSEDES); label de julho preservado como historia"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_W6_PERITEM
     node_type: claim
     layer: audit

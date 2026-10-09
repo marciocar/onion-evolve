@@ -120,6 +120,10 @@ nodes:
     verified_at: 2026-08-20
     verified_against: "repo onion-vps-librechat commitado (7338dcb): 5 servicos pinados (api v0.8.7, mongo 8.0.20, meili 1.35.1, pgvector 0.8.0-pg15, rag v0.9.0 — tags conferidas no registry), compose config valida com segredos reais, fail-closed provado por recusa, app OIDC sqov79y2x3s6qawreafga provisionado via Management API e verificado por releitura"
     label: "DECISOES DO MAESTRO SELADAS: chat.onionevolve.com · SSO Logto obrigatorio (janela do 1o admin local) · so Anthropic server-key · escopo COMPLETO (5 containers com RAG) — e o stack ja esta construido no padrao da casa"
+    provenance:
+      source: "/home/marcio/onion-vps-librechat/docker-compose.yml"
+      locator: "repo onion-vps-librechat commitado (7338dcb): 5 servicos pinados (api v0.8.7, mongo 8.0.20, meili 1.35.1, pgvector 0.8.0-pg15, rag v0.9.0 — tags conferidas no registry), compose config valida com segredos reais, fail-closed provado por recusa, app OIDC sqov79y2x3s6qawreafga provisionado via Management API e verificado por releitura"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-librechat/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ---- a fronteira aberta (a etapa do maestro) ----
   - id: Q_KG_RUNTIME_NO_LIBRECHAT
@@ -132,6 +136,10 @@ nodes:
     verified_at: 2026-08-20
     verified_against: "F4b EXECUTADA no gatilho real (agente da PoC alucinou skills/kg-ssot e negou a capacidade): pesquisa propria em docs/evolution/research/librechat-kg-runtime-2026-08/ (radar exit 0) — read-leg=tools MCP+instructions+skill always-apply; map=pipeline do servidor; write=proposta nunca direto (I3); memory nativo descartado como destino"
     label: "RESPONDIDA — era a PESQUISA F4b (+etapa do maestro): como read(KG)->verify->act->write(KG) executa numa conversa LibreChat? Hipoteses: read-first via skill always-apply + tools do MCP onion-kg; map so via Bridge-como-MCP; write(KG) e a perna critica (I3) — write-via-Bridge com gate OU write-como-proposta que o core sela (rima com federacao: adotante sinaliza, core sela). Risco a nomear: memory nativo do LibreChat como fonte paralela ao grafo. Gatilho: stack no ar + MCP onion-kg desenhado"
+    provenance:
+      source: "docs/evolution/research/librechat-kg-runtime-2026-08"
+      locator: "F4b EXECUTADA no gatilho real (agente da PoC alucinou skills/kg-ssot e negou a capacidade): pesquisa propria em docs/evolution/research/librechat-kg-runtime-2026-08/ (radar exit 0) — read-leg=tools MCP+instructions+skill always-apply; map=pipeline do servidor; write=proposta nunca direto (I3); memory nativo descartado como destino"
+      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
   - id: Q_EMBEDDINGS_KEY_PENDENTE
     node_type: question
     layer: audit

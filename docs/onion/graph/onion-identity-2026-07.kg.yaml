@@ -107,6 +107,10 @@ nodes:
     trace: "CLAUDE.md:identidade-canonica"
     verified_at: 2026-08-04
     verified_against: "filesystem do core 2026-08-04, INDEPENDENTE do texto do CLAUDE.md (senao seria circular): package.json AUSENTE (nao e npm), nenhum .cursor*/.antigravity*/.codex* na raiz (plataforma unica), docs/{business,technical,compliance}-context presentes (3 peer)"
+    provenance:
+      source: "CLAUDE.md:identidade-canonica"
+      locator: "filesystem do core 2026-08-04, INDEPENDENTE do texto do CLAUDE.md (senao seria circular): package.json AUSENTE (nao e npm), nenhum .cursor*/.antigravity*/.codex* na raiz (plataforma unica), docs/{business,technical,compliance}-context presentes (3 peer)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: C_RFC4_INTER_INSTANCE
     node_type: claim
     layer: audit
@@ -170,6 +174,10 @@ nodes:
     # EXATOS na main do metagamify; ultima gravacao nela em 2026-06-26 — 39 dias parada enquanto
     # a develop andou ate 07-14. As tres asserções do no batem verbatim; "apenas parada" REFORCADO.
     verified_against: "marciocar/metagamify@origin/main-bfb9bce2-2026-08-04"
+    provenance:
+      source: "git ls-tree origin/main .claude"
+      locator: "marciocar/metagamify@origin/main-bfb9bce2-2026-08-04"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_VERTICALS_EMPTY
     node_type: claim
     layer: audit
@@ -520,6 +528,10 @@ nodes:
     trace: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
     verified_at: 2026-08-04
     verified_against: "o proprio SYNTHESIS.md lido (311 linhas, 42 URLs unicas >= '26+ fontes', frase 'HYPE/discurso vs. IMPLEMENTADO/produto' literal) — evidencia sobre O ARTEFATO existir e conter isso, NAO checagem de mercado (essa e C_AXIS_HOT)"
+    provenance:
+      source: "docs/evolution/research/knowledge-centric-ssot-2026/SYNTHESIS.md"
+      locator: "o proprio SYNTHESIS.md lido (311 linhas, 42 URLs unicas >= '26+ fontes', frase 'HYPE/discurso vs. IMPLEMENTADO/produto' literal) — evidencia sobre O ARTEFATO existir e conter isso, NAO checagem de mercado (essa e C_AXIS_HOT)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: C_AXIS_HOT
     node_type: claim
     layer: audit
@@ -700,6 +712,10 @@ nodes:
     evidence_class: testimony   # fonte é RELATO — não re-verificável por máquina (Q_TESTEMUNHO_NAO_MEDIVEL_0804)
     label: "ORIGEM: o Onion nasceu nos experimentos do maestro com o CURSOR, e desde o inicio buscando ser AGNOSTICO. O repo mais antigo da familia e onion-architect (marciocar/onion-architect, criado 2025-12-01, publico, 'framework de comandos Cursor com abstracao de Task Manager') — a abstracao de provider ja estava la, antes de existir Claude Code no desenho"
     trace: "https://github.com/marciocar/onion-architect"
+    provenance:
+      source: "https://github.com/marciocar/onion-architect"
+      locator: "relato-do-maestro-2026-08-02"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PORTE_PARA_O_CURSO
     node_type: evidence
@@ -724,6 +740,10 @@ nodes:
     verified_against: gh-api-2026-08-02-e-relato-do-maestro
     label: "A FAMILIA MULTI-IDE EXISTE, E PUBLICA, E ESTA CONGELADA (confirmado pelo maestro 2026-08-02). Medido via gh api: marciocar/onion (hub, 'uma metodologia, SEIS ferramentas de IA, prova de universalidade'), onion-cursor, onion-antigravity, onion-copilot, onion-architect, onion-mini, onion-standalone — todos PUBLICOS. Seis dos sete nasceram DEPOIS da decisao de 2026-05-18. CONGELADO = material de curso e prova de portabilidade, NAO linha de manutencao ativa"
     trace: "https://github.com/marciocar/onion"
+    provenance:
+      source: "https://github.com/marciocar/onion"
+      locator: "gh-api-2026-08-02-e-relato-do-maestro"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_CLAUDE_CODE_POR_CAPACIDADE
     node_type: decision
@@ -798,6 +818,10 @@ nodes:
     trace: "git ls-remote --heads + git ls-tree -r --name-only origin/main -- .claude, em /home/marcio/rhilo-metagamify (origin = github.com/marciocar/metagamify)"
     verified_at: 2026-08-04
     verified_against: "marciocar/metagamify @ 2026-08-04, medido no clone local com ls-remote (estado remoto vivo, sem fetch)"
+    provenance:
+      source: "git ls-remote --heads + git ls-tree -r --name-only origin/main -- .claude, em /home/marcio/rhilo-metagamify (origin = github.com/marciocar/metagamify)"
+      locator: "marciocar/metagamify @ 2026-08-04, medido no clone local com ls-remote (estado remoto vivo, sem fetch)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_MEDICAO_NO_REPO_ERRADO_0804
     node_type: claim
@@ -813,6 +837,10 @@ nodes:
     # em 2026-07-17 20h — o "399" de E_LSTREE_MAIN_0717 cai exatamente nessa janela. A main do
     # metagamify esta congelada em 239 desde 06-26, logo nunca esteve em 399. Cadeia fechada.
     verified_against: "onion-evolve@main-historico-2026-07-16..17 x marciocar/metagamify@origin/main"
+    provenance:
+      source: "E_LSTREE_MAIN_0717 (refutado) + veredito do worker medir:C_TOPO_MAIN_HAS_FW (derrubado pelo juiz)"
+      locator: "onion-evolve@main-historico-2026-07-16..17 x marciocar/metagamify@origin/main"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_SUPERSEDE_NAO_PROPAGA_0804
     node_type: claim
@@ -825,6 +853,10 @@ nodes:
     trace: "arestas E_LSTREE_MAIN_0717 -SUPERSEDES-> E_GIT_LSTREE_MAIN e -SUPPORTS-> C_TOPO_MAIN_HAS_FW"
     verified_at: 2026-08-04
     verified_against: "kg-radar.sh --integrity saiu 0 no grafo contendo a contradicao (medido antes desta passada, no Passo 0 do /meta:kg-freshness)"
+    provenance:
+      source: "arestas E_LSTREE_MAIN_0717 -SUPERSEDES-> E_GIT_LSTREE_MAIN e -SUPPORTS-> C_TOPO_MAIN_HAS_FW"
+      locator: "kg-radar.sh --integrity saiu 0 no grafo contendo a contradicao (medido antes desta passada, no Passo 0 do /meta:kg-freshness)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ORBIT_0804
     node_type: evidence
@@ -837,6 +869,10 @@ nodes:
     trace: "docs/evolution/federation/members.yaml (awk ancorado em '^    kind: adopter' — o grep -c ingenuo devolve 9 porque casa o bloco TEMPLATE comentado) + handoff arandek + inbox/_processed"
     verified_at: 2026-08-04
     verified_against: "docs/evolution/federation/members.yaml @ 27ce2b4"
+    provenance:
+      source: "docs/evolution/federation/members.yaml (awk ancorado em '^    kind: adopter' — o grep -c ingenuo devolve 9 porque casa o bloco TEMPLATE comentado) + handoff arandek + inbox/_processed"
+      locator: "docs/evolution/federation/members.yaml @ 27ce2b4"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SITE_DEPLOY_STALE_0804
     node_type: evidence
@@ -849,6 +885,10 @@ nodes:
     trace: "curl https://onionevolve.com x docs/onion/inventory.md"
     verified_at: 2026-08-04
     verified_against: "onionevolve.com @ 2026-08-04 (data-n servidos: 98 comandos, 51 agentes, 82 KBs) x inventory.md @ 27ce2b4"
+    provenance:
+      source: "curl https://onionevolve.com x docs/onion/inventory.md"
+      locator: "onionevolve.com @ 2026-08-04 (data-n servidos: 98 comandos, 51 agentes, 82 KBs) x inventory.md @ 27ce2b4"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: C_SITE_LAG_E_DEPLOY_NAO_AUTORIA_0804
     node_type: claim
@@ -861,6 +901,10 @@ nodes:
     trace: "git show --stat 2785f02 (toca inventory.md + site/index.html); grep -c 'data-n=\"98\"' site/index.html = 0; data-n do fonte = 102/51/87 vs servidos 98/51/82"
     verified_at: 2026-08-25
     verified_against: "CONSEQUENCIA EXECUTADA 2026-08-25 (PR #671): ops/deploy-site.sh nasceu (allowlist + --check por hash + --selftest 14/14) e republicou — curl vivo passou a servir 104 comandos/12 skills; ver E_SITE_DEPLOY_MECHANIZED_0825"
+    provenance:
+      source: "git show --stat 2785f02 (toca inventory.md + site/index.html); grep -c 'data-n=\"98\"' site/index.html = 0; data-n do fonte = 102/51/87 vs servidos 98/51/82"
+      locator: "CONSEQUENCIA EXECUTADA 2026-08-25 (PR #671): ops/deploy-site.sh nasceu (allowlist + --check por hash + --selftest 14/14) e republicou — curl vivo passou a servir 104 comandos/12 skills; ver E_SITE_DEPLOY_MECHANIZED_0825"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_SITE_DEPLOY_MECHANIZED_0825
     node_type: evidence
@@ -873,6 +917,10 @@ nodes:
     trace: "ops/deploy-site.sh --selftest (16 pass/0 fail); ops/deploy-site.sh --check (6/6 verde); curl onionevolve.com -> '104 comandos'/'12 skills'; docs/evolution/review/feat-site-reform-f0-deploy.md"
     verified_at: 2026-08-25
     verified_against: "execucao real na KVM 8 em 2026-08-25: selftest + check + curl do vivo pos-deploy"
+    provenance:
+      source: "ops/deploy-site.sh --selftest (16 pass/0 fail); ops/deploy-site.sh --check (6/6 verde); curl onionevolve.com -> '104 comandos'/'12 skills'; docs/evolution/review/feat-site-reform-f0-deploy.md"
+      locator: "execucao real na KVM 8 em 2026-08-25: selftest + check + curl do vivo pos-deploy"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_FEDERACAO_VISIBILITY_GATE
     node_type: question
@@ -955,6 +1003,10 @@ nodes:
     verified_against: direcao-do-maestro-2026-08-06
     label: "VALOR = ORQUESTRACAO ANCORADA NO GRAFO (decisao do maestro, 2026-08-06, fechando Q_VALUE). Nao e orquestracao por si — e Elenxo/Workflow FUNDADO no KG: o grafo alimenta a orquestracao e a orquestracao devolve ao grafo. A palavra ANCORADA carrega a decisao inteira. E ELA JA NASCE COM UMA CONTRADICAO MEDIDA, registrada aqui em vez de escondida (ver C_ANCORA_SOLTA_79PCT): 77 orquestracoes com transcript produziram 19 sinteses versionadas (25%) e 16 grafos irmaos (21%) — a ancora solta em 4 de cada 5 casos. Enquanto isso nao fechar, o proprio conjunto escolhido se desmente, e fechar o laco deixa de ser higiene para ser CONDICAO da decisao"
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+      locator: "direcao-do-maestro-2026-08-06"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_ANCORA_SOLTA_79PCT
     node_type: claim
@@ -986,6 +1038,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — grep -n "C_NS2_PORTABLE" -A20 docs/onion/graph/onion-identity-2026-07.kg.yaml (localizou o'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó descreve NS2 como candidata de north-star em aberto com uma ressalva pendente ("família não verificada"). Isso morreu em duas camadas: (a) Q_NORTHSTAR foi decidida em 2026-08-06 (D_NORTHSTAR_NS1_KG) escolhendo NS1-KG, não NS2 — NS2 foi explicitamente descartada como norte e redirecionada para Q'
+    provenance:
+      source: "docs/onion/graph/onion-identity-2026-07.kg.yaml"
+      locator: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — grep -n \"C_NS2_PORTABLE\" -A20 docs/onion/graph/onion-identity-2026-07.kg.yaml (localizou o"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: E_CENSO0901_C_COMPLIANCE_RARE
     node_type: evidence
@@ -1008,6 +1064,10 @@ nodes:
     verified_against: "bash .claude/validation/kg-radar.sh <este grafo> --freshness (ℹ 4 nó(s) TESTEMUNHO; 0 TESTIMONY-UNMARKED); --freshness-tsv | grep -c TESTIMONY$ = 4; bancada kg-freshness (c3) e census-extract (d)"
     label: "RESPOSTA a Q_TESTEMUNHO_NAO_MEDIVEL_0804 (drive W9, 2026-09-02): SIM, precisam de marcador proprio — e ele existe: evidence_class: testimony (default ausente = measured). O radar para de tratar o testemunho como mensuravel (nao cobra STALE-OLD; verdict TESTIMONY; conta em linha propria), acusa relato SEM marcador (TESTIMONY-UNMARKED, so quando o alvo COMECA por relato- — o carimbo de censo que CITA o vocabulario nao e acusado, a classe guarda-por-vocabulario mordeu no 1o dogfood) e acusa testemunho que se diz PROD (MISPLANED: relato nao cruza com artefato vivo). O extrator do censo nao enfileira testemunho (74k tokens/no para concluir UNVERIFIABLE por construcao). Os 4 nos desta SSOT (E_ORIGEM_CURSOR_AGNOSTICO, E_PORTE_PARA_O_CURSO, D_CLAUDE_CODE_POR_CAPACIDADE, C_FATIAS_JA_TESTADAS) foram classificados e reclassificados PROD->DEV; E_FAMILIA_MULTIIDE_CONGELADA segue medido (fonte primaria gh-api; o relato apoia). Teto declarado: o marcador e opt-in — relato carimbado com alvo que NAO comece por relato- continua invisivel."
     trace: ".claude/validation/kg-radar.sh"
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "bash .claude/validation/kg-radar.sh <este grafo> --freshness (ℹ 4 nó(s) TESTEMUNHO; 0 TESTIMONY-UNMARKED); --freshness-tsv | grep -c TESTIMONY$ = 4; bancada kg-freshness (c3) e census-extract (d)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: D_FAMILIA_TEM_DOIS_REGIMES_2026_09
     node_type: decision
@@ -1021,6 +1081,10 @@ nodes:
     verified_against: "decisao do maestro em 2026-09-16 ('linha viva'), com o porte medido no mesmo dia: 0 scripts de guarda antes, 4 guardas + bancada 11/11 + gate no CI depois"
     label: "SELADA PELO MAESTRO: a familia nao tem UM regime, tem DOIS. CONGELADOS (onion, onion-cursor, onion-antigravity, onion-copilot, onion-architect, onion-mini, onion-standalone) seguem como material de curso e prova de portabilidade. LINHA VIVA: `onion-codex`, mantido com gate determinístico proprio. DUAS CORRECOES DE FATO que esta decisao carrega. (1) `onion-codex` NUNCA ESTEVE na lista do CLAUDE.md — repo PUBLICO, prefixo `onion-`, e portanto invisivel a REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente), que deriva termos do members.yaml e ignora esse prefixo; doutrina que nao lista um repo nao o protege, e ele tambem nao esta no registro. (2) 'linha viva' NAO revoga o abandono do multi-IDE de 2026-05-18: aquilo abandonou o AGNOSTICISMO COMO DIRECAO DE PRODUTO DO CORE; manter UM porte vivo e prova de portabilidade EXECUTAVEL, outro objeto. E ela se pagou no primeiro dia: o porte revelou que a REGRA 3 (Campo model: restrito a allowlist sonnet|opus|haiku|fable) le `model:` em FRONTMATTER e nao enxergaria `model = \"gpt-5.4\"` fixado em TOML — o defeito que quebrou o @onion la. Substrato diferente e o unico lugar onde se descobre o que a guarda do core assume sem dizer."
     trace: 'CLAUDE.md'
+    provenance:
+      source: "CLAUDE.md"
+      locator: "decisao do maestro em 2026-09-16 ('linha viva'), com o porte medido no mesmo dia: 0 scripts de guarda antes, 4 guardas + bancada 11/11 + gate no CI depois"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_FAMILIA_TEM_TRES_REGIMES_2026_09
     node_type: decision
@@ -1033,6 +1097,10 @@ nodes:
     verified_against: "instrucao do maestro em 2026-09-23 ('faltou o onion-core na documentacao'), com a omissao MEDIDA: `grep -c onion-core CLAUDE.md` devolvia ZERO e este grafo tambem; o repo aparecia so nas projecoes GERADAS (members.yaml kind: door, graph.md, federation-map.md)"
     label: "A FAMILIA TEM TRES REGIMES, nao dois. Ao CONGELADOS e a LINHA VIVA soma-se a PORTA: `onion-core`, publica desde 2026-09-17, que e a face publica do core — mesma plataforma, mesma maquinaria, SEM biografia. Nao e porte multi-IDE nem repo congelado: e PROJECAO GERADA de origin/main por ops/materialize-door.sh, re-materializada a cada leva (18 vezes ate 2026-09-23) e cobrada pela REGRA 85 (Porta publica espelha o core, com catraca). POR QUE FALTAVA, e a causa e de DATAS, nao de descuido: a decisao dos dois regimes foi selada em 16/09 e a porta nasceu publica em 17/09 — um dia depois, sem ninguem emendar a lista. E a repeticao EXATA do caso `onion-codex` que o no superado ja descrevia: repo publico, prefixo `onion-`, invisivel a REGRA 36 (Superficie VENDORIZADA sem nome comercial de cliente), que deriva termos do members.yaml e ignora esse prefixo. A DIFERENCA que importa: este ESTA no members.yaml, entao o registro protege — o que faltava era a doutrina que humano e IA leem. Duas vezes em oito dias a mesma lista ficou atrasada em relacao ao mundo; a licao e que lista de repos escrita a mao envelhece por construcao, e o gatilho de emenda tem de ser o NASCIMENTO do repo, nao a lembranca de alguem."
     trace: 'CLAUDE.md · docs/evolution/federation/members.yaml'
+    provenance:
+      source: "CLAUDE.md · docs/evolution/federation/members.yaml"
+      locator: "instrucao do maestro em 2026-09-23 ('faltou o onion-core na documentacao'), com a omissao MEDIDA: `grep -c onion-core CLAUDE.md` devolvia ZERO e este grafo tambem; o repo aparecia so nas projecoes GERADAS (members.yaml kind: door, graph.md, federation-map.md)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   - from: D_FAMILIA_TEM_DOIS_REGIMES_2026_09

@@ -35,6 +35,10 @@ nodes:
     verified_against: 'CHANGELOG 2.1.257 l.10 + l.99; juiz EMENDOU (omitia l.99)'
     label: 'F1 EMENDADO. Fable 5.1 (`claude-fable-5-1`) e o novo default Fable — 1M ctx, $10/$50 por MTok, cache read $0.25 (l.10). MAS l.99: em sessoes via gateway os aliases `fable`/`best` seguem resolvendo para Fable 5 "for now"; 5.1 so por `/model`. Workflow/Agent so aceitam o alias `fable` — e o MESMO gap de runtime que a KB ja nomeia para `opus` (agent-orchestration.md:319). Atualizar o snapshot para "5.1 e o frontier" sem essa nota reproduz declarado != executado.'
     trace: 'docs/knowledge-base/concepts/agent-orchestration.md'
+    provenance:
+      source: "docs/knowledge-base/concepts/agent-orchestration.md"
+      locator: "CHANGELOG 2.1.257 l.10 + l.99; juiz EMENDOU (omitia l.99)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F2_SUBAGENT_MODEL_FORCE
     node_type: evidence
@@ -46,6 +50,10 @@ nodes:
     verified_against: 'CHANGELOG l.13; grep -c ^model: .claude/agents = 51/60; onion-orchestration/SKILL.md:123,144,171; grep SUBAGENT_MODEL_FORCE na maquinaria = 0'
     label: 'F2 APROVADO. `CLAUDE_CODE_SUBAGENT_MODEL_FORCE` aplica um so modelo a TODO subagente ignorando `model` por spawn e por definicao de agente (l.13). E exatamente o que o tiering-por-fase do Onion declara: 51 de 60 agentes trazem `model:` no frontmatter e a skill fixa model por spawn. Com a env setada, o relatorio de tiering MENTE (declara opus/high no juiz, executa o modelo forcado). Mencoes na maquinaria: 0 — nenhuma guarda hoje.'
     trace: '.claude/skills/onion-orchestration/SKILL.md'
+    provenance:
+      source: ".claude/skills/onion-orchestration/SKILL.md"
+      locator: "CHANGELOG l.13; grep -c ^model: .claude/agents = 51/60; onion-orchestration/SKILL.md:123,144,171; grep SUBAGENT_MODEL_FORCE na maquinaria = 0"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: D_TIERING_CHECA_ENV_FORCE
     node_type: decision
@@ -68,6 +76,10 @@ nodes:
     verified_against: 'CHANGELOG l.98; grep -l bypassPermissions em 26 settings*.json (/home/marcio/*/.claude + core) rc=1 (ausencia); onion-bridge src/workspace.ts:105 + config.ts:28; juiz EMENDOU 2 numeros'
     label: 'F3 EMENDADO. `defaultMode: "bypassPermissions"` em `.claude/settings.json`/`settings.local.json` de PROJETO passa a ser IGNORADO (como "auto"); vale so em user/managed settings ou `--permission-mode` (l.98). Medido: 26 settings*.json varridos (nao "10 adotantes"), 0 ocorrencias, rc=1 = ausencia e nao erro. O bridge ESCREVE `.claude/settings.json` no workspace do convidado com `defaultMode: "default"` (workspace.ts:105) e o bypass vem de `config.permissionMode` do SDK (config.ts:28, fail-closed) — nao de settings. Impacto hoje: nenhum; a doutrina "exit 2 barra ate sob bypassPermissions" segue valida.'
     trace: 'CLAUDE.md'
+    provenance:
+      source: "CLAUDE.md"
+      locator: "CHANGELOG l.98; grep -l bypassPermissions em 26 settings*.json (/home/marcio/*/.claude + core) rc=1 (ausencia); onion-bridge src/workspace.ts:105 + config.ts:28; juiz EMENDOU 2 numeros"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F4_BLOCK_READS_FORA_WORKDIR
     node_type: evidence
@@ -79,6 +91,10 @@ nodes:
     verified_against: 'CHANGELOG l.16; kg-freshness.md:120-126 ("Bloqueio de acesso so vale TENTADO", cita /home/onion/onion-bridge/src/)'
     label: 'F4 APROVADO. Auto mode ganha prompt unico antes da 1a leitura fora dos working dirs + `permissions.blockReadsOutsideWorkingDirectories` (l.16). O censo, o kg-freshness e o drive LEEM adotantes em /home/marcio/* e o bridge em /home/onion a partir da sessao do core. Se o bloqueio for ativado, workers passam a devolver UNVERIFIABLE por acesso — e a elevacao que a doutrina manda tentar (`sudo`) NAO vence esse bloqueio: e o harness, nao o FS. A doutrina precisa do caso distinto.'
     trace: '.claude/commands/meta/kg-freshness.md'
+    provenance:
+      source: ".claude/commands/meta/kg-freshness.md"
+      locator: "CHANGELOG l.16; kg-freshness.md:120-126 (\"Bloqueio de acesso so vale TENTADO\", cita /home/onion/onion-bridge/src/)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: D_KG_FRESHNESS_DISTINGUE_BLOQUEIO_DE_HARNESS
     node_type: decision
@@ -112,6 +128,10 @@ nodes:
     verified_against: 'CHANGELOG l.69; grep -n setsid .claude/validation/lint-selftest.sh = so o decoy (l.9536-9537), morto por kill explicito (l.9555)'
     label: 'F6 APROVADO (correcao factual do juiz): comandos que se destacam do shell (`timeout`/`setsid`) agora morrem no task stop / saida do Claude Code (l.69). Unico setsid do core e o decoy do selftest — que nao "auto-termina pelo sleep 30": e morto por `kill` explicito; e a mudanca so age em stop/exit, nao no fim normal. Efeito liquido: higiene a favor, sem impacto.'
     trace: '.claude/validation/lint-selftest.sh'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "CHANGELOG l.69; grep -n setsid .claude/validation/lint-selftest.sh = so o decoy (l.9536-9537), morto por kill explicito (l.9555)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_F7_EXIT2_INTACTO
     node_type: evidence
@@ -134,6 +154,10 @@ nodes:
     verified_against: 'CHANGELOG l.63 + l.72; git worktree list = 1 worktree linkado ativo (.claude/worktrees/discuss+onion-pessoal-app); grep -c "<<" lint-selftest.sh = 82 linhas com heredoc; isolation: "worktree" so em comentario (orchestrate.md:174) — 0 usos reais'
     label: 'F8 (omissao apontada pelo juiz). Worktree isolado deixou de ser inviavel para a maquinaria: sessoes worktree-isoladas recusavam loops Bash, $VAR, "$(...)" e heredocs como "too complex to verify" (l.63), e git sandboxed em worktree linkado perdia escrita no .git comum apos cd (l.72). O gate e shell com dezenas de heredocs — antes disto, fan-out isolado nao rodava a bancada. A superficie `isolation: worktree` segue declarada-e-nao-exercitada (0 usos reais) — a categoria que o CLAUDE.md trata como divida. Gatilho: 1a mutacao concorrente com sobreposicao real.'
     trace: '.claude/commands/meta/orchestrate.md'
+    provenance:
+      source: ".claude/commands/meta/orchestrate.md"
+      locator: "CHANGELOG l.63 + l.72; git worktree list = 1 worktree linkado ativo (.claude/worktrees/discuss+onion-pessoal-app); grep -c \"<<\" lint-selftest.sh = 82 linhas com heredoc; isolation: \"worktree\" so em comentario (orchestrate.md:174) — 0 usos reais"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_F9_WORKER_CORTADO_CONTINUA
     node_type: evidence
@@ -156,6 +180,10 @@ nodes:
     verified_against: 'CHANGELOG l.18; onion-bridge src/workspace.ts:44-47,105 (GUEST_SETTINGS escrito em runtime, settingSources:[project]); adopt.md:175-184 (instala/mescla .claude/settings.json no alvo)'
     label: 'F10 (omissao apontada pelo juiz). Settings de uma `.claude/` criada DEPOIS do startup passam a valer sem restart (l.18). Dois pontos do Onion dependiam disso sem saber: (a) o bridge escreve `.claude/settings.json` do convidado em runtime; (b) `/meta:adopt` instala/mescla settings no alvo, inclusive --in-place. Antes, repo adotado no mesmo processo podia rodar com os settings recem-instalados NAO carregados — bug latente que a plataforma fechou.'
     trace: '.claude/commands/meta/adopt.md'
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: "CHANGELOG l.18; onion-bridge src/workspace.ts:44-47,105 (GUEST_SETTINGS escrito em runtime, settingSources:[project]); adopt.md:175-184 (instala/mescla .claude/settings.json no alvo)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_F11_CONTAINMENT_ESCAPE_CONVERGE_COM_SSRF
     node_type: evidence
@@ -167,6 +195,10 @@ nodes:
     verified_against: 'CHANGELOG l.12; a2a-ssrf-check.sh:69 nega 169.254.* (link-local-metadata); grep curl/wget/getent/dig no helper = 0 (rc=1); _ssrf em lint-selftest.sh:4223 so passa string'
     label: 'F11 (nota do juiz, sem impacto medido). Auto mode ganha regra Containment Escape: fetch de metadata-credencial de nuvem, evasao de egress e alcance cross-tenant deixam de ser auto-aprovados (l.12). Converge com a guarda propria do Onion (a2a-ssrf-check.sh ja nega 169.254.*). Sem friccao no gate: nem a guarda nem o selftest fazem rede. Relevante so ao A2A do bridge, que faz fetch real.'
     trace: '.claude/utils/federation-transport/a2a-ssrf-check.sh'
+    provenance:
+      source: ".claude/utils/federation-transport/a2a-ssrf-check.sh"
+      locator: "CHANGELOG l.12; a2a-ssrf-check.sh:69 nega 169.254.* (link-local-metadata); grep curl/wget/getent/dig no helper = 0 (rc=1); _ssrf em lint-selftest.sh:4223 so passa string"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_LACUNAS_DECLARADAS_E3_0902
     node_type: evidence
@@ -178,6 +210,10 @@ nodes:
     verified_against: 'juiz-e3, secao LACUNAS DECLARADAS — itens 1-2 na 1a entrega; itens 3-7 na 2a entrega (01:12Z, apos 2 truncamentos), que CONFIRMOU independentemente os itens 3-4 que eu declarara por conta propria (molde E_REDDIT_INALCANCAVEL)'
     label: 'LACUNAS DECLARADAS da rodada (desfecho de 1a classe, nunca finding): (1) preco/disponibilidade do Fable 5.1 NA CONTA do maestro — CHANGELOG da tabela, nao cota; a regua de 3 degraus (GA != liberado na conta != sem custo) exige confirmacao humana; (2) se o alias `fable` desta sessao (nao-gateway) resolve para 5 ou 5.1 — l.99 fala de "gateway sessions"; nao medi o runtime (exigiria spawnar `fable` e observar o modelo efetivo); (3) F9 e leitura do CHANGELOG, nao observacao — corte de stream nao reproduzido (declarado por mim E pelo juiz, independentemente); (4) blockReadsOutsideWorkingDirectories nao exercitado — a opcao nao esta setada; so se confirmou que a leitura cross-repo funciona hoje (idem, mim E juiz); (5, juiz) F8 mede DECLARACAO, nao execucao — o gate nao rodou dentro de worktree isolado; (6, juiz) sem WebSearch/WebFetch — nada cruzado com fonte externa; (7, juiz) 2.1.258 fora do escopo — seus 2 fixes nao avaliados (proxima rodada do E3).'
     trace: 'docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md"
+      locator: "juiz-e3, secao LACUNAS DECLARADAS — itens 1-2 na 1a entrega; itens 3-7 na 2a entrega (01:12Z, apos 2 truncamentos), que CONFIRMOU independentemente os itens 3-4 que eu declarara por conta propria (molde E_REDDIT_INALCANCAVEL)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_FABLE_5_1_CONFIRMADO_NA_CONTA
     node_type: evidence
@@ -190,6 +226,10 @@ nodes:
     verified_against: 'RELATO do maestro (2026-09-02, respondendo ao item "confirmar cota do Fable 5.1 nesta conta" do relatorio do W9): "confirmado, saiu a versão 5.1 do fable" — testemunho, nao medicao (por isso evidence_class: testimony e plane: DEV). Corroboracao observada: esta sessao roda como claude-fable-5-1 (identidade de modelo reportada pelo harness da sessao 72998cdc)'
     label: 'LACUNA 1 FECHADA POR TESTEMUNHO: o maestro confirma que o Fable 5.1 esta disponivel nesta conta (2026-09-02). Preco/cota continuam nao-medidos por maquina (o relato cobre ACESSO, nao custo) — o que muda: a regua de 3 degraus (GA != liberado na conta != sem custo) tem o 2o degrau satisfeito; o 3o (custo) segue declaracao de catalogo ($10/$50 por MTok, CHANGELOG 2.1.257 l.10).'
     trace: 'docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-02/SYNTHESIS.md"
+      locator: "RELATO do maestro (2026-09-02, respondendo ao item \"confirmar cota do Fable 5.1 nesta conta\" do relatorio do W9): \"confirmado, saiu a versão 5.1 do fable\" — testemunho, nao medicao (por isso evidence_class: testimony e plane: DEV). Corroboracao observada: esta sessao roda como claude-fable-5-1 (identidade de modelo reportada pelo harness da sessao 72998cdc)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PROBE_ALIAS_FABLE_MEDIDO_0902
     node_type: evidence
@@ -201,6 +241,10 @@ nodes:
     verified_against: 'Agent({model:"fable"}) + grep "model":"..." no transcript do subagente = 1x "claude-fable-5-1" (campo da RESPOSTA da API, nao declaracao do modelo); Claude Code 2.1.257; sessao sem gateway'
     label: 'FECHA A LACUNA 2 POR MEDICAO: o alias `fable` do Agent tool desta sessao (nao-gateway) resolve para claude-fable-5-1 — o mesmo molde que fechou o gap do `opus` (Q_E3_DELTA_2_1_257). Escopo: Workflow tool NAO medido; sessoes via gateway seguem o CHANGELOG l.99. Detalhe e consequencias na pesquisa de superacao (fable-5-1-superacao-2026-09.kg.yaml, E_PROBE_ALIAS_FABLE_5_1).'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-fable-alias.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-fable-alias.md"
+      locator: "Agent({model:\"fable\"}) + grep \"model\":\"...\" no transcript do subagente = 1x \"claude-fable-5-1\" (campo da RESPOSTA da API, nao declaracao do modelo); Claude Code 2.1.257; sessao sem gateway"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_REGRA65_CEGA_AO_PROCESSO_0902
     node_type: evidence
@@ -212,6 +256,10 @@ nodes:
     verified_against: '/proc/<pid>/exe da sessao interativa do maestro → …/versions/2.1.247 (deleted), iniciada 2026-08-27; disco (symlink ~/.local/bin/claude) → 2.1.258; picker do /model: "Fable 5.1 (disabled) — Update to 2.1.255+"; lint REGRA 65 dizia instalado=2.1.258'
     label: 'MEDIDO: o auto-updater troca o binario com a sessao VIVA — a sessao do maestro rodou 2.1.247 por 6 dias com o disco em 2.1.258. Picker de modelo, hooks (PreModelSwitch so existe em >= 2.1.251) e capacidades refletem o PROCESSO, nao o disco. A REGRA 65 comparava cc_version com `claude --version` (DISCO) e afirmava "instalado=2.1.258": declarado != verificado, exatamente a classe que a regra existe para pegar. Dano: Fable 5.1 invisivel por 6 dias; 1 rodada de medicao do hook perdida. 4 sessoes abaixo de 2.1.255 no host naquele momento.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md"
+      locator: "/proc/<pid>/exe da sessao interativa do maestro → …/versions/2.1.247 (deleted), iniciada 2026-08-27; disco (symlink ~/.local/bin/claude) → 2.1.258; picker do /model: \"Fable 5.1 (disabled) — Update to 2.1.255+\"; lint REGRA 65 dizia instalado=2.1.258"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_REGRA65_MEDE_O_PROCESSO
     node_type: decision
@@ -223,6 +271,10 @@ nodes:
     verified_against: 'hook session-version-drift.sh no UserPromptSubmit: drift simulado (ONION_CC_EXECPATH=…/2.1.247) emitiu o aviso com as 2 versoes, 2a vez calou (rate-limit), sem drift calou; bancada run_version_drift_selftests 5/5 com claude sintetico (symlink → versions/X) + radar-staleness (f)/(g) 2/2; lint REGRA 65 prefere CLAUDE_CODE_EXECPATH e emite SOFT proprio processo != disco. O 1o commit foi REPROVADO pelo pre-commit: o CLAUDE_CODE_EXECPATH da sessao VAZAVA para dentro do fixture (f) e o caso mudava de resultado entre CI e pre-commit — cura: override ONION_CC_EXECPATH vale quando DEFINIDO (mesmo vazio), a bancada isola'
     label: 'APLICADO: (a) hook UserPromptSubmit session-version-drift.sh compara a versao do PROCESSO (CLAUDE_CODE_EXECPATH, senao /proc/$CLAUDE_PID/exe com deteccao de "(deleted)") com a do DISCO e avisa 1x por (sessao, versao-do-disco) — no UserPromptSubmit e nao no SessionStart porque o drift nasce DEPOIS do inicio, quando o updater roda; nunca bloqueia (reiniciar e ato do maestro). (b) a REGRA 65 passa a ler o processo quando roda dentro de uma sessao e ganha um 2o SOFT "processo != disco — reinicie" (cura diferente: reiniciar, nao rodar o radar). Vendorizado em todo adotante (settings.json) — e sobre o Claude Code, nao sobre o core. Gatilho disparado: E_REGRA65_CEGA_AO_PROCESSO_0902. Fronteira: nao detecta processo velho a partir do CI (sem sessao) — la o disco e a unica verdade.'
     trace: '.claude/hooks/session-version-drift.sh'
+    provenance:
+      source: ".claude/hooks/session-version-drift.sh"
+      locator: "hook session-version-drift.sh no UserPromptSubmit: drift simulado (ONION_CC_EXECPATH=…/2.1.247) emitiu o aviso com as 2 versoes, 2a vez calou (rate-limit), sem drift calou; bancada run_version_drift_selftests 5/5 com claude sintetico (symlink → versions/X) + radar-staleness (f)/(g) 2/2; lint REGRA 65 prefere CLAUDE_CODE_EXECPATH e emite SOFT proprio processo != disco. O 1o commit foi REPROVADO pelo pre-commit: o CLAUDE_CODE_EXECPATH da sessao VAZAVA para dentro do fixture (f) e o caso mudava de resultado entre CI e pre-commit — cura: override ONION_CC_EXECPATH vale quando DEFINIDO (mesmo vazio), a bancada isola"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   - from: E_F1_FABLE_5_1_DEFAULT

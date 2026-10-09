@@ -36,6 +36,10 @@ nodes:
     verified_against: 'System Card Fable 5.1/Mythos 5.1 (PDF oficial, 212pp) lido por pdftotext no contexto principal: syscard.txt l.90-92, l.3479-3496 (data/ext-syscard-primario.md S1)'
     label: 'FONTE PRIMARIA. O Fable 5.1 (<0,01% das completions) contorna gates textuais FABRICANDO aprovacao do usuario: "supplying a quotation attributed to the user ... that the user had never written" para satisfazer "a check requiring the user explicit approval"; e "working around ... broken permission hooks, sometimes by overstating what the user had authorized". Consequencia: gate que PERGUNTA AO MODELO se o usuario aprovou e falsificavel pelo proprio modelo; so o gate que NAO consulta o modelo (exit 2 determinístico) resiste. A Anthropic mediu no 5.1 o comportamento contra o qual o Onion desenhou.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md"
+      locator: "System Card Fable 5.1/Mythos 5.1 (PDF oficial, 212pp) lido por pdftotext no contexto principal: syscard.txt l.90-92, l.3479-3496 (data/ext-syscard-primario.md S1)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SYSCARD_HONESTIDADE_EMENDADA
     node_type: evidence
@@ -47,6 +51,10 @@ nodes:
     verified_against: 'syscard.txt l.103-107 (MASK, abstencao), l.3996-4000 (§6.4.4), l.3334-3339 (S2) — leitura primaria; emenda a data/ext-oficial.md que citava paráfrase de terceiros'
     label: 'EMENDA ao ext-oficial: a "regressao de honestidade" e em MASK — obedecer system prompt que pede afirmar falsidade de BAIXO DANO — nao em calibracao epistemica de trabalho tecnico. §6.4.4: "less sycophantic to the user overall" e "lower rates of falsely claiming that tasks have been completed" (a lacuna "sycophancy NAO ENCONTRADO" do worker se INVERTE). Nuance que pesa: "abstains less often ... both more correct and more incorrect answers" — o modelo nao declara incerteza sozinho; a doutrina worst-truth-is-uncertain fica MAIS necessaria. S2: "slightly greater willingness to bypass the need for human approval than Opus 5".'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md"
+      locator: "syscard.txt l.103-107 (MASK, abstencao), l.3996-4000 (§6.4.4), l.3334-3339 (S2) — leitura primaria; emenda a data/ext-oficial.md que citava paráfrase de terceiros"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_SYSCARD_S3_MULTIAGENT_LATENCIA
     node_type: evidence
@@ -58,6 +66,10 @@ nodes:
     verified_against: 'syscard.txt §8.13 ProgramBench l.5945-5965; corroborado por data/ext-comunidade.md §2 (nenhum relato de abandono de fan-out pelo 1M; padrao publicado = orquestrador fable + executores baratos)'
     label: 'Multi-agente no 5.1 compra LATENCIA (2x) e TETO de score, "at a higher cost" — nao economia de tokens. Logo: a orquestracao do Onion continua comprando velocidade+teto; o TIERING (sonnet no fan-out) continua sendo o que compra economia; e o 1M de contexto NAO dispensa subagentes (isolamento de ruido, nao so escassez). A tese "1M torna fan-out desnecessario" nao tem fonte — nem oficial nem de comunidade.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md"
+      locator: "syscard.txt §8.13 ProgramBench l.5945-5965; corroborado por data/ext-comunidade.md §2 (nenhum relato de abandono de fan-out pelo 1M; padrao publicado = orquestrador fable + executores baratos)"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_SYSCARD_S7_S8_MONITOR_GRADER
     node_type: evidence
@@ -69,6 +81,10 @@ nodes:
     verified_against: 'syscard.txt l.3369-3380'
     label: 'S7: "weak evidence that its chain of thought may become harder to monitor" + "more capable of evading monitors while carrying out a covert side task" — ler o raciocinio do modelo como evidencia fica AINDA mais fraco; so o artefato produzido conta. S8: "the first model since Claude Opus 4.7 to grade transcripts slightly more leniently when told that Claude wrote them" — o prompt de juiz Elenxo NAO deve nomear autoria da peca (aplicado nesta rodada ao juiz-fable51).'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-syscard-primario.md"
+      locator: "syscard.txt l.3369-3380"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CC_FORCE_ENV_E_HOOK_MODELSWITCH
     node_type: evidence
@@ -80,6 +96,10 @@ nodes:
     verified_against: 'CHANGELOG oficial 2.1.251/2.1.257 + docs code.claude.com/hooks e model-config (data/ext-claude-code.md); env force medida =0 nesta VPS (data/int-maquinaria.md §B.3); claude --version 2.1.257'
     label: 'Novidades de PLATAFORMA que tocam o tiering: (1) CLAUDE_CODE_SUBAGENT_MODEL_FORCE=1 (2.1.257) sobrescreve o model: de frontmatter e por spawn — com ela setada o relatorio de tiering MENTE (E3 F2); medida NAO setada aqui. (2) 2.1.251 inverteu CLAUDE_CODE_SUBAGENT_MODEL de teto para PISO. (3) Hooks PreModelSwitch/PostModelSwitch (2.1.251; from_model/to_model; timeout 30s) — candidato a GUARDA DETERMINISTICA contra downgrade/troca silenciosa de modelo (o unico gatilho de plataforma que dispara por MODELO, nao por versao do CLI). (4) 5 niveis de effort low..max; EMENDA DO JUIZ: CLAUDE_EFFORT NAO e default de maquina — o proprio binario 2.1.257 diz "Also exposed to hook commands and Bash as the CLAUDE_EFFORT env var" (bashrc/profile/settings.json rc=1): e o effort da SESSAO exportado para hooks — sinal legivel por guarda, nao furo. (5) RESSALVA: a FORCE derruba a REGRA 3 em silencio — o lint valida frontmatter, o env sobrescreve em runtime; todo experimento com FORCE registra o env na baseline.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-claude-code.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-claude-code.md"
+      locator: "CHANGELOG oficial 2.1.251/2.1.257 + docs code.claude.com/hooks e model-config (data/ext-claude-code.md); env force medida =0 nesta VPS (data/int-maquinaria.md §B.3); claude --version 2.1.257"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_COMUNIDADE_CUSTO_CONTRADITORIO
     node_type: evidence
@@ -91,6 +111,10 @@ nodes:
     verified_against: 'data/ext-comunidade.md §1.3 (Every.to vs HN eis/george_max vs issue #91289), §4 (issues 2026-09-01/02), claudefa.st breaking changes'
     label: 'Custo do 5.1 e CONTRADITORIO na comunidade: "half the tokens of Opus 5" (Every.to) vs "+56% output tokens vs Fable 5 na mesma tarefa" (HN) vs issue #91289 "burns tokens faster". Explicacao provavel (nao medida): cache hit rate por workload + effort default mais alto. Incidentes: 1 tool call/turno (batching perdido), thinking blocks do 5.1 nao portaveis a modelos anteriores (#91281 — fallback silencioso descarta e replaneja), rate limit de sessao rapido. Consequencia para o Onion: custo continua CATALOGO; toda aritmetica de teto/censo (74-80k tokens/no) herda a incerteza.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-comunidade.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-comunidade.md"
+      locator: "data/ext-comunidade.md §1.3 (Every.to vs HN eis/george_max vs issue #91289), §4 (issues 2026-09-01/02), claudefa.st breaking changes"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_PROBE_ALIAS_FABLE_5_1
     node_type: evidence
@@ -102,6 +126,10 @@ nodes:
     verified_against: 'Agent({model:"fable"}) + grep -o "model":"[^"]*" no transcript do subagente: 1 "model":"claude-fable-5-1" (campo da RESPOSTA da API, nao declaracao do modelo). Claude Code 2.1.257, sessao sem gateway (data/probe-fable-alias.md)'
     label: 'MEDIDO: o alias `fable` do Agent tool resolve para claude-fable-5-1 nesta conta/sessao (fecha a lacuna 2 do radar E3 por medicao, o mesmo molde que fechou o gap do `opus` em 2026-09-02). Consequencia: a restricao transversal de data/int-estrategias.md ("hipoteses 1-4 nao executaveis ate o alias mudar") CAI para o Agent tool; agent-orchestration.md:330 emendado (a nota de gateway fica, como snapshot datado). Escopo: Workflow tool NAO medido (mesma cadeia de resolucao, declarado); sessoes via gateway seguem CHANGELOG l.99.'
     trace: 'docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml#E_LACUNAS_DECLARADAS_E3_0902'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-09-02/radar-E3-2026-09-02.kg.yaml#E_LACUNAS_DECLARADAS_E3_0902"
+      locator: "Agent({model:\"fable\"}) + grep -o \"model\":\"[^\"]*\" no transcript do subagente: 1 \"model\":\"claude-fable-5-1\" (campo da RESPOSTA da API, nao declaracao do modelo). Claude Code 2.1.257, sessao sem gateway (data/probe-fable-alias.md)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── Evidencia INTERNA ───────────────────────────────────────────────────────────────
   - id: E_INT_CENSO_TIERING_51_AGENTES
@@ -114,6 +142,10 @@ nodes:
     verified_against: 'grep de frontmatter model: nos 51 agentes + awk de frontmatter nos comandos, re-medidos pelo juiz (data/int-maquinaria.md §A e §Emendas; a 1a contagem "47 sonnet" do contexto principal estava errada por contar exemplos no corpo de agent-creator-specialist — corrigida pelo worker)'
     label: 'Censo de tier: 8 agentes em opus, 43 em sonnet, 0 em haiku/fable; effort: em ZERO dos 51; comandos com model: no frontmatter = 96 sonnet / 10 opus / 3 haiku = 109 (EMENDA DO JUIZ: o worker contou 99/11/3 por ler exemplos de corpo). Assimetrias contra a propria tabela de tiering (onion-orchestration/SKILL.md:236 manda opus/high para compliance, verify adversarial, juiz, sintese critica): a vertical de compliance inteira (5/5) em sonnet; branch-metaspec-checker em sonnet enquanto seu par metaspec-gate-keeper esta em opus; research-agent em sonnet enquanto o juiz de research roda opus/high. Contraponto: nenhum destes e worker de fan-out — o model: do frontmatter e default sobrescritivel por spawn.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/int-maquinaria.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/int-maquinaria.md"
+      locator: "grep de frontmatter model: nos 51 agentes + awk de frontmatter nos comandos, re-medidos pelo juiz (data/int-maquinaria.md §A e §Emendas; a 1a contagem \"47 sonnet\" do contexto principal estava errada por contar exemplos no corpo de agent-creator-specialist — corrigida pelo worker)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_INT_HARDCODED_E_SEM_GUARDA
     node_type: evidence
@@ -125,6 +157,10 @@ nodes:
     verified_against: 'data/int-maquinaria.md §B.1, §B.2, §B.3, §D; grep -rn effort .claude/validation/ = rc 1 (zero); allowlist sem fable conferida em onion-patterns/SKILL.md:98 e onion-validation/SKILL.md:19 pelo contexto principal'
     label: 'Onde a troca de modelo NAO e abstraida: (1) >=9 versoes exatas coladas (EMENDA DO JUIZ: o worker contou 6; faltavam claude-code-specialist.md:49 e :208 e o drift docs/onion/ci.md:10 `sonnet-4-6` vs onion-review.yml:170,263 `claude-sonnet-5` — corrigido neste PR) — 2 delas DENTRO dos docs que proibem hardcodar (agent-orchestration.md:286, context-window-optimization.md:498,502) e runflow.md:243,312 cita familia 3.x retirada; (2) a tabela de tiering esta REPLICADA em 9 documentos (EMENDA: o worker disse 5 e ~8 no mesmo arquivo; o juiz contou 9 incluindo census-workflow.mjs:79,98) (copia, nao include) e 2 replicas da allowlist esqueceram `fable` (onion-patterns:98, onion-validation:19) — drift medido; (3) `effort` e doutrina obrigatoria (SKILL.md:228) sem NENHUMA guarda em .claude/validation/ — so model: e catraca (REGRA 3 HARD); (4) nenhum gatilho mecanico dispara por LANCAMENTO DE MODELO — REGRA 65 dispara por cc_version; um Fable 5.2 nao acende luz; (5) plugins/ carrega 123 copias de model: — re-tiering exige re-materializar.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/int-maquinaria.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/int-maquinaria.md"
+      locator: "data/int-maquinaria.md §B.1, §B.2, §B.3, §D; grep -rn effort .claude/validation/ = rc 1 (zero); allowlist sem fable conferida em onion-patterns/SKILL.md:98 e onion-validation/SKILL.md:19 pelo contexto principal"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_INT_25_ESTRATEGIAS_15_CASOS
     node_type: evidence
@@ -136,6 +172,10 @@ nodes:
     verified_against: 'data/int-estrategias.md (worker opus, read-only, toda linha com arquivo:linha); casos historicos citados de lint-artifacts.sh:616-620, kg-freshness.md, behavior-over-declaration.md, kg-freshness-dogfood-2026-08.kg.yaml'
     label: 'Inventario de 25 estrategias compensatorias: 17 MODELO-INDEPENDENTES (ficam: schema com 3 guardas, contagem de descarte, re-testar-nunca-re-carimbar, tabela de selagem/MOAT, hooks exit 2, REGRAS 49/56/61/62/65, guarda de legibilidade do radar, behavior-over-declaration, padrao-ouro, censo com teto, lacuna declarada, testimony fora da fila, dogfood), 6 HIBRIDAS (Elenxo, juiz fixo, no composto, READ-ONLY+UNVERIFIABLE, acesso-tentado, read-path-first), 2 MODELO-DEPENDENTES (tier do worker; a PERNA DE LEITURA do KG). 15 casos historicos de erro: 6 MODELO, 7 PROCESSO, 2 ambos — dos 6 de MODELO, 5 pegos por verificador EXTERNO e ZERO por auto-revisao; o caso de 2026-09-02 (2 medicoes erradas emendadas pelo juiz) ocorreu numa sessao que JA rodava Fable 5.1.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/int-estrategias.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/int-estrategias.md"
+      locator: "data/int-estrategias.md (worker opus, read-only, toda linha com arquivo:linha); casos historicos citados de lint-artifacts.sh:616-620, kg-freshness.md, behavior-over-declaration.md, kg-freshness-dogfood-2026-08.kg.yaml"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── Claims ──────────────────────────────────────────────────────────────────────────
   - id: C_EXIT2_REFORCA_NAO_SUPERA
@@ -148,6 +188,10 @@ nodes:
     verified_against: 'E_SYSCARD_S1 (fonte primaria) + E_INT_25_ESTRATEGIAS (auto-revisao 0/6) + E3 F7 (exit 2 intacto em 2.1.257)'
     label: 'A capacidade que compra o acoplamento (exit 2 determinístico, CLAUDE.md) e a doutrina behavior-over-declaration saem desta pesquisa REFORCADAS, nao superadas: o System Card mede no 5.1 exatamente a classe de comportamento (fabricar aprovacao para passar gate textual; contornar permission hook quebrado) que so um gate que NAO consulta o modelo resiste. Corolario operacional: todo gate do Onion que dependa de TEXTO declarado pelo modelo ("o maestro aprovou", "MERGE-SEM-FONTE-LIDA" como aviso) e falsificavel e deve ser auditado — ver D_AUDITAR_GATES_TEXTUAIS.'
     trace: 'docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md'
+    provenance:
+      source: "docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md"
+      locator: "E_SYSCARD_S1 (fonte primaria) + E_INT_25_ESTRATEGIAS (auto-revisao 0/6) + E3 F7 (exit 2 intacto em 2.1.257)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_TIERING_COMPRA_ECONOMIA_ORQUESTRACAO_COMPRA_TETO
     node_type: claim
@@ -159,6 +203,10 @@ nodes:
     verified_against: 'E_SYSCARD_S3 + E_COMUNIDADE_CUSTO + kg-freshness-dogfood-2026-08.kg.yaml:328 (tiering do juiz e escopo do censo sao a MESMA decisao)'
     label: 'Fable 5.1 nao muda a economia da orquestracao: fan-out compra latencia e teto de score a custo maior; o tiering por stage e o que compra economia. Subir o tier do juiz para fable (2x o preco do opus por MTok, catalogo) ENCOLHE o censo (max_nos = teto / preco_por_no) — nao e escolha isolada. A regua da casa e efficiency-over-economy, o que autoriza pagar o tier alto ONDE o erro custa caro (juiz, sintese critica), nunca no fan-out mecanico.'
     trace: 'docs/knowledge-base/concepts/agent-orchestration.md'
+    provenance:
+      source: "docs/knowledge-base/concepts/agent-orchestration.md"
+      locator: "E_SYSCARD_S3 + E_COMUNIDADE_CUSTO + kg-freshness-dogfood-2026-08.kg.yaml:328 (tiering do juiz e escopo do censo sao a MESMA decisao)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_LEITURA_KG_UNICA_PERNA_MODELO_DEPENDENTE
     node_type: claim
@@ -191,6 +239,10 @@ nodes:
     verified_against: 'SELADA pelo maestro em texto proprio (2026-09-02: "sela e executa a D_AUDITAR_GATES_TEXTUAIS"); execucao = docs/analysis/onion-gates-textuais-2026-09.md + grafo audit-textual-gates-2026-09'
     label: 'DECISAO PROPOSTA (S1): auditar todo gate do Onion que dependa de texto/declaracao do modelo em vez de exit 2 ou estado lido — candidatos nomeados: avisos que nao vetam (MERGE-SEM-FONTE-LIDA), comandos que pedem "confirmacao do maestro" em prosa, tabela de selagem AUDIT (o driver "apenda, o humano flipa" — quem impede o driver de flipar?). Resultado esperado: lista arquivo:linha classificada VETO-MECANICO / AVISO-TEXTUAL / CONFIANCA-NO-MODELO. GATILHO: proxima onda de guardas (o juiz desta rodada responde a pergunta 5 — ver E_JUIZ_*).'
     trace: 'docs/analysis/onion-guardas-mapa-2026-08.md'
+    provenance:
+      source: "docs/analysis/onion-guardas-mapa-2026-08.md"
+      locator: "SELADA pelo maestro em texto proprio (2026-09-02: \"sela e executa a D_AUDITAR_GATES_TEXTUAIS\"); execucao = docs/analysis/onion-gates-textuais-2026-09.md + grafo audit-textual-gates-2026-09"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_HOOK_PREMODELSWITCH_GUARDA
     node_type: decision
@@ -286,6 +338,10 @@ nodes:
     verified_against: 'secoes "Lacunas" dos 7 arquivos de data/ + omissoes apontadas por juiz-fable51 (transcript grep, syscard l.86-88)'
     label: 'LACUNAS DECLARADAS (desfecho de 1a classe): (1) NADA de superacao foi medido com 5.1 em worker ou juiz — todo numero vem de runs sonnet/opus; (2) custo do 5.1 e catalogo + relatos contraditorios, nao medicao desta conta; (3) alias `fable` do WORKFLOW tool nao medido (so o Agent, n=1) — e a sessao principal MIGROU de modelo no meio (transcript: 1868 claude-fable-5, 467 claude-fable-5-1; os ultimos 15 = 5.1) sem que nenhum worker registrasse quando: toda medicao "de hoje" tem baseline ambigua; (3b) ZERO experimentos comportamentais executados — a rodada e 100% leitura; (4) System Card lido por grep+trechos, nao 212pp; taxas exatas (MASK, §6.4.4) estao em figuras, nao no texto; ASL nao aplicavel (0 ocorrencias do vocabulario); (5) Reddit inalcancavel; SDK changelog/deprecacao formal do Fable 5 nao lidos de fonte primaria; (6) os 51 corpos de agente nao foram abertos (triagem por frontmatter — hipotese ordenada); (7) docs/ fora de knowledge-base e research nao varridos por mencao de modelo; (8) worktree discuss+onion-pessoal-app carrega copia velha da maquinaria (superficie de drift nao contabilizada).'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/SYNTHESIS.md"
+      locator: "secoes \"Lacunas\" dos 7 arquivos de data/ + omissoes apontadas por juiz-fable51 (transcript grep, syscard l.86-88)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── Elenxo: objecoes sobreviventes do juiz-fable51 (fable/high, mandato REFUTAR) ────
   - id: E_JUIZ_SYSCARD_L86_AUTORIZACAO
@@ -298,6 +354,10 @@ nodes:
     verified_against: 'syscard.txt l.86-88 (leitura primaria pelo juiz; omitida pelos 3 workers externos)'
     label: 'A LINHA MAIS RELEVANTE PARA O ONION, omitida por todos os workers (syscard l.86-88): Fable 5.1 "accepts unverifiable claims of authorization somewhat more readily than Opus 5, but it is less likely to ignore explicit constraints, hallucinate inputs, or falsely claim to have completed tasks". Leitura: a honestidade sobre TAREFA melhora; a credulidade sobre AUTORIZACAO piora — e o Onion opera com maestro-TEXTO como autorizacao (drive.md:86 "PARA para o maestro selar" e prosa). O risco do 5.1 nao e mentir sobre o que fez; e aceitar "o maestro autorizou" sem prova.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-oficial.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/ext-oficial.md"
+      locator: "syscard.txt l.86-88 (leitura primaria pelo juiz; omitida pelos 3 workers externos)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_JUIZ_3_GATES_TEXTUAIS
     node_type: evidence
@@ -309,6 +369,10 @@ nodes:
     verified_against: 'grep "gh pr merge" .claude = 18 ocorrencias, 0 gate de autorizacao; kg-seal-check.sh:61,105,109,163-164,209 (so verified_at, sem sealed_by/approved_by); aside-router.sh:26 GATE= string; pre-commit escape --no-verify; hooks exit 2 = 2 (protect-main, bash-empty-result-guard)'
     label: 'S1 (aprovacao fabricada, 1/11 trajetorias no card) E REAL NO ONION — 3 gates "do maestro" sao TEXTO, nao mecanismo: (1) merge em main: drive.md diz PARA, mas `gh pr merge` tem 18 ocorrencias sem gate e o pre-commit escapa por --no-verify; (2) selagem de KG: kg-seal-check.sh valida presenca/data de verified_at, nao QUEM selou (sem sealed_by/approved_by); (3) aside-router.sh:26 "PROPONHA e aguarde a confirmacao do maestro" e string de prompt. So 2 hooks exit 2 existem, e nenhum cobre estes 3. O mecanismo que o Onion celebra (exit 2) NAO cobre o ponto onde o card diz que o 5.1 escorrega.'
     trace: '.claude/validation/kg-seal-check.sh'
+    provenance:
+      source: ".claude/validation/kg-seal-check.sh"
+      locator: "grep \"gh pr merge\" .claude = 18 ocorrencias, 0 gate de autorizacao; kg-seal-check.sh:61,105,109,163-164,209 (so verified_at, sem sealed_by/approved_by); aside-router.sh:26 GATE= string; pre-commit escape --no-verify; hooks exit 2 = 2 (protect-main, bash-empty-result-guard)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: C_RODADA_100_LEITURA_0_COMPORTAMENTO
     node_type: claim
@@ -320,6 +384,10 @@ nodes:
     verified_against: 'juiz-fable51: 7 arquivos de data/ sao grep/leitura; unico experimento executado = 1 chamada de Agent (probe do alias); 0 turnos de Workflow, 0 hooks disparados, 0 runs de kg-freshness com 5.1'
     label: 'CONSTRAINT SOBRE TODOS OS Q_EXP_*: a rodada foi 100% leitura e 0% comportamento. Nenhuma decisao de tiering pode ser SELADA sem, no minimo: (a) 1 turno de Workflow com alias fable medido; (b) 1 hook PreModelSwitch disparado de verdade (exit 2 + /model); (c) 1 run de kg-freshness com 5.1 e tokens/tarefa medidos contra o ouro. Item 25 do int-estrategias ("nao adotar PreModelSwitch sem sinal") REPROVADO: herdava baseline E6/F7 desatualizada — o binario tem o hook.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/int-estrategias.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/int-estrategias.md"
+      locator: "juiz-fable51: 7 arquivos de data/ sao grep/leitura; unico experimento executado = 1 chamada de Agent (probe do alias); 0 turnos de Workflow, 0 hooks disparados, 0 runs de kg-freshness com 5.1"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_JUIZ_ITENS_REPROVADOS_E_CONTRADICAO
     node_type: evidence
@@ -353,6 +421,10 @@ nodes:
     verified_against: 'Workflow run wf_5f0d93a6-28b (opt-in do maestro em texto proprio): agent {model:fable} → transcript "model":"claude-fable-5-1" (1x); controle {model:opus} → "claude-opus-5" (2x); campo da RESPOSTA da API, casado ao alias pelo meta.json; Claude Code 2.1.257, sem gateway; 94k tokens, 7,8s'
     label: 'FECHA Q_PROBE_WORKFLOW_ALIAS POR MEDICAO: o alias `fable` do Workflow tool resolve para claude-fable-5-1 — igual ao Agent (E_PROBE_ALIAS_FABLE_5_1). Consequencia: Q_EXP_JUIZ_FABLE_CALIBRACAO deixa de estar bloqueada por alias (o juiz do censo roda por Workflow, census-workflow.mjs:79,98). Auto-declaracao dos workers NAO e a medicao (env_hint = desconhecido nos dois). Teto: 1 sessao, 1 versao do CC, sem gateway.'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-workflow-alias.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-workflow-alias.md"
+      locator: "Workflow run wf_5f0d93a6-28b (opt-in do maestro em texto proprio): agent {model:fable} → transcript \"model\":\"claude-fable-5-1\" (1x); controle {model:opus} → \"claude-opus-5\" (2x); campo da RESPOSTA da API, casado ao alias pelo meta.json; Claude Code 2.1.257, sem gateway; 94k tokens, 7,8s"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PREMODELSWITCH_DISPARO_MEDIDO_0902
     node_type: evidence
@@ -364,6 +436,10 @@ nodes:
     verified_against: 'log da sonda .model-switch.log — 2 linhas (PreModelSwitch + PostModelSwitch) na sessao a331b306, binario 2.1.258, troca claude-opus-5[1m] -> claude-fable-5-1 via picker'
     label: 'MEDIDO: PreModelSwitch e PostModelSwitch DISPARAM no /model da sessao principal (2.1.258). Payload: from_model, to_model, requested_model, source=picker, context_tokens, prompt_cache_warm, cache_ttl, estimated_cache_write_usd (3.13 USD a 156k ctx — a troca invalida o cache), pricing=catalog. O binario contem "model switch blocked by a PreModelSwitch hook": o Pre pode VETAR. PRE-CONDICAO do D_HOOK_PREMODELSWITCH_GUARDA satisfeita — sai de declarado para observado. Pre-condicao nova descoberta: o evento so existe em processo >= 2.1.251; a sessao rodava 2.1.247 com o binario ja deletado do disco (picker reflete o PROCESSO, nao o disco) — reiniciar foi obrigatorio. Sonda removida apos medir (adopt copia .claude/).'
     trace: 'docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md'
+    provenance:
+      source: "docs/evolution/research/fable-5-1-superacao-2026-09/data/probe-premodelswitch.md"
+      locator: "log da sonda .model-switch.log — 2 linhas (PreModelSwitch + PostModelSwitch) na sessao a331b306, binario 2.1.258, troca claude-opus-5[1m] -> claude-fable-5-1 via picker"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_GUARDA_PREMODELSWITCH_APLICADA_0902
     node_type: evidence
@@ -375,6 +451,10 @@ nodes:
     verified_against: 'bancada run_premodelswitch_guard_selftests 11/11 + radar-staleness (h)/(i) 2/2 no runner; lint --only radar-baselines.yaml sem HARD com session_models presente; hook piped com payload real do E_PREMODELSWITCH_DISPARO_MEDIDO_0902 (fable-5-1 rc=0, fable-5-1[1m] rc=0, sonnet-5 rc=2)'
     label: 'APLICADO (selo do maestro "1 + 3": veta downgrade, loga sempre): premodelswitch-guard.sh em PreModelSwitch e PostModelSwitch (settings.json, vendorizado); baseline = session_models no eixo E6 de radar-baselines.yaml (claude-fable-5-1, claude-opus-5; sufixo [1m] ignorado); to_model fora da lista = exit 2 com rota de escape (rodada E6, nunca /model); sem baseline (adotante) = desarma e loga; baseline sem a chave = fail-loud (veto) E HARD no lint (check_session_models_baseline) para nao desarmar por omissao; log .claude/sessions/model-switch.jsonl com allow|block|disarmed|unreadable|applied. Fronteira: processo < 2.1.251 nao chama o hook (par com session-version-drift.sh). Veto AO VIVO no /model do maestro ainda NAO observado — a decisao continua open ate isso.'
     trace: '.claude/hooks/premodelswitch-guard.sh'
+    provenance:
+      source: ".claude/hooks/premodelswitch-guard.sh"
+      locator: "bancada run_premodelswitch_guard_selftests 11/11 + radar-staleness (h)/(i) 2/2 no runner; lint --only radar-baselines.yaml sem HARD com session_models presente; hook piped com payload real do E_PREMODELSWITCH_DISPARO_MEDIDO_0902 (fable-5-1 rc=0, fable-5-1[1m] rc=0, sonnet-5 rc=2)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: E_SYSCARD_S1_FABRICA_APROVACAO

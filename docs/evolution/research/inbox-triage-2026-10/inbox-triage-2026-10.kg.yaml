@@ -32,6 +32,10 @@ nodes:
     label: 'MEDIDO POR REFUTADOR ADVERSARIAL (2026-10-02, PR #903): eu arquivei os 6 sinais do inbox declarando "todos endereçados, com prova em origin/main" — e a prova que eu levantei cobria o PEDIDO PRINCIPAL de cada sinal, nao os pedidos INTERNOS. QUATRO pedidos ficaram abertos, sem resposta e sem teto declarado: o `index.md` da KB sobrescrito pelo update (pedido 3 de 3 do sinal do pre-commit), os dois itens do adendo do mesmo sinal (convergencia docs-only com gatilho JA disparado em adopt.md:685, e baseline explicito no stamp) e os tres falsos-positivos de gate relatados pelo hub gmill. A CLASSE: "endereçado" medido pelo titulo e pelo pedido de cabeça de lista, quando o sinal tem secoes com pedidos proprios — e exatamente a licao `read-full-content-before-triage` reincidindo, agora na direcao do ARQUIVAMENTO e nao da leitura. O gate mecanico saiu 0 HARD em todas as passadas: nenhuma guarda sabe ler o que um sinal PEDE. O refutador, lendo os sinais inteiros, achou os quatro em 23 minutos. CURA APLICADA: os quatro viraram nos com gatilho nomeado, e o arquivamento passou a declarar explicitamente o que ficou aberto em vez de dizer "endereçado".'
     trace: 'docs/evolution/review/chore-inbox-triage-2026-10.md'
     verified_against: 'passada adversarial em worktree isolada sobre o commit 63c25c3b; 5 achados reais, 5 provados; os 4 pedidos conferidos no codigo (grep por knowledge-base/index em .claude/utils/adopt = ZERO; adopt.md:685 declara o gate)'
+    provenance:
+      source: "docs/evolution/review/chore-inbox-triage-2026-10.md"
+      locator: "passada adversarial em worktree isolada sobre o commit 63c25c3b; 5 achados reais, 5 provados; os 4 pedidos conferidos no codigo (grep por knowledge-base/index em .claude/utils/adopt = ZERO; adopt.md:685 declara o gate)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO
     node_type: question
@@ -43,6 +47,10 @@ nodes:
     label: 'O `/meta:adopt --update` SOBRESCREVEU o `docs/knowledge-base/index.md` do adotante com a versao do core — ele perdeu frontmatter e entradas locais, e o `docs:check` dele passou a REPROVAR. Sinal de campo de brain-granaai (2026-10-01, pedido 3 de 3). Pedidos 1 e 2 do mesmo sinal foram curados no PR #902; ESTE ficou sem resposta e sem teto declarado, e so apareceu porque um refutador leu o sinal INTEIRO em vez do pedido principal. MEDIDO em 2026-10-02: `grep` por `knowledge-base/index` em `.claude/utils/adopt/` e em `adopt.md` devolve ZERO — nao existe tratamento desse arquivo como local do adotante. A classe e pior que um arquivo: `docs/knowledge-base/` e path VENDORIZADO no update, e um indice e exatamente o tipo de arquivo que o adotante PRECISA customizar (ele lista as KBs dele). Pergunta: o indice e projecao gerada (e entao o adotante deveria regenerar) ou arquivo de autoria mista (e entao precisa de never-clobber/merge)? GATILHO: antes do proximo `--update` em QUALQUER adotante com KB propria — ou o dano repete em silencio.'
     trace: 'docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md'
     verified_against: 'sinal lido integralmente em 2026-10-02; medido no core: zero tratamento de knowledge-base/index.md em .claude/utils/adopt/ e adopt.md'
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-01-pre-commit-pipefail-silent-exit.md"
+      locator: "sinal lido integralmente em 2026-10-02; medido no core: zero tratamento de knowledge-base/index.md em .claude/utils/adopt/ e adopt.md"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: I_ADOPT_DOCS_ONLY_CONVERGENCIA_GATILHO_DISPAROU
     node_type: decision
@@ -84,6 +92,10 @@ nodes:
     label: 'A REGRA 92 (Papel da porta no registro concorda com o CARIMBO dela) declara fronteira `kind: door` — logo NENHUMA guarda compara `role:` do registro contra o `role:` do CARIMBO de um ADOTANTE. Medido em 2026-10-02: `door-role-parity-check.sh:42,87` filtra por `kind == door`, e rodado no repo devolve saida VAZIA com rc=0 (nao ha porta divergente). Consequencia real no mesmo dia: o maestro promoveu `brain-granaai` de `adopted` a `hub` do lado do adotante, e o `members.yaml` do core ficou com TRES derivas (role `standalone`, comentario explicando uma divergencia que deixou de existir, e `onion_version` no pin da adocao) — e nada acusou. A deriva so chegou porque O ADOTANTE MANDOU SINAL, e ele chegou supondo que a REGRA 92 fosse julga-lo: ela nunca julgaria. CLASSE: mesma familia do `vendor-scrub-blind-spot` — a guarda protege uma categoria e a outra fica nua, e quem le a doutrina conclui cobertura que nao existe. POR QUE IMPORTA MAIS NUM HUB: o papel decide o CONJUNTO que o `--update` entrega (o inverso ja custou 106 arquivos de meta-fabrica num alvo `standalone`, com a bancada verde). GATILHO: forjar a guarda pelo /meta:forge-guard — defeito medido e datado, e o primeiro uso real do comando do passo 1 ao 10. \u26a0\ufe0f MAS NAO COM O PREDICADO OBVIO, e isto e correcao de Elenxo sobre este proprio no: paridade CEGA em adotante JA FOI MEDIDA COMO ERRADA aqui. O `door-role-parity-check.sh` declara a fronteira `kind: adopter` como SEMANTICA, nao de escopo (l.87 e o predicado; o bloco explicativo vem antes): em adotante o `role:` do registro diz o TIER NA REDE e o do carimbo diz a RELACAO COM O FRAMEWORK, logo `standalone` + `adopted` e CORRETO. O refutador rodou o censo contra o vivo: 18 comparaveis, 12 DIVERGENTES — uma guarda de paridade cega nasceria com 12 falsos positivos, e existe caso de bancada (g) protegendo essa fronteira. O PREDICADO QUE CABE e UNIDIRECIONAL: `carimbo role: hub` IMPLICA `registro role: hub`, porque `hub` e o unico valor que existe nos DOIS vocabularios e neles CONVERGE (ser hub e o tier E a relacao). Medido: com esse predicado hoje haveria UM achado (metagamify, registro hub x carimbo adopted) — e e achado de verdade, o espelho exato da deriva que esta leva curou.'
     trace: 'docs/evolution/inbox/_processed/2026-10-02-promocao-a-hub.md'
     verified_against: 'door-role-parity-check.sh rodado em 2026-10-02: rc=0 com saida vazia; o PREDICADO filtra kind==door na l.87 (a l.42 e o comentario que declara a fronteira, nao codigo); members.yaml tinha role standalone enquanto o carimbo do adotante dizia hub'
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-02-promocao-a-hub.md"
+      locator: "door-role-parity-check.sh rodado em 2026-10-02: rc=0 com saida vazia; o PREDICADO filtra kind==door na l.87 (a l.42 e o comentario que declara a fronteira, nao codigo); members.yaml tinha role standalone enquanto o carimbo do adotante dizia hub"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_UPDATE_3WAY_PRESERVA_O_INDEX_DA_KB
     node_type: evidence
@@ -94,6 +106,10 @@ nodes:
     verified_at: '2026-10-04'
     verified_against: 'medido PELO HUB (sinal de 2026-10-04): md5 do docs/knowledge-base/index.md antes = depois do update para 3a3c7cf280ac pelo merge de onion/vendor; nao re-medido no core'
     label: 'EVIDENCIA PARA o Q_ADOPT_INDEX_KB_LOCAL_SOBRESCRITO (grafo inbox-triage-2026-10): no caminho 3-way (onion/vendor) o index.md local da KB sobrevive byte a byte, porque e customizacao sobre a base e o core nao tocou no arquivo desde o pin. Se o core editar o arquivo, vira CONFLITO visivel, nao sobrescrita. O nó de la segue aberto para adotantes ainda em copy-over/docs-only.'
+    provenance:
+      source: "docs/knowledge-base/index.md"
+      locator: "medido PELO HUB (sinal de 2026-10-04): md5 do docs/knowledge-base/index.md antes = depois do update para 3a3c7cf280ac pelo merge de onion/vendor; nao re-medido no core"
+      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
 edges:
   - from: Q_PARIDADE_PAPEL_SO_COBRE_A_PORTA_NAO_O_ADOTANTE

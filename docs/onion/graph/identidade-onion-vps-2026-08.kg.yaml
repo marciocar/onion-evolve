@@ -54,6 +54,10 @@ nodes:
     confidence: 0.9
     label: "O CONSENSO DE 2026 CONTRARIA A INTUICAO, e e o achado que mais deve dirigir o desenho aqui. Passkeys sao mainstream (5 bilhoes em uso, 75% ativaram em alguma conta) MAS so 49% usam quando disponivel — metade ainda recai noutro metodo. E o modo de falha real NAO e perder o dispositivo (passkey sincronizada sobrevive): e o FALLBACK FRACO. E-mail ou SMS como unica recuperacao reabre exatamente o phishing que a passkey fechou. O NIST SP 800-63-4 (final em 31/07/2025) aceita passkey sincronizada em AAL2 mas exige vinculada-a-dispositivo para AAL3. O OWASP e explicito que recovery e 'a parte mais consistentemente negligenciada de qualquer implantacao de MFA' e que pergunta de seguranca sozinha e ANTI-PADRAO. PADRAO ACEITO: codigos de recuperacao de uso unico gerados no enrollment + no minimo DOIS fatores registrados. IMPLICACAO DIRETA: qualquer plano de MFA aqui precisa nascer com o caminho de recuperacao junto — MFA sem recovery desenhado troca risco de invasao por risco de lockout, e o segundo e mais provavel."
     trace: "https://fidoalliance.org/fido-alliance-reports-accelerating-global-passkey-adoption-on-world-passkey-day-2026/"
+    provenance:
+      source: "https://fidoalliance.org/fido-alliance-reports-accelerating-global-passkey-adoption-on-world-passkey-day-2026/"
+      locator: "fido-2026-5bi-passkeys-75pct-ativaram-49pct-usam-owasp-e-nist-800-63-4"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ORG_LOGICA_NAO_E_FRONTEIRA
     node_type: evidence
@@ -65,6 +69,10 @@ nodes:
     confidence: 1.0
     label: "A EVIDENCIA MAIS DURA CONTRA 'organizacoes' COMO ISOLAMENTO DE CLIENTE, e ela nao e teorica: JA QUEBROU EM PRODUCAO. O CVE-2026-43912 (CVSS 8.7, publicado 11/05/2026, corrigido na 1.35.5) e controle de acesso quebrado nos endpoints de grupo do Vaultwarden — falhavam em impor fronteira de organizacao ao persistir `MembershipId`/`CollectionId`. Um admin de UMA organizacao, com membership de baixo privilegio noutra, LIA o cofre da organizacao-vitima via `/api/sync` e podia escalar para ESCRITA. E exatamente o cenario 'um cofre por cliente na mesma instancia'. ESTAMOS COBERTOS (rodamos 1.37.1), mas a licao sobrevive ao patch: fronteira LOGICA depende de o codigo acertar toda vez; fronteira de CONTAINER/REDE nao tem o que acertar. Para cliente de consultoria com dado sensivel, o custo operacional de instancia separada compra a remocao de uma CLASSE inteira de bug — nao de um bug."
     trace: "https://www.sentinelone.com/vulnerability-database/cve-2026-43912/"
+    provenance:
+      source: "https://www.sentinelone.com/vulnerability-database/cve-2026-43912/"
+      locator: "CVE-2026-43912-cvss-8.7-corrigido-em-1.35.5-rodamos-1.37.1"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CVE_LOGTO_NAO_TEM_PORTA_AQUI
     node_type: evidence
@@ -76,6 +84,10 @@ nodes:
     confidence: 0.9
     label: "SEIS CVEs no Logto (CERT/CC VU#492466, 23/07/2026), incluindo um 9.1 — account-linking via SSO que vincula identidade externa a conta local pelo e-mail SEM exigir `email_verified` do IdP. MEDIDO AQUI: `select connector_id from connectors` devolve UMA linha (SMTP); `sso_connectors` devolve ZERO. O CVE exige que o Logto RECEBA login de um IdP externo — nesta instalacao ele e o PROVEDOR (o cofre e que consome). A PORTA DE ENTRADA NAO EXISTE. ⚠️ E ESTA E A PARTE QUE IMPORTA GUARDAR: isso e CONDICAO, nao cura. No dia em que alguem ligar login social (Google/GitHub), o vetor NASCE JUNTO — e a decisao de ligar social passa a carregar essa divida. Atualizamos para 1.42.0, cujas notas trazem endurecimento de seguranca (SSRF por default, escopo `identities`, MFA automatico ao vincular fator) mas NAO mencionam o account-linking; nao concluir 'corrigido' por ausencia de mencao."
     trace: "https://kb.cert.org/vuls/id/492466"
+    provenance:
+      source: "https://kb.cert.org/vuls/id/492466"
+      locator: "zero-conectores-sociais-zero-sso-empresarial-so-smtp"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── AS TRES CORRECOES DE AFIRMACOES MINHAS ──────────────────────────────────
   - id: I_EU_DECLAREI_SSO_PROVADO_SEM_PROVAR
@@ -108,6 +120,10 @@ nodes:
     confidence: 1.0
     label: "INCIDENTE EM PRODUCAO, e a causa e a assinatura desta casa. O `upgrade.sh` rodava `npm run cli db alteration deploy 2>&1 | tail -20 || { exit 1; }`. A migracao falhou com `Missing target version`, o `tail` devolveu 0, e o `||` NUNCA DISPAROU. O script seguiu, trocou a imagem, e o container entrou em restart loop com 'Undeployed database alterations found'. GUARDA QUE LE O EXIT ERRADO E PIOR QUE GUARDA AUSENTE: ela AFIRMA ter verificado. E a ironia que precisa ficar escrita: a hook `bash-empty-result-guard` desta casa pega EXATAMENTE essa classe (EXIT-CODE-DE-PIPE) — mas ela so protege o que passa pela ferramenta Bash, NAO alcanca os scripts do repo. Havia uma guarda no lugar certo, com a intencao certa, e cega. Curado: `set -o pipefail` DENTRO do `sh -c` (e la que o pipe roda) + versao alvo explicita. O QUE SALVOU: o backup rotulado ANTES e a verificacao final recusando declarar sucesso ('✗ OIDC nao respondeu — investigue antes de considerar pronto'). Restaurado e verificado nas quatro pontas."
     trace: "/home/marcio/onion-vps-logto/upgrade.sh"
+    provenance:
+      source: "/home/marcio/onion-vps-logto/upgrade.sh"
+      locator: "3-alterations-aplicadas-status-204-11-apps-issuer-ok-sso-redirect-restaurado"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-logto/upgrade.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── O QUE O ELENXO ACHOU E NINGUEM TINHA VISTO ──────────────────────────────
   - id: I_SEGUNDO_IDP_COM_CONSOLE_DESTRANCADO
@@ -120,6 +136,10 @@ nodes:
     confidence: 1.0
     label: "FECHADO 2026-08-11, nas duas pontas. Era o achado mais perigoso da sessao inteira, encontrado SO pelo Elenxo. Existe um SEGUNDO Logto nesta VPS (`onion-adopt-arandek-logto-1`, v1.36.0) e o tenant `admin` dele esta em modo **`Register` com ZERO usuarios** — estado de bootstrap: QUEM ALCANCAR CRIA O PRIMEIRO ADMINISTRADOR do IdP do adotante. Medido por mim, nao herdado: `select tenant_id, sign_in_mode, count(users)` devolve `admin|Register|0` e `default|SignInAndRegister|2`. ⚠️ E A CONTENCAO E PARCIAL: o `onion-vps-docker-firewall` faz `DROP -i eth0`, que NAO cobre trafego container-a-container. Provado: `docker exec onion-vps-waha curl http://172.17.0.1:3022/` devolve **302**. Logo qualquer container comprometido — e qualquer usuario com shell na caixa — toma o IdP do adotante. TODA a stack dele (10 containers: Redis, Postgres, MinIO, Milvus, o IdP) esta em `0.0.0.0`; e o item que a memoria ja registrava como `rebind dos adotantes pendente` desde o incidente de agosto. RESOLVIDO: (1) os overrides que a stack viva usava moravam em `/tmp/.../scratchpad/` sob UUID de SESSAO MORTA — `/tmp` e limpo no boot, e no proximo `up` o Logto do adotante voltaria a 3011/3012 e COLIDIRIA com o do core, derrubando `auth.onionevolve.com`. Bomba-relogio que eu nao tinha visto; foi o inventario que achou. Movidos para `/home/marcio/onion-adopt-arandek-local/`, versionados, com o porque escrito. (2) as 13 portas foram para `127.0.0.1` — inclusive quatro de servicos PARADOS que subiriam publicos (fecha a classe, nao o caso), com as portas do lado do container CONFERIDAS contra o compose base. (3) o bootstrap do IdP foi fechado (`sign_in_mode=SignIn` nos dois tenants), o que remove o vetor de USUARIO LOCAL que o loopback nao alcancava. VERIFICADO POR COMPORTAMENTO: `waha -> 172.17.0.1:3022` saiu de **302** para **timeout**; `/register` responde `302 -> /unknown-session`; `PUT /api/experience {Register}` responde **400** (era 204 no core aberto); CONTROLE `marker -> attu:3000` segue **200**, provando que a rede do compose nao foi afetada; core intacto. ⚠️ CORRECAO DE UMA PREOCUPACAO MINHA: eu temi que o bridge (`0.0.0.0:8787`) tivesse o mesmo vetor — MEDIDO, nao tem. Porta PUBLICADA PELO DOCKER escapa do `ufw INPUT` (caminho DNAT/FORWARD); processo do HOST em `0.0.0.0` nao escapa. O perigo era especifico de container. FICA PARA O MAESTRO: avisar o adotante sobre o tunel SSH e sobre o `requirepass` hardcoded no compose commitado dele."
     trace: "/home/marcio/onion-adopt-arandek/docker-compose.self-hosted.yml"
+    provenance:
+      source: "/home/marcio/onion-adopt-arandek/docker-compose.self-hosted.yml"
+      locator: "13-portas-em-loopback-waha-3022-timeout-e-register-400-com-controle-marker-attu-200"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-adopt-arandek/docker-compose.self-hosted.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: I_A1_A_MEDICAO_CAIU_A_CONCLUSAO_SOBREVIVEU
     node_type: decision
@@ -172,6 +192,10 @@ nodes:
     confidence: 1.0
     label: 'O DE MAIOR ALCANCE PARA ''NOVOS ENTRANTES'', e ele nao e ausencia de isolamento — e isolamento chaveado na coisa errada. `workspace.ts` faz `slug(bearer) = sha256(token)[:16]`; `chat.ts` deriva o cwd disso. Com OIDC o bearer e um JWT que ROTACIONA (~1h), entao cada refresh gera slug novo => WORKSPACE NOVO PARA A MESMA PESSOA, e o anterior fica orfao. Medido: 23 diretorios para um punhado de pessoas reais, nenhum coletado. O mesmo defeito atinge o rate limit (chaveado por `Authorization`): a cota de 20/min ZERA a cada renovacao de token. A cura e chavear em `sub` (a identidade), nao no portador. ⚠️ E o agravante: cada workspace tem symlink para `.claude/` e `docs/` do core, o servico roda como DONO do checkout, e `PERMISSION_MODE=bypassPermissions` esta no `.env`. O codigo chama de ''read-only'' e NADA no filesystem impoe isso. ✅ PROVADA EM USO REAL 2026-08-11, e por CALCULO, nao por confianca: o login do maestro produziu o workspace `94c9a93e606c64b2`, e `sha256("xwl2pkq5bdvb")[:16]` — o `sub` da identidade dele no Logto — da EXATAMENTE esse valor. Antes disso o codigo estava trocado e o servico bootava, mas a chave nunca tinha sido exercitada: a passada adversarial contra o proprio PR marcou isso como NAO PROVADA, e estava certa. EXECUTADO 2026-08-11: a chave passou a ser `identity.subject` (o `sub`, estavel por identidade, que o `authGuard` ja punha no contexto e que o proprio `chat.ts` ja lia para o medidor), com fallback ao bearer EXPLICITO em vez de implicito. As 21 cascas foram coletadas e os 2 workspaces com conteudo real (232MB e 1.6MB) preservados: 23 -> 2. Verificado por comportamento: unit `active`, boot limpo (o `tsx` interpreta direto, entao erro de sintaxe derrubaria o servico) e `app.onionevolve.com` 200 antes e depois. E o defeito IRMAO que o Elenxo apontou tambem foi curado: `void removeWorkspace(...)` sem `await` e sem `catch` engolia o erro — alvo inexistente sumia SEM REGISTRO; agora falha alto. NAO inventei um `removeWorkspace(sub)`: revogar convite continua certo ali, e revogacao de identidade OIDC nao passa por essa funcao — apagar diretorio de quem talvez ainda tenha acesso por outro caminho seria pior que o silencio. ⚠️ CORRECAO DA GRAVIDADE que eu havia declarado: o Elenxo mediu o conteudo e 21 dos 23 eram cascas de 8K. NAO era vazamento ENTRE pessoas — era PERDA DE CONTINUIDADE (a cada refresh o usuario perdia o cwd dos proprios uploads) mais lixo em disco. Bug de UX e de estado, nao incidente de isolamento. Commit `e09d4c7` em marciocar/onion-bridge. ✅ E O IRMAO FOI CURADO 2026-08-13 (P11, bridge PR #2, commit 8943e25): o rate-limit passou a chavear em `identity.subject` com fallback explicito ao header — a cota deixou de zerar a cada refresh. Prova mecanica: bancada Hono fiel do 6o Elenxo (4a req -> 429 com UMA chave estavel, sub). Prova viva (2 requests com refresh no meio, numa sessao real) PENDENTE — gatilho: proximo uso do app pelo maestro.'
     trace: "/home/onion/onion-bridge/src/workspace.ts"
+    provenance:
+      source: "/home/onion/onion-bridge/src/workspace.ts"
+      locator: "chave-por-identity-subject-boot-limpo-app-200-e-23-workspaces-viraram-2"
+      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/workspace.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_RECUPERACAO_NAO_EXISTE_ONDE_MAIS_DOI
     node_type: question
@@ -233,6 +257,10 @@ nodes:
     impact: 4
     confidence: 1.0
     label: "ACHADO DE ADOTANTE, ainda NAO COMUNICADO — acao pendente do maestro, nao minha. Medido em `/home/marcio/onion-adopt-arandek/docker-compose.yml`, arquivo RASTREADO por git em `ArandekBR/arandek`: (1) cinco segredos LITERAIS — `--requirepass arandek-redis-secret` na linha 60 e `LANGFUSE_INIT_PROJECT_PUBLIC_KEY`/`LANGFUSE_INIT_PROJECT_SECRET_KEY`/`MINIO_ROOT_PASSWORD`/`MINIO_SECRET_ACCESS_KEY` nas linhas 147/148/210/231 (VALORES DELIBERADAMENTE FORA DESTE GRAFO — o core nao guarda segredo de adotante; leia no arquivo dele); (2) as portas publicam em `0.0.0.0` sem prefixo de bind — MinIO 9090/9091, Langfuse 3006, Milvus 19530/19531, Postgres `${POSTGRES_PORT:-5438}` e Redis `${REDIS_PORT:-6379}`. Num host de IP publico isso E internet, e o `ufw` NAO segura: porta publicada por Docker atravessa DNAT/FORWARD e nao ve o `INPUT DROP` — medido nesta VPS, foi assim que dois Redis sem senha ficaram expostos aqui, e e a mesma mecanica que [C_REDE_ISOLADA_POR_CONSTRUCAO] descreve do lado de ca. NESTA VPS os 15 containers dele estao seguros SO por causa do overlay `onion-adopt-arandek-local/compose.local.yml`, que prefixa `127.0.0.1:` — sem o overlay nasceriam publicos. O redis vivo responde `NOAUTH`, entao a senha esta ativa: o defeito e ela ser publica no historico, nao ausente. RECADO REDIGIDO E PRONTO em `docs/analysis/arandek-repo-exposure-2026-08.md`. ⚠️ ARMADILHA QUE ME PEGOU: meu primeiro `grep` de portas voltou VAZIO e eu quase conclui 'ele nao publica nada' — o padrao nao cobria ASPAS SIMPLES (`- '9090:9000'`). Terceira vez no dia que o defeito estava no vocabulario do filtro, nao na logica."
+    provenance:
+      source: "docs/analysis/arandek-repo-exposure-2026-08.md"
+      locator: "grep-no-docker-compose-rastreado-de-ArandekBR-arandek-mais-teste-NOAUTH-no-container-vivo"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO
     node_type: question
@@ -244,6 +272,10 @@ nodes:
     impact: 3
     confidence: 0.9
     label: "A guarda `vps-exposure-check.sh` cobre o lado de CA (bind publico em container vivo, conector upstream, backup em claro) e roda diaria por systemd timer. Ela nao cobre — e por desenho nao poderia, no formato atual — o lado do ADOTANTE: um `docker-compose.yml` no repo dele que publica em `0.0.0.0` so vira risco quando ele sobe no host DELE, que eu nao meco. Esta e a lacuna que [Q_ARANDEK_SEGREDOS_E_BINDS_NO_COMPOSE_COMMITADO] expos: o achado saiu de `grep` MANUAL meu, nao de mecanismo — e por [[fix-must-become-mechanism]] achado que so existe porque alguem olhou nao se repete sozinho. CANDIDATO (nao decidido, nao pre-cozinhar): regra de lint que, em repo com `role: adopted`, acuse porta publicada sem prefixo de bind e segredo literal em compose rastreado. GATILHO PARA DECIDIR: o segundo adotante com o mesmo defeito — um caso e caso, dois e classe."
+    provenance:
+      source: "docs/analysis/arandek-repo-exposure-2026-08.md"
+      locator: "vps-exposure-check-varre-docker-ps-e-diretorios-locais-nao-le-compose-de-repo-adotante"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── A COSTURA COM O ONION COMO FRAMEWORK DE DESENVOLVIMENTO ─────────────────
   - id: C_BUSCA_AGENTICA_E_A_ESCOLHA_DO_MERCADO
@@ -275,6 +307,10 @@ nodes:
     confidence: 1.0
     label: "O PRECO DE PROTEGER A CHAVE, e ele e real — decisao do maestro, nao minha. Por A chave GPG ganhou passphrase (era o segredo de maior alcance da maquina e estava NU), e isso quebrou o acesso NAO-INTERATIVO ao `pass`: `pass show` sai rc=2 com `public key decryption failed`. CONSEQUENCIA MEDIDA: os tres `up.sh` (waha, logto, vaultwarden) leem do `pass`, entao REINICIAR QUALQUER SERVICO agora exige interacao. O que NAO quebrou, porque cifrar usa a chave PUBLICA: os backups — mas so depois de curar TRES defeitos empilhados que so apareceram um apos o outro (`${HOME}` virando /root no cron; `gpg` como root usando chaveiro vazio; e `marcio` sem conseguir LER o claro `root:root 600`). ⚠️ E o terceiro expos uma assimetria que ninguem tinha visto: o dump do Logto nascia **644** e por isso 'funcionava' — havia uma janela em que o banco de IDENTIDADES ficava legivel por qualquer uma das 5 contas com shell. AS OPCOES, com o custo de cada uma: (a) deixar como esta — reinicio manual pede senha, seguranca maxima; (b) presetar a passphrase no gpg-agent no boot a partir de arquivo 600 — devolve a automacao e ENFRAQUECE de volta, porque o arquivo vira o novo segredo nu; (c) chave separada, sem senha, so para automacao — isola o dano mas multiplica segredo. NAO ESCOLHI: (b) e (c) desfazem parte do que acabou de ser ganho, e essa troca e do dono. LICAO QUE FICA: eu testava so como `marcio`, e o cron e `root` — TESTAR NO CAMINHO ERRADO E NAO TESTAR."
     trace: "/home/marcio/onion-vps-logto/backup.sh"
+    provenance:
+      source: "/home/marcio/onion-vps-logto/backup.sh"
+      locator: "pass-show-rc2-sem-interacao-3-up-sh-afetados-backups-curados-nos-4-caminhos"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-logto/backup.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── O QUE A RE-VERIFICACAO DE 2026-08-12 ACHOU (run wf_7804d86f-3a7) ─────────
   - id: E_VERIFIED_AT_DUPLICADO_PASSA_CALADO
@@ -287,6 +323,10 @@ nodes:
     confidence: 1.0
     label: "ACHADO QUE SO APARECEU PORQUE FUI ESCREVER, e que CRESCEU de 5 para 7 quando virou guarda. CINCO nos DESTE grafo carregavam DUAS linhas `verified_at:` (`2026-08-10` seguida de `2026-08-11`): I_SEGUNDO_IDP, I_A6, Q_ISOLAMENTO, Q_MFA, Q_METADE_DO_BRIDGE. A rodada de carimbo de 08-11 ADICIONOU a data nova sem remover a velha. O radar e `awk`, uma chave por linha: o arquivo afirmava DUAS verdades e o motor escolhia uma calado. QUAL? MEDIDO, nao deduzido — `--freshness-tsv` devolvia a ULTIMA. Logo o comportamento estava CORRETO POR ACIDENTE. ⚠️ PRECISAO SOBRE O QUE ESTE PR FEZ COM OS CINCO (a 1a redacao deste label errava, e o Elenxo pegou): a linha antiga saiu dos cinco, mas so DOIS (Q_MFA, Q_METADE) ficaram com o `2026-08-11` que o radar ja lia — os outros TRES estavam na fila de re-verificacao e receberam `2026-08-12` por MEDICAO NOVA. Sao dois atos distintos (remover ambiguidade × re-verificar) e confundi-los faria o proximo leitor procurar um carimbo que nao esta la. ⚠️ E A CLASSE E MAIOR QUE ESTE GRAFO: com a guarda escrita, a varredura dos 60 grafos achou mais DUAS instancias que ninguem tinha visto — `stack-harmonia` (`C_producao_nao_e_o_repo`, com `verified_at` E `verified_against` duplicados, e a ULTIMA sendo a MAIS ANTIGA: o radar lia `08-01/git-log` e IGNORAVA a medicao nova e mais rigorosa de `08-08/rev-list`) e `fios-abertos` (`Q_REGRA56`, `verified_against` duplicado — e ESSE era a causa do aviso MISPLANED que o proprio warm-up desta sessao exibiu como fio aberto; curou junto). CURADA A CLASSE, nao so os casos: `kg-radar.sh` passa a REPROVAR chave repetida (`verified_at` e `verified_against`) na INTEGRIDADE. Os 60 grafos ficam em zero."
     trace: ".claude/validation/kg-radar.sh"
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "cinco-nos-com-duas-linhas-verified-at-e-o-tsv-do-radar-devolvendo-a-ultima"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_WORKER_CARIMBOU_CONFIRMED_COM_BLOQUEIO_DECLARADO
     node_type: evidence
@@ -298,6 +338,10 @@ nodes:
     confidence: 1.0
     label: "O INSTRUMENTO COMETEU A FALHA QUE ELE EXISTE PARA PEGAR, e no no de MAIOR atencao do grafo (att 30.0). O worker de `C_TRES_MODELOS_DE_CONFIANCA` devolveu **CONFIRMED com `blocked_by` preenchido** — campo que o schema do `/meta:kg-freshness` reserva a UNVERIFIABLE. Ele mediu DUAS das tres mecanicas (cofre resolvendo para o IP publico da VPS; WAHA com `sha512:`) e INFERIU a terceira, a do bridge, de 'zero conexoes na 3011'. Motivo declarado: permission denied em `/home/onion/onion-bridge/src/`. ⚠️ O BLOQUEIO ERA FALSO: `sudo ls` le o diretorio, e o proprio worker usou `sudo` em quatro outros comandos da MESMA medicao — instancia exata de [[verify-access-before-specifying]]. A medicao foi FECHADA a mao depois e o no e CONFIRMED de verdade: `identity.ts:34` busca JWKS local, `:45` cacheia `3_600_000`ms (1h exata), `:129` confere `iss`, `:133-145` confere `aud`, `:126` so le claims DEPOIS da assinatura. O worker acertou o veredito pelo caminho errado, que e a forma mais cara de acertar — porque nao deixa rastro de que nao mediu."
     trace: "/home/onion/onion-bridge/src/identity.ts"
+    provenance:
+      source: "/home/onion/onion-bridge/src/identity.ts"
+      locator: "sudo-ls-lendo-o-diretorio-que-o-worker-declarou-permission-denied"
+      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/identity.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_NO_COMPOSTO_RECEBE_VEREDITO_ATOMICO
     node_type: claim
@@ -319,6 +363,10 @@ nodes:
     confidence: 1.0
     label: "A PROJECAO humana do run `wf_7804d86f-3a7`, com o contrato de proveniencia de custo que a `onion-orchestration` exige (`run_id`/`tokens`/`agents`/`duration_min` no frontmatter, co-locados com `kg:`). ⚠️ NASCEU DE UM ACHADO CONTRA MIM: eu tinha carimbado nos deste grafo citando um run cujo artefato NUNCA persisti — o `wf_` existia so como comentario YAML, e `grep -rn wf_7804d86f` devolvia UMA ocorrencia, nele mesmo. Carimbo que cita run sem artefato e declarado-nao-verificado, que e a distincao que este comando existe para defender. O grafo e o DESTINO dos achados; este markdown e vista dele, nunca fonte paralela."
     trace: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
+    provenance:
+      source: "docs/analysis/kg-reverify-identidade-vps-2026-08-12.md"
+      locator: "arquivo-versionado-com-frontmatter-run-id-tokens-agents-duration"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_CARIMBO_A_MAO_INSERE_EM_VEZ_DE_SUBSTITUIR
     node_type: claim
@@ -330,6 +378,10 @@ nodes:
     confidence: 1.0
     label: "A CLASSE, nomeada — e ela e sobre o ATO de carimbar, nao sobre o campo. Quem aplica `verified_at:`/`verified_against:` a mao tende a INSERIR a linha nova em vez de SUBSTITUIR a velha; o parser sobrescreve calado e o grafo passa a afirmar duas coisas. Nao e descuido individual: e o gradiente do gesto (adicionar e mais barato que localizar-e-trocar) somado a um motor que nunca reclamou. ⚠️ A PROVA DE QUE VIRAR MECANISMO ERA O PONTO: enquanto o achado foi CASO, a contagem era 5, num grafo so. Assim que virou GUARDA e varreu os 60, a contagem foi a 7 em TRES grafos — e as duas novas eram piores que as cinco originais, porque nelas a linha que VENCIA era a ERRADA (em `stack-harmonia` o radar lia um carimbo de 08-01 tendo um de 08-08 no arquivo; em `fios-abertos` a duplicata era a causa de um aviso MISPLANED que ja aparecia no warm-up e ninguem tinha explicado). Instancia limpa de [[fix-must-become-mechanism]]: a cura one-off nao teria achado nenhuma das duas, e eu teria fechado o PR convencido de que eram cinco."
     trace: ".claude/validation/kg-radar.sh"
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "sete-instancias-em-tres-grafos-achadas-so-depois-que-a-guarda-existiu"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_A_SAIDA_DO_BACKUP_JA_ESTA_ESCRITA_E_DESARMADA
     node_type: evidence
@@ -341,6 +393,10 @@ nodes:
     confidence: 1.0
     label: "REFINA [Q_BACKUP_AINDA_NAO_SAI_DA_MAQUINA] sem contradiza-lo: a lacuna e real, mas o mecanismo que a fecha JA EXISTE ESCRITO. `backup-offsite.sh` (commit `31cd4f9`) usa `restic`, e o binario esta instalado (`/usr/bin/restic`). Ele sai com **exit 3** declarando que NAO FEZ, em vez de sair 0 parecendo que fez — o oposto do fail-open que derrubou o Logto no `I_UPGRADE_DERRUBOU_O_LOGTO_POR_PIPE`. FALTAM EXATAMENTE TRES COISAS, e as tres sao do maestro: `pass insert onion/restic-repo`, `pass insert onion/restic-password` (destino e conta a contratar) e a linha de cron. MEDIDO com stderr visivel (nao `2>/dev/null`, que confunde 'falhou' com 'nao ha'): o cron do root tem 4 entradas — logto/backup.sh, check-version, bridge-backup, vaultwarden/backup.sh — e NENHUMA offsite; `find` por `*.tar.gpg` acha UM artefato, no mesmo `/dev/sda1`; `~/.password-store` nao tem entrada `restic`. CONSEQUENCIA PARA A LEITURA DO NO PAI: aquilo nao e pesquisa a fazer, e um interruptor esperando destino contratado."
     trace: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh"
+    provenance:
+      source: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh"
+      locator: "crontab-l-do-root-com-4-entradas-e-zero-offsite-find-tar-gpg-num-so-disco-which-restic-presente-password-store-sem-entrada"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-vaultwarden/backup-offsite.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO
     node_type: question
@@ -362,6 +418,10 @@ nodes:
     verified_against: "censo lote 5 (run wf_2349bf29-ea0): compose rastreado no git do adotante, portas sem prefixo de bind + segredo literal de fallback; mesma classe do achado arandek (redigido, nao enviado)"
     label: "O GATILHO DO Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_DENTRO DISPAROU — um caso e caso, DOIS E CLASSE. O censo mediu um SEGUNDO adotante ativo com o mesmo defeito de exposicao do achado arandek: docker-compose rastreado no git com portas sem prefixo de bind (Docker publica em todas as interfaces por default — e nesta VPS o Docker FURA o ufw) e segredo literal como fallback. Detalhes especificos (repo, portas, valores) ficam FORA deste no de proposito: e material de comunicacao sensivel, e a decisao de comunicar e do maestro — como no arandek, que segue redigido e nao-enviado por ordem. ACAO PENDENTE (decisao do maestro): (a) comunicar os dois adotantes; (b) decidir a regra de lint de compose para role adotante que o Q_GUARDA propoe — a classe agora tem 2 instancias medidas."
     trace: "runs wf_2349bf29-ea0 · docs/analysis/granaai-compose-exposure-2026-08.md (material de comunicacao, REDIGIDO-NAO-ENVIADO) · docs/analysis/onion-vps-network-exposure-2026-08.md"
+    provenance:
+      source: "runs wf_2349bf29-ea0 · docs/analysis/granaai-compose-exposure-2026-08.md (material de comunicacao, REDIGIDO-NAO-ENVIADO) · docs/analysis/onion-vps-network-exposure-2026-08.md"
+      locator: "censo lote 5 (run wf_2349bf29-ea0): compose rastreado no git do adotante, portas sem prefixo de bind + segredo literal de fallback; mesma classe do achado arandek (redigido, nao enviado)"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_BACKUP_DESTINO_NUNCA_FOI_REMOTO
     node_type: question
@@ -373,6 +433,10 @@ nodes:
     verified_against: "PROVA REAL EXECUTADA 2026-08-31: maestro forneceu a Global API Key (pass onion/cloudflare-api-token); account-ID descoberto via API; bucket pre-existente onion-vps-backup reutilizado (o que eu criei foi removido); snapshot 81a0846f ENVIADO ao R2 e conferido do lado remoto; prova de restauracao devolveu 95 arquivos com integridade verificada, no errors; cron diario 13:00 UTC armado"
     label: "SUPERSEDE [Q_BACKUP_MECANISMO_ARMADO_SEM_AGENDAMENTO] com a verdade MEDIDA na 1a prova real: o OFFSITE NUNCA EXISTIU. Em 08-13 a MESMA string entrou nos DOIS campos do pass (restic-repo E restic-password) — o restic tratou a senha como CAMINHO, criou um repo LOCAL com esse nome (o diretorio acidental, ja renomeado para restic-local-acidental-2026-08-13) e o 1o backup real foi para o mesmo disco. O mecanismo em si esta PROVADO NA DIRECAO DA FALHA: cron armado, wrapper fail-loud, e o guard anti-local barrou exatamente o que devia (rc=5, nada enviado). FALTAM DOIS INSUMOS QUE SO O MAESTRO TEM: (1) o destino real — pass insert onion/restic-repo com esquema remoto (as chaves R2 ja existem no pass; conta/bucket sao dado dele; o script recomenda destino com imutabilidade do lado do servidor); (2) a decisao sobre a senha exposta como nome de diretorio desde 08-13 — a cura de classe seria rotacao, que esta PARADA POR ORDEM do maestro: registrado, nao proposto. Com o insumo (1), a prova roda no ato."
     trace: "/home/marcio/onion-vps-vaultwarden/offsite-cron.sh · logs/offsite-cron.log"
+    provenance:
+      source: "/home/marcio/onion-vps-vaultwarden/offsite-cron.sh · logs/offsite-cron.log"
+      locator: "PROVA REAL EXECUTADA 2026-08-31: maestro forneceu a Global API Key (pass onion/cloudflare-api-token); account-ID descoberto via API; bucket pre-existente onion-vps-backup reutilizado (o que eu criei foi removido); snapshot 81a0846f ENVIADO ao R2 e conferido do lado remoto; prova de restauracao devolveu 95 arquivos com integridade verificada, no errors; cron diario 13:00 UTC armado"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-vaultwarden/offsite-cron.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_MAIS_UM_IMUTAVEL_GATED
     node_type: question
@@ -384,6 +448,10 @@ nodes:
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 3/3 claims; juiz APROVADO. Lido o nó inteiro (label+trace). 3 claims: (1) R2 resolve off-site mas não prote => Nenhuma segunda credencial/destino (rsync.net ou qualquer outro) existe no `pass`; nenhum commit no …'
     label: "O +1 da regra 3-2-1-1-0 (imutabilidade DO LADO DO SERVIDOR) segue pendente por escolha declarada: o R2 resolve o OFF-SITE (perda do host) mas nao protege contra credencial roubada apagando o remoto — a limitacao conhecida do Object Lock com restic. A evolucao decidida com o maestro (2026-08-31): rsync.net (snapshot ZFS server-side) como segundo destino via restic copy, SEM retrabalho. GATILHO: o maestro contratar a conta — decisao de custo dele, sem urgencia; o risco coberto por este gate e o mais raro da matriz."
     trace: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh (recomendacoes de destino no cabecalho)"
+    provenance:
+      source: "/home/marcio/onion-vps-vaultwarden/backup-offsite.sh (recomendacoes de destino no cabecalho)"
+      locator: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): 3/3 claims; juiz APROVADO. Lido o nó inteiro (label+trace). 3 claims: (1) R2 resolve off-site mas não prote => Nenhuma segunda credencial/destino (rsync.net ou qualquer outro) existe no `pass`; nenhum commit no …"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-vaultwarden/backup-offsite.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CLASSE_DE_EXPOSICAO_VIROU_REGRA_64
     node_type: evidence
@@ -395,6 +463,10 @@ nodes:
     verified_against: "dogfood 4/4 acusacoes no compose ruim + 0 no curado; bancada 3/3 (acusa, cura passa, untracked fora); registry regenerado com a 64 classificada"
     label: "A CLASSE VIROU MECANISMO (selo do maestro 2026-08-31, fix-must-become-mechanism): nasceu a REGRA 64 [HARD] no lint — compose RASTREADO com porta sem prefixo de bind ou segredo em fallback literal reprova. Vendoriza para todo adotante via plugin: o 3o caso e pego pelo CI antes de existir, sem depender de comunicacao. E as duas instancias medidas foram tratadas: granaai recebeu branch fix/compose-bind-and-secret-fallback (pushed, commit 1b5afab00 — 2 binds + 1 fallback curados; o time revisa e mergeia); arandek tem pacote mensagem+patch PRONTO-RETIDO (docs/analysis/arandek-compose-fallbacks-message-2026-08.md — 3 fallbacks; portas ja limpas). CONTEXTO DO MAESTRO incorporado: producao de ambos roda na AWS em outras contas — SG cobre porta (nao e furada pelo Docker), NAO cobre fallback de senha, que viaja intacto."
     trace: ".claude/validation/lint-artifacts.sh (REGRA 64) · docs/analysis/granaai-compose-exposure-2026-08.md · docs/analysis/arandek-compose-fallbacks-message-2026-08.md"
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh (REGRA 64) · docs/analysis/granaai-compose-exposure-2026-08.md · docs/analysis/arandek-compose-fallbacks-message-2026-08.md"
+      locator: "dogfood 4/4 acusacoes no compose ruim + 0 no curado; bancada 3/3 (acusa, cura passa, untracked fora); registry regenerado com a 64 classificada"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CENSO0901_Q_GUARDA_DE_EXPOSICAO_SO_OLHA_PARA_D
     node_type: evidence
@@ -416,6 +488,10 @@ nodes:
     verified_against: 'remodelagem manual (etapa 4 da ordem; 2 workers reprovados no no antigo — label colapsava >=9 claims): pass show rc=2 AGORA (cache frio — pin pendente e o estado NORMAL entre destravas); backup.sh:29-33+82 chmod 600 (dump 644 CURADO); up.sh dos 3 servicos leem segredo via pass (dependencia segue); cache 8h no tmux e o contorno vigente'
     label: 'ESTADO ATUAL da chave GPG com passphrase (substitui o no de 08-12 que misturava >=9 afirmacoes): a protecao FICA (decisao do maestro); o preco e destravar 1x por janela no tmux (cache 8h); dump 644 curado na fonte; a NAO-ESCOLHA entre opcoes a/b/c segue aberta — e o que esta questao ainda pergunta. Gatilho: automacao quebrar de novo em janela fria OU o maestro escolher a/b/c.'
     trace: "/home/marcio/onion-vps-logto/backup.sh"
+    provenance:
+      source: "/home/marcio/onion-vps-logto/backup.sh"
+      locator: "remodelagem manual (etapa 4 da ordem; 2 workers reprovados no no antigo — label colapsava >=9 claims): pass show rc=2 AGORA (cache frio — pin pendente e o estado NORMAL entre destravas); backup.sh:29-33+82 chmod 600 (dump 644 CURADO); up.sh dos 3 servicos leem segredo via pass (dependencia segue); cache 8h no tmux e o contorno vigente"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-logto/backup.sh no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_REFUTA_Q_LACUNA_DECISAO_MAIS_CODIGO
     node_type: evidence

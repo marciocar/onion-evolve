@@ -224,6 +224,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 4/4 — git log --oneline -- .claude/validation/{cycle-completion,context-freshness-metric,session'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: O nó (07-2026) não sabe que a camada "barato-primeiro" da instrumentação FOI construída (4 scripts determinísticos, testados, rodáveis) em 2026-07-28 — mas o entregável que o nó realmente pede (um NÚMERO único de "valor medido por adotante" + benchmark de conversão free→paid) continua tão ausente qu'
+    provenance:
+      source: ".claude/validation"
+      locator: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 4/4 — git log --oneline -- .claude/validation/{cycle-completion,context-freshness-metric,session"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
 edges:
   # ratificação do maestro (2026-07-25) SUPPORTS as decisões fechadas

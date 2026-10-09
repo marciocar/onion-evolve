@@ -22,6 +22,10 @@ nodes:
     source_kind: adopter-signal
     trace: 'docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md'
     label: 'O HUB DEU O VEREDITO dos tres relatos de inbox-triage-2026-10#Q_GMILL_FALSOS_POSITIVOS_SEM_TRIAGEM, medido la: (1) REGRA 45 (Link vendorizado nao aponta caminho core-privado, com catraca) RESOLVIDA — 0 BASELINE-OBSOLETA apos o --update, so um ESCOPO-EXPANDIDO SOFT de uma rodada; (2) vendor-scrub `contains&criteria` ACEITO como por-desenho, o caso vai ao baseline deles; (3) bash-empty-result-guard com heredoc SEGUE SEM MEDICAO — nos dois disparos que eles viram nesta sessao o aviso era pertinente (diff vazio; $? apos pipe). Dois tercos do no fecham; o terco do heredoc fica aberto.'
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md"
+      locator: "sinal docs/evolution/inbox/_processed/2026-10-05-veredito-falsos-positivos-e-inventario-pos-update.md, medido pelo hub no pin 547e2e3edf3b com lint-artifacts.sh"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_UPDATE_547_CARIMBOU_0_HARD_E_CHEGOU_COM_1
     node_type: evidence
@@ -34,6 +38,10 @@ nodes:
     source_kind: adopter-signal
     trace: '.claude/utils/adopt/regen-ssot-projections.sh'
     label: 'DECLARADO != VERIFICADO NO RELATORIO DE UPDATE: o relatorio 2026-09-30-update-547e2e3edf3b.md carimbou "0 HARD / 22 SOFT, rc=0", e o hub mediu 1 HARD — REGRA 8 (Inventario canonico sincronizado com o filesystem): inventory.md com 109 comandos contra 111 no disco. Os dois comandos novos (meta/forge.md, docs/build-project-manual.md) entraram no PROPRIO commit do update. O passo (8) do adopt.md regenera o inventario, entao a causa e de ORDEM ou de alvo (regenerar antes do merge do vendor, ou fora da arvore que o commit leva) — NAO medido aqui qual. Seja qual for, o carimbo "0 HARD" saiu sem re-medicao depois do merge: a classe exit-code-nao-e-a-verificacao.'
+    provenance:
+      source: ".claude/utils/adopt/regen-ssot-projections.sh"
+      locator: "sinal do hub (inventory.md dizia 109 comandos, filesystem 111; meta 42->43, docs 11->12; forge.md e build-project-manual.md entraram no proprio commit do update 3f84b84) + no core: adopt.md passo (8) chama regen-ssot-projections.sh, logo a regeneracao EXISTE e mesmo assim nao cobriu os dois arquivos"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_UPDATE_REMEDE_DEPOIS_DO_MERGE
     node_type: question
@@ -45,6 +53,10 @@ nodes:
     verified_against: "PR fix/adopter-quick-cures: remeasure-hard.sh + adopt.md (--update cita HARD MEDIDO); bancada remeasure_hard (a)-(d), mutante (c) morde"
     trace: '.claude/commands/meta/adopt.md'
     label: 'CURA PROPOSTA (o pedido do hub, conferido no core e coerente com exit-code-nao-e-a-verificacao): o --update regenera as projecoes SSOT DEPOIS do merge de onion/vendor e re-roda o lint antes de escrever o relatorio; o numero de HARD do relatorio passa a ser o MEDIDO nessa passada, nunca herdado. Antes da cura, medir a causa exata (ordem do passo 8 vs. merge, ou alvo do regen). GATILHO: antes do proximo --update de qualquer hub (gmill e brain-granaai estao em espera por ordem do maestro, 2026-10-05).'
+    provenance:
+      source: ".claude/commands/meta/adopt.md"
+      locator: "PR fix/adopter-quick-cures: remeasure-hard.sh + adopt.md (--update cita HARD MEDIDO); bancada remeasure_hard (a)-(d), mutante (c) morde"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_CORTE_POR_PAPEL_SO_COBRE_STANDALONE
     node_type: question
@@ -56,6 +68,10 @@ nodes:
     verified_against: 'vendor-manifest.sh: _role_cut (l.142) so tem ramo para standalone (`*) : ;;` para o resto) e _emit_command_excludes retorna cedo quando o corte do papel e vazio; resolve-role-bundle.sh hub --tools lista 23 work_tools SEM forge; /home/marcio/gmill/.claude/commands/meta/ tem forge.md, evolve.md, create-*.md, co-announce.md, co-deliver.md, federation-publish.md'
     trace: '.claude/utils/adopt/vendor-manifest.sh'
     label: 'A PERGUNTA DO HUB ("meta:forge se declara Core-only e chegou aqui — era intencional?") TEM RESPOSTA: NAO. O corte por papel do vendor-manifest so existe para `standalone`; para `hub` e `adopted` o _role_cut e vazio e o corte de comandos de meta/ nem roda — mesmo o resolve-role-bundle declarando, para hub, 23 work_tools que NAO incluem forge. Resultado medido no gmill: a autoria do framework inteira viajou (forge, evolve, create-*, co-announce, co-deliver, federation-publish), contra o adopt.md:94 ("O que NAO ganha: a autoria do framework — Camada 1, so o core"). O forge-guard, mais novo que o pin dele, iria no proximo update. CURA: o corte de comandos de meta/ passa a valer para todo papel com work_tools declarados, com caso de bancada que reprova se um comando core-only aparecer no pacote de hub. GATILHO: antes do proximo --update de qualquer hub.'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh"
+      locator: "vendor-manifest.sh: _role_cut (l.142) so tem ramo para standalone (`*) : ;;` para o resto) e _emit_command_excludes retorna cedo quando o corte do papel e vazio; resolve-role-bundle.sh hub --tools lista 23 work_tools SEM forge; /home/marcio/gmill/.claude/commands/meta/ tem forge.md, evolve.md, create-*.md, co-announce.md, co-deliver.md, federation-publish.md"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_REGEN_POS_MERGE_MUDOU_O_INVENTARIO
     node_type: evidence
@@ -67,6 +83,10 @@ nodes:
     verified_against: 'update do gmill 547e2e3->ab08cde (branch chore/onion-update-ab08cde675fa, relatorio inbound/2026-10-05-update-ab08cde675fa.md): a regeneracao rodada DEPOIS do merge da onion/vendor levou o inventory.md de 111 para 113 comandos (meta 43->45); uma 2a regeneracao nao mudou nada; a oferta de CI rodada entre o merge e a regeneracao acusou o lint reprovando'
     trace: '.claude/utils/adopt/regen-ssot-projections.sh'
     label: 'A CAUSA DO DEFEITO 1 FOI MEDIDA, nao suposta: docs/onion/ NAO viaja na onion/vendor, entao o merge sozinho deixa as projecoes SSOT do alvo defasadas, e qualquer regeneracao feita ANTES do merge fica velha. No update de 2026-10-05 a mitigacao manual (regenerar e re-rodar o lint depois do merge) levou o gmill a 0 HARD medido, e o brain-granaai tambem (0 HARD). Isto vira a cura de Q_UPDATE_REMEDE_DEPOIS_DO_MERGE: o passo (8) do --update passa para depois do merge, e o relatorio carimba o numero dessa passada.'
+    provenance:
+      source: ".claude/utils/adopt/regen-ssot-projections.sh"
+      locator: "update do gmill 547e2e3->ab08cde (branch chore/onion-update-ab08cde675fa, relatorio inbound/2026-10-05-update-ab08cde675fa.md): a regeneracao rodada DEPOIS do merge da onion/vendor levou o inventory.md de 111 para 113 comandos (meta 43->45); uma 2a regeneracao nao mudou nada; a oferta de CI rodada entre o merge e a regeneracao acusou o lint reprovando"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_HELPERS_DO_UPDATE_SEM_TRAILER_DE_ASSINATURA
     node_type: question

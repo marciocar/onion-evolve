@@ -54,6 +54,10 @@ nodes:
     verified_against: "rodada de primárias 2026-09-28: 7 documentos lidos na íntegra, 18 claims ancoradas com quote verbatim + locator"
     label: "o campo NOMEOU três das quatro partes — (a) empacotamento de doutrina = 'Agent Skills' (Thoughtworks Radar vol. 34, tier 7), (b) contexto injetado = MCP sob a Agentic AI Foundation (tier 9/10), (c) orquestração determinística = topologia declarada (Microsoft Conductor, tier 6) — e deixou (d) DESTINO OBRIGATÓRIO DO QUE SE PRODUZ SEM DONO. Medido no texto do Context Kubernetes (88 KB): `write(` ocorre 1× só na assinatura do CxRI, sem nenhum critério de aceitação; `agent-produced`, `write path`, `contribute knowledge` → zero ocorrências. É a peça 5 da forja, e é onde o Onion está sozinho"
     trace: "docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml (E_MERCADO_AGENT_COMMAND_COMPOSITION_0928 · Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART)"
+    provenance:
+      source: "docs/evolution/research/agent-command-composition-2026-09/agent-command-composition-2026-09.kg.yaml (E_MERCADO_AGENT_COMMAND_COMPOSITION_0928 · Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART)"
+      locator: "rodada de primárias 2026-09-28: 7 documentos lidos na íntegra, 18 claims ancoradas com quote verbatim + locator"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_CONVENCAO_NO_DESTINO_MORRE
     node_type: claim
@@ -65,6 +69,10 @@ nodes:
     verified_against: 'sinal de campo primário docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md (nomeia os 3 run ids wwujc53hz, wte2k70qw, wzxz11dvf) + git log -S "write(KG)" em .claude/skills/onion-orchestration/SKILL.md, que datou a convenção em 6456e06a (2026-07-18) + memória datada de 2026-07-23 sobre as 8 passadas de Elenxo'
     label: 'CONVENÇÃO no destino não basta — e a prova é de DEPOIS da convenção existir, não de antes. PROVA PRINCIPAL: as 8 passadas de Elenxo de um audit evaporaram em prosa e só viraram grafo depois, À MÃO, com o passo 7 da skill onion-orchestration JÁ EM VIGOR (memória de 2026-07-23, posterior ao commit 6456e06a que criou o passo em 2026-07-18). Convenção instalada, conhecimento perdido do mesmo jeito. RE-ENQUADRAMENTO EXIGIDO PELA PASSADA ADVERSARIAL de 2026-09-28: as três pesquisas que perderam o write(KG) (run ids wwujc53hz, wte2k70qw, wzxz11dvf) são PRÉ-CONVENÇÃO — o passo 7 nasceu no MESMO DIA do sinal, 2026-07-18, COMO RESPOSTA a elas. Citá-las como prova de que convenção falha era citar a DOENÇA contra a CURA; elas provam que AUSÊNCIA DE MECANISMO falhou, que é claim diferente e mais fraca para este fim. A própria skill é mais precisa do que este nó era (SKILL.md l.106): "advice-que-depende-de-lembrar falhou empiricamente". CONSEQUÊNCIA PARA A FORJA: a peça 5 tem de ser EMITIDA como fase executável, não descrita como convenção — um gerador que só emite scaffolding é create-command com mais passos.'
     trace: 'docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md'
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md"
+      locator: "sinal de campo primário docs/evolution/inbox/_processed/2026-07-18-deep-research-no-auto-kg-persist.md (nomeia os 3 run ids wwujc53hz, wte2k70qw, wzxz11dvf) + git log -S \"write(KG)\" em .claude/skills/onion-orchestration/SKILL.md, que datou a convenção em 6456e06a (2026-07-18) + memória datada de 2026-07-23 sobre as 8 passadas de Elenxo"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: C_FACE_QUE_VIAJA_TEM_MOTOR_CORTADO
     node_type: claim
@@ -76,6 +84,10 @@ nodes:
     verified_against: 'lint-artifacts.sh de 2026-09-28 (3 SOFT de plugin-bare-path/ALLOWED-TOOLS + 1 PASSIVO, todos SOFT) + leitura de .claude/utils/adopt/vendor-manifest.sh (_base inclui .claude/utils; _role_cut corta utils/wizard/ SÓ em standalone) + ausência de plugins/onion/utils/wizard/'
     label: 'A face que VIAJA não pode ser cópia da face do core — mas o alvo é a superfície de PLUGIN/INSTALL e o papel `standalone`, NÃO o adotante. CORREÇÃO DA PASSADA ADVERSARIAL de 2026-09-28, que reprovou a versão anterior deste nó: no papel `adopted` o manifesto transporta `.claude/utils` INTEIRO (está em `_base`), e o corte de `.claude/utils/wizard/` existe SÓ no papel `standalone` — logo no adotante o caminho RESOLVE, e usar um achado de plugin para afirmar sobre o adotante confunde INSTALL com ADOPT, distinção que é doutrina desta casa. O QUE DE FATO ESTÁ MEDIDO: a REGRA 74 (Caminho .claude/ NU dentro de plugin só resolve no core, com catraca) acusa TRÊS arquivos empacotados — plugins/onion/skills/onion-wizard/SKILL.md l.8, plugins/onion/skills/onion-onboarding/SKILL.md l.8 e plugins/onion/commands/co-relay.md l.8 — e `plugins/onion/utils/` não contém `wizard/`, então o que falta é o MOTOR ter viajado, não a linha de permissão (que no limite só deixa de pré-aprovar). A CONSEQUÊNCIA "o comando nasce morto no consumidor" é INFERIDA, não medida: a frase é a mensagem do próprio plugin-bare-path-check.sh, e não existe medição consumer-side neste repo. GATILHO para medir: rodar a skill num repo que apenas INSTALOU o plugin, sem adotar.'
     trace: '.claude/utils/adopt/vendor-manifest.sh · plugins/onion/skills/onion-wizard/SKILL.md'
+    provenance:
+      source: ".claude/utils/adopt/vendor-manifest.sh · plugins/onion/skills/onion-wizard/SKILL.md"
+      locator: "lint-artifacts.sh de 2026-09-28 (3 SOFT de plugin-bare-path/ALLOWED-TOOLS + 1 PASSIVO, todos SOFT) + leitura de .claude/utils/adopt/vendor-manifest.sh (_base inclui .claude/utils; _role_cut corta utils/wizard/ SÓ em standalone) + ausência de plugins/onion/utils/wizard/"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SETE_PECAS_SAO_UMA_INSTANCIA
     node_type: evidence

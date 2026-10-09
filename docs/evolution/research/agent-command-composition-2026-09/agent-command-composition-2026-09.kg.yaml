@@ -103,6 +103,10 @@ nodes:
     source_kind: analyst
     label: 'CONFIRMADA (tier 7, 3-0 — a fonte mais forte da rodada): "Thoughtworks Technology Radar (vol. 34) nomeia o padrao emergente de empacotar instrucoes + scripts executaveis + recursos associados como Agent Skills, um padrao aberto de modularizacao de contexto, com especificacao em agentskills.io." POR QUE ISSO PESA: Radar nomear um padrao e o marcador classico de saida de "emergente idiossincratico" para "categoria reconhecida" — e a evidencia mais proxima de consolidacao terminologica que esta rodada alcancou. ⚠️ O QUE ESTA CLAIM NAO DIZ, e a rodada tentou fazer dizer: ela nomeia o EMPACOTAMENTO (camada (a) da pergunta: doutrina reutilizavel + scripts), NAO o composto (a)+(b)+(c) com destino em grafo de conhecimento. A claim que afirmava explicitamente que o Radar NAO confirma termo para o composto foi REFUTADA nesta mesma rodada (tier 7) — ou seja, nao se pode citar esta fonte nem a favor nem contra a existencia de nome para o composto. Autoridade sobre o nome da camada nao e autoridade sobre o nome do sistema.'
     trace: 'https://www.thoughtworks.com/radar/techniques/agent-skills'
+    provenance:
+      source: "https://www.thoughtworks.com/radar/techniques/agent-skills"
+      locator: "https://www.thoughtworks.com/radar/techniques/agent-skills — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CONDUCTOR_ORQUESTRACAO_DECLARADA_CUSTO_ZERO
     node_type: evidence
@@ -117,6 +121,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA (tier 6, 3-0): "A orquestracao e declarada deterministicamente em YAML com templates Jinja2 para roteamento entre agentes, com a topologia declarada (nao descoberta em runtime) e sem custo de token no orquestrador." POR QUE ISSO PESA: e a camada (c) da pergunta materializada por um fornecedor grande, e as DUAS propriedades que ela declara sao exatamente as duas que o Onion ja pratica — topologia declarada em ARQUIVO (nao negociada pelo modelo) e coordenacao que nao gasta inferencia. ⚠️ TIER E SUSPEITA: `vendor-on-competitor` e sempre suspeito (clausula 7) — e um fornecedor descrevendo o proprio produto num espaco onde compete; a confianca fica em 0,7 apesar do 3-0. ⚠️ O QUE NAO SOBREVIVEU DA MESMA FONTE, e importa: as claims de que o Conductor consome Agent Skills como formato de doutrina reutilizavel (o elo que uniria (a) a (c) num mesmo produto) e de que existem tres modos de controle de contexto injetado (accumulate / last_only / explicit, a camada (b)) foram AMBAS refutadas. Sobrou a orquestracao; a costura com as outras duas camadas nao foi estabelecida.'
     trace: 'https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/'
+    provenance:
+      source: "https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/"
+      locator: "https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MCP_GOVERNANCA_NEUTRA_PRECEDENTE
     node_type: evidence
@@ -152,6 +160,10 @@ nodes:
     source_kind: analyst
     label: 'CONFIRMADA (tier 5, 3-0): "A implementacao do Claude Code usa um pequeno arquivo .js que define o fluxo (quando fazer fan-out de agentes, quando gatear num resultado, quando avancar de fase), schemas JSON para validar saidas estruturadas e orcamento de tokens (budget.remaining()) medido em tempo real, com primitivas (agent(), parallel(), pipeline(), phase()) que compoem o fluxo sem gastar tokens em coordenacao." POR QUE ISSO PESA: e a SEGUNDA implementacao independente da mesma tese do E_CONDUCTOR_… — fluxo declarado em arquivo, fases explicitas, saida validada por schema, coordenacao a custo zero. Duas implementacoes de fornecedores que competem, convergindo nas mesmas primitivas, e o sinal mais forte desta rodada de que a camada (c) esta PADRONIZANDO DE FATO mesmo sem nome fechado. E e a plataforma a que o Onion e acoplado: a orquestracao que esta rodada pesquisou no mercado e a mesma maquinaria em que este grafo foi produzido. ⚠️ TIER: analista secundario, nao documentacao oficial — a verificacao contra o ARTEFATO INSTALADO (clausula 2: binario antes da web) NAO foi feita nesta rodada e e a primeira coisa a fazer numa proxima. ⚠️ O QUE NAO SOBREVIVEU DA MESMA FONTE: a claim de que nao existe nome consolidado para o padrao foi refutada.'
     trace: 'https://www.my2cents.ai/deep-dive/claude-code-workflows/'
+    provenance:
+      source: "https://www.my2cents.ai/deep-dive/claude-code-workflows/"
+      locator: "https://www.my2cents.ai/deep-dive/claude-code-workflows/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_AGENTSKILLS_SPEC_ADOCAO_MULTIPLATAFORMA
     node_type: evidence
@@ -165,6 +177,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA (tier 4, 3-0): "A especificacao aberta e governada em agentskills.io (Anthropic) e ja foi adotada por 26+ plataformas, incluindo concorrentes diretos." POR QUE ISSO PESA: e a unica claim sobrevivente que responde ao "QUEM publica especificacao aberta para isso" — e adocao por CONCORRENTE e o teste de que a spec e aberta de fato, nao so de nome. ⚠️ TIER BAIXO E SUSPEITA DUPLA: tier 4 e `vendor-on-competitor`; a confianca fica em 0,6 apesar do 3-0, e o numero "26+" e uma contagem que anda — e o tipo de dado que justifica a cadencia de 90 dias deste grafo. ⚠️ O QUE NAO SOBREVIVEU DA MESMA FONTE, e e o ponto: a claim de que "Agent Skills E o termo consolidado que o mercado usa para esse padrao" foi REFUTADA, assim como a claim sobre progressive disclosure de ~30-50 tokens por skill (a camada (b)). Desta fonte vale a EXISTENCIA e a ADOCAO da spec — nunca a afirmacao de que ela nomeia o composto.'
     trace: 'https://strapi.io/blog/what-are-agent-skills-and-how-to-use-them'
+    provenance:
+      source: "https://strapi.io/blog/what-are-agent-skills-and-how-to-use-them"
+      locator: "https://strapi.io/blog/what-are-agent-skills-and-how-to-use-them — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── MERCADO / CAPITAL (cláusula 4: invariante, não opção por tema) ───────────────────
   - id: E_MERCADO_AGENT_COMMAND_COMPOSITION_0928
@@ -219,6 +235,10 @@ nodes:
     source_kind: preprint
     label: 'ANCORADA (tier 4 — preprint arXiv de autor único, sem peer review, autor escrevendo a partir da própria empresa: vendor-on-own-product, cláusula 7): o paper DEFINE formalmente o Context Store como sistema de persistência de unidades de contexto, com tipo de store enumerado (repositório git, banco relacional, conector para sistema externo, filesystem) e acesso EXCLUSIVO pela Context Runtime Interface. POR QUE IMPORTA: é a peça mais próxima, na arte externa, de "onde o conhecimento mora é DECLARADO, não escolhido pelo agente". ⚠️ LIMITE MEDIDO PELO ELENXO, e ele muda a leitura: o Context Store é peça da via de LEITURA, não destino do que o agente PRODUZ. A única interface voltada ao agente é a Definition 3.4 (Context Endpoint) e é read-only por assinatura ("ε(q, ω, α) → {u1,...,uk} ⊆ U"), seguida de "The agent never specifies where knowledge lives—only what it needs." Medição no texto inteiro (88 KB): "write(" ocorre UMA vez (só a assinatura do CxRI) e "agent-produced", "knowledge produced", "write path", "writes back" e "contribute knowledge" ocorrem ZERO vezes. Definir onde o conhecimento organizacional MORA para ser ENTREGUE não é impor destino ao conhecimento PRODUZIDO: prova MENOS do que a pergunta desta rodada precisa.'
     trace: 'https://arxiv.org/abs/2604.11623v3'
+    provenance:
+      source: "https://arxiv.org/abs/2604.11623v3"
+      locator: "QUOTE verbatim: \"A context store is a backing system that persists context units: s=(σ,ι,ϕ) where σ is the store type (git repository, relational database, connector to external system, file system)... Stores are accessed exclusively through the Context Runtime Interface.\" — LOCATOR: arXiv:2604.11623v3, Seção 3.2 (Core Abstractions), Definição 3.3 (Context Store); paper.txt l.273-276 na cópia lida. DIVERGÊNCIA DECLARADA pelo próprio leitor: o número de página (p.6) NÃO é verificável na renderização HTML. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CXK_FRESHNESS_MANAGER_FOUR_STATES
     node_type: evidence
@@ -233,6 +253,10 @@ nodes:
     source_kind: preprint
     label: 'ANCORADA (tier 4): o paper implementa frescor como MÁQUINA DE ESTADOS de quatro estágios (fresh, stale, expired, conflicted) sob monitoramento contínuo, com "corrective action" no Liveness Probe. CONVERGÊNCIA REAL com a temporalidade do Onion (valid_from / verified_at / review_after) — chegando por outro caminho. ⚠️ LIMITE (objeção do Elenxo SOBREVIVE): o objeto medido é o frescor de conteúdo INGERIDO de fontes já existentes ("ι is the ingestion configuration") — quando um documento da empresa envelhece. NÃO é a validade bi-temporal de um claim PRODUZIDO por uma rodada de pesquisa. É convergência num eixo ADJACENTE (frescor), não a arte do destino. E o número de vitrine ("staleness detected in under 1 ms") é medido em seed data sintética num protótipo local.'
     trace: 'https://arxiv.org/abs/2604.11623v3'
+    provenance:
+      source: "https://arxiv.org/abs/2604.11623v3"
+      locator: "QUOTE verbatim: \"Freshness Manager (continuous monitoring with four states: fresh, stale, expired, conflicted)\" — LOCATOR: arXiv:2604.11623v3, Seção 3.3 (arquitetura de sistema); paper.txt l.307 (\"Freshness Manager (continuous mon-\") e l.665 (\"Liveness Probe / Freshness Manager / Health monitoring with corrective action\"). DIVERGÊNCIA DECLARADA pelo próprio leitor: o Requisito 2.4 vive na Seção 2.3, não na 3.3; páginas (6-7) não verificáveis em HTML. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CXK_REQUIREMENT_2_4_TTL_MANDATE
     node_type: evidence
@@ -247,6 +271,10 @@ nodes:
     source_kind: preprint
     label: 'ANCORADA (tier 4): o paper trata TTL + ação corretiva como REQUISITO numerado do sistema ("must continuously monitor... and take corrective action"), não como comentário lateral — e mapeia o requisito ao NIST Measure 2.6. ⚠️ LIMITE (objeção do Elenxo SOBREVIVE, e é a que mais desconta este nó): "exigência formal" de QUEM. R1-R7 são requisitos que o PRÓPRIO AUTOR estipula e depois pontua: a Table 8 dá "Impl." ao Context Kubernetes em R1-R6 e "Gap"/"Partial" a Microsoft/Salesforce/AWS/Google/DIY, e a §9.1 admite "Single-author evaluation. The gap analysis (Table 8) and the experiment design are by the author." Rubrica escrita e pontuada pelo mesmo autor cujo sistema é o único a implementá-la é tautológica. O mapeamento para o NIST é mapeamento DO AUTOR, não endosso do NIST. Prova que UM autor formalizou a exigência — não que o campo a exige.'
     trace: 'https://arxiv.org/abs/2604.11623v3'
+    provenance:
+      source: "https://arxiv.org/abs/2604.11623v3"
+      locator: "QUOTE verbatim: \"Requirement 2.4 (Context Freshness (NIST: Measure 2.6 — data quality and relevance)). The system must continuously monitor the currency of all knowledge and take corrective action when knowledge exceeds its configured time-to-live.\" — LOCATOR: arXiv:2604.11623v3, Seção 2.3 (subseção da Seção 2, Requirements); paper.txt l.225. DIVERGÊNCIA DECLARADA: página 5 não verificável em HTML. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CXK_GATE_AT_REGISTRATION_NOT_AT_WRITE
     node_type: evidence
@@ -261,6 +289,10 @@ nodes:
     source_kind: preprint
     label: 'ANCORADA (tier 4) E É O ACHADO QUE CARREGA A RODADA: o único gate determinístico do paper está no REGISTRO do perfil de agente — o Permission Engine rejeita perfil que não seja subconjunto estrito da autoridade humana — e NÃO existe gate de aceitação/qualidade no write() da CxRI. A medição REFORÇA: "write(" aparece uma única vez no documento inteiro, como assinatura de adapter, sem critério de aceitação, sem schema, sem validação em lugar nenhum. E mesmo o gate que existe é declaradamente NÃO-verificado: "An Alloy specification ... has been written ... but has not yet been model-checked ... we retain "design invariant" rather than "verified property". CONSEQUÊNCIA PARA O ONION, e é por isso que este nó tem impacto 5: a arte externa NÃO tem equivalente do exit 2 determinístico que BARRA a escrita — a capacidade que o CLAUDE.md nomeia como a que COMPRA o acoplamento ao Claude Code segue sem par publicado. O paper barra QUEM escreve (identidade/permissão); o Onion barra O QUE é escrito (conteúdo/forma). São gates em camadas diferentes.'
     trace: 'https://arxiv.org/abs/2604.11623v3'
+    provenance:
+      source: "https://arxiv.org/abs/2604.11623v3"
+      locator: "QUOTE verbatim: \"This invariant is enforced at registration time: the Permission Engine rejects any agent profile that is not a strict subset, that includes operations outside the user's role, or that specifies a less restrictive tier than the user's.\" — LOCATOR: arXiv:2604.11623v3, Seção 3.4 (The Agent Permission Model), imediatamente após a Design Invariant 3.7 (Agent Permission Subset); paper.txt l.367-369. DIVERGÊNCIA DECLARADA: página 7 não verificável em HTML. MEDIÇÃO DE AUSÊNCIA no mesmo documento: \"write(\" ocorre UMA única vez no paper inteiro (l.286, assinatura de adapter \"write(conn, path, c) → Result\"), sem critério de aceitação, sem schema, sem validação descrita. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CXK_EVAL_FOUR_GOVERNANCE_BASELINES
     node_type: evidence
@@ -275,6 +307,10 @@ nodes:
     source_kind: preprint
     label: 'ANCORADA (tier 4) MAS A TABELA REFUTA A MANCHETE PARA A QUAL ELA É USADA — e isto é achado, não ressalva: B1 (ACL-filtered RAG, o baseline TRIVIAL) tem 0 vazamentos / 0,0%; B3 (Context Kubernetes, o framework completo) tem 307 / 20,9%. O framework vaza MAIS que um filtro de permissão pós-retrieval e EMPATA com B2 em ruído (64,0%). Só a contagem de ataques favorece B3 (5/5 contra 4/5), sobre 5 cenários desenhados pelo próprio autor. Pior para a tese determinística que esta pesquisa procurava: o texto registra que a vantagem de ruído depende de LLM no caminho ("LLM-assisted routing (not shown) reduces B3 noise from 64.0% to 35.1%") — a via DETERMINÍSTICA é a pior das duas. Some-se a divergência de locator admitida, 200 queries sintéticas e protótipo local: é evidência de que o autor MEDIU algo, não de que o desenho vence.'
     trace: 'https://arxiv.org/abs/2604.11623v3'
+    provenance:
+      source: "https://arxiv.org/abs/2604.11623v3"
+      locator: "QUOTE verbatim: \"B0: Ungoverned RAG 375 26.5% 80.9% 0/5 ... B3: Context Kubernetes 307 20.9% 64.0% 5/5\" — LOCATOR: arXiv:2604.11623v3, Tabela 6; paper.txt l.808-814. DIVERGÊNCIA DECLARADA pelo verificador: o claim citava \"Seção 8, Tabela 6\"; a Tabela 6 está na Seção 7.2 (Governance Impact Experiments), NÃO na Seção 8. Confirmados no texto/legenda: os quatro baselines (B0 Ungoverned RAG, B1 ACL-filtered RAG, B2 RBAC-aware RAG, B3 Context Kubernetes) e \"Four governance baselines compared (200 queries, synthetic data)\". ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CXK_SELF_DECLARED_LIMITATIONS
     node_type: evidence
@@ -289,6 +325,10 @@ nodes:
     source_kind: preprint
     label: 'ANCORADA (tier 4) e é o claim que DEMOTE O PAPER INTEIRO em vez de sustentá-lo: sem nenhum deployment em produção (tudo contra seed data em protótipo local), avaliação por autor único, e — o ponto que decide a pergunta do maestro — o Requirement R7 (Context Operators com pattern extraction e learning loops), que é o ÚNICO componente que tocaria conhecimento PRODUZIDO por agentes realimentando a organização, está "designed but not implemented". Como resposta a "a arte externa do destino obrigatório EXISTE?", isto é uma PROPOSTA de uma pessoa, sem peer review, escrita a partir da própria empresa — não arte em uso. É o nó que fixa o teto de confiança de todos os outros seis nós E_CXK_*.'
     trace: 'https://arxiv.org/abs/2604.11623v3'
+    provenance:
+      source: "https://arxiv.org/abs/2604.11623v3"
+      locator: "QUOTE verbatim: \"No production deployment. All experiments run against seed data in a local prototype... Organizational intelligence not implemented. Requirement R7 (Context Operators with pattern extraction, learning loops) is designed but not implemented in the prototype.\" — LOCATOR: arXiv:2604.11623v3, Seção 9.1 (Limitations); paper.txt l.1035-1040 e l.1055-1057. DIVERGÊNCIA DECLARADA: páginas 19-20 não verificáveis em HTML; entre as duas frases unidas pela elipse existe no original a frase intermediária \"Single-author evaluation. The gap analysis (Table 8) and the experiment design are by the author.\" — nada foi omitido de conteúdo (o claim a menciona em prosa), houve reordenação na citação. AUTORIA lida no próprio documento: Charafeddine Mouzouni, OPIT – Open Institute of Technology, and Cohorte AI, Paris, France (l.1-13), preprint arXiv v3 de 16 abr 2026. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CXK_ABSTRACT_GOVERNS_DELIVERY_NOT_DESTINATION
     node_type: evidence
@@ -303,6 +343,10 @@ nodes:
     source_kind: preprint
     label: 'ANCORADA (tier 4) — É A RESPOSTA DIRETA À SUB-PERGUNTA (4) DO MAESTRO, E ELA É "NÃO": o "Context Kubernetes" propõe manifesto YAML declarativo (knowledge-architecture-as-code) + reconciliation loop + modelo de permissão em três camadas para GOVERNAR A ENTREGA e a PERMISSÃO de acesso a conhecimento organizacional JÁ EXISTENTE — não para ser destino obrigatório do conhecimento PRODUZIDO por agentes. Logo o paper NÃO é a arte externa do DESTINO OBRIGATÓRIO do conhecimento num grafo declarativo; é a arte externa da ENTREGA GOVERNADA de conhecimento a agentes. O QUE CONVERGE (e vale registrar): topologia declarada em arquivo YAML, loop de reconciliação, autoridade do agente como subconjunto estrito da humana. O QUE DIVERGE: a direção do fluxo. NOTA SOBRE A RODADA ANTERIOR: a refutação de 2026-09-28 (varredura) acertou o veredito por motivo errado — caiu por FONTE FRACA; lido na íntegra, continua não sustentando o claim, agora por CONTEÚDO.'
     trace: 'https://arxiv.org/abs/2604.11623v3'
+    provenance:
+      source: "https://arxiv.org/abs/2604.11623v3"
+      locator: "QUOTE verbatim: \"We formalize six core abstractions, a YAML-based declarative manifest for knowledge-architecture-as-code, a reconciliation loop, and a three-tier agent permission model where agent authority is always a strict subset of human authority.\" — LOCATOR: arxiv.org/abs/2604.11623v3, Abstract. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── (1) A ESPECIFICAÇÃO AGENT SKILLS LIDA NA FONTE PRIMÁRIA, AO VIVO ─────────────────
   - id: E_AGENTSKILLS_REQUIRED_FIELDS_NAME_DESCRIPTION
@@ -317,6 +361,10 @@ nodes:
     source_kind: standard-spec
     label: 'ANCORADA (tier 9, fonte primária lida ao vivo) — FECHA a sub-lacuna "o que a spec de fato MANDA em formato e campos": uma skill é um DIRETÓRIO contendo, no mínimo, um SKILL.md com frontmatter YAML seguido de corpo Markdown; os ÚNICOS campos obrigatórios são name (máx. 64 chars, minúsculas/números/hífens) e description (máx. 1024 chars, não-vazia). license, compatibility, metadata e allowed-tools são OPCIONAIS. Isto substitui de segunda mão por primeira mão: três claims da rodada anterior citavam este documento sem abri-lo. ⚠️ RESSALVA REGISTRADA PELO ELENXO (não é objeção, é medida): a página tem ZERO ocorrências de "normative" e ZERO de "MUST" em caixa alta (RFC-2119) — é especificação em PROSA acompanhada de um validador (skills-ref validate), não spec normativa. Isso LIMITA quanto peso a expressão "padrão aberto" (que o Thoughtworks Radar autoriza) pode carregar.'
     trace: 'https://agentskills.io/specification'
+    provenance:
+      source: "https://agentskills.io/specification"
+      locator: "QUOTE verbatim: \"The `SKILL.md` file must contain YAML frontmatter followed by Markdown content.\" e, na tabela de Frontmatter, \"| `name` | Yes | Max 64 characters. Lowercase letters, numbers, and hyphens only... | `description` | Yes | Max 1024 characters. Non-empty.\" — LOCATOR: agentskills.io/specification, seções \"SKILL.md format\" e \"Frontmatter\" (curl ao vivo, rc=200, 445 KB); license, compatibility, metadata e allowed-tools constam com Required=No. ancorada por DOIS leitores independentes e por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_AGENTSKILLS_NO_ORCHESTRATION_SYNTAX
     node_type: evidence
@@ -330,6 +378,10 @@ nodes:
     source_kind: standard-spec
     label: 'ANCORADA (tier 9) — FECHA COM "NÃO" a sub-lacuna "a spec cobre orquestração?": não há sintaxe de fases, fan-out, budget, gate nem coordenação em lugar nenhum da especificação; o corpo Markdown é livre-forma por decisão explícita, e o único mecanismo FORMAL de composição é referência relativa a arquivos, mantida a UM nível de profundidade. A ausência foi MEDIDA, não presumida ("orchestrat" = 0 no payload inteiro) — e argumento de silêncio é o instrumento correto aqui, porque a pergunta é sobre o ESCOPO de uma especificação, não sobre o que o mundo faz. CONSEQUÊNCIA: a camada (a) da pergunta original (doutrina como fragmento reutilizável) tem padrão aberto; a camada (c) NÃO é coberta por esse padrão — quem orquestra determinísticamente hoje o faz fora do padrão (Conductor em YAML+Jinja2, Claude Code Workflows em .js).'
     trace: 'https://agentskills.io/specification'
+    provenance:
+      source: "https://agentskills.io/specification"
+      locator: "QUOTE verbatim: \"The Markdown body after the frontmatter contains the skill instructions. There are no format restrictions. Write whatever helps agents perform the task effectively.\" e \"Keep file references one level deep from SKILL.md. Avoid deeply nested reference chains.\" — LOCATOR: agentskills.io/specification, seção \"Body content\". MEDIÇÃO DE AUSÊNCIA no payload inteiro da página: \"orchestrat\" = 0 ocorrências. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_AGENTSKILLS_INPUT_ONLY_NO_OUTPUT_DESTINATION
     node_type: evidence
@@ -343,6 +395,10 @@ nodes:
     source_kind: standard-spec
     label: 'ANCORADA (tier 9) — É A PEÇA QUE RESPONDE À METADE MAIS IMPORTANTE DA SUB-PERGUNTA (1): a especificação trata EXCLUSIVAMENTE do carregamento progressivo do CONTEXTO DE ENTRADA (metadata → instruções → recursos sob demanda, em três estágios Discovery/Activation/Execution), e não diz UMA palavra sobre destino, persistência, versionamento ou grafo do que a skill PRODUZ. Ausência medida, não presumida. CONSEQUÊNCIA DIRETA PARA A POSIÇÃO DO ONION: o padrão que o mercado nomeou ("Agent Skills") é empacotamento de contexto de entrada; o DESTINO OBRIGATÓRIO do conhecimento produzido não está no padrão aberto — nem contra, nem a favor: está FORA DO ESCOPO. A aposta do Onion segue sem par no padrão, e agora isso está ancorado na própria spec em vez de inferido de analista.'
     trace: 'https://agentskills.io/specification'
+    provenance:
+      source: "https://agentskills.io/specification"
+      locator: "QUOTE verbatim: \"Agents load skills *progressively*, pulling in more detail only as a task calls for it.\" e \"A skill is a directory containing, at minimum, a `SKILL.md` file... Agents load skills through progressive disclosure, in three stages: Discovery... Activation... Execution\" — LOCATOR: agentskills.io/specification, seção \"Progressive disclosure\" (itens 1-3: Metadata ~100 tokens · Instructions <5000 tokens · Resources as needed) e agentskills.io, seções \"Directory structure\" e \"How do Agent Skills work?\". MEDIÇÃO DE AUSÊNCIA na mesma página: \"knowledge graph\" = 0 ocorrências; as três subseções opcionais são scripts/, references/ e assets/ — todas de ENTRADA. ancorada por DOIS leitores independentes e por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_ANTHROPIC_DOCS_SKILLS_SINGLE_AGENT_SCOPE
     node_type: evidence
@@ -356,6 +412,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 9 — documentação oficial do fornecedor sobre o PRÓPRIO produto, que é fonte primária para "o que o produto faz", não para "o que o mercado faz"): a documentação da Anthropic manda o mesmo que a especificação independente — SKILL.md com frontmatter YAML, name e description obrigatórios — e declara o ESCOPO: dar expertise a UM agente via progressive disclosure. Nada sobre orquestração multi-agente, nada sobre destino do conhecimento produzido. POR QUE ISSO PESA: DUAS fontes primárias independentes (a spec em agentskills.io e a doc do fornecedor de origem) convergindo no MESMO escopo estreito é mais forte que qualquer uma isolada — e mata a hipótese de que o escopo estreito fosse artefato de uma das duas redações.'
     trace: 'https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview'
+    provenance:
+      source: "https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview"
+      locator: "QUOTE verbatim: \"Every Skill requires a `SKILL.md` file with YAML frontmatter... **Required fields:** `name` and `description`\" — LOCATOR: platform.claude.com/docs/en/agents-and-tools/agent-skills/overview, seções \"Why use Skills\" e \"Skill structure\". ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── (2) A FORMA REAL DO CONDUCTOR — metade ancorada, metade pendente ─────────────────
   - id: E_CONDUCTOR_STRUCTURE_FIXED_AT_DEFINITION_TIME
@@ -371,6 +431,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'ANCORADA (tier 6, vendor-on-competitor — sempre suspeito, cláusula 7; a confiança fica em 0,7 apesar da ancoragem): o anúncio oficial do Conductor afirma VERBATIM que a camada de orquestração consome ZERO tokens porque a estrutura é fixada em tempo de DEFINIÇÃO — é a fixidez declarativa que sustenta a alegação de custo zero, e é exatamente a tese que o Onion pratica. ⚠️ A METADE QUE ESTA RODADA NÃO CONSEGUIU ANCORAR, e é metade da sub-pergunta (2) do maestro: as duas claims sobre a FORMA do YAML de topologia (roteamento condicional) e sobre schema de output tipado por agente foram REJEITADAS na ancoragem como EXAGERADAS — o trecho existe, mas no POST DO BLOG e não no README do GitHub como o leitor afirmou, e o exemplo linkado (examples/design-review.yaml) NÃO existe no repositório (o equivalente real é examples/design.yaml). O conteúdo confirmado de graça pelo verificador, que por regra NÃO pode virar nó, está contabilizado em E_LACUNAS_PRIMARIES_0928 — inclusive a resposta a "veta ou roteia?".'
     trace: 'https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/'
+    provenance:
+      source: "https://opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/"
+      locator: "QUOTE verbatim: \"The orchestration layer consumes zero tokens. The structure is fixed at definition time—and that's the point.\" — LOCATOR: opensource.microsoft.com/blog/2026/05/14/conductor-deterministic-orchestration-for-multi-agent-ai-workflows/ (confirmado por grep no HTML bruto). ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── (3) A GOVERNANÇA DO MCP LIDA NAS DUAS FONTES INSTITUCIONAIS ──────────────────────
   - id: E_MCP_UNDER_LF_PROJECTS_NOT_NAMING_AAIF
@@ -385,6 +449,10 @@ nodes:
     source_kind: project-primary
     label: 'ANCORADA (tier 9, página institucional do próprio projeto) — o MCP está formalmente sob a guarda-chuva "LF Projects, LLC" da Linux Foundation, com governança técnica hierárquica (Lead Maintainers/BDFL → Core Maintainers → Maintainers) e SEPs (Specification Enhancement Proposals) como processo de mudança da especificação. ACHADO NEGATIVO QUE IMPORTA E FOI MEDIDO: a página de governança do PRÓPRIO projeto não nomeia a "Agentic AI Foundation". Logo a formulação da rodada anterior — "o MCP passou a ser governado pela Agentic AI Foundation" — não é o que a fonte primária do projeto diz; a entidade que a fonte do projeto declara é LF Projects, LLC. A relação com a AAIF existe e está ancorada, mas em OUTRA fonte (o press release da Linux Foundation) e com OUTRA formulação (projeto FUNDADOR da AAIF). Por isso este nó SUPERSEDES o nó de newsletter tier 5 da rodada anterior.'
     trace: 'https://modelcontextprotocol.io/community/governance'
+    provenance:
+      source: "https://modelcontextprotocol.io/community/governance"
+      locator: "QUOTE verbatim: \"Model Context Protocol has been established as **Model Context Protocol a Series of LF Projects, LLC**.\" — LOCATOR: modelcontextprotocol.io/community/governance, seção \"General Project Policies\". A mesma página descreve a governança técnica hierárquica (Lead Maintainers/BDFL, Core Maintainers, Maintainers) e SEPs para mudança de spec. MEDIÇÃO DE AUSÊNCIA declarada pelos leitores: a página NÃO cita \"Agentic AI Foundation\" pelo nome. ancorada por DOIS leitores independentes e por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_AAIF_FORMED_2025_12_09_MCP_FOUNDING
     node_type: evidence
@@ -399,6 +467,10 @@ nodes:
     source_kind: institutional
     label: 'ANCORADA (tier 10, fonte institucional primária) — FECHA a sub-lacuna (3) na parte fechável: em 9 de dezembro de 2025 a Linux Foundation anunciou formalmente a criação da Agentic AI Foundation (AAIF), tendo o MCP (contribuído pela Anthropic) como UM DE TRÊS projetos fundadores, ao lado de goose (Block) e AGENTS.md (OpenAI). Isto SUBSTITUI a newsletter tier 5 da rodada anterior por fonte institucional datada, e corrige a formulação: o MCP não "passou a ser governado pela AAIF" — ele é contribuição FUNDADORA dela, enquanto sua própria página declara a entidade LF Projects, LLC. POR QUE PESA NA PERGUNTA ORIGINAL: é o precedente completo de trajetória no mesmo ecossistema (spec nasce num fornecedor → adotada por concorrentes → fundação neutra), que dá o gatilho OBSERVÁVEL para julgar se "Agent Skills" consolida de verdade: a pergunta não é quantos blogs usam o termo, é se a spec muda de dono. ⚠️ A lista de membros Platinum NÃO entra como achado deste nó: a claim que a listava foi rejeitada na ancoragem por forma — ver E_LACUNAS_PRIMARIES_0928.'
     trace: 'https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation'
+    provenance:
+      source: "https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation"
+      locator: "QUOTE verbatim: \"The Linux Foundation announced the formation of the Agentic AI Foundation (AAIF) with founding contributions of leading technical projects including Anthropic's Model Context Protocol (MCP), Block's goose, and OpenAI's AGENTS.md.\" — LOCATOR: linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation, press release de 9 dez 2025 (HTML bruto conferido via curl, não newsletter nem blog de terceiro). ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_AAIF_SCOPE_NEUTRAL_HOME_OPEN_GOVERNANCE
     node_type: evidence
@@ -413,6 +485,10 @@ nodes:
     source_kind: institutional
     label: 'ANCORADA (tier 10) — o ESCOPO de governança que a AAIF DECLARA de si é ser "neutral home" garantindo que os projetos cresçam com transparência e estabilidade de governança aberta. ⚠️ LIMITE MEDIDO NO PRÓPRIO TEXTO, e é o que a sub-pergunta (3) do maestro pedia: o press release NÃO detalha se a fundação controla marca/trademark separadamente da especificação, nem descreve processo de compatibilidade — fala em governança aberta GENÉRICA. Portanto, para "com que escopo de governança", a resposta primária disponível é: guarda-chuva institucional e neutralidade DECLARADOS; mecânica de controle de spec e de marca NÃO declarada nesta fonte. O que se sabe de mecânica vem da página do projeto (SEPs, hierarquia de mantenedores), não da fundação — duas fontes, dois níveis, e a costura entre elas não está escrita em nenhuma das duas.'
     trace: 'https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation'
+    provenance:
+      source: "https://www.linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation"
+      locator: "QUOTE verbatim: \"Bringing these projects together under the AAIF ensures they can grow with the transparency and stability that only open governance provides. The Linux Foundation is proud to serve as the neutral home\" — LOCATOR: linuxfoundation.org/press/linux-foundation-announces-the-formation-of-the-agentic-ai-foundation, parágrafo de citação de apoio. ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── CONTABILIDADE DESTA RODADA (cláusula 8: lacuna vira nó) ──────────────────────────
   - id: E_LACUNAS_PRIMARIES_0928
@@ -452,6 +528,10 @@ nodes:
     verified_against: 'curl do arquivo bruto: http 200, 176.749 BYTES (o que o curl emite em size_download; 176.151 é a contagem de CARACTERES de `wc -m`, e atribuir esse número ao curl era troca de unidade — apontado pela passada adversarial) + extração VERBATIM confirmada por `grep -F` (1 ocorrência cada) + contagens de termo CASE-INSENSITIVE; docs/workflow-syntax.md do repositório oficial'
     label: 'O Conductor VALIDA A SAÍDA DO AGENTE CONTRA SCHEMA e pede correção na MESMA sessão — VERBATIM: "When declared, conductor enforces a strict contract: stdout must be a single JSON object, the JSON gets merged onto the `{stdout, stderr, exit_code}` baseline, and the **merged dict** is validated against the schema"; e "If either check fails, a correction prompt is sent in the same session asking the model to fix its response", com o número de tentativas configurável ("This field controls how many correction prompts to send"). Medido no arquivo bruto, CASE-INSENSITIVE: `schema` 45x, `validat` 113x, `JSON` 79x, `retry` 26x (sensível a caixa: 39/102/50/25 — a distinção importa e estava omitida). CORROBORADO NA IMPLEMENTAÇÃO, não só na documentação do fornecedor: `src/conductor/config/schema.py` l.625-626, `providers/hermes.py` l.724 e `_pydantic_ai/structured_output.py` l.60 — sem isso, `source_tier: 10` afirmaria COMPORTAMENTO a partir de doc de fornecedor, que é a lacuna declarado-vs-verificado que a KB behavior-over-declaration nomeia. ISTO É MAIS FORTE que a claim original da rodada, que falava só de estrutura fixa em tempo de definição: há gate DETERMINÍSTICO sobre a FORMA da saída, com laço de correção. O que ele NÃO é: gate sobre o CONTEÚDO do que se produz, nem destino obrigatório — permanece convergente com o veredito de Q_CONTEXT_KUBERNETES_IS_NOT_THE_DESTINATION_ART.'
     trace: 'https://raw.githubusercontent.com/microsoft/conductor/main/docs/workflow-syntax.md'
+    provenance:
+      source: "https://raw.githubusercontent.com/microsoft/conductor/main/docs/workflow-syntax.md"
+      locator: "curl do arquivo bruto: http 200, 176.749 BYTES (o que o curl emite em size_download; 176.151 é a contagem de CARACTERES de `wc -m`, e atribuir esse número ao curl era troca de unidade — apontado pela passada adversarial) + extração VERBATIM confirmada por `grep -F` (1 ocorrência cada) + contagens de termo CASE-INSENSITIVE; docs/workflow-syntax.md do repositório oficial"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_CONDUCTOR_VETO_ANCHORING_PENDING
     node_type: question

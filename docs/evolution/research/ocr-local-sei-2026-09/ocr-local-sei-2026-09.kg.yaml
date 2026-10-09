@@ -58,6 +58,10 @@ nodes:
     source_kind: paper
     label: 'CONFIRMADA (tier 7, 3-0): "dots.ocr e um unico Vision-Language Model (nao pipeline multi-estagio) que unifica layout detection, reconhecimento de texto e ordem de leitura num framework fim-a-fim." ATENCAO A INVERSAO DE SINAL: o paper registra a arquitetura fim-a-fim como MERITO; neste caso de uso ela e PASSIVO — ver E_OBJECAO_1_FIM_A_FIM_MAXIMIZA_SILENCIO. E o dossie usa "dots.ocr" e "dots.mocr" de forma intercambiavel com rebrand admitido em 2026-03, entao os numeros citados podem ser de geracao diferente do modelo que se instalaria.'
     trace: 'https://arxiv.org/pdf/2512.02498'
+    provenance:
+      source: "https://arxiv.org/pdf/2512.02498"
+      locator: "https://arxiv.org/pdf/2512.02498 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CONSENSUS_ENTROPY_SEM_TREINO
     node_type: evidence
@@ -72,6 +76,10 @@ nodes:
     source_kind: paper
     label: 'CONFIRMADA (tier 7, 3-0): "A metrica Consensus Entropy (CE) estima confiabilidade da saida de OCR/VLM medindo a entropia do acordo entre multiplos modelos independentes, sem necessidade de treinamento adicional — usavel como procedimento de verificacao quando a saida nao pode receber confianca cega." Confianca rebaixada a 0.7 (nao 0.8) porque a rodada REFUTOU a perna de sustentacao da metrica (o desacordo ser sinal detectavel de erro) e manteve o achado — contradicao interna reconhecida em E_OBJECAO_2_CE_MEDE_ACORDO_NAO_CORRECAO e E_OBJECAO_7_DESACORDO_REFUTADO_SUSTENTA_CE.'
     trace: 'https://arxiv.org/html/2504.11101'
+    provenance:
+      source: "https://arxiv.org/html/2504.11101"
+      locator: "https://arxiv.org/html/2504.11101 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_DOTSOCR_SEM_CONFIDENCE_NEM_CARIMBO
     node_type: evidence
@@ -86,6 +94,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 6, 3-0): "A documentacao do proprio projeto reconhece falhas de parsing ocasionais ainda nao eliminadas, e nao ha mencao especifica a robustez contra carimbo/assinatura sobreposta nem mecanismo nativo de confidence score ou validacao cruzada." COMO CONCLUSAO isto e decisivo (mata o candidato no requisito dominante: sem confidence nativo nao ha triagem dirigida); COMO EVIDENCIA a segunda metade e argumento do silencio — ver E_OBJECAO_3_ARGUMENTO_DO_SILENCIO_FALTA_MEDICAO.'
     trace: 'https://github.com/rednote-hilab/dots.ocr'
+    provenance:
+      source: "https://github.com/rednote-hilab/dots.ocr"
+      locator: "https://github.com/rednote-hilab/dots.ocr — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_DOCTR_PYTHON_311_PLUS
     node_type: evidence
@@ -99,6 +111,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 9, 3-0): "docTR requer Python 3.11 ou superior, sendo portanto compativel com Python 3.12." Impact rebaixado a 2 de proposito: e tier 9 respondendo um eixo que NAO decide nada — compatibilidade do framework nao e o custo, o custo e o backend (PyTorch/TensorFlow). Achado verdadeiro e irrelevante ocupando vaga — ver E_OBJECAO_4_DOCTR_TIER9_IRRELEVANTE_E_PESO_TORCH.'
     trace: 'https://mindee.github.io/doctr/getting_started/installing.html'
+    provenance:
+      source: "https://mindee.github.io/doctr/getting_started/installing.html"
+      locator: "https://mindee.github.io/doctr/getting_started/installing.html — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SURYA_CPU_EXIGE_LLAMACPP
     node_type: evidence
@@ -112,6 +128,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 7, 3-0): "Em ambiente CPU/sem GPU confirmada, Surya requer backend llama.cpp (llama-server), nao o caminho vllm/Docker/GPU." Confianca rebaixada a 0.6 apesar do tier 7 e do 3-0: suspeita fundamentada de CONFLACAO DE GERACOES dentro do mesmo repositorio (linha nova de modelo-fundacao Chandra vs. modelos classicos PyTorch de deteccao/reconhecimento), e a distincao muda inteiramente o requisito (c) — ver E_OBJECAO_5_SURYA_CONFLACAO_DE_GERACOES.'
     trace: 'https://github.com/datalab-to/surya'
+    provenance:
+      source: "https://github.com/datalab-to/surya"
+      locator: "https://github.com/datalab-to/surya — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EIXO MERCADO/CAPITAL (invariante — registrado mesmo vazio) ───────────────────────
   - id: E_MERCADO_OCR_LOCAL_0908
@@ -262,6 +282,10 @@ nodes:
     source_kind: analysis
     label: 'OBJECAO SOBREVIVENTE 1 — O ACHADO 1 REGISTRA COMO MERITO A PROPRIEDADE QUE E PASSIVO. Um decoder autorregressivo fim-a-fim nao tem estagio separavel que ancore o token no pixel: onde a imagem esta ilegivel (carimbo/assinatura sobreposta ao texto), ele nao falha — COMPLETA com o texto mais plausivel dado o contexto administrativo, em prosa fluente e sem sinal. O enunciado diz que um erro de leitura produz uma superacao errada EM SILENCIO: arquitetura fim-a-fim e a que MAXIMIZA o silencio. Um pipeline multi-estagio (deteccao -> recorte -> reconhecimento) ao menos produz caixa sem texto ou confianca baixa por palavra quando o recorte esta poluido. NADA no dossie mede alucinacao-sob-oclusao de nenhum motor — o eixo dominante da pergunta nao tem uma medicao sequer. E o dossie usa dots.ocr e dots.mocr de forma intercambiavel, com rebrand admitido em 2026-03: os numeros citados podem ser de geracao diferente do modelo que se instalaria.'
     trace: 'https://arxiv.org/pdf/2512.02498'
+    provenance:
+      source: "https://arxiv.org/pdf/2512.02498"
+      locator: "E_DOTSOCR_VLM_FIM_A_FIM (https://arxiv.org/pdf/2512.02498, tier 7, 3-0) confrontada com o requisito dominante do enunciado (\"um erro de leitura produz uma superacao errada em silencio\") — inversao de sinal da mesma propriedade arquitetural"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_2_CE_MEDE_ACORDO_NAO_CORRECAO
     node_type: evidence
@@ -275,6 +299,10 @@ nodes:
     source_kind: analysis
     label: 'OBJECAO SOBREVIVENTE 2 — CE MEDE CONCORDANCIA, NAO CORRECAO. A garantia utilizavel do paper e a direcao entropia-alta implica provavelmente-errado; a decisao precisa da CONVERSA (entropia-baixa implica confiavel), que NAO esta estabelecida e que falha justamente por erro CORRELACIONADO: PaddleOCR-VL, dots.ocr e MinerU 2.5 sao VLMs de backbone e dados sinteticos de linhagem proxima (familia Qwen-VL), logo erram JUNTOS e com confianca no MESMO trecho ocluido. Pior: o proprio dossie marcou como refutada a proposicao "quando os VLMs erram, as predicoes divergem" — a perna de sustentacao do CE — e manteve o ACHADO 2 como confirmado. Isso e CONTRADICAO INTERNA do dossie, nao evidencia. E o custo nunca foi precificado: CE exige 3 ou mais stacks pesados instalados num projeto declarado dependency-light. Consequencia operacional (nao anula o procedimento, o RESTRINGE): consenso so vale entre arquiteturas e linhagens de treino diferentes, e a saida de baixa entropia NAO autoriza aceitar a leitura sem humano nas paginas vinculantes.'
     trace: 'https://arxiv.org/html/2504.11101'
+    provenance:
+      source: "https://arxiv.org/html/2504.11101"
+      locator: "E_CONSENSUS_ENTROPY_SEM_TREINO (https://arxiv.org/html/2504.11101, tier 7, 3-0) confrontada com a propria lista de refutadas desta rodada, que marcou \"refutada\" a proposicao \"quando os VLMs erram, as predicoes divergem\" — a perna de sustentacao do mesmo achado"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_3_ARGUMENTO_DO_SILENCIO_FALTA_MEDICAO
     node_type: evidence
@@ -288,6 +316,10 @@ nodes:
     source_kind: analysis
     label: 'OBJECAO SOBREVIVENTE 3 — DECISIVO COMO CONCLUSAO, ARGUMENTO DO SILENCIO COMO EVIDENCIA. Que o motor nao exponha confidence nativo mata o candidato no requisito dominante (sem confidence nao ha triagem dirigida) — isso vale. Mas "o README nao menciona carimbo" NAO MEDE NADA: nenhum README de OCR menciona carimbo. E o achado foi registrado como ressalva LATERAL enquanto o arco do dossie seguia apontando dots.ocr como estado da arte — a ressalva nao mudou a conclusao que ela contradiz. O que falta e a unica coisa que resolveria: rodar o motor nas 3 paginas VINCULANTES reais e CONTAR os erros. Sem isso, tanto o elogio quanto a ressalva sao DECLARACAO — e a doutrina do repo e behavior-over-declaration (docs/knowledge-base/agentic-patterns/ai-strategies/behavior-over-declaration.md): confie no que o artefato FAZ, nao no que declara de si.'
     trace: 'https://github.com/rednote-hilab/dots.ocr'
+    provenance:
+      source: "https://github.com/rednote-hilab/dots.ocr"
+      locator: "E_DOTSOCR_SEM_CONFIDENCE_NEM_CARIMBO (https://github.com/rednote-hilab/dots.ocr, tier 6, 3-0) — a metade \"nao ha mencao a robustez contra carimbo\" e ausencia em README, nao medicao; confrontada com a doutrina behavior-over-declaration do repo"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_4_DOCTR_TIER9_IRRELEVANTE_E_PESO_TORCH
     node_type: evidence
@@ -301,6 +333,10 @@ nodes:
     source_kind: analysis
     label: 'OBJECAO SOBREVIVENTE 4 — TIER 9 RESPONDENDO EIXO QUE NAO DECIDE NADA. Compatibilidade do FRAMEWORK nao e o custo: docTR carrega PyTorch ou TensorFlow, e no venv medido aqui (numpy, pillow, pypdf, openpyxl) isso e da ordem de 2,5GB de wheel mais dependencias transitivas — o oposto de dependency-light, que e requisito declarado. E o eixo que importava ficou INTOCADO: os pesos pre-treinados de reconhecimento do docTR sao de vocabulario latino majoritariamente treinado em ingles, e ninguem verificou desempenho em portugues com serifa, acentuacao e cedilha, que e o corpus real. Achado verdadeiro e IRRELEVANTE ocupando vaga de achado confirmado — o sintoma e que uma rodada com 5 confirmacoes gastou uma delas num fato que nenhuma opcao usa para vencer ou perder.'
     trace: 'https://mindee.github.io/doctr/getting_started/installing.html'
+    provenance:
+      source: "https://mindee.github.io/doctr/getting_started/installing.html"
+      locator: "E_DOCTR_PYTHON_311_PLUS (https://mindee.github.io/doctr/getting_started/installing.html, tier 9, 3-0) confrontada com o venv real do projeto (/opt/venv: numpy, pillow, pypdf, openpyxl) e com o requisito (c) do enunciado"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_5_SURYA_CONFLACAO_DE_GERACOES
     node_type: evidence
@@ -314,6 +350,10 @@ nodes:
     source_kind: analysis
     label: 'OBJECAO SOBREVIVENTE 5 — SUSPEITA DE CONFLACAO DE GERACOES DENTRO DO MESMO REPO. O caminho llama-server pertence a linha NOVA de modelo-fundacao (Chandra / foundation OCR), enquanto os modelos CLASSICOS de deteccao e reconhecimento do Surya sao PyTorch e rodam em CPU sem llama.cpp. O dossie nao distingue as duas, e a distincao muda INTEIRAMENTE o custo de instalacao — que e o requisito (c). Some-se que TODAS as demais proposicoes sobre Surya foram marcadas refutada (87,2%; Pareto-otimo; confidence por bloco) e uma disconfirmadora foi cortada por orcamento ("ultimo lugar em todos os conjuntos"): o corpo de evidencia sobre Surya e mutuamente contraditorio e NAO FOI RECONCILIADO. Nenhuma recomendacao pode se apoiar nele. Confianca 0.7 (nao 0.8) porque a propria suspeita e inferencia sobre a estrutura do repo, e nao foi verificada abrindo o repo — o que a torna, ela tambem, uma tarefa de medicao pendente.'
     trace: 'https://github.com/datalab-to/surya'
+    provenance:
+      source: "https://github.com/datalab-to/surya"
+      locator: "E_SURYA_CPU_EXIGE_LLAMACPP (https://github.com/datalab-to/surya, tier 7, 3-0) confrontada com as 4 proposicoes tier 7 do MESMO repo marcadas refutada sem evidencia e com a disconfirmadora cortada por orcamento — corpo de evidencia mutuamente contraditorio"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_6_CUSTO_INSTALACAO_POR_IMPRESSAO
     node_type: evidence
@@ -327,6 +367,10 @@ nodes:
     source_kind: analysis
     label: 'OBJECAO SOBREVIVENTE 6 (descartado por comodismo) — REFUTACAO SEM EVIDENCIA CONTRA FONTE TIER 9. A proposicao "pip install python-doctr instala so o nucleo, extras a parte" veio de doc oficial (tier 9) e foi marcada refutada sem nenhuma evidencia registrada. O desfecho provavelmente esta certo — mas por um motivo que NINGUEM MEDIU e que vale para TODOS os candidatos VLM, nao so para o docTR. Faltou o teste de 1 comando neste venv: `pip install --dry-run python-doctr` e ver se torch entra na arvore. Enquanto isso nao for medido, o requisito (c) — custo de instalacao e pegada de dependencia, um dos cinco eixos explicitos da pergunta — segue respondido POR IMPRESSAO em todo o dossie, e nao apenas para o docTR. Este e o defeito de metodo mais barato de curar da rodada inteira: um comando por candidato, offline, sem sair da maquina.'
     trace: 'https://mindee.github.io/doctr/getting_started/installing.html'
+    provenance:
+      source: "https://mindee.github.io/doctr/getting_started/installing.html"
+      locator: "proposicao tier 9 (doc oficial docTR, https://mindee.github.io/doctr/getting_started/installing.html) marcada \"refutada\" na lista desta rodada SEM evidencia registrada; e o teste de 1 comando que a decidiria (`pip install --dry-run python-doctr` neste venv) nunca foi executado"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_7_DESACORDO_REFUTADO_SUSTENTA_CE
     node_type: evidence
@@ -340,6 +384,10 @@ nodes:
     source_kind: analysis
     label: 'OBJECAO SOBREVIVENTE 7 (descartado por comodismo) — O DOSSIE AFIRMA AS DUAS COISAS. "O desacordo entre motores independentes e sinal detectavel de erro" e a PERNA DE SUSTENTACAO do ACHADO 2, e foi refutada sem evidencia enquanto o achado que dela depende ficou confirmado. Ou o desacordo e sinal (e o CE se sustenta), ou nao e (e o CE cai junto) — nao ha terceira leitura. Faltou olhar a secao de RESULTADOS do proprio 2504.11101 e separar as duas direcoes (alta-entropia implica erro vs. baixa-entropia implica acerto), que e a unica leitura que decide o requisito (d) da pergunta. Consequencia pratica enquanto isso nao for feito: o roteamento por divergencia pode ser usado para ESCALAR ao humano (direcao segura), NUNCA para dispensar o humano quando os motores concordam (direcao nao estabelecida).'
     trace: 'https://arxiv.org/html/2504.11101'
+    provenance:
+      source: "https://arxiv.org/html/2504.11101"
+      locator: "proposicao tier 7 (https://arxiv.org/html/2504.11101) \"o desacordo entre motores independentes e sinal detectavel de erro\" marcada refutada sem evidencia, enquanto E_CONSENSUS_ENTROPY_SEM_TREINO, que dela depende, foi mantida confirmada"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_8_SURYA_QUATRO_REFUTADAS_EM_BLOCO
     node_type: evidence
@@ -353,6 +401,10 @@ nodes:
     source_kind: analysis
     label: 'OBJECAO SOBREVIVENTE 8 (descartado por comodismo) — QUATRO TIER 7 REFUTADAS EM BLOCO, ZERO EVIDENCIA. Refutar em bloco proposicoes da mesma fonte e decisao sobre a FONTE, nao sobre cada proposicao — e se a fonte fosse desqualificada, a quinta proposicao dela (llama.cpp em CPU) tambem cairia, e ela foi mantida CONFIRMADA. O criterio foi aplicado de forma inconsistente dentro da mesma URL. E uma das quatro custa caro: "Surya expoe confidence score por bloco (probabilidade media por token)" e o UNICO mecanismo NATIVO de confianca citado em todo o dossie fora do TSV do Tesseract — ou seja, refutou-se sem evidencia justamente o item que responderia o requisito (d). Cura barata e offline: abrir o repo e verificar se a API devolve o campo, em vez de decidir por impressao sobre a fonte inteira.'
     trace: 'https://github.com/datalab-to/surya'
+    provenance:
+      source: "https://github.com/datalab-to/surya"
+      locator: "quatro proposicoes tier 7 da MESMA fonte (https://github.com/datalab-to/surya) marcadas refutada sem evidencia registrada para nenhuma delas: 87,2% em 91 idiomas; Pareto-otimo sub-3B com 83,3% no olmOCR-bench; confidence score por bloco; ausencia de dados sobre robustez a carimbo"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   # ── evidência confirmada -> pergunta ─────────────────────────────────────────────────

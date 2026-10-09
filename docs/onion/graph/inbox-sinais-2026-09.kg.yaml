@@ -27,6 +27,10 @@ nodes:
     verified_against: 'os dez lidos integralmente; afirmacoes centrais reproduzidas no core'
     trace: 'docs/evolution/inbox/'
     label: "Dez sinais, quatro adotantes (jogo-da-vida, venda-direta-pdi, arandek, portal-gamificacao), 2026-08-27 a 2026-09-11. Cinco chegaram DURANTE esta sessao, entregues untracked pelo carteiro. Medicao antes do veredito derrubou numeros em dois deles: o de 2026-09-11 afirma `1 SUPERSEDES decisao-para-decisao no corpus inteiro, 18 de 20 sao decisao-para-pergunta` e o corpus tem 207 arestas com 10 decisao-para-decisao e 12 decisao-para-pergunta — proporcao equilibrada, nao 1 contra 18; provavelmente mediram o proprio repo e generalizaram. O mesmo sinal diz `kg-freshness: 0 execucoes em 34 dias`, que caducou no dia anterior quando o R0 rodou 16 workers. O restante das afirmacoes verificaveis SE REPRODUZIU."
+    provenance:
+      source: "docs/evolution/inbox/"
+      locator: "os dez lidos integralmente; afirmacoes centrais reproduzidas no core"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_A_PERNA_DE_LEITURA_TEM_PRECO
     node_type: evidence
@@ -38,6 +42,10 @@ nodes:
     verified_against: 'grep por kg.yaml em .claude/hooks/ devolve VAZIO; drifted=0 em 3715 nos'
     trace: 'docs/knowledge-base/concepts/knowledge-graph-sdaal.md:287-297'
     label: "O ADOTANTE MEDIU O PRECO DA LACUNA QUE O CORE JA CONHECIA. O aviso 10 da propria KB diz que a perna de LEITURA foi anunciada como mecanismo e e conselho — nenhum hook le `.kg.yaml` (confirmado: grep vazio). O custo agora tem numero: um agente gastou UM DIA, leu 8.585 linhas de fonte em quatro frentes paralelas e publicou QUATRO teses erradas em sequencia, todas derrubadas pelo autor e nenhuma pelo metodo, num repo cujo `maagica.kg.yaml` respondia a pergunta central em QUATRO nos. O agravante: ele CITOU o grafo no proprio prompt — como checklist de conferencia, nunca como fonte de verdade. Nao foi falta de acesso nem de contexto: foi falta de mecanismo. A frase que o sinal cunha e agora medicao: `o grafo que nao e lido e indistinguivel do grafo que nao foi escrito`. E vale para mim: passei esta sessao inteira sem abrir grafo antes de agir."
+    provenance:
+      source: "docs/knowledge-base/concepts/knowledge-graph-sdaal.md:287-297"
+      locator: "grep por kg.yaml em .claude/hooks/ devolve VAZIO; drifted=0 em 3715 nos"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ONZE_PONTOS_ONDE_A_DOUTRINA_PROMETE_E_O_CODIGO_NAO_FAZ
     node_type: evidence
@@ -49,6 +57,10 @@ nodes:
     verified_against: 'tres achados reproduzidos por medicao direta no core'
     trace: '.claude/validation/kg-radar.sh'
     label: "Um adotante foi LER a doutrina para construir em cima dela e conferiu se e verdade no codigo — em onze pontos nao e, cada um com arquivo:linha dos DOIS lados. Reproduzi tres por medicao direta: (2) o radar NAO detecta ciclo `DEPENDS_ON` — `grep ciclo` = 0, e `A->B->A` passa com exit 0, embora a KB prometa que a integridade reprova; (6) o motor NAO le `valid_from`/`source_tier`/`source_kind` — grep = 0 — e NOVE grafos ja preenchem `valid_from` para um consumidor que nao existe; (9) `drifted` = 0 em 3.715 nos, com o slot construido, peso 1.3 e racional escrito. PLACAR das cinco reprovacoes prometidas na KB: UMA implementada (orfaos), tres ausentes, uma rebaixada a aviso. A lista correta do que barra esta no cabecalho do motor, nao na KB. `A perna de escrita funciona; a de leitura e a de reconciliacao, nao`."
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "tres achados reproduzidos por medicao direta no core"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_A_FILA_KG_INBOX_NAO_PASSA_NO_PROPRIO_GATE
     node_type: evidence
@@ -60,6 +72,10 @@ nodes:
     verified_against: 'fixture de proposta com UM no: kg-radar --integrity --schema devolve rc=1, no orfao'
     trace: '.claude/validation/kg-radar.sh (secao INTEGRIDADE)'
     label: "DOIS CONTRATOS DO FRAMEWORK SE CONTRADIZEM, e reproduzi em 30 segundos: o `kg-inbox/README.md` manda propor UM no num `.proposal.kg.yaml`; a integridade do radar exige grau >= 1 em todo no, e aresta precisa de dois nos NO MESMO ARQUIVO. Logo uma proposta de um no so — que e o caso comum e o que o README descreve — NUNCA passa. Fixture medida: rc=1, `no orfao (grau 0)`. E o `ci.yml` que a adocao instala varre TODO `.kg.yaml` versionado fora de `fixtures/`, entao commitar a proposta pelo caminho DOCUMENTADO deixa o CI vermelho ate o dono selar. AGRAVANTE MEDIDO NESTA SESSAO: instalei essa fila no `granaa-ai` uma hora antes de ler o sinal — todo adotante a herda quebrada, e o primeiro que usar descobre por reprovacao."
+    provenance:
+      source: ".claude/validation/kg-radar.sh (secao INTEGRIDADE)"
+      locator: "fixture de proposta com UM no: kg-radar --integrity --schema devolve rc=1, no orfao"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_AUSENCIA_LIDA_COMO_RESULTADO_EM_TRES_SITIOS
     node_type: claim
@@ -71,6 +87,10 @@ nodes:
     verified_against: 'tres sitios medidos: inventory.sh:38, co-deliver.sh:101, verify-adopter-gate.sh:31'
     trace: '.claude/validation/inventory.sh:38'
     label: "CLASSE com TRES sitios, e o terceiro achei sozinho hoje, adotando. (1) `inventory.sh:38` pergunta `ha git?` e nao `houve resultado?` — no greenfield o framework esta copiado mas untracked, `git ls-files` volta vazio, o fallback nunca dispara, e a SSOT sai com 0 comandos e rc=0. (2) `co-deliver.sh:101` valida o alvo com `[ -d ]` — qualquer diretorio gravavel e destino valido; custo medido pelo arandek: uma mensagem entregue no checkout errado ficou 26 DIAS sem tratamento. (3) `ops/verify-adopter-gate.sh:31` usava `[ -d .git ]`, que e FALSO em worktree — e a adocao legacy/regulated SEMPRE instala em worktree, entao o passo BLOQUEANTE da prova de vida do gate falhava em 100% desse modo. O proprio instalador que o chama ja usava `rev-parse --git-dir`, a forma certa, uma linha acima: as duas pontas discordavam. CURADO hoje. As tres perguntam a coisa errada — e `harness-inventory.sh`, que nasceu nesta onda, herdou a mesma: 5 scripts e 14 hooks em disco, emite 0 nos quatro contadores."
+    provenance:
+      source: ".claude/validation/inventory.sh:38"
+      locator: "tres sitios medidos: inventory.sh:38, co-deliver.sh:101, verify-adopter-gate.sh:31"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SINAL_CURADO_SEM_AVISAR_QUEM_REPORTOU
     node_type: evidence
@@ -82,6 +102,10 @@ nodes:
     verified_against: 'os tres defeitos do sinal de 2026-08-27 medidos como curados; o sinal seguia no inbox'
     trace: 'docs/evolution/inbox/_processed/2026-08-27-adopt-greenfield-tres-defeitos.md'
     label: "O `venda-direta-pdi` reportou TRES defeitos de adocao greenfield em 2026-08-27. Medidos em 2026-09-11: os tres estao curados — crase escapada, `source_commit` com fallback (comentario datado 09-02), e o `regen-baselines` com guarda de stamp movido para depois do carimbo (dogfood 09-05). O sinal ficou QUINZE DIAS no inbox como se estivesse pendente, e o remetente nunca soube. MESMA CLASSE do anuncio do arandek, com o sinal invertido: la a medicao existia e nao viajou; aqui a CURA existia e nao viajou. O doc-bridge tem produtor e carteiro, e NAO TEM o ato de fechar o laco com quem reportou."
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-08-27-adopt-greenfield-tres-defeitos.md"
+      locator: "os tres defeitos do sinal de 2026-08-27 medidos como curados; o sinal seguia no inbox"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: I_LIGAR_A_PERNA_DE_LEITURA
     node_type: decision
@@ -210,6 +234,10 @@ nodes:
     verified_against: 'fixture reproduzida no core: PyYAML ve 2 nos, kg-radar anuncia 3 nos 2 arestas, ambos os gates rc=0'
     trace: '.claude/validation/kg-radar.sh'
     label: "Sinal do venda-direta-pdi (pin 5dcc706b2233), REPRODUZIDO no core em 30 segundos: um `.kg.yaml` PERFEITAMENTE VALIDO em que os dois leitores veem grafos DIFERENTES com todos os gates verdes. Um no `B_ESCONDIDO` escrito DENTRO do bloco `label: |` de outro, com aresta SUPPORTS saindo dele. PyYAML ve 2 nos; o `kg-radar.sh` — QUE E QUEM EMITE O VEREDITO — anuncia `3 nos, 2 arestas`, e o no forjado pesa na centralidade. A REGRA 78 (`.kg.yaml` versionado e YAML VALIDO, com catraca) sai rc=0 e esta CERTA: o arquivo E valido. Causa: o matcher casa `- id:` com QUALQUER indentacao dentro de `nodes:`, sem rastrear blocos literais — permissividade correta para um motor awk, e o preco declarado da economia de motores. A REGRA 78 fechou a metade SINTATICA; a do CENSO estava aberta. MESMA CLASSE ja registrada: o docstring da REGRA 78 diz que `foi essa fresta que permitiu forjar uma aresta REFUTES DENTRO de um label`."
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "fixture reproduzida no core: PyYAML ve 2 nos, kg-radar anuncia 3 nos 2 arestas, ambos os gates rc=0"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_PARIDADE_DE_CENSO_VIRA_REGRA
     node_type: decision
@@ -230,6 +258,10 @@ nodes:
     verified_against: 'reproduzido antes (rc=1, no orfao) e depois (rc=0, MODO PROPOSTA anunciado); familia kg_proposal_mode 7/7; mutante da poda de comentario EXECUTADO e reprovado'
     trace: '.claude/validation/kg-radar.sh'
     label: "A contradicao entre os dois contratos esta fechada: o radar reconhece `meta.target` OU o sufixo `.proposal.kg.yaml` e entra em MODO PROPOSTA, relaxando EXATAMENTE duas cobrancas — grau 0 e referencia para fora do arquivo — e CONTANDO as duas na saida. Todo o resto (id duplicado, chave repetida, node_type, plane, layer, status, impact, confidence, edge_type) continua reprovando, provado por mutante que EXECUTA. O modo nunca e silencioso: imprime `MODO PROPOSTA` e por qual gatilho entrou. Nao-regressao medida em 40 grafos vivos, zero. Os dois READMEs (core e o starter que o /meta:adopt escreve no adotante) ganharam o exemplo que PASSA, e o exemplo do core foi extraido do doc e rodado VERBATIM — foi esse dogfood que achou um defeito meu: o parser engolia o comentario YAML inline, e `target` e o CAMINHO que a selagem consome."
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "reproduzido antes (rc=1, no orfao) e depois (rc=0, MODO PROPOSTA anunciado); familia kg_proposal_mode 7/7; mutante da poda de comentario EXECUTADO e reprovado"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PARIDADE_DE_CENSO_E_REGRA_82
     node_type: evidence
@@ -241,6 +273,10 @@ nodes:
     verified_against: 'corpus do core: 128 grafos, 124 medidos, 0 HARD; fantasma forjado pego e NOMEADO; familia kg_census_parity 6/6; mutante da ancora fixa EXECUTADO e reprovado por 3 casos'
     trace: '.claude/validation/kg-census-parity-check.sh'
     label: "A REGRA 82 (Os dois leitores do corpus CONCORDAM sobre quem e no) esta no lint, irma da REGRA 78 e com a mesma catraca. O motor REPLICA a maquina de estados do radar linha a linha, e isso nao e estilo: o caso (d) da bancada confronta os DOIS contadores no mesmo arquivo e exige igualdade, e o mutante que ancora em dois espacos fixos — o defeito exato que a 1a guarda do adotante tinha — reprova em TRES casos. Medido no corpus real: 0 HARD em 128 grafos; os 4 nao-medidos sao passivo da REGRA 78 e saem roteados para ela, nunca como silencio nem como paridade OK. Sem divergencia, o baseline nasce desnecessario e qualquer divergencia nova ja e HARD."
+    provenance:
+      source: ".claude/validation/kg-census-parity-check.sh"
+      locator: "corpus do core: 128 grafos, 124 medidos, 0 HARD; fantasma forjado pego e NOMEADO; familia kg_census_parity 6/6; mutante da ancora fixa EXECUTADO e reprovado por 3 casos"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: E_A_PERNA_DE_LEITURA_TEM_PRECO

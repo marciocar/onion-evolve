@@ -71,6 +71,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 8, 3-0): "O sistema de documentacao Divio (precursor do Diataxis) define exatamente quatro tipos de documentacao — tutoriais, how-to guides, reference e explanation — como framework consagrado e amplamente adotado." ⚠️ O QUE ESTA CLAIM NAO DIZ, e a rodada tentou fazer dizer: ela estabelece uma TAXONOMIA de 4 tipos, nao uma SEQUENCIA de consumo. Cinco claims desta mesma rodada que atribuiam ordem progressiva ao Diataxis/Divio foram REFUTADAS. Autoridade sobre taxonomia nao e autoridade sobre ordem — ver E_OBJECAO_1.'
     trace: 'https://docs.divio.com/documentation-system/'
+    provenance:
+      source: "https://docs.divio.com/documentation-system/"
+      locator: "https://docs.divio.com/documentation-system/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_DISCLOSURE_TETO_DUAS_CAMADAS
     node_type: evidence
@@ -84,6 +88,10 @@ nodes:
     source_kind: analyst
     label: 'CONFIRMADA (tier 7, 2-1 — consenso fragil): "Mais de 2 niveis de progressive disclosure tende a ter baixa usabilidade — o teto recomendado e essencial + avancado (2 camadas), nao uma cascata de N camadas." ⚠️ DOMINIO DE ORIGEM: o artigo trata de OPCOES DE INTERFACE (quantos controles mostrar numa tela), nao de sequenciamento pedagogico de slides; a ponte de dominio nao foi estabelecida na rodada. E o teto que ela recomenda JA e pratica de campo aqui: o deck versionado tem 52 slides com 18 marcados `short:1` = exatamente 2 camadas. Ver E_OBJECAO_2.'
     trace: 'https://www.nngroup.com/articles/progressive-disclosure/'
+    provenance:
+      source: "https://www.nngroup.com/articles/progressive-disclosure/"
+      locator: "https://www.nngroup.com/articles/progressive-disclosure/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1), o consenso mais fragil da rodada"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_DIATAXIS_CANONICAL_SEPARACAO
     node_type: evidence
@@ -98,6 +106,10 @@ nodes:
     source_kind: engineer
     label: 'CONFIRMADA (tier 6, 3-0): "O framework Diataxis define quatro tipos distintos de documentacao (tutorials, how-to guides, reference, explanation), cada um com proposito, forma e estilo proprios, e recomenda mante-los estruturalmente separados." ⚠️ NAO E CONFIRMACAO INDEPENDENTE de E_DIVIO_QUATRO_TIPOS_DOCUMENTACAO: e a MESMA doutrina numa fonte de tier MENOR (6 vs 8). Contar as duas como dois achados infla a base probatoria — ver E_OBJECAO_3. A palavra operativa aqui e SEPARADOS, que e o oposto de ordenados: um deck e artefato LINEAR de fluxo unico e por construcao MISTURA tutorial+explanation no mesmo stream.'
     trace: 'https://ubuntu.com/blog/diataxis-a-new-foundation-for-canonical-documentation'
+    provenance:
+      source: "https://ubuntu.com/blog/diataxis-a-new-foundation-for-canonical-documentation"
+      locator: "https://ubuntu.com/blog/diataxis-a-new-foundation-for-canonical-documentation — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_NAVEGACAO_EXPECTATIVAS_EXPLICITAS
     node_type: evidence
@@ -111,6 +123,10 @@ nodes:
     source_kind: analyst
     label: 'CONFIRMADA (tier 7, 3-0): "A progressao deve ter mecanica de navegacao clara, com expectativas explicitas sobre o que cada nivel contem, para o usuario decidir se aprofunda." ⚠️ DELTA ACIONAVEL MEDIDO = ZERO em duas frentes. (i) A claim e quase tautologica e nao discrimina NENHUMA ordem — serve para qualquer arco, e a pergunta era sobre ordem. (ii) Ja esta entregue no artefato: medido no deck versionado — rotulos "Mapa", "Clique para saltar", "navegar", "caminho curto", "essenciais" todos presentes. Ver E_OBJECAO_4.'
     trace: 'https://www.nngroup.com/articles/progressive-disclosure/'
+    provenance:
+      source: "https://www.nngroup.com/articles/progressive-disclosure/"
+      locator: "https://www.nngroup.com/articles/progressive-disclosure/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0). MESMA URL de E_DISCLOSURE_TETO_DUAS_CAMADAS"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EIXO MERCADO/CAPITAL (invariante — cláusula 4) ───────────────────────────────────
   - id: E_MERCADO_DECK_PATTERNS_0924
@@ -251,6 +267,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 1 — ERRO DE CATEGORIA + JA ERA CORPUS. (i) O Divio/Diataxis e um MAPA de 4 tipos INDEPENDENTES cuja regra de ouro e a SEPARACAO ESTRUTURAL; ele nao prescreve ordem de consumo — e o proprio Scope confirma, porque as 5 claims que atribuiam ordem a ele foram REFUTADAS. Autoridade que nada diz sobre sequencia nao pode ser usada como autoridade sobre "a ORDEM correta", que e a pergunta do maestro. (ii) Pior para o meio: um deck e artefato LINEAR de fluxo unico e obrigatoriamente MISTURA tutorial+explanation no mesmo stream, exatamente o que o Diataxis proibe — aplicar Diataxis a deck importa uma regra que o meio viola por construcao. (iii) Nao e conhecimento novo: MEDIDO — educational-design-guidelines.md l.30, diretriz 5, cita Diataxis verbatim como fundamento VINCULANTE desde 2026-07-05. O achado tier-8 gastou orcamento para trazer de fora o que a casa ja tinha assinado.'
     trace: 'docs/knowledge-base/education/applications/educational-design-guidelines.md'
+    provenance:
+      source: "docs/knowledge-base/education/applications/educational-design-guidelines.md"
+      locator: "Objecao do Elenxo (1 agente, sem votacao) cruzada com medicao propria nesta sessao: grep -n \"Diataxis\\|Zettelkasten\" docs/knowledge-base/education/applications/educational-design-guidelines.md devolve l.30 com o texto verbatim \"convergencia Zettelkasten (literature!=permanent notes) - Diataxis (reference!=how-to)\", na coluna \"vinculante\", com \"decisao do maestro 2026-07-05\"; e o proprio Scope registra 5 claims refutadas que atribuiam ordem ao Diataxis"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_2_DISCLOSURE_SEM_PONTE_E_TETO_JA_FEITO
     node_type: evidence
@@ -277,6 +297,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 3 — DUPLA CONTAGEM DE CONFIANCA. O achado 3 e o MESMO conteudo do achado 1 numa fonte de tier MENOR (6 vs 8), contado como confirmacao independente; e os achados 2 e 4 saem da URL IDENTICA da NN/g. Somando: "4 achados confirmados" sao 2 FONTES. E nenhuma das duas e documentacao de onboarding de framework — o objeto que o Scope se propos a estudar (Kubernetes, Terraform, React, Rails, Docker, Stripe: todos na lista de fonte nao lida). A base probatoria do veredito "consagrado" e: 1 taxonomia de docs + 1 artigo de UI. Isto e o que torna (F) um gate e nao uma preferencia.'
     trace: 'https://www.nngroup.com/articles/progressive-disclosure/'
+    provenance:
+      source: "https://www.nngroup.com/articles/progressive-disclosure/"
+      locator: "Objecao do Elenxo (1 agente, sem votacao) verificavel no proprio payload da rodada: achados 1 e 3 sao a doutrina Diataxis (docs.divio.com tier 8 e ubuntu.com tier 6); achados 2 e 4 citam a URL IDENTICA https://www.nngroup.com/articles/progressive-disclosure/. 4 claims, 2 URLs-fonte"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_4_NAVEGACAO_NAO_DISCRIMINA_E_JA_ENTREGUE
     node_type: evidence
@@ -303,6 +327,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 5 — FALSO NEGATIVO DE MEDICAO, e o defeito mais caro da rodada: foi ele que licenciou importar ordem de fora por cima da doutrina da casa. O censo consultou so a camada .kg.yaml com termos em pt-BR; a resposta vive na camada KB e nas skills, e eu confirmei os quatro sitios: (1) education/theories/{srl-zimmerman.md,plea-rosario.md} — autorregulacao (planificar->executar->avaliar) com RCT peer-reviewed citado; (2) education/applications/educational-design-guidelines.md v1.3.0 — 9 diretrizes VINCULANTES (fases SRL explicitas; avaliacao forcada com os 3 rotulos gate tecnico/estrutural/ritual; fidelidade ao design system do alvo; jargao assina 1x nos creditos e desaparece do fluxo); (3) concepts/onion-guided-lifecycle.md — "Orient -> Activate -> Reinforce" com progressive disclosure JA dimensionado ("3 perguntas criticas + avancado adiado" = o teto de 2 camadas do achado 2, datado de jul/2026) e guardado pela REGRA 41; (4) .claude/skills/onion-onboarding/SKILL.md — LEI DE ORDEM explicita. Corpus DECLARADO vazio != corpus vazio. CURA DE MECANISMO que esta objecao pede (e que vale independentemente do selo da decisao): o censo de corpus precisa varrer KB e skills, nao so .kg.yaml — hoje ele e cego para a metade da casa que mais tem doutrina assinada.'
     trace: '.claude/skills/onion-onboarding/SKILL.md'
+    provenance:
+      source: ".claude/skills/onion-onboarding/SKILL.md"
+      locator: "Objecao do Elenxo (1 agente, sem votacao) cruzada com medicao propria nesta sessao — os 4 sitios existem e dizem o que ela afirma: ls docs/knowledge-base/education/theories/ = plea-rosario.md, srl-zimmerman.md; educational-design-guidelines.md l.3 \"Versao 1.3.0 | 2026-07-05\" e l.27 diretriz 2 com \"Fan et al. 2025, RCT peer-reviewed\" (srl-zimmerman.md l.53: BJET 56(2), DOI 10.1111/bjet.13544, N=117); onion-guided-lifecycle.md l.51-52 \"Orient -> Activate -> Reinforce\" e l.45 \"3 perguntas criticas + avancado adiado\"; .claude/skills/onion-onboarding/SKILL.md l.43-45 \"comece pelo papel DELE ... Nao despeje os 6 papeis de uma vez\""
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_6_DECK_DE_65_SLIDES_NAO_EXISTE
     node_type: evidence

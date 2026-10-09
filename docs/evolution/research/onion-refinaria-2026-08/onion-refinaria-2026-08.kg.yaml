@@ -32,6 +32,10 @@ nodes:
     verified_against: wf_083d49f2-3b2
     label: "CORRECAO DE METODO (do maestro): 'uma escolha ou negativa deve vir acompanhada de uma SUGESTAO DE SUPERACAO — e nao um juiz de sim ou nao, POR ISSO CRIAMOS O ELENXO. As decisoes nem sempre sao zero e um'. O W2 refutou 5 de 5 e nao propos superacao nenhuma — isso nao e Elenxo, e maquina de dizer nao. MECANIZADO no W3 como campo OBRIGATORIO `superacao` no schema do worker, com a consequencia INVERTIDA: refutacao sem superacao e DESCARTADA (cai a refutacao, nao a proposta). RESULTADO MEDIDO: 24 vereditos, 11 refutacoes, ZERO sem superacao"
     trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+      locator: "wf_083d49f2-3b2"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_o_terceiro_termo_e_o_motor
     node_type: claim
@@ -43,6 +47,10 @@ nodes:
     verified_against: contagem-derivados-vs-bruto-53-grafos
     label: "A METAFORA TEM TRES TERMOS, e o buraco esta no terceiro: BRUTO (2.049 nos, de sobra) -> REFINO (existe e e BARATO: kg-radar em 1 grafo = 16ms) -> MOTOR (NAO EXISTE). Medido: 3 de 53 grafos tem qualquer derivado publicado (5,7%); ~76 de 2.049 nos aparecem individualmente num derivado (3,7%); commits de refino vs de bruto = 3:130. Os ~5 casos de decisao-por-derivado sao TODOS de sessoes que estavam CONSTRUINDO o instrumento — dogfood do refinador, nao consumo do refinado. VEREDITO: 'o que falta nao e uma refinaria melhor — e um MOTOR QUE PECA GASOLINA'. Consequencia de desenho: derivado sem consumidor nomeado nao entra no menu; vira pergunta"
     trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+      locator: "contagem-derivados-vs-bruto-53-grafos"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_m7_ninguem_cita_id_em_pr
     node_type: evidence
@@ -54,6 +62,10 @@ nodes:
     verified_against: gh-pr-list-merged-antes-de-2026-08-02
     label: "M7 MEDIDO — o derivado 'projecao semantica para o revisor' NAO TEM MOTOR: de 13 PRs que tocaram .kg.yaml antes do corte de contaminacao (2026-08-02), APENAS 1 cita id de no no corpo. E o unico positivo (#506) era uma sessao de Elenxo ESCREVENDO grafo — fora de quem autora, ninguem cita. A fatia minima do W3 pedia 'contar nos proximos 3 PRs'; medir RETROATIVAMENTE deu 13 casos, amostra NAO-ENVIESADA (ninguem sabia que estava sendo medido) e resposta HOJE. Custo: zero linha de codigo. MATA o item por medicao, que era o proposito dele"
     trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+      locator: "gh-pr-list-merged-antes-de-2026-08-02"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_triagem_virar_status_erraria_80pct
     node_type: evidence
@@ -65,6 +77,10 @@ nodes:
     verified_against: wf_7541c420-c55
     label: "A TRIAGEM DOS 15 JUSTIFICA A FORMA DA GUARDA: de 137 arestas SUPERSEDES, 15 apontavam para alvo ainda confirmed (6) ou open (9) — o W3 nomeou so os 6. Placar do juizo adversarial: 8 CONSTRAINS (o superseder REFINA, o alvo segue vigente) · 4 done (pergunta RESPONDIDA, nao superada) · 3 superseded. Ou seja: VIRAR O STATUS CEGAMENTE ESTARIA ERRADO EM 12 DE 15 (80%). E por isso que a guarda NOMEIA com menu de remedios em vez de reprovar mandando virar — um gate HARD que compra verde CORROMPENDO o grafo e o verde falso invertido"
     trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+      locator: "wf_7541c420-c55"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_m1_avisa_nao_reprova
     node_type: decision
@@ -76,6 +92,10 @@ nodes:
     verified_against: kg-radar-integrity.sh-53-grafos-exit-0
     label: "M1 CONSTRUIDO: o bloco RECONCILIACAO do kg-radar.sh passa a NOMEAR alvo de SUPERSEDES nao reconciliado, com mensagem POR TIPO (question -> 'fechar como done'; demais -> menu de 3 remedios). Filtro deliberado: so acusa se o SUPERSEDER estiver `confirmed` — relacao nao assentada nao cobra reconciliacao do alvo (1 dos 15 casos, E_engine_measured, tem superseder open). E AVISO, nao reprovacao: `problems` fica intocado, exit-code de ninguem muda. Verificado: 14 avisos exatos antes da triagem, 0 depois, REGRA 52 exit 0 nos 53 grafos nas duas pontas. PROMOCAO A HARD e gated — gatilho: um 16o caso aparecer DEPOIS da triagem"
     trace: ".claude/validation/kg-radar.sh"
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "kg-radar-integrity.sh-53-grafos-exit-0"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_m2_decisao_sem_ancora_70pct
     node_type: evidence
@@ -87,6 +107,10 @@ nodes:
     verified_against: "parser-python-sobre-git-ls-files-kg-yaml-sem-fixtures"
     label: "M2 SELADO (numeros re-medidos hoje, POS-triagem): 53 grafos · 356 nos node_type=decision · 135 status=confirmed · 95 SEM verified_against (70% dos confirmed) · 90 FORA do bloco de frescor por kg-radar.sh:355 (plane!=PROD e sem verified_against -> continue). O EIXO E ANCORADO/NAO-ANCORADO, nunca 'medido vs aposta': a refutacao do W3 mostrou que ~21 dos 39 verified_against nomeiam METODO ou AUTORIDADE, nao alvo — selar '39 medidos' carimbaria declaracao como medicao, o erro-de-categoria que o item existia para denunciar. O radar pode exigir que o ALVO seja escrito; nunca julgar se a medicao ocorreu"
     trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+      locator: "parser-python-sobre-git-ls-files-kg-yaml-sem-fixtures"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_m3_portabilidade_executada
     node_type: evidence
@@ -98,6 +122,10 @@ nodes:
     verified_against: "env -i PATH=/usr/bin:/bin HOME=/tmp/nohome bash <script>"
     label: "M3 — PORTABILIDADE EXECUTADA, nao estimada: dos 39 scripts em .claude/validation/, 28 saem exit 0 sob `env -i` (sem HOME, sem PATH do usuario, sem Claude Code) e 9 saem 1/2 por USAGE SEM ARGUMENTO, nao por dependencia. CORRECAO DE UM NUMERO HERDADO: a leitura anterior dizia 30/39; re-executando, os 2 'timeouts' eram ARTEFATO DO INSTRUMENTO (corte de 25s) — lint-artifacts.sh roda sob env -i em 43s e seu exit 1 e VEREDITO DE LINT, nao falha de portabilidade. Este no ACRESCENTA chao a C_POSTURA_ACOPLAMENTO; nao a edita nem a contradiz"
     trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+      locator: "env -i PATH=/usr/bin:/bin HOME=/tmp/nohome bash <script>"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_lint_granularidade_por_secao
     node_type: question
@@ -119,6 +147,10 @@ nodes:
     verified_against: taxa-de-defeito-9-numeros-em-meses
     label: "REFINAMENTO DOUTRINARIO herdado do W2 e aplicado nesta leva: taxa de defeito medida = 9 numeros errados em MESES; custo do gate (gerador + guarda + selftest + manutencao) > custo do conserto manual => MECANIZAR E A CATEDRAL. 'fix-must-become-mechanism' NAO e 'todo fix vira gate' — e 'todo fix vira mecanismo QUANDO O VOLUME JUSTIFICA'. Sem o portao 4 (o volume forca), a propria doutrina anti-catedral fabrica catedral. Aplicado: os 9 numeros de docs/technical-context viraram CONSERTO manual (PR #542), enquanto o SUPERSEDES nao-reconciliado — 15 casos vivos, classe recorrente — virou GUARDA"
     trace: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/onion-refinaria-2026-08/SYNTHESIS.md"
+      locator: "taxa-de-defeito-9-numeros-em-meses"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_m5_state_construido_e_medido
     node_type: evidence
@@ -130,6 +162,10 @@ nodes:
     verified_against: "medicao-da-propria-construcao-3-grafos-ativos-e-mutation-test"
     label: "M5 EXECUTADO — o --state como modo do kg-radar.sh, e a licao veio de MEDIR O QUE CONSTRUI, nao o que planejei. Sinal inicial: 170/211 questions do corpus estao open (80%), 91 num unico arquivo — o que MATA a fila cross-grafo, mas nao a fila POR GRAFO, que e o que a sessao abre. Redundancia medida ANTES de escrever: das 79 questions abertas nos grafos ativos, so 26% aparecem no --radar (nos dois maiores: 1 de 16 e 1 de 13). Mas a 1a versao construida cobria TODOS os open, e ao medi-la deu 51% de sobreposicao com o --radar — e 100% num grafo. Causa estrutural: ordenar por atencao devolve os mesmos nos pesados que o radar ja mostra. CORRECAO POR CONSTRUCAO: excluir o top-10 do radar => 98% novo, e os 2 restantes eram falso-positivo do meu proprio regex (id casando dentro de label), logo sobreposicao REAL = zero. Se eu tivesse commitado a 1a versao, teria entregue uma vista filtrada do que ja se via — a cerimonia que esta rodada existe para evitar. FIACAO: zero — catch-up, warm-up e engineer/work ja invocam o radar SEM flag (= --all), so a prosa que enumerava as secoes estava stale"
     trace: ".claude/validation/kg-radar.sh --state"
+    provenance:
+      source: ".claude/validation/kg-radar.sh --state"
+      locator: "medicao-da-propria-construcao-3-grafos-ativos-e-mutation-test"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_state_e_aposta_com_falsificador
     node_type: claim
@@ -149,6 +185,10 @@ nodes:
     verified_against: "lint-selftest-run-2026-08-06-caso-d-reprovou"
     label: "O MUTATION TEST PEGOU UM DEFEITO MEU, NAO DO CODIGO — e essa e a prova de que ele nao e cerimonia. A 1a fixture state-below-radar tinha os 4 abertos todos LEVES, deliberadamente abaixo do top-10; nessa configuracao remover a exclusao do top-10 e um NO-OP (nao ha aberto pesado para suprimir), logo o caso (d) NAO PODIA falhar de verdade — teste (a) forte e teste (d) vacuo na MESMA fixture. A guarda-da-guarda confirmou que a mutacao FOI aplicada, e mesmo assim a sobreposicao nao apareceu: e isso que virou o veredito vermelho. Cura: Q_PESADA_OPEN (impact 5, grau 5) — o unico caso em que a exclusao faz trabalho. Com ela: com exclusao = 4 exibidos e sobreposicao 0; sem exclusao = 5 exibidos e sobreposicao 1"
     trace: ".claude/validation/fixtures/kg-reconcile/state-below-radar.kg.yaml"
+    provenance:
+      source: ".claude/validation/fixtures/kg-reconcile/state-below-radar.kg.yaml"
+      locator: "lint-selftest-run-2026-08-06-caso-d-reprovou"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_lint_only_ja_existe_e_e_parcial
     node_type: evidence
@@ -177,6 +217,10 @@ nodes:
     verified_against: "cronometragem-do-run-completo-921s-contra-comentario-do-hook"
     label: "BEHAVIOR-OVER-DECLARATION NO GATE, medido hoje: o .githooks/pre-commit declara no proprio comentario que o self-test e mais lento, '~1min'. CRONOMETRADO: 921s = 15,3 min, 612 guardas, 0 falhas. DESVIO DE 15x. E o lugar mais caro possivel para uma declaracao falsa, porque e exatamente por esse numero que alguem decide se roda o gate local ou empurra para o CI — quem le '~1min' e recebe 15 min tende a passar a usar --no-verify, e o gate vira decorativo. MESMO MODO DE FALHA ja diagnosticado nesta rodada para o lint-artifacts.sh (o historico de ~16s so existia em memoria de sessao, nunca no repo, e a regressao para 44s cresceu invisivel). CURA APLICADA: o comentario agora carrega o numero MEDIDO e DATADO, mais a instrucao de RE-MEDIR ao mexer — carimbo versionado, que e a unica forma de a proxima regressao ser visivel. Guarda mecanica para isso segue NAO construida: seria preciso decidir onde mora o carimbo e o que faz falhar, e o volume (2 casos) ainda nao paga o gate pelo portao 4"
     trace: ".githooks/pre-commit"
+    provenance:
+      source: ".githooks/pre-commit"
+      locator: "cronometragem-do-run-completo-921s-contra-comentario-do-hook"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_m4_trace_resolve_refutou_a_spec
     node_type: evidence
@@ -188,6 +232,10 @@ nodes:
     verified_against: "medicao-1659-traces-em-54-grafos-e-contagem-de-escopo-do-freshness-tsv"
     label: "M4 EXECUTADO, e a MEDICAO REFUTOU A PROPRIA ESPECIFICACAO em dois pontos. (1) LUGAR: o W3 mandou a clausula para dentro do kg-radar --freshness-tsv; medido, dos 13 casos reais so 2 caem nesse escopo (que cobre apenas plane:PROD ou no com verified_against) — a guarda nasceria vendo 15% do defeito e DECLARANDO cobertura, falso-verde por construcao. (2) ARQUITETURA: o kg-radar tem ZERO acesso a filesystem (0 chamadas system()/getline<), e essa pureza e load-bearing — e o que o faz rodar sob env -i (a portabilidade que o M3 mediu); embutir I/O custaria a propriedade para cobrir menos. SUPERACAO: script-irmao kg-trace-resolve.sh (padrao do kg-radar-integrity.sh), cobrindo 13/13. E a FORMA do M4 tambem mudou duas vezes antes disso: a fila de 70 candidatos morreu porque 64 ja estao ancorados (91% de ruido) e porque o bloco PROVENIENCIA ja cobre ancora ausente — o que o radar NUNCA fez foi verificar se a ancora RESOLVE, que e o behavior-over-declaration virado para a propria ancora"
     trace: ".claude/validation/kg-trace-resolve.sh"
+    provenance:
+      source: ".claude/validation/kg-trace-resolve.sh"
+      locator: "medicao-1659-traces-em-54-grafos-e-contagem-de-escopo-do-freshness-tsv"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_minha_guarda_deu_fail_open
     node_type: evidence
@@ -199,6 +247,10 @@ nodes:
     verified_against: "incidente-reproduzido-e-mutation-test-que-o-mata"
     label: "O ACHADO MAIS VALIOSO DO M4 E CONTRA MIM. Durante a construcao, uma edicao minha comentou sem querer o resto da linha do awk que casa `trace:`. O parser passou a ler ZERO nos — e o script imprimiu '✅ todo trace: julgavel resolve' e saiu com EXIT 0. UMA GUARDA COMPLETAMENTE QUEBRADA REPORTANDO SUCESSO: fail-open perfeito, invisivel, e so peguei porque eu tinha um numero conhecido (1300 julgaveis) para comparar — ninguem depois de mim teria esse numero. A cura NAO foi 'prestar mais atencao' (cura nula, [[fix-must-become-mechanism]]): virou GUARDA DE VACUIDADE no proprio script (se ha `trace:` no corpus e NADA foi julgado, o parser morreu → exit 1) mais o caso (e) do selftest, um mutante que reproduz o incidente exato. Antes da guarda o mutante saia 0 com ✅; agora sai 1 com VACUIDADE. Terceira vez nesta rodada que a mesma licao aparece: verde nao verificado e o modo de falha desta casa, e a unica cura e mecanica"
     trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "incidente-reproduzido-e-mutation-test-que-o-mata"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_m4_falso_positivo_e_o_inimigo
     node_type: claim

@@ -54,6 +54,10 @@ nodes:
     source_kind: primary
     label: 'A tese do manifesto NAO e "modelo mais inteligente": e que a inteligencia de hoje e dificil de construir em cima ("the bottleneck isn''t raw intelligence"). A analogia e a "horseless carriage" — a IA atual replica o formato humano (assistente articulado e agradavel) porque assume um humano no loop. A meta declarada e economica e falsificavel: TFP global em 3% ao ano em cinco anos, sustentada por dez.'
     trace: 'https://typesafe.ai/manifesto'
+    provenance:
+      source: "https://typesafe.ai/manifesto"
+      locator: "https://typesafe.ai/manifesto — lido 2026-09-21"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MACHINE_NATIVE_INTELLIGENCE
     node_type: evidence
@@ -67,6 +71,10 @@ nodes:
     source_kind: primary
     label: 'A aposta nomeada e "Machine Native Intelligence": IA com propriedades DE SOFTWARE — estrutura, confiabilidade, observabilidade, testabilidade, velocidade, consistencia e baixo custo. A projecao que a justifica: automacao em larga escala sera ~99% maquina-para-maquina e ~1% humana. O lema interno: "Building prod, not God".'
     trace: 'https://docs.typesafe.ai/introduction/machine-learning-primer'
+    provenance:
+      source: "https://docs.typesafe.ai/introduction/machine-learning-primer"
+      locator: "https://docs.typesafe.ai/introduction/machine-learning-primer — citacao literal do bloco destacado"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CAPITAL_40M_DCVC
     node_type: evidence
@@ -81,6 +89,10 @@ nodes:
     source_kind: press
     label: 'Seed de US$ 40M liderado pela DCVC, saindo de ~2 anos de stealth; lancamento publico em 2026-09-15 com avaliacao reportada de US$ 200M (Forbes, fonte nao nomeada). Fundadores: Diogo Almeida (CEO, co-inventor de RLHF/InstructGPT, ex-OpenAI e Google Brain), Sasha Sheng (COO, ex-Meta/FAIR), Erik Gafni (CTO, fundador da Ravel). O time e descrito como vindo de OpenAI, Google Brain, Meta/FAIR, Stripe, Airbnb, Plaid e Docker.'
     trace: 'https://typesafe.ai/team'
+    provenance:
+      source: "https://typesafe.ai/team"
+      locator: "imprensa concordante em >=4 veiculos (finsmes, theaiinsider, stackfutures, runtimewire) — NAO confirmado em fonte primaria do vendor; typesafe.ai/team diz apenas \"top-tier investors\" sem nomear"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ═══════════════════ O MODELO ═══════════════════
 
@@ -96,6 +108,10 @@ nodes:
     source_kind: primary
     label: 'System One Model e uma CLASSE de modelo (nome vindo do System 1 de Kahneman: rapido e intuitivo), nao um modelo. Jev e o primeiro e unico exemplar. Ele entende linguagem natural como um LLM, mas NAO escreve texto, NAO produz codigo e NAO explica o proprio raciocinio: avalia um `state` e devolve respostas TIPADAS com distribuicao de probabilidade. O espaco de respostas e definido por quem chama, nao pelo modelo.'
     trace: 'https://docs.typesafe.ai/concepts/system-one'
+    provenance:
+      source: "https://docs.typesafe.ai/concepts/system-one"
+      locator: "https://docs.typesafe.ai/concepts/system-one — lido integral"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_RLCD_TERCEIRA_VIA_DE_POS_TREINO
     node_type: evidence
@@ -109,6 +125,10 @@ nodes:
     source_kind: primary
     label: 'RLCD (Reinforcement Learning for Calibrated Decisions) e apresentado como a TERCEIRA via de pos-treino, ao lado de RLHF (que fez chatbots) e RLVR (que fez modelos de raciocinio). O contrato de saida do RLCD: nao gerar texto, devolver decisoes + probabilidades, e probabilidade maior deve corresponder a chance maior de acerto. A critica ao RLHF e especifica: sicofancia, alucinacao com tom confiante, e MODE DROPPING (a preferencia estreita a distribuicao). O argumento tem peso incomum de proveniencia: Diogo Almeida CO-INVENTOU o RLHF que ele agora aponta como inadequado para automacao.'
     trace: 'https://docs.typesafe.ai/introduction/machine-learning-primer'
+    provenance:
+      source: "https://docs.typesafe.ai/introduction/machine-learning-primer"
+      locator: "https://docs.typesafe.ai/introduction/machine-learning-primer — as tres cartas RLHF/RLVR/RLCD"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CALIBRACAO_E_DE_GRUPO_NAO_DE_RESPOSTA
     node_type: evidence
@@ -122,6 +142,10 @@ nodes:
     source_kind: primary
     label: 'A propria doc declara o limite da calibracao, e ele e o ponto mais importante de ler direito: calibracao e medida SOBRE GRUPOS de previsoes, nao garante nada sobre UMA resposta. "Outcomes assigned a probability of 0.2 should occur about 20% of the time." Ou seja: confidence alto NAO significa resposta certa — significa que, na media de muitas respostas com aquele confidence, a taxa de acerto bate. Quem ler confidence como "certeza desta resposta" esta usando o produto errado.'
     trace: 'https://docs.typesafe.ai/concepts/system-one'
+    provenance:
+      source: "https://docs.typesafe.ai/concepts/system-one"
+      locator: "https://docs.typesafe.ai/introduction/machine-learning-primer e https://docs.typesafe.ai/concepts/system-one — a ressalva aparece nas DUAS paginas"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_TRES_PRIMITIVAS_TIPADAS
     node_type: evidence
@@ -135,6 +159,10 @@ nodes:
     source_kind: primary
     label: 'A superficie inteira sao TRES primitivas de pergunta, avaliadas em PARALELO contra um mesmo `state`, num unico POST /v1/systemone: (1) NOUL — sim/nao, devolve so um float 0..1, SEM confidence; (2) CHOICE — uma opcao de um conjunto (ate 255), devolve a escolhida + probabilidade de CADA opcao + confidence; (3) SCORE — nota contra niveis ordenados (2 a 10), devolve valor ponderado por probabilidade (pode cair ENTRE niveis, ex. 1.05) + legend + probabilidades + confidence. Cada pergunta e independente: o resultado de uma nao vira contexto oculto de outra.'
     trace: 'https://docs.typesafe.ai/api'
+    provenance:
+      source: "https://docs.typesafe.ai/api"
+      locator: "https://docs.typesafe.ai/api e https://docs.typesafe.ai/primitives — request/response literais lidos"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CONFIDENCE_E_DERIVADO_DA_DISTRIBUICAO
     node_type: evidence
@@ -148,6 +176,10 @@ nodes:
     source_kind: primary
     label: 'Confidence nao e um campo a parte que o modelo "acha": e uma estatistica DERIVADA da forma da distribuicao de probabilidades que a resposta ja carrega (concentrada = confiante, espalhada = incerta), colapsada em 0..1 por conveniencia. A doc diz explicitamente que voce nao esta preso a definicao deles — as probabilidades cruas vem na resposta. A doutrina que acompanha: "if an intelligent system, whether human or machine, cannot express honest uncertainty, the system cannot be trusted", e o limiar NAO e um numero unico — escala com a consequencia (ler saldo aceita 0.5; aprovar transferencia exige 0.9).'
     trace: 'https://docs.typesafe.ai/confidence'
+    provenance:
+      source: "https://docs.typesafe.ai/confidence"
+      locator: "https://docs.typesafe.ai/confidence — lido integral, incl. o exemplo de limiar por risco"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ O QUE O PRODUTO DECLARA DE SI, COM AS RESSALVAS ═══════════════════
 
@@ -164,6 +196,10 @@ nodes:
     source_kind: primary
     label: 'jev-1.13.0: US$ 42 por bilhao de tokens de ENTRADA (US$ 0,042/Mtok); tokens de SAIDA gratis. Rate limit 250.000 tok/s e 1.200 req/min. Contexto 64k por request (state + TODAS as perguntas) e 32k para state + a pergunta mais longa. Texto apenas — sem imagem, audio ou video. Ingles e a lingua primaria; outras, inclusive CJK, "handled but not equally well" — o que importa para um core que escreve em pt-BR. Sem fine-tune nem LoRA por cliente: os mesmos pesos servem todo mundo, e a customizacao vive no `state` e no `criteria`. A propria doc AVISA que os rate limits mudam sem aviso enquanto absorvem demanda.'
     trace: 'https://docs.typesafe.ai/models'
+    provenance:
+      source: "https://docs.typesafe.ai/models"
+      locator: "https://docs.typesafe.ai/models — tabela do jev-1.13.0"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_BENCH_AUTODECLARADO
     node_type: evidence
@@ -177,6 +213,10 @@ nodes:
     source_kind: primary
     label: 'Os numeros de vitrine (193,6x mais RAPIDO · 444,6x mais BARATO — conferidos no HTML cru da home, "193.6x Faster,<br>444.6x Cheaper.", DEPOIS de um resumo automatico ter trocado os dois rotulos · 238x mais barato que Claude Fable 5.1 na entrada · 70-500ms contra 3-329s · "zero alucinacoes") sao AUTODECLARADOS, e o merito do vendor e que ele mesmo publica as ressalvas que os desarmam: os evals de workflow foram criados "por individuos no time de capacidades do modelo"; os ganhos sao "no higher end" do mundo real; as medicoes de latencia saem de laptops na Costa Oeste, onde o servico mora; a demo lado-a-lado usa entrada "curta, densa e detalhada" que "pinta nosso modelo de forma vantajosa"; e o "zero alucinacoes" e declaradamente NAO-EMPIRICO — e conformidade de schema garantida por construcao, o que NAO impede a resposta tipada de estar errada. Tratar como claim de marketing com proveniencia honesta, nunca como medicao independente.'
     trace: 'https://typesafe.ai/'
+    provenance:
+      source: "https://typesafe.ai/"
+      locator: "https://typesafe.ai/ (home) e o blog de lancamento — numeros LIDOS, nao reproduzidos; nenhuma chamada a API nesta rodada"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_LIMITES_DECLARADOS_PELO_VENDOR
     node_type: evidence
@@ -190,6 +230,10 @@ nodes:
     source_kind: primary
     label: 'O que Jev declaradamente NAO faz: nao gera string arbitraria, nao escreve codigo, nao conversa, nao aceita imagem/audio/video, nao e determinista (a doc mantem uma FAQ "Is Jev deterministic?"), e a acuracia varia com o tamanho do state — existe uma pagina inteira chamada "Jev 1.13 jaggedness" so para isso. Teto de 255 opcoes por Choice e 10 niveis por Score. Existe um endpoint /v1/models e classes de erro HTTP convencionais (401/422/429/529), com SDKs Python e JavaScript que ja fazem backoff.'
     trace: 'https://docs.typesafe.ai/models'
+    provenance:
+      source: "https://docs.typesafe.ai/models"
+      locator: "https://docs.typesafe.ai/models, /concepts/state, /primitives — ressalvas coletadas de 3 paginas"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_QUATRO_PADROES_ARQUITETURAIS
     node_type: evidence
@@ -203,6 +247,10 @@ nodes:
     source_kind: primary
     label: 'A doc canoniza QUATRO padroes, e os nomes merecem atencao porque sao o vocabulario que o vendor esta tentando fixar: (1) SPECULATIVE FAN-OUT — mandar muitas perguntas num request, inclusive especulativas, e o codigo decide o que era relevante (barato porque o state e ingerido UMA vez); (2) CONFIDENCE-GATED ROUTING — confidence como SEGUNDO eixo: a resposta diz o que, o confidence diz SE agir; (3) COMPOSITE SCORING — quebrar um juizo complexo em notas atomicas e combinar com pesos que vivem no SEU codigo; (4) INTENT ROUTING — classificar e rotear para logica deterministica, LLM especialista ou humano.'
     trace: 'https://docs.typesafe.ai/patterns'
+    provenance:
+      source: "https://docs.typesafe.ai/patterns"
+      locator: "https://docs.typesafe.ai/patterns — tabela dos 4 + as paginas de cada um"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_AI_POWERED_SOFTWARE_CONTRA_AGENTES
     node_type: evidence
@@ -216,6 +264,10 @@ nodes:
     source_kind: primary
     label: 'A doc opoe TRES arquiteturas e escolhe a terceira EXPLICITAMENTE contra a segunda: software tradicional (arvore de decisao de primitivas confiaveis) · AGENTES LLM ("every loop introduces another opportunity to go off the rails" — funciona quando ha humano monitorando) · AI-POWERED SOFTWARE (o codigo e dono do fluxo de controle; o modelo aparece SO onde o sistema precisa de senso comum programavel). A instrucao de projeto e literal: "Avoid agent while loops when a software workflow can express the same behavior." Isto NAO e detalhe de doc: e a tese de produto, e ela e adversaria da tese agentica.'
     trace: 'https://docs.typesafe.ai/concepts/how-to-build-with-system-one'
+    provenance:
+      source: "https://docs.typesafe.ai/concepts/how-to-build-with-system-one"
+      locator: "https://docs.typesafe.ai/concepts/how-to-build-with-system-one — as tres abas de arquitetura"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_JEV_NAO_SUBSTITUI_LLM_DE_AGENTE
     node_type: evidence
@@ -229,6 +281,10 @@ nodes:
     source_kind: primary
     label: 'O vendor mantem uma pagina so para BARRAR a leitura errada: Jev NAO e substituto do LLM por tras do Claude Code, Cursor, Codex ou Copilot. Nao existe `model: "jev-latest"` que transforme um agente de codigo em agente Jev — "the two systems solve different problems". O caminho correto e o inverso: use o agente de codigo normalmente para ESCREVER codigo que chama o Jev. Esta evidencia sozinha desarma a pergunta "o Onion trocaria de modelo?" — a resposta e nao, e quem responde e o proprio vendor.'
     trace: 'https://docs.typesafe.ai/introduction/coding-agents'
+    provenance:
+      source: "https://docs.typesafe.ai/introduction/coding-agents"
+      locator: "https://docs.typesafe.ai/introduction/coding-agents — pagina dedicada a desfazer exatamente esta confusao"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SKILL_E_PLUGIN_NO_MARKETPLACE_CLAUDE_CODE
     node_type: evidence
@@ -242,6 +298,10 @@ nodes:
     source_kind: primary
     label: 'A TypeSafe distribui uma AGENT SKILL por marketplace de plugin do Claude Code: `claude plugin marketplace add typesafe-ai/skills` + `claude plugin install typesafe@typesafe-ai`, invocavel como `/typesafe:typesafe-ai`, com auto-update via /plugin e uma via cross-agent por `npx skills add`. A skill existe para dar ao agente de codigo contexto sobre a API, as primitivas e os padroes. Isto e EXATAMENTE a superficie de distribuicao que o Onion usa — e a doc deles ate lista o modo de falha que o Onion ja conhece: "A stale skill can cause this" (o agente inventa campos de request/response).'
     trace: 'https://docs.typesafe.ai/agent-skill'
+    provenance:
+      source: "https://docs.typesafe.ai/agent-skill"
+      locator: "https://docs.typesafe.ai/agent-skill — comandos de instalacao literais"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ A RELACAO COM O ONION — ANALISE (claims minhas, nao do vendor) ═══════════════════
 
@@ -346,6 +406,10 @@ nodes:
     source_kind: primary
     label: 'MEDIDO (nao lido): a auto-consistencia do Transformer como proxy da distribuicao do Jev, sem vendor nenhum. Resultado por no (distribuicao empirica / confidence 1-H/ln4 / gabarito): N1 "contexts vazios" REFUTED 1.0 / 1.00 / superseded · N2 "5 adotantes, zero frio" DRIFTED 1.0 / 1.00 / superseded · N3 "branch two-tier" CONFIRMED 0.6 DRIFTED 0.4 / 0.51 / confirmed · N4 "AUTOMATE pronto" REFUTED 1.0 / 1.00 / refuted · N5 "maestro unico relay" REFUTED 0.8 DRIFTED 0.2 / 0.64 / refuted. A MODA ACERTOU 5 DE 5 — a distribuicao NAO corrigiu veredito nenhum. O que ela entregou foi outra coisa: (a) em N3 o empate expos que o ENUNCIADO e ambiguo, nao que o modelo e fraco — metade dos workers mediu o CORE (onde nao ha branch vendor/adopt/work) e metade mediu um ADOTANTE (gustavo-pulga, onde as 4 existem), e os dois lados mediram certo; (b) em N2 o veredito foi unanime mas a CONTAGEM por baixo dele divergiu (3 workers contaram 14 adotantes, 2 contaram 13, no mesmo members.yaml, por variacao do grep) — dispersao no FATO, invisivel no veredito. Custo: 956.102 tokens de subagente, ~38.244 por julgamento, ~191.220 por no com 5x repeticao.'
     trace: 'docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/typesafe-ai-2026-09/SYNTHESIS.md"
+      locator: "25 julgamentos REAIS rodados nesta maquina: 5 nos do proprio corpus x 5 repeticoes independentes, um subagente read-only por julgamento, cada um recebendo SO o enunciado (sem ver o status: selado, para nao copiar gabarito)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_JEV_NAO_COBRE_A_PARTE_CARA
     node_type: claim
@@ -370,6 +434,10 @@ nodes:
     source_kind: primary
     label: 'O que esta rodada NAO verificou, dito antes que alguem assuma que verificou. ⚠️ ATUALIZADO 2026-09-21: o item (1) segue valendo para o VENDOR, mas a rodada deixou de ser puramente de leitura — E_AUTOCONSISTENCIA_MEDIDA_0921 e medicao propria, com 25 julgamentos reais nesta maquina. O que continua nao verificado: (1) nenhuma chamada a API da TypeSafe — sem chave, sem latencia medida, sem custo real, sem acuracia observada do Jev; (2) nenhum benchmark reproduzido — os numeros de E_BENCH_AUTODECLARADO seguem sendo do vendor; (3) a skill typesafe-ai NAO foi instalada nem lida no GitHub, so a pagina que a descreve; (4) o capital (E_CAPITAL_40M_DCVC) vem de imprensa concordante, nao de anuncio primario do vendor nem de registro; (5) o comportamento em pt-BR nao foi testado, e a doc ja avisa que nao-ingles tem acuracia menor — para um core inteiro em pt-BR esta e a lacuna mais cara.'
     trace: 'https://docs.typesafe.ai/'
+    provenance:
+      source: "https://docs.typesafe.ai/"
+      locator: "inventario do que esta rodada NAO fez — ausencia medida, nao esquecida"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: E_MANIFESTO_GARGALO_E_COMPONIBILIDADE

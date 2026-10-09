@@ -152,6 +152,10 @@ nodes:
     verified_against: ycombinator.com-rfs-summer-2026
     label: "A CATEGORIA FOI NOMEADA POR FONTE PRIMÁRIA: 'Company Brain' e uma das 15 categorias oficiais do Request for Startups Summer 2026 da Y Combinator, escrita por Tom Blomfield (General Partner, fundador do Monzo e do GoCardless). Verbatim: 'If we want every company to run on AI automation, we need a new primitive: a company brain'. Definicao da categoria: sistema que PUXA conhecimento de fontes fragmentadas, ESTRUTURA, MANTEM ATUAL, e converte num EXECUTABLE SKILLS FILE para IA. Players ja nomeados no espaco: Hyper, GBrain, Engram (US$98M em 2026-06-23), Interloom, Graphon AI, Memory Store (YC Spring 2026), MemPalace, Cognee. RESSALVA QUE NAO PODE SER PERDIDA: um RFS e LISTA DE DESEJOS DE INVESTIDOR — sinal de onde alguem quer alocar capital, NAO prova de demanda paga. Categoria nomeada != mercado provado != cliente. Nao ha um unico pull datado de adotante pedindo 'company brain'."
     trace: "https://www.ycombinator.com/rfs"
+    provenance:
+      source: "https://www.ycombinator.com/rfs"
+      locator: "ycombinator.com-rfs-summer-2026"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_three_verbs_selfcheck
     node_type: claim
@@ -164,6 +168,10 @@ nodes:
     verified_against: medicao-interna-HEAD-2026-08-02
     label: "A DEFINICAO DA YC VIRA CHECKLIST DE 3 VERBOS, E FALHAMOS NO DO MEIO. (1) ESTRUTURA: OK — 51 agentes, 11 skills, 102 comandos, KB e KG sob 6 gates HARD. (2) CONVERTE EM EXECUTABLE SKILLS FILE: OK PARCIAL — CLAUDE.md + .claude/skills/ sao consumidos a cada sessao, mas como EFEITO COLATERAL, nunca como proposta de valor declarada. (3) MANTEM ATUAL: FALHA — /meta:kg-freshness com 0 runs em 34 dias, 459/566 nos 'open' (81%) sem nenhuma data, 13/50 grafos sem verified_at. O VERBO EM QUE FALHAMOS E EXATAMENTE O QUE SEPARA 'company brain' de 'wiki'."
     trace: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/onion-market-kg-2026-08/SYNTHESIS.md"
+      locator: "medicao-interna-HEAD-2026-08-02"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_whitespace_no_unified
     node_type: evidence

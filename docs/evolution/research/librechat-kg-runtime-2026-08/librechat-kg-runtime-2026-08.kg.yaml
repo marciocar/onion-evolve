@@ -50,6 +50,10 @@ nodes:
     verified_against: "CONSTRUIDO: propose_kg_write (onion-exec, Camada 1) grava na fila docs/evolution/kg-inbox/ e NUNCA no grafo vivo — testado: proposta caiu na fila, grafo vivo intacto. A fila tem _sealed/_rejected (Aufhebung). Bridge-como-MCP Camada 1 no ar: 4 tools; Camada 2 (prompt livre) gated por ACL. Log LibreChat: 3 servers 19 tools"
     status: confirmed
     label: "WRITE-LEG (a perna critica, I3): agente LibreChat NUNCA escreve grafo de outro repo direto — escreve COMO PROPOSTA que o dono sela. Formas: (1) tool MCP de write com gate no SERVIDOR (o server e o escritor do proprio repo — caso da PoC: ingerir_documento_colado escreve porque o MCP E o dono do caso); (2) proposta em fila p/ o core selar (rima com federacao: adotante sinaliza, core sela — so muda o transporte). O 'memory' nativo do LibreChat NAO e destino de conhecimento: fonte paralela ao grafo e o anti-padrao fonte-diferente-de-derivacao"
+    provenance:
+      source: "docs/evolution/research/librechat-kg-runtime-2026-08/SYNTHESIS.md"
+      locator: "CONSTRUIDO: propose_kg_write (onion-exec, Camada 1) grava na fila docs/evolution/kg-inbox/ e NUNCA no grafo vivo — testado: proposta caiu na fila, grafo vivo intacto. A fila tem _sealed/_rejected (Aufhebung). Bridge-como-MCP Camada 1 no ar: 4 tools; Camada 2 (prompt livre) gated por ACL. Log LibreChat: 3 servers 19 tools"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: Q_ONION_KG_MCP_NEXT
     node_type: question
     trace: /home/marcio/onion-evolve/ops/mcp-onion-kg/server.py
@@ -61,6 +65,10 @@ nodes:
     verified_at: 2026-08-20
     verified_against: "CONSTRUIDO E CONECTADO na ordem do maestro (mesmo dia): server stdlib no molde da PoC, 6 tools read-only testadas (radar real, busca real, 401 sem token), systemd onion-vps-mcp-kg (boot), ufw cirurgico 3032, registrado no librechat.yaml com serverInstructions da disciplina F4b — log do LibreChat: 2 configured servers and 15 tools (9 pdi + 6 kg). Licoes: env nova exige up -d (nao restart); allowedAddresses exige host:PORT (fix da PoC selado)"
     label: "RESOLVIDA — o MCP onion-kg esta VIVO: os agentes do core tem a mesma perna read(KG) que a PoC; o write segue proposta-que-o-core-sela (fila kg-inbox CONSTRUIDA e recebendo — ver E_SERVER_LEGS_PROVEN; a SELAGEM e que segue manual — ver Q_SEALING_NO_MECHANISM)"
+    provenance:
+      source: "/home/marcio/onion-evolve/ops/mcp-onion-kg/server.py"
+      locator: "CONSTRUIDO E CONECTADO na ordem do maestro (mesmo dia): server stdlib no molde da PoC, 6 tools read-only testadas (radar real, busca real, 401 sem token), systemd onion-vps-mcp-kg (boot), ufw cirurgico 3032, registrado no librechat.yaml com serverInstructions da disciplina F4b — log do LibreChat: 2 configured servers and 15 tools (9 pdi + 6 kg). Licoes: env nova exige up -d (nao restart); allowedAddresses exige host:PORT (fix da PoC selado)"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-evolve/ops/mcp-onion-kg/server.py no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_AGENTE_VITRINE_ONION
     node_type: evidence
     layer: audit
@@ -105,6 +113,10 @@ nodes:
     verified_at: 2026-08-21
     verified_against: "protocolo versionado em DOGFOOD-PROTOCOL.md: Parte A (pernas de servidor) pre-rodada por mim com evidencia real; Parte B (comportamento-do-chat: deferencia-ao-grafo, alucinacao, write-nao-vai-para-memory, disciplina write-leg do Elenxo) entregue ao maestro p/ rodar na UI. Escopo honesto declarado: Runtime=comportamento, Dogfood=metodo, Elenxo=parcial (so write-leg), SDAAL=conhecimento"
     label: "COMO se testa a doutrina profunda na bancada: um protocolo de DOGFOOD que verifica por comportamento (nao declaracao) e ataca o MODO-DE-FALHA (a alucinacao que abriu o F4b; o furo 7/9 de nao-consulta). As 5 coisas nomeadas nao se testam igual — o protocolo declara o escopo de cada uma"
+    provenance:
+      source: "docs/evolution/research/librechat-kg-runtime-2026-08/DOGFOOD-PROTOCOL.md"
+      locator: "protocolo versionado em DOGFOOD-PROTOCOL.md: Parte A (pernas de servidor) pre-rodada por mim com evidencia real; Parte B (comportamento-do-chat: deferencia-ao-grafo, alucinacao, write-nao-vai-para-memory, disciplina write-leg do Elenxo) entregue ao maestro p/ rodar na UI. Escopo honesto declarado: Runtime=comportamento, Dogfood=metodo, Elenxo=parcial (so write-leg), SDAAL=conhecimento"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: Q_SEALING_NO_MECHANISM
     node_type: question
     trace: docs/evolution/kg-inbox/README.md
@@ -116,6 +128,10 @@ nodes:
     verified_at: 2026-08-21
     verified_against: "verificado contra o vivo: grep por kg-inbox|proposal.kg.yaml|_sealed|_rejected em .claude/commands/ e .claude/validation/ = VAZIO (nenhum /meta:* nem guarda processa a fila); e ls docs/evolution/kg-inbox/*.proposal.kg.yaml = 2 propostas pendentes (gap-web-search, grana-ai-mapeamento). A selagem e ato manual de sessao do core (README da fila)"
     label: "BURACO exposto pelo protocolo: a SELAGEM da fila kg-inbox nao tem mecanismo — nenhum /meta:* nem guarda processa a fila; a costura no grafo vivo e ato manual de sessao do core. E ja ha 2 propostas pendentes (gap-web-search, grana-ai-mapeamento). Gatilho p/ mecanizar /meta:kg-inbox = o ACUMULO (ja em 2), fix-must-become-mechanism — mas gated (nao catedral antes do volume forcar)"
+    provenance:
+      source: "docs/evolution/kg-inbox/README.md"
+      locator: "verificado contra o vivo: grep por kg-inbox|proposal.kg.yaml|_sealed|_rejected em .claude/commands/ e .claude/validation/ = VAZIO (nenhum /meta:* nem guarda processa a fila); e ls docs/evolution/kg-inbox/*.proposal.kg.yaml = 2 propostas pendentes (gap-web-search, grana-ai-mapeamento). A selagem e ato manual de sessao do core (README da fila)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: Q_MAP_LEG_GATED
     node_type: question
     layer: audit
@@ -147,6 +163,10 @@ nodes:
     verified_at: 2026-08-21
     verified_against: "CONSTRUIDO E DOGFOODADO: comando /meta:kg-inbox (.claude/commands/meta/kg-inbox.md) processa a fila — lista, radar advisory, triagem (fronteira I3 primeiro), sela (integra no grafo vivo + git mv _sealed) ou rejeita (git mv _rejected + motivo). Rodado nas 2 propostas paradas: gap-web-search SELADA neste grafo; grana-ai-mapeamento REJEITADA (contexto de negocio da Grana nao mora no core, I3). Fila 2->0"
     label: "A SELAGEM tem mecanismo: /meta:kg-inbox e o portao unico que escreve o grafo vivo a partir da fila (do core, radar exit 0 como gate de selagem). Fecha Q_SEALING_NO_MECHANISM — a fila nao acumula mais sem controle"
+    provenance:
+      source: ".claude/commands/meta/kg-inbox.md"
+      locator: "CONSTRUIDO E DOGFOODADO: comando /meta:kg-inbox (.claude/commands/meta/kg-inbox.md) processa a fila — lista, radar advisory, triagem (fronteira I3 primeiro), sela (integra no grafo vivo + git mv _sealed) ou rejeita (git mv _rejected + motivo). Rodado nas 2 propostas paradas: gap-web-search SELADA neste grafo; grana-ai-mapeamento REJEITADA (contexto de negocio da Grana nao mora no core, I3). Fila 2->0"
+      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
   - id: Q_WEB_SEARCH_GAP
     node_type: question
     layer: audit
@@ -200,6 +220,10 @@ nodes:
     verified_at: '2026-09-05'
     verified_against: 'medido no core: .claude/commands/meta/kg-inbox.md Passos 1/3/4/5 roteados por papel (guarda (e) da familia upstream_portal_fixes varre os quatro, 8 mutantes provados — inclusive o cenario em que o Passo 1 roteia e o Passo 3 recusa, que a 1a versao da guarda deixava passar); .claude/utils/adopt/starter-kg-inbox.sh cria a fila (guarda (d) EXECUTA o bloco do starter, 3 mutantes); as 2 propostas reais do corpus nao trazem meta.target, logo a invariante da fronteira foi reancorada no ATO (caminho do alvo no git ls-files), nao no campo'
     trace: 'docs/evolution/inbox/_processed/2026-09-04-kg-inbox-recusa-adotante.md'
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-09-04-kg-inbox-recusa-adotante.md"
+      locator: "medido no core: .claude/commands/meta/kg-inbox.md Passos 1/3/4/5 roteados por papel (guarda (e) da familia upstream_portal_fixes varre os quatro, 8 mutantes provados — inclusive o cenario em que o Passo 1 roteia e o Passo 3 recusa, que a 1a versao da guarda deixava passar); .claude/utils/adopt/starter-kg-inbox.sh cria a fila (guarda (d) EXECUTA o bloco do starter, 3 mutantes); as 2 propostas reais do corpus nao trazem meta.target, logo a invariante da fronteira foi reancorada no ATO (caminho do alvo no git ls-files), nao no campo"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_KG_INBOX_FORA_DO_PLUGIN
     node_type: question
@@ -212,6 +236,10 @@ nodes:
     verified_at: '2026-09-05'
     verified_against: 'medido 2026-09-05: ls plugins/onion/commands/ = 20 arquivos, kg.md e kg-freshness.md presentes, kg-inbox.md AUSENTE; grep kg-inbox nos *.manifest.sh do marketplace = 0 hits'
     trace: 'plugins/onion/commands/'
+    provenance:
+      source: "plugins/onion/commands/"
+      locator: "medido 2026-09-05: ls plugins/onion/commands/ = 20 arquivos, kg.md e kg-freshness.md presentes, kg-inbox.md AUSENTE; grep kg-inbox nos *.manifest.sh do marketplace = 0 hits"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_KG_INBOX_FORA_POR_MEDICAO_NAO_POR_ESQUECIMENTO
     node_type: evidence
@@ -223,6 +251,10 @@ nodes:
     verified_at: '2026-09-06'
     verified_against: 'medido 2026-09-06: `sed -n 8p .claude/commands/meta/kg-inbox.md` mostra `Bash(bash .claude/utils/adopt/starter-kg-inbox.sh*)` no allowed-tools; `wc -l` do starter = 39; o Passo 2 do mesmo comando (l.64-69) afirma que a proposta nasce a mao num adotante; a REGRA 61 vive em lint-artifacts.sh:1372 e a classe ALLOWED-TOOLS da REGRA 74 e a que o lint ja acusa em 3 artefatos do bundle atual'
     trace: '.claude/commands/meta/kg-inbox.md'
+    provenance:
+      source: ".claude/commands/meta/kg-inbox.md"
+      locator: "medido 2026-09-06: `sed -n 8p .claude/commands/meta/kg-inbox.md` mostra `Bash(bash .claude/utils/adopt/starter-kg-inbox.sh*)` no allowed-tools; `wc -l` do starter = 39; o Passo 2 do mesmo comando (l.64-69) afirma que a proposta nasce a mao num adotante; a REGRA 61 vive em lint-artifacts.sh:1372 e a classe ALLOWED-TOOLS da REGRA 74 e a que o lint ja acusa em 3 artefatos do bundle atual"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_ARGUMENTO_CORRIGIDO_ANTES_DO_MERGE
     node_type: evidence
@@ -234,6 +266,10 @@ nodes:
     verified_at: '2026-09-06'
     verified_against: 'a correcao foi aplicada no mesmo PR, antes do merge; o gate mecanico (lint 0 HARD) estava verde sobre a versao errada, e o achado veio da passada adversarial da REGRA 56'
     trace: 'docs/evolution/review/feat-plugin-completo-drive.md'
+    provenance:
+      source: "docs/evolution/review/feat-plugin-completo-drive.md"
+      locator: "a correcao foi aplicada no mesmo PR, antes do merge; o gate mecanico (lint 0 HARD) estava verde sobre a versao errada, e o achado veio da passada adversarial da REGRA 56"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 
 edges:

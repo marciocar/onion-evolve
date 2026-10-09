@@ -80,6 +80,10 @@ nodes:
     verified_against: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O no descreve o fio #4 (/meta:guardrails) como GATED — residuo aberto aguardando decisao do maestro. Mas o PROPRIO arquivo kg registra, 7 dias depois, que a decisao FOI tomada (D_N"
     label: "o UNICO residuo real e a superficie /meta:guardrails — GATED (fio #4 do promotion-plan). Relabel ONION-Rn amplo = docs-pass opcional; fios #2/#5 = pesquisa, nao entrega"
     trace: "docs/discussions/guardrails-nemo-lens/promotion-plan.md:34"
+    provenance:
+      source: "docs/discussions/guardrails-nemo-lens/promotion-plan.md:34"
+      locator: "censo lote 1 (run wf_87c4a44e-0ff, 2026-08-30): O no descreve o fio #4 (/meta:guardrails) como GATED — residuo aberto aguardando decisao do maestro. Mas o PROPRIO arquivo kg registra, 7 dias depois, que a decisao FOI tomada (D_N"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_INDEX_VS_DSL
     node_type: question
@@ -101,6 +105,10 @@ nodes:
     verified_against: elenxo-3-steelman-6-refutacao-1-sintese
     label: "VEREDITO: /meta:guardrails = INDICE-DE-LEITURA fortificado (lente-viva, so-leitura), NAO DSL nem hibrido. 3 propriedades nao-negociaveis: (1) lente-viva por grep AO VIVO contra os gates reais (CONFIRMADO/DIVERGENTE), nunca espelho da taxonomia-snapshot; (2) codigo proprio = so a ESTRUTURA que um grep unico nao da (join reverso arquivo->categorias + resolucao canal C1/C2/C3->R15); (3) toda linha RE-PROVADA no call-time, zero veredito PASS/FAIL novo. Restricao: o re-grep de verificacao E o mesmo do gate anti-drift da Fase 1 — UM mecanismo, nao dois. Promocao a comando GANHA por dogfood (senao: helper/companheira-de-KB)"
     trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+    provenance:
+      source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+      locator: "elenxo-3-steelman-6-refutacao-1-sintese"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_DSL_REFUTED
     node_type: evidence
@@ -166,6 +174,10 @@ nodes:
     verified_against: spike-behavior-over-declaration
     label: "VEREDITO PÓS-SPIKE: NAO construir /meta:guardrails como comando — nao se paga hoje. Os guardrails JA rodam (48 gates + selftest) e JA sao navegaveis (grep + taxonomia-KB + tabela-canal §4.1/4.2). Fecha fio #4 como resolvido-sem-comando; reabrir so na demanda de autoria. O unico gap real (join-reverso) fica DEFERIDO atras de uma decisao maior: escopo self-declarado machine-readable pelas guardas. Behavior-over-declaration: a promessa 'ganha por dogfood' rodou o dogfood e nao ganhou"
     trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+    provenance:
+      source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+      locator: "spike-behavior-over-declaration"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_REVERSE_JOIN_SCOPE
     node_type: question
@@ -198,6 +210,10 @@ nodes:
     verified_against: substrato-verificado-projection-safety+hooks+guia-claude-code
     label: "REGRA: autoria de guardrail se PUXA por caso concreto recorrente, nunca se EMPURRA por hipotese. (1) O primitivo determinístico JA EXISTE e funciona: projection-safety.sh --terms (adotante declara os proprios termos -> gate exit-1, fail-loud P0-P5), dogfoodado no Gustavo P7. NAO construir camada. (2) Caso concreto aparece -> fiar A MAO ~15min (PostToolUse/UserPromptSubmit -> tmp -> projection-safety --terms), fresco e descartavel. (3) O scaffold /meta:create-guardrail so se paga apos o MESMO padrao ser fiado a mao 2-3x (boilerplate vira peso morto). (4) NUNCA construir por padrao: gate de TEMA (determinístico impossivel -> soft-only, invariante #3) nem gate por-agente no INPUT (tool_input carregar o prompt do subagente e NAO-verificado -> Fase-0 teste empirico e o gate). behavior-over-declaration + gated-work-derives-fresh: nao ficar preso em camada que nao funciona/ineficiente/ineficaz"
     trace: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+    provenance:
+      source: "docs/discussions/guardrails-nemo-lens/elenxo-index-vs-dsl-verdict.md"
+      locator: "substrato-verificado-projection-safety+hooks+guia-claude-code"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PRIMITIVE_EXISTS
     node_type: evidence
@@ -209,6 +225,10 @@ nodes:
     verified_against: projection-safety.sh-linha-74-run_audit-e-KG-relay-gustavo-P7
     label: "O mecanismo efetivo JA EXISTE: projection-safety.sh audita artefato ARBITRARIO (path posicional) contra termos DECLARADOS pelo adotante (--terms), exit 1 no vazamento, disciplina fail-loud P0-P5 (lista vazia=falha, nunca verde-falso). Shipado + dogfoodado (Gustavo Produto 7 = gate client-safe: adotante declara proprios nomes de cliente, gateia artefato antes de cruzar a fronteira). Nenhuma engine/DSL nova necessaria"
     trace: ".claude/validation/projection-safety.sh"
+    provenance:
+      source: ".claude/validation/projection-safety.sh"
+      locator: "projection-safety.sh-linha-74-run_audit-e-KG-relay-gustavo-P7"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HOOK_SUBSTRATE
     node_type: evidence
@@ -220,6 +240,10 @@ nodes:
     verified_against: guia-claude-code-hooks-oficial
     label: "Substrato de hook verificado (guia Claude Code): UserPromptSubmit ve o prompt e BLOQUEIA (exit 2) = gate de input nivel-sessao; PostToolUse ve/bloqueia OUTPUT = o analogo EXATO do gate-de-artefato do Gustavo; PreToolUse matcher Agent/Skill bloqueia por NOME. INCERTO (nao-documentado): tool_input carregar o texto do prompt que vai ao subagente -> o gate por-agente no input pede teste empirico. TEMA semantico so soft (invariante #3 proibe classificador no caminho critico)"
     trace: ".claude/settings.json"
+    provenance:
+      source: ".claude/settings.json"
+      locator: "guia-claude-code-hooks-oficial"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: E_WIRE_IN_DONE_PR452

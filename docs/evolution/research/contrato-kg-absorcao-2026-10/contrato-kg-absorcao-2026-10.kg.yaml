@@ -4,13 +4,14 @@
 # matriz leitor x caso. Fica fora da fila de 2026-10-06 porque a fila está no teto.
 # Migrado ao contrato v3 no SAC-71 (2026-10-08): datas entre aspas e provenance nos nós confirmed.
 meta:
-  x_drive_checkpoint: sealed
+  x_drive_checkpoint: pending
+  x_drive_checkpoint_note: "lote 2 (O1): provenance derivada aplicada a A1/A2 sob o v4; PR para merge humano"
   id: contrato-kg-absorcao-2026-10
   schema_version: "1"
   baseline: "2026-10-08"
   review_after: "2026-11-07"   # 30d: programa de trabalho
-  # ═══ TETO: 15 NÓS ═══
-  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08); 15 em 2026-10-09 (+E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH). NO TETO: onda nova exige onda colhida.
+  # ═══ TETO: 16 NÓS ═══
+  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08); 15 em 2026-10-09 (+E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH); 16 em 2026-10-09 (+E_ONDA_O1_APLICADA: a onda O1 é colhida aqui, e a evidência dela pertence ao programa que a mede, não a um grafo novo). NO TETO: onda nova exige onda colhida.
 nodes:
   - id: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     node_type: evidence
@@ -219,6 +220,22 @@ nodes:
       source: "vendor/kg-ssot/.kg-ssot-version e .kg-ssot/gate.json na branch feat/kg-ssot-contract-v4"
       locator: "tag contract-v4.0.0 e a base com 131 grafos na dívida herdada"
       method: "medição: kg_vendor check, kg_gate e bancada com mutantes em 2026-10-08"
+  - id: E_ONDA_O1_APLICADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-09"
+    verified_against: "branch feat/provenance-wave-o1 sobre origin/main 7ec6ebbb: classify.py e measure.py sob o v4 gravaram routing-v4.tsv (3.713 nós em 129 grafos); kg-migrate-v3 --routing aplicado ao corpus de 138 grafos; 2ª aplicação com --check rc 0; kg-radar --integrity --schema exit 0 nos 107 grafos tocados; kg_gate.py com os --exclude do CI rc 0 e --update sem --accept-regression"
+    label: "a onda O1 escreveu provenance derivada em 2.291 nós A1 e A2 de 107 grafos, com a classe de method do routing; 14 grafos saíram da dívida MUST e a base do gate caiu de 131 para 115 grafos"
+    narrative: "Re-medição sob o v4 (o unverifiable fica isento, e os proto pessoais, o kg-inbox arquivado e o demo saíram do corpus): de 3.794 nós em 139 grafos para 3.713 em 129; A1 1.442→1.439, A2 1.546→1.529, R 806→745 (dicas: C 375, T 34→23, U 312→263, R 85→84). A O1 tinha 2.297 deriváveis; 6 ficaram de fora porque o trace era o próprio grafo, fonte circular achada na passada adversarial e virada recusa na ferramenta. Fonte em caminho do host virou 'testemunho: leitura do arquivo <x> no host' (política 4): 67 nós. Classes escritas: leitura 1.031, juízes 475, medição 325, derivado 319, testemunho 141. Nenhum grafo piorou no contrato; kg-contract-check rc 0 nos 14 que saíram e rc 1 nos 93 que seguem com a dívida MUST herdada, igual à HEAD. Amostra de 20 nós escritos com a fonte aberta: 8 PRs com título igual ao label, 7 URLs com HTTP 200 e o termo do label, 5 arquivos que existem e sustentam o nó. Resta, sem tocar: 671 A1/A2 sem verified_against (O2), 745 do resíduo (O3), os 6 circulares e 3.460 datas sem aspas."
+    trace: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/routing-v4.tsv"
+    provenance:
+      source: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/routing-v4.tsv e .kg-ssot/gate.json na branch feat/provenance-wave-o1"
+      locator: "coluna final do routing (A1, A2, R) e a chave failing da base (115 grafos)"
+      method: "medição: classificador, kg-migrate-v3 --routing, kg-radar, kg-contract-check e kg_gate em 2026-10-09"
 edges:
   - from: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
@@ -264,4 +281,7 @@ edges:
     edge_type: SUPPORTS
   - from: E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH
     to: Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH
+    edge_type: SUPPORTS
+  - from: E_ONDA_O1_APLICADA
+    to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
     edge_type: SUPPORTS

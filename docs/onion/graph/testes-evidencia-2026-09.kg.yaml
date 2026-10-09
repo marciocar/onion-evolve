@@ -28,6 +28,10 @@ nodes:
     verified_against: 'commit 346673a7; grep dos números; bash consumed-mode-check.sh → 40 pares · 0 sem teste'
     label: "DUAS FALSIDADES no material de testes, nenhuma pega por guarda — as duas pegas por alguém rodando o comando. (1) `docs/onion/testing-validation-system.md` publicava painel ASCII com Coverage 85% · Unit Tests 247 · Mutation 74%, e NENHUM tinha produtor: eram as metas da seção anterior redesenhadas como medição, num documento de TESTES. (2) `docs/onion/maintenance-checklist.md` dizia que a guarda de modo consumido estava DESLIGADA; está ligada, é HARD, e mede 40 pares com 0 sem teste — o texto ficou stale no wire-in de 2026-08-13 e enganou uma exploração desta casa antes de qualquer humano."
     trace: 'docs/onion/testing-validation-system.md; docs/onion/maintenance-checklist.md'
+    provenance:
+      source: "docs/onion/testing-validation-system.md; docs/onion/maintenance-checklist.md"
+      locator: "commit 346673a7; grep dos números; bash consumed-mode-check.sh → 40 pares · 0 sem teste"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_BANCADA_NAO_CONTAVA_PARA_NINGUEM
     node_type: evidence
@@ -39,6 +43,10 @@ nodes:
     verified_against: 'commit 7d104066; bancada 1127/1127 STRICT --jobs auto em 685s, TSV de 164 linhas'
     label: "A bancada sabia tudo e não contava para ninguém: o resultado morria no log do job. Sem resultado legível por máquina não há série histórica, nem painel, nem detector de flaky. Curado com `--report`, e a restrição que importa é de PROCESSO, não de formato: escreve o PAI (worker concorrente se sobrescreveria), depois da CONTAGEM e antes do VEREDITO (há quatro saídas — relatório que só sai no verde é inútil), e a escrita NÃO pode mudar o rc. Três casos na bancada provam, incluindo a condição de aceite: a flag não altera a contagem."
     trace: '.claude/validation/lint-selftest.sh'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "commit 7d104066; bancada 1127/1127 STRICT --jobs auto em 685s, TSV de 164 linhas"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_NUMEROS_DO_HARNESS_DIVERGEM_ENTRE_SI
     node_type: evidence
@@ -50,6 +58,10 @@ nodes:
     verified_against: 'medido: 1127 casos · 155 famílias · 78 regras; comentários dizem 689, 980, ~850 e 18'
     label: "Os números do próprio harness vivem em COMENTÁRIO e divergem entre si: 689 no workflow, 980 no pre-commit, ~850 numa análise — e a medição de hoje dá 1127. O documento de testes citava 18 regras contra as 78 do registro. Sem gerador e sem catraca, todo número escrito à mão envelhece em semanas. É a mesma classe do painel inventado, um grau abaixo: não é ficção, é defasagem — e as duas enganam igual."
     trace: '.github/workflows/onion-selftest.yml; .githooks/pre-commit'
+    provenance:
+      source: ".github/workflows/onion-selftest.yml; .githooks/pre-commit"
+      locator: "medido: 1127 casos · 155 famílias · 78 regras; comentários dizem 689, 980, ~850 e 18"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: I_HARNESS_INVENTORY
     node_type: decision
@@ -115,6 +127,10 @@ nodes:
     verified_against: 'bash .claude/validation/review-ledger.sh sobre docs/evolution/review (262 residuos)'
     trace: '.claude/validation/review-ledger.sh'
     label: "ONDA 0.5 ENTREGUE — os 262 residuos da REGRA 56 (PR carrega residuo adversarial) foram agregados pela primeira vez, com ZERO instrumentacao nova: os 6 campos ja estavam la ha meses. A regua que faltava: 106.881 tokens e 4,3 minutos por achado REAL. Sobre os 170 residuos com tokens > 0 — 1331 achados, 1099 reais (83% de precisao), 416 corrigidos, 117,4M tokens, 4.710 minutos. Os outros 92 declaram `tokens: 0` e renderam 206 achados reais: contados para nao sumirem, fora da media porque divisao por zero nao e media."
+    provenance:
+      source: ".claude/validation/review-ledger.sh"
+      locator: "bash .claude/validation/review-ledger.sh sobre docs/evolution/review (262 residuos)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_O_LEDGER_TINHA_O_DEFEITO_QUE_CACA
     node_type: evidence
@@ -126,6 +142,10 @@ nodes:
     verified_against: 'a 1a versao do review-ledger.sh, corrigida no mesmo loop'
     trace: '.claude/validation/review-ledger.sh (particao de tres estados + assercao de fechamento)'
     label: "O leitor nasceu com a mesma classe de defeito que existe para medir: reportava `incompletos: 0` enquanto usava 170 de 262 residuos — os 92 com `tokens: 0` caiam num teste de veracidade do shell e evaporavam em silencio, e o numero impresso PARECIA cobrir o conjunto todo. A cura nao foi corrigir o teste: foi particionar em TRES estados nomeados (tokens>0 / `tokens: 0` declarado / campo AUSENTE) e ASSERTAR que a particao fecha em 262. Ausencia e custo-zero sao coisas diferentes, e so o nome as separa."
+    provenance:
+      source: ".claude/validation/review-ledger.sh (particao de tres estados + assercao de fechamento)"
+      locator: "a 1a versao do review-ledger.sh, corrigida no mesmo loop"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_VEREDITO_DO_RESIDUO_E_TEXTO_LIVRE
     node_type: question
@@ -146,6 +166,10 @@ nodes:
     verified_against: 'selo do maestro em 2026-09-08 + bancada review_artifact 17/17 com prova de mutacao'
     trace: '.claude/validation/review-artifact-check.sh (VERDICT_ENUM)'
     label: "SELADO pelo maestro em 2026-09-08: o `verdict:` do residuo da REGRA 56 (PR carrega residuo adversarial) fecha em CINCO valores — APROVADO | CORRIGIDO | REPROVADO | REPROVADO_E_CURADO | SEM_ACHADOS. CONFORME funde em APROVADO (42 contra 157 era vocabulario de epoca, nao distincao). REPROVADO_E_CURADO nao e enfeite: e a unica metrica que responde 'a revisao adversarial FEZ o PR mudar?' — 8 residuos ja diziam isso pela cauda livre (`HARD-MAS-NAO-COMO-ESTAVA-...`) e 5 ja escreviam o proprio termo com hifen. Caixa e separador normalizam (a grafia mista e do historico real); a PALAVRA nao. PROSPECTIVA POR CONSTRUCAO: a guarda so julga o residuo do PR corrente, entao os 262 antigos nunca entram em julgamento e nao se reescrevem. O ledger imprime as DUAS eras e a de legado nunca some — metrica que desaparece quando fica inconveniente e a classe do painel inventado que esta onda apagou."
+    provenance:
+      source: ".claude/validation/review-artifact-check.sh (VERDICT_ENUM)"
+      locator: "selo do maestro em 2026-09-08 + bancada review_artifact 17/17 com prova de mutacao"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_A_CAUDA_ERAM_TRES_CAMPOS
     node_type: evidence
@@ -157,6 +181,10 @@ nodes:
     verified_against: 'agrupamento das 72 formas por primeiro token sobre docs/evolution/review'
     trace: 'docs/evolution/review/*.md'
     label: "A cauda de 62 formas-de-uma-ocorrencia nao era ruido: eram TRES campos espremidos num slot so. 8 residuos usavam o veredito para declarar METODO (`SEM-ELENXO-...`, que nao houve passada adversarial); 8 declaravam um VEREDITO que faltava no enum (reprovou e curou no mesmo PR); 15 traziam a NARRATIVA do achado. A cura da forma e separar: `verdict:` fechado, `elenxo: sim|nao` para o metodo, `nota:` livre para a narrativa. Os dois ultimos entram ACEITOS e documentados, nao obrigatorios — nesta casa guarda vira HARD depois de se provar, nunca antes (foi assim que a REGRA 59 nasceu, e ela refutou o proprio plano que a criou)."
+    provenance:
+      source: "docs/evolution/review/*.md"
+      locator: "agrupamento das 72 formas por primeiro token sobre docs/evolution/review"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SSOT_DO_HARNESS_COM_CATRACA
     node_type: evidence
@@ -168,6 +196,10 @@ nodes:
     verified_against: 'lint-artifacts.sh 0 HARD + dogfood: editar o .md a mao reprova REGRA 80'
     trace: '.claude/validation/harness-inventory.sh'
     label: "ONDA 0.3 ENTREGUE — `harness-inventory.sh --markdown|--json|--env` gera `docs/onion/testing-inventory.md`, catracado byte-a-byte pela REGRA 80 (Numeros do harness saem de SSOT gerada, nunca de comentario), core-only para o adotante nao nascer vermelho. Dogfood: trocar 157 por 999 a mao reprova HARD. Os tres comentarios de CI que diziam `689 assercoes` NAO foram reescritos — sao snapshots datados de 2026-08-16 e historico nao se reescreve; ficaram marcados como da epoca, apontando a SSOT para o numero de hoje."
+    provenance:
+      source: ".claude/validation/harness-inventory.sh"
+      locator: "lint-artifacts.sh 0 HARD + dogfood: editar o .md a mao reprova REGRA 80"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_EXISTE_NAO_E_RODOU
     node_type: claim
@@ -190,6 +222,10 @@ nodes:
     verified_against: 'lint-artifacts.sh sobre o proprio commit em construcao'
     trace: '.claude/validation/lint-selftest.sh (run_harness_inventory_selftests)'
     label: "Ao estrear, a familia nova levou DUAS HARD das guardas que ela vinha reforcar, e nenhuma foi trivial. (1) REGRA 59 (Modo que a producao consome e exercitado pela bancada): eu testei os tres modos com `for m in --markdown --json --env`, e flag vinda de VARIAVEL e classificada como dinamica e sai de julgamento — entao `--markdown`, o modo que a catraca da REGRA 80 consome, ficava sem teste enquanto o caso PARECIA cobri-lo. Laco economiza tres linhas e compra falso-verde no modo que mais importa. (2) REGRA 60 (Identificador de codigo em INGLES): escrevi `local falhou`. O valor do registro nao e o conserto — e que o gatilho foi MECANICO, sem ninguem perguntar."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh (run_harness_inventory_selftests)"
+      locator: "lint-artifacts.sh sobre o proprio commit em construcao"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_UNTRACKED_TORNA_A_PROJECAO_INSTAVEL
     node_type: claim
@@ -201,6 +237,10 @@ nodes:
     verified_against: 'duas ocorrencias medidas em 2026-09-08, ambas barradas pelo gate antes de qualquer dano'
     trace: '.claude/validation/kg-backlog-project.sh + .claude/validation/harness-inventory.sh'
     label: "CLASSE, nao caso (2 ocorrencias no mesmo dia): projecao que enumera por `git ls-files` e INSTAVEL enquanto a fonte esta untracked — ela muda no instante do `git add`, e quem gerou antes de estajar carrega um artefato ja defasado. (1) o grafo da onda untracked fez `backlog-projection: em-dia` reprovar, porque o sandbox da bancada faz `git add -A` e enxergava 46 grafos contra 45 da arvore viva; (2) o proprio `harness-inventory.sh` untracked contou 70 scripts de validacao, e 71 depois de estajado. SEM GUARDA NOVA, e a razao e medida: um detector de untracked sob os caminhos contados dispararia em toda sessao de trabalho normal, e falso-positivo travante e o modo de falha que esta casa mais paga. A cura ja existe e FUNCIONOU as duas vezes — o gate roda sobre o estado estajado e barrou antes do commit. A ordem correta e: `git add` primeiro, gerar depois."
+    provenance:
+      source: ".claude/validation/kg-backlog-project.sh + .claude/validation/harness-inventory.sh"
+      locator: "duas ocorrencias medidas em 2026-09-08, ambas barradas pelo gate antes de qualquer dano"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_FIXTURE_NA_ARVORE_VIVA_E_DISPUTAVEL
     node_type: evidence
@@ -212,6 +252,10 @@ nodes:
     verified_against: 'moat_boundary 3/3 apos a cura; antes, (a) e (c) alternavam falha sem padrao'
     trace: '.claude/validation/lint-selftest.sh (run_moat_boundary_selftests)'
     label: "FLAKY CURADO, com DUAS causas independentes que se mascaravam. (1) A fixture nascia com nome FIXO num diretorio da ARVORE VIVA: dois processos tocando o repo — uma bancada sobrevivente de um commit morto por OOM e a rodada nova — disputavam o MESMO arquivo, um escrevendo o GREEN enquanto o outro esperava o RED, e o `rm -f` de um apagava a fixture do outro. Cura: `$$` no nome. (2) O predicado dos tres casos era assimetrico e errado nas duas direcoes: (a)/(b) casavam a assinatura do moat GLOBALMENTE — ficariam verdes por violacao de manifesto ALHEIO — e (c) casava so o arquivo, reprovando por regra que nao e a testada (a fixture GREEN dispara legitimamente as REGRAS 19 e 27). Cura: um predicado unico que exige arquivo E assinatura NA MESMA LINHA. Um caso GREEN que falha por manifesto alheio nao mede a guarda: mede a vizinhanca."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh (run_moat_boundary_selftests)"
+      locator: "moat_boundary 3/3 apos a cura; antes, (a) e (c) alternavam falha sem padrao"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_FIXTURE_NA_ARVORE_VIVA_CORRE_COM_AS_FAIXAS
     node_type: evidence
@@ -223,6 +267,10 @@ nodes:
     verified_against: 'as 3 falhas passam ISOLADAS (14/14) e so aparecem sob --jobs auto'
     trace: '.claude/validation/lint-selftest.sh:1121'
     label: "FLAKY COM CAUSA NOMEADA (nao 'as vezes falha'): a fixture `__mbguard__.manifest.sh` nasce na ARVORE VIVA por desenho — o caso testa o LINT, que varre o diretorio real, entao sandbox nao serviria. Sob `--jobs auto`, as familias `plugins_sync` e `moat_boundary` varrem esse MESMO diretorio ao mesmo tempo e enxergam um manifesto sem plugin correspondente: 2 falsos `plugins-sync: __mbguard__ em-sync` e 1 falso `moat-boundary: (c)`. As tres passam ISOLADAS (14/14). Agrava com pressao de memoria, que muda o escalonamento dos workers — na mesma maquina um worker foi MORTO no meio da familia e deixou a fixture orfa, e a REGRA 19 (Plugins de vertical sincronizados com as fontes) acusou um plugin que nunca deveria existir. CURA CANDIDATA, nao aplicada nesta onda: os varredores honrarem a convencao `__*__` que o .gitignore ja reserva para fixture de bancada. Nao aplicada porque muda guardas fora do escopo desta onda no fim de uma sessao longa — e mudanca no susto e o que esta casa proibe."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh:1121"
+      locator: "as 3 falhas passam ISOLADAS (14/14) e so aparecem sob --jobs auto"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_SERIE_DA_BANCADA_EXISTE
     node_type: evidence
@@ -234,6 +282,10 @@ nodes:
     verified_against: 'primeiro envelope real, LIDO do ledger commitado: 1164 pass / 0 fail / 160 familias em 167 linhas / 750s, sha 01d1df49, dirty=true'
     trace: 'ops/testing/collect-selftest.sh + docs/onion/metrics/selftest-runs.jsonl'
     label: "ONDA 0.6 ENTREGUE — `collect-selftest.sh` transforma o `--report` da bancada em um ENVELOPE por execucao em `selftest-runs.jsonl`. Modos: coleta · `--resumo` · `--flaky`. O DESENHO QUE IMPORTA: ele NAO roda a bancada, INGERE o relatorio de quem ja rodou. A bancada custa ~15 min, ja roda todo dia na main (`schedule: 17 4 * * *`) e em cada pre-commit; reinvoca-la seria o instrumento mais caro que o instrumentado — e nesta maquina isso matou dois workers por memoria em 2026-09-08. Quem aperta o botao e o humano: o script escreve, o CI nunca commita (molde literal do ledger GTM). Custo MEDIDO: 11,9 KB por envelope, ~4,3 MB/ano em execucao diaria."
+    provenance:
+      source: "ops/testing/collect-selftest.sh + docs/onion/metrics/selftest-runs.jsonl"
+      locator: "primeiro envelope real, LIDO do ledger commitado: 1164 pass / 0 fail / 160 familias em 167 linhas / 750s, sha 01d1df49, dirty=true"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_O_CAMPO_QUE_NAO_CONTAVA_O_QUE_O_NOME_DIZ
     node_type: evidence
@@ -245,6 +297,10 @@ nodes:
     verified_against: '165 linhas de relatorio para 158 familias; os 8 shards de `fixtures` somam 12x6+11x2 = 94, exatamente as 94 fixtures do manifesto'
     trace: 'ops/testing/collect-selftest.sh (familias x linhas_relatorio)'
     label: "O coletor nasceu com DOIS numeros meus errados, e os dois sao a classe que esta onda persegue — cometida DENTRO dela. (1) o campo `familias` contava LINHAS: a familia `fixtures` e FATIADA em 8 shards e cada shard emite a sua linha, entao 165 linhas para 158 familias. Campo cujo NOME nao e o que ele conta engana exatamente como o painel inventado. Curado em dois campos: `familias` (distintas) e `linhas_relatorio`. (2) o docstring declarava `~6 KB por envelope, ~2 MB/ano` como CUSTO MEDIDO — era estimativa minha; o arquivo real da 11,9 KB. Numero estimado apresentado como medido, num arquivo cuja razao de existir e nao fazer isso. Os dois pegos por dogfood na primeira coleta real, nao por releitura."
+    provenance:
+      source: "ops/testing/collect-selftest.sh (familias x linhas_relatorio)"
+      locator: "165 linhas de relatorio para 158 familias; os 8 shards de `fixtures` somam 12x6+11x2 = 94, exatamente as 94 fixtures do manifesto"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_IDEMPOTENCIA_CHECAVA_FORMATO_QUE_NINGUEM_ESCREVIA
     node_type: claim
@@ -256,6 +312,10 @@ nodes:
     verified_against: 'primeira invocacao do coletor gravou o MESMO envelope 2x'
     trace: '.claude/validation/lint-selftest.sh (selftest-series caso (b))'
     label: "CLASSE NOVA, e ela generaliza a tese desta onda: a guarda de idempotencia procurava a chave `\"dia\":\"...\"` SEM espacos, e o `json.dumps` default escreve `\"dia\": \"...\"`. A guarda nunca casava — o coletor gravou o mesmo envelope duas vezes seguidas na primeira invocacao. GUARDA QUE CHECA UM FORMATO QUE O ESCRITOR NAO PRODUZ E GUARDA NENHUMA, e ela e PIOR que guarda ausente: desativa a desconfianca de quem le o codigo e ve uma verificacao ali. Irma de `exit 0 e declaracao, nao verificacao` e de `o resumo impresso tambem e declaracao` — a familia toda diz que o verificador e o verificado tem de se falar no MESMO formato. Cura: escritor compacto + o caso (b) como fixture obrigatoria."
+    provenance:
+      source: ".claude/validation/lint-selftest.sh (selftest-series caso (b))"
+      locator: "primeira invocacao do coletor gravou o MESMO envelope 2x"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_EVIDENCIA_DE_TERMINAL_NO_CI_LIGADA
     node_type: evidence
@@ -278,6 +338,10 @@ nodes:
     verified_against: 'caso (f) da familia ci_evidence: sumario com falhas ainda sai 0'
     trace: 'ops/testing/selftest-summary.sh'
     label: "FRONTEIRA DELIBERADA: o gerador de sumario NUNCA reprova um build — sai 0 sempre que conseguiu dizer a verdade, inclusive quando a verdade e `nao foi medido`. Dois juizes para o mesmo fato criam o dia em que discordam e ninguem sabe qual vale; o veredito e do passo da bancada. E o terceiro desfecho vale aqui tambem: relatorio ausente ou sem linha TOTAL e a assinatura da bancada que morreu antes da soma, entao o sumario imprime `⊘ NAO MEDIDO` e NOMEIA a suspeita — nunca zeros. Um sumario com `0 falhas` sobre uma bancada abortada seria o painel inventado, agora no CI."
+    provenance:
+      source: "ops/testing/selftest-summary.sh"
+      locator: "caso (f) da familia ci_evidence: sumario com falhas ainda sai 0"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PAINEL_GERADO_COM_CINCO_DEFESAS
     node_type: evidence
@@ -289,6 +353,10 @@ nodes:
     verified_against: 'familia testing_state 6/6 + dogfood: editar o .md a mao reprova REGRA 81'
     trace: '.claude/validation/testing-state.sh + docs/onion/testing-state.md'
     label: "ONDA 0.7 ENTREGUE — `testing-state.sh` gera `docs/onion/testing-state.md` dos produtores de 0.2-0.6, catracado pela REGRA 81 (Painel de estado e GERADO dos produtores, nunca redigido). As cinco defesas TEM FIXTURE cada uma: (1) celula sem comando nao e impressa — asserido MECANICAMENTE, toda linha com numero em negrito precisa de uma 3a coluna com crase; (2) catraca byte-a-byte, provada por dogfood; (3) `⊘ NAO MEDIDO` presente no painel real; (4) zero produtor vivo derruba o gerador (provado por mutacao); (5) declara a idade da medicao. O painel publicado hoje traz TRES `⊘` honestos — flaky com 1 execucao nao mede repeticao, e nao ha suite de teste de codigo neste repo."
+    provenance:
+      source: ".claude/validation/testing-state.sh + docs/onion/testing-state.md"
+      locator: "familia testing_state 6/6 + dogfood: editar o .md a mao reprova REGRA 81"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ARTEFATO_CATRACADO_NAO_IMPRIME_HOJE
     node_type: claim
@@ -300,6 +368,10 @@ nodes:
     verified_against: 'caso (c) da familia testing_state trava a decisao'
     trace: '.claude/validation/testing-state.sh'
     label: "SUPERA A DEFESA 5 COMO O PLANO A ESCREVEU. O plano pedia `o painel declara a propria idade (data do ultimo envelope vs. HOJE)`. Um artefato com catraca byte-a-byte que imprime a data corrente MUDA TODO DIA — uma violacao HARD por dia, sem que nada tenha acontecido. Guarda que grita sem motivo treina o leitor a ignora-la, e ai ela nao serve para o dia em que o motivo existe. Entao o painel imprime a data do ULTIMO ENVELOPE (deterministica, vem do dado) e declara a CADENCIA esperada; o relogio fica com quem le e com o cron, nunca dentro do arquivo versionado. O caso (c) da bancada TRAVA isso: sem ele, alguem `conserta` a idade pondo `date +%F` no gerador e a catraca vira ruido diario. Regra geral: relogio em artefato catracado e defeito, nao feature."
+    provenance:
+      source: ".claude/validation/testing-state.sh"
+      locator: "caso (c) da familia testing_state trava a decisao"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_DOC_AFIRMA_ESTADO_QUE_O_VIVO_DESMENTE
     node_type: claim
@@ -322,6 +394,10 @@ nodes:
     verified_against: 'os 16 workers da 1a tentativa de R0 morreram todos com API Error 400'
     trace: '.claude/commands/meta/kg-freshness.md'
     label: "O comando `/meta:kg-freshness`, COMO DOCUMENTADO, NAO EXECUTA. Os 16 workers da 1a tentativa de R0 morreram com `API Error: 400 tools.custom.input_schema: input_schema does not support oneOf, allOf, or anyOf at the top level`. As TRES guardas condicionais que a doutrina do comando chama de load-bearing — escritas em 2026-08-12 depois de um defeito real — nao podem ser expressas num tool schema. A cura ja estava escrita no proprio doc, uma secao adiante: `JSON Schema nao compara duas propriedades entre si... a promessa so se cumpre no FAN-IN, em JS, custo 0 tokens`. Valia para a cobertura; vale para as tres. Ironia util: o documento continha o diagnostico e a cura, e mesmo assim prescrevia a forma que nao roda — declarado x verificado, dentro do comando que existe para separar os dois."
+    provenance:
+      source: ".claude/commands/meta/kg-freshness.md"
+      locator: "os 16 workers da 1a tentativa de R0 morreram todos com API Error 400"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_AS_GUARDAS_DO_FANIN_SAO_LOAD_BEARING
     node_type: evidence
@@ -333,6 +409,10 @@ nodes:
     verified_against: 'R0 run wf_5b2f274e-83d: 16 workers, 5 rebaixamentos no fan-in'
     trace: '/tmp/claude-1000/r0/final.json'
     label: "MEDIDO, nao suposto: dos 16 nos do R0, os workers declararam 9 CONFIRMED / 6 DRIFTED / 1 UNVERIFIABLE; apos o fan-in vale 6 / 4 / 6. CINCO rebaixamentos, um TERCO da amostra. Quatro por G1 (veredito positivo COM `blocked_by` preenchido — dizer `nao consegui medir isto` e `esta confirmado` na mesma respiracao) e um por G2: `E_MEDICAO_NAO_OBSERVADA_ERA_MINHA` declarou CONFIRMED tendo medido 5 de 6 afirmacoes, que e LITERALMENTE o defeito de 2026-08-12 que criou a guarda, reproduzido. Sem o fan-in, 5 nos receberiam carimbo indevido. E a prova pratica de que CONFIRMED e o desfecho para onde um worker escorrega: e o unico que nao pede justificativa."
+    provenance:
+      source: "/tmp/claude-1000/r0/final.json"
+      locator: "R0 run wf_5b2f274e-83d: 16 workers, 5 rebaixamentos no fan-in"
+      method: "testemunho: leitura do arquivo /tmp/claude-1000/r0/final.json no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_BLOCKED_BY_ESTA_SOBRECARREGADO
     node_type: question
@@ -353,6 +433,10 @@ nodes:
     verified_against: 'run wf_7cd5ae40-511: 6 dimensoes com mandato de refutar, 20 agentes, 1,87M tokens, 14 achados / 14 REAIS'
     trace: 'docs/evolution/review/feat-testing-visibility-onda0.md'
     label: "A passada adversarial do PR REPROVOU a entrega: 14 achados, 14 confirmados como REAIS, ZERO descartados no verify (11 ALTA, 3 MEDIA). Eu entreguei uma onda inteira sobre declarado-nao-e-verificado e cometi a MESMA CLASSE quatro vezes DENTRO dela: (1) o gerador da SSOT afirmava por string estatica que `selftest-runs.jsonl` nao existia, um commit depois de ele passar a existir; (2) e (3) os dois casos `(MUT)` das REGRAS 80 e 81 NAO EXECUTAVAM o mutante — asseriam so que o `sed` casou a ancora, e o proprio rotulo admitia `a mutacao foi APLICAVEL`; (4) o no `E_SERIE_DA_BANCADA_EXISTE` cita numeros que nao batem com o envelope commitado. NADA disso apareceu no lint nem na bancada. So apareceu quando seis revisores com mandato de REFUTAR foram olhar. O verificador de cada achado tinha vies INVERTIDO (default: derrubar), e ainda assim 14/14 sobreviveram."
+    provenance:
+      source: "docs/evolution/review/feat-testing-visibility-onda0.md"
+      locator: "run wf_7cd5ae40-511: 6 dimensoes com mandato de refutar, 20 agentes, 1,87M tokens, 14 achados / 14 REAIS"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: I_CURAR_O_RESIDUO_DO_ELENXO
     node_type: decision
@@ -392,6 +476,10 @@ nodes:
     verified_against: 'Medido em 2026-09-27 contra o `harness-inventory.sh` de origin/main, em tres sandboxes construidos com `git archive HEAD` (copia FIEL da arvore rastreada). (1) SEM .git: rc=0, a tabela sai com CINCO contadores zerados, e o stderr traz a mensagem `sem indice git ... Recusa.` CINCO VEZES — contadas com grep -c. (2) Com git e tudo UNTRACKED (o cenario do adotante greenfield): mesmo resultado, rc=0. (3) No repo real: 80 scripts, 16 hooks, correto. Depois da cura: (1) rc=2 recusando ANTES de contar; (2) rc=2 nomeando `CONTRADICAO ... 75 arquivo(s) em disco ... contagem RASTREADA = 0`; (3) inalterado. Mutante que devolve o `_die` para dentro do `_tracked` e remove a assertiva: os dois casos de bancada REPROVAM, com rc=0 e a mensagem Recusa impressa.'
     label: "A GUARDA GRITAVA CINCO VEZES E NAO PARAVA NADA — e o mecanismo e mais estreito e mais nitido do que o no I_AUSENCIA_LIDA_COMO_RESULTADO registrava. O `_die` vivia no ramo `else` do `_tracked`, e `_tracked` e chamado SEMPRE dentro de `$( )`: `_die` num subshell mata o SUBSHELL, nao o script. Entao a recusa era IMPRESSA e nao PROPAGADA — `grep -c .` devolvia 0, `|| true` engolia o rc, e a SSOT publicava cinco contadores zerados com rc=0, declarando na PROPRIA TABELA o comando `git ls-files` que produziu o zero (visivel para quem le, invisivel para qualquer gate). DUAS CORRECOES AO NO: (a) sao CINCO contadores, nao quatro — exatamente os cinco que delegam ao `git ls-files` (fixtures rastreadas, scripts de validacao, hooks, workflows, baselines); os outros quatro usam `grep` no arquivo e saem CERTOS, o que torna a tabela parcialmente verdadeira e por isso mais convincente; (b) a causa nao e `o fallback para find nunca dispara` — e que a RECUSA NAO ALCANCA o programa de onde e chamada. CURA: pre-condicao verificada UMA VEZ fora de subshell (sem git => rc=2 antes de contar qualquer coisa) MAIS assertiva de contradicao (arquivo em disco + contagem rastreada zero => rc=2, porque zero ali NAO e resultado). Dois casos de bancada, mutante morto. A classe generaliza: `_die`/`exit` dentro de `$( )` e guarda decorativa, e a forma de descobrir foi CONTAR as ocorrencias da mensagem no stderr em vez de ler o codigo."
     trace: '.claude/validation/harness-inventory.sh'
+    provenance:
+      source: ".claude/validation/harness-inventory.sh"
+      locator: "Medido em 2026-09-27 contra o `harness-inventory.sh` de origin/main, em tres sandboxes construidos com `git archive HEAD` (copia FIEL da arvore rastreada). (1) SEM .git: rc=0, a tabela sai com CINCO contadores zerados, e o stderr traz a mensagem `sem indice git ... Recusa.` CINCO VEZES — contadas com grep -c. (2) Com git e tudo UNTRACKED (o cenario do adotante greenfield): mesmo resultado, rc=0. (3) No repo real: 80 scripts, 16 hooks, correto. Depois da cura: (1) rc=2 recusando ANTES de contar; (2) rc=2 nomeando `CONTRADICAO ... 75 arquivo(s) em disco ... contagem RASTREADA = 0`; (3) inalterado. Mutante que devolve o `_die` para dentro do `_tracked` e remove a assertiva: os dois casos de bancada REPROVAM, com rc=0 e a mensagem Recusa impressa."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   - from: E_A_GUARDA_GRITAVA_CINCO_VEZES_E_NAO_PARAVA

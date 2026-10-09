@@ -59,6 +59,10 @@ nodes:
     source_kind: internal-audit
     label: 'O ESTADO VIVO e a razao da pergunta: reboot pendente desde 2026-09-24 (libc6 e kernel 6.8.0-142 em disco, rodando 139), 31 containers, docker e a contencao onion-vps-docker-firewall habilitados, e uma recorrencia de infra resolvida A MAO com N muito maior que 1 (16 mosh-server orfaos de 11h a 11 dias encerrados manualmente). Recorrencia resolvida a mao pede MECANISMO (fix-must-become-mechanism). A contagem kernel 146 disponivel nao foi reproduzida — so o 142 aparece instalado.'
     trace: '/var/run/reboot-required.pkgs · /boot · systemctl · docker ps'
+    provenance:
+      source: "/var/run/reboot-required.pkgs · /boot · systemctl · docker ps"
+      locator: "re-medido nesta sessao em 2026-10-05: uname -r = 6.8.0-139-generic; /boot tem vmlinuz-6.8.0-139 e vmlinuz-6.8.0-142; /var/run/reboot-required existe desde 2026-09-24 com .pkgs = libc6, linux-image-6.8.0-142-generic, linux-base; systemctl is-enabled docker e onion-vps-docker-firewall = enabled; docker ps = 31 containers. NAO re-medidos aqui (vindos do worker de escopo): 45 pacotes atualizaveis, 31 unless-stopped, 16 mosh-server orfaos encerrados a mao, release 26.04.1 disponivel; kernel 146 disponivel NAO reproduzido"
+      method: "testemunho: leitura do arquivo /var/run/reboot-required.pkgs no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CORPUS_INFRA_JA_COBRE_EXPOSICAO
     node_type: evidence
@@ -73,6 +77,10 @@ nodes:
     source_kind: internal-audit
     label: 'O CORPUS JA COBRE a parte de exposicao: Docker fura o UFW foi incidente medido em 2026-08-10, virou contencao viva (DOCKER-USER default-deny via servico systemd), virou REGRA 64 (compose rastreado com bind publico = HARD no lint) e guarda vps-exposure-check.sh. O que NAO tem mecanismo hoje e o resto da pergunta: reboot pendente, updates, restart policy e sessoes orfas — exatamente a recorrencia resolvida a mao. Esta rodada nao contradiz nenhum no daqueles grafos.'
     trace: 'docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml · docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml · .claude/validation/vps-exposure-check.sh'
+    provenance:
+      source: "docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml · docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml · .claude/validation/vps-exposure-check.sh"
+      locator: "leitura do corpus em 2026-10-05: docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml (CL_net_exposure_incident, D_containment_docker_user), docs/onion/graph/identidade-onion-vps-2026-08.kg.yaml (E_CLASSE_DE_EXPOSICAO_VIROU_REGRA_64), .claude/validation/vps-exposure-check.sh presente, ops/ com 20 entradas"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_DOUTRINA_PULL_NOT_PUSH_E_TRES_DIMENSOES
     node_type: evidence
@@ -86,6 +94,10 @@ nodes:
     source_kind: internal-audit
     label: 'A DOUTRINA SELADA limita C e D: as 3 dimensoes peer (produto, engenharia, compliance) sao doutrina selada e nem design/ foi promovida; viajar para adotante exige 2o adotante pedindo (pull-not-push) e hoje nenhum pediu; o substrato medido e ESPECIFICO desta VPS (Hostinger KVM8, containers onion-vps-*, regra DOCKER-USER -i eth0); e o corpus ja decidiu CATALOGO, nao plataforma (D_framing_catalogo) e o que NAO construir (D_anti_catalogo).'
     trace: 'CLAUDE.md · docs/evolution/research/stack-harmonia-2026-08/ · docs/onion/graph/vps-shared-tools-2026-07.kg.yaml'
+    provenance:
+      source: "CLAUDE.md · docs/evolution/research/stack-harmonia-2026-08/ · docs/onion/graph/vps-shared-tools-2026-07.kg.yaml"
+      locator: "CLAUDE.md (CORE diferente de FAMILIA; 3 dimensoes peer selada; design/ e categoria, nao 4a dimensao) + docs/evolution/research/stack-harmonia-2026-08 (D_regra_5_portoes, D_anti_catalogo) + docs/onion/graph/vps-shared-tools-2026-07 (D_framing_catalogo) — lidos no corpus desta rodada"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ CLAUDE CODE — HOOKS (tier 9) ═══════════════════
 
@@ -101,6 +113,10 @@ nodes:
     source_kind: primary
     label: 'Em eventos que suportam bloqueio, hook command que sai com codigo 2 bloqueia a acao de forma determinística, e nem um JSON permissionDecision allow o sobrepoe. Verdadeiro, mas nao sustenta B: um censo e medicao LIDA, nao acao a vetar (ver E_OBJECAO_EXIT2_NAO_SERVE_A_CENSO).'
     trace: 'https://code.claude.com/docs/en/hooks'
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "https://code.claude.com/docs/en/hooks — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HOOK_EVENTOS_SEM_AGENDADOR
     node_type: evidence
@@ -114,6 +130,10 @@ nodes:
     source_kind: primary
     label: 'Hooks do tipo command executam shell arbitrario e disparam por evento (SessionStart, SessionEnd, PreToolUse, Stop, FileChanged, CwdChanged), sem agendador. Isso permitiria censo acionado pela sessao sem cron — e e exatamente o que a objecao chama de auto-start com outro nome (E_OBJECAO_SESSIONSTART_E_AUTOSTART).'
     trace: 'https://code.claude.com/docs/en/hooks'
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "https://code.claude.com/docs/en/hooks — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HOOK_TIMEOUT_FALHA_ABERTO
     node_type: evidence
@@ -127,6 +147,10 @@ nodes:
     source_kind: primary
     label: 'Hook command (ou http/mcp_tool) que estoura o timeout e cancelado e sua saida descartada; em PreToolUse ele NAO bloqueia a chamada. Guarda ou censo lento em hook falha ABERTO: ausencia de aviso vira lida como tudo limpo.'
     trace: 'https://code.claude.com/docs/en/hooks'
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "https://code.claude.com/docs/en/hooks — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HOOK_TIMEOUT_PADRAO_600S
     node_type: evidence
@@ -140,6 +164,10 @@ nodes:
     source_kind: primary
     label: 'Timeout padrao de hook command e 600s, reduzido para 30s em UserPromptSubmit, PreModelSwitch e PostModelSwitch e para 10s em MessageDisplay. Censo em SessionStart caberia no padrao, mas nao em eventos de prompt.'
     trace: 'https://code.claude.com/docs/en/hooks'
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "https://code.claude.com/docs/en/hooks — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ CENSO QUE SO REPORTA (tier 6-8) ═══════════════════
 
@@ -155,6 +183,10 @@ nodes:
     source_kind: primary
     label: 'checkrestart e censo determinístico que apenas REPORTA processos que precisam de reinicio apos upgrade, sem reiniciar nada — modelo que casa com a restricao reboot e upgrade sao decisao humana, a ferramenta so propoe. O modelo vale; o instrumento NAO esta instalado nesta VPS (E_OBJECAO_CHECKRESTART_AUSENTE).'
     trace: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html'
+    provenance:
+      source: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html"
+      locator: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 2-1"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CHECKRESTART_VIA_LSOF_SEM_ESTADO
     node_type: evidence
@@ -168,6 +200,10 @@ nodes:
     source_kind: primary
     label: 'checkrestart detecta processos desatualizados via lsof (arquivos deletados ainda abertos), sem consultar grafo nem estado declarado — mede o vivo direto.'
     trace: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html'
+    provenance:
+      source: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html"
+      locator: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CHECKRESTART_SENSIVEL_AO_KERNEL
     node_type: evidence
@@ -181,6 +217,10 @@ nodes:
     source_kind: primary
     label: 'checkrestart e sensivel a versao do kernel e pode falhar em versoes mais novas ou antigas — o instrumento do censo precisa ele proprio ser verificado.'
     trace: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html'
+    provenance:
+      source: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html"
+      locator: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html — votos 2-1"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_LIVEPATCH_SUPRIME_REBOOT_REQUIRED
     node_type: evidence
@@ -195,6 +235,10 @@ nodes:
     source_kind: primary
     label: 'Com Livepatch habilitado, o postinst do kernel deliberadamente NAO cria /var/run/reboot-required: o sinal reboot pendente some mesmo com kernel novo em disco. Lição geral: sinal declarado pode ser suprimido; cruzar uname -r com /boot/vmlinuz-*.'
     trace: 'https://lists.snapcraft.io/archives/foundations-bugs/2025-June/539876.html'
+    provenance:
+      source: "https://lists.snapcraft.io/archives/foundations-bugs/2025-June/539876.html"
+      locator: "https://lists.snapcraft.io/archives/foundations-bugs/2025-June/539876.html — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_LYNIS_AUDITORIA_SO_RELATO
     node_type: evidence
@@ -208,6 +252,10 @@ nodes:
     source_kind: primary
     label: 'Lynis e auditor de host que verifica configuracoes de sistema e software e aponta melhorias em modo de relato, sem alterar. Existe auditor maduro de hardening generico — o que puxa CONTRA reinventar essa parte dentro de B.'
     trace: 'https://manpages.org/lynis/8'
+    provenance:
+      source: "https://manpages.org/lynis/8"
+      locator: "https://manpages.org/lynis/8 — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ DOCKER x UFW (tier 3-5) ═══════════════════
 
@@ -223,6 +271,10 @@ nodes:
     source_kind: engineer
     label: 'O Docker contorna o UFW porque o UFW gerencia so a cadeia INPUT, e o trafego para portas publicadas segue FORWARD apos DNAT, nunca passando pelas regras do UFW.'
     trace: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps'
+    provenance:
+      source: "https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps"
+      locator: "https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_DOCKER_USER_ROTEAR_PARA_UFW
     node_type: evidence
@@ -236,6 +288,10 @@ nodes:
     source_kind: engineer
     label: 'A cadeia DOCKER-USER e avaliada antes do forwarding do Docker; rotea-la para ufw-user-forward via /etc/ufw/after.rules faz o UFW filtrar portas de containers (testado em Ubuntu 24.04 e Debian 12). E MUDANCA de firewall, nao medicao — fora do escopo de um censo.'
     trace: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps'
+    provenance:
+      source: "https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps"
+      locator: "https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_UFW_STATUS_SUBESTIMA_EXPOSICAO
     node_type: evidence
@@ -249,6 +305,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'O Docker manipula o iptables diretamente para publicar portas e contorna o UFW; um censo que so leia ufw status subestima a exposicao real.'
     trace: 'https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown'
+    provenance:
+      source: "https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown"
+      locator: "https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown — votos 3-0; vendor-on-competitor, suspeito por clausula 7"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_DOCKER_USER_PONTO_OFICIAL
     node_type: evidence
@@ -262,6 +322,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'DOCKER-USER e o ponto oficial para regras do administrador, avaliada antes das regras do Docker; a verificacao de firewall deve inspecionar DOCKER-USER, nao so o UFW.'
     trace: 'https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown'
+    provenance:
+      source: "https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown"
+      locator: "https://oneuptime.com/blog/post/2026-03-02-ufw-docker-fix-bypassing-ufw-ubuntu/markdown — votos 3-0; vendor-on-competitor"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_DOCKER_DNAT_PREROUTING
     node_type: evidence
@@ -275,6 +339,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'Docker publica portas via DNAT na cadeia PREROUTING enquanto o UFW filtra em INPUT, entao as regras do UFW nao cobrem portas publicadas por containers.'
     trace: 'https://www.ssdnodes.com/learn/lang/pt/docker-ports-bypass-ufw'
+    provenance:
+      source: "https://www.ssdnodes.com/learn/lang/pt/docker-ports-bypass-ufw"
+      locator: "https://www.ssdnodes.com/learn/lang/pt/docker-ports-bypass-ufw — votos 3-0; vendor-on-competitor"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_BIND_LOOPBACK_MITIGA
     node_type: evidence
@@ -288,6 +356,10 @@ nodes:
     source_kind: engineer
     label: 'O Docker pode contornar o UFW para portas mapeadas, e a mitigacao e bind em 127.0.0.1 em vez de 0.0.0.0. Ja e doutrina e guarda no core (REGRA 64 e vps-exposure-check.sh).'
     trace: 'https://github.com/SDbyFrankChen/claude-code-server-security-audit'
+    provenance:
+      source: "https://github.com/SDbyFrankChen/claude-code-server-security-audit"
+      locator: "https://github.com/SDbyFrankChen/claude-code-server-security-audit — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ OPS AGENTICO (tier 4) ═══════════════════
 
@@ -304,6 +376,10 @@ nodes:
     source_kind: engineer
     label: 'Exclusao de dados, banco de producao e mudancas de acesso devem sempre voltar para um humano decidir. Repete restricao que ja e DURA no pedido — nao conta como sustentacao independente de B.'
     trace: 'https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/'
+    provenance:
+      source: "https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/"
+      locator: "https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/ — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_HEINZEL_MEMORIA_POR_SERVIDOR
     node_type: evidence
@@ -317,6 +393,10 @@ nodes:
     source_kind: engineer
     label: 'O heinzel mantem memoria persistente por servidor (OS, servicos, notas) e roda checagens de housekeeping (disco, memoria, carga, updates pendentes, firewall, SSL, servicos falhos). Analogia frouxa com grafo medido contra o vivo: a memoria dele e nota escrita pelo agente, nao SSOT tipada reconciliada por radar.'
     trace: 'https://github.com/wintermeyer/heinzel'
+    provenance:
+      source: "https://github.com/wintermeyer/heinzel"
+      locator: "https://github.com/wintermeyer/heinzel — votos 2-1"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ═══════════════════ MERCADO E LACUNAS ═══════════════════
 
@@ -332,6 +412,10 @@ nodes:
     source_kind: internal-audit
     label: 'SEM SINAL de mercado/capital. Nenhuma claim confirmada traz rodada, M&A ou leitura de analista sobre censo de VPS ou ops agentico de infra. As tres claims de custo de plataforma interna (2-4 engenheiros e 6-12 meses; manutencao perpetua como custo dominante; compre a camada de deploy, construa a camada fina) foram REFUTADAS — a terceira era recomendacao de fornecedor que vende a camada comprada. O eixo capital nao sustenta nem derruba C ou D: o argumento contra C e D vem da doutrina (pull-not-push, CORE diferente de FAMILIA), nao do mercado.'
     trace: 'https://www.qovery.com/blog/platform-engineering-vs-devops-50-engineers-build-or-buy'
+    provenance:
+      source: "https://www.qovery.com/blog/platform-engineering-vs-devops-50-engineers-build-or-buy"
+      locator: "sintese do eixo mercado/capital da rodada de 2026-10-05; 3 claims de mercado (qovery.com, tier 3) refutadas no voto adversarial"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_LACUNAS_INFRA_VPS_1005
     node_type: evidence
@@ -421,6 +505,10 @@ nodes:
     source_kind: primary
     label: 'OBJECAO (Elenxo, 1 agente): o exit 2 e verdadeiro mas nao e argumento a favor de B — censo e medicao LIDA, nao acao a vetar. Pela postura de acoplamento o censo deve ser shell puro; /ops:vps como casca seria acoplamento por conveniencia. O exit 2 so entraria numa guarda PreToolUse contra apt full-upgrade, reboot ou do-release-upgrade sem decisao humana — que nao esta em B.'
     trace: 'https://code.claude.com/docs/en/hooks'
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "objecao do Elenxo ao achado 1 (https://code.claude.com/docs/en/hooks, tier 9) + postura de acoplamento do CLAUDE.md"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_CHECKRESTART_AUSENTE
     node_type: evidence
@@ -434,6 +522,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO (Elenxo, 1 agente) aos achados 2 e 3: checkrestart NAO esta instalado aqui; needrestart esta (padrao do Ubuntu). O modelo relatar-sem-agir vale, mas o instrumento citado e ausente — evidencia emprestada. O censo chama needrestart -b (batch, parseavel).'
     trace: '/usr/sbin/needrestart'
+    provenance:
+      source: "/usr/sbin/needrestart"
+      locator: "medido nesta VPS em 2026-10-05: which checkrestart vazio; /usr/sbin/needrestart existe"
+      method: "testemunho: leitura do arquivo /usr/sbin/needrestart no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_INSTRUMENTO_NAO_VERIFICADO
     node_type: evidence
@@ -447,6 +539,10 @@ nodes:
     source_kind: primary
     label: 'OBJECAO (Elenxo, 1 agente) ao achado 17: vale como CLASSE — o instrumento precisa ser verificado — mas aponta a ferramenta errada. O mesmo risco precisa ser medido em needrestart no kernel 6.8.0-139 em execucao; ate la a certeza da saida de restart e CAMPO nao verificado, nao veredito.'
     trace: 'https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html'
+    provenance:
+      source: "https://manpages.debian.org/testing/debian-goodies/checkrestart.1.en.html"
+      locator: "objecao do Elenxo ao achado 17 (checkrestart sensivel ao kernel, tier 8)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_LIVEPATCH_CRUZAR_SINAIS
     node_type: evidence
@@ -460,6 +556,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO (Elenxo, 1 agente) ao achado 4: Livepatch nao se aplica a este host (ausente, e o reboot-required existe). A licao geral sobrevive: o censo cruza uname -r (139) com /boot/vmlinuz-* (142) e marca qual sinal sustentou o veredito. Premissa a corrigir: kernel 146 disponivel nao foi reproduzido.'
     trace: '/var/run/reboot-required.pkgs · /boot'
+    provenance:
+      source: "/var/run/reboot-required.pkgs · /boot"
+      locator: "medido nesta VPS em 2026-10-05: canonical-livepatch ausente; /var/run/reboot-required existe com .pkgs libc6, linux-image-6.8.0-142-generic, linux-base; uname -r 139"
+      method: "testemunho: leitura do arquivo /var/run/reboot-required.pkgs no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_LYNIS_NAO_REINVENTAR
     node_type: evidence
@@ -473,6 +573,10 @@ nodes:
     source_kind: primary
     label: 'OBJECAO (Elenxo, 1 agente) ao achado 5: Lynis nao esta instalado, e o achado puxa CONTRA B — se existe auditor maduro de hardening, construir checagem propria disso e reinventar a roda (D_regra_5_portoes, D_anti_catalogo). B so se sustenta restrito ao ESPECIFICO desta VPS (containers onion-vps-*, regra DOCKER-USER -i eth0, restart policy).'
     trace: 'https://manpages.org/lynis/8 · docs/evolution/research/stack-harmonia-2026-08/'
+    provenance:
+      source: "https://manpages.org/lynis/8 · docs/evolution/research/stack-harmonia-2026-08/"
+      locator: "objecao do Elenxo ao achado 5 (https://manpages.org/lynis/8, tier 6); which lynis vazio medido; D_regra_5_portoes e D_anti_catalogo em stack-harmonia-2026-08"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_DOCKER_UFW_JA_COBERTO
     node_type: evidence
@@ -486,6 +590,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO (Elenxo, 1 agente) aos achados 6, 8, 9 e 11: Docker fura o UFW e CONHECIDO e COBERTO na opcao A (vps-exposure-check.sh, D_containment_docker_user) — nao favorece B sobre A. Pior: DOCKER-USER -i eth0 cobre SO a internet; container para host em 0.0.0.0 segue aberto, entao inspecionar DOCKER-USER nao basta. E iptables sem root nega: o censo precisa de sudo (o NOPASSWD da VPS), e isso precisa ser declarado.'
     trace: '.claude/validation/vps-exposure-check.sh · docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml'
+    provenance:
+      source: ".claude/validation/vps-exposure-check.sh · docs/onion/graph/onion-vps-consolidation-2026-08.kg.yaml"
+      locator: "objecao do Elenxo aos achados 6, 8, 9 e 11; .claude/validation/vps-exposure-check.sh; D_containment_docker_user; iptables -S DOCKER-USER sem root = Permission denied (you must be root), medido pelo Elenxo"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_AFTER_RULES_E_MUDANCA
     node_type: evidence
@@ -499,6 +607,10 @@ nodes:
     source_kind: engineer
     label: 'OBJECAO (Elenxo, 1 agente) ao achado 7: rotear DOCKER-USER para ufw-user-forward via after.rules e MUDANCA de firewall, nao medicao — cai em mudanca de acesso volta ao humano, e conflita com a contencao ja viva (onion-vps-docker-firewall enabled). Trocar a contencao e decisao separada, fora do escopo de qualquer opcao de censo.'
     trace: 'https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps'
+    provenance:
+      source: "https://www.virtua.cloud/learn/en/tutorials/docker-ufw-firewall-fix-vps"
+      locator: "objecao do Elenxo ao achado 7 (virtua.cloud, tier 5); systemctl is-enabled onion-vps-docker-firewall = enabled, medido"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_HOMELAB_NAO_E_INDEPENDENTE
     node_type: evidence
@@ -512,6 +624,10 @@ nodes:
     source_kind: engineer
     label: 'OBJECAO (Elenxo, 1 agente) ao achado 10: tier 4, blog de opiniao, repete restricao que ja e DURA no pedido — so confirma o que se queria ouvir (instrumento-responde-outra-pergunta). Nao conta como sustentacao independente de nenhuma opcao.'
     trace: 'https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/'
+    provenance:
+      source: "https://mustafa.net/2026/09/27/7-rules-for-letting-an-ai-agent-maintain-your-homelab/"
+      locator: "objecao do Elenxo ao achado 10 (mustafa.net, tier 4, blog de opiniao)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECAO_HEINZEL_ANALOGIA_FROUXA
     node_type: evidence
@@ -525,6 +641,10 @@ nodes:
     source_kind: engineer
     label: 'OBJECAO (Elenxo, 1 agente) ao achado 12: a memoria do heinzel sao notas que o proprio agente escreve (declaracao), nao SSOT tipada reconciliada por radar determinístico. Prova so que alguem junta notas com checagens; nao prova o padrao grafo x vivo, e nao ha medida de falso positivo nem de custo de manter.'
     trace: 'https://github.com/wintermeyer/heinzel'
+    provenance:
+      source: "https://github.com/wintermeyer/heinzel"
+      locator: "objecao do Elenxo ao achado 12 (https://github.com/wintermeyer/heinzel, tier 4, votos 2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_BIND_LOOPBACK_JA_E_REGRA
     node_type: evidence
@@ -538,6 +658,10 @@ nodes:
     source_kind: internal-audit
     label: 'OBJECAO (Elenxo, 1 agente) ao achado 13: bind 127.0.0.1 ja e doutrina e guarda no core — REGRA 64 (compose rastreado com bind publico = HARD no lint) e vps-exposure-check.sh. Nao diferencia B de A.'
     trace: '.claude/validation/vps-exposure-check.sh'
+    provenance:
+      source: ".claude/validation/vps-exposure-check.sh"
+      locator: "objecao do Elenxo ao achado 13 (tier 3); REGRA 64 e vps-exposure-check.sh no core"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_SESSIONSTART_E_AUTOSTART
     node_type: evidence
@@ -551,6 +675,10 @@ nodes:
     source_kind: primary
     label: 'OBJECAO (Elenxo, 1 agente) ao achado 14: censo em SessionStart e AUTO-START com outro nome — roda sem o maestro pedir em toda sessao, numa VPS com varias contas e sessoes (granaai, adotantes), contra o espirito do MOAT W7. O caminho conforme e invocacao explicita (script/comando) mais deteccao de IDADE no lint (padrao REGRA 65), nunca hook que dispara sozinho.'
     trace: 'https://code.claude.com/docs/en/hooks'
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "objecao do Elenxo ao achado 14 (https://code.claude.com/docs/en/hooks, tier 9) + MOAT W7 (/meta:radar maestro-invocado, nunca agendado) + padrao REGRA 65"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_TIMEOUT_FALHA_ABERTO
     node_type: evidence
@@ -564,6 +692,10 @@ nodes:
     source_kind: primary
     label: 'OBJECAO (Elenxo, 1 agente) aos achados 15 e 16: e argumento CONTRA pôr o censo em hook. apt list --upgradable, needrestart e docker inspect de 31 containers podem ser lentos e, ao estourar o timeout, somem em silencio — ausencia de aviso lida como tudo limpo (classe exit-code-nao-e-a-verificacao, guarda anti-fail-open). O restante da objecao chegou truncado.'
     trace: 'https://code.claude.com/docs/en/hooks'
+    provenance:
+      source: "https://code.claude.com/docs/en/hooks"
+      locator: "objecao do Elenxo aos achados 15 e 16 (https://code.claude.com/docs/en/hooks, tier 9); evidencia TRUNCADA no payload em Se houver qualquer integracao por"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_VPS_EXPOSURE_CHECK_VAZA_TOPOLOGIA
     node_type: question
@@ -575,6 +707,10 @@ nodes:
     verified_against: 'grep em .claude/validation/vps-exposure-check.sh: 3 linhas com /home/marcio/onion-vps-*/backups, /home/marcio/backups/*, /home/onion/.claude/backups; o arquivo existe em brain-granaai, gmill, sacola-de-ideias e na porta publica onion-core'
     trace: '.claude/validation/vps-exposure-check.sh'
     label: 'VAZAMENTO JA EXISTENTE, achado ao medir a pergunta do maestro: a guarda vps-exposure-check.sh mora em .claude/validation/ (raiz que viaja) e carrega caminhos FIXOS desta VPS. Nao sao segredos, mas sao topologia da maquina do maestro, e chegaram a tres adotantes e a porta PUBLICA onion-core. CURA, junto da forja da opcao B: a guarda vira core-only (fora do pacote) ou o caminho passa a vir da configuracao, e a porta e re-materializada. GATILHO: a forja da opcao B.'
+    provenance:
+      source: ".claude/validation/vps-exposure-check.sh"
+      locator: "grep em .claude/validation/vps-exposure-check.sh: 3 linhas com /home/marcio/onion-vps-*/backups, /home/marcio/backups/*, /home/onion/.claude/backups; o arquivo existe em brain-granaai, gmill, sacola-de-ideias e na porta publica onion-core"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── evidencias sustentam a pergunta ──
 

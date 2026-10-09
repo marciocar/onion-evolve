@@ -61,6 +61,10 @@ nodes:
     trace: "docs/analysis/backlog-real-2026-09.md"
     verified_against: 'etapa 3 da ordem explicita do maestro (vai na ordem, 2026-09-01); itens = secao 1 da listagem REAL, so os executaveis pelo condutor'
     label: 'Onda 8 — pagar os REAIS: o fix do JWKS no bridge, o lint enxergando .github/workflows, a instrumentacao GTM persistida, o auto-off do console Logto, e os fechamentos triviais de grafo que a revisao-total ja mediu.'
+    provenance:
+      source: "docs/analysis/backlog-real-2026-09.md"
+      locator: "etapa 3 da ordem explicita do maestro (vai na ordem, 2026-09-01); itens = secao 1 da listagem REAL, so os executaveis pelo condutor"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_W8_FECHAMENTO_FONTES
     node_type: evidence
@@ -82,6 +86,10 @@ nodes:
     verified_at: '2026-09-03'
     verified_against: 'run #4 paralelo: 994 casos / 0 falhas / 519 s (par8-final2.log); hook pre-commit --affected-staged --jobs auto; CI --jobs auto'
     trace: 'docs/analysis/bancada-faixas-e-mapa-2026-09.md'
+    provenance:
+      source: "docs/analysis/bancada-faixas-e-mapa-2026-09.md"
+      locator: "run #4 paralelo: 994 casos / 0 falhas / 519 s (par8-final2.log); hook pre-commit --affected-staged --jobs auto; CI --jobs auto"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_BANCADA_FAIXAS_MEDIDA
     node_type: evidence
@@ -93,6 +101,10 @@ nodes:
     trace: 'docs/analysis/bancada-faixas-e-mapa-2026-09.md'
     verified_at: '2026-09-03'
     verified_against: 'runs medidos: serial.log, par8.log (800 s), par8q.log (472 s), lintload (7 lints); CI selftest run 33715418241 (20m18s)'
+    provenance:
+      source: "docs/analysis/bancada-faixas-e-mapa-2026-09.md"
+      locator: "runs medidos: serial.log, par8.log (800 s), par8q.log (472 s), lintload (7 lints); CI selftest run 33715418241 (20m18s)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: Q_KG_BACKLOG_E_INTERMITENTE_EM_PARALELO
     node_type: question
     plane: DEV
@@ -112,6 +124,10 @@ nodes:
     trace: 'docs/evolution/review/fix-bench-emit-pipe-race.md'
     verified_at: '2026-09-04'
     verified_against: 'probe.sh (12 processos x 40, serial vs concorrente) e cure.sh (4 formas x 480 tentativas) em /tmp/tmp/drive; bancada completa 1035/0 em 145 familias/8 workers/777s pos-cura'
+    provenance:
+      source: "docs/evolution/review/fix-bench-emit-pipe-race.md"
+      locator: "probe.sh (12 processos x 40, serial vs concorrente) e cure.sh (4 formas x 480 tentativas) em /tmp/tmp/drive; bancada completa 1035/0 em 145 familias/8 workers/777s pos-cura"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_CURA_HERE_STRING_MEDIDA_0904
     node_type: evidence
     plane: PROD
@@ -122,6 +138,10 @@ nodes:
     trace: 'docs/evolution/review/fix-bench-emit-pipe-race.md'
     verified_at: '2026-09-04'
     verified_against: 'lint-selftest.sh: 429 here-strings, 0 vereditos em pipe; bench1.log (1035/0/0, 777s)'
+    provenance:
+      source: "docs/evolution/review/fix-bench-emit-pipe-race.md"
+      locator: "lint-selftest.sh: 429 here-strings, 0 vereditos em pipe; bench1.log (1035/0/0, 777s)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_KG_BACKLOG_E_CONTADOR_NAO_SOBE_NO_MUTANTE
     node_type: question
@@ -162,6 +182,10 @@ nodes:
     verified_against: 'intersecao medida no corpus vivo: 4 de 4 arquivos, comm -12 entre a saida NAO-MEDIDO da 82 e o baseline da 78'
     trace: '.claude/validation/kg-census-parity-check.sh'
     label: "Os 4 grafos que a REGRA 82 (Os dois leitores do corpus CONCORDAM sobre quem e no) NAO consegue medir sao BYTE A BYTE os 4 que a REGRA 78 (`.kg.yaml` versionado e YAML VALIDO, com catraca) TOLERA pelo baseline. Medido: intersecao 4/4. Consequencia: nesses arquivos nenhuma das duas cobra em HARD, e um no forjado dentro de bloco literal passa pelas DUAS. Nao e duplicidade, e BURACO. Ja esta NOMEADO e CONTADO na saida da 82 (classe BURACO-78-82), o que o torna visivel — mas visivel nao e coberto."
+    provenance:
+      source: ".claude/validation/kg-census-parity-check.sh"
+      locator: "intersecao medida no corpus vivo: 4 de 4 arquivos, comm -12 entre a saida NAO-MEDIDO da 82 e o baseline da 78"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_COMO_FECHAR_O_BURACO_78_82
     node_type: decision
@@ -195,6 +219,10 @@ nodes:
     verified_against: 'o GNU grep 3.11 que os scripts usam (/usr/bin/grep), entrada real `Comandos — 116 invocáveis`: com `[—:–-]` casa VAZIO em LC_ALL=C e casa em C.UTF-8; com `(—|–|:|-)` casa nos dois. O lint inteiro num sandbox (origin/main e árvore viva) em C: a fixture r16 bad-invocaveis-invertida NAO e citada; em C.UTF-8 e citada'
     trace: '.claude/validation/lint-artifacts.sh (REGRA 16, pre-filtro e extrator) · .claude/utils/adopt/claude-md-fuse.sh · .claude/validation/lint-selftest.sh (shell-locale)'
     label: "⚠️ CORRIGIDO DUAS VEZES, e a 2a correcao desfaz a 1a. A 1a redacao (2026-09-12) dizia que a classe de locale sobrevivia em 3 sitios. A 2a (mesmo dia) a declarou INOCUA: `grep -oiE` com `[—:–-]` casaria identico em C e C.UTF-8. ERA MEDICAO NO CAMINHO ERRADO: na shell interativa desta sessao `grep` e uma FUNCAO que chama o ugrep (casa por caractere em qualquer locale); os scripts rodam o GNU grep 3.11, que em locale C le o conjunto BYTE A BYTE e nao casa o travessao. MEDIDO em 2026-09-13 com /usr/bin/grep: a REGRA 16 (Contagem de inventario-TOTAL divergente da SSOT) fica CEGA a `Comandos — N invocaveis` no hook de pre-commit (que roda em C) — fail-open real, o `mais grave` da 1a redacao estava certo. E a CAUSA do `r16-count-drift/bad-invocaveis-invertida` que so reprovava na suite: a suite roda em C, o teste isolado rodava na shell UTF-8. Sitios reais, contados pela guarda contra o origin/main: 2 no lint-artifacts (extrator + pre-filtro), 1 no claude-md-fuse (`OBRIGAT[ÓO]RI[OA]`, que em C nao casa o acentuado, e o `-i` nao dobra caixa de multibyte), 3 no context-freshness-metric (curados antes neste PR) e 1 no lint-selftest, mais 2 no projection-safety (`gsub(/[—–\/;,]/`) — este NAO era inocuo: com membro `ÓTICA-Z` ou apostrofo tipografico, em C os termos saiam partidos (`TICA-Z`, `Dona`) e a guarda da REGRA 30 comparava pedacos; so parecia inocuo porque o members.yaml de hoje nao tem esses bytes. O python do rules-registry segue imune. Licao de METODO que sobrevive as duas correcoes: medir comportamento de script exige o BINARIO do script (`command grep` ou o proprio script), nunca a ferramenta da shell interativa."
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh (REGRA 16, pre-filtro e extrator) · .claude/utils/adopt/claude-md-fuse.sh · .claude/validation/lint-selftest.sh (shell-locale)"
+      locator: "o GNU grep 3.11 que os scripts usam (/usr/bin/grep), entrada real `Comandos — 116 invocáveis`: com `[—:–-]` casa VAZIO em LC_ALL=C e casa em C.UTF-8; com `(—|–|:|-)` casa nos dois. O lint inteiro num sandbox (origin/main e árvore viva) em C: a fixture r16 bad-invocaveis-invertida NAO e citada; em C.UTF-8 e citada"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_CURAR_O_LOCALE_PRE_EXISTENTE
     node_type: decision
@@ -241,6 +269,10 @@ nodes:
     verified_against: 'SELADO PELO MAESTRO em 2026-10-04, e o selo foi conferido CONTRA O VIVO antes de aplicar, nao aceito por declaracao do STATE.md: a REGRA 95 (Anuncio que afirma ZERO sobre classe verificavel sem medicao) esta em `main` — `announce-zero-claim-check.sh` presente (5.496 bytes), registrada em 4 sitios do `lint-artifacts.sh`, e a familia `run_announce_zero_claim_selftests` passa 9/9. O driver conduziu este no ate PR-verde na passada de 2026-10-01 e PAROU no flip de status, que a tabela de selagem reserva ao maestro — mecanismo funcionando, nao atraso. ⚠️ O QUE A CURA NAO FECHA, e fica declarado: a guarda e PROSPECTIVA (so anuncios de 1o nivel em `outbox/<id>/`, onde a cura ainda existe; `_processed/` ja viajou e historia nao se reescreve), e nasceu `SEM-OBJETO` porque havia ZERO anuncios de 1o nivel na data — o que e DECLARACAO, nao conformidade. Ela morde o PROXIMO anuncio. Historico original do sinal: sinal de campo de um adotante (2026-08-31), triado e re-medido em 2026-09-16: a metade do transporte JA FOI CURADA (co-deliver.sh:111 exige .claude/.onion-version com role adopted|hub); a metade do RELATO segue viva'
     label: "A METADE VIVA DE UM SINAL CUJA OUTRA METADE JA FOI CURADA — registrada aqui para o arquivamento do sinal nao apagar o achado. O anuncio que viaja ao adotante AFIRMOU estado verificavel do repo dele ('as portas estao OK: nenhuma sem prefixo de bind') enquanto a catraca da MESMA leva tinha contado 38 exposicoes, e o relatorio DENTRO da propria branch dizia o numero certo. Dois artefatos da mesma leva, discordando: um dizia 0, o outro 38. O adotante que le so o anuncio — que e o unico documento que chega ANTES do merge — conclui que nao ha o que fazer, e a divida tolerada pela catraca fica tolerada para sempre porque ninguem foi avisado. O mesmo anuncio citava '3 fallbacks de senha' onde o padrao produzia 19 em 10 variaveis: quem aplicasse 'o fix de 3 linhas' curaria 16% da classe achando ter curado a classe. A CURA PROPOSTA pelo adotante, que e a certa: quando o /meta:co-announce descreve estado verificavel, DERIVAR o numero do artefato de medicao (baseline da catraca, saida do gate) em vez de reafirmar em prosa; e quando o numero nao estiver disponivel na geracao, dizer 'nao medido' em vez de afirmar o estado. Guarda barata que cabe junto: anuncio e relatorio da mesma leva nao podem discordar sobre uma contagem que ambos citam. Classe: declarado != medido, no unico artefato que viaja sozinho."
     trace: '.claude/commands/meta/co-announce.md'
+    provenance:
+      source: ".claude/commands/meta/co-announce.md"
+      locator: "SELADO PELO MAESTRO em 2026-10-04, e o selo foi conferido CONTRA O VIVO antes de aplicar, nao aceito por declaracao do STATE.md: a REGRA 95 (Anuncio que afirma ZERO sobre classe verificavel sem medicao) esta em `main` — `announce-zero-claim-check.sh` presente (5.496 bytes), registrada em 4 sitios do `lint-artifacts.sh`, e a familia `run_announce_zero_claim_selftests` passa 9/9. O driver conduziu este no ate PR-verde na passada de 2026-10-01 e PAROU no flip de status, que a tabela de selagem reserva ao maestro — mecanismo funcionando, nao atraso. ⚠️ O QUE A CURA NAO FECHA, e fica declarado: a guarda e PROSPECTIVA (so anuncios de 1o nivel em `outbox/<id>/`, onde a cura ainda existe; `_processed/` ja viajou e historia nao se reescreve), e nasceu `SEM-OBJETO` porque havia ZERO anuncios de 1o nivel na data — o que e DECLARACAO, nao conformidade. Ela morde o PROXIMO anuncio. Historico original do sinal: sinal de campo de um adotante (2026-08-31), triado e re-medido em 2026-09-16: a metade do transporte JA FOI CURADA (co-deliver.sh:111 exige .claude/.onion-version com role adopted|hub); a metade do RELATO segue viva"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_POR_QUE_O_REVISOR_SEMANTICO_MORRE
     node_type: question

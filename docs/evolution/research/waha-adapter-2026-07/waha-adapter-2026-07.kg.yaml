@@ -24,6 +24,10 @@ nodes:
     verified_against: webfetch-github-releases-e-waha.devlike.pro-docs
     label: "WAHA CURRENT (web-verificado): release 2026.7.2 (29/07/2026); Plus FUNDIDO no Core na 2026.6.1 -> 100% gratis; licenca Apache-2.0; engines WEBJS/NOWEB/GOWS; Docker devlikeapro/waha :3000 + volume /app/.sessions; auth por header X-Api-Key (WAHA_API_KEY); sessao POST/GET/PUT/DELETE /api/sessions + start|stop|restart|logout + GET /api/{s}/auth/qr + pairing-code; envio POST /api/sendText {chatId:'<num>@c.us',text,session}; webhooks WHATSAPP_HOOK_* com eventos message/session.status/message.ack/call.*"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "webfetch-github-releases-e-waha.devlike.pro-docs"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_waha_plus_contradiction
     node_type: claim
@@ -35,6 +39,10 @@ nodes:
     verified_against: readme-do-repo-vs-changelog-2026.6.1
     label: "CONTRADICAO RESIDUAL: o README do repo GitHub ainda cita 'WAHA Plus' + 'docker login -u devlikeapro -p {KEY}', divergindo do changelog 2026.6.1 (Plus fundido no Core). Verificacao decisiva NO DEPLOY: 'docker pull devlikeapro/waha' funciona SEM login? Se exigir credencial, a premissa 'tudo gratis' cai e o default merece re-litigio (so esse ponto — o risco de ToS ja esta decidido)"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "readme-do-repo-vs-changelog-2026.6.1"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_engine_weight_hypothesis
     node_type: claim
@@ -78,6 +86,10 @@ nodes:
     verified_against: anti-padrao-3-env-switch-ficticio
     label: "NAO criar WA_TRANSPORT agora: hoje o transporte e DETERMINADO pelo provider (WAHA->http; wwebjs->local-process), nao escolhido pelo ambiente. Variavel que nao pode variar dentro de um provider e o anti-padrao #3 (env switch ficticio) e violaria §3.4. O transport fica na INTERFACE como readonly resolvido pelo detector (precedente IForge.transport); a variavel nasce quando existir 2o transporte real. Divergencia vs task-manager/forge DECLARADA no README (como o forge declarou seu cli-default)"
     trace: "docs/meta-specs/integrations.md"
+    provenance:
+      source: "docs/meta-specs/integrations.md"
+      locator: "anti-padrao-3-env-switch-ficticio"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── O ACHADO CENTRAL ──
   - id: D_dogfood_before_sdaal
@@ -90,6 +102,10 @@ nodes:
     verified_against: teste-do-gatilho-1-real-mais-N-prometidos
     label: "VEREDITO F1: DOGFOOD PRIMEIRO, SDAAL DEPOIS. O Teste do EIXO passou no papel (2 providers) mas o Teste do GATILHO NAO disparou — 1 provider REAL rodando (whatsapp-web.js) + 1 DIRIGIDO (WAHA nao deployado) = script. Escrever a interface antes do WAHA existir seria catedral, e escrita contra uma DOC, nao contra um COMPORTAMENTO (behavior-over-declaration). ORDEM: (1) deployar WAHA + 1 sendText real = O GATILHO; (2) medir as 2 degradacoes do wwebjs; (3) so entao escrever .claude/utils/whatsapp/; (4) .env.example sem WA_TRANSPORT; (5) nomear o 1o consumidor cego"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "teste-do-gatilho-1-real-mais-N-prometidos"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_retraction_criterion
     node_type: claim
@@ -141,6 +157,10 @@ nodes:
     verified_against: leitura-do-ADR-onion-adr-sdaal-nested-two-level-2026-07
     label: "EXISTE ADR CANONICO (2026-07-17, accepted, nascido de pedido do maestro): 'SDAAL aninhado de 2 niveis (canal -> solucao)'. NIVEL-1 = CANAL (whatsapp/sms/email/push); NIVEL-2 = SOLUCAO dentro do canal (whatsapp -> waha/cloud-api). 5 regras: Teste do Eixo RECURSIVO (cada nivel passa por si; 'aninhar nao relaxa o gate, multiplica-o'); canal->solucao e FACETA (escolhe-1), nao escopo; adapter de nivel-1 e o CANAL; default de solucao e POR CANAL declarado; fallback nos DOIS eixos independentes. Validado por mercado (Novu/Knock modelam channel->provider). Gatilho do nivel-1 JA quase pronto: ntfy (push, ad-hoc em mail-receiver.sh) + whatsapp (WAHA)"
     trace: "docs/analysis/onion-adr-sdaal-nested-two-level-2026-07.md"
+    provenance:
+      source: "docs/analysis/onion-adr-sdaal-nested-two-level-2026-07.md"
+      locator: "leitura-do-ADR-onion-adr-sdaal-nested-two-level-2026-07"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_naming_messaging_nested
     node_type: decision
@@ -152,6 +172,10 @@ nodes:
     verified_against: ADR-aninhado-mais-ratificacao-do-maestro
     label: "CORRECAO RATIFICADA: dominio = 'messaging' com aninhamento, NAO 'whatsapp' plano. A F1 recomendou 'whatsapp' por NAO ter o ADR de aninhamento em contexto (falha de aterramento da orquestracao — os workers foram apontados a task-manager/forge/integrations, nao ao ADR). CONVENCAO DE ENV recursiva (deriva da convencao viva <DOMAIN>_PROVIDER): '<CAMINHO>_PROVIDER' SELECIONA em cada nivel e '<CAMINHO>_<SOLUCAO>_<CONFIG>' CONFIGURA — MESSAGING_PROVIDER=whatsapp|ntfy|email · MESSAGING_WHATSAPP_PROVIDER=waha|web-js · MESSAGING_WHATSAPP_WAHA_BASE_URL/API_KEY · MESSAGING_EMAIL_PROVIDER=smtp|resend. Diretorios espelham: .claude/utils/messaging/ -> adapters/whatsapp.md que e sub-SDAAL em messaging/whatsapp/. BONUS: resolve MELHOR que o WA_ proposto a colisao real (o WAHA consome WHATSAPP_HOOK_* como config DO CONTAINER; com MESSAGING_ nao ha colisao)"
     trace: "docs/analysis/onion-adr-sdaal-nested-two-level-2026-07.md"
+    provenance:
+      source: "docs/analysis/onion-adr-sdaal-nested-two-level-2026-07.md"
+      locator: "ADR-aninhado-mais-ratificacao-do-maestro"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_sender_is_consumer
     node_type: decision
@@ -163,6 +187,10 @@ nodes:
     verified_against: ratificacao-do-maestro
     label: "CORRECAO RATIFICADA: o whatsapp-sender e a APLICACAO (consumidor), WAHA e whatsapp-web.js sao os MEIOS (solucoes de nivel-2). RESOLVE O GAP MAIS CARO da F1 ('nenhum consumidor real nomeado') — a regra (c) do Teste do Eixo (consumidor CEGO ao provider) ganha sujeito. TRABALHO: refatorar o whatsapp-sender p/ chamar a abstracao em vez de importar whatsapp-web.js direto (hoje e literalmente o anti-padrao #2, provider hardcoded no consumidor). ENFRAQUECE o criterio de retracao da F1, que exigia 'consumidor real cego' — agora tem"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "ratificacao-do-maestro"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── GATILHO PARCIAL 2026-07-31: dogfood LOCAL do WAHA (comportamento medido, não doc lida) ──
   - id: E_dogfood_local_waha
@@ -175,6 +203,10 @@ nodes:
     verified_against: docker-run-local-curl-contra-a-API-viva
     label: "DOGFOOD LOCAL EXECUTADO (comportamento, nao doc): 'docker pull devlikeapro/waha' funciona SEM LOGIN -> a contradicao do README ('Plus' + docker login) e DOC VELHA, RESOLVIDA por comportamento. Imagem = 4.1GB (dado NOVO e material p/ a KVM8). API confirmada viva: sem X-Api-Key -> 401; com key -> 200. POST /api/sessions {name,start:true} -> status STARTING; GET /api/sessions/default -> SCAN_QR_CODE (enum real); GET /api/{s}/auth/qr -> 200 image/png 5418 bytes (QR real). Fluxo da doc bate 1:1 com o vivo"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "docker-run-local-curl-contra-a-API-viva"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_engine_measured
     node_type: evidence
@@ -186,6 +218,10 @@ nodes:
     verified_against: docker-stats-dois-containers-sessao-iniciada
     label: "ENGINE MEDIDO (a hypothesis virou numero): NOWEB = 420.7 MiB · WEBJS = 788.8 MiB, ambos com sessao iniciada aguardando QR -> WEBJS e ~1.9x mais pesado. DECIDE o engine default = NOWEB p/ a KVM8 (RAM finita). Consequencia colateral: com NOWEB o WAHA NAO compartilha mecanismo com o whatsapp-web.js (que e browser-based) — o argumento de ISOLAMENTO do default WAHA se sustenta, e os dois providers sao genuinamente diferentes em ambiente"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "docker-stats-dois-containers-sessao-iniciada"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_vps_access_blocked
     node_type: question
@@ -197,6 +233,10 @@ nodes:
     verified_against: ssh-permission-denied-2-chaves-3-usuarios
     label: "BLOQUEIO MEDIDO: esta sessao NAO tem acesso a VPS. ssh com id_ed25519 E com onion_vps_deploy (comentario 'onion-kvm8(srv1812846)-deploy-2026-07-08'), usuarios onion/marcio/root -> todos 'Permission denied (publickey)'. O alias 'onion-kvm8' nao resolve; bridge.onionevolve.com NAO resolve daqui (auth./onionevolve.com resolvem -> 179.197.65.94). Logo o deploy em PRODUCAO e o pareamento do numero (QR) sao atos do MAESTRO, nao desta sessao. O dogfood local cobriu tudo que nao exige a VPS nem o telefone"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "ssh-permission-denied-2-chaves-3-usuarios"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── CORREÇÃO 2026-07-31 (2ª): a sessão RODA NA VPS — o "sem acesso" era erro meu ──
   - id: E_session_is_on_vps
@@ -209,6 +249,10 @@ nodes:
     verified_against: hostname-whoami-hostnamectl-systemctl
     label: "REFUTA Q_vps_access_blocked: a sessao RODA NA PROPRIA VPS. hostname=srv1812846, user=marcio, Virtualization=kvm, Ubuntu 24.04.4; caddy+docker+onion-bridge ativos aqui. O ssh falhava porque 179.197.65.94 NAO e a VPS (auth./onionevolve.com resolvem p/ la, mas o host e este) — eu inferi 'maquina local' das falhas de ssh SEM antes rodar `hostname`. Licao verify-access-before-specifying aplicada ao contrario: tentei o acesso REMOTO sem checar se ja estava DENTRO. CONSEQUENCIA POSITIVA: o dogfood do WAHA foi executado NA VPS — as medicoes (NOWEB 420.7 vs WEBJS 788.8 MiB) sao representativas de PRODUCAO, nao de laptop"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "hostname-whoami-hostnamectl-systemctl"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_sender_absent_on_vps
     node_type: evidence
@@ -220,6 +264,10 @@ nodes:
     verified_against: ls-home-onion-mais-find-whatsapp-web.js-na-vps
     label: "ACHADO GRANDE: o whatsapp-sender NAO EXISTE MAIS na VPS. /home/onion/ contem apenas onion-bridge (+ dotfiles); find por 'whatsapp-web.js' na maquina inteira = ZERO. O parecer de 2026-07-05 dizia 'reinstalado no VPS (~onion/whatsapp-sender)' — declarado != verificado, 26 dias depois sumiu. REFUTA a premissa da F1 ('1 provider REAL rodando + 1 dirigido'): hoje ha ZERO capacidade de WhatsApp na VPS. Resolve Q_wwebjs_unread por AUSENCIA (nao ha o que ler) e muda o Teste do Eixo — com o WAHA deployado passamos a ter 1 provider real, nao 2"
     trace: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
+    provenance:
+      source: "docs/analysis/onion-parecer-whatsapp-sender-2026-07.md"
+      locator: "ls-home-onion-mais-find-whatsapp-web.js-na-vps"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_waha_deployed_prod
     node_type: evidence
@@ -231,6 +279,10 @@ nodes:
     verified_against: docker-compose-up-mais-curl-na-vps
     label: "WAHA DEPLOYADO NA VPS (o gatilho, metade infra): /home/marcio/onion-vps-waha/docker-compose.yml no padrao da casa (stacks em /home/marcio/<projeto>). container onion-waha, restart unless-stopped, bind 127.0.0.1:3999 (SEM superficie publica — o consumidor roda no mesmo host), engine NOWEB (decidido POR MEDICAO), volume ./sessions persistente, segredos gerados por openssl em .env com umask 077 + .gitignore. PROVAS: 401 sem X-Api-Key / 200 com; POST /api/sessions -> SCAN_QR_CODE; GET /auth/qr -> 200 png 5379 bytes; RAM em producao 412.9 MiB. FALTA SO o ato fisico do maestro: escanear o QR (parear o numero)"
     trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
+    provenance:
+      source: "/home/marcio/onion-vps-waha/docker-compose.yml"
+      locator: "docker-compose-up-mais-curl-na-vps"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── GATILHO FECHADO 2026-08-01: 1a mensagem REAL enviada ──
   - id: E_gatilho_fechado
@@ -243,6 +295,10 @@ nodes:
     verified_against: post-api-sendText-contra-waha-vivo-na-vps
     label: "GATILHO FECHADO: sessao PAREADA (status WORKING, me.pushName 'Marcio Carvalho') via PAIRING CODE (nao QR) e 1a MENSAGEM REAL ENVIADA por POST /api/sendText. Resposta observada: {key:{remoteJid,fromMe:true,id:'3EB0F3FD25A3BD038FC7EE'}, messageTimestamp, status:'PENDING'}. DECIDE 2 pontos do contrato que estavam no papel: (1) o WAHA DEVOLVE key.id real -> MessageReceipt.id e preenchivel neste provider (a nullabilidade existe pelo OUTRO provider, nao por este); (2) status PENDING prova CICLO DE VIDA de entrega (webhook message.ack) -> os estados queued/sent do MessageReceipt tem lastro, nao sao invencao. OBSERVACAO A VERIFICAR: me.id voltou '555197702725@c.us' (sem o 9), mas o envio para '5551997702725@c.us' funcionou — normalizacao de numero BR e assimetrica e o adapter precisa tratar"
     trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
+    provenance:
+      source: "/home/marcio/onion-vps-waha/docker-compose.yml"
+      locator: "post-api-sendText-contra-waha-vivo-na-vps"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_pairing_needs_primary
     node_type: claim
@@ -266,6 +322,10 @@ nodes:
     verified_against: tres-envios-controlados-com-9-sem-9-e-lid
     label: "CAUSA RAIZ (medida, 3 envios controlados): o WhatsApp moderno endereca por LID (Linked ID), nao por telefone. '5551997702725@c.us' (com 9) -> ERRO 'No LID for user'; '555197702725@c.us' (sem 9) -> falha; '84190032855084@lid' -> ENVIOU E CHEGOU (confirmado pelo maestro). GET /api/contacts/check-exists?phone=... devolve {numberExists:true, chatId:'84190032855084@lid'} — o telefone e CHAVE DE BUSCA, o LID e a identidade. O mesmo LID ja aparecia no me.lid da sessao NOWEB (consistente)"
     trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
+    provenance:
+      source: "/home/marcio/onion-vps-waha/docker-compose.yml"
+      locator: "tres-envios-controlados-com-9-sem-9-e-lid"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_resolve_is_contract
     node_type: decision
@@ -277,6 +337,10 @@ nodes:
     verified_against: achado-LID-medido
     label: "CORRIGE O CONTRATO DA F1: a sintese especificou que o adapter faria '${digits}@c.us' — ERRADO p/ contas LID. O correto: sendText(to: PhoneRef) -> (1) RESOLVE via check-exists(phone) -> chatId (@lid ou @c.us); (2) envia ao chatId resolvido. RESOLUCAO DE DESTINATARIO E PARTE DO CONTRATO, nao detalhe de implementacao — e e CARA (chamada extra por envio) -> o adapter precisa de CACHE de resolucao. Implicacao: PhoneRef nao e endereco, e chave de busca"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "achado-LID-medido"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_engine_decision_reopened
     node_type: claim
@@ -299,6 +363,10 @@ nodes:
     verified_against: nenhum-dos-3-destinatarios-recebeu
     label: "DECLARADO != VERIFICADO no sentido mais literal: as 3 primeiras mensagens (NOWEB) voltaram HTTP 200 com key.id e status PENDING — e eu declarei 'GATILHO FECHADO'. NENHUMA foi entregue (nem ao maestro nem ao 2o numero). O 200 do POST /sendText prova ACEITE NA FILA, NAO ENTREGA. O USync falhava em silencio (WARN, nao erro). LICAO P/ O CONTRATO: status 'PENDING' NAO pode ser reportado como sucesso pelo adapter; so ACK (webhook message.ack) prova entrega. O gatilho so fechou DE FATO no envio ao LID, confirmado pelo destinatario humano"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "nenhum-dos-3-destinatarios-recebeu"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── PENDENCIAS FECHADAS 2026-08-01 ──
   - id: D_engine_noweb_confirmed
@@ -311,6 +379,10 @@ nodes:
     verified_against: reteste-noweb-mais-LID-confirmado-por-humano
     label: "PENDENCIA 1 FECHADA — ENGINE DEFAULT = NOWEB. Re-teste com endereçamento LID correto: NOWEB enviou e a mensagem CHEGOU (confirmado pelo destinatario humano), com ZERO erros de USync nos logs (antes falhava sempre). Portanto o engine NUNCA foi a causa — era enderecamento. NOWEB e o default por medicao (412.9 MiB vs 638.8 do WEBJS, ~35% mais leve) SEM perda de funcionalidade. O valor real do WEBJS foi DIAGNOSTICO: mensagem de erro legivel ('No LID for user') vs o WARN silencioso do NOWEB ('USync yielded no results') — registrar como nota de troubleshooting, nao como default"
     trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
+    provenance:
+      source: "/home/marcio/onion-vps-waha/docker-compose.yml"
+      locator: "reteste-noweb-mais-LID-confirmado-por-humano"
+      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ack_lifecycle_proven
     node_type: evidence
@@ -322,6 +394,10 @@ nodes:
     verified_against: webhook-message.ack-capturado-em-container-na-rede-do-compose
     label: "PENDENCIA 2 FECHADA — CICLO DE ENTREGA PROVADO por webhook: capturado 'message.ack ack=1 SERVER' e depois 'ack=3 READ' (destinatario LEU). ack e numerico com nome: 1=SERVER, 2=DEVICE, 3=READ. E A UNICA PROVA REAL DE ENTREGA — confirma que HTTP 201 + PENDING nao prova nada. CONTRATO: sendText retorna 'queued'; confirmacao e ASSINCRONA (quem quiser assina o ack e correlaciona pelo MessageReceipt.id). ACHADO OPERACIONAL: ufw bloqueia container->host, entao o receptor de webhook precisa estar NA REDE DO COMPOSE (alcancado por nome DNS), nao no host"
     trace: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/SYNTHESIS.md"
+      locator: "webhook-message.ack-capturado-em-container-na-rede-do-compose"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_webhook_event_scope_is_guardrail
     node_type: claim
@@ -333,6 +409,10 @@ nodes:
     verified_against: erro-real-cometido-nesta-sessao
     label: "REGRA DE GUARDRAIL NASCIDA DE ERRO PROPRIO: assinei os eventos 'message' + 'message.ack' para medir ENTREGA — mas 'message' faz as mensagens RECEBIDAS pelo dono trafegarem pelo receptor (mensagens pessoais de terceiros apareceram nos logs do catcher). Para provar entrega bastava 'message.ack'. ASSINATURA DE EVENTO DE WEBHOOK E DECISAO DE ESCOPO, NAO CONVENIENCIA: allowlist de eventos, minimo necessario, NUNCA '*'. Mesmo modo-de-falha do 'peca so os campos necessarios' (field selection). Webhook removido e receptor destruido assim que percebido. Item da doutrina de webhook (aresta de ENTRADA do catalogo)"
     trace: "docs/knowledge-base/concepts/onion-guardrails.md"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-guardrails.md"
+      locator: "erro-real-cometido-nesta-sessao"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: E_waha_current

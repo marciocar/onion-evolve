@@ -13,6 +13,10 @@ nodes:
     verified_against: PR-486-mergeado-no-main
     label: "Promover ao core o console rico narrável, evoluindo o kg-console.sh in-place — o que o estudo SEED deixou gated (D_DESKTOP_CYTOSCAPE, D_EVOLVE_NOT_ADOPT)"
     trace: "docs/analysis/onion-adr-kg-console-rich-2026-07.md"
+    provenance:
+      source: "docs/analysis/onion-adr-kg-console-rich-2026-07.md"
+      locator: "PR-486-mergeado-no-main"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_seed_gated
     node_type: claim
     plane: DEV
@@ -31,6 +35,10 @@ nodes:
     verified_against: vendor-1-arquivo-sha-congelado
     label: "Renderer = Cytoscape core 3.34 vendorizado em UM arquivo (435KB, SHA congelado); layout cose EMBUTIDO em vez de fcose — evita a cadeia frágil de deps e mantém o vendoring num artefato só"
     trace: ".claude/validation/vendor/kg-console/provenance.md"
+    provenance:
+      source: ".claude/validation/vendor/kg-console/provenance.md"
+      locator: "vendor-1-arquivo-sha-congelado"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: C_fcose_planned
     node_type: claim
     plane: DEV
@@ -81,6 +89,10 @@ nodes:
     verified_against: html-gerado-sem-fetch-nem-src-externo
     label: "O HTML é autocontido (CSP-safe, file://, zero rede): injeção base64 à prova de </script>, vendor inline, sem fetch/XHR — verificado no HTML gerado"
     trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "html-gerado-sem-fetch-nem-src-externo"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: D_regra47_mechanism
     node_type: decision
     plane: DEV
@@ -99,6 +111,10 @@ nodes:
     verified_against: hook-nativo-e-CI-486-verdes
     label: "36 selftests verdes (kg-view V6, kg-console, kg-narrate N1-N5, rules-registry, assemble-plugin) + lint 0 HARD; CI #486 pass (lint-onion-artifacts + onion-review)"
     trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "hook-nativo-e-CI-486-verdes"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_headless_valid
     node_type: evidence
     plane: PROD
@@ -109,6 +125,10 @@ nodes:
     verified_against: node-cytoscape-headless
     label: "Teste headless: Cytoscape instanciou com os elementos+style reais (underlay, double-border, tee/chevron aceitos), .closedNeighborhood() e concentric rodaram — o modelo+estilos são válidos"
     trace: ".claude/validation/vendor/kg-console/cytoscape.min.js"
+    provenance:
+      source: ".claude/validation/vendor/kg-console/cytoscape.min.js"
+      locator: "node-cytoscape-headless"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_scale_881
     node_type: evidence
     plane: PROD
@@ -119,6 +139,10 @@ nodes:
     verified_against: federation-research-881-nos
     label: "Escala provada: o console gera para 19/116/881 nós; o maior (881 nós/1086 arestas) em 0.35s, 1.1MB — colapso-por-cluster no grande via concentric por atenção"
     trace: ".claude/validation/kg-console.sh"
+    provenance:
+      source: ".claude/validation/kg-console.sh"
+      locator: "federation-research-881-nos"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_market_2026
     node_type: evidence
     plane: DEV
@@ -129,6 +153,10 @@ nodes:
     verified_against: pesquisa-web-jul-2026
     label: "Pesquisa jul/2026: Cytoscape.js é o único renderer maduro single-file sem build; narração pré-cozida é o padrão p/ offline/CSP; GraphRAG/chat-over-graph são live (exigem runtime)"
     trace: "docs/analysis/onion-adr-kg-console-rich-2026-07.md"
+    provenance:
+      source: "docs/analysis/onion-adr-kg-console-rich-2026-07.md"
+      locator: "pesquisa-web-jul-2026"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_m2_dogfood
     node_type: evidence
     plane: PROD
@@ -139,6 +167,10 @@ nodes:
     verified_against: narracao-m2-valida-16-resumos
     label: "Dogfood: narração real do m2-bridge-logto (9 passos, 15 focos, 16 resumos) — válida pelo kg-narrate-validate; abre no arco canônico e fecha na fronteira stale"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.narration.json"
+    provenance:
+      source: "docs/onion/graph/m2-bridge-logto-2026-07.narration.json"
+      locator: "narracao-m2-valida-16-resumos"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: A_kg_console
     node_type: artifact
     plane: PROD
@@ -149,6 +181,10 @@ nodes:
     verified_against: main-dd6677b
     label: "kg-console.sh — o projetor rico (Cytoscape inline, encoding epistêmico, player de tour); LLM-free"
     trace: ".claude/validation/kg-console.sh"
+    provenance:
+      source: ".claude/validation/kg-console.sh"
+      locator: "main-dd6677b"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: Q_f3_wow
     node_type: question
     plane: DEV

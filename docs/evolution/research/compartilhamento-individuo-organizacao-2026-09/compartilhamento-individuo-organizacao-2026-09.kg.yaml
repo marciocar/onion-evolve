@@ -107,6 +107,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA (tier 5, 3-0, fornecedor falando de si): "O Glean constroi uma visao consolidada de cada pessoa (identidade unificada) agregando sinais de todas as aplicacoes conectadas — o Company Brain reconcilia o individuo como no de identidade, nao apenas como autor de conteudo." Limite (E_OBJECTION_GLEAN_IDENTITY_IS_ACL_NOT_SUBJECT): identidade para aplicar permissao por item e compativel com a posicao rival (autor); so refutaria B se o grafo expusesse sinais de atividade por pessoa a terceiros, e a doc nao afirma isso. Um unico fornecedor.'
     trace: 'https://docs.glean.com/security/knowledge-graph'
+    provenance:
+      source: "https://docs.glean.com/security/knowledge-graph"
+      locator: "https://docs.glean.com/security/knowledge-graph — verificacao adversarial 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_VIVA_COPILOT_DASHBOARD_MANAGER_COMPARISON
     node_type: evidence
@@ -121,6 +125,10 @@ nodes:
     source_kind: aggregator
     label: 'CONFIRMADA (tier 5, 3-0): "A Microsoft lancou um recurso do Viva Insights (via Copilot Dashboard/agent benchmarks) que permite a gestores monitorar e comparar como equipes usam o Copilot, inclusive contra dados anonimizados de empresas similares." Limite (E_OBJECTION_VIVA_MONITOR_VERB_OVERSTATES): manchete sensacionalista; o changelog da Microsoft informa grupo minimo padrao 10, reduzivel a 5, e benchmark externo por coorte de 20+ empresas — o verbo monitorar sugere visao individual que a arquitetura declarada nao entrega. Anuncio primario no Tech Community nao lido.'
     trace: 'https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/'
+    provenance:
+      source: "https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/"
+      locator: "https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/ — verificacao adversarial 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_VIVA_COPILOT_ADOPTION_METRICS
     node_type: evidence
@@ -149,6 +157,10 @@ nodes:
     source_kind: paper
     label: 'CONFIRMADA (tier 8, 3-0): "O principio da finalidade restringe o uso de dados de monitoramento no trabalho a um conjunto fechado e pre-declarado de propositos (no exemplo belga: saude/seguranca, protecao de ativos, controle de producao, controle do trabalho) — dado coletado para um proposito nao pode ser reaproveitado livremente para outro." Confianca abaixo do tier por E_OBJECTION_BELGIAN_CLOSED_LIST_NOT_GENERAL: a lista e da CCT belga n. 68 (cameras); no GDPR (art. 6(4)) e na LGPD (art. 6 I-II) a finalidade e ABERTA com tratamento posterior compativel. Vale como ANALOGIA DE DESENHO (proposito pre-declarado por fluxo), nao como regra importavel.'
     trace: 'https://academic.oup.com/idpl/article/12/4/276/6668508'
+    provenance:
+      source: "https://academic.oup.com/idpl/article/12/4/276/6668508"
+      locator: "https://academic.oup.com/idpl/article/12/4/276/6668508 — verificacao adversarial 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── TESTEMUNHO DO ADOTANTE (restrição matemática medida em produto vivo) ─────────────────
   - id: E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS
@@ -163,6 +175,10 @@ nodes:
     source_kind: adopter-testimony
     label: 'RESTRICAO MATEMATICA (testemunho medido, nao refutado): agregado com consentimento parcial vaza o individuo POR DIFERENCA em times de 3 a 5; anonimizar a dois ou tres e dedutivel. Consequencia para a decisao: indissociavel sem mecanismo nao e criterio, e piso de grupo sozinho nao basta (o ataque tracker contorna o piso por diferenca de consultas). Qualquer opcao que abra o fluxo individuo->organizacao precisa de defesa contra composicao de consultas (corpus: classification-por-vertical/PO_BUDGET, inference-mitigation/PO_L3_FILTRO).'
     trace: 'docs/evolution/inbox/_processed/2026-09-13-fronteira-pessoa-empregador-no-company-brain.md'
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-09-13-fronteira-pessoa-empregador-no-company-brain.md"
+      locator: "testemunho do adotante jogo-da-vida (docs/evolution/inbox/_processed/2026-09-13-fronteira-pessoa-empregador-no-company-brain.md), medido em produto vivo; NAO refutado por nenhuma fonte da rodada — coerente com o piso de grupo que a propria Microsoft aplica (padrao 10, piso 5) e com a literatura de ataque tracker (Denning, Denning & Schwartz 1979) e reconstrucao por consultas (Dinur & Nissim 2003), estas citadas pelo Elenxo e nao lidas nesta rodada"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── MERCADO / CAPITAL ────────────────────────────────────────────────────────────────────
   - id: E_MERCADO_NO_CAPITAL_SIGNAL_EMPLOYEE_DATA
@@ -255,6 +271,10 @@ nodes:
     source_kind: court-decision
     label: 'OBJECAO SOBREVIVENTE — o achado C-65/23 foi citado de fonte tier 6 quando o primario existe, e extrapola o enquadramento: o caso e de TRANSFERENCIA, nao de monitoramento. O que o tribunal decidiu: o acordo coletivo nao afasta os arts. 5, 6(1) e 9 e o juiz nacional revisa a necessidade. Dizer que nao basta para legitimar vigilancia e extrapolacao. E e jurisdicao UE: nada sobre LGPD/CLT. Limite imposto: C nao pode citar C-65/23 como regra de vigilancia, so como piso (acordo coletivo nao substitui base legal nem necessidade).'
     trace: 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065'
+    provenance:
+      source: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065"
+      locator: "EUR-Lex CELEX 62023CJ0065 / curia docid=293835 (MK v K GmbH, 19/12/2024, reenvio do Bundesarbeitsgericht): transferencia de dados de empregados do SAP para servidor da controladora nos EUA com base em Betriebsvereinbarung — nao monitoramento"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECTION_CONSENT_NOT_REJECTED_BUT_UNLIKELY
     node_type: evidence
@@ -268,6 +288,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'OBJECAO SOBREVIVENTE — a regra e verdadeira mas veio de tier 6 com primario tier alto disponivel, e nenhum dos dois documentos diz rejeitado: dizem improvavel na maioria dos casos, com excecao. O BDSG §26(2) admite consentimento quando ha vantagem ao empregado, o que enfraquece a generalizacao. Nada sobre LGPD (arts. 7, 8 §3 e 10) nem ANPD. Limite imposto: C nao pode fundar-se em consentimento proibido; a base e legitimo interesse com teste de proporcionalidade, e o consentimento fica como excecao documentada.'
     trace: 'https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en'
+    provenance:
+      source: "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en"
+      locator: "EDPB Guidelines 05/2020 sobre consentimento §3.1.1 (desequilibrio de poder no emprego); WP29 Opinion 2/2017 (data processing at work); BDSG §26(2)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECTION_GLEAN_IDENTITY_IS_ACL_NOT_SUBJECT
     node_type: evidence
@@ -281,6 +305,10 @@ nodes:
     source_kind: vendor-primary
     label: 'OBJECAO SOBREVIVENTE — o achado confunde identidade usada para aplicar PERMISSOES com o individuo como SUJEITO de dado comportamental avaliado. Um no de identidade para busca que respeita permissao e compativel com a posicao rival (autor). So refutaria B se o grafo expusesse sinais de atividade por pessoa a terceiros, e a doc nao afirma. Um fornecedor, primario em proveito proprio (tier 5). Limite imposto: a recomendacao nao pode dizer que a pratica de produto derruba B com base neste achado.'
     trace: 'https://docs.glean.com/security/knowledge-graph'
+    provenance:
+      source: "https://docs.glean.com/security/knowledge-graph"
+      locator: "https://docs.glean.com/security/knowledge-graph — a mesma doc registra ACL por item de conteudo (descarte cortado da propria rodada); nenhuma afirmacao de sinais de atividade por pessoa expostos a terceiros"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECTION_VIVA_MONITOR_VERB_OVERSTATES
     node_type: evidence
@@ -294,6 +322,10 @@ nodes:
     source_kind: vendor-primary
     label: 'OBJECAO SOBREVIVENTE — fonte tier 5 com manchete sensacionalista (lets your boss track). O changelog da Microsoft informa piso de grupo padrao 10, reduzivel a 5; o verbo monitorar sugere visao individual que a arquitetura declarada nao entrega. Falta ler o anuncio primario no Tech Community. Limite imposto: a leitura de mercado nao pode dizer que o produto entrega vigilancia individual; o que ele entrega e agregado com piso — o que CONFIRMA a restricao do adotante.'
     trace: 'https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/'
+    provenance:
+      source: "https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/"
+      locator: "changelog Microsoft (Petri / M365 Admin): Minimum group size update for Copilot Dashboard — grupo minimo padrao 10, reduzivel a 5; o proprio artigo winbuzzer registra coorte externa de 20+ empresas e modelos randomizados"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECTION_INDIVIDUAL_METRICS_UNSUPPORTED
     node_type: evidence
@@ -307,6 +339,10 @@ nodes:
     source_kind: vendor-primary
     label: 'OBJECAO SOBREVIVENTE — votacao 2-1, e o termo individuais nao se sustenta: o Copilot Dashboard aplica grupo minimo (padrao 10, piso 5) e benchmarks por coorte. Metrica individual ao gestor seria outro produto. Limite imposto: o achado perde individuais ou precisa mostrar a tela primaria que exibe o individuo.'
     trace: 'https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/'
+    provenance:
+      source: "https://winbuzzer.com/2025/10/11/new-microsoft-tool-lets-your-boss-track-if-you-use-ai-sufficiently-xcxwbn/"
+      locator: "votacao 2-1 do achado + doc Microsoft do Copilot Dashboard (grupo minimo padrao 10, piso 5; benchmarks por coorte)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECTION_BELGIAN_CLOSED_LIST_NOT_GENERAL
     node_type: evidence
@@ -320,6 +356,10 @@ nodes:
     source_kind: statute
     label: 'OBJECAO SOBREVIVENTE — a lista fechada citada e do direito belga por tecnologia (CCT n. 68, cameras); a CCT n. 81 tem outra. Nao se generaliza: no GDPR a finalidade NAO e lista fechada (art. 6(4)), e a LGPD da a mesma regra aberta. Limite imposto: em C, proposito pre-declarado por fluxo e ANALOGIA DE DESENHO do Onion, nao regra juridica importada — o criterio precisa aceitar tratamento posterior compativel.'
     trace: 'https://academic.oup.com/idpl/article/12/4/276/6668508'
+    provenance:
+      source: "https://academic.oup.com/idpl/article/12/4/276/6668508"
+      locator: "CCT belga n. 68 (cameras) vs CCT n. 81 (comunicacoes eletronicas, outra lista); GDPR art. 6(4) (tratamento posterior compativel); LGPD art. 6 I (finalidade) e II (adequacao)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECTION_MANDATORY_AXES_UNCOVERED
     node_type: evidence
@@ -347,6 +387,10 @@ nodes:
     source_kind: court-decision
     label: 'OBJECAO SOBREVIVENTE (descarte por comodismo) — o detalhe portugues pode estar mal lido (Lei 58/2019, art. 28(3): consentimento nao constitui requisito de legitimidade em certos casos), mas a TESE de fragmentacao nacional do art. 88 e sustentada por C-34/21. Refutou-se o detalhe e jogou-se fora a tese. Limite imposto: C nao pode prometer um criterio juridico unico europeu; o criterio do Onion e de desenho, com adaptacao por jurisdicao.'
     trace: 'https://curia.europa.eu/juris/liste.jsf?num=C-34/21'
+    provenance:
+      source: "https://curia.europa.eu/juris/liste.jsf?num=C-34/21"
+      locator: "CJEU C-34/21 (Hauptpersonalrat, 30/03/2023): regra nacional que so repete o GDPR nao vale como art. 88; Lei portuguesa 58/2019 art. 28(3) e desaplicacao pela CNPD; BDSG §26 pos-acordao nao lido"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECTION_BARBULESCU_DISCARDED_BY_COMODISMO
     node_type: evidence
@@ -361,6 +405,10 @@ nodes:
     source_kind: court-decision
     label: 'OBJECAO SOBREVIVENTE (descarte por comodismo) — Barbulescu §121 lista exatamente notificacao previa, extensao/grau de intrusao, razoes legitimas, meios menos intrusivos, consequencias e salvaguardas; Lopez Ribalda II confirma. O unico ponto fragil do descarte era necessidade estrita no lugar de meio menos intrusivo. E o candidato mais forte a criterio operacional e foi descartado sem evidencia contraria. Limite imposto: B (nunca como dado) ignora que o direito admite tratamento proporcional; A (indissociavel) precisa desse teste para virar criterio.'
     trace: 'https://hudoc.echr.coe.int/eng?i=001-177082'
+    provenance:
+      source: "https://hudoc.echr.coe.int/eng?i=001-177082"
+      locator: "TEDH Barbulescu v. Romenia (Grande Camara, 05/09/2017, app. 61496/08, §121); Lopez Ribalda e outros v. Espanha II (Grande Camara, 2019)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_OBJECTION_NO_UNIFORM_EU_THRESHOLD
     node_type: evidence
@@ -374,6 +422,10 @@ nodes:
     source_kind: paper
     label: 'OBJECAO SOBREVIVENTE (descarte por comodismo) — a lacuna doutrinaria e real: mesmo com art. 88 nao existe limiar operacional uniforme que separe dado organizacional legitimo de vigilancia; a fronteira depende de implementacao nacional fragmentada. Nenhuma evidencia a refuta. Limite imposto: nao existe criterio juridico pronto para importar ao desenho do Company Brain — A e C precisam CONSTRUIR o criterio como mecanismo, nao citar um.'
     trace: 'https://academic.oup.com/idpl/article/12/4/276/6668508'
+    provenance:
+      source: "https://academic.oup.com/idpl/article/12/4/276/6668508"
+      locator: "coerencia com C-34/21 (fragmentacao) e C-65/23 (harmoniza so o piso arts. 5/6/9, nao o limiar); nenhuma evidencia contraria na rodada; fonte do descarte: https://academic.oup.com/idpl/article/12/4/276/6668508"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ══════════════════════════════════════════════════════════════════════════════════════════
   # RODADA 2 (2026-09-13) — a rodada complementar da opção D, EXECUTADA. Apêndice, não reescrita.
@@ -411,6 +463,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'ANCORADA (tier 9, autoridade nacional): "O modelo de teste recomendado pela anpd possui tres fases, que se baseiam na lgpd e nos parametros de interpretacao expostos neste Texto. As fases do teste [...] sao as seguintes: fase 1. finalidade [...] fase 2. necessidade [...] fase 3. balanceamento e salvaguardas" [Secao "Teste de balanceamento", p. 31-32]. Elenxo C2 (objecao SOBREVIVENTE): prova um PROCEDIMENTO, nao um LIMIAR. A pergunta central pede o criterio que SEPARA; teste cujo output e juizo caso-a-caso e exatamente o que E_OBJECTION_NO_UNIFORM_EU_THRESHOLD ja dizia nao existir. Ganha-se JURISDICAO (o eixo BR deixa de ser zero), nao mecanismo. E guia de autoridade nao e norma vinculante.'
     trace: 'Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Secao "Teste de balanceamento", p. 31-32'
+    provenance:
+      source: "Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Secao \"Teste de balanceamento\", p. 31-32"
+      locator: "Guia Orientativo da ANPD sobre legitimo interesse, Secao \"Teste de balanceamento\", p. 31-32 — \"tres fases [...] fase 1. finalidade [...] fase 2. necessidade [...] fase 3. balanceamento e salvaguardas\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_ANPD_FASE_NECESSIDADE_ESTRITAMENTE_NECESSARIO
     node_type: evidence
@@ -424,6 +480,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'ANCORADA (tier 9): "quando o tratamento for baseado no legitimo interesse do controlador, somente os dados pessoais estritamente necessarios para a finalidade pretendida poderao ser tratados" [Fase 2 (Necessidade), p. 32] — privilegiando formas menos intrusivas. Elenxo C3: e o analogo BR do fator (iv) de Barbulescu (meio menos intrusivo); o valor e CONVERGENCIA entre jurisdicoes, nao novidade. Limite: "estritamente necessario" nao tem piso mensuravel para AGREGADOS — nao distingue agregado-com-piso de agregado-sem-piso, que e onde a decisao da opcao C vive.'
     trace: 'Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Fase 2 (Necessidade), p. 32'
+    provenance:
+      source: "Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Fase 2 (Necessidade), p. 32"
+      locator: "Guia Orientativo da ANPD, Fase 2 (Necessidade), p. 32 — \"somente os dados pessoais estritamente necessarios para a finalidade pretendida poderao ser tratados\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_ANPD_BALANCEAMENTO_MITIGACAO_NAO_IMPACTO_ZERO
     node_type: evidence
@@ -437,6 +497,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'ANCORADA (tier 9): "o que a lgpd exige nao e o impacto zero, mas, sim, que eventuais impactos sejam minimizados e levados em consideracao na adocao de salvaguardas" [Fase 3, p. 33]. Elenxo C4 — esta fonte CORTA CONTRA a leitura forte da opcao C, e serve aos dois lados: (a) se o padrao legal e mitigacao, o desenho de C entrega MAIS do que a lei pede, logo C e escolha de PRODUTO e nao decorrencia de conformidade; (b) arma o adversario com a doutrina "piso de grupo + masking ja e mitigacao suficiente", enquanto os nos de tracker, Dinur-Nissim e k-anonimato desta mesma rodada mostram que o vazamento persiste. LIMITA C.'
     trace: 'Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Fase 3 (Balanceamento e salvaguardas), p. 33'
+    provenance:
+      source: "Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Fase 3 (Balanceamento e salvaguardas), p. 33"
+      locator: "Guia Orientativo da ANPD, Fase 3 (Balanceamento e salvaguardas), p. 33 — \"o que a lgpd exige nao e o impacto zero\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_ANPD_LEGITIMA_EXPECTATIVA_FATORES_OBJETIVOS
     node_type: evidence
@@ -450,6 +514,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'ANCORADA (tier 9): "a existencia de uma relacao previa do controlador com o titular; a fonte e a forma da coleta dos dados [...]; o contexto e o periodo de coleta dos dados; e a finalidade pretendida da coleta dos dados e a sua compatibilidade com o tratamento baseado no legitimo interesse" [Secao "Legitima expectativa do titular", p. 23]. Leitura: a expectativa se mede por fatores OBJETIVOS, nao pelo que um titular especifico esperaria. Elenxo C5: ENFRAQUECE juridicamente o pilar "soberania do individuo" da opcao C (Second Brain soberano) — a recusa subjetiva do empregado nao e a regua legal. C sobrevive como desenho ACIMA do piso legal, nunca como decorrencia dele. LIMITA C.'
     trace: 'Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Secao "Legitima expectativa do titular", p. 23'
+    provenance:
+      source: "Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Secao \"Legitima expectativa do titular\", p. 23"
+      locator: "Guia Orientativo da ANPD, Secao \"Legitima expectativa do titular\", p. 23 — \"a existencia de uma relacao previa do controlador com o titular; a fonte e a forma da coleta\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_ANPD_EXEMPLO7_RASTREIO_PRODUTIVIDADE_REPROVADO
     node_type: evidence
@@ -463,6 +531,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'ANCORADA (tier 9) — O ACHADO MAIS ON-AXIS DA RODADA E O PRIMEIRO DO EIXO BR: "no contexto da relacao de emprego, os empregados estao em posicao de maior vulnerabilidade em face de seu empregador, nao possuindo meios efetivos de oposicao ao tratamento. Por tais razoes, o tratamento nao poderia ser realizado e nao seria admissivel o recurso a hipotese legal do legitimo interesse" [Exemplo 7 — software de rastreamento de atividades/webcam para medir produtividade, Analise, p. 24-25]. Elenxo C6: prova o EXTREMO, nao a linha — nada diz sobre telemetria agregada com finalidade declarada e piso. Mas o ganho e grande: REFUTA qualquer desenho que roteie telemetria de ATIVIDADE da pessoa ao empregador sob legitimo interesse, inclusive uma leitura frouxa do canal individuo->organizacao da opcao C. LIMITA C e alimenta Q_R2_REVISAO_DO_SELO_C.'
     trace: 'Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Exemplo 7, Analise, p. 24-25'
+    provenance:
+      source: "Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Exemplo 7, Analise, p. 24-25"
+      locator: "Guia Orientativo da ANPD, Exemplo 7 \"Instalacao de software para rastrear atividades e medir a produtividade de funcionarios\" — Analise, p. 24-25 — \"o tratamento nao poderia ser realizado e nao seria admissivel o recurso a hipotese legal do legitimo interesse\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_ANPD_POLITICA_PREVIA_NAO_CURA_EXCESSO
     node_type: evidence
@@ -476,6 +548,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'ANCORADA (tier 9): "mesmo que esta atividade possa ter sido previamente informada e constar da politica de privacidade [...] nao seria razoavel esperar que tamanha coleta de dados fosse realizada pelo empregador" [Exemplo 7, Analise, p. 24-25]. Elenxo C7 — GOLPE DIRETO no pilar "notificacao previa" que a opcao C importou de Barbulescu §121(i): no BR, informar antes NAO legitima o excesso. Combinado com E_R2_LOPEZ_RIBALDA_NOTIFICACAO_NAO_E_VETO (notificacao nao e veto autonomo), o resultado e que a notificacao nem BASTA nem e estritamente EXIGIDA — logo C nao pode mante-la como CONDICAO DE ENTRADA do fluxo. LIMITA C e alimenta Q_R2_REVISAO_DO_SELO_C.'
     trace: 'Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Exemplo 7, Analise, p. 24-25'
+    provenance:
+      source: "Guia Orientativo — Legitimo Interesse (ANPD, gov.br/anpd), Exemplo 7, Analise, p. 24-25"
+      locator: "Guia Orientativo da ANPD, Exemplo 7, Analise, p. 24-25 (texto continuo entre paginas) — \"mesmo que esta atividade possa ter sido previamente informada\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── EIXO BR · TST (monitoramento no emprego) ─────────────────────────────────────────────
   - id: E_R2_TST_EMAIL_CORPORATIVO_FERRAMENTA_DE_TRABALHO
@@ -490,6 +566,10 @@ nodes:
     source_kind: court-news
     label: 'ANCORADA COM RESSALVA DE TIER (6, nao 9): "esse meio eletronico fornecido pela empresa, afirmou, tem natureza juridica equivalente a uma ferramenta de trabalho" [noticia do tst.jus.br sobre RR-613/2000-013-10-00.7, 1a Turma]. Criterio de PROPRIEDADE DA FERRAMENTA. Elenxo C8: o locator e NOTICIA institucional, nao ementa nem acordao, e o caso e PRE-LGPD (~2005) — o mesmo defeito de tier que o grafo ja puniu em E_OBJECTION_C65_23_EXTRAPOLATED ("citado de fonte tier 6 quando o primario existe"). E transpor "propriedade da ferramenta" de e-mail para NOS de um Company Brain e analogia, nao holding.'
     trace: 'tst.jus.br — noticia "TST admite que empresa investigue e-mail de trabalho do empregado" (RR-613/2000-013-10-00.7, 1a Turma)'
+    provenance:
+      source: "tst.jus.br — noticia \"TST admite que empresa investigue e-mail de trabalho do empregado\" (RR-613/2000-013-10-00.7, 1a Turma)"
+      locator: "tst.jus.br, noticia \"TST admite que empresa investigue e-mail de trabalho do empregado\" sobre RR-613/2000-013-10-00.7 (1a Turma) — \"natureza juridica equivalente a uma ferramenta de trabalho\"; ancorada por verificador independente, com a ressalva de que o locator e NOTICIA, nao acordao"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_TST_EMAIL_FINALIDADE_ESTRITAMENTE_PROFISSIONAL
     node_type: evidence
@@ -503,6 +583,10 @@ nodes:
     source_kind: court-news
     label: 'ANCORADA COM RESSALVA DE TIER (6): "Esse meio eletronico fornecido pela empresa...destina-se ao uso estritamente profissional" [noticia do tst.jus.br, RR-613/2000-013-10-00.7]. Criterio de FINALIDADE, salvo consentimento em contrario do empregador. Elenxo C9: mesmo defeito de fonte — e o VETOR aponta para o EMPREGADOR (justifica o acesso dele ao artefato de trabalho). Serve ao lado organizacao->artefato da opcao C, nao a metade que a decisao precisa defender (individuo->organizacao).'
     trace: 'tst.jus.br — noticia "TST admite que empresa investigue e-mail de trabalho do empregado" (RR-613/2000-013-10-00.7, 1a Turma)'
+    provenance:
+      source: "tst.jus.br — noticia \"TST admite que empresa investigue e-mail de trabalho do empregado\" (RR-613/2000-013-10-00.7, 1a Turma)"
+      locator: "tst.jus.br, mesma noticia sobre RR-613/2000-013-10-00.7 — \"destina-se ao uso estritamente profissional\"; ancorada por verificador independente (locator = noticia)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_TST_CONTROLE_MODERADO_GENERALIZADO_IMPESSOAL
     node_type: evidence
@@ -516,6 +600,10 @@ nodes:
     source_kind: court-news
     label: 'ANCORADA COM RESSALVA DE TIER (6): "O empregador pode exercer, de forma moderada, generalizada e impessoal, o controle" [noticia do tst.jus.br, RR-613/2000-013-10-00.7] — ou seja, nao dirigido, continuo e individualizado a um unico empregado sem razao. Elenxo C10: e o mais proximo de um CRITERIO OPERACIONAL BR obtido na rodada e mapeia na assimetria da opcao C (impessoal = nada dirigido ao individuo). Mas vem de noticia, foi dito para controle de CONTEUDO de e-mail, e um Company Brain que agrega contribuicao POR PESSOA e discutivelmente "individualizado" mesmo sem gestor lendo. Usavel como VOCABULARIO DE DESENHO, nao como regra importada.'
     trace: 'tst.jus.br — noticia "TST admite que empresa investigue e-mail de trabalho do empregado" (RR-613/2000-013-10-00.7, 1a Turma)'
+    provenance:
+      source: "tst.jus.br — noticia \"TST admite que empresa investigue e-mail de trabalho do empregado\" (RR-613/2000-013-10-00.7, 1a Turma)"
+      locator: "tst.jus.br, mesma noticia sobre RR-613/2000-013-10-00.7 — \"de forma moderada, generalizada e impessoal, o controle\"; ancorada por verificador independente (locator = noticia)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_TST_CAMERAS_LOCAL_COLETIVO_LICITAS
     node_type: evidence
@@ -529,6 +617,10 @@ nodes:
     source_kind: court-news
     label: 'ANCORADA COM RESSALVA DE TIER (6): "a legislacao autoriza a adocao, pelos empregadores, de medidas de controle e fiscalizacao da prestacao de servicos, desde que nao ofendam direitos de personalidade do trabalhador" [noticia do tst.jus.br, RR-21162-51.2015.5.04.0014, 1a Turma] — cameras em locais COLETIVOS sao licitas; em vestiarios/banheiros sao ilicitas pela exposicao do corpo. Elenxo C11: prova uma regra ESPACIAL amarrada a exposicao do corpo; transpor "vestiario" para "dado intimo" num grafo de conhecimento e a mesma extrapolacao de enquadramento punida em C-65/23. Vale como INTUICAO DE ZONA PROIBIDA, nao como holding transponivel.'
     trace: 'tst.jus.br — noticia "Fiscalizacao de empregados por meio de cameras em locais coletivos e considerada licita" (RR-21162-51.2015.5.04.0014, 1a Turma)'
+    provenance:
+      source: "tst.jus.br — noticia \"Fiscalizacao de empregados por meio de cameras em locais coletivos e considerada licita\" (RR-21162-51.2015.5.04.0014, 1a Turma)"
+      locator: "tst.jus.br, noticia \"Fiscalizacao de empregados por meio de cameras em locais coletivos e considerada licita\" sobre RR-21162-51.2015.5.04.0014 (1a Turma) — \"desde que nao ofendam direitos de personalidade do trabalhador\"; ancorada por verificador independente (locator = noticia)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_TST_NUCLEO_ESSENCIAL_INTIMIDADE
     node_type: evidence
@@ -542,6 +634,10 @@ nodes:
     source_kind: court-news
     label: 'ANCORADA COM RESSALVA DE TIER (6): "a exposicao dos trabalhadores as cameras permite ao empregador o melhor controle da atividade laboral, sem afetar o nucleo essencial do direito de intimidade dos trabalhadores" [noticia do tst.jus.br, RR-21162-51.2015.5.04.0014] — a proporcionalidade e medida pelo equilibrio entre finalidade de controle e o nucleo protegido. Elenxo C12: "nucleo essencial" e padrao SEM fronteira mensuravel — reproduz no BR exatamente o achado de E_OBJECTION_NO_UNIFORM_EU_THRESHOLD. A rodada queria fechar essa lacuna no eixo BR e trouxe o MESMO VAZIO com outro sotaque.'
     trace: 'tst.jus.br — noticia "Fiscalizacao de empregados por meio de cameras em locais coletivos e considerada licita" (RR-21162-51.2015.5.04.0014, 1a Turma)'
+    provenance:
+      source: "tst.jus.br — noticia \"Fiscalizacao de empregados por meio de cameras em locais coletivos e considerada licita\" (RR-21162-51.2015.5.04.0014, 1a Turma)"
+      locator: "tst.jus.br, mesma noticia sobre RR-21162-51.2015.5.04.0014 — \"sem afetar o nucleo essencial do direito de intimidade dos trabalhadores\"; ancorada por verificador independente (locator = noticia)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── PRIMÁRIO DO CONSENTIMENTO · EDPB (corrige o "rejeitado" da rodada 1) ─────────────────
   - id: E_R2_EDPB_CONSENTIMENTO_IMPROVAVEL_NAO_REJEITADO
@@ -556,6 +652,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'ANCORADA (tier 9, quote VAZIA no dossie — confianca travada em 0.65 por isso): o EDPB NAO diz que o consentimento do empregado e "rejeitado" em bloco — diz que e IMPROVAVEL (unlikely) que seja livre, e por isso PROBLEMATICO como base legal na maioria dos casos. RECONCILIACAO: SUPERSEDES E_EMPLOYEE_CONSENT_UNLIKELY_UNDER_SUBORDINATION, que na rodada 1 veio de agregador tier 6 com o verbo "rejeitado". Elenxo C13: substantivamente RE-CONFIRMA o que E_OBJECTION_CONSENT_NOT_REJECTED_BUT_UNLIKELY ja dizia — fecha lacuna de TIER, nao de conhecimento.'
     trace: 'https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en'
+    provenance:
+      source: "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en"
+      locator: "EDPB Guidelines 05/2020 sobre consentimento (desequilibrio de poder no emprego) — leitura ancorada por verificador independente; ressalva: a ancoragem chegou SEM quote verbatim no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_EDPB_MAIORIA_NAO_PODE_SER_CONSENTIMENTO
     node_type: evidence
@@ -569,6 +669,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'ANCORADA (tier 9, quote VAZIA): para a MAIORIA do processamento de dados no trabalho, a base legal NAO pode e NAO deve ser o consentimento do empregado — formulacao normativa forte, mas restrita a "a maioria". Elenxo C14: reforca o ja modelado; o que a decisao precisava — QUAL BASE sustenta CADA DIRECAO do fluxo assimetrico da opcao C — segue sem resposta, porque a fonte fala do tratamento EM BLOCO, nao de fluxos direcionais. SUSTENTA C so no ponto em que C funda o canal no legitimo interesse com teste de proporcionalidade, nunca no consentimento.'
     trace: 'https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en'
+    provenance:
+      source: "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en"
+      locator: "EDPB Guidelines 05/2020 sobre consentimento — leitura ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_EDPB_EXCECAO_SEM_CONSEQUENCIA_ADVERSA
     node_type: evidence
@@ -582,6 +686,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'ANCORADA (tier 9, quote VAZIA): a excecao primaria explicita — o consentimento do empregado PODE ser valido em circunstancias EXCEPCIONAIS, quando nao houver NENHUMA consequencia adversa, seja qual for a escolha do empregado. Elenxo C15: abre porta para features opt-in da opcao C, mas E_R2_ANPD_EXEMPLO7 (o empregado nao possui meios efetivos de oposicao) e E_R2_EPM_CONTROLE_DO_ALVO (so controle REAL move o ponteiro) a fecham na pratica — C NAO deve desenhar nada que dependa de opt-in do empregado COMO SALVAGUARDA. LIMITA C.'
     trace: 'https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en'
+    provenance:
+      source: "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en"
+      locator: "EDPB Guidelines 05/2020 sobre consentimento, excecao explicita — leitura ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_EDPB_EXEMPLO_FILMAGEM_REALOCACAO_SEM_PENALIDADE
     node_type: evidence
@@ -595,6 +703,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'ANCORADA (tier 9, quote VAZIA): exemplo pratico (filmagem de escritorio) — quem nao consente e REALOCADO SEM PENALIDADE; o exemplo ilustra a barra alta, nao a impossibilidade total. Elenxo C16: mostra o tamanho da barra — a alternativa tem de EXISTIR e ser GRATUITA. Nenhum Company Brain oferece "realocacao sem penalidade" como fallback, logo o exemplo prova que a excecao e praticamente INALCANCAVEL no caso de uso, nao que ela ajuda a opcao C. LIMITA C.'
     trace: 'https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en'
+    provenance:
+      source: "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en"
+      locator: "EDPB Guidelines 05/2020 sobre consentimento, exemplo pratico da filmagem de escritorio — leitura ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_EDPB_TESTE_DE_FUNDO_LIBERDADE_REAL
     node_type: evidence
@@ -608,6 +720,10 @@ nodes:
     source_kind: regulator-guidance
     label: 'ANCORADA (tier 9, quote VAZIA): o documento GENERALIZA — desequilibrio de poder nao se limita a autoridades publicas e empregadores; o teste de fundo e LIBERDADE REAL DE ESCOLHA, sem decepcao, intimidacao, coercao ou consequencias negativas significativas. Elenxo C17: e a base para absorver a objecao da rodada 1 sobre o gestor que contorna o opt-out "pedindo educadamente" — o pedido do superior JA e coercao contextual. LIMITA C: o criterio de C nao pode depender de escolha declarada dentro da relacao de subordinacao.'
     trace: 'https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en'
+    provenance:
+      source: "https://www.edpb.europa.eu/our-work-tools/our-documents/guidelines/guidelines-052020-consent-under-regulation-2016679_en"
+      locator: "EDPB Guidelines 05/2020 sobre consentimento, generalizacao do desequilibrio de poder — leitura ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── PRIMÁRIO DO CRITÉRIO · TEDH (Bărbulescu §121 e López Ribalda II) ─────────────────────
   - id: E_R2_BARBULESCU_SEIS_FATORES_121
@@ -623,6 +739,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 9, primario judicial, quote VAZIA no dossie): Barbulescu §121 lista SEIS fatores — (i) notificacao previa, dada com antecedencia e clara quanto a natureza do monitoramento; (ii) extensao/grau de intrusao, cobrindo fluxo versus conteudo, escopo, duracao e numero de pessoas com acesso; (iii) razoes legitimas, com justificativa MAIS PESADA para conteudo; (iv) alternativas menos intrusivas; (v) consequencias para o empregado e uso dos resultados; (vi) salvaguardas adequadas, inclusive nao acessar conteudo sem aviso previo. SUSTENTA a opcao C, que adotou exatamente esse teste, e CONFIRMA por primario a objecao E_OBJECTION_BARBULESCU_DISCARDED_BY_COMODISMO (o criterio candidato mais forte havia sido descartado sem evidencia contraria).'
     trace: 'https://hudoc.echr.coe.int/eng?i=001-177082'
+    provenance:
+      source: "https://hudoc.echr.coe.int/eng?i=001-177082"
+      locator: "TEDH Barbulescu v. Romenia (Grande Camara, 05/09/2017, app. 61496/08), §121 — os seis fatores (i)-(vi); ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_LOPEZ_RIBALDA_ESTENDE_A_VIDEOVIGILANCIA
     node_type: evidence
@@ -637,6 +757,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 9, quote VAZIA): Lopez Ribalda II estende EXPLICITAMENTE os criterios de Barbulescu (e de Kopke) mutatis mutandis a VIDEOVIGILANCIA, reafirmando essencialmente os mesmos seis fatores adaptados a CFTV — nivel de privacidade esperado na area, limitacoes de tempo e espaco, numero de pessoas com acesso aos resultados. SUSTENTA C: o teste nao e um artefato de e-mail, e transponivel por tecnologia de monitoramento — o que autoriza (com cautela) transpo-lo tambem ao fluxo de um Company Brain.'
     trace: 'https://hudoc.echr.coe.int/eng?i=001-207569'
+    provenance:
+      source: "https://hudoc.echr.coe.int/eng?i=001-207569"
+      locator: "TEDH Lopez Ribalda e outros v. Espanha II (Grande Camara, 2019) — extensao mutatis mutandis dos criterios de Barbulescu (e Kopke) a videovigilancia; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_LOPEZ_RIBALDA_NOTIFICACAO_NAO_E_VETO
     node_type: evidence
@@ -651,6 +775,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 9, quote VAZIA): Lopez Ribalda II QUALIFICA a notificacao como apenas UM criterio entre outros, e nao um veto independente; faltando a informacao, as salvaguardas dos demais criterios pesam mais — e o Tribunal concluiu pela NAO violacao apesar da ausencia reconhecida de informacao previa. Elenxo C20: combinado com E_R2_ANPD_POLITICA_PREVIA_NAO_CURA_EXCESSO (informar antes nao legitima), a notificacao NEM BASTA NEM E ESTRITAMENTE EXIGIDA — logo a opcao C nao pode mante-la como CONDICAO DE ENTRADA do fluxo. LIMITA C e alimenta Q_R2_REVISAO_DO_SELO_C.'
     trace: 'https://hudoc.echr.coe.int/eng?i=001-207569'
+    provenance:
+      source: "https://hudoc.echr.coe.int/eng?i=001-207569"
+      locator: "TEDH Lopez Ribalda II (Grande Camara, 2019) — notificacao como UM criterio entre outros; o Tribunal nao viu violacao apesar da ausencia reconhecida de informacao previa; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_LOPEZ_RIBALDA_SUSPEITA_RAZOAVEL_COVERT
     node_type: evidence
@@ -665,6 +793,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 9, quote VAZIA): Lopez Ribalda II acrescenta uma glosa AUSENTE em Barbulescu — mera suspeita nao justifica vigilancia encoberta, mas suspeita RAZOAVEL de falta grave somada a extensao das perdas pode ser justificativa de peso, especialmente havendo acao concertada de varios empregados que ameace o funcionamento regular. LIMITA C: o direito admite, sob condicoes, monitoramento ENCOBERTO e DIRIGIDO — ou seja, a assimetria de C (nada dirigido ao individuo) e novamente escolha de PRODUTO acima do piso legal, nao decorrencia dele.'
     trace: 'https://hudoc.echr.coe.int/eng?i=001-207569'
+    provenance:
+      source: "https://hudoc.echr.coe.int/eng?i=001-207569"
+      locator: "TEDH Lopez Ribalda II (Grande Camara, 2019) — glosa ausente em Barbulescu sobre suspeita razoavel e vigilancia encoberta; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── PRIMÁRIO CJEU C-65/23 (o que a rodada 1 citou de tier 6) ─────────────────────────────
   - id: E_R2_C65_23_E_TRANSFERENCIA_NAO_MONITORAMENTO
@@ -680,6 +812,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 10, primario EUR-Lex): "The defendant in the main proceedings transferred various personal data of its employees from the SAP software to a server of the D group''s parent company in the United States." [§15, conforme extraido de EUR-Lex CELEX 62023CJ0065]. O caso trata de TRANSFERENCIA de dados de RH, NAO de monitoramento no local de trabalho. RECONCILIACAO: SUPERSEDES E_CJEU_C65_23_COLLECTIVE_AGREEMENT_NOT_ENOUGH (rodada 1, tier 6, agregador) e CONFIRMA por primario a objecao E_OBJECTION_C65_23_EXTRAPOLATED. Consequencia mantida: C nao pode citar C-65/23 como regra de vigilancia, so como piso.'
     trace: 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065'
+    provenance:
+      source: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065"
+      locator: "EUR-Lex CELEX 62023CJ0065, §15 (fatos do processo principal) — \"transferred various personal data of its employees from the SAP software to a server of the D group's parent company in the United States\"; ancorada por verificador independente"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_C65_23_ACORDO_NAO_AFASTA_ARTS_5_6_9
     node_type: evidence
@@ -694,6 +830,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 10, dispositivo, quote VAZIA no dossie): Ruling 1 — acordo ou norma nacional sob o art. 88(1) deve obrigar o cumprimento nao so do art. 88(2), mas tambem dos arts. 5, 6(1) e 9(1)/(2); o acordo coletivo NAO substitui nem afrouxa os requisitos gerais do RGPD. SUSTENTA a opcao C no unico ponto que a rodada 1 podia legitimamente extrair de C-65/23: acordo coletivo e PISO, nunca licenca.'
     trace: 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065'
+    provenance:
+      source: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065"
+      locator: "EUR-Lex CELEX 62023CJ0065, Ruling 1 do dispositivo — acordo/norma sob art. 88(1) deve obrigar cumprimento dos arts. 88(2), 5, 6(1) e 9(1)/(2); ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_C65_23_CONTROLE_JUDICIAL_PLENO_DA_NECESSIDADE
     node_type: evidence
@@ -708,6 +848,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 10, dispositivo, quote VAZIA no dossie): Ruling 2 — quando um acordo coletivo (inclusive Betriebsvereinbarung) se enquadra no art. 88(1), a margem de discricionariedade das partes sobre "necessidade" NAO impede o controle judicial PLENO sobre essa necessidade. SUSTENTA C: a necessidade e revisavel por terceiro imparcial, o que e exatamente a forma juridica do que o Onion chama mecanismo verificavel — quem decide se o fluxo era necessario nao e quem o desenhou.'
     trace: 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065'
+    provenance:
+      source: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065"
+      locator: "EUR-Lex CELEX 62023CJ0065, Ruling 2 do dispositivo — margem de discricionariedade das partes nao impede controle judicial PLENO sobre a necessidade; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_C65_23_BETRIEBSVEREINBARUNG_E_ACORDO_COLETIVO
     node_type: evidence
@@ -722,6 +866,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 10, quote VAZIA no dossie): o cabecalho/ementa oficial do caso ja rotula o tema como "Scope of judicial review" e "Margin of discretion", confirmando que a Betriebsvereinbarung e tratada como especie de "collective agreement" sob o art. 88(1). Achado de ENQUADRAMENTO: fecha a duvida de se o acordo de empresa alemao entra na clausula de abertura — entra, e por isso o piso dos arts. 5/6/9 o alcanca.'
     trace: 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065'
+    provenance:
+      source: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065"
+      locator: "EUR-Lex CELEX 62023CJ0065, cabecalho/ementa oficial — rotulos \"Scope of judicial review\" e \"Margin of discretion\"; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_C65_23_NECESSIDADE_NAO_NEGOCIAVEL
     node_type: evidence
@@ -736,6 +884,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 10, quote VAZIA no dossie): o tribunal REJEITA que o art. 88 permita as partes de um acordo coletivo uma margem que "afrouxe ou desconsidere" a exigencia de necessidade — necessidade e padrao OBRIGATORIO, nao negociavel. SUSTENTA C: nenhum acordo interno (politica de empresa, termo de uso do Company Brain, aceite de onboarding) pode comprar a dispensa do teste de necessidade sobre o fluxo individuo->organizacao.'
     trace: 'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065'
+    provenance:
+      source: "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:62023CJ0065"
+      locator: "EUR-Lex CELEX 62023CJ0065 — o tribunal rejeita que o art. 88 permita margem que \"afrouxe ou desconsidere\" a exigencia de necessidade; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── PRIMÁRIO CJEU C-34/21 (a fragmentação do art. 88, agora com dispositivo) ─────────────
   - id: E_R2_C34_21_REGRA_MAIS_ESPECIFICA_EXIGE_88_2
@@ -751,6 +903,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 10, DISPOSITIVO — nao obiter): "Article 88 of Regulation (EU) 2016/679 ... must be interpreted as meaning that national legislation cannot constitute a ''more specific rule'', within the meaning of paragraph 1 of that article, where it does not satisfy the conditions laid down in paragraph 2 of that article." [dispositivo, ponto 1, p. 20; §74-75]. SUSTENTA por primario a objecao E_OBJECTION_ART88_NATIONAL_FRAGMENTATION, que a rodada 1 tinha so por descarte reaberto: a clausula de abertura do emprego e condicionada, e a regra nacional que nao cumpre o 88(2) simplesmente nao existe como regra especifica.'
     trace: 'https://curia.europa.eu/juris/liste.jsf?num=C-34/21'
+    provenance:
+      source: "https://curia.europa.eu/juris/liste.jsf?num=C-34/21"
+      locator: "CJEU C-34/21 (Hauptpersonalrat, 30/03/2023), dispositivo ponto 1 (p. 20), reiterado nos §74-75 — \"cannot constitute a 'more specific rule' ... where it does not satisfy the conditions laid down in paragraph 2\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_C34_21_CONTEUDO_NORMATIVO_PROPRIO
     node_type: evidence
@@ -765,6 +921,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 10): "the rules referred to in that provision must have a normative content specific to the area regulated, which is distinct from the general rules of that regulation" [§61, retomado no §74]. E o CRITERIO TEXTUAL que ancora todo o resto da fragmentacao: regra de emprego so vale se ACRESCENTAR conteudo proprio. SUSTENTA E_OBJECTION_ART88_NATIONAL_FRAGMENTATION.'
     trace: 'https://curia.europa.eu/juris/liste.jsf?num=C-34/21'
+    provenance:
+      source: "https://curia.europa.eu/juris/liste.jsf?num=C-34/21"
+      locator: "CJEU C-34/21, §61 (retomado no §74) — \"normative content specific to the area regulated, which is distinct from the general rules of that regulation\"; ancorada por verificador independente"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_C34_21_REITERACAO_NAO_BASTA
     node_type: evidence
@@ -779,6 +939,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 10): "the ''more specific rules'', adopted on the basis of Article 88(1) of that regulation, cannot be limited to a reiteration of the conditions for the lawfulness of personal data processing and the principles of that processing, set out, respectively, in Article 6 and Article 5 of that regulation, or to a reference to those conditions and principles" [§71; §65]. SUSTENTA E_OBJECTION_NO_UNIFORM_EU_THRESHOLD por outro caminho: a UE nao so NAO fornece o limiar como impede que a regra nacional se limite a repetir o piso — o limiar operacional tem de ser CONSTRUIDO, e o RGPD nao o constroi.'
     trace: 'https://curia.europa.eu/juris/liste.jsf?num=C-34/21'
+    provenance:
+      source: "https://curia.europa.eu/juris/liste.jsf?num=C-34/21"
+      locator: "CJEU C-34/21, §71 (regra geral) e §65 (formulacao irma) — \"cannot be limited to a reiteration of the conditions for the lawfulness ... set out, respectively, in Article 6 and Article 5\"; ancorada por verificador independente"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_C34_21_NECESSIDADE_SO_REITERA_ART_6_1_B
     node_type: evidence
@@ -793,6 +957,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 10): "provisions such as Paragraph 23(1) of the HDSIG and Paragraph 86(4) of the HBG ... appear to reiterate the condition for general lawfulness of processing already set out in point (b) of the first subparagraph of Article 6(1) of the GDPR, without adding a more specific rule within the meaning of Article 88(1) of that regulation. Indeed, such provisions do not appear to have a normative content spec" [§81, citacao truncada na fonte lida]. Aplicacao concreta: dizer "necessario para fins ligados ao emprego" nao acrescenta nada. Leitura para o Onion: um criterio que so repete "necessario" e juridicamente VAZIO — exatamente a critica que o Elenxo faz a leitura frouxa da opcao C.'
     trace: 'https://curia.europa.eu/juris/liste.jsf?num=C-34/21'
+    provenance:
+      source: "https://curia.europa.eu/juris/liste.jsf?num=C-34/21"
+      locator: "CJEU C-34/21, §81 — dispositivos que condicionam o tratamento a \"necessidade\" apenas reiteram o art. 6(1)(b); ancorada por verificador independente"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_C34_21_AFASTAMENTO_POR_PRIMAZIA_SALVO_6_3
     node_type: evidence
@@ -807,6 +975,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 10, DISPOSITIVO): "the application of national provisions adopted to ensure the protection of employees'' rights and freedoms in respect of the processing of their personal data in the employment context must be disregarded where those provisions do not comply with the conditions and limits laid down in Article 88(1) and (2), unless those provisions constitute a legal basis referred to in Article 6(3) of that regulat" [dispositivo, ponto 2, p. 20; §89; mecanismo §82-88; citacao truncada na fonte lida]. Consequencia juridica da fragmentacao: a regra nacional reprovada e AFASTADA por primazia, salvo se servir de base legal sob o art. 6(3) c/c considerando 45.'
     trace: 'https://curia.europa.eu/juris/liste.jsf?num=C-34/21'
+    provenance:
+      source: "https://curia.europa.eu/juris/liste.jsf?num=C-34/21"
+      locator: "CJEU C-34/21, dispositivo ponto 2 (p. 20), identico no §89, mecanismo nos §82-88 — \"must be disregarded where those provisions do not comply with the conditions and limits laid down in Article 88(1) and (2)\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_C34_21_MARGEM_SEM_COMPROMETER_OBJETIVOS
     node_type: evidence
@@ -821,6 +993,10 @@ nodes:
     source_kind: court-decision
     label: 'ANCORADA (tier 10): "when the Member States exercise the option granted to them by an opening clause of the GDPR, they must use their discretion under the conditions and within the limits laid down by the provisions of that regulation and must therefore legislate in such a way as not to undermine the content and objectives of that regulation" [§59, aplicado ao art. 88 nos §72-73]. SUSTENTA C na forma: discricionariedade existe, mas e limitada pelo objetivo de protecao — a mesma forma que o Onion adota ao permitir fluxo so dentro de proposito declarado.'
     trace: 'https://curia.europa.eu/juris/liste.jsf?num=C-34/21'
+    provenance:
+      source: "https://curia.europa.eu/juris/liste.jsf?num=C-34/21"
+      locator: "CJEU C-34/21, §59 (aplicado ao art. 88 nos §72-73, citando a Opiniao do AG, pontos 56/70/73); ancorada por verificador independente"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── A MATEMÁTICA DO VAZAMENTO (o eixo que confronta a restrição do adotante) ─────────────
   - id: E_R2_TRACKER_FORMULA_DECOMPOE_CONHECIMENTO_PREVIO
@@ -836,6 +1012,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 9, paper seminal, quote VAZIA no dossie): o ataque TRACKER e definido como uma formula caracteristica que DECOMPOE o conhecimento previo do questionador sobre um individuo em partes respondiveis, permitindo recompor estatisticas sobre uma query-set pequena (abaixo do piso k) que, isolada, seria recusada. FONTE EXTERNA para a restricao matematica do adotante (E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS, hoje testemunho com confianca 0.6): o mecanismo do vazamento por diferenca agora tem primario de 1979. PROPOSTA (nao aplicada — o no antigo nao foi editado): confianca 0.6 -> 0.85, e evidence_class deixa de ser a unica ancora.'
     trace: 'Denning, Denning & Schwartz (1979), ACM TODS 4(1) — "The tracker: a threat to statistical database security"'
+    provenance:
+      source: "Denning, Denning & Schwartz (1979), ACM TODS 4(1) — \"The tracker: a threat to statistical database security\""
+      locator: "Denning, Denning & Schwartz (1979), \"The tracker: a threat to statistical database security\" — definicao do tracker; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_TRACKER_RESTRINGIR_QUERY_SET_NAO_GARANTE
     node_type: evidence
@@ -850,6 +1030,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 9, quote VAZIA): a conclusao central do paper (na introducao) e que restringir severamente o tamanho minimo/maximo das query sets torna o banco INUTIL como fonte estatistica — e ainda assim NAO garante o sigilo dos registros confidenciais. LIMITA a opcao C no ponto mais caro: o par "piso de grupo + agregacao" nao e um ponto de equilibrio, e uma escolha entre inutil e inseguro. Quem desenha o canal individuo->organizacao tem de pagar em BUDGET DE CONSULTAS (composicao), nao em tamanho de grupo.'
     trace: 'Denning, Denning & Schwartz (1979), ACM TODS 4(1)'
+    provenance:
+      source: "Denning, Denning & Schwartz (1979), ACM TODS 4(1)"
+      locator: "Denning et al. (1979), introducao — restringir severamente o tamanho minimo/maximo das query sets torna o banco inutil e ainda assim nao garante o sigilo; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_TRACKER_GENERAL_TRACKER_NA_MAIORIA
     node_type: evidence
@@ -864,6 +1048,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 9, quote VAZIA): o paper generaliza com o GENERAL TRACKER — uma unica formula, SEM conhecimento previo de ninguem especifico, ja basta para responder qualquer query proibida em bancos com classes distinguiveis suficientes, e a MAIORIA dos bancos possui um general tracker; logo a ausencia declarada de tracker nao garante seguranca. SUSTENTA por primario a restricao do adotante e refuta a defesa "ninguem aqui sabe o suficiente sobre ninguem para atacar".'
     trace: 'Denning, Denning & Schwartz (1979), ACM TODS 4(1)'
+    provenance:
+      source: "Denning, Denning & Schwartz (1979), ACM TODS 4(1)"
+      locator: "Denning et al. (1979) — o general tracker dispensa conhecimento previo de alguem especifico e existe na maioria dos bancos; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_TRACKER_K_E_N_MENOS_K_SAO_O_ALVO
     node_type: evidence
@@ -878,6 +1066,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 9, quote VAZIA): o proprio exemplo motivador mostra que a restricao k (piso minimo) e n-k (teto maximo) sao EXATAMENTE as defesas que a tecnica do tracker foi desenhada para quebrar, e o texto afirma que a compromissao e possivel mesmo para valores de k RELATIVAMENTE GRANDES. Consequencia direta para o Viva/Company Brain: piso 5 ou piso 10 nao muda a categoria do problema. SUSTENTA E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS.'
     trace: 'Denning, Denning & Schwartz (1979), ACM TODS 4(1)'
+    provenance:
+      source: "Denning, Denning & Schwartz (1979), ACM TODS 4(1)"
+      locator: "Denning et al. (1979), exemplo motivador — k (piso minimo) e n-k (teto maximo) sao as defesas que a tecnica do tracker foi desenhada para quebrar; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_DINUR_NISSIM_RECONSTRUCAO_SQRT_N
     node_type: evidence
@@ -892,6 +1084,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 10, paper fundador da privacidade diferencial, quote VAZIA no dossie): o resultado central e um algoritmo de RECONSTRUCAO POLINOMIAL — se as respostas a subset-sums tem perturbacao aditiva menor que O(raiz de n), um adversario em tempo polinomial reconstroi uma base candidata com distancia de Hamming <= epsilon*n, isto e, QUASE TODA a base e recuperada. SUSTENTA E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS com primario tier 10: a restricao do adotante deixa de ser testemunho isolado.'
     trace: 'Dinur & Nissim (2003), PODS — "Revealing information while preserving privacy"'
+    provenance:
+      source: "Dinur & Nissim (2003), PODS — \"Revealing information while preserving privacy\""
+      locator: "Dinur & Nissim (2003), \"Revealing information while preserving privacy\" (PODS) — reconstrucao polinomial sob perturbacao o(sqrt n); ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_DINUR_NISSIM_TEOREMA3_POLY_NAO_PRIVADO
     node_type: evidence
@@ -906,6 +1102,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 10, quote VAZIA): Teorema 3 — qualquer algoritmo de banco de dados cuja perturbacao seja o(raiz de n) e poly(n)-NAO-PRIVADO: um numero POLINOMIAL de consultas basta para quebrar a privacidade. LIMITA a opcao C de forma quantitativa: "agregado com ruido" so e defesa se o ruido crescer com a raiz do tamanho da base — abaixo disso a defesa e nominal. PROPOSTA de reconciliacao para E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS: confianca 0.6 -> 0.85 (testemunho + dois primarios independentes de 1979 e 2003).'
     trace: 'Dinur & Nissim (2003), PODS'
+    provenance:
+      source: "Dinur & Nissim (2003), PODS"
+      locator: "Dinur & Nissim (2003), Teorema 3 — qualquer algoritmo cuja perturbacao seja o(sqrt n) e poly(n)-nao-privado; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_DINUR_NISSIM_CONSULTAS_N_LOG2
     node_type: evidence
@@ -920,6 +1120,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 10, quote VAZIA): o numero de consultas na prova construtiva do Teorema 3 e t = n*(log n)^2, escolhidas uniformemente ao acaso entre subconjuntos de [n], bastando para reconstruir via programacao linear + arredondamento uma base a distancia de Hamming < epsilon*n. SUSTENTA a opcao C no ponto do BUDGET: existe um NUMERO, logo um ledger de consultas monotonico (corpus: classification-por-vertical/PO_BUDGET) e a defesa correta em especie — e ele tem de contar consultas, nao pessoas.'
     trace: 'Dinur & Nissim (2003), PODS'
+    provenance:
+      source: "Dinur & Nissim (2003), PODS"
+      locator: "Dinur & Nissim (2003), prova construtiva do Teorema 3 — t = n*(log n)^2 consultas uniformes ao acaso; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_DINUR_NISSIM_TEOREMA2_ADVERSARIO_ILIMITADO
     node_type: evidence
@@ -934,6 +1138,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 10, quote VAZIA): Teorema 2 (adversario ilimitado, todas as 2^n consultas) — perturbacao o(n) ja e insuficiente; o adversario reconstroi a base INTEIRA em tempo exponencial via uma fase de "weeding" que testa candidatos contra todas as respostas. Limite superior do problema: contra adversario sem limite de computo, nenhuma agregacao util e segura. SUSTENTA E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS.'
     trace: 'Dinur & Nissim (2003), PODS'
+    provenance:
+      source: "Dinur & Nissim (2003), PODS"
+      locator: "Dinur & Nissim (2003), Teorema 2 — adversario ilimitado com todas as 2^n consultas quebra sob perturbacao o(n); ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_DINUR_NISSIM_MODELO_SUBSET_SUM
     node_type: evidence
@@ -948,6 +1156,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 10, quote VAZIA): o modelo de consulta e "agregados sobre subconjunto pequeno/arbitrario" — q e um subconjunto de indices e a resposta exata e a soma dos bits da base nesses indices; estrutura que, repetida sobre subconjuntos SOBREPOSTOS, gera o sistema de restricoes explorado na reconstrucao. SUSTENTA C ao nomear o ponto exato de defesa: o perigo nasce da SOBREPOSICAO entre recortes, nao do tamanho de cada um — logo a guarda pertence ao ledger de consultas, e nao ao filtro por recorte.'
     trace: 'Dinur & Nissim (2003), PODS'
+    provenance:
+      source: "Dinur & Nissim (2003), PODS"
+      locator: "Dinur & Nissim (2003) — modelo de consulta: q e subconjunto de indices, resposta exata e a soma dos bits; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── k-ANONIMATO, l-DIVERSITY E AGREGAÇÃO SOBRE GRUPO PEQUENO ────────────────────────────
   - id: E_R2_K_ANONIMATO_SO_INDISTINGUIBILIDADE
@@ -962,6 +1174,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 8): "any released information should be indistinguishably related to no less than a certain number (k) of respondents" [Secao 2.2, p. 28]. O requisito do k-anonimato e SO que cada combinacao de quase-identificadores seja compartilhada por ao menos k respondentes (indistinguibilidade) — NAO que os valores sensiveis estejam protegidos contra divulgacao. Corrige a leitura ingenua de "piso de grupo = protecao" que a rodada 1 deixou implicita ao registrar o piso do Viva sem qualificacao.'
     trace: 'dossie da rodada 2 (leitor k-anonimato), Secao 2.2, p. 28'
+    provenance:
+      source: "dossie da rodada 2 (leitor k-anonimato), Secao 2.2, p. 28"
+      locator: "paper de k-anonimato lido na rodada 2, Secao 2.2, p. 28 — \"indistinguishably related to no less than a certain number (k) of respondents\"; ancorada por verificador independente"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_K_ANONIMATO_NAO_IMPEDE_ATRIBUTO
     node_type: evidence
@@ -975,6 +1191,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 8): "The privacy requirement of k-anonymity is explicitly formulated to protect respondents'' identities, is only a starting point for protecting privacy and further steps are needed to prevent attribute disclosure, which can be otherwise possible due to value homogeneity and external knowledge attacks" [Secao 2.3, p. 30]. LIMITA a opcao C: o piso de grupo protege a IDENTIDADE, nao o ATRIBUTO — e num Company Brain o que vaza e justamente o atributo (o que a pessoa fez, quanto, quando).'
     trace: 'dossie da rodada 2 (leitor k-anonimato), Secao 2.3, p. 30'
+    provenance:
+      source: "dossie da rodada 2 (leitor k-anonimato), Secao 2.3, p. 30"
+      locator: "paper de k-anonimato, Secao 2.3, p. 30 — \"is only a starting point for protecting privacy and further steps are needed to prevent attribute disclosure\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_K_ANONIMATO_ATAQUE_HOMOGENEIDADE
     node_type: evidence
@@ -988,6 +1208,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 8): "The problem of homogeneity occurs when all records in an equivalence class (i.e., the set of at least k records with the same value for QI attributes) in a k-anonymous dataset assume the same value for the sensitive attribute. ... the recipient can discover that he suffers from COVID-19, which is the only value assumed by all records in the class (homogeneity attack)." [Secao 2.3, p. 30]. Mesmo 3-anonimo, quem sabe que alguem esta no grupo aprende o atributo COM CERTEZA. SUSTENTA E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS por caminho independente do tracker.'
     trace: 'dossie da rodada 2 (leitor k-anonimato), Secao 2.3, p. 30'
+    provenance:
+      source: "dossie da rodada 2 (leitor k-anonimato), Secao 2.3, p. 30"
+      locator: "paper de k-anonimato, Secao 2.3, p. 30 — ataque de homogeneidade em classe de equivalencia 3-anonima; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_K_ANONIMATO_ATAQUE_CONHECIMENTO_EXTERNO
     node_type: evidence
@@ -1001,6 +1225,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 8): "Due to the fact that short breath and cough would not be possible for a runner practicing for a marathon, the recipient can discover that her friend suffers from dermatitis (external knowledge)." [Secao 2.3, p. 30]. Combinar a classe de equivalencia com fatos de FORA elimina valores implausiveis e deduz o verdadeiro mesmo quando a classe tem mais de um valor. Num time pequeno todo mundo tem conhecimento externo sobre todo mundo — e por isso o cenario do adotante (times de 3 a 5) e o PIOR caso, nao um caso de borda.'
     trace: 'dossie da rodada 2 (leitor k-anonimato), Secao 2.3, p. 30'
+    provenance:
+      source: "dossie da rodada 2 (leitor k-anonimato), Secao 2.3, p. 30"
+      locator: "paper de k-anonimato, Secao 2.3, p. 30 — ataque de conhecimento externo (background knowledge); ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_L_DIVERSITY_ATAQUE_SKEWNESS
     node_type: evidence
@@ -1014,6 +1242,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 8): "The skewness attack occurs when the value distribution for the sensitive attribute observable in an l-diverse equivalence class differs from that observable in the overall population (or in the overall l-diverse dataset)." [Secao 2.3, p. 31]. Nem a l-diversity (a correcao da homogeneidade) fecha a lacuna em grupos pequenos ou enviesados: a simples PERTENCA ao grupo ja eleva a probabilidade do atributo. E o vazamento por AGREGACAO SOBRE GRUPO PEQUENO em forma pura. SUSTENTA E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS.'
     trace: 'dossie da rodada 2 (leitor k-anonimato), Secao 2.3, p. 31'
+    provenance:
+      source: "dossie da rodada 2 (leitor k-anonimato), Secao 2.3, p. 31"
+      locator: "paper de k-anonimato, Secao 2.3, p. 31 — ataque de skewness contra l-diversity; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_IAPP_WINDOWING_ATTACK
     node_type: evidence
@@ -1027,6 +1259,10 @@ nodes:
     source_kind: analyst
     label: 'ANCORADA (tier 6, associacao profissional): "A particularly common, slightly more-complex version of this pitfall comes when giving viewers the ability to slice data by time." [IAPP, "Aggregating Over Anonymized Data"] — os "windowing attacks" fatiam os dados por JANELAS DE TEMPO SOBREPOSTAS para isolar e reconstruir valores de grupos pequenos que, individualmente, deveriam ter sido suprimidos. E o tracker vestido de dashboard: SUSTENTA E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS no vocabulario de produto que a opcao C vai ter de implementar (o eixo TEMPO tambem gasta budget).'
     trace: 'IAPP — "Aggregating Over Anonymized Data"'
+    provenance:
+      source: "IAPP — \"Aggregating Over Anonymized Data\""
+      locator: "IAPP, \"Aggregating Over Anonymized Data\" (secao sobre suppression/windowing attacks) — \"A particularly common, slightly more-complex version of this pitfall comes when giving viewers the ability to slice data by time.\"; ancorada por verificador independente"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── PRIMÁRIO DO FORNECEDOR · o piso de grupo do Viva (refutado por fonte fraca na rodada 1) ─
   - id: E_R2_VIVA_COPILOT_DASHBOARD_PISO_10
@@ -1041,6 +1277,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8, primario do fornecedor sobre o proprio produto): o tamanho minimo de grupo padrao do Copilot Dashboard e 10, NAO 5 — o que REFUTA a leitura de "piso 5 uniforme" que circulou na rodada 1 por fonte fraca (learn.microsoft.com citado em tier 6 dentro de E_LACUNAS_COMPARTILHAMENTO_0913). RECONCILIACAO: SUPERSEDES E_VIVA_COPILOT_ADOPTION_METRICS (rodada 1, agregador tier 5, votacao 2-1, com o termo "individuais" insustentavel) e CONFIRMA por primario E_OBJECTION_INDIVIDUAL_METRICS_UNSUPPORTED.'
     trace: 'learn.microsoft.com — Copilot Dashboard (minimum group size)'
+    provenance:
+      source: "learn.microsoft.com — Copilot Dashboard (minimum group size)"
+      locator: "learn.microsoft.com — documentacao do Copilot Dashboard: tamanho minimo de grupo padrao 10; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_VIVA_PISO_ABSOLUTO_5_ADMIN_CENTER
     node_type: evidence
@@ -1054,6 +1294,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8): no admin center, o piso ABSOLUTO ao configurar o Copilot Dashboard nao pode ser menor que 5, mesmo com o padrao em 10. Fecha com precisao o que a rodada 1 dizia de ouvido ("padrao 10, reduzivel a 5") e o confirma por primario. Nota do Elenxo: o numero exato importa MENOS do que parecia — pelos nos de tracker e Dinur-Nissim, 5 e 10 estao na mesma categoria de (in)seguranca.'
     trace: 'learn.microsoft.com — Copilot Dashboard (minimum group size, admin center)'
+    provenance:
+      source: "learn.microsoft.com — Copilot Dashboard (minimum group size, admin center)"
+      locator: "learn.microsoft.com / Microsoft 365 admin center — o piso absoluto ao configurar o Copilot Dashboard nao pode ser menor que 5; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_VIVA_INSIGHTS_LEGADO_DEFAULT_5
     node_type: evidence
@@ -1067,6 +1311,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8): no Viva Insights geral (legado) o padrao e 5 e nao pode ser menor que 5. Ou seja, a MESMA suite opera com dois pisos diferentes conforme a superficie (Copilot Dashboard 10, Insights legado 5) — o que confirma que o piso e parametro de produto, nao invariante de privacidade. SUSTENTA E_OBJECTION_VIVA_MONITOR_VERB_OVERSTATES.'
     trace: 'learn.microsoft.com — Viva Insights (minimum group size)'
+    provenance:
+      source: "learn.microsoft.com — Viva Insights (minimum group size)"
+      locator: "learn.microsoft.com — Viva Insights (legado): tamanho minimo de grupo padrao 5, nao reduzivel abaixo de 5; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_VIVA_ATRIBUTOS_COMBINADOS_INFEREM_IDENTIDADE
     node_type: evidence
@@ -1080,6 +1328,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8) — O ACHADO DE MERCADO MAIS FORTE DA RODADA: a propria Microsoft afirma EXPLICITAMENTE que combinar atributos organizacionais com dados de linha DE-IDENTIFICADOS pode permitir que um analista infira a identidade individual. O fornecedor que mais vende analitica de trabalho DOCUMENTA o ataque por composicao de quase-identificadores. SUSTENTA E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS por fonte externa e independente do testemunho, e LIMITA a opcao C: de-identificacao + piso nao e salvaguarda suficiente nem na visao de quem a implementa.'
     trace: 'learn.microsoft.com — Viva Insights / Copilot Dashboard: data protection e atributos organizacionais'
+    provenance:
+      source: "learn.microsoft.com — Viva Insights / Copilot Dashboard: data protection e atributos organizacionais"
+      locator: "learn.microsoft.com — a Microsoft afirma que combinar atributos organizacionais com dados de linha de-identificados pode permitir a um analista inferir identidade individual; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_VIVA_COLUNAS_ISOLADAS_NAO_IDENTIFICAM
     node_type: evidence
@@ -1093,6 +1345,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8): a Microsoft da o exemplo concreto — nenhuma coluna ISOLADA identifica, mas JUNTAS os atributos devem ser tratados como dado pessoal potencial. E a doutrina de composicao de quase-identificadores dita por um fornecedor, e bate exatamente com o que o corpus do Onion ja tinha em inference-mitigation/PO_L3_FILTRO (filtro por COMPOSICAO, nao por campo). SUSTENTA E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS.'
     trace: 'learn.microsoft.com — Viva Insights: atributos organizacionais como dado pessoal potencial'
+    provenance:
+      source: "learn.microsoft.com — Viva Insights: atributos organizacionais como dado pessoal potencial"
+      locator: "learn.microsoft.com — exemplo concreto: nenhuma coluna isolada identifica, mas juntas os atributos devem ser tratados como dado pessoal potencial; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_VIVA_DISTRIBUTION_MASKING
     node_type: evidence
@@ -1106,6 +1362,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8): a Microsoft define "distribution masking" e diz a QUAIS SUPERFICIES ele se aplica — isto e, a protecao nao e global, e por tela. SUSTENTA a opcao C na forma (salvaguarda declarada por fluxo, nao por sistema) e ao mesmo tempo mostra o custo: quem lista as superficies protegidas esta listando, por complemento, as desprotegidas.'
     trace: 'learn.microsoft.com — Viva Insights: distribution masking'
+    provenance:
+      source: "learn.microsoft.com — Viva Insights: distribution masking"
+      locator: "learn.microsoft.com — definicao de \"distribution masking\" e as superficies a que se aplica; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_VIVA_TRES_ESTRATEGIAS_PROTECAO
     node_type: evidence
@@ -1119,6 +1379,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8): a Microsoft NOMEIA tres estrategias de protecao de dados agregados, uma delas as masked distributions. Valor para a opcao C: existe um vocabulario de produto ja praticado no mercado (piso de grupo, mascaramento de distribuicao, coorte) para descrever salvaguardas — o Onion pode adotar o vocabulario sem adotar a suficiencia, que os nos de tracker e Dinur-Nissim refutam.'
     trace: 'learn.microsoft.com — Viva Insights: estrategias de protecao de dados agregados'
+    provenance:
+      source: "learn.microsoft.com — Viva Insights: estrategias de protecao de dados agregados"
+      locator: "learn.microsoft.com — tres estrategias nomeadas de protecao de dados agregados, uma delas masked distributions; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── AUTODETERMINAÇÃO APLICADA A MONITORAMENTO (o eixo 4, zero na rodada 1) ──────────────
   - id: E_R2_EPM_CONTROLE_DO_ALVO_MELHORA_PERCEPCAO
@@ -1133,6 +1397,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 8, meta-analise): mais restricoes e mais CONTROLE DO ALVO sobre COMO e QUANDO o monitoramento acontece associam-se a melhor percepcao de justica e autonomia e a menor sensacao de invasao de privacidade — a condicao positiva direta sob a qual o monitoramento frustra MENOS a autonomia. SUSTENTA a opcao C exatamente no seu pilar de assimetria: o que move o ponteiro e CONTROLE REAL do individuo sobre o fluxo, nao aviso nem explicacao. E o unico moderador com efeito medido.'
     trace: 'dossie da rodada 2 (leitor Deci & Ryan / EPM) — meta-analise de monitoramento eletronico de desempenho'
+    provenance:
+      source: "dossie da rodada 2 (leitor Deci & Ryan / EPM) — meta-analise de monitoramento eletronico de desempenho"
+      locator: "meta-analise de monitoramento eletronico de desempenho (EPM) lida na rodada 2 — mais restricoes e controle do ALVO associam-se a melhor percepcao de justica e autonomia e menor invasao de privacidade; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_EPM_TRANSPARENCIA_NAO_MUDA_DESEMPENHO
     node_type: evidence
@@ -1146,6 +1414,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 8, meta-analise): a transparencia associa-se a atitudes mais positivas, mas NAO muda o desempenho de forma mensuravel, e nao ha dados suficientes para testar seu efeito sobre estresse. LIMITA a opcao C: transparencia e um bem em si (e exigencia legal), mas nao e o mecanismo que protege — nao pode ocupar o lugar de salvaguarda no desenho.'
     trace: 'dossie da rodada 2 (leitor Deci & Ryan / EPM)'
+    provenance:
+      source: "dossie da rodada 2 (leitor Deci & Ryan / EPM)"
+      locator: "mesma meta-analise EPM — transparencia associa-se a atitudes mais positivas mas nao muda desempenho de forma mensuravel; dados insuficientes para testar o efeito sobre estresse; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_EPM_PROPOSITO_COMUNICADO_SEM_EFEITO
     node_type: evidence
@@ -1159,6 +1431,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA (tier 8, meta-analise) — O ACHADO QUE MAIS CUSTA A OPCAO C: o PROPOSITO COMUNICADO do monitoramento mostrou pouco ou NENHUM efeito moderador sobre desempenho, atitudes ou estresse; a experiencia subjetiva do monitorado pesou mais do que a justificativa declarada pela organizacao. C e "fluxo POR PROPOSITO": empiricamente, declarar o proposito nao muda o que o monitorado sente nem como se comporta. LIMITA C e alimenta Q_R2_REVISAO_DO_SELO_C — a finalidade declarada e condicao JURIDICA necessaria, nao salvaguarda EFETIVA; o que funciona e o controle do alvo.'
     trace: 'dossie da rodada 2 (leitor Deci & Ryan / EPM)'
+    provenance:
+      source: "dossie da rodada 2 (leitor Deci & Ryan / EPM)"
+      locator: "mesma meta-analise EPM — o proposito comunicado do monitoramento mostrou pouco ou nenhum efeito moderador sobre desempenho, atitudes ou estresse; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── MERCADO / CAPITAL (o eixo que a rodada 1 declarou vazio) ────────────────────────────
   - id: E_R2_MERCADO_GLEAN_SERIE_F_150M
@@ -1173,6 +1449,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 5, press release do proprio fornecedor): "Glean raises $150M Series F at $7.2B valuation to transform how companies use AI to accelerate innovation" [glean.com/press]. HA SINAL DE CAPITAL: capital forte investindo em analitica/IA corporativa sobre uso de ferramentas de trabalho. RECONCILIACAO: SUPERSEDES E_MERCADO_NO_CAPITAL_SIGNAL_EMPLOYEE_DATA, cuja afirmacao central era "SEM SINAL DE CAPITAL nesta rodada" — a lacuna que aquele no declarou (backlash e processos nao buscados por trajetoria) tambem foi fechada pelos nos de recuo de produto e litigio desta rodada.'
     trace: 'https://www.glean.com/press'
+    provenance:
+      source: "https://www.glean.com/press"
+      locator: "glean.com/press, titulo e corpo do press release da Serie F — \"Glean raises $150M Series F at $7.2B valuation\"; ancorada por verificador independente"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_MERCADO_MS_RECUO_PRODUCTIVITY_SCORE
     node_type: evidence
@@ -1187,6 +1467,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8, primario do fornecedor): "we''re removing user names from the product. During preview, we added a feature that showed end-user names and associated actions over a 28-day period." [Microsoft 365 Blog, 01/12/2020]. PRECEDENTE DE RECUO: a Microsoft retirou o recurso que expunha NOMES INDIVIDUAIS apos critica publica de vigilancia. Fecha a lacuna que E_MERCADO_NO_CAPITAL_SIGNAL_EMPLOYEE_DATA declarou em aberto (Productivity Score 2020). SUSTENTA a opcao C: a assimetria que C propoe e a mesma linha que o mercado JA foi obrigado a recuar para.'
     trace: 'https://www.microsoft.com/en-us/microsoft-365/blog/2020/12/01/our-commitment-to-privacy-in-microsoft-productivity-score/'
+    provenance:
+      source: "https://www.microsoft.com/en-us/microsoft-365/blog/2020/12/01/our-commitment-to-privacy-in-microsoft-productivity-score/"
+      locator: "Microsoft 365 Blog, \"Our commitment to privacy in Microsoft Productivity Score\", Jared Spataro, 01/12/2020 — \"we're removing user names from the product\"; ancorada por verificador independente"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_MERCADO_MS_METRICA_ORGANIZACIONAL_NAO_INDIVIDUAL
     node_type: evidence
@@ -1201,6 +1485,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8): "No one in the organization will be able to use Productivity Score to access data about how an individual user is using apps and services in Microsoft 365." [Microsoft 365 Blog, 01/12/2020] — a Microsoft reformulou a interface para deixar claro que a metrica e de ADOCAO ORGANIZACIONAL, nao de comportamento individual, e VEDOU o acesso a dados por usuario. SUSTENTA a opcao C com o precedente mais proximo de produto: a fronteira que C desenha (individuo->organizacao so como predicado agregado) e a que o maior fornecedor do setor adotou sob pressao.'
     trace: 'https://www.microsoft.com/en-us/microsoft-365/blog/2020/12/01/our-commitment-to-privacy-in-microsoft-productivity-score/'
+    provenance:
+      source: "https://www.microsoft.com/en-us/microsoft-365/blog/2020/12/01/our-commitment-to-privacy-in-microsoft-productivity-score/"
+      locator: "Microsoft 365 Blog, mesmo post de 01/12/2020 — \"No one in the organization will be able to use Productivity Score to access data about how an individual user is using apps and services\"; ancorada por verificador independente"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_R2_MERCADO_BIPA_NETRADYNE
     node_type: evidence
@@ -1215,6 +1503,10 @@ nodes:
     source_kind: aggregator
     label: 'ANCORADA COM RESSALVA DE TIER (4, agregador sobre docket nao lido): a acao alega que dashcams com IA da Netradyne "captured, retained and shared with third parties" os escaneamentos faciais dos motoristas sem "informing her or obtaining consent" [Ross v. Netradyne, No. 3:23-cv-01443, Illinois BIPA]. HA LITIGIO PRIVADO contra vigilancia por IA no trabalho — o eixo que a rodada 1 declarou nao buscado. Nota: BIPA e biometria, nao telemetria de conhecimento; vale como sinal de RISCO DE MERCADO, nao como criterio.'
     trace: 'ClassAction.org — Ross v. Netradyne, Inc., No. 3:23-cv-01443'
+    provenance:
+      source: "ClassAction.org — Ross v. Netradyne, Inc., No. 3:23-cv-01443"
+      locator: "Ross v. Netradyne, Inc., No. 3:23-cv-01443, acao ajuizada em 07/08/2023 sob a Illinois BIPA, conforme relatado por ClassAction.org; ancorada por verificador independente (locator = agregador de acoes coletivas, nao o docket)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R2_MERCADO_GARCIA_SAMSARA
     node_type: evidence
@@ -1229,6 +1521,10 @@ nodes:
     source_kind: aggregator
     label: 'ANCORADA COM RESSALVA DE TIER (4, imprensa setorial sobre docket nao lido): motorista demitido processa a transportadora e a fornecedora de monitoramento por video com IA, alegando que esta "used the Samsara system to engage in continuous and covert monitoring of drivers through AI-assisted video analysis, generating so-called ''distraction incidents'' unrelated to accidents or external safety events" [Garcia v. Figueroa Tank Lines / Samsara]. E FUNCTION CREEP LITIGADO: o uso saiu do proposito declarado (seguranca) para avaliacao continua. SUSTENTA a opcao C no ponto em que ela e mais defensavel — a finalidade declarada e o terreno onde a disputa de fato acontece.'
     trace: 'CDLLife (2026) — Garcia v. Figueroa Tank Lines / Samsara, Inc.'
+    provenance:
+      source: "CDLLife (2026) — Garcia v. Figueroa Tank Lines / Samsara, Inc."
+      locator: "Garcia v. Figueroa Tank Lines / Samsara, Inc., relatado por CDLLife (2026); demissao em 04/08/2025, cameras instaladas em maio de 2025; ancorada por verificador independente (locator = imprensa setorial, nao o docket)"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── CONTABILIDADE DESTA RODADA (lacuna vira nó, nunca omissão) ──────────────────────────
   - id: E_R2_LACUNAS_RODADA_COMPLEMENTAR_0913
@@ -1333,6 +1629,10 @@ nodes:
     source_kind: regulator-primary
     label: 'ANCORADA COM RESSALVA (tier 6, nao 9 — a pagina e oficial mas a claim chegou SEM quote e o locator original era blog com 403): o UNICO processo com multa pecuniaria efetiva (Telekall, SEI 00261.000489/2022-62) tratou de VENDA DE LISTAS DE WHATSAPP para fins eleitorais, violando arts. 7o/41 da LGPD e art. 5o do Regulamento de Fiscalizacao — SEM qualquer nexo com relacao de emprego. Elenxo R3-obj5 (SOBREVIVENTE): a claim prova MENOS do que parece. Telekall e irrelevante ao eixo empregador x empregado; ela so serve como evidencia de AUSENCIA ("a ANPD nunca sancionou monitoramento de trabalhador"), e ausencia exige a lista EXAUSTIVA, que nao foi citada verbatim. O proprio verificador registrou que a pagina oficial "nao descreve o assunto de cada processo diretamente" — logo o "nenhum versa sobre monitoramento" e INFERENCIA DO VERIFICADOR sobre nomes de processo, nao leitura de texto. Conclusao que sobrevive: ate 2026 o eixo BR de monitoramento no emprego e sustentado por GUIA ORIENTATIVO (E_R2_ANPD_EXEMPLO7_*), nunca por sancao aplicada — orientacao nao vinculante segue sendo todo o piso regulatorio disponivel.'
     trace: 'gov.br/anpd — pagina oficial de processos sancionadores (lista integral conferida pelo verificador em 2026-09-13)'
+    provenance:
+      source: "gov.br/anpd — pagina oficial de processos sancionadores (lista integral conferida pelo verificador em 2026-09-13)"
+      locator: "gov.br/anpd — pagina oficial de processos sancionadores, aberta pelo VERIFICADOR (o blog citado como locator pelo leitor devolveu 403 e nao pode ser conferido); a lista oficial confere item a item (ByteDance/TikTok, 2 do Ministerio da Saude, SAS-PE, SEEDF, INSS, Secretaria de Saude SC, JBRJ, IAMSPE, Telekall); ancorada por verificador independente, SEM quote verbatim"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── ALVO (a3) · LGPD — o texto da lei citado verbatim (5 de 6 claims caíram na rodada 2) ──
   - id: E_R3_LGPD_ART7_IX_LEGITIMO_INTERESSE
@@ -1348,6 +1648,10 @@ nodes:
     source_kind: statute
     label: 'ANCORADA COM CORRECAO DE TRUNCAMENTO (tier 8, nao 10 — a lei e fonte definitiva, mas a quote do leitor cortou o dispositivo sem reticencias e o planalto ficou inacessivel, entao o texto foi conferido em fonte secundaria): o art. 7o, IX admite o LEGITIMO INTERESSE do controlador como base legal — e a base que sustentaria monitoramento eletronico SEM consentimento individual. Elenxo R3-obj6 (SOBREVIVENTE): a quote da rodada terminava em "do titular", omitindo "que exijam a protecao dos dados pessoais" — MESMA FAMILIA de defeito que reprovou 5 de 6 claims de LGPD na rodada 2. O trecho omitido e MATERIAL: restringe o override do titular aos direitos que exijam protecao de dados, ou seja, estreita a porta que o titular tem para derrubar o legitimo interesse. LIMITA C: o piso legal brasileiro AUTORIZA tratamento sem consentimento sob legitimo interesse, e a assimetria da opcao C nao decorre da lei — e imposta pelo desenho.'
     trace: 'Lei 13.709/2018 (LGPD), art. 7o, IX — planalto.gov.br ECONNRESET; texto conferido em fonte secundaria pelo verificador'
+    provenance:
+      source: "Lei 13.709/2018 (LGPD), art. 7o, IX — planalto.gov.br ECONNRESET; texto conferido em fonte secundaria pelo verificador"
+      locator: "Lei 13.709/2018 (LGPD), art. 7o, inciso IX — quote do leitor: \"quando necessario para atender aos interesses legitimos do controlador ou de terceiro, exceto no caso de prevalecerem direitos e liberdades fundamentais do titular\"; o VERIFICADOR mediu o dispositivo e achou o corte: o inciso TERMINA em \"...do titular QUE EXIJAM A PROTECAO DOS DADOS PESSOAIS\". Ancorada por verificador independente COM correcao de truncamento; planalto.gov.br devolveu ECONNRESET nas duas tentativas"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_LGPD_ART10_CAPUT_SEM_TESTE_FORMAL
     node_type: evidence
@@ -1376,6 +1680,10 @@ nodes:
     source_kind: statute
     label: 'MEDIDO PELO ELENXO (tier 10, lei lida integralmente): a maquinaria de balanceamento que a claim declarou ausente ESTA na propria lei — par. 1o traz NECESSIDADE/MINIMIZACAO ("somente os dados pessoais estritamente necessarios para a finalidade pretendida poderao ser tratados"), o inciso II traz a LEGITIMA EXPECTATIVA ("respeitadas as legitimas expectativas dele e os direitos e liberdades fundamentais") e o par. 3o traz o RELATORIO DE IMPACTO a pedido da ANPD. Duas consequencias: (1) REFUTA E_R3_LGPD_ART10_CAPUT_SEM_TESTE_FORMAL; (2) mostra que o Guia da ANPD (E_R2_ANPD_TESTE_BALANCEAMENTO_3_FASES, E_R2_ANPD_FASE_NECESSIDADE_ESTRITAMENTE_NECESSARIO) NAO inventou o teste de tres fases — ele DERIVA do art. 10, o que ELEVA a autoridade do eixo BR de "guia orientativo nao vinculante" para "guia que le a lei". O que continua sem existir e o LIMIAR: a lei da necessidade e expectativa, nunca um numero que separe agregado-com-piso de agregado-sem-piso.'
     trace: 'Lei 13.709/2018 (LGPD), art. 10 integral — conferido pelo verificador (planalto.gov.br ECONNRESET)'
+    provenance:
+      source: "Lei 13.709/2018 (LGPD), art. 10 integral — conferido pelo verificador (planalto.gov.br ECONNRESET)"
+      locator: "Lei 13.709/2018, art. 10 INTEGRAL lido pelo verificador — par. 1o \"somente os dados pessoais estritamente necessarios para a finalidade pretendida poderao ser tratados\"; inciso II \"respeitadas as legitimas expectativas dele e os direitos e liberdades fundamentais\"; par. 3o relatorio de impacto a pedido da ANPD"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_LGPD_ART10_P2_TRANSPARENCIA_VERBATIM
     node_type: evidence
@@ -1390,6 +1698,10 @@ nodes:
     source_kind: statute
     label: 'ANCORADA COM QUOTE VERBATIM E LOCATOR DE DISPOSITIVO (tier 10 — a primeira claim de LGPD deste grafo que chega completa em DUAS rodadas): "O controlador devera adotar medidas para garantir a transparencia do tratamento de dados baseado em seu legitimo interesse." [art. 10, par. 2o]. Quando o tratamento se apoia em legitimo interesse — o fundamento tipico do monitoramento organizacional — a lei impoe DEVER ATIVO de transparencia. RECONCILIACAO: SUPERSEDES E_R2_LGPD_LEGITIMO_INTERESSE_TRANSPARENCIA_ATIVA, que afirmava o MESMO conteudo mas chegou sem quote e sem locator e por isso teve o tier rebaixado a 5; o conteudo se confirma e a fonte sobe a 10. Elenxo R3-obj8 (SOBREVIVENTE, e importa): "medidas para garantir a transparencia DO TRATAMENTO" e satisfeita por politica publica de privacidade — NAO equivale a "aviso ao titular monitorado", que e o que a prosa do leitor afirmava. A ponte transparencia -> notificacao individual e INFERENCIA, nao texto; e e exatamente o ponto sob disputa na emenda E3 de Q_R2_REVISAO_DO_SELO_C.'
     trace: 'Lei 13.709/2018 (LGPD), art. 10, par. 2o'
+    provenance:
+      source: "Lei 13.709/2018 (LGPD), art. 10, par. 2o"
+      locator: "Lei 13.709/2018, art. 10, par. 2o — quote CONFERIDA VERBATIM pelo verificador na integra do artigo: \"O controlador devera adotar medidas para garantir a transparencia do tratamento de dados baseado em seu legitimo interesse.\"; ancorada por verificador independente"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_LGPD_ART11_CAPUT_DADO_SENSIVEL
     node_type: evidence
@@ -1404,6 +1716,10 @@ nodes:
     source_kind: statute
     label: 'CAPUT ANCORADO VERBATIM, PONTE NAO ANCORADA (tier 10 para o texto; a inferencia fica com confianca 0,4): "O tratamento de dados pessoais sensiveis somente podera ocorrer nas seguintes hipoteses" [art. 11, caput] — nao ha hipotese de "legitimo interesse" para dado sensivel. Elenxo R3-obj9 (SOBREVIVENTE): a ponte que a claim precisaria provar e INVENTADA — dado sensivel na LGPD e definido por CATEGORIA TAXATIVA (art. 5o, II: origem racial, conviccao religiosa, opiniao politica, filiacao sindical, saude, vida sexual, genetico, biometrico), e o art. 5o, II NAO foi lido nesta rodada; telemetria comportamental de trabalho NAO e per se sensivel. A enumeracao do inciso II do art. 11 tambem nao foi citada, entao "nao ha legitimo interesse para dado sensivel" segue sem ancora textual completa. FIO ABERTO nomeado: se o histograma individual de monitoramento permite INFERIR saude ou filiacao sindical, a inferencia entra no art. 11 pela porta do corpus do Onion (classification-por-vertical/PO_INFERENCIA, classificar pelo pior caso de inferencia) — e nao pela leitura desta rodada.'
     trace: 'Lei 13.709/2018 (LGPD), art. 11, caput'
+    provenance:
+      source: "Lei 13.709/2018 (LGPD), art. 11, caput"
+      locator: "Lei 13.709/2018, art. 11, caput — quote verbatim conferida: \"O tratamento de dados pessoais sensiveis somente podera ocorrer nas seguintes hipoteses\"; ancorada por verificador independente, mas a PONTE da claim (histograma de monitoramento -> dado sensivel) NAO foi ancorada"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_LGPD_ART20_CAPUT_REVISAO_DE_DECISAO_AUTOMATIZADA
     node_type: evidence
@@ -1418,6 +1734,10 @@ nodes:
     source_kind: statute
     label: 'CAPUT ANCORADO VERBATIM, REGIME NAO LIDO (tier 10 para o texto; confianca 0,55 pelo que falta): o titular tem direito a SOLICITAR A REVISAO de decisoes tomadas unicamente por tratamento automatizado que afetem seus interesses, incluida a definicao de perfil PROFISSIONAL — relevante quando monitoramento alimenta scoring individual. Elenxo R3-obj10 (SOBREVIVENTE): a rodada NAO leu os paragrafos do art. 20, onde mora o regime — inclusive a controversia sobre revisao POR PESSOA NATURAL, suprimida na conversao da MP 869/2018, NAO verificada nesta rodada. Sem os paragrafos, esta e a ancora mais proxima da emenda E2 de Q_R2_REVISAO_DO_SELO_C ("falta a alavanca que mede: controle do alvo"), mas e ALAVANCA FRACA: direito a solicitar revisao sem garantia de revisor humano nao e o botao sobre COMO e QUANDO que a meta-analise EPM mostrou ser o unico com efeito medido. SUSTENTA C na direcao (a lei ja reconhece uma alavanca do individuo), sem entregar a alavanca.'
     trace: 'Lei 13.709/2018 (LGPD), art. 20, caput'
+    provenance:
+      source: "Lei 13.709/2018 (LGPD), art. 20, caput"
+      locator: "Lei 13.709/2018, art. 20, caput — quote verbatim conferida: \"O titular dos dados tem direito a solicitar a revisao de decisoes tomadas unicamente com base em tratamento automatizado de dados pessoais que afetem seus interesses, incluidas as decisoes destinadas a definir o seu perfil pessoal, profissional, de consumo e de credito ou os aspectos de sua personalidade.\"; ancorada por verificador independente; os PARAGRAFOS do art. 20 NAO foram lidos"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_LGPD_ART9_P1_NULIDADE_DO_CONSENTIMENTO
     node_type: evidence
@@ -1432,6 +1752,10 @@ nodes:
     source_kind: statute
     label: 'ANCORADA COM TRUNCAMENTO NA ABERTURA (tier 8, nao 10): quando o consentimento e a base invocada, a lei o declara NULO se as informacoes ao titular forem enganosas, abusivas ou nao tiverem sido apresentadas previamente com transparencia. Elenxo R3-obj11 (SOBREVIVENTE, duas frentes): (1) o corte omite "Na hipotese em que o consentimento e requerido," — MESMA FAMILIA do art. 7o, IX, e o segundo truncamento da mesma rodada; (2) prova MENOS: a nulidade do par. 1o e por INFORMACAO enganosa/abusiva, NAO por SUBORDINACAO — que e o problema real do consentimento do empregado. A pergunta "consentimento de empregado monitorado e valido?" segue SEM ancora legal brasileira apos DUAS rodadas; quem responde no grafo e o EDPB (E_R2_EDPB_CONSENTIMENTO_IMPROVAVEL_NAO_REJEITADO), que e fonte europeia. LIMITA C no ponto em que C dependeria de consentimento como base.'
     trace: 'Lei 13.709/2018 (LGPD), art. 9o, par. 1o'
+    provenance:
+      source: "Lei 13.709/2018 (LGPD), art. 9o, par. 1o"
+      locator: "Lei 13.709/2018, art. 9o, par. 1o — quote do leitor: \"esse sera considerado nulo caso as informacoes fornecidas ao titular tenham conteudo enganoso ou abusivo ou nao tenham sido apresentadas previamente com transparencia, de forma clara e inequivoca\"; o verificador registrou que a quote COMECA NO MEIO do dispositivo, omitindo a condicional de abertura \"Na hipotese em que o consentimento e requerido,\" — truncamento sem reticencias; tier REBAIXADO"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── ALVO (b) · autodeterminação no primário + meta-análise EPM com quote ─────────────────
   - id: E_R3_DECI_RYAN_TRES_NECESSIDADES_ABSTRACT
@@ -1447,6 +1771,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA COM QUOTE VERBATIM E LOCATOR PRECISO (tier 8, primario seminal) — FECHA A LACUNA (i) de E_R2_LACUNAS_RODADA_COMPLEMENTAR_0913 ("Deci & Ryan NAO foi lido; entrou meta-analise EPM como PROXY"): "The findings have led to the postulate of three innate psychological needs - competence, autonomy, and relatedness - which when satisfied yield enhanced self-motivation and mental health and when thwarted lead to diminished motivation and well-being" [Abstract, p. 68]. A SDT preve EXPLICITAMENTE o resultado quando as necessidades sao FRUSTRADAS. Unica objecao do Elenxo (R3-obj12, NAO SOBREVIVENTE quanto a ancoragem): e objecao de ESCOPO, nao de fonte — o artigo de 2000 nao menciona monitoramento em ponto algum, entao a ponte SDT -> monitoramento eletronico continua sendo INFERENCIA do leitor. Duas claims que tentavam construir essa ponte no proprio texto cairam como EXAGERADAS na ancoragem (ver E_R3_LACUNAS_*). SUSTENTA a opcao C no seu pilar de autonomia, com o escopo declarado.'
     trace: 'Deci, E. L., & Ryan, R. M. (2000). Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being. American Psychologist, 55(1), 68-78'
+    provenance:
+      source: "Deci, E. L., & Ryan, R. M. (2000). Self-determination theory and the facilitation of intrinsic motivation, social development, and well-being. American Psychologist, 55(1), 68-78"
+      locator: "Deci & Ryan (2000), American Psychologist 55(1), Abstract, p. 68 — quote verbatim conferida por verificador independente: \"The findings have led to the postulate of three innate psychological needs - competence, autonomy, and relatedness - which when satisfied yield enhanced self-motivation and mental health and when thwarted lead to diminished motivation and well-being.\""
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_DECI_RYAN_NECESSIDADES_NOMEADAS_P69
     node_type: evidence
@@ -1461,6 +1789,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA COM QUOTE VERBATIM E LOCATOR PRECISO (tier 8): as tres necessidades sao nomeadas com suas fontes originais e descritas como ESSENCIAIS ao funcionamento otimo e ao bem-estar [secao "Self-Determination Theory", p. 69, col. 2]. Valor para o grafo: a autonomia nao e preferencia nem gosto — e necessidade psicologica basica com lastro empirico, o que da FUNDAMENTO TEORICO (nao juridico) ao pilar de soberania do individuo da opcao C. Limite declarado pelo Elenxo: fundamento teorico nao e limiar operacional; a SDT diz que frustrar autonomia FAZ MAL, nunca QUANTO de fluxo a frustra.'
     trace: 'Deci, E. L., & Ryan, R. M. (2000). American Psychologist, 55(1), 68-78, p. 69'
+    provenance:
+      source: "Deci, E. L., & Ryan, R. M. (2000). American Psychologist, 55(1), 68-78, p. 69"
+      locator: "Deci & Ryan (2000), secao \"Self-Determination Theory\", p. 69, col. 2 — quote verbatim conferida: \"Inductively, using the empirical process, we have identified three such needs - the needs for competence (Harter, 1978; White, 1963), relatedness (Baumeister & Leary, 1995; Reis, 1994), and autonomy (deCharms, 1968; Deci, 1975) - that appear to be essential for facilitating optimal functioning of the natural propensities for growth and integration, as well as for constructive social development and personal well-being.\""
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_EPM_RAVID_SEM_GANHO_DE_DESEMPENHO_COM_ESTRESSE
     node_type: evidence
@@ -1475,6 +1807,10 @@ nodes:
     source_kind: paper
     label: 'ANCORADA COM QUOTE VERBATIM, LOCATOR E TAMANHO DE AMOSTRA (tier 8, meta-analise K=94, N=23.461) — E O ACHADO QUE MAIS CUSTA A QUALQUER DESENHO DE MONITORAMENTO: "Results provide no evidence that EPM improves worker performance. Moreover, findings indicate that the presence of EPM is associated with increased worker stress, regardless of the characteristics of monitoring" [Abstract, p. 5]. DUAS coisas que a rodada 2 tentou afirmar e teve REPROVADAS na ancoragem (estresse estrutural e ausencia de ganho de desempenho) agora estao ANCORADAS no texto. O "regardless of the characteristics of monitoring" e devastador para o desenho: nem transparencia, nem proposito declarado, nem grau de agregacao mudam a associacao com estresse — o que REFORCA E_R2_EPM_PROPOSITO_COMUNICADO_SEM_EFEITO e a emenda E1 de Q_R2_REVISAO_DO_SELO_C. LIMITA C no ponto mais duro: se o EPM nao entrega o beneficio que o justifica (desempenho) e entrega o custo (estresse), o teste de NECESSIDADE do art. 10 par. 1o da LGPD e da Fase 2 do Guia da ANPD fica MAIS dificil de passar, nao menos. Ressalva: os COEFICIENTES da Tabela 6 (invasividade, transparencia) NAO foram ancorados — a claim que os trazia caiu como EXAGERADA por fundir duas linhas distintas da tabela (ver E_R3_LACUNAS_*).'
     trace: 'Ravid, D. M., et al. (2023). Personnel Psychology, 76(1), Abstract, p. 5'
+    provenance:
+      source: "Ravid, D. M., et al. (2023). Personnel Psychology, 76(1), Abstract, p. 5"
+      locator: "Ravid et al. (2023), Personnel Psychology 76(1), Abstract, p. 5 (K=94 amostras, N=23.461) — quote verbatim conferida por verificador independente: \"Results provide no evidence that EPM improves worker performance. Moreover, findings indicate that the presence of EPM is associated with increased worker stress, regardless of the characteristics of monitoring.\""
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── ALVO (c) · Viva — o bin com 1 indivíduo e a ausência de epsilon ──────────────────────
   - id: E_R3_VIVA_BIN_UNITARIO_PERMITIDO
@@ -1489,6 +1825,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8, primario do fornecedor sobre o proprio produto) — FECHA R1-obj#29 E DERRUBA O PISO DE GRUPO COMO SALVAGUARDA: a propria doc da Microsoft confirma que um bin de histograma PODE exibir dado de UM UNICO INDIVIDUO, como EXCECAO a regra de tamanho minimo de grupo. O fornecedor que mais vende analitica de trabalho documenta que sua tela pode mostrar o individuo. Consequencia para o grafo: o debate "piso 10 ou piso 5" (E_R2_VIVA_COPILOT_DASHBOARD_PISO_10, E_R2_VIVA_PISO_ABSOLUTO_5_ADMIN_CENTER) era a pergunta ERRADA — o piso nunca se aplicou onde o vazamento acontece. SUSTENTA E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS por primario do fornecedor (o testemunho do adotante sobre times de 3 a 5 deixa de precisar de analogia) e LIMITA a opcao C: "agregado com piso de grupo" NAO e salvaguarda, nem no produto de referencia do mercado.'
     trace: 'learn.microsoft.com — Viva Insights: minimum group size e histogramas'
+    provenance:
+      source: "learn.microsoft.com — Viva Insights: minimum group size e histogramas"
+      locator: "learn.microsoft.com — documentacao do Viva Insights: a doc confirma EXPLICITAMENTE que um bin de histograma PODE exibir dado de um unico individuo, como excecao a regra de tamanho minimo de grupo; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_VIVA_JUSTIFICATIVA_DO_BIN_E_COMPORTAMENTO_NAO_RH
     node_type: evidence
@@ -1502,6 +1842,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8) — A JUSTIFICATIVA DO FORNECEDOR, QUE O PROPRIO GRAFO REFUTA NA SUBSTANCIA: a doc argumenta que permitir bin com 1 individuo e aceitavel porque os valores derivam de metricas de COMPORTAMENTO OBSERVADO e nao de dados de RH, logo nao revelariam grupo demografico. Leitura do Elenxo: o argumento troca o risco de lugar — protege contra revelar ATRIBUTO DEMOGRAFICO e nada diz sobre revelar A PROPRIA ATIVIDADE da pessoa, que e exatamente o dado em disputa neste grafo e exatamente o que o Exemplo 7 do Guia da ANPD reprova sob legitimo interesse. Alem disso colide com a admissao da propria Microsoft em E_R2_VIVA_ATRIBUTOS_COMBINADOS_INFEREM_IDENTIDADE (combinar atributos organizacionais com linhas de-identificadas permite inferir identidade). LIMITA C: adotar o vocabulario de salvaguarda do mercado sem adotar a justificativa dele e obrigatorio, nao opcional.'
     trace: 'learn.microsoft.com — Viva Insights: justificativa do bin de histograma'
+    provenance:
+      source: "learn.microsoft.com — Viva Insights: justificativa do bin de histograma"
+      locator: "learn.microsoft.com — a justificativa da doc para permitir bin com 1 individuo e que valores de bin/histograma derivam de metricas de COMPORTAMENTO OBSERVADO, nao de dados de RH, logo nao revelariam grupo demografico do individuo; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_VIVA_PISO_APLICA_AO_FILTRO_NAO_AO_BIN
     node_type: evidence
@@ -1515,6 +1859,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8) — A MECANICA EXATA DO VAZAMENTO, E A CORRECAO DE ESCOPO QUE FALTAVA: o minimum group size protege o FILTER GROUP, nunca o BIN. Filtro abaixo do minimo suprime o histograma inteiro; passando o filtro, cada bin interno pode ter qualquer contagem, INCLUSIVE 1. RECONCILIACAO com a rodada 2 (nao e refutacao, e qualificacao de escopo): E_R2_VIVA_COPILOT_DASHBOARD_PISO_10 e E_R2_VIVA_PISO_ABSOLUTO_5_ADMIN_CENTER seguem FACTUALMENTE CORRETOS sobre os numeros, mas o que eles mediam nao e o que protege — por isso este no CONSTRAINS os dois em vez de supersede-los. Isto e, no produto de referencia, a defesa e por TELA e por FILTRO, e o ataque por DIFERENCA opera dentro da tela permitida — exatamente o cenario de E_R2_TRACKER_RESTRINGIR_QUERY_SET_NAO_GARANTE e E_R2_DINUR_NISSIM_TEOREMA3_POLY_NAO_PRIVADO. LIMITA C e alimenta Q_R3.'
     trace: 'learn.microsoft.com — Viva Insights: minimum group size aplicado ao filter group'
+    provenance:
+      source: "learn.microsoft.com — Viva Insights: minimum group size aplicado ao filter group"
+      locator: "learn.microsoft.com — a regra de minimum group size (padrao 5) NAO se aplica ao bin do histograma, e sim ao \"filter group\" que o alimenta: se o filtro estiver abaixo do minimo o histograma INTEIRO nao aparece, mas DENTRO dele os bins podem ter qualquer contagem, inclusive 1; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_VIVA_SEM_EPSILON_DOCUMENTADO
     node_type: evidence
@@ -1528,6 +1876,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA COMO AUSENCIA MEDIDA (tier 8, pagina oficial do fornecedor lida diretamente) — A "PRIVACIDADE DIFERENCIAL" DECLARADA NAO TEM EPSILON: a pagina oficial da Microsoft para Viva Insights NAO documenta nenhum parametro epsilon, nenhum orcamento de privacidade e nenhuma garantia matematica formal; descreve apenas "introduzir pequenas variacoes nos dados" com base em metodos de pesquisadores, sem quantificacao. Este e o no que liga o eixo de mercado ao eixo matematico do grafo: sem epsilon nao ha composicao calculavel, logo nao ha como opor a reconstrucao de E_R2_DINUR_NISSIM_RECONSTRUCAO_SQRT_N nem contabilizar consultas como o corpus do Onion ja pede em classification-por-vertical/PO_BUDGET (ledger de epsilon monotonico). LIMITA C de forma dura: se a opcao C invocar "privacidade diferencial" sem parametro, repete o gesto do fornecedor — nome de garantia sem garantia (behavior-over-declaration: confie no que o artefato ENTREGA, nao no que declara de si).'
     trace: 'learn.microsoft.com — Viva Insights: pagina oficial de privacidade diferencial'
+    provenance:
+      source: "learn.microsoft.com — Viva Insights: pagina oficial de privacidade diferencial"
+      locator: "learn.microsoft.com — pagina oficial de privacidade diferencial da Microsoft para Viva Insights: AUSENCIA MEDIDA de qualquer parametro epsilon, orcamento de privacidade ou garantia matematica formal; a pagina descreve apenas \"introduzir pequenas variacoes nos dados\" com base em metodos de pesquisadores, sem quantificacao; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_VIVA_GARANTIA_QUALITATIVA_NAO_FORMAL
     node_type: evidence
@@ -1541,6 +1893,10 @@ nodes:
     source_kind: vendor-primary
     label: 'ANCORADA (tier 8): a garantia que a Microsoft declara e QUALITATIVA — "nenhuma atividade individual pode ser discernida COM CERTEZA" — e nao uma garantia formal com epsilon quantificado, o que REFORCA a ausencia medida em E_R3_VIVA_SEM_EPSILON_DOCUMENTADO. Leitura do Elenxo: "com certeza" e um qualificador que CONCEDE o ataque probabilistico — privacidade diferencial real limita a VANTAGEM do adversario por um parametro; "nao com certeza" admite que a inferencia provavel esta disponivel, que e precisamente o modelo de ataque de E_R2_DINUR_NISSIM_TEOREMA2_ADVERSARIO_ILIMITADO e do ataque por diferenca do adotante. LIMITA C.'
     trace: 'learn.microsoft.com — Viva Insights: privacidade diferencial, texto da garantia'
+    provenance:
+      source: "learn.microsoft.com — Viva Insights: privacidade diferencial, texto da garantia"
+      locator: "learn.microsoft.com — a garantia declarada pela Microsoft e QUALITATIVA (\"nenhuma atividade individual pode ser discernida com certeza\"), nao uma garantia formal com epsilon quantificado; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── ALVO (d) · acordo coletivo BR (CLT 611-A/611-B) como análogo do art. 88 do GDPR ──────
   - id: E_R3_CLT_611A_LISTA_FECHADA_SEM_MONITORAMENTO
@@ -1570,6 +1926,10 @@ nodes:
     source_kind: statute
     label: 'ANCORADA COMO AUSENCIA (tier 7): o art. 611-B lista TAXATIVAMENTE (30 incisos) o que e objeto ILICITO de supressao ou reducao por acordo coletivo — e dados pessoais, intimidade e privacidade do trabalhador NAO aparecem NOMINALMENTE nessa lista de blindagem. Elenxo R3: a ausencia corta para os dois lados e a rodada tem de dizer isso. (a) A favor de C: como o 611-A nao autoriza (E_R3_CLT_611A_*), a privacidade nao precisa estar no 611-B para ficar protegida — o que nao esta no rol de prevalencia simplesmente nao e negociavel. (b) Contra uma leitura forte: nao ha, no BR, uma blindagem EXPRESSA da privacidade do trabalhador contra a negociacao coletiva, entao a protecao vem por via constitucional (art. 5o, X) e pela LGPD, nunca por dispositivo trabalhista nominal — e uma protecao INFERIDA, nao escrita. Reproduz, no eixo (d), o mesmo vazio de limiar ja registrado em E_OBJECTION_NO_UNIFORM_EU_THRESHOLD.'
     trace: 'CLT, art. 611-B (redacao da Lei 13.467/2017)'
+    provenance:
+      source: "CLT, art. 611-B (redacao da Lei 13.467/2017)"
+      locator: "CLT, art. 611-B — rol TAXATIVO de 30 incisos do que e objeto ILICITO de supressao/reducao por acordo coletivo; dados pessoais, intimidade e privacidade do trabalhador NAO aparecem nominalmente nessa lista de blindagem; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_R3_CLT_611B_PU_LEITURA_RESTRITIVA_DA_BLINDAGEM
     node_type: evidence
@@ -1584,6 +1944,10 @@ nodes:
     source_kind: statute
     label: 'ANCORADA COM RESSALVA DE QUOTE (tier 7): o paragrafo unico do art. 611-B RESTRINGE o que conta como "norma de saude, higiene e seguranca" — excluindo regras de duracao e intervalo — o que reforca a LEITURA RESTRITIVA da lista de blindagem. Consequencia para o eixo (d): a porta pela qual se tentaria proteger o trabalhador contra monitoramento via "saude e seguranca" (o argumento natural, dado o achado de estresse de E_R3_EPM_RAVID_SEM_GANHO_DE_DESEMPENHO_COM_ESTRESSE) e legalmente ESTREITA no BR. O dano psiquico medido pela meta-analise nao encontra, nesta rodada, veiculo trabalhista brasileiro que o transforme em limite negocial — outra lacuna nomeada, nao fechada.'
     trace: 'CLT, art. 611-B, paragrafo unico (redacao da Lei 13.467/2017)'
+    provenance:
+      source: "CLT, art. 611-B, paragrafo unico (redacao da Lei 13.467/2017)"
+      locator: "CLT, art. 611-B, paragrafo unico — restringe o que conta como \"norma de saude, higiene e seguranca\", excluindo regras de duracao e intervalo; ancorada por verificador independente; quote verbatim ausente no dossie"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── CONTABILIDADE DESTA RODADA (lacuna vira nó, nunca omissão — cláusula 8) ──────────────
   - id: E_R3_LACUNAS_RODADA_PRIMARIAS_0913
@@ -1610,6 +1974,10 @@ nodes:
     verified_against: 'banco de provas executavel do adotante jogo-da-vida contra API e Postgres REAIS, em times de 3, 4 e 5 (a faixa do criterio de falseamento que este grafo aceitou): 8 testes, suite 139/139, no arquivo apps/api/src/routes/team.company-brain-bench.test.ts DO REPO DO ADOTANTE (nao existe aqui — por isso o trace aponta o sinal recebido, que e o que este repo pode abrir), COM CONTROLE NEGATIVO — quatro assercoes-chave mutadas (nome deduzido, karma_total esperado, delta do agregado, chaves da visao do admin) e as quatro reprovaram'
     label: 'A MEDICAO QUE FALTAVA, E ELA VEM DE PRODUTO VIVO. O ataque de reidentificacao por composicao VENCE com n = 3 — ABAIXO do piso de grupo e SEM TOCAR no agregado que o piso protege. A mecanica: com `karma_total` ainda nulo pelo piso, o CONTADOR DE OFERTAS de um pedido de ajuda entrega QUEM ofereceu — o numero sobe, `offered_by_me` e falso, e quem pediu nao pode ofertar no proprio pedido (409). Sobra UM nome, por DUAS leituras. A cinco, com participacao completa, o contador satura os elegiveis e o Karma individual de TODOS se reconstroi (`karma_total - o meu`). E NAO HA ORCAMENTO DE CONSULTAS: o limite por IP existente (120/min) e guarda de abuso — limita TAXA, nunca INFORMACAO LIBERADA. CONSEQUENCIA PARA O DESENHO: confirma E_ADOPTER_DIFFERENCE_ATTACK_SMALL_TEAMS (testemunho) por EXECUCAO, e confirma E_R3_VIVA_PISO_APLICA_AO_FILTRO_NAO_AO_BIN (primaria de fornecedor) por produto proprio. O que caiu nao estava nas emendas: caiu a HIPOTESE IMPLICITA de que um piso de agregacao e salvaguarda. HONESTIDADE DE METODO, nas palavras do adotante: "os oito testes passaram de primeira, o que e motivo de desconfiança e nao de comemoracao" — por isso o controle negativo. E o ataque 4 (excecao virando caminho normal) PERDEU: a visao de quem cuida do time e a do jogador comum sao iguais chave por chave, provado por ENUMERACAO da resposta, nao por declaracao de intencao.'
     trace: 'docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-resultado.md'
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-09-15-banco-de-provas-quatro-ataques-resultado.md"
+      locator: "banco de provas executavel do adotante jogo-da-vida contra API e Postgres REAIS, em times de 3, 4 e 5 (a faixa do criterio de falseamento que este grafo aceitou): 8 testes, suite 139/139, no arquivo apps/api/src/routes/team.company-brain-bench.test.ts DO REPO DO ADOTANTE (nao existe aqui — por isso o trace aponta o sinal recebido, que e o que este repo pode abrir), COM CONTROLE NEGATIVO — quatro assercoes-chave mutadas (nome deduzido, karma_total esperado, delta do agregado, chaves da visao do admin) e as quatro reprovaram"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_R3_F1_F2_SELADAS
     node_type: decision
@@ -1621,6 +1989,10 @@ nodes:
     verified_against: 'selado pelo maestro 2026-09-18 apos avaliacao que confrontou as tres familias de evidencia (teoria Dinur-Nissim/Denning; primaria de fornecedor Viva/Copilot; produto vivo do adotante) e recomendou selar F1 e F2 JUNTAS e NAO selar F3'
     label: 'F1 E F2 ENTRAM NO DESENHO DE C; F3 NAO FOI SELADA. (F1) O PISO DE GRUPO SAI COMO SALVAGUARDA e entra LEDGER DE CONSULTAS COM BUDGET DE COMPOSICAO. A pergunta "piso 5 ou piso 10" fica IRRELEVANTE: o piso responde "o grupo e grande o bastante?", e o ataque nao precisa do grupo — precisa de DUAS LEITURAS E UMA SUBTRACAO. A base probatoria e TRIPLA e independente: teoria (Dinur & Nissim 2003; Denning 1979 — restringir o query set nao garante), primaria de FORNECEDOR (o minimum group size protege o FILTER GROUP e nao o BIN; um bin pode exibir UM individuo) e PRODUTO VIVO (o banco de provas vence com n=3, abaixo do piso). (F2) SELADA JUNTO, E NAO POR SIMETRIA: "privacidade diferencial" so se invoca com EPSILON DECLARADO e ledger; sem parametro, F1 trocaria um mecanismo decorativo por outro de nome novo — e a casa ja tem nome para isso (behavior-over-declaration). Sem F2, o selo de F1 seria meia-cura. O QUE ESTE SELO NAO RESOLVE, declarado para nao virar promessa: (a) custo real — ledger MONOTONICO por leitor E por alvo e estado novo e persistente, com politica embutida (quanto custa cada leitura, se reseta, quando), nao e uma flag; (b) o budget ataca a REIDENTIFICACAO, e nao decide se o produto deve mostrar QUEM ajudou — ver Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL; (c) E_R3_EPM_RAVID_SEM_GANHO_DE_DESEMPENHO_COM_ESTRESSE segue pesando contra qualquer monitoramento, independente de piso ou budget. (F3) NAO SELADA de proposito: e afirmacao JURIDICA com tensao ABERTA declarada no proprio no (o piso do TST mais permissivo que C x o Exemplo 7 da ANPD) — selar mecanismo maduro junto com direito em contradicao misturaria duas certezas de grau diferente. Q_R3 SEGUE `open` por causa dela.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/'
+    provenance:
+      source: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/"
+      locator: "selado pelo maestro 2026-09-18 apos avaliacao que confrontou as tres familias de evidencia (teoria Dinur-Nissim/Denning; primaria de fornecedor Viva/Copilot; produto vivo do adotante) e recomendou selar F1 e F2 JUNTAS e NAO selar F3"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_FRONTEIRA_CONTROLE_DO_ALVO_X_RECONHECIMENTO_NOMINAL
     node_type: question
@@ -1655,6 +2027,10 @@ nodes:
     source_kind: primary-law
     label: 'MEDIDO DIRETO, e DERRUBA a conclusao do alvo (d) da rodada 3: o caput do art. 611-A da CLT contem a expressao `entre outros` antes dos incisos — a lista e EXEMPLIFICATIVA, nao taxativa. A rodada 3 concluiu que `nao ha analogo brasileiro do art. 88 do GDPR porque a lista e fechada`; a premissa e falsa e a conclusao cai junto. O que FICA em pe e outra coisa, e menor: monitoramento nao esta NOMEADO entre os incisos, e o art. 611-B protege direitos indisponiveis — mas se a negociacao coletiva pode ou nao disciplinar tratamento de dado de trabalhador no Brasil segue SEM RESPOSTA, e agora com a pergunta melhor colocada (o criterio e o Tema 1046 do STF sobre negociado x legislado, mais a indisponibilidade do art. 5o, X da CF). Lacuna DECLARADA, a ser vista em paralelo por ordem do maestro.'
     trace: 'https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452compilado.htm'
+    provenance:
+      source: "https://www.planalto.gov.br/ccivil_03/decreto-lei/del5452compilado.htm"
+      locator: "texto oficial baixado de planalto.gov.br/ccivil_03/decreto-lei/del5452compilado.htm e lido na propria sessao (nao por agente): \"Art. 611-A. A convencao coletiva e o acordo coletivo de trabalho tem prevalencia sobre a lei quando, ENTRE OUTROS, dispuserem sobre:\""
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: D_R2_EMENDAS_A_C_SELADAS
     node_type: decision
@@ -1666,6 +2042,10 @@ nodes:
     verified_against: 'selado pelo maestro 2026-09-14: as quatro emendas propostas em Q_R2_REVISAO_DO_SELO_C entram no desenho de C; as lacunas legais remanescentes seguem em paralelo e nao bloqueiam'
     label: 'AS QUATRO EMENDAS A C, AGORA PARTE DELA. (E1) A FINALIDADE DECLARADA NAO E PROTECAO: C50 mede que finalidade comunicada quase nao move atitude, desempenho nem estresse, e o TJUE (C-34/21 §61/§71/§81) diz que regra que so reitera finalidade e necessidade nao tem conteudo normativo proprio — C carrega conteudo CONCRETO (limiar, budget de consultas, denylist de predicados, masking) ou e decorativa pelos dois padroes. (E2) A ALAVANCA QUE MEDE E O CONTROLE DO ALVO: C48 mostra que constraints/controle e a UNICA caracteristica com efeito positivo medido (mais justica e autonomia percebidas, menos invasao) — C ganha botao sobre COMO e QUANDO (escopo, janela, inspecao, veto), nao so finalidade e egresso por predicado. (E3) NOTIFICACAO PREVIA CAI DE PORTAO A SALVAGUARDA obrigatoria porem insuficiente (C7 da ANPD: politica previa nao cura o excesso; C20 Lopez Ribalda II: notificacao e um criterio entre outros) — o portao passa a ser NECESSIDADE + MINIMIZACAO. (E4) REGIME DE EXCECAO INVESTIGATIVA: a Grande Camara admite vigilancia OCULTA sob suspeita razoavel de falta grave (C21); C cria modo investigativo GATED, LOGADO e REVISAVEL ex post — mecanismo sem porta de excecao e contornado no primeiro incidente, com cobertura jurisprudencial. Vale junto o LIMITE DURO BR ja selado: o Exemplo 7 do guia da ANPD reprova rastreio de atividade/produtividade de empregado sob legitimo interesse, logo o canal individuo->organizacao nao carrega telemetria de atividade em NENHUM grau de agregacao — `so predicado provado` le-se como predicado sobre ARTEFATO DE TRABALHO E DECISAO.'
     trace: 'docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/compartilhamento-individuo-organizacao-2026-09/SYNTHESIS.md"
+      locator: "selado pelo maestro 2026-09-14: as quatro emendas propostas em Q_R2_REVISAO_DO_SELO_C entram no desenho de C; as lacunas legais remanescentes seguem em paralelo e nao bloqueiam"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_FRONTEIRA_RECONHECIMENTO_POR_RAIO_PROPOSTA
     node_type: decision

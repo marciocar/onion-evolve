@@ -19,6 +19,10 @@ nodes:
     verified_at: 2026-07-27
     verified_against: sinal-do-adotante-lido
     label: "SINAL DE CAMPO (metagamify, 2026-07-27): --update mirando a 2a integration branch (develop) deu exit 10 com ~110 arquivos em conflito, INCLUINDO codigo de aplicacao (apps/api/src/...). Abortou limpo; nada quebrou. Diagnostico do adotante: conflito CONTABIL por base de merge errada — o onion/vendor seguiu a linhagem da chore, nao da develop"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-27-develop-onion-update-base-cruzada.md"
+      locator: "sinal-do-adotante-lido"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_cause_is_two_branches
     node_type: claim
@@ -55,6 +59,10 @@ nodes:
     verified_at: 2026-07-27
     verified_against: reproducao-tentativa-3
     label: "CAUSA RAIZ: o caminho de FALLBACK do seed. Sem commit na historia da integracao cujo tree do framework seja identico ao pin adotado (o 'legado entrelacado', tipico de quem CUSTOMIZOU framework), _clean_baseline falha e o seed ramifica do HEAD da integracao. Ai o onion/vendor deixa de ser portador de framework e passa a carregar o SNAPSHOT DE PRODUTO daquela branch, ficando casado com ela. Pedi-lo para uma 2a integracao arrasta a divergencia de produto para dentro do 3-way. Reproduzido: exit 10 com conflito em apps/api/src/wrr.service.ts"
+    provenance:
+      source: ".claude/utils/adopt/vendor-branch.sh"
+      locator: "reproducao-tentativa-3"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_reproduction_3_tries
     node_type: evidence
@@ -67,6 +75,10 @@ nodes:
     verified_at: 2026-07-27
     verified_against: fixtures-executadas-contra-o-helper-real
     label: "REPRODUCAO em 3 tentativas contra o vendor-branch.sh REAL, cada uma estreitando o gatilho: (1) branches divergentes, produto so numa => conflito de 1 arquivo de FRAMEWORK, nao e o caso — eu poderia ter parado aqui e declarado sucesso reproduzindo a coisa errada; (2) produto divergente E baseline limpa disponivel => 0 conflitos, produto intacto (a prova de que 2 branches nao quebram); (3) framework customizado => _clean_baseline falha => exit 10 em codigo de aplicacao, a assinatura do campo"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "fixtures-executadas-contra-o-helper-real"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_content_test_discriminates
     node_type: evidence
@@ -79,6 +91,10 @@ nodes:
     verified_at: 2026-07-27
     verified_against: md5-das-trees-nas-duas-fixtures
     label: "O DISCRIMINADOR, medido nas duas fixtures: tree(vendor) vs tree(base do merge) FORA do manifesto de framework. Seguro => identicos (vendor e framework-puro). Cruzado => diferentes (vendor carrega produto de outra branch). Vantagem decisiva sobre registrar a origem na semeadura: funciona no vendor LEGADO, que nasceu antes de qualquer registro existir"
+    provenance:
+      source: ".claude/utils/adopt/vendor-branch.sh"
+      locator: "md5-das-trees-nas-duas-fixtures"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_structural_guard
     node_type: decision
@@ -91,6 +107,10 @@ nodes:
     verified_at: 2026-07-27
     verified_against: selftest-g-e-g-mut-verdes
     label: "GUARD ESTRUTURAL antes do merge (_vendor_is_framework_pure): recusa com exit 11 quando o vendor difere da base fora do manifesto, NOMEIA os arquivos alheios e entrega o conserto. Criterio de aceite explicito: a integracao fica INTACTA (0 alteracoes, 0 conflitos) — recusar DEPOIS de sujar a arvore seria trocar 110 conflitos por 110 conflitos com mensagem bonita. Convencao onion/vendor-<branch> quando ha mais de uma integracao; vendor de baseline limpa PODE servir duas (proibe-se o contaminado, nao o compartilhamento)"
+    provenance:
+      source: "docs/analysis/onion-adr-vendor-multi-integration-branch-2026-07.md"
+      locator: "selftest-g-e-g-mut-verdes"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_three_or_more_branches
     node_type: question
@@ -125,6 +145,10 @@ nodes:
     verified_at: 2026-07-27
     verified_against: desfecho-do-adotante-e-fixture-reproduzida
     label: "FALSO-VERMELHO MEU. Eu instrui 'se vier o warn legado-entrelacado, PARE'. O warn disparou CORRETAMENTE (nao havia baseline limpa) e mesmo assim o desfecho certo era SEGUIR: o entrelacamento era so framework VELHO, nao customizacao. Vendor re-semeado do HEAD da MESMA branch da 3-way trivial — o adotante mediu 194 arquivos de framework e ZERO de produto. Transformar 'revise' em 'pare' e o erro SIMETRICO ao falso-verde: trava operacao segura e ensina a ignorar o aviso. REGRA REVISTA: o warn e 'revise o merge'; o sinal de parada e o EXIT 11, nao o aviso"
+    provenance:
+      source: "docs/evolution/inbox/_processed/2026-07-27-desfecho-receita-develop-warn-falso-positivo.md"
+      locator: "desfecho-do-adotante-e-fixture-reproduzida"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_guard_already_covers
     node_type: evidence
@@ -137,6 +161,10 @@ nodes:
     verified_at: 2026-07-27
     verified_against: fixture-do-caso-do-adotante-executada
     label: "O adotante propos que o criterio fosse 'o merge toca paths FORA do manifesto?' — que e EXATAMENTE o que _vendor_is_framework_pure ja faz, so que ANTES de mergear (eles tiveram que revisar 194 arquivos para concluir framework-only; o guard conclui sem sujar a arvore). REPRODUZIDO em vez de deduzido: fixture sem baseline limpa, vendor do HEAD da propria develop, produto divergente => exit 0, 2 arquivos de framework, 0 de app, produto intacto. Convergencia INDEPENDENTE: eles chegaram pelo uso, o teste chegou pela medicao das duas fixtures"
+    provenance:
+      source: ".claude/utils/adopt/vendor-branch.sh"
+      locator: "fixture-do-caso-do-adotante-executada"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CENSO0901_Q_volume_not_reproduced
     node_type: evidence

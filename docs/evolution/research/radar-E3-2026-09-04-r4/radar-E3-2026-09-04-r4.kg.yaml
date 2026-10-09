@@ -36,6 +36,10 @@ nodes:
     source_kind: primary
     label: 'EIXO 1 (HOOKS). A 2.1.261 corrigiu PERDA DE SAIDA DE HOOKS (e de outro contexto de tool calls paralelas) ao retomar sessao com `resume`, que antes ALTERAVA a requisicao retomada. Nao ha mudanca de evento (PreToolUse, PostToolUse, Stop, UserPromptSubmit, PreCompact, SessionStart/End, InstructionsLoaded, PreModelSwitch/PostModelSwitch), de matcher, de payload nem de semantica de exit code — a capacidade que COMPRA o acoplamento (exit 2 deterministico barrando acao inclusive sob bypassPermissions) segue intacta. NO ONION: nota — sem acao em .claude/hooks/ nem no CLAUDE.md; e ganho GRATIS para as guardas que falam pelo stderr (a doutrina "so exit 2 entrega stderr"): mensagem de veto que antes se perdia no `--resume` agora chega. CORROBORA E_F7_EXIT2_INTACTO (radar-E3-2026-09-02) por fonte primaria nova.'
     trace: 'https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261'
+    provenance:
+      source: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261"
+      locator: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261 — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_R4_F2_PLUGIN_POR_COMMAND_SOURCE_E_BLOQUEIO_GERENCIADO
     node_type: evidence
     plane: DEV
@@ -48,6 +52,10 @@ nodes:
     source_kind: primary
     label: 'EIXO 2 (PLUGINS). Plugins podem ser instalados por "command source" — um comando que RESOLVE o caminho do plugin — desde a v2.1.229+, e managed settings podem bloquear isso por `disableCommandPluginSources` e `allowManagedHooksOnly`. ATENCAO ao enquadramento: isto NAO e delta de 2.1.260→2.1.261, e contexto arquitetural que a rodada encontrou (a pagina de docs nao versiona). NO ONION: o canal de instalacao do core e marketplace (repo onion-plugins) e nada usa command source — sem acao. Nota de risco para adotante corporativo: `allowManagedHooksOnly` DESLIGA hooks de plugin, e e exatamente por hook de plugin que a guarda PreModelSwitch viaja quando o Onion e INSTALADO como plugin (converge com E_R3_F2_TROCA_DE_MODELO_RECHECA_E_NOMEIA, radar-E3-2026-09-04) — candidato a linha na doutrina de publicacao (.claude/skills/onion-publish).'
     trace: 'https://code.claude.com/docs/en/plugin-marketplaces'
+    provenance:
+      source: "https://code.claude.com/docs/en/plugin-marketplaces"
+      locator: "https://code.claude.com/docs/en/plugin-marketplaces — votos 3-0; a propria pagina NAO documenta delta 260→261 (e referencia arquitetural estavel)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_R4_F3_REGRA_DE_CAMINHO_SO_VALE_PARA_EDIT_E_READ
     node_type: evidence
     plane: DEV
@@ -61,6 +69,10 @@ nodes:
     source_kind: primary
     label: 'EIXO 5 (PERMISSOES) — o achado de maior consequencia da rodada. O Claude Code SO CONSULTA regras de caminho para os tipos de ferramenta Edit(path) e Read(path); regras de caminho escritas para Write, NotebookEdit, Glob ou MultiEdit sao ACEITAS mas NUNCA consultadas (com aviso no startup), exceto Glob passado via --allowedTools. Isto e a classe "guarda verde-vazia" da propria casa (o dano medido em .claude/rules/kg-grammar.md: guarda que passa sempre porque grepa o campo errado), agora vinda da plataforma. NO ONION: hoje nao morde — as 4 camadas de settings sao allow-only, zero deny e zero ask (E_R3_F11_REGRAS_DE_PERMISSAO, radar-E3-2026-09-04). ACAO PREVENTIVA nomeada: qualquer deny/allow de caminho futuro em .claude/settings.json vale so como Edit(path)/Read(path), e um lint de "settings bem-formados" que aceitasse Write(path) nasceria verde-vazio — se a regra de settings for escrita, ela precisa REPROVAR caminho em Write/NotebookEdit/MultiEdit.'
     trace: 'https://code.claude.com/docs/en/permissions'
+    provenance:
+      source: "https://code.claude.com/docs/en/permissions"
+      locator: "https://code.claude.com/docs/en/permissions — votos 3-0; requer v2.1.210+"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_R4_F4_REVERT_DE_260_CORROBORADO_POR_AGREGADOR
     node_type: evidence
     plane: DEV
@@ -74,6 +86,10 @@ nodes:
     source_kind: aggregator
     label: 'EIXO 1/5 (corroboracao FRACA, nao achado novo). Agregador tier 2 repete que a 2.1.260 (3 de setembro de 2026) REVERTEU a mudanca da 2.1.259 que aplicava deny de Read aos argumentos do Bash, e reafirma que nao ha mudanca de semantica de exit code nem nos eventos PreToolUse/PostToolUse. A rodada 3 ja fechou isso por fonte tier 9 (E_R3_F1_REVERT_DENY_READ_BASH, radar-E3-2026-09-04); o valor aqui e so confirmacao independente por outra fonte, e fica registrada com o tier baixo a vista. NO ONION: nota — sem acao.'
     trace: 'https://ccleaks.com/news/claude-code-2-1-260-sep-2026'
+    provenance:
+      source: "https://ccleaks.com/news/claude-code-2-1-260-sep-2026"
+      locator: "https://ccleaks.com/news/claude-code-2-1-260-sep-2026 — votos 3-0; tier 2 (agregador) trava a confianca em 0.6 pela clausula 7 da doutrina de pesquisa"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_R4_F5_RESUME_COM_SESSION_ID_MALFORMADO_REINICIA_FRESCO
     node_type: evidence
     plane: DEV
@@ -87,6 +103,10 @@ nodes:
     source_kind: primary
     label: 'EIXO 6 (SESSAO/HEADLESS). Na 2.1.261, `claude -p --resume <file>` que adotava um session ID MALFORMADO registrado no transcript agora REINICIA sob um session ID novo (fresh). NO ONION: toca as sessoes headless da VPS (o caminho `-p` do cron e dos scripts de ops). Consequencia a medir, nao a assumir: 6 artefatos do core casam por `session_id` (.claude/hooks/worklog-capture-session.sh, session-beacon-hook.sh, instructions-loaded-log.sh, session-degraded-notice.sh, .claude/validation/session-beacon.sh, lint-selftest.sh) — se a retomada troca o ID, a correlacao entre a sessao original e a retomada quebra ali. Nota — sem acao hoje; o gatilho e a primeira retomada headless em processo 2.1.261.'
     trace: 'https://code.claude.com/docs/en/changelog'
+    provenance:
+      source: "https://code.claude.com/docs/en/changelog"
+      locator: "https://code.claude.com/docs/en/changelog — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_R4_F6_SKILL_DOCTOR_MEDE_SKILL_SEM_USO_E_CUSTO
     node_type: evidence
     plane: DEV
@@ -100,6 +120,10 @@ nodes:
     source_kind: primary
     label: 'EIXO 6 (CONTEXTO). A 2.1.261 adiciona `/skill-doctor`: mostra quais skills CARREGADAS estao sem uso e o custo de contexto de cada uma, para permitir poda-las. NO ONION: e instrumento novo para dois fios ja abertos — a clausula 10 da doutrina de pesquisa ("ferramenta sem uso e custo") e o L2 da PODA, hoje gated no censo (13 skills em .claude/skills/, e o censo L1 ja registra 2 cargas de CLAUDE.md por session_start). ACAO candidata, sem mudanca de arquivo: rodar `/skill-doctor` num processo >=2.1.261 e alimentar o censo com a medicao em vez de estimar. Nao altera hooks, plugins nem permissoes.'
     trace: 'https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261'
+    provenance:
+      source: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261"
+      locator: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261 — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_R4_F7_URL_DE_RENDERIZADOR_PUBLICO_E_UPLOAD
     node_type: evidence
     plane: DEV
@@ -113,6 +137,10 @@ nodes:
     source_kind: primary
     label: 'EIXO 5 (SEGURANCA). A 2.1.261 muda o auto-approve: um link que EMPACOTA CONTEUDO na URL de um renderizador publico de diagramas passa a ser tratado como UPLOAD para aquele site, e nao e mais auto-aprovado a menos que explicitamente solicitado. NO ONION: e a plataforma fechando um caminho de EXFILTRACAO POR URL — a mesma familia que a doutrina R15 de conteudo nao-confiavel trata do lado da entrada. Nada no core gera esses links hoje (nota — sem acao), mas o padrao vale como guarda de projeto para a vertical de design (/design:deck embute diagrama; a regra da casa e artefato self-contained, offline, zero CDN — o que ja evita a classe).'
     trace: 'https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261'
+    provenance:
+      source: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261"
+      locator: "https://github.com/anthropics/claude-code/compare/v2.1.260...v2.1.261 — votos 3-0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_MERCADO_E3_R4_SEM_SINAL
     node_type: evidence
     plane: DEV
@@ -125,6 +153,10 @@ nodes:
     source_kind: internal-audit
     label: 'EIXO MERCADO/CAPITAL: SEM SINAL. Nenhuma rodada de investimento, M&A, down round, nota de analista ou movimento de preco/cota apareceu nas fontes consultadas — nenhuma das 7 claims confirmadas veio deste eixo. Causa declarada: a rodada foi um delta de changelog de versao pontual (2.1.260→2.1.261) e o fan-out NAO teve worker de mercado. Isso VIOLA o invariante da migalha follow-the-money-e-eixo-de-pesquisa e a clausula 4 da doutrina ("caminho do dinheiro — SEMPRE"), reforcada pelo maestro em 2026-09-02. Registrado como AUSENCIA medida, nao como "nao ha noticia": ausencia de busca nao e ausencia de fato. NO ONION: a cura e MECANISMO, nao disciplina — worker de mercado obrigatorio no fan-out do eixo E3, mesmo em delta tecnico (fio para /meta:radar; sem isso a proxima rodada repete).'
     trace: '.claude/commands/common/prompts/research-doctrine.md'
+    provenance:
+      source: ".claude/commands/common/prompts/research-doctrine.md"
+      locator: "as 27 fontes desta rodada, todas primarias de produto (GitHub compare, code.claude.com changelog/permissions/plugin-marketplaces) + 1 agregador tier 2; nenhuma do eixo mercado/capital/analistas"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_LACUNAS_E3_R4_0904
     node_type: evidence
     plane: DEV
@@ -137,6 +169,10 @@ nodes:
     source_kind: internal-audit
     label: 'LACUNAS DECLARADAS. (1) NENHUM comportamento de 2.1.261 foi OBSERVADO: processo desta sessao = 2.1.260, binario no disco = 2.1.261 — picker e hooks refletem a versao do PROCESSO, nao do disco (migalha premodelswitch-fires-process-version-not-disk); a leitura de changelog vale, a observacao exige reiniciar. Mesma lacuna das rodadas 2 e 3 — recorrencia, nao caso isolado. (2) NAO VERIFICADAS: ZERO — todas as 18 claims receberam veredito. (3) CORTADAS POR ORCAMENTO: 27 fontes consultadas, 18 claims julgadas, 7 confirmadas, 11 caidas; entre as cortadas fica um achado real de eixo (6): `bashOutputMaxChars` e `taskOutputMaxChars` na 2.1.261 (ate 128K caracteres de saida inline antes de salvar em arquivo) — nao entrou como no proprio porque veio so da pagina de release, sem par no compare, e nao muda hooks/plugins/modelo; e candidato a re-medicao. (4) REFUTADAS POR FONTE FRACA — e as duas mais GRAVES se fossem verdadeiras: issue #29360 (tier 3) diz que sob `--plugin-dir` as tools MCP ganham prefixo `plugin_<plugin>_<server>__<tool>` que nao existe na instalacao normal, quebrando wildcard de allowed-tools; issues #20946 (tier 3) diz que sob `--dangerously-skip-permissions` o PreToolUse dispara ASSINCRONO e NAO bloqueia (exit 2 chegando 37s depois do comando, 5 commits criados apesar de 9 negacoes) — isso atacaria de frente a capacidade que compra o acoplamento, e por isso fica como HIPOTESE A MEDIR na bancada, nunca como achado; e #37106 (tier 2) diz que `Bash(...)` nao casa comando com redirecionador `2>&1`. (5) FORA DO DELTA 260→261 (pertencem a 2.1.260, ja cobertas pela rodada 3, nao recontar): deny de `Skill(name)` nao cobrir a forma aninhada `<dir>:name` + skillOverrides por alias; PreModelSwitch/PostModelSwitch; comando de plugin apontando FORA do diretorio do plugin agora rejeitado; auto-compact perto de 1M para Opus e Fable; zsh escondendo substituicao em REPORTTIME/REPORTMEMORY/DIRSTACKSIZE; subagente com 404 no primeiro call passando a usar a cadeia de fallback da sessao. (6) EIXOS SEM ACHADO nesta rodada, por fonte tier 10 e tier 9: (3) escada de modelos (lineup, fallbackModel, `model:`, cota do Fable, picker), (4) orquestracao (ferramenta Workflow, teto de subagentes, Agent/Task, budget, /deep-research) e (7) forge/CI/lint/bancada/worktrees — o compare entre as tags toca apenas CHANGELOG.md e feed.xml, sem mudanca de codigo visivel; o gate mecanico do Onion segue inalterado.'
     trace: 'docs/onion/radar-baselines.yaml'
+    provenance:
+      source: "docs/onion/radar-baselines.yaml"
+      locator: "`claude --version` (disco 2.1.261) x versao do processo desta sessao (2.1.260); contabilidade da rodada: 27 fontes, 18 claims, 7 confirmadas"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 edges:
   - from: E_R4_F1_SAIDA_DE_HOOK_PERDIDA_NO_RESUME_CURADA
     to: Q_E3_DELTA_2_1_261

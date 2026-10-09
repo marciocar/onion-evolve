@@ -65,6 +65,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'kg-drive-project.sh:30 e kg-realign-project.sh:29 fixam fios-abertos; medido: fios-abertos = 0 abertos (20/20 teto) enquanto docs/backlog.md = 190'
     label: 'A ASSIMETRIA, REFINADA PELA MEDICAO (P3 do drive, 2026-08-28) — a versao anterior EXAGERAVA. Medido: (1) o `fios-abertos` e DEFAULT, nao trava — os dois scripts aceitam `*.kg.yaml` como argumento (linha 34), e o drive JA conduziu um grafo nao-default (a sessao drive-m3-federation-2026-08-27); (2) 37 dos 190 itens abertos (19%) JA aparecem citados em commits, logo a fila NAO esta sem condutor. O QUE PERSISTE, e por isso segue open: nao ha LACO CROSS-GRAFO — nada pega o topo do backlog e o entrega ao driver; conduzir exige o maestro ler a projecao e digitar o caminho. O default aponta para um grafo com ZERO abertos, entao a invocacao nua (`/meta:drive` sem argumento) e sempre um no-op'
+    provenance:
+      source: "docs/backlog.md"
+      locator: "kg-drive-project.sh:30 e kg-realign-project.sh:29 fixam fios-abertos; medido: fios-abertos = 0 abertos (20/20 teto) enquanto docs/backlog.md = 190"
+      method: "leitura: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: Q_PARADO_DE_PROPOSITO_OU_ABANDONADO
     node_type: question
@@ -111,6 +115,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'kg-backlog-check.sh docs/onion/graph/fios-abertos.kg.yaml => OK 20/20 nos'
     label: 'fios-abertos esta em 20/20 — TETO CHEIO. Um no novo estoura o TETO (HARD). Logo "colher a onda anterior" nao e boa pratica: e PRE-CONDICAO MECANICA para a Onda 1 conseguir registrar o proprio compromisso. A escassez e a feature — o programa nao PODE despejar 30 itens, e forcado a colher e escolher'
+    provenance:
+      source: "docs/onion/graph/fios-abertos.kg.yaml"
+      locator: "kg-backlog-check.sh docs/onion/graph/fios-abertos.kg.yaml => OK 20/20 nos"
+      method: "derivado: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   # ── a perna externa, com o limite medido ─────────────────────────────────
   - id: E_REDDIT_INACESSIVEL_DESTE_HARNESS
@@ -154,6 +162,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'grep pelos ids nomeados no plano em docs/onion/graph e docs/evolution/research => ZERO ocorrencias; o plano aprovado (33KB) esta fora do repositorio (git: "outside repository")'
     label: 'ACHADO DO PROPRIO /meta:realign, e a razao de este arquivo existir: o programa de tres ondas aprovado hoje NAO tinha casa em grafo nenhum — vivia so num arquivo de plano de 33KB FORA do repositorio, e as medicoes que o sustentam viviam so em prosa. O realign dizia ALINHADO com razao (os grafos existentes coerem) e era CEGO ao que nunca foi escrito. E o caso-ouro da porosidade que a doutrina do Elenxo descreve: conhecimento que nasce, e validado, e evapora fora da SSOT. O dente do realign e "achado vira NO, nao .md lateral" — este commit e esse dente'
+    provenance:
+      source: "docs/onion/graph"
+      locator: "grep pelos ids nomeados no plano em docs/onion/graph e docs/evolution/research => ZERO ocorrencias; o plano aprovado (33KB) esta fora do repositorio (git: \"outside repository\")"
+      method: "medição: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: E_A_FILA_E_PARCIALMENTE_CONDUZIDA
     node_type: evidence
@@ -164,6 +176,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'git log --all --grep=<id> para os 190 ids extraidos de docs/backlog.md => 37 com commit; grep GRAPH= em kg-drive-project.sh:30,34 e kg-realign-project.sh:30,34; .claude/sessions/drive-m3-federation-2026-08-27 conduziu grafo nao-default'
     label: 'MEDICAO QUE REFINA (e em parte DERRUBA) a manchete de C_O_DRIVER_CONDUZ_O_GRAFO_VAZIO. 37 de 190 abertos (19%) tem commit citando seu id — a fila e trabalhada, so nao POR AQUI. E o hardcode e default, nao trava: linha 34 dos dois scripts aceita `*.kg.yaml`, e ha precedente de uso com grafo nao-default. Registrado como medicao contra o vivo no P3 de um /meta:drive, nao como impressao: o driver medindo a propria assimetria que o motivou'
+    provenance:
+      source: "docs/backlog.md"
+      locator: "git log --all --grep=<id> para os 190 ids extraidos de docs/backlog.md => 37 com commit; grep GRAPH= em kg-drive-project.sh:30,34 e kg-realign-project.sh:30,34; .claude/sessions/drive-m3-federation-2026-08-27 conduziu grafo nao-default"
+      method: "leitura: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: E_O_TRABALHO_PRECEDE_A_PROJECAO
     node_type: evidence
@@ -174,6 +190,10 @@ nodes:
     verified_at: 2026-08-28
     verified_against: 'git log --follow -- docs/backlog.md => 8 commits, 7 da construcao (22-28/08); para os 190 ids, primeira citacao em commit ANTES de 2026-08-22 = 24, DEPOIS = 13'
     label: 'A LENTE L1 (absorcao/uso real), medida por git em vez de perguntada. docs/backlog.md tem SEIS DIAS e quase todos os commits que o tocam sao da sua propria construcao. Dos 37 abertos com rastro, 24 nasceram no historico ANTES da projecao existir. Conclusao com o teto declarado: a projecao ainda NAO PODE ter mudado a selecao de trabalho, e afirmar que ela e "sub-usada" seria tao infundado quanto afirmar que e util — e jovem demais para as duas coisas. O que a medicao DERRUBA e a premissa da propria pergunta (parado/abandonado), nao o valor da superficie'
+    provenance:
+      source: "docs/backlog.md"
+      locator: "git log --follow -- docs/backlog.md => 8 commits, 7 da construcao (22-28/08); para os 190 ids, primeira citacao em commit ANTES de 2026-08-22 = 24, DEPOIS = 13"
+      method: "leitura: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: E_KARMA2502_CITACAO_MAB_E_FALSA
     node_type: evidence

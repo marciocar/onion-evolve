@@ -216,6 +216,10 @@ nodes:
     verified_against: "medido 2026-09-07: gh repo view marciocar/onion-evolve --json visibility devolve PRIVATE, e assemble-plugin.sh:340-341 escreve homepage e repository derivados do remote em todos os 5 plugin.json"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "DECISAO DO MAESTRO — o repo-fonte e PRIVADO e e para onde tudo aponta. Consequencia em cadeia: homepage e repository dos 5 plugins sao 404 publico; o README diz 'Fonte: github.com/marciocar/onion-evolve'; e o UNICO canal de suporte declarado e esse 404 — o que derruba o requisito 3.B sozinho. Duas saidas: (a) abrir o onion-evolve; (b) desacoplar — homepage para onionevolve.com, repository e issues para onion-plugins, e provenance.repository continua marcando a fonte sem apresenta-la como endereco de suporte. Isto BLOQUEIA o PR 10 (suporte) e a submissao. Nao e decisao do driver."
+    provenance:
+      source: ".claude/utils/marketplace/assemble-plugin.sh"
+      locator: "medido 2026-09-07: gh repo view marciocar/onion-evolve --json visibility devolve PRIVATE, e assemble-plugin.sh:340-341 escreve homepage e repository derivados do remote em todos os 5 plugin.json"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_EMAIL_DE_SUPORTE_VERIFICADO
     node_type: question
@@ -228,6 +232,10 @@ nodes:
     verified_against: "medido 2026-09-07: author nos 5 plugin.json e objeto so com name, sem email nem url; 49 dos 291 plugins do diretorio oficial declaram author.email"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "DECISAO DO MAESTRO — qual e-mail de suporte. O requisito 3.B exige contato verificado, e author.email do plugin.json fica PUBLICO PARA SEMPRE (o nome do plugin e imutavel; o manifesto e reescrito, mas o que ja foi instalado carrega o que viu). Pessoal ou suporte@onionevolve.com? Isto BLOQUEIA o PR 10."
+    provenance:
+      source: ".claude/utils/marketplace/assemble-plugin.sh"
+      locator: "medido 2026-09-07: author nos 5 plugin.json e objeto so com name, sem email nem url; 49 dos 291 plugins do diretorio oficial declaram author.email"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_CATEGORY_DO_COMPLIANCE
     node_type: question
@@ -264,6 +272,10 @@ nodes:
     verified_against: "medido 2026-09-07: code-standards.md:4 esta em 1.0.0; a linha :42 ('frontmatter narrativo: pt-BR aceito') e REVOGADA, nao ampliada, e 176 artefatos dependiam dela"
     trace: docs/meta-specs/code-standards.md
     label: "DECISAO DO @metaspec-gate-keeper — 2.0.0 ou 1.1.0. Revogar uma linha da qual 176 artefatos dependem tem cara de major; se o gate-keeper julgar que a revogacao esta coberta pelo plano de migracao (o baseline que so encolhe ate zerar), 1.1.0 e defensavel. O driver nao antecipa essa chamada."
+    provenance:
+      source: "docs/meta-specs/code-standards.md"
+      locator: "medido 2026-09-07: code-standards.md:4 esta em 1.0.0; a linha :42 ('frontmatter narrativo: pt-BR aceito') e REVOGADA, nao ampliada, e 176 artefatos dependiam dela"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_SUBMISSAO_AO_PORTAL
     node_type: question
@@ -276,6 +288,10 @@ nodes:
     verified_against: "levantado 2026-09-07: a submissao exige org Team/Enterprise com Directory management access, ou role Developer/Admin/Owner no Console; e o diretorio OFICIAL nao tem processo de aplicacao — 'There is no application process'"
     trace: docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml
     label: "ATO DO MAESTRO — apertar o botao. O submissivel e o marketplace COMUNITARIO; o oficial e curadoria discricionaria da Anthropic e o selo Verified nao e solicitavel. Os campos reais do formulario continuam NAO-VERIFICADOS (autenticado, nao fetchavel) — e essa e a maior lacuna do levantamento: abrir o formulario e capturar os campos resolve tambem a duvida residual sobre idioma."
+    provenance:
+      source: "docs/evolution/research/plugin-directory-landscape-2026-09/plugin-directory-landscape-2026-09.kg.yaml"
+      locator: "levantado 2026-09-07: a submissao exige org Team/Enterprise com Directory management access, ou role Developer/Admin/Owner no Console; e o diretorio OFICIAL nao tem processo de aplicacao — 'There is no application process'"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PLANO_NASCEU_DE_TRES_MEDICOES
     node_type: evidence
@@ -298,6 +314,10 @@ nodes:
     verified_against: "DECIDIDO pelo maestro na invocacao do /meta:drive de 2026-09-07 (saida b) e medido na mesma sessao: `gh repo view marciocar/onion-plugins --json visibility,hasIssuesEnabled` devolve PUBLIC + issues on; `curl -L https://onionevolve.com/` devolve 200; `gh repo view marciocar/onion-evolve` segue PRIVATE. Censo dos sitios que hoje apontam para a fonte privada (grep -rln 'marciocar/onion-evolve' fora de docs/ e .git): os 5 plugin.json (homepage+repository, l.6-7), os 5 README.md gerados, os 5 provenance.json, .claude-plugin/marketplace.json (10 pares homepage/repository, l.20-69, MAIS o campo `name: onion-evolve` na l.2), assemble-plugin.sh:340-341 (o gerador), plugin-readme.sh:95 e :132, marketplace-readme.sh:32 e marketplace-root-check.sh:12"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "DECIDIDO — desacoplar (saida b); NAO abrir o onion-evolve. `homepage` passa a https://onionevolve.com; `repository` e o canal de issues passam a https://github.com/marciocar/onion-plugins; `provenance.repository` continua marcando marciocar/onion-evolve como ORIGEM, sem apresenta-la como endereco de suporte. O censo achou DOIS residuos que a formulacao original nao nomeia e que o PR 2 / PR 10 tem de cobrir: (1) plugin-readme.sh:95 imprime `Fonte: <provenance.repository>` no README PUBLICO — proveniencia vazando como endereco 404; a linha tem de dizer que a fonte e privada, ou imprimir so o tree_sha; (2) .claude-plugin/marketplace.json:2 chama o marketplace de `onion-evolve` e marketplace-root-check.sh:12 documenta `/plugin marketplace add marciocar/onion-evolve` — o comando de instalacao publicado 404a. ACEITE: `grep -rn 'marciocar/onion-evolve' plugins/ .claude-plugin/ *.md` so casa dentro de provenance.json, e nenhuma ocorrencia sob homepage, repository, `Fonte:` ou `marketplace add`."
+    provenance:
+      source: ".claude/utils/marketplace/assemble-plugin.sh"
+      locator: "DECIDIDO pelo maestro na invocacao do /meta:drive de 2026-09-07 (saida b) e medido na mesma sessao: `gh repo view marciocar/onion-plugins --json visibility,hasIssuesEnabled` devolve PUBLIC + issues on; `curl -L https://onionevolve.com/` devolve 200; `gh repo view marciocar/onion-evolve` segue PRIVATE. Censo dos sitios que hoje apontam para a fonte privada (grep -rln 'marciocar/onion-evolve' fora de docs/ e .git): os 5 plugin.json (homepage+repository, l.6-7), os 5 README.md gerados, os 5 provenance.json, .claude-plugin/marketplace.json (10 pares homepage/repository, l.20-69, MAIS o campo `name: onion-evolve` na l.2), assemble-plugin.sh:340-341 (o gerador), plugin-readme.sh:95 e :132, marketplace-readme.sh:32 e marketplace-root-check.sh:12"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: D_EMAIL_SUPORTE_E_O_DO_DOMINIO
     node_type: decision
@@ -355,6 +375,10 @@ nodes:
     verified_against: "medido 2026-09-07 no CLONE PUBLICO VIVO /home/marcio/onion-plugins: `grep -rc onion-evolve` somando as linhas da 50 OCORRENCIAS fora do .git. Entre elas, o pior caso confirmado a mao: `grep -rn 'Fonte: https://github.com/marciocar/onion-evolve' /home/marcio/onion-plugins/plugins/*/README.md` devolve 5 hits (onion:116, onion-product:124, onion-engineering:116, onion-compliance:78, onion-design:76) — HYPERLINK 404 publicado, emitido por plugin-readme.sh:132 a partir de prov['repository'] e nao do plugin.json"
     trace: .claude/utils/marketplace/plugin-readme.sh
     label: "FECHADO 2026-09-07 no PR #814 (head 5cf8ec57), CI verde nos quatro checks — lint-onion-artifacts 1m11s, onion-review 5m10s, onion-review-verdict, selftest 22m11s; a medicao da entrega esta em E_FACE_PUBLICA_VIROU_COSTURA_E_CATRACA e o merge no main segue do maestro (MOAT). SETE residuos que o desacoplamento como formulado NAO alcancava — e o 1o a tese CRIA por construcao (manter provenance privado mantem o link morto). (1) plugin-readme.sh:132 emite `Fonte: https://github.com/<provenance>` como LINK nos 5 READMEs publicos; (2) plugin-readme.sh:95 repete a fonte na tabela Proveniencia (code span, nao link — aceitavel se for consciente); (3) marketplace-readme.sh:32 tem a fonte HARDCODED, fora do alcance de qualquer mudanca no assemble; (4) marketplace-readme.sh:63 diz 'PRs de conteudo vao para o source, nao para este repositorio' — com issues no publico e source privado, o artefato convida contribuicao e fecha a porta dela; (5) prosa DENTRO dos plugins publicados cita o repo privado como caminho navegavel — co-evolve.md (4, inclusive `onion-evolve/docs/evolution/README.md`), recover.md (2), kb/onion-framework-identity.md (3), kb/knowledge-graph-sdaal.md, agents/metaspec-gate-keeper.md, onion-design/commands/{generate,identity}.md; (6) NAO HA CATRACA NO ALVO — a REGRA 19 varre plugins/ do CORE, nao o repo publico, entao as 50 ocorrencias (mais os 10 pares homepage/repository de .claude-plugin/marketplace.json) so mudam no proximo materialize + push human-gated; (7) generate-marketplace.sh:40 tem default `top_name=onion-evolve` — inocuo hoje (o publico esta semeado com onion-plugins) mas e o nome privado como fallback num gerador de artefato publico. ACEITE: no CLONE PUBLICO, `grep -rn 'marciocar/onion-evolve' --exclude-dir=.git .` so casa dentro de provenance.json — e a cura vive no GERADOR mais uma guarda que reprove a reincidencia, nunca em edicao a mao."
+    provenance:
+      source: ".claude/utils/marketplace/plugin-readme.sh"
+      locator: "medido 2026-09-07 no CLONE PUBLICO VIVO /home/marcio/onion-plugins: `grep -rc onion-evolve` somando as linhas da 50 OCORRENCIAS fora do .git. Entre elas, o pior caso confirmado a mao: `grep -rn 'Fonte: https://github.com/marciocar/onion-evolve' /home/marcio/onion-plugins/plugins/*/README.md` devolve 5 hits (onion:116, onion-product:124, onion-engineering:116, onion-compliance:78, onion-design:76) — HYPERLINK 404 publicado, emitido por plugin-readme.sh:132 a partir de prov['repository'] e nao do plugin.json"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_SITE_SEM_PORTA_EN_E_SEM_CONTATO
     node_type: question
@@ -367,6 +391,10 @@ nodes:
     verified_against: "medido 2026-09-07 com curl e no fonte: https://onionevolve.com/ = 200, https://onionevolve.com/en/ = 404, https://onionevolve.com/en/doutrinas/ = 200; `ls site/src/pages/en/` devolve so `doutrinas` e `maquinaria` (sem index.astro); `grep -il 'suporte|contato|support|contact'` em site/src/pages/ devolve 4 arquivos e NENHUM e pagina de contato (os hits sao a palavra SUPPORTS de aresta de grafo, ex. site/src/pages/index.astro:178)"
     trace: site/src/pages
     label: "A casa para onde o desacoplamento manda o publico nao tem porta nem balcao. `homepage` passa a apontar para onionevolve.com, mas /en/ da 404 (ha /en/doutrinas/ e /en/maquinaria/ sem indice que os reuna) e o site NAO TEM pagina de contato/suporte — num plano cuja frente e 'ingles integral' e cujo PR 10 e justamente suporte, mandar o instalador anglofono para um 404 e a mesma classe de defeito que se esta curando nos plugins. ACEITE: `curl -o /dev/null -w '%{http_code}' https://onionevolve.com/en/` devolve 200 E existe uma pagina de suporte/contato linkada da home, para onde SUPPORT.md e author.url possam apontar. CONSTRAINS o PR 10 e nao DEPENDS_ON: e trabalho de site, separavel — mas se o maestro quiser fail-closed como no Q_MX_DO_ONIONEVOLVE, e trocar a aresta."
+    provenance:
+      source: "site/src/pages"
+      locator: "medido 2026-09-07 com curl e no fonte: https://onionevolve.com/ = 200, https://onionevolve.com/en/ = 404, https://onionevolve.com/en/doutrinas/ = 200; `ls site/src/pages/en/` devolve so `doutrinas` e `maquinaria` (sem index.astro); `grep -il 'suporte|contato|support|contact'` em site/src/pages/ devolve 4 arquivos e NENHUM e pagina de contato (os hits sao a palavra SUPPORTS de aresta de grafo, ex. site/src/pages/index.astro:178)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_ONIONEVOLVE_AGORA_TEM_CORREIO
     node_type: evidence
@@ -400,6 +428,10 @@ nodes:
     verified_against: "medido 2026-09-07 apos a cura, no proprio repo: (1) varredura por AUSENCIA — `grep -rlE 'github\\.com/marciocar/onion-evolve' plugins/ .claude-plugin/marketplace.json` fora de provenance.json devolve ZERO, onde antes casava em 11 arquivos (10 pares no marketplace.json + 2 campos em cada um dos 5 plugin.json + 1 link em cada um dos 5 README); (2) a REGRA 79 rodou contra a arvore DEFEITUOSA e acusou 11 violacoes nos sitios reais, e contra a arvore curada acusa ZERO — com os 5 provenance.json ainda carregando o slug, o que prova a isencao no mesmo run; (3) `lint-artifacts.sh` completo: 0 HARD, 11 SOFT (passivos com catraca), rc 0; (4) `lint-selftest.sh --jobs auto`: 1101 passaram, 0 falharam, rc 0 — 1098 antes, mais os 3 casos novos da familia plugin-private-url; (5) `kg-trace-resolve.sh`: 1737/1737 julgaveis resolvem, TARGET-MISSING 0"
     trace: .claude/utils/marketplace/public-face.sh
     label: "ENTREGUE — os TRES PAPEIS que viviam colapsados numa variavel so (assemble-plugin.sh:292, `git remote get-url origin`) agora sao distintos e vivem numa costura unica, `.claude/utils/marketplace/public-face.sh`: ORIGEM (so proveniencia, nunca link) · CASA (`ONION_PUBLIC_HOMEPAGE`) · CANAL (`ONION_PUBLIC_REPOSITORY`), os tres sobrescriveis por ambiente para quem forkar. Curados os 7 residuos NO GERADOR — plugin-readme.sh :95 e :132, marketplace-readme.sh :32 e :63, generate-marketplace.sh:40 — mais a catraca que faltava (REGRA 79, HARD, com 3 casos de bancada). CORRECAO DE DIAGNOSTICO, lida no conteudo e nao no grep: das 12 mencoes a `onion-evolve` na prosa dos plugins, 10 sao o IDENTIFICADOR do core (`role: source`, `can_correct_to`, mapeamento de papel) e nao endereco — apaga-las quebraria semantica de members.yaml; so 2 eram caminho navegavel para o repo privado (co-evolve.md:17 e :131) e essas foram curadas. Achado nao previsto: o `.claude-plugin/marketplace.json` do core se chamava `onion-evolve` enquanto o repo PUBLICO ja se chama `onion-plugins` — divergencia alinhada."
+    provenance:
+      source: ".claude/utils/marketplace/public-face.sh"
+      locator: "medido 2026-09-07 apos a cura, no proprio repo: (1) varredura por AUSENCIA — `grep -rlE 'github\\.com/marciocar/onion-evolve' plugins/ .claude-plugin/marketplace.json` fora de provenance.json devolve ZERO, onde antes casava em 11 arquivos (10 pares no marketplace.json + 2 campos em cada um dos 5 plugin.json + 1 link em cada um dos 5 README); (2) a REGRA 79 rodou contra a arvore DEFEITUOSA e acusou 11 violacoes nos sitios reais, e contra a arvore curada acusa ZERO — com os 5 provenance.json ainda carregando o slug, o que prova a isencao no mesmo run; (3) `lint-artifacts.sh` completo: 0 HARD, 11 SOFT (passivos com catraca), rc 0; (4) `lint-selftest.sh --jobs auto`: 1101 passaram, 0 falharam, rc 0 — 1098 antes, mais os 3 casos novos da familia plugin-private-url; (5) `kg-trace-resolve.sh`: 1737/1737 julgaveis resolvem, TARGET-MISSING 0"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_README_DE_CATEGORIA_NAO_E_COMANDO
     node_type: evidence
@@ -411,6 +443,10 @@ nodes:
     verified_against: "medido 2026-09-07: a causa unica se confirmou por CORRESPONDENCIA EXATA — os 3 plugins que reprovavam `claude plugin validate --strict` (design, engineering, product) sao exatamente os 3 que tinham `commands/README.md`, e os 2 que passavam (onion, onion-compliance) nao tinham; a saida da CLI dizia `Validating command: .../commands/README.md` seguida de `frontmatter: No frontmatter block found`. Depois da cura e da regeneracao dos 5: `for p in plugins/*/; do claude plugin validate $p --strict; done` sai rc 0 NOS CINCO, e `ls plugins/*/commands/README.md` nao encontra nenhum. O assembler agora anuncia o skip por categoria (6 linhas em stderr: test, validate, git, engineer, design, product)"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "ENTREGUE (PR 1) — o README.md de categoria deixa de viajar para dentro de `commands/`. A CLI valida TODO .md nessa pasta como comando, e o README de categoria nao tem frontmatter porque nao e comando; o `help.md`, que tem, continua indo. O skip e por BASENAME, deliberadamente previsivel: filtrar por 'nao tem frontmatter' faria um comando REAL mal-formado sumir calado, e sumir calado e pior que reprovar alto — a ausencia de frontmatter num comando de verdade ja e REGRA 1 no core. A CATRACA nao entra aqui de proposito: por o `claude plugin validate` no gate da casa e o D_PR03_GATE_VALIDATE_NA_CASA, no que o plano ja separou."
+    provenance:
+      source: ".claude/utils/marketplace/assemble-plugin.sh"
+      locator: "medido 2026-09-07: a causa unica se confirmou por CORRESPONDENCIA EXATA — os 3 plugins que reprovavam `claude plugin validate --strict` (design, engineering, product) sao exatamente os 3 que tinham `commands/README.md`, e os 2 que passavam (onion, onion-compliance) nao tinham; a saida da CLI dizia `Validating command: .../commands/README.md` seguida de `frontmatter: No frontmatter block found`. Depois da cura e da regeneracao dos 5: `for p in plugins/*/; do claude plugin validate $p --strict; done` sai rc 0 NOS CINCO, e `ls plugins/*/commands/README.md` nao encontra nenhum. O assembler agora anuncia o skip por categoria (6 linhas em stderr: test, validate, git, engineer, design, product)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_GERADOR_E_INSUMO_DO_SINAL_DE_MUDANCA
     node_type: evidence
@@ -422,6 +458,10 @@ nodes:
     verified_against: "medido 2026-09-07 (achado do Elenxo do PR 1, re-medido por mim antes de aceitar): depois da cura que tirou o README de categoria de `commands/`, o conteudo publicado de 3 plugins MUDOU e os dois sinais de mudanca ficaram PARADOS — version design 0.1.22=0.1.22, engineering 0.1.92=0.1.92, product 0.1.53=0.1.53, e tree_sha identico nos tres (56e2fddc, 2ed62794, 7773f2f9). Depois de por os geradores nas duas listas: design 0.1.22->0.1.43 / 56e2fddc->274bce03; engineering 0.1.92->0.1.113 / 2ed62794->2b3fd613; product 0.1.53->0.1.76 / 7773f2f9->1cbe123c; onion 0.1.237->0.1.253; onion-compliance 0.1.19->0.1.38. Gate: lint 0 HARD rc 0, bancada 1104 passaram / 0 falharam rc 0"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "O GERADOR E INSUMO — e nao estava em conjunto nenhum. `tree_sha` e a versao derivada eram calculados so sobre as FONTES do manifesto; o assembler, o plugin-readme.sh e a public-face.sh ficavam de fora. Consequencia MEDIDA, nao hipotetica: uma cura no gerador muda a SAIDA publicada e os dois sinais dizem 'nada mudou', entao `claude plugin update` responde 'already at the latest version' e o instalador fica com o artefato que reprova. E o MESMO modo de falha que a versao derivada nasceu para curar (sinal de campo 2026-09-03), reaparecendo por um flanco que ela nao cobria — behavior-over-declaration aplicado ao proprio sinal de drift. A cura poe os 5 geradores nas DUAS listas. DIRECAO ESCOLHIDA, declarada: bump A MAIS numa mudanca de comentario do gerador e um update no-op; bump A MENOS deixa o usuario travado — entao erra-se para o lado do excesso. O salto de versao e retroativo (conta o historico dos geradores), monotonico e semver-valido, uma vez so."
+    provenance:
+      source: ".claude/utils/marketplace/assemble-plugin.sh"
+      locator: "medido 2026-09-07 (achado do Elenxo do PR 1, re-medido por mim antes de aceitar): depois da cura que tirou o README de categoria de `commands/`, o conteudo publicado de 3 plugins MUDOU e os dois sinais de mudanca ficaram PARADOS — version design 0.1.22=0.1.22, engineering 0.1.92=0.1.92, product 0.1.53=0.1.53, e tree_sha identico nos tres (56e2fddc, 2ed62794, 7773f2f9). Depois de por os geradores nas duas listas: design 0.1.22->0.1.43 / 56e2fddc->274bce03; engineering 0.1.92->0.1.113 / 2ed62794->2b3fd613; product 0.1.53->0.1.76 / 7773f2f9->1cbe123c; onion 0.1.237->0.1.253; onion-compliance 0.1.19->0.1.38. Gate: lint 0 HARD rc 0, bancada 1104 passaram / 0 falharam rc 0"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_TREE_SHA_ENDERECA_ENTRADA_NAO_SAIDA
     node_type: question
@@ -434,6 +474,10 @@ nodes:
     verified_against: "levantado pelo Elenxo do PR 1 em 2026-09-07 e nao resolvido nele: o campo se chama content-addressed e a nota do provenance.json diz 'hash do ls-tree das fontes canonicas em .claude/' — ou seja, ele enderecca a ENTRADA. A cura de E_GERADOR_E_INSUMO_DO_SINAL_DE_MUDANCA amplia o conjunto de entradas (poe os geradores dentro), mas nao muda a natureza do endereco"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "DECISAO DO MAESTRO — `tree_sha` deve endereccar a SAIDA (o conteudo do plugin montado, excluindo o proprio provenance.json) em vez das ENTRADAS? A favor: e o que 'content-addressed' promete, e fecha por construcao toda classe de 'a saida mudou e o hash nao' — a cura de hoje fecha o flanco conhecido (geradores) e deixa os desconhecidos abertos. Contra: muda a SEMANTICA da REGRA 19 (SSOT anti-drift), que hoje le o campo como 'a fonte mudou sem regenerar' e passaria a ler 'a saida no disco difere da registrada' — outra pergunta, talvez melhor, mas outra; e exige cuidado de bootstrap (o hash mora dentro do dir que ele endereca). NAO foi puxado para o PR 1 de proposito: e redesenho de contrato, nao correcao de bug."
+    provenance:
+      source: ".claude/utils/marketplace/assemble-plugin.sh"
+      locator: "levantado pelo Elenxo do PR 1 em 2026-09-07 e nao resolvido nele: o campo se chama content-addressed e a nota do provenance.json diz 'hash do ls-tree das fontes canonicas em .claude/' — ou seja, ele enderecca a ENTRADA. A cura de E_GERADOR_E_INSUMO_DO_SINAL_DE_MUDANCA amplia o conjunto de entradas (poe os geradores dentro), mas nao muda a natureza do endereco"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_MERGE_VERIFICADO_DA_FALSO_NEGATIVO
     node_type: claim
@@ -445,6 +489,10 @@ nodes:
     verified_against: "medido 2026-09-07 no merge do PR #814: `ops/pr-merge-verified.sh 814` saiu rc 1 com a mensagem 'gh pr merge saiu com rc=1 — NAO declaro merge', e a causa foi `could not determine current branch: failed to run git: not on any branch` (HEAD destacado, para liberar a branch presa na worktree). O merge TINHA acontecido: `gh pr view 814` devolveu state MERGED e mergedAt 2026-09-07T15:52:31Z, os 3 commits entraram em main (9857681a, d2c9000c, 437dd680) e a branch remota foi apagada (`git ls-remote origin refs/heads/feat/plugins-en-compliance` = 0 linhas)"
     trace: ops/pr-merge-verified.sh
     label: "O caminho verificado de merge tem a falha INVERSA da que ele cura: da FALSO NEGATIVO. Ele existe para nunca declarar sucesso falso, e o desenho e bom — mas morre no passo 3 (rc do `gh pr merge`) e por isso NUNCA CHEGA ao passo 4, que e justamente a prova independente pelo ESTADO (`state=MERGED` + `mergedAt`). Assim ele nao distingue 'nao mergeou' de 'mergeou, a limpeza pos-merge e que falhou'. Mais seguro que o inverso, mas ainda engana: uma sessao futura pode tentar re-mergear ou entrar em panico, e a memoria do repo ja carrega uma explicacao PARCIAL deste sintoma (worktree segurando a branch) que hoje se mostrou nao ser a unica causa. CURA PROPOSTA, na propria filosofia dele: em rc != 0, CONSULTAR O ESTADO antes de morrer, e reportar em tres vias — nao mergeou (die) · mergeou e limpou (sucesso) · mergeou mas a limpeza falhou (sucesso com aviso acionavel). Sao poucas linhas; nao entrou no PR 1 por ser outro artefato e outro escopo."
+    provenance:
+      source: "ops/pr-merge-verified.sh"
+      locator: "medido 2026-09-07 no merge do PR #814: `ops/pr-merge-verified.sh 814` saiu rc 1 com a mensagem 'gh pr merge saiu com rc=1 — NAO declaro merge', e a causa foi `could not determine current branch: failed to run git: not on any branch` (HEAD destacado, para liberar a branch presa na worktree). O merge TINHA acontecido: `gh pr view 814` devolveu state MERGED e mergedAt 2026-09-07T15:52:31Z, os 3 commits entraram em main (9857681a, d2c9000c, 437dd680) e a branch remota foi apagada (`git ls-remote origin refs/heads/feat/plugins-en-compliance` = 0 linhas)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CAIXA_DE_SUPORTE_RECEBE
     node_type: evidence
@@ -456,6 +504,10 @@ nodes:
     verified_against: "passo (3) do aceite de Q_MX_DO_ONIONEVOLVE cumprido em 2026-09-07: e-mail de teste com marcador ONION-MX-01 enviado da conta Gmail do maestro (id 1a07d037501df700) — DELIBERADAMENTE de fora do dominio onionevolve.com, para atravessar a internet em vez de circular dentro do proprio servidor — e o MAESTRO CONFIRMOU o recebimento ('email recebido'). Junto com os passos (1) e (2) ja medidos por mim no DNS (MX mx1/mx2.hostinger.com nos dois resolvers; SPF v=spf1 include:_spf.mail.hostinger.com ~all; DMARC p=none; mx1:25 respondendo 220-ESMTP), o aceite dos tres passos esta completo"
     trace: .claude/utils/marketplace/assemble-plugin.sh
     label: "MEDIDO — marcio@onionevolve.com RECEBE. Fecha a distancia entre 'o dominio aceita correio' (que o DNS provava) e 'esta caixa recebe' (que so a chegada prova) — e e a segunda que o requisito 3.B cobra. PROVENIENCIA DA EVIDENCIA, declarada: os passos (1) e (2) eu medi; o passo (3) e RELATO DO MAESTRO, porque a caixa nao e superficie que eu leia. Nao e medicao minha e nao vou apresenta-la como se fosse. Com isto o e-mail pode entrar em author.email dos 5 plugin.json, no SUPPORT.md e no security.txt — que e o que o PR 10 faz."
+    provenance:
+      source: ".claude/utils/marketplace/assemble-plugin.sh"
+      locator: "passo (3) do aceite de Q_MX_DO_ONIONEVOLVE cumprido em 2026-09-07: e-mail de teste com marcador ONION-MX-01 enviado da conta Gmail do maestro (id 1a07d037501df700) — DELIBERADAMENTE de fora do dominio onionevolve.com, para atravessar a internet em vez de circular dentro do proprio servidor — e o MAESTRO CONFIRMOU o recebimento ('email recebido'). Junto com os passos (1) e (2) ja medidos por mim no DNS (MX mx1/mx2.hostinger.com nos dois resolvers; SPF v=spf1 include:_spf.mail.hostinger.com ~all; DMARC p=none; mx1:25 respondendo 220-ESMTP), o aceite dos tres passos esta completo"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: D_PR02_VERDADE_NO_ARTEFATO_PUBLICO

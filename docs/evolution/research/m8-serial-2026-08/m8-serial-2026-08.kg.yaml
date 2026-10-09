@@ -14,6 +14,10 @@ nodes:
     verified_against: "execucao-direta-9-agents-seriais-com-usage-por-item"
     label: "A CORRIDA SERIAL DO M8, lado serial executado em 2026-08-06 sobre docs/onion/graph/vps-shared-tools-2026-07.kg.yaml (9 nos da fila --freshness-tsv, ordenada por atencao). Contrato de worker identico ao paralelo (KgReverifySchema do /meta:kg-freshness), modelo sonnet/medium, READ-ONLY. Custo medido por item, nao estimado: 697.710 tokens, 78 tool-uses, 699s de tempo-de-agente, 37 min de relogio. Vereditos: 4 CONFIRMED, 4 DRIFTED, 1 UNVERIFIABLE"
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+      locator: "execucao-direta-9-agents-seriais-com-usage-por-item"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_FALLBACK_SERIAL_RODA
     node_type: evidence
@@ -38,6 +42,10 @@ nodes:
     verified_against: "usage-por-item-do-runtime-ver-ledger-por-item.tsv"
     label: "A MEDICAO, sem a inferencia junto: o item 2 (ENT_whatsapp) gastou 15 tool-uses e 132.214ms; o item 3 (ENT_logto), que recebeu como NOTA DE AMBIENTE o que o item 2 descobriu (`docker ps` sem sudo da permission denied; `sudo -n docker ps` funciona), gastou 4 tool-uses e 25.243ms. Delta: 5,3x em tempo, 73% em ferramentas. ORDEM REAL de execucao registrada no ledger — o --freshness-tsv DOCUMENTA 'atencao desc' e NAO ordena (bug pre-existente), entao quem executou aplicou sort por fora; sem o ledger nao dava para distinguir isso de rotulos trocados, e a inferencia se INVERTERIA se a ordem fosse outra"
     trace: "docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
+    provenance:
+      source: "docs/evolution/research/m8-serial-2026-08/ledger-por-item.tsv"
+      locator: "usage-por-item-do-runtime-ver-ledger-por-item.tsv"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: C_SERIAL_ACUMULA_CONTEXTO
     node_type: claim

@@ -25,6 +25,10 @@ nodes:
     confidence: 0.9
     label: "A TESE, e ela INVERTE o diagnóstico do pedido. O maestro apontou '700+ conferências num arquivo' como o custo — MEDIDO, o problema não é o número de conferências: é que ~6 guardas de ESTADO GLOBAL ignoram o ONLY_PATH e varrem o repo INTEIRO mesmo quando o escopo é 1 arquivo. Prova A/B da lente 1: `--only` de um arquivo custa 16,2-19,6s no baseline; com 5 guardas ganhando `[ -n \"${ONLY_PATH}\" ] && return 0` + 1 ganhando scope-filter, cai para **5,1-5,5s** — e o `diff` da saida nos DOIS CENARIOS TESTADOS foi vazio — ⚠️ e o 2o Elenxo provou que isso NAO generalizava: a 1a versao do gate (por prefixo de path) perdia violacao em TRES cenarios novos (drift de fonte bundlada, rename de work_tool, --only nao-canonico). A versao final gateia por PERTENCIMENTO AO MANIFESTO + inode-compare (-ef), re-provada contra os tres repros. O custo composto é o que dói: a bancada faz ~90-99 invocações `--only`, então cada segundo ali multiplica. As guardas sem gate: check_plugins_sync (8,9s — reassembla os 7 plugins A CADA invocação), check_bundled_command_script_deps (3,0s), check_capability_conformance (2,5s — ⚠️ esta NÃO pode levar blanket-skip, ver nó próprio), check_outbox_channel_exists (1,5s), check_role_bundle_sync (0,7s), check_agent_tool_names. O padrão do early-return JÁ EXISTE em ~30 guardas do mesmo arquivo — as caras nasceram sem ele."
     trace: ".claude/validation/lint-artifacts.sh"
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "patch-a-b-medido-only-cai-de-16-2s-para-5-3s-com-diff-de-veredito-vazio-em-dois-cenarios"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_QUATRO_LENTES_CONVERGIRAM_SEM_SE_VER
     node_type: evidence
@@ -36,6 +40,10 @@ nodes:
     confidence: 1.0
     label: "O sinal de robustez do achado: as QUATRO lentes — que rodaram em paralelo, sem ver umas às outras, com perguntas DIFERENTES (por que --only custa 16,8s / anatomia dos 15min da bancada / sobreposição do parque / história da regressão) — nomearam `check_plugins_sync` como custo dominante, cada uma pelo próprio caminho de medição. Lente 1: 8,9s no trace por função. Lente 2: domina o loop do manifest, ~90 chamadas ≈ 10,5-11,7 MINUTOS da bancada. Lente 3: 'metade do custo de qualquer --only não-relacionado' (16,0→8,1s só ele). Lente 4: '~14,8s por invocação junto com agent_tool_names'. Convergência independente vale mais que qualquer confidence individual — é a versão multi-agente do perspective-diverse verify."
     trace: ".claude/validation/lint-artifacts.sh"
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "as-4-lentes-independentes-nomearam-check-plugins-sync-como-vilao-dominante"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_CAPABILITY_NAO_PODE_LEVAR_BLANKET_SKIP
     node_type: claim
@@ -47,6 +55,10 @@ nodes:
     confidence: 1.0
     label: "O CUIDADO QUE IMPEDE A CURA INGÊNUA — e foi provado por SABOTAGEM, não por leitura. `check_capability_conformance` (REGRA 20) É exercitada via `--only` pelo selftest r20: blanket-skip a deixaria CEGA e o caso passaria de PASS a FAIL silenciosamente... não: a guarda ficaria cega e o selftest FALHARIA — o revisor provou injetando a fixture `bad-overclaim` no repo real: com blanket-skip, saída VAZIA (o overclaim 'gold mas cumpre silver' some). ⚠️ E A CORREÇÃO CERTA TAMBÉM FALHAVA: o scope-filter (`[ \"${manifest}\" != \"${ONLY_PATH}\" ] && continue`) não casava NUNCA, porque `vdir` carrega `..` literal não-normalizado enquanto ONLY_PATH vem normalizado — string comparison entre um path com `validation/../utils/` e um path canônico. Bug PRÉ-EXISTENTE, invisível até alguém tentar filtrar. Cura em duas partes: `vdir=\"$(cd \"${vdir}\" && pwd)\"` + o filtro no loop. Com as duas, o overclaim volta a ser detectado e o honesto segue limpo. A lição que transfere: gate por comparação de path exige NORMALIZAR os dois lados — é a família do 'correlação por chave estável, nunca por path' da doutrina de orquestração."
     trace: ".claude/validation/lint-artifacts.sh"
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "fixture-bad-overclaim-injetada-com-blanket-skip-fica-cega-e-com-scope-filter-sem-normalizar-vdir-tambem"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_SHA1SUM_POR_NO_2486_SPAWNS
     node_type: evidence
@@ -58,6 +70,10 @@ nodes:
     confidence: 0.9
     label: "O SEGUNDO VILÃO É UM BUG DE EFICIÊNCIA, não de escopo: `check_kg_verification_coverage` (14,1s, a guarda mais cara do lint) gasta **8,5s dos 14,1s (60%) em 2.486 spawns de `sha1sum`** — um subprocesso POR NÓ do corpus de .kg.yaml, quando um lote único resolveria (o `load_universe` sozinho mede 0,44s). Guarda nascida DEPOIS da baseline de 16s, já nasceu cara, e o custo é por-commit no pre-commit local. Cura proposta pela lente: hash em lote no `load_hash_index()`. Ganho medido da eliminação: a guarda cai para ~5-6s. Junto: `check_kg_view_sync` (12,3s) gasta 5 subprocessos por arquivo quando 3 deles re-parseiam o MESMO --json. ⚠️ SUPERSEDED NA EXECUCAO DO P3 (2026-08-13): re-medido NO CAMINHO REAL do lint (`--format tsv`), o coverage custa **0,95s com 47 spawns** — os 2.486/8,5s da lente so ocorrem quando ha ORFAS no corpus (o caminho caro e condicional, linha 403 do proprio script), e o corpus esta limpo. testar-no-caminho-errado-e-nao-testar, cometido pela lente. O ALVO REAL do P3 era o item secundario: o kg_view_sync com triplo self --json — CURADO (uma captura, reuso 3x): guarda inteira 12,99s -> 8,81s (-32%) com paridade preservada nos 61 grafos."
     trace: ".claude/validation/kg-verification-coverage.sh"
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "re-medido-no-caminho-do-lint-format-tsv-0-95s-e-47-spawns-o-caminho-caro-so-dispara-com-orfas"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_REGRESSAO_16S_86S_E_CONCENTRADA_NAO_LINEAR
     node_type: evidence
@@ -69,6 +85,10 @@ nodes:
     confidence: 0.9
     label: "A REGRESSÃO NÃO FOI O PREÇO DO CRESCIMENTO — foi concentrada. De PR #357 (16s) a hoje (86s): guardas 27→59 (2,19×), linhas 1.307→3.279 (2,51×), tempo 16s→86s (**5,37×**). Se o custo fosse linear com o escopo, 86s seriam ~35s. O desproporcional mora em 3 guardas novas que já nasceram caras (kg_verification_coverage 14,1s, kg_view_sync 12,3s, plugins_sync 8,5s) — e nenhuma delas nasceu com o gate de ONLY_PATH que ~30 guardas irmãs já tinham. ⚠️ ACHADO DE DOUTRINA da mesma lente: o comentário do pre-commit hook declara '44s' de custo — o vivo é 86s, stale há 7 dias. Declarado≠verificado no próprio instrumento que existe para pegar isso. E a régua do maestro se aplica: efficiency-over-economy — a pergunta não é gastar menos, é se cada conferência roda no MOMENTO certo; as lentes recomendaram NÃO mover kg_view_sync para CI-only (o custo só aparece em runs sem --only) e NÃO deletar nenhuma guarda do top-6 (todas têm incidente real documentado no cabeçalho)."
     trace: ".claude/validation/lint-artifacts.sh"
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "guardas-27-para-59-2-19x-linhas-2-51x-tempo-5-37x-concentrado-em-3-guardas-novas"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_SEIS_SCRIPTS_SEM_CONSUMIDOR_DECISAO_DO_MAESTRO
     node_type: question
@@ -80,6 +100,10 @@ nodes:
     confidence: 0.8
     label: "SEIS dos 47 scripts têm ZERO consumidor de produção — só aparecem no próprio bloco `--selftest`: candidatos nomeados pela lente 3 incluem `context-freshness-metric.sh` e `federation-engagement.sh` (lista completa na síntese). São ~690 linhas mantidas sem invocação viva. ⚠️ TRÊS CUIDADOS ANTES DE QUALQUER BAIXA, todos da doutrina: (1) [[never-shutdown-vps-tools]] — 'sem consumidor hoje' = falta LIGAR, não licença para apagar; a decisão é do maestro; (2) o próprio `consumed-mode-check.sh` — o instrumento que mede isso — tem cabeçalho MENTINDO sobre o próprio status de wire-in (diz que não está ligado ao lint quando está); um medidor de consumo com autodescrição errada é ironia a corrigir ANTES de confiar na medição; (3) `vps-exposure-check.sh` aparece como zero-consumidor no grep mas roda por SYSTEMD TIMER — consumo fora do repo, invisível ao grep. A régua: consumo se mede pelo RUNTIME (timer, hook, CI), não só pelo grep no repo. GATILHO: o maestro decidir o destino dos 6, um a um. ✅ FECHADO 2026-08-13 — e a contagem de reguas foi CORRIGIDA pelo 3o Elenxo: eram DUAS, nao tres. (1) grep de invocacao real em hooks/CI/comandos/scripts achou UM orfao — `kg-reverify-schema-check.sh`, criado pelo proprio autor em 2026-08-12 e nunca ligado; (2) a regua da lente ('so aparece no proprio --selftest') nao resiste a medicao direta. ⚠️ A REGUA QUE EU CITAVA COMO (2) CAIU: o `consumed-mode-check.sh` compara EXCLUSIVAMENTE producao(lint) x bancada(selftest) — um script com ZERO invocacao de producao contribui ZERO pares e e INVISIVEL por construcao ao instrumento; '33 pares/0 sem teste' e IDENTICO em main e na branch, provando que ele nao ve o proprio wire-in deste PR. Responde 'todo modo consumido e exercitado?', nunca 'existe consumidor?'. Citar um numero verdadeiro como evidencia de uma pergunta que ele nao responde e a forma estatistica de casar-a-palavra-com-o-referente-errado. CURA APLICADA: o orfao real foi LIGADO a bancada (2 casos novos — selftest embutido 6/6 + schema real conforme), honrando 'sem consumidor = falta ligar, nao licenca para apagar'. NADA foi deletado."
     trace: ".claude/validation/consumed-mode-check.sh"
+    provenance:
+      source: ".claude/validation/consumed-mode-check.sh"
+      locator: "tripla-regua-2026-08-13-consumed-mode-oficial-33-pares-0-sem-teste-e-o-unico-orfao-real-foi-ligado"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PISO_IRREDUTIVEL_DA_REFINARIA_SUPERADO
     node_type: evidence
@@ -161,6 +185,10 @@ nodes:
     confidence: 0.9
     label: "O TETO DA GUARDA DIRTY-TREE GANHA DONO NO GRAFO (8o Elenxo, fechamento do Q_PARECER): no caminho benigno a guarda NAO emite nada — um log de versao SEM guarda e indistinguivel de guarda-que-rodou-e-ficou-muda sem ler o fonte do workflow ao lado; e a mudez so prova estado FINAL limpo (sujar-e-limpar via stash/pop ou checkout/restore passa invisivel — exercido de fato pelo revisor local no proprio ciclo do #593). DUAS CURAS CONCRETAS: (barata) notice positivo no else — '::notice::guarda dirty-tree: OK (0 modificados, HEAD igual, stash 0->0)' — o silencio passa a se identificar; (substantiva, HIPOTESE A VERIFICAR) o sensor que VE sujar-e-limpar nao e o git, e o claude-execution-output.json (EXEC1, ja entregue ao review-verdict.sh): se ele carregar os inputs das tool_use de Bash, grep de checkout|restore|stash|reset|clean cobre o teto onde o estado da arvore e cego — VERIFICAR PRIMEIRO que o JSON contem os inputs (o log do runner nao os mostra). GATILHO: proximo PR que tocar o onion-review.yml leva a cura barata junto; a substantiva depende da verificacao do JSON."
     trace: ".github/workflows/onion-review.yml"
+    provenance:
+      source: ".github/workflows/onion-review.yml"
+      locator: "8o-elenxo-no-caminho-benigno-a-guarda-nao-emite-nada-e-log-sem-guarda-e-indistinguivel-de-guarda-muda"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: A_RUN_DO_ELENXO_DE_MECANISMOS
     node_type: artifact
@@ -172,6 +200,10 @@ nodes:
     confidence: 1.0
     label: "O run `wf_167fa138-c0a`: 4 lentes `sonnet`/`high` em paralelo, 19 achados, 241 tool-calls, 565.393 tokens, 15min06s. Cada lente recebeu os DADOS JÁ MEDIDOS (perfil por guarda, custo do --only, anatomia da bancada) como ponto de partida para não re-medir o óbvio — e ainda assim mediu o próprio caminho (a lente 1 fez patch A/B com diff de veredito; a lente 3 rodou o consumed-mode-check; a lente 4 fez arqueologia git com contagem de guardas por commit). O campo `estimated_gain` do schema obrigou cada achado a declarar se o ganho é MEDIDO ou DERIVADO — a lente 1 rotulou honestamente a extrapolação de 18min como estimativa cuja soma excede o total observado (caching de kernel amortiza). Projeção: docs/analysis/elenxo-mecanismos-lint-2026-08-13.md"
     trace: "docs/analysis/elenxo-mecanismos-lint-2026-08-13.md"
+    provenance:
+      source: "docs/analysis/elenxo-mecanismos-lint-2026-08-13.md"
+      locator: "workflow-de-4-agentes-com-241-tool-calls-e-os-4-schemas-validados"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: I_P3_KG_VIEW_TRIPLO_PARSE_CURADO

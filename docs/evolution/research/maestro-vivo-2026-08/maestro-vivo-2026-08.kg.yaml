@@ -41,6 +41,10 @@ nodes:
     verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
     label: 'F0 capacidade x uso — skills: total 12, medidos 12, vivos 7, sub-usados 3, nunca-exercitados 2. Destaques: onion-retro [nunca-exercitado]; onion-compliance-context [nunca-exercitado]; onion-validation [sub-usado]. Evidencia por item no JSON do programa.'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F0_GUARDAS
     node_type: evidence
@@ -52,6 +56,10 @@ nodes:
     verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
     label: 'F0 capacidade x uso — guardas: total 58, medidos 58, vivos 47, sub-usados 4, nunca-exercitados 7. Destaques: cycle-completion.sh, context-freshness-metric.sh, federation-engagement.sh (.claude/validation/) [nunca-exercitado]; federation-inbox-scan.sh, federation-status-scan.sh, federation-contract-validate.sh (.claude/validation/) [sub-usado]; session-velocity.sh (.claude/validation/) [sub-usado]. Evidencia por item…'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F0_COMANDOS_META
     node_type: evidence
@@ -63,6 +71,10 @@ nodes:
     verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
     label: 'F0 capacidade x uso — comandos-meta: total 41, medidos 40, vivos 17, sub-usados 7, nunca-exercitados 16. Destaques: meta:federation-status [nunca-exercitado]; meta:federation-publish [nunca-exercitado]; meta:metaspec-validate [nunca-exercitado]. Evidencia por item no JSON do programa.'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F0_DOUTRINAS
     node_type: evidence
@@ -74,6 +86,10 @@ nodes:
     verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
     label: 'F0 capacidade x uso — doutrinas: total 57, medidos 57, vivos 39, sub-usados 16, nunca-exercitados 2. Destaques: behavior-sensor-three-gates.md [nunca-exercitado]; kg-getting-started.md [nunca-exercitado]; onion-promotion-ladder.md [sub-usado]. Evidencia por item no JSON do programa.'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F0_COMANDOS_WORKFLOW
     node_type: evidence
@@ -85,6 +101,10 @@ nodes:
     verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
     label: 'F0 capacidade x uso — comandos-workflow: total 64, medidos 64, vivos 7, sub-usados 11, nunca-exercitados 46. Destaques: validate/ (6 comandos: workflow, collab/three-amigos, collab/pair-testing, qa-points/estimate, test-strategy/analyze, test-strategy/create) [nunca-exercitado]; test/ (e2e.md, integration.md, unit.md) [nunca-exercitado]; engineer/start.md + engineer/work.md (entrada do ciclo faseado invariante decla…'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F0_FEDERACAO
     node_type: evidence
@@ -96,6 +116,10 @@ nodes:
     verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
     label: 'F0 capacidade x uso — federacao: total 59, medidos 36, vivos 24, sub-usados 7, nunca-exercitados 5. Destaques: decouple-source.sh / invite-collaborator.sh / transfer-ownership.sh (.claude/utils/adopt/) [nunca-exercitado]; a2a-live transport (a2a-accept.sh, a2a-verify.sh, a2a-ssrf-check.sh + jwks/granaai-1.pem, jwks/metagamify-1.pem) [sub-usado]; mail-receiver.sh (.claude/utils/co-evolution/) — acelerador ntfy da co-…'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F0_AGENTES
     node_type: evidence
@@ -107,6 +131,10 @@ nodes:
     verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
     label: 'F0 capacidade x uso — agentes: total 51, medidos 51, vivos 14, sub-usados 31, nunca-exercitados 6. Destaques: claude-code-specialist [nunca-exercitado]; linux-security-specialist [nunca-exercitado]; nx-migration-specialist [nunca-exercitado]. Evidencia por item no JSON do programa.'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F0_ORQUESTRACAO
     node_type: evidence
@@ -118,6 +146,10 @@ nodes:
     verified_against: 'fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)'
     label: 'F0 capacidade x uso — orquestracao: total 7, medidos 7, vivos 3, sub-usados 3, nunca-exercitados 1. Destaques: contrato de frontmatter run_id/tokens/agents/duration_min [sub-usado]; /meta:orchestrate (comando) [sub-usado]; .claude/commands/common/prompts/orchestration-fallback.md [sub-usado]. Evidencia por item no JSON do programa.'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "fan-out wf_6e6ef552-897 (8 workers sonnet/medium, 0 descartes)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F1_E1_KG_AGENTE
     node_type: evidence
@@ -129,6 +161,10 @@ nodes:
     verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
     label: 'F1 scan-mundo E1-kg-agente (6 findings aprovados por juiz adversarial que ABRIU as fontes): Cloudflare lançou ''Agent Memory'' como serviço gerenciado da própria nuvem — infra-gigante ; Cognee: US$7.5M seed para ''memória para agentes de IA'' via vetor+KG a partir de documentos; Graphon AI: US$8,3M seed para camada de ''inteligência pré-modelo'' multimodal — não é playe; Hyper (YC, lote de 2026): ''company brain'' auto-diri…'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F1_E2_SELF_IMPROVING
     node_type: evidence
@@ -140,6 +176,10 @@ nodes:
     verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
     label: 'F1 scan-mundo E2-self-improving (6 findings aprovados por juiz adversarial que ABRIU as fontes): Warp: self-improvement loop de duas skills sobre Claude, em produção real com escala grand; PrimeIntellect prime-agent: RLM + Continual Harness com comando /refine que promove trajet; Kulaxyz/self-learning-skills: harvesting de ''golden path'' em skill/rule com gate de promoç; KiroCrew: workspace persistente com skill synt…'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F1_E3_CLAUDE_CODE_DELTA
     node_type: evidence
@@ -151,6 +191,10 @@ nodes:
     verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
     label: 'F1 scan-mundo E3-claude-code-delta (8 findings aprovados por juiz adversarial que ABRIU as fontes): Claude Code v2.1.251 (28/08) — hooks de troca de modelo + streaming de subagente para Remo; Claude Code v2.1.251 — correções de segurança em path traversal de plugin e symlink em fer; Design skill (research preview) lançada 17/08 — ''ideia/screenshot vira artboard editável''; Auto mode virou default com allow/deny escri…'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F1_E4_CAPITAL
     node_type: evidence
@@ -162,6 +206,10 @@ nodes:
     verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
     label: 'F1 scan-mundo E4-capital (5 findings aprovados por juiz adversarial que ABRIU as fontes): SpaceX adquire Cursor (Anysphere) por US$60B — maior M&A de startup VC-backed; HappyRobot levanta US$150M Série C a US$1.2B — agentes de voz/operação empresarial; Zenity levanta US$125M — governança/segurança de agentes de IA empresariais; OpenAI adquire Ona para dar a Codex ambientes cloud de execução longa. Fontes+datas no JS…'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F1_E5_GATES_DETERMINISTICOS
     node_type: evidence
@@ -173,6 +221,10 @@ nodes:
     verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
     label: 'F1 scan-mundo E5-gates-deterministicos (5 findings aprovados por juiz adversarial que ABRIU as fontes): NIST CAISI lança AI Agent Standards Initiative (fev/2026); FailproofAI — hook-based policy enforcement, 12 harnesses, 1.6k stars; Sponsio — contratos LTL determinísticos sub-milissegundo, 438 stars; Statewright — máquina de estados restringe toolset por fase, 489 stars. Fontes+datas no JSON do programa; 13 finding…'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_F1_E6_FRONTEIRA_MODELOS
     node_type: evidence
@@ -184,6 +236,10 @@ nodes:
     verified_against: 'pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)'
     label: 'F1 scan-mundo E6-fronteira-modelos (4 findings aprovados por juiz adversarial que ABRIU as fontes): Família Claude 5 confirmada e hierarquizada (Sonnet 5, Opus 5, Fable 5/Mythos-class); Sonnet 5 traz auto-verificação nativa como capacidade agentic nova; OpenAI: GPT-5.6 ''Sol'' é o topo agentic/coding, com corte de preço de 20-33% em ago/2026; Google: Gemini 3.5 Flash lidera agentic; Gemini 3.5 Pro atrasado, 3.7 Flash …'
     trace: 'docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md'
+    provenance:
+      source: "docs/evolution/research/maestro-vivo-2026-08/SYNTHESIS.md"
+      locator: "pipeline wf_6a4da33e-97e (scan sonnet/medium + juiz opus/high por eixo)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_TESE_MOAT_GATES
     node_type: claim
@@ -555,6 +611,10 @@ nodes:
     verified_against: 'claude -p --dangerously-skip-permissions em sandbox: comando com marcador proibido BLOQUEADO (exit 2 do PreToolUse; prova.txt ausente) e controle PASSOU (controle.txt criado) — veredito pelo filesystem, nao pela mensagem'
     label: 'MEDIDO 2026-08-31: o exit 2 de PreToolUse barra a acao SOB bypassPermissions — a metade ''barra sob bypass'' da frase-moat e VERDADEIRA e exercitada; a metade ''compra o acoplamento'' se sustenta pelo CONJUNTO, nao pelo primitivo (Elenxo da passada: FailproofAI produtiza o mesmo primitivo). O veredito ERRADO do confronto acertou o diagnostico (nunca-exercitada) e a cura (provar) fechou no mesmo dia. Aberto com gatilho: 1o uso REAL de PreToolUse no core fecha a distancia sandbox->producao.'
     trace: "docs/analysis/pretooluse-proof-2026-08.md · docs/evolution/research/maestro-vivo-2026-08/data/pretooluse-sandbox/OBSERVADO.md"
+    provenance:
+      source: "docs/analysis/pretooluse-proof-2026-08.md · docs/evolution/research/maestro-vivo-2026-08/data/pretooluse-sandbox/OBSERVADO.md"
+      locator: "claude -p --dangerously-skip-permissions em sandbox: comando com marcador proibido BLOQUEADO (exit 2 do PreToolUse; prova.txt ausente) e controle PASSOU (controle.txt criado) — veredito pelo filesystem, nao pela mensagem"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_BENCHMARK_DO_GATE_PUBLICADO
     node_type: evidence
@@ -566,6 +626,10 @@ nodes:
     verified_against: 'medicoes 2026-08-31: lint 132.3-132.9s sob carga (16s historico ocioso), 0 tokens, 63 regras/218 HARD, 6 catracas/84 chaves, 5 vetos reais no dia, bancada 882/884 — e as 2 reprovacoes foram achado (fixture live-dependente curada no mesmo PR)'
     label: 'I_BENCHMARK_DO_GATE pago: o numero substituiu a narrativa (docs/analysis/onion-gate-benchmark-2026-08.md). Brinde do dogfood: medir a bancada expos um selftest que dependia do vivo estar no teto — curado (fixture enche ate teto+1 lido do proprio arquivo).'
     trace: "docs/analysis/onion-gate-benchmark-2026-08.md"
+    provenance:
+      source: "docs/analysis/onion-gate-benchmark-2026-08.md"
+      locator: "medicoes 2026-08-31: lint 132.3-132.9s sob carga (16s historico ocioso), 0 tokens, 63 regras/218 HARD, 6 catracas/84 chaves, 5 vetos reais no dia, bancada 882/884 — e as 2 reprovacoes foram achado (fixture live-dependente curada no mesmo PR)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PECA_CATRACA_REDIGIDA
     node_type: evidence
@@ -577,6 +641,10 @@ nodes:
     verified_against: 'draft completo em docs/materials/catraca-passivo-legado-piece-2026-08.md; varredura de nomes de adotante = 0 ocorrencias (vendor-scrub respeitado); numeros vem do benchmark medido no mesmo dia'
     label: 'I_PECA_CATRACA pago (draft, REPROVADO pelo Elenxo na 1a versao e emendado na mesma passada: recorte declarado — catraca e arte consolidada em analise estatica; o sem-par e aplica-la a regras de doutrina/agente) — ligue o gate hoje num repo que reprova; caso real anonimizado (38 legados congelados, 0 merge travado). PUBLICAR no site e ato do maestro (status DRAFT-PARA-PUBLICACAO no frontmatter).'
     trace: "docs/materials/catraca-passivo-legado-piece-2026-08.md"
+    provenance:
+      source: "docs/materials/catraca-passivo-legado-piece-2026-08.md"
+      locator: "draft completo em docs/materials/catraca-passivo-legado-piece-2026-08.md; varredura de nomes de adotante = 0 ocorrencias (vendor-scrub respeitado); numeros vem do benchmark medido no mesmo dia"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_RADAR_SURFACE_CONSTRUIDA
     node_type: evidence
@@ -588,6 +656,10 @@ nodes:
     verified_against: 'comando .claude/commands/meta/radar.md + REGRA 65 no lint (provada nos 4 modos: fresco/velho/ilegivel/vazio) + bancada run_radar_staleness_selftests 4/4 + baseline seed datada de hoje (rodada 0 = o F1 do programa); path vendorizado — merge e do maestro'
     label: 'I_RADAR_SURFACE construida ate PR-verde: /meta:radar (maestro-invocado, W7 intacto) + REGRA 65 (a maquina detecta a idade, o humano roda) + baselines datadas dos 6 eixos seedadas com a rodada 0. D_META_RADAR_DESENHO segue open ate o merge do maestro selar a superficie.'
     trace: ".claude/commands/meta/radar.md · docs/onion/radar-baselines.yaml"
+    provenance:
+      source: ".claude/commands/meta/radar.md · docs/onion/radar-baselines.yaml"
+      locator: "comando .claude/commands/meta/radar.md + REGRA 65 no lint (provada nos 4 modos: fresco/velho/ilegivel/vazio) + bancada run_radar_staleness_selftests 4/4 + baseline seed datada de hoje (rodada 0 = o F1 do programa); path vendorizado — merge e do maestro"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_ELENXO_DA_PASSADA_ONDA6
     node_type: evidence
@@ -599,6 +671,10 @@ nodes:
     verified_against: 'refutador opus/high sobre as 4 entregas, mandato REFUTAR: prova SUSTENTADA-COM-EMENDAS, benchmark SUSTENTADO-COM-EMENDAS (2 celulas factualmente erradas), peca REPROVADA (republicou veredito ja derrubado no f2-confronto.json:327), radar SUSTENTADO-COM-EMENDAS (date -d GNU-only virava HARD contra o artefato). TODAS as emendas aplicadas na mesma passada'
     label: 'Objecoes SOBREVIVENTES preservadas: (1) o defeito acoplamento-declarado-nao-usado NAO esta curado — settings.json do core segue com ZERO PreToolUse (a prova foi em sandbox; gatilho: 1o uso real); (2) provar o primitivo nao prova o moat — FailproofAI produtiza o mesmo primitivo em 12 harnesses; (3) a bancada vendorizada exercita a REGRA 65 no adotante mesmo sem o arquivo (por isso degrade SOFT); (4) baseline sem granularidade de lacuna ganhou o campo descartes; (5) os 5 vetos/dia sao testemunho nao-reproduzivel — rebaixados no doc.'
     trace: "docs/evolution/review/feat-meta-radar-surface.md"
+    provenance:
+      source: "docs/evolution/review/feat-meta-radar-surface.md"
+      locator: "refutador opus/high sobre as 4 entregas, mandato REFUTAR: prova SUSTENTADA-COM-EMENDAS, benchmark SUSTENTADO-COM-EMENDAS (2 celulas factualmente erradas), peca REPROVADA (republicou veredito ja derrubado no f2-confronto.json:327), radar SUSTENTADO-COM-EMENDAS (date -d GNU-only virava HARD contra o artefato). TODAS as emendas aplicadas na mesma passada"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_HERO_VIVO_JA_LIDERA_PELO_MECANISMO
     node_type: evidence
@@ -610,6 +686,10 @@ nodes:
     verified_against: 'site/src/pages/index.astro (reforma 2026-08-25): hero = grafo vivo e verificavel + trilha que voce audita + verificado por mecanismo, nenhum LLM adivinhou; o confronto mediu docs/materials/landing-page.md (06-28) — artefato MORTO, nao a superficie publicada'
     label: 'DRIFT no veredito SUBESTIMADO do empacotamento: a evidencia interna citava o landing-page.md de junho, mas o hero VIVO ja lidera pelo mecanismo desde a reforma de 08-25. O que restava do veredito (a regua de PROVAS no hero) foi entregue: strip hero-mech com 3 provas ESTAVEIS (exit 2 sob bypass, 0 tokens, catraca-so-desce) — sem contagens pereciveis, a licao count-drift aplicada ao proprio site. GATILHO ABERTO: aposentar/supersedar docs/materials/landing-page.md (32 refs — cirurgia propria).'
     trace: "site/src/pages/index.astro · site/src/styles/home.css"
+    provenance:
+      source: "site/src/pages/index.astro · site/src/styles/home.css"
+      locator: "site/src/pages/index.astro (reforma 2026-08-25): hero = grafo vivo e verificavel + trilha que voce audita + verificado por mecanismo, nenhum LLM adivinhou; o confronto mediu docs/materials/landing-page.md (06-28) — artefato MORTO, nao a superficie publicada"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_PRETOOLUSE_EM_PRODUCAO
     node_type: evidence
@@ -621,6 +701,10 @@ nodes:
     verified_against: 'sonda VIVA na propria sessao: force-push a main vetado ANTES de executar (exit 2); bateria 7/7 apos a cura do falso-positivo por vocabulario (o veto pegou o proprio commit da feature — julgamento passou a ser POR LINHA DE INVOCACAO)'
     label: 'A objecao sobrevivente do Elenxo FECHOU: o core tem PreToolUse REAL desde 2026-09-01 (protecao de main contra force-push), registrado em settings.json e provado em producao. E o 1o dogfood ja rendeu cura de classe: guarda-por-vocabulario nao julga string inteira, julga a linha que invoca.'
     trace: ".claude/hooks/pretooluse-protect-main.sh · .claude/settings.json"
+    provenance:
+      source: ".claude/hooks/pretooluse-protect-main.sh · .claude/settings.json"
+      locator: "sonda VIVA na propria sessao: force-push a main vetado ANTES de executar (exit 2); bateria 7/7 apos a cura do falso-positivo por vocabulario (o veto pegou o proprio commit da feature — julgamento passou a ser POR LINHA DE INVOCACAO)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CENSO0901_D_META_RADAR_DESENHO
     node_type: evidence
@@ -642,6 +726,10 @@ nodes:
     verified_against: 'wf_2944480c-98f: 72 medidos (0 descartes) + 27 frescos citados = 99/99; juiz fixo reprovou 21/72 (29%) — sem carimbo, listados; 29 carimbos aplicados, 22 SUPERSEDES; custo real 5.388.890 tokens vs teto 4,5M (+20%, declarado)'
     label: 'Revisao-total do backlog a pedido do maestro: a listagem REAL vive em docs/analysis/backlog-real-2026-09.md — 14 reais-acionaveis + 5 gatilhos disparados = material da proxima onda; 42 gated medidos; 15 mortos-candidatos propostos para selo; 21 a re-medir (o juiz pegou medicao-no-arquivo-errado, contagem conveniente e gatilho declarado-nao-medido — as MESMAS classes da calibracao de 08-29).'
     trace: "docs/analysis/backlog-real-2026-09.md"
+    provenance:
+      source: "docs/analysis/backlog-real-2026-09.md"
+      locator: "wf_2944480c-98f: 72 medidos (0 descartes) + 27 frescos citados = 99/99; juiz fixo reprovou 21/72 (29%) — sem carimbo, listados; 29 carimbos aplicados, 22 SUPERSEDES; custo real 5.388.890 tokens vs teto 4,5M (+20%, declarado)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_META_CENSUS_NASCEU
     node_type: evidence
@@ -653,6 +741,10 @@ nodes:
     verified_against: 'dogfood ponta-a-ponta do modo-de-falha do TETO (wf_15ebe561-003): teto 150k selecionou 2/8 por atencao, nomeou 6 NAO_MEDIDO_POR_TETO, juiz reprovou os 2 CONFIRMED preguicosos e a selagem recusou carimbo (0 stamps — AUDIT integro); extrator provou retomada KG-runtime (22 a-medir pos-revisao = exatamente os reprovados); bancada census-extract 3/3'
     label: 'A forma que rodou 2x a 5M+ renascendo em /tmp virou COMANDO: /meta:census (extrator determinstico + molde versionado com teto que PARA por contagem + selagem AUDIT + listagem-projecao). Ordem do maestro cumprida: KG-SSOT first/runtime (estado de retomada = carimbo nos grafos) e custo mecanico (incremental default; custo/no observado 88k no dogfood vs price 74k — recalibrar na 1a rodada real).'
     trace: ".claude/commands/meta/census.md · docs/analysis/backlog-real-census-dogfood-2026-09-01.md"
+    provenance:
+      source: ".claude/commands/meta/census.md · docs/analysis/backlog-real-census-dogfood-2026-09-01.md"
+      locator: "dogfood ponta-a-ponta do modo-de-falha do TETO (wf_15ebe561-003): teto 150k selecionou 2/8 por atencao, nomeou 6 NAO_MEDIDO_POR_TETO, juiz reprovou os 2 CONFIRMED preguicosos e a selagem recusou carimbo (0 stamps — AUDIT integro); extrator provou retomada KG-runtime (22 a-medir pos-revisao = exatamente os reprovados); bancada census-extract 3/3"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CENSUS_RODADA1
     node_type: evidence
@@ -664,6 +756,10 @@ nodes:
     verified_against: 'wf_90dd73fe-cd2: 22/22 medidos (motivo da reprovacao anterior injetado por no), 0 descartes; juiz aprovou 13, reprovou 5 (23% — caiu de 29%); vereditos 15 CONF/6 DRIFT/1 REFUTED; custo 1.768.062 tok = 80k/no vs teto 2M; A-MEDIR 22→6'
     label: '1a rodada REAL do /meta:census: valeu-a-pena MEDIDO — 80k/no com juiz incluso (vs 74k da revisao manual SEM retomada); a retomada KG-runtime reduziu a populacao de 72 para 22 e desta para 6; o dedupe do carimbo virou lei no census-seal (2a mordida da mesma classe). Restam 6 A-MEDIR: 5 reprovados-de-novo + 1 alvo de REFUTED proposto.'
     trace: "docs/analysis/backlog-real-2026-09-01-r1.md"
+    provenance:
+      source: "docs/analysis/backlog-real-2026-09-01-r1.md"
+      locator: "wf_90dd73fe-cd2: 22/22 medidos (motivo da reprovacao anterior injetado por no), 0 descartes; juiz aprovou 13, reprovou 5 (23% — caiu de 29%); vereditos 15 CONF/6 DRIFT/1 REFUTED; custo 1.768.062 tok = 80k/no vs teto 2M; A-MEDIR 22→6"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CENSUS_RODADA2
     node_type: evidence
@@ -675,6 +771,10 @@ nodes:
     verified_against: 'wf_102a9bec-52f: 6/6 medidos, juiz aprovou 3/reprovou 2 (3a reincidencia dos mesmos: contagem-inflada e trace-nao-medido); 5 CONF/1 REFUTED; 521k = 87k/no; A-MEDIR 6→3; seal com cura indent-agnostica+fail-barulhento exercitada (3 carimbos, radar 0)'
     label: 'Rodada 2 do /meta:census: populacao 99→3 em duas rodadas do comando (72→22→6→3). ACHADO DE SEGURANCA proposto ao maestro: D_pkce_risk_mitigations REFUTED — as 3 mitigacoes prometidas no flip NUNCA foram implantadas e a (1) foi na direcao OPOSTA por UX (token 1h, refresh 14d SEM rotacao; sem CSP; sem procedimento de suspensao). CRONICOS nomeados (3a reincidencia, tratamento distinto): Q_LACUNA (claims externas exigem WebSearch que o worker sonnet pula) e Q_SENHA (label drifted, re-modelagem manual).'
     trace: "docs/analysis/backlog-real-2026-09-01-r2.md"
+    provenance:
+      source: "docs/analysis/backlog-real-2026-09-01-r2.md"
+      locator: "wf_102a9bec-52f: 6/6 medidos, juiz aprovou 3/reprovou 2 (3a reincidencia dos mesmos: contagem-inflada e trace-nao-medido); 5 CONF/1 REFUTED; 521k = 87k/no; A-MEDIR 6→3; seal com cura indent-agnostica+fail-barulhento exercitada (3 carimbos, radar 0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: C_SETE_INSTRUMENTOS_ZERO_PERCEPCAO

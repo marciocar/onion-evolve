@@ -34,6 +34,10 @@ nodes:
     confidence: 1.0
     label: "O QUE FECHARIA O BURACO NAO EXISTE NO VAULTWARDEN. O Bitwarden comercial tem duas formas, e elas sao moralmente diferentes: Key Connector (Enterprise) custodia a chave no servidor da empresa e OBRIGA o membro a REMOVER a senha mestra — deixa de ser zero-knowledge no sentido estrito; e Trusted Devices (Business+), que PRESERVA zero-knowledge (um dispositivo destrava com a senha mestra uma vez, os demais sao aprovados por dispositivo confiavel ou admin). No Vaultwarden: Key Connector nao tem equivalente nem no roadmap; Trusted Device Encryption e o PR #7534, ABERTO, criado em 2026-07-31 — dias antes desta pesquisa. Planejar contando com ele seria contar com o que nao existe. A senha mestra e PERMANENTE no desenho de hoje."
     trace: "https://github.com/dani-garcia/vaultwarden/pull/7534"
+    provenance:
+      source: "https://github.com/dani-garcia/vaultwarden/pull/7534"
+      locator: "PR-7534-ABERTO-criado-2026-07-31-nao-mesclado"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── O BLOQUEADOR QUE SO APARECEU NO CRUZAMENTO ───────────────────────────────
   - id: E_ES384_ERA_O_BLOQUEADOR_CANDIDATO
@@ -46,6 +50,10 @@ nodes:
     confidence: 1.0
     label: "NENHUMA DAS DUAS PESQUISAS ACHOU ISTO SOZINHA — foi o cruzamento. A frente externa marcou como NAO VERIFICADO o path de discovery do Logto; a frente de terreno MEDIU ao vivo: `https://auth.onionevolve.com/oidc/.well-known/openid-configuration` declara `id_token_signing_alg_values_supported: [ES384]`, SEM RS256. Nenhuma das duas cruzou isso com o cliente. E o padrao e documentado: ES384-por-padrao do Logto ja quebrou kubelogin (issue #1210, com o erro literal `expected RS256 got ES384`) e traefik-forward-auth (#358). Nenhum guia existente de Vaultwarden pegaria — Keycloak, Authentik e Zitadel emitem RS256. LICAO DE METODO: duas passadas independentes que DISCORDAM sao sinal, nao ruido; a discordancia foi o que produziu a terceira medicao."
     trace: "https://github.com/int128/kubelogin/issues/1210"
+    provenance:
+      source: "https://github.com/int128/kubelogin/issues/1210"
+      locator: "discovery-vivo-declara-ES384-sem-RS256"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ES384_CAIU_NA_MEDICAO
     node_type: evidence
@@ -57,6 +65,10 @@ nodes:
     confidence: 1.0
     label: "O BLOQUEADOR CAIU, e o achado e melhor que a resposta. O `doc-comment` do enum `CoreJwsSigningAlgorithm` da crate `openidconnect` 4.0.1 marca `EcdsaP384Sha384` como `(currently unsupported)`. O README do MESMO repo declara ECDSA P-256/P-384 como suportado. Contradicao interna — e quem desempatou foi o CODIGO: `src/core/crypto.rs` da 4.0.1 tem `verify_ec_signature` usando `p384::ecdsa::VerifyingKey` com `.verify()` real; SO `P521` cai em `UnsupportedAlg`. O doc-comment esta STALE. E `declarado != verificado` dentro de uma dependencia de terceiro — a mesma classe que esta casa cacca em si mesma, agora encontrada fora. CONFIRMACAO CRUZADA: o que a crate REALMENTE nao suporta e HMAC, e ai o doc-comment e a wiki do Vaultwarden CONCORDAM. REDE DE SEGURANCA INDEPENDENTE: o Logto permite rotacionar a chave privada escolhendo RSA (Console -> Tenant settings -> OIDC configs), entao mesmo que o codigo surpreendesse em producao ha saida documentada."
     trace: "https://docs.rs/openidconnect/4.0.1/openidconnect/core/enum.CoreJwsSigningAlgorithm.html"
+    provenance:
+      source: "https://docs.rs/openidconnect/4.0.1/openidconnect/core/enum.CoreJwsSigningAlgorithm.html"
+      locator: "codigo-fonte-openidconnect-4.0.1-p384-VerifyingKey-verify-ativo"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_SSO_VALIDADO_PONTA_A_PONTA
     node_type: evidence
@@ -79,6 +91,10 @@ nodes:
     confidence: 1.0
     label: "NAO E MAIS FORK: o PR #3899 (`SSO using OpenID Connect`, autor Timshel) foi MESCLADO no upstream `dani-garcia/vaultwarden` em 2025-08-08, e a primeira release estavel com SSO foi a v1.35.0 (2025-12-27). O fork nao morreu — virou o motor do upstream. MAS em seis meses sairam correcoes de MULTIPLOS CVEs especificos de SSO (CSRF no login, enumeracao de usuario/organizacao, SSO binding, SSRF), e a v1.37.0 (2026-07-24) e OBRIGATORIA para clientes >=2026.7.0. E producao com a ressalva de acompanhar release de perto — nao e superficie assentada. Fricoes abertas medidas: usuario `SSO_ONLY` nao recebe convite de organizacao (#7072) e sync falhando no desktop com SSO obrigatorio (#6826)."
     trace: "https://github.com/dani-garcia/vaultwarden/pull/3899"
+    provenance:
+      source: "https://github.com/dani-garcia/vaultwarden/pull/3899"
+      locator: "PR-3899-merged-2025-08-08-v1.35.0-2025-12-27-CVEs-ate-v1.37.x"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_PRIMEIRO_CASO_DOCUMENTADO
     node_type: evidence
@@ -101,6 +117,10 @@ nodes:
     confidence: 1.0
     label: "O PADRAO NAO PRECISA SER INVENTADO — esta escrito como KB canonica (`docs/knowledge-base/tools/vps-tool-repo-skeleton.md`) e vivo em tres repos. Forma a copiar: repo `onion-vaultwarden`, container `onion-vps-vaultwarden`, `ports: '127.0.0.1:<porta>:80'` (OBRIGATORIO — o Docker fura o ufw nesta maquina; o bind e a cura na fonte e o `onion-vps-docker-firewall` e so a rede de seguranca), segredos em `pass onion/vaultwarden-*` via `.envrc`+`up.sh` com `${VAR:?}` (fail-closed), healthcheck no loopback, `mem_limit` explicito, vhost em `/etc/caddy/conf.d/` no molde do `console.sh` (que VALIDA antes de aplicar), e `backup.sh` com verificacao de integridade + retencao 14. Registro: NAO ha registry central por decisao explicita — a ferramenta ganha linha no ledger por-tool de `onion-vps-catalog-doctrine.md` e le `members.yaml` para identidade, nunca inventa tabela propria de usuarios."
     trace: "docs/knowledge-base/tools/vps-tool-repo-skeleton.md"
+    provenance:
+      source: "docs/knowledge-base/tools/vps-tool-repo-skeleton.md"
+      locator: "KB-vps-tool-repo-skeleton-mais-3-repos-vivos-e-caddy-com-conf.d"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_QUATRO_PENDENCIAS_DO_TERRENO
     node_type: question
@@ -123,6 +143,10 @@ nodes:
     confidence: 1.0
     label: "DEPENDE DO MAESTRO — nao e minha decisao fechar ferramenta da VPS. Medido por mim, nao herdado do agente: `/etc/caddy/conf.d/logto-console.caddy` esta ATIVO (sem sufixo `.disabled`) e `console.onionevolve.com` responde 302. TRES documentos declaram que ele fica DESLIGADO por padrao — o README do onion-logto, o proprio bloco do vhost, e o cabecalho do `logto-provision.sh` (`o vhost console.onionevolve.com esta DESLIGADO por desenho`). E `declarado != verificado` no painel de administracao do provedor de identidade. O interruptor existe e valida antes de aplicar: `/home/marcio/onion-vps-logto/console.sh off`. POR QUE ISTO ENTRA NUMA PESQUISA SOBRE COFRE: somar um cofre de senhas a caixa enquanto o painel do IdP esta aberto e a combinacao que merece decisao explicita, nao silencio."
     trace: "/etc/caddy/conf.d/logto-console.caddy"
+    provenance:
+      source: "/etc/caddy/conf.d/logto-console.caddy"
+      locator: "logto-console.caddy-sem-.disabled-e-HTTP-302-no-dominio-publico"
+      method: "testemunho: leitura do arquivo /etc/caddy/conf.d/logto-console.caddy no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: I_PROVISION_FICOU_PARA_TRAS_NO_RENAME
     node_type: decision

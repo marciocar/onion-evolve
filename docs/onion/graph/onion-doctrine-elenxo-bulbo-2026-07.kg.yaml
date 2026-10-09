@@ -153,6 +153,10 @@ nodes:
     label: "RESPONDIDA E GRADUADA (2026-08-25, reforma do site, PR #672): a area publica de doutrinas E a pagina /doutrinas/ do onionevolve.com (pt + /en/) — 7 doutrinas no formato sintese→cicatriz-datada→mecanismo-que-cobra + a tabela das 17 invencoes derivada da KB. O gatilho foi o pedido do maestro (gated-until-trigger respeitada: 39 dias entre o gate abrir como pergunta e o uso real prova-lo); o conteudo passou por gate explicito do maestro E revisao adversarial (residuo feat-site-reform-f1-astro). O 'grupo fechado primeiro' foi SUPERADO pelo proprio gatilho: o webinar publico de 25/08 aponta para o site"
     verified_at: 2026-08-25
     verified_against: "curl https://onionevolve.com/doutrinas/ -> 200 com as 7 doutrinas ancoradas; /en/doutrinas/ -> 200 lang=en; deploy 11/11 verde"
+    provenance:
+      source: "https://onionevolve.com/doutrinas/"
+      locator: "curl https://onionevolve.com/doutrinas/ -> 200 com as 7 doutrinas ancoradas; /en/doutrinas/ -> 200 lang=en; deploy 11/11 verde"
+      method: "medição: provenance derivada na migração ao contrato v4 (URL citada no verified_against; rota A1 da triagem); não reverificado"
   - id: Q_BULBO_DIAGRAM
     node_type: question
     layer: audit
@@ -213,6 +217,10 @@ nodes:
     verified_at: 2026-08-17
     verified_against: "sinal de campo do maestro numa adocao real (PoC): a sessao do adotante encontrou o termo em prosa normativa e foi grepar o repo antes de responder"
     label: "adotante de campo NAO SABIA o que e o Elenxo — o termo chegava como vocabulario estabelecido (4 KBs vendorizadas + 2 skills sempre-carregadas) sem definicao alcancavel"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-elenxo-doctrine.md"
+      locator: "sinal de campo do maestro numa adocao real (PoC): a sessao do adotante encontrou o termo em prosa normativa e foi grepar o repo antes de responder"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_PATH_SCOPED_SKILL_INVISIBLE
     node_type: evidence
     trace: docs/knowledge-base/concepts/onion-elenxo-doctrine.md
@@ -224,6 +232,10 @@ nodes:
     verified_at: 2026-08-17
     verified_against: "observado na propria sessao: 11 skills no disco, 9 na lista da sessao; as 2 ausentes sao exatamente as 2 com paths: (onion-patterns, onion-validation)"
     label: "a definicao VIAJAVA no manifesto e era INALCANCAVEL: morava so em onion-patterns, escopada por paths: [.claude/**, docs/onion/**] — e docs/onion/ nem viaja, logo metade do escopo apontava p/ diretorio inexistente no adotante"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-elenxo-doctrine.md"
+      locator: "observado na propria sessao: 11 skills no disco, 9 na lista da sessao; as 2 ausentes sao exatamente as 2 com paths: (onion-patterns, onion-validation)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: D_GRADUATED_TO_VENDORED_KB
     node_type: decision
     trace: docs/knowledge-base/concepts/onion-elenxo-doctrine.md
@@ -235,6 +247,10 @@ nodes:
     verified_at: 2026-08-17
     verified_against: "PR #630: KB criada em docs/knowledge-base/concepts/ (superficie vendorizada, sem escopo de path), 4 KBs + 2 skills religadas por link, onion-patterns virou derivacao com ponteiro; lint 0 HARD, passivo de link vendorizado intacto em 43"
     label: "o rascunho gated de 2026-07-22 GRADUOU para KB vendorizada — decisao do maestro; o rascunho FICA marcado como graduado (Aufhebung: cancela, preserva, eleva), nao e apagado"
+    provenance:
+      source: "docs/knowledge-base/concepts/onion-elenxo-doctrine.md"
+      locator: "PR #630: KB criada em docs/knowledge-base/concepts/ (superficie vendorizada, sem escopo de path), 4 KBs + 2 skills religadas por link, onion-patterns virou derivacao com ponteiro; lint 0 HARD, passivo de link vendorizado intacto em 43"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CENSO0901_D_QUADRO_CITACOES
     node_type: evidence
@@ -258,6 +274,10 @@ nodes:
     verified_against: 'mensagem do maestro, sessao 800cd025, 2026-10-05T18:19:47Z (verbatim abaixo). Leitura do condutor, NAO do maestro: a mensagem chegou como "duvida" sobre as pesquisas Nanochat/SLM, e o condutor a leu como correcao de um enquadramento estreito (SDAAL como "LLM=runtime", Elenxo como "refutador").'
     trace: 'docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml'
     label: 'AS QUATRO DOUTRINAS NA PALAVRA DO MAESTRO (2026-10-05, verbatim): "dogfood - dogfood master, só tem uma" · "kg-ssot runtime e first - é o conhecomento em grafo (kg) como fonte única da verdade (ssot), lendo sempre primeiro o grafo kg.yaml (first) e usando a maquinaria em tempo de execução (runtime) para gestão da fonte única da verdade, mantendo ele sempre atualizado, integro, eficiente e eficaz. Mais que guardar dados, ter as decisões e superações mapeadas aproveitando a doutrina e a metodologia." · "SDAAL - Adapters para camadas de abstração em IApode ser usada em todas as fases, planejamento, construção, usada em tempo de execução, fazendo validações, se adaptando e superando obstáculos para encontrar caminhos. Usando critérios especificos para padronizar, evoluir e superar obstaculos em tempo de execução." · "Elenxo - Este movimento de superação do Onion Evolve". CUNHAGENS: Elenxo, SDAAL e KG-SSOT First+Runtime (dogfooding e termo de industria; a cunhagem da casa e Dogfood-de-fronteira, D_COINAGES_DECLARED). LEITURA DO CONDUTOR (nao do maestro): o refutador adversarial e uma peca do Elenxo, nao o Elenxo inteiro — o que refina, sem contradizer, D_ELENXO_IS_METHOD.'
+    provenance:
+      source: "docs/evolution/research/nanochat-onion-2026-10/nanochat-onion-2026-10.kg.yaml"
+      locator: "mensagem do maestro, sessao 800cd025, 2026-10-05T18:19:47Z (verbatim abaixo). Leitura do condutor, NAO do maestro: a mensagem chegou como \"duvida\" sobre as pesquisas Nanochat/SLM, e o condutor a leu como correcao de um enquadramento estreito (SDAAL como \"LLM=runtime\", Elenxo como \"refutador\")."
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_PROMPTS_COMO_BYTECODE_LLM_COMO_VM_SUPERADA
     node_type: decision
@@ -270,6 +290,10 @@ nodes:
     verified_against: 'DIRETRIZ (reforco) do maestro, sessao 800cd025, 2026-10-05T18:20:54Z: "reforço: precisamos superar e adequar, sim prompts como bytecode e llm como vm" — nao e selo do argumento abaixo, que e do CONDUTOR. A tese refutada e federation-research-2026-06-reconciled#S7_claim_llm_as_vm; a REFUTACAO e S7_claim_metaphor_fragile ("frágil se levada a sério tecnicamente — cadê os testes?").'
     trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
     label: 'SUPERACAO (Aufhebung) DA TESE-MAE, por diretriz do maestro: prompts como BYTECODE, LLM como VM. A refutacao de 2026-06 nao e apagada — e a objecao que a superacao responde. ARGUMENTO DO CONDUTOR: o "cade os testes?" tem resposta parcial na propria casa — o bytecode (markdown de comando, doutrina, grafo) e interpretado pela VM (o LLM), e PARTE do que a VM executa e verificada por maquinaria deterministica que nao depende dela: o lint (verificacao estatica do bytecode) e os vetos exit 2 (sandbox em runtime); a bancada e a meta-camada que testa esses verificadores. A metafora deixa de ser fragil onde o resultado da VM passa por um verificador que nao e a VM; onde nao passa, fica em Q_BYTECODE_SEM_TESTE. O "ADEQUAR" da diretriz NAO foi tratado aqui — lacuna declarada: o que muda na forma do bytecode para caber na metafora segue em aberto.'
+    provenance:
+      source: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
+      locator: "DIRETRIZ (reforco) do maestro, sessao 800cd025, 2026-10-05T18:20:54Z: \"reforço: precisamos superar e adequar, sim prompts como bytecode e llm como vm\" — nao e selo do argumento abaixo, que e do CONDUTOR. A tese refutada e federation-research-2026-06-reconciled#S7_claim_llm_as_vm; a REFUTACAO e S7_claim_metaphor_fragile (\"frágil se levada a sério tecnicamente — cadê os testes?\")."
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_OS_TESTES_DO_BYTECODE_EXISTEM
     node_type: claim
@@ -282,6 +306,10 @@ nodes:
     verified_against: 'gate do pre-commit em 2026-10-05: "216 famílias em 8 workers" (lint-selftest.sh); lint-artifacts.sh com as REGRAS numeradas e catracas; kg-radar.sh --integrity --schema; vetos PreToolUse exit 2 (PR #921, 186 casos de bancada, 74/75 mutantes)'
     trace: '.claude/validation/lint-selftest.sh'
     label: 'OS TESTES DO BYTECODE, CONTADOS, EM DUAS CAMADAS: (1) testes do BYTECODE — o lint aplica as REGRAS numeradas com catraca (verificacao estatica), o radar recusa grafo ilegivel ou incoerente, e os vetos PreToolUse barram com exit 2 o que a VM nao pode fazer, mesmo sob bypassPermissions (sandbox em runtime); (2) testes dos VERIFICADORES — a bancada, com 216 familias de auto-teste das guardas. E a resposta material, parcial, ao "cade os testes?" de S7_claim_metaphor_fragile — medida, nao prometida.'
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "gate do pre-commit em 2026-10-05: \"216 famílias em 8 workers\" (lint-selftest.sh); lint-artifacts.sh com as REGRAS numeradas e catracas; kg-radar.sh --integrity --schema; vetos PreToolUse exit 2 (PR #921, 186 casos de bancada, 74/75 mutantes)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_BYTECODE_SEM_TESTE
     node_type: question

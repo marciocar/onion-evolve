@@ -24,6 +24,10 @@ nodes:
     label: 'A PECA 1 DA DOUTRINA — o defeito medido e datado, sem o qual nao se forja. 2026-10-03, TRES sitios, e um deles foi pago em AFIRMACAO FALSA SELADA: (1) `.claude/commands/meta/forge.md` injetava uma projecao que cortava 12 de 59 candidatos EM SILENCIO; uma sessao leu a projecao, nao viu o `/meta:evolve` nela, e selou numa migalha que ele tinha "0 de 7 pecas, ausente do censo inteiro" — o `--tsv` dizia 2/7, empatado com 12 outros, com 37 ABAIXO dele. (2) `.claude/skills/onion-research/SKILL.md` injetava `kg-corpus-grep … | head -40` sobre 298 achados: 259 caiam sem uma palavra. (3) `.claude/commands/meta/kg.md` prometia "FILA COMPLETA / CORPUS INTEIRO" antes de `head -20` sobre ~312 itens abertos. A CAUSA COMUM: na superficie INJETADA a sessao le a projecao como se fosse o conjunto — nao ha rolagem, nao ha "ver mais", nao ha pergunta a fazer. Logo ausencia-por-CORTE e indistinguivel de ausencia-por-ZERO, e o leitor conclui zero.'
     trace: '.claude/validation/injected-cut-check.sh'
     verified_against: 'os tres sitios lidos e curados em 2026-10-03; passivo RE-MEDIDO depois das curas = ZERO diretivas injetadas com corte (dois `head -1` legitimos sobraram, que sao extracao de valor unico)'
+    provenance:
+      source: ".claude/validation/injected-cut-check.sh"
+      locator: "os tres sitios lidos e curados em 2026-10-03; passivo RE-MEDIDO depois das curas = ZERO diretivas injetadas com corte (dois `head -1` legitimos sobraram, que sao extracao de valor unico)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_SUBSTRATO_CHECK_DE_LINT_MOLDE_CONSUMED_MODE
     node_type: decision
@@ -35,6 +39,10 @@ nodes:
     label: 'SUBSTRATO E MOLDE, escolhidos PELO CENSO e nao por lembranca (e a peca 2). Substrato: CHECK DE LINT, nao hook — a classe vive em arquivo versionado, julgavel em varredura, sem relacao com acao de turno; hook seria o substrato errado. Molde: `consumed-mode-check.sh` (8 casos, o mais exercitado dos checks no censo), que define a forma: script PROPRIO com `--selftest`, `set -euo pipefail`, parse de flag com guarda contra `${1:-}` engolindo flag como caminho, modo `--tsv` para a producao consumir, guarda de VACUIDADE, fail-loud exit 2 em fonte ilegivel, exit 1 com achado. ⚠️ A FORJA JA CORRIGIU A FORMA NA ENTRADA: eu estava escrevendo o predicado como FUNCAO EMBUTIDA no `lint-artifacts.sh`, que nao e o molde desta casa — o maestro interrompeu com "dogfood use a forja", e invocar devolveu a forma certa em uma leitura. Imitar o procedimento tinha produzido um artefato com a forma errada.'
     trace: '.claude/validation/consumed-mode-check.sh'
     verified_against: 'guard-census.sh --markdown: consumed-mode-check.sh com 8 casos, o maior entre os checks; apos a forja o censo lista injected-cut-check.sh registrado em lint-artifacts.sh E lint-selftest.sh, e a massa foi de 210 para 211 familias'
+    provenance:
+      source: ".claude/validation/consumed-mode-check.sh"
+      locator: "guard-census.sh --markdown: consumed-mode-check.sh com 8 casos, o maior entre os checks; apos a forja o censo lista injected-cut-check.sh registrado em lint-artifacts.sh E lint-selftest.sh, e a massa foi de 210 para 211 familias"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_O_DOGFOOD_ACHOU_TRES_DEFEITOS_QUE_LEITURA_NAO_ACHA
     node_type: evidence
@@ -47,6 +55,10 @@ nodes:
     label: 'A FORJA SE PAGOU NA PRIMEIRA EXECUCAO, e os tres defeitos sao invisiveis a leitura. (1) O MAIS GRAVE: a guarda de VACUIDADE era INALCANCAVEL exatamente na situacao para a qual existe — `xargs grep -l` devolve 123 sem casamento e, sob `set -euo pipefail`, isso MATAVA o script antes de a guarda falar (rc=123, saida vazia). Pior: isso deixava o caso (c) VERDE PELO MOTIVO ERRADO — o script morria, nada era achado, e o caso lia o silencio como "calou corretamente". Cura: `xargs -r` + `|| true`. (2) O caso (c) nascera com sandbox SEM diretiva nenhuma, logo a vacuidade disparava antes do varredor e o caso era INCAPAZ de reprovar o que afirmava reprovar; cura: o sandbox carrega uma diretiva legitima de proposito. (3) O regex do `sed -n 1,Np` nao capturava a aspa de fechamento, e a mensagem do veto mostraria um comando que nao existe. NENHUM dos tres aparece em revisao de codigo: todos exigiram RODAR.'
     trace: '.claude/validation/injected-cut-check.sh'
     verified_against: '--selftest 14/14 verde apos as curas (era 12/13 na 1a execucao, com o 13o reprovando pelo lado da ASSERCAO); producao rc=0 lendo 5 arquivos com diretiva'
+    provenance:
+      source: ".claude/validation/injected-cut-check.sh"
+      locator: "--selftest 14/14 verde apos as curas (era 12/13 na 1a execucao, com o 13o reprovando pelo lado da ASSERCAO); producao rc=0 lendo 5 arquivos com diretiva"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_MUTANTE_QUE_NAO_MORDE_TEM_QUATRO_CAUSAS
     node_type: claim
@@ -58,6 +70,10 @@ nodes:
     label: 'EXTENSAO DE DOUTRINA, e vale mais que a guarda. A casa conhecia DUAS causas para "o mutante nao mordeu": caso DECORATIVO, ou mutante que NAO MUDA o que o caso afirma. Esta forja produziu as outras duas, cada uma medida: (3) MUTANTE INERTE — a mutacao nao alterou o arquivo (meu `python -c` com escape aninhado nao casou nada), e o resultado e indistinguivel de caso decorativo; (4) MUTANTE FRACO — o arquivo MUDOU e o comportamento NAO: troquei a extracao por `printf "%s"` SEM `\n`, e `while read` sobre fluxo sem delimitador final nunca executa o corpo. Mais a 5a, que e de harness e nao de mutante: o HARNESS OLHOU A STRING ERRADA (grepei `VACUIDADE` em maiuscula quando o rotulo da falha e `(f) vacuidade`; e antes, o rotulo de `record_pass` dentro da linha de `record_fail`). CURA ESTRUTURAL, nao disciplina: o harness PROVA QUE MUTOU antes de interpretar — compara o arquivo com o original e aborta como `⊘ INERTE` se forem iguais. E o unico jeito de separar "o caso e enfeite" de "meu mutante nao existiu" sem adivinhar. CONTAGEM DA SESSAO: harness de mutante me enganou 5 VEZES.'
     trace: '.claude/commands/common/prompts/guard-doctrine.md'
     verified_against: '⚠️ CORRIGIDO 2026-10-04 apos reprovacao: a 1a redacao dizia "6 mutantes (M1-M6) ... 3 passadas ate os 6 morderem" e isso DESCREVIA ALGO QUE NAO ACONTECEU — o Elenxo provou que eram 5/6, porque o M4 era NO-OP SEMANTICO (equivalencia medida em 17 casos + varredura do repo inteiro, rc e saida byte-a-byte identicos). A ironia e fechada: o M4 era instancia da QUARTA CAUSA que ESTE PROPRIO NO nomeia (mutante fraco), e eu diagnostiquei a causa errada, atribuindo-a ao bug de vacuidade. HOJE: 10 mutantes, 10 mordendo, com o harness provando a mutacao e o M4 atacando o MECANISMO (os dois filtros redundantes) em vez de um ponto'
+    provenance:
+      source: ".claude/commands/common/prompts/guard-doctrine.md"
+      locator: "⚠️ CORRIGIDO 2026-10-04 apos reprovacao: a 1a redacao dizia \"6 mutantes (M1-M6) ... 3 passadas ate os 6 morderem\" e isso DESCREVIA ALGO QUE NAO ACONTECEU — o Elenxo provou que eram 5/6, porque o M4 era NO-OP SEMANTICO (equivalencia medida em 17 casos + varredura do repo inteiro, rc e saida byte-a-byte identicos). A ironia e fechada: o M4 era instancia da QUARTA CAUSA que ESTE PROPRIO NO nomeia (mutante fraco), e eu diagnostiquei a causa errada, atribuindo-a ao bug de vacuidade. HOJE: 10 mutantes, 10 mordendo, com o harness provando a mutacao e o M4 atacando o MECANISMO (os dois filtros redundantes) em vez de um ponto"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_O_PROPRIO_CORTE_ME_CEGOU_NA_FORJA_CONTRA_CORTE
     node_type: evidence
@@ -69,6 +85,10 @@ nodes:
     label: 'A CLASSE SE MANIFESTOU CONTRA MIM DENTRO DA FORJA QUE A COMBATE, e isso e dado, nao anedota. Ao perguntar ao censo "a classe ja esta coberta?", rodei `guard-census.sh --markdown | head -14` — e o bloco que RESPONDE essa pergunta mora na l.94, DEPOIS da secao de moldes. Meu proprio `head -14` cortou a resposta, e eu conclui que o filtro `GUARD_CENSUS_QUERY` nao funcionava (ele funciona: l.33 o le, l.94-96 o usa). Isto e a prova de uso real mais forte que a guarda tem: quem corta nao sabe o que descartou, e nem o autor da guarda contra corte escapa — por isso a cura e mecanismo e nunca disciplina.'
     trace: '.claude/validation/guard-census.sh'
     verified_against: 'GUARD_CENSUS_QUERY lido na l.33 e usado na l.94-96 do guard-census.sh; a 2a invocacao, com `sed -n` na secao certa, devolveu "a classe parece NOVA"'
+    provenance:
+      source: ".claude/validation/guard-census.sh"
+      locator: "GUARD_CENSUS_QUERY lido na l.33 e usado na l.94-96 do guard-census.sh; a 2a invocacao, com `sed -n` na secao certa, devolveu \"a classe parece NOVA\""
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_TETO_DECLARADO_O_QUE_A_GUARDA_NAO_VE
     node_type: evidence
@@ -81,6 +101,10 @@ nodes:
     label: 'A PECA 7 — o que a guarda NAO ve, escrito antes de alguem confiar nela. (1) Ela mede o corte NO PIPELINE DA DIRETIVA, nao se o comando por tras trunca por conta propria: um script que corta internamente passa por aqui, e foi exatamente o caso do `forge-census`, cuja cura foi outra (declarar o proprio corte). (2) Nao sabe se o total e declarado numa linha vizinha em PROSA — e de proposito: prosa nao e mecanismo, e o caminho certo e o cortador contar antes de cortar. (3) `N<=2` e ISENTO POR PROPOSITO (extracao de valor unico, onde o corte E o dado), nunca por sintaxe; a isencao tem caso proprio porque falso positivo treina a sessao a ignorar o veto. (4) A busca e LEXICAL: corte escrito por alias, funcao de shell ou python inline nao e visto. (5) Ela cobre `.claude/commands/**` e `.claude/skills/**`; diretiva injetada que nasca fora desses dois caminhos fica descoberta.'
     trace: '.claude/validation/injected-cut-check.sh'
     verified_against: 'teto escrito no cabecalho do proprio check (linhas 20-33) e exercitado pelos casos (b) isencao, (c) fora-da-diretiva e (f) vacuidade'
+    provenance:
+      source: ".claude/validation/injected-cut-check.sh"
+      locator: "teto escrito no cabecalho do proprio check (linhas 20-33) e exercitado pelos casos (b) isencao, (c) fora-da-diretiva e (f) vacuidade"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: Q_SEGUNDA_SUPERFICIE_INJETADA_FORA_DOS_DOIS_CAMINHOS
     node_type: question
@@ -92,6 +116,10 @@ nodes:
     label: '⚠️ O GATILHO JA DISPAROU, e eu o declarei nao-disparado no mesmo dia — medido pelo Elenxo: `plugins/onion/skills/onion/SKILL.md:21` tem diretiva VIVA com `| head -1` (nao exemplo), no arquivo que os adotantes INSTALAM, e e projecao COM TRANSFORMACAO, logo o materializador e caminho de entrada independente. Mais: `.claude/agents/**` sao 60 arquivos que o harness carrega e esta guarda nao varre. Meu `verified_against` citava so `.claude/rules/*.md` e `CLAUDE.md` — mediu MENOS do que o no afirmava, e a medicao completa (`grep -rl` por bang-crase, que a propria redacao nomeia como a regua) aponta `plugins/`. REDACAO ORIGINAL, preservada: LACUNA NOMEADA, com gatilho: a guarda varre `.claude/commands/**` e `.claude/skills/**` porque e onde as diretivas de injecao vivem HOJE. Se a plataforma passar a injetar de outro lugar — `.claude/rules/**` (que carregam por path), `CLAUDE.md`, ou o substrato novo `Claude Mods` que a 2.1.287 trouxe —, a classe reaparece num caminho que esta guarda nao olha, e o modo de falha e o pior possivel: silencio, igual ao de hoje. ⚠️ NAO AMPLIAR POR ESPECULACAO: varrer caminho onde a diretiva nao existe custa falso positivo, e falso positivo treina a sessao a ignorar o veto (clausula 4). GATILHO: a primeira diretiva de injecao medida fora dos dois caminhos — `grep -rl` por bang-crase e a medicao, e ela e de um comando.'
     trace: '.claude/validation/injected-cut-check.sh'
     verified_against: 'MEDICAO COMPLETA (2026-10-04, pelo Elenxo): `plugins/onion/skills/onion/SKILL.md:21` com diretiva viva e `| head -1`; `.claude/agents/**` com 60 arquivos fora do pathspec. A 1a redacao media apenas `.claude/rules/*.md` e CLAUDE.md — escopo menor que a afirmacao'
+    provenance:
+      source: ".claude/validation/injected-cut-check.sh"
+      locator: "MEDICAO COMPLETA (2026-10-04, pelo Elenxo): `plugins/onion/skills/onion/SKILL.md:21` com diretiva viva e `| head -1`; `.claude/agents/**` com 60 arquivos fora do pathspec. A 1a redacao media apenas `.claude/rules/*.md` e CLAUDE.md — escopo menor que a afirmacao"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_O_ELENXO_REPROVOU_A_GUARDA_E_O_PIOR_ERA_FATAL
     node_type: evidence
@@ -104,6 +132,10 @@ nodes:
     label: 'O ELENXO REPROVOU A GUARDA: 7 classes de FALSO POSITIVO (9 casos), 11 formas de truncar nao declaradas, 4 cortes destrutivos liberados pela isencao, e 5 achados de 1a classe — dois deles FATAIS. (1) FP-1, o fatal: a guarda PROIBIA DOCUMENTAR A PROPRIA REGRA 96. Ele acrescentou ao `/meta:forge-guard` a secao que qualquer autor de doutrina escreveria e o lint REAL foi a `HARD: 1 / FALHOU`; a unica saida era `--no-verify`. E a clausula 4 (falso positivo treina a sessao a ignorar o veto) realizada contra o proprio artefato. (2) ACHADO A, tambem fatal: o dispatcher invoca `… --tsv 2>/dev/null || true`, logo meu `exit 2` de fail-loud NUNCA chegava ao lint — eu escrevi o fail-loud, provei no CLI, mutei contra ele, e o CONSUMIDOR o anulava; em producao a guarda JA ERA fail-open nesse caminho. (3) FN-B: o predicado exigia `|` LITERAL, entao `head -40 arquivo` era invisivel, e `sed -n 1,40p arquivo` — a redacao USUAL — passava, o que tornava falsa a cobertura declarada da 6a forma. (4) FN-A: a isencao `N<=2` e SINTATICA e o teto afirmava "por proposito, nunca por sintaxe" — no MESMO cortador do dano, `| head -1` apaga 297 de 298 e passa calado enquanto `| head -3` reprova. (5) Minhas afirmacoes 2, 3 e 5 caem; a 1 se sustenta. TODOS CURADOS no mesmo laco, e a cura do FP-1 exigiu distinguir diretiva VIVA de diretiva CITADA (cerca, crase dupla, comentario, padrao entre aspas) — mais um marcador `# top-N` explicito para o corte que E a pergunta, porque adivinhar pelo pipeline isentaria o dano original.'
     trace: 'docs/evolution/review/fix-medidores-que-cortam-em-silencio.md'
     verified_against: 'refutador opus/high em worktree isolada, mandato CACAR FALSO POSITIVO; 164k tokens, 60 chamadas, ~16 min; harness proprio com shim de git, 43 sondas; FP-1 reproduzido por mim ponta-a-ponta antes de aceitar, e re-verificado curado (guarda cala E lint 0 HARD com a documentacao presente); pos-cura: 18 casos, 10 mutantes mordendo, producao rc=0'
+    provenance:
+      source: "docs/evolution/review/fix-medidores-que-cortam-em-silencio.md"
+      locator: "refutador opus/high em worktree isolada, mandato CACAR FALSO POSITIVO; 164k tokens, 60 chamadas, ~16 min; harness proprio com shim de git, 43 sondas; FP-1 reproduzido por mim ponta-a-ponta antes de aceitar, e re-verificado curado (guarda cala E lint 0 HARD com a documentacao presente); pos-cura: 18 casos, 10 mutantes mordendo, producao rc=0"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: E_DEFEITO_DATADO_TRES_SITIOS

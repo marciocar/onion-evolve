@@ -75,6 +75,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "O W3C RDF 1.1 declara explicitamente que nao existe uma semantica padronizada unica para conjuntos de grafos RDF (RDF datasets) porque hipoteses muito diferentes coexistem na pratica — ou seja, mesmo no padrao de referencia da industria, agregacao de multiplos grafos nao tem solucao unica e universal." ATENCAO: e argumento-de-ausencia e NAO discrimina nenhuma das 4 sub-perguntas — ver E_OBJECAO_1.'
     trace: 'https://www.w3.org/TR/rdf11-datasets/'
+    provenance:
+      source: "https://www.w3.org/TR/rdf11-datasets/"
+      locator: "https://www.w3.org/TR/rdf11-datasets/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_SPARQL_SERVICE_FEDERADO
     node_type: evidence
@@ -89,6 +93,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "O mecanismo padrao SPARQL 1.1 Federated Query usa a clausula SERVICE para consultar um endpoint remoto identificado por um IRI dentro de uma query maior, sem centralizar os dados em um unico armazenamento." Impacto rebaixado a 3 porque o pressuposto (processador de consulta VIVO por grafo, atras de um IRI de rede) nao existe no caso desta rodada — ver E_OBJECAO_2.'
     trace: 'https://www.w3.org/TR/sparql11-federated-query/'
+    provenance:
+      source: "https://www.w3.org/TR/sparql11-federated-query/"
+      locator: "https://www.w3.org/TR/sparql11-federated-query/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_NEO4J_COMPOSITE_QUERY_N_GRAFOS
     node_type: evidence
@@ -103,6 +111,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA (tier 8, 3-0, FONTE DE FORNECEDOR — sempre suspeita): "Neo4j Composite Databases permitem consultar multiplos grafos (bancos) separados atraves de uma unica query Cypher, sem duplicar dados — a agregacao e feita via camada de abstracao (database aliases) sobre os grafos constituintes, locais ou remotos." Confianca 0.7 e nao 0.8 porque e vendor descrevendo o que vende, em edicao Enterprise, e porque e SILENTE sobre metrica/algoritmo cross-grafo — ver E_OBJECAO_3.'
     trace: 'https://neo4j.com/docs/operations-manual/current/fabric/'
+    provenance:
+      source: "https://neo4j.com/docs/operations-manual/current/fabric/"
+      locator: "https://neo4j.com/docs/operations-manual/current/fabric/ — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_NEO4J_ARESTA_NAO_ATRAVESSA_PROXY_NODE
     node_type: evidence
@@ -117,6 +129,10 @@ nodes:
     source_kind: vendor-on-competitor
     label: 'CONFIRMADA (tier 8, 2-1): "Relacionamentos (arestas) nao podem atravessar grafos diferentes no modelo Neo4j Fabric/Composite — a ligacao cross-grafo exige um padrao de proxy node: nos com a mesma label presentes em ambos os grafos, um com os dados completos e outro so com um ID de referencia para linking." E o achado mais decisivo da rodada (impacto 5): o incumbente do mercado de grafos NAO faz aresta cross-grafo, ele faz PONTEIRO — precedente direto contra O4/O6 e a favor da forma de O5. Confianca 0.7 pelo voto 2-1 e pelo tier de fornecedor.'
     trace: 'https://neo4j.com/docs/operations-manual/current/fabric/'
+    provenance:
+      source: "https://neo4j.com/docs/operations-manual/current/fabric/"
+      locator: "https://neo4j.com/docs/operations-manual/current/fabric/ — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_FREEMAN_CENTRALIZATION_NORMALIZADA
     node_type: evidence
@@ -130,6 +146,10 @@ nodes:
     source_kind: aggregator
     label: 'CONFIRMADA (tier 6, 3-0): "Freeman centralization normaliza uma medida de centralidade dividindo a soma observada de diferencas pela maior soma teoricamente possivel de diferencas em qualquer rede do mesmo tamanho, produzindo um score comparavel entre redes distintas." Impacto 5: e a evidencia que REFUTA a premissa da pergunta ("a regua e a mesma formula, logo e comparavel"). A atencao do Onion usa GRAU BRUTO sem normalizacao — ver E_OBJECAO_5.'
     trace: 'https://en.wikipedia.org/wiki/Centrality'
+    provenance:
+      source: "https://en.wikipedia.org/wiki/Centrality"
+      locator: "https://en.wikipedia.org/wiki/Centrality — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CLOSENESS_NORMALIZA_POR_TAMANHO
     node_type: evidence
@@ -143,6 +163,10 @@ nodes:
     source_kind: aggregator
     label: 'CONFIRMADA (tier 6, 3-0): "A normalizacao de closeness centrality (multiplicando por N-1, onde N e o numero de nos) existe especificamente para permitir comparacoes entre nos de grafos de tamanhos diferentes." Corrobora E_FREEMAN_CENTRALIZATION_NORMALIZADA por um segundo caminho: normalizar por TAMANHO nao e refinamento opcional, e a condicao de existencia da comparacao entre grafos.'
     trace: 'https://en.wikipedia.org/wiki/Centrality'
+    provenance:
+      source: "https://en.wikipedia.org/wiki/Centrality"
+      locator: "https://en.wikipedia.org/wiki/Centrality — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_NAMED_GRAPHS_URI_PROVENIENCIA
     node_type: evidence
@@ -156,6 +180,10 @@ nodes:
     source_kind: aggregator
     label: 'CONFIRMADA (tier 6, 3-0): "RDF Named Graphs identificam um conjunto de statements (um grafo) usando uma URI, permitindo descrever esse conjunto com contexto e informacao de proveniencia — sem fundir os grafos numa fonte unica." Impacto 2 (o mais baixo da rodada) porque RATIFICA o que o Onion ja construiu: o .kg.yaml ja tem identidade por caminho e o --open-tsv ja emite o ARQUIVO na 1a coluna. Evidencia que so confirma o status quo nao testa nada — ver E_OBJECAO_7.'
     trace: 'https://en.wikipedia.org/wiki/Named_graph'
+    provenance:
+      source: "https://en.wikipedia.org/wiki/Named_graph"
+      locator: "https://en.wikipedia.org/wiki/Named_graph — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBSIDIAN_LINK_QUALIFICADO_NAMESPACE
     node_type: evidence
@@ -170,6 +198,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 5, 3-0): "O plugin Multi-Vault Navigator usa sintaxe de link explicito qualificado por namespace [[VaultName::NoteTitle]] para referenciar notas de outro vault sem fundir os dados dos vaults." Confianca 0.6: e UMA implementacao de terceiro num repo pessoal, nao precedente de industria — e e precedente de SINTAXE apenas, silente sobre validacao do alvo. Ver E_OBJECAO_8.'
     trace: 'https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian'
+    provenance:
+      source: "https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian"
+      locator: "https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MULTIVAULT_MCP_SEM_VIEW_AGREGADA
     node_type: evidence
@@ -184,6 +216,10 @@ nodes:
     source_kind: engineer
     label: 'CONFIRMADA (tier 5, 2-1): "O obsidian-multivault-mcp roteia cada usuario para seu proprio vault privado isolado, sem nenhuma view agregada ou comparativa entre vaults." Confianca 0.5 (a mais baixa da rodada): tier 5, voto 2-1, e a afirmacao e de AUSENCIA num unico projeto — ausencia de feature em uma implementacao nao e evidencia de que a feature seja anti-padrao. Ver E_OBJECAO_9.'
     trace: 'https://github.com/bepitulaz/obsidian-multivault-mcp'
+    provenance:
+      source: "https://github.com/bepitulaz/obsidian-multivault-mcp"
+      locator: "https://github.com/bepitulaz/obsidian-multivault-mcp — verificacao adversarial 2 votos a favor, 1 refutacao (2-1)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_W3C_MERGE_E_ESCOLHA_EXPLICITA
     node_type: evidence
@@ -197,6 +233,10 @@ nodes:
     source_kind: primary
     label: 'CONFIRMADA (tier 10, 3-0): "A alternativa de tratar o grafo default como a uniao (merge) de todos os grafos nomeados de um dataset e uma semantica formalmente reconhecida (secao 3.2 do documento), mas e uma opcao entre varias, nao a recomendacao unica do padrao — implicando que fundir grafos brutos e uma escolha de design explicita e nao neutra." E a evidencia tier 10 mais forte da rodada e ela CORTA PARA OS DOIS LADOS: fundir e legitimo (o padrao cataloga a semantica), logo reprovar O1 "porque o W3C nao endossa" e racionalizacao — ver E_OBJECAO_10.'
     trace: 'https://www.w3.org/TR/rdf11-datasets/'
+    provenance:
+      source: "https://www.w3.org/TR/rdf11-datasets/"
+      locator: "https://www.w3.org/TR/rdf11-datasets/ secao 3.2 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── EIXO MERCADO/CAPITAL (invariante — cláusula 4) ───────────────────────────────────
   - id: E_MERCADO_KG_MULTI_GRAPH_0904
@@ -211,6 +251,10 @@ nodes:
     source_kind: aggregator
     label: 'MERCADO: SEM SINAL DE CAPITAL nesta rodada. Nenhum funding, M&A ou nota de analista sobre "visao agregada de N grafos peer". O unico sinal comercial adjacente e de FORNECEDOR, nao de capital: a Neo4j empacota Composite Databases (ex-Fabric) como o produto para consultar N grafos separados numa query so — o incumbente monetiza a CAMADA DE ABSTRACAO DE CONSULTA FEDERADA (database aliases), explicitamente SEM duplicar dados e SEM permitir arestas cross-grafo. Leitura para a decisao: (a) o mercado precifica CONSULTA cross-grafo, nao METRICA cross-grafo — ninguem vende "atencao comparavel entre grafos", o que significa que a sub-pergunta (1) nao tem incumbente a copiar nem concorrente a temer; (b) a ausencia de capital e ela propria um dado: "N grafos, 1 visao" nao e um mercado, e uma necessidade interna de quem ja tem N grafos — coerente com D_anti_catalogo (nao construir painel/admin platform); (c) o que o mercado VALIDA e o formato ponteiro (proxy node), que e exatamente a metade barata de O5.'
     trace: 'https://neo4j.com/docs/operations-manual/current/fabric/'
+    provenance:
+      source: "https://neo4j.com/docs/operations-manual/current/fabric/"
+      locator: "busca do eixo mercado/capital nesta rodada — nenhuma rodada de investimento, M&A ou nota de analista colhida sobre \"visao agregada de N grafos de conhecimento peer\" (KG pessoal ou organizacional); unico sinal adjacente e de FORNECEDOR: https://neo4j.com/docs/operations-manual/current/fabric/"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   # ── LACUNAS DECLARADAS (cláusula 8: lacuna vira nó) ──────────────────────────────────
   - id: E_LACUNAS_KG_MULTI_GRAPH_0904
@@ -324,6 +368,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 1 — o achado 1 e argumento-de-ausencia e NAO discrimina nenhuma das 4 decisoes: "nao ha solucao unica" e compativel com O1, O2, O3, O5 e O6 simultaneamente. Pior: o proprio achado 10 mostra que o documento ENUMERA semanticas candidatas (secao 3.2 merge, named-graph-as-context), logo "nao tem solucao" e falso no nivel que importa — tem varias, catalogadas. Citado como suporte a "manter o radar de arquivo unico" seria RACIONALIZACAO. O que de fato sustenta O2 e local e medido: o kg-radar.sh tem ZERO acesso a filesystem (0 chamadas system()/getline<); e awk puro sobre um arquivo, e essa pureza e load-bearing — e o que o faz rodar sob `env -i` (kg-trace-resolve.sh l.19-23). A indecisao do W3C nao entra na fundamentacao.'
     trace: '.claude/validation/kg-trace-resolve.sh'
+    provenance:
+      source: ".claude/validation/kg-trace-resolve.sh"
+      locator: "E_W3C_SEM_SEMANTICA_UNICA_DATASETS (https://www.w3.org/TR/rdf11-datasets/) cruzada com E_W3C_MERGE_E_ESCOLHA_EXPLICITA (mesma fonte, secao 3.2) e com a medicao local: grep -c \"system(|getline <|getline<\" .claude/validation/kg-radar.sh -> 0 (executado 2026-09-04); kg-trace-resolve.sh l.19-23"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_2_SERVICE_PRESSUPOE_ENDPOINT_VIVO
     node_type: evidence
@@ -350,6 +398,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 3 — Composite database e feature de EDICAO ENTERPRISE com planner de consulta em servidor: e literalmente uma admin platform, exatamente o que D_anti_catalogo (confirmed 2026-08-01) proibe herdar. E e vendor doc (tier 8) descrevendo o que a Neo4j VENDE. Falha critica de ESCOPO para a pergunta real: composite/Fabric resolve CONSULTA cross-grafo e e SILENTE sobre ALGORITMO/METRICA cross-grafo (no Neo4j, GDS roda sobre uma projecao por vez). O achado, portanto, nada diz sobre "atencao comparavel entre verticais" — e cita-lo ali seria transferir autoridade de um dominio (consulta) para outro (metrica), que e o modo de falha classico de evidencia emprestada.'
     trace: 'docs/evolution/research/stack-harmonia-2026-08'
+    provenance:
+      source: "docs/evolution/research/stack-harmonia-2026-08"
+      locator: "E_NEO4J_COMPOSITE_QUERY_N_GRAFOS (https://neo4j.com/docs/operations-manual/current/fabric/ — vendor doc tier 8, edicao Enterprise) cruzada com o corpus: stack-harmonia-2026-08/D_anti_catalogo (confirmed 2026-08-01, \"nao construir admin platform/painel agregado\")"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_4_PROXY_NODE_SEM_INTEGRIDADE_REFERENCIAL
     node_type: evidence
@@ -363,6 +415,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 4 — a mais decisiva e a mais perigosa se lida como licenca: proxy node NAO tem integridade referencial; e convencao documentada como CONTORNO, nao mecanismo. Medido nesta casa que a classe custa caro: kg-trace-resolve.sh l.10-12 registra 54 grafos, 1.659 nos com `trace:` -> 13 PONTEIROS MORTOS (arquivo movido, prefixo perdido, reorganizacao). E o unico guard de orfao do motor e INTRA-arquivo (kg-radar.sh l.744, grau 0). Logo a objecao sobrevive como CONSTRAINT dura: qualquer `file:id` so entra ACOMPANHADO de um resolver-irmao HARD (padrao kg-trace-resolve.sh), senao nasce a mesma mentira silenciosa ja medida — behavior-over-declaration aplicado a propria ancora.'
     trace: '.claude/validation/kg-trace-resolve.sh'
+    provenance:
+      source: ".claude/validation/kg-trace-resolve.sh"
+      locator: "E_NEO4J_ARESTA_NAO_ATRAVESSA_PROXY_NODE (https://neo4j.com/docs/operations-manual/current/fabric/) cruzada com medicao local: kg-trace-resolve.sh l.10-12 registra \"54 grafos, 1.659 nos com trace: -> 13 ponteiros mortos (7 por arquivo movido para _processed/, 4 por prefixo perdido, 2 por reorganizacao)\"; e grep -n orfao .claude/validation/kg-radar.sh -> l.744 `if (deg[id] == 0) print \"✗ no orfao (grau 0)\"` — unico guard de orfao do motor, INTRA-arquivo"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_5_ATENCAO_COM_GRAU_BRUTO_NAO_E_COMPARAVEL
     node_type: evidence
@@ -376,6 +432,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 5 — sobrevive como REFUTACAO DA PREMISSA "a regua e a mesma formula, logo e comparavel". Medido: a atencao do Onion e `impact x confidence x statusFactor x (1 + deg)` com GRAU BRUTO, sem normalizacao (kg-radar.sh l.354, 407, 446, 457, 487). Dispersao do corpus medida hoje: 882 nos / 1.087 arestas (federation-research-2026-06-reconciled) contra grafos de ~10 nos. Formula identica sobre grau bruto NAO e regua comparavel: e regua que premia VERBOSIDADE DE MODELAGEM — quem desenha um grafo denso ganha atencao alta sem ganhar importancia. Freeman diz o oposto do que o instinto assume: comparar ENTRE redes exige normalizar (dividir pelo maximo teorico da rede daquele tamanho), e o Onion nao normaliza.'
     trace: '.claude/validation/kg-radar.sh'
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "E_FREEMAN_CENTRALIZATION_NORMALIZADA + E_CLOSENESS_NORMALIZA_POR_TAMANHO (https://en.wikipedia.org/wiki/Centrality) cruzadas com medicao local: .claude/validation/kg-radar.sh l.354/407/446/457/487 -> att[id] = impact[id] * conf[id] * sf * (1 + deg[id]) com deg incrementado cru em l.303/316, ZERO normalizacao por tamanho; dispersao do corpus medida hoje: docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml = 882 nos / 1.087 arestas contra grafos de ~10 nos"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_6_DEFEITO_JA_VIVO_NO_BACKLOG_MD
     node_type: evidence
@@ -389,6 +449,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 6 — o defeito JA ESTA VIVO em producao; nao e hipotese do adotante futuro. docs/backlog.md agrega 122 itens de 36 grafos e ORDENA OS GRUPOS pela maior atencao do grupo (kg-backlog-project.sh l.175-179), comparando crus numeros produzidos por grafos de densidades diferentes. Ou seja: a sub-pergunta (1) NAO e sobre criar comparabilidade cross-grafo — e sobre CONSERTAR uma comparabilidade que o core ja pratica sem ter provado. Consequencia para a decisao: aprovar O1 ou O2 (e O7, que e o mesmo script) sem resolver a normalizacao multiplica o defeito por 4 verticais e lhe da a aparencia de mecanismo. A normalizacao deixa de ser refinamento e vira PRE-CONDICAO de qualquer agregacao.'
     trace: 'docs/backlog.md'
+    provenance:
+      source: "docs/backlog.md"
+      locator: "medicao local 2026-09-04: docs/backlog.md l.8 \"122 itens abertos em 36 grafo(s) com aberto (de 58 no escopo) · 36 grupo(s)\"; .claude/validation/kg-backlog-project.sh l.175-179 comentario \"grupos ordenados por MAIOR atencao do grupo\" + `sort -t$\\t -k1,1nr`; ordem renderizada hoje coloca plugin-mcp-posture-2026-09 acima de m3-federation-admin-2026-07"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_7_NAMED_GRAPH_SO_RATIFICA_STATUS_QUO
     node_type: evidence
@@ -402,6 +466,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 7 — verdadeiro e inutil aqui: o .kg.yaml JA tem identidade por arquivo/caminho e o `--open-tsv` JA emite a 1a coluna ARQUIVO exatamente com essa funcao (kg-radar.sh l.390; corpus medido hoje = 88 grafos). O achado confirma o que ja esta construido e nao avanca nenhuma das 4 perguntas. Confirmar o status quo com fonte externa tier 6 e o modo de falha "evidencia que so ratifica" — nao testa nada, e infla a sensacao de fundamentacao da rodada. Registrado para que a proxima rodada nao o conte como suporte a uma opcao.'
     trace: '.claude/validation/kg-radar.sh'
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "E_NAMED_GRAPHS_URI_PROVENIENCIA (https://en.wikipedia.org/wiki/Named_graph, tier 6) cruzada com medicao local: .claude/validation/kg-radar.sh l.390 — \"a fila do corpus e o laco de quem chama — por isso a 1a coluna e o ARQUIVO, sem a qual o id sozinho nao localiza nada num corpus\"; git ls-files \"*.kg.yaml\" | grep -v /fixtures/ | wc -l -> 88 grafos"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_8_SINTAXE_SEM_RESOLVER_NAO_GARANTE
     node_type: evidence
@@ -415,6 +483,10 @@ nodes:
     source_kind: measurement
     label: 'OBJECAO SOBREVIVENTE 8 — tier 5, plugin de terceiro num repo pessoal do GitHub: nao e precedente de industria, e UMA implementacao. E e precedente de SINTAXE apenas — nada na evidencia diz que o plugin VALIDA que `Vault::Nota` existe. Adotar a sintaxe sem o resolver reproduz exatamente os 13 ponteiros mortos ja medidos no corpus. A objecao sobrevive assim: se este achado for a base de O5, ele contribui A FORMA e ZERO DA GARANTIA — e a garantia e a parte cara. O5 sem resolver-irmao HARD nao e O5; e a metade barata dele com o nome da metade cara.'
     trace: 'https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian'
+    provenance:
+      source: "https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian"
+      locator: "E_OBSIDIAN_LINK_QUALIFICADO_NAMESPACE (https://github.com/Finarfin12/Multi-Vault-Plugin-Obsidian, tier 5, plugin de terceiro em repo pessoal) cruzada com kg-trace-resolve.sh l.10-12 (13 ponteiros mortos medidos em 1.659 `trace:`)"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_9_AUSENCIA_EM_UMA_IMPLEMENTACAO_NAO_E_ANTIPADRAO
     node_type: evidence
@@ -428,6 +500,10 @@ nodes:
     source_kind: engineer
     label: 'OBJECAO SOBREVIVENTE 9 (registro honesto: o texto do Elenxo chegou TRUNCADO neste handoff; abaixo so o que e derivavel do achado e dos votos) — o achado 9 e uma afirmacao de AUSENCIA numa unica implementacao tier 5, com voto 2-1, o mais fraco da rodada. Ausencia de view agregada em UM projeto de um engenheiro nao estabelece que agregar seja anti-padrao; estabelece apenas que aquele projeto tinha outro escopo (roteamento por usuario). Usa-lo como sustentacao de O3 seria construir uma posicao de desenho sobre a nao-implementacao alheia. LIMITE que sobrevive: se O3 for selado, precisa de razao propria e medida, nao desta.'
     trace: 'https://github.com/bepitulaz/obsidian-multivault-mcp'
+    provenance:
+      source: "https://github.com/bepitulaz/obsidian-multivault-mcp"
+      locator: "E_MULTIVAULT_MCP_SEM_VIEW_AGREGADA (https://github.com/bepitulaz/obsidian-multivault-mcp, tier 5, voto 2-1); ⚠️ o texto integral desta objecao chegou TRUNCADO no handoff do Elenxo (\"kind\":\"fi...) — o que segue e derivado do proprio achado 9 e do seu tier/votos, sem completar por adivinhacao"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_OBJECAO_10_W3C_MERGE_LEGITIMA_FUNDIR
     node_type: evidence
@@ -441,6 +517,10 @@ nodes:
     source_kind: primary
     label: 'OBJECAO SOBREVIVENTE 10 — a evidencia tier 10 mais forte da rodada CORTA CONTRA a recomendacao, e por isso fica escrita: o W3C reconhece formalmente a semantica de merge (secao 3.2), logo FUNDIR grafos e escolha de design legitima e catalogada, nao heresia. Duas consequencias que limitam o veredito. (i) Quem reprovar O1 citando "o padrao nao endossa agregacao" esta RACIONALIZANDO — a reprovacao de O1 se sustenta em uma razao local (awk puro sem filesystem) e em outra medida (grau bruto nao comparavel), e em nenhuma fonte externa. (ii) O3 nao ganha apoio do padrao: "cada grafo julgado sozinho" e uma escolha entre varias, no mesmo pe que merge. A objecao sobrevive como guarda contra pos-racionalizacao: se a recomendacao mudar de fundamento, ela precisa mudar de EVIDENCIA junto.'
     trace: 'https://www.w3.org/TR/rdf11-datasets/'
+    provenance:
+      source: "https://www.w3.org/TR/rdf11-datasets/"
+      locator: "E_W3C_MERGE_E_ESCOLHA_EXPLICITA (https://www.w3.org/TR/rdf11-datasets/ secao 3.2, tier 10, 3-0) — a evidencia de maior autoridade da rodada, lida contra a tentacao de usar o achado 1 para reprovar O1"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   # ── evidência web -> pergunta ────────────────────────────────────────────────────────

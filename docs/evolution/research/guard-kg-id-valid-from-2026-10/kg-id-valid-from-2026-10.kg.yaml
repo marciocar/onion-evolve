@@ -21,6 +21,10 @@ nodes:
     verified_against: 'yaml.safe_load sobre os 138 .kg.yaml do core (fora fixtures e materials): 12 ids SYNTHESIS.md_* (29 ocorrencias) num grafo; 6 valid_from inteiros em 4 grafos; 6 grafos sem schema_version, 9 sem meta.id, 7 com schema_version inteiro. Depois da cura: 0 em todas as contagens.'
     trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
     label: 'O DEFEITO, DATADO: em 2026-10-07 um sinal de campo trouxe a medicao de um leitor tipado do corpus do core, e ela se reproduziu aqui pelo mesmo metodo. O radar awk aprovava tudo, porque le texto: id com ponto e ano sem aspas so viram defeito para um leitor que tipa o YAML. Dois leitores discordando do mesmo byte e a classe.'
+    provenance:
+      source: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
+      locator: "yaml.safe_load sobre os 138 .kg.yaml do core (fora fixtures e materials): 12 ids SYNTHESIS.md_* (29 ocorrencias) num grafo; 6 valid_from inteiros em 4 grafos; 6 grafos sem schema_version, 9 sem meta.id, 7 com schema_version inteiro. Depois da cura: 0 em todas as contagens."
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_ORIGEM_DOS_IDS_FOI_MODELAGEM_A_MAO
     node_type: evidence
@@ -32,6 +36,10 @@ nodes:
     verified_against: 'git log -S SYNTHESIS.md_ no grafo: nasceu em e0bf994a (2026-07-21), commit que so toca o grafo e o baseline de cobertura; nenhum script gerador no repo produz o prefixo'
     trace: 'docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml'
     label: 'A CAUSA DOS IDS NAO TEM GERADOR A CURAR: os 12 ids nasceram numa modelagem feita por sessao, que usou o nome do documento-fonte como prefixo (G1_, G2_ ... e SYNTHESIS.md_ sem tirar a extensao). Sem gerador, a cura de causa e a cobranca no radar: a proxima sessao que errar recebe o HARD antes do commit.'
+    provenance:
+      source: "docs/onion/graph/federation-research-2026-06-reconciled.kg.yaml"
+      locator: "git log -S SYNTHESIS.md_ no grafo: nasceu em e0bf994a (2026-07-21), commit que so toca o grafo e o baseline de cobertura; nenhum script gerador no repo produz o prefixo"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_ID_FORA_DO_ALFABETO_REPROVA_NO_INTEGRITY
     node_type: decision
@@ -65,6 +73,10 @@ nodes:
     verified_against: 'kg-radar-integrity.sh --format tsv no core: 10 SOFT falsos (35 nos com valid_from entre aspas simples); 0 depois de ler a forma crua'
     trace: '.claude/validation/kg-radar.sh'
     label: 'FALSO POSITIVO DA 1a REDACAO, preservado: o aviso lia validFrom ja trimado, e o trim do radar tira as aspas, entao valid_from: ''2017'' parecia inteiro. O dogfood no corpus inteiro pegou antes do commit. O caso (h) da bancada existe por causa disto.'
+    provenance:
+      source: ".claude/validation/kg-radar.sh"
+      locator: "kg-radar-integrity.sh --format tsv no core: 10 SOFT falsos (35 nos com valid_from entre aspas simples); 0 depois de ler a forma crua"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_TETO_DATAS_ISO_SEM_ASPAS
     node_type: claim

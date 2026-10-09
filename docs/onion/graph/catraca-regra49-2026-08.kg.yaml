@@ -22,6 +22,10 @@ nodes:
     verified_against: mesma-mutacao-rodada-no-script-ANTIGO-e-no-NOVO-lado-a-lado
     label: "A prova nao e 'o novo passa' — e o par. MESMA mutacao (um no PROD/impact 5 de `confirmed` para `drifted`, sem medir nada), scripts lado a lado: ANTIGO devolve 'no escopo: 47' + SOFT [OBSOLETA] 'no ja carimbado ou removido' — afirmando um carimbo inexistente; NOVO devolve 'no escopo: 48', zero acusacao. Sem rodar o antigo eu teria so a metade que me favorece."
     trace: ".claude/validation/kg-verification-coverage.sh"
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "mesma-mutacao-rodada-no-script-ANTIGO-e-no-NOVO-lado-a-lado"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CUSTO_ZERO_PROVA_QUE_E_CURA_E_NAO_APERTO
     node_type: evidence
@@ -45,6 +49,10 @@ nodes:
     verified_against: quatro-rotas-de-fuga-exercitadas-uma-a-uma-no-corpus-real
     label: "A catraca vigiava o TAMANHO do baseline e nao o MOTIVO da mudanca — e por isso tinha quatro portas dos fundos equivalentes a encolhe-lo: reetiquetar para drifted, reetiquetar para refuted/superseded sem aresta, rebaixar plane PROD->DEV, rebaixar impact 5->3. Nenhuma delas mede coisa alguma, e as quatro faziam o numero cair. Contar entradas nao e vigiar direcao."
     trace: ".claude/validation/kg-verification-coverage.sh"
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "quatro-rotas-de-fuga-exercitadas-uma-a-uma-no-corpus-real"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_DENYLIST_EM_SITIO_UNICO
     node_type: decision
@@ -56,6 +64,10 @@ nodes:
     verified_against: selftest-h-cinco-status-vivos-dentro-do-escopo
     label: "O predicato vira DENYLIST num literal unico (`st != superseded && st != refuted`), e as duas varreduras identicas viram UMA. A denylist tem exatamente os dois estados em que o no DEIXA DE AFIRMAR sobre producao. drifted, unverifiable, done e open ficam DENTRO — drifted mais que todos, porque e o estado em que a reconciliacao e DEVIDA, e era por ele que a fuga passava."
     trace: ".claude/validation/kg-verification-coverage.sh"
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "selftest-h-cinco-status-vivos-dentro-do-escopo"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_CINCO_SAIDAS_CLASSIFICADAS_CONTRA_O_VIVO
     node_type: decision
@@ -67,6 +79,10 @@ nodes:
     verified_against: selftests-i-a-n-uma-saida-por-caso
     label: "O SOFT unico [OBSOLETA] ('no ja carimbado ou removido') vira CINCO saidas julgadas contra o vivo: CARIMBADO (ganhou verified_at) e RECONCILIADO (refuted/superseded COM a aresta) e REMOVIDO (sumiu do arquivo) sao SOFT; FUGA-SEM-ARESTA e FUGA-DE-ESCOPO sao HARD. A mensagem antiga AFIRMAVA um carimbo sem nunca ter olhado se existia — declarado != verificado dentro do instrumento que existe para cobrar verificacao."
     trace: ".claude/validation/kg-verification-coverage.sh"
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "selftests-i-a-n-uma-saida-por-caso"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ⚠️ SUPERSEDIDO pelo Elenxo (E_MEDICAO_NAO_OBSERVADA_ERA_MINHA). O rótulo abaixo NÃO foi reescrito:
   # ele continua afirmando o que eu afirmei, que é o único jeito de a escada ficar legível.
@@ -80,6 +96,10 @@ nodes:
     verified_against: os-3-nos-refuted-superseded-sem-carimbo-do-corpus-real
     label: "Sem a checagem de aresta o guarda acusaria TRES CONFORMIDADES. Medido antes de escrever: os unicos nos PROD/impact>=4 `refuted|superseded` sem carimbo do corpus (C2_AUTOMATE_READY, C_VERTICALS_EMPTY, E_ORBIT) TEM cada um a sua aresta REFUTES/SUPERSEDES. Refutar com aresta e obediencia a gramatica do KG; puni-la seria repetir os tres falsos-positivos HARD que o Elenxo da REGRA 57 derrubou."
     trace: "docs/onion/graph/elenxos-2026-08-07.kg.yaml"
+    provenance:
+      source: "docs/onion/graph/elenxos-2026-08-07.kg.yaml"
+      locator: "os-3-nos-refuted-superseded-sem-carimbo-do-corpus-real"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_GUARDA_QUE_PUNE_CONFORMIDADE_E_PIOR_QUE_NENHUMA
     node_type: claim
@@ -91,6 +111,10 @@ nodes:
     verified_against: reincidencia-em-dois-dias-REGRA-57-e-REGRA-49
     label: "Tese que ja reincidiu: uma guarda cujo falso-positivo dispara para quem OBEDECE a doutrina ensina a ignorar a guarda, e o custo e maior que o de nao te-la. Na REGRA 57 foram 3 falsos-positivos HARD achados pelo Elenxo DEPOIS de escrita; aqui a mesma classe foi antecipada MEDINDO o corpus antes — o que mudou nao foi o cuidado, foi a ordem: medir a populacao antes de escrever o predicado."
     trace: "docs/evolution/review/feat-kg-seal-check.md"
+    provenance:
+      source: "docs/evolution/review/feat-kg-seal-check.md"
+      locator: "reincidencia-em-dois-dias-REGRA-57-e-REGRA-49"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── O ACHADO QUE VEIO DE FORA: O TESTE DO TESTE ─────────────────────────────────────────────
   - id: E_MUTATION_TEST_SOBREVIVEU_A_FIXTURE_MORTA
@@ -103,6 +127,10 @@ nodes:
     verified_against: sabotagem-deliberada-da-fixture-8-de-9-casos-morreram-1-sobreviveu
     label: "Sabotei o gerador de fixture de proposito (todo no nascendo plane:DEV impact:1) para ver quais dos 9 casos novos passavam por vacuidade. Oito morreram. UM sobreviveu — o mutation test (o) — e a razao e estrutural: ele afirma uma AUSENCIA de acusacao, e ausencia e exatamente o que uma fixture morta entrega de graca. O `cmp` provava que a MUTACAO fora aplicada; nada provava que a FIXTURE estava viva."
     trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "sabotagem-deliberada-da-fixture-8-de-9-casos-morreram-1-sobreviveu"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_TESTE_QUE_AFIRMA_AUSENCIA_PASSA_DE_GRACA
     node_type: claim
@@ -114,6 +142,10 @@ nodes:
     verified_against: 8-casos-que-afirmam-PRESENCA-morreram-1-que-afirma-ausencia-sobreviveu
     label: "Regra que a sabotagem entregou de graca: teste que afirma a PRESENCA de algo morre junto com a fixture; teste que afirma a AUSENCIA de algo sobrevive a ela. Isso da uma triagem barata e mecanica — para cada asserção negativa, perguntar 'o que garante que o caminho feliz ainda funciona aqui?'. Nao e sobre atencao; e sobre a forma da asserção."
     trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "8-casos-que-afirmam-PRESENCA-morreram-1-que-afirma-ausencia-sobreviveu"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_PROVA_MUTACAO_COBRA_AS_TRES_CONDICOES
     node_type: decision
@@ -125,6 +157,10 @@ nodes:
     verified_against: helper-unico-usado-por-3-mutation-tests-acusando-FIXTURE-MORTA-por-nome
     label: "A licao vira CHAMADOR OBRIGATORIO, nao comentario: `_prova_mutacao` cobra as tres condicoes de um mutation test — (1) a mutacao foi APLICADA (cmp, nao grep de padrao: em 2026-08-07 o padrao aparecia no arquivo intacto, na propria linha do sed); (2) o INTACTO satisfaz o caso (senao a fixture esta morta); (3) o MUTANTE nao satisfaz. Quem escrever o proximo nao precisa lembrar da licao — ela esta no helper que ele chama."
     trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "helper-unico-usado-por-3-mutation-tests-acusando-FIXTURE-MORTA-por-nome"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── O ACHADO QUE VEIO DA HIGIENE (F5) ───────────────────────────────────────────────────────
   # ⚠️ REFUTADO no mesmo dia, por E_O_DEFEITO_DO_GIT_DIR_JA_ESTAVA_CURADO. O rótulo NÃO foi
@@ -159,6 +195,10 @@ nodes:
     verified_against: lint-do-main-rodado-com-e-sem-GIT_DIR-em-sandbox-git-0-e-0-violacoes
     label: "REFUTA o no acima, e o erro foi meu. Diagnostiquei o GIT_DIR olhando SO o worktree e conclui defeito de familia em ~35 scripts, com PR proprio. Medido depois: o lint do MAIN da 0 violacoes com e sem GIT_DIR — a cura (`_gen_into`, que separa QUEBRA de DRIFT e captura rc/stderr do gerador) foi medida e embarcada em 2026-08-04, e ha selftests dedicados (`gerador-quebrado` a/b/c) cujo cabecalho nomeia esse mesmo gatilho. O que eu encontrei foi um worktree com lint de 2026-07-17, ANTERIOR a cura. Instancia exata de C_NOTA_DE_SESSAO_E_HIPOTESE_ATE_SER_MEDIDA cometida por mim: medi o sintoma num checkout velho e nao perguntei se o vivo ja o resolvia."
     trace: ".claude/validation/lint-artifacts.sh"
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh"
+      locator: "lint-do-main-rodado-com-e-sem-GIT_DIR-em-sandbox-git-0-e-0-violacoes"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_MEDIR_NO_CHECKOUT_VELHO_E_MEDIR_O_PASSADO
     node_type: claim
@@ -170,6 +210,10 @@ nodes:
     verified_against: um-defeito-de-familia-inventado-e-um-PR-que-teria-sido-desperdicio
     label: "Regra pratica que sai daqui: worktree, sandbox e copia vendorizada carregam a DATA do checkout, nao o estado do vivo. Antes de declarar defeito a partir de um deles, reproduzir no HEAD do main — custa um comando e evita inventar defeito de familia. Sem isso eu teria aberto um PR para consertar algo consertado quatro dias antes, e o unico sinal de que estava errado veio de um selftest FALHANDO por outro motivo."
     trace: "docs/evolution/review/fix-catraca-regra49.md"
+    provenance:
+      source: "docs/evolution/review/fix-catraca-regra49.md"
+      locator: "um-defeito-de-familia-inventado-e-um-PR-que-teria-sido-desperdicio"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_BRANCH_MAESTRO_ASIDE_ERA_MORTA_DE_FATO
     node_type: evidence
@@ -204,6 +248,10 @@ nodes:
     verified_against: tres-bypass-reproduzidos-pelo-juiz-e-refeitos-por-mim-em-sandbox
     label: "O eixo do PR sobreviveu; a AFIRMACAO DE FECHO nao. Tres rotas continuavam abertas, DUAS delas sem forjar nada: (1) apagar a linha do baseline no MESMO commit — o laco era dirigido por `known`, entao a chave apagada sumia do julgamento (exit 0, 47, zero VIOLATION); (2) a DIRECAO da aresta — `tem_aresta` casava origem OU alvo, e 8 das 48 entradas reais sao `from` de um REFUTES/SUPERSEDES: fugiam com UM `sed`; (3) self-edge de 3 linhas comprava RECONCILIADO. O custo do bypass tinha subido de um `sed` para um `sed` + um `grep -v` — e o desenho punia quem deixava rastro e libertava quem o apagava."
     trace: "docs/evolution/review/fix-catraca-regra49.md"
+    provenance:
+      source: "docs/evolution/review/fix-catraca-regra49.md"
+      locator: "tres-bypass-reproduzidos-pelo-juiz-e-refeitos-por-mim-em-sandbox"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_ALIBI_POR_PROXIMIDADE_NAO_E_RECONCILIACAO
     node_type: claim
@@ -215,6 +263,10 @@ nodes:
     verified_against: predicado-reescrito-e-6-mutacoes-que-sobreviviam-passando-a-acusar
     label: "A raiz das tres rotas e uma so: o predicado perguntava 'existe uma aresta POR PERTO?' quando a pergunta e 'ALGUEM, que nao ele mesmo, o reconciliou?'. Alibi por proximidade nao e prova. O predicado passa a exigir aresta ENTRANDO (o no e o `to`), com as DUAS PONTAS distintas, de qualquer um dos dois tipos de reconciliacao — e derivar o tipo do status estava errado de ida e de volta, porque o `kg-radar.sh:620-621` SANCIONA reconciliar um REFUTES como `superseded`."
     trace: ".claude/validation/kg-verification-coverage.sh"
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "predicado-reescrito-e-6-mutacoes-que-sobreviviam-passando-a-acusar"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_MEDICAO_NAO_OBSERVADA_ERA_MINHA
     node_type: evidence
@@ -226,6 +278,10 @@ nodes:
     verified_against: falsificacao-em-um-comando-pelo-juiz-48-SOFT-PASSIVO-zero-HARD
     label: "Eu escrevi no cabecalho do gate que 'sem a checagem de aresta o guarda acusaria 3 CONFORMIDADES'. O FATO de base era verdadeiro (os 3 nos existem e tem sua aresta); a CONSEQUENCIA era inventada, e o juiz a falsificou em um comando: hoje `--emit-baseline` e identico ao baseline versionado, o laco NUNCA EXECUTA no corpus real, e nenhum dos 3 esta no baseline — neutralizar a checagem da ZERO HARD. Medicao nao-observada no cabecalho do gate cuja tese e `declarado != verificado` e o defeito da REGRA 49 cometido DENTRO do instrumento."
     trace: ".claude/validation/kg-verification-coverage.sh"
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "falsificacao-em-um-comando-pelo-juiz-48-SOFT-PASSIVO-zero-HARD"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_MEMOIZACAO_MORTA_EM_SUBSHELL
     node_type: evidence
@@ -237,6 +293,10 @@ nodes:
     verified_against: cronometragem-no-estado-alvo-com-os-48-carimbados-saida-byte-identica
     label: "A memoizacao `UNIVERSO_CARREGADO` era MORTA: todo consumidor roda em command substitution, a atribuicao morria com o subshell e o universo era relido a cada chave. No estado-ALVO da propria catraca (os 48 medidos): 20,1s contra 0,67s do script substituido. Uma linha — `carrega_universo` icado ao escopo pai, onde os subshells HERDAM — leva a 7,2s com saida BYTE-IDENTICA. O gradiente estava invertido: quanto mais a doutrina fosse obedecida, mais lento ficaria o gate que a cobra."
     trace: ".claude/validation/kg-verification-coverage.sh"
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "cronometragem-no-estado-alvo-com-os-48-carimbados-saida-byte-identica"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_BANCADA_MORREU_CALADA_POR_SET_E
     node_type: evidence
@@ -248,6 +308,10 @@ nodes:
     verified_against: bancada-solo-abortando-duas-vezes-no-mesmo-caso-com-rc-1-e-zero-falhas
     label: "A bancada morreu DUAS vezes no mesmo ponto — rc=1, zero ✗, nenhuma soma — e eu li a primeira como colisao de corrida. Era deterministico, e eram TRES defeitos empilhados, todos do `set -euo pipefail` que meu runner isolado nao copiava: `cmd; rc=$?` mata a suite; `pipefail` faz `helper | grep -q` devolver o exit do HELPER, que sai 1 justamente quando ACHA HARD (o `_prova_mutacao` acusava FIXTURE MORTA sobre fixture viva); e `_g49` terminava em `[ -n \"$6\" ] && printf`, derrubando a suite antes do 1o caso. No meu runner: 16/16 verdes. Na bancada real: morta no caso 7."
     trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "bancada-solo-abortando-duas-vezes-no-mesmo-caso-com-rc-1-e-zero-falhas"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: D_TRAP_QUE_GRITA_QUANDO_A_SUITE_MORRE
     node_type: decision
@@ -259,6 +323,10 @@ nodes:
     verified_against: trap-provado-nos-dois-sentidos-grita-ao-abortar-cala-ao-chegar-ao-fim
     label: "A cura nao e atencao, e um trap de EXIT: se a suite terminar SEM imprimir a soma, ela DIZ isso, nomeia os dois suspeitos (`cmd; rc=$?` e pipefail) e manda copiar o `set` para runners extraidos. Mesma doutrina do `record_skip` uma camada acima — abort apresentado como veredito e vacuidade. Provado nos dois sentidos: grita quando morre, cala quando chega ao fim."
     trace: ".claude/validation/lint-selftest.sh"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "trap-provado-nos-dois-sentidos-grita-ao-abortar-cala-ao-chegar-ao-fim"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_RODADA
     node_type: claim
@@ -292,6 +360,10 @@ nodes:
     verified_against: git-mv-de-um-arquivo-tirando-5-entradas-de-uma-vez-com-exit-0
     label: "Divida que sai deste PR de proposito: um `git mv` de UM grafo para qualquer pasta `fixtures/` tirou CINCO entradas do baseline de uma vez, com o gate mandando remove-las e os nos intactos no disco, versionados, afirmando sobre producao. A cura exige resolver a chave por hash em TODO o universo antes de concluir remocao, mais uma classe MUDOU-DE-PATH para o rename legitimo — e mexe na convencao `grep -v '/fixtures/'` que e da casa inteira (kg-radar-integrity.sh:41), nao deste PR."
     trace: ".claude/validation/kg-radar-integrity.sh"
+    provenance:
+      source: ".claude/validation/kg-radar-integrity.sh"
+      locator: "git-mv-de-um-arquivo-tirando-5-entradas-de-uma-vez-com-exit-0"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_UPDATE_FILTER_REMOVIDO_COLLISION
     node_type: evidence
@@ -355,6 +427,10 @@ nodes:
     verified_against: "bancada run_vendor_baseline_removido_selftests (3 casos: A/GREEN baseline rastreado, B/GREEN vendor sem baseline=granaai, RED/MUT que remove o bloco entre marcadores e contamina os DOIS) + reproducoes isoladas dos dois estados + dogfood REAL num clone descartavel da granaai (nunca o repo real): update com o helper curado → vendor 0 chaves estrangeiras, develop sem baseline do core; update ANTIGO (fork, medido antes) → 47 REMOVIDO + vendor contaminado. A revisao adversarial (branch-code-reviewer) refutou minha 1a cura (checkout so cobria o estado A; no-op na granaai) — verificado e ESTENDIDO."
     trace: .claude/validation/lint-selftest.sh
     label: "REPRODUZIDO E CURADO por comportamento em AMBOS os estados de campo. A revisao adversarial pegou que a 1a versao (so `checkout`) era NO-OP na granaai (vendor sem baseline rastreado) — o dogfood real confirmou e a cura foi estendida (remove o untracked). Medir no repo do core dava 47 falso (testar-no-caminho-errado); o cwd tem de ser a arvore do ADOTANTE"
+    provenance:
+      source: ".claude/validation/lint-selftest.sh"
+      locator: "bancada run_vendor_baseline_removido_selftests (3 casos: A/GREEN baseline rastreado, B/GREEN vendor sem baseline=granaai, RED/MUT que remove o bloco entre marcadores e contamina os DOIS) + reproducoes isoladas dos dois estados + dogfood REAL num clone descartavel da granaai (nunca o repo real): update com o helper curado → vendor 0 chaves estrangeiras, develop sem baseline do core; update ANTIGO (fork, medido antes) → 47 REMOVIDO + vendor contaminado. A revisao adversarial (branch-code-reviewer) refutou minha 1a cura (checkout so cobria o estado A; no-op na granaai) — verificado e ESTENDIDO."
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: E_GRANAAI_NOBASELINE_PREEXISTING
     node_type: evidence
     layer: audit
@@ -366,6 +442,10 @@ nodes:
     verified_against: "clone da granaai, develop PRE-update (aa7732e6, sem meu update): a catraca ja emite [kg-verificacao/NO-BASELINE] baseline AUSENTE, rc=1. Nenhuma branch da granaai (develop/vendor/main/feat/*) rastreia kg-verification-baseline.txt. Logo o NO-BASELINE independe do --update — e estado PRE-catraca do adotante."
     trace: .claude/validation/kg-verification-coverage.sh
     label: "A granaai esta em estado PRE-catraca: nunca teve baseline de catraca proprio, entao a catraca fail-close (NO-BASELINE) independentemente de qualquer update. O '47 REMOVIDO' que o fork viu era o baseline ESTRANGEIRO do core chegando (a unica fonte de baseline que ela ja teve) e sendo filtrado — sintoma da contaminacao, nao do NO-BASELINE. Curada a contaminacao, o NO-BASELINE aflora como o problema de base, separado"
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "clone da granaai, develop PRE-update (aa7732e6, sem meu update): a catraca ja emite [kg-verificacao/NO-BASELINE] baseline AUSENTE, rc=1. Nenhuma branch da granaai (develop/vendor/main/feat/*) rastreia kg-verification-baseline.txt. Logo o NO-BASELINE independe do --update — e estado PRE-catraca do adotante."
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
   - id: D_ADOPT_MUST_EMIT_MISSING_BASELINES
     node_type: decision
     layer: audit
@@ -377,6 +457,10 @@ nodes:
     verified_against: "implementado: regen-baselines.sh ganhou --ensure-from <SOURCE> (semeia stub p/ cada baseline que o core define mas o alvo NAO tem; o loop --auto emite do CORPUS DO ADOTANTE). adopt.md passa --ensure-from no update. Provado por reproducao (adotante pre-catraca: catraca rc 1→0) + DOGFOOD REAL num clone da granaai (update+ensure-from → kg-verification-coverage rc=0, HARD:0, NO-BASELINE resolvido, baseline emitido do corpus dela com 0 chaves). Selftest run_regen_ensure_from_selftests 2/2 (a: cura; b/MUT: sem a flag o NO-BASELINE persiste = load-bearing)."
     trace: .claude/utils/adopt/regen-baselines.sh
     label: "FOLLOW-UP (gatilho: a granaai — ou qualquer adotante PRE-catraca — precisa passar o lint): o fluxo de --update/adopt deve GARANTIR que os *-baseline.txt exigidos EXISTAM na integracao, EMITINDO do corpus do ALVO quando ausentes (regen so processa baseline ja presente; nao cria o que falta). Fecha o NO-BASELINE de E_GRANAAI_NOBASELINE_PREEXISTING e o gap 'baseline de catraca NOVO do core → adotante emite o proprio'. Escopo SEPARADO da cura de contaminacao (nao mistura). Alternativa mais barata: o adotante roda `kg-verification-coverage.sh --emit-baseline` uma vez"
+    provenance:
+      source: ".claude/utils/adopt/regen-baselines.sh"
+      locator: "implementado: regen-baselines.sh ganhou --ensure-from <SOURCE> (semeia stub p/ cada baseline que o core define mas o alvo NAO tem; o loop --auto emite do CORPUS DO ADOTANTE). adopt.md passa --ensure-from no update. Provado por reproducao (adotante pre-catraca: catraca rc 1→0) + DOGFOOD REAL num clone da granaai (update+ensure-from → kg-verification-coverage rc=0, HARD:0, NO-BASELINE resolvido, baseline emitido do corpus dela com 0 chaves). Selftest run_regen_ensure_from_selftests 2/2 (a: cura; b/MUT: sem a flag o NO-BASELINE persiste = load-bearing)."
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: D_SCRUB_FROZEN_POISON_IN_VENDORS
     node_type: decision
     layer: audit
@@ -408,6 +492,10 @@ nodes:
     verified_against: "kg-verification-coverage.sh --format tsv rodado no corpus real: 46 PASSIVO, ZERO das outras 4 classes (corpus limpo)"
     label: "AVANCO do 1o /meta:drive (dogfood da Fase 1, catraca --max-nodes 1): o driver pegou Q_PRIMEIRO_DOGFOOD (research, atencao 15) e mediu o estado REAL das 5 classes. Achado: o corpus emite SO PASSIVO (46 nos) de forma continua; as outras 4 (NO-BASELINE, REGRESSAO, OBSOLETA, CARIMBADO) so disparam em EVENTO TRANSITORIO — CARIMBADO ja disparou de verdade 1x (D_linha_vermelha, pre-commit do #691), as 2 HARD so quando alguem adiciona no nao-baselineado (fixtures do selftest) ou cresce o baseline. Consequencia: a premissa da Q ('100% sintetico') e agora medivelmente PARCIAL — PASSIVO e real-continuo, CARIMBADO disparou real 1x; falta exercitar de campo as 2 HARD (fora do selftest) e OBSOLETA. A Q segue open, mas mais afiada."
     trace: ".claude/validation/kg-verification-coverage.sh"
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "kg-verification-coverage.sh --format tsv rodado no corpus real: 46 PASSIVO, ZERO das outras 4 classes (corpus limpo)"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
   - id: E_CENSO0901_C_MESMA_CLASSE_MUDA_DE_CAMPO_A_CADA_
     node_type: evidence
     plane: PROD
@@ -417,6 +505,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: 'revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — git log --oneline -- .claude/validation/kg-verification-coverage.sh (histórico completo do'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A parte histórica do claim (duas classes confirmadas eram a mesma classe reaparecendo em campo diferente) segue verdadeira e já está registrada (edges SUPPORTS de E_O_FECHO_ERA_FALSO_TRES_ROTAS_ABERTAS e Q_GIT_MV_ESVAZIA_O_BASELINE_EM_LOTE, este último já `done`). Mas a PREVISÃO que o nó existe para'
+    provenance:
+      source: ".claude/validation/kg-verification-coverage.sh"
+      locator: "revisao-total do backlog (wf_2944480c-98f, 2026-09-01): DRIFTED 3/3 — git log --oneline -- .claude/validation/kg-verification-coverage.sh (histórico completo do"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: E_CENSO0901_Q_PRIMEIRO_DOGFOOD_REAL_DAS_CINCO_
     node_type: evidence
@@ -427,6 +519,10 @@ nodes:
     verified_at: 2026-09-01
     verified_against: '/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 4/4 — git log --oneline -- .claude/validation/kg-verification-baseline.txt (achei 88099af3 e e86'
     label: 'MEDIDO 2026-09-01, o vivo superou o no: A premissa central ("toda a evidência é sintética"; "o laço nunca executou no corpus real, nem uma vez") está morta: 3 dogfoods reais já ocorreram desde 2026-08-08 — REMOVIDO (08-24, <membro>), CARIMBADO (08-27, D_linha_vermelha) e mais 13 saídas medidas (09-01) — todos registrados NO PRÓPRIO grafo '
+    provenance:
+      source: ".claude/validation/kg-verification-baseline.txt"
+      locator: "/meta:census 2026-09-01 (wf_90dd73fe-cd2): DRIFTED 4/4 — git log --oneline -- .claude/validation/kg-verification-baseline.txt (achei 88099af3 e e86"
+      method: "juízes: provenance derivada na migração ao contrato v4 (caminho citado no verified_against; rota A1 da triagem); não reverificado"
 
   - id: E_A_DISCIPLINA_VIROU_MECANISMO_DE_PAINEL
     node_type: evidence
@@ -438,6 +534,10 @@ nodes:
     verified_against: "grep do texto `comando que a produziu` em testing-validation-system.md:499-501 e framework-testes.md:633-637, medido 2026-09-09"
     trace: 'docs/onion/testing-validation-system.md'
     label: "R0 2026-09-09 — a regra pratica que este no documentou NASCENDO como disciplina manual de sessao (2026-08-08, 'rode o comando antes de agir sobre a nota') foi GENERALIZADA E MECANIZADA em 2026-09-08 como norma de painel: 'nenhuma celula e impressa sem o comando que a produziu ao lado; metrica sem produtor imprime NAO MEDIDO'. Os dois exemplos do no seguem verificaveis e batem com o vivo — a branch feat/maestro-aside de fato nao existe mais, e fix-revisor-invisivel.md confirma verbatim a premissa medida como falsa. O no nao errou; ele descreve a ORIGEM, e hoje a regra e estrutural, exigida de qualquer painel novo."
+    provenance:
+      source: "docs/onion/testing-validation-system.md"
+      locator: "grep do texto `comando que a produziu` em testing-validation-system.md:499-501 e framework-testes.md:633-637, medido 2026-09-09"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_A_CURA_DO_GIT_DIR_VIVE_MAS_O_LINT_DO_MAIN_NAO_ESTA_LIMPO
     node_type: evidence
@@ -449,6 +549,10 @@ nodes:
     verified_against: 'lint-artifacts.sh rodado com e sem GIT_DIR, diff das violacoes VAZIO; contagem do main hoje, medido 2026-09-09'
     trace: '.claude/validation/lint-artifacts.sh (_gen_into)'
     label: "R0 2026-09-09 — o NUCLEO do no CONFIRMA-SE: com e sem GIT_DIR o lint produz a MESMA lista de violacoes (diff vazio), entao `_gen_into` de fato neutraliza o efeito de GIT_DIR sobre a deteccao de toplevel. O que ficou obsoleto e o `verified_against`, que cita literalmente '0 e 0 violacoes': o lint do main hoje sai com 2 HARD + 24 SOFT, por motivos ALHEIOS ao GIT_DIR (REGRA 19 plugins fora de sincronia, REGRA 49 baseline, REGRA 65 versao do Claude Code, REGRAS 74/77/78). E crescimento de 5 semanas de vida do repo, nao regressao do defeito que o no refuta — mas quem lesse o no sem re-medir concluiria 'o lint do main esta limpo', o que ja nao e verdade."
+    provenance:
+      source: ".claude/validation/lint-artifacts.sh (_gen_into)"
+      locator: "lint-artifacts.sh rodado com e sem GIT_DIR, diff das violacoes VAZIO; contagem do main hoje, medido 2026-09-09"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
 edges:
   # o defeito e a forma da cura

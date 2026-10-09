@@ -44,6 +44,10 @@ nodes:
     source_kind: aggregator
     label: 'CONFIRMADA (tier 3, 3-0): "CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION impoe um teto por sessao de chamadas WebSearch, com default de 200." Confianca travada em 0.6 pela clausula 7 da doutrina (tier <= 3 nunca acima de 0.7): agregador, sem fonte primaria confirmando.'
     trace: 'https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212'
+    provenance:
+      source: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212"
+      locator: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_CAP_EXHAUSTED_MODEL_CONTINUES
     node_type: evidence
@@ -57,6 +61,10 @@ nodes:
     source_kind: aggregator
     label: 'CONFIRMADA (tier 3, 3-0): "Ao esgotar o teto, o modelo recebe instrucao para continuar com as informacoes ja coletadas em vez de emitir mais buscas, podendo sobrescrever via a env var." Ou seja: o teto degrada em NUDGE textual ao modelo, nao em erro duro de ferramenta — o que casa com a migalha search-is-sdaal-fallback-when-capped (no teto, trocar para WebFetch sobre um buscador, nunca desistir).'
     trace: 'https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212'
+    provenance:
+      source: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212"
+      locator: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_WEBFETCH_AUSENTE_NA_FONTE
     node_type: evidence
@@ -70,6 +78,10 @@ nodes:
     source_kind: aggregator
     label: 'CONFIRMADA (tier 3, 3-0), e e uma confirmacao de AUSENCIA: "A fonte nao contem nenhuma informacao sobre custo/limite equivalente do WebFetch." A metade WebFetch da pergunta fica sem resposta nesta rodada; o unico dado de WebFetch que o corpus tem e o cache de 15 min registrado em meta-research-lens-2026-09/E_PLATAFORMA_TEM_AS_PECAS_DA_LENTE_SEM_REDIGIR, que e outra propriedade (cache), nao teto nem custo.'
     trace: 'https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212'
+    provenance:
+      source: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212"
+      locator: "https://www.turboai.dev/blog/claude-code-env-vars-v2-1-212 — verificacao adversarial 3 votos a favor, 0 refutacoes (3-0)"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_MERCADO_SEM_SINAL_WEBSEARCH_CAP
     node_type: evidence
@@ -110,6 +122,10 @@ nodes:
     source_kind: primary
     label: 'MEDIDO NO ARTEFATO (behavior-over-declaration): no 2.1.258 o teto de WebSearch por sessao tem default 200 e a env var CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION o sobrescreve; ao esgotar, o modelo recebe a instrucao de seguir com o que ja coletou e pedir ao usuario para subir a env — degrada em silencio narrativo, nao em erro. O contador e incrementado em taskRegistry (registro da SESSAO), logo as buscas de subagentes SOMAM no mesmo teto. O que /clear faz com o taskRegistry NAO foi medido (fica aberto). Fecha por medicao o achado 1 (tier 3) desta rodada e o NAO-VERIFICADO #1 de meta-research-lens.'
     trace: 'python3 re.finditer sobre o binario 2.1.258; docs/evolution/research/websearch-cap-2026-09/SYNTHESIS.md'
+    provenance:
+      source: "python3 re.finditer sobre o binario 2.1.258; docs/evolution/research/websearch-cap-2026-09/SYNTHESIS.md"
+      locator: "binario ~/.local/share/claude/versions/2.1.258 (python re.finditer): `var Ee=200;function BQn(){return a.CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION??Ee}` e a mensagem `this session has used its web search budget (${v} of ${k} WebSearch calls)... ask the user to raise CLAUDE_CODE_MAX_WEB_SEARCHES_PER_SESSION` junto de `n.taskRegistry.incrementWebSearchCalls()`"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_BINARIO_2_1_258_MAX_CONCURRENT_SUBAGENTS_20
     node_type: evidence
@@ -124,6 +140,10 @@ nodes:
     source_kind: primary
     label: 'MEDIDO NO ARTEFATO (colateral): CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS existe literalmente no 2.1.258 com default 20 — fecha o NAO-VERIFICADO #2 de meta-research-lens (nome literal e default lidos por resumo de doc, nao por citacao).'
     trace: 'python3 re.finditer sobre o binario 2.1.258'
+    provenance:
+      source: "python3 re.finditer sobre o binario 2.1.258"
+      locator: "binario 2.1.258: `_e=20;function FQn(){return a.CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS??_e}` na mesma regiao do codigo"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
 edges:
   - from: E_CAP_DEFAULT_200_PER_SESSION

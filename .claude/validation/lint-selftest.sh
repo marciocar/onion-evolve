@@ -23595,16 +23595,21 @@ run_kg_migrate_v3_selftests() {
   #     routing; o id roteado R fica intocado e sai no relatório; nenhuma data é citada neste modo.
   #     O risco vigiado: a ferramenta ignorar o routing e escrever provenance no resíduo (que é da O2/O3).
   local gr="${d}/docs/x/r.kg.yaml" tsv="${d}/routing.tsv"
-  mkdir -p "${d}/docs/x"; _kmv_graph > "${gr}"
+  mkdir -p "${d}/docs/x"
+  # E_CIRCULAR: roteado A1, mas o trace é o PRÓPRIO grafo — fonte circular, fica intocado (passada adversarial da O1)
+  _kmv_graph | sed 's|^edges:$|  - id: E_CIRCULAR\n    node_type: evidence\n    plane: DEV\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    verified_against: "fan-out da rodada"\n    trace: "docs/x/r.kg.yaml"\n    label: "evidência cujo trace é o próprio grafo"\n  - id: E_HOST\n    node_type: evidence\n    plane: PROD\n    status: confirmed\n    impact: 2\n    confidence: 0.8\n    verified_against: "lido no host em 2026-10-08"\n    trace: "/etc/algum.conf"\n    label: "evidência com fonte no host"\nedges:|' > "${gr}"
   printf 'graph\tid\tstatus\tplane\tclass\tsubclass\tfinal\tmethod_class\ttool_derives\n' > "${tsv}"
   printf 'docs/x/r.kg.yaml\tE_COM_TRACE\tconfirmed\tDEV\tA1\tcaminho-lido\tA1\tmedição\tderivavel\n' >> "${tsv}"
   printf 'docs/x/r.kg.yaml\tE_COM_URL\tconfirmed\tDEV\tC\tsuporte-fraco\tR\tleitura\tderivavel\n' >> "${tsv}"
+  printf 'docs/x/r.kg.yaml\tE_CIRCULAR\tconfirmed\tDEV\tA1\tcenso-no-auditado\tA1\tleitura\tderivavel\n' >> "${tsv}"
+  printf 'docs/x/r.kg.yaml\tE_HOST\tconfirmed\tPROD\tA2\tfora-do-repo\tA2\tjuízes\tderivavel\n' >> "${tsv}"
   if out="$(PYTHONDONTWRITEBYTECODE=1 python3 -I -B "${tool}" --routing "${tsv}" "${gr}" 2>&1)"; then rc=0; else rc=$?; fi
   y="$(python3 -I -B -c 'import json,sys,yaml; print(json.dumps(yaml.safe_load(open(sys.argv[1])), default=str))' "${gr}" 2>&1)" || true
   if [ "${rc}" -eq 0 ] \
-     && python3 -I -B -c 'import json,re,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_COM_TRACE"]["provenance"]; assert p["source"]=="ops/algum-script.sh" and re.match(r"medição: \S", p["method"]) and "não reverificado" in p["method"]; assert "provenance" not in n["E_COM_URL"] and "provenance" not in n["E_SEM_FONTE"]' "${y}" 2>/dev/null \
-     && grep -q 'FORA DA ROTA A1/A2.*E_COM_URL (R)' <<< "${out}" && grep -q '  baseline: 2026-10-08$' "${gr}"; then
-    record_pass "kg-migrate-v3: (h) --routing escreve só no id A1/A2 com a classe de method do routing ('medição: …'); o id em R fica intocado e é reportado; datas não mudam"
+     && python3 -I -B -c 'import json,re,sys; g=json.loads(sys.argv[1]); n={x["id"]:x for x in g["nodes"]}; p=n["E_COM_TRACE"]["provenance"]; assert p["source"]=="ops/algum-script.sh" and re.match(r"medição: \S", p["method"]) and "não reverificado" in p["method"]; assert "provenance" not in n["E_COM_URL"] and "provenance" not in n["E_SEM_FONTE"] and "provenance" not in n["E_CIRCULAR"]; assert n["E_HOST"]["provenance"]["method"].startswith("testemunho: leitura do arquivo /etc/algum.conf no host")' "${y}" 2>/dev/null \
+     && grep -q 'FORA DA ROTA A1/A2.*E_COM_URL (R)' <<< "${out}" && grep -q 'FONTE CIRCULAR.*E_CIRCULAR' <<< "${out}" \
+     && grep -q '  baseline: 2026-10-08$' "${gr}"; then
+    record_pass "kg-migrate-v3: (h) --routing escreve só no id A1/A2 com a classe de method do routing ('medição: …'); o id em R e o de trace circular ficam intocados e são reportados; fonte no host vira testemunho; datas não mudam"
   else record_fail "kg-migrate-v3: (h)" "routing ignorado ou classe errada: rc=${rc} ${out} ${y}"; fi
   rm -rf "${d}"
 }

@@ -23,6 +23,10 @@ nodes:
     verified_against: m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps
     label: "SUBSTRATO VIVO: Hostinger KVM8 (srv1812846) + Caddy (reverse proxy) + onion-bridge (Node/Agent SDK, reverse_proxy 127.0.0.1:8787) + Logto 1.41.0 (OIDC em 127.0.0.1:3011). DOMINIOS REAIS (medidos no /etc/caddy/Caddyfile 2026-08-06): raiz+www (landing estatica), app. (onion-bridge), auth. (OIDC do Logto) e console. (admin do Logto, bloco opcional em conf.d, respondendo no momento da medicao). NAO EXISTE bridge.onionevolve.com: nao tem vhost no Caddy e da NXDOMAIN no resolver local, no 1.1.1.1 e no 8.8.8.8 (curl 000). O onion-bridge serve sob app., nunca sob bridge. — o rotulo anterior listava auth./bridge./app. e o bridge. era ficcao. Doutrina do roadmap: reuso-nao-invencao"
     trace: "docs/evolution/federation-roadmap-2026.md"
+    provenance:
+      source: "docs/evolution/federation-roadmap-2026.md"
+      locator: "m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── TOOL 1: AUTH/IDENTIDADE (maduro) ──
   - id: ENT_logto
@@ -35,6 +39,10 @@ nodes:
     verified_against: m2-bridge-logto-KG+flip-P7+m8-serial-2026-08-reverificado
     label: "AUTH/IDENTIDADE: Logto self-hosted 1.41.0 VIVO (OIDC/JWT+JWKS), flip P7 executado (AUTH_TOKEN->OIDC), gate duplo humano-PKCE/servico-M2M. members.yaml=SSOT, Logto=PROJECAO. Federation-admin spec-now/build-gated. GAP: sign-up default aberto (P3.4)"
     trace: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
+    provenance:
+      source: "docs/onion/graph/m2-bridge-logto-2026-07.kg.yaml"
+      locator: "m2-bridge-logto-KG+flip-P7+m8-serial-2026-08-reverificado"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── TOOL 2: WHATSAPP ──
   - id: ENT_whatsapp
@@ -57,6 +65,10 @@ nodes:
     verified_at: 2026-08-19
     verified_against: "PONTA A PONTA em 2026-08-19: caddy validate+reload OK; DNS criado VIA API Hostinger (PUT zones append, verificado por RELEITURA da zona, nao pelo eco do PUT) apos o maestro informar o token em ~/.config/hostinger; resolucao publica OK; cert Let s Encrypt emitido (valido ate 2026-11-17); https://waha.onionevolve.com/api/sessions devolve 401 JSON do WAHA sem chave E com chave errada — cadeia DNS->TLS->Caddy->auth inteira viva"
     label: "ROTA PUBLICA ABERTA por ordem do maestro (2026-08-19): waha.onionevolve.com -> 127.0.0.1:3999 via /etc/caddy/conf.d/waha.caddy (convencao de bloco opcional da casa). Motivo: integracao de app externo (Lovable) — o app na nuvem nao alcanca loopback. O bind do container SEGUE no localhost (o Caddy e o unico expositor; TLS na frente, X-Api-Key do WAHA em toda chamada). PENDENTES RESOLVIDOS em 2026-08-19: registro A criado via API Hostinger (token em ~/.config/hostinger, informado pelo maestro) e cert ACME emitido. Desligar = rm do .caddy + reload; revogar acesso = trocar WAHA_API_KEY no compose"
+    provenance:
+      source: "https://waha.onionevolve.com/api/sessions"
+      locator: "PONTA A PONTA em 2026-08-19: caddy validate+reload OK; DNS criado VIA API Hostinger (PUT zones append, verificado por RELEITURA da zona, nao pelo eco do PUT) apos o maestro informar o token em ~/.config/hostinger; resolucao publica OK; cert Let s Encrypt emitido (valido ate 2026-11-17); https://waha.onionevolve.com/api/sessions devolve 401 JSON do WAHA sem chave E com chave errada — cadeia DNS->TLS->Caddy->auth inteira viva"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (URL citada no verified_against; rota A1 da triagem); não reverificado"
 
   - id: E_gmill_demo_route_caddy
     node_type: evidence
@@ -147,6 +159,10 @@ nodes:
     verified_against: direcao-do-maestro+estado-de-execucao-medido-2026-08-06+m8-serial-2026-08-reverificado
     label: "DIRECAO: trazer TUDO para um PLANO ESTRUTURADO do Onion e DERIVAR dele uma DOUTRINA, usando todo o potencial do Onion — Elenxo, KG-SSOT first+runtime, pesquisas documentadas e mapeadas. CAVEAT (disciplina pull-not-push): derivar doutrina+estrutura AGORA, mas o PLANO e spec-now/build-gated por-ferramenta — nunca uma PLATAFORMA empurrada por hipotese. ESTADO DE EXECUCAO EM 2026-08-06, MEDIDO: a DOUTRINA EXISTE (docs/knowledge-base/concepts/onion-vps-catalog-doctrine.md v1.0.0, 2026-08-05, commit 5a5768f) mas nasceu do F0 DIRETO (D_framing_catalogo), pulando a escada de A_analysis_structure — F1 rodou para UMA tool (whatsapp/WAHA), F2 (arquitetura cross-tool) foi FORMALMENTE REPROVADA como arquitetura (stack-harmonia-2026-08, no D_sintese_reprovada: premissas fabricadas, 9 membros contra 12 reais), F3 e F4 nunca rodaram e A_analysis_structure segue status open. O PLANO ESTRUTURADO — a outra metade da direcao — AINDA NAO EXISTE. A direcao segue valida; o que drifou foi a suposicao de que ela tinha sido cumprida pela escada prevista"
     trace: "docs/discussions/vps-shared-tools/SEED.md"
+    provenance:
+      source: "docs/discussions/vps-shared-tools/SEED.md"
+      locator: "direcao-do-maestro+estado-de-execucao-medido-2026-08-06+m8-serial-2026-08-reverificado"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── QUESTOES DE PESQUISA (research-first-over-priors) ──
   - id: Q_catalog_vs_platform
@@ -292,6 +308,10 @@ nodes:
     verified_against: pesquisa-f1-web-verificada-mais-teste-do-gatilho+m8-serial-2026-08-reverificado
     label: "F1 (whatsapp) RESOLVIDO: DOGFOOD PRIMEIRO, SDAAL DEPOIS. O Teste do EIXO passou (2 providers) mas o do GATILHO NAO — 1 real rodando (whatsapp-web.js) + 1 dirigido (WAHA nao deployado) = script. Deployar WAHA + 1 sendText real E o gatilho; medir as 2 degradacoes do wwebjs decide se o contrato tem 2 operacoes ou 1; CRITERIO DE RETRACAO escrito antes de construir. Forma desenhada: dominio 'whatsapp' + prefix WA_ + interface v0.1 de 4 operacoes, WAHA default. Pesquisa completa (web-verificada, radar exit 0): docs/evolution/research/waha-adapter-2026-07/"
     trace: "docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml"
+    provenance:
+      source: "docs/evolution/research/waha-adapter-2026-07/waha-adapter-2026-07.kg.yaml"
+      locator: "pesquisa-f1-web-verificada-mais-teste-do-gatilho+m8-serial-2026-08-reverificado"
+      method: "derivado: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # A DIVIDA que o Elenxo mandou tirar da prosa do commit e por no grafo — e' aqui que
   # catch-up/warm-up leem, nao na mensagem de commit.
@@ -332,6 +352,10 @@ nodes:
     verified_against: m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find
     label: "SUPERADA (presuncao ate 2026-08-06): que o desenho dual ja tivesse DOIS LADOS materiais. A re-medicao achou UM: WAHA up (container onion-vps-waha) e whatsapp-sender sem processo, unit nem container — so codigo e sessao pareada em disco. E nenhum dos dois ADAPTERS existe: .claude/utils/whatsapp nao esta la. A direcao nao caiu; caiu a suposicao de que ela ja tinha sido executada"
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+      locator: "m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: C_escada_analise_presumida_cumprida
     node_type: claim
@@ -357,6 +381,10 @@ nodes:
     verified_against: m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps
     label: "SUPERADA (era a SSOT ate 2026-08-06): 'Dominios: auth./bridge./app.onionevolve.com'. A re-medicao achou que bridge.onionevolve.com RESOLVE por DNS mas NAO tem vhost no Caddy (curl devolve 000) — o onion-bridge serve sob app., nao sob bridge. E esta ficcao de subdominio que explica por que o mapa foi redesenhado"
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+      locator: "m8-serial-2026-08+re-medicao-no-host-vivo-caddyfile-dig-curl-dockerps"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   # ── AUFHEBUNG RESTAURADA (2026-08-07) — a posicao que o M8 APAGOU em vez de rebaixar ──
   # O run de 2026-08-06 (#552) reescreveu o label de ENT_whatsapp com a verdade nova, em vez de
@@ -372,6 +400,10 @@ nodes:
     verified_against: m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find
     label: "SUPERADA (era a SSOT ate 2026-08-06): 'WHATSAPP: whatsapp-sender VIVO (~onion/whatsapp-sender, whatsapp-web.js nao-oficial, repo privado)'. O parecer de 2026-07-05 registrava reinstalacao. A re-medicao no host vivo NAO achou processo, container nem unit systemd; o CODIGO existe em disco, mas em /home/onion/onion-bridge/workspaces/7f2a16301adad917/whatsapp-sender — NAO em ~onion/whatsapp-sender, que e o caminho que esta afirmacao superada dava — e a SSOT seguiu afirmando VIVO por 12h ate alguem ir procurar. Restaurada aqui porque foi APAGADA (label reescrito no #552), nao rebaixada"
     trace: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+    provenance:
+      source: "docs/evolution/research/m8-serial-2026-08/SYNTHESIS.md"
+      locator: "m8-serial-2026-08+re-medicao-no-host-ps-dockerps-systemctl-find"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
 
   - id: E_CENSO0901_ENT_monitoring
     node_type: evidence

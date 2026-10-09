@@ -27,6 +27,10 @@ nodes:
     verified_against: 'curl https://code.claude.com/docs/en/changelog (4.086.961 bytes), ancoras id="2-1-NNN"; juiz: CHANGELOG.md do GitHub abre em 2.1.289 e npm dist-tags latest=2.1.289 (2026-10-03T20:12Z), sem 2.1.290; data/2.1.289.txt identico aos 27 itens da pagina (diff); claude --version = 2.1.289'
     trace: 'docs/evolution/research/radar-E3-2026-10-05-r7/data/2.1.289.txt · projeção: docs/evolution/research/radar-E3-2026-10-05-r7/SYNTHESIS.md'
     label: 'O DELTA desde a baseline (2.1.288, 2026-10-03): UMA versao, a 2.1.289 (3 de outubro), com 27 itens — contigua NESTA janela, conferida em tres fontes (pagina do changelog, CHANGELOG.md do GitHub, dist-tags do npm). Isso NAO responde o Q_FLUXO_NAO_CHECA_CONTIGUIDADE_DE_VERSAO da r6, que pergunta pelo MECANISMO e segue aberto. Composicao recontada pelo juiz: 5 itens de deny/ask/permissoes, 3 de render (inclusive artifacts publicados), 2 do claude plugin validate, 1 de agent.spawn, 1 revert do VSCode, e o restante de mods e paineis de plugin (a 1a redacao dizia 6 e 2: as categorias nao fechavam). O bloco esta guardado em data/ para a citacao ser falsificavel sem re-buscar; o extrator desta rodada difere do da r6 so em espaco em volta de codigo inline (89 itens da 2.1.288 conferidos: mesmo texto).'
+    provenance:
+      source: "docs/evolution/research/radar-E3-2026-10-05-r7/data/2.1.289.txt · projeção: docs/evolution/research/radar-E3-2026-10-05-r7/SYNTHESIS.md"
+      locator: "curl https://code.claude.com/docs/en/changelog (4.086.961 bytes), ancoras id=\"2-1-NNN\"; juiz: CHANGELOG.md do GitHub abre em 2.1.289 e npm dist-tags latest=2.1.289 (2026-10-03T20:12Z), sem 2.1.290; data/2.1.289.txt identico aos 27 itens da pagina (diff); claude --version = 2.1.289"
+      method: "juízes: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_BYPASS_DE_DENY_ASK_NAO_TOCA_A_CASA
     node_type: evidence
@@ -39,6 +43,10 @@ nodes:
     verified_against: '.claude/settings.json so allow (13), settings.local.json so allow (97); plugins/onion/hooks/hooks.json sem permissoes; merge-onion-hooks e compose-settings nao injetam deny; MAS plugins/onion-engineering/agents/claude-code-specialist.md:223 RECOMENDA deny rules a adotantes'
     trace: '.claude/agents/development/claude-code-specialist.md'
     label: 'A 2.1.289 corrige QUATRO furos em regras deny/ask (a 1a redacao dizia seis): comando atras de prefixo de variavel com valor expandido (o exemplo oficial e TZ="$HOME" rm -rf build) e atribuicao nua antes do comando, sob sandbox auto-allow; parte aninhada de comando composto sobre aprovacao de mod; Read deny via symlink. O core NAO instala deny/ask em lugar nenhum — mas o @claude-code-specialist, que VIAJA no plugin onion-engineering, RECOMENDA a adotantes deny rules da forma exata do furo (Bash(rm -rf:*)). Adotante que seguiu o conselho ficou exposto ate a 2.1.288. A afirmacao da 1a redacao de que "a classe nao existe no veto proprio" foi REPROVADA pelo juiz e mora agora no no E_VETOS_PROPRIOS_TEM_A_MESMA_CLASSE.'
+    provenance:
+      source: ".claude/agents/development/claude-code-specialist.md"
+      locator: ".claude/settings.json so allow (13), settings.local.json so allow (97); plugins/onion/hooks/hooks.json sem permissoes; merge-onion-hooks e compose-settings nao injetam deny; MAS plugins/onion-engineering/agents/claude-code-specialist.md:223 RECOMENDA deny rules a adotantes"
+      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: E_PLUGIN_VALIDATE_FIX_NAO_TOCA_OS_PLUGINS
     node_type: evidence
@@ -51,6 +59,10 @@ nodes:
     verified_against: 'ls plugins/*/.claude-plugin: capability.json plugin.json provenance.json, nenhum marketplace.json; o marketplace.json mora so na raiz; claude plugin validate plugins/onion --strict: Validation passed'
     trace: 'plugins/onion/.claude-plugin/plugin.json'
     label: 'A 2.1.289 corrige o claude plugin validate PULANDO o plugin quando a pasta tambem tinha um manifesto de marketplace — ou seja, ate a 2.1.288 um "validacao passou" ali podia ser validacao que nao rodou. Medido: nenhuma pasta de plugin desta casa tem os dois manifestos juntos (o marketplace.json mora so na raiz), logo os "Validation passed" anteriores eram validacao de verdade.'
+    provenance:
+      source: "plugins/onion/.claude-plugin/plugin.json"
+      locator: "ls plugins/*/.claude-plugin: capability.json plugin.json provenance.json, nenhum marketplace.json; o marketplace.json mora so na raiz; claude plugin validate plugins/onion --strict: Validation passed"
+      method: "medição: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_AGENT_SPAWN_E_O_ACOPLAMENTO_DECLARADO_E_NAO_USADO
     node_type: question
@@ -82,6 +94,10 @@ nodes:
     verified_against: 'payload JSON sintetico contra .claude/hooks/pretooluse-merge-gate.sh e pretooluse-protect-main.sh, rc lido do hook: git push origin +main 0/0; git push origin "main" 0/0; TZ="$HOME" bash -c "gh pr merge 1" 0/0; timeout 60 gh pr merge 1 0/0; gh -R o/r pr merge 1 0/0; controle git push origin main 2/0. Branch protection do host: 403 (plano sem o recurso) — o hook e a UNICA barreira'
     trace: '.claude/hooks/pretooluse-merge-gate.sh'
     label: 'ACHADO DO JUIZ, reproduzido no contexto principal e PRE-EXISTENTE a esta versao: os vetos proprios da casa tem a MESMA classe que a 2.1.289 curou no harness — a lista de formas barradas e menor que a lingua do shell. Escapam dos dois vetos: o force-push git push origin +main (o mais grave: reescreve a main sem PR), o nome entre aspas, prefixo de variavel combinado com invólucro bash -c, timeout, gh -R/--repo, /usr/bin/gh, aspas no subcomando, eval, xargs, $(echo gh), & simples, if/for. O host nao protege a main (403), entao o hook e a unica barreira. As seis formas que a 1a redacao testou seguem barradas; a CLASSE nao esta fechada. E guarda-por-lista falhando pelo vocabulario, de novo.'
+    provenance:
+      source: ".claude/hooks/pretooluse-merge-gate.sh"
+      locator: "payload JSON sintetico contra .claude/hooks/pretooluse-merge-gate.sh e pretooluse-protect-main.sh, rc lido do hook: git push origin +main 0/0; git push origin \"main\" 0/0; TZ=\"$HOME\" bash -c \"gh pr merge 1\" 0/0; timeout 60 gh pr merge 1 0/0; gh -R o/r pr merge 1 0/0; controle git push origin main 2/0. Branch protection do host: 403 (plano sem o recurso) — o hook e a UNICA barreira"
+      method: "leitura: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
 
   - id: Q_CURAR_OS_VETOS_DE_MERGE_E_PUSH
     node_type: question
