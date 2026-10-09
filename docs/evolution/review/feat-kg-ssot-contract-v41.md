@@ -2,11 +2,11 @@
 title: 'Resíduo — adoção do contrato KG-SSOT v4.1 (SAC-73)'
 date: 2026-10-09
 branch: feat/kg-ssot-contract-v41
-reviewed_diff_sha256: be18466f7e3bcdc414f277ecf3f9625aadb6490f42a1982529aaadd5c4c93841
-reviewed_code_sha256: ba4b581043957804d4944b51a58cc555f40c91be1b0c701de6e2ceecd2b088fb
-findings_total: 2
-findings_real: 2
-findings_fixed: 2
+reviewed_diff_sha256: 8eedcb76645ba1a4f9b3d7e12ec0712684814b90506019b406db7109375ceac7
+reviewed_code_sha256: d67e3731bb0ed302a4e5832f1126f4e717ed06fb687e902b16ac52f7b135ac85
+findings_total: 3
+findings_real: 3
+findings_fixed: 3
 tokens: 0
 duration_min: 50
 verdict: CORRIGIDO
@@ -14,7 +14,7 @@ elenxo: nao
 nota: >-
   A passada é do autor. O contrato é vendorizado por pin, e o juízo dele é do onion-kg-ssot, que publicou
   a tag. Aqui se prova a integração: vendor íntegro, gate rc 0 com a base nova, as 9 famílias de bancada
-  dos geradores verdes com LC_ALL=C, e um mutante para cada caso novo.
+  dos geradores verdes com LC_ALL=C, um mutante para cada caso novo e a bancada completa do CI.
 ---
 
 # O que o v4.1 mudou e o que precisou mudar aqui
@@ -69,6 +69,11 @@ Curas:
    `sed '/^edges:/,$d'` o removia. O grafo saía conforme, e o caso reprovava pela razão errada. Pego na
    1ª execução (rc 0 e "conforme"), contra o leitor do vendor, que acusava o código no mesmo grafo escrito à
    mão. Cura: o nó entra antes das arestas e ganha uma aresta própria, para não cair em `orphan-node`.
+3. **O caso (q) abria três sítios novos da classe EPIPE.** Ele usava `printf '%s' "$v" | grep -qF` como veredito,
+   e a catraca `shell-pipefail` reprovou no CI (shard 3, 37 > 34 sítios). A família não estava entre as 9 que rodei
+   localmente, porque ela não pertence a gerador: guarda a própria bancada. Cura: here-string
+   (`grep -qF PAD <<< "$v"`) e `grep -m1` no lugar de `grep | head -1`. Com a cura, `shell_pipefail_robustness` e
+   `research_workflow` passam verdes, e o mutante de (q) segue reprovando.
 
 # Divergências do radar contra o contrato (apontadas pelo onion-kg-ssot, medidas aqui, não curadas neste PR)
 
@@ -84,8 +89,8 @@ Ficam registradas no nó `E_CONTRATO_V41_ADOTADO`. A cura é do radar e vira lot
 
 - O lint local acusa a REGRA 16 (Contagem de inventário-TOTAL divergente da SSOT) em
   `docs/technical-context/02-ai-context/codebase-guide.md`: a tabela fala em 113 comandos, e a SSOT tem 114.
-  A tabela por categoria inteira está defasada (meta 35, contra 46 da SSOT). O CI dos PRs recentes passou com
-  ela. O passo de lint do `pr-finalize` é quem decide se ela bloqueia.
+  A tabela por categoria inteira está defasada (meta 35, contra 46 da SSOT). No ambiente do CI ela não é HARD: o
+  `pr-finalize` deu 0 HARD e o linter do CI passou. Fica para quem tocar o guia.
 
 # Tetos
 
