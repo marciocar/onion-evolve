@@ -63,7 +63,7 @@ nodes:
   # ── O QUE SOBREVIVE (acionavel) ──
   - id: C_waha_orfao_desligar
     node_type: claim
-    plane: PROD
+    plane: DEV
     status: superseded
     impact: 5
     confidence: 0.9
@@ -72,14 +72,14 @@ nodes:
     label: "MELHOR ITEM DA LISTA INTEIRA — DESLIGAR O WAHA: container Up 15h, ZERO referencias a waha/3999/whatsapp em todo o src/ do bridge, ZERO cron/systemd-timer, WAHA_API_KEY e WAHA_DASHBOARD_PASSWORD legiveis via docker inspect, e as 3 primeiras mensagens de teste voltaram HTTP 200 e NUNCA chegaram. Custo de seguranca > 0, entrega comprovada = 0, esforco = docker stop, totalmente reversivel. NOTA DE HONESTIDADE: o canal FOI provado depois (LID + ack READ) — mas provado != consumido; nao ha consumidor nomeado num artefato versionado"
     trace: "/home/marcio/onion-vps-waha/docker-compose.yml"
     provenance:
-      source: "/home/marcio/onion-vps-waha/docker-compose.yml"
+      source: "container onion-vps-waha e seu docker-compose.yml no host (host)"
       locator: "docker-ps-mais-grep-no-src-do-bridge"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-waha/docker-compose.yml no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura do docker-compose.yml do onion-vps-waha e medição do container no host 2026-08-01"
       locality: "host"
 
   - id: C_producao_nao_e_o_repo
     node_type: claim
-    plane: PROD
+    plane: DEV
     status: refuted
     verified_at: 2026-08-08
     verified_against: rev-list-HEAD..origin-main-no-checkout-de-producao-do-bridge-0-a-frente-0-atras
@@ -88,14 +88,14 @@ nodes:
     label: "BEHAVIOR-OVER-DECLARATION VIRADO PARA DENTRO: o artefato que RODA nao e o artefato do REPO — checkout de producao em 965224c (07-27) contra main de 07-31. CONSEQUENCIA EPISTEMICA: toda conclusao sobre 'o que o bridge faz' tirada do main pode estar ERRADA. A cura e HABITO (git pull + restart), NAO contrato /health {sha,dirty} + 409 fail-closed — que derrubaria a federacao hoje por condicao cosmetica, para N=1 operador (dead-layer). A 'deriva do org-map' e SUBPRODUTO disto, nao causa independente"
     trace: "/home/onion/onion-bridge"
     provenance:
-      source: "/home/onion/onion-bridge"
+      source: "checkout de produção do onion-bridge (git rev-list/status no host)"
       locator: "rev-list-HEAD..origin-main-no-checkout-de-producao-do-bridge-0-a-frente-0-atras"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura do checkout de produção do onion-bridge no host 2026-08-08"
       locality: "host"
 
   - id: C_bypass_permissions_exposto
     node_type: claim
-    plane: PROD
+    plane: DEV
     status: open
     impact: 4
     confidence: 0.9
@@ -104,9 +104,9 @@ nodes:
     label: "PERMISSION_MODE=bypassPermissions EXPLICITO no .env de producao, atras de porta publica via Caddy. O flip P7 entregou IDENTIDADE na borda e NAO reduziu o que o agente pode fazer DEPOIS de entrar. A contencao certa e de PROCESSO (usuario dedicado, checkout read-only onde possivel, sem socket do Docker, sem credencial de outro tenant no ambiente), nao flag do SDK — o modo foi escolhido porque o agente precisa agir"
     trace: "/home/onion/onion-bridge/.env"
     provenance:
-      source: "/home/onion/onion-bridge/.env"
+      source: ".env de produção do onion-bridge (host, não versionado)"
       locator: "env-de-producao-do-bridge"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/.env no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura do .env de produção do onion-bridge no host 2026-08-01"
       locality: "host"
 
   - id: C_medir_firewall_antes
@@ -201,10 +201,10 @@ nodes:
     label: "DISSENT DE SEGURANCA (do F2-b, INCORPORADO — e corrige a propria REGRA): no MESMO processo do bridge estao /chat com CREDENCIAIS ANTHROPIC e /admin que CUNHA CONVITES. Por ali um parser de HMAC processando bytes hostis de fora significa que UM BUG NO PARSER ALCANCA A CUNHAGEM DE CONVITES. CONCESSAO ADOTADA: se a rota de webhook for construida um dia, que rode como SEGUNDO PROCESSO DO MESMO CODIGO — mesmo repo, mesmo dono, porta propria, ambiente SEM AUTH_TOKEN, SEM chave Anthropic, SEM /admin. COROLARIO QUE CORRIGE A REGRA: os 5 portoes otimizam MENOS PECAS; seguranca as vezes quer UMA PECA A MAIS que so compra ISOLAMENTO — e ai o portao de seguranca vence os 5"
     trace: "/home/onion/onion-bridge/src/server.ts"
     provenance:
-      source: "/home/onion/onion-bridge/src/server.ts"
+      source: "onion-bridge@38702f00:src/server.ts"
       locator: "leitura-do-server.ts-do-bridge"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/server.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "host"
+      method: "leitura: src/server.ts em onion-bridge@38702f00 (remoto marciocar/onion-bridge; arquivo na data 2026-08-01)"
+      locality: "repo"
 
   # ── ANTI-CATALOGO (sobreviveu inteiro) ──
   - id: D_anti_catalogo
@@ -234,9 +234,9 @@ nodes:
     label: "REFORMULACAO: 'tunneling' e o NOME ERRADO da capacidade. O que se quer e INGRESSO AUTENTICADO — e as duas metades ja estao instaladas e pagas: Caddy (ingress/TLS) + Logto (IdP). Um forward_auth do Caddy contra o Logto expoe qualquer UI interna com identidade real, revogavel por pessoa, sem NENHUMA peca nova (reuso-nao-invencao literal). GATILHO NOMEADO, e esta mais perto do que parece: no dia em que um humano que NAO e o maestro precisar de uma UI nessa caixa — a equipe granaai ja tem contas na VPS, e ssh -L para eles significa ENTREGAR SHELL, que e a resposta errada. Enquanto for so o maestro, -L e otimo e nada deve ser construido"
     trace: "/etc/caddy/Caddyfile"
     provenance:
-      source: "/etc/caddy/Caddyfile"
+      source: "Caddyfile do host (configuração do Caddy, host)"
       locator: "F2b-pesquisa-tunneling"
-      method: "testemunho: leitura do arquivo /etc/caddy/Caddyfile no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura do Caddyfile no host 2026-08-01"
       locality: "host"
 
   - id: Q_publicar_ou_nao
@@ -271,7 +271,7 @@ nodes:
   # que eu mesmo escrevi no `meta:` do outro arquivo, mordendo quem a conhece.
   - id: E_producao_alcancou_o_repo
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 1.0
@@ -280,9 +280,9 @@ nodes:
     label: "REFUTA C_producao_nao_e_o_repo. O checkout de producao do bridge (/home/onion/onion-bridge, o WorkingDirectory do onion-vps-bridge.service) esta em `a1b6c87`, que e EXATAMENTE `origin/main` do proprio bridge: zero commits a frente, zero atras, arvore limpa. O commit que curou a deriva esta la e nomeia o que era: 'versiona o medidor de consumo de IA (existia so em producao)'. A deriva de 4 dias que o no registrava foi PAGA — e a consequencia epistemica que ele declarava (toda conclusao sobre o bridge tirada do main pode estar errada) deixa de valer."
     trace: "/home/onion/onion-bridge"
     provenance:
-      source: "/home/onion/onion-bridge"
+      source: "checkout de produção do onion-bridge (git rev-list/status no host)"
       locator: "rev-list-nos-dois-sentidos-no-checkout-de-producao-mais-status-porcelain-limpo"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: leitura do checkout de produção do onion-bridge no host 2026-08-08"
       locality: "host"
 
   - id: PO_ferramenta_da_vps_nao_se_encerra

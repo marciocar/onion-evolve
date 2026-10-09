@@ -80,7 +80,7 @@ nodes:
 
   - id: E_SSO_VALIDADO_PONTA_A_PONTA
     node_type: evidence
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-10
     verified_against: cofre-307-para-logto-e-logto-303-para-sign-in-com-app_id-do-cofre
     status: confirmed
@@ -139,7 +139,7 @@ nodes:
 
   - id: Q_QUATRO_PENDENCIAS_DO_TERRENO
     node_type: question
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-10
     verified_against: as-quatro-pagas-dns-resolve-backup-gpg-decifra-fail2ban-baniu-sso-303-sign-in
     status: done
@@ -155,7 +155,7 @@ nodes:
   # ── COLATERAIS: producao, nao Vaultwarden ───────────────────────────────────
   - id: I_CONSOLE_DO_LOGTO_ESTA_PUBLICO
     node_type: decision
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-10
     verified_against: logto-console.caddy-sem-.disabled-e-HTTP-302-no-dominio-publico
     status: open
@@ -189,10 +189,10 @@ nodes:
     label: "VIÁVEL, e implantado: Vaultwarden (Rust, AGPL-3.0) implementa quase toda a API cliente do Bitwarden, com organizações, grupos, event logs, anexos, Send, 2FA e Emergency Access; SSO autentica quem entra e a senha mestra segue o único material que decifra (SSO_ONLY=false)."
     narrative: "label anterior: VIAVEL, e o unico bloqueador candidato caiu na medicao. Vaultwarden e a escolha obvia sobre Bitwarden self-hosted nesta maquina: AGPL-3.0, ordens de magnitude mais leve (o Bitwarden oficial pede 2GB minimo / 4GB recomendado), clientes oficiais funcionam sem modificacao, e libera de graca o que la exige licenca (organizacoes, grupos, event logs, anexos, TOTP, Send, Emergency Access, 2FA). O que NAO tem: login por Passkey, New Device Login Protection, e a API publica de organizacao completa. A CONDICAO E DE EXPECTATIVA, NAO DE CONFIGURACAO: adotar sabendo que SSO aqui e conveniencia de login e provisionamento — o segredo raiz continua sendo a senha mestra, fora do Logto, sem substituto server-side disponivel. GATED no que depende do maestro: criar o DNS, decidir sobre o console aberto, e decidir se backup de cofre exige cifra em repouso + saida da maquina antes de existir cofre."
     provenance:
-      source: "/home/marcio/onion-vps-vaultwarden@6d82b1b"
-      locator: "/home/marcio/onion-vps-vaultwarden 6d82b1b:README.md l.3-19 (Vaultwarden em Rust, SSO não substitui a senha mestra, SSO_ONLY=false) e corpo de 6d82b1b (o cofre implantado); github.com/dani-garcia/vaultwarden README.md l.3, l.16 (AGPL-3.0), l.31-53 (Features), lido 2026-10-09"
+      source: "onion-vps-vaultwarden@6d82b1b8:README.md"
+      locator: "onion-vps-vaultwarden 6d82b1b:README.md l.3-19 (Vaultwarden em Rust, SSO não substitui a senha mestra, SSO_ONLY=false) e corpo de 6d82b1b (o cofre implantado); github.com/dani-garcia/vaultwarden README.md l.3, l.16 (AGPL-3.0), l.31-53 (Features), lido 2026-10-09"
       method: "leitura: README do onion-vps-vaultwarden em 6d82b1b (commit noutro repo) + README upstream do Vaultwarden"
-      locality: "host"
+      locality: "repo"
 
 edges:
   - from: C_SSO_NAO_REDUZ_SEGREDO

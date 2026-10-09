@@ -30,7 +30,7 @@ nodes:
 
   - id: C_TRES_MODELOS_DE_CONFIANCA
     node_type: claim
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-12
     verified_against: bridge-jwks-local-cofre-redirect-oidc-waha-apikey-hash-medidos-no-vivo
     status: confirmed
@@ -145,15 +145,15 @@ nodes:
     label: "INCIDENTE EM PRODUCAO, e a causa e a assinatura desta casa. O `upgrade.sh` rodava `npm run cli db alteration deploy 2>&1 | tail -20 || { exit 1; }`. A migracao falhou com `Missing target version`, o `tail` devolveu 0, e o `||` NUNCA DISPAROU. O script seguiu, trocou a imagem, e o container entrou em restart loop com 'Undeployed database alterations found'. GUARDA QUE LE O EXIT ERRADO E PIOR QUE GUARDA AUSENTE: ela AFIRMA ter verificado. E a ironia que precisa ficar escrita: a hook `bash-empty-result-guard` desta casa pega EXATAMENTE essa classe (EXIT-CODE-DE-PIPE) — mas ela so protege o que passa pela ferramenta Bash, NAO alcanca os scripts do repo. Havia uma guarda no lugar certo, com a intencao certa, e cega. Curado: `set -o pipefail` DENTRO do `sh -c` (e la que o pipe roda) + versao alvo explicita. O QUE SALVOU: o backup rotulado ANTES e a verificacao final recusando declarar sucesso ('✗ OIDC nao respondeu — investigue antes de considerar pronto'). Restaurado e verificado nas quatro pontas."
     trace: "/home/marcio/onion-vps-logto/upgrade.sh"
     provenance:
-      source: "/home/marcio/onion-vps-logto@cc15d9b"
-      locator: "cc15d9b (corpo) no clone /home/marcio/onion-vps-logto; .claude/hooks/bash-empty-result-guard.sh l.151"
-      method: "leitura: commit cc15d9b do repo onion-vps-logto (2026-08-10) + hook do core l.151 (classe EXIT-CODE-DE-PIPE)"
-      locality: "host"
+      source: "onion-logto@cc15d9b0"
+      locator: "cc15d9b (corpo) no repo onion-logto; .claude/hooks/bash-empty-result-guard.sh l.151"
+      method: "leitura: commit cc15d9b do repo onion-logto (2026-08-10) + hook do core l.151 (classe EXIT-CODE-DE-PIPE)"
+      locality: "repo"
 
   # ── O QUE O ELENXO ACHOU E NINGUEM TINHA VISTO ──────────────────────────────
   - id: I_SEGUNDO_IDP_COM_CONSOLE_DESTRANCADO
     node_type: decision
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-12
     verified_against: 13-portas-em-loopback-waha-3022-timeout-e-register-400-com-controle-marker-attu-200
     status: done
@@ -162,10 +162,10 @@ nodes:
     label: "FECHADO 2026-08-11, nas duas pontas. Era o achado mais perigoso da sessao inteira, encontrado SO pelo Elenxo. Existe um SEGUNDO Logto nesta VPS (`onion-adopt-arandek-logto-1`, v1.36.0) e o tenant `admin` dele esta em modo **`Register` com ZERO usuarios** — estado de bootstrap: QUEM ALCANCAR CRIA O PRIMEIRO ADMINISTRADOR do IdP do adotante. Medido por mim, nao herdado: `select tenant_id, sign_in_mode, count(users)` devolve `admin|Register|0` e `default|SignInAndRegister|2`. ⚠️ E A CONTENCAO E PARCIAL: o `onion-vps-docker-firewall` faz `DROP -i eth0`, que NAO cobre trafego container-a-container. Provado: `docker exec onion-vps-waha curl http://172.17.0.1:3022/` devolve **302**. Logo qualquer container comprometido — e qualquer usuario com shell na caixa — toma o IdP do adotante. TODA a stack dele (10 containers: Redis, Postgres, MinIO, Milvus, o IdP) esta em `0.0.0.0`; e o item que a memoria ja registrava como `rebind dos adotantes pendente` desde o incidente de agosto. RESOLVIDO: (1) os overrides que a stack viva usava moravam em `/tmp/.../scratchpad/` sob UUID de SESSAO MORTA — `/tmp` e limpo no boot, e no proximo `up` o Logto do adotante voltaria a 3011/3012 e COLIDIRIA com o do core, derrubando `auth.onionevolve.com`. Bomba-relogio que eu nao tinha visto; foi o inventario que achou. Movidos para `/home/marcio/onion-adopt-arandek-local/`, versionados, com o porque escrito. (2) as 13 portas foram para `127.0.0.1` — inclusive quatro de servicos PARADOS que subiriam publicos (fecha a classe, nao o caso), com as portas do lado do container CONFERIDAS contra o compose base. (3) o bootstrap do IdP foi fechado (`sign_in_mode=SignIn` nos dois tenants), o que remove o vetor de USUARIO LOCAL que o loopback nao alcancava. VERIFICADO POR COMPORTAMENTO: `waha -> 172.17.0.1:3022` saiu de **302** para **timeout**; `/register` responde `302 -> /unknown-session`; `PUT /api/experience {Register}` responde **400** (era 204 no core aberto); CONTROLE `marker -> attu:3000` segue **200**, provando que a rede do compose nao foi afetada; core intacto. ⚠️ CORRECAO DE UMA PREOCUPACAO MINHA: eu temi que o bridge (`0.0.0.0:8787`) tivesse o mesmo vetor — MEDIDO, nao tem. Porta PUBLICADA PELO DOCKER escapa do `ufw INPUT` (caminho DNAT/FORWARD); processo do HOST em `0.0.0.0` nao escapa. O perigo era especifico de container. FICA PARA O MAESTRO: avisar o adotante sobre o tunel SSH e sobre o `requirepass` hardcoded no compose commitado dele."
     trace: "/home/marcio/onion-adopt-arandek/docker-compose.self-hosted.yml"
     provenance:
-      source: "/home/marcio/onion-adopt-arandek-local@01ee76f"
-      locator: "corpo de 01ee76f + README.md no clone /home/marcio/onion-adopt-arandek-local; docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.43, l.105-107; /home/marcio/onion-adopt-arandek/docker-compose.yml l.268 (logto:1.36.0)"
-      method: "testemunho: medição da sessão 2026-08-11 registrada em 1ª pessoa em 01ee76f (onion-adopt-arandek-local) e no resíduo do #578; a saída SQL e a contagem de containers sem comando registrado"
-      locality: "host"
+      source: "onion-adopt-arandek-local@01ee76f2"
+      locator: "corpo de 01ee76f + README.md no clone onion-adopt-arandek-local; docs/evolution/review/docs-arquitetura-identidade-onion-vps.md l.43, l.105-107; arandek/docker-compose.yml l.268 (logto:1.36.0)"
+      method: "testemunho: medição da sessão 2026-08-11 registrada em 1ª pessoa no corpo de onion-adopt-arandek-local@01ee76f2 e no resíduo do #578; a saída SQL e a contagem de containers sem comando registrado"
+      locality: "repo"
 
   - id: I_A1_A_MEDICAO_CAIU_A_CONCLUSAO_SOBREVIVEU
     node_type: decision
@@ -231,10 +231,10 @@ nodes:
     label: 'O DE MAIOR ALCANCE PARA ''NOVOS ENTRANTES'', e ele nao e ausencia de isolamento — e isolamento chaveado na coisa errada. `workspace.ts` faz `slug(bearer) = sha256(token)[:16]`; `chat.ts` deriva o cwd disso. Com OIDC o bearer e um JWT que ROTACIONA (~1h), entao cada refresh gera slug novo => WORKSPACE NOVO PARA A MESMA PESSOA, e o anterior fica orfao. Medido: 23 diretorios para um punhado de pessoas reais, nenhum coletado. O mesmo defeito atinge o rate limit (chaveado por `Authorization`): a cota de 20/min ZERA a cada renovacao de token. A cura e chavear em `sub` (a identidade), nao no portador. ⚠️ E o agravante: cada workspace tem symlink para `.claude/` e `docs/` do core, o servico roda como DONO do checkout, e `PERMISSION_MODE=bypassPermissions` esta no `.env`. O codigo chama de ''read-only'' e NADA no filesystem impoe isso. ✅ PROVADA EM USO REAL 2026-08-11, e por CALCULO, nao por confianca: o login do maestro produziu o workspace `94c9a93e606c64b2`, e `sha256("xwl2pkq5bdvb")[:16]` — o `sub` da identidade dele no Logto — da EXATAMENTE esse valor. Antes disso o codigo estava trocado e o servico bootava, mas a chave nunca tinha sido exercitada: a passada adversarial contra o proprio PR marcou isso como NAO PROVADA, e estava certa. EXECUTADO 2026-08-11: a chave passou a ser `identity.subject` (o `sub`, estavel por identidade, que o `authGuard` ja punha no contexto e que o proprio `chat.ts` ja lia para o medidor), com fallback ao bearer EXPLICITO em vez de implicito. As 21 cascas foram coletadas e os 2 workspaces com conteudo real (232MB e 1.6MB) preservados: 23 -> 2. Verificado por comportamento: unit `active`, boot limpo (o `tsx` interpreta direto, entao erro de sintaxe derrubaria o servico) e `app.onionevolve.com` 200 antes e depois. E o defeito IRMAO que o Elenxo apontou tambem foi curado: `void removeWorkspace(...)` sem `await` e sem `catch` engolia o erro — alvo inexistente sumia SEM REGISTRO; agora falha alto. NAO inventei um `removeWorkspace(sub)`: revogar convite continua certo ali, e revogacao de identidade OIDC nao passa por essa funcao — apagar diretorio de quem talvez ainda tenha acesso por outro caminho seria pior que o silencio. ⚠️ CORRECAO DA GRAVIDADE que eu havia declarado: o Elenxo mediu o conteudo e 21 dos 23 eram cascas de 8K. NAO era vazamento ENTRE pessoas — era PERDA DE CONTINUIDADE (a cada refresh o usuario perdia o cwd dos proprios uploads) mais lixo em disco. Bug de UX e de estado, nao incidente de isolamento. Commit `e09d4c7` em marciocar/onion-bridge. ✅ E O IRMAO FOI CURADO 2026-08-13 (P11, bridge PR #2, commit 8943e25): o rate-limit passou a chavear em `identity.subject` com fallback explicito ao header — a cota deixou de zerar a cada refresh. Prova mecanica: bancada Hono fiel do 6o Elenxo (4a req -> 429 com UMA chave estavel, sub). Prova viva (2 requests com refresh no meio, numa sessao real) PENDENTE — gatilho: proximo uso do app pelo maestro.'
     trace: "/home/onion/onion-bridge/src/workspace.ts"
     provenance:
-      source: "/home/marcio/onion-bridge-dev@e09d4c7"
-      locator: "e09d4c7 e 8943e25 no clone /home/marcio/onion-bridge-dev (marciocar/onion-bridge); corpo do PR #2 de marciocar/onion-bridge (bancada Hono, 4ª req → 429); 037d4d3c (sha256 do sub); db8d9844:docs/onion/identidade-onion-vps.md l.135-146"
+      source: "onion-bridge@e09d4c7f"
+      locator: "e09d4c7 e 8943e25 no clone onion-bridge (marciocar/onion-bridge); corpo do PR #2 de marciocar/onion-bridge (bancada Hono, 4ª req → 429); 037d4d3c (sha256 do sub); db8d9844:docs/onion/identidade-onion-vps.md l.135-146"
       method: "leitura: commits e09d4c7 (2026-08-11) e 8943e25 (2026-08-13) do onion-bridge + corpo de 037d4d3c + prosa db8d9844"
-      locality: "host"
+      locality: "repo"
 
   - id: Q_RECUPERACAO_NAO_EXISTE_ONDE_MAIS_DOI
     node_type: question
@@ -301,7 +301,7 @@ nodes:
 
   - id: Q_CUSTODIA_DA_CHAVE_GPG_FORA_DA_VPS
     node_type: question
-    plane: PROD
+    plane: DEV
     verified_at: 2026-08-13
     verified_against: confirmacao-do-maestro-em-2026-08-13-gpg-ja-foi-mais-o-medido-por-mim-asc-ausente-e-privada-no-chaveiro
     status: done
@@ -415,9 +415,9 @@ nodes:
     label: "O INSTRUMENTO COMETEU A FALHA QUE ELE EXISTE PARA PEGAR, e no no de MAIOR atencao do grafo (att 30.0). O worker de `C_TRES_MODELOS_DE_CONFIANCA` devolveu **CONFIRMED com `blocked_by` preenchido** — campo que o schema do `/meta:kg-freshness` reserva a UNVERIFIABLE. Ele mediu DUAS das tres mecanicas (cofre resolvendo para o IP publico da VPS; WAHA com `sha512:`) e INFERIU a terceira, a do bridge, de 'zero conexoes na 3011'. Motivo declarado: permission denied em `/home/onion/onion-bridge/src/`. ⚠️ O BLOQUEIO ERA FALSO: `sudo ls` le o diretorio, e o proprio worker usou `sudo` em quatro outros comandos da MESMA medicao — instancia exata de [[verify-access-before-specifying]]. A medicao foi FECHADA a mao depois e o no e CONFIRMED de verdade: `identity.ts:34` busca JWKS local, `:45` cacheia `3_600_000`ms (1h exata), `:129` confere `iss`, `:133-145` confere `aud`, `:126` so le claims DEPOIS da assinatura. O worker acertou o veredito pelo caminho errado, que e a forma mais cara de acertar — porque nao deixa rastro de que nao mediu."
     trace: "/home/onion/onion-bridge/src/identity.ts"
     provenance:
-      source: "/home/onion/onion-bridge/src/identity.ts"
+      source: "sudo ls no checkout de produção do onion-bridge (permission denied relatado pelo worker, host)"
       locator: "sudo-ls-lendo-o-diretorio-que-o-worker-declarou-permission-denied"
-      method: "testemunho: leitura do arquivo /home/onion/onion-bridge/src/identity.ts no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "testemunho: comportamento do worker contra o diretório de produção no host 2026-08-12"
       locality: "host"
 
   - id: C_NO_COMPOSTO_RECEBE_VEREDITO_ATOMICO
@@ -581,7 +581,7 @@ nodes:
 
   - id: Q_SENHA_CHAVE_ESTADO_2026_09
     node_type: question
-    plane: PROD
+    plane: DEV
     status: open
     impact: 3
     confidence: 0.9

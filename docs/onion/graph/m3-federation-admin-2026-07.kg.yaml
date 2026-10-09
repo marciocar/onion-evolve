@@ -211,10 +211,10 @@ nodes:
     verified_against: 'selo Onda 8 (2026-09-01): medicao da revisao-total (README Logto + members.yaml) sem contra-evidencia'
     label: "FRONTEIRA commodity-BUY (Logto) × diferencial-BUILD (Onion): comprar identidade/sessão/token/MFA/CRUD de org/Secret Vault (undifferentiated); construir a tradução papel-grosso→semântica de tier (D7) + matriz de confiança fina de members.yaml (nunca delegável ao Logto sem duplicar a SSOT)"
     provenance:
-      source: "/home/marcio/onion-vps-logto/README.md"
+      source: "onion-logto@17f4ecd9:README.md"
       locator: "selo Onda 8 (2026-09-01): medicao da revisao-total (README Logto + members.yaml) sem contra-evidencia"
-      method: "testemunho: leitura do arquivo /home/marcio/onion-vps-logto/README.md no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
-      locality: "host"
+      method: "leitura: README.md do repo onion-logto em 17f4ecd9 (último commit do arquivo até 2026-09-01)"
+      locality: "repo"
   - id: C_trust_matrix_stays_onion
     node_type: claim
     trace: docs/evolution/federation/members.yaml:57-83

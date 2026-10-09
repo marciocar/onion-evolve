@@ -309,7 +309,7 @@ nodes:
 
   - id: E_PLANO_NASCEU_DE_TRES_MEDICOES
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 3
     confidence: 0.9
@@ -318,9 +318,9 @@ nodes:
     trace: docs/analysis/plugins-en-compliance-2026-09-plano.md
     label: "PROVENIENCIA DESTE PLANO. Ele nao saiu de opiniao: as tres frentes derrubaram duas premissas que eu tinha antes de medir. (a) O clau.de/plugin-directory-submission NAO leva ao diretorio oficial — o submissivel e o COMUNITARIO, o oficial nao tem processo de aplicacao e o selo Verified nao e solicitavel. (b) NAO existe requisito publicado de idioma em lugar nenhum da politica; o que existe e taxa-base: o marketplace oficial tem 291 plugins e ZERO descricoes nao-inglesas, e o comunitario 11 em 2.282. (c) O idioma segue o ESCOPO do produto, nao a nacionalidade do time — 25 de 25 repos examinados obedecem, e projeto de dominio brasileiro chega a 11 mil estrelas em pt-BR. (d) O que de fato bloqueia nao e idioma: dos 5 requisitos duros cumprimos um e meio, tres plugins reprovam o validate --strict, o canal de suporte declarado e um 404, e o README afirma coisas FALSAS sobre privacidade e sobre o que os hooks fazem. O plano completo, com a ordem de PRs e os riscos declarados, vive no trace."
     provenance:
-      source: "docs/analysis/plugins-en-compliance-2026-09-plano.md + /home/marcio/.claude/projects/-home-marcio-onion-evolve/5938ea58-21a9-462c-93a3-17003494089c.jsonl"
+      source: "docs/analysis/plugins-en-compliance-2026-09-plano.md + transcrito da sessão 5938ea58 (host)"
       locator: "plano l.6-7 (pesquisa de 2026-09-07, 3 frentes), l.10-15 (um e meio de 5; 3 reprovam --strict; suporte 404; README falso; oficial 291 e ZERO não-inglesas; comunitário 11 em 2.282; Verified não solicitável), l.32-38 (clau.de não leva ao oficial; oficial sem processo); jsonl índice de linha 5455 (task-notification do subagente a5535248c003539cc \"Idioma em projetos populares e comunidade\", 2026-09-07T11:56:59Z): relatório l.14 (25 repos), l.44-50 (escopo local; BrasilAPI 11.110★ pt-BR monolíngue), l.57 e l.136 (\"25/25 consistente: o idioma segue o ESCOPO, não a nacionalidade\")"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/5938ea58-21a9-462c-93a3-17003494089c.jsonl no host (relatório do subagente de 2026-09-07) para a cláusula (c); cláusulas (a), (b) e (d) em leitura do plano versionado"
+      method: "testemunho: leitura do transcrito da sessão 5938ea58 no host (relatório do subagente de 2026-09-07) para a cláusula (c); cláusulas (a), (b) e (d) em leitura do plano versionado"
       locality: "host"
 
   - id: D_CONTATO_DESACOPLADO
@@ -341,7 +341,7 @@ nodes:
 
   - id: D_EMAIL_SUPORTE_E_O_DO_DOMINIO
     node_type: decision
-    plane: PROD
+    plane: DEV
     status: superseded
     impact: 3
     confidence: 0.95
@@ -372,7 +372,7 @@ nodes:
   - id: Q_MX_DO_ONIONEVOLVE
     node_type: question
     drive_kind: execution
-    plane: PROD
+    plane: DEV
     status: done
     impact: 4
     confidence: 0.9
@@ -452,7 +452,7 @@ nodes:
 
   - id: D_EMAIL_SUPORTE_E_MARCIO_ARROBA
     node_type: decision
-    plane: PROD
+    plane: DEV
     status: done
     impact: 3
     confidence: 0.95

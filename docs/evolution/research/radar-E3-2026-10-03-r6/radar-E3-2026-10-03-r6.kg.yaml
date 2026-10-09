@@ -267,7 +267,7 @@ nodes:
 
   - id: E_A_GUARDA_VETOU_O_PROPRIO_MAESTRO
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -278,7 +278,7 @@ nodes:
     trace: '.claude/hooks/premodelswitch-guard.sh'
     verified_against: 'veto observado ao vivo na saida do /model do maestro (2026-10-03); depois 3 payloads reais no hook com rc 0/2/2 E o .claude/sessions/model-switch.jsonl registrando allow/block/block de forma independente do rc'
     provenance:
-      source: "/home/marcio/onion-evolve/.claude/sessions/model-switch.jsonl (host) + /tmp/claude-1000/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/scratchpad/sw.jsonl (host) + commit 08f67521 + commit 4ead57a1 / PR #907"
+      source: ".claude/sessions/model-switch.jsonl (host, fora do git) + scratchpad sw.jsonl da sessão 800cd025 (host) + commit 08f67521 + commit 4ead57a1 / PR #907"
       locator: "model-switch.jsonl l.34 (2026-10-03T23:08:12Z, PreModelSwitch opus-5→opus-5-5, picker, block; único veto de 10-03); sw.jsonl l.1-3 (23:09:38Z: allow restored; block haiku-3; block sonnet-5 degraded); 08f67521^:.claude/hooks/premodelswitch-guard.sh l.79 e radar-baselines.yaml l.51-53; 4ead57a1 (autor 2026-10-03T14:02:43Z) já contém E_OPUS_5_5 l.62"
       method: "testemunho: leitura de .claude/sessions/model-switch.jsonl e scratchpad/sw.jsonl no host 2026-10-09 (não versionados), mais leitura dos commits 08f67521 e 4ead57a1"
       locality: "host"

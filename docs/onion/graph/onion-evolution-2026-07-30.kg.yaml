@@ -141,14 +141,14 @@ nodes:
     impact: 2
     confidence: 1.0
     status: confirmed
-    verified_at: 2026-07-30
+    verified_at: "2026-10-09"
     verified_against: relatorio-escrito
     label: "O relatório do evolve (projeção deste grafo — vista markdown, não fonte paralela)"
     trace: "docs/analysis/onion-evolution-2026-07-30.md"
     provenance:
       source: "docs/analysis/onion-evolution-2026-07-30.md"
-      locator: "relatorio-escrito"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      locator: "l.4 (kg: docs/onion/graph/onion-evolution-2026-07-30.kg.yaml) e l.17-18 (\"este relatório é a projeção dele\")"
+      method: "medição: test -f docs/analysis/onion-evolution-2026-07-30.md && grep -n \"projeção\" no arquivo (origin/main cffe09fe; último commit 40e4229b)"
       locality: "repo"
   - id: E_no_absolute_link_convention
     node_type: evidence

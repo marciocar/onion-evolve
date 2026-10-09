@@ -10254,13 +10254,13 @@ nodes:
     status: open
     impact: 3
     confidence: 0.7
-    verified_at: 2026-07-21
+    verified_at: "2026-10-09"
     trace: ".claude/settings.json · .claude/settings.local.json · find *execution*template* → vazio"
     label: "settings.json e settings.local.json presentes; templates órfãos de execução removidos"
     provenance:
-      source: "/home/marcio/onion-evolve/.claude/settings.local.json + .claude/settings.json@e94fd6f1"
-      locator: ".claude/settings.json@e94fd6f1; .gitignore@e94fd6f1 l.46 (.claude/settings.local.json ignorado); git ls-tree -r e94fd6f1 | grep -i execution (vazio); docs/analysis/onion-sessions-review-2026-06.md@e94fd6f1 l.38 (os templates órfãos)"
-      method: "testemunho: medição da sessão 2026-07-21 (commit e94fd6f1), comando não registrado, para .claude/settings.local.json (gitignored, .gitignore@e94fd6f1 l.46); settings.json e ausência dos templates por leitura de e94fd6f1"
+      source: "onion-evolve@cffe09fe:.claude/settings.json + .claude/settings.local.json (host, gitignored)"
+      locator: "ls -la no checkout principal: settings.json 5869 B (2026-10-06), settings.local.json 7137 B (2026-08-28); templates execution-plan/phase-execution deletados em 3d2cc9c7 (2026-06-14), dir .claude/docs/templates/ inexistente"
+      method: "medição: ls -la .claude/settings.json .claude/settings.local.json (checkout principal do core, 2026-10-09) + git log --diff-filter=D -1 -- .claude/docs/templates/execution-plan-template.md → 3d2cc9c7"
       locality: "host"
   - id: SY6_ev_mcp_json_ausente
     node_type: claim

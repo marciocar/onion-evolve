@@ -21,7 +21,7 @@ nodes:
   - id: E_RITO_COMPLETO_CHAVE_QUEBRADA
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.95
     status: confirmed
@@ -38,7 +38,7 @@ nodes:
   - id: E_DIA_INTEIRO_FORA_DO_PROVIDER
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
@@ -55,7 +55,7 @@ nodes:
   - id: E_WORKLOG_E_MECANISMO_MORTO
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -65,14 +65,14 @@ nodes:
     source_tier: 10
     label: "o worklog e MECANISMO MORTO medido: resume_command em 0 de 12, porque o hook resolve por branch e nenhuma das 12 sessions tem branch — e um dos dois hooks ainda carrega o filtro que ja foi provado no-op em 96% das branches"
     provenance:
-      source: "/home/marcio/onion-evolve/.claude/sessions/*/STATE.md (host) · .claude/hooks/worklog-capture-session.sh@198393e4 · .claude/hooks/worklog-precompact-breadcrumb.sh@198393e4 · commit 3e6a962d"
+      source: ".claude/sessions/*/STATE.md (host, fora do git) · .claude/hooks/worklog-capture-session.sh@198393e4 · .claude/hooks/worklog-precompact-breadcrumb.sh@198393e4 · commit 3e6a962d"
       locator: "12 STATE.md com mtime ≤ 2026-09-30 · capture-session@198393e4:28-29 · precompact@198393e4:11-12 · 3e6a962d diff do hook (l.455 'NO-OP em 56 de 58 branches reais (96%)')"
-      method: "testemunho: leitura dos 12 STATE.md no host + leitura dos hooks no commit 198393e4 e do commit 3e6a962d"
+      method: "testemunho: leitura dos 12 STATE.md no host 2026-09-30 + leitura dos hooks no commit 198393e4 e do commit 3e6a962d"
       locality: "host"
   - id: E_ESQUEMA_DIVERGIU_DA_PRATICA
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 3
     confidence: 1.0
     status: confirmed
@@ -82,9 +82,9 @@ nodes:
     source_tier: 10
     label: "o esquema canonico do STATE.md divergiu 100% da pratica — tres secoes e todos os campos tipados existem em ZERO dos 12 arquivos reais"
     provenance:
-      source: "/home/marcio/onion-evolve/.claude/sessions/*/STATE.md (host) · docs/knowledge-base/concepts/worklog-protocol.md@198393e4"
+      source: ".claude/sessions/*/STATE.md (host, fora do git) · docs/knowledge-base/concepts/worklog-protocol.md@198393e4"
       locator: "STATE.md dos 12 diretórios com mtime ≤ 2026-09-30 · worklog-protocol.md@198393e4:62,65,68,88 (Objective/Constraints/Map/resume_command)"
-      method: "testemunho: leitura dos 12 arquivos .claude/sessions/*/STATE.md no host (fora do git) + leitura do esquema em worklog-protocol.md@198393e4"
+      method: "testemunho: leitura dos 12 arquivos .claude/sessions/*/STATE.md no host 2026-09-30 (fora do git) + leitura do esquema em worklog-protocol.md@198393e4"
       locality: "host"
   - id: C_PRECEDENTE_DERIVAR_DA_BRANCH_FUNCIONA
     node_type: claim
@@ -104,7 +104,7 @@ nodes:
   - id: E_LEVA_NAO_SERVE_COMO_UNIDADE
     node_type: evidence
     layer: audit
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 0.9
     status: confirmed
@@ -205,9 +205,10 @@ nodes:
     source_tier: 10
     label: "a absorcao de KB de adotante se pagou NO MESMO DIA: o core absorveu a v1.1 dele de manha e a v1.2 dele corrigiu o core a tarde"
     provenance:
-      source: "commit fbf9ac12 (corpo) · /home/marcio/gmill@6d60149 e @148a87e:docs/knowledge-base/platforms/zoho-projects-api.md · core@198393e4"
-      locator: "fbf9ac12 corpo §'E o que isto diz da federação' · gmill@6d60149:16 (v1.1, 10:49 -0300) · gmill@148a87e:16 (v1.2, 15:30 -0300) · core@198393e4 zoho-projects-api.md:26 (v1.1)"
-      method: "leitura: corpo do commit fbf9ac12 e as duas versões da KB no histórico do adotante (gmill)"
+      source: "commit fbf9ac12 (corpo) · hub-operacoes-enterprise@6d601498 e @148a87e2:docs/knowledge-base/platforms/zoho-projects-api.md · onion-evolve@198393e4"
+      locator: "fbf9ac12 corpo §'E o que isto diz da federação' · hub-operacoes-enterprise@6d60149:16 (v1.1, 10:49 -0300) · hub-operacoes-enterprise@148a87e:16 (v1.2, 15:30 -0300) · core@198393e4 zoho-projects-api.md:26 (v1.1)"
+      method: "leitura: corpo do commit fbf9ac12 e as duas versões da KB no histórico do adotante (hub-operacoes-enterprise)"
+      locality: "repo"
 
   - id: E_IMPOSSIBILIDADE_ERA_FORMA_NAO_TESTADA
     node_type: evidence
@@ -239,9 +240,10 @@ nodes:
     label: "o main do clone do adotante DIVERGIU do remoto (3x3): push apagaria o ADR da equipe, pull cego reescreveria os updates do Onion — reconciliacao e sobre CONTEUDO deles, nao minha de decidir"
     gatilho: "o maestro dizer qual lado ganha em cada um dos 6 arquivos sobrepostos, OU a equipe do adotante reconciliar no repo dela. Ate la o Onion entrega em branch dedicada a partir do origin/main REAL, sem tocar o main."
     provenance:
-      source: "commit c383df21 (corpo) · /home/marcio/gmill@e1e0ec3 e @148a87e"
-      locator: "c383df21 corpo §Q_GMILL_MAIN_DIVERGIU (\"divergiu 3x3 do remoto... PR #2 da equipe (ADR, 219 linhas)... seis arquivos se sobrepõem\") · gmill@e1e0ec3 (Merge PR #2 ... SAC-59, 2026-09-30 15:40) · gmill@148a87e numstat adr-zoho-projects-task-mapping.md +219"
-      method: "leitura: corpo do commit c383df21 (2026-09-30) + commits e1e0ec3 e 148a87e no clone /home/marcio/gmill"
+      source: "commit c383df21 (corpo) · hub-operacoes-enterprise@e1e0ec3e e @148a87e2"
+      locator: "c383df21 corpo §Q_GMILL_MAIN_DIVERGIU (\"divergiu 3x3 do remoto... PR #2 da equipe (ADR, 219 linhas)... seis arquivos se sobrepõem\") · hub-operacoes-enterprise@e1e0ec3 (Merge PR #2 ... SAC-59, 2026-09-30 15:40) · hub-operacoes-enterprise@148a87e numstat adr-zoho-projects-task-mapping.md +219"
+      method: "leitura: corpo do commit c383df21 (2026-09-30) + commits e1e0ec3 e 148a87e no clone hub-operacoes-enterprise"
+      locality: "repo"
 
   - id: D_NAO_SOBRESCREVER_KB_DE_ADOTANTE
     node_type: decision
@@ -254,10 +256,10 @@ nodes:
     label: "o update NAO sobrescreve KB de terceiro que o adotante evoluiu: o manifesto transporta docs/knowledge-base, mas never-clobber tem de valer ali tambem — o core absorve o que falta, nunca o contrario"
     gatilho: "mecanizar: hoje a exclusao das 3 KBs e MANUAL na entrega. Vira guarda quando um segundo adotante tiver KB propria mais nova que a do core."
     provenance:
-      source: "commit c383df21 (corpo) · /home/marcio/gmill@148a87e:docs/knowledge-base/platforms/zoho-projects-api.md · docs/knowledge-base/platforms/zoho-projects-api.md@198393e4"
-      locator: "c383df21 corpo §D_NAO_SOBRESCREVER_KB_DE_ADOTANTE · gmill@148a87e zoho-projects-api.md:16,18,232,304 (v1.2, /api/v3.1/, global-statuses, custom_fields.READ) · core@198393e4 zoho-projects-api.md:26 (v1.1)"
-      method: "leitura: corpo do commit c383df21 + KB do adotante no commit gmill@148a87e contra a KB do core em 198393e4"
-      locality: "host"
+      source: "commit c383df21 (corpo) · hub-operacoes-enterprise@148a87e2:docs/knowledge-base/platforms/zoho-projects-api.md · docs/knowledge-base/platforms/zoho-projects-api.md@198393e4"
+      locator: "c383df21 corpo §D_NAO_SOBRESCREVER_KB_DE_ADOTANTE · hub-operacoes-enterprise@148a87e zoho-projects-api.md:16,18,232,304 (v1.2, /api/v3.1/, global-statuses, custom_fields.READ) · core@198393e4 zoho-projects-api.md:26 (v1.1)"
+      method: "leitura: corpo do commit c383df21 + KB do adotante no commit hub-operacoes-enterprise@148a87e contra a KB do core em 198393e4"
+      locality: "repo"
 
   # ── SELOS DO MAESTRO EM 2026-10-01 (pesquisa de motores e corpus de regras) ─────────────────
   - id: D_NAO_MIGRAR_O_GATE_PARA_MOTOR_DECLARATIVO

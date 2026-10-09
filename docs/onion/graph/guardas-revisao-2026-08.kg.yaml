@@ -208,7 +208,7 @@ nodes:
 
   - id: E_FIX_PIORA_23_REGRAS
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
@@ -446,7 +446,7 @@ nodes:
 
   - id: E_FUROPRUNE_LINT_0804
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -519,7 +519,7 @@ nodes:
   # ── 2026-08-28: a guarda que anunciava fantasma (farol de sessao) ─────────
   - id: E_FAROL_ANUNCIAVA_FANTASMA
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 4
     confidence: 1.0
     status: confirmed
@@ -673,7 +673,7 @@ nodes:
 
   - id: E_ENUMERACAO_VAZIA_ERA_DESTRUTIVA
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -703,7 +703,7 @@ nodes:
 
   - id: E_A_GUARDA_SELAVA_A_PROPRIA_DOENCA
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed
@@ -718,7 +718,7 @@ nodes:
 
   - id: E_RENDER_ERA_LOCALE_DEPENDENTE
     node_type: evidence
-    plane: PROD
+    plane: DEV
     impact: 5
     confidence: 1.0
     status: confirmed

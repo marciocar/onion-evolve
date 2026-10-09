@@ -207,7 +207,7 @@ nodes:
   # ═══════════════ O achado operacional: dois SSOTs, e o projetor escolhe pela CWD ═══════════════
   - id: E_ESPELHO_CADUCO_DO_SSOT_DA_FEDERACAO
     node_type: evidence
-    plane: PROD
+    plane: DEV
     status: confirmed
     impact: 5
     confidence: 1.0

@@ -312,7 +312,7 @@ nodes:
     narrative: "label anterior: CONTABILIDADE EXATA DESTA RODADA. (A) NAO VERIFICADAS por 403 ou truncagem: ZERO. (B) REFUTADAS POR FONTE FRACA: 17 — e e aqui que a rodada se fere, porque entre elas estao justamente os numeros dos eixos 3 e 5: Semgrep US$35 por contributor/mes e motor LGPL gratis ate 10 contributors, Vanta mediana US$17.700 a 100 funcionarios e US$5.000 de lista por framework adicional, Drata mediana US$20.300-26.700, Sentry cerca de US$128M de ARR com 70% vindo de self-serve, Snyk caindo de US$7,4B para cerca de US$3,7B, a commoditizacao do scanning pela plataforma, a agentrust-trace distribuindo a camada de atestacao de graca, os agregados de capital (12 rodadas, US$186,8M, Gray Swan, Cinder), o OPA graduado na CNCF, a leitura anti-padrao do open-core da Styra, a pagina de precos da AWS em tier 9 e a doc de hooks dizendo que nao ha billing. CONSEQUENCIA: dos SEIS eixos pedidos, o 3 (open-core com numero) e o 5 (anti-padrao) nao tem UMA evidencia confirmada neste grafo. (C) CORTADAS POR ORCAMENTO: o repasse trouxe DOIS numeros DIVERGENTES e esta sessao NAO os reconciliou — o contrato de conteudo diz 31 fontes e 56 claims, enquanto a opcao (f) fala em 10 fontes nao lidas e 15 cortes. Entre os cortes nomeados esta o que a Geordie de fato vende (discovery mais risk mapping mais remediacao por context engineering, packaging de plataforma e NAO gate por veredito) e o item do AgentCore sobre Gateway e Evaluations. (D) OBJECOES: 10 sobreviventes entregues pelo Elenxo, 10 MODELADAS neste grafo — nenhuma ficou de fora; a decima chegou TRUNCADA no repasse (o texto corta em \"A fonte nao responde as seis perguntas...\") e esta modelada pelo que dela se le, declarado em E_OBJECAO_AUSENCIA_CONTADA_COMO_ACHADO. (E) NAO MEDIDO E NOMEADO: pagina de precos da AWS, site e docs do Vectimus e do Sondera, blips e PDF do Thoughtworks Radar, objeto social da Neo, qualquer analista de casa, e o preco de QUALQUER concorrente direto de framework de orquestracao."
     trace: 'docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/unidade-bilhetavel-do-onion-2026-10.kg.yaml'
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_8fc9168b-69a.json"
+      source: "journal wf_8fc9168b-69a (host)"
       locator: "journal wf_8fc9168b-69a.json: result.stats {sources 24, claims 90, verified 34, confirmed 17, refuted 17, unverified 0}; logs \"fetch 24 (31 cortadas por orçamento)\", \"Fontes 24 → claims 90 → verificando top 34 (56 fora do orçamento)\", \"Elenxo: 60 objeções, 52 sobreviventes\"; result.refuted (17)"
       method: "testemunho: leitura do journal wf_8fc9168b-69a no host 2026-10-01"
       locality: "host"
@@ -404,9 +404,9 @@ nodes:
     label: 'OBJECAO 1 (Elenxo, 1 agente sem votacao) — o achado PROVA O CONTRARIO do que a pergunta precisa: se o exit 2 e NATIVO da plataforma e documentado publicamente, ele e um PRIMITIVO GRATIS disponivel a qualquer concorrente, nao unidade bilhetavel nem moat. Qualquer um escreve um hook que sai 2; ninguem paga pelo que a plataforma da de graca. E o CLAUDE.md ja diz que isso compra o acoplamento — comprar acoplamento NAO e gerar receita, e a rodada confunde as duas coisas. CORRECAO DE NUMERO desta sessao, porque refutador tambem se re-mede: o Elenxo declarou 117 ocorrencias de PreToolUse no binario; medido aqui com `grep -ao` sao 243 (provavel diferenca de metodo, linhas versus ocorrencias). A direcao da objecao nao muda.'
     trace: '/home/marcio/.local/share/claude/versions/2.1.286'
     provenance:
-      source: "/home/marcio/.local/share/claude/versions/2.1.286"
+      source: "binário do Claude Code 2.1.286 (host)"
       locator: "achado 1 (exit 2 nativo, tier 9) lido contra a medicao local de 2026-10-01: o binario 2.1.286 traz 243 ocorrencias de PreToolUse e 195 de bypassPermissions — o Elenxo declarou 117, numero que NAO reproduz aqui"
-      method: "testemunho: leitura do arquivo /home/marcio/.local/share/claude/versions/2.1.286 no host; provenance derivada na migração ao contrato v4 (trace do nó; rota A2 da triagem); não reverificado"
+      method: "medição: contagem de ocorrências no binário do Claude Code 2.1.286 no host 2026-10-01 (PreToolUse=243, bypassPermissions=195), comando exato não registrado; o 2.1.286 não está mais instalado (versions/ tem 2.1.293 a 2.1.296)"
       locality: "host"
 
   - id: E_OBJECAO_STYRA_E_DE_2025_E_INFERENCIA
@@ -566,9 +566,9 @@ nodes:
     label: 'OBJECAO 10 (Elenxo, 1 agente sem votacao) — CHEGOU TRUNCADA no repasse e esta modelada pelo que dela se le, declarado aqui para nao inflar nem apagar: o texto corta em A fonte nao responde as seis perguntas, apontando o mesmo vicio da objecao 5. O que a contagem desta sessao confirma: CINCO dos 17 achados confirmados sao declaracoes de ausencia, nao de conteudo. Uma rodada em que quase um terco da evidencia confirmada e eu procurei e nao achei nao sustenta selo de modelo de negocio — sustenta segunda passada. Esta e a objecao que mais diretamente empurra para (f).'
     trace: 'docs/evolution/research/unidade-bilhetavel-do-onion-2026-10/unidade-bilhetavel-do-onion-2026-10.kg.yaml'
     provenance:
-      source: "/home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_8fc9168b-69a.json"
+      source: "journal wf_8fc9168b-69a (host)"
       locator: "journal wf_8fc9168b-69a.json: result.decision.objections[9] (target \"Achado 10 — A fonte não responde às seis perguntas… (mesmo arXiv)\": \"Dois achados confirmados (9 e 10) extraídos da MESMA fonte... a rodada parece ter 17 achados e tem, na prática, ~11 com conteúdo\") + objections[4] (achado 5, Radar sem info), [7] (achado 8, Vectimus sem preço), [12] (achado 13, openappa sem evidência), [16] (achado 17, Sondera sem preço)"
-      method: "testemunho: leitura do arquivo /home/marcio/.claude/projects/-home-marcio-onion-evolve/800cd025-cb6e-490f-885e-582787e16612/workflows/wf_8fc9168b-69a.json no host"
+      method: "testemunho: leitura do journal wf_8fc9168b-69a no host 2026-10-01"
       locality: "host"
 
 edges:

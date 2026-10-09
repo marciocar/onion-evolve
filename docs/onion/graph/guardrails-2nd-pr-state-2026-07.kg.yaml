@@ -92,7 +92,7 @@ nodes:
 
   - id: C_SURFACE_REMAINS_GATED
     node_type: claim
-    plane: PROD
+    plane: DEV
     status: done
     impact: 3
     confidence: 0.9
@@ -265,14 +265,14 @@ nodes:
     status: confirmed
     impact: 5
     confidence: 0.95
-    verified_at: 2026-07-31
+    verified_at: "2026-10-09"
     verified_against: projection-safety.sh-linha-74-run_audit-e-KG-relay-gustavo-P7
     label: "O mecanismo efetivo JA EXISTE: projection-safety.sh audita artefato ARBITRARIO (path posicional) contra termos DECLARADOS pelo adotante (--terms), exit 1 no vazamento, disciplina fail-loud P0-P5 (lista vazia=falha, nunca verde-falso). Shipado + dogfoodado (Gustavo Produto 7 = gate client-safe: adotante declara proprios nomes de cliente, gateia artefato antes de cruzar a fronteira). Nenhuma engine/DSL nova necessaria"
     trace: ".claude/validation/projection-safety.sh"
     provenance:
       source: ".claude/validation/projection-safety.sh"
-      locator: "projection-safety.sh-linha-74-run_audit-e-KG-relay-gustavo-P7"
-      method: "testemunho: provenance derivada na migração ao contrato v4 (trace do nó; rota A1 da triagem); não reverificado"
+      locator: "l.74 (--terms) e l.140-154 (gate client-safe; lista vazia = HARD)"
+      method: "medição: bash .claude/validation/projection-safety.sh --terms <arquivo com 1 termo> <alvo que o contém> → rc=1 \"✗ REPROVA — 1 violação(ões) HARD\"; com --terms <arquivo vazio> → rc=1 \"lista de termos ... está vazia\" (2026-10-09, origin/main cffe09fe)"
       locality: "repo"
 
   - id: E_HOOK_SUBSTRATE
