@@ -2,7 +2,7 @@
 branch: fix/cited-directive-reextract-2-1-295
 pr: pendente
 date: 2026-10-09
-reviewed_diff_sha256: b81b73cae687ea7b3f71d501f4933f5b796b03ee9156147b7aacf9bdf5063372
+reviewed_diff_sha256: 2a321c4f9e26c21352c750985168131e6f2e7217ab2a57e3a984f0a3c170de51
 reviewed_code_sha256: 76c06b34d2e3b457133ddfbaca85adfdf82a265b2e984cc1b54cb2e5072dc68a
 findings_total: 4
 findings_real: 1
