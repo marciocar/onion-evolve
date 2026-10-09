@@ -21141,14 +21141,14 @@ STUB
   rm -f "${stamps}"/*; _rp_stamp vizinho "${PIN_OLD}"; _rp_stamp alvo "${PIN_NEW}"
   _rp_reg "${PIN_OLD}" "${PIN_OLD}" "github.com/dono/alvo"; local _sum0; _sum0="$(cksum < "${REG}")"
   _rp --check
-  if [ "${_r}" -eq 1 ] && grep -E '^alvo ' <<< "${_o}" | grep -q 'DIVERGE' && [ "$(cksum < "${REG}")" = "${_sum0}" ]; then
+  if [ "${_r}" -eq 1 ] && grep -qE '^alvo .*DIVERGE' <<< "${_o}" && [ "$(cksum < "${REG}")" = "${_sum0}" ]; then
     record_pass "registry-pins: (a) pin divergente no remoto ⇒ --check rc=1 e NÃO escreve"
   else record_fail "registry-pins: (a) divergência não acusada" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
 
   # (b) remoto ILEGÍVEL e sem clone ⇒ declarado ILEGÍVEL, rc=3, NUNCA 'ok' nem rc=0
   rm -f "${stamps}/dono_alvo_main"
   _rp --check
-  if [ "${_r}" -eq 3 ] && grep -E '^alvo ' <<< "${_o}" | grep -q 'ILEGÍVEL' && ! grep -E '^alvo ' <<< "${_o}" | grep -qE ' ok$'; then
+  if [ "${_r}" -eq 3 ] && grep -qE '^alvo .*ILEGÍVEL' <<< "${_o}" && ! grep -qE '^alvo .* ok$' <<< "${_o}"; then
     record_pass "registry-pins: (b) remoto ilegível ⇒ ILEGÍVEL declarado e rc=3 (nunca zero silencioso)"
   else record_fail "registry-pins: (b) ilegível virou ok" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
 
@@ -21176,7 +21176,7 @@ STUB
   git -C "${clone}" add -A >/dev/null 2>&1; git -C "${clone}" -c user.email=t@t -c user.name=t commit -q -m stamp
   _rp_reg "${PIN_OLD}" "${PIN_OLD}" "n/a"
   _rp --seal
-  if [ "${_r}" -eq 1 ] && grep -E '^alvo ' <<< "${_o}" | grep -q 'clone-local' && grep -q 'só carimba o remoto' <<< "${_o}" \
+  if [ "${_r}" -eq 1 ] && grep -qE '^alvo .*clone-local' <<< "${_o}" && grep -q 'só carimba o remoto' <<< "${_o}" \
      && grep -qF "onion_version: ${PIN_OLD}   # comentario antigo do alvo" "${REG}"; then
     record_pass "registry-pins: (e) leitura de clone acusa a divergência, mas o --seal só carimba o remoto"
   else record_fail "registry-pins: (e) carimbou leitura de clone" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
@@ -21189,7 +21189,7 @@ STUB
   _rp_reg "${PIN_OLD}" "${PIN_OLD}" "github.com/dono/alvo"
   sed -i '/^  - id: alvo$/a\    role: standalone' "${REG}"
   _rp --seal
-  if [ "${_r}" -eq 1 ] && grep -E '^alvo ' <<< "${_o}" | grep -q 'papel: registro standalone × carimbo hub' \
+  if [ "${_r}" -eq 1 ] && grep -qE '^alvo .*papel: registro standalone × carimbo hub' <<< "${_o}" \
      && grep -qF "onion_version: ${PIN_OLD}   # comentario antigo do alvo" "${REG}"; then
     record_pass "registry-pins: (f) carimbo de outra adoção (papel incompatível) ⇒ acusa e NÃO carimba"
   else record_fail "registry-pins: (f) carimbou carimbo de outra adoção" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
@@ -21204,7 +21204,7 @@ STUB
   rm -f "${stamps}/dono_alvo_main"
   _rp_reg "${PIN_OLD}" "${PIN_OLD}" "github.com/dono/alvo"
   _rp --check
-  if [ "${_r}" -eq 3 ] && grep -E '^alvo ' <<< "${_o}" | grep -q 'ILEGÍVEL' && ! grep -E '^alvo ' <<< "${_o}" | grep -qE ' ok$'; then
+  if [ "${_r}" -eq 3 ] && grep -qE '^alvo .*ILEGÍVEL' <<< "${_o}" && ! grep -qE '^alvo .* ok$' <<< "${_o}"; then
     record_pass "registry-pins: (g) remoto falhou e só o clone confirma ⇒ ILEGÍVEL rc=3 (clone parado não vira 'em dia')"
   else record_fail "registry-pins: (g) clone parado virou ok" "rc=${_r} out=$(_emit "${_o}" | head -c 300)"; fi
   unset -f _rp _rp_reg _rp_stamp
