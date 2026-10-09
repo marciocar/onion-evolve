@@ -2,8 +2,8 @@
 title: 'Resíduo — gmill.onionevolve.com: o 1º vhost de conf.d versionado, com segredo fora do git'
 date: 2026-10-08
 branch: ops/gmill-demo-site
-reviewed_diff_sha256: pendente
-reviewed_code_sha256: 8066dc592f5ea5e75aa971c08b8aa39326df268dfd9596db5cf10051daed7953
+reviewed_diff_sha256: 05ba8293aee1e16bee31f7d9603c5feccf03ce7deccbe2368917ee5867860fc3
+reviewed_code_sha256: 07675c24dd5e2d0c8353f4bd6372f1bd18fbf86d38077919adc9d9241e1a7e1e
 findings_total: 7
 findings_real: 6
 findings_fixed: 5
