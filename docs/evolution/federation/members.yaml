@@ -263,7 +263,7 @@ members:
     parent: onion-evolve
     remote: github.com/marciocar/onion-standalone   # PÚBLICO desde 2026-07-19 (flip feito, verificado ao vivo). Resta gated: reapontar o redirect onion-claude→onion-standalone (onion-claude segue privado)
     local_path: "/home/marcio/onion-standalone"
-    onion_version: 685140eadd7d   # carimbado por ops/door-seal-pin.sh (remoto conferido)
+    onion_version: 947e69ce069d   # carimbado por ops/door-seal-pin.sh (remoto conferido)
     adopted_at: 2026-07-19
     mode: greenfield            # pasta vazia → adopt role-scoped; SÓ o bundle standalone (eng/product/testing/docs), meta-factory selada
     personality_summary: "A porta pública Claude do Onion: instância adotada role-scoped (bundle standalone: eng/product/testing/docs), SEM meta-factory nem memória privada de evolução. Derivação que cita o core (pin verificado). Desfaz o colapso porta≡core; nasce privada, flip público gated."
@@ -425,7 +425,7 @@ members:
     #    orfao unico + force-push, e nao ha nada a preservar nisso. LIMITE DECLARADO: o objeto antigo
     #    segue acessivel por SHA ate o GC do GitHub, e quem clonou tem copia — o force-push torna
     #    INALCANCAVEL, nunca inexistente.
-    onion_version: 8278fee79d1c   # carimbado por ops/door-seal-pin.sh (remoto conferido)
+    onion_version: 947e69ce069d   # carimbado por ops/door-seal-pin.sh (remoto conferido)
                                   # via `gh api repos/marciocar/onion-core/commits/main` -> 5063e81b2d8d.
                                   # ⚠️ SEGUNDA vez EM UM DIA que este numero e avancado A MAO, e a 1a vez
                                   # eu escrevi aqui que 'numero mantido a mao apodrece'. Apodreceu em duas
