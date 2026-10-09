@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Medidas finais sobre rows.json (classificador v3): encaminhamento, classe de method proposta, cruzamentos."""
-import json, re, collections
+import json, os, re, collections
 
-R = json.load(open("/tmp/prov-triage/rows.json"))
+HERE = os.environ.get("PROV_HERE", "/tmp/prov-triage")
+R = json.load(open(f"{HERE}/rows.json"))
 JUIZES = re.compile(r'votos?\s*\d|vota[çc][ãa]o|\bjuiz|ju[ií]zes|elenxo|adversarial|\bwf_|veredito|painel|worker', re.I)
 LEITURA = re.compile(r'QUOTE|verbatim|cita[çc][ãa]o|\blid[oa]\b|leitura|gh: PR #|WebFetch|se[çc][ãa]o|p\. \d|l\.\d|:\d+', re.I)
 MEDICAO = re.compile(r'grep|curl|medid|medi[çc]|rodad|executad|exit \d|rc=|selftest|bancada|wc -l|contagem|dogfood|sandbox|mutante|ls |git log|jq ', re.I)
@@ -38,7 +39,7 @@ for r in R:
     r["route_hint"] = ROUTE[r["cls"]]
     r["final"] = "R" if r["cls"] in FAILED else r["cls"]
     r["demo"] = bool(DEMO.search(r["graph"].split("/")[-1]))
-json.dump(R, open("/tmp/prov-triage/rows-final.json", "w"), ensure_ascii=False, indent=0)
+json.dump(R, open(f"{HERE}/rows-final.json", "w"), ensure_ascii=False, indent=0)
 
 C = collections.Counter
 print("classe v3:", dict(sorted(C(r["cls"] for r in R).items())))
@@ -62,8 +63,14 @@ for k, v in g.items():
     d = max(v, key=v.get); dom[d].append((k, sum(v.values()), round(v[d] / sum(v.values()), 2)))
 for d, lst in sorted(dom.items()):
     print("DOM", d, len(lst), "grafos,", sum(x[1] for x in lst), "nós")
-json.dump({k: dict(v) for k, v in g.items()}, open("/tmp/prov-triage/per-graph.json", "w"), ensure_ascii=False, indent=1)
+json.dump({k: dict(v) for k, v in g.items()}, open(f"{HERE}/per-graph.json", "w"), ensure_ascii=False, indent=1)
 # resíduo por dica de subclasse
 print("R por subclasse-dica:", C((r["cls"], r["sub"].split("+")[0]) for r in R if r["final"] == "R").most_common())
 print("R PROD nao-confirmed:", sum(1 for r in R if r["final"] == "R" and r["plane"] == "PROD" and r["status"] != "confirmed"))
 print("U v3 por plano/status:", C((r["plane"], r["status"]) for r in R if r["cls"] == "U"))
+# o routing por nó (a entrada do kg-migrate-v3 --routing): uma linha por nó, na ordem do corpus
+with open(f"{HERE}/routing.tsv", "w", encoding="utf-8") as fh:
+    fh.write("graph\tid\tstatus\tplane\tclass\tsubclass\tfinal\tmethod_class\ttool_derives\n")
+    for r in R:
+        fh.write("\t".join([r["graph"], r["id"], r["status"] or "", r["plane"] or "", r["cls"], r["sub"], r["final"],
+                            r["method_class"], r["tool"]]) + "\n")

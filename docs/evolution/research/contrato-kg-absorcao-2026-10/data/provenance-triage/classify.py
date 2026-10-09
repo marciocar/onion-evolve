@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 """Classificador determinístico dos candidatos à provenance (fora do repo, somente leitura) — v3.
 Reusa o kg-migrate-v3.py (source_of, NODE_RE, FIELD_RE, scalar) para que o universo seja o MESMO da ferramenta.
-v3 = v2 + as 9 curas que a amostra da rodada 1 apontou (ver REPORT.md §4)."""
+v3 = v2 + as 9 curas que a amostra da rodada 1 apontou (ver REPORT.md §4).
+v4 (2026-10-09, re-medição da onda O1): caminhos por ambiente (PROV_REPO = a árvore medida, PROV_HERE = o dir
+de entrada/saída) e o universo do contrato v4 — status unverifiable fica isento de provenance, mesmo em PROD."""
 import importlib.util, json, os, re, sys, collections
 
-REPO = "/home/marcio/onion-evolve"
-HERE = "/tmp/prov-triage"
+CANON = "/home/marcio/onion-evolve"   # o prefixo absoluto que os grafos citam (o checkout do core)
+REPO = os.environ.get("PROV_REPO", CANON).rstrip("/")
+HERE = os.environ.get("PROV_HERE", "/tmp/prov-triage")
 spec = importlib.util.spec_from_file_location("mig", f"{REPO}/.claude/utils/kg/kg-migrate-v3.py")
 mig = importlib.util.module_from_spec(spec); spec.loader.exec_module(mig)
 
@@ -71,8 +74,9 @@ def paths_in(text):
     repo, ext = [], []
     for m in ABS_RE.finditer(text):
         p = m.group(1)
-        if p.startswith(REPO + "/"):
-            repo.append(clean_path(p[len(REPO) + 1:]))
+        pre = next((x for x in (REPO, CANON) if p.startswith(x + "/")), None)
+        if pre:
+            repo.append(clean_path(p[len(pre) + 1:]))
         else:
             ext.append(p)
     for m in mig.PATH_RE.finditer(text):
@@ -187,7 +191,8 @@ def nodes_of(path):
 
 def classify(fields, graph, nid):
     status, plane = mig.scalar(fields.get("status", "")), mig.scalar(fields.get("plane", ""))
-    if not ((status == "confirmed" or plane == "PROD") and "provenance" not in fields):
+    # contrato v4: unverifiable é o destino do nó sem fonte e fica isento (Q_CONTRACT_SOURCELESS_CONFIRMED)
+    if not ((status == "confirmed" or plane == "PROD") and status != "unverifiable" and "provenance" not in fields):
         return None
     gdir = os.path.dirname(graph)
     va = mig.scalar(fields.get("verified_against", "")) or ""
