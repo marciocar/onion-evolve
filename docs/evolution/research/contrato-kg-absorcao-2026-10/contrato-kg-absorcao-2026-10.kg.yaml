@@ -4,13 +4,14 @@
 # matriz leitor x caso. Fica fora da fila de 2026-10-06 porque a fila está no teto.
 # Migrado ao contrato v3 no SAC-71 (2026-10-08): datas entre aspas e provenance nos nós confirmed.
 meta:
-  x_drive_checkpoint: sealed
+  x_drive_checkpoint: pending
+  x_drive_checkpoint_note: "lote 3 (O2): trace como locator nos A1/A2 sem verified_against; PR para merge humano"
   id: contrato-kg-absorcao-2026-10
   schema_version: "1"
   baseline: "2026-10-08"
   review_after: "2026-11-07"   # 30d: programa de trabalho
-  # ═══ TETO: 16 NÓS ═══
-  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08); 15 em 2026-10-09 (+E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH); 16 em 2026-10-09 (+E_ONDA_O1_APLICADA: a onda O1 é colhida aqui, e a evidência dela pertence ao programa que a mede, não a um grafo novo). NO TETO: onda nova exige onda colhida.
+  # ═══ TETO: 17 NÓS ═══
+  #   14 em 2026-10-08 (+E_CONTRATO_V4_ADOTADO); (+E_TRIAGEM_DA_PROVENANCE_DO_CORPUS, +D_POLITICAS_DA_MIGRACAO_DE_PROVENANCE, +Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH; o do trace da raiz foi para kg-read-leg-2026-08); 15 em 2026-10-09 (+E_MERGE_EXIGE_MERGE_COMMIT_QUANDO_GRAFO_CITA_A_BRANCH); 16 em 2026-10-09 (+E_ONDA_O1_APLICADA: a onda O1 é colhida aqui, e a evidência dela pertence ao programa que a mede, não a um grafo novo); 17 em 2026-10-09 (+E_ONDA_O2_APLICADA: mesma razão da O1 — cada onda colhida é um nó de evidência do programa que a mede, e a O1 já está colhida). NO TETO: a O3 entra só colhendo a O2 ou fundindo O1 e O2 num nó.
 nodes:
   - id: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     node_type: evidence
@@ -235,6 +236,22 @@ nodes:
       source: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/routing-v4.tsv e .kg-ssot/gate.json na branch feat/provenance-wave-o1"
       locator: "coluna final do routing (A1, A2, R) e a chave failing da base (115 grafos)"
       method: "medição: classificador, kg-migrate-v3 --routing, kg-radar, kg-contract-check e kg_gate em 2026-10-09"
+  - id: E_ONDA_O2_APLICADA
+    node_type: evidence
+    layer: audit
+    plane: DEV
+    status: confirmed
+    impact: 4
+    confidence: 0.85
+    verified_at: "2026-10-09"
+    verified_against: "branch feat/provenance-wave-o2 sobre origin/main 49e50466: kg-migrate-v3 --routing routing-v4.tsv aplicado aos 138 grafos do corpus do gate; --check rc 0 na 2ª passada; kg-radar --integrity --schema exit 0 nos 36 grafos tocados; kg-contract-check sem código novo em nenhum; kg_gate.py com os --exclude do CI rc 0 e --update sem --accept-regression; bancada kg_migrate_v3 10/10 com LC_ALL=C e 8 mutantes reprovando o caso (i)"
+    label: "a onda O2 escreveu o trace como locator em 602 nós A2 sem verified_against de 36 grafos (601 derivado, 1 testemunho de host); 22 recusas e os 47 run-local-va vão para a O3, e a base do gate caiu de 115 para 114 grafos"
+    narrative: "O universo de 671 'sem fonte' do routing não era todo trace sem verified_against: 624 têm trace e nenhum registro, 47 (run-local-va) citam um journal wf_* no registro e não têm trace, e ficam como sem fonte recuperável. Dos 624, a ferramenta escreveu 602 com method 'derivado: trace do nó, sem registro de medição' (595 caminho do repo, 5 URL, 1 LICENSE:1, 1 caminho de host como testemunho pela política 4) e recusou 22 por critério mecânico achado na passada adversarial: 17 traces que registram um comando (grep, ls, find, git, run do Actions, PR #N), que são medição e pela política 2 pedem 'medição: <comando>', e 5 citações sem localizador (memória, histórico de outro repo, 'síntese desta leva'). Nenhum trace sumido sobrou, porque o routing já os mandara para R. Amostra de 20 escritos com o arquivo aberto: 18 sustentam o label e 2 só em parte. Fora da amostra, 6 dizem o resultado de uma execução sobre o artefato do trace (465 passaram, exit 0, dogfood, reproduz, wired, ausência de comando); a regex que os pegaria tinha 3 falsos positivos em 9, então foram escritos e vão para a O3 revisitar. Só 1 grafo saiu inteiro da dívida MUST, porque os outros 35 ainda têm nós do resíduo. A O3 recebe 820 nós sem provenance (477 PROD e 343 DEV) mais 8 escritos para revisitar, em data/provenance-triage/o3-universe.tsv."
+    trace: "docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o3-universe.tsv"
+    provenance:
+      source: ".claude/utils/kg/kg-migrate-v3.py, docs/evolution/research/contrato-kg-absorcao-2026-10/data/provenance-triage/o3-universe.tsv e .kg-ssot/gate.json na branch feat/provenance-wave-o2"
+      locator: "o relatório do kg-migrate-v3 --routing (provenance derivada, trace sem localizador, registro de comando), as colunas hint e bucket do o3-universe e a chave failing da base (114 grafos)"
+      method: "medição: kg-migrate-v3 --routing, kg-radar, kg-contract-check, kg_gate e bancada com mutantes em 2026-10-09"
 edges:
   - from: E_GATE_ACEITA_FORMA_QUE_O_CONTRATO_REPROVA
     to: D_GATE_CHAMA_O_VALIDADOR_DO_CONTRATO
@@ -282,5 +299,8 @@ edges:
     to: Q_REBASE_QUEBRA_PROVENANCE_DA_BRANCH
     edge_type: SUPPORTS
   - from: E_ONDA_O1_APLICADA
+    to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
+    edge_type: SUPPORTS
+  - from: E_ONDA_O2_APLICADA
     to: Q_MIGRAR_CORPUS_PARA_CONTRATO_V3
     edge_type: SUPPORTS
