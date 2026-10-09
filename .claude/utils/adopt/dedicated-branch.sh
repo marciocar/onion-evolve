@@ -56,7 +56,7 @@ fi
 
 if [ "${LIVE}" = 1 ]; then
   WT="$(dirname "${TOP}")/$(basename "${TOP}")-${BR//\//-}"
-  if git -C "${TOP}" worktree list --porcelain | grep -qxF "worktree ${WT}"; then
+  if grep -qxF "worktree ${WT}" <<< "$(git -C "${TOP}" worktree list --porcelain)"; then
     _cur="$(git -C "${WT}" rev-parse --abbrev-ref HEAD 2>/dev/null)"
     [ "${_cur}" = "${BR}" ] || { echo "ERRO: a worktree ${WT} existe mas está em '${_cur}', não em '${BR}'." >&2; exit 2; }
   elif [ -e "${WT}" ]; then
