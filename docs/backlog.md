@@ -384,7 +384,7 @@
 | Atenção | Nó | Grafo | O que é |
 |--:|---|---|---|
 | 23.4 | `Q_MIGRAR_CORPUS_PARA_CONTRATO_V3` | contrato-kg-absorcao-2026-10 | o que resta: as ondas da migração do corpus com a ferramenta kg-migrate-v3 (datas e provenance derivável), os nós sem fonte re |
-| 7.2 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
+| 9.6 | `Q_ABSORVER_VALIDADOR_DO_CONTRATO` | contrato-kg-absorcao-2026-10 | o que resta depois do gate do contrato no CI: decidir o pre-commit, os válidos que o radar ainda recusa (lista sem indentação,  |
 | 2.4 | `Q_PORT_JS_DO_RADAR_DIVERGE` | contrato-kg-absorcao-2026-10 | o port JS do radar no app pessoal não espelha o radar que declara espelhar; dono: o maestro (app), não o core |
 
 ## guardas-revisao-2026-08 — 4 item(ns)

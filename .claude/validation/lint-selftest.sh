@@ -3789,6 +3789,105 @@ run_kg_provenance_selftests() {
 }
 
 # ---------------------------------------------------------------------------
+# Modo kg-radar-contract — o radar contra os CASOS DO DONO DO CONTRATO (SAC-96, 2026-10-09).
+# O vendor `vendor/kg-ssot` traz a matriz `latest/integrity/coherence/`, e o radar divergia dela em
+# dois códigos SHOULD: integrity.testimony-in-prod (o radar só lia `evidence_class`, e o caso
+# `warn-testimony-method-in-prod` declara o testemunho no `provenance.method`) e
+# integrity.untraced-decision (o radar cobrava origem da decision que já traz `provenance`). As
+# fixtures são as do VENDOR, não cópias: se o dono mudar o caso, esta família vê. As TRÊS
+# polaridades no mesmo lugar — avisa no warn, cala no valid, e continua cobrando a decisão sem
+# nenhuma origem — e um mutante por cura, senão "passar" não distingue cura de guarda morta.
+# Sem o vendor (adotante que não o vendoriza) a família pula com ⊘ VISÍVEL.
+# ---------------------------------------------------------------------------
+run_kg_radar_contract_selftests() {
+  local radar="${SCRIPT_DIR}/kg-radar.sh"
+  local cx="${REPO_ROOT}/vendor/kg-ssot/spec/conformance/fixtures/latest/integrity/coherence"
+  local out rc mut
+  if [ ! -f "${cx}/warn-testimony-method-in-prod.kg.yaml" ] || [ ! -f "${cx}/valid-decision-with-provenance.kg.yaml" ]; then
+    record_skip "kg-radar-contract: vendor/kg-ssot sem a matriz latest/integrity/coherence — família pulada"
+    return 0
+  fi
+
+  # (a) WARN pelo method: nó PROD com `provenance.method: "testemunho: …"` → MISPLANED (aviso, exit 0).
+  rc=0; out=$(LC_ALL=C bash "${radar}" "${cx}/warn-testimony-method-in-prod.kg.yaml" --freshness 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'MISPLANED: EV_A (plane:PROD mas provenance.method: testemunho' <<< "${out}"; then
+    record_pass "kg-radar-contract: (a) PROD com provenance.method testemunho → MISPLANED (integrity.testimony-in-prod)"
+  else record_fail "kg-radar-contract: (a) warn-testimony-method-in-prod" "rc=${rc} out=${out}"; fi
+
+  # (b) o caso pela CLASSE segue avisando, e UMA vez só (os dois marcadores não somam dois avisos).
+  rc=0; out=$(LC_ALL=C bash "${radar}" "${cx}/warn-testimony-class-in-prod.kg.yaml" --freshness 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && [ "$(grep -c 'MISPLANED: EV_A' <<< "${out}")" -eq 1 ]; then
+    record_pass "kg-radar-contract: (b) PROD com evidence_class testimony → MISPLANED uma vez"
+  else record_fail "kg-radar-contract: (b) warn-testimony-class-in-prod" "rc=${rc} out=${out}"; fi
+
+  # (c) VALID: o mesmo testemunho em DEV não avisa.
+  rc=0; out=$(LC_ALL=C bash "${radar}" "${cx}/valid-testimony-in-dev.kg.yaml" --freshness 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q 'MISPLANED' <<< "${out}"; then
+    record_pass "kg-radar-contract: (c) testemunho em DEV → nada a avisar"
+  else record_fail "kg-radar-contract: (c) valid-testimony-in-dev" "rc=${rc} out=${out}"; fi
+
+  # (d) VALID: decision com provenance tem origem → sem decisão-sem-proveniência, ✅ 1.
+  rc=0; out=$(LC_ALL=C bash "${radar}" "${cx}/valid-decision-with-provenance.kg.yaml" --provenance 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q 'decisão-sem-proveniência' <<< "${out}" && grep -q '✅ 1 decisão' <<< "${out}"; then
+    record_pass "kg-radar-contract: (d) decision com provenance → origem aceita (sem integrity.untraced-decision)"
+  else record_fail "kg-radar-contract: (d) valid-decision-with-provenance" "rc=${rc} out=${out}"; fi
+
+  # (e) WARN: decision SEM trace, SEM provenance e SEM TRACES_TO continua cobrada (a cura não matou a guarda).
+  rc=0; out=$(LC_ALL=C bash "${radar}" "${cx}/warn-untraced-decision.kg.yaml" --provenance 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && grep -q 'decisão-sem-proveniência: D_A' <<< "${out}"; then
+    record_pass "kg-radar-contract: (e) decision sem nenhuma origem → segue cobrada"
+  else record_fail "kg-radar-contract: (e) warn-untraced-decision" "rc=${rc} out=${out}"; fi
+
+  # (f) as quatro fixtures são grafos íntegros — veredito sobre grafo quebrado seria vacuidade.
+  local f bad=""
+  for f in warn-testimony-method-in-prod warn-testimony-class-in-prod valid-testimony-in-dev valid-decision-with-provenance warn-untraced-decision; do
+    rc=0; LC_ALL=C bash "${radar}" "${cx}/${f}.kg.yaml" --integrity --schema >/dev/null 2>&1 || rc=$?
+    [ "${rc}" -eq 0 ] || bad="${bad} ${f}(rc=${rc})"
+  done
+  if [ -z "${bad}" ]; then record_pass "kg-radar-contract: (f) as fixtures do vendor passam em --integrity --schema"
+  else record_fail "kg-radar-contract: (f) integridade" "${bad}"; fi
+
+  # (g) LEITURA POSICIONAL: `method: testemunho:` FORA do bloco provenance (num mapa x_ ao lado) não
+  # é a base do nó — não avisa. E a `source:` de um mapa x_ não vale como origem da decisão.
+  mut="$(mktemp -d)"
+  printf '%s\n' 'meta:' '  schema_version: "1"' '  id: pos' 'nodes:' \
+    '  - id: Q_A' '    node_type: question' '    plane: DEV' '    status: open' '    impact: 3' '    confidence: 0.5' '    label: "Q."' \
+    '  - id: EV_A' '    node_type: evidence' '    plane: PROD' '    status: confirmed' '    impact: 3' '    confidence: 0.9' \
+    '    verified_at: "2026-10-08"' '    verified_against: "medição sintética"' '    label: "EV."' \
+    '    x_nota:' '      method: "testemunho: fora do bloco"' \
+    '    provenance:' '      source: "medição sintética"' '      locator: "caso"' '      method: "medição: caso"' \
+    '  - id: D_A' '    node_type: decision' '    plane: DEV' '    status: open' '    impact: 3' '    confidence: 0.9' '    label: "D."' \
+    '    x_nota:' '      source: "não é provenance"' \
+    'edges:' '  - from: EV_A' '    to: Q_A' '    edge_type: SUPPORTS' '  - from: D_A' '    to: Q_A' '    edge_type: SUPPORTS' \
+    > "${mut}/pos.kg.yaml"
+  rc=0; out=$(LC_ALL=C bash "${radar}" "${mut}/pos.kg.yaml" --freshness --provenance 2>&1) || rc=$?
+  if [ "${rc}" -eq 0 ] && ! grep -q 'MISPLANED' <<< "${out}" && grep -q 'decisão-sem-proveniência: D_A' <<< "${out}"; then
+    record_pass "kg-radar-contract: (g) method/source fora do bloco provenance não contam (leitura posicional)"
+  else record_fail "kg-radar-contract: (g) posicional" "rc=${rc} out=${out}"; fi
+
+  # (h) (MUT) cura 1 desligada: o radar volta a ler só o evidence_class → (a) tem de reprovar.
+  cp "${radar}" "${mut}/mut-tm.sh"; _lib_beside "${mut}"
+  sed -i 's|provMethod\[id\] ~ /^testemunho:/|provMethod[id] ~ /^MUTANTE_NUNCA:/|' "${mut}/mut-tm.sh"
+  if grep -q 'MUTANTE_NUNCA' "${mut}/mut-tm.sh"; then
+    out="$(LC_ALL=C bash "${mut}/mut-tm.sh" "${cx}/warn-testimony-method-in-prod.kg.yaml" --freshness 2>&1 || true)"
+    if ! grep -q 'MISPLANED: EV_A' <<< "${out}"; then
+      record_pass "kg-radar-contract: (h) (MUT) sem a leitura do method, o caso (a) cala — o teste morde"
+    else record_fail "kg-radar-contract: (h) (MUT)" "o mutante ainda avisa; out=${out}"; fi
+  else record_fail "kg-radar-contract: (h) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+
+  # (i) (MUT) cura 2 desligada: provenance deixa de valer como origem → (d) tem de reprovar.
+  cp "${radar}" "${mut}/mut-dp.sh"
+  sed -i 's| \&\& provSource\[id\] == ""||' "${mut}/mut-dp.sh"
+  if ! grep -q 'provSource\[id\] == ""' "${mut}/mut-dp.sh"; then
+    out="$(LC_ALL=C bash "${mut}/mut-dp.sh" "${cx}/valid-decision-with-provenance.kg.yaml" --provenance 2>&1 || true)"
+    if grep -q 'decisão-sem-proveniência: D_A' <<< "${out}"; then
+      record_pass "kg-radar-contract: (i) (MUT) sem a provenance como origem, o caso (d) volta a cobrar — o teste morde"
+    else record_fail "kg-radar-contract: (i) (MUT)" "o mutante não cobrou; out=${out}"; fi
+  else record_fail "kg-radar-contract: (i) (MUT)" "a mutação NÃO foi aplicada — o teste não prova nada"; fi
+  rm -rf "${mut}"
+}
+
+# ---------------------------------------------------------------------------
 # Modo kg-label-collision — CONTEÚDO não é CONFIGURAÇÃO. O parser do kg-radar.sh é line-based;
 # antes da âncora `^[[:space:]]*<campo>:`, um label que CITASSE um token de campo era lido como
 # valor daquele campo e REPROVAVA um grafo correto. Sinal de campo da estrela onion-pessoal-app
@@ -15966,6 +16065,9 @@ _family run_kg_freshness_selftests
 
 # Modo kg-provenance — guarda de proveniência de decisão (ITEM2).
 _family run_kg_provenance_selftests
+
+# Modo kg-radar-contract — o radar contra a matriz de coerência do vendor kg-ssot (SAC-96).
+_family run_kg_radar_contract_selftests
 
 # Modo reconcile — o ⚠ de alvo de SUPERSEDES não reconciliado (primeiro teste do bloco)
 _family run_kg_reconcile_selftests

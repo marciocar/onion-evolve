@@ -32,7 +32,8 @@
 #                     RULE-sem-trace · fonte-única (>1 READS saindo — ADR design-extends-kg)
 #   PROVENIÊNCIA    = decisão ancorada em origem (⚠ atenção, NÃO reprova — completude da camada
 #                     audit): decisão VIVA sem NENHUMA proveniência (nem aresta TRACES_TO nem
-#                     campo `trace:` inline `arquivo:linha`). Reconciliada (superseded/refuted)
+#                     campo `trace:` inline `arquivo:linha`, nem `provenance.source` — contrato
+#                     v4.1, SAC-96). Reconciliada (superseded/refuted)
 #                     é história — não cobrada (mesmo racional do FRESCOR).
 #   FRESCOR         = frescor da SSOT (⚠ atenção, NÃO reprova — nó stale mente, não corrompe):
 #                     STALE-MISSING (nó plane:PROD sem verified_at:) · STALE-OLD (verified_at
@@ -40,7 +41,9 @@
 #                     mas SEM verified_against: — carimbo sem alvo declarado; os demais tipos
 #                     ancoram por trace:/TRACES_TO e não são cobrados) · MISPLANED (plane:PROD
 #                     com verified_against: branch|commit — o nó afirma sobre o VIVO e declara
-#                     ter olhado a FONTE; contradição interna, vale p/ TODOS os tipos).
+#                     ter olhado a FONTE; contradição interna, vale p/ TODOS os tipos), e
+#                     plane:PROD com base em relato (`evidence_class: testimony` ou
+#                     `provenance.method: testemunho: …` — contrato v4.1, SAC-96).
 #                     Determinístico: compara duas datas / dois campos do arquivo, sem "agora"
 #                     (ADR onion-adr-kg-freshness-gate, proposta #2 (dogfood de campo)).
 #   SCHEMA          = versão de schema (✗ REPROVA na divergência — radar não sabe ler o arquivo):
@@ -232,6 +235,7 @@ section == "nodes" && /^[[:space:]]+- id:/ {
   # Indentação dos CAMPOS deste nó = a do traço + 2 (é onde o `id:` vive). Só chave nesta coluna
   # conta como chave do nó: texto de bloco (`>-`) e mapas aninhados ficam mais à direita.
   match($0, /-/); fieldIndent = RSTART + 1
+  inProv = 0; provIndent = -1
   next
 }
 section == "nodes" && nid != "" {
@@ -248,6 +252,25 @@ section == "nodes" && nid != "" {
       _k = substr($0, _ind + 1); sub(/:.*/, "", _k)
       if ((nid "|" _k) in nodeKeySeen) { if (!((nid "|" _k) in dupKey)) dupKey[nid "|" _k] = "linhas " nodeKeySeen[nid "|" _k] " e " NR }
       else nodeKeySeen[nid "|" _k] = NR
+    }
+  }
+  # ── PROVENANCE (bloco ANINHADO, contrato v4.1 — SAC-96, 2026-10-09) ─────────────────────────────
+  # O contrato lê dois campos de dentro do bloco que este radar ignorava: `provenance.method` da
+  # classe `testemunho:` em PROD alerta integrity.testimony-in-prod (aqui: MISPLANED), e a decision
+  # com `provenance` já tem origem (não alerta integrity.untraced-decision). Os dois avisos do radar
+  # liam só `evidence_class` e `trace:`/TRACES_TO, e divergiam do contrato em ~256 nós e 9 decisões.
+  # Leitura POSICIONAL, como a chave repetida acima: o bloco abre com `provenance:` SEM valor na
+  # coluna dos campos do nó, e só vale chave na coluna do 1º filho. Um `method:` em outro mapa
+  # aninhado, ou num texto de bloco, fica de fora. Lê de $0 (não de `line`): a fonte pode ter `#`.
+  if ($0 !~ /^[[:space:]]*$/) {
+    _pi = match($0, /[^ ]/) - 1
+    if (_pi <= fieldIndent) { inProv = (_pi == fieldIndent && line ~ /^ *provenance:[[:space:]]*$/); provIndent = -1 }
+    else if (inProv) {
+      if (provIndent < 0) provIndent = _pi
+      if (_pi == provIndent) {
+        if ($0 ~ /^ *source:/) { v = $0; sub(/^ *source:/, "", v); provSource[nid] = trim(v) }
+        if ($0 ~ /^ *method:/) { v = $0; sub(/^ *method:/, "", v); provMethod[nid] = trim(v) }
+      }
     }
   }
   # ── CAMPO SÓ EM POSIÇÃO DE CAMPO (âncora ^[[:space:]]*<campo>:) ──────────────────────────────
@@ -901,8 +924,11 @@ END {
       # 2026-07-17). A guarda mira a decisão VIVA sem chão.
       if (nstatus[id] == "superseded" || nstatus[id] == "refuted") continue
       ndec++
-      if (traceOut[id] == 0 && traceInline[id] == "") {
-        print "  ⚠ decisão-sem-proveniência: " id " (sem aresta TRACES_TO nem campo trace: inline — origem não ancorada)"; pwarns++
+      # A `provenance` estruturada (source não vazio) também é origem — é o que o contrato v4.1 diz
+      # em integrity.untraced-decision ("sem trace, sem provenance e sem TRACES_TO"). Antes do
+      # SAC-96 (2026-10-09) o radar cobrava 9 decisões de 4 grafos que já declaravam a fonte.
+      if (traceOut[id] == 0 && traceInline[id] == "" && provSource[id] == "") {
+        print "  ⚠ decisão-sem-proveniência: " id " (sem aresta TRACES_TO, sem campo trace: inline e sem provenance.source — origem não ancorada)"; pwarns++
       }
     }
     if (ndec == 0) print "  (nenhuma decisão viva no grafo — nada a verificar)"
@@ -994,6 +1020,14 @@ END {
       # artefato vivo"; relato não cruza com artefato nenhum.
       if (eclass[id] == "testimony" && plane[id] == "PROD") {
         print "  ⚠ MISPLANED: " id " (plane:PROD mas evidence_class: testimony — relato não é artefato vivo; reclassifique para plane:DEV)"; fwarns++
+      }
+      # A MESMA contradição declarada pelo OUTRO campo (contrato v4.1, integrity.testimony-in-prod):
+      # `provenance.method` da classe `testemunho:` diz que a base do nó é relato. Até o SAC-96
+      # (2026-10-09) o radar só via o `evidence_class`, e ~125 nós PROD com método de testemunho
+      # passavam calados enquanto o contrato os acusava. `else`: um nó com os DOIS marcadores é UM
+      # aviso, não dois.
+      else if (plane[id] == "PROD" && provMethod[id] ~ /^testemunho:/) {
+        print "  ⚠ MISPLANED: " id " (plane:PROD mas provenance.method: testemunho — relato não é artefato vivo; reclassifique para plane:DEV)"; fwarns++
       }
       # MISPLANED — CONTRADIÇÃO INTERNA ao próprio nó, e vale para TODOS os tipos.
       # `plane: PROD` afirma "cruzei com o ARTEFATO VIVO"; `verified_against: branch|commit`
