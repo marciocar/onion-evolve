@@ -1,0 +1,55 @@
+# Onda O6 (SAC-73), proponente — nós NOVOS propostos. NÃO aplicados: o juiz refuta e o maestro sela.
+# Destino: docs/evolution/research/librechat-2026-08/librechat-2026-08.kg.yaml (o grafo do nó que este
+# supersede; o meta dele não declara teto). Forma do contrato v4: provenance com source/locator/method,
+# method numa classe do contrato, locality no vocabulário, data entre aspas.
+#
+# Convenção (a) do selo: a medição foi feita no serviço (o host), então a SOURCE descreve a medição e o
+# código (o compose que fixa os mem_limit) vai no LOCATOR.
+#
+# Medido por mim em 2026-10-09T23:13Z, na própria VPS (saída verbatim resumida no verified_against):
+#   free -m                → Mem total 32094, used 7818, free 1526, buff/cache 23428, available 24276 (MiB)
+#                            Swap total 8191, used 3592, free 4599 (MiB)
+#   swapon --show          → /swapfile file 8G 3.5G -2
+#   docker inspect --format '{{.Name}} mem={{.HostConfig.Memory}}' <os 6 containers>
+#                          → librechat 1073741824 · rag 1073741824 · vectordb, mongo, meilisearch, admin 536870912
+#   docker stats --no-stream --format '{{.Name}} {{.MemUsage}} {{.MemPerc}}' <os 6 containers>
+#                          → librechat 206.6MiB · rag 13.48MiB · vectordb 38.38MiB · mongo 196.8MiB
+#                            · meilisearch 39.37MiB · admin 10.42MiB  (soma 505 MiB)
+#   docker stats --no-stream (todos)  → 34 containers, ~3004 MiB somados
+# O juiz da O5 mediu às 22:21Z do mesmo dia: available 24169 MiB e swap 3,5G/8G. Bate.
+
+nodes:
+  - id: E_HEADROOM_RAM_MEDIDO_1009
+    node_type: evidence
+    layer: audit
+    plane: PROD
+    impact: 4
+    confidence: 0.95
+    status: confirmed
+    verified_at: "2026-10-09"
+    valid_from: "2026-10-09"
+    verified_against: "free -m e swapon --show na VPS em 2026-10-09T23:13Z: RAM available 24276 de 32094 MiB (buff/cache 23428), swap 3592 de 8191 MiB (/swapfile 8G, 3.5G usados); docker inspect HostConfig.Memory: onion-vps-librechat e -rag 1073741824, -vectordb, -mongo, -meilisearch e -admin 536870912; docker stats --no-stream: 505 MiB somados nos 6 containers do stack, ~3004 MiB nos 34 containers do host"
+    label: "Medido em 2026-10-09: a VPS tem 23,7 GiB de RAM disponível de 31,3 GiB e o swap em 3,5 de 8 GiB (44%). O stack do LibreChat segue com mem_limit nos 6 containers (api e rag 1g; vectordb, mongo, meili e admin 512m) e usa 505 MiB. O headroom não está apertado hoje."
+    narrative: "Reconcilia E_HEADROOM_SWAP_100 (2026-08-20), que dizia no presente que o headroom de RAM É apertado, com o swap já tendo estado em 100%. Em 08-20 o aperto tinha causa nomeada no próprio nó: 2 servidores do VS Code (~3,5G) e ~7 processos claude (~6G). Hoje, com o mesmo host, há 23,7 GiB disponíveis e o swap está em 44%, então o claim do presente não se sustenta e o nó antigo vira histórico (superseded, em DEV). O que se mantém é a CONSEQUÊNCIA de desenho: os mem_limit do compose estão em vigor, com os mesmos valores, mais o container admin, que entrou depois com 512m. O passado (swap a 100% em agosto) não se re-mede e fica no nó antigo. A medição é um instante: o headroom muda com o número de sessões no host, por isso o verified_at manda e o /meta:kg-freshness é o caminho de revisitar."
+    provenance:
+      source: "medição da VPS em 2026-10-09T23:13Z: free -m, swapon --show e, nos 6 containers do LibreChat, docker inspect e docker stats --no-stream"
+      locator: "saídas resumidas no verified_against (RAM available 24276/32094 MiB; swap 3592/8191 MiB; mem_limit por container; uso 505 MiB); o compose que fixa os mem_limit: onion-vps-librechat@7338dcb:docker-compose.yml l.6, l.16, l.82, l.100, l.119, l.137 (repo local sem remoto alcançável, host)"
+      method: "medição: free -m; swapon --show; docker inspect --format '{{.Name}} mem={{.HostConfig.Memory}}' e docker stats --no-stream --format '{{.Name}} {{.MemUsage}} {{.MemPerc}}' sobre onion-vps-librechat, -rag, -vectordb, -mongo, -meilisearch e -admin, em 2026-10-09"
+      locality: "host"
+
+edges:
+  - from: E_HEADROOM_RAM_MEDIDO_1009
+    to: E_HEADROOM_SWAP_100
+    edge_type: SUPERSEDES
+
+# Mudança no nó ANTIGO, que acompanha (linha HEADROOM do o6-proposta.csv):
+#   E_HEADROOM_SWAP_100: status confirmed → superseded; plane DEV (já desde a O5, dev-historia); o resto intocado.
+#
+# NÃO proposto, para o maestro decidir: a aresta E_HEADROOM_SWAP_100 CONSTRAINS D_STACK_PADRAO_ONION_VPS
+# fica com o histórico. Se a restrição deve seguir valendo no presente, ela passa para o nó novo
+# (E_HEADROOM_RAM_MEDIDO_1009 CONSTRAINS D_STACK_PADRAO_ONION_VPS) — mas o que o nó novo sustenta é
+# "os mem_limit estão em vigor", não "o headroom é apertado", e a aresta mudaria de sentido.
+#
+# Nota sobre os line numbers do compose no locator: são os que o nó antigo já citava em 7338dcb. Não os
+# reli nesta onda: o repo onion-vps-librechat não tem remoto, e o isolamento desta sessão não deixa rodar
+# git fora da worktree. Os mem_limit em si foram medidos no serviço (docker inspect), que é a base do claim.
