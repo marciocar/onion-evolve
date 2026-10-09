@@ -2,11 +2,10 @@
 title: 'Resíduo — o pr-merge-verified recusa o rebase quando o .kg.yaml cita commit da própria branch'
 date: 2026-10-09
 branch: fix/merge-verified-kg-provenance
-reviewed_diff_sha256: 8dec10d0a8b15718528607f0016f6df1269569f1ce3a99b3d99bdb9ffa3b409d
-reviewed_code_sha256: 75ae36ac0eaf242eaea6ca5a866d518438b026aa7a7582aad561a9e0d754a84d
-findings_total: 3
-findings_real: 1
-findings_fixed: 1
+reviewed_diff_sha256: pendente
+findings_total: 4
+findings_real: 2
+findings_fixed: 2
 tokens: 0
 duration_min: 50
 verdict: CORRIGIDO
@@ -37,7 +36,13 @@ nota: >-
   method: ao lado do source: não vaza para a extração (kg-c). Achado real e curado no mesmo PR: o
   auto-rebase do SAC-78 rebaseava a branch de PR CONFLICTING, o que reescreve o commit citado mesmo
   com --merge-commit; agora o auto-rebase para com mensagem nomeada quando há sha da branch citado
-  (kg-f). Tetos declarados: linha de block scalar (narrative: |) que comece com "source:" e cite
+  (kg-f). Segundo achado real, medido pelo CI (faixa 4 da bancada): a família merge_dispensa tem um
+  dublê de gh fail-loud que não previa a leitura dos arquivos do PR, e a guarda nova, fail-closed
+  nessa leitura, matava os casos (a)(b)(c)(f) dela. A guarda está certa e o dublê estava incompleto
+  ([[fail-closed-exposes-incomplete-harness]]): o dublê passou a responder um PR sem .kg.yaml, e as
+  famílias merge_dispensa e pr_merge_verified rodaram 43 de 43 com LC_ALL=C. Eu tinha rodado só a
+  família pr_merge_verified antes do push, e a outra família que executa o mesmo SUT ficou de fora.
+  Tetos declarados: linha de block scalar (narrative: |) que comece com "source:" e cite
   commit real fora da base dispara (só recusa, com a saída --merge-commit); sha curto ambíguo,
   maiúsculo, ou citado por URL sem @ fica fora; o texto diz "própria branch" também para commit de
   outra branch não mergeada, que é igualmente provenance fora da main; com .kg.yaml no PR a guarda é
